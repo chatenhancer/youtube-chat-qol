@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!--
+      Extension action popup.
+      This offers an out-of-chat settings surface for users who prefer Chrome's
+      toolbar popup over YouTube's injected live-chat settings menu.
+    -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Chat Enhancer for YouTube</title>
+    <link rel="stylesheet" href="popup.css">
+  </head>
+  <body>
+    <main>
+      <h1 class="brand">
+        <img src="logo.png" alt="Chat Enhancer for YouTube">
+      </h1>
+
+      <label class="field">
+        <span>Translate to</span>
+        <select id="targetLanguage"></select>
+      </label>
+
+      <label class="field">
+        <span>Translation display</span>
+        <select id="translationDisplay">
+          <option value="replace">Replace message</option>
+          <option value="below">Show below</option>
+        </select>
+      </label>
+
+      <label class="field">
+        <span>Quote length</span>
+        <input id="quoteMaxLength" type="number" min="40" max="240" step="10">
+      </label>
+
+      <label class="row">
+        <input id="openProfilesInPopup" type="checkbox">
+        <span>Open avatars in a popup window</span>
+      </label>
+
+      <label class="row">
+        <input id="mentionSound" type="checkbox">
+        <span>Play a sound when mentioned</span>
+      </label>
+
+      <p class="hint">These options also appear in YouTube's live chat settings menu. Mention and Quote appear in each message's chat actions menu.</p>
+    </main>
+    <script src="popup.js"></script>
+  </body>
+</html>

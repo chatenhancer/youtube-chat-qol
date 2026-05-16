@@ -1,0 +1,67 @@
+/*
+ * Extension action popup styles.
+ *
+ * The popup is intentionally plain and light-themed because it sits outside
+ * YouTube's chat iframe and mainly mirrors settings already available there.
+ */
+:root {
+  color-scheme: light;
+  font-family: Roboto, Arial, sans-serif;
+}
+
+body {
+  width: 280px;
+  margin: 0;
+  color: #0f0f0f;
+  background: #ffffff;
+}
+
+main {
+  padding: 16px;
+}
+
+.brand {
+  margin: 0 0 18px;
+}
+
+.brand img {
+  display: block;
+  width: 147px;
+  height: 50px;
+}
+
+.row,
+.field {
+  display: flex;
+  gap: 10px;
+  margin: 12px 0;
+  font-size: 13px;
+}
+
+.row {
+  align-items: center;
+}
+
+.field {
+  flex-direction: column;
+  gap: 6px;
+}
+
+input,
+select {
+  font: inherit;
+}
+
+select,
+input[type="number"] {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 30px;
+}
+
+.hint {
+  margin: 14px 0 0;
+  color: #606060;
+  font-size: 12px;
+  line-height: 16px;
+}

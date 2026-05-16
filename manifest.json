@@ -1,0 +1,48 @@
+{
+  "manifest_version": 3,
+  "name": "Chat Enhancer for YouTube",
+  "short_name": "Chat Enhancer",
+  "version": "0.1.0",
+  "description": "Lightweight translation, reply, profile, and emoji tools for YouTube live chat.",
+  "icons": {
+    "16": "dist/extension/icons/icon-16.png",
+    "32": "dist/extension/icons/icon-32.png",
+    "48": "dist/extension/icons/icon-48.png",
+    "128": "dist/extension/icons/icon-128.png"
+  },
+  "permissions": ["storage"],
+  "host_permissions": [
+    "https://www.youtube.com/live_chat*",
+    "https://www.youtube.com/live_chat_replay*",
+    "https://studio.youtube.com/live_chat*",
+    "https://studio.youtube.com/live_chat_replay*",
+    "https://translate.googleapis.com/*"
+  ],
+  "background": {
+    "service_worker": "dist/extension/background.js"
+  },
+  "action": {
+    "default_title": "Chat Enhancer for YouTube",
+    "default_popup": "dist/extension/popup.html",
+    "default_icon": {
+      "16": "dist/extension/icons/icon-16.png",
+      "32": "dist/extension/icons/icon-32.png",
+      "48": "dist/extension/icons/icon-48.png",
+      "128": "dist/extension/icons/icon-128.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.youtube.com/live_chat*",
+        "https://www.youtube.com/live_chat_replay*",
+        "https://studio.youtube.com/live_chat*",
+        "https://studio.youtube.com/live_chat_replay*"
+      ],
+      "js": ["dist/extension/content.js"],
+      "css": ["dist/extension/content.css"],
+      "run_at": "document_idle",
+      "all_frames": true
+    }
+  ]
+}
