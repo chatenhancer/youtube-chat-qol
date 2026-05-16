@@ -32,11 +32,7 @@ Not affiliated with YouTube or Google.
 
 ## Screenshots
 
-![Translation settings and translated chat messages](assets/screenshots/1_screenshot_translation.png)
-
-![Mention and quote actions](assets/screenshots/2_screenshot_mentions.png)
-
-![Recent user messages and frequent emoji row](assets/screenshots/3_screenshot_extras.png)
+![Chat Enhancer for YouTube screenshots](assets/screenshots/readme-showcase.png)
 
 ## Development
 
