@@ -1,0 +1,20 @@
+/**
+ * Lightweight in-chat toast feedback.
+ *
+ * Used for actions such as Mention and Quote where the user needs confirmation
+ * but a persistent UI element would be too disruptive.
+ */
+let toastTimer = 0;
+
+export function showToast(message: string): void {
+  let toast = document.querySelector<HTMLElement>('.ytcq-toast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.className = 'ytcq-toast';
+    document.documentElement.appendChild(toast);
+  }
+
+  toast.textContent = message;
+  window.clearTimeout(toastTimer);
+  toastTimer = window.setTimeout(() => toast.remove(), 2400);
+}

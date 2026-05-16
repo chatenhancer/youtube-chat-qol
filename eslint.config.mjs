@@ -1,0 +1,40 @@
+import js from '@eslint/js';
+import globals from 'globals';
+import tseslint from 'typescript-eslint';
+
+export default [
+  {
+    ignores: ['dist/**', 'node_modules/**']
+  },
+  {
+    files: ['src/**/*.ts'],
+    languageOptions: {
+      parser: tseslint.parser,
+      parserOptions: {
+        projectService: true,
+        tsconfigRootDir: import.meta.dirname
+      },
+      globals: {
+        ...globals.browser,
+        chrome: 'readonly'
+      }
+    },
+    plugins: {
+      '@typescript-eslint': tseslint.plugin
+    },
+    rules: {
+      ...js.configs.recommended.rules,
+      ...tseslint.configs.recommended.rules,
+      'no-unused-vars': 'off',
+      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+      '@typescript-eslint/no-explicit-any': 'off'
+    }
+  },
+  {
+    files: ['scripts/**/*.mjs', 'eslint.config.mjs'],
+    languageOptions: {
+      globals: globals.node
+    },
+    rules: js.configs.recommended.rules
+  }
+];
