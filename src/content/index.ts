@@ -13,7 +13,7 @@ import { configureSettingsMenu, refreshSettingsMenus } from '../features/menus/s
 import { handlePotentialMentionsInbox, initMentionsInbox, scheduleMentionsInboxButtonWire } from '../features/mentionsInbox';
 import { handlePotentialMention, initMentionSound } from '../features/mentionSound';
 import { wireProfileClick } from '../features/profilePopup';
-import { handleShiftClickMention } from '../features/reply';
+import { handleShiftClickMention, wireAuthorNameMention } from '../features/reply';
 import {
   clearTranslations,
   getRetroactiveTranslationMessages,
@@ -153,6 +153,7 @@ function enhanceMessage(message: HTMLElement, { allowTranslate }: { allowTransla
   recordUserMessage(message);
   wireMessageContext(message);
   wireProfileClick(message);
+  wireAuthorNameMention(message);
 
   if (allowTranslate) {
     handlePotentialMention(message);

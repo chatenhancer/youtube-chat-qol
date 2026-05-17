@@ -2,8 +2,9 @@
  * Reply insertion helpers.
  *
  * Mention and Quote insert plain text into YouTube's native chat input.
- * Shift-clicking a message is also treated as a quick Mention shortcut while
- * normal clicks remain available for YouTube's own message UI.
+ * Clicking an author name or shift-clicking a message is also treated as a
+ * quick Mention shortcut while normal message clicks remain available for
+ * YouTube's own message UI.
  */
 import { getOptions } from '../shared/state';
 import { cleanText } from '../shared/text';
@@ -24,6 +25,24 @@ export function handleShiftClickMention(event: MouseEvent): void {
   event.stopPropagation();
   event.stopImmediatePropagation?.();
   replyToMessage(message, { quote: false });
+}
+
+export function wireAuthorNameMention(message: HTMLElement): void {
+  if (message.dataset.ytcqAuthorMentionWired === 'true') return;
+  message.dataset.ytcqAuthorMentionWired = 'true';
+
+  const authorName = message.querySelector<HTMLElement>('#author-name');
+  if (!authorName) return;
+
+  authorName.title = 'Mention user';
+  authorName.addEventListener('click', (event) => {
+    if (event.defaultPrevented || event.button !== 0) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+    event.stopImmediatePropagation?.();
+    replyToMessage(message, { quote: false });
+  }, true);
 }
 
 export function replyToMessage(message: HTMLElement, { quote }: { quote: boolean }): void {
