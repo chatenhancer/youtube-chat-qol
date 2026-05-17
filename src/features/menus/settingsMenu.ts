@@ -3,21 +3,12 @@
  *
  * Adds extension controls into YouTube's existing chat settings popup instead
  * of building a separate in-chat settings surface. Native selects are used for
- * language/display choices because they stay compact across themes.
+ * language choices because they stay compact across themes.
  */
 import { LANGUAGE_OPTIONS } from '../../shared/languages';
-import {
-  TRANSLATION_DISPLAY_OPTIONS,
-  type Options
-} from '../../shared/options';
+import type { Options } from '../../shared/options';
 import { getOptions } from '../../shared/state';
-import {
-  getMentionsInboxLabel,
-  MENTIONS_INBOX_ICON_PATH,
-  MENTIONS_INBOX_ICON_VIEW_BOX,
-  openMentionsInboxCard
-} from '../mentionsInbox';
-import { clampMenuToViewport, closeMenu, createMenuActionItem, createMenuToggleItem, createPaperItem } from './common';
+import { clampMenuToViewport, createMenuToggleItem, createPaperItem } from './common';
 
 type SaveOptions = (values: Partial<Options>) => void;
 
@@ -35,7 +26,6 @@ export function enhanceSettingsMenu(menu: HTMLElement): void {
   prepareSettingsMenu(menu);
   list.append(
     createLanguageSelectItem(),
-    createTranslationDisplaySelectItem(),
     createMenuToggleItem({
       setting: 'mentionSound',
       label: 'Mention sound',
@@ -43,16 +33,6 @@ export function enhanceSettingsMenu(menu: HTMLElement): void {
       iconPath: 'M12 3a4 4 0 00-4 4v3.2c0 1.15-.37 2.27-1.05 3.2L5.2 15.8A1.4 1.4 0 006.33 18h11.34a1.4 1.4 0 001.13-2.2l-1.75-2.4A5.43 5.43 0 0116 10.2V7a4 4 0 00-4-4Zm0 19a3 3 0 002.83-2h-5.66A3 3 0 0012 22ZM19.7 4.3a1 1 0 00-1.4 1.4A8.92 8.92 0 0121 12a1 1 0 102 0 10.9 10.9 0 00-3.3-7.7ZM5.7 5.7a1 1 0 00-1.4-1.4A10.9 10.9 0 001 12a1 1 0 102 0 8.92 8.92 0 012.7-6.3Z',
       onClick: () => {
         saveOptions({ mentionSound: !getOptions().mentionSound });
-      }
-    }),
-    createMenuActionItem({
-      setting: 'mentionsInbox',
-      label: getMentionsInboxLabel(),
-      iconPath: MENTIONS_INBOX_ICON_PATH,
-      iconViewBox: MENTIONS_INBOX_ICON_VIEW_BOX,
-      onClick: () => {
-        openMentionsInboxCard(menu);
-        closeMenu();
       }
     })
   );
@@ -71,15 +51,9 @@ export function refreshSettingsMenus(): void {
       label.textContent = 'Translate to';
       const select = item.querySelector<HTMLSelectElement>('.ytcq-menu-select');
       if (select) select.value = options.targetLanguage;
-    } else if (setting === 'translationDisplay') {
-      label.textContent = 'Translation display';
-      const select = item.querySelector<HTMLSelectElement>('.ytcq-menu-select');
-      if (select) select.value = options.translationDisplay;
     } else if (setting === 'mentionSound') {
       label.textContent = 'Mention sound';
       item.setAttribute('aria-checked', String(options.mentionSound));
-    } else if (setting === 'mentionsInbox') {
-      label.textContent = getMentionsInboxLabel();
     }
   });
 }
@@ -118,38 +92,6 @@ function createLanguageSelectItem(): HTMLElement {
   select.addEventListener('change', (event) => {
     event.stopPropagation();
     saveOptions({ targetLanguage: select.value });
-  });
-
-  stopMenuPropagation(select);
-  item.querySelector('.ytcq-paper-item')?.appendChild(select);
-  return item;
-}
-
-function createTranslationDisplaySelectItem(): HTMLElement {
-  const options = getOptions();
-  const item = document.createElement('div');
-  item.className = 'style-scope ytd-menu-popup-renderer ytcq-settings-item ytcq-select-item';
-  item.setAttribute('system-icons', '');
-  item.setAttribute('role', 'menuitem');
-  item.setAttribute('use-icons', '');
-  item.setAttribute('tabindex', '-1');
-  item.setAttribute('aria-selected', 'false');
-  item.setAttribute('data-ytcq-setting', 'translationDisplay');
-  item.appendChild(createPaperItem({
-    label: 'Translation display',
-    iconPath: 'M4 4h16a2 2 0 012 2v9a2 2 0 01-2 2h-5.2l-4.1 3.3A1 1 0 019 19.5V17H4a2 2 0 01-2-2V6a2 2 0 012-2Zm0 2v9h7v2.42L14.1 15H20V6H4Zm2 2h12v2H6V8Zm0 4h8v2H6v-2Z'
-  }));
-
-  const select = document.createElement('select');
-  select.className = 'ytcq-menu-select';
-  select.setAttribute('aria-label', 'Translation display');
-  for (const [value, label] of TRANSLATION_DISPLAY_OPTIONS) {
-    select.appendChild(createSelectOption(value, label));
-  }
-  select.value = options.translationDisplay;
-  select.addEventListener('change', (event) => {
-    event.stopPropagation();
-    saveOptions({ translationDisplay: select.value as Options['translationDisplay'] });
   });
 
   stopMenuPropagation(select);
