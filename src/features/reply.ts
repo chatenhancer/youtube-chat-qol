@@ -2,30 +2,15 @@
  * Reply insertion helpers.
  *
  * Mention and Quote insert plain text into YouTube's native chat input.
- * Clicking an author name or shift-clicking a message is also treated as a
- * quick Mention shortcut while normal message clicks remain available for
- * YouTube's own message UI.
+ * Clicking an author name is a quick Mention shortcut. Alt/Option-clicking an
+ * author name quotes that message while normal message clicks remain available
+ * for YouTube's own message UI.
  */
 import { getOptions } from '../shared/state';
 import { cleanText } from '../shared/text';
 import { showToast } from '../shared/toast';
 import { insertIntoChatInput } from '../youtube/chatInput';
 import { getMessageDetails } from '../youtube/messages';
-import { CHAT_MESSAGE_SELECTOR } from '../youtube/selectors';
-
-export function handleShiftClickMention(event: MouseEvent): void {
-  if (!event.shiftKey || event.defaultPrevented) return;
-  if (event.button !== 0) return;
-
-  const target = event.target instanceof Element ? event.target : null;
-  const message = target?.closest<HTMLElement>(CHAT_MESSAGE_SELECTOR);
-  if (!message || !target || shouldIgnoreShiftClickMention(target)) return;
-
-  event.preventDefault();
-  event.stopPropagation();
-  event.stopImmediatePropagation?.();
-  replyToMessage(message, { quote: false });
-}
 
 export function wireAuthorNameMention(message: HTMLElement): void {
   if (message.dataset.ytcqAuthorMentionWired === 'true') return;
@@ -34,14 +19,14 @@ export function wireAuthorNameMention(message: HTMLElement): void {
   const authorName = message.querySelector<HTMLElement>('#author-name');
   if (!authorName) return;
 
-  authorName.title = 'Mention user';
+  authorName.title = 'Mention user. Alt/Option-click to quote.';
   authorName.addEventListener('click', (event) => {
     if (event.defaultPrevented || event.button !== 0) return;
 
     event.preventDefault();
     event.stopPropagation();
     event.stopImmediatePropagation?.();
-    replyToMessage(message, { quote: false });
+    replyToMessage(message, { quote: event.altKey });
   }, true);
 }
 
@@ -95,22 +80,6 @@ function insertMentionText(text: string): void {
   if (!insertIntoChatInput(text)) {
     showToast('Could not find the chat input.');
   }
-}
-
-function shouldIgnoreShiftClickMention(target: Element): boolean {
-  return Boolean(target.closest([
-    'a',
-    'button',
-    'input',
-    'textarea',
-    'select',
-    '[contenteditable]',
-    '#menu',
-    'ytd-menu-popup-renderer',
-    '.ytcq-translation',
-    '.ytcq-replaced-translation-icon',
-    '.ytcq-frequent-emoji-row'
-  ].join(',')));
 }
 
 function truncateForQuote(text: string): string {

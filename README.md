@@ -18,7 +18,7 @@ Not affiliated with YouTube or Google.
 ### Replying
 
 - Add `Mention` and `Quote` actions to YouTube's existing message menu.
-- Shift-click a chat message to mention its author.
+- Click an author name to mention them, or Alt/Option-click it to quote that message.
 
 ### Social Context
 
