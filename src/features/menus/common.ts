@@ -10,12 +10,14 @@ interface MenuActionItemOptions {
   setting?: string;
   label: string;
   iconPath: string;
+  iconViewBox?: string;
   onClick: () => void;
 }
 
 interface PaperItemOptions {
   label: string;
   iconPath: string;
+  iconViewBox?: string;
 }
 
 export function createMenuActionItem({
@@ -23,6 +25,7 @@ export function createMenuActionItem({
   setting = '',
   label,
   iconPath,
+  iconViewBox,
   onClick
 }: MenuActionItemOptions): HTMLElement {
   const item = document.createElement('div');
@@ -33,7 +36,7 @@ export function createMenuActionItem({
   item.setAttribute('tabindex', '-1');
   item.setAttribute('aria-selected', 'false');
   if (setting) item.setAttribute('data-ytcq-setting', setting);
-  item.appendChild(createPaperItem({ label, iconPath }));
+  item.appendChild(createPaperItem({ label, iconPath, iconViewBox }));
   wireMenuItemClick(item, onClick);
   return item;
 }
@@ -66,7 +69,7 @@ export function createMenuToggleItem({
   return item;
 }
 
-export function createPaperItem({ label, iconPath }: PaperItemOptions): HTMLElement {
+export function createPaperItem({ label, iconPath, iconViewBox }: PaperItemOptions): HTMLElement {
   const paperItem = document.createElement('div');
   paperItem.className = 'ytcq-paper-item';
   paperItem.setAttribute('role', 'option');
@@ -75,7 +78,7 @@ export function createPaperItem({ label, iconPath }: PaperItemOptions): HTMLElem
 
   const icon = document.createElement('span');
   icon.className = 'ytcq-menu-icon';
-  icon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true"><path d="${iconPath}"></path></svg>`;
+  icon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="${iconViewBox || '0 0 24 24'}" width="24" focusable="false" aria-hidden="true"><path d="${iconPath}"></path></svg>`;
 
   const text = document.createElement('span');
   text.className = 'ytcq-menu-label';

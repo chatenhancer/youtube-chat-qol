@@ -37,7 +37,21 @@ export function replyToMessage(message: HTMLElement, { quote }: { quote: boolean
     ? `${details.authorName}: "${truncateForQuote(details.text)}" `
     : `${details.authorName} `;
 
-  if (!insertIntoChatInput(prefix)) {
+  insertMentionText(prefix);
+}
+
+export function mentionAuthorName(authorName: string): void {
+  const cleanAuthorName = cleanText(authorName);
+  if (!cleanAuthorName) {
+    showToast('Could not read that user name.');
+    return;
+  }
+
+  insertMentionText(`${cleanAuthorName} `);
+}
+
+function insertMentionText(text: string): void {
+  if (!insertIntoChatInput(text)) {
     showToast('Could not find the chat input.');
   }
 }

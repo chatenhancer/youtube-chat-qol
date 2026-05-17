@@ -12,7 +12,13 @@ import {
   type Options
 } from '../../shared/options';
 import { getOptions } from '../../shared/state';
-import { clampMenuToViewport, createMenuActionItem, createMenuToggleItem, createPaperItem } from './common';
+import {
+  getMentionsInboxLabel,
+  MENTIONS_INBOX_ICON_PATH,
+  MENTIONS_INBOX_ICON_VIEW_BOX,
+  openMentionsInboxCard
+} from '../mentionsInbox';
+import { clampMenuToViewport, closeMenu, createMenuActionItem, createMenuToggleItem, createPaperItem } from './common';
 
 type SaveOptions = (values: Partial<Options>) => void;
 
@@ -56,6 +62,16 @@ export function enhanceSettingsMenu(menu: HTMLElement): void {
       onClick: () => {
         saveOptions({ mentionSound: !getOptions().mentionSound });
       }
+    }),
+    createMenuActionItem({
+      setting: 'mentionsInbox',
+      label: getMentionsInboxLabel(),
+      iconPath: MENTIONS_INBOX_ICON_PATH,
+      iconViewBox: MENTIONS_INBOX_ICON_VIEW_BOX,
+      onClick: () => {
+        openMentionsInboxCard(menu);
+        closeMenu();
+      }
     })
   );
   refreshSettingsMenus();
@@ -85,6 +101,8 @@ export function refreshSettingsMenus(): void {
     } else if (setting === 'mentionSound') {
       label.textContent = 'Mention sound';
       item.setAttribute('aria-checked', String(options.mentionSound));
+    } else if (setting === 'mentionsInbox') {
+      label.textContent = getMentionsInboxLabel();
     }
   });
 }

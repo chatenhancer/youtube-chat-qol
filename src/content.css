@@ -207,6 +207,60 @@ yt-live-chat-membership-item-renderer .ytcq-profile-enabled {
   cursor: pointer;
 }
 
+yt-live-chat-header-renderer .ytcq-mentions-inbox-button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 8px;
+  border: 0;
+  border-radius: 50%;
+  color: var(--yt-spec-icon-inactive, var(--yt-live-chat-secondary-text-color, currentColor));
+  fill: currentColor;
+  background: transparent;
+  cursor: pointer;
+  vertical-align: middle;
+}
+
+yt-live-chat-header-renderer .ytcq-mentions-inbox-button:hover,
+yt-live-chat-header-renderer .ytcq-mentions-inbox-button:focus {
+  color: var(--yt-spec-text-primary, var(--yt-live-chat-primary-text-color, currentColor));
+  background: var(--yt-spec-badge-chip-background, rgba(255, 255, 255, 0.1));
+  outline: none;
+}
+
+yt-live-chat-header-renderer .ytcq-mentions-inbox-button svg {
+  display: block;
+  width: 24px;
+  height: 24px;
+  pointer-events: none;
+}
+
+yt-live-chat-header-renderer .ytcq-mentions-inbox-button-has-unread {
+  color: var(--yt-spec-call-to-action, #3ea6ff);
+}
+
+yt-live-chat-header-renderer .ytcq-mentions-inbox-badge {
+  position: absolute;
+  top: 4px;
+  right: 3px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 8px;
+  color: #fff;
+  background: #c00;
+  font: 700 10px/16px Roboto, Arial, sans-serif;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+yt-live-chat-header-renderer .ytcq-mentions-inbox-badge[hidden] {
+  display: none;
+}
+
 .ytcq-profile-card {
   position: fixed;
   z-index: 10000;
@@ -345,6 +399,50 @@ yt-live-chat-membership-item-renderer .ytcq-profile-enabled {
   color: var(--yt-live-chat-secondary-text-color, var(--yt-spec-text-secondary, #aaa));
   cursor: default;
   opacity: 0.5;
+}
+
+.ytcq-mentions-inbox-card-header {
+  grid-template-columns: 36px minmax(0, 1fr) 28px;
+}
+
+.ytcq-mentions-inbox-card-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  color: var(--yt-spec-call-to-action, #3ea6ff);
+  fill: currentColor;
+  background: var(--yt-spec-badge-chip-background, rgba(62, 166, 255, 0.12));
+}
+
+.ytcq-mentions-inbox-card-icon svg {
+  display: block;
+  width: 22px;
+  height: 22px;
+}
+
+.ytcq-mentions-inbox-messages {
+  max-height: 300px;
+}
+
+.ytcq-mentions-inbox-author {
+  display: inline;
+  padding: 0;
+  border: 0;
+  color: inherit;
+  background: transparent;
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.ytcq-mentions-inbox-author:hover,
+.ytcq-mentions-inbox-author:focus {
+  color: var(--yt-spec-call-to-action, #3ea6ff);
+  text-decoration: underline;
+  outline: none;
 }
 
 yt-live-chat-text-message-renderer .ytcq-translation,

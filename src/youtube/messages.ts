@@ -91,6 +91,19 @@ export function getMessageRuns(message: HTMLElement): RendererRun[] | null {
     null;
 }
 
+export function getMessageTimestampText(message: HTMLElement, timestamp = Date.now()): string {
+  const youtubeTimestamp = message.querySelector('#timestamp')?.textContent;
+  if (youtubeTimestamp) {
+    const cleanTimestamp = youtubeTimestamp.replace(/\s+/g, ' ').trim();
+    if (cleanTimestamp) return cleanTimestamp;
+  }
+
+  return new Intl.DateTimeFormat(undefined, {
+    hour: 'numeric',
+    minute: '2-digit'
+  }).format(timestamp);
+}
+
 export function getTextFromRuns(runs: RendererRun[] | undefined): string {
   if (!Array.isArray(runs)) return '';
   return runs.map((run) => run.text || getEmojiTextFromRun(run) || '').join('');
