@@ -6,7 +6,7 @@
  */
 import { cleanText } from '../shared/text';
 import { getAuthorName, getMessageText, getMessageTimestampText } from '../youtube/messages';
-import { mentionAuthorName } from './reply';
+import { mentionAuthorName, quoteAuthorText } from './reply';
 import {
   initMentionDetection,
   processPotentialMentionForConsumer,
@@ -259,6 +259,10 @@ function renderMentionsInboxList(list: HTMLElement): void {
   records.forEach((record) => {
     const item = document.createElement('div');
     item.className = 'ytcq-profile-card-message ytcq-mentions-inbox-message';
+    item.title = 'Quote message';
+    item.setAttribute('role', 'button');
+    item.tabIndex = 0;
+    wireQuoteCardItem(item, record.authorName, record.text);
 
     const timestamp = document.createElement('time');
     timestamp.className = 'ytcq-profile-card-message-time';
@@ -288,6 +292,25 @@ function renderMentionsInboxList(list: HTMLElement): void {
     body.append(author, text);
     item.append(timestamp, body);
     list.append(item);
+  });
+}
+
+function wireQuoteCardItem(item: HTMLElement, authorName: string, text: string): void {
+  const quote = (event: Event): void => {
+    event.preventDefault();
+    event.stopPropagation();
+    quoteAuthorText(authorName, text);
+  };
+
+  item.addEventListener('click', (event) => {
+    if (event.target instanceof Element && event.target.closest('button')) return;
+    quote(event);
+  });
+  item.addEventListener('keydown', (event) => {
+    if (event.target instanceof Element && event.target.closest('button')) return;
+    if (event.key === 'Enter' || event.key === ' ') {
+      quote(event);
+    }
   });
 }
 

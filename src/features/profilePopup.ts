@@ -13,6 +13,7 @@ import {
   onUserMessagesChanged,
   type MessageRecord
 } from './userMessageHistory';
+import { mentionAuthorName, quoteAuthorText } from './reply';
 
 let activeProfileCard: HTMLElement | null = null;
 let activeProfileCardCleanup: (() => void) | null = null;
@@ -78,9 +79,17 @@ function showProfileCard(message: HTMLElement, anchor: HTMLElement, profileUrl: 
   const titleWrap = document.createElement('div');
   titleWrap.className = 'ytcq-profile-card-title-wrap';
 
-  const title = document.createElement('div');
-  title.className = 'ytcq-profile-card-title';
-  title.textContent = getAuthorName(message) || 'Chat user';
+  const authorName = getAuthorName(message) || 'Chat user';
+  const title = document.createElement('button');
+  title.type = 'button';
+  title.className = 'ytcq-profile-card-title ytcq-profile-card-author';
+  title.textContent = authorName;
+  title.title = 'Mention user';
+  title.addEventListener('click', (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    mentionAuthorName(authorName);
+  });
 
   const subtitle = document.createElement('div');
   subtitle.className = 'ytcq-profile-card-subtitle';
@@ -175,6 +184,10 @@ function renderProfileMessages(list: HTMLElement, recentMessages: MessageRecord[
     recentMessages.forEach((recentMessage) => {
       const item = document.createElement('div');
       item.className = 'ytcq-profile-card-message';
+      item.title = 'Quote message';
+      item.setAttribute('role', 'button');
+      item.tabIndex = 0;
+      wireQuoteCardItem(item, recentMessage);
 
       const timestamp = document.createElement('time');
       timestamp.className = 'ytcq-profile-card-message-time';
@@ -195,6 +208,21 @@ function renderProfileMessages(list: HTMLElement, recentMessages: MessageRecord[
   empty.className = 'ytcq-profile-card-empty';
   empty.textContent = 'No recent messages yet.';
   list.append(empty);
+}
+
+function wireQuoteCardItem(item: HTMLElement, recentMessage: MessageRecord): void {
+  const quote = (event: Event): void => {
+    event.preventDefault();
+    event.stopPropagation();
+    quoteAuthorText(recentMessage.authorName, recentMessage.text);
+  };
+
+  item.addEventListener('click', quote);
+  item.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      quote(event);
+    }
+  });
 }
 
 function scrollCardListToBottom(list: HTMLElement): void {
