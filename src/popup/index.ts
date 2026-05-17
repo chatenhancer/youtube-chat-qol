@@ -14,7 +14,8 @@ const controls = {
   translationDisplay: document.querySelector<HTMLSelectElement>('#translationDisplay'),
   quoteMaxLength: document.querySelector<HTMLInputElement>('#quoteMaxLength'),
   openProfilesInPopup: document.querySelector<HTMLInputElement>('#openProfilesInPopup'),
-  mentionSound: document.querySelector<HTMLInputElement>('#mentionSound')
+  mentionSound: document.querySelector<HTMLInputElement>('#mentionSound'),
+  version: document.querySelector<HTMLElement>('#version')
 };
 
 init();
@@ -22,6 +23,10 @@ init();
 function init(): void {
   if (!controls.targetLanguage || !controls.translationDisplay || !controls.quoteMaxLength || !controls.openProfilesInPopup || !controls.mentionSound) {
     return;
+  }
+
+  if (controls.version) {
+    controls.version.textContent = `Version ${chrome.runtime.getManifest().version}`;
   }
 
   controls.targetLanguage.appendChild(createLanguageOption('', 'Off'));
