@@ -20,6 +20,8 @@ interface PaperItemOptions {
   iconViewBox?: string;
 }
 
+const SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
+
 export function createMenuActionItem({
   className = 'ytcq-settings-item',
   setting = '',
@@ -78,7 +80,7 @@ export function createPaperItem({ label, iconPath, iconViewBox }: PaperItemOptio
 
   const icon = document.createElement('span');
   icon.className = 'ytcq-menu-icon';
-  icon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="${iconViewBox || '0 0 24 24'}" width="24" focusable="false" aria-hidden="true"><path d="${iconPath}"></path></svg>`;
+  icon.appendChild(createSvgIcon(iconPath, iconViewBox || '0 0 24 24'));
 
   const text = document.createElement('span');
   text.className = 'ytcq-menu-label';
@@ -86,6 +88,20 @@ export function createPaperItem({ label, iconPath, iconViewBox }: PaperItemOptio
 
   paperItem.append(icon, text);
   return paperItem;
+}
+
+function createSvgIcon(iconPath: string, viewBox: string): SVGSVGElement {
+  const svg = document.createElementNS(SVG_NAMESPACE, 'svg');
+  svg.setAttribute('height', '24');
+  svg.setAttribute('viewBox', viewBox);
+  svg.setAttribute('width', '24');
+  svg.setAttribute('focusable', 'false');
+  svg.setAttribute('aria-hidden', 'true');
+
+  const path = document.createElementNS(SVG_NAMESPACE, 'path');
+  path.setAttribute('d', iconPath);
+  svg.appendChild(path);
+  return svg;
 }
 
 export function closeMenu(): void {
