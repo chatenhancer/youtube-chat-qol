@@ -14,7 +14,7 @@ import { configureSettingsMenu, refreshSettingsMenus } from '../features/menus/s
 import { handlePotentialMentionsInbox, initMentionsInbox, scheduleMentionsInboxButtonWire } from '../features/mentionsInbox';
 import { handlePotentialMention, initMentionSound } from '../features/mentionSound';
 import { wireProfileClick } from '../features/profilePopup';
-import { handleShiftClickMention, wireAuthorNameMention } from '../features/reply';
+import { wireAuthorNameMention } from '../features/reply';
 import {
   clearTranslations,
   getRetroactiveTranslationMessages,
@@ -68,7 +68,6 @@ function boot(): void {
   document.addEventListener('click', handleEmojiPickerClick, true);
   document.addEventListener('pointerdown', handleMessageMenuActivation, true);
   document.addEventListener('click', handleMessageMenuActivation, true);
-  document.addEventListener('click', handleShiftClickMention, true);
   document.addEventListener('keydown', handleMessageMenuActivation, true);
   document.addEventListener('visibilitychange', scheduleVisibleMessageRecovery);
   window.addEventListener('focus', scheduleVisibleMessageRecovery);
