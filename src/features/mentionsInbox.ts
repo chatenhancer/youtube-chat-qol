@@ -2,8 +2,7 @@
  * Mentions inbox.
  *
  * Keeps a small local list of messages that mention the signed-in chat handle.
- * The primary entry point is a compact @ button in YouTube's chat header, with
- * a matching settings-menu row as a fallback when the header layout changes.
+ * The primary entry point is a compact @ button in YouTube's chat header.
  */
 import { cleanText } from '../shared/text';
 import { getAuthorName, getMessageText, getMessageTimestampText } from '../youtube/messages';
@@ -195,22 +194,9 @@ export function openMentionsInboxCard(anchor?: HTMLElement): void {
   });
 }
 
-export function getMentionsInboxLabel(): string {
-  const unread = getUnreadMentionCount();
-  return unread ? `Mentions inbox: ${formatBadgeCount(unread)}` : 'Mentions inbox';
-}
-
 export function refreshMentionsInboxSurfaces(): void {
   document.querySelectorAll<HTMLButtonElement>('.ytcq-mentions-inbox-button')
     .forEach(refreshMentionsInboxButton);
-
-  document.querySelectorAll<HTMLElement>('.ytcq-settings-item[data-ytcq-setting="mentionsInbox"] .ytcq-menu-label')
-    .forEach((label) => {
-      const nextLabel = getMentionsInboxLabel();
-      if (label.textContent !== nextLabel) {
-        label.textContent = nextLabel;
-      }
-    });
 }
 
 function recordMention(message: HTMLElement): void {
