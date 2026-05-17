@@ -17,6 +17,8 @@ When a target language is selected, eligible visible and incoming chat message t
 
 The extension does not send your YouTube cookies or credentials with translation requests.
 
+For Firefox's built-in data-collection disclosure, this translation behavior is declared as `personalCommunications` because Mozilla's taxonomy includes chat messages in that category.
+
 ## Data Not Collected
 
 The extension does not run analytics, does not collect browsing history, and does not send data to an extension-owned server.

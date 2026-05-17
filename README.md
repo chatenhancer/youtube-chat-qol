@@ -58,7 +58,7 @@ Load it in Chrome, Edge, Brave, Vivaldi, Arc, or another Chromium browser:
 
 After source changes, run `npm run build` again and reload the unpacked extension.
 
-For Firefox development, build the Firefox package and load `dist/extension-firefox` from `about:debugging#/runtime/this-firefox`:
+For Firefox 140+ development, build the Firefox package and load `dist/extension-firefox` from `about:debugging#/runtime/this-firefox`:
 
 ```sh
 npm run build:firefox

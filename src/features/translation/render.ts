@@ -25,6 +25,9 @@ export interface TranslationResult {
   targetLanguage: string;
 }
 
+const SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
+const TRANSLATION_ICON_PATH = 'M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0014.07 6H17V4h-7V2H8v2H1v2h11.17a15.7 15.7 0 01-2.86 4.63A15.07 15.07 0 017.22 7H5.2a17.2 17.2 0 002.77 5.03l-5.09 5.02L4.3 18.47l5.01-5.01 3.11 3.11.45-1.5ZM18.5 10h-2L12 22h2l1.13-3h4.74L21 22h2l-4.5-12Zm-2.62 7l1.62-4.33L19.12 17h-3.24Z';
+
 export function renderTranslation(
   message: HTMLElement,
   result: TranslationResult,
@@ -122,8 +125,21 @@ function createReplacedTranslationIcon(): HTMLElement {
   const icon = document.createElement('span');
   icon.className = 'ytcq-replaced-translation-icon';
   icon.setAttribute('aria-hidden', 'true');
-  icon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" height="14" viewBox="0 0 24 24" width="14" focusable="false"><path d="M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0014.07 6H17V4h-7V2H8v2H1v2h11.17a15.7 15.7 0 01-2.86 4.63A15.07 15.07 0 017.22 7H5.2a17.2 17.2 0 002.77 5.03l-5.09 5.02L4.3 18.47l5.01-5.01 3.11 3.11.45-1.5ZM18.5 10h-2L12 22h2l1.13-3h4.74L21 22h2l-4.5-12Zm-2.62 7l1.62-4.33L19.12 17h-3.24Z"></path></svg>';
+  icon.appendChild(createTranslationSvgIcon());
   return icon;
+}
+
+function createTranslationSvgIcon(): SVGSVGElement {
+  const svg = document.createElementNS(SVG_NAMESPACE, 'svg');
+  svg.setAttribute('height', '14');
+  svg.setAttribute('viewBox', '0 0 24 24');
+  svg.setAttribute('width', '14');
+  svg.setAttribute('focusable', 'false');
+
+  const path = document.createElementNS(SVG_NAMESPACE, 'path');
+  path.setAttribute('d', TRANSLATION_ICON_PATH);
+  svg.appendChild(path);
+  return svg;
 }
 
 function hasReliableSourceLanguage(result: TranslationResult): boolean {
