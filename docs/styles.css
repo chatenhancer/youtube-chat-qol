@@ -8,7 +8,10 @@
   --line: #e2e6ee;
   --blue: #1769d1;
   --blue-soft: #e9f2ff;
-  --red: #d82921;
+  --logo-red-start: #fe0031;
+  --logo-red-end: #fd0032;
+  --logo-red-hover-start: #ec002f;
+  --logo-red-hover-end: #df002c;
 }
 
 * {
@@ -184,12 +187,12 @@ h3 {
 
 .button-primary {
   color: #fff;
-  background: var(--red);
+  background: linear-gradient(180deg, var(--logo-red-start), var(--logo-red-end));
 }
 
 .button-primary:hover,
 .button-primary:focus {
-  background: #bd201a;
+  background: linear-gradient(180deg, var(--logo-red-hover-start), var(--logo-red-hover-end));
 }
 
 .button-secondary,
