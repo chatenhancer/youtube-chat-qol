@@ -501,7 +501,12 @@ function parseCommand(value: string): ParsedCommand | null {
 function parseInlineTextCommand(selection: ChatInputTextSelection): InlineParsedCommand | null {
   if (selection.selectionStart !== selection.selectionEnd) return null;
 
-  const beforeCaret = selection.text.slice(0, selection.selectionStart);
+  return parseInlineTextCommandAt(selection.text, selection.selectionStart) ||
+    parseInlineTextCommandAt(selection.text, selection.text.length);
+}
+
+function parseInlineTextCommandAt(text: string, end: number): InlineParsedCommand | null {
+  const beforeCaret = text.slice(0, end);
   for (let start = beforeCaret.lastIndexOf('/'); start >= 0; start = beforeCaret.lastIndexOf('/', start - 1)) {
     if (start > 0 && !/\s/.test(beforeCaret[start - 1])) continue;
     if (beforeCaret[start + 1] === '/') continue;
@@ -510,7 +515,7 @@ function parseInlineTextCommand(selection: ChatInputTextSelection): InlineParsed
     if (parsed && INLINE_TEXT_COMPLETION_COMMANDS.has(parsed.name)) {
       return {
         ...parsed,
-        end: selection.selectionStart,
+        end,
         start
       };
     }
