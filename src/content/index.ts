@@ -10,6 +10,7 @@ import { enhanceEmojiPicker, handleEmojiPickerClick, initFrequentEmojis } from '
 import { enhanceMenu } from '../features/menus';
 import { handleMessageMenuActivation, wireMessageContext } from '../features/menus/messageMenu';
 import { configureSettingsMenu, refreshSettingsMenus } from '../features/menus/settingsMenu';
+import { handlePotentialMentionsInbox, initMentionsInbox, scheduleMentionsInboxButtonWire } from '../features/mentionsInbox';
 import { handlePotentialMention, initMentionSound } from '../features/mentionSound';
 import { wireProfileClick } from '../features/profilePopup';
 import { handleShiftClickMention } from '../features/reply';
@@ -31,6 +32,7 @@ init();
 function init(): void {
   initFrequentEmojis();
   initMentionSound();
+  initMentionsInbox();
   configureSettingsMenu(saveOptions);
 
   chrome.storage.sync.get(DEFAULT_OPTIONS, (storedOptions) => {
@@ -59,6 +61,7 @@ function boot(): void {
   processExistingMessages(getOptions().targetLanguage ? MAX_RETROACTIVE_TRANSLATIONS : 0);
   document.querySelectorAll('ytd-menu-popup-renderer').forEach(enhanceMenu);
   document.querySelectorAll('yt-emoji-picker-renderer').forEach(enhanceEmojiPicker);
+  scheduleMentionsInboxButtonWire();
   document.addEventListener('click', handleEmojiPickerClick, true);
   document.addEventListener('pointerdown', handleMessageMenuActivation, true);
   document.addEventListener('click', handleMessageMenuActivation, true);
@@ -66,6 +69,7 @@ function boot(): void {
   document.addEventListener('keydown', handleMessageMenuActivation, true);
 
   observer = new MutationObserver((mutations) => {
+    let shouldWireMentionsInboxButton = false;
     for (const mutation of mutations) {
       if (mutation.type === 'childList') {
         const targetMenu = mutation.target instanceof Element
@@ -74,11 +78,20 @@ function boot(): void {
         if (targetMenu) {
           enhanceMenu(targetMenu);
         }
+        if (mutation.target instanceof Element && mutation.target.closest('yt-live-chat-header-renderer')) {
+          shouldWireMentionsInboxButton = true;
+        }
       }
 
       for (const node of mutation.addedNodes) {
         if (!(node instanceof Element)) continue;
         if (node.closest('.ytcq-frequent-emoji-row')) continue;
+        if (
+          node.matches('yt-live-chat-header-renderer') ||
+          node.querySelector('yt-live-chat-header-renderer')
+        ) {
+          shouldWireMentionsInboxButton = true;
+        }
         if (node.matches(CHAT_MESSAGE_SELECTOR) && node instanceof HTMLElement) {
           enhanceMessage(node, { allowTranslate: true });
         }
@@ -111,6 +124,10 @@ function boot(): void {
         }
       }
     }
+
+    if (shouldWireMentionsInboxButton) {
+      scheduleMentionsInboxButtonWire();
+    }
   });
 
   observer.observe(document.documentElement, {
@@ -139,6 +156,7 @@ function enhanceMessage(message: HTMLElement, { allowTranslate }: { allowTransla
 
   if (allowTranslate) {
     handlePotentialMention(message);
+    handlePotentialMentionsInbox(message);
   }
 
   if (allowTranslate && getOptions().targetLanguage) {

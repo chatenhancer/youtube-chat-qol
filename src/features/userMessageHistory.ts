@@ -6,7 +6,7 @@
  * avatar profile card while the livestream page is open.
  */
 import { normalizeComparableText } from '../shared/text';
-import { getAuthorName, getMessageText, getRendererData } from '../youtube/messages';
+import { getAuthorName, getMessageText, getMessageTimestampText, getRendererData } from '../youtube/messages';
 
 const MAX_USERS = 160;
 const MAX_MESSAGES_PER_USER = 12;
@@ -25,9 +25,12 @@ interface ElementRecord {
   signature: string;
 }
 
+type UserMessageListener = (key: string) => void;
+
 const recordsByUser = new Map<string, MessageRecord[]>();
 const latestByUser = new Map<string, number>();
 const recordsByElement = new WeakMap<HTMLElement, ElementRecord>();
+const userMessageListeners = new Set<UserMessageListener>();
 let nextRecordId = 1;
 
 export function recordUserMessage(message: HTMLElement): void {
@@ -66,12 +69,17 @@ export function recordUserMessage(message: HTMLElement): void {
   });
 
   pruneOldUsers();
+  notifyUserMessageListeners(key);
 }
 
 export function getRecentMessagesForUser(message: HTMLElement, limit = 5): MessageRecord[] {
   const key = getUserKey(message);
   if (!key) return [];
 
+  return getRecentMessagesForKey(key, limit);
+}
+
+export function getRecentMessagesForKey(key: string, limit = 5): MessageRecord[] {
   return (recordsByUser.get(key) || []).slice(-limit);
 }
 
@@ -82,6 +90,13 @@ export function getUserKey(message: HTMLElement): string {
 
   const authorName = normalizeComparableText(getAuthorName(message));
   return authorName ? `author:${authorName}` : '';
+}
+
+export function onUserMessagesChanged(listener: UserMessageListener): () => void {
+  userMessageListeners.add(listener);
+  return () => {
+    userMessageListeners.delete(listener);
+  };
 }
 
 function removeRecord(key: string, id: number): void {
@@ -111,15 +126,8 @@ function pruneOldUsers(): void {
   });
 }
 
-function getMessageTimestampText(message: HTMLElement, timestamp: number): string {
-  const youtubeTimestamp = message.querySelector('#timestamp')?.textContent;
-  if (youtubeTimestamp) {
-    const cleanTimestamp = youtubeTimestamp.replace(/\s+/g, ' ').trim();
-    if (cleanTimestamp) return cleanTimestamp;
-  }
-
-  return new Intl.DateTimeFormat(undefined, {
-    hour: 'numeric',
-    minute: '2-digit'
-  }).format(timestamp);
+function notifyUserMessageListeners(key: string): void {
+  userMessageListeners.forEach((listener) => {
+    listener(key);
+  });
 }

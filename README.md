@@ -23,6 +23,7 @@ Not affiliated with YouTube or Google.
 ### Social Context
 
 - Click an avatar to see that user's recent messages and open their channel.
+- Keep a local mentions inbox for messages that mention your handle.
 - Optionally play a subtle sound when chat mentions your handle.
 
 ### Chat Comfort

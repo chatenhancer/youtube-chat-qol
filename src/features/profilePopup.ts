@@ -7,7 +7,12 @@
  */
 import { getOptions } from '../shared/state';
 import { getAuthorName, getRendererData } from '../youtube/messages';
-import { getRecentMessagesForUser } from './userMessageHistory';
+import {
+  getRecentMessagesForKey,
+  getUserKey,
+  onUserMessagesChanged,
+  type MessageRecord
+} from './userMessageHistory';
 
 let activeProfileCard: HTMLElement | null = null;
 let activeProfileCardCleanup: (() => void) | null = null;
@@ -95,30 +100,8 @@ function showProfileCard(message: HTMLElement, anchor: HTMLElement, profileUrl: 
   const list = document.createElement('div');
   list.className = 'ytcq-profile-card-messages';
 
-  const recentMessages = getRecentMessagesForUser(message);
-  if (recentMessages.length) {
-    recentMessages.forEach((recentMessage) => {
-      const item = document.createElement('div');
-      item.className = 'ytcq-profile-card-message';
-
-      const timestamp = document.createElement('time');
-      timestamp.className = 'ytcq-profile-card-message-time';
-      timestamp.textContent = recentMessage.timestampText;
-      timestamp.dateTime = new Date(recentMessage.timestamp).toISOString();
-
-      const text = document.createElement('span');
-      text.className = 'ytcq-profile-card-message-text';
-      text.textContent = recentMessage.text;
-
-      item.append(timestamp, text);
-      list.append(item);
-    });
-  } else {
-    const empty = document.createElement('div');
-    empty.className = 'ytcq-profile-card-empty';
-    empty.textContent = 'No recent messages yet.';
-    list.append(empty);
-  }
+  const profileKey = getUserKey(message);
+  renderProfileMessages(list, profileKey ? getRecentMessagesForKey(profileKey) : []);
 
   const actions = document.createElement('div');
   actions.className = 'ytcq-profile-card-actions';
@@ -138,6 +121,7 @@ function showProfileCard(message: HTMLElement, anchor: HTMLElement, profileUrl: 
   document.body.append(card);
   activeProfileCard = card;
   positionProfileCard(card, anchor);
+  scrollCardListToBottom(list);
 
   const handleOutsideClick = (event: MouseEvent): void => {
     if (activeProfileCard?.contains(event.target as Node)) return;
@@ -155,11 +139,19 @@ function showProfileCard(message: HTMLElement, anchor: HTMLElement, profileUrl: 
 
     positionProfileCard(activeProfileCard, anchor);
   };
+  const unsubscribeMessages = profileKey
+    ? onUserMessagesChanged((key) => {
+        if (key !== profileKey || !activeProfileCard) return;
+        renderProfileMessages(list, getRecentMessagesForKey(profileKey));
+        scrollCardListToBottom(list);
+      })
+    : null;
 
   activeProfileCardCleanup = () => {
     document.removeEventListener('click', handleOutsideClick, true);
     document.removeEventListener('keydown', handleKeydown, true);
     window.removeEventListener('resize', handleResize, true);
+    unsubscribeMessages?.();
   };
 
   window.setTimeout(() => {
@@ -174,6 +166,41 @@ function closeProfileCard(): void {
   activeProfileCardCleanup = null;
   activeProfileCard?.remove();
   activeProfileCard = null;
+}
+
+function renderProfileMessages(list: HTMLElement, recentMessages: MessageRecord[]): void {
+  list.replaceChildren();
+
+  if (recentMessages.length) {
+    recentMessages.forEach((recentMessage) => {
+      const item = document.createElement('div');
+      item.className = 'ytcq-profile-card-message';
+
+      const timestamp = document.createElement('time');
+      timestamp.className = 'ytcq-profile-card-message-time';
+      timestamp.textContent = recentMessage.timestampText;
+      timestamp.dateTime = new Date(recentMessage.timestamp).toISOString();
+
+      const text = document.createElement('span');
+      text.className = 'ytcq-profile-card-message-text';
+      text.textContent = recentMessage.text;
+
+      item.append(timestamp, text);
+      list.append(item);
+    });
+    return;
+  }
+
+  const empty = document.createElement('div');
+  empty.className = 'ytcq-profile-card-empty';
+  empty.textContent = 'No recent messages yet.';
+  list.append(empty);
+}
+
+function scrollCardListToBottom(list: HTMLElement): void {
+  window.requestAnimationFrame(() => {
+    list.scrollTop = list.scrollHeight;
+  });
 }
 
 function getAvatarElement(message: HTMLElement): HTMLImageElement | null {
