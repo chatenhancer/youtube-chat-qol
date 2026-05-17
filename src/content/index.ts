@@ -81,6 +81,9 @@ function boot(): void {
         if (mutation.target instanceof Element && mutation.target.closest('yt-live-chat-header-renderer')) {
           shouldWireMentionsInboxButton = true;
         }
+        retryTranslationForLateMessageText(mutation.target);
+      } else if (mutation.type === 'characterData') {
+        retryTranslationForLateMessageText(mutation.target);
       }
 
       for (const node of mutation.addedNodes) {
@@ -163,6 +166,28 @@ function enhanceMessage(message: HTMLElement, { allowTranslate }: { allowTransla
   if (allowTranslate && getOptions().targetLanguage) {
     queueMessageTranslation(message);
   }
+}
+
+function retryTranslationForLateMessageText(target: Node): void {
+  if (!getOptions().targetLanguage) return;
+
+  const targetElement = target instanceof Element ? target : target.parentElement;
+  if (!targetElement || isExtensionManagedMutation(targetElement)) return;
+
+  const message = targetElement.closest<HTMLElement>(CHAT_MESSAGE_SELECTOR);
+  if (!message || message.dataset.ytcqTranslationKey) return;
+
+  queueMessageTranslation(message);
+}
+
+function isExtensionManagedMutation(element: Element): boolean {
+  return Boolean(element.closest([
+    '.ytcq-translation',
+    '.ytcq-replaced-translation-icon',
+    '.ytcq-frequent-emoji-row',
+    '.ytcq-profile-card',
+    'ytd-menu-popup-renderer'
+  ].join(',')));
 }
 
 function saveOptions(values: Partial<Options>): void {
