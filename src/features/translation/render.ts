@@ -29,11 +29,13 @@ export function renderTranslation(
   message: HTMLElement,
   result: TranslationResult,
   originalText: string,
-  emojiTokens: EmojiToken[] = []
+  emojiTokens: EmojiToken[] = [],
+  sourceText = originalText
 ): boolean {
   if (!message.isConnected) return false;
   const translatedText = restoreEmojiPlaceholdersToText(result.text, emojiTokens);
-  if (normalizeComparableText(translatedText) === normalizeComparableText(originalText)) return false;
+  const comparableSourceText = restoreEmojiPlaceholdersToText(sourceText, emojiTokens);
+  if (normalizeComparableText(translatedText) === normalizeComparableText(comparableSourceText)) return false;
 
   if (getOptions().translationDisplay === 'replace') {
     renderReplacementTranslation(message, result, originalText, emojiTokens);
