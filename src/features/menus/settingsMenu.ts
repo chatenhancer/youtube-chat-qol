@@ -7,7 +7,6 @@
  */
 import { LANGUAGE_OPTIONS } from '../../shared/languages';
 import {
-  getNextQuoteLength,
   TRANSLATION_DISPLAY_OPTIONS,
   type Options
 } from '../../shared/options';
@@ -37,23 +36,6 @@ export function enhanceSettingsMenu(menu: HTMLElement): void {
   list.append(
     createLanguageSelectItem(),
     createTranslationDisplaySelectItem(),
-    createMenuActionItem({
-      setting: 'quoteMaxLength',
-      label: `Quote length: ${options.quoteMaxLength}`,
-      iconPath: 'M7.2 6C5.45 7.45 4.5 9.34 4.5 11.55V18h6.4v-6.25H7.25c.08-1.33.62-2.42 1.63-3.28L7.2 6Zm9 0c-1.75 1.45-2.7 3.34-2.7 5.55V18h6.4v-6.25h-3.65c.08-1.33.62-2.42 1.63-3.28L16.2 6Z',
-      onClick: () => {
-        saveOptions({ quoteMaxLength: getNextQuoteLength(getOptions().quoteMaxLength) });
-      }
-    }),
-    createMenuToggleItem({
-      setting: 'openProfilesInPopup',
-      label: 'Avatar popups',
-      checked: options.openProfilesInPopup,
-      iconPath: 'M14 3h7v7h-2V6.41l-9.29 9.3-1.42-1.42 9.3-9.29H14V3ZM5 5h6v2H5v12h12v-6h2v6a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2Z',
-      onClick: () => {
-        saveOptions({ openProfilesInPopup: !getOptions().openProfilesInPopup });
-      }
-    }),
     createMenuToggleItem({
       setting: 'mentionSound',
       label: 'Mention sound',
@@ -93,11 +75,6 @@ export function refreshSettingsMenus(): void {
       label.textContent = 'Translation display';
       const select = item.querySelector<HTMLSelectElement>('.ytcq-menu-select');
       if (select) select.value = options.translationDisplay;
-    } else if (setting === 'quoteMaxLength') {
-      label.textContent = `Quote length: ${options.quoteMaxLength}`;
-    } else if (setting === 'openProfilesInPopup') {
-      label.textContent = 'Avatar popups';
-      item.setAttribute('aria-checked', String(options.openProfilesInPopup));
     } else if (setting === 'mentionSound') {
       label.textContent = 'Mention sound';
       item.setAttribute('aria-checked', String(options.mentionSound));
