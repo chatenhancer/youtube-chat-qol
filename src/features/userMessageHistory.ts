@@ -7,6 +7,7 @@
  */
 import { normalizeComparableText } from '../shared/text';
 import { getAuthorName, getMessageText, getMessageTimestampText, getRendererData } from '../youtube/messages';
+import { CHAT_MESSAGE_SELECTOR } from '../youtube/selectors';
 
 const MAX_USERS = 160;
 const MAX_MESSAGES_PER_USER = 12;
@@ -70,6 +71,10 @@ export function recordUserMessage(message: HTMLElement): void {
 
   pruneOldUsers();
   notifyUserMessageListeners(key);
+}
+
+export function recordVisibleUserMessages(): void {
+  document.querySelectorAll<HTMLElement>(CHAT_MESSAGE_SELECTOR).forEach(recordUserMessage);
 }
 
 export function getRecentMessagesForUser(message: HTMLElement, limit = 5): MessageRecord[] {

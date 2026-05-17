@@ -85,8 +85,10 @@ function boot(): void {
           shouldWireMentionsInboxButton = true;
         }
         retryTranslationForLateMessageText(mutation.target);
+        recordMessageForLateText(mutation.target);
       } else if (mutation.type === 'characterData') {
         retryTranslationForLateMessageText(mutation.target);
+        recordMessageForLateText(mutation.target);
       }
 
       for (const node of mutation.addedNodes) {
@@ -190,6 +192,14 @@ function retryTranslationForLateMessageText(target: Node): void {
   if (!message || message.dataset.ytcqTranslationKey) return;
 
   queueMessageTranslation(message);
+}
+
+function recordMessageForLateText(target: Node): void {
+  const targetElement = target instanceof Element ? target : target.parentElement;
+  if (!targetElement || isExtensionManagedMutation(targetElement)) return;
+
+  const message = targetElement.closest<HTMLElement>(CHAT_MESSAGE_SELECTOR);
+  if (message) recordUserMessage(message);
 }
 
 function isExtensionManagedMutation(element: Element): boolean {

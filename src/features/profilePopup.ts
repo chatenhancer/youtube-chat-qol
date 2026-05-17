@@ -11,6 +11,7 @@ import {
   getRecentMessagesForKey,
   getUserKey,
   onUserMessagesChanged,
+  recordVisibleUserMessages,
   type MessageRecord
 } from './userMessageHistory';
 import { mentionAuthorName, quoteAuthorText } from './reply';
@@ -62,6 +63,7 @@ function openProfileWindow(url: string): void {
 
 function showProfileCard(message: HTMLElement, anchor: HTMLElement, profileUrl: string): void {
   closeProfileCard();
+  recordVisibleUserMessages();
 
   const card = document.createElement('section');
   card.className = 'ytcq-profile-card';
