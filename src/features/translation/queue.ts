@@ -15,6 +15,7 @@ import { clearTranslationRenderings, removeTranslation, renderTranslation, type 
 interface PendingTranslationEntry {
   message: HTMLElement;
   originalText: string;
+  sourceText: string;
   emojiTokens: EmojiToken[];
 }
 
@@ -55,7 +56,7 @@ export function queueMessageTranslation(message: HTMLElement, { backfill = false
 
   const cached = translationCache.get(key);
   if (cached) {
-    const rendered = renderTranslation(message, cached, details.text, plan.emojiTokens);
+    const rendered = renderTranslation(message, cached, details.text, plan.emojiTokens, plan.text);
     if (!rendered) {
       translationCache.delete(key);
       delete message.dataset.ytcqTranslationKey;
@@ -66,6 +67,7 @@ export function queueMessageTranslation(message: HTMLElement, { backfill = false
   const entry = {
     message,
     originalText: details.text,
+    sourceText: plan.text,
     emojiTokens: plan.emojiTokens
   };
 
@@ -152,7 +154,7 @@ function pumpTranslationQueue(): void {
     .then((result) => {
       let renderedAny = false;
       for (const entry of pendingTranslations.get(job.key) || []) {
-        const rendered = renderTranslation(entry.message, result, entry.originalText, entry.emojiTokens);
+        const rendered = renderTranslation(entry.message, result, entry.originalText, entry.emojiTokens, entry.sourceText);
         if (rendered) {
           renderedAny = true;
         } else {
