@@ -26,6 +26,7 @@ import { getOptions, setOptions } from '../shared/state';
 import { CHAT_MESSAGE_SELECTOR } from '../youtube/selectors';
 
 let observer: MutationObserver | null = null;
+let visibilityRecoveryTimer = 0;
 
 init();
 
@@ -67,6 +68,8 @@ function boot(): void {
   document.addEventListener('click', handleMessageMenuActivation, true);
   document.addEventListener('click', handleShiftClickMention, true);
   document.addEventListener('keydown', handleMessageMenuActivation, true);
+  document.addEventListener('visibilitychange', scheduleVisibleMessageRecovery);
+  window.addEventListener('focus', scheduleVisibleMessageRecovery);
 
   observer = new MutationObserver((mutations) => {
     let shouldWireMentionsInboxButton = false;
@@ -150,6 +153,15 @@ function processExistingMessages(translateLimit: number): void {
 
   getRetroactiveTranslationMessages(messages, translateLimit)
     .forEach((message) => queueMessageTranslation(message, { backfill: true }));
+}
+
+function scheduleVisibleMessageRecovery(): void {
+  if (document.visibilityState === 'hidden') return;
+  if (visibilityRecoveryTimer) window.clearTimeout(visibilityRecoveryTimer);
+  visibilityRecoveryTimer = window.setTimeout(() => {
+    visibilityRecoveryTimer = 0;
+    processExistingMessages(getOptions().targetLanguage ? MAX_RETROACTIVE_TRANSLATIONS : 0);
+  }, 300);
 }
 
 function enhanceMessage(message: HTMLElement, { allowTranslate }: { allowTranslate: boolean }): void {
