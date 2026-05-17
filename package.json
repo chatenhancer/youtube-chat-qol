@@ -4,12 +4,20 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "node scripts/build.mjs",
+    "build": "node scripts/build.mjs --target=chrome",
+    "build:chrome": "node scripts/build.mjs --target=chrome",
+    "build:edge": "node scripts/build.mjs --target=edge",
+    "build:firefox": "node scripts/build.mjs --target=firefox",
+    "build:all": "node scripts/build.mjs --all",
     "icons": "node scripts/generate-icons.mjs",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
-    "verify": "npm run typecheck && npm run lint && npm run build",
-    "zip": "npm run build && node scripts/zip.mjs"
+    "verify": "npm run typecheck && npm run lint && npm run build:all",
+    "zip": "npm run build && node scripts/zip.mjs",
+    "zip:chrome": "npm run build:chrome && node scripts/zip.mjs --target=chrome",
+    "zip:edge": "npm run build:edge && node scripts/zip.mjs --target=edge",
+    "zip:firefox": "npm run build:firefox && node scripts/zip.mjs --target=firefox",
+    "zip:all": "npm run build:all && node scripts/zip.mjs --all"
   },
   "devDependencies": {
     "@eslint/js": "^9.27.0",

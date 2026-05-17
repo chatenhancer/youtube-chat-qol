@@ -2,8 +2,8 @@
  * Extension build script.
  *
  * Bundles TypeScript entrypoints with esbuild, copies static assets, and writes
- * a flattened manifest into dist/extension so that folder can be loaded
- * directly by Chrome or zipped for the Web Store.
+ * flattened browser-specific manifests into dist folders that can be loaded
+ * directly by extension browsers or zipped for stores.
  */
 import { build } from 'esbuild';
 import { copyFile, cp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
@@ -11,10 +11,13 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const extensionDir = path.join(root, 'dist', 'extension');
-
-await rm(extensionDir, { recursive: true, force: true });
-await mkdir(extensionDir, { recursive: true });
+const targetOutputDirs = {
+  chrome: path.join(root, 'dist', 'extension'),
+  edge: path.join(root, 'dist', 'extension-edge'),
+  firefox: path.join(root, 'dist', 'extension-firefox')
+};
+const targets = getRequestedTargets();
+const manifestSource = await readFile(path.join(root, 'manifest.json'), 'utf8');
 
 const sharedBuildOptions = {
   bundle: true,
@@ -24,54 +27,93 @@ const sharedBuildOptions = {
   sourcemap: false
 };
 
-await Promise.all([
-  build({
-    ...sharedBuildOptions,
-    entryPoints: [path.join(root, 'src', 'content', 'index.ts')],
-    outfile: path.join(extensionDir, 'content.js'),
-    format: 'iife'
-  }),
-  build({
-    ...sharedBuildOptions,
-    entryPoints: [path.join(root, 'src', 'background', 'translate.ts')],
-    outfile: path.join(extensionDir, 'background.js'),
-    format: 'iife'
-  }),
-  build({
-    ...sharedBuildOptions,
-    entryPoints: [path.join(root, 'src', 'popup', 'index.ts')],
-    outfile: path.join(extensionDir, 'popup.js'),
-    format: 'iife'
-  })
-]);
-
-await Promise.all([
-  copyFile(path.join(root, 'src', 'content.css'), path.join(extensionDir, 'content.css')),
-  copyFile(path.join(root, 'src', 'popup.css'), path.join(extensionDir, 'popup.css')),
-  copyFile(path.join(root, 'src', 'popup.html'), path.join(extensionDir, 'popup.html')),
-  copyFile(path.join(root, 'assets', 'logo.png'), path.join(extensionDir, 'logo.png')),
-  cp(path.join(root, 'assets', 'icons'), path.join(extensionDir, 'icons'), { recursive: true })
-]);
-
-const manifest = JSON.parse(await readFile(path.join(root, 'manifest.json'), 'utf8'));
-for (const size of Object.keys(manifest.icons || {})) {
-  manifest.icons[size] = stripBuildPrefix(manifest.icons[size]);
-}
-manifest.background.service_worker = stripBuildPrefix(manifest.background.service_worker);
-manifest.action.default_popup = stripBuildPrefix(manifest.action.default_popup);
-for (const size of Object.keys(manifest.action.default_icon || {})) {
-  manifest.action.default_icon[size] = stripBuildPrefix(manifest.action.default_icon[size]);
-}
-for (const script of manifest.content_scripts) {
-  script.js = script.js.map(stripBuildPrefix);
-  script.css = script.css.map(stripBuildPrefix);
+for (const target of targets) {
+  await buildTarget(target);
 }
 
-await writeFile(
-  path.join(extensionDir, 'manifest.json'),
-  `${JSON.stringify(manifest, null, 2)}\n`
-);
+async function buildTarget(target) {
+  const extensionDir = targetOutputDirs[target];
+  if (!extensionDir) throw new Error(`Unsupported build target: ${target}`);
+
+  await rm(extensionDir, { recursive: true, force: true });
+  await mkdir(extensionDir, { recursive: true });
+
+  await Promise.all([
+    build({
+      ...sharedBuildOptions,
+      entryPoints: [path.join(root, 'src', 'content', 'index.ts')],
+      outfile: path.join(extensionDir, 'content.js'),
+      format: 'iife'
+    }),
+    build({
+      ...sharedBuildOptions,
+      entryPoints: [path.join(root, 'src', 'background', 'translate.ts')],
+      outfile: path.join(extensionDir, 'background.js'),
+      format: 'iife'
+    }),
+    build({
+      ...sharedBuildOptions,
+      entryPoints: [path.join(root, 'src', 'popup', 'index.ts')],
+      outfile: path.join(extensionDir, 'popup.js'),
+      format: 'iife'
+    })
+  ]);
+
+  await Promise.all([
+    copyFile(path.join(root, 'src', 'content.css'), path.join(extensionDir, 'content.css')),
+    copyFile(path.join(root, 'src', 'popup.css'), path.join(extensionDir, 'popup.css')),
+    copyFile(path.join(root, 'src', 'popup.html'), path.join(extensionDir, 'popup.html')),
+    copyFile(path.join(root, 'assets', 'logo.png'), path.join(extensionDir, 'logo.png')),
+    cp(path.join(root, 'assets', 'icons'), path.join(extensionDir, 'icons'), { recursive: true })
+  ]);
+
+  await writeFile(
+    path.join(extensionDir, 'manifest.json'),
+    `${JSON.stringify(createManifest(target), null, 2)}\n`
+  );
+}
+
+function createManifest(target) {
+  const manifest = JSON.parse(manifestSource);
+  for (const size of Object.keys(manifest.icons || {})) {
+    manifest.icons[size] = stripBuildPrefix(manifest.icons[size]);
+  }
+  manifest.background.service_worker = stripBuildPrefix(manifest.background.service_worker);
+  manifest.action.default_popup = stripBuildPrefix(manifest.action.default_popup);
+  for (const size of Object.keys(manifest.action.default_icon || {})) {
+    manifest.action.default_icon[size] = stripBuildPrefix(manifest.action.default_icon[size]);
+  }
+  for (const script of manifest.content_scripts) {
+    script.js = script.js.map(stripBuildPrefix);
+    script.css = script.css.map(stripBuildPrefix);
+  }
+
+  if (target === 'firefox') {
+    manifest.background = {
+      scripts: [manifest.background.service_worker]
+    };
+    manifest.browser_specific_settings = {
+      gecko: {
+        id: 'chat-enhancer-for-youtube@chat-enhancer-yt.github.io',
+        strict_min_version: '109.0'
+      }
+    };
+  }
+
+  return manifest;
+}
 
 function stripBuildPrefix(value) {
   return String(value).replace(/^dist\/extension\//, '');
+}
+
+function getRequestedTargets() {
+  const args = new Set(process.argv.slice(2));
+  if (args.has('--all')) return ['chrome', 'edge', 'firefox'];
+  const targetArg = [...args].find((arg) => arg.startsWith('--target='));
+  const target = targetArg ? targetArg.slice('--target='.length) : 'chrome';
+  if (!Object.hasOwn(targetOutputDirs, target)) {
+    throw new Error(`Unsupported build target: ${target}`);
+  }
+  return [target];
 }
