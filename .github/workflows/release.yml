@@ -16,10 +16,10 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: npm run zip
+      - run: npm run zip:all
       - uses: actions/upload-artifact@v4
         with:
-          name: youtube-chat-qol
+          name: youtube-chat-qol-packages
           path: dist/release/*.zip
       - uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/')
