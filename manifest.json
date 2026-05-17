@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Chat Enhancer for YouTube",
   "short_name": "Chat Enhancer",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Lightweight translation, reply, profile, and emoji tools for YouTube live chat.",
   "icons": {
     "16": "dist/extension/icons/icon-16.png",
