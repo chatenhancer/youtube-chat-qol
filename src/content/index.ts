@@ -7,6 +7,7 @@
  * reason about.
  */
 import { enhanceEmojiPicker, handleEmojiPickerClick, initFrequentEmojis } from '../features/frequentEmojis';
+import { initChatCommands } from '../features/chatCommands';
 import { enhanceMenu } from '../features/menus';
 import { handleMessageMenuActivation, wireMessageContext } from '../features/menus/messageMenu';
 import { configureSettingsMenu, refreshSettingsMenus } from '../features/menus/settingsMenu';
@@ -34,6 +35,7 @@ function init(): void {
   initFrequentEmojis();
   initMentionSound();
   initMentionsInbox();
+  initChatCommands(saveOptions);
   configureSettingsMenu(saveOptions);
 
   chrome.storage.sync.get(DEFAULT_OPTIONS, (storedOptions) => {

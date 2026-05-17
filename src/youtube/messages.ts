@@ -68,11 +68,22 @@ export function getMessageText(message: HTMLElement): string {
     getTextFromRuns(data?.messageText?.runs) ||
     getTextFromRuns(data?.headerSubtext?.runs);
 
-  return cleanText(fromRuns || message.querySelector('#message')?.textContent || '');
+  const messageText = getMessageTextElement(message);
+  return cleanText(fromRuns || (messageText ? getPlainTextFromMessageNodes(messageText) : ''));
 }
 
 export function getMessageTextElement(message: HTMLElement): HTMLElement | null {
   return message.querySelector<HTMLElement>('#message');
+}
+
+export function getMessageContentNodes(message: HTMLElement): Node[] {
+  const replaced = replacedMessages.get(message);
+  if (replaced?.childNodes.length) {
+    return replaced.childNodes.map((node) => node.cloneNode(true));
+  }
+
+  const messageText = getMessageTextElement(message);
+  return messageText ? Array.from(messageText.childNodes).map((node) => node.cloneNode(true)) : [];
 }
 
 export function getRendererData(message: HTMLElement): RendererData | null {
@@ -114,6 +125,27 @@ export function getEmojiTextFromRun(run: RendererRun): string {
     run?.emoji?.searchTerms?.[0] ||
     run?.emoji?.emojiId ||
     '';
+}
+
+function getPlainTextFromMessageNodes(element: HTMLElement): string {
+  return Array.from(element.childNodes).map(getPlainTextFromNode).join('') || element.textContent || '';
+}
+
+function getPlainTextFromNode(node: Node): string {
+  if (node.nodeType === Node.TEXT_NODE) return node.textContent || '';
+  if (!(node instanceof Element)) return '';
+
+  const tagName = node.tagName.toLowerCase();
+  if (tagName === 'br') return '\n';
+  if (tagName === 'img' || node.getAttribute('role') === 'img') {
+    return node.getAttribute('alt') ||
+      node.getAttribute('aria-label') ||
+      node.getAttribute('title') ||
+      node.textContent ||
+      '';
+  }
+
+  return Array.from(node.childNodes).map(getPlainTextFromNode).join('') || node.textContent || '';
 }
 
 export function rememberOriginalMessageText(message: HTMLElement, messageText: HTMLElement, originalText: string): void {

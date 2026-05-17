@@ -5,7 +5,8 @@
  * The primary entry point is a compact @ button in YouTube's chat header.
  */
 import { cleanText } from '../shared/text';
-import { getAuthorName, getMessageText, getMessageTimestampText } from '../youtube/messages';
+import { getAuthorName, getMessageContentNodes, getMessageText, getMessageTimestampText } from '../youtube/messages';
+import { appendRichMessageText } from '../youtube/richText';
 import { mentionAuthorName, quoteAuthorText } from './reply';
 import {
   initMentionDetection,
@@ -22,11 +23,17 @@ export const MENTIONS_INBOX_ICON_PATH = 'M480-80q-83 0-156-31.5T197-197q-54-54-8
 interface MentionRecord {
   id: string;
   authorName: string;
+  contentNodes?: Node[];
   text: string;
   timestamp: number;
   timestampText: string;
   sourceUrl: string;
   read: boolean;
+}
+
+export interface LatestMentionRecord {
+  authorName: string;
+  text: string;
 }
 
 let records: MentionRecord[] = [];
@@ -199,6 +206,15 @@ export function refreshMentionsInboxSurfaces(): void {
     .forEach(refreshMentionsInboxButton);
 }
 
+export async function getLatestMentionRecord(): Promise<LatestMentionRecord | null> {
+  await loadMentionRecords();
+  const record = records[records.length - 1];
+  return record ? {
+    authorName: record.authorName,
+    text: record.text
+  } : null;
+}
+
 function recordMention(message: HTMLElement): void {
   const record = createMentionRecord(message);
   if (!record) return;
@@ -237,6 +253,7 @@ function createMentionRecord(message: HTMLElement): MentionRecord | null {
   return {
     id: `${timestamp}-${Math.random().toString(36).slice(2, 8)}`,
     authorName,
+    contentNodes: getMessageContentNodes(message),
     text,
     timestamp,
     timestampText: getMessageTimestampText(message, timestamp),
@@ -287,10 +304,11 @@ function renderMentionsInboxList(list: HTMLElement): void {
       closeMentionsInboxCard();
     });
 
+    const spacer = document.createTextNode(' ');
     const text = document.createElement('span');
-    text.textContent = ` ${record.text}`;
+    appendRichMessageText(text, record.text, record.contentNodes);
 
-    body.append(author, text);
+    body.append(author, spacer, text);
     item.append(timestamp, body);
     list.append(item);
   });
@@ -486,8 +504,20 @@ function loadMentionRecords(): Promise<void> {
 
 function saveMentionRecords(): Promise<void> {
   return new Promise((resolve) => {
-    chrome.storage.local.set({ [STORAGE_KEY]: records }, resolve);
+    chrome.storage.local.set({ [STORAGE_KEY]: records.map(serializeMentionRecord) }, resolve);
   });
+}
+
+function serializeMentionRecord(record: MentionRecord): Omit<MentionRecord, 'contentNodes'> {
+  return {
+    id: record.id,
+    authorName: record.authorName,
+    text: record.text,
+    timestamp: record.timestamp,
+    timestampText: record.timestampText,
+    sourceUrl: record.sourceUrl,
+    read: record.read
+  };
 }
 
 function normalizeStoredRecords(value: unknown): MentionRecord[] {

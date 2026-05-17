@@ -29,7 +29,40 @@ Not affiliated with YouTube or Google.
 ### Chat Comfort
 
 - Add a local most-used row to YouTube's emoji picker.
+- Complete chat slash commands for mentions, quotes, repeated messages, time helpers, and extension settings.
 - Configure extension options from YouTube's live chat settings menu or the extension popup.
+
+## Chat Commands
+
+Type commands in the YouTube chat input. Text commands complete with `Tab` and do not send automatically. Setting commands run with `Enter`. Unknown slash commands are left alone.
+
+### Text Commands
+
+- `/mention` + `Tab`: insert a mention for the author of the newest mentions-inbox message.
+- `/reply` + `Tab`: alias for `/mention`.
+- `/quote` + `Tab`: quote the newest mentions-inbox message.
+- `/again` + `Tab`: restore your last sent message.
+- `/repeat` + `Tab`: alias for `/again`.
+- `/time utc` + `Tab`: insert the current time for a supported timezone or city.
+- `/timeuntil 7:45pm` + `Tab`: insert the time remaining until the next matching local time.
+
+Supported `/time` aliases include `utc`, `tokyo`, `jst`, `seoul`, `kst`, `london`, `paris`, `madrid`, `nyc`, `et`, `la`, and `pt`.
+
+`/timeuntil` accepts formats like `7`, `7am`, `7 am`, `7:45am`, `7:45 am`, `19`, `19:00`, `19:00:30`, and `7:45:30 pm`.
+
+### Setting Commands
+
+- `/settranslateto english` + `Enter`: set the translation language.
+- `/settranslateto off` + `Enter`: turn translation off.
+- `/settranslationdisplay replace` + `Enter`: replace original messages with translations.
+- `/settranslationdisplay below` + `Enter`: show translations below original messages.
+- `/setquotelength 120` + `Enter`: set quote length to `80`, `120`, `180`, or `240`.
+- `/setmentionsound on` + `Enter`: turn mention sounds on.
+- `/setmentionsound off` + `Enter`: turn mention sounds off.
+- `/setopenchannelsinpopup on` + `Enter`: open channels in popup windows.
+- `/setopenchannelsinpopup off` + `Enter`: open channels normally.
+
+Use `//` to send a literal slash command, such as `//quote`.
 
 ## Screenshots
 
