@@ -47,16 +47,11 @@ export function wireAuthorNameMention(message: HTMLElement): void {
 
 export function replyToMessage(message: HTMLElement, { quote }: { quote: boolean }): void {
   const details = getMessageDetails(message);
-  if (!details.authorName) {
-    showToast('Could not read that user name.');
-    return;
+  if (quote && details.text) {
+    quoteAuthorText(details.authorName, details.text);
+  } else {
+    mentionAuthorName(details.authorName);
   }
-
-  const prefix = quote && details.text
-    ? `${details.authorName}: "${truncateForQuote(details.text)}" `
-    : `${details.authorName} `;
-
-  insertMentionText(prefix);
 }
 
 export function mentionAuthorName(authorName: string): void {
@@ -67,6 +62,22 @@ export function mentionAuthorName(authorName: string): void {
   }
 
   insertMentionText(`${cleanAuthorName} `);
+}
+
+export function quoteAuthorText(authorName: string, text: string): void {
+  const cleanAuthorName = cleanText(authorName);
+  if (!cleanAuthorName) {
+    showToast('Could not read that user name.');
+    return;
+  }
+
+  const cleanMessage = cleanText(text);
+  if (!cleanMessage) {
+    insertMentionText(`${cleanAuthorName} `);
+    return;
+  }
+
+  insertMentionText(`${cleanAuthorName}: "${truncateForQuote(cleanMessage)}" `);
 }
 
 function insertMentionText(text: string): void {

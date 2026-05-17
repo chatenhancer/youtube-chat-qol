@@ -302,6 +302,23 @@ yt-live-chat-header-renderer .ytcq-mentions-inbox-badge[hidden] {
   white-space: nowrap;
 }
 
+.ytcq-profile-card-author {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+}
+
+.ytcq-profile-card-author:hover,
+.ytcq-profile-card-author:focus {
+  color: var(--yt-spec-call-to-action, #3ea6ff);
+  text-decoration: underline;
+  outline: none;
+}
+
 .ytcq-profile-card-subtitle {
   color: var(--yt-live-chat-secondary-text-color, var(--yt-spec-text-secondary, #aaa));
   font: 400 12px/16px Roboto, Arial, sans-serif;
@@ -355,6 +372,13 @@ yt-live-chat-header-renderer .ytcq-mentions-inbox-badge[hidden] {
   color: var(--yt-spec-text-primary, var(--yt-live-chat-primary-text-color, #f1f1f1));
   background: var(--yt-spec-badge-chip-background, rgba(255, 255, 255, 0.08));
   overflow-wrap: anywhere;
+  cursor: pointer;
+}
+
+.ytcq-profile-card-message:hover,
+.ytcq-profile-card-message:focus {
+  background: var(--yt-spec-badge-chip-background, rgba(255, 255, 255, 0.12));
+  outline: none;
 }
 
 .ytcq-profile-card-message-time {
