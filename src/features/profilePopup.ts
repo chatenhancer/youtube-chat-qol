@@ -7,6 +7,7 @@
  */
 import { getOptions } from '../shared/state';
 import { getAuthorName, getRendererData } from '../youtube/messages';
+import { appendRichMessageText } from '../youtube/richText';
 import {
   getRecentMessagesForKey,
   getUserKey,
@@ -199,7 +200,7 @@ function renderProfileMessages(list: HTMLElement, recentMessages: MessageRecord[
 
       const text = document.createElement('span');
       text.className = 'ytcq-profile-card-message-text';
-      text.textContent = recentMessage.text;
+      appendRichMessageText(text, recentMessage.text, recentMessage.contentNodes);
 
       item.append(timestamp, text);
       list.append(item);

@@ -6,7 +6,13 @@
  * avatar profile card while the livestream page is open.
  */
 import { normalizeComparableText } from '../shared/text';
-import { getAuthorName, getMessageText, getMessageTimestampText, getRendererData } from '../youtube/messages';
+import {
+  getAuthorName,
+  getMessageContentNodes,
+  getMessageText,
+  getMessageTimestampText,
+  getRendererData
+} from '../youtube/messages';
 import { CHAT_MESSAGE_SELECTOR } from '../youtube/selectors';
 
 const MAX_USERS = 160;
@@ -15,6 +21,7 @@ const MAX_MESSAGES_PER_USER = 12;
 export interface MessageRecord {
   id: number;
   authorName: string;
+  contentNodes: Node[];
   text: string;
   timestamp: number;
   timestampText: string;
@@ -54,6 +61,7 @@ export function recordUserMessage(message: HTMLElement): void {
   const record: MessageRecord = {
     id: previousRecord?.id || nextRecordId++,
     authorName,
+    contentNodes: getMessageContentNodes(message),
     text,
     timestamp,
     timestampText: getMessageTimestampText(message, timestamp)

@@ -55,29 +55,40 @@ export function replyToMessage(message: HTMLElement, { quote }: { quote: boolean
 }
 
 export function mentionAuthorName(authorName: string): void {
-  const cleanAuthorName = cleanText(authorName);
-  if (!cleanAuthorName) {
+  const mentionText = formatMentionText(authorName);
+  if (!mentionText) {
     showToast('Could not read that user name.');
     return;
   }
 
-  insertMentionText(`${cleanAuthorName} `);
+  insertMentionText(mentionText);
 }
 
 export function quoteAuthorText(authorName: string, text: string): void {
-  const cleanAuthorName = cleanText(authorName);
-  if (!cleanAuthorName) {
+  const quoteText = formatQuoteText(authorName, text);
+  if (!quoteText) {
     showToast('Could not read that user name.');
     return;
   }
 
+  insertMentionText(quoteText);
+}
+
+export function formatMentionText(authorName: string): string {
+  const cleanAuthorName = cleanText(authorName);
+  return cleanAuthorName ? `${cleanAuthorName} ` : '';
+}
+
+export function formatQuoteText(authorName: string, text: string): string {
+  const cleanAuthorName = cleanText(authorName);
+  if (!cleanAuthorName) return '';
+
   const cleanMessage = cleanText(text);
   if (!cleanMessage) {
-    insertMentionText(`${cleanAuthorName} `);
-    return;
+    return `${cleanAuthorName} `;
   }
 
-  insertMentionText(`${cleanAuthorName}: "${truncateForQuote(cleanMessage)}" `);
+  return `${cleanAuthorName}: "${truncateForQuote(cleanMessage)}" `;
 }
 
 function insertMentionText(text: string): void {
