@@ -236,5 +236,13 @@ function isUsefulTranslationCandidate(text: string): boolean {
   if (clean.length < 2) return false;
   if (/^https?:\/\//i.test(clean)) return false;
   if (!/[^\d\s!"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~]/.test(clean)) return false;
+  if (!hasLanguageSignal(clean)) return false;
   return true;
+}
+
+function hasLanguageSignal(text: string): boolean {
+  const letters = text.match(/\p{Letter}/gu) || [];
+  if (!letters.length) return false;
+  if (letters.some((letter) => !/\p{Script=Latin}/u.test(letter))) return true;
+  return letters.length >= 2;
 }
