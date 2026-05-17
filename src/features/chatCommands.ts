@@ -1,9 +1,9 @@
 /**
  * Chat input slash commands.
  *
- * Commands are intentionally conservative: text-producing commands complete
- * with Tab and never auto-send, while /set commands run on Enter. Unknown
- * slash-prefixed text is left to YouTube.
+ * Commands are intentionally conservative: known commands run with Tab and
+ * never auto-send. Enter only blocks known commands from leaking into chat.
+ * Unknown slash-prefixed text is left to YouTube.
  */
 import { LANGUAGE_OPTIONS, getLanguageLabel } from '../shared/languages';
 import { QUOTE_LENGTH_OPTIONS, type Options, type TranslationDisplay } from '../shared/options';
@@ -13,9 +13,12 @@ import {
   findChatInput,
   getChatInputSnapshot,
   getChatInputText,
+  getChatInputTextSelection,
   replaceChatInput,
+  replaceChatInputTextRange,
   replaceChatInputSnapshot,
-  type ChatInputSnapshot
+  type ChatInputSnapshot,
+  type ChatInputTextSelection
 } from '../youtube/chatInput';
 import { formatMentionText, formatQuoteText } from './reply';
 import { getLatestMentionRecord } from './mentionsInbox';
@@ -28,6 +31,11 @@ interface ParsedCommand {
   text: string;
 }
 
+interface InlineParsedCommand extends ParsedCommand {
+  end: number;
+  start: number;
+}
+
 const SEND_BUTTON_SELECTOR = [
   '#send-button',
   '#send-button button',
@@ -37,7 +45,16 @@ const SEND_BUTTON_SELECTOR = [
   'button[title="Send"]'
 ].join(',');
 
-const TEXT_COMPLETION_COMMANDS = new Set(['mention', 'reply', 'quote', 'again', 'repeat', 'time', 'timeuntil']);
+const TEXT_COMPLETION_COMMANDS = new Set(['help', 'mention', 'reply', 'quote', 'again', 'repeat', 'time', 'timeuntil']);
+const INLINE_TEXT_COMPLETION_COMMANDS = new Set(['mention', 'reply', 'time', 'timeuntil']);
+const SETTING_COMMANDS = new Set([
+  'setmentionsound',
+  'setopenchannelsinpopup',
+  'setopenprofilesinpopup',
+  'setquotelength',
+  'settranslateto',
+  'settranslationdisplay'
+]);
 const languageByCommandName = createLanguageCommandMap();
 const timeZoneByCommandName = new Map<string, TimeZoneOption>([
   ['utc', { label: 'UTC', timeZone: 'UTC' }],
@@ -65,10 +82,12 @@ interface TimeZoneOption {
 
 let lastSentMessage: ChatInputSnapshot | null = null;
 let escapedSlashText = '';
+let activeHelpCard: HTMLElement | null = null;
+let activeHelpCardCleanup: (() => void) | null = null;
 
 export function initChatCommands(saveOptions: SaveOptions): void {
   document.addEventListener('keydown', (event) => handleChatCommandKeydown(event, saveOptions), true);
-  document.addEventListener('click', (event) => handleChatCommandSendClick(event, saveOptions), true);
+  document.addEventListener('click', handleChatCommandSendClick, true);
 }
 
 function handleChatCommandKeydown(event: KeyboardEvent, saveOptions: SaveOptions): void {
@@ -76,9 +95,18 @@ function handleChatCommandKeydown(event: KeyboardEvent, saveOptions: SaveOptions
   if (event.key !== 'Tab' && event.key !== 'Enter') return;
   if (!isFromChatInput(event.target)) return;
 
-  const inputText = getChatInputText();
+  const inputSelection = getChatInputTextSelection();
+  const inputText = inputSelection?.text || getChatInputText();
   const parsed = parseCommand(inputText);
   if (!parsed) {
+    if (event.key === 'Tab' && inputSelection) {
+      const inlineParsed = parseInlineTextCommand(inputSelection);
+      if (inlineParsed) {
+        void executeInlineTextCommand(event, inlineParsed);
+        return;
+      }
+    }
+
     if (event.key === 'Enter' && !event.shiftKey) rememberLastSentMessage(inputText);
     return;
   }
@@ -89,7 +117,7 @@ function handleChatCommandKeydown(event: KeyboardEvent, saveOptions: SaveOptions
   }
 
   if (event.key === 'Tab') {
-    void completeTextCommand(event, parsed);
+    void executeTabCommand(event, parsed, saveOptions);
     return;
   }
 
@@ -100,21 +128,16 @@ function handleChatCommandKeydown(event: KeyboardEvent, saveOptions: SaveOptions
     return;
   }
 
-  if (TEXT_COMPLETION_COMMANDS.has(parsed.name)) {
+  if (isKnownCommand(parsed.name)) {
     preventCommandEvent(event);
-    showToast('Press Tab to complete this command.');
-    return;
-  }
-
-  if (parsed.name.startsWith('set')) {
-    executeSetCommand(event, parsed, saveOptions);
+    showToast('Press Tab to run this command.');
     return;
   }
 
   rememberLastSentMessage(parsed.text);
 }
 
-function handleChatCommandSendClick(event: MouseEvent, saveOptions: SaveOptions): void {
+function handleChatCommandSendClick(event: MouseEvent): void {
   if (event.defaultPrevented || !isSendButtonClick(event.target)) return;
 
   const text = getChatInputText();
@@ -135,35 +158,37 @@ function handleChatCommandSendClick(event: MouseEvent, saveOptions: SaveOptions)
     return;
   }
 
-  if (TEXT_COMPLETION_COMMANDS.has(parsed.name)) {
+  if (isKnownCommand(parsed.name)) {
     preventCommandEvent(event);
-    showToast('Press Tab to complete this command.');
-    return;
-  }
-
-  if (parsed.name.startsWith('set')) {
-    executeSetCommand(event, parsed, saveOptions);
+    showToast('Press Tab to run this command.');
     return;
   }
 
   rememberLastSentMessage(parsed.text);
 }
 
-async function completeTextCommand(event: KeyboardEvent, parsed: ParsedCommand): Promise<void> {
-  if (!TEXT_COMPLETION_COMMANDS.has(parsed.name)) return;
+async function executeTabCommand(event: KeyboardEvent, parsed: ParsedCommand, saveOptions: SaveOptions): Promise<void> {
+  if (!isKnownCommand(parsed.name)) return;
   preventCommandEvent(event);
 
+  if (SETTING_COMMANDS.has(parsed.name)) {
+    executeSetCommand(parsed, saveOptions);
+    return;
+  }
+
+  if (parsed.name === 'help') {
+    replaceChatInput('');
+    showChatCommandHelp();
+    return;
+  }
+
   if (parsed.name === 'mention' || parsed.name === 'reply') {
-    const latestMention = await getLatestMentionRecord();
-    const text = latestMention ? formatMentionText(latestMention.authorName) : '';
-    replaceCommandText(text, 'No mentions yet.');
+    replaceCommandText(await getMentionCommandText(), 'No mentions yet.');
     return;
   }
 
   if (parsed.name === 'quote') {
-    const latestMention = await getLatestMentionRecord();
-    const text = latestMention ? formatQuoteText(latestMention.authorName, latestMention.text) : '';
-    replaceCommandText(text, 'No mentions yet.');
+    replaceCommandText(await getQuoteCommandText(), 'No mentions yet.');
     return;
   }
 
@@ -182,8 +207,30 @@ async function completeTextCommand(event: KeyboardEvent, parsed: ParsedCommand):
   }
 }
 
-function executeSetCommand(event: Event, parsed: ParsedCommand, saveOptions: SaveOptions): void {
+async function executeInlineTextCommand(event: KeyboardEvent, parsed: InlineParsedCommand): Promise<void> {
   preventCommandEvent(event);
+
+  if (parsed.name === 'mention' || parsed.name === 'reply') {
+    replaceInlineCommandText(await getMentionCommandText(), parsed, 'No mentions yet.');
+    return;
+  }
+
+  if (parsed.name === 'quote') {
+    replaceInlineCommandText(await getQuoteCommandText(), parsed, 'No mentions yet.');
+    return;
+  }
+
+  if (parsed.name === 'time') {
+    replaceInlineCommandText(formatTime(parsed.args), parsed, 'Unknown timezone.');
+    return;
+  }
+
+  if (parsed.name === 'timeuntil') {
+    replaceInlineCommandText(formatTimeUntil(parsed.args), parsed, 'Could not read that time.');
+  }
+}
+
+function executeSetCommand(parsed: ParsedCommand, saveOptions: SaveOptions): void {
   if (parsed.name === 'settranslateto') {
     executeSetTranslateToCommand(parsed, saveOptions);
     return;
@@ -276,6 +323,17 @@ function replaceCommandText(text: string, emptyMessage: string): void {
   }
 }
 
+function replaceInlineCommandText(text: string, parsed: InlineParsedCommand, emptyMessage: string): void {
+  if (!text) {
+    showToast(emptyMessage);
+    return;
+  }
+
+  if (!replaceChatInputTextRange(parsed.start, parsed.end, text)) {
+    showToast('Could not find the chat input.');
+  }
+}
+
 function replaceLastSentMessage(): void {
   if (!lastSentMessage?.text && !lastSentMessage?.childNodes.length) {
     showToast('No previous message yet.');
@@ -285,6 +343,130 @@ function replaceLastSentMessage(): void {
   if (!replaceChatInputSnapshot(lastSentMessage)) {
     showToast('Could not find the chat input.');
   }
+}
+
+function showChatCommandHelp(): void {
+  closeChatCommandHelp();
+
+  const card = document.createElement('section');
+  card.className = 'ytcq-command-help-card';
+  card.setAttribute('role', 'dialog');
+  card.setAttribute('aria-label', 'Chat commands');
+
+  const header = document.createElement('div');
+  header.className = 'ytcq-command-help-header';
+
+  const title = document.createElement('div');
+  title.className = 'ytcq-command-help-title';
+  title.textContent = 'Chat commands';
+
+  const closeButton = document.createElement('button');
+  closeButton.type = 'button';
+  closeButton.className = 'ytcq-command-help-close';
+  closeButton.setAttribute('aria-label', 'Close');
+  closeButton.append(createCloseIcon());
+  closeButton.addEventListener('click', closeChatCommandHelp);
+
+  header.append(title, closeButton);
+
+  const hint = document.createElement('p');
+  hint.className = 'ytcq-command-help-hint';
+  hint.textContent = 'Type a command, then press Tab.';
+
+  const list = document.createElement('dl');
+  list.className = 'ytcq-command-help-list';
+
+  getHelpRows().forEach(([command, description]) => {
+    const term = document.createElement('dt');
+    term.textContent = command;
+
+    const details = document.createElement('dd');
+    details.textContent = description;
+
+    list.append(term, details);
+  });
+
+  card.append(header, hint, list);
+  document.body.append(card);
+  activeHelpCard = card;
+  positionHelpCard(card);
+
+  const handleOutsideClick = (event: MouseEvent): void => {
+    if (activeHelpCard?.contains(event.target as Node)) return;
+    closeChatCommandHelp();
+  };
+  const handleKeydown = (event: KeyboardEvent): void => {
+    if (event.key === 'Escape') closeChatCommandHelp();
+  };
+  const handleResize = (): void => {
+    if (activeHelpCard) positionHelpCard(activeHelpCard);
+  };
+
+  activeHelpCardCleanup = () => {
+    document.removeEventListener('click', handleOutsideClick, true);
+    document.removeEventListener('keydown', handleKeydown, true);
+    window.removeEventListener('resize', handleResize, true);
+  };
+
+  window.setTimeout(() => {
+    document.addEventListener('click', handleOutsideClick, true);
+    document.addEventListener('keydown', handleKeydown, true);
+    window.addEventListener('resize', handleResize, true);
+  }, 0);
+}
+
+function closeChatCommandHelp(): void {
+  activeHelpCardCleanup?.();
+  activeHelpCardCleanup = null;
+  activeHelpCard?.remove();
+  activeHelpCard = null;
+}
+
+function getHelpRows(): Array<[string, string]> {
+  return [
+    ['/help', 'Show this list.'],
+    ['/mention, /reply', 'Mention the author of your newest saved mention.'],
+    ['/quote', 'Quote your newest saved mention.'],
+    ['/again, /repeat', 'Restore your last sent message.'],
+    ['/time utc', 'Insert the current time.'],
+    ['/timeuntil 7:45pm', 'Insert the time remaining until a local time.'],
+    ['/settranslateto english/off', 'Set the translation language.'],
+    ['/settranslationdisplay replace/below', 'Set how translations are shown.'],
+    ['/setquotelength 120', 'Set the quote length.'],
+    ['/setmentionsound on/off', 'Set mention sound.'],
+    ['/setopenchannelsinpopup on/off', 'Set channel popup behavior.']
+  ];
+}
+
+function positionHelpCard(card: HTMLElement): void {
+  const input = findChatInput();
+  const inputRect = input?.getBoundingClientRect();
+  const margin = 8;
+  const cardRect = card.getBoundingClientRect();
+  const width = cardRect.width;
+  const height = cardRect.height;
+  const fallbackLeft = window.innerWidth - width - margin;
+  const fallbackTop = window.innerHeight - height - margin;
+  const preferredLeft = inputRect ? inputRect.left : fallbackLeft;
+  const preferredTop = inputRect ? inputRect.top - height - margin : fallbackTop;
+  const maxLeft = window.innerWidth - width - margin;
+  const maxTop = window.innerHeight - height - margin;
+
+  card.style.left = `${Math.max(margin, Math.min(Math.round(preferredLeft), maxLeft))}px`;
+  card.style.top = `${Math.max(margin, Math.min(Math.round(preferredTop), maxTop))}px`;
+}
+
+function createCloseIcon(): SVGSVGElement {
+  const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  icon.setAttribute('viewBox', '0 0 24 24');
+  icon.setAttribute('focusable', 'false');
+  icon.setAttribute('aria-hidden', 'true');
+
+  const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  path.setAttribute('d', 'M18.3 5.71a1 1 0 0 0-1.41 0L12 10.59 7.11 5.7A1 1 0 0 0 5.7 7.11L10.59 12 5.7 16.89a1 1 0 1 0 1.41 1.41L12 13.41l4.89 4.89a1 1 0 0 0 1.41-1.41L13.41 12l4.89-4.89a1 1 0 0 0 0-1.4Z');
+  icon.append(path);
+
+  return icon;
 }
 
 function handleEscapedCommand(event: Event, text: string): void {
@@ -314,6 +496,37 @@ function parseCommand(value: string): ParsedCommand | null {
     name: match[1].toLowerCase(),
     text
   };
+}
+
+function parseInlineTextCommand(selection: ChatInputTextSelection): InlineParsedCommand | null {
+  if (selection.selectionStart !== selection.selectionEnd) return null;
+
+  const beforeCaret = selection.text.slice(0, selection.selectionStart);
+  for (let start = beforeCaret.lastIndexOf('/'); start >= 0; start = beforeCaret.lastIndexOf('/', start - 1)) {
+    if (start > 0 && !/\s/.test(beforeCaret[start - 1])) continue;
+    if (beforeCaret[start + 1] === '/') continue;
+
+    const parsed = parseCommand(beforeCaret.slice(start));
+    if (parsed && INLINE_TEXT_COMPLETION_COMMANDS.has(parsed.name)) {
+      return {
+        ...parsed,
+        end: selection.selectionStart,
+        start
+      };
+    }
+  }
+
+  return null;
+}
+
+async function getMentionCommandText(): Promise<string> {
+  const latestMention = await getLatestMentionRecord();
+  return latestMention ? formatMentionText(latestMention.authorName) : '';
+}
+
+async function getQuoteCommandText(): Promise<string> {
+  const latestMention = await getLatestMentionRecord();
+  return latestMention ? formatQuoteText(latestMention.authorName, latestMention.text) : '';
 }
 
 function getTranslateCommandTarget(value: string): string | null {
@@ -364,7 +577,7 @@ function formatTime(value: string): string {
     timeZoneName: 'short'
   }).format(new Date());
 
-  return `${timeZone.label} time: ${time}`;
+  return time;
 }
 
 function formatTimeUntil(value: string): string {
@@ -456,6 +669,10 @@ function isFromChatInput(target: EventTarget | null): boolean {
 
 function isSendButtonClick(target: EventTarget | null): boolean {
   return target instanceof Element && Boolean(target.closest(SEND_BUTTON_SELECTOR));
+}
+
+function isKnownCommand(name: string): boolean {
+  return TEXT_COMPLETION_COMMANDS.has(name) || SETTING_COMMANDS.has(name);
 }
 
 function rememberLastSentMessage(value: string): void {
