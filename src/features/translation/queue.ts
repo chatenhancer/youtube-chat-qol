@@ -243,6 +243,7 @@ function isUsefulTranslationCandidate(text: string): boolean {
 function hasLanguageSignal(text: string): boolean {
   const letters = text.match(/\p{Letter}/gu) || [];
   if (!letters.length) return false;
-  if (letters.some((letter) => !/\p{Script=Latin}/u.test(letter))) return true;
-  return letters.length >= 2;
+  if (letters.length >= 2) return true;
+  if (letters.some((letter) => !/\p{Script=Latin}/u.test(letter) && !/[\u0445\u0425]/u.test(letter))) return true;
+  return false;
 }
