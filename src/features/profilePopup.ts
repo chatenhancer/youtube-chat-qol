@@ -89,6 +89,7 @@ function showProfileCard(message: HTMLElement, anchor: HTMLElement, profileUrl: 
     event.preventDefault();
     event.stopPropagation();
     mentionAuthorName(authorName);
+    closeProfileCard();
   });
 
   const subtitle = document.createElement('div');
@@ -215,6 +216,7 @@ function wireQuoteCardItem(item: HTMLElement, recentMessage: MessageRecord): voi
     event.preventDefault();
     event.stopPropagation();
     quoteAuthorText(recentMessage.authorName, recentMessage.text);
+    closeProfileCard();
   };
 
   item.addEventListener('click', quote);

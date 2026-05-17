@@ -284,6 +284,7 @@ function renderMentionsInboxList(list: HTMLElement): void {
       event.preventDefault();
       event.stopPropagation();
       mentionAuthorName(record.authorName);
+      closeMentionsInboxCard();
     });
 
     const text = document.createElement('span');
@@ -300,6 +301,7 @@ function wireQuoteCardItem(item: HTMLElement, authorName: string, text: string):
     event.preventDefault();
     event.stopPropagation();
     quoteAuthorText(authorName, text);
+    closeMentionsInboxCard();
   };
 
   item.addEventListener('click', (event) => {
