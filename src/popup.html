@@ -13,35 +13,38 @@
   </head>
   <body>
     <main>
-      <h1 class="brand">
-        <img src="logo.png" alt="Chat Enhancer for YouTube">
-      </h1>
+      <header class="header">
+        <h1 class="brand">
+          <img src="logo.png" alt="Chat Enhancer for YouTube">
+        </h1>
+        <p id="version" class="version" aria-label="Extension version"></p>
+      </header>
 
-      <label class="field">
+      <label class="field" title="Choose the language chat messages should be translated into. Off disables automatic translation.">
         <span>Translate to</span>
-        <select id="targetLanguage"></select>
+        <select id="targetLanguage" title="Choose the language chat messages should be translated into. Off disables automatic translation."></select>
       </label>
 
-      <label class="field">
+      <label class="field" title="Choose whether translations replace the original message or appear below it.">
         <span>Translation display</span>
-        <select id="translationDisplay">
+        <select id="translationDisplay" title="Choose whether translations replace the original message or appear below it.">
           <option value="replace">Replace message</option>
           <option value="below">Show below</option>
         </select>
       </label>
 
-      <label class="field">
+      <label class="field" title="Maximum characters included when quoting a message from chat actions or cards.">
         <span>Quote length</span>
-        <input id="quoteMaxLength" type="number" min="40" max="240" step="10">
+        <input id="quoteMaxLength" type="number" min="40" max="240" step="10" title="Maximum characters included when quoting a message from chat actions or cards.">
       </label>
 
-      <label class="row">
-        <input id="openProfilesInPopup" type="checkbox">
-        <span>Open profiles in a popup window</span>
+      <label class="row" title="Open YouTube channel pages in a smaller popup window instead of a normal browser tab.">
+        <input id="openProfilesInPopup" type="checkbox" title="Open YouTube channel pages in a smaller popup window instead of a normal browser tab.">
+        <span>Open channels in a popup window</span>
       </label>
 
-      <label class="row">
-        <input id="mentionSound" type="checkbox">
+      <label class="row" title="Play a short sound when a chat message mentions your handle.">
+        <input id="mentionSound" type="checkbox" title="Play a short sound when a chat message mentions your handle.">
         <span>Play a sound when mentioned</span>
       </label>
 

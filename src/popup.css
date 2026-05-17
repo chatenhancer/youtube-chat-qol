@@ -20,7 +20,10 @@ main {
   padding: 16px;
 }
 
-.brand {
+.header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   margin: 0 0 18px;
 }
 
@@ -28,6 +31,18 @@ main {
   display: block;
   width: 147px;
   height: 50px;
+}
+
+.brand {
+  margin: 0;
+}
+
+.version {
+  margin: 0;
+  color: #606060;
+  font-size: 12px;
+  line-height: 16px;
+  white-space: nowrap;
 }
 
 .row,
