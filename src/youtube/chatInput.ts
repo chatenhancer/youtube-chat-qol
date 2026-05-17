@@ -10,6 +10,12 @@ export interface ChatInputSnapshot {
   text: string;
 }
 
+export interface ChatInputTextSelection {
+  selectionEnd: number;
+  selectionStart: number;
+  text: string;
+}
+
 export function findChatInput(): HTMLElement | HTMLTextAreaElement | HTMLInputElement | null {
   const candidates = Array.from(document.querySelectorAll([
     'yt-live-chat-text-input-field-renderer #input[contenteditable]',
@@ -57,6 +63,44 @@ export function getChatInputText(): string {
   return getInputPlainText(input);
 }
 
+export function getChatInputTextSelection(): ChatInputTextSelection | null {
+  const input = findChatInput();
+  if (!input) return null;
+
+  if (input instanceof HTMLTextAreaElement || input instanceof HTMLInputElement) {
+    return {
+      selectionEnd: input.selectionEnd ?? input.value.length,
+      selectionStart: input.selectionStart ?? input.value.length,
+      text: input.value
+    };
+  }
+
+  const text = getInputPlainText(input);
+  const selection = document.getSelection();
+  if (!selection?.rangeCount) {
+    return {
+      selectionEnd: text.length,
+      selectionStart: text.length,
+      text
+    };
+  }
+
+  const range = selection.getRangeAt(0);
+  if (!inputContainsNode(input, range.startContainer) || !inputContainsNode(input, range.endContainer)) {
+    return {
+      selectionEnd: text.length,
+      selectionStart: text.length,
+      text
+    };
+  }
+
+  return {
+    selectionEnd: getPlainTextOffset(input, range.endContainer, range.endOffset),
+    selectionStart: getPlainTextOffset(input, range.startContainer, range.startOffset),
+    text
+  };
+}
+
 export function insertIntoChatInput(text: string): boolean {
   const input = findChatInput();
   if (!input) return false;
@@ -93,6 +137,44 @@ export function insertIntoChatInput(text: string): boolean {
     data: text
   }));
   return inserted || Boolean(input.textContent);
+}
+
+export function replaceChatInputTextRange(start: number, end: number, text: string): boolean {
+  const input = findChatInput();
+  if (!input) return false;
+
+  input.focus();
+
+  if (input instanceof HTMLTextAreaElement || input instanceof HTMLInputElement) {
+    const safeStart = Math.max(0, Math.min(start, input.value.length));
+    const safeEnd = Math.max(safeStart, Math.min(end, input.value.length));
+    input.value = `${input.value.slice(0, safeStart)}${text}${input.value.slice(safeEnd)}`;
+    input.selectionStart = input.selectionEnd = safeStart + text.length;
+    dispatchInputReplacement(input);
+    return true;
+  }
+
+  const fullTextLength = getInputPlainText(input).length;
+  const safeStart = Math.max(0, Math.min(start, fullTextLength));
+  const safeEnd = Math.max(safeStart, Math.min(end, fullTextLength));
+  const selection = document.getSelection();
+  const range = document.createRange();
+  const startPosition = getPositionForPlainTextOffset(input, safeStart);
+  const endPosition = getPositionForPlainTextOffset(input, safeEnd);
+
+  range.setStart(startPosition.node, startPosition.offset);
+  range.setEnd(endPosition.node, endPosition.offset);
+  selection?.removeAllRanges();
+  selection?.addRange(range);
+
+  const inserted = document.execCommand('insertText', false, text);
+  if (!inserted) {
+    range.deleteContents();
+    range.insertNode(document.createTextNode(text));
+  }
+
+  dispatchInputReplacement(input);
+  return true;
 }
 
 export function replaceChatInput(text: string): boolean {
@@ -163,6 +245,94 @@ function dispatchInputReplacement(input: HTMLElement | HTMLTextAreaElement | HTM
 
 function getInputPlainText(input: HTMLElement): string {
   return Array.from(input.childNodes).map(getNodePlainText).join('') || input.textContent || '';
+}
+
+function inputContainsNode(input: HTMLElement, node: Node): boolean {
+  return input === node || input.contains(node);
+}
+
+function getPlainTextOffset(root: HTMLElement, container: Node, offset: number): number {
+  let total = 0;
+  let found = false;
+
+  const walk = (node: Node): void => {
+    if (found) return;
+
+    if (node === container) {
+      if (node.nodeType === Node.TEXT_NODE) {
+        total += Math.max(0, Math.min(offset, node.textContent?.length || 0));
+      } else {
+        Array.from(node.childNodes).slice(0, offset).forEach((child) => {
+          total += getNodePlainText(child).length;
+        });
+      }
+      found = true;
+      return;
+    }
+
+    if (node.nodeType === Node.TEXT_NODE || isPlainTextLeaf(node)) {
+      total += getNodePlainText(node).length;
+      return;
+    }
+
+    node.childNodes.forEach(walk);
+  };
+
+  walk(root);
+  return found ? total : getInputPlainText(root).length;
+}
+
+function getPositionForPlainTextOffset(root: HTMLElement, targetOffset: number): { node: Node; offset: number } {
+  let remaining = Math.max(0, targetOffset);
+
+  const walkChildren = (parent: Node): { node: Node; offset: number } => {
+    const children = Array.from(parent.childNodes);
+    for (let index = 0; index < children.length; index += 1) {
+      const child = children[index];
+      const childTextLength = getNodePlainText(child).length;
+
+      if (child.nodeType === Node.TEXT_NODE) {
+        if (remaining <= childTextLength) {
+          return {
+            node: child,
+            offset: Math.max(0, Math.min(remaining, child.textContent?.length || 0))
+          };
+        }
+
+        remaining -= childTextLength;
+        continue;
+      }
+
+      if (!isPlainTextLeaf(child) && child.childNodes.length) {
+        if (remaining <= childTextLength) return walkChildren(child);
+        remaining -= childTextLength;
+        continue;
+      }
+
+      if (remaining <= childTextLength) {
+        return {
+          node: parent,
+          offset: index + (remaining > 0 ? 1 : 0)
+        };
+      }
+
+      remaining -= childTextLength;
+    }
+
+    return {
+      node: parent,
+      offset: children.length
+    };
+  };
+
+  return walkChildren(root);
+}
+
+function isPlainTextLeaf(node: Node): boolean {
+  if (!(node instanceof Element)) return false;
+
+  const tagName = node.tagName.toLowerCase();
+  return tagName === 'br' || tagName === 'img' || node.getAttribute('role') === 'img' || node.childNodes.length === 0;
 }
 
 function getNodePlainText(node: Node): string {

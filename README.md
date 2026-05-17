@@ -34,12 +34,13 @@ Not affiliated with YouTube or Google.
 
 ## Chat Commands
 
-Type commands in the YouTube chat input. Text commands complete with `Tab` and do not send automatically. Setting commands run with `Enter`. Unknown slash commands are left alone.
+Type commands in the YouTube chat input, then press `Tab`. Commands do not send automatically. Unknown slash commands are left alone. Mention, time, and time-until commands can also be expanded inline, such as `starts in /timeuntil 7pm`.
 
 ### Text Commands
 
 - `/mention` + `Tab`: insert a mention for the author of the newest mentions-inbox message.
 - `/reply` + `Tab`: alias for `/mention`.
+- `/help` + `Tab`: show available chat commands.
 - `/quote` + `Tab`: quote the newest mentions-inbox message.
 - `/again` + `Tab`: restore your last sent message.
 - `/repeat` + `Tab`: alias for `/again`.
@@ -52,15 +53,15 @@ Supported `/time` aliases include `utc`, `tokyo`, `jst`, `seoul`, `kst`, `london
 
 ### Setting Commands
 
-- `/settranslateto english` + `Enter`: set the translation language.
-- `/settranslateto off` + `Enter`: turn translation off.
-- `/settranslationdisplay replace` + `Enter`: replace original messages with translations.
-- `/settranslationdisplay below` + `Enter`: show translations below original messages.
-- `/setquotelength 120` + `Enter`: set quote length to `80`, `120`, `180`, or `240`.
-- `/setmentionsound on` + `Enter`: turn mention sounds on.
-- `/setmentionsound off` + `Enter`: turn mention sounds off.
-- `/setopenchannelsinpopup on` + `Enter`: open channels in popup windows.
-- `/setopenchannelsinpopup off` + `Enter`: open channels normally.
+- `/settranslateto english` + `Tab`: set the translation language.
+- `/settranslateto off` + `Tab`: turn translation off.
+- `/settranslationdisplay replace` + `Tab`: replace original messages with translations.
+- `/settranslationdisplay below` + `Tab`: show translations below original messages.
+- `/setquotelength 120` + `Tab`: set quote length to `80`, `120`, `180`, or `240`.
+- `/setmentionsound on` + `Tab`: turn mention sounds on.
+- `/setmentionsound off` + `Tab`: turn mention sounds off.
+- `/setopenchannelsinpopup on` + `Tab`: open channels in popup windows.
+- `/setopenchannelsinpopup off` + `Tab`: open channels normally.
 
 Use `//` to send a literal slash command, such as `//quote`.
 

@@ -478,6 +478,92 @@ yt-live-chat-header-renderer .ytcq-mentions-inbox-badge[hidden] {
   outline: none;
 }
 
+.ytcq-command-help-card {
+  position: fixed;
+  z-index: 10000;
+  width: min(360px, calc(100vw - 16px));
+  max-height: min(420px, calc(100vh - 16px));
+  box-sizing: border-box;
+  padding: 12px;
+  border: 1px solid var(--yt-spec-10-percent-layer, rgba(255, 255, 255, 0.12));
+  border-radius: 8px;
+  color: var(--yt-spec-text-primary, var(--yt-live-chat-primary-text-color, #f1f1f1));
+  background: var(--yt-spec-raised-background, var(--yt-live-chat-background-color, #282828));
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.32);
+  font: 400 13px/18px Roboto, Arial, sans-serif;
+}
+
+.ytcq-command-help-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.ytcq-command-help-title {
+  color: var(--yt-spec-text-primary, var(--yt-live-chat-primary-text-color, #f1f1f1));
+  font: 500 14px/20px Roboto, Arial, sans-serif;
+}
+
+.ytcq-command-help-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  fill: currentColor;
+  color: var(--yt-spec-text-secondary, var(--yt-live-chat-secondary-text-color, #aaa));
+  background: transparent;
+  cursor: pointer;
+}
+
+.ytcq-command-help-close svg {
+  display: block;
+  width: 18px;
+  height: 18px;
+  pointer-events: none;
+}
+
+.ytcq-command-help-close:hover,
+.ytcq-command-help-close:focus {
+  color: var(--yt-spec-text-primary, var(--yt-live-chat-primary-text-color, #f1f1f1));
+  background: var(--yt-spec-badge-chip-background, rgba(255, 255, 255, 0.1));
+  outline: none;
+}
+
+.ytcq-command-help-hint {
+  margin: 2px 0 10px;
+  color: var(--yt-live-chat-secondary-text-color, var(--yt-spec-text-secondary, #aaa));
+  font: 400 12px/16px Roboto, Arial, sans-serif;
+}
+
+.ytcq-command-help-list {
+  display: grid;
+  grid-template-columns: minmax(112px, auto) minmax(0, 1fr);
+  gap: 6px 10px;
+  max-height: 320px;
+  margin: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.ytcq-command-help-list dt {
+  margin: 0;
+  color: var(--yt-spec-text-primary, var(--yt-live-chat-primary-text-color, #f1f1f1));
+  font: 500 12px/16px Roboto, Arial, sans-serif;
+  overflow-wrap: anywhere;
+}
+
+.ytcq-command-help-list dd {
+  margin: 0;
+  color: var(--yt-live-chat-secondary-text-color, var(--yt-spec-text-secondary, #aaa));
+  font: 400 12px/16px Roboto, Arial, sans-serif;
+  min-width: 0;
+}
+
 yt-live-chat-text-message-renderer .ytcq-translation,
 yt-live-chat-paid-message-renderer .ytcq-translation,
 yt-live-chat-membership-item-renderer .ytcq-translation {
