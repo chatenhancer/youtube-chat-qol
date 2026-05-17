@@ -81,7 +81,7 @@ MIT. See [LICENSE](LICENSE).
 ## Project Layout
 
 - `src/content/` wires features into YouTube live chat.
-- `src/features/` contains chat actions, translation, emoji, profile, and mention-sound features.
+- `src/features/` contains chat actions, translation, emoji, profile, mentions inbox, and mention-sound features.
 - `src/youtube/` contains YouTube DOM adapters and selectors.
 - `src/shared/` contains shared options, language data, state, and helpers.
 - `src/background/` contains the translation service worker.
