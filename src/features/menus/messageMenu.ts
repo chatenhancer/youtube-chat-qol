@@ -2,7 +2,7 @@
  * Per-message action menu integration.
  *
  * Tracks which chat message opened YouTube's native context menu, then injects
- * Mention and Quote into that existing menu. The active-message bookkeeping
+ * Quote and Mention into that existing menu. The active-message bookkeeping
  * covers both clicking the message body and clicking YouTube's three-dot menu.
  */
 import { CHAT_MESSAGE_SELECTOR } from '../../youtube/selectors';
@@ -53,22 +53,22 @@ export function enhanceMessageContextMenu(menu: HTMLElement): void {
   list.append(
     createMenuActionItem({
       className: 'ytcq-context-item',
-      label: 'Mention',
-      iconPath: 'M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-.6-5-3.4-10-11-11Z',
+      label: 'Quote',
+      iconPath: 'M7.2 6C5.45 7.45 4.5 9.34 4.5 11.55V18h6.4v-6.25H7.25c.08-1.33.62-2.42 1.63-3.28L7.2 6Zm9 0c-1.75 1.45-2.7 3.34-2.7 5.55V18h6.4v-6.25h-3.65c.08-1.33.62-2.42 1.63-3.28L16.2 6Z',
       onClick: () => {
         if (activeContextMessage?.isConnected) {
-          replyToMessage(activeContextMessage, { quote: false });
+          replyToMessage(activeContextMessage, { quote: true });
           closeMenu();
         }
       }
     }),
     createMenuActionItem({
       className: 'ytcq-context-item',
-      label: 'Quote',
-      iconPath: 'M7.2 6C5.45 7.45 4.5 9.34 4.5 11.55V18h6.4v-6.25H7.25c.08-1.33.62-2.42 1.63-3.28L7.2 6Zm9 0c-1.75 1.45-2.7 3.34-2.7 5.55V18h6.4v-6.25h-3.65c.08-1.33.62-2.42 1.63-3.28L16.2 6Z',
+      label: 'Mention',
+      iconPath: 'M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-.6-5-3.4-10-11-11Z',
       onClick: () => {
         if (activeContextMessage?.isConnected) {
-          replyToMessage(activeContextMessage, { quote: true });
+          replyToMessage(activeContextMessage, { quote: false });
           closeMenu();
         }
       }
