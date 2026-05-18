@@ -70,7 +70,7 @@ export function processPotentialMentionForConsumer(
   onMention();
 }
 
-export function getMentionCandidates(): string[] {
+function getMentionCandidates(): string[] {
   if (!cachedMentionCandidates.length) {
     refreshMentionCandidates();
   }

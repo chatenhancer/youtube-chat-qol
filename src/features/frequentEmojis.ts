@@ -38,7 +38,7 @@ export function enhanceEmojiPicker(picker: Element): void {
   renderFrequentEmojiRow(picker);
 }
 
-export function refreshEmojiPickers(): void {
+function refreshEmojiPickers(): void {
   document.querySelectorAll('yt-emoji-picker-renderer').forEach(enhanceEmojiPicker);
 }
 

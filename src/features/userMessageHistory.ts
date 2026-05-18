@@ -85,13 +85,6 @@ export function recordVisibleUserMessages(): void {
   document.querySelectorAll<HTMLElement>(CHAT_MESSAGE_SELECTOR).forEach(recordUserMessage);
 }
 
-export function getRecentMessagesForUser(message: HTMLElement, limit = 5): MessageRecord[] {
-  const key = getUserKey(message);
-  if (!key) return [];
-
-  return getRecentMessagesForKey(key, limit);
-}
-
 export function getRecentMessagesForKey(key: string, limit = 5): MessageRecord[] {
   return (recordsByUser.get(key) || []).slice(-limit);
 }

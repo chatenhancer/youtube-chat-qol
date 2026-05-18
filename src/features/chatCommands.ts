@@ -215,11 +215,6 @@ async function executeInlineTextCommand(event: KeyboardEvent, parsed: InlinePars
     return;
   }
 
-  if (parsed.name === 'quote') {
-    replaceInlineCommandText(await getQuoteCommandText(), parsed, 'No mentions yet.');
-    return;
-  }
-
   if (parsed.name === 'time') {
     replaceInlineCommandText(formatTime(parsed.args), parsed, 'Unknown timezone.');
     return;
