@@ -62,6 +62,7 @@ export function handleEmojiPickerClick(event: Event): void {
 function renderFrequentEmojiRow(picker: HTMLElement): void {
   const topEmojis = getTopEmojiUsage();
   let row = picker.querySelector<HTMLElement>('.ytcq-frequent-emoji-row');
+  const renderKey = getFrequentEmojiRenderKey(topEmojis);
 
   if (!topEmojis.length) {
     row?.remove();
@@ -78,6 +79,9 @@ function renderFrequentEmojiRow(picker: HTMLElement): void {
   if (row.parentElement !== rowHost || row !== rowHost.firstElementChild) {
     rowHost.insertBefore(row, rowHost.firstElementChild);
   }
+
+  if (row.dataset.ytcqEmojiRenderKey === renderKey) return;
+  row.dataset.ytcqEmojiRenderKey = renderKey;
 
   const label = document.createElement('div');
   label.className = 'ytcq-frequent-emoji-label';
@@ -100,8 +104,7 @@ function getFrequentEmojiRowHost(picker: HTMLElement): HTMLElement {
 }
 
 function createFrequentEmojiButton(picker: HTMLElement, emoji: EmojiUsage): HTMLButtonElement {
-  const option = findEmojiOption(picker, emoji);
-  const displayEmoji = getEmojiUsageData(option) || emoji;
+  const displayEmoji = emoji;
   const button = document.createElement('button');
   button.type = 'button';
   button.className = 'ytcq-frequent-emoji-button';
@@ -122,7 +125,7 @@ function createFrequentEmojiButton(picker: HTMLElement, emoji: EmojiUsage): HTML
   const activate = (event: Event) => {
     consumeEmojiButtonEvent(event);
     handledPointer = event.type === 'pointerdown' || event.type === 'mousedown';
-    chooseFrequentEmoji(picker, displayEmoji, option);
+    chooseFrequentEmoji(picker, displayEmoji);
   };
 
   button.addEventListener('pointerdown', activate);
@@ -139,15 +142,28 @@ function createFrequentEmojiButton(picker: HTMLElement, emoji: EmojiUsage): HTML
       handledPointer = false;
       return;
     }
-    chooseFrequentEmoji(picker, displayEmoji, option);
+    chooseFrequentEmoji(picker, displayEmoji);
   });
   button.addEventListener('keydown', (event) => {
     if (event.key !== 'Enter' && event.key !== ' ') return;
     consumeEmojiButtonEvent(event);
-    chooseFrequentEmoji(picker, displayEmoji, option);
+    chooseFrequentEmoji(picker, displayEmoji);
   });
 
   return button;
+}
+
+function getFrequentEmojiRenderKey(topEmojis: EmojiUsage[]): string {
+  return topEmojis.map((emoji) => [
+    emoji.key,
+    emoji.src,
+    emoji.alt,
+    emoji.label,
+    emoji.shortcut,
+    emoji.text,
+    emoji.count,
+    emoji.lastUsed
+  ].join('|')).join('\n');
 }
 
 function chooseFrequentEmoji(picker: HTMLElement, emoji: EmojiUsage, preferredOption: Element | null = null): void {
