@@ -6,7 +6,7 @@
  * the chat input. The row is capped so it does not crowd the native emoji list.
  */
 import { cleanText } from '../shared/text';
-import { findChatInput, insertIntoChatInput } from '../youtube/chatInput';
+import { insertIntoChatInput, insertNodeIntoChatInput } from '../youtube/chatInput';
 
 interface EmojiUsage {
   key: string;
@@ -25,7 +25,6 @@ const MAX_EMOJI_USAGE_ENTRIES = 80;
 
 let emojiUsage: EmojiUsage[] = [];
 let emojiUsageSaveTimer = 0;
-let ignoredSyntheticEmojiKey = '';
 
 export function initFrequentEmojis(): void {
   chrome.storage.local.get({ [EMOJI_USAGE_STORAGE_KEY]: [] }, (stored) => {
@@ -50,11 +49,6 @@ export function handleEmojiPickerClick(event: Event): void {
 
   const emoji = getEmojiUsageData(option);
   if (!emoji) return;
-
-  if (ignoredSyntheticEmojiKey === emoji.key) {
-    ignoredSyntheticEmojiKey = '';
-    return;
-  }
 
   recordEmojiUsage(emoji);
 }
@@ -91,7 +85,7 @@ function renderFrequentEmojiRow(picker: HTMLElement): void {
   list.className = 'ytcq-frequent-emoji-list';
 
   for (const emoji of topEmojis) {
-    list.appendChild(createFrequentEmojiButton(picker, emoji));
+    list.appendChild(createFrequentEmojiButton(emoji));
   }
 
   row.replaceChildren(label, list);
@@ -103,7 +97,7 @@ function getFrequentEmojiRowHost(picker: HTMLElement): HTMLElement {
     picker;
 }
 
-function createFrequentEmojiButton(picker: HTMLElement, emoji: EmojiUsage): HTMLButtonElement {
+function createFrequentEmojiButton(emoji: EmojiUsage): HTMLButtonElement {
   const displayEmoji = emoji;
   const button = document.createElement('button');
   button.type = 'button';
@@ -125,7 +119,7 @@ function createFrequentEmojiButton(picker: HTMLElement, emoji: EmojiUsage): HTML
   const activate = (event: Event) => {
     consumeEmojiButtonEvent(event);
     handledPointer = event.type === 'pointerdown' || event.type === 'mousedown';
-    chooseFrequentEmoji(picker, displayEmoji);
+    chooseFrequentEmoji(displayEmoji);
   };
 
   button.addEventListener('pointerdown', activate);
@@ -142,12 +136,12 @@ function createFrequentEmojiButton(picker: HTMLElement, emoji: EmojiUsage): HTML
       handledPointer = false;
       return;
     }
-    chooseFrequentEmoji(picker, displayEmoji);
+    chooseFrequentEmoji(displayEmoji);
   });
   button.addEventListener('keydown', (event) => {
     if (event.key !== 'Enter' && event.key !== ' ') return;
     consumeEmojiButtonEvent(event);
-    chooseFrequentEmoji(picker, displayEmoji);
+    chooseFrequentEmoji(displayEmoji);
   });
 
   return button;
@@ -166,28 +160,8 @@ function getFrequentEmojiRenderKey(topEmojis: EmojiUsage[]): string {
   ].join('|')).join('\n');
 }
 
-function chooseFrequentEmoji(picker: HTMLElement, emoji: EmojiUsage, preferredOption: Element | null = null): void {
-  const option = getUsableEmojiOption(picker, emoji, preferredOption);
-  const inputBeforeClick = getChatInputSnapshot();
-
-  if (!isEmojiPickerCategoryBarReady(picker) && insertEmojiIntoChat(emoji)) {
-    recordEmojiUsage(emoji);
-    return;
-  }
-
-  if (option) {
-    const matchedEmoji = getEmojiUsageData(option) || emoji;
-    ignoredSyntheticEmojiKey = matchedEmoji.key;
-    (option as HTMLElement).click();
-  } else {
-    insertEmojiIntoChat(emoji);
-  }
-
-  window.setTimeout(() => {
-    if (getChatInputSnapshot() === inputBeforeClick) {
-      insertEmojiIntoChat(emoji);
-    }
-  }, 120);
+function chooseFrequentEmoji(emoji: EmojiUsage): void {
+  if (!insertEmojiIntoChat(emoji)) return;
   recordEmojiUsage(emoji);
 }
 
@@ -212,13 +186,6 @@ function getEmojiUsageData(option: Element | null): EmojiUsage | null {
     count: 0,
     lastUsed: 0
   };
-}
-
-function findEmojiOption(picker: HTMLElement, emoji: EmojiUsage): Element | null {
-  return Array.from(picker.querySelectorAll('[role="option"]')).find((option) => {
-    const data = getEmojiUsageData(option);
-    return data && emojiRecordsMatch(data, emoji);
-  }) || null;
 }
 
 function recordEmojiUsage(emoji: EmojiUsage): void {
@@ -296,37 +263,26 @@ function consumeEmojiButtonEvent(event: Event): void {
   event.stopImmediatePropagation?.();
 }
 
-function isEmojiPickerCategoryBarReady(picker: HTMLElement): boolean {
-  return Boolean(picker.querySelector('#category-buttons yt-emoji-picker-category-button-renderer'));
-}
-
-function getUsableEmojiOption(picker: HTMLElement, emoji: EmojiUsage, preferredOption: Element | null): Element | null {
-  if (
-    preferredOption instanceof Element &&
-    preferredOption.isConnected &&
-    picker.contains(preferredOption) &&
-    !preferredOption.closest('.ytcq-frequent-emoji-row')
-  ) {
-    return preferredOption;
-  }
-
-  return findEmojiOption(picker, emoji);
-}
-
-function getChatInputSnapshot(): string {
-  const input = findChatInput();
-  if (!input) return '';
-
-  if (input instanceof HTMLTextAreaElement || input instanceof HTMLInputElement) {
-    return input.value;
-  }
-
-  return input.innerHTML || input.textContent || '';
-}
-
 function insertEmojiIntoChat(emoji: EmojiUsage): boolean {
+  if (emoji.src && insertEmojiImageIntoChat(emoji)) return true;
+
   const text = getEmojiInsertText(emoji);
   return text ? insertIntoChatInput(text) : false;
+}
+
+function insertEmojiImageIntoChat(emoji: EmojiUsage): boolean {
+  const alt = cleanText(emoji.alt || getEmojiFallbackText(emoji) || emoji.label || emoji.shortcut);
+  if (!alt) return false;
+
+  const image = document.createElement('img');
+  image.className = 'emoji yt-formatted-string style-scope yt-live-chat-text-input-field-renderer';
+  image.src = emoji.src;
+  image.alt = alt;
+
+  const tooltipText = cleanText(emoji.shortcut || emoji.label);
+  if (tooltipText) image.setAttribute('shared-tooltip-text', tooltipText);
+
+  return insertNodeIntoChatInput(image, alt);
 }
 
 function getEmojiOptionImage(option: Element | null): HTMLImageElement | null {
@@ -361,13 +317,14 @@ function isUsableEmojiImageSource(src: string | null | undefined): boolean {
 
 function emojiRecordsMatch(a: Partial<EmojiUsage>, b: Partial<EmojiUsage>): boolean {
   if (!a || !b) return false;
+  if (a.src && b.src) return a.src === b.src;
+
   return Boolean(
     (a.key && b.key && a.key === b.key) ||
     (a.shortcut && b.shortcut && a.shortcut === b.shortcut) ||
     (a.label && b.label && a.label === b.label) ||
     (a.alt && b.alt && a.alt === b.alt) ||
-    (a.text && b.text && a.text === b.text) ||
-    (a.src && b.src && a.src === b.src)
+    (a.text && b.text && a.text === b.text)
   );
 }
 

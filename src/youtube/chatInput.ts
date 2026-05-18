@@ -105,11 +105,12 @@ export function insertIntoChatInput(text: string): boolean {
   const input = findChatInput();
   if (!input) return false;
 
+  const shouldAppend = !isChatInputFocused(input);
   input.focus();
 
   if (input instanceof HTMLTextAreaElement || input instanceof HTMLInputElement) {
-    const start = input.selectionStart ?? input.value.length;
-    const end = input.selectionEnd ?? input.value.length;
+    const start = shouldAppend ? input.value.length : input.selectionStart ?? input.value.length;
+    const end = shouldAppend ? input.value.length : input.selectionEnd ?? input.value.length;
     input.value = `${input.value.slice(0, start)}${text}${input.value.slice(end)}`;
     input.selectionStart = input.selectionEnd = start + text.length;
     input.dispatchEvent(new InputEvent('input', {
@@ -122,7 +123,7 @@ export function insertIntoChatInput(text: string): boolean {
 
   const selection = document.getSelection();
   const selectionNode = selection?.anchorNode || null;
-  if (selection && (!selectionNode || !input.contains(selectionNode))) {
+  if (selection && (shouldAppend || !selectionNode || !input.contains(selectionNode))) {
     const range = document.createRange();
     range.selectNodeContents(input);
     range.collapse(false);
@@ -137,6 +138,47 @@ export function insertIntoChatInput(text: string): boolean {
     data: text
   }));
   return inserted || Boolean(input.textContent);
+}
+
+export function insertNodeIntoChatInput(node: Node, fallbackText = ''): boolean {
+  const input = findChatInput();
+  if (!input) return false;
+
+  const shouldAppend = !isChatInputFocused(input);
+  input.focus();
+
+  if (input instanceof HTMLTextAreaElement || input instanceof HTMLInputElement) {
+    return fallbackText ? insertIntoChatInput(fallbackText) : false;
+  }
+
+  const selection = document.getSelection();
+  let range = selection?.rangeCount ? selection.getRangeAt(0) : null;
+
+  if (shouldAppend || !range || !inputContainsNode(input, range.startContainer) || !inputContainsNode(input, range.endContainer)) {
+    range = document.createRange();
+    range.selectNodeContents(input);
+    range.collapse(false);
+  }
+
+  range.deleteContents();
+  range.insertNode(node);
+  range.setStartAfter(node);
+  range.setEndAfter(node);
+  selection?.removeAllRanges();
+  selection?.addRange(range);
+
+  input.dispatchEvent(new InputEvent('input', {
+    bubbles: true,
+    inputType: 'insertText',
+    data: fallbackText
+  }));
+
+  return true;
+}
+
+function isChatInputFocused(input: HTMLElement | HTMLTextAreaElement | HTMLInputElement): boolean {
+  const active = document.activeElement;
+  return active === input || Boolean(active && input.contains(active));
 }
 
 export function replaceChatInputTextRange(start: number, end: number, text: string): boolean {
