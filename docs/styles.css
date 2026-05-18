@@ -88,6 +88,18 @@ img {
   font-weight: 600;
 }
 
+.site-nav-github {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.site-nav-github svg {
+  width: 17px;
+  height: 17px;
+  fill: currentColor;
+}
+
 .site-nav a:hover,
 .site-nav a:focus {
   color: var(--text);
