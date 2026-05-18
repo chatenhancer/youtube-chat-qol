@@ -169,9 +169,9 @@ yt-emoji-picker-renderer .ytcq-frequent-emoji-label {
 }
 
 yt-emoji-picker-renderer .ytcq-frequent-emoji-list {
-  display: grid;
-  grid-template-columns: repeat(10, minmax(0, 1fr));
-  gap: 3px;
+  display: flex;
+  justify-content: center;
+  gap: 4px;
   overflow: hidden;
 }
 
@@ -179,16 +179,17 @@ yt-emoji-picker-renderer .ytcq-frequent-emoji-button {
   display: flex;
   align-items: center;
   justify-content: center;
-  justify-self: center;
-  width: 100%;
+  flex: 0 1 32px;
+  min-width: 24px;
+  width: 32px;
   max-width: 32px;
   aspect-ratio: 1;
-  padding: 3px;
+  padding: 4px;
   border: 0;
   border-radius: 50%;
   color: var(--yt-spec-text-primary, var(--yt-live-chat-primary-text-color, currentColor));
   background: transparent;
-  font: 400 18px/1 Roboto, Arial, sans-serif;
+  font: 400 20px/1 Roboto, Arial, sans-serif;
   cursor: pointer;
 }
 
