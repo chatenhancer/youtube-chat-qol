@@ -106,6 +106,7 @@ npm run build:firefox
 - `npm run build:all` writes Chrome, Edge, and Firefox unpacked extension folders.
 - `npm run verify` runs typecheck, lint, and all browser builds.
 - `npm run icons` regenerates PNG icons from `assets/icons/icon.svg`.
+- `npm run screenshots` regenerates README, high-resolution docs, and Chrome Web Store screenshots from the three docs screenshot exports.
 - `npm run zip` builds and writes the default Chrome Web Store archive to `dist/release/`.
 - `npm run zip:all` builds Chrome, Edge, and Firefox release archives.
 
