@@ -1,0 +1,66 @@
+name: Feature request
+description: Suggest a quality-of-life improvement for YouTube live chat.
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This extension aims to feel like a small native improvement to YouTube live chat. The best feature requests are lightweight, contextual, and easy to explain.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem would this solve?
+      description: Describe the live chat workflow or frustration behind the request.
+      placeholder: "Example: I often miss messages where people mention me while chat is moving quickly."
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: What would you like to happen?
+      description: Describe the behavior you want, not just the UI.
+      placeholder: "Example: Keep a small inbox of messages that mention my handle."
+    validations:
+      required: true
+
+  - type: dropdown
+    id: surface
+    attributes:
+      label: Where should this live?
+      options:
+        - YouTube chat message menu
+        - YouTube chat settings menu
+        - Extension popup
+        - Avatar/profile card
+        - Mentions inbox
+        - Emoji picker
+        - Chat input command
+        - Player/video area
+        - Not sure
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: If there are simpler or less intrusive ways to solve this, mention them here.
+
+  - type: checkboxes
+    id: philosophy
+    attributes:
+      label: Fit with the extension
+      options:
+        - label: This should not replace YouTube chat or heavily restyle it.
+        - label: This can work locally or with minimal data where possible.
+        - label: This is useful during a livestream, not only after the stream ends.
+        - label: This does not need to post extra messages into YouTube chat.
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Add examples, screenshots, or links to similar behavior if helpful.
