@@ -20,7 +20,7 @@ interface EmojiUsage {
 }
 
 const EMOJI_USAGE_STORAGE_KEY = 'ytcqEmojiUsage';
-const MAX_FREQUENT_EMOJIS = 12;
+const MAX_FREQUENT_EMOJIS = 10;
 const MAX_EMOJI_USAGE_ENTRIES = 80;
 
 let emojiUsage: EmojiUsage[] = [];
