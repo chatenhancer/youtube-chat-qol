@@ -73,7 +73,7 @@ export function formatQuoteText(authorName: string, text: string): string {
     return `${cleanAuthorName} `;
   }
 
-  return `${cleanAuthorName}: "${truncateForQuote(cleanMessage)}" `;
+  return `${cleanAuthorName} : "${truncateForQuote(cleanMessage)}" `;
 }
 
 function insertMentionText(text: string): void {
