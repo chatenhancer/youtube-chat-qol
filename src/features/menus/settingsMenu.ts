@@ -14,6 +14,9 @@ type SaveOptions = (values: Partial<Options>) => void;
 
 let saveOptions: SaveOptions = () => {};
 
+const MENTION_SOUND_BELL_ICON_PATH = 'M12 3a4 4 0 00-4 4v3.2c0 1.15-.37 2.27-1.05 3.2L5.2 15.8A1.4 1.4 0 006.33 18h11.34a1.4 1.4 0 001.13-2.2l-1.75-2.4A5.43 5.43 0 0116 10.2V7a4 4 0 00-4-4Zm0 19a3 3 0 002.83-2h-5.66A3 3 0 0012 22Z';
+const MENTION_SOUND_RINGING_BELL_ICON_PATH = `${MENTION_SOUND_BELL_ICON_PATH}M19.7 4.3a1 1 0 00-1.4 1.4A8.92 8.92 0 0121 12a1 1 0 102 0 10.9 10.9 0 00-3.3-7.7ZM5.7 5.7a1 1 0 00-1.4-1.4A10.9 10.9 0 001 12a1 1 0 102 0 8.92 8.92 0 012.7-6.3Z`;
+
 export function configureSettingsMenu(callback: SaveOptions): void {
   saveOptions = callback;
 }
@@ -30,7 +33,7 @@ export function enhanceSettingsMenu(menu: HTMLElement): void {
       setting: 'mentionSound',
       label: 'Mention sound',
       checked: options.mentionSound,
-      iconPath: 'M12 3a4 4 0 00-4 4v3.2c0 1.15-.37 2.27-1.05 3.2L5.2 15.8A1.4 1.4 0 006.33 18h11.34a1.4 1.4 0 001.13-2.2l-1.75-2.4A5.43 5.43 0 0116 10.2V7a4 4 0 00-4-4Zm0 19a3 3 0 002.83-2h-5.66A3 3 0 0012 22ZM19.7 4.3a1 1 0 00-1.4 1.4A8.92 8.92 0 0121 12a1 1 0 102 0 10.9 10.9 0 00-3.3-7.7ZM5.7 5.7a1 1 0 00-1.4-1.4A10.9 10.9 0 001 12a1 1 0 102 0 8.92 8.92 0 012.7-6.3Z',
+      iconPath: getMentionSoundIconPath(options.mentionSound),
       onClick: () => {
         saveOptions({ mentionSound: !getOptions().mentionSound });
       }
@@ -54,8 +57,13 @@ export function refreshSettingsMenus(): void {
     } else if (setting === 'mentionSound') {
       label.textContent = 'Mention sound';
       item.setAttribute('aria-checked', String(options.mentionSound));
+      item.querySelector<SVGPathElement>('.ytcq-menu-icon path')?.setAttribute('d', getMentionSoundIconPath(options.mentionSound));
     }
   });
+}
+
+function getMentionSoundIconPath(enabled: boolean): string {
+  return enabled ? MENTION_SOUND_RINGING_BELL_ICON_PATH : MENTION_SOUND_BELL_ICON_PATH;
 }
 
 function prepareSettingsMenu(menu: HTMLElement): void {
