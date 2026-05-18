@@ -46,8 +46,3 @@ export function normalizeOptions(value: Partial<Options> | Record<string, unknow
     mentionSound: candidate.mentionSound === true
   };
 }
-
-export function getNextQuoteLength(currentLength: number): number {
-  const currentIndex = QUOTE_LENGTH_OPTIONS.indexOf(currentLength as typeof QUOTE_LENGTH_OPTIONS[number]);
-  return QUOTE_LENGTH_OPTIONS[(currentIndex + 1) % QUOTE_LENGTH_OPTIONS.length];
-}
