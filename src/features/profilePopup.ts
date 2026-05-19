@@ -17,6 +17,10 @@ import {
 } from './userMessageHistory';
 import { mentionAuthorName, quoteAuthorText } from './reply';
 
+const PROFILE_WINDOW_WIDTH = 430;
+const PROFILE_WINDOW_HEIGHT = 680;
+const PROFILE_WINDOW_MARGIN = 12;
+
 let activeProfileCard: HTMLElement | null = null;
 let activeProfileCardCleanup: (() => void) | null = null;
 
@@ -57,9 +61,26 @@ function openProfileWindow(url: string): void {
   if (!url) return;
 
   const features = getOptions().openProfilesInPopup
-    ? 'popup=yes,width=430,height=680,menubar=no,toolbar=no,location=yes,status=no,scrollbars=yes,resizable=yes'
+    ? getProfileWindowFeatures()
     : 'noopener';
   window.open(url, 'ytcq-profile', features);
+}
+
+function getProfileWindowFeatures(): string {
+  const position = getProfileWindowPosition();
+  return [
+    'popup=yes',
+    `width=${PROFILE_WINDOW_WIDTH}`,
+    `height=${PROFILE_WINDOW_HEIGHT}`,
+    `left=${position.left}`,
+    `top=${position.top}`,
+    'menubar=no',
+    'toolbar=no',
+    'location=yes',
+    'status=no',
+    'scrollbars=yes',
+    'resizable=yes'
+  ].join(',');
 }
 
 function showProfileCard(message: HTMLElement, anchor: HTMLElement, profileUrl: string): void {
@@ -280,4 +301,70 @@ function positionProfileCard(card: HTMLElement, anchor: HTMLElement): void {
 
   card.style.left = `${Math.max(margin, Math.round(left))}px`;
   card.style.top = `${Math.max(margin, Math.round(top))}px`;
+}
+
+function getProfileWindowPosition(): { left: number; top: number } {
+  const screenRect = getAvailableScreenRect();
+  const chatRect = getChatScreenRect();
+
+  let left = chatRect.left - PROFILE_WINDOW_WIDTH - PROFILE_WINDOW_MARGIN;
+  if (left < screenRect.left + PROFILE_WINDOW_MARGIN) {
+    left = chatRect.left + chatRect.width + PROFILE_WINDOW_MARGIN;
+  }
+
+  const top = chatRect.top + Math.max(PROFILE_WINDOW_MARGIN, (chatRect.height - PROFILE_WINDOW_HEIGHT) / 2);
+
+  const leftMin = screenRect.left + PROFILE_WINDOW_MARGIN;
+  const leftMax = screenRect.left + screenRect.width - PROFILE_WINDOW_WIDTH - PROFILE_WINDOW_MARGIN;
+  const topMin = screenRect.top + PROFILE_WINDOW_MARGIN;
+  const topMax = screenRect.top + screenRect.height - PROFILE_WINDOW_HEIGHT - PROFILE_WINDOW_MARGIN;
+
+  return {
+    left: Math.round(clamp(left, leftMin, leftMax)),
+    top: Math.round(clamp(top, topMin, topMax))
+  };
+}
+
+function getChatScreenRect(): { left: number; top: number; width: number; height: number } {
+  try {
+    const frame = window.frameElement as HTMLElement | null;
+    if (frame && window.parent !== window) {
+      const frameRect = frame.getBoundingClientRect();
+      const parentChromeTop = Math.max(0, window.parent.outerHeight - window.parent.innerHeight);
+
+      return {
+        left: window.parent.screenX + frameRect.left,
+        top: window.parent.screenY + parentChromeTop + frameRect.top,
+        width: frameRect.width,
+        height: frameRect.height
+      };
+    }
+  } catch {
+    // Fall through to the standalone chat-window approximation.
+  }
+
+  return {
+    left: window.screenX,
+    top: window.screenY,
+    width: window.outerWidth || window.innerWidth,
+    height: window.outerHeight || window.innerHeight
+  };
+}
+
+function getAvailableScreenRect(): { left: number; top: number; width: number; height: number } {
+  const screenWithOffsets = window.screen as Screen & { availLeft?: number; availTop?: number };
+  const left = Number.isFinite(screenWithOffsets.availLeft) ? Number(screenWithOffsets.availLeft) : 0;
+  const top = Number.isFinite(screenWithOffsets.availTop) ? Number(screenWithOffsets.availTop) : 0;
+
+  return {
+    left,
+    top,
+    width: window.screen.availWidth || window.screen.width,
+    height: window.screen.availHeight || window.screen.height
+  };
+}
+
+function clamp(value: number, min: number, max: number): number {
+  if (max < min) return min;
+  return Math.min(Math.max(value, min), max);
 }
