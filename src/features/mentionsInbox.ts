@@ -134,7 +134,7 @@ export function openMentionsInboxCard(anchor?: HTMLElement): void {
 
     const title = document.createElement('div');
     title.className = 'ytcq-profile-card-title';
-    title.textContent = 'Mentions inbox';
+    title.textContent = 'Mentions';
 
     const subtitle = document.createElement('div');
     subtitle.className = 'ytcq-profile-card-subtitle';
