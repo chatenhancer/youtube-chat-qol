@@ -17,7 +17,7 @@ import {
 } from './userMessageHistory';
 import { mentionAuthorName, quoteAuthorText } from './reply';
 
-const PROFILE_WINDOW_WIDTH = 430;
+const PROFILE_WINDOW_WIDTH = 458;
 const PROFILE_WINDOW_HEIGHT = 680;
 const PROFILE_WINDOW_MARGIN = 12;
 
