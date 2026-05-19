@@ -10,6 +10,7 @@ import { insertIntoChatInput, insertNodeIntoChatInput } from '../youtube/chatInp
 
 interface EmojiUsage {
   key: string;
+  emojiId: string;
   src: string;
   alt: string;
   label: string;
@@ -49,6 +50,7 @@ export function handleEmojiPickerClick(event: Event): void {
 
   const emoji = getEmojiUsageData(option);
   if (!emoji) return;
+  if (isVariantParentEmoji(emoji)) return;
 
   recordEmojiUsage(emoji);
 }
@@ -153,6 +155,7 @@ function getFrequentEmojiRenderKey(topEmojis: EmojiUsage[]): string {
     emoji.src,
     emoji.alt,
     emoji.label,
+    emoji.emojiId,
     emoji.shortcut,
     emoji.text,
     emoji.count,
@@ -172,12 +175,14 @@ function getEmojiUsageData(option: Element | null): EmojiUsage | null {
   const label = cleanText(option?.getAttribute('aria-label') || image?.getAttribute('aria-label') || option?.getAttribute('title') || alt);
   const text = cleanText(option?.textContent || '');
   const shortcut = getEmojiShortcut([label, alt, text]);
+  const emojiId = getNativeEmojiId(option, image);
   const key = shortcut ? `shortcut:${shortcut}` : label ? `label:${label}` : alt ? `alt:${alt}` : text ? `text:${text}` : src ? `src:${src}` : '';
 
   if (!key) return null;
 
   return {
     key,
+    emojiId,
     src,
     alt,
     label,
@@ -196,6 +201,7 @@ function recordEmojiUsage(emoji: EmojiUsage): void {
     existing.key = emoji.key || existing.key;
     existing.count += 1;
     existing.lastUsed = now;
+    existing.emojiId = emoji.emojiId || existing.emojiId;
     existing.src = emoji.src || existing.src;
     existing.alt = emoji.alt || existing.alt;
     existing.label = emoji.label || existing.label;
@@ -204,6 +210,7 @@ function recordEmojiUsage(emoji: EmojiUsage): void {
   } else {
     emojiUsage.push({
       key: emoji.key,
+      emojiId: emoji.emojiId || '',
       src: emoji.src || '',
       alt: emoji.alt || '',
       label: emoji.label || '',
@@ -227,6 +234,7 @@ function normalizeEmojiUsage(value: unknown): EmojiUsage[] {
     .filter((item): item is Partial<EmojiUsage> => Boolean(item && typeof item.key === 'string' && item.key))
     .map((item) => ({
       key: String(item.key),
+      emojiId: String(item.emojiId || ''),
       src: String(item.src || ''),
       alt: String(item.alt || ''),
       label: String(item.label || ''),
@@ -279,6 +287,13 @@ function insertEmojiImageIntoChat(emoji: EmojiUsage): boolean {
   image.src = emoji.src;
   image.alt = alt;
 
+  if (isCustomEmojiUsage(emoji)) {
+    const emojiId = cleanText(emoji.emojiId);
+    if (!emojiId) return false;
+    image.id = emojiId;
+    image.setAttribute('data-emoji-id', emojiId);
+  }
+
   const tooltipText = cleanText(emoji.shortcut || emoji.label);
   if (tooltipText) image.setAttribute('shared-tooltip-text', tooltipText);
 
@@ -309,6 +324,16 @@ function getEmojiImageSource(image: HTMLImageElement | null): string {
   return candidates.find(isUsableEmojiImageSource) || '';
 }
 
+function getNativeEmojiId(option: Element | null, image: HTMLImageElement | null): string {
+  return cleanText(
+    image?.getAttribute('data-emoji-id') ||
+    option?.getAttribute('data-emoji-id') ||
+    image?.getAttribute('id') ||
+    option?.getAttribute('id') ||
+    ''
+  );
+}
+
 function isUsableEmojiImageSource(src: string | null | undefined): boolean {
   if (!src) return false;
   const value = String(src).trim();
@@ -317,6 +342,7 @@ function isUsableEmojiImageSource(src: string | null | undefined): boolean {
 
 function emojiRecordsMatch(a: Partial<EmojiUsage>, b: Partial<EmojiUsage>): boolean {
   if (!a || !b) return false;
+  if (a.emojiId && b.emojiId) return a.emojiId === b.emojiId;
   if (a.src && b.src) return a.src === b.src;
 
   return Boolean(
@@ -333,17 +359,36 @@ function getEmojiFallbackText(emoji: EmojiUsage): string {
   return candidates.find((value) => /\p{Extended_Pictographic}/u.test(value)) || candidates[0] || '';
 }
 
+function isCustomEmojiUsage(emoji: EmojiUsage): boolean {
+  return Boolean(emoji.src) && !getUnicodeEmojiText(emoji);
+}
+
+function isVariantParentEmoji(emoji: EmojiUsage): boolean {
+  const unicodeEmoji = getUnicodeEmojiText(emoji);
+  return Boolean(unicodeEmoji) && isShortcode(emoji.label) && /\p{Emoji_Modifier_Base}/u.test(unicodeEmoji);
+}
+
 function getEmojiInsertText(emoji: EmojiUsage): string {
   const candidates = [emoji.shortcut, emoji.text, emoji.alt, emoji.label]
     .map(cleanText)
     .filter(Boolean);
-  const unicodeEmoji = candidates.find((value) => /\p{Extended_Pictographic}/u.test(value));
+  const unicodeEmoji = candidates.find(isUnicodeEmojiText);
   if (unicodeEmoji) return unicodeEmoji;
 
   const shortcode = getEmojiShortcut(candidates);
   if (shortcode) return shortcode;
 
   return '';
+}
+
+function getUnicodeEmojiText(emoji: Partial<EmojiUsage>): string {
+  return [emoji.text, emoji.alt, emoji.label]
+    .map((value) => cleanText(value || ''))
+    .find(isUnicodeEmojiText) || '';
+}
+
+function isUnicodeEmojiText(value: string): boolean {
+  return /\p{Extended_Pictographic}/u.test(value) || /\p{Emoji_Presentation}/u.test(value);
 }
 
 function getEmojiShortcut(values: string[]): string {
@@ -358,4 +403,8 @@ function getEmojiShortcut(values: string[]): string {
   }
 
   return '';
+}
+
+function isShortcode(value: string): boolean {
+  return /^:[^:\s][^:]*:$/.test(cleanText(value));
 }
