@@ -76,6 +76,12 @@ export function restoreEmojiPlaceholdersToText(text: string, emojiTokens: EmojiT
     .join('');
 }
 
+export function hasTextOutsideEmojiPlaceholders(text: string): boolean {
+  EMOJI_PLACEHOLDER_PATTERN.lastIndex = 0;
+  const withoutPlaceholders = String(text || '').replace(EMOJI_PLACEHOLDER_PATTERN, '');
+  return Boolean(cleanText(withoutPlaceholders));
+}
+
 export function createNodesWithEmojiPlaceholders(text: string, emojiTokens: EmojiToken[]): Node[] {
   const nodes: Node[] = [];
   const source = removeLeakedEmojiShortcodes(String(text || ''), emojiTokens);

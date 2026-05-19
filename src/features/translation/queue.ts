@@ -9,7 +9,7 @@
 import { getOptions } from '../../shared/state';
 import { cleanText } from '../../shared/text';
 import { getMessageDetails } from '../../youtube/messages';
-import { createTranslationPlan, type EmojiToken } from './emojiPlaceholders';
+import { createTranslationPlan, hasTextOutsideEmojiPlaceholders, type EmojiToken } from './emojiPlaceholders';
 import { clearTranslationRenderings, removeTranslation, renderTranslation, type TranslationResult } from './render';
 
 interface PendingTranslationEntry {
@@ -49,6 +49,7 @@ export function queueMessageTranslation(message: HTMLElement, { backfill = false
   const key = makeTranslationKey(plan.text, options.targetLanguage);
 
   if (!details.text || !key || message.dataset.ytcqTranslationKey === key) return;
+  if (!hasTextOutsideEmojiPlaceholders(plan.text)) return;
   if (!isUsefulTranslationCandidate(details.text)) return;
 
   message.dataset.ytcqTranslationKey = key;
@@ -233,7 +234,6 @@ function makeTranslationKey(text: string, targetLanguage: string): string {
 
 function isUsefulTranslationCandidate(text: string): boolean {
   const clean = cleanText(text);
-  if (clean.length < 2) return false;
   if (/^https?:\/\//i.test(clean)) return false;
   if (!/[^\d\s!"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~]/.test(clean)) return false;
   if (!hasLanguageSignal(clean)) return false;
