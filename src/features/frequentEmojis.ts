@@ -99,7 +99,7 @@ function renderFrequentEmojiRow(picker: HTMLElement): void {
 
   const label = document.createElement('div');
   label.className = 'ytcq-frequent-emoji-label';
-  label.textContent = 'Most used';
+  label.textContent = 'MOST USED';
 
   const list = document.createElement('div');
   list.className = 'ytcq-frequent-emoji-list';
@@ -112,7 +112,8 @@ function renderFrequentEmojiRow(picker: HTMLElement): void {
 }
 
 function getFrequentEmojiRowHost(picker: HTMLElement): HTMLElement {
-  return picker.querySelector<HTMLElement>('yt-emoji-picker-category-renderer:not(#search-category)') ||
+  return picker.querySelector<HTMLElement>('#categories') ||
+    picker.querySelector<HTMLElement>('yt-emoji-picker-category-renderer:not(#search-category)') ||
     picker.querySelector<HTMLElement>('yt-emoji-picker-category-renderer') ||
     picker;
 }
