@@ -6,7 +6,12 @@
  */
 import { cleanText } from '../shared/text';
 import { getAuthorName, getMessageContentNodes, getMessageText, getMessageTimestampText } from '../youtube/messages';
-import { appendRichMessageText } from '../youtube/richText';
+import {
+  appendRichMessageText,
+  normalizeRichTextSegments,
+  serializeRichMessageNodes,
+  type RichTextSegment
+} from '../youtube/richText';
 import { mentionAuthorName, quoteAuthorText } from './reply';
 import {
   initMentionDetection,
@@ -24,6 +29,7 @@ interface MentionRecord {
   id: string;
   authorName: string;
   contentNodes?: Node[];
+  contentParts?: RichTextSegment[];
   text: string;
   timestamp: number;
   timestampText: string;
@@ -249,11 +255,13 @@ function createMentionRecord(message: HTMLElement): MentionRecord | null {
   const text = getMessageText(message);
   if (!authorName || !text) return null;
 
+  const contentNodes = getMessageContentNodes(message);
   const timestamp = Date.now();
   return {
     id: `${timestamp}-${Math.random().toString(36).slice(2, 8)}`,
     authorName,
-    contentNodes: getMessageContentNodes(message),
+    contentNodes,
+    contentParts: serializeRichMessageNodes(contentNodes),
     text,
     timestamp,
     timestampText: getMessageTimestampText(message, timestamp),
@@ -306,7 +314,7 @@ function renderMentionsInboxList(list: HTMLElement): void {
 
     const spacer = document.createTextNode(' ');
     const text = document.createElement('span');
-    appendRichMessageText(text, record.text, record.contentNodes);
+    appendRichMessageText(text, record.text, record.contentNodes, record.contentParts);
 
     body.append(author, spacer, text);
     item.append(timestamp, body);
@@ -512,6 +520,7 @@ function serializeMentionRecord(record: MentionRecord): Omit<MentionRecord, 'con
   return {
     id: record.id,
     authorName: record.authorName,
+    contentParts: record.contentParts || [],
     text: record.text,
     timestamp: record.timestamp,
     timestampText: record.timestampText,
@@ -540,6 +549,7 @@ function normalizeStoredRecord(value: unknown): MentionRecord | null {
   return {
     id: cleanText(candidate.id) || `${timestamp}`,
     authorName,
+    contentParts: normalizeRichTextSegments(candidate.contentParts),
     text,
     timestamp,
     timestampText: cleanText(candidate.timestampText) || new Intl.DateTimeFormat(undefined, {

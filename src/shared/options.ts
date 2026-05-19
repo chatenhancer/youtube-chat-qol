@@ -22,7 +22,7 @@ export const DEFAULT_OPTIONS: Options = {
   translationDisplay: 'replace',
   quoteMaxLength: 120,
   openProfilesInPopup: true,
-  mentionSound: false
+  mentionSound: true
 };
 
 export const TRANSLATION_DISPLAY_OPTIONS: readonly (readonly [TranslationDisplay, string])[] = [
@@ -43,6 +43,6 @@ export function normalizeOptions(value: Partial<Options> | Record<string, unknow
     translationDisplay,
     quoteMaxLength: clampNumber(candidate.quoteMaxLength, 40, 240, DEFAULT_OPTIONS.quoteMaxLength),
     openProfilesInPopup: candidate.openProfilesInPopup !== false,
-    mentionSound: candidate.mentionSound === true
+    mentionSound: candidate.mentionSound !== false
   };
 }

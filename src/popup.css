@@ -1,30 +1,55 @@
 /*
  * Extension action popup styles.
  *
- * The popup is intentionally plain and light-themed because it sits outside
- * YouTube's chat iframe and mainly mirrors settings already available there.
+ * The popup sits outside YouTube's iframe, so it approximates YouTube's light
+ * and dark surfaces with local tokens instead of relying on YouTube variables.
  */
 :root {
-  color-scheme: light;
+  color-scheme: light dark;
+  --ytcq-popup-card-bg: #fff;
+  --ytcq-popup-row-bg: rgba(0, 0, 0, 0.04);
+  --ytcq-popup-row-hover-bg: rgba(0, 0, 0, 0.07);
+  --ytcq-popup-control-bg: #fff;
+  --ytcq-popup-control-tint: rgba(0, 0, 0, 0.04);
+  --ytcq-popup-control-border: rgba(0, 0, 0, 0.22);
+  --ytcq-popup-text: #0f0f0f;
+  --ytcq-popup-secondary-text: #606060;
+  --ytcq-popup-action: #065fd4;
   font-family: Roboto, Arial, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ytcq-popup-card-bg: #282828;
+    --ytcq-popup-row-bg: rgba(255, 255, 255, 0.08);
+    --ytcq-popup-row-hover-bg: rgba(255, 255, 255, 0.12);
+    --ytcq-popup-control-bg: #282828;
+    --ytcq-popup-control-tint: rgba(255, 255, 255, 0.06);
+    --ytcq-popup-control-border: rgba(255, 255, 255, 0.24);
+    --ytcq-popup-text: #f1f1f1;
+    --ytcq-popup-secondary-text: #aaa;
+    --ytcq-popup-action: #3ea6ff;
+  }
 }
 
 body {
   width: 280px;
   margin: 0;
-  color: #0f0f0f;
-  background: #ffffff;
+  color: var(--ytcq-popup-text);
+  background: var(--ytcq-popup-card-bg);
 }
 
 main {
-  padding: 16px;
+  box-sizing: border-box;
+  padding: 14px;
+  background: var(--ytcq-popup-card-bg);
 }
 
 .header {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin: 0 0 18px;
+  margin: 0 0 12px;
 }
 
 .brand img {
@@ -37,9 +62,15 @@ main {
   margin: 0;
 }
 
+@media (prefers-color-scheme: dark) {
+  .brand img {
+    content: url("logo-white.png");
+  }
+}
+
 .version {
   margin: 0;
-  color: #606060;
+  color: var(--ytcq-popup-secondary-text);
   font-size: 12px;
   line-height: 16px;
   white-space: nowrap;
@@ -48,8 +79,11 @@ main {
 .row,
 .field {
   display: flex;
-  gap: 10px;
-  margin: 12px 0;
+  gap: 8px;
+  margin: 8px 0;
+  padding: 7px 8px;
+  border-radius: 6px;
+  background: var(--ytcq-popup-row-bg);
   font-size: 13px;
 }
 
@@ -57,9 +91,41 @@ main {
   align-items: center;
 }
 
+.row:hover,
+.field:hover {
+  background: var(--ytcq-popup-row-hover-bg);
+}
+
 .field {
   flex-direction: column;
-  gap: 6px;
+  gap: 5px;
+}
+
+.option-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+}
+
+.row .option-title {
+  flex: 1 1 auto;
+}
+
+.option-icon {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  fill: currentColor;
+  opacity: 0.78;
+}
+
+.mention-sound-ring {
+  display: none;
+}
+
+#mentionSound:checked + .option-title .mention-sound-ring {
+  display: block;
 }
 
 input,
@@ -71,12 +137,27 @@ select,
 input[type="number"] {
   box-sizing: border-box;
   width: 100%;
-  min-height: 30px;
+  min-height: 28px;
+  padding: 3px 8px;
+  border: 1px solid var(--ytcq-popup-control-border);
+  border-radius: 4px;
+  color: var(--ytcq-popup-text);
+  background:
+    linear-gradient(var(--ytcq-popup-control-tint), var(--ytcq-popup-control-tint)),
+    var(--ytcq-popup-control-bg);
+}
+
+select {
+  padding-right: 24px;
+}
+
+input[type="checkbox"] {
+  accent-color: var(--ytcq-popup-action);
 }
 
 .hint {
-  margin: 14px 0 0;
-  color: #606060;
+  margin: 10px 0 0;
+  color: var(--ytcq-popup-secondary-text);
   font-size: 12px;
   line-height: 16px;
 }

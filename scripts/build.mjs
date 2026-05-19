@@ -64,6 +64,7 @@ async function buildTarget(target) {
     copyFile(path.join(root, 'src', 'popup.css'), path.join(extensionDir, 'popup.css')),
     copyFile(path.join(root, 'src', 'popup.html'), path.join(extensionDir, 'popup.html')),
     copyFile(path.join(root, 'assets', 'logo.png'), path.join(extensionDir, 'logo.png')),
+    copyFile(path.join(root, 'assets', 'logo-white.png'), path.join(extensionDir, 'logo-white.png')),
     cp(path.join(root, 'assets', 'icons'), path.join(extensionDir, 'icons'), { recursive: true })
   ]);
 
