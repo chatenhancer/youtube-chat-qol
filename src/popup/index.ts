@@ -40,7 +40,7 @@ function init(): void {
     controls.translationDisplay.value = storedOptions.translationDisplay || DEFAULT_OPTIONS.translationDisplay;
     controls.quoteMaxLength.value = String(storedOptions.quoteMaxLength || DEFAULT_OPTIONS.quoteMaxLength);
     controls.openProfilesInPopup.checked = storedOptions.openProfilesInPopup !== false;
-    controls.mentionSound.checked = storedOptions.mentionSound === true;
+    controls.mentionSound.checked = storedOptions.mentionSound !== false;
   });
 
   controls.targetLanguage.addEventListener('change', () => {
