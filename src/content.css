@@ -287,7 +287,7 @@ yt-live-chat-header-renderer .ytcq-mentions-inbox-badge[hidden] {
 
 .ytcq-profile-card-header {
   display: grid;
-  grid-template-columns: 36px minmax(0, 1fr) 28px;
+  grid-template-columns: 36px minmax(0, 1fr) auto 28px;
   gap: 10px;
   align-items: center;
 }
@@ -297,6 +297,53 @@ yt-live-chat-header-renderer .ytcq-mentions-inbox-badge[hidden] {
   height: 36px;
   border-radius: 50%;
   object-fit: cover;
+}
+
+.ytcq-profile-card-avatar-button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  overflow: hidden;
+  background: transparent;
+  cursor: pointer;
+}
+
+.ytcq-profile-card-avatar-button::after {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: rgba(0, 0, 0, 0.42);
+  opacity: 0;
+  content: "";
+  transition: opacity 120ms ease;
+}
+
+.ytcq-profile-card-avatar-open-icon {
+  position: absolute;
+  z-index: 1;
+  width: 18px;
+  height: 18px;
+  fill: #fff;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 120ms ease;
+}
+
+.ytcq-profile-card-avatar-button:hover::after,
+.ytcq-profile-card-avatar-button:focus::after,
+.ytcq-profile-card-avatar-button:hover .ytcq-profile-card-avatar-open-icon,
+.ytcq-profile-card-avatar-button:focus .ytcq-profile-card-avatar-open-icon {
+  opacity: 1;
+}
+
+.ytcq-profile-card-avatar-button:focus {
+  outline: none;
 }
 
 .ytcq-profile-card-title-wrap {
@@ -445,6 +492,12 @@ yt-live-chat-header-renderer .ytcq-mentions-inbox-badge[hidden] {
   color: var(--yt-live-chat-secondary-text-color, var(--yt-spec-text-secondary, #aaa));
   cursor: default;
   opacity: 0.5;
+}
+
+.ytcq-profile-card-open-header {
+  min-height: 28px;
+  padding: 0 10px;
+  white-space: nowrap;
 }
 
 .ytcq-mentions-inbox-card-header {

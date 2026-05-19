@@ -97,7 +97,7 @@ function showProfileCard(message: HTMLElement, anchor: HTMLElement, profileUrl: 
 
   const avatar = getAvatarElement(message);
   if (avatar) {
-    header.append(avatar);
+    header.append(profileUrl ? createProfileAvatarButton(avatar, profileUrl) : avatar);
   }
 
   const titleWrap = document.createElement('div');
@@ -123,6 +123,16 @@ function showProfileCard(message: HTMLElement, anchor: HTMLElement, profileUrl: 
   titleWrap.append(title, subtitle);
   header.append(titleWrap);
 
+  const openButton = document.createElement('button');
+  openButton.type = 'button';
+  openButton.className = 'ytcq-profile-card-open ytcq-profile-card-open-header';
+  openButton.textContent = 'Open channel';
+  openButton.disabled = !profileUrl;
+  openButton.addEventListener('click', () => {
+    openProfileWindow(profileUrl);
+  });
+  header.append(openButton);
+
   const closeButton = document.createElement('button');
   closeButton.type = 'button';
   closeButton.className = 'ytcq-profile-card-close';
@@ -137,21 +147,7 @@ function showProfileCard(message: HTMLElement, anchor: HTMLElement, profileUrl: 
   const profileKey = getUserKey(message);
   renderProfileMessages(list, profileKey ? getRecentMessagesForKey(profileKey) : []);
 
-  const actions = document.createElement('div');
-  actions.className = 'ytcq-profile-card-actions';
-
-  const openButton = document.createElement('button');
-  openButton.type = 'button';
-  openButton.className = 'ytcq-profile-card-open';
-  openButton.textContent = 'Open channel';
-  openButton.disabled = !profileUrl;
-  openButton.addEventListener('click', () => {
-    openProfileWindow(profileUrl);
-    closeProfileCard();
-  });
-  actions.append(openButton);
-
-  card.append(header, list, actions);
+  card.append(header, list);
   document.body.append(card);
   activeProfileCard = card;
   positionProfileCard(card, anchor);
@@ -267,6 +263,35 @@ function getAvatarElement(message: HTMLElement): HTMLImageElement | null {
   image.alt = '';
   image.referrerPolicy = 'no-referrer';
   return image;
+}
+
+function createProfileAvatarButton(avatar: HTMLImageElement, profileUrl: string): HTMLButtonElement {
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = 'ytcq-profile-card-avatar-button';
+  button.title = 'Open channel';
+  button.setAttribute('aria-label', 'Open channel');
+  button.append(avatar, createOpenInNewIcon());
+  button.addEventListener('click', (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    openProfileWindow(profileUrl);
+  });
+  return button;
+}
+
+function createOpenInNewIcon(): SVGSVGElement {
+  const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  icon.setAttribute('viewBox', '0 0 24 24');
+  icon.setAttribute('focusable', 'false');
+  icon.setAttribute('aria-hidden', 'true');
+  icon.classList.add('ytcq-profile-card-avatar-open-icon');
+
+  const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  path.setAttribute('d', 'M14 3h7v7h-2V6.41l-9.29 9.3-1.42-1.42 9.3-9.29H14V3ZM5 5h6v2H5v12h12v-6h2v6a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2Z');
+  icon.append(path);
+
+  return icon;
 }
 
 function createCloseIcon(): SVGSVGElement {
