@@ -26,6 +26,7 @@ const MAX_EMOJI_USAGE_ENTRIES = 80;
 
 let emojiUsage: EmojiUsage[] = [];
 let emojiUsageSaveTimer = 0;
+let emojiPickerRefreshTimer = 0;
 
 export function initFrequentEmojis(): void {
   chrome.storage.local.get({ [EMOJI_USAGE_STORAGE_KEY]: [] }, (stored) => {
@@ -43,8 +44,25 @@ function refreshEmojiPickers(): void {
   document.querySelectorAll('yt-emoji-picker-renderer').forEach(enhanceEmojiPicker);
 }
 
+function scheduleEmojiPickerRefresh(): void {
+  window.clearTimeout(emojiPickerRefreshTimer);
+  emojiPickerRefreshTimer = window.setTimeout(() => {
+    emojiPickerRefreshTimer = 0;
+    refreshEmojiPickers();
+  }, 50);
+}
+
+function isEmojiPickerToggle(target: Element): boolean {
+  return !target.closest('yt-emoji-picker-renderer') &&
+    Boolean(target.closest('#emoji.style-scope.yt-live-chat-message-input-renderer'));
+}
+
 export function handleEmojiPickerClick(event: Event): void {
   const target = event.target instanceof Element ? event.target : null;
+  if (target && isEmojiPickerToggle(target)) {
+    scheduleEmojiPickerRefresh();
+  }
+
   const option = target?.closest('yt-emoji-picker-renderer [role="option"]');
   if (!option || option.closest('.ytcq-frequent-emoji-row')) return;
 
@@ -165,7 +183,7 @@ function getFrequentEmojiRenderKey(topEmojis: EmojiUsage[]): string {
 
 function chooseFrequentEmoji(emoji: EmojiUsage): void {
   if (!insertEmojiIntoChat(emoji)) return;
-  recordEmojiUsage(emoji);
+  recordEmojiUsage(emoji, { refreshPickers: false });
 }
 
 function getEmojiUsageData(option: Element | null): EmojiUsage | null {
@@ -193,7 +211,7 @@ function getEmojiUsageData(option: Element | null): EmojiUsage | null {
   };
 }
 
-function recordEmojiUsage(emoji: EmojiUsage): void {
+function recordEmojiUsage(emoji: EmojiUsage, options: { refreshPickers?: boolean } = {}): void {
   const existing = emojiUsage.find((item) => emojiRecordsMatch(item, emoji));
   const now = Date.now();
 
@@ -223,8 +241,7 @@ function recordEmojiUsage(emoji: EmojiUsage): void {
 
   emojiUsage = normalizeEmojiUsage(emojiUsage);
   scheduleEmojiUsageSave();
-  refreshEmojiPickers();
-  window.setTimeout(refreshEmojiPickers, 150);
+  if (options.refreshPickers !== false) refreshEmojiPickers();
 }
 
 function normalizeEmojiUsage(value: unknown): EmojiUsage[] {
