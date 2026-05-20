@@ -19,6 +19,12 @@ import {
   processPotentialMentionForConsumer,
   registerMentionProcessor
 } from './mentionDetection';
+import {
+  clearMentionTabAlert,
+  initMentionTabAlert,
+  isCurrentTabActive,
+  showMentionTabAlert
+} from './tabAlert';
 
 const STORAGE_KEY = 'ytcqMentionsInbox';
 const MAX_MENTION_RECORDS = 100;
@@ -53,6 +59,7 @@ let mentionsInboxWireTimer: number | null = null;
 
 export function initMentionsInbox(): void {
   initMentionDetection();
+  initMentionTabAlert();
   if (!registeredMentionsInbox) {
     registeredMentionsInbox = true;
     registerMentionProcessor(handlePotentialMentionsInbox);
@@ -179,6 +186,7 @@ export function openMentionsInboxCard(anchor?: HTMLElement): void {
     activeMentionsInboxCard = card;
     positionMentionsInboxCard(card, anchor);
     scrollMentionsInboxToBottom(list);
+    clearMentionTabAlert();
     markMentionsRead();
 
     const handleOutsideClick = (event: MouseEvent): void => {
@@ -231,9 +239,10 @@ function recordMention(message: HTMLElement): void {
       return;
     }
 
+    const read = Boolean(activeMentionsInboxCard && isCurrentTabActive());
     records.push({
       ...record,
-      read: Boolean(activeMentionsInboxCard)
+      read
     });
     records = records.slice(-MAX_MENTION_RECORDS);
     void saveMentionRecords();
@@ -244,9 +253,16 @@ function recordMention(message: HTMLElement): void {
       if (list) renderMentionsInboxList(list);
       if (list) scrollMentionsInboxToBottom(list);
       if (subtitle) subtitle.textContent = getMentionsInboxSubtitle();
-      markMentionsRead();
+      if (isCurrentTabActive()) {
+        clearMentionTabAlert();
+        markMentionsRead();
+      } else {
+        refreshMentionsInboxSurfaces();
+        showMentionTabAlert(getUnreadMentionCount());
+      }
     } else {
       refreshMentionsInboxSurfaces();
+      showMentionTabAlert(getUnreadMentionCount());
     }
   });
 }
@@ -377,6 +393,7 @@ function markMentionsRead(): void {
 
   records = records.map((record) => ({ ...record, read: true }));
   void saveMentionRecords();
+  clearMentionTabAlert();
   refreshMentionsInboxSurfaces();
 }
 
