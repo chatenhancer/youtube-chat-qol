@@ -9,7 +9,10 @@ import { LANGUAGE_OPTIONS } from '../shared/languages';
 import { DEFAULT_OPTIONS, type Options } from '../shared/options';
 import { clampNumber } from '../shared/text';
 
+const REPOSITORY_URL = 'https://github.com/chat-enhancer-yt/youtube-chat-qol';
+
 const controls = {
+  repositoryLink: document.querySelector<HTMLAnchorElement>('#repositoryLink'),
   targetLanguage: document.querySelector<HTMLSelectElement>('#targetLanguage'),
   translationDisplay: document.querySelector<HTMLSelectElement>('#translationDisplay'),
   quoteMaxLength: document.querySelector<HTMLInputElement>('#quoteMaxLength'),
@@ -28,6 +31,11 @@ function init(): void {
   if (controls.version) {
     controls.version.textContent = `Version ${chrome.runtime.getManifest().version}`;
   }
+
+  controls.repositoryLink?.addEventListener('click', (event) => {
+    event.preventDefault();
+    chrome.tabs.create({ url: REPOSITORY_URL });
+  });
 
   controls.targetLanguage.appendChild(createLanguageOption('', 'Off'));
   for (const [value, label] of LANGUAGE_OPTIONS) {
