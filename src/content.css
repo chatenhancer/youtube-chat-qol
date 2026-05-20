@@ -212,7 +212,8 @@ yt-emoji-picker-renderer .ytcq-frequent-emoji-button img {
 
 yt-live-chat-text-message-renderer .ytcq-profile-enabled,
 yt-live-chat-paid-message-renderer .ytcq-profile-enabled,
-yt-live-chat-membership-item-renderer .ytcq-profile-enabled {
+yt-live-chat-membership-item-renderer .ytcq-profile-enabled,
+yt-live-chat-participant-renderer .ytcq-profile-enabled {
   cursor: pointer;
 }
 
@@ -465,6 +466,37 @@ yt-live-chat-header-renderer .ytcq-mentions-inbox-badge[hidden] {
   color: var(--yt-live-chat-secondary-text-color, var(--yt-spec-text-secondary, #aaa));
 }
 
+.ytcq-profile-card-empty-centered {
+  display: flex;
+  min-height: 84px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-align: center;
+}
+
+.ytcq-profile-card-empty-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  color: var(--yt-live-chat-secondary-text-color, var(--yt-spec-text-secondary, #aaa));
+  fill: currentColor;
+  opacity: 0.32;
+}
+
+.ytcq-profile-card-empty-icon svg {
+  display: block;
+  width: 34px;
+  height: 34px;
+  overflow: visible;
+  stroke: currentColor;
+  stroke-width: 2px;
+  paint-order: stroke fill;
+}
+
 .ytcq-profile-card-actions {
   display: flex;
   justify-content: flex-end;
@@ -528,10 +560,13 @@ yt-live-chat-header-renderer .ytcq-mentions-inbox-badge[hidden] {
 
 .ytcq-mentions-inbox-empty {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 8px;
   min-height: 84px;
   padding: 12px 0;
+  text-align: center;
 }
 
 .ytcq-mentions-inbox-empty-icon {

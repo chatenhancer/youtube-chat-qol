@@ -37,6 +37,11 @@ export interface MessageTranslationRecord {
   emojiTokens: EmojiToken[];
 }
 
+export interface UserIdentity {
+  authorName?: string;
+  channelId?: string;
+}
+
 interface ElementRecord {
   key: string;
   id: number;
@@ -99,6 +104,21 @@ export function getRecentMessagesForKey(key: string, limit = 5): MessageRecord[]
   return (recordsByUser.get(key) || []).slice(-limit);
 }
 
+export function getRecentMessagesForIdentity(identity: UserIdentity, limit = 5): MessageRecord[] {
+  const key = getUserKeyFromIdentity(identity);
+  const directRecords = key ? getRecentMessagesForKey(key, limit) : [];
+  if (directRecords.length || !identity.authorName) return directRecords;
+
+  const normalizedAuthorName = normalizeComparableText(identity.authorName);
+  if (!normalizedAuthorName) return [];
+
+  return Array.from(recordsByUser.values())
+    .flat()
+    .filter((record) => normalizeComparableText(record.authorName) === normalizedAuthorName)
+    .sort((a, b) => a.timestamp - b.timestamp)
+    .slice(-limit);
+}
+
 export function recordUserMessageTranslation(
   message: HTMLElement,
   result: TranslationResult,
@@ -146,10 +166,16 @@ export function clearUserMessageTranslations(): void {
 
 export function getUserKey(message: HTMLElement): string {
   const data = getRendererData(message);
-  const channelId = data?.authorExternalChannelId || data?.authorChannelId;
-  if (channelId) return `channel:${channelId}`;
+  return getUserKeyFromIdentity({
+    channelId: data?.authorExternalChannelId || data?.authorChannelId,
+    authorName: getAuthorName(message)
+  });
+}
 
-  const authorName = normalizeComparableText(getAuthorName(message));
+export function getUserKeyFromIdentity(identity: UserIdentity): string {
+  if (identity.channelId) return `channel:${identity.channelId}`;
+
+  const authorName = normalizeComparableText(identity.authorName || '');
   return authorName ? `author:${authorName}` : '';
 }
 
