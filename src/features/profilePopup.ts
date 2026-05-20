@@ -6,6 +6,8 @@
  * it only exists while the current chat page is open.
  */
 import { getOptions } from '../shared/state';
+import { createEmptyLeavesIcon } from '../shared/icons';
+import { cleanText, normalizeComparableText } from '../shared/text';
 import { getAuthorName, getRendererData } from '../youtube/messages';
 import { appendRichMessageText } from '../youtube/richText';
 import {
@@ -16,13 +18,15 @@ import {
 } from './translation/render';
 import { createNodesWithEmojiPlaceholders } from './translation/emojiPlaceholders';
 import {
+  getRecentMessagesForIdentity,
   getRecentMessagesForKey,
-  getUserKey,
+  getUserKeyFromIdentity,
   onUserMessagesChanged,
   recordVisibleUserMessages,
-  type MessageRecord
+  type MessageRecord,
+  type UserIdentity
 } from './userMessageHistory';
-import { mentionAuthorName, quoteAuthorText } from './reply';
+import { mentionAuthorName, quoteAuthorRichText } from './reply';
 
 const PROFILE_WINDOW_WIDTH = 458;
 const PROFILE_WINDOW_HEIGHT = 680;
@@ -30,6 +34,22 @@ const PROFILE_WINDOW_MARGIN = 12;
 
 let activeProfileCard: HTMLElement | null = null;
 let activeProfileCardCleanup: (() => void) | null = null;
+
+interface ProfileSource {
+  authorName: string;
+  avatarSrc: string;
+  identity: UserIdentity;
+  profileUrl: string;
+}
+
+interface ParticipantRendererData {
+  authorExternalChannelId?: string;
+  authorChannelId?: string;
+  authorName?: {
+    simpleText?: string;
+    runs?: { text?: string }[];
+  };
+}
 
 export function wireProfileClick(message: HTMLElement): void {
   if (message.dataset.ytcqProfileWired === 'true') return;
@@ -41,27 +61,99 @@ export function wireProfileClick(message: HTMLElement): void {
   avatar.classList.add('ytcq-profile-enabled');
   avatar.title = 'Show recent messages';
   avatar.addEventListener('click', (event) => {
-    const url = getProfileUrl(message);
+    const source = getMessageProfileSource(message);
+    if (!source) return;
 
     event.preventDefault();
     event.stopPropagation();
-    showProfileCard(message, avatar, url);
+    showProfileCard(source, avatar);
   }, true);
 }
 
-function getProfileUrl(message: HTMLElement): string {
+export function wireParticipantProfileClick(participant: HTMLElement): void {
+  if (participant.dataset.ytcqProfileWired === 'true') return;
+  participant.dataset.ytcqProfileWired = 'true';
+
+  const clickTargets = [
+    participant.querySelector<HTMLElement>('yt-img-shadow, img#img, img'),
+    participant.querySelector<HTMLElement>('#author-name')
+  ].filter((target): target is HTMLElement => Boolean(target));
+
+  clickTargets.forEach((target) => {
+    target.classList.add('ytcq-profile-enabled');
+    target.title = 'Show recent messages';
+    target.addEventListener('click', (event) => {
+      const source = getParticipantProfileSource(participant);
+      if (!source) return;
+
+      event.preventDefault();
+      event.stopPropagation();
+      showProfileCard(source, target);
+    }, true);
+  });
+}
+
+function getMessageProfileSource(message: HTMLElement): ProfileSource | null {
   const data = getRendererData(message);
   const channelId = data?.authorExternalChannelId || data?.authorChannelId;
+  const authorName = getAuthorName(message);
+  const avatarSrc = getMessageAvatarSrc(message);
+  if (!authorName || !avatarSrc) return null;
+
+  return {
+    authorName,
+    avatarSrc,
+    identity: {
+      authorName,
+      channelId
+    },
+    profileUrl: getProfileUrl(channelId, authorName)
+  };
+}
+
+function getParticipantProfileSource(participant: HTMLElement): ProfileSource | null {
+  const data = getParticipantRendererData(participant);
+  const channelId = data?.authorExternalChannelId || data?.authorChannelId;
+  const authorName = cleanText(
+    data?.authorName?.simpleText ||
+    data?.authorName?.runs?.map((run) => run.text || '').join('') ||
+    participant.querySelector('#author-name')?.textContent ||
+    participant.textContent ||
+    ''
+  );
+  const avatarSrc = participant.querySelector<HTMLImageElement>('yt-img-shadow img, img#img, img')?.src || '';
+
+  if (!authorName || !avatarSrc) return null;
+
+  return {
+    authorName,
+    avatarSrc,
+    identity: {
+      authorName,
+      channelId
+    },
+    profileUrl: getProfileUrl(channelId, authorName)
+  };
+}
+
+function getProfileUrl(channelId: string | undefined, authorName: string): string {
   if (channelId) {
     return `https://www.youtube.com/channel/${encodeURIComponent(channelId)}`;
   }
 
-  const authorName = getAuthorName(message);
   if (authorName?.startsWith('@')) {
-    return `https://www.youtube.com/${encodeURIComponent(authorName)}`;
+    return `https://www.youtube.com/${authorName}`;
   }
 
   return '';
+}
+
+function getParticipantRendererData(participant: HTMLElement): ParticipantRendererData | null {
+  const candidate = participant as HTMLElement & {
+    data?: ParticipantRendererData;
+    __data?: { data?: ParticipantRendererData };
+  };
+  return candidate.data || candidate.__data?.data || null;
 }
 
 function openProfileWindow(url: string): void {
@@ -90,7 +182,7 @@ function getProfileWindowFeatures(): string {
   ].join(',');
 }
 
-function showProfileCard(message: HTMLElement, anchor: HTMLElement, profileUrl: string): void {
+function showProfileCard(source: ProfileSource, anchor: HTMLElement): void {
   closeProfileCard();
   recordVisibleUserMessages();
 
@@ -102,24 +194,21 @@ function showProfileCard(message: HTMLElement, anchor: HTMLElement, profileUrl: 
   const header = document.createElement('div');
   header.className = 'ytcq-profile-card-header';
 
-  const avatar = getAvatarElement(message);
-  if (avatar) {
-    header.append(profileUrl ? createProfileAvatarButton(avatar, profileUrl) : avatar);
-  }
+  const avatar = createAvatarElement(source.avatarSrc);
+  header.append(source.profileUrl ? createProfileAvatarButton(avatar, source.profileUrl) : avatar);
 
   const titleWrap = document.createElement('div');
   titleWrap.className = 'ytcq-profile-card-title-wrap';
 
-  const authorName = getAuthorName(message) || 'Chat user';
   const title = document.createElement('button');
   title.type = 'button';
   title.className = 'ytcq-profile-card-title ytcq-profile-card-author';
-  title.textContent = authorName;
+  title.textContent = source.authorName;
   title.title = 'Mention user';
   title.addEventListener('click', (event) => {
     event.preventDefault();
     event.stopPropagation();
-    mentionAuthorName(authorName);
+    mentionAuthorName(source.authorName);
     closeProfileCard();
   });
 
@@ -134,9 +223,9 @@ function showProfileCard(message: HTMLElement, anchor: HTMLElement, profileUrl: 
   openButton.type = 'button';
   openButton.className = 'ytcq-profile-card-open ytcq-profile-card-open-header';
   openButton.textContent = 'Open channel';
-  openButton.disabled = !profileUrl;
+  openButton.disabled = !source.profileUrl;
   openButton.addEventListener('click', () => {
-    openProfileWindow(profileUrl);
+    openProfileWindow(source.profileUrl);
   });
   header.append(openButton);
 
@@ -151,8 +240,8 @@ function showProfileCard(message: HTMLElement, anchor: HTMLElement, profileUrl: 
   const list = document.createElement('div');
   list.className = 'ytcq-profile-card-messages';
 
-  const profileKey = getUserKey(message);
-  renderProfileMessages(list, profileKey ? getRecentMessagesForKey(profileKey) : []);
+  const profileKey = getUserKeyFromIdentity(source.identity);
+  renderProfileMessages(list, getRecentMessagesForIdentity(source.identity));
 
   card.append(header, list);
   document.body.append(card);
@@ -176,19 +265,17 @@ function showProfileCard(message: HTMLElement, anchor: HTMLElement, profileUrl: 
 
     positionProfileCard(activeProfileCard, anchor);
   };
-  const unsubscribeMessages = profileKey
-    ? onUserMessagesChanged((key) => {
-        if (key !== profileKey || !activeProfileCard) return;
-        renderProfileMessages(list, getRecentMessagesForKey(profileKey));
-        scrollCardListToBottom(list);
-      })
-    : null;
+  const unsubscribeMessages = onUserMessagesChanged((key) => {
+    if (!activeProfileCard || !shouldRefreshProfileMessages(key, source, profileKey)) return;
+    renderProfileMessages(list, getRecentMessagesForIdentity(source.identity));
+    scrollCardListToBottom(list);
+  });
 
   activeProfileCardCleanup = () => {
     document.removeEventListener('click', handleOutsideClick, true);
     document.removeEventListener('keydown', handleKeydown, true);
     window.removeEventListener('resize', handleResize, true);
-    unsubscribeMessages?.();
+    unsubscribeMessages();
   };
 
   window.setTimeout(() => {
@@ -233,9 +320,29 @@ function renderProfileMessages(list: HTMLElement, recentMessages: MessageRecord[
   }
 
   const empty = document.createElement('div');
-  empty.className = 'ytcq-profile-card-empty';
-  empty.textContent = 'No recent messages yet.';
+  empty.className = 'ytcq-profile-card-empty ytcq-profile-card-empty-centered';
+
+  const icon = document.createElement('span');
+  icon.className = 'ytcq-profile-card-empty-icon';
+  icon.setAttribute('aria-hidden', 'true');
+  icon.append(createEmptyLeavesIcon());
+
+  const text = document.createElement('span');
+  text.textContent = 'No recent messages yet';
+
+  empty.append(icon, text);
   list.append(empty);
+}
+
+function shouldRefreshProfileMessages(key: string, source: ProfileSource, profileKey: string): boolean {
+  if (key === profileKey) return true;
+
+  const authorName = normalizeComparableText(source.authorName);
+  if (!authorName) return false;
+
+  return getRecentMessagesForKey(key).some((record) => (
+    normalizeComparableText(record.authorName) === authorName
+  ));
 }
 
 function renderProfileMessageText(
@@ -276,7 +383,9 @@ function wireQuoteCardItem(item: HTMLElement, recentMessage: MessageRecord): voi
   const quote = (event: Event): void => {
     event.preventDefault();
     event.stopPropagation();
-    quoteAuthorText(recentMessage.authorName, recentMessage.text);
+    quoteAuthorRichText(recentMessage.authorName, recentMessage.text, {
+      nodes: recentMessage.contentNodes
+    });
     closeProfileCard();
   };
 
@@ -294,13 +403,15 @@ function scrollCardListToBottom(list: HTMLElement): void {
   });
 }
 
-function getAvatarElement(message: HTMLElement): HTMLImageElement | null {
+function getMessageAvatarSrc(message: HTMLElement): string {
   const source = message.querySelector<HTMLImageElement>('#author-photo img, #author-photo #img, img#img');
-  if (!source?.src) return null;
+  return source?.src || '';
+}
 
+function createAvatarElement(src: string): HTMLImageElement {
   const image = document.createElement('img');
   image.className = 'ytcq-profile-card-avatar';
-  image.src = source.src;
+  image.src = src;
   image.alt = '';
   image.referrerPolicy = 'no-referrer';
   return image;

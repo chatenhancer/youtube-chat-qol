@@ -13,7 +13,7 @@ import { handleMessageMenuActivation, wireMessageContext } from '../features/men
 import { configureSettingsMenu, refreshSettingsMenus } from '../features/menus/settingsMenu';
 import { handlePotentialMentionsInbox, initMentionsInbox, scheduleMentionsInboxButtonWire } from '../features/mentionsInbox';
 import { handlePotentialMention, initMentionSound } from '../features/mentionSound';
-import { wireProfileClick } from '../features/profilePopup';
+import { wireParticipantProfileClick, wireProfileClick } from '../features/profilePopup';
 import { wireAuthorNameMention } from '../features/reply';
 import {
   clearTranslations,
@@ -24,7 +24,7 @@ import {
 import { recordUserMessage } from '../features/userMessageHistory';
 import { DEFAULT_OPTIONS, normalizeOptions, type Options } from '../shared/options';
 import { getOptions, setOptions } from '../shared/state';
-import { CHAT_MESSAGE_SELECTOR } from '../youtube/selectors';
+import { CHAT_MESSAGE_SELECTOR, PARTICIPANT_SELECTOR } from '../youtube/selectors';
 
 let observer: MutationObserver | null = null;
 let visibilityRecoveryTimer = 0;
@@ -62,6 +62,7 @@ function init(): void {
 
 function boot(): void {
   processExistingMessages(getOptions().targetLanguage ? MAX_RETROACTIVE_TRANSLATIONS : 0);
+  processExistingParticipants();
   document.querySelectorAll('ytd-menu-popup-renderer').forEach(enhanceMenu);
   document.querySelectorAll('yt-emoji-picker-renderer').forEach(enhanceEmojiPicker);
   scheduleMentionsInboxButtonWire();
@@ -104,9 +105,16 @@ function boot(): void {
         if (node.matches(CHAT_MESSAGE_SELECTOR) && node instanceof HTMLElement) {
           enhanceMessage(node, { allowTranslate: true });
         }
+        if (node.matches(PARTICIPANT_SELECTOR) && node instanceof HTMLElement) {
+          enhanceParticipant(node);
+        }
         const containingMessage = node.closest<HTMLElement>(CHAT_MESSAGE_SELECTOR);
         if (containingMessage && !node.matches(CHAT_MESSAGE_SELECTOR)) {
           enhanceMessage(containingMessage, { allowTranslate: false });
+        }
+        const containingParticipant = node.closest<HTMLElement>(PARTICIPANT_SELECTOR);
+        if (containingParticipant && !node.matches(PARTICIPANT_SELECTOR)) {
+          enhanceParticipant(containingParticipant);
         }
         if (node.matches('ytd-menu-popup-renderer')) {
           enhanceMenu(node);
@@ -124,6 +132,9 @@ function boot(): void {
         }
         for (const message of node.querySelectorAll<HTMLElement>(CHAT_MESSAGE_SELECTOR)) {
           enhanceMessage(message, { allowTranslate: true });
+        }
+        for (const participant of node.querySelectorAll<HTMLElement>(PARTICIPANT_SELECTOR)) {
+          enhanceParticipant(participant);
         }
         for (const menu of node.querySelectorAll('ytd-menu-popup-renderer')) {
           enhanceMenu(menu);
@@ -158,6 +169,10 @@ function processExistingMessages(translateLimit: number): void {
     .forEach((message) => queueMessageTranslation(message, { backfill: true }));
 }
 
+function processExistingParticipants(): void {
+  document.querySelectorAll<HTMLElement>(PARTICIPANT_SELECTOR).forEach(enhanceParticipant);
+}
+
 function scheduleVisibleMessageRecovery(): void {
   if (document.visibilityState === 'hidden') return;
   if (visibilityRecoveryTimer) window.clearTimeout(visibilityRecoveryTimer);
@@ -181,6 +196,10 @@ function enhanceMessage(message: HTMLElement, { allowTranslate }: { allowTransla
   if (allowTranslate && getOptions().targetLanguage) {
     queueMessageTranslation(message);
   }
+}
+
+function enhanceParticipant(participant: HTMLElement): void {
+  wireParticipantProfileClick(participant);
 }
 
 function retryTranslationForLateMessageText(target: Node): void {

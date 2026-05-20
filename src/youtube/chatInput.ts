@@ -140,6 +140,21 @@ export function insertIntoChatInput(text: string): boolean {
   return inserted || Boolean(input.textContent);
 }
 
+export function returnToChatInputPanel(): boolean {
+  const candidates = Array.from(document.querySelectorAll<HTMLElement>([
+    'yt-live-chat-participant-list-renderer.iron-selected #back-button button',
+    'yt-live-chat-participant-list-renderer.iron-selected button[aria-label="Back"]',
+    'yt-live-chat-participant-list-renderer #back-button button',
+    'yt-live-chat-participant-list-renderer button[aria-label="Back"]',
+    'yt-live-chat-participant-list-renderer #back-button'
+  ].join(',')));
+  const button = candidates.find(isVisibleElement);
+  if (!button) return false;
+
+  button.click();
+  return true;
+}
+
 export function insertNodeIntoChatInput(node: Node, fallbackText = ''): boolean {
   const input = findChatInput();
   if (!input) return false;
@@ -176,9 +191,60 @@ export function insertNodeIntoChatInput(node: Node, fallbackText = ''): boolean 
   return true;
 }
 
+export function insertNodesIntoChatInput(nodes: Node[], fallbackText = ''): boolean {
+  if (!nodes.length) return fallbackText ? insertIntoChatInput(fallbackText) : false;
+
+  const input = findChatInput();
+  if (!input) return false;
+
+  const shouldAppend = !isChatInputFocused(input);
+  input.focus();
+
+  if (input instanceof HTMLTextAreaElement || input instanceof HTMLInputElement) {
+    return fallbackText ? insertIntoChatInput(fallbackText) : false;
+  }
+
+  const selection = document.getSelection();
+  let range = selection?.rangeCount ? selection.getRangeAt(0) : null;
+
+  if (shouldAppend || !range || !inputContainsNode(input, range.startContainer) || !inputContainsNode(input, range.endContainer)) {
+    range = document.createRange();
+    range.selectNodeContents(input);
+    range.collapse(false);
+  }
+
+  range.deleteContents();
+
+  const fragment = document.createDocumentFragment();
+  const insertedNodes = nodes.map((node) => node.cloneNode(true));
+  insertedNodes.forEach((node) => fragment.append(node));
+  const lastNode = insertedNodes[insertedNodes.length - 1];
+
+  range.insertNode(fragment);
+  if (lastNode) {
+    range.setStartAfter(lastNode);
+    range.setEndAfter(lastNode);
+  }
+  selection?.removeAllRanges();
+  selection?.addRange(range);
+
+  input.dispatchEvent(new InputEvent('input', {
+    bubbles: true,
+    inputType: 'insertText',
+    data: fallbackText
+  }));
+
+  return true;
+}
+
 function isChatInputFocused(input: HTMLElement | HTMLTextAreaElement | HTMLInputElement): boolean {
   const active = document.activeElement;
   return active === input || Boolean(active && input.contains(active));
+}
+
+function isVisibleElement(element: HTMLElement): boolean {
+  const rect = element.getBoundingClientRect();
+  return rect.width > 0 && rect.height > 0;
 }
 
 export function replaceChatInputTextRange(start: number, end: number, text: string): boolean {
