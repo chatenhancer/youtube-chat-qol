@@ -16,17 +16,12 @@ export function initMentionTabAlert(): void {
   if (listenersAttached) return;
   listenersAttached = true;
 
-  addVisibilityListener(document);
-  addFocusListener(window);
+  addClearListeners(document, window);
 
   const topDocument = getTopDocument();
-  if (topDocument && topDocument !== document) {
-    addVisibilityListener(topDocument);
-  }
-
   const topWindow = getTopWindow();
-  if (topWindow && topWindow !== window) {
-    addFocusListener(topWindow);
+  if (topDocument && topDocument !== document) {
+    addClearListeners(topDocument, topWindow || window);
   }
 }
 
@@ -62,18 +57,17 @@ export function clearMentionTabAlert(): void {
 export function isCurrentTabActive(): boolean {
   const topDocument = getTopDocument();
   if (!topDocument) {
-    return document.visibilityState === 'visible' && document.hasFocus();
+    return document.visibilityState === 'visible';
   }
 
-  return topDocument.visibilityState === 'visible' && topDocument.hasFocus();
+  return topDocument.visibilityState === 'visible';
 }
 
-function addVisibilityListener(targetDocument: Document): void {
+function addClearListeners(targetDocument: Document, targetWindow: Window): void {
   targetDocument.addEventListener('visibilitychange', clearAlertIfTabActive, true);
-}
-
-function addFocusListener(targetWindow: Window): void {
   targetWindow.addEventListener('focus', clearAlertIfTabActive, true);
+  targetDocument.addEventListener('pointerdown', clearAlertIfTabActive, true);
+  targetDocument.addEventListener('keydown', clearAlertIfTabActive, true);
 }
 
 function clearAlertIfTabActive(): void {
