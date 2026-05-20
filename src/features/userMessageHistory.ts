@@ -100,11 +100,11 @@ export function recordVisibleUserMessages(): void {
   document.querySelectorAll<HTMLElement>(CHAT_MESSAGE_SELECTOR).forEach(recordUserMessage);
 }
 
-export function getRecentMessagesForKey(key: string, limit = 5): MessageRecord[] {
+export function getRecentMessagesForKey(key: string, limit = MAX_MESSAGES_PER_USER): MessageRecord[] {
   return (recordsByUser.get(key) || []).slice(-limit);
 }
 
-export function getRecentMessagesForIdentity(identity: UserIdentity, limit = 5): MessageRecord[] {
+export function getRecentMessagesForIdentity(identity: UserIdentity, limit = MAX_MESSAGES_PER_USER): MessageRecord[] {
   const key = getUserKeyFromIdentity(identity);
   const directRecords = key ? getRecentMessagesForKey(key, limit) : [];
   if (directRecords.length || !identity.authorName) return directRecords;
