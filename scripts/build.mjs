@@ -9,6 +9,7 @@ import { build } from 'esbuild';
 import { copyFile, cp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import packageJson from '../package.json' with { type: 'json' };
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const targetOutputDirs = {
@@ -17,6 +18,9 @@ const targetOutputDirs = {
   firefox: path.join(root, 'dist', 'extension-firefox')
 };
 const targets = getRequestedTargets();
+
+await syncVersionedSourceFiles();
+
 const manifestSource = await readFile(path.join(root, 'manifest.json'), 'utf8');
 
 const sharedBuildOptions = {
@@ -76,6 +80,7 @@ async function buildTarget(target) {
 
 function createManifest(target) {
   const manifest = JSON.parse(manifestSource);
+  manifest.version = packageJson.version;
   for (const size of Object.keys(manifest.icons || {})) {
     manifest.icons[size] = stripBuildPrefix(manifest.icons[size]);
   }
@@ -120,4 +125,44 @@ function getRequestedTargets() {
     throw new Error(`Unsupported build target: ${target}`);
   }
   return [target];
+}
+
+async function syncVersionedSourceFiles() {
+  await Promise.all([
+    syncManifestVersion(),
+    syncPackageLockVersion(),
+    syncDocsStructuredDataVersion()
+  ]);
+}
+
+async function syncManifestVersion() {
+  const manifestPath = path.join(root, 'manifest.json');
+  const original = await readFile(manifestPath, 'utf8');
+  const next = original.replace(
+    /("version":\s*")[^"]+(")/,
+    `$1${packageJson.version}$2`
+  );
+  if (next !== original) await writeFile(manifestPath, next);
+}
+
+async function syncPackageLockVersion() {
+  const packageLockPath = path.join(root, 'package-lock.json');
+  const original = await readFile(packageLockPath, 'utf8');
+  const next = original
+    .replace(/("version":\s*")[^"]+(")/, `$1${packageJson.version}$2`)
+    .replace(
+      /("packages":\s*\{\n\s+"":\s*\{\n\s+"name":\s*"[^"]+",\n\s+"version":\s*")[^"]+(")/,
+      `$1${packageJson.version}$2`
+    );
+  if (next !== original) await writeFile(packageLockPath, next);
+}
+
+async function syncDocsStructuredDataVersion() {
+  const docsPath = path.join(root, 'docs', 'index.html');
+  const original = await readFile(docsPath, 'utf8');
+  const next = original.replace(
+    /"softwareVersion":\s*"[^"]+"/,
+    `"softwareVersion": "${packageJson.version}"`
+  );
+  if (next !== original) await writeFile(docsPath, next);
 }

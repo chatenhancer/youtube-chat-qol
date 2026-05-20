@@ -121,7 +121,7 @@ npm run build:firefox
 
 ## Release
 
-1. Update `version` in `manifest.json` and `package.json`.
+1. Update `version` in `package.json`.
 2. Run `npm run verify`.
 3. Run `npm run zip:all`.
 4. Upload the generated browser-specific zip from `dist/release/` to the relevant store. Use the `source` zip for Firefox source-code review when needed.
