@@ -97,7 +97,7 @@ Load it in Chrome, Edge, Brave, Vivaldi, Arc, or another Chromium browser:
 1. Open `chrome://extensions`.
 2. Enable Developer mode.
 3. Click `Load unpacked`.
-4. Select this repository folder or `dist/extension`.
+4. Select this repository folder or `dist/extension-chrome`.
 
 After source changes, run `npm run build` again and reload the unpacked extension.
 
@@ -111,20 +111,20 @@ npm run build:firefox
 
 - `npm run typecheck` checks TypeScript.
 - `npm run lint` runs ESLint.
-- `npm run build` writes the Chromium unpacked extension to `dist/extension`.
+- `npm run build` writes the Chromium unpacked extension to `dist/extension-chrome`.
 - `npm run build:all` writes Chrome, Edge, and Firefox unpacked extension folders.
 - `npm run verify` runs typecheck, lint, and all browser builds.
 - `npm run icons` regenerates PNG icons from `assets/icons/icon.svg`.
 - `npm run screenshots` regenerates README, high-resolution docs, and Chrome Web Store screenshots from the three docs screenshot exports.
-- `npm run zip` builds and writes the default Chrome Web Store archive to `dist/release/`.
-- `npm run zip:all` builds Chrome, Edge, and Firefox release archives.
+- `npm run zip` builds and writes the default Chrome Web Store archive and tracked source archive to `dist/release/`.
+- `npm run zip:all` builds Chrome, Edge, Firefox, and tracked source release archives.
 
 ## Release
 
 1. Update `version` in `manifest.json` and `package.json`.
 2. Run `npm run verify`.
 3. Run `npm run zip:all`.
-4. Upload the generated browser-specific zip from `dist/release/` to the relevant store.
+4. Upload the generated browser-specific zip from `dist/release/` to the relevant store. Use the `source` zip for Firefox source-code review when needed.
 
 ## License
 
