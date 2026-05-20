@@ -6,11 +6,13 @@
  * background tab can signal unread chat mentions without adding more controls.
  */
 const ALERT_FAVICON_ID = 'ytcq-tab-alert-favicon';
+const RESTORE_FAVICON_ID = 'ytcq-tab-alert-restore-favicon';
 const ALERT_STATE_DATASET_KEY = 'ytcqTabAlertActive';
 const TITLE_PREFIX_PATTERN = /^\((?:\d+|99\+)\)\s+/;
 
 let listenersAttached = false;
 let alertActive = false;
+let originalFaviconHref = '';
 
 export function initMentionTabAlert(): void {
   if (listenersAttached) return;
@@ -48,10 +50,12 @@ export function clearMentionTabAlert(): void {
   if (alertActive || alertFavicon || topDocument.documentElement.dataset[ALERT_STATE_DATASET_KEY] === 'true') {
     topDocument.title = stripAlertPrefix(topDocument.title);
     alertFavicon?.remove();
+    restoreOriginalFavicon(topDocument);
     delete topDocument.documentElement.dataset[ALERT_STATE_DATASET_KEY];
   }
 
   alertActive = false;
+  originalFaviconHref = '';
 }
 
 export function isCurrentTabActive(): boolean {
@@ -96,6 +100,9 @@ function setAlertFavicon(topDocument: Document): void {
   const head = topDocument.head || topDocument.documentElement;
   if (!head) return;
 
+  originalFaviconHref ||= getCurrentFaviconHref(topDocument);
+  topDocument.getElementById(RESTORE_FAVICON_ID)?.remove();
+
   let link = topDocument.getElementById(ALERT_FAVICON_ID) as HTMLLinkElement | null;
   if (!link) {
     link = topDocument.createElement('link');
@@ -106,6 +113,30 @@ function setAlertFavicon(topDocument: Document): void {
   }
 
   link.href = `data:image/svg+xml,${encodeURIComponent(createAlertFaviconSvg())}`;
+}
+
+function restoreOriginalFavicon(topDocument: Document): void {
+  if (!originalFaviconHref) return;
+
+  const head = topDocument.head || topDocument.documentElement;
+  if (!head) return;
+
+  const restoreLink = topDocument.createElement('link');
+  restoreLink.id = RESTORE_FAVICON_ID;
+  restoreLink.rel = 'icon';
+  restoreLink.href = originalFaviconHref;
+  head.append(restoreLink);
+}
+
+function getCurrentFaviconHref(topDocument: Document): string {
+  const links = Array.from(topDocument.querySelectorAll<HTMLLinkElement>('link[rel~="icon"]'));
+  const current = links.reverse().find((link) => (
+    link.id !== ALERT_FAVICON_ID &&
+    link.id !== RESTORE_FAVICON_ID &&
+    Boolean(link.href)
+  ));
+
+  return current?.href || '';
 }
 
 function createAlertFaviconSvg(): string {
