@@ -526,6 +526,31 @@ yt-live-chat-header-renderer .ytcq-mentions-inbox-badge[hidden] {
   max-height: 300px;
 }
 
+.ytcq-mentions-inbox-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 84px;
+  padding: 12px 0;
+}
+
+.ytcq-mentions-inbox-empty-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  color: var(--yt-live-chat-secondary-text-color, var(--yt-spec-text-secondary, #aaa));
+  fill: currentColor;
+  opacity: 0.32;
+}
+
+.ytcq-mentions-inbox-empty-icon svg {
+  display: block;
+  width: 34px;
+  height: 34px;
+}
+
 .ytcq-mentions-inbox-author {
   display: inline;
   padding: 0;

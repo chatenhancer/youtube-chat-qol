@@ -24,6 +24,8 @@ const MAX_MENTION_RECORDS = 100;
 const HEADER_SELECTOR = 'yt-live-chat-header-renderer';
 const MENTIONS_INBOX_ICON_VIEW_BOX = '0 -960 960 960';
 const MENTIONS_INBOX_ICON_PATH = 'M480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480v58q0 59-40.5 100.5T740-280q-35 0-66-15t-52-43q-29 29-65.5 43.5T480-280q-83 0-141.5-58.5T280-480q0-83 58.5-141.5T480-680q83 0 141.5 58.5T680-480v58q0 26 17 44t43 18q26 0 43-18t17-44v-58q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93h200v80H480Zm85-315q35-35 35-85t-35-85q-35-35-85-35t-85 35q-35 35-35 85t35 85q35 35 85 35t85-35Z';
+const EMPTY_DRAFTS_ICON_VIEW_BOX = '0 -960 960 960';
+const EMPTY_DRAFTS_ICON_PATH = 'm480-920 362 216q18 11 28 30t10 40v434q0 33-23.5 56.5T800-120H160q-33 0-56.5-23.5T80-200v-434q0-21 10-40t28-30l362-216Zm0 466 312-186-312-186-312 186 312 186Zm0 94L160-552v352h640v-352L480-360Zm0 160h320-640 320Z';
 
 interface MentionRecord {
   id: string;
@@ -275,8 +277,15 @@ function renderMentionsInboxList(list: HTMLElement): void {
 
   if (!records.length) {
     const empty = document.createElement('div');
-    empty.className = 'ytcq-profile-card-empty';
-    empty.textContent = 'No mentions yet.';
+    empty.className = 'ytcq-profile-card-empty ytcq-mentions-inbox-empty';
+
+    const icon = document.createElement('span');
+    icon.className = 'ytcq-mentions-inbox-empty-icon';
+    icon.setAttribute('aria-hidden', 'true');
+    icon.appendChild(createEmptyInboxIcon());
+
+    empty.setAttribute('aria-label', 'No mentions yet');
+    empty.append(icon);
     list.append(empty);
     return;
   }
@@ -371,7 +380,7 @@ function getUnreadMentionCount(): number {
 }
 
 function getMentionsInboxSubtitle(): string {
-  if (!records.length) return 'No saved mentions';
+  if (!records.length) return 'No mentions yet';
   const unread = getUnreadMentionCount();
   if (unread) return `${unread} new mention${unread === 1 ? '' : 's'}`;
   return `${records.length} saved mention${records.length === 1 ? '' : 's'}`;
@@ -413,13 +422,21 @@ function createMentionBadge(): HTMLSpanElement {
 }
 
 function createMentionIcon(): SVGSVGElement {
+  return createSvgIcon(MENTIONS_INBOX_ICON_VIEW_BOX, MENTIONS_INBOX_ICON_PATH);
+}
+
+function createEmptyInboxIcon(): SVGSVGElement {
+  return createSvgIcon(EMPTY_DRAFTS_ICON_VIEW_BOX, EMPTY_DRAFTS_ICON_PATH);
+}
+
+function createSvgIcon(viewBox: string, pathData: string): SVGSVGElement {
   const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-  icon.setAttribute('viewBox', MENTIONS_INBOX_ICON_VIEW_BOX);
+  icon.setAttribute('viewBox', viewBox);
   icon.setAttribute('focusable', 'false');
   icon.setAttribute('aria-hidden', 'true');
 
   const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-  path.setAttribute('d', MENTIONS_INBOX_ICON_PATH);
+  path.setAttribute('d', pathData);
   icon.append(path);
 
   return icon;
