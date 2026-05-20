@@ -9,6 +9,11 @@
 import { getOptions } from '../../shared/state';
 import { cleanText } from '../../shared/text';
 import { getMessageDetails } from '../../youtube/messages';
+import {
+  clearUserMessageTranslation,
+  clearUserMessageTranslations,
+  recordUserMessageTranslation
+} from '../userMessageHistory';
 import { createTranslationPlan, hasTextOutsideEmojiPlaceholders, type EmojiToken } from './emojiPlaceholders';
 import { clearTranslationRenderings, removeTranslation, renderTranslation, type TranslationResult } from './render';
 
@@ -61,6 +66,9 @@ export function queueMessageTranslation(message: HTMLElement, { backfill = false
     if (!rendered) {
       translationCache.delete(key);
       delete message.dataset.ytcqTranslationKey;
+      clearUserMessageTranslation(message);
+    } else {
+      recordUserMessageTranslation(message, cached, details.text, plan.emojiTokens, plan.text);
     }
     return;
   }
@@ -93,6 +101,7 @@ export function clearTranslations(): void {
   backfillTranslationQueue = [];
   pendingTranslations.clear();
   clearTranslationRenderings();
+  clearUserMessageTranslations();
 }
 
 export function getRetroactiveTranslationMessages(messages: HTMLElement[], translateLimit: number): HTMLElement[] {
@@ -157,9 +166,11 @@ function pumpTranslationQueue(): void {
       for (const entry of pendingTranslations.get(job.key) || []) {
         const rendered = renderTranslation(entry.message, result, entry.originalText, entry.emojiTokens, entry.sourceText);
         if (rendered) {
+          recordUserMessageTranslation(entry.message, result, entry.originalText, entry.emojiTokens, entry.sourceText);
           renderedAny = true;
         } else {
           delete entry.message.dataset.ytcqTranslationKey;
+          clearUserMessageTranslation(entry.message);
         }
       }
       if (renderedAny) rememberTranslation(job.key, result);

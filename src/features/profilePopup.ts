@@ -9,6 +9,13 @@ import { getOptions } from '../shared/state';
 import { getAuthorName, getRendererData } from '../youtube/messages';
 import { appendRichMessageText } from '../youtube/richText';
 import {
+  createInlineTranslationElement,
+  createReplacedTranslationIcon,
+  getReplacementTranslationTitle,
+  isMeaningfulTranslation
+} from './translation/render';
+import { createNodesWithEmojiPlaceholders } from './translation/emojiPlaceholders';
+import {
   getRecentMessagesForKey,
   getUserKey,
   onUserMessagesChanged,
@@ -215,9 +222,9 @@ function renderProfileMessages(list: HTMLElement, recentMessages: MessageRecord[
       timestamp.textContent = recentMessage.timestampText;
       timestamp.dateTime = new Date(recentMessage.timestamp).toISOString();
 
-      const text = document.createElement('span');
+      const text = document.createElement('div');
       text.className = 'ytcq-profile-card-message-text';
-      appendRichMessageText(text, recentMessage.text, recentMessage.contentNodes);
+      renderProfileMessageText(item, text, recentMessage);
 
       item.append(timestamp, text);
       list.append(item);
@@ -229,6 +236,40 @@ function renderProfileMessages(list: HTMLElement, recentMessages: MessageRecord[
   empty.className = 'ytcq-profile-card-empty';
   empty.textContent = 'No recent messages yet.';
   list.append(empty);
+}
+
+function renderProfileMessageText(
+  item: HTMLElement,
+  text: HTMLElement,
+  recentMessage: MessageRecord
+): void {
+  const translation = getVisibleProfileMessageTranslation(recentMessage);
+
+  if (translation && getOptions().translationDisplay === 'replace') {
+    item.classList.add('ytcq-translation-replaced');
+    text.classList.add('ytcq-translation-replaced-text');
+    text.lang = translation.result.targetLanguage;
+    text.title = getReplacementTranslationTitle(translation.result, recentMessage.text);
+    text.append(
+      ...createNodesWithEmojiPlaceholders(translation.result.text, translation.emojiTokens),
+      createReplacedTranslationIcon()
+    );
+    return;
+  }
+
+  appendRichMessageText(text, recentMessage.text, recentMessage.contentNodes);
+  if (translation) {
+    text.append(createInlineTranslationElement(translation.result, translation.emojiTokens));
+  }
+}
+
+function getVisibleProfileMessageTranslation(recentMessage: MessageRecord): MessageRecord['translation'] {
+  const translation = recentMessage.translation;
+  const targetLanguage = getOptions().targetLanguage;
+  if (!translation || !targetLanguage) return undefined;
+  if (translation.result.targetLanguage !== targetLanguage) return undefined;
+  if (!isMeaningfulTranslation(translation.result, translation.emojiTokens, translation.sourceText)) return undefined;
+  return translation;
 }
 
 function wireQuoteCardItem(item: HTMLElement, recentMessage: MessageRecord): void {

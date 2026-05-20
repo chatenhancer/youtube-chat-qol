@@ -36,9 +36,7 @@ export function renderTranslation(
   sourceText = originalText
 ): boolean {
   if (!message.isConnected) return false;
-  const translatedText = restoreEmojiPlaceholdersToText(result.text, emojiTokens);
-  const comparableSourceText = restoreEmojiPlaceholdersToText(sourceText, emojiTokens);
-  if (normalizeComparableText(translatedText) === normalizeComparableText(comparableSourceText)) return false;
+  if (!isMeaningfulTranslation(result, emojiTokens, sourceText)) return false;
 
   if (getOptions().translationDisplay === 'replace') {
     renderReplacementTranslation(message, result, originalText, emojiTokens);
@@ -70,23 +68,13 @@ function renderInlineTranslation(
 ): void {
   const content = message.querySelector('#content') || message;
   const existing = message.querySelector<HTMLElement>(':scope .ytcq-translation');
-  const translation = existing || document.createElement('div');
+  const translation = existing || createInlineTranslationElement(result, emojiTokens);
 
-  translation.className = 'ytcq-translation';
-  translation.lang = result.targetLanguage;
-  translation.title = hasReliableSourceLanguage(result)
-    ? `Translated from ${getLanguageLabel(result.sourceLanguage)}`
-    : 'Translated message';
-  translation.textContent = '';
+  if (existing) {
+    existing.replaceWith(createInlineTranslationElement(result, emojiTokens));
+    return;
+  }
 
-  const prefix = document.createElement('span');
-  prefix.className = 'ytcq-translation-prefix';
-  prefix.textContent = 'Translated:';
-
-  const body = document.createElement('span');
-  body.append(...createNodesWithEmojiPlaceholders(result.text, emojiTokens));
-
-  translation.append(prefix, body);
   if (!existing) content.appendChild(translation);
 }
 
@@ -114,14 +102,46 @@ function renderReplacementTranslation(
   messageText.appendChild(createReplacedTranslationIcon());
 }
 
-function getReplacementTranslationTitle(result: TranslationResult, originalText: string): string {
+export function createInlineTranslationElement(
+  result: TranslationResult,
+  emojiTokens: EmojiToken[] = []
+): HTMLElement {
+  const translation = document.createElement('div');
+  translation.className = 'ytcq-translation';
+  translation.lang = result.targetLanguage;
+  translation.title = hasReliableSourceLanguage(result)
+    ? `Translated from ${getLanguageLabel(result.sourceLanguage)}`
+    : 'Translated message';
+
+  const prefix = document.createElement('span');
+  prefix.className = 'ytcq-translation-prefix';
+  prefix.textContent = 'Translated:';
+
+  const body = document.createElement('span');
+  body.append(...createNodesWithEmojiPlaceholders(result.text, emojiTokens));
+
+  translation.append(prefix, body);
+  return translation;
+}
+
+export function isMeaningfulTranslation(
+  result: TranslationResult,
+  emojiTokens: EmojiToken[] = [],
+  sourceText = ''
+): boolean {
+  const translatedText = restoreEmojiPlaceholdersToText(result.text, emojiTokens);
+  const comparableSourceText = restoreEmojiPlaceholdersToText(sourceText, emojiTokens);
+  return normalizeComparableText(translatedText) !== normalizeComparableText(comparableSourceText);
+}
+
+export function getReplacementTranslationTitle(result: TranslationResult, originalText: string): string {
   if (!originalText) return 'Original message';
   return hasReliableSourceLanguage(result)
     ? `Translated from ${getLanguageLabel(result.sourceLanguage)}: ${originalText}`
     : `Original: ${originalText}`;
 }
 
-function createReplacedTranslationIcon(): HTMLElement {
+export function createReplacedTranslationIcon(): HTMLElement {
   const icon = document.createElement('span');
   icon.className = 'ytcq-replaced-translation-icon';
   icon.setAttribute('aria-hidden', 'true');
