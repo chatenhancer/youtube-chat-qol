@@ -1,10 +1,11 @@
 /*
  * Release archive script.
  *
- * Packages dist/extension into a versioned zip after the normal build has
+ * Packages browser-specific dist/extension-* folders into versioned zips after
+ * the normal build has
  * produced a Web Store-ready extension directory.
  */
-import { mkdir } from 'node:fs/promises';
+import { mkdir, rm } from 'node:fs/promises';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
@@ -13,7 +14,7 @@ import packageJson from '../package.json' with { type: 'json' };
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const releaseDir = path.join(root, 'dist', 'release');
 const targetOutputDirs = {
-  chrome: path.join(root, 'dist', 'extension'),
+  chrome: path.join(root, 'dist', 'extension-chrome'),
   edge: path.join(root, 'dist', 'extension-edge'),
   firefox: path.join(root, 'dist', 'extension-firefox')
 };
@@ -24,14 +25,28 @@ await mkdir(releaseDir, { recursive: true });
 for (const target of targets) {
   const extensionDir = getTargetOutputDir(target);
   const zipPath = path.join(releaseDir, getZipName(target));
-  const result = spawnSync('zip', ['-r', zipPath, '.'], {
+  await rm(zipPath, { force: true });
+  run('zip', ['-r', zipPath, '.'], {
     cwd: extensionDir,
     stdio: 'inherit'
   });
+}
 
-  if (result.status !== 0) {
-    throw new Error(`zip exited with ${result.status ?? 'unknown status'}`);
-  }
+await createSourceArchive();
+
+async function createSourceArchive() {
+  const sourceZipPath = path.join(releaseDir, `youtube-chat-qol-${packageJson.version}-source.zip`);
+  await rm(sourceZipPath, { force: true });
+  const files = run('git', ['ls-files', '-z'], {
+    cwd: root,
+    encoding: 'buffer',
+    maxBuffer: 20 * 1024 * 1024
+  }).stdout;
+
+  run('zip', ['-q', '-@', sourceZipPath], {
+    cwd: root,
+    input: Buffer.from(files).toString('utf8').replaceAll('\0', '\n')
+  });
 }
 
 function getRequestedTargets() {
@@ -54,4 +69,14 @@ function getZipName(target) {
 
 function getTargetOutputDir(target) {
   return target === 'chrome-default' ? targetOutputDirs.chrome : targetOutputDirs[target];
+}
+
+function run(command, args, options = {}) {
+  const result = spawnSync(command, args, options);
+
+  if (result.status !== 0) {
+    throw new Error(`${command} exited with ${result.status ?? 'unknown status'}`);
+  }
+
+  return result;
 }

@@ -12,7 +12,7 @@ import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const targetOutputDirs = {
-  chrome: path.join(root, 'dist', 'extension'),
+  chrome: path.join(root, 'dist', 'extension-chrome'),
   edge: path.join(root, 'dist', 'extension-edge'),
   firefox: path.join(root, 'dist', 'extension-firefox')
 };
@@ -108,7 +108,7 @@ function createManifest(target) {
 }
 
 function stripBuildPrefix(value) {
-  return String(value).replace(/^dist\/extension\//, '');
+  return String(value).replace(/^dist\/extension(?:-chrome)?\//, '');
 }
 
 function getRequestedTargets() {
