@@ -549,6 +549,10 @@ yt-live-chat-header-renderer .ytcq-mentions-inbox-badge[hidden] {
   display: block;
   width: 34px;
   height: 34px;
+  overflow: visible;
+  stroke: currentColor;
+  stroke-width: 2px;
+  paint-order: stroke fill;
 }
 
 .ytcq-mentions-inbox-author {
