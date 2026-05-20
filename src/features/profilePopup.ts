@@ -328,7 +328,7 @@ function renderProfileMessages(list: HTMLElement, recentMessages: MessageRecord[
   icon.append(createEmptyLeavesIcon());
 
   const text = document.createElement('span');
-  text.textContent = 'No recent messages yet';
+  text.textContent = 'Nothing here yet';
 
   empty.append(icon, text);
   list.append(empty);
