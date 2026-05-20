@@ -632,7 +632,8 @@ yt-live-chat-header-renderer .ytcq-mentions-inbox-badge[hidden] {
 
 yt-live-chat-text-message-renderer .ytcq-translation,
 yt-live-chat-paid-message-renderer .ytcq-translation,
-yt-live-chat-membership-item-renderer .ytcq-translation {
+yt-live-chat-membership-item-renderer .ytcq-translation,
+.ytcq-profile-card-message .ytcq-translation {
   display: block;
   margin-top: 2px;
   color: var(--yt-live-chat-secondary-text-color, var(--yt-spec-text-secondary));
@@ -643,14 +644,16 @@ yt-live-chat-membership-item-renderer .ytcq-translation {
 
 yt-live-chat-text-message-renderer .ytcq-translation-prefix,
 yt-live-chat-paid-message-renderer .ytcq-translation-prefix,
-yt-live-chat-membership-item-renderer .ytcq-translation-prefix {
+yt-live-chat-membership-item-renderer .ytcq-translation-prefix,
+.ytcq-profile-card-message .ytcq-translation-prefix {
   opacity: 0.72;
   margin-right: 4px;
 }
 
 yt-live-chat-text-message-renderer .ytcq-translation img,
 yt-live-chat-paid-message-renderer .ytcq-translation img,
-yt-live-chat-membership-item-renderer .ytcq-translation img {
+yt-live-chat-membership-item-renderer .ytcq-translation img,
+.ytcq-profile-card-message .ytcq-translation img {
   width: 16px;
   height: 16px;
   max-width: 16px;
@@ -661,7 +664,8 @@ yt-live-chat-membership-item-renderer .ytcq-translation img {
 
 yt-live-chat-text-message-renderer.ytcq-translation-replaced #message,
 yt-live-chat-paid-message-renderer.ytcq-translation-replaced #message,
-yt-live-chat-membership-item-renderer.ytcq-translation-replaced #message {
+yt-live-chat-membership-item-renderer.ytcq-translation-replaced #message,
+.ytcq-profile-card-message.ytcq-translation-replaced .ytcq-profile-card-message-text {
   text-decoration: underline dotted rgba(62, 166, 255, 0.55);
   text-decoration-thickness: 1px;
   text-underline-offset: 2px;
@@ -669,7 +673,8 @@ yt-live-chat-membership-item-renderer.ytcq-translation-replaced #message {
 
 yt-live-chat-text-message-renderer .ytcq-replaced-translation-icon,
 yt-live-chat-paid-message-renderer .ytcq-replaced-translation-icon,
-yt-live-chat-membership-item-renderer .ytcq-replaced-translation-icon {
+yt-live-chat-membership-item-renderer .ytcq-replaced-translation-icon,
+.ytcq-profile-card-message .ytcq-replaced-translation-icon {
   display: inline-flex;
   width: 14px;
   height: 14px;
@@ -682,7 +687,8 @@ yt-live-chat-membership-item-renderer .ytcq-replaced-translation-icon {
 
 yt-live-chat-text-message-renderer .ytcq-replaced-translation-icon svg,
 yt-live-chat-paid-message-renderer .ytcq-replaced-translation-icon svg,
-yt-live-chat-membership-item-renderer .ytcq-replaced-translation-icon svg {
+yt-live-chat-membership-item-renderer .ytcq-replaced-translation-icon svg,
+.ytcq-profile-card-message .ytcq-replaced-translation-icon svg {
   display: block;
   width: 14px;
   height: 14px;

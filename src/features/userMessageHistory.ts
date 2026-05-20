@@ -14,6 +14,8 @@ import {
   getRendererData
 } from '../youtube/messages';
 import { CHAT_MESSAGE_SELECTOR } from '../youtube/selectors';
+import type { EmojiToken } from './translation/emojiPlaceholders';
+import type { TranslationResult } from './translation/render';
 
 const MAX_USERS = 160;
 const MAX_MESSAGES_PER_USER = 12;
@@ -25,6 +27,14 @@ export interface MessageRecord {
   text: string;
   timestamp: number;
   timestampText: string;
+  translation?: MessageTranslationRecord;
+}
+
+export interface MessageTranslationRecord {
+  result: TranslationResult;
+  sourceText: string;
+  originalText: string;
+  emojiTokens: EmojiToken[];
 }
 
 interface ElementRecord {
@@ -89,6 +99,51 @@ export function getRecentMessagesForKey(key: string, limit = 5): MessageRecord[]
   return (recordsByUser.get(key) || []).slice(-limit);
 }
 
+export function recordUserMessageTranslation(
+  message: HTMLElement,
+  result: TranslationResult,
+  originalText: string,
+  emojiTokens: EmojiToken[],
+  sourceText: string
+): void {
+  const record = getRecordForMessage(message);
+  if (!record) return;
+
+  record.translation = {
+    result,
+    originalText,
+    sourceText,
+    emojiTokens: cloneEmojiTokens(emojiTokens)
+  };
+
+  const elementRecord = recordsByElement.get(message);
+  if (elementRecord) notifyUserMessageListeners(elementRecord.key);
+}
+
+export function clearUserMessageTranslation(message: HTMLElement): void {
+  const record = getRecordForMessage(message);
+  if (!record?.translation) return;
+
+  delete record.translation;
+  const elementRecord = recordsByElement.get(message);
+  if (elementRecord) notifyUserMessageListeners(elementRecord.key);
+}
+
+export function clearUserMessageTranslations(): void {
+  const changedKeys: string[] = [];
+  recordsByUser.forEach((records, key) => {
+    let changed = false;
+    records.forEach((record) => {
+      if (!record.translation) return;
+      delete record.translation;
+      changed = true;
+    });
+    if (changed) changedKeys.push(key);
+  });
+
+  changedKeys.forEach(notifyUserMessageListeners);
+}
+
 export function getUserKey(message: HTMLElement): string {
   const data = getRendererData(message);
   const channelId = data?.authorExternalChannelId || data?.authorChannelId;
@@ -136,4 +191,23 @@ function notifyUserMessageListeners(key: string): void {
   userMessageListeners.forEach((listener) => {
     listener(key);
   });
+}
+
+function getRecordForMessage(message: HTMLElement): MessageRecord | null {
+  let elementRecord = recordsByElement.get(message);
+  if (!elementRecord) {
+    recordUserMessage(message);
+    elementRecord = recordsByElement.get(message);
+  }
+  if (!elementRecord) return null;
+
+  return recordsByUser.get(elementRecord.key)?.find((record) => record.id === elementRecord.id) || null;
+}
+
+function cloneEmojiTokens(emojiTokens: EmojiToken[]): EmojiToken[] {
+  return emojiTokens.map((token) => ({
+    placeholder: token.placeholder,
+    fallbackText: token.fallbackText,
+    node: token.node ? token.node.cloneNode(true) : null
+  }));
 }
