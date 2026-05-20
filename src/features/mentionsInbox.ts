@@ -402,7 +402,7 @@ function getUnreadMentionCount(): number {
 }
 
 function getMentionsInboxSubtitle(): string {
-  if (!records.length) return 'No mentions yet';
+  if (!records.length) return 'Saved chat mentions';
   const unread = getUnreadMentionCount();
   if (unread) return `${unread} new mention${unread === 1 ? '' : 's'}`;
   return `${records.length} saved mention${records.length === 1 ? '' : 's'}`;
