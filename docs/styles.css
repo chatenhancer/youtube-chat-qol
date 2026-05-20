@@ -345,6 +345,29 @@ h3 {
   color: var(--muted);
 }
 
+.version-badges {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.version-badges span {
+  flex: 0 0 100%;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.version-badges a {
+  display: inline-flex;
+}
+
+.version-badges img {
+  height: 20px;
+}
+
 .feature-link {
   display: inline-flex;
   margin-top: 14px;
