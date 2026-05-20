@@ -1,4 +1,4 @@
-<p align="center">
+<p>
   <img src="assets/icons/icon-128.png" alt="Chat Enhancer for YouTube icon" width="96" height="96">
 </p>
 
