@@ -1,4 +1,4 @@
-import { getMessageTextElement } from '../../youtube/messages';
+import { getAuthorNameElement, getMessageTextElement } from '../../youtube/messages';
 import type { InboxRecord, InlineHighlightMatch, InlineHighlightTerm } from './types';
 
 export const CHAT_KEYWORD_HIGHLIGHT_CLASS = 'ytcq-chat-keyword-highlight';
@@ -13,11 +13,15 @@ export function applyChatKeywordHighlights(
   nextHighlightKey: string
 ): void {
   const messageText = getMessageTextElement(message);
-  if (!messageText) return;
+  const authorName = getAuthorNameElement(message);
+  if (!messageText && !authorName) return;
 
   if (
     message.dataset.ytcqInboxKeywordHighlightKey === nextHighlightKey &&
-    (matchedKeywords.length || !messageText.querySelector(`.${CHAT_KEYWORD_HIGHLIGHT_CLASS}`))
+    (
+      matchedKeywords.length ||
+      !message.querySelector(`:scope #message .${CHAT_KEYWORD_HIGHLIGHT_CLASS}, :scope #author-name .${CHAT_KEYWORD_HIGHLIGHT_CLASS}`)
+    )
   ) {
     return;
   }
@@ -30,11 +34,13 @@ export function applyChatKeywordHighlights(
       return;
     }
 
-    highlightTerms(messageText, matchedKeywords.map((text) => ({
+    const terms = matchedKeywords.map((text) => ({
       className: CHAT_KEYWORD_HIGHLIGHT_CLASS,
       priority: 1,
       text
-    })));
+    }));
+    if (messageText) highlightTerms(messageText, terms);
+    if (authorName) highlightTerms(authorName, terms);
     message.dataset.ytcqInboxKeywordHighlightKey = nextHighlightKey;
   } finally {
     window.setTimeout(() => {
@@ -44,13 +50,23 @@ export function applyChatKeywordHighlights(
 }
 
 export function clearChatKeywordHighlights(message: HTMLElement): void {
-  const messageText = getMessageTextElement(message);
-  if (!messageText) return;
-
-  messageText.querySelectorAll<HTMLElement>(`.${CHAT_KEYWORD_HIGHLIGHT_CLASS}`).forEach((highlight) => {
-    highlight.replaceWith(...Array.from(highlight.childNodes));
+  [
+    getMessageTextElement(message),
+    getAuthorNameElement(message)
+  ].forEach((root) => {
+    root?.querySelectorAll<HTMLElement>(`.${CHAT_KEYWORD_HIGHLIGHT_CLASS}`).forEach((highlight) => {
+      highlight.replaceWith(...Array.from(highlight.childNodes));
+    });
+    root?.normalize();
   });
-  messageText.normalize();
+}
+
+export function highlightInboxAuthorMatches(root: HTMLElement, record: InboxRecord): void {
+  highlightTerms(root, record.matchedKeywords.map((text) => ({
+    className: 'ytcq-inbox-inline-highlight ytcq-inbox-keyword-highlight',
+    priority: 1,
+    text
+  })));
 }
 
 export function hasNodeWithClass(nodes: Node[], className: string): boolean {

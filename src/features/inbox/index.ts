@@ -23,6 +23,7 @@ import {
   CHAT_KEYWORD_HIGHLIGHT_CLASS,
   clearChatKeywordHighlights,
   hasNodeWithClass,
+  highlightInboxAuthorMatches,
   highlightInboxMatches
 } from './highlights';
 import {
@@ -312,13 +313,15 @@ function processPotentialKeywordInbox(message: HTMLElement): void {
   }
 
   const text = getMessageText(message);
-  if (!text) return;
+  const authorName = getAuthorName(message);
+  if (!text && !authorName) return;
 
-  const keywordKey = getKeywordCheckKey(keywords, text);
+  const keywordValues = [authorName, text];
+  const keywordKey = getKeywordCheckKey(keywords, keywordValues);
   if (message.dataset.ytcqInboxKeywordChecked === keywordKey) return;
   message.dataset.ytcqInboxKeywordChecked = keywordKey;
 
-  const matchedKeywords = getMatchingKeywords(text);
+  const matchedKeywords = getMatchingKeywords(...keywordValues);
   if (!matchedKeywords.length) {
     applyChatKeywordHighlights(message, [], '');
     return;
@@ -490,6 +493,7 @@ function renderInboxList(list: HTMLElement): void {
     author.type = 'button';
     author.className = 'ytcq-inbox-author';
     author.textContent = record.authorName;
+    highlightInboxAuthorMatches(author, record);
     author.addEventListener('click', (event) => {
       event.preventDefault();
       event.stopPropagation();
@@ -622,8 +626,10 @@ function refreshVisibleChatKeywordHighlights(): void {
 
 function applyCurrentChatKeywordHighlights(message: HTMLElement): string[] {
   const text = getMessageText(message);
-  const matchedKeywords = keywords.length ? getMatchingKeywords(text) : [];
-  applyChatKeywordHighlights(message, matchedKeywords, matchedKeywords.length ? getKeywordCheckKey(keywords, text) : '');
+  const authorName = getAuthorName(message);
+  const keywordValues = [authorName, text];
+  const matchedKeywords = keywords.length ? getMatchingKeywords(...keywordValues) : [];
+  applyChatKeywordHighlights(message, matchedKeywords, matchedKeywords.length ? getKeywordCheckKey(keywords, keywordValues) : '');
   return matchedKeywords;
 }
 
@@ -860,8 +866,8 @@ function getMatchedMentionHandles(text: string): string[] {
   return getMatchedMentionHandlesFromCandidates(text, getCurrentMentionCandidates());
 }
 
-function getMatchingKeywords(text: string): string[] {
-  return getMatchingKeywordsFromKeywords(text, keywords);
+function getMatchingKeywords(...values: string[]): string[] {
+  return getMatchingKeywordsFromKeywords(values, keywords);
 }
 
 function getCurrentSourceUrl(): string {
