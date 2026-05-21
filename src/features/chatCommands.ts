@@ -48,7 +48,6 @@ const SEND_BUTTON_SELECTOR = [
 const TEXT_COMPLETION_COMMANDS = new Set(['help', 'mention', 'reply', 'quote', 'again', 'repeat', 'time', 'timeuntil']);
 const INLINE_TEXT_COMPLETION_COMMANDS = new Set(['mention', 'reply', 'time', 'timeuntil']);
 const SETTING_COMMANDS = new Set([
-  'setkeepchatlive',
   'setopenchannelsinpopup',
   'setopenprofilesinpopup',
   'setquotelength',
@@ -258,11 +257,6 @@ function executeSetCommand(parsed: ParsedCommand, saveOptions: SaveOptions): voi
     return;
   }
 
-  if (parsed.name === 'setkeepchatlive') {
-    executeBooleanSetCommand(parsed, saveOptions, 'keepChatLive', 'Keep chat live');
-    return;
-  }
-
   showToast('Unknown setting command.');
 }
 
@@ -305,7 +299,7 @@ function executeSetQuoteLengthCommand(parsed: ParsedCommand, saveOptions: SaveOp
 function executeBooleanSetCommand(
   parsed: ParsedCommand,
   saveOptions: SaveOptions,
-  option: 'keepChatLive' | 'openProfilesInPopup' | 'sound',
+  option: 'openProfilesInPopup' | 'sound',
   label: string
 ): void {
   const value = getBooleanCommandTarget(parsed.args);
@@ -441,8 +435,7 @@ function getHelpRows(): Array<[string, string]> {
     ['/settranslationdisplay replace/below', 'Set how translations are shown.'],
     ['/setquotelength 120', 'Set the quote length.'],
     ['/setsound on/off', 'Set inbox sound.'],
-    ['/setopenchannelsinpopup on/off', 'Set channel popup behavior.'],
-    ['/setkeepchatlive on/off', 'Keep chat at the live edge after tab switches.']
+    ['/setopenchannelsinpopup on/off', 'Set channel popup behavior.']
   ];
 }
 
