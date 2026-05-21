@@ -72,8 +72,6 @@ Supported `/time` aliases include `utc`, `tokyo`, `jst`, `seoul`, `kst`, `london
 - `/setsound off` + `Tab`: turn inbox sounds off.
 - `/setopenchannelsinpopup on` + `Tab`: open channels in popup windows.
 - `/setopenchannelsinpopup off` + `Tab`: open channels normally.
-- `/setkeepchatlive on` + `Tab`: keep chat at the live edge after tab switches.
-- `/setkeepchatlive off` + `Tab`: leave chat scroll position alone.
 
 Use `//` to send a literal slash command, such as `//quote`.
 

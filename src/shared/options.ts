@@ -16,7 +16,6 @@ export interface Options {
   quoteMaxLength: number;
   openProfilesInPopup: boolean;
   sound: boolean;
-  keepChatLive: boolean;
 }
 
 export const DEFAULT_TRANSLATION_TARGET = 'en';
@@ -27,8 +26,7 @@ export const DEFAULT_OPTIONS: Options = {
   translationDisplay: 'replace',
   quoteMaxLength: 120,
   openProfilesInPopup: true,
-  sound: true,
-  keepChatLive: true
+  sound: true
 };
 
 export const TRANSLATION_DISPLAY_OPTIONS: readonly (readonly [TranslationDisplay, string])[] = [
@@ -52,8 +50,7 @@ export function normalizeOptions(value: Partial<Options> | Record<string, unknow
     translationDisplay,
     quoteMaxLength: clampNumber(candidate.quoteMaxLength, 40, 240, DEFAULT_OPTIONS.quoteMaxLength),
     openProfilesInPopup: candidate.openProfilesInPopup !== false,
-    sound: candidate.sound !== false,
-    keepChatLive: candidate.keepChatLive !== false
+    sound: candidate.sound !== false
   };
 }
 

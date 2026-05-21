@@ -23,7 +23,6 @@ const controls = {
   quoteMaxLength: document.querySelector<HTMLInputElement>('#quoteMaxLength'),
   openProfilesInPopup: document.querySelector<HTMLInputElement>('#openProfilesInPopup'),
   sound: document.querySelector<HTMLInputElement>('#sound'),
-  keepChatLive: document.querySelector<HTMLInputElement>('#keepChatLive'),
   version: document.querySelector<HTMLElement>('#version')
 };
 
@@ -32,7 +31,7 @@ let lastKnownTranslationTarget = DEFAULT_OPTIONS.lastTranslationTarget;
 init();
 
 function init(): void {
-  if (!controls.targetLanguage || !controls.translationDisplay || !controls.quoteMaxLength || !controls.openProfilesInPopup || !controls.sound || !controls.keepChatLive) {
+  if (!controls.targetLanguage || !controls.translationDisplay || !controls.quoteMaxLength || !controls.openProfilesInPopup || !controls.sound) {
     return;
   }
 
@@ -61,7 +60,7 @@ function init(): void {
   }
 
   chrome.storage.sync.get(DEFAULT_OPTIONS, (storedOptions: Partial<Options>) => {
-    if (!controls.targetLanguage || !controls.translationDisplay || !controls.quoteMaxLength || !controls.openProfilesInPopup || !controls.sound || !controls.keepChatLive) return;
+    if (!controls.targetLanguage || !controls.translationDisplay || !controls.quoteMaxLength || !controls.openProfilesInPopup || !controls.sound) return;
     applyOptionsToControls(storedOptions);
   });
 
@@ -88,10 +87,6 @@ function init(): void {
 
   controls.sound.addEventListener('change', () => {
     save({ sound: Boolean(controls.sound?.checked) });
-  });
-
-  controls.keepChatLive.addEventListener('change', () => {
-    save({ keepChatLive: Boolean(controls.keepChatLive?.checked) });
   });
 }
 
@@ -135,7 +130,7 @@ function broadcastPageReset(callback: () => void): void {
 }
 
 function applyOptionsToControls(options: Partial<Options>): void {
-  if (!controls.targetLanguage || !controls.translationDisplay || !controls.quoteMaxLength || !controls.openProfilesInPopup || !controls.sound || !controls.keepChatLive) return;
+  if (!controls.targetLanguage || !controls.translationDisplay || !controls.quoteMaxLength || !controls.openProfilesInPopup || !controls.sound) return;
 
   const normalized = normalizeOptions(options);
   lastKnownTranslationTarget = normalized.lastTranslationTarget;
@@ -144,7 +139,6 @@ function applyOptionsToControls(options: Partial<Options>): void {
   controls.quoteMaxLength.value = String(normalized.quoteMaxLength);
   controls.openProfilesInPopup.checked = normalized.openProfilesInPopup;
   controls.sound.checked = normalized.sound;
-  controls.keepChatLive.checked = normalized.keepChatLive;
 }
 
 function createLanguageOption(value: string, label: string): HTMLOptionElement {

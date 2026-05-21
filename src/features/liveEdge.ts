@@ -5,7 +5,6 @@
  * or when the tab is backgrounded. Keeping the native chat scroller at the
  * bottom gives DOM-driven features fresh messages to observe after tab switches.
  */
-import { getOptions } from '../shared/state';
 
 const CHAT_SCROLLER_SELECTOR = [
   'yt-live-chat-item-list-renderer #item-scroller',
@@ -25,15 +24,11 @@ const LIVE_EDGE_RETRY_DELAYS = [120, 500, 1200];
 let liveEdgeTimer = 0;
 
 export function keepChatAtLiveEdge(): void {
-  if (!getOptions().keepChatLive) return;
-
   clickJumpToBottomButton();
   scrollChatToBottom();
 }
 
 export function scheduleKeepChatAtLiveEdge(): void {
-  if (!getOptions().keepChatLive) return;
-
   keepChatAtLiveEdge();
   if (liveEdgeTimer) window.clearTimeout(liveEdgeTimer);
 
