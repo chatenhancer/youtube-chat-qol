@@ -8,6 +8,7 @@
 import { getOptions } from '../shared/state';
 import { createEmptyLeavesIcon } from '../shared/icons';
 import { cleanText, normalizeComparableText } from '../shared/text';
+import { returnToChatInputPanel } from '../youtube/chatInput';
 import { getAuthorName, getRendererData } from '../youtube/messages';
 import { appendRichMessageText } from '../youtube/richText';
 import {
@@ -32,6 +33,7 @@ import { mentionAuthorName, quoteAuthorRichText } from './reply';
 const PROFILE_WINDOW_WIDTH = 458;
 const PROFILE_WINDOW_HEIGHT = 680;
 const PROFILE_WINDOW_MARGIN = 12;
+const JUMP_AFTER_PANEL_RETURN_DELAY_MS = 120;
 
 let activeProfileCard: HTMLElement | null = null;
 let activeProfileCardCleanup: (() => void) | null = null;
@@ -420,6 +422,17 @@ function createJumpToMessageButton(recentMessage: MessageRecord): HTMLButtonElem
 }
 
 function jumpToRecentMessage(recentMessage: MessageRecord): void {
+  if (returnToChatInputPanel()) {
+    window.setTimeout(() => {
+      scrollToRecentMessage(recentMessage);
+    }, JUMP_AFTER_PANEL_RETURN_DELAY_MS);
+    return;
+  }
+
+  scrollToRecentMessage(recentMessage);
+}
+
+function scrollToRecentMessage(recentMessage: MessageRecord): void {
   const target = getLiveMessageForRecord(recentMessage);
   if (!target) return;
 
