@@ -411,7 +411,8 @@ yt-live-chat-header-renderer .ytcq-inbox-badge[hidden] {
   grid-template-columns: auto minmax(0, 1fr);
   column-gap: 8px;
   align-items: start;
-  padding: 7px 9px;
+  position: relative;
+  padding: 7px 36px 7px 9px;
   border-radius: 6px;
   color: var(--yt-spec-text-primary, var(--yt-live-chat-primary-text-color, #f1f1f1));
   background:
@@ -427,6 +428,50 @@ yt-live-chat-header-renderer .ytcq-inbox-badge[hidden] {
     linear-gradient(rgba(128, 128, 128, 0.16), rgba(128, 128, 128, 0.16)),
     var(--yt-spec-badge-chip-background, transparent);
   outline: none;
+}
+
+.ytcq-profile-card-jump {
+  position: absolute;
+  top: 5px;
+  right: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  color: var(--yt-live-chat-secondary-text-color, var(--yt-spec-text-secondary, #aaa));
+  background: rgba(128, 128, 128, 0.16);
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    background-color 120ms ease,
+    color 120ms ease,
+    opacity 120ms ease;
+}
+
+.ytcq-profile-card-message:hover .ytcq-profile-card-jump,
+.ytcq-profile-card-message:focus-within .ytcq-profile-card-jump {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.ytcq-profile-card-jump:hover,
+.ytcq-profile-card-jump:focus {
+  color: var(--yt-spec-call-to-action, #3ea6ff);
+  background: rgba(62, 166, 255, 0.18);
+  outline: none;
+}
+
+.ytcq-profile-card-jump svg {
+  display: block;
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+  pointer-events: none;
 }
 
 .ytcq-profile-card-message-time {
@@ -853,6 +898,12 @@ yt-live-chat-membership-item-renderer.ytcq-translation-replaced #message,
   text-decoration: underline dotted rgba(62, 166, 255, 0.55);
   text-decoration-thickness: 1px;
   text-underline-offset: 2px;
+}
+
+yt-live-chat-text-message-renderer.ytcq-profile-jump-target,
+yt-live-chat-paid-message-renderer.ytcq-profile-jump-target,
+yt-live-chat-membership-item-renderer.ytcq-profile-jump-target {
+  background: var(--yt-live-chat-mention-background-color, transparent);
 }
 
 yt-live-chat-text-message-renderer .ytcq-replaced-translation-icon,

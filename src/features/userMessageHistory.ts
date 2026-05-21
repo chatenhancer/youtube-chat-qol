@@ -24,6 +24,7 @@ export interface MessageRecord {
   id: number;
   authorName: string;
   contentNodes: Node[];
+  messageRef?: WeakRef<HTMLElement>;
   text: string;
   timestamp: number;
   timestampText: string;
@@ -77,6 +78,7 @@ export function recordUserMessage(message: HTMLElement): void {
     id: previousRecord?.id || nextRecordId++,
     authorName,
     contentNodes: getMessageContentNodes(message),
+    messageRef: new WeakRef(message),
     text,
     timestamp,
     timestampText: getMessageTimestampText(message, timestamp)
@@ -117,6 +119,11 @@ export function getRecentMessagesForIdentity(identity: UserIdentity, limit = MAX
     .filter((record) => normalizeComparableText(record.authorName) === normalizedAuthorName)
     .sort((a, b) => a.timestamp - b.timestamp)
     .slice(-limit);
+}
+
+export function getLiveMessageForRecord(record: MessageRecord): HTMLElement | null {
+  const message = record.messageRef?.deref() || null;
+  return message?.isConnected ? message : null;
 }
 
 export function recordUserMessageTranslation(
