@@ -56,7 +56,9 @@ Mention, reply, time, and time-until commands can also be expanded inline, such 
 - `/quote` + `Tab`: quote the newest inbox message.
 - `/again` or `/repeat` + `Tab`: restore your last sent message.
 - `/time utc` + `Tab`: insert the current time for a supported timezone or city.
+  Supported aliases: `utc`, `tokyo`, `jst`, `seoul`, `kst`, `london`, `paris`, `madrid`, `newyork`, `nyc`, `et`, `eastern`, `losangeles`, `la`, `pt`, and `pacific`.
 - `/timeuntil 7:45pm` + `Tab`: insert the time remaining until the next matching local time.
+  Accepted formats: `7`, `7am`, `7 am`, `7:45am`, `7:45 am`, `19`, `19:00`, `19:00:30`, and `7:45:30 pm`.
 - `/help` + `Tab`: show available chat commands.
 
 ### Setting commands
@@ -66,10 +68,6 @@ Mention, reply, time, and time-until commands can also be expanded inline, such 
 - `/setquotelength 120` + `Tab`: set quote length to 80, 120, 180, or 240.
 - `/setsound on` or `/setsound off` + `Tab`: turn inbox sounds on or off.
 - `/setopenchannelsinpopup on` or `/setopenchannelsinpopup off` + `Tab`: open channels in popup windows or open them normally.
-
-Supported `/time` aliases include `utc`, `tokyo`, `jst`, `seoul`, `kst`, `london`, `paris`, `madrid`, `newyork`, `nyc`, `et`, `eastern`, `losangeles`, `la`, `pt`, and `pacific`.
-
-`/timeuntil` accepts formats like `7`, `7am`, `7 am`, `7:45am`, `7:45 am`, `19`, `19:00`, `19:00:30`, and `7:45:30 pm`.
 
 Use `//` to send a literal slash command, such as `//quote`.
 

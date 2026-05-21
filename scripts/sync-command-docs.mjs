@@ -49,15 +49,9 @@ function createReadmeCommandSection() {
     ...commandReference.groups.flatMap((group) => [
       `### ${group.title}`,
       '',
-      ...group.commands.map((command) => (
-        `- ${formatMarkdownExamples(command.examples)} + \`Tab\`: ${command.readmeDescription}`
-      )),
+      ...group.commands.flatMap(createReadmeCommandLines),
       ''
     ]),
-    `Supported \`/time\` aliases include ${formatMarkdownInlineList(getTimeAliases())}.`,
-    '',
-    `\`/timeuntil\` accepts formats like ${formatMarkdownInlineList(commandReference.timeUntilFormats)}.`,
-    '',
     `Use \`//\` to send a literal slash command, such as \`${commandReference.escapeExample}\`.`,
     '',
     markerEnd,
@@ -90,24 +84,52 @@ function createDocsCommandGroup(group) {
     '  <article class="command-group">',
     `    <h3>${escapeHtml(group.title)}</h3>`,
     '    <dl class="command-list">',
-    ...group.commands.flatMap((command) => [
-      '      <div>',
-      `        <dt>${formatHtmlCommandExamples(command.examples)}</dt>`,
-      `        <dd>${escapeHtml(command.docsDescription)}</dd>`,
-      '      </div>'
-    ]),
+    ...group.commands.flatMap(createDocsCommandLines),
     '    </dl>',
-    `    <p class="command-footnote">${createDocsFootnote(group.id)}</p>`,
     '  </article>'
   ];
 }
 
-function createDocsFootnote(groupId) {
-  if (groupId === 'text') {
-    return `Time aliases include ${formatHtmlCodeList(getTimeAliases())}.`;
+function createReadmeCommandLines(command) {
+  const lines = [
+    `- ${formatMarkdownExamples(command.examples)} + \`Tab\`: ${command.readmeDescription}`
+  ];
+  const note = getMarkdownCommandNote(command);
+  if (note) lines.push(`  ${note}`);
+  return lines;
+}
+
+function createDocsCommandLines(command) {
+  return [
+    '      <div>',
+    `        <dt>${formatHtmlCommandExamples(command.examples)}</dt>`,
+    `        <dd>${escapeHtml(command.docsDescription)}${getHtmlCommandNote(command)}</dd>`,
+    '      </div>'
+  ];
+}
+
+function getMarkdownCommandNote(command) {
+  if (command.names.includes('time')) {
+    return `Supported aliases: ${formatMarkdownInlineList(getTimeAliases())}.`;
   }
 
-  return `<code>/timeuntil</code> accepts formats like ${formatHtmlCodeList(commandReference.timeUntilFormats)}.`;
+  if (command.names.includes('timeuntil')) {
+    return `Accepted formats: ${formatMarkdownInlineList(commandReference.timeUntilFormats)}.`;
+  }
+
+  return '';
+}
+
+function getHtmlCommandNote(command) {
+  if (command.names.includes('time')) {
+    return `<br><span class="command-detail">Supported aliases: ${formatHtmlCodeList(getTimeAliases())}.</span>`;
+  }
+
+  if (command.names.includes('timeuntil')) {
+    return `<br><span class="command-detail">Accepted formats: ${formatHtmlCodeList(commandReference.timeUntilFormats)}.</span>`;
+  }
+
+  return '';
 }
 
 function replaceBetweenHeadings(value, startHeading, endHeading, replacement) {
