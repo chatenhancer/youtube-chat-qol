@@ -397,13 +397,9 @@ h3 {
   margin-bottom: 20px;
 }
 
-.command-notes p,
-.command-footnote {
+.command-notes p {
   margin: 0;
   color: var(--muted);
-}
-
-.command-notes p {
   padding: 16px;
   background: var(--soft);
   border: 1px solid var(--line);
@@ -411,6 +407,7 @@ h3 {
 }
 
 .command-groups {
+  align-items: start;
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
@@ -421,10 +418,16 @@ h3 {
   border-radius: 8px;
 }
 
+.command-group h3 {
+  margin-bottom: 18px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+
 .command-list {
   display: grid;
   gap: 16px;
-  margin: 0 0 18px;
+  margin: 0;
 }
 
 .command-list div {
@@ -441,9 +444,9 @@ h3 {
   color: var(--muted);
 }
 
-.command-footnote {
-  padding-top: 16px;
-  border-top: 1px solid var(--line);
+.command-detail {
+  display: inline-block;
+  margin-top: 6px;
   font-size: 14px;
 }
 
