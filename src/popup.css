@@ -187,7 +187,12 @@ main {
 
 .option:hover {
   border-radius: 6px;
+  border-top-color: transparent;
   background: var(--ytcq-popup-row-hover-bg);
+}
+
+.option:hover + .option {
+  border-top-color: transparent;
 }
 
 .option-title {
