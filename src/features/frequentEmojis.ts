@@ -40,6 +40,15 @@ export function enhanceEmojiPicker(picker: Element): void {
   renderFrequentEmojiRow(picker);
 }
 
+export function resetFrequentEmojis(): void {
+  window.clearTimeout(emojiUsageSaveTimer);
+  window.clearTimeout(emojiPickerRefreshTimer);
+  emojiUsageSaveTimer = 0;
+  emojiPickerRefreshTimer = 0;
+  emojiUsage = [];
+  document.querySelectorAll('.ytcq-frequent-emoji-row').forEach((row) => row.remove());
+}
+
 function refreshEmojiPickers(): void {
   document.querySelectorAll('yt-emoji-picker-renderer').forEach(enhanceEmojiPicker);
 }

@@ -6,14 +6,21 @@
  * Keeping DOM observation centralized makes mutation-driven behavior easier to
  * reason about.
  */
-import { enhanceEmojiPicker, handleEmojiPickerClick, initFrequentEmojis } from '../features/frequentEmojis';
-import { initChatCommands } from '../features/chatCommands';
+import { enhanceEmojiPicker, handleEmojiPickerClick, initFrequentEmojis, resetFrequentEmojis } from '../features/frequentEmojis';
+import { initChatCommands, resetChatCommandsState } from '../features/chatCommands';
 import { enhanceMenu } from '../features/menus';
 import { handleMessageMenuActivation, wireMessageContext } from '../features/menus/messageMenu';
 import { configureSettingsMenu, refreshSettingsMenus } from '../features/menus/settingsMenu';
-import { handlePotentialMentionsInbox, initMentionsInbox, scheduleMentionsInboxButtonWire } from '../features/mentionsInbox';
-import { handlePotentialMention, initMentionSound } from '../features/mentionSound';
-import { wireParticipantProfileClick, wireProfileClick } from '../features/profilePopup';
+import {
+  handlePotentialInbox,
+  highlightPotentialInboxKeywords,
+  initInbox,
+  resetInboxState,
+  scheduleInboxButtonWire
+} from '../features/inbox';
+import { initSound } from '../features/inbox/sound';
+import { keepChatAtLiveEdge, scheduleKeepChatAtLiveEdge } from '../features/liveEdge';
+import { closeProfileCard, wireParticipantProfileClick, wireProfileClick } from '../features/profilePopup';
 import { wireAuthorNameMention } from '../features/reply';
 import {
   clearTranslations,
@@ -22,7 +29,7 @@ import {
   queueMessageTranslation
 } from '../features/translation/queue';
 import { recordUserMessage } from '../features/userMessageHistory';
-import { DEFAULT_OPTIONS, normalizeOptions, type Options } from '../shared/options';
+import { DEFAULT_OPTIONS, getTargetLanguageUpdate, normalizeOptions, type Options } from '../shared/options';
 import { getOptions, setOptions } from '../shared/state';
 import { CHAT_MESSAGE_SELECTOR, PARTICIPANT_SELECTOR } from '../youtube/selectors';
 
@@ -33,8 +40,8 @@ init();
 
 function init(): void {
   initFrequentEmojis();
-  initMentionSound();
-  initMentionsInbox();
+  initSound();
+  initInbox();
   initChatCommands(saveOptions);
   configureSettingsMenu(saveOptions);
 
@@ -58,6 +65,11 @@ function init(): void {
     applyOptionSideEffects(previousOptions, getOptions());
     refreshSettingsMenus();
   });
+
+  chrome.runtime.onMessage.addListener((message: { type?: string }) => {
+    if (message?.type !== 'ytcq:reset-page') return;
+    resetPageState();
+  });
 }
 
 function boot(): void {
@@ -65,16 +77,15 @@ function boot(): void {
   processExistingParticipants();
   document.querySelectorAll('ytd-menu-popup-renderer').forEach(enhanceMenu);
   document.querySelectorAll('yt-emoji-picker-renderer').forEach(enhanceEmojiPicker);
-  scheduleMentionsInboxButtonWire();
+  scheduleInboxButtonWire();
   document.addEventListener('click', handleEmojiPickerClick, true);
   document.addEventListener('pointerdown', handleMessageMenuActivation, true);
   document.addEventListener('click', handleMessageMenuActivation, true);
   document.addEventListener('keydown', handleMessageMenuActivation, true);
-  document.addEventListener('visibilitychange', scheduleVisibleMessageRecovery);
-  window.addEventListener('focus', scheduleVisibleMessageRecovery);
+  document.addEventListener('visibilitychange', handleVisibilityChange);
 
   observer = new MutationObserver((mutations) => {
-    let shouldWireMentionsInboxButton = false;
+    let shouldWireInboxButton = false;
     for (const mutation of mutations) {
       if (mutation.type === 'childList') {
         const targetMenu = mutation.target instanceof Element
@@ -84,7 +95,7 @@ function boot(): void {
           enhanceMenu(targetMenu);
         }
         if (mutation.target instanceof Element && mutation.target.closest('yt-live-chat-header-renderer')) {
-          shouldWireMentionsInboxButton = true;
+          shouldWireInboxButton = true;
         }
         retryTranslationForLateMessageText(mutation.target);
         recordMessageForLateText(mutation.target);
@@ -96,11 +107,12 @@ function boot(): void {
       for (const node of mutation.addedNodes) {
         if (!(node instanceof Element)) continue;
         if (node.closest('.ytcq-frequent-emoji-row')) continue;
+        if (isExtensionManagedAddedNode(node)) continue;
         if (
           node.matches('yt-live-chat-header-renderer') ||
           node.querySelector('yt-live-chat-header-renderer')
         ) {
-          shouldWireMentionsInboxButton = true;
+          shouldWireInboxButton = true;
         }
         if (node.matches(CHAT_MESSAGE_SELECTOR) && node instanceof HTMLElement) {
           enhanceMessage(node, { allowTranslate: true });
@@ -145,8 +157,8 @@ function boot(): void {
       }
     }
 
-    if (shouldWireMentionsInboxButton) {
-      scheduleMentionsInboxButtonWire();
+    if (shouldWireInboxButton) {
+      scheduleInboxButtonWire();
     }
   });
 
@@ -176,10 +188,20 @@ function processExistingParticipants(): void {
 function scheduleVisibleMessageRecovery(): void {
   if (document.visibilityState === 'hidden') return;
   if (visibilityRecoveryTimer) window.clearTimeout(visibilityRecoveryTimer);
+  scheduleKeepChatAtLiveEdge();
   visibilityRecoveryTimer = window.setTimeout(() => {
     visibilityRecoveryTimer = 0;
     processExistingMessages(getOptions().targetLanguage ? MAX_RETROACTIVE_TRANSLATIONS : 0);
   }, 300);
+}
+
+function handleVisibilityChange(): void {
+  if (document.visibilityState === 'hidden') {
+    keepChatAtLiveEdge();
+    return;
+  }
+
+  scheduleVisibleMessageRecovery();
 }
 
 function enhanceMessage(message: HTMLElement, { allowTranslate }: { allowTranslate: boolean }): void {
@@ -189,8 +211,9 @@ function enhanceMessage(message: HTMLElement, { allowTranslate }: { allowTransla
   wireAuthorNameMention(message);
 
   if (allowTranslate) {
-    handlePotentialMention(message);
-    handlePotentialMentionsInbox(message);
+    handlePotentialInbox(message);
+  } else {
+    highlightPotentialInboxKeywords(message);
   }
 
   if (allowTranslate && getOptions().targetLanguage) {
@@ -219,25 +242,54 @@ function recordMessageForLateText(target: Node): void {
   if (!targetElement || isExtensionManagedMutation(targetElement)) return;
 
   const message = targetElement.closest<HTMLElement>(CHAT_MESSAGE_SELECTOR);
-  if (message) recordUserMessage(message);
+  if (message) {
+    recordUserMessage(message);
+    handlePotentialInbox(message);
+  }
 }
 
 function isExtensionManagedMutation(element: Element): boolean {
+  const chatMessage = element.closest<HTMLElement>(CHAT_MESSAGE_SELECTOR);
+  if (chatMessage?.dataset.ytcqInboxKeywordHighlighting === 'true') return true;
+
   return Boolean(element.closest([
     '.ytcq-translation',
     '.ytcq-replaced-translation-icon',
     '.ytcq-frequent-emoji-row',
     '.ytcq-profile-card',
+    '.ytcq-inbox-card',
     'ytd-menu-popup-renderer'
+  ].join(',')));
+}
+
+function isExtensionManagedAddedNode(element: Element): boolean {
+  const chatMessage = element.closest<HTMLElement>(CHAT_MESSAGE_SELECTOR);
+  if (chatMessage?.dataset.ytcqInboxKeywordHighlighting === 'true') return true;
+
+  return Boolean(element.closest([
+    '.ytcq-chat-keyword-highlight',
+    '.ytcq-translation',
+    '.ytcq-replaced-translation-icon',
+    '.ytcq-profile-card',
+    '.ytcq-inbox-card'
   ].join(',')));
 }
 
 function saveOptions(values: Partial<Options>): void {
   const previousOptions = getOptions();
-  setOptions(normalizeOptions({ ...previousOptions, ...values }));
+  const nextValues = values.targetLanguage !== undefined
+    ? {
+        ...values,
+        ...getTargetLanguageUpdate(
+          values.targetLanguage,
+          values.lastTranslationTarget || previousOptions.targetLanguage || previousOptions.lastTranslationTarget
+        )
+      }
+    : values;
+  setOptions(normalizeOptions({ ...previousOptions, ...nextValues }));
   applyOptionSideEffects(previousOptions, getOptions());
   refreshSettingsMenus();
-  chrome.storage.sync.set(values);
+  chrome.storage.sync.set(nextValues);
 }
 
 function applyOptionSideEffects(previousOptions: Options, nextOptions: Options): void {
@@ -250,4 +302,18 @@ function applyOptionSideEffects(previousOptions: Options, nextOptions: Options):
       processExistingMessages(MAX_RETROACTIVE_TRANSLATIONS);
     }
   }
+}
+
+function resetPageState(): void {
+  const previousOptions = getOptions();
+  setOptions(DEFAULT_OPTIONS);
+  clearTranslations();
+  resetInboxState();
+  resetFrequentEmojis();
+  resetChatCommandsState();
+  closeProfileCard();
+  document.querySelectorAll('.ytcq-toast').forEach((toast) => toast.remove());
+  applyOptionSideEffects(previousOptions, DEFAULT_OPTIONS);
+  refreshSettingsMenus();
+  scheduleInboxButtonWire();
 }

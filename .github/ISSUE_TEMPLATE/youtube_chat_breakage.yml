@@ -17,8 +17,9 @@ body:
         - Mention / Quote message menu
         - Author click or Alt/Option-click
         - Avatar profile card
-        - Mentions inbox
-        - Mention sound
+        - Inbox / keyword highlights
+        - Inbox sound
+        - Keep chat live
         - Frequent emoji row
         - Chat commands
         - Extension popup
@@ -31,7 +32,7 @@ body:
     attributes:
       label: What broke?
       description: Describe what is missing, clipped, frozen, or behaving differently.
-      placeholder: "Example: The Mention and Quote actions no longer appear in the message menu."
+      placeholder: "Example: The Quote and Mention actions no longer appear in the message menu."
     validations:
       required: true
 
@@ -74,9 +75,16 @@ body:
     id: extension-version
     attributes:
       label: Extension version
-      placeholder: "0.3.0"
+      placeholder: "0.7.0"
     validations:
       required: true
+
+  - type: textarea
+    id: related-settings
+    attributes:
+      label: Related settings or keywords
+      description: If the issue involves translation, inbox, keywords, sound, emoji, or keep-chat-live behavior, include the relevant settings.
+      placeholder: "Translate chat: on; inbox sound: on; watched keywords: robot, battery"
 
   - type: textarea
     id: screenshots

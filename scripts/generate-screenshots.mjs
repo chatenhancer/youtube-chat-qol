@@ -1,18 +1,18 @@
 /*
  * Screenshot asset generation script.
  *
- * Uses the three high-resolution screenshot exports in docs/assets/screenshots
+ * Uses the three high-resolution screenshot exports in assets/screenshots
  * as the source of truth, then generates the README showcase, high-resolution
  * docs showcase, and Chrome Web Store screenshots with centered white padding.
  */
-import { mkdir } from 'node:fs/promises';
+import { copyFile, mkdir } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const sourceDir = path.join(root, 'docs', 'assets', 'screenshots');
-const readmeDir = path.join(root, 'assets', 'screenshots');
+const sourceDir = path.join(root, 'assets', 'screenshots');
+const readmeDir = sourceDir;
 const docsDir = path.join(root, 'docs', 'assets', 'screenshots');
 const chromeWebStoreDir = path.join(readmeDir, 'chrome-web-store');
 
@@ -40,6 +40,7 @@ const whiteBackground = {
 };
 
 await mkdir(readmeDir, { recursive: true });
+await mkdir(docsDir, { recursive: true });
 await mkdir(chromeWebStoreDir, { recursive: true });
 
 const readmeShowcaseBuffers = await Promise.all(screenshots.map(async (filename) => {
@@ -54,7 +55,7 @@ const readmeShowcaseBuffers = await Promise.all(screenshots.map(async (filename)
     .png()
     .toBuffer();
 
-  await sharp(normalizedScreenshot).toFile(path.join(readmeDir, filename));
+  await copyFile(sourcePath, path.join(docsDir, filename));
 
   await sharp(sourcePath)
     .resize(chromeWebStoreSize.width, chromeWebStoreSize.height, {

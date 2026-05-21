@@ -50,6 +50,10 @@ export function registerMentionProcessor(processor: MentionProcessor): void {
   mentionProcessors.add(processor);
 }
 
+export function getCurrentMentionCandidates(): string[] {
+  return [...getMentionCandidates()];
+}
+
 export function processPotentialMentionForConsumer(
   message: HTMLElement,
   checkedDatasetKey: string,

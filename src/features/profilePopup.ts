@@ -285,7 +285,7 @@ function showProfileCard(source: ProfileSource, anchor: HTMLElement): void {
   }, 0);
 }
 
-function closeProfileCard(): void {
+export function closeProfileCard(): void {
   activeProfileCardCleanup?.();
   activeProfileCardCleanup = null;
   activeProfileCard?.remove();

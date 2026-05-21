@@ -28,7 +28,9 @@ Describe the change and the user-facing behavior it affects.
 - [ ] Chat input / commands
 - [ ] Emoji picker
 - [ ] Avatar/profile card
-- [ ] Mentions inbox
+- [ ] Inbox / keyword highlights
+- [ ] Inbox sound / tab alert
+- [ ] Keep chat live
 - [ ] Extension popup
 - [ ] Docs/assets only
 - [ ] Other:
@@ -43,4 +45,4 @@ Describe the change and the user-facing behavior it affects.
 
 ## Notes
 
-Mention any YouTube DOM assumptions, browser-specific behavior, screenshots, or release notes needed for reviewers.
+Mention any YouTube DOM assumptions, browser-specific behavior, screenshots, migration/reset expectations, or release notes needed for reviewers.

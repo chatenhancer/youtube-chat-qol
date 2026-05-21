@@ -13,7 +13,7 @@ body:
     attributes:
       label: What happened?
       description: Describe the problem and what you expected to happen instead.
-      placeholder: "Example: The Mentions inbox button appears, but clicking it does not open the inbox."
+      placeholder: "Example: The Inbox button appears, but clicking it does not open the inbox."
     validations:
       required: true
 
@@ -47,7 +47,7 @@ body:
     attributes:
       label: Extension version
       description: You can find this in the extension popup.
-      placeholder: "0.3.0"
+      placeholder: "0.7.0"
     validations:
       required: true
 
@@ -69,8 +69,8 @@ body:
     id: settings
     attributes:
       label: Relevant settings
-      description: Mention any related settings, such as translation target, display mode, mention sound, or channel popup behavior.
-      placeholder: "Translate to: English; display mode: replace; mention sound: off"
+      description: Mention any related settings, such as translation target, display mode, inbox sound, watched keywords, keep chat live, or channel popup behavior.
+      placeholder: "Translate to: English; display mode: replace; inbox sound: off; keywords: robot, coffee"
 
   - type: textarea
     id: screenshots

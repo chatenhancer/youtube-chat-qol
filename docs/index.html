@@ -14,7 +14,7 @@
     <meta property="og:title" content="Chat Enhancer for YouTube">
     <meta
       property="og:description"
-      content="Translate messages, mention and quote users, track mentions, reuse emojis, and run quick commands in YouTube live chat."
+      content="Translate messages, mention and quote users, save inbox matches, reuse emojis, and run quick commands in YouTube live chat."
     >
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://chatenhancer.com/">
@@ -27,7 +27,7 @@
     <meta property="og:image:height" content="630">
     <meta
       property="og:image:alt"
-      content="Chat Enhancer for YouTube showing native-feeling live chat translation, mentions, and emoji tools."
+      content="Chat Enhancer for YouTube showing native-feeling live chat translation, inbox, and emoji tools."
     >
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Chat Enhancer for YouTube">
@@ -38,7 +38,7 @@
     <meta name="twitter:image" content="https://chatenhancer.com/assets/social-card.png">
     <meta
       name="twitter:image:alt"
-      content="Chat Enhancer for YouTube showing native-feeling live chat translation, mentions, and emoji tools."
+      content="Chat Enhancer for YouTube showing native-feeling live chat translation, inbox, and emoji tools."
     >
     <link rel="icon" href="assets/icons/icon-128.png">
     <link rel="apple-touch-icon" href="assets/icons/icon-128.png">
@@ -56,7 +56,7 @@
         "image": "https://chatenhancer.com/assets/social-card.png",
         "applicationCategory": "BrowserApplication",
         "operatingSystem": "Chrome, Edge, Firefox",
-        "softwareVersion": "0.5.6",
+        "softwareVersion": "0.7.0",
         "offers": {
           "@type": "Offer",
           "price": "0",
@@ -112,7 +112,7 @@
           <h1 id="hero-title">Chat Enhancer for YouTube</h1>
           <p class="hero-copy">
             Translate messages, mention and quote users, revisit chat context,
-            catch mentions, reuse emojis, and run quick commands without
+            catch messages you care about, reuse emojis, and run quick commands without
             replacing YouTube's native chat.
           </p>
           <div class="hero-actions">
@@ -145,8 +145,8 @@
               </span>
               <h3>Translate Live Chat</h3>
               <p>
-                Choose a target language from YouTube's live chat settings and
-                decide whether translations replace messages or appear below.
+                Choose a target language in the extension popup, then quickly
+                toggle translation from YouTube's live chat settings.
               </p>
             </article>
             <article class="feature">
@@ -174,15 +174,15 @@
               </p>
             </article>
             <article class="feature">
-              <span class="feature-icon" data-symbol="alternate_email" aria-hidden="true">
-                <svg viewBox="0 -960 960 960" focusable="false">
-                  <path d="M480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480v58q0 59-40.5 100.5T740-280q-35 0-66-15t-52-43q-29 29-65.5 43.5T480-280q-83 0-141.5-58.5T280-480q0-83 58.5-141.5T480-680q83 0 141.5 58.5T680-480v58q0 26 17 44t43 18q26 0 43-18t17-44v-58q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93h160q17 0 28.5 11.5T680-120q0 17-11.5 28.5T640-80H480Zm0-280q50 0 85-35t35-85q0-50-35-85t-85-35q-50 0-85 35t-35 85q0 50 35 85t85 35Z"></path>
+              <span class="feature-icon" data-symbol="inbox" aria-hidden="true">
+                <svg viewBox="0 0 24 24" focusable="false">
+                  <path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2Zm0 12h-4a3 3 0 0 1-6 0H5V5h14v10Z"></path>
                 </svg>
               </span>
-              <h3>Mentions Inbox</h3>
+              <h3>Inbox</h3>
               <p>
-                Keep a local list of recent messages that mention your handle,
-                with an optional subtle sound for new mentions.
+                Keep a local list of messages that mention your handle or match
+                your keywords, with an optional subtle sound for new inbox messages.
               </p>
             </article>
             <article class="feature">
@@ -220,8 +220,8 @@
           <h2 id="screenshots-title">Native-feeling chat improvements</h2>
           <div class="screenshot-grid">
             <figure class="showcase-figure">
-              <img src="assets/screenshots/feature-showcase.png" alt="Chat Enhancer for YouTube feature showcase with translation, mentions, profile context, frequent emojis, commands, and settings">
-              <figcaption>Translation, mentions, profile context, frequent emojis, and quick commands in one native-feeling chat workflow.</figcaption>
+              <img src="assets/screenshots/feature-showcase.png" alt="Chat Enhancer for YouTube feature showcase with translation, inbox, profile context, frequent emojis, commands, and settings">
+              <figcaption>Translation, inbox, profile context, frequent emojis, and quick commands in one native-feeling chat workflow.</figcaption>
             </figure>
           </div>
         </div>
@@ -272,9 +272,9 @@
               Source Code
             </a>
             <a class="button button-link" href="https://github.com/chat-enhancer-yt/youtube-chat-qol/issues">
-              <span class="button-icon" data-symbol="support_agent" aria-hidden="true">
+              <span class="button-icon" data-symbol="support" aria-hidden="true">
                 <svg viewBox="0 -960 960 960" focusable="false">
-                  <path d="M480-120q-17 0-28.5-11.5T440-160q0-17 11.5-28.5T480-200h280v-284q0-117-81.5-198.5T480-764q-117 0-198.5 81.5T200-484v204q0 17-11.5 28.5T160-240q-33 0-56.5-23.5T80-320v-80q0-21 10.5-39.5T120-469l3-53q8-68 39.5-126t79-101q47.5-43 109-67T480-840q68 0 129 24t109 66.5Q766-707 797-649t40 126l3 52q19 9 29.5 27t10.5 38v92q0 20-10.5 38T840-249v49q0 33-23.5 56.5T760-120H480ZM360-400q-17 0-28.5-11.5T320-440q0-17 11.5-28.5T360-480q17 0 28.5 11.5T400-440q0 17-11.5 28.5T360-400Zm240 0q-17 0-28.5-11.5T560-440q0-17 11.5-28.5T600-480q17 0 28.5 11.5T640-440q0 17-11.5 28.5T600-400Zm-359-62q-7-106 64-182t177-76q89 0 156.5 56.5T720-519q-91-1-167.5-49T435-698q-16 80-67.5 142.5T241-462Z"></path>
+                  <path d="M324-111.5Q251-143 197-197t-85.5-127Q80-397 80-480t31.5-156Q143-709 197-763t127-85.5Q397-880 480-880t156 31.5Q709-817 763-763t85.5 127Q880-563 880-480t-31.5 156Q817-251 763-197t-127 85.5Q563-80 480-80t-156-31.5Zm40-70.5 48-110q-42-15-72.5-46.5T292-412l-110 46q23 64 71 112t111 72Zm-72-366q17-42 47.5-73.5T412-668l-46-110q-64 24-112 72t-72 112l110 46Zm273 153q35-35 35-85t-35-85q-35-35-85-35t-85 35q-35 35-35 85t35 85q35 35 85 35t85-35Zm31 213q63-24 110.5-71.5T778-364l-110-48q-15 42-46 72.5T550-292l46 110Zm72-368 110-46q-24-63-71.5-110.5T596-778l-46 112q41 15 71 45.5t47 70.5Z"></path>
                 </svg>
               </span>
               Support / Feedback
@@ -306,8 +306,8 @@
             <p>
               Most features run in your browser. Settings are saved with your
               browser's extension storage so they can follow your extension
-              install. Your mentions inbox and frequent emoji counts are stored
-              locally on your device.
+              install. Your inbox messages, inbox keywords, and frequent emoji
+              counts are stored locally on your device.
             </p>
             <p>
               Recent profile messages are only kept in memory for the current
@@ -362,11 +362,11 @@
               <dl class="command-list">
                 <div>
                   <dt><code>/mention</code> or <code>/reply</code></dt>
-                  <dd>Insert a mention for the author of your newest mentions-inbox message.</dd>
+                  <dd>Insert a mention for the author of your newest inbox message.</dd>
                 </div>
                 <div>
                   <dt><code>/quote</code></dt>
-                  <dd>Quote the newest message saved in your mentions inbox.</dd>
+                  <dd>Quote the newest message saved in your inbox.</dd>
                 </div>
                 <div>
                   <dt><code>/again</code> or <code>/repeat</code></dt>
@@ -410,12 +410,16 @@
                   <dd>Set quote length to <code>80</code>, <code>120</code>, <code>180</code>, or <code>240</code>.</dd>
                 </div>
                 <div>
-                  <dt><code>/setmentionsound on</code></dt>
-                  <dd>Turn mention sounds on or off.</dd>
+                  <dt><code>/setsound on</code></dt>
+                  <dd>Turn inbox sounds on or off.</dd>
                 </div>
                 <div>
                   <dt><code>/setopenchannelsinpopup on</code></dt>
                   <dd>Open channels in popup windows. Use <code>off</code> to open them normally.</dd>
+                </div>
+                <div>
+                  <dt><code>/setkeepchatlive on</code></dt>
+                  <dd>Keep chat at the live edge after tab switches. Use <code>off</code> to leave scroll position alone.</dd>
                 </div>
               </dl>
               <p class="command-footnote">
