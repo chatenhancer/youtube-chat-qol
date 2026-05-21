@@ -6,6 +6,7 @@ export interface InboxRecord {
   contentNodes?: Node[];
   contentParts?: RichTextSegment[];
   matchedKeywords: string[];
+  messageRef?: WeakRef<HTMLElement>;
   mention: boolean;
   mentionHandles: string[];
   messageId?: string;

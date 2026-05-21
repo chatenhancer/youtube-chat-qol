@@ -52,6 +52,7 @@ import {
   showInboxTabAlert
 } from '../tabAlert';
 import { playAlertSound } from './sound';
+import { createJumpToMessageIcon, jumpToChatMessage } from '../messageJump';
 import {
   getInboxTimestamp,
   loadInboxStoredState,
@@ -354,9 +355,14 @@ function recordInboxMatch(message: HTMLElement, match: InboxMatch): void {
     if (existingIndex >= 0) {
       const existing = records[existingIndex];
       const merged = mergeInboxRecords(existing, incoming, isReadNow);
+      const transientChanged = hasTransientRecordUpdate(existing, merged);
       changed = !recordsEqual(existing, merged);
-      if (changed) {
+      if (changed || transientChanged) {
         records[existingIndex] = merged;
+      }
+      if (!changed && transientChanged) {
+        refreshOpenInboxCard();
+        return;
       }
     } else {
       records.push(incoming);
@@ -400,6 +406,7 @@ function createInboxRecord(message: HTMLElement, match: InboxMatch): InboxRecord
     contentNodes,
     contentParts: serializeRichMessageNodes(contentNodes),
     matchedKeywords,
+    messageRef: new WeakRef(message),
     mention: match.mention === true,
     mentionHandles,
     messageId: getMessageStableId(message),
@@ -430,6 +437,7 @@ function mergeInboxRecords(existing: InboxRecord, incoming: InboxRecord, isReadN
       ? incoming.contentParts
       : existing.contentParts?.length ? existing.contentParts : incoming.contentParts,
     matchedKeywords: nextKeywords,
+    messageRef: getLiveInboxMessage(incoming) ? incoming.messageRef : existing.messageRef,
     mention: nextMention,
     mentionHandles: nextMentionHandles,
     messageId: existing.messageId || incoming.messageId,
@@ -443,6 +451,11 @@ function recordsEqual(first: InboxRecord, second: InboxRecord): boolean {
     first.mention === second.mention &&
     first.matchedKeywords.join('\n') === second.matchedKeywords.join('\n') &&
     first.mentionHandles.join('\n') === second.mentionHandles.join('\n');
+}
+
+function hasTransientRecordUpdate(existing: InboxRecord, merged: InboxRecord): boolean {
+  return getLiveInboxMessage(existing) !== getLiveInboxMessage(merged) ||
+    (!existing.contentNodes?.length && Boolean(merged.contentNodes?.length));
 }
 
 function shouldUseIncomingContentNodes(existing: InboxRecord, incoming: InboxRecord): boolean {
@@ -516,6 +529,8 @@ function renderInboxList(list: HTMLElement): void {
 
     body.append(author, spacer, text);
     item.append(timestamp, body);
+    const jumpButton = createInboxJumpButton(record);
+    if (jumpButton) item.append(jumpButton);
     list.append(item);
   });
 }
@@ -622,6 +637,37 @@ function wireQuoteCardItem(item: HTMLElement, record: InboxRecord): void {
       quote(event);
     }
   });
+}
+
+function createInboxJumpButton(record: InboxRecord): HTMLButtonElement | null {
+  if (!getLiveInboxMessage(record)) return null;
+
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = 'ytcq-profile-card-jump';
+  button.title = 'Jump to message';
+  button.setAttribute('aria-label', 'Jump to message');
+  button.append(createJumpToMessageIcon());
+  button.addEventListener('click', (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    jumpToInboxMessage(record);
+  });
+
+  return button;
+}
+
+function jumpToInboxMessage(record: InboxRecord): void {
+  const target = getLiveInboxMessage(record);
+  if (!target) return;
+
+  jumpToChatMessage(target);
+  closeInboxCard();
+}
+
+function getLiveInboxMessage(record: InboxRecord): HTMLElement | null {
+  const message = record.messageRef?.deref() || null;
+  return message?.isConnected ? message : null;
 }
 
 function refreshVisibleChatKeywordHighlights(): void {

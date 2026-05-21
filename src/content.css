@@ -900,9 +900,9 @@ yt-live-chat-membership-item-renderer.ytcq-translation-replaced #message,
   text-underline-offset: 2px;
 }
 
-yt-live-chat-text-message-renderer.ytcq-profile-jump-target,
-yt-live-chat-paid-message-renderer.ytcq-profile-jump-target,
-yt-live-chat-membership-item-renderer.ytcq-profile-jump-target {
+yt-live-chat-text-message-renderer.ytcq-message-jump-target,
+yt-live-chat-paid-message-renderer.ytcq-message-jump-target,
+yt-live-chat-membership-item-renderer.ytcq-message-jump-target {
   background: var(--yt-live-chat-mention-background-color, transparent);
 }
 
