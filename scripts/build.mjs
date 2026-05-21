@@ -10,6 +10,7 @@ import { copyFile, cp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import packageJson from '../package.json' with { type: 'json' };
+import { syncCommandDocs } from './sync-command-docs.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const targetOutputDirs = {
@@ -130,9 +131,10 @@ function getRequestedTargets() {
 async function syncVersionedSourceFiles() {
   await Promise.all([
     syncManifestVersion(),
-    syncPackageLockVersion(),
-    syncDocsStructuredDataVersion()
+    syncPackageLockVersion()
   ]);
+  await syncCommandDocs();
+  await syncDocsStructuredDataVersion();
 }
 
 async function syncManifestVersion() {

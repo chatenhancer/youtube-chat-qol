@@ -24,18 +24,18 @@ Not affiliated with YouTube or Google.
 - Translate live chat messages, with `Off` as the default.
 - Choose whether translations replace the original message or appear below it.
 
-### Replying
+### Mention and quote
 
 - Add `Mention` and `Quote` actions to YouTube's existing message menu.
 - Click an author name to mention them, or Alt/Option-click it to quote that message.
 
-### Social Context
+### Chat context
 
 - Click an avatar to see that user's recent messages and open their channel.
 - Keep a local inbox for messages that mention your handle or match your keywords.
 - Optionally play a subtle sound when chat saves a new inbox message.
 
-### Chat Comfort
+### Chat comfort
 
 - Add a local most-used row to YouTube's emoji picker.
 - Complete chat slash commands for mentions, quotes, repeated messages, time helpers, and extension settings.
@@ -44,36 +44,36 @@ Not affiliated with YouTube or Google.
 
 ## Chat Commands
 
-Type commands in the YouTube chat input, then press `Tab`. Commands do not send automatically. Unknown slash commands are left alone. Mention, time, and time-until commands can also be expanded inline, such as `starts in /timeuntil 7pm`.
+<!-- chat-commands:start -->
 
-### Text Commands
+Type commands in the YouTube chat input, then press `Tab`. Commands do not send automatically. Unknown slash commands are left alone.
 
-- `/mention` + `Tab`: insert a mention for the author of the newest inbox message.
-- `/reply` + `Tab`: alias for `/mention`.
-- `/help` + `Tab`: show available chat commands.
+Mention, reply, time, and time-until commands can also be expanded inline, such as `starts in /timeuntil 7pm`.
+
+### Text commands
+
+- `/mention` or `/reply` + `Tab`: insert a mention for the author of the newest inbox message.
 - `/quote` + `Tab`: quote the newest inbox message.
-- `/again` + `Tab`: restore your last sent message.
-- `/repeat` + `Tab`: alias for `/again`.
+- `/again` or `/repeat` + `Tab`: restore your last sent message.
 - `/time utc` + `Tab`: insert the current time for a supported timezone or city.
 - `/timeuntil 7:45pm` + `Tab`: insert the time remaining until the next matching local time.
+- `/help` + `Tab`: show available chat commands.
 
-Supported `/time` aliases include `utc`, `tokyo`, `jst`, `seoul`, `kst`, `london`, `paris`, `madrid`, `nyc`, `et`, `la`, and `pt`.
+### Setting commands
+
+- `/settranslateto english` or `/settranslateto off` + `Tab`: set the translation language, or turn translation off.
+- `/settranslationdisplay replace` or `/settranslationdisplay below` + `Tab`: choose whether translations replace messages or show below them.
+- `/setquotelength 120` + `Tab`: set quote length to 80, 120, 180, or 240.
+- `/setsound on` or `/setsound off` + `Tab`: turn inbox sounds on or off.
+- `/setopenchannelsinpopup on` or `/setopenchannelsinpopup off` + `Tab`: open channels in popup windows or open them normally.
+
+Supported `/time` aliases include `utc`, `tokyo`, `jst`, `seoul`, `kst`, `london`, `paris`, `madrid`, `newyork`, `nyc`, `et`, `eastern`, `losangeles`, `la`, `pt`, and `pacific`.
 
 `/timeuntil` accepts formats like `7`, `7am`, `7 am`, `7:45am`, `7:45 am`, `19`, `19:00`, `19:00:30`, and `7:45:30 pm`.
 
-### Setting Commands
-
-- `/settranslateto english` + `Tab`: set the translation language.
-- `/settranslateto off` + `Tab`: turn translation off.
-- `/settranslationdisplay replace` + `Tab`: replace original messages with translations.
-- `/settranslationdisplay below` + `Tab`: show translations below original messages.
-- `/setquotelength 120` + `Tab`: set quote length to `80`, `120`, `180`, or `240`.
-- `/setsound on` + `Tab`: turn inbox sounds on.
-- `/setsound off` + `Tab`: turn inbox sounds off.
-- `/setopenchannelsinpopup on` + `Tab`: open channels in popup windows.
-- `/setopenchannelsinpopup off` + `Tab`: open channels normally.
-
 Use `//` to send a literal slash command, such as `//quote`.
+
+<!-- chat-commands:end -->
 
 ## Screenshots
 
