@@ -6,7 +6,8 @@ Chat Enhancer for YouTube runs only on YouTube live chat and live chat replay pa
 
 - Extension settings are stored with `chrome.storage.sync`.
 - The most-used emoji row stores local emoji usage counts with `chrome.storage.local`.
-- The mentions inbox stores recent messages that mention your handle with `chrome.storage.local`.
+- The inbox stores recent messages that mention your handle or match your local keywords with `chrome.storage.local`.
+- Inbox keywords are stored locally with `chrome.storage.local`.
 - Translation results are cached only in memory in the live chat page and are cleared when the page is unloaded.
 
 ## Data Sent To Third Parties

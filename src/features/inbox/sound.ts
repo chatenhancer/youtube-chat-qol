@@ -1,40 +1,26 @@
 /**
- * Mention sound detection.
+ * Alert sound.
  *
- * The signed-in chat handle is read from YouTube's message input author chip
- * and cached once it appears. New incoming messages are checked for explicit
- * @handle mentions while own-authored messages are ignored.
+ * Plays the small inbox blip for messages that need attention, such as direct
+ * mentions and keyword matches.
  */
-import { getOptions } from '../shared/state';
-import {
-  initMentionDetection,
-  processPotentialMentionForConsumer,
-  registerMentionProcessor
-} from './mentionDetection';
+import { getOptions } from '../../shared/state';
 
-const MENTION_COOLDOWN_MS = 1400;
+const SOUND_COOLDOWN_MS = 1400;
 
-let lastMentionSoundAt = 0;
+let lastSoundAt = 0;
 let audioContext: AudioContext | null = null;
-let registeredMentionSound = false;
 
-export function initMentionSound(): void {
-  initMentionDetection();
-  if (registeredMentionSound) return;
-
-  registeredMentionSound = true;
-  registerMentionProcessor(handlePotentialMention);
+export function initSound(): void {
+  // Kept as an explicit startup hook next to other feature initializers.
 }
 
-export function handlePotentialMention(message: HTMLElement): void {
-  if (!getOptions().mentionSound) return;
-  processPotentialMentionForConsumer(message, 'ytcqMentionSoundChecked', playMentionBlip);
-}
+export function playAlertSound(): void {
+  if (!getOptions().sound) return;
 
-function playMentionBlip(): void {
   const now = Date.now();
-  if (now - lastMentionSoundAt < MENTION_COOLDOWN_MS) return;
-  lastMentionSoundAt = now;
+  if (now - lastSoundAt < SOUND_COOLDOWN_MS) return;
+  lastSoundAt = now;
 
   try {
     const AudioContextConstructor = window.AudioContext || (window as Window & {

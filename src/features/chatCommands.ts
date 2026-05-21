@@ -6,7 +6,7 @@
  * Unknown slash-prefixed text is left to YouTube.
  */
 import { LANGUAGE_OPTIONS, getLanguageLabel } from '../shared/languages';
-import { QUOTE_LENGTH_OPTIONS, type Options, type TranslationDisplay } from '../shared/options';
+import { getTargetLanguageUpdate, QUOTE_LENGTH_OPTIONS, type Options, type TranslationDisplay } from '../shared/options';
 import { cleanText } from '../shared/text';
 import { showToast } from '../shared/toast';
 import {
@@ -21,7 +21,7 @@ import {
   type ChatInputTextSelection
 } from '../youtube/chatInput';
 import { formatMentionText, formatQuoteText } from './reply';
-import { getLatestMentionRecord } from './mentionsInbox';
+import { getLatestInboxRecord } from './inbox';
 
 type SaveOptions = (values: Partial<Options>) => void;
 
@@ -48,10 +48,11 @@ const SEND_BUTTON_SELECTOR = [
 const TEXT_COMPLETION_COMMANDS = new Set(['help', 'mention', 'reply', 'quote', 'again', 'repeat', 'time', 'timeuntil']);
 const INLINE_TEXT_COMPLETION_COMMANDS = new Set(['mention', 'reply', 'time', 'timeuntil']);
 const SETTING_COMMANDS = new Set([
-  'setmentionsound',
+  'setkeepchatlive',
   'setopenchannelsinpopup',
   'setopenprofilesinpopup',
   'setquotelength',
+  'setsound',
   'settranslateto',
   'settranslationdisplay'
 ]);
@@ -88,6 +89,12 @@ let activeHelpCardCleanup: (() => void) | null = null;
 export function initChatCommands(saveOptions: SaveOptions): void {
   document.addEventListener('keydown', (event) => handleChatCommandKeydown(event, saveOptions), true);
   document.addEventListener('click', handleChatCommandSendClick, true);
+}
+
+export function resetChatCommandsState(): void {
+  lastSentMessage = null;
+  escapedSlashText = '';
+  closeChatCommandHelp();
 }
 
 function handleChatCommandKeydown(event: KeyboardEvent, saveOptions: SaveOptions): void {
@@ -183,12 +190,12 @@ async function executeTabCommand(event: KeyboardEvent, parsed: ParsedCommand, sa
   }
 
   if (parsed.name === 'mention' || parsed.name === 'reply') {
-    replaceCommandText(await getMentionCommandText(), 'No mentions yet.');
+    replaceCommandText(await getMentionCommandText(), 'No inbox messages yet.');
     return;
   }
 
   if (parsed.name === 'quote') {
-    replaceCommandText(await getQuoteCommandText(), 'No mentions yet.');
+    replaceCommandText(await getQuoteCommandText(), 'No inbox messages yet.');
     return;
   }
 
@@ -211,7 +218,7 @@ async function executeInlineTextCommand(event: KeyboardEvent, parsed: InlinePars
   preventCommandEvent(event);
 
   if (parsed.name === 'mention' || parsed.name === 'reply') {
-    replaceInlineCommandText(await getMentionCommandText(), parsed, 'No mentions yet.');
+    replaceInlineCommandText(await getMentionCommandText(), parsed, 'No inbox messages yet.');
     return;
   }
 
@@ -241,13 +248,18 @@ function executeSetCommand(parsed: ParsedCommand, saveOptions: SaveOptions): voi
     return;
   }
 
-  if (parsed.name === 'setmentionsound') {
-    executeBooleanSetCommand(parsed, saveOptions, 'mentionSound', 'Mention sound');
+  if (parsed.name === 'setsound') {
+    executeBooleanSetCommand(parsed, saveOptions, 'sound', 'Inbox sound');
     return;
   }
 
   if (parsed.name === 'setopenchannelsinpopup' || parsed.name === 'setopenprofilesinpopup') {
     executeBooleanSetCommand(parsed, saveOptions, 'openProfilesInPopup', 'Open channels in popup');
+    return;
+  }
+
+  if (parsed.name === 'setkeepchatlive') {
+    executeBooleanSetCommand(parsed, saveOptions, 'keepChatLive', 'Keep chat live');
     return;
   }
 
@@ -261,7 +273,7 @@ function executeSetTranslateToCommand(parsed: ParsedCommand, saveOptions: SaveOp
     return;
   }
 
-  saveOptions({ targetLanguage });
+  saveOptions(getTargetLanguageUpdate(targetLanguage));
   replaceChatInput('');
   showToast(targetLanguage ? `Translate to ${getLanguageLabel(targetLanguage)}.` : 'Translation off.');
 }
@@ -293,7 +305,7 @@ function executeSetQuoteLengthCommand(parsed: ParsedCommand, saveOptions: SaveOp
 function executeBooleanSetCommand(
   parsed: ParsedCommand,
   saveOptions: SaveOptions,
-  option: 'mentionSound' | 'openProfilesInPopup',
+  option: 'keepChatLive' | 'openProfilesInPopup' | 'sound',
   label: string
 ): void {
   const value = getBooleanCommandTarget(parsed.args);
@@ -428,8 +440,9 @@ function getHelpRows(): Array<[string, string]> {
     ['/settranslateto english/off', 'Set the translation language.'],
     ['/settranslationdisplay replace/below', 'Set how translations are shown.'],
     ['/setquotelength 120', 'Set the quote length.'],
-    ['/setmentionsound on/off', 'Set mention sound.'],
-    ['/setopenchannelsinpopup on/off', 'Set channel popup behavior.']
+    ['/setsound on/off', 'Set inbox sound.'],
+    ['/setopenchannelsinpopup on/off', 'Set channel popup behavior.'],
+    ['/setkeepchatlive on/off', 'Keep chat at the live edge after tab switches.']
   ];
 }
 
@@ -520,13 +533,13 @@ function parseInlineTextCommandAt(text: string, end: number): InlineParsedComman
 }
 
 async function getMentionCommandText(): Promise<string> {
-  const latestMention = await getLatestMentionRecord();
-  return latestMention ? formatMentionText(latestMention.authorName) : '';
+  const latestInboxMessage = await getLatestInboxRecord();
+  return latestInboxMessage ? formatMentionText(latestInboxMessage.authorName) : '';
 }
 
 async function getQuoteCommandText(): Promise<string> {
-  const latestMention = await getLatestMentionRecord();
-  return latestMention ? formatQuoteText(latestMention.authorName, latestMention.text) : '';
+  const latestInboxMessage = await getLatestInboxRecord();
+  return latestInboxMessage ? formatQuoteText(latestInboxMessage.authorName, latestInboxMessage.text) : '';
 }
 
 function getTranslateCommandTarget(value: string): string | null {

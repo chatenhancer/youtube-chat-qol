@@ -15,69 +15,120 @@
     <main>
       <header class="header">
         <h1 class="brand">
-          <a id="repositoryLink" class="brand-link" href="https://github.com/chat-enhancer-yt/youtube-chat-qol" title="Open GitHub repository">
+          <a id="landingLink" class="brand-link" href="https://chatenhancer.com" title="Open Chat Enhancer website">
             <img src="logo.png" alt="Chat Enhancer for YouTube">
           </a>
         </h1>
-        <p id="version" class="version" aria-label="Extension version"></p>
+        <div class="header-actions">
+          <a id="githubLink" class="header-icon-button" href="https://github.com/chat-enhancer-yt/youtube-chat-qol" title="Open GitHub repository" aria-label="Open GitHub repository">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.56v-2.14c-3.2.7-3.87-1.36-3.87-1.36-.52-1.33-1.28-1.68-1.28-1.68-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.76 2.7 1.25 3.36.96.1-.75.4-1.25.73-1.54-2.56-.29-5.25-1.28-5.25-5.69 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.04 0 0 .97-.31 3.17 1.18A10.9 10.9 0 0 1 12 6.05c.98 0 1.96.13 2.88.39 2.2-1.49 3.17-1.18 3.17-1.18.63 1.58.23 2.75.11 3.04.74.81 1.19 1.83 1.19 3.09 0 4.42-2.7 5.4-5.27 5.68.42.36.78 1.07.78 2.16v3.12c0 .31.21.67.8.56A11.52 11.52 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z"></path>
+            </svg>
+          </a>
+          <a id="supportLink" class="header-icon-button" href="https://github.com/chat-enhancer-yt/youtube-chat-qol/issues" title="Support / Feedback" aria-label="Support and feedback">
+            <svg class="support-icon" viewBox="0 -960 960 960" aria-hidden="true" focusable="false">
+              <path d="M324-111.5Q251-143 197-197t-85.5-127Q80-397 80-480t31.5-156Q143-709 197-763t127-85.5Q397-880 480-880t156 31.5Q709-817 763-763t85.5 127Q880-563 880-480t-31.5 156Q817-251 763-197t-127 85.5Q563-80 480-80t-156-31.5Zm40-70.5 48-110q-42-15-72.5-46.5T292-412l-110 46q23 64 71 112t111 72Zm-72-366q17-42 47.5-73.5T412-668l-46-110q-64 24-112 72t-72 112l110 46Zm273 153q35-35 35-85t-35-85q-35-35-85-35t-85 35q-35 35-35 85t35 85q35 35 85 35t85-35Zm31 213q63-24 110.5-71.5T778-364l-110-48q-15 42-46 72.5T550-292l46 110Zm72-368 110-46q-24-63-71.5-110.5T596-778l-46 112q41 15 71 45.5t47 70.5Z"></path>
+            </svg>
+          </a>
+          <button id="resetExtension" class="header-icon-button reset-button" type="button" title="Reset all extension settings and local data" aria-label="Reset extension">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8Z"></path>
+            </svg>
+          </button>
+        </div>
       </header>
 
-      <label class="field" title="Choose the language chat messages should be translated into. Off disables automatic translation.">
-        <span class="option-title">
-          <svg class="option-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <path d="M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0014.07 6H17V4h-7V2H8v2H1v2h11.17a15.7 15.7 0 01-2.86 4.63A15.07 15.07 0 017.22 7H5.2a17.2 17.2 0 002.77 5.03l-5.09 5.02L4.3 18.47l5.01-5.01 3.11 3.11.45-1.5ZM18.5 10h-2L12 22h2l1.13-3h4.74L21 22h2l-4.5-12Zm-2.62 7l1.62-4.33L19.12 17h-3.24Z"></path>
-          </svg>
-          <span>Translate to</span>
-        </span>
-        <select id="targetLanguage" title="Choose the language chat messages should be translated into. Off disables automatic translation."></select>
-      </label>
+      <section class="settings-section" aria-labelledby="translation-heading">
+        <h2 id="translation-heading">Translation</h2>
 
-      <label class="field" title="Choose whether translations replace the original message or appear below it.">
-        <span class="option-title">
-          <svg class="option-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <path d="M4 4h16a2 2 0 012 2v12a2 2 0 01-2 2H4a2 2 0 01-2-2V6a2 2 0 012-2Zm0 2v12h16V6H4Zm2 8h5v2H6v-2Zm7 0h5v2h-5v-2Zm-7-4h12v2H6v-2Z"></path>
-          </svg>
-          <span>Translation display</span>
-        </span>
-        <select id="translationDisplay" title="Choose whether translations replace the original message or appear below it.">
-          <option value="replace">Replace message</option>
-          <option value="below">Show below</option>
-        </select>
-      </label>
+        <label class="option option-control" title="Choose the language chat messages should be translated into. Off disables automatic translation.">
+          <span class="option-title">
+            <svg class="option-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0014.07 6H17V4h-7V2H8v2H1v2h11.17a15.7 15.7 0 01-2.86 4.63A15.07 15.07 0 017.22 7H5.2a17.2 17.2 0 002.77 5.03l-5.09 5.02L4.3 18.47l5.01-5.01 3.11 3.11.45-1.5ZM18.5 10h-2L12 22h2l1.13-3h4.74L21 22h2l-4.5-12Zm-2.62 7l1.62-4.33L19.12 17h-3.24Z"></path>
+            </svg>
+            <span>Translate to</span>
+          </span>
+          <span class="option-helper">Off disables automatic translation.</span>
+          <select id="targetLanguage" title="Choose the language chat messages should be translated into. Off disables automatic translation."></select>
+        </label>
 
-      <label class="field" title="Maximum characters included when quoting a message from chat actions or cards.">
-        <span class="option-title">
-          <svg class="option-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <path d="M7.17 6A5.17 5.17 0 002 11.17V18h7v-7H5.06A2.17 2.17 0 017.17 9H9V6H7.17Zm10 0A5.17 5.17 0 0012 11.17V18h7v-7h-3.94A2.17 2.17 0 0117.17 9H19V6h-1.83Z"></path>
-          </svg>
-          <span>Quote length</span>
-        </span>
-        <input id="quoteMaxLength" type="number" min="40" max="240" step="10" title="Maximum characters included when quoting a message from chat actions or cards.">
-      </label>
+        <label class="option option-control" title="Choose whether translations replace the original message or appear below it.">
+          <span class="option-title">
+            <svg class="option-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M4 4h16a2 2 0 012 2v12a2 2 0 01-2 2H4a2 2 0 01-2-2V6a2 2 0 012-2Zm0 2v12h16V6H4Zm2 8h5v2H6v-2Zm7 0h5v2h-5v-2Zm-7-4h12v2H6v-2Z"></path>
+            </svg>
+            <span>Display</span>
+          </span>
+          <span class="option-helper">Replace the message or show the translation below.</span>
+          <select id="translationDisplay" title="Choose whether translations replace the original message or appear below it.">
+            <option value="replace">Replace message</option>
+            <option value="below">Show below</option>
+          </select>
+        </label>
+      </section>
 
-      <label class="row" title="Open YouTube channel pages in a smaller popup window instead of a normal browser tab.">
-        <input id="openProfilesInPopup" type="checkbox" title="Open YouTube channel pages in a smaller popup window instead of a normal browser tab.">
-        <span class="option-title">
-          <svg class="option-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <path d="M14 3h7v7h-2V6.41l-9.29 9.3-1.42-1.42 9.3-9.29H14V3ZM5 5h6v2H5v12h12v-6h2v6a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2Z"></path>
-          </svg>
-          <span>Open channels in popup</span>
-        </span>
-      </label>
+      <section class="settings-section" aria-labelledby="chat-heading">
+        <h2 id="chat-heading">Chat Actions</h2>
 
-      <label class="row" title="Play a short sound when a chat message mentions your handle.">
-        <input id="mentionSound" type="checkbox" title="Play a short sound when a chat message mentions your handle.">
-        <span class="option-title">
-          <svg class="option-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <path d="M12 3a4 4 0 00-4 4v3.2c0 1.15-.37 2.27-1.05 3.2L5.2 15.8A1.4 1.4 0 006.33 18h11.34a1.4 1.4 0 001.13-2.2l-1.75-2.4A5.43 5.43 0 0116 10.2V7a4 4 0 00-4-4Zm0 19a3 3 0 002.83-2h-5.66A3 3 0 0012 22Z"></path>
-            <path class="mention-sound-ring" d="M19.7 4.3a1 1 0 00-1.4 1.4A8.92 8.92 0 0121 12a1 1 0 102 0 10.9 10.9 0 00-3.3-7.7ZM5.7 5.7a1 1 0 00-1.4-1.4A10.9 10.9 0 001 12a1 1 0 102 0 8.92 8.92 0 012.7-6.3Z"></path>
-          </svg>
-          <span>Play a sound when mentioned</span>
-        </span>
-      </label>
+        <label class="option option-control" title="Maximum characters included when quoting a message from chat actions or cards.">
+          <span class="option-title">
+            <svg class="option-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M7.17 6A5.17 5.17 0 002 11.17V18h7v-7H5.06A2.17 2.17 0 017.17 9H9V6H7.17Zm10 0A5.17 5.17 0 0012 11.17V18h7v-7h-3.94A2.17 2.17 0 0117.17 9H19V6h-1.83Z"></path>
+            </svg>
+            <span>Quote length</span>
+          </span>
+          <span class="option-helper">Maximum characters included when quoting messages.</span>
+          <input id="quoteMaxLength" type="number" min="40" max="240" step="10" title="Maximum characters included when quoting a message from chat actions or cards.">
+        </label>
 
-      <p class="hint">Translate to and mention sound also appear in YouTube's live chat settings menu for quick access.</p>
-      <p class="hint">Mention and Quote appear in each message's chat actions menu.</p>
+        <label class="option option-toggle" title="Open YouTube channel pages in a smaller popup window instead of a normal browser tab.">
+          <span class="option-copy">
+            <span class="option-title">
+              <svg class="option-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M14 3h7v7h-2V6.41l-9.29 9.3-1.42-1.42 9.3-9.29H14V3ZM5 5h6v2H5v12h12v-6h2v6a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2Z"></path>
+              </svg>
+              <span>Open channels in popup</span>
+            </span>
+            <span class="option-helper">Use a smaller window for channel pages from avatar cards.</span>
+          </span>
+          <input id="openProfilesInPopup" type="checkbox" title="Open YouTube channel pages in a smaller popup window instead of a normal browser tab.">
+        </label>
+      </section>
+
+      <section class="settings-section" aria-labelledby="alerts-heading">
+        <h2 id="alerts-heading">Alerts</h2>
+
+        <label class="option option-toggle" title="Play a short sound when a chat message is saved to your inbox.">
+          <span class="option-copy">
+            <span class="option-title">
+              <svg class="option-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M12 3a4 4 0 00-4 4v3.2c0 1.15-.37 2.27-1.05 3.2L5.2 15.8A1.4 1.4 0 006.33 18h11.34a1.4 1.4 0 001.13-2.2l-1.75-2.4A5.43 5.43 0 0116 10.2V7a4 4 0 00-4-4Zm0 19a3 3 0 002.83-2h-5.66A3 3 0 0012 22Z"></path>
+                <path class="sound-ring" d="M19.7 4.3a1 1 0 00-1.4 1.4A8.92 8.92 0 0121 12a1 1 0 102 0 10.9 10.9 0 00-3.3-7.7ZM5.7 5.7a1 1 0 00-1.4-1.4A10.9 10.9 0 001 12a1 1 0 102 0 8.92 8.92 0 012.7-6.3Z"></path>
+              </svg>
+              <span>Play inbox sound</span>
+            </span>
+            <span class="option-helper">Play a short sound for new inbox messages.</span>
+          </span>
+          <input id="sound" type="checkbox" title="Play a short sound when a chat message is saved to your inbox.">
+        </label>
+
+        <label class="option option-toggle" title="Keep YouTube chat at the live edge when you switch away and return, so new messages keep rendering for translations and inbox alerts.">
+          <span class="option-copy">
+            <span class="option-title">
+              <svg class="option-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M4 20h16v-2H4v2Zm8-16a1 1 0 00-1 1v8.59L7.7 10.3a1 1 0 10-1.4 1.4l5 5a1 1 0 001.4 0l5-5a1 1 0 00-1.4-1.4L13 13.59V5a1 1 0 00-1-1Z"></path>
+              </svg>
+              <span>Keep chat live</span>
+            </span>
+            <span class="option-helper">Return chat to the live edge after tab switches.</span>
+          </span>
+          <input id="keepChatLive" type="checkbox" title="Keep YouTube chat at the live edge when you switch away and return, so new messages keep rendering for translations and inbox alerts.">
+        </label>
+      </section>
+
+      <footer class="footer">
+        <p id="version" class="version" aria-label="Extension version"></p>
+      </footer>
     </main>
     <script src="popup.js"></script>
   </body>

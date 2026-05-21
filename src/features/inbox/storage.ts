@@ -1,0 +1,154 @@
+import { cleanText } from '../../shared/text';
+import { CHAT_MESSAGE_SELECTOR } from '../../youtube/selectors';
+import { normalizeRichTextSegments } from '../../youtube/richText';
+import {
+  normalizeMentionHandles,
+  normalizeStoredKeywords
+} from './matching';
+import type { InboxRecord } from './types';
+
+const INBOX_RECORDS_STORAGE_KEY = 'ytcqInboxRecords';
+const INBOX_KEYWORDS_STORAGE_KEY = 'ytcqInboxKeywords';
+const MAX_INBOX_RECORDS = 100;
+const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+const CHAT_TIMESTAMP_FUTURE_TOLERANCE_MS = 10 * 60 * 1000;
+
+export interface InboxStoredState {
+  keywords: string[];
+  records: InboxRecord[];
+}
+
+export function loadInboxStoredState(getCurrentHandles: () => string[]): Promise<InboxStoredState> {
+  return new Promise((resolve) => {
+    chrome.storage.local.get({
+      [INBOX_RECORDS_STORAGE_KEY]: [],
+      [INBOX_KEYWORDS_STORAGE_KEY]: []
+    }, (stored) => {
+      const storedRecords = stored[INBOX_RECORDS_STORAGE_KEY];
+      resolve({
+        records: normalizeStoredRecords(storedRecords, getCurrentHandles),
+        keywords: normalizeStoredKeywords(stored[INBOX_KEYWORDS_STORAGE_KEY])
+      });
+    });
+  });
+}
+
+export function saveInboxRecords(records: InboxRecord[]): Promise<void> {
+  const sortedRecords = sortAndTrimRecords(records);
+  return new Promise((resolve) => {
+    chrome.storage.local.set({
+      [INBOX_RECORDS_STORAGE_KEY]: sortedRecords.map(serializeInboxRecord)
+    }, resolve);
+  });
+}
+
+export function saveInboxKeywords(keywords: string[]): Promise<void> {
+  return new Promise((resolve) => {
+    chrome.storage.local.set({ [INBOX_KEYWORDS_STORAGE_KEY]: keywords }, resolve);
+  });
+}
+
+export function serializeInboxRecord(record: InboxRecord): Omit<InboxRecord, 'contentNodes'> {
+  return {
+    id: record.id,
+    authorName: record.authorName,
+    contentParts: record.contentParts || [],
+    matchedKeywords: record.matchedKeywords,
+    mention: record.mention,
+    mentionHandles: record.mentionHandles,
+    read: record.read,
+    sourceUrl: record.sourceUrl,
+    text: record.text,
+    timestamp: record.timestamp,
+    timestampText: record.timestampText
+  };
+}
+
+export function sortAndTrimRecords(nextRecords: InboxRecord[]): InboxRecord[] {
+  return [...nextRecords]
+    .sort((first, second) => first.timestamp - second.timestamp || first.id.localeCompare(second.id))
+    .slice(-MAX_INBOX_RECORDS);
+}
+
+export function getInboxTimestamp(message: HTMLElement, timestampText: string, fallbackTimestamp: number): number {
+  const parsedTimestamp = parseInboxTimestampText(timestampText, fallbackTimestamp);
+  if (parsedTimestamp === null) return fallbackTimestamp;
+
+  return parsedTimestamp + getMessageDomOrderOffset(message);
+}
+
+function normalizeStoredRecords(value: unknown, getCurrentHandles: () => string[]): InboxRecord[] {
+  if (!Array.isArray(value)) return [];
+
+  return sortAndTrimRecords(value
+    .map((record) => normalizeStoredRecord(record, getCurrentHandles))
+    .filter((record): record is InboxRecord => Boolean(record)));
+}
+
+function normalizeStoredRecord(value: unknown, getCurrentHandles: () => string[]): InboxRecord | null {
+  if (!value || typeof value !== 'object') return null;
+  const candidate = value as Partial<InboxRecord>;
+  const authorName = cleanText(candidate.authorName);
+  const text = cleanText(candidate.text);
+  const storedTimestamp = Number(candidate.timestamp);
+  if (!authorName || !text || !Number.isFinite(storedTimestamp)) return null;
+
+  const timestampText = cleanText(candidate.timestampText) || new Intl.DateTimeFormat(undefined, {
+    hour: 'numeric',
+    minute: '2-digit'
+  }).format(storedTimestamp);
+  const timestamp = parseInboxTimestampText(timestampText, storedTimestamp) ?? storedTimestamp;
+  const mention = candidate.mention !== false;
+
+  return {
+    id: cleanText(candidate.id) || `${timestamp}`,
+    authorName,
+    contentParts: normalizeRichTextSegments(candidate.contentParts),
+    matchedKeywords: normalizeStoredKeywords(candidate.matchedKeywords),
+    mention,
+    mentionHandles: normalizeMentionHandles(candidate.mentionHandles, text, mention, getCurrentHandles),
+    read: candidate.read === true,
+    sourceUrl: cleanText(candidate.sourceUrl),
+    text,
+    timestamp,
+    timestampText
+  };
+}
+
+function parseInboxTimestampText(timestampText: string, referenceTimestamp: number): number | null {
+  const normalized = cleanText(timestampText).replace(/\./g, '').toLocaleUpperCase();
+  const match = normalized.match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?\s*([AP]M)?$/);
+  if (!match) return null;
+
+  let hour = Number(match[1]);
+  const minute = Number(match[2]);
+  const second = match[3] ? Number(match[3]) : 0;
+  const meridiem = match[4];
+
+  if (!Number.isFinite(hour) || !Number.isFinite(minute) || !Number.isFinite(second)) return null;
+  if (minute > 59 || second > 59) return null;
+
+  if (meridiem) {
+    if (hour < 1 || hour > 12) return null;
+    if (hour === 12) hour = 0;
+    if (meridiem === 'PM') hour += 12;
+  } else if (hour > 23) {
+    return null;
+  }
+
+  const date = new Date(referenceTimestamp);
+  date.setHours(hour, minute, second, 0);
+  let parsedTimestamp = date.getTime();
+
+  if (parsedTimestamp > referenceTimestamp + CHAT_TIMESTAMP_FUTURE_TOLERANCE_MS) {
+    parsedTimestamp -= ONE_DAY_MS;
+  }
+
+  return parsedTimestamp;
+}
+
+function getMessageDomOrderOffset(message: HTMLElement): number {
+  const messages = Array.from(document.querySelectorAll<HTMLElement>(CHAT_MESSAGE_SELECTOR));
+  const index = messages.indexOf(message);
+  return index >= 0 ? Math.min(index, 59_999) : 0;
+}

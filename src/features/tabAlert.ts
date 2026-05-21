@@ -1,9 +1,9 @@
 /**
- * Browser-tab mention alert.
+ * Browser-tab inbox alert.
  *
  * YouTube live chat runs inside an iframe, but the iframe is same-origin with
  * the watch page. When possible, update the top document's title/favicon so a
- * background tab can signal unread chat mentions without adding more controls.
+ * background tab can signal unread inbox messages without adding more controls.
  */
 const ALERT_FAVICON_ID = 'ytcq-tab-alert-favicon';
 const RESTORE_FAVICON_ID = 'ytcq-tab-alert-restore-favicon';
@@ -14,7 +14,7 @@ let listenersAttached = false;
 let alertActive = false;
 let originalFaviconHref = '';
 
-export function initMentionTabAlert(): void {
+export function initInboxTabAlert(): void {
   if (listenersAttached) return;
   listenersAttached = true;
 
@@ -27,9 +27,9 @@ export function initMentionTabAlert(): void {
   }
 }
 
-export function showMentionTabAlert(unreadCount: number): void {
+export function showInboxTabAlert(unreadCount: number): void {
   if (isCurrentTabActive()) {
-    clearMentionTabAlert();
+    clearInboxTabAlert();
     return;
   }
 
@@ -42,7 +42,7 @@ export function showMentionTabAlert(unreadCount: number): void {
   setAlertFavicon(topDocument);
 }
 
-export function clearMentionTabAlert(): void {
+export function clearInboxTabAlert(): void {
   const topDocument = getTopDocument();
   if (!topDocument) return;
 
@@ -76,7 +76,7 @@ function addClearListeners(targetDocument: Document, targetWindow: Window): void
 
 function clearAlertIfTabActive(): void {
   if (isCurrentTabActive()) {
-    clearMentionTabAlert();
+    clearInboxTabAlert();
   }
 }
 

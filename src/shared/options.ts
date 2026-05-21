@@ -11,18 +11,24 @@ export type TranslationDisplay = 'replace' | 'below';
 
 export interface Options {
   targetLanguage: string;
+  lastTranslationTarget: string;
   translationDisplay: TranslationDisplay;
   quoteMaxLength: number;
   openProfilesInPopup: boolean;
-  mentionSound: boolean;
+  sound: boolean;
+  keepChatLive: boolean;
 }
+
+export const DEFAULT_TRANSLATION_TARGET = 'en';
 
 export const DEFAULT_OPTIONS: Options = {
   targetLanguage: '',
+  lastTranslationTarget: DEFAULT_TRANSLATION_TARGET,
   translationDisplay: 'replace',
   quoteMaxLength: 120,
   openProfilesInPopup: true,
-  mentionSound: true
+  sound: true,
+  keepChatLive: true
 };
 
 export const TRANSLATION_DISPLAY_OPTIONS: readonly (readonly [TranslationDisplay, string])[] = [
@@ -34,15 +40,31 @@ export const QUOTE_LENGTH_OPTIONS = [80, 120, 180, 240] as const;
 
 export function normalizeOptions(value: Partial<Options> | Record<string, unknown>): Options {
   const candidate = value as Record<string, unknown>;
+  const targetLanguage = String(candidate.targetLanguage || '');
+  const lastTranslationTarget = String(candidate.lastTranslationTarget || targetLanguage || DEFAULT_TRANSLATION_TARGET);
   const translationDisplay = TRANSLATION_DISPLAY_OPTIONS.some(([mode]) => mode === candidate.translationDisplay)
     ? candidate.translationDisplay as TranslationDisplay
     : DEFAULT_OPTIONS.translationDisplay;
 
   return {
-    targetLanguage: String(candidate.targetLanguage || ''),
+    targetLanguage,
+    lastTranslationTarget,
     translationDisplay,
     quoteMaxLength: clampNumber(candidate.quoteMaxLength, 40, 240, DEFAULT_OPTIONS.quoteMaxLength),
     openProfilesInPopup: candidate.openProfilesInPopup !== false,
-    mentionSound: candidate.mentionSound !== false
+    sound: candidate.sound !== false,
+    keepChatLive: candidate.keepChatLive !== false
   };
+}
+
+export function getTranslationToggleTarget(options: Pick<Options, 'lastTranslationTarget' | 'targetLanguage'>): string {
+  return options.lastTranslationTarget || options.targetLanguage || DEFAULT_TRANSLATION_TARGET;
+}
+
+export function getTargetLanguageUpdate(targetLanguage: string, lastTranslationTarget = ''): Partial<Options> {
+  return targetLanguage
+    ? { targetLanguage, lastTranslationTarget: targetLanguage }
+    : lastTranslationTarget
+      ? { targetLanguage: '', lastTranslationTarget }
+      : { targetLanguage: '' };
 }

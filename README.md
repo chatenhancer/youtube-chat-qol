@@ -32,14 +32,15 @@ Not affiliated with YouTube or Google.
 ### Social Context
 
 - Click an avatar to see that user's recent messages and open their channel.
-- Keep a local mentions inbox for messages that mention your handle.
-- Optionally play a subtle sound when chat mentions your handle.
+- Keep a local inbox for messages that mention your handle or match your keywords.
+- Optionally play a subtle sound when chat saves a new inbox message.
 
 ### Chat Comfort
 
 - Add a local most-used row to YouTube's emoji picker.
 - Complete chat slash commands for mentions, quotes, repeated messages, time helpers, and extension settings.
-- Configure extension options from YouTube's live chat settings menu or the extension popup.
+- Keep chat at the live edge after tab switches so inbox alerts and translations can keep up.
+- Toggle translation and inbox sound from YouTube's live chat settings menu, with deeper options in the extension popup.
 
 ## Chat Commands
 
@@ -47,10 +48,10 @@ Type commands in the YouTube chat input, then press `Tab`. Commands do not send 
 
 ### Text Commands
 
-- `/mention` + `Tab`: insert a mention for the author of the newest mentions-inbox message.
+- `/mention` + `Tab`: insert a mention for the author of the newest inbox message.
 - `/reply` + `Tab`: alias for `/mention`.
 - `/help` + `Tab`: show available chat commands.
-- `/quote` + `Tab`: quote the newest mentions-inbox message.
+- `/quote` + `Tab`: quote the newest inbox message.
 - `/again` + `Tab`: restore your last sent message.
 - `/repeat` + `Tab`: alias for `/again`.
 - `/time utc` + `Tab`: insert the current time for a supported timezone or city.
@@ -67,10 +68,12 @@ Supported `/time` aliases include `utc`, `tokyo`, `jst`, `seoul`, `kst`, `london
 - `/settranslationdisplay replace` + `Tab`: replace original messages with translations.
 - `/settranslationdisplay below` + `Tab`: show translations below original messages.
 - `/setquotelength 120` + `Tab`: set quote length to `80`, `120`, `180`, or `240`.
-- `/setmentionsound on` + `Tab`: turn mention sounds on.
-- `/setmentionsound off` + `Tab`: turn mention sounds off.
+- `/setsound on` + `Tab`: turn inbox sounds on.
+- `/setsound off` + `Tab`: turn inbox sounds off.
 - `/setopenchannelsinpopup on` + `Tab`: open channels in popup windows.
 - `/setopenchannelsinpopup off` + `Tab`: open channels normally.
+- `/setkeepchatlive on` + `Tab`: keep chat at the live edge after tab switches.
+- `/setkeepchatlive off` + `Tab`: leave chat scroll position alone.
 
 Use `//` to send a literal slash command, such as `//quote`.
 
@@ -133,7 +136,7 @@ MIT. See [LICENSE](LICENSE).
 ## Project Layout
 
 - `src/content/` wires features into YouTube live chat.
-- `src/features/` contains chat actions, translation, emoji, profile, mentions inbox, and mention-sound features.
+- `src/features/` contains chat actions, translation, emoji, profile, inbox, and sound features.
 - `src/youtube/` contains YouTube DOM adapters and selectors.
 - `src/shared/` contains shared options, language data, state, and helpers.
 - `src/background/` contains the translation service worker.

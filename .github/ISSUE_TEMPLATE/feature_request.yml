@@ -13,7 +13,7 @@ body:
     attributes:
       label: What problem would this solve?
       description: Describe the live chat workflow or frustration behind the request.
-      placeholder: "Example: I often miss messages where people mention me while chat is moving quickly."
+      placeholder: "Example: I often miss messages about a topic I care about while chat is moving quickly."
     validations:
       required: true
 
@@ -22,7 +22,7 @@ body:
     attributes:
       label: What would you like to happen?
       description: Describe the behavior you want, not just the UI.
-      placeholder: "Example: Keep a small inbox of messages that mention my handle."
+      placeholder: "Example: Save matching messages in the inbox and highlight the matched words."
     validations:
       required: true
 
@@ -35,7 +35,7 @@ body:
         - YouTube chat settings menu
         - Extension popup
         - Avatar/profile card
-        - Mentions inbox
+        - Inbox
         - Emoji picker
         - Chat input command
         - Player/video area
@@ -58,6 +58,7 @@ body:
         - label: This can work locally or with minimal data where possible.
         - label: This is useful during a livestream, not only after the stream ends.
         - label: This does not need to post extra messages into YouTube chat.
+        - label: This does not require tracking a user across streams.
 
   - type: textarea
     id: context
