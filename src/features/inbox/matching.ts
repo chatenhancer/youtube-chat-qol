@@ -31,14 +31,24 @@ export function getMatchedMentionHandles(text: string, candidates: string[]): st
     .filter((candidate) => textContainsHandle(normalizedText, normalizeComparableText(candidate)));
 }
 
-export function getMatchingKeywords(text: string, keywords: string[]): string[] {
-  const normalizedText = normalizeComparableText(text);
+export function getMatchingKeywords(values: string | string[], keywords: string[]): string[] {
+  const normalizedValues = (Array.isArray(values) ? values : [values])
+    .map(normalizeComparableText)
+    .filter(Boolean);
+
   return keywords
-    .filter((keyword) => normalizedText.includes(normalizeComparableText(keyword)));
+    .filter((keyword) => {
+      const normalizedKeyword = normalizeComparableText(keyword);
+      return Boolean(normalizedKeyword && normalizedValues.some((value) => value.includes(normalizedKeyword)));
+    });
 }
 
-export function getKeywordCheckKey(keywords: string[], text: string): string {
-  return `${getKeywordsKey(keywords)}\n${normalizeComparableText(text)}`;
+export function getKeywordCheckKey(keywords: string[], values: string | string[]): string {
+  const normalizedValues = (Array.isArray(values) ? values : [values])
+    .map(normalizeComparableText)
+    .join('\n');
+
+  return `${getKeywordsKey(keywords)}\n${normalizedValues}`;
 }
 
 export function normalizeKeyword(value: unknown): string {

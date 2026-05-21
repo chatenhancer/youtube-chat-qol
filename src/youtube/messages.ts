@@ -55,9 +55,13 @@ export function getAuthorName(message: HTMLElement): string {
   return cleanText(
     data?.authorName?.simpleText ||
     data?.authorName?.runs?.map((run) => run.text || '').join('') ||
-    message.querySelector('#author-name')?.textContent ||
+    getAuthorNameElement(message)?.textContent ||
     ''
   );
+}
+
+export function getAuthorNameElement(message: HTMLElement): HTMLElement | null {
+  return message.querySelector<HTMLElement>('#author-name');
 }
 
 export function getMessageText(message: HTMLElement): string {
