@@ -1,4 +1,5 @@
 import { cleanText } from '../../shared/text';
+import type { InboxRecord } from './types';
 
 export const MAX_INBOX_KEYWORDS = 30;
 export const MAX_KEYWORD_LENGTH = 60;
@@ -65,15 +66,47 @@ export function mergeStrings(first: string[], second: string[]): string[] {
 
 export function getRecordSignature(record: {
   authorName: string;
+  messageId?: string;
   sourceUrl: string;
   text: string;
   timestampText: string;
 }): string {
+  const messageId = cleanText(record.messageId);
+  if (messageId) {
+    return [
+      'message-id',
+      normalizeComparableText(record.sourceUrl),
+      messageId
+    ].join('\n');
+  }
+
   return [
-    record.authorName,
-    record.text,
-    record.timestampText,
-    record.sourceUrl
+    'message-content',
+    normalizeComparableText(record.authorName),
+    normalizeComparableText(record.text),
+    normalizeComparableText(record.timestampText),
+    normalizeComparableText(record.sourceUrl)
+  ].join('\n');
+}
+
+export function findMatchingRecordIndex(records: InboxRecord[], incoming: InboxRecord): number {
+  const exactSignature = getRecordSignature(incoming);
+  const exactIndex = records.findIndex((record) => getRecordSignature(record) === exactSignature);
+  if (exactIndex >= 0) return exactIndex;
+
+  const looseSignature = getLooseRecordSignature(incoming);
+  return records.findIndex((record) => getLooseRecordSignature(record) === looseSignature);
+}
+
+function getLooseRecordSignature(record: {
+  authorName: string;
+  sourceUrl: string;
+  text: string;
+}): string {
+  return [
+    normalizeComparableText(record.authorName),
+    normalizeComparableText(record.text),
+    normalizeComparableText(record.sourceUrl)
   ].join('\n');
 }
 

@@ -22,6 +22,7 @@ interface RendererText {
 }
 
 interface RendererData {
+  id?: string;
   authorExternalChannelId?: string;
   authorChannelId?: string;
   authorName?: RendererText;
@@ -113,6 +114,16 @@ export function getMessageTimestampText(message: HTMLElement, timestamp = Date.n
     hour: 'numeric',
     minute: '2-digit'
   }).format(timestamp);
+}
+
+export function getMessageStableId(message: HTMLElement): string {
+  const data = getRendererData(message);
+  return cleanText(
+    data?.id ||
+    message.getAttribute('data-message-id') ||
+    message.id ||
+    ''
+  );
 }
 
 export function getTextFromRuns(runs: RendererRun[] | undefined): string {
