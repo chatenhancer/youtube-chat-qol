@@ -48,7 +48,7 @@ export function saveInboxKeywords(keywords: string[]): Promise<void> {
   });
 }
 
-export function serializeInboxRecord(record: InboxRecord): Omit<InboxRecord, 'contentNodes'> {
+export function serializeInboxRecord(record: InboxRecord): Omit<InboxRecord, 'contentNodes' | 'messageRef'> {
   return {
     id: record.id,
     authorName: record.authorName,
