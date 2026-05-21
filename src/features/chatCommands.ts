@@ -6,6 +6,12 @@
  * Unknown slash-prefixed text is left to YouTube.
  */
 import { LANGUAGE_OPTIONS, getLanguageLabel } from '../shared/languages';
+import {
+  getChatCommandHelpRows,
+  getChatCommandNames,
+  getChatCommandTimeZones,
+  getInlineChatCommandNames
+} from '../shared/chatCommandReference';
 import { getTargetLanguageUpdate, QUOTE_LENGTH_OPTIONS, type Options, type TranslationDisplay } from '../shared/options';
 import { cleanText } from '../shared/text';
 import { showToast } from '../shared/toast';
@@ -45,35 +51,11 @@ const SEND_BUTTON_SELECTOR = [
   'button[title="Send"]'
 ].join(',');
 
-const TEXT_COMPLETION_COMMANDS = new Set(['help', 'mention', 'reply', 'quote', 'again', 'repeat', 'time', 'timeuntil']);
-const INLINE_TEXT_COMPLETION_COMMANDS = new Set(['mention', 'reply', 'time', 'timeuntil']);
-const SETTING_COMMANDS = new Set([
-  'setopenchannelsinpopup',
-  'setopenprofilesinpopup',
-  'setquotelength',
-  'setsound',
-  'settranslateto',
-  'settranslationdisplay'
-]);
+const TEXT_COMPLETION_COMMANDS = new Set(getChatCommandNames('text'));
+const INLINE_TEXT_COMPLETION_COMMANDS = new Set(getInlineChatCommandNames());
+const SETTING_COMMANDS = new Set(getChatCommandNames('setting'));
 const languageByCommandName = createLanguageCommandMap();
-const timeZoneByCommandName = new Map<string, TimeZoneOption>([
-  ['utc', { label: 'UTC', timeZone: 'UTC' }],
-  ['tokyo', { label: 'Tokyo', timeZone: 'Asia/Tokyo' }],
-  ['jst', { label: 'Tokyo', timeZone: 'Asia/Tokyo' }],
-  ['seoul', { label: 'Seoul', timeZone: 'Asia/Seoul' }],
-  ['kst', { label: 'Seoul', timeZone: 'Asia/Seoul' }],
-  ['london', { label: 'London', timeZone: 'Europe/London' }],
-  ['paris', { label: 'Paris', timeZone: 'Europe/Paris' }],
-  ['madrid', { label: 'Madrid', timeZone: 'Europe/Madrid' }],
-  ['newyork', { label: 'New York', timeZone: 'America/New_York' }],
-  ['nyc', { label: 'New York', timeZone: 'America/New_York' }],
-  ['et', { label: 'New York', timeZone: 'America/New_York' }],
-  ['eastern', { label: 'New York', timeZone: 'America/New_York' }],
-  ['losangeles', { label: 'Los Angeles', timeZone: 'America/Los_Angeles' }],
-  ['la', { label: 'Los Angeles', timeZone: 'America/Los_Angeles' }],
-  ['pt', { label: 'Los Angeles', timeZone: 'America/Los_Angeles' }],
-  ['pacific', { label: 'Los Angeles', timeZone: 'America/Los_Angeles' }]
-]);
+const timeZoneByCommandName = createTimeZoneCommandMap();
 
 interface TimeZoneOption {
   label: string;
@@ -377,7 +359,7 @@ function showChatCommandHelp(): void {
   const list = document.createElement('dl');
   list.className = 'ytcq-command-help-list';
 
-  getHelpRows().forEach(([command, description]) => {
+  getChatCommandHelpRows().forEach(([command, description]) => {
     const term = document.createElement('dt');
     term.textContent = command;
 
@@ -421,22 +403,6 @@ function closeChatCommandHelp(): void {
   activeHelpCardCleanup = null;
   activeHelpCard?.remove();
   activeHelpCard = null;
-}
-
-function getHelpRows(): Array<[string, string]> {
-  return [
-    ['/help', 'Show this list.'],
-    ['/mention, /reply', 'Mention the author of your newest saved mention.'],
-    ['/quote', 'Quote your newest saved mention.'],
-    ['/again, /repeat', 'Restore your last sent message.'],
-    ['/time utc', 'Insert the current time.'],
-    ['/timeuntil 7:45pm', 'Insert the time remaining until a local time.'],
-    ['/settranslateto english/off', 'Set the translation language.'],
-    ['/settranslationdisplay replace/below', 'Set how translations are shown.'],
-    ['/setquotelength 120', 'Set the quote length.'],
-    ['/setsound on/off', 'Set inbox sound.'],
-    ['/setopenchannelsinpopup on/off', 'Set channel popup behavior.']
-  ];
 }
 
 function positionHelpCard(card: HTMLElement): void {
@@ -561,6 +527,16 @@ function createLanguageCommandMap(): Map<string, string> {
   LANGUAGE_OPTIONS.forEach(([value, label]) => {
     map.set(normalizeCommandToken(value), value);
     map.set(normalizeCommandToken(label), value);
+  });
+  return map;
+}
+
+function createTimeZoneCommandMap(): Map<string, TimeZoneOption> {
+  const map = new Map<string, TimeZoneOption>();
+  getChatCommandTimeZones().forEach(({ aliases, label, timeZone }) => {
+    aliases.forEach((alias) => {
+      map.set(normalizeCommandToken(alias), { label, timeZone });
+    });
   });
   return map;
 }

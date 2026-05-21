@@ -11,6 +11,7 @@
     "build:all": "node scripts/build.mjs --all",
     "icons": "node scripts/generate-icons.mjs",
     "screenshots": "node scripts/generate-screenshots.mjs",
+    "docs:commands": "node scripts/sync-command-docs.mjs",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "verify": "npm run typecheck && npm run lint && npm run build:all",

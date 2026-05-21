@@ -342,23 +342,19 @@
             left alone. Use <code>//</code> to send a literal slash command.
           </p>
 
+          <!-- chat-commands:start -->
           <div class="command-notes" aria-label="Command usage notes">
             <p>
-              <strong>Inline commands:</strong> <code>/mention</code>,
-              <code>/reply</code>, <code>/time</code>, and
-              <code>/timeuntil</code> can expand inside a sentence.
+              <strong>Inline commands:</strong> <code>/mention</code>, <code>/reply</code>, <code>/time</code>, and <code>/timeuntil</code> can expand inside a sentence.
             </p>
             <p>
-              <strong>Whole-input commands:</strong> <code>/help</code>,
-              <code>/quote</code>, <code>/again</code>, <code>/repeat</code>,
-              and all <code>/set...</code> commands should be the only text in
-              the input.
+              <strong>Whole-input commands:</strong> <code>/quote</code>, <code>/again</code>, <code>/repeat</code>, <code>/help</code>, and all <code>/set...</code> commands should be the only text in the input.
             </p>
           </div>
 
           <div class="command-groups">
             <article class="command-group">
-              <h3>Text Commands</h3>
+              <h3>Text commands</h3>
               <dl class="command-list">
                 <div>
                   <dt><code>/mention</code> or <code>/reply</code></dt>
@@ -385,46 +381,36 @@
                   <dd>Open the command help card inside YouTube chat.</dd>
                 </div>
               </dl>
-              <p class="command-footnote">
-                Time aliases include <code>utc</code>, <code>tokyo</code>,
-                <code>jst</code>, <code>seoul</code>, <code>kst</code>,
-                <code>london</code>, <code>paris</code>, <code>madrid</code>,
-                <code>nyc</code>, <code>et</code>, <code>la</code>, and
-                <code>pt</code>.
-              </p>
+              <p class="command-footnote">Time aliases include <code>utc</code>, <code>tokyo</code>, <code>jst</code>, <code>seoul</code>, <code>kst</code>, <code>london</code>, <code>paris</code>, <code>madrid</code>, <code>newyork</code>, <code>nyc</code>, <code>et</code>, <code>eastern</code>, <code>losangeles</code>, <code>la</code>, <code>pt</code>, and <code>pacific</code>.</p>
             </article>
-
             <article class="command-group">
-              <h3>Setting Commands</h3>
+              <h3>Setting commands</h3>
               <dl class="command-list">
                 <div>
-                  <dt><code>/settranslateto english</code></dt>
-                  <dd>Set the translation target language. Use <code>off</code> to disable translation.</dd>
+                  <dt><code>/settranslateto english</code> or <code>/settranslateto off</code></dt>
+                  <dd>Set the translation target language. Use off to disable translation.</dd>
                 </div>
                 <div>
-                  <dt><code>/settranslationdisplay replace</code></dt>
-                  <dd>Replace original messages with translations. Use <code>below</code> to show translations underneath.</dd>
+                  <dt><code>/settranslationdisplay replace</code> or <code>/settranslationdisplay below</code></dt>
+                  <dd>Replace original messages with translations. Use below to show translations underneath.</dd>
                 </div>
                 <div>
                   <dt><code>/setquotelength 120</code></dt>
-                  <dd>Set quote length to <code>80</code>, <code>120</code>, <code>180</code>, or <code>240</code>.</dd>
+                  <dd>Set quote length to 80, 120, 180, or 240.</dd>
                 </div>
                 <div>
-                  <dt><code>/setsound on</code></dt>
+                  <dt><code>/setsound on</code> or <code>/setsound off</code></dt>
                   <dd>Turn inbox sounds on or off.</dd>
                 </div>
                 <div>
-                  <dt><code>/setopenchannelsinpopup on</code></dt>
-                  <dd>Open channels in popup windows. Use <code>off</code> to open them normally.</dd>
+                  <dt><code>/setopenchannelsinpopup on</code> or <code>/setopenchannelsinpopup off</code></dt>
+                  <dd>Open channels in popup windows. Use off to open them normally.</dd>
                 </div>
               </dl>
-              <p class="command-footnote">
-                <code>/timeuntil</code> accepts formats like <code>7</code>,
-                <code>7am</code>, <code>7:45 am</code>, <code>19:00</code>,
-                and <code>19:00:30</code>.
-              </p>
+              <p class="command-footnote"><code>/timeuntil</code> accepts formats like <code>7</code>, <code>7am</code>, <code>7 am</code>, <code>7:45am</code>, <code>7:45 am</code>, <code>19</code>, <code>19:00</code>, <code>19:00:30</code>, and <code>7:45:30 pm</code>.</p>
             </article>
           </div>
+          <!-- chat-commands:end -->
         </div>
       </section>
     </main>
