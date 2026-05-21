@@ -40,6 +40,7 @@ import {
 import {
   getCurrentMentionCandidates,
   initMentionDetection,
+  isCurrentUserAuthorName,
   processPotentialMentionForConsumer,
   registerMentionProcessor
 } from '../mentionDetection';
@@ -315,6 +316,10 @@ function processPotentialKeywordInbox(message: HTMLElement): void {
   const text = getMessageText(message);
   const authorName = getAuthorName(message);
   if (!text && !authorName) return;
+  if (isCurrentUserAuthorName(authorName)) {
+    applyChatKeywordHighlights(message, [], '');
+    return;
+  }
 
   const keywordValues = [authorName, text];
   const keywordKey = getKeywordCheckKey(keywords, keywordValues);
@@ -627,6 +632,11 @@ function refreshVisibleChatKeywordHighlights(): void {
 function applyCurrentChatKeywordHighlights(message: HTMLElement): string[] {
   const text = getMessageText(message);
   const authorName = getAuthorName(message);
+  if (isCurrentUserAuthorName(authorName)) {
+    applyChatKeywordHighlights(message, [], '');
+    return [];
+  }
+
   const keywordValues = [authorName, text];
   const matchedKeywords = keywords.length ? getMatchingKeywords(...keywordValues) : [];
   applyChatKeywordHighlights(message, matchedKeywords, matchedKeywords.length ? getKeywordCheckKey(keywords, keywordValues) : '');
@@ -871,9 +881,30 @@ function getMatchingKeywords(...values: string[]): string[] {
 }
 
 function getCurrentSourceUrl(): string {
-  const url = new URL(window.location.href);
-  const videoId = url.searchParams.get('v');
-  return videoId ? `https://www.youtube.com/watch?v=${encodeURIComponent(videoId)}` : window.location.href;
+  return getWatchSourceUrl(window.location.href) ||
+    getWatchSourceUrl(document.referrer) ||
+    getStablePageUrl(window.location.href);
+}
+
+function getWatchSourceUrl(value: string): string {
+  if (!value) return '';
+
+  try {
+    const url = new URL(value);
+    const videoId = url.searchParams.get('v');
+    return videoId ? `https://www.youtube.com/watch?v=${encodeURIComponent(videoId)}` : '';
+  } catch {
+    return '';
+  }
+}
+
+function getStablePageUrl(value: string): string {
+  try {
+    const url = new URL(value);
+    return `${url.origin}${url.pathname}`;
+  } catch {
+    return value;
+  }
 }
 
 function trackPendingInboxMessage(message: HTMLElement): void {

@@ -85,7 +85,6 @@ export function getRecordSignature(record: {
   if (messageId) {
     return [
       'message-id',
-      normalizeComparableText(record.sourceUrl),
       messageId
     ].join('\n');
   }
@@ -95,7 +94,7 @@ export function getRecordSignature(record: {
     normalizeComparableText(record.authorName),
     normalizeComparableText(record.text),
     normalizeComparableText(record.timestampText),
-    normalizeComparableText(record.sourceUrl)
+    normalizeSourceUrl(record.sourceUrl)
   ].join('\n');
 }
 
@@ -116,8 +115,23 @@ function getLooseRecordSignature(record: {
   return [
     normalizeComparableText(record.authorName),
     normalizeComparableText(record.text),
-    normalizeComparableText(record.sourceUrl)
+    normalizeSourceUrl(record.sourceUrl)
   ].join('\n');
+}
+
+function normalizeSourceUrl(value: string): string {
+  const clean = cleanText(value);
+  if (!clean) return '';
+
+  try {
+    const url = new URL(clean);
+    const videoId = url.searchParams.get('v');
+    if (videoId) return `${url.origin}/watch?v=${videoId}`;
+
+    return `${url.origin}${url.pathname}`;
+  } catch {
+    return normalizeComparableText(clean);
+  }
 }
 
 function getKeywordsKey(keywords: string[]): string {

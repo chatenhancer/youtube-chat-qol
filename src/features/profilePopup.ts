@@ -18,6 +18,7 @@ import {
 } from './translation/render';
 import { createNodesWithEmojiPlaceholders } from './translation/emojiPlaceholders';
 import {
+  getLiveMessageForRecord,
   getRecentMessagesForIdentity,
   getRecentMessagesForKey,
   getUserKeyFromIdentity,
@@ -314,6 +315,8 @@ function renderProfileMessages(list: HTMLElement, recentMessages: MessageRecord[
       renderProfileMessageText(item, text, recentMessage);
 
       item.append(timestamp, text);
+      const jumpButton = createJumpToMessageButton(recentMessage);
+      if (jumpButton) item.append(jumpButton);
       list.append(item);
     });
     return;
@@ -391,10 +394,43 @@ function wireQuoteCardItem(item: HTMLElement, recentMessage: MessageRecord): voi
 
   item.addEventListener('click', quote);
   item.addEventListener('keydown', (event) => {
+    if (event.target !== item) return;
     if (event.key === 'Enter' || event.key === ' ') {
       quote(event);
     }
   });
+}
+
+function createJumpToMessageButton(recentMessage: MessageRecord): HTMLButtonElement | null {
+  if (!getLiveMessageForRecord(recentMessage)) return null;
+
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = 'ytcq-profile-card-jump';
+  button.title = 'Jump to message';
+  button.setAttribute('aria-label', 'Jump to message');
+  button.append(createJumpToMessageIcon());
+  button.addEventListener('click', (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    jumpToRecentMessage(recentMessage);
+  });
+
+  return button;
+}
+
+function jumpToRecentMessage(recentMessage: MessageRecord): void {
+  const target = getLiveMessageForRecord(recentMessage);
+  if (!target) return;
+
+  target.scrollIntoView({
+    block: 'center',
+    behavior: 'smooth'
+  });
+  target.classList.add('ytcq-profile-jump-target');
+  window.setTimeout(() => {
+    target.classList.remove('ytcq-profile-jump-target');
+  }, 1600);
 }
 
 function scrollCardListToBottom(list: HTMLElement): void {
@@ -441,6 +477,19 @@ function createOpenInNewIcon(): SVGSVGElement {
 
   const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
   path.setAttribute('d', 'M14 3h7v7h-2V6.41l-9.29 9.3-1.42-1.42 9.3-9.29H14V3ZM5 5h6v2H5v12h12v-6h2v6a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2Z');
+  icon.append(path);
+
+  return icon;
+}
+
+function createJumpToMessageIcon(): SVGSVGElement {
+  const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  icon.setAttribute('viewBox', '0 -960 960 960');
+  icon.setAttribute('focusable', 'false');
+  icon.setAttribute('aria-hidden', 'true');
+
+  const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  path.setAttribute('d', 'M440-42v-80q-125-14-214.5-103.5T122-440H42v-80h80q14-125 103.5-214.5T440-838v-80h80v80q125 14 214.5 103.5T838-520h80v80h-80q-14 125-103.5 214.5T520-122v80h-80Zm40-158q116 0 198-82t82-198q0-116-82-198t-198-82q-116 0-198 82t-82 198q0 116 82 198t198 82Zm0-120q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47Zm0-80q33 0 56.5-23.5T560-480q0-33-23.5-56.5T480-560q-33 0-56.5 23.5T400-480q0 33 23.5 56.5T480-400Zm0-80Z');
   icon.append(path);
 
   return icon;

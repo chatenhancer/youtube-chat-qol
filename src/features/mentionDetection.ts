@@ -54,6 +54,14 @@ export function getCurrentMentionCandidates(): string[] {
   return [...getMentionCandidates()];
 }
 
+export function isCurrentUserAuthorName(authorName: string): boolean {
+  const candidates = getMentionCandidates();
+  if (!candidates.length) return false;
+
+  const authorHandles = getCandidateHandles(authorName, { allowPlainHandle: true });
+  return authorHandles.some((authorHandle) => candidates.includes(authorHandle));
+}
+
 export function processPotentialMentionForConsumer(
   message: HTMLElement,
   checkedDatasetKey: string,
