@@ -56,6 +56,7 @@ export function serializeInboxRecord(record: InboxRecord): Omit<InboxRecord, 'co
     matchedKeywords: record.matchedKeywords,
     mention: record.mention,
     mentionHandles: record.mentionHandles,
+    messageId: record.messageId,
     read: record.read,
     sourceUrl: record.sourceUrl,
     text: record.text,
@@ -80,9 +81,11 @@ export function getInboxTimestamp(message: HTMLElement, timestampText: string, f
 function normalizeStoredRecords(value: unknown, getCurrentHandles: () => string[]): InboxRecord[] {
   if (!Array.isArray(value)) return [];
 
-  return sortAndTrimRecords(value
+  const normalizedRecords = value
     .map((record) => normalizeStoredRecord(record, getCurrentHandles))
-    .filter((record): record is InboxRecord => Boolean(record)));
+    .filter((record): record is InboxRecord => Boolean(record));
+
+  return sortAndTrimRecords(normalizedRecords);
 }
 
 function normalizeStoredRecord(value: unknown, getCurrentHandles: () => string[]): InboxRecord | null {
@@ -107,6 +110,7 @@ function normalizeStoredRecord(value: unknown, getCurrentHandles: () => string[]
     matchedKeywords: normalizeStoredKeywords(candidate.matchedKeywords),
     mention,
     mentionHandles: normalizeMentionHandles(candidate.mentionHandles, text, mention, getCurrentHandles),
+    messageId: cleanText(candidate.messageId),
     read: candidate.read === true,
     sourceUrl: cleanText(candidate.sourceUrl),
     text,

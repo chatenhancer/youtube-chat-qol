@@ -8,6 +8,7 @@ export interface InboxRecord {
   matchedKeywords: string[];
   mention: boolean;
   mentionHandles: string[];
+  messageId?: string;
   read: boolean;
   sourceUrl: string;
   text: string;

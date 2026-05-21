@@ -9,6 +9,7 @@ import { createEmptyLeavesIcon, createSvgIcon } from '../../shared/icons';
 import {
   getAuthorName,
   getMessageContentNodes,
+  getMessageStableId,
   getMessageText,
   getMessageTimestampText
 } from '../../youtube/messages';
@@ -25,10 +26,10 @@ import {
   highlightInboxMatches
 } from './highlights';
 import {
+  findMatchingRecordIndex,
   getKeywordCheckKey,
   getMatchedMentionHandles as getMatchedMentionHandlesFromCandidates,
   getMatchingKeywords as getMatchingKeywordsFromKeywords,
-  getRecordSignature,
   keywordsEqual,
   MAX_INBOX_KEYWORDS,
   MAX_KEYWORD_LENGTH,
@@ -318,12 +319,15 @@ function processPotentialKeywordInbox(message: HTMLElement): void {
   message.dataset.ytcqInboxKeywordChecked = keywordKey;
 
   const matchedKeywords = getMatchingKeywords(text);
-  applyChatKeywordHighlights(message, matchedKeywords, matchedKeywords.length ? keywordKey : '');
-  if (!matchedKeywords.length) return;
+  if (!matchedKeywords.length) {
+    applyChatKeywordHighlights(message, [], '');
+    return;
+  }
 
   recordInboxMatch(message, {
     keywords: matchedKeywords
   });
+  applyChatKeywordHighlights(message, matchedKeywords, keywordKey);
 }
 
 function recordInboxMatch(message: HTMLElement, match: InboxMatch): void {
@@ -336,7 +340,7 @@ function recordInboxMatch(message: HTMLElement, match: InboxMatch): void {
       ...record,
       read: isReadNow
     };
-    const existingIndex = records.findIndex((existing) => getRecordSignature(existing) === getRecordSignature(incoming));
+    const existingIndex = findMatchingRecordIndex(records, incoming);
     let changed = false;
 
     if (existingIndex >= 0) {
@@ -390,6 +394,7 @@ function createInboxRecord(message: HTMLElement, match: InboxMatch): InboxRecord
     matchedKeywords,
     mention: match.mention === true,
     mentionHandles,
+    messageId: getMessageStableId(message),
     read: false,
     sourceUrl: getCurrentSourceUrl(),
     text,
@@ -419,12 +424,14 @@ function mergeInboxRecords(existing: InboxRecord, incoming: InboxRecord, isReadN
     matchedKeywords: nextKeywords,
     mention: nextMention,
     mentionHandles: nextMentionHandles,
+    messageId: existing.messageId || incoming.messageId,
     read: hasNewMatch && !isReadNow ? false : existing.read
   };
 }
 
 function recordsEqual(first: InboxRecord, second: InboxRecord): boolean {
   return first.read === second.read &&
+    first.messageId === second.messageId &&
     first.mention === second.mention &&
     first.matchedKeywords.join('\n') === second.matchedKeywords.join('\n') &&
     first.mentionHandles.join('\n') === second.mentionHandles.join('\n');
@@ -494,7 +501,7 @@ function renderInboxList(list: HTMLElement): void {
     const text = document.createElement('span');
     const contentNodes = record.contentNodes || [];
     appendRichMessageText(text, record.text, contentNodes, record.contentParts);
-    if (!contentNodes.length) {
+    if (!hasNodeWithClass(contentNodes, CHAT_KEYWORD_HIGHLIGHT_CLASS)) {
       highlightInboxMatches(text, record);
     }
 
