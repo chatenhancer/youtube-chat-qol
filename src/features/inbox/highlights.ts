@@ -36,6 +36,7 @@ export function applyChatKeywordHighlights(
 
     const terms = matchedKeywords.map((text) => ({
       className: CHAT_KEYWORD_HIGHLIGHT_CLASS,
+      normalizedText: normalizeHighlightText(text),
       priority: 1,
       text
     }));
@@ -64,16 +65,10 @@ export function clearChatKeywordHighlights(message: HTMLElement): void {
 export function highlightInboxAuthorMatches(root: HTMLElement, record: InboxRecord): void {
   highlightTerms(root, record.matchedKeywords.map((text) => ({
     className: 'ytcq-inbox-inline-highlight ytcq-inbox-keyword-highlight',
+    normalizedText: normalizeHighlightText(text),
     priority: 1,
     text
   })));
-}
-
-export function hasNodeWithClass(nodes: Node[], className: string): boolean {
-  return nodes.some((node) => {
-    if (!(node instanceof Element)) return false;
-    return node.classList.contains(className) || Boolean(node.querySelector(`.${className}`));
-  });
 }
 
 function highlightTerms(root: HTMLElement, terms: InlineHighlightTerm[]): void {
@@ -124,11 +119,11 @@ function findNextHighlightMatch(
   start: number,
   terms: InlineHighlightTerm[]
 ): InlineHighlightMatch | null {
-  const lowerText = text.toLocaleLowerCase();
+  const lowerText = normalizeHighlightText(text);
   let best: InlineHighlightMatch | null = null;
 
   terms.forEach((term) => {
-    const lowerTerm = term.text.toLocaleLowerCase();
+    const lowerTerm = term.normalizedText || normalizeHighlightText(term.text);
     if (!lowerTerm) return;
 
     const index = lowerText.indexOf(lowerTerm, start);
@@ -156,13 +151,19 @@ function getHighlightTerms(record: InboxRecord): InlineHighlightTerm[] {
   return [
     ...record.mentionHandles.map((text) => ({
       className: 'ytcq-inbox-inline-highlight ytcq-inbox-mention-highlight',
+      normalizedText: normalizeHighlightText(text),
       priority: 2,
       text
     })),
     ...record.matchedKeywords.map((text) => ({
       className: 'ytcq-inbox-inline-highlight ytcq-inbox-keyword-highlight',
+      normalizedText: normalizeHighlightText(text),
       priority: 1,
       text
     }))
   ];
+}
+
+function normalizeHighlightText(text: string): string {
+  return text.toLocaleLowerCase();
 }

@@ -4,6 +4,11 @@ import type { InboxRecord } from './types';
 export const MAX_INBOX_KEYWORDS = 30;
 export const MAX_KEYWORD_LENGTH = 60;
 
+export interface PreparedKeyword {
+  normalized: string;
+  value: string;
+}
+
 export function normalizeStoredKeywords(value: unknown): string[] {
   if (!Array.isArray(value)) return [];
 
@@ -32,23 +37,38 @@ export function getMatchedMentionHandles(text: string, candidates: string[]): st
 }
 
 export function getMatchingKeywords(values: string | string[], keywords: string[]): string[] {
+  return getMatchingPreparedKeywords(values, prepareKeywords(keywords));
+}
+
+export function prepareKeywords(keywords: string[]): PreparedKeyword[] {
+  return keywords
+    .map((value) => ({
+      normalized: normalizeComparableText(value),
+      value
+    }))
+    .filter((keyword) => Boolean(keyword.normalized));
+}
+
+export function getMatchingPreparedKeywords(values: string | string[], keywords: PreparedKeyword[]): string[] {
   const normalizedValues = (Array.isArray(values) ? values : [values])
     .map(normalizeComparableText)
     .filter(Boolean);
 
   return keywords
     .filter((keyword) => {
-      const normalizedKeyword = normalizeComparableText(keyword);
-      return Boolean(normalizedKeyword && normalizedValues.some((value) => value.includes(normalizedKeyword)));
-    });
+      return normalizedValues.some((value) => value.includes(keyword.normalized));
+    })
+    .map((keyword) => keyword.value);
 }
 
 export function getKeywordCheckKey(keywords: string[], values: string | string[]): string {
-  const normalizedValues = (Array.isArray(values) ? values : [values])
+  return `${getKeywordsKey(prepareKeywords(keywords))}\n${getKeywordValuesKey(values)}`;
+}
+
+export function getKeywordValuesKey(values: string | string[]): string {
+  return (Array.isArray(values) ? values : [values])
     .map(normalizeComparableText)
     .join('\n');
-
-  return `${getKeywordsKey(keywords)}\n${normalizedValues}`;
 }
 
 export function normalizeKeyword(value: unknown): string {
@@ -134,8 +154,12 @@ function normalizeSourceUrl(value: string): string {
   }
 }
 
-function getKeywordsKey(keywords: string[]): string {
-  return keywords.map(normalizeComparableText).join('\n');
+export function getPreparedKeywordsKey(keywords: PreparedKeyword[]): string {
+  return getKeywordsKey(keywords);
+}
+
+function getKeywordsKey(keywords: PreparedKeyword[]): string {
+  return keywords.map((keyword) => keyword.normalized).join('\n');
 }
 
 function normalizeComparableText(value: string): string {

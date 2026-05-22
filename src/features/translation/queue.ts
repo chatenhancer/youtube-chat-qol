@@ -116,9 +116,10 @@ export function getRetroactiveTranslationMessages(messages: HTMLElement[], trans
   };
 
   messages
-    .filter(isPotentiallyVisibleMessage)
-    .sort((a, b) => b.getBoundingClientRect().top - a.getBoundingClientRect().top)
-    .forEach(add);
+    .map(getPotentiallyVisibleMessagePosition)
+    .filter((entry): entry is { message: HTMLElement; top: number } => Boolean(entry))
+    .sort((a, b) => b.top - a.top)
+    .forEach((entry) => add(entry.message));
 
   messages
     .slice()
@@ -229,12 +230,13 @@ function rememberTranslation(key: string, value: TranslationResult): void {
   if (firstKey) translationCache.delete(firstKey);
 }
 
-function isPotentiallyVisibleMessage(message: HTMLElement): boolean {
+function getPotentiallyVisibleMessagePosition(message: HTMLElement): { message: HTMLElement; top: number } | null {
   const rect = message.getBoundingClientRect();
-  return rect.height > 0 &&
+  const visible = rect.height > 0 &&
     rect.width > 0 &&
     rect.bottom >= -240 &&
     rect.top <= window.innerHeight + 240;
+  return visible ? { message, top: rect.top } : null;
 }
 
 function makeTranslationKey(text: string, targetLanguage: string): string {
