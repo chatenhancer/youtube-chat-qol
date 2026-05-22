@@ -14,10 +14,10 @@ import {
   restoreReplacedTranslation
 } from '../../youtube/messages';
 import {
-  createNodesWithEmojiPlaceholders,
-  restoreEmojiPlaceholdersToText,
-  type EmojiToken
-} from './emojiPlaceholders';
+  createNodesWithPlaceholders,
+  restorePlaceholdersToText,
+  type ProtectedToken
+} from './protectedPlaceholders';
 
 export interface TranslationResult {
   text: string;
@@ -32,19 +32,19 @@ export function renderTranslation(
   message: HTMLElement,
   result: TranslationResult,
   originalText: string,
-  emojiTokens: EmojiToken[] = [],
+  protectedTokens: ProtectedToken[] = [],
   sourceText = originalText
 ): boolean {
   if (!message.isConnected) return false;
-  if (!isMeaningfulTranslation(result, emojiTokens, sourceText)) return false;
+  if (!isMeaningfulTranslation(result, protectedTokens, sourceText)) return false;
 
   if (getOptions().translationDisplay === 'replace') {
-    renderReplacementTranslation(message, result, originalText, emojiTokens);
+    renderReplacementTranslation(message, result, originalText, protectedTokens);
     return true;
   }
 
   restoreReplacedTranslation(message);
-  renderInlineTranslation(message, result, originalText, emojiTokens);
+  renderInlineTranslation(message, result, originalText, protectedTokens);
   return true;
 }
 
@@ -64,14 +64,14 @@ function renderInlineTranslation(
   message: HTMLElement,
   result: TranslationResult,
   originalText: string,
-  emojiTokens: EmojiToken[] = []
+  protectedTokens: ProtectedToken[] = []
 ): void {
   const content = message.querySelector('#content') || message;
   const existing = message.querySelector<HTMLElement>(':scope .ytcq-translation');
-  const translation = existing || createInlineTranslationElement(result, emojiTokens);
+  const translation = existing || createInlineTranslationElement(result, protectedTokens);
 
   if (existing) {
-    existing.replaceWith(createInlineTranslationElement(result, emojiTokens));
+    existing.replaceWith(createInlineTranslationElement(result, protectedTokens));
     return;
   }
 
@@ -82,11 +82,11 @@ function renderReplacementTranslation(
   message: HTMLElement,
   result: TranslationResult,
   originalText: string,
-  emojiTokens: EmojiToken[] = []
+  protectedTokens: ProtectedToken[] = []
 ): void {
   const messageText = getMessageTextElement(message);
   if (!messageText) {
-    renderInlineTranslation(message, result, originalText, emojiTokens);
+    renderInlineTranslation(message, result, originalText, protectedTokens);
     return;
   }
 
@@ -98,13 +98,13 @@ function renderReplacementTranslation(
   messageText.classList.add('ytcq-translation-replaced-text');
   messageText.lang = result.targetLanguage;
   messageText.title = getReplacementTranslationTitle(result, originalText);
-  messageText.replaceChildren(...createNodesWithEmojiPlaceholders(result.text, emojiTokens));
+  messageText.replaceChildren(...createNodesWithPlaceholders(result.text, protectedTokens));
   messageText.appendChild(createReplacedTranslationIcon());
 }
 
 export function createInlineTranslationElement(
   result: TranslationResult,
-  emojiTokens: EmojiToken[] = []
+  protectedTokens: ProtectedToken[] = []
 ): HTMLElement {
   const translation = document.createElement('div');
   translation.className = 'ytcq-translation';
@@ -118,7 +118,7 @@ export function createInlineTranslationElement(
   prefix.textContent = 'Translated:';
 
   const body = document.createElement('span');
-  body.append(...createNodesWithEmojiPlaceholders(result.text, emojiTokens));
+  body.append(...createNodesWithPlaceholders(result.text, protectedTokens));
 
   translation.append(prefix, body);
   return translation;
@@ -126,11 +126,11 @@ export function createInlineTranslationElement(
 
 export function isMeaningfulTranslation(
   result: TranslationResult,
-  emojiTokens: EmojiToken[] = [],
+  protectedTokens: ProtectedToken[] = [],
   sourceText = ''
 ): boolean {
-  const translatedText = restoreEmojiPlaceholdersToText(result.text, emojiTokens);
-  const comparableSourceText = restoreEmojiPlaceholdersToText(sourceText, emojiTokens);
+  const translatedText = restorePlaceholdersToText(result.text, protectedTokens);
+  const comparableSourceText = restorePlaceholdersToText(sourceText, protectedTokens);
   return normalizeComparableText(translatedText) !== normalizeComparableText(comparableSourceText);
 }
 

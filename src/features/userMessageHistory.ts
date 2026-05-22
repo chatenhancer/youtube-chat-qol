@@ -16,7 +16,7 @@ import {
 } from '../youtube/messages';
 import { serializeRichMessageNodes, type RichTextSegment } from '../youtube/richText';
 import { CHAT_MESSAGE_SELECTOR } from '../youtube/selectors';
-import type { EmojiToken } from './translation/emojiPlaceholders';
+import type { ProtectedToken } from './translation/protectedPlaceholders';
 import type { TranslationResult } from './translation/render';
 
 const MAX_USERS = 160;
@@ -38,7 +38,7 @@ export interface MessageTranslationRecord {
   result: TranslationResult;
   sourceText: string;
   originalText: string;
-  emojiTokens: EmojiToken[];
+  protectedTokens: ProtectedToken[];
 }
 
 export interface UserIdentity {
@@ -152,7 +152,7 @@ export function recordUserMessageTranslation(
   message: HTMLElement,
   result: TranslationResult,
   originalText: string,
-  emojiTokens: EmojiToken[],
+  protectedTokens: ProtectedToken[],
   sourceText: string
 ): void {
   const record = getRecordForMessage(message);
@@ -162,7 +162,7 @@ export function recordUserMessageTranslation(
     result,
     originalText,
     sourceText,
-    emojiTokens: cloneEmojiTokens(emojiTokens)
+    protectedTokens: cloneProtectedTokens(protectedTokens)
   };
 
   const elementRecord = recordsByElement.get(message);
@@ -263,8 +263,8 @@ function getRecordForMessage(message: HTMLElement): MessageRecord | null {
   return recordsByUser.get(elementRecord.key)?.find((record) => record.id === elementRecord.id) || null;
 }
 
-function cloneEmojiTokens(emojiTokens: EmojiToken[]): EmojiToken[] {
-  return emojiTokens.map((token) => ({
+function cloneProtectedTokens(protectedTokens: ProtectedToken[]): ProtectedToken[] {
+  return protectedTokens.map((token) => ({
     placeholder: token.placeholder,
     fallbackText: token.fallbackText,
     node: token.node ? token.node.cloneNode(true) : null,
