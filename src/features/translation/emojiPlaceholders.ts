@@ -18,6 +18,7 @@ export interface EmojiToken {
   placeholder: string;
   fallbackText: string;
   node: Node | null;
+  nodes: Node[];
 }
 
 export interface TranslationPlan {
@@ -47,19 +48,70 @@ export function createTranslationPlan(message: HTMLElement, originalText: string
   if (Array.isArray(runs) && runs.length) {
     const emojiNodes = Array.from(getMessageTextElement(message)?.querySelectorAll('img') || []);
     let emojiNodeIndex = 0;
-    const text = runs.map((run) => {
-      if (run.text) return replaceUnicodeEmojisWithPlaceholders(run.text, emojiTokens);
-      if (!run.emoji) return '';
+    const parts: string[] = [];
+    const emojiRunNodes: Node[] = [];
+    let emojiRunText = '';
+    const pendingWhitespaceNodes: Node[] = [];
+    let pendingWhitespaceText = '';
 
-      return createEmojiPlaceholderToken({
+    const hasEmojiRun = (): boolean => Boolean(emojiRunText || emojiRunNodes.length);
+
+    const movePendingWhitespaceToEmojiRun = (): void => {
+      if (!pendingWhitespaceText && !pendingWhitespaceNodes.length) return;
+      emojiRunText += pendingWhitespaceText;
+      emojiRunNodes.push(...pendingWhitespaceNodes);
+      pendingWhitespaceText = '';
+      pendingWhitespaceNodes.length = 0;
+    };
+
+    const flushPendingWhitespaceToParts = (): void => {
+      if (!pendingWhitespaceText) return;
+      parts.push(pendingWhitespaceText);
+      pendingWhitespaceText = '';
+      pendingWhitespaceNodes.length = 0;
+    };
+
+    const flushEmojiRun = (): void => {
+      if (!emojiRunText && !emojiRunNodes.length) return;
+      parts.push(createEmojiPlaceholderToken({
         emojiTokens,
-        fallbackText: getEmojiTextFromRun(run),
-        node: emojiNodes[emojiNodeIndex++] || null
-      });
-    }).join('');
+        fallbackText: emojiRunText,
+        nodes: emojiRunNodes
+      }));
+      emojiRunText = '';
+      emojiRunNodes.length = 0;
+    };
+
+    runs.forEach((run) => {
+      if (run.text) {
+        if (hasEmojiRun() && isWhitespaceOnly(run.text)) {
+          pendingWhitespaceText += run.text;
+          pendingWhitespaceNodes.push(document.createTextNode(run.text));
+          return;
+        }
+
+        flushEmojiRun();
+        flushPendingWhitespaceToParts();
+        parts.push(replaceUnicodeEmojisWithPlaceholders(run.text, emojiTokens));
+        return;
+      }
+      if (!run.emoji) {
+        flushEmojiRun();
+        flushPendingWhitespaceToParts();
+        return;
+      }
+
+      movePendingWhitespaceToEmojiRun();
+      emojiRunText += getEmojiTextFromRun(run);
+      const emojiNode = emojiNodes[emojiNodeIndex++] || null;
+      if (emojiNode) emojiRunNodes.push(emojiNode);
+    });
+    movePendingWhitespaceToEmojiRun();
+    flushEmojiRun();
+    flushPendingWhitespaceToParts();
 
     return {
-      text: cleanText(text),
+      text: cleanText(parts.join('')),
       emojiTokens
     };
   }
@@ -96,7 +148,7 @@ export function createNodesWithEmojiPlaceholders(text: string, emojiTokens: Emoj
 
     const tokenIndex = Number(match[1]);
     restoredTokenIndexes.add(tokenIndex);
-    nodes.push(createEmojiTokenNode(emojiTokens[tokenIndex]));
+    nodes.push(...createEmojiTokenNodes(emojiTokens[tokenIndex]));
     lastIndex = match.index + match[0].length;
   }
 
@@ -115,9 +167,64 @@ export function createNodesWithEmojiPlaceholders(text: string, emojiTokens: Emoj
 function getTranslationTextFromNodes(nodes: NodeListOf<ChildNode> | Node[] | undefined, emojiTokens: EmojiToken[]): string {
   if (!nodes?.length) return '';
 
-  return Array.from(nodes)
-    .map((node) => getTranslationTextFromNode(node, emojiTokens))
-    .join('');
+  const parts: string[] = [];
+  const emojiRunNodes: Node[] = [];
+  let emojiRunText = '';
+  const pendingWhitespaceNodes: Node[] = [];
+  let pendingWhitespaceText = '';
+
+  const hasEmojiRun = (): boolean => Boolean(emojiRunText || emojiRunNodes.length);
+
+  const movePendingWhitespaceToEmojiRun = (): void => {
+    if (!pendingWhitespaceText && !pendingWhitespaceNodes.length) return;
+    emojiRunText += pendingWhitespaceText;
+    emojiRunNodes.push(...pendingWhitespaceNodes);
+    pendingWhitespaceText = '';
+    pendingWhitespaceNodes.length = 0;
+  };
+
+  const flushPendingWhitespaceToParts = (): void => {
+    if (!pendingWhitespaceText) return;
+    parts.push(pendingWhitespaceText);
+    pendingWhitespaceText = '';
+    pendingWhitespaceNodes.length = 0;
+  };
+
+  const flushEmojiRun = (): void => {
+    if (!emojiRunText && !emojiRunNodes.length) return;
+    parts.push(createEmojiPlaceholderToken({
+      emojiTokens,
+      fallbackText: emojiRunText,
+      nodes: emojiRunNodes
+    }));
+    emojiRunText = '';
+    emojiRunNodes.length = 0;
+  };
+
+  Array.from(nodes).forEach((node) => {
+    const emoji = getEmojiRunItem(node);
+    if (emoji) {
+      movePendingWhitespaceToEmojiRun();
+      emojiRunText += emoji.fallbackText;
+      emojiRunNodes.push(emoji.node);
+      return;
+    }
+
+    if (node.nodeType === Node.TEXT_NODE && hasEmojiRun() && isWhitespaceOnly(node.textContent || '')) {
+      pendingWhitespaceText += node.textContent || '';
+      pendingWhitespaceNodes.push(node);
+      return;
+    }
+
+    flushEmojiRun();
+    flushPendingWhitespaceToParts();
+    parts.push(getTranslationTextFromNode(node, emojiTokens));
+  });
+  movePendingWhitespaceToEmojiRun();
+  flushEmojiRun();
+  flushPendingWhitespaceToParts();
+
+  return parts.join('');
 }
 
 function getTranslationTextFromNode(node: Node, emojiTokens: EmojiToken[]): string {
@@ -138,6 +245,15 @@ function getTranslationTextFromNode(node: Node, emojiTokens: EmojiToken[]): stri
 
   return getTranslationTextFromNodes(node.childNodes, emojiTokens) ||
     replaceUnicodeEmojisWithPlaceholders(node.textContent || '', emojiTokens);
+}
+
+function getEmojiRunItem(node: Node): { fallbackText: string; node: Node } | null {
+  if (!(node instanceof Element)) return null;
+  if (!isEmojiElement(node)) return null;
+  return {
+    fallbackText: getEmojiTextFromElement(node),
+    node
+  };
 }
 
 function isEmojiElement(element: Element): boolean {
@@ -163,30 +279,90 @@ function getEmojiTextFromElement(element: Element): string {
 }
 
 function replaceUnicodeEmojisWithPlaceholders(text: string, emojiTokens: EmojiToken[]): string {
-  return String(text || '').replace(UNICODE_EMOJI_PATTERN, (emojiText) => (
-    createEmojiPlaceholderToken({
+  const source = String(text || '');
+  let result = '';
+  let lastIndex = 0;
+  let emojiRunText = '';
+  let pendingWhitespaceText = '';
+  UNICODE_EMOJI_PATTERN.lastIndex = 0;
+
+  const hasEmojiRun = (): boolean => Boolean(emojiRunText);
+
+  const movePendingWhitespaceToEmojiRun = (): void => {
+    if (!pendingWhitespaceText) return;
+    emojiRunText += pendingWhitespaceText;
+    pendingWhitespaceText = '';
+  };
+
+  const flushPendingWhitespaceToResult = (): void => {
+    if (!pendingWhitespaceText) return;
+    result += pendingWhitespaceText;
+    pendingWhitespaceText = '';
+  };
+
+  const flushEmojiRun = (): void => {
+    if (!emojiRunText) return;
+    result += createEmojiPlaceholderToken({
       emojiTokens,
-      fallbackText: emojiText,
-      node: null
-    })
-  ));
+      fallbackText: emojiRunText,
+      nodes: []
+    });
+    emojiRunText = '';
+  };
+
+  const appendTextGap = (gap: string): void => {
+    if (!gap) return;
+    if (hasEmojiRun() && isWhitespaceOnly(gap)) {
+      pendingWhitespaceText += gap;
+      return;
+    }
+
+    flushEmojiRun();
+    flushPendingWhitespaceToResult();
+    result += gap;
+  };
+
+  for (let match = UNICODE_EMOJI_PATTERN.exec(source); match; match = UNICODE_EMOJI_PATTERN.exec(source)) {
+    if (match.index > lastIndex) {
+      appendTextGap(source.slice(lastIndex, match.index));
+    }
+
+    movePendingWhitespaceToEmojiRun();
+    emojiRunText += match[0];
+    lastIndex = match.index + match[0].length;
+  }
+
+  if (lastIndex < source.length) appendTextGap(source.slice(lastIndex));
+  movePendingWhitespaceToEmojiRun();
+  flushEmojiRun();
+  flushPendingWhitespaceToResult();
+
+  return result;
 }
 
 function createEmojiPlaceholderToken({
   emojiTokens,
   fallbackText,
-  node
+  node,
+  nodes
 }: {
   emojiTokens: EmojiToken[];
   fallbackText: string;
-  node: Element | Node | null;
+  node?: Element | Node | null;
+  nodes?: Node[];
 }): string {
   const index = emojiTokens.length;
   const placeholder = `__YTCQ_EMOJI_${index}_TOKEN__`;
+  const tokenNodes = nodes?.length
+    ? nodes.map((emojiNode) => emojiNode.cloneNode(true))
+    : node
+      ? [node.cloneNode(true)]
+      : [];
   emojiTokens.push({
     placeholder,
     fallbackText: fallbackText || '',
-    node: node ? node.cloneNode(true) : null
+    node: tokenNodes[0] || null,
+    nodes: tokenNodes
   });
   return placeholder;
 }
@@ -200,6 +376,10 @@ function isEmojiLikeText(text: string): boolean {
   return /^:[^:\s][^:]*:$/.test(cleanText(text));
 }
 
+function isWhitespaceOnly(text: string): boolean {
+  return Boolean(text) && /^\s+$/u.test(text);
+}
+
 function appendMissingEmojiToken(nodes: Node[], token: EmojiToken): void {
   if (!token) return;
   const lastNode = nodes[nodes.length - 1];
@@ -209,10 +389,11 @@ function appendMissingEmojiToken(nodes: Node[], token: EmojiToken): void {
     nodes.push(document.createTextNode(' '));
   }
 
-  nodes.push(createEmojiTokenNode(token));
+  nodes.push(...createEmojiTokenNodes(token));
 }
 
-function createEmojiTokenNode(token: EmojiToken | undefined): Node {
-  if (token?.node) return token.node.cloneNode(true);
-  return document.createTextNode(token?.fallbackText || '');
+function createEmojiTokenNodes(token: EmojiToken | undefined): Node[] {
+  if (token?.nodes?.length) return token.nodes.map((node) => node.cloneNode(true));
+  if (token?.node) return [token.node.cloneNode(true)];
+  return [document.createTextNode(token?.fallbackText || '')];
 }

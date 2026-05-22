@@ -569,6 +569,22 @@ figcaption {
   width: 100%;
 }
 
+.install-contact {
+  grid-column: 1 / -1;
+  margin: 2px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.install-contact a {
+  color: var(--text);
+  font-weight: 700;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
 .privacy {
   background: var(--background);
 }

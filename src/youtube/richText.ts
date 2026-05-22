@@ -18,6 +18,12 @@ export type RichTextSegment =
       className: string;
     };
 
+const TOOLTIP_SELECTOR = [
+  '[role="tooltip"]',
+  'tp-yt-paper-tooltip',
+  'yt-tooltip'
+].join(',');
+
 export function appendRichMessageText(
   container: HTMLElement,
   text: string,
@@ -56,8 +62,10 @@ export function normalizeRichTextSegments(value: unknown): RichTextSegment[] {
 function cloneSafeMessageNode(node: Node): Node | null {
   if (node.nodeType === Node.TEXT_NODE) return node.cloneNode(true);
   if (!(node instanceof Element)) return null;
+  if (isTooltipElement(node)) return null;
 
   const clone = node.cloneNode(true) as Element;
+  clone.querySelectorAll(TOOLTIP_SELECTOR).forEach((child) => child.remove());
   stripDuplicateIds(clone);
   return clone;
 }
@@ -73,6 +81,7 @@ function appendSerializedNode(segments: RichTextSegment[], node: Node): void {
     return;
   }
   if (!(node instanceof Element)) return;
+  if (isTooltipElement(node)) return;
 
   const tagName = node.tagName.toLowerCase();
   if (tagName === 'br') {
@@ -152,6 +161,10 @@ function getElementImageSource(element: Element): string {
 
 function getCleanAttribute(element: Element, name: string): string {
   return (element.getAttribute(name) || '').replace(/\s+/g, ' ').trim();
+}
+
+function isTooltipElement(element: Element): boolean {
+  return element.matches(TOOLTIP_SELECTOR);
 }
 
 function createRichTextSegmentNodes(segments: RichTextSegment[]): Node[] {

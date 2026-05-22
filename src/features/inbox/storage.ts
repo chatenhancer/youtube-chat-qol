@@ -6,7 +6,7 @@ import {
 } from './matching';
 import type { InboxRecord } from './types';
 
-const INBOX_RECORDS_STORAGE_KEY = 'ytcqInboxRecords';
+const INBOX_RECORDS_STORAGE_KEY_PREFIX = 'ytcqInboxRecords';
 const INBOX_KEYWORDS_STORAGE_KEY = 'ytcqInboxKeywords';
 const MAX_INBOX_RECORDS = 100;
 const ONE_DAY_MS = 24 * 60 * 60 * 1000;
@@ -22,13 +22,15 @@ export interface InboxStoredState {
   records: InboxRecord[];
 }
 
-export function loadInboxStoredState(getCurrentHandles: () => string[]): Promise<InboxStoredState> {
+export function loadInboxStoredState(getCurrentHandles: () => string[], sourceUrl: string): Promise<InboxStoredState> {
+  const recordsStorageKey = getInboxRecordsStorageKey(sourceUrl);
+
   return new Promise((resolve) => {
     chrome.storage.local.get({
-      [INBOX_RECORDS_STORAGE_KEY]: [],
+      [recordsStorageKey]: [],
       [INBOX_KEYWORDS_STORAGE_KEY]: []
     }, (stored) => {
-      const storedRecords = stored[INBOX_RECORDS_STORAGE_KEY];
+      const storedRecords = stored[recordsStorageKey];
       resolve({
         records: normalizeStoredRecords(storedRecords, getCurrentHandles),
         keywords: normalizeStoredKeywords(stored[INBOX_KEYWORDS_STORAGE_KEY])
@@ -37,11 +39,13 @@ export function loadInboxStoredState(getCurrentHandles: () => string[]): Promise
   });
 }
 
-export function saveInboxRecords(records: InboxRecord[]): Promise<void> {
+export function saveInboxRecords(records: InboxRecord[], sourceUrl: string): Promise<void> {
   const sortedRecords = sortAndTrimRecords(records);
+  const recordsStorageKey = getInboxRecordsStorageKey(sourceUrl);
+
   return new Promise((resolve) => {
     chrome.storage.local.set({
-      [INBOX_RECORDS_STORAGE_KEY]: sortedRecords.map(serializeInboxRecord)
+      [recordsStorageKey]: sortedRecords.map(serializeInboxRecord)
     }, resolve);
   });
 }
@@ -179,4 +183,33 @@ function pruneTimestampOffsetBases(): void {
     if (oldestBase === undefined) return;
     nextTimestampOffsetByBase.delete(oldestBase);
   }
+}
+
+function getInboxRecordsStorageKey(sourceUrl: string): string {
+  const cleanSourceUrl = cleanText(sourceUrl);
+  const videoId = getVideoIdFromUrl(cleanSourceUrl);
+  if (videoId) return `${INBOX_RECORDS_STORAGE_KEY_PREFIX}:video:${videoId}`;
+
+  return `${INBOX_RECORDS_STORAGE_KEY_PREFIX}:source:${hashStorageKey(cleanSourceUrl || 'unknown')}`;
+}
+
+function getVideoIdFromUrl(value: string): string {
+  if (!value) return '';
+
+  try {
+    const url = new URL(value);
+    return cleanText(url.searchParams.get('v') || url.searchParams.get('video_id') || '');
+  } catch {
+    return '';
+  }
+}
+
+function hashStorageKey(value: string): string {
+  let hash = 0x811c9dc5;
+  for (let index = 0; index < value.length; index += 1) {
+    hash ^= value.charCodeAt(index);
+    hash = Math.imul(hash, 0x01000193);
+  }
+
+  return (hash >>> 0).toString(36);
 }
