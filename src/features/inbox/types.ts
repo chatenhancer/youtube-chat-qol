@@ -3,7 +3,6 @@ import type { RichTextSegment } from '../../youtube/richText';
 export interface InboxRecord {
   id: string;
   authorName: string;
-  contentNodes?: Node[];
   contentParts?: RichTextSegment[];
   matchedKeywords: string[];
   messageRef?: WeakRef<HTMLElement>;
@@ -30,6 +29,7 @@ export interface LatestInboxRecord {
 
 export interface InlineHighlightTerm {
   className: string;
+  normalizedText?: string;
   priority: number;
   text: string;
 }

@@ -8,7 +8,7 @@
 import { createEmptyLeavesIcon, createSvgIcon } from '../../shared/icons';
 import {
   getAuthorName,
-  getMessageContentNodes,
+  getMessageContentSourceNodes,
   getMessageStableId,
   getMessageText,
   getMessageTimestampText
@@ -20,22 +20,23 @@ import {
 } from '../../youtube/richText';
 import {
   applyChatKeywordHighlights,
-  CHAT_KEYWORD_HIGHLIGHT_CLASS,
   clearChatKeywordHighlights,
-  hasNodeWithClass,
   highlightInboxAuthorMatches,
   highlightInboxMatches
 } from './highlights';
 import {
   findMatchingRecordIndex,
-  getKeywordCheckKey,
+  getMatchingPreparedKeywords,
   getMatchedMentionHandles as getMatchedMentionHandlesFromCandidates,
-  getMatchingKeywords as getMatchingKeywordsFromKeywords,
+  getKeywordValuesKey,
   keywordsEqual,
   MAX_INBOX_KEYWORDS,
   MAX_KEYWORD_LENGTH,
   mergeStrings,
-  normalizeKeyword
+  normalizeKeyword,
+  prepareKeywords,
+  getPreparedKeywordsKey,
+  type PreparedKeyword
 } from './matching';
 import {
   getCurrentMentionCandidates,
@@ -72,6 +73,8 @@ const ADD_ICON_PATH = 'M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2Z';
 
 let records: InboxRecord[] = [];
 let keywords: string[] = [];
+let preparedKeywords: PreparedKeyword[] = [];
+let preparedKeywordsKey = '';
 let inboxStateLoaded = false;
 let inboxStateLoadPromise: Promise<void> | null = null;
 let registeredInbox = false;
@@ -172,6 +175,8 @@ export function resetInboxState(): void {
   pendingInboxMessages.clear();
   records = [];
   keywords = [];
+  preparedKeywords = [];
+  preparedKeywordsKey = '';
   inboxStateLoaded = true;
   inboxStateLoadPromise = null;
   closeInboxCard();
@@ -323,7 +328,7 @@ function processPotentialKeywordInbox(message: HTMLElement): void {
   }
 
   const keywordValues = [authorName, text];
-  const keywordKey = getKeywordCheckKey(keywords, keywordValues);
+  const keywordKey = getKeywordCheckKeyFromValues(keywordValues);
   if (message.dataset.ytcqInboxKeywordChecked === keywordKey) return;
   message.dataset.ytcqInboxKeywordChecked = keywordKey;
 
@@ -391,7 +396,6 @@ function createInboxRecord(message: HTMLElement, match: InboxMatch): InboxRecord
   const text = getMessageText(message);
   if (!authorName || !text) return null;
 
-  const contentNodes = getMessageContentNodes(message);
   const now = Date.now();
   const timestampText = getMessageTimestampText(message, now);
   const timestamp = getInboxTimestamp(message, timestampText, now);
@@ -403,8 +407,7 @@ function createInboxRecord(message: HTMLElement, match: InboxMatch): InboxRecord
   return {
     id: `${timestamp}-${Math.random().toString(36).slice(2, 8)}`,
     authorName,
-    contentNodes,
-    contentParts: serializeRichMessageNodes(contentNodes),
+    contentParts: serializeRichMessageNodes(getMessageContentSourceNodes(message)),
     matchedKeywords,
     messageRef: new WeakRef(message),
     mention: match.mention === true,
@@ -428,14 +431,9 @@ function mergeInboxRecords(existing: InboxRecord, incoming: InboxRecord, isReadN
     nextMentionHandles.length !== existing.mentionHandles.length
   );
 
-  const useIncomingContentNodes = shouldUseIncomingContentNodes(existing, incoming);
-
   return {
     ...existing,
-    contentNodes: useIncomingContentNodes ? incoming.contentNodes : existing.contentNodes || incoming.contentNodes,
-    contentParts: useIncomingContentNodes
-      ? incoming.contentParts
-      : existing.contentParts?.length ? existing.contentParts : incoming.contentParts,
+    contentParts: existing.contentParts?.length ? existing.contentParts : incoming.contentParts,
     matchedKeywords: nextKeywords,
     messageRef: getLiveInboxMessage(incoming) ? incoming.messageRef : existing.messageRef,
     mention: nextMention,
@@ -454,16 +452,7 @@ function recordsEqual(first: InboxRecord, second: InboxRecord): boolean {
 }
 
 function hasTransientRecordUpdate(existing: InboxRecord, merged: InboxRecord): boolean {
-  return getLiveInboxMessage(existing) !== getLiveInboxMessage(merged) ||
-    (!existing.contentNodes?.length && Boolean(merged.contentNodes?.length));
-}
-
-function shouldUseIncomingContentNodes(existing: InboxRecord, incoming: InboxRecord): boolean {
-  if (!incoming.contentNodes?.length) return false;
-  if (!existing.contentNodes?.length) return true;
-
-  return hasNodeWithClass(incoming.contentNodes, CHAT_KEYWORD_HIGHLIGHT_CLASS) &&
-    !hasNodeWithClass(existing.contentNodes, CHAT_KEYWORD_HIGHLIGHT_CLASS);
+  return getLiveInboxMessage(existing) !== getLiveInboxMessage(merged);
 }
 
 function renderInboxList(list: HTMLElement): void {
@@ -521,11 +510,8 @@ function renderInboxList(list: HTMLElement): void {
 
     const spacer = document.createTextNode(' ');
     const text = document.createElement('span');
-    const contentNodes = record.contentNodes || [];
-    appendRichMessageText(text, record.text, contentNodes, record.contentParts);
-    if (!hasNodeWithClass(contentNodes, CHAT_KEYWORD_HIGHLIGHT_CLASS)) {
-      highlightInboxMatches(text, record);
-    }
+    appendRichMessageText(text, record.text, [], record.contentParts);
+    highlightInboxMatches(text, record);
 
     body.append(author, spacer, text);
     item.append(timestamp, body);
@@ -565,6 +551,7 @@ function createKeywordPanel(): HTMLElement {
     }
 
     keywords = [...keywords, keyword].slice(-MAX_INBOX_KEYWORDS);
+    refreshPreparedKeywords();
     input.value = '';
     void saveInboxKeywords();
     renderKeywordChips(chips);
@@ -605,6 +592,7 @@ function renderKeywordChips(container: HTMLElement): void {
     removeButton.append(createCloseIcon());
     removeButton.addEventListener('click', () => {
       keywords = keywords.filter((existing) => existing !== keyword);
+      refreshPreparedKeywords();
       void saveInboxKeywords();
       renderKeywordChips(container);
       refreshVisibleChatKeywordHighlights();
@@ -621,7 +609,6 @@ function wireQuoteCardItem(item: HTMLElement, record: InboxRecord): void {
     event.preventDefault();
     event.stopPropagation();
     quoteAuthorRichText(record.authorName, record.text, {
-      nodes: record.contentNodes,
       segments: record.contentParts
     });
     closeInboxCard();
@@ -685,7 +672,7 @@ function applyCurrentChatKeywordHighlights(message: HTMLElement): string[] {
 
   const keywordValues = [authorName, text];
   const matchedKeywords = keywords.length ? getMatchingKeywords(...keywordValues) : [];
-  applyChatKeywordHighlights(message, matchedKeywords, matchedKeywords.length ? getKeywordCheckKey(keywords, keywordValues) : '');
+  applyChatKeywordHighlights(message, matchedKeywords, matchedKeywords.length ? getKeywordCheckKeyFromValues(keywordValues) : '');
   return matchedKeywords;
 }
 
@@ -903,6 +890,7 @@ function loadInboxState(): Promise<void> {
   inboxStateLoadPromise = loadInboxStoredState(getCurrentMentionCandidates).then((stored) => {
     records = stored.records;
     keywords = stored.keywords;
+    refreshPreparedKeywords();
     inboxStateLoaded = true;
   });
 
@@ -923,7 +911,16 @@ function getMatchedMentionHandles(text: string): string[] {
 }
 
 function getMatchingKeywords(...values: string[]): string[] {
-  return getMatchingKeywordsFromKeywords(values, keywords);
+  return getMatchingPreparedKeywords(values, preparedKeywords);
+}
+
+function getKeywordCheckKeyFromValues(values: string[]): string {
+  return `${preparedKeywordsKey}\n${getKeywordValuesKey(values)}`;
+}
+
+function refreshPreparedKeywords(): void {
+  preparedKeywords = prepareKeywords(keywords);
+  preparedKeywordsKey = getPreparedKeywordsKey(preparedKeywords);
 }
 
 function getCurrentSourceUrl(): string {

@@ -368,7 +368,7 @@ function renderProfileMessageText(
     return;
   }
 
-  appendRichMessageText(text, recentMessage.text, recentMessage.contentNodes);
+  appendRichMessageText(text, recentMessage.text, [], recentMessage.contentParts);
   if (translation) {
     text.append(createInlineTranslationElement(translation.result, translation.emojiTokens));
   }
@@ -388,7 +388,7 @@ function wireQuoteCardItem(item: HTMLElement, recentMessage: MessageRecord): voi
     event.preventDefault();
     event.stopPropagation();
     quoteAuthorRichText(recentMessage.authorName, recentMessage.text, {
-      nodes: recentMessage.contentNodes
+      segments: recentMessage.contentParts
     });
     closeProfileCard();
   };

@@ -8,11 +8,12 @@
 import { normalizeComparableText } from '../shared/text';
 import {
   getAuthorName,
-  getMessageContentNodes,
+  getMessageContentSourceNodes,
   getMessageText,
   getMessageTimestampText,
   getRendererData
 } from '../youtube/messages';
+import { serializeRichMessageNodes, type RichTextSegment } from '../youtube/richText';
 import { CHAT_MESSAGE_SELECTOR } from '../youtube/selectors';
 import type { EmojiToken } from './translation/emojiPlaceholders';
 import type { TranslationResult } from './translation/render';
@@ -23,7 +24,7 @@ const MAX_MESSAGES_PER_USER = 12;
 export interface MessageRecord {
   id: number;
   authorName: string;
-  contentNodes: Node[];
+  contentParts: RichTextSegment[];
   messageRef?: WeakRef<HTMLElement>;
   text: string;
   timestamp: number;
@@ -77,7 +78,7 @@ export function recordUserMessage(message: HTMLElement): void {
   const record: MessageRecord = {
     id: previousRecord?.id || nextRecordId++,
     authorName,
-    contentNodes: getMessageContentNodes(message),
+    contentParts: serializeRichMessageNodes(getMessageContentSourceNodes(message)),
     messageRef: new WeakRef(message),
     text,
     timestamp,

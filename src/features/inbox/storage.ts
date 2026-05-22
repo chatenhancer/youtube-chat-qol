@@ -1,5 +1,4 @@
 import { cleanText } from '../../shared/text';
-import { CHAT_MESSAGE_SELECTOR } from '../../youtube/selectors';
 import { normalizeRichTextSegments } from '../../youtube/richText';
 import {
   normalizeMentionHandles,
@@ -12,6 +11,11 @@ const INBOX_KEYWORDS_STORAGE_KEY = 'ytcqInboxKeywords';
 const MAX_INBOX_RECORDS = 100;
 const ONE_DAY_MS = 24 * 60 * 60 * 1000;
 const CHAT_TIMESTAMP_FUTURE_TOLERANCE_MS = 10 * 60 * 1000;
+const MAX_TIMESTAMP_ORDER_OFFSET = 59_999;
+const MAX_TRACKED_TIMESTAMP_BASES = 720;
+
+const messageTimestampOffsets = new WeakMap<HTMLElement, number>();
+const nextTimestampOffsetByBase = new Map<number, number>();
 
 export interface InboxStoredState {
   keywords: string[];
@@ -48,7 +52,7 @@ export function saveInboxKeywords(keywords: string[]): Promise<void> {
   });
 }
 
-export function serializeInboxRecord(record: InboxRecord): Omit<InboxRecord, 'contentNodes' | 'messageRef'> {
+export function serializeInboxRecord(record: InboxRecord): Omit<InboxRecord, 'messageRef'> {
   return {
     id: record.id,
     authorName: record.authorName,
@@ -75,7 +79,7 @@ export function getInboxTimestamp(message: HTMLElement, timestampText: string, f
   const parsedTimestamp = parseInboxTimestampText(timestampText, fallbackTimestamp);
   if (parsedTimestamp === null) return fallbackTimestamp;
 
-  return parsedTimestamp + getMessageDomOrderOffset(message);
+  return parsedTimestamp + getMessageOrderOffset(message, parsedTimestamp);
 }
 
 function normalizeStoredRecords(value: unknown, getCurrentHandles: () => string[]): InboxRecord[] {
@@ -151,8 +155,28 @@ function parseInboxTimestampText(timestampText: string, referenceTimestamp: numb
   return parsedTimestamp;
 }
 
-function getMessageDomOrderOffset(message: HTMLElement): number {
-  const messages = Array.from(document.querySelectorAll<HTMLElement>(CHAT_MESSAGE_SELECTOR));
-  const index = messages.indexOf(message);
-  return index >= 0 ? Math.min(index, 59_999) : 0;
+function getMessageOrderOffset(message: HTMLElement, baseTimestamp: number): number {
+  const existingOffset = messageTimestampOffsets.get(message);
+  if (existingOffset !== undefined) return existingOffset;
+
+  const nextOffset = Math.min(
+    nextTimestampOffsetByBase.get(baseTimestamp) || 0,
+    MAX_TIMESTAMP_ORDER_OFFSET
+  );
+  messageTimestampOffsets.set(message, nextOffset);
+
+  if (nextOffset < MAX_TIMESTAMP_ORDER_OFFSET) {
+    nextTimestampOffsetByBase.set(baseTimestamp, nextOffset + 1);
+    pruneTimestampOffsetBases();
+  }
+
+  return nextOffset;
+}
+
+function pruneTimestampOffsetBases(): void {
+  while (nextTimestampOffsetByBase.size > MAX_TRACKED_TIMESTAMP_BASES) {
+    const oldestBase = nextTimestampOffsetByBase.keys().next().value;
+    if (oldestBase === undefined) return;
+    nextTimestampOffsetByBase.delete(oldestBase);
+  }
 }

@@ -82,13 +82,17 @@ export function getMessageTextElement(message: HTMLElement): HTMLElement | null 
 }
 
 export function getMessageContentNodes(message: HTMLElement): Node[] {
+  return getMessageContentSourceNodes(message).map((node) => node.cloneNode(true));
+}
+
+export function getMessageContentSourceNodes(message: HTMLElement): Node[] {
   const replaced = replacedMessages.get(message);
   if (replaced?.childNodes.length) {
-    return replaced.childNodes.map((node) => node.cloneNode(true));
+    return replaced.childNodes;
   }
 
   const messageText = getMessageTextElement(message);
-  return messageText ? Array.from(messageText.childNodes).map((node) => node.cloneNode(true)) : [];
+  return messageText ? Array.from(messageText.childNodes) : [];
 }
 
 export function getRendererData(message: HTMLElement): RendererData | null {

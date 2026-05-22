@@ -19,6 +19,10 @@ const IDENTITY_SELECTORS = [
   'yt-live-chat-message-input-renderer [id*="author"]',
   'yt-live-chat-viewer-engagement-message-renderer #author-name'
 ];
+const IDENTITY_MATCH_SELECTOR = [
+  IDENTITY_CONTAINER_SELECTOR,
+  ...IDENTITY_SELECTORS
+].join(',');
 
 type MentionProcessor = (message: HTMLElement) => void;
 
@@ -149,14 +153,16 @@ function mutationMayChangeMentionIdentity(mutation: MutationRecord): boolean {
   }
 
   return Array.from(mutation.addedNodes)
-    .some((node) => node instanceof Element && elementTouchesIdentity(node));
+    .some((node) => node instanceof Element && (
+      elementTouchesIdentity(node) ||
+      Boolean(node.querySelector(IDENTITY_MATCH_SELECTOR))
+    ));
 }
 
 function elementTouchesIdentity(element: Element): boolean {
   return Boolean(
     element.matches(IDENTITY_CONTAINER_SELECTOR) ||
-    element.closest(IDENTITY_CONTAINER_SELECTOR) ||
-    element.querySelector(IDENTITY_CONTAINER_SELECTOR)
+    element.closest(IDENTITY_CONTAINER_SELECTOR)
   );
 }
 
