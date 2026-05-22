@@ -13,6 +13,7 @@ import {
   getMessageTextElement,
   getStoredOriginalMessage
 } from '../../youtube/messages';
+import { CHAT_TOOLTIP_SELECTOR } from '../../youtube/selectors';
 
 export interface EmojiToken {
   placeholder: string;
@@ -233,6 +234,7 @@ function getTranslationTextFromNode(node: Node, emojiTokens: EmojiToken[]): stri
   }
 
   if (!(node instanceof Element)) return '';
+  if (node.matches(CHAT_TOOLTIP_SELECTOR)) return '';
   if (node.classList.contains('ytcq-replaced-translation-icon')) return '';
 
   if (isEmojiElement(node)) {
@@ -243,8 +245,9 @@ function getTranslationTextFromNode(node: Node, emojiTokens: EmojiToken[]): stri
     });
   }
 
-  return getTranslationTextFromNodes(node.childNodes, emojiTokens) ||
-    replaceUnicodeEmojisWithPlaceholders(node.textContent || '', emojiTokens);
+  const childText = getTranslationTextFromNodes(node.childNodes, emojiTokens);
+  if (childText || node.childNodes.length) return childText;
+  return replaceUnicodeEmojisWithPlaceholders(node.textContent || '', emojiTokens);
 }
 
 function getEmojiRunItem(node: Node): { fallbackText: string; node: Node } | null {

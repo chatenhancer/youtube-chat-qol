@@ -6,6 +6,7 @@
  * fragile selectors across the codebase.
  */
 import { cleanText } from '../shared/text';
+import { CHAT_TOOLTIP_SELECTOR } from './selectors';
 
 interface RendererRun {
   text?: string;
@@ -147,12 +148,13 @@ export function getEmojiTextFromRun(run: RendererRun): string {
 }
 
 function getPlainTextFromMessageNodes(element: HTMLElement): string {
-  return Array.from(element.childNodes).map(getPlainTextFromNode).join('') || element.textContent || '';
+  return Array.from(element.childNodes).map(getPlainTextFromNode).join('');
 }
 
 function getPlainTextFromNode(node: Node): string {
   if (node.nodeType === Node.TEXT_NODE) return node.textContent || '';
   if (!(node instanceof Element)) return '';
+  if (node.matches(CHAT_TOOLTIP_SELECTOR)) return '';
 
   const tagName = node.tagName.toLowerCase();
   if (tagName === 'br') return '\n';
@@ -164,7 +166,7 @@ function getPlainTextFromNode(node: Node): string {
       '';
   }
 
-  return Array.from(node.childNodes).map(getPlainTextFromNode).join('') || node.textContent || '';
+  return Array.from(node.childNodes).map(getPlainTextFromNode).join('');
 }
 
 export function rememberOriginalMessageText(message: HTMLElement, messageText: HTMLElement, originalText: string): void {
