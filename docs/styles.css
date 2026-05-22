@@ -397,8 +397,7 @@ h3 {
 }
 
 .feature p,
-.install p,
-.privacy-copy p {
+.install p {
   margin-bottom: 0;
   color: var(--muted);
 }
@@ -617,9 +616,35 @@ figcaption {
   font-size: 18px;
 }
 
-.privacy-copy {
+.privacy-list {
   display: grid;
-  gap: 14px;
+  gap: 12px;
+  margin: 0;
+  padding: 0 0 0 18px;
+  color: var(--muted);
+  border-left: 1px solid var(--line);
+  list-style: none;
+}
+
+.privacy-list li {
+  position: relative;
+  padding-left: 18px;
+}
+
+.privacy-list li::before {
+  position: absolute;
+  top: 0.75em;
+  left: -23.5px;
+  width: 7px;
+  height: 7px;
+  background: var(--blue);
+  border: 2px solid var(--background);
+  border-radius: 50%;
+  content: "";
+}
+
+.privacy-list strong {
+  color: var(--text);
 }
 
 .privacy-actions {
