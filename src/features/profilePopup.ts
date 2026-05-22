@@ -16,7 +16,7 @@ import {
   getReplacementTranslationTitle,
   isMeaningfulTranslation
 } from './translation/render';
-import { createNodesWithEmojiPlaceholders } from './translation/emojiPlaceholders';
+import { createNodesWithPlaceholders } from './translation/protectedPlaceholders';
 import {
   getLiveMessageForRecord,
   getRecentMessagesForIdentity,
@@ -362,7 +362,7 @@ function renderProfileMessageText(
     text.lang = translation.result.targetLanguage;
     text.title = getReplacementTranslationTitle(translation.result, recentMessage.text);
     text.append(
-      ...createNodesWithEmojiPlaceholders(translation.result.text, translation.emojiTokens),
+      ...createNodesWithPlaceholders(translation.result.text, translation.protectedTokens),
       createReplacedTranslationIcon()
     );
     return;
@@ -370,7 +370,7 @@ function renderProfileMessageText(
 
   appendRichMessageText(text, recentMessage.text, [], recentMessage.contentParts);
   if (translation) {
-    text.append(createInlineTranslationElement(translation.result, translation.emojiTokens));
+    text.append(createInlineTranslationElement(translation.result, translation.protectedTokens));
   }
 }
 
@@ -379,7 +379,7 @@ function getVisibleProfileMessageTranslation(recentMessage: MessageRecord): Mess
   const targetLanguage = getOptions().targetLanguage;
   if (!translation || !targetLanguage) return undefined;
   if (translation.result.targetLanguage !== targetLanguage) return undefined;
-  if (!isMeaningfulTranslation(translation.result, translation.emojiTokens, translation.sourceText)) return undefined;
+  if (!isMeaningfulTranslation(translation.result, translation.protectedTokens, translation.sourceText)) return undefined;
   return translation;
 }
 

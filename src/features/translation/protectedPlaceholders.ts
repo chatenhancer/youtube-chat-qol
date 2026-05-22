@@ -1,10 +1,10 @@
 /**
- * Emoji placeholder planning.
+ * Translation placeholder planning.
  *
- * Google Translate often drops or distorts emoji/custom-emote text. Before a
- * request is queued, this module replaces emoji-like message runs with stable
- * placeholders, then maps translated placeholders back to the original emoji
- * tokens during rendering.
+ * Google Translate often drops or distorts emoji/custom-emote text and can
+ * translate @mentions as ordinary words. Before a request is queued, this
+ * module replaces those protected message runs with stable placeholders, then
+ * maps translated placeholders back to the original tokens during rendering.
  */
 import { cleanText } from '../../shared/text';
 import {
@@ -15,7 +15,7 @@ import {
 } from '../../youtube/messages';
 import { CHAT_TOOLTIP_SELECTOR } from '../../youtube/selectors';
 
-export interface EmojiToken {
+export interface ProtectedToken {
   placeholder: string;
   fallbackText: string;
   node: Node | null;
@@ -24,23 +24,25 @@ export interface EmojiToken {
 
 export interface TranslationPlan {
   text: string;
-  emojiTokens: EmojiToken[];
+  protectedTokens: ProtectedToken[];
 }
 
-const EMOJI_PLACEHOLDER_PATTERN = /_{0,2}\s*YTCQ[\s_-]*EMOJI[\s_-]*(\d+)[\s_-]*TOKEN\s*_{0,2}/gi;
+const PROTECTED_PLACEHOLDER_PATTERN = /_{0,2}\s*YTCQ[\s_-]*TOKEN[\s_-]*(\d+)[\s_-]*PLACEHOLDER\s*_{0,2}/gi;
+const MENTION_PATTERN = /(^|[^\p{L}\p{N}_])(@[\p{L}\p{N}_][^\s@]*)/gu;
+const MENTION_TRAILING_PUNCTUATION_PATTERN = /[),.!?;:'"’”\]]+$/u;
 const UNICODE_EMOJI_PATTERN = /\p{Extended_Pictographic}(?:[\uFE0E\uFE0F]|[\u{1F3FB}-\u{1F3FF}])?(?:\u200D\p{Extended_Pictographic}(?:[\uFE0E\uFE0F]|[\u{1F3FB}-\u{1F3FF}])?)*/gu;
 
 export function createTranslationPlan(message: HTMLElement, originalText: string): TranslationPlan {
-  const emojiTokens: EmojiToken[] = [];
+  const protectedTokens: ProtectedToken[] = [];
   const messageText = getMessageTextElement(message);
   const original = getStoredOriginalMessage(message);
   const sourceNodes = original?.childNodes || messageText?.childNodes;
-  const domText = getTranslationTextFromNodes(sourceNodes, emojiTokens);
+  const domText = getTranslationTextFromNodes(sourceNodes, protectedTokens);
 
   if (domText) {
     return {
-      text: cleanText(domText),
-      emojiTokens
+      text: cleanText(replaceMentionsWithPlaceholders(domText, protectedTokens)),
+      protectedTokens
     };
   }
 
@@ -74,8 +76,8 @@ export function createTranslationPlan(message: HTMLElement, originalText: string
 
     const flushEmojiRun = (): void => {
       if (!emojiRunText && !emojiRunNodes.length) return;
-      parts.push(createEmojiPlaceholderToken({
-        emojiTokens,
+      parts.push(createProtectedPlaceholderToken({
+        protectedTokens,
         fallbackText: emojiRunText,
         nodes: emojiRunNodes
       }));
@@ -93,7 +95,7 @@ export function createTranslationPlan(message: HTMLElement, originalText: string
 
         flushEmojiRun();
         flushPendingWhitespaceToParts();
-        parts.push(replaceUnicodeEmojisWithPlaceholders(run.text, emojiTokens));
+        parts.push(replaceProtectedTextWithPlaceholders(run.text, protectedTokens));
         return;
       }
       if (!run.emoji) {
@@ -112,44 +114,44 @@ export function createTranslationPlan(message: HTMLElement, originalText: string
     flushPendingWhitespaceToParts();
 
     return {
-      text: cleanText(parts.join('')),
-      emojiTokens
+      text: cleanText(replaceMentionsWithPlaceholders(parts.join(''), protectedTokens)),
+      protectedTokens
     };
   }
 
   return {
-    text: cleanText(replaceUnicodeEmojisWithPlaceholders(originalText, emojiTokens)),
-    emojiTokens
+    text: cleanText(replaceProtectedTextWithPlaceholders(originalText, protectedTokens)),
+    protectedTokens
   };
 }
 
-export function restoreEmojiPlaceholdersToText(text: string, emojiTokens: EmojiToken[]): string {
-  return createNodesWithEmojiPlaceholders(text, emojiTokens)
+export function restorePlaceholdersToText(text: string, protectedTokens: ProtectedToken[]): string {
+  return createNodesWithPlaceholders(text, protectedTokens)
     .map((node) => node.textContent || (node instanceof Element ? node.getAttribute('alt') || '' : ''))
     .join('');
 }
 
-export function hasTextOutsideEmojiPlaceholders(text: string): boolean {
-  EMOJI_PLACEHOLDER_PATTERN.lastIndex = 0;
-  const withoutPlaceholders = String(text || '').replace(EMOJI_PLACEHOLDER_PATTERN, '');
+export function hasTextOutsidePlaceholders(text: string): boolean {
+  PROTECTED_PLACEHOLDER_PATTERN.lastIndex = 0;
+  const withoutPlaceholders = String(text || '').replace(PROTECTED_PLACEHOLDER_PATTERN, '');
   return Boolean(cleanText(withoutPlaceholders));
 }
 
-export function createNodesWithEmojiPlaceholders(text: string, emojiTokens: EmojiToken[]): Node[] {
+export function createNodesWithPlaceholders(text: string, protectedTokens: ProtectedToken[]): Node[] {
   const nodes: Node[] = [];
-  const source = removeLeakedEmojiShortcodes(String(text || ''), emojiTokens);
+  const source = removeLeakedEmojiShortcodes(String(text || ''), protectedTokens);
   let lastIndex = 0;
   const restoredTokenIndexes = new Set<number>();
-  EMOJI_PLACEHOLDER_PATTERN.lastIndex = 0;
+  PROTECTED_PLACEHOLDER_PATTERN.lastIndex = 0;
 
-  for (let match = EMOJI_PLACEHOLDER_PATTERN.exec(source); match; match = EMOJI_PLACEHOLDER_PATTERN.exec(source)) {
+  for (let match = PROTECTED_PLACEHOLDER_PATTERN.exec(source); match; match = PROTECTED_PLACEHOLDER_PATTERN.exec(source)) {
     if (match.index > lastIndex) {
       nodes.push(document.createTextNode(source.slice(lastIndex, match.index)));
     }
 
     const tokenIndex = Number(match[1]);
     restoredTokenIndexes.add(tokenIndex);
-    nodes.push(...createEmojiTokenNodes(emojiTokens[tokenIndex]));
+    nodes.push(...createProtectedTokenNodes(protectedTokens[tokenIndex]));
     lastIndex = match.index + match[0].length;
   }
 
@@ -157,15 +159,15 @@ export function createNodesWithEmojiPlaceholders(text: string, emojiTokens: Emoj
     nodes.push(document.createTextNode(source.slice(lastIndex)));
   }
 
-  emojiTokens.forEach((token, index) => {
+  protectedTokens.forEach((token, index) => {
     if (restoredTokenIndexes.has(index)) return;
-    appendMissingEmojiToken(nodes, token);
+    appendMissingProtectedToken(nodes, token);
   });
 
   return nodes.length ? nodes : [document.createTextNode(source)];
 }
 
-function getTranslationTextFromNodes(nodes: NodeListOf<ChildNode> | Node[] | undefined, emojiTokens: EmojiToken[]): string {
+function getTranslationTextFromNodes(nodes: NodeListOf<ChildNode> | Node[] | undefined, protectedTokens: ProtectedToken[]): string {
   if (!nodes?.length) return '';
 
   const parts: string[] = [];
@@ -193,8 +195,8 @@ function getTranslationTextFromNodes(nodes: NodeListOf<ChildNode> | Node[] | und
 
   const flushEmojiRun = (): void => {
     if (!emojiRunText && !emojiRunNodes.length) return;
-    parts.push(createEmojiPlaceholderToken({
-      emojiTokens,
+    parts.push(createProtectedPlaceholderToken({
+      protectedTokens,
       fallbackText: emojiRunText,
       nodes: emojiRunNodes
     }));
@@ -219,7 +221,7 @@ function getTranslationTextFromNodes(nodes: NodeListOf<ChildNode> | Node[] | und
 
     flushEmojiRun();
     flushPendingWhitespaceToParts();
-    parts.push(getTranslationTextFromNode(node, emojiTokens));
+    parts.push(getTranslationTextFromNode(node, protectedTokens));
   });
   movePendingWhitespaceToEmojiRun();
   flushEmojiRun();
@@ -228,9 +230,9 @@ function getTranslationTextFromNodes(nodes: NodeListOf<ChildNode> | Node[] | und
   return parts.join('');
 }
 
-function getTranslationTextFromNode(node: Node, emojiTokens: EmojiToken[]): string {
+function getTranslationTextFromNode(node: Node, protectedTokens: ProtectedToken[]): string {
   if (node.nodeType === Node.TEXT_NODE) {
-    return replaceUnicodeEmojisWithPlaceholders(node.textContent || '', emojiTokens);
+    return replaceProtectedTextWithPlaceholders(node.textContent || '', protectedTokens);
   }
 
   if (!(node instanceof Element)) return '';
@@ -238,16 +240,16 @@ function getTranslationTextFromNode(node: Node, emojiTokens: EmojiToken[]): stri
   if (node.classList.contains('ytcq-replaced-translation-icon')) return '';
 
   if (isEmojiElement(node)) {
-    return createEmojiPlaceholderToken({
-      emojiTokens,
+    return createProtectedPlaceholderToken({
+      protectedTokens,
       fallbackText: getEmojiTextFromElement(node),
       node
     });
   }
 
-  const childText = getTranslationTextFromNodes(node.childNodes, emojiTokens);
+  const childText = getTranslationTextFromNodes(node.childNodes, protectedTokens);
   if (childText || node.childNodes.length) return childText;
-  return replaceUnicodeEmojisWithPlaceholders(node.textContent || '', emojiTokens);
+  return replaceProtectedTextWithPlaceholders(node.textContent || '', protectedTokens);
 }
 
 function getEmojiRunItem(node: Node): { fallbackText: string; node: Node } | null {
@@ -281,7 +283,42 @@ function getEmojiTextFromElement(element: Element): string {
   );
 }
 
-function replaceUnicodeEmojisWithPlaceholders(text: string, emojiTokens: EmojiToken[]): string {
+function replaceProtectedTextWithPlaceholders(text: string, protectedTokens: ProtectedToken[]): string {
+  return replaceUnicodeEmojisWithPlaceholders(
+    replaceMentionsWithPlaceholders(text, protectedTokens),
+    protectedTokens
+  );
+}
+
+function replaceMentionsWithPlaceholders(text: string, protectedTokens: ProtectedToken[]): string {
+  return String(text || '').replace(MENTION_PATTERN, (_match, prefix: string, rawMention: string) => {
+    const { mention, suffix } = splitMentionSuffix(rawMention);
+    if (!mention) return `${prefix}${rawMention}`;
+
+    return `${prefix}${createProtectedPlaceholderToken({
+      protectedTokens,
+      fallbackText: mention,
+      nodes: [document.createTextNode(mention)]
+    })}${suffix}`;
+  });
+}
+
+function splitMentionSuffix(rawMention: string): { mention: string; suffix: string } {
+  let mention = rawMention;
+  let suffix = '';
+
+  while (mention.length > 1 && MENTION_TRAILING_PUNCTUATION_PATTERN.test(mention)) {
+    suffix = `${mention.slice(-1)}${suffix}`;
+    mention = mention.slice(0, -1);
+  }
+
+  return {
+    mention,
+    suffix
+  };
+}
+
+function replaceUnicodeEmojisWithPlaceholders(text: string, protectedTokens: ProtectedToken[]): string {
   const source = String(text || '');
   let result = '';
   let lastIndex = 0;
@@ -305,8 +342,8 @@ function replaceUnicodeEmojisWithPlaceholders(text: string, emojiTokens: EmojiTo
 
   const flushEmojiRun = (): void => {
     if (!emojiRunText) return;
-    result += createEmojiPlaceholderToken({
-      emojiTokens,
+    result += createProtectedPlaceholderToken({
+      protectedTokens,
       fallbackText: emojiRunText,
       nodes: []
     });
@@ -343,25 +380,25 @@ function replaceUnicodeEmojisWithPlaceholders(text: string, emojiTokens: EmojiTo
   return result;
 }
 
-function createEmojiPlaceholderToken({
-  emojiTokens,
+function createProtectedPlaceholderToken({
+  protectedTokens,
   fallbackText,
   node,
   nodes
 }: {
-  emojiTokens: EmojiToken[];
+  protectedTokens: ProtectedToken[];
   fallbackText: string;
   node?: Element | Node | null;
   nodes?: Node[];
 }): string {
-  const index = emojiTokens.length;
-  const placeholder = `__YTCQ_EMOJI_${index}_TOKEN__`;
+  const index = protectedTokens.length;
+  const placeholder = `__YTCQ_TOKEN_${index}_PLACEHOLDER__`;
   const tokenNodes = nodes?.length
     ? nodes.map((emojiNode) => emojiNode.cloneNode(true))
     : node
       ? [node.cloneNode(true)]
       : [];
-  emojiTokens.push({
+  protectedTokens.push({
     placeholder,
     fallbackText: fallbackText || '',
     node: tokenNodes[0] || null,
@@ -370,8 +407,8 @@ function createEmojiPlaceholderToken({
   return placeholder;
 }
 
-function removeLeakedEmojiShortcodes(text: string, emojiTokens: EmojiToken[]): string {
-  if (!emojiTokens.length) return text;
+function removeLeakedEmojiShortcodes(text: string, protectedTokens: ProtectedToken[]): string {
+  if (!protectedTokens.length) return text;
   return text.replace(/(^|\s):[\p{L}\p{N}_]+(?:-[\p{L}\p{N}_]+)+:(?=\s|$)/gu, '$1');
 }
 
@@ -383,7 +420,7 @@ function isWhitespaceOnly(text: string): boolean {
   return Boolean(text) && /^\s+$/u.test(text);
 }
 
-function appendMissingEmojiToken(nodes: Node[], token: EmojiToken): void {
+function appendMissingProtectedToken(nodes: Node[], token: ProtectedToken): void {
   if (!token) return;
   const lastNode = nodes[nodes.length - 1];
   const lastText = lastNode?.nodeType === Node.TEXT_NODE ? lastNode.textContent || '' : '';
@@ -392,10 +429,10 @@ function appendMissingEmojiToken(nodes: Node[], token: EmojiToken): void {
     nodes.push(document.createTextNode(' '));
   }
 
-  nodes.push(...createEmojiTokenNodes(token));
+  nodes.push(...createProtectedTokenNodes(token));
 }
 
-function createEmojiTokenNodes(token: EmojiToken | undefined): Node[] {
+function createProtectedTokenNodes(token: ProtectedToken | undefined): Node[] {
   if (token?.nodes?.length) return token.nodes.map((node) => node.cloneNode(true));
   if (token?.node) return [token.node.cloneNode(true)];
   return [document.createTextNode(token?.fallbackText || '')];

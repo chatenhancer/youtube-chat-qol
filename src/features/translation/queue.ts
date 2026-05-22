@@ -14,14 +14,14 @@ import {
   clearUserMessageTranslations,
   recordUserMessageTranslation
 } from '../userMessageHistory';
-import { createTranslationPlan, hasTextOutsideEmojiPlaceholders, type EmojiToken } from './emojiPlaceholders';
+import { createTranslationPlan, hasTextOutsidePlaceholders, type ProtectedToken } from './protectedPlaceholders';
 import { clearTranslationRenderings, removeTranslation, renderTranslation, type TranslationResult } from './render';
 
 interface PendingTranslationEntry {
   message: HTMLElement;
   originalText: string;
   sourceText: string;
-  emojiTokens: EmojiToken[];
+  protectedTokens: ProtectedToken[];
 }
 
 interface TranslationJob {
@@ -54,7 +54,7 @@ export function queueMessageTranslation(message: HTMLElement, { backfill = false
   const key = makeTranslationKey(plan.text, options.targetLanguage);
 
   if (!details.text || !key || message.dataset.ytcqTranslationKey === key) return;
-  if (!hasTextOutsideEmojiPlaceholders(plan.text)) return;
+  if (!hasTextOutsidePlaceholders(plan.text)) return;
   if (!isUsefulTranslationCandidate(details.text)) return;
 
   message.dataset.ytcqTranslationKey = key;
@@ -62,13 +62,13 @@ export function queueMessageTranslation(message: HTMLElement, { backfill = false
 
   const cached = translationCache.get(key);
   if (cached) {
-    const rendered = renderTranslation(message, cached, details.text, plan.emojiTokens, plan.text);
+    const rendered = renderTranslation(message, cached, details.text, plan.protectedTokens, plan.text);
     if (!rendered) {
       translationCache.delete(key);
       delete message.dataset.ytcqTranslationKey;
       clearUserMessageTranslation(message);
     } else {
-      recordUserMessageTranslation(message, cached, details.text, plan.emojiTokens, plan.text);
+      recordUserMessageTranslation(message, cached, details.text, plan.protectedTokens, plan.text);
     }
     return;
   }
@@ -77,7 +77,7 @@ export function queueMessageTranslation(message: HTMLElement, { backfill = false
     message,
     originalText: details.text,
     sourceText: plan.text,
-    emojiTokens: plan.emojiTokens
+    protectedTokens: plan.protectedTokens
   };
 
   if (pendingTranslations.has(key)) {
@@ -165,9 +165,9 @@ function pumpTranslationQueue(): void {
     .then((result) => {
       let renderedAny = false;
       for (const entry of pendingTranslations.get(job.key) || []) {
-        const rendered = renderTranslation(entry.message, result, entry.originalText, entry.emojiTokens, entry.sourceText);
+        const rendered = renderTranslation(entry.message, result, entry.originalText, entry.protectedTokens, entry.sourceText);
         if (rendered) {
-          recordUserMessageTranslation(entry.message, result, entry.originalText, entry.emojiTokens, entry.sourceText);
+          recordUserMessageTranslation(entry.message, result, entry.originalText, entry.protectedTokens, entry.sourceText);
           renderedAny = true;
         } else {
           delete entry.message.dataset.ytcqTranslationKey;
