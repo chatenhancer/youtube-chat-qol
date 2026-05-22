@@ -43,7 +43,7 @@
     <link rel="icon" href="assets/icons/icon-128.png">
     <link rel="apple-touch-icon" href="assets/icons/icon-128.png">
     <link rel="preload" href="assets/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="stylesheet" href="styles.css?v=11">
+    <link rel="stylesheet" href="styles.css?v=20">
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -310,28 +310,29 @@
               <a class="button button-secondary" href="https://github.com/chat-enhancer-yt/youtube-chat-qol/blob/main/PRIVACY.md">Read the full privacy policy</a>
             </div>
           </div>
-          <div class="privacy-copy">
-            <p>
-              Most features run in your browser. Settings are saved with your
-              browser's extension storage so they can follow your extension
-              install. Your inbox messages, inbox keywords, and frequent emoji
-              counts are stored locally on your device.
-            </p>
-            <p>
-              Recent profile messages are only kept in memory for the current
-              chat page. When you leave or reload the page, that temporary
-              recent-message context is cleared.
-            </p>
-            <p>
-              Translation is off by default. When you choose a translation
-              language, chat message text is sent to the Google Translate
-              endpoint so the translated text can be shown in chat.
-            </p>
-            <p>
-              Chat Enhancer for YouTube does not sell user data and is not
-              affiliated with YouTube or Google.
-            </p>
-          </div>
+          <ul class="privacy-list" aria-label="Privacy summary">
+            <li>
+              <strong>Live chat only.</strong>
+              The extension runs only on YouTube live chat and live chat replay
+              pages matched by its manifest.
+            </li>
+            <li>
+              <strong>Local storage.</strong>
+              Settings, inbox messages, watched keywords, and frequent emoji
+              counts stay in browser extension storage.
+            </li>
+            <li>
+              <strong>Opt-in translation.</strong>
+              Chat text is not sent to a translation provider while translation
+              is off. If enabled, message text is sent to Google Translate
+              without your YouTube cookies or credentials.
+            </li>
+            <li>
+              <strong>No analytics.</strong>
+              The extension does not run analytics, collect browsing history, or
+              send data to an extension-owned server.
+            </li>
+          </ul>
         </div>
       </section>
 
