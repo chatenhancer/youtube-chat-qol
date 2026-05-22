@@ -1,5 +1,6 @@
 import { cleanText } from '../../shared/text';
 import { normalizeRichTextSegments } from '../../youtube/richText';
+import { getChatTimestampValue, isLiveChatReplayUrl } from '../../youtube/timestamps';
 import {
   normalizeMentionHandles,
   normalizeStoredKeywords
@@ -9,8 +10,6 @@ import type { InboxRecord } from './types';
 const INBOX_RECORDS_STORAGE_KEY_PREFIX = 'ytcqInboxRecords';
 const INBOX_KEYWORDS_STORAGE_KEY = 'ytcqInboxKeywords';
 const MAX_INBOX_RECORDS = 100;
-const ONE_DAY_MS = 24 * 60 * 60 * 1000;
-const CHAT_TIMESTAMP_FUTURE_TOLERANCE_MS = 10 * 60 * 1000;
 const MAX_TIMESTAMP_ORDER_OFFSET = 59_999;
 const MAX_TRACKED_TIMESTAMP_BASES = 720;
 
@@ -80,7 +79,9 @@ export function sortAndTrimRecords(nextRecords: InboxRecord[]): InboxRecord[] {
 }
 
 export function getInboxTimestamp(message: HTMLElement, timestampText: string, fallbackTimestamp: number): number {
-  const parsedTimestamp = parseInboxTimestampText(timestampText, fallbackTimestamp);
+  const parsedTimestamp = getChatTimestampValue(timestampText, fallbackTimestamp, {
+    preferElapsed: isLiveChatReplayUrl(message.ownerDocument?.location?.href || window.location.href)
+  });
   if (parsedTimestamp === null) return fallbackTimestamp;
 
   return parsedTimestamp + getMessageOrderOffset(message, parsedTimestamp);
@@ -108,7 +109,10 @@ function normalizeStoredRecord(value: unknown, getCurrentHandles: () => string[]
     hour: 'numeric',
     minute: '2-digit'
   }).format(storedTimestamp);
-  const timestamp = parseInboxTimestampText(timestampText, storedTimestamp) ?? storedTimestamp;
+  const sourceUrl = cleanText(candidate.sourceUrl);
+  const timestamp = getChatTimestampValue(timestampText, storedTimestamp, {
+    preferElapsed: isLiveChatReplayUrl(sourceUrl)
+  }) ?? storedTimestamp;
   const mention = candidate.mention !== false;
 
   return {
@@ -120,43 +124,11 @@ function normalizeStoredRecord(value: unknown, getCurrentHandles: () => string[]
     mentionHandles: normalizeMentionHandles(candidate.mentionHandles, text, mention, getCurrentHandles),
     messageId: cleanText(candidate.messageId),
     read: candidate.read === true,
-    sourceUrl: cleanText(candidate.sourceUrl),
+    sourceUrl,
     text,
     timestamp,
     timestampText
   };
-}
-
-function parseInboxTimestampText(timestampText: string, referenceTimestamp: number): number | null {
-  const normalized = cleanText(timestampText).replace(/\./g, '').toLocaleUpperCase();
-  const match = normalized.match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?\s*([AP]M)?$/);
-  if (!match) return null;
-
-  let hour = Number(match[1]);
-  const minute = Number(match[2]);
-  const second = match[3] ? Number(match[3]) : 0;
-  const meridiem = match[4];
-
-  if (!Number.isFinite(hour) || !Number.isFinite(minute) || !Number.isFinite(second)) return null;
-  if (minute > 59 || second > 59) return null;
-
-  if (meridiem) {
-    if (hour < 1 || hour > 12) return null;
-    if (hour === 12) hour = 0;
-    if (meridiem === 'PM') hour += 12;
-  } else if (hour > 23) {
-    return null;
-  }
-
-  const date = new Date(referenceTimestamp);
-  date.setHours(hour, minute, second, 0);
-  let parsedTimestamp = date.getTime();
-
-  if (parsedTimestamp > referenceTimestamp + CHAT_TIMESTAMP_FUTURE_TOLERANCE_MS) {
-    parsedTimestamp -= ONE_DAY_MS;
-  }
-
-  return parsedTimestamp;
 }
 
 function getMessageOrderOffset(message: HTMLElement, baseTimestamp: number): number {
