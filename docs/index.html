@@ -43,7 +43,7 @@
     <link rel="icon" href="assets/icons/icon-128.png">
     <link rel="apple-touch-icon" href="assets/icons/icon-128.png">
     <link rel="preload" href="assets/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="stylesheet" href="styles.css?v=20">
+    <link rel="stylesheet" href="styles.css?v=22">
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -310,29 +310,24 @@
               <a class="button button-secondary" href="https://github.com/chat-enhancer-yt/youtube-chat-qol/blob/main/PRIVACY.md">Read the full privacy policy</a>
             </div>
           </div>
-          <ul class="privacy-list" aria-label="Privacy summary">
-            <li>
-              <strong>Live chat only.</strong>
-              The extension runs only on YouTube live chat and live chat replay
-              pages matched by its manifest.
-            </li>
-            <li>
-              <strong>Local storage.</strong>
-              Settings, inbox messages, watched keywords, and frequent emoji
-              counts stay in browser extension storage.
-            </li>
-            <li>
-              <strong>Opt-in translation.</strong>
-              Chat text is not sent to a translation provider while translation
-              is off. If enabled, message text is sent to Google Translate
-              without your YouTube cookies or credentials.
-            </li>
-            <li>
-              <strong>No analytics.</strong>
-              The extension does not run analytics, collect browsing history, or
-              send data to an extension-owned server.
-            </li>
-          </ul>
+          <dl class="privacy-list" aria-label="Privacy summary">
+            <div>
+              <dt>Scope</dt>
+              <dd>Runs only on YouTube live chat and live chat replay pages.</dd>
+            </div>
+            <div>
+              <dt>Storage</dt>
+              <dd>Settings, inbox messages, watched keywords, and frequent emoji counts stay in browser extension storage.</dd>
+            </div>
+            <div>
+              <dt>Translation</dt>
+              <dd>Off by default. If enabled, message text is sent to Google Translate without your YouTube cookies or credentials.</dd>
+            </div>
+            <div>
+              <dt>Tracking</dt>
+              <dd>No analytics, browsing history collection, data resale, or extension-owned server.</dd>
+            </div>
+          </dl>
         </div>
       </section>
 

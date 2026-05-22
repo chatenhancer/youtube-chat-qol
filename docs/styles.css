@@ -618,33 +618,39 @@ figcaption {
 
 .privacy-list {
   display: grid;
-  gap: 12px;
   margin: 0;
-  padding: 0 0 0 18px;
-  color: var(--muted);
-  border-left: 1px solid var(--line);
-  list-style: none;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 8px;
 }
 
-.privacy-list li {
-  position: relative;
-  padding-left: 18px;
+.privacy-list div {
+  display: grid;
+  grid-template-columns: 112px minmax(0, 1fr);
+  gap: 18px;
+  padding: 13px 16px;
+  background: var(--surface);
 }
 
-.privacy-list li::before {
-  position: absolute;
-  top: 0.75em;
-  left: -23.5px;
-  width: 7px;
-  height: 7px;
-  background: var(--blue);
-  border: 2px solid var(--background);
-  border-radius: 50%;
-  content: "";
+.privacy-list div + div {
+  border-top: 1px solid var(--line);
 }
 
-.privacy-list strong {
+.privacy-list div:nth-child(even) {
+  background: var(--soft);
+}
+
+.privacy-list dt {
   color: var(--text);
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.privacy-list dd {
+  margin: 0;
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.55;
 }
 
 .privacy-actions {
@@ -690,7 +696,8 @@ figcaption {
   .command-notes,
   .command-groups,
   .install-inner,
-  .privacy-inner {
+  .privacy-inner,
+  .privacy-list div {
     grid-template-columns: 1fr;
   }
 
