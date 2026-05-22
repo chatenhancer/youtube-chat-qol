@@ -620,30 +620,45 @@ figcaption {
   display: grid;
   margin: 0;
   overflow: hidden;
+  background: var(--surface);
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: 14px;
+  box-shadow: 0 18px 38px rgba(23, 25, 31, 0.055);
 }
 
 .privacy-list div {
   display: grid;
-  grid-template-columns: 112px minmax(0, 1fr);
-  gap: 18px;
-  padding: 13px 16px;
-  background: var(--surface);
+  grid-template-columns: 118px minmax(0, 1fr);
+  align-items: start;
+  gap: 20px;
+  padding: 17px 20px;
 }
 
 .privacy-list div + div {
   border-top: 1px solid var(--line);
 }
 
-.privacy-list div:nth-child(even) {
-  background: var(--soft);
+.privacy-list dt {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1.45;
 }
 
-.privacy-list dt {
-  color: var(--text);
-  font-size: 14px;
-  font-weight: 800;
+.privacy-list dt::before {
+  width: 8px;
+  height: 8px;
+  flex: 0 0 auto;
+  background: var(--logo-red-start);
+  border-radius: 999px;
+  content: "";
+}
+
+.privacy-list div:nth-child(even) dt::before {
+  background: var(--blue);
 }
 
 .privacy-list dd {
