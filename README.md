@@ -24,6 +24,7 @@ Not affiliated with YouTube or Google.
 
 - Translate live chat messages, with `Off` as the default.
 - Choose whether translations replace the original message or appear below it.
+- See translated messages in chat and in recent-message cards.
 
 ### Mention and quote
 
@@ -32,9 +33,10 @@ Not affiliated with YouTube or Google.
 
 ### Chat context
 
-- Click an avatar to see that user's recent messages and open their channel.
-- Keep a local inbox for messages that mention your handle or match your keywords.
-- Optionally play a subtle sound when chat saves a new inbox message.
+- Click an avatar or participant avatar to see that user's recent messages, jump back to visible messages, and open their channel.
+- Keep a local inbox for messages that mention your handle or match watched keywords.
+- Add watched keywords from the inbox and highlight matches in chat.
+- Show a browser-tab alert for unread inbox messages, with an optional subtle sound.
 
 ### Chat comfort
 
@@ -123,8 +125,26 @@ npm run build:firefox
 
 1. Update `version` in `package.json`.
 2. Run `npm run verify`.
-3. Run `npm run zip:all`.
-4. Upload the generated browser-specific zip from `dist/release/` to the relevant store. Use the `source` zip for Firefox source-code review when needed.
+3. Commit the version bump and create a tag such as `v0.7.6`.
+4. Push the commit and tag.
+
+The release workflow builds Chrome, Edge, Firefox, and source archives, then attaches them to a GitHub Release.
+Store submission only runs for exact `vX.Y.Z` tags that match the `package.json` version.
+
+Store submission is automatic on tags when these repository settings are present:
+
+- Repository variables:
+  - `CHROME_WEBSTORE_EXTENSION_ID`
+  - `CHROME_WEBSTORE_PUBLISHER_ID`
+  - `FIREFOX_AMO_ADDON_ID`
+  - optional `FIREFOX_AMO_APPROVAL_NOTES`
+  - optional `FIREFOX_AMO_RELEASE_NOTES`
+- Repository secrets:
+  - `CHROME_WEBSTORE_SERVICE_ACCOUNT_JSON`
+  - `FIREFOX_AMO_API_KEY`
+  - `FIREFOX_AMO_API_SECRET`
+
+If those settings are missing, the workflow still produces release zips and skips store submission.
 
 ## License
 

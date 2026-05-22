@@ -19,7 +19,10 @@
     "zip:chrome": "npm run build:chrome && node scripts/zip.mjs --target=chrome",
     "zip:edge": "npm run build:edge && node scripts/zip.mjs --target=edge",
     "zip:firefox": "npm run build:firefox && node scripts/zip.mjs --target=firefox",
-    "zip:all": "npm run build:all && node scripts/zip.mjs --all"
+    "zip:all": "npm run build:all && node scripts/zip.mjs --all",
+    "release:validate-tag": "node scripts/validate-release-tag.mjs",
+    "release:chrome": "node scripts/submit-chrome-webstore.mjs",
+    "release:firefox": "node scripts/submit-firefox-amo.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^9.27.0",
