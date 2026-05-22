@@ -9,6 +9,7 @@ import { normalizeComparableText } from '../shared/text';
 import {
   getAuthorName,
   getMessageContentSourceNodes,
+  getMessageStableId,
   getMessageText,
   getMessageTimestampText,
   getRendererData
@@ -25,6 +26,7 @@ export interface MessageRecord {
   id: number;
   authorName: string;
   contentParts: RichTextSegment[];
+  messageId?: string;
   messageRef?: WeakRef<HTMLElement>;
   text: string;
   timestamp: number;
@@ -66,12 +68,30 @@ export function recordUserMessage(message: HTMLElement): void {
   const text = getMessageText(message);
   if (!authorName || !text) return;
 
-  const signature = `${authorName}\n${text}`;
+  const messageId = getMessageStableId(message);
+  const signature = `${messageId || 'message-content'}\n${authorName}\n${text}`;
   const previousRecord = recordsByElement.get(message);
   if (previousRecord?.signature === signature) return;
 
-  if (previousRecord) {
+  const existingRecord = messageId ? findRecordByMessageId(key, messageId) : null;
+  if (previousRecord && previousRecord.id !== existingRecord?.id) {
     removeRecord(previousRecord.key, previousRecord.id);
+  }
+
+  if (existingRecord) {
+    existingRecord.authorName = authorName;
+    existingRecord.contentParts = serializeRichMessageNodes(getMessageContentSourceNodes(message));
+    existingRecord.messageId = messageId;
+    existingRecord.messageRef = new WeakRef(message);
+    existingRecord.text = text;
+    existingRecord.timestampText = getMessageTimestampText(message, existingRecord.timestamp);
+    recordsByElement.set(message, {
+      key,
+      id: existingRecord.id,
+      signature
+    });
+    notifyUserMessageListeners(key);
+    return;
   }
 
   const timestamp = Date.now();
@@ -79,6 +99,7 @@ export function recordUserMessage(message: HTMLElement): void {
     id: previousRecord?.id || nextRecordId++,
     authorName,
     contentParts: serializeRichMessageNodes(getMessageContentSourceNodes(message)),
+    messageId,
     messageRef: new WeakRef(message),
     text,
     timestamp,
@@ -206,6 +227,10 @@ function removeRecord(key: string, id: number): void {
     recordsByUser.delete(key);
     latestByUser.delete(key);
   }
+}
+
+function findRecordByMessageId(key: string, messageId: string): MessageRecord | null {
+  return recordsByUser.get(key)?.find((record) => record.messageId === messageId) || null;
 }
 
 function pruneOldUsers(): void {
