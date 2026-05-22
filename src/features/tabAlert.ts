@@ -5,14 +5,15 @@
  * the watch page. When possible, update the top document's title/favicon so a
  * background tab can signal unread inbox messages without adding more controls.
  */
-const ALERT_FAVICON_ID = 'ytcq-tab-alert-favicon';
-const RESTORE_FAVICON_ID = 'ytcq-tab-alert-restore-favicon';
+const ALERT_FAVICON_CLASS = 'ytcq-tab-alert-favicon';
 const ALERT_STATE_DATASET_KEY = 'ytcqTabAlertActive';
 const TITLE_PREFIX_PATTERN = /^\((?:\d+|99\+)\)\s+/;
+const FAVICON_SELECTOR = 'link[rel~="icon"], link[rel~="shortcut"][rel~="icon"]';
+const ALERT_FAVICON_SIZES = ['32x32', '48x48', '96x96', '144x144'];
 
 let listenersAttached = false;
 let alertActive = false;
-let originalFaviconHref = '';
+let originalFaviconLinks: HTMLLinkElement[] = [];
 
 export function initInboxTabAlert(): void {
   if (listenersAttached) return;
@@ -46,16 +47,16 @@ export function clearInboxTabAlert(): void {
   const topDocument = getTopDocument();
   if (!topDocument) return;
 
-  const alertFavicon = topDocument.getElementById(ALERT_FAVICON_ID);
-  if (alertActive || alertFavicon || topDocument.documentElement.dataset[ALERT_STATE_DATASET_KEY] === 'true') {
+  const alertFavicons = getAlertFaviconLinks(topDocument);
+  if (alertActive || alertFavicons.length || topDocument.documentElement.dataset[ALERT_STATE_DATASET_KEY] === 'true') {
     topDocument.title = stripAlertPrefix(topDocument.title);
-    alertFavicon?.remove();
+    removeAlertFavicons(topDocument);
     restoreOriginalFavicon(topDocument);
     delete topDocument.documentElement.dataset[ALERT_STATE_DATASET_KEY];
   }
 
   alertActive = false;
-  originalFaviconHref = '';
+  originalFaviconLinks = [];
 }
 
 export function isCurrentTabActive(): boolean {
@@ -100,43 +101,53 @@ function setAlertFavicon(topDocument: Document): void {
   const head = topDocument.head || topDocument.documentElement;
   if (!head) return;
 
-  originalFaviconHref ||= getCurrentFaviconHref(topDocument);
-  topDocument.getElementById(RESTORE_FAVICON_ID)?.remove();
-
-  let link = topDocument.getElementById(ALERT_FAVICON_ID) as HTMLLinkElement | null;
-  if (!link) {
-    link = topDocument.createElement('link');
-    link.id = ALERT_FAVICON_ID;
-    link.rel = 'icon';
-    link.type = 'image/svg+xml';
-    head.append(link);
+  if (!originalFaviconLinks.length) {
+    originalFaviconLinks = getPageFaviconLinks(topDocument).map((link) => link.cloneNode(true) as HTMLLinkElement);
   }
 
-  link.href = `data:image/svg+xml,${encodeURIComponent(createAlertFaviconSvg())}`;
+  getPageFaviconLinks(topDocument).forEach((link) => link.remove());
+  removeAlertFavicons(topDocument);
+
+  const href = createAlertFaviconHref();
+  ALERT_FAVICON_SIZES.forEach((size) => {
+    const link = topDocument.createElement('link');
+    link.className = ALERT_FAVICON_CLASS;
+    link.rel = 'icon';
+    link.type = 'image/svg+xml';
+    link.sizes.value = size;
+    link.href = href;
+    head.append(link);
+  });
 }
 
 function restoreOriginalFavicon(topDocument: Document): void {
-  if (!originalFaviconHref) return;
-
   const head = topDocument.head || topDocument.documentElement;
   if (!head) return;
 
-  const restoreLink = topDocument.createElement('link');
-  restoreLink.id = RESTORE_FAVICON_ID;
-  restoreLink.rel = 'icon';
-  restoreLink.href = originalFaviconHref;
-  head.append(restoreLink);
+  getAlertFaviconLinks(topDocument).forEach((link) => link.remove());
+  if (!originalFaviconLinks.length) return;
+  getPageFaviconLinks(topDocument).forEach((link) => link.remove());
+
+  originalFaviconLinks.forEach((link) => {
+    head.append(link.cloneNode(true));
+  });
 }
 
-function getCurrentFaviconHref(topDocument: Document): string {
-  const links = Array.from(topDocument.querySelectorAll<HTMLLinkElement>('link[rel~="icon"]'));
-  const current = links.reverse().find((link) => (
-    link.id !== ALERT_FAVICON_ID &&
-    link.id !== RESTORE_FAVICON_ID &&
-    Boolean(link.href)
-  ));
+function getPageFaviconLinks(topDocument: Document): HTMLLinkElement[] {
+  return Array.from(topDocument.querySelectorAll<HTMLLinkElement>(FAVICON_SELECTOR))
+    .filter((link) => !link.classList.contains(ALERT_FAVICON_CLASS));
+}
 
-  return current?.href || '';
+function getAlertFaviconLinks(topDocument: Document): HTMLLinkElement[] {
+  return Array.from(topDocument.querySelectorAll<HTMLLinkElement>(`.${ALERT_FAVICON_CLASS}`));
+}
+
+function removeAlertFavicons(topDocument: Document): void {
+  getAlertFaviconLinks(topDocument).forEach((link) => link.remove());
+}
+
+function createAlertFaviconHref(): string {
+  return `data:image/svg+xml,${encodeURIComponent(createAlertFaviconSvg())}#${Date.now()}`;
 }
 
 function createAlertFaviconSvg(): string {
