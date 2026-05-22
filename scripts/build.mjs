@@ -134,7 +134,6 @@ async function syncVersionedSourceFiles() {
     syncPackageLockVersion()
   ]);
   await syncCommandDocs();
-  await syncDocsStructuredDataVersion();
 }
 
 async function syncManifestVersion() {
@@ -157,14 +156,4 @@ async function syncPackageLockVersion() {
       `$1${packageJson.version}$2`
     );
   if (next !== original) await writeFile(packageLockPath, next);
-}
-
-async function syncDocsStructuredDataVersion() {
-  const docsPath = path.join(root, 'docs', 'index.html');
-  const original = await readFile(docsPath, 'utf8');
-  const next = original.replace(
-    /"softwareVersion":\s*"[^"]+"/,
-    `"softwareVersion": "${packageJson.version}"`
-  );
-  if (next !== original) await writeFile(docsPath, next);
 }

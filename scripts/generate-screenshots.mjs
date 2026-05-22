@@ -5,7 +5,7 @@
  * as the source of truth, then generates the README showcase, high-resolution
  * docs showcase, and Chrome Web Store screenshots with centered white padding.
  */
-import { copyFile, mkdir } from 'node:fs/promises';
+import { mkdir } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
@@ -54,8 +54,6 @@ const readmeShowcaseBuffers = await Promise.all(screenshots.map(async (filename)
     .flatten({ background: whiteBackground })
     .png()
     .toBuffer();
-
-  await copyFile(sourcePath, path.join(docsDir, filename));
 
   await sharp(sourcePath)
     .resize(chromeWebStoreSize.width, chromeWebStoreSize.height, {

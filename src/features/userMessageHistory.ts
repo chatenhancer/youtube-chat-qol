@@ -242,6 +242,7 @@ function cloneEmojiTokens(emojiTokens: EmojiToken[]): EmojiToken[] {
   return emojiTokens.map((token) => ({
     placeholder: token.placeholder,
     fallbackText: token.fallbackText,
-    node: token.node ? token.node.cloneNode(true) : null
+    node: token.node ? token.node.cloneNode(true) : null,
+    nodes: token.nodes.map((node) => node.cloneNode(true))
   }));
 }
