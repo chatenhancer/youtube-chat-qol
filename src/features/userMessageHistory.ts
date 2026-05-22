@@ -16,13 +16,12 @@ import {
 } from '../youtube/messages';
 import { serializeRichMessageNodes, type RichTextSegment } from '../youtube/richText';
 import { CHAT_MESSAGE_SELECTOR } from '../youtube/selectors';
+import { getChatTimestampValue, isLiveChatReplayUrl } from '../youtube/timestamps';
 import type { ProtectedToken } from './translation/protectedPlaceholders';
 import type { TranslationResult } from './translation/render';
 
 const MAX_USERS = 160;
 const MAX_MESSAGES_PER_USER = 12;
-const CHAT_TIMESTAMP_FUTURE_TOLERANCE_MS = 10 * 60 * 1000;
-const ONE_DAY_MS = 24 * 60 * 60 * 1000;
 
 export interface MessageRecord {
   id: number;
@@ -304,41 +303,9 @@ function createUniqueRecordCollector(): {
 }
 
 function getMessageHistoryTimestamp(timestampText: string, fallbackTimestamp: number): number {
-  return parseMessageHistoryTimestamp(timestampText, fallbackTimestamp) ?? fallbackTimestamp;
-}
-
-function parseMessageHistoryTimestamp(timestampText: string, referenceTimestamp: number): number | null {
-  const normalized = cleanText(timestampText)
-    .replace(/\./g, '')
-    .toLocaleUpperCase();
-  const match = normalized.match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?\s*([AP]M)?$/);
-  if (!match) return null;
-
-  let hour = Number(match[1]);
-  const minute = Number(match[2]);
-  const second = match[3] ? Number(match[3]) : 0;
-  const meridiem = match[4];
-
-  if (!Number.isFinite(hour) || !Number.isFinite(minute) || !Number.isFinite(second)) return null;
-  if (minute > 59 || second > 59) return null;
-
-  if (meridiem) {
-    if (hour < 1 || hour > 12) return null;
-    if (hour === 12) hour = 0;
-    if (meridiem === 'PM') hour += 12;
-  } else if (hour > 23) {
-    return null;
-  }
-
-  const date = new Date(referenceTimestamp);
-  date.setHours(hour, minute, second, 0);
-  let parsedTimestamp = date.getTime();
-
-  if (parsedTimestamp > referenceTimestamp + CHAT_TIMESTAMP_FUTURE_TOLERANCE_MS) {
-    parsedTimestamp -= ONE_DAY_MS;
-  }
-
-  return parsedTimestamp;
+  return getChatTimestampValue(timestampText, fallbackTimestamp, {
+    preferElapsed: isLiveChatReplayUrl()
+  }) ?? fallbackTimestamp;
 }
 
 function getRecordForMessage(message: HTMLElement): MessageRecord | null {
