@@ -4,6 +4,8 @@
  * Cards can reuse cloned YouTube message nodes for custom emoji while falling
  * back to plain text for records restored from extension storage.
  */
+import { CHAT_TOOLTIP_SELECTOR } from './selectors';
+
 export type RichTextSegment =
   | {
       type: 'text';
@@ -17,12 +19,6 @@ export type RichTextSegment =
       tooltip: string;
       className: string;
     };
-
-const TOOLTIP_SELECTOR = [
-  '[role="tooltip"]',
-  'tp-yt-paper-tooltip',
-  'yt-tooltip'
-].join(',');
 
 export function appendRichMessageText(
   container: HTMLElement,
@@ -65,7 +61,7 @@ function cloneSafeMessageNode(node: Node): Node | null {
   if (isTooltipElement(node)) return null;
 
   const clone = node.cloneNode(true) as Element;
-  clone.querySelectorAll(TOOLTIP_SELECTOR).forEach((child) => child.remove());
+  clone.querySelectorAll(CHAT_TOOLTIP_SELECTOR).forEach((child) => child.remove());
   stripDuplicateIds(clone);
   return clone;
 }
@@ -164,7 +160,7 @@ function getCleanAttribute(element: Element, name: string): string {
 }
 
 function isTooltipElement(element: Element): boolean {
-  return element.matches(TOOLTIP_SELECTOR);
+  return element.matches(CHAT_TOOLTIP_SELECTOR);
 }
 
 function createRichTextSegmentNodes(segments: RichTextSegment[]): Node[] {
