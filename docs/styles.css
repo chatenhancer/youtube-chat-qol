@@ -221,13 +221,6 @@ h3 {
   gap: 12px;
 }
 
-.hero-availability {
-  margin-top: 14px;
-  color: var(--muted);
-  font-size: 14px;
-  font-weight: 400;
-}
-
 .hero-media {
   position: relative;
   min-width: 0;
@@ -652,13 +645,10 @@ figcaption {
   width: 8px;
   height: 8px;
   flex: 0 0 auto;
-  background: var(--logo-red-start);
-  border-radius: 999px;
-  content: "";
-}
-
-.privacy-list div:nth-child(even) dt::before {
   background: var(--blue);
+  border-radius: 999px;
+  box-shadow: 0 0 0 3px rgba(37, 151, 255, 0.12);
+  content: "";
 }
 
 .privacy-list dd {
