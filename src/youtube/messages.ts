@@ -30,6 +30,7 @@ interface RendererData {
   message?: RendererText;
   messageText?: RendererText;
   headerSubtext?: RendererText;
+  timestampUsec?: string;
 }
 
 interface OriginalMessageSnapshot {
@@ -127,8 +128,22 @@ export function getMessageTimestampText(message: HTMLElement, timestamp = Date.n
 
 export function getMessageStableId(message: HTMLElement): string {
   const data = getRendererData(message);
+  const rendererId = cleanText(data?.id);
+  if (rendererId) return rendererId;
+
+  const timestampUsec = cleanText(data?.timestampUsec);
+  if (timestampUsec) {
+    const authorKey = cleanText(
+      data?.authorExternalChannelId ||
+      data?.authorChannelId ||
+      data?.authorName?.simpleText ||
+      getTextFromRuns(data?.authorName?.runs) ||
+      ''
+    );
+    return ['timestamp-usec', timestampUsec, authorKey].filter(Boolean).join(':');
+  }
+
   return cleanText(
-    data?.id ||
     message.getAttribute('data-message-id') ||
     message.id ||
     ''

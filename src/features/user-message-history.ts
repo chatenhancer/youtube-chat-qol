@@ -70,24 +70,29 @@ export function recordUserMessage(message: HTMLElement): void {
   if (!authorName || !text) return;
 
   const messageId = getMessageStableId(message);
+  const recordedAt = Date.now();
+  const timestampText = getMessageTimestampText(message, recordedAt);
+  const timestamp = getMessageHistoryTimestamp(timestampText, recordedAt);
   const signature = `${messageId || 'message-content'}\n${authorName}\n${text}`;
   const previousRecord = recordsByElement.get(message);
   if (previousRecord?.signature === signature) return;
 
-  const existingRecord = messageId ? findRecordByMessageId(key, messageId) : null;
+  const existingRecord = messageId
+    ? findRecordByMessageId(key, messageId) || findDisconnectedRecordByContent(key, authorName, text, timestampText)
+    : findDisconnectedRecordByContent(key, authorName, text, timestampText);
   if (previousRecord && previousRecord.id !== existingRecord?.id) {
     removeRecord(previousRecord.key, previousRecord.id);
   }
 
   if (existingRecord) {
-    const timestampText = getMessageTimestampText(message, existingRecord.timestamp);
+    const nextTimestampText = getMessageTimestampText(message, existingRecord.timestamp);
     existingRecord.authorName = authorName;
     existingRecord.contentParts = serializeRichMessageNodes(getMessageContentSourceNodes(message));
-    existingRecord.messageId = messageId;
+    existingRecord.messageId = messageId || existingRecord.messageId;
     existingRecord.messageRef = new WeakRef(message);
     existingRecord.text = text;
-    existingRecord.timestamp = getMessageHistoryTimestamp(timestampText, existingRecord.timestamp);
-    existingRecord.timestampText = timestampText;
+    existingRecord.timestamp = getMessageHistoryTimestamp(nextTimestampText, existingRecord.timestamp);
+    existingRecord.timestampText = nextTimestampText;
     recordsByElement.set(message, {
       key,
       id: existingRecord.id,
@@ -98,14 +103,11 @@ export function recordUserMessage(message: HTMLElement): void {
     return;
   }
 
-  const recordedAt = Date.now();
-  const timestampText = getMessageTimestampText(message, recordedAt);
-  const timestamp = getMessageHistoryTimestamp(timestampText, recordedAt);
   const record: MessageRecord = {
     id: previousRecord?.id || nextRecordId++,
     authorName,
     contentParts: serializeRichMessageNodes(getMessageContentSourceNodes(message)),
-    messageId,
+    messageId: messageId || undefined,
     messageRef: new WeakRef(message),
     text,
     timestamp,
@@ -140,6 +142,9 @@ export function getRecentMessagesForIdentity(identity: UserIdentity, limit = MAX
   if (key) records.add(recordsByUser.get(key) || []);
   if (authorKey && authorKey !== key) {
     records.add(recordsByUser.get(authorKey) || []);
+  }
+  if (!identity.channelId && authorKey) {
+    records.add(getRecordsByAuthorName(identity.authorName));
   }
 
   return sortRecentRecords(records.values())
@@ -226,6 +231,41 @@ function removeRecord(key: string, id: number): void {
 
 function findRecordByMessageId(key: string, messageId: string): MessageRecord | null {
   return recordsByUser.get(key)?.find((record) => record.messageId === messageId) || null;
+}
+
+function getRecordsByAuthorName(authorName: string | undefined): MessageRecord[] {
+  const authorSignature = normalizeComparableText(authorName || '');
+  if (!authorSignature) return [];
+
+  const records: MessageRecord[] = [];
+  recordsByUser.forEach((userRecords) => {
+    userRecords.forEach((record) => {
+      if (normalizeComparableText(record.authorName) === authorSignature) {
+        records.push(record);
+      }
+    });
+  });
+  return records;
+}
+
+function findDisconnectedRecordByContent(
+  key: string,
+  authorName: string,
+  text: string,
+  timestampText: string
+): MessageRecord | null {
+  const authorSignature = normalizeComparableText(authorName);
+  const textSignature = normalizeComparableText(text);
+  const timestampSignature = normalizeComparableText(timestampText);
+  if (!authorSignature || !textSignature || !timestampSignature) return null;
+
+  return recordsByUser.get(key)?.find((record) => {
+    const liveMessage = getLiveMessageForRecord(record);
+    return !liveMessage &&
+      normalizeComparableText(record.authorName) === authorSignature &&
+      normalizeComparableText(record.text) === textSignature &&
+      normalizeComparableText(record.timestampText) === timestampSignature;
+  }) || null;
 }
 
 function pruneOldUsers(): void {
