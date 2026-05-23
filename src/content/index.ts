@@ -6,11 +6,11 @@
  * Keeping DOM observation centralized makes mutation-driven behavior easier to
  * reason about.
  */
-import { enhanceEmojiPicker, handleEmojiPickerClick, initFrequentEmojis, resetFrequentEmojis } from '../features/frequentEmojis';
-import { initChatCommands, resetChatCommandsState } from '../features/chatCommands';
+import { enhanceEmojiPicker, handleEmojiPickerClick, initFrequentEmojis, resetFrequentEmojis } from '../features/frequent-emojis';
+import { initChatCommands, resetChatCommandsState } from '../features/chat-commands';
 import { enhanceMenu } from '../features/menus';
-import { handleMessageMenuActivation, wireMessageContext } from '../features/menus/messageMenu';
-import { configureSettingsMenu, refreshSettingsMenus } from '../features/menus/settingsMenu';
+import { handleMessageMenuActivation, wireMessageContext } from '../features/menus/message-menu';
+import { configureSettingsMenu, refreshSettingsMenus } from '../features/menus/settings-menu';
 import {
   handlePotentialInbox,
   highlightPotentialInboxKeywords,
@@ -19,8 +19,8 @@ import {
   scheduleInboxButtonWire
 } from '../features/inbox';
 import { initSound } from '../features/inbox/sound';
-import { keepChatAtLiveEdge, scheduleKeepChatAtLiveEdge } from '../features/liveEdge';
-import { closeProfileCard, wireParticipantProfileClick, wireProfileClick } from '../features/profilePopup';
+import { keepChatAtLiveEdge, scheduleKeepChatAtLiveEdge } from '../features/live-edge';
+import { closeProfileCard, wireParticipantProfileClick, wireProfileClick } from '../features/profile-popup';
 import { wireAuthorNameMention } from '../features/reply';
 import {
   clearTranslations,
@@ -28,7 +28,7 @@ import {
   MAX_RETROACTIVE_TRANSLATIONS,
   queueMessageTranslation
 } from '../features/translation/queue';
-import { recordUserMessage } from '../features/userMessageHistory';
+import { recordUserMessage } from '../features/user-message-history';
 import { DEFAULT_OPTIONS, getTargetLanguageUpdate, normalizeOptions, type Options } from '../shared/options';
 import { getOptions, setOptions } from '../shared/state';
 import { CHAT_MESSAGE_SELECTOR, PARTICIPANT_SELECTOR } from '../youtube/selectors';

@@ -13,8 +13,8 @@ import {
   clearUserMessageTranslation,
   clearUserMessageTranslations,
   recordUserMessageTranslation
-} from '../userMessageHistory';
-import { createTranslationPlan, hasTextOutsidePlaceholders, type ProtectedToken } from './protectedPlaceholders';
+} from '../user-message-history';
+import { createTranslationPlan, hasTextOutsidePlaceholders, type ProtectedToken } from './protected-placeholders';
 import { clearTranslationRenderings, removeTranslation, renderTranslation, type TranslationResult } from './render';
 
 interface PendingTranslationEntry {

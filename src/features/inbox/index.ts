@@ -17,7 +17,7 @@ import { CHAT_MESSAGE_SELECTOR } from '../../youtube/selectors';
 import {
   appendRichMessageText,
   serializeRichMessageNodes
-} from '../../youtube/richText';
+} from '../../youtube/rich-text';
 import {
   applyChatKeywordHighlights,
   clearChatKeywordHighlights,
@@ -44,16 +44,16 @@ import {
   isCurrentUserAuthorName,
   processPotentialMentionForConsumer,
   registerMentionProcessor
-} from '../mentionDetection';
+} from '../mention-detection';
 import { mentionAuthorName, quoteAuthorRichText } from '../reply';
 import {
   clearInboxTabAlert,
   initInboxTabAlert,
   isCurrentTabActive,
   showInboxTabAlert
-} from '../tabAlert';
+} from '../tab-alert';
 import { playAlertSound } from './sound';
-import { createJumpToMessageIcon, jumpToChatMessage } from '../messageJump';
+import { createJumpToMessageIcon, jumpToChatMessage } from '../message-jump';
 import {
   getInboxTimestamp,
   loadInboxStoredState,

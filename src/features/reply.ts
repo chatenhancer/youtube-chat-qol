@@ -9,9 +9,9 @@
 import { getOptions } from '../shared/state';
 import { cleanText } from '../shared/text';
 import { showToast } from '../shared/toast';
-import { insertIntoChatInput, insertNodesIntoChatInput, returnToChatInputPanel } from '../youtube/chatInput';
+import { insertIntoChatInput, insertNodesIntoChatInput, returnToChatInputPanel } from '../youtube/chat-input';
 import { getMessageContentNodes, getMessageDetails } from '../youtube/messages';
-import type { RichTextSegment } from '../youtube/richText';
+import type { RichTextSegment } from '../youtube/rich-text';
 
 const CHAT_INPUT_RETRY_DELAYS = [80, 180, 360, 600];
 const INPUT_EMOJI_CLASS = 'emoji yt-formatted-string style-scope yt-live-chat-text-input-field-renderer';

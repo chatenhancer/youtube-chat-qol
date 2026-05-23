@@ -4,7 +4,7 @@
  * The JSON file is the source of truth for extension help text and generated
  * public docs. Behavior-specific code still decides what each command does.
  */
-import chatCommandReferenceJson from './chatCommands.json';
+import chatCommandReferenceJson from './chat-commands.json';
 
 export interface ChatCommandEntry {
   docsDescription: string;

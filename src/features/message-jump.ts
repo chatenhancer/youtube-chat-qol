@@ -4,7 +4,7 @@
  * Scrolls YouTube's internal chat list only, so jumping to a message does not
  * move the outer YouTube watch page.
  */
-import { returnToChatInputPanel } from '../youtube/chatInput';
+import { returnToChatInputPanel } from '../youtube/chat-input';
 
 const JUMP_AFTER_PANEL_RETURN_DELAY_MS = 120;
 const JUMP_LIVE_EDGE_RELEASE_OFFSET = 48;

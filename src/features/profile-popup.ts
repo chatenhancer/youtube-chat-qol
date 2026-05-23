@@ -9,14 +9,14 @@ import { getOptions } from '../shared/state';
 import { createEmptyLeavesIcon } from '../shared/icons';
 import { cleanText, normalizeComparableText } from '../shared/text';
 import { getAuthorName, getRendererData } from '../youtube/messages';
-import { appendRichMessageText } from '../youtube/richText';
+import { appendRichMessageText } from '../youtube/rich-text';
 import {
   createInlineTranslationElement,
   createReplacedTranslationIcon,
   getReplacementTranslationTitle,
   isMeaningfulTranslation
 } from './translation/render';
-import { createNodesWithPlaceholders } from './translation/protectedPlaceholders';
+import { createNodesWithPlaceholders } from './translation/protected-placeholders';
 import {
   getLiveMessageForRecord,
   getRecentMessagesForIdentity,
@@ -26,8 +26,8 @@ import {
   recordVisibleUserMessages,
   type MessageRecord,
   type UserIdentity
-} from './userMessageHistory';
-import { createJumpToMessageIcon, jumpToChatMessage } from './messageJump';
+} from './user-message-history';
+import { createJumpToMessageIcon, jumpToChatMessage } from './message-jump';
 import { mentionAuthorName, quoteAuthorRichText } from './reply';
 
 const PROFILE_WINDOW_WIDTH = 458;

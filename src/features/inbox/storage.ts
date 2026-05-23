@@ -1,5 +1,5 @@
 import { cleanText } from '../../shared/text';
-import { normalizeRichTextSegments } from '../../youtube/richText';
+import { normalizeRichTextSegments } from '../../youtube/rich-text';
 import { getChatTimestampValue, isLiveChatReplayUrl } from '../../youtube/timestamps';
 import {
   normalizeMentionHandles,
