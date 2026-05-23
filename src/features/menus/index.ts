@@ -5,8 +5,8 @@
  * renderer. This module classifies each popup after Polymer stamps its children
  * and routes it to the correct enhancer.
  */
-import { enhanceMessageContextMenu, isRecentActiveContextMessage } from './messageMenu';
-import { enhanceSettingsMenu } from './settingsMenu';
+import { enhanceMessageContextMenu, isRecentActiveContextMessage } from './message-menu';
+import { enhanceSettingsMenu } from './settings-menu';
 
 export function enhanceMenu(menu: Element): void {
   if (!(menu instanceof HTMLElement)) return;

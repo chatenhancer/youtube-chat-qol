@@ -6,7 +6,7 @@
  * the chat input. The row is capped so it does not crowd the native emoji list.
  */
 import { cleanText } from '../shared/text';
-import { insertIntoChatInput, insertNodeIntoChatInput } from '../youtube/chatInput';
+import { insertIntoChatInput, insertNodeIntoChatInput } from '../youtube/chat-input';
 
 interface EmojiUsage {
   key: string;

@@ -14,10 +14,10 @@ import {
   getMessageTimestampText,
   getRendererData
 } from '../youtube/messages';
-import { serializeRichMessageNodes, type RichTextSegment } from '../youtube/richText';
+import { serializeRichMessageNodes, type RichTextSegment } from '../youtube/rich-text';
 import { CHAT_MESSAGE_SELECTOR } from '../youtube/selectors';
 import { getChatTimestampValue, isLiveChatReplayUrl } from '../youtube/timestamps';
-import type { ProtectedToken } from './translation/protectedPlaceholders';
+import type { ProtectedToken } from './translation/protected-placeholders';
 import type { TranslationResult } from './translation/render';
 
 const MAX_USERS = 160;

@@ -11,7 +11,7 @@ import {
   getChatCommandNames,
   getChatCommandTimeZones,
   getInlineChatCommandNames
-} from '../shared/chatCommandReference';
+} from '../shared/chat-command-reference';
 import { getTargetLanguageUpdate, QUOTE_LENGTH_OPTIONS, type Options, type TranslationDisplay } from '../shared/options';
 import { cleanText } from '../shared/text';
 import { showToast } from '../shared/toast';
@@ -25,7 +25,7 @@ import {
   replaceChatInputSnapshot,
   type ChatInputSnapshot,
   type ChatInputTextSelection
-} from '../youtube/chatInput';
+} from '../youtube/chat-input';
 import { formatMentionText, formatQuoteText } from './reply';
 import { getLatestInboxRecord } from './inbox';
 

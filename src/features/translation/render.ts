@@ -17,7 +17,7 @@ import {
   createNodesWithPlaceholders,
   restorePlaceholdersToText,
   type ProtectedToken
-} from './protectedPlaceholders';
+} from './protected-placeholders';
 
 export interface TranslationResult {
   text: string;

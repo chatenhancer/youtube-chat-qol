@@ -1,5 +1,5 @@
 /*
- * Synchronizes public command reference docs from src/shared/chatCommands.json.
+ * Synchronizes public command reference docs from src/shared/chat-commands.json.
  *
  * The extension help card imports the same JSON, so README and the landing page
  * stay aligned with the app behavior when this script runs during builds.
@@ -7,7 +7,7 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import commandReference from '../src/shared/chatCommands.json' with { type: 'json' };
+import commandReference from '../src/shared/chat-commands.json' with { type: 'json' };
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const readmePath = path.join(root, 'README.md');
