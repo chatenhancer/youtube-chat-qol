@@ -135,16 +135,11 @@ export function getRecentMessagesForKey(key: string, limit = MAX_MESSAGES_PER_US
 
 export function getRecentMessagesForIdentity(identity: UserIdentity, limit = MAX_MESSAGES_PER_USER): MessageRecord[] {
   const key = getUserKeyFromIdentity(identity);
+  const authorKey = getAuthorKey(identity.authorName);
   const records = createUniqueRecordCollector();
   if (key) records.add(recordsByUser.get(key) || []);
-
-  const normalizedAuthorName = normalizeComparableText(identity.authorName || '');
-  if (normalizedAuthorName) {
-    records.add(
-      Array.from(recordsByUser.values())
-        .flat()
-        .filter((record) => normalizeComparableText(record.authorName) === normalizedAuthorName)
-    );
+  if (authorKey && authorKey !== key) {
+    records.add(recordsByUser.get(authorKey) || []);
   }
 
   return sortRecentRecords(records.values())
@@ -211,9 +206,7 @@ export function getUserKey(message: HTMLElement): string {
 
 export function getUserKeyFromIdentity(identity: UserIdentity): string {
   if (identity.channelId) return `channel:${identity.channelId}`;
-
-  const authorName = normalizeComparableText(identity.authorName || '');
-  return authorName ? `author:${authorName}` : '';
+  return getAuthorKey(identity.authorName);
 }
 
 export function onUserMessagesChanged(listener: UserMessageListener): () => void {
@@ -268,6 +261,11 @@ function setUserRecords(key: string, records: MessageRecord[]): void {
 
 function sortRecentRecords(records: MessageRecord[]): MessageRecord[] {
   return [...records].sort((a, b) => a.timestamp - b.timestamp || a.id - b.id);
+}
+
+function getAuthorKey(authorName: string | undefined): string {
+  const normalizedAuthorName = normalizeComparableText(authorName || '');
+  return normalizedAuthorName ? `author:${normalizedAuthorName}` : '';
 }
 
 function createUniqueRecordCollector(): {
