@@ -418,6 +418,136 @@ h3 {
   height: 20px;
 }
 
+.install-quickstart {
+  display: grid;
+  grid-column: 1 / -1;
+  gap: 16px;
+  justify-self: stretch;
+  width: 100%;
+  margin-top: 2px;
+  padding-top: 22px;
+  border-top: 1px solid var(--line);
+}
+
+.install-quickstart-heading {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+}
+
+.install-quickstart-icon {
+  display: grid;
+  place-items: center;
+  color: var(--blue);
+}
+
+.install-quickstart-app-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+}
+
+.install-quickstart-icon svg {
+  width: 22px;
+  height: 22px;
+  fill: currentColor;
+}
+
+.install-quickstart-heading h3 {
+  margin-bottom: 3px;
+  font-size: 16px;
+}
+
+.install-quickstart-heading p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.install-quickstart-list strong {
+  display: block;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+.install-quickstart-copy > span {
+  display: block;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.install-quickstart-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: repeat(2, auto);
+  grid-auto-flow: column;
+  column-gap: 28px;
+  row-gap: 18px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: install-quickstart;
+}
+
+.install-quickstart-list li {
+  position: relative;
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+  counter-increment: install-quickstart;
+}
+
+.install-quickstart-list li + li {
+  border-top: 0;
+}
+
+.install-quickstart-list strong::before {
+  color: var(--blue);
+  content: counter(install-quickstart) ". ";
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
+}
+
+.install-quickstart-icon {
+  width: 30px;
+  height: 30px;
+  background: rgba(37, 151, 255, 0.08);
+  border-radius: 8px;
+}
+
+.install-quickstart-copy {
+  min-width: 0;
+}
+
+.inline-symbol,
+.inline-app-icon {
+  display: inline-grid;
+  width: 16px;
+  height: 16px;
+  vertical-align: -3px;
+}
+
+.inline-symbol {
+  place-items: center;
+  color: var(--blue);
+}
+
+.inline-symbol svg {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+}
+
+.inline-app-icon {
+  border-radius: 4px;
+}
+
 .feature-link {
   display: inline-flex;
   margin-top: 14px;
@@ -573,7 +703,7 @@ figcaption {
 
 .install-actions {
   display: grid;
-  grid-template-columns: repeat(2, minmax(190px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
   gap: 12px;
   justify-self: stretch;
 }
@@ -709,6 +839,7 @@ figcaption {
   .install-actions {
     justify-self: stretch;
   }
+
 }
 
 @media (max-width: 640px) {
@@ -773,6 +904,12 @@ figcaption {
 
   .install-actions {
     grid-template-columns: 1fr;
+  }
+
+  .install-quickstart-list {
+    grid-template-columns: 1fr;
+    grid-template-rows: none;
+    grid-auto-flow: row;
   }
 
   .header-install {
