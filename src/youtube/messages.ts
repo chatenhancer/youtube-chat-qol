@@ -128,9 +128,6 @@ export function getMessageTimestampText(message: HTMLElement, timestamp = Date.n
 
 export function getMessageStableId(message: HTMLElement): string {
   const data = getRendererData(message);
-  const rendererId = cleanText(data?.id);
-  if (rendererId) return rendererId;
-
   const timestampUsec = cleanText(data?.timestampUsec);
   if (timestampUsec) {
     const authorKey = cleanText(
@@ -142,6 +139,9 @@ export function getMessageStableId(message: HTMLElement): string {
     );
     return ['timestamp-usec', timestampUsec, authorKey].filter(Boolean).join(':');
   }
+
+  const rendererId = cleanText(data?.id);
+  if (rendererId) return rendererId;
 
   return cleanText(
     message.getAttribute('data-message-id') ||

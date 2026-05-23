@@ -94,21 +94,51 @@ export function mergeStrings(first: string[], second: string[]): string[] {
   return result;
 }
 
-export function getRecordSignature(record: {
+export function findMatchingRecordIndex(records: InboxRecord[], incoming: InboxRecord): number {
+  const messageId = cleanText(incoming.messageId);
+  if (messageId) {
+    const messageIdIndex = records.findIndex((record) => cleanText(record.messageId) === messageId);
+    if (messageIdIndex >= 0) return messageIdIndex;
+  }
+
+  const liveDuplicateIndex = records.findIndex((record) => isDuplicateAcrossLiveChatSurfaces(record, incoming));
+  if (liveDuplicateIndex >= 0) return liveDuplicateIndex;
+
+  const contentSignature = getContentRecordSignature(incoming);
+  const disconnectedContentIndex = records.findIndex((record) => (
+    !getLiveRecordMessage(record) &&
+    getContentRecordSignature(record) === contentSignature
+  ));
+  if (disconnectedContentIndex >= 0) return disconnectedContentIndex;
+
+  const looseSignature = getLooseRecordSignature(incoming);
+  return records.findIndex((record) => (
+    !getLiveRecordMessage(record) &&
+    getLooseRecordSignature(record) === looseSignature
+  ));
+}
+
+function isDuplicateAcrossLiveChatSurfaces(record: InboxRecord, incoming: InboxRecord): boolean {
+  const recordMessage = getLiveRecordMessage(record);
+  const incomingMessage = getLiveRecordMessage(incoming);
+  if (!recordMessage || !incomingMessage) return false;
+
+  const recordSurface = getLiveChatSurfaceKey(recordMessage);
+  const incomingSurface = getLiveChatSurfaceKey(incomingMessage);
+  return Boolean(
+    recordSurface &&
+    incomingSurface &&
+    recordSurface !== incomingSurface &&
+    getContentRecordSignature(record) === getContentRecordSignature(incoming)
+  );
+}
+
+function getContentRecordSignature(record: {
   authorName: string;
-  messageId?: string;
   sourceUrl: string;
   text: string;
   timestampText: string;
 }): string {
-  const messageId = cleanText(record.messageId);
-  if (messageId) {
-    return [
-      'message-id',
-      messageId
-    ].join('\n');
-  }
-
   return [
     'message-content',
     normalizeComparableText(record.authorName),
@@ -118,13 +148,17 @@ export function getRecordSignature(record: {
   ].join('\n');
 }
 
-export function findMatchingRecordIndex(records: InboxRecord[], incoming: InboxRecord): number {
-  const exactSignature = getRecordSignature(incoming);
-  const exactIndex = records.findIndex((record) => getRecordSignature(record) === exactSignature);
-  if (exactIndex >= 0) return exactIndex;
+function getLiveRecordMessage(record: InboxRecord): HTMLElement | null {
+  const message = record.messageRef?.deref() || null;
+  return message?.isConnected ? message : null;
+}
 
-  const looseSignature = getLooseRecordSignature(incoming);
-  return records.findIndex((record) => getLooseRecordSignature(record) === looseSignature);
+function getLiveChatSurfaceKey(message: HTMLElement): string {
+  const list = message.closest<HTMLElement>([
+    '#items.style-scope.yt-live-chat-item-list-renderer',
+    '#items.style-scope.yt-live-chat-item-display-list-renderer'
+  ].join(','));
+  return list?.className || '';
 }
 
 function getLooseRecordSignature(record: {

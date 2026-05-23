@@ -78,8 +78,11 @@ export function recordUserMessage(message: HTMLElement): void {
   if (previousRecord?.signature === signature) return;
 
   const existingRecord = messageId
-    ? findRecordByMessageId(key, messageId) || findDisconnectedRecordByContent(key, authorName, text, timestampText)
-    : findDisconnectedRecordByContent(key, authorName, text, timestampText);
+    ? findRecordByMessageId(key, messageId) ||
+      findDuplicateRecordAcrossLiveSurfaces(key, message, authorName, text, timestampText) ||
+      findDisconnectedRecordByContent(key, authorName, text, timestampText)
+    : findDuplicateRecordAcrossLiveSurfaces(key, message, authorName, text, timestampText) ||
+      findDisconnectedRecordByContent(key, authorName, text, timestampText);
   if (previousRecord && previousRecord.id !== existingRecord?.id) {
     removeRecord(previousRecord.key, previousRecord.id);
   }
@@ -88,7 +91,7 @@ export function recordUserMessage(message: HTMLElement): void {
     const nextTimestampText = getMessageTimestampText(message, existingRecord.timestamp);
     existingRecord.authorName = authorName;
     existingRecord.contentParts = serializeRichMessageNodes(getMessageContentSourceNodes(message));
-    existingRecord.messageId = messageId || existingRecord.messageId;
+    existingRecord.messageId = existingRecord.messageId || messageId;
     existingRecord.messageRef = new WeakRef(message);
     existingRecord.text = text;
     existingRecord.timestamp = getMessageHistoryTimestamp(nextTimestampText, existingRecord.timestamp);
@@ -233,6 +236,34 @@ function findRecordByMessageId(key: string, messageId: string): MessageRecord | 
   return recordsByUser.get(key)?.find((record) => record.messageId === messageId) || null;
 }
 
+function findDuplicateRecordAcrossLiveSurfaces(
+  key: string,
+  message: HTMLElement,
+  authorName: string,
+  text: string,
+  timestampText: string
+): MessageRecord | null {
+  const incomingSurface = getLiveChatSurfaceKey(message);
+  if (!incomingSurface) return null;
+
+  const authorSignature = normalizeComparableText(authorName);
+  const textSignature = normalizeComparableText(text);
+  const timestampSignature = normalizeComparableText(timestampText);
+  if (!authorSignature || !textSignature || !timestampSignature) return null;
+
+  return recordsByUser.get(key)?.find((record) => {
+    const liveMessage = getLiveMessageForRecord(record);
+    if (!liveMessage) return false;
+
+    const liveSurface = getLiveChatSurfaceKey(liveMessage);
+    return liveSurface &&
+      liveSurface !== incomingSurface &&
+      normalizeComparableText(record.authorName) === authorSignature &&
+      normalizeComparableText(record.text) === textSignature &&
+      normalizeComparableText(record.timestampText) === timestampSignature;
+  }) || null;
+}
+
 function getRecordsByAuthorName(authorName: string | undefined): MessageRecord[] {
   const authorSignature = normalizeComparableText(authorName || '');
   if (!authorSignature) return [];
@@ -266,6 +297,14 @@ function findDisconnectedRecordByContent(
       normalizeComparableText(record.text) === textSignature &&
       normalizeComparableText(record.timestampText) === timestampSignature;
   }) || null;
+}
+
+function getLiveChatSurfaceKey(message: HTMLElement): string {
+  const list = message.closest<HTMLElement>([
+    '#items.style-scope.yt-live-chat-item-list-renderer',
+    '#items.style-scope.yt-live-chat-item-display-list-renderer'
+  ].join(','));
+  return list?.className || '';
 }
 
 function pruneOldUsers(): void {
