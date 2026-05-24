@@ -100,8 +100,8 @@ export function quoteAuthorRichText(authorName: string, text: string, content: R
   insertMentionNodes([
     document.createTextNode(`${cleanAuthorName} : "`),
     ...quoteContent.nodes,
-    document.createTextNode(`${quoteContent.truncated ? '...' : ''}" `)
-  ], fallbackText);
+    document.createTextNode(`${quoteContent.truncated ? '...' : ''}"`)
+  ], fallbackText, ' ');
 }
 
 export function formatMentionText(authorName: string): string {
@@ -125,8 +125,8 @@ function insertMentionText(text: string): void {
   insertWithChatInputRecovery(() => insertIntoChatInput(text));
 }
 
-function insertMentionNodes(nodes: Node[], fallbackText: string): void {
-  insertWithChatInputRecovery(() => insertNodesIntoChatInput(nodes, fallbackText));
+function insertMentionNodes(nodes: Node[], fallbackText: string, trailingText = ''): void {
+  insertWithChatInputRecovery(() => insertNodesIntoChatInput(nodes, fallbackText, trailingText));
 }
 
 function insertWithChatInputRecovery(insert: () => boolean): void {

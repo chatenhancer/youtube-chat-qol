@@ -191,7 +191,7 @@ export function insertNodeIntoChatInput(node: Node, fallbackText = ''): boolean 
   return true;
 }
 
-export function insertNodesIntoChatInput(nodes: Node[], fallbackText = ''): boolean {
+export function insertNodesIntoChatInput(nodes: Node[], fallbackText = '', trailingText = ''): boolean {
   if (!nodes.length) return fallbackText ? insertIntoChatInput(fallbackText) : false;
 
   const input = findChatInput();
@@ -227,6 +227,8 @@ export function insertNodesIntoChatInput(nodes: Node[], fallbackText = ''): bool
   }
   selection?.removeAllRanges();
   selection?.addRange(range);
+
+  if (trailingText) return insertIntoChatInput(trailingText);
 
   input.dispatchEvent(new InputEvent('input', {
     bubbles: true,
