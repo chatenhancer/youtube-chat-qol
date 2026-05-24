@@ -1,0 +1,183 @@
+{
+  "messages": {
+    "add": "Tambah",
+    "addKeywords": "Tambah kata kunci",
+    "addKeywordsCount": {
+      "one": "Tambah kata kunci, {count} kata kunci dipantau",
+      "other": "Tambah kata kunci, {count} kata kunci dipantau"
+    },
+    "chatCommands": "Perintah chat",
+    "clear": "Hapus",
+    "close": "Tutup",
+    "commandHelpHint": "Ketik perintah, lalu tekan Tab.",
+    "couldNotFindChatInput": "Tidak dapat menemukan input chat.",
+    "couldNotReadTime": "Tidak dapat membaca waktu itu.",
+    "couldNotReadUserName": "Tidak dapat membaca nama pengguna itu.",
+    "inbox": "Kotak masuk",
+    "inboxAriaUnread": "Kotak masuk, {count} belum dibaca",
+    "inboxEmpty": "Kotak masuk kosong",
+    "inboxSound": "Suara kotak masuk",
+    "jumpToMessage": "Lompat ke pesan",
+    "keywordOrPhrase": "Kata kunci atau frasa",
+    "lessThanOneMinute": "kurang dari 1 menit",
+    "mention": "Sebut",
+    "mentionUser": "Sebut pengguna",
+    "mentionUserTitle": "Sebut pengguna. Alt/Option-klik untuk mengutip.",
+    "mostUsed": "PALING SERING DIPAKAI",
+    "noInboxMessagesYet": "Belum ada pesan di kotak masuk.",
+    "noKeywords": "Tidak ada kata kunci",
+    "noPreviousMessageYet": "Belum ada pesan sebelumnya.",
+    "nothingHereYet": "Belum ada apa-apa di sini",
+    "openChannel": "Buka channel",
+    "openChannelsInPopup": "Buka channel di popup",
+    "original": "Asli: {text}",
+    "originalMessage": "Pesan asli",
+    "pressEnterAgainToSend": "Tekan Enter lagi untuk mengirim.",
+    "pressTabToRunCommand": "Tekan Tab untuk menjalankan perintah ini.",
+    "quote": "Kutip",
+    "quoteLength": "Panjang kutipan {count}.",
+    "quoteMessage": "Kutip pesan",
+    "recentMessages": "Pesan terbaru",
+    "recentMessagesFromThisUser": "Pesan terbaru dari pengguna ini",
+    "removeKeyword": "Hapus {keyword}",
+    "savedMessages": {
+      "one": "{count} pesan tersimpan",
+      "other": "{count} pesan tersimpan"
+    },
+    "settingState": "{label} {state}.",
+    "showRecentMessages": "Tampilkan pesan terbaru",
+    "stateOff": "mati",
+    "stateOn": "nyala",
+    "timeHours": "{count} jam",
+    "timeMinutes": "{count} menit",
+    "timeSeconds": "{count} detik",
+    "translateChat": "Terjemahkan chat",
+    "translated": "Diterjemahkan:",
+    "translatedFrom": "Diterjemahkan dari {language}",
+    "translatedFromOriginal": "Diterjemahkan dari {language}: {text}",
+    "translatedMessage": "Pesan terjemahan",
+    "translateOff": "Terjemahan mati.",
+    "translateToLanguage": "Terjemahkan ke {language}.",
+    "translationsReplaceMessages": "Terjemahan menggantikan pesan.",
+    "translationsShowBelowMessages": "Terjemahan muncul di bawah pesan.",
+    "unknownSettingCommand": "Perintah pengaturan tidak dikenal.",
+    "unknownTimezone": "Zona waktu tidak dikenal.",
+    "unknownTranslationLanguage": "Bahasa terjemahan tidak dikenal.",
+    "unreadMessages": {
+      "one": "{count} pesan baru",
+      "other": "{count} pesan baru"
+    },
+    "useOnOrOff": "Gunakan on atau off.",
+    "useQuoteLength": "Gunakan panjang kutipan {lengths}.",
+    "useReplaceOrBelow": "Gunakan replace atau below.",
+    "watchingMentions": "Memantau sebutan",
+    "watchingMentionsAndKeywords": "Memantau sebutan dan kata kunci"
+  },
+  "extension": {
+    "extensionName": {
+      "message": "Chat Enhancer for YouTube",
+      "description": "Nama publik ekstensi."
+    },
+    "extensionShortName": {
+      "message": "Chat Enhancer",
+      "description": "Nama pendek ekstensi."
+    },
+    "extensionDescription": {
+      "message": "Alat ringan untuk terjemahan, sebutan, profil, dan emoji di live chat YouTube.",
+      "description": "Ringkasan manifest dan toko."
+    },
+    "openChatEnhancerWebsite": {
+      "message": "Buka situs web Chat Enhancer"
+    },
+    "openGithubRepository": {
+      "message": "Buka repositori GitHub"
+    },
+    "supportFeedback": {
+      "message": "Dukungan / Masukan"
+    },
+    "supportAndFeedback": {
+      "message": "Dukungan dan masukan"
+    },
+    "resetAllExtensionData": {
+      "message": "Reset semua pengaturan ekstensi dan data lokal"
+    },
+    "resetExtension": {
+      "message": "Reset ekstensi"
+    },
+    "translation": {
+      "message": "Terjemahan"
+    },
+    "chooseTranslationLanguageTitle": {
+      "message": "Pilih bahasa tujuan terjemahan pesan chat. Mati menonaktifkan terjemahan otomatis."
+    },
+    "translateTo": {
+      "message": "Terjemahkan ke"
+    },
+    "translationOffHelper": {
+      "message": "Mati menonaktifkan terjemahan otomatis."
+    },
+    "display": {
+      "message": "Tampilan"
+    },
+    "translationDisplayTitle": {
+      "message": "Pilih apakah terjemahan menggantikan pesan asli atau muncul di bawahnya."
+    },
+    "translationDisplayHelper": {
+      "message": "Ganti pesan atau tampilkan terjemahan di bawah."
+    },
+    "replaceMessage": {
+      "message": "Ganti pesan"
+    },
+    "showBelow": {
+      "message": "Tampilkan di bawah"
+    },
+    "chatActions": {
+      "message": "Aksi chat"
+    },
+    "quoteLengthTitle": {
+      "message": "Jumlah karakter maksimum yang disertakan saat mengutip pesan dari aksi chat atau kartu."
+    },
+    "quoteLengthLabel": {
+      "message": "Panjang kutipan"
+    },
+    "quoteLengthHelper": {
+      "message": "Jumlah karakter maksimum yang disertakan saat mengutip pesan."
+    },
+    "openChannelsInPopup": {
+      "message": "Buka channel di popup"
+    },
+    "openChannelsInPopupTitle": {
+      "message": "Buka halaman channel YouTube di jendela popup kecil, bukan tab browser biasa."
+    },
+    "openChannelsInPopupHelper": {
+      "message": "Gunakan jendela kecil untuk halaman channel dari kartu avatar."
+    },
+    "popupAlerts": {
+      "message": "Peringatan"
+    },
+    "playInboxSound": {
+      "message": "Putar suara kotak masuk"
+    },
+    "playInboxSoundTitle": {
+      "message": "Putar suara singkat saat pesan chat disimpan ke kotak masuk Anda."
+    },
+    "playInboxSoundHelper": {
+      "message": "Putar suara singkat untuk pesan kotak masuk baru."
+    },
+    "extensionVersion": {
+      "message": "Versi ekstensi"
+    },
+    "versionLabel": {
+      "message": "Versi {version}"
+    },
+    "off": {
+      "message": "Mati"
+    },
+    "popupResetConfirm": {
+      "message": "Reset pengaturan Chat Enhancer dan hapus kotak masuk lokal, kata kunci, serta data emoji?"
+    },
+    "popupResetComplete": {
+      "message": "Chat Enhancer telah direset."
+    }
+  }
+}

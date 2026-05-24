@@ -1,0 +1,183 @@
+{
+  "messages": {
+    "add": "إضافة",
+    "addKeywords": "إضافة كلمات مفتاحية",
+    "addKeywordsCount": {
+      "one": "إضافة كلمات مفتاحية، تتم مراقبة كلمة واحدة",
+      "other": "إضافة كلمات مفتاحية، تتم مراقبة {count} كلمات مفتاحية"
+    },
+    "chatCommands": "أوامر الدردشة",
+    "clear": "مسح",
+    "close": "إغلاق",
+    "commandHelpHint": "اكتب أمرا، ثم اضغط Tab.",
+    "couldNotFindChatInput": "تعذر العثور على حقل إدخال الدردشة.",
+    "couldNotReadTime": "تعذرت قراءة هذا الوقت.",
+    "couldNotReadUserName": "تعذرت قراءة اسم المستخدم هذا.",
+    "inbox": "صندوق الوارد",
+    "inboxAriaUnread": "صندوق الوارد، {count} غير مقروءة",
+    "inboxEmpty": "صندوق الوارد فارغ",
+    "inboxSound": "صوت صندوق الوارد",
+    "jumpToMessage": "الانتقال إلى الرسالة",
+    "keywordOrPhrase": "كلمة مفتاحية أو عبارة",
+    "lessThanOneMinute": "أقل من دقيقة واحدة",
+    "mention": "إشارة",
+    "mentionUser": "الإشارة إلى المستخدم",
+    "mentionUserTitle": "الإشارة إلى المستخدم. انقر مع Alt/Option للاقتباس.",
+    "mostUsed": "الأكثر استخداما",
+    "noInboxMessagesYet": "لا توجد رسائل في صندوق الوارد بعد.",
+    "noKeywords": "لا توجد كلمات مفتاحية",
+    "noPreviousMessageYet": "لا توجد رسالة سابقة بعد.",
+    "nothingHereYet": "لا شيء هنا بعد",
+    "openChannel": "فتح القناة",
+    "openChannelsInPopup": "فتح القنوات في نافذة منبثقة",
+    "original": "الأصل: {text}",
+    "originalMessage": "الرسالة الأصلية",
+    "pressEnterAgainToSend": "اضغط Enter مرة أخرى للإرسال.",
+    "pressTabToRunCommand": "اضغط Tab لتشغيل هذا الأمر.",
+    "quote": "اقتباس",
+    "quoteLength": "طول الاقتباس {count}.",
+    "quoteMessage": "اقتباس الرسالة",
+    "recentMessages": "الرسائل الأخيرة",
+    "recentMessagesFromThisUser": "الرسائل الأخيرة من هذا المستخدم",
+    "removeKeyword": "إزالة {keyword}",
+    "savedMessages": {
+      "one": "رسالة محفوظة واحدة",
+      "other": "{count} رسائل محفوظة"
+    },
+    "settingState": "{label} {state}.",
+    "showRecentMessages": "عرض الرسائل الأخيرة",
+    "stateOff": "متوقف",
+    "stateOn": "مشغل",
+    "timeHours": "{count} س",
+    "timeMinutes": "{count} د",
+    "timeSeconds": "{count} ث",
+    "translateChat": "ترجمة الدردشة",
+    "translated": "تمت الترجمة:",
+    "translatedFrom": "تمت الترجمة من {language}",
+    "translatedFromOriginal": "تمت الترجمة من {language}: {text}",
+    "translatedMessage": "رسالة مترجمة",
+    "translateOff": "الترجمة متوقفة.",
+    "translateToLanguage": "الترجمة إلى {language}.",
+    "translationsReplaceMessages": "الترجمات تستبدل الرسائل.",
+    "translationsShowBelowMessages": "الترجمات تظهر أسفل الرسائل.",
+    "unknownSettingCommand": "أمر إعداد غير معروف.",
+    "unknownTimezone": "منطقة زمنية غير معروفة.",
+    "unknownTranslationLanguage": "لغة ترجمة غير معروفة.",
+    "unreadMessages": {
+      "one": "رسالة جديدة واحدة",
+      "other": "{count} رسائل جديدة"
+    },
+    "useOnOrOff": "استخدم on أو off.",
+    "useQuoteLength": "استخدم طول اقتباس {lengths}.",
+    "useReplaceOrBelow": "استخدم replace أو below.",
+    "watchingMentions": "مراقبة الإشارات",
+    "watchingMentionsAndKeywords": "مراقبة الإشارات والكلمات المفتاحية"
+  },
+  "extension": {
+    "extensionName": {
+      "message": "Chat Enhancer for YouTube",
+      "description": "اسم الإضافة العام."
+    },
+    "extensionShortName": {
+      "message": "Chat Enhancer",
+      "description": "الاسم المختصر للإضافة."
+    },
+    "extensionDescription": {
+      "message": "أدوات خفيفة للترجمة والإشارات والملفات الشخصية والرموز التعبيرية لدردشة YouTube المباشرة.",
+      "description": "ملخص البيان والمتجر."
+    },
+    "openChatEnhancerWebsite": {
+      "message": "فتح موقع Chat Enhancer"
+    },
+    "openGithubRepository": {
+      "message": "فتح مستودع GitHub"
+    },
+    "supportFeedback": {
+      "message": "الدعم / الملاحظات"
+    },
+    "supportAndFeedback": {
+      "message": "الدعم والملاحظات"
+    },
+    "resetAllExtensionData": {
+      "message": "إعادة تعيين كل إعدادات الإضافة والبيانات المحلية"
+    },
+    "resetExtension": {
+      "message": "إعادة تعيين الإضافة"
+    },
+    "translation": {
+      "message": "الترجمة"
+    },
+    "chooseTranslationLanguageTitle": {
+      "message": "اختر اللغة التي ستترجم إليها رسائل الدردشة. خيار الإيقاف يعطل الترجمة التلقائية."
+    },
+    "translateTo": {
+      "message": "الترجمة إلى"
+    },
+    "translationOffHelper": {
+      "message": "الإيقاف يعطل الترجمة التلقائية."
+    },
+    "display": {
+      "message": "العرض"
+    },
+    "translationDisplayTitle": {
+      "message": "اختر ما إذا كانت الترجمات تستبدل الرسالة الأصلية أو تظهر أسفلها."
+    },
+    "translationDisplayHelper": {
+      "message": "استبدل الرسالة أو اعرض الترجمة أسفلها."
+    },
+    "replaceMessage": {
+      "message": "استبدال الرسالة"
+    },
+    "showBelow": {
+      "message": "إظهار بالأسفل"
+    },
+    "chatActions": {
+      "message": "إجراءات الدردشة"
+    },
+    "quoteLengthTitle": {
+      "message": "الحد الأقصى للأحرف المضمنة عند اقتباس رسالة من إجراءات الدردشة أو البطاقات."
+    },
+    "quoteLengthLabel": {
+      "message": "طول الاقتباس"
+    },
+    "quoteLengthHelper": {
+      "message": "الحد الأقصى للأحرف المضمنة عند اقتباس الرسائل."
+    },
+    "openChannelsInPopup": {
+      "message": "فتح القنوات في نافذة منبثقة"
+    },
+    "openChannelsInPopupTitle": {
+      "message": "افتح صفحات قنوات YouTube في نافذة منبثقة أصغر بدلا من تبويب عادي في المتصفح."
+    },
+    "openChannelsInPopupHelper": {
+      "message": "استخدم نافذة أصغر لصفحات القنوات من بطاقات الصورة الرمزية."
+    },
+    "popupAlerts": {
+      "message": "التنبيهات"
+    },
+    "playInboxSound": {
+      "message": "تشغيل صوت صندوق الوارد"
+    },
+    "playInboxSoundTitle": {
+      "message": "تشغيل صوت قصير عند حفظ رسالة دردشة في صندوق الوارد."
+    },
+    "playInboxSoundHelper": {
+      "message": "تشغيل صوت قصير للرسائل الجديدة في صندوق الوارد."
+    },
+    "extensionVersion": {
+      "message": "إصدار الإضافة"
+    },
+    "versionLabel": {
+      "message": "الإصدار {version}"
+    },
+    "off": {
+      "message": "متوقف"
+    },
+    "popupResetConfirm": {
+      "message": "إعادة تعيين إعدادات Chat Enhancer ومسح صندوق الوارد المحلي والكلمات المفتاحية وبيانات الرموز التعبيرية؟"
+    },
+    "popupResetComplete": {
+      "message": "تمت إعادة تعيين Chat Enhancer."
+    }
+  }
+}

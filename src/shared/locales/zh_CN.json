@@ -1,0 +1,183 @@
+{
+  "messages": {
+    "add": "添加",
+    "addKeywords": "添加关键词",
+    "addKeywordsCount": {
+      "one": "添加关键词，正在监视 {count} 个关键词",
+      "other": "添加关键词，正在监视 {count} 个关键词"
+    },
+    "chatCommands": "聊天命令",
+    "clear": "清除",
+    "close": "关闭",
+    "commandHelpHint": "输入命令，然后按 Tab。",
+    "couldNotFindChatInput": "找不到聊天输入框。",
+    "couldNotReadTime": "无法读取该时间。",
+    "couldNotReadUserName": "无法读取该用户名。",
+    "inbox": "收件箱",
+    "inboxAriaUnread": "收件箱，{count} 条未读",
+    "inboxEmpty": "收件箱为空",
+    "inboxSound": "收件箱提示音",
+    "jumpToMessage": "跳到消息",
+    "keywordOrPhrase": "关键词或短语",
+    "lessThanOneMinute": "少于 1 分钟",
+    "mention": "提及",
+    "mentionUser": "提及用户",
+    "mentionUserTitle": "提及用户。Alt/Option 点击可引用。",
+    "mostUsed": "最常用",
+    "noInboxMessagesYet": "收件箱中还没有消息。",
+    "noKeywords": "没有关键词",
+    "noPreviousMessageYet": "还没有上一条消息。",
+    "nothingHereYet": "这里还没有内容",
+    "openChannel": "打开频道",
+    "openChannelsInPopup": "在弹出窗口中打开频道",
+    "original": "原文：{text}",
+    "originalMessage": "原始消息",
+    "pressEnterAgainToSend": "再次按 Enter 发送。",
+    "pressTabToRunCommand": "按 Tab 运行此命令。",
+    "quote": "引用",
+    "quoteLength": "引用长度 {count}。",
+    "quoteMessage": "引用消息",
+    "recentMessages": "最近消息",
+    "recentMessagesFromThisUser": "此用户的最近消息",
+    "removeKeyword": "移除 {keyword}",
+    "savedMessages": {
+      "one": "{count} 条已保存消息",
+      "other": "{count} 条已保存消息"
+    },
+    "settingState": "{label} {state}。",
+    "showRecentMessages": "显示最近消息",
+    "stateOff": "关闭",
+    "stateOn": "开启",
+    "timeHours": "{count} 小时",
+    "timeMinutes": "{count} 分钟",
+    "timeSeconds": "{count} 秒",
+    "translateChat": "翻译聊天",
+    "translated": "已翻译：",
+    "translatedFrom": "从{language}翻译",
+    "translatedFromOriginal": "从{language}翻译：{text}",
+    "translatedMessage": "已翻译消息",
+    "translateOff": "翻译已关闭。",
+    "translateToLanguage": "翻译为{language}。",
+    "translationsReplaceMessages": "翻译会替换消息。",
+    "translationsShowBelowMessages": "翻译会显示在消息下方。",
+    "unknownSettingCommand": "未知的设置命令。",
+    "unknownTimezone": "未知时区。",
+    "unknownTranslationLanguage": "未知翻译语言。",
+    "unreadMessages": {
+      "one": "{count} 条新消息",
+      "other": "{count} 条新消息"
+    },
+    "useOnOrOff": "使用 on 或 off。",
+    "useQuoteLength": "使用引用长度 {lengths}。",
+    "useReplaceOrBelow": "使用 replace 或 below。",
+    "watchingMentions": "正在监视提及",
+    "watchingMentionsAndKeywords": "正在监视提及和关键词"
+  },
+  "extension": {
+    "extensionName": {
+      "message": "Chat Enhancer for YouTube",
+      "description": "公开显示的扩展名称。"
+    },
+    "extensionShortName": {
+      "message": "Chat Enhancer",
+      "description": "扩展的短名称。"
+    },
+    "extensionDescription": {
+      "message": "为 YouTube 直播聊天提供轻量的翻译、提及、个人资料和表情工具。",
+      "description": "清单和商店摘要。"
+    },
+    "openChatEnhancerWebsite": {
+      "message": "打开 Chat Enhancer 网站"
+    },
+    "openGithubRepository": {
+      "message": "打开 GitHub 仓库"
+    },
+    "supportFeedback": {
+      "message": "支持 / 反馈"
+    },
+    "supportAndFeedback": {
+      "message": "支持和反馈"
+    },
+    "resetAllExtensionData": {
+      "message": "重置所有扩展设置和本地数据"
+    },
+    "resetExtension": {
+      "message": "重置扩展"
+    },
+    "translation": {
+      "message": "翻译"
+    },
+    "chooseTranslationLanguageTitle": {
+      "message": "选择聊天消息要翻译成的语言。关闭会停用自动翻译。"
+    },
+    "translateTo": {
+      "message": "翻译为"
+    },
+    "translationOffHelper": {
+      "message": "关闭会停用自动翻译。"
+    },
+    "display": {
+      "message": "显示"
+    },
+    "translationDisplayTitle": {
+      "message": "选择翻译是替换原消息，还是显示在原消息下方。"
+    },
+    "translationDisplayHelper": {
+      "message": "替换消息，或在下方显示翻译。"
+    },
+    "replaceMessage": {
+      "message": "替换消息"
+    },
+    "showBelow": {
+      "message": "显示在下方"
+    },
+    "chatActions": {
+      "message": "聊天操作"
+    },
+    "quoteLengthTitle": {
+      "message": "从聊天操作或卡片引用消息时包含的最大字符数。"
+    },
+    "quoteLengthLabel": {
+      "message": "引用长度"
+    },
+    "quoteLengthHelper": {
+      "message": "引用消息时包含的最大字符数。"
+    },
+    "openChannelsInPopup": {
+      "message": "在弹出窗口中打开频道"
+    },
+    "openChannelsInPopupTitle": {
+      "message": "在较小的弹出窗口中打开 YouTube 频道页面，而不是普通浏览器标签页。"
+    },
+    "openChannelsInPopupHelper": {
+      "message": "从头像卡片打开频道页面时使用较小窗口。"
+    },
+    "popupAlerts": {
+      "message": "提醒"
+    },
+    "playInboxSound": {
+      "message": "播放收件箱提示音"
+    },
+    "playInboxSoundTitle": {
+      "message": "当聊天消息保存到收件箱时播放短提示音。"
+    },
+    "playInboxSoundHelper": {
+      "message": "有新的收件箱消息时播放短提示音。"
+    },
+    "extensionVersion": {
+      "message": "扩展版本"
+    },
+    "versionLabel": {
+      "message": "版本 {version}"
+    },
+    "off": {
+      "message": "关闭"
+    },
+    "popupResetConfirm": {
+      "message": "重置 Chat Enhancer 设置并清除本地收件箱、关键词和表情数据？"
+    },
+    "popupResetComplete": {
+      "message": "Chat Enhancer 已重置。"
+    }
+  }
+}

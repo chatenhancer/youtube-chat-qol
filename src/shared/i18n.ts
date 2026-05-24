@@ -5,13 +5,20 @@
  * follow YouTube's page language. Both systems use the same source catalogs in
  * `src/shared/locales`; build output derives `_locales` from those files.
  */
+import arCatalog from './locales/ar.json';
 import deCatalog from './locales/de.json';
 import enCatalog from './locales/en.json';
 import esCatalog from './locales/es.json';
 import frCatalog from './locales/fr.json';
+import hiCatalog from './locales/hi.json';
+import idCatalog from './locales/id.json';
+import itCatalog from './locales/it.json';
 import jaCatalog from './locales/ja.json';
 import koCatalog from './locales/ko.json';
 import ptCatalog from './locales/pt.json';
+import ruCatalog from './locales/ru.json';
+import trCatalog from './locales/tr.json';
+import zhCnCatalog from './locales/zh_CN.json';
 import { getLanguageLabel } from './languages';
 
 type MessageParams = Record<string, number | string>;
@@ -24,13 +31,20 @@ type MessageKey = keyof typeof enCatalog.messages;
 
 const EN_MESSAGES = enCatalog.messages as Record<MessageKey, MessageValue>;
 const LOCALES: Record<string, LocaleCatalog> = {
+  ar: arCatalog,
   de: deCatalog,
   en: enCatalog,
   es: esCatalog,
   fr: frCatalog,
+  hi: hiCatalog,
+  id: idCatalog,
+  it: itCatalog,
   ja: jaCatalog,
   ko: koCatalog,
-  pt: ptCatalog
+  pt: ptCatalog,
+  ru: ruCatalog,
+  tr: trCatalog,
+  'zh-CN': zhCnCatalog
 };
 
 let currentUiLocale = 'en';
@@ -77,7 +91,11 @@ function selectPluralMessage(message: PluralMessage, params: MessageParams): str
 }
 
 function normalizeSupportedLocale(locale: string): string {
-  const base = String(locale || '').trim().toLowerCase().replace('_', '-').split('-')[0];
+  const normalized = String(locale || '').trim().toLowerCase().replace('_', '-');
+  if (!normalized) return '';
+  if (normalized === 'zh' || normalized === 'zh-cn' || normalized === 'zh-hans') return 'zh-CN';
+
+  const base = normalized.split('-')[0];
   return base && LOCALES[base] ? base : '';
 }
 
