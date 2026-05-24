@@ -119,7 +119,7 @@ If those settings are missing, the workflow still produces release zips and skip
 
 MIT. See [LICENSE](LICENSE).
 
-## Project Layout
+## Project layout
 
 - `src/content/` wires features into YouTube live chat.
 - `src/features/` contains chat actions, translation, emoji, profile, inbox, and sound features.
