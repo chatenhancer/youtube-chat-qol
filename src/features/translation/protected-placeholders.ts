@@ -41,7 +41,7 @@ export function createTranslationPlan(message: HTMLElement, originalText: string
 
   if (domText) {
     return {
-      text: cleanText(replaceMentionsWithPlaceholders(domText, protectedTokens)),
+      text: cleanText(domText),
       protectedTokens
     };
   }
@@ -114,7 +114,7 @@ export function createTranslationPlan(message: HTMLElement, originalText: string
     flushPendingWhitespaceToParts();
 
     return {
-      text: cleanText(replaceMentionsWithPlaceholders(parts.join(''), protectedTokens)),
+      text: cleanText(parts.join('')),
       protectedTokens
     };
   }
