@@ -1,0 +1,9 @@
+name = "chat-enhancer-language-redirect"
+main = "language-redirect-worker.js"
+compatibility_date = "2026-05-24"
+workers_dev = false
+
+routes = [
+  { pattern = "chatenhancer.com/*", zone_name = "chatenhancer.com" },
+  { pattern = "www.chatenhancer.com/*", zone_name = "chatenhancer.com" }
+]

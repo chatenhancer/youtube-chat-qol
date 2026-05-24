@@ -25,6 +25,8 @@
     "zip:edge": "npm run check && npm run build:edge && node scripts/zip.mjs --target=edge",
     "zip:firefox": "npm run check && npm run build:firefox && node scripts/zip.mjs --target=firefox",
     "zip:all": "npm run verify && node scripts/zip.mjs --all",
+    "cloudflare:dev": "npx wrangler@4 dev --config cloudflare/wrangler.toml",
+    "cloudflare:deploy": "npx wrangler@4 deploy --config cloudflare/wrangler.toml",
     "release:validate-tag": "node scripts/validate-release-tag.mjs",
     "release:chrome": "node scripts/submit-chrome-webstore.mjs",
     "release:firefox": "node scripts/submit-firefox-amo.mjs"
