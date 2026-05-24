@@ -5,7 +5,7 @@
  * translated line below the original. Original message DOM is remembered so
  * settings changes can restore chat messages cleanly.
  */
-import { getLanguageLabel } from '../../shared/languages';
+import { getLocalizedLanguageLabel, t } from '../../shared/i18n';
 import { getOptions } from '../../shared/state';
 import { normalizeComparableText } from '../../shared/text';
 import {
@@ -110,12 +110,12 @@ export function createInlineTranslationElement(
   translation.className = 'ytcq-translation';
   translation.lang = result.targetLanguage;
   translation.title = hasReliableSourceLanguage(result)
-    ? `Translated from ${getLanguageLabel(result.sourceLanguage)}`
-    : 'Translated message';
+    ? t('translatedFrom', { language: getLocalizedLanguageLabel(result.sourceLanguage) })
+    : t('translatedMessage');
 
   const prefix = document.createElement('span');
   prefix.className = 'ytcq-translation-prefix';
-  prefix.textContent = 'Translated:';
+  prefix.textContent = t('translated');
 
   const body = document.createElement('span');
   body.append(...createNodesWithPlaceholders(result.text, protectedTokens));
@@ -135,10 +135,10 @@ export function isMeaningfulTranslation(
 }
 
 export function getReplacementTranslationTitle(result: TranslationResult, originalText: string): string {
-  if (!originalText) return 'Original message';
+  if (!originalText) return t('originalMessage');
   return hasReliableSourceLanguage(result)
-    ? `Translated from ${getLanguageLabel(result.sourceLanguage)}: ${originalText}`
-    : `Original: ${originalText}`;
+    ? t('translatedFromOriginal', { language: getLocalizedLanguageLabel(result.sourceLanguage), text: originalText })
+    : t('original', { text: originalText });
 }
 
 export function createReplacedTranslationIcon(): HTMLElement {

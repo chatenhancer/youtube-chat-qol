@@ -1,0 +1,183 @@
+{
+  "messages": {
+    "add": "Add",
+    "addKeywords": "Add keywords",
+    "addKeywordsCount": {
+      "one": "Add keywords, {count} keyword watching",
+      "other": "Add keywords, {count} keywords watching"
+    },
+    "chatCommands": "Chat commands",
+    "clear": "Clear",
+    "close": "Close",
+    "commandHelpHint": "Type a command, then press Tab.",
+    "couldNotFindChatInput": "Could not find the chat input.",
+    "couldNotReadTime": "Could not read that time.",
+    "couldNotReadUserName": "Could not read that user name.",
+    "inbox": "Inbox",
+    "inboxAriaUnread": "Inbox, {count} unread",
+    "inboxEmpty": "Inbox empty",
+    "inboxSound": "Inbox sound",
+    "jumpToMessage": "Jump to message",
+    "keywordOrPhrase": "Keyword or phrase",
+    "lessThanOneMinute": "less than 1 min",
+    "mention": "Mention",
+    "mentionUser": "Mention user",
+    "mentionUserTitle": "Mention user. Alt/Option-click to quote.",
+    "mostUsed": "MOST USED",
+    "noInboxMessagesYet": "No inbox messages yet.",
+    "noKeywords": "No keywords",
+    "noPreviousMessageYet": "No previous message yet.",
+    "nothingHereYet": "Nothing here yet",
+    "openChannel": "Open channel",
+    "openChannelsInPopup": "Open channels in popup",
+    "original": "Original: {text}",
+    "originalMessage": "Original message",
+    "pressEnterAgainToSend": "Press Enter again to send.",
+    "pressTabToRunCommand": "Press Tab to run this command.",
+    "quote": "Quote",
+    "quoteLength": "Quote length {count}.",
+    "quoteMessage": "Quote message",
+    "recentMessages": "Recent messages",
+    "recentMessagesFromThisUser": "Recent messages from this user",
+    "removeKeyword": "Remove {keyword}",
+    "savedMessages": {
+      "one": "{count} saved message",
+      "other": "{count} saved messages"
+    },
+    "settingState": "{label} {state}.",
+    "showRecentMessages": "Show recent messages",
+    "stateOff": "off",
+    "stateOn": "on",
+    "timeHours": "{count} hrs",
+    "timeMinutes": "{count} min",
+    "timeSeconds": "{count} sec",
+    "translateChat": "Translate chat",
+    "translated": "Translated:",
+    "translatedFrom": "Translated from {language}",
+    "translatedFromOriginal": "Translated from {language}: {text}",
+    "translatedMessage": "Translated message",
+    "translateOff": "Translation off.",
+    "translateToLanguage": "Translate to {language}.",
+    "translationsReplaceMessages": "Translations replace messages.",
+    "translationsShowBelowMessages": "Translations show below messages.",
+    "unknownSettingCommand": "Unknown setting command.",
+    "unknownTimezone": "Unknown timezone.",
+    "unknownTranslationLanguage": "Unknown translation language.",
+    "unreadMessages": {
+      "one": "{count} new message",
+      "other": "{count} new messages"
+    },
+    "useOnOrOff": "Use on or off.",
+    "useQuoteLength": "Use quote length {lengths}.",
+    "useReplaceOrBelow": "Use replace or below.",
+    "watchingMentions": "Watching mentions",
+    "watchingMentionsAndKeywords": "Watching mentions and keywords"
+  },
+  "extension": {
+    "extensionName": {
+      "message": "Chat Enhancer for YouTube",
+      "description": "Public extension name."
+    },
+    "extensionShortName": {
+      "message": "Chat Enhancer",
+      "description": "Short extension name."
+    },
+    "extensionDescription": {
+      "message": "Lightweight translation, reply, profile, and emoji tools for YouTube live chat.",
+      "description": "Manifest and store summary."
+    },
+    "openChatEnhancerWebsite": {
+      "message": "Open Chat Enhancer website"
+    },
+    "openGithubRepository": {
+      "message": "Open GitHub repository"
+    },
+    "supportFeedback": {
+      "message": "Support / Feedback"
+    },
+    "supportAndFeedback": {
+      "message": "Support and feedback"
+    },
+    "resetAllExtensionData": {
+      "message": "Reset all extension settings and local data"
+    },
+    "resetExtension": {
+      "message": "Reset extension"
+    },
+    "translation": {
+      "message": "Translation"
+    },
+    "chooseTranslationLanguageTitle": {
+      "message": "Choose the language chat messages should be translated into. Off disables automatic translation."
+    },
+    "translateTo": {
+      "message": "Translate to"
+    },
+    "translationOffHelper": {
+      "message": "Off disables automatic translation."
+    },
+    "display": {
+      "message": "Display"
+    },
+    "translationDisplayTitle": {
+      "message": "Choose whether translations replace the original message or appear below it."
+    },
+    "translationDisplayHelper": {
+      "message": "Replace the message or show the translation below."
+    },
+    "replaceMessage": {
+      "message": "Replace message"
+    },
+    "showBelow": {
+      "message": "Show below"
+    },
+    "chatActions": {
+      "message": "Chat Actions"
+    },
+    "quoteLengthTitle": {
+      "message": "Maximum characters included when quoting a message from chat actions or cards."
+    },
+    "quoteLengthLabel": {
+      "message": "Quote length"
+    },
+    "quoteLengthHelper": {
+      "message": "Maximum characters included when quoting messages."
+    },
+    "openChannelsInPopup": {
+      "message": "Open channels in popup"
+    },
+    "openChannelsInPopupTitle": {
+      "message": "Open YouTube channel pages in a smaller popup window instead of a normal browser tab."
+    },
+    "openChannelsInPopupHelper": {
+      "message": "Use a smaller window for channel pages from avatar cards."
+    },
+    "popupAlerts": {
+      "message": "Alerts"
+    },
+    "playInboxSound": {
+      "message": "Play inbox sound"
+    },
+    "playInboxSoundTitle": {
+      "message": "Play a short sound when a chat message is saved to your inbox."
+    },
+    "playInboxSoundHelper": {
+      "message": "Play a short sound for new inbox messages."
+    },
+    "extensionVersion": {
+      "message": "Extension version"
+    },
+    "versionLabel": {
+      "message": "Version {version}"
+    },
+    "off": {
+      "message": "Off"
+    },
+    "popupResetConfirm": {
+      "message": "Reset Chat Enhancer settings and clear local inbox, keyword, and emoji data?"
+    },
+    "popupResetComplete": {
+      "message": "Chat Enhancer has been reset."
+    }
+  }
+}

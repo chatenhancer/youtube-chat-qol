@@ -31,6 +31,7 @@ import {
 import { recordUserMessage } from '../features/user-message-history';
 import { DEFAULT_OPTIONS, getTargetLanguageUpdate, normalizeOptions, type Options } from '../shared/options';
 import { getOptions, setOptions } from '../shared/state';
+import { initUiLocaleFromDocument } from '../shared/i18n';
 import { CHAT_MESSAGE_SELECTOR, PARTICIPANT_SELECTOR } from '../youtube/selectors';
 
 let observer: MutationObserver | null = null;
@@ -39,6 +40,7 @@ let visibilityRecoveryTimer = 0;
 init();
 
 function init(): void {
+  initUiLocaleFromDocument();
   initFrequentEmojis();
   initSound();
   initInbox();

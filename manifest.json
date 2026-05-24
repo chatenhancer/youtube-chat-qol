@@ -1,9 +1,10 @@
 {
   "manifest_version": 3,
-  "name": "Chat Enhancer for YouTube",
-  "short_name": "Chat Enhancer",
+  "name": "__MSG_extensionName__",
+  "short_name": "__MSG_extensionShortName__",
   "version": "0.7.8",
-  "description": "Lightweight translation, reply, profile, and emoji tools for YouTube live chat.",
+  "description": "__MSG_extensionDescription__",
+  "default_locale": "en",
   "icons": {
     "16": "dist/extension-chrome/icons/icon-16.png",
     "32": "dist/extension-chrome/icons/icon-32.png",
@@ -22,7 +23,7 @@
     "service_worker": "dist/extension-chrome/background.js"
   },
   "action": {
-    "default_title": "Chat Enhancer for YouTube",
+    "default_title": "__MSG_extensionName__",
     "default_popup": "dist/extension-chrome/popup.html",
     "default_icon": {
       "16": "dist/extension-chrome/icons/icon-16.png",

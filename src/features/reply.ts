@@ -7,6 +7,7 @@
  * for YouTube's own message UI.
  */
 import { getOptions } from '../shared/state';
+import { t } from '../shared/i18n';
 import { cleanText } from '../shared/text';
 import { showToast } from '../shared/toast';
 import { insertIntoChatInput, insertNodesIntoChatInput, returnToChatInputPanel } from '../youtube/chat-input';
@@ -34,7 +35,7 @@ export function wireAuthorNameMention(message: HTMLElement): void {
   const authorName = message.querySelector<HTMLElement>('#author-name');
   if (!authorName) return;
 
-  authorName.title = 'Mention user. Alt/Option-click to quote.';
+  authorName.title = t('mentionUserTitle');
   authorName.addEventListener('click', (event) => {
     if (event.defaultPrevented || event.button !== 0) return;
 
@@ -59,7 +60,7 @@ export function replyToMessage(message: HTMLElement, { quote }: { quote: boolean
 export function mentionAuthorName(authorName: string): void {
   const mentionText = formatMentionText(authorName);
   if (!mentionText) {
-    showToast('Could not read that user name.');
+    showToast(t('couldNotReadUserName'));
     return;
   }
 
@@ -69,7 +70,7 @@ export function mentionAuthorName(authorName: string): void {
 export function quoteAuthorText(authorName: string, text: string): void {
   const quoteText = formatQuoteText(authorName, text);
   if (!quoteText) {
-    showToast('Could not read that user name.');
+    showToast(t('couldNotReadUserName'));
     return;
   }
 
@@ -79,7 +80,7 @@ export function quoteAuthorText(authorName: string, text: string): void {
 export function quoteAuthorRichText(authorName: string, text: string, content: RichQuoteContent): void {
   const cleanAuthorName = cleanText(authorName);
   if (!cleanAuthorName) {
-    showToast('Could not read that user name.');
+    showToast(t('couldNotReadUserName'));
     return;
   }
 
@@ -131,7 +132,7 @@ function insertMentionNodes(nodes: Node[], fallbackText: string): void {
 function insertWithChatInputRecovery(insert: () => boolean): void {
   if (!insert()) {
     if (!returnToChatInputPanel()) {
-      showToast('Could not find the chat input.');
+      showToast(t('couldNotFindChatInput'));
       return;
     }
 
@@ -142,7 +143,7 @@ function insertWithChatInputRecovery(insert: () => boolean): void {
 function retryInsertMentionContent(insert: () => boolean, attempt: number): void {
   const delay = CHAT_INPUT_RETRY_DELAYS[attempt];
   if (delay === undefined) {
-    showToast('Could not find the chat input.');
+    showToast(t('couldNotFindChatInput'));
     return;
   }
 

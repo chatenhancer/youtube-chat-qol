@@ -5,6 +5,7 @@
  * YouTube's emoji picker, and inserts selected frequent emojis directly into
  * the chat input. The row is capped so it does not crowd the native emoji list.
  */
+import { t } from '../shared/i18n';
 import { cleanText } from '../shared/text';
 import { insertIntoChatInput, insertNodeIntoChatInput } from '../youtube/chat-input';
 
@@ -108,7 +109,7 @@ function renderFrequentEmojiRow(picker: HTMLElement): void {
 
   const label = document.createElement('div');
   label.className = 'ytcq-frequent-emoji-label';
-  label.textContent = 'MOST USED';
+  label.textContent = t('mostUsed');
 
   const list = document.createElement('div');
   list.className = 'ytcq-frequent-emoji-list';
