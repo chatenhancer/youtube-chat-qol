@@ -1,0 +1,123 @@
+{
+  "meta": {
+    "title": "Chat Enhancer for YouTube - YouTube ライブチャットツール",
+    "description": "YouTube ライブチャット向けの軽量な翻訳、メンション、引用、プロフィール、絵文字、コマンドツールです。",
+    "ogDescription": "YouTube ライブチャットでメッセージを翻訳し、ユーザーをメンションや引用し、受信箱の一致を保存し、絵文字を再利用し、クイックコマンドを実行できます。",
+    "imageAlt": "Chat Enhancer for YouTube が、ネイティブ風のライブチャット翻訳、受信箱、絵文字ツールを表示している画面。"
+  },
+  "nav": {
+    "features": "機能",
+    "screenshots": "スクリーンショット",
+    "privacy": "プライバシー",
+    "commands": "コマンド",
+    "github": "GitHub",
+    "install": "インストール",
+    "language": "言語"
+  },
+  "brand": {
+    "homeAria": "Chat Enhancer for YouTube ホーム",
+    "beta": "BETA"
+  },
+  "hero": {
+    "eyebrow": "YouTube ライブチャット用ブラウザ拡張機能",
+    "title": "Chat Enhancer for YouTube",
+    "copy": "YouTube のネイティブチャットを置き換えずに、メッセージの翻訳、ユーザーのメンションや引用、チャット文脈の確認、重要なメッセージの捕捉、絵文字の再利用、クイックコマンドの実行ができます。",
+    "primaryCta": "インストール",
+    "secondaryCta": "機能を見る"
+  },
+  "features": {
+    "eyebrow": "ライブ配信用",
+    "title": "チャットが行われる場所に小さなツールを追加",
+    "translationTitle": "ライブチャットを翻訳",
+    "translationBody": "拡張機能のポップアップで翻訳先の言語を選び、YouTube のライブチャット設定からすばやく翻訳を切り替えられます。",
+    "mentionTitle": "メンションと引用",
+    "mentionBody": "YouTube のメッセージメニュー、投稿者クリック、プロフィールカード、スラッシュコマンドを使って、より速くメンションや引用ができます。",
+    "contextTitle": "チャットの文脈",
+    "contextBody": "アバターカードを開くと、現在のチャット内でそのユーザーの最近のメッセージを確認し、必要に応じてチャンネルへ移動できます。",
+    "inboxTitle": "受信箱",
+    "inboxBody": "自分のハンドルを含むメッセージやキーワードに一致するメッセージをローカルに保存し、新しい受信箱メッセージには任意で控えめな音を鳴らせます。",
+    "emojisTitle": "よく使う絵文字",
+    "emojisBody": "YouTube の絵文字ピッカーに、よく使う絵文字のコンパクトな行を追加し、よく使うリアクションにすぐ届くようにします。",
+    "commandsTitle": "チャットコマンド",
+    "commandsBody": "Tab を押すと、メンション、引用、繰り返しメッセージ、時刻ヘルパー、拡張機能設定のコマンドを展開できます。",
+    "commandsLink": "コマンドリファレンスを見る"
+  },
+  "screenshots": {
+    "eyebrow": "スクリーンショット",
+    "title": "ネイティブ感のあるチャット改善",
+    "alt": "Chat Enhancer for YouTube の機能紹介。翻訳、受信箱、プロフィール文脈、よく使う絵文字、コマンド、設定が表示されています。",
+    "caption": "翻訳、受信箱、プロフィール文脈、よく使う絵文字、クイックコマンドを、ネイティブ感のあるひとつのチャット体験にまとめます。"
+  },
+  "install": {
+    "eyebrow": "拡張機能を追加",
+    "title": "Chat Enhancer をインストール",
+    "copy": "Chrome Web Store または Firefox Add-ons から入手できます。ローカル開発用にソースからビルドすることもできます。Chrome 版は他の Chromium ベースのブラウザでも動作する場合があります。",
+    "publishedVersions": "公開済みバージョン",
+    "chromeStore": "Chrome Web Store",
+    "firefoxAddons": "Firefox Add-ons",
+    "sourceCode": "ソースコード",
+    "supportFeedback": "サポート / フィードバック",
+    "privateQuestions": "個別の質問はメールで",
+    "gettingStartedTitle": "はじめ方",
+    "gettingStartedBody": "インストールし、YouTube をすでに開いていた場合は一度更新してから、ライブチャット上で拡張機能を使います。",
+    "stepStoreTitle": "ブラウザのストアからインストール",
+    "stepStoreBody": "上の Chrome または Firefox ボタンを使ってください。他の Chromium ベースのブラウザでは通常 Chrome ビルドを利用できます。",
+    "stepRefreshTitle": "YouTube ライブチャットを開く、または更新",
+    "stepRefreshBody": "すでに開いているタブを更新すると、拡張機能がライブチャットフレームに接続できます。YouTube チャットに受信箱アイコンが表示されれば動作しています。",
+    "stepSettingsTitle": "必要に応じて詳細設定を調整",
+    "stepSettingsBody": "拡張機能はライブチャット内で自動的に動作します。すべての設定を見るには、ブラウザツールバーの拡張機能アイコンをクリックし、Chat Enhancer を選択します。すばやく開きたい場合はピン留めしてください。",
+    "stepUseTitle": "チャット改善機能を使う",
+    "stepUseBody": "メッセージメニュー、アバターカード、受信箱ボタン、よく使う絵文字、Tab コマンドが YouTube のチャット画面に表示され、そのまま利用できます。",
+    "stepRefreshBodyBeforeIcon": "すでに開いていたタブを更新すると、拡張機能がライブチャットのフレームに接続できます。YouTubeチャットに受信箱アイコン",
+    "stepRefreshBodyAfterIcon": "が表示されれば動作しています。",
+    "stepSettingsBodyBeforeIcon": "拡張機能はライブチャット内で自動的に動作します。すべての設定を開くには、ブラウザのツールバーにある拡張機能アイコンをクリックし",
+    "stepSettingsBodyMiddle": "次に",
+    "stepSettingsBodyAfterIcon": "Chat Enhancerを選んですべてのオプションを表示します。すばやく開きたい場合はピン留めしてください。"
+  },
+  "privacy": {
+    "eyebrow": "プライバシー",
+    "title": "ローカル優先のチャットツール",
+    "copy": "この拡張機能は、日常的なチャット改善をできるだけ端末内に保つように設計されています。翻訳だけは外部サービスを必要とし、翻訳先言語を選んだ後にのみ実行されます。",
+    "button": "プライバシーポリシー全文を読む",
+    "summaryAria": "プライバシー概要",
+    "scopeTitle": "範囲",
+    "scopeBody": "YouTube ライブチャットとライブチャットリプレイのページでのみ動作します。",
+    "storageTitle": "保存",
+    "storageBody": "設定、受信箱メッセージ、監視キーワード、よく使う絵文字の回数はブラウザ拡張機能のストレージに保存されます。",
+    "translationTitle": "翻訳",
+    "translationBody": "デフォルトではオフです。有効にすると、メッセージ本文が YouTube の Cookie や認証情報なしで Google Translate に送信されます。",
+    "trackingTitle": "トラッキング",
+    "trackingBody": "解析、閲覧履歴の収集、データ販売、拡張機能所有のサーバーはありません。"
+  },
+  "commands": {
+    "eyebrow": "リファレンス",
+    "title": "チャットコマンドは Tab で展開",
+    "copy": "YouTube のチャット入力欄にコマンドを入力して Tab を押します。コマンドは自動送信されず、未知のスラッシュコマンドはそのまま残ります。スラッシュコマンドを文字通り送るには // を使います。",
+    "inlineTitle": "インラインコマンド:",
+    "inlineBody": "/mention、/reply、/time、/timeuntil は文の途中でも展開できます。",
+    "wholeTitle": "入力全体で使うコマンド:",
+    "wholeBody": "/quote、/again、/repeat、/help、およびすべての /set... コマンドは、入力欄の唯一のテキストとして使ってください。",
+    "textCommandsTitle": "テキストコマンド",
+    "settingCommandsTitle": "設定コマンド",
+    "mentionDescription": "受信箱の最新メッセージの投稿者へのメンションを挿入します。",
+    "quoteDescription": "受信箱に保存された最新メッセージを引用します。",
+    "repeatDescription": "利用可能な場合はリッチな絵文字内容も含めて、最後に送信したメッセージを復元します。",
+    "timeDescription": "対応するタイムゾーンまたは都市の現在時刻を挿入します。",
+    "timeAliases": "対応エイリアス:",
+    "timeUntilDescription": "次に一致するローカル時刻までの残り時間を挿入します。",
+    "timeUntilFormats": "利用できる形式:",
+    "helpDescription": "YouTube チャット内でコマンドヘルプカードを開きます。",
+    "setTranslateDescription": "翻訳先言語を設定します。翻訳を無効にするには off を使います。",
+    "setDisplayDescription": "元のメッセージを翻訳で置き換えます。翻訳を下に表示するには below を使います。",
+    "setQuoteLengthDescription": "引用の長さを 80、120、180、240 に設定します。",
+    "setSoundDescription": "受信箱サウンドをオンまたはオフにします。",
+    "setPopupDescription": "チャンネルをポップアップウィンドウで開きます。通常どおり開くには off を使います。"
+  },
+  "footer": {
+    "disclaimer": "Chat Enhancer for YouTube は YouTube または Google と提携していません。",
+    "privacy": "プライバシー",
+    "support": "サポート",
+    "email": "メール",
+    "license": "ライセンス"
+  }
+}

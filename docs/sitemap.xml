@@ -1,9 +1,269 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://chatenhancer.com/</loc>
-    <lastmod>2026-05-20</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://chatenhancer.com/" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://chatenhancer.com/ar/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://chatenhancer.com/de/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://chatenhancer.com/es/" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://chatenhancer.com/fr/" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://chatenhancer.com/hi/" />
+    <xhtml:link rel="alternate" hreflang="id" href="https://chatenhancer.com/id/" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://chatenhancer.com/it/" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://chatenhancer.com/ja/" />
+    <xhtml:link rel="alternate" hreflang="ko" href="https://chatenhancer.com/ko/" />
+    <xhtml:link rel="alternate" hreflang="pt" href="https://chatenhancer.com/pt/" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://chatenhancer.com/ru/" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://chatenhancer.com/tr/" />
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://chatenhancer.com/zh-CN/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://chatenhancer.com/" />
     <changefreq>weekly</changefreq>
-    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://chatenhancer.com/ar/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://chatenhancer.com/" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://chatenhancer.com/ar/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://chatenhancer.com/de/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://chatenhancer.com/es/" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://chatenhancer.com/fr/" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://chatenhancer.com/hi/" />
+    <xhtml:link rel="alternate" hreflang="id" href="https://chatenhancer.com/id/" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://chatenhancer.com/it/" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://chatenhancer.com/ja/" />
+    <xhtml:link rel="alternate" hreflang="ko" href="https://chatenhancer.com/ko/" />
+    <xhtml:link rel="alternate" hreflang="pt" href="https://chatenhancer.com/pt/" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://chatenhancer.com/ru/" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://chatenhancer.com/tr/" />
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://chatenhancer.com/zh-CN/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://chatenhancer.com/" />
+    <changefreq>weekly</changefreq>
+  </url>
+  <url>
+    <loc>https://chatenhancer.com/de/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://chatenhancer.com/" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://chatenhancer.com/ar/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://chatenhancer.com/de/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://chatenhancer.com/es/" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://chatenhancer.com/fr/" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://chatenhancer.com/hi/" />
+    <xhtml:link rel="alternate" hreflang="id" href="https://chatenhancer.com/id/" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://chatenhancer.com/it/" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://chatenhancer.com/ja/" />
+    <xhtml:link rel="alternate" hreflang="ko" href="https://chatenhancer.com/ko/" />
+    <xhtml:link rel="alternate" hreflang="pt" href="https://chatenhancer.com/pt/" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://chatenhancer.com/ru/" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://chatenhancer.com/tr/" />
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://chatenhancer.com/zh-CN/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://chatenhancer.com/" />
+    <changefreq>weekly</changefreq>
+  </url>
+  <url>
+    <loc>https://chatenhancer.com/es/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://chatenhancer.com/" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://chatenhancer.com/ar/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://chatenhancer.com/de/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://chatenhancer.com/es/" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://chatenhancer.com/fr/" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://chatenhancer.com/hi/" />
+    <xhtml:link rel="alternate" hreflang="id" href="https://chatenhancer.com/id/" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://chatenhancer.com/it/" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://chatenhancer.com/ja/" />
+    <xhtml:link rel="alternate" hreflang="ko" href="https://chatenhancer.com/ko/" />
+    <xhtml:link rel="alternate" hreflang="pt" href="https://chatenhancer.com/pt/" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://chatenhancer.com/ru/" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://chatenhancer.com/tr/" />
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://chatenhancer.com/zh-CN/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://chatenhancer.com/" />
+    <changefreq>weekly</changefreq>
+  </url>
+  <url>
+    <loc>https://chatenhancer.com/fr/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://chatenhancer.com/" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://chatenhancer.com/ar/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://chatenhancer.com/de/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://chatenhancer.com/es/" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://chatenhancer.com/fr/" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://chatenhancer.com/hi/" />
+    <xhtml:link rel="alternate" hreflang="id" href="https://chatenhancer.com/id/" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://chatenhancer.com/it/" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://chatenhancer.com/ja/" />
+    <xhtml:link rel="alternate" hreflang="ko" href="https://chatenhancer.com/ko/" />
+    <xhtml:link rel="alternate" hreflang="pt" href="https://chatenhancer.com/pt/" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://chatenhancer.com/ru/" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://chatenhancer.com/tr/" />
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://chatenhancer.com/zh-CN/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://chatenhancer.com/" />
+    <changefreq>weekly</changefreq>
+  </url>
+  <url>
+    <loc>https://chatenhancer.com/hi/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://chatenhancer.com/" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://chatenhancer.com/ar/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://chatenhancer.com/de/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://chatenhancer.com/es/" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://chatenhancer.com/fr/" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://chatenhancer.com/hi/" />
+    <xhtml:link rel="alternate" hreflang="id" href="https://chatenhancer.com/id/" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://chatenhancer.com/it/" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://chatenhancer.com/ja/" />
+    <xhtml:link rel="alternate" hreflang="ko" href="https://chatenhancer.com/ko/" />
+    <xhtml:link rel="alternate" hreflang="pt" href="https://chatenhancer.com/pt/" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://chatenhancer.com/ru/" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://chatenhancer.com/tr/" />
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://chatenhancer.com/zh-CN/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://chatenhancer.com/" />
+    <changefreq>weekly</changefreq>
+  </url>
+  <url>
+    <loc>https://chatenhancer.com/id/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://chatenhancer.com/" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://chatenhancer.com/ar/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://chatenhancer.com/de/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://chatenhancer.com/es/" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://chatenhancer.com/fr/" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://chatenhancer.com/hi/" />
+    <xhtml:link rel="alternate" hreflang="id" href="https://chatenhancer.com/id/" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://chatenhancer.com/it/" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://chatenhancer.com/ja/" />
+    <xhtml:link rel="alternate" hreflang="ko" href="https://chatenhancer.com/ko/" />
+    <xhtml:link rel="alternate" hreflang="pt" href="https://chatenhancer.com/pt/" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://chatenhancer.com/ru/" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://chatenhancer.com/tr/" />
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://chatenhancer.com/zh-CN/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://chatenhancer.com/" />
+    <changefreq>weekly</changefreq>
+  </url>
+  <url>
+    <loc>https://chatenhancer.com/it/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://chatenhancer.com/" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://chatenhancer.com/ar/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://chatenhancer.com/de/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://chatenhancer.com/es/" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://chatenhancer.com/fr/" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://chatenhancer.com/hi/" />
+    <xhtml:link rel="alternate" hreflang="id" href="https://chatenhancer.com/id/" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://chatenhancer.com/it/" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://chatenhancer.com/ja/" />
+    <xhtml:link rel="alternate" hreflang="ko" href="https://chatenhancer.com/ko/" />
+    <xhtml:link rel="alternate" hreflang="pt" href="https://chatenhancer.com/pt/" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://chatenhancer.com/ru/" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://chatenhancer.com/tr/" />
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://chatenhancer.com/zh-CN/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://chatenhancer.com/" />
+    <changefreq>weekly</changefreq>
+  </url>
+  <url>
+    <loc>https://chatenhancer.com/ja/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://chatenhancer.com/" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://chatenhancer.com/ar/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://chatenhancer.com/de/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://chatenhancer.com/es/" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://chatenhancer.com/fr/" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://chatenhancer.com/hi/" />
+    <xhtml:link rel="alternate" hreflang="id" href="https://chatenhancer.com/id/" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://chatenhancer.com/it/" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://chatenhancer.com/ja/" />
+    <xhtml:link rel="alternate" hreflang="ko" href="https://chatenhancer.com/ko/" />
+    <xhtml:link rel="alternate" hreflang="pt" href="https://chatenhancer.com/pt/" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://chatenhancer.com/ru/" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://chatenhancer.com/tr/" />
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://chatenhancer.com/zh-CN/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://chatenhancer.com/" />
+    <changefreq>weekly</changefreq>
+  </url>
+  <url>
+    <loc>https://chatenhancer.com/ko/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://chatenhancer.com/" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://chatenhancer.com/ar/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://chatenhancer.com/de/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://chatenhancer.com/es/" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://chatenhancer.com/fr/" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://chatenhancer.com/hi/" />
+    <xhtml:link rel="alternate" hreflang="id" href="https://chatenhancer.com/id/" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://chatenhancer.com/it/" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://chatenhancer.com/ja/" />
+    <xhtml:link rel="alternate" hreflang="ko" href="https://chatenhancer.com/ko/" />
+    <xhtml:link rel="alternate" hreflang="pt" href="https://chatenhancer.com/pt/" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://chatenhancer.com/ru/" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://chatenhancer.com/tr/" />
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://chatenhancer.com/zh-CN/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://chatenhancer.com/" />
+    <changefreq>weekly</changefreq>
+  </url>
+  <url>
+    <loc>https://chatenhancer.com/pt/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://chatenhancer.com/" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://chatenhancer.com/ar/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://chatenhancer.com/de/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://chatenhancer.com/es/" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://chatenhancer.com/fr/" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://chatenhancer.com/hi/" />
+    <xhtml:link rel="alternate" hreflang="id" href="https://chatenhancer.com/id/" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://chatenhancer.com/it/" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://chatenhancer.com/ja/" />
+    <xhtml:link rel="alternate" hreflang="ko" href="https://chatenhancer.com/ko/" />
+    <xhtml:link rel="alternate" hreflang="pt" href="https://chatenhancer.com/pt/" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://chatenhancer.com/ru/" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://chatenhancer.com/tr/" />
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://chatenhancer.com/zh-CN/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://chatenhancer.com/" />
+    <changefreq>weekly</changefreq>
+  </url>
+  <url>
+    <loc>https://chatenhancer.com/ru/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://chatenhancer.com/" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://chatenhancer.com/ar/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://chatenhancer.com/de/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://chatenhancer.com/es/" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://chatenhancer.com/fr/" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://chatenhancer.com/hi/" />
+    <xhtml:link rel="alternate" hreflang="id" href="https://chatenhancer.com/id/" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://chatenhancer.com/it/" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://chatenhancer.com/ja/" />
+    <xhtml:link rel="alternate" hreflang="ko" href="https://chatenhancer.com/ko/" />
+    <xhtml:link rel="alternate" hreflang="pt" href="https://chatenhancer.com/pt/" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://chatenhancer.com/ru/" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://chatenhancer.com/tr/" />
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://chatenhancer.com/zh-CN/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://chatenhancer.com/" />
+    <changefreq>weekly</changefreq>
+  </url>
+  <url>
+    <loc>https://chatenhancer.com/tr/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://chatenhancer.com/" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://chatenhancer.com/ar/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://chatenhancer.com/de/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://chatenhancer.com/es/" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://chatenhancer.com/fr/" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://chatenhancer.com/hi/" />
+    <xhtml:link rel="alternate" hreflang="id" href="https://chatenhancer.com/id/" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://chatenhancer.com/it/" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://chatenhancer.com/ja/" />
+    <xhtml:link rel="alternate" hreflang="ko" href="https://chatenhancer.com/ko/" />
+    <xhtml:link rel="alternate" hreflang="pt" href="https://chatenhancer.com/pt/" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://chatenhancer.com/ru/" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://chatenhancer.com/tr/" />
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://chatenhancer.com/zh-CN/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://chatenhancer.com/" />
+    <changefreq>weekly</changefreq>
+  </url>
+  <url>
+    <loc>https://chatenhancer.com/zh-CN/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://chatenhancer.com/" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://chatenhancer.com/ar/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://chatenhancer.com/de/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://chatenhancer.com/es/" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://chatenhancer.com/fr/" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://chatenhancer.com/hi/" />
+    <xhtml:link rel="alternate" hreflang="id" href="https://chatenhancer.com/id/" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://chatenhancer.com/it/" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://chatenhancer.com/ja/" />
+    <xhtml:link rel="alternate" hreflang="ko" href="https://chatenhancer.com/ko/" />
+    <xhtml:link rel="alternate" hreflang="pt" href="https://chatenhancer.com/pt/" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://chatenhancer.com/ru/" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://chatenhancer.com/tr/" />
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://chatenhancer.com/zh-CN/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://chatenhancer.com/" />
+    <changefreq>weekly</changefreq>
   </url>
 </urlset>

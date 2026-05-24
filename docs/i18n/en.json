@@ -1,0 +1,123 @@
+{
+  "meta": {
+    "title": "Chat Enhancer for YouTube - YouTube Live Chat Tools",
+    "description": "Lightweight translation, mention, quote, profile, emoji, and command tools for YouTube live chat.",
+    "ogDescription": "Translate messages, mention and quote users, save inbox matches, reuse emojis, and run quick commands in YouTube live chat.",
+    "imageAlt": "Chat Enhancer for YouTube showing native-feeling live chat translation, inbox, and emoji tools."
+  },
+  "nav": {
+    "features": "Features",
+    "screenshots": "Screenshots",
+    "privacy": "Privacy",
+    "commands": "Commands",
+    "github": "GitHub",
+    "install": "Install",
+    "language": "Language"
+  },
+  "brand": {
+    "homeAria": "Chat Enhancer for YouTube home",
+    "beta": "BETA"
+  },
+  "hero": {
+    "eyebrow": "Browser extension for YouTube live chat",
+    "title": "Chat Enhancer for YouTube",
+    "copy": "Translate messages, mention and quote users, revisit chat context, catch messages you care about, reuse emojis, and run quick commands without replacing YouTube's native chat.",
+    "primaryCta": "Install",
+    "secondaryCta": "See features"
+  },
+  "features": {
+    "eyebrow": "Built for live streams",
+    "title": "Small tools where chat already happens",
+    "translationTitle": "Translate live chat",
+    "translationBody": "Choose a target language in the extension popup, then quickly toggle translation from YouTube's live chat settings.",
+    "mentionTitle": "Mention and quote",
+    "mentionBody": "Use YouTube's message menu, author clicks, profile cards, or slash commands to mention and quote people faster.",
+    "contextTitle": "Chat context",
+    "contextBody": "Open an avatar card to review a user's recent messages in the current chat and jump to their channel when needed.",
+    "inboxTitle": "Inbox",
+    "inboxBody": "Keep a local list of messages that mention your handle or match your keywords, with an optional subtle sound for new inbox messages.",
+    "emojisTitle": "Frequent emojis",
+    "emojisBody": "Add a compact row of your most-used emojis to YouTube's emoji picker so common reactions are always close.",
+    "commandsTitle": "Chat commands",
+    "commandsBody": "Press Tab to expand commands for mentions, quotes, repeated messages, time helpers, and extension settings.",
+    "commandsLink": "View command reference"
+  },
+  "screenshots": {
+    "eyebrow": "Screenshots",
+    "title": "Native-feeling chat improvements",
+    "alt": "Chat Enhancer for YouTube feature showcase with translation, inbox, profile context, frequent emojis, commands, and settings",
+    "caption": "Translation, inbox, profile context, frequent emojis, and quick commands in one native-feeling chat workflow."
+  },
+  "install": {
+    "eyebrow": "Add the extension",
+    "title": "Install Chat Enhancer",
+    "copy": "Get it from the Chrome Web Store or Firefox Add-ons, or build the extension from source for local development. The Chrome version may also work in other Chromium-based browsers.",
+    "publishedVersions": "Published versions",
+    "chromeStore": "Chrome Web Store",
+    "firefoxAddons": "Firefox Add-ons",
+    "sourceCode": "Source Code",
+    "supportFeedback": "Support / Feedback",
+    "privateQuestions": "For private questions, email",
+    "gettingStartedTitle": "Getting started",
+    "gettingStartedBody": "Install, refresh YouTube once if it was already open, then use the extension where live chat already is.",
+    "stepStoreTitle": "Install from your browser store",
+    "stepStoreBody": "Use the Chrome or Firefox button above. Other Chromium-based browsers can generally use the Chrome build.",
+    "stepRefreshTitle": "Open or refresh YouTube live chat",
+    "stepRefreshBody": "Refresh tabs that were already open so the extension can attach to the live chat frame. You'll know it's working when the inbox icon appears in YouTube chat.",
+    "stepSettingsTitle": "Adjust full settings when needed",
+    "stepSettingsBody": "The extension works in live chat automatically. For complete settings, click the browser toolbar extensions icon and choose Chat Enhancer to reveal all the options. Pin it if you want faster access.",
+    "stepUseTitle": "Use the chat enhancements",
+    "stepUseBody": "Message menus, avatar cards, the inbox button, frequent emojis, and Tab commands appear and can be used within YouTube's chat interface.",
+    "stepRefreshBodyBeforeIcon": "Refresh tabs that were already open so the extension can attach to the live chat frame. You'll know it's working when the inbox icon",
+    "stepRefreshBodyAfterIcon": "appears in YouTube chat.",
+    "stepSettingsBodyBeforeIcon": "The extension works in live chat automatically. For complete settings, click the browser toolbar extensions icon",
+    "stepSettingsBodyMiddle": "and choose",
+    "stepSettingsBodyAfterIcon": "Chat Enhancer to reveal all the options. Pin it if you want faster access."
+  },
+  "privacy": {
+    "eyebrow": "Privacy",
+    "title": "Local-first chat tools",
+    "copy": "The extension is designed to keep routine chat enhancements on your device. Translation is the one feature that needs an external service, and it only runs after you choose a target language.",
+    "button": "Read the full privacy policy",
+    "summaryAria": "Privacy summary",
+    "scopeTitle": "Scope",
+    "scopeBody": "Runs only on YouTube live chat and live chat replay pages.",
+    "storageTitle": "Storage",
+    "storageBody": "Settings, inbox messages, watched keywords, and frequent emoji counts stay in browser extension storage.",
+    "translationTitle": "Translation",
+    "translationBody": "Off by default. If enabled, message text is sent to Google Translate without your YouTube cookies or credentials.",
+    "trackingTitle": "Tracking",
+    "trackingBody": "No analytics, browsing history collection, data resale, or extension-owned server."
+  },
+  "commands": {
+    "eyebrow": "Reference",
+    "title": "Chat commands expand with Tab",
+    "copy": "Type a command in YouTube's chat input, then press Tab. Commands do not send automatically, and unknown slash commands are left alone. Use // to send a literal slash command.",
+    "inlineTitle": "Inline commands:",
+    "inlineBody": "/mention, /reply, /time, and /timeuntil can expand inside a sentence.",
+    "wholeTitle": "Whole-input commands:",
+    "wholeBody": "/quote, /again, /repeat, /help, and all /set... commands should be the only text in the input.",
+    "textCommandsTitle": "Text commands",
+    "settingCommandsTitle": "Setting commands",
+    "mentionDescription": "Insert a mention for the author of your newest inbox message.",
+    "quoteDescription": "Quote the newest message saved in your inbox.",
+    "repeatDescription": "Restore your last sent message, including rich emoji content when available.",
+    "timeDescription": "Insert the current time for a supported timezone or city.",
+    "timeAliases": "Supported aliases:",
+    "timeUntilDescription": "Insert the time remaining until the next matching local time.",
+    "timeUntilFormats": "Accepted formats:",
+    "helpDescription": "Open the command help card inside YouTube chat.",
+    "setTranslateDescription": "Set the translation target language. Use off to disable translation.",
+    "setDisplayDescription": "Replace original messages with translations. Use below to show translations underneath.",
+    "setQuoteLengthDescription": "Set quote length to 80, 120, 180, or 240.",
+    "setSoundDescription": "Turn inbox sounds on or off.",
+    "setPopupDescription": "Open channels in popup windows. Use off to open them normally."
+  },
+  "footer": {
+    "disclaimer": "Chat Enhancer for YouTube is not affiliated with YouTube or Google.",
+    "privacy": "Privacy",
+    "support": "Support",
+    "email": "Email",
+    "license": "License"
+  }
+}

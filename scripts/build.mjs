@@ -10,7 +10,6 @@ import { copyFile, cp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import packageJson from '../package.json' with { type: 'json' };
-import { syncCommandDocs } from './sync-command-docs.mjs';
 import { syncExtensionLocales } from './sync-extension-locales.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -135,7 +134,6 @@ async function syncVersionedSourceFiles() {
     syncManifestVersion(),
     syncPackageLockVersion()
   ]);
-  await syncCommandDocs();
 }
 
 async function syncManifestVersion() {

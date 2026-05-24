@@ -15,7 +15,7 @@ Describe the change and the user-facing behavior it affects.
 
 - [ ] `npm run typecheck`
 - [ ] `npm run lint`
-- [ ] `npm run build`
+- [ ] `npm run verify`
 - [ ] Tested in Chrome
 - [ ] Tested in Firefox
 - [ ] Not applicable

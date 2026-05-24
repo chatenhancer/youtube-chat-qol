@@ -7,12 +7,6 @@
  */
 import { LANGUAGE_OPTIONS, getLanguageLabel } from '../shared/languages';
 import { getLocalizedLanguageLabel, t } from '../shared/i18n';
-import {
-  getChatCommandHelpRows,
-  getChatCommandNames,
-  getChatCommandTimeZones,
-  getInlineChatCommandNames
-} from '../shared/chat-command-reference';
 import { getTargetLanguageUpdate, QUOTE_LENGTH_OPTIONS, type Options, type TranslationDisplay } from '../shared/options';
 import { cleanText } from '../shared/text';
 import { showToast } from '../shared/toast';
@@ -43,6 +37,35 @@ interface InlineParsedCommand extends ParsedCommand {
   start: number;
 }
 
+type ChatCommandKind = 'setting' | 'text';
+type ChatCommandHandler = (parsed: ParsedCommand, context: ChatCommandContext) => void | Promise<void>;
+type InlineChatCommandHandler = (parsed: InlineParsedCommand) => void | Promise<void>;
+type MessageKey = Parameters<typeof t>[0];
+
+interface ChatCommandContext {
+  saveOptions: SaveOptions;
+}
+
+interface ChatCommandDefinition {
+  helpDescriptionKey: MessageKey;
+  helpLabel: string;
+  hiddenAliases?: string[];
+  inline?: boolean;
+  kind: ChatCommandKind;
+  names: string[];
+  run: ChatCommandHandler;
+  runInline?: InlineChatCommandHandler;
+}
+
+interface TimeZoneOption {
+  label: string;
+  timeZone: string;
+}
+
+interface ChatCommandTimeZone extends TimeZoneOption {
+  aliases: string[];
+}
+
 const SEND_BUTTON_SELECTOR = [
   '#send-button',
   '#send-button button',
@@ -52,16 +75,152 @@ const SEND_BUTTON_SELECTOR = [
   'button[title="Send"]'
 ].join(',');
 
-const TEXT_COMPLETION_COMMANDS = new Set(getChatCommandNames('text'));
-const INLINE_TEXT_COMPLETION_COMMANDS = new Set(getInlineChatCommandNames());
-const SETTING_COMMANDS = new Set(getChatCommandNames('setting'));
+const CHAT_COMMAND_TIME_ZONES: ChatCommandTimeZone[] = [
+  {
+    aliases: ['utc'],
+    label: 'UTC',
+    timeZone: 'UTC'
+  },
+  {
+    aliases: ['tokyo', 'jst'],
+    label: 'Tokyo',
+    timeZone: 'Asia/Tokyo'
+  },
+  {
+    aliases: ['seoul', 'kst'],
+    label: 'Seoul',
+    timeZone: 'Asia/Seoul'
+  },
+  {
+    aliases: ['london'],
+    label: 'London',
+    timeZone: 'Europe/London'
+  },
+  {
+    aliases: ['paris'],
+    label: 'Paris',
+    timeZone: 'Europe/Paris'
+  },
+  {
+    aliases: ['madrid'],
+    label: 'Madrid',
+    timeZone: 'Europe/Madrid'
+  },
+  {
+    aliases: ['newyork', 'nyc', 'et', 'eastern'],
+    label: 'New York',
+    timeZone: 'America/New_York'
+  },
+  {
+    aliases: ['losangeles', 'la', 'pt', 'pacific'],
+    label: 'Los Angeles',
+    timeZone: 'America/Los_Angeles'
+  }
+];
+
+const CHAT_COMMANDS: ChatCommandDefinition[] = [
+  {
+    helpDescriptionKey: 'commandHelpMention',
+    helpLabel: '/mention, /reply',
+    inline: true,
+    kind: 'text',
+    names: ['mention', 'reply'],
+    run: async () => replaceCommandText(await getMentionCommandText(), t('noInboxMessagesYet')),
+    runInline: async (parsed) => replaceInlineCommandText(
+      await getMentionCommandText(),
+      parsed,
+      t('noInboxMessagesYet')
+    )
+  },
+  {
+    helpDescriptionKey: 'commandHelpQuote',
+    helpLabel: '/quote',
+    kind: 'text',
+    names: ['quote'],
+    run: async () => replaceCommandText(await getQuoteCommandText(), t('noInboxMessagesYet'))
+  },
+  {
+    helpDescriptionKey: 'commandHelpRepeat',
+    helpLabel: '/again, /repeat',
+    kind: 'text',
+    names: ['again', 'repeat'],
+    run: () => replaceLastSentMessage()
+  },
+  {
+    helpDescriptionKey: 'commandHelpTime',
+    helpLabel: '/time utc',
+    inline: true,
+    kind: 'text',
+    names: ['time'],
+    run: (parsed) => replaceCommandText(formatTime(parsed.args), t('unknownTimezone')),
+    runInline: (parsed) => replaceInlineCommandText(formatTime(parsed.args), parsed, t('unknownTimezone'))
+  },
+  {
+    helpDescriptionKey: 'commandHelpTimeUntil',
+    helpLabel: '/timeuntil 7:45pm',
+    inline: true,
+    kind: 'text',
+    names: ['timeuntil'],
+    run: (parsed) => replaceCommandText(formatTimeUntil(parsed.args), t('couldNotReadTime')),
+    runInline: (parsed) => replaceInlineCommandText(formatTimeUntil(parsed.args), parsed, t('couldNotReadTime'))
+  },
+  {
+    helpDescriptionKey: 'commandHelpOpenHelp',
+    helpLabel: '/help',
+    kind: 'text',
+    names: ['help'],
+    run: () => {
+      replaceChatInput('');
+      showChatCommandHelp();
+    }
+  },
+  {
+    helpDescriptionKey: 'commandHelpSetTranslateTo',
+    helpLabel: '/settranslateto english/off',
+    kind: 'setting',
+    names: ['settranslateto'],
+    run: (parsed, { saveOptions }) => executeSetTranslateToCommand(parsed, saveOptions)
+  },
+  {
+    helpDescriptionKey: 'commandHelpSetTranslationDisplay',
+    helpLabel: '/settranslationdisplay replace/below',
+    kind: 'setting',
+    names: ['settranslationdisplay'],
+    run: (parsed, { saveOptions }) => executeSetTranslationDisplayCommand(parsed, saveOptions)
+  },
+  {
+    helpDescriptionKey: 'commandHelpSetQuoteLength',
+    helpLabel: '/setquotelength 120',
+    kind: 'setting',
+    names: ['setquotelength'],
+    run: (parsed, { saveOptions }) => executeSetQuoteLengthCommand(parsed, saveOptions)
+  },
+  {
+    helpDescriptionKey: 'commandHelpSetSound',
+    helpLabel: '/setsound on/off',
+    kind: 'setting',
+    names: ['setsound'],
+    run: (parsed, { saveOptions }) => executeBooleanSetCommand(parsed, saveOptions, 'sound', t('inboxSound'))
+  },
+  {
+    helpDescriptionKey: 'commandHelpSetOpenChannelsInPopup',
+    helpLabel: '/setopenchannelsinpopup on/off',
+    hiddenAliases: ['setopenprofilesinpopup'],
+    kind: 'setting',
+    names: ['setopenchannelsinpopup'],
+    run: (parsed, { saveOptions }) => executeBooleanSetCommand(
+      parsed,
+      saveOptions,
+      'openProfilesInPopup',
+      t('openChannelsInPopup')
+    )
+  }
+];
+
+const COMMAND_BY_NAME = createCommandMap(CHAT_COMMANDS);
+const INLINE_COMMANDS = new Set(CHAT_COMMANDS.filter((command) => command.inline).flatMap((command) => command.names));
 const languageByCommandName = createLanguageCommandMap();
 const timeZoneByCommandName = createTimeZoneCommandMap();
-
-interface TimeZoneOption {
-  label: string;
-  timeZone: string;
-}
 
 let lastSentMessage: ChatInputSnapshot | null = null;
 let escapedSlashText = '';
@@ -157,90 +316,17 @@ function handleChatCommandSendClick(event: MouseEvent): void {
 }
 
 async function executeTabCommand(event: KeyboardEvent, parsed: ParsedCommand, saveOptions: SaveOptions): Promise<void> {
-  if (!isKnownCommand(parsed.name)) return;
+  const command = COMMAND_BY_NAME.get(parsed.name);
+  if (!command) return;
   preventCommandEvent(event);
-
-  if (SETTING_COMMANDS.has(parsed.name)) {
-    executeSetCommand(parsed, saveOptions);
-    return;
-  }
-
-  if (parsed.name === 'help') {
-    replaceChatInput('');
-    showChatCommandHelp();
-    return;
-  }
-
-  if (parsed.name === 'mention' || parsed.name === 'reply') {
-    replaceCommandText(await getMentionCommandText(), t('noInboxMessagesYet'));
-    return;
-  }
-
-  if (parsed.name === 'quote') {
-    replaceCommandText(await getQuoteCommandText(), t('noInboxMessagesYet'));
-    return;
-  }
-
-  if (parsed.name === 'again' || parsed.name === 'repeat') {
-    replaceLastSentMessage();
-    return;
-  }
-
-  if (parsed.name === 'time') {
-    replaceCommandText(formatTime(parsed.args), t('unknownTimezone'));
-    return;
-  }
-
-  if (parsed.name === 'timeuntil') {
-    replaceCommandText(formatTimeUntil(parsed.args), t('couldNotReadTime'));
-  }
+  await command.run(parsed, { saveOptions });
 }
 
 async function executeInlineTextCommand(event: KeyboardEvent, parsed: InlineParsedCommand): Promise<void> {
+  const command = COMMAND_BY_NAME.get(parsed.name);
+  if (!command?.runInline) return;
   preventCommandEvent(event);
-
-  if (parsed.name === 'mention' || parsed.name === 'reply') {
-    replaceInlineCommandText(await getMentionCommandText(), parsed, t('noInboxMessagesYet'));
-    return;
-  }
-
-  if (parsed.name === 'time') {
-    replaceInlineCommandText(formatTime(parsed.args), parsed, t('unknownTimezone'));
-    return;
-  }
-
-  if (parsed.name === 'timeuntil') {
-    replaceInlineCommandText(formatTimeUntil(parsed.args), parsed, t('couldNotReadTime'));
-  }
-}
-
-function executeSetCommand(parsed: ParsedCommand, saveOptions: SaveOptions): void {
-  if (parsed.name === 'settranslateto') {
-    executeSetTranslateToCommand(parsed, saveOptions);
-    return;
-  }
-
-  if (parsed.name === 'settranslationdisplay') {
-    executeSetTranslationDisplayCommand(parsed, saveOptions);
-    return;
-  }
-
-  if (parsed.name === 'setquotelength') {
-    executeSetQuoteLengthCommand(parsed, saveOptions);
-    return;
-  }
-
-  if (parsed.name === 'setsound') {
-    executeBooleanSetCommand(parsed, saveOptions, 'sound', t('inboxSound'));
-    return;
-  }
-
-  if (parsed.name === 'setopenchannelsinpopup' || parsed.name === 'setopenprofilesinpopup') {
-    executeBooleanSetCommand(parsed, saveOptions, 'openProfilesInPopup', t('openChannelsInPopup'));
-    return;
-  }
-
-  showToast(t('unknownSettingCommand'));
+  await command.runInline(parsed);
 }
 
 function executeSetTranslateToCommand(parsed: ParsedCommand, saveOptions: SaveOptions): void {
@@ -362,12 +448,12 @@ function showChatCommandHelp(): void {
   const list = document.createElement('dl');
   list.className = 'ytcq-command-help-list';
 
-  getChatCommandHelpRows().forEach(([command, description]) => {
+  CHAT_COMMANDS.forEach((command) => {
     const term = document.createElement('dt');
-    term.textContent = command;
+    term.textContent = command.helpLabel;
 
     const details = document.createElement('dd');
-    details.textContent = description;
+    details.textContent = t(command.helpDescriptionKey);
 
     list.append(term, details);
   });
@@ -482,7 +568,7 @@ function parseInlineTextCommandAt(text: string, end: number): InlineParsedComman
     if (beforeCaret[start + 1] === '/') continue;
 
     const parsed = parseCommand(beforeCaret.slice(start));
-    if (parsed && INLINE_TEXT_COMPLETION_COMMANDS.has(parsed.name)) {
+    if (parsed && INLINE_COMMANDS.has(parsed.name)) {
       return {
         ...parsed,
         end,
@@ -536,9 +622,19 @@ function createLanguageCommandMap(): Map<string, string> {
 
 function createTimeZoneCommandMap(): Map<string, TimeZoneOption> {
   const map = new Map<string, TimeZoneOption>();
-  getChatCommandTimeZones().forEach(({ aliases, label, timeZone }) => {
+  CHAT_COMMAND_TIME_ZONES.forEach(({ aliases, label, timeZone }) => {
     aliases.forEach((alias) => {
       map.set(normalizeCommandToken(alias), { label, timeZone });
+    });
+  });
+  return map;
+}
+
+function createCommandMap(commands: ChatCommandDefinition[]): Map<string, ChatCommandDefinition> {
+  const map = new Map<string, ChatCommandDefinition>();
+  commands.forEach((command) => {
+    [...command.names, ...(command.hiddenAliases || [])].forEach((name) => {
+      map.set(name, command);
     });
   });
   return map;
@@ -657,7 +753,7 @@ function isSendButtonClick(target: EventTarget | null): boolean {
 }
 
 function isKnownCommand(name: string): boolean {
-  return TEXT_COMPLETION_COMMANDS.has(name) || SETTING_COMMANDS.has(name);
+  return COMMAND_BY_NAME.has(name);
 }
 
 function rememberLastSentMessage(value: string): void {
