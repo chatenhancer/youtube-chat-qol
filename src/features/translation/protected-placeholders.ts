@@ -13,7 +13,7 @@ import {
   getMessageTextElement,
   getStoredOriginalMessage
 } from '../../youtube/messages';
-import { CHAT_TOOLTIP_SELECTOR } from '../../youtube/selectors';
+import { isIgnoredMessageContentElement } from '../../youtube/message-content';
 
 export interface ProtectedToken {
   placeholder: string;
@@ -236,7 +236,7 @@ function getTranslationTextFromNode(node: Node, protectedTokens: ProtectedToken[
   }
 
   if (!(node instanceof Element)) return '';
-  if (node.matches(CHAT_TOOLTIP_SELECTOR)) return '';
+  if (isIgnoredMessageContentElement(node)) return '';
   if (node.classList.contains('ytcq-replaced-translation-icon')) return '';
 
   if (isEmojiElement(node)) {

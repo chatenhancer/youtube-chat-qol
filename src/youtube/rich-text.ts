@@ -4,7 +4,14 @@
  * Cards can reuse cloned YouTube message nodes for custom emoji while falling
  * back to plain text for records restored from extension storage.
  */
-import { CHAT_TOOLTIP_SELECTOR } from './selectors';
+import {
+  cloneSafeMessageNode,
+  getCleanAttribute,
+  getElementImageSource,
+  isEmojiLikeElement,
+  isIgnoredMessageContentElement,
+  isMessageLineBreakElement
+} from './message-content';
 
 export type RichTextSegment =
   | {
@@ -55,32 +62,15 @@ export function normalizeRichTextSegments(value: unknown): RichTextSegment[] {
     .filter((segment): segment is RichTextSegment => Boolean(segment));
 }
 
-function cloneSafeMessageNode(node: Node): Node | null {
-  if (node.nodeType === Node.TEXT_NODE) return node.cloneNode(true);
-  if (!(node instanceof Element)) return null;
-  if (isTooltipElement(node)) return null;
-
-  const clone = node.cloneNode(true) as Element;
-  clone.querySelectorAll(CHAT_TOOLTIP_SELECTOR).forEach((child) => child.remove());
-  stripDuplicateIds(clone);
-  return clone;
-}
-
-function stripDuplicateIds(element: Element): void {
-  element.removeAttribute('id');
-  element.querySelectorAll('[id]').forEach((child) => child.removeAttribute('id'));
-}
-
 function appendSerializedNode(segments: RichTextSegment[], node: Node): void {
   if (node.nodeType === Node.TEXT_NODE) {
     appendTextSegment(segments, node.textContent || '');
     return;
   }
   if (!(node instanceof Element)) return;
-  if (isTooltipElement(node)) return;
+  if (isIgnoredMessageContentElement(node)) return;
 
-  const tagName = node.tagName.toLowerCase();
-  if (tagName === 'br') {
+  if (isMessageLineBreakElement(node)) {
     appendTextSegment(segments, '\n');
     return;
   }
@@ -128,39 +118,6 @@ function getEmojiSegment(element: Element): RichTextSegment | null {
     tooltip: getCleanAttribute(element, 'shared-tooltip-text') || getCleanAttribute(element, 'title'),
     className: element.getAttribute('class') || ''
   };
-}
-
-function isEmojiLikeElement(element: Element): boolean {
-  const tagName = element.tagName.toLowerCase();
-  if (tagName === 'img' || element.getAttribute('role') === 'img') return true;
-
-  const marker = [
-    element.id,
-    element.getAttribute('class'),
-    element.getAttribute('data-emoji-id'),
-    element.getAttribute('shared-tooltip-text')
-  ].join(' ');
-  return /\bemoji\b/i.test(marker);
-}
-
-function getElementImageSource(element: Element): string {
-  if (element instanceof HTMLImageElement) {
-    return element.currentSrc ||
-      element.src ||
-      element.getAttribute('src') ||
-      element.getAttribute('data-src') ||
-      '';
-  }
-
-  return element.getAttribute('src') || element.getAttribute('data-src') || '';
-}
-
-function getCleanAttribute(element: Element, name: string): string {
-  return (element.getAttribute(name) || '').replace(/\s+/g, ' ').trim();
-}
-
-function isTooltipElement(element: Element): boolean {
-  return element.matches(CHAT_TOOLTIP_SELECTOR);
 }
 
 function createRichTextSegmentNodes(segments: RichTextSegment[]): Node[] {
