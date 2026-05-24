@@ -93,7 +93,14 @@ function selectPluralMessage(message: PluralMessage, params: MessageParams): str
 function normalizeSupportedLocale(locale: string): string {
   const normalized = String(locale || '').trim().toLowerCase().replace('_', '-');
   if (!normalized) return '';
-  if (normalized === 'zh' || normalized === 'zh-cn' || normalized === 'zh-hans') return 'zh-CN';
+  if (
+    normalized === 'zh' ||
+    normalized.startsWith('zh-cn') ||
+    normalized.startsWith('zh-hans') ||
+    normalized.startsWith('zh-sg')
+  ) {
+    return 'zh-CN';
+  }
 
   const base = normalized.split('-')[0];
   return base && LOCALES[base] ? base : '';
