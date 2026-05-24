@@ -1,0 +1,123 @@
+{
+  "meta": {
+    "title": "Chat Enhancer for YouTube - YouTube canlı sohbet araçları",
+    "description": "YouTube canlı sohbeti için hafif çeviri, bahsetme, alıntı, profil, emoji ve komut araçları.",
+    "ogDescription": "Mesajları çevirin, kullanıcıları bahsedin ve alıntılayın, inbox eşleşmelerini kaydedin, emojileri yeniden kullanın ve YouTube canlı sohbetinde hızlı komutlar çalıştırın.",
+    "imageAlt": "Chat Enhancer for YouTube, canlı sohbette doğal görünen çeviri, inbox ve emoji araçlarını gösteriyor."
+  },
+  "nav": {
+    "features": "Özellikler",
+    "screenshots": "Ekran görüntüleri",
+    "privacy": "Gizlilik",
+    "commands": "Komutlar",
+    "github": "GitHub",
+    "install": "Yükle",
+    "language": "Dil"
+  },
+  "brand": {
+    "homeAria": "Chat Enhancer for YouTube ana sayfası",
+    "beta": "BETA"
+  },
+  "hero": {
+    "eyebrow": "YouTube canlı sohbeti için tarayıcı uzantısı",
+    "title": "Chat Enhancer for YouTube",
+    "copy": "Mesajları çevirin, kullanıcıları bahsedin ve alıntılayın, sohbet bağlamını tekrar görün, önemsediğiniz mesajları yakalayın, emojileri yeniden kullanın ve YouTube'un doğal sohbetini değiştirmeden hızlı komutlar çalıştırın.",
+    "primaryCta": "Yükle",
+    "secondaryCta": "Özellikleri gör"
+  },
+  "features": {
+    "eyebrow": "Canlı yayınlar için üretildi",
+    "title": "Sohbetin zaten olduğu yerde küçük araçlar",
+    "translationTitle": "Canlı sohbeti çevir",
+    "translationBody": "Uzantı popup'ında hedef dili seçin, sonra YouTube canlı sohbet ayarlarından çeviriyi hızlıca açıp kapatın.",
+    "mentionTitle": "Bahset ve alıntıla",
+    "mentionBody": "Daha hızlı bahsetmek ve alıntılamak için YouTube mesaj menüsünü, yazar tıklamalarını, profil kartlarını veya slash komutlarını kullanın.",
+    "contextTitle": "Sohbet bağlamı",
+    "contextBody": "Bir kullanıcının mevcut sohbetteki son mesajlarını görmek ve gerektiğinde kanalına gitmek için avatar kartını açın.",
+    "inboxTitle": "Inbox",
+    "inboxBody": "Handle'ınızı bahseden veya anahtar kelimelerinizle eşleşen mesajların yerel listesini tutun; yeni inbox mesajları için isteğe bağlı hafif ses kullanın.",
+    "emojisTitle": "Sık emojiler",
+    "emojisBody": "Sık kullandığınız emojilerden kompakt bir satırı YouTube emoji seçicisine ekleyin, böylece yaygın tepkiler hep yakında olsun.",
+    "commandsTitle": "Sohbet komutları",
+    "commandsBody": "Bahsetme, alıntı, tekrarlanan mesaj, zaman yardımcıları ve uzantı ayarları için komutları genişletmek üzere Tab'a basın.",
+    "commandsLink": "Komut referansını gör"
+  },
+  "screenshots": {
+    "eyebrow": "Ekran görüntüleri",
+    "title": "Doğal hissettiren sohbet iyileştirmeleri",
+    "alt": "Çeviri, inbox, profil bağlamı, sık emojiler, komutlar ve ayarlarla Chat Enhancer for YouTube özellik gösterimi",
+    "caption": "Doğal hissettiren tek bir sohbet akışında çeviri, inbox, profil bağlamı, sık emojiler ve hızlı komutlar."
+  },
+  "install": {
+    "eyebrow": "Uzantıyı ekle",
+    "title": "Chat Enhancer'ı yükle",
+    "copy": "Chrome Web Store veya Firefox Add-ons üzerinden edinin ya da yerel geliştirme için uzantıyı kaynak koddan derleyin. Chrome sürümü diğer Chromium tabanlı tarayıcılarda da çalışabilir.",
+    "publishedVersions": "Yayınlanmış sürümler",
+    "chromeStore": "Chrome Web Store",
+    "firefoxAddons": "Firefox Add-ons",
+    "sourceCode": "Kaynak kod",
+    "supportFeedback": "Destek / Geri bildirim",
+    "privateQuestions": "Özel sorular için e-posta gönderin:",
+    "gettingStartedTitle": "Başlarken",
+    "gettingStartedBody": "Yükleyin, YouTube zaten açıksa bir kez yenileyin, sonra uzantıyı canlı sohbetin zaten olduğu yerde kullanın.",
+    "stepStoreTitle": "Tarayıcı mağazanızdan yükleyin",
+    "stepStoreBody": "Yukarıdaki Chrome veya Firefox düğmesini kullanın. Diğer Chromium tabanlı tarayıcılar genellikle Chrome derlemesini kullanabilir.",
+    "stepRefreshTitle": "YouTube canlı sohbetini açın veya yenileyin",
+    "stepRefreshBody": "Uzantının canlı sohbet frame'ine bağlanabilmesi için zaten açık olan sekmeleri yenileyin. YouTube sohbetinde inbox simgesi göründüğünde çalıştığını anlarsınız.",
+    "stepSettingsTitle": "Gerektiğinde tüm ayarları değiştirin",
+    "stepSettingsBody": "Uzantı canlı sohbette otomatik çalışır. Tüm ayarlar için tarayıcı araç çubuğundaki uzantılar simgesine tıklayın ve Chat Enhancer'ı seçin. Daha hızlı erişim için sabitleyin.",
+    "stepUseTitle": "Sohbet iyileştirmelerini kullanın",
+    "stepUseBody": "Mesaj menüleri, avatar kartları, inbox düğmesi, sık emojiler ve Tab komutları YouTube sohbet arayüzünde görünür ve kullanılabilir.",
+    "stepRefreshBodyBeforeIcon": "Uzantının canlı sohbet frame’ine bağlanabilmesi için zaten açık olan sekmeleri yenileyin. YouTube sohbetinde inbox simgesi",
+    "stepRefreshBodyAfterIcon": "göründüğünde çalıştığını anlarsınız.",
+    "stepSettingsBodyBeforeIcon": "Uzantı canlı sohbette otomatik çalışır. Tüm ayarlar için tarayıcı araç çubuğundaki uzantılar simgesine tıklayın",
+    "stepSettingsBodyMiddle": "ve seçin",
+    "stepSettingsBodyAfterIcon": "Tüm seçenekleri görmek için Chat Enhancer. Daha hızlı erişim için sabitleyin."
+  },
+  "privacy": {
+    "eyebrow": "Gizlilik",
+    "title": "Önce yerel sohbet araçları",
+    "copy": "Uzantı, rutin sohbet iyileştirmelerini cihazınızda tutmak için tasarlandı. Çeviri harici hizmet gerektiren tek özelliktir ve yalnızca hedef dil seçtikten sonra çalışır.",
+    "button": "Tam gizlilik politikasını oku",
+    "summaryAria": "Gizlilik özeti",
+    "scopeTitle": "Kapsam",
+    "scopeBody": "Yalnızca YouTube canlı sohbet ve canlı sohbet tekrar sayfalarında çalışır.",
+    "storageTitle": "Depolama",
+    "storageBody": "Ayarlar, inbox mesajları, izlenen anahtar kelimeler ve sık emoji sayımları tarayıcı uzantısı depolamasında kalır.",
+    "translationTitle": "Çeviri",
+    "translationBody": "Varsayılan olarak kapalıdır. Etkinse mesaj metni YouTube çerezleriniz veya kimlik bilgileriniz olmadan Google Translate'e gönderilir.",
+    "trackingTitle": "İzleme",
+    "trackingBody": "Analitik, tarama geçmişi toplama, veri satışı veya uzantıya ait sunucu yoktur."
+  },
+  "commands": {
+    "eyebrow": "Referans",
+    "title": "Sohbet komutları Tab ile genişler",
+    "copy": "YouTube sohbet girişine bir komut yazın, sonra Tab'a basın. Komutlar otomatik gönderilmez ve bilinmeyen slash komutları olduğu gibi bırakılır. Gerçek slash komutu göndermek için // kullanın.",
+    "inlineTitle": "Satır içi komutlar:",
+    "inlineBody": "/mention, /reply, /time ve /timeuntil bir cümlenin içinde genişleyebilir.",
+    "wholeTitle": "Tam giriş komutları:",
+    "wholeBody": "/quote, /again, /repeat, /help ve tüm /set... komutları girişteki tek metin olmalıdır.",
+    "textCommandsTitle": "Metin komutları",
+    "settingCommandsTitle": "Ayar komutları",
+    "mentionDescription": "En yeni inbox mesajınızın yazarına bir bahsetme ekler.",
+    "quoteDescription": "Inbox'ınıza kaydedilen en yeni mesajı alıntılar.",
+    "repeatDescription": "Varsa zengin emoji içeriği dahil son gönderdiğiniz mesajı geri yükler.",
+    "timeDescription": "Desteklenen bir saat dilimi veya şehir için geçerli saati ekler.",
+    "timeAliases": "Desteklenen takma adlar:",
+    "timeUntilDescription": "Sonraki eşleşen yerel saate kadar kalan süreyi ekler.",
+    "timeUntilFormats": "Kabul edilen formatlar:",
+    "helpDescription": "YouTube sohbetinde komut yardım kartını açar.",
+    "setTranslateDescription": "Çeviri hedef dilini ayarlar. Çeviriyi devre dışı bırakmak için off kullanın.",
+    "setDisplayDescription": "Orijinal mesajları çevirilerle değiştirir. Çevirileri altta göstermek için below kullanın.",
+    "setQuoteLengthDescription": "Alıntı uzunluğunu 80, 120, 180 veya 240 yapar.",
+    "setSoundDescription": "Inbox seslerini açar veya kapatır.",
+    "setPopupDescription": "Kanalları popup pencerelerde açar. Normal açmak için off kullanın."
+  },
+  "footer": {
+    "disclaimer": "Chat Enhancer for YouTube, YouTube veya Google ile bağlantılı değildir.",
+    "privacy": "Gizlilik",
+    "support": "Destek",
+    "email": "E-posta",
+    "license": "Lisans"
+  }
+}

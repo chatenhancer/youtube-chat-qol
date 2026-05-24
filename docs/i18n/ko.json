@@ -1,0 +1,123 @@
+{
+  "meta": {
+    "title": "Chat Enhancer for YouTube - YouTube 라이브 채팅 도구",
+    "description": "YouTube 라이브 채팅을 위한 가벼운 번역, 멘션, 인용, 프로필, 이모지, 명령 도구입니다.",
+    "ogDescription": "YouTube 라이브 채팅에서 메시지를 번역하고, 사용자를 멘션하고 인용하며, 받은함 일치 항목을 저장하고, 이모지를 재사용하고, 빠른 명령을 실행합니다.",
+    "imageAlt": "Chat Enhancer for YouTube가 기본 UI처럼 보이는 라이브 채팅 번역, 받은함, 이모지 도구를 보여주는 화면."
+  },
+  "nav": {
+    "features": "기능",
+    "screenshots": "스크린샷",
+    "privacy": "개인정보",
+    "commands": "명령",
+    "github": "GitHub",
+    "install": "설치",
+    "language": "언어"
+  },
+  "brand": {
+    "homeAria": "Chat Enhancer for YouTube 홈",
+    "beta": "BETA"
+  },
+  "hero": {
+    "eyebrow": "YouTube 라이브 채팅용 브라우저 확장 프로그램",
+    "title": "Chat Enhancer for YouTube",
+    "copy": "YouTube 기본 채팅을 대체하지 않고 메시지 번역, 사용자 멘션과 인용, 채팅 맥락 확인, 중요한 메시지 수집, 이모지 재사용, 빠른 명령 실행을 할 수 있습니다.",
+    "primaryCta": "설치",
+    "secondaryCta": "기능 보기"
+  },
+  "features": {
+    "eyebrow": "라이브 스트림을 위해 제작",
+    "title": "채팅이 이미 일어나는 곳에 작은 도구를 추가",
+    "translationTitle": "라이브 채팅 번역",
+    "translationBody": "확장 프로그램 팝업에서 대상 언어를 선택한 뒤 YouTube 라이브 채팅 설정에서 번역을 빠르게 켜고 끌 수 있습니다.",
+    "mentionTitle": "멘션과 인용",
+    "mentionBody": "YouTube 메시지 메뉴, 작성자 클릭, 프로필 카드, 슬래시 명령을 사용해 사람들을 더 빠르게 멘션하고 인용합니다.",
+    "contextTitle": "채팅 맥락",
+    "contextBody": "아바타 카드를 열어 현재 채팅에서 해당 사용자의 최근 메시지를 확인하고 필요할 때 채널로 이동할 수 있습니다.",
+    "inboxTitle": "받은함",
+    "inboxBody": "내 핸들을 멘션하거나 키워드와 일치하는 메시지를 로컬 목록에 저장하고, 새 받은함 메시지에는 선택적으로 은은한 소리를 재생합니다.",
+    "emojisTitle": "자주 쓰는 이모지",
+    "emojisBody": "YouTube 이모지 선택기에 가장 많이 사용한 이모지의 작은 행을 추가해 자주 쓰는 반응을 항상 가까이에 둡니다.",
+    "commandsTitle": "채팅 명령",
+    "commandsBody": "Tab을 눌러 멘션, 인용, 반복 메시지, 시간 도우미, 확장 설정 명령을 확장합니다.",
+    "commandsLink": "명령 참고 보기"
+  },
+  "screenshots": {
+    "eyebrow": "스크린샷",
+    "title": "기본 UI처럼 느껴지는 채팅 개선",
+    "alt": "번역, 받은함, 프로필 맥락, 자주 쓰는 이모지, 명령, 설정을 보여주는 Chat Enhancer for YouTube 기능 쇼케이스",
+    "caption": "번역, 받은함, 프로필 맥락, 자주 쓰는 이모지, 빠른 명령을 하나의 기본 UI 같은 채팅 흐름에 담았습니다."
+  },
+  "install": {
+    "eyebrow": "확장 프로그램 추가",
+    "title": "Chat Enhancer 설치",
+    "copy": "Chrome Web Store 또는 Firefox Add-ons에서 받거나, 로컬 개발을 위해 소스에서 확장 프로그램을 빌드할 수 있습니다. Chrome 버전은 다른 Chromium 기반 브라우저에서도 작동할 수 있습니다.",
+    "publishedVersions": "게시된 버전",
+    "chromeStore": "Chrome Web Store",
+    "firefoxAddons": "Firefox Add-ons",
+    "sourceCode": "소스 코드",
+    "supportFeedback": "지원 / 피드백",
+    "privateQuestions": "개인적인 질문은 이메일로 보내세요",
+    "gettingStartedTitle": "시작하기",
+    "gettingStartedBody": "설치하고, YouTube가 이미 열려 있었다면 한 번 새로고침한 뒤 라이브 채팅이 있는 곳에서 확장 프로그램을 사용하세요.",
+    "stepStoreTitle": "브라우저 스토어에서 설치",
+    "stepStoreBody": "위의 Chrome 또는 Firefox 버튼을 사용하세요. 다른 Chromium 기반 브라우저는 일반적으로 Chrome 빌드를 사용할 수 있습니다.",
+    "stepRefreshTitle": "YouTube 라이브 채팅 열기 또는 새로고침",
+    "stepRefreshBody": "이미 열려 있던 탭을 새로고침하면 확장 프로그램이 라이브 채팅 프레임에 연결할 수 있습니다. YouTube 채팅에 받은함 아이콘이 나타나면 작동 중입니다.",
+    "stepSettingsTitle": "필요할 때 전체 설정 조정",
+    "stepSettingsBody": "확장 프로그램은 라이브 채팅에서 자동으로 작동합니다. 전체 설정을 보려면 브라우저 툴바의 확장 프로그램 아이콘을 클릭하고 Chat Enhancer를 선택하세요. 더 빠르게 접근하려면 고정하세요.",
+    "stepUseTitle": "채팅 개선 기능 사용",
+    "stepUseBody": "메시지 메뉴, 아바타 카드, 받은함 버튼, 자주 쓰는 이모지, Tab 명령이 YouTube 채팅 인터페이스 안에 나타나며 그곳에서 사용할 수 있습니다.",
+    "stepRefreshBodyBeforeIcon": "이미 열려 있던 탭을 새로고침하면 확장 프로그램이 라이브 채팅 프레임에 연결됩니다. YouTube 채팅에 받은편지함 아이콘",
+    "stepRefreshBodyAfterIcon": "이 표시되면 작동 중입니다.",
+    "stepSettingsBodyBeforeIcon": "확장 프로그램은 라이브 채팅에서 자동으로 작동합니다. 전체 설정을 보려면 브라우저 도구 모음의 확장 프로그램 아이콘을 클릭하고",
+    "stepSettingsBodyMiddle": "다음에서",
+    "stepSettingsBodyAfterIcon": "Chat Enhancer를 선택해 모든 옵션을 표시하세요. 더 빠르게 접근하려면 고정하세요."
+  },
+  "privacy": {
+    "eyebrow": "개인정보",
+    "title": "로컬 우선 채팅 도구",
+    "copy": "이 확장 프로그램은 일상적인 채팅 개선 기능을 사용자의 기기에 유지하도록 설계되었습니다. 번역은 외부 서비스가 필요한 유일한 기능이며, 대상 언어를 선택한 뒤에만 실행됩니다.",
+    "button": "전체 개인정보 처리방침 읽기",
+    "summaryAria": "개인정보 요약",
+    "scopeTitle": "범위",
+    "scopeBody": "YouTube 라이브 채팅 및 라이브 채팅 다시보기 페이지에서만 실행됩니다.",
+    "storageTitle": "저장",
+    "storageBody": "설정, 받은함 메시지, 감시 키워드, 자주 쓰는 이모지 횟수는 브라우저 확장 프로그램 저장소에 남습니다.",
+    "translationTitle": "번역",
+    "translationBody": "기본값은 꺼짐입니다. 활성화하면 메시지 텍스트가 YouTube 쿠키나 인증 정보 없이 Google Translate로 전송됩니다.",
+    "trackingTitle": "추적",
+    "trackingBody": "분석, 방문 기록 수집, 데이터 판매, 확장 프로그램 소유 서버가 없습니다."
+  },
+  "commands": {
+    "eyebrow": "참고",
+    "title": "채팅 명령은 Tab으로 확장됩니다",
+    "copy": "YouTube 채팅 입력창에 명령을 입력한 뒤 Tab을 누르세요. 명령은 자동으로 전송되지 않으며, 알 수 없는 슬래시 명령은 그대로 둡니다. 슬래시 명령을 문자 그대로 보내려면 //를 사용하세요.",
+    "inlineTitle": "인라인 명령:",
+    "inlineBody": "/mention, /reply, /time, /timeuntil은 문장 안에서 확장할 수 있습니다.",
+    "wholeTitle": "전체 입력 명령:",
+    "wholeBody": "/quote, /again, /repeat, /help 및 모든 /set... 명령은 입력창의 유일한 텍스트여야 합니다.",
+    "textCommandsTitle": "텍스트 명령",
+    "settingCommandsTitle": "설정 명령",
+    "mentionDescription": "가장 최근 받은함 메시지의 작성자를 멘션합니다.",
+    "quoteDescription": "받은함에 저장된 가장 최근 메시지를 인용합니다.",
+    "repeatDescription": "가능한 경우 풍부한 이모지 콘텐츠를 포함해 마지막으로 보낸 메시지를 복원합니다.",
+    "timeDescription": "지원되는 시간대 또는 도시의 현재 시간을 삽입합니다.",
+    "timeAliases": "지원되는 별칭:",
+    "timeUntilDescription": "다음에 일치하는 현지 시간까지 남은 시간을 삽입합니다.",
+    "timeUntilFormats": "허용되는 형식:",
+    "helpDescription": "YouTube 채팅 안에서 명령 도움말 카드를 엽니다.",
+    "setTranslateDescription": "번역 대상 언어를 설정합니다. 번역을 비활성화하려면 off를 사용하세요.",
+    "setDisplayDescription": "원본 메시지를 번역으로 대체합니다. 번역을 아래에 표시하려면 below를 사용하세요.",
+    "setQuoteLengthDescription": "인용 길이를 80, 120, 180 또는 240으로 설정합니다.",
+    "setSoundDescription": "받은함 소리를 켜거나 끕니다.",
+    "setPopupDescription": "채널을 팝업 창으로 엽니다. 일반적으로 열려면 off를 사용하세요."
+  },
+  "footer": {
+    "disclaimer": "Chat Enhancer for YouTube는 YouTube 또는 Google과 제휴하지 않습니다.",
+    "privacy": "개인정보",
+    "support": "지원",
+    "email": "이메일",
+    "license": "라이선스"
+  }
+}

@@ -45,37 +45,6 @@ Not affiliated with YouTube or Google.
 - Keep chat at the live edge after tab switches so inbox alerts and translations can keep up.
 - Toggle translation and inbox sound from YouTube's live chat settings menu, with deeper options in the extension popup.
 
-## Chat Commands
-
-<!-- chat-commands:start -->
-
-Type commands in the YouTube chat input, then press `Tab`. Commands do not send automatically. Unknown slash commands are left alone.
-
-Mention, reply, time, and time-until commands can also be expanded inline, such as `starts in /timeuntil 7pm`.
-
-### Text commands
-
-- `/mention` or `/reply` + `Tab`: insert a mention for the author of the newest inbox message.
-- `/quote` + `Tab`: quote the newest inbox message.
-- `/again` or `/repeat` + `Tab`: restore your last sent message.
-- `/time utc` + `Tab`: insert the current time for a supported timezone or city.
-  Supported aliases: `utc`, `tokyo`, `jst`, `seoul`, `kst`, `london`, `paris`, `madrid`, `newyork`, `nyc`, `et`, `eastern`, `losangeles`, `la`, `pt`, and `pacific`.
-- `/timeuntil 7:45pm` + `Tab`: insert the time remaining until the next matching local time.
-  Accepted formats: `7`, `7am`, `7 am`, `7:45am`, `7:45 am`, `19`, `19:00`, `19:00:30`, and `7:45:30 pm`.
-- `/help` + `Tab`: show available chat commands.
-
-### Setting commands
-
-- `/settranslateto english` or `/settranslateto off` + `Tab`: set the translation language, or turn translation off.
-- `/settranslationdisplay replace` or `/settranslationdisplay below` + `Tab`: choose whether translations replace messages or show below them.
-- `/setquotelength 120` + `Tab`: set quote length to 80, 120, 180, or 240.
-- `/setsound on` or `/setsound off` + `Tab`: turn inbox sounds on or off.
-- `/setopenchannelsinpopup on` or `/setopenchannelsinpopup off` + `Tab`: open channels in popup windows or open them normally.
-
-Use `//` to send a literal slash command, such as `//quote`.
-
-<!-- chat-commands:end -->
-
 ## Screenshots
 
 ![Chat Enhancer for YouTube screenshots](assets/screenshots/readme-showcase.png)
@@ -113,13 +82,13 @@ npm run build:firefox
 
 - `npm run typecheck` checks TypeScript.
 - `npm run lint` runs ESLint.
-- `npm run build` writes the Chromium unpacked extension to `dist/extension-chrome`.
-- `npm run build:all` writes Chrome, Edge, and Firefox unpacked extension folders.
-- `npm run verify` runs typecheck, lint, and all browser builds.
-- `npm run icons` regenerates PNG icons from `assets/icons/icon.svg`.
-- `npm run screenshots` regenerates README, high-resolution docs, and Chrome Web Store screenshots from the three docs screenshot exports.
-- `npm run zip` builds and writes the default Chrome Web Store archive and tracked source archive to `dist/release/`.
-- `npm run zip:all` builds Chrome, Edge, Firefox, and tracked source release archives.
+- `npm run check` runs typecheck and lint.
+- `npm run generate` refreshes generated repo assets: icons, screenshots, localized docs, and the sitemap.
+- `npm run build` runs `generate`, then writes Chrome, Edge, and Firefox unpacked extension folders.
+- `npm run build:chrome`, `npm run build:edge`, and `npm run build:firefox` run `generate`, then write one browser's unpacked extension folder.
+- `npm run verify` runs `check` and the full repo build.
+- `npm run zip` verifies the repo, then writes the default Chrome Web Store archive and tracked source archive to `dist/release/`.
+- `npm run zip:all` verifies the repo, then writes Chrome, Edge, Firefox, and tracked source release archives.
 
 ## Release
 

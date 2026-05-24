@@ -1,0 +1,123 @@
+{
+  "meta": {
+    "title": "Chat Enhancer for YouTube - Herramientas para el chat en vivo de YouTube",
+    "description": "Herramientas ligeras de traducción, mención, cita, perfil, emoji y comandos para el chat en vivo de YouTube.",
+    "ogDescription": "Traduce mensajes, menciona y cita usuarios, guarda coincidencias en la bandeja, reutiliza emojis y usa comandos rápidos en el chat en vivo de YouTube.",
+    "imageAlt": "Chat Enhancer for YouTube mostrando traducción, bandeja y herramientas de emoji integradas de forma nativa en el chat en vivo."
+  },
+  "nav": {
+    "features": "Funciones",
+    "screenshots": "Capturas",
+    "privacy": "Privacidad",
+    "commands": "Comandos",
+    "github": "GitHub",
+    "install": "Instalar",
+    "language": "Idioma"
+  },
+  "brand": {
+    "homeAria": "Inicio de Chat Enhancer for YouTube",
+    "beta": "BETA"
+  },
+  "hero": {
+    "eyebrow": "Extensión de navegador para el chat en vivo de YouTube",
+    "title": "Chat Enhancer for YouTube",
+    "copy": "Traduce mensajes, menciona y cita usuarios, revisa contexto del chat, guarda mensajes que te importan, reutiliza emojis y usa comandos rápidos sin reemplazar el chat nativo de YouTube.",
+    "primaryCta": "Instalar",
+    "secondaryCta": "Ver funciones"
+  },
+  "features": {
+    "eyebrow": "Pensado para directos",
+    "title": "Pequeñas herramientas donde ya ocurre el chat",
+    "translationTitle": "Traducir chat en vivo",
+    "translationBody": "Elige un idioma de destino en el popup de la extensión y activa o desactiva la traducción desde los ajustes del chat en vivo de YouTube.",
+    "mentionTitle": "Mencionar y citar",
+    "mentionBody": "Usa el menú de mensajes de YouTube, clics en autores, tarjetas de perfil o comandos para mencionar y citar más rápido.",
+    "contextTitle": "Contexto del chat",
+    "contextBody": "Abre una tarjeta de avatar para revisar mensajes recientes de un usuario en el chat actual y saltar a su canal cuando lo necesites.",
+    "inboxTitle": "Bandeja",
+    "inboxBody": "Mantén una lista local de mensajes que mencionan tu identificador o coinciden con tus palabras clave, con un sonido opcional para nuevos mensajes.",
+    "emojisTitle": "Emojis frecuentes",
+    "emojisBody": "Añade una fila compacta de tus emojis más usados al selector de emojis de YouTube para tener tus reacciones habituales cerca.",
+    "commandsTitle": "Comandos del chat",
+    "commandsBody": "Pulsa Tab para expandir comandos de menciones, citas, mensajes repetidos, ayuda de tiempo y ajustes de la extensión.",
+    "commandsLink": "Ver referencia de comandos"
+  },
+  "screenshots": {
+    "eyebrow": "Capturas",
+    "title": "Mejoras de chat con aspecto nativo",
+    "alt": "Muestra de funciones de Chat Enhancer for YouTube con traducción, bandeja, contexto de perfil, emojis frecuentes, comandos y ajustes",
+    "caption": "Traducción, bandeja, contexto de perfil, emojis frecuentes y comandos rápidos en un flujo de chat que se siente nativo."
+  },
+  "install": {
+    "eyebrow": "Añade la extensión",
+    "title": "Instala Chat Enhancer",
+    "copy": "Consíguela en Chrome Web Store o Firefox Add-ons, o compila la extensión desde el código fuente para desarrollo local. La versión de Chrome también puede funcionar en otros navegadores basados en Chromium.",
+    "publishedVersions": "Versiones publicadas",
+    "chromeStore": "Chrome Web Store",
+    "firefoxAddons": "Firefox Add-ons",
+    "sourceCode": "Código fuente",
+    "supportFeedback": "Soporte / Comentarios",
+    "privateQuestions": "Para preguntas privadas, escribe a",
+    "gettingStartedTitle": "Primeros pasos",
+    "gettingStartedBody": "Instala, refresca YouTube una vez si ya estaba abierto y usa la extensión donde ya está el chat en vivo.",
+    "stepStoreTitle": "Instala desde la tienda de tu navegador",
+    "stepStoreBody": "Usa el botón de Chrome o Firefox de arriba. Otros navegadores basados en Chromium normalmente pueden usar la versión de Chrome.",
+    "stepRefreshTitle": "Abre o refresca el chat en vivo de YouTube",
+    "stepRefreshBody": "Refresca las pestañas que ya estaban abiertas para que la extensión pueda conectarse al marco del chat en vivo. Sabrás que funciona cuando el icono de bandeja aparezca en el chat de YouTube.",
+    "stepSettingsTitle": "Ajusta la configuración completa cuando la necesites",
+    "stepSettingsBody": "La extensión funciona automáticamente en el chat en vivo. Para la configuración completa, haz clic en el icono de extensiones de la barra del navegador y elige Chat Enhancer para ver todas las opciones. Fíjala si quieres acceso más rápido.",
+    "stepUseTitle": "Usa las mejoras del chat",
+    "stepUseBody": "Los menús de mensajes, tarjetas de avatar, botón de bandeja, emojis frecuentes y comandos con Tab aparecen y se usan dentro de la interfaz de chat de YouTube.",
+    "stepRefreshBodyBeforeIcon": "Refresca las pestañas que ya estaban abiertas para que la extensión pueda conectarse al marco del chat en vivo. Sabrás que funciona cuando el icono de bandeja",
+    "stepRefreshBodyAfterIcon": "aparezca en el chat de YouTube.",
+    "stepSettingsBodyBeforeIcon": "La extensión funciona automáticamente en el chat en vivo. Para la configuración completa, haz clic en el icono de extensiones de la barra del navegador",
+    "stepSettingsBodyMiddle": "y elige",
+    "stepSettingsBodyAfterIcon": "Chat Enhancer para ver todas las opciones. Fíjala si quieres acceso más rápido."
+  },
+  "privacy": {
+    "eyebrow": "Privacidad",
+    "title": "Herramientas de chat locales primero",
+    "copy": "La extensión está diseñada para mantener en tu dispositivo las mejoras rutinarias del chat. La traducción es la única función que necesita un servicio externo y solo se ejecuta después de elegir un idioma de destino.",
+    "button": "Leer la política de privacidad completa",
+    "summaryAria": "Resumen de privacidad",
+    "scopeTitle": "Alcance",
+    "scopeBody": "Solo se ejecuta en páginas de chat en vivo y repetición de chat en vivo de YouTube.",
+    "storageTitle": "Almacenamiento",
+    "storageBody": "Los ajustes, mensajes de la bandeja, palabras clave vigiladas y conteos de emojis frecuentes permanecen en el almacenamiento de la extensión.",
+    "translationTitle": "Traducción",
+    "translationBody": "Desactivada por defecto. Si la activas, el texto del mensaje se envía a Google Translate sin tus cookies ni credenciales de YouTube.",
+    "trackingTitle": "Seguimiento",
+    "trackingBody": "Sin analíticas, recopilación de historial de navegación, reventa de datos ni servidor propio de la extensión."
+  },
+  "commands": {
+    "eyebrow": "Referencia",
+    "title": "Los comandos del chat se expanden con Tab",
+    "copy": "Escribe un comando en el campo del chat de YouTube y pulsa Tab. Los comandos no se envían automáticamente y los comandos con barra desconocidos se dejan intactos. Usa // para enviar un comando literal con barra.",
+    "inlineTitle": "Comandos en línea:",
+    "inlineBody": "/mention, /reply, /time y /timeuntil pueden expandirse dentro de una frase.",
+    "wholeTitle": "Comandos de entrada completa:",
+    "wholeBody": "/quote, /again, /repeat, /help y todos los comandos /set... deben ser el único texto en el campo.",
+    "textCommandsTitle": "Comandos de texto",
+    "settingCommandsTitle": "Comandos de ajustes",
+    "mentionDescription": "Inserta una mención al autor del mensaje más reciente de tu bandeja.",
+    "quoteDescription": "Cita el mensaje más reciente guardado en tu bandeja.",
+    "repeatDescription": "Restaura tu último mensaje enviado, incluido contenido enriquecido de emojis cuando esté disponible.",
+    "timeDescription": "Inserta la hora actual de una zona horaria o ciudad compatible.",
+    "timeAliases": "Alias compatibles:",
+    "timeUntilDescription": "Inserta el tiempo restante hasta la próxima hora local coincidente.",
+    "timeUntilFormats": "Formatos aceptados:",
+    "helpDescription": "Abre la tarjeta de ayuda de comandos dentro del chat de YouTube.",
+    "setTranslateDescription": "Define el idioma de destino de la traducción. Usa off para desactivar la traducción.",
+    "setDisplayDescription": "Reemplaza mensajes originales con traducciones. Usa below para mostrar las traducciones debajo.",
+    "setQuoteLengthDescription": "Define la longitud de cita en 80, 120, 180 o 240.",
+    "setSoundDescription": "Activa o desactiva los sonidos de la bandeja.",
+    "setPopupDescription": "Abre canales en ventanas emergentes. Usa off para abrirlos normalmente."
+  },
+  "footer": {
+    "disclaimer": "Chat Enhancer for YouTube no está afiliado a YouTube ni a Google.",
+    "privacy": "Privacidad",
+    "support": "Soporte",
+    "email": "Email",
+    "license": "Licencia"
+  }
+}

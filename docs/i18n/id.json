@@ -1,0 +1,123 @@
+{
+  "meta": {
+    "title": "Chat Enhancer for YouTube - Alat live chat YouTube",
+    "description": "Alat ringan untuk terjemahan, sebutan, kutipan, profil, emoji, dan perintah di live chat YouTube.",
+    "ogDescription": "Terjemahkan pesan, sebut dan kutip pengguna, simpan kecocokan inbox, gunakan ulang emoji, dan jalankan perintah cepat di live chat YouTube.",
+    "imageAlt": "Chat Enhancer for YouTube menampilkan alat terjemahan, inbox, dan emoji yang terasa native di live chat."
+  },
+  "nav": {
+    "features": "Fitur",
+    "screenshots": "Screenshot",
+    "privacy": "Privasi",
+    "commands": "Perintah",
+    "github": "GitHub",
+    "install": "Instal",
+    "language": "Bahasa"
+  },
+  "brand": {
+    "homeAria": "Beranda Chat Enhancer for YouTube",
+    "beta": "BETA"
+  },
+  "hero": {
+    "eyebrow": "Ekstensi browser untuk live chat YouTube",
+    "title": "Chat Enhancer for YouTube",
+    "copy": "Terjemahkan pesan, sebut dan kutip pengguna, lihat kembali konteks chat, tangkap pesan penting, gunakan ulang emoji, dan jalankan perintah cepat tanpa mengganti chat native YouTube.",
+    "primaryCta": "Instal",
+    "secondaryCta": "Lihat fitur"
+  },
+  "features": {
+    "eyebrow": "Dibuat untuk live stream",
+    "title": "Alat kecil di tempat chat sudah berjalan",
+    "translationTitle": "Terjemahkan live chat",
+    "translationBody": "Pilih bahasa target di popup ekstensi, lalu aktifkan terjemahan dengan cepat dari pengaturan live chat YouTube.",
+    "mentionTitle": "Sebut dan kutip",
+    "mentionBody": "Gunakan menu pesan YouTube, klik nama penulis, kartu profil, atau perintah slash untuk menyebut dan mengutip lebih cepat.",
+    "contextTitle": "Konteks chat",
+    "contextBody": "Buka kartu avatar untuk melihat pesan terbaru pengguna di chat saat ini dan buka channel mereka saat diperlukan.",
+    "inboxTitle": "Inbox",
+    "inboxBody": "Simpan daftar lokal pesan yang menyebut handle Anda atau cocok dengan kata kunci Anda, dengan suara halus opsional untuk pesan inbox baru.",
+    "emojisTitle": "Emoji sering dipakai",
+    "emojisBody": "Tambahkan baris ringkas emoji yang paling sering Anda gunakan ke pemilih emoji YouTube agar reaksi umum selalu dekat.",
+    "commandsTitle": "Perintah chat",
+    "commandsBody": "Tekan Tab untuk memperluas perintah sebutan, kutipan, pesan berulang, bantuan waktu, dan pengaturan ekstensi.",
+    "commandsLink": "Lihat referensi perintah"
+  },
+  "screenshots": {
+    "eyebrow": "Screenshot",
+    "title": "Peningkatan chat yang terasa native",
+    "alt": "Tampilan fitur Chat Enhancer for YouTube dengan terjemahan, inbox, konteks profil, emoji sering dipakai, perintah, dan pengaturan",
+    "caption": "Terjemahan, inbox, konteks profil, emoji sering dipakai, dan perintah cepat dalam alur chat yang terasa native."
+  },
+  "install": {
+    "eyebrow": "Tambahkan ekstensi",
+    "title": "Instal Chat Enhancer",
+    "copy": "Dapatkan dari Chrome Web Store atau Firefox Add-ons, atau bangun ekstensi dari source untuk pengembangan lokal. Versi Chrome juga dapat bekerja di browser berbasis Chromium lainnya.",
+    "publishedVersions": "Versi yang dipublikasikan",
+    "chromeStore": "Chrome Web Store",
+    "firefoxAddons": "Firefox Add-ons",
+    "sourceCode": "Source Code",
+    "supportFeedback": "Dukungan / Masukan",
+    "privateQuestions": "Untuk pertanyaan pribadi, email",
+    "gettingStartedTitle": "Mulai menggunakan",
+    "gettingStartedBody": "Instal, refresh YouTube sekali jika sudah terbuka, lalu gunakan ekstensi di tempat live chat sudah ada.",
+    "stepStoreTitle": "Instal dari toko browser Anda",
+    "stepStoreBody": "Gunakan tombol Chrome atau Firefox di atas. Browser berbasis Chromium lain umumnya dapat memakai build Chrome.",
+    "stepRefreshTitle": "Buka atau refresh live chat YouTube",
+    "stepRefreshBody": "Refresh tab yang sudah terbuka agar ekstensi dapat menempel ke frame live chat. Anda tahu ini bekerja saat ikon inbox muncul di chat YouTube.",
+    "stepSettingsTitle": "Sesuaikan pengaturan lengkap saat diperlukan",
+    "stepSettingsBody": "Ekstensi bekerja otomatis di live chat. Untuk pengaturan lengkap, klik ikon ekstensi di toolbar browser dan pilih Chat Enhancer untuk melihat semua opsi. Pin jika ingin akses lebih cepat.",
+    "stepUseTitle": "Gunakan peningkatan chat",
+    "stepUseBody": "Menu pesan, kartu avatar, tombol inbox, emoji sering dipakai, dan perintah Tab muncul dan dapat digunakan di dalam antarmuka chat YouTube.",
+    "stepRefreshBodyBeforeIcon": "Segarkan tab yang sudah terbuka agar ekstensi dapat terhubung ke frame live chat. Kamu tahu ekstensi sudah bekerja saat ikon inbox",
+    "stepRefreshBodyAfterIcon": "muncul di chat YouTube.",
+    "stepSettingsBodyBeforeIcon": "Ekstensi bekerja otomatis di live chat. Untuk pengaturan lengkap, klik ikon ekstensi di toolbar browser",
+    "stepSettingsBodyMiddle": "lalu pilih",
+    "stepSettingsBodyAfterIcon": "Chat Enhancer untuk melihat semua opsi. Sematkan jika ingin akses lebih cepat."
+  },
+  "privacy": {
+    "eyebrow": "Privasi",
+    "title": "Alat chat yang mengutamakan lokal",
+    "copy": "Ekstensi dirancang untuk menjaga peningkatan chat rutin tetap di perangkat Anda. Terjemahan adalah satu-satunya fitur yang membutuhkan layanan eksternal, dan hanya berjalan setelah Anda memilih bahasa target.",
+    "button": "Baca kebijakan privasi lengkap",
+    "summaryAria": "Ringkasan privasi",
+    "scopeTitle": "Cakupan",
+    "scopeBody": "Hanya berjalan di halaman live chat YouTube dan replay live chat.",
+    "storageTitle": "Penyimpanan",
+    "storageBody": "Pengaturan, pesan inbox, kata kunci yang dipantau, dan jumlah emoji sering dipakai tetap berada di penyimpanan ekstensi browser.",
+    "translationTitle": "Terjemahan",
+    "translationBody": "Mati secara default. Jika diaktifkan, teks pesan dikirim ke Google Translate tanpa cookie atau kredensial YouTube Anda.",
+    "trackingTitle": "Pelacakan",
+    "trackingBody": "Tidak ada analitik, pengumpulan riwayat browsing, penjualan data, atau server milik ekstensi."
+  },
+  "commands": {
+    "eyebrow": "Referensi",
+    "title": "Perintah chat diperluas dengan Tab",
+    "copy": "Ketik perintah di input chat YouTube, lalu tekan Tab. Perintah tidak dikirim otomatis, dan perintah slash yang tidak dikenal dibiarkan. Gunakan // untuk mengirim perintah slash literal.",
+    "inlineTitle": "Perintah inline:",
+    "inlineBody": "/mention, /reply, /time, dan /timeuntil dapat diperluas di dalam kalimat.",
+    "wholeTitle": "Perintah input penuh:",
+    "wholeBody": "/quote, /again, /repeat, /help, dan semua perintah /set... harus menjadi satu-satunya teks di input.",
+    "textCommandsTitle": "Perintah teks",
+    "settingCommandsTitle": "Perintah pengaturan",
+    "mentionDescription": "Masukkan sebutan untuk penulis pesan inbox terbaru Anda.",
+    "quoteDescription": "Kutip pesan terbaru yang disimpan di inbox Anda.",
+    "repeatDescription": "Pulihkan pesan terakhir yang Anda kirim, termasuk konten emoji kaya jika tersedia.",
+    "timeDescription": "Masukkan waktu saat ini untuk zona waktu atau kota yang didukung.",
+    "timeAliases": "Alias yang didukung:",
+    "timeUntilDescription": "Masukkan waktu tersisa hingga waktu lokal cocok berikutnya.",
+    "timeUntilFormats": "Format yang diterima:",
+    "helpDescription": "Buka kartu bantuan perintah di dalam chat YouTube.",
+    "setTranslateDescription": "Atur bahasa target terjemahan. Gunakan off untuk menonaktifkan terjemahan.",
+    "setDisplayDescription": "Ganti pesan asli dengan terjemahan. Gunakan below untuk menampilkan terjemahan di bawah.",
+    "setQuoteLengthDescription": "Atur panjang kutipan ke 80, 120, 180, atau 240.",
+    "setSoundDescription": "Nyalakan atau matikan suara inbox.",
+    "setPopupDescription": "Buka channel di jendela popup. Gunakan off untuk membukanya secara normal."
+  },
+  "footer": {
+    "disclaimer": "Chat Enhancer for YouTube tidak berafiliasi dengan YouTube atau Google.",
+    "privacy": "Privasi",
+    "support": "Dukungan",
+    "email": "Email",
+    "license": "Lisensi"
+  }
+}

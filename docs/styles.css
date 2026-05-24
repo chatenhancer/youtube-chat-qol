@@ -127,6 +127,32 @@ img {
   color: var(--text);
 }
 
+.language-switcher {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.language-switcher select {
+  min-height: 34px;
+  max-width: 148px;
+  padding: 5px 26px 5px 10px;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font: inherit;
+}
+
+.language-switcher select:hover,
+.language-switcher select:focus {
+  border-color: #c7d0dd;
+  outline: none;
+}
+
 .button.header-install {
   color: var(--text);
   background: var(--surface);
@@ -862,6 +888,14 @@ figcaption {
 
   .site-nav {
     display: none;
+  }
+
+  .language-switcher span {
+    display: none;
+  }
+
+  .language-switcher select {
+    max-width: 116px;
   }
 
   .hero {
