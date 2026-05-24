@@ -6,7 +6,7 @@
  * fragile selectors across the codebase.
  */
 import { cleanText } from '../shared/text';
-import { CHAT_TOOLTIP_SELECTOR } from './selectors';
+import { cloneSafeMessageNode, getPlainTextFromMessageNodes } from './message-content';
 
 interface RendererRun {
   text?: string;
@@ -76,7 +76,7 @@ export function getMessageText(message: HTMLElement): string {
     getTextFromRuns(data?.headerSubtext?.runs);
 
   const messageText = getMessageTextElement(message);
-  return cleanText(fromRuns || (messageText ? getPlainTextFromMessageNodes(messageText) : ''));
+  return cleanText(fromRuns || (messageText ? getPlainTextFromMessageNodes(messageText.childNodes) : ''));
 }
 
 export function getMessageTextElement(message: HTMLElement): HTMLElement | null {
@@ -84,7 +84,9 @@ export function getMessageTextElement(message: HTMLElement): HTMLElement | null 
 }
 
 export function getMessageContentNodes(message: HTMLElement): Node[] {
-  return getMessageContentSourceNodes(message).map((node) => node.cloneNode(true));
+  return getMessageContentSourceNodes(message)
+    .map(cloneSafeMessageNode)
+    .filter((node): node is Node => Boolean(node));
 }
 
 export function getMessageContentSourceNodes(message: HTMLElement): Node[] {
@@ -162,34 +164,14 @@ export function getEmojiTextFromRun(run: RendererRun): string {
     '';
 }
 
-function getPlainTextFromMessageNodes(element: HTMLElement): string {
-  return Array.from(element.childNodes).map(getPlainTextFromNode).join('');
-}
-
-function getPlainTextFromNode(node: Node): string {
-  if (node.nodeType === Node.TEXT_NODE) return node.textContent || '';
-  if (!(node instanceof Element)) return '';
-  if (node.matches(CHAT_TOOLTIP_SELECTOR)) return '';
-
-  const tagName = node.tagName.toLowerCase();
-  if (tagName === 'br') return '\n';
-  if (tagName === 'img' || node.getAttribute('role') === 'img') {
-    return node.getAttribute('alt') ||
-      node.getAttribute('aria-label') ||
-      node.getAttribute('title') ||
-      node.textContent ||
-      '';
-  }
-
-  return Array.from(node.childNodes).map(getPlainTextFromNode).join('');
-}
-
 export function rememberOriginalMessageText(message: HTMLElement, messageText: HTMLElement, originalText: string): void {
   if (replacedMessages.has(message)) return;
 
   replacedMessages.set(message, {
     originalText,
-    childNodes: Array.from(messageText.childNodes).map((node) => node.cloneNode(true)),
+    childNodes: Array.from(messageText.childNodes)
+      .map(cloneSafeMessageNode)
+      .filter((node): node is Node => Boolean(node)),
     className: messageText.className,
     hadLang: messageText.hasAttribute('lang'),
     lang: messageText.getAttribute('lang'),

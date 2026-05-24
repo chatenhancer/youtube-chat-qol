@@ -11,6 +11,14 @@ import { t } from '../shared/i18n';
 import { cleanText } from '../shared/text';
 import { showToast } from '../shared/toast';
 import { insertIntoChatInput, insertNodesIntoChatInput, returnToChatInputPanel } from '../youtube/chat-input';
+import {
+  getCleanAttribute,
+  getElementImageSource,
+  getElementTextFallback,
+  isEmojiLikeElement,
+  isIgnoredMessageContentElement,
+  isMessageLineBreakElement
+} from '../youtube/message-content';
 import { getMessageContentNodes, getMessageDetails } from '../youtube/messages';
 import type { RichTextSegment } from '../youtube/rich-text';
 
@@ -202,9 +210,9 @@ function appendQuoteNode(
     return;
   }
   if (!(node instanceof Element)) return;
+  if (isIgnoredMessageContentElement(node)) return;
 
-  const tagName = node.tagName.toLowerCase();
-  if (tagName === 'br') {
+  if (isMessageLineBreakElement(node)) {
     appendQuoteText(nodes, '\n', state);
     return;
   }
@@ -327,44 +335,4 @@ function createInputEmojiNode(data: {
   if (tooltip) image.setAttribute('shared-tooltip-text', tooltip);
 
   return image;
-}
-
-function isEmojiLikeElement(element: Element): boolean {
-  const tagName = element.tagName.toLowerCase();
-  if (tagName === 'img' || element.getAttribute('role') === 'img') return true;
-
-  const marker = [
-    element.id,
-    element.getAttribute('class'),
-    element.getAttribute('data-emoji-id'),
-    element.getAttribute('shared-tooltip-text')
-  ].join(' ');
-  return /\bemoji\b/i.test(marker);
-}
-
-function getElementImageSource(element: Element): string {
-  if (element instanceof HTMLImageElement) {
-    return element.currentSrc ||
-      element.src ||
-      element.getAttribute('src') ||
-      element.getAttribute('data-src') ||
-      '';
-  }
-
-  return element.getAttribute('src') || element.getAttribute('data-src') || '';
-}
-
-function getElementTextFallback(element: Element): string {
-  return cleanText(
-    getCleanAttribute(element, 'alt') ||
-    getCleanAttribute(element, 'aria-label') ||
-    getCleanAttribute(element, 'title') ||
-    getCleanAttribute(element, 'shared-tooltip-text') ||
-    element.textContent ||
-    ''
-  );
-}
-
-function getCleanAttribute(element: Element, name: string): string {
-  return (element.getAttribute(name) || '').replace(/\s+/g, ' ').trim();
 }
