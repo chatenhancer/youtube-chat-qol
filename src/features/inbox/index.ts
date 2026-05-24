@@ -6,6 +6,7 @@
  * one header button, one card, and inline highlights instead of extra labels.
  */
 import { createEmptyLeavesIcon, createSvgIcon } from '../../shared/icons';
+import { t } from '../../shared/i18n';
 import {
   getAuthorName,
   getMessageContentSourceNodes,
@@ -143,7 +144,7 @@ export function wireInboxButton(): void {
   const button = document.createElement('button');
   button.type = 'button';
   button.className = 'ytcq-inbox-button';
-  button.title = 'Inbox';
+  button.title = t('inbox');
   button.setAttribute('aria-label', getInboxAriaLabel());
   button.append(createInboxIcon(), createInboxBadge());
   button.addEventListener('click', (event) => {
@@ -196,7 +197,7 @@ export function openInboxCard(anchor?: HTMLElement): void {
     const card = document.createElement('section');
     card.className = 'ytcq-profile-card ytcq-inbox-card';
     card.setAttribute('role', 'dialog');
-    card.setAttribute('aria-label', 'Inbox');
+    card.setAttribute('aria-label', t('inbox'));
 
     const header = document.createElement('div');
     header.className = 'ytcq-profile-card-header ytcq-inbox-card-header';
@@ -210,7 +211,7 @@ export function openInboxCard(anchor?: HTMLElement): void {
 
     const title = document.createElement('div');
     title.className = 'ytcq-profile-card-title';
-    title.textContent = 'Inbox';
+    title.textContent = t('inbox');
 
     const subtitle = document.createElement('div');
     subtitle.className = 'ytcq-profile-card-subtitle';
@@ -221,8 +222,8 @@ export function openInboxCard(anchor?: HTMLElement): void {
     const keywordButton = document.createElement('button');
     keywordButton.type = 'button';
     keywordButton.className = 'ytcq-profile-card-close ytcq-inbox-keyword-toggle';
-    keywordButton.title = 'Add keywords';
-    keywordButton.setAttribute('aria-label', 'Add keywords');
+    keywordButton.title = t('addKeywords');
+    keywordButton.setAttribute('aria-label', t('addKeywords'));
     keywordButton.setAttribute('aria-expanded', 'false');
     keywordButton.append(createAddIcon(), createKeywordCountBadge());
     refreshKeywordToggle(keywordButton);
@@ -230,7 +231,7 @@ export function openInboxCard(anchor?: HTMLElement): void {
     const closeButton = document.createElement('button');
     closeButton.type = 'button';
     closeButton.className = 'ytcq-profile-card-close';
-    closeButton.setAttribute('aria-label', 'Close');
+    closeButton.setAttribute('aria-label', t('close'));
     closeButton.append(createCloseIcon());
     closeButton.addEventListener('click', closeInboxCard);
 
@@ -258,7 +259,7 @@ export function openInboxCard(anchor?: HTMLElement): void {
     const clearButton = document.createElement('button');
     clearButton.type = 'button';
     clearButton.className = 'ytcq-profile-card-open ytcq-inbox-clear';
-    clearButton.textContent = 'Clear';
+    clearButton.textContent = t('clear');
     clearButton.disabled = records.length === 0;
     clearButton.addEventListener('click', () => {
       records = [];
@@ -468,9 +469,9 @@ function renderInboxList(list: HTMLElement): void {
     icon.appendChild(createEmptyInboxIcon());
 
     const text = document.createElement('span');
-    text.textContent = 'Nothing here yet';
+    text.textContent = t('nothingHereYet');
 
-    empty.setAttribute('aria-label', 'Inbox empty');
+    empty.setAttribute('aria-label', t('inboxEmpty'));
     empty.append(icon, text);
     list.append(empty);
     return;
@@ -479,7 +480,7 @@ function renderInboxList(list: HTMLElement): void {
   records.forEach((record) => {
     const item = document.createElement('div');
     item.className = 'ytcq-profile-card-message ytcq-inbox-message';
-    item.title = 'Quote message';
+    item.title = t('quoteMessage');
     item.setAttribute('role', 'button');
     item.tabIndex = 0;
     wireQuoteCardItem(item, record);
@@ -533,13 +534,13 @@ function createKeywordPanel(): HTMLElement {
   input.className = 'ytcq-inbox-keyword-input';
   input.type = 'text';
   input.maxLength = MAX_KEYWORD_LENGTH;
-  input.placeholder = 'Keyword or phrase';
-  input.setAttribute('aria-label', 'Keyword or phrase');
+  input.placeholder = t('keywordOrPhrase');
+  input.setAttribute('aria-label', t('keywordOrPhrase'));
 
   const addButton = document.createElement('button');
   addButton.type = 'submit';
   addButton.className = 'ytcq-inbox-keyword-add';
-  addButton.textContent = 'Add';
+  addButton.textContent = t('add');
 
   form.append(input, addButton);
   form.addEventListener('submit', (event) => {
@@ -573,7 +574,7 @@ function renderKeywordChips(container: HTMLElement): void {
   if (!keywords.length) {
     const empty = document.createElement('span');
     empty.className = 'ytcq-inbox-keyword-empty';
-    empty.textContent = 'No keywords';
+    empty.textContent = t('noKeywords');
     container.append(empty);
     return;
   }
@@ -588,7 +589,7 @@ function renderKeywordChips(container: HTMLElement): void {
     const removeButton = document.createElement('button');
     removeButton.type = 'button';
     removeButton.className = 'ytcq-inbox-keyword-remove';
-    removeButton.setAttribute('aria-label', `Remove ${keyword}`);
+    removeButton.setAttribute('aria-label', t('removeKeyword', { keyword }));
     removeButton.append(createCloseIcon());
     removeButton.addEventListener('click', () => {
       keywords = keywords.filter((existing) => existing !== keyword);
@@ -632,8 +633,8 @@ function createInboxJumpButton(record: InboxRecord): HTMLButtonElement | null {
   const button = document.createElement('button');
   button.type = 'button';
   button.className = 'ytcq-profile-card-jump';
-  button.title = 'Jump to message';
-  button.setAttribute('aria-label', 'Jump to message');
+  button.title = t('jumpToMessage');
+  button.setAttribute('aria-label', t('jumpToMessage'));
   button.append(createJumpToMessageIcon());
   button.addEventListener('click', (event) => {
     event.preventDefault();
@@ -724,10 +725,10 @@ function getUnreadInboxCount(): number {
 }
 
 function getInboxSubtitle(): string {
-  if (!records.length) return keywords.length ? 'Watching mentions and keywords' : 'Watching mentions';
+  if (!records.length) return keywords.length ? t('watchingMentionsAndKeywords') : t('watchingMentions');
   const unread = getUnreadInboxCount();
-  if (unread) return `${unread} new message${unread === 1 ? '' : 's'}`;
-  return `${records.length} saved message${records.length === 1 ? '' : 's'}`;
+  if (unread) return t('unreadMessages', { count: unread });
+  return t('savedMessages', { count: records.length });
 }
 
 function refreshInboxSurfaces(): void {
@@ -761,7 +762,7 @@ function refreshInboxButton(button: HTMLButtonElement): void {
 
 function getInboxAriaLabel(): string {
   const unread = getUnreadInboxCount();
-  return unread ? `Inbox, ${unread} unread` : 'Inbox';
+  return unread ? t('inboxAriaUnread', { count: unread }) : t('inbox');
 }
 
 function createInboxBadge(): HTMLSpanElement {
@@ -779,7 +780,7 @@ function createKeywordCountBadge(): HTMLSpanElement {
 
 function refreshKeywordToggle(button: HTMLButtonElement): void {
   const count = keywords.length;
-  const label = count === 1 ? 'Add keywords, 1 keyword watching' : `Add keywords, ${count} keywords watching`;
+  const label = t('addKeywordsCount', { count });
   const badge = button.querySelector<HTMLElement>('.ytcq-inbox-keyword-count');
 
   button.title = label;

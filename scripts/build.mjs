@@ -11,6 +11,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import packageJson from '../package.json' with { type: 'json' };
 import { syncCommandDocs } from './sync-command-docs.mjs';
+import { syncExtensionLocales } from './sync-extension-locales.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const targetOutputDirs = {
@@ -70,6 +71,7 @@ async function buildTarget(target) {
     copyFile(path.join(root, 'src', 'popup.html'), path.join(extensionDir, 'popup.html')),
     copyFile(path.join(root, 'assets', 'logo.png'), path.join(extensionDir, 'logo.png')),
     copyFile(path.join(root, 'assets', 'logo-white.png'), path.join(extensionDir, 'logo-white.png')),
+    syncExtensionLocales(path.join(extensionDir, '_locales')),
     cp(path.join(root, 'assets', 'icons'), path.join(extensionDir, 'icons'), { recursive: true })
   ]);
 

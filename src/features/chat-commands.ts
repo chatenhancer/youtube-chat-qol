@@ -6,6 +6,7 @@
  * Unknown slash-prefixed text is left to YouTube.
  */
 import { LANGUAGE_OPTIONS, getLanguageLabel } from '../shared/languages';
+import { getLocalizedLanguageLabel, t } from '../shared/i18n';
 import {
   getChatCommandHelpRows,
   getChatCommandNames,
@@ -118,7 +119,7 @@ function handleChatCommandKeydown(event: KeyboardEvent, saveOptions: SaveOptions
 
   if (isKnownCommand(parsed.name)) {
     preventCommandEvent(event);
-    showToast('Press Tab to run this command.');
+    showToast(t('pressTabToRunCommand'));
     return;
   }
 
@@ -148,7 +149,7 @@ function handleChatCommandSendClick(event: MouseEvent): void {
 
   if (isKnownCommand(parsed.name)) {
     preventCommandEvent(event);
-    showToast('Press Tab to run this command.');
+    showToast(t('pressTabToRunCommand'));
     return;
   }
 
@@ -171,12 +172,12 @@ async function executeTabCommand(event: KeyboardEvent, parsed: ParsedCommand, sa
   }
 
   if (parsed.name === 'mention' || parsed.name === 'reply') {
-    replaceCommandText(await getMentionCommandText(), 'No inbox messages yet.');
+    replaceCommandText(await getMentionCommandText(), t('noInboxMessagesYet'));
     return;
   }
 
   if (parsed.name === 'quote') {
-    replaceCommandText(await getQuoteCommandText(), 'No inbox messages yet.');
+    replaceCommandText(await getQuoteCommandText(), t('noInboxMessagesYet'));
     return;
   }
 
@@ -186,12 +187,12 @@ async function executeTabCommand(event: KeyboardEvent, parsed: ParsedCommand, sa
   }
 
   if (parsed.name === 'time') {
-    replaceCommandText(formatTime(parsed.args), 'Unknown timezone.');
+    replaceCommandText(formatTime(parsed.args), t('unknownTimezone'));
     return;
   }
 
   if (parsed.name === 'timeuntil') {
-    replaceCommandText(formatTimeUntil(parsed.args), 'Could not read that time.');
+    replaceCommandText(formatTimeUntil(parsed.args), t('couldNotReadTime'));
   }
 }
 
@@ -199,17 +200,17 @@ async function executeInlineTextCommand(event: KeyboardEvent, parsed: InlinePars
   preventCommandEvent(event);
 
   if (parsed.name === 'mention' || parsed.name === 'reply') {
-    replaceInlineCommandText(await getMentionCommandText(), parsed, 'No inbox messages yet.');
+    replaceInlineCommandText(await getMentionCommandText(), parsed, t('noInboxMessagesYet'));
     return;
   }
 
   if (parsed.name === 'time') {
-    replaceInlineCommandText(formatTime(parsed.args), parsed, 'Unknown timezone.');
+    replaceInlineCommandText(formatTime(parsed.args), parsed, t('unknownTimezone'));
     return;
   }
 
   if (parsed.name === 'timeuntil') {
-    replaceInlineCommandText(formatTimeUntil(parsed.args), parsed, 'Could not read that time.');
+    replaceInlineCommandText(formatTimeUntil(parsed.args), parsed, t('couldNotReadTime'));
   }
 }
 
@@ -230,52 +231,54 @@ function executeSetCommand(parsed: ParsedCommand, saveOptions: SaveOptions): voi
   }
 
   if (parsed.name === 'setsound') {
-    executeBooleanSetCommand(parsed, saveOptions, 'sound', 'Inbox sound');
+    executeBooleanSetCommand(parsed, saveOptions, 'sound', t('inboxSound'));
     return;
   }
 
   if (parsed.name === 'setopenchannelsinpopup' || parsed.name === 'setopenprofilesinpopup') {
-    executeBooleanSetCommand(parsed, saveOptions, 'openProfilesInPopup', 'Open channels in popup');
+    executeBooleanSetCommand(parsed, saveOptions, 'openProfilesInPopup', t('openChannelsInPopup'));
     return;
   }
 
-  showToast('Unknown setting command.');
+  showToast(t('unknownSettingCommand'));
 }
 
 function executeSetTranslateToCommand(parsed: ParsedCommand, saveOptions: SaveOptions): void {
   const targetLanguage = getTranslateCommandTarget(parsed.args);
   if (targetLanguage === null) {
-    showToast('Unknown translation language.');
+    showToast(t('unknownTranslationLanguage'));
     return;
   }
 
   saveOptions(getTargetLanguageUpdate(targetLanguage));
   replaceChatInput('');
-  showToast(targetLanguage ? `Translate to ${getLanguageLabel(targetLanguage)}.` : 'Translation off.');
+  showToast(targetLanguage
+    ? t('translateToLanguage', { language: getLocalizedLanguageLabel(targetLanguage) || getLanguageLabel(targetLanguage) })
+    : t('translateOff'));
 }
 
 function executeSetTranslationDisplayCommand(parsed: ParsedCommand, saveOptions: SaveOptions): void {
   const display = getTranslationDisplayCommandTarget(parsed.args);
   if (!display) {
-    showToast('Use replace or below.');
+    showToast(t('useReplaceOrBelow'));
     return;
   }
 
   saveOptions({ translationDisplay: display });
   replaceChatInput('');
-  showToast(display === 'replace' ? 'Translations replace messages.' : 'Translations show below messages.');
+  showToast(display === 'replace' ? t('translationsReplaceMessages') : t('translationsShowBelowMessages'));
 }
 
 function executeSetQuoteLengthCommand(parsed: ParsedCommand, saveOptions: SaveOptions): void {
   const quoteMaxLength = Number(cleanText(parsed.args));
   if (!QUOTE_LENGTH_OPTIONS.some((value) => value === quoteMaxLength)) {
-    showToast(`Use quote length ${QUOTE_LENGTH_OPTIONS.join(', ')}.`);
+    showToast(t('useQuoteLength', { lengths: QUOTE_LENGTH_OPTIONS.join(', ') }));
     return;
   }
 
   saveOptions({ quoteMaxLength });
   replaceChatInput('');
-  showToast(`Quote length ${quoteMaxLength}.`);
+  showToast(t('quoteLength', { count: quoteMaxLength }));
 }
 
 function executeBooleanSetCommand(
@@ -286,13 +289,13 @@ function executeBooleanSetCommand(
 ): void {
   const value = getBooleanCommandTarget(parsed.args);
   if (value === null) {
-    showToast('Use on or off.');
+    showToast(t('useOnOrOff'));
     return;
   }
 
   saveOptions({ [option]: value });
   replaceChatInput('');
-  showToast(`${label} ${value ? 'on' : 'off'}.`);
+  showToast(t('settingState', { label, state: value ? t('stateOn') : t('stateOff') }));
 }
 
 function replaceCommandText(text: string, emptyMessage: string): void {
@@ -302,7 +305,7 @@ function replaceCommandText(text: string, emptyMessage: string): void {
   }
 
   if (!replaceChatInput(text)) {
-    showToast('Could not find the chat input.');
+    showToast(t('couldNotFindChatInput'));
   }
 }
 
@@ -313,18 +316,18 @@ function replaceInlineCommandText(text: string, parsed: InlineParsedCommand, emp
   }
 
   if (!replaceChatInputTextRange(parsed.start, parsed.end, text)) {
-    showToast('Could not find the chat input.');
+    showToast(t('couldNotFindChatInput'));
   }
 }
 
 function replaceLastSentMessage(): void {
   if (!lastSentMessage?.text && !lastSentMessage?.childNodes.length) {
-    showToast('No previous message yet.');
+    showToast(t('noPreviousMessageYet'));
     return;
   }
 
   if (!replaceChatInputSnapshot(lastSentMessage)) {
-    showToast('Could not find the chat input.');
+    showToast(t('couldNotFindChatInput'));
   }
 }
 
@@ -334,19 +337,19 @@ function showChatCommandHelp(): void {
   const card = document.createElement('section');
   card.className = 'ytcq-command-help-card';
   card.setAttribute('role', 'dialog');
-  card.setAttribute('aria-label', 'Chat commands');
+  card.setAttribute('aria-label', t('chatCommands'));
 
   const header = document.createElement('div');
   header.className = 'ytcq-command-help-header';
 
   const title = document.createElement('div');
   title.className = 'ytcq-command-help-title';
-  title.textContent = 'Chat commands';
+  title.textContent = t('chatCommands');
 
   const closeButton = document.createElement('button');
   closeButton.type = 'button';
   closeButton.className = 'ytcq-command-help-close';
-  closeButton.setAttribute('aria-label', 'Close');
+  closeButton.setAttribute('aria-label', t('close'));
   closeButton.append(createCloseIcon());
   closeButton.addEventListener('click', closeChatCommandHelp);
 
@@ -354,7 +357,7 @@ function showChatCommandHelp(): void {
 
   const hint = document.createElement('p');
   hint.className = 'ytcq-command-help-hint';
-  hint.textContent = 'Type a command, then press Tab.';
+  hint.textContent = t('commandHelpHint');
 
   const list = document.createElement('dl');
   list.className = 'ytcq-command-help-list';
@@ -441,7 +444,7 @@ function handleEscapedCommand(event: Event, text: string): void {
   const nextText = text.slice(1);
   escapedSlashText = nextText;
   replaceChatInput(nextText);
-  showToast('Press Enter again to send.');
+  showToast(t('pressEnterAgainToSend'));
 }
 
 function parseCommand(value: string): ParsedCommand | null {
@@ -636,10 +639,10 @@ function formatDuration(diffMs: number, includeSeconds: boolean): string {
   const seconds = totalSeconds % 60;
   const parts: string[] = [];
 
-  if (hours) parts.push(`${hours} hrs`);
-  if (minutes) parts.push(`${minutes} min`);
-  if (includeSeconds && (seconds || !parts.length)) parts.push(`${seconds} sec`);
-  if (!includeSeconds && !parts.length) return 'less than 1 min';
+  if (hours) parts.push(t('timeHours', { count: hours }));
+  if (minutes) parts.push(t('timeMinutes', { count: minutes }));
+  if (includeSeconds && (seconds || !parts.length)) parts.push(t('timeSeconds', { count: seconds }));
+  if (!includeSeconds && !parts.length) return t('lessThanOneMinute');
   return parts.join(' ');
 }
 

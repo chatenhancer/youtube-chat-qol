@@ -6,6 +6,7 @@
  * it only exists while the current chat page is open.
  */
 import { getOptions } from '../shared/state';
+import { t } from '../shared/i18n';
 import { createEmptyLeavesIcon } from '../shared/icons';
 import { cleanText, normalizeComparableText } from '../shared/text';
 import { getAuthorName, getRendererData } from '../youtube/messages';
@@ -61,7 +62,7 @@ export function wireProfileClick(message: HTMLElement): void {
   if (!avatar) return;
 
   avatar.classList.add('ytcq-profile-enabled');
-  avatar.title = 'Show recent messages';
+  avatar.title = t('showRecentMessages');
   avatar.addEventListener('click', (event) => {
     const source = getMessageProfileSource(message);
     if (!source) return;
@@ -83,7 +84,7 @@ export function wireParticipantProfileClick(participant: HTMLElement): void {
 
   clickTargets.forEach((target) => {
     target.classList.add('ytcq-profile-enabled');
-    target.title = 'Show recent messages';
+    target.title = t('showRecentMessages');
     target.addEventListener('click', (event) => {
       const source = getParticipantProfileSource(participant);
       if (!source) return;
@@ -191,7 +192,7 @@ function showProfileCard(source: ProfileSource, anchor: HTMLElement): void {
   const card = document.createElement('section');
   card.className = 'ytcq-profile-card';
   card.setAttribute('role', 'dialog');
-  card.setAttribute('aria-label', 'Recent messages from this user');
+  card.setAttribute('aria-label', t('recentMessagesFromThisUser'));
 
   const header = document.createElement('div');
   header.className = 'ytcq-profile-card-header';
@@ -206,7 +207,7 @@ function showProfileCard(source: ProfileSource, anchor: HTMLElement): void {
   title.type = 'button';
   title.className = 'ytcq-profile-card-title ytcq-profile-card-author';
   title.textContent = source.authorName;
-  title.title = 'Mention user';
+  title.title = t('mentionUser');
   title.addEventListener('click', (event) => {
     event.preventDefault();
     event.stopPropagation();
@@ -216,7 +217,7 @@ function showProfileCard(source: ProfileSource, anchor: HTMLElement): void {
 
   const subtitle = document.createElement('div');
   subtitle.className = 'ytcq-profile-card-subtitle';
-  subtitle.textContent = 'Recent messages';
+  subtitle.textContent = t('recentMessages');
 
   titleWrap.append(title, subtitle);
   header.append(titleWrap);
@@ -224,7 +225,7 @@ function showProfileCard(source: ProfileSource, anchor: HTMLElement): void {
   const openButton = document.createElement('button');
   openButton.type = 'button';
   openButton.className = 'ytcq-profile-card-open ytcq-profile-card-open-header';
-  openButton.textContent = 'Open channel';
+  openButton.textContent = t('openChannel');
   openButton.disabled = !source.profileUrl;
   openButton.addEventListener('click', () => {
     openProfileWindow(source.profileUrl);
@@ -234,7 +235,7 @@ function showProfileCard(source: ProfileSource, anchor: HTMLElement): void {
   const closeButton = document.createElement('button');
   closeButton.type = 'button';
   closeButton.className = 'ytcq-profile-card-close';
-  closeButton.setAttribute('aria-label', 'Close');
+  closeButton.setAttribute('aria-label', t('close'));
   closeButton.append(createCloseIcon());
   closeButton.addEventListener('click', closeProfileCard);
   header.append(closeButton);
@@ -301,7 +302,7 @@ function renderProfileMessages(list: HTMLElement, recentMessages: MessageRecord[
     recentMessages.forEach((recentMessage) => {
       const item = document.createElement('div');
       item.className = 'ytcq-profile-card-message';
-      item.title = 'Quote message';
+      item.title = t('quoteMessage');
       item.setAttribute('role', 'button');
       item.tabIndex = 0;
       wireQuoteCardItem(item, recentMessage);
@@ -332,7 +333,7 @@ function renderProfileMessages(list: HTMLElement, recentMessages: MessageRecord[
   icon.append(createEmptyLeavesIcon());
 
   const text = document.createElement('span');
-  text.textContent = 'Nothing here yet';
+  text.textContent = t('nothingHereYet');
 
   empty.append(icon, text);
   list.append(empty);
@@ -408,8 +409,8 @@ function createJumpToMessageButton(recentMessage: MessageRecord): HTMLButtonElem
   const button = document.createElement('button');
   button.type = 'button';
   button.className = 'ytcq-profile-card-jump';
-  button.title = 'Jump to message';
-  button.setAttribute('aria-label', 'Jump to message');
+  button.title = t('jumpToMessage');
+  button.setAttribute('aria-label', t('jumpToMessage'));
   button.append(createJumpToMessageIcon());
   button.addEventListener('click', (event) => {
     event.preventDefault();
@@ -451,8 +452,8 @@ function createProfileAvatarButton(avatar: HTMLImageElement, profileUrl: string)
   const button = document.createElement('button');
   button.type = 'button';
   button.className = 'ytcq-profile-card-avatar-button';
-  button.title = 'Open channel';
-  button.setAttribute('aria-label', 'Open channel');
+  button.title = t('openChannel');
+  button.setAttribute('aria-label', t('openChannel'));
   button.append(avatar, createOpenInNewIcon());
   button.addEventListener('click', (event) => {
     event.preventDefault();

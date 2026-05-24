@@ -7,6 +7,7 @@
  */
 import { getTargetLanguageUpdate, getTranslationToggleTarget, type Options } from '../../shared/options';
 import { getOptions } from '../../shared/state';
+import { t } from '../../shared/i18n';
 import { clampMenuToViewport, createMenuToggleItem } from './common';
 
 type SaveOptions = (values: Partial<Options>) => void;
@@ -30,7 +31,7 @@ export function enhanceSettingsMenu(menu: HTMLElement): void {
   list.append(
     createMenuToggleItem({
       setting: 'targetLanguage',
-      label: 'Translate chat',
+      label: t('translateChat'),
       checked: Boolean(options.targetLanguage),
       iconPath: TRANSLATE_ICON_PATH,
       onClick: () => {
@@ -43,7 +44,7 @@ export function enhanceSettingsMenu(menu: HTMLElement): void {
     }),
     createMenuToggleItem({
       setting: 'sound',
-      label: 'Inbox sound',
+      label: t('inboxSound'),
       checked: options.sound,
       iconPath: getSoundIconPath(options.sound),
       onClick: () => {
@@ -63,10 +64,10 @@ export function refreshSettingsMenus(): void {
     if (!setting || !label) return;
 
     if (setting === 'targetLanguage') {
-      label.textContent = 'Translate chat';
+      label.textContent = t('translateChat');
       item.setAttribute('aria-checked', String(Boolean(options.targetLanguage)));
     } else if (setting === 'sound') {
-      label.textContent = 'Inbox sound';
+      label.textContent = t('inboxSound');
       item.setAttribute('aria-checked', String(options.sound));
       item.querySelector<SVGPathElement>('.ytcq-menu-icon path')?.setAttribute('d', getSoundIconPath(options.sound));
     }

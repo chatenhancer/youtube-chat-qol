@@ -1,0 +1,180 @@
+{
+  "messages": {
+    "add": "Añadir",
+    "addKeywords": "Añadir palabras clave",
+    "addKeywordsCount": {
+      "one": "Añadir palabras clave, {count} palabra vigilada",
+      "other": "Añadir palabras clave, {count} palabras vigiladas"
+    },
+    "chatCommands": "Comandos del chat",
+    "clear": "Borrar",
+    "close": "Cerrar",
+    "commandHelpHint": "Escribe un comando y pulsa Tab.",
+    "couldNotFindChatInput": "No se encontró el campo del chat.",
+    "couldNotReadTime": "No se pudo leer esa hora.",
+    "couldNotReadUserName": "No se pudo leer ese nombre de usuario.",
+    "inbox": "Bandeja",
+    "inboxAriaUnread": "Bandeja, {count} sin leer",
+    "inboxEmpty": "Bandeja vacía",
+    "inboxSound": "Sonido de la bandeja",
+    "jumpToMessage": "Ir al mensaje",
+    "keywordOrPhrase": "Palabra clave o frase",
+    "lessThanOneMinute": "menos de 1 min",
+    "mention": "Mencionar",
+    "mentionUser": "Mencionar usuario",
+    "mentionUserTitle": "Mencionar usuario. Alt/Opción-clic para citar.",
+    "mostUsed": "MÁS USADOS",
+    "noInboxMessagesYet": "Todavía no hay mensajes en la bandeja.",
+    "noKeywords": "Sin palabras clave",
+    "noPreviousMessageYet": "Todavía no hay mensaje anterior.",
+    "nothingHereYet": "Nada por aquí todavía",
+    "openChannel": "Abrir canal",
+    "openChannelsInPopup": "Abrir canales en ventana emergente",
+    "original": "Original: {text}",
+    "originalMessage": "Mensaje original",
+    "pressEnterAgainToSend": "Pulsa Enter de nuevo para enviar.",
+    "pressTabToRunCommand": "Pulsa Tab para ejecutar este comando.",
+    "quote": "Citar",
+    "quoteLength": "Longitud de cita {count}.",
+    "quoteMessage": "Citar mensaje",
+    "recentMessages": "Mensajes recientes",
+    "recentMessagesFromThisUser": "Mensajes recientes de este usuario",
+    "removeKeyword": "Quitar {keyword}",
+    "savedMessages": {
+      "one": "{count} mensaje guardado",
+      "other": "{count} mensajes guardados"
+    },
+    "settingState": "{label} {state}.",
+    "showRecentMessages": "Mostrar mensajes recientes",
+    "stateOff": "desactivado",
+    "stateOn": "activado",
+    "timeHours": "{count} h",
+    "timeMinutes": "{count} min",
+    "timeSeconds": "{count} s",
+    "translateChat": "Traducir chat",
+    "translated": "Traducido:",
+    "translatedFrom": "Traducido del {language}",
+    "translatedFromOriginal": "Traducido del {language}: {text}",
+    "translatedMessage": "Mensaje traducido",
+    "translateOff": "Traducción desactivada.",
+    "translateToLanguage": "Traducir a {language}.",
+    "translationsReplaceMessages": "Las traducciones reemplazan los mensajes.",
+    "translationsShowBelowMessages": "Las traducciones aparecen debajo de los mensajes.",
+    "unknownSettingCommand": "Comando de ajuste desconocido.",
+    "unknownTimezone": "Zona horaria desconocida.",
+    "unknownTranslationLanguage": "Idioma de traducción desconocido.",
+    "unreadMessages": {
+      "one": "{count} mensaje nuevo",
+      "other": "{count} mensajes nuevos"
+    },
+    "useOnOrOff": "Usa on u off.",
+    "useQuoteLength": "Usa una longitud de cita de {lengths}.",
+    "useReplaceOrBelow": "Usa replace o below.",
+    "watchingMentions": "Vigilando menciones",
+    "watchingMentionsAndKeywords": "Vigilando menciones y palabras clave"
+  },
+  "extension": {
+    "extensionName": {
+      "message": "Chat Enhancer for YouTube"
+    },
+    "extensionShortName": {
+      "message": "Chat Enhancer"
+    },
+    "extensionDescription": {
+      "message": "Herramientas ligeras de traducción, menciones, perfiles y emojis para el chat en vivo de YouTube."
+    },
+    "openChatEnhancerWebsite": {
+      "message": "Abrir el sitio web de Chat Enhancer"
+    },
+    "openGithubRepository": {
+      "message": "Abrir el repositorio de GitHub"
+    },
+    "supportFeedback": {
+      "message": "Soporte / Comentarios"
+    },
+    "supportAndFeedback": {
+      "message": "Soporte y comentarios"
+    },
+    "resetAllExtensionData": {
+      "message": "Restablecer toda la configuración y los datos locales"
+    },
+    "resetExtension": {
+      "message": "Restablecer extensión"
+    },
+    "translation": {
+      "message": "Traducción"
+    },
+    "chooseTranslationLanguageTitle": {
+      "message": "Elige el idioma al que se traducirán los mensajes del chat. Desactivado apaga la traducción automática."
+    },
+    "translateTo": {
+      "message": "Traducir a"
+    },
+    "translationOffHelper": {
+      "message": "Desactivado apaga la traducción automática."
+    },
+    "display": {
+      "message": "Visualización"
+    },
+    "translationDisplayTitle": {
+      "message": "Elige si las traducciones reemplazan el mensaje original o aparecen debajo."
+    },
+    "translationDisplayHelper": {
+      "message": "Reemplaza el mensaje o muestra la traducción debajo."
+    },
+    "replaceMessage": {
+      "message": "Reemplazar mensaje"
+    },
+    "showBelow": {
+      "message": "Mostrar debajo"
+    },
+    "chatActions": {
+      "message": "Acciones del chat"
+    },
+    "quoteLengthTitle": {
+      "message": "Máximo de caracteres incluidos al citar un mensaje desde acciones del chat o tarjetas."
+    },
+    "quoteLengthLabel": {
+      "message": "Longitud de cita"
+    },
+    "quoteLengthHelper": {
+      "message": "Máximo de caracteres incluidos al citar mensajes."
+    },
+    "openChannelsInPopup": {
+      "message": "Abrir canales en popup"
+    },
+    "openChannelsInPopupTitle": {
+      "message": "Abre páginas de canales de YouTube en una ventana emergente pequeña en lugar de una pestaña normal."
+    },
+    "openChannelsInPopupHelper": {
+      "message": "Usa una ventana más pequeña para los canales desde las tarjetas de avatar."
+    },
+    "popupAlerts": {
+      "message": "Alertas"
+    },
+    "playInboxSound": {
+      "message": "Reproducir sonido de la bandeja"
+    },
+    "playInboxSoundTitle": {
+      "message": "Reproduce un sonido corto cuando un mensaje del chat se guarda en tu bandeja."
+    },
+    "playInboxSoundHelper": {
+      "message": "Reproduce un sonido corto para nuevos mensajes en la bandeja."
+    },
+    "extensionVersion": {
+      "message": "Versión de la extensión"
+    },
+    "versionLabel": {
+      "message": "Versión {version}"
+    },
+    "off": {
+      "message": "Desactivado"
+    },
+    "popupResetConfirm": {
+      "message": "¿Restablecer la configuración de Chat Enhancer y borrar la bandeja local, palabras clave y datos de emojis?"
+    },
+    "popupResetComplete": {
+      "message": "Chat Enhancer se ha restablecido."
+    }
+  }
+}

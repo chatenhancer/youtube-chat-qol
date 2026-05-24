@@ -12,6 +12,7 @@
     "icons": "node scripts/generate-icons.mjs",
     "screenshots": "node scripts/generate-screenshots.mjs",
     "docs:commands": "node scripts/sync-command-docs.mjs",
+    "locales": "node scripts/sync-extension-locales.mjs",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "verify": "npm run typecheck && npm run lint && npm run build:all",
