@@ -131,7 +131,14 @@ function parseLanguagePreference(part) {
 function normalizeLocale(value) {
   const locale = decodeURIComponent(String(value || '')).trim().toLowerCase().replace('_', '-');
   if (!locale) return '';
-  if (locale === 'zh' || locale === 'zh-cn' || locale === 'zh-hans') return 'zh-CN';
+  if (
+    locale === 'zh' ||
+    locale.startsWith('zh-cn') ||
+    locale.startsWith('zh-hans') ||
+    locale.startsWith('zh-sg')
+  ) {
+    return 'zh-CN';
+  }
 
   const baseLocale = locale.split('-')[0];
   return SUPPORTED_LOCALES.has(baseLocale) ? baseLocale : '';
