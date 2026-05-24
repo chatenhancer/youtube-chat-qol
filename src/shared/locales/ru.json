@@ -1,0 +1,183 @@
+{
+  "messages": {
+    "add": "Добавить",
+    "addKeywords": "Добавить ключевые слова",
+    "addKeywordsCount": {
+      "one": "Добавить ключевые слова, отслеживается {count} ключевое слово",
+      "other": "Добавить ключевые слова, отслеживается {count} ключевых слов"
+    },
+    "chatCommands": "Команды чата",
+    "clear": "Очистить",
+    "close": "Закрыть",
+    "commandHelpHint": "Введите команду, затем нажмите Tab.",
+    "couldNotFindChatInput": "Не удалось найти поле ввода чата.",
+    "couldNotReadTime": "Не удалось прочитать это время.",
+    "couldNotReadUserName": "Не удалось прочитать это имя пользователя.",
+    "inbox": "Входящие",
+    "inboxAriaUnread": "Входящие, непрочитано: {count}",
+    "inboxEmpty": "Входящие пусты",
+    "inboxSound": "Звук входящих",
+    "jumpToMessage": "Перейти к сообщению",
+    "keywordOrPhrase": "Ключевое слово или фраза",
+    "lessThanOneMinute": "меньше 1 мин",
+    "mention": "Упомянуть",
+    "mentionUser": "Упомянуть пользователя",
+    "mentionUserTitle": "Упомянуть пользователя. Alt/Option-клик, чтобы процитировать.",
+    "mostUsed": "ЧАСТО ИСПОЛЬЗУЕМЫЕ",
+    "noInboxMessagesYet": "Во входящих пока нет сообщений.",
+    "noKeywords": "Нет ключевых слов",
+    "noPreviousMessageYet": "Предыдущего сообщения пока нет.",
+    "nothingHereYet": "Здесь пока ничего нет",
+    "openChannel": "Открыть канал",
+    "openChannelsInPopup": "Открывать каналы во всплывающем окне",
+    "original": "Оригинал: {text}",
+    "originalMessage": "Исходное сообщение",
+    "pressEnterAgainToSend": "Нажмите Enter еще раз, чтобы отправить.",
+    "pressTabToRunCommand": "Нажмите Tab, чтобы выполнить эту команду.",
+    "quote": "Цитировать",
+    "quoteLength": "Длина цитаты {count}.",
+    "quoteMessage": "Цитировать сообщение",
+    "recentMessages": "Недавние сообщения",
+    "recentMessagesFromThisUser": "Недавние сообщения этого пользователя",
+    "removeKeyword": "Удалить {keyword}",
+    "savedMessages": {
+      "one": "{count} сохраненное сообщение",
+      "other": "{count} сохраненных сообщений"
+    },
+    "settingState": "{label} {state}.",
+    "showRecentMessages": "Показать недавние сообщения",
+    "stateOff": "выключено",
+    "stateOn": "включено",
+    "timeHours": "{count} ч",
+    "timeMinutes": "{count} мин",
+    "timeSeconds": "{count} с",
+    "translateChat": "Переводить чат",
+    "translated": "Переведено:",
+    "translatedFrom": "Переведено с {language}",
+    "translatedFromOriginal": "Переведено с {language}: {text}",
+    "translatedMessage": "Переведенное сообщение",
+    "translateOff": "Перевод выключен.",
+    "translateToLanguage": "Переводить на {language}.",
+    "translationsReplaceMessages": "Переводы заменяют сообщения.",
+    "translationsShowBelowMessages": "Переводы отображаются под сообщениями.",
+    "unknownSettingCommand": "Неизвестная команда настройки.",
+    "unknownTimezone": "Неизвестный часовой пояс.",
+    "unknownTranslationLanguage": "Неизвестный язык перевода.",
+    "unreadMessages": {
+      "one": "{count} новое сообщение",
+      "other": "{count} новых сообщений"
+    },
+    "useOnOrOff": "Используйте on или off.",
+    "useQuoteLength": "Используйте длину цитаты {lengths}.",
+    "useReplaceOrBelow": "Используйте replace или below.",
+    "watchingMentions": "Отслеживаются упоминания",
+    "watchingMentionsAndKeywords": "Отслеживаются упоминания и ключевые слова"
+  },
+  "extension": {
+    "extensionName": {
+      "message": "Chat Enhancer for YouTube",
+      "description": "Публичное название расширения."
+    },
+    "extensionShortName": {
+      "message": "Chat Enhancer",
+      "description": "Короткое название расширения."
+    },
+    "extensionDescription": {
+      "message": "Легкие инструменты перевода, упоминаний, профилей и эмодзи для прямого чата YouTube.",
+      "description": "Краткое описание для манифеста и магазина."
+    },
+    "openChatEnhancerWebsite": {
+      "message": "Открыть сайт Chat Enhancer"
+    },
+    "openGithubRepository": {
+      "message": "Открыть репозиторий GitHub"
+    },
+    "supportFeedback": {
+      "message": "Поддержка / обратная связь"
+    },
+    "supportAndFeedback": {
+      "message": "Поддержка и обратная связь"
+    },
+    "resetAllExtensionData": {
+      "message": "Сбросить все настройки расширения и локальные данные"
+    },
+    "resetExtension": {
+      "message": "Сбросить расширение"
+    },
+    "translation": {
+      "message": "Перевод"
+    },
+    "chooseTranslationLanguageTitle": {
+      "message": "Выберите язык, на который будут переводиться сообщения чата. Выключено отключает автоматический перевод."
+    },
+    "translateTo": {
+      "message": "Переводить на"
+    },
+    "translationOffHelper": {
+      "message": "Выключено отключает автоматический перевод."
+    },
+    "display": {
+      "message": "Отображение"
+    },
+    "translationDisplayTitle": {
+      "message": "Выберите, будут ли переводы заменять исходное сообщение или появляться под ним."
+    },
+    "translationDisplayHelper": {
+      "message": "Заменять сообщение или показывать перевод ниже."
+    },
+    "replaceMessage": {
+      "message": "Заменять сообщение"
+    },
+    "showBelow": {
+      "message": "Показывать ниже"
+    },
+    "chatActions": {
+      "message": "Действия чата"
+    },
+    "quoteLengthTitle": {
+      "message": "Максимальное число символов при цитировании сообщения из действий чата или карточек."
+    },
+    "quoteLengthLabel": {
+      "message": "Длина цитаты"
+    },
+    "quoteLengthHelper": {
+      "message": "Максимальное число символов при цитировании сообщений."
+    },
+    "openChannelsInPopup": {
+      "message": "Открывать каналы во всплывающем окне"
+    },
+    "openChannelsInPopupTitle": {
+      "message": "Открывать страницы каналов YouTube в меньшем всплывающем окне вместо обычной вкладки браузера."
+    },
+    "openChannelsInPopupHelper": {
+      "message": "Использовать меньшее окно для страниц каналов из карточек аватаров."
+    },
+    "popupAlerts": {
+      "message": "Оповещения"
+    },
+    "playInboxSound": {
+      "message": "Воспроизводить звук входящих"
+    },
+    "playInboxSoundTitle": {
+      "message": "Воспроизводит короткий звук, когда сообщение чата сохраняется во входящие."
+    },
+    "playInboxSoundHelper": {
+      "message": "Воспроизводит короткий звук для новых сообщений во входящих."
+    },
+    "extensionVersion": {
+      "message": "Версия расширения"
+    },
+    "versionLabel": {
+      "message": "Версия {version}"
+    },
+    "off": {
+      "message": "Выключено"
+    },
+    "popupResetConfirm": {
+      "message": "Сбросить настройки Chat Enhancer и очистить локальные входящие, ключевые слова и данные эмодзи?"
+    },
+    "popupResetComplete": {
+      "message": "Chat Enhancer был сброшен."
+    }
+  }
+}

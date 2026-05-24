@@ -1,0 +1,183 @@
+{
+  "messages": {
+    "add": "Ekle",
+    "addKeywords": "Anahtar kelime ekle",
+    "addKeywordsCount": {
+      "one": "Anahtar kelime ekle, {count} anahtar kelime izleniyor",
+      "other": "Anahtar kelime ekle, {count} anahtar kelime izleniyor"
+    },
+    "chatCommands": "Sohbet komutları",
+    "clear": "Temizle",
+    "close": "Kapat",
+    "commandHelpHint": "Bir komut yazın, sonra Tab'a basın.",
+    "couldNotFindChatInput": "Sohbet girişi bulunamadı.",
+    "couldNotReadTime": "Bu saat okunamadı.",
+    "couldNotReadUserName": "Bu kullanıcı adı okunamadı.",
+    "inbox": "Gelen kutusu",
+    "inboxAriaUnread": "Gelen kutusu, {count} okunmamış",
+    "inboxEmpty": "Gelen kutusu boş",
+    "inboxSound": "Gelen kutusu sesi",
+    "jumpToMessage": "Mesaja git",
+    "keywordOrPhrase": "Anahtar kelime veya ifade",
+    "lessThanOneMinute": "1 dakikadan az",
+    "mention": "Bahset",
+    "mentionUser": "Kullanıcıdan bahset",
+    "mentionUserTitle": "Kullanıcıdan bahset. Alıntı yapmak için Alt/Option-tıkla.",
+    "mostUsed": "EN ÇOK KULLANILANLAR",
+    "noInboxMessagesYet": "Gelen kutusunda henüz mesaj yok.",
+    "noKeywords": "Anahtar kelime yok",
+    "noPreviousMessageYet": "Henüz önceki mesaj yok.",
+    "nothingHereYet": "Burada henüz bir şey yok",
+    "openChannel": "Kanalı aç",
+    "openChannelsInPopup": "Kanalları açılır pencerede aç",
+    "original": "Orijinal: {text}",
+    "originalMessage": "Orijinal mesaj",
+    "pressEnterAgainToSend": "Göndermek için tekrar Enter'a basın.",
+    "pressTabToRunCommand": "Bu komutu çalıştırmak için Tab'a basın.",
+    "quote": "Alıntıla",
+    "quoteLength": "Alıntı uzunluğu {count}.",
+    "quoteMessage": "Mesajı alıntıla",
+    "recentMessages": "Son mesajlar",
+    "recentMessagesFromThisUser": "Bu kullanıcının son mesajları",
+    "removeKeyword": "{keyword} kaldır",
+    "savedMessages": {
+      "one": "{count} kayıtlı mesaj",
+      "other": "{count} kayıtlı mesaj"
+    },
+    "settingState": "{label} {state}.",
+    "showRecentMessages": "Son mesajları göster",
+    "stateOff": "kapalı",
+    "stateOn": "açık",
+    "timeHours": "{count} sa",
+    "timeMinutes": "{count} dk",
+    "timeSeconds": "{count} sn",
+    "translateChat": "Sohbeti çevir",
+    "translated": "Çevrildi:",
+    "translatedFrom": "{language} dilinden çevrildi",
+    "translatedFromOriginal": "{language} dilinden çevrildi: {text}",
+    "translatedMessage": "Çevrilmiş mesaj",
+    "translateOff": "Çeviri kapalı.",
+    "translateToLanguage": "{language} diline çevir.",
+    "translationsReplaceMessages": "Çeviriler mesajların yerini alır.",
+    "translationsShowBelowMessages": "Çeviriler mesajların altında görünür.",
+    "unknownSettingCommand": "Bilinmeyen ayar komutu.",
+    "unknownTimezone": "Bilinmeyen saat dilimi.",
+    "unknownTranslationLanguage": "Bilinmeyen çeviri dili.",
+    "unreadMessages": {
+      "one": "{count} yeni mesaj",
+      "other": "{count} yeni mesaj"
+    },
+    "useOnOrOff": "on veya off kullanın.",
+    "useQuoteLength": "Alıntı uzunluğu {lengths} kullanın.",
+    "useReplaceOrBelow": "replace veya below kullanın.",
+    "watchingMentions": "Bahsetmeler izleniyor",
+    "watchingMentionsAndKeywords": "Bahsetmeler ve anahtar kelimeler izleniyor"
+  },
+  "extension": {
+    "extensionName": {
+      "message": "Chat Enhancer for YouTube",
+      "description": "Herkese açık uzantı adı."
+    },
+    "extensionShortName": {
+      "message": "Chat Enhancer",
+      "description": "Kısa uzantı adı."
+    },
+    "extensionDescription": {
+      "message": "YouTube canlı sohbeti için hafif çeviri, bahsetme, profil ve emoji araçları.",
+      "description": "Manifest ve mağaza özeti."
+    },
+    "openChatEnhancerWebsite": {
+      "message": "Chat Enhancer web sitesini aç"
+    },
+    "openGithubRepository": {
+      "message": "GitHub deposunu aç"
+    },
+    "supportFeedback": {
+      "message": "Destek / Geri bildirim"
+    },
+    "supportAndFeedback": {
+      "message": "Destek ve geri bildirim"
+    },
+    "resetAllExtensionData": {
+      "message": "Tüm uzantı ayarlarını ve yerel verileri sıfırla"
+    },
+    "resetExtension": {
+      "message": "Uzantıyı sıfırla"
+    },
+    "translation": {
+      "message": "Çeviri"
+    },
+    "chooseTranslationLanguageTitle": {
+      "message": "Sohbet mesajlarının çevrileceği dili seçin. Kapalı seçeneği otomatik çeviriyi devre dışı bırakır."
+    },
+    "translateTo": {
+      "message": "Şuna çevir"
+    },
+    "translationOffHelper": {
+      "message": "Kapalı seçeneği otomatik çeviriyi devre dışı bırakır."
+    },
+    "display": {
+      "message": "Görünüm"
+    },
+    "translationDisplayTitle": {
+      "message": "Çevirilerin orijinal mesajın yerini alacağını veya altında görüneceğini seçin."
+    },
+    "translationDisplayHelper": {
+      "message": "Mesajı değiştirin veya çeviriyi altında gösterin."
+    },
+    "replaceMessage": {
+      "message": "Mesajı değiştir"
+    },
+    "showBelow": {
+      "message": "Altında göster"
+    },
+    "chatActions": {
+      "message": "Sohbet işlemleri"
+    },
+    "quoteLengthTitle": {
+      "message": "Sohbet işlemlerinden veya kartlardan mesaj alıntılarken dahil edilecek en fazla karakter sayısı."
+    },
+    "quoteLengthLabel": {
+      "message": "Alıntı uzunluğu"
+    },
+    "quoteLengthHelper": {
+      "message": "Mesaj alıntılarken dahil edilecek en fazla karakter sayısı."
+    },
+    "openChannelsInPopup": {
+      "message": "Kanalları açılır pencerede aç"
+    },
+    "openChannelsInPopupTitle": {
+      "message": "YouTube kanal sayfalarını normal tarayıcı sekmesi yerine daha küçük bir açılır pencerede aç."
+    },
+    "openChannelsInPopupHelper": {
+      "message": "Avatar kartlarından kanal sayfaları için daha küçük bir pencere kullan."
+    },
+    "popupAlerts": {
+      "message": "Uyarılar"
+    },
+    "playInboxSound": {
+      "message": "Gelen kutusu sesi çal"
+    },
+    "playInboxSoundTitle": {
+      "message": "Bir sohbet mesajı gelen kutunuza kaydedildiğinde kısa bir ses çalar."
+    },
+    "playInboxSoundHelper": {
+      "message": "Yeni gelen kutusu mesajları için kısa bir ses çalar."
+    },
+    "extensionVersion": {
+      "message": "Uzantı sürümü"
+    },
+    "versionLabel": {
+      "message": "Sürüm {version}"
+    },
+    "off": {
+      "message": "Kapalı"
+    },
+    "popupResetConfirm": {
+      "message": "Chat Enhancer ayarları sıfırlansın ve yerel gelen kutusu, anahtar kelime ve emoji verileri temizlensin mi?"
+    },
+    "popupResetComplete": {
+      "message": "Chat Enhancer sıfırlandı."
+    }
+  }
+}

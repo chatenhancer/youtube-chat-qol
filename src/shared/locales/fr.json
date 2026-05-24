@@ -2,39 +2,179 @@
   "messages": {
     "add": "Ajouter",
     "addKeywords": "Ajouter des mots-clés",
+    "addKeywordsCount": {
+      "one": "Ajouter des mots-clés, {count} mot-clé surveillé",
+      "other": "Ajouter des mots-clés, {count} mots-clés surveillés"
+    },
     "chatCommands": "Commandes du chat",
     "clear": "Effacer",
     "close": "Fermer",
     "commandHelpHint": "Saisissez une commande, puis appuyez sur Tab.",
     "couldNotFindChatInput": "Impossible de trouver le champ du chat.",
     "couldNotReadTime": "Impossible de lire cette heure.",
-    "couldNotReadUserName": "Impossible de lire ce nom d’utilisateur.",
+    "couldNotReadUserName": "Impossible de lire ce nom d'utilisateur.",
     "inbox": "Boîte de réception",
-    "inboxSound": "Son de la boîte",
+    "inboxAriaUnread": "Boîte de réception, {count} non lu(s)",
+    "inboxEmpty": "Boîte de réception vide",
+    "inboxSound": "Son de la boîte de réception",
     "jumpToMessage": "Aller au message",
     "keywordOrPhrase": "Mot-clé ou expression",
     "lessThanOneMinute": "moins de 1 min",
     "mention": "Mentionner",
-    "mentionUser": "Mentionner l’utilisateur",
+    "mentionUser": "Mentionner l'utilisateur",
+    "mentionUserTitle": "Mentionner l'utilisateur. Alt/Option-clic pour citer.",
+    "mostUsed": "LES PLUS UTILISÉS",
+    "noInboxMessagesYet": "Aucun message dans la boîte de réception pour le moment.",
     "noKeywords": "Aucun mot-clé",
+    "noPreviousMessageYet": "Aucun message précédent pour le moment.",
     "nothingHereYet": "Rien ici pour le moment",
     "openChannel": "Ouvrir la chaîne",
-    "openChannelsInPopup": "Ouvrir les chaînes dans une fenêtre",
-    "originalMessage": "Message d’origine",
+    "openChannelsInPopup": "Ouvrir les chaînes dans une fenêtre pop-up",
+    "original": "Original : {text}",
+    "originalMessage": "Message d'origine",
+    "pressEnterAgainToSend": "Appuyez encore sur Entrée pour envoyer.",
     "pressTabToRunCommand": "Appuyez sur Tab pour exécuter cette commande.",
     "quote": "Citer",
+    "quoteLength": "Longueur de citation {count}.",
     "quoteMessage": "Citer le message",
     "recentMessages": "Messages récents",
     "recentMessagesFromThisUser": "Messages récents de cet utilisateur",
+    "removeKeyword": "Supprimer {keyword}",
+    "savedMessages": {
+      "one": "{count} message enregistré",
+      "other": "{count} messages enregistrés"
+    },
+    "settingState": "{label} {state}.",
     "showRecentMessages": "Afficher les messages récents",
+    "stateOff": "désactivé",
+    "stateOn": "activé",
+    "timeHours": "{count} h",
+    "timeMinutes": "{count} min",
+    "timeSeconds": "{count} s",
     "translateChat": "Traduire le chat",
     "translated": "Traduit :",
     "translatedFrom": "Traduit du {language}",
     "translatedFromOriginal": "Traduit du {language} : {text}",
     "translatedMessage": "Message traduit",
     "translateOff": "Traduction désactivée.",
+    "translateToLanguage": "Traduire en {language}.",
+    "translationsReplaceMessages": "Les traductions remplacent les messages.",
+    "translationsShowBelowMessages": "Les traductions s'affichent sous les messages.",
+    "unknownSettingCommand": "Commande de réglage inconnue.",
+    "unknownTimezone": "Fuseau horaire inconnu.",
     "unknownTranslationLanguage": "Langue de traduction inconnue.",
+    "unreadMessages": {
+      "one": "{count} nouveau message",
+      "other": "{count} nouveaux messages"
+    },
+    "useOnOrOff": "Utilisez on ou off.",
+    "useQuoteLength": "Utilisez une longueur de citation de {lengths}.",
+    "useReplaceOrBelow": "Utilisez replace ou below.",
     "watchingMentions": "Surveillance des mentions",
     "watchingMentionsAndKeywords": "Surveillance des mentions et mots-clés"
+  },
+  "extension": {
+    "extensionName": {
+      "message": "Chat Enhancer for YouTube"
+    },
+    "extensionShortName": {
+      "message": "Chat Enhancer"
+    },
+    "extensionDescription": {
+      "message": "Outils légers de traduction, de mention, de profil et d'emoji pour le chat en direct YouTube."
+    },
+    "openChatEnhancerWebsite": {
+      "message": "Ouvrir le site web de Chat Enhancer"
+    },
+    "openGithubRepository": {
+      "message": "Ouvrir le dépôt GitHub"
+    },
+    "supportFeedback": {
+      "message": "Assistance / Retours"
+    },
+    "supportAndFeedback": {
+      "message": "Assistance et retours"
+    },
+    "resetAllExtensionData": {
+      "message": "Réinitialiser tous les réglages et les données locales"
+    },
+    "resetExtension": {
+      "message": "Réinitialiser l'extension"
+    },
+    "translation": {
+      "message": "Traduction"
+    },
+    "chooseTranslationLanguageTitle": {
+      "message": "Choisissez la langue dans laquelle les messages du chat doivent être traduits. Désactivé coupe la traduction automatique."
+    },
+    "translateTo": {
+      "message": "Traduire en"
+    },
+    "translationOffHelper": {
+      "message": "Désactivé coupe la traduction automatique."
+    },
+    "display": {
+      "message": "Affichage"
+    },
+    "translationDisplayTitle": {
+      "message": "Choisissez si les traductions remplacent le message original ou apparaissent dessous."
+    },
+    "translationDisplayHelper": {
+      "message": "Remplacer le message ou afficher la traduction dessous."
+    },
+    "replaceMessage": {
+      "message": "Remplacer le message"
+    },
+    "showBelow": {
+      "message": "Afficher dessous"
+    },
+    "chatActions": {
+      "message": "Actions du chat"
+    },
+    "quoteLengthTitle": {
+      "message": "Nombre maximum de caractères inclus lors de la citation d'un message depuis les actions du chat ou les cartes."
+    },
+    "quoteLengthLabel": {
+      "message": "Longueur de citation"
+    },
+    "quoteLengthHelper": {
+      "message": "Nombre maximum de caractères inclus lors de la citation des messages."
+    },
+    "openChannelsInPopup": {
+      "message": "Ouvrir les chaînes en pop-up"
+    },
+    "openChannelsInPopupTitle": {
+      "message": "Ouvrir les pages de chaînes YouTube dans une petite fenêtre pop-up au lieu d'un onglet normal."
+    },
+    "openChannelsInPopupHelper": {
+      "message": "Utilise une petite fenêtre pour les pages de chaîne depuis les cartes d'avatar."
+    },
+    "popupAlerts": {
+      "message": "Alertes"
+    },
+    "playInboxSound": {
+      "message": "Jouer un son de boîte de réception"
+    },
+    "playInboxSoundTitle": {
+      "message": "Joue un court son quand un message du chat est enregistré dans votre boîte de réception."
+    },
+    "playInboxSoundHelper": {
+      "message": "Joue un court son pour les nouveaux messages de la boîte de réception."
+    },
+    "extensionVersion": {
+      "message": "Version de l'extension"
+    },
+    "versionLabel": {
+      "message": "Version {version}"
+    },
+    "off": {
+      "message": "Désactivé"
+    },
+    "popupResetConfirm": {
+      "message": "Réinitialiser les réglages de Chat Enhancer et effacer la boîte de réception locale, les mots-clés et les données d'emojis ?"
+    },
+    "popupResetComplete": {
+      "message": "Chat Enhancer a été réinitialisé."
+    }
   }
 }

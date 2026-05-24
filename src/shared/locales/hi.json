@@ -1,0 +1,183 @@
+{
+  "messages": {
+    "add": "जोड़ें",
+    "addKeywords": "कीवर्ड जोड़ें",
+    "addKeywordsCount": {
+      "one": "कीवर्ड जोड़ें, {count} कीवर्ड देखा जा रहा है",
+      "other": "कीवर्ड जोड़ें, {count} कीवर्ड देखे जा रहे हैं"
+    },
+    "chatCommands": "चैट कमांड",
+    "clear": "साफ करें",
+    "close": "बंद करें",
+    "commandHelpHint": "कमांड लिखें, फिर Tab दबाएं.",
+    "couldNotFindChatInput": "चैट इनपुट नहीं मिला.",
+    "couldNotReadTime": "यह समय पढ़ा नहीं जा सका.",
+    "couldNotReadUserName": "यह यूज़र नाम पढ़ा नहीं जा सका.",
+    "inbox": "इनबॉक्स",
+    "inboxAriaUnread": "इनबॉक्स, {count} अपठित",
+    "inboxEmpty": "इनबॉक्स खाली है",
+    "inboxSound": "इनबॉक्स साउंड",
+    "jumpToMessage": "मैसेज पर जाएं",
+    "keywordOrPhrase": "कीवर्ड या वाक्यांश",
+    "lessThanOneMinute": "1 मिनट से कम",
+    "mention": "मेंशन",
+    "mentionUser": "यूज़र को मेंशन करें",
+    "mentionUserTitle": "यूज़र को मेंशन करें. कोट करने के लिए Alt/Option-क्लिक करें.",
+    "mostUsed": "सबसे ज़्यादा इस्तेमाल किए गए",
+    "noInboxMessagesYet": "इनबॉक्स में अभी कोई मैसेज नहीं है.",
+    "noKeywords": "कोई कीवर्ड नहीं",
+    "noPreviousMessageYet": "अभी कोई पिछला मैसेज नहीं है.",
+    "nothingHereYet": "यहां अभी कुछ नहीं है",
+    "openChannel": "चैनल खोलें",
+    "openChannelsInPopup": "चैनल पॉपअप में खोलें",
+    "original": "मूल: {text}",
+    "originalMessage": "मूल मैसेज",
+    "pressEnterAgainToSend": "भेजने के लिए फिर से Enter दबाएं.",
+    "pressTabToRunCommand": "यह कमांड चलाने के लिए Tab दबाएं.",
+    "quote": "कोट",
+    "quoteLength": "कोट की लंबाई {count}.",
+    "quoteMessage": "मैसेज को कोट करें",
+    "recentMessages": "हाल के मैसेज",
+    "recentMessagesFromThisUser": "इस यूज़र के हाल के मैसेज",
+    "removeKeyword": "{keyword} हटाएं",
+    "savedMessages": {
+      "one": "{count} सेव किया गया मैसेज",
+      "other": "{count} सेव किए गए मैसेज"
+    },
+    "settingState": "{label} {state}.",
+    "showRecentMessages": "हाल के मैसेज दिखाएं",
+    "stateOff": "बंद",
+    "stateOn": "चालू",
+    "timeHours": "{count} घंटे",
+    "timeMinutes": "{count} मिनट",
+    "timeSeconds": "{count} सेकंड",
+    "translateChat": "चैट का अनुवाद करें",
+    "translated": "अनुवादित:",
+    "translatedFrom": "{language} से अनुवादित",
+    "translatedFromOriginal": "{language} से अनुवादित: {text}",
+    "translatedMessage": "अनुवादित मैसेज",
+    "translateOff": "अनुवाद बंद है.",
+    "translateToLanguage": "{language} में अनुवाद करें.",
+    "translationsReplaceMessages": "अनुवाद मैसेज की जगह लेता है.",
+    "translationsShowBelowMessages": "अनुवाद मैसेज के नीचे दिखता है.",
+    "unknownSettingCommand": "अज्ञात सेटिंग कमांड.",
+    "unknownTimezone": "अज्ञात टाइमज़ोन.",
+    "unknownTranslationLanguage": "अज्ञात अनुवाद भाषा.",
+    "unreadMessages": {
+      "one": "{count} नया मैसेज",
+      "other": "{count} नए मैसेज"
+    },
+    "useOnOrOff": "on या off इस्तेमाल करें.",
+    "useQuoteLength": "कोट की लंबाई {lengths} इस्तेमाल करें.",
+    "useReplaceOrBelow": "replace या below इस्तेमाल करें.",
+    "watchingMentions": "मेंशन देखे जा रहे हैं",
+    "watchingMentionsAndKeywords": "मेंशन और कीवर्ड देखे जा रहे हैं"
+  },
+  "extension": {
+    "extensionName": {
+      "message": "Chat Enhancer for YouTube",
+      "description": "एक्सटेंशन का सार्वजनिक नाम."
+    },
+    "extensionShortName": {
+      "message": "Chat Enhancer",
+      "description": "एक्सटेंशन का छोटा नाम."
+    },
+    "extensionDescription": {
+      "message": "YouTube लाइव चैट के लिए हल्के अनुवाद, मेंशन, प्रोफ़ाइल और इमोजी टूल.",
+      "description": "मैनिफेस्ट और स्टोर सारांश."
+    },
+    "openChatEnhancerWebsite": {
+      "message": "Chat Enhancer वेबसाइट खोलें"
+    },
+    "openGithubRepository": {
+      "message": "GitHub रिपॉज़िटरी खोलें"
+    },
+    "supportFeedback": {
+      "message": "सपोर्ट / फ़ीडबैक"
+    },
+    "supportAndFeedback": {
+      "message": "सपोर्ट और फ़ीडबैक"
+    },
+    "resetAllExtensionData": {
+      "message": "सभी एक्सटेंशन सेटिंग और लोकल डेटा रीसेट करें"
+    },
+    "resetExtension": {
+      "message": "एक्सटेंशन रीसेट करें"
+    },
+    "translation": {
+      "message": "अनुवाद"
+    },
+    "chooseTranslationLanguageTitle": {
+      "message": "वह भाषा चुनें जिसमें चैट मैसेज का अनुवाद होना चाहिए. बंद करने से ऑटोमैटिक अनुवाद बंद हो जाता है."
+    },
+    "translateTo": {
+      "message": "इसमें अनुवाद करें"
+    },
+    "translationOffHelper": {
+      "message": "बंद करने से ऑटोमैटिक अनुवाद बंद हो जाता है."
+    },
+    "display": {
+      "message": "दिखावट"
+    },
+    "translationDisplayTitle": {
+      "message": "चुनें कि अनुवाद मूल मैसेज की जगह ले या उसके नीचे दिखाई दे."
+    },
+    "translationDisplayHelper": {
+      "message": "मैसेज बदलें या अनुवाद नीचे दिखाएं."
+    },
+    "replaceMessage": {
+      "message": "मैसेज बदलें"
+    },
+    "showBelow": {
+      "message": "नीचे दिखाएं"
+    },
+    "chatActions": {
+      "message": "चैट ऐक्शन"
+    },
+    "quoteLengthTitle": {
+      "message": "चैट ऐक्शन या कार्ड से मैसेज को कोट करते समय शामिल किए जाने वाले अधिकतम अक्षर."
+    },
+    "quoteLengthLabel": {
+      "message": "कोट की लंबाई"
+    },
+    "quoteLengthHelper": {
+      "message": "मैसेज को कोट करते समय शामिल किए जाने वाले अधिकतम अक्षर."
+    },
+    "openChannelsInPopup": {
+      "message": "चैनल पॉपअप में खोलें"
+    },
+    "openChannelsInPopupTitle": {
+      "message": "YouTube चैनल पेज को सामान्य ब्राउज़र टैब के बजाय छोटी पॉपअप विंडो में खोलें."
+    },
+    "openChannelsInPopupHelper": {
+      "message": "अवतार कार्ड से चैनल पेज के लिए छोटी विंडो इस्तेमाल करें."
+    },
+    "popupAlerts": {
+      "message": "अलर्ट"
+    },
+    "playInboxSound": {
+      "message": "इनबॉक्स साउंड चलाएं"
+    },
+    "playInboxSoundTitle": {
+      "message": "जब कोई चैट मैसेज आपके इनबॉक्स में सेव हो, तो छोटा साउंड चलाएं."
+    },
+    "playInboxSoundHelper": {
+      "message": "नए इनबॉक्स मैसेज के लिए छोटा साउंड चलाएं."
+    },
+    "extensionVersion": {
+      "message": "एक्सटेंशन वर्ज़न"
+    },
+    "versionLabel": {
+      "message": "वर्ज़न {version}"
+    },
+    "off": {
+      "message": "बंद"
+    },
+    "popupResetConfirm": {
+      "message": "Chat Enhancer सेटिंग रीसेट करें और लोकल इनबॉक्स, कीवर्ड और इमोजी डेटा साफ करें?"
+    },
+    "popupResetComplete": {
+      "message": "Chat Enhancer रीसेट हो गया है."
+    }
+  }
+}

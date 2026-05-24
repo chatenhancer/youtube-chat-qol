@@ -2,6 +2,10 @@
   "messages": {
     "add": "追加",
     "addKeywords": "キーワードを追加",
+    "addKeywordsCount": {
+      "one": "キーワードを追加、{count} 個のキーワードを監視中",
+      "other": "キーワードを追加、{count} 個のキーワードを監視中"
+    },
     "chatCommands": "チャットコマンド",
     "clear": "クリア",
     "close": "閉じる",
@@ -10,31 +14,170 @@
     "couldNotReadTime": "その時刻を読み取れませんでした。",
     "couldNotReadUserName": "そのユーザー名を読み取れませんでした。",
     "inbox": "受信トレイ",
+    "inboxAriaUnread": "受信トレイ、未読 {count} 件",
+    "inboxEmpty": "受信トレイは空です",
     "inboxSound": "受信トレイの音",
     "jumpToMessage": "メッセージへ移動",
     "keywordOrPhrase": "キーワードまたはフレーズ",
     "lessThanOneMinute": "1分未満",
     "mention": "メンション",
     "mentionUser": "ユーザーをメンション",
+    "mentionUserTitle": "ユーザーをメンション。Alt/Option クリックで引用。",
+    "mostUsed": "よく使うもの",
+    "noInboxMessagesYet": "受信トレイのメッセージはまだありません。",
     "noKeywords": "キーワードなし",
+    "noPreviousMessageYet": "前のメッセージはまだありません。",
     "nothingHereYet": "まだ何もありません",
     "openChannel": "チャンネルを開く",
     "openChannelsInPopup": "チャンネルをポップアップで開く",
+    "original": "元の文: {text}",
     "originalMessage": "元のメッセージ",
+    "pressEnterAgainToSend": "送信するにはもう一度 Enter を押します。",
     "pressTabToRunCommand": "このコマンドを実行するには Tab キーを押します。",
     "quote": "引用",
+    "quoteLength": "引用の長さ {count}。",
     "quoteMessage": "メッセージを引用",
     "recentMessages": "最近のメッセージ",
     "recentMessagesFromThisUser": "このユーザーの最近のメッセージ",
+    "removeKeyword": "{keyword} を削除",
+    "savedMessages": {
+      "one": "保存済みメッセージ {count} 件",
+      "other": "保存済みメッセージ {count} 件"
+    },
+    "settingState": "{label} {state}。",
     "showRecentMessages": "最近のメッセージを表示",
+    "stateOff": "オフ",
+    "stateOn": "オン",
+    "timeHours": "{count}時間",
+    "timeMinutes": "{count}分",
+    "timeSeconds": "{count}秒",
     "translateChat": "チャットを翻訳",
     "translated": "翻訳:",
     "translatedFrom": "{language}から翻訳",
     "translatedFromOriginal": "{language}から翻訳: {text}",
     "translatedMessage": "翻訳済みメッセージ",
     "translateOff": "翻訳はオフです。",
+    "translateToLanguage": "{language}に翻訳します。",
+    "translationsReplaceMessages": "翻訳はメッセージを置き換えます。",
+    "translationsShowBelowMessages": "翻訳はメッセージの下に表示されます。",
+    "unknownSettingCommand": "不明な設定コマンドです。",
+    "unknownTimezone": "不明なタイムゾーンです。",
     "unknownTranslationLanguage": "不明な翻訳言語です。",
+    "unreadMessages": {
+      "one": "新着メッセージ {count} 件",
+      "other": "新着メッセージ {count} 件"
+    },
+    "useOnOrOff": "on または off を使ってください。",
+    "useQuoteLength": "引用の長さは {lengths} を使ってください。",
+    "useReplaceOrBelow": "replace または below を使ってください。",
     "watchingMentions": "メンションを監視中",
     "watchingMentionsAndKeywords": "メンションとキーワードを監視中"
+  },
+  "extension": {
+    "extensionName": {
+      "message": "Chat Enhancer for YouTube",
+      "description": "公開される拡張機能名。"
+    },
+    "extensionShortName": {
+      "message": "Chat Enhancer",
+      "description": "短い拡張機能名。"
+    },
+    "extensionDescription": {
+      "message": "YouTube ライブチャット向けの軽量な翻訳、メンション、プロフィール、絵文字ツールです。",
+      "description": "マニフェストとストア用の概要。"
+    },
+    "openChatEnhancerWebsite": {
+      "message": "Chat Enhancer のウェブサイトを開く"
+    },
+    "openGithubRepository": {
+      "message": "GitHub リポジトリを開く"
+    },
+    "supportFeedback": {
+      "message": "サポート / フィードバック"
+    },
+    "supportAndFeedback": {
+      "message": "サポートとフィードバック"
+    },
+    "resetAllExtensionData": {
+      "message": "拡張機能のすべての設定とローカルデータをリセット"
+    },
+    "resetExtension": {
+      "message": "拡張機能をリセット"
+    },
+    "translation": {
+      "message": "翻訳"
+    },
+    "chooseTranslationLanguageTitle": {
+      "message": "チャットメッセージの翻訳先言語を選びます。オフにすると自動翻訳は無効になります。"
+    },
+    "translateTo": {
+      "message": "翻訳先"
+    },
+    "translationOffHelper": {
+      "message": "オフにすると自動翻訳は無効になります。"
+    },
+    "display": {
+      "message": "表示"
+    },
+    "translationDisplayTitle": {
+      "message": "翻訳で元のメッセージを置き換えるか、下に表示するかを選びます。"
+    },
+    "translationDisplayHelper": {
+      "message": "メッセージを置き換えるか、翻訳を下に表示します。"
+    },
+    "replaceMessage": {
+      "message": "メッセージを置き換え"
+    },
+    "showBelow": {
+      "message": "下に表示"
+    },
+    "chatActions": {
+      "message": "チャット操作"
+    },
+    "quoteLengthTitle": {
+      "message": "チャット操作やカードからメッセージを引用するときに含める最大文字数。"
+    },
+    "quoteLengthLabel": {
+      "message": "引用の長さ"
+    },
+    "quoteLengthHelper": {
+      "message": "メッセージを引用するときに含める最大文字数。"
+    },
+    "openChannelsInPopup": {
+      "message": "チャンネルをポップアップで開く"
+    },
+    "openChannelsInPopupTitle": {
+      "message": "YouTube チャンネルページを通常のブラウザータブではなく小さなポップアップウィンドウで開きます。"
+    },
+    "openChannelsInPopupHelper": {
+      "message": "アバターカードから開くチャンネルページに小さなウィンドウを使います。"
+    },
+    "popupAlerts": {
+      "message": "通知"
+    },
+    "playInboxSound": {
+      "message": "受信トレイの音を鳴らす"
+    },
+    "playInboxSoundTitle": {
+      "message": "チャットメッセージが受信トレイに保存されたときに短い音を鳴らします。"
+    },
+    "playInboxSoundHelper": {
+      "message": "新しい受信トレイメッセージに短い音を鳴らします。"
+    },
+    "extensionVersion": {
+      "message": "拡張機能のバージョン"
+    },
+    "versionLabel": {
+      "message": "バージョン {version}"
+    },
+    "off": {
+      "message": "オフ"
+    },
+    "popupResetConfirm": {
+      "message": "Chat Enhancer の設定をリセットし、ローカルの受信トレイ、キーワード、絵文字データを消去しますか？"
+    },
+    "popupResetComplete": {
+      "message": "Chat Enhancer がリセットされました。"
+    }
   }
 }
