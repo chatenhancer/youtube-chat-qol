@@ -71,7 +71,15 @@
     <link rel="icon" href="../assets/icons/icon-128.png">
     <link rel="apple-touch-icon" href="../assets/icons/icon-128.png">
     <link rel="preload" href="../assets/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="stylesheet" href="../styles.css?v=48">
+    <script>
+      (() => {
+        const screenshotPanel = new URLSearchParams(window.location.search).get('ytcq-screenshot');
+        if (screenshotPanel) {
+          document.documentElement.dataset.screenshotPanel = screenshotPanel;
+        }
+      })();
+    </script>
+    <link rel="stylesheet" href="../styles.css?v=50">
     <script type="application/ld+json">
       {
               "@context": "https://schema.org",
@@ -253,7 +261,7 @@
           <div class="screenshot-grid">
             <figure class="showcase-figure">
               <div class="showcase-stack">
-                <article class="showcase-panel">
+                <article class="showcase-panel" data-screenshot-panel="translation">
                   <div class="showcase-copy showcase-copy-balanced">
                     <div class="showcase-brand">
                       <img src="../assets/logo.png" width="178" height="60" alt="Chat Enhancer for YouTube">
@@ -299,8 +307,8 @@
                   </div>
                 </article>
 
-                <article class="showcase-panel showcase-panel-reverse">
-                  <div class="showcase-media">
+                <article class="showcase-panel showcase-panel-reverse" data-screenshot-panel="inbox-context">
+                  <div class="showcase-media showcase-media-inbox-context">
                     <img src="../assets/screenshots/hero-img2.png" alt="Caixa de entrada do chat ao vivo do YouTube e menu de ações de mensagem" data-i18n-attr="alt:screenshots.mentionAlt">
                   </div>
                   <div class="showcase-copy">
@@ -325,7 +333,7 @@
                   </div>
                 </article>
 
-                <article class="showcase-panel">
+                <article class="showcase-panel" data-screenshot-panel="extras">
                   <div class="showcase-copy showcase-copy-balanced">
                     <div class="showcase-brand">
                       <img src="../assets/logo.png" width="178" height="60" alt="Chat Enhancer for YouTube">
@@ -354,7 +362,7 @@
                         <dd data-i18n="screenshots.commandHelpBody">mostra todos os comandos disponíveis</dd>
                       </div>
                     </dl>
-                    <a class="feature-link showcase-command-link" href="#commands" data-i18n="screenshots.commandsFullLink">Ver referência completa de comandos</a>
+                    <a class="feature-link showcase-command-link" href="#commands" data-i18n="screenshots.commandsFullLink">Ver referência completa de comandos em chatenhancer.com</a>
                   </div>
                   <div class="showcase-media showcase-media-extras">
                     <img src="../assets/screenshots/hero-img3.png" alt="Cartão de perfil, comandos e linha de emojis frequentes do chat ao vivo do YouTube" data-i18n-attr="alt:screenshots.extrasAlt">

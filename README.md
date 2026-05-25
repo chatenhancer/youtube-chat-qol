@@ -53,7 +53,7 @@ Not affiliated with YouTube or Google.
 
 ## Screenshots
 
-![Chat Enhancer for YouTube screenshots](assets/screenshots/readme-showcase.png)
+![Chat Enhancer for YouTube screenshots](docs/assets/screenshots/readme-showcase.png)
 
 ## Development
 
