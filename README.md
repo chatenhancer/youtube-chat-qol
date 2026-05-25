@@ -22,28 +22,34 @@ Not affiliated with YouTube or Google.
 
 ### Translation
 
-- Translate live chat messages, with `Off` as the default.
-- Choose whether translations replace the original message or appear below it.
-- See translated messages in chat and in recent-message cards.
+- Translate live chat messages, with translation off by default
+- Choose whether translations replace the original message or appear below it
 
-### Mention and quote
+### Reply and context
 
-- Add `Mention` and `Quote` actions to YouTube's existing message menu.
-- Click an author name to mention them, or Alt/Option-click it to quote that message.
+- Mention or quote messages from YouTube's existing message menu
+- Click an author name to mention them
+- Alt/Option-click an author name to quote their message
+- Click an avatar to see that user's recent messages and open their channel
 
-### Chat context
+### Inbox
 
-- Click an avatar or participant avatar to see that user's recent messages, jump back to visible messages, and open their channel.
-- Keep a local inbox for messages that mention your handle or match watched keywords.
-- Add watched keywords from the inbox and highlight matches in chat.
-- Show a browser-tab alert for unread inbox messages, with an optional subtle sound.
+- Keep a local inbox for messages that mention your handle
+- Add watched keywords or phrases and save matching messages in the inbox
+- Highlight mentions and watched keywords in chat
+- Optionally play a subtle sound for new inbox messages
 
-### Chat comfort
+### Emoji and commands
 
-- Add a local most-used row to YouTube's emoji picker.
-- Complete chat slash commands for mentions, quotes, repeated messages, time helpers, and extension settings.
-- Keep chat at the live edge after tab switches so inbox alerts and translations can keep up.
-- Toggle translation and inbox sound from YouTube's live chat settings menu, with deeper options in the extension popup.
+- Reuse your most-used emojis from a local row in the emoji picker
+- Use Tab-expanded chat commands for mentions, quotes, repeated messages, time helpers, and settings
+
+### Privacy
+
+- The extension does not replace YouTube chat
+- The extension does not run analytics
+- The extension does not send data to an extension-owned server
+- When translation is enabled, message text is sent to Google Translate so it can be translated
 
 ## Screenshots
 
