@@ -9,16 +9,24 @@ import arCatalog from './locales/ar.json';
 import deCatalog from './locales/de.json';
 import enCatalog from './locales/en.json';
 import esCatalog from './locales/es.json';
+import faCatalog from './locales/fa.json';
 import frCatalog from './locales/fr.json';
+import heCatalog from './locales/he.json';
 import hiCatalog from './locales/hi.json';
 import idCatalog from './locales/id.json';
 import itCatalog from './locales/it.json';
 import jaCatalog from './locales/ja.json';
 import koCatalog from './locales/ko.json';
+import nlCatalog from './locales/nl.json';
+import plCatalog from './locales/pl.json';
 import ptCatalog from './locales/pt.json';
 import ruCatalog from './locales/ru.json';
+import thCatalog from './locales/th.json';
 import trCatalog from './locales/tr.json';
+import ukCatalog from './locales/uk.json';
+import viCatalog from './locales/vi.json';
 import zhCnCatalog from './locales/zh_CN.json';
+import zhTwCatalog from './locales/zh_TW.json';
 import { getLanguageLabel } from './languages';
 
 type MessageParams = Record<string, number | string>;
@@ -35,15 +43,23 @@ const LOCALES: Record<string, LocaleCatalog> = {
   de: deCatalog,
   en: enCatalog,
   es: esCatalog,
+  fa: faCatalog,
   fr: frCatalog,
+  he: heCatalog,
   hi: hiCatalog,
   id: idCatalog,
   it: itCatalog,
   ja: jaCatalog,
   ko: koCatalog,
+  nl: nlCatalog,
+  pl: plCatalog,
   pt: ptCatalog,
   ru: ruCatalog,
+  th: thCatalog,
   tr: trCatalog,
+  uk: ukCatalog,
+  vi: viCatalog,
+  'zh-TW': zhTwCatalog,
   'zh-CN': zhCnCatalog
 };
 
@@ -100,6 +116,14 @@ function normalizeSupportedLocale(locale: string): string {
     normalized.startsWith('zh-sg')
   ) {
     return 'zh-CN';
+  }
+  if (
+    normalized.startsWith('zh-tw') ||
+    normalized.startsWith('zh-hant') ||
+    normalized.startsWith('zh-hk') ||
+    normalized.startsWith('zh-mo')
+  ) {
+    return 'zh-TW';
   }
 
   const base = normalized.split('-')[0];

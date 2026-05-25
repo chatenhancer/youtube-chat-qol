@@ -15,16 +15,24 @@ const localeMeta = {
   de: { ogLocale: 'de_DE', path: 'de' },
   en: { ogLocale: 'en_US', path: '' },
   es: { ogLocale: 'es_ES', path: 'es' },
+  fa: { dir: 'rtl', ogLocale: 'fa_IR', path: 'fa' },
   fr: { ogLocale: 'fr_FR', path: 'fr' },
+  he: { dir: 'rtl', ogLocale: 'he_IL', path: 'he' },
   hi: { ogLocale: 'hi_IN', path: 'hi' },
   id: { ogLocale: 'id_ID', path: 'id' },
   it: { ogLocale: 'it_IT', path: 'it' },
   ja: { ogLocale: 'ja_JP', path: 'ja' },
   ko: { ogLocale: 'ko_KR', path: 'ko' },
+  nl: { ogLocale: 'nl_NL', path: 'nl' },
+  pl: { ogLocale: 'pl_PL', path: 'pl' },
   pt: { ogLocale: 'pt_BR', path: 'pt' },
   ru: { ogLocale: 'ru_RU', path: 'ru' },
+  th: { ogLocale: 'th_TH', path: 'th' },
   tr: { ogLocale: 'tr_TR', path: 'tr' },
-  zh_CN: { htmlLang: 'zh-CN', ogLocale: 'zh_CN', path: 'zh-CN' }
+  uk: { ogLocale: 'uk_UA', path: 'uk' },
+  vi: { ogLocale: 'vi_VN', path: 'vi' },
+  zh_CN: { htmlLang: 'zh-CN', ogLocale: 'zh_CN', path: 'zh-CN' },
+  zh_TW: { htmlLang: 'zh-TW', ogLocale: 'zh_TW', path: 'zh-TW' }
 };
 
 const template = await readFile(templatePath, 'utf8');

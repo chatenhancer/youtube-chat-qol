@@ -1,0 +1,191 @@
+{
+  "messages": {
+    "add": "Toevoegen",
+    "addKeywords": "Trefwoorden toevoegen",
+    "addKeywordsCount": {
+      "one": "Trefwoorden toevoegen, {count} trefwoord wordt gevolgd",
+      "other": "Trefwoorden toevoegen, {count} trefwoorden worden gevolgd"
+    },
+    "chatCommands": "Chatcommando’s",
+    "clear": "Wissen",
+    "close": "Sluiten",
+    "commandHelpHint": "Typ een commando en druk op Tab.",
+    "commandHelpMention": "Vermeld de auteur van je nieuwste inboxbericht.",
+    "commandHelpQuote": "Citeer je nieuwste inboxbericht.",
+    "commandHelpRepeat": "Herstel je laatst verzonden bericht.",
+    "commandHelpTime": "Voeg de huidige tijd in.",
+    "commandHelpTimeUntil": "Voeg de resterende tijd tot een lokale tijd in.",
+    "commandHelpOpenHelp": "Toon deze lijst.",
+    "commandHelpSetTranslateTo": "Stel de vertaaltaal in.",
+    "commandHelpSetTranslationDisplay": "Stel in hoe vertalingen worden getoond.",
+    "commandHelpSetQuoteLength": "Stel de citaatlengte in.",
+    "commandHelpSetSound": "Stel inboxgeluid in.",
+    "commandHelpSetOpenChannelsInPopup": "Stel kanaalpop-upgedrag in.",
+    "couldNotFindChatInput": "Kan de chatinvoer niet vinden.",
+    "couldNotReadTime": "Kan die tijd niet lezen.",
+    "couldNotReadUserName": "Kan die gebruikersnaam niet lezen.",
+    "inbox": "Inbox",
+    "inboxAriaUnread": "Inbox, {count} ongelezen",
+    "inboxEmpty": "Inbox leeg",
+    "inboxSound": "Inboxgeluid",
+    "jumpToMessage": "Naar bericht springen",
+    "keywordOrPhrase": "Trefwoord of zin",
+    "lessThanOneMinute": "minder dan 1 min",
+    "mention": "Vermelden",
+    "mentionUser": "Gebruiker vermelden",
+    "mentionUserTitle": "Gebruiker vermelden. Alt/Option-klik om te citeren.",
+    "mostUsed": "MEEST GEBRUIKT",
+    "noInboxMessagesYet": "Nog geen inboxberichten.",
+    "noKeywords": "Geen trefwoorden",
+    "noPreviousMessageYet": "Nog geen vorig bericht.",
+    "nothingHereYet": "Hier is nog niets",
+    "openChannel": "Kanaal openen",
+    "openChannelsInPopup": "Kanalen in pop-up openen",
+    "original": "Origineel: {text}",
+    "originalMessage": "Origineel bericht",
+    "pressEnterAgainToSend": "Druk nogmaals op Enter om te verzenden.",
+    "pressTabToRunCommand": "Druk op Tab om dit commando uit te voeren.",
+    "quote": "Citeren",
+    "quoteLength": "Citaatlengte {count}.",
+    "quoteMessage": "Bericht citeren",
+    "recentMessages": "Recente berichten",
+    "recentMessagesFromThisUser": "Recente berichten van deze gebruiker",
+    "removeKeyword": "{keyword} verwijderen",
+    "savedMessages": {
+      "one": "{count} opgeslagen bericht",
+      "other": "{count} opgeslagen berichten"
+    },
+    "settingState": "{label} {state}.",
+    "showRecentMessages": "Recente berichten tonen",
+    "stateOff": "uit",
+    "stateOn": "aan",
+    "timeHours": "{count} uur",
+    "timeMinutes": "{count} min",
+    "timeSeconds": "{count} sec",
+    "translateChat": "Chat vertalen",
+    "translated": "Vertaald:",
+    "translatedFrom": "Vertaald uit {language}",
+    "translatedFromOriginal": "Vertaald uit {language}: {text}",
+    "translatedMessage": "Vertaald bericht",
+    "translateOff": "Vertaling uit.",
+    "translateToLanguage": "Vertalen naar {language}.",
+    "translationsReplaceMessages": "Vertalingen vervangen berichten.",
+    "translationsShowBelowMessages": "Vertalingen verschijnen onder berichten.",
+    "unknownSettingCommand": "Onbekend instellingencommando.",
+    "unknownTimezone": "Onbekende tijdzone.",
+    "unknownTranslationLanguage": "Onbekende vertaaltaal.",
+    "unreadMessages": {
+      "one": "{count} nieuw bericht",
+      "other": "{count} nieuwe berichten"
+    },
+    "useOnOrOff": "Gebruik aan of uit.",
+    "useQuoteLength": "Gebruik citaatlengte {lengths}.",
+    "useReplaceOrBelow": "Gebruik replace of below.",
+    "watchingMentions": "Let op vermeldingen",
+    "watchingMentionsAndKeywords": "Let op vermeldingen en trefwoorden"
+  },
+  "extension": {
+    "extensionName": {
+      "message": "Chat Enhancer for YouTube"
+    },
+    "extensionShortName": {
+      "message": "Chat Enhancer"
+    },
+    "extensionDescription": {
+      "message": "Lichte vertaal-, vermeld-, profiel- en emoji-tools voor YouTube-livechat."
+    },
+    "openChatEnhancerWebsite": {
+      "message": "Chat Enhancer-website openen"
+    },
+    "openGithubRepository": {
+      "message": "GitHub-repository openen"
+    },
+    "supportFeedback": {
+      "message": "Support / Feedback"
+    },
+    "supportAndFeedback": {
+      "message": "Support en feedback"
+    },
+    "resetAllExtensionData": {
+      "message": "Alle extensie-instellingen en lokale gegevens resetten"
+    },
+    "resetExtension": {
+      "message": "Extensie resetten"
+    },
+    "translation": {
+      "message": "Vertaling"
+    },
+    "chooseTranslationLanguageTitle": {
+      "message": "Kies de taal waarnaar chatberichten moeten worden vertaald. Uit schakelt automatische vertaling uit."
+    },
+    "translateTo": {
+      "message": "Vertalen naar"
+    },
+    "translationOffHelper": {
+      "message": "Uit schakelt automatische vertaling uit."
+    },
+    "display": {
+      "message": "Weergave"
+    },
+    "translationDisplayTitle": {
+      "message": "Kies of vertalingen het oorspronkelijke bericht vervangen of eronder verschijnen."
+    },
+    "translationDisplayHelper": {
+      "message": "Vervang het bericht of toon de vertaling eronder."
+    },
+    "replaceMessage": {
+      "message": "Bericht vervangen"
+    },
+    "showBelow": {
+      "message": "Eronder tonen"
+    },
+    "chatActions": {
+      "message": "Chatacties"
+    },
+    "quoteLengthTitle": {
+      "message": "Maximaal aantal tekens bij het citeren van een bericht via chatacties of kaarten."
+    },
+    "quoteLengthLabel": {
+      "message": "Citaatlengte"
+    },
+    "quoteLengthHelper": {
+      "message": "Maximaal aantal tekens bij het citeren van berichten."
+    },
+    "openChannelsInPopup": {
+      "message": "Kanalen in pop-up openen"
+    },
+    "openChannelsInPopupTitle": {
+      "message": "Open YouTube-kanaalpagina’s in een kleinere pop-up in plaats van een normale browsertab."
+    },
+    "openChannelsInPopupHelper": {
+      "message": "Gebruik een kleiner venster voor kanalen vanuit avatarkaarten."
+    },
+    "popupAlerts": {
+      "message": "Meldingen"
+    },
+    "playInboxSound": {
+      "message": "Inboxgeluid afspelen"
+    },
+    "playInboxSoundTitle": {
+      "message": "Speel een kort geluid af wanneer een chatbericht in je inbox wordt opgeslagen."
+    },
+    "playInboxSoundHelper": {
+      "message": "Speel een kort geluid af voor nieuwe inboxberichten."
+    },
+    "extensionVersion": {
+      "message": "Extensieversie"
+    },
+    "versionLabel": {
+      "message": "Versie {version}"
+    },
+    "off": {
+      "message": "Uit"
+    },
+    "popupResetConfirm": {
+      "message": "Chat Enhancer-instellingen resetten en lokale inbox-, trefwoord- en emojigegevens wissen?"
+    },
+    "popupResetComplete": {
+      "message": "Chat Enhancer is gereset."
+    }
+  }
+}

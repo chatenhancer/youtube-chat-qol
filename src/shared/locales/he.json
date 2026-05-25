@@ -1,0 +1,191 @@
+{
+  "messages": {
+    "add": "הוספה",
+    "addKeywords": "הוספת מילות מפתח",
+    "addKeywordsCount": {
+      "one": "הוספת מילות מפתח, מעקב אחרי מילת מפתח אחת",
+      "other": "הוספת מילות מפתח, מעקב אחרי {count} מילות מפתח"
+    },
+    "chatCommands": "פקודות צ׳אט",
+    "clear": "ניקוי",
+    "close": "סגירה",
+    "commandHelpHint": "הקלד פקודה ואז לחץ Tab.",
+    "commandHelpMention": "אזכר את כותב ההודעה החדשה ביותר בתיבה.",
+    "commandHelpQuote": "צטט את ההודעה החדשה ביותר בתיבה.",
+    "commandHelpRepeat": "שחזר את ההודעה האחרונה ששלחת.",
+    "commandHelpTime": "הכנס את השעה הנוכחית.",
+    "commandHelpTimeUntil": "הכנס את הזמן שנותר עד שעה מקומית.",
+    "commandHelpOpenHelp": "הצג את הרשימה הזו.",
+    "commandHelpSetTranslateTo": "הגדר את שפת התרגום.",
+    "commandHelpSetTranslationDisplay": "הגדר איך תרגומים מוצגים.",
+    "commandHelpSetQuoteLength": "הגדר אורך ציטוט.",
+    "commandHelpSetSound": "הגדר צליל תיבה.",
+    "commandHelpSetOpenChannelsInPopup": "הגדר פתיחת ערוצים בחלון קופץ.",
+    "couldNotFindChatInput": "לא נמצא שדה הקלט של הצ׳אט.",
+    "couldNotReadTime": "לא ניתן לקרוא את השעה הזו.",
+    "couldNotReadUserName": "לא ניתן לקרוא את שם המשתמש הזה.",
+    "inbox": "תיבה",
+    "inboxAriaUnread": "תיבה, {count} לא נקראו",
+    "inboxEmpty": "התיבה ריקה",
+    "inboxSound": "צליל תיבה",
+    "jumpToMessage": "קפיצה להודעה",
+    "keywordOrPhrase": "מילת מפתח או ביטוי",
+    "lessThanOneMinute": "פחות מדקה",
+    "mention": "אזכור",
+    "mentionUser": "אזכור משתמש",
+    "mentionUserTitle": "אזכור משתמש. Alt/Option-קליק כדי לצטט.",
+    "mostUsed": "בשימוש נפוץ",
+    "noInboxMessagesYet": "אין עדיין הודעות בתיבה.",
+    "noKeywords": "אין מילות מפתח",
+    "noPreviousMessageYet": "אין עדיין הודעה קודמת.",
+    "nothingHereYet": "עדיין אין כאן כלום",
+    "openChannel": "פתיחת ערוץ",
+    "openChannelsInPopup": "פתיחת ערוצים בחלון קופץ",
+    "original": "מקור: {text}",
+    "originalMessage": "הודעה מקורית",
+    "pressEnterAgainToSend": "לחץ Enter שוב כדי לשלוח.",
+    "pressTabToRunCommand": "לחץ Tab כדי להריץ את הפקודה.",
+    "quote": "ציטוט",
+    "quoteLength": "אורך ציטוט {count}.",
+    "quoteMessage": "ציטוט הודעה",
+    "recentMessages": "הודעות אחרונות",
+    "recentMessagesFromThisUser": "הודעות אחרונות מהמשתמש הזה",
+    "removeKeyword": "הסרת {keyword}",
+    "savedMessages": {
+      "one": "הודעה שמורה אחת",
+      "other": "{count} הודעות שמורות"
+    },
+    "settingState": "{label} {state}.",
+    "showRecentMessages": "הצגת הודעות אחרונות",
+    "stateOff": "כבוי",
+    "stateOn": "פעיל",
+    "timeHours": "{count} שעות",
+    "timeMinutes": "{count} דק׳",
+    "timeSeconds": "{count} שנ׳",
+    "translateChat": "תרגום צ׳אט",
+    "translated": "תורגם:",
+    "translatedFrom": "תורגם מ{language}",
+    "translatedFromOriginal": "תורגם מ{language}: {text}",
+    "translatedMessage": "הודעה מתורגמת",
+    "translateOff": "התרגום כבוי.",
+    "translateToLanguage": "תרגום ל{language}.",
+    "translationsReplaceMessages": "תרגומים מחליפים הודעות.",
+    "translationsShowBelowMessages": "תרגומים מופיעים מתחת להודעות.",
+    "unknownSettingCommand": "פקודת הגדרות לא מוכרת.",
+    "unknownTimezone": "אזור זמן לא מוכר.",
+    "unknownTranslationLanguage": "שפת תרגום לא מוכרת.",
+    "unreadMessages": {
+      "one": "הודעה חדשה אחת",
+      "other": "{count} הודעות חדשות"
+    },
+    "useOnOrOff": "השתמש ב-on או off.",
+    "useQuoteLength": "השתמש באורך ציטוט {lengths}.",
+    "useReplaceOrBelow": "השתמש ב-replace או below.",
+    "watchingMentions": "מעקב אחרי אזכורים",
+    "watchingMentionsAndKeywords": "מעקב אחרי אזכורים ומילות מפתח"
+  },
+  "extension": {
+    "extensionName": {
+      "message": "Chat Enhancer for YouTube"
+    },
+    "extensionShortName": {
+      "message": "Chat Enhancer"
+    },
+    "extensionDescription": {
+      "message": "כלים קלים לתרגום, אזכורים, פרופילים ואימוג׳י לצ׳אט חי ב-YouTube."
+    },
+    "openChatEnhancerWebsite": {
+      "message": "פתיחת אתר Chat Enhancer"
+    },
+    "openGithubRepository": {
+      "message": "פתיחת מאגר GitHub"
+    },
+    "supportFeedback": {
+      "message": "תמיכה / משוב"
+    },
+    "supportAndFeedback": {
+      "message": "תמיכה ומשוב"
+    },
+    "resetAllExtensionData": {
+      "message": "איפוס כל הגדרות התוסף והנתונים המקומיים"
+    },
+    "resetExtension": {
+      "message": "איפוס התוסף"
+    },
+    "translation": {
+      "message": "תרגום"
+    },
+    "chooseTranslationLanguageTitle": {
+      "message": "בחר לאיזו שפה לתרגם הודעות צ׳אט. כבוי משבית תרגום אוטומטי."
+    },
+    "translateTo": {
+      "message": "תרגום אל"
+    },
+    "translationOffHelper": {
+      "message": "כבוי משבית תרגום אוטומטי."
+    },
+    "display": {
+      "message": "תצוגה"
+    },
+    "translationDisplayTitle": {
+      "message": "בחר אם תרגומים מחליפים את ההודעה המקורית או מופיעים מתחתיה."
+    },
+    "translationDisplayHelper": {
+      "message": "החלף את ההודעה או הצג את התרגום מתחת."
+    },
+    "replaceMessage": {
+      "message": "החלפת הודעה"
+    },
+    "showBelow": {
+      "message": "הצגה מתחת"
+    },
+    "chatActions": {
+      "message": "פעולות צ׳אט"
+    },
+    "quoteLengthTitle": {
+      "message": "מספר התווים המרבי בציטוט הודעה מפעולות צ׳אט או כרטיסים."
+    },
+    "quoteLengthLabel": {
+      "message": "אורך ציטוט"
+    },
+    "quoteLengthHelper": {
+      "message": "מספר התווים המרבי בציטוט הודעות."
+    },
+    "openChannelsInPopup": {
+      "message": "פתיחת ערוצים בחלון קופץ"
+    },
+    "openChannelsInPopupTitle": {
+      "message": "פתח דפי ערוץ YouTube בחלון קופץ קטן במקום בלשונית רגילה."
+    },
+    "openChannelsInPopupHelper": {
+      "message": "השתמש בחלון קטן יותר לערוצים מכרטיסי אווטאר."
+    },
+    "popupAlerts": {
+      "message": "התראות"
+    },
+    "playInboxSound": {
+      "message": "השמעת צליל תיבה"
+    },
+    "playInboxSoundTitle": {
+      "message": "השמע צליל קצר כאשר הודעת צ׳אט נשמרת בתיבה."
+    },
+    "playInboxSoundHelper": {
+      "message": "השמע צליל קצר להודעות חדשות בתיבה."
+    },
+    "extensionVersion": {
+      "message": "גרסת התוסף"
+    },
+    "versionLabel": {
+      "message": "גרסה {version}"
+    },
+    "off": {
+      "message": "כבוי"
+    },
+    "popupResetConfirm": {
+      "message": "לאפס את הגדרות Chat Enhancer ולנקות תיבה מקומית, מילות מפתח ונתוני אימוג׳י?"
+    },
+    "popupResetComplete": {
+      "message": "Chat Enhancer אופס."
+    }
+  }
+}

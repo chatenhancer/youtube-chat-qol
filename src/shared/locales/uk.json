@@ -1,0 +1,191 @@
+{
+  "messages": {
+    "add": "Додати",
+    "addKeywords": "Додати ключові слова",
+    "addKeywordsCount": {
+      "one": "Додати ключові слова, відстежується {count} слово",
+      "other": "Додати ключові слова, відстежується {count} слів"
+    },
+    "chatCommands": "Команди чату",
+    "clear": "Очистити",
+    "close": "Закрити",
+    "commandHelpHint": "Введіть команду, потім натисніть Tab.",
+    "commandHelpMention": "Згадати автора найновішого повідомлення у вхідних.",
+    "commandHelpQuote": "Цитувати найновіше повідомлення у вхідних.",
+    "commandHelpRepeat": "Відновити останнє надіслане повідомлення.",
+    "commandHelpTime": "Вставити поточний час.",
+    "commandHelpTimeUntil": "Вставити час, що залишився до локального часу.",
+    "commandHelpOpenHelp": "Показати цей список.",
+    "commandHelpSetTranslateTo": "Установити мову перекладу.",
+    "commandHelpSetTranslationDisplay": "Установити спосіб показу перекладів.",
+    "commandHelpSetQuoteLength": "Установити довжину цитати.",
+    "commandHelpSetSound": "Установити звук вхідних.",
+    "commandHelpSetOpenChannelsInPopup": "Установити поведінку спливаючого вікна каналу.",
+    "couldNotFindChatInput": "Не вдалося знайти поле чату.",
+    "couldNotReadTime": "Не вдалося прочитати цей час.",
+    "couldNotReadUserName": "Не вдалося прочитати це ім’я користувача.",
+    "inbox": "Вхідні",
+    "inboxAriaUnread": "Вхідні, {count} непрочитаних",
+    "inboxEmpty": "Вхідні порожні",
+    "inboxSound": "Звук вхідних",
+    "jumpToMessage": "Перейти до повідомлення",
+    "keywordOrPhrase": "Ключове слово або фраза",
+    "lessThanOneMinute": "менше ніж 1 хв",
+    "mention": "Згадати",
+    "mentionUser": "Згадати користувача",
+    "mentionUserTitle": "Згадати користувача. Alt/Option-клік, щоб процитувати.",
+    "mostUsed": "НАЙЧАСТІШЕ",
+    "noInboxMessagesYet": "Поки немає повідомлень у вхідних.",
+    "noKeywords": "Немає ключових слів",
+    "noPreviousMessageYet": "Поки немає попереднього повідомлення.",
+    "nothingHereYet": "Тут поки нічого немає",
+    "openChannel": "Відкрити канал",
+    "openChannelsInPopup": "Відкривати канали у спливаючому вікні",
+    "original": "Оригінал: {text}",
+    "originalMessage": "Оригінальне повідомлення",
+    "pressEnterAgainToSend": "Натисніть Enter ще раз, щоб надіслати.",
+    "pressTabToRunCommand": "Натисніть Tab, щоб виконати цю команду.",
+    "quote": "Цитувати",
+    "quoteLength": "Довжина цитати {count}.",
+    "quoteMessage": "Цитувати повідомлення",
+    "recentMessages": "Останні повідомлення",
+    "recentMessagesFromThisUser": "Останні повідомлення цього користувача",
+    "removeKeyword": "Вилучити {keyword}",
+    "savedMessages": {
+      "one": "{count} збережене повідомлення",
+      "other": "{count} збережених повідомлень"
+    },
+    "settingState": "{label} {state}.",
+    "showRecentMessages": "Показати останні повідомлення",
+    "stateOff": "вимк.",
+    "stateOn": "увімк.",
+    "timeHours": "{count} год",
+    "timeMinutes": "{count} хв",
+    "timeSeconds": "{count} с",
+    "translateChat": "Перекладати чат",
+    "translated": "Перекладено:",
+    "translatedFrom": "Перекладено з {language}",
+    "translatedFromOriginal": "Перекладено з {language}: {text}",
+    "translatedMessage": "Перекладене повідомлення",
+    "translateOff": "Переклад вимкнено.",
+    "translateToLanguage": "Перекладати на {language}.",
+    "translationsReplaceMessages": "Переклади замінюють повідомлення.",
+    "translationsShowBelowMessages": "Переклади показуються під повідомленнями.",
+    "unknownSettingCommand": "Невідома команда налаштувань.",
+    "unknownTimezone": "Невідомий часовий пояс.",
+    "unknownTranslationLanguage": "Невідома мова перекладу.",
+    "unreadMessages": {
+      "one": "{count} нове повідомлення",
+      "other": "{count} нових повідомлень"
+    },
+    "useOnOrOff": "Використайте on або off.",
+    "useQuoteLength": "Використайте довжину цитати {lengths}.",
+    "useReplaceOrBelow": "Використайте replace або below.",
+    "watchingMentions": "Відстеження згадок",
+    "watchingMentionsAndKeywords": "Відстеження згадок і ключових слів"
+  },
+  "extension": {
+    "extensionName": {
+      "message": "Chat Enhancer for YouTube"
+    },
+    "extensionShortName": {
+      "message": "Chat Enhancer"
+    },
+    "extensionDescription": {
+      "message": "Легкі інструменти перекладу, згадок, профілів та емодзі для живого чату YouTube."
+    },
+    "openChatEnhancerWebsite": {
+      "message": "Відкрити сайт Chat Enhancer"
+    },
+    "openGithubRepository": {
+      "message": "Відкрити репозиторій GitHub"
+    },
+    "supportFeedback": {
+      "message": "Підтримка / відгуки"
+    },
+    "supportAndFeedback": {
+      "message": "Підтримка та відгуки"
+    },
+    "resetAllExtensionData": {
+      "message": "Скинути всі налаштування розширення та локальні дані"
+    },
+    "resetExtension": {
+      "message": "Скинути розширення"
+    },
+    "translation": {
+      "message": "Переклад"
+    },
+    "chooseTranslationLanguageTitle": {
+      "message": "Виберіть мову, якою потрібно перекладати повідомлення чату. Вимкнено — автоматичний переклад не працює."
+    },
+    "translateTo": {
+      "message": "Перекладати на"
+    },
+    "translationOffHelper": {
+      "message": "Вимкнено — автоматичний переклад не працює."
+    },
+    "display": {
+      "message": "Відображення"
+    },
+    "translationDisplayTitle": {
+      "message": "Виберіть, чи переклади замінюють оригінальне повідомлення, чи з’являються під ним."
+    },
+    "translationDisplayHelper": {
+      "message": "Замінювати повідомлення або показувати переклад нижче."
+    },
+    "replaceMessage": {
+      "message": "Замінити повідомлення"
+    },
+    "showBelow": {
+      "message": "Показувати нижче"
+    },
+    "chatActions": {
+      "message": "Дії чату"
+    },
+    "quoteLengthTitle": {
+      "message": "Максимальна кількість символів у цитаті з дій чату або карток."
+    },
+    "quoteLengthLabel": {
+      "message": "Довжина цитати"
+    },
+    "quoteLengthHelper": {
+      "message": "Максимальна кількість символів у цитованих повідомленнях."
+    },
+    "openChannelsInPopup": {
+      "message": "Відкривати канали в popup"
+    },
+    "openChannelsInPopupTitle": {
+      "message": "Відкривати сторінки каналів YouTube у меншому спливаючому вікні замість звичайної вкладки."
+    },
+    "openChannelsInPopupHelper": {
+      "message": "Використовувати менше вікно для каналів із карток аватарів."
+    },
+    "popupAlerts": {
+      "message": "Сповіщення"
+    },
+    "playInboxSound": {
+      "message": "Відтворювати звук вхідних"
+    },
+    "playInboxSoundTitle": {
+      "message": "Відтворювати короткий звук, коли повідомлення чату зберігається у вхідних."
+    },
+    "playInboxSoundHelper": {
+      "message": "Відтворювати короткий звук для нових повідомлень у вхідних."
+    },
+    "extensionVersion": {
+      "message": "Версія розширення"
+    },
+    "versionLabel": {
+      "message": "Версія {version}"
+    },
+    "off": {
+      "message": "Вимкнено"
+    },
+    "popupResetConfirm": {
+      "message": "Скинути налаштування Chat Enhancer і очистити локальні вхідні, ключові слова та дані емодзі?"
+    },
+    "popupResetComplete": {
+      "message": "Chat Enhancer скинуто."
+    }
+  }
+}

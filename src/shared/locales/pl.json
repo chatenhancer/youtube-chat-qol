@@ -1,0 +1,191 @@
+{
+  "messages": {
+    "add": "Dodaj",
+    "addKeywords": "Dodaj słowa kluczowe",
+    "addKeywordsCount": {
+      "one": "Dodaj słowa kluczowe, obserwowane {count} słowo",
+      "other": "Dodaj słowa kluczowe, obserwowane {count} słów"
+    },
+    "chatCommands": "Polecenia czatu",
+    "clear": "Wyczyść",
+    "close": "Zamknij",
+    "commandHelpHint": "Wpisz polecenie, a potem naciśnij Tab.",
+    "commandHelpMention": "Wspomnij autora najnowszej wiadomości w skrzynce.",
+    "commandHelpQuote": "Zacytuj najnowszą wiadomość ze skrzynki.",
+    "commandHelpRepeat": "Przywróć ostatnio wysłaną wiadomość.",
+    "commandHelpTime": "Wstaw aktualny czas.",
+    "commandHelpTimeUntil": "Wstaw czas pozostały do lokalnej godziny.",
+    "commandHelpOpenHelp": "Pokaż tę listę.",
+    "commandHelpSetTranslateTo": "Ustaw język tłumaczenia.",
+    "commandHelpSetTranslationDisplay": "Ustaw sposób wyświetlania tłumaczeń.",
+    "commandHelpSetQuoteLength": "Ustaw długość cytatu.",
+    "commandHelpSetSound": "Ustaw dźwięk skrzynki.",
+    "commandHelpSetOpenChannelsInPopup": "Ustaw zachowanie wyskakujących okien kanałów.",
+    "couldNotFindChatInput": "Nie znaleziono pola czatu.",
+    "couldNotReadTime": "Nie można odczytać tej godziny.",
+    "couldNotReadUserName": "Nie można odczytać tej nazwy użytkownika.",
+    "inbox": "Skrzynka",
+    "inboxAriaUnread": "Skrzynka, {count} nieprzeczytanych",
+    "inboxEmpty": "Skrzynka pusta",
+    "inboxSound": "Dźwięk skrzynki",
+    "jumpToMessage": "Przejdź do wiadomości",
+    "keywordOrPhrase": "Słowo kluczowe lub fraza",
+    "lessThanOneMinute": "mniej niż 1 min",
+    "mention": "Wspomnij",
+    "mentionUser": "Wspomnij użytkownika",
+    "mentionUserTitle": "Wspomnij użytkownika. Alt/Option-klik, aby zacytować.",
+    "mostUsed": "NAJCZĘŚCIEJ UŻYWANE",
+    "noInboxMessagesYet": "Brak wiadomości w skrzynce.",
+    "noKeywords": "Brak słów kluczowych",
+    "noPreviousMessageYet": "Brak poprzedniej wiadomości.",
+    "nothingHereYet": "Jeszcze nic tu nie ma",
+    "openChannel": "Otwórz kanał",
+    "openChannelsInPopup": "Otwieraj kanały w oknie popup",
+    "original": "Oryginał: {text}",
+    "originalMessage": "Oryginalna wiadomość",
+    "pressEnterAgainToSend": "Naciśnij Enter ponownie, aby wysłać.",
+    "pressTabToRunCommand": "Naciśnij Tab, aby uruchomić to polecenie.",
+    "quote": "Cytuj",
+    "quoteLength": "Długość cytatu {count}.",
+    "quoteMessage": "Cytuj wiadomość",
+    "recentMessages": "Ostatnie wiadomości",
+    "recentMessagesFromThisUser": "Ostatnie wiadomości tego użytkownika",
+    "removeKeyword": "Usuń {keyword}",
+    "savedMessages": {
+      "one": "{count} zapisana wiadomość",
+      "other": "{count} zapisanych wiadomości"
+    },
+    "settingState": "{label} {state}.",
+    "showRecentMessages": "Pokaż ostatnie wiadomości",
+    "stateOff": "wył.",
+    "stateOn": "wł.",
+    "timeHours": "{count} godz.",
+    "timeMinutes": "{count} min",
+    "timeSeconds": "{count} s",
+    "translateChat": "Tłumacz czat",
+    "translated": "Przetłumaczono:",
+    "translatedFrom": "Przetłumaczono z {language}",
+    "translatedFromOriginal": "Przetłumaczono z {language}: {text}",
+    "translatedMessage": "Przetłumaczona wiadomość",
+    "translateOff": "Tłumaczenie wyłączone.",
+    "translateToLanguage": "Tłumacz na {language}.",
+    "translationsReplaceMessages": "Tłumaczenia zastępują wiadomości.",
+    "translationsShowBelowMessages": "Tłumaczenia pojawiają się pod wiadomościami.",
+    "unknownSettingCommand": "Nieznane polecenie ustawień.",
+    "unknownTimezone": "Nieznana strefa czasowa.",
+    "unknownTranslationLanguage": "Nieznany język tłumaczenia.",
+    "unreadMessages": {
+      "one": "{count} nowa wiadomość",
+      "other": "{count} nowych wiadomości"
+    },
+    "useOnOrOff": "Użyj on albo off.",
+    "useQuoteLength": "Użyj długości cytatu {lengths}.",
+    "useReplaceOrBelow": "Użyj replace albo below.",
+    "watchingMentions": "Obserwowanie wzmianek",
+    "watchingMentionsAndKeywords": "Obserwowanie wzmianek i słów kluczowych"
+  },
+  "extension": {
+    "extensionName": {
+      "message": "Chat Enhancer for YouTube"
+    },
+    "extensionShortName": {
+      "message": "Chat Enhancer"
+    },
+    "extensionDescription": {
+      "message": "Lekkie narzędzia do tłumaczenia, wzmianek, profili i emoji dla czatu na żywo YouTube."
+    },
+    "openChatEnhancerWebsite": {
+      "message": "Otwórz stronę Chat Enhancer"
+    },
+    "openGithubRepository": {
+      "message": "Otwórz repozytorium GitHub"
+    },
+    "supportFeedback": {
+      "message": "Pomoc / opinie"
+    },
+    "supportAndFeedback": {
+      "message": "Pomoc i opinie"
+    },
+    "resetAllExtensionData": {
+      "message": "Zresetuj wszystkie ustawienia rozszerzenia i dane lokalne"
+    },
+    "resetExtension": {
+      "message": "Zresetuj rozszerzenie"
+    },
+    "translation": {
+      "message": "Tłumaczenie"
+    },
+    "chooseTranslationLanguageTitle": {
+      "message": "Wybierz język, na który mają być tłumaczone wiadomości czatu. Wyłączone zatrzymuje automatyczne tłumaczenie."
+    },
+    "translateTo": {
+      "message": "Tłumacz na"
+    },
+    "translationOffHelper": {
+      "message": "Wyłączone zatrzymuje automatyczne tłumaczenie."
+    },
+    "display": {
+      "message": "Wyświetlanie"
+    },
+    "translationDisplayTitle": {
+      "message": "Wybierz, czy tłumaczenia zastępują oryginalną wiadomość, czy pojawiają się pod nią."
+    },
+    "translationDisplayHelper": {
+      "message": "Zastąp wiadomość albo pokaż tłumaczenie pod spodem."
+    },
+    "replaceMessage": {
+      "message": "Zastąp wiadomość"
+    },
+    "showBelow": {
+      "message": "Pokaż pod spodem"
+    },
+    "chatActions": {
+      "message": "Akcje czatu"
+    },
+    "quoteLengthTitle": {
+      "message": "Maksymalna liczba znaków przy cytowaniu wiadomości z akcji czatu lub kart."
+    },
+    "quoteLengthLabel": {
+      "message": "Długość cytatu"
+    },
+    "quoteLengthHelper": {
+      "message": "Maksymalna liczba znaków przy cytowaniu wiadomości."
+    },
+    "openChannelsInPopup": {
+      "message": "Otwieraj kanały w popupie"
+    },
+    "openChannelsInPopupTitle": {
+      "message": "Otwieraj strony kanałów YouTube w mniejszym oknie popup zamiast w zwykłej karcie."
+    },
+    "openChannelsInPopupHelper": {
+      "message": "Używaj mniejszego okna dla kanałów z kart awatarów."
+    },
+    "popupAlerts": {
+      "message": "Alerty"
+    },
+    "playInboxSound": {
+      "message": "Odtwarzaj dźwięk skrzynki"
+    },
+    "playInboxSoundTitle": {
+      "message": "Odtwórz krótki dźwięk, gdy wiadomość czatu zostanie zapisana w skrzynce."
+    },
+    "playInboxSoundHelper": {
+      "message": "Odtwarzaj krótki dźwięk dla nowych wiadomości w skrzynce."
+    },
+    "extensionVersion": {
+      "message": "Wersja rozszerzenia"
+    },
+    "versionLabel": {
+      "message": "Wersja {version}"
+    },
+    "off": {
+      "message": "Wyłączone"
+    },
+    "popupResetConfirm": {
+      "message": "Zresetować ustawienia Chat Enhancer i wyczyścić lokalną skrzynkę, słowa kluczowe oraz dane emoji?"
+    },
+    "popupResetComplete": {
+      "message": "Chat Enhancer został zresetowany."
+    }
+  }
+}
