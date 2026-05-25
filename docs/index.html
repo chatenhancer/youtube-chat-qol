@@ -63,7 +63,7 @@
     <link rel="icon" href="assets/icons/icon-128.png">
     <link rel="apple-touch-icon" href="assets/icons/icon-128.png">
     <link rel="preload" href="assets/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="stylesheet" href="styles.css?v=42">
+    <link rel="stylesheet" href="styles.css?v=48">
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -255,11 +255,120 @@
       <section class="section screenshots" id="screenshots" aria-labelledby="screenshots-title">
         <div class="section-inner screenshots-inner">
           <p class="eyebrow" data-i18n="screenshots.eyebrow">Screenshots</p>
-          <h2 id="screenshots-title" data-i18n="screenshots.title">Native-feeling chat<br/>improvements</h2>
+          <h2 id="screenshots-title" data-i18n-html="screenshots.title">Native-feeling chat<br/>improvements</h2>
           <div class="screenshot-grid">
             <figure class="showcase-figure">
-              <img src="assets/screenshots/feature-showcase.png" alt="Chat Enhancer for YouTube feature showcase with translation, inbox, profile context, frequent emojis, commands, and settings" data-i18n-attr="alt:screenshots.alt">
-              <figcaption data-i18n="screenshots.caption">Translation, inbox, profile context, frequent emojis, and quick commands in one native-feeling chat workflow.</figcaption>
+              <div class="showcase-stack">
+                <article class="showcase-panel">
+                  <div class="showcase-copy showcase-copy-balanced">
+                    <div class="showcase-brand">
+                      <img src="assets/logo.png" width="178" height="60" alt="Chat Enhancer for YouTube">
+                    </div>
+                    <h3 data-i18n="screenshots.translationTitle">Read live chat<br>in your language</h3>
+                    <p data-i18n="screenshots.translationBody">
+                      Incoming messages are automatically translated with Google Translate into the language you choose.
+                    </p>
+                    <p>
+                      <span data-i18n-html="screenshots.translationHighlightHtml">Automated translations are highlighted with a <span class="showcase-underline">subtle underline</span> and a Google Translate icon</span>
+                      <span class="translate-mark translate-mark-inline" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" focusable="false">
+                          <path d="M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0014.07 6H17V4h-7V2H8v2H1v2h11.17a15.7 15.7 0 01-2.86 4.63A15.07 15.07 0 017.22 7H5.2a17.2 17.2 0 002.77 5.03l-5.09 5.02L4.3 18.47l5.01-5.01 3.11 3.11.45-1.5ZM18.5 10h-2L12 22h2l1.13-3h4.74L21 22h2l-4.5-12Zm-2.62 7l1.62-4.33L19.12 17h-3.24Z"></path>
+                        </svg>
+                      </span>
+                    </p>
+                    <p data-i18n="screenshots.translationModesIntro">Two styles available:</p>
+                    <div class="translation-mode-grid" aria-label="Translation display modes" data-i18n-attr="aria-label:screenshots.translationModesAria">
+                      <div class="translation-mode">
+                        <strong data-i18n="screenshots.replaceMode">REPLACE MESSAGE</strong>
+                        <p>
+                          <img class="sample-avatar" src="assets/avatar.png" width="22" height="22" alt="" aria-hidden="true">
+                          <span class="sample-muted">@猫爪软乎乎</span>
+                          <span class="showcase-underline" data-i18n="screenshots.replaceModeSample">thank you!</span>
+                          <span class="translate-mark" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" focusable="false">
+                              <path d="M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0014.07 6H17V4h-7V2H8v2H1v2h11.17a15.7 15.7 0 01-2.86 4.63A15.07 15.07 0 017.22 7H5.2a17.2 17.2 0 002.77 5.03l-5.09 5.02L4.3 18.47l5.01-5.01 3.11 3.11.45-1.5ZM18.5 10h-2L12 22h2l1.13-3h4.74L21 22h2l-4.5-12Zm-2.62 7l1.62-4.33L19.12 17h-3.24Z"></path>
+                            </svg>
+                          </span>
+                        </p>
+                      </div>
+                      <div class="translation-mode">
+                        <strong data-i18n="screenshots.belowMode">SHOW BELOW</strong>
+                        <p>
+                          <img class="sample-avatar" src="assets/avatar.png" width="22" height="22" alt="" aria-hidden="true">
+                          <span class="sample-muted">@猫爪软乎乎</span>
+                          <span class="sample-original" data-i18n="screenshots.belowModeOriginalSample">谢谢！</span>
+                          <span class="translation-line" data-i18n="screenshots.belowModeSample">Translated: Thank you!</span>
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="showcase-media showcase-media-translation">
+                    <img src="assets/screenshots/hero-img1.png" alt="Translated YouTube live chat message" data-i18n-attr="alt:screenshots.translationAlt">
+                  </div>
+                </article>
+
+                <article class="showcase-panel showcase-panel-reverse">
+                  <div class="showcase-media">
+                    <img src="assets/screenshots/hero-img2.png" alt="YouTube live chat inbox and message action menu" data-i18n-attr="alt:screenshots.mentionAlt">
+                  </div>
+                  <div class="showcase-copy">
+                    <div class="showcase-brand">
+                      <img src="assets/logo.png" width="178" height="60" alt="Chat Enhancer for YouTube">
+                    </div>
+                    <h3 data-i18n="screenshots.mentionTitle">Stay in the conversation with easy @mentions and quotes</h3>
+                    <p data-i18n="screenshots.mentionIntro">Two options available:</p>
+                    <ul class="showcase-list">
+                      <li data-i18n-html="screenshots.mentionMenuHtml">Click on a message and <strong>“Quote”</strong> or <strong>“Mention”</strong>.</li>
+                      <li data-i18n-html="screenshots.mentionAuthorHtml">Click on a <strong>@username</strong> to mention someone. Alt/Option-click on a <strong>@username</strong> to quote someone.</li>
+                    </ul>
+                    <p>
+                      <span data-i18n-html="screenshots.mentionInboxHtml"><strong>Never miss a mention:</strong> when you’re mentioned in chat, the message is added to your <strong>Inbox</strong></span>
+                      <span class="inline-symbol showcase-inline-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" focusable="false">
+                          <path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2Zm0 12h-4a3 3 0 0 1-6 0H5V5h14v10Z"></path>
+                        </svg>
+                      </span>.
+                    </p>
+                    <p data-i18n="screenshots.mentionSound">You can also turn on a sound for notifications.</p>
+                  </div>
+                </article>
+
+                <article class="showcase-panel">
+                  <div class="showcase-copy showcase-copy-balanced">
+                    <div class="showcase-brand">
+                      <img src="assets/logo.png" width="178" height="60" alt="Chat Enhancer for YouTube">
+                    </div>
+                    <h3 data-i18n="screenshots.extrasTitle">A plethora of quality-of-life improvements</h3>
+                    <ul class="showcase-list">
+                      <li data-i18n="screenshots.extrasAvatar">Click a user's avatar to see their most recent messages and open their YouTube profile in a new window.</li>
+                      <li data-i18n="screenshots.extrasEmoji">Find your most used emojis at the top of the emoji picker.</li>
+                      <li data-i18n="screenshots.extrasCommands">Use Tab slash commands for helpful shortcuts, including:</li>
+                    </ul>
+                    <dl class="showcase-command-list">
+                      <div>
+                        <dt data-i18n="screenshots.commandReply">/reply or /mention:</dt>
+                        <dd data-i18n="screenshots.commandReplyBody">@ the last user that @ you</dd>
+                      </div>
+                      <div>
+                        <dt data-i18n="screenshots.commandTime">/time &lt;place&gt;:</dt>
+                        <dd data-i18n="screenshots.commandTimeBody">the current time for place</dd>
+                      </div>
+                      <div>
+                        <dt data-i18n="screenshots.commandTimeUntil">/timeuntil &lt;time&gt;:</dt>
+                        <dd data-i18n="screenshots.commandTimeUntilBody">hrs, mins and secs until &lt;time&gt;</dd>
+                      </div>
+                      <div>
+                        <dt data-i18n="screenshots.commandHelp">/help:</dt>
+                        <dd data-i18n="screenshots.commandHelpBody">shows all available commands</dd>
+                      </div>
+                    </dl>
+                    <a class="feature-link showcase-command-link" href="#commands" data-i18n="screenshots.commandsFullLink">View full command reference</a>
+                  </div>
+                  <div class="showcase-media showcase-media-extras">
+                    <img src="assets/screenshots/hero-img3.png" alt="YouTube live chat profile card, commands, and frequent emoji row" data-i18n-attr="alt:screenshots.extrasAlt">
+                  </div>
+                </article>
+              </div>
             </figure>
           </div>
         </div>

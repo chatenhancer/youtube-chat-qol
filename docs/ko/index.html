@@ -16,7 +16,7 @@
     <meta
       property="og:description"
       data-i18n-attr="content:meta.ogDescription"
-      content="YouTube 라이브 채팅에서 메시지를 번역하고, 사용자를 멘션하고 인용하며, 받은함 일치 항목을 저장하고, 이모지를 재사용하고, 빠른 명령을 실행합니다."
+      content="메시지를 번역하고, 사용자를 멘션하거나 인용하고, 받은 편지함 일치를 저장하고, 이모지를 재사용하고, YouTube 실시간 채팅에서 빠른 명령을 실행하세요."
     >
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://chatenhancer.com/ko/">
@@ -30,7 +30,7 @@
     <meta
       property="og:image:alt"
       data-i18n-attr="content:meta.imageAlt"
-      content="Chat Enhancer for YouTube가 기본 UI처럼 보이는 라이브 채팅 번역, 받은함, 이모지 도구를 보여주는 화면."
+      content="Chat Enhancer for YouTube가 실시간 채팅에 자연스럽게 어울리는 번역, 받은 편지함, 이모지 도구를 보여주는 모습."
     >
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Chat Enhancer for YouTube">
@@ -43,7 +43,7 @@
     <meta
       name="twitter:image:alt"
       data-i18n-attr="content:meta.imageAlt"
-      content="Chat Enhancer for YouTube가 기본 UI처럼 보이는 라이브 채팅 번역, 받은함, 이모지 도구를 보여주는 화면."
+      content="Chat Enhancer for YouTube가 실시간 채팅에 자연스럽게 어울리는 번역, 받은 편지함, 이모지 도구를 보여주는 모습."
     >
     <link rel="alternate" hreflang="en" href="https://chatenhancer.com/">
     <link rel="alternate" hreflang="ar" href="https://chatenhancer.com/ar/">
@@ -63,7 +63,7 @@
     <link rel="icon" href="../assets/icons/icon-128.png">
     <link rel="apple-touch-icon" href="../assets/icons/icon-128.png">
     <link rel="preload" href="../assets/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="stylesheet" href="../styles.css?v=42">
+    <link rel="stylesheet" href="../styles.css?v=48">
     <script type="application/ld+json">
       {
               "@context": "https://schema.org",
@@ -204,8 +204,8 @@
                   <path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2Zm0 12h-4a3 3 0 0 1-6 0H5V5h14v10Z"></path>
                 </svg>
               </span>
-              <h3 data-i18n="features.inboxTitle">받은함</h3>
-              <p data-i18n="features.inboxBody">내 핸들을 멘션하거나 키워드와 일치하는 메시지를 로컬 목록에 저장하고, 새 받은함 메시지에는 선택적으로 은은한 소리를 재생합니다.</p>
+              <h3 data-i18n="features.inboxTitle">받은 편지함</h3>
+              <p data-i18n="features.inboxBody">내 핸들을 멘션하거나 키워드와 일치하는 메시지를 로컬 목록으로 보관하고, 새 받은 편지함 메시지에는 선택적으로 은은한 소리를 재생합니다.</p>
             </article>
             <article class="feature">
               <span class="feature-icon" data-symbol="mood" aria-hidden="true">
@@ -233,11 +233,118 @@
       <section class="section screenshots" id="screenshots" aria-labelledby="screenshots-title">
         <div class="section-inner screenshots-inner">
           <p class="eyebrow" data-i18n="screenshots.eyebrow">스크린샷</p>
-          <h2 id="screenshots-title" data-i18n="screenshots.title">기본 UI처럼 느껴지는 채팅 개선</h2>
+          <h2 id="screenshots-title" data-i18n-html="screenshots.title">기본 UI처럼 느껴지는<br>채팅 개선</h2>
           <div class="screenshot-grid">
             <figure class="showcase-figure">
-              <img src="../assets/screenshots/feature-showcase.png" alt="번역, 받은함, 프로필 맥락, 자주 쓰는 이모지, 명령, 설정을 보여주는 Chat Enhancer for YouTube 기능 쇼케이스" data-i18n-attr="alt:screenshots.alt">
-              <figcaption data-i18n="screenshots.caption">번역, 받은함, 프로필 맥락, 자주 쓰는 이모지, 빠른 명령을 하나의 기본 UI 같은 채팅 흐름에 담았습니다.</figcaption>
+              <div class="showcase-stack">
+                <article class="showcase-panel">
+                  <div class="showcase-copy showcase-copy-balanced">
+                    <div class="showcase-brand">
+                      <img src="../assets/logo.png" width="178" height="60" alt="Chat Enhancer for YouTube">
+                    </div>
+                    <h3 data-i18n="screenshots.translationTitle">라이브 채팅을 내 언어로 읽기</h3>
+                    <p data-i18n="screenshots.translationBody">들어오는 메시지는 선택한 언어로 Google Translate를 통해 자동 번역됩니다.</p>
+                    <p>
+                      <span data-i18n-html="screenshots.translationHighlightHtml">자동 번역은 <span class="showcase-underline">은은한 밑줄</span>과 Google Translate 아이콘으로 표시됩니다</span>
+                      <span class="translate-mark translate-mark-inline" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" focusable="false">
+                          <path d="M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0014.07 6H17V4h-7V2H8v2H1v2h11.17a15.7 15.7 0 01-2.86 4.63A15.07 15.07 0 017.22 7H5.2a17.2 17.2 0 002.77 5.03l-5.09 5.02L4.3 18.47l5.01-5.01 3.11 3.11.45-1.5ZM18.5 10h-2L12 22h2l1.13-3h4.74L21 22h2l-4.5-12Zm-2.62 7l1.62-4.33L19.12 17h-3.24Z"></path>
+                        </svg>
+                      </span>
+                    </p>
+                    <p data-i18n="screenshots.translationModesIntro">두 가지 스타일을 사용할 수 있습니다:</p>
+                    <div class="translation-mode-grid" aria-label="번역 표시 모드" data-i18n-attr="aria-label:screenshots.translationModesAria">
+                      <div class="translation-mode">
+                        <strong data-i18n="screenshots.replaceMode">메시지 대체</strong>
+                        <p>
+                          <img class="sample-avatar" src="../assets/avatar.png" width="22" height="22" alt="" aria-hidden="true">
+                          <span class="sample-muted">@猫爪软乎乎</span>
+                          <span class="showcase-underline" data-i18n="screenshots.replaceModeSample">감사합니다!</span>
+                          <span class="translate-mark" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" focusable="false">
+                              <path d="M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0014.07 6H17V4h-7V2H8v2H1v2h11.17a15.7 15.7 0 01-2.86 4.63A15.07 15.07 0 017.22 7H5.2a17.2 17.2 0 002.77 5.03l-5.09 5.02L4.3 18.47l5.01-5.01 3.11 3.11.45-1.5ZM18.5 10h-2L12 22h2l1.13-3h4.74L21 22h2l-4.5-12Zm-2.62 7l1.62-4.33L19.12 17h-3.24Z"></path>
+                            </svg>
+                          </span>
+                        </p>
+                      </div>
+                      <div class="translation-mode">
+                        <strong data-i18n="screenshots.belowMode">아래에 표시</strong>
+                        <p>
+                          <img class="sample-avatar" src="../assets/avatar.png" width="22" height="22" alt="" aria-hidden="true">
+                          <span class="sample-muted">@猫爪软乎乎</span>
+                          <span class="sample-original" data-i18n="screenshots.belowModeOriginalSample">谢谢！</span>
+                          <span class="translation-line" data-i18n="screenshots.belowModeSample">번역됨: 감사합니다!</span>
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="showcase-media showcase-media-translation">
+                    <img src="../assets/screenshots/hero-img1.png" alt="번역된 YouTube 라이브 채팅 메시지" data-i18n-attr="alt:screenshots.translationAlt">
+                  </div>
+                </article>
+
+                <article class="showcase-panel showcase-panel-reverse">
+                  <div class="showcase-media">
+                    <img src="../assets/screenshots/hero-img2.png" alt="YouTube 실시간 채팅 받은 편지함과 메시지 작업 메뉴" data-i18n-attr="alt:screenshots.mentionAlt">
+                  </div>
+                  <div class="showcase-copy">
+                    <div class="showcase-brand">
+                      <img src="../assets/logo.png" width="178" height="60" alt="Chat Enhancer for YouTube">
+                    </div>
+                    <h3 data-i18n="screenshots.mentionTitle">쉬운 @멘션과 인용으로 대화에 계속 참여</h3>
+                    <p data-i18n="screenshots.mentionIntro">두 가지 옵션:</p>
+                    <ul class="showcase-list">
+                      <li data-i18n-html="screenshots.mentionMenuHtml">메시지를 클릭하고 <strong>“인용”</strong> 또는 <strong>“멘션”</strong>을 선택합니다.</li>
+                      <li data-i18n-html="screenshots.mentionAuthorHtml"><strong>@username</strong>을 클릭해 누군가를 멘션합니다. Alt/Option-클릭하면 해당 사용자의 메시지를 인용합니다.</li>
+                    </ul>
+                    <p>
+                      <span data-i18n-html="screenshots.mentionInboxHtml"><strong>멘션을 놓치지 마세요:</strong> 채팅에서 멘션되면 메시지가 <strong>받은 편지함</strong>에 추가됩니다</span>
+                      <span class="inline-symbol showcase-inline-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" focusable="false">
+                          <path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2Zm0 12h-4a3 3 0 0 1-6 0H5V5h14v10Z"></path>
+                        </svg>
+                      </span>.
+                    </p>
+                    <p data-i18n="screenshots.mentionSound">알림 소리도 켤 수 있습니다.</p>
+                  </div>
+                </article>
+
+                <article class="showcase-panel">
+                  <div class="showcase-copy showcase-copy-balanced">
+                    <div class="showcase-brand">
+                      <img src="../assets/logo.png" width="178" height="60" alt="Chat Enhancer for YouTube">
+                    </div>
+                    <h3 data-i18n="screenshots.extrasTitle">다양한 편의 기능 개선</h3>
+                    <ul class="showcase-list">
+                      <li data-i18n="screenshots.extrasAvatar">사용자의 아바타를 클릭해 최근 메시지를 보고 YouTube 프로필을 새 창에서 열 수 있습니다.</li>
+                      <li data-i18n="screenshots.extrasEmoji">이모지 선택기 상단에서 가장 자주 쓰는 이모지를 찾을 수 있습니다.</li>
+                      <li data-i18n="screenshots.extrasCommands">Tab으로 slash 명령을 확장해 유용한 단축 기능을 사용할 수 있습니다:</li>
+                    </ul>
+                    <dl class="showcase-command-list">
+                      <div>
+                        <dt data-i18n="screenshots.commandReply">/reply 또는 /mention:</dt>
+                        <dd data-i18n="screenshots.commandReplyBody">나를 @한 가장 최근 사용자를 @</dd>
+                      </div>
+                      <div>
+                        <dt data-i18n="screenshots.commandTime">/time &lt;place&gt;:</dt>
+                        <dd data-i18n="screenshots.commandTimeBody">해당 장소의 현재 시간</dd>
+                      </div>
+                      <div>
+                        <dt data-i18n="screenshots.commandTimeUntil">/timeuntil &lt;time&gt;:</dt>
+                        <dd data-i18n="screenshots.commandTimeUntilBody">&lt;time&gt;까지 남은 시간, 분, 초</dd>
+                      </div>
+                      <div>
+                        <dt data-i18n="screenshots.commandHelp">/help:</dt>
+                        <dd data-i18n="screenshots.commandHelpBody">사용 가능한 모든 명령 표시</dd>
+                      </div>
+                    </dl>
+                    <a class="feature-link showcase-command-link" href="#commands" data-i18n="screenshots.commandsFullLink">전체 명령어 참조 보기</a>
+                  </div>
+                  <div class="showcase-media showcase-media-extras">
+                    <img src="../assets/screenshots/hero-img3.png" alt="YouTube 라이브 채팅 프로필 카드, 명령, 자주 쓰는 이모지 행" data-i18n-attr="alt:screenshots.extrasAlt">
+                  </div>
+                </article>
+              </div>
             </figure>
           </div>
         </div>
@@ -290,7 +397,7 @@
                   <path d="M324-111.5Q251-143 197-197t-85.5-127Q80-397 80-480t31.5-156Q143-709 197-763t127-85.5Q397-880 480-880t156 31.5Q709-817 763-763t85.5 127Q880-563 880-480t-31.5 156Q817-251 763-197t-127 85.5Q563-80 480-80t-156-31.5Zm40-70.5 48-110q-42-15-72.5-46.5T292-412l-110 46q23 64 71 112t111 72Zm-72-366q17-42 47.5-73.5T412-668l-46-110q-64 24-112 72t-72 112l110 46Zm273 153q35-35 35-85t-35-85q-35-35-85-35t-85 35q-35 35-35 85t35 85q35 35 85 35t85-35Zm31 213q63-24 110.5-71.5T778-364l-110-48q-15 42-46 72.5T550-292l46 110Zm72-368 110-46q-24-63-71.5-110.5T596-778l-46 112q41 15 71 45.5t47 70.5Z"></path>
                 </svg>
               </span>
-              <span data-i18n="install.supportFeedback">지원 / 피드백</span>
+              <span data-i18n="install.supportFeedback">지원</span>
             </a>
             <p class="install-contact">
               <span data-i18n="install.privateQuestions">개인적인 질문은 이메일로 보내세요</span>
@@ -326,7 +433,7 @@
                 <span class="install-quickstart-copy">
                   <strong data-i18n="install.stepRefreshTitle">YouTube 라이브 채팅 열기 또는 새로고침</strong>
                   <span>
-                    <span data-i18n="install.stepRefreshBodyBeforeIcon">이미 열려 있던 탭을 새로고침하면 확장 프로그램이 라이브 채팅 프레임에 연결됩니다. YouTube 채팅에 받은편지함 아이콘</span>
+                    <span data-i18n="install.stepRefreshBodyBeforeIcon">이미 열려 있던 탭을 새로고침하면 확장 프로그램이 실시간 채팅 프레임에 연결됩니다. YouTube 채팅에 받은 편지함 아이콘</span>
                     <span class="inline-symbol" data-symbol="inbox" aria-hidden="true">
                       <svg viewBox="0 0 24 24" focusable="false">
                         <path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2Zm0 12h-4a3 3 0 0 1-6 0H5V5h14v10Z"></path>
@@ -365,7 +472,7 @@
                 </span>
                 <span class="install-quickstart-copy">
                   <strong data-i18n="install.stepUseTitle">채팅 개선 기능 사용</strong>
-                  <span data-i18n="install.stepUseBody">메시지 메뉴, 아바타 카드, 받은함 버튼, 자주 쓰는 이모지, Tab 명령이 YouTube 채팅 인터페이스 안에 나타나며 그곳에서 사용할 수 있습니다.</span>
+                  <span data-i18n="install.stepUseBody">메시지 메뉴, 아바타 카드, 받은 편지함 버튼, 자주 쓰는 이모지, Tab 명령이 YouTube 채팅 인터페이스 안에 나타나고 사용할 수 있습니다.</span>
                 </span>
               </li>
             </ol>
@@ -395,7 +502,7 @@
             </div>
             <div>
               <dt data-i18n="privacy.storageTitle">저장</dt>
-              <dd data-i18n="privacy.storageBody">설정, 받은함 메시지, 감시 키워드, 자주 쓰는 이모지 횟수는 브라우저 확장 프로그램 저장소에 남습니다.</dd>
+              <dd data-i18n="privacy.storageBody">설정, 받은 편지함 메시지, 감시 키워드, 자주 쓰는 이모지 횟수는 브라우저 확장 프로그램 저장소에 남습니다.</dd>
             </div>
             <div>
               <dt data-i18n="privacy.translationTitle">번역</dt>
@@ -435,11 +542,11 @@
               <dl class="command-list">
                 <div>
                   <dt><code>/mention</code> or <code>/reply</code></dt>
-                  <dd data-i18n="commands.mentionDescription">가장 최근 받은함 메시지의 작성자를 멘션합니다.</dd>
+                  <dd data-i18n="commands.mentionDescription">최신 받은 편지함 메시지의 작성자를 멘션합니다.</dd>
                 </div>
                 <div>
                   <dt><code>/quote</code></dt>
-                  <dd data-i18n="commands.quoteDescription">받은함에 저장된 가장 최근 메시지를 인용합니다.</dd>
+                  <dd data-i18n="commands.quoteDescription">받은 편지함에 저장된 최신 메시지를 인용합니다.</dd>
                 </div>
                 <div>
                   <dt><code>/again</code> or <code>/repeat</code></dt>
@@ -476,7 +583,7 @@
                 </div>
                 <div>
                   <dt><code>/setsound on</code> or <code>/setsound off</code></dt>
-                  <dd data-i18n="commands.setSoundDescription">받은함 소리를 켜거나 끕니다.</dd>
+                  <dd data-i18n="commands.setSoundDescription">받은 편지함 소리를 켜거나 끕니다.</dd>
                 </div>
                 <div>
                   <dt><code>/setopenchannelsinpopup on</code> or <code>/setopenchannelsinpopup off</code></dt>

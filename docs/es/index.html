@@ -30,7 +30,7 @@
     <meta
       property="og:image:alt"
       data-i18n-attr="content:meta.imageAlt"
-      content="Chat Enhancer for YouTube mostrando traducción, bandeja y herramientas de emoji integradas de forma nativa en el chat en vivo."
+      content="Chat Enhancer for YouTube mostrando herramientas de traducción, bandeja y emojis que se sienten nativas en el chat en vivo."
     >
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Chat Enhancer for YouTube">
@@ -43,7 +43,7 @@
     <meta
       name="twitter:image:alt"
       data-i18n-attr="content:meta.imageAlt"
-      content="Chat Enhancer for YouTube mostrando traducción, bandeja y herramientas de emoji integradas de forma nativa en el chat en vivo."
+      content="Chat Enhancer for YouTube mostrando herramientas de traducción, bandeja y emojis que se sienten nativas en el chat en vivo."
     >
     <link rel="alternate" hreflang="en" href="https://chatenhancer.com/">
     <link rel="alternate" hreflang="ar" href="https://chatenhancer.com/ar/">
@@ -63,7 +63,7 @@
     <link rel="icon" href="../assets/icons/icon-128.png">
     <link rel="apple-touch-icon" href="../assets/icons/icon-128.png">
     <link rel="preload" href="../assets/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="stylesheet" href="../styles.css?v=42">
+    <link rel="stylesheet" href="../styles.css?v=48">
     <script type="application/ld+json">
       {
               "@context": "https://schema.org",
@@ -205,7 +205,7 @@
                 </svg>
               </span>
               <h3 data-i18n="features.inboxTitle">Bandeja</h3>
-              <p data-i18n="features.inboxBody">Mantén una lista local de mensajes que mencionan tu identificador o coinciden con tus palabras clave, con un sonido opcional para nuevos mensajes.</p>
+              <p data-i18n="features.inboxBody">Mantén una lista local de mensajes que mencionen tu handle o coincidan con tus palabras clave, con un sonido sutil opcional para nuevos mensajes en la bandeja.</p>
             </article>
             <article class="feature">
               <span class="feature-icon" data-symbol="mood" aria-hidden="true">
@@ -233,11 +233,118 @@
       <section class="section screenshots" id="screenshots" aria-labelledby="screenshots-title">
         <div class="section-inner screenshots-inner">
           <p class="eyebrow" data-i18n="screenshots.eyebrow">Capturas</p>
-          <h2 id="screenshots-title" data-i18n="screenshots.title">Mejoras de chat con aspecto nativo</h2>
+          <h2 id="screenshots-title" data-i18n-html="screenshots.title">Mejoras de chat<br>con aspecto nativo</h2>
           <div class="screenshot-grid">
             <figure class="showcase-figure">
-              <img src="../assets/screenshots/feature-showcase.png" alt="Muestra de funciones de Chat Enhancer for YouTube con traducción, bandeja, contexto de perfil, emojis frecuentes, comandos y ajustes" data-i18n-attr="alt:screenshots.alt">
-              <figcaption data-i18n="screenshots.caption">Traducción, bandeja, contexto de perfil, emojis frecuentes y comandos rápidos en un flujo de chat que se siente nativo.</figcaption>
+              <div class="showcase-stack">
+                <article class="showcase-panel">
+                  <div class="showcase-copy showcase-copy-balanced">
+                    <div class="showcase-brand">
+                      <img src="../assets/logo.png" width="178" height="60" alt="Chat Enhancer for YouTube">
+                    </div>
+                    <h3 data-i18n="screenshots.translationTitle">Lee el chat en vivo en tu idioma</h3>
+                    <p data-i18n="screenshots.translationBody">Los mensajes entrantes se traducen automáticamente con Google Translate al idioma que elijas.</p>
+                    <p>
+                      <span data-i18n-html="screenshots.translationHighlightHtml">Las traducciones automáticas se resaltan con un <span class="showcase-underline">subrayado sutil</span> y un icono de Google Translate</span>
+                      <span class="translate-mark translate-mark-inline" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" focusable="false">
+                          <path d="M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0014.07 6H17V4h-7V2H8v2H1v2h11.17a15.7 15.7 0 01-2.86 4.63A15.07 15.07 0 017.22 7H5.2a17.2 17.2 0 002.77 5.03l-5.09 5.02L4.3 18.47l5.01-5.01 3.11 3.11.45-1.5ZM18.5 10h-2L12 22h2l1.13-3h4.74L21 22h2l-4.5-12Zm-2.62 7l1.62-4.33L19.12 17h-3.24Z"></path>
+                        </svg>
+                      </span>
+                    </p>
+                    <p data-i18n="screenshots.translationModesIntro">Dos estilos disponibles:</p>
+                    <div class="translation-mode-grid" aria-label="Modos de visualización de traducción" data-i18n-attr="aria-label:screenshots.translationModesAria">
+                      <div class="translation-mode">
+                        <strong data-i18n="screenshots.replaceMode">REEMPLAZAR MENSAJE</strong>
+                        <p>
+                          <img class="sample-avatar" src="../assets/avatar.png" width="22" height="22" alt="" aria-hidden="true">
+                          <span class="sample-muted">@猫爪软乎乎</span>
+                          <span class="showcase-underline" data-i18n="screenshots.replaceModeSample">¡Gracias!</span>
+                          <span class="translate-mark" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" focusable="false">
+                              <path d="M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0014.07 6H17V4h-7V2H8v2H1v2h11.17a15.7 15.7 0 01-2.86 4.63A15.07 15.07 0 017.22 7H5.2a17.2 17.2 0 002.77 5.03l-5.09 5.02L4.3 18.47l5.01-5.01 3.11 3.11.45-1.5ZM18.5 10h-2L12 22h2l1.13-3h4.74L21 22h2l-4.5-12Zm-2.62 7l1.62-4.33L19.12 17h-3.24Z"></path>
+                            </svg>
+                          </span>
+                        </p>
+                      </div>
+                      <div class="translation-mode">
+                        <strong data-i18n="screenshots.belowMode">MOSTRAR DEBAJO</strong>
+                        <p>
+                          <img class="sample-avatar" src="../assets/avatar.png" width="22" height="22" alt="" aria-hidden="true">
+                          <span class="sample-muted">@猫爪软乎乎</span>
+                          <span class="sample-original" data-i18n="screenshots.belowModeOriginalSample">谢谢！</span>
+                          <span class="translation-line" data-i18n="screenshots.belowModeSample">Traducido: ¡Gracias!</span>
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="showcase-media showcase-media-translation">
+                    <img src="../assets/screenshots/hero-img1.png" alt="Mensaje traducido en el chat en vivo de YouTube" data-i18n-attr="alt:screenshots.translationAlt">
+                  </div>
+                </article>
+
+                <article class="showcase-panel showcase-panel-reverse">
+                  <div class="showcase-media">
+                    <img src="../assets/screenshots/hero-img2.png" alt="Bandeja del chat en vivo de YouTube y menú de acciones de mensaje" data-i18n-attr="alt:screenshots.mentionAlt">
+                  </div>
+                  <div class="showcase-copy">
+                    <div class="showcase-brand">
+                      <img src="../assets/logo.png" width="178" height="60" alt="Chat Enhancer for YouTube">
+                    </div>
+                    <h3 data-i18n="screenshots.mentionTitle">Mantente en la conversación con @menciones y citas fáciles</h3>
+                    <p data-i18n="screenshots.mentionIntro">Dos opciones disponibles:</p>
+                    <ul class="showcase-list">
+                      <li data-i18n-html="screenshots.mentionMenuHtml">Haz clic en un mensaje y elige <strong>“Citar”</strong> o <strong>“Mencionar”</strong>.</li>
+                      <li data-i18n-html="screenshots.mentionAuthorHtml">Haz clic en un <strong>@usuario</strong> para mencionar a alguien. Alt/Option-clic en un <strong>@usuario</strong> para citarlo.</li>
+                    </ul>
+                    <p>
+                      <span data-i18n-html="screenshots.mentionInboxHtml"><strong>No te pierdas una mención:</strong> cuando te mencionen en el chat, el mensaje se añade a tu <strong>bandeja</strong></span>
+                      <span class="inline-symbol showcase-inline-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" focusable="false">
+                          <path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2Zm0 12h-4a3 3 0 0 1-6 0H5V5h14v10Z"></path>
+                        </svg>
+                      </span>.
+                    </p>
+                    <p data-i18n="screenshots.mentionSound">También puedes activar un sonido para las notificaciones.</p>
+                  </div>
+                </article>
+
+                <article class="showcase-panel">
+                  <div class="showcase-copy showcase-copy-balanced">
+                    <div class="showcase-brand">
+                      <img src="../assets/logo.png" width="178" height="60" alt="Chat Enhancer for YouTube">
+                    </div>
+                    <h3 data-i18n="screenshots.extrasTitle">Un montón de mejoras de calidad de vida</h3>
+                    <ul class="showcase-list">
+                      <li data-i18n="screenshots.extrasAvatar">Haz clic en el avatar de un usuario para ver sus mensajes más recientes y abrir su perfil de YouTube en una ventana nueva.</li>
+                      <li data-i18n="screenshots.extrasEmoji">Encuentra tus emojis más usados en la parte superior del selector de emojis.</li>
+                      <li data-i18n="screenshots.extrasCommands">Usa comandos con barra y Tab para atajos útiles, incluyendo:</li>
+                    </ul>
+                    <dl class="showcase-command-list">
+                      <div>
+                        <dt data-i18n="screenshots.commandReply">/reply o /mention:</dt>
+                        <dd data-i18n="screenshots.commandReplyBody">@ al último usuario que te mencionó</dd>
+                      </div>
+                      <div>
+                        <dt data-i18n="screenshots.commandTime">/time &lt;place&gt;:</dt>
+                        <dd data-i18n="screenshots.commandTimeBody">la hora actual de ese lugar</dd>
+                      </div>
+                      <div>
+                        <dt data-i18n="screenshots.commandTimeUntil">/timeuntil &lt;time&gt;:</dt>
+                        <dd data-i18n="screenshots.commandTimeUntilBody">horas, minutos y segundos hasta &lt;time&gt;</dd>
+                      </div>
+                      <div>
+                        <dt data-i18n="screenshots.commandHelp">/help:</dt>
+                        <dd data-i18n="screenshots.commandHelpBody">muestra todos los comandos disponibles</dd>
+                      </div>
+                    </dl>
+                    <a class="feature-link showcase-command-link" href="#commands" data-i18n="screenshots.commandsFullLink">Ver referencia completa de comandos</a>
+                  </div>
+                  <div class="showcase-media showcase-media-extras">
+                    <img src="../assets/screenshots/hero-img3.png" alt="Tarjeta de perfil, comandos y fila de emojis frecuentes del chat en vivo de YouTube" data-i18n-attr="alt:screenshots.extrasAlt">
+                  </div>
+                </article>
+              </div>
             </figure>
           </div>
         </div>
@@ -290,7 +397,7 @@
                   <path d="M324-111.5Q251-143 197-197t-85.5-127Q80-397 80-480t31.5-156Q143-709 197-763t127-85.5Q397-880 480-880t156 31.5Q709-817 763-763t85.5 127Q880-563 880-480t-31.5 156Q817-251 763-197t-127 85.5Q563-80 480-80t-156-31.5Zm40-70.5 48-110q-42-15-72.5-46.5T292-412l-110 46q23 64 71 112t111 72Zm-72-366q17-42 47.5-73.5T412-668l-46-110q-64 24-112 72t-72 112l110 46Zm273 153q35-35 35-85t-35-85q-35-35-85-35t-85 35q-35 35-35 85t35 85q35 35 85 35t85-35Zm31 213q63-24 110.5-71.5T778-364l-110-48q-15 42-46 72.5T550-292l46 110Zm72-368 110-46q-24-63-71.5-110.5T596-778l-46 112q41 15 71 45.5t47 70.5Z"></path>
                 </svg>
               </span>
-              <span data-i18n="install.supportFeedback">Soporte / Comentarios</span>
+              <span data-i18n="install.supportFeedback">Soporte</span>
             </a>
             <p class="install-contact">
               <span data-i18n="install.privateQuestions">Para preguntas privadas, escribe a</span>
@@ -326,7 +433,7 @@
                 <span class="install-quickstart-copy">
                   <strong data-i18n="install.stepRefreshTitle">Abre o refresca el chat en vivo de YouTube</strong>
                   <span>
-                    <span data-i18n="install.stepRefreshBodyBeforeIcon">Refresca las pestañas que ya estaban abiertas para que la extensión pueda conectarse al marco del chat en vivo. Sabrás que funciona cuando el icono de bandeja</span>
+                    <span data-i18n="install.stepRefreshBodyBeforeIcon">Actualiza las pestañas que ya estaban abiertas para que la extensión pueda conectarse al frame del chat en vivo. Sabrás que funciona cuando el icono de la bandeja</span>
                     <span class="inline-symbol" data-symbol="inbox" aria-hidden="true">
                       <svg viewBox="0 0 24 24" focusable="false">
                         <path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2Zm0 12h-4a3 3 0 0 1-6 0H5V5h14v10Z"></path>
@@ -365,7 +472,7 @@
                 </span>
                 <span class="install-quickstart-copy">
                   <strong data-i18n="install.stepUseTitle">Usa las mejoras del chat</strong>
-                  <span data-i18n="install.stepUseBody">Los menús de mensajes, tarjetas de avatar, botón de bandeja, emojis frecuentes y comandos con Tab aparecen y se usan dentro de la interfaz de chat de YouTube.</span>
+                  <span data-i18n="install.stepUseBody">Los menús de mensajes, tarjetas de avatar, botón de bandeja, emojis frecuentes y comandos con Tab aparecen y se pueden usar dentro de la interfaz del chat de YouTube.</span>
                 </span>
               </li>
             </ol>
@@ -395,7 +502,7 @@
             </div>
             <div>
               <dt data-i18n="privacy.storageTitle">Almacenamiento</dt>
-              <dd data-i18n="privacy.storageBody">Los ajustes, mensajes de la bandeja, palabras clave vigiladas y conteos de emojis frecuentes permanecen en el almacenamiento de la extensión.</dd>
+              <dd data-i18n="privacy.storageBody">Los ajustes, mensajes de la bandeja, palabras clave vigiladas y recuentos de emojis frecuentes permanecen en el almacenamiento de la extensión del navegador.</dd>
             </div>
             <div>
               <dt data-i18n="privacy.translationTitle">Traducción</dt>
@@ -435,7 +542,7 @@
               <dl class="command-list">
                 <div>
                   <dt><code>/mention</code> or <code>/reply</code></dt>
-                  <dd data-i18n="commands.mentionDescription">Inserta una mención al autor del mensaje más reciente de tu bandeja.</dd>
+                  <dd data-i18n="commands.mentionDescription">Inserta una mención para el autor del mensaje más reciente de tu bandeja.</dd>
                 </div>
                 <div>
                   <dt><code>/quote</code></dt>
