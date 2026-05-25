@@ -76,7 +76,8 @@
     "extrasAlt": "YouTube ライブチャットのプロフィールカード、コマンド、よく使う絵文字行",
     "replaceModeSample": "ありがとう!",
     "belowModeOriginalSample": "谢谢！",
-    "commandsFullLink": "chatenhancer.comでコマンド一覧を見る"
+    "commandsFullLink": "コマンド一覧を見る",
+    "commandsFullLinkScreenshot": "chatenhancer.comでコマンド一覧を見る"
   },
   "install": {
     "eyebrow": "拡張機能を追加",

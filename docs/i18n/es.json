@@ -76,7 +76,8 @@
     "extrasAlt": "Tarjeta de perfil, comandos y fila de emojis frecuentes del chat en vivo de YouTube",
     "replaceModeSample": "¡Gracias!",
     "belowModeOriginalSample": "谢谢！",
-    "commandsFullLink": "Ver referencia completa de comandos en chatenhancer.com"
+    "commandsFullLink": "Ver referencia completa de comandos",
+    "commandsFullLinkScreenshot": "Ver referencia completa de comandos en chatenhancer.com"
   },
   "install": {
     "eyebrow": "Añade la extensión",

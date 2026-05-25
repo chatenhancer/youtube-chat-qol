@@ -76,7 +76,8 @@
     "extrasAlt": "YouTube 直播聊天个人资料卡片、命令和常用表情行",
     "replaceModeSample": "谢谢！",
     "belowModeOriginalSample": "ありがとう！",
-    "commandsFullLink": "在 chatenhancer.com 查看完整命令参考"
+    "commandsFullLink": "查看完整命令参考",
+    "commandsFullLinkScreenshot": "在 chatenhancer.com 查看完整命令参考"
   },
   "install": {
     "eyebrow": "添加扩展",
