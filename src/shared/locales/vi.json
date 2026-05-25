@@ -1,0 +1,191 @@
+{
+  "messages": {
+    "add": "Thêm",
+    "addKeywords": "Thêm từ khóa",
+    "addKeywordsCount": {
+      "one": "Thêm từ khóa, đang theo dõi {count} từ khóa",
+      "other": "Thêm từ khóa, đang theo dõi {count} từ khóa"
+    },
+    "chatCommands": "Lệnh chat",
+    "clear": "Xóa",
+    "close": "Đóng",
+    "commandHelpHint": "Nhập lệnh rồi nhấn Tab.",
+    "commandHelpMention": "Nhắc đến tác giả của tin nhắn mới nhất trong hộp thư.",
+    "commandHelpQuote": "Trích dẫn tin nhắn mới nhất trong hộp thư.",
+    "commandHelpRepeat": "Khôi phục tin nhắn bạn gửi gần nhất.",
+    "commandHelpTime": "Chèn giờ hiện tại.",
+    "commandHelpTimeUntil": "Chèn thời gian còn lại đến một giờ địa phương.",
+    "commandHelpOpenHelp": "Hiển thị danh sách này.",
+    "commandHelpSetTranslateTo": "Đặt ngôn ngữ dịch.",
+    "commandHelpSetTranslationDisplay": "Đặt cách hiển thị bản dịch.",
+    "commandHelpSetQuoteLength": "Đặt độ dài trích dẫn.",
+    "commandHelpSetSound": "Đặt âm thanh hộp thư.",
+    "commandHelpSetOpenChannelsInPopup": "Đặt cách mở popup kênh.",
+    "couldNotFindChatInput": "Không tìm thấy ô nhập chat.",
+    "couldNotReadTime": "Không đọc được thời gian đó.",
+    "couldNotReadUserName": "Không đọc được tên người dùng đó.",
+    "inbox": "Hộp thư",
+    "inboxAriaUnread": "Hộp thư, {count} chưa đọc",
+    "inboxEmpty": "Hộp thư trống",
+    "inboxSound": "Âm thanh hộp thư",
+    "jumpToMessage": "Nhảy đến tin nhắn",
+    "keywordOrPhrase": "Từ khóa hoặc cụm từ",
+    "lessThanOneMinute": "dưới 1 phút",
+    "mention": "Nhắc đến",
+    "mentionUser": "Nhắc đến người dùng",
+    "mentionUserTitle": "Nhắc đến người dùng. Alt/Option-click để trích dẫn.",
+    "mostUsed": "DÙNG NHIỀU NHẤT",
+    "noInboxMessagesYet": "Chưa có tin nhắn trong hộp thư.",
+    "noKeywords": "Không có từ khóa",
+    "noPreviousMessageYet": "Chưa có tin nhắn trước đó.",
+    "nothingHereYet": "Chưa có gì ở đây",
+    "openChannel": "Mở kênh",
+    "openChannelsInPopup": "Mở kênh trong popup",
+    "original": "Gốc: {text}",
+    "originalMessage": "Tin nhắn gốc",
+    "pressEnterAgainToSend": "Nhấn Enter lần nữa để gửi.",
+    "pressTabToRunCommand": "Nhấn Tab để chạy lệnh này.",
+    "quote": "Trích dẫn",
+    "quoteLength": "Độ dài trích dẫn {count}.",
+    "quoteMessage": "Trích dẫn tin nhắn",
+    "recentMessages": "Tin nhắn gần đây",
+    "recentMessagesFromThisUser": "Tin nhắn gần đây từ người dùng này",
+    "removeKeyword": "Xóa {keyword}",
+    "savedMessages": {
+      "one": "{count} tin nhắn đã lưu",
+      "other": "{count} tin nhắn đã lưu"
+    },
+    "settingState": "{label} {state}.",
+    "showRecentMessages": "Hiện tin nhắn gần đây",
+    "stateOff": "tắt",
+    "stateOn": "bật",
+    "timeHours": "{count} giờ",
+    "timeMinutes": "{count} phút",
+    "timeSeconds": "{count} giây",
+    "translateChat": "Dịch chat",
+    "translated": "Đã dịch:",
+    "translatedFrom": "Dịch từ {language}",
+    "translatedFromOriginal": "Dịch từ {language}: {text}",
+    "translatedMessage": "Tin nhắn đã dịch",
+    "translateOff": "Đã tắt dịch.",
+    "translateToLanguage": "Dịch sang {language}.",
+    "translationsReplaceMessages": "Bản dịch thay thế tin nhắn.",
+    "translationsShowBelowMessages": "Bản dịch hiển thị bên dưới tin nhắn.",
+    "unknownSettingCommand": "Lệnh cài đặt không xác định.",
+    "unknownTimezone": "Múi giờ không xác định.",
+    "unknownTranslationLanguage": "Ngôn ngữ dịch không xác định.",
+    "unreadMessages": {
+      "one": "{count} tin nhắn mới",
+      "other": "{count} tin nhắn mới"
+    },
+    "useOnOrOff": "Dùng on hoặc off.",
+    "useQuoteLength": "Dùng độ dài trích dẫn {lengths}.",
+    "useReplaceOrBelow": "Dùng replace hoặc below.",
+    "watchingMentions": "Đang theo dõi lượt nhắc",
+    "watchingMentionsAndKeywords": "Đang theo dõi lượt nhắc và từ khóa"
+  },
+  "extension": {
+    "extensionName": {
+      "message": "Chat Enhancer for YouTube"
+    },
+    "extensionShortName": {
+      "message": "Chat Enhancer"
+    },
+    "extensionDescription": {
+      "message": "Công cụ nhẹ cho dịch, nhắc tên, hồ sơ và emoji trong YouTube live chat."
+    },
+    "openChatEnhancerWebsite": {
+      "message": "Mở trang web Chat Enhancer"
+    },
+    "openGithubRepository": {
+      "message": "Mở kho GitHub"
+    },
+    "supportFeedback": {
+      "message": "Hỗ trợ / góp ý"
+    },
+    "supportAndFeedback": {
+      "message": "Hỗ trợ và góp ý"
+    },
+    "resetAllExtensionData": {
+      "message": "Đặt lại mọi cài đặt tiện ích và dữ liệu cục bộ"
+    },
+    "resetExtension": {
+      "message": "Đặt lại tiện ích"
+    },
+    "translation": {
+      "message": "Dịch"
+    },
+    "chooseTranslationLanguageTitle": {
+      "message": "Chọn ngôn ngữ để dịch tin nhắn chat sang. Tắt sẽ tắt dịch tự động."
+    },
+    "translateTo": {
+      "message": "Dịch sang"
+    },
+    "translationOffHelper": {
+      "message": "Tắt sẽ tắt dịch tự động."
+    },
+    "display": {
+      "message": "Hiển thị"
+    },
+    "translationDisplayTitle": {
+      "message": "Chọn bản dịch thay thế tin nhắn gốc hay hiển thị bên dưới."
+    },
+    "translationDisplayHelper": {
+      "message": "Thay thế tin nhắn hoặc hiển thị bản dịch bên dưới."
+    },
+    "replaceMessage": {
+      "message": "Thay thế tin nhắn"
+    },
+    "showBelow": {
+      "message": "Hiển thị bên dưới"
+    },
+    "chatActions": {
+      "message": "Thao tác chat"
+    },
+    "quoteLengthTitle": {
+      "message": "Số ký tự tối đa khi trích dẫn tin nhắn từ thao tác chat hoặc thẻ."
+    },
+    "quoteLengthLabel": {
+      "message": "Độ dài trích dẫn"
+    },
+    "quoteLengthHelper": {
+      "message": "Số ký tự tối đa khi trích dẫn tin nhắn."
+    },
+    "openChannelsInPopup": {
+      "message": "Mở kênh trong popup"
+    },
+    "openChannelsInPopupTitle": {
+      "message": "Mở trang kênh YouTube trong cửa sổ popup nhỏ thay vì tab trình duyệt thông thường."
+    },
+    "openChannelsInPopupHelper": {
+      "message": "Dùng cửa sổ nhỏ hơn cho kênh từ thẻ avatar."
+    },
+    "popupAlerts": {
+      "message": "Cảnh báo"
+    },
+    "playInboxSound": {
+      "message": "Phát âm thanh hộp thư"
+    },
+    "playInboxSoundTitle": {
+      "message": "Phát âm thanh ngắn khi tin nhắn chat được lưu vào hộp thư."
+    },
+    "playInboxSoundHelper": {
+      "message": "Phát âm thanh ngắn cho tin nhắn hộp thư mới."
+    },
+    "extensionVersion": {
+      "message": "Phiên bản tiện ích"
+    },
+    "versionLabel": {
+      "message": "Phiên bản {version}"
+    },
+    "off": {
+      "message": "Tắt"
+    },
+    "popupResetConfirm": {
+      "message": "Đặt lại cài đặt Chat Enhancer và xóa hộp thư, từ khóa, dữ liệu emoji cục bộ?"
+    },
+    "popupResetComplete": {
+      "message": "Chat Enhancer đã được đặt lại."
+    }
+  }
+}

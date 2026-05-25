@@ -6,15 +6,23 @@ const SUPPORTED_LOCALES = new Set([
   'de',
   'en',
   'es',
+  'fa',
   'fr',
+  'he',
   'hi',
   'id',
   'it',
   'ja',
   'ko',
+  'nl',
+  'pl',
   'pt',
   'ru',
+  'th',
   'tr',
+  'uk',
+  'vi',
+  'zh-TW',
   'zh-CN'
 ]);
 
@@ -138,6 +146,14 @@ function normalizeLocale(value) {
     locale.startsWith('zh-sg')
   ) {
     return 'zh-CN';
+  }
+  if (
+    locale.startsWith('zh-tw') ||
+    locale.startsWith('zh-hant') ||
+    locale.startsWith('zh-hk') ||
+    locale.startsWith('zh-mo')
+  ) {
+    return 'zh-TW';
   }
 
   const baseLocale = locale.split('-')[0];

@@ -1,0 +1,191 @@
+{
+  "messages": {
+    "add": "افزودن",
+    "addKeywords": "افزودن کلیدواژه‌ها",
+    "addKeywordsCount": {
+      "one": "افزودن کلیدواژه‌ها، {count} کلیدواژه دنبال می‌شود",
+      "other": "افزودن کلیدواژه‌ها، {count} کلیدواژه دنبال می‌شود"
+    },
+    "chatCommands": "دستورهای چت",
+    "clear": "پاک کردن",
+    "close": "بستن",
+    "commandHelpHint": "یک دستور بنویسید، سپس Tab را بزنید.",
+    "commandHelpMention": "نویسنده جدیدترین پیام صندوق ورودی را منشن کنید.",
+    "commandHelpQuote": "جدیدترین پیام صندوق ورودی را نقل‌قول کنید.",
+    "commandHelpRepeat": "آخرین پیام ارسالی خود را بازگردانید.",
+    "commandHelpTime": "زمان فعلی را وارد کنید.",
+    "commandHelpTimeUntil": "زمان باقی‌مانده تا یک ساعت محلی را وارد کنید.",
+    "commandHelpOpenHelp": "این فهرست را نشان بده.",
+    "commandHelpSetTranslateTo": "زبان ترجمه را تنظیم کن.",
+    "commandHelpSetTranslationDisplay": "نحوه نمایش ترجمه‌ها را تنظیم کن.",
+    "commandHelpSetQuoteLength": "طول نقل‌قول را تنظیم کن.",
+    "commandHelpSetSound": "صدای صندوق ورودی را تنظیم کن.",
+    "commandHelpSetOpenChannelsInPopup": "رفتار باز شدن کانال در پنجره کوچک را تنظیم کن.",
+    "couldNotFindChatInput": "کادر ورود چت پیدا نشد.",
+    "couldNotReadTime": "این زمان خوانده نشد.",
+    "couldNotReadUserName": "این نام کاربری خوانده نشد.",
+    "inbox": "صندوق ورودی",
+    "inboxAriaUnread": "صندوق ورودی، {count} خوانده‌نشده",
+    "inboxEmpty": "صندوق ورودی خالی است",
+    "inboxSound": "صدای صندوق ورودی",
+    "jumpToMessage": "پرش به پیام",
+    "keywordOrPhrase": "کلیدواژه یا عبارت",
+    "lessThanOneMinute": "کمتر از ۱ دقیقه",
+    "mention": "منشن",
+    "mentionUser": "منشن کاربر",
+    "mentionUserTitle": "منشن کاربر. برای نقل‌قول Alt/Option-click کنید.",
+    "mostUsed": "بیشترین استفاده",
+    "noInboxMessagesYet": "هنوز پیامی در صندوق ورودی نیست.",
+    "noKeywords": "کلیدواژه‌ای نیست",
+    "noPreviousMessageYet": "هنوز پیام قبلی وجود ندارد.",
+    "nothingHereYet": "هنوز چیزی اینجا نیست",
+    "openChannel": "باز کردن کانال",
+    "openChannelsInPopup": "باز کردن کانال‌ها در پنجره کوچک",
+    "original": "اصلی: {text}",
+    "originalMessage": "پیام اصلی",
+    "pressEnterAgainToSend": "برای ارسال دوباره Enter را بزنید.",
+    "pressTabToRunCommand": "برای اجرای این دستور Tab را بزنید.",
+    "quote": "نقل‌قول",
+    "quoteLength": "طول نقل‌قول {count}.",
+    "quoteMessage": "نقل‌قول پیام",
+    "recentMessages": "پیام‌های اخیر",
+    "recentMessagesFromThisUser": "پیام‌های اخیر این کاربر",
+    "removeKeyword": "حذف {keyword}",
+    "savedMessages": {
+      "one": "{count} پیام ذخیره‌شده",
+      "other": "{count} پیام ذخیره‌شده"
+    },
+    "settingState": "{label} {state}.",
+    "showRecentMessages": "نمایش پیام‌های اخیر",
+    "stateOff": "خاموش",
+    "stateOn": "روشن",
+    "timeHours": "{count} ساعت",
+    "timeMinutes": "{count} دقیقه",
+    "timeSeconds": "{count} ثانیه",
+    "translateChat": "ترجمه چت",
+    "translated": "ترجمه‌شده:",
+    "translatedFrom": "ترجمه‌شده از {language}",
+    "translatedFromOriginal": "ترجمه‌شده از {language}: {text}",
+    "translatedMessage": "پیام ترجمه‌شده",
+    "translateOff": "ترجمه خاموش است.",
+    "translateToLanguage": "ترجمه به {language}.",
+    "translationsReplaceMessages": "ترجمه‌ها جایگزین پیام‌ها می‌شوند.",
+    "translationsShowBelowMessages": "ترجمه‌ها زیر پیام‌ها نشان داده می‌شوند.",
+    "unknownSettingCommand": "دستور تنظیمات ناشناخته است.",
+    "unknownTimezone": "منطقه زمانی ناشناخته است.",
+    "unknownTranslationLanguage": "زبان ترجمه ناشناخته است.",
+    "unreadMessages": {
+      "one": "{count} پیام جدید",
+      "other": "{count} پیام جدید"
+    },
+    "useOnOrOff": "از on یا off استفاده کنید.",
+    "useQuoteLength": "از طول نقل‌قول {lengths} استفاده کنید.",
+    "useReplaceOrBelow": "از replace یا below استفاده کنید.",
+    "watchingMentions": "در حال دنبال کردن منشن‌ها",
+    "watchingMentionsAndKeywords": "در حال دنبال کردن منشن‌ها و کلیدواژه‌ها"
+  },
+  "extension": {
+    "extensionName": {
+      "message": "Chat Enhancer for YouTube"
+    },
+    "extensionShortName": {
+      "message": "Chat Enhancer"
+    },
+    "extensionDescription": {
+      "message": "ابزارهای سبک ترجمه، منشن، پروفایل و ایموجی برای چت زنده YouTube."
+    },
+    "openChatEnhancerWebsite": {
+      "message": "باز کردن وب‌سایت Chat Enhancer"
+    },
+    "openGithubRepository": {
+      "message": "باز کردن مخزن GitHub"
+    },
+    "supportFeedback": {
+      "message": "پشتیبانی / بازخورد"
+    },
+    "supportAndFeedback": {
+      "message": "پشتیبانی و بازخورد"
+    },
+    "resetAllExtensionData": {
+      "message": "بازنشانی همه تنظیمات افزونه و داده‌های محلی"
+    },
+    "resetExtension": {
+      "message": "بازنشانی افزونه"
+    },
+    "translation": {
+      "message": "ترجمه"
+    },
+    "chooseTranslationLanguageTitle": {
+      "message": "زبانی را انتخاب کنید که پیام‌های چت به آن ترجمه شوند. خاموش، ترجمه خودکار را غیرفعال می‌کند."
+    },
+    "translateTo": {
+      "message": "ترجمه به"
+    },
+    "translationOffHelper": {
+      "message": "خاموش، ترجمه خودکار را غیرفعال می‌کند."
+    },
+    "display": {
+      "message": "نمایش"
+    },
+    "translationDisplayTitle": {
+      "message": "انتخاب کنید ترجمه‌ها جایگزین پیام اصلی شوند یا زیر آن نمایش داده شوند."
+    },
+    "translationDisplayHelper": {
+      "message": "پیام را جایگزین کن یا ترجمه را زیر آن نشان بده."
+    },
+    "replaceMessage": {
+      "message": "جایگزینی پیام"
+    },
+    "showBelow": {
+      "message": "نمایش زیر پیام"
+    },
+    "chatActions": {
+      "message": "اقدام‌های چت"
+    },
+    "quoteLengthTitle": {
+      "message": "حداکثر نویسه‌های واردشده هنگام نقل‌قول پیام از اقدام‌های چت یا کارت‌ها."
+    },
+    "quoteLengthLabel": {
+      "message": "طول نقل‌قول"
+    },
+    "quoteLengthHelper": {
+      "message": "حداکثر نویسه‌ها هنگام نقل‌قول پیام‌ها."
+    },
+    "openChannelsInPopup": {
+      "message": "باز کردن کانال‌ها در پنجره کوچک"
+    },
+    "openChannelsInPopupTitle": {
+      "message": "صفحه‌های کانال YouTube را به‌جای زبانه معمولی در پنجره کوچک باز کن."
+    },
+    "openChannelsInPopupHelper": {
+      "message": "برای کانال‌ها از کارت‌های آواتار، پنجره کوچک‌تر استفاده کن."
+    },
+    "popupAlerts": {
+      "message": "هشدارها"
+    },
+    "playInboxSound": {
+      "message": "پخش صدای صندوق ورودی"
+    },
+    "playInboxSoundTitle": {
+      "message": "وقتی پیام چت در صندوق ورودی ذخیره می‌شود، صدای کوتاهی پخش کن."
+    },
+    "playInboxSoundHelper": {
+      "message": "برای پیام‌های جدید صندوق ورودی صدای کوتاه پخش کن."
+    },
+    "extensionVersion": {
+      "message": "نسخه افزونه"
+    },
+    "versionLabel": {
+      "message": "نسخه {version}"
+    },
+    "off": {
+      "message": "خاموش"
+    },
+    "popupResetConfirm": {
+      "message": "تنظیمات Chat Enhancer بازنشانی و صندوق ورودی محلی، کلیدواژه‌ها و داده‌های ایموجی پاک شوند؟"
+    },
+    "popupResetComplete": {
+      "message": "Chat Enhancer بازنشانی شد."
+    }
+  }
+}

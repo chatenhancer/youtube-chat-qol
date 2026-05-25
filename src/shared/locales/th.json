@@ -1,0 +1,191 @@
+{
+  "messages": {
+    "add": "เพิ่ม",
+    "addKeywords": "เพิ่มคำสำคัญ",
+    "addKeywordsCount": {
+      "one": "เพิ่มคำสำคัญ กำลังติดตาม {count} คำ",
+      "other": "เพิ่มคำสำคัญ กำลังติดตาม {count} คำ"
+    },
+    "chatCommands": "คำสั่งแชท",
+    "clear": "ล้าง",
+    "close": "ปิด",
+    "commandHelpHint": "พิมพ์คำสั่ง แล้วกด Tab",
+    "commandHelpMention": "กล่าวถึงผู้เขียนข้อความล่าสุดในกล่องข้อความของคุณ",
+    "commandHelpQuote": "อ้างอิงข้อความล่าสุดในกล่องข้อความของคุณ",
+    "commandHelpRepeat": "กู้คืนข้อความล่าสุดที่คุณส่ง",
+    "commandHelpTime": "แทรกเวลาปัจจุบัน",
+    "commandHelpTimeUntil": "แทรกเวลาที่เหลือจนถึงเวลาท้องถิ่น",
+    "commandHelpOpenHelp": "แสดงรายการนี้",
+    "commandHelpSetTranslateTo": "ตั้งค่าภาษาที่จะแปล",
+    "commandHelpSetTranslationDisplay": "ตั้งค่าวิธีแสดงคำแปล",
+    "commandHelpSetQuoteLength": "ตั้งค่าความยาวข้อความอ้างอิง",
+    "commandHelpSetSound": "ตั้งค่าเสียงกล่องข้อความ",
+    "commandHelpSetOpenChannelsInPopup": "ตั้งค่าการเปิดช่องในหน้าต่างป๊อปอัป",
+    "couldNotFindChatInput": "ไม่พบช่องพิมพ์แชท",
+    "couldNotReadTime": "อ่านเวลานั้นไม่ได้",
+    "couldNotReadUserName": "อ่านชื่อผู้ใช้นั้นไม่ได้",
+    "inbox": "กล่องข้อความ",
+    "inboxAriaUnread": "กล่องข้อความ มี {count} รายการที่ยังไม่ได้อ่าน",
+    "inboxEmpty": "กล่องข้อความว่าง",
+    "inboxSound": "เสียงกล่องข้อความ",
+    "jumpToMessage": "ข้ามไปยังข้อความ",
+    "keywordOrPhrase": "คำสำคัญหรือวลี",
+    "lessThanOneMinute": "น้อยกว่า 1 นาที",
+    "mention": "กล่าวถึง",
+    "mentionUser": "กล่าวถึงผู้ใช้",
+    "mentionUserTitle": "กล่าวถึงผู้ใช้ กด Alt/Option-click เพื่ออ้างอิง",
+    "mostUsed": "ใช้บ่อยที่สุด",
+    "noInboxMessagesYet": "ยังไม่มีข้อความในกล่องข้อความ",
+    "noKeywords": "ไม่มีคำสำคัญ",
+    "noPreviousMessageYet": "ยังไม่มีข้อความก่อนหน้า",
+    "nothingHereYet": "ยังไม่มีอะไรที่นี่",
+    "openChannel": "เปิดช่อง",
+    "openChannelsInPopup": "เปิดช่องในป๊อปอัป",
+    "original": "ต้นฉบับ: {text}",
+    "originalMessage": "ข้อความต้นฉบับ",
+    "pressEnterAgainToSend": "กด Enter อีกครั้งเพื่อส่ง",
+    "pressTabToRunCommand": "กด Tab เพื่อเรียกใช้คำสั่งนี้",
+    "quote": "อ้างอิง",
+    "quoteLength": "ความยาวอ้างอิง {count}",
+    "quoteMessage": "อ้างอิงข้อความ",
+    "recentMessages": "ข้อความล่าสุด",
+    "recentMessagesFromThisUser": "ข้อความล่าสุดจากผู้ใช้นี้",
+    "removeKeyword": "ลบ {keyword}",
+    "savedMessages": {
+      "one": "บันทึกแล้ว {count} ข้อความ",
+      "other": "บันทึกแล้ว {count} ข้อความ"
+    },
+    "settingState": "{label} {state}",
+    "showRecentMessages": "แสดงข้อความล่าสุด",
+    "stateOff": "ปิด",
+    "stateOn": "เปิด",
+    "timeHours": "{count} ชม.",
+    "timeMinutes": "{count} นาที",
+    "timeSeconds": "{count} วินาที",
+    "translateChat": "แปลแชท",
+    "translated": "แปลแล้ว:",
+    "translatedFrom": "แปลจาก {language}",
+    "translatedFromOriginal": "แปลจาก {language}: {text}",
+    "translatedMessage": "ข้อความที่แปลแล้ว",
+    "translateOff": "ปิดการแปลแล้ว",
+    "translateToLanguage": "แปลเป็น {language}",
+    "translationsReplaceMessages": "คำแปลจะแทนที่ข้อความ",
+    "translationsShowBelowMessages": "คำแปลจะแสดงใต้ข้อความ",
+    "unknownSettingCommand": "ไม่รู้จักคำสั่งตั้งค่านี้",
+    "unknownTimezone": "ไม่รู้จักเขตเวลา",
+    "unknownTranslationLanguage": "ไม่รู้จักภาษานี้",
+    "unreadMessages": {
+      "one": "{count} ข้อความใหม่",
+      "other": "{count} ข้อความใหม่"
+    },
+    "useOnOrOff": "ใช้ on หรือ off",
+    "useQuoteLength": "ใช้ความยาวอ้างอิง {lengths}",
+    "useReplaceOrBelow": "ใช้ replace หรือ below",
+    "watchingMentions": "กำลังติดตามการกล่าวถึง",
+    "watchingMentionsAndKeywords": "กำลังติดตามการกล่าวถึงและคำสำคัญ"
+  },
+  "extension": {
+    "extensionName": {
+      "message": "Chat Enhancer for YouTube"
+    },
+    "extensionShortName": {
+      "message": "Chat Enhancer"
+    },
+    "extensionDescription": {
+      "message": "เครื่องมือแปล กล่าวถึง โปรไฟล์ และอีโมจิแบบเบาสำหรับ YouTube live chat"
+    },
+    "openChatEnhancerWebsite": {
+      "message": "เปิดเว็บไซต์ Chat Enhancer"
+    },
+    "openGithubRepository": {
+      "message": "เปิด GitHub repository"
+    },
+    "supportFeedback": {
+      "message": "ช่วยเหลือ / ความเห็น"
+    },
+    "supportAndFeedback": {
+      "message": "ช่วยเหลือและความเห็น"
+    },
+    "resetAllExtensionData": {
+      "message": "รีเซ็ตการตั้งค่าส่วนขยายและข้อมูลในเครื่องทั้งหมด"
+    },
+    "resetExtension": {
+      "message": "รีเซ็ตส่วนขยาย"
+    },
+    "translation": {
+      "message": "การแปล"
+    },
+    "chooseTranslationLanguageTitle": {
+      "message": "เลือกภาษาที่ต้องการแปลข้อความแชทไปเป็น ปิดเพื่อหยุดการแปลอัตโนมัติ"
+    },
+    "translateTo": {
+      "message": "แปลเป็น"
+    },
+    "translationOffHelper": {
+      "message": "ปิดเพื่อหยุดการแปลอัตโนมัติ"
+    },
+    "display": {
+      "message": "การแสดงผล"
+    },
+    "translationDisplayTitle": {
+      "message": "เลือกให้คำแปลแทนที่ข้อความเดิมหรือแสดงอยู่ด้านล่าง"
+    },
+    "translationDisplayHelper": {
+      "message": "แทนที่ข้อความหรือแสดงคำแปลด้านล่าง"
+    },
+    "replaceMessage": {
+      "message": "แทนที่ข้อความ"
+    },
+    "showBelow": {
+      "message": "แสดงด้านล่าง"
+    },
+    "chatActions": {
+      "message": "การกระทำในแชท"
+    },
+    "quoteLengthTitle": {
+      "message": "จำนวนอักขระสูงสุดเมื่ออ้างอิงข้อความจากการกระทำในแชทหรือการ์ด"
+    },
+    "quoteLengthLabel": {
+      "message": "ความยาวอ้างอิง"
+    },
+    "quoteLengthHelper": {
+      "message": "จำนวนอักขระสูงสุดเมื่ออ้างอิงข้อความ"
+    },
+    "openChannelsInPopup": {
+      "message": "เปิดช่องในป๊อปอัป"
+    },
+    "openChannelsInPopupTitle": {
+      "message": "เปิดหน้าช่อง YouTube ในหน้าต่างป๊อปอัปขนาดเล็กแทนแท็บเบราว์เซอร์ปกติ"
+    },
+    "openChannelsInPopupHelper": {
+      "message": "ใช้หน้าต่างขนาดเล็กสำหรับช่องจากการ์ดอวาตาร์"
+    },
+    "popupAlerts": {
+      "message": "การแจ้งเตือน"
+    },
+    "playInboxSound": {
+      "message": "เล่นเสียงกล่องข้อความ"
+    },
+    "playInboxSoundTitle": {
+      "message": "เล่นเสียงสั้นเมื่อข้อความแชทถูกบันทึกลงกล่องข้อความ"
+    },
+    "playInboxSoundHelper": {
+      "message": "เล่นเสียงสั้นสำหรับข้อความใหม่ในกล่องข้อความ"
+    },
+    "extensionVersion": {
+      "message": "เวอร์ชันส่วนขยาย"
+    },
+    "versionLabel": {
+      "message": "เวอร์ชัน {version}"
+    },
+    "off": {
+      "message": "ปิด"
+    },
+    "popupResetConfirm": {
+      "message": "รีเซ็ตการตั้งค่า Chat Enhancer และล้างกล่องข้อความ คำสำคัญ และข้อมูลอีโมจิในเครื่องหรือไม่?"
+    },
+    "popupResetComplete": {
+      "message": "รีเซ็ต Chat Enhancer แล้ว"
+    }
+  }
+}

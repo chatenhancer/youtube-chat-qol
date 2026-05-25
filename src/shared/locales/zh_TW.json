@@ -1,0 +1,191 @@
+{
+  "messages": {
+    "add": "新增",
+    "addKeywords": "新增關鍵字",
+    "addKeywordsCount": {
+      "one": "新增關鍵字，正在監看 {count} 個關鍵字",
+      "other": "新增關鍵字，正在監看 {count} 個關鍵字"
+    },
+    "chatCommands": "聊天室指令",
+    "clear": "清除",
+    "close": "關閉",
+    "commandHelpHint": "輸入指令，然後按 Tab。",
+    "commandHelpMention": "提及收件匣中最新訊息的作者。",
+    "commandHelpQuote": "引用收件匣中最新的訊息。",
+    "commandHelpRepeat": "還原你上一則送出的訊息。",
+    "commandHelpTime": "插入目前時間。",
+    "commandHelpTimeUntil": "插入距離本地時間的剩餘時間。",
+    "commandHelpOpenHelp": "顯示此清單。",
+    "commandHelpSetTranslateTo": "設定翻譯語言。",
+    "commandHelpSetTranslationDisplay": "設定翻譯顯示方式。",
+    "commandHelpSetQuoteLength": "設定引用長度。",
+    "commandHelpSetSound": "設定收件匣音效。",
+    "commandHelpSetOpenChannelsInPopup": "設定頻道彈出視窗行為。",
+    "couldNotFindChatInput": "找不到聊天室輸入框。",
+    "couldNotReadTime": "無法讀取該時間。",
+    "couldNotReadUserName": "無法讀取該使用者名稱。",
+    "inbox": "收件匣",
+    "inboxAriaUnread": "收件匣，{count} 則未讀",
+    "inboxEmpty": "收件匣是空的",
+    "inboxSound": "收件匣音效",
+    "jumpToMessage": "跳到訊息",
+    "keywordOrPhrase": "關鍵字或片語",
+    "lessThanOneMinute": "少於 1 分鐘",
+    "mention": "提及",
+    "mentionUser": "提及使用者",
+    "mentionUserTitle": "提及使用者。Alt/Option 點擊可引用。",
+    "mostUsed": "最常使用",
+    "noInboxMessagesYet": "收件匣尚無訊息。",
+    "noKeywords": "沒有關鍵字",
+    "noPreviousMessageYet": "尚無上一則訊息。",
+    "nothingHereYet": "這裡還沒有內容",
+    "openChannel": "開啟頻道",
+    "openChannelsInPopup": "在彈出視窗開啟頻道",
+    "original": "原文：{text}",
+    "originalMessage": "原始訊息",
+    "pressEnterAgainToSend": "再按一次 Enter 即可送出。",
+    "pressTabToRunCommand": "按 Tab 執行此指令。",
+    "quote": "引用",
+    "quoteLength": "引用長度 {count}。",
+    "quoteMessage": "引用訊息",
+    "recentMessages": "最近訊息",
+    "recentMessagesFromThisUser": "此使用者的最近訊息",
+    "removeKeyword": "移除 {keyword}",
+    "savedMessages": {
+      "one": "{count} 則已儲存訊息",
+      "other": "{count} 則已儲存訊息"
+    },
+    "settingState": "{label}{state}。",
+    "showRecentMessages": "顯示最近訊息",
+    "stateOff": "關閉",
+    "stateOn": "開啟",
+    "timeHours": "{count} 小時",
+    "timeMinutes": "{count} 分",
+    "timeSeconds": "{count} 秒",
+    "translateChat": "翻譯聊天室",
+    "translated": "已翻譯：",
+    "translatedFrom": "從{language}翻譯",
+    "translatedFromOriginal": "從{language}翻譯：{text}",
+    "translatedMessage": "已翻譯訊息",
+    "translateOff": "翻譯已關閉。",
+    "translateToLanguage": "翻譯成{language}。",
+    "translationsReplaceMessages": "翻譯會取代訊息。",
+    "translationsShowBelowMessages": "翻譯會顯示在訊息下方。",
+    "unknownSettingCommand": "未知的設定指令。",
+    "unknownTimezone": "未知的時區。",
+    "unknownTranslationLanguage": "未知的翻譯語言。",
+    "unreadMessages": {
+      "one": "{count} 則新訊息",
+      "other": "{count} 則新訊息"
+    },
+    "useOnOrOff": "使用 on 或 off。",
+    "useQuoteLength": "使用引用長度 {lengths}。",
+    "useReplaceOrBelow": "使用 replace 或 below。",
+    "watchingMentions": "正在監看提及",
+    "watchingMentionsAndKeywords": "正在監看提及與關鍵字"
+  },
+  "extension": {
+    "extensionName": {
+      "message": "Chat Enhancer for YouTube"
+    },
+    "extensionShortName": {
+      "message": "Chat Enhancer"
+    },
+    "extensionDescription": {
+      "message": "適用於 YouTube 直播聊天室的輕量翻譯、提及、個人檔案與 emoji 工具。"
+    },
+    "openChatEnhancerWebsite": {
+      "message": "開啟 Chat Enhancer 網站"
+    },
+    "openGithubRepository": {
+      "message": "開啟 GitHub 儲存庫"
+    },
+    "supportFeedback": {
+      "message": "支援 / 回饋"
+    },
+    "supportAndFeedback": {
+      "message": "支援與回饋"
+    },
+    "resetAllExtensionData": {
+      "message": "重設所有擴充功能設定與本機資料"
+    },
+    "resetExtension": {
+      "message": "重設擴充功能"
+    },
+    "translation": {
+      "message": "翻譯"
+    },
+    "chooseTranslationLanguageTitle": {
+      "message": "選擇聊天室訊息要翻譯成的語言。關閉會停用自動翻譯。"
+    },
+    "translateTo": {
+      "message": "翻譯成"
+    },
+    "translationOffHelper": {
+      "message": "關閉會停用自動翻譯。"
+    },
+    "display": {
+      "message": "顯示"
+    },
+    "translationDisplayTitle": {
+      "message": "選擇翻譯要取代原始訊息，或顯示在下方。"
+    },
+    "translationDisplayHelper": {
+      "message": "取代訊息或在下方顯示翻譯。"
+    },
+    "replaceMessage": {
+      "message": "取代訊息"
+    },
+    "showBelow": {
+      "message": "顯示在下方"
+    },
+    "chatActions": {
+      "message": "聊天室動作"
+    },
+    "quoteLengthTitle": {
+      "message": "從聊天室動作或卡片引用訊息時包含的最大字元數。"
+    },
+    "quoteLengthLabel": {
+      "message": "引用長度"
+    },
+    "quoteLengthHelper": {
+      "message": "引用訊息時包含的最大字元數。"
+    },
+    "openChannelsInPopup": {
+      "message": "在彈出視窗開啟頻道"
+    },
+    "openChannelsInPopupTitle": {
+      "message": "以較小的彈出視窗開啟 YouTube 頻道頁面，而不是一般瀏覽器分頁。"
+    },
+    "openChannelsInPopupHelper": {
+      "message": "從頭像卡片開啟頻道時使用較小視窗。"
+    },
+    "popupAlerts": {
+      "message": "提醒"
+    },
+    "playInboxSound": {
+      "message": "播放收件匣音效"
+    },
+    "playInboxSoundTitle": {
+      "message": "聊天室訊息儲存到收件匣時播放短音效。"
+    },
+    "playInboxSoundHelper": {
+      "message": "新收件匣訊息播放短音效。"
+    },
+    "extensionVersion": {
+      "message": "擴充功能版本"
+    },
+    "versionLabel": {
+      "message": "版本 {version}"
+    },
+    "off": {
+      "message": "關閉"
+    },
+    "popupResetConfirm": {
+      "message": "要重設 Chat Enhancer 設定並清除本機收件匣、關鍵字與 emoji 資料嗎？"
+    },
+    "popupResetComplete": {
+      "message": "Chat Enhancer 已重設。"
+    }
+  }
+}

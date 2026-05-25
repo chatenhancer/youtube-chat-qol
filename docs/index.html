@@ -49,16 +49,24 @@
     <link rel="alternate" hreflang="ar" href="https://chatenhancer.com/ar/">
     <link rel="alternate" hreflang="de" href="https://chatenhancer.com/de/">
     <link rel="alternate" hreflang="es" href="https://chatenhancer.com/es/">
+    <link rel="alternate" hreflang="fa" href="https://chatenhancer.com/fa/">
     <link rel="alternate" hreflang="fr" href="https://chatenhancer.com/fr/">
+    <link rel="alternate" hreflang="he" href="https://chatenhancer.com/he/">
     <link rel="alternate" hreflang="hi" href="https://chatenhancer.com/hi/">
     <link rel="alternate" hreflang="id" href="https://chatenhancer.com/id/">
     <link rel="alternate" hreflang="it" href="https://chatenhancer.com/it/">
     <link rel="alternate" hreflang="ja" href="https://chatenhancer.com/ja/">
     <link rel="alternate" hreflang="ko" href="https://chatenhancer.com/ko/">
+    <link rel="alternate" hreflang="nl" href="https://chatenhancer.com/nl/">
+    <link rel="alternate" hreflang="pl" href="https://chatenhancer.com/pl/">
     <link rel="alternate" hreflang="pt" href="https://chatenhancer.com/pt/">
     <link rel="alternate" hreflang="ru" href="https://chatenhancer.com/ru/">
+    <link rel="alternate" hreflang="th" href="https://chatenhancer.com/th/">
     <link rel="alternate" hreflang="tr" href="https://chatenhancer.com/tr/">
+    <link rel="alternate" hreflang="uk" href="https://chatenhancer.com/uk/">
+    <link rel="alternate" hreflang="vi" href="https://chatenhancer.com/vi/">
     <link rel="alternate" hreflang="zh-CN" href="https://chatenhancer.com/zh-CN/">
+    <link rel="alternate" hreflang="zh-TW" href="https://chatenhancer.com/zh-TW/">
     <link rel="alternate" hreflang="x-default" href="https://chatenhancer.com/">
     <link rel="icon" href="assets/icons/icon-128.png">
     <link rel="apple-touch-icon" href="assets/icons/icon-128.png">
@@ -117,16 +125,24 @@
             <option value="/ar/">العربية</option>
             <option value="/de/">Deutsch</option>
             <option value="/es/">Español</option>
+            <option value="/fa/">فارسی</option>
             <option value="/fr/">Français</option>
+            <option value="/he/">עברית</option>
             <option value="/hi/">हिन्दी</option>
             <option value="/id/">Bahasa Indonesia</option>
             <option value="/it/">Italiano</option>
             <option value="/ja/">日本語</option>
             <option value="/ko/">한국어</option>
+            <option value="/nl/">Nederlands</option>
+            <option value="/pl/">Polski</option>
             <option value="/pt/">Português</option>
             <option value="/ru/">Русский</option>
+            <option value="/th/">ไทย</option>
             <option value="/tr/">Türkçe</option>
+            <option value="/uk/">Українська</option>
+            <option value="/vi/">Tiếng Việt</option>
             <option value="/zh-CN/">中文（简体）</option>
+            <option value="/zh-TW/">中文（繁體）</option>
           </select>
         </label>
         <a class="button header-install" href="#install">
@@ -648,7 +664,7 @@
 
         if (languageSwitcher) {
           const path = window.location.pathname;
-          const localeMatch = path.match(/^\/(ar|de|es|fr|hi|id|it|ja|ko|pt|ru|tr|zh-CN)(?:\/|$)/);
+          const localeMatch = path.match(/^\/(ar|de|es|fa|fr|he|hi|id|it|ja|ko|nl|pl|pt|ru|th|tr|uk|vi|zh-CN|zh-TW)(?:\/|$)/);
           languageSwitcher.value = localeMatch ? `/${localeMatch[1]}/` : "/";
           languageSwitcher.addEventListener("change", () => {
             const locale = languageSwitcher.value === "/" ? "en" : languageSwitcher.value.replace(/^\/|\/$/g, "");
