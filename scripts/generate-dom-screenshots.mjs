@@ -185,6 +185,8 @@ async function capturePanel({ htmlPath, outputPath, panelId }) {
     }, sessionId);
 
     await writeFile(outputPath, Buffer.from(screenshot.data, 'base64'));
+  } catch (error) {
+    throw new Error(`Failed to capture ${path.relative(root, outputPath)}: ${error.message}`);
   } finally {
     await cdp.send('Target.closeTarget', { targetId }).catch(() => {});
   }
