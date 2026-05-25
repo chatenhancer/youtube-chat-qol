@@ -16,7 +16,7 @@
     <meta
       property="og:description"
       data-i18n-attr="content:meta.ogDescription"
-      content="Traduisez les messages, mentionnez et citez les utilisateurs, enregistrez les correspondances dans la boîte de réception, réutilisez les emojis et lancez des commandes rapides dans le chat en direct YouTube."
+      content="Traduisez des messages, mentionnez et citez des utilisateurs, enregistrez les correspondances de la boîte de réception, réutilisez des emojis et lancez des commandes rapides dans le chat en direct YouTube."
     >
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://chatenhancer.com/fr/">
@@ -30,7 +30,7 @@
     <meta
       property="og:image:alt"
       data-i18n-attr="content:meta.imageAlt"
-      content="Chat Enhancer for YouTube montrant des outils de traduction, boîte de réception et emojis intégrés naturellement au chat en direct."
+      content="Chat Enhancer for YouTube montrant des outils de traduction, de boîte de réception et d’emojis au style natif pour le chat en direct."
     >
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Chat Enhancer for YouTube">
@@ -43,7 +43,7 @@
     <meta
       name="twitter:image:alt"
       data-i18n-attr="content:meta.imageAlt"
-      content="Chat Enhancer for YouTube montrant des outils de traduction, boîte de réception et emojis intégrés naturellement au chat en direct."
+      content="Chat Enhancer for YouTube montrant des outils de traduction, de boîte de réception et d’emojis au style natif pour le chat en direct."
     >
     <link rel="alternate" hreflang="en" href="https://chatenhancer.com/">
     <link rel="alternate" hreflang="ar" href="https://chatenhancer.com/ar/">
@@ -63,7 +63,7 @@
     <link rel="icon" href="../assets/icons/icon-128.png">
     <link rel="apple-touch-icon" href="../assets/icons/icon-128.png">
     <link rel="preload" href="../assets/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="stylesheet" href="../styles.css?v=42">
+    <link rel="stylesheet" href="../styles.css?v=48">
     <script type="application/ld+json">
       {
               "@context": "https://schema.org",
@@ -205,7 +205,7 @@
                 </svg>
               </span>
               <h3 data-i18n="features.inboxTitle">Boîte de réception</h3>
-              <p data-i18n="features.inboxBody">Conservez localement les messages qui mentionnent votre identifiant ou correspondent à vos mots-clés, avec un son discret optionnel pour les nouveaux messages.</p>
+              <p data-i18n="features.inboxBody">Conservez localement une liste des messages qui mentionnent votre handle ou correspondent à vos mots-clés, avec un son discret facultatif pour les nouveaux messages de la boîte de réception.</p>
             </article>
             <article class="feature">
               <span class="feature-icon" data-symbol="mood" aria-hidden="true">
@@ -233,11 +233,118 @@
       <section class="section screenshots" id="screenshots" aria-labelledby="screenshots-title">
         <div class="section-inner screenshots-inner">
           <p class="eyebrow" data-i18n="screenshots.eyebrow">Captures</p>
-          <h2 id="screenshots-title" data-i18n="screenshots.title">Améliorations de chat au style natif</h2>
+          <h2 id="screenshots-title" data-i18n-html="screenshots.title">Améliorations du chat<br>au style natif</h2>
           <div class="screenshot-grid">
             <figure class="showcase-figure">
-              <img src="../assets/screenshots/feature-showcase.png" alt="Présentation des fonctionnalités de Chat Enhancer for YouTube avec traduction, boîte de réception, contexte de profil, emojis fréquents, commandes et réglages" data-i18n-attr="alt:screenshots.alt">
-              <figcaption data-i18n="screenshots.caption">Traduction, boîte de réception, contexte de profil, emojis fréquents et commandes rapides dans un flux de chat qui semble natif.</figcaption>
+              <div class="showcase-stack">
+                <article class="showcase-panel">
+                  <div class="showcase-copy showcase-copy-balanced">
+                    <div class="showcase-brand">
+                      <img src="../assets/logo.png" width="178" height="60" alt="Chat Enhancer for YouTube">
+                    </div>
+                    <h3 data-i18n="screenshots.translationTitle">Lire le chat en direct dans votre langue</h3>
+                    <p data-i18n="screenshots.translationBody">Les messages entrants sont automatiquement traduits avec Google Translate dans la langue de votre choix.</p>
+                    <p>
+                      <span data-i18n-html="screenshots.translationHighlightHtml">Les traductions automatiques sont signalées par un <span class="showcase-underline">soulignement discret</span> et une icône Google Translate</span>
+                      <span class="translate-mark translate-mark-inline" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" focusable="false">
+                          <path d="M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0014.07 6H17V4h-7V2H8v2H1v2h11.17a15.7 15.7 0 01-2.86 4.63A15.07 15.07 0 017.22 7H5.2a17.2 17.2 0 002.77 5.03l-5.09 5.02L4.3 18.47l5.01-5.01 3.11 3.11.45-1.5ZM18.5 10h-2L12 22h2l1.13-3h4.74L21 22h2l-4.5-12Zm-2.62 7l1.62-4.33L19.12 17h-3.24Z"></path>
+                        </svg>
+                      </span>
+                    </p>
+                    <p data-i18n="screenshots.translationModesIntro">Deux styles disponibles :</p>
+                    <div class="translation-mode-grid" aria-label="Modes d’affichage des traductions" data-i18n-attr="aria-label:screenshots.translationModesAria">
+                      <div class="translation-mode">
+                        <strong data-i18n="screenshots.replaceMode">REMPLACER LE MESSAGE</strong>
+                        <p>
+                          <img class="sample-avatar" src="../assets/avatar.png" width="22" height="22" alt="" aria-hidden="true">
+                          <span class="sample-muted">@猫爪软乎乎</span>
+                          <span class="showcase-underline" data-i18n="screenshots.replaceModeSample">Merci !</span>
+                          <span class="translate-mark" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" focusable="false">
+                              <path d="M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0014.07 6H17V4h-7V2H8v2H1v2h11.17a15.7 15.7 0 01-2.86 4.63A15.07 15.07 0 017.22 7H5.2a17.2 17.2 0 002.77 5.03l-5.09 5.02L4.3 18.47l5.01-5.01 3.11 3.11.45-1.5ZM18.5 10h-2L12 22h2l1.13-3h4.74L21 22h2l-4.5-12Zm-2.62 7l1.62-4.33L19.12 17h-3.24Z"></path>
+                            </svg>
+                          </span>
+                        </p>
+                      </div>
+                      <div class="translation-mode">
+                        <strong data-i18n="screenshots.belowMode">AFFICHER EN DESSOUS</strong>
+                        <p>
+                          <img class="sample-avatar" src="../assets/avatar.png" width="22" height="22" alt="" aria-hidden="true">
+                          <span class="sample-muted">@猫爪软乎乎</span>
+                          <span class="sample-original" data-i18n="screenshots.belowModeOriginalSample">谢谢！</span>
+                          <span class="translation-line" data-i18n="screenshots.belowModeSample">Traduit : Merci !</span>
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="showcase-media showcase-media-translation">
+                    <img src="../assets/screenshots/hero-img1.png" alt="Message traduit dans le chat en direct YouTube" data-i18n-attr="alt:screenshots.translationAlt">
+                  </div>
+                </article>
+
+                <article class="showcase-panel showcase-panel-reverse">
+                  <div class="showcase-media">
+                    <img src="../assets/screenshots/hero-img2.png" alt="Boîte de réception du chat en direct YouTube et menu d’actions des messages" data-i18n-attr="alt:screenshots.mentionAlt">
+                  </div>
+                  <div class="showcase-copy">
+                    <div class="showcase-brand">
+                      <img src="../assets/logo.png" width="178" height="60" alt="Chat Enhancer for YouTube">
+                    </div>
+                    <h3 data-i18n="screenshots.mentionTitle">Restez dans la conversation avec des @mentions et citations faciles</h3>
+                    <p data-i18n="screenshots.mentionIntro">Deux options disponibles :</p>
+                    <ul class="showcase-list">
+                      <li data-i18n-html="screenshots.mentionMenuHtml">Cliquez sur un message puis sur <strong>« Citer »</strong> ou <strong>« Mentionner »</strong>.</li>
+                      <li data-i18n-html="screenshots.mentionAuthorHtml">Cliquez sur un <strong>@pseudo</strong> pour mentionner quelqu’un. Alt/Option-clic sur un <strong>@pseudo</strong> pour le citer.</li>
+                    </ul>
+                    <p>
+                      <span data-i18n-html="screenshots.mentionInboxHtml"><strong>Ne manquez aucune mention :</strong> quand vous êtes mentionné dans le chat, le message est ajouté à votre <strong>boîte de réception</strong></span>
+                      <span class="inline-symbol showcase-inline-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" focusable="false">
+                          <path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2Zm0 12h-4a3 3 0 0 1-6 0H5V5h14v10Z"></path>
+                        </svg>
+                      </span>.
+                    </p>
+                    <p data-i18n="screenshots.mentionSound">Vous pouvez aussi activer un son pour les notifications.</p>
+                  </div>
+                </article>
+
+                <article class="showcase-panel">
+                  <div class="showcase-copy showcase-copy-balanced">
+                    <div class="showcase-brand">
+                      <img src="../assets/logo.png" width="178" height="60" alt="Chat Enhancer for YouTube">
+                    </div>
+                    <h3 data-i18n="screenshots.extrasTitle">Une foule d’améliorations de confort</h3>
+                    <ul class="showcase-list">
+                      <li data-i18n="screenshots.extrasAvatar">Cliquez sur l’avatar d’un utilisateur pour voir ses messages récents et ouvrir son profil YouTube dans une nouvelle fenêtre.</li>
+                      <li data-i18n="screenshots.extrasEmoji">Retrouvez vos emojis les plus utilisés en haut du sélecteur d’emojis.</li>
+                      <li data-i18n="screenshots.extrasCommands">Utilisez les commandes slash avec Tab pour des raccourcis utiles, notamment :</li>
+                    </ul>
+                    <dl class="showcase-command-list">
+                      <div>
+                        <dt data-i18n="screenshots.commandReply">/reply ou /mention :</dt>
+                        <dd data-i18n="screenshots.commandReplyBody">@ le dernier utilisateur qui vous a mentionné</dd>
+                      </div>
+                      <div>
+                        <dt data-i18n="screenshots.commandTime">/time &lt;place&gt; :</dt>
+                        <dd data-i18n="screenshots.commandTimeBody">l’heure actuelle pour ce lieu</dd>
+                      </div>
+                      <div>
+                        <dt data-i18n="screenshots.commandTimeUntil">/timeuntil &lt;time&gt; :</dt>
+                        <dd data-i18n="screenshots.commandTimeUntilBody">heures, minutes et secondes jusqu’à &lt;time&gt;</dd>
+                      </div>
+                      <div>
+                        <dt data-i18n="screenshots.commandHelp">/help :</dt>
+                        <dd data-i18n="screenshots.commandHelpBody">affiche toutes les commandes disponibles</dd>
+                      </div>
+                    </dl>
+                    <a class="feature-link showcase-command-link" href="#commands" data-i18n="screenshots.commandsFullLink">Voir la référence complète des commandes</a>
+                  </div>
+                  <div class="showcase-media showcase-media-extras">
+                    <img src="../assets/screenshots/hero-img3.png" alt="Carte de profil, commandes et rangée d’emojis fréquents du chat en direct YouTube" data-i18n-attr="alt:screenshots.extrasAlt">
+                  </div>
+                </article>
+              </div>
             </figure>
           </div>
         </div>
@@ -290,7 +397,7 @@
                   <path d="M324-111.5Q251-143 197-197t-85.5-127Q80-397 80-480t31.5-156Q143-709 197-763t127-85.5Q397-880 480-880t156 31.5Q709-817 763-763t85.5 127Q880-563 880-480t-31.5 156Q817-251 763-197t-127 85.5Q563-80 480-80t-156-31.5Zm40-70.5 48-110q-42-15-72.5-46.5T292-412l-110 46q23 64 71 112t111 72Zm-72-366q17-42 47.5-73.5T412-668l-46-110q-64 24-112 72t-72 112l110 46Zm273 153q35-35 35-85t-35-85q-35-35-85-35t-85 35q-35 35-35 85t35 85q35 35 85 35t85-35Zm31 213q63-24 110.5-71.5T778-364l-110-48q-15 42-46 72.5T550-292l46 110Zm72-368 110-46q-24-63-71.5-110.5T596-778l-46 112q41 15 71 45.5t47 70.5Z"></path>
                 </svg>
               </span>
-              <span data-i18n="install.supportFeedback">Assistance / Retours</span>
+              <span data-i18n="install.supportFeedback">Assistance</span>
             </a>
             <p class="install-contact">
               <span data-i18n="install.privateQuestions">Pour les questions privées, écrivez à</span>
@@ -326,7 +433,7 @@
                 <span class="install-quickstart-copy">
                   <strong data-i18n="install.stepRefreshTitle">Ouvrir ou actualiser le chat en direct YouTube</strong>
                   <span>
-                    <span data-i18n="install.stepRefreshBodyBeforeIcon">Actualisez les onglets déjà ouverts pour que l’extension puisse se connecter au cadre du chat en direct. Vous saurez qu’elle fonctionne quand l’icône de boîte de réception</span>
+                    <span data-i18n="install.stepRefreshBodyBeforeIcon">Actualisez les onglets déjà ouverts pour que l’extension puisse se connecter au cadre du chat en direct. Vous saurez qu’elle fonctionne lorsque l’icône de boîte de réception</span>
                     <span class="inline-symbol" data-symbol="inbox" aria-hidden="true">
                       <svg viewBox="0 0 24 24" focusable="false">
                         <path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2Zm0 12h-4a3 3 0 0 1-6 0H5V5h14v10Z"></path>
@@ -365,7 +472,7 @@
                 </span>
                 <span class="install-quickstart-copy">
                   <strong data-i18n="install.stepUseTitle">Utiliser les améliorations du chat</strong>
-                  <span data-i18n="install.stepUseBody">Les menus de messages, cartes d'avatar, bouton de boîte de réception, emojis fréquents et commandes avec Tab apparaissent et s'utilisent dans l'interface du chat YouTube.</span>
+                  <span data-i18n="install.stepUseBody">Les menus de messages, cartes d’avatar, bouton de boîte de réception, emojis fréquents et commandes Tab apparaissent et peuvent être utilisés dans l’interface de chat YouTube.</span>
                 </span>
               </li>
             </ol>
@@ -395,7 +502,7 @@
             </div>
             <div>
               <dt data-i18n="privacy.storageTitle">Stockage</dt>
-              <dd data-i18n="privacy.storageBody">Les réglages, messages de boîte de réception, mots-clés surveillés et compteurs d'emojis fréquents restent dans le stockage de l'extension du navigateur.</dd>
+              <dd data-i18n="privacy.storageBody">Les paramètres, messages de la boîte de réception, mots-clés surveillés et compteurs d’emojis fréquents restent dans le stockage de l’extension du navigateur.</dd>
             </div>
             <div>
               <dt data-i18n="privacy.translationTitle">Traduction</dt>
@@ -435,11 +542,11 @@
               <dl class="command-list">
                 <div>
                   <dt><code>/mention</code> or <code>/reply</code></dt>
-                  <dd data-i18n="commands.mentionDescription">Insère une mention de l'auteur du plus récent message de votre boîte de réception.</dd>
+                  <dd data-i18n="commands.mentionDescription">Insère une mention pour l’auteur du dernier message de votre boîte de réception.</dd>
                 </div>
                 <div>
                   <dt><code>/quote</code></dt>
-                  <dd data-i18n="commands.quoteDescription">Cite le plus récent message enregistré dans votre boîte de réception.</dd>
+                  <dd data-i18n="commands.quoteDescription">Cite le dernier message enregistré dans votre boîte de réception.</dd>
                 </div>
                 <div>
                   <dt><code>/again</code> or <code>/repeat</code></dt>

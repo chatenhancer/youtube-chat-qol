@@ -16,7 +16,7 @@
     <meta
       property="og:description"
       data-i18n-attr="content:meta.ogDescription"
-      content="Переводите сообщения, упоминайте и цитируйте пользователей, сохраняйте совпадения во входящие, повторно используйте эмодзи и запускайте быстрые команды в прямом чате YouTube."
+      content="Переводите сообщения, упоминайте и цитируйте пользователей, сохраняйте совпадения во входящих, повторно используйте эмодзи и запускайте быстрые команды в чате YouTube."
     >
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://chatenhancer.com/ru/">
@@ -30,7 +30,7 @@
     <meta
       property="og:image:alt"
       data-i18n-attr="content:meta.imageAlt"
-      content="Chat Enhancer for YouTube показывает нативно выглядящие инструменты перевода, входящих и эмодзи для прямого чата."
+      content="Chat Enhancer for YouTube показывает нативно выглядящие инструменты перевода, входящих и эмодзи для live-чата."
     >
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Chat Enhancer for YouTube">
@@ -43,7 +43,7 @@
     <meta
       name="twitter:image:alt"
       data-i18n-attr="content:meta.imageAlt"
-      content="Chat Enhancer for YouTube показывает нативно выглядящие инструменты перевода, входящих и эмодзи для прямого чата."
+      content="Chat Enhancer for YouTube показывает нативно выглядящие инструменты перевода, входящих и эмодзи для live-чата."
     >
     <link rel="alternate" hreflang="en" href="https://chatenhancer.com/">
     <link rel="alternate" hreflang="ar" href="https://chatenhancer.com/ar/">
@@ -63,7 +63,7 @@
     <link rel="icon" href="../assets/icons/icon-128.png">
     <link rel="apple-touch-icon" href="../assets/icons/icon-128.png">
     <link rel="preload" href="../assets/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="stylesheet" href="../styles.css?v=42">
+    <link rel="stylesheet" href="../styles.css?v=48">
     <script type="application/ld+json">
       {
               "@context": "https://schema.org",
@@ -205,7 +205,7 @@
                 </svg>
               </span>
               <h3 data-i18n="features.inboxTitle">Входящие</h3>
-              <p data-i18n="features.inboxBody">Храните локальный список сообщений, которые упоминают ваш handle или совпадают с вашими ключевыми словами, с необязательным тихим звуком для новых сообщений.</p>
+              <p data-i18n="features.inboxBody">Храните локальный список сообщений, где упомянут ваш handle или есть совпадения с ключевыми словами, с необязательным тихим звуком для новых входящих сообщений.</p>
             </article>
             <article class="feature">
               <span class="feature-icon" data-symbol="mood" aria-hidden="true">
@@ -233,11 +233,118 @@
       <section class="section screenshots" id="screenshots" aria-labelledby="screenshots-title">
         <div class="section-inner screenshots-inner">
           <p class="eyebrow" data-i18n="screenshots.eyebrow">Скриншоты</p>
-          <h2 id="screenshots-title" data-i18n="screenshots.title">Улучшения чата с нативным ощущением</h2>
+          <h2 id="screenshots-title" data-i18n-html="screenshots.title">Улучшения чата<br>в нативном стиле</h2>
           <div class="screenshot-grid">
             <figure class="showcase-figure">
-              <img src="../assets/screenshots/feature-showcase.png" alt="Демонстрация функций Chat Enhancer for YouTube с переводом, входящими, контекстом профиля, частыми эмодзи, командами и настройками" data-i18n-attr="alt:screenshots.alt">
-              <figcaption data-i18n="screenshots.caption">Перевод, входящие, контекст профиля, частые эмодзи и быстрые команды в едином нативно выглядящем потоке чата.</figcaption>
+              <div class="showcase-stack">
+                <article class="showcase-panel">
+                  <div class="showcase-copy showcase-copy-balanced">
+                    <div class="showcase-brand">
+                      <img src="../assets/logo.png" width="178" height="60" alt="Chat Enhancer for YouTube">
+                    </div>
+                    <h3 data-i18n="screenshots.translationTitle">Читайте live chat на своем языке</h3>
+                    <p data-i18n="screenshots.translationBody">Входящие сообщения автоматически переводятся через Google Translate на выбранный вами язык.</p>
+                    <p>
+                      <span data-i18n-html="screenshots.translationHighlightHtml">Автоматические переводы отмечаются <span class="showcase-underline">тонким подчеркиванием</span> и значком Google Translate</span>
+                      <span class="translate-mark translate-mark-inline" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" focusable="false">
+                          <path d="M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0014.07 6H17V4h-7V2H8v2H1v2h11.17a15.7 15.7 0 01-2.86 4.63A15.07 15.07 0 017.22 7H5.2a17.2 17.2 0 002.77 5.03l-5.09 5.02L4.3 18.47l5.01-5.01 3.11 3.11.45-1.5ZM18.5 10h-2L12 22h2l1.13-3h4.74L21 22h2l-4.5-12Zm-2.62 7l1.62-4.33L19.12 17h-3.24Z"></path>
+                        </svg>
+                      </span>
+                    </p>
+                    <p data-i18n="screenshots.translationModesIntro">Доступны два стиля:</p>
+                    <div class="translation-mode-grid" aria-label="Режимы отображения перевода" data-i18n-attr="aria-label:screenshots.translationModesAria">
+                      <div class="translation-mode">
+                        <strong data-i18n="screenshots.replaceMode">ЗАМЕНИТЬ СООБЩЕНИЕ</strong>
+                        <p>
+                          <img class="sample-avatar" src="../assets/avatar.png" width="22" height="22" alt="" aria-hidden="true">
+                          <span class="sample-muted">@猫爪软乎乎</span>
+                          <span class="showcase-underline" data-i18n="screenshots.replaceModeSample">Спасибо!</span>
+                          <span class="translate-mark" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" focusable="false">
+                              <path d="M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0014.07 6H17V4h-7V2H8v2H1v2h11.17a15.7 15.7 0 01-2.86 4.63A15.07 15.07 0 017.22 7H5.2a17.2 17.2 0 002.77 5.03l-5.09 5.02L4.3 18.47l5.01-5.01 3.11 3.11.45-1.5ZM18.5 10h-2L12 22h2l1.13-3h4.74L21 22h2l-4.5-12Zm-2.62 7l1.62-4.33L19.12 17h-3.24Z"></path>
+                            </svg>
+                          </span>
+                        </p>
+                      </div>
+                      <div class="translation-mode">
+                        <strong data-i18n="screenshots.belowMode">ПОКАЗАТЬ НИЖЕ</strong>
+                        <p>
+                          <img class="sample-avatar" src="../assets/avatar.png" width="22" height="22" alt="" aria-hidden="true">
+                          <span class="sample-muted">@猫爪软乎乎</span>
+                          <span class="sample-original" data-i18n="screenshots.belowModeOriginalSample">谢谢！</span>
+                          <span class="translation-line" data-i18n="screenshots.belowModeSample">Переведено: Спасибо!</span>
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="showcase-media showcase-media-translation">
+                    <img src="../assets/screenshots/hero-img1.png" alt="Переведенное сообщение в live chat YouTube" data-i18n-attr="alt:screenshots.translationAlt">
+                  </div>
+                </article>
+
+                <article class="showcase-panel showcase-panel-reverse">
+                  <div class="showcase-media">
+                    <img src="../assets/screenshots/hero-img2.png" alt="Входящие live-чата YouTube и меню действий с сообщением" data-i18n-attr="alt:screenshots.mentionAlt">
+                  </div>
+                  <div class="showcase-copy">
+                    <div class="showcase-brand">
+                      <img src="../assets/logo.png" width="178" height="60" alt="Chat Enhancer for YouTube">
+                    </div>
+                    <h3 data-i18n="screenshots.mentionTitle">Оставайтесь в разговоре с удобными @упоминаниями и цитатами</h3>
+                    <p data-i18n="screenshots.mentionIntro">Доступны два варианта:</p>
+                    <ul class="showcase-list">
+                      <li data-i18n-html="screenshots.mentionMenuHtml">Нажмите сообщение и выберите <strong>«Цитировать»</strong> или <strong>«Упомянуть»</strong>.</li>
+                      <li data-i18n-html="screenshots.mentionAuthorHtml">Нажмите <strong>@username</strong>, чтобы упомянуть пользователя. Alt/Option-клик по <strong>@username</strong>, чтобы процитировать его.</li>
+                    </ul>
+                    <p>
+                      <span data-i18n-html="screenshots.mentionInboxHtml"><strong>Не пропускайте упоминания:</strong> когда вас упоминают в чате, сообщение добавляется во <strong>Входящие</strong></span>
+                      <span class="inline-symbol showcase-inline-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" focusable="false">
+                          <path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2Zm0 12h-4a3 3 0 0 1-6 0H5V5h14v10Z"></path>
+                        </svg>
+                      </span>.
+                    </p>
+                    <p data-i18n="screenshots.mentionSound">Также можно включить звук для уведомлений.</p>
+                  </div>
+                </article>
+
+                <article class="showcase-panel">
+                  <div class="showcase-copy showcase-copy-balanced">
+                    <div class="showcase-brand">
+                      <img src="../assets/logo.png" width="178" height="60" alt="Chat Enhancer for YouTube">
+                    </div>
+                    <h3 data-i18n="screenshots.extrasTitle">Множество улучшений удобства</h3>
+                    <ul class="showcase-list">
+                      <li data-i18n="screenshots.extrasAvatar">Нажмите аватар пользователя, чтобы увидеть его недавние сообщения и открыть профиль YouTube в новом окне.</li>
+                      <li data-i18n="screenshots.extrasEmoji">Находите самые используемые эмодзи вверху панели выбора эмодзи.</li>
+                      <li data-i18n="screenshots.extrasCommands">Используйте slash-команды с Tab для полезных быстрых действий, включая:</li>
+                    </ul>
+                    <dl class="showcase-command-list">
+                      <div>
+                        <dt data-i18n="screenshots.commandReply">/reply или /mention:</dt>
+                        <dd data-i18n="screenshots.commandReplyBody">@ последний пользователь, который @ вас</dd>
+                      </div>
+                      <div>
+                        <dt data-i18n="screenshots.commandTime">/time &lt;place&gt;:</dt>
+                        <dd data-i18n="screenshots.commandTimeBody">текущее время для места</dd>
+                      </div>
+                      <div>
+                        <dt data-i18n="screenshots.commandTimeUntil">/timeuntil &lt;time&gt;:</dt>
+                        <dd data-i18n="screenshots.commandTimeUntilBody">часы, минуты и секунды до &lt;time&gt;</dd>
+                      </div>
+                      <div>
+                        <dt data-i18n="screenshots.commandHelp">/help:</dt>
+                        <dd data-i18n="screenshots.commandHelpBody">показывает все доступные команды</dd>
+                      </div>
+                    </dl>
+                    <a class="feature-link showcase-command-link" href="#commands" data-i18n="screenshots.commandsFullLink">Открыть полный справочник команд</a>
+                  </div>
+                  <div class="showcase-media showcase-media-extras">
+                    <img src="../assets/screenshots/hero-img3.png" alt="Карточка профиля live chat YouTube, команды и ряд частых эмодзи" data-i18n-attr="alt:screenshots.extrasAlt">
+                  </div>
+                </article>
+              </div>
             </figure>
           </div>
         </div>
@@ -290,7 +397,7 @@
                   <path d="M324-111.5Q251-143 197-197t-85.5-127Q80-397 80-480t31.5-156Q143-709 197-763t127-85.5Q397-880 480-880t156 31.5Q709-817 763-763t85.5 127Q880-563 880-480t-31.5 156Q817-251 763-197t-127 85.5Q563-80 480-80t-156-31.5Zm40-70.5 48-110q-42-15-72.5-46.5T292-412l-110 46q23 64 71 112t111 72Zm-72-366q17-42 47.5-73.5T412-668l-46-110q-64 24-112 72t-72 112l110 46Zm273 153q35-35 35-85t-35-85q-35-35-85-35t-85 35q-35 35-35 85t35 85q35 35 85 35t85-35Zm31 213q63-24 110.5-71.5T778-364l-110-48q-15 42-46 72.5T550-292l46 110Zm72-368 110-46q-24-63-71.5-110.5T596-778l-46 112q41 15 71 45.5t47 70.5Z"></path>
                 </svg>
               </span>
-              <span data-i18n="install.supportFeedback">Поддержка / обратная связь</span>
+              <span data-i18n="install.supportFeedback">Поддержка</span>
             </a>
             <p class="install-contact">
               <span data-i18n="install.privateQuestions">Для личных вопросов пишите на</span>
@@ -326,7 +433,7 @@
                 <span class="install-quickstart-copy">
                   <strong data-i18n="install.stepRefreshTitle">Откройте или обновите прямой чат YouTube</strong>
                   <span>
-                    <span data-i18n="install.stepRefreshBodyBeforeIcon">Обновите уже открытые вкладки, чтобы расширение могло подключиться к фрейму live chat. Вы поймете, что оно работает, когда значок входящих</span>
+                    <span data-i18n="install.stepRefreshBodyBeforeIcon">Обновите уже открытые вкладки, чтобы расширение подключилось к фрейму live-чата. Оно работает, когда значок входящих</span>
                     <span class="inline-symbol" data-symbol="inbox" aria-hidden="true">
                       <svg viewBox="0 0 24 24" focusable="false">
                         <path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2Zm0 12h-4a3 3 0 0 1-6 0H5V5h14v10Z"></path>
@@ -365,7 +472,7 @@
                 </span>
                 <span class="install-quickstart-copy">
                   <strong data-i18n="install.stepUseTitle">Используйте улучшения чата</strong>
-                  <span data-i18n="install.stepUseBody">Меню сообщений, карточки аватаров, кнопка входящих, частые эмодзи и команды Tab появляются и используются прямо в интерфейсе чата YouTube.</span>
+                  <span data-i18n="install.stepUseBody">Меню сообщений, карточки аватаров, кнопка входящих, частые эмодзи и команды Tab появляются и работают внутри интерфейса чата YouTube.</span>
                 </span>
               </li>
             </ol>
@@ -435,7 +542,7 @@
               <dl class="command-list">
                 <div>
                   <dt><code>/mention</code> or <code>/reply</code></dt>
-                  <dd data-i18n="commands.mentionDescription">Вставляет упоминание автора вашего новейшего сообщения во входящих.</dd>
+                  <dd data-i18n="commands.mentionDescription">Вставляет упоминание автора новейшего сообщения во входящих.</dd>
                 </div>
                 <div>
                   <dt><code>/quote</code></dt>
