@@ -847,6 +847,11 @@ kbd {
   justify-self: start;
 }
 
+.showcase-media-inbox-context {
+  justify-self: center;
+  width: min(560px, calc(100vw - 40px));
+}
+
 .showcase-media img {
   width: 100%;
   border: 0;
@@ -895,6 +900,86 @@ kbd {
 
 .showcase-command-link {
   margin-left: 34px;
+}
+
+html[data-screenshot-panel] {
+  width: 1542px;
+  height: 852px;
+  overflow: hidden;
+  background: #fff;
+}
+
+html[data-screenshot-panel] body {
+  width: 1542px;
+  min-width: 1542px;
+  height: 852px;
+  margin: 0;
+  overflow: hidden;
+  background: #fff;
+}
+
+html[data-screenshot-panel] .site-header,
+html[data-screenshot-panel] .site-footer,
+html[data-screenshot-panel] main > section:not(#screenshots),
+html[data-screenshot-panel] .screenshots-inner > .eyebrow,
+html[data-screenshot-panel] .screenshots-inner > h2 {
+  display: none !important;
+}
+
+html[data-screenshot-panel] main,
+html[data-screenshot-panel] .screenshots,
+html[data-screenshot-panel] .screenshots-inner,
+html[data-screenshot-panel] .screenshot-grid,
+html[data-screenshot-panel] .showcase-figure,
+html[data-screenshot-panel] .showcase-stack {
+  display: block;
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+html[data-screenshot-panel] .showcase-stack {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+html[data-screenshot-panel] .showcase-panel {
+  display: none;
+  width: 1060px;
+  gap: 38px;
+  justify-content: center;
+  transform: scale(1.32);
+  transform-origin: center;
+}
+
+html[data-screenshot-panel="translation"] [data-screenshot-panel="translation"],
+html[data-screenshot-panel="inbox-context"] [data-screenshot-panel="inbox-context"],
+html[data-screenshot-panel="extras"] [data-screenshot-panel="extras"] {
+  display: grid;
+}
+
+html[data-screenshot-panel] [data-screenshot-panel="translation"],
+html[data-screenshot-panel] [data-screenshot-panel="extras"] {
+  grid-template-columns: minmax(0, 500px) minmax(0, 372px);
+}
+
+html[data-screenshot-panel] [data-screenshot-panel="inbox-context"] {
+  grid-template-columns: minmax(0, 552px) minmax(0, 490px);
+}
+
+html[data-screenshot-panel] .showcase-copy {
+  max-width: 500px;
+}
+
+html[data-screenshot-panel] [data-screenshot-panel="inbox-context"] .showcase-copy {
+  max-width: 490px;
+}
+
+html[data-screenshot-panel] .showcase-media-inbox-context {
+  width: 552px;
 }
 
 figure {
