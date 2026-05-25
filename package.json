@@ -10,7 +10,7 @@
     "build:firefox": "npm run generate && node scripts/build.mjs --target=firefox",
     "build:extensions": "node scripts/build.mjs --all",
     "build:all": "npm run build",
-    "generate": "npm run icons && npm run screenshots",
+    "generate": "npm run icons && npm run docs:build",
     "icons": "node scripts/generate-icons.mjs",
     "screenshots": "npm run docs:build && node scripts/generate-dom-screenshots.mjs",
     "screenshots:dom": "npm run screenshots",

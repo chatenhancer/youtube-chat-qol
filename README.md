@@ -89,7 +89,8 @@ npm run build:firefox
 - `npm run typecheck` checks TypeScript.
 - `npm run lint` runs ESLint.
 - `npm run check` runs typecheck and lint.
-- `npm run generate` refreshes generated repo assets: icons, screenshots, localized docs, and the sitemap.
+- `npm run generate` refreshes generated repo assets: icons, localized docs, and the sitemap.
+- `npm run screenshots` regenerates README/site showcase images and localized store screenshots when needed.
 - `npm run build` runs `generate`, then writes Chrome, Edge, and Firefox unpacked extension folders.
 - `npm run build:chrome`, `npm run build:edge`, and `npm run build:firefox` run `generate`, then write one browser's unpacked extension folder.
 - `npm run verify` runs `check` and the full repo build.
