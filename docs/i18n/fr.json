@@ -76,7 +76,8 @@
     "extrasAlt": "Carte de profil, commandes et rangée d’emojis fréquents du chat en direct YouTube",
     "replaceModeSample": "Merci !",
     "belowModeOriginalSample": "谢谢！",
-    "commandsFullLink": "Voir la référence complète des commandes sur chatenhancer.com"
+    "commandsFullLink": "Voir la référence complète des commandes",
+    "commandsFullLinkScreenshot": "Voir la référence complète des commandes sur chatenhancer.com"
   },
   "install": {
     "eyebrow": "Ajouter l'extension",

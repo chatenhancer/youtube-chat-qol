@@ -902,6 +902,10 @@ kbd {
   margin-left: 34px;
 }
 
+.showcase-command-link-screenshot {
+  display: none;
+}
+
 html[data-screenshot-panel] {
   width: 1542px;
   height: 852px;
@@ -980,6 +984,14 @@ html[data-screenshot-panel] [data-screenshot-panel="inbox-context"] .showcase-co
 
 html[data-screenshot-panel] .showcase-media-inbox-context {
   width: 552px;
+}
+
+html[data-screenshot-panel] .showcase-command-link-default {
+  display: none;
+}
+
+html[data-screenshot-panel] .showcase-command-link-screenshot {
+  display: inline;
 }
 
 figure {

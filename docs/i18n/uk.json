@@ -76,7 +76,8 @@
     "extrasAlt": "Картка профілю, команди й ряд частих емодзі в живому чаті YouTube",
     "replaceModeSample": "Дякую!",
     "belowModeOriginalSample": "谢谢！",
-    "commandsFullLink": "Відкрити повний довідник команд на chatenhancer.com"
+    "commandsFullLink": "Відкрити повний довідник команд",
+    "commandsFullLinkScreenshot": "Відкрити повний довідник команд на chatenhancer.com"
   },
   "install": {
     "eyebrow": "Додайте розширення",
