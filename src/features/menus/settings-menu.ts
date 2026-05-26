@@ -8,6 +8,7 @@
 import { getTargetLanguageUpdate, getTranslationToggleTarget, type Options } from '../../shared/options';
 import { getOptions } from '../../shared/state';
 import { t } from '../../shared/i18n';
+import { playSoftChime } from '../../shared/sounds/soft-chime';
 import { clampMenuToViewport, createMenuToggleItem } from './common';
 
 type SaveOptions = (values: Partial<Options>) => void;
@@ -50,7 +51,10 @@ export function enhanceSettingsMenu(menu: HTMLElement): void {
     iconPath: getSoundIconPath(options.sound),
     onClick: () => {
       const enabled = !getOptions().sound;
-      if (enabled && soundItem) animateSoundMenuIcon(soundItem);
+      if (enabled && soundItem) {
+        animateSoundMenuIcon(soundItem);
+        playSoftChime();
+      }
       saveOptions({ sound: enabled });
     }
   });
