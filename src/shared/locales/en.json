@@ -111,7 +111,7 @@
       "message": "Support and feedback"
     },
     "supportGithubIssuesPrompt": {
-      "message": "GitHub Issues is public and works best for bug reports, YouTube chat breakages, and feature requests.\n\nInclude what happened, what you expected, your browser, and the livestream URL, screenshot, or console error when relevant.\n\nA GitHub account may be required.\n\nContinue to GitHub Issues?"
+      "message": "GitHub Issues is the public tracker we use for bug reports and feature requests. A GitHub account may be required.\n\nYou can also email us at chatenhanceryt@gmail.com.\n\nContinue to GitHub Issues?"
     },
     "resetAllExtensionData": {
       "message": "Reset all extension settings and local data"

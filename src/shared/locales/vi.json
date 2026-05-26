@@ -108,7 +108,7 @@
       "message": "Hỗ trợ và góp ý"
     },
     "supportGithubIssuesPrompt": {
-      "message": "GitHub Issues là công khai và phù hợp nhất để báo lỗi, sự cố chat YouTube và yêu cầu tính năng.\n\nHãy mô tả điều đã xảy ra, điều bạn mong đợi, trình duyệt của bạn và URL livestream, ảnh chụp màn hình hoặc lỗi console khi liên quan.\n\nCó thể cần tài khoản GitHub.\n\nTiếp tục đến GitHub Issues?"
+      "message": "GitHub Issues là trình theo dõi công khai mà chúng tôi dùng cho báo lỗi và yêu cầu tính năng. Có thể cần tài khoản GitHub.\n\nBạn cũng có thể email cho chúng tôi tại chatenhanceryt@gmail.com.\n\nTiếp tục đến GitHub Issues?"
     },
     "resetAllExtensionData": {
       "message": "Đặt lại mọi cài đặt tiện ích và dữ liệu cục bộ"

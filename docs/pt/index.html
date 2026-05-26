@@ -171,7 +171,7 @@
       hidden
       data-store-version-alert
       data-i18n-attr="data-alert-body:install.updatePendingBody;data-alert-and:install.updatePendingAnd;data-alert-chrome:install.chromeStore;data-alert-firefox:install.firefoxAddons"
-      data-alert-body="{stores} receberão a versão mais recente em breve."
+      data-alert-body="{stores} receberão a versão mais recente em breve"
       data-alert-and="e"
       data-alert-chrome="Chrome Web Store"
       data-alert-firefox="Firefox Add-ons"
@@ -464,8 +464,8 @@
               <span data-i18n="install.supportFeedback">Suporte</span>
             </a>
             <p class="install-contact">
-              <span data-i18n="install.privateQuestions">Para perguntas privadas, envie email para</span>
-              <a href="mailto:chatenhanceryt@gmail.com">chatenhanceryt@gmail.com</a>.
+              <span data-i18n="install.privateQuestions">Você também pode enviar email para</span>
+              <a href="mailto:chatenhanceryt@gmail.com">chatenhanceryt@gmail.com</a>
             </p>
           </div>
           <div class="install-quickstart" aria-labelledby="install-quickstart-title">
@@ -665,11 +665,12 @@
         <div class="support-modal-heading">
           <h2 id="support-modal-title" data-i18n="install.supportModalTitle">Sobre o GitHub Issues</h2>
         </div>
-        <p data-i18n="install.supportModalBody">O GitHub Issues é público e funciona melhor para relatórios de bugs, problemas no chat do YouTube e pedidos de recursos. Uma conta do GitHub pode ser necessária.</p>
+        <p data-i18n="install.supportModalBody">O GitHub Issues é o rastreador público que usamos para relatórios de bugs e pedidos de recursos.</p>
         <ul class="support-modal-list">
-          <li data-i18n="install.supportModalDetailOne">Inclua o que aconteceu, o que você esperava e o navegador usado.</li>
-          <li data-i18n="install.supportModalDetailTwo">Para problemas no chat do YouTube, inclua a URL da transmissão e, se possível, uma captura de tela ou erro do console.</li>
-          <li data-i18n="install.supportModalDetailThree">Para perguntas privadas, use o e-mail.</li>
+          <li data-i18n="install.supportModalDetailOne">Publicar ou comentar no GitHub pode exigir uma conta do GitHub.</li>
+          <li data-i18n="install.supportModalDetailTwo">Clique no botão New issue no GitHub para iniciar um relatório ou pedido.</li>
+          <li data-i18n="install.supportModalDetailThree">Os formulários de issues pedirão os detalhes necessários para cada tipo de relatório.</li>
+          <li data-i18n-html="install.supportModalDetailFour">Você também pode enviar email para <a href="mailto:chatenhanceryt@gmail.com">chatenhanceryt@gmail.com</a>.</li>
         </ul>
         <div class="support-modal-actions">
           <button class="button button-link" type="button" data-support-modal-close data-i18n="install.supportModalCancel">Cancelar</button>
@@ -764,7 +765,7 @@
 
           const stores = pendingStores.map(([key]) => alert.dataset[`alert${capitalize(key)}`]);
           const storeList = formatStoreList(stores, alert.dataset.alertAnd || "and");
-          const bodyTemplate = alert.dataset.alertBody || "{stores} will get the latest version soon.";
+          const bodyTemplate = alert.dataset.alertBody || "{stores} will get the latest version soon";
 
           message.textContent = bodyTemplate.replace("{stores}", storeList);
           alert.hidden = false;

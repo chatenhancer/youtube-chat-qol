@@ -171,7 +171,7 @@
       hidden
       data-store-version-alert
       data-i18n-attr="data-alert-body:install.updatePendingBody;data-alert-and:install.updatePendingAnd;data-alert-chrome:install.chromeStore;data-alert-firefox:install.firefoxAddons"
-      data-alert-body="{stores} yakında en son sürümü alacak."
+      data-alert-body="{stores} yakında en son sürümü alacak"
       data-alert-and="ve"
       data-alert-chrome="Chrome Web Store"
       data-alert-firefox="Firefox Add-ons"
@@ -464,8 +464,8 @@
               <span data-i18n="install.supportFeedback">Destek</span>
             </a>
             <p class="install-contact">
-              <span data-i18n="install.privateQuestions">Özel sorular için e-posta gönderin:</span>
-              <a href="mailto:chatenhanceryt@gmail.com">chatenhanceryt@gmail.com</a>.
+              <span data-i18n="install.privateQuestions">Bize şu adresten de e-posta gönderebilirsin:</span>
+              <a href="mailto:chatenhanceryt@gmail.com">chatenhanceryt@gmail.com</a>
             </p>
           </div>
           <div class="install-quickstart" aria-labelledby="install-quickstart-title">
@@ -665,11 +665,12 @@
         <div class="support-modal-heading">
           <h2 id="support-modal-title" data-i18n="install.supportModalTitle">GitHub Issues hakkında</h2>
         </div>
-        <p data-i18n="install.supportModalBody">GitHub Issues herkese açıktır ve en çok hata bildirimleri, YouTube sohbet sorunları ve özellik istekleri için uygundur. GitHub hesabı gerekebilir.</p>
+        <p data-i18n="install.supportModalBody">GitHub Issues, hata bildirimleri ve özellik istekleri için kullandığımız herkese açık izleyicidir.</p>
         <ul class="support-modal-list">
-          <li data-i18n="install.supportModalDetailOne">Ne olduğunu, ne beklediğini ve kullandığın tarayıcıyı ekle.</li>
-          <li data-i18n="install.supportModalDetailTwo">YouTube sohbet sorunları için mümkünse canlı yayın URL’sini, ekran görüntüsünü veya konsol hatasını ekle.</li>
-          <li data-i18n="install.supportModalDetailThree">Özel sorular için e-posta kullan.</li>
+          <li data-i18n="install.supportModalDetailOne">GitHub’da paylaşım yapmak veya yorum yazmak GitHub hesabı gerektirebilir.</li>
+          <li data-i18n="install.supportModalDetailTwo">Bir bildirim veya istek başlatmak için GitHub’daki New issue düğmesine tıkla.</li>
+          <li data-i18n="install.supportModalDetailThree">Issue formları, her bildirim türü için gereken ayrıntıları sorar.</li>
+          <li data-i18n-html="install.supportModalDetailFour">Bize şu adresten de e-posta gönderebilirsin: <a href="mailto:chatenhanceryt@gmail.com">chatenhanceryt@gmail.com</a>.</li>
         </ul>
         <div class="support-modal-actions">
           <button class="button button-link" type="button" data-support-modal-close data-i18n="install.supportModalCancel">İptal</button>
@@ -764,7 +765,7 @@
 
           const stores = pendingStores.map(([key]) => alert.dataset[`alert${capitalize(key)}`]);
           const storeList = formatStoreList(stores, alert.dataset.alertAnd || "and");
-          const bodyTemplate = alert.dataset.alertBody || "{stores} will get the latest version soon.";
+          const bodyTemplate = alert.dataset.alertBody || "{stores} will get the latest version soon";
 
           message.textContent = bodyTemplate.replace("{stores}", storeList);
           alert.hidden = false;

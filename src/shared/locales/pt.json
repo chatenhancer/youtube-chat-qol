@@ -111,7 +111,7 @@
       "message": "Suporte e feedback"
     },
     "supportGithubIssuesPrompt": {
-      "message": "O GitHub Issues é público e funciona melhor para relatórios de bugs, problemas no chat do YouTube e pedidos de recursos.\n\nInclua o que aconteceu, o que você esperava, seu navegador e, quando relevante, a URL da transmissão, uma captura de tela ou erro do console.\n\nUma conta do GitHub pode ser necessária.\n\nContinuar para GitHub Issues?"
+      "message": "O GitHub Issues é o rastreador público que usamos para relatórios de bugs e pedidos de recursos. Uma conta do GitHub pode ser necessária.\n\nVocê também pode enviar email para chatenhanceryt@gmail.com.\n\nContinuar para GitHub Issues?"
     },
     "resetAllExtensionData": {
       "message": "Redefinir todas as configurações e dados locais da extensão"

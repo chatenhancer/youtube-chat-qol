@@ -171,7 +171,7 @@
       hidden
       data-store-version-alert
       data-i18n-attr="data-alert-body:install.updatePendingBody;data-alert-and:install.updatePendingAnd;data-alert-chrome:install.chromeStore;data-alert-firefox:install.firefoxAddons"
-      data-alert-body="{stores} 很快会获得最新版本。"
+      data-alert-body="{stores} 很快会获得最新版本"
       data-alert-and="和"
       data-alert-chrome="Chrome Web Store"
       data-alert-firefox="Firefox Add-ons"
@@ -464,8 +464,8 @@
               <span data-i18n="install.supportFeedback">支持</span>
             </a>
             <p class="install-contact">
-              <span data-i18n="install.privateQuestions">如有私人问题，请发送邮件至</span>
-              <a href="mailto:chatenhanceryt@gmail.com">chatenhanceryt@gmail.com</a>.
+              <span data-i18n="install.privateQuestions">你也可以发送邮件至</span>
+              <a href="mailto:chatenhanceryt@gmail.com">chatenhanceryt@gmail.com</a>
             </p>
           </div>
           <div class="install-quickstart" aria-labelledby="install-quickstart-title">
@@ -665,11 +665,12 @@
         <div class="support-modal-heading">
           <h2 id="support-modal-title" data-i18n="install.supportModalTitle">关于 GitHub Issues</h2>
         </div>
-        <p data-i18n="install.supportModalBody">GitHub Issues 是公开的，最适合报告错误、YouTube 聊天问题和功能请求。可能需要 GitHub 账户。</p>
+        <p data-i18n="install.supportModalBody">GitHub Issues 是我们用于报告错误和功能请求的公开跟踪器。</p>
         <ul class="support-modal-list">
-          <li data-i18n="install.supportModalDetailOne">请说明发生了什么、你期望的结果以及正在使用的浏览器。</li>
-          <li data-i18n="install.supportModalDetailTwo">如果是 YouTube 聊天问题，请尽可能附上直播 URL、截图或控制台错误。</li>
-          <li data-i18n="install.supportModalDetailThree">私人问题请改用电子邮件。</li>
+          <li data-i18n="install.supportModalDetailOne">在 GitHub 上发布或评论可能需要 GitHub 账户。</li>
+          <li data-i18n="install.supportModalDetailTwo">在 GitHub 上点击 New issue 按钮，开始提交报告或请求。</li>
+          <li data-i18n="install.supportModalDetailThree">Issue 表单会根据报告类型询问所需信息。</li>
+          <li data-i18n-html="install.supportModalDetailFour">你也可以发送邮件至 <a href="mailto:chatenhanceryt@gmail.com">chatenhanceryt@gmail.com</a>。</li>
         </ul>
         <div class="support-modal-actions">
           <button class="button button-link" type="button" data-support-modal-close data-i18n="install.supportModalCancel">取消</button>
@@ -764,7 +765,7 @@
 
           const stores = pendingStores.map(([key]) => alert.dataset[`alert${capitalize(key)}`]);
           const storeList = formatStoreList(stores, alert.dataset.alertAnd || "and");
-          const bodyTemplate = alert.dataset.alertBody || "{stores} will get the latest version soon.";
+          const bodyTemplate = alert.dataset.alertBody || "{stores} will get the latest version soon";
 
           message.textContent = bodyTemplate.replace("{stores}", storeList);
           alert.hidden = false;

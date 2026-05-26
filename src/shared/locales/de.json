@@ -108,7 +108,7 @@
       "message": "Support und Feedback"
     },
     "supportGithubIssuesPrompt": {
-      "message": "GitHub Issues ist öffentlich und eignet sich am besten für Fehlerberichte, YouTube-Chat-Probleme und Funktionswünsche.\n\nBeschreibe, was passiert ist, was erwartet wurde, den Browser und bei Bedarf die Livestream-URL, einen Screenshot oder Konsolenfehler.\n\nEin GitHub-Konto kann erforderlich sein.\n\nZu GitHub Issues fortfahren?"
+      "message": "GitHub Issues ist der öffentliche Tracker, den wir für Fehlerberichte und Funktionswünsche verwenden. Ein GitHub-Konto kann erforderlich sein.\n\nDu kannst uns auch per E-Mail erreichen unter chatenhanceryt@gmail.com.\n\nZu GitHub Issues fortfahren?"
     },
     "resetAllExtensionData": {
       "message": "Alle Erweiterungseinstellungen und lokalen Daten zurücksetzen"

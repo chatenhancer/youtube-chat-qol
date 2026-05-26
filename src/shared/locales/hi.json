@@ -111,7 +111,7 @@
       "message": "सपोर्ट और फ़ीडबैक"
     },
     "supportGithubIssuesPrompt": {
-      "message": "GitHub Issues सार्वजनिक है और बग रिपोर्ट, YouTube चैट समस्याओं और फीचर अनुरोधों के लिए सबसे अच्छा है।\n\nक्या हुआ, आप क्या उम्मीद कर रहे थे, आपका ब्राउज़र, और ज़रूरत होने पर livestream URL, screenshot या console error शामिल करें।\n\nGitHub खाता आवश्यक हो सकता है।\n\nGitHub Issues पर जाएँ?"
+      "message": "GitHub Issues वह सार्वजनिक tracker है जिसका उपयोग हम bug reports और feature requests के लिए करते हैं। GitHub खाते की ज़रूरत हो सकती है।\n\nआप हमें chatenhanceryt@gmail.com पर ईमेल भी कर सकते हैं।\n\nGitHub Issues पर जाएँ?"
     },
     "resetAllExtensionData": {
       "message": "सभी एक्सटेंशन सेटिंग और लोकल डेटा रीसेट करें"

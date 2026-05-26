@@ -171,7 +171,7 @@
       hidden
       data-store-version-alert
       data-i18n-attr="data-alert-body:install.updatePendingBody;data-alert-and:install.updatePendingAnd;data-alert-chrome:install.chromeStore;data-alert-firefox:install.firefoxAddons"
-      data-alert-body="{stores} recevront bientôt la dernière version."
+      data-alert-body="{stores} recevront bientôt la dernière version"
       data-alert-and="et"
       data-alert-chrome="Chrome Web Store"
       data-alert-firefox="Firefox Add-ons"
@@ -464,8 +464,8 @@
               <span data-i18n="install.supportFeedback">Assistance</span>
             </a>
             <p class="install-contact">
-              <span data-i18n="install.privateQuestions">Pour les questions privées, écrivez à</span>
-              <a href="mailto:chatenhanceryt@gmail.com">chatenhanceryt@gmail.com</a>.
+              <span data-i18n="install.privateQuestions">Vous pouvez aussi nous écrire à</span>
+              <a href="mailto:chatenhanceryt@gmail.com">chatenhanceryt@gmail.com</a>
             </p>
           </div>
           <div class="install-quickstart" aria-labelledby="install-quickstart-title">
@@ -665,11 +665,12 @@
         <div class="support-modal-heading">
           <h2 id="support-modal-title" data-i18n="install.supportModalTitle">À propos de GitHub Issues</h2>
         </div>
-        <p data-i18n="install.supportModalBody">GitHub Issues est public et convient surtout aux rapports de bugs, aux problèmes du chat YouTube et aux demandes de fonctionnalités. Un compte GitHub peut être nécessaire.</p>
+        <p data-i18n="install.supportModalBody">GitHub Issues est le suivi public que nous utilisons pour les rapports de bugs et les demandes de fonctionnalités.</p>
         <ul class="support-modal-list">
-          <li data-i18n="install.supportModalDetailOne">Indiquez ce qui s’est passé, ce qui était attendu et le navigateur utilisé.</li>
-          <li data-i18n="install.supportModalDetailTwo">Pour les problèmes de chat YouTube, ajoutez l’URL du livestream et, si possible, une capture d’écran ou une erreur de console.</li>
-          <li data-i18n="install.supportModalDetailThree">Pour les questions privées, utilisez plutôt l’e-mail.</li>
+          <li data-i18n="install.supportModalDetailOne">Publier ou commenter sur GitHub peut nécessiter un compte GitHub.</li>
+          <li data-i18n="install.supportModalDetailTwo">Cliquez sur le bouton New issue sur GitHub pour commencer un rapport ou une demande.</li>
+          <li data-i18n="install.supportModalDetailThree">Les formulaires d’issues demanderont les détails adaptés à chaque type de signalement.</li>
+          <li data-i18n-html="install.supportModalDetailFour">Vous pouvez aussi nous écrire à <a href="mailto:chatenhanceryt@gmail.com">chatenhanceryt@gmail.com</a>.</li>
         </ul>
         <div class="support-modal-actions">
           <button class="button button-link" type="button" data-support-modal-close data-i18n="install.supportModalCancel">Annuler</button>
@@ -764,7 +765,7 @@
 
           const stores = pendingStores.map(([key]) => alert.dataset[`alert${capitalize(key)}`]);
           const storeList = formatStoreList(stores, alert.dataset.alertAnd || "and");
-          const bodyTemplate = alert.dataset.alertBody || "{stores} will get the latest version soon.";
+          const bodyTemplate = alert.dataset.alertBody || "{stores} will get the latest version soon";
 
           message.textContent = bodyTemplate.replace("{stores}", storeList);
           alert.hidden = false;

@@ -108,7 +108,7 @@
       "message": "Support en feedback"
     },
     "supportGithubIssuesPrompt": {
-      "message": "GitHub Issues is openbaar en werkt het best voor bugmeldingen, problemen met YouTube-chat en functieverzoeken.\n\nVermeld wat er gebeurde, wat je verwachtte, je browser en indien relevant de livestream-URL, een screenshot of consolefout.\n\nEen GitHub-account kan nodig zijn.\n\nDoorgaan naar GitHub Issues?"
+      "message": "GitHub Issues is de openbare tracker die we gebruiken voor bugmeldingen en functieverzoeken. Een GitHub-account kan nodig zijn.\n\nJe kunt ons ook mailen op chatenhanceryt@gmail.com.\n\nDoorgaan naar GitHub Issues?"
     },
     "resetAllExtensionData": {
       "message": "Alle extensie-instellingen en lokale gegevens resetten"

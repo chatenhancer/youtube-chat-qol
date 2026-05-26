@@ -171,7 +171,7 @@
       hidden
       data-store-version-alert
       data-i18n-attr="data-alert-body:install.updatePendingBody;data-alert-and:install.updatePendingAnd;data-alert-chrome:install.chromeStore;data-alert-firefox:install.firefoxAddons"
-      data-alert-body="{stores}에 곧 최신 버전이 제공됩니다."
+      data-alert-body="{stores}에 곧 최신 버전이 제공됩니다"
       data-alert-and="및"
       data-alert-chrome="Chrome Web Store"
       data-alert-firefox="Firefox Add-ons"
@@ -464,8 +464,8 @@
               <span data-i18n="install.supportFeedback">지원</span>
             </a>
             <p class="install-contact">
-              <span data-i18n="install.privateQuestions">개인적인 질문은 이메일로 보내세요</span>
-              <a href="mailto:chatenhanceryt@gmail.com">chatenhanceryt@gmail.com</a>.
+              <span data-i18n="install.privateQuestions">이메일로도 문의할 수 있습니다:</span>
+              <a href="mailto:chatenhanceryt@gmail.com">chatenhanceryt@gmail.com</a>
             </p>
           </div>
           <div class="install-quickstart" aria-labelledby="install-quickstart-title">
@@ -665,11 +665,12 @@
         <div class="support-modal-heading">
           <h2 id="support-modal-title" data-i18n="install.supportModalTitle">GitHub Issues 정보</h2>
         </div>
-        <p data-i18n="install.supportModalBody">GitHub Issues는 공개되며 버그 신고, YouTube 채팅 문제, 기능 요청에 가장 적합합니다. GitHub 계정이 필요할 수 있습니다.</p>
+        <p data-i18n="install.supportModalBody">GitHub Issues는 버그 신고와 기능 요청에 사용하는 공개 추적 공간입니다.</p>
         <ul class="support-modal-list">
-          <li data-i18n="install.supportModalDetailOne">무슨 일이 있었는지, 기대한 동작은 무엇인지, 사용 중인 브라우저를 포함해 주세요.</li>
-          <li data-i18n="install.supportModalDetailTwo">YouTube 채팅 문제라면 가능하면 라이브스트림 URL, 스크린샷 또는 콘솔 오류를 포함해 주세요.</li>
-          <li data-i18n="install.supportModalDetailThree">개인적인 질문은 이메일을 사용해 주세요.</li>
+          <li data-i18n="install.supportModalDetailOne">GitHub에 게시하거나 댓글을 달려면 GitHub 계정이 필요할 수 있습니다.</li>
+          <li data-i18n="install.supportModalDetailTwo">GitHub에서 New issue 버튼을 클릭해 신고나 요청을 시작하세요.</li>
+          <li data-i18n="install.supportModalDetailThree">Issue 양식이 보고 유형에 맞는 필요한 세부 정보를 안내합니다.</li>
+          <li data-i18n-html="install.supportModalDetailFour">이메일로도 <a href="mailto:chatenhanceryt@gmail.com">chatenhanceryt@gmail.com</a>에 문의할 수 있습니다.</li>
         </ul>
         <div class="support-modal-actions">
           <button class="button button-link" type="button" data-support-modal-close data-i18n="install.supportModalCancel">취소</button>
@@ -764,7 +765,7 @@
 
           const stores = pendingStores.map(([key]) => alert.dataset[`alert${capitalize(key)}`]);
           const storeList = formatStoreList(stores, alert.dataset.alertAnd || "and");
-          const bodyTemplate = alert.dataset.alertBody || "{stores} will get the latest version soon.";
+          const bodyTemplate = alert.dataset.alertBody || "{stores} will get the latest version soon";
 
           message.textContent = bodyTemplate.replace("{stores}", storeList);
           alert.hidden = false;
