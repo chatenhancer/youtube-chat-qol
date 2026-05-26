@@ -1,6 +1,7 @@
 import { mkdir, readFile, readdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { validateDocsLocales } from './validate-docs-locales.mjs';
 
 const SITE_URL = 'https://chatenhancer.com';
 const DEFAULT_LOCALE = 'en';
@@ -34,6 +35,8 @@ const localeMeta = {
   zh_CN: { htmlLang: 'zh-CN', ogLocale: 'zh_CN', path: 'zh-CN' },
   zh_TW: { htmlLang: 'zh-TW', ogLocale: 'zh_TW', path: 'zh-TW' }
 };
+
+await validateDocsLocales();
 
 const template = await readFile(templatePath, 'utf8');
 const localeFiles = (await readdir(i18nDir))

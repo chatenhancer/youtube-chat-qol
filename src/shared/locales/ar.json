@@ -3,7 +3,7 @@
     "add": "إضافة",
     "addKeywords": "إضافة كلمات مفتاحية",
     "addKeywordsCount": {
-      "one": "إضافة كلمات مفتاحية، تتم مراقبة كلمة واحدة",
+      "one": "إضافة كلمات مفتاحية، تتم مراقبة {count} كلمة مفتاحية",
       "other": "إضافة كلمات مفتاحية، تتم مراقبة {count} كلمات مفتاحية"
     },
     "chatCommands": "أوامر الدردشة",
@@ -52,7 +52,7 @@
     "recentMessagesFromThisUser": "الرسائل الأخيرة من هذا المستخدم",
     "removeKeyword": "إزالة {keyword}",
     "savedMessages": {
-      "one": "رسالة محفوظة واحدة",
+      "one": "{count} رسالة محفوظة",
       "other": "{count} رسائل محفوظة"
     },
     "settingState": "{label} {state}.",
@@ -75,7 +75,7 @@
     "unknownTimezone": "منطقة زمنية غير معروفة.",
     "unknownTranslationLanguage": "لغة ترجمة غير معروفة.",
     "unreadMessages": {
-      "one": "رسالة جديدة واحدة",
+      "one": "{count} رسالة جديدة",
       "other": "{count} رسائل جديدة"
     },
     "useOnOrOff": "استخدم on أو off.",

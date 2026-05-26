@@ -12,6 +12,7 @@ import { fileURLToPath } from 'node:url';
 import packageJson from '../package.json' with { type: 'json' };
 import { generateIcons } from './generate-icons.mjs';
 import { syncExtensionLocales } from './sync-extension-locales.mjs';
+import { validateExtensionLocales } from './validate-extension-locales.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const targetOutputDirs = {
@@ -22,6 +23,7 @@ const targetOutputDirs = {
 const targets = getRequestedTargets();
 
 await generateIcons();
+await validateExtensionLocales();
 await syncVersionedSourceFiles();
 
 const manifestSource = await readFile(path.join(root, 'manifest.json'), 'utf8');

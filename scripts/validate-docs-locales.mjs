@@ -7,35 +7,33 @@ const localesDir = path.join(rootDir, 'docs', 'i18n');
 const baseLocale = 'en.json';
 const basePath = path.join(localesDir, baseLocale);
 
-const baseMessages = JSON.parse(await readFile(basePath, 'utf8'));
-const expectedKeys = flattenKeys(baseMessages);
-const localeFiles = (await readdir(localesDir))
-  .filter((file) => file.endsWith('.json'))
-  .sort();
+export async function validateDocsLocales() {
+  const baseMessages = JSON.parse(await readFile(basePath, 'utf8'));
+  const expectedKeys = flattenKeys(baseMessages);
+  const localeFiles = (await readdir(localesDir))
+    .filter((file) => file.endsWith('.json'))
+    .sort();
 
-let hasError = false;
+  const errors = [];
 
-for (const file of localeFiles) {
-  const messages = JSON.parse(await readFile(path.join(localesDir, file), 'utf8'));
-  const actualKeys = flattenKeys(messages);
-  const missingKeys = expectedKeys.filter((key) => !actualKeys.includes(key));
-  const extraKeys = actualKeys.filter((key) => !expectedKeys.includes(key));
+  for (const file of localeFiles) {
+    const messages = JSON.parse(await readFile(path.join(localesDir, file), 'utf8'));
+    const actualKeys = flattenKeys(messages);
+    const missingKeys = expectedKeys.filter((key) => !actualKeys.includes(key));
+    const extraKeys = actualKeys.filter((key) => !expectedKeys.includes(key));
 
-  if (!missingKeys.length && !extraKeys.length) continue;
-
-  hasError = true;
-  console.error(`\n${file}`);
-  if (missingKeys.length) {
-    console.error(`  Missing keys:\n    ${missingKeys.join('\n    ')}`);
+    if (missingKeys.length) {
+      errors.push(`${file} missing keys: ${missingKeys.join(', ')}`);
+    }
+    if (extraKeys.length) {
+      errors.push(`${file} extra keys: ${extraKeys.join(', ')}`);
+    }
   }
-  if (extraKeys.length) {
-    console.error(`  Extra keys:\n    ${extraKeys.join('\n    ')}`);
-  }
-}
 
-if (hasError) {
-  process.exitCode = 1;
-} else {
+  if (errors.length) {
+    throw new Error(`Docs locale validation failed:\n${errors.map((error) => `- ${error}`).join('\n')}`);
+  }
+
   console.log(`Docs locale keys match ${baseLocale} (${expectedKeys.length} keys, ${localeFiles.length} locales).`);
 }
 
@@ -48,4 +46,8 @@ function flattenKeys(value, prefix = '') {
     const nextPrefix = prefix ? `${prefix}.${key}` : key;
     return flattenKeys(child, nextPrefix);
   });
+}
+
+if (import.meta.url === `file://${process.argv[1]}`) {
+  await validateDocsLocales();
 }
