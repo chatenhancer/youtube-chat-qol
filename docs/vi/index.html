@@ -171,7 +171,7 @@
       hidden
       data-store-version-alert
       data-i18n-attr="data-alert-body:install.updatePendingBody;data-alert-and:install.updatePendingAnd;data-alert-chrome:install.chromeStore;data-alert-firefox:install.firefoxAddons"
-      data-alert-body="{stores} sẽ sớm có phiên bản mới nhất."
+      data-alert-body="{stores} sẽ sớm có phiên bản mới nhất"
       data-alert-and="và"
       data-alert-chrome="Chrome Web Store"
       data-alert-firefox="Firefox Add-ons"
@@ -464,8 +464,8 @@
               <span data-i18n="install.supportFeedback">Hỗ trợ</span>
             </a>
             <p class="install-contact">
-              <span data-i18n="install.privateQuestions">Câu hỏi riêng tư gửi email đến</span>
-              <a href="mailto:chatenhanceryt@gmail.com">chatenhanceryt@gmail.com</a>.
+              <span data-i18n="install.privateQuestions">Bạn cũng có thể email cho chúng tôi tại</span>
+              <a href="mailto:chatenhanceryt@gmail.com">chatenhanceryt@gmail.com</a>
             </p>
           </div>
           <div class="install-quickstart" aria-labelledby="install-quickstart-title">
@@ -665,11 +665,12 @@
         <div class="support-modal-heading">
           <h2 id="support-modal-title" data-i18n="install.supportModalTitle">Giới thiệu về GitHub Issues</h2>
         </div>
-        <p data-i18n="install.supportModalBody">GitHub Issues là công khai và phù hợp nhất để báo lỗi, sự cố chat YouTube và yêu cầu tính năng. Có thể cần tài khoản GitHub.</p>
+        <p data-i18n="install.supportModalBody">GitHub Issues là trình theo dõi công khai mà chúng tôi dùng cho báo lỗi và yêu cầu tính năng.</p>
         <ul class="support-modal-list">
-          <li data-i18n="install.supportModalDetailOne">Hãy mô tả điều đã xảy ra, điều bạn mong đợi và trình duyệt đang dùng.</li>
-          <li data-i18n="install.supportModalDetailTwo">Với sự cố chat YouTube, hãy kèm URL livestream và ảnh chụp màn hình hoặc lỗi console nếu có thể.</li>
-          <li data-i18n="install.supportModalDetailThree">Với câu hỏi riêng tư, hãy dùng email.</li>
+          <li data-i18n="install.supportModalDetailOne">Đăng hoặc bình luận trên GitHub có thể cần tài khoản GitHub.</li>
+          <li data-i18n="install.supportModalDetailTwo">Nhấp vào nút New issue trên GitHub để bắt đầu báo cáo hoặc yêu cầu.</li>
+          <li data-i18n="install.supportModalDetailThree">Các biểu mẫu issue sẽ hỏi những chi tiết cần thiết cho từng loại báo cáo.</li>
+          <li data-i18n-html="install.supportModalDetailFour">Bạn cũng có thể email cho chúng tôi tại <a href="mailto:chatenhanceryt@gmail.com">chatenhanceryt@gmail.com</a>.</li>
         </ul>
         <div class="support-modal-actions">
           <button class="button button-link" type="button" data-support-modal-close data-i18n="install.supportModalCancel">Hủy</button>
@@ -764,7 +765,7 @@
 
           const stores = pendingStores.map(([key]) => alert.dataset[`alert${capitalize(key)}`]);
           const storeList = formatStoreList(stores, alert.dataset.alertAnd || "and");
-          const bodyTemplate = alert.dataset.alertBody || "{stores} will get the latest version soon.";
+          const bodyTemplate = alert.dataset.alertBody || "{stores} will get the latest version soon";
 
           message.textContent = bodyTemplate.replace("{stores}", storeList);
           alert.hidden = false;

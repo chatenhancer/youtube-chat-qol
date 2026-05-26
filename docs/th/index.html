@@ -464,8 +464,8 @@
               <span data-i18n="install.supportFeedback">ช่วยเหลือ</span>
             </a>
             <p class="install-contact">
-              <span data-i18n="install.privateQuestions">คำถามส่วนตัว ส่งอีเมลที่</span>
-              <a href="mailto:chatenhanceryt@gmail.com">chatenhanceryt@gmail.com</a>.
+              <span data-i18n="install.privateQuestions">คุณสามารถส่งอีเมลหาเราได้ที่</span>
+              <a href="mailto:chatenhanceryt@gmail.com">chatenhanceryt@gmail.com</a>
             </p>
           </div>
           <div class="install-quickstart" aria-labelledby="install-quickstart-title">
@@ -665,11 +665,12 @@
         <div class="support-modal-heading">
           <h2 id="support-modal-title" data-i18n="install.supportModalTitle">เกี่ยวกับ GitHub Issues</h2>
         </div>
-        <p data-i18n="install.supportModalBody">GitHub Issues เป็นพื้นที่สาธารณะ และเหมาะที่สุดสำหรับรายงานบั๊ก ปัญหาแชท YouTube และคำขอฟีเจอร์ อาจต้องมีบัญชี GitHub</p>
+        <p data-i18n="install.supportModalBody">GitHub Issues เป็นตัวติดตามสาธารณะที่เราใช้สำหรับรายงานบั๊กและคำขอฟีเจอร์</p>
         <ul class="support-modal-list">
-          <li data-i18n="install.supportModalDetailOne">ระบุสิ่งที่เกิดขึ้น สิ่งที่คาดหวัง และเบราว์เซอร์ที่ใช้</li>
-          <li data-i18n="install.supportModalDetailTwo">สำหรับปัญหาแชท YouTube ให้ใส่ URL ไลฟ์สตรีม และภาพหน้าจอหรือข้อผิดพลาดจากคอนโซลถ้าเป็นไปได้</li>
-          <li data-i18n="install.supportModalDetailThree">สำหรับคำถามส่วนตัว ให้ใช้อีเมลแทน</li>
+          <li data-i18n="install.supportModalDetailOne">การโพสต์หรือแสดงความคิดเห็นบน GitHub อาจต้องใช้บัญชี GitHub</li>
+          <li data-i18n="install.supportModalDetailTwo">คลิกปุ่ม New issue บน GitHub เพื่อเริ่มรายงานหรือคำขอ</li>
+          <li data-i18n="install.supportModalDetailThree">ฟอร์ม issue จะถามรายละเอียดที่จำเป็นสำหรับรายงานแต่ละประเภท</li>
+          <li data-i18n-html="install.supportModalDetailFour">คุณสามารถส่งอีเมลหาเราได้ที่ <a href="mailto:chatenhanceryt@gmail.com">chatenhanceryt@gmail.com</a>.</li>
         </ul>
         <div class="support-modal-actions">
           <button class="button button-link" type="button" data-support-modal-close data-i18n="install.supportModalCancel">ยกเลิก</button>
@@ -764,7 +765,7 @@
 
           const stores = pendingStores.map(([key]) => alert.dataset[`alert${capitalize(key)}`]);
           const storeList = formatStoreList(stores, alert.dataset.alertAnd || "and");
-          const bodyTemplate = alert.dataset.alertBody || "{stores} will get the latest version soon.";
+          const bodyTemplate = alert.dataset.alertBody || "{stores} will get the latest version soon";
 
           message.textContent = bodyTemplate.replace("{stores}", storeList);
           alert.hidden = false;

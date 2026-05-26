@@ -111,7 +111,7 @@
       "message": "Dukungan dan masukan"
     },
     "supportGithubIssuesPrompt": {
-      "message": "GitHub Issues bersifat publik dan paling cocok untuk laporan bug, masalah chat YouTube, dan permintaan fitur.\n\nSertakan apa yang terjadi, apa yang diharapkan, browser yang digunakan, serta URL livestream, tangkapan layar, atau error konsol jika relevan.\n\nAkun GitHub mungkin diperlukan.\n\nLanjut ke GitHub Issues?"
+      "message": "GitHub Issues adalah pelacak publik yang kami gunakan untuk laporan bug dan permintaan fitur. Akun GitHub mungkin diperlukan.\n\nAnda juga bisa mengirim email ke chatenhanceryt@gmail.com.\n\nLanjut ke GitHub Issues?"
     },
     "resetAllExtensionData": {
       "message": "Reset semua pengaturan ekstensi dan data lokal"

@@ -108,7 +108,7 @@
       "message": "תמיכה ומשוב"
     },
     "supportGithubIssuesPrompt": {
-      "message": "GitHub Issues הוא ציבורי ומתאים במיוחד לדיווחי באגים, בעיות בצ׳אט YouTube ובקשות לפיצ׳רים.\n\nיש לכלול מה קרה, מה היה צפוי, באיזה דפדפן נעשה שימוש, ובמידת הצורך את כתובת השידור החי, צילום מסך או שגיאת מסוף.\n\nייתכן שיידרש חשבון GitHub.\n\nלהמשיך אל GitHub Issues?"
+      "message": "GitHub Issues הוא כלי המעקב הציבורי שבו אנו משתמשים לדיווחי באגים ובקשות לפיצ׳רים. ייתכן שיידרש חשבון GitHub.\n\nאפשר גם לשלוח לנו אימייל אל chatenhanceryt@gmail.com.\n\nלהמשיך אל GitHub Issues?"
     },
     "resetAllExtensionData": {
       "message": "איפוס כל הגדרות התוסף והנתונים המקומיים"

@@ -171,7 +171,7 @@
       hidden
       data-store-version-alert
       data-i18n-attr="data-alert-body:install.updatePendingBody;data-alert-and:install.updatePendingAnd;data-alert-chrome:install.chromeStore;data-alert-firefox:install.firefoxAddons"
-      data-alert-body="{stores} akan segera mendapatkan versi terbaru."
+      data-alert-body="{stores} akan segera mendapatkan versi terbaru"
       data-alert-and="dan"
       data-alert-chrome="Chrome Web Store"
       data-alert-firefox="Firefox Add-ons"
@@ -464,8 +464,8 @@
               <span data-i18n="install.supportFeedback">Dukungan</span>
             </a>
             <p class="install-contact">
-              <span data-i18n="install.privateQuestions">Untuk pertanyaan pribadi, email</span>
-              <a href="mailto:chatenhanceryt@gmail.com">chatenhanceryt@gmail.com</a>.
+              <span data-i18n="install.privateQuestions">Anda juga bisa mengirim email ke</span>
+              <a href="mailto:chatenhanceryt@gmail.com">chatenhanceryt@gmail.com</a>
             </p>
           </div>
           <div class="install-quickstart" aria-labelledby="install-quickstart-title">
@@ -665,11 +665,12 @@
         <div class="support-modal-heading">
           <h2 id="support-modal-title" data-i18n="install.supportModalTitle">Tentang GitHub Issues</h2>
         </div>
-        <p data-i18n="install.supportModalBody">GitHub Issues bersifat publik dan paling cocok untuk laporan bug, masalah chat YouTube, dan permintaan fitur. Akun GitHub mungkin diperlukan.</p>
+        <p data-i18n="install.supportModalBody">GitHub Issues adalah pelacak publik yang kami gunakan untuk laporan bug dan permintaan fitur.</p>
         <ul class="support-modal-list">
-          <li data-i18n="install.supportModalDetailOne">Sertakan apa yang terjadi, apa yang diharapkan, dan browser yang digunakan.</li>
-          <li data-i18n="install.supportModalDetailTwo">Untuk masalah chat YouTube, sertakan URL livestream dan tangkapan layar atau error konsol jika memungkinkan.</li>
-          <li data-i18n="install.supportModalDetailThree">Untuk pertanyaan privat, gunakan email.</li>
+          <li data-i18n="install.supportModalDetailOne">Membuat posting atau komentar di GitHub mungkin memerlukan akun GitHub.</li>
+          <li data-i18n="install.supportModalDetailTwo">Klik tombol New issue di GitHub untuk memulai laporan atau permintaan.</li>
+          <li data-i18n="install.supportModalDetailThree">Form issue akan meminta detail yang diperlukan untuk setiap jenis laporan.</li>
+          <li data-i18n-html="install.supportModalDetailFour">Anda juga bisa mengirim email ke <a href="mailto:chatenhanceryt@gmail.com">chatenhanceryt@gmail.com</a>.</li>
         </ul>
         <div class="support-modal-actions">
           <button class="button button-link" type="button" data-support-modal-close data-i18n="install.supportModalCancel">Batal</button>
@@ -764,7 +765,7 @@
 
           const stores = pendingStores.map(([key]) => alert.dataset[`alert${capitalize(key)}`]);
           const storeList = formatStoreList(stores, alert.dataset.alertAnd || "and");
-          const bodyTemplate = alert.dataset.alertBody || "{stores} will get the latest version soon.";
+          const bodyTemplate = alert.dataset.alertBody || "{stores} will get the latest version soon";
 
           message.textContent = bodyTemplate.replace("{stores}", storeList);
           alert.hidden = false;

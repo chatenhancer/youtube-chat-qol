@@ -111,7 +111,7 @@
       "message": "サポートとフィードバック"
     },
     "supportGithubIssuesPrompt": {
-      "message": "GitHub Issues は公開されます。バグ報告、YouTube チャットの不具合、機能リクエストに向いています。\n\n何が起きたか、期待していた動作、使用ブラウザ、必要に応じてライブ配信 URL、スクリーンショット、コンソールエラーを含めてください。\n\nGitHub アカウントが必要な場合があります。\n\nGitHub Issues に進みますか？"
+      "message": "GitHub Issues は、バグ報告と機能リクエストに使用している公開トラッカーです。GitHub アカウントが必要な場合があります。\n\nメールでも chatenhanceryt@gmail.com に連絡できます。\n\nGitHub Issues に進みますか？"
     },
     "resetAllExtensionData": {
       "message": "拡張機能のすべての設定とローカルデータをリセット"

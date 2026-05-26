@@ -111,7 +111,7 @@
       "message": "Destek ve geri bildirim"
     },
     "supportGithubIssuesPrompt": {
-      "message": "GitHub Issues herkese açıktır ve en çok hata bildirimleri, YouTube sohbet sorunları ve özellik istekleri için uygundur.\n\nNe olduğunu, ne beklediğini, tarayıcını ve gerekiyorsa canlı yayın URL’sini, ekran görüntüsünü veya konsol hatasını ekle.\n\nGitHub hesabı gerekebilir.\n\nGitHub Issues’a devam edilsin mi?"
+      "message": "GitHub Issues, hata bildirimleri ve özellik istekleri için kullandığımız herkese açık izleyicidir. GitHub hesabı gerekebilir.\n\nBize şu adresten de e-posta gönderebilirsin: chatenhanceryt@gmail.com.\n\nGitHub Issues’a devam edilsin mi?"
     },
     "resetAllExtensionData": {
       "message": "Tüm uzantı ayarlarını ve yerel verileri sıfırla"

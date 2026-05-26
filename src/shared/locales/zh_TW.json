@@ -108,7 +108,7 @@
       "message": "支援與回饋"
     },
     "supportGithubIssuesPrompt": {
-      "message": "GitHub Issues 是公開的，最適合回報錯誤、YouTube 聊天問題和功能請求。\n\n請說明發生了什麼、你預期的結果、使用的瀏覽器，以及相關時的直播 URL、截圖或主控台錯誤。\n\n可能需要 GitHub 帳號。\n\n繼續前往 GitHub Issues？"
+      "message": "GitHub Issues 是我們用於回報錯誤和功能請求的公開追蹤器。可能需要 GitHub 帳號。\n\n你也可以寄信到 chatenhanceryt@gmail.com。\n\n繼續前往 GitHub Issues？"
     },
     "resetAllExtensionData": {
       "message": "重設所有擴充功能設定與本機資料"
