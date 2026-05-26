@@ -6,6 +6,7 @@
  * option updates as the injected chat settings menu.
  */
 import { LANGUAGE_OPTIONS } from '../shared/languages';
+import { playSoftChime } from '../shared/sounds/soft-chime';
 import { DEFAULT_OPTIONS, getTargetLanguageUpdate, normalizeOptions, type Options } from '../shared/options';
 import { clampNumber } from '../shared/text';
 
@@ -92,7 +93,10 @@ function init(): void {
 
   controls.sound.addEventListener('change', () => {
     const enabled = Boolean(controls.sound?.checked);
-    if (enabled) animatePopupSoundIcon();
+    if (enabled) {
+      animatePopupSoundIcon();
+      playSoftChime();
+    }
     save({ sound: enabled });
   });
 }
