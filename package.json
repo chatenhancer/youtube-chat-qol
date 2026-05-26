@@ -1,6 +1,6 @@
 {
   "name": "youtube-chat-qol",
-  "version": "0.8.2",
+  "version": "0.8.3",
   "private": true,
   "type": "module",
   "scripts": {
@@ -8,21 +8,16 @@
     "build:chrome": "npm run check && node scripts/build.mjs --target=chrome",
     "build:edge": "npm run check && node scripts/build.mjs --target=edge",
     "build:firefox": "npm run check && node scripts/build.mjs --target=firefox",
-
     "docs:screenshots": "npm run docs:build && node scripts/generate-dom-screenshots.mjs",
     "docs:build": "node scripts/build-docs.mjs",
-
     "zip": "npm run build && node scripts/zip.mjs --all",
     "zip:chrome": "npm run build:chrome && node scripts/zip.mjs --target=chrome",
     "zip:edge": "npm run build:edge && node scripts/zip.mjs --target=edge",
     "zip:firefox": "npm run build:firefox && node scripts/zip.mjs --target=firefox",
-
     "cloudflare:dev": "npx wrangler@4 dev --config cloudflare/wrangler.toml",
     "cloudflare:deploy": "npx wrangler@4 deploy --config cloudflare/wrangler.toml",
-
     "publish:chrome": "node scripts/submit-chrome-webstore.mjs",
     "publish:firefox": "node scripts/submit-firefox-amo.mjs",
-
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "check": "npm run typecheck && npm run lint"
