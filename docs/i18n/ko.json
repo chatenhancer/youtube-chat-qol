@@ -85,7 +85,7 @@
     "copy": "Chrome Web Store 또는 Firefox Add-ons에서 받거나, 로컬 개발을 위해 소스에서 확장 프로그램을 빌드할 수 있습니다. Chrome 버전은 다른 Chromium 기반 브라우저에서도 작동할 수 있습니다.",
     "publishedVersions": "게시된 버전",
     "updatePendingTitle": "스토어 업데이트 진행 중",
-    "updatePendingBody": "{stores}에 곧 최신 버전이 제공됩니다",
+    "updatePendingBody": "{stores}에 곧 최신 버전이 제공됩니다.",
     "updatePendingAnd": "및",
     "chromeStore": "Chrome Web Store",
     "firefoxAddons": "Firefox Add-ons",

@@ -85,7 +85,7 @@
     "copy": "Установите из Chrome Web Store или Firefox Add-ons либо соберите расширение из исходного кода для локальной разработки. Версия Chrome также может работать в других браузерах на базе Chromium.",
     "publishedVersions": "Опубликованные версии",
     "updatePendingTitle": "Обновление в магазине выполняется",
-    "updatePendingBody": "{stores} скоро получат последнюю версию",
+    "updatePendingBody": "{stores} скоро получат последнюю версию.",
     "updatePendingAnd": "и",
     "chromeStore": "Chrome Web Store",
     "firefoxAddons": "Firefox Add-ons",

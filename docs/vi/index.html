@@ -171,7 +171,7 @@
       hidden
       data-store-version-alert
       data-i18n-attr="data-alert-body:install.updatePendingBody;data-alert-and:install.updatePendingAnd;data-alert-chrome:install.chromeStore;data-alert-firefox:install.firefoxAddons"
-      data-alert-body="{stores} sẽ sớm có phiên bản mới nhất"
+      data-alert-body="{stores} sẽ sớm có phiên bản mới nhất."
       data-alert-and="và"
       data-alert-chrome="Chrome Web Store"
       data-alert-firefox="Firefox Add-ons"
@@ -765,7 +765,7 @@
 
           const stores = pendingStores.map(([key]) => alert.dataset[`alert${capitalize(key)}`]);
           const storeList = formatStoreList(stores, alert.dataset.alertAnd || "and");
-          const bodyTemplate = alert.dataset.alertBody || "{stores} will get the latest version soon";
+          const bodyTemplate = alert.dataset.alertBody || "{stores} will get the latest version soon.";
 
           message.textContent = bodyTemplate.replace("{stores}", storeList);
           alert.hidden = false;

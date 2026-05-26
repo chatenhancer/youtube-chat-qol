@@ -85,7 +85,7 @@
     "copy": "احصل عليه من Chrome Web Store أو Firefox Add-ons، أو ابن الإضافة من المصدر للتطوير المحلي. قد تعمل نسخة Chrome أيضا في المتصفحات الأخرى المبنية على Chromium.",
     "publishedVersions": "الإصدارات المنشورة",
     "updatePendingTitle": "تحديث المتجر جارٍ",
-    "updatePendingBody": "ستحصل {stores} على أحدث إصدار قريبًا",
+    "updatePendingBody": "ستحصل {stores} على أحدث إصدار قريبًا.",
     "updatePendingAnd": "و",
     "chromeStore": "Chrome Web Store",
     "firefoxAddons": "Firefox Add-ons",

@@ -85,7 +85,7 @@
     "copy": "Consíguela en Chrome Web Store o Firefox Add-ons, o compila la extensión desde el código fuente para desarrollo local. La versión de Chrome también puede funcionar en otros navegadores basados en Chromium.",
     "publishedVersions": "Versiones publicadas",
     "updatePendingTitle": "Actualización de tienda en curso",
-    "updatePendingBody": "{stores} recibirán la versión más reciente pronto",
+    "updatePendingBody": "{stores} recibirán la versión más reciente pronto.",
     "updatePendingAnd": "y",
     "chromeStore": "Chrome Web Store",
     "firefoxAddons": "Firefox Add-ons",

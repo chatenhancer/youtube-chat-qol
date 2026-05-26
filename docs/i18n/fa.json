@@ -85,7 +85,7 @@
     "copy": "آن را از Chrome Web Store یا Firefox Add-ons بگیرید، یا افزونه را از کد منبع برای توسعه محلی بسازید. نسخه Chrome معمولاً در مرورگرهای دیگر مبتنی بر Chromium هم کار می‌کند.",
     "publishedVersions": "نسخه‌های منتشرشده",
     "updatePendingTitle": "به‌روزرسانی فروشگاه در حال انجام است",
-    "updatePendingBody": "{stores} به‌زودی آخرین نسخه را دریافت خواهند کرد",
+    "updatePendingBody": "{stores} به‌زودی آخرین نسخه را دریافت خواهند کرد.",
     "updatePendingAnd": "و",
     "chromeStore": "Chrome Web Store",
     "firefoxAddons": "Firefox Add-ons",

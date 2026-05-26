@@ -85,7 +85,7 @@
     "copy": "รับจาก Chrome Web Store หรือ Firefox Add-ons หรือ build ส่วนขยายจาก source สำหรับพัฒนาในเครื่อง เวอร์ชัน Chrome มักใช้ได้กับเบราว์เซอร์ Chromium อื่นด้วย",
     "publishedVersions": "เวอร์ชันที่เผยแพร่",
     "updatePendingTitle": "กำลังอัปเดตในสโตร์",
-    "updatePendingBody": "{stores} จะได้รับเวอร์ชันล่าสุดเร็ว ๆ นี้",
+    "updatePendingBody": "{stores} จะได้รับเวอร์ชันล่าสุดเร็ว ๆ นี้.",
     "updatePendingAnd": "และ",
     "chromeStore": "Chrome Web Store",
     "firefoxAddons": "Firefox Add-ons",

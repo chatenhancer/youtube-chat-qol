@@ -85,7 +85,7 @@
     "copy": "從 Chrome Web Store 或 Firefox Add-ons 取得，或從原始碼建置供本機開發使用。Chrome 版本通常也可用於其他 Chromium 瀏覽器。",
     "publishedVersions": "已發布版本",
     "updatePendingTitle": "商店更新進行中",
-    "updatePendingBody": "{stores} 很快會獲得最新版本",
+    "updatePendingBody": "{stores} 很快會獲得最新版本.",
     "updatePendingAnd": "和",
     "chromeStore": "Chrome Web Store",
     "firefoxAddons": "Firefox Add-ons",

@@ -85,7 +85,7 @@
     "copy": "Installiere sie aus dem Chrome Web Store oder Firefox Add-ons oder baue die Erweiterung aus dem Quellcode für lokale Entwicklung. Die Chrome-Version funktioniert meist auch in anderen Chromium-basierten Browsern.",
     "publishedVersions": "Veröffentlichte Versionen",
     "updatePendingTitle": "Store-Update läuft",
-    "updatePendingBody": "{stores} erhalten bald die neueste Version",
+    "updatePendingBody": "{stores} erhalten bald die neueste Version.",
     "updatePendingAnd": "und",
     "chromeStore": "Chrome Web Store",
     "firefoxAddons": "Firefox Add-ons",

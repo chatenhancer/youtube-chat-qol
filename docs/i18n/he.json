@@ -85,7 +85,7 @@
     "copy": "קבלו אותו מ-Chrome Web Store או Firefox Add-ons, או בנו את התוסף מהמקור לפיתוח מקומי. גרסת Chrome בדרך כלל עובדת גם בדפדפנים אחרים מבוססי Chromium.",
     "publishedVersions": "גרסאות שפורסמו",
     "updatePendingTitle": "עדכון חנות בתהליך",
-    "updatePendingBody": "{stores} יקבלו את הגרסה האחרונה בקרוב",
+    "updatePendingBody": "{stores} יקבלו את הגרסה האחרונה בקרוב.",
     "updatePendingAnd": "ו",
     "chromeStore": "Chrome Web Store",
     "firefoxAddons": "Firefox Add-ons",
