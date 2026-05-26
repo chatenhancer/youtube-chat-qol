@@ -10,7 +10,7 @@
     "build:firefox": "npm run check && node scripts/build.mjs --target=firefox",
 
     "docs:screenshots": "npm run docs:build && node scripts/generate-dom-screenshots.mjs",
-    "docs:build": "node scripts/validate-docs-locales.mjs && node scripts/build-docs-locales.mjs",
+    "docs:build": "node scripts/build-docs.mjs",
 
     "zip": "npm run build && node scripts/zip.mjs --all",
     "zip:chrome": "npm run build:chrome && node scripts/zip.mjs --target=chrome",

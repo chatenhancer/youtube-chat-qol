@@ -3,7 +3,7 @@
     "add": "הוספה",
     "addKeywords": "הוספת מילות מפתח",
     "addKeywordsCount": {
-      "one": "הוספת מילות מפתח, מעקב אחרי מילת מפתח אחת",
+      "one": "הוספת מילות מפתח, מעקב אחרי {count} מילת מפתח",
       "other": "הוספת מילות מפתח, מעקב אחרי {count} מילות מפתח"
     },
     "chatCommands": "פקודות צ׳אט",
@@ -52,7 +52,7 @@
     "recentMessagesFromThisUser": "הודעות אחרונות מהמשתמש הזה",
     "removeKeyword": "הסרת {keyword}",
     "savedMessages": {
-      "one": "הודעה שמורה אחת",
+      "one": "{count} הודעה שמורה",
       "other": "{count} הודעות שמורות"
     },
     "settingState": "{label} {state}.",
@@ -75,7 +75,7 @@
     "unknownTimezone": "אזור זמן לא מוכר.",
     "unknownTranslationLanguage": "שפת תרגום לא מוכרת.",
     "unreadMessages": {
-      "one": "הודעה חדשה אחת",
+      "one": "{count} הודעה חדשה",
       "other": "{count} הודעות חדשות"
     },
     "useOnOrOff": "השתמש ב-on או off.",
