@@ -36,9 +36,10 @@
     "mentionUserTitle": "Sebut pengguna. Alt/Option-klik untuk mengutip.",
     "mostUsed": "PALING SERING DIPAKAI",
     "noInboxMessagesYet": "Belum ada pesan di kotak masuk.",
+    "noInboxMessages": "Tidak ada pesan kotak masuk",
     "noKeywords": "Tidak ada kata kunci",
     "noPreviousMessageYet": "Belum ada pesan sebelumnya.",
-    "nothingHereYet": "Belum ada apa-apa di sini",
+    "noRecentMessages": "Tidak ada pesan terbaru",
     "openChannel": "Buka channel",
     "openChannelsInPopup": "Buka channel di popup",
     "original": "Asli: {text}",
@@ -108,6 +109,9 @@
     },
     "supportAndFeedback": {
       "message": "Dukungan dan masukan"
+    },
+    "supportGithubIssuesPrompt": {
+      "message": "GitHub Issues bersifat publik dan paling cocok untuk laporan bug, masalah chat YouTube, dan permintaan fitur.\n\nSertakan apa yang terjadi, apa yang diharapkan, browser yang digunakan, serta URL livestream, tangkapan layar, atau error konsol jika relevan.\n\nAkun GitHub mungkin diperlukan.\n\nLanjut ke GitHub Issues?"
     },
     "resetAllExtensionData": {
       "message": "Reset semua pengaturan ekstensi dan data lokal"

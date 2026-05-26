@@ -36,9 +36,10 @@
     "mentionUserTitle": "Menziona utente. Alt/Option-clic per citare.",
     "mostUsed": "PIU USATI",
     "noInboxMessagesYet": "Nessun messaggio nella posta in arrivo.",
+    "noInboxMessages": "Nessun messaggio nella posta in arrivo",
     "noKeywords": "Nessuna parola chiave",
     "noPreviousMessageYet": "Nessun messaggio precedente.",
-    "nothingHereYet": "Ancora niente qui",
+    "noRecentMessages": "Nessun messaggio recente",
     "openChannel": "Apri canale",
     "openChannelsInPopup": "Apri canali in popup",
     "original": "Originale: {text}",
@@ -108,6 +109,9 @@
     },
     "supportAndFeedback": {
       "message": "Supporto e feedback"
+    },
+    "supportGithubIssuesPrompt": {
+      "message": "GitHub Issues è pubblico ed è più adatto per segnalare bug, problemi della chat di YouTube e richieste di funzionalità.\n\nIncludi cosa è successo, cosa ti aspettavi, il browser e, se utile, l’URL del livestream, uno screenshot o un errore della console.\n\nPotrebbe essere necessario un account GitHub.\n\nContinuare su GitHub Issues?"
     },
     "resetAllExtensionData": {
       "message": "Reimposta tutte le impostazioni e i dati locali dell'estensione"

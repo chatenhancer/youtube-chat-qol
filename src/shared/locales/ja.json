@@ -36,9 +36,10 @@
     "mentionUserTitle": "ユーザーをメンション。Alt/Option クリックで引用。",
     "mostUsed": "よく使うもの",
     "noInboxMessagesYet": "受信トレイのメッセージはまだありません。",
+    "noInboxMessages": "受信トレイにメッセージはありません",
     "noKeywords": "キーワードなし",
     "noPreviousMessageYet": "前のメッセージはまだありません。",
-    "nothingHereYet": "まだ何もありません",
+    "noRecentMessages": "最近のメッセージはありません",
     "openChannel": "チャンネルを開く",
     "openChannelsInPopup": "チャンネルをポップアップで開く",
     "original": "元の文: {text}",
@@ -108,6 +109,9 @@
     },
     "supportAndFeedback": {
       "message": "サポートとフィードバック"
+    },
+    "supportGithubIssuesPrompt": {
+      "message": "GitHub Issues は公開されます。バグ報告、YouTube チャットの不具合、機能リクエストに向いています。\n\n何が起きたか、期待していた動作、使用ブラウザ、必要に応じてライブ配信 URL、スクリーンショット、コンソールエラーを含めてください。\n\nGitHub アカウントが必要な場合があります。\n\nGitHub Issues に進みますか？"
     },
     "resetAllExtensionData": {
       "message": "拡張機能のすべての設定とローカルデータをリセット"

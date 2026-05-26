@@ -36,9 +36,10 @@
     "mentionUserTitle": "Упомянуть пользователя. Alt/Option-клик, чтобы процитировать.",
     "mostUsed": "ЧАСТО ИСПОЛЬЗУЕМЫЕ",
     "noInboxMessagesYet": "Во входящих пока нет сообщений.",
+    "noInboxMessages": "Нет сообщений во входящих",
     "noKeywords": "Нет ключевых слов",
     "noPreviousMessageYet": "Предыдущего сообщения пока нет.",
-    "nothingHereYet": "Здесь пока ничего нет",
+    "noRecentMessages": "Нет недавних сообщений",
     "openChannel": "Открыть канал",
     "openChannelsInPopup": "Открывать каналы во всплывающем окне",
     "original": "Оригинал: {text}",
@@ -108,6 +109,9 @@
     },
     "supportAndFeedback": {
       "message": "Поддержка и обратная связь"
+    },
+    "supportGithubIssuesPrompt": {
+      "message": "GitHub Issues является публичным и лучше всего подходит для сообщений об ошибках, проблемах с чатом YouTube и запросов функций.\n\nУкажите, что произошло, что ожидалось, ваш браузер и при необходимости URL трансляции, скриншот или ошибку из консоли.\n\nМожет потребоваться аккаунт GitHub.\n\nПерейти в GitHub Issues?"
     },
     "resetAllExtensionData": {
       "message": "Сбросить все настройки расширения и локальные данные"

@@ -36,9 +36,10 @@
     "mentionUserTitle": "Mention user. Alt/Option-click to quote.",
     "mostUsed": "MOST USED",
     "noInboxMessagesYet": "No inbox messages yet.",
+    "noInboxMessages": "No inbox messages",
     "noKeywords": "No keywords",
     "noPreviousMessageYet": "No previous message yet.",
-    "nothingHereYet": "Nothing here yet",
+    "noRecentMessages": "No recent messages",
     "openChannel": "Open channel",
     "openChannelsInPopup": "Open channels in popup",
     "original": "Original: {text}",
@@ -108,6 +109,9 @@
     },
     "supportAndFeedback": {
       "message": "Support and feedback"
+    },
+    "supportGithubIssuesPrompt": {
+      "message": "GitHub Issues is public and works best for bug reports, YouTube chat breakages, and feature requests.\n\nInclude what happened, what you expected, your browser, and the livestream URL, screenshot, or console error when relevant.\n\nA GitHub account may be required.\n\nContinue to GitHub Issues?"
     },
     "resetAllExtensionData": {
       "message": "Reset all extension settings and local data"

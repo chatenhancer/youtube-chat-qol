@@ -36,9 +36,10 @@
     "mentionUserTitle": "Kullanıcıdan bahset. Alıntı yapmak için Alt/Option-tıkla.",
     "mostUsed": "EN ÇOK KULLANILANLAR",
     "noInboxMessagesYet": "Gelen kutusunda henüz mesaj yok.",
+    "noInboxMessages": "Gelen kutusunda mesaj yok",
     "noKeywords": "Anahtar kelime yok",
     "noPreviousMessageYet": "Henüz önceki mesaj yok.",
-    "nothingHereYet": "Burada henüz bir şey yok",
+    "noRecentMessages": "Son mesaj yok",
     "openChannel": "Kanalı aç",
     "openChannelsInPopup": "Kanalları açılır pencerede aç",
     "original": "Orijinal: {text}",
@@ -108,6 +109,9 @@
     },
     "supportAndFeedback": {
       "message": "Destek ve geri bildirim"
+    },
+    "supportGithubIssuesPrompt": {
+      "message": "GitHub Issues herkese açıktır ve en çok hata bildirimleri, YouTube sohbet sorunları ve özellik istekleri için uygundur.\n\nNe olduğunu, ne beklediğini, tarayıcını ve gerekiyorsa canlı yayın URL’sini, ekran görüntüsünü veya konsol hatasını ekle.\n\nGitHub hesabı gerekebilir.\n\nGitHub Issues’a devam edilsin mi?"
     },
     "resetAllExtensionData": {
       "message": "Tüm uzantı ayarlarını ve yerel verileri sıfırla"

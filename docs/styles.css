@@ -337,6 +337,76 @@ h3 {
   background: var(--soft);
 }
 
+.support-modal {
+  width: min(520px, calc(100% - 32px));
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 24px 70px rgba(23, 25, 31, 0.22);
+}
+
+.support-modal::backdrop {
+  background: rgba(23, 25, 31, 0.42);
+  backdrop-filter: blur(2px);
+}
+
+.support-modal-panel {
+  padding: 24px;
+}
+
+.support-modal-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.support-modal-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  color: var(--blue);
+  background: var(--blue-soft);
+  border-radius: 8px;
+  flex: 0 0 auto;
+}
+
+.support-modal-icon svg {
+  width: 22px;
+  height: 22px;
+  fill: currentColor;
+}
+
+.support-modal h2 {
+  margin: 0;
+  font-size: 22px;
+  line-height: 1.2;
+}
+
+.support-modal p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.support-modal-list {
+  display: grid;
+  gap: 8px;
+  margin: 16px 0 0;
+  padding-left: 20px;
+  color: var(--muted);
+}
+
+.support-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 22px;
+}
+
 .section {
   padding: 76px 32px;
 }
@@ -442,6 +512,151 @@ h3 {
 
 .version-badges img {
   height: 20px;
+}
+
+.store-version-alert {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr);
+  gap: 8px;
+  align-items: start;
+  margin-top: 12px;
+  padding: 10px 12px;
+  border: 1px solid rgba(245, 158, 11, 0.28);
+  border-radius: 8px;
+  background: rgba(245, 158, 11, 0.08);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.store-version-alert[hidden] {
+  display: none;
+}
+
+.store-version-alert-top {
+  width: fit-content;
+  max-width: min(720px, calc(100% - 64px));
+  margin: 14px auto 0;
+}
+
+.store-version-alert-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  color: #b45309;
+}
+
+.store-version-alert-icon svg {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+}
+
+.store-version-hourglass {
+  transform-origin: center;
+  overflow: visible;
+  animation: store-version-hourglass-turn 5.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.store-version-hourglass-frame {
+  opacity: 0.36;
+}
+
+.store-version-hourglass-top-sand,
+.store-version-hourglass-bottom-sand {
+  opacity: 1;
+  transform-box: fill-box;
+  transform-origin: center bottom;
+}
+
+.store-version-hourglass-top-sand {
+  animation: store-version-hourglass-top-sand 5.6s linear infinite;
+}
+
+.store-version-hourglass-bottom-sand {
+  animation: store-version-hourglass-bottom-sand 5.6s linear infinite;
+}
+
+.store-version-hourglass-stream {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-dasharray: 4.7;
+  animation: store-version-hourglass-stream 5.6s linear infinite;
+}
+
+@keyframes store-version-hourglass-turn {
+  0%,
+  74% {
+    transform: rotate(0deg);
+  }
+
+  86%,
+  100% {
+    transform: rotate(180deg);
+  }
+}
+
+@keyframes store-version-hourglass-top-sand {
+  0%,
+  10% {
+    transform: scaleY(1);
+  }
+
+  70%,
+  100% {
+    transform: scaleY(0.08);
+  }
+}
+
+@keyframes store-version-hourglass-bottom-sand {
+  0%,
+  10% {
+    transform: scaleY(0.08);
+  }
+
+  70%,
+  100% {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes store-version-hourglass-stream {
+  0%,
+  8%,
+  72%,
+  100% {
+    opacity: 0;
+    stroke-dashoffset: 4.7;
+  }
+
+  14%,
+  66% {
+    opacity: 1;
+    stroke-dashoffset: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .store-version-hourglass,
+  .store-version-hourglass-top-sand,
+  .store-version-hourglass-bottom-sand,
+  .store-version-hourglass-stream {
+    animation: none;
+  }
+}
+
+.store-version-alert strong {
+  display: block;
+  margin-bottom: 2px;
+  color: #b45309;
+  font-weight: 600;
+}
+
+.store-version-alert-copy > span {
+  color: var(--muted);
 }
 
 .install-quickstart {
@@ -1278,6 +1493,14 @@ figcaption {
 
   .button {
     width: 100%;
+  }
+
+  .support-modal-panel {
+    padding: 22px;
+  }
+
+  .support-modal-actions {
+    flex-direction: column-reverse;
   }
 
   .install-actions {

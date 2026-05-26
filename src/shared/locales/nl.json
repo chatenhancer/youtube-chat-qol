@@ -36,9 +36,10 @@
     "mentionUserTitle": "Gebruiker vermelden. Alt/Option-klik om te citeren.",
     "mostUsed": "MEEST GEBRUIKT",
     "noInboxMessagesYet": "Nog geen inboxberichten.",
+    "noInboxMessages": "Geen inboxberichten",
     "noKeywords": "Geen trefwoorden",
     "noPreviousMessageYet": "Nog geen vorig bericht.",
-    "nothingHereYet": "Hier is nog niets",
+    "noRecentMessages": "Geen recente berichten",
     "openChannel": "Kanaal openen",
     "openChannelsInPopup": "Kanalen in pop-up openen",
     "original": "Origineel: {text}",
@@ -105,6 +106,9 @@
     },
     "supportAndFeedback": {
       "message": "Support en feedback"
+    },
+    "supportGithubIssuesPrompt": {
+      "message": "GitHub Issues is openbaar en werkt het best voor bugmeldingen, problemen met YouTube-chat en functieverzoeken.\n\nVermeld wat er gebeurde, wat je verwachtte, je browser en indien relevant de livestream-URL, een screenshot of consolefout.\n\nEen GitHub-account kan nodig zijn.\n\nDoorgaan naar GitHub Issues?"
     },
     "resetAllExtensionData": {
       "message": "Alle extensie-instellingen en lokale gegevens resetten"

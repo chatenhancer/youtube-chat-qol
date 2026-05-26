@@ -36,9 +36,10 @@
     "mentionUserTitle": "यूज़र को मेंशन करें. कोट करने के लिए Alt/Option-क्लिक करें.",
     "mostUsed": "सबसे ज़्यादा इस्तेमाल किए गए",
     "noInboxMessagesYet": "इनबॉक्स में अभी कोई मैसेज नहीं है.",
+    "noInboxMessages": "इनबॉक्स में कोई मैसेज नहीं है",
     "noKeywords": "कोई कीवर्ड नहीं",
     "noPreviousMessageYet": "अभी कोई पिछला मैसेज नहीं है.",
-    "nothingHereYet": "यहां अभी कुछ नहीं है",
+    "noRecentMessages": "कोई हालिया मैसेज नहीं",
     "openChannel": "चैनल खोलें",
     "openChannelsInPopup": "चैनल पॉपअप में खोलें",
     "original": "मूल: {text}",
@@ -108,6 +109,9 @@
     },
     "supportAndFeedback": {
       "message": "सपोर्ट और फ़ीडबैक"
+    },
+    "supportGithubIssuesPrompt": {
+      "message": "GitHub Issues सार्वजनिक है और बग रिपोर्ट, YouTube चैट समस्याओं और फीचर अनुरोधों के लिए सबसे अच्छा है।\n\nक्या हुआ, आप क्या उम्मीद कर रहे थे, आपका ब्राउज़र, और ज़रूरत होने पर livestream URL, screenshot या console error शामिल करें।\n\nGitHub खाता आवश्यक हो सकता है।\n\nGitHub Issues पर जाएँ?"
     },
     "resetAllExtensionData": {
       "message": "सभी एक्सटेंशन सेटिंग और लोकल डेटा रीसेट करें"
