@@ -10,6 +10,7 @@ import { copyFile, cp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import packageJson from '../package.json' with { type: 'json' };
+import { generateIcons } from './generate-icons.mjs';
 import { syncExtensionLocales } from './sync-extension-locales.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -20,6 +21,7 @@ const targetOutputDirs = {
 };
 const targets = getRequestedTargets();
 
+await generateIcons();
 await syncVersionedSourceFiles();
 
 const manifestSource = await readFile(path.join(root, 'manifest.json'), 'utf8');

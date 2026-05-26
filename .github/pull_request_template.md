@@ -13,9 +13,8 @@ Describe the change and the user-facing behavior it affects.
 
 ## Testing
 
-- [ ] `npm run typecheck`
-- [ ] `npm run lint`
-- [ ] `npm run verify`
+- [ ] `npm run build`
+- [ ] `npm run docs:build` if docs changed
 - [ ] Tested in Chrome
 - [ ] Tested in Firefox
 - [ ] Not applicable

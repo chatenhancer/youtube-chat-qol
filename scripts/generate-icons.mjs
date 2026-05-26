@@ -13,14 +13,21 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const iconDir = path.join(root, 'assets', 'icons');
 const sourcePath = path.join(iconDir, 'icon.svg');
 const sizes = [16, 32, 48, 128];
-const source = await readFile(sourcePath);
 
-for (const size of sizes) {
-  await sharp(source)
-    .resize(size, size, {
-      fit: 'contain',
-      background: { r: 0, g: 0, b: 0, alpha: 0 }
-    })
-    .png()
-    .toFile(path.join(iconDir, `icon-${size}.png`));
+export async function generateIcons() {
+  const source = await readFile(sourcePath);
+
+  for (const size of sizes) {
+    await sharp(source)
+      .resize(size, size, {
+        fit: 'contain',
+        background: { r: 0, g: 0, b: 0, alpha: 0 }
+      })
+      .png()
+      .toFile(path.join(iconDir, `icon-${size}.png`));
+  }
+}
+
+if (import.meta.url === `file://${process.argv[1]}`) {
+  await generateIcons();
 }
