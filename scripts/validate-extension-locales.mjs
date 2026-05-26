@@ -33,6 +33,7 @@ export async function validateExtensionLocales() {
   }
 
   for (const [locale, catalog] of Object.entries(catalogs)) {
+    validateTopLevelKeys(errors, locale, catalog);
     validateMessages(errors, locale, defaultMessages, catalog.messages);
     validateExtensionMessages(errors, locale, defaultExtension, catalog.extension);
   }
@@ -58,6 +59,19 @@ async function readLocaleCatalogs() {
     }));
 
   return Object.fromEntries(entries);
+}
+
+function validateTopLevelKeys(errors, locale, catalog) {
+  if (!isPlainObject(catalog)) {
+    errors.push(`${locale}.json must be an object.`);
+    return;
+  }
+
+  const allowedKeys = new Set(['messages', 'extension']);
+  const extraKeys = Object.keys(catalog).filter((key) => !allowedKeys.has(key)).sort();
+  if (extraKeys.length) {
+    errors.push(`${locale}.json has unexpected top-level keys: ${extraKeys.join(', ')}`);
+  }
 }
 
 function validateMessages(errors, locale, defaultMessages, localeMessagesSource) {

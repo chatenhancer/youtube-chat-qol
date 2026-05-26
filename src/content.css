@@ -66,6 +66,40 @@ ytd-menu-popup-renderer .ytcq-menu-icon svg {
   pointer-events: none;
 }
 
+ytd-menu-popup-renderer .ytcq-menu-icon.ytcq-bell-ringing svg {
+  transform-origin: 50% 16%;
+  animation: ytcq-bell-ring 620ms ease-in-out;
+}
+
+@keyframes ytcq-bell-ring {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+
+  15% {
+    transform: rotate(-14deg);
+  }
+
+  32% {
+    transform: rotate(12deg);
+  }
+
+  49% {
+    transform: rotate(-9deg);
+  }
+
+  66% {
+    transform: rotate(6deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ytd-menu-popup-renderer .ytcq-menu-icon.ytcq-bell-ringing svg {
+    animation: none;
+  }
+}
+
 ytd-menu-popup-renderer .ytcq-menu-label {
   flex: 1 1 auto;
   min-width: 0;
@@ -501,32 +535,9 @@ yt-live-chat-header-renderer .ytcq-inbox-badge[hidden] {
 .ytcq-profile-card-empty-centered {
   display: flex;
   min-height: 84px;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8px;
   text-align: center;
-}
-
-.ytcq-profile-card-empty-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 34px;
-  height: 34px;
-  color: var(--yt-live-chat-secondary-text-color, var(--yt-spec-text-secondary, #aaa));
-  fill: currentColor;
-  opacity: 0.32;
-}
-
-.ytcq-profile-card-empty-icon svg {
-  display: block;
-  width: 34px;
-  height: 34px;
-  overflow: visible;
-  stroke: currentColor;
-  stroke-width: 2px;
-  paint-order: stroke fill;
 }
 
 .ytcq-profile-card-actions {
@@ -594,34 +605,11 @@ yt-live-chat-header-renderer .ytcq-inbox-badge[hidden] {
 
 .ytcq-inbox-empty {
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8px;
   min-height: 84px;
   padding: 12px 0;
   text-align: center;
-}
-
-.ytcq-inbox-empty-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 34px;
-  height: 34px;
-  color: var(--yt-live-chat-secondary-text-color, var(--yt-spec-text-secondary, #aaa));
-  fill: currentColor;
-  opacity: 0.32;
-}
-
-.ytcq-inbox-empty-icon svg {
-  display: block;
-  width: 34px;
-  height: 34px;
-  overflow: visible;
-  stroke: currentColor;
-  stroke-width: 2px;
-  paint-order: stroke fill;
 }
 
 .ytcq-inbox-author {

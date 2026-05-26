@@ -36,9 +36,10 @@
     "mentionUserTitle": "Nhắc đến người dùng. Alt/Option-click để trích dẫn.",
     "mostUsed": "DÙNG NHIỀU NHẤT",
     "noInboxMessagesYet": "Chưa có tin nhắn trong hộp thư.",
+    "noInboxMessages": "Không có tin nhắn trong hộp thư",
     "noKeywords": "Không có từ khóa",
     "noPreviousMessageYet": "Chưa có tin nhắn trước đó.",
-    "nothingHereYet": "Chưa có gì ở đây",
+    "noRecentMessages": "Không có tin nhắn gần đây",
     "openChannel": "Mở kênh",
     "openChannelsInPopup": "Mở kênh trong popup",
     "original": "Gốc: {text}",
@@ -105,6 +106,9 @@
     },
     "supportAndFeedback": {
       "message": "Hỗ trợ và góp ý"
+    },
+    "supportGithubIssuesPrompt": {
+      "message": "GitHub Issues là công khai và phù hợp nhất để báo lỗi, sự cố chat YouTube và yêu cầu tính năng.\n\nHãy mô tả điều đã xảy ra, điều bạn mong đợi, trình duyệt của bạn và URL livestream, ảnh chụp màn hình hoặc lỗi console khi liên quan.\n\nCó thể cần tài khoản GitHub.\n\nTiếp tục đến GitHub Issues?"
     },
     "resetAllExtensionData": {
       "message": "Đặt lại mọi cài đặt tiện ích và dữ liệu cục bộ"

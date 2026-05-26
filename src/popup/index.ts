@@ -12,6 +12,7 @@ import { clampNumber } from '../shared/text';
 const LANDING_PAGE_URL = 'https://chatenhancer.com';
 const GITHUB_URL = 'https://github.com/chat-enhancer-yt/youtube-chat-qol';
 const SUPPORT_URL = 'https://github.com/chat-enhancer-yt/youtube-chat-qol/issues';
+const BELL_RING_CLASS = 'ytcq-bell-ringing';
 
 const controls = {
   landingLink: document.querySelector<HTMLAnchorElement>('#landingLink'),
@@ -51,6 +52,8 @@ function init(): void {
   });
   controls.supportLink?.addEventListener('click', (event) => {
     event.preventDefault();
+    const confirmed = window.confirm(getExtensionMessage('supportGithubIssuesPrompt'));
+    if (!confirmed) return;
     chrome.tabs.create({ url: SUPPORT_URL });
   });
 
@@ -88,12 +91,26 @@ function init(): void {
   });
 
   controls.sound.addEventListener('change', () => {
-    save({ sound: Boolean(controls.sound?.checked) });
+    const enabled = Boolean(controls.sound?.checked);
+    if (enabled) animatePopupSoundIcon();
+    save({ sound: enabled });
   });
 }
 
 function save(values: Partial<Options>): void {
   chrome.storage.sync.set(values);
+}
+
+function animatePopupSoundIcon(): void {
+  const icon = document.querySelector<SVGSVGElement>('.sound-icon');
+  if (!icon) return;
+
+  icon.classList.remove(BELL_RING_CLASS);
+  void icon.getBoundingClientRect();
+  icon.classList.add(BELL_RING_CLASS);
+  window.setTimeout(() => {
+    icon.classList.remove(BELL_RING_CLASS);
+  }, 700);
 }
 
 function resetExtensionState(): void {

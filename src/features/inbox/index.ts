@@ -5,7 +5,7 @@
  * locally configured keyword/phrase matches. The UI stays compact by sharing
  * one header button, one card, and inline highlights instead of extra labels.
  */
-import { createEmptyLeavesIcon, createSvgIcon } from '../../shared/icons';
+import { createSvgIcon } from '../../shared/icons';
 import { t } from '../../shared/i18n';
 import {
   getAuthorName,
@@ -463,16 +463,11 @@ function renderInboxList(list: HTMLElement): void {
     const empty = document.createElement('div');
     empty.className = 'ytcq-profile-card-empty ytcq-inbox-empty';
 
-    const icon = document.createElement('span');
-    icon.className = 'ytcq-inbox-empty-icon';
-    icon.setAttribute('aria-hidden', 'true');
-    icon.appendChild(createEmptyInboxIcon());
-
     const text = document.createElement('span');
-    text.textContent = t('nothingHereYet');
+    text.textContent = t('noInboxMessages');
 
     empty.setAttribute('aria-label', t('inboxEmpty'));
-    empty.append(icon, text);
+    empty.append(text);
     list.append(empty);
     return;
   }
@@ -808,10 +803,6 @@ function setInboxIcon(container: HTMLElement, inboxText: boolean): void {
 
 function createAddIcon(): SVGSVGElement {
   return createSvgIcon(INBOX_ICON_VIEW_BOX, ADD_ICON_PATH);
-}
-
-function createEmptyInboxIcon(): SVGSVGElement {
-  return createEmptyLeavesIcon();
 }
 
 function getInboxHeaderAnchor(header: HTMLElement): HTMLElement | null {

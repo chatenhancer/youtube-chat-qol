@@ -36,9 +36,10 @@
     "mentionUserTitle": "الإشارة إلى المستخدم. انقر مع Alt/Option للاقتباس.",
     "mostUsed": "الأكثر استخداما",
     "noInboxMessagesYet": "لا توجد رسائل في صندوق الوارد بعد.",
+    "noInboxMessages": "لا توجد رسائل في صندوق الوارد",
     "noKeywords": "لا توجد كلمات مفتاحية",
     "noPreviousMessageYet": "لا توجد رسالة سابقة بعد.",
-    "nothingHereYet": "لا شيء هنا بعد",
+    "noRecentMessages": "لا توجد رسائل حديثة",
     "openChannel": "فتح القناة",
     "openChannelsInPopup": "فتح القنوات في نافذة منبثقة",
     "original": "الأصل: {text}",
@@ -108,6 +109,9 @@
     },
     "supportAndFeedback": {
       "message": "الدعم والملاحظات"
+    },
+    "supportGithubIssuesPrompt": {
+      "message": "GitHub Issues علني، وهو الأنسب لبلاغات الأخطاء ومشكلات دردشة YouTube وطلبات الميزات.\n\nاذكر ما حدث، وما الذي كنت تتوقعه، والمتصفح المستخدم، ورابط البث المباشر أو لقطة شاشة أو خطأ من وحدة التحكم عند الحاجة.\n\nقد تحتاج إلى حساب GitHub.\n\nهل تريد المتابعة إلى GitHub Issues؟"
     },
     "resetAllExtensionData": {
       "message": "إعادة تعيين كل إعدادات الإضافة والبيانات المحلية"

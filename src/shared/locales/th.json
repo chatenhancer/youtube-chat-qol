@@ -36,9 +36,10 @@
     "mentionUserTitle": "กล่าวถึงผู้ใช้ กด Alt/Option-click เพื่ออ้างอิง",
     "mostUsed": "ใช้บ่อยที่สุด",
     "noInboxMessagesYet": "ยังไม่มีข้อความในกล่องข้อความ",
+    "noInboxMessages": "ไม่มีข้อความในกล่องข้อความ",
     "noKeywords": "ไม่มีคำสำคัญ",
     "noPreviousMessageYet": "ยังไม่มีข้อความก่อนหน้า",
-    "nothingHereYet": "ยังไม่มีอะไรที่นี่",
+    "noRecentMessages": "ไม่มีข้อความล่าสุด",
     "openChannel": "เปิดช่อง",
     "openChannelsInPopup": "เปิดช่องในป๊อปอัป",
     "original": "ต้นฉบับ: {text}",
@@ -105,6 +106,9 @@
     },
     "supportAndFeedback": {
       "message": "ช่วยเหลือและความเห็น"
+    },
+    "supportGithubIssuesPrompt": {
+      "message": "GitHub Issues เป็นพื้นที่สาธารณะ และเหมาะที่สุดสำหรับรายงานบั๊ก ปัญหาแชท YouTube และคำขอฟีเจอร์\n\nระบุสิ่งที่เกิดขึ้น สิ่งที่คาดหวัง เบราว์เซอร์ที่ใช้ และ URL ไลฟ์สตรีม ภาพหน้าจอ หรือข้อผิดพลาดจากคอนโซลเมื่อเกี่ยวข้อง\n\nอาจต้องมีบัญชี GitHub\n\nต้องการไปต่อที่ GitHub Issues หรือไม่?"
     },
     "resetAllExtensionData": {
       "message": "รีเซ็ตการตั้งค่าส่วนขยายและข้อมูลในเครื่องทั้งหมด"

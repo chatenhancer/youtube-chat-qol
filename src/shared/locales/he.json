@@ -36,9 +36,10 @@
     "mentionUserTitle": "אזכור משתמש. Alt/Option-קליק כדי לצטט.",
     "mostUsed": "בשימוש נפוץ",
     "noInboxMessagesYet": "אין עדיין הודעות בתיבה.",
+    "noInboxMessages": "אין הודעות בתיבה",
     "noKeywords": "אין מילות מפתח",
     "noPreviousMessageYet": "אין עדיין הודעה קודמת.",
-    "nothingHereYet": "עדיין אין כאן כלום",
+    "noRecentMessages": "אין הודעות אחרונות",
     "openChannel": "פתיחת ערוץ",
     "openChannelsInPopup": "פתיחת ערוצים בחלון קופץ",
     "original": "מקור: {text}",
@@ -105,6 +106,9 @@
     },
     "supportAndFeedback": {
       "message": "תמיכה ומשוב"
+    },
+    "supportGithubIssuesPrompt": {
+      "message": "GitHub Issues הוא ציבורי ומתאים במיוחד לדיווחי באגים, בעיות בצ׳אט YouTube ובקשות לפיצ׳רים.\n\nיש לכלול מה קרה, מה היה צפוי, באיזה דפדפן נעשה שימוש, ובמידת הצורך את כתובת השידור החי, צילום מסך או שגיאת מסוף.\n\nייתכן שיידרש חשבון GitHub.\n\nלהמשיך אל GitHub Issues?"
     },
     "resetAllExtensionData": {
       "message": "איפוס כל הגדרות התוסף והנתונים המקומיים"

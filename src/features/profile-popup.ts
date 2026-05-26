@@ -7,7 +7,6 @@
  */
 import { getOptions } from '../shared/state';
 import { t } from '../shared/i18n';
-import { createEmptyLeavesIcon } from '../shared/icons';
 import { cleanText, normalizeComparableText } from '../shared/text';
 import { getAuthorName, getRendererData } from '../youtube/messages';
 import { appendRichMessageText } from '../youtube/rich-text';
@@ -327,15 +326,10 @@ function renderProfileMessages(list: HTMLElement, recentMessages: MessageRecord[
   const empty = document.createElement('div');
   empty.className = 'ytcq-profile-card-empty ytcq-profile-card-empty-centered';
 
-  const icon = document.createElement('span');
-  icon.className = 'ytcq-profile-card-empty-icon';
-  icon.setAttribute('aria-hidden', 'true');
-  icon.append(createEmptyLeavesIcon());
-
   const text = document.createElement('span');
-  text.textContent = t('nothingHereYet');
+  text.textContent = t('noRecentMessages');
 
-  empty.append(icon, text);
+  empty.append(text);
   list.append(empty);
 }
 

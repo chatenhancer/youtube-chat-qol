@@ -36,9 +36,10 @@
     "mentionUserTitle": "提及用户。Alt/Option 点击可引用。",
     "mostUsed": "最常用",
     "noInboxMessagesYet": "收件箱中还没有消息。",
+    "noInboxMessages": "收件箱中没有消息",
     "noKeywords": "没有关键词",
     "noPreviousMessageYet": "还没有上一条消息。",
-    "nothingHereYet": "这里还没有内容",
+    "noRecentMessages": "没有最近消息",
     "openChannel": "打开频道",
     "openChannelsInPopup": "在弹出窗口中打开频道",
     "original": "原文：{text}",
@@ -108,6 +109,9 @@
     },
     "supportAndFeedback": {
       "message": "支持和反馈"
+    },
+    "supportGithubIssuesPrompt": {
+      "message": "GitHub Issues 是公开的，最适合报告错误、YouTube 聊天问题和功能请求。\n\n请说明发生了什么、你期望的结果、使用的浏览器，以及相关时的直播 URL、截图或控制台错误。\n\n可能需要 GitHub 账户。\n\n继续前往 GitHub Issues？"
     },
     "resetAllExtensionData": {
       "message": "重置所有扩展设置和本地数据"

@@ -36,9 +36,10 @@
     "mentionUserTitle": "提及使用者。Alt/Option 點擊可引用。",
     "mostUsed": "最常使用",
     "noInboxMessagesYet": "收件匣尚無訊息。",
+    "noInboxMessages": "收件匣中沒有訊息",
     "noKeywords": "沒有關鍵字",
     "noPreviousMessageYet": "尚無上一則訊息。",
-    "nothingHereYet": "這裡還沒有內容",
+    "noRecentMessages": "沒有最近訊息",
     "openChannel": "開啟頻道",
     "openChannelsInPopup": "在彈出視窗開啟頻道",
     "original": "原文：{text}",
@@ -105,6 +106,9 @@
     },
     "supportAndFeedback": {
       "message": "支援與回饋"
+    },
+    "supportGithubIssuesPrompt": {
+      "message": "GitHub Issues 是公開的，最適合回報錯誤、YouTube 聊天問題和功能請求。\n\n請說明發生了什麼、你預期的結果、使用的瀏覽器，以及相關時的直播 URL、截圖或主控台錯誤。\n\n可能需要 GitHub 帳號。\n\n繼續前往 GitHub Issues？"
     },
     "resetAllExtensionData": {
       "message": "重設所有擴充功能設定與本機資料"

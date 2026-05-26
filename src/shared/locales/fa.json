@@ -36,9 +36,10 @@
     "mentionUserTitle": "منشن کاربر. برای نقل‌قول Alt/Option-click کنید.",
     "mostUsed": "بیشترین استفاده",
     "noInboxMessagesYet": "هنوز پیامی در صندوق ورودی نیست.",
+    "noInboxMessages": "هیچ پیامی در صندوق ورودی نیست",
     "noKeywords": "کلیدواژه‌ای نیست",
     "noPreviousMessageYet": "هنوز پیام قبلی وجود ندارد.",
-    "nothingHereYet": "هنوز چیزی اینجا نیست",
+    "noRecentMessages": "هیچ پیام اخیری نیست",
     "openChannel": "باز کردن کانال",
     "openChannelsInPopup": "باز کردن کانال‌ها در پنجره کوچک",
     "original": "اصلی: {text}",
@@ -105,6 +106,9 @@
     },
     "supportAndFeedback": {
       "message": "پشتیبانی و بازخورد"
+    },
+    "supportGithubIssuesPrompt": {
+      "message": "GitHub Issues عمومی است و برای گزارش باگ، مشکلات چت YouTube و درخواست قابلیت‌ها مناسب‌تر است.\n\nبنویسید چه اتفاقی افتاده، انتظار چه چیزی را داشتید، مرورگر شما چیست و در صورت نیاز URL پخش زنده، اسکرین‌شات یا خطای کنسول را اضافه کنید.\n\nممکن است حساب GitHub لازم باشد.\n\nبه GitHub Issues ادامه می‌دهید؟"
     },
     "resetAllExtensionData": {
       "message": "بازنشانی همه تنظیمات افزونه و داده‌های محلی"

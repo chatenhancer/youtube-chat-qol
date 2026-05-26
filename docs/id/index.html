@@ -79,7 +79,7 @@
         }
       })();
     </script>
-    <link rel="stylesheet" href="../styles.css?v=51">
+    <link rel="stylesheet" href="../styles.css?v=58">
     <script type="application/ld+json">
       {
               "@context": "https://schema.org",
@@ -163,6 +163,40 @@
         </a>
       </div>
     </header>
+
+    <div
+      class="store-version-alert store-version-alert-top"
+      role="status"
+      aria-live="polite"
+      hidden
+      data-store-version-alert
+      data-i18n-attr="data-alert-body:install.updatePendingBody;data-alert-and:install.updatePendingAnd;data-alert-chrome:install.chromeStore;data-alert-firefox:install.firefoxAddons"
+      data-alert-body="{stores} akan segera mendapatkan versi terbaru."
+      data-alert-and="dan"
+      data-alert-chrome="Chrome Web Store"
+      data-alert-firefox="Firefox Add-ons"
+    >
+      <span class="store-version-alert-icon" aria-hidden="true">
+        <svg class="store-version-hourglass" viewBox="0 0 24 24" focusable="false">
+          <defs>
+            <clipPath id="store-version-hourglass-top-clip">
+              <path d="M8 4h8v3q0 1.65-1.175 2.825T12 11T9.175 9.825T8 7V4Z"></path>
+            </clipPath>
+            <clipPath id="store-version-hourglass-bottom-clip">
+              <path d="M8 20h8v-3q0-1.65-1.175-2.825T12 13t-2.825 1.175T8 17v3Z"></path>
+            </clipPath>
+          </defs>
+          <path class="store-version-hourglass-frame" d="M4 22v-2h2v-3q0-1.525.713-2.863T8.7 12q-1.275-.8-1.987-2.137T6 7V4H4V2h16v2h-2v3q0 1.525-.712 2.863T15.3 12q1.275.8 1.988 2.138T18 17v3h2v2H4Z"></path>
+          <rect class="store-version-hourglass-top-sand" x="8" y="4" width="8" height="7" clip-path="url(#store-version-hourglass-top-clip)"></rect>
+          <rect class="store-version-hourglass-bottom-sand" x="8" y="13" width="8" height="7" clip-path="url(#store-version-hourglass-bottom-clip)"></rect>
+          <path class="store-version-hourglass-stream" d="M12 10.8v4.7"></path>
+        </svg>
+      </span>
+      <span class="store-version-alert-copy">
+        <strong data-i18n="install.updatePendingTitle">Pembaruan store sedang berlangsung</strong>
+        <span data-store-version-alert-message></span>
+      </span>
+    </div>
 
     <main id="top">
       <section class="hero" aria-labelledby="hero-title">
@@ -385,6 +419,9 @@
             <p data-i18n="install.copy">Dapatkan dari Chrome Web Store atau Firefox Add-ons, atau bangun ekstensi dari source untuk pengembangan lokal. Versi Chrome juga dapat bekerja di browser berbasis Chromium lainnya.</p>
             <div class="version-badges" aria-label="Published extension versions">
               <span data-i18n="install.publishedVersions">Versi yang dipublikasikan</span>
+              <a href="https://github.com/chat-enhancer-yt/youtube-chat-qol/blob/main/package.json">
+                <img src="https://img.shields.io/github/package-json/v/chat-enhancer-yt/youtube-chat-qol?label=Source" alt="Source version">
+              </a>
               <a href="https://chromewebstore.google.com/detail/pkhaaipeppfpakofgpdpcpkflangpghf">
                 <img src="https://img.shields.io/chrome-web-store/v/pkhaaipeppfpakofgpdpcpkflangpghf?label=Chrome%20Web%20Store" alt="Chrome Web Store version">
               </a>
@@ -418,10 +455,10 @@
               </span>
               <span data-i18n="install.sourceCode">Source Code</span>
             </a>
-            <a class="button button-link" href="https://github.com/chat-enhancer-yt/youtube-chat-qol/issues">
-              <span class="button-icon" data-symbol="support" aria-hidden="true">
-                <svg viewBox="0 -960 960 960" focusable="false">
-                  <path d="M324-111.5Q251-143 197-197t-85.5-127Q80-397 80-480t31.5-156Q143-709 197-763t127-85.5Q397-880 480-880t156 31.5Q709-817 763-763t85.5 127Q880-563 880-480t-31.5 156Q817-251 763-197t-127 85.5Q563-80 480-80t-156-31.5Zm40-70.5 48-110q-42-15-72.5-46.5T292-412l-110 46q23 64 71 112t111 72Zm-72-366q17-42 47.5-73.5T412-668l-46-110q-64 24-112 72t-72 112l110 46Zm273 153q35-35 35-85t-35-85q-35-35-85-35t-85 35q-35 35-35 85t35 85q35 35 85 35t85-35Zm31 213q63-24 110.5-71.5T778-364l-110-48q-15 42-46 72.5T550-292l46 110Zm72-368 110-46q-24-63-71.5-110.5T596-778l-46 112q41 15 71 45.5t47 70.5Z"></path>
+            <a class="button button-link" href="https://github.com/chat-enhancer-yt/youtube-chat-qol/issues" data-support-modal-trigger>
+              <span class="button-icon" data-symbol="bug_report" aria-hidden="true">
+                <svg viewBox="0 0 24 24" focusable="false">
+                  <path d="M12 21q-1.625 0-3.012-.8T6.8 18H4v-2h2.1q-.075-.5-.088-1T6 14H4v-2h2q0-.5.012-1t.088-1H4V8h2.8q.35-.575.788-1.075T8.6 6.05L7 4.4L8.4 3l2.15 2.15q.7-.225 1.425-.225t1.425.225L15.6 3L17 4.4l-1.65 1.65q.575.375 1.038.862T17.2 8H20v2h-2.1q.075.5.088 1T18 12h2v2h-2q0 .5-.013 1t-.087 1H20v2h-2.8q-.8 1.4-2.187 2.2T12 21m-2-5h4v-2h-4zm0-4h4v-2h-4z"></path>
                 </svg>
               </span>
               <span data-i18n="install.supportFeedback">Dukungan</span>
@@ -623,6 +660,29 @@
       </section>
     </main>
 
+    <dialog class="support-modal" aria-labelledby="support-modal-title" data-support-modal>
+      <div class="support-modal-panel">
+        <div class="support-modal-heading">
+          <span class="support-modal-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" focusable="false">
+              <path d="M12 21q-1.625 0-3.012-.8T6.8 18H4v-2h2.1q-.075-.5-.088-1T6 14H4v-2h2q0-.5.012-1t.088-1H4V8h2.8q.35-.575.788-1.075T8.6 6.05L7 4.4L8.4 3l2.15 2.15q.7-.225 1.425-.225t1.425.225L15.6 3L17 4.4l-1.65 1.65q.575.375 1.038.862T17.2 8H20v2h-2.1q.075.5.088 1T18 12h2v2h-2q0 .5-.013 1t-.087 1H20v2h-2.8q-.8 1.4-2.187 2.2T12 21m-2-5h4v-2h-4zm0-4h4v-2h-4z"></path>
+            </svg>
+          </span>
+          <h2 id="support-modal-title" data-i18n="install.supportModalTitle">Tentang GitHub Issues</h2>
+        </div>
+        <p data-i18n="install.supportModalBody">GitHub Issues bersifat publik dan paling cocok untuk laporan bug, masalah chat YouTube, dan permintaan fitur. Akun GitHub mungkin diperlukan.</p>
+        <ul class="support-modal-list">
+          <li data-i18n="install.supportModalDetailOne">Sertakan apa yang terjadi, apa yang diharapkan, dan browser yang digunakan.</li>
+          <li data-i18n="install.supportModalDetailTwo">Untuk masalah chat YouTube, sertakan URL livestream dan tangkapan layar atau error konsol jika memungkinkan.</li>
+          <li data-i18n="install.supportModalDetailThree">Untuk pertanyaan privat, gunakan email.</li>
+        </ul>
+        <div class="support-modal-actions">
+          <button class="button button-link" type="button" data-support-modal-close data-i18n="install.supportModalCancel">Batal</button>
+          <a class="button button-primary" href="https://github.com/chat-enhancer-yt/youtube-chat-qol/issues" data-support-modal-continue data-i18n="install.supportModalContinue">Lanjut ke GitHub Issues</a>
+        </div>
+      </div>
+    </dialog>
+
     <footer class="site-footer">
       <p data-i18n="footer.disclaimer">Chat Enhancer for YouTube tidak berafiliasi dengan YouTube atau Google.</p>
       <a href="https://github.com/chat-enhancer-yt/youtube-chat-qol/blob/main/PRIVACY.md" data-i18n="footer.privacy">Privasi</a>
@@ -636,6 +696,9 @@
         const chromeButton = document.querySelector('[data-browser-install="chrome"]');
         const firefoxButton = document.querySelector('[data-browser-install="firefox"]');
         const languageSwitcher = document.querySelector("[data-language-switcher]");
+        const supportModal = document.querySelector("[data-support-modal]");
+        const supportModalClose = document.querySelector("[data-support-modal-close]");
+        const supportModalContinue = document.querySelector("[data-support-modal-continue]");
 
         if (languageSwitcher) {
           const path = window.location.pathname;
@@ -648,6 +711,34 @@
           });
         }
 
+        document.querySelectorAll("[data-support-modal-trigger]").forEach((trigger) => {
+          trigger.addEventListener("click", (event) => {
+            if (event instanceof MouseEvent && (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0)) return;
+            event.preventDefault();
+            const href = trigger.getAttribute("href") || "";
+
+            if (supportModal && typeof supportModal.showModal === "function" && supportModalContinue) {
+              supportModalContinue.setAttribute("href", href);
+              supportModal.showModal();
+              return;
+            }
+
+            if (window.confirm(getSupportModalPlainText())) {
+              window.location.href = href;
+            }
+          });
+        });
+
+        supportModalClose?.addEventListener("click", () => {
+          closeSupportModal();
+        });
+
+        supportModal?.addEventListener("click", (event) => {
+          if (event.target === supportModal) closeSupportModal();
+        });
+
+        void checkStoreVersionStatus();
+
         if (!installActions || !chromeButton || !firefoxButton) return;
 
         const isFirefox = navigator.userAgent.toLowerCase().includes("firefox/");
@@ -659,6 +750,85 @@
         secondaryButton.classList.add("button-secondary");
         secondaryButton.classList.remove("button-primary");
         installActions.insertBefore(primaryButton, installActions.firstElementChild);
+
+        async function checkStoreVersionStatus() {
+          const alert = document.querySelector("[data-store-version-alert]");
+          const message = document.querySelector("[data-store-version-alert-message]");
+          if (!alert || !message) return;
+
+          const versions = await fetchPublishedVersions();
+          const packageVersion = versions.package;
+          if (!packageVersion) return;
+
+          const pendingStores = [
+            ["chrome", versions.chrome],
+            ["firefox", versions.firefox]
+          ].filter(([, version]) => version && normalizeVersion(version) !== normalizeVersion(packageVersion));
+
+          if (!pendingStores.length) return;
+
+          const stores = pendingStores.map(([key]) => alert.dataset[`alert${capitalize(key)}`]);
+          const storeList = formatStoreList(stores, alert.dataset.alertAnd || "and");
+          const bodyTemplate = alert.dataset.alertBody || "{stores} will get the latest version soon.";
+
+          message.textContent = bodyTemplate.replace("{stores}", storeList);
+          alert.hidden = false;
+        }
+
+        function formatStoreList(stores, conjunction) {
+          if (stores.length <= 2) return stores.join(` ${conjunction} `);
+          return `${stores.slice(0, -1).join(", ")} ${conjunction} ${stores.at(-1)}`;
+        }
+
+        function getSupportModalPlainText() {
+          const title = document.querySelector("#support-modal-title")?.textContent?.trim();
+          const body = supportModal?.querySelector("p")?.textContent?.trim();
+          const details = Array.from(supportModal?.querySelectorAll("li") || [])
+            .map((item) => item.textContent?.trim())
+            .filter(Boolean)
+            .map((item) => `- ${item}`);
+          return [title, body, details.join("\n")].filter(Boolean).join("\n\n");
+        }
+
+        function closeSupportModal() {
+          if (supportModal && typeof supportModal.close === "function") supportModal.close();
+        }
+
+        async function fetchPublishedVersions() {
+          const sources = {
+            package: "https://img.shields.io/github/package-json/v/chat-enhancer-yt/youtube-chat-qol.json?label=Source",
+            chrome: "https://img.shields.io/chrome-web-store/v/pkhaaipeppfpakofgpdpcpkflangpghf.json?label=Chrome%20Web%20Store",
+            firefox: "https://img.shields.io/amo/v/chat-enhancer-for-youtube.json?label=Firefox%20Add-ons"
+          };
+          const entries = await Promise.all(
+            Object.entries(sources).map(async ([key, url]) => [key, await fetchShieldMessage(url)])
+          );
+          return Object.fromEntries(entries);
+        }
+
+        async function fetchShieldMessage(url) {
+          try {
+            const response = await fetch(url, { cache: "no-store" });
+            if (!response.ok) return "";
+            const badge = await response.json();
+            const message = typeof badge.message === "string" ? badge.message : "";
+            return isVersionMessage(message) ? message : "";
+          } catch {
+            return "";
+          }
+        }
+
+        function isVersionMessage(value) {
+          return /^v?\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?$/.test(String(value).trim());
+        }
+
+        function normalizeVersion(version) {
+          return String(version).trim().replace(/^v/i, "");
+        }
+
+        function capitalize(value) {
+          return value.charAt(0).toUpperCase() + value.slice(1);
+        }
       })();
     </script>
   </body>
