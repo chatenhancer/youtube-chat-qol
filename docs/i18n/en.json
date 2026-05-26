@@ -85,7 +85,7 @@
     "copy": "Get it from the Chrome Web Store or Firefox Add-ons, or build the extension from source for local development. The Chrome version may also work in other Chromium-based browsers.",
     "publishedVersions": "Published versions",
     "updatePendingTitle": "Store update in progress",
-    "updatePendingBody": "{stores} will get the latest version soon",
+    "updatePendingBody": "{stores} will get the latest version soon.",
     "updatePendingAnd": "and",
     "chromeStore": "Chrome Web Store",
     "firefoxAddons": "Firefox Add-ons",

@@ -85,7 +85,7 @@
     "copy": "इसे Chrome Web Store या Firefox Add-ons से लें, या स्थानीय विकास के लिए सोर्स से एक्सटेंशन बनाएं। Chrome वर्जन अन्य Chromium-आधारित ब्राउजरों में भी काम कर सकता है।",
     "publishedVersions": "प्रकाशित वर्जन",
     "updatePendingTitle": "स्टोर अपडेट जारी है",
-    "updatePendingBody": "{stores} को जल्द ही नया वर्ज़न मिलेगा",
+    "updatePendingBody": "{stores} को जल्द ही नया वर्ज़न मिलेगा.",
     "updatePendingAnd": "और",
     "chromeStore": "Chrome Web Store",
     "firefoxAddons": "Firefox Add-ons",

@@ -85,7 +85,7 @@
     "copy": "Chrome Web Store または Firefox Add-ons から入手できます。ローカル開発用にソースからビルドすることもできます。Chrome 版は他の Chromium ベースのブラウザでも動作する場合があります。",
     "publishedVersions": "公開済みバージョン",
     "updatePendingTitle": "ストア更新中",
-    "updatePendingBody": "{stores} にはまもなく最新バージョンが届きます",
+    "updatePendingBody": "{stores} にはまもなく最新バージョンが届きます.",
     "updatePendingAnd": "と",
     "chromeStore": "Chrome Web Store",
     "firefoxAddons": "Firefox Add-ons",

@@ -85,7 +85,7 @@
     "copy": "Отримайте його в Chrome Web Store або Firefox Add-ons, або зберіть розширення з вихідного коду для локальної розробки. Версія Chrome зазвичай працює й в інших браузерах на Chromium.",
     "publishedVersions": "Опубліковані версії",
     "updatePendingTitle": "Оновлення в магазині триває",
-    "updatePendingBody": "{stores} скоро отримають найновішу версію",
+    "updatePendingBody": "{stores} скоро отримають найновішу версію.",
     "updatePendingAnd": "і",
     "chromeStore": "Chrome Web Store",
     "firefoxAddons": "Firefox Add-ons",

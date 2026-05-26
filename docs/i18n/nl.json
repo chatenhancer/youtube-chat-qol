@@ -85,7 +85,7 @@
     "copy": "Haal de extensie uit de Chrome Web Store of Firefox Add-ons, of bouw hem vanuit de broncode voor lokale ontwikkeling. De Chrome-versie werkt meestal ook in andere Chromium-gebaseerde browsers.",
     "publishedVersions": "Gepubliceerde versies",
     "updatePendingTitle": "Store-update bezig",
-    "updatePendingBody": "{stores} krijgen binnenkort de nieuwste versie",
+    "updatePendingBody": "{stores} krijgen binnenkort de nieuwste versie.",
     "updatePendingAnd": "en",
     "chromeStore": "Chrome Web Store",
     "firefoxAddons": "Firefox Add-ons",

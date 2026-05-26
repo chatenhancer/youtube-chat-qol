@@ -85,7 +85,7 @@
     "copy": "Chrome Web Store veya Firefox Add-ons üzerinden edinin ya da yerel geliştirme için uzantıyı kaynak koddan derleyin. Chrome sürümü diğer Chromium tabanlı tarayıcılarda da çalışabilir.",
     "publishedVersions": "Yayınlanmış sürümler",
     "updatePendingTitle": "Store güncellemesi sürüyor",
-    "updatePendingBody": "{stores} yakında en son sürümü alacak",
+    "updatePendingBody": "{stores} yakında en son sürümü alacak.",
     "updatePendingAnd": "ve",
     "chromeStore": "Chrome Web Store",
     "firefoxAddons": "Firefox Add-ons",

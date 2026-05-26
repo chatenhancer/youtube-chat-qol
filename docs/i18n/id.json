@@ -85,7 +85,7 @@
     "copy": "Dapatkan dari Chrome Web Store atau Firefox Add-ons, atau bangun ekstensi dari source untuk pengembangan lokal. Versi Chrome juga dapat bekerja di browser berbasis Chromium lainnya.",
     "publishedVersions": "Versi yang dipublikasikan",
     "updatePendingTitle": "Pembaruan store sedang berlangsung",
-    "updatePendingBody": "{stores} akan segera mendapatkan versi terbaru",
+    "updatePendingBody": "{stores} akan segera mendapatkan versi terbaru.",
     "updatePendingAnd": "dan",
     "chromeStore": "Chrome Web Store",
     "firefoxAddons": "Firefox Add-ons",

@@ -85,7 +85,7 @@
     "copy": "Tải từ Chrome Web Store hoặc Firefox Add-ons, hoặc build tiện ích từ mã nguồn để phát triển cục bộ. Phiên bản Chrome thường cũng dùng được trên trình duyệt dựa trên Chromium.",
     "publishedVersions": "Phiên bản đã phát hành",
     "updatePendingTitle": "Đang cập nhật trên cửa hàng",
-    "updatePendingBody": "{stores} sẽ sớm có phiên bản mới nhất",
+    "updatePendingBody": "{stores} sẽ sớm có phiên bản mới nhất.",
     "updatePendingAnd": "và",
     "chromeStore": "Chrome Web Store",
     "firefoxAddons": "Firefox Add-ons",
