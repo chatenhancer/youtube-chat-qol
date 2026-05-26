@@ -89,18 +89,16 @@ npm run build:firefox
 - `npm run typecheck` checks TypeScript.
 - `npm run lint` runs ESLint.
 - `npm run check` runs typecheck and lint.
-- `npm run generate` refreshes generated repo assets: icons, localized docs, and the sitemap.
-- `npm run screenshots` regenerates README/site showcase images and localized store screenshots when needed.
-- `npm run build` runs `generate`, then writes Chrome, Edge, and Firefox unpacked extension folders.
-- `npm run build:chrome`, `npm run build:edge`, and `npm run build:firefox` run `generate`, then write one browser's unpacked extension folder.
-- `npm run verify` runs `check` and the full repo build.
-- `npm run zip` verifies the repo, then writes the default Chrome Web Store archive and tracked source archive to `dist/release/`.
-- `npm run zip:all` verifies the repo, then writes Chrome, Edge, Firefox, and tracked source release archives.
+- `npm run docs:build` regenerates localized docs and the sitemap when docs change.
+- `npm run docs:screenshots` regenerates README/site showcase images and localized store screenshots when needed.
+- `npm run build` runs `check`, then writes Chrome, Edge, and Firefox unpacked extension folders.
+- `npm run build:chrome`, `npm run build:edge`, and `npm run build:firefox` run `check`, then write one browser's unpacked extension folder.
+- `npm run zip` runs `build`, then writes Chrome, Edge, Firefox, and tracked source release archives to `dist/release/`.
 
 ## Release
 
 1. Update `version` in `package.json`.
-2. Run `npm run verify`.
+2. Run `npm run build`.
 3. Commit the version bump and create a tag such as `v0.7.6`.
 4. Push the commit and tag.
 

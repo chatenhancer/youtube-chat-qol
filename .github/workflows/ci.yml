@@ -7,7 +7,7 @@ on:
       - main
 
 jobs:
-  verify:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -16,4 +16,5 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: npm run verify
+      - run: npm run build
+      - run: npm run docs:build
