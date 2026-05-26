@@ -5,13 +5,13 @@
 # Chat Enhancer for YouTube
 
 <p>
-  <a href="https://chromewebstore.google.com/detail/pkhaaipeppfpakofgpdpcpkflangpghf"><img alt="Chrome Web Store" src="https://img.shields.io/chrome-web-store/v/pkhaaipeppfpakofgpdpcpkflangpghf?label=Chrome%20Web%20Store"></a>
-  <a href="https://addons.mozilla.org/firefox/addon/chat-enhancer-for-youtube/"><img alt="Firefox Add-ons" src="https://img.shields.io/amo/v/chat-enhancer-for-youtube?label=Firefox%20Add-ons"></a>
-  <img alt="Package version" src="https://img.shields.io/github/package-json/v/chat-enhancer-yt/youtube-chat-qol?label=package">
-  <a href="https://github.com/chat-enhancer-yt/youtube-chat-qol/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/chat-enhancer-yt/youtube-chat-qol/actions/workflows/ci.yml/badge.svg"></a>
-  <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-5.x-3178c6">
-  <img alt="Manifest V3" src="https://img.shields.io/badge/Manifest-V3-4285f4">
-  <a href="LICENSE"><img alt="License" src="https://img.shields.io/github/license/chat-enhancer-yt/youtube-chat-qol"></a>
+  <a href="https://chromewebstore.google.com/detail/pkhaaipeppfpakofgpdpcpkflangpghf"><img alt="chrome web store" src="https://img.shields.io/chrome-web-store/v/pkhaaipeppfpakofgpdpcpkflangpghf?label=chrome%20web%20store"></a>
+  <a href="https://addons.mozilla.org/firefox/addon/chat-enhancer-for-youtube/"><img alt="firefox add-ons" src="https://img.shields.io/amo/v/chat-enhancer-for-youtube?label=firefox%20add-ons"></a>
+  <img alt="package version" src="https://img.shields.io/github/package-json/v/chat-enhancer-yt/youtube-chat-qol?label=package">
+  <a href="https://github.com/chat-enhancer-yt/youtube-chat-qol/actions/workflows/ci.yml"><img alt="ci" src="https://img.shields.io/github/actions/workflow/status/chat-enhancer-yt/youtube-chat-qol/ci.yml?label=ci"></a>
+  <img alt="typescript" src="https://img.shields.io/badge/typescript-5.x-3178c6">
+  <img alt="manifest v3" src="https://img.shields.io/badge/manifest-v3-4285f4">
+  <a href="LICENSE"><img alt="license" src="https://img.shields.io/badge/license-mit-97ca00"></a>
 </p>
 
 A lightweight Manifest V3 browser extension that adds native-feeling quality-of-life tools to YouTube livestream chat.

@@ -420,13 +420,13 @@
             <div class="version-badges" aria-label="Published extension versions">
               <span data-i18n="install.publishedVersions">Phiên bản đã phát hành</span>
               <a href="https://github.com/chat-enhancer-yt/youtube-chat-qol/blob/main/package.json">
-                <img src="https://img.shields.io/github/package-json/v/chat-enhancer-yt/youtube-chat-qol?label=Source" alt="Source version">
+                <img src="https://img.shields.io/github/package-json/v/chat-enhancer-yt/youtube-chat-qol?label=source" alt="source version">
               </a>
               <a href="https://chromewebstore.google.com/detail/pkhaaipeppfpakofgpdpcpkflangpghf">
-                <img src="https://img.shields.io/chrome-web-store/v/pkhaaipeppfpakofgpdpcpkflangpghf?label=Chrome%20Web%20Store" alt="Chrome Web Store version">
+                <img src="https://img.shields.io/chrome-web-store/v/pkhaaipeppfpakofgpdpcpkflangpghf?label=chrome%20web%20store" alt="chrome web store version">
               </a>
               <a href="https://addons.mozilla.org/firefox/addon/chat-enhancer-for-youtube/">
-                <img src="https://img.shields.io/amo/v/chat-enhancer-for-youtube?label=Firefox%20Add-ons" alt="Firefox Add-ons version">
+                <img src="https://img.shields.io/amo/v/chat-enhancer-for-youtube?label=firefox%20add-ons" alt="firefox add-ons version">
               </a>
             </div>
           </div>
@@ -796,9 +796,9 @@
 
         async function fetchPublishedVersions() {
           const sources = {
-            package: "https://img.shields.io/github/package-json/v/chat-enhancer-yt/youtube-chat-qol.json?label=Source",
-            chrome: "https://img.shields.io/chrome-web-store/v/pkhaaipeppfpakofgpdpcpkflangpghf.json?label=Chrome%20Web%20Store",
-            firefox: "https://img.shields.io/amo/v/chat-enhancer-for-youtube.json?label=Firefox%20Add-ons"
+            package: "https://img.shields.io/github/package-json/v/chat-enhancer-yt/youtube-chat-qol.json?label=source",
+            chrome: "https://img.shields.io/chrome-web-store/v/pkhaaipeppfpakofgpdpcpkflangpghf.json?label=chrome%20web%20store",
+            firefox: "https://img.shields.io/amo/v/chat-enhancer-for-youtube.json?label=firefox%20add-ons"
           };
           const entries = await Promise.all(
             Object.entries(sources).map(async ([key, url]) => [key, await fetchShieldMessage(url)])
