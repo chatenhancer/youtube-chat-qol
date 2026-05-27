@@ -163,11 +163,7 @@ function rewriteHeadMetadata(html, messages, pageUrl, ogLocale) {
   return html
     .replace(/<link rel="canonical" href="[^"]+">/, `<link rel="canonical" href="${escapeHtmlAttribute(pageUrl)}">`)
     .replace(/<meta property="og:url" content="[^"]+">/, `<meta property="og:url" content="${escapeHtmlAttribute(pageUrl)}">`)
-    .replace(/<meta property="og:locale" content="[^"]+">/, `<meta property="og:locale" content="${escapeHtmlAttribute(ogLocale)}">`)
-    .replace(
-      /"description": "Lightweight translation, mention, quote, profile, emoji, and command tools for YouTube live chat\."/,
-      `"description": ${JSON.stringify(messages.meta.description)}`
-    );
+    .replace(/<meta property="og:locale" content="[^"]+">/, `<meta property="og:locale" content="${escapeHtmlAttribute(ogLocale)}">`);
 }
 
 function rewriteStructuredData(html, messages, pageUrl) {

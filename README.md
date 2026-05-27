@@ -14,7 +14,7 @@
   <a href="LICENSE"><img alt="license" src="https://img.shields.io/badge/license-mit-97ca00"></a>
 </p>
 
-A lightweight Manifest V3 browser extension that adds native-feeling quality-of-life tools to YouTube livestream chat.
+Quality-of-life enhancements that make YouTube live chat easier to follow and participate in.
 
 Not affiliated with YouTube or Google.
 
@@ -30,6 +30,7 @@ Not affiliated with YouTube or Google.
 - Mention or quote messages from YouTube's existing message menu
 - Click an author name to mention them
 - Alt/Option-click an author name to quote their message
+- Use Focus mode to keep one conversation visible while you reply
 - Click an avatar to see that user's recent messages and open their channel
 
 ### Inbox
