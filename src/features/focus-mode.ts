@@ -5,6 +5,7 @@
  * selected chatter. It is intentionally local and current-page only.
  */
 import { t } from '../shared/i18n';
+import { captureScrollPosition, restoreScrollPositionAfterRender, scrollElementToBottom } from '../shared/scroll';
 import { getOptions } from '../shared/state';
 import { cleanText, normalizeComparableText } from '../shared/text';
 import { findChatInput, getChatInputText, replaceChatInput } from '../youtube/chat-input';
@@ -111,8 +112,7 @@ export function handlePotentialFocusMessage(message: HTMLElement): void {
   if (!record) return;
 
   focusRecords.push(record);
-  renderFocusMessages();
-  scrollFocusListToBottom();
+  refreshFocusMessages();
 }
 
 export function recordFocusMessageTranslation(
@@ -123,8 +123,7 @@ export function recordFocusMessageTranslation(
   if (!record) return;
 
   record.translation = translation;
-  renderFocusMessages();
-  scrollFocusListToBottom();
+  refreshFocusMessages();
 }
 
 export function clearFocusMessageTranslation(message: HTMLElement): void {
@@ -132,8 +131,7 @@ export function clearFocusMessageTranslation(message: HTMLElement): void {
   if (!record?.translation) return;
 
   delete record.translation;
-  renderFocusMessages();
-  scrollFocusListToBottom();
+  refreshFocusMessages();
 }
 
 export function clearFocusMessageTranslations(): void {
@@ -145,8 +143,7 @@ export function clearFocusMessageTranslations(): void {
   });
   if (!changed) return;
 
-  renderFocusMessages();
-  scrollFocusListToBottom();
+  refreshFocusMessages();
 }
 
 function renderCollapsedFocusPrompt(): void {
@@ -231,7 +228,7 @@ function openFocusPanel(): void {
 
   scanVisibleFocusInteractions();
   renderFocusMessages();
-  scrollFocusListToBottom();
+  if (activeList) scrollElementToBottom(activeList);
   scheduleEnsureFocusMentionPrefix();
 }
 
@@ -475,11 +472,12 @@ function getFocusAnchor(): HTMLElement {
   return anchor;
 }
 
-function scrollFocusListToBottom(): void {
+function refreshFocusMessages(): void {
   if (!activeList) return;
-  window.requestAnimationFrame(() => {
-    if (activeList) activeList.scrollTop = activeList.scrollHeight;
-  });
+
+  const scrollPosition = captureScrollPosition(activeList);
+  renderFocusMessages();
+  restoreScrollPositionAfterRender(activeList, scrollPosition);
 }
 
 function handleDocumentKeydown(event: KeyboardEvent): void {

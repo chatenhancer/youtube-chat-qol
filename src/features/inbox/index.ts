@@ -7,6 +7,7 @@
  */
 import { createSvgIcon } from '../../shared/icons';
 import { t } from '../../shared/i18n';
+import { captureScrollPosition, restoreScrollPositionAfterRender, scrollElementToBottom } from '../../shared/scroll';
 import {
   getAuthorName,
   getMessageContentSourceNodes,
@@ -274,7 +275,7 @@ export function openInboxCard(anchor?: HTMLElement): void {
     document.body.append(card);
     activeInboxCard = card;
     positionInboxCard(card, anchor);
-    scrollInboxToBottom(list);
+    scrollElementToBottom(list);
     clearInboxTabAlert();
     markInboxRead();
 
@@ -681,19 +682,14 @@ function refreshOpenInboxCard(): void {
   const icon = activeInboxCard.querySelector<HTMLElement>('.ytcq-inbox-card-icon');
   const keywordButton = activeInboxCard.querySelector<HTMLButtonElement>('.ytcq-inbox-keyword-toggle');
   if (list) {
+    const scrollPosition = captureScrollPosition(list);
     renderInboxList(list);
-    scrollInboxToBottom(list);
+    restoreScrollPositionAfterRender(list, scrollPosition);
   }
   if (subtitle) subtitle.textContent = getInboxSubtitle();
   if (clearButton) clearButton.disabled = records.length === 0;
   if (icon) setInboxIcon(icon, records.length > 0);
   if (keywordButton) refreshKeywordToggle(keywordButton);
-}
-
-function scrollInboxToBottom(list: HTMLElement): void {
-  window.requestAnimationFrame(() => {
-    list.scrollTop = list.scrollHeight;
-  });
 }
 
 function closeInboxCard(): void {
