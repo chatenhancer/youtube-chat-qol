@@ -7,6 +7,7 @@
  */
 import { getOptions } from '../shared/state';
 import { t } from '../shared/i18n';
+import { captureScrollPosition, restoreScrollPositionAfterRender, scrollElementToBottom } from '../shared/scroll';
 import { cleanText, normalizeComparableText } from '../shared/text';
 import { getAuthorName, getMessageAvatarSrc, getRendererData } from '../youtube/messages';
 import { appendRichMessageText } from '../youtube/rich-text';
@@ -214,7 +215,35 @@ function showProfileCard(source: ProfileSource, anchor: HTMLElement): void {
   document.body.append(card);
   activeProfileCard = card;
   positionProfileCard(card, anchor);
-  scrollCardListToBottom(list);
+  scrollElementToBottom(list);
+
+  let positionFrame = 0;
+  let positionMode: 'anchor' | 'viewport' = 'viewport';
+  const schedulePosition = (mode: 'anchor' | 'viewport'): void => {
+    if (mode === 'anchor') positionMode = mode;
+    if (positionFrame) return;
+
+    positionMode = mode;
+
+    positionFrame = window.requestAnimationFrame(() => {
+      positionFrame = 0;
+      const modeToApply = positionMode;
+      positionMode = 'viewport';
+      if (activeProfileCard !== card) return;
+      if (!anchor.isConnected) {
+        closeProfileCard();
+        return;
+      }
+
+      if (modeToApply === 'anchor') {
+        positionProfileCard(card, anchor);
+      } else {
+        keepProfileCardInViewport(card);
+      }
+    });
+  };
+  const resizeObserver = new ResizeObserver(() => schedulePosition('viewport'));
+  resizeObserver.observe(card);
 
   const handleOutsideClick = (event: MouseEvent): void => {
     if (activeProfileCard?.contains(event.target as Node)) return;
@@ -230,18 +259,22 @@ function showProfileCard(source: ProfileSource, anchor: HTMLElement): void {
       return;
     }
 
-    positionProfileCard(activeProfileCard, anchor);
+    schedulePosition('anchor');
   };
   const unsubscribeMessages = onUserMessagesChanged((key) => {
     if (!activeProfileCard || !shouldRefreshProfileMessages(key, source, profileKey)) return;
+    const scrollPosition = captureScrollPosition(list);
     renderProfileMessages(list, getRecentMessagesForIdentity(source.identity), source);
-    scrollCardListToBottom(list);
+    schedulePosition('viewport');
+    restoreScrollPositionAfterRender(list, scrollPosition);
   });
 
   activeProfileCardCleanup = () => {
     document.removeEventListener('click', handleOutsideClick, true);
     document.removeEventListener('keydown', handleKeydown, true);
     window.removeEventListener('resize', handleResize, true);
+    if (positionFrame) window.cancelAnimationFrame(positionFrame);
+    resizeObserver.disconnect();
     unsubscribeMessages();
   };
 
@@ -393,12 +426,6 @@ function jumpToRecentMessage(recentMessage: MessageRecord): void {
   jumpToChatMessage(target);
 }
 
-function scrollCardListToBottom(list: HTMLElement): void {
-  window.requestAnimationFrame(() => {
-    list.scrollTop = list.scrollHeight;
-  });
-}
-
 function createAvatarElement(src: string): HTMLImageElement {
   const image = document.createElement('img');
   image.className = 'ytcq-profile-card-avatar';
@@ -469,4 +496,28 @@ function positionProfileCard(card: HTMLElement, anchor: HTMLElement): void {
 
   card.style.left = `${Math.max(margin, Math.round(left))}px`;
   card.style.top = `${Math.max(margin, Math.round(top))}px`;
+}
+
+function keepProfileCardInViewport(card: HTMLElement): void {
+  const rect = card.getBoundingClientRect();
+  const margin = 8;
+
+  let left = rect.left;
+  if (left + rect.width + margin > window.innerWidth) {
+    left -= left + rect.width + margin - window.innerWidth;
+  }
+  if (left < margin) {
+    left = margin;
+  }
+
+  let top = rect.top;
+  if (top + rect.height + margin > window.innerHeight) {
+    top -= top + rect.height + margin - window.innerHeight;
+  }
+  if (top < margin) {
+    top = margin;
+  }
+
+  card.style.left = `${Math.round(left)}px`;
+  card.style.top = `${Math.round(top)}px`;
 }
