@@ -137,7 +137,6 @@ function createRichTextSegmentNode(segment: RichTextSegment): Node | null {
   image.loading = 'lazy';
 
   if (segment.emojiId) image.setAttribute('data-emoji-id', segment.emojiId);
-  if (segment.tooltip) image.setAttribute('shared-tooltip-text', segment.tooltip);
 
   return image;
 }

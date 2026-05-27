@@ -84,8 +84,18 @@ export function cloneSafeMessageNode(node: Node): Node | null {
 
   const clone = node.cloneNode(true) as Element;
   clone.querySelectorAll(CHAT_TOOLTIP_SELECTOR).forEach((child) => child.remove());
+  stripTooltipAttributes(clone);
   stripDuplicateIds(clone);
   return clone;
+}
+
+function stripTooltipAttributes(element: Element): void {
+  element.removeAttribute('title');
+  element.removeAttribute('shared-tooltip-text');
+  element.querySelectorAll('[title], [shared-tooltip-text]').forEach((child) => {
+    child.removeAttribute('title');
+    child.removeAttribute('shared-tooltip-text');
+  });
 }
 
 function stripDuplicateIds(element: Element): void {

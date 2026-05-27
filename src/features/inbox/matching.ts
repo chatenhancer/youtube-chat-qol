@@ -1,4 +1,5 @@
 import { cleanText } from '../../shared/text';
+import { findMatchingLiveMessageRecordIndex } from '../../youtube/message-dedupe';
 import type { InboxRecord } from './types';
 
 export const MAX_INBOX_KEYWORDS = 30;
@@ -95,97 +96,7 @@ export function mergeStrings(first: string[], second: string[]): string[] {
 }
 
 export function findMatchingRecordIndex(records: InboxRecord[], incoming: InboxRecord): number {
-  const messageId = cleanText(incoming.messageId);
-  if (messageId) {
-    const messageIdIndex = records.findIndex((record) => cleanText(record.messageId) === messageId);
-    if (messageIdIndex >= 0) return messageIdIndex;
-  }
-
-  const liveDuplicateIndex = records.findIndex((record) => isDuplicateAcrossLiveChatSurfaces(record, incoming));
-  if (liveDuplicateIndex >= 0) return liveDuplicateIndex;
-
-  const contentSignature = getContentRecordSignature(incoming);
-  const disconnectedContentIndex = records.findIndex((record) => (
-    !getLiveRecordMessage(record) &&
-    getContentRecordSignature(record) === contentSignature
-  ));
-  if (disconnectedContentIndex >= 0) return disconnectedContentIndex;
-
-  const looseSignature = getLooseRecordSignature(incoming);
-  return records.findIndex((record) => (
-    !getLiveRecordMessage(record) &&
-    getLooseRecordSignature(record) === looseSignature
-  ));
-}
-
-function isDuplicateAcrossLiveChatSurfaces(record: InboxRecord, incoming: InboxRecord): boolean {
-  const recordMessage = getLiveRecordMessage(record);
-  const incomingMessage = getLiveRecordMessage(incoming);
-  if (!recordMessage || !incomingMessage) return false;
-
-  const recordSurface = getLiveChatSurfaceKey(recordMessage);
-  const incomingSurface = getLiveChatSurfaceKey(incomingMessage);
-  return Boolean(
-    recordSurface &&
-    incomingSurface &&
-    recordSurface !== incomingSurface &&
-    getContentRecordSignature(record) === getContentRecordSignature(incoming)
-  );
-}
-
-function getContentRecordSignature(record: {
-  authorName: string;
-  sourceUrl: string;
-  text: string;
-  timestampText: string;
-}): string {
-  return [
-    'message-content',
-    normalizeComparableText(record.authorName),
-    normalizeComparableText(record.text),
-    normalizeComparableText(record.timestampText),
-    normalizeSourceUrl(record.sourceUrl)
-  ].join('\n');
-}
-
-function getLiveRecordMessage(record: InboxRecord): HTMLElement | null {
-  const message = record.messageRef?.deref() || null;
-  return message?.isConnected ? message : null;
-}
-
-function getLiveChatSurfaceKey(message: HTMLElement): string {
-  const list = message.closest<HTMLElement>([
-    '#items.style-scope.yt-live-chat-item-list-renderer',
-    '#items.style-scope.yt-live-chat-item-display-list-renderer'
-  ].join(','));
-  return list?.className || '';
-}
-
-function getLooseRecordSignature(record: {
-  authorName: string;
-  sourceUrl: string;
-  text: string;
-}): string {
-  return [
-    normalizeComparableText(record.authorName),
-    normalizeComparableText(record.text),
-    normalizeSourceUrl(record.sourceUrl)
-  ].join('\n');
-}
-
-function normalizeSourceUrl(value: string): string {
-  const clean = cleanText(value);
-  if (!clean) return '';
-
-  try {
-    const url = new URL(clean);
-    const videoId = url.searchParams.get('v');
-    if (videoId) return `${url.origin}/watch?v=${videoId}`;
-
-    return `${url.origin}${url.pathname}`;
-  } catch {
-    return normalizeComparableText(clean);
-  }
+  return findMatchingLiveMessageRecordIndex(records, incoming);
 }
 
 export function getPreparedKeywordsKey(keywords: PreparedKeyword[]): string {

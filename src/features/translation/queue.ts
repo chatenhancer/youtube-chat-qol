@@ -14,6 +14,11 @@ import {
   clearUserMessageTranslations,
   recordUserMessageTranslation
 } from '../user-message-history';
+import {
+  clearFocusMessageTranslation,
+  clearFocusMessageTranslations,
+  recordFocusMessageTranslation
+} from '../focus-mode';
 import { createTranslationPlan, hasTextOutsidePlaceholders, type ProtectedToken } from './protected-placeholders';
 import { clearTranslationRenderings, removeTranslation, renderTranslation, type TranslationResult } from './render';
 
@@ -69,6 +74,12 @@ export function queueMessageTranslation(message: HTMLElement, { backfill = false
       clearUserMessageTranslation(message);
     } else {
       recordUserMessageTranslation(message, cached, details.text, plan.protectedTokens, plan.text);
+      recordFocusMessageTranslation(message, {
+        result: cached,
+        originalText: details.text,
+        sourceText: plan.text,
+        protectedTokens: cloneProtectedTokens(plan.protectedTokens)
+      });
     }
     return;
   }
@@ -102,6 +113,7 @@ export function clearTranslations(): void {
   pendingTranslations.clear();
   clearTranslationRenderings();
   clearUserMessageTranslations();
+  clearFocusMessageTranslations();
 }
 
 export function getRetroactiveTranslationMessages(messages: HTMLElement[], translateLimit: number): HTMLElement[] {
@@ -168,10 +180,17 @@ function pumpTranslationQueue(): void {
         const rendered = renderTranslation(entry.message, result, entry.originalText, entry.protectedTokens, entry.sourceText);
         if (rendered) {
           recordUserMessageTranslation(entry.message, result, entry.originalText, entry.protectedTokens, entry.sourceText);
+          recordFocusMessageTranslation(entry.message, {
+            result,
+            originalText: entry.originalText,
+            sourceText: entry.sourceText,
+            protectedTokens: cloneProtectedTokens(entry.protectedTokens)
+          });
           renderedAny = true;
         } else {
           delete entry.message.dataset.ytcqTranslationKey;
           clearUserMessageTranslation(entry.message);
+          clearFocusMessageTranslation(entry.message);
         }
       }
       if (renderedAny) rememberTranslation(job.key, result);
@@ -195,6 +214,15 @@ function pumpTranslationQueue(): void {
       }, backfillTranslationQueue.length ? TRANSLATION_DELAY_MS : LIVE_TRANSLATION_DELAY_MS);
       pumpTranslationQueue();
     });
+}
+
+function cloneProtectedTokens(protectedTokens: ProtectedToken[]): ProtectedToken[] {
+  return protectedTokens.map((token) => ({
+    placeholder: token.placeholder,
+    fallbackText: token.fallbackText,
+    node: token.node ? token.node.cloneNode(true) : null,
+    nodes: token.nodes.map((node) => node.cloneNode(true))
+  }));
 }
 
 function translate(text: string, targetLanguage: string): Promise<TranslationResult> {
