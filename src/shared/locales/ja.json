@@ -100,7 +100,7 @@
       "description": "短い拡張機能名。"
     },
     "extensionDescription": {
-      "message": "YouTube ライブチャット向けの軽量な翻訳、メンション、プロフィール、絵文字ツールです。",
+      "message": "YouTube ライブチャットを追いやすく、参加しやすくする便利な改善機能です。",
       "description": "マニフェストとストア用の概要。"
     },
     "openChatEnhancerWebsite": {
