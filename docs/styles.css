@@ -841,7 +841,7 @@ h3 {
 
 .command-notes p {
   display: grid;
-  grid-template-columns: max-content minmax(0, 1fr);
+  grid-template-columns: minmax(190px, 0.32fr) minmax(0, 1fr);
   gap: 22px;
   align-items: start;
   margin: 0;
