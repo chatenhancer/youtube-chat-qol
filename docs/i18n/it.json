@@ -1,8 +1,8 @@
 {
   "meta": {
     "title": "Chat Enhancer for YouTube - Strumenti per la chat live di YouTube",
-    "description": "Miglioramenti pratici che rendono la chat live di YouTube più facile da seguire e a cui partecipare.",
-    "ogDescription": "Segui le chat live di YouTube più affollate, rispondi più velocemente e tieni traccia delle conversazioni senza sostituire la chat nativa.",
+    "description": "Una raccolta di miglioramenti che rende la chat live di YouTube più facile da seguire e a cui partecipare.",
+    "ogDescription": "Una raccolta di miglioramenti che rende la chat live di YouTube più facile da seguire e a cui partecipare.",
     "imageAlt": "Chat Enhancer for YouTube mostra strumenti di traduzione, posta in arrivo ed emoji in stile nativo per la live chat."
   },
   "nav": {
@@ -21,13 +21,13 @@
   "hero": {
     "eyebrow": "Estensione browser per la chat live di YouTube",
     "title": "Chat Enhancer for YouTube",
-    "copy": "Segui le chat affollate, rispondi più velocemente e tieni traccia delle conversazioni senza sostituire la chat nativa di YouTube.",
+    "copy": "Segui le chat affollate, tieni traccia delle conversazioni e partecipa più facilmente alla chat live di YouTube.",
     "primaryCta": "Installa",
     "secondaryCta": "Vedi funzioni"
   },
   "features": {
     "eyebrow": "Creato per le live",
-    "title": "Piccoli strumenti dove la chat esiste già",
+    "title": "Miglioramenti dove la chat esiste già",
     "translationTitle": "Traduci la chat live",
     "translationBody": "Scegli una lingua di destinazione nel popup dell'estensione, poi attiva rapidamente la traduzione dalle impostazioni della chat live di YouTube.",
     "mentionTitle": "Menziona, cita e resta sul punto",

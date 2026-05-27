@@ -1,8 +1,8 @@
 {
   "meta": {
     "title": "Chat Enhancer for YouTube - YouTube canlı sohbet araçları",
-    "description": "YouTube canlı sohbetini takip etmeyi ve katılmayı kolaylaştıran pratik iyileştirmeler.",
-    "ogDescription": "Yoğun YouTube canlı sohbetlerini takip edin, daha hızlı yanıt verin ve yerel sohbeti değiştirmeden konuşmaları kaçırmayın.",
+    "description": "YouTube canlı sohbetini takip etmeyi ve katılmayı kolaylaştıran bir iyileştirme paketi.",
+    "ogDescription": "YouTube canlı sohbetini takip etmeyi ve katılmayı kolaylaştıran bir iyileştirme paketi.",
     "imageAlt": "Chat Enhancer for YouTube, canlı sohbette doğal görünen çeviri, gelen kutusu ve emoji araçlarını gösteriyor."
   },
   "nav": {
@@ -21,13 +21,13 @@
   "hero": {
     "eyebrow": "YouTube canlı sohbeti için tarayıcı uzantısı",
     "title": "Chat Enhancer for YouTube",
-    "copy": "Yoğun sohbetleri takip edin, daha hızlı yanıt verin ve YouTube’un yerel sohbetini değiştirmeden konuşmaları kaçırmayın.",
+    "copy": "YouTube canlı sohbetinde yoğun sohbetleri takip edin, konuşmaları kaçırmayın ve daha kolay katılın.",
     "primaryCta": "Yükle",
     "secondaryCta": "Özellikleri gör"
   },
   "features": {
     "eyebrow": "Canlı yayınlar için üretildi",
-    "title": "Sohbetin zaten olduğu yerde küçük araçlar",
+    "title": "Sohbetin zaten olduğu yerde iyileştirmeler",
     "translationTitle": "Canlı sohbeti çevir",
     "translationBody": "Uzantı popup'ında hedef dili seçin, sonra YouTube canlı sohbet ayarlarından çeviriyi hızlıca açıp kapatın.",
     "mentionTitle": "Bahset, alıntıla ve odaklan",

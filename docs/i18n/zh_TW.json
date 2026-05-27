@@ -1,8 +1,8 @@
 {
   "meta": {
     "title": "Chat Enhancer for YouTube - YouTube 直播聊天室工具",
-    "description": "讓 YouTube 直播聊天室更容易跟上和參與的實用增強功能。",
-    "ogDescription": "跟上繁忙的 YouTube 直播聊天室，更快回覆，並在不取代原生聊天室的情況下保持對話脈絡。",
+    "description": "一組增強功能，讓 YouTube 直播聊天室更容易跟上和參與。",
+    "ogDescription": "一組增強功能，讓 YouTube 直播聊天室更容易跟上和參與。",
     "imageAlt": "Chat Enhancer for YouTube 顯示自然融入直播聊天室的翻譯、收件匣與 emoji 工具。"
   },
   "nav": {
@@ -21,13 +21,13 @@
   "hero": {
     "eyebrow": "YouTube 直播聊天室瀏覽器擴充功能",
     "title": "Chat Enhancer for YouTube",
-    "copy": "跟上繁忙聊天室，更快回覆，並在不取代 YouTube 原生聊天室的情況下保持對話脈絡。",
+    "copy": "在 YouTube 直播聊天室中跟上繁忙聊天室，掌握對話脈絡，並更輕鬆地參與。",
     "primaryCta": "安裝",
     "secondaryCta": "查看功能"
   },
   "features": {
     "eyebrow": "為直播打造",
-    "title": "小工具就在聊天室所在的位置",
+    "title": "在聊天室所在的位置加入增強功能",
     "translationTitle": "翻譯直播聊天室",
     "translationBody": "在擴充功能彈出視窗選擇目標語言，然後從 YouTube 直播聊天室設定快速切換翻譯。",
     "mentionTitle": "提及、引用與聚焦",

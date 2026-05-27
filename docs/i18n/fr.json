@@ -1,8 +1,8 @@
 {
   "meta": {
     "title": "Chat Enhancer for YouTube - Outils pour le chat en direct YouTube",
-    "description": "Des améliorations pratiques pour suivre et participer plus facilement au chat en direct YouTube.",
-    "ogDescription": "Suivez les chats YouTube chargés, répondez plus vite et gardez le fil des conversations sans remplacer le chat natif.",
+    "description": "Une suite d’améliorations pour suivre et participer plus facilement au chat en direct YouTube.",
+    "ogDescription": "Une suite d’améliorations pour suivre et participer plus facilement au chat en direct YouTube.",
     "imageAlt": "Chat Enhancer for YouTube montrant des outils de traduction, de boîte de réception et d’emojis au style natif pour le chat en direct."
   },
   "nav": {
@@ -21,13 +21,13 @@
   "hero": {
     "eyebrow": "Extension de navigateur pour le chat en direct YouTube",
     "title": "Chat Enhancer for YouTube",
-    "copy": "Suivez les chats chargés, répondez plus vite et gardez le fil des conversations sans remplacer le chat natif de YouTube.",
+    "copy": "Suivez les chats chargés, gardez le fil des conversations et participez plus facilement au chat en direct YouTube.",
     "primaryCta": "Installer",
     "secondaryCta": "Voir les fonctionnalités"
   },
   "features": {
     "eyebrow": "Pensé pour les lives",
-    "title": "De petits outils là où le chat existe déjà",
+    "title": "Des améliorations là où le chat existe déjà",
     "translationTitle": "Traduire le chat en direct",
     "translationBody": "Choisissez une langue cible dans le popup de l'extension, puis activez rapidement la traduction depuis les paramètres du chat en direct YouTube.",
     "mentionTitle": "Mentionner, citer et suivre",

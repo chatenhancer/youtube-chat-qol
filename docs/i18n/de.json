@@ -1,8 +1,8 @@
 {
   "meta": {
     "title": "Chat Enhancer for YouTube - Werkzeuge für den YouTube-Livechat",
-    "description": "Quality-of-Life-Verbesserungen, mit denen YouTube Live Chat leichter zu verfolgen und zu nutzen ist.",
-    "ogDescription": "Folge vollen YouTube Live Chats, antworte schneller und behalte Gespräche im Blick, ohne den nativen Chat zu ersetzen.",
+    "description": "Eine Sammlung von Verbesserungen, mit denen YouTube Live Chat leichter zu verfolgen und zu nutzen ist.",
+    "ogDescription": "Eine Sammlung von Verbesserungen, mit denen YouTube Live Chat leichter zu verfolgen und zu nutzen ist.",
     "imageAlt": "Chat Enhancer for YouTube mit nativ wirkenden Livechat-Werkzeugen für Übersetzung, Posteingang und Emojis."
   },
   "nav": {
@@ -21,13 +21,13 @@
   "hero": {
     "eyebrow": "Browser-Erweiterung für den YouTube-Livechat",
     "title": "Chat Enhancer for YouTube",
-    "copy": "Folge vollen Chats, antworte schneller und behalte Gespräche im Blick, ohne den nativen YouTube-Chat zu ersetzen.",
+    "copy": "Folge vollen Chats, behalte Gespräche im Blick und mach leichter im YouTube Live Chat mit.",
     "primaryCta": "Installieren",
     "secondaryCta": "Funktionen ansehen"
   },
   "features": {
     "eyebrow": "Für Livestreams gebaut",
-    "title": "Kleine Werkzeuge dort, wo der Chat bereits passiert",
+    "title": "Verbesserungen dort, wo der Chat schon stattfindet",
     "translationTitle": "Livechat übersetzen",
     "translationBody": "Wähle eine Zielsprache im Popup der Erweiterung und schalte Übersetzung schnell über die Livechat-Einstellungen von YouTube um.",
     "mentionTitle": "Erwähnen, zitieren und fokussieren",

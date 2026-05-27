@@ -1,8 +1,8 @@
 {
   "meta": {
     "title": "Chat Enhancer for YouTube - tools voor YouTube-livechat",
-    "description": "Verbeteringen die YouTube live chat makkelijker maken om te volgen en aan mee te doen.",
-    "ogDescription": "Volg drukke YouTube live chats, reageer sneller en houd gesprekken bij zonder de native chat te vervangen.",
+    "description": "Een verzameling verbeteringen die YouTube-livechat makkelijker maken om te volgen en aan mee te doen.",
+    "ogDescription": "Een verzameling verbeteringen die YouTube-livechat makkelijker maken om te volgen en aan mee te doen.",
     "imageAlt": "Chat Enhancer for YouTube toont livechatvertaling, inbox en emoji-tools die natuurlijk in de chat passen."
   },
   "nav": {
@@ -21,13 +21,13 @@
   "hero": {
     "eyebrow": "Browserextensie voor YouTube-livechat",
     "title": "Chat Enhancer for YouTube",
-    "copy": "Volg drukke chats, reageer sneller en houd gesprekken bij zonder de native YouTube-chat te vervangen.",
+    "copy": "Volg drukke chats, houd gesprekken bij en doe makkelijker mee in YouTube-livechat.",
     "primaryCta": "Installeren",
     "secondaryCta": "Functies bekijken"
   },
   "features": {
     "eyebrow": "Gemaakt voor livestreams",
-    "title": "Kleine tools precies waar chat al gebeurt",
+    "title": "Verbeteringen precies waar chat al gebeurt",
     "translationTitle": "Livechat vertalen",
     "translationBody": "Kies een doeltaal in de extensiepop-up en schakel vertaling snel in via YouTube’s livechatinstellingen.",
     "mentionTitle": "Noemen, citeren en focussen",

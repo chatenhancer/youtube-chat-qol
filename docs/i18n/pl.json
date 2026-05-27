@@ -1,8 +1,8 @@
 {
   "meta": {
     "title": "Chat Enhancer for YouTube - narzędzia do czatu na żywo YouTube",
-    "description": "Ulepszenia, które ułatwiają śledzenie czatu na żywo YouTube i udział w rozmowie.",
-    "ogDescription": "Śledź zatłoczone czaty YouTube, odpowiadaj szybciej i trzymaj się rozmów bez zastępowania natywnego czatu.",
+    "description": "Zestaw ulepszeń, które ułatwiają śledzenie czatu na żywo YouTube i udział w rozmowie.",
+    "ogDescription": "Zestaw ulepszeń, które ułatwiają śledzenie czatu na żywo YouTube i udział w rozmowie.",
     "imageAlt": "Chat Enhancer for YouTube pokazuje tłumaczenie czatu, skrzynkę i narzędzia emoji wyglądające naturalnie w czacie."
   },
   "nav": {
@@ -21,13 +21,13 @@
   "hero": {
     "eyebrow": "Rozszerzenie przeglądarki dla czatu na żywo YouTube",
     "title": "Chat Enhancer for YouTube",
-    "copy": "Śledź zatłoczone czaty, odpowiadaj szybciej i trzymaj się rozmów bez zastępowania natywnego czatu YouTube.",
+    "copy": "Śledź zatłoczone czaty, trzymaj się rozmów i łatwiej bierz udział w czacie na żywo YouTube.",
     "primaryCta": "Zainstaluj",
     "secondaryCta": "Zobacz funkcje"
   },
   "features": {
     "eyebrow": "Stworzone dla transmisji na żywo",
-    "title": "Małe narzędzia tam, gdzie już dzieje się czat",
+    "title": "Ulepszenia tam, gdzie już dzieje się czat",
     "translationTitle": "Tłumacz czat na żywo",
     "translationBody": "Wybierz język docelowy w popupie rozszerzenia, a potem szybko włącz tłumaczenie z ustawień czatu na żywo YouTube.",
     "mentionTitle": "Wzmianki, cytaty i fokus",

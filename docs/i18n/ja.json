@@ -1,8 +1,8 @@
 {
   "meta": {
     "title": "Chat Enhancer for YouTube - YouTube ライブチャットツール",
-    "description": "YouTube ライブチャットを追いやすく、参加しやすくする便利な改善機能です。",
-    "ogDescription": "にぎやかな YouTube ライブチャットを追い、すばやく返信し、標準チャットを置き換えずに会話を見失わないようにします。",
+    "description": "YouTube ライブチャットを追いやすく、参加しやすくする一連の改善機能です。",
+    "ogDescription": "YouTube ライブチャットを追いやすく、参加しやすくする一連の改善機能です。",
     "imageAlt": "Chat Enhancer for YouTube が、ライブチャットに自然になじむ翻訳、受信トレイ、絵文字ツールを表示している様子。"
   },
   "nav": {
@@ -21,13 +21,13 @@
   "hero": {
     "eyebrow": "YouTube ライブチャット用ブラウザ拡張機能",
     "title": "Chat Enhancer for YouTube",
-    "copy": "にぎやかなチャットを追いやすく、すばやく返信でき、YouTube の標準チャットを置き換えずに会話を見失いません。",
+    "copy": "YouTube ライブチャットで、にぎやかなチャットを追いやすく、会話を見失わず、より参加しやすくします。",
     "primaryCta": "インストール",
     "secondaryCta": "機能を見る"
   },
   "features": {
     "eyebrow": "ライブ配信用",
-    "title": "チャットが行われる場所に小さなツールを追加",
+    "title": "チャットが行われる場所に改善機能を追加",
     "translationTitle": "ライブチャットを翻訳",
     "translationBody": "拡張機能のポップアップで翻訳先の言語を選び、YouTube のライブチャット設定からすばやく翻訳を切り替えられます。",
     "mentionTitle": "メンション、引用、フォーカス",
