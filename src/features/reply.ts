@@ -10,7 +10,12 @@ import { getOptions } from '../shared/state';
 import { t } from '../shared/i18n';
 import { cleanText } from '../shared/text';
 import { showToast } from '../shared/toast';
-import { insertIntoChatInput, insertNodesIntoChatInput, returnToChatInputPanel } from '../youtube/chat-input';
+import {
+  insertIntoChatInput,
+  replaceChatInput,
+  replaceNodesInChatInput,
+  returnToChatInputPanel
+} from '../youtube/chat-input';
 import {
   getCleanAttribute,
   getElementImageSource,
@@ -21,6 +26,7 @@ import {
 } from '../youtube/message-content';
 import { getMessageContentNodes, getMessageDetails } from '../youtube/messages';
 import type { RichTextSegment } from '../youtube/rich-text';
+import { showFocusPromptForAuthor, showFocusPromptForMessage } from './focus-mode';
 
 const CHAT_INPUT_RETRY_DELAYS = [80, 180, 360, 600];
 const INPUT_EMOJI_CLASS = 'emoji yt-formatted-string style-scope yt-live-chat-text-input-field-renderer';
@@ -29,6 +35,15 @@ const INVISIBLE_QUOTE_TEXT_PATTERN = /[\u200B\u2060\uFEFF]/g;
 interface RichQuoteContent {
   nodes?: Node[];
   segments?: RichTextSegment[];
+}
+
+interface ReplyInsertOptions {
+  focusSource?: {
+    authorName: string;
+    avatarSrc?: string;
+    channelId?: string;
+  };
+  skipFocusPrompt?: boolean;
 }
 
 interface QuoteContentBuild {
@@ -56,16 +71,19 @@ export function wireAuthorNameMention(message: HTMLElement): void {
 
 export function replyToMessage(message: HTMLElement, { quote }: { quote: boolean }): void {
   const details = getMessageDetails(message);
+  showFocusPromptForMessage(message);
   if (quote && details.text) {
     quoteAuthorRichText(details.authorName, details.text, {
       nodes: getMessageContentNodes(message)
-    });
+    }, { skipFocusPrompt: true });
   } else {
-    mentionAuthorName(details.authorName);
+    mentionAuthorName(details.authorName, { skipFocusPrompt: true });
   }
 }
 
-export function mentionAuthorName(authorName: string): void {
+export function mentionAuthorName(authorName: string, options: ReplyInsertOptions = {}): void {
+  if (!options.skipFocusPrompt) showFocusPromptForAuthor(options.focusSource || { authorName });
+
   const mentionText = formatMentionText(authorName);
   if (!mentionText) {
     showToast(t('couldNotReadUserName'));
@@ -75,17 +93,26 @@ export function mentionAuthorName(authorName: string): void {
   insertMentionText(mentionText);
 }
 
-export function quoteAuthorText(authorName: string, text: string): void {
+export function quoteAuthorText(authorName: string, text: string, options: ReplyInsertOptions = {}): void {
+  if (!options.skipFocusPrompt) showFocusPromptForAuthor(options.focusSource || { authorName });
+
   const quoteText = formatQuoteText(authorName, text);
   if (!quoteText) {
     showToast(t('couldNotReadUserName'));
     return;
   }
 
-  insertMentionText(quoteText);
+  replaceInputWithQuoteText(quoteText);
 }
 
-export function quoteAuthorRichText(authorName: string, text: string, content: RichQuoteContent): void {
+export function quoteAuthorRichText(
+  authorName: string,
+  text: string,
+  content: RichQuoteContent,
+  options: ReplyInsertOptions = {}
+): void {
+  if (!options.skipFocusPrompt) showFocusPromptForAuthor(options.focusSource || { authorName });
+
   const cleanAuthorName = cleanText(authorName);
   if (!cleanAuthorName) {
     showToast(t('couldNotReadUserName'));
@@ -94,18 +121,18 @@ export function quoteAuthorRichText(authorName: string, text: string, content: R
 
   const cleanMessage = cleanText(text);
   if (!cleanMessage) {
-    insertMentionText(`${cleanAuthorName} `);
+    replaceInputWithQuoteText(`${cleanAuthorName} `);
     return;
   }
 
   const quoteContent = createQuoteContentNodes(content, cleanMessage);
   const fallbackText = formatQuoteText(cleanAuthorName, cleanMessage);
   if (!quoteContent.nodes.length) {
-    insertMentionText(fallbackText);
+    replaceInputWithQuoteText(fallbackText);
     return;
   }
 
-  insertMentionNodes([
+  replaceInputWithQuoteNodes([
     document.createTextNode(`${cleanAuthorName} : "`),
     ...quoteContent.nodes,
     document.createTextNode(`${quoteContent.truncated ? '...' : ''}"`)
@@ -133,8 +160,12 @@ function insertMentionText(text: string): void {
   insertWithChatInputRecovery(() => insertIntoChatInput(text));
 }
 
-function insertMentionNodes(nodes: Node[], fallbackText: string, trailingText = ''): void {
-  insertWithChatInputRecovery(() => insertNodesIntoChatInput(nodes, fallbackText, trailingText));
+function replaceInputWithQuoteText(text: string): void {
+  insertWithChatInputRecovery(() => replaceChatInput(text));
+}
+
+function replaceInputWithQuoteNodes(nodes: Node[], fallbackText: string, trailingText = ''): void {
+  insertWithChatInputRecovery(() => replaceNodesInChatInput(nodes, fallbackText, trailingText));
 }
 
 function insertWithChatInputRecovery(insert: () => boolean): void {

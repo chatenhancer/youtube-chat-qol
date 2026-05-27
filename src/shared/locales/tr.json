@@ -83,7 +83,12 @@
     "useQuoteLength": "Alıntı uzunluğu {lengths} kullanın.",
     "useReplaceOrBelow": "replace veya below kullanın.",
     "watchingMentions": "Bahsetmeler izleniyor",
-    "watchingMentionsAndKeywords": "Bahsetmeler ve anahtar kelimeler izleniyor"
+    "watchingMentionsAndKeywords": "Bahsetmeler ve anahtar kelimeler izleniyor",
+    "open": "Aç",
+    "focusMode": "Odak modu",
+    "focusOn": "Odaklan",
+    "focusingOn": "Odaklanılan",
+    "noMessagesYet": "Henüz mesaj yok"
   },
   "extension": {
     "extensionName": {

@@ -83,7 +83,12 @@
     "useQuoteLength": "از طول نقل‌قول {lengths} استفاده کنید.",
     "useReplaceOrBelow": "از replace یا below استفاده کنید.",
     "watchingMentions": "در حال دنبال کردن منشن‌ها",
-    "watchingMentionsAndKeywords": "در حال دنبال کردن منشن‌ها و کلیدواژه‌ها"
+    "watchingMentionsAndKeywords": "در حال دنبال کردن منشن‌ها و کلیدواژه‌ها",
+    "open": "باز کردن",
+    "focusMode": "حالت تمرکز",
+    "focusOn": "تمرکز روی",
+    "focusingOn": "در حال تمرکز روی",
+    "noMessagesYet": "هنوز پیامی نیست"
   },
   "extension": {
     "extensionName": {

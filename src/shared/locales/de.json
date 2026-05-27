@@ -83,7 +83,12 @@
     "useQuoteLength": "Verwende Zitatlänge {lengths}.",
     "useReplaceOrBelow": "Verwende replace oder below.",
     "watchingMentions": "Erwähnungen werden beobachtet",
-    "watchingMentionsAndKeywords": "Erwähnungen und Schlüsselwörter werden beobachtet"
+    "watchingMentionsAndKeywords": "Erwähnungen und Schlüsselwörter werden beobachtet",
+    "open": "Öffnen",
+    "focusMode": "Fokusmodus",
+    "focusOn": "Fokus auf",
+    "focusingOn": "Fokussiert auf",
+    "noMessagesYet": "Noch keine Nachrichten"
   },
   "extension": {
     "extensionName": {

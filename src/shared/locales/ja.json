@@ -83,7 +83,12 @@
     "useQuoteLength": "引用の長さは {lengths} を使ってください。",
     "useReplaceOrBelow": "replace または below を使ってください。",
     "watchingMentions": "メンションを監視中",
-    "watchingMentionsAndKeywords": "メンションとキーワードを監視中"
+    "watchingMentionsAndKeywords": "メンションとキーワードを監視中",
+    "open": "開く",
+    "focusMode": "フォーカスモード",
+    "focusOn": "フォーカス",
+    "focusingOn": "フォーカス中",
+    "noMessagesYet": "まだメッセージはありません"
   },
   "extension": {
     "extensionName": {

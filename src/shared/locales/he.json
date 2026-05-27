@@ -83,7 +83,12 @@
     "useQuoteLength": "השתמש באורך ציטוט {lengths}.",
     "useReplaceOrBelow": "השתמש ב-replace או below.",
     "watchingMentions": "מעקב אחרי אזכורים",
-    "watchingMentionsAndKeywords": "מעקב אחרי אזכורים ומילות מפתח"
+    "watchingMentionsAndKeywords": "מעקב אחרי אזכורים ומילות מפתח",
+    "open": "פתח",
+    "focusMode": "מצב מיקוד",
+    "focusOn": "התמקדות ב",
+    "focusingOn": "מתמקד ב",
+    "noMessagesYet": "אין עדיין הודעות"
   },
   "extension": {
     "extensionName": {

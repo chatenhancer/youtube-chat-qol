@@ -83,7 +83,12 @@
     "useQuoteLength": "Gebruik citaatlengte {lengths}.",
     "useReplaceOrBelow": "Gebruik replace of below.",
     "watchingMentions": "Let op vermeldingen",
-    "watchingMentionsAndKeywords": "Let op vermeldingen en trefwoorden"
+    "watchingMentionsAndKeywords": "Let op vermeldingen en trefwoorden",
+    "open": "Openen",
+    "focusMode": "Focusmodus",
+    "focusOn": "Focus op",
+    "focusingOn": "Gefocust op",
+    "noMessagesYet": "Nog geen berichten"
   },
   "extension": {
     "extensionName": {

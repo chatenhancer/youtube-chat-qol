@@ -83,7 +83,12 @@
     "useQuoteLength": "使用引用长度 {lengths}。",
     "useReplaceOrBelow": "使用 replace 或 below。",
     "watchingMentions": "正在监视提及",
-    "watchingMentionsAndKeywords": "正在监视提及和关键词"
+    "watchingMentionsAndKeywords": "正在监视提及和关键词",
+    "open": "打开",
+    "focusMode": "聚焦模式",
+    "focusOn": "聚焦",
+    "focusingOn": "正在聚焦",
+    "noMessagesYet": "暂无消息"
   },
   "extension": {
     "extensionName": {

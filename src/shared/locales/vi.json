@@ -83,7 +83,12 @@
     "useQuoteLength": "Dùng độ dài trích dẫn {lengths}.",
     "useReplaceOrBelow": "Dùng replace hoặc below.",
     "watchingMentions": "Đang theo dõi lượt nhắc",
-    "watchingMentionsAndKeywords": "Đang theo dõi lượt nhắc và từ khóa"
+    "watchingMentionsAndKeywords": "Đang theo dõi lượt nhắc và từ khóa",
+    "open": "Mở",
+    "focusMode": "Chế độ tập trung",
+    "focusOn": "Tập trung vào",
+    "focusingOn": "Đang tập trung vào",
+    "noMessagesYet": "Chưa có tin nhắn"
   },
   "extension": {
     "extensionName": {

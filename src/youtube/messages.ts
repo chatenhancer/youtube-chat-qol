@@ -66,6 +66,11 @@ export function getAuthorNameElement(message: HTMLElement): HTMLElement | null {
   return message.querySelector<HTMLElement>('#author-name');
 }
 
+export function getMessageAvatarSrc(message: HTMLElement): string {
+  const source = message.querySelector<HTMLImageElement>('#author-photo img, #author-photo #img, img#img');
+  return source?.src || '';
+}
+
 export function getMessageText(message: HTMLElement): string {
   const replaced = replacedMessages.get(message);
   if (replaced?.originalText) return cleanText(replaced.originalText);

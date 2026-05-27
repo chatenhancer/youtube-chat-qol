@@ -83,7 +83,12 @@
     "useQuoteLength": "인용 길이는 {lengths} 중 하나를 사용하세요.",
     "useReplaceOrBelow": "replace 또는 below를 사용하세요.",
     "watchingMentions": "멘션 감시 중",
-    "watchingMentionsAndKeywords": "멘션 및 키워드 감시 중"
+    "watchingMentionsAndKeywords": "멘션 및 키워드 감시 중",
+    "open": "열기",
+    "focusMode": "포커스 모드",
+    "focusOn": "포커스",
+    "focusingOn": "포커스 중",
+    "noMessagesYet": "아직 메시지가 없습니다"
   },
   "extension": {
     "extensionName": {

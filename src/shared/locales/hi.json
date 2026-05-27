@@ -83,7 +83,12 @@
     "useQuoteLength": "कोट की लंबाई {lengths} इस्तेमाल करें.",
     "useReplaceOrBelow": "replace या below इस्तेमाल करें.",
     "watchingMentions": "मेंशन देखे जा रहे हैं",
-    "watchingMentionsAndKeywords": "मेंशन और कीवर्ड देखे जा रहे हैं"
+    "watchingMentionsAndKeywords": "मेंशन और कीवर्ड देखे जा रहे हैं",
+    "open": "खोलें",
+    "focusMode": "फ़ोकस मोड",
+    "focusOn": "फ़ोकस करें",
+    "focusingOn": "फ़ोकस किया जा रहा है",
+    "noMessagesYet": "अभी कोई संदेश नहीं"
   },
   "extension": {
     "extensionName": {

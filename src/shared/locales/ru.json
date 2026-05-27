@@ -83,7 +83,12 @@
     "useQuoteLength": "Используйте длину цитаты {lengths}.",
     "useReplaceOrBelow": "Используйте replace или below.",
     "watchingMentions": "Отслеживаются упоминания",
-    "watchingMentionsAndKeywords": "Отслеживаются упоминания и ключевые слова"
+    "watchingMentionsAndKeywords": "Отслеживаются упоминания и ключевые слова",
+    "open": "Открыть",
+    "focusMode": "Режим фокуса",
+    "focusOn": "Фокус на",
+    "focusingOn": "Фокус на",
+    "noMessagesYet": "Пока нет сообщений"
   },
   "extension": {
     "extensionName": {
