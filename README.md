@@ -14,7 +14,7 @@
   <a href="LICENSE"><img alt="license" src="https://img.shields.io/badge/license-mit-97ca00"></a>
 </p>
 
-Quality-of-life enhancements that make YouTube live chat easier to follow and participate in.
+Suite of enhancements that make YouTube live chat easier to follow and participate in.
 
 Not affiliated with YouTube or Google.
 
