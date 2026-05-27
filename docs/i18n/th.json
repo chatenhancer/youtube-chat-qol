@@ -1,8 +1,8 @@
 {
   "meta": {
     "title": "Chat Enhancer for YouTube - เครื่องมือ YouTube live chat",
-    "description": "เครื่องมือเสริมที่ทำให้ YouTube live chat ติดตามและมีส่วนร่วมได้ง่ายขึ้น",
-    "ogDescription": "ติดตาม YouTube live chat ที่คึกคัก ตอบกลับได้เร็วขึ้น และไม่หลุดจากบทสนทนาโดยไม่แทนที่แชตเดิม",
+    "description": "ชุดการปรับปรุงที่ทำให้ YouTube live chat ติดตามและมีส่วนร่วมได้ง่ายขึ้น",
+    "ogDescription": "ชุดการปรับปรุงที่ทำให้ YouTube live chat ติดตามและมีส่วนร่วมได้ง่ายขึ้น",
     "imageAlt": "Chat Enhancer for YouTube แสดงการแปล กล่องข้อความ และเครื่องมืออีโมจิที่เข้ากับ live chat อย่างเป็นธรรมชาติ"
   },
   "nav": {
@@ -21,13 +21,13 @@
   "hero": {
     "eyebrow": "ส่วนขยายเบราว์เซอร์สำหรับ YouTube live chat",
     "title": "Chat Enhancer for YouTube",
-    "copy": "ติดตามแชตที่คึกคัก ตอบกลับได้เร็วขึ้น และไม่หลุดจากบทสนทนาโดยไม่แทนที่แชตเดิมของ YouTube",
+    "copy": "ติดตามแชตที่คึกคัก ไม่หลุดจากบทสนทนา และมีส่วนร่วมใน YouTube live chat ได้ง่ายขึ้น",
     "primaryCta": "ติดตั้ง",
     "secondaryCta": "ดูฟีเจอร์"
   },
   "features": {
     "eyebrow": "สร้างเพื่อไลฟ์สตรีม",
-    "title": "เครื่องมือเล็กๆ ในที่ที่แชทเกิดขึ้นอยู่แล้ว",
+    "title": "การปรับปรุงในที่ที่แชทเกิดขึ้นอยู่แล้ว",
     "translationTitle": "แปล live chat",
     "translationBody": "เลือกภาษาปลายทางในป๊อปอัปส่วนขยาย แล้วเปิด/ปิดการแปลอย่างรวดเร็วจากการตั้งค่า live chat ของ YouTube",
     "mentionTitle": "เมนชัน อ้างอิง และโฟกัส",

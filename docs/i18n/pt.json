@@ -1,8 +1,8 @@
 {
   "meta": {
     "title": "Chat Enhancer for YouTube - Ferramentas para o chat ao vivo do YouTube",
-    "description": "Melhorias de qualidade de vida que tornam o chat ao vivo do YouTube mais fácil de acompanhar e participar.",
-    "ogDescription": "Acompanhe chats ao vivo movimentados, responda mais rápido e mantenha o contexto das conversas sem substituir o chat nativo.",
+    "description": "Uma coleção de melhorias que torna o chat ao vivo do YouTube mais fácil de acompanhar e participar.",
+    "ogDescription": "Uma coleção de melhorias que torna o chat ao vivo do YouTube mais fácil de acompanhar e participar.",
     "imageAlt": "Chat Enhancer for YouTube mostrando ferramentas de tradução, caixa de entrada e emojis com aparência nativa no chat ao vivo."
   },
   "nav": {
@@ -21,13 +21,13 @@
   "hero": {
     "eyebrow": "Extensão de navegador para o chat ao vivo do YouTube",
     "title": "Chat Enhancer for YouTube",
-    "copy": "Acompanhe chats movimentados, responda mais rápido e mantenha o contexto das conversas sem substituir o chat nativo do YouTube.",
+    "copy": "Acompanhe chats movimentados, mantenha o contexto das conversas e participe com mais facilidade no chat ao vivo do YouTube.",
     "primaryCta": "Instalar",
     "secondaryCta": "Ver recursos"
   },
   "features": {
     "eyebrow": "Feito para lives",
-    "title": "Pequenas ferramentas onde o chat já acontece",
+    "title": "Melhorias onde o chat já acontece",
     "translationTitle": "Traduzir chat ao vivo",
     "translationBody": "Escolha um idioma de destino no popup da extensão e alterne a tradução rapidamente nas configurações do chat ao vivo do YouTube.",
     "mentionTitle": "Mencione, cite e foque",

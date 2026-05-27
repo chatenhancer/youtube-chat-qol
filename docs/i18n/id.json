@@ -1,8 +1,8 @@
 {
   "meta": {
     "title": "Chat Enhancer for YouTube - Alat live chat YouTube",
-    "description": "Peningkatan yang membuat live chat YouTube lebih mudah diikuti dan membuat Anda lebih mudah ikut berpartisipasi.",
-    "ogDescription": "Ikuti live chat YouTube yang ramai, balas lebih cepat, dan tetap mengikuti percakapan tanpa mengganti chat bawaan.",
+    "description": "Kumpulan peningkatan yang membuat live chat YouTube lebih mudah diikuti dan membuat Anda lebih mudah ikut berpartisipasi.",
+    "ogDescription": "Kumpulan peningkatan yang membuat live chat YouTube lebih mudah diikuti dan membuat Anda lebih mudah ikut berpartisipasi.",
     "imageAlt": "Chat Enhancer for YouTube menampilkan alat terjemahan, kotak masuk, dan emoji yang terasa native di live chat."
   },
   "nav": {
@@ -21,13 +21,13 @@
   "hero": {
     "eyebrow": "Ekstensi browser untuk live chat YouTube",
     "title": "Chat Enhancer for YouTube",
-    "copy": "Ikuti chat yang ramai, balas lebih cepat, dan tetap mengikuti percakapan tanpa mengganti chat bawaan YouTube.",
+    "copy": "Ikuti chat yang ramai, tetap mengikuti percakapan, dan ikut berpartisipasi dengan lebih mudah di live chat YouTube.",
     "primaryCta": "Instal",
     "secondaryCta": "Lihat fitur"
   },
   "features": {
     "eyebrow": "Dibuat untuk live stream",
-    "title": "Alat kecil di tempat chat sudah berjalan",
+    "title": "Peningkatan di tempat chat sudah berjalan",
     "translationTitle": "Terjemahkan live chat",
     "translationBody": "Pilih bahasa target di popup ekstensi, lalu aktifkan terjemahan dengan cepat dari pengaturan live chat YouTube.",
     "mentionTitle": "Sebut, kutip, dan fokus",

@@ -1,8 +1,8 @@
 {
   "meta": {
     "title": "Chat Enhancer for YouTube - công cụ YouTube live chat",
-    "description": "Các cải tiến giúp live chat YouTube dễ theo dõi và tham gia hơn.",
-    "ogDescription": "Theo dõi live chat YouTube đông người, trả lời nhanh hơn và giữ mạch trò chuyện mà không thay thế chat gốc.",
+    "description": "Bộ cải tiến giúp live chat YouTube dễ theo dõi và tham gia hơn.",
+    "ogDescription": "Bộ cải tiến giúp live chat YouTube dễ theo dõi và tham gia hơn.",
     "imageAlt": "Chat Enhancer for YouTube hiển thị bản dịch live chat, hộp thư và công cụ emoji hòa hợp với giao diện chat."
   },
   "nav": {
@@ -21,13 +21,13 @@
   "hero": {
     "eyebrow": "Tiện ích trình duyệt cho YouTube live chat",
     "title": "Chat Enhancer for YouTube",
-    "copy": "Theo dõi chat đông người, trả lời nhanh hơn và giữ mạch trò chuyện mà không thay thế chat gốc của YouTube.",
+    "copy": "Theo dõi chat đông người, giữ mạch trò chuyện và tham gia dễ hơn trong live chat YouTube.",
     "primaryCta": "Cài đặt",
     "secondaryCta": "Xem tính năng"
   },
   "features": {
     "eyebrow": "Xây cho livestream",
-    "title": "Công cụ nhỏ ngay nơi chat đang diễn ra",
+    "title": "Cải tiến ngay nơi chat đang diễn ra",
     "translationTitle": "Dịch live chat",
     "translationBody": "Chọn ngôn ngữ đích trong popup tiện ích, rồi bật/tắt dịch nhanh từ phần cài đặt live chat của YouTube.",
     "mentionTitle": "Nhắc tên, trích dẫn và tập trung",

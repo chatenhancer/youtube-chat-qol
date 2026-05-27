@@ -1,8 +1,8 @@
 {
   "meta": {
     "title": "Chat Enhancer for YouTube - YouTube 라이브 채팅 도구",
-    "description": "YouTube 라이브 채팅을 더 쉽게 따라가고 참여할 수 있게 해주는 편의 기능입니다.",
-    "ogDescription": "복잡한 YouTube 라이브 채팅을 따라가고, 더 빠르게 답장하며, 기본 채팅을 대체하지 않고 대화를 놓치지 않습니다.",
+    "description": "YouTube 라이브 채팅을 더 쉽게 따라가고 참여할 수 있게 해주는 개선 기능 모음입니다.",
+    "ogDescription": "YouTube 라이브 채팅을 더 쉽게 따라가고 참여할 수 있게 해주는 개선 기능 모음입니다.",
     "imageAlt": "Chat Enhancer for YouTube가 실시간 채팅에 자연스럽게 어울리는 번역, 받은 편지함, 이모지 도구를 보여주는 모습."
   },
   "nav": {
@@ -21,13 +21,13 @@
   "hero": {
     "eyebrow": "YouTube 라이브 채팅용 브라우저 확장 프로그램",
     "title": "Chat Enhancer for YouTube",
-    "copy": "복잡한 채팅을 따라가고, 더 빠르게 답장하며, YouTube 기본 채팅을 대체하지 않고 대화를 놓치지 않습니다.",
+    "copy": "YouTube 라이브 채팅에서 복잡한 채팅을 따라가고, 대화를 놓치지 않고, 더 쉽게 참여하세요.",
     "primaryCta": "설치",
     "secondaryCta": "기능 보기"
   },
   "features": {
     "eyebrow": "라이브 스트림을 위해 제작",
-    "title": "채팅이 이미 일어나는 곳에 작은 도구를 추가",
+    "title": "채팅이 이미 일어나는 곳에 개선 기능을 추가",
     "translationTitle": "라이브 채팅 번역",
     "translationBody": "확장 프로그램 팝업에서 대상 언어를 선택한 뒤 YouTube 라이브 채팅 설정에서 번역을 빠르게 켜고 끌 수 있습니다.",
     "mentionTitle": "멘션, 인용, 포커스",

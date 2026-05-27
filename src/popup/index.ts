@@ -11,8 +11,8 @@ import { DEFAULT_OPTIONS, getTargetLanguageUpdate, normalizeOptions, type Option
 import { clampNumber } from '../shared/text';
 
 const LANDING_PAGE_URL = 'https://chatenhancer.com';
-const GITHUB_URL = 'https://github.com/chat-enhancer-yt/youtube-chat-qol';
-const SUPPORT_URL = 'https://github.com/chat-enhancer-yt/youtube-chat-qol/issues';
+const GITHUB_URL = 'https://www.chatenhancer.com/source';
+const SUPPORT_URL = 'https://www.chatenhancer.com/support';
 const BELL_RING_CLASS = 'ytcq-bell-ringing';
 
 const controls = {
