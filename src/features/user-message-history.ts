@@ -9,6 +9,7 @@ import { cleanText, normalizeComparableText } from '../shared/text';
 import {
   getAuthorName,
   getMessageContentSourceNodes,
+  getMessageAvatarSrc,
   getMessageStableId,
   getMessageText,
   getMessageTimestampText,
@@ -26,6 +27,7 @@ const MAX_MESSAGES_PER_USER = 12;
 export interface MessageRecord {
   id: number;
   authorName: string;
+  avatarSrc?: string;
   contentParts: RichTextSegment[];
   messageId?: string;
   messageRef?: WeakRef<HTMLElement>;
@@ -69,6 +71,7 @@ export function recordUserMessage(message: HTMLElement): void {
   const text = getMessageText(message);
   if (!authorName || !text) return;
 
+  const avatarSrc = getMessageAvatarSrc(message);
   const messageId = getMessageStableId(message);
   const recordedAt = Date.now();
   const timestampText = getMessageTimestampText(message, recordedAt);
@@ -90,6 +93,7 @@ export function recordUserMessage(message: HTMLElement): void {
   if (existingRecord) {
     const nextTimestampText = getMessageTimestampText(message, existingRecord.timestamp);
     existingRecord.authorName = authorName;
+    existingRecord.avatarSrc = avatarSrc || existingRecord.avatarSrc;
     existingRecord.contentParts = serializeRichMessageNodes(getMessageContentSourceNodes(message));
     existingRecord.messageId = existingRecord.messageId || messageId;
     existingRecord.messageRef = new WeakRef(message);
@@ -109,6 +113,7 @@ export function recordUserMessage(message: HTMLElement): void {
   const record: MessageRecord = {
     id: previousRecord?.id || nextRecordId++,
     authorName,
+    avatarSrc: avatarSrc || undefined,
     contentParts: serializeRichMessageNodes(getMessageContentSourceNodes(message)),
     messageId: messageId || undefined,
     messageRef: new WeakRef(message),
@@ -152,6 +157,11 @@ export function getRecentMessagesForIdentity(identity: UserIdentity, limit = MAX
 
   return sortRecentRecords(records.values())
     .slice(-limit);
+}
+
+export function getAvatarSrcForIdentity(identity: UserIdentity): string {
+  const records = getRecentMessagesForIdentity(identity, MAX_MESSAGES_PER_USER);
+  return [...records].reverse().find((record) => record.avatarSrc)?.avatarSrc || '';
 }
 
 export function getLiveMessageForRecord(record: MessageRecord): HTMLElement | null {

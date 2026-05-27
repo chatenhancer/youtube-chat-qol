@@ -83,7 +83,12 @@
     "useQuoteLength": "Використайте довжину цитати {lengths}.",
     "useReplaceOrBelow": "Використайте replace або below.",
     "watchingMentions": "Відстеження згадок",
-    "watchingMentionsAndKeywords": "Відстеження згадок і ключових слів"
+    "watchingMentionsAndKeywords": "Відстеження згадок і ключових слів",
+    "open": "Відкрити",
+    "focusMode": "Режим фокуса",
+    "focusOn": "Фокус на",
+    "focusingOn": "Фокус на",
+    "noMessagesYet": "Поки немає повідомлень"
   },
   "extension": {
     "extensionName": {

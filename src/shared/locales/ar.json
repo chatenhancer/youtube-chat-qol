@@ -83,7 +83,12 @@
     "useQuoteLength": "استخدم طول اقتباس {lengths}.",
     "useReplaceOrBelow": "استخدم replace أو below.",
     "watchingMentions": "مراقبة الإشارات",
-    "watchingMentionsAndKeywords": "مراقبة الإشارات والكلمات المفتاحية"
+    "watchingMentionsAndKeywords": "مراقبة الإشارات والكلمات المفتاحية",
+    "open": "فتح",
+    "focusMode": "وضع التركيز",
+    "focusOn": "التركيز على",
+    "focusingOn": "جارٍ التركيز على",
+    "noMessagesYet": "لا توجد رسائل بعد"
   },
   "extension": {
     "extensionName": {

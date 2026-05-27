@@ -19,6 +19,7 @@ import {
   scheduleInboxButtonWire
 } from '../features/inbox';
 import { initSound } from '../features/inbox/sound';
+import { handlePotentialFocusMessage, initFocusMode, resetFocusMode } from '../features/focus-mode';
 import { keepChatAtLiveEdge, scheduleKeepChatAtLiveEdge } from '../features/live-edge';
 import { closeProfileCard, wireParticipantProfileClick, wireProfileClick } from '../features/profile-popup';
 import { wireAuthorNameMention } from '../features/reply';
@@ -43,6 +44,7 @@ function init(): void {
   initUiLocaleFromDocument();
   initFrequentEmojis();
   initSound();
+  initFocusMode();
   initInbox();
   initChatCommands(saveOptions);
   configureSettingsMenu(saveOptions);
@@ -208,6 +210,7 @@ function handleVisibilityChange(): void {
 
 function enhanceMessage(message: HTMLElement, { allowTranslate }: { allowTranslate: boolean }): void {
   recordUserMessage(message);
+  handlePotentialFocusMessage(message);
   wireMessageContext(message);
   wireProfileClick(message);
   wireAuthorNameMention(message);
@@ -246,6 +249,7 @@ function recordMessageForLateText(target: Node): void {
   const message = targetElement.closest<HTMLElement>(CHAT_MESSAGE_SELECTOR);
   if (message) {
     recordUserMessage(message);
+    handlePotentialFocusMessage(message);
     handlePotentialInbox(message);
   }
 }
@@ -258,6 +262,7 @@ function isExtensionManagedMutation(element: Element): boolean {
     '.ytcq-translation',
     '.ytcq-replaced-translation-icon',
     '.ytcq-frequent-emoji-row',
+    '.ytcq-focus-card',
     '.ytcq-profile-card',
     '.ytcq-inbox-card',
     'ytd-menu-popup-renderer'
@@ -272,6 +277,7 @@ function isExtensionManagedAddedNode(element: Element): boolean {
     '.ytcq-chat-keyword-highlight',
     '.ytcq-translation',
     '.ytcq-replaced-translation-icon',
+    '.ytcq-focus-card',
     '.ytcq-profile-card',
     '.ytcq-inbox-card'
   ].join(',')));
@@ -313,6 +319,7 @@ function resetPageState(): void {
   resetInboxState();
   resetFrequentEmojis();
   resetChatCommandsState();
+  resetFocusMode();
   closeProfileCard();
   document.querySelectorAll('.ytcq-toast').forEach((toast) => toast.remove());
   applyOptionSideEffects(previousOptions, DEFAULT_OPTIONS);

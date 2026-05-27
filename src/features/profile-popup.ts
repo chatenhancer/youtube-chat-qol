@@ -8,7 +8,7 @@
 import { getOptions } from '../shared/state';
 import { t } from '../shared/i18n';
 import { cleanText, normalizeComparableText } from '../shared/text';
-import { getAuthorName, getRendererData } from '../youtube/messages';
+import { getAuthorName, getMessageAvatarSrc, getRendererData } from '../youtube/messages';
 import { appendRichMessageText } from '../youtube/rich-text';
 import {
   createInlineTranslationElement,
@@ -29,10 +29,7 @@ import {
 } from './user-message-history';
 import { createJumpToMessageIcon, jumpToChatMessage } from './message-jump';
 import { mentionAuthorName, quoteAuthorRichText } from './reply';
-
-const PROFILE_WINDOW_WIDTH = 486;
-const PROFILE_WINDOW_HEIGHT = 680;
-const PROFILE_WINDOW_MARGIN = 12;
+import { getChannelUrl, openChannelWindow } from './channel-popup';
 
 let activeProfileCard: HTMLElement | null = null;
 let activeProfileCardCleanup: (() => void) | null = null;
@@ -109,7 +106,7 @@ function getMessageProfileSource(message: HTMLElement): ProfileSource | null {
       authorName,
       channelId
     },
-    profileUrl: getProfileUrl(channelId, authorName)
+    profileUrl: getChannelUrl(channelId, authorName)
   };
 }
 
@@ -134,20 +131,8 @@ function getParticipantProfileSource(participant: HTMLElement): ProfileSource | 
       authorName,
       channelId
     },
-    profileUrl: getProfileUrl(channelId, authorName)
+    profileUrl: getChannelUrl(channelId, authorName)
   };
-}
-
-function getProfileUrl(channelId: string | undefined, authorName: string): string {
-  if (channelId) {
-    return `https://www.youtube.com/channel/${encodeURIComponent(channelId)}`;
-  }
-
-  if (authorName?.startsWith('@')) {
-    return `https://www.youtube.com/${authorName}`;
-  }
-
-  return '';
 }
 
 function getParticipantRendererData(participant: HTMLElement): ParticipantRendererData | null {
@@ -156,32 +141,6 @@ function getParticipantRendererData(participant: HTMLElement): ParticipantRender
     __data?: { data?: ParticipantRendererData };
   };
   return candidate.data || candidate.__data?.data || null;
-}
-
-function openProfileWindow(url: string): void {
-  if (!url) return;
-
-  const features = getOptions().openProfilesInPopup
-    ? getProfileWindowFeatures()
-    : 'noopener';
-  window.open(url, 'ytcq-profile', features);
-}
-
-function getProfileWindowFeatures(): string {
-  const position = getProfileWindowPosition();
-  return [
-    'popup=yes',
-    `width=${PROFILE_WINDOW_WIDTH}`,
-    `height=${PROFILE_WINDOW_HEIGHT}`,
-    `left=${position.left}`,
-    `top=${position.top}`,
-    'menubar=no',
-    'toolbar=no',
-    'location=yes',
-    'status=no',
-    'scrollbars=yes',
-    'resizable=yes'
-  ].join(',');
 }
 
 function showProfileCard(source: ProfileSource, anchor: HTMLElement): void {
@@ -210,7 +169,13 @@ function showProfileCard(source: ProfileSource, anchor: HTMLElement): void {
   title.addEventListener('click', (event) => {
     event.preventDefault();
     event.stopPropagation();
-    mentionAuthorName(source.authorName);
+    mentionAuthorName(source.authorName, {
+      focusSource: {
+        authorName: source.authorName,
+        avatarSrc: source.avatarSrc,
+        channelId: source.identity.channelId
+      }
+    });
     closeProfileCard();
   });
 
@@ -227,7 +192,7 @@ function showProfileCard(source: ProfileSource, anchor: HTMLElement): void {
   openButton.textContent = t('openChannel');
   openButton.disabled = !source.profileUrl;
   openButton.addEventListener('click', () => {
-    openProfileWindow(source.profileUrl);
+    openChannelWindow(source.profileUrl);
   });
   header.append(openButton);
 
@@ -243,7 +208,7 @@ function showProfileCard(source: ProfileSource, anchor: HTMLElement): void {
   list.className = 'ytcq-profile-card-messages';
 
   const profileKey = getUserKeyFromIdentity(source.identity);
-  renderProfileMessages(list, getRecentMessagesForIdentity(source.identity));
+  renderProfileMessages(list, getRecentMessagesForIdentity(source.identity), source);
 
   card.append(header, list);
   document.body.append(card);
@@ -269,7 +234,7 @@ function showProfileCard(source: ProfileSource, anchor: HTMLElement): void {
   };
   const unsubscribeMessages = onUserMessagesChanged((key) => {
     if (!activeProfileCard || !shouldRefreshProfileMessages(key, source, profileKey)) return;
-    renderProfileMessages(list, getRecentMessagesForIdentity(source.identity));
+    renderProfileMessages(list, getRecentMessagesForIdentity(source.identity), source);
     scrollCardListToBottom(list);
   });
 
@@ -294,7 +259,7 @@ export function closeProfileCard(): void {
   activeProfileCard = null;
 }
 
-function renderProfileMessages(list: HTMLElement, recentMessages: MessageRecord[]): void {
+function renderProfileMessages(list: HTMLElement, recentMessages: MessageRecord[], source: ProfileSource): void {
   list.replaceChildren();
 
   if (recentMessages.length) {
@@ -304,7 +269,7 @@ function renderProfileMessages(list: HTMLElement, recentMessages: MessageRecord[
       item.title = t('quoteMessage');
       item.setAttribute('role', 'button');
       item.tabIndex = 0;
-      wireQuoteCardItem(item, recentMessage);
+      wireQuoteCardItem(item, recentMessage, source);
 
       const timestamp = document.createElement('time');
       timestamp.className = 'ytcq-profile-card-message-time';
@@ -378,12 +343,18 @@ function getVisibleProfileMessageTranslation(recentMessage: MessageRecord): Mess
   return translation;
 }
 
-function wireQuoteCardItem(item: HTMLElement, recentMessage: MessageRecord): void {
+function wireQuoteCardItem(item: HTMLElement, recentMessage: MessageRecord, source: ProfileSource): void {
   const quote = (event: Event): void => {
     event.preventDefault();
     event.stopPropagation();
     quoteAuthorRichText(recentMessage.authorName, recentMessage.text, {
       segments: recentMessage.contentParts
+    }, {
+      focusSource: {
+        authorName: source.authorName,
+        avatarSrc: source.avatarSrc,
+        channelId: source.identity.channelId
+      }
     });
     closeProfileCard();
   };
@@ -428,11 +399,6 @@ function scrollCardListToBottom(list: HTMLElement): void {
   });
 }
 
-function getMessageAvatarSrc(message: HTMLElement): string {
-  const source = message.querySelector<HTMLImageElement>('#author-photo img, #author-photo #img, img#img');
-  return source?.src || '';
-}
-
 function createAvatarElement(src: string): HTMLImageElement {
   const image = document.createElement('img');
   image.className = 'ytcq-profile-card-avatar';
@@ -452,7 +418,7 @@ function createProfileAvatarButton(avatar: HTMLImageElement, profileUrl: string)
   button.addEventListener('click', (event) => {
     event.preventDefault();
     event.stopPropagation();
-    openProfileWindow(profileUrl);
+    openChannelWindow(profileUrl);
   });
   return button;
 }
@@ -503,70 +469,4 @@ function positionProfileCard(card: HTMLElement, anchor: HTMLElement): void {
 
   card.style.left = `${Math.max(margin, Math.round(left))}px`;
   card.style.top = `${Math.max(margin, Math.round(top))}px`;
-}
-
-function getProfileWindowPosition(): { left: number; top: number } {
-  const screenRect = getAvailableScreenRect();
-  const chatRect = getChatScreenRect();
-
-  let left = chatRect.left - PROFILE_WINDOW_WIDTH - PROFILE_WINDOW_MARGIN;
-  if (left < screenRect.left + PROFILE_WINDOW_MARGIN) {
-    left = chatRect.left + chatRect.width + PROFILE_WINDOW_MARGIN;
-  }
-
-  const top = chatRect.top + Math.max(PROFILE_WINDOW_MARGIN, (chatRect.height - PROFILE_WINDOW_HEIGHT) / 2);
-
-  const leftMin = screenRect.left + PROFILE_WINDOW_MARGIN;
-  const leftMax = screenRect.left + screenRect.width - PROFILE_WINDOW_WIDTH - PROFILE_WINDOW_MARGIN;
-  const topMin = screenRect.top + PROFILE_WINDOW_MARGIN;
-  const topMax = screenRect.top + screenRect.height - PROFILE_WINDOW_HEIGHT - PROFILE_WINDOW_MARGIN;
-
-  return {
-    left: Math.round(clamp(left, leftMin, leftMax)),
-    top: Math.round(clamp(top, topMin, topMax))
-  };
-}
-
-function getChatScreenRect(): { left: number; top: number; width: number; height: number } {
-  try {
-    const frame = window.frameElement as HTMLElement | null;
-    if (frame && window.parent !== window) {
-      const frameRect = frame.getBoundingClientRect();
-      const parentChromeTop = Math.max(0, window.parent.outerHeight - window.parent.innerHeight);
-
-      return {
-        left: window.parent.screenX + frameRect.left,
-        top: window.parent.screenY + parentChromeTop + frameRect.top,
-        width: frameRect.width,
-        height: frameRect.height
-      };
-    }
-  } catch {
-    // Fall through to the standalone chat-window approximation.
-  }
-
-  return {
-    left: window.screenX,
-    top: window.screenY,
-    width: window.outerWidth || window.innerWidth,
-    height: window.outerHeight || window.innerHeight
-  };
-}
-
-function getAvailableScreenRect(): { left: number; top: number; width: number; height: number } {
-  const screenWithOffsets = window.screen as Screen & { availLeft?: number; availTop?: number };
-  const left = Number.isFinite(screenWithOffsets.availLeft) ? Number(screenWithOffsets.availLeft) : 0;
-  const top = Number.isFinite(screenWithOffsets.availTop) ? Number(screenWithOffsets.availTop) : 0;
-
-  return {
-    left,
-    top,
-    width: window.screen.availWidth || window.screen.width,
-    height: window.screen.availHeight || window.screen.height
-  };
-}
-
-function clamp(value: number, min: number, max: number): number {
-  if (max < min) return min;
-  return Math.min(Math.max(value, min), max);
 }

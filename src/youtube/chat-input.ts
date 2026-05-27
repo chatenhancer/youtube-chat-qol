@@ -5,6 +5,8 @@
  * the input as different editable elements. The adapter dispatches input events
  * after mutation so YouTube's own send button state updates.
  */
+import { CHAT_TOOLTIP_SELECTOR } from './selectors';
+
 export interface ChatInputSnapshot {
   childNodes: Node[];
   text: string;
@@ -337,6 +339,21 @@ export function replaceChatInputSnapshot(snapshot: ChatInputSnapshot): boolean {
   return true;
 }
 
+export function replaceNodesInChatInput(nodes: Node[], fallbackText = '', trailingText = ''): boolean {
+  const input = findChatInput();
+  if (!input) return false;
+
+  if (!nodes.length || input instanceof HTMLTextAreaElement || input instanceof HTMLInputElement) {
+    return replaceChatInput(fallbackText);
+  }
+
+  input.focus();
+  input.replaceChildren(...nodes.map((node) => node.cloneNode(true)));
+  moveCaretToEnd(input);
+  dispatchInputReplacement(input);
+  return trailingText ? insertIntoChatInput(trailingText) : true;
+}
+
 function moveCaretToEnd(input: HTMLElement): void {
   const selection = document.getSelection();
   const range = document.createRange();
@@ -354,7 +371,7 @@ function dispatchInputReplacement(input: HTMLElement | HTMLTextAreaElement | HTM
 }
 
 function getInputPlainText(input: HTMLElement): string {
-  return Array.from(input.childNodes).map(getNodePlainText).join('') || input.textContent || '';
+  return Array.from(input.childNodes).map(getNodePlainText).join('');
 }
 
 function inputContainsNode(input: HTMLElement, node: Node): boolean {
@@ -448,6 +465,7 @@ function isPlainTextLeaf(node: Node): boolean {
 function getNodePlainText(node: Node): string {
   if (node.nodeType === Node.TEXT_NODE) return node.textContent || '';
   if (!(node instanceof Element)) return '';
+  if (isIgnoredInputTextElement(node)) return '';
 
   const tagName = node.tagName.toLowerCase();
   if (tagName === 'br') return '\n';
@@ -459,5 +477,28 @@ function getNodePlainText(node: Node): string {
       '';
   }
 
-  return Array.from(node.childNodes).map(getNodePlainText).join('') || node.textContent || '';
+  return Array.from(node.childNodes).map(getNodePlainText).join('');
+}
+
+function isIgnoredInputTextElement(element: Element): boolean {
+  if (
+    element.matches(CHAT_TOOLTIP_SELECTOR) ||
+    element.closest(CHAT_TOOLTIP_SELECTOR) ||
+    element.getAttribute('aria-hidden') === 'true' ||
+    element.hasAttribute('hidden')
+  ) {
+    return true;
+  }
+
+  const role = element.getAttribute('role');
+  if (role && ['listbox', 'menu', 'menuitem', 'option', 'tooltip'].includes(role)) {
+    return true;
+  }
+
+  if (element instanceof HTMLElement) {
+    const style = window.getComputedStyle(element);
+    return style.display === 'none' || style.visibility === 'hidden';
+  }
+
+  return false;
 }

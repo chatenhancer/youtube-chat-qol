@@ -83,7 +83,12 @@
     "useQuoteLength": "ใช้ความยาวอ้างอิง {lengths}",
     "useReplaceOrBelow": "ใช้ replace หรือ below",
     "watchingMentions": "กำลังติดตามการกล่าวถึง",
-    "watchingMentionsAndKeywords": "กำลังติดตามการกล่าวถึงและคำสำคัญ"
+    "watchingMentionsAndKeywords": "กำลังติดตามการกล่าวถึงและคำสำคัญ",
+    "open": "เปิด",
+    "focusMode": "โหมดโฟกัส",
+    "focusOn": "โฟกัสที่",
+    "focusingOn": "กำลังโฟกัสที่",
+    "noMessagesYet": "ยังไม่มีข้อความ"
   },
   "extension": {
     "extensionName": {

@@ -83,7 +83,12 @@
     "useQuoteLength": "Gunakan panjang kutipan {lengths}.",
     "useReplaceOrBelow": "Gunakan replace atau below.",
     "watchingMentions": "Memantau sebutan",
-    "watchingMentionsAndKeywords": "Memantau sebutan dan kata kunci"
+    "watchingMentionsAndKeywords": "Memantau sebutan dan kata kunci",
+    "open": "Buka",
+    "focusMode": "Mode fokus",
+    "focusOn": "Fokus pada",
+    "focusingOn": "Sedang fokus pada",
+    "noMessagesYet": "Belum ada pesan"
   },
   "extension": {
     "extensionName": {
