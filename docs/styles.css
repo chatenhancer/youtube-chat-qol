@@ -839,22 +839,23 @@ h3 {
   gap: 0;
 }
 
-.command-notes p {
-  display: grid;
-  grid-template-columns: minmax(0, 180px) minmax(0, 1fr);
-  gap: 14px;
-  align-items: start;
-  margin: 0;
-  color: var(--muted);
-  padding: 13px 0;
+.command-note {
+  min-width: 0;
+  padding: 14px 0;
 }
 
-.command-notes p + p {
+.command-note + .command-note {
   border-top: 1px solid var(--line);
 }
 
+.command-note p {
+  margin: 0;
+  color: var(--muted);
+}
+
 .command-notes strong {
-  display: inline-flex;
+  display: block;
+  margin-bottom: 4px;
   color: var(--blue);
   font-size: 14px;
   font-weight: 800;
@@ -1429,16 +1430,6 @@ figcaption {
 
   .feature-grid {
     grid-template-columns: 1fr;
-  }
-
-  .command-notes p {
-    grid-template-columns: 1fr;
-    gap: 4px;
-  }
-
-  .command-notes p + p {
-    padding-top: 16px;
-    border-top: 1px solid var(--line);
   }
 
   .showcase-panel-reverse .showcase-media {
