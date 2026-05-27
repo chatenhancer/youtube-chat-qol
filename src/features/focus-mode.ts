@@ -5,8 +5,10 @@
  * selected chatter. It is intentionally local and current-page only.
  */
 import { t } from '../shared/i18n';
+import { getOptions } from '../shared/state';
 import { cleanText, normalizeComparableText } from '../shared/text';
 import { findChatInput, getChatInputText, replaceChatInput } from '../youtube/chat-input';
+import { findMatchingLiveMessageRecordIndex } from '../youtube/message-dedupe';
 import {
   getAuthorName,
   getMessageContentSourceNodes,
@@ -20,7 +22,18 @@ import { appendRichMessageText, serializeRichMessageNodes, type RichTextSegment 
 import { CHAT_MESSAGE_SELECTOR } from '../youtube/selectors';
 import { getChannelUrl, openChannelWindow } from './channel-popup';
 import { isCurrentUserAuthorName } from './mention-detection';
-import { getAvatarSrcForIdentity } from './user-message-history';
+import {
+  getAvatarSrcForIdentity,
+  getUserMessageRecordForMessage,
+  type MessageTranslationRecord
+} from './user-message-history';
+import { createNodesWithPlaceholders } from './translation/protected-placeholders';
+import {
+  createInlineTranslationElement,
+  createReplacedTranslationIcon,
+  getReplacementTranslationTitle,
+  isMeaningfulTranslation
+} from './translation/render';
 
 interface FocusSource {
   authorName: string;
@@ -32,10 +45,12 @@ interface FocusRecord {
   authorName: string;
   contentParts: RichTextSegment[];
   id: number;
-  key: string;
+  messageId?: string;
+  messageRef?: WeakRef<HTMLElement>;
   side: 'them' | 'us';
   text: string;
   timestampText: string;
+  translation?: MessageTranslationRecord;
 }
 
 const SEND_BUTTON_SELECTOR = [
@@ -55,9 +70,6 @@ let mentionRestoreTimer = 0;
 let nextRecordId = 1;
 let initialized = false;
 const focusRecords: FocusRecord[] = [];
-const seenFocusRecordKeys = new Set<string>();
-const seenFocusRecordContentKeys = new Set<string>();
-let seenFocusRecordMessages = new WeakSet<HTMLElement>();
 
 export function initFocusMode(): void {
   if (initialized) return;
@@ -99,6 +111,40 @@ export function handlePotentialFocusMessage(message: HTMLElement): void {
   if (!record) return;
 
   focusRecords.push(record);
+  renderFocusMessages();
+  scrollFocusListToBottom();
+}
+
+export function recordFocusMessageTranslation(
+  message: HTMLElement,
+  translation: MessageTranslationRecord
+): void {
+  const record = findFocusRecordForMessage(message);
+  if (!record) return;
+
+  record.translation = translation;
+  renderFocusMessages();
+  scrollFocusListToBottom();
+}
+
+export function clearFocusMessageTranslation(message: HTMLElement): void {
+  const record = findFocusRecordForMessage(message);
+  if (!record?.translation) return;
+
+  delete record.translation;
+  renderFocusMessages();
+  scrollFocusListToBottom();
+}
+
+export function clearFocusMessageTranslations(): void {
+  let changed = false;
+  focusRecords.forEach((record) => {
+    if (!record.translation) return;
+    delete record.translation;
+    changed = true;
+  });
+  if (!changed) return;
+
   renderFocusMessages();
   scrollFocusListToBottom();
 }
@@ -214,34 +260,21 @@ function createFocusRecord(message: HTMLElement): FocusRecord | null {
 
   const timestampText = getMessageTimestampText(message);
   const messageId = cleanText(getMessageStableId(message));
-  const contentKey = [
-    side,
-    normalizeComparableText(authorName),
-    normalizeComparableText(timestampText),
-    normalizeComparableText(text)
-  ].join('\n');
-  const key = messageId || contentKey;
-  if (
-    !key ||
-    seenFocusRecordMessages.has(message) ||
-    seenFocusRecordKeys.has(key) ||
-    seenFocusRecordContentKeys.has(contentKey)
-  ) {
+  const messageRef = new WeakRef(message);
+  if (findMatchingLiveMessageRecordIndex(focusRecords, { messageId, messageRef }) >= 0) {
     return null;
   }
-
-  seenFocusRecordMessages.add(message);
-  seenFocusRecordKeys.add(key);
-  seenFocusRecordContentKeys.add(contentKey);
 
   return {
     authorName,
     contentParts: serializeRichMessageNodes(getMessageContentSourceNodes(message)),
     id: nextRecordId++,
-    key,
+    messageId: messageId || undefined,
+    messageRef,
     side,
     text,
-    timestampText
+    timestampText,
+    translation: getUserMessageRecordForMessage(message)?.translation
   };
 }
 
@@ -275,11 +308,48 @@ function renderFocusMessages(): void {
 
     const bubble = document.createElement('div');
     bubble.className = 'ytcq-focus-bubble';
-    appendRichMessageText(bubble, record.text, [], record.contentParts);
+    renderFocusMessageText(item, bubble, record);
 
     item.append(meta, bubble);
     activeList?.append(item);
   });
+}
+
+function renderFocusMessageText(item: HTMLElement, bubble: HTMLElement, record: FocusRecord): void {
+  const translation = getVisibleFocusMessageTranslation(record);
+
+  if (translation && getOptions().translationDisplay === 'replace') {
+    item.classList.add('ytcq-translation-replaced');
+    bubble.classList.add('ytcq-translation-replaced-text');
+    bubble.lang = translation.result.targetLanguage;
+    bubble.title = getReplacementTranslationTitle(translation.result, record.text);
+    bubble.append(
+      ...createNodesWithPlaceholders(translation.result.text, translation.protectedTokens),
+      createReplacedTranslationIcon()
+    );
+    return;
+  }
+
+  appendRichMessageText(bubble, record.text, [], record.contentParts);
+  if (translation) {
+    bubble.append(createInlineTranslationElement(translation.result, translation.protectedTokens));
+  }
+}
+
+function getVisibleFocusMessageTranslation(record: FocusRecord): MessageTranslationRecord | undefined {
+  const translation = record.translation;
+  const targetLanguage = getOptions().targetLanguage;
+  if (!translation || !targetLanguage) return undefined;
+  if (translation.result.targetLanguage !== targetLanguage) return undefined;
+  if (!isMeaningfulTranslation(translation.result, translation.protectedTokens, translation.sourceText)) return undefined;
+  return translation;
+}
+
+function findFocusRecordForMessage(message: HTMLElement): FocusRecord | null {
+  const messageId = cleanText(getMessageStableId(message));
+  const messageRef = new WeakRef(message);
+  const index = findMatchingLiveMessageRecordIndex(focusRecords, { messageId, messageRef });
+  return index >= 0 ? focusRecords[index] : null;
 }
 
 function wireFocusMessageQuote(item: HTMLElement, record: FocusRecord): void {
@@ -318,9 +388,6 @@ function closeFocusMode(): void {
 
 function clearFocusRecords(): void {
   focusRecords.length = 0;
-  seenFocusRecordKeys.clear();
-  seenFocusRecordContentKeys.clear();
-  seenFocusRecordMessages = new WeakSet<HTMLElement>();
 }
 
 function createFocusAuthor(source: FocusSource, options: { openChannel: boolean }): HTMLElement {

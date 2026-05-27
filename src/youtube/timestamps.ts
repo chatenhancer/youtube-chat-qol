@@ -13,22 +13,25 @@ export function getChatTimestampValue(
   options: ChatTimestampOptions = {}
 ): number | null {
   const normalized = cleanText(timestampText)
+    .replace(/[−–—]/g, '-')
     .replace(/\./g, '')
     .toLocaleUpperCase();
-  const match = normalized.match(/^(\d{1,4}):(\d{2})(?::(\d{2}))?\s*([AP]M)?$/);
+  const match = normalized.match(/^(-?)(\d{1,4}):(\d{2})(?::(\d{2}))?\s*([AP]M)?$/);
   if (!match) return null;
 
-  const first = Number(match[1]);
-  const second = Number(match[2]);
-  const third = match[3] ? Number(match[3]) : 0;
-  const meridiem = match[4];
-  const hasThirdPart = Boolean(match[3]);
+  const isNegative = match[1] === '-';
+  const first = Number(match[2]);
+  const second = Number(match[3]);
+  const third = match[4] ? Number(match[4]) : 0;
+  const meridiem = match[5];
+  const hasThirdPart = Boolean(match[4]);
 
   if (!Number.isFinite(first) || !Number.isFinite(second) || !Number.isFinite(third)) return null;
   if (second > 59 || third > 59) return null;
+  if (isNegative && meridiem) return null;
 
-  if (!meridiem && shouldParseElapsedTimestamp(first, options.preferElapsed === true)) {
-    return getElapsedTimestampValue(first, second, third, hasThirdPart, referenceTimestamp);
+  if (!meridiem && shouldParseElapsedTimestamp(first, options.preferElapsed === true, isNegative)) {
+    return getElapsedTimestampValue(first, second, third, hasThirdPart, referenceTimestamp, isNegative);
   }
 
   return getClockTimestampValue(first, second, third, meridiem, referenceTimestamp);
@@ -38,8 +41,8 @@ export function isLiveChatReplayUrl(value = window.location.href): boolean {
   return /\/live_chat_replay\b/.test(value) || value.includes('live_chat_replay');
 }
 
-function shouldParseElapsedTimestamp(first: number, preferElapsed: boolean): boolean {
-  return preferElapsed || first > 23;
+function shouldParseElapsedTimestamp(first: number, preferElapsed: boolean, isNegative: boolean): boolean {
+  return isNegative || preferElapsed || first > 23;
 }
 
 function getElapsedTimestampValue(
@@ -47,14 +50,15 @@ function getElapsedTimestampValue(
   second: number,
   third: number,
   hasThirdPart: boolean,
-  referenceTimestamp: number
+  referenceTimestamp: number,
+  isNegative: boolean
 ): number {
   const totalSeconds = hasThirdPart
     ? first * 60 * 60 + second * 60 + third
     : first * 60 + second;
   const date = new Date(referenceTimestamp);
   date.setHours(0, 0, 0, 0);
-  return date.getTime() + totalSeconds * 1000;
+  return date.getTime() + totalSeconds * (isNegative ? -1000 : 1000);
 }
 
 function getClockTimestampValue(

@@ -6,6 +6,7 @@
  * avatar profile card while the livestream page is open.
  */
 import { cleanText, normalizeComparableText } from '../shared/text';
+import { findMatchingLiveMessageRecordIndex } from '../youtube/message-dedupe';
 import {
   getAuthorName,
   getMessageContentSourceNodes,
@@ -52,7 +53,7 @@ export interface UserIdentity {
 interface ElementRecord {
   key: string;
   id: number;
-  signature: string;
+  elementStateKey: string;
 }
 
 type UserMessageListener = (key: string) => void;
@@ -76,16 +77,16 @@ export function recordUserMessage(message: HTMLElement): void {
   const recordedAt = Date.now();
   const timestampText = getMessageTimestampText(message, recordedAt);
   const timestamp = getMessageHistoryTimestamp(timestampText, recordedAt);
-  const signature = `${messageId || 'message-content'}\n${authorName}\n${text}`;
+  const elementStateKey = `${messageId || 'message-content'}\n${authorName}\n${text}`;
   const previousRecord = recordsByElement.get(message);
-  if (previousRecord?.signature === signature) return;
+  if (previousRecord?.elementStateKey === elementStateKey) return;
 
-  const existingRecord = messageId
-    ? findRecordByMessageId(key, messageId) ||
-      findDuplicateRecordAcrossLiveSurfaces(key, message, authorName, text, timestampText) ||
-      findDisconnectedRecordByContent(key, authorName, text, timestampText)
-    : findDuplicateRecordAcrossLiveSurfaces(key, message, authorName, text, timestampText) ||
-      findDisconnectedRecordByContent(key, authorName, text, timestampText);
+  const currentRecords = recordsByUser.get(key) || [];
+  const existingRecordIndex = findMatchingLiveMessageRecordIndex(currentRecords, {
+    messageId,
+    messageRef: new WeakRef(message)
+  });
+  const existingRecord = existingRecordIndex >= 0 ? currentRecords[existingRecordIndex] : null;
   if (previousRecord && previousRecord.id !== existingRecord?.id) {
     removeRecord(previousRecord.key, previousRecord.id);
   }
@@ -103,7 +104,7 @@ export function recordUserMessage(message: HTMLElement): void {
     recordsByElement.set(message, {
       key,
       id: existingRecord.id,
-      signature
+      elementStateKey
     });
     setUserRecords(key, recordsByUser.get(key) || []);
     notifyUserMessageListeners(key);
@@ -128,7 +129,7 @@ export function recordUserMessage(message: HTMLElement): void {
   recordsByElement.set(message, {
     key,
     id: record.id,
-    signature
+    elementStateKey
   });
 
   pruneOldUsers();
@@ -214,6 +215,10 @@ export function clearUserMessageTranslations(): void {
   changedKeys.forEach(notifyUserMessageListeners);
 }
 
+export function getUserMessageRecordForMessage(message: HTMLElement): MessageRecord | null {
+  return getRecordForMessage(message);
+}
+
 export function getUserKey(message: HTMLElement): string {
   const data = getRendererData(message);
   return getUserKeyFromIdentity({
@@ -242,38 +247,6 @@ function removeRecord(key: string, id: number): void {
   setUserRecords(key, nextRecords);
 }
 
-function findRecordByMessageId(key: string, messageId: string): MessageRecord | null {
-  return recordsByUser.get(key)?.find((record) => record.messageId === messageId) || null;
-}
-
-function findDuplicateRecordAcrossLiveSurfaces(
-  key: string,
-  message: HTMLElement,
-  authorName: string,
-  text: string,
-  timestampText: string
-): MessageRecord | null {
-  const incomingSurface = getLiveChatSurfaceKey(message);
-  if (!incomingSurface) return null;
-
-  const authorSignature = normalizeComparableText(authorName);
-  const textSignature = normalizeComparableText(text);
-  const timestampSignature = normalizeComparableText(timestampText);
-  if (!authorSignature || !textSignature || !timestampSignature) return null;
-
-  return recordsByUser.get(key)?.find((record) => {
-    const liveMessage = getLiveMessageForRecord(record);
-    if (!liveMessage) return false;
-
-    const liveSurface = getLiveChatSurfaceKey(liveMessage);
-    return liveSurface &&
-      liveSurface !== incomingSurface &&
-      normalizeComparableText(record.authorName) === authorSignature &&
-      normalizeComparableText(record.text) === textSignature &&
-      normalizeComparableText(record.timestampText) === timestampSignature;
-  }) || null;
-}
-
 function getRecordsByAuthorName(authorName: string | undefined): MessageRecord[] {
   const authorSignature = normalizeComparableText(authorName || '');
   if (!authorSignature) return [];
@@ -287,34 +260,6 @@ function getRecordsByAuthorName(authorName: string | undefined): MessageRecord[]
     });
   });
   return records;
-}
-
-function findDisconnectedRecordByContent(
-  key: string,
-  authorName: string,
-  text: string,
-  timestampText: string
-): MessageRecord | null {
-  const authorSignature = normalizeComparableText(authorName);
-  const textSignature = normalizeComparableText(text);
-  const timestampSignature = normalizeComparableText(timestampText);
-  if (!authorSignature || !textSignature || !timestampSignature) return null;
-
-  return recordsByUser.get(key)?.find((record) => {
-    const liveMessage = getLiveMessageForRecord(record);
-    return !liveMessage &&
-      normalizeComparableText(record.authorName) === authorSignature &&
-      normalizeComparableText(record.text) === textSignature &&
-      normalizeComparableText(record.timestampText) === timestampSignature;
-  }) || null;
-}
-
-function getLiveChatSurfaceKey(message: HTMLElement): string {
-  const list = message.closest<HTMLElement>([
-    '#items.style-scope.yt-live-chat-item-list-renderer',
-    '#items.style-scope.yt-live-chat-item-display-list-renderer'
-  ].join(','));
-  return list?.className || '';
 }
 
 function pruneOldUsers(): void {
