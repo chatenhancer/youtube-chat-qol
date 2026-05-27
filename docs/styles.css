@@ -841,7 +841,7 @@ h3 {
 
 .command-notes p {
   display: grid;
-  grid-template-columns: 170px minmax(0, 1fr);
+  grid-template-columns: max-content minmax(0, 1fr);
   gap: 22px;
   align-items: start;
   margin: 0;
@@ -859,7 +859,6 @@ h3 {
   font-size: 14px;
   font-weight: 800;
   line-height: 1.5;
-  white-space: nowrap;
 }
 
 .command-notes span {
