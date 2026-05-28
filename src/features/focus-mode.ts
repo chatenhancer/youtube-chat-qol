@@ -6,53 +6,22 @@
  */
 import { t } from '../shared/i18n';
 import { captureScrollPosition, restoreScrollPositionAfterRender, scrollElementToBottom } from '../shared/scroll';
-import { getOptions } from '../shared/state';
-import { cleanText, normalizeComparableText } from '../shared/text';
 import { findChatInput, getChatInputText, replaceChatInput } from '../youtube/chat-input';
-import { findMatchingLiveMessageRecordIndex } from '../youtube/message-dedupe';
-import {
-  getAuthorName,
-  getMessageContentSourceNodes,
-  getMessageAvatarSrc,
-  getMessageStableId,
-  getMessageText,
-  getMessageTimestampText,
-  getRendererData
-} from '../youtube/messages';
-import { appendRichMessageText, serializeRichMessageNodes, type RichTextSegment } from '../youtube/rich-text';
 import { CHAT_MESSAGE_SELECTOR } from '../youtube/selectors';
 import { getChannelUrl, openChannelWindow } from './channel-popup';
 import { isCurrentUserAuthorName } from './mention-detection';
+import type { MessageTranslationRecord } from './user-message-history';
+import { createFocusRecord, findFocusRecordForMessage } from './focus-mode/records';
 import {
-  getAvatarSrcForIdentity,
-  getUserMessageRecordForMessage,
-  type MessageTranslationRecord
-} from './user-message-history';
-import { createNodesWithPlaceholders } from './translation/protected-placeholders';
-import {
-  createInlineTranslationElement,
-  createReplacedTranslationIcon,
-  getReplacementTranslationTitle,
-  isMeaningfulTranslation
-} from './translation/render';
-
-interface FocusSource {
-  authorName: string;
-  avatarSrc?: string;
-  channelId?: string;
-}
-
-interface FocusRecord {
-  authorName: string;
-  contentParts: RichTextSegment[];
-  id: number;
-  messageId?: string;
-  messageRef?: WeakRef<HTMLElement>;
-  side: 'them' | 'us';
-  text: string;
-  timestampText: string;
-  translation?: MessageTranslationRecord;
-}
+  getAuthorInitial,
+  getFocusMentionPrefix,
+  getFocusSourceFromMessage,
+  isSameFocusSource,
+  normalizeFocusSource,
+  startsWithFocusMention
+} from './focus-mode/source';
+import { renderFocusMessageText } from './focus-mode/translation';
+import type { FocusRecord, FocusSource } from './focus-mode/types';
 
 const SEND_BUTTON_SELECTOR = [
   '#send-button',
@@ -117,7 +86,7 @@ export function openFocusModeForAuthor(source: FocusSource): boolean {
 export function handlePotentialFocusMessage(message: HTMLElement): void {
   if (!activeExpanded || !activeSource || !activeList || !message.isConnected) return;
 
-  const record = createFocusRecord(message);
+  const record = createFocusRecord(message, activeSource, focusRecords, () => nextRecordId++);
   if (!record) return;
 
   focusRecords.push(record);
@@ -128,7 +97,7 @@ export function recordFocusMessageTranslation(
   message: HTMLElement,
   translation: MessageTranslationRecord
 ): void {
-  const record = findFocusRecordForMessage(message);
+  const record = findFocusRecordForMessage(focusRecords, message);
   if (!record) return;
 
   record.translation = translation;
@@ -136,7 +105,7 @@ export function recordFocusMessageTranslation(
 }
 
 export function clearFocusMessageTranslation(message: HTMLElement): void {
-  const record = findFocusRecordForMessage(message);
+  const record = findFocusRecordForMessage(focusRecords, message);
   if (!record?.translation) return;
 
   delete record.translation;
@@ -243,45 +212,12 @@ function openFocusPanel(): void {
 
 function scanVisibleFocusInteractions(): void {
   if (!activeSource) return;
+  const source = activeSource;
 
   document.querySelectorAll<HTMLElement>(CHAT_MESSAGE_SELECTOR).forEach((message) => {
-    const record = createFocusRecord(message);
+    const record = createFocusRecord(message, source, focusRecords, () => nextRecordId++);
     if (record) focusRecords.push(record);
   });
-}
-
-function createFocusRecord(message: HTMLElement): FocusRecord | null {
-  if (!activeSource) return null;
-
-  const authorName = getAuthorName(message);
-  const text = getMessageText(message);
-  if (!authorName || !text) return null;
-
-  const selectedAuthor = isSelectedFocusAuthor(message, activeSource);
-  const currentAuthor = isCurrentUserAuthorName(authorName);
-  if (!selectedAuthor && !currentAuthor) return null;
-
-  const side = currentAuthor ? 'us' : 'them';
-  if (currentAuthor && !textMentionsSelectedUser(text, activeSource)) return null;
-
-  const timestampText = getMessageTimestampText(message);
-  const messageId = cleanText(getMessageStableId(message));
-  const messageRef = new WeakRef(message);
-  if (findMatchingLiveMessageRecordIndex(focusRecords, { messageId, messageRef }) >= 0) {
-    return null;
-  }
-
-  return {
-    authorName,
-    contentParts: serializeRichMessageNodes(getMessageContentSourceNodes(message)),
-    id: nextRecordId++,
-    messageId: messageId || undefined,
-    messageRef,
-    side,
-    text,
-    timestampText,
-    translation: getUserMessageRecordForMessage(message)?.translation
-  };
 }
 
 function renderFocusMessages(): void {
@@ -319,43 +255,6 @@ function renderFocusMessages(): void {
     item.append(meta, bubble);
     activeList?.append(item);
   });
-}
-
-function renderFocusMessageText(item: HTMLElement, bubble: HTMLElement, record: FocusRecord): void {
-  const translation = getVisibleFocusMessageTranslation(record);
-
-  if (translation && getOptions().translationDisplay === 'replace') {
-    item.classList.add('ytcq-translation-replaced');
-    bubble.classList.add('ytcq-translation-replaced-text');
-    bubble.lang = translation.result.targetLanguage;
-    bubble.title = getReplacementTranslationTitle(translation.result, record.text);
-    bubble.append(
-      ...createNodesWithPlaceholders(translation.result.text, translation.protectedTokens),
-      createReplacedTranslationIcon()
-    );
-    return;
-  }
-
-  appendRichMessageText(bubble, record.text, [], record.contentParts);
-  if (translation) {
-    bubble.append(createInlineTranslationElement(translation.result, translation.protectedTokens));
-  }
-}
-
-function getVisibleFocusMessageTranslation(record: FocusRecord): MessageTranslationRecord | undefined {
-  const translation = record.translation;
-  const targetLanguage = getOptions().targetLanguage;
-  if (!translation || !targetLanguage) return undefined;
-  if (translation.result.targetLanguage !== targetLanguage) return undefined;
-  if (!isMeaningfulTranslation(translation.result, translation.protectedTokens, translation.sourceText)) return undefined;
-  return translation;
-}
-
-function findFocusRecordForMessage(message: HTMLElement): FocusRecord | null {
-  const messageId = cleanText(getMessageStableId(message));
-  const messageRef = new WeakRef(message);
-  const index = findMatchingLiveMessageRecordIndex(focusRecords, { messageId, messageRef });
-  return index >= 0 ? focusRecords[index] : null;
 }
 
 function wireFocusMessageQuote(item: HTMLElement, record: FocusRecord): void {
@@ -562,110 +461,4 @@ function focusChatInput(): void {
 function isFromChatInput(target: EventTarget | null): boolean {
   const input = findChatInput();
   return Boolean(input && target instanceof Node && (input === target || input.contains(target)));
-}
-
-function startsWithFocusMention(text: string, source: FocusSource): boolean {
-  const normalizedText = normalizeSearchText(text);
-  return getMentionNeedlesForAuthor(source.authorName).some((needle) => (
-    normalizedText.startsWith(needle) &&
-    !isHandleCharacter(normalizedText[needle.length] || '')
-  ));
-}
-
-function getFocusMentionPrefix(source: FocusSource): string {
-  const authorName = cleanText(source.authorName);
-  return authorName ? `${authorName} ` : '';
-}
-
-function textMentionsSelectedUser(text: string, source: FocusSource): boolean {
-  return getMentionNeedlesForAuthor(source.authorName)
-    .some((needle) => textContainsMentionNeedle(text, needle));
-}
-
-function textContainsMentionNeedle(text: string, needle: string): boolean {
-  const haystack = normalizeSearchText(text);
-  if (!haystack || !needle) return false;
-
-  let index = haystack.indexOf(needle);
-  while (index >= 0) {
-    const before = index > 0 ? haystack[index - 1] : '';
-    const after = haystack[index + needle.length] || '';
-    if (!isHandleCharacter(before) && !isHandleCharacter(after)) return true;
-    index = haystack.indexOf(needle, index + 1);
-  }
-  return false;
-}
-
-function getMentionNeedlesForAuthor(authorName: string): string[] {
-  const normalized = normalizeSearchText(authorName).replace(/^@+/, '');
-  if (!normalized || /\s/.test(normalized)) return [];
-
-  return Array.from(new Set([
-    `@${normalized}`,
-    normalized
-  ]));
-}
-
-function isSelectedFocusAuthor(message: HTMLElement, source: FocusSource): boolean {
-  const data = getRendererData(message);
-  const channelId = data?.authorExternalChannelId || data?.authorChannelId;
-  if (source.channelId && channelId) return source.channelId === channelId;
-
-  return normalizeComparableText(getAuthorName(message)) === normalizeComparableText(source.authorName);
-}
-
-function getFocusSourceFromMessage(message: HTMLElement): FocusSource | null {
-  const data = getRendererData(message);
-  const authorName = getAuthorName(message);
-  if (!authorName) return null;
-
-  return normalizeFocusSource({
-    authorName,
-    avatarSrc: getMessageAvatarSrc(message),
-    channelId: data?.authorExternalChannelId || data?.authorChannelId
-  });
-}
-
-function normalizeFocusSource(source: FocusSource): FocusSource | null {
-  const authorName = cleanText(source.authorName);
-  if (!authorName) return null;
-  const channelId = cleanText(source.channelId);
-  const cleanSource: FocusSource = { authorName, channelId };
-  const avatarSrc = cleanText(source.avatarSrc) ||
-    getAvatarSrcForIdentity(cleanSource) ||
-    getVisibleAvatarSrcForFocusSource(cleanSource);
-
-  return {
-    authorName,
-    avatarSrc,
-    channelId
-  };
-}
-
-function getVisibleAvatarSrcForFocusSource(source: FocusSource): string {
-  for (const message of document.querySelectorAll<HTMLElement>(CHAT_MESSAGE_SELECTOR)) {
-    if (!isSelectedFocusAuthor(message, source)) continue;
-
-    const avatarSrc = getMessageAvatarSrc(message);
-    if (avatarSrc) return avatarSrc;
-  }
-
-  return '';
-}
-
-function isSameFocusSource(a: FocusSource, b: FocusSource): boolean {
-  if (a.channelId && b.channelId) return a.channelId === b.channelId;
-  return normalizeComparableText(a.authorName) === normalizeComparableText(b.authorName);
-}
-
-function getAuthorInitial(authorName: string): string {
-  return cleanText(authorName).replace(/^@/, '').slice(0, 1).toUpperCase() || '?';
-}
-
-function normalizeSearchText(value: string): string {
-  return cleanText(value).toLocaleLowerCase().normalize('NFKC');
-}
-
-function isHandleCharacter(value: string): boolean {
-  return Boolean(value && /[\p{L}\p{N}._-]/u.test(value));
 }
