@@ -9,6 +9,7 @@ import { getOptions } from '../shared/state';
 import { t } from '../shared/i18n';
 import { captureScrollPosition, restoreScrollPositionAfterRender, scrollElementToBottom } from '../shared/scroll';
 import { cleanText, normalizeComparableText } from '../shared/text';
+import { findChatInput } from '../youtube/chat-input';
 import { getAuthorName, getMessageAvatarSrc, getRendererData } from '../youtube/messages';
 import { appendRichMessageText } from '../youtube/rich-text';
 import {
@@ -91,6 +92,30 @@ export function wireParticipantProfileClick(participant: HTMLElement): void {
       showProfileCard(source, target);
     }, true);
   });
+}
+
+export function openProfileCardForIdentity(identity: UserIdentity, anchor?: HTMLElement | null): boolean {
+  recordVisibleUserMessages();
+  const recentMessages = getRecentMessagesForIdentity(identity);
+  const latestMessage = recentMessages[recentMessages.length - 1];
+  if (!latestMessage) return false;
+
+  const authorName = latestMessage.authorName || identity.authorName || '';
+  if (!authorName) return false;
+
+  const avatarSrc = latestMessage.avatarSrc || '';
+  const source: ProfileSource = {
+    authorName,
+    avatarSrc,
+    identity: {
+      authorName,
+      channelId: identity.channelId
+    },
+    profileUrl: getChannelUrl(identity.channelId, authorName)
+  };
+
+  showProfileCard(source, anchor || findChatInput() || document.body);
+  return true;
 }
 
 function getMessageProfileSource(message: HTMLElement): ProfileSource | null {
