@@ -105,6 +105,15 @@ export function showFocusPromptForAuthor(source: FocusSource): void {
   renderCollapsedFocusPrompt();
 }
 
+export function openFocusModeForAuthor(source: FocusSource): boolean {
+  const normalizedSource = normalizeFocusSource(source);
+  if (!normalizedSource || isCurrentUserAuthorName(normalizedSource.authorName)) return false;
+
+  activeSource = normalizedSource;
+  openFocusPanel();
+  return true;
+}
+
 export function handlePotentialFocusMessage(message: HTMLElement): void {
   if (!activeExpanded || !activeSource || !activeList || !message.isConnected) return;
 

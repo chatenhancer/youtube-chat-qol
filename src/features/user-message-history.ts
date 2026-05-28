@@ -50,6 +50,13 @@ export interface UserIdentity {
   channelId?: string;
 }
 
+export interface RecentUserMatch {
+  authorName: string;
+  avatarSrc?: string;
+  identity: UserIdentity;
+  latestMessage: MessageRecord;
+}
+
 interface ElementRecord {
   key: string;
   id: number;
@@ -158,6 +165,21 @@ export function getRecentMessagesForIdentity(identity: UserIdentity, limit = MAX
 
   return sortRecentRecords(records.values())
     .slice(-limit);
+}
+
+export function getLatestMessageForIdentity(identity: UserIdentity): MessageRecord | null {
+  return getRecentMessagesForIdentity(identity, 1)[0] || null;
+}
+
+export function findRecentUsersByHandle(query: string): RecentUserMatch[] {
+  const normalizedQuery = getNormalizedHandle(query);
+  if (!normalizedQuery) return [];
+
+  const users = collectRecentUsers();
+  const exactMatches = users.filter((user) => getNormalizedHandle(user.authorName) === normalizedQuery);
+  if (exactMatches.length) return exactMatches;
+
+  return users.filter((user) => getNormalizedHandle(user.authorName).startsWith(normalizedQuery));
 }
 
 export function getAvatarSrcForIdentity(identity: UserIdentity): string {
@@ -297,9 +319,57 @@ function sortRecentRecords(records: MessageRecord[]): MessageRecord[] {
   return [...records].sort((a, b) => a.timestamp - b.timestamp || a.id - b.id);
 }
 
+function collectRecentUsers(): RecentUserMatch[] {
+  const users = new Map<string, RecentUserMatch>();
+
+  recordsByUser.forEach((records, key) => {
+    const sortedRecords = sortRecentRecords(records);
+    const latestMessage = sortedRecords[sortedRecords.length - 1];
+    if (!latestMessage) return;
+
+    const identity = getIdentityFromUserKey(key, latestMessage.authorName);
+    const userKey = getUserKeyFromIdentity(identity);
+    if (!userKey || users.has(userKey)) return;
+
+    users.set(userKey, {
+      authorName: latestMessage.authorName,
+      avatarSrc: latestMessage.avatarSrc,
+      identity,
+      latestMessage
+    });
+  });
+
+  const seenHandles = new Set<string>();
+  return Array.from(users.values())
+    .sort((a, b) => b.latestMessage.timestamp - a.latestMessage.timestamp)
+    .filter((user) => {
+      const handle = getNormalizedHandle(user.authorName);
+      if (!handle) return true;
+      if (seenHandles.has(handle)) return false;
+      seenHandles.add(handle);
+      return true;
+    });
+}
+
+function getIdentityFromUserKey(key: string, authorName: string): UserIdentity {
+  const channelPrefix = 'channel:';
+  if (key.startsWith(channelPrefix)) {
+    return {
+      authorName,
+      channelId: key.slice(channelPrefix.length)
+    };
+  }
+
+  return { authorName };
+}
+
 function getAuthorKey(authorName: string | undefined): string {
   const normalizedAuthorName = normalizeComparableText(authorName || '');
   return normalizedAuthorName ? `author:${normalizedAuthorName}` : '';
+}
+
+function getNormalizedHandle(value: string): string {
+  return normalizeComparableText(value).replace(/^@+/, '');
 }
 
 function createUniqueRecordCollector(): {

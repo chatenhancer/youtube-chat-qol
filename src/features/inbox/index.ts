@@ -315,6 +315,90 @@ export async function getLatestInboxRecord(): Promise<LatestInboxRecord | null> 
   } : null;
 }
 
+export async function getLatestMentionInboxRecord(): Promise<LatestInboxRecord | null> {
+  await loadInboxState();
+  const record = [...records].reverse().find((candidate) => candidate.mention);
+  return record ? {
+    authorName: record.authorName,
+    text: record.text
+  } : null;
+}
+
+export async function getInboxKeywords(): Promise<string[]> {
+  await loadInboxState();
+  return [...keywords];
+}
+
+export function getLoadedInboxKeywords(): string[] {
+  return inboxStateLoaded ? [...keywords] : [];
+}
+
+export async function addInboxKeywords(values: string[]): Promise<{
+  added: string[];
+  duplicates: string[];
+}> {
+  await loadInboxState();
+
+  const added: string[] = [];
+  const duplicates: string[] = [];
+  values.forEach((value) => {
+    const keyword = normalizeKeyword(value);
+    if (!keyword) return;
+    if (
+      keywords.some((existing) => keywordsEqual(existing, keyword)) ||
+      added.some((existing) => keywordsEqual(existing, keyword))
+    ) {
+      duplicates.push(keyword);
+      return;
+    }
+
+    added.push(keyword);
+  });
+
+  if (!added.length) return { added, duplicates };
+
+  keywords = [...keywords, ...added].slice(-MAX_INBOX_KEYWORDS);
+  refreshPreparedKeywords();
+  await saveInboxKeywords();
+  refreshVisibleChatKeywordHighlights();
+  refreshOpenInboxCard();
+  return { added, duplicates };
+}
+
+export async function removeInboxKeywords(values: string[]): Promise<{
+  missing: string[];
+  removed: string[];
+}> {
+  await loadInboxState();
+
+  const removed: string[] = [];
+  const missing: string[] = [];
+  const nextKeywords = [...keywords];
+
+  values.forEach((value) => {
+    const keyword = normalizeKeyword(value);
+    if (!keyword) return;
+
+    const index = nextKeywords.findIndex((existing) => keywordsEqual(existing, keyword));
+    if (index < 0) {
+      missing.push(keyword);
+      return;
+    }
+
+    removed.push(nextKeywords[index]);
+    nextKeywords.splice(index, 1);
+  });
+
+  if (!removed.length) return { missing, removed };
+
+  keywords = nextKeywords;
+  refreshPreparedKeywords();
+  await saveInboxKeywords();
+  refreshVisibleChatKeywordHighlights();
+  refreshOpenInboxCard();
+  return { missing, removed };
+}
+
 function processPotentialKeywordInbox(message: HTMLElement): void {
   if (!keywords.length) {
     clearChatKeywordHighlights(message);
