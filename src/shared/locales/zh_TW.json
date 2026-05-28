@@ -88,11 +88,52 @@
     "focusMode": "聚焦模式",
     "focusOn": "聚焦",
     "focusingOn": "正在聚焦",
-    "noMessagesYet": "尚無訊息"
+    "noMessagesYet": "尚無訊息",
+    "refreshChat": "重新整理",
+    "refreshChatTitle": "重新整理聊天室以重新連接擴充功能"
   },
   "extension": {
     "extensionName": {
       "message": "Chat Enhancer for YouTube"
+    },
+    "extensionActiveTitle": {
+      "message": "Chat Enhancer for YouTube 已在此分頁中啟用"
+    },
+    "extensionStatusChecking": {
+      "message": "正在檢查開啟的分頁..."
+    },
+    "extensionStatusCheckingHelper": {
+      "message": "正在尋找 YouTube 直播聊天室分頁。"
+    },
+    "extensionStatusActiveCurrent": {
+      "message": "已在此分頁中啟用"
+    },
+    "extensionStatusActiveCurrentAndOne": {
+      "message": "已在此分頁和另外 1 個分頁中啟用"
+    },
+    "extensionStatusActiveCurrentAndMany": {
+      "message": "已在此分頁和另外 {count} 個分頁中啟用"
+    },
+    "extensionStatusActiveOneOther": {
+      "message": "已在另外 1 個分頁中啟用"
+    },
+    "extensionStatusActiveManyOther": {
+      "message": "已在另外 {count} 個分頁中啟用"
+    },
+    "extensionStatusActiveHelper": {
+      "message": "擴充功能正在 YouTube 直播聊天室中執行。"
+    },
+    "extensionStatusInactiveAll": {
+      "message": "未在任何開啟的分頁中啟用"
+    },
+    "extensionStatusInactiveHelper": {
+      "message": "開啟 YouTube 直播聊天室以執行擴充功能。"
+    },
+    "extensionStatusInactiveDisconnectedHelperOne": {
+      "message": "重新整理已開啟的 YouTube 直播聊天室。"
+    },
+    "extensionStatusInactiveDisconnectedHelperMany": {
+      "message": "重新整理已開啟的 YouTube 直播聊天室。"
     },
     "extensionShortName": {
       "message": "Chat Enhancer"

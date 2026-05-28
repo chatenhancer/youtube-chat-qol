@@ -7,6 +7,7 @@
  * reason about.
  */
 import { enhanceEmojiPicker, handleEmojiPickerClick, initFrequentEmojis, resetFrequentEmojis } from '../features/frequent-emojis';
+import { startActiveChatKeepAlive } from '../features/active-chat-keepalive';
 import { initChatCommands, resetChatCommandsState } from '../features/chat-commands';
 import { enhanceMenu } from '../features/menus';
 import { handleMessageMenuActivation, wireMessageContext } from '../features/menus/message-menu';
@@ -41,6 +42,7 @@ let visibilityRecoveryTimer = 0;
 init();
 
 function init(): void {
+  startActiveChatKeepAlive();
   initUiLocaleFromDocument();
   initFrequentEmojis();
   initSound();
@@ -70,9 +72,20 @@ function init(): void {
     refreshSettingsMenus();
   });
 
-  chrome.runtime.onMessage.addListener((message: { type?: string }) => {
-    if (message?.type !== 'ytcq:reset-page') return;
+  chrome.runtime.onMessage.addListener((message: { type?: string }, _sender, sendResponse) => {
+    if (message?.type === 'ytcq:status-ping') {
+      sendResponse({ active: true });
+      return false;
+    }
+    if (message?.type !== 'ytcq:reset-page') return false;
     resetPageState();
+    return false;
+  });
+}
+
+function notifyChatAttached(): void {
+  chrome.runtime.sendMessage({ type: 'ytcq:chat-attached' }, () => {
+    void chrome.runtime.lastError;
   });
 }
 
@@ -171,6 +184,7 @@ function boot(): void {
     subtree: true,
     characterData: true
   });
+  notifyChatAttached();
 }
 
 function processExistingMessages(translateLimit: number): void {

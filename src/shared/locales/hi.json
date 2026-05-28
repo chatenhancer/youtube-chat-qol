@@ -88,12 +88,53 @@
     "focusMode": "फ़ोकस मोड",
     "focusOn": "फ़ोकस करें",
     "focusingOn": "फ़ोकस किया जा रहा है",
-    "noMessagesYet": "अभी कोई संदेश नहीं"
+    "noMessagesYet": "अभी कोई संदेश नहीं",
+    "refreshChat": "रीफ़्रेश",
+    "refreshChatTitle": "एक्सटेंशन को फिर से जोड़ने के लिए चैट रीफ़्रेश करें"
   },
   "extension": {
     "extensionName": {
       "message": "Chat Enhancer for YouTube",
       "description": "एक्सटेंशन का सार्वजनिक नाम."
+    },
+    "extensionActiveTitle": {
+      "message": "Chat Enhancer for YouTube इस टैब में सक्रिय है"
+    },
+    "extensionStatusChecking": {
+      "message": "खुले टैब जाँचे जा रहे हैं..."
+    },
+    "extensionStatusCheckingHelper": {
+      "message": "YouTube लाइव चैट टैब खोजे जा रहे हैं."
+    },
+    "extensionStatusActiveCurrent": {
+      "message": "इस टैब में सक्रिय"
+    },
+    "extensionStatusActiveCurrentAndOne": {
+      "message": "इस टैब और 1 अन्य टैब में सक्रिय"
+    },
+    "extensionStatusActiveCurrentAndMany": {
+      "message": "इस टैब और {count} अन्य टैब में सक्रिय"
+    },
+    "extensionStatusActiveOneOther": {
+      "message": "1 अन्य टैब में सक्रिय"
+    },
+    "extensionStatusActiveManyOther": {
+      "message": "{count} अन्य टैब में सक्रिय"
+    },
+    "extensionStatusActiveHelper": {
+      "message": "एक्सटेंशन YouTube लाइव चैट में चल रहा है."
+    },
+    "extensionStatusInactiveAll": {
+      "message": "किसी भी खुले टैब में सक्रिय नहीं"
+    },
+    "extensionStatusInactiveHelper": {
+      "message": "एक्सटेंशन चलाने के लिए YouTube लाइव चैट खोलें."
+    },
+    "extensionStatusInactiveDisconnectedHelperOne": {
+      "message": "खुले YouTube लाइव चैट को रीफ़्रेश करें."
+    },
+    "extensionStatusInactiveDisconnectedHelperMany": {
+      "message": "खुले YouTube लाइव चैट रीफ़्रेश करें."
     },
     "extensionShortName": {
       "message": "Chat Enhancer",

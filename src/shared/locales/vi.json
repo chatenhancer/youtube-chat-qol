@@ -88,11 +88,52 @@
     "focusMode": "Chế độ tập trung",
     "focusOn": "Tập trung vào",
     "focusingOn": "Đang tập trung vào",
-    "noMessagesYet": "Chưa có tin nhắn"
+    "noMessagesYet": "Chưa có tin nhắn",
+    "refreshChat": "Làm mới",
+    "refreshChatTitle": "Làm mới chat để kết nối lại tiện ích"
   },
   "extension": {
     "extensionName": {
       "message": "Chat Enhancer for YouTube"
+    },
+    "extensionActiveTitle": {
+      "message": "Chat Enhancer for YouTube đang hoạt động trong tab này"
+    },
+    "extensionStatusChecking": {
+      "message": "Đang kiểm tra các tab đang mở..."
+    },
+    "extensionStatusCheckingHelper": {
+      "message": "Đang tìm tab live chat YouTube."
+    },
+    "extensionStatusActiveCurrent": {
+      "message": "Đang hoạt động trong tab này"
+    },
+    "extensionStatusActiveCurrentAndOne": {
+      "message": "Đang hoạt động trong tab này và 1 tab khác"
+    },
+    "extensionStatusActiveCurrentAndMany": {
+      "message": "Đang hoạt động trong tab này và {count} tab khác"
+    },
+    "extensionStatusActiveOneOther": {
+      "message": "Đang hoạt động trong 1 tab khác"
+    },
+    "extensionStatusActiveManyOther": {
+      "message": "Đang hoạt động trong {count} tab khác"
+    },
+    "extensionStatusActiveHelper": {
+      "message": "Tiện ích đang chạy trong live chat YouTube."
+    },
+    "extensionStatusInactiveAll": {
+      "message": "Không hoạt động trong tab đang mở nào"
+    },
+    "extensionStatusInactiveHelper": {
+      "message": "Mở live chat YouTube để tiện ích chạy."
+    },
+    "extensionStatusInactiveDisconnectedHelperOne": {
+      "message": "Làm mới live chat YouTube đang mở."
+    },
+    "extensionStatusInactiveDisconnectedHelperMany": {
+      "message": "Làm mới các live chat YouTube đang mở."
     },
     "extensionShortName": {
       "message": "Chat Enhancer"

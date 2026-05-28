@@ -88,12 +88,53 @@
     "focusMode": "Mode fokus",
     "focusOn": "Fokus pada",
     "focusingOn": "Sedang fokus pada",
-    "noMessagesYet": "Belum ada pesan"
+    "noMessagesYet": "Belum ada pesan",
+    "refreshChat": "Segarkan",
+    "refreshChatTitle": "Segarkan chat untuk menghubungkan kembali ekstensi"
   },
   "extension": {
     "extensionName": {
       "message": "Chat Enhancer for YouTube",
       "description": "Nama publik ekstensi."
+    },
+    "extensionActiveTitle": {
+      "message": "Chat Enhancer for YouTube aktif di tab ini"
+    },
+    "extensionStatusChecking": {
+      "message": "Memeriksa tab terbuka..."
+    },
+    "extensionStatusCheckingHelper": {
+      "message": "Mencari tab live chat YouTube."
+    },
+    "extensionStatusActiveCurrent": {
+      "message": "Aktif di tab ini"
+    },
+    "extensionStatusActiveCurrentAndOne": {
+      "message": "Aktif di tab ini dan 1 tab lain"
+    },
+    "extensionStatusActiveCurrentAndMany": {
+      "message": "Aktif di tab ini dan {count} tab lain"
+    },
+    "extensionStatusActiveOneOther": {
+      "message": "Aktif di 1 tab lain"
+    },
+    "extensionStatusActiveManyOther": {
+      "message": "Aktif di {count} tab lain"
+    },
+    "extensionStatusActiveHelper": {
+      "message": "Ekstensi sedang berjalan di live chat YouTube."
+    },
+    "extensionStatusInactiveAll": {
+      "message": "Tidak aktif di tab terbuka mana pun"
+    },
+    "extensionStatusInactiveHelper": {
+      "message": "Buka live chat YouTube agar ekstensi berjalan."
+    },
+    "extensionStatusInactiveDisconnectedHelperOne": {
+      "message": "Segarkan live chat YouTube yang terbuka."
+    },
+    "extensionStatusInactiveDisconnectedHelperMany": {
+      "message": "Segarkan live chat YouTube yang terbuka."
     },
     "extensionShortName": {
       "message": "Chat Enhancer",

@@ -88,12 +88,53 @@
     "focusMode": "聚焦模式",
     "focusOn": "聚焦",
     "focusingOn": "正在聚焦",
-    "noMessagesYet": "暂无消息"
+    "noMessagesYet": "暂无消息",
+    "refreshChat": "刷新",
+    "refreshChatTitle": "刷新聊天以重新连接扩展程序"
   },
   "extension": {
     "extensionName": {
       "message": "Chat Enhancer for YouTube",
       "description": "公开显示的扩展名称。"
+    },
+    "extensionActiveTitle": {
+      "message": "Chat Enhancer for YouTube 已在此标签页中启用"
+    },
+    "extensionStatusChecking": {
+      "message": "正在检查打开的标签页..."
+    },
+    "extensionStatusCheckingHelper": {
+      "message": "正在查找 YouTube 直播聊天标签页。"
+    },
+    "extensionStatusActiveCurrent": {
+      "message": "已在此标签页中启用"
+    },
+    "extensionStatusActiveCurrentAndOne": {
+      "message": "已在此标签页和另外 1 个标签页中启用"
+    },
+    "extensionStatusActiveCurrentAndMany": {
+      "message": "已在此标签页和另外 {count} 个标签页中启用"
+    },
+    "extensionStatusActiveOneOther": {
+      "message": "已在另外 1 个标签页中启用"
+    },
+    "extensionStatusActiveManyOther": {
+      "message": "已在另外 {count} 个标签页中启用"
+    },
+    "extensionStatusActiveHelper": {
+      "message": "扩展程序正在 YouTube 实时聊天中运行。"
+    },
+    "extensionStatusInactiveAll": {
+      "message": "未在任何打开的标签页中启用"
+    },
+    "extensionStatusInactiveHelper": {
+      "message": "打开 YouTube 实时聊天以运行扩展程序。"
+    },
+    "extensionStatusInactiveDisconnectedHelperOne": {
+      "message": "刷新已打开的 YouTube 直播聊天。"
+    },
+    "extensionStatusInactiveDisconnectedHelperMany": {
+      "message": "刷新已打开的 YouTube 直播聊天。"
     },
     "extensionShortName": {
       "message": "Chat Enhancer",

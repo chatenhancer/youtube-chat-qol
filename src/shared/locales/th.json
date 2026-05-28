@@ -88,11 +88,52 @@
     "focusMode": "โหมดโฟกัส",
     "focusOn": "โฟกัสที่",
     "focusingOn": "กำลังโฟกัสที่",
-    "noMessagesYet": "ยังไม่มีข้อความ"
+    "noMessagesYet": "ยังไม่มีข้อความ",
+    "refreshChat": "รีเฟรช",
+    "refreshChatTitle": "รีเฟรชแชทเพื่อเชื่อมต่อส่วนขยายอีกครั้ง"
   },
   "extension": {
     "extensionName": {
       "message": "Chat Enhancer for YouTube"
+    },
+    "extensionActiveTitle": {
+      "message": "Chat Enhancer for YouTube ทำงานอยู่ในแท็บนี้"
+    },
+    "extensionStatusChecking": {
+      "message": "กำลังตรวจสอบแท็บที่เปิดอยู่..."
+    },
+    "extensionStatusCheckingHelper": {
+      "message": "กำลังหาแท็บแชทสด YouTube"
+    },
+    "extensionStatusActiveCurrent": {
+      "message": "ทำงานในแท็บนี้"
+    },
+    "extensionStatusActiveCurrentAndOne": {
+      "message": "ทำงานในแท็บนี้และอีก 1 แท็บ"
+    },
+    "extensionStatusActiveCurrentAndMany": {
+      "message": "ทำงานในแท็บนี้และอีก {count} แท็บ"
+    },
+    "extensionStatusActiveOneOther": {
+      "message": "ทำงานในอีก 1 แท็บ"
+    },
+    "extensionStatusActiveManyOther": {
+      "message": "ทำงานในอีก {count} แท็บ"
+    },
+    "extensionStatusActiveHelper": {
+      "message": "ส่วนขยายกำลังทำงานในแชทสดของ YouTube"
+    },
+    "extensionStatusInactiveAll": {
+      "message": "ไม่ทำงานในแท็บที่เปิดอยู่ใดๆ"
+    },
+    "extensionStatusInactiveHelper": {
+      "message": "เปิดแชทสดของ YouTube เพื่อให้ส่วนขยายทำงาน"
+    },
+    "extensionStatusInactiveDisconnectedHelperOne": {
+      "message": "รีเฟรชแชทสด YouTube ที่เปิดอยู่"
+    },
+    "extensionStatusInactiveDisconnectedHelperMany": {
+      "message": "รีเฟรชแชทสด YouTube ที่เปิดอยู่"
     },
     "extensionShortName": {
       "message": "Chat Enhancer"

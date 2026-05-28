@@ -7,6 +7,7 @@
  */
 import { LANGUAGE_OPTIONS } from '../shared/languages';
 import { playSoftChime } from '../shared/sounds/soft-chime';
+import { getFreshKnownChatTabIds, KNOWN_CHAT_TABS_STORAGE_KEY } from '../shared/known-chat-tabs';
 import { DEFAULT_OPTIONS, getTargetLanguageUpdate, normalizeOptions, type Options } from '../shared/options';
 import { clampNumber } from '../shared/text';
 
@@ -15,11 +16,16 @@ const GITHUB_URL = 'https://www.chatenhancer.com/source';
 const SUPPORT_URL = 'https://www.chatenhancer.com/support';
 const BELL_RING_CLASS = 'ytcq-bell-ringing';
 
+type ExtensionStatus = 'checking' | 'active' | 'inactive';
+
 const controls = {
   landingLink: document.querySelector<HTMLAnchorElement>('#landingLink'),
   githubLink: document.querySelector<HTMLAnchorElement>('#githubLink'),
   supportLink: document.querySelector<HTMLAnchorElement>('#supportLink'),
   resetExtension: document.querySelector<HTMLButtonElement>('#resetExtension'),
+  extensionStatus: document.querySelector<HTMLElement>('[data-extension-status]'),
+  extensionStatusText: document.querySelector<HTMLElement>('[data-extension-status-text]'),
+  extensionStatusHelper: document.querySelector<HTMLElement>('[data-extension-status-helper]'),
   targetLanguage: document.querySelector<HTMLSelectElement>('#targetLanguage'),
   translationDisplay: document.querySelector<HTMLSelectElement>('#translationDisplay'),
   quoteMaxLength: document.querySelector<HTMLInputElement>('#quoteMaxLength'),
@@ -34,6 +40,7 @@ init();
 
 function init(): void {
   const popupLocale = localizePopup();
+  refreshExtensionStatus();
 
   if (!controls.targetLanguage || !controls.translationDisplay || !controls.quoteMaxLength || !controls.openProfilesInPopup || !controls.sound) {
     return;
@@ -115,6 +122,101 @@ function animatePopupSoundIcon(): void {
   window.setTimeout(() => {
     icon.classList.remove(BELL_RING_CLASS);
   }, 700);
+}
+
+function refreshExtensionStatus(): void {
+  setExtensionStatus('checking', getExtensionMessage('extensionStatusChecking'), getExtensionMessage('extensionStatusCheckingHelper'));
+
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    const currentTabId = tabs[0]?.id;
+    refreshGlobalExtensionStatus(typeof currentTabId === 'number' ? currentTabId : null);
+  });
+}
+
+function refreshGlobalExtensionStatus(currentTabId: number | null): void {
+  chrome.tabs.query({}, (tabs) => {
+    const tabIds = tabs
+      .map((tab) => tab.id)
+      .filter((tabId): tabId is number => typeof tabId === 'number');
+
+    if (!tabIds.length) {
+      updateExtensionStatusSummary(new Set(), currentTabId, 0);
+      return;
+    }
+
+    const activeTabIds = new Set<number>();
+    const openTabIds = new Set(tabIds);
+    let pending = tabIds.length;
+
+    tabIds.forEach((tabId) => {
+      chrome.tabs.sendMessage(tabId, { type: 'ytcq:status-ping' }, (response?: { active?: boolean }) => {
+        if (!chrome.runtime.lastError && response?.active === true) {
+          activeTabIds.add(tabId);
+        }
+        pending -= 1;
+        if (!pending) {
+          updateExtensionStatusSummaryWithKnownTabs(activeTabIds, openTabIds, currentTabId);
+        }
+      });
+    });
+  });
+}
+
+function updateExtensionStatusSummaryWithKnownTabs(activeTabIds: Set<number>, openTabIds: Set<number>, currentTabId: number | null): void {
+  chrome.storage.local.get(KNOWN_CHAT_TABS_STORAGE_KEY, (stored) => {
+    const knownTabIds = getFreshKnownChatTabIds(stored[KNOWN_CHAT_TABS_STORAGE_KEY]);
+    const disconnectedKnownChatCount = [...knownTabIds].filter((tabId) => openTabIds.has(tabId) && !activeTabIds.has(tabId)).length;
+    updateExtensionStatusSummary(activeTabIds, currentTabId, disconnectedKnownChatCount);
+  });
+}
+
+function updateExtensionStatusSummary(activeTabIds: Set<number>, currentTabId: number | null, disconnectedKnownChatCount: number): void {
+  const currentActive = typeof currentTabId === 'number' && activeTabIds.has(currentTabId);
+  const otherCount = activeTabIds.size - (currentActive ? 1 : 0);
+
+  if (currentActive && otherCount === 0) {
+    setExtensionStatus('active', getExtensionMessage('extensionStatusActiveCurrent'), getExtensionMessage('extensionStatusActiveHelper'));
+    return;
+  }
+
+  if (currentActive && otherCount === 1) {
+    setExtensionStatus('active', getExtensionMessage('extensionStatusActiveCurrentAndOne'), getExtensionMessage('extensionStatusActiveHelper'));
+    return;
+  }
+
+  if (currentActive && otherCount > 1) {
+    setExtensionStatus('active', getExtensionMessage('extensionStatusActiveCurrentAndMany', String(otherCount)), getExtensionMessage('extensionStatusActiveHelper'));
+    return;
+  }
+
+  if (otherCount === 1) {
+    setExtensionStatus('active', getExtensionMessage('extensionStatusActiveOneOther'), getExtensionMessage('extensionStatusActiveHelper'));
+    return;
+  }
+
+  if (otherCount > 1) {
+    setExtensionStatus('active', getExtensionMessage('extensionStatusActiveManyOther', String(otherCount)), getExtensionMessage('extensionStatusActiveHelper'));
+    return;
+  }
+
+  const inactiveHelper = disconnectedKnownChatCount === 1
+    ? getExtensionMessage('extensionStatusInactiveDisconnectedHelperOne')
+    : disconnectedKnownChatCount > 1
+      ? getExtensionMessage('extensionStatusInactiveDisconnectedHelperMany')
+      : getExtensionMessage('extensionStatusInactiveHelper');
+  setExtensionStatus('inactive', getExtensionMessage('extensionStatusInactiveAll'), inactiveHelper);
+}
+
+function setExtensionStatus(status: ExtensionStatus, text: string, helper: string): void {
+  if (controls.extensionStatus) {
+    controls.extensionStatus.dataset.extensionStatus = status;
+  }
+  if (controls.extensionStatusText) {
+    controls.extensionStatusText.textContent = text;
+  }
+  if (controls.extensionStatusHelper) {
+    controls.extensionStatusHelper.textContent = helper;
+  }
 }
 
 function resetExtensionState(): void {

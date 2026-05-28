@@ -88,11 +88,52 @@
     "focusMode": "Fokusmodus",
     "focusOn": "Fokus auf",
     "focusingOn": "Fokussiert auf",
-    "noMessagesYet": "Noch keine Nachrichten"
+    "noMessagesYet": "Noch keine Nachrichten",
+    "refreshChat": "Aktualisieren",
+    "refreshChatTitle": "Chat aktualisieren, um die Erweiterung wieder zu verbinden"
   },
   "extension": {
     "extensionName": {
       "message": "Chat Enhancer for YouTube"
+    },
+    "extensionActiveTitle": {
+      "message": "Chat Enhancer for YouTube ist in diesem Tab aktiv"
+    },
+    "extensionStatusChecking": {
+      "message": "Offene Tabs werden geprüft..."
+    },
+    "extensionStatusCheckingHelper": {
+      "message": "Suche nach YouTube-Livechat-Tabs."
+    },
+    "extensionStatusActiveCurrent": {
+      "message": "In diesem Tab aktiv"
+    },
+    "extensionStatusActiveCurrentAndOne": {
+      "message": "In diesem Tab und 1 weiterem Tab aktiv"
+    },
+    "extensionStatusActiveCurrentAndMany": {
+      "message": "In diesem Tab und {count} weiteren Tabs aktiv"
+    },
+    "extensionStatusActiveOneOther": {
+      "message": "In 1 weiterem Tab aktiv"
+    },
+    "extensionStatusActiveManyOther": {
+      "message": "In {count} weiteren Tabs aktiv"
+    },
+    "extensionStatusActiveHelper": {
+      "message": "Die Erweiterung läuft im YouTube-Livechat."
+    },
+    "extensionStatusInactiveAll": {
+      "message": "In keinem offenen Tab aktiv"
+    },
+    "extensionStatusInactiveHelper": {
+      "message": "Öffne einen YouTube-Livechat, damit die Erweiterung läuft."
+    },
+    "extensionStatusInactiveDisconnectedHelperOne": {
+      "message": "Aktualisiere den geöffneten YouTube-Livechat."
+    },
+    "extensionStatusInactiveDisconnectedHelperMany": {
+      "message": "Aktualisiere die geöffneten YouTube-Livechats."
     },
     "extensionShortName": {
       "message": "Chat Enhancer"

@@ -88,11 +88,52 @@
     "focusMode": "Focusmodus",
     "focusOn": "Focus op",
     "focusingOn": "Gefocust op",
-    "noMessagesYet": "Nog geen berichten"
+    "noMessagesYet": "Nog geen berichten",
+    "refreshChat": "Vernieuwen",
+    "refreshChatTitle": "Vernieuw de chat om de extensie opnieuw te verbinden"
   },
   "extension": {
     "extensionName": {
       "message": "Chat Enhancer for YouTube"
+    },
+    "extensionActiveTitle": {
+      "message": "Chat Enhancer for YouTube is actief in dit tabblad"
+    },
+    "extensionStatusChecking": {
+      "message": "Open tabbladen controleren..."
+    },
+    "extensionStatusCheckingHelper": {
+      "message": "Zoeken naar YouTube-livechattabbladen."
+    },
+    "extensionStatusActiveCurrent": {
+      "message": "Actief in dit tabblad"
+    },
+    "extensionStatusActiveCurrentAndOne": {
+      "message": "Actief in dit tabblad en 1 ander tabblad"
+    },
+    "extensionStatusActiveCurrentAndMany": {
+      "message": "Actief in dit tabblad en {count} andere tabbladen"
+    },
+    "extensionStatusActiveOneOther": {
+      "message": "Actief in 1 ander tabblad"
+    },
+    "extensionStatusActiveManyOther": {
+      "message": "Actief in {count} andere tabbladen"
+    },
+    "extensionStatusActiveHelper": {
+      "message": "De extensie draait in YouTube-livechat."
+    },
+    "extensionStatusInactiveAll": {
+      "message": "Niet actief in een open tabblad"
+    },
+    "extensionStatusInactiveHelper": {
+      "message": "Open een YouTube-livechat om de extensie te laten draaien."
+    },
+    "extensionStatusInactiveDisconnectedHelperOne": {
+      "message": "Vernieuw de geopende YouTube-livechat."
+    },
+    "extensionStatusInactiveDisconnectedHelperMany": {
+      "message": "Vernieuw de geopende YouTube-livechats."
     },
     "extensionShortName": {
       "message": "Chat Enhancer"

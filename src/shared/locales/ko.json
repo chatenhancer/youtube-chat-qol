@@ -88,11 +88,52 @@
     "focusMode": "포커스 모드",
     "focusOn": "포커스",
     "focusingOn": "포커스 중",
-    "noMessagesYet": "아직 메시지가 없습니다"
+    "noMessagesYet": "아직 메시지가 없습니다",
+    "refreshChat": "새로고침",
+    "refreshChatTitle": "확장 프로그램을 다시 연결하려면 채팅을 새로고침하세요"
   },
   "extension": {
     "extensionName": {
       "message": "Chat Enhancer for YouTube"
+    },
+    "extensionActiveTitle": {
+      "message": "Chat Enhancer for YouTube가 이 탭에서 활성화되어 있습니다"
+    },
+    "extensionStatusChecking": {
+      "message": "열린 탭 확인 중..."
+    },
+    "extensionStatusCheckingHelper": {
+      "message": "YouTube 실시간 채팅 탭을 찾고 있습니다."
+    },
+    "extensionStatusActiveCurrent": {
+      "message": "이 탭에서 활성화됨"
+    },
+    "extensionStatusActiveCurrentAndOne": {
+      "message": "이 탭과 다른 탭 1개에서 활성화됨"
+    },
+    "extensionStatusActiveCurrentAndMany": {
+      "message": "이 탭과 다른 탭 {count}개에서 활성화됨"
+    },
+    "extensionStatusActiveOneOther": {
+      "message": "다른 탭 1개에서 활성화됨"
+    },
+    "extensionStatusActiveManyOther": {
+      "message": "다른 탭 {count}개에서 활성화됨"
+    },
+    "extensionStatusActiveHelper": {
+      "message": "확장 프로그램이 YouTube 실시간 채팅 안에서 실행 중입니다."
+    },
+    "extensionStatusInactiveAll": {
+      "message": "열린 탭 어디에서도 활성화되지 않음"
+    },
+    "extensionStatusInactiveHelper": {
+      "message": "확장 프로그램을 실행하려면 YouTube 실시간 채팅을 여세요."
+    },
+    "extensionStatusInactiveDisconnectedHelperOne": {
+      "message": "열려 있는 YouTube 실시간 채팅을 새로고침하세요."
+    },
+    "extensionStatusInactiveDisconnectedHelperMany": {
+      "message": "열려 있는 YouTube 실시간 채팅을 새로고침하세요."
     },
     "extensionShortName": {
       "message": "Chat Enhancer"

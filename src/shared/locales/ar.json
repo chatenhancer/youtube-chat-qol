@@ -88,12 +88,53 @@
     "focusMode": "وضع التركيز",
     "focusOn": "التركيز على",
     "focusingOn": "جارٍ التركيز على",
-    "noMessagesYet": "لا توجد رسائل بعد"
+    "noMessagesYet": "لا توجد رسائل بعد",
+    "refreshChat": "تحديث",
+    "refreshChatTitle": "حدّث الدردشة لإعادة توصيل الإضافة"
   },
   "extension": {
     "extensionName": {
       "message": "Chat Enhancer for YouTube",
       "description": "اسم الإضافة العام."
+    },
+    "extensionActiveTitle": {
+      "message": "Chat Enhancer for YouTube نشط في علامة التبويب هذه"
+    },
+    "extensionStatusChecking": {
+      "message": "جارٍ فحص علامات التبويب المفتوحة..."
+    },
+    "extensionStatusCheckingHelper": {
+      "message": "يتم البحث عن علامات تبويب دردشة YouTube المباشرة."
+    },
+    "extensionStatusActiveCurrent": {
+      "message": "نشط في علامة التبويب هذه"
+    },
+    "extensionStatusActiveCurrentAndOne": {
+      "message": "نشط في علامة التبويب هذه وعلامة تبويب أخرى واحدة"
+    },
+    "extensionStatusActiveCurrentAndMany": {
+      "message": "نشط في علامة التبويب هذه و{count} علامات تبويب أخرى"
+    },
+    "extensionStatusActiveOneOther": {
+      "message": "نشط في علامة تبويب أخرى واحدة"
+    },
+    "extensionStatusActiveManyOther": {
+      "message": "نشط في {count} علامات تبويب أخرى"
+    },
+    "extensionStatusActiveHelper": {
+      "message": "الإضافة تعمل في دردشة YouTube المباشرة."
+    },
+    "extensionStatusInactiveAll": {
+      "message": "غير نشط في أي علامة تبويب مفتوحة"
+    },
+    "extensionStatusInactiveHelper": {
+      "message": "افتح دردشة YouTube مباشرة لتعمل الإضافة."
+    },
+    "extensionStatusInactiveDisconnectedHelperOne": {
+      "message": "حدّث دردشة YouTube المباشرة المفتوحة."
+    },
+    "extensionStatusInactiveDisconnectedHelperMany": {
+      "message": "حدّث دردشات YouTube المباشرة المفتوحة."
     },
     "extensionShortName": {
       "message": "Chat Enhancer",
