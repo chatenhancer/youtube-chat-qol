@@ -559,6 +559,7 @@ h3 {
   background: rgba(245, 158, 11, 0.07);
   font-size: 13px;
   line-height: 1.45;
+  opacity: var(--store-version-alert-opacity, 1);
 }
 
 .store-version-alert[hidden] {
@@ -566,9 +567,20 @@ h3 {
 }
 
 .store-version-alert-top {
+  position: fixed;
+  top: 82px;
+  left: 50%;
+  z-index: 30;
   width: fit-content;
   max-width: min(720px, calc(100% - 64px));
-  margin: 14px auto 0;
+  margin: 0;
+  border-radius: 10px;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+  transform: translate(-50%, var(--store-version-alert-offset, 0));
+}
+
+.store-version-alert-faded {
+  pointer-events: none;
 }
 
 .store-version-alert-icon {
@@ -689,7 +701,7 @@ h3 {
 }
 
 .store-version-alert-copy > span {
-  color: var(--muted);
+  color: #b45309;
 }
 
 .install-quickstart {
@@ -1137,6 +1149,13 @@ kbd {
   color: #85868c;
 }
 
+.translation-sample-result {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  white-space: nowrap;
+}
+
 .translation-line {
   display: block;
   margin: 2px 0 0 31px;
@@ -1247,6 +1266,7 @@ html[data-screenshot-panel] body {
 }
 
 html[data-screenshot-panel] .site-header,
+html[data-screenshot-panel] .store-version-alert,
 html[data-screenshot-panel] .site-footer,
 html[data-screenshot-panel] main > section:not(#screenshots),
 html[data-screenshot-panel] .screenshots-inner > .eyebrow,
@@ -1300,6 +1320,16 @@ html[data-screenshot-panel] [data-screenshot-panel="inbox-context"] {
 
 html[data-screenshot-panel] .showcase-copy {
   max-width: 500px;
+}
+
+html[data-screenshot-panel="translation"] .showcase-copy h3,
+html[data-screenshot-panel="translation"] .showcase-copy > p {
+  max-width: 430px;
+}
+
+html[data-screenshot-panel="translation"] .translation-mode-grid {
+  grid-template-columns: minmax(270px, 1fr) minmax(0, 1fr);
+  gap: 20px;
 }
 
 html[data-screenshot-panel] [data-screenshot-panel="inbox-context"] .showcase-copy {
@@ -1455,6 +1485,12 @@ figcaption {
   font-weight: 700;
 }
 
+@media (max-width: 1100px) {
+  .site-nav {
+    display: none;
+  }
+}
+
 @media (max-width: 980px) {
   .hero {
     grid-template-columns: 1fr;
@@ -1521,15 +1557,6 @@ figcaption {
   }
 
   .brand span {
-    display: none;
-  }
-
-  .site-nav {
-    gap: 12px;
-    font-size: 13px;
-  }
-
-  .site-nav {
     display: none;
   }
 

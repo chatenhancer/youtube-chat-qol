@@ -55,6 +55,7 @@
     "settingState": "{label} {state}.",
     "showRecentMessages": "عرض الرسائل الأخيرة",
     "stateOff": "متوقف",
+    "selectOff": "متوقف",
     "stateOn": "مشغل",
     "timeHours": "{count} س",
     "timeMinutes": "{count} د",
@@ -117,7 +118,11 @@
     "removedKeywordsWithMissing": "تمت الإزالة: {removed}. غير موجودة: {missing}.",
     "watchedKeywords": "الكلمات المفتاحية المراقبة",
     "watchingKeywords": "تتم المراقبة: {keywords}.",
-    "watchingKeywordsWithDuplicates": "تتم المراقبة: {added}. موجودة مسبقًا: {duplicates}."
+    "watchingKeywordsWithDuplicates": "تتم المراقبة: {added}. موجودة مسبقًا: {duplicates}.",
+    "translateDraft": "ترجمة المسودة",
+    "translateDraftTo": "ترجمة المسودة إلى",
+    "draftTranslationOff": "ترجمة المسودة متوقفة.",
+    "draftTranslationTo": "ترجمة المسودة إلى {language}."
   },
   "extension": {
     "extensionName": {
@@ -174,8 +179,8 @@
     "openChatEnhancerWebsite": {
       "message": "فتح موقع Chat Enhancer"
     },
-    "openGithubRepository": {
-      "message": "فتح مستودع GitHub"
+    "openSourceCode": {
+      "message": "فتح الشفرة المصدرية"
     },
     "supportFeedback": {
       "message": "الدعم / الملاحظات"
@@ -183,8 +188,8 @@
     "supportAndFeedback": {
       "message": "الدعم والملاحظات"
     },
-    "supportGithubIssuesPrompt": {
-      "message": "GitHub Issues هو المتتبّع العام الذي نستخدمه لبلاغات الأخطاء وطلبات الميزات. قد تحتاج إلى حساب GitHub.\n\nيمكنك أيضًا مراسلتنا على chatenhanceryt@gmail.com.\n\nهل تريد المتابعة إلى GitHub Issues؟"
+    "supportIssueTrackerPrompt": {
+      "message": "ستتم إعادة توجيهك إلى متتبّع المشكلات العام الخاص بنا للإبلاغ عن الأخطاء وطلب الميزات. قد تحتاج إلى حساب.\n\nيمكنك أيضًا مراسلتنا على chatenhanceryt@gmail.com.\n\nهل تريد المتابعة إلى متتبّع المشكلات؟"
     },
     "resetAllExtensionData": {
       "message": "إعادة تعيين كل إعدادات الإضافة والبيانات المحلية"

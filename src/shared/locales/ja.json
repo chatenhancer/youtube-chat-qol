@@ -55,6 +55,7 @@
     "settingState": "{label} {state}。",
     "showRecentMessages": "最近のメッセージを表示",
     "stateOff": "オフ",
+    "selectOff": "オフ",
     "stateOn": "オン",
     "timeHours": "{count}時間",
     "timeMinutes": "{count}分",
@@ -117,7 +118,11 @@
     "removedKeywordsWithMissing": "削除済み: {removed}。見つかりません: {missing}。",
     "watchedKeywords": "監視中のキーワード",
     "watchingKeywords": "監視中: {keywords}。",
-    "watchingKeywordsWithDuplicates": "監視中: {added}。既存: {duplicates}。"
+    "watchingKeywordsWithDuplicates": "監視中: {added}。既存: {duplicates}。",
+    "translateDraft": "下書きを翻訳",
+    "translateDraftTo": "下書きの翻訳先",
+    "draftTranslationOff": "下書き翻訳はオフです。",
+    "draftTranslationTo": "下書きを{language}に翻訳。"
   },
   "extension": {
     "extensionName": {
@@ -174,8 +179,8 @@
     "openChatEnhancerWebsite": {
       "message": "Chat Enhancer のウェブサイトを開く"
     },
-    "openGithubRepository": {
-      "message": "GitHub リポジトリを開く"
+    "openSourceCode": {
+      "message": "ソースコードを開く"
     },
     "supportFeedback": {
       "message": "サポート / フィードバック"
@@ -183,8 +188,8 @@
     "supportAndFeedback": {
       "message": "サポートとフィードバック"
     },
-    "supportGithubIssuesPrompt": {
-      "message": "GitHub Issues は、バグ報告と機能リクエストに使用している公開トラッカーです。GitHub アカウントが必要な場合があります。\n\nメールでも chatenhanceryt@gmail.com に連絡できます。\n\nGitHub Issues に進みますか？"
+    "supportIssueTrackerPrompt": {
+      "message": "バグ報告と機能リクエストのために、公開の課題トラッカーへ移動します。アカウントが必要な場合があります。\n\nメールでも chatenhanceryt@gmail.com に連絡できます。\n\n課題トラッカーに進みますか？"
     },
     "resetAllExtensionData": {
       "message": "拡張機能のすべての設定とローカルデータをリセット"

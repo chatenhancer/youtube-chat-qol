@@ -55,6 +55,7 @@
     "settingState": "{label} {state}.",
     "showRecentMessages": "הצגת הודעות אחרונות",
     "stateOff": "כבוי",
+    "selectOff": "כבוי",
     "stateOn": "פעיל",
     "timeHours": "{count} שעות",
     "timeMinutes": "{count} דק׳",
@@ -117,7 +118,11 @@
     "removedKeywordsWithMissing": "הוסר: {removed}. לא נמצא: {missing}.",
     "watchedKeywords": "מילות מפתח במעקב",
     "watchingKeywords": "במעקב: {keywords}.",
-    "watchingKeywordsWithDuplicates": "במעקב: {added}. כבר היה: {duplicates}."
+    "watchingKeywordsWithDuplicates": "במעקב: {added}. כבר היה: {duplicates}.",
+    "translateDraft": "תרגום טיוטה",
+    "translateDraftTo": "תרגום הטיוטה אל",
+    "draftTranslationOff": "תרגום הטיוטה כבוי.",
+    "draftTranslationTo": "תרגום הטיוטה אל {language}."
   },
   "extension": {
     "extensionName": {
@@ -171,8 +176,8 @@
     "openChatEnhancerWebsite": {
       "message": "פתיחת אתר Chat Enhancer"
     },
-    "openGithubRepository": {
-      "message": "פתיחת מאגר GitHub"
+    "openSourceCode": {
+      "message": "פתיחת קוד המקור"
     },
     "supportFeedback": {
       "message": "תמיכה / משוב"
@@ -180,8 +185,8 @@
     "supportAndFeedback": {
       "message": "תמיכה ומשוב"
     },
-    "supportGithubIssuesPrompt": {
-      "message": "GitHub Issues הוא כלי המעקב הציבורי שבו אנו משתמשים לדיווחי באגים ובקשות לפיצ׳רים. ייתכן שיידרש חשבון GitHub.\n\nאפשר גם לשלוח לנו אימייל אל chatenhanceryt@gmail.com.\n\nלהמשיך אל GitHub Issues?"
+    "supportIssueTrackerPrompt": {
+      "message": "תופנו אל כלי המעקב הציבורי שלנו לבעיות עבור דיווחי באגים ובקשות לפיצ׳רים. ייתכן שיידרש חשבון.\n\nאפשר גם לשלוח לנו אימייל אל chatenhanceryt@gmail.com.\n\nלהמשיך אל כלי המעקב?"
     },
     "resetAllExtensionData": {
       "message": "איפוס כל הגדרות התוסף והנתונים המקומיים"

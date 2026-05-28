@@ -55,6 +55,7 @@
     "settingState": "{label} {state}.",
     "showRecentMessages": "Показать недавние сообщения",
     "stateOff": "выключено",
+    "selectOff": "Выключено",
     "stateOn": "включено",
     "timeHours": "{count} ч",
     "timeMinutes": "{count} мин",
@@ -117,7 +118,11 @@
     "removedKeywordsWithMissing": "Удалено: {removed}. Не найдено: {missing}.",
     "watchedKeywords": "Отслеживаемые ключевые слова",
     "watchingKeywords": "Отслеживается: {keywords}.",
-    "watchingKeywordsWithDuplicates": "Отслеживается: {added}. Уже было: {duplicates}."
+    "watchingKeywordsWithDuplicates": "Отслеживается: {added}. Уже было: {duplicates}.",
+    "translateDraft": "Перевести черновик",
+    "translateDraftTo": "Перевести черновик на",
+    "draftTranslationOff": "Перевод черновика выключен.",
+    "draftTranslationTo": "Перевод черновика на {language}."
   },
   "extension": {
     "extensionName": {
@@ -174,8 +179,8 @@
     "openChatEnhancerWebsite": {
       "message": "Открыть сайт Chat Enhancer"
     },
-    "openGithubRepository": {
-      "message": "Открыть репозиторий GitHub"
+    "openSourceCode": {
+      "message": "Открыть исходный код"
     },
     "supportFeedback": {
       "message": "Поддержка / обратная связь"
@@ -183,8 +188,8 @@
     "supportAndFeedback": {
       "message": "Поддержка и обратная связь"
     },
-    "supportGithubIssuesPrompt": {
-      "message": "GitHub Issues — это публичный трекер, который мы используем для сообщений об ошибках и запросов функций. Может потребоваться аккаунт GitHub.\n\nВы также можете написать нам на chatenhanceryt@gmail.com.\n\nПерейти в GitHub Issues?"
+    "supportIssueTrackerPrompt": {
+      "message": "Вы будете перенаправлены в наш публичный трекер задач для сообщений об ошибках и запросов функций. Может потребоваться аккаунт.\n\nВы также можете написать нам на chatenhanceryt@gmail.com.\n\nПерейти в трекер задач?"
     },
     "resetAllExtensionData": {
       "message": "Сбросить все настройки расширения и локальные данные"

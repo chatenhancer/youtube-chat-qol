@@ -79,7 +79,7 @@
         }
       })();
     </script>
-    <link rel="stylesheet" href="../styles.css?v=94">
+    <link rel="stylesheet" href="../styles.css?v=108">
     <script type="application/ld+json">
       {
               "@context": "https://schema.org",
@@ -204,7 +204,7 @@
           <img class="hero-icon" src="../assets/icons/icon-128.png" width="72" height="72" alt="">
           <p class="eyebrow" data-i18n="hero.eyebrow">YouTube 라이브 채팅용 브라우저 확장 프로그램</p>
           <h1 id="hero-title">Chat Enhancer for YouTube</h1>
-          <p class="hero-copy" data-i18n="hero.copy">YouTube 라이브 채팅에서 복잡한 채팅을 따라가고, 대화를 놓치지 않고, 더 쉽게 참여하세요.</p>
+          <p class="hero-copy" data-i18n="hero.copy">빠르게 지나가는 YouTube 실시간 채팅을 따라가고, 사람들이 하는 말을 더 잘 이해하고, 중요한 메시지를 찾고, 흐름을 놓치지 않고 자연스럽게 답장하세요.</p>
           <div class="hero-actions">
             <a class="button button-primary" href="#install">
               <span class="button-icon" data-symbol="install_desktop" aria-hidden="true">
@@ -236,7 +236,7 @@
                 </svg>
               </span>
               <h3 data-i18n="features.translationTitle">라이브 채팅 번역</h3>
-              <p data-i18n="features.translationBody">확장 프로그램 팝업에서 대상 언어를 선택한 뒤 YouTube 라이브 채팅 설정에서 번역을 빠르게 켜고 끌 수 있습니다.</p>
+              <p data-i18n="features.translationBody">YouTube 설정에서 들어오는 채팅을 번역하거나, 보내기 전에 입력 중인 메시지를 번역할 수 있습니다.</p>
             </article>
             <article class="feature">
               <span class="feature-icon" data-symbol="alternate_email" aria-hidden="true">
@@ -300,8 +300,8 @@
                     <div class="showcase-brand">
                       <img src="../assets/logo.png" width="178" height="60" alt="Chat Enhancer for YouTube">
                     </div>
-                    <h3 data-i18n="screenshots.translationTitle">라이브 채팅을 내 언어로 읽기</h3>
-                    <p data-i18n="screenshots.translationBody">들어오는 메시지는 선택한 언어로 Google Translate를 통해 자동 번역됩니다.</p>
+                    <h3 data-i18n-html="screenshots.translationTitle">다른 언어로<br>읽고 쓰기</h3>
+                    <p data-i18n="screenshots.translationBody">들어오는 메시지는 자동으로 번역할 수 있습니다. 채팅 입력창도 보내기 전에 입력 중인 내용을 번역할 수 있습니다.</p>
                     <p>
                       <span data-i18n-html="screenshots.translationHighlightHtml">자동 번역은 <span class="showcase-underline">은은한 밑줄</span>과 Google Translate 아이콘으로 표시됩니다</span>
                       <span class="translate-mark translate-mark-inline" aria-hidden="true">
@@ -317,11 +317,13 @@
                         <p>
                           <img class="sample-avatar" src="../assets/avatar.png" width="22" height="22" alt="" aria-hidden="true">
                           <span class="sample-muted">@猫爪软乎乎</span>
-                          <span class="showcase-underline" data-i18n="screenshots.replaceModeSample">감사합니다!</span>
-                          <span class="translate-mark" aria-hidden="true">
-                            <svg viewBox="0 0 24 24" focusable="false">
-                              <path d="M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0014.07 6H17V4h-7V2H8v2H1v2h11.17a15.7 15.7 0 01-2.86 4.63A15.07 15.07 0 017.22 7H5.2a17.2 17.2 0 002.77 5.03l-5.09 5.02L4.3 18.47l5.01-5.01 3.11 3.11.45-1.5ZM18.5 10h-2L12 22h2l1.13-3h4.74L21 22h2l-4.5-12Zm-2.62 7l1.62-4.33L19.12 17h-3.24Z"></path>
-                            </svg>
+                          <span class="translation-sample-result">
+                            <span class="showcase-underline" data-i18n="screenshots.replaceModeSample">감사합니다!</span>
+                            <span class="translate-mark" aria-hidden="true">
+                              <svg viewBox="0 0 24 24" focusable="false">
+                                <path d="M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0014.07 6H17V4h-7V2H8v2H1v2h11.17a15.7 15.7 0 01-2.86 4.63A15.07 15.07 0 017.22 7H5.2a17.2 17.2 0 002.77 5.03l-5.09 5.02L4.3 18.47l5.01-5.01 3.11 3.11.45-1.5ZM18.5 10h-2L12 22h2l1.13-3h4.74L21 22h2l-4.5-12Zm-2.62 7l1.62-4.33L19.12 17h-3.24Z"></path>
+                              </svg>
+                            </span>
                           </span>
                         </p>
                       </div>
@@ -393,8 +395,8 @@
                         <dd data-i18n="screenshots.commandTimeUntilBody">현지 시간까지 남은 시간을 입력</dd>
                       </div>
                       <div>
-                        <dt><code>/help</code></dt>
-                        <dd data-i18n="screenshots.commandHelpBody">전체 명령어 목록 열기</dd>
+                        <dt><code>/watch &lt;word&gt;</code></dt>
+                        <dd data-i18n="screenshots.commandWatchBody">일치하는 메시지를 받은편지함에 저장</dd>
                       </div>
                     </dl>
                     <a class="feature-link showcase-command-link" href="#commands">
@@ -571,7 +573,7 @@
             </div>
             <div>
               <dt data-i18n="privacy.translationTitle">번역</dt>
-              <dd data-i18n="privacy.translationBody">기본값은 꺼짐입니다. 활성화하면 메시지 텍스트가 YouTube 쿠키나 인증 정보 없이 Google Translate로 전송됩니다.</dd>
+              <dd data-i18n="privacy.translationBody">기본값은 꺼짐입니다. 사용하면 들어오는 채팅 텍스트 또는 번역하기로 선택한 초안 텍스트가 YouTube 쿠키나 인증 정보 없이 Google Translate로 전송됩니다.</dd>
             </div>
             <div>
               <dt data-i18n="privacy.trackingTitle">추적</dt>
@@ -691,7 +693,7 @@
                       <code>/translate es hello</code>
                       <span class="command-aliases"><span data-i18n="commands.aliasesLabel">별칭:</span> <code>/tr</code></span>
                     </dt>
-                    <dd data-i18n="commands.translateDescription">사용자 지정 텍스트를 언어로 번역합니다.</dd>
+                    <dd data-i18n="commands.translateDescription">보내기 전에 채팅 입력창의 사용자 지정 텍스트를 번역합니다.</dd>
                   </div>
                 </dl>
               </article>
@@ -794,6 +796,7 @@
           if (event.target === supportModal) closeSupportModal();
         });
 
+        setupStoreVersionAlertScrollFade();
         void checkStoreVersionStatus();
 
         if (!installActions || !chromeButton || !firefoxButton) return;
@@ -830,6 +833,28 @@
 
           message.textContent = bodyTemplate.replace("{stores}", storeList);
           alert.hidden = false;
+        }
+
+        function setupStoreVersionAlertScrollFade() {
+          const alert = document.querySelector("[data-store-version-alert]");
+          if (!alert) return;
+
+          let frame = 0;
+          const update = () => {
+            frame = 0;
+            const progress = Math.min(Math.max(window.scrollY / 80, 0), 1);
+            alert.style.setProperty("--store-version-alert-opacity", String(1 - progress));
+            alert.style.setProperty("--store-version-alert-offset", `${Math.round(progress * -8)}px`);
+            alert.classList.toggle("store-version-alert-faded", progress >= 0.98);
+          };
+          const schedule = () => {
+            if (frame) return;
+            frame = window.requestAnimationFrame(update);
+          };
+
+          window.addEventListener("scroll", schedule, { passive: true });
+          window.addEventListener("resize", schedule);
+          update();
         }
 
         function formatStoreList(stores, conjunction) {

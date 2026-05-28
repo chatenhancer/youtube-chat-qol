@@ -55,6 +55,7 @@
     "settingState": "{label} {state}.",
     "showRecentMessages": "최근 메시지 보기",
     "stateOff": "꺼짐",
+    "selectOff": "꺼짐",
     "stateOn": "켜짐",
     "timeHours": "{count}시간",
     "timeMinutes": "{count}분",
@@ -117,7 +118,11 @@
     "removedKeywordsWithMissing": "삭제됨: {removed}. 찾을 수 없음: {missing}.",
     "watchedKeywords": "감시 중인 키워드",
     "watchingKeywords": "감시 중: {keywords}.",
-    "watchingKeywordsWithDuplicates": "감시 중: {added}. 이미 있음: {duplicates}."
+    "watchingKeywordsWithDuplicates": "감시 중: {added}. 이미 있음: {duplicates}.",
+    "translateDraft": "초안 번역",
+    "translateDraftTo": "초안을 번역할 언어",
+    "draftTranslationOff": "초안 번역 꺼짐.",
+    "draftTranslationTo": "초안을 {language}(으)로 번역."
   },
   "extension": {
     "extensionName": {
@@ -171,8 +176,8 @@
     "openChatEnhancerWebsite": {
       "message": "Chat Enhancer 웹사이트 열기"
     },
-    "openGithubRepository": {
-      "message": "GitHub 저장소 열기"
+    "openSourceCode": {
+      "message": "소스 코드 열기"
     },
     "supportFeedback": {
       "message": "지원 / 피드백"
@@ -180,8 +185,8 @@
     "supportAndFeedback": {
       "message": "지원 및 피드백"
     },
-    "supportGithubIssuesPrompt": {
-      "message": "GitHub Issues는 버그 신고와 기능 요청에 사용하는 공개 추적 공간입니다. GitHub 계정이 필요할 수 있습니다.\n\n이메일로도 chatenhanceryt@gmail.com에 문의할 수 있습니다.\n\nGitHub Issues로 이동할까요?"
+    "supportIssueTrackerPrompt": {
+      "message": "버그 신고와 기능 요청을 위해 공개 이슈 트래커로 이동합니다. 계정이 필요할 수 있습니다.\n\n이메일로도 chatenhanceryt@gmail.com에 문의할 수 있습니다.\n\n이슈 트래커로 이동할까요?"
     },
     "resetAllExtensionData": {
       "message": "모든 확장 설정과 로컬 데이터 재설정"

@@ -55,6 +55,7 @@
     "settingState": "{label} {state}.",
     "showRecentMessages": "Tampilkan pesan terbaru",
     "stateOff": "mati",
+    "selectOff": "Mati",
     "stateOn": "nyala",
     "timeHours": "{count} jam",
     "timeMinutes": "{count} menit",
@@ -117,7 +118,11 @@
     "removedKeywordsWithMissing": "Dihapus: {removed}. Tidak ditemukan: {missing}.",
     "watchedKeywords": "Kata kunci yang dipantau",
     "watchingKeywords": "Memantau: {keywords}.",
-    "watchingKeywordsWithDuplicates": "Memantau: {added}. Sudah ada: {duplicates}."
+    "watchingKeywordsWithDuplicates": "Memantau: {added}. Sudah ada: {duplicates}.",
+    "translateDraft": "Terjemahkan draf",
+    "translateDraftTo": "Terjemahkan draf ke",
+    "draftTranslationOff": "Terjemahan draf nonaktif.",
+    "draftTranslationTo": "Terjemahan draf ke {language}."
   },
   "extension": {
     "extensionName": {
@@ -174,8 +179,8 @@
     "openChatEnhancerWebsite": {
       "message": "Buka situs web Chat Enhancer"
     },
-    "openGithubRepository": {
-      "message": "Buka repositori GitHub"
+    "openSourceCode": {
+      "message": "Buka kode sumber"
     },
     "supportFeedback": {
       "message": "Dukungan / Masukan"
@@ -183,8 +188,8 @@
     "supportAndFeedback": {
       "message": "Dukungan dan masukan"
     },
-    "supportGithubIssuesPrompt": {
-      "message": "GitHub Issues adalah pelacak publik yang kami gunakan untuk laporan bug dan permintaan fitur. Akun GitHub mungkin diperlukan.\n\nAnda juga bisa mengirim email ke chatenhanceryt@gmail.com.\n\nLanjut ke GitHub Issues?"
+    "supportIssueTrackerPrompt": {
+      "message": "Anda akan diarahkan ke pelacak isu publik kami untuk laporan bug dan permintaan fitur. Akun mungkin diperlukan.\n\nAnda juga bisa mengirim email ke chatenhanceryt@gmail.com.\n\nLanjut ke pelacak isu?"
     },
     "resetAllExtensionData": {
       "message": "Reset semua pengaturan ekstensi dan data lokal"

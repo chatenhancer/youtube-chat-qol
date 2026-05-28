@@ -9,6 +9,13 @@
 import { enhanceEmojiPicker, handleEmojiPickerClick, initFrequentEmojis, resetFrequentEmojis } from '../features/frequent-emojis';
 import { startActiveChatKeepAlive } from '../features/active-chat-keepalive';
 import { initChatCommands, resetChatCommandsState } from '../features/chat-commands';
+import {
+  initComposerTranslation,
+  refreshComposerTranslation,
+  resetComposerTranslation,
+  scheduleComposerTranslationWire,
+  shouldWireComposerTranslationForNode
+} from '../features/composer-translation';
 import { enhanceMenu } from '../features/menus';
 import { handleMessageMenuActivation, wireMessageContext } from '../features/menus/message-menu';
 import { configureSettingsMenu, refreshSettingsMenus } from '../features/menus/settings-menu';
@@ -49,6 +56,7 @@ function init(): void {
   initFocusMode();
   initInbox();
   initChatCommands(saveOptions);
+  initComposerTranslation(saveOptions);
   configureSettingsMenu(saveOptions);
 
   chrome.storage.sync.get(DEFAULT_OPTIONS, (storedOptions) => {
@@ -69,6 +77,7 @@ function init(): void {
 
     setOptions(normalizeOptions(nextOptions));
     applyOptionSideEffects(previousOptions, getOptions());
+    refreshComposerTranslation();
     refreshSettingsMenus();
   });
 
@@ -95,6 +104,7 @@ function boot(): void {
   document.querySelectorAll('ytd-menu-popup-renderer').forEach(enhanceMenu);
   document.querySelectorAll('yt-emoji-picker-renderer').forEach(enhanceEmojiPicker);
   scheduleInboxButtonWire();
+  scheduleComposerTranslationWire();
   document.addEventListener('click', handleEmojiPickerClick, true);
   document.addEventListener('pointerdown', handleMessageMenuActivation, true);
   document.addEventListener('click', handleMessageMenuActivation, true);
@@ -130,6 +140,9 @@ function boot(): void {
           node.querySelector('yt-live-chat-header-renderer')
         ) {
           shouldWireInboxButton = true;
+        }
+        if (shouldWireComposerTranslationForNode(node)) {
+          scheduleComposerTranslationWire();
         }
         if (node.matches(CHAT_MESSAGE_SELECTOR) && node instanceof HTMLElement) {
           enhanceMessage(node, { allowTranslate: true });
@@ -276,6 +289,7 @@ function isExtensionManagedMutation(element: Element): boolean {
     '.ytcq-translation',
     '.ytcq-replaced-translation-icon',
     '.ytcq-frequent-emoji-row',
+    '.ytcq-composer-translate-control',
     '.ytcq-focus-card',
     '.ytcq-profile-card',
     '.ytcq-inbox-card',
@@ -291,6 +305,7 @@ function isExtensionManagedAddedNode(element: Element): boolean {
     '.ytcq-chat-keyword-highlight',
     '.ytcq-translation',
     '.ytcq-replaced-translation-icon',
+    '.ytcq-composer-translate-control',
     '.ytcq-focus-card',
     '.ytcq-profile-card',
     '.ytcq-inbox-card'
@@ -310,6 +325,7 @@ function saveOptions(values: Partial<Options>): void {
     : values;
   setOptions(normalizeOptions({ ...previousOptions, ...nextValues }));
   applyOptionSideEffects(previousOptions, getOptions());
+  refreshComposerTranslation();
   refreshSettingsMenus();
   chrome.storage.sync.set(nextValues);
 }
@@ -333,6 +349,7 @@ function resetPageState(): void {
   resetInboxState();
   resetFrequentEmojis();
   resetChatCommandsState();
+  resetComposerTranslation();
   resetFocusMode();
   closeProfileCard();
   document.querySelectorAll('.ytcq-toast').forEach((toast) => toast.remove());

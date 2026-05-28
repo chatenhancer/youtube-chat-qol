@@ -55,6 +55,7 @@
     "settingState": "{label} {state}.",
     "showRecentMessages": "Afficher les messages récents",
     "stateOff": "désactivé",
+    "selectOff": "Désactivé",
     "stateOn": "activé",
     "timeHours": "{count} h",
     "timeMinutes": "{count} min",
@@ -117,7 +118,11 @@
     "removedKeywordsWithMissing": "Supprimé : {removed}. Introuvable : {missing}.",
     "watchedKeywords": "Mots-clés surveillés",
     "watchingKeywords": "Surveillance : {keywords}.",
-    "watchingKeywordsWithDuplicates": "Surveillance : {added}. Déjà présent : {duplicates}."
+    "watchingKeywordsWithDuplicates": "Surveillance : {added}. Déjà présent : {duplicates}.",
+    "translateDraft": "Traduire le brouillon",
+    "translateDraftTo": "Traduire le brouillon en",
+    "draftTranslationOff": "Traduction du brouillon désactivée.",
+    "draftTranslationTo": "Traduction du brouillon en {language}."
   },
   "extension": {
     "extensionName": {
@@ -171,8 +176,8 @@
     "openChatEnhancerWebsite": {
       "message": "Ouvrir le site web de Chat Enhancer"
     },
-    "openGithubRepository": {
-      "message": "Ouvrir le dépôt GitHub"
+    "openSourceCode": {
+      "message": "Ouvrir le code source"
     },
     "supportFeedback": {
       "message": "Assistance / Retours"
@@ -180,8 +185,8 @@
     "supportAndFeedback": {
       "message": "Assistance et retours"
     },
-    "supportGithubIssuesPrompt": {
-      "message": "GitHub Issues est le suivi public que nous utilisons pour les rapports de bugs et les demandes de fonctionnalités. Un compte GitHub peut être nécessaire.\n\nVous pouvez aussi nous écrire à chatenhanceryt@gmail.com.\n\nContinuer vers GitHub Issues ?"
+    "supportIssueTrackerPrompt": {
+      "message": "Vous serez redirigé vers notre suivi public des problèmes pour les rapports de bugs et les demandes de fonctionnalités. Un compte peut être nécessaire.\n\nVous pouvez aussi nous écrire à chatenhanceryt@gmail.com.\n\nContinuer vers le suivi des problèmes ?"
     },
     "resetAllExtensionData": {
       "message": "Réinitialiser tous les réglages et les données locales"

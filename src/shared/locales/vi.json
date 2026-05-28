@@ -55,6 +55,7 @@
     "settingState": "{label} {state}.",
     "showRecentMessages": "Hiện tin nhắn gần đây",
     "stateOff": "tắt",
+    "selectOff": "Tắt",
     "stateOn": "bật",
     "timeHours": "{count} giờ",
     "timeMinutes": "{count} phút",
@@ -117,7 +118,11 @@
     "removedKeywordsWithMissing": "Đã xóa: {removed}. Không tìm thấy: {missing}.",
     "watchedKeywords": "Từ khóa đang theo dõi",
     "watchingKeywords": "Đang theo dõi: {keywords}.",
-    "watchingKeywordsWithDuplicates": "Đang theo dõi: {added}. Đã có: {duplicates}."
+    "watchingKeywordsWithDuplicates": "Đang theo dõi: {added}. Đã có: {duplicates}.",
+    "translateDraft": "Dịch bản nháp",
+    "translateDraftTo": "Dịch bản nháp sang",
+    "draftTranslationOff": "Đã tắt dịch bản nháp.",
+    "draftTranslationTo": "Dịch bản nháp sang {language}."
   },
   "extension": {
     "extensionName": {
@@ -171,8 +176,8 @@
     "openChatEnhancerWebsite": {
       "message": "Mở trang web Chat Enhancer"
     },
-    "openGithubRepository": {
-      "message": "Mở kho GitHub"
+    "openSourceCode": {
+      "message": "Mở mã nguồn"
     },
     "supportFeedback": {
       "message": "Hỗ trợ / góp ý"
@@ -180,8 +185,8 @@
     "supportAndFeedback": {
       "message": "Hỗ trợ và góp ý"
     },
-    "supportGithubIssuesPrompt": {
-      "message": "GitHub Issues là trình theo dõi công khai mà chúng tôi dùng cho báo lỗi và yêu cầu tính năng. Có thể cần tài khoản GitHub.\n\nBạn cũng có thể email cho chúng tôi tại chatenhanceryt@gmail.com.\n\nTiếp tục đến GitHub Issues?"
+    "supportIssueTrackerPrompt": {
+      "message": "Bạn sẽ được chuyển đến trình theo dõi vấn đề công khai của chúng tôi để báo lỗi và yêu cầu tính năng. Có thể cần tài khoản.\n\nBạn cũng có thể email cho chúng tôi tại chatenhanceryt@gmail.com.\n\nTiếp tục đến trình theo dõi vấn đề?"
     },
     "resetAllExtensionData": {
       "message": "Đặt lại mọi cài đặt tiện ích và dữ liệu cục bộ"

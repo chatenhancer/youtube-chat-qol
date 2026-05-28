@@ -7,7 +7,12 @@
 import { t } from '../../shared/i18n';
 import { cleanText } from '../../shared/text';
 import { showToast } from '../../shared/toast';
-import { createTranslationPlan, restorePlaceholdersToText } from '../translation/protected-placeholders';
+import {
+  createNodesWithPlaceholders,
+  createTranslationPlanFromNodes,
+  restorePlaceholdersToText,
+  type TranslationPlan
+} from '../translation/protected-placeholders';
 import type { TranslationResult } from '../translation/render';
 import { LANGUAGE_OPTIONS } from '../../shared/languages';
 import { normalizeCommandToken } from './parser';
@@ -44,9 +49,22 @@ export function parseTranslateTextCommand(value: string): {
 export async function translateCommandText(text: string, targetLanguage: string): Promise<string> {
   const holder = document.createElement('span');
   holder.textContent = text;
-  const plan = createTranslationPlan(holder, text);
-  const result = await sendCommandTranslationRequest(plan.text || text, targetLanguage);
-  return cleanText(restorePlaceholdersToText(result.text, plan.protectedTokens) || result.text);
+  const plan = createTranslationPlanFromNodes(holder.childNodes, text);
+  return (await translateTranslationPlan(plan, text, targetLanguage)).text;
+}
+
+export async function translateTranslationPlan(
+  plan: TranslationPlan,
+  fallbackText: string,
+  targetLanguage: string
+): Promise<{ nodes: Node[]; text: string }> {
+  const result = await sendCommandTranslationRequest(plan.text || fallbackText, targetLanguage);
+  const text = cleanText(restorePlaceholdersToText(result.text, plan.protectedTokens) || result.text || fallbackText);
+
+  return {
+    nodes: createNodesWithPlaceholders(result.text || fallbackText, plan.protectedTokens),
+    text
+  };
 }
 
 function getLanguageCodeCommandTarget(value: string): string {
