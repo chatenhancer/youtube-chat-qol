@@ -79,7 +79,7 @@
         }
       })();
     </script>
-    <link rel="stylesheet" href="../styles.css?v=85">
+    <link rel="stylesheet" href="../styles.css?v=94">
     <script type="application/ld+json">
       {
               "@context": "https://schema.org",
@@ -171,7 +171,7 @@
       hidden
       data-store-version-alert
       data-i18n-attr="data-alert-body:install.updatePendingBody;data-alert-and:install.updatePendingAnd;data-alert-chrome:install.chromeStore;data-alert-firefox:install.firefoxAddons"
-      data-alert-body="{stores} recevront bientôt la dernière version."
+      data-alert-body="La dernière version est encore en attente sur {stores}."
       data-alert-and="et"
       data-alert-chrome="Chrome Web Store"
       data-alert-firefox="Firefox Add-ons"
@@ -214,7 +214,7 @@
               </span>
               <span data-i18n="hero.primaryCta">Installer</span>
             </a>
-            <a class="button button-secondary" href="#features" data-i18n="hero.secondaryCta">Voir les fonctionnalités</a>
+            <a class="button button-text" href="#features" data-i18n="hero.secondaryCta">Voir les fonctionnalités</a>
           </div>
         </div>
         <div class="hero-media" aria-hidden="true">
@@ -281,7 +281,7 @@
                 </svg>
               </span>
               <h3 data-i18n="features.commandsTitle">Commandes du chat</h3>
-              <p data-i18n="features.commandsBody">Appuyez sur Tab pour transformer de courtes commandes du chat en mentions, citations, messages répétés, aides de temps et réglages.</p>
+              <p data-i18n="features.commandsBody">Appuyez sur Tab pour transformer de courtes commandes de chat en mentions, citations, aides de temps, traductions, veilles de boîte de réception et réglages.</p>
               <a class="feature-link" href="#commands" data-i18n="features.commandsLink">Voir la référence des commandes</a>
             </article>
           </div>
@@ -458,8 +458,8 @@
             </a>
             <a class="button button-link" href="https://www.chatenhancer.com/support" data-support-modal-trigger>
               <span class="button-icon" data-symbol="bug_report" aria-hidden="true">
-                <svg viewBox="0 0 24 24" focusable="false">
-                  <path d="M12 21q-1.625 0-3.012-.8T6.8 18H4v-2h2.1q-.075-.5-.088-1T6 14H4v-2h2q0-.5.012-1t.088-1H4V8h2.8q.35-.575.788-1.075T8.6 6.05L7 4.4L8.4 3l2.15 2.15q.7-.225 1.425-.225t1.425.225L15.6 3L17 4.4l-1.65 1.65q.575.375 1.038.862T17.2 8H20v2h-2.1q.075.5.088 1T18 12h2v2h-2q0 .5-.013 1t-.087 1H20v2h-2.8q-.8 1.4-2.187 2.2T12 21m-2-5h4v-2h-4zm0-4h4v-2h-4z"></path>
+                <svg viewBox="0 -960 960 960" focusable="false">
+                  <path d="M480-200q66 0 113-47t47-113v-160q0-66-47-113t-113-47q-66 0-113 47t-47 113v160q0 66 47 113t113 47Zm-80-120h160v-80H400v80Zm0-160h160v-80H400v80Zm80 40Zm0 320q-65 0-120.5-32T272-240H160v-80h84q-3-20-3.5-40t-.5-40h-80v-80h80q0-20 .5-40t3.5-40h-84v-80h112q14-23 31.5-43t40.5-35l-64-66 56-56 86 86q28-9 57-9t57 9l88-86 56 56-66 66q23 15 41.5 34.5T688-640h112v80h-84q3 20 3.5 40t.5 40h80v80h-80q0 20-.5 40t-3.5 40h84v80H688q-32 56-87.5 88T480-120Z"></path>
                 </svg>
               </span>
               <span data-i18n="install.supportFeedback">Assistance</span>
@@ -595,63 +595,127 @@
           <div class="command-notes" aria-label="Command usage notes">
             <article class="command-note">
               <p>
-                <strong data-i18n="commands.inlineTitle">Commandes en ligne :</strong> <span data-i18n="commands.inlineBody">/mention, /reply, /time et /timeuntil peuvent se développer dans une phrase.</span>
+                <strong data-i18n="commands.inlineTitle">Commandes en ligne :</strong> <span data-i18n="commands.inlineBody">/mention, /m, /reply, /r, /time, /t, /when, /wh, /timeuntil, /tu, /timesince, /ts, /translate et /tr peuvent se développer dans une phrase.</span>
               </p>
             </article>
             <article class="command-note">
               <p>
-                <strong data-i18n="commands.wholeTitle">Commandes en saisie complète :</strong> <span data-i18n="commands.wholeBody">/quote, /again, /repeat, /help et toutes les commandes /set... doivent être le seul texte dans le champ.</span>
+                <strong data-i18n="commands.wholeTitle">Commandes en saisie complète :</strong> <span data-i18n="commands.wholeBody">/quote, /q, /again, /repeat, /watch, /w, /unwatch, /uw, /focus, /f, /who, /help et toutes les commandes /set... doivent être le seul texte dans le champ.</span>
               </p>
             </article>
           </div>
 
           <div class="command-groups">
-            <article class="command-group">
-              <h3 data-i18n="commands.textCommandsTitle">Commandes de texte</h3>
-              <dl class="command-list">
-                <div>
-                  <dt><code>/mention</code> or <code>/reply</code></dt>
-                  <dd data-i18n="commands.mentionDescription">Insère une mention pour l’auteur du dernier message de votre boîte de réception.</dd>
-                </div>
-                <div>
-                  <dt><code>/quote</code></dt>
-                  <dd data-i18n="commands.quoteDescription">Cite le dernier message enregistré dans votre boîte de réception.</dd>
-                </div>
-                <div>
-                  <dt><code>/again</code> or <code>/repeat</code></dt>
-                  <dd data-i18n="commands.repeatDescription">Restaure votre dernier message envoyé, y compris le contenu emoji enrichi quand il est disponible.</dd>
-                </div>
-                <div>
-                  <dt><code>/time utc</code></dt>
-                  <dd><span data-i18n="commands.timeDescription">Insère l'heure actuelle pour un fuseau horaire ou une ville compatible.</span><br><span class="command-detail"><span data-i18n="commands.timeAliases">Alias pris en charge :</span> <code>utc</code>, <code>tokyo</code>, <code>jst</code>, <code>seoul</code>, <code>kst</code>, <code>london</code>, <code>paris</code>, <code>madrid</code>, <code>newyork</code>, <code>nyc</code>, <code>et</code>, <code>eastern</code>, <code>losangeles</code>, <code>la</code>, <code>pt</code>, and <code>pacific</code>.</span></dd>
-                </div>
-                <div>
-                  <dt><code>/timeuntil 7:45pm</code></dt>
-                  <dd><span data-i18n="commands.timeUntilDescription">Insère le temps restant jusqu'à la prochaine heure locale correspondante.</span><br><span class="command-detail"><span data-i18n="commands.timeUntilFormats">Formats acceptés :</span> <code>7</code>, <code>7am</code>, <code>7 am</code>, <code>7:45am</code>, <code>7:45 am</code>, <code>19</code>, <code>19:00</code>, <code>19:00:30</code>, and <code>7:45:30 pm</code>.</span></dd>
-                </div>
-                <div>
-                  <dt><code>/help</code></dt>
-                  <dd data-i18n="commands.helpDescription">Ouvre la carte d'aide des commandes dans le chat YouTube.</dd>
-                </div>
-              </dl>
-            </article>
-            <article class="command-group">
-              <h3 data-i18n="commands.settingCommandsTitle">Commandes de réglages</h3>
-              <dl class="command-list">
-                <div>
-                  <dt><code>/settranslateto english</code> or <code>/settranslateto off</code></dt>
-                  <dd data-i18n="commands.setTranslateDescription">Définit la langue cible de traduction. Utilisez off pour désactiver la traduction.</dd>
-                </div>
-                <div>
-                  <dt><code>/settranslationdisplay replace</code> or <code>/settranslationdisplay below</code></dt>
-                  <dd data-i18n="commands.setDisplayDescription">Remplace les messages originaux par les traductions. Utilisez below pour afficher les traductions dessous.</dd>
-                </div>
-                <div>
-                  <dt><code>/setsound on</code> or <code>/setsound off</code></dt>
-                  <dd data-i18n="commands.setSoundDescription">Active ou désactive les sons de la boîte de réception.</dd>
-                </div>
-              </dl>
-            </article>
+            <div class="command-column">
+              <article class="command-group">
+                <h3 data-i18n="commands.textCommandsTitle">Commandes de texte</h3>
+                <dl class="command-list">
+                  <div>
+                    <dt>
+                      <code>/mention</code>
+                      <span class="command-aliases"><span data-i18n="commands.aliasesLabel">Alias :</span> <code>/m</code> <code>/reply</code> <code>/r</code></span>
+                    </dt>
+                    <dd data-i18n="commands.mentionDescription">Mentionne l'auteur du dernier message de votre boîte de réception.</dd>
+                  </div>
+                  <div>
+                    <dt>
+                      <code>/quote</code>
+                      <span class="command-aliases"><span data-i18n="commands.aliasesLabel">Alias :</span> <code>/q</code></span>
+                    </dt>
+                    <dd data-i18n="commands.quoteDescription">Sans pseudo, cite le message le plus récent de votre inbox. Avec @pseudo, cite le dernier message vu de cette personne.</dd>
+                  </div>
+                  <div>
+                    <dt>
+                      <code>/again</code>
+                      <span class="command-aliases"><span data-i18n="commands.aliasesLabel">Alias :</span> <code>/repeat</code></span>
+                    </dt>
+                    <dd data-i18n="commands.repeatDescription">Restaure votre dernier message envoyé.</dd>
+                  </div>
+                  <div>
+                    <dt>
+                      <code>/focus @handle</code>
+                      <span class="command-aliases"><span data-i18n="commands.aliasesLabel">Alias :</span> <code>/f</code></span>
+                    </dt>
+                    <dd data-i18n="commands.focusDescription">Avec @pseudo, ouvre le mode focus pour cette personne. Sans pseudo, cible la dernière personne qui vous a mentionné.</dd>
+                  </div>
+                  <div>
+                    <dt><code>/who @handle</code></dt>
+                    <dd data-i18n="commands.whoDescription">Ouvre la fiche d’un utilisateur récent.</dd>
+                  </div>
+                  <div>
+                    <dt><code>/help</code></dt>
+                    <dd data-i18n="commands.helpDescription">Affiche cette liste.</dd>
+                  </div>
+                </dl>
+              </article>
+              <article class="command-group">
+                <h3 data-i18n="commands.inboxCommandsTitle">Boîte de réception</h3>
+                <dl class="command-list">
+                  <div>
+                    <dt>
+                      <code>/watch keyword</code>
+                      <span class="command-aliases"><span data-i18n="commands.aliasesLabel">Alias :</span> <code>/w</code></span>
+                    </dt>
+                    <dd data-i18n="commands.watchDescription">Ajoute des mots-clés ou expressions surveillés. Sans texte, affiche votre liste de surveillance actuelle.</dd>
+                  </div>
+                  <div>
+                    <dt>
+                      <code>/unwatch keyword</code>
+                      <span class="command-aliases"><span data-i18n="commands.aliasesLabel">Alias :</span> <code>/uw</code></span>
+                    </dt>
+                    <dd data-i18n="commands.unwatchDescription">Arrête de surveiller des mots-clés ou des phrases.</dd>
+                  </div>
+                </dl>
+              </article>
+            </div>
+            <div class="command-column">
+              <article class="command-group">
+                <h3 data-i18n="commands.timeTranslationCommandsTitle">Heure et traduction</h3>
+                <dl class="command-list">
+                  <div>
+                    <dt>
+                      <code>/time</code>
+                      <span class="command-aliases"><span data-i18n="commands.aliasesLabel">Alias :</span> <code>/t</code> <span data-i18n="commands.exampleLabel">Exemple :</span> <code>/time utc</code></span>
+                    </dt>
+                    <dd><span data-i18n="commands.timeDescription">Insère l’heure locale actuelle, ou l’heure actuelle d’un lieu/fuseau horaire pris en charge.</span><br><span class="command-detail"><span data-i18n="commands.timeAliases">Alias pris en charge :</span> <code>utc</code>, <code>tokyo</code>, <code>jst</code>, <code>seoul</code>, <code>kst</code>, <code>london</code>, <code>paris</code>, <code>madrid</code>, <code>newyork</code>, <code>nyc</code>, <code>et</code>, <code>eastern</code>, <code>losangeles</code>, <code>la</code>, <code>pt</code>, and <code>pacific</code>.</span></dd>
+                  </div>
+                  <div>
+                    <dt>
+                      <code>/when 7:45pm</code>
+                      <span class="command-aliases"><span data-i18n="commands.aliasesLabel">Alias :</span> <code>/wh</code> <code>/timeuntil</code> <code>/tu</code> <code>/timesince</code> <code>/ts</code></span>
+                    </dt>
+                    <dd><span data-i18n="commands.whenDescription">Insère la durée jusqu’à ou depuis une heure/date.</span><br><span class="command-detail"><span data-i18n="commands.timeUntilFormats">Formats acceptés :</span> <code>7pm</code>, <code>19:00</code>, <code>2026-6-12</code>, <code>2026-06-12 19:00</code>, <code>tomorrow 8pm</code>, and <code>yesterday 14:30</code>.</span></dd>
+                  </div>
+                  <div>
+                    <dt>
+                      <code>/translate es hello</code>
+                      <span class="command-aliases"><span data-i18n="commands.aliasesLabel">Alias :</span> <code>/tr</code></span>
+                    </dt>
+                    <dd data-i18n="commands.translateDescription">Traduit un texte personnalisé dans une langue.</dd>
+                  </div>
+                </dl>
+              </article>
+              <article class="command-group">
+                <h3 data-i18n="commands.settingCommandsTitle">Commandes de réglages</h3>
+                <dl class="command-list">
+                  <div>
+                    <dt>
+                      <code>/settranslateto english</code>
+                      <span class="command-aliases"><span data-i18n="commands.aliasesLabel">Alias :</span> <code>/lang en</code> <code>/lang off</code></span>
+                    </dt>
+                    <dd data-i18n="commands.setTranslateDescription">Définit la langue de traduction. Utilisez off pour désactiver la traduction. Utilisez /lang sans langue pour afficher la cible actuelle.</dd>
+                  </div>
+                  <div>
+                    <dt><code>/settranslationdisplay replace|below</code></dt>
+                    <dd data-i18n="commands.setDisplayDescription">Définit l'affichage des traductions.</dd>
+                  </div>
+                  <div>
+                    <dt><code>/setsound on|off</code></dt>
+                    <dd data-i18n="commands.setSoundDescription">Définit le son de la boîte de réception.</dd>
+                  </div>
+                </dl>
+              </article>
+            </div>
           </div>
         </div>
       </section>

@@ -127,6 +127,12 @@ main {
   height: 20px;
 }
 
+.header-icon-button .source-icon,
+.header-icon-button .reset-icon {
+  width: 20px;
+  height: 20px;
+}
+
 .header-icon-button:hover,
 .header-icon-button:focus {
   color: var(--ytcq-popup-text);

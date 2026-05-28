@@ -17,12 +17,12 @@ export function createTimeCommand(runtime: ChatCommandRuntime): ChatCommandDefin
       value: alias
     }))),
     helpDescriptionKey: 'commandHelpTime',
-    helpLabel: '/time utc',
+    helpLabel: '/time, /t',
     inline: true,
     kind: 'text',
-    names: ['time'],
+    names: ['time', 't'],
     run: (parsed) => runtime.replaceCommandText(formatTime(parsed.args), t('unknownTimezone')),
     runInline: (parsed) => runtime.replaceInlineCommandText(formatTime(parsed.args), parsed, t('unknownTimezone')),
-    runWithoutArgumentNames: ['time']
+    runWithoutArgumentNames: ['time', 't']
   };
 }

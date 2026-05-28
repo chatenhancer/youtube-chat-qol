@@ -5,6 +5,8 @@
  * structure without depending on private Polymer constructors. Settings-menu
  * and per-message action modules both use this path.
  */
+import { createSvgIcon } from '../../shared/icons';
+
 interface MenuActionItemOptions {
   className?: string;
   setting?: string;
@@ -19,8 +21,6 @@ interface PaperItemOptions {
   iconPath: string;
   iconViewBox?: string;
 }
-
-const SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
 
 export function createMenuActionItem({
   className = 'ytcq-settings-item',
@@ -80,7 +80,7 @@ export function createPaperItem({ label, iconPath, iconViewBox }: PaperItemOptio
 
   const icon = document.createElement('span');
   icon.className = 'ytcq-menu-icon';
-  icon.appendChild(createSvgIcon(iconPath, iconViewBox || '0 0 24 24'));
+  icon.appendChild(createSvgIcon(iconViewBox || '0 0 24 24', iconPath));
 
   const text = document.createElement('span');
   text.className = 'ytcq-menu-label';
@@ -88,20 +88,6 @@ export function createPaperItem({ label, iconPath, iconViewBox }: PaperItemOptio
 
   paperItem.append(icon, text);
   return paperItem;
-}
-
-function createSvgIcon(iconPath: string, viewBox: string): SVGSVGElement {
-  const svg = document.createElementNS(SVG_NAMESPACE, 'svg');
-  svg.setAttribute('height', '24');
-  svg.setAttribute('viewBox', viewBox);
-  svg.setAttribute('width', '24');
-  svg.setAttribute('focusable', 'false');
-  svg.setAttribute('aria-hidden', 'true');
-
-  const path = document.createElementNS(SVG_NAMESPACE, 'path');
-  path.setAttribute('d', iconPath);
-  svg.appendChild(path);
-  return svg;
 }
 
 export function closeMenu(): void {

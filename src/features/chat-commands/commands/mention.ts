@@ -12,17 +12,17 @@ import type { ChatCommandDefinition, ChatCommandRuntime } from '../types';
 export function createMentionCommand(runtime: ChatCommandRuntime): ChatCommandDefinition {
   return {
     helpDescriptionKey: 'commandHelpMention',
-    helpLabel: '/mention, /reply',
+    helpLabel: '/mention, /m, /reply, /r',
     inline: true,
     kind: 'text',
-    names: ['mention', 'reply'],
+    names: ['mention', 'm', 'reply', 'r'],
     run: async () => runtime.replaceCommandText(await getMentionCommandText(), t('noInboxMessagesYet')),
     runInline: async (parsed) => runtime.replaceInlineCommandText(
       await getMentionCommandText(),
       parsed,
       t('noInboxMessagesYet')
     ),
-    runWithoutArgumentNames: ['mention', 'reply']
+    runWithoutArgumentNames: ['mention', 'm', 'reply', 'r']
   };
 }
 
