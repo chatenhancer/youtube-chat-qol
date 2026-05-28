@@ -8,6 +8,7 @@
 export type TranslationDisplay = 'replace' | 'below';
 
 export interface Options {
+  composerTranslateLanguage: string;
   targetLanguage: string;
   lastTranslationTarget: string;
   translationDisplay: TranslationDisplay;
@@ -17,6 +18,7 @@ export interface Options {
 export const DEFAULT_TRANSLATION_TARGET = 'en';
 
 export const DEFAULT_OPTIONS: Options = {
+  composerTranslateLanguage: '',
   targetLanguage: '',
   lastTranslationTarget: DEFAULT_TRANSLATION_TARGET,
   translationDisplay: 'replace',
@@ -30,6 +32,7 @@ export const TRANSLATION_DISPLAY_OPTIONS: readonly (readonly [TranslationDisplay
 
 export function normalizeOptions(value: Partial<Options> | Record<string, unknown>): Options {
   const candidate = value as Record<string, unknown>;
+  const composerTranslateLanguage = String(candidate.composerTranslateLanguage || '');
   const targetLanguage = String(candidate.targetLanguage || '');
   const lastTranslationTarget = String(candidate.lastTranslationTarget || targetLanguage || DEFAULT_TRANSLATION_TARGET);
   const translationDisplay = TRANSLATION_DISPLAY_OPTIONS.some(([mode]) => mode === candidate.translationDisplay)
@@ -37,6 +40,7 @@ export function normalizeOptions(value: Partial<Options> | Record<string, unknow
     : DEFAULT_OPTIONS.translationDisplay;
 
   return {
+    composerTranslateLanguage,
     targetLanguage,
     lastTranslationTarget,
     translationDisplay,

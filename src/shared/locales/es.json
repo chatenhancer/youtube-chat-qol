@@ -55,6 +55,7 @@
     "settingState": "{label} {state}.",
     "showRecentMessages": "Mostrar mensajes recientes",
     "stateOff": "desactivado",
+    "selectOff": "Desactivado",
     "stateOn": "activado",
     "timeHours": "{count} h",
     "timeMinutes": "{count} min",
@@ -117,7 +118,11 @@
     "removedKeywordsWithMissing": "Eliminado: {removed}. No encontrado: {missing}.",
     "watchedKeywords": "Palabras clave seguidas",
     "watchingKeywords": "Siguiendo: {keywords}.",
-    "watchingKeywordsWithDuplicates": "Siguiendo: {added}. Ya existía: {duplicates}."
+    "watchingKeywordsWithDuplicates": "Siguiendo: {added}. Ya existía: {duplicates}.",
+    "translateDraft": "Traducir borrador",
+    "translateDraftTo": "Traducir borrador a",
+    "draftTranslationOff": "Traducción del borrador desactivada.",
+    "draftTranslationTo": "Traducción del borrador a {language}."
   },
   "extension": {
     "extensionName": {
@@ -171,8 +176,8 @@
     "openChatEnhancerWebsite": {
       "message": "Abrir el sitio web de Chat Enhancer"
     },
-    "openGithubRepository": {
-      "message": "Abrir el repositorio de GitHub"
+    "openSourceCode": {
+      "message": "Abrir el código fuente"
     },
     "supportFeedback": {
       "message": "Soporte / Comentarios"
@@ -180,8 +185,8 @@
     "supportAndFeedback": {
       "message": "Soporte y comentarios"
     },
-    "supportGithubIssuesPrompt": {
-      "message": "GitHub Issues es el sistema público que usamos para informes de errores y solicitudes de funciones. Puede requerir una cuenta de GitHub.\n\nTambién puedes escribirnos a chatenhanceryt@gmail.com.\n\n¿Continuar a GitHub Issues?"
+    "supportIssueTrackerPrompt": {
+      "message": "Se te redirigirá a nuestro sistema público de incidencias para informes de errores y solicitudes de funciones. Puede requerir una cuenta.\n\nTambién puedes escribirnos a chatenhanceryt@gmail.com.\n\n¿Continuar al sistema de incidencias?"
     },
     "resetAllExtensionData": {
       "message": "Restablecer toda la configuración y los datos locales"

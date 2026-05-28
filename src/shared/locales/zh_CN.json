@@ -55,6 +55,7 @@
     "settingState": "{label} {state}。",
     "showRecentMessages": "显示最近消息",
     "stateOff": "关闭",
+    "selectOff": "关闭",
     "stateOn": "开启",
     "timeHours": "{count} 小时",
     "timeMinutes": "{count} 分钟",
@@ -117,7 +118,11 @@
     "removedKeywordsWithMissing": "已移除：{removed}。未找到：{missing}。",
     "watchedKeywords": "关注的关键词",
     "watchingKeywords": "正在关注：{keywords}。",
-    "watchingKeywordsWithDuplicates": "正在关注：{added}。已存在：{duplicates}。"
+    "watchingKeywordsWithDuplicates": "正在关注：{added}。已存在：{duplicates}。",
+    "translateDraft": "翻译草稿",
+    "translateDraftTo": "将草稿翻译为",
+    "draftTranslationOff": "草稿翻译已关闭。",
+    "draftTranslationTo": "草稿翻译为 {language}。"
   },
   "extension": {
     "extensionName": {
@@ -174,8 +179,8 @@
     "openChatEnhancerWebsite": {
       "message": "打开 Chat Enhancer 网站"
     },
-    "openGithubRepository": {
-      "message": "打开 GitHub 仓库"
+    "openSourceCode": {
+      "message": "打开源代码"
     },
     "supportFeedback": {
       "message": "支持 / 反馈"
@@ -183,8 +188,8 @@
     "supportAndFeedback": {
       "message": "支持和反馈"
     },
-    "supportGithubIssuesPrompt": {
-      "message": "GitHub Issues 是我们用于报告错误和功能请求的公开跟踪器。可能需要 GitHub 账户。\n\n你也可以发送邮件至 chatenhanceryt@gmail.com。\n\n继续前往 GitHub Issues？"
+    "supportIssueTrackerPrompt": {
+      "message": "你将被重定向到我们的公开问题跟踪器，用于报告错误和提交功能请求。可能需要账户。\n\n你也可以发送邮件至 chatenhanceryt@gmail.com。\n\n继续前往问题跟踪器？"
     },
     "resetAllExtensionData": {
       "message": "重置所有扩展设置和本地数据"

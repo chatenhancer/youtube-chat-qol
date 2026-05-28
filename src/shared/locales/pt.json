@@ -55,6 +55,7 @@
     "settingState": "{label} {state}.",
     "showRecentMessages": "Mostrar mensagens recentes",
     "stateOff": "desativado",
+    "selectOff": "Desativado",
     "stateOn": "ativado",
     "timeHours": "{count} h",
     "timeMinutes": "{count} min",
@@ -117,7 +118,11 @@
     "removedKeywordsWithMissing": "Removido: {removed}. Não encontrado: {missing}.",
     "watchedKeywords": "Palavras-chave monitoradas",
     "watchingKeywords": "Monitorando: {keywords}.",
-    "watchingKeywordsWithDuplicates": "Monitorando: {added}. Já existia: {duplicates}."
+    "watchingKeywordsWithDuplicates": "Monitorando: {added}. Já existia: {duplicates}.",
+    "translateDraft": "Traduzir rascunho",
+    "translateDraftTo": "Traduzir rascunho para",
+    "draftTranslationOff": "Tradução do rascunho desativada.",
+    "draftTranslationTo": "Tradução do rascunho para {language}."
   },
   "extension": {
     "extensionName": {
@@ -174,8 +179,8 @@
     "openChatEnhancerWebsite": {
       "message": "Abrir o site do Chat Enhancer"
     },
-    "openGithubRepository": {
-      "message": "Abrir repositório no GitHub"
+    "openSourceCode": {
+      "message": "Abrir código-fonte"
     },
     "supportFeedback": {
       "message": "Suporte / Feedback"
@@ -183,8 +188,8 @@
     "supportAndFeedback": {
       "message": "Suporte e feedback"
     },
-    "supportGithubIssuesPrompt": {
-      "message": "O GitHub Issues é o rastreador público que usamos para relatórios de bugs e pedidos de recursos. Uma conta do GitHub pode ser necessária.\n\nVocê também pode enviar email para chatenhanceryt@gmail.com.\n\nContinuar para GitHub Issues?"
+    "supportIssueTrackerPrompt": {
+      "message": "Você será redirecionado para nosso rastreador público de problemas para relatórios de bugs e pedidos de recursos. Uma conta pode ser necessária.\n\nVocê também pode enviar email para chatenhanceryt@gmail.com.\n\nContinuar para o rastreador de problemas?"
     },
     "resetAllExtensionData": {
       "message": "Redefinir todas as configurações e dados locais da extensão"

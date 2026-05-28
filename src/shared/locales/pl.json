@@ -55,6 +55,7 @@
     "settingState": "{label} {state}.",
     "showRecentMessages": "Pokaż ostatnie wiadomości",
     "stateOff": "wył.",
+    "selectOff": "Wył.",
     "stateOn": "wł.",
     "timeHours": "{count} godz.",
     "timeMinutes": "{count} min",
@@ -117,7 +118,11 @@
     "removedKeywordsWithMissing": "Usunięto: {removed}. Nie znaleziono: {missing}.",
     "watchedKeywords": "Obserwowane słowa kluczowe",
     "watchingKeywords": "Obserwowane: {keywords}.",
-    "watchingKeywordsWithDuplicates": "Obserwowane: {added}. Już było: {duplicates}."
+    "watchingKeywordsWithDuplicates": "Obserwowane: {added}. Już było: {duplicates}.",
+    "translateDraft": "Przetłumacz szkic",
+    "translateDraftTo": "Przetłumacz szkic na",
+    "draftTranslationOff": "Tłumaczenie szkicu wyłączone.",
+    "draftTranslationTo": "Tłumaczenie szkicu na {language}."
   },
   "extension": {
     "extensionName": {
@@ -171,8 +176,8 @@
     "openChatEnhancerWebsite": {
       "message": "Otwórz stronę Chat Enhancer"
     },
-    "openGithubRepository": {
-      "message": "Otwórz repozytorium GitHub"
+    "openSourceCode": {
+      "message": "Otwórz kod źródłowy"
     },
     "supportFeedback": {
       "message": "Pomoc / opinie"
@@ -180,8 +185,8 @@
     "supportAndFeedback": {
       "message": "Pomoc i opinie"
     },
-    "supportGithubIssuesPrompt": {
-      "message": "GitHub Issues to publiczny tracker, którego używamy do zgłoszeń błędów i próśb o funkcje. Konto GitHub może być wymagane.\n\nMożna też napisać do nas na chatenhanceryt@gmail.com.\n\nPrzejść do GitHub Issues?"
+    "supportIssueTrackerPrompt": {
+      "message": "Nastąpi przekierowanie do naszego publicznego trackera zgłoszeń dla błędów i próśb o funkcje. Konto może być wymagane.\n\nMożna też napisać do nas na chatenhanceryt@gmail.com.\n\nPrzejść do trackera zgłoszeń?"
     },
     "resetAllExtensionData": {
       "message": "Zresetuj wszystkie ustawienia rozszerzenia i dane lokalne"

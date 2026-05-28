@@ -26,6 +26,7 @@ Not affiliated with YouTube or Google.
 
 - Translate live chat messages, with translation off by default
 - Choose whether translations replace the original message or appear below it
+- Translate the message you're typing before sending it, while keeping mentions and emojis intact
 
 ### Reply and context
 
@@ -57,7 +58,7 @@ Not affiliated with YouTube or Google.
 - The extension does not replace YouTube chat
 - The extension does not run analytics
 - The extension does not send data to an extension-owned server
-- When translation is enabled, message text is sent to Google Translate so it can be translated
+- When a translation feature is enabled, incoming message text or draft text you choose to translate is sent to Google Translate so it can be translated
 
 ## Screenshots
 

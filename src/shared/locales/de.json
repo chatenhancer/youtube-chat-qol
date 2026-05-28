@@ -55,6 +55,7 @@
     "settingState": "{label} {state}.",
     "showRecentMessages": "Neueste Nachrichten anzeigen",
     "stateOff": "aus",
+    "selectOff": "Aus",
     "stateOn": "ein",
     "timeHours": "{count} Std.",
     "timeMinutes": "{count} Min.",
@@ -117,7 +118,11 @@
     "removedKeywordsWithMissing": "Entfernt: {removed}. Nicht gefunden: {missing}.",
     "watchedKeywords": "Beobachtete Keywords",
     "watchingKeywords": "Beobachtet: {keywords}.",
-    "watchingKeywordsWithDuplicates": "Beobachtet: {added}. Bereits vorhanden: {duplicates}."
+    "watchingKeywordsWithDuplicates": "Beobachtet: {added}. Bereits vorhanden: {duplicates}.",
+    "translateDraft": "Entwurf übersetzen",
+    "translateDraftTo": "Entwurf übersetzen in",
+    "draftTranslationOff": "Entwurfsübersetzung aus.",
+    "draftTranslationTo": "Entwurfsübersetzung in {language}."
   },
   "extension": {
     "extensionName": {
@@ -171,8 +176,8 @@
     "openChatEnhancerWebsite": {
       "message": "Chat Enhancer-Website öffnen"
     },
-    "openGithubRepository": {
-      "message": "GitHub-Repository öffnen"
+    "openSourceCode": {
+      "message": "Quellcode öffnen"
     },
     "supportFeedback": {
       "message": "Support / Feedback"
@@ -180,8 +185,8 @@
     "supportAndFeedback": {
       "message": "Support und Feedback"
     },
-    "supportGithubIssuesPrompt": {
-      "message": "GitHub Issues ist der öffentliche Tracker, den wir für Fehlerberichte und Funktionswünsche verwenden. Ein GitHub-Konto kann erforderlich sein.\n\nDu kannst uns auch per E-Mail erreichen unter chatenhanceryt@gmail.com.\n\nZu GitHub Issues fortfahren?"
+    "supportIssueTrackerPrompt": {
+      "message": "Du wirst zu unserem öffentlichen Issue-Tracker weitergeleitet, um Fehler zu melden oder Funktionen vorzuschlagen. Ein Konto kann erforderlich sein.\n\nDu kannst uns auch per E-Mail erreichen unter chatenhanceryt@gmail.com.\n\nZum Issue-Tracker fortfahren?"
     },
     "resetAllExtensionData": {
       "message": "Alle Erweiterungseinstellungen und lokalen Daten zurücksetzen"

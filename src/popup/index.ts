@@ -11,7 +11,7 @@ import { getFreshKnownChatTabIds, KNOWN_CHAT_TABS_STORAGE_KEY } from '../shared/
 import { DEFAULT_OPTIONS, getTargetLanguageUpdate, normalizeOptions, type Options } from '../shared/options';
 
 const LANDING_PAGE_URL = 'https://chatenhancer.com';
-const GITHUB_URL = 'https://www.chatenhancer.com/source';
+const SOURCE_CODE_URL = 'https://www.chatenhancer.com/source';
 const SUPPORT_URL = 'https://www.chatenhancer.com/support';
 const BELL_RING_CLASS = 'ytcq-bell-ringing';
 
@@ -19,7 +19,7 @@ type ExtensionStatus = 'checking' | 'active' | 'inactive';
 
 const controls = {
   landingLink: document.querySelector<HTMLAnchorElement>('#landingLink'),
-  githubLink: document.querySelector<HTMLAnchorElement>('#githubLink'),
+  sourceCodeLink: document.querySelector<HTMLAnchorElement>('#sourceCodeLink'),
   supportLink: document.querySelector<HTMLAnchorElement>('#supportLink'),
   resetExtension: document.querySelector<HTMLButtonElement>('#resetExtension'),
   extensionStatus: document.querySelector<HTMLElement>('[data-extension-status]'),
@@ -51,13 +51,13 @@ function init(): void {
     event.preventDefault();
     chrome.tabs.create({ url: LANDING_PAGE_URL });
   });
-  controls.githubLink?.addEventListener('click', (event) => {
+  controls.sourceCodeLink?.addEventListener('click', (event) => {
     event.preventDefault();
-    chrome.tabs.create({ url: GITHUB_URL });
+    chrome.tabs.create({ url: SOURCE_CODE_URL });
   });
   controls.supportLink?.addEventListener('click', (event) => {
     event.preventDefault();
-    const confirmed = window.confirm(getExtensionMessage('supportGithubIssuesPrompt'));
+    const confirmed = window.confirm(getExtensionMessage('supportIssueTrackerPrompt'));
     if (!confirmed) return;
     chrome.tabs.create({ url: SUPPORT_URL });
   });

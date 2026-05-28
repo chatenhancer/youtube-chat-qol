@@ -55,6 +55,7 @@
     "settingState": "{label} {state}.",
     "showRecentMessages": "Показати останні повідомлення",
     "stateOff": "вимк.",
+    "selectOff": "Вимк.",
     "stateOn": "увімк.",
     "timeHours": "{count} год",
     "timeMinutes": "{count} хв",
@@ -117,7 +118,11 @@
     "removedKeywordsWithMissing": "Видалено: {removed}. Не знайдено: {missing}.",
     "watchedKeywords": "Відстежувані ключові слова",
     "watchingKeywords": "Відстежується: {keywords}.",
-    "watchingKeywordsWithDuplicates": "Відстежується: {added}. Уже було: {duplicates}."
+    "watchingKeywordsWithDuplicates": "Відстежується: {added}. Уже було: {duplicates}.",
+    "translateDraft": "Перекласти чернетку",
+    "translateDraftTo": "Перекласти чернетку на",
+    "draftTranslationOff": "Переклад чернетки вимкнено.",
+    "draftTranslationTo": "Переклад чернетки на {language}."
   },
   "extension": {
     "extensionName": {
@@ -171,8 +176,8 @@
     "openChatEnhancerWebsite": {
       "message": "Відкрити сайт Chat Enhancer"
     },
-    "openGithubRepository": {
-      "message": "Відкрити репозиторій GitHub"
+    "openSourceCode": {
+      "message": "Відкрити вихідний код"
     },
     "supportFeedback": {
       "message": "Підтримка / відгуки"
@@ -180,8 +185,8 @@
     "supportAndFeedback": {
       "message": "Підтримка та відгуки"
     },
-    "supportGithubIssuesPrompt": {
-      "message": "GitHub Issues — це публічний трекер, який ми використовуємо для звітів про помилки й запитів функцій. Може знадобитися обліковий запис GitHub.\n\nВи також можете написати нам на chatenhanceryt@gmail.com.\n\nПерейти до GitHub Issues?"
+    "supportIssueTrackerPrompt": {
+      "message": "Вас буде перенаправлено до нашого публічного трекера звернень для звітів про помилки й запитів функцій. Може знадобитися обліковий запис.\n\nВи також можете написати нам на chatenhanceryt@gmail.com.\n\nПерейти до трекера звернень?"
     },
     "resetAllExtensionData": {
       "message": "Скинути всі налаштування розширення та локальні дані"

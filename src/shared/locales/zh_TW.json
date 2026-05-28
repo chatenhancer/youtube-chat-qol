@@ -55,6 +55,7 @@
     "settingState": "{label}{state}。",
     "showRecentMessages": "顯示最近訊息",
     "stateOff": "關閉",
+    "selectOff": "關閉",
     "stateOn": "開啟",
     "timeHours": "{count} 小時",
     "timeMinutes": "{count} 分",
@@ -117,7 +118,11 @@
     "removedKeywordsWithMissing": "已移除：{removed}。找不到：{missing}。",
     "watchedKeywords": "關注的關鍵字",
     "watchingKeywords": "正在關注：{keywords}。",
-    "watchingKeywordsWithDuplicates": "正在關注：{added}。已存在：{duplicates}。"
+    "watchingKeywordsWithDuplicates": "正在關注：{added}。已存在：{duplicates}。",
+    "translateDraft": "翻譯草稿",
+    "translateDraftTo": "將草稿翻譯為",
+    "draftTranslationOff": "草稿翻譯已關閉。",
+    "draftTranslationTo": "草稿翻譯為 {language}。"
   },
   "extension": {
     "extensionName": {
@@ -171,8 +176,8 @@
     "openChatEnhancerWebsite": {
       "message": "開啟 Chat Enhancer 網站"
     },
-    "openGithubRepository": {
-      "message": "開啟 GitHub 儲存庫"
+    "openSourceCode": {
+      "message": "開啟原始碼"
     },
     "supportFeedback": {
       "message": "支援 / 回饋"
@@ -180,8 +185,8 @@
     "supportAndFeedback": {
       "message": "支援與回饋"
     },
-    "supportGithubIssuesPrompt": {
-      "message": "GitHub Issues 是我們用於回報錯誤和功能請求的公開追蹤器。可能需要 GitHub 帳號。\n\n你也可以寄信到 chatenhanceryt@gmail.com。\n\n繼續前往 GitHub Issues？"
+    "supportIssueTrackerPrompt": {
+      "message": "你將被重新導向到我們的公開問題追蹤器，用於錯誤回報和功能請求。可能需要帳號。\n\n你也可以寄信到 chatenhanceryt@gmail.com。\n\n繼續前往問題追蹤器？"
     },
     "resetAllExtensionData": {
       "message": "重設所有擴充功能設定與本機資料"

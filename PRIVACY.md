@@ -14,9 +14,9 @@ Chat Enhancer for YouTube is designed for YouTube live chat. The extension runs 
 
 ## Translation
 
-Translation is `Off` by default. When translation is set to `Off`, chat message text is not sent to a translation provider.
+Translation features are `Off` by default. When chat translation and draft translation are off, chat message text and typed draft text are not sent to a translation provider.
 
-When a target language is selected, eligible visible and incoming chat message text is sent to Google's public `https://translate.googleapis.com/translate_a/single` endpoint from the extension background service worker. The extension sends the message text and target language so Google can return a translated string.
+When a target language is selected for chat translation, eligible visible and incoming chat message text is sent to Google's public `https://translate.googleapis.com/translate_a/single` endpoint from the extension background service worker. When draft translation is enabled from the chat box, the draft text you choose to translate is sent to the same endpoint. The extension sends the text and target language so Google can return a translated string.
 
 The extension does not send your YouTube cookies or credentials with translation requests.
 

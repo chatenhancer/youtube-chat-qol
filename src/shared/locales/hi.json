@@ -55,6 +55,7 @@
     "settingState": "{label} {state}.",
     "showRecentMessages": "हाल के मैसेज दिखाएं",
     "stateOff": "बंद",
+    "selectOff": "बंद",
     "stateOn": "चालू",
     "timeHours": "{count} घंटे",
     "timeMinutes": "{count} मिनट",
@@ -117,7 +118,11 @@
     "removedKeywordsWithMissing": "हटाया गया: {removed}. नहीं मिला: {missing}.",
     "watchedKeywords": "देखे जा रहे कीवर्ड",
     "watchingKeywords": "देख रहे हैं: {keywords}.",
-    "watchingKeywordsWithDuplicates": "देख रहे हैं: {added}. पहले से था: {duplicates}."
+    "watchingKeywordsWithDuplicates": "देख रहे हैं: {added}. पहले से था: {duplicates}.",
+    "translateDraft": "ड्राफ्ट अनुवाद करें",
+    "translateDraftTo": "ड्राफ्ट का अनुवाद इसमें करें",
+    "draftTranslationOff": "ड्राफ्ट अनुवाद बंद है.",
+    "draftTranslationTo": "ड्राफ्ट का अनुवाद {language} में."
   },
   "extension": {
     "extensionName": {
@@ -174,8 +179,8 @@
     "openChatEnhancerWebsite": {
       "message": "Chat Enhancer वेबसाइट खोलें"
     },
-    "openGithubRepository": {
-      "message": "GitHub रिपॉज़िटरी खोलें"
+    "openSourceCode": {
+      "message": "सोर्स कोड खोलें"
     },
     "supportFeedback": {
       "message": "सपोर्ट / फ़ीडबैक"
@@ -183,8 +188,8 @@
     "supportAndFeedback": {
       "message": "सपोर्ट और फ़ीडबैक"
     },
-    "supportGithubIssuesPrompt": {
-      "message": "GitHub Issues वह सार्वजनिक tracker है जिसका उपयोग हम bug reports और feature requests के लिए करते हैं। GitHub खाते की ज़रूरत हो सकती है।\n\nआप हमें chatenhanceryt@gmail.com पर ईमेल भी कर सकते हैं।\n\nGitHub Issues पर जाएँ?"
+    "supportIssueTrackerPrompt": {
+      "message": "Bug reports और feature requests के लिए आपको हमारे public issue tracker पर भेजा जाएगा। खाते की ज़रूरत हो सकती है।\n\nआप हमें chatenhanceryt@gmail.com पर ईमेल भी कर सकते हैं।\n\nIssue tracker पर जाएँ?"
     },
     "resetAllExtensionData": {
       "message": "सभी एक्सटेंशन सेटिंग और लोकल डेटा रीसेट करें"

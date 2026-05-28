@@ -55,6 +55,7 @@
     "settingState": "{label} {state}.",
     "showRecentMessages": "نمایش پیام‌های اخیر",
     "stateOff": "خاموش",
+    "selectOff": "خاموش",
     "stateOn": "روشن",
     "timeHours": "{count} ساعت",
     "timeMinutes": "{count} دقیقه",
@@ -117,7 +118,11 @@
     "removedKeywordsWithMissing": "حذف شد: {removed}. پیدا نشد: {missing}.",
     "watchedKeywords": "کلمات کلیدی زیر نظر",
     "watchingKeywords": "زیر نظر: {keywords}.",
-    "watchingKeywordsWithDuplicates": "زیر نظر: {added}. از قبل وجود داشت: {duplicates}."
+    "watchingKeywordsWithDuplicates": "زیر نظر: {added}. از قبل وجود داشت: {duplicates}.",
+    "translateDraft": "ترجمه پیش‌نویس",
+    "translateDraftTo": "ترجمه پیش‌نویس به",
+    "draftTranslationOff": "ترجمه پیش‌نویس خاموش است.",
+    "draftTranslationTo": "ترجمه پیش‌نویس به {language}."
   },
   "extension": {
     "extensionName": {
@@ -171,8 +176,8 @@
     "openChatEnhancerWebsite": {
       "message": "باز کردن وب‌سایت Chat Enhancer"
     },
-    "openGithubRepository": {
-      "message": "باز کردن مخزن GitHub"
+    "openSourceCode": {
+      "message": "باز کردن کد منبع"
     },
     "supportFeedback": {
       "message": "پشتیبانی / بازخورد"
@@ -180,8 +185,8 @@
     "supportAndFeedback": {
       "message": "پشتیبانی و بازخورد"
     },
-    "supportGithubIssuesPrompt": {
-      "message": "GitHub Issues رهگیر عمومی‌ای است که برای گزارش باگ و درخواست قابلیت‌ها استفاده می‌کنیم. ممکن است حساب GitHub لازم باشد.\n\nهمچنین می‌توانید به chatenhanceryt@gmail.com ایمیل بزنید.\n\nبه GitHub Issues ادامه می‌دهید؟"
+    "supportIssueTrackerPrompt": {
+      "message": "برای گزارش باگ و درخواست قابلیت‌ها به ردیاب عمومی مشکلات ما هدایت می‌شوید. ممکن است حساب لازم باشد.\n\nهمچنین می‌توانید به chatenhanceryt@gmail.com ایمیل بزنید.\n\nبه ردیاب مشکلات ادامه می‌دهید؟"
     },
     "resetAllExtensionData": {
       "message": "بازنشانی همه تنظیمات افزونه و داده‌های محلی"

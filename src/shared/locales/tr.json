@@ -55,6 +55,7 @@
     "settingState": "{label} {state}.",
     "showRecentMessages": "Son mesajları göster",
     "stateOff": "kapalı",
+    "selectOff": "Kapalı",
     "stateOn": "açık",
     "timeHours": "{count} sa",
     "timeMinutes": "{count} dk",
@@ -117,7 +118,11 @@
     "removedKeywordsWithMissing": "Kaldırıldı: {removed}. Bulunamadı: {missing}.",
     "watchedKeywords": "İzlenen anahtar kelimeler",
     "watchingKeywords": "İzleniyor: {keywords}.",
-    "watchingKeywordsWithDuplicates": "İzleniyor: {added}. Zaten vardı: {duplicates}."
+    "watchingKeywordsWithDuplicates": "İzleniyor: {added}. Zaten vardı: {duplicates}.",
+    "translateDraft": "Taslağı çevir",
+    "translateDraftTo": "Taslağı şuna çevir",
+    "draftTranslationOff": "Taslak çevirisi kapalı.",
+    "draftTranslationTo": "Taslak çevirisi {language}."
   },
   "extension": {
     "extensionName": {
@@ -174,8 +179,8 @@
     "openChatEnhancerWebsite": {
       "message": "Chat Enhancer web sitesini aç"
     },
-    "openGithubRepository": {
-      "message": "GitHub deposunu aç"
+    "openSourceCode": {
+      "message": "Kaynak kodu aç"
     },
     "supportFeedback": {
       "message": "Destek / Geri bildirim"
@@ -183,8 +188,8 @@
     "supportAndFeedback": {
       "message": "Destek ve geri bildirim"
     },
-    "supportGithubIssuesPrompt": {
-      "message": "GitHub Issues, hata bildirimleri ve özellik istekleri için kullandığımız herkese açık izleyicidir. GitHub hesabı gerekebilir.\n\nBize şu adresten de e-posta gönderebilirsin: chatenhanceryt@gmail.com.\n\nGitHub Issues’a devam edilsin mi?"
+    "supportIssueTrackerPrompt": {
+      "message": "Hata bildirimleri ve özellik istekleri için herkese açık sorun takipçimize yönlendirileceksin. Hesap gerekebilir.\n\nBize şu adresten de e-posta gönderebilirsin: chatenhanceryt@gmail.com.\n\nSorun takipçisine devam edilsin mi?"
     },
     "resetAllExtensionData": {
       "message": "Tüm uzantı ayarlarını ve yerel verileri sıfırla"

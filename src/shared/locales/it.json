@@ -55,6 +55,7 @@
     "settingState": "{label} {state}.",
     "showRecentMessages": "Mostra messaggi recenti",
     "stateOff": "disattivato",
+    "selectOff": "Disattivato",
     "stateOn": "attivato",
     "timeHours": "{count} h",
     "timeMinutes": "{count} min",
@@ -117,7 +118,11 @@
     "removedKeywordsWithMissing": "Rimosso: {removed}. Non trovato: {missing}.",
     "watchedKeywords": "Parole chiave monitorate",
     "watchingKeywords": "Monitoraggio: {keywords}.",
-    "watchingKeywordsWithDuplicates": "Monitoraggio: {added}. Già presente: {duplicates}."
+    "watchingKeywordsWithDuplicates": "Monitoraggio: {added}. Già presente: {duplicates}.",
+    "translateDraft": "Traduci bozza",
+    "translateDraftTo": "Traduci bozza in",
+    "draftTranslationOff": "Traduzione della bozza disattivata.",
+    "draftTranslationTo": "Traduzione della bozza in {language}."
   },
   "extension": {
     "extensionName": {
@@ -174,8 +179,8 @@
     "openChatEnhancerWebsite": {
       "message": "Apri il sito web di Chat Enhancer"
     },
-    "openGithubRepository": {
-      "message": "Apri repository GitHub"
+    "openSourceCode": {
+      "message": "Apri codice sorgente"
     },
     "supportFeedback": {
       "message": "Supporto / Feedback"
@@ -183,8 +188,8 @@
     "supportAndFeedback": {
       "message": "Supporto e feedback"
     },
-    "supportGithubIssuesPrompt": {
-      "message": "GitHub Issues è il tracker pubblico che usiamo per segnalazioni di bug e richieste di funzionalità. Potrebbe essere necessario un account GitHub.\n\nPuoi anche scriverci a chatenhanceryt@gmail.com.\n\nContinuare su GitHub Issues?"
+    "supportIssueTrackerPrompt": {
+      "message": "Verrai reindirizzato al nostro tracker pubblico dei problemi per segnalazioni di bug e richieste di funzionalità. Potrebbe essere necessario un account.\n\nPuoi anche scriverci a chatenhanceryt@gmail.com.\n\nContinuare al tracker dei problemi?"
     },
     "resetAllExtensionData": {
       "message": "Reimposta tutte le impostazioni e i dati locali dell'estensione"

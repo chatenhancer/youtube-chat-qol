@@ -55,6 +55,7 @@
     "settingState": "{label} {state}.",
     "showRecentMessages": "Recente berichten tonen",
     "stateOff": "uit",
+    "selectOff": "Uit",
     "stateOn": "aan",
     "timeHours": "{count} uur",
     "timeMinutes": "{count} min",
@@ -117,7 +118,11 @@
     "removedKeywordsWithMissing": "Verwijderd: {removed}. Niet gevonden: {missing}.",
     "watchedKeywords": "Gevolgde trefwoorden",
     "watchingKeywords": "Volgt: {keywords}.",
-    "watchingKeywordsWithDuplicates": "Volgt: {added}. Bestond al: {duplicates}."
+    "watchingKeywordsWithDuplicates": "Volgt: {added}. Bestond al: {duplicates}.",
+    "translateDraft": "Concept vertalen",
+    "translateDraftTo": "Concept vertalen naar",
+    "draftTranslationOff": "Conceptvertaling uit.",
+    "draftTranslationTo": "Conceptvertaling naar {language}."
   },
   "extension": {
     "extensionName": {
@@ -171,8 +176,8 @@
     "openChatEnhancerWebsite": {
       "message": "Chat Enhancer-website openen"
     },
-    "openGithubRepository": {
-      "message": "GitHub-repository openen"
+    "openSourceCode": {
+      "message": "Broncode openen"
     },
     "supportFeedback": {
       "message": "Support / Feedback"
@@ -180,8 +185,8 @@
     "supportAndFeedback": {
       "message": "Support en feedback"
     },
-    "supportGithubIssuesPrompt": {
-      "message": "GitHub Issues is de openbare tracker die we gebruiken voor bugmeldingen en functieverzoeken. Een GitHub-account kan nodig zijn.\n\nJe kunt ons ook mailen op chatenhanceryt@gmail.com.\n\nDoorgaan naar GitHub Issues?"
+    "supportIssueTrackerPrompt": {
+      "message": "Je wordt doorgestuurd naar onze openbare issue-tracker voor bugmeldingen en functieverzoeken. Een account kan nodig zijn.\n\nJe kunt ons ook mailen op chatenhanceryt@gmail.com.\n\nDoorgaan naar de issue-tracker?"
     },
     "resetAllExtensionData": {
       "message": "Alle extensie-instellingen en lokale gegevens resetten"

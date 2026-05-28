@@ -79,7 +79,7 @@
         }
       })();
     </script>
-    <link rel="stylesheet" href="styles.css?v=94">
+    <link rel="stylesheet" href="styles.css?v=108">
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -205,7 +205,7 @@
           <p class="eyebrow" data-i18n="hero.eyebrow">Browser extension for YouTube live chat</p>
           <h1 id="hero-title">Chat Enhancer for YouTube</h1>
           <p class="hero-copy" data-i18n="hero.copy">
-            Follow busy chats, keep track of conversations, and participate more easily in YouTube live chat.
+            Keep up with fast-moving YouTube live chats, understand more of what people are saying, find the messages that matter, and reply naturally without losing your place.
           </p>
           <div class="hero-actions">
             <a class="button button-primary" href="#install">
@@ -239,8 +239,8 @@
               </span>
               <h3 data-i18n="features.translationTitle">Translate live chat</h3>
               <p data-i18n="features.translationBody">
-                Choose a target language in the extension popup, then quickly
-                toggle translation from YouTube's live chat settings.
+                Translate incoming chat from YouTube's settings, or translate
+                the message you're typing before you send it.
               </p>
             </article>
             <article class="feature">
@@ -319,9 +319,9 @@
                     <div class="showcase-brand">
                       <img src="assets/logo.png" width="178" height="60" alt="Chat Enhancer for YouTube">
                     </div>
-                    <h3 data-i18n="screenshots.translationTitle">Read live chat<br>in your language</h3>
+                    <h3 data-i18n-html="screenshots.translationTitle">Read and write<br>across languages</h3>
                     <p data-i18n="screenshots.translationBody">
-                      Incoming messages are automatically translated with Google Translate into the language you choose.
+                      Incoming messages can be translated automatically. The chat box can also translate what you're typing before you send it.
                     </p>
                     <p>
                       <span data-i18n-html="screenshots.translationHighlightHtml">Automated translations are highlighted with a <span class="showcase-underline">subtle underline</span> and a Google Translate icon</span>
@@ -338,11 +338,13 @@
                         <p>
                           <img class="sample-avatar" src="assets/avatar.png" width="22" height="22" alt="" aria-hidden="true">
                           <span class="sample-muted">@猫爪软乎乎</span>
-                          <span class="showcase-underline" data-i18n="screenshots.replaceModeSample">Thank you!</span>
-                          <span class="translate-mark" aria-hidden="true">
-                            <svg viewBox="0 0 24 24" focusable="false">
-                              <path d="M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0014.07 6H17V4h-7V2H8v2H1v2h11.17a15.7 15.7 0 01-2.86 4.63A15.07 15.07 0 017.22 7H5.2a17.2 17.2 0 002.77 5.03l-5.09 5.02L4.3 18.47l5.01-5.01 3.11 3.11.45-1.5ZM18.5 10h-2L12 22h2l1.13-3h4.74L21 22h2l-4.5-12Zm-2.62 7l1.62-4.33L19.12 17h-3.24Z"></path>
-                            </svg>
+                          <span class="translation-sample-result">
+                            <span class="showcase-underline" data-i18n="screenshots.replaceModeSample">Thank you!</span>
+                            <span class="translate-mark" aria-hidden="true">
+                              <svg viewBox="0 0 24 24" focusable="false">
+                                <path d="M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0014.07 6H17V4h-7V2H8v2H1v2h11.17a15.7 15.7 0 01-2.86 4.63A15.07 15.07 0 017.22 7H5.2a17.2 17.2 0 002.77 5.03l-5.09 5.02L4.3 18.47l5.01-5.01 3.11 3.11.45-1.5ZM18.5 10h-2L12 22h2l1.13-3h4.74L21 22h2l-4.5-12Zm-2.62 7l1.62-4.33L19.12 17h-3.24Z"></path>
+                              </svg>
+                            </span>
                           </span>
                         </p>
                       </div>
@@ -414,8 +416,8 @@
                         <dd data-i18n="screenshots.commandTimeUntilBody">Insert the time left until a local time</dd>
                       </div>
                       <div>
-                        <dt><code>/help</code></dt>
-                        <dd data-i18n="screenshots.commandHelpBody">Open the full command list</dd>
+                        <dt><code>/watch &lt;word&gt;</code></dt>
+                        <dd data-i18n="screenshots.commandWatchBody">Save matching messages to your inbox</dd>
                       </div>
                     </dl>
                     <a class="feature-link showcase-command-link" href="#commands">
@@ -600,7 +602,7 @@
             </div>
             <div>
               <dt data-i18n="privacy.translationTitle">Translation</dt>
-              <dd data-i18n="privacy.translationBody">Off by default. If enabled, message text is sent to Google Translate without your YouTube cookies or credentials.</dd>
+              <dd data-i18n="privacy.translationBody">Off by default. If enabled, incoming chat text or draft text you choose to translate is sent to Google Translate without your YouTube cookies or credentials.</dd>
             </div>
             <div>
               <dt data-i18n="privacy.trackingTitle">Tracking</dt>
@@ -620,7 +622,7 @@
           <p class="eyebrow" data-i18n="commands.eyebrow">Reference</p>
           <h2 id="commands-title" data-i18n="commands.title">Chat commands expand with Tab</h2>
           <p class="section-copy" data-i18n="commands.copy">
-            Type a command in YouTube's chat input, then press <kbd>Tab</kbd>.
+            Type a command in YouTube's chat box, then press <kbd>Tab</kbd>.
             Commands do not send automatically, and unknown slash commands are
             left alone. Use <code>//</code> to send a literal slash command.
           </p>
@@ -724,7 +726,7 @@
                       <code>/translate es hello</code>
                       <span class="command-aliases"><span data-i18n="commands.aliasesLabel">Aliases:</span> <code>/tr</code></span>
                     </dt>
-                    <dd data-i18n="commands.translateDescription">Translate custom text into a language.</dd>
+                    <dd data-i18n="commands.translateDescription">Translate custom text in the chat box before sending it.</dd>
                   </div>
                 </dl>
               </article>
@@ -827,6 +829,7 @@
           if (event.target === supportModal) closeSupportModal();
         });
 
+        setupStoreVersionAlertScrollFade();
         void checkStoreVersionStatus();
 
         if (!installActions || !chromeButton || !firefoxButton) return;
@@ -863,6 +866,28 @@
 
           message.textContent = bodyTemplate.replace("{stores}", storeList);
           alert.hidden = false;
+        }
+
+        function setupStoreVersionAlertScrollFade() {
+          const alert = document.querySelector("[data-store-version-alert]");
+          if (!alert) return;
+
+          let frame = 0;
+          const update = () => {
+            frame = 0;
+            const progress = Math.min(Math.max(window.scrollY / 80, 0), 1);
+            alert.style.setProperty("--store-version-alert-opacity", String(1 - progress));
+            alert.style.setProperty("--store-version-alert-offset", `${Math.round(progress * -8)}px`);
+            alert.classList.toggle("store-version-alert-faded", progress >= 0.98);
+          };
+          const schedule = () => {
+            if (frame) return;
+            frame = window.requestAnimationFrame(update);
+          };
+
+          window.addEventListener("scroll", schedule, { passive: true });
+          window.addEventListener("resize", schedule);
+          update();
         }
 
         function formatStoreList(stores, conjunction) {

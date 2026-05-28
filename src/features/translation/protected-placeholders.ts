@@ -125,6 +125,16 @@ export function createTranslationPlan(message: HTMLElement, originalText: string
   };
 }
 
+export function createTranslationPlanFromNodes(nodes: NodeListOf<ChildNode> | Node[], originalText: string): TranslationPlan {
+  const protectedTokens: ProtectedToken[] = [];
+  const domText = getTranslationTextFromNodes(nodes, protectedTokens);
+
+  return {
+    text: cleanText(domText || replaceProtectedTextWithPlaceholders(originalText, protectedTokens)),
+    protectedTokens
+  };
+}
+
 export function restorePlaceholdersToText(text: string, protectedTokens: ProtectedToken[]): string {
   return createNodesWithPlaceholders(text, protectedTokens)
     .map((node) => node.textContent || (node instanceof Element ? node.getAttribute('alt') || '' : ''))
@@ -236,7 +246,7 @@ function getTranslationTextFromNode(node: Node, protectedTokens: ProtectedToken[
   }
 
   if (!(node instanceof Element)) return '';
-  if (isIgnoredMessageContentElement(node)) return '';
+  if (isIgnoredTranslationContentElement(node)) return '';
   if (node.classList.contains('ytcq-replaced-translation-icon')) return '';
 
   if (isEmojiElement(node)) {
@@ -250,6 +260,28 @@ function getTranslationTextFromNode(node: Node, protectedTokens: ProtectedToken[
   const childText = getTranslationTextFromNodes(node.childNodes, protectedTokens);
   if (childText || node.childNodes.length) return childText;
   return replaceProtectedTextWithPlaceholders(node.textContent || '', protectedTokens);
+}
+
+function isIgnoredTranslationContentElement(element: Element): boolean {
+  if (
+    isIgnoredMessageContentElement(element) ||
+    element.getAttribute('aria-hidden') === 'true' ||
+    element.hasAttribute('hidden')
+  ) {
+    return true;
+  }
+
+  const role = element.getAttribute('role');
+  if (role && ['listbox', 'menu', 'menuitem', 'option', 'tooltip'].includes(role)) {
+    return true;
+  }
+
+  if (element instanceof HTMLElement && element.isConnected) {
+    const style = window.getComputedStyle(element);
+    return style.display === 'none' || style.visibility === 'hidden';
+  }
+
+  return false;
 }
 
 function getEmojiRunItem(node: Node): { fallbackText: string; node: Node } | null {

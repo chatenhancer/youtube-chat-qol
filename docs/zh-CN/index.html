@@ -79,7 +79,7 @@
         }
       })();
     </script>
-    <link rel="stylesheet" href="../styles.css?v=94">
+    <link rel="stylesheet" href="../styles.css?v=108">
     <script type="application/ld+json">
       {
               "@context": "https://schema.org",
@@ -204,7 +204,7 @@
           <img class="hero-icon" src="../assets/icons/icon-128.png" width="72" height="72" alt="">
           <p class="eyebrow" data-i18n="hero.eyebrow">适用于 YouTube 直播聊天的浏览器扩展</p>
           <h1 id="hero-title">Chat Enhancer for YouTube</h1>
-          <p class="hero-copy" data-i18n="hero.copy">在 YouTube 直播聊天中跟上繁忙聊天，掌握对话脉络，并更轻松地参与。</p>
+          <p class="hero-copy" data-i18n="hero.copy">轻松跟上快速滚动的 YouTube 直播聊天，更好地理解大家在说什么，找到重要消息，并在不丢失当前位置的情况下自然回复。</p>
           <div class="hero-actions">
             <a class="button button-primary" href="#install">
               <span class="button-icon" data-symbol="install_desktop" aria-hidden="true">
@@ -236,7 +236,7 @@
                 </svg>
               </span>
               <h3 data-i18n="features.translationTitle">翻译直播聊天</h3>
-              <p data-i18n="features.translationBody">在扩展弹窗中选择目标语言，然后从 YouTube 直播聊天设置中快速切换翻译。</p>
+              <p data-i18n="features.translationBody">从 YouTube 设置翻译收到的聊天，或在发送前翻译你正在输入的消息。</p>
             </article>
             <article class="feature">
               <span class="feature-icon" data-symbol="alternate_email" aria-hidden="true">
@@ -300,8 +300,8 @@
                     <div class="showcase-brand">
                       <img src="../assets/logo.png" width="178" height="60" alt="Chat Enhancer for YouTube">
                     </div>
-                    <h3 data-i18n="screenshots.translationTitle">用你的语言阅读直播聊天</h3>
-                    <p data-i18n="screenshots.translationBody">收到的消息会通过 Google Translate 自动翻译成你选择的语言。</p>
+                    <h3 data-i18n-html="screenshots.translationTitle">跨语言<br>阅读和发言</h3>
+                    <p data-i18n="screenshots.translationBody">收到的消息可以自动翻译。聊天输入框也可以在发送前翻译你正在输入的内容。</p>
                     <p>
                       <span data-i18n-html="screenshots.translationHighlightHtml">自动翻译会用<span class="showcase-underline">轻微下划线</span>和 Google Translate 图标标出</span>
                       <span class="translate-mark translate-mark-inline" aria-hidden="true">
@@ -317,11 +317,13 @@
                         <p>
                           <img class="sample-avatar" src="../assets/avatar.png" width="22" height="22" alt="" aria-hidden="true">
                           <span class="sample-muted">@猫爪软乎乎</span>
-                          <span class="showcase-underline" data-i18n="screenshots.replaceModeSample">谢谢！</span>
-                          <span class="translate-mark" aria-hidden="true">
-                            <svg viewBox="0 0 24 24" focusable="false">
-                              <path d="M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0014.07 6H17V4h-7V2H8v2H1v2h11.17a15.7 15.7 0 01-2.86 4.63A15.07 15.07 0 017.22 7H5.2a17.2 17.2 0 002.77 5.03l-5.09 5.02L4.3 18.47l5.01-5.01 3.11 3.11.45-1.5ZM18.5 10h-2L12 22h2l1.13-3h4.74L21 22h2l-4.5-12Zm-2.62 7l1.62-4.33L19.12 17h-3.24Z"></path>
-                            </svg>
+                          <span class="translation-sample-result">
+                            <span class="showcase-underline" data-i18n="screenshots.replaceModeSample">谢谢！</span>
+                            <span class="translate-mark" aria-hidden="true">
+                              <svg viewBox="0 0 24 24" focusable="false">
+                                <path d="M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0014.07 6H17V4h-7V2H8v2H1v2h11.17a15.7 15.7 0 01-2.86 4.63A15.07 15.07 0 017.22 7H5.2a17.2 17.2 0 002.77 5.03l-5.09 5.02L4.3 18.47l5.01-5.01 3.11 3.11.45-1.5ZM18.5 10h-2L12 22h2l1.13-3h4.74L21 22h2l-4.5-12Zm-2.62 7l1.62-4.33L19.12 17h-3.24Z"></path>
+                              </svg>
+                            </span>
                           </span>
                         </p>
                       </div>
@@ -393,8 +395,8 @@
                         <dd data-i18n="screenshots.commandTimeUntilBody">插入距离某个本地时间的剩余时间</dd>
                       </div>
                       <div>
-                        <dt><code>/help</code></dt>
-                        <dd data-i18n="screenshots.commandHelpBody">打开完整命令列表</dd>
+                        <dt><code>/watch &lt;word&gt;</code></dt>
+                        <dd data-i18n="screenshots.commandWatchBody">将匹配消息保存到收件箱</dd>
                       </div>
                     </dl>
                     <a class="feature-link showcase-command-link" href="#commands">
@@ -571,7 +573,7 @@
             </div>
             <div>
               <dt data-i18n="privacy.translationTitle">翻译</dt>
-              <dd data-i18n="privacy.translationBody">默认关闭。启用后，消息文本会发送到 Google Translate，但不会附带你的 YouTube Cookie 或凭据。</dd>
+              <dd data-i18n="privacy.translationBody">默认关闭。启用后，收到的聊天文本或你选择翻译的草稿文本会发送到 Google Translate，但不会附带你的 YouTube Cookie 或凭据。</dd>
             </div>
             <div>
               <dt data-i18n="privacy.trackingTitle">跟踪</dt>
@@ -691,7 +693,7 @@
                       <code>/translate es hello</code>
                       <span class="command-aliases"><span data-i18n="commands.aliasesLabel">别名：</span> <code>/tr</code></span>
                     </dt>
-                    <dd data-i18n="commands.translateDescription">将自定义文本翻译成指定语言。</dd>
+                    <dd data-i18n="commands.translateDescription">在发送前翻译聊天输入框中的自定义文本。</dd>
                   </div>
                 </dl>
               </article>
@@ -794,6 +796,7 @@
           if (event.target === supportModal) closeSupportModal();
         });
 
+        setupStoreVersionAlertScrollFade();
         void checkStoreVersionStatus();
 
         if (!installActions || !chromeButton || !firefoxButton) return;
@@ -830,6 +833,28 @@
 
           message.textContent = bodyTemplate.replace("{stores}", storeList);
           alert.hidden = false;
+        }
+
+        function setupStoreVersionAlertScrollFade() {
+          const alert = document.querySelector("[data-store-version-alert]");
+          if (!alert) return;
+
+          let frame = 0;
+          const update = () => {
+            frame = 0;
+            const progress = Math.min(Math.max(window.scrollY / 80, 0), 1);
+            alert.style.setProperty("--store-version-alert-opacity", String(1 - progress));
+            alert.style.setProperty("--store-version-alert-offset", `${Math.round(progress * -8)}px`);
+            alert.classList.toggle("store-version-alert-faded", progress >= 0.98);
+          };
+          const schedule = () => {
+            if (frame) return;
+            frame = window.requestAnimationFrame(update);
+          };
+
+          window.addEventListener("scroll", schedule, { passive: true });
+          window.addEventListener("resize", schedule);
+          update();
         }
 
         function formatStoreList(stores, conjunction) {

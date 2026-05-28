@@ -55,6 +55,7 @@
     "settingState": "{label} {state}",
     "showRecentMessages": "แสดงข้อความล่าสุด",
     "stateOff": "ปิด",
+    "selectOff": "ปิด",
     "stateOn": "เปิด",
     "timeHours": "{count} ชม.",
     "timeMinutes": "{count} นาที",
@@ -117,7 +118,11 @@
     "removedKeywordsWithMissing": "ลบแล้ว: {removed}. ไม่พบ: {missing}.",
     "watchedKeywords": "คีย์เวิร์ดที่ติดตาม",
     "watchingKeywords": "กำลังติดตาม: {keywords}.",
-    "watchingKeywordsWithDuplicates": "กำลังติดตาม: {added}. มีอยู่แล้ว: {duplicates}."
+    "watchingKeywordsWithDuplicates": "กำลังติดตาม: {added}. มีอยู่แล้ว: {duplicates}.",
+    "translateDraft": "แปลข้อความร่าง",
+    "translateDraftTo": "แปลข้อความร่างเป็น",
+    "draftTranslationOff": "ปิดการแปลข้อความร่างอยู่",
+    "draftTranslationTo": "แปลข้อความร่างเป็น {language}"
   },
   "extension": {
     "extensionName": {
@@ -171,8 +176,8 @@
     "openChatEnhancerWebsite": {
       "message": "เปิดเว็บไซต์ Chat Enhancer"
     },
-    "openGithubRepository": {
-      "message": "เปิด GitHub repository"
+    "openSourceCode": {
+      "message": "เปิดซอร์สโค้ด"
     },
     "supportFeedback": {
       "message": "ช่วยเหลือ / ความเห็น"
@@ -180,8 +185,8 @@
     "supportAndFeedback": {
       "message": "ช่วยเหลือและความเห็น"
     },
-    "supportGithubIssuesPrompt": {
-      "message": "GitHub Issues เป็นตัวติดตามสาธารณะที่เราใช้สำหรับรายงานบั๊กและคำขอฟีเจอร์ อาจต้องมีบัญชี GitHub\n\nคุณสามารถส่งอีเมลหาเราได้ที่ chatenhanceryt@gmail.com.\n\nต้องการไปต่อที่ GitHub Issues หรือไม่?"
+    "supportIssueTrackerPrompt": {
+      "message": "คุณจะถูกส่งต่อไปยังตัวติดตามปัญหาสาธารณะของเราสำหรับรายงานบั๊กและคำขอฟีเจอร์ อาจต้องมีบัญชี\n\nคุณสามารถส่งอีเมลหาเราได้ที่ chatenhanceryt@gmail.com.\n\nต้องการไปต่อที่ตัวติดตามปัญหาหรือไม่?"
     },
     "resetAllExtensionData": {
       "message": "รีเซ็ตการตั้งค่าส่วนขยายและข้อมูลในเครื่องทั้งหมด"
