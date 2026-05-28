@@ -4,14 +4,14 @@
  * Offers a temporary input-adjacent panel for continuing a conversation with a
  * selected chatter. It is intentionally local and current-page only.
  */
-import { t } from '../shared/i18n';
-import { captureScrollPosition, restoreScrollPositionAfterRender, scrollElementToBottom } from '../shared/scroll';
-import { findChatInput, getChatInputText, replaceChatInput } from '../youtube/chat-input';
-import { CHAT_MESSAGE_SELECTOR } from '../youtube/selectors';
-import { getChannelUrl, openChannelWindow } from './channel-popup';
-import { isCurrentUserAuthorName } from './mention-detection';
-import type { MessageTranslationRecord } from './user-message-history';
-import { createFocusRecord, findFocusRecordForMessage } from './focus-mode/records';
+import { t } from '../../shared/i18n';
+import { captureScrollPosition, restoreScrollPositionAfterRender, scrollElementToBottom } from '../../shared/scroll';
+import { findChatInput, getChatInputText, replaceChatInput } from '../../youtube/chat-input';
+import { CHAT_MESSAGE_SELECTOR } from '../../youtube/selectors';
+import { getChannelUrl, openChannelWindow } from '../channel-popup';
+import { isCurrentUserAuthorName } from '../mention-detection';
+import type { MessageTranslationRecord } from '../user-message-history';
+import { createFocusRecord, findFocusRecordForMessage } from './records';
 import {
   getAuthorInitial,
   getFocusMentionPrefix,
@@ -19,9 +19,9 @@ import {
   isSameFocusSource,
   normalizeFocusSource,
   startsWithFocusMention
-} from './focus-mode/source';
-import { renderFocusMessageText } from './focus-mode/translation';
-import type { FocusRecord, FocusSource } from './focus-mode/types';
+} from './source';
+import { renderFocusMessageText } from './translation';
+import type { FocusRecord, FocusSource } from './types';
 
 const SEND_BUTTON_SELECTOR = [
   '#send-button',
@@ -274,7 +274,7 @@ function wireFocusMessageQuote(item: HTMLElement, record: FocusRecord): void {
 }
 
 async function quoteFocusRecord(record: FocusRecord): Promise<void> {
-  const { quoteAuthorRichText } = await import('./reply');
+  const { quoteAuthorRichText } = await import('../reply');
   quoteAuthorRichText(record.authorName, record.text, {
     segments: record.contentParts
   }, { skipFocusPrompt: true });
