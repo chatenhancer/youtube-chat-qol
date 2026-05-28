@@ -20,11 +20,11 @@ export function createTranslateCommand(runtime: ChatCommandRuntime): ChatCommand
     acceptsArguments: true,
     argumentOptions: createTranslationTextLanguageOptions,
     helpDescriptionKey: 'commandHelpTranslate',
-    helpLabel: '/translate, /t, /tr',
+    helpLabel: '/translate, /tr',
     hideExactArgumentAutocomplete: false,
     inline: true,
     kind: 'text',
-    names: ['translate', 't', 'tr'],
+    names: ['translate', 'tr'],
     run: (parsed) => executeTranslateTextCommand(parsed, runtime),
     runInline: (parsed) => executeInlineTranslateTextCommand(parsed, runtime)
   };

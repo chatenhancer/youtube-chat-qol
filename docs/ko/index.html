@@ -79,7 +79,7 @@
         }
       })();
     </script>
-    <link rel="stylesheet" href="../styles.css?v=85">
+    <link rel="stylesheet" href="../styles.css?v=94">
     <script type="application/ld+json">
       {
               "@context": "https://schema.org",
@@ -171,7 +171,7 @@
       hidden
       data-store-version-alert
       data-i18n-attr="data-alert-body:install.updatePendingBody;data-alert-and:install.updatePendingAnd;data-alert-chrome:install.chromeStore;data-alert-firefox:install.firefoxAddons"
-      data-alert-body="{stores}에 곧 최신 버전이 제공됩니다."
+      data-alert-body="최신 릴리스가 아직 {stores}에서 대기 중입니다."
       data-alert-and="및"
       data-alert-chrome="Chrome Web Store"
       data-alert-firefox="Firefox Add-ons"
@@ -214,7 +214,7 @@
               </span>
               <span data-i18n="hero.primaryCta">설치</span>
             </a>
-            <a class="button button-secondary" href="#features" data-i18n="hero.secondaryCta">기능 보기</a>
+            <a class="button button-text" href="#features" data-i18n="hero.secondaryCta">기능 보기</a>
           </div>
         </div>
         <div class="hero-media" aria-hidden="true">
@@ -281,7 +281,7 @@
                 </svg>
               </span>
               <h3 data-i18n="features.commandsTitle">채팅 명령</h3>
-              <p data-i18n="features.commandsBody">Tab을 눌러 짧은 채팅 명령을 멘션, 인용, 반복 메시지, 시간 도우미, 설정으로 바꿉니다.</p>
+              <p data-i18n="features.commandsBody">Tab을 눌러 짧은 채팅 명령을 멘션, 인용, 시간 도우미, 번역, 받은함 감시, 설정으로 바꿀 수 있습니다.</p>
               <a class="feature-link" href="#commands" data-i18n="features.commandsLink">명령 참고 보기</a>
             </article>
           </div>
@@ -458,8 +458,8 @@
             </a>
             <a class="button button-link" href="https://www.chatenhancer.com/support" data-support-modal-trigger>
               <span class="button-icon" data-symbol="bug_report" aria-hidden="true">
-                <svg viewBox="0 0 24 24" focusable="false">
-                  <path d="M12 21q-1.625 0-3.012-.8T6.8 18H4v-2h2.1q-.075-.5-.088-1T6 14H4v-2h2q0-.5.012-1t.088-1H4V8h2.8q.35-.575.788-1.075T8.6 6.05L7 4.4L8.4 3l2.15 2.15q.7-.225 1.425-.225t1.425.225L15.6 3L17 4.4l-1.65 1.65q.575.375 1.038.862T17.2 8H20v2h-2.1q.075.5.088 1T18 12h2v2h-2q0 .5-.013 1t-.087 1H20v2h-2.8q-.8 1.4-2.187 2.2T12 21m-2-5h4v-2h-4zm0-4h4v-2h-4z"></path>
+                <svg viewBox="0 -960 960 960" focusable="false">
+                  <path d="M480-200q66 0 113-47t47-113v-160q0-66-47-113t-113-47q-66 0-113 47t-47 113v160q0 66 47 113t113 47Zm-80-120h160v-80H400v80Zm0-160h160v-80H400v80Zm80 40Zm0 320q-65 0-120.5-32T272-240H160v-80h84q-3-20-3.5-40t-.5-40h-80v-80h80q0-20 .5-40t3.5-40h-84v-80h112q14-23 31.5-43t40.5-35l-64-66 56-56 86 86q28-9 57-9t57 9l88-86 56 56-66 66q23 15 41.5 34.5T688-640h112v80h-84q3 20 3.5 40t.5 40h80v80h-80q0 20-.5 40t-3.5 40h84v80H688q-32 56-87.5 88T480-120Z"></path>
                 </svg>
               </span>
               <span data-i18n="install.supportFeedback">지원</span>
@@ -595,63 +595,127 @@
           <div class="command-notes" aria-label="Command usage notes">
             <article class="command-note">
               <p>
-                <strong data-i18n="commands.inlineTitle">인라인 명령:</strong> <span data-i18n="commands.inlineBody">/mention, /reply, /time, /timeuntil은 문장 안에서 확장할 수 있습니다.</span>
+                <strong data-i18n="commands.inlineTitle">인라인 명령:</strong> <span data-i18n="commands.inlineBody">/mention, /m, /reply, /r, /time, /t, /when, /wh, /timeuntil, /tu, /timesince, /ts, /translate, /tr은 문장 안에서 펼칠 수 있습니다.</span>
               </p>
             </article>
             <article class="command-note">
               <p>
-                <strong data-i18n="commands.wholeTitle">전체 입력 명령:</strong> <span data-i18n="commands.wholeBody">/quote, /again, /repeat, /help 및 모든 /set... 명령은 입력창의 유일한 텍스트여야 합니다.</span>
+                <strong data-i18n="commands.wholeTitle">전체 입력 명령:</strong> <span data-i18n="commands.wholeBody">/quote, /q, /again, /repeat, /watch, /w, /unwatch, /uw, /focus, /f, /who, /help 및 모든 /set... 명령은 입력창의 유일한 텍스트여야 합니다.</span>
               </p>
             </article>
           </div>
 
           <div class="command-groups">
-            <article class="command-group">
-              <h3 data-i18n="commands.textCommandsTitle">텍스트 명령</h3>
-              <dl class="command-list">
-                <div>
-                  <dt><code>/mention</code> or <code>/reply</code></dt>
-                  <dd data-i18n="commands.mentionDescription">최신 받은 편지함 메시지의 작성자를 멘션합니다.</dd>
-                </div>
-                <div>
-                  <dt><code>/quote</code></dt>
-                  <dd data-i18n="commands.quoteDescription">받은 편지함에 저장된 최신 메시지를 인용합니다.</dd>
-                </div>
-                <div>
-                  <dt><code>/again</code> or <code>/repeat</code></dt>
-                  <dd data-i18n="commands.repeatDescription">가능한 경우 풍부한 이모지 콘텐츠를 포함해 마지막으로 보낸 메시지를 복원합니다.</dd>
-                </div>
-                <div>
-                  <dt><code>/time utc</code></dt>
-                  <dd><span data-i18n="commands.timeDescription">지원되는 시간대 또는 도시의 현재 시간을 삽입합니다.</span><br><span class="command-detail"><span data-i18n="commands.timeAliases">지원되는 별칭:</span> <code>utc</code>, <code>tokyo</code>, <code>jst</code>, <code>seoul</code>, <code>kst</code>, <code>london</code>, <code>paris</code>, <code>madrid</code>, <code>newyork</code>, <code>nyc</code>, <code>et</code>, <code>eastern</code>, <code>losangeles</code>, <code>la</code>, <code>pt</code>, and <code>pacific</code>.</span></dd>
-                </div>
-                <div>
-                  <dt><code>/timeuntil 7:45pm</code></dt>
-                  <dd><span data-i18n="commands.timeUntilDescription">다음에 일치하는 현지 시간까지 남은 시간을 삽입합니다.</span><br><span class="command-detail"><span data-i18n="commands.timeUntilFormats">허용되는 형식:</span> <code>7</code>, <code>7am</code>, <code>7 am</code>, <code>7:45am</code>, <code>7:45 am</code>, <code>19</code>, <code>19:00</code>, <code>19:00:30</code>, and <code>7:45:30 pm</code>.</span></dd>
-                </div>
-                <div>
-                  <dt><code>/help</code></dt>
-                  <dd data-i18n="commands.helpDescription">YouTube 채팅 안에서 명령 도움말 카드를 엽니다.</dd>
-                </div>
-              </dl>
-            </article>
-            <article class="command-group">
-              <h3 data-i18n="commands.settingCommandsTitle">설정 명령</h3>
-              <dl class="command-list">
-                <div>
-                  <dt><code>/settranslateto english</code> or <code>/settranslateto off</code></dt>
-                  <dd data-i18n="commands.setTranslateDescription">번역 대상 언어를 설정합니다. 번역을 비활성화하려면 off를 사용하세요.</dd>
-                </div>
-                <div>
-                  <dt><code>/settranslationdisplay replace</code> or <code>/settranslationdisplay below</code></dt>
-                  <dd data-i18n="commands.setDisplayDescription">원본 메시지를 번역으로 대체합니다. 번역을 아래에 표시하려면 below를 사용하세요.</dd>
-                </div>
-                <div>
-                  <dt><code>/setsound on</code> or <code>/setsound off</code></dt>
-                  <dd data-i18n="commands.setSoundDescription">받은 편지함 소리를 켜거나 끕니다.</dd>
-                </div>
-              </dl>
-            </article>
+            <div class="command-column">
+              <article class="command-group">
+                <h3 data-i18n="commands.textCommandsTitle">텍스트 명령</h3>
+                <dl class="command-list">
+                  <div>
+                    <dt>
+                      <code>/mention</code>
+                      <span class="command-aliases"><span data-i18n="commands.aliasesLabel">별칭:</span> <code>/m</code> <code>/reply</code> <code>/r</code></span>
+                    </dt>
+                    <dd data-i18n="commands.mentionDescription">받은함의 최신 메시지 작성자를 멘션합니다.</dd>
+                  </div>
+                  <div>
+                    <dt>
+                      <code>/quote</code>
+                      <span class="command-aliases"><span data-i18n="commands.aliasesLabel">별칭:</span> <code>/q</code></span>
+                    </dt>
+                    <dd data-i18n="commands.quoteDescription">핸들 없이 사용하면 가장 최근 inbox 메시지를 인용합니다. @handle을 쓰면 해당 사용자의 최근에 본 메시지를 인용합니다.</dd>
+                  </div>
+                  <div>
+                    <dt>
+                      <code>/again</code>
+                      <span class="command-aliases"><span data-i18n="commands.aliasesLabel">별칭:</span> <code>/repeat</code></span>
+                    </dt>
+                    <dd data-i18n="commands.repeatDescription">마지막으로 보낸 메시지를 복원합니다.</dd>
+                  </div>
+                  <div>
+                    <dt>
+                      <code>/focus @handle</code>
+                      <span class="command-aliases"><span data-i18n="commands.aliasesLabel">별칭:</span> <code>/f</code></span>
+                    </dt>
+                    <dd data-i18n="commands.focusDescription">@handle을 쓰면 해당 사용자의 Focus mode를 엽니다. 핸들 없이 사용하면 나를 마지막으로 멘션한 사용자에게 포커스합니다.</dd>
+                  </div>
+                  <div>
+                    <dt><code>/who @handle</code></dt>
+                    <dd data-i18n="commands.whoDescription">최근 사용자 카드를 엽니다.</dd>
+                  </div>
+                  <div>
+                    <dt><code>/help</code></dt>
+                    <dd data-i18n="commands.helpDescription">이 목록을 표시합니다.</dd>
+                  </div>
+                </dl>
+              </article>
+              <article class="command-group">
+                <h3 data-i18n="commands.inboxCommandsTitle">받은 편지함</h3>
+                <dl class="command-list">
+                  <div>
+                    <dt>
+                      <code>/watch keyword</code>
+                      <span class="command-aliases"><span data-i18n="commands.aliasesLabel">별칭:</span> <code>/w</code></span>
+                    </dt>
+                    <dd data-i18n="commands.watchDescription">감시할 키워드나 문구를 추가합니다. 텍스트 없이 사용하면 현재 감시 목록을 보여줍니다.</dd>
+                  </div>
+                  <div>
+                    <dt>
+                      <code>/unwatch keyword</code>
+                      <span class="command-aliases"><span data-i18n="commands.aliasesLabel">별칭:</span> <code>/uw</code></span>
+                    </dt>
+                    <dd data-i18n="commands.unwatchDescription">키워드 또는 문구 감시를 중지합니다.</dd>
+                  </div>
+                </dl>
+              </article>
+            </div>
+            <div class="command-column">
+              <article class="command-group">
+                <h3 data-i18n="commands.timeTranslationCommandsTitle">시간 및 번역</h3>
+                <dl class="command-list">
+                  <div>
+                    <dt>
+                      <code>/time</code>
+                      <span class="command-aliases"><span data-i18n="commands.aliasesLabel">별칭:</span> <code>/t</code> <span data-i18n="commands.exampleLabel">예:</span> <code>/time utc</code></span>
+                    </dt>
+                    <dd><span data-i18n="commands.timeDescription">현재 로컬 시간 또는 지원되는 장소/시간대의 현재 시간을 삽입합니다.</span><br><span class="command-detail"><span data-i18n="commands.timeAliases">지원되는 별칭:</span> <code>utc</code>, <code>tokyo</code>, <code>jst</code>, <code>seoul</code>, <code>kst</code>, <code>london</code>, <code>paris</code>, <code>madrid</code>, <code>newyork</code>, <code>nyc</code>, <code>et</code>, <code>eastern</code>, <code>losangeles</code>, <code>la</code>, <code>pt</code>, and <code>pacific</code>.</span></dd>
+                  </div>
+                  <div>
+                    <dt>
+                      <code>/when 7:45pm</code>
+                      <span class="command-aliases"><span data-i18n="commands.aliasesLabel">별칭:</span> <code>/wh</code> <code>/timeuntil</code> <code>/tu</code> <code>/timesince</code> <code>/ts</code></span>
+                    </dt>
+                    <dd><span data-i18n="commands.whenDescription">시간/날짜까지 또는 이후의 기간을 삽입합니다.</span><br><span class="command-detail"><span data-i18n="commands.timeUntilFormats">허용되는 형식:</span> <code>7pm</code>, <code>19:00</code>, <code>2026-6-12</code>, <code>2026-06-12 19:00</code>, <code>tomorrow 8pm</code>, and <code>yesterday 14:30</code>.</span></dd>
+                  </div>
+                  <div>
+                    <dt>
+                      <code>/translate es hello</code>
+                      <span class="command-aliases"><span data-i18n="commands.aliasesLabel">별칭:</span> <code>/tr</code></span>
+                    </dt>
+                    <dd data-i18n="commands.translateDescription">사용자 지정 텍스트를 언어로 번역합니다.</dd>
+                  </div>
+                </dl>
+              </article>
+              <article class="command-group">
+                <h3 data-i18n="commands.settingCommandsTitle">설정 명령</h3>
+                <dl class="command-list">
+                  <div>
+                    <dt>
+                      <code>/settranslateto english</code>
+                      <span class="command-aliases"><span data-i18n="commands.aliasesLabel">별칭:</span> <code>/lang en</code> <code>/lang off</code></span>
+                    </dt>
+                    <dd data-i18n="commands.setTranslateDescription">번역 언어를 설정합니다. off를 사용하면 번역을 끕니다. 언어 없이 /lang을 사용하면 현재 대상을 보여줍니다.</dd>
+                  </div>
+                  <div>
+                    <dt><code>/settranslationdisplay replace|below</code></dt>
+                    <dd data-i18n="commands.setDisplayDescription">번역 표시 방식을 설정합니다.</dd>
+                  </div>
+                  <div>
+                    <dt><code>/setsound on|off</code></dt>
+                    <dd data-i18n="commands.setSoundDescription">받은함 소리를 설정합니다.</dd>
+                  </div>
+                </dl>
+              </article>
+            </div>
           </div>
         </div>
       </section>

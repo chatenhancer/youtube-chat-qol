@@ -7,7 +7,7 @@
 <p>
   <a href="https://chromewebstore.google.com/detail/pkhaaipeppfpakofgpdpcpkflangpghf"><img alt="chrome web store" src="https://img.shields.io/chrome-web-store/v/pkhaaipeppfpakofgpdpcpkflangpghf?label=chrome%20web%20store"></a>
   <a href="https://addons.mozilla.org/firefox/addon/chat-enhancer-for-youtube/"><img alt="firefox add-ons" src="https://img.shields.io/amo/v/chat-enhancer-for-youtube?label=firefox%20add-ons"></a>
-  <img alt="package version" src="https://img.shields.io/github/package-json/v/chat-enhancer-yt/youtube-chat-qol?label=package">
+  <img alt="source version" src="https://img.shields.io/github/package-json/v/chat-enhancer-yt/youtube-chat-qol?label=source">
   <a href="https://github.com/chat-enhancer-yt/youtube-chat-qol/actions/workflows/ci.yml"><img alt="ci" src="https://img.shields.io/github/actions/workflow/status/chat-enhancer-yt/youtube-chat-qol/ci.yml?label=ci"></a>
   <img alt="typescript" src="https://img.shields.io/badge/typescript-5.x-3178c6">
   <img alt="manifest v3" src="https://img.shields.io/badge/manifest-v3-4285f4">
@@ -17,6 +17,8 @@
 Suite of enhancements that make YouTube live chat easier to follow and participate in.
 
 Not affiliated with YouTube or Google.
+
+[Website](https://www.chatenhancer.com) · [Chrome Web Store](https://chromewebstore.google.com/detail/pkhaaipeppfpakofgpdpcpkflangpghf) · [Firefox Add-ons](https://addons.mozilla.org/firefox/addon/chat-enhancer-for-youtube/)
 
 ## Features
 
@@ -35,15 +37,20 @@ Not affiliated with YouTube or Google.
 
 ### Inbox
 
-- Keep a local inbox for messages that mention your handle
-- Add watched keywords or phrases and save matching messages in the inbox
-- Highlight mentions and watched keywords in chat
-- Optionally play a subtle sound for new inbox messages
+- Keep a local inbox for messages that mention your handle or match watched keywords/phrases
+- Highlight mentions and watched keywords in chat and in the inbox
+- Jump back to saved messages while they are still visible in chat
+- Optionally play a subtle sound and show tab alerts for new inbox messages
 
 ### Emoji and commands
 
 - Reuse your most-used emojis from a local row in the emoji picker
-- Use Tab-expanded chat commands for mentions, quotes, repeated messages, time helpers, and settings
+- Use Tab-expanded chat commands and autocomplete for mentions, quotes, time helpers, translations, inbox watches, and settings
+
+### Popup and status
+
+- See whether the extension is active in the current tab or other open live chat tabs
+- Configure less-frequent options without crowding YouTube's chat settings menu
 
 ### Privacy
 
@@ -75,7 +82,7 @@ Load it in Chrome, Edge, Brave, Vivaldi, Arc, or another Chromium browser:
 1. Open `chrome://extensions`.
 2. Enable Developer mode.
 3. Click `Load unpacked`.
-4. Select this repository folder or `dist/extension-chrome`.
+4. Select `dist/extension-chrome`.
 
 After source changes, run `npm run build` again and reload the unpacked extension.
 
@@ -128,10 +135,10 @@ MIT. See [LICENSE](LICENSE).
 ## Project layout
 
 - `src/content/` wires features into YouTube live chat.
-- `src/features/` contains chat actions, translation, emoji, profile, inbox, and sound features.
+- `src/features/` contains chat actions, commands, translation, emoji, focus mode, profile cards, inbox, and sound features.
 - `src/youtube/` contains YouTube DOM adapters and selectors.
 - `src/shared/` contains shared options, language data, state, and helpers.
-- `src/background/` contains the translation service worker.
+- `src/background/` contains the translation bridge, toolbar status, and active-chat keepalive service worker modules.
 - `src/popup/` contains the extension action popup.
 - `scripts/` contains build, icon, and release packaging scripts.
 
