@@ -5,11 +5,11 @@
  * YouTube's emoji picker, and inserts selected frequent emojis directly into
  * the chat input. The row is capped so it does not crowd the native emoji list.
  */
-import { getEmojiUsageData, isVariantParentEmoji } from './frequent-emojis/data';
-import { insertEmojiIntoChat } from './frequent-emojis/insert';
-import { renderFrequentEmojiRow as renderFrequentEmojiRowView } from './frequent-emojis/row';
-import type { EmojiUsage } from './frequent-emojis/types';
-import { getTopEmojiUsage, normalizeEmojiUsage, upsertEmojiUsage } from './frequent-emojis/usage';
+import { getEmojiUsageData, isVariantParentEmoji } from './data';
+import { insertEmojiIntoChat } from './insert';
+import { renderFrequentEmojiRow as renderFrequentEmojiRowView } from './row';
+import type { EmojiUsage } from './types';
+import { getTopEmojiUsage, normalizeEmojiUsage, upsertEmojiUsage } from './usage';
 
 const EMOJI_USAGE_STORAGE_KEY = 'ytcqEmojiUsage';
 

@@ -5,23 +5,23 @@
  * that user and an Open channel action. The message history is not persisted;
  * it only exists while the current chat page is open.
  */
-import { t } from '../shared/i18n';
-import { captureScrollPosition, restoreScrollPositionAfterRender, scrollElementToBottom } from '../shared/scroll';
-import { findChatInput } from '../youtube/chat-input';
+import { t } from '../../shared/i18n';
+import { captureScrollPosition, restoreScrollPositionAfterRender, scrollElementToBottom } from '../../shared/scroll';
+import { findChatInput } from '../../youtube/chat-input';
 import {
   getRecentMessagesForIdentity,
   getUserKeyFromIdentity,
   onUserMessagesChanged,
   recordVisibleUserMessages,
   type UserIdentity
-} from './user-message-history';
-import { mentionAuthorName } from './reply';
-import { getChannelUrl, openChannelWindow } from './channel-popup';
-import { createAvatarElement, createProfileAvatarButton } from './profile-popup/elements';
-import { renderProfileMessages, shouldRefreshProfileMessages } from './profile-popup/messages';
-import { keepProfileCardInViewport, positionProfileCard } from './profile-popup/positioning';
-import { getMessageProfileSource, getParticipantProfileSource } from './profile-popup/source';
-import type { ProfileSource } from './profile-popup/types';
+} from '../user-message-history';
+import { mentionAuthorName } from '../reply';
+import { getChannelUrl, openChannelWindow } from '../channel-popup';
+import { createAvatarElement, createProfileAvatarButton } from './elements';
+import { renderProfileMessages, shouldRefreshProfileMessages } from './messages';
+import { keepProfileCardInViewport, positionProfileCard } from './positioning';
+import { getMessageProfileSource, getParticipantProfileSource } from './source';
+import type { ProfileSource } from './types';
 
 let activeProfileCard: HTMLElement | null = null;
 let activeProfileCardCleanup: (() => void) | null = null;
