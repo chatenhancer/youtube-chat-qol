@@ -1,3 +1,9 @@
+/**
+ * Inbox header button.
+ *
+ * Wires the compact Inbox entry point into YouTube's live chat header and keeps
+ * its unread icon, badge, and aria label in sync.
+ */
 import { t } from '../../shared/i18n';
 import { createInboxIcon, formatBadgeCount, setInboxIcon } from './icons';
 

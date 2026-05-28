@@ -1,3 +1,9 @@
+/**
+ * Profile card positioning.
+ *
+ * Places the recent-messages card near the clicked avatar and nudges it back
+ * into the visible chat viewport as content changes.
+ */
 export function positionProfileCard(card: HTMLElement, anchor: HTMLElement): void {
   const anchorRect = anchor.getBoundingClientRect();
   const cardRect = card.getBoundingClientRect();

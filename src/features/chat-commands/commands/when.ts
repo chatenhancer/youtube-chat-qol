@@ -1,3 +1,9 @@
+/**
+ * When command.
+ *
+ * Calculates a localized duration to a future target or from a past target
+ * using flexible date and time inputs.
+ */
 import { t } from '../../../shared/i18n';
 import { formatWhen } from '../time';
 import type { ChatCommandDefinition, ChatCommandRuntime } from '../types';

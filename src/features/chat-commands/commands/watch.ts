@@ -1,3 +1,9 @@
+/**
+ * Watch command.
+ *
+ * Adds watched Inbox keywords or phrases, or shows the current watch list when
+ * used without arguments.
+ */
 import { cleanText } from '../../../shared/text';
 import { showToast } from '../../../shared/toast';
 import { addInboxKeywords, getInboxKeywords } from '../../inbox';

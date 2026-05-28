@@ -1,3 +1,9 @@
+/**
+ * Inbox matching helpers.
+ *
+ * Normalizes watched keywords and mention handles, performs case-insensitive
+ * matching, and exposes conservative record dedupe lookup.
+ */
 import { cleanText } from '../../shared/text';
 import { findMatchingLiveMessageRecordIndex } from '../../youtube/message-dedupe';
 import type { InboxRecord } from './types';

@@ -1,3 +1,9 @@
+/**
+ * Inline translation command helpers.
+ *
+ * Parses /translate arguments, protects emoji and mentions through the shared
+ * placeholder planner, and returns translated text for the chat input.
+ */
 import { t } from '../../shared/i18n';
 import { cleanText } from '../../shared/text';
 import { showToast } from '../../shared/toast';

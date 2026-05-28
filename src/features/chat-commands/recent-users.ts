@@ -1,3 +1,9 @@
+/**
+ * Recent user command resolution.
+ *
+ * Resolves handle arguments for commands such as /quote, /focus, and /who
+ * against the current page's in-memory chat history.
+ */
 import { t } from '../../shared/i18n';
 import { cleanText } from '../../shared/text';
 import { showToast } from '../../shared/toast';

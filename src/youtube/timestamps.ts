@@ -1,3 +1,9 @@
+/**
+ * YouTube chat timestamp parser.
+ *
+ * Converts live clock timestamps and replay elapsed timestamps into comparable
+ * numeric values for sorting chat-derived records.
+ */
 import { cleanText } from '../shared/text';
 
 const CHAT_TIMESTAMP_FUTURE_TOLERANCE_MS = 10 * 60 * 1000;

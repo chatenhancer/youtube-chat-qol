@@ -1,3 +1,9 @@
+/**
+ * Settings commands.
+ *
+ * Maps slash commands to extension option updates and localized confirmation
+ * toasts while keeping these commands whole-input only.
+ */
 import { getLocalizedLanguageLabel, t } from '../../../shared/i18n';
 import { getLanguageLabel, LANGUAGE_OPTIONS } from '../../../shared/languages';
 import { getTargetLanguageUpdate, type TranslationDisplay } from '../../../shared/options';

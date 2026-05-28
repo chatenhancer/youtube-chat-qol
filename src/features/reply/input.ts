@@ -1,3 +1,9 @@
+/**
+ * Reply input insertion.
+ *
+ * Performs mention and quote insertion with short recovery retries for cases
+ * where YouTube is switching panels or late-rendering the chat input.
+ */
 import { t } from '../../shared/i18n';
 import { showToast } from '../../shared/toast';
 import {

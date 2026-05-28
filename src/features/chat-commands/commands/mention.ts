@@ -1,3 +1,9 @@
+/**
+ * Mention command.
+ *
+ * Expands to a mention of the latest Inbox sender in either whole-input or
+ * inline command contexts.
+ */
 import { t } from '../../../shared/i18n';
 import { getLatestInboxRecord } from '../../inbox';
 import { formatMentionText } from '../../reply';

@@ -1,3 +1,9 @@
+/**
+ * Focus mode type definitions.
+ *
+ * Shared record and focused-user identity contracts used by the focus panel
+ * and command integrations.
+ */
 import type { RichTextSegment } from '../../youtube/rich-text';
 import type { MessageTranslationRecord } from '../user-message-history';
 

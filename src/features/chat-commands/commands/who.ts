@@ -1,3 +1,8 @@
+/**
+ * Who command.
+ *
+ * Opens the recent-messages/profile card for a resolved recent chat user.
+ */
 import { t } from '../../../shared/i18n';
 import { cleanText } from '../../../shared/text';
 import { showToast } from '../../../shared/toast';

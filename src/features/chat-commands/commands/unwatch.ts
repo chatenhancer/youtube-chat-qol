@@ -1,3 +1,9 @@
+/**
+ * Unwatch command.
+ *
+ * Removes watched Inbox keywords or phrases using the same quoted-phrase
+ * parsing rules as /watch.
+ */
 import { t } from '../../../shared/i18n';
 import { showToast } from '../../../shared/toast';
 import { getLoadedInboxKeywords, removeInboxKeywords } from '../../inbox';

@@ -1,3 +1,9 @@
+/**
+ * Focus mode source helpers.
+ *
+ * Normalizes focused-user identity, avatar data, and mention matching rules for
+ * deciding which messages belong in a focused conversation.
+ */
 import { cleanText, normalizeComparableText } from '../../shared/text';
 import {
   getAuthorName,

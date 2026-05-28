@@ -1,3 +1,9 @@
+/**
+ * Soft chime sound generator.
+ *
+ * Creates the small Web Audio notification sound used by Inbox alerts and
+ * popup sound previews.
+ */
 let audioContext: AudioContext | null = null;
 
 export function playSoftChime(): void {

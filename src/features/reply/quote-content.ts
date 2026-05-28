@@ -1,3 +1,9 @@
+/**
+ * Rich quote content builder.
+ *
+ * Converts cloned chat message content into safe input nodes, preserving emoji
+ * images while enforcing the quote character budget.
+ */
 import { cleanText } from '../../shared/text';
 import {
   getCleanAttribute,

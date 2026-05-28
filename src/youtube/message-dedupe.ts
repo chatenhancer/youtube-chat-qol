@@ -1,3 +1,9 @@
+/**
+ * Live message dedupe helpers.
+ *
+ * Finds matching records by stable YouTube message ID first, then by live DOM
+ * renderer reference when an ID is unavailable.
+ */
 import { cleanText } from '../shared/text';
 
 export interface LiveMessageRecordRef {

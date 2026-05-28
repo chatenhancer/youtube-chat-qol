@@ -1,3 +1,9 @@
+/**
+ * Profile source extraction.
+ *
+ * Reads author, avatar, channel, and profile URL data from chat messages and
+ * participant-list renderers for the shared profile card.
+ */
 import { cleanText } from '../../shared/text';
 import { getAuthorName, getMessageAvatarSrc, getRendererData } from '../../youtube/messages';
 import { getChannelUrl } from '../channel-popup';

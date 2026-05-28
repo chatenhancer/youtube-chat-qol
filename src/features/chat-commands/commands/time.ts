@@ -1,3 +1,8 @@
+/**
+ * Time command.
+ *
+ * Inserts the current local time or the current time for an aliased timezone.
+ */
 import { t } from '../../../shared/i18n';
 import { CHAT_COMMAND_TIME_ZONES, formatTime } from '../time';
 import type { ChatCommandDefinition, ChatCommandRuntime } from '../types';

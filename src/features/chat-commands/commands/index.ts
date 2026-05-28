@@ -1,3 +1,9 @@
+/**
+ * Chat command registry.
+ *
+ * Composes the individual command modules in the order used by command help
+ * and autocomplete.
+ */
 import type { ChatCommandDefinition, ChatCommandRuntime } from '../types';
 import { createFocusCommand } from './focus';
 import { createHelpCommand } from './help';

@@ -1,3 +1,9 @@
+/**
+ * Inbox state store.
+ *
+ * Owns loaded records, watched keywords, read state, persistence, and prepared
+ * keyword caches for the current chat page.
+ */
 import {
   getCurrentMentionCandidates
 } from '../mention-detection';

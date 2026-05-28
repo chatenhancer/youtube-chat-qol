@@ -1,3 +1,9 @@
+/**
+ * Inbox source scoping.
+ *
+ * Derives a stable per-stream storage URL so saved Inbox records stay scoped to
+ * the current livestream or replay instead of leaking across pages.
+ */
 export function getCurrentInboxSourceUrl(): string {
   return getWatchSourceUrl(window.location.href) ||
     getWatchSourceUrl(document.referrer) ||

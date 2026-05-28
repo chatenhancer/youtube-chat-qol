@@ -1,3 +1,9 @@
+/**
+ * Inbox type definitions.
+ *
+ * Shared contracts for saved Inbox records, match metadata, latest-record
+ * command lookups, and inline highlight planning.
+ */
 import type { RichTextSegment } from '../../youtube/rich-text';
 
 export interface InboxRecord {

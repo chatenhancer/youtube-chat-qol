@@ -1,3 +1,9 @@
+/**
+ * Focus mode record builder.
+ *
+ * Converts visible YouTube chat messages into local focus-panel records and
+ * dedupes them against stable message IDs or live renderer references.
+ */
 import { cleanText } from '../../shared/text';
 import { findMatchingLiveMessageRecordIndex } from '../../youtube/message-dedupe';
 import {
