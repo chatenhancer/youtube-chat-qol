@@ -27,7 +27,7 @@
   },
   "features": {
     "eyebrow": "Built for live streams",
-    "title": "Enhancements where chat already happens",
+    "title": "Enhancements where chat<br>already happens",
     "translationTitle": "Translate live chat",
     "translationBody": "Choose a target language in the extension popup, then quickly toggle translation from YouTube's live chat settings.",
     "mentionTitle": "Mention, quote, and focus",
