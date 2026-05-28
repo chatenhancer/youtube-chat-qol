@@ -5,20 +5,15 @@
  * locally configured keyword/phrase matches. The UI stays compact by sharing
  * one header button, one card, and inline highlights instead of extra labels.
  */
-import { createSvgIcon } from '../../shared/icons';
 import { t } from '../../shared/i18n';
 import { captureScrollPosition, restoreScrollPositionAfterRender, scrollElementToBottom } from '../../shared/scroll';
 import {
   getAuthorName,
-  getMessageContentSourceNodes,
-  getMessageStableId,
-  getMessageText,
-  getMessageTimestampText
+  getMessageText
 } from '../../youtube/messages';
 import { CHAT_MESSAGE_SELECTOR } from '../../youtube/selectors';
 import {
-  appendRichMessageText,
-  serializeRichMessageNodes
+  appendRichMessageText
 } from '../../youtube/rich-text';
 import {
   applyChatKeywordHighlights,
@@ -34,7 +29,6 @@ import {
   keywordsEqual,
   MAX_INBOX_KEYWORDS,
   MAX_KEYWORD_LENGTH,
-  mergeStrings,
   normalizeKeyword,
   prepareKeywords,
   getPreparedKeywordsKey,
@@ -57,21 +51,24 @@ import {
 import { playAlertSound } from './sound';
 import { createJumpToMessageIcon, jumpToChatMessage } from '../message-jump';
 import {
-  getInboxTimestamp,
   loadInboxStoredState,
   saveInboxKeywords as saveInboxKeywordsToStorage,
   saveInboxRecords as saveInboxRecordsToStorage,
   sortAndTrimRecords
 } from './storage';
+import { createAddIcon, createInboxIcon, formatBadgeCount, setInboxIcon } from './icons';
+import {
+  createInboxRecord,
+  hasTransientRecordUpdate,
+  mergeInboxRecords,
+  recordsEqual
+} from './records';
+import { getCurrentInboxSourceUrl } from './source-url';
 import type { InboxMatch, InboxRecord, LatestInboxRecord } from './types';
 export type { LatestInboxRecord };
 
 const MAX_PENDING_INBOX_MESSAGES = 60;
 const HEADER_SELECTOR = 'yt-live-chat-header-renderer';
-const INBOX_ICON_VIEW_BOX = '0 0 24 24';
-const INBOX_ICON_PATH = 'M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2Zm0 12h-4a3 3 0 0 1-6 0H5V5h14v10Z';
-const INBOX_TEXT_ICON_PATH = 'M5 21a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5Zm0-6h4a3 3 0 0 0 6 0h4V5H5v10Zm3-5h8V8H8v2Zm0 3h6v-2H8v2Z';
-const ADD_ICON_PATH = 'M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2Z';
 
 let records: InboxRecord[] = [];
 let keywords: string[] = [];
@@ -431,7 +428,10 @@ function processPotentialKeywordInbox(message: HTMLElement): void {
 }
 
 function recordInboxMatch(message: HTMLElement, match: InboxMatch): void {
-  const record = createInboxRecord(message, match);
+  const record = createInboxRecord(message, match, {
+    getMentionHandles: getMatchedMentionHandles,
+    sourceUrl: getCurrentInboxSourceUrl()
+  });
   if (!record) return;
 
   void loadInboxState().then(() => {
@@ -445,8 +445,8 @@ function recordInboxMatch(message: HTMLElement, match: InboxMatch): void {
 
     if (existingIndex >= 0) {
       const existing = records[existingIndex];
-      const merged = mergeInboxRecords(existing, incoming, isReadNow);
-      const transientChanged = hasTransientRecordUpdate(existing, merged);
+      const merged = mergeInboxRecords(existing, incoming, isReadNow, getLiveInboxMessage);
+      const transientChanged = hasTransientRecordUpdate(existing, merged, getLiveInboxMessage);
       changed = !recordsEqual(existing, merged);
       if (changed || transientChanged) {
         records[existingIndex] = merged;
@@ -475,70 +475,6 @@ function recordInboxMatch(message: HTMLElement, match: InboxMatch): void {
       showInboxTabAlert(getUnreadInboxCount());
     }
   });
-}
-
-function createInboxRecord(message: HTMLElement, match: InboxMatch): InboxRecord | null {
-  const authorName = getAuthorName(message);
-  const text = getMessageText(message);
-  if (!authorName || !text) return null;
-
-  const now = Date.now();
-  const timestampText = getMessageTimestampText(message, now);
-  const timestamp = getInboxTimestamp(message, timestampText, now);
-  const matchedKeywords = mergeStrings([], match.keywords || []);
-  const mentionHandles = match.mention
-    ? mergeStrings([], match.mentionHandles?.length ? match.mentionHandles : getMatchedMentionHandles(text))
-    : [];
-
-  return {
-    id: `${timestamp}-${Math.random().toString(36).slice(2, 8)}`,
-    authorName,
-    contentParts: serializeRichMessageNodes(getMessageContentSourceNodes(message)),
-    matchedKeywords,
-    messageRef: new WeakRef(message),
-    mention: match.mention === true,
-    mentionHandles,
-    messageId: getMessageStableId(message),
-    read: false,
-    sourceUrl: getCurrentSourceUrl(),
-    text,
-    timestamp,
-    timestampText
-  };
-}
-
-function mergeInboxRecords(existing: InboxRecord, incoming: InboxRecord, isReadNow: boolean): InboxRecord {
-  const nextMention = existing.mention || incoming.mention;
-  const nextKeywords = mergeStrings(existing.matchedKeywords, incoming.matchedKeywords);
-  const nextMentionHandles = mergeStrings(existing.mentionHandles, incoming.mentionHandles);
-  const hasNewMatch = (
-    nextMention !== existing.mention ||
-    nextKeywords.length !== existing.matchedKeywords.length ||
-    nextMentionHandles.length !== existing.mentionHandles.length
-  );
-
-  return {
-    ...existing,
-    contentParts: existing.contentParts?.length ? existing.contentParts : incoming.contentParts,
-    matchedKeywords: nextKeywords,
-    messageRef: getLiveInboxMessage(incoming) ? incoming.messageRef : existing.messageRef,
-    mention: nextMention,
-    mentionHandles: nextMentionHandles,
-    messageId: existing.messageId || incoming.messageId,
-    read: hasNewMatch && !isReadNow ? false : existing.read
-  };
-}
-
-function recordsEqual(first: InboxRecord, second: InboxRecord): boolean {
-  return first.read === second.read &&
-    first.messageId === second.messageId &&
-    first.mention === second.mention &&
-    first.matchedKeywords.join('\n') === second.matchedKeywords.join('\n') &&
-    first.mentionHandles.join('\n') === second.mentionHandles.join('\n');
-}
-
-function hasTransientRecordUpdate(existing: InboxRecord, merged: InboxRecord): boolean {
-  return getLiveInboxMessage(existing) !== getLiveInboxMessage(merged);
 }
 
 function renderInboxList(list: HTMLElement): void {
@@ -868,23 +804,6 @@ function refreshKeywordToggle(button: HTMLButtonElement): void {
   }
 }
 
-function createInboxIcon(inboxText = false): SVGSVGElement {
-  return createSvgIcon(INBOX_ICON_VIEW_BOX, inboxText ? INBOX_TEXT_ICON_PATH : INBOX_ICON_PATH);
-}
-
-function setInboxIcon(container: HTMLElement, inboxText: boolean): void {
-  const icon = container.querySelector<SVGSVGElement>('svg');
-  const path = icon?.querySelector<SVGPathElement>('path');
-  const nextPath = inboxText ? INBOX_TEXT_ICON_PATH : INBOX_ICON_PATH;
-  if (path && path.getAttribute('d') !== nextPath) {
-    path.setAttribute('d', nextPath);
-  }
-}
-
-function createAddIcon(): SVGSVGElement {
-  return createSvgIcon(INBOX_ICON_VIEW_BOX, ADD_ICON_PATH);
-}
-
 function getInboxHeaderAnchor(header: HTMLElement): HTMLElement | null {
   return header.querySelector<HTMLElement>('#live-chat-header-context-menu') ||
     getDirectHeaderChild(header, header.querySelector<HTMLElement>('button[aria-label="More options"]')) ||
@@ -959,7 +878,7 @@ function loadInboxState(): Promise<void> {
   if (inboxStateLoaded) return Promise.resolve();
   if (inboxStateLoadPromise) return inboxStateLoadPromise;
 
-  inboxStateLoadPromise = loadInboxStoredState(getCurrentMentionCandidates, getCurrentSourceUrl()).then((stored) => {
+  inboxStateLoadPromise = loadInboxStoredState(getCurrentMentionCandidates, getCurrentInboxSourceUrl()).then((stored) => {
     records = stored.records;
     keywords = stored.keywords;
     refreshPreparedKeywords();
@@ -971,7 +890,7 @@ function loadInboxState(): Promise<void> {
 
 function saveInboxRecords(): Promise<void> {
   records = sortAndTrimRecords(records);
-  return saveInboxRecordsToStorage(records, getCurrentSourceUrl());
+  return saveInboxRecordsToStorage(records, getCurrentInboxSourceUrl());
 }
 
 function saveInboxKeywords(): Promise<void> {
@@ -995,48 +914,6 @@ function refreshPreparedKeywords(): void {
   preparedKeywordsKey = getPreparedKeywordsKey(preparedKeywords);
 }
 
-function getCurrentSourceUrl(): string {
-  return getWatchSourceUrl(window.location.href) ||
-    getWatchSourceUrl(document.referrer) ||
-    getLiveChatSourceUrl(window.location.href) ||
-    getStablePageUrl(window.location.href);
-}
-
-function getWatchSourceUrl(value: string): string {
-  if (!value) return '';
-
-  try {
-    const url = new URL(value);
-    const videoId = url.searchParams.get('v');
-    return videoId ? `https://www.youtube.com/watch?v=${encodeURIComponent(videoId)}` : '';
-  } catch {
-    return '';
-  }
-}
-
-function getLiveChatSourceUrl(value: string): string {
-  if (!value) return '';
-
-  try {
-    const url = new URL(value);
-    const continuation = url.searchParams.get('continuation');
-    if (!continuation || !/\/live_chat(?:_replay)?$/.test(url.pathname)) return '';
-
-    return `${url.origin}${url.pathname}?continuation=${encodeURIComponent(continuation)}`;
-  } catch {
-    return '';
-  }
-}
-
-function getStablePageUrl(value: string): string {
-  try {
-    const url = new URL(value);
-    return `${url.origin}${url.pathname}`;
-  } catch {
-    return value;
-  }
-}
-
 function trackPendingInboxMessage(message: HTMLElement): void {
   pendingInboxMessages.add(message);
   if (pendingInboxMessages.size <= MAX_PENDING_INBOX_MESSAGES) return;
@@ -1053,8 +930,4 @@ function flushPendingInboxMessages(): void {
   messages.forEach((message) => {
     if (message.isConnected) handlePotentialInbox(message);
   });
-}
-
-function formatBadgeCount(count: number): string {
-  return count > 99 ? '99+' : String(count);
 }
