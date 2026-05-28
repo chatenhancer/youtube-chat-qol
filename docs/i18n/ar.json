@@ -148,9 +148,7 @@
     "helpDescription": "فتح بطاقة مساعدة الأوامر داخل دردشة YouTube.",
     "setTranslateDescription": "تعيين لغة هدف الترجمة. استخدم off لتعطيل الترجمة.",
     "setDisplayDescription": "استبدال الرسائل الأصلية بالترجمات. استخدم below لعرض الترجمات أسفلها.",
-    "setQuoteLengthDescription": "تعيين طول الاقتباس إلى 80 أو 120 أو 180 أو 240.",
-    "setSoundDescription": "تشغيل أو إيقاف أصوات صندوق الوارد.",
-    "setPopupDescription": "فتح القنوات في نوافذ منبثقة. استخدم off لفتحها بالطريقة العادية."
+    "setSoundDescription": "تشغيل أو إيقاف أصوات صندوق الوارد."
   },
   "footer": {
     "disclaimer": "Chat Enhancer for YouTube ليس تابعا لـ YouTube أو Google.",

@@ -148,9 +148,7 @@
     "helpDescription": "Öffnet die Befehlshilfe-Karte im YouTube-Chat.",
     "setTranslateDescription": "Legt die Zielübersetzungssprache fest. Nutze off, um Übersetzung zu deaktivieren.",
     "setDisplayDescription": "Ersetzt Originalnachrichten durch Übersetzungen. Nutze below, um Übersetzungen darunter anzuzeigen.",
-    "setQuoteLengthDescription": "Legt die Zitierlänge auf 80, 120, 180 oder 240 fest.",
-    "setSoundDescription": "Schaltet Posteingangstöne ein oder aus.",
-    "setPopupDescription": "Öffnet Kanäle in Popup-Fenstern. Nutze off, um sie normal zu öffnen."
+    "setSoundDescription": "Schaltet Posteingangstöne ein oder aus."
   },
   "footer": {
     "disclaimer": "Chat Enhancer for YouTube ist nicht mit YouTube oder Google verbunden.",

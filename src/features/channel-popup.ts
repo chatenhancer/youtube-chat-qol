@@ -1,5 +1,3 @@
-import { getOptions } from '../shared/state';
-
 const CHANNEL_WINDOW_WIDTH = 486;
 const CHANNEL_WINDOW_HEIGHT = 680;
 const CHANNEL_WINDOW_MARGIN = 12;
@@ -19,10 +17,7 @@ export function getChannelUrl(channelId: string | undefined, authorName: string)
 export function openChannelWindow(url: string): void {
   if (!url) return;
 
-  const features = getOptions().openProfilesInPopup
-    ? getChannelWindowFeatures()
-    : 'noopener';
-  window.open(url, 'ytcq-profile', features);
+  window.open(url, 'ytcq-profile', getChannelWindowFeatures());
 }
 
 function getChannelWindowFeatures(): string {

@@ -18,9 +18,7 @@
     "commandHelpOpenHelp": "Toon deze lijst.",
     "commandHelpSetTranslateTo": "Stel de vertaaltaal in.",
     "commandHelpSetTranslationDisplay": "Stel in hoe vertalingen worden getoond.",
-    "commandHelpSetQuoteLength": "Stel de citaatlengte in.",
     "commandHelpSetSound": "Stel inboxgeluid in.",
-    "commandHelpSetOpenChannelsInPopup": "Stel kanaalpop-upgedrag in.",
     "couldNotFindChatInput": "Kan de chatinvoer niet vinden.",
     "couldNotReadTime": "Kan die tijd niet lezen.",
     "couldNotReadUserName": "Kan die gebruikersnaam niet lezen.",
@@ -41,13 +39,11 @@
     "noPreviousMessageYet": "Nog geen vorig bericht.",
     "noRecentMessages": "Geen recente berichten",
     "openChannel": "Kanaal openen",
-    "openChannelsInPopup": "Kanalen in pop-up openen",
     "original": "Origineel: {text}",
     "originalMessage": "Origineel bericht",
     "pressEnterAgainToSend": "Druk nogmaals op Enter om te verzenden.",
     "pressTabToRunCommand": "Druk op Tab om dit commando uit te voeren.",
     "quote": "Citeren",
-    "quoteLength": "Citaatlengte {count}.",
     "quoteMessage": "Bericht citeren",
     "recentMessages": "Recente berichten",
     "recentMessagesFromThisUser": "Recente berichten van deze gebruiker",
@@ -80,7 +76,6 @@
       "other": "{count} nieuwe berichten"
     },
     "useOnOrOff": "Gebruik aan of uit.",
-    "useQuoteLength": "Gebruik citaatlengte {lengths}.",
     "useReplaceOrBelow": "Gebruik replace of below.",
     "watchingMentions": "Let op vermeldingen",
     "watchingMentionsAndKeywords": "Let op vermeldingen en trefwoorden",
@@ -90,7 +85,7 @@
     "focusingOn": "Gefocust op",
     "noMessagesYet": "Nog geen berichten",
     "refreshChat": "Vernieuwen",
-    "refreshChatTitle": "Vernieuw de chat om de extensie opnieuw te verbinden"
+    "refreshChatTitle": "De extensie is losgekoppeld. Klik om de chat te vernieuwen."
   },
   "extension": {
     "extensionName": {
@@ -188,27 +183,6 @@
     },
     "showBelow": {
       "message": "Eronder tonen"
-    },
-    "chatActions": {
-      "message": "Chatacties"
-    },
-    "quoteLengthTitle": {
-      "message": "Maximaal aantal tekens bij het citeren van een bericht via chatacties of kaarten."
-    },
-    "quoteLengthLabel": {
-      "message": "Citaatlengte"
-    },
-    "quoteLengthHelper": {
-      "message": "Maximaal aantal tekens bij het citeren van berichten."
-    },
-    "openChannelsInPopup": {
-      "message": "Kanalen in pop-up openen"
-    },
-    "openChannelsInPopupTitle": {
-      "message": "Open YouTube-kanaalpagina’s in een kleinere pop-up in plaats van een normale browsertab."
-    },
-    "openChannelsInPopupHelper": {
-      "message": "Gebruik een kleiner venster voor kanalen vanuit avatarkaarten."
     },
     "popupAlerts": {
       "message": "Meldingen"

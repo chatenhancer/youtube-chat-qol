@@ -5,16 +5,12 @@
  * against missing or malformed stored values so old or partial storage state
  * cannot break content-script startup.
  */
-import { clampNumber } from './text';
-
 export type TranslationDisplay = 'replace' | 'below';
 
 export interface Options {
   targetLanguage: string;
   lastTranslationTarget: string;
   translationDisplay: TranslationDisplay;
-  quoteMaxLength: number;
-  openProfilesInPopup: boolean;
   sound: boolean;
 }
 
@@ -24,8 +20,6 @@ export const DEFAULT_OPTIONS: Options = {
   targetLanguage: '',
   lastTranslationTarget: DEFAULT_TRANSLATION_TARGET,
   translationDisplay: 'replace',
-  quoteMaxLength: 120,
-  openProfilesInPopup: true,
   sound: true
 };
 
@@ -33,8 +27,6 @@ export const TRANSLATION_DISPLAY_OPTIONS: readonly (readonly [TranslationDisplay
   ['replace', 'Replace message'],
   ['below', 'Show below']
 ];
-
-export const QUOTE_LENGTH_OPTIONS = [80, 120, 180, 240] as const;
 
 export function normalizeOptions(value: Partial<Options> | Record<string, unknown>): Options {
   const candidate = value as Record<string, unknown>;
@@ -48,8 +40,6 @@ export function normalizeOptions(value: Partial<Options> | Record<string, unknow
     targetLanguage,
     lastTranslationTarget,
     translationDisplay,
-    quoteMaxLength: clampNumber(candidate.quoteMaxLength, 40, 240, DEFAULT_OPTIONS.quoteMaxLength),
-    openProfilesInPopup: candidate.openProfilesInPopup !== false,
     sound: candidate.sound !== false
   };
 }

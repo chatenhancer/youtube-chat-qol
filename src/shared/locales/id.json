@@ -18,9 +18,7 @@
     "commandHelpOpenHelp": "Tampilkan daftar ini.",
     "commandHelpSetTranslateTo": "Atur bahasa terjemahan.",
     "commandHelpSetTranslationDisplay": "Atur cara terjemahan ditampilkan.",
-    "commandHelpSetQuoteLength": "Atur panjang kutipan.",
     "commandHelpSetSound": "Atur suara inbox.",
-    "commandHelpSetOpenChannelsInPopup": "Atur cara channel dibuka.",
     "couldNotFindChatInput": "Tidak dapat menemukan input chat.",
     "couldNotReadTime": "Tidak dapat membaca waktu itu.",
     "couldNotReadUserName": "Tidak dapat membaca nama pengguna itu.",
@@ -41,13 +39,11 @@
     "noPreviousMessageYet": "Belum ada pesan sebelumnya.",
     "noRecentMessages": "Tidak ada pesan terbaru",
     "openChannel": "Buka channel",
-    "openChannelsInPopup": "Buka channel di popup",
     "original": "Asli: {text}",
     "originalMessage": "Pesan asli",
     "pressEnterAgainToSend": "Tekan Enter lagi untuk mengirim.",
     "pressTabToRunCommand": "Tekan Tab untuk menjalankan perintah ini.",
     "quote": "Kutip",
-    "quoteLength": "Panjang kutipan {count}.",
     "quoteMessage": "Kutip pesan",
     "recentMessages": "Pesan terbaru",
     "recentMessagesFromThisUser": "Pesan terbaru dari pengguna ini",
@@ -80,7 +76,6 @@
       "other": "{count} pesan baru"
     },
     "useOnOrOff": "Gunakan on atau off.",
-    "useQuoteLength": "Gunakan panjang kutipan {lengths}.",
     "useReplaceOrBelow": "Gunakan replace atau below.",
     "watchingMentions": "Memantau sebutan",
     "watchingMentionsAndKeywords": "Memantau sebutan dan kata kunci",
@@ -90,7 +85,7 @@
     "focusingOn": "Sedang fokus pada",
     "noMessagesYet": "Belum ada pesan",
     "refreshChat": "Segarkan",
-    "refreshChatTitle": "Segarkan chat untuk menghubungkan kembali ekstensi"
+    "refreshChatTitle": "Ekstensi terputus. Klik untuk menyegarkan chat."
   },
   "extension": {
     "extensionName": {
@@ -191,27 +186,6 @@
     },
     "showBelow": {
       "message": "Tampilkan di bawah"
-    },
-    "chatActions": {
-      "message": "Aksi chat"
-    },
-    "quoteLengthTitle": {
-      "message": "Jumlah karakter maksimum yang disertakan saat mengutip pesan dari aksi chat atau kartu."
-    },
-    "quoteLengthLabel": {
-      "message": "Panjang kutipan"
-    },
-    "quoteLengthHelper": {
-      "message": "Jumlah karakter maksimum yang disertakan saat mengutip pesan."
-    },
-    "openChannelsInPopup": {
-      "message": "Buka channel di popup"
-    },
-    "openChannelsInPopupTitle": {
-      "message": "Buka halaman channel YouTube di jendela popup kecil, bukan tab browser biasa."
-    },
-    "openChannelsInPopupHelper": {
-      "message": "Gunakan jendela kecil untuk halaman channel dari kartu avatar."
     },
     "popupAlerts": {
       "message": "Peringatan"

@@ -18,9 +18,7 @@
     "commandHelpOpenHelp": "显示此列表。",
     "commandHelpSetTranslateTo": "设置翻译语言。",
     "commandHelpSetTranslationDisplay": "设置翻译的显示方式。",
-    "commandHelpSetQuoteLength": "设置引用长度。",
     "commandHelpSetSound": "设置收件箱声音。",
-    "commandHelpSetOpenChannelsInPopup": "设置频道的打开方式。",
     "couldNotFindChatInput": "找不到聊天输入框。",
     "couldNotReadTime": "无法读取该时间。",
     "couldNotReadUserName": "无法读取该用户名。",
@@ -41,13 +39,11 @@
     "noPreviousMessageYet": "还没有上一条消息。",
     "noRecentMessages": "没有最近消息",
     "openChannel": "打开频道",
-    "openChannelsInPopup": "在弹出窗口中打开频道",
     "original": "原文：{text}",
     "originalMessage": "原始消息",
     "pressEnterAgainToSend": "再次按 Enter 发送。",
     "pressTabToRunCommand": "按 Tab 运行此命令。",
     "quote": "引用",
-    "quoteLength": "引用长度 {count}。",
     "quoteMessage": "引用消息",
     "recentMessages": "最近消息",
     "recentMessagesFromThisUser": "此用户的最近消息",
@@ -80,7 +76,6 @@
       "other": "{count} 条新消息"
     },
     "useOnOrOff": "使用 on 或 off。",
-    "useQuoteLength": "使用引用长度 {lengths}。",
     "useReplaceOrBelow": "使用 replace 或 below。",
     "watchingMentions": "正在监视提及",
     "watchingMentionsAndKeywords": "正在监视提及和关键词",
@@ -90,7 +85,7 @@
     "focusingOn": "正在聚焦",
     "noMessagesYet": "暂无消息",
     "refreshChat": "刷新",
-    "refreshChatTitle": "刷新聊天以重新连接扩展程序"
+    "refreshChatTitle": "扩展程序已断开连接。点击刷新聊天。"
   },
   "extension": {
     "extensionName": {
@@ -191,27 +186,6 @@
     },
     "showBelow": {
       "message": "显示在下方"
-    },
-    "chatActions": {
-      "message": "聊天操作"
-    },
-    "quoteLengthTitle": {
-      "message": "从聊天操作或卡片引用消息时包含的最大字符数。"
-    },
-    "quoteLengthLabel": {
-      "message": "引用长度"
-    },
-    "quoteLengthHelper": {
-      "message": "引用消息时包含的最大字符数。"
-    },
-    "openChannelsInPopup": {
-      "message": "在弹出窗口中打开频道"
-    },
-    "openChannelsInPopupTitle": {
-      "message": "在较小的弹出窗口中打开 YouTube 频道页面，而不是普通浏览器标签页。"
-    },
-    "openChannelsInPopupHelper": {
-      "message": "从头像卡片打开频道页面时使用较小窗口。"
     },
     "popupAlerts": {
       "message": "提醒"

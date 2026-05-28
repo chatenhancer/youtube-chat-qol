@@ -148,9 +148,7 @@
     "helpDescription": "YouTube 채팅 안에서 명령 도움말 카드를 엽니다.",
     "setTranslateDescription": "번역 대상 언어를 설정합니다. 번역을 비활성화하려면 off를 사용하세요.",
     "setDisplayDescription": "원본 메시지를 번역으로 대체합니다. 번역을 아래에 표시하려면 below를 사용하세요.",
-    "setQuoteLengthDescription": "인용 길이를 80, 120, 180 또는 240으로 설정합니다.",
-    "setSoundDescription": "받은 편지함 소리를 켜거나 끕니다.",
-    "setPopupDescription": "채널을 팝업 창으로 엽니다. 일반적으로 열려면 off를 사용하세요."
+    "setSoundDescription": "받은 편지함 소리를 켜거나 끕니다."
   },
   "footer": {
     "disclaimer": "Chat Enhancer for YouTube는 YouTube 또는 Google과 제휴하지 않습니다.",

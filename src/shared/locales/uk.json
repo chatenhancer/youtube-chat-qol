@@ -18,9 +18,7 @@
     "commandHelpOpenHelp": "Показати цей список.",
     "commandHelpSetTranslateTo": "Установити мову перекладу.",
     "commandHelpSetTranslationDisplay": "Установити спосіб показу перекладів.",
-    "commandHelpSetQuoteLength": "Установити довжину цитати.",
     "commandHelpSetSound": "Установити звук вхідних.",
-    "commandHelpSetOpenChannelsInPopup": "Установити поведінку спливаючого вікна каналу.",
     "couldNotFindChatInput": "Не вдалося знайти поле чату.",
     "couldNotReadTime": "Не вдалося прочитати цей час.",
     "couldNotReadUserName": "Не вдалося прочитати це ім’я користувача.",
@@ -41,13 +39,11 @@
     "noPreviousMessageYet": "Поки немає попереднього повідомлення.",
     "noRecentMessages": "Немає останніх повідомлень",
     "openChannel": "Відкрити канал",
-    "openChannelsInPopup": "Відкривати канали у спливаючому вікні",
     "original": "Оригінал: {text}",
     "originalMessage": "Оригінальне повідомлення",
     "pressEnterAgainToSend": "Натисніть Enter ще раз, щоб надіслати.",
     "pressTabToRunCommand": "Натисніть Tab, щоб виконати цю команду.",
     "quote": "Цитувати",
-    "quoteLength": "Довжина цитати {count}.",
     "quoteMessage": "Цитувати повідомлення",
     "recentMessages": "Останні повідомлення",
     "recentMessagesFromThisUser": "Останні повідомлення цього користувача",
@@ -80,7 +76,6 @@
       "other": "{count} нових повідомлень"
     },
     "useOnOrOff": "Використайте on або off.",
-    "useQuoteLength": "Використайте довжину цитати {lengths}.",
     "useReplaceOrBelow": "Використайте replace або below.",
     "watchingMentions": "Відстеження згадок",
     "watchingMentionsAndKeywords": "Відстеження згадок і ключових слів",
@@ -90,7 +85,7 @@
     "focusingOn": "Фокус на",
     "noMessagesYet": "Поки немає повідомлень",
     "refreshChat": "Оновити",
-    "refreshChatTitle": "Оновіть чат, щоб знову підключити розширення"
+    "refreshChatTitle": "Розширення від’єдналося. Натисніть, щоб оновити чат."
   },
   "extension": {
     "extensionName": {
@@ -188,27 +183,6 @@
     },
     "showBelow": {
       "message": "Показувати нижче"
-    },
-    "chatActions": {
-      "message": "Дії чату"
-    },
-    "quoteLengthTitle": {
-      "message": "Максимальна кількість символів у цитаті з дій чату або карток."
-    },
-    "quoteLengthLabel": {
-      "message": "Довжина цитати"
-    },
-    "quoteLengthHelper": {
-      "message": "Максимальна кількість символів у цитованих повідомленнях."
-    },
-    "openChannelsInPopup": {
-      "message": "Відкривати канали в popup"
-    },
-    "openChannelsInPopupTitle": {
-      "message": "Відкривати сторінки каналів YouTube у меншому спливаючому вікні замість звичайної вкладки."
-    },
-    "openChannelsInPopupHelper": {
-      "message": "Використовувати менше вікно для каналів із карток аватарів."
     },
     "popupAlerts": {
       "message": "Сповіщення"

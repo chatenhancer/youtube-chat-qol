@@ -18,9 +18,7 @@
     "commandHelpOpenHelp": "Bu listeyi göster.",
     "commandHelpSetTranslateTo": "Çeviri dilini ayarla.",
     "commandHelpSetTranslationDisplay": "Çevirilerin nasıl gösterileceğini ayarla.",
-    "commandHelpSetQuoteLength": "Alıntı uzunluğunu ayarla.",
     "commandHelpSetSound": "Gelen kutusu sesini ayarla.",
-    "commandHelpSetOpenChannelsInPopup": "Kanalların nasıl açılacağını ayarla.",
     "couldNotFindChatInput": "Sohbet girişi bulunamadı.",
     "couldNotReadTime": "Bu saat okunamadı.",
     "couldNotReadUserName": "Bu kullanıcı adı okunamadı.",
@@ -41,13 +39,11 @@
     "noPreviousMessageYet": "Henüz önceki mesaj yok.",
     "noRecentMessages": "Son mesaj yok",
     "openChannel": "Kanalı aç",
-    "openChannelsInPopup": "Kanalları açılır pencerede aç",
     "original": "Orijinal: {text}",
     "originalMessage": "Orijinal mesaj",
     "pressEnterAgainToSend": "Göndermek için tekrar Enter'a basın.",
     "pressTabToRunCommand": "Bu komutu çalıştırmak için Tab'a basın.",
     "quote": "Alıntıla",
-    "quoteLength": "Alıntı uzunluğu {count}.",
     "quoteMessage": "Mesajı alıntıla",
     "recentMessages": "Son mesajlar",
     "recentMessagesFromThisUser": "Bu kullanıcının son mesajları",
@@ -80,7 +76,6 @@
       "other": "{count} yeni mesaj"
     },
     "useOnOrOff": "on veya off kullanın.",
-    "useQuoteLength": "Alıntı uzunluğu {lengths} kullanın.",
     "useReplaceOrBelow": "replace veya below kullanın.",
     "watchingMentions": "Bahsetmeler izleniyor",
     "watchingMentionsAndKeywords": "Bahsetmeler ve anahtar kelimeler izleniyor",
@@ -90,7 +85,7 @@
     "focusingOn": "Odaklanılan",
     "noMessagesYet": "Henüz mesaj yok",
     "refreshChat": "Yenile",
-    "refreshChatTitle": "Uzantıyı yeniden bağlamak için sohbeti yenile"
+    "refreshChatTitle": "Uzantının bağlantısı kesildi. Sohbeti yenilemek için tıkla."
   },
   "extension": {
     "extensionName": {
@@ -191,27 +186,6 @@
     },
     "showBelow": {
       "message": "Altında göster"
-    },
-    "chatActions": {
-      "message": "Sohbet işlemleri"
-    },
-    "quoteLengthTitle": {
-      "message": "Sohbet işlemlerinden veya kartlardan mesaj alıntılarken dahil edilecek en fazla karakter sayısı."
-    },
-    "quoteLengthLabel": {
-      "message": "Alıntı uzunluğu"
-    },
-    "quoteLengthHelper": {
-      "message": "Mesaj alıntılarken dahil edilecek en fazla karakter sayısı."
-    },
-    "openChannelsInPopup": {
-      "message": "Kanalları açılır pencerede aç"
-    },
-    "openChannelsInPopupTitle": {
-      "message": "YouTube kanal sayfalarını normal tarayıcı sekmesi yerine daha küçük bir açılır pencerede aç."
-    },
-    "openChannelsInPopupHelper": {
-      "message": "Avatar kartlarından kanal sayfaları için daha küçük bir pencere kullan."
     },
     "popupAlerts": {
       "message": "Uyarılar"

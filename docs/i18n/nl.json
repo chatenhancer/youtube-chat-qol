@@ -148,9 +148,7 @@
     "helpDescription": "Open de commandohelpkaart in YouTube-chat.",
     "setTranslateDescription": "Stel de doeltaal voor vertaling in. Gebruik off om vertaling uit te schakelen.",
     "setDisplayDescription": "Vervang oorspronkelijke berichten door vertalingen. Gebruik below om vertalingen eronder te tonen.",
-    "setQuoteLengthDescription": "Stel citaatlengte in op 80, 120, 180 of 240.",
-    "setSoundDescription": "Zet inboxgeluid aan of uit.",
-    "setPopupDescription": "Open kanalen in pop-upvensters. Gebruik off om ze normaal te openen."
+    "setSoundDescription": "Zet inboxgeluid aan of uit."
   },
   "footer": {
     "disclaimer": "Chat Enhancer for YouTube is niet verbonden aan YouTube of Google.",

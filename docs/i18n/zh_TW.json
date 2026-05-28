@@ -148,9 +148,7 @@
     "helpDescription": "在 YouTube 聊天室中開啟指令說明卡片。",
     "setTranslateDescription": "設定翻譯目標語言。使用 off 停用翻譯。",
     "setDisplayDescription": "用翻譯取代原始訊息。使用 below 將翻譯顯示在下方。",
-    "setQuoteLengthDescription": "將引用長度設定為 80、120、180 或 240。",
-    "setSoundDescription": "開啟或關閉收件匣音效。",
-    "setPopupDescription": "在彈出視窗開啟頻道。使用 off 以一般方式開啟。"
+    "setSoundDescription": "開啟或關閉收件匣音效。"
   },
   "footer": {
     "disclaimer": "Chat Enhancer for YouTube 與 YouTube 或 Google 無關。",

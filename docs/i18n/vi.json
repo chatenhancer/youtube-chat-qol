@@ -148,9 +148,7 @@
     "helpDescription": "Mở thẻ trợ giúp lệnh trong YouTube chat.",
     "setTranslateDescription": "Đặt ngôn ngữ đích cho dịch. Dùng off để tắt dịch.",
     "setDisplayDescription": "Thay tin nhắn gốc bằng bản dịch. Dùng below để hiển thị bản dịch bên dưới.",
-    "setQuoteLengthDescription": "Đặt độ dài trích dẫn là 80, 120, 180 hoặc 240.",
-    "setSoundDescription": "Bật hoặc tắt âm thanh hộp thư.",
-    "setPopupDescription": "Mở kênh trong cửa sổ popup. Dùng off để mở bình thường."
+    "setSoundDescription": "Bật hoặc tắt âm thanh hộp thư."
   },
   "footer": {
     "disclaimer": "Chat Enhancer for YouTube không liên kết với YouTube hoặc Google.",

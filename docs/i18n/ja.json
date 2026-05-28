@@ -148,9 +148,7 @@
     "helpDescription": "YouTube チャット内でコマンドヘルプカードを開きます。",
     "setTranslateDescription": "翻訳先言語を設定します。翻訳を無効にするには off を使います。",
     "setDisplayDescription": "元のメッセージを翻訳で置き換えます。翻訳を下に表示するには below を使います。",
-    "setQuoteLengthDescription": "引用の長さを 80、120、180、240 に設定します。",
-    "setSoundDescription": "受信トレイの音をオンまたはオフにします。",
-    "setPopupDescription": "チャンネルをポップアップウィンドウで開きます。通常どおり開くには off を使います。"
+    "setSoundDescription": "受信トレイの音をオンまたはオフにします。"
   },
   "footer": {
     "disclaimer": "Chat Enhancer for YouTube は YouTube または Google と提携していません。",

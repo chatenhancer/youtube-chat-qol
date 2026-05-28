@@ -1196,10 +1196,17 @@ yt-live-chat-membership-item-renderer .ytcq-replaced-translation-icon svg,
   pointer-events: none;
 }
 
+.ytcq-reconnect-anchor {
+  position: relative;
+  z-index: 10002;
+  height: 0;
+  pointer-events: none;
+}
+
 .ytcq-reconnect-button {
-  position: fixed;
-  right: 12px;
-  bottom: 72px;
+  position: absolute;
+  left: 50%;
+  bottom: 8px;
   z-index: 9999;
   display: inline-flex;
   align-items: center;
@@ -1216,9 +1223,11 @@ yt-live-chat-membership-item-renderer .ytcq-replaced-translation-icon svg,
   font: 500 11px/14px Roboto, Arial, sans-serif;
   cursor: pointer;
   overflow: hidden;
+  pointer-events: auto;
   -webkit-backdrop-filter: blur(4px);
   backdrop-filter: blur(4px);
   transition: background-color 120ms ease, color 120ms ease;
+  transform: translateX(-50%);
   user-select: none;
 }
 

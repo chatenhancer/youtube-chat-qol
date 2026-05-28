@@ -18,9 +18,7 @@
     "commandHelpOpenHelp": "यह सूची दिखाता है।",
     "commandHelpSetTranslateTo": "अनुवाद भाषा सेट करता है।",
     "commandHelpSetTranslationDisplay": "अनुवाद कैसे दिखें, यह सेट करता है।",
-    "commandHelpSetQuoteLength": "कोट की लंबाई सेट करता है।",
     "commandHelpSetSound": "इनबॉक्स ध्वनि सेट करता है।",
-    "commandHelpSetOpenChannelsInPopup": "चैनल कैसे खुलें, यह सेट करता है।",
     "couldNotFindChatInput": "चैट इनपुट नहीं मिला.",
     "couldNotReadTime": "यह समय पढ़ा नहीं जा सका.",
     "couldNotReadUserName": "यह यूज़र नाम पढ़ा नहीं जा सका.",
@@ -41,13 +39,11 @@
     "noPreviousMessageYet": "अभी कोई पिछला मैसेज नहीं है.",
     "noRecentMessages": "कोई हालिया मैसेज नहीं",
     "openChannel": "चैनल खोलें",
-    "openChannelsInPopup": "चैनल पॉपअप में खोलें",
     "original": "मूल: {text}",
     "originalMessage": "मूल मैसेज",
     "pressEnterAgainToSend": "भेजने के लिए फिर से Enter दबाएं.",
     "pressTabToRunCommand": "यह कमांड चलाने के लिए Tab दबाएं.",
     "quote": "कोट",
-    "quoteLength": "कोट की लंबाई {count}.",
     "quoteMessage": "मैसेज को कोट करें",
     "recentMessages": "हाल के मैसेज",
     "recentMessagesFromThisUser": "इस यूज़र के हाल के मैसेज",
@@ -80,7 +76,6 @@
       "other": "{count} नए मैसेज"
     },
     "useOnOrOff": "on या off इस्तेमाल करें.",
-    "useQuoteLength": "कोट की लंबाई {lengths} इस्तेमाल करें.",
     "useReplaceOrBelow": "replace या below इस्तेमाल करें.",
     "watchingMentions": "मेंशन देखे जा रहे हैं",
     "watchingMentionsAndKeywords": "मेंशन और कीवर्ड देखे जा रहे हैं",
@@ -90,7 +85,7 @@
     "focusingOn": "फ़ोकस किया जा रहा है",
     "noMessagesYet": "अभी कोई संदेश नहीं",
     "refreshChat": "रीफ़्रेश",
-    "refreshChatTitle": "एक्सटेंशन को फिर से जोड़ने के लिए चैट रीफ़्रेश करें"
+    "refreshChatTitle": "एक्सटेंशन डिस्कनेक्ट हो गया. चैट रीफ़्रेश करने के लिए क्लिक करें."
   },
   "extension": {
     "extensionName": {
@@ -191,27 +186,6 @@
     },
     "showBelow": {
       "message": "नीचे दिखाएं"
-    },
-    "chatActions": {
-      "message": "चैट ऐक्शन"
-    },
-    "quoteLengthTitle": {
-      "message": "चैट ऐक्शन या कार्ड से मैसेज को कोट करते समय शामिल किए जाने वाले अधिकतम अक्षर."
-    },
-    "quoteLengthLabel": {
-      "message": "कोट की लंबाई"
-    },
-    "quoteLengthHelper": {
-      "message": "मैसेज को कोट करते समय शामिल किए जाने वाले अधिकतम अक्षर."
-    },
-    "openChannelsInPopup": {
-      "message": "चैनल पॉपअप में खोलें"
-    },
-    "openChannelsInPopupTitle": {
-      "message": "YouTube चैनल पेज को सामान्य ब्राउज़र टैब के बजाय छोटी पॉपअप विंडो में खोलें."
-    },
-    "openChannelsInPopupHelper": {
-      "message": "अवतार कार्ड से चैनल पेज के लिए छोटी विंडो इस्तेमाल करें."
     },
     "popupAlerts": {
       "message": "अलर्ट"

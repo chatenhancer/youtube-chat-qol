@@ -18,9 +18,7 @@
     "commandHelpOpenHelp": "この一覧を表示します。",
     "commandHelpSetTranslateTo": "翻訳言語を設定します。",
     "commandHelpSetTranslationDisplay": "翻訳の表示方法を設定します。",
-    "commandHelpSetQuoteLength": "引用の長さを設定します。",
     "commandHelpSetSound": "受信箱サウンドを設定します。",
-    "commandHelpSetOpenChannelsInPopup": "チャンネルの開き方を設定します。",
     "couldNotFindChatInput": "チャット入力欄が見つかりません。",
     "couldNotReadTime": "その時刻を読み取れませんでした。",
     "couldNotReadUserName": "そのユーザー名を読み取れませんでした。",
@@ -41,13 +39,11 @@
     "noPreviousMessageYet": "前のメッセージはまだありません。",
     "noRecentMessages": "最近のメッセージはありません",
     "openChannel": "チャンネルを開く",
-    "openChannelsInPopup": "チャンネルをポップアップで開く",
     "original": "元の文: {text}",
     "originalMessage": "元のメッセージ",
     "pressEnterAgainToSend": "送信するにはもう一度 Enter を押します。",
     "pressTabToRunCommand": "このコマンドを実行するには Tab キーを押します。",
     "quote": "引用",
-    "quoteLength": "引用の長さ {count}。",
     "quoteMessage": "メッセージを引用",
     "recentMessages": "最近のメッセージ",
     "recentMessagesFromThisUser": "このユーザーの最近のメッセージ",
@@ -80,7 +76,6 @@
       "other": "新着メッセージ {count} 件"
     },
     "useOnOrOff": "on または off を使ってください。",
-    "useQuoteLength": "引用の長さは {lengths} を使ってください。",
     "useReplaceOrBelow": "replace または below を使ってください。",
     "watchingMentions": "メンションを監視中",
     "watchingMentionsAndKeywords": "メンションとキーワードを監視中",
@@ -90,7 +85,7 @@
     "focusingOn": "フォーカス中",
     "noMessagesYet": "まだメッセージはありません",
     "refreshChat": "更新",
-    "refreshChatTitle": "拡張機能を再接続するためにチャットを更新します"
+    "refreshChatTitle": "拡張機能の接続が切れました。クリックしてチャットを更新してください。"
   },
   "extension": {
     "extensionName": {
@@ -191,27 +186,6 @@
     },
     "showBelow": {
       "message": "下に表示"
-    },
-    "chatActions": {
-      "message": "チャット操作"
-    },
-    "quoteLengthTitle": {
-      "message": "チャット操作やカードからメッセージを引用するときに含める最大文字数。"
-    },
-    "quoteLengthLabel": {
-      "message": "引用の長さ"
-    },
-    "quoteLengthHelper": {
-      "message": "メッセージを引用するときに含める最大文字数。"
-    },
-    "openChannelsInPopup": {
-      "message": "チャンネルをポップアップで開く"
-    },
-    "openChannelsInPopupTitle": {
-      "message": "YouTube チャンネルページを通常のブラウザータブではなく小さなポップアップウィンドウで開きます。"
-    },
-    "openChannelsInPopupHelper": {
-      "message": "アバターカードから開くチャンネルページに小さなウィンドウを使います。"
     },
     "popupAlerts": {
       "message": "通知"

@@ -18,9 +18,7 @@
     "commandHelpOpenHelp": "Affiche cette liste.",
     "commandHelpSetTranslateTo": "Définit la langue de traduction.",
     "commandHelpSetTranslationDisplay": "Définit l'affichage des traductions.",
-    "commandHelpSetQuoteLength": "Définit la longueur des citations.",
     "commandHelpSetSound": "Définit le son de la boîte de réception.",
-    "commandHelpSetOpenChannelsInPopup": "Définit le comportement d'ouverture des chaînes.",
     "couldNotFindChatInput": "Impossible de trouver le champ du chat.",
     "couldNotReadTime": "Impossible de lire cette heure.",
     "couldNotReadUserName": "Impossible de lire ce nom d'utilisateur.",
@@ -41,13 +39,11 @@
     "noPreviousMessageYet": "Aucun message précédent pour le moment.",
     "noRecentMessages": "Aucun message récent",
     "openChannel": "Ouvrir la chaîne",
-    "openChannelsInPopup": "Ouvrir les chaînes dans une fenêtre pop-up",
     "original": "Original : {text}",
     "originalMessage": "Message d'origine",
     "pressEnterAgainToSend": "Appuyez encore sur Entrée pour envoyer.",
     "pressTabToRunCommand": "Appuyez sur Tab pour exécuter cette commande.",
     "quote": "Citer",
-    "quoteLength": "Longueur de citation {count}.",
     "quoteMessage": "Citer le message",
     "recentMessages": "Messages récents",
     "recentMessagesFromThisUser": "Messages récents de cet utilisateur",
@@ -80,7 +76,6 @@
       "other": "{count} nouveaux messages"
     },
     "useOnOrOff": "Utilisez on ou off.",
-    "useQuoteLength": "Utilisez une longueur de citation de {lengths}.",
     "useReplaceOrBelow": "Utilisez replace ou below.",
     "watchingMentions": "Surveillance des mentions",
     "watchingMentionsAndKeywords": "Surveillance des mentions et mots-clés",
@@ -90,7 +85,7 @@
     "focusingOn": "Focus sur",
     "noMessagesYet": "Aucun message pour l’instant",
     "refreshChat": "Actualiser",
-    "refreshChatTitle": "Actualisez le chat pour reconnecter l’extension"
+    "refreshChatTitle": "L’extension a été déconnectée. Cliquez pour actualiser le chat."
   },
   "extension": {
     "extensionName": {
@@ -188,27 +183,6 @@
     },
     "showBelow": {
       "message": "Afficher dessous"
-    },
-    "chatActions": {
-      "message": "Actions du chat"
-    },
-    "quoteLengthTitle": {
-      "message": "Nombre maximum de caractères inclus lors de la citation d'un message depuis les actions du chat ou les cartes."
-    },
-    "quoteLengthLabel": {
-      "message": "Longueur de citation"
-    },
-    "quoteLengthHelper": {
-      "message": "Nombre maximum de caractères inclus lors de la citation des messages."
-    },
-    "openChannelsInPopup": {
-      "message": "Ouvrir les chaînes en pop-up"
-    },
-    "openChannelsInPopupTitle": {
-      "message": "Ouvrir les pages de chaînes YouTube dans une petite fenêtre pop-up au lieu d'un onglet normal."
-    },
-    "openChannelsInPopupHelper": {
-      "message": "Utilise une petite fenêtre pour les pages de chaîne depuis les cartes d'avatar."
     },
     "popupAlerts": {
       "message": "Alertes"

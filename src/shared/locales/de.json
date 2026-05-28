@@ -18,9 +18,7 @@
     "commandHelpOpenHelp": "Zeigt diese Liste an.",
     "commandHelpSetTranslateTo": "Legt die Übersetzungssprache fest.",
     "commandHelpSetTranslationDisplay": "Legt fest, wie Übersetzungen angezeigt werden.",
-    "commandHelpSetQuoteLength": "Legt die Zitierlänge fest.",
     "commandHelpSetSound": "Legt den Inbox-Ton fest.",
-    "commandHelpSetOpenChannelsInPopup": "Legt fest, wie Kanäle geöffnet werden.",
     "couldNotFindChatInput": "Chat-Eingabe nicht gefunden.",
     "couldNotReadTime": "Diese Zeit konnte nicht gelesen werden.",
     "couldNotReadUserName": "Dieser Nutzername konnte nicht gelesen werden.",
@@ -41,13 +39,11 @@
     "noPreviousMessageYet": "Noch keine vorherige Nachricht.",
     "noRecentMessages": "Keine aktuellen Nachrichten",
     "openChannel": "Kanal öffnen",
-    "openChannelsInPopup": "Kanäle in Popup öffnen",
     "original": "Original: {text}",
     "originalMessage": "Originalnachricht",
     "pressEnterAgainToSend": "Drücke erneut Enter zum Senden.",
     "pressTabToRunCommand": "Drücke Tab, um diesen Befehl auszuführen.",
     "quote": "Zitieren",
-    "quoteLength": "Zitatlänge {count}.",
     "quoteMessage": "Nachricht zitieren",
     "recentMessages": "Neueste Nachrichten",
     "recentMessagesFromThisUser": "Neueste Nachrichten dieses Nutzers",
@@ -80,7 +76,6 @@
       "other": "{count} neue Nachrichten"
     },
     "useOnOrOff": "Verwende on oder off.",
-    "useQuoteLength": "Verwende Zitatlänge {lengths}.",
     "useReplaceOrBelow": "Verwende replace oder below.",
     "watchingMentions": "Erwähnungen werden beobachtet",
     "watchingMentionsAndKeywords": "Erwähnungen und Schlüsselwörter werden beobachtet",
@@ -90,7 +85,7 @@
     "focusingOn": "Fokussiert auf",
     "noMessagesYet": "Noch keine Nachrichten",
     "refreshChat": "Aktualisieren",
-    "refreshChatTitle": "Chat aktualisieren, um die Erweiterung wieder zu verbinden"
+    "refreshChatTitle": "Die Erweiterung wurde getrennt. Klicke, um den Chat zu aktualisieren."
   },
   "extension": {
     "extensionName": {
@@ -188,27 +183,6 @@
     },
     "showBelow": {
       "message": "Darunter anzeigen"
-    },
-    "chatActions": {
-      "message": "Chat-Aktionen"
-    },
-    "quoteLengthTitle": {
-      "message": "Maximale Zeichenanzahl beim Zitieren einer Nachricht aus Chat-Aktionen oder Karten."
-    },
-    "quoteLengthLabel": {
-      "message": "Zitatlänge"
-    },
-    "quoteLengthHelper": {
-      "message": "Maximale Zeichenanzahl beim Zitieren von Nachrichten."
-    },
-    "openChannelsInPopup": {
-      "message": "Kanäle in Popup öffnen"
-    },
-    "openChannelsInPopupTitle": {
-      "message": "YouTube-Kanalseiten in einem kleineren Popup-Fenster statt in einem normalen Browser-Tab öffnen."
-    },
-    "openChannelsInPopupHelper": {
-      "message": "Verwendet ein kleineres Fenster für Kanalseiten aus Avatar-Karten."
     },
     "popupAlerts": {
       "message": "Hinweise"

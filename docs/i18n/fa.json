@@ -148,9 +148,7 @@
     "helpDescription": "کارت راهنمای دستورها را داخل چت YouTube باز می‌کند.",
     "setTranslateDescription": "زبان مقصد ترجمه را تنظیم می‌کند. برای غیرفعال کردن ترجمه از off استفاده کنید.",
     "setDisplayDescription": "پیام‌های اصلی را با ترجمه جایگزین می‌کند. برای نمایش ترجمه در پایین از below استفاده کنید.",
-    "setQuoteLengthDescription": "طول نقل‌قول را روی 80، 120، 180 یا 240 تنظیم می‌کند.",
-    "setSoundDescription": "صدای صندوق ورودی را روشن یا خاموش می‌کند.",
-    "setPopupDescription": "کانال‌ها را در پنجره‌های کوچک باز می‌کند. برای باز کردن عادی از off استفاده کنید."
+    "setSoundDescription": "صدای صندوق ورودی را روشن یا خاموش می‌کند."
   },
   "footer": {
     "disclaimer": "Chat Enhancer for YouTube وابسته به YouTube یا Google نیست.",

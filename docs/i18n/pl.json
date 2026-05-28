@@ -148,9 +148,7 @@
     "helpDescription": "Otwórz kartę pomocy poleceń w czacie YouTube.",
     "setTranslateDescription": "Ustaw język docelowy tłumaczenia. Użyj off, aby wyłączyć tłumaczenie.",
     "setDisplayDescription": "Zastępuj oryginalne wiadomości tłumaczeniami. Użyj below, aby pokazywać tłumaczenia pod spodem.",
-    "setQuoteLengthDescription": "Ustaw długość cytatu na 80, 120, 180 lub 240.",
-    "setSoundDescription": "Włącz lub wyłącz dźwięki skrzynki.",
-    "setPopupDescription": "Otwieraj kanały w oknach popup. Użyj off, aby otwierać je normalnie."
+    "setSoundDescription": "Włącz lub wyłącz dźwięki skrzynki."
   },
   "footer": {
     "disclaimer": "Chat Enhancer for YouTube nie jest powiązany z YouTube ani Google.",
