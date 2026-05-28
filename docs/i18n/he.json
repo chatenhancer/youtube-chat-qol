@@ -148,9 +148,7 @@
     "helpDescription": "פותח כרטיס עזרה לפקודות בתוך צ׳אט YouTube.",
     "setTranslateDescription": "מגדיר את שפת יעד התרגום. השתמשו ב-off כדי לכבות תרגום.",
     "setDisplayDescription": "מחליף הודעות מקוריות בתרגומים. השתמשו ב-below כדי להציג תרגומים מתחת.",
-    "setQuoteLengthDescription": "מגדיר אורך ציטוט ל-80, 120, 180 או 240.",
-    "setSoundDescription": "מדליק או מכבה צלילי תיבה.",
-    "setPopupDescription": "פותח ערוצים בחלונות קופצים. השתמשו ב-off כדי לפתוח אותם רגיל."
+    "setSoundDescription": "מדליק או מכבה צלילי תיבה."
   },
   "footer": {
     "disclaimer": "Chat Enhancer for YouTube אינו קשור ל-YouTube או Google.",

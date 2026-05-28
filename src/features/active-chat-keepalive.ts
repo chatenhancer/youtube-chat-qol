@@ -9,7 +9,9 @@ import { findChatInput, getChatInputText, replaceChatInput } from '../youtube/ch
 const ACTIVE_CHAT_PORT_NAME = 'ytcq:active-chat';
 const ACTIVE_CHAT_PING_TYPE = 'ytcq:active-chat-ping';
 const ACTIVE_CHAT_PING_INTERVAL_MS = 25_000;
+const PANEL_PAGES_SELECTOR = 'tp-yt-iron-pages#panel-pages';
 const RECONNECT_DRAFT_STORAGE_KEY = 'ytcqReconnectDraft';
+const RECONNECT_ANCHOR_CLASS = 'ytcq-reconnect-anchor';
 const DRAFT_RESTORE_DELAYS_MS = [300, 800, 1500, 3000, 5000];
 
 let keepAlivePort: chrome.runtime.Port | null = null;
@@ -85,7 +87,7 @@ function showReconnectNotice(): void {
     location.reload();
   });
 
-  document.documentElement.append(button);
+  getReconnectAnchor().replaceChildren(button);
   reconnectNotice = button;
 }
 
@@ -147,6 +149,24 @@ function readReconnectDraft(): ReconnectDraft | null {
     removeSessionStorageValue(RECONNECT_DRAFT_STORAGE_KEY);
     return null;
   }
+}
+
+function getReconnectAnchor(): HTMLElement {
+  const existing = document.querySelector<HTMLElement>(`.${RECONNECT_ANCHOR_CLASS}`);
+  const panelPages = document.querySelector<HTMLElement>(PANEL_PAGES_SELECTOR);
+  const parent = panelPages?.parentElement || document.body;
+  if (existing && existing.parentElement === parent) return existing;
+
+  existing?.remove();
+
+  const anchor = document.createElement('div');
+  anchor.className = RECONNECT_ANCHOR_CLASS;
+  if (panelPages) {
+    parent.insertBefore(anchor, panelPages);
+  } else {
+    parent.append(anchor);
+  }
+  return anchor;
 }
 
 function getSessionStorageValue(key: string): string {

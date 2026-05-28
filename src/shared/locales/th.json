@@ -18,9 +18,7 @@
     "commandHelpOpenHelp": "แสดงรายการนี้",
     "commandHelpSetTranslateTo": "ตั้งค่าภาษาที่จะแปล",
     "commandHelpSetTranslationDisplay": "ตั้งค่าวิธีแสดงคำแปล",
-    "commandHelpSetQuoteLength": "ตั้งค่าความยาวข้อความอ้างอิง",
     "commandHelpSetSound": "ตั้งค่าเสียงกล่องข้อความ",
-    "commandHelpSetOpenChannelsInPopup": "ตั้งค่าการเปิดช่องในหน้าต่างป๊อปอัป",
     "couldNotFindChatInput": "ไม่พบช่องพิมพ์แชท",
     "couldNotReadTime": "อ่านเวลานั้นไม่ได้",
     "couldNotReadUserName": "อ่านชื่อผู้ใช้นั้นไม่ได้",
@@ -41,13 +39,11 @@
     "noPreviousMessageYet": "ยังไม่มีข้อความก่อนหน้า",
     "noRecentMessages": "ไม่มีข้อความล่าสุด",
     "openChannel": "เปิดช่อง",
-    "openChannelsInPopup": "เปิดช่องในป๊อปอัป",
     "original": "ต้นฉบับ: {text}",
     "originalMessage": "ข้อความต้นฉบับ",
     "pressEnterAgainToSend": "กด Enter อีกครั้งเพื่อส่ง",
     "pressTabToRunCommand": "กด Tab เพื่อเรียกใช้คำสั่งนี้",
     "quote": "อ้างอิง",
-    "quoteLength": "ความยาวอ้างอิง {count}",
     "quoteMessage": "อ้างอิงข้อความ",
     "recentMessages": "ข้อความล่าสุด",
     "recentMessagesFromThisUser": "ข้อความล่าสุดจากผู้ใช้นี้",
@@ -80,7 +76,6 @@
       "other": "{count} ข้อความใหม่"
     },
     "useOnOrOff": "ใช้ on หรือ off",
-    "useQuoteLength": "ใช้ความยาวอ้างอิง {lengths}",
     "useReplaceOrBelow": "ใช้ replace หรือ below",
     "watchingMentions": "กำลังติดตามการกล่าวถึง",
     "watchingMentionsAndKeywords": "กำลังติดตามการกล่าวถึงและคำสำคัญ",
@@ -90,7 +85,7 @@
     "focusingOn": "กำลังโฟกัสที่",
     "noMessagesYet": "ยังไม่มีข้อความ",
     "refreshChat": "รีเฟรช",
-    "refreshChatTitle": "รีเฟรชแชทเพื่อเชื่อมต่อส่วนขยายอีกครั้ง"
+    "refreshChatTitle": "ส่วนขยายถูกตัดการเชื่อมต่อ คลิกเพื่อรีเฟรชแชท"
   },
   "extension": {
     "extensionName": {
@@ -188,27 +183,6 @@
     },
     "showBelow": {
       "message": "แสดงด้านล่าง"
-    },
-    "chatActions": {
-      "message": "การกระทำในแชท"
-    },
-    "quoteLengthTitle": {
-      "message": "จำนวนอักขระสูงสุดเมื่ออ้างอิงข้อความจากการกระทำในแชทหรือการ์ด"
-    },
-    "quoteLengthLabel": {
-      "message": "ความยาวอ้างอิง"
-    },
-    "quoteLengthHelper": {
-      "message": "จำนวนอักขระสูงสุดเมื่ออ้างอิงข้อความ"
-    },
-    "openChannelsInPopup": {
-      "message": "เปิดช่องในป๊อปอัป"
-    },
-    "openChannelsInPopupTitle": {
-      "message": "เปิดหน้าช่อง YouTube ในหน้าต่างป๊อปอัปขนาดเล็กแทนแท็บเบราว์เซอร์ปกติ"
-    },
-    "openChannelsInPopupHelper": {
-      "message": "ใช้หน้าต่างขนาดเล็กสำหรับช่องจากการ์ดอวาตาร์"
     },
     "popupAlerts": {
       "message": "การแจ้งเตือน"

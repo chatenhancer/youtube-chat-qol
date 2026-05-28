@@ -9,7 +9,6 @@ import { LANGUAGE_OPTIONS } from '../shared/languages';
 import { playSoftChime } from '../shared/sounds/soft-chime';
 import { getFreshKnownChatTabIds, KNOWN_CHAT_TABS_STORAGE_KEY } from '../shared/known-chat-tabs';
 import { DEFAULT_OPTIONS, getTargetLanguageUpdate, normalizeOptions, type Options } from '../shared/options';
-import { clampNumber } from '../shared/text';
 
 const LANDING_PAGE_URL = 'https://chatenhancer.com';
 const GITHUB_URL = 'https://www.chatenhancer.com/source';
@@ -28,8 +27,6 @@ const controls = {
   extensionStatusHelper: document.querySelector<HTMLElement>('[data-extension-status-helper]'),
   targetLanguage: document.querySelector<HTMLSelectElement>('#targetLanguage'),
   translationDisplay: document.querySelector<HTMLSelectElement>('#translationDisplay'),
-  quoteMaxLength: document.querySelector<HTMLInputElement>('#quoteMaxLength'),
-  openProfilesInPopup: document.querySelector<HTMLInputElement>('#openProfilesInPopup'),
   sound: document.querySelector<HTMLInputElement>('#sound'),
   version: document.querySelector<HTMLElement>('#version')
 };
@@ -42,7 +39,7 @@ function init(): void {
   const popupLocale = localizePopup();
   refreshExtensionStatus();
 
-  if (!controls.targetLanguage || !controls.translationDisplay || !controls.quoteMaxLength || !controls.openProfilesInPopup || !controls.sound) {
+  if (!controls.targetLanguage || !controls.translationDisplay || !controls.sound) {
     return;
   }
 
@@ -73,7 +70,7 @@ function init(): void {
   }
 
   chrome.storage.sync.get(DEFAULT_OPTIONS, (storedOptions: Partial<Options>) => {
-    if (!controls.targetLanguage || !controls.translationDisplay || !controls.quoteMaxLength || !controls.openProfilesInPopup || !controls.sound) return;
+    if (!controls.targetLanguage || !controls.translationDisplay || !controls.sound) return;
     applyOptionsToControls(storedOptions);
   });
 
@@ -85,17 +82,6 @@ function init(): void {
 
   controls.translationDisplay.addEventListener('change', () => {
     save({ translationDisplay: controls.translationDisplay?.value as Options['translationDisplay'] });
-  });
-
-  controls.quoteMaxLength.addEventListener('change', () => {
-    if (!controls.quoteMaxLength) return;
-    const value = clampNumber(controls.quoteMaxLength.value, 40, 240, DEFAULT_OPTIONS.quoteMaxLength);
-    controls.quoteMaxLength.value = String(value);
-    save({ quoteMaxLength: value });
-  });
-
-  controls.openProfilesInPopup.addEventListener('change', () => {
-    save({ openProfilesInPopup: Boolean(controls.openProfilesInPopup?.checked) });
   });
 
   controls.sound.addEventListener('change', () => {
@@ -255,14 +241,12 @@ function broadcastPageReset(callback: () => void): void {
 }
 
 function applyOptionsToControls(options: Partial<Options>): void {
-  if (!controls.targetLanguage || !controls.translationDisplay || !controls.quoteMaxLength || !controls.openProfilesInPopup || !controls.sound) return;
+  if (!controls.targetLanguage || !controls.translationDisplay || !controls.sound) return;
 
   const normalized = normalizeOptions(options);
   lastKnownTranslationTarget = normalized.lastTranslationTarget;
   controls.targetLanguage.value = normalized.targetLanguage;
   controls.translationDisplay.value = normalized.translationDisplay;
-  controls.quoteMaxLength.value = String(normalized.quoteMaxLength);
-  controls.openProfilesInPopup.checked = normalized.openProfilesInPopup;
   controls.sound.checked = normalized.sound;
 }
 

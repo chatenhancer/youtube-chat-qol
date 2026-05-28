@@ -18,9 +18,7 @@
     "commandHelpOpenHelp": "يعرض هذه القائمة.",
     "commandHelpSetTranslateTo": "يضبط لغة الترجمة.",
     "commandHelpSetTranslationDisplay": "يضبط طريقة عرض الترجمات.",
-    "commandHelpSetQuoteLength": "يضبط طول الاقتباس.",
     "commandHelpSetSound": "يضبط صوت البريد الوارد.",
-    "commandHelpSetOpenChannelsInPopup": "يضبط طريقة فتح القنوات.",
     "couldNotFindChatInput": "تعذر العثور على حقل إدخال الدردشة.",
     "couldNotReadTime": "تعذرت قراءة هذا الوقت.",
     "couldNotReadUserName": "تعذرت قراءة اسم المستخدم هذا.",
@@ -41,13 +39,11 @@
     "noPreviousMessageYet": "لا توجد رسالة سابقة بعد.",
     "noRecentMessages": "لا توجد رسائل حديثة",
     "openChannel": "فتح القناة",
-    "openChannelsInPopup": "فتح القنوات في نافذة منبثقة",
     "original": "الأصل: {text}",
     "originalMessage": "الرسالة الأصلية",
     "pressEnterAgainToSend": "اضغط Enter مرة أخرى للإرسال.",
     "pressTabToRunCommand": "اضغط Tab لتشغيل هذا الأمر.",
     "quote": "اقتباس",
-    "quoteLength": "طول الاقتباس {count}.",
     "quoteMessage": "اقتباس الرسالة",
     "recentMessages": "الرسائل الأخيرة",
     "recentMessagesFromThisUser": "الرسائل الأخيرة من هذا المستخدم",
@@ -80,7 +76,6 @@
       "other": "{count} رسائل جديدة"
     },
     "useOnOrOff": "استخدم on أو off.",
-    "useQuoteLength": "استخدم طول اقتباس {lengths}.",
     "useReplaceOrBelow": "استخدم replace أو below.",
     "watchingMentions": "مراقبة الإشارات",
     "watchingMentionsAndKeywords": "مراقبة الإشارات والكلمات المفتاحية",
@@ -90,7 +85,7 @@
     "focusingOn": "جارٍ التركيز على",
     "noMessagesYet": "لا توجد رسائل بعد",
     "refreshChat": "تحديث",
-    "refreshChatTitle": "حدّث الدردشة لإعادة توصيل الإضافة"
+    "refreshChatTitle": "انقطع اتصال الإضافة. انقر لتحديث الدردشة."
   },
   "extension": {
     "extensionName": {
@@ -191,27 +186,6 @@
     },
     "showBelow": {
       "message": "إظهار بالأسفل"
-    },
-    "chatActions": {
-      "message": "إجراءات الدردشة"
-    },
-    "quoteLengthTitle": {
-      "message": "الحد الأقصى للأحرف المضمنة عند اقتباس رسالة من إجراءات الدردشة أو البطاقات."
-    },
-    "quoteLengthLabel": {
-      "message": "طول الاقتباس"
-    },
-    "quoteLengthHelper": {
-      "message": "الحد الأقصى للأحرف المضمنة عند اقتباس الرسائل."
-    },
-    "openChannelsInPopup": {
-      "message": "فتح القنوات في نافذة منبثقة"
-    },
-    "openChannelsInPopupTitle": {
-      "message": "افتح صفحات قنوات YouTube في نافذة منبثقة أصغر بدلا من تبويب عادي في المتصفح."
-    },
-    "openChannelsInPopupHelper": {
-      "message": "استخدم نافذة أصغر لصفحات القنوات من بطاقات الصورة الرمزية."
     },
     "popupAlerts": {
       "message": "التنبيهات"

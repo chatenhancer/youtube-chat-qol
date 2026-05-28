@@ -18,9 +18,7 @@
     "commandHelpOpenHelp": "Mostra esta lista.",
     "commandHelpSetTranslateTo": "Define o idioma da tradução.",
     "commandHelpSetTranslationDisplay": "Define como as traduções são exibidas.",
-    "commandHelpSetQuoteLength": "Define o tamanho da citação.",
     "commandHelpSetSound": "Define o som da caixa de entrada.",
-    "commandHelpSetOpenChannelsInPopup": "Define como os canais são abertos.",
     "couldNotFindChatInput": "Não foi possível encontrar o campo do chat.",
     "couldNotReadTime": "Não foi possível ler esse horário.",
     "couldNotReadUserName": "Não foi possível ler esse nome de usuário.",
@@ -41,13 +39,11 @@
     "noPreviousMessageYet": "Ainda não há mensagem anterior.",
     "noRecentMessages": "Nenhuma mensagem recente",
     "openChannel": "Abrir canal",
-    "openChannelsInPopup": "Abrir canais em pop-up",
     "original": "Original: {text}",
     "originalMessage": "Mensagem original",
     "pressEnterAgainToSend": "Pressione Enter novamente para enviar.",
     "pressTabToRunCommand": "Pressione Tab para executar este comando.",
     "quote": "Citar",
-    "quoteLength": "Tamanho da citação {count}.",
     "quoteMessage": "Citar mensagem",
     "recentMessages": "Mensagens recentes",
     "recentMessagesFromThisUser": "Mensagens recentes deste usuário",
@@ -80,7 +76,6 @@
       "other": "{count} novas mensagens"
     },
     "useOnOrOff": "Use on ou off.",
-    "useQuoteLength": "Use tamanho de citação {lengths}.",
     "useReplaceOrBelow": "Use replace ou below.",
     "watchingMentions": "Monitorando menções",
     "watchingMentionsAndKeywords": "Monitorando menções e palavras-chave",
@@ -90,7 +85,7 @@
     "focusingOn": "Focando em",
     "noMessagesYet": "Nenhuma mensagem ainda",
     "refreshChat": "Atualizar",
-    "refreshChatTitle": "Atualize o chat para reconectar a extensão"
+    "refreshChatTitle": "A extensão foi desconectada. Clique para atualizar o chat."
   },
   "extension": {
     "extensionName": {
@@ -191,27 +186,6 @@
     },
     "showBelow": {
       "message": "Mostrar abaixo"
-    },
-    "chatActions": {
-      "message": "Ações do chat"
-    },
-    "quoteLengthTitle": {
-      "message": "Número máximo de caracteres incluídos ao citar uma mensagem pelas ações do chat ou pelos cartões."
-    },
-    "quoteLengthLabel": {
-      "message": "Tamanho da citação"
-    },
-    "quoteLengthHelper": {
-      "message": "Número máximo de caracteres incluídos ao citar mensagens."
-    },
-    "openChannelsInPopup": {
-      "message": "Abrir canais em pop-up"
-    },
-    "openChannelsInPopupTitle": {
-      "message": "Abrir páginas de canais do YouTube em uma janela pop-up menor em vez de uma aba normal do navegador."
-    },
-    "openChannelsInPopupHelper": {
-      "message": "Use uma janela menor para páginas de canais abertas pelos cartões de avatar."
     },
     "popupAlerts": {
       "message": "Alertas"

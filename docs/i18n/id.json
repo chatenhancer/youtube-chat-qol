@@ -148,9 +148,7 @@
     "helpDescription": "Buka kartu bantuan perintah di dalam chat YouTube.",
     "setTranslateDescription": "Atur bahasa target terjemahan. Gunakan off untuk menonaktifkan terjemahan.",
     "setDisplayDescription": "Ganti pesan asli dengan terjemahan. Gunakan below untuk menampilkan terjemahan di bawah.",
-    "setQuoteLengthDescription": "Atur panjang kutipan ke 80, 120, 180, atau 240.",
-    "setSoundDescription": "Nyalakan atau matikan suara kotak masuk.",
-    "setPopupDescription": "Buka channel di jendela popup. Gunakan off untuk membukanya secara normal."
+    "setSoundDescription": "Nyalakan atau matikan suara kotak masuk."
   },
   "footer": {
     "disclaimer": "Chat Enhancer for YouTube tidak berafiliasi dengan YouTube atau Google.",

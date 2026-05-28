@@ -18,9 +18,7 @@
     "commandHelpOpenHelp": "Show this list.",
     "commandHelpSetTranslateTo": "Set the translation language.",
     "commandHelpSetTranslationDisplay": "Set how translations are shown.",
-    "commandHelpSetQuoteLength": "Set the quote length.",
     "commandHelpSetSound": "Set inbox sound.",
-    "commandHelpSetOpenChannelsInPopup": "Set channel popup behavior.",
     "couldNotFindChatInput": "Could not find the chat input.",
     "couldNotReadTime": "Could not read that time.",
     "couldNotReadUserName": "Could not read that user name.",
@@ -41,13 +39,11 @@
     "noPreviousMessageYet": "No previous message yet.",
     "noRecentMessages": "No recent messages",
     "openChannel": "Open channel",
-    "openChannelsInPopup": "Open channels in popup",
     "original": "Original: {text}",
     "originalMessage": "Original message",
     "pressEnterAgainToSend": "Press Enter again to send.",
     "pressTabToRunCommand": "Press Tab to run this command.",
     "quote": "Quote",
-    "quoteLength": "Quote length {count}.",
     "quoteMessage": "Quote message",
     "recentMessages": "Recent messages",
     "recentMessagesFromThisUser": "Recent messages from this user",
@@ -80,7 +76,6 @@
       "other": "{count} new messages"
     },
     "useOnOrOff": "Use on or off.",
-    "useQuoteLength": "Use quote length {lengths}.",
     "useReplaceOrBelow": "Use replace or below.",
     "watchingMentions": "Watching mentions",
     "watchingMentionsAndKeywords": "Watching mentions and keywords",
@@ -90,7 +85,7 @@
     "focusingOn": "Focusing on",
     "noMessagesYet": "No messages yet",
     "refreshChat": "Refresh",
-    "refreshChatTitle": "Refresh chat to reconnect the extension"
+    "refreshChatTitle": "The extension was disconnected. Click to refresh chat."
   },
   "extension": {
     "extensionName": {
@@ -191,27 +186,6 @@
     },
     "showBelow": {
       "message": "Show below"
-    },
-    "chatActions": {
-      "message": "Chat Actions"
-    },
-    "quoteLengthTitle": {
-      "message": "Maximum characters included when quoting a message from chat actions or cards."
-    },
-    "quoteLengthLabel": {
-      "message": "Quote length"
-    },
-    "quoteLengthHelper": {
-      "message": "Maximum characters included when quoting messages."
-    },
-    "openChannelsInPopup": {
-      "message": "Open channels in popup"
-    },
-    "openChannelsInPopupTitle": {
-      "message": "Open YouTube channel pages in a smaller popup window instead of a normal browser tab."
-    },
-    "openChannelsInPopupHelper": {
-      "message": "Use a smaller window for channel pages from avatar cards."
     },
     "popupAlerts": {
       "message": "Alerts"

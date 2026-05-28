@@ -7,7 +7,7 @@
  */
 import { LANGUAGE_OPTIONS, getLanguageLabel } from '../shared/languages';
 import { getLocalizedLanguageLabel, t } from '../shared/i18n';
-import { getTargetLanguageUpdate, QUOTE_LENGTH_OPTIONS, type Options, type TranslationDisplay } from '../shared/options';
+import { getTargetLanguageUpdate, type Options, type TranslationDisplay } from '../shared/options';
 import { cleanText } from '../shared/text';
 import { showToast } from '../shared/toast';
 import {
@@ -189,31 +189,11 @@ const CHAT_COMMANDS: ChatCommandDefinition[] = [
     run: (parsed, { saveOptions }) => executeSetTranslationDisplayCommand(parsed, saveOptions)
   },
   {
-    helpDescriptionKey: 'commandHelpSetQuoteLength',
-    helpLabel: '/setquotelength 120',
-    kind: 'setting',
-    names: ['setquotelength'],
-    run: (parsed, { saveOptions }) => executeSetQuoteLengthCommand(parsed, saveOptions)
-  },
-  {
     helpDescriptionKey: 'commandHelpSetSound',
     helpLabel: '/setsound on/off',
     kind: 'setting',
     names: ['setsound'],
     run: (parsed, { saveOptions }) => executeBooleanSetCommand(parsed, saveOptions, 'sound', t('inboxSound'))
-  },
-  {
-    helpDescriptionKey: 'commandHelpSetOpenChannelsInPopup',
-    helpLabel: '/setopenchannelsinpopup on/off',
-    hiddenAliases: ['setopenprofilesinpopup'],
-    kind: 'setting',
-    names: ['setopenchannelsinpopup'],
-    run: (parsed, { saveOptions }) => executeBooleanSetCommand(
-      parsed,
-      saveOptions,
-      'openProfilesInPopup',
-      t('openChannelsInPopup')
-    )
   }
 ];
 
@@ -355,22 +335,10 @@ function executeSetTranslationDisplayCommand(parsed: ParsedCommand, saveOptions:
   showToast(display === 'replace' ? t('translationsReplaceMessages') : t('translationsShowBelowMessages'));
 }
 
-function executeSetQuoteLengthCommand(parsed: ParsedCommand, saveOptions: SaveOptions): void {
-  const quoteMaxLength = Number(cleanText(parsed.args));
-  if (!QUOTE_LENGTH_OPTIONS.some((value) => value === quoteMaxLength)) {
-    showToast(t('useQuoteLength', { lengths: QUOTE_LENGTH_OPTIONS.join(', ') }));
-    return;
-  }
-
-  saveOptions({ quoteMaxLength });
-  replaceChatInput('');
-  showToast(t('quoteLength', { count: quoteMaxLength }));
-}
-
 function executeBooleanSetCommand(
   parsed: ParsedCommand,
   saveOptions: SaveOptions,
-  option: 'openProfilesInPopup' | 'sound',
+  option: 'sound',
   label: string
 ): void {
   const value = getBooleanCommandTarget(parsed.args);

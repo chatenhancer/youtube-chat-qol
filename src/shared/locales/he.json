@@ -18,9 +18,7 @@
     "commandHelpOpenHelp": "הצג את הרשימה הזו.",
     "commandHelpSetTranslateTo": "הגדר את שפת התרגום.",
     "commandHelpSetTranslationDisplay": "הגדר איך תרגומים מוצגים.",
-    "commandHelpSetQuoteLength": "הגדר אורך ציטוט.",
     "commandHelpSetSound": "הגדר צליל תיבה.",
-    "commandHelpSetOpenChannelsInPopup": "הגדר פתיחת ערוצים בחלון קופץ.",
     "couldNotFindChatInput": "לא נמצא שדה הקלט של הצ׳אט.",
     "couldNotReadTime": "לא ניתן לקרוא את השעה הזו.",
     "couldNotReadUserName": "לא ניתן לקרוא את שם המשתמש הזה.",
@@ -41,13 +39,11 @@
     "noPreviousMessageYet": "אין עדיין הודעה קודמת.",
     "noRecentMessages": "אין הודעות אחרונות",
     "openChannel": "פתיחת ערוץ",
-    "openChannelsInPopup": "פתיחת ערוצים בחלון קופץ",
     "original": "מקור: {text}",
     "originalMessage": "הודעה מקורית",
     "pressEnterAgainToSend": "לחץ Enter שוב כדי לשלוח.",
     "pressTabToRunCommand": "לחץ Tab כדי להריץ את הפקודה.",
     "quote": "ציטוט",
-    "quoteLength": "אורך ציטוט {count}.",
     "quoteMessage": "ציטוט הודעה",
     "recentMessages": "הודעות אחרונות",
     "recentMessagesFromThisUser": "הודעות אחרונות מהמשתמש הזה",
@@ -80,7 +76,6 @@
       "other": "{count} הודעות חדשות"
     },
     "useOnOrOff": "השתמש ב-on או off.",
-    "useQuoteLength": "השתמש באורך ציטוט {lengths}.",
     "useReplaceOrBelow": "השתמש ב-replace או below.",
     "watchingMentions": "מעקב אחרי אזכורים",
     "watchingMentionsAndKeywords": "מעקב אחרי אזכורים ומילות מפתח",
@@ -90,7 +85,7 @@
     "focusingOn": "מתמקד ב",
     "noMessagesYet": "אין עדיין הודעות",
     "refreshChat": "רענון",
-    "refreshChatTitle": "רעננו את הצ׳אט כדי לחבר מחדש את התוסף"
+    "refreshChatTitle": "התוסף נותק. לחצו כדי לרענן את הצ׳אט."
   },
   "extension": {
     "extensionName": {
@@ -188,27 +183,6 @@
     },
     "showBelow": {
       "message": "הצגה מתחת"
-    },
-    "chatActions": {
-      "message": "פעולות צ׳אט"
-    },
-    "quoteLengthTitle": {
-      "message": "מספר התווים המרבי בציטוט הודעה מפעולות צ׳אט או כרטיסים."
-    },
-    "quoteLengthLabel": {
-      "message": "אורך ציטוט"
-    },
-    "quoteLengthHelper": {
-      "message": "מספר התווים המרבי בציטוט הודעות."
-    },
-    "openChannelsInPopup": {
-      "message": "פתיחת ערוצים בחלון קופץ"
-    },
-    "openChannelsInPopupTitle": {
-      "message": "פתח דפי ערוץ YouTube בחלון קופץ קטן במקום בלשונית רגילה."
-    },
-    "openChannelsInPopupHelper": {
-      "message": "השתמש בחלון קטן יותר לערוצים מכרטיסי אווטאר."
     },
     "popupAlerts": {
       "message": "התראות"

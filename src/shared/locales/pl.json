@@ -18,9 +18,7 @@
     "commandHelpOpenHelp": "Pokaż tę listę.",
     "commandHelpSetTranslateTo": "Ustaw język tłumaczenia.",
     "commandHelpSetTranslationDisplay": "Ustaw sposób wyświetlania tłumaczeń.",
-    "commandHelpSetQuoteLength": "Ustaw długość cytatu.",
     "commandHelpSetSound": "Ustaw dźwięk skrzynki.",
-    "commandHelpSetOpenChannelsInPopup": "Ustaw zachowanie wyskakujących okien kanałów.",
     "couldNotFindChatInput": "Nie znaleziono pola czatu.",
     "couldNotReadTime": "Nie można odczytać tej godziny.",
     "couldNotReadUserName": "Nie można odczytać tej nazwy użytkownika.",
@@ -41,13 +39,11 @@
     "noPreviousMessageYet": "Brak poprzedniej wiadomości.",
     "noRecentMessages": "Brak ostatnich wiadomości",
     "openChannel": "Otwórz kanał",
-    "openChannelsInPopup": "Otwieraj kanały w oknie popup",
     "original": "Oryginał: {text}",
     "originalMessage": "Oryginalna wiadomość",
     "pressEnterAgainToSend": "Naciśnij Enter ponownie, aby wysłać.",
     "pressTabToRunCommand": "Naciśnij Tab, aby uruchomić to polecenie.",
     "quote": "Cytuj",
-    "quoteLength": "Długość cytatu {count}.",
     "quoteMessage": "Cytuj wiadomość",
     "recentMessages": "Ostatnie wiadomości",
     "recentMessagesFromThisUser": "Ostatnie wiadomości tego użytkownika",
@@ -80,7 +76,6 @@
       "other": "{count} nowych wiadomości"
     },
     "useOnOrOff": "Użyj on albo off.",
-    "useQuoteLength": "Użyj długości cytatu {lengths}.",
     "useReplaceOrBelow": "Użyj replace albo below.",
     "watchingMentions": "Obserwowanie wzmianek",
     "watchingMentionsAndKeywords": "Obserwowanie wzmianek i słów kluczowych",
@@ -90,7 +85,7 @@
     "focusingOn": "Skupienie na",
     "noMessagesYet": "Brak wiadomości",
     "refreshChat": "Odśwież",
-    "refreshChatTitle": "Odśwież czat, aby ponownie połączyć rozszerzenie"
+    "refreshChatTitle": "Rozszerzenie zostało rozłączone. Kliknij, aby odświeżyć czat."
   },
   "extension": {
     "extensionName": {
@@ -188,27 +183,6 @@
     },
     "showBelow": {
       "message": "Pokaż pod spodem"
-    },
-    "chatActions": {
-      "message": "Akcje czatu"
-    },
-    "quoteLengthTitle": {
-      "message": "Maksymalna liczba znaków przy cytowaniu wiadomości z akcji czatu lub kart."
-    },
-    "quoteLengthLabel": {
-      "message": "Długość cytatu"
-    },
-    "quoteLengthHelper": {
-      "message": "Maksymalna liczba znaków przy cytowaniu wiadomości."
-    },
-    "openChannelsInPopup": {
-      "message": "Otwieraj kanały w popupie"
-    },
-    "openChannelsInPopupTitle": {
-      "message": "Otwieraj strony kanałów YouTube w mniejszym oknie popup zamiast w zwykłej karcie."
-    },
-    "openChannelsInPopupHelper": {
-      "message": "Używaj mniejszego okna dla kanałów z kart awatarów."
     },
     "popupAlerts": {
       "message": "Alerty"

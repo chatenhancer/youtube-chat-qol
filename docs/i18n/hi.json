@@ -148,9 +148,7 @@
     "helpDescription": "YouTube चैट के अंदर कमांड मदद कार्ड खोलें।",
     "setTranslateDescription": "अनुवाद की लक्ष्य भाषा सेट करें। अनुवाद बंद करने के लिए off का उपयोग करें।",
     "setDisplayDescription": "मूल संदेशों को अनुवाद से बदलें। अनुवाद नीचे दिखाने के लिए below का उपयोग करें।",
-    "setQuoteLengthDescription": "कोट लंबाई 80, 120, 180, या 240 पर सेट करें।",
-    "setSoundDescription": "इनबॉक्स sounds चालू या बंद करें.",
-    "setPopupDescription": "चैनल पॉपअप विंडो में खोलें। उन्हें सामान्य रूप से खोलने के लिए off का उपयोग करें।"
+    "setSoundDescription": "इनबॉक्स sounds चालू या बंद करें."
   },
   "footer": {
     "disclaimer": "Chat Enhancer for YouTube, YouTube या Google से संबद्ध नहीं है।",

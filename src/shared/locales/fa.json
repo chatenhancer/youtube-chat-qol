@@ -18,9 +18,7 @@
     "commandHelpOpenHelp": "این فهرست را نشان بده.",
     "commandHelpSetTranslateTo": "زبان ترجمه را تنظیم کن.",
     "commandHelpSetTranslationDisplay": "نحوه نمایش ترجمه‌ها را تنظیم کن.",
-    "commandHelpSetQuoteLength": "طول نقل‌قول را تنظیم کن.",
     "commandHelpSetSound": "صدای صندوق ورودی را تنظیم کن.",
-    "commandHelpSetOpenChannelsInPopup": "رفتار باز شدن کانال در پنجره کوچک را تنظیم کن.",
     "couldNotFindChatInput": "کادر ورود چت پیدا نشد.",
     "couldNotReadTime": "این زمان خوانده نشد.",
     "couldNotReadUserName": "این نام کاربری خوانده نشد.",
@@ -41,13 +39,11 @@
     "noPreviousMessageYet": "هنوز پیام قبلی وجود ندارد.",
     "noRecentMessages": "هیچ پیام اخیری نیست",
     "openChannel": "باز کردن کانال",
-    "openChannelsInPopup": "باز کردن کانال‌ها در پنجره کوچک",
     "original": "اصلی: {text}",
     "originalMessage": "پیام اصلی",
     "pressEnterAgainToSend": "برای ارسال دوباره Enter را بزنید.",
     "pressTabToRunCommand": "برای اجرای این دستور Tab را بزنید.",
     "quote": "نقل‌قول",
-    "quoteLength": "طول نقل‌قول {count}.",
     "quoteMessage": "نقل‌قول پیام",
     "recentMessages": "پیام‌های اخیر",
     "recentMessagesFromThisUser": "پیام‌های اخیر این کاربر",
@@ -80,7 +76,6 @@
       "other": "{count} پیام جدید"
     },
     "useOnOrOff": "از on یا off استفاده کنید.",
-    "useQuoteLength": "از طول نقل‌قول {lengths} استفاده کنید.",
     "useReplaceOrBelow": "از replace یا below استفاده کنید.",
     "watchingMentions": "در حال دنبال کردن منشن‌ها",
     "watchingMentionsAndKeywords": "در حال دنبال کردن منشن‌ها و کلیدواژه‌ها",
@@ -90,7 +85,7 @@
     "focusingOn": "در حال تمرکز روی",
     "noMessagesYet": "هنوز پیامی نیست",
     "refreshChat": "تازه‌سازی",
-    "refreshChatTitle": "برای اتصال دوباره افزونه، چت را تازه‌سازی کنید"
+    "refreshChatTitle": "افزونه قطع شد. برای تازه‌سازی چت کلیک کنید."
   },
   "extension": {
     "extensionName": {
@@ -188,27 +183,6 @@
     },
     "showBelow": {
       "message": "نمایش زیر پیام"
-    },
-    "chatActions": {
-      "message": "اقدام‌های چت"
-    },
-    "quoteLengthTitle": {
-      "message": "حداکثر نویسه‌های واردشده هنگام نقل‌قول پیام از اقدام‌های چت یا کارت‌ها."
-    },
-    "quoteLengthLabel": {
-      "message": "طول نقل‌قول"
-    },
-    "quoteLengthHelper": {
-      "message": "حداکثر نویسه‌ها هنگام نقل‌قول پیام‌ها."
-    },
-    "openChannelsInPopup": {
-      "message": "باز کردن کانال‌ها در پنجره کوچک"
-    },
-    "openChannelsInPopupTitle": {
-      "message": "صفحه‌های کانال YouTube را به‌جای زبانه معمولی در پنجره کوچک باز کن."
-    },
-    "openChannelsInPopupHelper": {
-      "message": "برای کانال‌ها از کارت‌های آواتار، پنجره کوچک‌تر استفاده کن."
     },
     "popupAlerts": {
       "message": "هشدارها"

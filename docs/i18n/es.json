@@ -148,9 +148,7 @@
     "helpDescription": "Abre la tarjeta de ayuda de comandos dentro del chat de YouTube.",
     "setTranslateDescription": "Define el idioma de destino de la traducción. Usa off para desactivar la traducción.",
     "setDisplayDescription": "Reemplaza mensajes originales con traducciones. Usa below para mostrar las traducciones debajo.",
-    "setQuoteLengthDescription": "Define la longitud de cita en 80, 120, 180 o 240.",
-    "setSoundDescription": "Activa o desactiva los sonidos de la bandeja.",
-    "setPopupDescription": "Abre canales en ventanas emergentes. Usa off para abrirlos normalmente."
+    "setSoundDescription": "Activa o desactiva los sonidos de la bandeja."
   },
   "footer": {
     "disclaimer": "Chat Enhancer for YouTube no está afiliado a YouTube ni a Google.",

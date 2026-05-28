@@ -148,9 +148,7 @@
     "helpDescription": "เปิดการ์ดช่วยเหลือคำสั่งใน YouTube chat",
     "setTranslateDescription": "ตั้งค่าภาษาปลายทางการแปล ใช้ off เพื่อปิดการแปล",
     "setDisplayDescription": "แทนที่ข้อความเดิมด้วยคำแปล ใช้ below เพื่อแสดงคำแปลด้านล่าง",
-    "setQuoteLengthDescription": "ตั้งค่าความยาวอ้างอิงเป็น 80, 120, 180 หรือ 240",
-    "setSoundDescription": "เปิดหรือปิดเสียงกล่องข้อความ",
-    "setPopupDescription": "เปิดช่องในหน้าต่างป๊อปอัป ใช้ off เพื่อเปิดตามปกติ"
+    "setSoundDescription": "เปิดหรือปิดเสียงกล่องข้อความ"
   },
   "footer": {
     "disclaimer": "Chat Enhancer for YouTube ไม่ได้มีความเกี่ยวข้องกับ YouTube หรือ Google",

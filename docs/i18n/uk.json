@@ -148,9 +148,7 @@
     "helpDescription": "Відкриває картку довідки команд у чаті YouTube.",
     "setTranslateDescription": "Установлює цільову мову перекладу. Використовуйте off, щоб вимкнути переклад.",
     "setDisplayDescription": "Замінює оригінальні повідомлення перекладами. Використовуйте below, щоб показувати переклади нижче.",
-    "setQuoteLengthDescription": "Установлює довжину цитати 80, 120, 180 або 240.",
-    "setSoundDescription": "Вмикає або вимикає звуки вхідних.",
-    "setPopupDescription": "Відкриває канали у спливаючих вікнах. Використовуйте off, щоб відкривати їх звичайно."
+    "setSoundDescription": "Вмикає або вимикає звуки вхідних."
   },
   "footer": {
     "disclaimer": "Chat Enhancer for YouTube не пов’язаний із YouTube або Google.",

@@ -18,9 +18,7 @@
     "commandHelpOpenHelp": "Hiển thị danh sách này.",
     "commandHelpSetTranslateTo": "Đặt ngôn ngữ dịch.",
     "commandHelpSetTranslationDisplay": "Đặt cách hiển thị bản dịch.",
-    "commandHelpSetQuoteLength": "Đặt độ dài trích dẫn.",
     "commandHelpSetSound": "Đặt âm thanh hộp thư.",
-    "commandHelpSetOpenChannelsInPopup": "Đặt cách mở popup kênh.",
     "couldNotFindChatInput": "Không tìm thấy ô nhập chat.",
     "couldNotReadTime": "Không đọc được thời gian đó.",
     "couldNotReadUserName": "Không đọc được tên người dùng đó.",
@@ -41,13 +39,11 @@
     "noPreviousMessageYet": "Chưa có tin nhắn trước đó.",
     "noRecentMessages": "Không có tin nhắn gần đây",
     "openChannel": "Mở kênh",
-    "openChannelsInPopup": "Mở kênh trong popup",
     "original": "Gốc: {text}",
     "originalMessage": "Tin nhắn gốc",
     "pressEnterAgainToSend": "Nhấn Enter lần nữa để gửi.",
     "pressTabToRunCommand": "Nhấn Tab để chạy lệnh này.",
     "quote": "Trích dẫn",
-    "quoteLength": "Độ dài trích dẫn {count}.",
     "quoteMessage": "Trích dẫn tin nhắn",
     "recentMessages": "Tin nhắn gần đây",
     "recentMessagesFromThisUser": "Tin nhắn gần đây từ người dùng này",
@@ -80,7 +76,6 @@
       "other": "{count} tin nhắn mới"
     },
     "useOnOrOff": "Dùng on hoặc off.",
-    "useQuoteLength": "Dùng độ dài trích dẫn {lengths}.",
     "useReplaceOrBelow": "Dùng replace hoặc below.",
     "watchingMentions": "Đang theo dõi lượt nhắc",
     "watchingMentionsAndKeywords": "Đang theo dõi lượt nhắc và từ khóa",
@@ -90,7 +85,7 @@
     "focusingOn": "Đang tập trung vào",
     "noMessagesYet": "Chưa có tin nhắn",
     "refreshChat": "Làm mới",
-    "refreshChatTitle": "Làm mới chat để kết nối lại tiện ích"
+    "refreshChatTitle": "Tiện ích đã bị ngắt kết nối. Nhấp để làm mới chat."
   },
   "extension": {
     "extensionName": {
@@ -188,27 +183,6 @@
     },
     "showBelow": {
       "message": "Hiển thị bên dưới"
-    },
-    "chatActions": {
-      "message": "Thao tác chat"
-    },
-    "quoteLengthTitle": {
-      "message": "Số ký tự tối đa khi trích dẫn tin nhắn từ thao tác chat hoặc thẻ."
-    },
-    "quoteLengthLabel": {
-      "message": "Độ dài trích dẫn"
-    },
-    "quoteLengthHelper": {
-      "message": "Số ký tự tối đa khi trích dẫn tin nhắn."
-    },
-    "openChannelsInPopup": {
-      "message": "Mở kênh trong popup"
-    },
-    "openChannelsInPopupTitle": {
-      "message": "Mở trang kênh YouTube trong cửa sổ popup nhỏ thay vì tab trình duyệt thông thường."
-    },
-    "openChannelsInPopupHelper": {
-      "message": "Dùng cửa sổ nhỏ hơn cho kênh từ thẻ avatar."
     },
     "popupAlerts": {
       "message": "Cảnh báo"

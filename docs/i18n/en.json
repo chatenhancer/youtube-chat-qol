@@ -148,9 +148,7 @@
     "helpDescription": "Open the command help card inside YouTube chat.",
     "setTranslateDescription": "Set the translation target language. Use off to disable translation.",
     "setDisplayDescription": "Replace original messages with translations. Use below to show translations underneath.",
-    "setQuoteLengthDescription": "Set quote length to 80, 120, 180, or 240.",
-    "setSoundDescription": "Turn inbox sounds on or off.",
-    "setPopupDescription": "Open channels in popup windows. Use off to open them normally."
+    "setSoundDescription": "Turn inbox sounds on or off."
   },
   "footer": {
     "disclaimer": "Chat Enhancer for YouTube is not affiliated with YouTube or Google.",

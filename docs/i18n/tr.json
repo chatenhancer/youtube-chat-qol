@@ -148,9 +148,7 @@
     "helpDescription": "YouTube sohbetinde komut yardım kartını açar.",
     "setTranslateDescription": "Çeviri hedef dilini ayarlar. Çeviriyi devre dışı bırakmak için off kullanın.",
     "setDisplayDescription": "Orijinal mesajları çevirilerle değiştirir. Çevirileri altta göstermek için below kullanın.",
-    "setQuoteLengthDescription": "Alıntı uzunluğunu 80, 120, 180 veya 240 yapar.",
-    "setSoundDescription": "Gelen kutusu seslerini açar veya kapatır.",
-    "setPopupDescription": "Kanalları popup pencerelerde açar. Normal açmak için off kullanın."
+    "setSoundDescription": "Gelen kutusu seslerini açar veya kapatır."
   },
   "footer": {
     "disclaimer": "Chat Enhancer for YouTube, YouTube veya Google ile bağlantılı değildir.",

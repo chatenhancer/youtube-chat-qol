@@ -148,9 +148,7 @@
     "helpDescription": "Apre la scheda di aiuto dei comandi nella chat YouTube.",
     "setTranslateDescription": "Imposta la lingua di destinazione della traduzione. Usa off per disattivare la traduzione.",
     "setDisplayDescription": "Sostituisce i messaggi originali con traduzioni. Usa below per mostrare le traduzioni sotto.",
-    "setQuoteLengthDescription": "Imposta la lunghezza della citazione a 80, 120, 180 o 240.",
-    "setSoundDescription": "Attiva o disattiva i suoni della posta in arrivo.",
-    "setPopupDescription": "Apre i canali in finestre popup. Usa off per aprirli normalmente."
+    "setSoundDescription": "Attiva o disattiva i suoni della posta in arrivo."
   },
   "footer": {
     "disclaimer": "Chat Enhancer for YouTube non è affiliato a YouTube o Google.",

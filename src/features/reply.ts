@@ -6,7 +6,6 @@
  * author name quotes that message while normal message clicks remain available
  * for YouTube's own message UI.
  */
-import { getOptions } from '../shared/state';
 import { t } from '../shared/i18n';
 import { cleanText } from '../shared/text';
 import { showToast } from '../shared/toast';
@@ -31,6 +30,7 @@ import { showFocusPromptForAuthor, showFocusPromptForMessage } from './focus-mod
 const CHAT_INPUT_RETRY_DELAYS = [80, 180, 360, 600];
 const INPUT_EMOJI_CLASS = 'emoji yt-formatted-string style-scope yt-live-chat-text-input-field-renderer';
 const INVISIBLE_QUOTE_TEXT_PATTERN = /[\u200B\u2060\uFEFF]/g;
+const QUOTE_MAX_LENGTH = 120;
 
 interface RichQuoteContent {
   nodes?: Node[];
@@ -194,14 +194,13 @@ function retryInsertMentionContent(insert: () => boolean, attempt: number): void
 
 function truncateForQuote(text: string): string {
   const clean = cleanText(text);
-  const { quoteMaxLength } = getOptions();
-  if (clean.length <= quoteMaxLength) return clean;
-  return `${clean.slice(0, Math.max(0, quoteMaxLength - 3)).trim()}...`;
+  if (clean.length <= QUOTE_MAX_LENGTH) return clean;
+  return `${clean.slice(0, Math.max(0, QUOTE_MAX_LENGTH - 3)).trim()}...`;
 }
 
 function createQuoteContentNodes(content: RichQuoteContent, fallbackText: string): QuoteContentBuild {
   const state = {
-    remaining: getOptions().quoteMaxLength,
+    remaining: QUOTE_MAX_LENGTH,
     truncated: false
   };
   const nodes: Node[] = [];

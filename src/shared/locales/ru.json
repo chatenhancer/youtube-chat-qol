@@ -18,9 +18,7 @@
     "commandHelpOpenHelp": "Показывает этот список.",
     "commandHelpSetTranslateTo": "Задает язык перевода.",
     "commandHelpSetTranslationDisplay": "Задает способ отображения переводов.",
-    "commandHelpSetQuoteLength": "Задает длину цитаты.",
     "commandHelpSetSound": "Задает звук входящих.",
-    "commandHelpSetOpenChannelsInPopup": "Задает способ открытия каналов.",
     "couldNotFindChatInput": "Не удалось найти поле ввода чата.",
     "couldNotReadTime": "Не удалось прочитать это время.",
     "couldNotReadUserName": "Не удалось прочитать это имя пользователя.",
@@ -41,13 +39,11 @@
     "noPreviousMessageYet": "Предыдущего сообщения пока нет.",
     "noRecentMessages": "Нет недавних сообщений",
     "openChannel": "Открыть канал",
-    "openChannelsInPopup": "Открывать каналы во всплывающем окне",
     "original": "Оригинал: {text}",
     "originalMessage": "Исходное сообщение",
     "pressEnterAgainToSend": "Нажмите Enter еще раз, чтобы отправить.",
     "pressTabToRunCommand": "Нажмите Tab, чтобы выполнить эту команду.",
     "quote": "Цитировать",
-    "quoteLength": "Длина цитаты {count}.",
     "quoteMessage": "Цитировать сообщение",
     "recentMessages": "Недавние сообщения",
     "recentMessagesFromThisUser": "Недавние сообщения этого пользователя",
@@ -80,7 +76,6 @@
       "other": "{count} новых сообщений"
     },
     "useOnOrOff": "Используйте on или off.",
-    "useQuoteLength": "Используйте длину цитаты {lengths}.",
     "useReplaceOrBelow": "Используйте replace или below.",
     "watchingMentions": "Отслеживаются упоминания",
     "watchingMentionsAndKeywords": "Отслеживаются упоминания и ключевые слова",
@@ -90,7 +85,7 @@
     "focusingOn": "Фокус на",
     "noMessagesYet": "Пока нет сообщений",
     "refreshChat": "Обновить",
-    "refreshChatTitle": "Обновите чат, чтобы заново подключить расширение"
+    "refreshChatTitle": "Расширение отключилось. Нажмите, чтобы обновить чат."
   },
   "extension": {
     "extensionName": {
@@ -191,27 +186,6 @@
     },
     "showBelow": {
       "message": "Показывать ниже"
-    },
-    "chatActions": {
-      "message": "Действия чата"
-    },
-    "quoteLengthTitle": {
-      "message": "Максимальное число символов при цитировании сообщения из действий чата или карточек."
-    },
-    "quoteLengthLabel": {
-      "message": "Длина цитаты"
-    },
-    "quoteLengthHelper": {
-      "message": "Максимальное число символов при цитировании сообщений."
-    },
-    "openChannelsInPopup": {
-      "message": "Открывать каналы во всплывающем окне"
-    },
-    "openChannelsInPopupTitle": {
-      "message": "Открывать страницы каналов YouTube в меньшем всплывающем окне вместо обычной вкладки браузера."
-    },
-    "openChannelsInPopupHelper": {
-      "message": "Использовать меньшее окно для страниц каналов из карточек аватаров."
     },
     "popupAlerts": {
       "message": "Оповещения"
