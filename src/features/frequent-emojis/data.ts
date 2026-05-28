@@ -1,3 +1,9 @@
+/**
+ * Frequent emoji data extraction.
+ *
+ * Reads YouTube emoji picker option DOM and normalizes it into stable usage
+ * records for Unicode and custom YouTube emoji.
+ */
 import { cleanText } from '../../shared/text';
 import type { EmojiUsage } from './types';
 

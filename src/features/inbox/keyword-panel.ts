@@ -1,3 +1,9 @@
+/**
+ * Inbox keyword panel.
+ *
+ * Renders the add/remove UI for watched keywords and phrases inside the Inbox
+ * card, delegating persistence and chat highlight refresh to callbacks.
+ */
 import { t } from '../../shared/i18n';
 import { createCloseIcon } from '../../shared/icons';
 import { createAddIcon, formatBadgeCount } from './icons';

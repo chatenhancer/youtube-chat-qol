@@ -1,3 +1,9 @@
+/**
+ * Quote command.
+ *
+ * Quotes the latest Inbox record, or the latest seen message from a requested
+ * recent user when a handle argument is provided.
+ */
 import { t } from '../../../shared/i18n';
 import { cleanText } from '../../../shared/text';
 import { showToast } from '../../../shared/toast';

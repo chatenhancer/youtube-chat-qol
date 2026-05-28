@@ -1,3 +1,9 @@
+/**
+ * Channel popup helpers.
+ *
+ * Builds stable YouTube channel URLs and opens them in a small window positioned
+ * near the live chat instead of navigating away from the stream.
+ */
 const CHANNEL_WINDOW_WIDTH = 486;
 const CHANNEL_WINDOW_HEIGHT = 680;
 const CHANNEL_WINDOW_MARGIN = 12;

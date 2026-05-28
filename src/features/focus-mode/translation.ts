@@ -1,3 +1,9 @@
+/**
+ * Focus mode translation rendering.
+ *
+ * Renders focus-panel message text with any available live-chat translation
+ * state in the same style used by profile cards.
+ */
 import { getOptions } from '../../shared/state';
 import { appendRichMessageText } from '../../youtube/rich-text';
 import { createNodesWithPlaceholders } from '../translation/protected-placeholders';

@@ -1,3 +1,9 @@
+/**
+ * Translate command.
+ *
+ * Translates custom text into a requested language and replaces only the typed
+ * command span; it never auto-sends the result.
+ */
 import { t } from '../../../shared/i18n';
 import { showToast } from '../../../shared/toast';
 import { createTranslationTextLanguageOptions } from './language-options';

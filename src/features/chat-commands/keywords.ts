@@ -1,3 +1,9 @@
+/**
+ * Keyword command parsing.
+ *
+ * Parses /watch and /unwatch arguments, preserving quoted phrases while
+ * splitting unquoted text into individual watched terms.
+ */
 import { t } from '../../shared/i18n';
 import { cleanText } from '../../shared/text';
 

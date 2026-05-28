@@ -1,3 +1,9 @@
+/**
+ * Frequent emoji row rendering.
+ *
+ * Adds and refreshes the compact most-used emoji row inside YouTube's native
+ * emoji picker without disturbing the picker scroll area.
+ */
 import { t } from '../../shared/i18n';
 import { getEmojiFallbackText } from './data';
 import type { EmojiUsage } from './types';

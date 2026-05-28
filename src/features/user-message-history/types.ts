@@ -1,3 +1,9 @@
+/**
+ * User message history type definitions.
+ *
+ * Shared record, translation, identity, and recent-user match contracts for
+ * current-page message history.
+ */
 import type { RichTextSegment } from '../../youtube/rich-text';
 import type { ProtectedToken } from '../translation/protected-placeholders';
 import type { TranslationResult } from '../translation/render';

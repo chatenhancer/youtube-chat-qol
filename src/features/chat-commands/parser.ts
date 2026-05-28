@@ -1,3 +1,9 @@
+/**
+ * Slash command parser.
+ *
+ * Normalizes whole-input commands and inline command spans while leaving
+ * unknown slash-prefixed chat text untouched.
+ */
 import { cleanText } from '../../shared/text';
 import type { ChatInputTextSelection } from '../../youtube/chat-input';
 import type { InlineParsedCommand, ParsedCommand } from './types';

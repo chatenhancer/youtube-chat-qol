@@ -1,3 +1,9 @@
+/**
+ * Inbox highlight helpers.
+ *
+ * Applies mention and watched-keyword highlights to live chat renderers and
+ * stored Inbox message rows without nesting duplicate highlight spans.
+ */
 import { getAuthorNameElement, getMessageTextElement } from '../../youtube/messages';
 import type { InboxRecord, InlineHighlightMatch, InlineHighlightTerm } from './types';
 

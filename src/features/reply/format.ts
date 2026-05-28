@@ -1,3 +1,9 @@
+/**
+ * Reply text formatting.
+ *
+ * Builds the plain-text Mention and Quote prefixes used when rich message
+ * content is unavailable or not needed.
+ */
 import { cleanText } from '../../shared/text';
 
 export const QUOTE_MAX_LENGTH = 120;

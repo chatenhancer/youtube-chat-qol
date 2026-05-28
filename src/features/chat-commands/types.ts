@@ -1,3 +1,9 @@
+/**
+ * Chat command type definitions.
+ *
+ * Shared contracts for command parsing, autocomplete, runtime callbacks, and
+ * individual command declarations.
+ */
 import type { t } from '../../shared/i18n';
 import type { Options } from '../../shared/options';
 

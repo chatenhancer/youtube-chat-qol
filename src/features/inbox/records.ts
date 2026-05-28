@@ -1,3 +1,9 @@
+/**
+ * Inbox record creation and merging.
+ *
+ * Converts live YouTube messages into stored Inbox records and merges mention
+ * plus keyword matches for the same live message.
+ */
 import {
   getAuthorName,
   getMessageContentSourceNodes,

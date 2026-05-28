@@ -1,3 +1,9 @@
+/**
+ * Inbox storage adapter.
+ *
+ * Serializes records and keywords to chrome.storage.local, scopes records per
+ * stream, and preserves stable ordering for messages sharing a timestamp.
+ */
 import { cleanText } from '../../shared/text';
 import { normalizeRichTextSegments } from '../../youtube/rich-text';
 import { getChatTimestampValue, isLiveChatReplayUrl } from '../../youtube/timestamps';

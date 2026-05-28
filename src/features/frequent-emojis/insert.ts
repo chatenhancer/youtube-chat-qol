@@ -1,3 +1,9 @@
+/**
+ * Frequent emoji insertion.
+ *
+ * Inserts a saved frequent emoji into YouTube's chat input, preserving custom
+ * YouTube emoji image metadata when available.
+ */
 import { cleanText } from '../../shared/text';
 import { insertIntoChatInput, insertNodeIntoChatInput } from '../../youtube/chat-input';
 import {

@@ -1,3 +1,9 @@
+/**
+ * Frequent emoji usage state helpers.
+ *
+ * Normalizes, caps, sorts, and updates the local usage list that backs the
+ * most-used emoji row.
+ */
 import { emojiRecordsMatch } from './data';
 import type { EmojiUsage } from './types';
 

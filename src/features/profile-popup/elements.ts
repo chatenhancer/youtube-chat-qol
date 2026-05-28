@@ -1,3 +1,9 @@
+/**
+ * Profile card element helpers.
+ *
+ * Builds avatar and channel-link controls shared by the recent-messages card
+ * without mixing SVG details into the card renderer.
+ */
 import { t } from '../../shared/i18n';
 import { openChannelWindow } from '../channel-popup';
 

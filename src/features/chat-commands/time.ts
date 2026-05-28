@@ -1,3 +1,9 @@
+/**
+ * Time parsing and formatting helpers.
+ *
+ * Supports timezone aliases and flexible local date/time inputs for /time and
+ * /when-style duration commands.
+ */
 import { getUiLocale } from '../../shared/i18n';
 import { cleanText } from '../../shared/text';
 import { normalizeCommandToken } from './parser';

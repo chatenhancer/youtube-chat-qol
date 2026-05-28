@@ -1,3 +1,9 @@
+/**
+ * Command language autocomplete options.
+ *
+ * Builds localized language choices for translation-target settings and
+ * custom inline translation commands.
+ */
 import { getLocalizedLanguageLabel, t } from '../../../shared/i18n';
 import { LANGUAGE_OPTIONS } from '../../../shared/languages';
 import { cleanText } from '../../../shared/text';

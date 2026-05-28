@@ -1,3 +1,9 @@
+/**
+ * Profile card message list.
+ *
+ * Renders recent user messages, optional translations, quote interactions, and
+ * jump-to-message controls for the avatar profile card.
+ */
 import { getOptions } from '../../shared/state';
 import { t } from '../../shared/i18n';
 import { normalizeComparableText } from '../../shared/text';

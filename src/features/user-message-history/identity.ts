@@ -1,3 +1,9 @@
+/**
+ * User message identity helpers.
+ *
+ * Builds stable in-memory keys for recent-message records from channel IDs,
+ * handles, and author-name fallbacks.
+ */
 import { normalizeComparableText } from '../../shared/text';
 import {
   getAuthorName,

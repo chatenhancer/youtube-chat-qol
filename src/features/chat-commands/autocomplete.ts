@@ -1,3 +1,9 @@
+/**
+ * Chat command autocomplete.
+ *
+ * Finds the command or argument fragment at the caret, renders suggestions
+ * above the input, and owns keyboard/pointer selection behavior.
+ */
 import { t } from '../../shared/i18n';
 import { cleanText } from '../../shared/text';
 import { showToast } from '../../shared/toast';

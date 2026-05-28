@@ -1,3 +1,9 @@
+/**
+ * Focus command.
+ *
+ * Opens focus mode for an explicit recent handle, or for the most recent user
+ * who mentioned the current user when no handle is provided.
+ */
 import { t } from '../../../shared/i18n';
 import { cleanText } from '../../../shared/text';
 import { showToast } from '../../../shared/toast';

@@ -1,3 +1,9 @@
+/**
+ * Inbox card UI.
+ *
+ * Renders the Inbox panel, message rows, clear action, quote behavior, and
+ * jump-to-message buttons while state changes stay in the coordinator.
+ */
 import { t } from '../../shared/i18n';
 import { createCloseIcon } from '../../shared/icons';
 import { captureScrollPosition, restoreScrollPositionAfterRender, scrollElementToBottom } from '../../shared/scroll';

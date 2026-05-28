@@ -1,3 +1,9 @@
+/**
+ * Input-adjacent floating card helpers.
+ *
+ * Shared positioning and close-button utilities for command UI that should sit
+ * near the YouTube chat input without resizing chat.
+ */
 import { t } from '../../shared/i18n';
 import { createCloseIcon } from '../../shared/icons';
 import { findChatInput } from '../../youtube/chat-input';

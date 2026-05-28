@@ -1,3 +1,8 @@
+/**
+ * Repeat command.
+ *
+ * Restores the previous rich chat input snapshot for /again and /repeat.
+ */
 import type { ChatCommandDefinition, ChatCommandRuntime } from '../types';
 
 export function createRepeatCommand(runtime: ChatCommandRuntime): ChatCommandDefinition {

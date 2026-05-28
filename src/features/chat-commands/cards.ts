@@ -1,3 +1,9 @@
+/**
+ * Chat command floating cards.
+ *
+ * Shows command help and watched-keyword summaries using the same compact card
+ * shell positioned near YouTube's chat input.
+ */
 import { t } from '../../shared/i18n';
 import { createFloatingCardCloseButton, positionFloatingCardAboveInput } from './floating-card';
 import type { ChatCommandDefinition } from './types';

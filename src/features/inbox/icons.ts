@@ -1,3 +1,9 @@
+/**
+ * Inbox SVG helpers.
+ *
+ * Creates and swaps the outlined/full Inbox icons plus shared badge formatting
+ * used by the header button and card controls.
+ */
 import { createSvgIcon } from '../../shared/icons';
 
 const INBOX_ICON_VIEW_BOX = '0 0 24 24';
