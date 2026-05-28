@@ -88,12 +88,53 @@
     "focusMode": "Modo foco",
     "focusOn": "Focar em",
     "focusingOn": "Focando em",
-    "noMessagesYet": "Nenhuma mensagem ainda"
+    "noMessagesYet": "Nenhuma mensagem ainda",
+    "refreshChat": "Atualizar",
+    "refreshChatTitle": "Atualize o chat para reconectar a extensão"
   },
   "extension": {
     "extensionName": {
       "message": "Chat Enhancer for YouTube",
       "description": "Nome público da extensão."
+    },
+    "extensionActiveTitle": {
+      "message": "Chat Enhancer for YouTube está ativo nesta aba"
+    },
+    "extensionStatusChecking": {
+      "message": "Verificando abas abertas..."
+    },
+    "extensionStatusCheckingHelper": {
+      "message": "Procurando abas com chat ao vivo do YouTube."
+    },
+    "extensionStatusActiveCurrent": {
+      "message": "Ativo nesta aba"
+    },
+    "extensionStatusActiveCurrentAndOne": {
+      "message": "Ativo nesta aba e em mais 1 aba"
+    },
+    "extensionStatusActiveCurrentAndMany": {
+      "message": "Ativo nesta aba e em mais {count} abas"
+    },
+    "extensionStatusActiveOneOther": {
+      "message": "Ativo em mais 1 aba"
+    },
+    "extensionStatusActiveManyOther": {
+      "message": "Ativo em mais {count} abas"
+    },
+    "extensionStatusActiveHelper": {
+      "message": "A extensão está em execução no chat ao vivo do YouTube."
+    },
+    "extensionStatusInactiveAll": {
+      "message": "Não ativo em nenhuma aba aberta"
+    },
+    "extensionStatusInactiveHelper": {
+      "message": "Abra um chat ao vivo do YouTube para a extensão funcionar."
+    },
+    "extensionStatusInactiveDisconnectedHelperOne": {
+      "message": "Atualize o chat ao vivo aberto do YouTube."
+    },
+    "extensionStatusInactiveDisconnectedHelperMany": {
+      "message": "Atualize os chats ao vivo abertos do YouTube."
     },
     "extensionShortName": {
       "message": "Chat Enhancer",

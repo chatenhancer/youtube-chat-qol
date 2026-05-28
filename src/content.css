@@ -1196,6 +1196,76 @@ yt-live-chat-membership-item-renderer .ytcq-replaced-translation-icon svg,
   pointer-events: none;
 }
 
+.ytcq-reconnect-button {
+  position: fixed;
+  right: 12px;
+  bottom: 72px;
+  z-index: 9999;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  max-width: calc(100vw - 24px);
+  min-height: 28px;
+  padding: 0 10px 0 8px;
+  border: 0;
+  border-radius: 999px;
+  color: var(--yt-spec-text-primary, var(--yt-live-chat-primary-text-color, #fff));
+  fill: currentColor;
+  background: var(--yt-spec-badge-chip-background, rgba(255, 255, 255, 0.1));
+  box-shadow: none;
+  font: 500 11px/14px Roboto, Arial, sans-serif;
+  cursor: pointer;
+  overflow: hidden;
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  transition: background-color 120ms ease, color 120ms ease;
+  user-select: none;
+}
+
+.ytcq-reconnect-button::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: currentColor;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 120ms ease;
+}
+
+.ytcq-reconnect-button:hover,
+.ytcq-reconnect-button:focus-visible {
+  background: var(--yt-spec-10-percent-layer, rgba(255, 255, 255, 0.16));
+  outline: none;
+}
+
+.ytcq-reconnect-button:hover::after,
+.ytcq-reconnect-button:focus-visible::after {
+  opacity: 0.04;
+}
+
+.ytcq-reconnect-button:active::after {
+  opacity: 0.1;
+}
+
+.ytcq-reconnect-button:disabled {
+  cursor: default;
+  opacity: 0.72;
+}
+
+.ytcq-reconnect-button svg {
+  display: block;
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  pointer-events: none;
+}
+
+.ytcq-reconnect-button span {
+  pointer-events: none;
+  white-space: nowrap;
+}
+
 .ytcq-toast {
   position: fixed;
   left: 50%;

@@ -88,11 +88,52 @@
     "focusMode": "Tryb skupienia",
     "focusOn": "Skup się na",
     "focusingOn": "Skupienie na",
-    "noMessagesYet": "Brak wiadomości"
+    "noMessagesYet": "Brak wiadomości",
+    "refreshChat": "Odśwież",
+    "refreshChatTitle": "Odśwież czat, aby ponownie połączyć rozszerzenie"
   },
   "extension": {
     "extensionName": {
       "message": "Chat Enhancer for YouTube"
+    },
+    "extensionActiveTitle": {
+      "message": "Chat Enhancer for YouTube jest aktywny na tej karcie"
+    },
+    "extensionStatusChecking": {
+      "message": "Sprawdzanie otwartych kart..."
+    },
+    "extensionStatusCheckingHelper": {
+      "message": "Szukanie kart z czatem na żywo YouTube."
+    },
+    "extensionStatusActiveCurrent": {
+      "message": "Aktywne na tej karcie"
+    },
+    "extensionStatusActiveCurrentAndOne": {
+      "message": "Aktywne na tej karcie i 1 innej karcie"
+    },
+    "extensionStatusActiveCurrentAndMany": {
+      "message": "Aktywne na tej karcie i {count} innych kartach"
+    },
+    "extensionStatusActiveOneOther": {
+      "message": "Aktywne w 1 innej karcie"
+    },
+    "extensionStatusActiveManyOther": {
+      "message": "Aktywne w {count} innych kartach"
+    },
+    "extensionStatusActiveHelper": {
+      "message": "Rozszerzenie działa w czacie na żywo YouTube."
+    },
+    "extensionStatusInactiveAll": {
+      "message": "Nieaktywne w żadnej otwartej karcie"
+    },
+    "extensionStatusInactiveHelper": {
+      "message": "Otwórz czat na żywo YouTube, aby rozszerzenie działało."
+    },
+    "extensionStatusInactiveDisconnectedHelperOne": {
+      "message": "Odśwież otwarty czat na żywo YouTube."
+    },
+    "extensionStatusInactiveDisconnectedHelperMany": {
+      "message": "Odśwież otwarte czaty na żywo YouTube."
     },
     "extensionShortName": {
       "message": "Chat Enhancer"

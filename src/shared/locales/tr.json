@@ -88,12 +88,53 @@
     "focusMode": "Odak modu",
     "focusOn": "Odaklan",
     "focusingOn": "Odaklanılan",
-    "noMessagesYet": "Henüz mesaj yok"
+    "noMessagesYet": "Henüz mesaj yok",
+    "refreshChat": "Yenile",
+    "refreshChatTitle": "Uzantıyı yeniden bağlamak için sohbeti yenile"
   },
   "extension": {
     "extensionName": {
       "message": "Chat Enhancer for YouTube",
       "description": "Herkese açık uzantı adı."
+    },
+    "extensionActiveTitle": {
+      "message": "Chat Enhancer for YouTube bu sekmede etkin"
+    },
+    "extensionStatusChecking": {
+      "message": "Açık sekmeler kontrol ediliyor..."
+    },
+    "extensionStatusCheckingHelper": {
+      "message": "YouTube canlı sohbet sekmeleri aranıyor."
+    },
+    "extensionStatusActiveCurrent": {
+      "message": "Bu sekmede etkin"
+    },
+    "extensionStatusActiveCurrentAndOne": {
+      "message": "Bu sekmede ve 1 başka sekmede etkin"
+    },
+    "extensionStatusActiveCurrentAndMany": {
+      "message": "Bu sekmede ve {count} başka sekmede etkin"
+    },
+    "extensionStatusActiveOneOther": {
+      "message": "1 başka sekmede etkin"
+    },
+    "extensionStatusActiveManyOther": {
+      "message": "{count} başka sekmede etkin"
+    },
+    "extensionStatusActiveHelper": {
+      "message": "Uzantı YouTube canlı sohbetinde çalışıyor."
+    },
+    "extensionStatusInactiveAll": {
+      "message": "Hiçbir açık sekmede etkin değil"
+    },
+    "extensionStatusInactiveHelper": {
+      "message": "Uzantının çalışması için bir YouTube canlı sohbeti açın."
+    },
+    "extensionStatusInactiveDisconnectedHelperOne": {
+      "message": "Açık YouTube canlı sohbetini yenile."
+    },
+    "extensionStatusInactiveDisconnectedHelperMany": {
+      "message": "Açık YouTube canlı sohbetlerini yenile."
     },
     "extensionShortName": {
       "message": "Chat Enhancer",

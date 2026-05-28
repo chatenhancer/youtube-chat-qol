@@ -25,6 +25,16 @@ export async function generateIcons() {
       })
       .png()
       .toFile(path.join(iconDir, `icon-${size}.png`));
+
+    await sharp(source)
+      .resize(size, size, {
+        fit: 'contain',
+        background: { r: 0, g: 0, b: 0, alpha: 0 }
+      })
+      .grayscale()
+      .modulate({ brightness: 1.18 })
+      .png()
+      .toFile(path.join(iconDir, `icon-inactive-${size}.png`));
   }
 }
 

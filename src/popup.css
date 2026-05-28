@@ -139,6 +139,53 @@ main {
   outline-offset: 2px;
 }
 
+.extension-status {
+  display: grid;
+  grid-template-columns: 9px minmax(0, 1fr);
+  gap: 9px;
+  align-items: center;
+  margin: 0 0 7px;
+  padding: 7px 8px;
+  border-radius: 8px;
+  background: var(--ytcq-popup-row-bg);
+}
+
+.extension-status-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--ytcq-popup-secondary-text);
+  opacity: 0.72;
+}
+
+.extension-status[data-extension-status="active"] .extension-status-dot {
+  background: #22c55e;
+  opacity: 1;
+}
+
+.extension-status[data-extension-status="inactive"] .extension-status-dot {
+  background: var(--ytcq-popup-secondary-text);
+}
+
+.extension-status-copy {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+}
+
+.extension-status strong {
+  color: var(--ytcq-popup-text);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 15px;
+}
+
+.extension-status-copy > span {
+  color: var(--ytcq-popup-secondary-text);
+  font-size: 11px;
+  line-height: 14px;
+}
+
 .settings-section {
   padding: 7px 8px;
   border-radius: 8px;

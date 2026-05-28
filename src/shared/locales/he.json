@@ -88,11 +88,52 @@
     "focusMode": "מצב מיקוד",
     "focusOn": "התמקדות ב",
     "focusingOn": "מתמקד ב",
-    "noMessagesYet": "אין עדיין הודעות"
+    "noMessagesYet": "אין עדיין הודעות",
+    "refreshChat": "רענון",
+    "refreshChatTitle": "רעננו את הצ׳אט כדי לחבר מחדש את התוסף"
   },
   "extension": {
     "extensionName": {
       "message": "Chat Enhancer for YouTube"
+    },
+    "extensionActiveTitle": {
+      "message": "Chat Enhancer for YouTube פעיל בלשונית הזו"
+    },
+    "extensionStatusChecking": {
+      "message": "בודק לשוניות פתוחות..."
+    },
+    "extensionStatusCheckingHelper": {
+      "message": "מחפש לשוניות עם צ׳אט חי של YouTube."
+    },
+    "extensionStatusActiveCurrent": {
+      "message": "פעיל בלשונית הזו"
+    },
+    "extensionStatusActiveCurrentAndOne": {
+      "message": "פעיל בלשונית הזו ובעוד לשונית אחת"
+    },
+    "extensionStatusActiveCurrentAndMany": {
+      "message": "פעיל בלשונית הזו ובעוד {count} לשוניות"
+    },
+    "extensionStatusActiveOneOther": {
+      "message": "פעיל בעוד לשונית אחת"
+    },
+    "extensionStatusActiveManyOther": {
+      "message": "פעיל בעוד {count} לשוניות"
+    },
+    "extensionStatusActiveHelper": {
+      "message": "התוסף פועל בצ׳אט החי של YouTube."
+    },
+    "extensionStatusInactiveAll": {
+      "message": "לא פעיל באף לשונית פתוחה"
+    },
+    "extensionStatusInactiveHelper": {
+      "message": "פתחו צ׳אט חי של YouTube כדי שהתוסף יפעל."
+    },
+    "extensionStatusInactiveDisconnectedHelperOne": {
+      "message": "רעננו את הצ׳אט החי הפתוח של YouTube."
+    },
+    "extensionStatusInactiveDisconnectedHelperMany": {
+      "message": "רעננו את הצ׳אטים החיים הפתוחים של YouTube."
     },
     "extensionShortName": {
       "message": "Chat Enhancer"

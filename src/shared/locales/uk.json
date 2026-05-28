@@ -88,11 +88,52 @@
     "focusMode": "Режим фокуса",
     "focusOn": "Фокус на",
     "focusingOn": "Фокус на",
-    "noMessagesYet": "Поки немає повідомлень"
+    "noMessagesYet": "Поки немає повідомлень",
+    "refreshChat": "Оновити",
+    "refreshChatTitle": "Оновіть чат, щоб знову підключити розширення"
   },
   "extension": {
     "extensionName": {
       "message": "Chat Enhancer for YouTube"
+    },
+    "extensionActiveTitle": {
+      "message": "Chat Enhancer for YouTube активний на цій вкладці"
+    },
+    "extensionStatusChecking": {
+      "message": "Перевірка відкритих вкладок..."
+    },
+    "extensionStatusCheckingHelper": {
+      "message": "Пошук вкладок із live-чатом YouTube."
+    },
+    "extensionStatusActiveCurrent": {
+      "message": "Активно на цій вкладці"
+    },
+    "extensionStatusActiveCurrentAndOne": {
+      "message": "Активно на цій вкладці й ще 1 вкладці"
+    },
+    "extensionStatusActiveCurrentAndMany": {
+      "message": "Активно на цій вкладці й ще {count} вкладках"
+    },
+    "extensionStatusActiveOneOther": {
+      "message": "Активно ще в 1 вкладці"
+    },
+    "extensionStatusActiveManyOther": {
+      "message": "Активно ще в {count} вкладках"
+    },
+    "extensionStatusActiveHelper": {
+      "message": "Розширення працює в живому чаті YouTube."
+    },
+    "extensionStatusInactiveAll": {
+      "message": "Неактивно в жодній відкритій вкладці"
+    },
+    "extensionStatusInactiveHelper": {
+      "message": "Відкрийте живий чат YouTube, щоб розширення запрацювало."
+    },
+    "extensionStatusInactiveDisconnectedHelperOne": {
+      "message": "Оновіть відкритий чат YouTube наживо."
+    },
+    "extensionStatusInactiveDisconnectedHelperMany": {
+      "message": "Оновіть відкриті чати YouTube наживо."
     },
     "extensionShortName": {
       "message": "Chat Enhancer"

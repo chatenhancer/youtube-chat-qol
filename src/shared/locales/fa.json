@@ -88,11 +88,52 @@
     "focusMode": "حالت تمرکز",
     "focusOn": "تمرکز روی",
     "focusingOn": "در حال تمرکز روی",
-    "noMessagesYet": "هنوز پیامی نیست"
+    "noMessagesYet": "هنوز پیامی نیست",
+    "refreshChat": "تازه‌سازی",
+    "refreshChatTitle": "برای اتصال دوباره افزونه، چت را تازه‌سازی کنید"
   },
   "extension": {
     "extensionName": {
       "message": "Chat Enhancer for YouTube"
+    },
+    "extensionActiveTitle": {
+      "message": "Chat Enhancer for YouTube در این تب فعال است"
+    },
+    "extensionStatusChecking": {
+      "message": "در حال بررسی تب‌های باز..."
+    },
+    "extensionStatusCheckingHelper": {
+      "message": "در حال جستجوی تب‌های چت زنده YouTube."
+    },
+    "extensionStatusActiveCurrent": {
+      "message": "در این تب فعال است"
+    },
+    "extensionStatusActiveCurrentAndOne": {
+      "message": "در این تب و ۱ تب دیگر فعال است"
+    },
+    "extensionStatusActiveCurrentAndMany": {
+      "message": "در این تب و {count} تب دیگر فعال است"
+    },
+    "extensionStatusActiveOneOther": {
+      "message": "در ۱ تب دیگر فعال است"
+    },
+    "extensionStatusActiveManyOther": {
+      "message": "در {count} تب دیگر فعال است"
+    },
+    "extensionStatusActiveHelper": {
+      "message": "افزونه در چت زنده YouTube در حال اجرا است."
+    },
+    "extensionStatusInactiveAll": {
+      "message": "در هیچ تب بازی فعال نیست"
+    },
+    "extensionStatusInactiveHelper": {
+      "message": "یک چت زنده YouTube را باز کنید تا افزونه اجرا شود."
+    },
+    "extensionStatusInactiveDisconnectedHelperOne": {
+      "message": "چت زنده باز YouTube را تازه‌سازی کنید."
+    },
+    "extensionStatusInactiveDisconnectedHelperMany": {
+      "message": "چت‌های زنده باز YouTube را تازه‌سازی کنید."
     },
     "extensionShortName": {
       "message": "Chat Enhancer"

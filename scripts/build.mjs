@@ -56,7 +56,7 @@ async function buildTarget(target) {
     }),
     build({
       ...sharedBuildOptions,
-      entryPoints: [path.join(root, 'src', 'background', 'translate.ts')],
+      entryPoints: [path.join(root, 'src', 'background', 'index.ts')],
       outfile: path.join(extensionDir, 'background.js'),
       format: 'iife'
     }),

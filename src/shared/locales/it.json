@@ -88,12 +88,53 @@
     "focusMode": "Modalità focus",
     "focusOn": "Focus su",
     "focusingOn": "Focus su",
-    "noMessagesYet": "Nessun messaggio ancora"
+    "noMessagesYet": "Nessun messaggio ancora",
+    "refreshChat": "Aggiorna",
+    "refreshChatTitle": "Aggiorna la chat per riconnettere l’estensione"
   },
   "extension": {
     "extensionName": {
       "message": "Chat Enhancer for YouTube",
       "description": "Nome pubblico dell'estensione."
+    },
+    "extensionActiveTitle": {
+      "message": "Chat Enhancer for YouTube è attivo in questa scheda"
+    },
+    "extensionStatusChecking": {
+      "message": "Controllo delle schede aperte..."
+    },
+    "extensionStatusCheckingHelper": {
+      "message": "Ricerca di schede con live chat YouTube."
+    },
+    "extensionStatusActiveCurrent": {
+      "message": "Attivo in questa scheda"
+    },
+    "extensionStatusActiveCurrentAndOne": {
+      "message": "Attivo in questa scheda e in 1 altra scheda"
+    },
+    "extensionStatusActiveCurrentAndMany": {
+      "message": "Attivo in questa scheda e in altre {count} schede"
+    },
+    "extensionStatusActiveOneOther": {
+      "message": "Attivo in 1 altra scheda"
+    },
+    "extensionStatusActiveManyOther": {
+      "message": "Attivo in altre {count} schede"
+    },
+    "extensionStatusActiveHelper": {
+      "message": "L’estensione è in esecuzione nella live chat di YouTube."
+    },
+    "extensionStatusInactiveAll": {
+      "message": "Non attivo in nessuna scheda aperta"
+    },
+    "extensionStatusInactiveHelper": {
+      "message": "Apri una live chat di YouTube per far funzionare l’estensione."
+    },
+    "extensionStatusInactiveDisconnectedHelperOne": {
+      "message": "Aggiorna la live chat YouTube aperta."
+    },
+    "extensionStatusInactiveDisconnectedHelperMany": {
+      "message": "Aggiorna le live chat YouTube aperte."
     },
     "extensionShortName": {
       "message": "Chat Enhancer",
