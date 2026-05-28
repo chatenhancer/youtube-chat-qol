@@ -5,57 +5,43 @@
  * chat page. Nothing is persisted to extension storage; this only powers the
  * avatar profile card while the livestream page is open.
  */
-import { cleanText, normalizeComparableText } from '../shared/text';
-import { findMatchingLiveMessageRecordIndex } from '../youtube/message-dedupe';
+import { cleanText, normalizeComparableText } from '../../shared/text';
+import { findMatchingLiveMessageRecordIndex } from '../../youtube/message-dedupe';
 import {
   getAuthorName,
   getMessageContentSourceNodes,
   getMessageAvatarSrc,
   getMessageStableId,
   getMessageText,
-  getMessageTimestampText,
-  getRendererData
-} from '../youtube/messages';
-import { serializeRichMessageNodes, type RichTextSegment } from '../youtube/rich-text';
-import { CHAT_MESSAGE_SELECTOR } from '../youtube/selectors';
-import { getChatTimestampValue, isLiveChatReplayUrl } from '../youtube/timestamps';
-import type { ProtectedToken } from './translation/protected-placeholders';
-import type { TranslationResult } from './translation/render';
+  getMessageTimestampText
+} from '../../youtube/messages';
+import { serializeRichMessageNodes } from '../../youtube/rich-text';
+import { CHAT_MESSAGE_SELECTOR } from '../../youtube/selectors';
+import { getChatTimestampValue, isLiveChatReplayUrl } from '../../youtube/timestamps';
+import type { ProtectedToken } from '../translation/protected-placeholders';
+import type { TranslationResult } from '../translation/render';
+import {
+  getAuthorKey,
+  getIdentityFromUserKey,
+  getNormalizedHandle,
+  getUserKey,
+  getUserKeyFromIdentity
+} from './identity';
+import type {
+  MessageRecord,
+  RecentUserMatch,
+  UserIdentity
+} from './types';
+export type {
+  MessageRecord,
+  MessageTranslationRecord,
+  RecentUserMatch,
+  UserIdentity
+} from './types';
+export { getUserKey, getUserKeyFromIdentity } from './identity';
 
 const MAX_USERS = 160;
 const MAX_MESSAGES_PER_USER = 12;
-
-export interface MessageRecord {
-  id: number;
-  authorName: string;
-  avatarSrc?: string;
-  contentParts: RichTextSegment[];
-  messageId?: string;
-  messageRef?: WeakRef<HTMLElement>;
-  text: string;
-  timestamp: number;
-  timestampText: string;
-  translation?: MessageTranslationRecord;
-}
-
-export interface MessageTranslationRecord {
-  result: TranslationResult;
-  sourceText: string;
-  originalText: string;
-  protectedTokens: ProtectedToken[];
-}
-
-export interface UserIdentity {
-  authorName?: string;
-  channelId?: string;
-}
-
-export interface RecentUserMatch {
-  authorName: string;
-  avatarSrc?: string;
-  identity: UserIdentity;
-  latestMessage: MessageRecord;
-}
 
 interface ElementRecord {
   key: string;
@@ -241,19 +227,6 @@ export function getUserMessageRecordForMessage(message: HTMLElement): MessageRec
   return getRecordForMessage(message);
 }
 
-export function getUserKey(message: HTMLElement): string {
-  const data = getRendererData(message);
-  return getUserKeyFromIdentity({
-    channelId: data?.authorExternalChannelId || data?.authorChannelId,
-    authorName: getAuthorName(message)
-  });
-}
-
-export function getUserKeyFromIdentity(identity: UserIdentity): string {
-  if (identity.channelId) return `channel:${identity.channelId}`;
-  return getAuthorKey(identity.authorName);
-}
-
 export function onUserMessagesChanged(listener: UserMessageListener): () => void {
   userMessageListeners.add(listener);
   return () => {
@@ -349,27 +322,6 @@ function collectRecentUsers(): RecentUserMatch[] {
       seenHandles.add(handle);
       return true;
     });
-}
-
-function getIdentityFromUserKey(key: string, authorName: string): UserIdentity {
-  const channelPrefix = 'channel:';
-  if (key.startsWith(channelPrefix)) {
-    return {
-      authorName,
-      channelId: key.slice(channelPrefix.length)
-    };
-  }
-
-  return { authorName };
-}
-
-function getAuthorKey(authorName: string | undefined): string {
-  const normalizedAuthorName = normalizeComparableText(authorName || '');
-  return normalizedAuthorName ? `author:${normalizedAuthorName}` : '';
-}
-
-function getNormalizedHandle(value: string): string {
-  return normalizeComparableText(value).replace(/^@+/, '');
 }
 
 function createUniqueRecordCollector(): {
