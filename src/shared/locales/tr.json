@@ -96,7 +96,7 @@
     "commandHelpTranslate": "Özel metni bir dile çevir.",
     "commandHelpUnwatch": "Anahtar kelime veya ifade izlemeyi durdur.",
     "commandHelpWatch": "Gelen kutusunda anahtar kelime veya ifadeleri izle.",
-    "commandHelpWhen": "Bir saat/tarihe kadar veya ondan bu yana geçen süreyi ekle.",
+    "commandHelpWhen": "Bir saat/tarihe kadar veya ondan bu yana geçen süreyi ekle; isteğe bağlı olarak desteklenen bir yer/saat dilimiyle.",
     "commandHelpWho": "Yakın tarihli bir kullanıcı kartı aç.",
     "couldNotFindUser": "Bu kullanıcı bulunamadı.",
     "couldNotOpenFocusForUser": "Bu kullanıcı için odak modu açılamadı.",
@@ -122,7 +122,10 @@
     "translateDraft": "Taslağı çevir",
     "translateDraftTo": "Taslağı şuna çevir",
     "draftTranslationOff": "Taslak çevirisi kapalı.",
-    "draftTranslationTo": "Taslak çevirisi {language}."
+    "draftTranslationTo": "Taslak çevirisi {language}.",
+    "whenUntilTarget": "{target} için {duration} kaldı",
+    "whenSinceTarget": "{target} üzerinden {duration} geçti",
+    "whenTargetInPlace": "{place} için {target}"
   },
   "extension": {
     "extensionName": {

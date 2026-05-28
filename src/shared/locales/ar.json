@@ -96,7 +96,7 @@
     "commandHelpTranslate": "ترجم نصًا مخصصًا إلى لغة.",
     "commandHelpUnwatch": "أوقف مراقبة الكلمات المفتاحية أو العبارات.",
     "commandHelpWatch": "راقب الكلمات المفتاحية أو العبارات في الصندوق.",
-    "commandHelpWhen": "أدخل المدة حتى وقت/تاريخ أو منذ وقت/تاريخ.",
+    "commandHelpWhen": "أدخل المدة حتى وقت/تاريخ أو منذ وقت/تاريخ، اختياريًا في مكان/منطقة زمنية مدعومة.",
     "commandHelpWho": "افتح بطاقة مستخدم حديث.",
     "couldNotFindUser": "تعذر العثور على هذا المستخدم.",
     "couldNotOpenFocusForUser": "تعذر فتح وضع التركيز لهذا المستخدم.",
@@ -122,7 +122,10 @@
     "translateDraft": "ترجمة المسودة",
     "translateDraftTo": "ترجمة المسودة إلى",
     "draftTranslationOff": "ترجمة المسودة متوقفة.",
-    "draftTranslationTo": "ترجمة المسودة إلى {language}."
+    "draftTranslationTo": "ترجمة المسودة إلى {language}.",
+    "whenUntilTarget": "{duration} حتى {target}",
+    "whenSinceTarget": "{duration} منذ {target}",
+    "whenTargetInPlace": "{target} في {place}"
   },
   "extension": {
     "extensionName": {

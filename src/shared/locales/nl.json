@@ -96,7 +96,7 @@
     "commandHelpTranslate": "Vertaal aangepaste tekst naar een taal.",
     "commandHelpUnwatch": "Stop met het volgen van trefwoorden of zinnen.",
     "commandHelpWatch": "Volg trefwoorden of zinnen in de inbox.",
-    "commandHelpWhen": "Voeg de duur tot of sinds een tijd/datum in.",
+    "commandHelpWhen": "Voeg de duur tot of sinds een tijd/datum in, optioneel in een ondersteunde plaats/tijdzone.",
     "commandHelpWho": "Open een kaart van een recente gebruiker.",
     "couldNotFindUser": "Die gebruiker is niet gevonden.",
     "couldNotOpenFocusForUser": "Focusmodus voor die gebruiker kon niet worden geopend.",
@@ -122,7 +122,10 @@
     "translateDraft": "Concept vertalen",
     "translateDraftTo": "Concept vertalen naar",
     "draftTranslationOff": "Conceptvertaling uit.",
-    "draftTranslationTo": "Conceptvertaling naar {language}."
+    "draftTranslationTo": "Conceptvertaling naar {language}.",
+    "whenUntilTarget": "{duration} tot {target}",
+    "whenSinceTarget": "{duration} sinds {target}",
+    "whenTargetInPlace": "{target} in {place}"
   },
   "extension": {
     "extensionName": {

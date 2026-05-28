@@ -148,7 +148,7 @@
     "whoDescription": "Yakın tarihli bir kullanıcı kartı aç.",
     "timeDescription": "Geçerli yerel saati veya desteklenen bir yer/saat diliminin geçerli saatini ekler.",
     "timeAliases": "Desteklenen takma adlar:",
-    "whenDescription": "Bir saat/tarihe kadar veya ondan bu yana geçen süreyi ekle.",
+    "whenDescription": "Bir saat/tarihe kadar veya ondan bu yana geçen süreyi ekler; isteğe bağlı olarak desteklenen bir yer/saat dilimiyle.",
     "timeUntilFormats": "Kabul edilen formatlar:",
     "translateDescription": "Göndermeden önce sohbet girişindeki özel metni çevir.",
     "watchDescription": "İzlenen anahtar kelimeler veya ifadeler ekler. Metin yoksa mevcut izleme listesini gösterir.",
@@ -158,7 +158,8 @@
     "setDisplayDescription": "Çevirilerin nasıl gösterileceğini ayarla.",
     "setSoundDescription": "Gelen kutusu sesini ayarla.",
     "aliasesLabel": "Kısayollar:",
-    "exampleLabel": "Örnek:"
+    "exampleLabel": "Örnek:",
+    "timeZoneAliases": "Desteklenen yerler/saat dilimleri:"
   },
   "footer": {
     "disclaimer": "Chat Enhancer for YouTube, YouTube veya Google ile bağlantılı değildir.",

@@ -4,7 +4,7 @@
  * Supports timezone aliases and flexible local date/time inputs for /time and
  * /when-style duration commands.
  */
-import { getUiLocale } from '../../shared/i18n';
+import { getUiLocale, t } from '../../shared/i18n';
 import { cleanText } from '../../shared/text';
 import { normalizeCommandToken } from './parser';
 
@@ -17,6 +17,11 @@ export interface TimeZoneOption {
 
 export interface ChatCommandTimeZone extends TimeZoneOption {
   aliases: string[];
+}
+
+export interface WhenFormatResult {
+  detail: string;
+  insertion: string;
 }
 
 export const CHAT_COMMAND_TIME_ZONES: ChatCommandTimeZone[] = [
@@ -66,7 +71,7 @@ const timeZoneByCommandName = createTimeZoneCommandMap();
 
 export function formatTime(value: string): string {
   const normalized = normalizeCommandToken(value);
-  const timeZone = normalized ? timeZoneByCommandName.get(normalized) : null;
+  const timeZone = normalized ? getTimeZoneOption(normalized) : null;
   if (normalized && !timeZone) return '';
 
   return new Intl.DateTimeFormat(undefined, {
@@ -78,13 +83,41 @@ export function formatTime(value: string): string {
 }
 
 export function formatWhen(value: string): string {
+  return formatWhenResult(value)?.insertion || '';
+}
+
+export function formatWhenResult(value: string): WhenFormatResult | null {
   const parsed = parseWhenTarget(value);
-  if (!parsed) return '';
+  if (!parsed) return null;
 
   const now = new Date();
-  return parsed.target.getTime() >= now.getTime()
+  const insertion = parsed.target.getTime() >= now.getTime()
     ? formatCalendarDuration(now, parsed.target)
     : formatCalendarDuration(parsed.target, now);
+  const target = formatWhenTarget(parsed.target, parsed.timeZone, parsed.includeDate);
+
+  if (parsed.target.getTime() >= now.getTime()) {
+    return {
+      detail: t('whenUntilTarget', {
+        duration: insertion,
+        target
+      }),
+      insertion
+    };
+  }
+
+  return {
+    detail: t('whenSinceTarget', {
+      duration: insertion,
+      target
+    }),
+    insertion
+  };
+}
+
+export function getTimeZoneOption(value: string): TimeZoneOption | null {
+  const normalized = normalizeCommandToken(value);
+  return normalized ? timeZoneByCommandName.get(normalized) || null : null;
 }
 
 function parseLocalTime(value: string): {
@@ -116,60 +149,116 @@ function parseLocalTime(value: string): {
 }
 
 function parseWhenTarget(value: string): {
+  includeDate: boolean;
   target: Date;
+  timeZone: TimeZoneOption | null;
 } | null {
-  const text = cleanText(value);
+  const { text, timeZone } = extractWhenTextAndTimeZone(value);
   if (!text) return null;
 
-  const relativeMatch = /^(tomorrow|yesterday)(?:\s+([\s\S]+))?$/i.exec(text);
-  if (relativeMatch) {
-    const base = new Date();
-    base.setDate(base.getDate() + (relativeMatch[1].toLowerCase() === 'tomorrow' ? 1 : -1));
-    const time = relativeMatch[2] ? parseLocalTime(relativeMatch[2]) : null;
-    if (relativeMatch[2] && !time) return null;
-    return {
-      target: createLocalDateTime(
-        base.getFullYear(),
-        base.getMonth() + 1,
-        base.getDate(),
-        time ? getLocalHour(time) : 0,
-        time?.minute || 0,
-        time?.second || 0
-      )
-    };
-  }
-
-  const dateMatch = /^(\d{4})-(\d{1,2})-(\d{1,2})(?:[ T]([\s\S]+))?$/.exec(text);
-  if (dateMatch) {
-    const time = dateMatch[4] ? parseLocalTime(dateMatch[4]) : null;
-    if (dateMatch[4] && !time) return null;
-
-    const target = createValidatedLocalDateTime(
-      Number(dateMatch[1]),
-      Number(dateMatch[2]),
-      Number(dateMatch[3]),
-      time ? getLocalHour(time) : 0,
-      time?.minute || 0,
-      time?.second || 0
-    );
-    if (!target) return null;
-
-    return { target };
-  }
+  const datedTarget = parseDatedWhenTarget(text, timeZone?.timeZone);
+  if (datedTarget) return { includeDate: true, target: datedTarget, timeZone };
 
   const time = parseLocalTime(text);
   if (!time) return null;
 
-  const now = new Date();
+  const now = getCurrentDateParts(timeZone?.timeZone);
+  const target = createDateTime(
+    now.year,
+    now.month,
+    now.day,
+    getLocalHour(time),
+    time.minute,
+    time.second,
+    timeZone?.timeZone
+  );
+  if (!target) return null;
+
   return {
-    target: createLocalDateTime(
-      now.getFullYear(),
-      now.getMonth() + 1,
-      now.getDate(),
-      getLocalHour(time),
-      time.minute,
-      time.second
-    )
+    includeDate: false,
+    target,
+    timeZone
+  };
+}
+
+function parseDatedWhenTarget(text: string, timeZone?: string): Date | null {
+  const dateFirstMatch = /^(\d{4})-(\d{1,2})-(\d{1,2})(?:[ T]([\s\S]+))?$/.exec(text);
+  if (dateFirstMatch) {
+    return createDatedDateTime(
+      Number(dateFirstMatch[1]),
+      Number(dateFirstMatch[2]),
+      Number(dateFirstMatch[3]),
+      dateFirstMatch[4] || '',
+      timeZone
+    );
+  }
+
+  const dateLastMatch = /^([\s\S]+?)\s+(\d{4})-(\d{1,2})-(\d{1,2})$/.exec(text);
+  if (!dateLastMatch) return null;
+
+  return createDatedDateTime(
+    Number(dateLastMatch[2]),
+    Number(dateLastMatch[3]),
+    Number(dateLastMatch[4]),
+    dateLastMatch[1],
+    timeZone
+  );
+}
+
+function createDatedDateTime(
+  year: number,
+  month: number,
+  day: number,
+  timeText: string,
+  timeZone?: string
+): Date | null {
+  const cleanTimeText = cleanText(timeText);
+  const time = cleanTimeText ? parseLocalTime(cleanTimeText) : null;
+  if (cleanTimeText && !time) return null;
+
+  return createValidatedDateTime(
+    year,
+    month,
+    day,
+    time ? getLocalHour(time) : 0,
+    time?.minute || 0,
+    time?.second || 0,
+    timeZone
+  );
+}
+
+function extractWhenTextAndTimeZone(value: string): {
+  text: string;
+  timeZone: TimeZoneOption | null;
+} {
+  const text = cleanText(value);
+  if (!text) {
+    return {
+      text: '',
+      timeZone: null
+    };
+  }
+
+  const tokens = text.split(/\s+/);
+  const firstTimeZone = getTimeZoneOption(tokens[0] || '');
+  if (firstTimeZone) {
+    return {
+      text: cleanText(tokens.slice(1).join(' ')),
+      timeZone: firstTimeZone
+    };
+  }
+
+  const lastTimeZone = getTimeZoneOption(tokens[tokens.length - 1] || '');
+  if (lastTimeZone) {
+    return {
+      text: cleanText(tokens.slice(0, -1).join(' ')),
+      timeZone: lastTimeZone
+    };
+  }
+
+  return {
+    text,
+    timeZone: null
   };
 }
 
@@ -179,23 +268,39 @@ function getLocalHour(parsed: { hour: number; meridiem: 'am' | 'pm' | '' }): num
   return parsed.hour;
 }
 
-function createValidatedLocalDateTime(
+function createValidatedDateTime(
   year: number,
   month: number,
   day: number,
   hour: number,
   minute: number,
-  second: number
+  second: number,
+  timeZone?: string
 ): Date | null {
-  const date = createLocalDateTime(year, month, day, hour, minute, second);
-  if (
-    date.getFullYear() !== year ||
-    date.getMonth() + 1 !== month ||
-    date.getDate() !== day
-  ) {
-    return null;
-  }
+  if (!isValidCalendarDate(year, month, day)) return null;
+
+  const date = createDateTime(year, month, day, hour, minute, second, timeZone);
+  if (!date) return null;
+
+  const parts = timeZone
+    ? getZonedDateTimeParts(date, timeZone)
+    : getLocalDateTimeParts(date);
+  if (!matchesDateTimeParts(parts, year, month, day, hour, minute, second)) return null;
+
   return date;
+}
+
+function createDateTime(
+  year: number,
+  month: number,
+  day: number,
+  hour: number,
+  minute: number,
+  second: number,
+  timeZone?: string
+): Date | null {
+  if (timeZone) return createZonedDateTime(year, month, day, hour, minute, second, timeZone);
+  return createLocalDateTime(year, month, day, hour, minute, second);
 }
 
 function createLocalDateTime(
@@ -210,6 +315,168 @@ function createLocalDateTime(
   target.setFullYear(year, month - 1, day);
   target.setHours(hour, minute, second, 0);
   return target;
+}
+
+function createZonedDateTime(
+  year: number,
+  month: number,
+  day: number,
+  hour: number,
+  minute: number,
+  second: number,
+  timeZone: string
+): Date | null {
+  const desiredUtc = Date.UTC(year, month - 1, day, hour, minute, second);
+  let instant = desiredUtc;
+
+  for (let attempt = 0; attempt < 4; attempt += 1) {
+    const parts = getZonedDateTimeParts(new Date(instant), timeZone);
+    const actualUtc = Date.UTC(
+      parts.year,
+      parts.month - 1,
+      parts.day,
+      parts.hour,
+      parts.minute,
+      parts.second
+    );
+    const offset = desiredUtc - actualUtc;
+    if (offset === 0) break;
+    instant += offset;
+  }
+
+  const date = new Date(instant);
+  return matchesDateTimeParts(getZonedDateTimeParts(date, timeZone), year, month, day, hour, minute, second)
+    ? date
+    : null;
+}
+
+function getCurrentDateParts(timeZone?: string): { day: number; month: number; year: number } {
+  if (timeZone) {
+    const parts = getZonedDateTimeParts(new Date(), timeZone);
+    return {
+      day: parts.day,
+      month: parts.month,
+      year: parts.year
+    };
+  }
+
+  const now = new Date();
+  return {
+    day: now.getDate(),
+    month: now.getMonth() + 1,
+    year: now.getFullYear()
+  };
+}
+
+function isValidCalendarDate(year: number, month: number, day: number): boolean {
+  const date = new Date(Date.UTC(year, month - 1, day));
+  return (
+    date.getUTCFullYear() === year &&
+    date.getUTCMonth() + 1 === month &&
+    date.getUTCDate() === day
+  );
+}
+
+function getLocalDateTimeParts(date: Date): {
+  day: number;
+  hour: number;
+  minute: number;
+  month: number;
+  second: number;
+  year: number;
+} {
+  return {
+    day: date.getDate(),
+    hour: date.getHours(),
+    minute: date.getMinutes(),
+    month: date.getMonth() + 1,
+    second: date.getSeconds(),
+    year: date.getFullYear()
+  };
+}
+
+function getZonedDateTimeParts(date: Date, timeZone: string): {
+  day: number;
+  hour: number;
+  minute: number;
+  month: number;
+  second: number;
+  year: number;
+} {
+  const values = new Map(
+    getTimeZoneFormatter(timeZone)
+      .formatToParts(date)
+      .map((part) => [part.type, part.value])
+  );
+  const hour = Number(values.get('hour'));
+  return {
+    day: Number(values.get('day')),
+    hour: hour === 24 ? 0 : hour,
+    minute: Number(values.get('minute')),
+    month: Number(values.get('month')),
+    second: Number(values.get('second')),
+    year: Number(values.get('year'))
+  };
+}
+
+function matchesDateTimeParts(
+  parts: { day: number; hour: number; minute: number; month: number; second: number; year: number },
+  year: number,
+  month: number,
+  day: number,
+  hour: number,
+  minute: number,
+  second: number
+): boolean {
+  return (
+    parts.year === year &&
+    parts.month === month &&
+    parts.day === day &&
+    parts.hour === hour &&
+    parts.minute === minute &&
+    parts.second === second
+  );
+}
+
+function getTimeZoneFormatter(timeZone: string): Intl.DateTimeFormat {
+  return new Intl.DateTimeFormat('en-US-u-hc-h23', {
+    day: '2-digit',
+    hour: '2-digit',
+    hourCycle: 'h23',
+    minute: '2-digit',
+    month: '2-digit',
+    second: '2-digit',
+    timeZone,
+    year: 'numeric'
+  });
+}
+
+function formatWhenTarget(target: Date, timeZone: TimeZoneOption | null, includeExplicitDate: boolean): string {
+  const targetParts = timeZone
+    ? getZonedDateTimeParts(target, timeZone.timeZone)
+    : getLocalDateTimeParts(target);
+  const todayParts = getCurrentDateParts(timeZone?.timeZone);
+  const includeDate = includeExplicitDate || !isSameCalendarDay(targetParts, todayParts);
+  const includeSeconds = targetParts.second !== 0;
+  const formatter = new Intl.DateTimeFormat(getUiLocale(), {
+    ...(includeDate ? { day: 'numeric', month: 'short', year: 'numeric' } : {}),
+    hour: 'numeric',
+    minute: '2-digit',
+    ...(includeSeconds ? { second: '2-digit' } : {}),
+    ...(timeZone ? { timeZone: timeZone.timeZone } : {})
+  });
+  const targetLabel = formatter.format(target);
+
+  return timeZone
+    ? t('whenTargetInPlace', { place: timeZone.label, target: targetLabel })
+    : targetLabel;
+}
+
+function isSameCalendarDay(
+  a: { day: number; month: number; year: number },
+  b: { day: number; month: number; year: number }
+): boolean {
+  return a.year === b.year && a.month === b.month && a.day === b.day;
 }
 
 function formatCalendarDuration(start: Date, end: Date): string {

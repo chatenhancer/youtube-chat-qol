@@ -96,7 +96,7 @@
     "commandHelpTranslate": "Traduit un texte personnalisé dans une langue.",
     "commandHelpUnwatch": "Arrête de surveiller des mots-clés ou des phrases.",
     "commandHelpWatch": "Surveille des mots-clés ou des phrases dans la boîte de réception.",
-    "commandHelpWhen": "Insère la durée jusqu’à ou depuis une heure/date.",
+    "commandHelpWhen": "Insère la durée jusqu’à ou depuis une heure/date, éventuellement dans un lieu/fuseau horaire pris en charge.",
     "commandHelpWho": "Ouvre la fiche d’un utilisateur récent.",
     "couldNotFindUser": "Impossible de trouver cet utilisateur.",
     "couldNotOpenFocusForUser": "Impossible d’ouvrir le mode focus pour cet utilisateur.",
@@ -122,7 +122,10 @@
     "translateDraft": "Traduire le brouillon",
     "translateDraftTo": "Traduire le brouillon en",
     "draftTranslationOff": "Traduction du brouillon désactivée.",
-    "draftTranslationTo": "Traduction du brouillon en {language}."
+    "draftTranslationTo": "Traduction du brouillon en {language}.",
+    "whenUntilTarget": "{duration} jusqu’à {target}",
+    "whenSinceTarget": "{duration} depuis {target}",
+    "whenTargetInPlace": "{target} à {place}"
   },
   "extension": {
     "extensionName": {

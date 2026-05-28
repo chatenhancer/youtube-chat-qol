@@ -96,7 +96,7 @@
     "commandHelpTranslate": "사용자 지정 텍스트를 언어로 번역합니다.",
     "commandHelpUnwatch": "키워드 또는 문구 감시를 중지합니다.",
     "commandHelpWatch": "받은함에서 키워드 또는 문구를 감시합니다.",
-    "commandHelpWhen": "시간/날짜까지 또는 이후의 기간을 삽입합니다.",
+    "commandHelpWhen": "시간/날짜까지 또는 이후의 기간을 삽입합니다. 지원되는 장소/시간대를 선택할 수도 있습니다.",
     "commandHelpWho": "최근 사용자 카드를 엽니다.",
     "couldNotFindUser": "해당 사용자를 찾을 수 없습니다.",
     "couldNotOpenFocusForUser": "해당 사용자의 포커스 모드를 열 수 없습니다.",
@@ -122,7 +122,10 @@
     "translateDraft": "초안 번역",
     "translateDraftTo": "초안을 번역할 언어",
     "draftTranslationOff": "초안 번역 꺼짐.",
-    "draftTranslationTo": "초안을 {language}(으)로 번역."
+    "draftTranslationTo": "초안을 {language}(으)로 번역.",
+    "whenUntilTarget": "{target}까지 {duration}",
+    "whenSinceTarget": "{target}부터 {duration}",
+    "whenTargetInPlace": "{place}의 {target}"
   },
   "extension": {
     "extensionName": {

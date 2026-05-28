@@ -96,7 +96,7 @@
     "commandHelpTranslate": "Перевести произвольный текст на язык.",
     "commandHelpUnwatch": "Перестать отслеживать ключевые слова или фразы.",
     "commandHelpWatch": "Отслеживать ключевые слова или фразы во входящих.",
-    "commandHelpWhen": "Вставить длительность до или после времени/даты.",
+    "commandHelpWhen": "Вставить длительность до или после времени/даты, при необходимости для поддерживаемого места/часового пояса.",
     "commandHelpWho": "Открыть карточку недавнего пользователя.",
     "couldNotFindUser": "Не удалось найти этого пользователя.",
     "couldNotOpenFocusForUser": "Не удалось открыть режим фокуса для этого пользователя.",
@@ -122,7 +122,10 @@
     "translateDraft": "Перевести черновик",
     "translateDraftTo": "Перевести черновик на",
     "draftTranslationOff": "Перевод черновика выключен.",
-    "draftTranslationTo": "Перевод черновика на {language}."
+    "draftTranslationTo": "Перевод черновика на {language}.",
+    "whenUntilTarget": "{duration} до {target}",
+    "whenSinceTarget": "{duration} с {target}",
+    "whenTargetInPlace": "{target} в {place}"
   },
   "extension": {
     "extensionName": {

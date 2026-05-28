@@ -96,7 +96,7 @@
     "commandHelpTranslate": "Przetłumacz własny tekst na język.",
     "commandHelpUnwatch": "Przestań obserwować słowa kluczowe lub frazy.",
     "commandHelpWatch": "Obserwuj słowa kluczowe lub frazy w skrzynce.",
-    "commandHelpWhen": "Wstaw czas do lub od godziny/daty.",
+    "commandHelpWhen": "Wstaw czas do lub od godziny/daty, opcjonalnie w obsługiwanym miejscu/strefie czasowej.",
     "commandHelpWho": "Otwórz kartę ostatniego użytkownika.",
     "couldNotFindUser": "Nie można znaleźć tego użytkownika.",
     "couldNotOpenFocusForUser": "Nie można otworzyć trybu skupienia dla tego użytkownika.",
@@ -122,7 +122,10 @@
     "translateDraft": "Przetłumacz szkic",
     "translateDraftTo": "Przetłumacz szkic na",
     "draftTranslationOff": "Tłumaczenie szkicu wyłączone.",
-    "draftTranslationTo": "Tłumaczenie szkicu na {language}."
+    "draftTranslationTo": "Tłumaczenie szkicu na {language}.",
+    "whenUntilTarget": "{duration} do {target}",
+    "whenSinceTarget": "{duration} od {target}",
+    "whenTargetInPlace": "{target} w {place}"
   },
   "extension": {
     "extensionName": {

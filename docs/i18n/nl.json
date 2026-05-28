@@ -148,7 +148,7 @@
     "whoDescription": "Open een kaart van een recente gebruiker.",
     "timeDescription": "Voegt de huidige lokale tijd in, of de huidige tijd voor een ondersteunde plaats/tijdzone.",
     "timeAliases": "Ondersteunde aliassen:",
-    "whenDescription": "Voeg de duur tot of sinds een tijd/datum in.",
+    "whenDescription": "Voegt de duur tot of sinds een tijd/datum in, optioneel in een ondersteunde plaats/tijdzone.",
     "timeUntilFormats": "Geaccepteerde formaten:",
     "translateDescription": "Vertaal aangepaste tekst in de chatinvoer voordat je die verstuurt.",
     "watchDescription": "Voeg bewaakte trefwoorden of zinnen toe. Zonder tekst wordt je huidige watchlist getoond.",
@@ -158,7 +158,8 @@
     "setDisplayDescription": "Stel in hoe vertalingen worden getoond.",
     "setSoundDescription": "Stel inboxgeluid in.",
     "aliasesLabel": "Aliassen:",
-    "exampleLabel": "Voorbeeld:"
+    "exampleLabel": "Voorbeeld:",
+    "timeZoneAliases": "Ondersteunde plaatsen/tijdzones:"
   },
   "footer": {
     "disclaimer": "Chat Enhancer for YouTube is niet verbonden aan YouTube of Google.",

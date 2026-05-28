@@ -148,7 +148,7 @@
     "whoDescription": "פותח כרטיס של משתמש אחרון.",
     "timeDescription": "מכניס את השעה המקומית הנוכחית, או את השעה הנוכחית עבור מקום/אזור זמן נתמך.",
     "timeAliases": "כינויים נתמכים:",
-    "whenDescription": "מכניס את משך הזמן עד או מאז שעה/תאריך.",
+    "whenDescription": "מכניס את משך הזמן עד או מאז שעה/תאריך, אופציונלית במקום/אזור זמן נתמך.",
     "timeUntilFormats": "פורמטים נתמכים:",
     "translateDescription": "תרגום טקסט מותאם אישית בשדה הצ׳אט לפני השליחה.",
     "watchDescription": "מוסיף מילות מפתח או ביטויים למעקב. בלי טקסט, מציג את רשימת המעקב הנוכחית.",
@@ -158,7 +158,8 @@
     "setDisplayDescription": "הגדר איך תרגומים מוצגים.",
     "setSoundDescription": "הגדר צליל תיבה.",
     "aliasesLabel": "כינויים:",
-    "exampleLabel": "דוגמה:"
+    "exampleLabel": "דוגמה:",
+    "timeZoneAliases": "מקומות/אזורי זמן נתמכים:"
   },
   "footer": {
     "disclaimer": "Chat Enhancer for YouTube אינו קשור ל-YouTube או Google.",

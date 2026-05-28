@@ -96,7 +96,7 @@
     "commandHelpTranslate": "מתרגם טקסט מותאם אישית לשפה.",
     "commandHelpUnwatch": "מפסיק לעקוב אחרי מילות מפתח או ביטויים.",
     "commandHelpWatch": "עוקב אחרי מילות מפתח או ביטויים בתיבה.",
-    "commandHelpWhen": "מכניס את משך הזמן עד או מאז שעה/תאריך.",
+    "commandHelpWhen": "מכניס את משך הזמן עד או מאז שעה/תאריך, אופציונלית במקום/אזור זמן נתמך.",
     "commandHelpWho": "פותח כרטיס של משתמש אחרון.",
     "couldNotFindUser": "לא ניתן למצוא את המשתמש הזה.",
     "couldNotOpenFocusForUser": "לא ניתן לפתוח מצב מיקוד למשתמש הזה.",
@@ -122,7 +122,10 @@
     "translateDraft": "תרגום טיוטה",
     "translateDraftTo": "תרגום הטיוטה אל",
     "draftTranslationOff": "תרגום הטיוטה כבוי.",
-    "draftTranslationTo": "תרגום הטיוטה אל {language}."
+    "draftTranslationTo": "תרגום הטיוטה אל {language}.",
+    "whenUntilTarget": "{duration} עד {target}",
+    "whenSinceTarget": "{duration} מאז {target}",
+    "whenTargetInPlace": "{target} ב־{place}"
   },
   "extension": {
     "extensionName": {

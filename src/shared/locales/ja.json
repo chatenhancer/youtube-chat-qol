@@ -96,7 +96,7 @@
     "commandHelpTranslate": "指定したテキストを別の言語に翻訳します。",
     "commandHelpUnwatch": "キーワードまたはフレーズの監視を停止します。",
     "commandHelpWatch": "Inbox でキーワードまたはフレーズを監視します。",
-    "commandHelpWhen": "時刻/日付まで、またはそれ以降の時間を挿入します。",
+    "commandHelpWhen": "時刻/日付まで、またはそれ以降の時間を、対応する場所/タイムゾーンで指定して挿入できます。",
     "commandHelpWho": "最近のユーザーカードを開きます。",
     "couldNotFindUser": "そのユーザーが見つかりませんでした。",
     "couldNotOpenFocusForUser": "そのユーザーのフォーカスモードを開けませんでした。",
@@ -122,7 +122,10 @@
     "translateDraft": "下書きを翻訳",
     "translateDraftTo": "下書きの翻訳先",
     "draftTranslationOff": "下書き翻訳はオフです。",
-    "draftTranslationTo": "下書きを{language}に翻訳。"
+    "draftTranslationTo": "下書きを{language}に翻訳。",
+    "whenUntilTarget": "{target}まで{duration}",
+    "whenSinceTarget": "{target}から{duration}",
+    "whenTargetInPlace": "{place}の{target}"
   },
   "extension": {
     "extensionName": {

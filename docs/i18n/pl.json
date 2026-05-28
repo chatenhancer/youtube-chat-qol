@@ -148,7 +148,7 @@
     "whoDescription": "Otwórz kartę ostatniego użytkownika.",
     "timeDescription": "Wstawia bieżący czas lokalny albo bieżący czas dla obsługiwanego miejsca/strefy czasowej.",
     "timeAliases": "Obsługiwane aliasy:",
-    "whenDescription": "Wstaw czas do lub od godziny/daty.",
+    "whenDescription": "Wstawia czas do lub od godziny/daty, opcjonalnie w obsługiwanym miejscu/strefie czasowej.",
     "timeUntilFormats": "Akceptowane formaty:",
     "translateDescription": "Przetłumacz własny tekst w polu czatu przed wysłaniem.",
     "watchDescription": "Dodaje obserwowane słowa kluczowe lub frazy. Bez tekstu pokazuje aktualną listę obserwowanych.",
@@ -158,7 +158,8 @@
     "setDisplayDescription": "Ustaw sposób wyświetlania tłumaczeń.",
     "setSoundDescription": "Ustaw dźwięk skrzynki.",
     "aliasesLabel": "Aliasy:",
-    "exampleLabel": "Przykład:"
+    "exampleLabel": "Przykład:",
+    "timeZoneAliases": "Obsługiwane miejsca/strefy czasowe:"
   },
   "footer": {
     "disclaimer": "Chat Enhancer for YouTube nie jest powiązany z YouTube ani Google.",

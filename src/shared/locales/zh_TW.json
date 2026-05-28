@@ -96,7 +96,7 @@
     "commandHelpTranslate": "將自訂文字翻譯成指定語言。",
     "commandHelpUnwatch": "停止關注關鍵字或片語。",
     "commandHelpWatch": "在收件匣中關注關鍵字或片語。",
-    "commandHelpWhen": "插入距離某個時間/日期還有多久或過去多久。",
+    "commandHelpWhen": "插入距離某個時間/日期還有多久或過去多久，可選擇支援的地點/時區。",
     "commandHelpWho": "開啟最近使用者的卡片。",
     "couldNotFindUser": "找不到該使用者。",
     "couldNotOpenFocusForUser": "無法為該使用者開啟專注模式。",
@@ -122,7 +122,10 @@
     "translateDraft": "翻譯草稿",
     "translateDraftTo": "將草稿翻譯為",
     "draftTranslationOff": "草稿翻譯已關閉。",
-    "draftTranslationTo": "草稿翻譯為 {language}。"
+    "draftTranslationTo": "草稿翻譯為 {language}。",
+    "whenUntilTarget": "距離{target}還有{duration}",
+    "whenSinceTarget": "自{target}起已過{duration}",
+    "whenTargetInPlace": "{place}的{target}"
   },
   "extension": {
     "extensionName": {

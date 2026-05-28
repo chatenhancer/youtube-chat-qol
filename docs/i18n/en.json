@@ -148,7 +148,7 @@
     "whoDescription": "Open a recent user card.",
     "timeDescription": "Insert the current local time, or the current time for a supported place/timezone.",
     "timeAliases": "Supported aliases:",
-    "whenDescription": "Insert the duration until or since a time/date.",
+    "whenDescription": "Insert the duration until or since a time/date, optionally in a supported place/timezone.",
     "timeUntilFormats": "Accepted formats:",
     "translateDescription": "Translate custom text in the chat box before sending it.",
     "watchDescription": "Add watched keywords or phrases. Without text, show your current watch list.",
@@ -158,7 +158,8 @@
     "setDisplayDescription": "Set how translations are shown.",
     "setSoundDescription": "Set inbox sound.",
     "aliasesLabel": "Aliases:",
-    "exampleLabel": "Example:"
+    "exampleLabel": "Example:",
+    "timeZoneAliases": "Supported places/timezones:"
   },
   "footer": {
     "disclaimer": "Chat Enhancer for YouTube is not affiliated with YouTube or Google.",

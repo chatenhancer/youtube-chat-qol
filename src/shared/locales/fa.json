@@ -96,7 +96,7 @@
     "commandHelpTranslate": "متن دلخواه را به یک زبان ترجمه کنید.",
     "commandHelpUnwatch": "زیر نظر گرفتن کلمات کلیدی یا عبارات را متوقف کنید.",
     "commandHelpWatch": "کلمات کلیدی یا عبارات را در صندوق ورودی زیر نظر بگیرید.",
-    "commandHelpWhen": "مدت زمان تا یا از یک زمان/تاریخ را وارد کنید.",
+    "commandHelpWhen": "مدت زمان تا یا از یک زمان/تاریخ را وارد کنید، در صورت نیاز برای مکان/منطقه زمانی پشتیبانی‌شده.",
     "commandHelpWho": "کارت یک کاربر اخیر را باز کنید.",
     "couldNotFindUser": "آن کاربر پیدا نشد.",
     "couldNotOpenFocusForUser": "حالت تمرکز برای آن کاربر باز نشد.",
@@ -122,7 +122,10 @@
     "translateDraft": "ترجمه پیش‌نویس",
     "translateDraftTo": "ترجمه پیش‌نویس به",
     "draftTranslationOff": "ترجمه پیش‌نویس خاموش است.",
-    "draftTranslationTo": "ترجمه پیش‌نویس به {language}."
+    "draftTranslationTo": "ترجمه پیش‌نویس به {language}.",
+    "whenUntilTarget": "{duration} تا {target}",
+    "whenSinceTarget": "{duration} از {target}",
+    "whenTargetInPlace": "{target} در {place}"
   },
   "extension": {
     "extensionName": {

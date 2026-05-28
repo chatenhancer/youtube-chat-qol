@@ -96,7 +96,7 @@
     "commandHelpTranslate": "แปลข้อความกำหนดเองเป็นภาษา",
     "commandHelpUnwatch": "หยุดติดตามคีย์เวิร์ดหรือวลี",
     "commandHelpWatch": "ติดตามคีย์เวิร์ดหรือวลีในกล่องข้อความ",
-    "commandHelpWhen": "แทรกระยะเวลาจนถึงหรือจากเวลา/วันที่",
+    "commandHelpWhen": "แทรกระยะเวลาจนถึงหรือจากเวลา/วันที่ โดยเลือกสถานที่/เขตเวลาที่รองรับได้",
     "commandHelpWho": "เปิดการ์ดผู้ใช้ล่าสุด",
     "couldNotFindUser": "ไม่พบผู้ใช้นั้น",
     "couldNotOpenFocusForUser": "ไม่สามารถเปิดโหมดโฟกัสสำหรับผู้ใช้นั้นได้",
@@ -122,7 +122,10 @@
     "translateDraft": "แปลข้อความร่าง",
     "translateDraftTo": "แปลข้อความร่างเป็น",
     "draftTranslationOff": "ปิดการแปลข้อความร่างอยู่",
-    "draftTranslationTo": "แปลข้อความร่างเป็น {language}"
+    "draftTranslationTo": "แปลข้อความร่างเป็น {language}",
+    "whenUntilTarget": "อีก {duration} ถึง {target}",
+    "whenSinceTarget": "{duration} ตั้งแต่ {target}",
+    "whenTargetInPlace": "{target} ใน{place}"
   },
   "extension": {
     "extensionName": {
