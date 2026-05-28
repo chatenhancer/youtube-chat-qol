@@ -96,7 +96,7 @@
     "commandHelpTranslate": "Übersetze eigenen Text in eine Sprache.",
     "commandHelpUnwatch": "Beobachte Keywords oder Phrasen nicht mehr.",
     "commandHelpWatch": "Beobachte Keywords oder Phrasen im Posteingang.",
-    "commandHelpWhen": "Füge die Dauer bis zu oder seit einer Zeit/einem Datum ein.",
+    "commandHelpWhen": "Füge die Dauer bis zu oder seit einer Zeit/einem Datum ein, optional an einem unterstützten Ort/einer Zeitzone.",
     "commandHelpWho": "Öffne eine Karte für einen kürzlich gesehenen Nutzer.",
     "couldNotFindUser": "Dieser Nutzer wurde nicht gefunden.",
     "couldNotOpenFocusForUser": "Der Fokusmodus konnte für diesen Nutzer nicht geöffnet werden.",
@@ -122,7 +122,10 @@
     "translateDraft": "Entwurf übersetzen",
     "translateDraftTo": "Entwurf übersetzen in",
     "draftTranslationOff": "Entwurfsübersetzung aus.",
-    "draftTranslationTo": "Entwurfsübersetzung in {language}."
+    "draftTranslationTo": "Entwurfsübersetzung in {language}.",
+    "whenUntilTarget": "{duration} bis {target}",
+    "whenSinceTarget": "{duration} seit {target}",
+    "whenTargetInPlace": "{target} in {place}"
   },
   "extension": {
     "extensionName": {

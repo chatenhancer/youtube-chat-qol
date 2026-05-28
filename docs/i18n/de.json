@@ -148,7 +148,7 @@
     "whoDescription": "Öffne eine Karte für einen kürzlich gesehenen Nutzer.",
     "timeDescription": "Fügt die aktuelle lokale Uhrzeit ein oder die aktuelle Uhrzeit für einen unterstützten Ort/eine Zeitzone.",
     "timeAliases": "Unterstützte Aliasse:",
-    "whenDescription": "Füge die Dauer bis zu oder seit einer Zeit/einem Datum ein.",
+    "whenDescription": "Fügt die Dauer bis zu oder seit einer Zeit/einem Datum ein, optional an einem unterstützten Ort/einer Zeitzone.",
     "timeUntilFormats": "Akzeptierte Formate:",
     "translateDescription": "Übersetze eigenen Text im Chat-Eingabefeld, bevor du ihn sendest.",
     "watchDescription": "Füge beobachtete Keywords oder Phrasen hinzu. Ohne Text wird deine aktuelle Watchlist angezeigt.",
@@ -158,7 +158,8 @@
     "setDisplayDescription": "Legt fest, wie Übersetzungen angezeigt werden.",
     "setSoundDescription": "Legt den Inbox-Ton fest.",
     "aliasesLabel": "Aliasse:",
-    "exampleLabel": "Beispiel:"
+    "exampleLabel": "Beispiel:",
+    "timeZoneAliases": "Unterstützte Orte/Zeitzonen:"
   },
   "footer": {
     "disclaimer": "Chat Enhancer for YouTube ist nicht mit YouTube oder Google verbunden.",

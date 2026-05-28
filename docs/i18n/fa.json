@@ -148,7 +148,7 @@
     "whoDescription": "کارت یک کاربر اخیر را باز کنید.",
     "timeDescription": "زمان محلی فعلی را وارد می‌کند، یا زمان فعلی یک مکان/منطقه زمانی پشتیبانی‌شده را.",
     "timeAliases": "نام‌های جایگزین پشتیبانی‌شده:",
-    "whenDescription": "مدت زمان تا یا از یک زمان/تاریخ را وارد کنید.",
+    "whenDescription": "مدت زمان تا یا از یک زمان/تاریخ را وارد می‌کند، در صورت نیاز برای مکان/منطقه زمانی پشتیبانی‌شده.",
     "timeUntilFormats": "قالب‌های پذیرفته‌شده:",
     "translateDescription": "متن دلخواه را در کادر چت پیش از ارسال ترجمه کنید.",
     "watchDescription": "کلیدواژه‌ها یا عبارت‌های تحت نظر را اضافه می‌کند. بدون متن، فهرست فعلی watch را نشان می‌دهد.",
@@ -158,7 +158,8 @@
     "setDisplayDescription": "نحوه نمایش ترجمه‌ها را تنظیم کن.",
     "setSoundDescription": "صدای صندوق ورودی را تنظیم کن.",
     "aliasesLabel": "نام‌های جایگزین:",
-    "exampleLabel": "مثال:"
+    "exampleLabel": "مثال:",
+    "timeZoneAliases": "مکان‌ها/منطقه‌های زمانی پشتیبانی‌شده:"
   },
   "footer": {
     "disclaimer": "Chat Enhancer for YouTube وابسته به YouTube یا Google نیست.",

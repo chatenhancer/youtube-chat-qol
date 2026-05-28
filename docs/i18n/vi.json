@@ -148,7 +148,7 @@
     "whoDescription": "Mở thẻ người dùng gần đây.",
     "timeDescription": "Chèn giờ địa phương hiện tại, hoặc giờ hiện tại của địa điểm/múi giờ được hỗ trợ.",
     "timeAliases": "Alias được hỗ trợ:",
-    "whenDescription": "Chèn khoảng thời gian đến hoặc từ một giờ/ngày.",
+    "whenDescription": "Chèn khoảng thời gian đến hoặc từ một giờ/ngày, tùy chọn theo địa điểm/múi giờ được hỗ trợ.",
     "timeUntilFormats": "Định dạng chấp nhận:",
     "translateDescription": "Dịch văn bản tùy chỉnh trong ô nhập chat trước khi gửi.",
     "watchDescription": "Thêm từ khóa hoặc cụm từ cần theo dõi. Không có văn bản thì hiển thị danh sách đang theo dõi.",
@@ -158,7 +158,8 @@
     "setDisplayDescription": "Đặt cách hiển thị bản dịch.",
     "setSoundDescription": "Đặt âm thanh hộp thư.",
     "aliasesLabel": "Bí danh:",
-    "exampleLabel": "Ví dụ:"
+    "exampleLabel": "Ví dụ:",
+    "timeZoneAliases": "Địa điểm/múi giờ được hỗ trợ:"
   },
   "footer": {
     "disclaimer": "Chat Enhancer for YouTube không liên kết với YouTube hoặc Google.",

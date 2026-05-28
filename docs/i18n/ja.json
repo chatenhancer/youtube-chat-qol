@@ -148,7 +148,7 @@
     "whoDescription": "最近のユーザーカードを開きます。",
     "timeDescription": "現在のローカル時刻、または対応している場所/タイムゾーンの現在時刻を挿入します。",
     "timeAliases": "対応エイリアス:",
-    "whenDescription": "時刻/日付まで、またはそれ以降の時間を挿入します。",
+    "whenDescription": "時刻/日付まで、またはそれ以降の時間を、対応する場所/タイムゾーンで指定して挿入できます。",
     "timeUntilFormats": "利用できる形式:",
     "translateDescription": "送信前にチャット入力欄の指定テキストを翻訳します。",
     "watchDescription": "監視するキーワードやフレーズを追加します。テキストなしでは現在の監視リストを表示します。",
@@ -158,7 +158,8 @@
     "setDisplayDescription": "翻訳の表示方法を設定します。",
     "setSoundDescription": "受信箱サウンドを設定します。",
     "aliasesLabel": "エイリアス:",
-    "exampleLabel": "例:"
+    "exampleLabel": "例:",
+    "timeZoneAliases": "対応する場所/タイムゾーン:"
   },
   "footer": {
     "disclaimer": "Chat Enhancer for YouTube は YouTube または Google と提携していません。",

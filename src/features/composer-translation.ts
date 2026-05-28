@@ -35,6 +35,7 @@ const TRANSLATION_DEBOUNCE_MS = 850;
 
 let saveOptions: SaveOptions = () => {};
 let button: HTMLButtonElement | null = null;
+let control: HTMLElement | null = null;
 let panel: HTMLElement | null = null;
 let select: HTMLSelectElement | null = null;
 let wireFrame = 0;
@@ -53,6 +54,8 @@ export function initComposerTranslation(callback: SaveOptions): void {
   document.addEventListener('input', handleDocumentInput, true);
   document.addEventListener('click', handleDocumentClick, true);
   document.addEventListener('keydown', handleDocumentKeydown, true);
+  document.addEventListener('scroll', positionPanel, true);
+  window.addEventListener('resize', positionPanel, true);
 }
 
 export function scheduleComposerTranslationWire(): void {
@@ -96,6 +99,8 @@ function wireComposerTranslationControl(): void {
 
   const currentControl = button?.closest<HTMLElement>(`.${CONTROL_CLASS}`) || null;
   if (currentControl?.isConnected && currentControl.parentElement === emojiButton) {
+    control = currentControl;
+    ensurePanel();
     updateButtonState();
     return;
   }
@@ -103,9 +108,10 @@ function wireComposerTranslationControl(): void {
   currentControl?.remove();
   emojiButton.querySelectorAll(`:scope > .${CONTROL_CLASS}`).forEach((control) => control.remove());
 
-  const control = document.createElement('div');
+  control = document.createElement('div');
   control.className = CONTROL_CLASS;
-  control.append(createButton(), createPanel());
+  control.append(createButton());
+  ensurePanel();
   emojiButton.classList.add('ytcq-composer-translate-host');
   emojiButton.prepend(control);
   updateButtonState();
@@ -150,6 +156,13 @@ function createPanel(): HTMLElement {
   return panel;
 }
 
+function ensurePanel(): HTMLElement {
+  if (panel?.isConnected) return panel;
+
+  panel?.remove();
+  return document.body.appendChild(createPanel());
+}
+
 function createLanguageOption(value: string, label: string): HTMLOptionElement {
   const option = document.createElement('option');
   option.value = value;
@@ -158,9 +171,11 @@ function createLanguageOption(value: string, label: string): HTMLOptionElement {
 }
 
 function togglePanel(): void {
-  if (!panel) return;
-  panel.hidden = !panel.hidden;
-  if (!panel.hidden && select) {
+  const currentPanel = ensurePanel();
+  currentPanel.hidden = !currentPanel.hidden;
+  if (!currentPanel.hidden && select) {
+    positionPanel();
+    window.requestAnimationFrame(positionPanel);
     select.value = getOptions().composerTranslateLanguage;
     select.focus();
   }
@@ -191,12 +206,28 @@ function handleDocumentInput(event: Event): void {
 
 function handleDocumentClick(event: MouseEvent): void {
   if (!panel || panel.hidden) return;
-  if (event.target instanceof Node && panel.parentElement?.contains(event.target)) return;
+  if (event.target instanceof Node && (panel.contains(event.target) || control?.contains(event.target))) return;
   closePanel();
 }
 
 function handleDocumentKeydown(event: KeyboardEvent): void {
   if (event.key === 'Escape') closePanel();
+}
+
+function positionPanel(): void {
+  if (!panel || panel.hidden || !button?.isConnected) return;
+
+  const buttonRect = button.getBoundingClientRect();
+  const edgePadding = 8;
+  const gap = 4;
+  const panelWidth = panel.offsetWidth;
+  const panelHeight = panel.offsetHeight;
+  const maxLeft = Math.max(edgePadding, window.innerWidth - panelWidth - edgePadding);
+  const left = Math.min(Math.max(edgePadding, buttonRect.right - panelWidth), maxLeft);
+  const top = Math.max(edgePadding, buttonRect.top - panelHeight - gap);
+
+  panel.style.left = `${Math.round(left)}px`;
+  panel.style.top = `${Math.round(top)}px`;
 }
 
 function scheduleDraftTranslation(immediate = false): void {

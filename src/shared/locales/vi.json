@@ -96,7 +96,7 @@
     "commandHelpTranslate": "Dịch văn bản tùy chỉnh sang một ngôn ngữ.",
     "commandHelpUnwatch": "Ngừng theo dõi từ khóa hoặc cụm từ.",
     "commandHelpWatch": "Theo dõi từ khóa hoặc cụm từ trong hộp thư.",
-    "commandHelpWhen": "Chèn khoảng thời gian đến hoặc từ một giờ/ngày.",
+    "commandHelpWhen": "Chèn khoảng thời gian đến hoặc từ một giờ/ngày, tùy chọn theo địa điểm/múi giờ được hỗ trợ.",
     "commandHelpWho": "Mở thẻ người dùng gần đây.",
     "couldNotFindUser": "Không tìm thấy người dùng đó.",
     "couldNotOpenFocusForUser": "Không thể mở chế độ tập trung cho người dùng đó.",
@@ -122,7 +122,10 @@
     "translateDraft": "Dịch bản nháp",
     "translateDraftTo": "Dịch bản nháp sang",
     "draftTranslationOff": "Đã tắt dịch bản nháp.",
-    "draftTranslationTo": "Dịch bản nháp sang {language}."
+    "draftTranslationTo": "Dịch bản nháp sang {language}.",
+    "whenUntilTarget": "{duration} đến {target}",
+    "whenSinceTarget": "{duration} kể từ {target}",
+    "whenTargetInPlace": "{target} ở {place}"
   },
   "extension": {
     "extensionName": {

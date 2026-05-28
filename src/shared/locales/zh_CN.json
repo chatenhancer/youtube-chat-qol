@@ -96,7 +96,7 @@
     "commandHelpTranslate": "将自定义文本翻译成指定语言。",
     "commandHelpUnwatch": "停止关注关键词或短语。",
     "commandHelpWatch": "在收件箱中关注关键词或短语。",
-    "commandHelpWhen": "插入距离某个时间/日期还有多久或过去多久。",
+    "commandHelpWhen": "插入距离某个时间/日期还有多久或过去多久，可选择支持的地点/时区。",
     "commandHelpWho": "打开最近用户的卡片。",
     "couldNotFindUser": "找不到该用户。",
     "couldNotOpenFocusForUser": "无法为该用户打开专注模式。",
@@ -122,7 +122,10 @@
     "translateDraft": "翻译草稿",
     "translateDraftTo": "将草稿翻译为",
     "draftTranslationOff": "草稿翻译已关闭。",
-    "draftTranslationTo": "草稿翻译为 {language}。"
+    "draftTranslationTo": "草稿翻译为 {language}。",
+    "whenUntilTarget": "距离{target}还有{duration}",
+    "whenSinceTarget": "自{target}起已过{duration}",
+    "whenTargetInPlace": "{place}的{target}"
   },
   "extension": {
     "extensionName": {

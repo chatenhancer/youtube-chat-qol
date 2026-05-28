@@ -96,7 +96,7 @@
     "commandHelpTranslate": "Terjemahkan teks khusus ke suatu bahasa.",
     "commandHelpUnwatch": "Berhenti memantau kata kunci atau frasa.",
     "commandHelpWatch": "Pantau kata kunci atau frasa di inbox.",
-    "commandHelpWhen": "Masukkan durasi hingga atau sejak waktu/tanggal.",
+    "commandHelpWhen": "Masukkan durasi hingga atau sejak waktu/tanggal, opsional untuk tempat/zona waktu yang didukung.",
     "commandHelpWho": "Buka kartu pengguna terbaru.",
     "couldNotFindUser": "Pengguna itu tidak ditemukan.",
     "couldNotOpenFocusForUser": "Mode fokus untuk pengguna itu tidak dapat dibuka.",
@@ -122,7 +122,10 @@
     "translateDraft": "Terjemahkan draf",
     "translateDraftTo": "Terjemahkan draf ke",
     "draftTranslationOff": "Terjemahan draf nonaktif.",
-    "draftTranslationTo": "Terjemahan draf ke {language}."
+    "draftTranslationTo": "Terjemahan draf ke {language}.",
+    "whenUntilTarget": "{duration} sampai {target}",
+    "whenSinceTarget": "{duration} sejak {target}",
+    "whenTargetInPlace": "{target} di {place}"
   },
   "extension": {
     "extensionName": {

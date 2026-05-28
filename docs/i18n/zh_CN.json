@@ -148,7 +148,7 @@
     "whoDescription": "打开最近用户的卡片。",
     "timeDescription": "插入当前本地时间，或受支持地点/时区的当前时间。",
     "timeAliases": "支持的别名：",
-    "whenDescription": "插入距离某个时间/日期还有多久或过去多久。",
+    "whenDescription": "插入距离某个时间/日期还有多久或过去多久，可选择支持的地点/时区。",
     "timeUntilFormats": "接受的格式：",
     "translateDescription": "在发送前翻译聊天输入框中的自定义文本。",
     "watchDescription": "添加要监看的关键词或短语。不输入文本时，显示当前监看列表。",
@@ -158,7 +158,8 @@
     "setDisplayDescription": "设置翻译的显示方式。",
     "setSoundDescription": "设置收件箱声音。",
     "aliasesLabel": "别名：",
-    "exampleLabel": "示例："
+    "exampleLabel": "示例：",
+    "timeZoneAliases": "支持的地点/时区："
   },
   "footer": {
     "disclaimer": "Chat Enhancer for YouTube 与 YouTube 或 Google 没有关联。",

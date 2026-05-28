@@ -148,7 +148,7 @@
     "whoDescription": "افتح بطاقة مستخدم حديث.",
     "timeDescription": "يدرج الوقت المحلي الحالي، أو الوقت الحالي لمكان/منطقة زمنية مدعومة.",
     "timeAliases": "الأسماء المختصرة المدعومة:",
-    "whenDescription": "أدخل المدة حتى وقت/تاريخ أو منذ وقت/تاريخ.",
+    "whenDescription": "أدخل المدة حتى وقت/تاريخ أو منذ وقت/تاريخ، اختياريًا في مكان/منطقة زمنية مدعومة.",
     "timeUntilFormats": "الصيغ المقبولة:",
     "translateDescription": "ترجم نصا مخصصا في حقل الدردشة قبل إرساله.",
     "watchDescription": "أضف كلمات أو عبارات للمراقبة. بدون نص، يعرض قائمة المراقبة الحالية.",
@@ -158,7 +158,8 @@
     "setDisplayDescription": "يضبط طريقة عرض الترجمات.",
     "setSoundDescription": "يضبط صوت البريد الوارد.",
     "aliasesLabel": "الأسماء البديلة:",
-    "exampleLabel": "مثال:"
+    "exampleLabel": "مثال:",
+    "timeZoneAliases": "الأماكن/المناطق الزمنية المدعومة:"
   },
   "footer": {
     "disclaimer": "Chat Enhancer for YouTube ليس تابعا لـ YouTube أو Google.",

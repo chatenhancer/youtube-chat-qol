@@ -96,7 +96,7 @@
     "commandHelpTranslate": "Traduci testo personalizzato in una lingua.",
     "commandHelpUnwatch": "Smetti di monitorare parole chiave o frasi.",
     "commandHelpWatch": "Monitora parole chiave o frasi nella posta.",
-    "commandHelpWhen": "Inserisci la durata fino a o da un orario/data.",
+    "commandHelpWhen": "Inserisci la durata fino a o da un orario/data, opzionalmente in un luogo/fuso orario supportato.",
     "commandHelpWho": "Apri una scheda utente recente.",
     "couldNotFindUser": "Impossibile trovare quell’utente.",
     "couldNotOpenFocusForUser": "Impossibile aprire la modalità focus per quell’utente.",
@@ -122,7 +122,10 @@
     "translateDraft": "Traduci bozza",
     "translateDraftTo": "Traduci bozza in",
     "draftTranslationOff": "Traduzione della bozza disattivata.",
-    "draftTranslationTo": "Traduzione della bozza in {language}."
+    "draftTranslationTo": "Traduzione della bozza in {language}.",
+    "whenUntilTarget": "{duration} fino a {target}",
+    "whenSinceTarget": "{duration} da {target}",
+    "whenTargetInPlace": "{target} a {place}"
   },
   "extension": {
     "extensionName": {

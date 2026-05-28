@@ -148,7 +148,7 @@
     "whoDescription": "Buka kartu pengguna terbaru.",
     "timeDescription": "Menyisipkan waktu lokal saat ini, atau waktu saat ini untuk tempat/zona waktu yang didukung.",
     "timeAliases": "Alias yang didukung:",
-    "whenDescription": "Masukkan durasi hingga atau sejak waktu/tanggal.",
+    "whenDescription": "Memasukkan durasi hingga atau sejak waktu/tanggal, opsional untuk tempat/zona waktu yang didukung.",
     "timeUntilFormats": "Format yang diterima:",
     "translateDescription": "Terjemahkan teks khusus di kolom chat sebelum dikirim.",
     "watchDescription": "Menambahkan keyword atau frasa yang dipantau. Tanpa teks, menampilkan daftar pantauan saat ini.",
@@ -158,7 +158,8 @@
     "setDisplayDescription": "Atur cara terjemahan ditampilkan.",
     "setSoundDescription": "Atur suara inbox.",
     "aliasesLabel": "Alias:",
-    "exampleLabel": "Contoh:"
+    "exampleLabel": "Contoh:",
+    "timeZoneAliases": "Tempat/zona waktu yang didukung:"
   },
   "footer": {
     "disclaimer": "Chat Enhancer for YouTube tidak berafiliasi dengan YouTube atau Google.",

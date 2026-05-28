@@ -96,7 +96,7 @@
     "commandHelpTranslate": "Translate custom text into a language.",
     "commandHelpUnwatch": "Stop watching keywords or phrases.",
     "commandHelpWatch": "Watch keywords or phrases in the inbox.",
-    "commandHelpWhen": "Insert the duration until or since a time/date.",
+    "commandHelpWhen": "Insert the duration until or since a time/date, optionally in a supported place/timezone.",
     "commandHelpWho": "Open a recent user card.",
     "couldNotFindUser": "Could not find that user.",
     "couldNotOpenFocusForUser": "Could not open focus mode for that user.",
@@ -122,7 +122,10 @@
     "translateDraft": "Translate draft",
     "translateDraftTo": "Translate draft to",
     "draftTranslationOff": "Draft translation off.",
-    "draftTranslationTo": "Draft translation to {language}."
+    "draftTranslationTo": "Draft translation to {language}.",
+    "whenUntilTarget": "{duration} until {target}",
+    "whenSinceTarget": "{duration} since {target}",
+    "whenTargetInPlace": "{target} in {place}"
   },
   "extension": {
     "extensionName": {

@@ -148,7 +148,7 @@
     "whoDescription": "เปิดการ์ดผู้ใช้ล่าสุด",
     "timeDescription": "แทรกเวลาท้องถิ่นปัจจุบัน หรือเวลาปัจจุบันของสถานที่/เขตเวลาที่รองรับ",
     "timeAliases": "alias ที่รองรับ:",
-    "whenDescription": "แทรกระยะเวลาจนถึงหรือจากเวลา/วันที่",
+    "whenDescription": "แทรกระยะเวลาจนถึงหรือจากเวลา/วันที่ โดยเลือกสถานที่/เขตเวลาที่รองรับได้",
     "timeUntilFormats": "รูปแบบที่รองรับ:",
     "translateDescription": "แปลข้อความที่กำหนดเองในช่องพิมพ์แชตก่อนส่ง",
     "watchDescription": "เพิ่มคีย์เวิร์ดหรือวลีที่ต้องการเฝ้าดู ถ้าไม่มีข้อความ จะแสดงรายการที่เฝ้าดูอยู่",
@@ -158,7 +158,8 @@
     "setDisplayDescription": "ตั้งค่าวิธีแสดงคำแปล",
     "setSoundDescription": "ตั้งค่าเสียงกล่องข้อความ",
     "aliasesLabel": "ชื่อย่อ:",
-    "exampleLabel": "ตัวอย่าง:"
+    "exampleLabel": "ตัวอย่าง:",
+    "timeZoneAliases": "สถานที่/เขตเวลาที่รองรับ:"
   },
   "footer": {
     "disclaimer": "Chat Enhancer for YouTube ไม่ได้มีความเกี่ยวข้องกับ YouTube หรือ Google",

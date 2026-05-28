@@ -96,7 +96,7 @@
     "commandHelpTranslate": "कस्टम टेक्स्ट को किसी भाषा में अनुवाद करें.",
     "commandHelpUnwatch": "कीवर्ड या वाक्यांश देखना बंद करें.",
     "commandHelpWatch": "इनबॉक्स में कीवर्ड या वाक्यांश देखें.",
-    "commandHelpWhen": "किसी समय/तारीख तक या उसके बाद की अवधि डालें.",
+    "commandHelpWhen": "किसी समय/तारीख तक या उसके बाद की अवधि डालें, वैकल्पिक रूप से किसी समर्थित स्थान/समय क्षेत्र में.",
     "commandHelpWho": "हाल के यूज़र का कार्ड खोलें.",
     "couldNotFindUser": "वह यूज़र नहीं मिला.",
     "couldNotOpenFocusForUser": "उस यूज़र के लिए फ़ोकस मोड नहीं खुल सका.",
@@ -122,7 +122,10 @@
     "translateDraft": "ड्राफ्ट अनुवाद करें",
     "translateDraftTo": "ड्राफ्ट का अनुवाद इसमें करें",
     "draftTranslationOff": "ड्राफ्ट अनुवाद बंद है.",
-    "draftTranslationTo": "ड्राफ्ट का अनुवाद {language} में."
+    "draftTranslationTo": "ड्राफ्ट का अनुवाद {language} में.",
+    "whenUntilTarget": "{target} तक {duration}",
+    "whenSinceTarget": "{target} से {duration}",
+    "whenTargetInPlace": "{place} में {target}"
   },
   "extension": {
     "extensionName": {

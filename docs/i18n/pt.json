@@ -148,7 +148,7 @@
     "whoDescription": "Abre um cartão de usuário recente.",
     "timeDescription": "Insere a hora local atual, ou a hora atual de um lugar/fuso horário compatível.",
     "timeAliases": "Aliases compatíveis:",
-    "whenDescription": "Insere a duração até ou desde uma hora/data.",
+    "whenDescription": "Insere a duração até ou desde uma hora/data, opcionalmente em um lugar/fuso horário compatível.",
     "timeUntilFormats": "Formatos aceitos:",
     "translateDescription": "Traduza texto personalizado no campo de chat antes de enviar.",
     "watchDescription": "Adiciona palavras-chave ou frases monitoradas. Sem texto, mostra sua lista atual de monitoramento.",
@@ -158,7 +158,8 @@
     "setDisplayDescription": "Define como as traduções são exibidas.",
     "setSoundDescription": "Define o som da caixa de entrada.",
     "aliasesLabel": "Aliases:",
-    "exampleLabel": "Exemplo:"
+    "exampleLabel": "Exemplo:",
+    "timeZoneAliases": "Lugares/fusos horários compatíveis:"
   },
   "footer": {
     "disclaimer": "Chat Enhancer for YouTube não é afiliado ao YouTube ou Google.",

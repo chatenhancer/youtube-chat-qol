@@ -96,7 +96,7 @@
     "commandHelpTranslate": "Перекласти власний текст іншою мовою.",
     "commandHelpUnwatch": "Припинити відстеження ключових слів або фраз.",
     "commandHelpWatch": "Відстежувати ключові слова або фрази у вхідних.",
-    "commandHelpWhen": "Вставити тривалість до або від часу/дати.",
+    "commandHelpWhen": "Вставити тривалість до або від часу/дати, за потреби для підтримуваного місця/часового поясу.",
     "commandHelpWho": "Відкрити картку нещодавнього користувача.",
     "couldNotFindUser": "Не вдалося знайти цього користувача.",
     "couldNotOpenFocusForUser": "Не вдалося відкрити режим фокусу для цього користувача.",
@@ -122,7 +122,10 @@
     "translateDraft": "Перекласти чернетку",
     "translateDraftTo": "Перекласти чернетку на",
     "draftTranslationOff": "Переклад чернетки вимкнено.",
-    "draftTranslationTo": "Переклад чернетки на {language}."
+    "draftTranslationTo": "Переклад чернетки на {language}.",
+    "whenUntilTarget": "{duration} до {target}",
+    "whenSinceTarget": "{duration} від {target}",
+    "whenTargetInPlace": "{target} у {place}"
   },
   "extension": {
     "extensionName": {

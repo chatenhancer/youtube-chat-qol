@@ -96,7 +96,7 @@
     "commandHelpTranslate": "Traduce texto personalizado a un idioma.",
     "commandHelpUnwatch": "Deja de seguir palabras clave o frases.",
     "commandHelpWatch": "Sigue palabras clave o frases en la bandeja.",
-    "commandHelpWhen": "Inserta la duración hasta o desde una hora/fecha.",
+    "commandHelpWhen": "Inserta la duración hasta o desde una hora/fecha, opcionalmente en un lugar/zona horaria compatible.",
     "commandHelpWho": "Abre la tarjeta de un usuario reciente.",
     "couldNotFindUser": "No se pudo encontrar ese usuario.",
     "couldNotOpenFocusForUser": "No se pudo abrir el modo foco para ese usuario.",
@@ -122,7 +122,10 @@
     "translateDraft": "Traducir borrador",
     "translateDraftTo": "Traducir borrador a",
     "draftTranslationOff": "Traducción del borrador desactivada.",
-    "draftTranslationTo": "Traducción del borrador a {language}."
+    "draftTranslationTo": "Traducción del borrador a {language}.",
+    "whenUntilTarget": "{duration} hasta {target}",
+    "whenSinceTarget": "{duration} desde {target}",
+    "whenTargetInPlace": "{target} en {place}"
   },
   "extension": {
     "extensionName": {

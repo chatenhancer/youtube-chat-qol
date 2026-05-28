@@ -148,7 +148,7 @@
     "whoDescription": "हाल के यूज़र का कार्ड खोलें.",
     "timeDescription": "मौजूदा स्थानीय समय डालता है, या किसी समर्थित जगह/टाइमज़ोन का मौजूदा समय डालता है.",
     "timeAliases": "समर्थित उपनाम:",
-    "whenDescription": "किसी समय/तारीख तक या उसके बाद की अवधि डालें.",
+    "whenDescription": "किसी समय/तारीख तक या उसके बाद की अवधि डालता है, वैकल्पिक रूप से किसी समर्थित स्थान/समय क्षेत्र में.",
     "timeUntilFormats": "स्वीकृत फॉर्मेट:",
     "translateDescription": "भेजने से पहले चैट इनपुट में कस्टम टेक्स्ट का अनुवाद करें.",
     "watchDescription": "देखे जाने वाले keywords या phrases जोड़ता है. बिना text के, आपकी मौजूदा watch list दिखाता है.",
@@ -158,7 +158,8 @@
     "setDisplayDescription": "अनुवाद कैसे दिखें, यह सेट करता है।",
     "setSoundDescription": "इनबॉक्स ध्वनि सेट करता है।",
     "aliasesLabel": "Aliases:",
-    "exampleLabel": "उदाहरण:"
+    "exampleLabel": "उदाहरण:",
+    "timeZoneAliases": "समर्थित स्थान/समय क्षेत्र:"
   },
   "footer": {
     "disclaimer": "Chat Enhancer for YouTube, YouTube या Google से संबद्ध नहीं है।",
