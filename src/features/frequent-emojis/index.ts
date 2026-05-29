@@ -7,6 +7,7 @@
  */
 import { getEmojiUsageData, isVariantParentEmoji } from './data';
 import { insertEmojiIntoChat } from './insert';
+import { registerFeatureLifecycle } from '../../content/lifecycle';
 import { renderFrequentEmojiRow as renderFrequentEmojiRowView } from './row';
 import type { EmojiUsage } from './types';
 import { getTopEmojiUsage, normalizeEmojiUsage, upsertEmojiUsage } from './usage';
@@ -17,7 +18,17 @@ let emojiUsage: EmojiUsage[] = [];
 let emojiUsageSaveTimer = 0;
 let emojiPickerRefreshTimer = 0;
 
+registerFeatureLifecycle({
+  page: {
+    init: initFrequentEmojis,
+    cleanupStale: cleanupStaleFrequentEmojis,
+    reset: resetFrequentEmojis
+  },
+  mutation: { enhance: handleFrequentEmojiMutations }
+});
+
 export function initFrequentEmojis(): void {
+  document.addEventListener('click', handleEmojiPickerClick, true);
   chrome.storage.local.get({ [EMOJI_USAGE_STORAGE_KEY]: [] }, (stored) => {
     emojiUsage = normalizeEmojiUsage(stored[EMOJI_USAGE_STORAGE_KEY]);
     refreshEmojiPickers();
@@ -35,6 +46,10 @@ export function resetFrequentEmojis(): void {
   emojiUsageSaveTimer = 0;
   emojiPickerRefreshTimer = 0;
   emojiUsage = [];
+  document.querySelectorAll('.ytcq-frequent-emoji-row').forEach((row) => row.remove());
+}
+
+export function cleanupStaleFrequentEmojis(): void {
   document.querySelectorAll('.ytcq-frequent-emoji-row').forEach((row) => row.remove());
 }
 
@@ -69,6 +84,21 @@ export function handleEmojiPickerClick(event: Event): void {
   if (isVariantParentEmoji(emoji)) return;
 
   recordEmojiUsage(emoji);
+}
+
+function handleFrequentEmojiMutations({ addedElements }: { addedElements: Element[] }): void {
+  addedElements.forEach((element) => {
+    if (element.matches('yt-emoji-picker-renderer')) {
+      enhanceEmojiPicker(element);
+    }
+
+    const containingEmojiPicker = element.closest('yt-emoji-picker-renderer');
+    if (containingEmojiPicker) {
+      enhanceEmojiPicker(containingEmojiPicker);
+    }
+
+    element.querySelectorAll('yt-emoji-picker-renderer').forEach(enhanceEmojiPicker);
+  });
 }
 
 function renderFrequentEmojiRow(picker: HTMLElement): void {

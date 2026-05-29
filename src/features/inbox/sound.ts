@@ -11,10 +11,6 @@ const ALERT_COOLDOWN_MS = 1400;
 
 let lastSoundAt = 0;
 
-export function initSound(): void {
-  // Kept as an explicit startup hook next to other feature initializers.
-}
-
 export function playAlertSound(): void {
   if (!getOptions().sound) return;
 

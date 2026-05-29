@@ -5,6 +5,7 @@
  * above the input, and owns keyboard/pointer selection behavior.
  */
 import { t } from '../../shared/i18n';
+import { ytcqCreateElement } from '../../shared/managed-dom';
 import { cleanText } from '../../shared/text';
 import { showToast } from '../../shared/toast';
 import {
@@ -81,12 +82,12 @@ export function createCommandAutocomplete(options: ChatCommandAutocompleteOption
     activeCard ||= createCommandAutocompleteCard();
     activeCard.replaceChildren();
 
-    const list = document.createElement('div');
+    const list = ytcqCreateElement('div');
     list.className = 'ytcq-command-autocomplete-list';
     list.setAttribute('role', 'listbox');
 
     state.suggestions.forEach((suggestion, index) => {
-      const option = document.createElement('button');
+      const option = ytcqCreateElement('button');
       option.type = 'button';
       option.className = 'ytcq-command-autocomplete-option';
       option.dataset.ytcqCommandAutocompleteIndex = String(index);
@@ -97,11 +98,11 @@ export function createCommandAutocomplete(options: ChatCommandAutocompleteOption
         option.classList.add('ytcq-command-autocomplete-option-active');
       }
 
-      const name = document.createElement('span');
+      const name = ytcqCreateElement('span');
       name.className = 'ytcq-command-autocomplete-name';
       name.textContent = suggestion.label;
 
-      const description = document.createElement('span');
+      const description = ytcqCreateElement('span');
       description.className = 'ytcq-command-autocomplete-description';
       description.textContent = suggestion.description;
 
@@ -407,7 +408,7 @@ function getReplacementText(suggestion: CommandAutocompleteSuggestion, context: 
 }
 
 function createCommandAutocompleteCard(): HTMLElement {
-  const card = document.createElement('section');
+  const card = ytcqCreateElement('section');
   card.className = 'ytcq-command-autocomplete-card';
   card.setAttribute('aria-label', t('chatCommands'));
   return card;

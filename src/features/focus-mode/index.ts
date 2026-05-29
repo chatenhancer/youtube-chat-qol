@@ -6,11 +6,13 @@
  */
 import { t } from '../../shared/i18n';
 import { createCloseIcon } from '../../shared/icons';
+import { ytcqCreateElement } from '../../shared/managed-dom';
 import { captureScrollPosition, restoreScrollPositionAfterRender, scrollElementToBottom } from '../../shared/scroll';
 import { findChatInput, getChatInputText, replaceChatInput } from '../../youtube/chat-input';
 import { CHAT_MESSAGE_SELECTOR } from '../../youtube/selectors';
 import { getChannelUrl, openChannelWindow } from '../channel-popup';
 import { isCurrentUserAuthorName } from '../mention-detection';
+import { registerFeatureLifecycle } from '../../content/lifecycle';
 import type { MessageTranslationRecord } from '../user-message-history';
 import { createFocusRecord, findFocusRecordForMessage } from './records';
 import {
@@ -42,6 +44,20 @@ let nextRecordId = 1;
 let initialized = false;
 const focusRecords: FocusRecord[] = [];
 
+registerFeatureLifecycle({
+  page: {
+    init: initFocusMode,
+    cleanupStale: cleanupStaleFocusMode,
+    reset: resetFocusMode
+  },
+  message: { collect: handlePotentialFocusMessage },
+  mutation: {
+    collect: ({ changedMessages }) => {
+      changedMessages.forEach(handlePotentialFocusMessage);
+    }
+  }
+});
+
 export function initFocusMode(): void {
   if (initialized) return;
   initialized = true;
@@ -51,6 +67,11 @@ export function initFocusMode(): void {
 
 export function resetFocusMode(): void {
   closeFocusMode();
+}
+
+export function cleanupStaleFocusMode(): void {
+  closeFocusMode();
+  document.querySelectorAll<HTMLElement>(`.${FOCUS_ANCHOR_CLASS}`).forEach((anchor) => anchor.remove());
 }
 
 export function showFocusPromptForMessage(message: HTMLElement): void {
@@ -131,7 +152,7 @@ function renderCollapsedFocusPrompt(): void {
   activeExpanded = false;
   activeCard?.remove();
 
-  const card = document.createElement('section');
+  const card = ytcqCreateElement('section');
   card.className = 'ytcq-focus-card ytcq-focus-card-collapsed';
   card.setAttribute('role', 'button');
   card.tabIndex = 0;
@@ -144,17 +165,17 @@ function renderCollapsedFocusPrompt(): void {
     }
   });
 
-  const summary = document.createElement('div');
+  const summary = ytcqCreateElement('div');
   summary.className = 'ytcq-focus-summary';
 
-  const label = document.createElement('span');
+  const label = ytcqCreateElement('span');
   label.className = 'ytcq-focus-label';
   label.textContent = t('focusOn');
 
   const author = createFocusAuthor(activeSource, { openChannel: false });
   summary.append(label, author);
 
-  const openButton = document.createElement('button');
+  const openButton = ytcqCreateElement('button');
   openButton.type = 'button';
   openButton.className = 'ytcq-focus-open';
   openButton.textContent = t('open');
@@ -180,25 +201,25 @@ function openFocusPanel(): void {
   activeCard?.remove();
   clearFocusRecords();
 
-  const card = document.createElement('section');
+  const card = ytcqCreateElement('section');
   card.className = 'ytcq-focus-card ytcq-focus-card-expanded';
   card.setAttribute('role', 'dialog');
   card.setAttribute('aria-label', t('focusMode'));
 
-  const header = document.createElement('div');
+  const header = ytcqCreateElement('div');
   header.className = 'ytcq-focus-header';
 
-  const title = document.createElement('div');
+  const title = ytcqCreateElement('div');
   title.className = 'ytcq-focus-title';
 
-  const label = document.createElement('span');
+  const label = ytcqCreateElement('span');
   label.className = 'ytcq-focus-label';
   label.textContent = t('focusingOn');
   title.append(label, createFocusAuthor(activeSource, { openChannel: true }));
 
   header.append(title, createFocusCloseButton(closeFocusMode));
 
-  const list = document.createElement('div');
+  const list = ytcqCreateElement('div');
   list.className = 'ytcq-focus-messages';
 
   card.append(header, list);
@@ -226,7 +247,7 @@ function renderFocusMessages(): void {
   activeList.replaceChildren();
 
   if (!focusRecords.length) {
-    const empty = document.createElement('div');
+    const empty = ytcqCreateElement('div');
     empty.className = 'ytcq-focus-empty';
     empty.textContent = t('noMessagesYet');
     activeList.append(empty);
@@ -234,7 +255,7 @@ function renderFocusMessages(): void {
   }
 
   focusRecords.forEach((record) => {
-    const item = document.createElement('div');
+    const item = ytcqCreateElement('div');
     item.className = `ytcq-focus-message ytcq-focus-message-${record.side}`;
     if (record.side === 'them') {
       item.classList.add('ytcq-focus-message-quotable');
@@ -245,11 +266,11 @@ function renderFocusMessages(): void {
       wireFocusMessageQuote(item, record);
     }
 
-    const meta = document.createElement('div');
+    const meta = ytcqCreateElement('div');
     meta.className = 'ytcq-focus-message-meta';
     meta.textContent = record.timestampText;
 
-    const bubble = document.createElement('div');
+    const bubble = ytcqCreateElement('div');
     bubble.className = 'ytcq-focus-bubble';
     renderFocusMessageText(item, bubble, record);
 
@@ -298,7 +319,7 @@ function clearFocusRecords(): void {
 
 function createFocusAuthor(source: FocusSource, options: { openChannel: boolean }): HTMLElement {
   const channelUrl = getChannelUrl(source.channelId, source.authorName);
-  const author = channelUrl && options.openChannel ? document.createElement('button') : document.createElement('span');
+  const author = channelUrl && options.openChannel ? ytcqCreateElement('button') : ytcqCreateElement('span');
   author.className = 'ytcq-focus-author';
   if (author instanceof HTMLButtonElement) {
     author.type = 'button';
@@ -317,7 +338,7 @@ function createFocusAuthor(source: FocusSource, options: { openChannel: boolean 
 
 function createFocusAvatar(source: FocusSource): HTMLElement {
   if (source.avatarSrc) {
-    const image = document.createElement('img');
+    const image = ytcqCreateElement('img');
     image.className = 'ytcq-focus-avatar';
     image.src = source.avatarSrc;
     image.alt = '';
@@ -325,14 +346,14 @@ function createFocusAvatar(source: FocusSource): HTMLElement {
     return image;
   }
 
-  const fallback = document.createElement('span');
+  const fallback = ytcqCreateElement('span');
   fallback.className = 'ytcq-focus-avatar ytcq-focus-avatar-fallback';
   fallback.textContent = getAuthorInitial(source.authorName);
   return fallback;
 }
 
 function createFocusCloseButton(onClick: () => void): HTMLButtonElement {
-  const button = document.createElement('button');
+  const button = ytcqCreateElement('button');
   button.type = 'button';
   button.className = 'ytcq-focus-close';
   button.setAttribute('aria-label', t('close'));
@@ -359,7 +380,7 @@ function getFocusAnchor(): HTMLElement {
 
   existing?.remove();
 
-  const anchor = document.createElement('div');
+  const anchor = ytcqCreateElement('div');
   anchor.className = FOCUS_ANCHOR_CLASS;
   if (panelPages) {
     parent.insertBefore(anchor, panelPages);

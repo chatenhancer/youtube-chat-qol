@@ -6,6 +6,7 @@
  */
 import { t } from '../../shared/i18n';
 import { createCloseIcon } from '../../shared/icons';
+import { ytcqCreateElement } from '../../shared/managed-dom';
 import { captureScrollPosition, restoreScrollPositionAfterRender, scrollElementToBottom } from '../../shared/scroll';
 import { appendRichMessageText } from '../../youtube/rich-text';
 import { createJumpToMessageIcon, jumpToChatMessage } from '../message-jump';
@@ -44,26 +45,26 @@ export function isInboxCardOpen(): boolean {
 export function openInboxCardView(anchor: HTMLElement | undefined, callbacks: InboxCardCallbacks): void {
   closeInboxCard();
 
-  const card = document.createElement('section');
+  const card = ytcqCreateElement('section');
   card.className = 'ytcq-profile-card ytcq-inbox-card';
   card.setAttribute('role', 'dialog');
   card.setAttribute('aria-label', t('inbox'));
 
-  const header = document.createElement('div');
+  const header = ytcqCreateElement('div');
   header.className = 'ytcq-profile-card-header ytcq-inbox-card-header';
 
-  const icon = document.createElement('span');
+  const icon = ytcqCreateElement('span');
   icon.className = 'ytcq-inbox-card-icon';
   icon.append(createInboxIcon(getInboxRecordsSnapshot().length > 0));
 
-  const titleWrap = document.createElement('div');
+  const titleWrap = ytcqCreateElement('div');
   titleWrap.className = 'ytcq-profile-card-title-wrap';
 
-  const title = document.createElement('div');
+  const title = ytcqCreateElement('div');
   title.className = 'ytcq-profile-card-title';
   title.textContent = t('inbox');
 
-  const subtitle = document.createElement('div');
+  const subtitle = ytcqCreateElement('div');
   subtitle.className = 'ytcq-profile-card-subtitle';
   subtitle.textContent = getInboxSubtitle();
 
@@ -88,14 +89,14 @@ export function openInboxCardView(anchor: HTMLElement | undefined, callbacks: In
     }
   });
 
-  const list = document.createElement('div');
+  const list = ytcqCreateElement('div');
   list.className = 'ytcq-profile-card-messages ytcq-inbox-messages';
   renderInboxList(list);
 
-  const actions = document.createElement('div');
+  const actions = ytcqCreateElement('div');
   actions.className = 'ytcq-profile-card-actions';
 
-  const clearButton = document.createElement('button');
+  const clearButton = ytcqCreateElement('button');
   clearButton.type = 'button';
   clearButton.className = 'ytcq-profile-card-open ytcq-inbox-clear';
   clearButton.textContent = t('clear');
@@ -164,15 +165,20 @@ export function closeInboxCard(): void {
   activeInboxCard = null;
 }
 
+export function cleanupStaleInboxCards(): void {
+  closeInboxCard();
+  document.querySelectorAll<HTMLElement>('.ytcq-inbox-card').forEach((card) => card.remove());
+}
+
 function renderInboxList(list: HTMLElement): void {
   list.replaceChildren();
 
   const records = getInboxRecordsSnapshot();
   if (!records.length) {
-    const empty = document.createElement('div');
+    const empty = ytcqCreateElement('div');
     empty.className = 'ytcq-profile-card-empty ytcq-inbox-empty';
 
-    const text = document.createElement('span');
+    const text = ytcqCreateElement('span');
     text.textContent = t('noInboxMessages');
 
     empty.setAttribute('aria-label', t('inboxEmpty'));
@@ -182,14 +188,14 @@ function renderInboxList(list: HTMLElement): void {
   }
 
   records.forEach((record) => {
-    const item = document.createElement('div');
+    const item = ytcqCreateElement('div');
     item.className = 'ytcq-profile-card-message ytcq-inbox-message';
     item.title = t('quoteMessage');
     item.setAttribute('role', 'button');
     item.tabIndex = 0;
     wireQuoteCardItem(item, record);
 
-    const timestamp = document.createElement('time');
+    const timestamp = ytcqCreateElement('time');
     timestamp.className = 'ytcq-profile-card-message-time';
     timestamp.textContent = record.timestampText;
     timestamp.dateTime = new Date(record.timestamp).toISOString();
@@ -198,10 +204,10 @@ function renderInboxList(list: HTMLElement): void {
       timeStyle: 'short'
     }).format(record.timestamp);
 
-    const body = document.createElement('span');
+    const body = ytcqCreateElement('span');
     body.className = 'ytcq-profile-card-message-text ytcq-inbox-message-body';
 
-    const author = document.createElement('button');
+    const author = ytcqCreateElement('button');
     author.type = 'button';
     author.className = 'ytcq-inbox-author';
     author.textContent = record.authorName;
@@ -214,7 +220,7 @@ function renderInboxList(list: HTMLElement): void {
     });
 
     const spacer = document.createTextNode(' ');
-    const text = document.createElement('span');
+    const text = ytcqCreateElement('span');
     appendRichMessageText(text, record.text, [], record.contentParts);
     highlightInboxMatches(text, record);
 
@@ -227,7 +233,7 @@ function renderInboxList(list: HTMLElement): void {
 }
 
 function createCardCloseButton(): HTMLButtonElement {
-  const closeButton = document.createElement('button');
+  const closeButton = ytcqCreateElement('button');
   closeButton.type = 'button';
   closeButton.className = 'ytcq-profile-card-close';
   closeButton.setAttribute('aria-label', t('close'));
@@ -261,7 +267,7 @@ function wireQuoteCardItem(item: HTMLElement, record: InboxRecord): void {
 function createInboxJumpButton(record: InboxRecord): HTMLButtonElement | null {
   if (!getLiveInboxMessage(record)) return null;
 
-  const button = document.createElement('button');
+  const button = ytcqCreateElement('button');
   button.type = 'button';
   button.className = 'ytcq-profile-card-jump';
   button.title = t('jumpToMessage');

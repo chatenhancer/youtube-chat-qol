@@ -7,6 +7,7 @@
  */
 import { getLocalizedLanguageLabel, t } from '../../shared/i18n';
 import { createTranslateIcon } from '../../shared/icons';
+import { ytcqCreateElement } from '../../shared/managed-dom';
 import { getOptions } from '../../shared/state';
 import { normalizeComparableText } from '../../shared/text';
 import {
@@ -104,18 +105,18 @@ export function createInlineTranslationElement(
   result: TranslationResult,
   protectedTokens: ProtectedToken[] = []
 ): HTMLElement {
-  const translation = document.createElement('div');
+  const translation = ytcqCreateElement('div');
   translation.className = 'ytcq-translation';
   translation.lang = result.targetLanguage;
   translation.title = hasReliableSourceLanguage(result)
     ? t('translatedFrom', { language: getLocalizedLanguageLabel(result.sourceLanguage) })
     : t('translatedMessage');
 
-  const prefix = document.createElement('span');
+  const prefix = ytcqCreateElement('span');
   prefix.className = 'ytcq-translation-prefix';
   prefix.textContent = t('translated');
 
-  const body = document.createElement('span');
+  const body = ytcqCreateElement('span');
   body.append(...createNodesWithPlaceholders(result.text, protectedTokens));
 
   translation.append(prefix, body);
@@ -140,7 +141,7 @@ export function getReplacementTranslationTitle(result: TranslationResult, origin
 }
 
 export function createReplacedTranslationIcon(): HTMLElement {
-  const icon = document.createElement('span');
+  const icon = ytcqCreateElement('span');
   icon.className = 'ytcq-replaced-translation-icon';
   icon.setAttribute('aria-hidden', 'true');
   icon.appendChild(createTranslationSvgIcon());

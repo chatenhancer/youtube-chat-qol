@@ -7,6 +7,7 @@
  */
 import { t } from '../../shared/i18n';
 import { createCloseIcon } from '../../shared/icons';
+import { ytcqCreateElement } from '../../shared/managed-dom';
 import { captureScrollPosition, restoreScrollPositionAfterRender, scrollElementToBottom } from '../../shared/scroll';
 import { findChatInput } from '../../youtube/chat-input';
 import {
@@ -16,6 +17,7 @@ import {
   recordVisibleUserMessages,
   type UserIdentity
 } from '../user-message-history';
+import { registerFeatureLifecycle } from '../../content/lifecycle';
 import { mentionAuthorName } from '../reply';
 import { getChannelUrl, openChannelWindow } from '../channel-popup';
 import { createAvatarElement, createProfileAvatarButton } from './elements';
@@ -26,6 +28,15 @@ import type { ProfileSource } from './types';
 
 let activeProfileCard: HTMLElement | null = null;
 let activeProfileCardCleanup: (() => void) | null = null;
+
+registerFeatureLifecycle({
+  page: {
+    cleanupStale: cleanupStaleProfilePopupSurfaces,
+    reset: closeProfileCard
+  },
+  message: { enhance: wireProfileClick },
+  participant: { enhance: wireParticipantProfileClick }
+});
 
 export function wireProfileClick(message: HTMLElement): void {
   if (message.dataset.ytcqProfileWired === 'true') return;
@@ -69,6 +80,14 @@ export function wireParticipantProfileClick(participant: HTMLElement): void {
   });
 }
 
+export function cleanupStaleProfilePopupSurfaces(): void {
+  closeProfileCard();
+  document.querySelectorAll<HTMLElement>('.ytcq-profile-card:not(.ytcq-inbox-card)').forEach((card) => card.remove());
+  document.querySelectorAll('[data-ytcq-profile-wired]').forEach((element) => {
+    element.removeAttribute('data-ytcq-profile-wired');
+  });
+}
+
 export function openProfileCardForIdentity(identity: UserIdentity, anchor?: HTMLElement | null): boolean {
   recordVisibleUserMessages();
   const recentMessages = getRecentMessagesForIdentity(identity);
@@ -97,21 +116,21 @@ function showProfileCard(source: ProfileSource, anchor: HTMLElement): void {
   closeProfileCard();
   recordVisibleUserMessages();
 
-  const card = document.createElement('section');
+  const card = ytcqCreateElement('section');
   card.className = 'ytcq-profile-card';
   card.setAttribute('role', 'dialog');
   card.setAttribute('aria-label', t('recentMessagesFromThisUser'));
 
-  const header = document.createElement('div');
+  const header = ytcqCreateElement('div');
   header.className = 'ytcq-profile-card-header';
 
   const avatar = createAvatarElement(source.avatarSrc);
   header.append(source.profileUrl ? createProfileAvatarButton(avatar, source.profileUrl) : avatar);
 
-  const titleWrap = document.createElement('div');
+  const titleWrap = ytcqCreateElement('div');
   titleWrap.className = 'ytcq-profile-card-title-wrap';
 
-  const title = document.createElement('button');
+  const title = ytcqCreateElement('button');
   title.type = 'button';
   title.className = 'ytcq-profile-card-title ytcq-profile-card-author';
   title.textContent = source.authorName;
@@ -129,14 +148,14 @@ function showProfileCard(source: ProfileSource, anchor: HTMLElement): void {
     closeProfileCard();
   });
 
-  const subtitle = document.createElement('div');
+  const subtitle = ytcqCreateElement('div');
   subtitle.className = 'ytcq-profile-card-subtitle';
   subtitle.textContent = t('recentMessages');
 
   titleWrap.append(title, subtitle);
   header.append(titleWrap);
 
-  const openButton = document.createElement('button');
+  const openButton = ytcqCreateElement('button');
   openButton.type = 'button';
   openButton.className = 'ytcq-profile-card-open ytcq-profile-card-open-header';
   openButton.textContent = t('openChannel');
@@ -146,7 +165,7 @@ function showProfileCard(source: ProfileSource, anchor: HTMLElement): void {
   });
   header.append(openButton);
 
-  const closeButton = document.createElement('button');
+  const closeButton = ytcqCreateElement('button');
   closeButton.type = 'button';
   closeButton.className = 'ytcq-profile-card-close';
   closeButton.setAttribute('aria-label', t('close'));
@@ -154,7 +173,7 @@ function showProfileCard(source: ProfileSource, anchor: HTMLElement): void {
   closeButton.addEventListener('click', closeProfileCard);
   header.append(closeButton);
 
-  const list = document.createElement('div');
+  const list = ytcqCreateElement('div');
   list.className = 'ytcq-profile-card-messages';
 
   const profileKey = getUserKeyFromIdentity(source.identity);

@@ -4,6 +4,11 @@
  * Shows a short edge shimmer when the extension attaches, then leaves a quiet
  * ambient glow so the chat feels enhanced without competing with messages.
  */
+import { registerFeatureLifecycle } from '../content/lifecycle';
+import { ytcqCreateElement } from '../shared/managed-dom';
+import { getOptions } from '../shared/state';
+import type { Options } from '../shared/options';
+
 const EFFECT_CLASS = 'ytcq-enhanced-effect';
 const ACTIVE_CLASS = 'ytcq-enhanced-effect-active';
 const ACTIVATION_MS = 1000;
@@ -18,6 +23,23 @@ let animationStart = 0;
 
 interface EnhancedEffectOptions {
   animate?: boolean;
+}
+
+registerFeatureLifecycle({
+  page: {
+    boot: showConfiguredEnhancedEffect,
+    cleanupStale: cleanupStaleEnhancedEffect,
+    optionsChanged: handleEnhancedEffectOptionsChanged
+  }
+});
+
+function showConfiguredEnhancedEffect(): void {
+  showEnhancedEffect({ animate: getOptions().startupEffect });
+}
+
+function handleEnhancedEffectOptionsChanged(previousOptions: Options, nextOptions: Options): void {
+  if (nextOptions.startupEffect === previousOptions.startupEffect) return;
+  showEnhancedEffect({ animate: nextOptions.startupEffect });
 }
 
 export function showEnhancedEffect({ animate = true }: EnhancedEffectOptions = {}): void {
@@ -72,14 +94,19 @@ export function hideEnhancedEffect(): void {
   canvas = null;
 }
 
+export function cleanupStaleEnhancedEffect(): void {
+  hideEnhancedEffect();
+  document.querySelectorAll<HTMLDivElement>(`.${EFFECT_CLASS}`).forEach((element) => element.remove());
+}
+
 function getOrCreateEffect(): HTMLDivElement {
   const existing = document.querySelector<HTMLDivElement>(`.${EFFECT_CLASS}`);
   if (existing) return existing;
 
-  const element = document.createElement('div');
+  const element = ytcqCreateElement('div');
   element.className = EFFECT_CLASS;
   element.setAttribute('aria-hidden', 'true');
-  const elementCanvas = document.createElement('canvas');
+  const elementCanvas = ytcqCreateElement('canvas');
   element.appendChild(elementCanvas);
   return element;
 }

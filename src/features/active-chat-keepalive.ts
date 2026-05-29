@@ -5,8 +5,10 @@
  */
 import { t } from '../shared/i18n';
 import { createRefreshIcon } from '../shared/icons';
+import { ytcqCreateElement } from '../shared/managed-dom';
 import { findChatInput, getChatInputText, replaceChatInput } from '../youtube/chat-input';
 import { hideEnhancedEffect } from './enhanced-effect';
+import { registerFeatureLifecycle } from '../content/lifecycle';
 
 const ACTIVE_CHAT_PORT_NAME = 'ytcq:active-chat';
 const ACTIVE_CHAT_PING_TYPE = 'ytcq:active-chat-ping';
@@ -25,6 +27,13 @@ interface ReconnectDraft {
   text: string;
   url: string;
 }
+
+registerFeatureLifecycle({
+  page: {
+    init: startActiveChatKeepAlive,
+    cleanupStale: cleanupStaleReconnectNotice
+  }
+});
 
 export function startActiveChatKeepAlive(): void {
   restoreReconnectDraft();
@@ -49,6 +58,12 @@ export function startActiveChatKeepAlive(): void {
   keepAliveTimer = window.setInterval(sendActiveChatPing, ACTIVE_CHAT_PING_INTERVAL_MS);
 }
 
+export function cleanupStaleReconnectNotice(): void {
+  document.querySelectorAll<HTMLElement>(`.${RECONNECT_ANCHOR_CLASS}`).forEach((anchor) => anchor.remove());
+  reconnectNotice = null;
+  reconnectNoticePending = false;
+}
+
 function sendActiveChatPing(): void {
   try {
     keepAlivePort?.postMessage({
@@ -67,13 +82,13 @@ function showReconnectNotice(): void {
   if (reconnectNotice || document.visibilityState === 'hidden') return;
   reconnectNoticePending = false;
 
-  const button = document.createElement('button');
+  const button = ytcqCreateElement('button');
   button.type = 'button';
   button.className = 'ytcq-reconnect-button';
   button.title = t('refreshChatTitle');
   button.setAttribute('aria-label', t('refreshChatTitle'));
 
-  const label = document.createElement('span');
+  const label = ytcqCreateElement('span');
   label.textContent = t('refreshChat');
 
   button.append(createRefreshIcon(), label);
@@ -155,7 +170,7 @@ function getReconnectAnchor(): HTMLElement {
 
   existing?.remove();
 
-  const anchor = document.createElement('div');
+  const anchor = ytcqCreateElement('div');
   anchor.className = RECONNECT_ANCHOR_CLASS;
   if (panelPages) {
     parent.insertBefore(anchor, panelPages);

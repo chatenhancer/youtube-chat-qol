@@ -3,42 +3,27 @@
  *
  * This file is the wiring layer: it loads options, watches YouTube's live chat
  * iframe for new renderers, and delegates each behavior to feature modules.
- * Keeping DOM observation centralized makes mutation-driven behavior easier to
- * reason about.
+ *
+ * `enabled-features` is imported for lifecycle registration side effects. This
+ * entrypoint owns the single MutationObserver; features should register
+ * lifecycle hooks rather than creating their own observers.
  */
-import { enhanceEmojiPicker, handleEmojiPickerClick, initFrequentEmojis, resetFrequentEmojis } from '../features/frequent-emojis';
-import { startActiveChatKeepAlive } from '../features/active-chat-keepalive';
-import { initChatCommands, resetChatCommandsState } from '../features/chat-commands';
+import './enabled-features';
 import {
-  initComposerTranslation,
-  refreshComposerTranslation,
-  resetComposerTranslation,
-  scheduleComposerTranslationWire,
-  shouldWireComposerTranslationForNode
-} from '../features/composer-translation';
-import { showEnhancedEffect } from '../features/enhanced-effect';
-import { enhanceMenu } from '../features/menus';
-import { handleMessageMenuActivation, wireMessageContext } from '../features/menus/message-menu';
-import { configureSettingsMenu, refreshSettingsMenus } from '../features/menus/settings-menu';
-import {
-  handlePotentialInbox,
-  highlightPotentialInboxKeywords,
-  initInbox,
-  resetInboxState,
-  scheduleInboxButtonWire
-} from '../features/inbox';
-import { initSound } from '../features/inbox/sound';
-import { handlePotentialFocusMessage, initFocusMode, resetFocusMode } from '../features/focus-mode';
-import { keepChatAtLiveEdge, scheduleKeepChatAtLiveEdge } from '../features/live-edge';
-import { closeProfileCard, wireParticipantProfileClick, wireProfileClick } from '../features/profile-popup';
-import { wireAuthorNameMention } from '../features/reply';
-import {
-  clearTranslations,
-  getRetroactiveTranslationMessages,
-  MAX_RETROACTIVE_TRANSLATIONS,
-  queueMessageTranslation
-} from '../features/translation/queue';
-import { recordUserMessage } from '../features/user-message-history';
+  bootFeatures,
+  cleanupStaleFeatures,
+  handleFeatureMessage,
+  handleFeatureMutations,
+  handleFeatureOptionsChanged,
+  handleFeatureParticipant,
+  handleFeatureVisibilityChanged,
+  initFeatures,
+  recoverVisibleFeatures,
+  resetFeatures,
+  shouldIgnoreFeatureAddedNode,
+  shouldIgnoreFeatureMutation,
+  type FeatureMutationBatch
+} from './lifecycle';
 import { DEFAULT_OPTIONS, getTargetLanguageUpdate, normalizeOptions, type Options } from '../shared/options';
 import { getOptions, setOptions } from '../shared/state';
 import { initUiLocaleFromDocument } from '../shared/i18n';
@@ -50,15 +35,9 @@ let visibilityRecoveryTimer = 0;
 init();
 
 function init(): void {
-  startActiveChatKeepAlive();
+  cleanupStaleFeatures();
   initUiLocaleFromDocument();
-  initFrequentEmojis();
-  initSound();
-  initFocusMode();
-  initInbox();
-  initChatCommands(saveOptions);
-  initComposerTranslation(saveOptions);
-  configureSettingsMenu(saveOptions);
+  initFeatures({ saveOptions });
 
   chrome.storage.sync.get(DEFAULT_OPTIONS, (storedOptions) => {
     setOptions(normalizeOptions(storedOptions));
@@ -77,16 +56,10 @@ function init(): void {
     }
 
     setOptions(normalizeOptions(nextOptions));
-    applyOptionSideEffects(previousOptions, getOptions());
-    refreshComposerTranslation();
-    refreshSettingsMenus();
+    notifyFeatureOptionsChanged(previousOptions, getOptions());
   });
 
-  chrome.runtime.onMessage.addListener((message: { type?: string }, _sender, sendResponse) => {
-    if (message?.type === 'ytcq:status-ping') {
-      sendResponse({ active: true });
-      return false;
-    }
+  chrome.runtime.onMessage.addListener((message: { type?: string }) => {
     if (message?.type !== 'ytcq:reset-page') return false;
     resetPageState();
     return false;
@@ -100,97 +73,15 @@ function notifyChatAttached(): void {
 }
 
 function boot(): void {
-  processExistingMessages(getOptions().targetLanguage ? MAX_RETROACTIVE_TRANSLATIONS : 0);
+  processExistingMessages();
   processExistingParticipants();
-  document.querySelectorAll('ytd-menu-popup-renderer').forEach(enhanceMenu);
-  document.querySelectorAll('yt-emoji-picker-renderer').forEach(enhanceEmojiPicker);
-  scheduleInboxButtonWire();
-  scheduleComposerTranslationWire();
-  document.addEventListener('click', handleEmojiPickerClick, true);
-  document.addEventListener('pointerdown', handleMessageMenuActivation, true);
-  document.addEventListener('click', handleMessageMenuActivation, true);
-  document.addEventListener('keydown', handleMessageMenuActivation, true);
+  bootFeatures();
   document.addEventListener('visibilitychange', handleVisibilityChange);
 
   observer = new MutationObserver((mutations) => {
-    let shouldWireInboxButton = false;
-    for (const mutation of mutations) {
-      if (mutation.type === 'childList') {
-        const targetMenu = mutation.target instanceof Element
-          ? mutation.target.closest('ytd-menu-popup-renderer')
-          : null;
-        if (targetMenu) {
-          enhanceMenu(targetMenu);
-        }
-        if (mutation.target instanceof Element && mutation.target.closest('yt-live-chat-header-renderer')) {
-          shouldWireInboxButton = true;
-        }
-        retryTranslationForLateMessageText(mutation.target);
-        recordMessageForLateText(mutation.target);
-      } else if (mutation.type === 'characterData') {
-        retryTranslationForLateMessageText(mutation.target);
-        recordMessageForLateText(mutation.target);
-      }
-
-      for (const node of mutation.addedNodes) {
-        if (!(node instanceof Element)) continue;
-        if (node.closest('.ytcq-frequent-emoji-row')) continue;
-        if (isExtensionManagedAddedNode(node)) continue;
-        if (
-          node.matches('yt-live-chat-header-renderer') ||
-          node.querySelector('yt-live-chat-header-renderer')
-        ) {
-          shouldWireInboxButton = true;
-        }
-        if (shouldWireComposerTranslationForNode(node)) {
-          scheduleComposerTranslationWire();
-        }
-        if (node.matches(CHAT_MESSAGE_SELECTOR) && node instanceof HTMLElement) {
-          enhanceMessage(node, { allowTranslate: true });
-        }
-        if (node.matches(PARTICIPANT_SELECTOR) && node instanceof HTMLElement) {
-          enhanceParticipant(node);
-        }
-        const containingMessage = node.closest<HTMLElement>(CHAT_MESSAGE_SELECTOR);
-        if (containingMessage && !node.matches(CHAT_MESSAGE_SELECTOR)) {
-          enhanceMessage(containingMessage, { allowTranslate: false });
-        }
-        const containingParticipant = node.closest<HTMLElement>(PARTICIPANT_SELECTOR);
-        if (containingParticipant && !node.matches(PARTICIPANT_SELECTOR)) {
-          enhanceParticipant(containingParticipant);
-        }
-        if (node.matches('ytd-menu-popup-renderer')) {
-          enhanceMenu(node);
-        }
-        if (node.matches('yt-emoji-picker-renderer')) {
-          enhanceEmojiPicker(node);
-        }
-        const containingMenu = node.closest('ytd-menu-popup-renderer');
-        if (containingMenu) {
-          enhanceMenu(containingMenu);
-        }
-        const containingEmojiPicker = node.closest('yt-emoji-picker-renderer');
-        if (containingEmojiPicker) {
-          enhanceEmojiPicker(containingEmojiPicker);
-        }
-        for (const message of node.querySelectorAll<HTMLElement>(CHAT_MESSAGE_SELECTOR)) {
-          enhanceMessage(message, { allowTranslate: true });
-        }
-        for (const participant of node.querySelectorAll<HTMLElement>(PARTICIPANT_SELECTOR)) {
-          enhanceParticipant(participant);
-        }
-        for (const menu of node.querySelectorAll('ytd-menu-popup-renderer')) {
-          enhanceMenu(menu);
-        }
-        for (const picker of node.querySelectorAll('yt-emoji-picker-renderer')) {
-          enhanceEmojiPicker(picker);
-        }
-      }
-    }
-
-    if (shouldWireInboxButton) {
-      scheduleInboxButtonWire();
-    }
+    const batch = createFeatureMutationBatch(mutations);
+    handleFeatureMutations(batch);
+    batch.addedElements.forEach(handleAddedElement);
   });
 
   observer.observe(document.documentElement, {
@@ -198,122 +89,93 @@ function boot(): void {
     subtree: true,
     characterData: true
   });
-  showEnhancedEffect({ animate: getOptions().startupEffect });
   notifyChatAttached();
 }
 
-function processExistingMessages(translateLimit: number): void {
+function processExistingMessages(): void {
   const messages = Array.from(document.querySelectorAll<HTMLElement>(CHAT_MESSAGE_SELECTOR));
   messages.forEach((message) => {
-    enhanceMessage(message, { allowTranslate: false });
+    handleFeatureMessage(message, { allowTranslate: false });
   });
-
-  if (!getOptions().targetLanguage || translateLimit <= 0) return;
-
-  getRetroactiveTranslationMessages(messages, translateLimit)
-    .forEach((message) => queueMessageTranslation(message, { backfill: true }));
 }
 
 function processExistingParticipants(): void {
-  document.querySelectorAll<HTMLElement>(PARTICIPANT_SELECTOR).forEach(enhanceParticipant);
+  document.querySelectorAll<HTMLElement>(PARTICIPANT_SELECTOR).forEach(handleFeatureParticipant);
 }
 
 function scheduleVisibleMessageRecovery(): void {
   if (document.visibilityState === 'hidden') return;
   if (visibilityRecoveryTimer) window.clearTimeout(visibilityRecoveryTimer);
-  scheduleKeepChatAtLiveEdge();
   visibilityRecoveryTimer = window.setTimeout(() => {
     visibilityRecoveryTimer = 0;
-    processExistingMessages(getOptions().targetLanguage ? MAX_RETROACTIVE_TRANSLATIONS : 0);
+    processExistingMessages();
+    recoverVisibleFeatures();
   }, 300);
 }
 
 function handleVisibilityChange(): void {
+  handleFeatureVisibilityChanged(document.visibilityState);
   if (document.visibilityState === 'hidden') {
-    keepChatAtLiveEdge();
     return;
   }
 
   scheduleVisibleMessageRecovery();
 }
 
-function enhanceMessage(message: HTMLElement, { allowTranslate }: { allowTranslate: boolean }): void {
-  recordUserMessage(message);
-  handlePotentialFocusMessage(message);
-  wireMessageContext(message);
-  wireProfileClick(message);
-  wireAuthorNameMention(message);
+function createFeatureMutationBatch(mutations: MutationRecord[]): FeatureMutationBatch {
+  const addedElements: Element[] = [];
+  const changedMessages = new Set<HTMLElement>();
 
-  if (allowTranslate) {
-    handlePotentialInbox(message);
-  } else {
-    highlightPotentialInboxKeywords(message);
+  mutations.forEach((mutation) => {
+    if (mutation.type === 'childList' || mutation.type === 'characterData') {
+      const message = getChangedMessageForMutation(mutation);
+      if (message) changedMessages.add(message);
+    }
+
+    mutation.addedNodes.forEach((node) => {
+      if (!(node instanceof Element)) return;
+      if (shouldIgnoreFeatureAddedNode(node)) return;
+      addedElements.push(node);
+    });
+  });
+
+  return {
+    addedElements,
+    changedMessages: [...changedMessages],
+    mutations
+  };
+}
+
+function handleAddedElement(element: Element): void {
+  if (element.matches(CHAT_MESSAGE_SELECTOR) && element instanceof HTMLElement) {
+    handleFeatureMessage(element, { allowTranslate: true });
+  }
+  if (element.matches(PARTICIPANT_SELECTOR) && element instanceof HTMLElement) {
+    handleFeatureParticipant(element);
   }
 
-  if (allowTranslate && getOptions().targetLanguage) {
-    queueMessageTranslation(message);
+  const containingMessage = element.closest<HTMLElement>(CHAT_MESSAGE_SELECTOR);
+  if (containingMessage && !element.matches(CHAT_MESSAGE_SELECTOR)) {
+    handleFeatureMessage(containingMessage, { allowTranslate: false });
   }
-}
 
-function enhanceParticipant(participant: HTMLElement): void {
-  wireParticipantProfileClick(participant);
-}
-
-function retryTranslationForLateMessageText(target: Node): void {
-  if (!getOptions().targetLanguage) return;
-
-  const targetElement = target instanceof Element ? target : target.parentElement;
-  if (!targetElement || isExtensionManagedMutation(targetElement)) return;
-
-  const message = targetElement.closest<HTMLElement>(CHAT_MESSAGE_SELECTOR);
-  if (!message || message.dataset.ytcqTranslationKey) return;
-
-  queueMessageTranslation(message);
-}
-
-function recordMessageForLateText(target: Node): void {
-  const targetElement = target instanceof Element ? target : target.parentElement;
-  if (!targetElement || isExtensionManagedMutation(targetElement)) return;
-
-  const message = targetElement.closest<HTMLElement>(CHAT_MESSAGE_SELECTOR);
-  if (message) {
-    recordUserMessage(message);
-    handlePotentialFocusMessage(message);
-    handlePotentialInbox(message);
+  const containingParticipant = element.closest<HTMLElement>(PARTICIPANT_SELECTOR);
+  if (containingParticipant && !element.matches(PARTICIPANT_SELECTOR)) {
+    handleFeatureParticipant(containingParticipant);
   }
+
+  element.querySelectorAll<HTMLElement>(CHAT_MESSAGE_SELECTOR).forEach((message) => {
+    handleFeatureMessage(message, { allowTranslate: true });
+  });
+  element.querySelectorAll<HTMLElement>(PARTICIPANT_SELECTOR).forEach(handleFeatureParticipant);
 }
 
-function isExtensionManagedMutation(element: Element): boolean {
-  const chatMessage = element.closest<HTMLElement>(CHAT_MESSAGE_SELECTOR);
-  if (chatMessage?.dataset.ytcqInboxKeywordHighlighting === 'true') return true;
-
-  return Boolean(element.closest([
-    '.ytcq-translation',
-    '.ytcq-replaced-translation-icon',
-    '.ytcq-frequent-emoji-row',
-    '.ytcq-composer-translate-control',
-    '.ytcq-enhanced-effect',
-    '.ytcq-focus-card',
-    '.ytcq-profile-card',
-    '.ytcq-inbox-card',
-    'ytd-menu-popup-renderer'
-  ].join(',')));
-}
-
-function isExtensionManagedAddedNode(element: Element): boolean {
-  const chatMessage = element.closest<HTMLElement>(CHAT_MESSAGE_SELECTOR);
-  if (chatMessage?.dataset.ytcqInboxKeywordHighlighting === 'true') return true;
-
-  return Boolean(element.closest([
-    '.ytcq-chat-keyword-highlight',
-    '.ytcq-translation',
-    '.ytcq-replaced-translation-icon',
-    '.ytcq-composer-translate-control',
-    '.ytcq-enhanced-effect',
-    '.ytcq-focus-card',
-    '.ytcq-profile-card',
-    '.ytcq-inbox-card'
-  ].join(',')));
+function getChangedMessageForMutation(mutation: MutationRecord): HTMLElement | null {
+  const targetElement = mutation.target instanceof Element
+    ? mutation.target
+    : mutation.target.parentElement;
+  if (!targetElement || shouldIgnoreFeatureMutation(targetElement)) return null;
+  return targetElement.closest<HTMLElement>(CHAT_MESSAGE_SELECTOR);
 }
 
 function saveOptions(values: Partial<Options>): void {
@@ -328,41 +190,17 @@ function saveOptions(values: Partial<Options>): void {
       }
     : values;
   setOptions(normalizeOptions({ ...previousOptions, ...nextValues }));
-  applyOptionSideEffects(previousOptions, getOptions());
-  refreshComposerTranslation();
-  refreshSettingsMenus();
+  notifyFeatureOptionsChanged(previousOptions, getOptions());
   chrome.storage.sync.set(nextValues);
 }
 
-function applyOptionSideEffects(previousOptions: Options, nextOptions: Options): void {
-  const languageChanged = nextOptions.targetLanguage !== previousOptions.targetLanguage;
-  const displayChanged = nextOptions.translationDisplay !== previousOptions.translationDisplay;
-  const startupEffectChanged = nextOptions.startupEffect !== previousOptions.startupEffect;
-
-  if (languageChanged || displayChanged) {
-    clearTranslations();
-    if (nextOptions.targetLanguage) {
-      processExistingMessages(MAX_RETROACTIVE_TRANSLATIONS);
-    }
-  }
-
-  if (startupEffectChanged) {
-    showEnhancedEffect({ animate: nextOptions.startupEffect });
-  }
+function notifyFeatureOptionsChanged(previousOptions: Options, nextOptions: Options): void {
+  handleFeatureOptionsChanged(previousOptions, nextOptions);
 }
 
 function resetPageState(): void {
   const previousOptions = getOptions();
   setOptions(DEFAULT_OPTIONS);
-  clearTranslations();
-  resetInboxState();
-  resetFrequentEmojis();
-  resetChatCommandsState();
-  resetComposerTranslation();
-  resetFocusMode();
-  closeProfileCard();
-  document.querySelectorAll('.ytcq-toast').forEach((toast) => toast.remove());
-  applyOptionSideEffects(previousOptions, DEFAULT_OPTIONS);
-  refreshSettingsMenus();
-  scheduleInboxButtonWire();
+  resetFeatures();
+  notifyFeatureOptionsChanged(previousOptions, DEFAULT_OPTIONS);
 }

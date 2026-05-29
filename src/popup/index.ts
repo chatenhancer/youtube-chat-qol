@@ -18,6 +18,10 @@ const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)';
 
 type ExtensionStatus = 'checking' | 'active' | 'inactive';
 
+interface ActiveChatTabsResponse {
+  activeTabIds?: unknown;
+}
+
 const controls = {
   landingLink: document.querySelector<HTMLAnchorElement>('#landingLink'),
   sourceCodeLink: document.querySelector<HTMLAnchorElement>('#sourceCodeLink'),
@@ -136,22 +140,21 @@ function refreshGlobalExtensionStatus(currentTabId: number | null): void {
       return;
     }
 
-    const activeTabIds = new Set<number>();
     const openTabIds = new Set(tabIds);
-    let pending = tabIds.length;
-
-    tabIds.forEach((tabId) => {
-      chrome.tabs.sendMessage(tabId, { type: 'ytcq:status-ping' }, (response?: { active?: boolean }) => {
-        if (!chrome.runtime.lastError && response?.active === true) {
-          activeTabIds.add(tabId);
-        }
-        pending -= 1;
-        if (!pending) {
-          updateExtensionStatusSummaryWithKnownTabs(activeTabIds, openTabIds, currentTabId);
-        }
-      });
+    chrome.runtime.sendMessage({ type: 'ytcq:get-active-chat-tabs' }, (response?: ActiveChatTabsResponse) => {
+      const activeTabIds = chrome.runtime.lastError
+        ? new Set<number>()
+        : getOpenActiveChatTabIds(response, openTabIds);
+      updateExtensionStatusSummaryWithKnownTabs(activeTabIds, openTabIds, currentTabId);
     });
   });
+}
+
+function getOpenActiveChatTabIds(response: ActiveChatTabsResponse | undefined, openTabIds: Set<number>): Set<number> {
+  if (!Array.isArray(response?.activeTabIds)) return new Set();
+  return new Set(response.activeTabIds.filter((tabId): tabId is number => {
+    return typeof tabId === 'number' && openTabIds.has(tabId);
+  }));
 }
 
 function updateExtensionStatusSummaryWithKnownTabs(activeTabIds: Set<number>, openTabIds: Set<number>, currentTabId: number | null): void {

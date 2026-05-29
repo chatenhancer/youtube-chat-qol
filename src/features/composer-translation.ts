@@ -10,6 +10,7 @@
 import { getLocalizedLanguageLabel, t } from '../shared/i18n';
 import { createTranslateIcon } from '../shared/icons';
 import { LANGUAGE_OPTIONS } from '../shared/languages';
+import { ytcqCreateElement } from '../shared/managed-dom';
 import type { Options } from '../shared/options';
 import { getOptions } from '../shared/state';
 import { cleanText } from '../shared/text';
@@ -21,6 +22,7 @@ import {
   replaceNodesInChatInput
 } from '../youtube/chat-input';
 import { translateTranslationPlan } from './chat-commands/translate-text';
+import { registerFeatureLifecycle } from '../content/lifecycle';
 import { createTranslationPlanFromNodes, type TranslationPlan } from './translation/protected-placeholders';
 
 type SaveOptions = (values: Partial<Options>) => void;
@@ -47,6 +49,22 @@ let lastSourceText = '';
 let lastSourceNodes: Node[] = [];
 let lastSourcePlanText = '';
 let lastTranslatedText = '';
+
+registerFeatureLifecycle({
+  page: {
+    init: ({ saveOptions }) => initComposerTranslation(saveOptions),
+    cleanupStale: cleanupStaleComposerTranslation,
+    optionsChanged: refreshComposerTranslation,
+    reset: resetComposerTranslation
+  },
+  mutation: {
+    enhance: ({ addedElements }) => {
+      if (addedElements.some(shouldWireComposerTranslationForNode)) {
+        scheduleComposerTranslationWire();
+      }
+    }
+  }
+});
 
 export function initComposerTranslation(callback: SaveOptions): void {
   saveOptions = callback;
@@ -93,6 +111,17 @@ export function resetComposerTranslation(): void {
   refreshComposerTranslation();
 }
 
+export function cleanupStaleComposerTranslation(): void {
+  document.querySelectorAll(`.${CONTROL_CLASS}, .${PANEL_CLASS}`).forEach((surface) => surface.remove());
+  document.querySelectorAll('.ytcq-composer-translate-host').forEach((host) => {
+    host.classList.remove('ytcq-composer-translate-host');
+  });
+  button = null;
+  control = null;
+  panel = null;
+  select = null;
+}
+
 function wireComposerTranslationControl(): void {
   const emojiButton = document.querySelector<HTMLElement>(EMOJI_BUTTON_SELECTOR);
   if (!emojiButton) return;
@@ -108,7 +137,7 @@ function wireComposerTranslationControl(): void {
   currentControl?.remove();
   emojiButton.querySelectorAll(`:scope > .${CONTROL_CLASS}`).forEach((control) => control.remove());
 
-  control = document.createElement('div');
+  control = ytcqCreateElement('div');
   control.className = CONTROL_CLASS;
   control.append(createButton());
   ensurePanel();
@@ -118,7 +147,7 @@ function wireComposerTranslationControl(): void {
 }
 
 function createButton(): HTMLButtonElement {
-  button = document.createElement('button');
+  button = ytcqCreateElement('button');
   button.type = 'button';
   button.className = BUTTON_CLASS;
   button.append(createTranslateIcon());
@@ -131,15 +160,15 @@ function createButton(): HTMLButtonElement {
 }
 
 function createPanel(): HTMLElement {
-  panel = document.createElement('div');
+  panel = ytcqCreateElement('div');
   panel.className = PANEL_CLASS;
   panel.hidden = true;
 
-  const label = document.createElement('label');
+  const label = ytcqCreateElement('label');
   label.className = 'ytcq-composer-translate-label';
   label.textContent = t('translateDraftTo');
 
-  select = document.createElement('select');
+  select = ytcqCreateElement('select');
   select.className = SELECT_CLASS;
   select.setAttribute('aria-label', t('translateDraftTo'));
   select.append(createLanguageOption('', t('selectOff')));
@@ -164,7 +193,7 @@ function ensurePanel(): HTMLElement {
 }
 
 function createLanguageOption(value: string, label: string): HTMLOptionElement {
-  const option = document.createElement('option');
+  const option = ytcqCreateElement('option');
   option.value = value;
   option.textContent = label;
   return option;

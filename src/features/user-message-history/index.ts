@@ -18,6 +18,7 @@ import {
 import { serializeRichMessageNodes } from '../../youtube/rich-text';
 import { CHAT_MESSAGE_SELECTOR } from '../../youtube/selectors';
 import { getChatTimestampValue, isLiveChatReplayUrl } from '../../youtube/timestamps';
+import { registerFeatureLifecycle } from '../../content/lifecycle';
 import type { ProtectedToken } from '../translation/protected-placeholders';
 import type { TranslationResult } from '../translation/render';
 import {
@@ -56,6 +57,15 @@ const latestByUser = new Map<string, number>();
 const recordsByElement = new WeakMap<HTMLElement, ElementRecord>();
 const userMessageListeners = new Set<UserMessageListener>();
 let nextRecordId = 1;
+
+registerFeatureLifecycle({
+  message: { collect: recordUserMessage },
+  mutation: {
+    collect: ({ changedMessages }) => {
+      changedMessages.forEach(recordUserMessage);
+    }
+  }
+});
 
 export function recordUserMessage(message: HTMLElement): void {
   const key = getUserKey(message);

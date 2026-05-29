@@ -13,10 +13,22 @@ import {
   QUOTE_ICON_PATH
 } from '../../shared/icons';
 import { replyToMessage } from '../reply';
+import { registerFeatureLifecycle } from '../../content/lifecycle';
 import { closeMenu, createMenuActionItem } from './common';
 
 let activeContextMessage: HTMLElement | null = null;
 let activeContextMessageAt = 0;
+
+registerFeatureLifecycle({
+  page: { init: initMessageMenuActivation },
+  message: { enhance: wireMessageContext }
+});
+
+function initMessageMenuActivation(): void {
+  document.addEventListener('pointerdown', handleMessageMenuActivation, true);
+  document.addEventListener('click', handleMessageMenuActivation, true);
+  document.addEventListener('keydown', handleMessageMenuActivation, true);
+}
 
 export function wireMessageContext(message: HTMLElement): void {
   const menu = message.querySelector<HTMLElement>('#menu');
@@ -87,6 +99,15 @@ export function enhanceMessageContextMenu(menu: HTMLElement): void {
 export function isRecentActiveContextMessage(): boolean {
   if (!activeContextMessage?.isConnected) return false;
   return Date.now() - activeContextMessageAt < 2500;
+}
+
+export function cleanupStaleMessageMenuSurfaces(): void {
+  activeContextMessage = null;
+  activeContextMessageAt = 0;
+  document.querySelectorAll('.ytcq-context-item').forEach((item) => item.remove());
+  document.querySelectorAll('[data-ytcq-context-wired]').forEach((element) => {
+    element.removeAttribute('data-ytcq-context-wired');
+  });
 }
 
 function setActiveContextMessage(message: HTMLElement): void {

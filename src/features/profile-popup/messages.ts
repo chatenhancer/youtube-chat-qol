@@ -6,6 +6,7 @@
  */
 import { getOptions } from '../../shared/state';
 import { t } from '../../shared/i18n';
+import { ytcqCreateElement } from '../../shared/managed-dom';
 import { normalizeComparableText } from '../../shared/text';
 import { appendRichMessageText } from '../../youtube/rich-text';
 import { createNodesWithPlaceholders } from '../translation/protected-placeholders';
@@ -34,19 +35,19 @@ export function renderProfileMessages(
 
   if (recentMessages.length) {
     recentMessages.forEach((recentMessage) => {
-      const item = document.createElement('div');
+      const item = ytcqCreateElement('div');
       item.className = 'ytcq-profile-card-message';
       item.title = t('quoteMessage');
       item.setAttribute('role', 'button');
       item.tabIndex = 0;
       wireQuoteCardItem(item, recentMessage, source, onClose);
 
-      const timestamp = document.createElement('time');
+      const timestamp = ytcqCreateElement('time');
       timestamp.className = 'ytcq-profile-card-message-time';
       timestamp.textContent = recentMessage.timestampText;
       timestamp.dateTime = new Date(recentMessage.timestamp).toISOString();
 
-      const text = document.createElement('div');
+      const text = ytcqCreateElement('div');
       text.className = 'ytcq-profile-card-message-text';
       renderProfileMessageText(item, text, recentMessage);
 
@@ -58,10 +59,10 @@ export function renderProfileMessages(
     return;
   }
 
-  const empty = document.createElement('div');
+  const empty = ytcqCreateElement('div');
   empty.className = 'ytcq-profile-card-empty ytcq-profile-card-empty-centered';
 
-  const text = document.createElement('span');
+  const text = ytcqCreateElement('span');
   text.textContent = t('noRecentMessages');
 
   empty.append(text);
@@ -146,7 +147,7 @@ function wireQuoteCardItem(
 function createJumpToMessageButton(recentMessage: MessageRecord): HTMLButtonElement | null {
   if (!getLiveMessageForRecord(recentMessage)) return null;
 
-  const button = document.createElement('button');
+  const button = ytcqCreateElement('button');
   button.type = 'button';
   button.className = 'ytcq-profile-card-jump';
   button.title = t('jumpToMessage');
