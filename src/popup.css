@@ -127,10 +127,14 @@ main {
   height: 20px;
 }
 
-.header-icon-button .source-icon,
-.header-icon-button .reset-icon {
+.header-icon-button .source-icon {
   width: 20px;
   height: 20px;
+}
+
+.header-icon-button .reset-icon {
+  width: 17px;
+  height: 17px;
 }
 
 .header-icon-button:hover,
