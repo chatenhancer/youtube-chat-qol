@@ -239,6 +239,18 @@
     "playInboxSoundHelper": {
       "message": "Putar suara singkat untuk pesan kotak masuk baru."
     },
+    "appearance": {
+      "message": "Tampilan"
+    },
+    "startupShimmer": {
+      "message": "Efek awal"
+    },
+    "startupShimmerTitle": {
+      "message": "Tampilkan efek awal singkat saat ekstensi terhubung ke chat. Preferensi kurangi gerakan menonaktifkannya otomatis."
+    },
+    "startupShimmerHelper": {
+      "message": "Tampilkan efek singkat di tepi saat ekstensi terhubung ke chat."
+    },
     "extensionVersion": {
       "message": "Versi ekstensi"
     },

@@ -236,6 +236,18 @@
     "playInboxSoundHelper": {
       "message": "برای پیام‌های جدید صندوق ورودی صدای کوتاه پخش کن."
     },
+    "appearance": {
+      "message": "ظاهر"
+    },
+    "startupShimmer": {
+      "message": "جلوه آغازین"
+    },
+    "startupShimmerTitle": {
+      "message": "هنگام اتصال افزونه به چت، یک جلوه آغازین کوتاه نشان می‌دهد. کاهش حرکت آن را به‌طور خودکار غیرفعال می‌کند."
+    },
+    "startupShimmerHelper": {
+      "message": "هنگام اتصال افزونه به چت، یک جلوه کوتاه در لبه نشان می‌دهد."
+    },
     "extensionVersion": {
       "message": "نسخه افزونه"
     },

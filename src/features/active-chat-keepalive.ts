@@ -6,6 +6,7 @@
 import { t } from '../shared/i18n';
 import { createRefreshIcon } from '../shared/icons';
 import { findChatInput, getChatInputText, replaceChatInput } from '../youtube/chat-input';
+import { hideEnhancedEffect } from './enhanced-effect';
 
 const ACTIVE_CHAT_PORT_NAME = 'ytcq:active-chat';
 const ACTIVE_CHAT_PING_TYPE = 'ytcq:active-chat-ping';
@@ -34,6 +35,7 @@ export function startActiveChatKeepAlive(): void {
     keepAlivePort = chrome.runtime.connect({ name: ACTIVE_CHAT_PORT_NAME });
   } catch {
     keepAlivePort = null;
+    hideEnhancedEffect();
     return;
   }
 
@@ -60,6 +62,7 @@ function sendActiveChatPing(): void {
 }
 
 function showReconnectNotice(): void {
+  hideEnhancedEffect();
   reconnectNoticePending = true;
   if (reconnectNotice || document.visibilityState === 'hidden') return;
   reconnectNoticePending = false;

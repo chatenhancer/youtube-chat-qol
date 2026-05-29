@@ -239,6 +239,18 @@
     "playInboxSoundHelper": {
       "message": "تشغيل صوت قصير للرسائل الجديدة في صندوق الوارد."
     },
+    "appearance": {
+      "message": "المظهر"
+    },
+    "startupShimmer": {
+      "message": "تأثير البداية"
+    },
+    "startupShimmerTitle": {
+      "message": "إظهار تأثير بداية قصير عند اتصال الإضافة بالدردشة. يتم تعطيله تلقائيًا عند تفعيل تقليل الحركة."
+    },
+    "startupShimmerHelper": {
+      "message": "إظهار تأثير قصير على الحافة عند اتصال الإضافة بالدردشة."
+    },
     "extensionVersion": {
       "message": "إصدار الإضافة"
     },

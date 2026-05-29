@@ -239,6 +239,18 @@
     "playInboxSoundHelper": {
       "message": "Play a short sound for new inbox messages."
     },
+    "appearance": {
+      "message": "Appearance"
+    },
+    "startupShimmer": {
+      "message": "Startup effect"
+    },
+    "startupShimmerTitle": {
+      "message": "Show a brief startup effect when the extension connects to chat. Reduced motion disables it automatically."
+    },
+    "startupShimmerHelper": {
+      "message": "Show a brief edge effect when the extension connects to chat."
+    },
     "extensionVersion": {
       "message": "Extension version"
     },

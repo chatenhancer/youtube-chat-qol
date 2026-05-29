@@ -16,6 +16,7 @@ import {
   scheduleComposerTranslationWire,
   shouldWireComposerTranslationForNode
 } from '../features/composer-translation';
+import { showEnhancedEffect } from '../features/enhanced-effect';
 import { enhanceMenu } from '../features/menus';
 import { handleMessageMenuActivation, wireMessageContext } from '../features/menus/message-menu';
 import { configureSettingsMenu, refreshSettingsMenus } from '../features/menus/settings-menu';
@@ -197,6 +198,7 @@ function boot(): void {
     subtree: true,
     characterData: true
   });
+  showEnhancedEffect({ animate: getOptions().startupEffect });
   notifyChatAttached();
 }
 
@@ -290,6 +292,7 @@ function isExtensionManagedMutation(element: Element): boolean {
     '.ytcq-replaced-translation-icon',
     '.ytcq-frequent-emoji-row',
     '.ytcq-composer-translate-control',
+    '.ytcq-enhanced-effect',
     '.ytcq-focus-card',
     '.ytcq-profile-card',
     '.ytcq-inbox-card',
@@ -306,6 +309,7 @@ function isExtensionManagedAddedNode(element: Element): boolean {
     '.ytcq-translation',
     '.ytcq-replaced-translation-icon',
     '.ytcq-composer-translate-control',
+    '.ytcq-enhanced-effect',
     '.ytcq-focus-card',
     '.ytcq-profile-card',
     '.ytcq-inbox-card'
@@ -333,12 +337,17 @@ function saveOptions(values: Partial<Options>): void {
 function applyOptionSideEffects(previousOptions: Options, nextOptions: Options): void {
   const languageChanged = nextOptions.targetLanguage !== previousOptions.targetLanguage;
   const displayChanged = nextOptions.translationDisplay !== previousOptions.translationDisplay;
+  const startupEffectChanged = nextOptions.startupEffect !== previousOptions.startupEffect;
 
   if (languageChanged || displayChanged) {
     clearTranslations();
     if (nextOptions.targetLanguage) {
       processExistingMessages(MAX_RETROACTIVE_TRANSLATIONS);
     }
+  }
+
+  if (startupEffectChanged) {
+    showEnhancedEffect({ animate: nextOptions.startupEffect });
   }
 }
 

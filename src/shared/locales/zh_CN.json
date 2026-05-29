@@ -239,6 +239,18 @@
     "playInboxSoundHelper": {
       "message": "有新的收件箱消息时播放短提示音。"
     },
+    "appearance": {
+      "message": "外观"
+    },
+    "startupShimmer": {
+      "message": "启动效果"
+    },
+    "startupShimmerTitle": {
+      "message": "扩展连接到聊天时显示短暂启动效果。开启减少动态效果时会自动停用。"
+    },
+    "startupShimmerHelper": {
+      "message": "扩展连接到聊天时，在边缘显示短暂效果。"
+    },
     "extensionVersion": {
       "message": "扩展版本"
     },

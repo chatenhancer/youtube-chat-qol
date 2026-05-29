@@ -239,6 +239,18 @@
     "playInboxSoundHelper": {
       "message": "नए इनबॉक्स मैसेज के लिए छोटा साउंड चलाएं."
     },
+    "appearance": {
+      "message": "रूप"
+    },
+    "startupShimmer": {
+      "message": "शुरुआती प्रभाव"
+    },
+    "startupShimmerTitle": {
+      "message": "एक्सटेंशन के चैट से जुड़ने पर एक छोटा शुरुआती प्रभाव दिखाएं। कम गति की सेटिंग इसे अपने आप बंद कर देती है।"
+    },
+    "startupShimmerHelper": {
+      "message": "एक्सटेंशन के चैट से जुड़ने पर किनारे पर छोटा प्रभाव दिखाएं।"
+    },
     "extensionVersion": {
       "message": "एक्सटेंशन वर्ज़न"
     },

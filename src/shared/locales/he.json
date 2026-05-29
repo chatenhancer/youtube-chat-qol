@@ -236,6 +236,18 @@
     "playInboxSoundHelper": {
       "message": "השמע צליל קצר להודעות חדשות בתיבה."
     },
+    "appearance": {
+      "message": "מראה"
+    },
+    "startupShimmer": {
+      "message": "אפקט בהפעלה"
+    },
+    "startupShimmerTitle": {
+      "message": "הצגת אפקט קצר בהפעלה כשהתוסף מתחבר לצ׳אט. העדפת צמצום תנועה משביתה זאת אוטומטית."
+    },
+    "startupShimmerHelper": {
+      "message": "הצגת אפקט קצר בקצה כשהתוסף מתחבר לצ׳אט."
+    },
     "extensionVersion": {
       "message": "גרסת התוסף"
     },

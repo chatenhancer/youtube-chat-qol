@@ -236,6 +236,18 @@
     "playInboxSoundHelper": {
       "message": "새 받은 편지함 메시지에 짧은 소리를 재생합니다."
     },
+    "appearance": {
+      "message": "모양"
+    },
+    "startupShimmer": {
+      "message": "시작 효과"
+    },
+    "startupShimmerTitle": {
+      "message": "확장 프로그램이 채팅에 연결될 때 짧은 시작 효과를 표시합니다. 동작 줄이기 설정에서는 자동으로 비활성화됩니다."
+    },
+    "startupShimmerHelper": {
+      "message": "확장 프로그램이 채팅에 연결될 때 가장자리에 짧은 효과를 표시합니다."
+    },
     "extensionVersion": {
       "message": "확장 프로그램 버전"
     },

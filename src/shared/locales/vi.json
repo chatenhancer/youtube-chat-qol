@@ -236,6 +236,18 @@
     "playInboxSoundHelper": {
       "message": "Phát âm thanh ngắn cho tin nhắn hộp thư mới."
     },
+    "appearance": {
+      "message": "Giao diện"
+    },
+    "startupShimmer": {
+      "message": "Hiệu ứng khởi động"
+    },
+    "startupShimmerTitle": {
+      "message": "Hiển thị hiệu ứng khởi động ngắn khi tiện ích kết nối với cuộc trò chuyện. Tùy chọn giảm chuyển động sẽ tự động tắt hiệu ứng này."
+    },
+    "startupShimmerHelper": {
+      "message": "Hiển thị hiệu ứng ngắn ở cạnh khi tiện ích kết nối với cuộc trò chuyện."
+    },
     "extensionVersion": {
       "message": "Phiên bản tiện ích"
     },

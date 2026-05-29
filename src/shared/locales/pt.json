@@ -239,6 +239,18 @@
     "playInboxSoundHelper": {
       "message": "Toca um som curto para novas mensagens da caixa de entrada."
     },
+    "appearance": {
+      "message": "Aparência"
+    },
+    "startupShimmer": {
+      "message": "Efeito inicial"
+    },
+    "startupShimmerTitle": {
+      "message": "Mostra um breve efeito inicial quando a extensão se conecta ao chat. Movimento reduzido o desativa automaticamente."
+    },
+    "startupShimmerHelper": {
+      "message": "Mostra um breve efeito na borda quando a extensão se conecta ao chat."
+    },
     "extensionVersion": {
       "message": "Versão da extensão"
     },
