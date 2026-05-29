@@ -6,6 +6,7 @@
  * fragile selectors across the codebase.
  */
 import { cleanText } from '../shared/text';
+import { getAuthorNameFromElement, getAuthorNameFromRendererText } from './authors';
 import { cloneSafeMessageNode, getPlainTextFromMessageNodes } from './message-content';
 
 interface RendererRun {
@@ -54,12 +55,8 @@ export function getMessageDetails(message: HTMLElement): { authorName: string; t
 
 export function getAuthorName(message: HTMLElement): string {
   const data = getRendererData(message);
-  return cleanText(
-    data?.authorName?.simpleText ||
-    data?.authorName?.runs?.map((run) => run.text || '').join('') ||
-    getAuthorNameElement(message)?.textContent ||
-    ''
-  );
+  return getAuthorNameFromRendererText(data?.authorName) ||
+    getAuthorNameFromElement(getAuthorNameElement(message));
 }
 
 export function getAuthorNameElement(message: HTMLElement): HTMLElement | null {
@@ -140,8 +137,7 @@ export function getMessageStableId(message: HTMLElement): string {
     const authorKey = cleanText(
       data?.authorExternalChannelId ||
       data?.authorChannelId ||
-      data?.authorName?.simpleText ||
-      getTextFromRuns(data?.authorName?.runs) ||
+      getAuthorNameFromRendererText(data?.authorName) ||
       ''
     );
     return ['timestamp-usec', timestampUsec, authorKey].filter(Boolean).join(':');

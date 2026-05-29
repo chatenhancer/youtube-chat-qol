@@ -4,7 +4,11 @@
  * Reads author, avatar, channel, and profile URL data from chat messages and
  * participant-list renderers for the shared profile card.
  */
-import { cleanText } from '../../shared/text';
+import {
+  cleanAuthorNameText,
+  getAuthorNameFromElement,
+  getAuthorNameFromRendererText
+} from '../../youtube/authors';
 import { getAuthorName, getMessageAvatarSrc, getRendererData } from '../../youtube/messages';
 import { getChannelUrl } from '../channel-popup';
 import type { ProfileSource } from './types';
@@ -39,13 +43,9 @@ export function getMessageProfileSource(message: HTMLElement): ProfileSource | n
 export function getParticipantProfileSource(participant: HTMLElement): ProfileSource | null {
   const data = getParticipantRendererData(participant);
   const channelId = data?.authorExternalChannelId || data?.authorChannelId;
-  const authorName = cleanText(
-    data?.authorName?.simpleText ||
-    data?.authorName?.runs?.map((run) => run.text || '').join('') ||
-    participant.querySelector('#author-name')?.textContent ||
-    participant.textContent ||
-    ''
-  );
+  const authorName = getAuthorNameFromRendererText(data?.authorName) ||
+    getAuthorNameFromElement(participant.querySelector('#author-name')) ||
+    cleanAuthorNameText(participant.textContent);
   const avatarSrc = participant.querySelector<HTMLImageElement>('yt-img-shadow img, img#img, img')?.src || '';
 
   if (!authorName || !avatarSrc) return null;
