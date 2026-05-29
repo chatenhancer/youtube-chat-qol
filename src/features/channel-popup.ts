@@ -4,6 +4,8 @@
  * Builds stable YouTube channel URLs and opens them in a small window positioned
  * near the live chat instead of navigating away from the stream.
  */
+import { getAuthorHandleForUrl } from '../youtube/authors';
+
 const CHANNEL_WINDOW_WIDTH = 486;
 const CHANNEL_WINDOW_HEIGHT = 680;
 const CHANNEL_WINDOW_MARGIN = 12;
@@ -13,8 +15,9 @@ export function getChannelUrl(channelId: string | undefined, authorName: string)
     return `https://www.youtube.com/channel/${encodeURIComponent(channelId)}`;
   }
 
-  if (authorName?.startsWith('@')) {
-    return `https://www.youtube.com/${authorName}`;
+  const authorHandle = getAuthorHandleForUrl(authorName);
+  if (authorHandle) {
+    return `https://www.youtube.com/${authorHandle}`;
   }
 
   return '';

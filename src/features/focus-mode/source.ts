@@ -5,6 +5,7 @@
  * deciding which messages belong in a focused conversation.
  */
 import { cleanText, normalizeComparableText } from '../../shared/text';
+import { cleanAuthorNameText } from '../../youtube/authors';
 import {
   getAuthorName,
   getMessageAvatarSrc,
@@ -27,7 +28,7 @@ export function getFocusSourceFromMessage(message: HTMLElement): FocusSource | n
 }
 
 export function normalizeFocusSource(source: FocusSource): FocusSource | null {
-  const authorName = cleanText(source.authorName);
+  const authorName = cleanAuthorNameText(source.authorName);
   if (!authorName) return null;
   const channelId = cleanText(source.channelId);
   const cleanSource: FocusSource = { authorName, channelId };
@@ -64,7 +65,7 @@ export function startsWithFocusMention(text: string, source: FocusSource): boole
 }
 
 export function getFocusMentionPrefix(source: FocusSource): string {
-  const authorName = cleanText(source.authorName);
+  const authorName = cleanAuthorNameText(source.authorName);
   return authorName ? `${authorName} ` : '';
 }
 

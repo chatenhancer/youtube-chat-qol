@@ -5,16 +5,17 @@
  * content is unavailable or not needed.
  */
 import { cleanText } from '../../shared/text';
+import { cleanAuthorNameText } from '../../youtube/authors';
 
 export const QUOTE_MAX_LENGTH = 120;
 
 export function formatMentionText(authorName: string): string {
-  const cleanAuthorName = cleanText(authorName);
+  const cleanAuthorName = cleanAuthorNameText(authorName);
   return cleanAuthorName ? `${cleanAuthorName} ` : '';
 }
 
 export function formatQuoteText(authorName: string, text: string): string {
-  const cleanAuthorName = cleanText(authorName);
+  const cleanAuthorName = cleanAuthorNameText(authorName);
   if (!cleanAuthorName) return '';
 
   const cleanMessage = cleanText(text);
