@@ -11,19 +11,15 @@ import type { Options } from '../../shared/options';
 import { cleanText } from '../../shared/text';
 import { getMessageDetails } from '../../youtube/messages';
 import { CHAT_MESSAGE_SELECTOR } from '../../youtube/selectors';
-import {
-  clearUserMessageTranslation,
-  clearUserMessageTranslations,
-  recordUserMessageTranslation
-} from '../user-message-history';
-import {
-  clearFocusMessageTranslation,
-  clearFocusMessageTranslations,
-  recordFocusMessageTranslation
-} from '../focus-mode';
 import { registerFeatureLifecycle } from '../../content/lifecycle';
+import {
+  emitMessageTranslationCleared,
+  emitMessageTranslationRendered,
+  emitMessageTranslationsCleared
+} from './events';
 import { createTranslationPlan, hasTextOutsidePlaceholders, type ProtectedToken } from './protected-placeholders';
-import { clearTranslationRenderings, removeTranslation, renderTranslation, type TranslationResult } from './render';
+import { clearTranslationRenderings, removeTranslation, renderTranslation } from './render';
+import type { TranslationResult } from './types';
 
 interface PendingTranslationEntry {
   message: HTMLElement;
@@ -109,14 +105,14 @@ function queueMessageTranslation(message: HTMLElement, { backfill = false } = {}
     if (!rendered) {
       translationCache.delete(key);
       delete message.dataset.ytcqTranslationKey;
-      clearUserMessageTranslation(message);
+      emitMessageTranslationCleared(message);
     } else {
-      recordUserMessageTranslation(message, cached, details.text, plan.protectedTokens, plan.text);
-      recordFocusMessageTranslation(message, {
+      emitMessageTranslationRendered({
+        message,
         result: cached,
         originalText: details.text,
-        sourceText: plan.text,
-        protectedTokens: cloneProtectedTokens(plan.protectedTokens)
+        protectedTokens: plan.protectedTokens,
+        sourceText: plan.text
       });
     }
     return;
@@ -150,8 +146,7 @@ function clearTranslations(): void {
   backfillTranslationQueue = [];
   pendingTranslations.clear();
   clearTranslationRenderings();
-  clearUserMessageTranslations();
-  clearFocusMessageTranslations();
+  emitMessageTranslationsCleared();
 }
 
 function queueRetroactiveTranslations(): void {
@@ -227,18 +222,17 @@ function pumpTranslationQueue(): void {
       for (const entry of pendingTranslations.get(job.key) || []) {
         const rendered = renderTranslation(entry.message, result, entry.originalText, entry.protectedTokens, entry.sourceText);
         if (rendered) {
-          recordUserMessageTranslation(entry.message, result, entry.originalText, entry.protectedTokens, entry.sourceText);
-          recordFocusMessageTranslation(entry.message, {
+          emitMessageTranslationRendered({
+            message: entry.message,
             result,
             originalText: entry.originalText,
+            protectedTokens: entry.protectedTokens,
             sourceText: entry.sourceText,
-            protectedTokens: cloneProtectedTokens(entry.protectedTokens)
           });
           renderedAny = true;
         } else {
           delete entry.message.dataset.ytcqTranslationKey;
-          clearUserMessageTranslation(entry.message);
-          clearFocusMessageTranslation(entry.message);
+          emitMessageTranslationCleared(entry.message);
         }
       }
       if (renderedAny) rememberTranslation(job.key, result);
@@ -262,15 +256,6 @@ function pumpTranslationQueue(): void {
       }, backfillTranslationQueue.length ? TRANSLATION_DELAY_MS : LIVE_TRANSLATION_DELAY_MS);
       pumpTranslationQueue();
     });
-}
-
-function cloneProtectedTokens(protectedTokens: ProtectedToken[]): ProtectedToken[] {
-  return protectedTokens.map((token) => ({
-    placeholder: token.placeholder,
-    fallbackText: token.fallbackText,
-    node: token.node ? token.node.cloneNode(true) : null,
-    nodes: token.nodes.map((node) => node.cloneNode(true))
-  }));
 }
 
 function translate(text: string, targetLanguage: string): Promise<TranslationResult> {

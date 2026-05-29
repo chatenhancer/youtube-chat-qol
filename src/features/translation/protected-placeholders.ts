@@ -27,6 +27,15 @@ export interface TranslationPlan {
   protectedTokens: ProtectedToken[];
 }
 
+export function cloneProtectedTokens(protectedTokens: ProtectedToken[]): ProtectedToken[] {
+  return protectedTokens.map((token) => ({
+    placeholder: token.placeholder,
+    fallbackText: token.fallbackText,
+    node: token.node ? token.node.cloneNode(true) : null,
+    nodes: token.nodes.map((node) => node.cloneNode(true))
+  }));
+}
+
 const PROTECTED_PLACEHOLDER_PATTERN = /_{0,2}\s*YTCQ[\s_-]*TOKEN[\s_-]*(\d+)[\s_-]*PLACEHOLDER\s*_{0,2}/gi;
 const MENTION_PATTERN = /(^|[^\p{L}\p{N}_])(@[\p{L}\p{N}_][^\s@]*)/gu;
 const MENTION_TRAILING_PUNCTUATION_PATTERN = /[),.!?;:'"’”\]]+$/u;

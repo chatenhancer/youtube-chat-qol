@@ -9,11 +9,17 @@ import { createCloseIcon } from '../../shared/icons';
 import { ytcqCreateElement } from '../../shared/managed-dom';
 import { captureScrollPosition, restoreScrollPositionAfterRender, scrollElementToBottom } from '../../shared/scroll';
 import { findChatInput, getChatInputText, replaceChatInput } from '../../youtube/chat-input';
-import { CHAT_MESSAGE_SELECTOR } from '../../youtube/selectors';
+import { CHAT_MESSAGE_SELECTOR, PANEL_PAGES_SELECTOR, SEND_BUTTON_SELECTOR } from '../../youtube/selectors';
 import { getChannelUrl, openChannelWindow } from '../channel-popup';
 import { isCurrentUserAuthorName } from '../mention-detection';
 import { registerFeatureLifecycle } from '../../content/lifecycle';
-import type { MessageTranslationRecord } from '../user-message-history';
+import {
+  onMessageTranslationCleared,
+  onMessageTranslationRendered,
+  onMessageTranslationsCleared,
+  type MessageTranslationRenderedEvent
+} from '../translation/events';
+import { cloneProtectedTokens } from '../translation/protected-placeholders';
 import { createFocusRecord, findFocusRecordForMessage } from './records';
 import {
   getAuthorInitial,
@@ -26,13 +32,6 @@ import {
 import { renderFocusMessageText } from './translation';
 import type { FocusRecord, FocusSource } from './types';
 
-const SEND_BUTTON_SELECTOR = [
-  '#send-button',
-  '#send-button button',
-  'yt-button-renderer#send-button',
-  'yt-icon-button#send-button'
-].join(',');
-const PANEL_PAGES_SELECTOR = 'tp-yt-iron-pages#panel-pages';
 const FOCUS_ANCHOR_CLASS = 'ytcq-focus-anchor';
 
 let activeSource: FocusSource | null = null;
@@ -63,6 +62,9 @@ export function initFocusMode(): void {
   initialized = true;
   document.addEventListener('keydown', handleDocumentKeydown, true);
   document.addEventListener('click', handleDocumentClick, true);
+  onMessageTranslationRendered(recordFocusMessageTranslation);
+  onMessageTranslationCleared(({ message }) => clearFocusMessageTranslation(message));
+  onMessageTranslationsCleared(clearFocusMessageTranslations);
 }
 
 export function resetFocusMode(): void {
@@ -115,18 +117,26 @@ export function handlePotentialFocusMessage(message: HTMLElement): void {
   refreshFocusMessages();
 }
 
-export function recordFocusMessageTranslation(
-  message: HTMLElement,
-  translation: MessageTranslationRecord
-): void {
+function recordFocusMessageTranslation({
+  message,
+  result,
+  originalText,
+  protectedTokens,
+  sourceText
+}: MessageTranslationRenderedEvent): void {
   const record = findFocusRecordForMessage(focusRecords, message);
   if (!record) return;
 
-  record.translation = translation;
+  record.translation = {
+    result,
+    originalText,
+    sourceText,
+    protectedTokens: cloneProtectedTokens(protectedTokens)
+  };
   refreshFocusMessages();
 }
 
-export function clearFocusMessageTranslation(message: HTMLElement): void {
+function clearFocusMessageTranslation(message: HTMLElement): void {
   const record = findFocusRecordForMessage(focusRecords, message);
   if (!record?.translation) return;
 
@@ -134,7 +144,7 @@ export function clearFocusMessageTranslation(message: HTMLElement): void {
   refreshFocusMessages();
 }
 
-export function clearFocusMessageTranslations(): void {
+function clearFocusMessageTranslations(): void {
   let changed = false;
   focusRecords.forEach((record) => {
     if (!record.translation) return;

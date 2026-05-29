@@ -18,6 +18,7 @@ import {
   replaceChatInputSnapshot,
   type ChatInputSnapshot
 } from '../../youtube/chat-input';
+import { SEND_BUTTON_SELECTOR } from '../../youtube/selectors';
 import { createCommandAutocomplete } from './autocomplete';
 import { createCommandCards } from './cards';
 import { createChatCommands } from './commands';
@@ -30,15 +31,6 @@ import type {
   ParsedCommand,
   SaveOptions
 } from './types';
-
-const SEND_BUTTON_SELECTOR = [
-  '#send-button',
-  '#send-button button',
-  'yt-button-renderer#send-button',
-  'yt-icon-button#send-button',
-  'button[aria-label="Send"]',
-  'button[title="Send"]'
-].join(',');
 
 let lastSentMessage: ChatInputSnapshot | null = null;
 let escapedSlashText = '';

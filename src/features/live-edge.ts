@@ -6,12 +6,7 @@
  * bottom gives DOM-driven features fresh messages to observe after tab switches.
  */
 import { registerFeatureLifecycle } from '../content/lifecycle';
-
-const CHAT_SCROLLER_SELECTOR = [
-  'yt-live-chat-item-list-renderer #item-scroller',
-  'yt-live-chat-renderer #item-scroller',
-  '#item-scroller'
-].join(',');
+import { CHAT_SCROLLER_SELECTOR } from '../youtube/selectors';
 
 const JUMP_TO_BOTTOM_SELECTOR = [
   'yt-live-chat-item-list-renderer #jump-to-bottom-button button',

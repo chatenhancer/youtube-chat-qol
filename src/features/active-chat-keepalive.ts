@@ -7,13 +7,13 @@ import { t } from '../shared/i18n';
 import { createRefreshIcon } from '../shared/icons';
 import { ytcqCreateElement } from '../shared/managed-dom';
 import { findChatInput, getChatInputText, replaceChatInput } from '../youtube/chat-input';
+import { PANEL_PAGES_SELECTOR } from '../youtube/selectors';
 import { hideEnhancedEffect } from './enhanced-effect';
 import { registerFeatureLifecycle } from '../content/lifecycle';
 
 const ACTIVE_CHAT_PORT_NAME = 'ytcq:active-chat';
 const ACTIVE_CHAT_PING_TYPE = 'ytcq:active-chat-ping';
 const ACTIVE_CHAT_PING_INTERVAL_MS = 25_000;
-const PANEL_PAGES_SELECTOR = 'tp-yt-iron-pages#panel-pages';
 const RECONNECT_DRAFT_STORAGE_KEY = 'ytcqReconnectDraft';
 const RECONNECT_ANCHOR_CLASS = 'ytcq-reconnect-anchor';
 const DRAFT_RESTORE_DELAYS_MS = [300, 800, 1500, 3000, 5000];

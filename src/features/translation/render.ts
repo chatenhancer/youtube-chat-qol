@@ -20,12 +20,7 @@ import {
   restorePlaceholdersToText,
   type ProtectedToken
 } from './protected-placeholders';
-
-export interface TranslationResult {
-  text: string;
-  sourceLanguage: string;
-  targetLanguage: string;
-}
+import type { TranslationResult } from './types';
 
 export function renderTranslation(
   message: HTMLElement,
