@@ -51,7 +51,7 @@ Not affiliated with YouTube or Google.
 ### Popup and status
 
 - See whether the extension is active in the current tab or other open live chat tabs
-- Configure less-frequent options without crowding YouTube's chat settings menu
+- Manage extension settings and clear local extension data from the popup
 
 ### Privacy
 
