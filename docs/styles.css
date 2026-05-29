@@ -247,6 +247,12 @@ h3 {
   gap: 12px;
 }
 
+.hero-disclaimer {
+  margin-top: 28px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
 .hero-media {
   position: relative;
   min-width: 0;
@@ -474,24 +480,102 @@ h3 {
   margin-left: auto;
 }
 
+@property --feature-grid-shimmer-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: -35deg;
+}
+
 .feature-grid {
+  --feature-grid-line: #d7e8ff;
+  position: relative;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1px;
   margin: 36px auto 0;
   overflow: hidden;
-  background: var(--line);
-  border: 1px solid var(--line);
+  background: var(--feature-grid-line);
+  border: 1px solid var(--feature-grid-line);
   border-radius: 8px;
+  box-shadow: 0 0 0 1px rgba(62, 166, 255, 0.06), 0 18px 70px rgba(62, 166, 255, 0.12);
+  isolation: isolate;
+}
+
+.feature-grid::before,
+.feature-grid::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+}
+
+.feature-grid::before {
+  inset: 0;
+  z-index: 2;
+  border-radius: inherit;
+  box-shadow: inset 0 0 24px rgba(62, 166, 255, 0.14), inset 0 0 4px rgba(62, 166, 255, 0.32);
+}
+
+.feature-grid::after {
+  --feature-grid-shimmer-angle: -35deg;
+  inset: -2px;
+  z-index: 3;
+  padding: 3px;
+  border-radius: 11px;
+  background:
+    conic-gradient(
+      from var(--feature-grid-shimmer-angle) at 50% 50%,
+      transparent 0deg,
+      transparent 58deg,
+      rgba(62, 166, 255, 0.16) 80deg,
+      rgba(62, 166, 255, 0.94) 102deg,
+      rgba(255, 255, 255, 0.98) 118deg,
+      rgba(118, 87, 255, 0.58) 136deg,
+      rgba(62, 166, 255, 0.18) 160deg,
+      transparent 192deg,
+      transparent 360deg
+    );
+  filter: drop-shadow(0 0 8px rgba(62, 166, 255, 0.55));
+  opacity: 0;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+
+.feature-grid-shimmer-visible::after {
+  animation: feature-grid-shimmer 1450ms cubic-bezier(0.22, 1, 0.36, 1) 1 both;
+}
+
+@keyframes feature-grid-shimmer {
+  0% {
+    opacity: 0;
+    --feature-grid-shimmer-angle: -35deg;
+  }
+
+  12% {
+    opacity: 1;
+  }
+
+  78% {
+    opacity: 0.82;
+  }
+
+  100% {
+    opacity: 0;
+    --feature-grid-shimmer-angle: 325deg;
+  }
 }
 
 .feature {
+  position: relative;
+  z-index: 1;
   min-height: 164px;
   padding: 24px;
   background: var(--surface);
 }
 
 .feature-icon {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -502,6 +586,25 @@ h3 {
   background: var(--blue-soft);
   border: 1px solid #d8e8ff;
   border-radius: 10px;
+}
+
+.feature-icon-badge {
+  position: absolute;
+  top: -5px;
+  right: -6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0;
+  color: #fff;
+  background: var(--logo-red-end);
+  border-radius: 8px;
+  box-sizing: border-box;
+  font: 700 10px/1 Inter, Roboto, Arial, sans-serif;
+  text-indent: -1px;
 }
 
 .feature-icon svg {
@@ -688,8 +791,13 @@ h3 {
   .store-version-hourglass,
   .store-version-hourglass-top-sand,
   .store-version-hourglass-bottom-sand,
-  .store-version-hourglass-stream {
+  .store-version-hourglass-stream,
+  .feature-grid::after {
     animation: none;
+  }
+
+  .feature-grid::after {
+    opacity: 0;
   }
 }
 
