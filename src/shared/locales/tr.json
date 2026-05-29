@@ -239,6 +239,18 @@
     "playInboxSoundHelper": {
       "message": "Yeni gelen kutusu mesajları için kısa bir ses çalar."
     },
+    "appearance": {
+      "message": "Görünüm"
+    },
+    "startupShimmer": {
+      "message": "Başlangıç efekti"
+    },
+    "startupShimmerTitle": {
+      "message": "Uzantı sohbete bağlandığında kısa bir başlangıç efekti gösterir. Hareketi azaltma ayarı bunu otomatik olarak kapatır."
+    },
+    "startupShimmerHelper": {
+      "message": "Uzantı sohbete bağlandığında kenarda kısa bir efekt gösterir."
+    },
     "extensionVersion": {
       "message": "Uzantı sürümü"
     },

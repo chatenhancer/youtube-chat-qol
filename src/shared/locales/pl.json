@@ -236,6 +236,18 @@
     "playInboxSoundHelper": {
       "message": "Odtwarzaj krótki dźwięk dla nowych wiadomości w skrzynce."
     },
+    "appearance": {
+      "message": "Wygląd"
+    },
+    "startupShimmer": {
+      "message": "Efekt startowy"
+    },
+    "startupShimmerTitle": {
+      "message": "Pokaż krótki efekt startowy, gdy rozszerzenie łączy się z czatem. Ograniczenie ruchu wyłącza go automatycznie."
+    },
+    "startupShimmerHelper": {
+      "message": "Pokaż krótki efekt na krawędzi, gdy rozszerzenie łączy się z czatem."
+    },
     "extensionVersion": {
       "message": "Wersja rozszerzenia"
     },

@@ -236,6 +236,18 @@
     "playInboxSoundHelper": {
       "message": "Spielt einen kurzen Ton für neue Posteingangsnachrichten ab."
     },
+    "appearance": {
+      "message": "Darstellung"
+    },
+    "startupShimmer": {
+      "message": "Starteffekt"
+    },
+    "startupShimmerTitle": {
+      "message": "Zeigt kurz einen Starteffekt, wenn die Erweiterung eine Verbindung zum Chat herstellt. Reduzierte Bewegung deaktiviert ihn automatisch."
+    },
+    "startupShimmerHelper": {
+      "message": "Zeigt kurz einen Randeffekt, wenn die Erweiterung eine Verbindung zum Chat herstellt."
+    },
     "extensionVersion": {
       "message": "Erweiterungsversion"
     },

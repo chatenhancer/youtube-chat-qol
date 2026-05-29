@@ -236,6 +236,18 @@
     "playInboxSoundHelper": {
       "message": "新收件匣訊息播放短音效。"
     },
+    "appearance": {
+      "message": "外觀"
+    },
+    "startupShimmer": {
+      "message": "啟動效果"
+    },
+    "startupShimmerTitle": {
+      "message": "擴充功能連接到聊天室時顯示短暫啟動效果。啟用減少動態效果時會自動停用。"
+    },
+    "startupShimmerHelper": {
+      "message": "擴充功能連接到聊天室時，在邊緣顯示短暫效果。"
+    },
     "extensionVersion": {
       "message": "擴充功能版本"
     },

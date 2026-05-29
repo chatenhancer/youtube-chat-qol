@@ -236,6 +236,18 @@
     "playInboxSoundHelper": {
       "message": "Joue un court son pour les nouveaux messages de la boîte de réception."
     },
+    "appearance": {
+      "message": "Apparence"
+    },
+    "startupShimmer": {
+      "message": "Effet de démarrage"
+    },
+    "startupShimmerTitle": {
+      "message": "Affiche un bref effet au démarrage lorsque l’extension se connecte au chat. Le mode mouvements réduits le désactive automatiquement."
+    },
+    "startupShimmerHelper": {
+      "message": "Affiche un bref effet sur le bord lorsque l’extension se connecte au chat."
+    },
     "extensionVersion": {
       "message": "Version de l'extension"
     },

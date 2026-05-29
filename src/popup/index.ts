@@ -14,6 +14,7 @@ const LANDING_PAGE_URL = 'https://chatenhancer.com';
 const SOURCE_CODE_URL = 'https://www.chatenhancer.com/source';
 const SUPPORT_URL = 'https://www.chatenhancer.com/support';
 const BELL_RING_CLASS = 'ytcq-bell-ringing';
+const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)';
 
 type ExtensionStatus = 'checking' | 'active' | 'inactive';
 
@@ -28,6 +29,7 @@ const controls = {
   targetLanguage: document.querySelector<HTMLSelectElement>('#targetLanguage'),
   translationDisplay: document.querySelector<HTMLSelectElement>('#translationDisplay'),
   sound: document.querySelector<HTMLInputElement>('#sound'),
+  startupEffect: document.querySelector<HTMLInputElement>('#startupEffect'),
   version: document.querySelector<HTMLElement>('#version')
 };
 
@@ -39,7 +41,7 @@ function init(): void {
   const popupLocale = localizePopup();
   refreshExtensionStatus();
 
-  if (!controls.targetLanguage || !controls.translationDisplay || !controls.sound) {
+  if (!controls.targetLanguage || !controls.translationDisplay || !controls.sound || !controls.startupEffect) {
     return;
   }
 
@@ -70,7 +72,7 @@ function init(): void {
   }
 
   chrome.storage.sync.get(DEFAULT_OPTIONS, (storedOptions: Partial<Options>) => {
-    if (!controls.targetLanguage || !controls.translationDisplay || !controls.sound) return;
+    if (!controls.targetLanguage || !controls.translationDisplay || !controls.sound || !controls.startupEffect) return;
     applyOptionsToControls(storedOptions);
   });
 
@@ -91,6 +93,10 @@ function init(): void {
       playSoftChime();
     }
     save({ sound: enabled });
+  });
+
+  controls.startupEffect.addEventListener('change', () => {
+    save({ startupEffect: Boolean(controls.startupEffect?.checked) });
   });
 }
 
@@ -241,13 +247,15 @@ function broadcastPageReset(callback: () => void): void {
 }
 
 function applyOptionsToControls(options: Partial<Options>): void {
-  if (!controls.targetLanguage || !controls.translationDisplay || !controls.sound) return;
+  if (!controls.targetLanguage || !controls.translationDisplay || !controls.sound || !controls.startupEffect) return;
 
   const normalized = normalizeOptions(options);
   lastKnownTranslationTarget = normalized.lastTranslationTarget;
   controls.targetLanguage.value = normalized.targetLanguage;
   controls.translationDisplay.value = normalized.translationDisplay;
   controls.sound.checked = normalized.sound;
+  controls.startupEffect.disabled = prefersReducedMotion();
+  controls.startupEffect.checked = normalized.startupEffect && !controls.startupEffect.disabled;
 }
 
 function createLanguageOption(value: string, label: string): HTMLOptionElement {
@@ -296,4 +304,8 @@ function getLocalizedLanguageLabel(languageCode: string, locale: string): string
   }
 
   return '';
+}
+
+function prefersReducedMotion(): boolean {
+  return window.matchMedia(REDUCED_MOTION_QUERY).matches;
 }

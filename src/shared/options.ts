@@ -13,6 +13,7 @@ export interface Options {
   lastTranslationTarget: string;
   translationDisplay: TranslationDisplay;
   sound: boolean;
+  startupEffect: boolean;
 }
 
 export const DEFAULT_TRANSLATION_TARGET = 'en';
@@ -22,7 +23,8 @@ export const DEFAULT_OPTIONS: Options = {
   targetLanguage: '',
   lastTranslationTarget: DEFAULT_TRANSLATION_TARGET,
   translationDisplay: 'replace',
-  sound: true
+  sound: true,
+  startupEffect: true
 };
 
 export const TRANSLATION_DISPLAY_OPTIONS: readonly (readonly [TranslationDisplay, string])[] = [
@@ -44,7 +46,8 @@ export function normalizeOptions(value: Partial<Options> | Record<string, unknow
     targetLanguage,
     lastTranslationTarget,
     translationDisplay,
-    sound: candidate.sound !== false
+    sound: candidate.sound !== false,
+    startupEffect: candidate.startupEffect !== false
   };
 }
 

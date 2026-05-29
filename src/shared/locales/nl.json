@@ -236,6 +236,18 @@
     "playInboxSoundHelper": {
       "message": "Speel een kort geluid af voor nieuwe inboxberichten."
     },
+    "appearance": {
+      "message": "Weergave"
+    },
+    "startupShimmer": {
+      "message": "Starteffect"
+    },
+    "startupShimmerTitle": {
+      "message": "Toon een kort starteffect wanneer de extensie verbinding maakt met de chat. Verminderde beweging schakelt dit automatisch uit."
+    },
+    "startupShimmerHelper": {
+      "message": "Toon kort een effect langs de rand wanneer de extensie verbinding maakt met de chat."
+    },
     "extensionVersion": {
       "message": "Extensieversie"
     },

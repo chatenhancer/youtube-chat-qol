@@ -239,6 +239,18 @@
     "playInboxSoundHelper": {
       "message": "新しい受信トレイメッセージに短い音を鳴らします。"
     },
+    "appearance": {
+      "message": "表示"
+    },
+    "startupShimmer": {
+      "message": "起動時の効果"
+    },
+    "startupShimmerTitle": {
+      "message": "拡張機能がチャットに接続したとき、短い起動効果を表示します。視差効果を減らす設定では自動的に無効になります。"
+    },
+    "startupShimmerHelper": {
+      "message": "拡張機能がチャットに接続したとき、端に短い効果を表示します。"
+    },
     "extensionVersion": {
       "message": "拡張機能のバージョン"
     },

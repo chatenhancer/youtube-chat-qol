@@ -239,6 +239,18 @@
     "playInboxSoundHelper": {
       "message": "Riproduce un breve suono per i nuovi messaggi nella posta in arrivo."
     },
+    "appearance": {
+      "message": "Aspetto"
+    },
+    "startupShimmer": {
+      "message": "Effetto iniziale"
+    },
+    "startupShimmerTitle": {
+      "message": "Mostra un breve effetto iniziale quando l’estensione si connette alla chat. Movimento ridotto lo disattiva automaticamente."
+    },
+    "startupShimmerHelper": {
+      "message": "Mostra un breve effetto sul bordo quando l’estensione si connette alla chat."
+    },
     "extensionVersion": {
       "message": "Versione estensione"
     },
