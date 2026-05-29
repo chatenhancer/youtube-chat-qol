@@ -19,8 +19,13 @@ import { serializeRichMessageNodes } from '../../youtube/rich-text';
 import { CHAT_MESSAGE_SELECTOR } from '../../youtube/selectors';
 import { getChatTimestampValue, isLiveChatReplayUrl } from '../../youtube/timestamps';
 import { registerFeatureLifecycle } from '../../content/lifecycle';
-import type { ProtectedToken } from '../translation/protected-placeholders';
-import type { TranslationResult } from '../translation/render';
+import {
+  onMessageTranslationCleared,
+  onMessageTranslationRendered,
+  onMessageTranslationsCleared,
+  type MessageTranslationRenderedEvent
+} from '../translation/events';
+import { cloneProtectedTokens } from '../translation/protected-placeholders';
 import {
   getAuthorKey,
   getIdentityFromUserKey,
@@ -57,8 +62,10 @@ const latestByUser = new Map<string, number>();
 const recordsByElement = new WeakMap<HTMLElement, ElementRecord>();
 const userMessageListeners = new Set<UserMessageListener>();
 let nextRecordId = 1;
+let translationListenersInitialized = false;
 
 registerFeatureLifecycle({
+  page: { init: initUserMessageHistoryTranslationListeners },
   message: { collect: recordUserMessage },
   mutation: {
     collect: ({ changedMessages }) => {
@@ -66,6 +73,14 @@ registerFeatureLifecycle({
     }
   }
 });
+
+function initUserMessageHistoryTranslationListeners(): void {
+  if (translationListenersInitialized) return;
+  translationListenersInitialized = true;
+  onMessageTranslationRendered(recordUserMessageTranslation);
+  onMessageTranslationCleared(({ message }) => clearUserMessageTranslation(message));
+  onMessageTranslationsCleared(clearUserMessageTranslations);
+}
 
 export function recordUserMessage(message: HTMLElement): void {
   const key = getUserKey(message);
@@ -188,13 +203,13 @@ export function getLiveMessageForRecord(record: MessageRecord): HTMLElement | nu
   return message?.isConnected ? message : null;
 }
 
-export function recordUserMessageTranslation(
-  message: HTMLElement,
-  result: TranslationResult,
-  originalText: string,
-  protectedTokens: ProtectedToken[],
-  sourceText: string
-): void {
+function recordUserMessageTranslation({
+  message,
+  result,
+  originalText,
+  protectedTokens,
+  sourceText
+}: MessageTranslationRenderedEvent): void {
   const record = getRecordForMessage(message);
   if (!record) return;
 
@@ -209,7 +224,7 @@ export function recordUserMessageTranslation(
   if (elementRecord) notifyUserMessageListeners(elementRecord.key);
 }
 
-export function clearUserMessageTranslation(message: HTMLElement): void {
+function clearUserMessageTranslation(message: HTMLElement): void {
   const record = getRecordForMessage(message);
   if (!record?.translation) return;
 
@@ -218,7 +233,7 @@ export function clearUserMessageTranslation(message: HTMLElement): void {
   if (elementRecord) notifyUserMessageListeners(elementRecord.key);
 }
 
-export function clearUserMessageTranslations(): void {
+function clearUserMessageTranslations(): void {
   const changedKeys: string[] = [];
   recordsByUser.forEach((records, key) => {
     let changed = false;
@@ -381,13 +396,4 @@ function getRecordForMessage(message: HTMLElement): MessageRecord | null {
   if (!elementRecord) return null;
 
   return recordsByUser.get(elementRecord.key)?.find((record) => record.id === elementRecord.id) || null;
-}
-
-function cloneProtectedTokens(protectedTokens: ProtectedToken[]): ProtectedToken[] {
-  return protectedTokens.map((token) => ({
-    placeholder: token.placeholder,
-    fallbackText: token.fallbackText,
-    node: token.node ? token.node.cloneNode(true) : null,
-    nodes: token.nodes.map((node) => node.cloneNode(true))
-  }));
 }

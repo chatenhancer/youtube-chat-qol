@@ -13,7 +13,7 @@ import {
   getReplacementTranslationTitle,
   isMeaningfulTranslation
 } from '../translation/render';
-import type { MessageTranslationRecord } from '../user-message-history';
+import type { MessageTranslationRecord } from '../translation/types';
 import type { FocusRecord } from './types';
 
 export function renderFocusMessageText(item: HTMLElement, bubble: HTMLElement, record: FocusRecord): void {

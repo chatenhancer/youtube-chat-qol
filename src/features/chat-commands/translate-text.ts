@@ -13,7 +13,7 @@ import {
   restorePlaceholdersToText,
   type TranslationPlan
 } from '../translation/protected-placeholders';
-import type { TranslationResult } from '../translation/render';
+import type { TranslationResult } from '../translation/types';
 import { LANGUAGE_OPTIONS } from '../../shared/languages';
 import { normalizeCommandToken } from './parser';
 

@@ -5,7 +5,7 @@
  * and command integrations.
  */
 import type { RichTextSegment } from '../../youtube/rich-text';
-import type { MessageTranslationRecord } from '../user-message-history';
+import type { MessageTranslationRecord } from '../translation/types';
 
 export interface FocusSource {
   authorName: string;

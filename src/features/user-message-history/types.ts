@@ -5,8 +5,8 @@
  * current-page message history.
  */
 import type { RichTextSegment } from '../../youtube/rich-text';
-import type { ProtectedToken } from '../translation/protected-placeholders';
-import type { TranslationResult } from '../translation/render';
+import type { MessageTranslationRecord } from '../translation/types';
+export type { MessageTranslationRecord } from '../translation/types';
 
 export interface MessageRecord {
   id: number;
@@ -19,13 +19,6 @@ export interface MessageRecord {
   timestamp: number;
   timestampText: string;
   translation?: MessageTranslationRecord;
-}
-
-export interface MessageTranslationRecord {
-  result: TranslationResult;
-  sourceText: string;
-  originalText: string;
-  protectedTokens: ProtectedToken[];
 }
 
 export interface UserIdentity {

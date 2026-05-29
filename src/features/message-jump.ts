@@ -5,16 +5,12 @@
  * move the outer YouTube watch page.
  */
 import { returnToChatInputPanel } from '../youtube/chat-input';
+import { CHAT_SCROLLER_SELECTOR } from '../youtube/selectors';
 export { createJumpToMessageIcon } from '../shared/icons';
 
 const JUMP_AFTER_PANEL_RETURN_DELAY_MS = 120;
 const JUMP_LIVE_EDGE_RELEASE_OFFSET = 48;
 const JUMP_TARGET_CLASS = 'ytcq-message-jump-target';
-const CHAT_SCROLLER_SELECTOR = [
-  'yt-live-chat-item-list-renderer #item-scroller',
-  'yt-live-chat-renderer #item-scroller',
-  '#item-scroller'
-].join(',');
 
 export function jumpToChatMessage(target: HTMLElement): void {
   if (returnToChatInputPanel()) {

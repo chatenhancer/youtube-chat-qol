@@ -18,3 +18,20 @@ export const CHAT_TOOLTIP_SELECTOR = [
 ].join(',');
 
 export const PARTICIPANT_SELECTOR = 'yt-live-chat-participant-renderer';
+
+export const CHAT_SCROLLER_SELECTOR = [
+  'yt-live-chat-item-list-renderer #item-scroller',
+  'yt-live-chat-renderer #item-scroller',
+  '#item-scroller'
+].join(',');
+
+export const PANEL_PAGES_SELECTOR = 'tp-yt-iron-pages#panel-pages';
+
+export const SEND_BUTTON_SELECTOR = [
+  '#send-button',
+  '#send-button button',
+  'yt-button-renderer#send-button',
+  'yt-icon-button#send-button',
+  'button[aria-label="Send"]',
+  'button[title="Send"]'
+].join(',');
