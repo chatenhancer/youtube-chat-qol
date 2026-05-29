@@ -2,7 +2,7 @@
  * Avatar profile card.
  *
  * Clicking a chat avatar opens a small local card with recent messages from
- * that user and an Open channel action. The message history is not persisted;
+ * that user and an avatar channel action. The message history is not persisted;
  * it only exists while the current chat page is open.
  */
 import { t } from '../../shared/i18n';
@@ -19,7 +19,7 @@ import {
 } from '../user-message-history';
 import { registerFeatureLifecycle } from '../../content/lifecycle';
 import { mentionAuthorName } from '../reply';
-import { getChannelUrl, openChannelWindow } from '../channel-popup';
+import { getChannelUrl } from '../channel-popup';
 import { createAvatarElement, createProfileAvatarButton } from './elements';
 import { renderProfileMessages, shouldRefreshProfileMessages } from './messages';
 import { keepProfileCardInViewport, positionProfileCard } from './positioning';
@@ -154,16 +154,6 @@ function showProfileCard(source: ProfileSource, anchor: HTMLElement): void {
 
   titleWrap.append(title, subtitle);
   header.append(titleWrap);
-
-  const openButton = ytcqCreateElement('button');
-  openButton.type = 'button';
-  openButton.className = 'ytcq-profile-card-open ytcq-profile-card-open-header';
-  openButton.textContent = t('openChannel');
-  openButton.disabled = !source.profileUrl;
-  openButton.addEventListener('click', () => {
-    openChannelWindow(source.profileUrl);
-  });
-  header.append(openButton);
 
   const closeButton = ytcqCreateElement('button');
   closeButton.type = 'button';
