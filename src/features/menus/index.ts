@@ -5,8 +5,26 @@
  * renderer. This module classifies each popup after Polymer stamps its children
  * and routes it to the correct enhancer.
  */
-import { enhanceMessageContextMenu, isRecentActiveContextMessage } from './message-menu';
-import { enhanceSettingsMenu } from './settings-menu';
+import { registerFeatureLifecycle } from '../../content/lifecycle';
+import {
+  cleanupStaleMessageMenuSurfaces,
+  enhanceMessageContextMenu,
+  isRecentActiveContextMessage
+} from './message-menu';
+import { cleanupStaleSettingsMenuSurfaces, enhanceSettingsMenu, refreshSettingsMenus } from './settings-menu';
+
+registerFeatureLifecycle({
+  page: {
+    boot: initMenus,
+    cleanupStale: cleanupStaleMenuSurfaces,
+    reset: refreshSettingsMenus
+  },
+  mutation: { enhance: handleMenuMutations }
+});
+
+function initMenus(): void {
+  document.querySelectorAll('ytd-menu-popup-renderer').forEach(enhanceMenu);
+}
 
 export function enhanceMenu(menu: Element): void {
   if (!(menu instanceof HTMLElement)) return;
@@ -17,6 +35,36 @@ export function enhanceMenu(menu: Element): void {
       enhanceMessageContextMenu(menu);
     }
   }, 0);
+}
+
+export function cleanupStaleMenuSurfaces(): void {
+  cleanupStaleMessageMenuSurfaces();
+  cleanupStaleSettingsMenuSurfaces();
+}
+
+function handleMenuMutations({ addedElements, mutations }: {
+  addedElements: Element[];
+  mutations: MutationRecord[];
+}): void {
+  mutations.forEach((mutation) => {
+    const targetMenu = mutation.type === 'childList' && mutation.target instanceof Element
+      ? mutation.target.closest('ytd-menu-popup-renderer')
+      : null;
+    if (targetMenu) enhanceMenu(targetMenu);
+  });
+
+  addedElements.forEach((element) => {
+    if (element.matches('ytd-menu-popup-renderer')) {
+      enhanceMenu(element);
+    }
+
+    const containingMenu = element.closest('ytd-menu-popup-renderer');
+    if (containingMenu) {
+      enhanceMenu(containingMenu);
+    }
+
+    element.querySelectorAll('ytd-menu-popup-renderer').forEach(enhanceMenu);
+  });
 }
 
 function isChatSettingsMenu(menu: HTMLElement): boolean {

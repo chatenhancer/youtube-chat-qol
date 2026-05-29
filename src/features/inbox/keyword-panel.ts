@@ -6,6 +6,7 @@
  */
 import { t } from '../../shared/i18n';
 import { createCloseIcon } from '../../shared/icons';
+import { ytcqCreateElement } from '../../shared/managed-dom';
 import { createAddIcon, formatBadgeCount } from './icons';
 import { keywordsEqual, MAX_KEYWORD_LENGTH, normalizeKeyword } from './matching';
 import {
@@ -19,7 +20,7 @@ export interface KeywordPanelOptions {
 }
 
 export function createKeywordToggleButton(): HTMLButtonElement {
-  const button = document.createElement('button');
+  const button = ytcqCreateElement('button');
   button.type = 'button';
   button.className = 'ytcq-profile-card-close ytcq-inbox-keyword-toggle';
   button.title = t('addKeywords');
@@ -31,28 +32,28 @@ export function createKeywordToggleButton(): HTMLButtonElement {
 }
 
 export function createKeywordPanel({ onKeywordsChanged }: KeywordPanelOptions): HTMLElement {
-  const panel = document.createElement('div');
+  const panel = ytcqCreateElement('div');
   panel.className = 'ytcq-inbox-keyword-panel';
   panel.hidden = true;
 
-  const form = document.createElement('form');
+  const form = ytcqCreateElement('form');
   form.className = 'ytcq-inbox-keyword-form';
 
-  const input = document.createElement('input');
+  const input = ytcqCreateElement('input');
   input.className = 'ytcq-inbox-keyword-input';
   input.type = 'text';
   input.maxLength = MAX_KEYWORD_LENGTH;
   input.placeholder = t('keywordOrPhrase');
   input.setAttribute('aria-label', t('keywordOrPhrase'));
 
-  const addButton = document.createElement('button');
+  const addButton = ytcqCreateElement('button');
   addButton.type = 'submit';
   addButton.className = 'ytcq-inbox-keyword-add';
   addButton.textContent = t('add');
 
   form.append(input, addButton);
 
-  const chips = document.createElement('div');
+  const chips = ytcqCreateElement('div');
   chips.className = 'ytcq-inbox-keyword-chips';
   renderKeywordChips(chips, { onKeywordsChanged });
 
@@ -92,7 +93,7 @@ export function refreshKeywordToggle(button: HTMLButtonElement): void {
 }
 
 function createKeywordCountBadge(): HTMLSpanElement {
-  const badge = document.createElement('span');
+  const badge = ytcqCreateElement('span');
   badge.className = 'ytcq-inbox-keyword-count';
   return badge;
 }
@@ -102,7 +103,7 @@ function renderKeywordChips(container: HTMLElement, { onKeywordsChanged }: Keywo
 
   const keywords = getInboxKeywordsSnapshot();
   if (!keywords.length) {
-    const empty = document.createElement('span');
+    const empty = ytcqCreateElement('span');
     empty.className = 'ytcq-inbox-keyword-empty';
     empty.textContent = t('noKeywords');
     container.append(empty);
@@ -110,13 +111,13 @@ function renderKeywordChips(container: HTMLElement, { onKeywordsChanged }: Keywo
   }
 
   keywords.forEach((keyword) => {
-    const chip = document.createElement('span');
+    const chip = ytcqCreateElement('span');
     chip.className = 'ytcq-inbox-keyword-chip';
 
-    const label = document.createElement('span');
+    const label = ytcqCreateElement('span');
     label.textContent = keyword;
 
-    const removeButton = document.createElement('button');
+    const removeButton = ytcqCreateElement('button');
     removeButton.type = 'button';
     removeButton.className = 'ytcq-inbox-keyword-remove';
     removeButton.setAttribute('aria-label', t('removeKeyword', { keyword }));

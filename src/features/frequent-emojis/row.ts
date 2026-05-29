@@ -5,6 +5,7 @@
  * emoji picker without disturbing the picker scroll area.
  */
 import { t } from '../../shared/i18n';
+import { ytcqCreateElement } from '../../shared/managed-dom';
 import { getEmojiFallbackText } from './data';
 import type { EmojiUsage } from './types';
 
@@ -24,7 +25,7 @@ export function renderFrequentEmojiRow(
   const rowHost = getFrequentEmojiRowHost(picker);
 
   if (!row) {
-    row = document.createElement('div');
+    row = ytcqCreateElement('div');
     row.className = 'ytcq-frequent-emoji-row';
   }
 
@@ -35,11 +36,11 @@ export function renderFrequentEmojiRow(
   if (row.dataset.ytcqEmojiRenderKey === renderKey) return;
   row.dataset.ytcqEmojiRenderKey = renderKey;
 
-  const label = document.createElement('div');
+  const label = ytcqCreateElement('div');
   label.className = 'ytcq-frequent-emoji-label';
   label.textContent = t('mostUsed');
 
-  const list = document.createElement('div');
+  const list = ytcqCreateElement('div');
   list.className = 'ytcq-frequent-emoji-list';
 
   for (const emoji of topEmojis) {
@@ -58,14 +59,14 @@ function getFrequentEmojiRowHost(picker: HTMLElement): HTMLElement {
 
 function createFrequentEmojiButton(emoji: EmojiUsage, chooseEmoji: (emoji: EmojiUsage) => void): HTMLButtonElement {
   const displayEmoji = emoji;
-  const button = document.createElement('button');
+  const button = ytcqCreateElement('button');
   button.type = 'button';
   button.className = 'ytcq-frequent-emoji-button';
   button.title = displayEmoji.label || displayEmoji.alt || displayEmoji.text || 'Emoji';
   button.setAttribute('aria-label', button.title);
 
   if (displayEmoji.src) {
-    const image = document.createElement('img');
+    const image = ytcqCreateElement('img');
     image.src = displayEmoji.src;
     image.alt = displayEmoji.alt || displayEmoji.text || displayEmoji.label || '';
     image.loading = 'lazy';

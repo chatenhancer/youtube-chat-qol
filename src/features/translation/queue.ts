@@ -7,8 +7,10 @@
  * endpoint.
  */
 import { getOptions } from '../../shared/state';
+import type { Options } from '../../shared/options';
 import { cleanText } from '../../shared/text';
 import { getMessageDetails } from '../../youtube/messages';
+import { CHAT_MESSAGE_SELECTOR } from '../../youtube/selectors';
 import {
   clearUserMessageTranslation,
   clearUserMessageTranslations,
@@ -19,6 +21,7 @@ import {
   clearFocusMessageTranslations,
   recordFocusMessageTranslation
 } from '../focus-mode';
+import { registerFeatureLifecycle } from '../../content/lifecycle';
 import { createTranslationPlan, hasTextOutsidePlaceholders, type ProtectedToken } from './protected-placeholders';
 import { clearTranslationRenderings, removeTranslation, renderTranslation, type TranslationResult } from './render';
 
@@ -35,7 +38,7 @@ interface TranslationJob {
   targetLanguage: string;
 }
 
-export const MAX_RETROACTIVE_TRANSLATIONS = 150;
+const MAX_RETROACTIVE_TRANSLATIONS = 150;
 
 const MAX_TRANSLATION_CACHE_SIZE = 500;
 const MAX_TRANSLATION_CONCURRENCY = 2;
@@ -50,7 +53,42 @@ let translationDelayTimer = 0;
 const translationCache = new Map<string, TranslationResult>();
 const pendingTranslations = new Map<string, Set<PendingTranslationEntry>>();
 
-export function queueMessageTranslation(message: HTMLElement, { backfill = false } = {}): void {
+registerFeatureLifecycle({
+  page: {
+    boot: queueRetroactiveTranslations,
+    optionsChanged: handleTranslationOptionsChanged,
+    reset: clearTranslations,
+    visibleRecovery: queueRetroactiveTranslations
+  },
+  message: { render: handleTranslationMessage },
+  mutation: { render: handleTranslationMutations }
+});
+
+function handleTranslationOptionsChanged(previousOptions: Options, nextOptions: Options): void {
+  const languageChanged = nextOptions.targetLanguage !== previousOptions.targetLanguage;
+  const displayChanged = nextOptions.translationDisplay !== previousOptions.translationDisplay;
+  if (!languageChanged && !displayChanged) return;
+
+  clearTranslations();
+  if (nextOptions.targetLanguage) queueRetroactiveTranslations();
+}
+
+function handleTranslationMessage(message: HTMLElement, { allowTranslate }: { allowTranslate: boolean }): void {
+  if (allowTranslate && getOptions().targetLanguage) {
+    queueMessageTranslation(message);
+  }
+}
+
+function handleTranslationMutations({ changedMessages }: { changedMessages: HTMLElement[] }): void {
+  if (!getOptions().targetLanguage) return;
+
+  changedMessages.forEach((message) => {
+    if (message.dataset.ytcqTranslationKey) return;
+    queueMessageTranslation(message);
+  });
+}
+
+function queueMessageTranslation(message: HTMLElement, { backfill = false } = {}): void {
   const options = getOptions();
   if (!options.targetLanguage) return;
 
@@ -107,7 +145,7 @@ export function queueMessageTranslation(message: HTMLElement, { backfill = false
   pumpTranslationQueue();
 }
 
-export function clearTranslations(): void {
+function clearTranslations(): void {
   liveTranslationQueue = [];
   backfillTranslationQueue = [];
   pendingTranslations.clear();
@@ -116,7 +154,17 @@ export function clearTranslations(): void {
   clearFocusMessageTranslations();
 }
 
-export function getRetroactiveTranslationMessages(messages: HTMLElement[], translateLimit: number): HTMLElement[] {
+function queueRetroactiveTranslations(): void {
+  if (!getOptions().targetLanguage) return;
+  getRetroactiveTranslationMessages(getCurrentChatMessages(), MAX_RETROACTIVE_TRANSLATIONS)
+    .forEach((message) => queueMessageTranslation(message, { backfill: true }));
+}
+
+function getCurrentChatMessages(): HTMLElement[] {
+  return Array.from(document.querySelectorAll<HTMLElement>(CHAT_MESSAGE_SELECTOR));
+}
+
+function getRetroactiveTranslationMessages(messages: HTMLElement[], translateLimit: number): HTMLElement[] {
   const limit = Math.min(messages.length, Math.max(0, translateLimit));
   const queued = new Set<HTMLElement>();
   const result: HTMLElement[] = [];

@@ -6,6 +6,7 @@
  */
 import { t } from '../../shared/i18n';
 import { createCloseIcon } from '../../shared/icons';
+import { ytcqCreateElement } from '../../shared/managed-dom';
 import { findChatInput } from '../../youtube/chat-input';
 
 export function positionFloatingCardAboveInput(card: HTMLElement): void {
@@ -27,7 +28,7 @@ export function positionFloatingCardAboveInput(card: HTMLElement): void {
 }
 
 export function createFloatingCardCloseButton(onClick: () => void): HTMLButtonElement {
-  const closeButton = document.createElement('button');
+  const closeButton = ytcqCreateElement('button');
   closeButton.type = 'button';
   closeButton.className = 'ytcq-command-help-close';
   closeButton.setAttribute('aria-label', t('close'));

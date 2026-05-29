@@ -5,9 +5,11 @@
  * its unread icon, badge, and aria label in sync.
  */
 import { t } from '../../shared/i18n';
+import { ytcqCreateElement } from '../../shared/managed-dom';
 import { createInboxIcon, formatBadgeCount, setInboxIcon } from './icons';
 
 const HEADER_SELECTOR = 'yt-live-chat-header-renderer';
+const INBOX_BUTTON_OWNER_ID = `${Date.now()}-${Math.random()}`;
 
 export interface InboxButtonOptions {
   getUnreadCount: () => number;
@@ -31,15 +33,23 @@ export function wireInboxButton(options: InboxButtonOptions): void {
 
   const anchor = getInboxHeaderAnchor(header);
   const existing = header.querySelector<HTMLButtonElement>('.ytcq-inbox-button');
-  if (existing) {
+  if (existing?.dataset.ytcqInboxOwner === INBOX_BUTTON_OWNER_ID) {
     moveInboxButton(existing, header, anchor);
     refreshInboxButton(existing, options.getUnreadCount());
     return;
   }
 
-  const button = document.createElement('button');
+  existing?.remove();
+  const button = createInboxButton(options);
+  moveInboxButton(button, header, anchor);
+  refreshInboxButton(button, options.getUnreadCount());
+}
+
+function createInboxButton(options: InboxButtonOptions): HTMLButtonElement {
+  const button = ytcqCreateElement('button');
   button.type = 'button';
   button.className = 'ytcq-inbox-button';
+  button.dataset.ytcqInboxOwner = INBOX_BUTTON_OWNER_ID;
   button.title = t('inbox');
   button.setAttribute('aria-label', getInboxAriaLabel(options.getUnreadCount()));
   button.append(createInboxIcon(), createInboxBadge());
@@ -48,14 +58,16 @@ export function wireInboxButton(options: InboxButtonOptions): void {
     event.stopPropagation();
     options.onToggle(button);
   }, true);
-
-  moveInboxButton(button, header, anchor);
-  refreshInboxButton(button, options.getUnreadCount());
+  return button;
 }
 
 export function refreshInboxSurfaces(getUnreadCount: () => number): void {
   document.querySelectorAll<HTMLButtonElement>('.ytcq-inbox-button')
     .forEach((button) => refreshInboxButton(button, getUnreadCount()));
+}
+
+export function cleanupStaleInboxButtons(): void {
+  document.querySelectorAll<HTMLButtonElement>('.ytcq-inbox-button').forEach((button) => button.remove());
 }
 
 function refreshInboxButton(button: HTMLButtonElement, unread: number): void {
@@ -86,7 +98,7 @@ function getInboxAriaLabel(unread: number): string {
 }
 
 function createInboxBadge(): HTMLSpanElement {
-  const badge = document.createElement('span');
+  const badge = ytcqCreateElement('span');
   badge.className = 'ytcq-inbox-badge';
   badge.hidden = true;
   return badge;

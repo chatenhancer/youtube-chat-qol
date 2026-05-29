@@ -6,10 +6,11 @@
  */
 import { createOpenInNewIcon } from '../../shared/icons';
 import { t } from '../../shared/i18n';
+import { ytcqCreateElement } from '../../shared/managed-dom';
 import { openChannelWindow } from '../channel-popup';
 
 export function createAvatarElement(src: string): HTMLImageElement {
-  const image = document.createElement('img');
+  const image = ytcqCreateElement('img');
   image.className = 'ytcq-profile-card-avatar';
   image.src = src;
   image.alt = '';
@@ -18,7 +19,7 @@ export function createAvatarElement(src: string): HTMLImageElement {
 }
 
 export function createProfileAvatarButton(avatar: HTMLImageElement, profileUrl: string): HTMLButtonElement {
-  const button = document.createElement('button');
+  const button = ytcqCreateElement('button');
   button.type = 'button';
   button.className = 'ytcq-profile-card-avatar-button';
   button.title = t('openChannel');

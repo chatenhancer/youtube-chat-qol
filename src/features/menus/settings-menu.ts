@@ -14,6 +14,7 @@ import {
   TRANSLATE_ICON_PATH
 } from '../../shared/icons';
 import { playSoftChime } from '../../shared/sounds/soft-chime';
+import { registerFeatureLifecycle } from '../../content/lifecycle';
 import { clampMenuToViewport, createMenuToggleItem } from './common';
 
 type SaveOptions = (values: Partial<Options>) => void;
@@ -21,6 +22,13 @@ type SaveOptions = (values: Partial<Options>) => void;
 let saveOptions: SaveOptions = () => {};
 
 const BELL_RING_CLASS = 'ytcq-bell-ringing';
+
+registerFeatureLifecycle({
+  page: {
+    init: ({ saveOptions }) => configureSettingsMenu(saveOptions),
+    optionsChanged: refreshSettingsMenus
+  }
+});
 
 export function configureSettingsMenu(callback: SaveOptions): void {
   saveOptions = callback;
@@ -81,6 +89,10 @@ export function refreshSettingsMenus(): void {
       item.querySelector<SVGPathElement>('.ytcq-menu-icon path')?.setAttribute('d', getSoundIconPath(options.sound));
     }
   });
+}
+
+export function cleanupStaleSettingsMenuSurfaces(): void {
+  document.querySelectorAll('.ytcq-settings-item').forEach((item) => item.remove());
 }
 
 function getSoundIconPath(enabled: boolean): string {

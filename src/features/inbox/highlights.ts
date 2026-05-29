@@ -5,6 +5,7 @@
  * stored Inbox message rows without nesting duplicate highlight spans.
  */
 import { getAuthorNameElement, getMessageTextElement } from '../../youtube/messages';
+import { ytcqCreateElement } from '../../shared/managed-dom';
 import type { InboxRecord, InlineHighlightMatch, InlineHighlightTerm } from './types';
 
 export const CHAT_KEYWORD_HIGHLIGHT_CLASS = 'ytcq-chat-keyword-highlight';
@@ -106,7 +107,7 @@ function highlightTextNode(node: Text, terms: InlineHighlightTerm[]): void {
       fragment.append(document.createTextNode(text.slice(cursor, match.index)));
     }
 
-    const highlight = document.createElement('span');
+    const highlight = ytcqCreateElement('span');
     highlight.className = match.className;
     highlight.textContent = text.slice(match.index, match.index + match.length);
     fragment.append(highlight);

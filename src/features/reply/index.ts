@@ -11,10 +11,16 @@ import { cleanText } from '../../shared/text';
 import { showToast } from '../../shared/toast';
 import { getMessageContentNodes, getMessageDetails } from '../../youtube/messages';
 import { showFocusPromptForAuthor, showFocusPromptForMessage } from '../focus-mode';
+import { registerFeatureLifecycle } from '../../content/lifecycle';
 import { formatMentionText, formatQuoteText } from './format';
 import { insertMentionText, replaceInputWithQuoteNodes, replaceInputWithQuoteText } from './input';
 import { createQuoteContentNodes } from './quote-content';
 import type { ReplyInsertOptions, RichQuoteContent } from './types';
+
+registerFeatureLifecycle({
+  page: { cleanupStale: cleanupStaleReplyWiring },
+  message: { enhance: wireAuthorNameMention }
+});
 
 export function wireAuthorNameMention(message: HTMLElement): void {
   if (message.dataset.ytcqAuthorMentionWired === 'true') return;
@@ -32,6 +38,12 @@ export function wireAuthorNameMention(message: HTMLElement): void {
     event.stopImmediatePropagation?.();
     replyToMessage(message, { quote: event.altKey });
   }, true);
+}
+
+export function cleanupStaleReplyWiring(): void {
+  document.querySelectorAll('[data-ytcq-author-mention-wired]').forEach((element) => {
+    element.removeAttribute('data-ytcq-author-mention-wired');
+  });
 }
 
 export function replyToMessage(message: HTMLElement, { quote }: { quote: boolean }): void {

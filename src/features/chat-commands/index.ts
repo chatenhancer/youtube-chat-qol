@@ -21,6 +21,7 @@ import {
 import { createCommandAutocomplete } from './autocomplete';
 import { createCommandCards } from './cards';
 import { createChatCommands } from './commands';
+import { registerFeatureLifecycle } from '../../content/lifecycle';
 import { parseCommand, parseInlineTextCommand } from './parser';
 import type {
   ChatCommandDefinition,
@@ -64,6 +65,14 @@ const commandAutocomplete = createCommandAutocomplete({
   preventCommandEvent
 });
 
+registerFeatureLifecycle({
+  page: {
+    init: ({ saveOptions }) => initChatCommands(saveOptions),
+    cleanupStale: cleanupStaleChatCommandSurfaces,
+    reset: resetChatCommandsState
+  }
+});
+
 export function initChatCommands(saveOptions: SaveOptions): void {
   document.addEventListener('keydown', (event) => handleChatCommandKeydown(event, saveOptions), true);
   document.addEventListener('input', handleChatCommandInput, true);
@@ -78,6 +87,11 @@ export function resetChatCommandsState(): void {
   escapedSlashText = '';
   closeChatCommandHelp();
   commandAutocomplete.close();
+}
+
+export function cleanupStaleChatCommandSurfaces(): void {
+  document.querySelectorAll('.ytcq-command-autocomplete-card, .ytcq-command-help-card')
+    .forEach((surface) => surface.remove());
 }
 
 function handleChatCommandKeydown(event: KeyboardEvent, saveOptions: SaveOptions): void {

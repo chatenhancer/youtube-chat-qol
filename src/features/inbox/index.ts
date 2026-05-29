@@ -21,6 +21,7 @@ import {
   processPotentialMentionForConsumer,
   registerMentionProcessor
 } from '../mention-detection';
+import { registerFeatureLifecycle } from '../../content/lifecycle';
 import {
   clearInboxTabAlert,
   initInboxTabAlert,
@@ -29,12 +30,14 @@ import {
 } from '../tab-alert';
 import { playAlertSound } from './sound';
 import {
+  cleanupStaleInboxCards,
   closeInboxCard,
   isInboxCardOpen,
   openInboxCardView,
   refreshOpenInboxCard
 } from './card';
 import {
+  cleanupStaleInboxButtons,
   refreshInboxSurfaces,
   scheduleInboxButtonWire as scheduleInboxButtonWireInternal
 } from './button';
@@ -94,6 +97,20 @@ const inboxCardCallbacks = {
   onMarkRead: markInboxRead
 };
 
+registerFeatureLifecycle({
+  page: {
+    init: initInbox,
+    cleanupStale: cleanupStaleInboxSurfaces,
+    reset: resetInboxFeature
+  },
+  observerIgnore: {
+    addedNode: shouldIgnoreInboxHighlightMutation,
+    mutation: shouldIgnoreInboxHighlightMutation
+  },
+  message: { collect: handleInboxMessage },
+  mutation: { collect: handleInboxMutations }
+});
+
 export function initInbox(): void {
   initMentionDetection();
   initInboxTabAlert();
@@ -129,6 +146,32 @@ export function handlePotentialInbox(message: HTMLElement): void {
   processPotentialKeywordInbox(message);
 }
 
+function handleInboxMessage(message: HTMLElement, { allowTranslate }: { allowTranslate: boolean }): void {
+  if (allowTranslate) {
+    handlePotentialInbox(message);
+  } else {
+    highlightPotentialInboxKeywords(message);
+  }
+}
+
+function handleInboxMutations({ addedElements, changedMessages, mutations }: {
+  addedElements: Element[];
+  changedMessages: HTMLElement[];
+  mutations: MutationRecord[];
+}): void {
+  const shouldWireButton = mutations.some((mutation) => {
+    return mutation.type === 'childList' &&
+      mutation.target instanceof Element &&
+      mutation.target.closest('yt-live-chat-header-renderer');
+  }) || addedElements.some((element) => {
+    return element.matches('yt-live-chat-header-renderer') ||
+      Boolean(element.querySelector('yt-live-chat-header-renderer'));
+  });
+
+  if (shouldWireButton) scheduleInboxButtonWire();
+  changedMessages.forEach(handlePotentialInbox);
+}
+
 export function highlightPotentialInboxKeywords(message: HTMLElement): void {
   if (!message.isConnected) return;
   if (!isInboxStateLoaded()) {
@@ -143,6 +186,10 @@ export function scheduleInboxButtonWire(): void {
   scheduleInboxButtonWireInternal(inboxButtonOptions);
 }
 
+function shouldIgnoreInboxHighlightMutation(element: Element): boolean {
+  return element.closest<HTMLElement>(CHAT_MESSAGE_SELECTOR)?.dataset.ytcqInboxKeywordHighlighting === 'true';
+}
+
 export function resetInboxState(): void {
   pendingInboxMessages.clear();
   resetInboxStore();
@@ -154,6 +201,16 @@ export function resetInboxState(): void {
     delete message.dataset.ytcqInboxKeywordHighlightKey;
   });
   refreshInboxSurfaces(getUnreadInboxCount);
+}
+
+export function cleanupStaleInboxSurfaces(): void {
+  cleanupStaleInboxButtons();
+  cleanupStaleInboxCards();
+}
+
+function resetInboxFeature(): void {
+  resetInboxState();
+  scheduleInboxButtonWire();
 }
 
 export function openInboxCard(anchor?: HTMLElement): void {

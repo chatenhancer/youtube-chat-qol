@@ -6,6 +6,7 @@
  * and per-message action modules both use this path.
  */
 import { createSvgIcon } from '../../shared/icons';
+import { ytcqCreateElement } from '../../shared/managed-dom';
 
 interface MenuActionItemOptions {
   className?: string;
@@ -30,7 +31,7 @@ export function createMenuActionItem({
   iconViewBox,
   onClick
 }: MenuActionItemOptions): HTMLElement {
-  const item = document.createElement('div');
+  const item = ytcqCreateElement('div');
   item.className = `style-scope ytd-menu-popup-renderer ${className}`;
   item.setAttribute('system-icons', '');
   item.setAttribute('role', 'menuitem');
@@ -64,7 +65,7 @@ export function createMenuToggleItem({
     onClick
   });
   item.setAttribute('aria-checked', String(Boolean(checked)));
-  const toggle = document.createElement('span');
+  const toggle = ytcqCreateElement('span');
   toggle.className = 'ytcq-menu-toggle';
   toggle.setAttribute('aria-hidden', 'true');
   item.querySelector('.ytcq-paper-item')?.appendChild(toggle);
@@ -72,17 +73,17 @@ export function createMenuToggleItem({
 }
 
 export function createPaperItem({ label, iconPath, iconViewBox }: PaperItemOptions): HTMLElement {
-  const paperItem = document.createElement('div');
+  const paperItem = ytcqCreateElement('div');
   paperItem.className = 'ytcq-paper-item';
   paperItem.setAttribute('role', 'option');
   paperItem.setAttribute('tabindex', '0');
   paperItem.setAttribute('aria-disabled', 'false');
 
-  const icon = document.createElement('span');
+  const icon = ytcqCreateElement('span');
   icon.className = 'ytcq-menu-icon';
   icon.appendChild(createSvgIcon(iconViewBox || '0 0 24 24', iconPath));
 
-  const text = document.createElement('span');
+  const text = ytcqCreateElement('span');
   text.className = 'ytcq-menu-label';
   text.textContent = label;
 

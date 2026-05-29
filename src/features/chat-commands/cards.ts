@@ -5,6 +5,7 @@
  * shell positioned near YouTube's chat input.
  */
 import { t } from '../../shared/i18n';
+import { ytcqCreateElement } from '../../shared/managed-dom';
 import { createFloatingCardCloseButton, positionFloatingCardAboveInput } from './floating-card';
 import type { ChatCommandDefinition } from './types';
 
@@ -65,18 +66,18 @@ export function createCommandCards(): CommandCards {
   ): void => {
     const card = createBaseCard(t('chatCommands'), t('chatCommands'), close);
 
-    const hint = document.createElement('p');
+    const hint = ytcqCreateElement('p');
     hint.className = 'ytcq-command-help-hint';
     hint.textContent = t('commandHelpHint');
 
-    const list = document.createElement('dl');
+    const list = ytcqCreateElement('dl');
     list.className = 'ytcq-command-help-list';
 
     commands.forEach((command) => {
-      const term = document.createElement('dt');
+      const term = ytcqCreateElement('dt');
       term.textContent = command.helpLabel;
 
-      const details = document.createElement('dd');
+      const details = ytcqCreateElement('dd');
       details.textContent = getCommandDescription(command);
 
       list.append(term, details);
@@ -89,7 +90,7 @@ export function createCommandCards(): CommandCards {
   const showWatchedKeywords = (keywords: string[]): void => {
     const card = createBaseCard(t('watchedKeywords'), t('watchedKeywords'), close);
 
-    const body = document.createElement('p');
+    const body = ytcqCreateElement('p');
     body.className = 'ytcq-command-help-hint';
     body.textContent = keywords.length
       ? keywords.map((keyword) => `"${keyword}"`).join(', ')
@@ -107,15 +108,15 @@ export function createCommandCards(): CommandCards {
 }
 
 function createBaseCard(titleText: string, ariaLabel: string, close: () => void): HTMLElement {
-  const card = document.createElement('section');
+  const card = ytcqCreateElement('section');
   card.className = 'ytcq-command-help-card';
   card.setAttribute('role', 'dialog');
   card.setAttribute('aria-label', ariaLabel);
 
-  const header = document.createElement('div');
+  const header = ytcqCreateElement('div');
   header.className = 'ytcq-command-help-header';
 
-  const title = document.createElement('div');
+  const title = ytcqCreateElement('div');
   title.className = 'ytcq-command-help-title';
   title.textContent = titleText;
 
