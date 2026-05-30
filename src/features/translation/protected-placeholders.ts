@@ -36,7 +36,8 @@ export function cloneProtectedTokens(protectedTokens: ProtectedToken[]): Protect
   }));
 }
 
-const PROTECTED_PLACEHOLDER_PATTERN = /_{0,2}\s*YTCQ[\s_-]*TOKEN[\s_-]*(\d+)[\s_-]*PLACEHOLDER\s*_{0,2}/gi;
+const PROTECTED_PLACEHOLDER_MARKER = '\u00A7';
+const PROTECTED_PLACEHOLDER_PATTERN = /\u00A7\s*(\d+)\s*\u00A7/g;
 const MENTION_PATTERN = /(^|[^\p{L}\p{N}_])(@[\p{L}\p{N}_][^\s@]*)/gu;
 const MENTION_TRAILING_PUNCTUATION_PATTERN = /[),.!?;:'"’”\]]+$/u;
 const UNICODE_EMOJI_PATTERN = /\p{Extended_Pictographic}(?:[\uFE0E\uFE0F]|[\u{1F3FB}-\u{1F3FF}])?(?:\u200D\p{Extended_Pictographic}(?:[\uFE0E\uFE0F]|[\u{1F3FB}-\u{1F3FF}])?)*/gu;
@@ -433,7 +434,7 @@ function createProtectedPlaceholderToken({
   nodes?: Node[];
 }): string {
   const index = protectedTokens.length;
-  const placeholder = `__YTCQ_TOKEN_${index}_PLACEHOLDER__`;
+  const placeholder = `${PROTECTED_PLACEHOLDER_MARKER}${index}${PROTECTED_PLACEHOLDER_MARKER}`;
   const tokenNodes = nodes?.length
     ? nodes.map((emojiNode) => emojiNode.cloneNode(true))
     : node
