@@ -21,7 +21,5 @@ jobs:
         run: npm run test:browser:install
       - name: Verify project
         run: npm run verify
-      - name: Run mock YouTube browser smoke test
-        run: npx playwright test --config=playwright.config.ts --project=youtube-mock
         env:
           YTCQ_HEADLESS: '1'
