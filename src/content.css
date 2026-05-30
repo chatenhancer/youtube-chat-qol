@@ -1407,6 +1407,10 @@ yt-live-chat-membership-item-renderer .ytcq-translation,
   overflow-wrap: anywhere;
 }
 
+yt-live-chat-paid-message-renderer .ytcq-translation {
+  color: inherit;
+}
+
 yt-live-chat-text-message-renderer .ytcq-translation-prefix,
 yt-live-chat-paid-message-renderer .ytcq-translation-prefix,
 yt-live-chat-membership-item-renderer .ytcq-translation-prefix,
