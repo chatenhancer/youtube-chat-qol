@@ -4,7 +4,8 @@
  * Live messages and retroactive backfill use separate queues. New live messages
  * always get priority, while backfill is capped and throttled so old chat
  * history cannot starve fresh messages or overload the unofficial translate
- * endpoint.
+ * endpoint. The pending backlog is also capped so slow translation responses do
+ * not retain stale chat renderers in very fast streams.
  */
 import { getOptions } from '../../shared/state';
 import type { Options } from '../../shared/options';
@@ -22,10 +23,11 @@ import { clearTranslationRenderings, removeTranslation, renderTranslation } from
 import type { TranslationResult } from './types';
 
 interface PendingTranslationEntry {
-  message: HTMLElement;
+  messageRef: WeakRef<HTMLElement>;
   originalText: string;
   sourceText: string;
   protectedTokens: ProtectedToken[];
+  sequence: number;
 }
 
 interface TranslationJob {
@@ -38,6 +40,7 @@ const MAX_RETROACTIVE_TRANSLATIONS = 150;
 
 const MAX_TRANSLATION_CACHE_SIZE = 500;
 const MAX_TRANSLATION_CONCURRENCY = 2;
+const MAX_PENDING_TRANSLATION_ENTRIES = 300;
 const TRANSLATION_DELAY_MS = 250;
 const LIVE_TRANSLATION_DELAY_MS = 40;
 
@@ -45,6 +48,7 @@ let liveTranslationQueue: TranslationJob[] = [];
 let backfillTranslationQueue: TranslationJob[] = [];
 let activeTranslations = 0;
 let translationDelayTimer = 0;
+let pendingTranslationSequence = 0;
 
 const translationCache = new Map<string, TranslationResult>();
 const pendingTranslations = new Map<string, Set<PendingTranslationEntry>>();
@@ -119,15 +123,17 @@ function queueMessageTranslation(message: HTMLElement, { backfill = false } = {}
   }
 
   const entry = {
-    message,
+    messageRef: new WeakRef(message),
     originalText: details.text,
     sourceText: plan.text,
-    protectedTokens: plan.protectedTokens
+    protectedTokens: plan.protectedTokens,
+    sequence: pendingTranslationSequence += 1
   };
 
   if (pendingTranslations.has(key)) {
     pendingTranslations.get(key)?.add(entry);
     if (!backfill) promoteBackfillTranslation(key);
+    enforcePendingTranslationLimit();
     return;
   }
 
@@ -138,6 +144,7 @@ function queueMessageTranslation(message: HTMLElement, { backfill = false } = {}
     targetLanguage: options.targetLanguage
   };
   enqueueTranslationJob(job, { backfill });
+  enforcePendingTranslationLimit();
   pumpTranslationQueue();
 }
 
@@ -208,6 +215,117 @@ function promoteBackfillTranslation(key: string): void {
   pumpTranslationQueue();
 }
 
+function enforcePendingTranslationLimit(): void {
+  pruneDisconnectedPendingTranslations();
+  while (getPendingTranslationEntryCount() > MAX_PENDING_TRANSLATION_ENTRIES) {
+    if (dropOldestBackfillTranslation()) continue;
+    if (pruneDisconnectedPendingTranslations()) continue;
+    if (dropOldestLiveTranslation()) continue;
+    if (dropOldestPendingTranslationEntry()) continue;
+    break;
+  }
+}
+
+function pruneDisconnectedPendingTranslations(): boolean {
+  let pruned = false;
+  for (const [key, entries] of pendingTranslations) {
+    for (const entry of Array.from(entries)) {
+      const message = entry.messageRef.deref();
+      if (message?.isConnected) continue;
+      entries.delete(entry);
+      pruned = true;
+    }
+    if (!entries.size) {
+      pendingTranslations.delete(key);
+      removeQueuedTranslationJob(key);
+    }
+  }
+  return pruned;
+}
+
+function dropOldestBackfillTranslation(): boolean {
+  const job = backfillTranslationQueue.shift();
+  if (!job) return false;
+  dropPendingTranslationKey(job.key);
+  return true;
+}
+
+function dropOldestLiveTranslation(): boolean {
+  for (let index = liveTranslationQueue.length - 1; index >= 0; index -= 1) {
+    const job = liveTranslationQueue[index];
+    if (dropOldestPendingTranslationEntryForKey(job.key)) return true;
+    liveTranslationQueue.splice(index, 1);
+  }
+  return false;
+}
+
+function dropOldestPendingTranslationEntry(): boolean {
+  let oldestKey = '';
+  let oldestEntry: PendingTranslationEntry | null = null;
+  for (const [key, entries] of pendingTranslations) {
+    for (const entry of entries) {
+      if (!oldestEntry || entry.sequence < oldestEntry.sequence) {
+        oldestKey = key;
+        oldestEntry = entry;
+      }
+    }
+  }
+  if (!oldestEntry) return false;
+  return dropPendingTranslationEntry(oldestKey, oldestEntry);
+}
+
+function dropOldestPendingTranslationEntryForKey(key: string): boolean {
+  const entries = pendingTranslations.get(key);
+  let oldestEntry: PendingTranslationEntry | null = null;
+  for (const entry of entries || []) {
+    if (!oldestEntry || entry.sequence < oldestEntry.sequence) {
+      oldestEntry = entry;
+    }
+  }
+  if (!oldestEntry) return false;
+  return dropPendingTranslationEntry(key, oldestEntry);
+}
+
+function dropPendingTranslationEntry(key: string, entry: PendingTranslationEntry): boolean {
+  const entries = pendingTranslations.get(key);
+  if (!entries) return false;
+  entries.delete(entry);
+  clearPendingTranslationEntry(entry);
+  if (!entries.size) {
+    pendingTranslations.delete(key);
+    removeQueuedTranslationJob(key);
+  }
+  return true;
+}
+
+function dropPendingTranslationKey(key: string): void {
+  for (const entry of pendingTranslations.get(key) || []) {
+    clearPendingTranslationEntry(entry);
+  }
+  pendingTranslations.delete(key);
+  removeQueuedTranslationJob(key);
+}
+
+function clearPendingTranslationEntry(entry: PendingTranslationEntry): void {
+  const message = entry.messageRef.deref();
+  if (message?.isConnected) {
+    delete message.dataset.ytcqTranslationKey;
+  }
+}
+
+function removeQueuedTranslationJob(key: string): void {
+  liveTranslationQueue = liveTranslationQueue.filter((job) => job.key !== key);
+  backfillTranslationQueue = backfillTranslationQueue.filter((job) => job.key !== key);
+}
+
+function getPendingTranslationEntryCount(): number {
+  let count = 0;
+  for (const entries of pendingTranslations.values()) {
+    count += entries.size;
+  }
+  return count;
+}
+
 function pumpTranslationQueue(): void {
   if (activeTranslations >= MAX_TRANSLATION_CONCURRENCY) return;
   if (translationDelayTimer) return;
@@ -220,10 +338,13 @@ function pumpTranslationQueue(): void {
     .then((result) => {
       let renderedAny = false;
       for (const entry of pendingTranslations.get(job.key) || []) {
-        const rendered = renderTranslation(entry.message, result, entry.originalText, entry.protectedTokens, entry.sourceText);
+        const message = entry.messageRef.deref();
+        if (!message) continue;
+
+        const rendered = renderTranslation(message, result, entry.originalText, entry.protectedTokens, entry.sourceText);
         if (rendered) {
           emitMessageTranslationRendered({
-            message: entry.message,
+            message,
             result,
             originalText: entry.originalText,
             protectedTokens: entry.protectedTokens,
@@ -231,15 +352,16 @@ function pumpTranslationQueue(): void {
           });
           renderedAny = true;
         } else {
-          delete entry.message.dataset.ytcqTranslationKey;
-          emitMessageTranslationCleared(entry.message);
+          delete message.dataset.ytcqTranslationKey;
+          emitMessageTranslationCleared(message);
         }
       }
       if (renderedAny) rememberTranslation(job.key, result);
     })
     .catch(() => {
       for (const entry of pendingTranslations.get(job.key) || []) {
-        delete entry.message.dataset.ytcqTranslationKey;
+        const message = entry.messageRef.deref();
+        if (message) delete message.dataset.ytcqTranslationKey;
       }
     })
     .finally(() => {
