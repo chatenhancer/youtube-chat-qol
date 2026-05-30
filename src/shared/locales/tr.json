@@ -207,7 +207,7 @@
       "message": "Sohbet mesajlarının çevrileceği dili seçin. Kapalı seçeneği otomatik çeviriyi devre dışı bırakır."
     },
     "translateTo": {
-      "message": "Şuna çevir"
+      "message": "Sohbeti şuna çevir"
     },
     "translationOffHelper": {
       "message": "Kapalı seçeneği otomatik çeviriyi devre dışı bırakır."

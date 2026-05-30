@@ -204,7 +204,7 @@
       "message": "Choisissez la langue dans laquelle les messages du chat doivent être traduits. Désactivé coupe la traduction automatique."
     },
     "translateTo": {
-      "message": "Traduire en"
+      "message": "Traduire le chat en"
     },
     "translationOffHelper": {
       "message": "Désactivé coupe la traduction automatique."

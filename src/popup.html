@@ -22,7 +22,7 @@
         <div class="header-actions">
           <a id="sourceCodeLink" class="header-icon-button source-code-button" href="https://www.chatenhancer.com/source" title="View source code" aria-label="View source code" data-i18n-title="openSourceCode" data-i18n-aria-label="openSourceCode">
             <svg class="source-icon" viewBox="0 -960 960 960" aria-hidden="true" focusable="false">
-              <path d="m193-479 155 155q11 11 11 28t-11 28q-11 11-28 11t-28-11L108-452q-6-6-8.5-13T97-480q0-8 2.5-15t8.5-13l184-184q12-12 28.5-12t28.5 12q12 12 12 28.5T349-635L193-479Zm574-2L612-636q-11-11-11-28t11-28q11-11 28-11t28 11l184 184q6 6 8.5 13t2.5 15q0 8-2.5 15t-8.5 13L668-268q-12 12-28 11.5T612-269q-12-12-12-28.5t12-28.5l155-155Z"></path>
+              <path d="m153-480 115 115q11 12 11.5 28.5T268-308q-12 12-28 12t-28-12L68-452q-12-12-12-28t12-28l144-144q12-12 28-12t28 12q12 12 12 28.5T268-595L153-480Zm203.5 300.5Q349-194 354-210l176-564q5-16 19.5-23.5T580-800q16 5 23.5 19.5T606-750L430-186q-5 16-19.5 23.5T380-160q-16-5-23.5-19.5ZM807-480 692-595q-12-12-12-28.5t12-28.5q12-12 28-12t28 12l144 144q12 12 12 28t-12 28L748-308q-12 12-28 12t-28-12q-12-12-12-28.5t12-28.5l115-115Z"></path>
             </svg>
           </a>
           <a id="supportLink" class="header-icon-button" href="https://www.chatenhancer.com/support" title="Support / Feedback" aria-label="Support and feedback" data-i18n-title="supportFeedback" data-i18n-aria-label="supportAndFeedback">
@@ -51,8 +51,9 @@
 
         <label class="option option-control" title="Choose the language chat messages should be translated into. Off disables automatic translation." data-i18n-title="chooseTranslationLanguageTitle">
           <span class="option-title">
-            <svg class="option-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-              <path d="M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0014.07 6H17V4h-7V2H8v2H1v2h11.17a15.7 15.7 0 01-2.86 4.63A15.07 15.07 0 017.22 7H5.2a17.2 17.2 0 002.77 5.03l-5.09 5.02L4.3 18.47l5.01-5.01 3.11 3.11.45-1.5ZM18.5 10h-2L12 22h2l1.13-3h4.74L21 22h2l-4.5-12Zm-2.62 7l1.62-4.33L19.12 17h-3.24Z"></path>
+            <svg class="option-icon translation-target-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path class="translation-source-mark" d="M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0014.07 6H17V4h-7V2H8v2H1v2h11.17a15.7 15.7 0 01-2.86 4.63A15.07 15.07 0 017.22 7H5.2a17.2 17.2 0 002.77 5.03l-5.09 5.02L4.3 18.47l5.01-5.01 3.11 3.11.45-1.5Z"></path>
+              <path class="translation-target-mark" d="M18.5 10h-2L12 22h2l1.13-3h4.74L21 22h2l-4.5-12Zm-2.62 7l1.62-4.33L19.12 17h-3.24Z"></path>
             </svg>
             <span data-i18n="translateTo">Translate to</span>
           </span>
@@ -62,8 +63,11 @@
 
         <label class="option option-control" title="Choose whether translations replace the original message or appear below it." data-i18n-title="translationDisplayTitle">
           <span class="option-title">
-            <svg class="option-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-              <path d="M4 4h16a2 2 0 012 2v12a2 2 0 01-2 2H4a2 2 0 01-2-2V6a2 2 0 012-2Zm0 2v12h16V6H4Zm2 8h5v2H6v-2Zm7 0h5v2h-5v-2Zm-7-4h12v2H6v-2Z"></path>
+            <svg class="option-icon translation-display-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path class="translation-display-frame" d="M4 4h16a2 2 0 012 2v12a2 2 0 01-2 2H4a2 2 0 01-2-2V6a2 2 0 012-2Zm0 2v12h16V6H4Z"></path>
+              <path class="translation-display-line translation-display-line-top" d="M6 10h12v2H6v-2Z"></path>
+              <path class="translation-display-line translation-display-line-left" d="M6 14h5v2H6v-2Z"></path>
+              <path class="translation-display-line translation-display-line-right" d="M13 14h5v2h-5v-2Z"></path>
             </svg>
             <span data-i18n="display">Display</span>
           </span>
@@ -100,8 +104,10 @@
         <label class="option option-toggle" title="Show a brief startup effect when the extension connects to chat. Reduced motion disables it automatically." data-i18n-title="startupShimmerTitle">
           <span class="option-copy">
             <span class="option-title">
-              <svg class="option-icon" viewBox="0 -960 960 960" aria-hidden="true" focusable="false">
-                <path d="m306-120-44-92-102-44 102-44 44-92 44 92 102 44-102 44-44 92Zm378-80-76-160-168-76 168-76 76-160 76 160 168 76-168 76-76 160ZM306-568l-44-92-102-44 102-44 44-92 44 92 102 44-102 44-44 92Z"></path>
+              <svg class="option-icon startup-effect-icon" viewBox="0 -960 960 960" aria-hidden="true" focusable="false">
+                <path class="startup-sparkle startup-sparkle-small-start" d="m306-120-44-92-102-44 102-44 44-92 44 92 102 44-102 44-44 92Z"></path>
+                <path class="startup-sparkle startup-sparkle-large" d="m684-200-76-160-168-76 168-76 76-160 76 160 168 76-168 76-76 160Z"></path>
+                <path class="startup-sparkle startup-sparkle-small-end" d="m306-568-44-92-102-44 102-44 44-92 44 92 102 44-102 44-44 92Z"></path>
               </svg>
               <span data-i18n="startupShimmer">Startup effect</span>
             </span>

@@ -14,6 +14,9 @@ const LANDING_PAGE_URL = 'https://chatenhancer.com';
 const SOURCE_CODE_URL = 'https://www.chatenhancer.com/source';
 const SUPPORT_URL = 'https://www.chatenhancer.com/support';
 const BELL_RING_CLASS = 'ytcq-bell-ringing';
+const TRANSLATION_PULSE_CLASS = 'ytcq-translation-pulse';
+const DISPLAY_REFLOW_CLASS = 'ytcq-display-reflow';
+const SPARKLE_BURST_CLASS = 'ytcq-sparkle-burst';
 const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)';
 
 type ExtensionStatus = 'checking' | 'active' | 'inactive';
@@ -82,11 +85,15 @@ function init(): void {
 
   controls.targetLanguage.addEventListener('change', () => {
     const targetLanguage = controls.targetLanguage?.value || '';
-    if (targetLanguage) lastKnownTranslationTarget = targetLanguage;
+    if (targetLanguage) {
+      lastKnownTranslationTarget = targetLanguage;
+      animatePopupTranslationIcon();
+    }
     save(getTargetLanguageUpdate(targetLanguage, lastKnownTranslationTarget));
   });
 
   controls.translationDisplay.addEventListener('change', () => {
+    animatePopupDisplayIcon();
     save({ translationDisplay: controls.translationDisplay?.value as Options['translationDisplay'] });
   });
 
@@ -100,7 +107,9 @@ function init(): void {
   });
 
   controls.startupEffect.addEventListener('change', () => {
-    save({ startupEffect: Boolean(controls.startupEffect?.checked) });
+    const enabled = Boolean(controls.startupEffect?.checked);
+    if (enabled) animatePopupStartupEffectIcon();
+    save({ startupEffect: enabled });
   });
 }
 
@@ -109,15 +118,31 @@ function save(values: Partial<Options>): void {
 }
 
 function animatePopupSoundIcon(): void {
-  const icon = document.querySelector<SVGSVGElement>('.sound-icon');
-  if (!icon) return;
+  animatePopupIcon('.sound-icon', BELL_RING_CLASS, 700);
+}
 
-  icon.classList.remove(BELL_RING_CLASS);
+function animatePopupTranslationIcon(): void {
+  animatePopupIcon('.translation-target-icon', TRANSLATION_PULSE_CLASS, 900);
+}
+
+function animatePopupDisplayIcon(): void {
+  animatePopupIcon('.translation-display-icon', DISPLAY_REFLOW_CLASS, 900);
+}
+
+function animatePopupStartupEffectIcon(): void {
+  animatePopupIcon('.startup-effect-icon', SPARKLE_BURST_CLASS, 1000);
+}
+
+function animatePopupIcon(selector: string, className: string, durationMs: number): void {
+  const icon = document.querySelector<SVGSVGElement>(selector);
+  if (!icon || prefersReducedMotion()) return;
+
+  icon.classList.remove(className);
   void icon.getBoundingClientRect();
-  icon.classList.add(BELL_RING_CLASS);
+  icon.classList.add(className);
   window.setTimeout(() => {
-    icon.classList.remove(BELL_RING_CLASS);
-  }, 700);
+    icon.classList.remove(className);
+  }, durationMs);
 }
 
 function refreshExtensionStatus(): void {

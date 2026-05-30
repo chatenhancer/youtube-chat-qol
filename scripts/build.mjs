@@ -75,6 +75,7 @@ async function buildTarget(target) {
     copyFile(path.join(root, 'assets', 'logo.png'), path.join(extensionDir, 'logo.png')),
     copyFile(path.join(root, 'assets', 'logo-white.png'), path.join(extensionDir, 'logo-white.png')),
     syncExtensionLocales(path.join(extensionDir, '_locales')),
+    cp(path.join(root, 'assets', 'fonts'), path.join(extensionDir, 'fonts'), { recursive: true }),
     cp(path.join(root, 'assets', 'icons'), path.join(extensionDir, 'icons'), { recursive: true })
   ]);
 

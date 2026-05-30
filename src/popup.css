@@ -4,6 +4,14 @@
  * The popup sits outside YouTube's iframe, so it approximates YouTube's light
  * and dark surfaces with local tokens instead of relying on YouTube variables.
  */
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("fonts/InterVariable.woff2") format("woff2");
+}
+
 :root {
   color-scheme: light dark;
   --ytcq-popup-card-bg: #fff;
@@ -15,7 +23,7 @@
   --ytcq-popup-text: #0f0f0f;
   --ytcq-popup-secondary-text: #606060;
   --ytcq-popup-action: #065fd4;
-  font-family: Roboto, Arial, sans-serif;
+  font-family: "Inter", Arial, sans-serif;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -36,6 +44,7 @@ body {
   width: 360px;
   margin: 0;
   color: var(--ytcq-popup-text);
+  font-family: "Inter", Arial, sans-serif;
   background: var(--ytcq-popup-card-bg);
 }
 
@@ -186,7 +195,7 @@ main {
 .extension-status strong {
   color: var(--ytcq-popup-text);
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 400;
   line-height: 15px;
 }
 
@@ -214,7 +223,7 @@ main {
   margin: 0 0 4px;
   color: var(--ytcq-popup-secondary-text);
   font-size: 11px;
-  font-weight: 500;
+  font-weight: 550;
   line-height: 14px;
   text-transform: uppercase;
 }
@@ -223,7 +232,8 @@ main {
   display: flex;
   gap: 7px;
   padding: 6px 8px;
-  font-size: 13px;
+  font-size: 12px;
+  line-height: 16px;
 }
 
 .option-control,
@@ -253,6 +263,7 @@ main {
   align-items: center;
   gap: 7px;
   min-width: 0;
+  font-weight: 400;
 }
 
 .option-control .option-title {
@@ -268,6 +279,7 @@ main {
   margin-left: 23px;
   color: var(--ytcq-popup-secondary-text);
   font-size: 11px;
+  font-weight: 400;
   line-height: 14px;
 }
 
@@ -307,6 +319,63 @@ main {
   animation: ytcq-bell-ring-lines 620ms ease-in-out;
 }
 
+.translation-target-icon .translation-source-mark,
+.translation-target-icon .translation-target-mark,
+.translation-display-icon .translation-display-frame,
+.translation-display-icon .translation-display-line {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.translation-target-icon {
+  transform-origin: center;
+}
+
+.translation-target-icon.ytcq-translation-pulse {
+  animation: ytcq-translation-icon-pop 560ms cubic-bezier(0.18, 0.89, 0.32, 1.28);
+}
+
+.translation-target-icon.ytcq-translation-pulse .translation-source-mark {
+  animation: ytcq-translation-source-pop 560ms ease-out;
+}
+
+.translation-target-icon.ytcq-translation-pulse .translation-target-mark {
+  animation: ytcq-translation-target-pop 560ms ease-out 60ms;
+}
+
+.translation-display-icon.ytcq-display-reflow .translation-display-frame {
+  animation: ytcq-display-frame-reflow 680ms ease-out;
+}
+
+.translation-display-icon.ytcq-display-reflow .translation-display-line-top {
+  animation: ytcq-display-line-top-reflow 680ms ease-out;
+}
+
+.translation-display-icon.ytcq-display-reflow .translation-display-line-left {
+  animation: ytcq-display-line-bottom-reflow 680ms ease-out 70ms;
+}
+
+.translation-display-icon.ytcq-display-reflow .translation-display-line-right {
+  animation: ytcq-display-line-bottom-reflow 680ms ease-out 120ms;
+}
+
+.startup-effect-icon .startup-sparkle {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.startup-effect-icon.ytcq-sparkle-burst .startup-sparkle-large {
+  animation: ytcq-sparkle-large-burst 760ms ease-out;
+}
+
+.startup-effect-icon.ytcq-sparkle-burst .startup-sparkle-small-start {
+  animation: ytcq-sparkle-small-burst 760ms ease-out 80ms;
+}
+
+.startup-effect-icon.ytcq-sparkle-burst .startup-sparkle-small-end {
+  animation: ytcq-sparkle-small-burst 760ms ease-out 150ms;
+}
+
 @keyframes ytcq-bell-ring {
   0%,
   100% {
@@ -330,6 +399,154 @@ main {
   }
 }
 
+@keyframes ytcq-translation-icon-pop {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  36% {
+    transform: scale(1.22);
+  }
+
+  68% {
+    transform: scale(0.94);
+  }
+}
+
+@keyframes ytcq-translation-source-pop {
+  0%,
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+
+  38% {
+    transform: scale(0.88) rotate(-10deg);
+    opacity: 0.64;
+  }
+
+  72% {
+    transform: scale(1.04) rotate(3deg);
+    opacity: 0.92;
+  }
+}
+
+@keyframes ytcq-translation-target-pop {
+  0%,
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+
+  34% {
+    transform: scale(1.32) rotate(11deg);
+    opacity: 1;
+  }
+
+  68% {
+    transform: scale(0.92) rotate(-3deg);
+    opacity: 0.78;
+  }
+}
+
+@keyframes ytcq-display-frame-reflow {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  34% {
+    transform: scale(1.07);
+  }
+
+  68% {
+    transform: scale(0.97);
+  }
+}
+
+@keyframes ytcq-display-line-top-reflow {
+  0%,
+  100% {
+    transform: translateY(0) scaleX(1);
+    opacity: 1;
+  }
+
+  34% {
+    transform: translateY(3px) scaleX(0.58);
+    opacity: 0.62;
+  }
+
+  66% {
+    transform: translateY(-0.7px) scaleX(1.08);
+    opacity: 1;
+  }
+}
+
+@keyframes ytcq-display-line-bottom-reflow {
+  0%,
+  100% {
+    transform: translateY(0) scaleX(1);
+    opacity: 1;
+  }
+
+  34% {
+    transform: translateY(-2px) scaleX(0.72);
+    opacity: 0.64;
+  }
+
+  66% {
+    transform: translateY(0.8px) scaleX(1.16);
+    opacity: 1;
+  }
+}
+
+@keyframes ytcq-sparkle-large-burst {
+  0%,
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+
+  26% {
+    transform: scale(1.24) rotate(7deg);
+    opacity: 1;
+  }
+
+  54% {
+    transform: scale(0.9) rotate(-5deg);
+    opacity: 0.72;
+  }
+
+  78% {
+    transform: scale(1.08) rotate(2deg);
+    opacity: 1;
+  }
+}
+
+@keyframes ytcq-sparkle-small-burst {
+  0%,
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+
+  22% {
+    transform: scale(0.72) rotate(-8deg);
+    opacity: 0.58;
+  }
+
+  48% {
+    transform: scale(1.36) rotate(10deg);
+    opacity: 1;
+  }
+
+  76% {
+    transform: scale(0.94) rotate(-3deg);
+    opacity: 0.82;
+  }
+}
+
 @keyframes ytcq-bell-ring-lines {
   0%,
   100% {
@@ -344,11 +561,18 @@ main {
 
 @media (prefers-reduced-motion: reduce) {
   .sound-icon.ytcq-bell-ringing,
-  .sound-icon.ytcq-bell-ringing .sound-ring {
+  .sound-icon.ytcq-bell-ringing .sound-ring,
+  .translation-target-icon.ytcq-translation-pulse,
+  .translation-target-icon.ytcq-translation-pulse .translation-source-mark,
+  .translation-target-icon.ytcq-translation-pulse .translation-target-mark,
+  .translation-display-icon.ytcq-display-reflow .translation-display-frame,
+  .translation-display-icon.ytcq-display-reflow .translation-display-line,
+  .startup-effect-icon.ytcq-sparkle-burst .startup-sparkle {
     animation: none;
   }
 }
 
+button,
 input,
 select {
   font: inherit;

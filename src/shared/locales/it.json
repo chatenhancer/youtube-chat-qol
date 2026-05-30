@@ -207,7 +207,7 @@
       "message": "Scegli la lingua in cui tradurre i messaggi della chat. Disattivato spegne la traduzione automatica."
     },
     "translateTo": {
-      "message": "Traduci in"
+      "message": "Traduci la chat in"
     },
     "translationOffHelper": {
       "message": "Disattivato spegne la traduzione automatica."
