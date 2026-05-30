@@ -1,0 +1,37 @@
+/**
+ * Playwright browser-test configuration.
+ *
+ * These tests launch the built Chrome extension in a persistent Chromium
+ * profile so content scripts, extension storage, and the popup can be tested
+ * together instead of only through isolated unit tests.
+ */
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  expect: {
+    timeout: 15_000
+  },
+  fullyParallel: false,
+  outputDir: 'test-results/browser',
+  projects: [
+    {
+      name: 'youtube-mock',
+      testMatch: /specs\/youtube-mock\/.*\.spec\.ts/
+    },
+    {
+      name: 'youtube-live',
+      testMatch: /specs\/youtube-live\/.*\.spec\.ts/
+    }
+  ],
+  reporter: [['list']],
+  testDir: './tests/browser',
+  timeout: 90_000,
+  use: {
+    actionTimeout: 15_000,
+    navigationTimeout: 30_000,
+    screenshot: 'only-on-failure',
+    trace: 'retain-on-failure',
+    video: 'retain-on-failure'
+  },
+  workers: 1
+});

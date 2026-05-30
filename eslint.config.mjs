@@ -7,7 +7,7 @@ export default [
     ignores: ['dist/**', 'node_modules/**']
   },
   {
-    files: ['src/**/*.ts'],
+    files: ['src/**/*.ts', 'tests/**/*.ts'],
     languageOptions: {
       parser: tseslint.parser,
       parserOptions: {
@@ -36,5 +36,26 @@ export default [
       globals: globals.node
     },
     rules: js.configs.recommended.rules
+  },
+  {
+    files: ['tests/browser/**/*.ts', 'playwright.config.ts', 'vitest.config.ts'],
+    languageOptions: {
+      parser: tseslint.parser,
+      parserOptions: {
+        projectService: true,
+        tsconfigRootDir: import.meta.dirname
+      },
+      globals: {
+        ...globals.browser,
+        ...globals.node
+      }
+    },
+    plugins: {
+      '@typescript-eslint': tseslint.plugin
+    },
+    rules: {
+      ...js.configs.recommended.rules,
+      ...tseslint.configs.recommended.rules
+    }
   }
 ];

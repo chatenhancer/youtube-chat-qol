@@ -5,10 +5,10 @@
     "moduleResolution": "Bundler",
     "lib": ["DOM", "DOM.Iterable", "ES2022"],
     "resolveJsonModule": true,
-    "types": ["chrome"],
+    "types": ["chrome", "node"],
     "strict": true,
     "skipLibCheck": true,
     "noEmit": true
   },
-  "include": ["src/**/*.ts"]
+  "include": ["src/**/*.ts", "tests/**/*.ts", "vitest.config.ts", "playwright.config.ts"]
 }

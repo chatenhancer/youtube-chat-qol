@@ -19,18 +19,30 @@
     "cloudflare:deploy": "npx wrangler@4 deploy --config cloudflare/wrangler.toml",
     "publish:chrome": "node scripts/submit-chrome-webstore.mjs",
     "publish:firefox": "node scripts/submit-firefox-amo.mjs",
+    "test": "vitest run",
+    "test:browser": "npm run build:chrome && playwright test --config=playwright.config.ts --project=youtube-mock --project=youtube-live",
+    "test:browser:install": "playwright install --with-deps chromium",
+    "test:browser:live": "npm run build:chrome && playwright test --config=playwright.config.ts --project=youtube-live",
+    "test:browser:mock": "npm run build:chrome && playwright test --config=playwright.config.ts --project=youtube-mock",
+    "test:youtube-login": "node scripts/open-youtube-test-profile.mjs",
+    "test:youtube-live": "npm run test:browser:live",
+    "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
-    "check": "npm run typecheck && npm run lint"
+    "check": "npm run typecheck && npm run lint && npm run test"
   },
   "devDependencies": {
     "@eslint/js": "^9.27.0",
+    "@playwright/test": "^1.60.0",
     "@types/chrome": "^0.0.315",
+    "@types/node": "^25.9.1",
     "esbuild": "^0.25.4",
     "eslint": "^9.27.0",
     "globals": "^16.1.0",
+    "jsdom": "^29.1.1",
     "sharp": "^0.34.5",
     "typescript": "^5.8.3",
-    "typescript-eslint": "^8.32.1"
+    "typescript-eslint": "^8.32.1",
+    "vitest": "^4.1.7"
   }
 }

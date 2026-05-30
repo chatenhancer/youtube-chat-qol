@@ -333,6 +333,10 @@ ytd-menu-popup-renderer .ytcq-toggle-item[aria-checked="true"] .ytcq-menu-toggle
   font: 400 13px/18px Roboto, Arial, sans-serif;
 }
 
+.ytcq-composer-translate-panel[hidden] {
+  display: none;
+}
+
 .ytcq-composer-translate-label {
   display: block;
   flex: 0 0 auto;
