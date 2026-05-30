@@ -120,6 +120,10 @@ so the unpacked extension loads correctly.
 This is the browser smoke test that runs in CI. It avoids real YouTube, Google
 sign-in, and the persistent signed-in Chrome profile.
 
+CI runs this through `npm run verify` after the Chrome extension output has
+already been built, so the underlying Playwright command is not expected to
+rebuild the extension a second time.
+
 Real YouTube smoke tests stay headed by default. The signed-in live smoke can
 be tried headlessly for debugging:
 

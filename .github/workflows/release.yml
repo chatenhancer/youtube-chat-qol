@@ -25,14 +25,10 @@ jobs:
       - name: Validate release tag
         if: startsWith(github.ref, 'refs/tags/')
         run: node scripts/validate-release-tag.mjs
-      - name: Verify project
-        run: npm run verify
-      - name: Run mock YouTube browser smoke test
-        run: npx playwright test --config=playwright.config.ts --project=youtube-mock
+      - name: Build release archives
+        run: npm run zip
         env:
           YTCQ_HEADLESS: '1'
-      - name: Build release archives
-        run: node scripts/zip.mjs --all
       - name: Upload release archives
         uses: actions/upload-artifact@v6
         with:
