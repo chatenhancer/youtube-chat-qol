@@ -6,7 +6,7 @@
  * it only exists while the current chat page is open.
  */
 import { t } from '../../shared/i18n';
-import { createCloseIcon, createHomeIcon } from '../../shared/icons';
+import { createChannelIcon, createCloseIcon } from '../../shared/icons';
 import { ytcqCreateElement } from '../../shared/managed-dom';
 import { captureScrollPosition, restoreScrollPositionAfterRender, scrollElementToBottom } from '../../shared/scroll';
 import { findChatInput } from '../../youtube/chat-input';
@@ -163,7 +163,7 @@ function showProfileCard(source: ProfileSource, anchor: HTMLElement): void {
     channelButton.className = 'ytcq-profile-card-header-button ytcq-profile-card-channel';
     channelButton.title = t('openChannel');
     channelButton.setAttribute('aria-label', t('openChannel'));
-    channelButton.append(createHomeIcon());
+    channelButton.append(createChannelIcon());
     channelButton.addEventListener('click', (event) => {
       event.preventDefault();
       event.stopPropagation();
