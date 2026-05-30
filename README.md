@@ -11,7 +11,7 @@
   <a href="https://github.com/chat-enhancer-yt/youtube-chat-qol/actions/workflows/ci.yml"><img alt="ci" src="https://img.shields.io/github/actions/workflow/status/chat-enhancer-yt/youtube-chat-qol/ci.yml?label=ci"></a>
   <img alt="typescript" src="https://img.shields.io/badge/typescript-5.x-3178c6">
   <img alt="manifest v3" src="https://img.shields.io/badge/manifest-v3-4285f4">
-  <a href="LICENSE"><img alt="license" src="https://img.shields.io/badge/license-mit-97ca00"></a>
+  <a href="LICENSE"><img alt="license" src="https://img.shields.io/badge/license-GPL--3.0--or--later-97ca00"></a>
 </p>
 
 Suite of enhancements that make YouTube live chat easier to follow and participate in.
@@ -131,7 +131,9 @@ If those settings are missing, the workflow still produces release zips and skip
 
 ## License
 
-MIT. See [LICENSE](LICENSE).
+GPL-3.0-or-later. See [LICENSE](LICENSE).
+
+The `Chat Enhancer for YouTube` name, logo, and store listing assets are not licensed for use in a way that suggests an official release or endorsement.
 
 ## Project layout
 
