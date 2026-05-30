@@ -116,6 +116,28 @@ ytd-menu-popup-renderer .ytcq-menu-icon.ytcq-bell-ringing svg {
   animation: ytcq-bell-ring 620ms ease-in-out;
 }
 
+ytd-menu-popup-renderer .ytcq-translate-menu-icon {
+  transform-origin: center;
+}
+
+ytd-menu-popup-renderer .ytcq-translate-menu-icon .ytcq-translate-source-mark,
+ytd-menu-popup-renderer .ytcq-translate-menu-icon .ytcq-translate-target-mark {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+ytd-menu-popup-renderer .ytcq-translate-menu-icon.ytcq-translation-pulse {
+  animation: ytcq-translation-icon-pop 560ms cubic-bezier(0.18, 0.89, 0.32, 1.28);
+}
+
+ytd-menu-popup-renderer .ytcq-translate-menu-icon.ytcq-translation-pulse .ytcq-translate-source-mark {
+  animation: ytcq-translation-source-pop 560ms ease-out;
+}
+
+ytd-menu-popup-renderer .ytcq-translate-menu-icon.ytcq-translation-pulse .ytcq-translate-target-mark {
+  animation: ytcq-translation-target-pop 560ms ease-out 60ms;
+}
+
 @keyframes ytcq-bell-ring {
   0%,
   100% {
@@ -139,8 +161,56 @@ ytd-menu-popup-renderer .ytcq-menu-icon.ytcq-bell-ringing svg {
   }
 }
 
+@keyframes ytcq-translation-icon-pop {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  36% {
+    transform: scale(1.22);
+  }
+
+  68% {
+    transform: scale(0.94);
+  }
+}
+
+@keyframes ytcq-translation-source-pop {
+  0%,
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+
+  38% {
+    transform: scale(0.88) rotate(-10deg);
+  }
+
+  72% {
+    transform: scale(1.04) rotate(3deg);
+  }
+}
+
+@keyframes ytcq-translation-target-pop {
+  0%,
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+
+  34% {
+    transform: scale(1.32) rotate(11deg);
+  }
+
+  68% {
+    transform: scale(0.92) rotate(-3deg);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  ytd-menu-popup-renderer .ytcq-menu-icon.ytcq-bell-ringing svg {
+  ytd-menu-popup-renderer .ytcq-menu-icon.ytcq-bell-ringing svg,
+  ytd-menu-popup-renderer .ytcq-translate-menu-icon.ytcq-translation-pulse,
+  ytd-menu-popup-renderer .ytcq-translate-menu-icon.ytcq-translation-pulse .ytcq-translate-source-mark,
+  ytd-menu-popup-renderer .ytcq-translate-menu-icon.ytcq-translation-pulse .ytcq-translate-target-mark {
     animation: none;
   }
 }

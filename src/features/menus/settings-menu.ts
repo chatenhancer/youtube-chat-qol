@@ -9,9 +9,12 @@ import { getTargetLanguageUpdate, getTranslationToggleTarget, type Options } fro
 import { getOptions } from '../../shared/state';
 import { t } from '../../shared/i18n';
 import {
+  ICON_VIEW_BOX,
   SOUND_BELL_ICON_PATH,
   SOUND_RINGING_BELL_ICON_PATH,
-  TRANSLATE_ICON_PATH
+  TRANSLATE_ICON_PATH,
+  TRANSLATE_SOURCE_ICON_PATH,
+  TRANSLATE_TARGET_ICON_PATH
 } from '../../shared/icons';
 import { playSoftChime } from '../../shared/sounds/soft-chime';
 import { registerFeatureLifecycle } from '../../content/lifecycle';
@@ -22,6 +25,8 @@ type SaveOptions = (values: Partial<Options>) => void;
 let saveOptions: SaveOptions = () => {};
 
 const BELL_RING_CLASS = 'ytcq-bell-ringing';
+const TRANSLATION_PULSE_CLASS = 'ytcq-translation-pulse';
+const SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
 
 registerFeatureLifecycle({
   page: {
@@ -40,7 +45,8 @@ export function enhanceSettingsMenu(menu: HTMLElement): void {
 
   const options = getOptions();
   prepareSettingsMenu(menu);
-  const translateItem = createMenuToggleItem({
+  let translateItem: HTMLElement | null = null;
+  translateItem = createMenuToggleItem({
     setting: 'targetLanguage',
     label: t('translateChat'),
     checked: Boolean(options.targetLanguage),
@@ -50,9 +56,13 @@ export function enhanceSettingsMenu(menu: HTMLElement): void {
       const nextTargetLanguage = currentOptions.targetLanguage
         ? ''
         : getTranslationToggleTarget(currentOptions);
+      if (nextTargetLanguage && translateItem) {
+        animateTranslateMenuIcon(translateItem);
+      }
       saveOptions(getTargetLanguageUpdate(nextTargetLanguage));
     }
   });
+  prepareTranslateMenuIcon(translateItem);
   let soundItem: HTMLElement | null = null;
   soundItem = createMenuToggleItem({
     setting: 'sound',
@@ -112,6 +122,45 @@ function animateSoundMenuIcon(item: HTMLElement): void {
   window.setTimeout(() => {
     icon.classList.remove(BELL_RING_CLASS);
   }, 700);
+}
+
+function prepareTranslateMenuIcon(item: HTMLElement): void {
+  const icon = item.querySelector<HTMLElement>('.ytcq-menu-icon');
+  if (!icon) return;
+
+  icon.classList.add('ytcq-translate-menu-icon');
+  icon.replaceChildren(createSplitTranslateIcon());
+}
+
+function createSplitTranslateIcon(): SVGSVGElement {
+  const svg = document.createElementNS(SVG_NAMESPACE, 'svg');
+  svg.setAttribute('viewBox', ICON_VIEW_BOX);
+  svg.setAttribute('focusable', 'false');
+  svg.setAttribute('aria-hidden', 'true');
+  svg.append(
+    createTranslateIconPath(TRANSLATE_SOURCE_ICON_PATH, 'ytcq-translate-source-mark'),
+    createTranslateIconPath(TRANSLATE_TARGET_ICON_PATH, 'ytcq-translate-target-mark')
+  );
+  return svg;
+}
+
+function createTranslateIconPath(pathData: string, className: string): SVGPathElement {
+  const path = document.createElementNS(SVG_NAMESPACE, 'path');
+  path.setAttribute('class', className);
+  path.setAttribute('d', pathData);
+  return path;
+}
+
+function animateTranslateMenuIcon(item: HTMLElement): void {
+  const icon = item.querySelector<HTMLElement>('.ytcq-translate-menu-icon');
+  if (!icon) return;
+
+  icon.classList.remove(TRANSLATION_PULSE_CLASS);
+  void icon.getBoundingClientRect();
+  icon.classList.add(TRANSLATION_PULSE_CLASS);
+  window.setTimeout(() => {
+    icon.classList.remove(TRANSLATION_PULSE_CLASS);
+  }, 900);
 }
 
 function prepareSettingsMenu(menu: HTMLElement): void {
