@@ -2,6 +2,7 @@
   "name": "youtube-chat-qol",
   "version": "0.11.4",
   "private": true,
+  "license": "GPL-3.0-or-later",
   "type": "module",
   "scripts": {
     "build": "npm run check && node scripts/build.mjs --all",
