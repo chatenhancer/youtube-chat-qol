@@ -22,7 +22,7 @@ export interface KeywordPanelOptions {
 export function createKeywordToggleButton(): HTMLButtonElement {
   const button = ytcqCreateElement('button');
   button.type = 'button';
-  button.className = 'ytcq-profile-card-close ytcq-inbox-keyword-toggle';
+  button.className = 'ytcq-profile-card-header-button ytcq-inbox-keyword-toggle';
   button.title = t('addKeywords');
   button.setAttribute('aria-label', t('addKeywords'));
   button.setAttribute('aria-expanded', 'false');
