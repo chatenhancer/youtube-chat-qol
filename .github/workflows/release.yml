@@ -18,10 +18,17 @@ jobs:
         with:
           node-version: 22
           cache: npm
-      - run: npm ci
+      - name: Install dependencies
+        run: npm ci
+      - name: Install Playwright Chromium
+        run: npm run test:browser:install
       - name: Validate release tag
         if: startsWith(github.ref, 'refs/tags/')
         run: node scripts/validate-release-tag.mjs
+      - name: Run mock YouTube browser smoke test
+        run: npm run test:browser:mock
+        env:
+          YTCQ_HEADLESS: '1'
       - name: Build release archives
         run: npm run zip
       - name: Upload release archives
