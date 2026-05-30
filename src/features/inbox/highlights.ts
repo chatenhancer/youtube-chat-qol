@@ -6,6 +6,7 @@
  */
 import { getAuthorNameElement, getMessageTextElement } from '../../youtube/messages';
 import { ytcqCreateElement } from '../../shared/managed-dom';
+import { normalizeComparableText } from '../../shared/text';
 import type { InboxRecord, InlineHighlightMatch, InlineHighlightTerm } from './types';
 
 export const CHAT_KEYWORD_HIGHLIGHT_CLASS = 'ytcq-chat-keyword-highlight';
@@ -172,5 +173,5 @@ function getHighlightTerms(record: InboxRecord): InlineHighlightTerm[] {
 }
 
 function normalizeHighlightText(text: string): string {
-  return text.toLocaleLowerCase();
+  return normalizeComparableText(text);
 }

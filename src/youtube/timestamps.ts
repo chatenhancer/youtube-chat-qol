@@ -21,7 +21,7 @@ export function getChatTimestampValue(
   const normalized = cleanText(timestampText)
     .replace(/[−–—]/g, '-')
     .replace(/\./g, '')
-    .toLocaleUpperCase();
+    .toUpperCase();
   const match = normalized.match(/^(-?)(\d{1,4}):(\d{2})(?::(\d{2}))?\s*([AP]M)?$/);
   if (!match) return null;
 

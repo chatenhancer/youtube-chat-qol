@@ -6,7 +6,7 @@
  * @handle candidates from them. Feature modules can then process message
  * renderers through the same detection path without duplicating selectors.
  */
-import { cleanText } from '../shared/text';
+import { cleanText, normalizeComparableText } from '../shared/text';
 import { getMessageDetails } from '../youtube/messages';
 
 const MAX_PENDING_MENTION_MESSAGES = 40;
@@ -207,9 +207,7 @@ function normalizeHandle(value: string): string {
 }
 
 function normalizeMessageText(value: string): string {
-  return cleanText(value)
-    .toLocaleLowerCase()
-    .normalize('NFKC');
+  return normalizeComparableText(value);
 }
 
 function textContainsHandle(text: string, handle: string): boolean {

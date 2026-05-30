@@ -16,6 +16,7 @@ export function clampNumber(value: unknown, min: number, max: number, fallback: 
 
 export function normalizeComparableText(text: unknown): string {
   return cleanText(text)
+    .normalize('NFKC')
     .replace(MATH_X_CONFUSABLE_PATTERN, 'x')
     .toLowerCase();
 }
