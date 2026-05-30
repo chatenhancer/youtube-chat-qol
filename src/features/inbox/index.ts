@@ -16,7 +16,6 @@ import {
   clearChatKeywordHighlights
 } from './highlights';
 import {
-  initMentionDetection,
   isCurrentUserAuthorName,
   processPotentialMentionForConsumer,
   registerMentionProcessor
@@ -112,7 +111,6 @@ registerFeatureLifecycle({
 });
 
 export function initInbox(): void {
-  initMentionDetection();
   initInboxTabAlert();
   if (!registeredInbox) {
     registeredInbox = true;

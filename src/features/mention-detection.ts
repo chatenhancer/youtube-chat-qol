@@ -2,10 +2,12 @@
  * Current-user mention detection.
  *
  * YouTube does not expose a stable extension API for the signed-in chat handle,
- * so this module watches the native chat identity surfaces and derives likely
- * @handle candidates from them. Feature modules can then process message
- * renderers through the same detection path without duplicating selectors.
+ * so this module derives likely @handle candidates from native chat identity
+ * surfaces as the shared content lifecycle sees them. Feature modules can then
+ * process message renderers through the same detection path without
+ * duplicating selectors.
  */
+import { registerFeatureLifecycle, type FeatureMutationBatch } from '../content/lifecycle';
 import { cleanText, normalizeComparableText } from '../shared/text';
 import { getMessageDetails } from '../youtube/messages';
 
@@ -28,26 +30,22 @@ type MentionProcessor = (message: HTMLElement) => void;
 
 let cachedMentionKey = '';
 let cachedMentionCandidates: string[] = [];
-let mentionIdentityObserver: MutationObserver | null = null;
 let mentionIdentityRefreshTimer: number | null = null;
 const pendingMentionMessages = new Set<HTMLElement>();
 const mentionProcessors = new Set<MentionProcessor>();
 
+registerFeatureLifecycle({
+  page: {
+    init: initMentionDetection,
+    boot: refreshMentionCandidates,
+    cleanupStale: resetMentionDetectionTimer,
+    reset: resetMentionDetectionTimer
+  },
+  mutation: { collect: handleMentionIdentityMutations }
+});
+
 export function initMentionDetection(): void {
   refreshMentionCandidates();
-  if (mentionIdentityObserver || !document.documentElement) return;
-
-  mentionIdentityObserver = new MutationObserver((mutations) => {
-    if (mutations.some(mutationMayChangeMentionIdentity)) {
-      scheduleMentionCandidateRefresh();
-    }
-  });
-
-  mentionIdentityObserver.observe(document.documentElement, {
-    childList: true,
-    subtree: true,
-    characterData: true
-  });
 }
 
 export function registerMentionProcessor(processor: MentionProcessor): void {
@@ -137,6 +135,18 @@ function scheduleMentionCandidateRefresh(): void {
     mentionIdentityRefreshTimer = null;
     refreshMentionCandidates();
   }, 0);
+}
+
+function handleMentionIdentityMutations({ mutations }: FeatureMutationBatch): void {
+  if (mutations.some(mutationMayChangeMentionIdentity)) {
+    scheduleMentionCandidateRefresh();
+  }
+}
+
+function resetMentionDetectionTimer(): void {
+  if (mentionIdentityRefreshTimer === null) return;
+  window.clearTimeout(mentionIdentityRefreshTimer);
+  mentionIdentityRefreshTimer = null;
 }
 
 function mutationMayChangeMentionIdentity(mutation: MutationRecord): boolean {
