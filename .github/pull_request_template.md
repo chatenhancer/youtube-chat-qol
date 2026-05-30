@@ -13,7 +13,8 @@ Describe the change and the user-facing behavior it affects.
 
 ## Testing
 
-- [ ] `npm run build`
+- [ ] `npm run verify`
+- [ ] `npm run test:browser`
 - [ ] `npm run docs:build` if docs changed
 - [ ] Tested in Chrome
 - [ ] Tested in Firefox
