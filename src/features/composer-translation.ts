@@ -53,6 +53,7 @@ let lastTranslatedText = '';
 registerFeatureLifecycle({
   page: {
     init: ({ saveOptions }) => initComposerTranslation(saveOptions),
+    boot: refreshComposerTranslation,
     cleanupStale: cleanupStaleComposerTranslation,
     optionsChanged: refreshComposerTranslation,
     reset: resetComposerTranslation
