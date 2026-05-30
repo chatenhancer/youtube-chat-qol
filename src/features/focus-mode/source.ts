@@ -114,7 +114,7 @@ function getMentionNeedlesForAuthor(authorName: string): string[] {
 }
 
 function normalizeSearchText(value: string): string {
-  return cleanText(value).toLocaleLowerCase().normalize('NFKC');
+  return normalizeComparableText(value);
 }
 
 function isHandleCharacter(value: string): boolean {

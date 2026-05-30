@@ -4,7 +4,7 @@
  * Normalizes watched keywords and mention handles, performs case-insensitive
  * matching, and exposes conservative record dedupe lookup.
  */
-import { cleanText } from '../../shared/text';
+import { cleanText, normalizeComparableText } from '../../shared/text';
 import { findMatchingLiveMessageRecordIndex } from '../../youtube/message-dedupe';
 import type { InboxRecord } from './types';
 
@@ -111,12 +111,6 @@ export function getPreparedKeywordsKey(keywords: PreparedKeyword[]): string {
 
 function getKeywordsKey(keywords: PreparedKeyword[]): string {
   return keywords.map((keyword) => keyword.normalized).join('\n');
-}
-
-function normalizeComparableText(value: string): string {
-  return cleanText(value)
-    .toLocaleLowerCase()
-    .normalize('NFKC');
 }
 
 function textContainsHandle(text: string, handle: string): boolean {

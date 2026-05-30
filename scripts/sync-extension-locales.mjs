@@ -12,6 +12,11 @@ import { fileURLToPath } from 'node:url';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const localesSourceDir = path.join(root, 'src', 'shared', 'locales');
 const defaultOutputDir = path.join(root, 'dist', 'extension-chrome', '_locales');
+const webExtensionLocaleAliases = {
+  // WebExtension locale directories require regional Portuguese names.
+  // The source catalog is intentionally broad, so ship it to both variants.
+  pt: ['pt_BR', 'pt_PT']
+};
 
 export async function syncExtensionLocales(outputDir = defaultOutputDir) {
   const catalogs = await readLocaleCatalogs();
@@ -24,8 +29,9 @@ export async function syncExtensionLocales(outputDir = defaultOutputDir) {
 
   await Promise.all(Object.entries(catalogs)
     .filter(([, catalog]) => catalog.extension)
-    .map(async ([locale, catalog]) => {
-      const localeDir = path.join(outputDir, locale);
+    .flatMap(([locale, catalog]) => getWebExtensionLocales(locale).map((outputLocale) => ({ catalog, outputLocale })))
+    .map(async ({ catalog, outputLocale }) => {
+      const localeDir = path.join(outputDir, outputLocale);
       await mkdir(localeDir, { recursive: true });
       const messages = createExtensionMessages(defaultExtensionMessages, catalog.extension || {});
       await writeFile(path.join(localeDir, 'messages.json'), `${JSON.stringify(messages, null, 2)}\n`);
@@ -55,6 +61,10 @@ function createExtensionMessages(defaultMessages, localeMessages) {
 
     return [key, toWebExtensionMessage(message)];
   }));
+}
+
+function getWebExtensionLocales(locale) {
+  return webExtensionLocaleAliases[locale] || [locale];
 }
 
 function toWebExtensionMessage(message) {
