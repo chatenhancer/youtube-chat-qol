@@ -5,8 +5,8 @@
 # Chat Enhancer for YouTube
 
 <p>
-  <a href="https://chromewebstore.google.com/detail/pkhaaipeppfpakofgpdpcpkflangpghf"><img alt="chrome web store" src="https://img.shields.io/chrome-web-store/v/pkhaaipeppfpakofgpdpcpkflangpghf?label=chrome%20web%20store"></a>
-  <a href="https://addons.mozilla.org/firefox/addon/chat-enhancer-for-youtube/"><img alt="firefox add-ons" src="https://img.shields.io/amo/v/chat-enhancer-for-youtube?label=firefox%20add-ons"></a>
+  <a href="https://www.chatenhancer.com/chrome"><img alt="chrome web store" src="https://img.shields.io/chrome-web-store/v/pkhaaipeppfpakofgpdpcpkflangpghf?label=chrome%20web%20store"></a>
+  <a href="https://www.chatenhancer.com/firefox"><img alt="firefox add-ons" src="https://img.shields.io/amo/v/chat-enhancer-for-youtube?label=firefox%20add-ons"></a>
   <img alt="source version" src="https://img.shields.io/github/package-json/v/chat-enhancer-yt/youtube-chat-qol?label=source">
   <a href="https://github.com/chat-enhancer-yt/youtube-chat-qol/actions/workflows/ci.yml"><img alt="ci" src="https://img.shields.io/github/actions/workflow/status/chat-enhancer-yt/youtube-chat-qol/ci.yml?label=ci"></a>
   <img alt="typescript" src="https://img.shields.io/badge/typescript-5.x-3178c6">
@@ -18,7 +18,7 @@ Suite of enhancements that make YouTube live chat easier to follow and participa
 
 Not affiliated with YouTube or Google.
 
-[Website](https://www.chatenhancer.com) · [Chrome Web Store](https://chromewebstore.google.com/detail/pkhaaipeppfpakofgpdpcpkflangpghf) · [Firefox Add-ons](https://addons.mozilla.org/firefox/addon/chat-enhancer-for-youtube/)
+[Website](https://www.chatenhancer.com) · [Chrome Web Store](https://www.chatenhancer.com/chrome) · [Firefox Add-ons](https://www.chatenhancer.com/firefox)
 
 ## Features
 
