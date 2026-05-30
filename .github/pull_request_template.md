@@ -29,7 +29,7 @@ Describe the change and the user-facing behavior it affects.
 - [ ] Avatar/profile card
 - [ ] Inbox / keyword highlights
 - [ ] Inbox sound / tab alert
-- [ ] Keep chat live
+- [ ] Background chat updates / reconnect
 - [ ] Extension popup
 - [ ] Docs/assets only
 - [ ] Other:

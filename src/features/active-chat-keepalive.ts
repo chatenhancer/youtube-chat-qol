@@ -31,14 +31,14 @@ interface ReconnectDraft {
 registerFeatureLifecycle({
   page: {
     init: startActiveChatKeepAlive,
-    cleanupStale: cleanupStaleReconnectNotice
+    cleanupStale: cleanupStaleReconnectNotice,
+    visibilityChanged: showPendingReconnectNotice
   }
 });
 
 export function startActiveChatKeepAlive(): void {
   restoreReconnectDraft();
   if (keepAlivePort) return;
-  document.addEventListener('visibilitychange', showPendingReconnectNotice);
 
   try {
     keepAlivePort = chrome.runtime.connect({ name: ACTIVE_CHAT_PORT_NAME });
@@ -102,8 +102,8 @@ function showReconnectNotice(): void {
   reconnectNotice = button;
 }
 
-function showPendingReconnectNotice(): void {
-  if (!reconnectNoticePending || document.visibilityState === 'hidden') return;
+function showPendingReconnectNotice(visibilityState: Document['visibilityState']): void {
+  if (!reconnectNoticePending || visibilityState === 'hidden') return;
   showReconnectNotice();
 }
 

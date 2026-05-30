@@ -19,7 +19,7 @@ body:
         - Avatar profile card
         - Inbox / keyword highlights
         - Inbox sound
-        - Keep chat live
+        - Background chat updates / alerts
         - Frequent emoji row
         - Chat commands
         - Extension popup
@@ -83,7 +83,7 @@ body:
     id: related-settings
     attributes:
       label: Related settings or keywords
-      description: If the issue involves translation, inbox, keywords, sound, emoji, or keep-chat-live behavior, include the relevant settings.
+      description: If the issue involves translation, inbox, keywords, sound, emoji, or background chat alerts, include the relevant settings.
       placeholder: "Translate chat: on; inbox sound: on; watched keywords: robot, battery"
 
   - type: textarea

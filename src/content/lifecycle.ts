@@ -158,8 +158,8 @@ export interface FeaturePageLifecycle {
    *
    * Use for capped recovery work that should happen after background-tab live
    * edge recovery, such as translation backfill. This is not a general
-   * visibility listener; features that need raw visibility events should wire
-   * their own page listener in `init`.
+   * visibility listener; features that need raw foreground/background events
+   * should use `visibilityChanged`.
    */
   visibleRecovery?: LifecycleCallback;
 
