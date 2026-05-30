@@ -426,6 +426,10 @@ yt-live-chat-header-renderer .ytcq-inbox-badge[hidden] {
   align-items: center;
 }
 
+.ytcq-profile-card-header-has-channel {
+  grid-template-columns: 36px minmax(0, 1fr) 28px 28px;
+}
+
 .ytcq-profile-card-avatar {
   width: 36px;
   height: 36px;
@@ -513,7 +517,7 @@ yt-live-chat-header-renderer .ytcq-inbox-badge[hidden] {
   font: 400 12px/16px Roboto, Arial, sans-serif;
 }
 
-.ytcq-profile-card-close {
+.ytcq-profile-card-header-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -528,15 +532,15 @@ yt-live-chat-header-renderer .ytcq-inbox-badge[hidden] {
   cursor: pointer;
 }
 
-.ytcq-profile-card-close svg {
+.ytcq-profile-card-header-button svg {
   display: block;
   width: 18px;
   height: 18px;
   pointer-events: none;
 }
 
-.ytcq-profile-card-close:hover,
-.ytcq-profile-card-close:focus {
+.ytcq-profile-card-header-button:hover,
+.ytcq-profile-card-header-button:focus {
   color: var(--yt-spec-text-primary, var(--yt-live-chat-primary-text-color, #f1f1f1));
   background: var(--yt-spec-badge-chip-background, rgba(255, 255, 255, 0.1));
   outline: none;

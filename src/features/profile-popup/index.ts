@@ -6,7 +6,7 @@
  * it only exists while the current chat page is open.
  */
 import { t } from '../../shared/i18n';
-import { createCloseIcon } from '../../shared/icons';
+import { createCloseIcon, createHomeIcon } from '../../shared/icons';
 import { ytcqCreateElement } from '../../shared/managed-dom';
 import { captureScrollPosition, restoreScrollPositionAfterRender, scrollElementToBottom } from '../../shared/scroll';
 import { findChatInput } from '../../youtube/chat-input';
@@ -19,7 +19,7 @@ import {
 } from '../user-message-history';
 import { registerFeatureLifecycle } from '../../content/lifecycle';
 import { mentionAuthorName } from '../reply';
-import { getChannelUrl } from '../channel-popup';
+import { getChannelUrl, openChannelWindow } from '../channel-popup';
 import { createAvatarElement, createProfileAvatarButton } from './elements';
 import { renderProfileMessages, shouldRefreshProfileMessages } from './messages';
 import { keepProfileCardInViewport, positionProfileCard } from './positioning';
@@ -122,7 +122,9 @@ function showProfileCard(source: ProfileSource, anchor: HTMLElement): void {
   card.setAttribute('aria-label', t('recentMessagesFromThisUser'));
 
   const header = ytcqCreateElement('div');
-  header.className = 'ytcq-profile-card-header';
+  header.className = source.profileUrl
+    ? 'ytcq-profile-card-header ytcq-profile-card-header-has-channel'
+    : 'ytcq-profile-card-header';
 
   const avatar = createAvatarElement(source.avatarSrc);
   header.append(source.profileUrl ? createProfileAvatarButton(avatar, source.profileUrl) : avatar);
@@ -155,9 +157,24 @@ function showProfileCard(source: ProfileSource, anchor: HTMLElement): void {
   titleWrap.append(title, subtitle);
   header.append(titleWrap);
 
+  if (source.profileUrl) {
+    const channelButton = ytcqCreateElement('button');
+    channelButton.type = 'button';
+    channelButton.className = 'ytcq-profile-card-header-button ytcq-profile-card-channel';
+    channelButton.title = t('openChannel');
+    channelButton.setAttribute('aria-label', t('openChannel'));
+    channelButton.append(createHomeIcon());
+    channelButton.addEventListener('click', (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      openChannelWindow(source.profileUrl);
+    });
+    header.append(channelButton);
+  }
+
   const closeButton = ytcqCreateElement('button');
   closeButton.type = 'button';
-  closeButton.className = 'ytcq-profile-card-close';
+  closeButton.className = 'ytcq-profile-card-header-button ytcq-profile-card-close';
   closeButton.setAttribute('aria-label', t('close'));
   closeButton.append(createCloseIcon());
   closeButton.addEventListener('click', closeProfileCard);

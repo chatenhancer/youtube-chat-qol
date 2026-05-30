@@ -235,7 +235,7 @@ function renderInboxList(list: HTMLElement): void {
 function createCardCloseButton(): HTMLButtonElement {
   const closeButton = ytcqCreateElement('button');
   closeButton.type = 'button';
-  closeButton.className = 'ytcq-profile-card-close';
+  closeButton.className = 'ytcq-profile-card-header-button ytcq-profile-card-close';
   closeButton.setAttribute('aria-label', t('close'));
   closeButton.append(createCloseIcon());
   closeButton.addEventListener('click', closeInboxCard);
