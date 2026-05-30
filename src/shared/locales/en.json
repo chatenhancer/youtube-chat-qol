@@ -207,7 +207,7 @@
       "message": "Choose the language chat messages should be translated into. Off disables automatic translation."
     },
     "translateTo": {
-      "message": "Translate to"
+      "message": "Translate chat to"
     },
     "translationOffHelper": {
       "message": "Off disables automatic translation."

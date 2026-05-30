@@ -207,7 +207,7 @@
       "message": "Escolha o idioma para o qual as mensagens do chat devem ser traduzidas. Desativado desliga a tradução automática."
     },
     "translateTo": {
-      "message": "Traduzir para"
+      "message": "Traduzir chat para"
     },
     "translationOffHelper": {
       "message": "Desativado desliga a tradução automática."

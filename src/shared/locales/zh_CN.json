@@ -207,7 +207,7 @@
       "message": "选择聊天消息要翻译成的语言。关闭会停用自动翻译。"
     },
     "translateTo": {
-      "message": "翻译为"
+      "message": "将聊天翻译为"
     },
     "translationOffHelper": {
       "message": "关闭会停用自动翻译。"

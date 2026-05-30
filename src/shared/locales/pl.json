@@ -204,7 +204,7 @@
       "message": "Wybierz język, na który mają być tłumaczone wiadomości czatu. Wyłączone zatrzymuje automatyczne tłumaczenie."
     },
     "translateTo": {
-      "message": "Tłumacz na"
+      "message": "Tłumacz czat na"
     },
     "translationOffHelper": {
       "message": "Wyłączone zatrzymuje automatyczne tłumaczenie."

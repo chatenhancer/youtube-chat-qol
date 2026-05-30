@@ -207,7 +207,7 @@
       "message": "チャットメッセージの翻訳先言語を選びます。オフにすると自動翻訳は無効になります。"
     },
     "translateTo": {
-      "message": "翻訳先"
+      "message": "チャットの翻訳先"
     },
     "translationOffHelper": {
       "message": "オフにすると自動翻訳は無効になります。"

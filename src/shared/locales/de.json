@@ -204,7 +204,7 @@
       "message": "Wähle die Sprache, in die Chatnachrichten übersetzt werden sollen. Aus deaktiviert die automatische Übersetzung."
     },
     "translateTo": {
-      "message": "Übersetzen in"
+      "message": "Chat übersetzen in"
     },
     "translationOffHelper": {
       "message": "Aus deaktiviert die automatische Übersetzung."

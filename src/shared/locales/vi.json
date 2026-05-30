@@ -204,7 +204,7 @@
       "message": "Chọn ngôn ngữ để dịch tin nhắn chat sang. Tắt sẽ tắt dịch tự động."
     },
     "translateTo": {
-      "message": "Dịch sang"
+      "message": "Dịch chat sang"
     },
     "translationOffHelper": {
       "message": "Tắt sẽ tắt dịch tự động."

@@ -204,7 +204,7 @@
       "message": "選擇聊天室訊息要翻譯成的語言。關閉會停用自動翻譯。"
     },
     "translateTo": {
-      "message": "翻譯成"
+      "message": "將聊天室翻譯成"
     },
     "translationOffHelper": {
       "message": "關閉會停用自動翻譯。"
