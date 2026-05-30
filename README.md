@@ -98,16 +98,18 @@ npm run build:firefox
 - `npm run typecheck` checks TypeScript.
 - `npm run lint` runs ESLint.
 - `npm run check` runs typecheck and lint.
+- `npm run test` runs the Vitest unit tests.
+- `npm run verify` runs `check`, unit tests, the full extension build, and localized docs build.
 - `npm run docs:build` regenerates localized docs and the sitemap when docs change.
 - `npm run docs:screenshots` regenerates README/site showcase images and localized store screenshots when needed.
-- `npm run build` runs `check`, then writes Chrome, Edge, and Firefox unpacked extension folders.
-- `npm run build:chrome`, `npm run build:edge`, and `npm run build:firefox` run `check`, then write one browser's unpacked extension folder.
-- `npm run zip` runs `build`, then writes Chrome, Edge, Firefox, and tracked source release archives to `dist/release/`.
+- `npm run build` writes Chrome, Edge, and Firefox unpacked extension folders.
+- `npm run build:chrome`, `npm run build:edge`, and `npm run build:firefox` write one browser's unpacked extension folder.
+- `npm run zip` runs `verify`, then writes Chrome, Edge, Firefox, and tracked source release archives to `dist/release/`.
 
 ## Release
 
 1. Update `version` in `package.json`.
-2. Run `npm run build`.
+2. Run `npm run verify`.
 3. Commit the version bump and create a tag such as `v0.7.6`.
 4. Push the commit and tag.
 

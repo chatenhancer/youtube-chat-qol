@@ -19,11 +19,9 @@ jobs:
         run: npm ci
       - name: Install Playwright Chromium
         run: npm run test:browser:install
-      - name: Build extension
-        run: npm run build
-      - name: Build docs
-        run: npm run docs:build
+      - name: Verify project
+        run: npm run verify
       - name: Run mock YouTube browser smoke test
-        run: npm run test:browser:mock
+        run: npx playwright test --config=playwright.config.ts --project=youtube-mock
         env:
           YTCQ_HEADLESS: '1'
