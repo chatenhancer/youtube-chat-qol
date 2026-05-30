@@ -1,9 +1,8 @@
 /*
  * Release archive script.
  *
- * Packages browser-specific dist/extension-* folders into versioned zips after
- * the normal build has
- * produced a Web Store-ready extension directory.
+ * Packages built dist/extension-* folders into versioned browser-store zips
+ * and adds the tracked source archive required by Firefox AMO.
  */
 import { mkdir, rm } from 'node:fs/promises';
 import path from 'node:path';
