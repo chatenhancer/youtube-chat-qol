@@ -22,12 +22,13 @@ const MESSAGE_MENU_MARKER_SELECTOR = [
 export async function openSettingsMenu(chat: ChatSurface): Promise<Locator> {
   await test.step('Click chat settings menu button', async () => {
     await closeOpenMenus(chat);
+    await resetOuterPageScroll(chat);
     const menuButton = chat.locator([
       'yt-live-chat-header-renderer #live-chat-header-context-menu button',
       'yt-live-chat-header-renderer #live-chat-header-context-menu yt-icon-button',
       'yt-live-chat-header-renderer #live-chat-header-context-menu'
     ].join(',')).first();
-    await menuButton.click({ force: true, timeout: 10_000 });
+    await menuButton.click({ timeout: 10_000 });
   });
 
   return test.step('Wait for native settings menu popup', async () => waitForVisibleMenu(
@@ -96,6 +97,17 @@ export async function openMessageMenu(chat: ChatSurface): Promise<Locator> {
 
 async function closeOpenMenus(chat: ChatSurface): Promise<void> {
   await chat.locator('body').press('Escape').catch(() => undefined);
+}
+
+async function resetOuterPageScroll(chat: ChatSurface): Promise<void> {
+  await chat.locator('body').evaluate(() => {
+    try {
+      window.parent?.scrollTo(0, 0);
+    } catch {
+      // Live chat may be isolated differently by the browser; normal click
+      // actionability still protects us from clicking through top-page chrome.
+    }
+  }).catch(() => undefined);
 }
 
 async function waitForVisibleMenu(
