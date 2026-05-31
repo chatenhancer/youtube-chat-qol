@@ -74,9 +74,7 @@ async function expectAuthorClickInsertsMentionDraft(chat: ChatSurface): Promise<
 async function expectMentionMenuActionInsertsDraft(chat: ChatSurface): Promise<void> {
   await clearComposerForAction(chat, 'Clear composer before Mention action');
 
-  await openMessageMenu(chat);
-
-  const menu = chat.locator('ytd-menu-popup-renderer').last();
+  const menu = await openMessageMenu(chat);
   const mentionAction = menu.locator('.ytcq-context-item').nth(1);
   await test.step('Click injected Mention action', async () => {
     await expect(mentionAction).toBeVisible({ timeout: 10_000 });
@@ -97,10 +95,10 @@ async function expectMentionMenuActionInsertsDraft(chat: ChatSurface): Promise<v
 async function expectQuoteMenuActionInsertsDraft(chat: ChatSurface): Promise<void> {
   await clearComposerForAction(chat, 'Clear composer before Quote action');
 
-  await openMessageMenu(chat);
+  const menu = await openMessageMenu(chat);
 
   await test.step('Click injected Quote action', async () => {
-    await chat.locator('ytd-menu-popup-renderer').last().locator('.ytcq-context-item').first().click({ force: true });
+    await menu.locator('.ytcq-context-item').first().click({ force: true });
   });
 
   await test.step('Verify composer contains quote draft', async () => {
