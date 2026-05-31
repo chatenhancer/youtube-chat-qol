@@ -135,6 +135,8 @@ If those settings are missing, the workflow still produces release zips and skip
 
 GPL-3.0-or-later. See [LICENSE](LICENSE).
 
+Third-party icon and font notices are listed in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+
 The `Chat Enhancer for YouTube` name, logo, and store listing assets are not licensed for use in a way that suggests an official release or endorsement.
 
 ## Project layout

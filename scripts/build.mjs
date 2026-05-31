@@ -72,11 +72,14 @@ async function buildTarget(target) {
     copyFile(path.join(root, 'src', 'content.css'), path.join(extensionDir, 'content.css')),
     copyFile(path.join(root, 'src', 'popup.css'), path.join(extensionDir, 'popup.css')),
     copyFile(path.join(root, 'src', 'popup.html'), path.join(extensionDir, 'popup.html')),
+    copyFile(path.join(root, 'LICENSE'), path.join(extensionDir, 'LICENSE')),
+    copyFile(path.join(root, 'THIRD_PARTY_NOTICES.md'), path.join(extensionDir, 'THIRD_PARTY_NOTICES.md')),
     copyFile(path.join(root, 'assets', 'logo.png'), path.join(extensionDir, 'logo.png')),
     copyFile(path.join(root, 'assets', 'logo-white.png'), path.join(extensionDir, 'logo-white.png')),
     syncExtensionLocales(path.join(extensionDir, '_locales')),
     cp(path.join(root, 'assets', 'fonts'), path.join(extensionDir, 'fonts'), { recursive: true }),
-    cp(path.join(root, 'assets', 'icons'), path.join(extensionDir, 'icons'), { recursive: true })
+    cp(path.join(root, 'assets', 'icons'), path.join(extensionDir, 'icons'), { recursive: true }),
+    cp(path.join(root, 'assets', 'licenses'), path.join(extensionDir, 'licenses'), { recursive: true })
   ]);
 
   await writeFile(
