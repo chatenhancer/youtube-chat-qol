@@ -5,13 +5,21 @@
  * fixture provides just enough menu behavior for those clicks to create a
  * native-looking menu node, so scenarios do not need fixture-specific hooks.
  */
-import { expect, test } from '@playwright/test';
+import { expect, test, type Locator } from '@playwright/test';
 import {
   NORMAL_CHAT_MESSAGE_SELECTOR,
   type ChatSurface
 } from './types';
 
-export async function openSettingsMenu(chat: ChatSurface): Promise<void> {
+const MENU_POPUP_SELECTOR = 'ytd-menu-popup-renderer';
+const SETTINGS_MENU_MARKER_SELECTOR = 'yt-live-chat-toggle-renderer, .ytcq-settings-item';
+const MESSAGE_MENU_MARKER_SELECTOR = [
+  'ytd-menu-service-item-renderer',
+  'ytd-menu-navigation-item-renderer',
+  '.ytcq-context-item'
+].join(',');
+
+export async function openSettingsMenu(chat: ChatSurface): Promise<Locator> {
   await test.step('Click chat settings menu button', async () => {
     await closeOpenMenus(chat);
     const menuButton = chat.locator([
@@ -22,12 +30,15 @@ export async function openSettingsMenu(chat: ChatSurface): Promise<void> {
     await menuButton.click({ force: true, timeout: 10_000 });
   });
 
-  await test.step('Wait for native settings menu popup', async () => {
-    await expect(chat.locator('ytd-menu-popup-renderer').last()).toBeVisible({ timeout: 10_000 });
-  });
+  return test.step('Wait for native settings menu popup', async () => waitForVisibleMenu(
+    chat,
+    SETTINGS_MENU_MARKER_SELECTOR,
+    'native settings menu popup',
+    10_000
+  ));
 }
 
-export async function openMessageMenu(chat: ChatSurface): Promise<void> {
+export async function openMessageMenu(chat: ChatSurface): Promise<Locator> {
   await test.step('Close any open native menus', async () => {
     await closeOpenMenus(chat);
   });
@@ -39,7 +50,7 @@ export async function openMessageMenu(chat: ChatSurface): Promise<void> {
     await messages.last().waitFor({ state: 'visible', timeout: 45_000 });
   });
 
-  await test.step('Click a message menu button', async () => {
+  return test.step('Click a message menu button', async () => {
     const messages = chat.locator(NORMAL_CHAT_MESSAGE_SELECTOR).filter({
       has: chat.locator('#menu')
     });
@@ -60,9 +71,22 @@ export async function openMessageMenu(chat: ChatSurface): Promise<void> {
       for (const menuTarget of menuTargets) {
         if (!await menuTarget.isVisible({ timeout: 500 }).catch(() => false)) continue;
         await menuTarget.click({ force: true, timeout: 1_000 }).catch(() => undefined);
-        if (await waitForMessageMenu(chat)) return;
+        const openedMenu = await waitForVisibleMenu(
+          chat,
+          MESSAGE_MENU_MARKER_SELECTOR,
+          'message context menu popup',
+          1_000
+        ).catch(() => null);
+        if (openedMenu) return openedMenu;
         await menuTarget.dispatchEvent('click').catch(() => undefined);
-        if (await waitForMessageMenu(chat)) return;
+        const dispatchedMenu = await waitForVisibleMenu(
+          chat,
+          MESSAGE_MENU_MARKER_SELECTOR,
+          'message context menu popup',
+          1_000
+        ).catch(() => null);
+        if (dispatchedMenu) return dispatchedMenu;
+        await closeOpenMenus(chat);
       }
     }
 
@@ -74,8 +98,52 @@ async function closeOpenMenus(chat: ChatSurface): Promise<void> {
   await chat.locator('body').press('Escape').catch(() => undefined);
 }
 
-async function waitForMessageMenu(chat: ChatSurface): Promise<boolean> {
-  return chat.locator('ytd-menu-popup-renderer').last()
-    .isVisible({ timeout: 1_000 })
-    .catch(() => false);
+async function waitForVisibleMenu(
+  chat: ChatSurface,
+  markerSelector: string,
+  menuDescription: string,
+  timeout: number
+): Promise<Locator> {
+  await expect.poll(async () => {
+    const menu = await findVisibleMenu(chat, markerSelector);
+    return menu !== null;
+  }, {
+    message: `Expected ${menuDescription} to become visible.`,
+    timeout
+  }).toBe(true);
+
+  const menu = await findVisibleMenu(chat, markerSelector);
+  if (!menu) {
+    throw new Error(`Expected ${menuDescription} to be visible, but only hidden or unrelated menu nodes were found.`);
+  }
+
+  return menu;
+}
+
+async function findVisibleMenu(chat: ChatSurface, markerSelector: string): Promise<Locator | null> {
+  const menus = chat.locator(MENU_POPUP_SELECTOR).filter({
+    has: chat.locator(markerSelector)
+  });
+  const count = await menus.count();
+
+  for (let index = count - 1; index >= 0; index -= 1) {
+    const menu = menus.nth(index);
+    if (
+      await menu.isVisible().catch(() => false) &&
+      await hasUsableMenuBox(menu)
+    ) {
+      return menu;
+    }
+  }
+
+  return null;
+}
+
+// YouTube can leave collapsed popup shells in the DOM near chat edges; those
+// are technically visible to Playwright but cannot receive a real user click.
+async function hasUsableMenuBox(menu: Locator): Promise<boolean> {
+  return menu.evaluate((element) => {
+    const rect = element.getBoundingClientRect();
+    return rect.width >= 48 && rect.height >= 24;
+  }).catch(() => false);
 }

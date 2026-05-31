@@ -173,13 +173,72 @@ export function createLiveChatFixtureHtml({
     </yt-live-chat-app>
 
     <script>
-      const message = document.querySelector('#fixture-message-1');
-      message.data = {
-        authorExternalChannelId: 'fixture-channel-1',
-        authorName: { simpleText: '@ExampleCreator' },
-        id: 'fixture-message-1',
-        message: { runs: [{ text: 'Hola mundo' }] },
-        timestampUsec: '1779396300000000'
+      const scroller = document.querySelector('#item-scroller');
+      const items = document.querySelector('#items');
+      let nextMessageNumber = 1;
+      const fixtureMessages = [
+        { author: '@ExampleCreator', channel: 'fixture-channel-1', text: 'Hola mundo' },
+        { author: '@ChatFan', channel: 'fixture-channel-2', text: 'Gracias por el stream' },
+        { author: '@NightViewer', channel: 'fixture-channel-3', text: 'This mock chat is still moving' },
+        { author: '@StreamHelper', channel: 'fixture-channel-4', text: 'Bonjour le chat' },
+        { author: '@EmojiFan', channel: 'fixture-channel-5', text: 'Great moment 😄' },
+        { author: '@LateViewer', channel: 'fixture-channel-6', text: 'Llegué tarde pero aquí estoy' }
+      ];
+
+      const getMessageId = (number) => \`fixture-message-\${number}\`;
+
+      const createAvatarSrc = (label, index) => {
+        const colors = ['3f8cff', 'ff7043', '7e57c2', '26a69a', 'ef5350', '8d6e63'];
+        return \`data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Crect width='32' height='32' rx='16' fill='%23\${colors[index % colors.length]}'/%3E%3Ctext x='16' y='21' text-anchor='middle' fill='white' font-size='16'%3E\${encodeURIComponent(label)}%3C/text%3E%3C/svg%3E\`;
+      };
+
+      const attachMessageData = (message, fixtureMessage, number) => {
+        const id = getMessageId(number);
+        message.data = {
+          authorExternalChannelId: fixtureMessage.channel,
+          authorName: { simpleText: fixtureMessage.author },
+          id,
+          message: { runs: [{ text: fixtureMessage.text }] },
+          timestampUsec: String(1779396300000000 + (number * 1000000))
+        };
+      };
+
+      const createMessage = (fixtureMessage, number) => {
+        const id = getMessageId(number);
+        const message = document.createElement('yt-live-chat-text-message-renderer');
+        message.id = id;
+        message.dataset.messageId = id;
+        message.innerHTML = \`
+          <button id="author-photo" type="button">
+            <img alt="" src="\${createAvatarSrc(fixtureMessage.author.replace(/^@/, '').slice(0, 1).toUpperCase(), number)}">
+          </button>
+          <div id="content">
+            <span id="timestamp">10:0\${Math.min(number + 4, 9)} PM</span>
+            <span id="author-name">\${fixtureMessage.author}</span>
+            <span id="message">\${fixtureMessage.text}</span>
+          </div>
+          <button id="menu" type="button" aria-label="Message actions">⋮</button>
+        \`;
+        attachMessageData(message, fixtureMessage, number);
+        return message;
+      };
+
+      const initialMessage = document.querySelector('#fixture-message-1');
+      attachMessageData(initialMessage, fixtureMessages[0], 1);
+      nextMessageNumber = 2;
+
+      const appendFixtureMessage = () => {
+        if (!items || !scroller || nextMessageNumber > fixtureMessages.length) return;
+
+        const wasAtBottom = scroller.scrollTop + scroller.clientHeight >= scroller.scrollHeight - 4;
+        const fixtureMessage = fixtureMessages[nextMessageNumber - 1];
+        items.append(createMessage(fixtureMessage, nextMessageNumber));
+        nextMessageNumber += 1;
+
+        if (wasAtBottom) {
+          scroller.scrollTop = scroller.scrollHeight;
+          scroller.dispatchEvent(new Event('scroll', { bubbles: true }));
+        }
       };
 
       const removeOpenMenus = () => {
@@ -203,10 +262,16 @@ export function createLiveChatFixtureHtml({
       };
 
       document.querySelector('#live-chat-header-context-menu button').addEventListener('click', addSettingsMenu);
-      document.querySelector('#fixture-message-1 #menu').addEventListener('click', addMessageMenu);
+      document.addEventListener('click', (event) => {
+        const target = event.target instanceof Element ? event.target.closest('#menu') : null;
+        if (!target?.closest('yt-live-chat-text-message-renderer')) return;
+        addMessageMenu();
+      });
       document.addEventListener('keydown', (event) => {
         if (event.key === 'Escape') removeOpenMenus();
       });
+      window.setTimeout(appendFixtureMessage, 300);
+      window.setInterval(appendFixtureMessage, 1200);
     </script>
   </body>
 </html>`;

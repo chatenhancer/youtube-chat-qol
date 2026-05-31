@@ -49,8 +49,9 @@ npm run test:browser:mock
 ```
 
 This builds the Chrome extension and opens a deterministic local fixture that
-looks like a small YouTube live chat page. It does not use a real YouTube page,
-does not require login, and is the safest browser smoke test to run often.
+looks like a small YouTube live chat page with new messages arriving.
+It does not use a real YouTube page, does not require login, and is the safest
+browser smoke test to run often.
 
 It runs both mock auth states:
 
