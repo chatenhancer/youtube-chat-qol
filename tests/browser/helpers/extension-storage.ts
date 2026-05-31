@@ -27,6 +27,20 @@ export async function withExtensionStorageValues<T>(
   }
 }
 
+export async function withExtensionStorageSnapshot<T>(
+  context: BrowserContext,
+  area: StorageArea,
+  callback: () => Promise<T>
+): Promise<T> {
+  const previous = await readEntireExtensionStorage(context, area);
+
+  try {
+    return await callback();
+  } finally {
+    await replaceExtensionStorageValues(context, area, previous);
+  }
+}
+
 export async function getExtensionStorageValues(
   context: BrowserContext,
   area: StorageArea,
@@ -58,6 +72,18 @@ async function readExtensionStorageSnapshot(
   ));
 }
 
+async function readEntireExtensionStorage(
+  context: BrowserContext,
+  area: StorageArea
+): Promise<StorageValues> {
+  return withExtensionPage(context, (page) => page.evaluate(
+    ({ storageArea }) => new Promise((resolve) => {
+      chrome.storage[storageArea].get(null, (stored) => resolve(stored));
+    }),
+    { storageArea: area }
+  ));
+}
+
 async function setExtensionStorageValues(
   context: BrowserContext,
   area: StorageArea,
@@ -66,6 +92,21 @@ async function setExtensionStorageValues(
   await withExtensionPage(context, (page) => page.evaluate(
     ({ storageArea, storageValues }) => new Promise<void>((resolve) => {
       chrome.storage[storageArea].set(storageValues, () => resolve());
+    }),
+    { storageArea: area, storageValues: values }
+  ));
+}
+
+async function replaceExtensionStorageValues(
+  context: BrowserContext,
+  area: StorageArea,
+  values: StorageValues
+): Promise<void> {
+  await withExtensionPage(context, (page) => page.evaluate(
+    ({ storageArea, storageValues }) => new Promise<void>((resolve) => {
+      chrome.storage[storageArea].clear(() => {
+        chrome.storage[storageArea].set(storageValues, () => resolve());
+      });
     }),
     { storageArea: area, storageValues: values }
   ));

@@ -5,12 +5,20 @@
  * coverage stays aligned between the deterministic fixture and real YouTube.
  */
 import { attachScenario } from './attach';
-import { composerTranslationScenario } from './composer-translation';
+import { chatCommandsScenario } from './chat-commands';
+import {
+  composerTranslationScenario,
+  mockedComposerTranslationScenario,
+  realComposerTranslationScenario
+} from './composer-translation';
+import { focusPanelScenario } from './focus';
+import { frequentEmojiScenario } from './frequent-emojis';
 import { inboxScenario } from './inbox';
 import {
   messageTranslationScenario,
   realMessageTranslationScenario,
-  translationDisplayScenario
+  translationDisplayScenario,
+  translationSettingsReactScenario
 } from './message-translation';
 import {
   authorMentionDraftScenario,
@@ -21,11 +29,13 @@ import {
   messageMenuScenario,
   settingsMenuScenario
 } from './menus';
+import { popupResetScenario } from './popup-reset';
 import { profileScenario } from './profile';
 import {
   popupSettingsBehaviorScenario,
   settingsMenuBehaviorScenario
 } from './settings';
+import { tabAlertScenario } from './tab-alert';
 import type { BrowserScenario } from './types';
 
 export const loggedOutScenarios: BrowserScenario[] = [
@@ -33,9 +43,13 @@ export const loggedOutScenarios: BrowserScenario[] = [
   settingsMenuScenario,
   settingsMenuBehaviorScenario,
   popupSettingsBehaviorScenario,
+  popupResetScenario,
   messageTranslationScenario,
   translationDisplayScenario,
+  translationSettingsReactScenario,
   realMessageTranslationScenario,
+  tabAlertScenario,
+  focusPanelScenario,
   inboxScenario,
   profileScenario
 ];
@@ -48,11 +62,19 @@ export const loggedInScenarios: BrowserScenario[] = [
   settingsMenuScenario,
   settingsMenuBehaviorScenario,
   popupSettingsBehaviorScenario,
+  popupResetScenario,
   messageTranslationScenario,
   translationDisplayScenario,
+  translationSettingsReactScenario,
   realMessageTranslationScenario,
+  tabAlertScenario,
+  focusPanelScenario,
   inboxScenario,
   profileScenario,
   composerTranslationScenario,
+  mockedComposerTranslationScenario,
+  realComposerTranslationScenario,
+  frequentEmojiScenario,
+  chatCommandsScenario,
   authorMentionDraftScenario
 ];
