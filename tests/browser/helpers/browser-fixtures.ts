@@ -13,6 +13,7 @@ import {
   launchExtensionContext,
   launchNormalChromeExtensionContext
 } from './chrome';
+import { dumpDomOnFailure } from './dom-dump';
 import { getInstalledProfileExtensionId } from './extension';
 import {
   createLiveChatFixtureHtml,
@@ -91,14 +92,22 @@ export const mockTest = base.extend<MockTestFixtures, MockWorkerFixtures>({
     }
   }, { scope: 'worker' }],
 
-  mockLoggedOutSession: async ({ mockWorkerSession }, use) => {
+  mockLoggedOutSession: async ({ mockWorkerSession }, use, testInfo) => {
     await openMockChatPage(mockWorkerSession.page, fixtureLoggedOutLiveChatUrl);
-    await use(mockWorkerSession);
+    try {
+      await use(mockWorkerSession);
+    } finally {
+      await dumpDomOnFailure(mockWorkerSession.context, testInfo);
+    }
   },
 
-  mockSignedInSession: async ({ mockWorkerSession }, use) => {
+  mockSignedInSession: async ({ mockWorkerSession }, use, testInfo) => {
     await openMockChatPage(mockWorkerSession.page, fixtureSignedInLiveChatUrl);
-    await use(mockWorkerSession);
+    try {
+      await use(mockWorkerSession);
+    } finally {
+      await dumpDomOnFailure(mockWorkerSession.context, testInfo);
+    }
   }
 });
 
@@ -131,19 +140,27 @@ export const liveTest = base.extend<LiveTestFixtures, LiveWorkerFixtures>({
     }
   }, { scope: 'worker' }],
 
-  liveLoggedOutSession: async ({ liveLoggedOutWorkerSession }, use) => {
+  liveLoggedOutSession: async ({ liveLoggedOutWorkerSession }, use, testInfo) => {
     await closeTransientSurfaces(liveLoggedOutWorkerSession.chat);
-    await use(liveLoggedOutWorkerSession);
-    await closeTransientSurfaces(liveLoggedOutWorkerSession.chat);
+    try {
+      await use(liveLoggedOutWorkerSession);
+    } finally {
+      await dumpDomOnFailure(liveLoggedOutWorkerSession.context, testInfo);
+      await closeTransientSurfaces(liveLoggedOutWorkerSession.chat);
+    }
   },
 
-  liveSignedInSession: async ({ liveSignedInWorkerSession }, use) => {
+  liveSignedInSession: async ({ liveSignedInWorkerSession }, use, testInfo) => {
     if (liveSignedInWorkerSession) {
       await closeTransientSurfaces(liveSignedInWorkerSession.chat);
     }
-    await use(liveSignedInWorkerSession);
-    if (liveSignedInWorkerSession) {
-      await closeTransientSurfaces(liveSignedInWorkerSession.chat);
+    try {
+      await use(liveSignedInWorkerSession);
+    } finally {
+      if (liveSignedInWorkerSession) {
+        await dumpDomOnFailure(liveSignedInWorkerSession.context, testInfo);
+        await closeTransientSurfaces(liveSignedInWorkerSession.chat);
+      }
     }
   }
 });
