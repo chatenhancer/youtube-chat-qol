@@ -214,8 +214,9 @@ npx playwright show-report playwright-report/youtube-live
 ```
 
 The report shows each test, its `test.step(...)` timeline, and links to failure
-artifacts. Failure screenshots, videos, and traces are written under
-`test-results/browser/`; traces can also be opened directly with
+artifacts. Failure screenshots, videos, traces, and full DOM dumps for every
+open page/frame are written under `test-results/browser/`; traces can also be
+opened directly with
 `npx playwright show-trace test-results/browser/<failed-test>/trace.zip`.
 
 If the signed-in test fails because the profile is already open, close the
