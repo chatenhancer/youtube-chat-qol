@@ -9,7 +9,8 @@ import { composerTranslationScenario } from './composer-translation';
 import { inboxScenario } from './inbox';
 import {
   messageTranslationScenario,
-  realMessageTranslationScenario
+  realMessageTranslationScenario,
+  translationDisplayScenario
 } from './message-translation';
 import {
   authorMentionDraftScenario,
@@ -21,12 +22,19 @@ import {
   settingsMenuScenario
 } from './menus';
 import { profileScenario } from './profile';
+import {
+  popupSettingsBehaviorScenario,
+  settingsMenuBehaviorScenario
+} from './settings';
 import type { BrowserScenario } from './types';
 
 export const loggedOutScenarios: BrowserScenario[] = [
   attachScenario,
   settingsMenuScenario,
+  settingsMenuBehaviorScenario,
+  popupSettingsBehaviorScenario,
   messageTranslationScenario,
+  translationDisplayScenario,
   realMessageTranslationScenario,
   inboxScenario,
   profileScenario
@@ -38,7 +46,10 @@ export const loggedInScenarios: BrowserScenario[] = [
   mentionMenuDraftScenario,
   quoteMenuDraftScenario,
   settingsMenuScenario,
+  settingsMenuBehaviorScenario,
+  popupSettingsBehaviorScenario,
   messageTranslationScenario,
+  translationDisplayScenario,
   realMessageTranslationScenario,
   inboxScenario,
   profileScenario,
