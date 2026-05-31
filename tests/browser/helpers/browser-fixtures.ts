@@ -13,6 +13,7 @@ import {
   launchExtensionContext,
   launchNormalChromeExtensionContext
 } from './chrome';
+import { clearChatComposer } from './composer';
 import { dumpDomOnFailure } from './dom-dump';
 import { getInstalledProfileExtensionId } from './extension';
 import {
@@ -34,6 +35,13 @@ import {
 } from './youtube-page';
 
 const DEFAULT_MOCK_HEADLESS = true;
+const TOP_LEVEL_TRANSIENT_SURFACE_SELECTOR = [
+  'ytd-popup-container ytd-multi-page-menu-renderer',
+  'ytd-popup-container ytd-menu-popup-renderer',
+  'ytd-popup-container tp-yt-paper-dialog',
+  'ytd-popup-container tp-yt-paper-toast',
+  'tp-yt-iron-dropdown'
+].join(',');
 
 export interface MockSession {
   context: BrowserContext;
@@ -223,11 +231,31 @@ async function createLoggedInLiveSession(): Promise<{
 }
 
 async function resetLiveScenarioState(session: LiveSession): Promise<void> {
-  await session.page.keyboard.press('Escape').catch(() => undefined);
+  await closeTopLevelYouTubeOverlays(session.page);
   await session.page.evaluate(() => {
     window.scrollTo(0, 0);
   }).catch(() => undefined);
+  await closeChatNativeMenus(session.chat);
   await closeTransientSurfaces(session.chat);
+  await clearComposerIfVisible(session.chat);
+  await closeChatNativeMenus(session.chat);
+}
+
+async function closeTopLevelYouTubeOverlays(page: Page): Promise<void> {
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    await page.keyboard.press('Escape').catch(() => undefined);
+  }
+
+  await page.locator(TOP_LEVEL_TRANSIENT_SURFACE_SELECTOR)
+    .first()
+    .waitFor({ state: 'hidden', timeout: 500 })
+    .catch(() => undefined);
+}
+
+async function closeChatNativeMenus(chat: FrameLocator): Promise<void> {
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    await chat.locator('body').press('Escape').catch(() => undefined);
+  }
 }
 
 async function closeTransientSurfaces(chat: FrameLocator): Promise<void> {
@@ -249,6 +277,12 @@ async function closeTransientSurfaces(chat: FrameLocator): Promise<void> {
       if (panel instanceof HTMLElement) panel.hidden = true;
     })
     .catch(() => undefined);
+}
+
+async function clearComposerIfVisible(chat: FrameLocator): Promise<void> {
+  const composer = chat.locator('yt-live-chat-message-input-renderer').first();
+  if (!await composer.isVisible({ timeout: 500 }).catch(() => false)) return;
+  await clearChatComposer(chat).catch(() => undefined);
 }
 
 function getMissingLoggedInProfileReason(): string {

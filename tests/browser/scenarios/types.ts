@@ -8,6 +8,8 @@ import type { BrowserContext } from '@playwright/test';
 import type { ChatSurface } from '../helpers/chat-surface';
 
 export type { ChatSurface };
+export type BrowserScenarioEnvironment = 'mock' | 'live';
+
 export const NORMAL_CHAT_MESSAGE_SELECTOR = [
   'yt-live-chat-text-message-renderer:not([in-banner])',
   ':not([in-collapsed-banner])',
@@ -17,6 +19,7 @@ export const NORMAL_CHAT_MESSAGE_SELECTOR = [
 export interface BrowserScenarioSession {
   chat: ChatSurface;
   context: BrowserContext;
+  environment: BrowserScenarioEnvironment;
 }
 
 export interface BrowserScenario {

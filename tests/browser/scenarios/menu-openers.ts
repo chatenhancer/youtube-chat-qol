@@ -10,14 +10,21 @@ import {
   NORMAL_CHAT_MESSAGE_SELECTOR,
   type ChatSurface
 } from './types';
+import { cleanVisibleText } from '../helpers/text';
 
 const MENU_POPUP_SELECTOR = 'ytd-menu-popup-renderer';
 const SETTINGS_MENU_MARKER_SELECTOR = 'yt-live-chat-toggle-renderer, .ytcq-settings-item';
 const MESSAGE_MENU_MARKER_SELECTOR = [
   'ytd-menu-service-item-renderer',
   'ytd-menu-navigation-item-renderer',
-  '.ytcq-context-item'
+  '.ytcq-context-item[data-ytcq-action]'
 ].join(',');
+
+export interface OpenedMessageMenu {
+  menu: Locator;
+  message: Locator;
+  authorName: string;
+}
 
 export async function openSettingsMenu(chat: ChatSurface): Promise<Locator> {
   await test.step('Click chat settings menu button', async () => {
@@ -39,7 +46,7 @@ export async function openSettingsMenu(chat: ChatSurface): Promise<Locator> {
   ));
 }
 
-export async function openMessageMenu(chat: ChatSurface): Promise<Locator> {
+export async function openMessageMenu(chat: ChatSurface): Promise<OpenedMessageMenu> {
   await test.step('Close any open native menus', async () => {
     await closeOpenMenus(chat);
   });
@@ -61,8 +68,11 @@ export async function openMessageMenu(chat: ChatSurface): Promise<Locator> {
       const message = messages.nth(index);
       await message.scrollIntoViewIfNeeded({ timeout: 2_000 }).catch(() => undefined);
       if (!await message.isVisible({ timeout: 500 }).catch(() => false)) continue;
+      const authorName = await getMessageAuthorName(message);
+      if (!authorName) continue;
 
       await message.hover({ timeout: 2_000 }).catch(() => undefined);
+      await markMessageAsContextSource(message);
       const menuTargets = [
         message.locator('#menu button').first(),
         message.locator('#menu yt-icon-button').first(),
@@ -78,7 +88,8 @@ export async function openMessageMenu(chat: ChatSurface): Promise<Locator> {
           'message context menu popup',
           1_000
         ).catch(() => null);
-        if (openedMenu) return openedMenu;
+        if (openedMenu) return { menu: openedMenu, message, authorName };
+        await markMessageAsContextSource(message);
         await menuTarget.dispatchEvent('click').catch(() => undefined);
         const dispatchedMenu = await waitForVisibleMenu(
           chat,
@@ -86,7 +97,7 @@ export async function openMessageMenu(chat: ChatSurface): Promise<Locator> {
           'message context menu popup',
           1_000
         ).catch(() => null);
-        if (dispatchedMenu) return dispatchedMenu;
+        if (dispatchedMenu) return { menu: dispatchedMenu, message, authorName };
         await closeOpenMenus(chat);
       }
     }
@@ -96,7 +107,33 @@ export async function openMessageMenu(chat: ChatSurface): Promise<Locator> {
 }
 
 async function closeOpenMenus(chat: ChatSurface): Promise<void> {
-  await chat.locator('body').press('Escape').catch(() => undefined);
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    await chat.locator('body').press('Escape').catch(() => undefined);
+  }
+}
+
+async function getMessageAuthorName(message: Locator): Promise<string> {
+  const authorName = await message.locator('#author-name').first()
+    .innerText({ timeout: 500 })
+    .catch(() => '');
+  const cleanAuthorName = cleanAuthorNameText(authorName);
+  return /^@?\S/.test(cleanAuthorName) ? cleanAuthorName : '';
+}
+
+function cleanAuthorNameText(text: string): string {
+  const cleanAuthorName = cleanVisibleText(text);
+  return cleanAuthorName.match(/^@[^\s]+/)?.[0] || cleanAuthorName;
+}
+
+async function markMessageAsContextSource(message: Locator): Promise<void> {
+  await message.dispatchEvent('pointerdown', {
+    bubbles: true,
+    cancelable: true
+  }).catch(() => undefined);
+  await message.dispatchEvent('click', {
+    bubbles: true,
+    cancelable: true
+  }).catch(() => undefined);
 }
 
 async function resetOuterPageScroll(chat: ChatSurface): Promise<void> {

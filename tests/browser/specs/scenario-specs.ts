@@ -33,7 +33,8 @@ export function createMockScenarioTest(
     const session = authState === 'logged-in' ? mockLoggedInSession : mockLoggedOutSession;
     await scenario.run({
       chat: session.page,
-      context: session.context
+      context: session.context,
+      environment: 'mock'
     });
   };
 }
@@ -47,14 +48,16 @@ export function createLiveScenarioTest(
       skipIfLoggedInLiveUnavailable(liveTest, liveLoggedInSession);
       await scenario.run({
         chat: liveLoggedInSession.chat,
-        context: liveLoggedInSession.context
+        context: liveLoggedInSession.context,
+        environment: 'live'
       });
       return;
     }
 
     await scenario.run({
       chat: liveLoggedOutSession.chat,
-      context: liveLoggedOutSession.context
+      context: liveLoggedOutSession.context,
+      environment: 'live'
     });
   };
 }

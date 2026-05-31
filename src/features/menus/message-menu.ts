@@ -71,6 +71,7 @@ export function enhanceMessageContextMenu(menu: HTMLElement): void {
   list.append(
     createMenuActionItem({
       className: 'ytcq-context-item',
+      action: 'quote',
       label: t('quote'),
       iconPath: QUOTE_ICON_PATH,
       onClick: () => {
@@ -82,6 +83,7 @@ export function enhanceMessageContextMenu(menu: HTMLElement): void {
     }),
     createMenuActionItem({
       className: 'ytcq-context-item',
+      action: 'mention',
       label: t('mention'),
       iconPath: MENTION_ICON_PATH,
       iconViewBox: MATERIAL_ICON_VIEW_BOX,

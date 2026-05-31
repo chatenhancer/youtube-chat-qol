@@ -10,6 +10,7 @@ import { ytcqCreateElement } from '../../shared/managed-dom';
 
 interface MenuActionItemOptions {
   className?: string;
+  action?: string;
   setting?: string;
   label: string;
   iconPath: string;
@@ -25,6 +26,7 @@ interface PaperItemOptions {
 
 export function createMenuActionItem({
   className = 'ytcq-settings-item',
+  action = '',
   setting = '',
   label,
   iconPath,
@@ -38,6 +40,7 @@ export function createMenuActionItem({
   item.setAttribute('use-icons', '');
   item.setAttribute('tabindex', '-1');
   item.setAttribute('aria-selected', 'false');
+  if (action) item.setAttribute('data-ytcq-action', action);
   if (setting) item.setAttribute('data-ytcq-setting', setting);
   item.appendChild(createPaperItem({ label, iconPath, iconViewBox }));
   wireMenuItemClick(item, onClick);
@@ -103,9 +106,13 @@ export function closeMenu(): void {
 
 export function clampMenuToViewport(menu: HTMLElement): void {
   window.requestAnimationFrame(() => {
+    menu.style.setProperty('--ytcq-context-shift-y', '0px');
+
     const rect = menu.getBoundingClientRect();
     const overflowRight = rect.right - (window.innerWidth - 8);
     const overflowLeft = 8 - rect.left;
+    const overflowBottom = rect.bottom - (window.innerHeight - 8);
+    const overflowTop = 8 - rect.top;
 
     if (overflowRight > 0) {
       menu.style.left = `${Math.max(8, rect.left - overflowRight)}px`;
@@ -113,6 +120,12 @@ export function clampMenuToViewport(menu: HTMLElement): void {
     } else if (overflowLeft > 0) {
       menu.style.left = `${rect.left + overflowLeft}px`;
       menu.style.right = 'auto';
+    }
+
+    if (overflowBottom > 0) {
+      menu.style.setProperty('--ytcq-context-shift-y', `${-Math.ceil(overflowBottom)}px`);
+    } else if (overflowTop > 0) {
+      menu.style.setProperty('--ytcq-context-shift-y', `${Math.ceil(overflowTop)}px`);
     }
   });
 }
