@@ -20,6 +20,7 @@ import {
   type MessageTranslationRenderedEvent
 } from '../translation/events';
 import { cloneProtectedTokens } from '../translation/protected-placeholders';
+import { createTranslationPriorityScope, type TranslationPriorityScope } from '../translation/queue';
 import { createFocusRecord, findFocusRecordForMessage } from './records';
 import {
   getAuthorInitial,
@@ -37,6 +38,7 @@ const FOCUS_ANCHOR_CLASS = 'ytcq-focus-anchor';
 let activeSource: FocusSource | null = null;
 let activeCard: HTMLElement | null = null;
 let activeList: HTMLElement | null = null;
+let activeTranslationPriorityScope: TranslationPriorityScope | null = null;
 let activeExpanded = false;
 let mentionRestoreTimer = 0;
 let nextRecordId = 1;
@@ -95,6 +97,7 @@ export function showFocusPromptForAuthor(source: FocusSource): void {
 
   activeSource = normalizedSource;
   clearFocusRecords();
+  stopFocusTranslationPriority();
   renderCollapsedFocusPrompt();
 }
 
@@ -114,6 +117,7 @@ export function handlePotentialFocusMessage(message: HTMLElement): void {
   if (!record) return;
 
   focusRecords.push(record);
+  prioritizeFocusRecordTranslation(record);
   refreshFocusMessages();
 }
 
@@ -134,6 +138,7 @@ function recordFocusMessageTranslation({
     protectedTokens: cloneProtectedTokens(protectedTokens)
   };
   refreshFocusMessages();
+  prioritizeFocusMessageTranslations();
 }
 
 function clearFocusMessageTranslation(message: HTMLElement): void {
@@ -154,6 +159,7 @@ function clearFocusMessageTranslations(): void {
   if (!changed) return;
 
   refreshFocusMessages();
+  prioritizeFocusMessageTranslations();
 }
 
 function renderCollapsedFocusPrompt(): void {
@@ -210,6 +216,8 @@ function openFocusPanel(): void {
   activeExpanded = true;
   activeCard?.remove();
   clearFocusRecords();
+  stopFocusTranslationPriority();
+  activeTranslationPriorityScope = createTranslationPriorityScope();
 
   const card = ytcqCreateElement('section');
   card.className = 'ytcq-focus-card ytcq-focus-card-expanded';
@@ -237,6 +245,7 @@ function openFocusPanel(): void {
   activeList = list;
 
   scanVisibleFocusInteractions();
+  prioritizeFocusMessageTranslations();
   renderFocusMessages();
   if (activeList) scrollElementToBottom(activeList);
   scheduleEnsureFocusMentionPrefix();
@@ -318,6 +327,7 @@ function closeFocusMode(): void {
   activeList = null;
   activeSource = null;
   activeExpanded = false;
+  stopFocusTranslationPriority();
   clearFocusRecords();
   window.clearTimeout(mentionRestoreTimer);
   mentionRestoreTimer = 0;
@@ -325,6 +335,24 @@ function closeFocusMode(): void {
 
 function clearFocusRecords(): void {
   focusRecords.length = 0;
+}
+
+function prioritizeFocusMessageTranslations(): void {
+  activeTranslationPriorityScope?.prioritize(focusRecords.map(getFocusRecordLiveMessage));
+}
+
+function prioritizeFocusRecordTranslation(record: FocusRecord): void {
+  activeTranslationPriorityScope?.prioritize([getFocusRecordLiveMessage(record)]);
+}
+
+function getFocusRecordLiveMessage(record: FocusRecord): HTMLElement | null {
+  const message = record.messageRef?.deref() || null;
+  return message?.isConnected ? message : null;
+}
+
+function stopFocusTranslationPriority(): void {
+  activeTranslationPriorityScope?.close();
+  activeTranslationPriorityScope = null;
 }
 
 function createFocusAuthor(source: FocusSource, options: { openChannel: boolean }): HTMLElement {
