@@ -7,6 +7,8 @@
  */
 import { defineConfig } from '@playwright/test';
 
+const reportOutputFolder = process.env.YTCQ_PLAYWRIGHT_REPORT_DIR ?? 'playwright-report/browser';
+
 export default defineConfig({
   expect: {
     timeout: 15_000
@@ -23,7 +25,10 @@ export default defineConfig({
       testMatch: /specs\/youtube-live\/.*\.spec\.ts/
     }
   ],
-  reporter: [['list']],
+  reporter: [
+    ['list'],
+    ['html', { open: 'never', outputFolder: reportOutputFolder }]
+  ],
   testDir: './tests/browser',
   timeout: 90_000,
   use: {

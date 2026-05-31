@@ -17,13 +17,13 @@ interface LaunchExtensionContextOptions {
   channel?: string;
   headless?: boolean;
   profileDir: string;
-  testInfo: TestInfo;
+  testInfo?: Pick<TestInfo, 'annotations'>;
 }
 
 interface LaunchNormalChromeExtensionContextOptions {
   initialUrl?: string;
   profileDir: string;
-  testInfo: TestInfo;
+  testInfo?: Pick<TestInfo, 'annotations'>;
 }
 
 interface NormalChromeExtensionContext {
@@ -45,7 +45,7 @@ export async function launchExtensionContext({
 
   const headless = requestedHeadless ?? isHeadlessBrowserTest();
   const channel = requestedChannel || process.env.YTCQ_CHROME_CHANNEL || (headless ? 'chromium' : undefined);
-  testInfo.annotations.push({
+  testInfo?.annotations.push({
     type: 'chrome-profile',
     description: profileDir
   });
@@ -97,7 +97,7 @@ export async function launchNormalChromeExtensionContext({
   }
 
   const remoteDebuggingPort = await getFreePort();
-  testInfo.annotations.push({
+  testInfo?.annotations.push({
     type: 'chrome-profile',
     description: profileDir
   });

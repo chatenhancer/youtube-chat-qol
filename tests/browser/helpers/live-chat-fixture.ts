@@ -5,9 +5,16 @@
  * extension consumes, giving the browser smoke test a stable local page while
  * still exercising the real content script.
  */
-export const fixtureLiveChatUrl = 'https://www.youtube.com/live_chat?continuation=ytcq-fixture';
+export const fixtureSignedInLiveChatUrl = 'https://www.youtube.com/live_chat?continuation=ytcq-fixture&ytcq-auth=signed-in';
+export const fixtureLoggedOutLiveChatUrl = 'https://www.youtube.com/live_chat?continuation=ytcq-fixture&ytcq-auth=logged-out';
 
-export function createLiveChatFixtureHtml(): string {
+interface LiveChatFixtureOptions {
+  signedIn?: boolean;
+}
+
+export function createLiveChatFixtureHtml({
+  signedIn = true
+}: LiveChatFixtureOptions = {}): string {
   return `<!doctype html>
 <html lang="en">
   <head>
@@ -152,14 +159,16 @@ export function createLiveChatFixtureHtml(): string {
           </div>
         </yt-live-chat-item-list-renderer>
 
-        <yt-live-chat-message-input-renderer>
-          <span id="author-name">@CurrentViewer</span>
-          <div id="input" contenteditable="true" aria-label="Chat input"></div>
-          <div id="emoji-picker-button">
-            <button type="button" aria-label="Add emotes">🙂</button>
-          </div>
-          <button id="send-button" type="button">Send</button>
-        </yt-live-chat-message-input-renderer>
+        ${signedIn ? `
+          <yt-live-chat-message-input-renderer>
+            <span id="author-name">@CurrentViewer</span>
+            <div id="input" contenteditable="true" aria-label="Chat input"></div>
+            <div id="emoji-picker-button">
+              <button type="button" aria-label="Add emotes">🙂</button>
+            </div>
+            <button id="send-button" type="button">Send</button>
+          </yt-live-chat-message-input-renderer>
+        ` : ''}
       </yt-live-chat-renderer>
     </yt-live-chat-app>
 
@@ -173,17 +182,31 @@ export function createLiveChatFixtureHtml(): string {
         timestampUsec: '1779396300000000'
       };
 
-      window.ytcqAddSettingsMenu = () => {
+      const removeOpenMenus = () => {
+        for (const menu of document.querySelectorAll('ytd-menu-popup-renderer')) {
+          menu.remove();
+        }
+      };
+
+      const addSettingsMenu = () => {
+        removeOpenMenus();
         const menu = document.createElement('ytd-menu-popup-renderer');
         menu.innerHTML = '<div id="items"><yt-live-chat-toggle-renderer></yt-live-chat-toggle-renderer></div>';
         document.body.append(menu);
       };
 
-      window.ytcqAddMessageMenu = () => {
+      const addMessageMenu = () => {
+        removeOpenMenus();
         const menu = document.createElement('ytd-menu-popup-renderer');
         menu.innerHTML = '<div id="items"><ytd-menu-service-item-renderer><tp-yt-paper-item>Native item</tp-yt-paper-item></ytd-menu-service-item-renderer></div>';
         document.body.append(menu);
       };
+
+      document.querySelector('#live-chat-header-context-menu button').addEventListener('click', addSettingsMenu);
+      document.querySelector('#fixture-message-1 #menu').addEventListener('click', addMessageMenu);
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') removeOpenMenus();
+      });
     </script>
   </body>
 </html>`;
