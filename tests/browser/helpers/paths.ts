@@ -3,7 +3,7 @@
  *
  * Keeping these values in one place makes the fixture tests, real YouTube
  * tests, and login helper agree on the built extension location and the
- * persistent signed-in Chrome profile.
+ * persistent logged-in Chrome profile.
  */
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';

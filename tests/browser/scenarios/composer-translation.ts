@@ -1,7 +1,7 @@
 /**
  * Browser scenario for the composer translation control.
  *
- * This scenario is signed-in only because YouTube exposes the composer only
+ * This scenario is logged-in only because YouTube exposes the composer only
  * when the current viewer can write in chat.
  */
 import { expect, test } from '@playwright/test';

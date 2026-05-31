@@ -1,7 +1,7 @@
 /**
  * Shared browser scenario groups.
  *
- * Mock and live specs import the same groups so logged-out and signed-in
+ * Mock and live specs import the same groups so logged-out and logged-in
  * coverage stays aligned between the deterministic fixture and real YouTube.
  */
 import { attachScenario } from './attach';
@@ -32,7 +32,7 @@ export const loggedOutScenarios: BrowserScenario[] = [
   profileScenario
 ];
 
-export const signedInScenarios: BrowserScenario[] = [
+export const loggedInScenarios: BrowserScenario[] = [
   attachScenario,
   messageMenuScenario,
   mentionMenuDraftScenario,
