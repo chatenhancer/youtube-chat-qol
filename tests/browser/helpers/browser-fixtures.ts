@@ -143,25 +143,25 @@ export const liveTest = base.extend<LiveTestFixtures, LiveWorkerFixtures>({
   }, { scope: 'worker' }],
 
   liveLoggedOutSession: async ({ liveLoggedOutWorkerSession }, use, testInfo) => {
-    await closeTransientSurfaces(liveLoggedOutWorkerSession.chat);
+    await resetLiveScenarioState(liveLoggedOutWorkerSession);
     try {
       await use(liveLoggedOutWorkerSession);
     } finally {
       await dumpDomOnFailure(liveLoggedOutWorkerSession.context, testInfo);
-      await closeTransientSurfaces(liveLoggedOutWorkerSession.chat);
+      await resetLiveScenarioState(liveLoggedOutWorkerSession);
     }
   },
 
   liveLoggedInSession: async ({ liveLoggedInWorkerSession }, use, testInfo) => {
     if (liveLoggedInWorkerSession) {
-      await closeTransientSurfaces(liveLoggedInWorkerSession.chat);
+      await resetLiveScenarioState(liveLoggedInWorkerSession);
     }
     try {
       await use(liveLoggedInWorkerSession);
     } finally {
       if (liveLoggedInWorkerSession) {
         await dumpDomOnFailure(liveLoggedInWorkerSession.context, testInfo);
-        await closeTransientSurfaces(liveLoggedInWorkerSession.chat);
+        await resetLiveScenarioState(liveLoggedInWorkerSession);
       }
     }
   }
@@ -220,6 +220,14 @@ async function createLoggedInLiveSession(): Promise<{
       unavailableReason
     }
   };
+}
+
+async function resetLiveScenarioState(session: LiveSession): Promise<void> {
+  await session.page.keyboard.press('Escape').catch(() => undefined);
+  await session.page.evaluate(() => {
+    window.scrollTo(0, 0);
+  }).catch(() => undefined);
+  await closeTransientSurfaces(session.chat);
 }
 
 async function closeTransientSurfaces(chat: FrameLocator): Promise<void> {
