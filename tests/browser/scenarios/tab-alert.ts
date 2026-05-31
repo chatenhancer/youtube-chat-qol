@@ -12,30 +12,29 @@ import {
 import { getExtensionId } from '../helpers/extension';
 import {
   appendMockFixtureMessage,
-  skipIfNotMockPage
+  isMockPageSurface
 } from '../helpers/mock-page';
 import type { BrowserScenario } from './types';
 
 const ALERT_KEYWORD = 'ytcq-alert-browser-test';
 
-export const tabAlertScenario: BrowserScenario = {
-  name: 'Background tab alert updates title and favicon',
-  run: async ({ chat, context }) => {
-    skipIfNotMockPage(chat, 'Tab alert behavior is verified with deterministic mock page visibility.');
-
-    await withExtensionStorageSnapshot(context, 'local', async () => {
-      await withExtensionStorageValues(context, 'local', {
-        ytcqInboxKeywords: [ALERT_KEYWORD]
-      }, async () => {
-        await reloadMockChat(chat);
-        await setExtensionWorldVisibility(chat, 'hidden');
-        await appendKeywordMessage(chat);
-        await expectAlertShown(chat);
-        await setExtensionWorldVisibility(chat, 'visible');
-        await expectAlertCleared(chat);
-      });
-    });
+export const tabAlertScenario: BrowserScenario = async ({ chat, extensionContext }) => {
+  if (!isMockPageSurface(chat)) {
+    throw new Error('tabAlertScenario requires the deterministic mock chat page.');
   }
+
+  await withExtensionStorageSnapshot(extensionContext, 'local', async () => {
+    await withExtensionStorageValues(extensionContext, 'local', {
+      ytcqInboxKeywords: [ALERT_KEYWORD]
+    }, async () => {
+      await reloadMockChat(chat);
+      await setExtensionWorldVisibility(chat, 'hidden');
+      await appendKeywordMessage(chat);
+      await expectAlertShown(chat);
+      await setExtensionWorldVisibility(chat, 'visible');
+      await expectAlertCleared(chat);
+    });
+  });
 };
 
 async function reloadMockChat(page: Page): Promise<void> {

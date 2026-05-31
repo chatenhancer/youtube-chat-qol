@@ -1,9 +1,8 @@
 /**
  * Browser scenario for the frequent emoji row.
  *
- * Uses a stable built-in Unicode emoji so the same scenario can prove usage
- * tracking, row rendering, persistence after reload, and composer insertion in
- * the mock fixture and real YouTube chat.
+ * Uses a stable built-in Unicode emoji so the mock suite can prove persistence
+ * after reload while the live suite can run a shorter picker-wiring smoke.
  */
 import { expect, test, type BrowserContext, type Page } from '@playwright/test';
 import {
@@ -19,23 +18,38 @@ import type { BrowserScenario, ChatSurface } from './types';
 const EMOJI_USAGE_STORAGE_KEY = 'ytcqEmojiUsage';
 const TEST_EMOJI = '✅';
 
-export const frequentEmojiScenario: BrowserScenario = {
-  name: 'Frequent emojis are tracked, rendered, and persisted',
-  run: async ({ chat, context }) => {
-    await withExtensionStorageValues(context, 'local', {
-      [EMOJI_USAGE_STORAGE_KEY]: []
-    }, async () => {
-      await reloadChatSurface({ chat, context });
-      await clickNativeEmojiOption(chat);
-      await expectEmojiUsageCount(chat, 1);
-      await expectFrequentEmojiRow(chat);
-      await reloadChatSurface({ chat, context });
-      await expectFrequentEmojiRow(chat);
-      await clickFrequentEmojiAndExpectComposerInsertion(chat);
-      await expectEmojiUsageCount(chat, 2);
-    });
-  }
+export const frequentEmojiPersistenceScenario: BrowserScenario = async ({ chat, extensionContext }) => {
+  await expectFrequentEmojiBehavior({ chat, context: extensionContext, verifyPersistenceAfterReload: true });
 };
+
+export const frequentEmojiSmokeScenario: BrowserScenario = async ({ chat, extensionContext }) => {
+  await expectFrequentEmojiBehavior({ chat, context: extensionContext, verifyPersistenceAfterReload: false });
+};
+
+async function expectFrequentEmojiBehavior({
+  chat,
+  context,
+  verifyPersistenceAfterReload
+}: {
+  chat: ChatSurface;
+  context: BrowserContext;
+  verifyPersistenceAfterReload: boolean;
+}): Promise<void> {
+  await withExtensionStorageValues(context, 'local', {
+    [EMOJI_USAGE_STORAGE_KEY]: []
+  }, async () => {
+    await reloadChatSurface({ chat, context });
+    await clickNativeEmojiOption(chat);
+    await expectEmojiUsageCount(chat, 1);
+    await expectFrequentEmojiRow(chat);
+    if (verifyPersistenceAfterReload) {
+      await reloadChatSurface({ chat, context });
+      await expectFrequentEmojiRow(chat);
+    }
+    await clickFrequentEmojiAndExpectComposerInsertion(chat);
+    await expectEmojiUsageCount(chat, 2);
+  });
+}
 
 async function reloadChatSurface({
   chat,

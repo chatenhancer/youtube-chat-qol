@@ -18,47 +18,38 @@ const MOCKED_COMPOSER_TRANSLATION = 'texte traduit depuis le compositeur';
 const MOCKED_COMPOSER_SOURCE = 'translate this composer draft';
 const REAL_COMPOSER_SOURCE = 'thank you for the stream';
 
-export const composerTranslationScenario: BrowserScenario = {
-  name: 'Composer translation controls open',
-  run: async ({ chat }) => {
-    await expectChatComposerVisible(chat);
-    await expectComposerTranslateButtonAttached(chat);
-    await openComposerTranslationPanel(chat);
-  }
+export const composerTranslationScenario: BrowserScenario = async ({ chat }) => {
+  await expectChatComposerVisible(chat);
+  await expectComposerTranslateButtonAttached(chat);
+  await openComposerTranslationPanel(chat);
 };
 
-export const mockedComposerTranslationScenario: BrowserScenario = {
-  name: 'Composer translation translates draft text with mocked Google Translate',
-  run: async ({ chat, context }) => {
-    await expectChatComposerVisible(chat);
-    await withMockedTranslationEndpoint(context, MOCKED_COMPOSER_TRANSLATION, async () => {
-      await withExtensionStorageValues(context, 'sync', {
-        composerTranslateLanguage: 'fr'
-      }, async () => {
-        await translateComposerDraft({
-          chat,
-          expectedText: MOCKED_COMPOSER_TRANSLATION,
-          sourceText: MOCKED_COMPOSER_SOURCE
-        });
-      });
-    });
-  }
-};
-
-export const realComposerTranslationScenario: BrowserScenario = {
-  name: 'Composer translation translates draft text with real Google Translate',
-  run: async ({ chat, context }) => {
-    await expectChatComposerVisible(chat);
-    await withExtensionStorageValues(context, 'sync', {
-      composerTranslateLanguage: 'ja'
+export const mockedComposerTranslationScenario: BrowserScenario = async ({ chat, extensionContext }) => {
+  await expectChatComposerVisible(chat);
+  await withMockedTranslationEndpoint(extensionContext, MOCKED_COMPOSER_TRANSLATION, async () => {
+    await withExtensionStorageValues(extensionContext, 'sync', {
+      composerTranslateLanguage: 'fr'
     }, async () => {
       await translateComposerDraft({
         chat,
-        expectedPattern: /[\u3040-\u30ff\u4e00-\u9faf]/,
-        sourceText: REAL_COMPOSER_SOURCE
+        expectedText: MOCKED_COMPOSER_TRANSLATION,
+        sourceText: MOCKED_COMPOSER_SOURCE
       });
     });
-  }
+  });
+};
+
+export const realComposerTranslationScenario: BrowserScenario = async ({ chat, extensionContext }) => {
+  await expectChatComposerVisible(chat);
+  await withExtensionStorageValues(extensionContext, 'sync', {
+    composerTranslateLanguage: 'ja'
+  }, async () => {
+    await translateComposerDraft({
+      chat,
+      expectedPattern: /[\u3040-\u30ff\u4e00-\u9faf]/,
+      sourceText: REAL_COMPOSER_SOURCE
+    });
+  });
 };
 
 async function expectChatComposerVisible(chat: ChatSurface): Promise<void> {

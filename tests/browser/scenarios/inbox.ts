@@ -7,13 +7,10 @@
 import { expect, test } from '@playwright/test';
 import type { BrowserScenario, ChatSurface } from './types';
 
-export const inboxScenario: BrowserScenario = {
-  name: 'Inbox opens from the chat header',
-  run: async ({ chat }) => {
-    await expectInboxButtonAttached(chat);
-    await openInboxPanel(chat);
-    await closeInboxPanel(chat);
-  }
+export const inboxScenario: BrowserScenario = async ({ chat }) => {
+  await expectInboxButtonAttached(chat);
+  await openInboxPanel(chat);
+  await closeInboxPanel(chat);
 };
 
 async function expectInboxButtonAttached(chat: ChatSurface): Promise<void> {

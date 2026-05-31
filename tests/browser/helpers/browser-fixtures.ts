@@ -13,7 +13,7 @@ import {
   launchExtensionContext,
   launchNormalChromeExtensionContext
 } from './chrome';
-import { clearChatComposer } from './composer';
+import { clearChatComposerIfVisible } from './composer';
 import { dumpDomOnFailure } from './dom-dump';
 import { getInstalledProfileExtensionId } from './extension';
 import {
@@ -30,8 +30,7 @@ import {
   getLiveUrl,
   getUnavailableComposerReason,
   isChatComposerVisible,
-  openLiveChat,
-  primeYouTubeSession
+  openLiveChat
 } from './youtube-page';
 
 const DEFAULT_MOCK_HEADLESS = true;
@@ -213,7 +212,6 @@ async function createLoggedInLiveSession(): Promise<{
   });
   const { context } = chrome;
   const page = context.pages()[0] || await context.newPage();
-  await primeYouTubeSession(page);
   const chat = await openLiveChat(page, liveUrl);
   const unavailableReason = await isChatComposerVisible(chat)
     ? ''
@@ -280,9 +278,7 @@ async function closeTransientSurfaces(chat: FrameLocator): Promise<void> {
 }
 
 async function clearComposerIfVisible(chat: FrameLocator): Promise<void> {
-  const composer = chat.locator('yt-live-chat-message-input-renderer').first();
-  if (!await composer.isVisible({ timeout: 500 }).catch(() => false)) return;
-  await clearChatComposer(chat).catch(() => undefined);
+  await clearChatComposerIfVisible(chat).catch(() => undefined);
 }
 
 function getMissingLoggedInProfileReason(): string {

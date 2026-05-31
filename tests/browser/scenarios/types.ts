@@ -8,7 +8,6 @@ import type { BrowserContext } from '@playwright/test';
 import type { ChatSurface } from '../helpers/chat-surface';
 
 export type { ChatSurface };
-export type BrowserScenarioEnvironment = 'mock' | 'live';
 
 export const NORMAL_CHAT_MESSAGE_SELECTOR = [
   'yt-live-chat-text-message-renderer:not([in-banner])',
@@ -18,11 +17,12 @@ export const NORMAL_CHAT_MESSAGE_SELECTOR = [
 
 export interface BrowserScenarioSession {
   chat: ChatSurface;
-  context: BrowserContext;
-  environment: BrowserScenarioEnvironment;
+  extensionContext: BrowserContext;
 }
 
-export interface BrowserScenario {
-  name: string;
-  run: (..._args: [BrowserScenarioSession]) => Promise<void>;
-}
+/**
+ * Executes one browser-level behavior check.
+ * Test titles and browser surfaces are defined by the plan-case spec files
+ * under `tests/browser/specs/`, not on the scenario itself.
+ */
+export type BrowserScenario = (..._args: [BrowserScenarioSession]) => Promise<void>;

@@ -22,34 +22,28 @@ const SETTINGS_INITIAL_VALUES = {
   startupEffect: true
 };
 
-export const settingsMenuBehaviorScenario: BrowserScenario = {
-  name: 'Chat settings menu toggles persist options',
-  run: async ({ chat, context }) => {
-    await withExtensionStorageValues(context, 'sync', SETTINGS_INITIAL_VALUES, async () => {
-      const menu = await openSettingsMenu(chat);
-      await toggleTranslationFromChatSettings({ context, menu });
-      await toggleInboxSoundFromChatSettings({ context, menu });
-      await closeNativeMenu(chat);
-    });
-  }
+export const settingsMenuBehaviorScenario: BrowserScenario = async ({ chat, extensionContext }) => {
+  await withExtensionStorageValues(extensionContext, 'sync', SETTINGS_INITIAL_VALUES, async () => {
+    const menu = await openSettingsMenu(chat);
+    await toggleTranslationFromChatSettings({ context: extensionContext, menu });
+    await toggleInboxSoundFromChatSettings({ context: extensionContext, menu });
+    await closeNativeMenu(chat);
+  });
 };
 
-export const popupSettingsBehaviorScenario: BrowserScenario = {
-  name: 'Extension popup settings persist options',
-  run: async ({ context }) => {
-    await withExtensionStorageValues(context, 'sync', SETTINGS_INITIAL_VALUES, async () => {
-      const popup = await openExtensionPopup(context);
+export const popupSettingsBehaviorScenario: BrowserScenario = async ({ extensionContext }) => {
+  await withExtensionStorageValues(extensionContext, 'sync', SETTINGS_INITIAL_VALUES, async () => {
+    const popup = await openExtensionPopup(extensionContext);
 
-      try {
-        await changePopupTranslationTarget({ context, popup });
-        await changePopupTranslationDisplay({ context, popup });
-        await changePopupInboxSound({ context, popup });
-        await changePopupStartupEffect({ context, popup });
-      } finally {
-        await popup.close();
-      }
-    });
-  }
+    try {
+      await changePopupTranslationTarget({ context: extensionContext, popup });
+      await changePopupTranslationDisplay({ context: extensionContext, popup });
+      await changePopupInboxSound({ context: extensionContext, popup });
+      await changePopupStartupEffect({ context: extensionContext, popup });
+    } finally {
+      await popup.close();
+    }
+  });
 };
 
 async function toggleTranslationFromChatSettings({
