@@ -11,14 +11,17 @@ import { ytcqCreateElement } from '../../shared/managed-dom';
 import { captureScrollPosition, restoreScrollPositionAfterRender, scrollElementToBottom } from '../../shared/scroll';
 import { findChatInput } from '../../youtube/chat-input';
 import {
+  getLiveMessageForRecord,
   getRecentMessagesForIdentity,
   getUserKeyFromIdentity,
   onUserMessagesChanged,
   recordVisibleUserMessages,
+  type MessageRecord,
   type UserIdentity
 } from '../user-message-history';
 import { registerFeatureLifecycle } from '../../content/lifecycle';
 import { mentionAuthorName } from '../reply';
+import { createTranslationPriorityScope, type TranslationPriorityScope } from '../translation/queue';
 import { getChannelUrl, openChannelWindow } from '../channel-popup';
 import { createAvatarElement, createProfileAvatarButton } from './elements';
 import { renderProfileMessages, shouldRefreshProfileMessages } from './messages';
@@ -184,7 +187,13 @@ function showProfileCard(source: ProfileSource, anchor: HTMLElement): void {
   list.className = 'ytcq-profile-card-messages';
 
   const profileKey = getUserKeyFromIdentity(source.identity);
-  renderProfileMessages(list, getRecentMessagesForIdentity(source.identity), source, closeProfileCard);
+  const translationPriorityScope = createTranslationPriorityScope();
+  const renderMessages = (): void => {
+    const recentMessages = getRecentMessagesForIdentity(source.identity);
+    renderProfileMessages(list, recentMessages, source, closeProfileCard);
+    prioritizeProfileMessageTranslations(translationPriorityScope, recentMessages);
+  };
+  renderMessages();
 
   card.append(header, list);
   document.body.append(card);
@@ -239,7 +248,7 @@ function showProfileCard(source: ProfileSource, anchor: HTMLElement): void {
   const unsubscribeMessages = onUserMessagesChanged((key) => {
     if (!activeProfileCard || !shouldRefreshProfileMessages(key, source, profileKey)) return;
     const scrollPosition = captureScrollPosition(list);
-    renderProfileMessages(list, getRecentMessagesForIdentity(source.identity), source, closeProfileCard);
+    renderMessages();
     schedulePosition('viewport');
     restoreScrollPositionAfterRender(list, scrollPosition);
   });
@@ -250,6 +259,7 @@ function showProfileCard(source: ProfileSource, anchor: HTMLElement): void {
     window.removeEventListener('resize', handleResize, true);
     if (positionFrame) window.cancelAnimationFrame(positionFrame);
     resizeObserver.disconnect();
+    translationPriorityScope.close();
     unsubscribeMessages();
   };
 
@@ -265,4 +275,11 @@ export function closeProfileCard(): void {
   activeProfileCardCleanup = null;
   activeProfileCard?.remove();
   activeProfileCard = null;
+}
+
+function prioritizeProfileMessageTranslations(
+  scope: TranslationPriorityScope,
+  recentMessages: MessageRecord[]
+): void {
+  scope.prioritize(recentMessages.map(getLiveMessageForRecord));
 }

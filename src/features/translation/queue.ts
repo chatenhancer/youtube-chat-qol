@@ -2,10 +2,11 @@
  * Translation queue and cache.
  *
  * Live messages and retroactive backfill use separate queues. New live messages
- * always get priority, while backfill is capped and throttled so old chat
- * history cannot starve fresh messages or overload the unofficial translate
- * endpoint. The pending backlog is also capped so slow translation responses do
- * not retain stale chat renderers in very fast streams.
+ * usually outrank ordinary backfill, while open focus/profile panels can
+ * temporarily prioritize the messages they are showing. Backfill is capped and
+ * throttled so old chat history cannot starve fresh messages or overload the
+ * unofficial translate endpoint. The pending backlog is also capped so slow
+ * translation responses do not retain stale chat renderers in very fast streams.
  */
 import { getOptions } from '../../shared/state';
 import { cleanText } from '../../shared/text';
@@ -34,6 +35,26 @@ interface TranslationJob {
   targetLanguage: string;
 }
 
+interface TranslationRequest {
+  key: string;
+  originalText: string;
+  protectedTokens: ProtectedToken[];
+  sourceText: string;
+  targetLanguage: string;
+}
+
+interface ActiveTranslationPriorityScope {
+  keys: Set<string>;
+  messages: Set<HTMLElement>;
+}
+
+export interface TranslationPriorityScope {
+  /** Releases all priority keys retained by this panel/surface. */
+  close: () => void;
+  /** Marks live message renderers as important while this scope is open. */
+  prioritize: (messages: Iterable<HTMLElement | null | undefined>) => void;
+}
+
 const MAX_RETROACTIVE_TRANSLATIONS = 150;
 
 const MAX_TRANSLATION_CACHE_SIZE = 500;
@@ -50,36 +71,33 @@ let pendingTranslationSequence = 0;
 
 const translationCache = new Map<string, TranslationResult>();
 const pendingTranslations = new Map<string, Set<PendingTranslationEntry>>();
+const priorityTranslationKeys = new Map<string, number>();
+const activePriorityScopes = new Set<ActiveTranslationPriorityScope>();
 
 export function queueMessageTranslation(message: HTMLElement, { backfill = false } = {}): void {
-  const options = getOptions();
-  if (!options.targetLanguage) return;
+  const request = getTranslationRequest(message);
+  if (!request) return;
 
-  const details = getMessageDetails(message);
-  const plan = createTranslationPlan(message, details.text);
-  const key = makeTranslationKey(plan.text, options.targetLanguage);
+  retainPriorityTranslationKeyForMessage(message, request.key);
+  if (message.dataset.ytcqTranslationKey === request.key) return;
 
-  if (!details.text || !key || message.dataset.ytcqTranslationKey === key) return;
-  if (!hasTextOutsidePlaceholders(plan.text)) return;
-  if (!isUsefulTranslationCandidate(details.text)) return;
-
-  message.dataset.ytcqTranslationKey = key;
+  message.dataset.ytcqTranslationKey = request.key;
   removeTranslation(message);
 
-  const cached = translationCache.get(key);
+  const cached = translationCache.get(request.key);
   if (cached) {
-    const rendered = renderTranslation(message, cached, details.text, plan.protectedTokens, plan.text);
+    const rendered = renderTranslation(message, cached, request.originalText, request.protectedTokens, request.sourceText);
     if (!rendered) {
-      translationCache.delete(key);
+      translationCache.delete(request.key);
       delete message.dataset.ytcqTranslationKey;
       emitMessageTranslationCleared(message);
     } else {
       emitMessageTranslationRendered({
         message,
         result: cached,
-        originalText: details.text,
-        protectedTokens: plan.protectedTokens,
-        sourceText: plan.text
+        originalText: request.originalText,
+        protectedTokens: request.protectedTokens,
+        sourceText: request.sourceText
       });
     }
     return;
@@ -87,28 +105,64 @@ export function queueMessageTranslation(message: HTMLElement, { backfill = false
 
   const entry = {
     messageRef: new WeakRef(message),
-    originalText: details.text,
-    sourceText: plan.text,
-    protectedTokens: plan.protectedTokens,
+    originalText: request.originalText,
+    sourceText: request.sourceText,
+    protectedTokens: request.protectedTokens,
     sequence: pendingTranslationSequence += 1
   };
 
-  if (pendingTranslations.has(key)) {
-    pendingTranslations.get(key)?.add(entry);
-    if (!backfill) promoteBackfillTranslation(key);
+  if (pendingTranslations.has(request.key)) {
+    pendingTranslations.get(request.key)?.add(entry);
+    if (!backfill) promoteBackfillTranslation(request.key);
     enforcePendingTranslationLimit();
     return;
   }
 
-  pendingTranslations.set(key, new Set([entry]));
+  pendingTranslations.set(request.key, new Set([entry]));
   const job = {
-    key,
-    text: plan.text,
-    targetLanguage: options.targetLanguage
+    key: request.key,
+    text: request.sourceText,
+    targetLanguage: request.targetLanguage
   };
   enqueueTranslationJob(job, { backfill });
   enforcePendingTranslationLimit();
   pumpTranslationQueue();
+}
+
+export function createTranslationPriorityScope(): TranslationPriorityScope {
+  const scope = {
+    keys: new Set<string>(),
+    messages: new Set<HTMLElement>()
+  };
+  activePriorityScopes.add(scope);
+  let closed = false;
+
+  return {
+    close: () => {
+      if (closed) return;
+      closed = true;
+      scope.keys.forEach(releasePriorityTranslationKey);
+      scope.keys.clear();
+      scope.messages.clear();
+      activePriorityScopes.delete(scope);
+    },
+    prioritize: (messages) => {
+      if (closed) return;
+
+      for (const message of messages) {
+        if (!message?.isConnected) continue;
+        scope.messages.add(message);
+        const request = getTranslationRequest(message);
+        if (!request) continue;
+        retainPriorityTranslationKey(scope, request.key);
+        if (message.dataset.ytcqTranslationKey !== request.key) {
+          queueMessageTranslation(message, { backfill: true });
+        }
+      }
+
+      pumpTranslationQueue();
+    }
+  };
 }
 
 export function clearTranslations(): void {
@@ -117,6 +171,27 @@ export function clearTranslations(): void {
   pendingTranslations.clear();
   clearTranslationRenderings();
   emitMessageTranslationsCleared();
+}
+
+function getTranslationRequest(message: HTMLElement): TranslationRequest | null {
+  const options = getOptions();
+  if (!options.targetLanguage) return null;
+
+  const details = getMessageDetails(message);
+  const plan = createTranslationPlan(message, details.text);
+  const key = makeTranslationKey(plan.text, options.targetLanguage);
+
+  if (!details.text || !key) return null;
+  if (!hasTextOutsidePlaceholders(plan.text)) return null;
+  if (!isUsefulTranslationCandidate(details.text)) return null;
+
+  return {
+    key,
+    originalText: details.text,
+    protectedTokens: plan.protectedTokens,
+    sourceText: plan.text,
+    targetLanguage: options.targetLanguage
+  };
 }
 
 export function queueRetroactiveTranslations(): void {
@@ -176,6 +251,28 @@ function promoteBackfillTranslation(key: string): void {
     translationDelayTimer = 0;
   }
   pumpTranslationQueue();
+}
+
+function retainPriorityTranslationKey(scope: ActiveTranslationPriorityScope, key: string): void {
+  if (scope.keys.has(key)) return;
+  scope.keys.add(key);
+  priorityTranslationKeys.set(key, (priorityTranslationKeys.get(key) || 0) + 1);
+}
+
+function retainPriorityTranslationKeyForMessage(message: HTMLElement, key: string): void {
+  activePriorityScopes.forEach((scope) => {
+    if (scope.messages.has(message)) retainPriorityTranslationKey(scope, key);
+  });
+}
+
+function releasePriorityTranslationKey(key: string): void {
+  const count = priorityTranslationKeys.get(key) || 0;
+  if (count <= 1) {
+    priorityTranslationKeys.delete(key);
+    return;
+  }
+
+  priorityTranslationKeys.set(key, count - 1);
 }
 
 function enforcePendingTranslationLimit(): void {
@@ -293,7 +390,7 @@ function pumpTranslationQueue(): void {
   if (activeTranslations >= MAX_TRANSLATION_CONCURRENCY) return;
   if (translationDelayTimer) return;
 
-  const job = liveTranslationQueue.shift() || backfillTranslationQueue.shift();
+  const job = takeNextTranslationJob();
   if (!job) return;
 
   activeTranslations += 1;
@@ -341,6 +438,19 @@ function pumpTranslationQueue(): void {
       }, backfillTranslationQueue.length ? TRANSLATION_DELAY_MS : LIVE_TRANSLATION_DELAY_MS);
       pumpTranslationQueue();
     });
+}
+
+function takeNextTranslationJob(): TranslationJob | undefined {
+  return takePriorityTranslationJob(liveTranslationQueue) ||
+    takePriorityTranslationJob(backfillTranslationQueue) ||
+    liveTranslationQueue.shift() ||
+    backfillTranslationQueue.shift();
+}
+
+function takePriorityTranslationJob(queue: TranslationJob[]): TranslationJob | undefined {
+  const index = queue.findIndex((job) => priorityTranslationKeys.has(job.key));
+  if (index < 0) return undefined;
+  return queue.splice(index, 1)[0];
 }
 
 function translate(text: string, targetLanguage: string): Promise<TranslationResult> {
