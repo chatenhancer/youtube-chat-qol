@@ -43,7 +43,7 @@ export async function launchExtensionContext({
     throw new Error('Missing dist/extension-chrome. Run npm run build:chrome first.');
   }
 
-  const headless = requestedHeadless ?? isHeadlessBrowserTest();
+  const headless = requestedHeadless ?? false;
   const channel = requestedChannel || process.env.YTCQ_CHROME_CHANNEL || (headless ? 'chromium' : undefined);
   testInfo?.annotations.push({
     type: 'chrome-profile',
@@ -108,10 +108,6 @@ export async function launchNormalChromeExtensionContext({
     '--mute-audio',
     `--remote-debugging-port=${remoteDebuggingPort}`,
     '--no-first-run',
-    ...(isHeadlessBrowserTest() ? [
-      '--headless=new',
-      '--window-size=1280,900'
-    ] : []),
     ...(initialUrl ? [initialUrl] : [])
   ];
   const browserProcess = spawn(await getChromeExecutable(), args, {
@@ -245,8 +241,4 @@ async function getChromeExecutable(): Promise<string> {
 
 async function fileExists(filePath: string): Promise<boolean> {
   return access(filePath).then(() => true, () => false);
-}
-
-function isHeadlessBrowserTest(): boolean {
-  return process.env.YTCQ_HEADLESS === '1';
 }
