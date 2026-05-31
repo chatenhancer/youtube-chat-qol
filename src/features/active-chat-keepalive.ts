@@ -14,14 +14,16 @@ import { registerFeatureLifecycle } from '../content/lifecycle';
 const ACTIVE_CHAT_PORT_NAME = 'ytcq:active-chat';
 const ACTIVE_CHAT_PING_TYPE = 'ytcq:active-chat-ping';
 const ACTIVE_CHAT_PING_INTERVAL_MS = 25_000;
+const ACTIVE_CHAT_RECONNECT_DELAY_MS = 250;
 const RECONNECT_DRAFT_STORAGE_KEY = 'ytcqReconnectDraft';
 const RECONNECT_ANCHOR_CLASS = 'ytcq-reconnect-anchor';
 const DRAFT_RESTORE_DELAYS_MS = [300, 800, 1500, 3000, 5000];
 
 let keepAlivePort: chrome.runtime.Port | null = null;
 let keepAliveTimer = 0;
+let reconnectTimer = 0;
 let reconnectNotice: HTMLButtonElement | null = null;
-let reconnectNoticePending = false;
+let reconnectPending = false;
 
 interface ReconnectDraft {
   text: string;
@@ -39,29 +41,39 @@ registerFeatureLifecycle({
 export function startActiveChatKeepAlive(): void {
   restoreReconnectDraft();
   if (keepAlivePort) return;
+  connectActiveChatPort();
+}
 
+function connectActiveChatPort(): boolean {
   try {
     keepAlivePort = chrome.runtime.connect({ name: ACTIVE_CHAT_PORT_NAME });
   } catch {
     keepAlivePort = null;
     hideEnhancedEffect();
-    return;
+    return false;
   }
 
   keepAlivePort.onDisconnect.addListener(() => {
     keepAlivePort = null;
     clearKeepAliveTimer();
-    showReconnectNotice();
+    scheduleActiveChatReconnect();
   });
 
+  reconnectPending = false;
+  reconnectNotice?.remove();
+  reconnectNotice = null;
+  clearReconnectTimer();
   sendActiveChatPing();
+  clearKeepAliveTimer();
   keepAliveTimer = window.setInterval(sendActiveChatPing, ACTIVE_CHAT_PING_INTERVAL_MS);
+  return true;
 }
 
 export function cleanupStaleReconnectNotice(): void {
   document.querySelectorAll<HTMLElement>(`.${RECONNECT_ANCHOR_CLASS}`).forEach((anchor) => anchor.remove());
   reconnectNotice = null;
-  reconnectNoticePending = false;
+  reconnectPending = false;
+  clearReconnectTimer();
 }
 
 function sendActiveChatPing(): void {
@@ -72,15 +84,26 @@ function sendActiveChatPing(): void {
   } catch {
     keepAlivePort = null;
     clearKeepAliveTimer();
-    showReconnectNotice();
+    scheduleActiveChatReconnect();
   }
+}
+
+function scheduleActiveChatReconnect(): void {
+  reconnectPending = true;
+  if (document.visibilityState === 'hidden' || reconnectTimer) return;
+
+  reconnectTimer = window.setTimeout(() => {
+    reconnectTimer = 0;
+    if (connectActiveChatPort()) return;
+    showReconnectNotice();
+  }, ACTIVE_CHAT_RECONNECT_DELAY_MS);
 }
 
 function showReconnectNotice(): void {
   hideEnhancedEffect();
-  reconnectNoticePending = true;
+  reconnectPending = true;
   if (reconnectNotice || document.visibilityState === 'hidden') return;
-  reconnectNoticePending = false;
+  reconnectPending = false;
 
   const button = ytcqCreateElement('button');
   button.type = 'button';
@@ -103,14 +126,20 @@ function showReconnectNotice(): void {
 }
 
 function showPendingReconnectNotice(visibilityState: Document['visibilityState']): void {
-  if (!reconnectNoticePending || visibilityState === 'hidden') return;
-  showReconnectNotice();
+  if (!reconnectPending || visibilityState === 'hidden') return;
+  scheduleActiveChatReconnect();
 }
 
 function clearKeepAliveTimer(): void {
   if (!keepAliveTimer) return;
   window.clearInterval(keepAliveTimer);
   keepAliveTimer = 0;
+}
+
+function clearReconnectTimer(): void {
+  if (!reconnectTimer) return;
+  window.clearTimeout(reconnectTimer);
+  reconnectTimer = 0;
 }
 
 function saveReconnectDraft(): void {
