@@ -6,23 +6,22 @@
  * calls this runner with --no-build to avoid rebuilding before Playwright.
  */
 import { spawnSync } from 'node:child_process';
+import { createBrowserTestPlan } from './run-browser-tests-plan.mjs';
 
 const args = process.argv.slice(2);
-const shouldBuild = !args.includes('--no-build');
-const playwrightArgs = [
-  'test',
-  '--config=playwright.config.ts',
-  ...args.filter((arg) => arg !== '--no-build')
-];
+const { playwrightArgs, reportOutputFolder, shouldBuild } = createBrowserTestPlan(args);
 
 if (shouldBuild) {
   run(getNpmCommand(), ['run', 'build:chrome']);
 }
 
-run(getPlaywrightCommand(), playwrightArgs);
+run(getPlaywrightCommand(), playwrightArgs, {
+  YTCQ_PLAYWRIGHT_REPORT_DIR: reportOutputFolder
+});
 
-function run(command, commandArgs) {
+function run(command, commandArgs, extraEnv = {}) {
   const result = spawnSync(command, commandArgs, {
+    env: { ...process.env, ...extraEnv },
     stdio: 'inherit'
   });
 

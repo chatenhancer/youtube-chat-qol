@@ -114,7 +114,7 @@ function setAlertFavicon(topDocument: Document): void {
     link.className = ALERT_FAVICON_CLASS;
     link.rel = 'icon';
     link.type = 'image/svg+xml';
-    link.sizes.value = size;
+    link.setAttribute('sizes', size);
     link.href = href;
     head.append(link);
   });

@@ -13,11 +13,26 @@ Google account checks, consent screens, and livestream availability.
 
 ```text
 tests/browser/
+  scenarios/       feature-level checks shared by mock and live specs
   specs/
     youtube-mock/  deterministic mock YouTube chat specs
     youtube-live/  real YouTube livestream specs
   helpers/         shared Chrome, extension, YouTube, and assertion helpers
 ```
+
+The scenario files are the source of truth for portable feature checks. Mock
+and live specs import the same logged-out and signed-in scenario groups, so it
+is obvious when a feature passes in the fixture but fails against real YouTube.
+Each portable scenario is registered as its own Playwright test with matching
+names in `youtube-mock` and `youtube-live`.
+
+Browser launches are still worker-scoped. Splitting the specs by feature does
+not intentionally reopen Chrome for every check when the suite runs normally
+with one worker.
+
+Mock-only specs should stay rare. Menu checks are part of the shared scenario
+groups because the extension injects those actions into real YouTube chat
+menus too.
 
 ## Test types
 
@@ -41,14 +56,25 @@ This builds the Chrome extension and opens a deterministic local fixture that
 looks like a small YouTube live chat page. It does not use a real YouTube page,
 does not require login, and is the safest browser smoke test to run often.
 
+It runs both mock auth states:
+
+- logged out: read-only extension surfaces
+- signed in: read-only surfaces plus composer-only draft controls
+
 It checks that the extension can attach and render the core injected surfaces:
 
 - Inbox button and card
+- incoming message translation rendering with a mocked Translate response
+- incoming message translation through the real Google Translate endpoint
 - composer translate button
-- YouTube settings menu items
-- message menu actions
+- mention and quote draft insertion
 - recent-message profile card
 - extension popup active status
+
+Menu injection is part of the shared scenario groups:
+
+- YouTube settings menu items
+- message menu Quote and Mention actions
 
 ### Real YouTube live smoke
 
@@ -64,11 +90,15 @@ Set `YTCQ_LIVE_URL` to test a different livestream:
 YTCQ_LIVE_URL=https://www.youtube.com/watch?v=VIDEO_ID npm run test:browser:live
 ```
 
-The logged-out case uses a throwaway Playwright profile. It verifies read-only
-features that should work without a chat composer.
+The logged-out case uses a throwaway Playwright profile. It runs the same
+logged-out scenario group as the mock fixture: attachment, settings menu,
+mocked and real incoming message translation, Inbox, profile card, and popup
+active status.
 
 The logged-in case uses a dedicated local Chrome profile because Google sign-in
-can reject automated browser profiles.
+can reject automated browser profiles. It runs the same signed-in scenario
+group as the mock fixture, including composer translation controls and safe
+message-menu/draft insertion checks. It never sends a chat message.
 
 ## Signed-in setup
 
@@ -124,16 +154,10 @@ CI runs this through `npm run verify` after the Chrome extension output has
 already been built, so the underlying Playwright command is not expected to
 rebuild the extension a second time.
 
-Real YouTube smoke tests stay headed by default. The signed-in live smoke can
-be tried headlessly for debugging:
-
-```sh
-YTCQ_HEADLESS=1 npm run test:browser:live -- -g logged-in
-```
-
-In current Chrome and YouTube behavior, headless real-YouTube runs are not
-reliable enough for normal extension iframe injection and signed-in composer
-checks, so headed mode is still the supported path for real YouTube coverage.
+Real YouTube smoke tests stay headed. In current Chrome and YouTube behavior,
+headless real-YouTube runs are not reliable enough for normal extension iframe
+injection and signed-in composer checks. `YTCQ_HEADLESS=1` is for
+`youtube-mock`; signed-in live tests intentionally skip when that flag is set.
 
 `npm run test:youtube-login` also intentionally stays visible because it is an
 interactive setup utility for Google sign-in and extension installation.
@@ -175,6 +199,24 @@ npm run test:browser:live
 npm run test:youtube-login
 npm run test:browser:live -- -g logged-in
 ```
+
+After a full browser-test run, open the combined HTML report with:
+
+```sh
+npx playwright show-report playwright-report/browser
+```
+
+Project-specific npm commands write their own reports:
+
+```sh
+npx playwright show-report playwright-report/youtube-mock
+npx playwright show-report playwright-report/youtube-live
+```
+
+The report shows each test, its `test.step(...)` timeline, and links to failure
+artifacts. Failure screenshots, videos, and traces are written under
+`test-results/browser/`; traces can also be opened directly with
+`npx playwright show-trace test-results/browser/<failed-test>/trace.zip`.
 
 If the signed-in test fails because the profile is already open, close the
 Chrome window using `.chrome-test-profile/` and rerun the command.
