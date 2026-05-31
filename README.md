@@ -22,43 +22,43 @@ Not affiliated with YouTube or Google.
 
 ## Features
 
-### Translation
+### <img src="assets/readme-icons/translation.svg" alt="" width="20" height="20" align="absmiddle"> &nbsp;Translation
 
-- Translate live chat messages, with translation off by default
-- Choose whether translations replace the original message or appear below it
-- Translate the message you're typing before sending it, while keeping mentions and emojis intact
+- Translate live chat messages, with translation off by default.
+- Choose whether translations replace the original message or appear below it.
+- Translate the message you're typing before sending it, while keeping mentions and emojis intact.
 
-### Reply and context
+### <img src="assets/readme-icons/reply-context.svg" alt="" width="20" height="20" align="absmiddle"> &nbsp;Reply and context
 
-- Mention or quote messages from YouTube's existing message menu
-- Click an author name to mention them
-- Alt/Option-click an author name to quote their message
-- Use Focus mode to keep one conversation visible while you reply
-- Click an avatar to see that user's recent messages and open their channel
+- Mention or quote messages from YouTube's existing message menu.
+- Click an author name to mention them.
+- Alt/Option-click an author name to quote their message.
+- Use Focus mode to keep one conversation visible while you reply.
+- Click an avatar to see that user's recent messages and open their channel.
 
-### Inbox
+### <img src="assets/readme-icons/inbox.svg" alt="" width="20" height="20" align="absmiddle"> &nbsp;Inbox
 
-- Keep a local inbox for messages that mention your handle or match watched keywords/phrases
-- Highlight mentions and watched keywords in chat and in the inbox
-- Jump back to saved messages while they are still visible in chat
-- Optionally play a subtle sound and show tab alerts for new inbox messages
+- Keep a local inbox for messages that mention your handle or match watched keywords/phrases.
+- Highlight mentions and watched keywords in chat and in the inbox.
+- Jump back to saved messages while they are still visible in chat.
+- Optionally play a subtle sound and show tab alerts for new inbox messages.
 
-### Emoji and commands
+### <img src="assets/readme-icons/emoji-commands.svg" alt="" width="20" height="20" align="absmiddle"> &nbsp;Emoji and commands
 
-- Reuse your most-used emojis from a local row in the emoji picker
-- Use Tab-expanded chat commands and autocomplete for mentions, quotes, time helpers, translations, inbox watches, and settings
+- Reuse your most-used emojis from a local row in the emoji picker.
+- Use Tab-expanded chat commands and autocomplete for mentions, quotes, time helpers, translations, inbox watches, and settings.
 
-### Popup and status
+### <img src="assets/readme-icons/popup-status.svg" alt="" width="20" height="20" align="absmiddle"> &nbsp;Popup and status
 
-- See whether the extension is active in the current tab or other open live chat tabs
-- Manage extension settings and clear local extension data from the popup
+- See whether the extension is active in the current tab or other open live chat tabs.
+- Manage extension settings and clear local extension data from the popup.
 
-### Privacy
+### <img src="assets/readme-icons/privacy.svg" alt="" width="20" height="20" align="absmiddle"> &nbsp;Privacy
 
-- The extension does not replace YouTube chat
-- The extension does not run analytics
-- The extension does not send data to an extension-owned server
-- When a translation feature is enabled, incoming message text or draft text you choose to translate is sent to Google Translate so it can be translated
+- The extension does not replace YouTube chat.
+- The extension does not run analytics.
+- The extension does not send data to an extension-owned server.
+- When a translation feature is enabled, incoming message text or draft text you choose to translate is sent to Google Translate so it can be translated.
 
 ## Screenshots
 
