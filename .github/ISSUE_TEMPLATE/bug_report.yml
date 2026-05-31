@@ -1,5 +1,5 @@
 name: Bug report
-description: Report something that is not working as expected.
+description: Report anything in the extension that is not working as expected.
 title: "[Bug]: "
 labels: ["bug"]
 body:
@@ -7,6 +7,28 @@ body:
     attributes:
       value: |
         Thanks for reporting a bug. Please include enough detail to reproduce the issue without exposing private chat content.
+
+  - type: dropdown
+    id: affected-area
+    attributes:
+      label: What part is affected?
+      options:
+        - Extension button missing or inactive
+        - Translation
+        - Draft translation
+        - Mention / Quote message menu
+        - Author click or Alt/Option-click
+        - Focus mode
+        - Avatar profile card / recent messages
+        - Inbox / keyword highlights
+        - Inbox sound
+        - Tab alerts / background chat updates
+        - Frequent emoji row
+        - Chat commands
+        - Extension popup
+        - Other
+    validations:
+      required: true
 
   - type: textarea
     id: problem
@@ -29,6 +51,39 @@ body:
         4. See ...
     validations:
       required: true
+
+  - type: dropdown
+    id: youtube-ui-change
+    attributes:
+      label: Did this start after YouTube's chat UI looked different?
+      options:
+        - Not sure
+        - "Yes"
+        - "No"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: chat-location
+    attributes:
+      label: Where does it happen?
+      options:
+        - Normal watch page live chat
+        - Live chat replay
+        - Popout chat
+        - Theater or fullscreen layout
+        - Extension popup
+        - Not sure
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: video-url
+    attributes:
+      label: Example video or livestream URL
+      description: Optional. Only include a URL if it is public and safe to share.
+      placeholder: "https://www.youtube.com/watch?v=..."
 
   - type: dropdown
     id: browser
@@ -77,6 +132,13 @@ body:
     attributes:
       label: Screenshots or screen recording
       description: If useful, attach screenshots. Please avoid sharing private information.
+
+  - type: textarea
+    id: console-errors
+    attributes:
+      label: Console errors or technical details
+      description: Optional. If you know how to inspect the page, paste relevant console errors or DOM details.
+      render: shell
 
   - type: textarea
     id: extra
