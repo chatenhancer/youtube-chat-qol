@@ -79,7 +79,7 @@ async function buildTarget(target) {
     syncExtensionLocales(path.join(extensionDir, '_locales')),
     cp(path.join(root, 'assets', 'fonts'), path.join(extensionDir, 'fonts'), { recursive: true }),
     cp(path.join(root, 'assets', 'icons'), path.join(extensionDir, 'icons'), { recursive: true }),
-    cp(path.join(root, 'assets', 'licenses'), path.join(extensionDir, 'licenses'), { recursive: true })
+    cp(path.join(root, 'licenses'), path.join(extensionDir, 'licenses'), { recursive: true })
   ]);
 
   await writeFile(
