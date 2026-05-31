@@ -33,6 +33,8 @@ import {
   primeYouTubeSession
 } from './youtube-page';
 
+const DEFAULT_MOCK_HEADLESS = true;
+
 interface MockSession {
   context: BrowserContext;
   page: Page;
@@ -71,6 +73,7 @@ export const mockTest = base.extend<MockTestFixtures, MockWorkerFixtures>({
   mockWorkerSession: [async ({ browserName }, use, workerInfo) => {
     void browserName;
     const context = await launchExtensionContext({
+      headless: shouldRunHeadlessBrowserTest(),
       profileDir: path.join(workerInfo.project.outputDir, 'profiles', `mock-${workerInfo.workerIndex}`)
     });
 
@@ -183,8 +186,6 @@ async function createSignedInLiveSession(): Promise<{
   close: () => Promise<void>;
   session: LiveSession;
 } | null> {
-  if (process.env.YTCQ_HEADLESS === '1') return null;
-
   const profileDir = getLiveProfileDir();
   const liveUrl = getLiveUrl();
   console.log(`Using signed-in Chrome profile: ${profileDir}`);
@@ -245,14 +246,17 @@ async function closeTransientSurfaces(chat: FrameLocator): Promise<void> {
 }
 
 function getMissingSignedInProfileReason(): string {
-  if (process.env.YTCQ_HEADLESS === '1') {
-    return 'Skipping signed-in live smoke because signed-in YouTube coverage should run headed, not headless.';
-  }
-
   return [
     'Skipping signed-in live smoke because the prepared Chrome profile or installed extension was not found.',
     'Run `npm run test:youtube-login`, sign in to YouTube web, and make sure Chat Enhancer is loaded from:',
     extensionDir,
     `Default livestream: ${defaultLiveUrl}`
   ].join(' ');
+}
+
+function shouldRunHeadlessBrowserTest(): boolean {
+  const override = process.env.YTCQ_TEST_HEADLESS;
+  if (override === '0') return false;
+  if (override === '1') return true;
+  return DEFAULT_MOCK_HEADLESS;
 }

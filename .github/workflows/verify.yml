@@ -21,5 +21,3 @@ jobs:
         run: npm run test:browser:install
       - name: Verify project
         run: npm run verify
-        env:
-          YTCQ_HEADLESS: '1'

@@ -132,16 +132,22 @@ Then run only the signed-in smoke with:
 npm run test:browser:live -- -g logged-in
 ```
 
-## Headless mock runs
+## Mock runs
 
-The mock browser smoke test can run headless by setting `YTCQ_HEADLESS=1`:
+The mock browser smoke test runs headless by default:
 
 ```sh
-YTCQ_HEADLESS=1 npm run test:browser:mock
+npm run test:browser:mock
 ```
 
 The mock test automatically uses Playwright's Chromium channel in headless mode
 so the unpacked extension loads correctly.
+
+To debug the mock test in a visible browser window, opt out of the default:
+
+```sh
+YTCQ_TEST_HEADLESS=0 npm run test:browser:mock
+```
 
 This is the browser smoke test that runs in CI. It avoids real YouTube, Google
 sign-in, and the persistent signed-in Chrome profile.
@@ -152,8 +158,7 @@ rebuild the extension a second time.
 
 Real YouTube smoke tests stay headed. In current Chrome and YouTube behavior,
 headless real-YouTube runs are not reliable enough for normal extension iframe
-injection and signed-in composer checks. `YTCQ_HEADLESS=1` is for
-`youtube-mock`; signed-in live tests intentionally skip when that flag is set.
+injection and signed-in composer checks.
 
 `npm run test:youtube-login` also intentionally stays visible because it is an
 interactive setup utility for Google sign-in and extension installation.

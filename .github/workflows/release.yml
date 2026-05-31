@@ -27,8 +27,6 @@ jobs:
         run: node scripts/validate-release-tag.mjs
       - name: Build release archives
         run: npm run zip
-        env:
-          YTCQ_HEADLESS: '1'
       - name: Upload release archives
         uses: actions/upload-artifact@v6
         with:
