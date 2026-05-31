@@ -69,13 +69,25 @@ It checks that the extension can attach and render the core injected surfaces:
 - chat settings toggles persisting translation and Inbox sound options
 - extension popup controls persisting translation, display, sound, and startup
   effect options
+- extension popup reset restoring defaults, clearing local data, and closing
+  open panels
+- settings changes reacting in the open chat, not only persisting for reloads
 - incoming message translation rendering with a mocked Translate response
 - translation display modes rendering below the original message and replacing
   the original message
 - incoming message translation through the real Google Translate endpoint
-- composer translate button
+- composer translate button and draft translation with mocked and real Google
+  Translate responses
+- frequent emoji tracking, most-used row rendering, persistence after reload,
+  and composer insertion
+- tab title and favicon alerts for background Inbox matches
+- Tab-expanded chat commands for time helpers, settings, watched keywords, and
+  help
+- focus panel opening from an author click, populated with that author's recent
+  messages, plus fixture-controlled live updates
 - mention and quote draft insertion
-- recent-message profile card
+- recent-message profile card content for the clicked author, plus
+  fixture-controlled live updates
 - extension popup active status
 
 Menu injection is part of the shared scenario groups:

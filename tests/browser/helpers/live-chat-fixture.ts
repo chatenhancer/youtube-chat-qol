@@ -20,6 +20,7 @@ export function createLiveChatFixtureHtml({
   <head>
     <meta charset="utf-8">
     <title>Mock YouTube Live Chat</title>
+    <link rel="icon" href="/favicon.ico">
     <style>
       html,
       body {
@@ -117,6 +118,28 @@ export function createLiveChatFixtureHtml({
         min-height: 40px;
       }
 
+      yt-emoji-picker-renderer {
+        background: #212121;
+        border-top: 1px solid #333;
+        display: block;
+        padding: 8px 12px;
+      }
+
+      yt-emoji-picker-renderer #categories {
+        display: block;
+      }
+
+      yt-emoji-picker-renderer [role="option"] {
+        background: transparent;
+        border: 0;
+        border-radius: 50%;
+        color: #fff;
+        cursor: pointer;
+        font-size: 20px;
+        height: 36px;
+        width: 36px;
+      }
+
       ytd-menu-popup-renderer {
         background: #282828;
         border-radius: 8px;
@@ -164,7 +187,9 @@ export function createLiveChatFixtureHtml({
             <span id="author-name">@CurrentViewer</span>
             <div id="input" contenteditable="true" aria-label="Chat input"></div>
             <div id="emoji-picker-button">
-              <button type="button" aria-label="Add emotes">🙂</button>
+              <yt-live-chat-icon-toggle-button-renderer id="emoji" class="style-scope yt-live-chat-message-input-renderer">
+                <button type="button" aria-label="Add emotes">🙂</button>
+              </yt-live-chat-icon-toggle-button-renderer>
             </div>
             <button id="send-button" type="button">Send</button>
           </yt-live-chat-message-input-renderer>
@@ -241,6 +266,42 @@ export function createLiveChatFixtureHtml({
         }
       };
 
+      window.ytcqAppendFixtureMessage = (overrides = {}) => {
+        if (!items || !scroller) return null;
+
+        const fixtureMessage = {
+          author: String(overrides.author || '@BrowserTestViewer'),
+          channel: String(overrides.channel || \`fixture-channel-custom-\${nextMessageNumber}\`),
+          text: String(overrides.text || 'Browser test message')
+        };
+        const message = createMessage(fixtureMessage, nextMessageNumber);
+        items.append(message);
+        nextMessageNumber += 1;
+        scroller.scrollTop = scroller.scrollHeight;
+        scroller.dispatchEvent(new Event('scroll', { bubbles: true }));
+        return message.id;
+      };
+
+      const removeEmojiPicker = () => {
+        document.querySelector('yt-emoji-picker-renderer')?.remove();
+      };
+
+      const addEmojiPicker = () => {
+        removeEmojiPicker();
+        const picker = document.createElement('yt-emoji-picker-renderer');
+        picker.innerHTML = \`
+          <div id="categories">
+            <yt-emoji-picker-category-renderer>
+              <button type="button" role="option" aria-label="check mark button">✅</button>
+              <button type="button" role="option" aria-label="grinning face">😀</button>
+              <button type="button" role="option" aria-label="party popper">🎉</button>
+              <button type="button" role="option" aria-label="blue heart">💙</button>
+            </yt-emoji-picker-category-renderer>
+          </div>
+        \`;
+        document.querySelector('yt-live-chat-renderer')?.append(picker);
+      };
+
       const removeOpenMenus = () => {
         for (const menu of document.querySelectorAll('ytd-menu-popup-renderer')) {
           menu.remove();
@@ -262,6 +323,7 @@ export function createLiveChatFixtureHtml({
       };
 
       document.querySelector('#live-chat-header-context-menu button').addEventListener('click', addSettingsMenu);
+      document.querySelector('#emoji-picker-button button')?.addEventListener('click', addEmojiPicker);
       document.addEventListener('click', (event) => {
         const target = event.target instanceof Element ? event.target.closest('#menu') : null;
         if (!target?.closest('yt-live-chat-text-message-renderer')) return;
