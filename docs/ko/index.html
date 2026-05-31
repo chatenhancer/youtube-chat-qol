@@ -79,7 +79,7 @@
         }
       })();
     </script>
-    <link rel="stylesheet" href="../styles.css?v=120">
+    <link rel="stylesheet" href="../styles.css?v=121">
     <script type="application/ld+json">
       {
               "@context": "https://schema.org",
@@ -799,7 +799,6 @@
         });
 
         setupStoreVersionAlertScrollFade();
-        setupFeatureGridShimmer();
         void checkStoreVersionStatus();
 
         if (!installActions || !chromeButton || !firefoxButton) return;
@@ -858,46 +857,6 @@
           window.addEventListener("scroll", schedule, { passive: true });
           window.addEventListener("resize", schedule);
           update();
-        }
-
-        function setupFeatureGridShimmer() {
-          if (document.documentElement.dataset.screenshotPanel) return;
-
-          const featureGrid = document.querySelector(".feature-grid");
-          if (!featureGrid) return;
-
-          const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-          if (motionQuery.matches) return;
-
-          const play = () => {
-            featureGrid.classList.add("feature-grid-shimmer-visible");
-          };
-
-          let frame = 0;
-          const isMostlyVisible = () => {
-            const rect = featureGrid.getBoundingClientRect();
-            const visibleHeight = Math.max(0, Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0));
-            const visibleTarget = Math.min(rect.height, window.innerHeight);
-            return visibleTarget > 0 && visibleHeight / visibleTarget >= 0.72;
-          };
-          const cleanup = () => {
-            window.removeEventListener("scroll", schedule);
-            window.removeEventListener("resize", schedule);
-          };
-          const check = () => {
-            frame = 0;
-            if (!isMostlyVisible()) return;
-            cleanup();
-            play();
-          };
-          const schedule = () => {
-            if (frame) return;
-            frame = window.requestAnimationFrame(check);
-          };
-
-          window.addEventListener("scroll", schedule, { passive: true });
-          window.addEventListener("resize", schedule);
-          schedule();
         }
 
         function formatStoreList(stores, conjunction) {
