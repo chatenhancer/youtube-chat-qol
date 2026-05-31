@@ -18,7 +18,7 @@ import { getInstalledProfileExtensionId } from './extension';
 import {
   createLiveChatFixtureHtml,
   fixtureLoggedOutLiveChatUrl,
-  fixtureSignedInLiveChatUrl
+  fixtureLoggedInLiveChatUrl
 } from './live-chat-fixture';
 import {
   defaultLiveUrl,
@@ -35,12 +35,12 @@ import {
 
 const DEFAULT_MOCK_HEADLESS = true;
 
-interface MockSession {
+export interface MockSession {
   context: BrowserContext;
   page: Page;
 }
 
-interface LiveSession {
+export interface LiveSession {
   context: BrowserContext;
   page: Page;
   chat: FrameLocator;
@@ -49,7 +49,7 @@ interface LiveSession {
 
 interface MockTestFixtures {
   mockLoggedOutSession: MockSession;
-  mockSignedInSession: MockSession;
+  mockLoggedInSession: MockSession;
 }
 
 interface MockWorkerFixtures {
@@ -58,12 +58,12 @@ interface MockWorkerFixtures {
 
 interface LiveTestFixtures {
   liveLoggedOutSession: LiveSession;
-  liveSignedInSession: LiveSession | null;
+  liveLoggedInSession: LiveSession | null;
 }
 
 interface LiveWorkerFixtures {
   liveLoggedOutWorkerSession: LiveSession;
-  liveSignedInWorkerSession: LiveSession | null;
+  liveLoggedInWorkerSession: LiveSession | null;
 }
 
 export { expect };
@@ -78,9 +78,9 @@ export const mockTest = base.extend<MockTestFixtures, MockWorkerFixtures>({
 
     await context.route('https://www.youtube.com/live_chat*', (route) => {
       const url = new URL(route.request().url());
-      const signedIn = url.searchParams.get('ytcq-auth') !== 'logged-out';
+      const loggedIn = url.searchParams.get('ytcq-auth') !== 'logged-out';
       route.fulfill({
-        body: createLiveChatFixtureHtml({ signedIn }),
+        body: createLiveChatFixtureHtml({ loggedIn }),
         contentType: 'text/html'
       });
     });
@@ -103,8 +103,8 @@ export const mockTest = base.extend<MockTestFixtures, MockWorkerFixtures>({
     }
   },
 
-  mockSignedInSession: async ({ mockWorkerSession }, use, testInfo) => {
-    await openMockChatPage(mockWorkerSession.page, fixtureSignedInLiveChatUrl);
+  mockLoggedInSession: async ({ mockWorkerSession }, use, testInfo) => {
+    await openMockChatPage(mockWorkerSession.page, fixtureLoggedInLiveChatUrl);
     try {
       await use(mockWorkerSession);
     } finally {
@@ -131,9 +131,9 @@ export const liveTest = base.extend<LiveTestFixtures, LiveWorkerFixtures>({
     }
   }, { scope: 'worker' }],
 
-  liveSignedInWorkerSession: [async ({ browserName }, use) => {
+  liveLoggedInWorkerSession: [async ({ browserName }, use) => {
     void browserName;
-    const session = await createSignedInLiveSession();
+    const session = await createLoggedInLiveSession();
 
     try {
       await use(session?.session || null);
@@ -152,26 +152,26 @@ export const liveTest = base.extend<LiveTestFixtures, LiveWorkerFixtures>({
     }
   },
 
-  liveSignedInSession: async ({ liveSignedInWorkerSession }, use, testInfo) => {
-    if (liveSignedInWorkerSession) {
-      await closeTransientSurfaces(liveSignedInWorkerSession.chat);
+  liveLoggedInSession: async ({ liveLoggedInWorkerSession }, use, testInfo) => {
+    if (liveLoggedInWorkerSession) {
+      await closeTransientSurfaces(liveLoggedInWorkerSession.chat);
     }
     try {
-      await use(liveSignedInWorkerSession);
+      await use(liveLoggedInWorkerSession);
     } finally {
-      if (liveSignedInWorkerSession) {
-        await dumpDomOnFailure(liveSignedInWorkerSession.context, testInfo);
-        await closeTransientSurfaces(liveSignedInWorkerSession.chat);
+      if (liveLoggedInWorkerSession) {
+        await dumpDomOnFailure(liveLoggedInWorkerSession.context, testInfo);
+        await closeTransientSurfaces(liveLoggedInWorkerSession.chat);
       }
     }
   }
 });
 
-export function skipIfSignedInLiveUnavailable(
+export function skipIfLoggedInLiveUnavailable(
   test: typeof liveTest,
   session: LiveSession | null
 ): asserts session is LiveSession {
-  test.skip(!session, getMissingSignedInProfileReason());
+  test.skip(!session, getMissingLoggedInProfileReason());
   test.skip(Boolean(session?.unavailableReason), session?.unavailableReason || '');
 }
 
@@ -181,13 +181,13 @@ async function openMockChatPage(page: Page, url: string): Promise<void> {
   await expect(page.locator('.ytcq-inbox-button')).toBeVisible({ timeout: 15_000 });
 }
 
-async function createSignedInLiveSession(): Promise<{
+async function createLoggedInLiveSession(): Promise<{
   close: () => Promise<void>;
   session: LiveSession;
 } | null> {
   const profileDir = getLiveProfileDir();
   const liveUrl = getLiveUrl();
-  console.log(`Using signed-in Chrome profile: ${profileDir}`);
+  console.log(`Using logged-in Chrome profile: ${profileDir}`);
   console.log(`Opening live stream: ${liveUrl}`);
 
   if (!existsSync(path.join(profileDir, 'Default', 'Cookies'))) {
@@ -243,9 +243,9 @@ async function closeTransientSurfaces(chat: FrameLocator): Promise<void> {
     .catch(() => undefined);
 }
 
-function getMissingSignedInProfileReason(): string {
+function getMissingLoggedInProfileReason(): string {
   return [
-    'Skipping signed-in live smoke because the prepared Chrome profile or installed extension was not found.',
+    'Skipping logged-in live smoke because the prepared Chrome profile or installed extension was not found.',
     'Run `npm run test:youtube-login`, sign in to YouTube web, and make sure Chat Enhancer is loaded from:',
     extensionDir,
     `Default livestream: ${defaultLiveUrl}`

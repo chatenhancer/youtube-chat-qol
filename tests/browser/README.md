@@ -3,7 +3,7 @@
 This folder contains Playwright smoke tests for the built browser extension.
 They are intended to catch wiring failures that unit tests cannot see, such as
 content script injection, popup status, YouTube chat iframe behavior, and the
-composer-only controls that require a signed-in account.
+composer-only controls that require a logged-in account.
 
 These tests are not a replacement for unit tests. They are slower, depend on
 browser behavior, and the real YouTube tests can be affected by YouTube UI,
@@ -21,10 +21,15 @@ tests/browser/
 ```
 
 The scenario files are the source of truth for portable feature checks. Mock
-and live specs import the same logged-out and signed-in scenario groups, so it
+and live specs import the same logged-out and logged-in scenario groups, so it
 is obvious when a feature passes in the fixture but fails against real YouTube.
 Each portable scenario is registered as its own Playwright test with matching
 names in `youtube-mock` and `youtube-live`.
+
+Add or change feature coverage in `tests/browser/scenarios/`. The spec files
+under `tests/browser/specs/youtube-mock/` and `tests/browser/specs/youtube-live/`
+are thin environment bindings and normally should not change unless a new
+browser environment or auth-state split is added.
 
 Browser launches are still worker-scoped. Splitting the specs by feature does
 not intentionally reopen Chrome for every check when the suite runs normally
@@ -39,8 +44,8 @@ npm run test:browser
 ```
 
 This runs the mock YouTube specs first, then the real YouTube livestream specs.
-It assumes the signed-in profile is already prepared if the logged-in live spec
-is expected to run.
+It assumes the logged-in profile is already prepared if logged-in live
+scenarios are expected to run.
 
 ### Mock YouTube smoke
 
@@ -55,8 +60,8 @@ browser smoke test to run often.
 
 It runs both mock auth states:
 
-- logged out: read-only extension surfaces
-- signed in: read-only surfaces plus composer-only draft controls
+- logged-out: read-only extension surfaces
+- logged-in: read-only surfaces plus composer-only draft controls
 
 It checks that the extension can attach and render the core injected surfaces:
 
@@ -93,13 +98,13 @@ mocked and real incoming message translation, Inbox, profile card, and popup
 active status.
 
 The logged-in case uses a dedicated local Chrome profile because Google sign-in
-can reject automated browser profiles. It runs the same signed-in scenario
+can reject automated browser profiles. It runs the same logged-in scenario
 group as the mock fixture, including composer translation controls and safe
 message-menu/draft insertion checks. It never sends a chat message.
 
-## Signed-in setup
+## Logged-in setup
 
-Prepare the signed-in profile with:
+Prepare the logged-in profile with:
 
 ```sh
 npm run test:youtube-login
@@ -124,10 +129,10 @@ In that Chrome window:
 
 5. Make sure Chat Enhancer is enabled.
 
-The helper closes Chrome automatically once it detects both a signed-in YouTube
+The helper closes Chrome automatically once it detects both a logged-in YouTube
 web session and the installed unpacked extension.
 
-Then run only the signed-in smoke with:
+Then run only the logged-in smoke with:
 
 ```sh
 npm run test:browser:live -- -g logged-in
@@ -151,7 +156,7 @@ YTCQ_TEST_HEADLESS=0 npm run test:browser:mock
 ```
 
 This is the browser smoke test that runs in CI. It avoids real YouTube, Google
-sign-in, and the persistent signed-in Chrome profile.
+sign-in, and the persistent logged-in Chrome profile.
 
 CI runs this through `npm run verify` after the Chrome extension output has
 already been built, so the underlying Playwright command is not expected to
@@ -159,15 +164,15 @@ rebuild the extension a second time.
 
 Real YouTube smoke tests stay headed. In current Chrome and YouTube behavior,
 headless real-YouTube runs are not reliable enough for normal extension iframe
-injection and signed-in composer checks.
+injection and logged-in composer checks.
 
 `npm run test:youtube-login` also intentionally stays visible because it is an
 interactive setup utility for Google sign-in and extension installation.
 
-## Why the signed-in test works this way
+## Why the logged-in test works this way
 
 Recent Chrome versions can ignore or restrict command-line unpacked extension
-loading in normal Chrome. For a signed-in smoke test, the extension should be
+loading in normal Chrome. For a logged-in smoke test, the extension should be
 installed once in the dedicated profile through `chrome://extensions`, then the
 test reuses that profile.
 
@@ -176,14 +181,14 @@ installed unpacked extension points at the current build output.
 
 ## Safety and privacy
 
-Do not use a personal everyday Chrome profile for these tests. The signed-in
+Do not use a personal everyday Chrome profile for these tests. The logged-in
 smoke profile is intentionally isolated under `.chrome-test-profile/`.
 
 Never commit or share:
 
 - `.chrome-test-profile/`
 - `test-results/`
-- Playwright traces, screenshots, or videos from signed-in failures unless they
+- Playwright traces, screenshots, or videos from logged-in failures unless they
   have been reviewed for private account or YouTube page data
 
 Both `.chrome-test-profile/` and `test-results/` are ignored by `.gitignore`.
@@ -221,5 +226,5 @@ open page/frame are written under `test-results/browser/`; traces can also be
 opened directly with
 `npx playwright show-trace test-results/browser/<failed-test>/trace.zip`.
 
-If the signed-in test fails because the profile is already open, close the
+If the logged-in test fails because the profile is already open, close the
 Chrome window using `.chrome-test-profile/` and rerun the command.

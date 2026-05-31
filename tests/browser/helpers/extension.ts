@@ -1,7 +1,7 @@
 /**
  * Extension detection helpers for browser smoke tests.
  *
- * Playwright needs the extension id to open the popup. The signed-in YouTube
+ * Playwright needs the extension id to open the popup. The logged-in YouTube
  * smoke also validates that Chat Enhancer is installed in the persistent
  * Chrome profile before it opens a real livestream.
  */

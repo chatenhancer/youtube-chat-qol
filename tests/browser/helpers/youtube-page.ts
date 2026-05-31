@@ -65,7 +65,7 @@ export async function isChatComposerVisible(chat: FrameLocator): Promise<boolean
 export async function getUnavailableComposerReason(page: Page, chat: FrameLocator): Promise<string> {
   if (await page.getByRole('button', { name: /sign in/i }).first().isVisible({ timeout: 500 }).catch(() => false)) {
     return [
-      'Skipping signed-in live smoke because YouTube still shows Sign in.',
+      'Skipping logged-in live smoke because YouTube still shows Sign in.',
       'Run `npm run test:youtube-login` in a normal Chrome window first.',
       `Profile directory: ${getLiveProfileDir()}`
     ].join(' ');
@@ -73,7 +73,7 @@ export async function getUnavailableComposerReason(page: Page, chat: FrameLocato
 
   if (await page.getByText(/Verify it.?s you/i).first().isVisible({ timeout: 500 }).catch(() => false)) {
     return [
-      'Skipping signed-in live smoke because Google requires account verification.',
+      'Skipping logged-in live smoke because Google requires account verification.',
       'Complete Chrome account verification through `npm run test:youtube-login` or use a real Chrome tab manual smoke instead.',
       `Profile directory: ${getLiveProfileDir()}`
     ].join(' ');
@@ -82,10 +82,10 @@ export async function getUnavailableComposerReason(page: Page, chat: FrameLocato
   const chatText = await chat.locator('body').innerText({ timeout: 1_000 }).catch(() => '');
   const compactChatText = chatText.replace(/\s+/g, ' ').trim();
   if (compactChatText) {
-    return `Skipping signed-in live smoke because YouTube did not expose the chat composer. Chat text: ${compactChatText.slice(0, 240)}`;
+    return `Skipping logged-in live smoke because YouTube did not expose the chat composer. Chat text: ${compactChatText.slice(0, 240)}`;
   }
 
-  return 'Skipping signed-in live smoke because YouTube did not expose the chat composer.';
+  return 'Skipping logged-in live smoke because YouTube did not expose the chat composer.';
 }
 
 async function dismissYouTubeConsentIfPresent(page: Page): Promise<void> {

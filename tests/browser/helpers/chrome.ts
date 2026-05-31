@@ -2,7 +2,7 @@
  * Chrome launch and shutdown helpers for browser smoke tests.
  *
  * Fixture tests use Playwright's persistent Chromium context with the unpacked
- * extension loaded by flags. Signed-in YouTube tests use normal Chrome with a
+ * extension loaded by flags. Logged-in YouTube tests use normal Chrome with a
  * prepared profile, then connect over CDP so Google login state is preserved.
  */
 import { chromium, type Browser, type BrowserContext, type TestInfo } from '@playwright/test';

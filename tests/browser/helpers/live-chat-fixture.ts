@@ -5,15 +5,15 @@
  * extension consumes, giving the browser smoke test a stable local page while
  * still exercising the real content script.
  */
-export const fixtureSignedInLiveChatUrl = 'https://www.youtube.com/live_chat?continuation=ytcq-fixture&ytcq-auth=signed-in';
+export const fixtureLoggedInLiveChatUrl = 'https://www.youtube.com/live_chat?continuation=ytcq-fixture&ytcq-auth=logged-in';
 export const fixtureLoggedOutLiveChatUrl = 'https://www.youtube.com/live_chat?continuation=ytcq-fixture&ytcq-auth=logged-out';
 
 interface LiveChatFixtureOptions {
-  signedIn?: boolean;
+  loggedIn?: boolean;
 }
 
 export function createLiveChatFixtureHtml({
-  signedIn = true
+  loggedIn = true
 }: LiveChatFixtureOptions = {}): string {
   return `<!doctype html>
 <html lang="en">
@@ -159,7 +159,7 @@ export function createLiveChatFixtureHtml({
           </div>
         </yt-live-chat-item-list-renderer>
 
-        ${signedIn ? `
+        ${loggedIn ? `
           <yt-live-chat-message-input-renderer>
             <span id="author-name">@CurrentViewer</span>
             <div id="input" contenteditable="true" aria-label="Chat input"></div>

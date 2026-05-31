@@ -1,7 +1,7 @@
 /**
  * Browser scenario for the chat-header Inbox panel.
  *
- * The same check runs in logged-out and signed-in contexts because the Inbox
+ * The same check runs in logged-out and logged-in contexts because the Inbox
  * should be available whenever the extension is attached to YouTube live chat.
  */
 import { expect, test } from '@playwright/test';
