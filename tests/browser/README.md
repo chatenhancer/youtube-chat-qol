@@ -15,21 +15,27 @@ Google account checks, consent screens, and livestream availability.
 tests/browser/
   scenarios/       feature-level checks shared by mock and live specs
   specs/
-    youtube-mock/  deterministic mock YouTube chat specs
-    youtube-live/  real YouTube livestream specs
+    scenario-fixtures.ts
+    youtube-mock/
+      logged-in.spec.ts
+      logged-out.spec.ts
+    youtube-live/
+      logged-in.spec.ts
+      logged-out.spec.ts
   helpers/         shared Chrome, extension, YouTube, and assertion helpers
 ```
 
-The scenario files are the source of truth for portable feature checks. Mock
-and live specs import the same logged-out and logged-in scenario groups, so it
-is obvious when a feature passes in the fixture but fails against real YouTube.
-Each portable scenario is registered as its own Playwright test with matching
-names in `youtube-mock` and `youtube-live`.
+The scenario files define behavior only. The four plan-case spec files are the
+explicit source of truth for which scenarios run against each browser surface:
+mock logged-in, mock logged-out, live logged-in, and live logged-out.
+Mock specs run the broad deterministic behavior suite; live specs run the
+smaller smoke suite that proves the extension still attaches to YouTube's
+current DOM and critical provider-backed flows still work.
 
-Add or change feature coverage in `tests/browser/scenarios/`. The spec files
-under `tests/browser/specs/youtube-mock/` and `tests/browser/specs/youtube-live/`
-are thin environment bindings and normally should not change unless a new
-browser environment or auth-state split is added.
+Add or change reusable feature coverage in `tests/browser/scenarios/`. Add that
+scenario to the relevant plan-case spec files under `tests/browser/specs/`.
+The spec files should stay as direct Playwright test registrations using the
+normalized plan-case fixtures; feature behavior belongs in scenarios.
 
 Browser launches are still worker-scoped. Splitting the specs by feature does
 not intentionally reopen Chrome for every check when the suite runs normally
@@ -75,9 +81,8 @@ It checks that the extension can attach and render the core injected surfaces:
 - incoming message translation rendering with a mocked Translate response
 - translation display modes rendering below the original message and replacing
   the original message
-- incoming message translation through the real Google Translate endpoint
-- composer translate button and draft translation with mocked and real Google
-  Translate responses
+- composer translate button and draft translation with a mocked Translate
+  response
 - frequent emoji tracking, most-used row rendering, persistence after reload,
   and composer insertion
 - tab title and favicon alerts for background Inbox matches
@@ -90,7 +95,8 @@ It checks that the extension can attach and render the core injected surfaces:
   fixture-controlled live updates
 - extension popup active status
 
-Menu injection is part of the shared scenario groups:
+Menu injection is covered directly in mock and indirectly by live draft-action
+checks:
 
 - YouTube settings menu items
 - message menu Quote and Mention actions
@@ -109,15 +115,16 @@ Set `YTCQ_LIVE_URL` to test a different livestream:
 YTCQ_LIVE_URL=https://www.youtube.com/watch?v=VIDEO_ID npm run test:browser:live
 ```
 
-The logged-out case uses a throwaway Playwright profile. It runs the same
-logged-out scenario group as the mock fixture: attachment, settings menu,
-mocked and real incoming message translation, Inbox, profile card, and popup
-active status.
+The logged-out case uses a throwaway Playwright profile. It checks attachment,
+chat settings menu injection, one real incoming-message translation through
+Google Translate, Inbox, focus mode, profile cards, and popup active status.
 
 The logged-in case uses a dedicated local Chrome profile because Google sign-in
-can reject automated browser profiles. It runs the same logged-in scenario
-group as the mock fixture, including composer translation controls and safe
-message-menu/draft insertion checks. It never sends a chat message.
+can reject automated browser profiles. It checks attachment, message-menu draft
+actions, chat settings menu injection, focus mode, Inbox, profile cards,
+composer translation controls, one real composer translation through Google
+Translate, frequent emojis, command expansion, author-click draft insertion,
+and popup active status. It never sends a chat message.
 
 ## Logged-in setup
 

@@ -42,11 +42,6 @@ export function getLiveUrl(): string {
   return process.env.YTCQ_LIVE_URL || defaultLiveUrl;
 }
 
-export async function primeYouTubeSession(page: Page): Promise<void> {
-  await page.goto('https://www.youtube.com/', { waitUntil: 'domcontentloaded', timeout: LIVE_PAGE_TIMEOUT_MS });
-  await dismissYouTubeConsentIfPresent(page);
-}
-
 export async function openLiveChat(page: Page, liveUrl: string): Promise<FrameLocator> {
   await page.goto(liveUrl, { waitUntil: 'domcontentloaded', timeout: LIVE_PAGE_TIMEOUT_MS });
   await dismissYouTubeConsentIfPresent(page);

@@ -11,22 +11,16 @@ import {
 } from './menu-openers';
 import type { BrowserScenario, ChatSurface } from './types';
 
-export const settingsMenuScenario: BrowserScenario = {
-  name: 'Chat settings menu receives extension controls',
-  run: async ({ chat }) => {
-    const menu = await openSettingsMenu(chat);
-    await expectSettingsMenuControlsInjected(menu);
-    await closeNativeMenuStep(chat, 'Close settings menu');
-  }
+export const settingsMenuScenario: BrowserScenario = async ({ chat }) => {
+  const menu = await openSettingsMenu(chat);
+  await expectSettingsMenuControlsInjected(menu);
+  await closeNativeMenuStep(chat, 'Close settings menu');
 };
 
-export const messageMenuScenario: BrowserScenario = {
-  name: 'Message context menu receives quote and mention actions',
-  run: async ({ chat }) => {
-    const { menu } = await openMessageMenu(chat);
-    await expectMessageMenuActionsInjected(menu);
-    await closeNativeMenuStep(chat, 'Close message context menu');
-  }
+export const messageMenuScenario: BrowserScenario = async ({ chat }) => {
+  const { menu } = await openMessageMenu(chat);
+  await expectMessageMenuActionsInjected(menu);
+  await closeNativeMenuStep(chat, 'Close message context menu');
 };
 
 async function expectSettingsMenuControlsInjected(menu: Locator): Promise<void> {

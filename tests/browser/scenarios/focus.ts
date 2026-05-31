@@ -6,7 +6,7 @@
  * that author so live runs do not depend on random chat timing.
  */
 import { expect, test, type Locator } from '@playwright/test';
-import { clearChatComposer } from '../helpers/composer';
+import { clearChatComposerIfVisible } from '../helpers/composer';
 import { closeFocusPromptIfPresent } from '../helpers/focus-panel';
 import {
   appendMockFixtureMessage,
@@ -19,16 +19,13 @@ import {
   type ChatSurface
 } from './types';
 
-export const focusPanelScenario: BrowserScenario = {
-  name: 'Focus panel opens from an author and follows their messages',
-  run: async ({ chat }) => {
-    const source = await findRecentMessageSource(chat);
-    await openCollapsedFocusPrompt(chat, source);
-    await expandFocusPanel(chat);
-    await expectFocusPanelContainsSourceMessage(chat, source);
-    await expectMockFocusPanelReceivesNewMessages(chat, source);
-    await cleanUpFocusPanel(chat);
-  }
+export const focusPanelScenario: BrowserScenario = async ({ chat }) => {
+  const source = await findRecentMessageSource(chat);
+  await openCollapsedFocusPrompt(chat, source);
+  await expandFocusPanel(chat);
+  await expectFocusPanelContainsSourceMessage(chat, source);
+  await expectMockFocusPanelReceivesNewMessages(chat, source);
+  await cleanUpFocusPanel(chat);
 };
 
 interface MessageSource {
@@ -116,6 +113,6 @@ async function expectMockFocusPanelReceivesNewMessages(chat: ChatSurface, source
 async function cleanUpFocusPanel(chat: ChatSurface): Promise<void> {
   await test.step('Close focus panel and clear composer if present', async () => {
     await closeFocusPromptIfPresent(chat);
-    await clearChatComposer(chat).catch(() => undefined);
+    await clearChatComposerIfVisible(chat).catch(() => undefined);
   });
 }

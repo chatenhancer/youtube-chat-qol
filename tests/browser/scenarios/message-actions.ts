@@ -18,45 +18,42 @@ import {
 } from './types';
 import { openMessageMenu } from './menu-openers';
 
-export const authorMentionDraftScenario: BrowserScenario = {
-  name: 'Author click writes a mention draft only',
-  run: async ({ chat }) => {
-    await expectAuthorClickInsertsMentionDraft(chat);
-  }
+export const authorMentionDraftScenario: BrowserScenario = async ({ chat }) => {
+  await expectAuthorClickInsertsMentionDraft(chat);
 };
 
-export const mentionMenuDraftScenario: BrowserScenario = {
-  name: 'Mention menu action writes a draft only',
-  run: async ({ chat }) => {
-    await expectMentionMenuActionInsertsDraft(chat);
-  }
+export const mentionMenuDraftScenario: BrowserScenario = async ({ chat }) => {
+  await expectMentionMenuActionInsertsDraft(chat);
 };
 
-export const quoteMenuDraftScenario: BrowserScenario = {
-  name: 'Quote menu action writes a draft only',
-  run: async ({ chat }) => {
-    await expectQuoteMenuActionInsertsDraft(chat);
-  }
+export const quoteMenuDraftScenario: BrowserScenario = async ({ chat }) => {
+  await expectQuoteMenuActionInsertsDraft(chat);
 };
 
 async function expectAuthorClickInsertsMentionDraft(chat: ChatSurface): Promise<void> {
   await clearComposerForAction(chat, 'Clear composer before author click');
 
-  const message = chat.locator(NORMAL_CHAT_MESSAGE_SELECTOR).last();
+  const messages = chat.locator(NORMAL_CHAT_MESSAGE_SELECTOR);
   await test.step('Wait for a clickable author name', async () => {
-    await message.waitFor({ state: 'visible', timeout: 45_000 });
+    await messages.last().waitFor({ state: 'visible', timeout: 45_000 });
   });
 
+  const message = messages.nth(Math.max(0, await messages.count() - 1));
   const author = message.locator('#author-name').first();
-  const authorName = await test.step('Capture author name', async () => {
-    const name = cleanVisibleText(await author.innerText());
+  const { authorHandle, authorName } = await test.step('Capture author name', async () => {
+    const handle = await author.elementHandle();
+    if (!handle) throw new Error('Could not resolve clickable author element.');
+    const name = cleanVisibleText(await handle.evaluate((element) => element.textContent || ''));
     expect(name).toMatch(/^@?\S/);
-    return name;
+    return {
+      authorHandle: handle,
+      authorName: name
+    };
   });
 
   await test.step('Click author name', async () => {
-    await author.click({ timeout: 2_000 }).catch(async () => {
-      await author.dispatchEvent('click');
+    await authorHandle.click({ timeout: 2_000 }).catch(async () => {
+      await authorHandle.dispatchEvent('click');
     });
   });
 

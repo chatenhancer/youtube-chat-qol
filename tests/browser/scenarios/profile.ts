@@ -16,15 +16,12 @@ import {
   type ChatSurface
 } from './types';
 
-export const profileScenario: BrowserScenario = {
-  name: 'Profile card opens from a chat avatar',
-  run: async ({ chat }) => {
-    const source = await findRecentMessageSource(chat);
-    await openProfileCardFromAvatar(chat, source);
-    await expectProfileCardHasRecentMessages(chat, source);
-    await expectMockProfileCardReceivesNewMessages(chat, source);
-    await closeProfileCard(chat);
-  }
+export const profileScenario: BrowserScenario = async ({ chat }) => {
+  const source = await findRecentMessageSource(chat);
+  await openProfileCardFromAvatar(chat, source);
+  await expectProfileCardHasRecentMessages(chat, source);
+  await expectMockProfileCardReceivesNewMessages(chat, source);
+  await closeProfileCard(chat);
 };
 
 interface MessageSource {

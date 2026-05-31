@@ -135,7 +135,7 @@ function clampContextMenuVertically(menu: HTMLElement): void {
     window.requestAnimationFrame(() => {
       menu.style.setProperty('--ytcq-context-shift-y', '0px');
 
-      const rect = menu.getBoundingClientRect();
+      const rect = getContextMenuContentRect(menu);
       const bounds = getContextMenuVerticalBounds(menu);
       const overflowBottom = rect.bottom - bounds.bottom;
       const overflowTop = bounds.top - rect.top;
@@ -166,4 +166,20 @@ function getContextMenuVerticalBounds(menu: HTMLElement): { top: number; bottom:
   }
 
   return bounds;
+}
+
+function getContextMenuContentRect(menu: HTMLElement): Pick<DOMRect, 'top' | 'bottom'> {
+  const menuRect = menu.getBoundingClientRect();
+  const list = menu.querySelector<HTMLElement>('#items');
+  if (!list) return menuRect;
+
+  const childRects = Array.from(list.children)
+    .map((child) => child.getBoundingClientRect())
+    .filter((rect) => rect.width > 0 && rect.height > 0);
+  if (!childRects.length) return menuRect;
+
+  return {
+    top: Math.min(menuRect.top, ...childRects.map((rect) => rect.top)),
+    bottom: Math.max(menuRect.bottom, ...childRects.map((rect) => rect.bottom))
+  };
 }

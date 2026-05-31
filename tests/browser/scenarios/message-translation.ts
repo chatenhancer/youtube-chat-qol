@@ -13,8 +13,7 @@ import { openSettingsMenu } from './menu-openers';
 import {
   NORMAL_CHAT_MESSAGE_SELECTOR,
   type ChatSurface,
-  type BrowserScenario,
-  type BrowserScenarioEnvironment
+  type BrowserScenario
 } from './types';
 
 const MOCKED_TARGET_LANGUAGE = 'cy';
@@ -26,36 +25,24 @@ const SETTINGS_TRANSLATED_TEXT = 'YTCQ settings result';
 
 type TranslationDisplayMode = 'below' | 'replace';
 
-export const messageTranslationScenario: BrowserScenario = {
-  name: 'Incoming chat messages are translated',
-  run: async ({ chat, context, environment }) => {
-    await waitForSourceChatMessage(chat);
-    await expectIncomingTranslation({ chat, context, environment });
-  }
+export const mockedMessageTranslationScenario: BrowserScenario = async ({ chat, extensionContext }) => {
+  await waitForSourceChatMessage(chat);
+  await expectMockedIncomingTranslation({ chat, context: extensionContext });
 };
 
-export const realMessageTranslationScenario: BrowserScenario = {
-  name: 'Incoming chat messages translate through real Google Translate',
-  run: async ({ chat, context }) => {
-    await waitForSourceChatMessage(chat);
-    await expectRealIncomingTranslation({ chat, context });
-  }
+export const realMessageTranslationScenario: BrowserScenario = async ({ chat, extensionContext }) => {
+  await waitForSourceChatMessage(chat);
+  await expectRealIncomingTranslation({ chat, context: extensionContext });
 };
 
-export const translationDisplayScenario: BrowserScenario = {
-  name: 'Translation display modes render correctly',
-  run: async ({ chat, context, environment }) => {
-    await waitForSourceChatMessage(chat);
-    await expectTranslationDisplayModes({ chat, context, environment });
-  }
+export const translationDisplayScenario: BrowserScenario = async ({ chat, extensionContext }) => {
+  await waitForSourceChatMessage(chat);
+  await expectTranslationDisplayModes({ chat, context: extensionContext });
 };
 
-export const translationSettingsReactScenario: BrowserScenario = {
-  name: 'Translate chat setting reacts live',
-  run: async ({ chat, context, environment }) => {
-    await waitForSourceChatMessage(chat);
-    await expectTranslateSettingReactsLive({ chat, context, environment });
-  }
+export const translationSettingsReactScenario: BrowserScenario = async ({ chat, extensionContext }) => {
+  await waitForSourceChatMessage(chat);
+  await expectTranslateSettingReactsLive({ chat, context: extensionContext });
 };
 
 async function waitForSourceChatMessage(chat: ChatSurface): Promise<void> {
@@ -64,24 +51,22 @@ async function waitForSourceChatMessage(chat: ChatSurface): Promise<void> {
   });
 }
 
-async function expectIncomingTranslation({
+async function expectMockedIncomingTranslation({
   chat,
-  context,
-  environment
+  context
 }: {
   chat: ChatSurface;
   context: BrowserContext;
-  environment: BrowserScenarioEnvironment;
 }): Promise<void> {
-  await test.step('Use scenario translation endpoint', async () => {
-    await withScenarioTranslationEndpoint({ context, environment, mockedText: MOCKED_TRANSLATED_TEXT, callback: async () => {
+  await test.step('Use mocked translation endpoint', async () => {
+    await withMockedTranslationEndpoint(context, MOCKED_TRANSLATED_TEXT, async () => {
       await enableTranslationAndExpectRendered({
         chat,
         context,
         targetLanguage: MOCKED_TARGET_LANGUAGE,
-        expectedText: getExpectedMockText(environment, MOCKED_TRANSLATED_TEXT)
+        expectedText: MOCKED_TRANSLATED_TEXT
       });
-    } });
+    });
   });
 }
 
@@ -130,22 +115,27 @@ async function enableTranslationAndExpectRendered({
 
 async function expectTranslationDisplayModes({
   chat,
-  context,
-  environment
+  context
 }: {
   chat: ChatSurface;
   context: BrowserContext;
-  environment: BrowserScenarioEnvironment;
 }): Promise<void> {
-  const expectedText = getExpectedMockText(environment, DISPLAY_TRANSLATED_TEXT);
-
-  await test.step('Use scenario translation endpoint for display modes', async () => {
-    await withScenarioTranslationEndpoint({ context, environment, mockedText: DISPLAY_TRANSLATED_TEXT, callback: async () => {
+  await test.step('Use mocked translation endpoint for display modes', async () => {
+    await withMockedTranslationEndpoint(context, DISPLAY_TRANSLATED_TEXT, async () => {
       await withTranslationCleared({ chat, context, targetLanguage: DISPLAY_TARGET_LANGUAGE, callback: async () => {
-        const { sourceMessage, sourceText } = await expectBelowDisplayMode({ chat, context, expectedText });
-        await expectReplaceDisplayMode({ context, sourceMessage, sourceText, expectedText });
+        const { sourceMessage, sourceText } = await expectBelowDisplayMode({
+          chat,
+          context,
+          expectedText: DISPLAY_TRANSLATED_TEXT
+        });
+        await expectReplaceDisplayMode({
+          context,
+          sourceMessage,
+          sourceText,
+          expectedText: DISPLAY_TRANSLATED_TEXT
+        });
       } });
-    } });
+    });
   });
 }
 
@@ -217,17 +207,13 @@ async function expectReplaceDisplayMode({
 
 async function expectTranslateSettingReactsLive({
   chat,
-  context,
-  environment
+  context
 }: {
   chat: ChatSurface;
   context: BrowserContext;
-  environment: BrowserScenarioEnvironment;
 }): Promise<void> {
-  const expectedText = getExpectedMockText(environment, SETTINGS_TRANSLATED_TEXT);
-
-  await test.step('Use scenario translation endpoint for chat settings', async () => {
-    await withScenarioTranslationEndpoint({ context, environment, mockedText: SETTINGS_TRANSLATED_TEXT, callback: async () => {
+  await test.step('Use mocked translation endpoint for chat settings', async () => {
+    await withMockedTranslationEndpoint(context, SETTINGS_TRANSLATED_TEXT, async () => {
       await withTranslationCleared({ chat, context, targetLanguage: MOCKED_TARGET_LANGUAGE, callback: async () => {
         const menu = await openSettingsMenu(chat);
         const translateItem = menu.locator('.ytcq-settings-item[data-ytcq-setting="targetLanguage"]').first();
@@ -237,7 +223,11 @@ async function expectTranslateSettingReactsLive({
           await expect(translateItem).toHaveAttribute('aria-checked', 'false');
           await translateItem.click();
           await expect(translateItem).toHaveAttribute('aria-checked', 'true');
-          await expectAnyRenderedTranslation({ chat, targetLanguage: MOCKED_TARGET_LANGUAGE, expectedText });
+          await expectAnyRenderedTranslation({
+            chat,
+            targetLanguage: MOCKED_TARGET_LANGUAGE,
+            expectedText: SETTINGS_TRANSLATED_TEXT
+          });
         });
 
         await test.step('Disable Translate chat and verify visible translation clears', async () => {
@@ -247,7 +237,7 @@ async function expectTranslateSettingReactsLive({
           await expect(chat.locator('.ytcq-translation-replaced')).toHaveCount(0, { timeout: 5_000 });
         });
       } });
-    } });
+    });
   });
 }
 
@@ -427,31 +417,6 @@ async function withTranslationEnabled<T>({
 function isLikelyTranslatableSource(text: string): boolean {
   const letters = text.match(/\p{Letter}/gu) || [];
   return letters.length >= 2;
-}
-
-function getExpectedMockText(
-  environment: BrowserScenarioEnvironment,
-  expectedText: string
-): string | undefined {
-  return environment === 'mock' ? expectedText : undefined;
-}
-
-async function withScenarioTranslationEndpoint<T>({
-  context,
-  environment,
-  mockedText,
-  callback
-}: {
-  context: BrowserContext;
-  environment: BrowserScenarioEnvironment;
-  mockedText: string;
-  callback: () => Promise<T>;
-}): Promise<T> {
-  if (environment === 'mock') {
-    return withMockedTranslationEndpoint(context, mockedText, callback);
-  }
-
-  return callback();
 }
 
 async function waitForTranslationsCleared(chat: ChatSurface): Promise<void> {

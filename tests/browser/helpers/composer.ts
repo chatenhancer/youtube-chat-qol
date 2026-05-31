@@ -36,6 +36,14 @@ export async function clearChatComposer(chat: ChatSurface): Promise<void> {
   }).toBe('');
 }
 
+export async function clearChatComposerIfVisible(
+  chat: ChatSurface,
+  timeout = 500
+): Promise<void> {
+  if (!await getChatComposerInput(chat).isVisible({ timeout }).catch(() => false)) return;
+  await clearChatComposer(chat);
+}
+
 export function getChatComposerInput(chat: ChatSurface): Locator {
   return chat.locator(CHAT_COMPOSER_INPUT_SELECTOR).first();
 }

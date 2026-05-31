@@ -19,32 +19,52 @@ import type { BrowserScenario, ChatSurface } from './types';
 
 const COMMAND_KEYWORD = 'browser command phrase';
 
-export const chatCommandsScenario: BrowserScenario = {
-  name: 'Chat commands expand and apply settings',
-  run: async ({ chat, context }) => {
-    await withExtensionStorageValues(context, 'sync', {
-      targetLanguage: 'ja',
-      lastTranslationTarget: 'ja',
-      translationDisplay: 'replace'
+export const chatCommandsFullScenario: BrowserScenario = async ({ chat, extensionContext }) => {
+  await expectChatCommands({ chat, context: extensionContext, fullCoverage: true });
+};
+
+export const chatCommandsSmokeScenario: BrowserScenario = async ({ chat, extensionContext }) => {
+  await expectChatCommands({ chat, context: extensionContext, fullCoverage: false });
+};
+
+async function expectChatCommands({
+  chat,
+  context,
+  fullCoverage
+}: {
+  chat: ChatSurface;
+  context: BrowserContext;
+  fullCoverage: boolean;
+}): Promise<void> {
+  await withExtensionStorageValues(context, 'sync', {
+    targetLanguage: 'ja',
+    lastTranslationTarget: 'ja',
+    translationDisplay: 'replace'
+  }, async () => {
+    await withExtensionStorageValues(context, 'local', {
+      ytcqInboxKeywords: []
     }, async () => {
-      await withExtensionStorageValues(context, 'local', {
-        ytcqInboxKeywords: []
-      }, async () => {
-        await expectTimeCommandsExpand(chat);
+      await expectTimeCommandsExpand(chat, fullCoverage);
+      if (fullCoverage) {
         await expectDisplayCommandApplies(chat, context);
         await expectLangOffCommandApplies(chat, context);
         await expectWatchCommandApplies(chat, context);
-        await expectHelpCommandOpensCard(chat);
-      });
+      }
+      await expectHelpCommandOpensCard(chat);
     });
-  }
-};
+  });
+}
 
-async function expectTimeCommandsExpand(chat: ChatSurface): Promise<void> {
+async function expectTimeCommandsExpand(
+  chat: ChatSurface,
+  fullCoverage: boolean
+): Promise<void> {
   await test.step('Expand time commands', async () => {
     await expectCommandReplacesText(chat, '/time', {
       message: '/time should expand to a visible local time.'
     });
+    if (!fullCoverage) return;
+
     await expectCommandReplacesText(chat, '/time tokyo', {
       message: '/time tokyo should expand to the current time in Tokyo.'
     });
