@@ -43,12 +43,6 @@ body:
     validations:
       required: true
 
-  - type: textarea
-    id: alternatives
-    attributes:
-      label: Alternatives considered
-      description: If there are simpler or less intrusive ways to solve this, mention them here.
-
   - type: checkboxes
     id: philosophy
     attributes:
