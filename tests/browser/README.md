@@ -66,7 +66,12 @@ It runs both mock auth states:
 It checks that the extension can attach and render the core injected surfaces:
 
 - Inbox button and card
+- chat settings toggles persisting translation and Inbox sound options
+- extension popup controls persisting translation, display, sound, and startup
+  effect options
 - incoming message translation rendering with a mocked Translate response
+- translation display modes rendering below the original message and replacing
+  the original message
 - incoming message translation through the real Google Translate endpoint
 - composer translate button
 - mention and quote draft insertion

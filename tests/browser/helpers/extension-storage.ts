@@ -17,7 +17,7 @@ export async function withExtensionStorageValues<T>(
   callback: () => Promise<T>
 ): Promise<T> {
   const keys = Object.keys(values);
-  const previous = await readExtensionStorageValues(context, area, keys);
+  const previous = await readExtensionStorageSnapshot(context, area, keys);
   await setExtensionStorageValues(context, area, values);
 
   try {
@@ -27,7 +27,15 @@ export async function withExtensionStorageValues<T>(
   }
 }
 
-async function readExtensionStorageValues(
+export async function getExtensionStorageValues(
+  context: BrowserContext,
+  area: StorageArea,
+  keys: string[]
+): Promise<StorageValues> {
+  return (await readExtensionStorageSnapshot(context, area, keys)).values;
+}
+
+async function readExtensionStorageSnapshot(
   context: BrowserContext,
   area: StorageArea,
   keys: string[]

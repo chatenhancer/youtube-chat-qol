@@ -1,0 +1,191 @@
+/**
+ * Browser scenarios for extension settings behavior.
+ *
+ * These checks verify that the visible YouTube and popup controls persist the
+ * shared option fields that feature modules consume.
+ */
+import { expect, test, type BrowserContext, type Locator, type Page } from '@playwright/test';
+import { getExtensionId } from '../helpers/extension';
+import {
+  getExtensionStorageValues,
+  withExtensionStorageValues
+} from '../helpers/extension-storage';
+import { openSettingsMenu } from './menu-openers';
+import type { BrowserScenario, ChatSurface } from './types';
+
+const SETTINGS_INITIAL_VALUES = {
+  composerTranslateLanguage: '',
+  targetLanguage: '',
+  lastTranslationTarget: 'ja',
+  translationDisplay: 'replace',
+  sound: false,
+  startupEffect: true
+};
+
+export const settingsMenuBehaviorScenario: BrowserScenario = {
+  name: 'Chat settings menu toggles persist options',
+  run: async ({ chat, context }) => {
+    await withExtensionStorageValues(context, 'sync', SETTINGS_INITIAL_VALUES, async () => {
+      const menu = await openSettingsMenu(chat);
+      await toggleTranslationFromChatSettings({ context, menu });
+      await toggleInboxSoundFromChatSettings({ context, menu });
+      await closeNativeMenu(chat);
+    });
+  }
+};
+
+export const popupSettingsBehaviorScenario: BrowserScenario = {
+  name: 'Extension popup settings persist options',
+  run: async ({ context }) => {
+    await withExtensionStorageValues(context, 'sync', SETTINGS_INITIAL_VALUES, async () => {
+      const popup = await openExtensionPopup(context);
+
+      try {
+        await changePopupTranslationTarget({ context, popup });
+        await changePopupTranslationDisplay({ context, popup });
+        await changePopupInboxSound({ context, popup });
+        await changePopupStartupEffect({ context, popup });
+      } finally {
+        await popup.close();
+      }
+    });
+  }
+};
+
+async function toggleTranslationFromChatSettings({
+  context,
+  menu
+}: {
+  context: BrowserContext;
+  menu: Locator;
+}): Promise<void> {
+  const item = menu.locator('.ytcq-settings-item[data-ytcq-setting="targetLanguage"]').first();
+
+  await test.step('Verify Translate chat starts off in chat settings', async () => {
+    await expect(item).toHaveAttribute('aria-checked', 'false');
+  });
+
+  await test.step('Enable Translate chat from chat settings', async () => {
+    await item.click();
+    await expectStorageValue(context, 'targetLanguage', 'ja');
+    await expectStorageValue(context, 'lastTranslationTarget', 'ja');
+    await expect(item).toHaveAttribute('aria-checked', 'true');
+  });
+
+  await test.step('Disable Translate chat from chat settings', async () => {
+    await item.click();
+    await expectStorageValue(context, 'targetLanguage', '');
+    await expect(item).toHaveAttribute('aria-checked', 'false');
+  });
+}
+
+async function toggleInboxSoundFromChatSettings({
+  context,
+  menu
+}: {
+  context: BrowserContext;
+  menu: Locator;
+}): Promise<void> {
+  const item = menu.locator('.ytcq-settings-item[data-ytcq-setting="sound"]').first();
+
+  await test.step('Verify Inbox sound starts off in chat settings', async () => {
+    await expect(item).toHaveAttribute('aria-checked', 'false');
+  });
+
+  await test.step('Enable Inbox sound from chat settings', async () => {
+    await item.click();
+    await expectStorageValue(context, 'sound', true);
+    await expect(item).toHaveAttribute('aria-checked', 'true');
+  });
+
+  await test.step('Disable Inbox sound from chat settings', async () => {
+    await item.click();
+    await expectStorageValue(context, 'sound', false);
+    await expect(item).toHaveAttribute('aria-checked', 'false');
+  });
+}
+
+async function changePopupTranslationTarget({
+  context,
+  popup
+}: {
+  context: BrowserContext;
+  popup: Page;
+}): Promise<void> {
+  await test.step('Set popup translation target', async () => {
+    await popup.locator('#targetLanguage').selectOption('ja');
+    await expectStorageValue(context, 'targetLanguage', 'ja');
+    await expectStorageValue(context, 'lastTranslationTarget', 'ja');
+  });
+}
+
+async function changePopupTranslationDisplay({
+  context,
+  popup
+}: {
+  context: BrowserContext;
+  popup: Page;
+}): Promise<void> {
+  await test.step('Set popup translation display mode', async () => {
+    await popup.locator('#translationDisplay').selectOption('below');
+    await expectStorageValue(context, 'translationDisplay', 'below');
+  });
+}
+
+async function changePopupInboxSound({
+  context,
+  popup
+}: {
+  context: BrowserContext;
+  popup: Page;
+}): Promise<void> {
+  await test.step('Set popup Inbox sound option', async () => {
+    await popup.locator('#sound').setChecked(true);
+    await expectStorageValue(context, 'sound', true);
+  });
+}
+
+async function changePopupStartupEffect({
+  context,
+  popup
+}: {
+  context: BrowserContext;
+  popup: Page;
+}): Promise<void> {
+  await test.step('Set popup startup effect option', async () => {
+    const control = popup.locator('#startupEffect');
+    if (await control.isDisabled()) return;
+
+    await control.setChecked(false);
+    await expectStorageValue(context, 'startupEffect', false);
+  });
+}
+
+async function openExtensionPopup(context: BrowserContext): Promise<Page> {
+  return test.step('Open extension popup', async () => {
+    const extensionId = await getExtensionId(context);
+    const popup = await context.newPage();
+    await popup.goto(`chrome-extension://${extensionId}/popup.html`);
+    return popup;
+  });
+}
+
+async function expectStorageValue(
+  context: BrowserContext,
+  key: string,
+  expectedValue: unknown
+): Promise<void> {
+  await expect.poll(async () => {
+    const values = await getExtensionStorageValues(context, 'sync', [key]);
+    return values[key];
+  }, {
+    message: `Expected extension sync storage ${key} to equal ${String(expectedValue)}.`,
+    timeout: 5_000
+  }).toEqual(expectedValue);
+}
+
+async function closeNativeMenu(chat: ChatSurface): Promise<void> {
+  await test.step('Close chat settings menu', async () => {
+    await chat.locator('body').press('Escape').catch(() => undefined);
+  });
+}
