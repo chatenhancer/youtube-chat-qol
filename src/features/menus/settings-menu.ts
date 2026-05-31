@@ -166,12 +166,7 @@ function animateTranslateMenuIcon(item: HTMLElement): void {
 function prepareSettingsMenu(menu: HTMLElement): void {
   menu.classList.add('ytcq-settings-expanded-menu');
   menu.classList.remove('ytcq-context-expanded-menu', 'ytcq-expanded-menu');
-  const nativeMaxHeight = menu.style.maxHeight.trim();
-  if (nativeMaxHeight) {
-    menu.style.setProperty('--ytcq-settings-menu-max-height', nativeMaxHeight);
-  } else {
-    menu.style.removeProperty('--ytcq-settings-menu-max-height');
-  }
+  menu.style.setProperty('--ytcq-context-shift-y', '0px');
   menu.style.removeProperty('width');
   menu.style.removeProperty('min-width');
   menu.style.removeProperty('max-width');
