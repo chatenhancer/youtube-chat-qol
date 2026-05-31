@@ -30,10 +30,6 @@ Browser launches are still worker-scoped. Splitting the specs by feature does
 not intentionally reopen Chrome for every check when the suite runs normally
 with one worker.
 
-Mock-only specs should stay rare. Menu checks are part of the shared scenario
-groups because the extension injects those actions into real YouTube chat
-menus too.
-
 ## Test types
 
 ### Full browser smoke suite
