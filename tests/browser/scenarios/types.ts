@@ -17,7 +17,6 @@ export const NORMAL_CHAT_MESSAGE_SELECTOR = [
 export interface BrowserScenarioSession {
   chat: ChatSurface;
   context: BrowserContext;
-  extensionId?: string | null;
 }
 
 export interface BrowserScenario {

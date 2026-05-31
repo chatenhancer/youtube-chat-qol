@@ -11,8 +11,7 @@ for (const scenario of signedInScenarios) {
   test(`signed-in mock: ${scenario.name}`, async ({ mockSignedInSession }) => {
     await scenario.run({
       chat: mockSignedInSession.page,
-      context: mockSignedInSession.context,
-      extensionId: null
+      context: mockSignedInSession.context
     });
   });
 }

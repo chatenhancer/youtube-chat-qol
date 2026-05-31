@@ -15,11 +15,10 @@ for (const scenario of signedInScenarios) {
   test(`signed-in live: ${scenario.name}`, async ({ liveSignedInSession }) => {
     skipIfSignedInLiveUnavailable(test, liveSignedInSession);
 
-    const { chat, context, extensionId } = liveSignedInSession;
+    const { chat, context } = liveSignedInSession;
     await scenario.run({
       chat,
-      context,
-      extensionId
+      context
     });
   });
 }

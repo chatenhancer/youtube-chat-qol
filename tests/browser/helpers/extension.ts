@@ -5,15 +5,18 @@
  * smoke also validates that Chat Enhancer is installed in the persistent
  * Chrome profile before it opens a real livestream.
  */
-import type { BrowserContext } from '@playwright/test';
+import type { BrowserContext, Worker } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { extensionDir } from './paths';
 
 export async function getExtensionId(context: BrowserContext): Promise<string> {
-  let serviceWorker = context.serviceWorkers()[0];
+  let serviceWorker = context.serviceWorkers().find(isExtensionServiceWorker);
   if (!serviceWorker) {
-    serviceWorker = await context.waitForEvent('serviceworker', { timeout: 15_000 });
+    serviceWorker = await context.waitForEvent('serviceworker', {
+      predicate: isExtensionServiceWorker,
+      timeout: 15_000
+    });
   }
 
   const match = serviceWorker.url().match(/^chrome-extension:\/\/([^/]+)\//);
@@ -22,6 +25,10 @@ export async function getExtensionId(context: BrowserContext): Promise<string> {
   }
 
   return match[1];
+}
+
+function isExtensionServiceWorker(serviceWorker: Worker): boolean {
+  return serviceWorker.url().startsWith('chrome-extension://');
 }
 
 export async function getInstalledProfileExtensionId(profileDir: string): Promise<string | null> {

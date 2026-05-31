@@ -5,10 +5,9 @@ import { expect, type BrowserContext } from '@playwright/test';
 import { getExtensionId } from './extension';
 
 export async function expectPopupReportsActiveStatus(
-  context: BrowserContext,
-  installedExtensionId?: string | null
+  context: BrowserContext
 ): Promise<void> {
-  const extensionId = installedExtensionId || await getExtensionId(context);
+  const extensionId = await getExtensionId(context);
   const popup = await context.newPage();
 
   try {
