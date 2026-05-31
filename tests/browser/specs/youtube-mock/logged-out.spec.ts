@@ -11,8 +11,7 @@ for (const scenario of loggedOutScenarios) {
   test(`logged-out mock: ${scenario.name}`, async ({ mockLoggedOutSession }) => {
     await scenario.run({
       chat: mockLoggedOutSession.page,
-      context: mockLoggedOutSession.context,
-      extensionId: null
+      context: mockLoggedOutSession.context
     });
   });
 }

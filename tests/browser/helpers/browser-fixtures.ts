@@ -42,7 +42,6 @@ interface MockSession {
 
 interface LiveSession {
   context: BrowserContext;
-  extensionId?: string | null;
   page: Page;
   chat: FrameLocator;
   unavailableReason?: string;
@@ -216,7 +215,6 @@ async function createSignedInLiveSession(): Promise<{
     close: chrome.close,
     session: {
       context,
-      extensionId,
       page,
       chat,
       unavailableReason

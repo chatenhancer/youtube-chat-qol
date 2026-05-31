@@ -21,17 +21,17 @@ const REAL_TARGET_LANGUAGE = 'ga';
 
 export const messageTranslationScenario: BrowserScenario = {
   name: 'Incoming chat messages are translated',
-  run: async ({ chat, context, extensionId }) => {
+  run: async ({ chat, context }) => {
     await waitForSourceChatMessage(chat);
-    await expectMockedIncomingTranslation({ chat, context, extensionId });
+    await expectMockedIncomingTranslation({ chat, context });
   }
 };
 
 export const realMessageTranslationScenario: BrowserScenario = {
   name: 'Incoming chat messages translate through real Google Translate',
-  run: async ({ chat, context, extensionId }) => {
+  run: async ({ chat, context }) => {
     await waitForSourceChatMessage(chat);
-    await expectRealIncomingTranslation({ chat, context, extensionId });
+    await expectRealIncomingTranslation({ chat, context });
   }
 };
 
@@ -43,19 +43,16 @@ async function waitForSourceChatMessage(chat: ChatSurface): Promise<void> {
 
 async function expectMockedIncomingTranslation({
   chat,
-  context,
-  extensionId
+  context
 }: {
   chat: ChatSurface;
   context: BrowserContext;
-  extensionId?: string | null;
 }): Promise<void> {
   await test.step('Mock Google Translate response', async () => {
     await withMockedTranslationEndpoint(context, MOCKED_TRANSLATED_TEXT, async () => {
       await enableTranslationAndExpectRendered({
         chat,
         context,
-        extensionId,
         targetLanguage: MOCKED_TARGET_LANGUAGE,
         expectedText: MOCKED_TRANSLATED_TEXT
       });
@@ -65,18 +62,15 @@ async function expectMockedIncomingTranslation({
 
 async function expectRealIncomingTranslation({
   chat,
-  context,
-  extensionId
+  context
 }: {
   chat: ChatSurface;
   context: BrowserContext;
-  extensionId?: string | null;
 }): Promise<void> {
   await test.step('Use real Google Translate response', async () => {
     await enableTranslationAndExpectRendered({
       chat,
       context,
-      extensionId,
       targetLanguage: REAL_TARGET_LANGUAGE
     });
   });
@@ -85,13 +79,11 @@ async function expectRealIncomingTranslation({
 async function enableTranslationAndExpectRendered({
   chat,
   context,
-  extensionId,
   targetLanguage,
   expectedText
 }: {
   chat: ChatSurface;
   context: BrowserContext;
-  extensionId?: string | null;
   targetLanguage: string;
   expectedText?: string;
 }): Promise<void> {
@@ -121,6 +113,6 @@ async function enableTranslationAndExpectRendered({
           await expect(translation).toContainText(expectedText);
         });
       }
-    }, extensionId);
+    });
   });
 }

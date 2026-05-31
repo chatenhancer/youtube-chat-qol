@@ -9,11 +9,10 @@ import { loggedOutScenarios } from '../../scenarios';
 
 for (const scenario of loggedOutScenarios) {
   test(`logged-out live: ${scenario.name}`, async ({ liveLoggedOutSession }) => {
-    const { chat, context, extensionId } = liveLoggedOutSession;
+    const { chat, context } = liveLoggedOutSession;
     await scenario.run({
       chat,
-      context,
-      extensionId
+      context
     });
   });
 }

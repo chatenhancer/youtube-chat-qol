@@ -12,12 +12,12 @@ const EXTENSION_ATTACH_TIMEOUT_MS = 15_000;
 
 export const attachScenario: BrowserScenario = {
   name: 'Extension attaches and popup reports active status',
-  run: async ({ chat, context, extensionId }) => {
+  run: async ({ chat, context }) => {
     await expectExtensionUiAttached(chat);
     await expectReconnectPromptHidden(chat);
     await expectVisibleChatMessages(chat);
     await test.step('Verify popup reports active status', async () => {
-      await expectPopupReportsActiveStatus(context, extensionId);
+      await expectPopupReportsActiveStatus(context);
     });
   }
 };

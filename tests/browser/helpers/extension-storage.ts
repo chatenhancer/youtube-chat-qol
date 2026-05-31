@@ -14,31 +14,29 @@ export async function withExtensionStorageValues<T>(
   context: BrowserContext,
   area: StorageArea,
   values: StorageValues,
-  callback: () => Promise<T>,
-  installedExtensionId?: string | null
+  callback: () => Promise<T>
 ): Promise<T> {
   const keys = Object.keys(values);
-  const previous = await readExtensionStorageValues(context, area, keys, installedExtensionId);
-  await setExtensionStorageValues(context, area, values, installedExtensionId);
+  const previous = await readExtensionStorageValues(context, area, keys);
+  await setExtensionStorageValues(context, area, values);
 
   try {
     return await callback();
   } finally {
-    await restoreExtensionStorageValues(context, area, previous, installedExtensionId);
+    await restoreExtensionStorageValues(context, area, previous);
   }
 }
 
 async function readExtensionStorageValues(
   context: BrowserContext,
   area: StorageArea,
-  keys: string[],
-  installedExtensionId?: string | null
+  keys: string[]
 ): Promise<{
   requestedKeys: string[];
   existingKeys: string[];
   values: StorageValues;
 }> {
-  return withExtensionPage(context, installedExtensionId, (page) => page.evaluate(
+  return withExtensionPage(context, (page) => page.evaluate(
     ({ storageArea, storageKeys }) => new Promise((resolve) => {
       chrome.storage[storageArea].get(storageKeys, (stored) => {
         resolve({
@@ -55,10 +53,9 @@ async function readExtensionStorageValues(
 async function setExtensionStorageValues(
   context: BrowserContext,
   area: StorageArea,
-  values: StorageValues,
-  installedExtensionId?: string | null
+  values: StorageValues
 ): Promise<void> {
-  await withExtensionPage(context, installedExtensionId, (page) => page.evaluate(
+  await withExtensionPage(context, (page) => page.evaluate(
     ({ storageArea, storageValues }) => new Promise<void>((resolve) => {
       chrome.storage[storageArea].set(storageValues, () => resolve());
     }),
@@ -73,13 +70,12 @@ async function restoreExtensionStorageValues(
     requestedKeys: string[];
     existingKeys: string[];
     values: StorageValues;
-  },
-  installedExtensionId?: string | null
+  }
 ): Promise<void> {
   const keysToRemove = previous.requestedKeys
     .filter((key) => !previous.existingKeys.includes(key));
 
-  await withExtensionPage(context, installedExtensionId, (page) => page.evaluate(
+  await withExtensionPage(context, (page) => page.evaluate(
     ({ storageArea, storageKeys, storageValues }) => new Promise<void>((resolve) => {
       chrome.storage[storageArea].remove(storageKeys, () => {
         chrome.storage[storageArea].set(storageValues, () => resolve());
@@ -95,10 +91,9 @@ async function restoreExtensionStorageValues(
 
 async function withExtensionPage<T>(
   context: BrowserContext,
-  installedExtensionId: string | null | undefined,
   callback: (page: Page) => Promise<T>
 ): Promise<T> {
-  const extensionId = installedExtensionId || await getExtensionId(context);
+  const extensionId = await getExtensionId(context);
   const page = await context.newPage();
 
   try {
