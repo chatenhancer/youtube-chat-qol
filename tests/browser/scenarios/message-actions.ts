@@ -74,8 +74,8 @@ async function expectAuthorClickInsertsMentionDraft(chat: ChatSurface): Promise<
 async function expectMentionMenuActionInsertsDraft(chat: ChatSurface): Promise<void> {
   await clearComposerForAction(chat, 'Clear composer before Mention action');
 
-  const menu = await openMessageMenu(chat);
-  const mentionAction = menu.locator('.ytcq-context-item').nth(1);
+  const { menu, authorName } = await openMessageMenu(chat);
+  const mentionAction = menu.locator('.ytcq-context-item[data-ytcq-action="mention"]').first();
   await test.step('Click injected Mention action', async () => {
     await expect(mentionAction).toBeVisible({ timeout: 10_000 });
     await mentionAction.click({ force: true });
@@ -85,7 +85,7 @@ async function expectMentionMenuActionInsertsDraft(chat: ChatSurface): Promise<v
     await expect.poll(async () => cleanVisibleText(await getChatComposerText(chat)), {
       message: 'Mention action should write a draft without sending it.',
       timeout: 10_000
-    }).toMatch(/^@\S+/);
+    }).toBe(authorName);
   });
 
   await expectCollapsedFocusPrompt(chat);
@@ -95,17 +95,17 @@ async function expectMentionMenuActionInsertsDraft(chat: ChatSurface): Promise<v
 async function expectQuoteMenuActionInsertsDraft(chat: ChatSurface): Promise<void> {
   await clearComposerForAction(chat, 'Clear composer before Quote action');
 
-  const menu = await openMessageMenu(chat);
+  const { menu, authorName } = await openMessageMenu(chat);
 
   await test.step('Click injected Quote action', async () => {
-    await menu.locator('.ytcq-context-item').first().click({ force: true });
+    await menu.locator('.ytcq-context-item[data-ytcq-action="quote"]').first().click({ force: true });
   });
 
   await test.step('Verify composer contains quote draft', async () => {
     await expect.poll(async () => getChatComposerText(chat), {
       message: 'Quote action should write a draft without sending it.',
       timeout: 10_000
-    }).toContain(': "');
+    }).toContain(`${authorName} : "`);
   });
 
   await expectCollapsedFocusPrompt(chat);

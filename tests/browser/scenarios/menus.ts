@@ -23,7 +23,7 @@ export const settingsMenuScenario: BrowserScenario = {
 export const messageMenuScenario: BrowserScenario = {
   name: 'Message context menu receives quote and mention actions',
   run: async ({ chat }) => {
-    const menu = await openMessageMenu(chat);
+    const { menu } = await openMessageMenu(chat);
     await expectMessageMenuActionsInjected(menu);
     await closeNativeMenuStep(chat, 'Close message context menu');
   }
@@ -41,11 +41,11 @@ async function expectSettingsMenuControlsInjected(menu: Locator): Promise<void> 
 
 async function expectMessageMenuActionsInjected(menu: Locator): Promise<void> {
   await test.step('Verify Quote action is injected', async () => {
-    await expect(menu.locator('.ytcq-context-item').filter({ hasText: 'Quote' })).toBeVisible();
+    await expect(menu.locator('.ytcq-context-item[data-ytcq-action="quote"]').filter({ hasText: 'Quote' })).toBeVisible();
   });
 
   await test.step('Verify Mention action is injected', async () => {
-    await expect(menu.locator('.ytcq-context-item').filter({ hasText: 'Mention' })).toBeVisible();
+    await expect(menu.locator('.ytcq-context-item[data-ytcq-action="mention"]').filter({ hasText: 'Mention' })).toBeVisible();
   });
 }
 
