@@ -6,6 +6,7 @@
  * while keeping visual changes localized to injected controls.
  */
 ytd-menu-popup-renderer.ytcq-settings-expanded-menu {
+  max-height: min(80vh, 360px) !important;
   transform: translateY(var(--ytcq-context-shift-y, 0px));
 }
 
@@ -55,7 +56,7 @@ ytd-menu-popup-renderer.ytcq-settings-expanded-menu {
 }
 
 ytd-menu-popup-renderer.ytcq-settings-expanded-menu #items {
-  max-height: var(--ytcq-settings-menu-max-height, min(80vh, 360px));
+  max-height: min(80vh, 360px);
   overflow-y: auto;
   overflow-x: hidden;
 }

@@ -31,6 +31,22 @@ async function expectSettingsMenuControlsInjected(menu: Locator): Promise<void> 
   await test.step('Verify Inbox sound setting is injected', async () => {
     await expect(menu.locator('.ytcq-settings-item').filter({ hasText: 'Inbox sound' })).toBeVisible();
   });
+
+  await test.step('Verify extension settings are inside the visible menu area', async () => {
+    await expect.poll(async () => menu.evaluate((element) => {
+      const list = element.querySelector<HTMLElement>('#items');
+      const items = Array.from(element.querySelectorAll<HTMLElement>('.ytcq-settings-item'));
+      if (!list || items.length < 2) return false;
+
+      const bounds = list.getBoundingClientRect();
+      return items.every((item) => {
+        const rect = item.getBoundingClientRect();
+        return rect.top >= bounds.top - 1 && rect.bottom <= bounds.bottom + 1;
+      });
+    }), {
+      message: 'Expected extension settings rows to be visible without scrolling the native menu.'
+    }).toBe(true);
+  });
 }
 
 async function expectMessageMenuActionsInjected(menu: Locator): Promise<void> {
