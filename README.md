@@ -9,7 +9,7 @@
   <a href="https://www.chatenhancer.com/firefox"><img alt="firefox add-ons" src="https://img.shields.io/amo/v/chat-enhancer-for-youtube?label=firefox%20add-ons"></a>
   <img alt="source version" src="https://img.shields.io/github/package-json/v/chat-enhancer-yt/youtube-chat-qol?label=source">
   <a href="https://github.com/chat-enhancer-yt/youtube-chat-qol/actions/workflows/verify.yml"><img alt="verify" src="https://img.shields.io/github/actions/workflow/status/chat-enhancer-yt/youtube-chat-qol/verify.yml?label=verify"></a>
-  <img alt="typescript" src="https://img.shields.io/badge/typescript-5.x-3178c6">
+  <img alt="ts" src="https://img.shields.io/badge/ts-5.x-3178c6">
   <img alt="manifest v3" src="https://img.shields.io/badge/manifest-v3-4285f4">
   <a href="LICENSE"><img alt="license" src="https://img.shields.io/badge/license-GPL--3.0--or--later-97ca00"></a>
 </p>
