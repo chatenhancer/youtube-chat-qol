@@ -6,7 +6,7 @@
  * stay focused on extension behavior.
  */
 import { expect, type FrameLocator, type Page } from '@playwright/test';
-import { defaultLiveUrl, getLiveProfileDir } from './paths';
+import { defaultLiveUrl, defaultReplayUrl, getLiveProfileDir } from './paths';
 
 const CHAT_FRAME_SELECTOR = 'iframe#chatframe';
 const COMPOSER_TIMEOUT_MS = 30_000;
@@ -42,12 +42,43 @@ export function getLiveUrl(): string {
   return process.env.YTCQ_LIVE_URL || defaultLiveUrl;
 }
 
+export function getReplayUrl(): string {
+  return process.env.YTCQ_REPLAY_URL || defaultReplayUrl;
+}
+
 export async function openLiveChat(page: Page, liveUrl: string): Promise<FrameLocator> {
   await page.goto(liveUrl, { waitUntil: 'domcontentloaded', timeout: LIVE_PAGE_TIMEOUT_MS });
   await dismissYouTubeConsentIfPresent(page);
   await expect(page.locator(CHAT_FRAME_SELECTOR)).toBeVisible({ timeout: LIVE_PAGE_TIMEOUT_MS });
   await dismissYouTubeConsentIfPresent(page);
   return page.frameLocator(CHAT_FRAME_SELECTOR);
+}
+
+export async function startVideoPlaybackIfPaused(page: Page): Promise<void> {
+  const video = page.locator('video').first();
+  await video.waitFor({ state: 'attached', timeout: 15_000 });
+
+  if (!await isVideoPaused(video)) return;
+
+  for (const playButton of [
+    page.locator('.ytp-large-play-button').first(),
+    page.locator('.ytp-play-button').first(),
+    page.getByRole('button', { name: /^Play\b/i }).first()
+  ]) {
+    if (!await playButton.isVisible({ timeout: 500 }).catch(() => false)) continue;
+    await playButton.click({ timeout: 2_000 }).catch(() => undefined);
+    if (!await isVideoPaused(video)) return;
+  }
+
+  await video.evaluate((element) => {
+    if (!(element instanceof HTMLVideoElement)) return;
+    void element.play().catch(() => undefined);
+  }).catch(() => undefined);
+
+  await expect.poll(async () => !await isVideoPaused(video), {
+    message: 'Expected replay video playback to start so chat replay messages can render.',
+    timeout: 10_000
+  }).toBe(true);
 }
 
 export async function isChatComposerVisible(chat: FrameLocator): Promise<boolean> {
@@ -58,21 +89,8 @@ export async function isChatComposerVisible(chat: FrameLocator): Promise<boolean
 }
 
 export async function getUnavailableComposerReason(page: Page, chat: FrameLocator): Promise<string> {
-  if (await page.getByRole('button', { name: /sign in/i }).first().isVisible({ timeout: 500 }).catch(() => false)) {
-    return [
-      'Skipping logged-in live smoke because YouTube still shows Sign in.',
-      'Run `npm run test:youtube-login` in a normal Chrome window first.',
-      `Profile directory: ${getLiveProfileDir()}`
-    ].join(' ');
-  }
-
-  if (await page.getByText(/Verify it.?s you/i).first().isVisible({ timeout: 500 }).catch(() => false)) {
-    return [
-      'Skipping logged-in live smoke because Google requires account verification.',
-      'Complete Chrome account verification through `npm run test:youtube-login` or use a real Chrome tab manual smoke instead.',
-      `Profile directory: ${getLiveProfileDir()}`
-    ].join(' ');
-  }
+  const unavailableSignedInReason = await getUnavailableSignedInReason(page);
+  if (unavailableSignedInReason) return unavailableSignedInReason;
 
   const chatText = await chat.locator('body').innerText({ timeout: 1_000 }).catch(() => '');
   const compactChatText = chatText.replace(/\s+/g, ' ').trim();
@@ -81,6 +99,26 @@ export async function getUnavailableComposerReason(page: Page, chat: FrameLocato
   }
 
   return 'Skipping logged-in live smoke because YouTube did not expose the chat composer.';
+}
+
+export async function getUnavailableSignedInReason(page: Page): Promise<string> {
+  if (await page.getByRole('button', { name: /sign in/i }).first().isVisible({ timeout: 500 }).catch(() => false)) {
+    return [
+      'Skipping logged-in YouTube smoke because YouTube still shows Sign in.',
+      'Run `npm run test:youtube-login` in a normal Chrome window first.',
+      `Profile directory: ${getLiveProfileDir()}`
+    ].join(' ');
+  }
+
+  if (await page.getByText(/Verify it.?s you/i).first().isVisible({ timeout: 500 }).catch(() => false)) {
+    return [
+      'Skipping logged-in YouTube smoke because Google requires account verification.',
+      'Complete Chrome account verification through `npm run test:youtube-login` or use a real Chrome tab manual smoke instead.',
+      `Profile directory: ${getLiveProfileDir()}`
+    ].join(' ');
+  }
+
+  return '';
 }
 
 async function dismissYouTubeConsentIfPresent(page: Page): Promise<void> {
@@ -131,4 +169,10 @@ async function hasYouTubeConsentPrompt(page: Page): Promise<boolean> {
   }
 
   return false;
+}
+
+async function isVideoPaused(video: ReturnType<Page['locator']>): Promise<boolean> {
+  return video.evaluate((element) => {
+    return element instanceof HTMLVideoElement ? element.paused : true;
+  }).catch(() => true);
 }

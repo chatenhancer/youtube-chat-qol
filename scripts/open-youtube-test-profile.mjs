@@ -3,9 +3,9 @@
  * Open the persistent YouTube smoke-test profile in a normal browser.
  *
  * Google may block sign-in from Playwright-controlled browsers. This script
- * opens the repo-local `.chrome-test-profile` with a normal Chrome launch so a
- * developer can sign in to YouTube web once. It keeps running until YouTube's
- * own page config reports that the web session is signed in.
+ * opens the repo-local `.chrome-test-profiles/pristine` with a normal Chrome
+ * launch so a developer can sign in to YouTube web once. It keeps running until
+ * YouTube's own page config reports that the web session is signed in.
  */
 import { chromium } from '@playwright/test';
 import { spawn, spawnSync } from 'node:child_process';
@@ -15,7 +15,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const profileDir = path.resolve(process.env.YTCQ_CHROME_PROFILE || path.join(repoRoot, '.chrome-test-profile'));
+const profileDir = path.resolve(process.env.YTCQ_CHROME_PROFILE || path.join(repoRoot, '.chrome-test-profiles', 'pristine'));
 const extensionDir = path.join(repoRoot, 'dist', 'extension-chrome');
 const liveUrl = process.env.YTCQ_LIVE_URL || 'https://www.youtube.com/watch?v=EWrX250Zhko';
 const authCookieNames = [

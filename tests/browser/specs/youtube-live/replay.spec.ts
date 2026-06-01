@@ -1,0 +1,23 @@
+/**
+ * Logged-in real YouTube live chat replay scenario.
+ *
+ * This checks the extension against a real YouTube replay iframe where there
+ * is no composer, but read-only chat features should still attach.
+ */
+import {
+  attachScenario
+} from '../../scenarios/attach';
+import { focusPanelScenario } from '../../scenarios/focus';
+import { inboxScenario } from '../../scenarios/inbox';
+import { realMessageTranslationScenario } from '../../scenarios/message-translation';
+import { messageMenuScenario, settingsMenuScenario } from '../../scenarios/menus';
+import { profileScenario } from '../../scenarios/profile';
+import { loggedInLiveReplayTest as test } from '../scenario-fixtures';
+
+test('logged-in live replay: extension attaches and popup reports active status', attachScenario);
+test('logged-in live replay: chat settings menu receives extension controls', settingsMenuScenario);
+test('logged-in live replay: message context menu receives quote and mention actions', messageMenuScenario);
+test('logged-in live replay: incoming chat messages translate through real Google Translate', realMessageTranslationScenario);
+test('logged-in live replay: focus panel opens from an author and follows their messages', focusPanelScenario);
+test('logged-in live replay: inbox opens from the chat header', inboxScenario);
+test('logged-in live replay: profile card opens from a chat avatar', profileScenario);

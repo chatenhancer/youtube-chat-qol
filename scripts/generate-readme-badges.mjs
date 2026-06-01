@@ -75,7 +75,7 @@ function walk(directory) {
 
   const ignored = new Set([
     '.git',
-    '.chrome-test-profile',
+    '.chrome-test-profiles',
     'coverage',
     'dist',
     'node_modules',

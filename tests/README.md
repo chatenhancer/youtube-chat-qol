@@ -42,7 +42,7 @@ npm run test:browser:live
 
 CI runs the mock browser smoke test through `npm run verify`. Real YouTube live
 smoke tests stay local-only because they depend on YouTube, Google auth state,
-and a prepared `.chrome-test-profile/`.
+and a prepared `.chrome-test-profiles/pristine/`.
 
 See `tests/browser/README.md` for the browser smoke-test profile and privacy
 notes.
