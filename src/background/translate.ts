@@ -82,3 +82,5 @@ async function translateText(text: unknown, targetLanguage: unknown): Promise<{
     clearTimeout(timeoutId);
   }
 }
+
+export {};

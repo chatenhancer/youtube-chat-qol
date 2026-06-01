@@ -20,6 +20,18 @@ Run the main unit-test suite with:
 npm run test
 ```
 
+Generate unit-test coverage with:
+
+```sh
+npm run test:coverage
+```
+
+This prints a text summary and writes the HTML report to
+`coverage/unit/index.html`. The report intentionally measures unit-testable
+logic only. Browser-mounted entrypoints and UI surfaces are covered by the
+Playwright scenario suite instead, so use those reports and traces for behavior
+that needs a real extension frame.
+
 Run the browser smoke tests with:
 
 ```sh

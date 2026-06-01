@@ -113,6 +113,11 @@ export function resetComposerTranslation(): void {
 }
 
 export function cleanupStaleComposerTranslation(): void {
+  window.clearTimeout(debounceTimer);
+  debounceTimer = 0;
+  requestSerial += 1;
+  replacingDraft = false;
+  resetDraftMemory();
   document.querySelectorAll(`.${CONTROL_CLASS}, .${PANEL_CLASS}`).forEach((surface) => surface.remove());
   document.querySelectorAll('.ytcq-composer-translate-host').forEach((host) => {
     host.classList.remove('ytcq-composer-translate-host');
