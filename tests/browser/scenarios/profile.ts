@@ -4,12 +4,12 @@
  * It uses the first visible live-chat message so the same behavior can be
  * checked against both the deterministic fixture and real YouTube chat.
  */
-import { expect, test, type BrowserContext } from '@playwright/test';
+import { expect, test, type BrowserContext, type Locator } from '@playwright/test';
 import {
   appendMockFixtureMessage,
   isMockPageSurface
 } from '../helpers/mock-page';
-import { cleanVisibleText } from '../helpers/text';
+import { cleanVisibleText, getRichVisibleText } from '../helpers/text';
 import {
   NORMAL_CHAT_MESSAGE_SELECTOR,
   type BrowserScenario,
@@ -20,15 +20,16 @@ export const profileScenario: BrowserScenario = async ({ chat, context }) => {
   const source = await findRecentMessageSource(chat);
   await openProfileCardFromAvatar(chat, source);
   await expectProfileCardHasRecentMessages(chat, source);
+  await expectProfileCardJumpToMessage(chat, source);
   await expectMockProfileCardReceivesNewMessages(chat, source);
   await expectProfileChannelButtonOpensChannel(chat, context);
-  await expectProfileCardJumpToMessage(chat, source);
   await closeProfileCard(chat);
 };
 
 interface MessageSource {
   authorName: string;
   channelId: string;
+  messageId: string;
   messageText: string;
 }
 
@@ -42,8 +43,9 @@ async function findRecentMessageSource(chat: ChatSurface): Promise<MessageSource
     for (let index = count - 1; index >= firstCandidate; index -= 1) {
       const message = messages.nth(index);
       const authorName = cleanVisibleText(await message.locator('#author-name').first().innerText().catch(() => ''));
-      const messageText = cleanVisibleText(await message.locator('#message').first().innerText().catch(() => ''));
+      const messageText = await getRichVisibleText(message.locator('#message').first()).catch(() => '');
       if (!authorName || !messageText) continue;
+      if (!hasMeaningfulText(messageText)) continue;
 
       const channelId = await message.evaluate((element) => {
         const data = (element as HTMLElement & {
@@ -51,10 +53,12 @@ async function findRecentMessageSource(chat: ChatSurface): Promise<MessageSource
         }).data;
         return data?.authorExternalChannelId || '';
       }).catch(() => '');
+      const messageId = await message.getAttribute('id').catch(() => '') || '';
 
       return {
         authorName,
         channelId,
+        messageId,
         messageText
       };
     }
@@ -85,9 +89,7 @@ async function expectProfileCardHasRecentMessages(chat: ChatSurface, source: Mes
   await test.step('Verify profile card shows recent messages for the clicked author', async () => {
     const profileCard = chat.locator('.ytcq-profile-card:not(.ytcq-inbox-card)');
     await expect(profileCard.locator('.ytcq-profile-card-title')).toContainText(source.authorName);
-    await expect(profileCard.locator('.ytcq-profile-card-message').filter({
-      hasText: source.messageText
-    }).first()).toBeVisible();
+    await expect(await getProfileCardRecord(chat, source)).toBeVisible();
   });
 }
 
@@ -146,14 +148,48 @@ async function expectProfileChannelButtonOpensChannel(
 async function expectProfileCardJumpToMessage(chat: ChatSurface, source: MessageSource): Promise<void> {
   await test.step('Jump from profile card record back to the live message', async () => {
     const sourceMessage = getSourceMessage(chat, source);
-    const record = chat.locator('.ytcq-profile-card:not(.ytcq-inbox-card) .ytcq-profile-card-message').filter({
-      hasText: source.messageText
-    }).first();
+    const record = await getProfileCardRecord(chat, source);
 
+    await record.evaluate((element) => {
+      element.scrollIntoView({
+        block: 'center',
+        inline: 'nearest'
+      });
+    }).catch(() => undefined);
     await record.hover();
     await record.locator('.ytcq-profile-card-jump').click();
     await expect(sourceMessage).toHaveClass(/ytcq-message-jump-target/, { timeout: 2_000 });
   });
+}
+
+async function getProfileCardRecord(chat: ChatSurface, source: MessageSource): Promise<Locator> {
+  if (source.messageId) {
+    const liveMessageRecord = chat.locator(`.ytcq-profile-card:not(.ytcq-inbox-card) .ytcq-profile-card-message[data-ytcq-live-message-id="${escapeCssString(source.messageId)}"]`).first();
+    if (await liveMessageRecord.count()) return liveMessageRecord;
+  }
+
+  const records = chat.locator('.ytcq-profile-card:not(.ytcq-inbox-card) .ytcq-profile-card-message');
+
+  await expect.poll(async () => findProfileCardRecordIndex(records, source.messageText), {
+    message: 'Profile card should contain the exact recent message record.',
+    timeout: 10_000
+  }).toBeGreaterThanOrEqual(0);
+
+  const index = await findProfileCardRecordIndex(records, source.messageText);
+  return records.nth(index);
+}
+
+async function findProfileCardRecordIndex(records: Locator, expectedText: string): Promise<number> {
+  const count = await records.count();
+
+  for (let index = 0; index < count; index += 1) {
+    const text = await getRichVisibleText(records.nth(index).locator('.ytcq-profile-card-message-text').first(), {
+      ignoredSelector: '.ytcq-translation, .ytcq-replaced-translation-icon'
+    }).catch(() => '');
+    if (text === expectedText) return index;
+  }
+
+  return -1;
 }
 
 async function closeProfileCard(chat: ChatSurface): Promise<void> {
@@ -165,11 +201,23 @@ async function closeProfileCard(chat: ChatSurface): Promise<void> {
 }
 
 function getSourceMessage(chat: ChatSurface, source: MessageSource): ReturnType<ChatSurface['locator']> {
+  if (source.messageId) {
+    return chat.locator(`${NORMAL_CHAT_MESSAGE_SELECTOR}[id="${escapeCssString(source.messageId)}"]`).first();
+  }
+
   return chat.locator(NORMAL_CHAT_MESSAGE_SELECTOR).filter({
     has: chat.locator('#author-name').filter({ hasText: source.authorName })
   }).filter({
     has: chat.locator('#message').filter({ hasText: source.messageText })
   }).last();
+}
+
+function hasMeaningfulText(value: string): boolean {
+  return /[\p{L}\p{N}]/u.test(value);
+}
+
+function escapeCssString(value: string): string {
+  return value.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
 }
 
 function getOpenedProfileUrl(value: string): string {

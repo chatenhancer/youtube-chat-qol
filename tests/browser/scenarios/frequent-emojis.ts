@@ -38,7 +38,9 @@ async function expectFrequentEmojiBehavior({
   await withExtensionStorageValues(context, 'local', {
     [EMOJI_USAGE_STORAGE_KEY]: []
   }, async () => {
-    await reloadChatSurface({ chat, context });
+    if (verifyPersistenceAfterReload) {
+      await reloadChatSurface({ chat, context });
+    }
     await clickNativeEmojiOption(chat);
     await expectEmojiUsageCount(context, 1);
     await expectFrequentEmojiRow(chat);

@@ -35,11 +35,15 @@ export function renderProfileMessages(
 
   if (recentMessages.length) {
     recentMessages.forEach((recentMessage) => {
+      const liveMessage = getLiveMessageForRecord(recentMessage);
       const item = ytcqCreateElement('div');
       item.className = 'ytcq-profile-card-message';
       item.title = t('quoteMessage');
       item.setAttribute('role', 'button');
       item.tabIndex = 0;
+      item.dataset.ytcqMessageRecordId = String(recentMessage.id);
+      if (recentMessage.messageId) item.dataset.ytcqMessageId = recentMessage.messageId;
+      if (liveMessage?.id) item.dataset.ytcqLiveMessageId = liveMessage.id;
       wireQuoteCardItem(item, recentMessage, source, onClose);
 
       const timestamp = ytcqCreateElement('time');
@@ -52,7 +56,7 @@ export function renderProfileMessages(
       renderProfileMessageText(item, text, recentMessage);
 
       item.append(timestamp, text);
-      const jumpButton = createJumpToMessageButton(recentMessage);
+      const jumpButton = liveMessage ? createJumpToMessageButton(liveMessage) : null;
       if (jumpButton) item.append(jumpButton);
       list.append(item);
     });
@@ -144,9 +148,7 @@ function wireQuoteCardItem(
   });
 }
 
-function createJumpToMessageButton(recentMessage: MessageRecord): HTMLButtonElement | null {
-  if (!getLiveMessageForRecord(recentMessage)) return null;
-
+function createJumpToMessageButton(liveMessage: HTMLElement): HTMLButtonElement {
   const button = ytcqCreateElement('button');
   button.type = 'button';
   button.className = 'ytcq-profile-card-jump';
@@ -156,15 +158,8 @@ function createJumpToMessageButton(recentMessage: MessageRecord): HTMLButtonElem
   button.addEventListener('click', (event) => {
     event.preventDefault();
     event.stopPropagation();
-    jumpToRecentMessage(recentMessage);
+    jumpToChatMessage(liveMessage);
   });
 
   return button;
-}
-
-function jumpToRecentMessage(recentMessage: MessageRecord): void {
-  const target = getLiveMessageForRecord(recentMessage);
-  if (!target) return;
-
-  jumpToChatMessage(target);
 }
