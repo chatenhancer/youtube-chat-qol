@@ -5,6 +5,7 @@
  * parsing rules as /watch.
  */
 import { t } from '../../../shared/i18n';
+import { cleanText } from '../../../shared/text';
 import { showToast } from '../../../shared/toast';
 import { getLoadedInboxKeywords, removeInboxKeywords } from '../../inbox';
 import {
@@ -31,7 +32,7 @@ export function createUnwatchCommand(runtime: ChatCommandRuntime): ChatCommandDe
 async function executeUnwatchCommand(parsed: ParsedCommand, runtime: ChatCommandRuntime): Promise<void> {
   const parsedKeywords = parseKeywordCommandArguments(parsed.args);
   if (!parsedKeywords.ok) {
-    showToast(parsedKeywords.error || t('addKeywordOrPhraseToRemove'));
+    showToast(cleanText(parsed.args) ? parsedKeywords.error : t('addKeywordOrPhraseToRemove'));
     return;
   }
 

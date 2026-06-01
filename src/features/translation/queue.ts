@@ -169,6 +169,10 @@ export function clearTranslations(): void {
   liveTranslationQueue = [];
   backfillTranslationQueue = [];
   pendingTranslations.clear();
+  if (translationDelayTimer) {
+    window.clearTimeout(translationDelayTimer);
+    translationDelayTimer = 0;
+  }
   clearTranslationRenderings();
   emitMessageTranslationsCleared();
 }

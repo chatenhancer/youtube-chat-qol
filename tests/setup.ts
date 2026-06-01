@@ -4,6 +4,14 @@ const localStorageArea = createStorageArea();
 const syncStorageArea = createStorageArea();
 
 const chromeMock = {
+  action: {
+    setIcon: vi.fn((_details: unknown, callback?: () => void) => {
+      callback?.();
+    }),
+    setTitle: vi.fn((_details: unknown, callback?: () => void) => {
+      callback?.();
+    })
+  },
   i18n: {
     getMessage: vi.fn((key: string, substitutions?: string | string[]) => {
       const suffix = Array.isArray(substitutions) ? substitutions.join(',') : substitutions || '';
@@ -14,6 +22,10 @@ const chromeMock = {
   runtime: {
     getManifest: vi.fn(() => ({ version: '0.0.0' })),
     lastError: undefined,
+    onConnect: {
+      addListener: vi.fn(),
+      removeListener: vi.fn()
+    },
     onMessage: {
       addListener: vi.fn(),
       removeListener: vi.fn()
@@ -35,6 +47,14 @@ const chromeMock = {
     query: vi.fn((_queryInfo: chrome.tabs.QueryInfo, callback: (tabs: chrome.tabs.Tab[]) => void) => {
       callback([]);
     }),
+    onRemoved: {
+      addListener: vi.fn(),
+      removeListener: vi.fn()
+    },
+    onUpdated: {
+      addListener: vi.fn(),
+      removeListener: vi.fn()
+    },
     sendMessage: vi.fn((_tabId: number, _message: unknown, callback?: () => void) => {
       callback?.();
     })

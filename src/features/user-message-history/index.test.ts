@@ -117,9 +117,110 @@ describe('user message history', () => {
       .toMatchObject([
         {
           authorName: '@OldHandle',
-          text: 'message before rename'
-        }
-      ]);
+        text: 'message before rename'
+      }
+    ]);
+  });
+
+  it('finds recently seen users by exact handle before prefix matches', async () => {
+    const history = await import('./index');
+    history.recordUserMessage(createMessage({
+      authorName: '@Viewer',
+      channelId: 'viewer-channel',
+      messageId: 'message-1',
+      text: 'exact handle'
+    }));
+    history.recordUserMessage(createMessage({
+      authorName: '@ViewerExtra',
+      channelId: 'viewer-extra-channel',
+      messageId: 'message-2',
+      text: 'prefix handle'
+    }));
+
+    expect(history.findRecentUsersByHandle('@Viewer')).toMatchObject([
+      {
+        authorName: '@Viewer',
+        identity: { channelId: 'viewer-channel' },
+        latestMessage: { text: 'exact handle' }
+      }
+    ]);
+    expect(history.findRecentUsersByHandle('@View')).toHaveLength(2);
+  });
+
+  it('dedupes recent user matches that share the same handle fallback', async () => {
+    const history = await import('./index');
+    history.recordUserMessage(createMessage({
+      authorName: '@SameHandle',
+      messageId: 'message-1',
+      text: 'first fallback record'
+    }));
+    history.recordUserMessage(createMessage({
+      authorName: '@SameHandle',
+      messageId: 'message-2',
+      text: 'second fallback record'
+    }));
+
+    const matches = history.findRecentUsersByHandle('@SameHandle');
+
+    expect(matches).toHaveLength(1);
+    expect(matches[0].latestMessage.text).toBe('second fallback record');
+  });
+
+  it('notifies listeners when a user history record changes and stops after unsubscribe', async () => {
+    const history = await import('./index');
+    const listener = vi.fn();
+    const unsubscribe = history.onUserMessagesChanged(listener);
+
+    history.recordUserMessage(createMessage({
+      authorName: '@ListenerTarget',
+      channelId: 'listener-channel',
+      messageId: 'message-1',
+      text: 'first notification'
+    }));
+    unsubscribe();
+    history.recordUserMessage(createMessage({
+      authorName: '@ListenerTarget',
+      channelId: 'listener-channel',
+      messageId: 'message-2',
+      text: 'second notification'
+    }));
+
+    expect(listener).toHaveBeenCalledOnce();
+    expect(listener).toHaveBeenCalledWith('channel:listener-channel');
+  });
+
+  it('returns the latest message, avatar, and connected live element for an identity', async () => {
+    const history = await import('./index');
+    const first = createMessage({
+      authorName: '@CardViewer',
+      channelId: 'card-channel',
+      messageId: 'message-1',
+      text: 'older message'
+    });
+    first.querySelector('#author-photo')?.append(createAvatarImage('https://example.com/avatar.jpg'));
+    const latest = createMessage({
+      authorName: '@CardViewer',
+      channelId: 'card-channel',
+      messageId: 'message-2',
+      text: 'newer message'
+    });
+    history.recordUserMessage(first);
+    history.recordUserMessage(latest);
+
+    const latestRecord = history.getLatestMessageForIdentity({
+      authorName: '@CardViewer',
+      channelId: 'card-channel'
+    });
+
+    expect(latestRecord).toMatchObject({ text: 'newer message' });
+    expect(history.getAvatarSrcForIdentity({
+      authorName: '@CardViewer',
+      channelId: 'card-channel'
+    })).toBe('https://example.com/avatar.jpg');
+    expect(history.getLiveMessageForRecord(latestRecord!)).toBe(latest);
+
+    latest.remove();
+    expect(history.getLiveMessageForRecord(latestRecord!)).toBeNull();
   });
 });
 
@@ -145,9 +246,16 @@ function createMessage({
   };
   message.innerHTML = `
     <span id="timestamp">${timestampText}</span>
+    <span id="author-photo"></span>
     <span id="author-name">${authorName}</span>
     <span id="message">${text}</span>
   `;
   document.body.append(message);
   return message;
+}
+
+function createAvatarImage(src: string): HTMLImageElement {
+  const image = document.createElement('img');
+  image.src = src;
+  return image;
 }
