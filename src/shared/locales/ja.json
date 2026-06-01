@@ -222,7 +222,7 @@
       "message": "メッセージを置き換えるか、翻訳を下に表示します。"
     },
     "replaceMessage": {
-      "message": "メッセージを置き換え"
+      "message": "置き換え"
     },
     "showBelow": {
       "message": "下に表示"

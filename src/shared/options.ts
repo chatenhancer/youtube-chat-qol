@@ -28,7 +28,7 @@ export const DEFAULT_OPTIONS: Options = {
 };
 
 export const TRANSLATION_DISPLAY_OPTIONS: readonly (readonly [TranslationDisplay, string])[] = [
-  ['replace', 'Replace message'],
+  ['replace', 'Replace'],
   ['below', 'Show below']
 ];
 
