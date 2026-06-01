@@ -12,7 +12,7 @@ writeBadge('unit-coverage.json', createCoverageBadge(coverage));
 writeBadge('unit-tests.json', {
   label: 'unit tests',
   message: String(countUnitTests()),
-  color: '3178c6'
+  color: '8b5cf6'
 });
 writeBadge('browser-tests.json', createBrowserTestsBadge());
 
@@ -50,7 +50,7 @@ function createBrowserTestsBadge() {
   return {
     label: 'browser tests',
     message: `${mockCount} mock / ${liveCount} live`,
-    color: '4285f4'
+    color: '0891b2'
   };
 }
 
