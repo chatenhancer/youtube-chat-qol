@@ -2,6 +2,9 @@
 node_modules/
 dist/
 coverage/
+docs/badges/
+docs/*/index.html
+docs/sitemap.xml
 test-results/
 playwright-report/
 .chrome-test-profile/
