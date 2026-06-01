@@ -10,12 +10,12 @@ import type { BrowserScenario, ChatSurface } from './types';
 
 const EXTENSION_ATTACH_TIMEOUT_MS = 15_000;
 
-export const attachScenario: BrowserScenario = async ({ chat, extensionContext }) => {
+export const attachScenario: BrowserScenario = async ({ chat, context }) => {
   await expectExtensionUiAttached(chat);
   await expectReconnectPromptHidden(chat);
   await expectVisibleChatMessages(chat);
   await test.step('Verify popup reports active status', async () => {
-    await expectPopupReportsActiveStatus(extensionContext);
+    await expectPopupReportsActiveStatus(context);
   });
 };
 

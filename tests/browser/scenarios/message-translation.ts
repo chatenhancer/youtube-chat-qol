@@ -25,24 +25,24 @@ const SETTINGS_TRANSLATED_TEXT = 'YTCQ settings result';
 
 type TranslationDisplayMode = 'below' | 'replace';
 
-export const mockedMessageTranslationScenario: BrowserScenario = async ({ chat, extensionContext }) => {
+export const mockedMessageTranslationScenario: BrowserScenario = async ({ chat, context }) => {
   await waitForSourceChatMessage(chat);
-  await expectMockedIncomingTranslation({ chat, context: extensionContext });
+  await expectMockedIncomingTranslation({ chat, context });
 };
 
-export const realMessageTranslationScenario: BrowserScenario = async ({ chat, extensionContext }) => {
+export const realMessageTranslationScenario: BrowserScenario = async ({ chat, context }) => {
   await waitForSourceChatMessage(chat);
-  await expectRealIncomingTranslation({ chat, context: extensionContext });
+  await expectRealIncomingTranslation({ chat, context });
 };
 
-export const translationDisplayScenario: BrowserScenario = async ({ chat, extensionContext }) => {
+export const translationDisplayScenario: BrowserScenario = async ({ chat, context }) => {
   await waitForSourceChatMessage(chat);
-  await expectTranslationDisplayModes({ chat, context: extensionContext });
+  await expectTranslationDisplayModes({ chat, context });
 };
 
-export const translationSettingsReactScenario: BrowserScenario = async ({ chat, extensionContext }) => {
+export const translationSettingsReactScenario: BrowserScenario = async ({ chat, context }) => {
   await waitForSourceChatMessage(chat);
-  await expectTranslateSettingReactsLive({ chat, context: extensionContext });
+  await expectTranslateSettingReactsLive({ chat, context });
 };
 
 async function waitForSourceChatMessage(chat: ChatSurface): Promise<void> {

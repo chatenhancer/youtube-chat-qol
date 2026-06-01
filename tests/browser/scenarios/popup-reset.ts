@@ -26,14 +26,14 @@ const RESET_LOCAL_SEED = {
   ytcqInboxKeywords: ['reset-browser-test']
 };
 
-export const popupResetScenario: BrowserScenario = async ({ chat, extensionContext }) => {
-  await withExtensionStorageSnapshot(extensionContext, 'sync', async () => {
-    await withExtensionStorageSnapshot(extensionContext, 'local', async () => {
-      await withExtensionStorageValues(extensionContext, 'sync', RESET_SYNC_SEED, async () => {
-        await withExtensionStorageValues(extensionContext, 'local', RESET_LOCAL_SEED, async () => {
+export const popupResetScenario: BrowserScenario = async ({ chat, context }) => {
+  await withExtensionStorageSnapshot(context, 'sync', async () => {
+    await withExtensionStorageSnapshot(context, 'local', async () => {
+      await withExtensionStorageValues(context, 'sync', RESET_SYNC_SEED, async () => {
+        await withExtensionStorageValues(context, 'local', RESET_LOCAL_SEED, async () => {
           await openInboxPanel(chat);
-          await resetExtensionFromPopup(extensionContext);
-          await expectPopupResetState({ chat, context: extensionContext });
+          await resetExtensionFromPopup(context);
+          await expectPopupResetState({ chat, context });
         });
       });
     });

@@ -19,12 +19,12 @@ import type { BrowserScenario, ChatSurface } from './types';
 
 const COMMAND_KEYWORD = 'browser command phrase';
 
-export const chatCommandsFullScenario: BrowserScenario = async ({ chat, extensionContext }) => {
-  await expectChatCommands({ chat, context: extensionContext, fullCoverage: true });
+export const chatCommandsFullScenario: BrowserScenario = async ({ chat, context }) => {
+  await expectChatCommands({ chat, context, fullCoverage: true });
 };
 
-export const chatCommandsSmokeScenario: BrowserScenario = async ({ chat, extensionContext }) => {
-  await expectChatCommands({ chat, context: extensionContext, fullCoverage: false });
+export const chatCommandsSmokeScenario: BrowserScenario = async ({ chat, context }) => {
+  await expectChatCommands({ chat, context, fullCoverage: false });
 };
 
 async function expectChatCommands({

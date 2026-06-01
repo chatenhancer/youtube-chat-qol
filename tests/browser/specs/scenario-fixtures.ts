@@ -14,7 +14,7 @@ import type { ChatSurface } from '../helpers/chat-surface';
 
 interface BrowserScenarioFixtures {
   chat: ChatSurface;
-  extensionContext: BrowserContext;
+  context: BrowserContext;
 }
 
 export const loggedInMockTest = mockTest.extend<BrowserScenarioFixtures>({
@@ -22,7 +22,7 @@ export const loggedInMockTest = mockTest.extend<BrowserScenarioFixtures>({
     await use(mockLoggedInSession.page);
   },
 
-  extensionContext: async ({ mockLoggedInSession }, use) => {
+  context: async ({ mockLoggedInSession }, use) => {
     await use(mockLoggedInSession.context);
   }
 });
@@ -32,7 +32,7 @@ export const loggedOutMockTest = mockTest.extend<BrowserScenarioFixtures>({
     await use(mockLoggedOutSession.page);
   },
 
-  extensionContext: async ({ mockLoggedOutSession }, use) => {
+  context: async ({ mockLoggedOutSession }, use) => {
     await use(mockLoggedOutSession.context);
   }
 });
@@ -43,7 +43,7 @@ export const loggedInLiveTest = liveTest.extend<BrowserScenarioFixtures>({
     await use(liveLoggedInSession.chat);
   },
 
-  extensionContext: async ({ liveLoggedInSession }, use) => {
+  context: async ({ liveLoggedInSession }, use) => {
     skipIfLoggedInLiveUnavailable(liveTest, liveLoggedInSession);
     await use(liveLoggedInSession.context);
   }
@@ -54,7 +54,7 @@ export const loggedOutLiveTest = liveTest.extend<BrowserScenarioFixtures>({
     await use(liveLoggedOutSession.chat);
   },
 
-  extensionContext: async ({ liveLoggedOutSession }, use) => {
+  context: async ({ liveLoggedOutSession }, use) => {
     await use(liveLoggedOutSession.context);
   }
 });
