@@ -18,12 +18,15 @@ interface LaunchExtensionContextOptions {
   headless?: boolean;
   profileDir: string;
   testInfo?: Pick<TestInfo, 'annotations'>;
+  userAgent?: string;
 }
 
 interface LaunchNormalChromeExtensionContextOptions {
+  headless?: boolean;
   initialUrl?: string;
   profileDir: string;
   testInfo?: Pick<TestInfo, 'annotations'>;
+  userAgent?: string;
 }
 
 interface NormalChromeExtensionContext {
@@ -37,7 +40,8 @@ export async function launchExtensionContext({
   channel: requestedChannel,
   headless: requestedHeadless,
   profileDir,
-  testInfo
+  testInfo,
+  userAgent
 }: LaunchExtensionContextOptions): Promise<BrowserContext> {
   if (!existsSync(extensionDir)) {
     throw new Error('Missing dist/extension-chrome. Run npm run build:chrome first.');
@@ -59,6 +63,7 @@ export async function launchExtensionContext({
         height: 900,
         width: 1280
       },
+      ...(userAgent ? { userAgent } : {}),
       args: [
         '--disable-features=DisableLoadExtensionCommandLineSwitch',
         `--disable-extensions-except=${extensionDir}`,
@@ -88,9 +93,11 @@ export async function closeExtensionContext(context: BrowserContext): Promise<vo
 }
 
 export async function launchNormalChromeExtensionContext({
+  headless = false,
   initialUrl,
   profileDir,
-  testInfo
+  testInfo,
+  userAgent
 }: LaunchNormalChromeExtensionContextOptions): Promise<NormalChromeExtensionContext> {
   if (!existsSync(extensionDir)) {
     throw new Error('Missing dist/extension-chrome. Run npm run build:chrome first.');
@@ -108,6 +115,11 @@ export async function launchNormalChromeExtensionContext({
     '--mute-audio',
     `--remote-debugging-port=${remoteDebuggingPort}`,
     '--no-first-run',
+    ...(headless ? [
+      '--headless=new',
+      '--window-size=1280,900'
+    ] : []),
+    ...(userAgent ? [`--user-agent=${userAgent}`] : []),
     ...(initialUrl ? [initialUrl] : [])
   ];
   const browserProcess = spawn(await getChromeExecutable(), args, {

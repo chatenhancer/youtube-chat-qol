@@ -67,14 +67,19 @@ describe('profile card message renderer', () => {
   it('adds a jump button when the live message renderer is still connected', () => {
     const list = document.createElement('div');
     const liveMessage = document.createElement('yt-live-chat-text-message-renderer');
+    liveMessage.id = 'live-message-1';
     document.body.append(liveMessage);
     userHistoryMocks.getLiveMessageForRecord.mockReturnValue(liveMessage);
     const recentMessage = record();
 
     renderProfileMessages(list, [recentMessage], source(), vi.fn());
+    const item = list.querySelector<HTMLElement>('.ytcq-profile-card-message')!;
     const jumpButton = list.querySelector<HTMLButtonElement>('.ytcq-profile-card-jump')!;
     jumpButton.click();
 
+    expect(item.dataset.ytcqMessageRecordId).toBe('1');
+    expect(item.dataset.ytcqMessageId).toBe('message-1');
+    expect(item.dataset.ytcqLiveMessageId).toBe('live-message-1');
     expect(jumpButton.title).toBe('Jump to message');
     expect(jumpMocks.jumpToChatMessage).toHaveBeenCalledWith(liveMessage);
   });

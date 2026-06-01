@@ -7,6 +7,7 @@
  */
 import { defineConfig } from '@playwright/test';
 
+const DEFAULT_WORKERS = 4;
 const reportOutputFolder = process.env.YTCQ_PLAYWRIGHT_REPORT_DIR ?? 'playwright-report/browser';
 
 export default defineConfig({
@@ -38,5 +39,15 @@ export default defineConfig({
     trace: 'retain-on-failure',
     video: 'retain-on-failure'
   },
-  workers: 1
+  workers: getWorkerCount()
 });
+
+function getWorkerCount(): number {
+  const rawWorkerCount = process.env.YTCQ_TEST_WORKERS;
+  if (!rawWorkerCount) return DEFAULT_WORKERS;
+
+  const workerCount = Number.parseInt(rawWorkerCount, 10);
+  if (!Number.isFinite(workerCount) || workerCount < 1) return DEFAULT_WORKERS;
+
+  return workerCount;
+}

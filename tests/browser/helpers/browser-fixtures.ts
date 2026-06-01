@@ -34,6 +34,12 @@ import {
 } from './youtube-page';
 
 const DEFAULT_MOCK_HEADLESS = true;
+const DEFAULT_LIVE_HEADLESS = true;
+const LIVE_HEADLESS_USER_AGENT = [
+  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)',
+  'AppleWebKit/537.36 (KHTML, like Gecko)',
+  'Chrome/148.0.0.0 Safari/537.36'
+].join(' ');
 const TOP_LEVEL_TRANSIENT_SURFACE_SELECTOR = [
   'ytd-popup-container ytd-multi-page-menu-renderer',
   'ytd-popup-container ytd-menu-popup-renderer',
@@ -123,9 +129,11 @@ export const mockTest = base.extend<MockTestFixtures, MockWorkerFixtures>({
 export const liveTest = base.extend<LiveTestFixtures, LiveWorkerFixtures>({
   liveLoggedOutWorkerSession: [async ({ browserName }, use, workerInfo) => {
     void browserName;
+    const headless = shouldRunLiveHeadlessBrowserTest();
     const context = await launchExtensionContext({
-      headless: false,
-      profileDir: path.join(workerInfo.project.outputDir, 'profiles', `live-logged-out-${workerInfo.workerIndex}`)
+      headless,
+      profileDir: path.join(workerInfo.project.outputDir, 'profiles', `live-logged-out-${workerInfo.workerIndex}`),
+      userAgent: getLiveBrowserUserAgent(headless)
     });
 
     const page = await context.newPage();
@@ -155,7 +163,6 @@ export const liveTest = base.extend<LiveTestFixtures, LiveWorkerFixtures>({
       await use(liveLoggedOutWorkerSession);
     } finally {
       await dumpDomOnFailure(liveLoggedOutWorkerSession.context, testInfo);
-      await resetLiveScenarioState(liveLoggedOutWorkerSession);
     }
   },
 
@@ -168,7 +175,6 @@ export const liveTest = base.extend<LiveTestFixtures, LiveWorkerFixtures>({
     } finally {
       if (liveLoggedInWorkerSession) {
         await dumpDomOnFailure(liveLoggedInWorkerSession.context, testInfo);
-        await resetLiveScenarioState(liveLoggedInWorkerSession);
       }
     }
   }
@@ -207,8 +213,10 @@ async function createLoggedInLiveSession(): Promise<{
   }
 
   const chrome = await launchNormalChromeExtensionContext({
+    headless: shouldRunLiveHeadlessBrowserTest(),
     initialUrl: liveUrl,
-    profileDir
+    profileDir,
+    userAgent: getLiveBrowserUserAgent(shouldRunLiveHeadlessBrowserTest())
   });
   const { context } = chrome;
   const page = context.pages()[0] || await context.newPage();
@@ -267,12 +275,11 @@ async function closeTransientSurfaces(chat: FrameLocator): Promise<void> {
     }
   }).catch(() => undefined);
 
-  const composerTranslatePanel = chat.locator('.ytcq-composer-translate-panel').first();
-  if (!await composerTranslatePanel.isVisible({ timeout: 500 }).catch(() => false)) return;
-
-  await composerTranslatePanel
-    .evaluate((panel) => {
-      if (panel instanceof HTMLElement) panel.hidden = true;
+  await chat.locator('.ytcq-composer-translate-panel')
+    .evaluateAll((panels) => {
+      for (const panel of panels) {
+        if (panel instanceof HTMLElement) panel.hidden = true;
+      }
     })
     .catch(() => undefined);
 }
@@ -295,4 +302,15 @@ function shouldRunHeadlessBrowserTest(): boolean {
   if (override === '0') return false;
   if (override === '1') return true;
   return DEFAULT_MOCK_HEADLESS;
+}
+
+function shouldRunLiveHeadlessBrowserTest(): boolean {
+  const override = process.env.YTCQ_TEST_LIVE_HEADLESS;
+  if (override === '0') return false;
+  if (override === '1') return true;
+  return DEFAULT_LIVE_HEADLESS;
+}
+
+function getLiveBrowserUserAgent(headless: boolean): string | undefined {
+  return headless ? (process.env.YTCQ_TEST_LIVE_USER_AGENT || LIVE_HEADLESS_USER_AGENT) : undefined;
 }

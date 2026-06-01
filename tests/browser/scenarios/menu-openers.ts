@@ -66,7 +66,7 @@ export async function openMessageMenu(chat: ChatSurface): Promise<OpenedMessageM
     const firstCandidate = Math.max(0, count - 8);
     for (let index = count - 1; index >= firstCandidate; index -= 1) {
       const message = messages.nth(index);
-      await message.scrollIntoViewIfNeeded({ timeout: 2_000 }).catch(() => undefined);
+      await centerMessageInViewport(message);
       if (!await message.isVisible({ timeout: 500 }).catch(() => false)) continue;
       const authorName = await getMessageAuthorName(message);
       if (!authorName) continue;
@@ -136,6 +136,17 @@ async function markMessageAsContextSource(message: Locator): Promise<void> {
   }).catch(() => undefined);
 }
 
+async function centerMessageInViewport(message: Locator): Promise<void> {
+  await message.evaluate((element) => {
+    element.scrollIntoView({
+      block: 'center',
+      inline: 'nearest'
+    });
+  }).catch(async () => {
+    await message.scrollIntoViewIfNeeded({ timeout: 2_000 }).catch(() => undefined);
+  });
+}
+
 async function resetOuterPageScroll(chat: ChatSurface): Promise<void> {
   await chat.locator('body').evaluate(() => {
     try {
@@ -192,7 +203,17 @@ async function findVisibleMenu(chat: ChatSurface, markerSelector: string): Promi
 // are technically visible to Playwright but cannot receive a real user click.
 async function hasUsableMenuBox(menu: Locator): Promise<boolean> {
   return menu.evaluate((element) => {
-    const rect = element.getBoundingClientRect();
-    return rect.width >= 48 && rect.height >= 24;
+    const rects = [
+      element.getBoundingClientRect(),
+      ...Array.from(element.querySelectorAll('.ytcq-context-item[data-ytcq-action]'))
+        .map((child) => child.getBoundingClientRect())
+    ];
+
+    return rects.every((rect) => {
+      return rect.width >= 48 &&
+        rect.height >= 24 &&
+        rect.top >= 0 &&
+        rect.bottom <= window.innerHeight;
+    });
   }).catch(() => false);
 }

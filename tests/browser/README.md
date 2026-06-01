@@ -50,14 +50,21 @@ Runs the mock suite with a visible browser for debugging.
 npm run test:browser:live
 ```
 
-Runs real YouTube livestream smoke tests. These stay headed because headless
-real-YouTube extension checks are not reliable enough.
+Runs real YouTube livestream smoke tests. These use Chrome's new headless mode
+by default.
+
+```sh
+YTCQ_TEST_LIVE_HEADLESS=0 npm run test:browser:live
+```
+
+Runs the live suite with visible Chrome windows. Use this when debugging account
+verification or YouTube UI prompts.
 
 ```sh
 npm run test:browser
 ```
 
-Runs mock first, then live.
+Runs all mock and live browser specs.
 
 ```sh
 npm run test:browser:live -- -g logged-in
@@ -112,6 +119,16 @@ real YouTube, such as fixture-controlled incoming messages.
 
 Browser sessions are worker-scoped, so adding more scenarios to one spec does
 not intentionally reopen Chrome for every test.
+
+The suite uses multiple Playwright workers by default. Parallelism happens
+between the four plan-case spec files, so `logged-in mock`, `logged-out mock`,
+`logged-in live`, and `logged-out live` can run at the same time with separate
+browser sessions. Scenarios inside one plan-case file stay serial so they do
+not fight over one chat surface. Override the worker count with
+`YTCQ_TEST_WORKERS=1` when debugging a single shared timeline is easier.
+Keep logged-in live scenarios in one spec file unless the test harness starts
+cloning the signed-in profile, because that surface uses the persistent local
+Chrome profile prepared by `npm run test:youtube-login`.
 
 ## Reports and failures
 
