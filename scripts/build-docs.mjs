@@ -10,6 +10,7 @@ const docsDir = path.join(rootDir, 'docs');
 const i18nDir = path.join(docsDir, 'i18n');
 const templatePath = path.join(docsDir, 'index.html');
 const sitemapPath = path.join(docsDir, 'sitemap.xml');
+const generatedComment = createGeneratedComment();
 
 const localeMeta = {
   ar: { dir: 'rtl', ogLocale: 'ar_AR', path: 'ar' },
@@ -39,6 +40,10 @@ const localeMeta = {
 await validateDocsLocales();
 
 const template = await readFile(templatePath, 'utf8');
+if (process.env.YTCQ_DOCS_STAMP_SOURCE === '1') {
+  await writeFile(templatePath, addGeneratedHtmlComment(template));
+}
+
 const localeFiles = (await readdir(i18nDir))
   .filter((file) => file.endsWith('.json'))
   .sort();
@@ -83,8 +88,22 @@ function buildLocalizedPage(source, messages, locale, meta) {
   html = rewriteHeadMetadata(html, messages, pageUrl, meta.ogLocale);
   html = rewriteStructuredData(html, messages, pageUrl);
   html = rewriteRelativeAssetPaths(html);
+  html = addGeneratedHtmlComment(html);
 
   return html;
+}
+
+function createGeneratedComment() {
+  const source = process.env.YTCQ_DOCS_BUILD_SHA
+    ? `; source=${process.env.YTCQ_DOCS_BUILD_SHA}`
+    : '';
+
+  return `<!-- ytcq-docs-generated: ${new Date().toISOString()}${source} -->`;
+}
+
+function addGeneratedHtmlComment(html) {
+  const withoutOldComment = html.replace(/\n?<!-- ytcq-docs-generated: [\s\S]*? -->\n?/g, '\n');
+  return withoutOldComment.replace(/^<!doctype html>\n/i, `<!doctype html>\n${generatedComment}\n`);
 }
 
 function replaceDataI18nElements(html, messages, attributeName, formatter) {

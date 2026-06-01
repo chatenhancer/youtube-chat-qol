@@ -33,6 +33,9 @@ jobs:
         run: npm ci
       - name: Build docs
         run: npm run docs:build
+        env:
+          YTCQ_DOCS_BUILD_SHA: ${{ github.event.workflow_run.head_sha }}
+          YTCQ_DOCS_STAMP_SOURCE: '1'
       - name: Generate README badges
         run: npm run test:coverage
       - name: Configure GitHub Pages
