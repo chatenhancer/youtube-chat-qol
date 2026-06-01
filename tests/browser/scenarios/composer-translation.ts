@@ -24,10 +24,10 @@ export const composerTranslationScenario: BrowserScenario = async ({ chat }) => 
   await openComposerTranslationPanel(chat);
 };
 
-export const mockedComposerTranslationScenario: BrowserScenario = async ({ chat, extensionContext }) => {
+export const mockedComposerTranslationScenario: BrowserScenario = async ({ chat, context }) => {
   await expectChatComposerVisible(chat);
-  await withMockedTranslationEndpoint(extensionContext, MOCKED_COMPOSER_TRANSLATION, async () => {
-    await withExtensionStorageValues(extensionContext, 'sync', {
+  await withMockedTranslationEndpoint(context, MOCKED_COMPOSER_TRANSLATION, async () => {
+    await withExtensionStorageValues(context, 'sync', {
       composerTranslateLanguage: 'fr'
     }, async () => {
       await translateComposerDraft({
@@ -39,9 +39,9 @@ export const mockedComposerTranslationScenario: BrowserScenario = async ({ chat,
   });
 };
 
-export const realComposerTranslationScenario: BrowserScenario = async ({ chat, extensionContext }) => {
+export const realComposerTranslationScenario: BrowserScenario = async ({ chat, context }) => {
   await expectChatComposerVisible(chat);
-  await withExtensionStorageValues(extensionContext, 'sync', {
+  await withExtensionStorageValues(context, 'sync', {
     composerTranslateLanguage: 'ja'
   }, async () => {
     await translateComposerDraft({

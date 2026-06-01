@@ -18,13 +18,13 @@ import type { BrowserScenario } from './types';
 
 const ALERT_KEYWORD = 'ytcq-alert-browser-test';
 
-export const tabAlertScenario: BrowserScenario = async ({ chat, extensionContext }) => {
+export const tabAlertScenario: BrowserScenario = async ({ chat, context }) => {
   if (!isMockPageSurface(chat)) {
     throw new Error('tabAlertScenario requires the deterministic mock chat page.');
   }
 
-  await withExtensionStorageSnapshot(extensionContext, 'local', async () => {
-    await withExtensionStorageValues(extensionContext, 'local', {
+  await withExtensionStorageSnapshot(context, 'local', async () => {
+    await withExtensionStorageValues(context, 'local', {
       ytcqInboxKeywords: [ALERT_KEYWORD]
     }, async () => {
       await reloadMockChat(chat);
@@ -76,9 +76,9 @@ async function setExtensionWorldVisibility(page: Page, state: 'hidden' | 'visibl
     const client = await page.context().newCDPSession(page);
 
     try {
-      const extensionContextId = await getExtensionExecutionContextId(page, client);
+      const executionContextId = await getContentScriptContextId(page, client);
       const result = await client.send('Runtime.evaluate', {
-        contextId: extensionContextId,
+        contextId: executionContextId,
         expression: [
           `Object.defineProperty(document, 'visibilityState', { configurable: true, value: ${JSON.stringify(state)} });`,
           `Object.defineProperty(document, 'hidden', { configurable: true, value: ${state !== 'visible'} });`,
@@ -99,7 +99,7 @@ async function setExtensionWorldVisibility(page: Page, state: 'hidden' | 'visibl
   });
 }
 
-async function getExtensionExecutionContextId(
+async function getContentScriptContextId(
   page: Page,
   client: CDPSession
 ): Promise<number> {

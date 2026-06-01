@@ -16,8 +16,14 @@ export const NORMAL_CHAT_MESSAGE_SELECTOR = [
 ].join('');
 
 export interface BrowserScenarioSession {
+  /**
+   * Either the mock chat page or the real YouTube chat frame.
+   */
   chat: ChatSurface;
-  extensionContext: BrowserContext;
+  /** 
+   * The browser context that owns the loaded extension. 
+   */
+  context: BrowserContext;
 }
 
 /**

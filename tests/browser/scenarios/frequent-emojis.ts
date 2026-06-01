@@ -18,12 +18,12 @@ import type { BrowserScenario, ChatSurface } from './types';
 const EMOJI_USAGE_STORAGE_KEY = 'ytcqEmojiUsage';
 const TEST_EMOJI = '✅';
 
-export const frequentEmojiPersistenceScenario: BrowserScenario = async ({ chat, extensionContext }) => {
-  await expectFrequentEmojiBehavior({ chat, context: extensionContext, verifyPersistenceAfterReload: true });
+export const frequentEmojiPersistenceScenario: BrowserScenario = async ({ chat, context }) => {
+  await expectFrequentEmojiBehavior({ chat, context, verifyPersistenceAfterReload: true });
 };
 
-export const frequentEmojiSmokeScenario: BrowserScenario = async ({ chat, extensionContext }) => {
-  await expectFrequentEmojiBehavior({ chat, context: extensionContext, verifyPersistenceAfterReload: false });
+export const frequentEmojiSmokeScenario: BrowserScenario = async ({ chat, context }) => {
+  await expectFrequentEmojiBehavior({ chat, context, verifyPersistenceAfterReload: false });
 };
 
 async function expectFrequentEmojiBehavior({
@@ -40,14 +40,14 @@ async function expectFrequentEmojiBehavior({
   }, async () => {
     await reloadChatSurface({ chat, context });
     await clickNativeEmojiOption(chat);
-    await expectEmojiUsageCount(chat, 1);
+    await expectEmojiUsageCount(context, 1);
     await expectFrequentEmojiRow(chat);
     if (verifyPersistenceAfterReload) {
       await reloadChatSurface({ chat, context });
       await expectFrequentEmojiRow(chat);
     }
     await clickFrequentEmojiAndExpectComposerInsertion(chat);
-    await expectEmojiUsageCount(chat, 2);
+    await expectEmojiUsageCount(context, 2);
   });
 }
 
@@ -93,10 +93,10 @@ async function clickFrequentEmojiAndExpectComposerInsertion(chat: ChatSurface): 
   });
 }
 
-async function expectEmojiUsageCount(chat: ChatSurface, expectedCount: number): Promise<void> {
+async function expectEmojiUsageCount(context: BrowserContext, expectedCount: number): Promise<void> {
   await test.step(`Verify persisted emoji usage count is ${expectedCount}`, async () => {
     await expect.poll(async () => {
-      const values = await getExtensionStorageValues(getContext(chat), 'local', [EMOJI_USAGE_STORAGE_KEY]);
+      const values = await getExtensionStorageValues(context, 'local', [EMOJI_USAGE_STORAGE_KEY]);
       const usage = values[EMOJI_USAGE_STORAGE_KEY];
       if (!Array.isArray(usage)) return 0;
       const record = usage.find((item) => {
@@ -153,11 +153,6 @@ function getReloadablePage(chat: ChatSurface, context: BrowserContext): Page {
   }
 
   return youtubePage;
-}
-
-function getContext(chat: ChatSurface): BrowserContext {
-  if (isPageSurface(chat)) return chat.context();
-  return chat.owner().page().context();
 }
 
 function isPageSurface(chat: ChatSurface): chat is Page {
