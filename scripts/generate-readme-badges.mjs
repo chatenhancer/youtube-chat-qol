@@ -50,7 +50,7 @@ function createBrowserTestsBadge() {
   return {
     label: 'browser tests',
     message: `${mockCount} mock / ${liveCount} live`,
-    color: '0891b2'
+    color: 'db2777'
   };
 }
 

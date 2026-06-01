@@ -13,7 +13,7 @@
   <img alt="unit tests" src="https://img.shields.io/endpoint?url=https%3A%2F%2Fwww.chatenhancer.com%2Fbadges%2Funit-tests.json">
   <img alt="browser tests" src="https://img.shields.io/endpoint?url=https%3A%2F%2Fwww.chatenhancer.com%2Fbadges%2Fbrowser-tests.json">
   <img alt="TS" src="https://img.shields.io/badge/TS-5.x-3178c6">
-  <img alt="manifest v3" src="https://img.shields.io/badge/manifest-v3-6f42c1">
+  <img alt="manifest v3" src="https://img.shields.io/badge/manifest-v3-6b7280">
   <a href="LICENSE"><img alt="license" src="https://img.shields.io/badge/license-GPL--3.0--or--later-2da44e"></a>
 </p>
 
