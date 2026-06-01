@@ -38,6 +38,21 @@ chat features.
 ## Commands
 
 ```sh
+npm run test:browser:install
+```
+
+Installs Playwright's Chromium browser without installing Linux system
+packages. CI always uses this command after restoring the Playwright browser
+cache, so cached runs only need to verify the browser is present.
+
+```sh
+npm run test:browser:install-deps
+```
+
+Installs Playwright's Chromium browser plus Linux system dependencies. Use this
+only when a local Linux machine is missing browser libraries or fonts.
+
+```sh
 npm run test:browser:mock
 ```
 
