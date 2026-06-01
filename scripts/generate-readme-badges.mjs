@@ -107,7 +107,7 @@ function formatPercent(value) {
 function coverageColor(value) {
   if (value >= 90) return 'brightgreen';
   if (value >= 80) return 'green';
-  if (value >= 65) return 'yellow';
+  if (value >= 65) return 'b58900';
   if (value >= 50) return 'orange';
   return 'red';
 }
