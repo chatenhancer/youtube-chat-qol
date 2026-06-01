@@ -27,6 +27,10 @@ export const chatCommandsSmokeScenario: BrowserScenario = async ({ chat, context
   await expectChatCommands({ chat, context, fullCoverage: false });
 };
 
+export const chatCommandAutocompleteScenario: BrowserScenario = async ({ chat }) => {
+  await expectCommandAutocomplete(chat);
+};
+
 async function expectChatCommands({
   chat,
   context,
@@ -55,6 +59,40 @@ async function expectChatCommands({
   });
 }
 
+async function expectCommandAutocomplete(chat: ChatSurface): Promise<void> {
+  await test.step('Autocomplete command names', async () => {
+    await setChatComposerText(chat, '/tr');
+    await expect(chat.locator('.ytcq-command-autocomplete-card')).toBeVisible({ timeout: 5_000 });
+    await expect(chat.locator('.ytcq-command-autocomplete-name').filter({
+      hasText: '/translate'
+    }).first()).toBeVisible();
+
+    await getChatComposerInput(chat).press('Tab');
+    await expect.poll(async () => getNormalizedChatComposerText(chat), {
+      message: 'Tab should accept the best command autocomplete suggestion.',
+      timeout: 5_000
+    }).toBe('/translate ');
+  });
+
+  await test.step('Autocomplete command arguments', async () => {
+    await setChatComposerText(chat, '/lang j');
+    await expect(chat.locator('.ytcq-command-autocomplete-card')).toBeVisible({ timeout: 5_000 });
+    await expect(chat.locator('.ytcq-command-autocomplete-option').filter({
+      hasText: 'Japanese'
+    }).first()).toBeVisible();
+
+    await getChatComposerInput(chat).press('Tab');
+    await expect.poll(async () => getNormalizedChatComposerText(chat), {
+      message: 'Tab should accept the best command argument suggestion.',
+      timeout: 5_000
+    }).toBe('/lang japanese ');
+  });
+
+  await test.step('Clear autocomplete draft', async () => {
+    await clearChatComposer(chat);
+  });
+}
+
 async function expectTimeCommandsExpand(
   chat: ChatSurface,
   fullCoverage: boolean
@@ -75,6 +113,10 @@ async function expectTimeCommandsExpand(
     await expectWhenCommandReplacesText(chat, '/when 2099-01-01 8pm utc');
     await expectWhenCommandReplacesText(chat, '/timeuntil 2099-01-01 8pm utc');
   });
+}
+
+async function getNormalizedChatComposerText(chat: ChatSurface): Promise<string> {
+  return (await getChatComposerText(chat)).replace(/\u00a0/g, ' ');
 }
 
 async function expectDisplayCommandApplies(chat: ChatSurface, context: BrowserContext): Promise<void> {

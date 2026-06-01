@@ -7,7 +7,10 @@
  * against a logged-in real YouTube chat.
  */
 import { attachScenario } from '../../scenarios/attach';
-import { chatCommandsSmokeScenario } from '../../scenarios/chat-commands';
+import {
+  chatCommandAutocompleteScenario,
+  chatCommandsSmokeScenario
+} from '../../scenarios/chat-commands';
 import {
   composerTranslationScenario,
   realComposerTranslationScenario
@@ -16,6 +19,7 @@ import { focusPanelScenario } from '../../scenarios/focus';
 import { frequentEmojiSmokeScenario } from '../../scenarios/frequent-emojis';
 import { inboxScenario } from '../../scenarios/inbox';
 import {
+  authorQuoteDraftScenario,
   authorMentionDraftScenario,
   mentionMenuDraftScenario,
   quoteMenuDraftScenario
@@ -35,4 +39,6 @@ test('logged-in live: composer translation controls open', composerTranslationSc
 test('logged-in live: composer translation translates draft text with real Google Translate', realComposerTranslationScenario);
 test('logged-in live: frequent emojis are tracked and rendered', frequentEmojiSmokeScenario);
 test('logged-in live: chat commands expand in the composer', chatCommandsSmokeScenario);
+test('logged-in live: chat command autocomplete suggests names and arguments', chatCommandAutocompleteScenario);
 test('logged-in live: author click writes a mention draft only', authorMentionDraftScenario);
+test('logged-in live: author Alt-click writes a quote draft only', authorQuoteDraftScenario);

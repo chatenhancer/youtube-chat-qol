@@ -15,7 +15,10 @@ import { withMockedTranslationEndpoint } from '../helpers/translation-endpoint';
 import type { BrowserScenario, ChatSurface } from './types';
 
 const MOCKED_COMPOSER_TRANSLATION = 'texte traduit depuis le compositeur';
+const MOCKED_PROTECTED_COMPOSER_TRANSLATION = 'texte traduit §0§ §1§';
 const MOCKED_COMPOSER_SOURCE = 'translate this composer draft';
+const PROTECTED_COMPOSER_SOURCE = 'hello @DraftTarget ✅';
+const PROTECTED_COMPOSER_EXPECTED = 'texte traduit @DraftTarget ✅';
 const REAL_COMPOSER_SOURCE = 'thank you for the stream';
 
 export const composerTranslationScenario: BrowserScenario = async ({ chat }) => {
@@ -34,6 +37,21 @@ export const mockedComposerTranslationScenario: BrowserScenario = async ({ chat,
         chat,
         expectedText: MOCKED_COMPOSER_TRANSLATION,
         sourceText: MOCKED_COMPOSER_SOURCE
+      });
+    });
+  });
+};
+
+export const mockedComposerTranslationProtectedDraftScenario: BrowserScenario = async ({ chat, context }) => {
+  await expectChatComposerVisible(chat);
+  await withMockedTranslationEndpoint(context, MOCKED_PROTECTED_COMPOSER_TRANSLATION, async () => {
+    await withExtensionStorageValues(context, 'sync', {
+      composerTranslateLanguage: 'fr'
+    }, async () => {
+      await translateComposerDraft({
+        chat,
+        expectedText: PROTECTED_COMPOSER_EXPECTED,
+        sourceText: PROTECTED_COMPOSER_SOURCE
       });
     });
   });
