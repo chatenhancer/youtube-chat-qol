@@ -13,7 +13,12 @@ const supportDir = path.dirname(fileURLToPath(import.meta.url));
 export const repoRoot = path.resolve(supportDir, '..', '..', '..');
 export const extensionDir = path.join(repoRoot, 'dist', 'extension-chrome');
 export const defaultLiveUrl = 'https://www.youtube.com/watch?v=EWrX250Zhko';
+export const defaultReplayUrl = 'https://www.youtube.com/watch?v=SHt3FyE-VIQ';
 
 export function getLiveProfileDir(): string {
-  return path.resolve(process.env.YTCQ_CHROME_PROFILE || path.join(repoRoot, '.chrome-test-profile'));
+  return path.resolve(process.env.YTCQ_CHROME_PROFILE || path.join(getLiveWorkingProfilesDir(), 'pristine'));
+}
+
+export function getLiveWorkingProfilesDir(): string {
+  return path.resolve(process.env.YTCQ_CHROME_WORKING_PROFILES || path.join(repoRoot, '.chrome-test-profiles'));
 }

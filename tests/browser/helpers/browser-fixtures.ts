@@ -7,6 +7,12 @@
  */
 import { expect, test as base, type BrowserContext, type FrameLocator, type Page } from '@playwright/test';
 import { existsSync } from 'node:fs';
+import {
+  cp,
+  lstat,
+  mkdir,
+  rm
+} from 'node:fs/promises';
 import path from 'node:path';
 import {
   closeExtensionContext,
@@ -19,18 +25,23 @@ import { getInstalledProfileExtensionId } from './extension';
 import {
   createLiveChatFixtureHtml,
   fixtureLoggedOutLiveChatUrl,
-  fixtureLoggedInLiveChatUrl
+  fixtureLoggedInLiveChatUrl,
+  fixtureLoggedInReplayChatUrl
 } from './live-chat-fixture';
 import {
   defaultLiveUrl,
   extensionDir,
-  getLiveProfileDir
+  getLiveProfileDir,
+  getLiveWorkingProfilesDir
 } from './paths';
 import {
   getLiveUrl,
+  getReplayUrl,
+  getUnavailableSignedInReason,
   getUnavailableComposerReason,
   isChatComposerVisible,
-  openLiveChat
+  openLiveChat,
+  startVideoPlaybackIfPaused
 } from './youtube-page';
 
 const DEFAULT_MOCK_HEADLESS = true;
@@ -47,6 +58,16 @@ const TOP_LEVEL_TRANSIENT_SURFACE_SELECTOR = [
   'ytd-popup-container tp-yt-paper-toast',
   'tp-yt-iron-dropdown'
 ].join(',');
+const ACTIVE_CHROME_PROFILE_FILE_NAMES = new Set([
+  'SingletonCookie',
+  'SingletonLock',
+  'SingletonSocket'
+]);
+const RUNTIME_CHROME_PROFILE_FILE_NAMES = new Set([
+  ...ACTIVE_CHROME_PROFILE_FILE_NAMES,
+  '.ytcq-playwright-profile.lock',
+  'DevToolsActivePort'
+]);
 
 export interface MockSession {
   context: BrowserContext;
@@ -63,6 +84,7 @@ export interface LiveSession {
 interface MockTestFixtures {
   mockLoggedOutSession: MockSession;
   mockLoggedInSession: MockSession;
+  mockLoggedInReplaySession: MockSession;
 }
 
 interface MockWorkerFixtures {
@@ -72,11 +94,13 @@ interface MockWorkerFixtures {
 interface LiveTestFixtures {
   liveLoggedOutSession: LiveSession;
   liveLoggedInSession: LiveSession | null;
+  liveLoggedInReplaySession: LiveSession | null;
 }
 
 interface LiveWorkerFixtures {
   liveLoggedOutWorkerSession: LiveSession;
   liveLoggedInWorkerSession: LiveSession | null;
+  liveLoggedInReplayWorkerSession: LiveSession | null;
 }
 
 export { expect };
@@ -89,11 +113,12 @@ export const mockTest = base.extend<MockTestFixtures, MockWorkerFixtures>({
       profileDir: path.join(workerInfo.project.outputDir, 'profiles', `mock-${workerInfo.workerIndex}`)
     });
 
-    await context.route('https://www.youtube.com/live_chat*', (route) => {
+    await context.route(/^https:\/\/www\.youtube\.com\/live_chat(?:_replay)?(?:\?|$)/, (route) => {
       const url = new URL(route.request().url());
       const loggedIn = url.searchParams.get('ytcq-auth') !== 'logged-out';
+      const replay = url.pathname.includes('live_chat_replay');
       route.fulfill({
-        body: createLiveChatFixtureHtml({ loggedIn }),
+        body: createLiveChatFixtureHtml({ loggedIn, replay }),
         contentType: 'text/html'
       });
     });
@@ -118,6 +143,15 @@ export const mockTest = base.extend<MockTestFixtures, MockWorkerFixtures>({
 
   mockLoggedInSession: async ({ mockWorkerSession }, use, testInfo) => {
     await openMockChatPage(mockWorkerSession.page, fixtureLoggedInLiveChatUrl);
+    try {
+      await use(mockWorkerSession);
+    } finally {
+      await dumpDomOnFailure(mockWorkerSession.context, testInfo);
+    }
+  },
+
+  mockLoggedInReplaySession: async ({ mockWorkerSession }, use, testInfo) => {
+    await openMockChatPage(mockWorkerSession.page, fixtureLoggedInReplayChatUrl);
     try {
       await use(mockWorkerSession);
     } finally {
@@ -157,6 +191,17 @@ export const liveTest = base.extend<LiveTestFixtures, LiveWorkerFixtures>({
     }
   }, { scope: 'worker' }],
 
+  liveLoggedInReplayWorkerSession: [async ({ browserName }, use) => {
+    void browserName;
+    const session = await createLoggedInReplaySession();
+
+    try {
+      await use(session?.session || null);
+    } finally {
+      await session?.close();
+    }
+  }, { scope: 'worker' }],
+
   liveLoggedOutSession: async ({ liveLoggedOutWorkerSession }, use, testInfo) => {
     await resetLiveScenarioState(liveLoggedOutWorkerSession);
     try {
@@ -177,10 +222,23 @@ export const liveTest = base.extend<LiveTestFixtures, LiveWorkerFixtures>({
         await dumpDomOnFailure(liveLoggedInWorkerSession.context, testInfo);
       }
     }
+  },
+
+  liveLoggedInReplaySession: async ({ liveLoggedInReplayWorkerSession }, use, testInfo) => {
+    if (liveLoggedInReplayWorkerSession) {
+      await resetLiveScenarioState(liveLoggedInReplayWorkerSession);
+    }
+    try {
+      await use(liveLoggedInReplayWorkerSession);
+    } finally {
+      if (liveLoggedInReplayWorkerSession) {
+        await dumpDomOnFailure(liveLoggedInReplayWorkerSession.context, testInfo);
+      }
+    }
   }
 });
 
-export function skipIfLoggedInLiveUnavailable(
+export function skipIfLoggedInYouTubeUnavailable(
   test: typeof liveTest,
   session: LiveSession | null
 ): asserts session is LiveSession {
@@ -198,35 +256,76 @@ async function createLoggedInLiveSession(): Promise<{
   close: () => Promise<void>;
   session: LiveSession;
 } | null> {
-  const profileDir = getLiveProfileDir();
-  const liveUrl = getLiveUrl();
-  console.log(`Using logged-in Chrome profile: ${profileDir}`);
-  console.log(`Opening live stream: ${liveUrl}`);
+  return createLoggedInYouTubeSession({
+    label: 'live stream',
+    profileName: 'youtube-live-logged-in',
+    requireComposer: true,
+    url: getLiveUrl()
+  });
+}
 
-  if (!existsSync(path.join(profileDir, 'Default', 'Cookies'))) {
+async function createLoggedInReplaySession(): Promise<{
+  close: () => Promise<void>;
+  session: LiveSession;
+} | null> {
+  return createLoggedInYouTubeSession({
+    label: 'live replay',
+    profileName: 'youtube-live-replay',
+    requireComposer: false,
+    url: getReplayUrl()
+  });
+}
+
+async function createLoggedInYouTubeSession({
+  label,
+  profileName,
+  requireComposer,
+  url
+}: {
+  label: string;
+  profileName: string;
+  requireComposer: boolean;
+  url: string;
+}): Promise<{
+  close: () => Promise<void>;
+  session: LiveSession;
+} | null> {
+  const sourceProfileDir = getLiveProfileDir();
+  console.log(`Using logged-in Chrome source profile: ${sourceProfileDir}`);
+  console.log(`Opening ${label}: ${url}`);
+
+  if (!existsSync(path.join(sourceProfileDir, 'Default', 'Cookies'))) {
     return null;
   }
 
-  const extensionId = await getInstalledProfileExtensionId(profileDir);
+  const extensionId = await getInstalledProfileExtensionId(sourceProfileDir);
   if (!extensionId) {
     return null;
   }
 
+  const profileDir = await prepareLoggedInWorkingProfile(sourceProfileDir, profileName);
+  console.log(`Using logged-in Chrome working profile: ${profileDir}`);
+
   const chrome = await launchNormalChromeExtensionContext({
     headless: shouldRunLiveHeadlessBrowserTest(),
-    initialUrl: liveUrl,
+    initialUrl: url,
     profileDir,
     userAgent: getLiveBrowserUserAgent(shouldRunLiveHeadlessBrowserTest())
   });
   const { context } = chrome;
   const page = context.pages()[0] || await context.newPage();
-  const chat = await openLiveChat(page, liveUrl);
-  const unavailableReason = await isChatComposerVisible(chat)
-    ? ''
-    : await getUnavailableComposerReason(page, chat);
+  const chat = await openLiveChat(page, url);
+  if (!requireComposer) {
+    await startVideoPlaybackIfPaused(page);
+  }
+  const unavailableReason = requireComposer
+    ? await getComposerUnavailableReason(page, chat)
+    : await getUnavailableSignedInReason(page);
 
   return {
-    close: chrome.close,
+    close: async () => {
+      await chrome.close();
+    },
     session: {
       context,
       page,
@@ -234,6 +333,12 @@ async function createLoggedInLiveSession(): Promise<{
       unavailableReason
     }
   };
+}
+
+async function getComposerUnavailableReason(page: Page, chat: FrameLocator): Promise<string> {
+  return await isChatComposerVisible(chat)
+    ? ''
+    : await getUnavailableComposerReason(page, chat);
 }
 
 async function resetLiveScenarioState(session: LiveSession): Promise<void> {
@@ -290,9 +395,10 @@ async function clearComposerIfVisible(chat: FrameLocator): Promise<void> {
 
 function getMissingLoggedInProfileReason(): string {
   return [
-    'Skipping logged-in live smoke because the prepared Chrome profile or installed extension was not found.',
+    'Skipping logged-in YouTube smoke because the prepared Chrome profile or installed extension was not found.',
     'Run `npm run test:youtube-login`, sign in to YouTube web, and make sure Chat Enhancer is loaded from:',
     extensionDir,
+    `Pristine profile: ${getLiveProfileDir()}`,
     `Default livestream: ${defaultLiveUrl}`
   ].join(' ');
 }
@@ -313,4 +419,70 @@ function shouldRunLiveHeadlessBrowserTest(): boolean {
 
 function getLiveBrowserUserAgent(headless: boolean): string | undefined {
   return headless ? (process.env.YTCQ_TEST_LIVE_USER_AGENT || LIVE_HEADLESS_USER_AGENT) : undefined;
+}
+
+async function prepareLoggedInWorkingProfile(sourceProfileDir: string, profileName: string): Promise<string> {
+  const workingProfilesDir = getLiveWorkingProfilesDir();
+  const profileDir = path.join(workingProfilesDir, profileName);
+
+  if (isSameOrNestedPath(sourceProfileDir, profileDir) || isSameOrNestedPath(profileDir, sourceProfileDir)) {
+    throw new Error([
+      `Logged-in source profile and working profile overlap: ${sourceProfileDir} -> ${profileDir}`,
+      'Use a separate YTCQ_CHROME_PROFILE or YTCQ_CHROME_WORKING_PROFILES value.'
+    ].join('\n'));
+  }
+
+  await assertSourceProfileClosed(sourceProfileDir);
+  await mkdir(workingProfilesDir, { recursive: true });
+  await rm(profileDir, { recursive: true, force: true });
+  await cp(sourceProfileDir, profileDir, {
+    recursive: true,
+    filter: (source) => !isRootChromeRuntimePath(source, sourceProfileDir)
+  });
+  await removeChromeRuntimeFiles(profileDir);
+
+  return profileDir;
+}
+
+async function assertSourceProfileClosed(profileDir: string): Promise<void> {
+  const activeFiles = await getExistingRootProfileFiles(profileDir, ACTIVE_CHROME_PROFILE_FILE_NAMES);
+  if (activeFiles.length === 0) return;
+
+  throw new Error([
+    `The logged-in source Chrome profile appears to be open: ${profileDir}`,
+    'Close the Chrome window opened by `npm run test:youtube-login`, then rerun the browser tests.',
+    `Open-profile marker files: ${activeFiles.join(', ')}`
+  ].join('\n'));
+}
+
+async function removeChromeRuntimeFiles(profileDir: string): Promise<void> {
+  const runtimeFiles = await getExistingRootProfileFiles(profileDir, RUNTIME_CHROME_PROFILE_FILE_NAMES);
+  await Promise.all(runtimeFiles.map((fileName) => {
+    return rm(path.join(profileDir, fileName), {
+      force: true,
+      recursive: true
+    });
+  }));
+}
+
+async function getExistingRootProfileFiles(profileDir: string, fileNames: Set<string>): Promise<string[]> {
+  const existingFiles: string[] = [];
+  for (const fileName of fileNames) {
+    const filePath = path.join(profileDir, fileName);
+    const exists = await lstat(filePath).then(() => true, () => false);
+    if (exists) existingFiles.push(fileName);
+  }
+  return existingFiles;
+}
+
+function isRootChromeRuntimePath(filePath: string, profileDir: string): boolean {
+  const relativePath = path.relative(profileDir, filePath);
+  if (!relativePath || relativePath.startsWith('..') || path.isAbsolute(relativePath)) return false;
+  if (relativePath.includes(path.sep)) return false;
+  return RUNTIME_CHROME_PROFILE_FILE_NAMES.has(relativePath);
+}
+
+function isSameOrNestedPath(parentPath: string, childPath: string): boolean {
+  const relativePath = path.relative(path.resolve(parentPath), path.resolve(childPath));
+  return !relativePath || (!relativePath.startsWith('..') && !path.isAbsolute(relativePath));
 }

@@ -7,5 +7,5 @@ docs/*/index.html
 docs/sitemap.xml
 test-results/
 playwright-report/
-.chrome-test-profile/
+.chrome-test-profiles/
 *.zip

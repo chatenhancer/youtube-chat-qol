@@ -20,16 +20,20 @@ tests/browser/
     youtube-live/          real YouTube livestream smoke tests
 ```
 
-The four browser surfaces are:
+The browser surfaces are:
 
 - `logged-in mock`
 - `logged-out mock`
+- `logged-in mock replay`
 - `logged-in live`
 - `logged-out live`
+- `logged-in live replay`
 
 Mock specs are broad, deterministic, and CI-safe. Live specs are narrower and
 exist to prove the extension still works against YouTube's current DOM and real
-provider-backed flows such as Google Translate.
+provider-backed flows such as Google Translate. Replay specs cover YouTube's
+`live_chat_replay` iframe, which has no composer but still supports read-only
+chat features.
 
 ## Commands
 
@@ -80,7 +84,7 @@ Prepare the dedicated local Chrome profile with:
 npm run test:youtube-login
 ```
 
-The helper opens Chrome with `.chrome-test-profile/`. In that window:
+The helper opens Chrome with `.chrome-test-profiles/pristine/`. In that window:
 
 1. Sign in to YouTube.
 2. Open `chrome://extensions`.
@@ -91,6 +95,18 @@ The helper opens Chrome with `.chrome-test-profile/`. In that window:
 The helper closes Chrome once it detects both a signed-in YouTube session and
 the installed unpacked extension. Do not use a personal everyday Chrome profile
 for this.
+
+Logged-in live specs do not run directly against the pristine profile. Before a
+logged-in live or replay spec opens Chrome, it copies the pristine profile into a
+spec-named working profile such as:
+
+```text
+.chrome-test-profiles/youtube-live-logged-in/
+.chrome-test-profiles/youtube-live-replay/
+```
+
+Those working profiles are recreated for each run. This lets live and replay
+tests run in parallel without opening the same Chrome profile twice.
 
 ## Adding coverage
 
@@ -109,8 +125,10 @@ Then add the scenario to the relevant plan-case specs:
 ```text
 tests/browser/specs/youtube-mock/logged-in.spec.ts
 tests/browser/specs/youtube-mock/logged-out.spec.ts
+tests/browser/specs/youtube-mock/replay.spec.ts
 tests/browser/specs/youtube-live/logged-in.spec.ts
 tests/browser/specs/youtube-live/logged-out.spec.ts
+tests/browser/specs/youtube-live/replay.spec.ts
 ```
 
 Prefer running the same scenario on mock and live when the behavior exists on
@@ -120,15 +138,16 @@ real YouTube, such as fixture-controlled incoming messages.
 Browser sessions are worker-scoped, so adding more scenarios to one spec does
 not intentionally reopen Chrome for every test.
 
-The suite uses multiple Playwright workers by default. Parallelism happens
-between the four plan-case spec files, so `logged-in mock`, `logged-out mock`,
-`logged-in live`, and `logged-out live` can run at the same time with separate
-browser sessions. Scenarios inside one plan-case file stay serial so they do
-not fight over one chat surface. Override the worker count with
-`YTCQ_TEST_WORKERS=1` when debugging a single shared timeline is easier.
-Keep logged-in live scenarios in one spec file unless the test harness starts
-cloning the signed-in profile, because that surface uses the persistent local
-Chrome profile prepared by `npm run test:youtube-login`.
+The suite uses one Playwright worker per browser spec file by default.
+Parallelism happens
+between plan-case spec files, so mock, logged-out live, and logged-in live
+surfaces can run at the same time with separate browser sessions. Scenarios
+inside one plan-case file stay serial so they do not fight over one chat
+surface. Logged-in live and logged-in replay use separate generated working
+profiles copied from `.chrome-test-profiles/pristine/`, so they can run at the
+same time while sharing one login source of truth.
+Override the worker count with `YTCQ_TEST_WORKERS=1` when debugging a single
+shared timeline is easier.
 
 ## Reports and failures
 
@@ -156,5 +175,5 @@ npx playwright show-trace test-results/browser/<failed-test>/trace.zip
 
 - Browser tests must not send YouTube chat messages.
 - Composer tests may write draft text, but must not press Enter or click Send.
-- Do not commit `.chrome-test-profile/`, `test-results/`, traces, screenshots,
-  videos, or DOM dumps.
+- Do not commit `.chrome-test-profiles/`, `test-results/`, traces,
+  screenshots, videos, or DOM dumps.

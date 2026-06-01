@@ -6,8 +6,10 @@
  * together instead of only through isolated unit tests.
  */
 import { defineConfig } from '@playwright/test';
+import { readdirSync } from 'node:fs';
+import path from 'node:path';
 
-const DEFAULT_WORKERS = 4;
+const DEFAULT_WORKERS = getBrowserSpecFileCount();
 const reportOutputFolder = process.env.YTCQ_PLAYWRIGHT_REPORT_DIR ?? 'playwright-report/browser';
 
 export default defineConfig({
@@ -50,4 +52,21 @@ function getWorkerCount(): number {
   if (!Number.isFinite(workerCount) || workerCount < 1) return DEFAULT_WORKERS;
 
   return workerCount;
+}
+
+function getBrowserSpecFileCount(): number {
+  const specsDir = path.join(process.cwd(), 'tests', 'browser', 'specs');
+  try {
+    return Math.max(1, countSpecFiles(specsDir));
+  } catch {
+    return 1;
+  }
+}
+
+function countSpecFiles(directory: string): number {
+  return readdirSync(directory, { withFileTypes: true }).reduce((count, entry) => {
+    const entryPath = path.join(directory, entry.name);
+    if (entry.isDirectory()) return count + countSpecFiles(entryPath);
+    return count + (entry.name.endsWith('.spec.ts') ? 1 : 0);
+  }, 0);
 }

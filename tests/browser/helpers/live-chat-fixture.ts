@@ -7,13 +7,16 @@
  */
 export const fixtureLoggedInLiveChatUrl = 'https://www.youtube.com/live_chat?continuation=ytcq-fixture&ytcq-auth=logged-in';
 export const fixtureLoggedOutLiveChatUrl = 'https://www.youtube.com/live_chat?continuation=ytcq-fixture&ytcq-auth=logged-out';
+export const fixtureLoggedInReplayChatUrl = 'https://www.youtube.com/live_chat_replay?continuation=ytcq-fixture-replay&ytcq-auth=logged-in';
 
 interface LiveChatFixtureOptions {
   loggedIn?: boolean;
+  replay?: boolean;
 }
 
 export function createLiveChatFixtureHtml({
-  loggedIn = true
+  loggedIn = true,
+  replay = false
 }: LiveChatFixtureOptions = {}): string {
   return `<!doctype html>
 <html lang="en">
@@ -172,7 +175,7 @@ export function createLiveChatFixtureHtml({
                   <img alt="" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Crect width='32' height='32' rx='16' fill='%233f8cff'/%3E%3Ctext x='16' y='21' text-anchor='middle' fill='white' font-size='16'%3EE%3C/text%3E%3C/svg%3E">
                 </button>
                 <div id="content">
-                  <span id="timestamp">10:05 PM</span>
+                  <span id="timestamp">${replay ? '0:05' : '10:05 PM'}</span>
                   <span id="author-name">@ExampleCreator</span>
                   <span id="message">Hola mundo</span>
                 </div>
@@ -182,7 +185,7 @@ export function createLiveChatFixtureHtml({
           </div>
         </yt-live-chat-item-list-renderer>
 
-        ${loggedIn ? `
+        ${loggedIn && !replay ? `
           <yt-live-chat-message-input-renderer>
             <span id="author-name">@CurrentViewer</span>
             <div id="input" contenteditable="true" aria-label="Chat input"></div>
@@ -238,7 +241,7 @@ export function createLiveChatFixtureHtml({
             <img alt="" src="\${createAvatarSrc(fixtureMessage.author.replace(/^@/, '').slice(0, 1).toUpperCase(), number)}">
           </button>
           <div id="content">
-            <span id="timestamp">10:0\${Math.min(number + 4, 9)} PM</span>
+            <span id="timestamp">${replay ? '${Math.min(number * 5, 59)}:00' : '10:0${Math.min(number + 4, 9)} PM'}</span>
             <span id="author-name">\${fixtureMessage.author}</span>
             <span id="message">\${fixtureMessage.text}</span>
           </div>

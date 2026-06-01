@@ -228,6 +228,7 @@ function showProfileCard(source: ProfileSource, anchor: HTMLElement): void {
   };
   const resizeObserver = new ResizeObserver(() => schedulePosition('viewport'));
   resizeObserver.observe(card);
+  schedulePosition('viewport');
 
   const handleOutsideClick = (event: MouseEvent): void => {
     if (activeProfileCard?.contains(event.target as Node)) return;

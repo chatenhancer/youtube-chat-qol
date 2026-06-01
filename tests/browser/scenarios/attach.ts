@@ -36,7 +36,9 @@ async function expectReconnectPromptHidden(chat: ChatSurface): Promise<void> {
 
 async function expectVisibleChatMessages(chat: ChatSurface): Promise<void> {
   await test.step('Verify chat has visible messages', async () => {
-    const initialMessageCount = await chat.locator('yt-live-chat-text-message-renderer').count();
+    const messages = chat.locator('yt-live-chat-text-message-renderer');
+    await expect(messages.first()).toBeVisible({ timeout: 45_000 });
+    const initialMessageCount = await messages.count();
     expect(initialMessageCount).toBeGreaterThan(0);
   });
 }
