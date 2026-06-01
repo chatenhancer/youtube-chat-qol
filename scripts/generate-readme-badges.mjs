@@ -26,7 +26,7 @@ function readCoverageSummary() {
 function createCoverageBadge(summary) {
   if (!summary?.lines || !summary?.branches) {
     return {
-      label: 'unit coverage',
+      label: 'coverage',
       message: 'run npm run test:coverage',
       color: 'lightgrey'
     };
@@ -35,7 +35,7 @@ function createCoverageBadge(summary) {
   const linePct = Number(summary.lines.pct);
   const branchPct = Number(summary.branches.pct);
   return {
-    label: 'unit coverage',
+    label: 'coverage',
     message: `${formatPercent(linePct)} lines / ${formatPercent(branchPct)} branches`,
     color: coverageColor(Math.min(linePct, branchPct))
   };
