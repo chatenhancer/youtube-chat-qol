@@ -27,7 +27,7 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "check": "npm run typecheck && npm run lint",
-    "verify": "npm run check && npm run test && npm run build && npm run docs:build && node scripts/run-browser-tests.mjs --project=youtube-mock --no-build"
+    "verify": "npm run check && npm run test && npm run build && npm run docs:build && node scripts/run-browser-tests.mjs --no-build tests/browser/specs/youtube-mock tests/browser/specs/youtube-live/logged-out.spec.ts"
   },
   "devDependencies": {
     "@eslint/js": "^9.27.0",

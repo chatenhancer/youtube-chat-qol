@@ -99,7 +99,7 @@ npm run build:firefox
 - `npm run lint` runs ESLint.
 - `npm run check` runs typecheck and lint.
 - `npm run test` runs the Vitest unit tests.
-- `npm run verify` runs `check`, unit tests, the full extension build, localized docs build, and CI-safe mock browser smoke test.
+- `npm run verify` runs `check`, unit tests, the full extension build, localized docs build, mock browser tests, and logged-out live browser smoke tests.
 - `npm run docs:build` regenerates localized docs and the sitemap when docs change.
 - `npm run docs:screenshots` regenerates README/site showcase images and localized store screenshots when needed.
 - `npm run build` writes Chrome, Edge, and Firefox unpacked extension folders.

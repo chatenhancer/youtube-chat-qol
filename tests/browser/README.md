@@ -41,8 +41,7 @@ chat features.
 npm run test:browser:mock
 ```
 
-Runs the mock suite. This is headless by default and is the browser suite used
-by CI through `npm run verify`.
+Runs the mock suite. This is headless by default.
 
 ```sh
 YTCQ_TEST_HEADLESS=0 npm run test:browser:mock
@@ -69,6 +68,10 @@ npm run test:browser
 ```
 
 Runs all mock and live browser specs.
+
+`npm run verify` and CI run the mock specs and logged-out live specs together
+in one Playwright invocation so those surfaces can run in parallel without
+requiring a signed-in YouTube profile.
 
 ```sh
 npm run test:browser:live -- -g logged-in

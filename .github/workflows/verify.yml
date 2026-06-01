@@ -22,9 +22,14 @@ jobs:
           cache: npm
       - name: Install dependencies
         run: npm ci
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-
       - name: Install Playwright Chromium
         run: npm run test:browser:install
       - name: Verify project
         run: npm run verify
-      - name: Run logged-out live browser smoke tests
-        run: npm run test:browser:live -- --no-build --grep "logged-out live"
