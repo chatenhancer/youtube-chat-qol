@@ -5,6 +5,9 @@ on:
   push:
     branches:
       - main
+  schedule:
+    - cron: '17 */6 * * *'
+  workflow_dispatch:
 
 jobs:
   verify:
@@ -23,3 +26,5 @@ jobs:
         run: npm run test:browser:install
       - name: Verify project
         run: npm run verify
+      - name: Run logged-out live browser smoke tests
+        run: npm run test:browser:live -- --no-build --grep "logged-out live"
