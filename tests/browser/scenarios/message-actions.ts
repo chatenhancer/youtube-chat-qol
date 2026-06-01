@@ -4,7 +4,7 @@
  * These checks may write local draft text into the YouTube composer, but they
  * never press Enter or click the send button.
  */
-import { expect, test } from '@playwright/test';
+import { expect, test, type ElementHandle } from '@playwright/test';
 import {
   clearChatComposer,
   getChatComposerText
@@ -22,6 +22,10 @@ export const authorMentionDraftScenario: BrowserScenario = async ({ chat }) => {
   await expectAuthorClickInsertsMentionDraft(chat);
 };
 
+export const authorQuoteDraftScenario: BrowserScenario = async ({ chat }) => {
+  await expectAuthorAltClickInsertsQuoteDraft(chat);
+};
+
 export const mentionMenuDraftScenario: BrowserScenario = async ({ chat }) => {
   await expectMentionMenuActionInsertsDraft(chat);
 };
@@ -33,23 +37,7 @@ export const quoteMenuDraftScenario: BrowserScenario = async ({ chat }) => {
 async function expectAuthorClickInsertsMentionDraft(chat: ChatSurface): Promise<void> {
   await clearComposerForAction(chat, 'Clear composer before author click');
 
-  const messages = chat.locator(NORMAL_CHAT_MESSAGE_SELECTOR);
-  await test.step('Wait for a clickable author name', async () => {
-    await messages.last().waitFor({ state: 'visible', timeout: 45_000 });
-  });
-
-  const message = messages.nth(Math.max(0, await messages.count() - 1));
-  const author = message.locator('#author-name').first();
-  const { authorHandle, authorName } = await test.step('Capture author name', async () => {
-    const handle = await author.elementHandle();
-    if (!handle) throw new Error('Could not resolve clickable author element.');
-    const name = cleanVisibleText(await handle.evaluate((element) => element.textContent || ''));
-    expect(name).toMatch(/^@?\S/);
-    return {
-      authorHandle: handle,
-      authorName: name
-    };
-  });
+  const { authorHandle, authorName } = await getLatestClickableAuthor(chat);
 
   await test.step('Click author name', async () => {
     await authorHandle.click({ timeout: 2_000 }).catch(async () => {
@@ -62,6 +50,35 @@ async function expectAuthorClickInsertsMentionDraft(chat: ChatSurface): Promise<
       message: 'Author click should write a mention draft without sending it.',
       timeout: 10_000
     }).toBe(authorName);
+  });
+
+  await expectCollapsedFocusPrompt(chat);
+  await cleanUpFocusPromptAndComposer(chat);
+}
+
+async function expectAuthorAltClickInsertsQuoteDraft(chat: ChatSurface): Promise<void> {
+  await clearComposerForAction(chat, 'Clear composer before author Alt-click');
+
+  const { authorHandle, authorName } = await getLatestClickableAuthor(chat);
+
+  await test.step('Alt-click author name', async () => {
+    await authorHandle.click({
+      modifiers: ['Alt'],
+      timeout: 2_000
+    }).catch(async () => {
+      await authorHandle.dispatchEvent('click', {
+        altKey: true,
+        bubbles: true,
+        cancelable: true
+      });
+    });
+  });
+
+  await test.step('Verify composer contains quote draft', async () => {
+    await expect.poll(async () => getChatComposerText(chat), {
+      message: 'Alt-clicking an author should write a quote draft without sending it.',
+      timeout: 10_000
+    }).toContain(`${authorName} : "`);
   });
 
   await expectCollapsedFocusPrompt(chat);
@@ -113,6 +130,29 @@ async function expectQuoteMenuActionInsertsDraft(chat: ChatSurface): Promise<voi
 async function clearComposerForAction(chat: ChatSurface, stepName: string): Promise<void> {
   await test.step(stepName, async () => {
     await clearChatComposer(chat);
+  });
+}
+
+async function getLatestClickableAuthor(chat: ChatSurface): Promise<{
+  authorHandle: ElementHandle<HTMLElement | SVGElement>;
+  authorName: string;
+}> {
+  const messages = chat.locator(NORMAL_CHAT_MESSAGE_SELECTOR);
+  await test.step('Wait for a clickable author name', async () => {
+    await messages.last().waitFor({ state: 'visible', timeout: 45_000 });
+  });
+
+  const message = messages.nth(Math.max(0, await messages.count() - 1));
+  const author = message.locator('#author-name').first();
+  return test.step('Capture author name', async () => {
+    const handle = await author.elementHandle();
+    if (!handle) throw new Error('Could not resolve clickable author element.');
+    const name = cleanVisibleText(await handle.evaluate((element) => element.textContent || ''));
+    expect(name).toMatch(/^@?\S/);
+    return {
+      authorHandle: handle,
+      authorName: name
+    };
   });
 }
 

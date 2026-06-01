@@ -7,7 +7,10 @@
  */
 import { attachScenario } from '../../scenarios/attach';
 import { focusPanelScenario } from '../../scenarios/focus';
-import { inboxScenario } from '../../scenarios/inbox';
+import {
+  inboxRecordCreationAndJumpScenario,
+  inboxScenario
+} from '../../scenarios/inbox';
 import {
   mockedMessageTranslationScenario,
   translationDisplayScenario,
@@ -34,4 +37,5 @@ test('logged-out mock: translate chat setting reacts live', translationSettingsR
 test('logged-out mock: background tab alert updates title and favicon', tabAlertScenario);
 test('logged-out mock: focus panel opens from an author and follows their messages', focusPanelScenario);
 test('logged-out mock: inbox opens from the chat header', inboxScenario);
+test('logged-out mock: inbox saves keyword matches, highlights them, and jumps back to chat', inboxRecordCreationAndJumpScenario);
 test('logged-out mock: profile card opens from a chat avatar', profileScenario);

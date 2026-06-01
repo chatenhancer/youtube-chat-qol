@@ -4,7 +4,7 @@
  * It uses the first visible live-chat message so the same behavior can be
  * checked against both the deterministic fixture and real YouTube chat.
  */
-import { expect, test } from '@playwright/test';
+import { expect, test, type BrowserContext } from '@playwright/test';
 import {
   appendMockFixtureMessage,
   isMockPageSurface
@@ -16,11 +16,13 @@ import {
   type ChatSurface
 } from './types';
 
-export const profileScenario: BrowserScenario = async ({ chat }) => {
+export const profileScenario: BrowserScenario = async ({ chat, context }) => {
   const source = await findRecentMessageSource(chat);
   await openProfileCardFromAvatar(chat, source);
   await expectProfileCardHasRecentMessages(chat, source);
   await expectMockProfileCardReceivesNewMessages(chat, source);
+  await expectProfileChannelButtonOpensChannel(chat, context);
+  await expectProfileCardJumpToMessage(chat, source);
   await closeProfileCard(chat);
 };
 
@@ -106,10 +108,80 @@ async function expectMockProfileCardReceivesNewMessages(chat: ChatSurface, sourc
   });
 }
 
+async function expectProfileChannelButtonOpensChannel(
+  chat: ChatSurface,
+  context: BrowserContext
+): Promise<void> {
+  const youtubeProfileUrlPattern = '**://www.youtube.com/**';
+  await test.step('Click profile channel button and verify it opens YouTube', async () => {
+    if (isMockPageSurface(chat)) {
+      await context.route(youtubeProfileUrlPattern, (route) => route.fulfill({
+        body: '<!doctype html><title>Mock channel</title>',
+        contentType: 'text/html',
+        status: 200
+      }));
+    }
+
+    try {
+      const popupPromise = context.waitForEvent('page');
+      await chat.locator('.ytcq-profile-card-channel').click();
+      const popup = await popupPromise;
+
+      try {
+        await expect.poll(async () => getOpenedProfileUrl(popup.url()), {
+          message: 'Profile channel button should open the selected author channel.',
+          timeout: isMockPageSurface(chat) ? 5_000 : 15_000
+        }).toMatch(/^https:\/\/www\.youtube\.com\/(?:@|channel\/)/);
+      } finally {
+        await popup.close().catch(() => undefined);
+      }
+    } finally {
+      if (isMockPageSurface(chat)) {
+        await context.unroute(youtubeProfileUrlPattern);
+      }
+    }
+  });
+}
+
+async function expectProfileCardJumpToMessage(chat: ChatSurface, source: MessageSource): Promise<void> {
+  await test.step('Jump from profile card record back to the live message', async () => {
+    const sourceMessage = getSourceMessage(chat, source);
+    const record = chat.locator('.ytcq-profile-card:not(.ytcq-inbox-card) .ytcq-profile-card-message').filter({
+      hasText: source.messageText
+    }).first();
+
+    await record.hover();
+    await record.locator('.ytcq-profile-card-jump').click();
+    await expect(sourceMessage).toHaveClass(/ytcq-message-jump-target/, { timeout: 2_000 });
+  });
+}
+
 async function closeProfileCard(chat: ChatSurface): Promise<void> {
   await test.step('Close profile card', async () => {
     const profileCard = chat.locator('.ytcq-profile-card:not(.ytcq-inbox-card)');
     await profileCard.locator('.ytcq-profile-card-close').click();
     await expect(profileCard).toHaveCount(0);
   });
+}
+
+function getSourceMessage(chat: ChatSurface, source: MessageSource): ReturnType<ChatSurface['locator']> {
+  return chat.locator(NORMAL_CHAT_MESSAGE_SELECTOR).filter({
+    has: chat.locator('#author-name').filter({ hasText: source.authorName })
+  }).filter({
+    has: chat.locator('#message').filter({ hasText: source.messageText })
+  }).last();
+}
+
+function getOpenedProfileUrl(value: string): string {
+  try {
+    const url = new URL(value);
+    if (url.hostname === 'consent.youtube.com') {
+      const continueUrl = url.searchParams.get('continue');
+      if (continueUrl) return continueUrl;
+    }
+  } catch {
+    return value;
+  }
+
+  return value;
 }
