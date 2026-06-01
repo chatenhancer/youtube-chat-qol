@@ -21,7 +21,7 @@
     "test:browser:install": "playwright install --with-deps chromium",
     "test:browser:live": "node scripts/run-browser-tests.mjs --project=youtube-live",
     "test:browser:mock": "node scripts/run-browser-tests.mjs --project=youtube-mock",
-    "test:coverage": "vitest run --coverage",
+    "test:coverage": "vitest run --coverage && node scripts/generate-readme-badges.mjs",
     "test:youtube-login": "node scripts/open-youtube-test-profile.mjs",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
