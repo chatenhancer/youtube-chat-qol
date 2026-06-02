@@ -74,7 +74,6 @@ async function openBrowser(userDataDir, url, remotePort) {
   const commonArgs = [
     `--user-data-dir=${userDataDir}`,
     '--profile-directory=Default',
-    '--mute-audio',
     `--remote-debugging-port=${remotePort}`,
     '--no-first-run',
     url
