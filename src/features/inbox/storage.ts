@@ -6,6 +6,7 @@
  */
 import { cleanText } from '../../shared/text';
 import { normalizeRichTextSegments } from '../../youtube/rich-text';
+import { getYouTubeChatSourceStorageKey } from '../../youtube/source-url';
 import { getChatTimestampValue, isLiveChatReplayUrl } from '../../youtube/timestamps';
 import {
   normalizeMentionHandles,
@@ -165,30 +166,5 @@ function pruneTimestampOffsetBases(): void {
 }
 
 function getInboxRecordsStorageKey(sourceUrl: string): string {
-  const cleanSourceUrl = cleanText(sourceUrl);
-  const videoId = getVideoIdFromUrl(cleanSourceUrl);
-  if (videoId) return `${INBOX_RECORDS_STORAGE_KEY_PREFIX}:video:${videoId}`;
-
-  return `${INBOX_RECORDS_STORAGE_KEY_PREFIX}:source:${hashStorageKey(cleanSourceUrl || 'unknown')}`;
-}
-
-function getVideoIdFromUrl(value: string): string {
-  if (!value) return '';
-
-  try {
-    const url = new URL(value);
-    return cleanText(url.searchParams.get('v') || url.searchParams.get('video_id') || '');
-  } catch {
-    return '';
-  }
-}
-
-function hashStorageKey(value: string): string {
-  let hash = 0x811c9dc5;
-  for (let index = 0; index < value.length; index += 1) {
-    hash ^= value.charCodeAt(index);
-    hash = Math.imul(hash, 0x01000193);
-  }
-
-  return (hash >>> 0).toString(36);
+  return `${INBOX_RECORDS_STORAGE_KEY_PREFIX}:${getYouTubeChatSourceStorageKey(sourceUrl)}`;
 }

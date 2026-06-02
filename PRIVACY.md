@@ -1,6 +1,6 @@
 # Privacy
 
-Last updated: May 31, 2026
+Last updated: June 2, 2026
 
 Chat Enhancer for YouTube is a browser extension for YouTube live chat. It is designed to add small chat features without replacing YouTube chat or collecting analytics.
 
@@ -26,6 +26,8 @@ Settings are stored with `chrome.storage.sync`. Depending on your browser settin
 Inbox data is stored with `chrome.storage.local`. This includes watched keywords and up to 100 inbox records per stream or replay. Inbox records may include message text, author name, timestamp, YouTube message/source metadata, match metadata, and emoji/image display data needed to show the saved message.
 
 Frequent emoji data is stored with `chrome.storage.local`. This includes local usage counts and emoji display metadata used to build the frequent emoji row.
+
+Unsent chat drafts are stored with `chrome.storage.local` per stream so they can be restored after a page refresh. Drafts are removed when the chat input is cleared, the message is sent, or extension data is reset.
 
 Live chat tab status is stored with `chrome.storage.local`. This is limited to browser tab IDs and last-seen timestamps for recently active YouTube live chat tabs, and is used to show whether the extension is currently connected or disconnected. These records expire after 12 hours.
 

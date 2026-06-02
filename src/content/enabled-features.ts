@@ -9,6 +9,7 @@
  * belongs to lifecycle phases in `lifecycle.ts`.
  */
 import '../features/active-chat-keepalive';
+import '../features/chat-drafts';
 import '../features/chat-commands';
 import '../features/composer-translation';
 import '../features/user-message-history';

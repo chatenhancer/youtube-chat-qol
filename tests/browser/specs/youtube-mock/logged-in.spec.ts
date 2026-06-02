@@ -10,6 +10,7 @@ import {
   chatCommandAutocompleteScenario,
   chatCommandsFullScenario
 } from '../../scenarios/chat-commands';
+import { chatDraftRecoveryScenario } from '../../scenarios/chat-drafts';
 import {
   composerTranslationScenario,
   mockedComposerTranslationProtectedDraftScenario,
@@ -66,6 +67,7 @@ test('logged-in mock: profile card opens from a chat avatar', profileScenario);
 test('logged-in mock: composer translation controls open', composerTranslationScenario);
 test('logged-in mock: composer translation translates draft text with mocked Google Translate', mockedComposerTranslationScenario);
 test('logged-in mock: composer translation preserves mentions and emoji placeholders', mockedComposerTranslationProtectedDraftScenario);
+test('logged-in mock: unsent chat draft is restored after refresh', chatDraftRecoveryScenario);
 test('logged-in mock: frequent emojis are tracked, rendered, and persisted', frequentEmojiPersistenceScenario);
 test('logged-in mock: chat commands expand and apply settings', chatCommandsFullScenario);
 test('logged-in mock: chat command autocomplete suggests names and arguments', chatCommandAutocompleteScenario);
