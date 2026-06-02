@@ -86,10 +86,10 @@ img {
 
 .brand img {
   flex: 0 0 auto;
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  transition: width 180ms ease, height 180ms ease, border-radius 180ms ease;
+  width: 38px;
+  height: auto;
+  border-radius: 0;
+  transition: width 180ms ease;
 }
 
 .brand span {
@@ -106,9 +106,7 @@ img {
 }
 
 .site-header.site-header-top .brand img {
-  width: 58px;
-  height: 58px;
-  border-radius: 13px;
+  width: 70px;
 }
 
 .site-header.site-header-top .brand span {
