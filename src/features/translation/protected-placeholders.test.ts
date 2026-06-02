@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
+  cloneProtectedTokens,
+  createTranslationPlan,
   createNodesWithPlaceholders,
   createTranslationPlanFromNodes,
   hasTextOutsidePlaceholders,
@@ -97,5 +99,218 @@ describe('translation protected placeholders', () => {
     expect(getPlainTextFromMessageNodes(restoredNodes).replace(/\s+/g, ' '))
       .toBe('Hola :face-red-heart-shape:');
     expect(restoredNodes.some((node) => node instanceof HTMLImageElement)).toBe(true);
+  });
+
+  it('plans translation from YouTube renderer runs when DOM text is unavailable', () => {
+    const message = document.createElement('yt-live-chat-text-message-renderer') as HTMLElement & {
+      data?: unknown;
+    };
+    message.data = {
+      message: {
+        runs: [
+          { emoji: { shortcuts: [':wave:'] } },
+          { text: ' ' },
+          { emoji: { searchTerms: [':sparkles:'] } },
+          { text: ' hello @ExampleUser!' },
+          { emoji: { emojiId: 'custom-heart' } },
+          { text: ' ' },
+          { emoji: { shortcuts: [':second:'] } },
+          {}
+        ]
+      }
+    };
+
+    const plan = createTranslationPlan(message, ':wave: :sparkles: hello @ExampleUser!custom-heart :second:');
+
+    expect(plan.text).toBe('§0§ hello §1§!§2§');
+    expect(plan.protectedTokens.map((token) => token.fallbackText)).toEqual([
+      ':wave: :sparkles:',
+      '@ExampleUser',
+      'custom-heart :second:'
+    ]);
+  });
+
+  it('restores DOM emoji nodes when message text contains only emoji images', () => {
+    const message = document.createElement('yt-live-chat-text-message-renderer') as HTMLElement & {
+      data?: unknown;
+    };
+    const messageText = document.createElement('span');
+    messageText.id = 'message';
+    const emoji = document.createElement('img');
+    emoji.alt = ':wave:';
+    emoji.hidden = true;
+    messageText.append(emoji);
+    message.append(messageText);
+    message.data = {
+      message: {
+        runs: [
+          { emoji: { shortcuts: [':wave:'] } },
+          { text: ' hello' }
+        ]
+      }
+    };
+
+    const plan = createTranslationPlan(message, ':wave: hello');
+    const restored = createNodesWithPlaceholders(plan.text, plan.protectedTokens);
+
+    expect(plan.text).toBe('§0§');
+    expect(restored[0]).toBeInstanceOf(HTMLImageElement);
+  });
+
+  it('keeps pending whitespace as text when an emoji run ends before normal content', () => {
+    const message = document.createElement('yt-live-chat-text-message-renderer') as HTMLElement & {
+      data?: unknown;
+    };
+    message.data = {
+      message: {
+        runs: [
+          { emoji: { shortcuts: [':wave:'] } },
+          { text: '   ' },
+          {},
+          { text: 'hello' }
+        ]
+      }
+    };
+
+    const plan = createTranslationPlan(message, ':wave:   hello');
+
+    expect(plan.text).toBe('§0§ hello');
+    expect(plan.protectedTokens[0].fallbackText).toBe(':wave:');
+  });
+
+  it('falls back to original text when no DOM nodes or renderer runs are available', () => {
+    const message = document.createElement('yt-live-chat-text-message-renderer');
+
+    const plan = createTranslationPlan(message, 'hello @ExampleUser 😀');
+
+    expect(plan.text).toBe('hello §0§ §1§');
+    expect(plan.protectedTokens.map((token) => token.fallbackText)).toEqual(['@ExampleUser', '😀']);
+  });
+
+  it('falls back to original text for empty node lists', () => {
+    const plan = createTranslationPlanFromNodes([], 'hello @ExampleUser');
+
+    expect(plan.text).toBe('hello §0§');
+    expect(plan.protectedTokens[0].fallbackText).toBe('@ExampleUser');
+  });
+
+  it('protects emoji-like DOM leaves and ignores replacement icons and menu text', () => {
+    const roleEmoji = document.createElement('span');
+    roleEmoji.setAttribute('role', 'img');
+    roleEmoji.setAttribute('aria-label', ':party:');
+    const classEmoji = document.createElement('span');
+    classEmoji.className = 'yt-emoji';
+    classEmoji.title = ':class-emoji:';
+    const wrappedEmoji = document.createElement('span');
+    const image = document.createElement('img');
+    image.alt = ':wrapped:';
+    wrappedEmoji.append(image);
+    const shortcodeLeaf = document.createElement('span');
+    shortcodeLeaf.textContent = ':shortcode:';
+    const replacementIcon = document.createElement('span');
+    replacementIcon.className = 'ytcq-replaced-translation-icon';
+    replacementIcon.textContent = 'translate icon';
+    const menuItem = document.createElement('span');
+    menuItem.setAttribute('role', 'menuitem');
+    menuItem.textContent = 'menu text';
+
+    const plan = createTranslationPlanFromNodes([
+      document.createTextNode('hello '),
+      roleEmoji,
+      classEmoji,
+      wrappedEmoji,
+      shortcodeLeaf,
+      replacementIcon,
+      menuItem
+    ], '');
+
+    expect(plan.text).toBe('hello §0§');
+    expect(plan.protectedTokens.map((token) => token.fallbackText)).toEqual([
+      ':party::class-emoji::wrapped::shortcode:'
+    ]);
+  });
+
+  it('handles emoji-like ids, child-image wrappers with empty text, and title fallbacks', () => {
+    const idEmoji = document.createElement('span');
+    idEmoji.id = 'emoji-sprite';
+    idEmoji.setAttribute('aria-label', ':id-emoji:');
+    const childImageWrapper = document.createElement('span');
+    const image = document.createElement('img');
+    image.setAttribute('aria-label', ':child-image:');
+    childImageWrapper.append(image);
+    const titleOnly = document.createElement('img');
+    titleOnly.title = ':title-only:';
+
+    const plan = createTranslationPlanFromNodes([idEmoji, childImageWrapper, titleOnly], '');
+
+    expect(plan.text).toBe('§0§');
+    expect(plan.protectedTokens[0].fallbackText).toBe(':id-emoji::child-image::title-only:');
+  });
+
+  it('ignores connected elements hidden by CSS while preserving visible siblings', () => {
+    const visible = document.createElement('span');
+    visible.textContent = 'visible';
+    const displayNone = document.createElement('span');
+    displayNone.style.display = 'none';
+    displayNone.textContent = 'display none';
+    const invisible = document.createElement('span');
+    invisible.style.visibility = 'hidden';
+    invisible.textContent = 'invisible';
+    const root = document.createElement('span');
+    root.append(visible, displayNone, invisible);
+    document.body.append(root);
+
+    const plan = createTranslationPlanFromNodes(Array.from(root.childNodes), root.textContent || '');
+
+    expect(plan.text).toBe('visible');
+  });
+
+  it('restores spaced placeholders and can clone protected token nodes safely', () => {
+    const emoji = document.createElement('img');
+    emoji.alt = ':wave:';
+    const plan = createTranslationPlanFromNodes([emoji], '');
+    const clones = cloneProtectedTokens(plan.protectedTokens);
+
+    expect(clones[0].node).not.toBe(plan.protectedTokens[0].node);
+    expect(restorePlaceholdersToText('hello § 0 §', clones)).toBe('hello :wave:');
+  });
+
+  it('returns plain text nodes when there are no placeholder matches', () => {
+    const nodes = createNodesWithPlaceholders('plain text', []);
+
+    expect(nodes).toHaveLength(1);
+    expect(nodes[0].textContent).toBe('plain text');
+    expect(hasTextOutsidePlaceholders('§ 0 §')).toBe(false);
+  });
+
+  it('handles nullish and empty placeholder restore inputs', () => {
+    const emptyNodes = createNodesWithPlaceholders('', []);
+
+    expect(emptyNodes).toHaveLength(1);
+    expect(emptyNodes[0].textContent).toBe('');
+    expect(hasTextOutsidePlaceholders(null as unknown as string)).toBe(false);
+    expect(restorePlaceholdersToText(null as unknown as string, [])).toBe('');
+  });
+
+  it('restores missing tokens with spacing and fallback nodes', () => {
+    const node = document.createElement('span');
+    node.textContent = '@NodeUser';
+    const restoredWithNode = createNodesWithPlaceholders('Hola', [{
+      fallbackText: '@NodeUser',
+      node,
+      nodes: [],
+      placeholder: '§0§'
+    }]);
+    const restoredWithFallback = createNodesWithPlaceholders('Hola ', [{
+      fallbackText: '@FallbackUser',
+      node: null,
+      nodes: [],
+      placeholder: '§0§'
+    }]);
+    const restoredMissingToken = createNodesWithPlaceholders('Hola §3§', []);
+
+    expect(getPlainTextFromMessageNodes(restoredWithNode)).toBe('Hola @NodeUser');
+    expect(getPlainTextFromMessageNodes(restoredWithFallback)).toBe('Hola @FallbackUser');
+    expect(getPlainTextFromMessageNodes(restoredMissingToken)).toBe('Hola ');
   });
 });

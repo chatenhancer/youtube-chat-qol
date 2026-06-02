@@ -9,9 +9,9 @@ import {
   clearChatComposer,
   getChatComposerText,
   setChatComposerText
-} from '../helpers/composer';
-import { withExtensionStorageValues } from '../helpers/extension-storage';
-import { withMockedTranslationEndpoint } from '../helpers/translation-endpoint';
+} from '../support/composer';
+import { withExtensionStorageValues } from '../support/extension-storage';
+import { withMockedTranslationEndpoint } from '../support/translation-endpoint';
 import type { BrowserScenario, ChatSurface } from './types';
 
 const MOCKED_COMPOSER_TRANSLATION = 'texte traduit depuis le compositeur';
@@ -21,7 +21,7 @@ const PROTECTED_COMPOSER_SOURCE = 'hello @DraftTarget ✅';
 const PROTECTED_COMPOSER_EXPECTED = 'texte traduit @DraftTarget ✅';
 const REAL_COMPOSER_SOURCE = 'thank you for the stream';
 
-export const composerTranslationScenario: BrowserScenario = async ({ chat }) => {
+export const composerTranslationControlsOpenScenario: BrowserScenario = async ({ chat }) => {
   await expectChatComposerVisible(chat);
   await expectComposerTranslateButtonAttached(chat);
   await openComposerTranslationPanel(chat);

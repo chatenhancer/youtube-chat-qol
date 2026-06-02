@@ -1,8 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import {
   cloneSafeMessageNode,
+  getElementImageSource,
   getElementTextFallback,
-  getPlainTextFromMessageNodes
+  getPlainTextFromMessageNode,
+  getPlainTextFromMessageNodes,
+  isEmojiLikeElement
 } from './message-content';
 
 describe('YouTube message content helpers', () => {
@@ -26,6 +29,43 @@ describe('YouTube message content helpers', () => {
     emoji.setAttribute('shared-tooltip-text', ':custom-emoji:');
 
     expect(getElementTextFallback(emoji)).toBe(':custom-emoji:');
+  });
+
+  it('detects emoji-like elements from ids, classes, data attributes, and child images', () => {
+    const byId = document.createElement('span');
+    byId.id = 'emoji-1';
+    const byData = document.createElement('span');
+    byData.setAttribute('data-emoji-id', 'emoji-id');
+    const plain = document.createElement('span');
+    plain.textContent = 'not emoji';
+
+    expect(isEmojiLikeElement(byId)).toBe(true);
+    expect(isEmojiLikeElement(byData)).toBe(true);
+    expect(isEmojiLikeElement(plain)).toBe(false);
+  });
+
+  it('reads image sources and fallback labels from nested image attributes', () => {
+    const wrapper = document.createElement('span');
+    const image = document.createElement('img');
+    image.setAttribute('data-src', 'https://example.test/fallback.png');
+    image.setAttribute('aria-label', ':nested:');
+    wrapper.append(image);
+    const sourceOnly = document.createElement('span');
+    sourceOnly.setAttribute('data-src', 'https://example.test/source-only.png');
+
+    expect(getElementImageSource(wrapper)).toBe('https://example.test/fallback.png');
+    expect(getElementImageSource(sourceOnly)).toBe('https://example.test/source-only.png');
+    expect(getElementTextFallback(wrapper)).toBe(':nested:');
+  });
+
+  it('returns blank text for comments and ignored tooltip nodes', () => {
+    const tooltip = document.createElement('yt-tooltip');
+    tooltip.textContent = 'hidden';
+
+    expect(getPlainTextFromMessageNode(document.createComment('comment'))).toBe('');
+    expect(getPlainTextFromMessageNode(tooltip)).toBe('');
+    expect(cloneSafeMessageNode(document.createComment('comment'))).toBeNull();
+    expect(cloneSafeMessageNode(tooltip)).toBeNull();
   });
 
   it('clones message nodes without duplicate ids or tooltip attributes', () => {

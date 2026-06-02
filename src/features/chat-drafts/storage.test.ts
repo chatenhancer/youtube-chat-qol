@@ -75,6 +75,68 @@ describe('chat input draft storage', () => {
     });
   });
 
+  it('normalizes empty and plain-text composer snapshots', () => {
+    expect(createChatInputDraftContent(null)).toEqual({
+      contentParts: [],
+      text: ''
+    });
+
+    expect(createChatInputDraftContent({
+      childNodes: [],
+      text: 'plain draft'
+    })).toEqual({
+      contentParts: [{ text: 'plain draft', type: 'text' }],
+      text: 'plain draft'
+    });
+  });
+
+  it('ignores malformed stored draft maps and draft records', async () => {
+    const sourceUrl = 'https://www.youtube.com/watch?v=stream-a';
+    await chrome.storage.local.set({
+      [CHAT_INPUT_DRAFTS_STORAGE_KEY]: []
+    });
+
+    await expect(loadChatInputDraft(sourceUrl)).resolves.toEqual({
+      contentParts: [],
+      text: ''
+    });
+
+    await chrome.storage.local.set({
+      [CHAT_INPUT_DRAFTS_STORAGE_KEY]: {
+        [sourceUrl]: null,
+        'video:missing-content': {
+          sourceUrl,
+          text: 'missing content',
+          updatedAt: Date.now()
+        },
+        'video:missing-source': {
+          contentParts: [{ text: 'missing source', type: 'text' }],
+          text: 'missing source',
+          updatedAt: Date.now()
+        },
+        'video:missing-time': {
+          contentParts: [{ text: 'missing time', type: 'text' }],
+          sourceUrl,
+          text: 'missing time'
+        }
+      }
+    });
+
+    await expect(loadChatInputDraft(sourceUrl)).resolves.toEqual({
+      contentParts: [],
+      text: ''
+    });
+  });
+
+  it('truncates overlong stored draft text', async () => {
+    const sourceUrl = 'https://www.youtube.com/watch?v=stream-a';
+    await saveChatInputDraft(sourceUrl, textDraft('a'.repeat(2100)));
+
+    await expect(loadChatInputDraft(sourceUrl)).resolves.toMatchObject({
+      text: 'a'.repeat(2000)
+    });
+  });
+
   it('keeps only the newest stored drafts', async () => {
     for (let index = 0; index < 55; index += 1) {
       vi.setSystemTime(new Date(Date.UTC(2026, 5, 2, 12, 0, index)));

@@ -8,7 +8,7 @@ import { expect, test, type Locator } from '@playwright/test';
 import {
   openMessageMenu,
   openSettingsMenu
-} from './menu-openers';
+} from '../support/menu-openers';
 import type { BrowserScenario, ChatSurface } from './types';
 
 export const settingsMenuScenario: BrowserScenario = async ({ chat }) => {

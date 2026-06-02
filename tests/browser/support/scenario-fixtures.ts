@@ -9,8 +9,8 @@ import {
   liveTest,
   mockTest,
   skipIfLoggedInYouTubeUnavailable
-} from '../helpers/browser-fixtures';
-import type { ChatSurface } from '../helpers/chat-surface';
+} from './browser-fixtures';
+import type { ChatSurface } from './chat-surface';
 
 interface BrowserScenarioFixtures {
   chat: ChatSurface;

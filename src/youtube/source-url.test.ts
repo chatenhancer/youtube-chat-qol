@@ -46,4 +46,17 @@ describe('YouTube chat source url helpers', () => {
   it('creates stable per-video storage keys', () => {
     expect(getYouTubeChatSourceStorageKey('https://www.youtube.com/watch?v=stream-1')).toBe('video:stream-1');
   });
+
+  it('creates per-video storage keys from live chat video_id urls', () => {
+    expect(getYouTubeChatSourceStorageKey('https://www.youtube.com/live_chat?video_id=stream-2')).toBe('video:stream-2');
+  });
+
+  it('hashes non-video and blank source urls into stable fallback keys', () => {
+    expect(getYouTubeChatSourceStorageKey('https://www.youtube.com/channel/example')).toMatch(/^source:/);
+    expect(getYouTubeChatSourceStorageKey('')).toMatch(/^source:/);
+  });
+
+  it('keeps invalid urls as stable page source fallbacks', () => {
+    expect(getYouTubeChatSourceStorageKey('not a url')).toMatch(/^source:/);
+  });
 });

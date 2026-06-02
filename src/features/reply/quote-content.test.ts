@@ -56,4 +56,77 @@ describe('rich quote content builder', () => {
     expect(result.nodes).toHaveLength(1);
     expect(result.nodes[0].textContent).toBe('fallback message');
   });
+
+  it('preserves line breaks and ignores invisible or unsupported nodes', () => {
+    const hidden = document.createElement('tp-yt-paper-tooltip');
+    hidden.textContent = 'hidden';
+    const lineBreak = document.createElement('br');
+    const comment = document.createComment('ignored');
+
+    const result = createQuoteContentNodes({
+      nodes: [
+        document.createTextNode('first\u200B'),
+        lineBreak,
+        hidden,
+        comment,
+        document.createTextNode('second')
+      ]
+    }, 'fallback');
+
+    expect(result.nodes.map((node) => node.textContent).join('')).toBe('first\nsecond');
+  });
+
+  it('falls back to emoji text when an emoji-like node cannot become an input image', () => {
+    const emoji = document.createElement('span');
+    emoji.className = 'emoji';
+    emoji.setAttribute('title', ':party:');
+
+    const result = createQuoteContentNodes({ nodes: [emoji] }, 'fallback');
+
+    expect(result.truncated).toBe(false);
+    expect(result.nodes).toHaveLength(1);
+    expect(result.nodes[0].textContent).toBe(':party:');
+  });
+
+  it('does not append emoji segments that have no usable fallback text', () => {
+    const result = createQuoteContentNodes({
+      segments: [
+        { type: 'emoji', alt: '', className: 'emoji', emojiId: '', src: '', tooltip: '' }
+      ]
+    }, 'fallback');
+
+    expect(result.truncated).toBe(false);
+    expect(result.nodes[0].textContent).toBe('fallback');
+  });
+
+  it('marks quote content truncated when the remaining budget is exhausted before later nodes', () => {
+    const result = createQuoteContentNodes({
+      nodes: [
+        document.createTextNode('x'.repeat(QUOTE_MAX_LENGTH)),
+        document.createTextNode('extra')
+      ]
+    }, 'fallback');
+
+    expect(result.truncated).toBe(true);
+    expect(result.nodes.map((node) => node.textContent).join('')).toHaveLength(QUOTE_MAX_LENGTH);
+  });
+
+  it('marks oversized emoji segments truncated without appending them', () => {
+    const result = createQuoteContentNodes({
+      segments: [
+        { type: 'text', text: 'x'.repeat(QUOTE_MAX_LENGTH - 1) },
+        {
+          type: 'emoji',
+          alt: ':very-long-emoji-name:',
+          className: 'emoji',
+          emojiId: 'long',
+          src: 'https://example.test/long.png',
+          tooltip: 'Long'
+        }
+      ]
+    }, 'fallback');
+
+    expect(result.truncated).toBe(true);
+    expect(result.nodes).toHaveLength(1);
+  });
 });

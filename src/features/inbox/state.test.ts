@@ -4,9 +4,11 @@ import {
   clearInboxRecords,
   getInboxKeywordsSnapshot,
   getInboxRecordsSnapshot,
+  getInboxKeywords,
   getKeywordCheckKeyFromValues,
   getLatestInboxRecord,
   getLatestMentionInboxRecord,
+  getLiveInboxMessage,
   getLoadedInboxKeywords,
   getMatchingKeywords,
   getUnreadInboxCount,
@@ -42,6 +44,16 @@ describe('inbox state store', () => {
     expect(getKeywordCheckKeyFromValues(['new launch soon'])).toContain('new launch soon');
   });
 
+  it('ignores blank keyword additions and duplicate additions in one call', () => {
+    const result = addInboxKeywordsToState([' ', 'Launch', 'launch', '\n']);
+
+    expect(result).toEqual({
+      added: ['Launch'],
+      duplicates: ['launch']
+    });
+    expect(getInboxKeywordsSnapshot()).toEqual(['Launch']);
+  });
+
   it('caps watched keywords to the newest maximum entries', () => {
     addInboxKeywordsToState(Array.from({ length: 32 }, (_, index) => `keyword-${index}`));
 
@@ -59,6 +71,16 @@ describe('inbox state store', () => {
     expect(getInboxKeywordsSnapshot()).toEqual(['status']);
   });
 
+  it('ignores blank keyword removals and leaves state unchanged when nothing is removed', () => {
+    addInboxKeywordsToState(['launch']);
+
+    expect(removeInboxKeywordsFromState([' ', 'missing'])).toEqual({
+      missing: ['missing'],
+      removed: []
+    });
+    expect(getInboxKeywordsSnapshot()).toEqual(['launch']);
+  });
+
   it('tracks unread records and can mark all read', () => {
     upsertInboxRecord(record({ id: 'old', read: false, timestamp: 1 }), false);
     upsertInboxRecord(record({ id: 'new', read: true, timestamp: 2 }), true);
@@ -67,6 +89,12 @@ describe('inbox state store', () => {
     expect(markInboxRecordsRead()).toBe(true);
     expect(getUnreadInboxCount()).toBe(0);
     expect(markInboxRecordsRead()).toBe(false);
+  });
+
+  it('reports null latest command records when the inbox is empty', async () => {
+    await expect(getLatestInboxRecord()).resolves.toBeNull();
+    await expect(getLatestMentionInboxRecord()).resolves.toBeNull();
+    await expect(getInboxKeywords()).resolves.toEqual([]);
   });
 
   it('merges matching records instead of duplicating them', () => {
@@ -97,6 +125,17 @@ describe('inbox state store', () => {
     });
   });
 
+  it('reports unchanged upserts when the matching record does not change', () => {
+    const current = record({ messageId: 'message-1', read: true });
+    upsertInboxRecord(current, true);
+
+    expect(upsertInboxRecord(current, true)).toEqual({
+      changed: false,
+      transientChanged: false
+    });
+    expect(getInboxRecordsSnapshot()).toHaveLength(1);
+  });
+
   it('returns latest inbox and mention records for commands', async () => {
     upsertInboxRecord(record({ authorName: '@KeywordUser', mention: false, timestamp: 1, text: 'keyword' }), false);
     upsertInboxRecord(record({ authorName: '@MentionUser', mention: true, timestamp: 2, text: 'mention' }), false);
@@ -119,6 +158,18 @@ describe('inbox state store', () => {
 
     expect(getInboxRecordsSnapshot()).toEqual([]);
     expect(getInboxKeywordsSnapshot()).toEqual(['launch']);
+  });
+
+  it('returns connected live messages and rejects stale live message refs', () => {
+    const message = document.createElement('yt-live-chat-text-message-renderer');
+    document.body.append(message);
+    const withLiveMessage = record({ messageRef: new WeakRef(message) });
+    const withoutLiveMessage = record();
+
+    expect(getLiveInboxMessage(withLiveMessage)).toBe(message);
+    message.remove();
+    expect(getLiveInboxMessage(withLiveMessage)).toBeNull();
+    expect(getLiveInboxMessage(withoutLiveMessage)).toBeNull();
   });
 });
 

@@ -66,6 +66,53 @@ describe('translation rendering', () => {
     expect(message.dataset.ytcqTranslationKey).toBeUndefined();
   });
 
+  it('updates an existing below-message translation in place', () => {
+    setOptions({ ...DEFAULT_OPTIONS, targetLanguage: 'ja', translationDisplay: 'below' });
+    const message = createMessage('gracias');
+    document.body.appendChild(message);
+
+    expect(renderTranslation(message, result({ text: 'ありがとう' }), 'gracias')).toBe(true);
+    expect(renderTranslation(message, result({ text: 'どうも' }), 'gracias')).toBe(true);
+
+    const translations = message.querySelectorAll('.ytcq-translation');
+    expect(translations).toHaveLength(1);
+    expect(translations[0].textContent).toContain('どうも');
+    expect(translations[0].textContent).not.toContain('ありがとう');
+  });
+
+  it('falls back to inline rendering when replacement mode cannot find message text', () => {
+    setOptions({ ...DEFAULT_OPTIONS, targetLanguage: 'en', translationDisplay: 'replace' });
+    const message = document.createElement('yt-live-chat-text-message-renderer');
+    message.innerHTML = '<span id="content">custom renderer text</span>';
+    document.body.appendChild(message);
+
+    expect(renderTranslation(message, result({ targetLanguage: 'en', text: 'custom translation' }), 'custom renderer text')).toBe(true);
+
+    expect(message.classList.contains('ytcq-translation-replaced')).toBe(false);
+    expect(message.querySelector('.ytcq-translation')?.textContent).toContain('custom translation');
+  });
+
+  it('uses fallback titles when source language or original text is not reliable', () => {
+    expect(createInlineTranslationElement(result({
+      sourceLanguage: 'ja',
+      targetLanguage: 'ja',
+      text: 'hello'
+    })).title).toBe('Translated message');
+
+    expect(createInlineTranslationElement(result({
+      sourceLanguage: '',
+      targetLanguage: 'ja',
+      text: 'hello'
+    })).title).toBe('Translated message');
+
+    expect(getReplacementTranslationTitle(result({ text: 'hello' }), '')).toBe('Original message');
+    expect(getReplacementTranslationTitle(result({
+      sourceLanguage: 'ja',
+      targetLanguage: 'ja',
+      text: 'hello'
+    }), 'ありがとう')).toContain('ありがとう');
+  });
+
   it('preserves the chat scroller top position and nudges YouTube layout after clearing translations', async () => {
     setOptions({ ...DEFAULT_OPTIONS, targetLanguage: 'ja', translationDisplay: 'below' });
     const { list, scroller, message } = createScrollableChatMessage('gracias');
@@ -82,6 +129,52 @@ describe('translation rendering', () => {
 
     expect(scroller.scrollTop).toBe(0);
     expect(events).toEqual(expect.arrayContaining(['list-resize', 'scroller-resize', 'scroll']));
+  });
+
+  it('preserves the chat scroller bottom position after clearing translations', async () => {
+    setOptions({ ...DEFAULT_OPTIONS, targetLanguage: 'ja', translationDisplay: 'below' });
+    const { list, scroller, message } = createScrollableChatMessage('gracias');
+    document.body.appendChild(list);
+    renderTranslation(message, result({ text: 'ありがとう' }), 'gracias');
+    scroller.scrollTop = 200;
+
+    clearTranslationRenderings();
+    await nextFrame();
+
+    expect(scroller.scrollTop).toBe(300);
+  });
+
+  it('clamps the chat scroller position when clearing translations while scrolled in the middle', async () => {
+    setOptions({ ...DEFAULT_OPTIONS, targetLanguage: 'ja', translationDisplay: 'below' });
+    const { list, scroller, message } = createScrollableChatMessage('gracias');
+    const chatRenderer = document.createElement('yt-live-chat-renderer');
+    chatRenderer.appendChild(list);
+    document.body.appendChild(chatRenderer);
+    renderTranslation(message, result({ text: 'ありがとう' }), 'gracias');
+    const events: string[] = [];
+    chatRenderer.addEventListener('iron-resize', () => events.push('chat-resize'));
+    scroller.scrollTop = 150;
+
+    clearTranslationRenderings();
+    setScrollMetrics(scroller, { clientHeight: 100, scrollHeight: 220 });
+    await nextFrame();
+
+    expect(scroller.scrollTop).toBe(120);
+    expect(events).toContain('chat-resize');
+  });
+
+  it('does not restore scroll when the chat scroller disconnects before the next frame', async () => {
+    setOptions({ ...DEFAULT_OPTIONS, targetLanguage: 'ja', translationDisplay: 'below' });
+    const { list, scroller, message } = createScrollableChatMessage('gracias');
+    document.body.appendChild(list);
+    renderTranslation(message, result({ text: 'ありがとう' }), 'gracias');
+    scroller.scrollTop = 150;
+
+    clearTranslationRenderings();
+    list.remove();
+    await nextFrame();
+
+    expect(scroller.scrollTop).toBe(150);
   });
 
   it('builds meaningful translation metadata and protected-token text', () => {

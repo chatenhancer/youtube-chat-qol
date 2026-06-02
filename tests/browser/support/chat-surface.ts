@@ -7,4 +7,10 @@
  */
 import type { FrameLocator, Page } from '@playwright/test';
 
+export const NORMAL_CHAT_MESSAGE_SELECTOR = [
+  'yt-live-chat-text-message-renderer:not([in-banner])',
+  ':not([in-collapsed-banner])',
+  ':not([author-is-owner])'
+].join('');
+
 export type ChatSurface = FrameLocator | Page;

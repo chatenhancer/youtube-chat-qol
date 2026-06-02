@@ -44,8 +44,8 @@ function createCoverageBadge(summary) {
 function createBrowserTestsBadge() {
   const specsDir = path.join(rootDir, 'tests', 'browser', 'specs');
   const specFiles = walk(specsDir).filter((file) => file.endsWith('.spec.ts'));
-  const mockCount = countTestsInFiles(specFiles.filter((file) => file.includes(`${path.sep}youtube-mock${path.sep}`)));
-  const liveCount = countTestsInFiles(specFiles.filter((file) => file.includes(`${path.sep}youtube-live${path.sep}`)));
+  const mockCount = countTestsInFiles(specFiles.filter((file) => path.basename(file).startsWith('yt-mock-')));
+  const liveCount = countTestsInFiles(specFiles.filter((file) => path.basename(file).startsWith('yt-live-')));
 
   return {
     label: 'browser tests',

@@ -1,5 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { parseTranslateTextCommand, translateCommandText } from './translate-text';
+import {
+  parseTranslateTextCommand,
+  translateCommandText,
+  translateTranslationPlan
+} from './translate-text';
 
 const toastMock = vi.hoisted(() => vi.fn());
 
@@ -10,6 +14,7 @@ vi.mock('../../shared/toast', () => ({
 describe('inline translate command helpers', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    setRuntimeLastError(undefined);
   });
 
   it('parses stable language codes and preserves the text after the code', () => {
@@ -58,6 +63,53 @@ describe('inline translate command helpers', () => {
     );
   });
 
+  it('falls back to the source text when the background returns no translated text', async () => {
+    vi.mocked(chrome.runtime.sendMessage).mockImplementation(((
+      _message: unknown,
+      callback?: (response: unknown) => void
+    ) => {
+      callback?.({ ok: true });
+      return Promise.resolve();
+    }) as never);
+
+    await expect(translateCommandText('hello @ExampleViewer', 'ja'))
+      .resolves.toBe('hello @ExampleViewer');
+  });
+
+  it('uses the fallback text when translating an empty plan', async () => {
+    vi.mocked(chrome.runtime.sendMessage).mockImplementation(((
+      message: unknown,
+      callback?: (response: unknown) => void
+    ) => {
+      callback?.({
+        ok: true,
+        translatedText: (message as { text?: string }).text
+      });
+      return Promise.resolve();
+    }) as never);
+
+    await expect(translateTranslationPlan({
+      protectedTokens: [],
+      text: ''
+    }, 'fallback text', 'ja')).resolves.toMatchObject({
+      text: 'fallback text'
+    });
+  });
+
+  it('rejects when the background translation bridge reports a runtime error', async () => {
+    vi.mocked(chrome.runtime.sendMessage).mockImplementation(((
+      _message: unknown,
+      callback?: (response: unknown) => void
+    ) => {
+      setRuntimeLastError({ message: 'The message port closed.' });
+      callback?.({ ok: true, translatedText: 'ignored' });
+      setRuntimeLastError(undefined);
+      return Promise.resolve();
+    }) as never);
+
+    await expect(translateCommandText('hello', 'ja')).rejects.toThrow('The message port closed.');
+  });
+
   it('rejects when the background translation bridge reports an error', async () => {
     vi.mocked(chrome.runtime.sendMessage).mockImplementation(((
       _message: unknown,
@@ -69,4 +121,23 @@ describe('inline translate command helpers', () => {
 
     await expect(translateCommandText('hello', 'ja')).rejects.toThrow('Translate request failed.');
   });
+
+  it('uses the default translation error when the background omits the error text', async () => {
+    vi.mocked(chrome.runtime.sendMessage).mockImplementation(((
+      _message: unknown,
+      callback?: (response: unknown) => void
+    ) => {
+      callback?.({ ok: false });
+      return Promise.resolve();
+    }) as never);
+
+    await expect(translateCommandText('hello', 'ja')).rejects.toThrow('Translate request failed.');
+  });
 });
+
+function setRuntimeLastError(value: { message: string } | undefined): void {
+  Object.defineProperty(chrome.runtime, 'lastError', {
+    configurable: true,
+    value
+  });
+}

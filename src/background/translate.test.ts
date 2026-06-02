@@ -47,6 +47,30 @@ describe('background translation bridge', () => {
     expect(String(vi.mocked(fetch).mock.calls[0][0])).toContain('q=hola+a+todos');
   });
 
+  it('defaults missing target language to English and falls back to source text when no sentences return', async () => {
+    vi.mocked(fetch).mockResolvedValue({
+      json: () => Promise.resolve({
+        sentences: [],
+        src: ''
+      }),
+      ok: true
+    } as Response);
+    await import('./translate');
+    const listener = getMessageListener();
+    const sendResponse = vi.fn();
+
+    listener({ type: 'ytcq:translate', text: 'hola' }, {}, sendResponse);
+
+    await vi.waitFor(() => {
+      expect(sendResponse).toHaveBeenCalledWith({
+        ok: true,
+        sourceLanguage: '',
+        translatedText: 'hola'
+      });
+    });
+    expect(String(vi.mocked(fetch).mock.calls[0][0])).toContain('tl=en');
+  });
+
   it('returns a clear error for missing request data', async () => {
     await import('./translate');
     const listener = getMessageListener();
@@ -77,6 +101,22 @@ describe('background translation bridge', () => {
     await vi.waitFor(() => {
       expect(sendResponse).toHaveBeenCalledWith({
         error: 'Translate request failed with 500',
+        ok: false
+      });
+    });
+  });
+
+  it('returns stringified errors for non-Error translation failures', async () => {
+    vi.mocked(fetch).mockRejectedValue('network down');
+    await import('./translate');
+    const listener = getMessageListener();
+    const sendResponse = vi.fn();
+
+    listener({ type: 'ytcq:translate', text: 'hola', targetLanguage: 'en' }, {}, sendResponse);
+
+    await vi.waitFor(() => {
+      expect(sendResponse).toHaveBeenCalledWith({
+        error: 'network down',
         ok: false
       });
     });

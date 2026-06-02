@@ -1,102 +1,110 @@
-# Browser tests
+# Browser Tests
 
-This folder contains Playwright smoke tests for the built extension. They cover
-the parts unit tests cannot see: content-script attachment, YouTube chat iframe
-wiring, injected menu/card UI, popup status, and composer behavior.
+Browser tests run the built extension in Chromium through Playwright. They cover
+the behavior that Vitest cannot see: content-script attachment, YouTube chat
+frame wiring, injected menus and panels, popup status, composer behavior, and
+real YouTube DOM compatibility.
 
-These tests are deliberately split into reusable behavior scenarios and small
-plan-case spec files. The specs decide where each scenario runs; the scenario
-files contain the actual checks.
-
-## Layout
+## Structure
 
 ```text
 tests/browser/
-  helpers/                 browser launch, storage, popup, DOM, and YouTube helpers
-  scenarios/               reusable feature-level checks
-  specs/
-    scenario-fixtures.ts   maps each browser surface to { chat, context }
-    youtube-mock/          deterministic local YouTube-like chat
-    youtube-live/          real YouTube livestream smoke tests
+  support/     launchers, fixtures, storage, popup, DOM, and YouTube utilities
+  scenarios/   reusable feature-level behavior checks
+  specs/       flattened Playwright plan files
 ```
 
-The browser surfaces are:
+`support/` is test plumbing. It should not export scenarios.
 
-- `logged-in mock`
-- `logged-out mock`
-- `logged-in mock replay`
-- `logged-in live`
-- `logged-out live`
-- `logged-in live replay`
+`scenarios/` contains reusable browser checks. A scenario should have one fixed
+assertion set everywhere it runs.
 
-Mock specs are broad, deterministic, and CI-safe. Live specs are narrower and
-exist to prove the extension still works against YouTube's current DOM and real
-provider-backed flows such as Google Translate. Replay specs cover YouTube's
-`live_chat_replay` iframe, which has no composer but still supports read-only
-chat features.
+`specs/` decides where each scenario runs:
+
+```text
+yt-mock-logged-in.spec.ts
+yt-mock-logged-out.spec.ts
+yt-mock-replay.spec.ts
+yt-live-logged-in.spec.ts
+yt-live-logged-out.spec.ts
+yt-live-replay.spec.ts
+yt-mock-perf-*.spec.ts
+```
+
+`yt-mock-*` specs use the deterministic local YouTube-like fixture. They are
+broad, stable, and safe for CI.
+
+`yt-live-*` specs use real YouTube pages. They are narrower and exist to catch
+YouTube DOM, iframe, composer, menu, and provider-integration regressions.
+
+`yt-mock-perf-*` specs use the mock fixture for performance workloads and write
+timing/heap reports.
+
+Replay specs cover YouTube's `live_chat_replay` iframe. Replay has no composer,
+but read-only chat features should still attach.
 
 ## Commands
+
+Install Playwright's Chromium browser:
 
 ```sh
 npm run test:browser:install
 ```
 
-Installs Playwright's Chromium browser without installing Linux system
-packages. CI always uses this command after restoring the Playwright browser
-cache, so cached runs only need to verify the browser is present.
+Install Chromium plus Linux system dependencies:
 
 ```sh
 npm run test:browser:install-deps
 ```
 
-Installs Playwright's Chromium browser plus Linux system dependencies. Use this
-only when a local Linux machine is missing browser libraries or fonts.
+Run deterministic mock browser specs:
 
 ```sh
 npm run test:browser:mock
 ```
 
-Runs the mock suite. This is headless by default.
-
-```sh
-YTCQ_TEST_HEADLESS=0 npm run test:browser:mock
-```
-
-Runs the mock suite with a visible browser for debugging.
+Run real YouTube browser specs:
 
 ```sh
 npm run test:browser:live
 ```
 
-Runs real YouTube livestream smoke tests. These use Chrome's new headless mode
-by default.
-
-```sh
-YTCQ_TEST_LIVE_HEADLESS=0 npm run test:browser:live
-```
-
-Runs the live suite with visible Chrome windows. Use this when debugging account
-verification or YouTube UI prompts.
+Run all browser behavior specs:
 
 ```sh
 npm run test:browser
 ```
 
-Runs all mock and live browser specs.
+Run browser behavior specs repeatedly to check flakiness:
 
-`npm run verify` and CI run the mock specs and logged-out live specs together
-in one Playwright invocation so those surfaces can run in parallel without
-requiring a signed-in YouTube profile.
+```sh
+npm run test:browser:flake
+```
+
+Run mock browser performance specs:
+
+```sh
+npm run test:browser:perf
+```
+
+Run only a subset with Playwright's grep:
 
 ```sh
 npm run test:browser:live -- -g logged-in
+npm run test:browser:mock -- -g "focus panel"
 ```
 
-Runs only logged-in live tests.
+Mock and live browser tests run headless by default. Use these when a visible
+browser is needed for debugging:
 
-## Logged-in live setup
+```sh
+YTCQ_TEST_HEADLESS=0 npm run test:browser:mock
+YTCQ_TEST_LIVE_HEADLESS=0 npm run test:browser:live
+```
 
-Prepare the dedicated local Chrome profile with:
+## Logged-In Live Setup
+
+Prepare the dedicated Chrome profile with:
 
 ```sh
 npm run test:youtube-login
@@ -114,22 +122,23 @@ The helper closes Chrome once it detects both a signed-in YouTube session and
 the installed unpacked extension. Do not use a personal everyday Chrome profile
 for this.
 
-Logged-in live specs do not run directly against the pristine profile. Before a
-logged-in live or replay spec opens Chrome, it copies the pristine profile into a
-spec-named working profile such as:
+Logged-in live specs do not run directly against the pristine profile. Each
+logged-in live spec copies the pristine profile into a generated working profile
+such as:
 
 ```text
 .chrome-test-profiles/youtube-live-logged-in/
 .chrome-test-profiles/youtube-live-replay/
 ```
 
-Those working profiles are recreated for each run. This lets live and replay
-tests run in parallel without opening the same Chrome profile twice.
+Those working profiles are recreated for each run. This lets logged-in live and
+replay specs run in parallel without opening the same Chrome profile twice.
 
-## Adding coverage
+## Adding Behavior Tests
 
-Add behavior in `tests/browser/scenarios/`. A scenario is a normal Playwright
-callback that receives:
+Add reusable behavior in `tests/browser/scenarios/`.
+
+A scenario receives the normalized browser surface:
 
 ```ts
 async ({ chat, context }) => {
@@ -138,48 +147,70 @@ async ({ chat, context }) => {
 }
 ```
 
-Then add the scenario to the relevant plan-case specs:
+Then include that scenario in the relevant plan files:
 
 ```text
-tests/browser/specs/youtube-mock/logged-in.spec.ts
-tests/browser/specs/youtube-mock/logged-out.spec.ts
-tests/browser/specs/youtube-mock/replay.spec.ts
-tests/browser/specs/youtube-live/logged-in.spec.ts
-tests/browser/specs/youtube-live/logged-out.spec.ts
-tests/browser/specs/youtube-live/replay.spec.ts
+tests/browser/specs/yt-mock-logged-in.spec.ts
+tests/browser/specs/yt-mock-logged-out.spec.ts
+tests/browser/specs/yt-mock-replay.spec.ts
+tests/browser/specs/yt-live-logged-in.spec.ts
+tests/browser/specs/yt-live-logged-out.spec.ts
+tests/browser/specs/yt-live-replay.spec.ts
 ```
 
 Prefer running the same scenario on mock and live when the behavior exists on
-both. Keep mock-only assertions for deterministic details that would be flaky on
-real YouTube, such as fixture-controlled incoming messages.
+both. If a deterministic fixture-only check is needed, such as appending a
+controlled incoming message, split it into a clearly named mock-only scenario
+instead of hiding a mock/live branch inside a shared scenario.
 
-Browser sessions are worker-scoped, so adding more scenarios to one spec does
-not intentionally reopen Chrome for every test.
+Browser sessions are worker-scoped. Adding another test to one spec file does
+not intentionally reopen Chrome for every scenario.
 
-The suite uses one Playwright worker per browser spec file by default.
-Parallelism happens
-between plan-case spec files, so mock, logged-out live, and logged-in live
-surfaces can run at the same time with separate browser sessions. Scenarios
-inside one plan-case file stay serial so they do not fight over one chat
-surface. Logged-in live and logged-in replay use separate generated working
-profiles copied from `.chrome-test-profiles/pristine/`, so they can run at the
-same time while sharing one login source of truth.
-Override the worker count with `YTCQ_TEST_WORKERS=1` when debugging a single
-shared timeline is easier.
+The default worker count is based on the number of browser spec files. Scenarios
+inside one spec file run serially against one chat surface; different spec files
+can run in parallel with separate browser sessions. Use one worker when
+debugging a single shared timeline:
 
-## Reports and failures
+```sh
+YTCQ_TEST_WORKERS=1 npm run test:browser
+```
 
-Open the latest combined browser report with:
+## Adding Performance Tests
+
+Add performance specs as flattened `yt-mock-perf-*.spec.ts` files under
+`tests/browser/specs/`.
+
+Use `tests/browser/support/mock-perf.ts` for common instrumentation:
+
+- append mock chat bursts
+- mock slow or failing translation responses
+- record long tasks and frame gaps
+- collect optional heap snapshots
+- write JSON and Markdown summaries to `test-results/performance/`
+
+Keep performance tests mock-only unless there is a specific reason to involve
+real YouTube. Real YouTube performance numbers are harder to compare because
+page load, chat velocity, and network behavior vary.
+
+## Reports and Artifacts
+
+Open the combined browser report:
 
 ```sh
 npx playwright show-report playwright-report/browser
 ```
 
-Project-specific reports are also written when running a single project:
+Project-specific reports are written when running one project:
 
 ```sh
 npx playwright show-report playwright-report/youtube-mock
 npx playwright show-report playwright-report/youtube-live
+```
+
+Open the performance report:
+
+```sh
+npx playwright show-report playwright-report/performance
 ```
 
 Local failure artifacts are under `test-results/browser/`. They may include
@@ -189,16 +220,19 @@ screenshots, videos, traces, and DOM dumps. Open a trace directly with:
 npx playwright show-trace test-results/browser/<failed-test>/trace.zip
 ```
 
-GitHub Actions uploads only failed `youtube-mock` artifacts from
+GitHub Actions uploads failed `youtube-mock` artifacts from
 `test-results/browser/mock-artifacts/`. Mock chat content is synthetic. Live
 YouTube screenshots, videos, traces, and DOM dumps can contain real chat text,
-so they are disabled in CI by default. Rerun the failing live test locally for
-full diagnostics, or explicitly set `YTCQ_CAPTURE_LIVE_BROWSER_ARTIFACTS=1` for
-a trusted CI run where live artifact handling is intentionally changed.
+so live artifacts are disabled in CI by default. Rerun failing live tests
+locally for full diagnostics, or explicitly set
+`YTCQ_CAPTURE_LIVE_BROWSER_ARTIFACTS=1` for a trusted CI run.
 
 ## Rules
 
-- Browser tests must not send YouTube chat messages.
+- Do not send YouTube chat messages from browser tests.
 - Composer tests may write draft text, but must not press Enter or click Send.
+- Keep scenario names explicit about the behavior they assert.
+- Keep scenario files free of hidden mock/live assertion branches.
+- Put shared mechanics in `support/`, not `scenarios/`.
 - Do not commit `.chrome-test-profiles/`, `test-results/`, traces,
   screenshots, videos, or DOM dumps.

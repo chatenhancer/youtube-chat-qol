@@ -11,12 +11,12 @@ import { expect, test, type CDPSession, type Page } from '@playwright/test';
 import {
   withExtensionStorageSnapshot,
   withExtensionStorageValues
-} from '../helpers/extension-storage';
-import { getExtensionId } from '../helpers/extension';
+} from '../support/extension-storage';
+import { getExtensionId } from '../support/extension';
 import {
   appendMockFixtureMessage,
   isMockPageSurface
-} from '../helpers/mock-page';
+} from '../support/mock-page';
 import type { BrowserScenario } from './types';
 
 const ALERT_KEYWORD = 'ytcq-alert-browser-test';

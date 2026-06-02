@@ -1,4 +1,4 @@
-# Third-Party Notices
+# Third-party notices
 
 This project includes third-party visual assets and fonts under their own licenses. These notices apply only to those third-party assets, not to the Chat Enhancer for YouTube project code or branding.
 
@@ -20,6 +20,6 @@ The documentation site and extension popup bundle Inter font files.
 - License: SIL Open Font License 1.1
 - Local license copy: `licenses/OFL-1.1-Inter.txt`
 
-## Project-Owned Assets
+## Project-owned assets
 
 The Chat Enhancer for YouTube name, logo, app icon, screenshots, and store listing assets are project-owned assets. See `README.md` and `LICENSE` for the project license and branding restriction.

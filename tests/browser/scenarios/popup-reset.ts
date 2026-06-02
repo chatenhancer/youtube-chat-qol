@@ -5,12 +5,12 @@
  * the destructive reset action can run against mock and live browser sessions.
  */
 import { expect, test, type BrowserContext, type Page } from '@playwright/test';
-import { getExtensionId } from '../helpers/extension';
+import { getExtensionId } from '../support/extension';
 import {
   getExtensionStorageValues,
   withExtensionStorageSnapshot,
   withExtensionStorageValues
-} from '../helpers/extension-storage';
+} from '../support/extension-storage';
 import type { BrowserScenario, ChatSurface } from './types';
 
 const RESET_SYNC_SEED = {

@@ -43,6 +43,20 @@ describe('YouTube chat input adapter', () => {
     expect(findChatInput()).toBe(visible);
   });
 
+  it('returns empty/null values when no chat input is visible', () => {
+    expect(findChatInput()).toBeNull();
+    expect(getChatInputSnapshot()).toBeNull();
+    expect(getChatInputText()).toBe('');
+    expect(getChatInputTextSelection()).toBeNull();
+    expect(insertIntoChatInput('hello')).toBe(false);
+    expect(insertNodeIntoChatInput(document.createElement('img'), ':emoji:')).toBe(false);
+    expect(insertNodesIntoChatInput([document.createTextNode('hello')], 'hello')).toBe(false);
+    expect(replaceChatInputTextRange(0, 1, 'x')).toBe(false);
+    expect(replaceChatInput('hello')).toBe(false);
+    expect(replaceChatInputSnapshot({ childNodes: [], text: 'hello' })).toBe(false);
+    expect(replaceNodesInChatInput([document.createTextNode('hello')], 'hello')).toBe(false);
+  });
+
   it('reads snapshots and text selection from contenteditable input', () => {
     const input = createContentEditable();
     const emoji = document.createElement('img');
@@ -83,6 +97,65 @@ describe('YouTube chat input adapter', () => {
     });
   });
 
+  it('reads contenteditable selection offsets from element containers', () => {
+    const input = createContentEditable();
+    const first = document.createElement('span');
+    first.textContent = 'one';
+    const image = document.createElement('img');
+    image.alt = ':wave:';
+    const second = document.createElement('span');
+    second.textContent = 'two';
+    input.append(first, image, second);
+    document.body.append(input);
+    const range = document.createRange();
+    range.setStart(input, 1);
+    range.setEnd(input, 2);
+    document.getSelection()?.removeAllRanges();
+    document.getSelection()?.addRange(range);
+
+    expect(getChatInputTextSelection()).toEqual({
+      selectionEnd: 'one:wave:'.length,
+      selectionStart: 'one'.length,
+      text: 'one:wave:two'
+    });
+  });
+
+  it('uses the end of contenteditable text when the selection is outside the input', () => {
+    const input = createContentEditable();
+    input.append('hello');
+    const outside = document.createElement('p');
+    outside.textContent = 'outside';
+    document.body.append(input, outside);
+    const range = document.createRange();
+    range.selectNodeContents(outside);
+    document.getSelection()?.removeAllRanges();
+    document.getSelection()?.addRange(range);
+
+    expect(getChatInputTextSelection()).toEqual({
+      selectionEnd: 5,
+      selectionStart: 5,
+      text: 'hello'
+    });
+  });
+
+  it('reads textarea snapshots and selection offsets', () => {
+    const textarea = createTextArea('hello world');
+    document.body.append(textarea);
+    textarea.selectionStart = 2;
+    textarea.selectionEnd = 7;
+
+    expect(getChatInputSnapshot()).toEqual({
+      childNodes: [],
+      text: 'hello world'
+    });
+    expect(getChatInputText()).toBe('hello world');
+    expect(getChatInputTextSelection()).toEqual({
+      selectionEnd: 7,
+      selectionStart: 2,
+      text: 'hello world'
+    });
+  });
+
   it('inserts and replaces textarea text with selection preservation', () => {
     const textarea = createTextArea('hello world');
     document.body.append(textarea);
@@ -97,6 +170,30 @@ describe('YouTube chat input adapter', () => {
     expect(textarea.value).toBe('hello stream');
 
     expect(replaceChatInput('done')).toBe(true);
+    expect(textarea.value).toBe('done');
+    expect(textarea.selectionStart).toBe(4);
+  });
+
+  it('appends textarea text when the input is not focused', () => {
+    const textarea = createTextArea('hello');
+    const other = document.createElement('button');
+    document.body.append(textarea, other);
+    other.focus();
+    textarea.selectionStart = 0;
+    textarea.selectionEnd = 0;
+
+    expect(insertIntoChatInput(' world')).toBe(true);
+
+    expect(textarea.value).toBe('hello world');
+    expect(textarea.selectionStart).toBe(11);
+  });
+
+  it('clamps textarea text range replacements to safe bounds', () => {
+    const textarea = createTextArea('hello');
+    document.body.append(textarea);
+
+    expect(replaceChatInputTextRange(-10, 99, 'done')).toBe(true);
+
     expect(textarea.value).toBe('done');
     expect(textarea.selectionStart).toBe(4);
   });
@@ -123,6 +220,55 @@ describe('YouTube chat input adapter', () => {
     expect(input.textContent).toBe('snapshot');
   });
 
+  it('appends contenteditable text when the editor is not focused or selection is outside', () => {
+    const input = createContentEditable();
+    input.append('hello');
+    const outside = document.createElement('button');
+    document.body.append(input, outside);
+    outside.focus();
+    const range = document.createRange();
+    range.selectNodeContents(outside);
+    document.getSelection()?.removeAllRanges();
+    document.getSelection()?.addRange(range);
+
+    expect(insertIntoChatInput(' world')).toBe(true);
+
+    expect(getChatInputText()).toBe('hello world');
+  });
+
+  it('returns contenteditable text presence when execCommand reports failed insertion', () => {
+    vi.mocked(document.execCommand).mockReturnValue(false);
+    const input = createContentEditable();
+    input.append('hello');
+    document.body.append(input);
+
+    expect(insertIntoChatInput(' world')).toBe(true);
+  });
+
+  it('creates insertion ranges for contenteditable node insertion when selection is missing or outside', () => {
+    const input = createContentEditable();
+    input.append('hello');
+    document.body.append(input);
+    document.getSelection()?.removeAllRanges();
+    const image = document.createElement('img');
+    image.alt = ':wave:';
+
+    expect(insertNodeIntoChatInput(image, ':wave:')).toBe(true);
+    expect(input.querySelector('img')?.alt).toBe(':wave:');
+
+    const outside = document.createElement('button');
+    document.body.append(outside);
+    const range = document.createRange();
+    range.selectNodeContents(outside);
+    document.getSelection()?.removeAllRanges();
+    document.getSelection()?.addRange(range);
+    const strong = document.createElement('strong');
+    strong.textContent = 'tail';
+
+    expect(insertNodesIntoChatInput([strong], 'tail')).toBe(true);
+    expect(input.textContent).toContain('tail');
+  });
+
   it('replaces contenteditable text ranges and inserts node groups', () => {
     const input = createContentEditable();
     input.append('hello world');
@@ -139,6 +285,45 @@ describe('YouTube chat input adapter', () => {
     expect(input.textContent).toBe('hello chatAB');
   });
 
+  it('inserts trailing text after contenteditable node groups', () => {
+    const input = createContentEditable();
+    input.append('hello');
+    document.body.append(input);
+    const strong = document.createElement('strong');
+    strong.textContent = ' quote';
+
+    expect(insertNodesIntoChatInput([strong], ' quote', ' ')).toBe(true);
+
+    expect(input.textContent).toBe('hello quote ');
+  });
+
+  it('replaces nested contenteditable ranges by plain-text offsets', () => {
+    const input = createContentEditable();
+    const first = document.createElement('span');
+    first.textContent = 'alpha';
+    const second = document.createElement('span');
+    second.textContent = 'beta';
+    input.append(first, ' ', second, ' gamma');
+    document.body.append(input);
+
+    expect(replaceChatInputTextRange(2, 12, 'X')).toBe(true);
+
+    expect(getChatInputText()).toBe('alXamma');
+  });
+
+  it('falls back when contenteditable execCommand insertion fails', () => {
+    vi.mocked(document.execCommand).mockReturnValue(false);
+    const input = createContentEditable();
+    input.append('hello world');
+    document.body.append(input);
+
+    expect(replaceChatInputTextRange(6, 11, 'chat')).toBe(true);
+    expect(input.textContent).toBe('hello chat');
+
+    expect(replaceChatInput('done')).toBe(true);
+    expect(input.textContent).toBe('done');
+  });
+
   it('falls back to plain text for textarea node insertion and empty node groups', () => {
     const textarea = createTextArea('hello');
     document.body.append(textarea);
@@ -147,6 +332,78 @@ describe('YouTube chat input adapter', () => {
     expect(textarea.value).toBe('hello:emoji:');
     expect(insertNodesIntoChatInput([], ' fallback')).toBe(true);
     expect(textarea.value).toBe('hello:emoji: fallback');
+    expect(insertNodeIntoChatInput(document.createElement('img'))).toBe(false);
+    expect(insertNodesIntoChatInput([document.createElement('img')])).toBe(false);
+    expect(insertNodesIntoChatInput([])).toBe(false);
+  });
+
+  it('uses fallback text for textarea node groups with nodes', () => {
+    const textarea = createTextArea('hello');
+    document.body.append(textarea);
+
+    expect(insertNodesIntoChatInput([document.createElement('img')], ':emoji:')).toBe(true);
+
+    expect(textarea.value).toBe('hello:emoji:');
+  });
+
+  it('replaces textarea content from snapshots and node groups using fallback text', () => {
+    const textarea = createTextArea('hello');
+    document.body.append(textarea);
+
+    expect(replaceChatInputSnapshot({
+      childNodes: [document.createTextNode('rich')],
+      text: 'snapshot'
+    })).toBe(true);
+    expect(textarea.value).toBe('snapshot');
+
+    expect(replaceNodesInChatInput([document.createElement('img')], ':emoji:')).toBe(true);
+    expect(textarea.value).toBe(':emoji:');
+  });
+
+  it('reads visible fallback text from rich input leaves while ignoring hidden UI text', () => {
+    const input = createContentEditable();
+    const lineBreak = document.createElement('br');
+    const ariaEmoji = document.createElement('span');
+    ariaEmoji.setAttribute('role', 'img');
+    ariaEmoji.setAttribute('aria-label', ':party:');
+    const titleEmoji = document.createElement('span');
+    titleEmoji.setAttribute('role', 'img');
+    titleEmoji.setAttribute('title', ':sparkles:');
+    const emptyLeaf = document.createElement('span');
+    const ariaHidden = document.createElement('span');
+    ariaHidden.setAttribute('aria-hidden', 'true');
+    ariaHidden.textContent = 'hidden';
+    const hiddenElement = document.createElement('span');
+    hiddenElement.hidden = true;
+    hiddenElement.textContent = 'hidden';
+    const menuText = document.createElement('span');
+    menuText.setAttribute('role', 'menuitem');
+    menuText.textContent = 'menu';
+    const textEmoji = document.createElement('span');
+    textEmoji.setAttribute('role', 'img');
+    textEmoji.textContent = ':text-emoji:';
+    const displayNone = document.createElement('span');
+    displayNone.style.display = 'none';
+    displayNone.textContent = 'display none';
+    const invisible = document.createElement('span');
+    invisible.style.visibility = 'hidden';
+    invisible.textContent = 'invisible';
+    input.append(
+      'hello',
+      lineBreak,
+      ariaEmoji,
+      titleEmoji,
+      textEmoji,
+      emptyLeaf,
+      ariaHidden,
+      hiddenElement,
+      menuText,
+      displayNone,
+      invisible
+    );
+    document.body.append(input);
+
+    expect(getChatInputText()).toBe('hello\n:party::sparkles::text-emoji:');
   });
 
   it('clicks the visible participant back button before insertion recovery', () => {

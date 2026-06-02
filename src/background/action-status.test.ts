@@ -2,9 +2,10 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { KNOWN_CHAT_TABS_STORAGE_KEY } from '../shared/known-chat-tabs';
 
 describe('background action status wiring', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.resetModules();
     vi.clearAllMocks();
+    await chrome.storage.local.clear();
   });
 
   it('marks a tab active when content reports that chat attached', async () => {
@@ -26,6 +27,18 @@ describe('background action status wiring', () => {
     expect(chrome.storage.local.set).toHaveBeenCalledWith({
       [KNOWN_CHAT_TABS_STORAGE_KEY]: { '17': expect.any(Number) }
     });
+  });
+
+  it('ignores unrelated messages and attached messages without a numeric tab id', async () => {
+    await import('./action-status');
+    const messageListener = getRuntimeMessageListener();
+
+    expect(messageListener(undefined, {}, vi.fn())).toBe(false);
+    expect(messageListener({ type: 'other' }, {}, vi.fn())).toBe(false);
+    expect(messageListener({ type: 'ytcq:chat-attached' }, { tab: {} as chrome.tabs.Tab }, vi.fn())).toBe(false);
+    expect(messageListener({ type: 'ytcq:chat-attached' }, { tab: { id: undefined } as chrome.tabs.Tab }, vi.fn())).toBe(false);
+
+    expect(chrome.action.setIcon).not.toHaveBeenCalled();
   });
 
   it('clears active state when the tab reloads or closes', async () => {

@@ -1,8 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
+  initChatInputDrafts,
   resetChatInputDrafts,
   restoreChatInputDraft,
-  saveCurrentChatInputDraft
+  saveCurrentChatInputDraft,
+  scheduleChatInputDraftRestore
 } from './index';
 import { loadChatInputDraft, saveChatInputDraft } from './storage';
 
@@ -32,6 +34,7 @@ describe('chat input draft recovery', () => {
 
   afterEach(() => {
     vi.useRealTimers();
+    window.history.replaceState({}, '', '/');
     document.body.replaceChildren();
   });
 
@@ -89,6 +92,46 @@ describe('chat input draft recovery', () => {
     expect(input.textContent).toBe('current draft');
   });
 
+  it('waits for the composer to appear before restoring a draft', async () => {
+    window.history.replaceState({}, '', '/watch?v=stream-a');
+    const sourceUrl = 'https://www.youtube.com/watch?v=stream-a';
+    await saveChatInputDraft(sourceUrl, textDraft('saved draft'));
+
+    await expect(restoreChatInputDraft(sourceUrl)).resolves.toBe(false);
+
+    const input = createContentEditable();
+    document.body.append(input);
+    await vi.advanceTimersByTimeAsync(100);
+
+    expect(input.textContent).toBe('saved draft');
+  });
+
+  it('does not restore blank or sourceless drafts', async () => {
+    const input = createContentEditable();
+    document.body.append(input);
+
+    await expect(restoreChatInputDraft('')).resolves.toBe(false);
+    await expect(restoreChatInputDraft('https://www.youtube.com/watch?v=stream-a')).resolves.toBe(false);
+
+    expect(input.textContent).toBe('');
+  });
+
+  it('stops retrying restore after the configured delays are exhausted', async () => {
+    window.history.replaceState({}, '', '/watch?v=stream-a');
+    scheduleChatInputDraftRestore();
+
+    for (const delay of [100, 300, 800, 1500, 3000, 5000]) {
+      await vi.advanceTimersByTimeAsync(delay);
+      await flushPromises();
+    }
+
+    const input = createContentEditable();
+    document.body.append(input);
+    await vi.advanceTimersByTimeAsync(6000);
+
+    expect(input.textContent).toBe('');
+  });
+
   it('saves the current composer text for the stream', async () => {
     const sourceUrl = 'https://www.youtube.com/watch?v=stream-a';
     const input = createContentEditable();
@@ -99,6 +142,18 @@ describe('chat input draft recovery', () => {
 
     await expect(loadChatInputDraft(sourceUrl)).resolves.toMatchObject({
       text: 'typed draft'
+    });
+  });
+
+  it('does not save drafts without a stream source', async () => {
+    const input = createContentEditable();
+    input.textContent = 'orphan draft';
+    document.body.append(input);
+
+    await saveCurrentChatInputDraft('');
+
+    await expect(loadChatInputDraft('https://www.youtube.com/watch?v=stream-a')).resolves.toMatchObject({
+      text: ''
     });
   });
 
@@ -131,6 +186,159 @@ describe('chat input draft recovery', () => {
       text: 'typed :custom-smile: draft'
     });
   });
+
+  it('debounces draft saves after composer input', async () => {
+    window.history.replaceState({}, '', '/watch?v=stream-a');
+    initChatInputDrafts();
+    const input = createContentEditable();
+    input.textContent = 'typed draft';
+    document.body.append(input);
+
+    input.dispatchEvent(new InputEvent('input', { bubbles: true }));
+    await vi.advanceTimersByTimeAsync(249);
+    await expect(loadChatInputDraft('https://www.youtube.com/watch?v=stream-a')).resolves.toMatchObject({
+      text: ''
+    });
+
+    await vi.advanceTimersByTimeAsync(1);
+
+    await expect(loadChatInputDraft('https://www.youtube.com/watch?v=stream-a')).resolves.toMatchObject({
+      text: 'typed draft'
+    });
+  });
+
+  it('ignores input events outside the chat composer', async () => {
+    window.history.replaceState({}, '', '/watch?v=stream-a');
+    initChatInputDrafts();
+    const input = createContentEditable();
+    const unrelated = document.createElement('div');
+    unrelated.textContent = 'outside draft';
+    input.textContent = 'inside draft';
+    document.body.append(input, unrelated);
+
+    unrelated.dispatchEvent(new InputEvent('input', { bubbles: true }));
+    await vi.advanceTimersByTimeAsync(250);
+
+    await expect(loadChatInputDraft('https://www.youtube.com/watch?v=stream-a')).resolves.toMatchObject({
+      text: ''
+    });
+  });
+
+  it('does not save while restoring draft content into the composer', async () => {
+    window.history.replaceState({}, '', '/watch?v=stream-a');
+    await saveChatInputDraft('https://www.youtube.com/watch?v=stream-a', textDraft('saved draft'));
+    initChatInputDrafts();
+    const input = createContentEditable();
+    document.body.append(input);
+
+    await restoreChatInputDraft('https://www.youtube.com/watch?v=stream-a');
+    input.dispatchEvent(new InputEvent('input', { bubbles: true }));
+    await vi.advanceTimersByTimeAsync(250);
+
+    await expect(loadChatInputDraft('https://www.youtube.com/watch?v=stream-a')).resolves.toMatchObject({
+      text: 'saved draft'
+    });
+  });
+
+  it('flushes a pending draft save on pagehide', async () => {
+    window.history.replaceState({}, '', '/watch?v=stream-a');
+    initChatInputDrafts();
+    const input = createContentEditable();
+    input.textContent = 'leaving soon';
+    document.body.append(input);
+
+    input.dispatchEvent(new InputEvent('input', { bubbles: true }));
+    window.dispatchEvent(new Event('pagehide'));
+    await flushPromises();
+
+    await expect(loadChatInputDraft('https://www.youtube.com/watch?v=stream-a')).resolves.toMatchObject({
+      text: 'leaving soon'
+    });
+  });
+
+  it('saves after Enter send behavior has had time to clear the composer', async () => {
+    window.history.replaceState({}, '', '/watch?v=stream-a');
+    await saveChatInputDraft('https://www.youtube.com/watch?v=stream-a', textDraft('old draft'));
+    initChatInputDrafts();
+    const input = createContentEditable();
+    input.textContent = 'message being sent';
+    document.body.append(input);
+
+    input.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Enter' }));
+    input.textContent = '';
+    await vi.advanceTimersByTimeAsync(500);
+
+    await expect(loadChatInputDraft('https://www.youtube.com/watch?v=stream-a')).resolves.toMatchObject({
+      text: ''
+    });
+  });
+
+  it('does not treat Shift Enter as send behavior', async () => {
+    window.history.replaceState({}, '', '/watch?v=stream-a');
+    await saveChatInputDraft('https://www.youtube.com/watch?v=stream-a', textDraft('old draft'));
+    initChatInputDrafts();
+    const input = createContentEditable();
+    input.textContent = 'multiline draft';
+    document.body.append(input);
+
+    input.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Enter', shiftKey: true }));
+    input.textContent = '';
+    await vi.advanceTimersByTimeAsync(500);
+
+    await expect(loadChatInputDraft('https://www.youtube.com/watch?v=stream-a')).resolves.toMatchObject({
+      text: 'old draft'
+    });
+  });
+
+  it('saves after the send button is clicked', async () => {
+    window.history.replaceState({}, '', '/watch?v=stream-a');
+    await saveChatInputDraft('https://www.youtube.com/watch?v=stream-a', textDraft('old draft'));
+    initChatInputDrafts();
+    const input = createContentEditable();
+    const sendButton = document.createElement('button');
+    sendButton.id = 'send-button';
+    input.textContent = 'clicked send';
+    document.body.append(input, sendButton);
+
+    sendButton.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    input.textContent = '';
+    await vi.advanceTimersByTimeAsync(500);
+
+    await expect(loadChatInputDraft('https://www.youtube.com/watch?v=stream-a')).resolves.toMatchObject({
+      text: ''
+    });
+  });
+
+  it('ignores clicks outside YouTube send buttons', async () => {
+    window.history.replaceState({}, '', '/watch?v=stream-a');
+    await saveChatInputDraft('https://www.youtube.com/watch?v=stream-a', textDraft('old draft'));
+    initChatInputDrafts();
+    const input = createContentEditable();
+    const unrelated = document.createElement('button');
+    input.textContent = 'clicked elsewhere';
+    document.body.append(input, unrelated);
+
+    unrelated.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    input.textContent = '';
+    await vi.advanceTimersByTimeAsync(500);
+
+    await expect(loadChatInputDraft('https://www.youtube.com/watch?v=stream-a')).resolves.toMatchObject({
+      text: 'old draft'
+    });
+  });
+
+  it('schedules restore only once while a restore timer is pending', async () => {
+    window.history.replaceState({}, '', '/watch?v=stream-a');
+    await saveChatInputDraft('https://www.youtube.com/watch?v=stream-a', textDraft('saved draft'));
+    scheduleChatInputDraftRestore();
+    scheduleChatInputDraftRestore();
+
+    const input = createContentEditable();
+    document.body.append(input);
+    await vi.advanceTimersByTimeAsync(100);
+
+    expect(input.textContent).toBe('saved draft');
+  });
 });
 
 function createContentEditable(): HTMLElement {
@@ -156,4 +364,9 @@ function textDraft(text: string) {
     contentParts: text ? [{ text, type: 'text' as const }] : [],
     text
   };
+}
+
+async function flushPromises(): Promise<void> {
+  await Promise.resolve();
+  await Promise.resolve();
 }

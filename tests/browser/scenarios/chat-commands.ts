@@ -10,21 +10,17 @@ import {
   getChatComposerInput,
   getChatComposerText,
   setChatComposerText
-} from '../helpers/composer';
+} from '../support/composer';
 import {
   getExtensionStorageValues,
   withExtensionStorageValues
-} from '../helpers/extension-storage';
+} from '../support/extension-storage';
 import type { BrowserScenario, ChatSurface } from './types';
 
 const COMMAND_KEYWORD = 'browser command phrase';
 
-export const chatCommandsFullScenario: BrowserScenario = async ({ chat, context }) => {
-  await expectChatCommands({ chat, context, fullCoverage: true });
-};
-
-export const chatCommandsSmokeScenario: BrowserScenario = async ({ chat, context }) => {
-  await expectChatCommands({ chat, context, fullCoverage: false });
+export const chatCommandsExpandAndApplySettingsScenario: BrowserScenario = async ({ chat, context }) => {
+  await expectChatCommands({ chat, context });
 };
 
 export const chatCommandAutocompleteScenario: BrowserScenario = async ({ chat }) => {
@@ -33,12 +29,10 @@ export const chatCommandAutocompleteScenario: BrowserScenario = async ({ chat })
 
 async function expectChatCommands({
   chat,
-  context,
-  fullCoverage
+  context
 }: {
   chat: ChatSurface;
   context: BrowserContext;
-  fullCoverage: boolean;
 }): Promise<void> {
   await withExtensionStorageValues(context, 'sync', {
     targetLanguage: 'ja',
@@ -48,12 +42,10 @@ async function expectChatCommands({
     await withExtensionStorageValues(context, 'local', {
       ytcqInboxKeywords: []
     }, async () => {
-      await expectTimeCommandsExpand(chat, fullCoverage);
-      if (fullCoverage) {
-        await expectDisplayCommandApplies(chat, context);
-        await expectLangOffCommandApplies(chat, context);
-        await expectWatchCommandApplies(chat, context);
-      }
+      await expectTimeCommandsExpand(chat);
+      await expectDisplayCommandApplies(chat, context);
+      await expectLangOffCommandApplies(chat, context);
+      await expectWatchCommandApplies(chat, context);
       await expectHelpCommandOpensCard(chat);
     });
   });
@@ -93,15 +85,11 @@ async function expectCommandAutocomplete(chat: ChatSurface): Promise<void> {
   });
 }
 
-async function expectTimeCommandsExpand(
-  chat: ChatSurface,
-  fullCoverage: boolean
-): Promise<void> {
+async function expectTimeCommandsExpand(chat: ChatSurface): Promise<void> {
   await test.step('Expand time commands', async () => {
     await expectCommandReplacesText(chat, '/time', {
       message: '/time should expand to a visible local time.'
     });
-    if (!fullCoverage) return;
 
     await expectCommandReplacesText(chat, '/time tokyo', {
       message: '/time tokyo should expand to the current time in Tokyo.'

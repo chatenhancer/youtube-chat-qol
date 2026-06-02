@@ -23,6 +23,7 @@
     "test:browser:install-deps": "playwright install --with-deps chromium",
     "test:browser:live": "node scripts/run-browser-tests.mjs --project=youtube-live",
     "test:browser:mock": "node scripts/run-browser-tests.mjs --project=youtube-mock",
+    "test:browser:perf": "node scripts/run-browser-performance-tests.mjs",
     "test:coverage": "node scripts/run-unit-tests.mjs --coverage && node scripts/generate-readme-badges.mjs",
     "test:youtube-login": "node scripts/open-youtube-test-profile.mjs",
     "test:watch": "vitest",
@@ -31,7 +32,7 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "check": "npm run typecheck && npm run lint",
-    "verify": "npm run check && npm run test && npm run build && npm run docs:build && node scripts/run-browser-tests.mjs --no-build tests/browser/specs/youtube-mock tests/browser/specs/youtube-live/logged-out.spec.ts"
+    "verify": "npm run check && npm run test && npm run build && npm run docs:build && node scripts/run-browser-tests.mjs --no-build tests/browser/specs/yt-mock-logged-in.spec.ts tests/browser/specs/yt-mock-logged-out.spec.ts tests/browser/specs/yt-mock-replay.spec.ts tests/browser/specs/yt-live-logged-out.spec.ts"
   },
   "devDependencies": {
     "@eslint/js": "^9.27.0",

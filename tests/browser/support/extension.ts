@@ -11,13 +11,7 @@ import path from 'node:path';
 import { extensionDir } from './paths';
 
 export async function getExtensionId(context: BrowserContext): Promise<string> {
-  let serviceWorker = context.serviceWorkers().find(isExtensionServiceWorker);
-  if (!serviceWorker) {
-    serviceWorker = await context.waitForEvent('serviceworker', {
-      predicate: isExtensionServiceWorker,
-      timeout: 15_000
-    });
-  }
+  const serviceWorker = await getExtensionServiceWorker(context);
 
   const match = serviceWorker.url().match(/^chrome-extension:\/\/([^/]+)\//);
   if (!match) {
@@ -25,6 +19,16 @@ export async function getExtensionId(context: BrowserContext): Promise<string> {
   }
 
   return match[1];
+}
+
+export async function getExtensionServiceWorker(context: BrowserContext): Promise<Worker> {
+  const serviceWorker = context.serviceWorkers().find(isExtensionServiceWorker);
+  if (serviceWorker) return serviceWorker;
+
+  return context.waitForEvent('serviceworker', {
+    predicate: isExtensionServiceWorker,
+    timeout: 15_000
+  });
 }
 
 function isExtensionServiceWorker(serviceWorker: Worker): boolean {

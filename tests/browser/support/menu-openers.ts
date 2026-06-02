@@ -9,20 +9,22 @@ import { expect, test, type Locator } from '@playwright/test';
 import {
   NORMAL_CHAT_MESSAGE_SELECTOR,
   type ChatSurface
-} from './types';
+} from './chat-surface';
 import {
   centerLocatorInViewport,
   clickLocatorAtCurrentCenter
-} from '../helpers/locator';
-import { cleanVisibleText } from '../helpers/text';
+} from './locator';
+import { cleanVisibleText } from './text';
 
 const MENU_POPUP_SELECTOR = 'ytd-menu-popup-renderer';
+const MESSAGE_TARGET_ATTRIBUTE = 'data-ytcq-test-menu-target';
 const SETTINGS_MENU_MARKER_SELECTOR = 'yt-live-chat-toggle-renderer, .ytcq-settings-item';
 const MESSAGE_MENU_MARKER_SELECTOR = [
   'ytd-menu-service-item-renderer',
   'ytd-menu-navigation-item-renderer',
   '.ytcq-context-item[data-ytcq-action]'
 ].join(',');
+let nextMessageTargetId = 1;
 
 export interface OpenedMessageMenu {
   menu: Locator;
@@ -68,11 +70,18 @@ export async function openMessageMenu(chat: ChatSurface): Promise<OpenedMessageM
     const count = await messages.count();
     const firstCandidate = Math.max(0, count - 8);
     for (let index = count - 1; index >= firstCandidate; index -= 1) {
-      const message = messages.nth(index);
+      const message = await freezeMessageTarget(chat, messages.nth(index));
+      if (!message) continue;
       await centerLocatorInViewport(message);
-      if (!await message.isVisible({ timeout: 500 }).catch(() => false)) continue;
+      if (!await message.isVisible({ timeout: 500 }).catch(() => false)) {
+        await releaseMessageTarget(message);
+        continue;
+      }
       const authorName = await getMessageAuthorName(message);
-      if (!authorName) continue;
+      if (!authorName) {
+        await releaseMessageTarget(message);
+        continue;
+      }
 
       await message.hover({ timeout: 2_000 }).catch(() => undefined);
       const menuTargets = [
@@ -98,10 +107,33 @@ export async function openMessageMenu(chat: ChatSurface): Promise<OpenedMessageM
           await closeOpenMenus(chat);
         }
       }
+
+      await releaseMessageTarget(message);
     }
 
     throw new Error('Could not open a real YouTube message context menu from recent visible chat rows.');
   });
+}
+
+async function freezeMessageTarget(chat: ChatSurface, message: Locator): Promise<Locator | null> {
+  const targetId = `message-menu-${Date.now()}-${nextMessageTargetId++}`;
+  const didFreeze = await message.evaluate((element, { attribute, value }) => {
+    if (!(element instanceof HTMLElement) || !element.isConnected) return false;
+    element.setAttribute(attribute, value);
+    return true;
+  }, {
+    attribute: MESSAGE_TARGET_ATTRIBUTE,
+    value: targetId
+  }).catch(() => false);
+
+  if (!didFreeze) return null;
+  return chat.locator(`[${MESSAGE_TARGET_ATTRIBUTE}="${targetId}"]`).first();
+}
+
+async function releaseMessageTarget(message: Locator): Promise<void> {
+  await message.evaluate((element, attribute) => {
+    if (element instanceof HTMLElement) element.removeAttribute(attribute);
+  }, MESSAGE_TARGET_ATTRIBUTE).catch(() => undefined);
 }
 
 async function closeOpenMenus(chat: ChatSurface): Promise<void> {
