@@ -9,7 +9,7 @@ import type { RichTextSegment } from '../../youtube/rich-text';
 export interface InboxRecord {
   id: string;
   authorName: string;
-  contentParts?: RichTextSegment[];
+  contentParts: RichTextSegment[];
   matchedKeywords: string[];
   messageRef?: WeakRef<HTMLElement>;
   mention: boolean;

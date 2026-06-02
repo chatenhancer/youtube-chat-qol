@@ -17,10 +17,7 @@ describe('shared option helpers', () => {
       targetLanguage: 456,
       translationDisplay: 'sideways'
     })).toEqual({
-      ...DEFAULT_OPTIONS,
-      composerTranslateLanguage: '123',
-      lastTranslationTarget: '456',
-      targetLanguage: '456'
+      ...DEFAULT_OPTIONS
     });
   });
 

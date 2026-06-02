@@ -41,7 +41,7 @@ import {
   scheduleInboxButtonWire as scheduleInboxButtonWireInternal
 } from './button';
 import { createInboxRecord } from './records';
-import { getCurrentInboxSourceUrl } from './source-url';
+import { getCurrentYouTubeChatSourceUrl } from '../../youtube/source-url';
 import {
   addInboxKeywordsToState,
   clearInboxRecords,
@@ -281,7 +281,7 @@ function processPotentialKeywordInbox(message: HTMLElement): void {
 function recordInboxMatch(message: HTMLElement, match: InboxMatch): void {
   const record = createInboxRecord(message, match, {
     getMentionHandles: getMatchedMentionHandles,
-    sourceUrl: getCurrentInboxSourceUrl()
+    sourceUrl: getCurrentYouTubeChatSourceUrl()
   });
   if (!record) return;
 

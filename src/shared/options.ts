@@ -2,8 +2,8 @@
  * Shared extension option schema.
  *
  * Every UI surface reads and writes these same fields. normalizeOptions guards
- * against missing or malformed stored values so old or partial storage state
- * cannot break content-script startup.
+ * against missing or malformed stored values so storage state cannot break
+ * content-script startup.
  */
 export type TranslationDisplay = 'replace' | 'below';
 
@@ -34,9 +34,9 @@ export const TRANSLATION_DISPLAY_OPTIONS: readonly (readonly [TranslationDisplay
 
 export function normalizeOptions(value: Partial<Options> | Record<string, unknown>): Options {
   const candidate = value as Record<string, unknown>;
-  const composerTranslateLanguage = String(candidate.composerTranslateLanguage || '');
-  const targetLanguage = String(candidate.targetLanguage || '');
-  const lastTranslationTarget = String(candidate.lastTranslationTarget || targetLanguage || DEFAULT_TRANSLATION_TARGET);
+  const composerTranslateLanguage = getStringOption(candidate.composerTranslateLanguage);
+  const targetLanguage = getStringOption(candidate.targetLanguage);
+  const lastTranslationTarget = getStringOption(candidate.lastTranslationTarget) || targetLanguage || DEFAULT_TRANSLATION_TARGET;
   const translationDisplay = TRANSLATION_DISPLAY_OPTIONS.some(([mode]) => mode === candidate.translationDisplay)
     ? candidate.translationDisplay as TranslationDisplay
     : DEFAULT_OPTIONS.translationDisplay;
@@ -49,6 +49,10 @@ export function normalizeOptions(value: Partial<Options> | Record<string, unknow
     sound: candidate.sound !== false,
     startupEffect: candidate.startupEffect !== false
   };
+}
+
+function getStringOption(value: unknown): string {
+  return typeof value === 'string' ? value : '';
 }
 
 export function getTranslationToggleTarget(options: Pick<Options, 'lastTranslationTarget' | 'targetLanguage'>): string {

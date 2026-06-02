@@ -46,17 +46,17 @@ export function normalizeEmojiUsage(value: unknown): EmojiUsage[] {
   if (!Array.isArray(value)) return [];
 
   return value
-    .filter((item): item is Partial<EmojiUsage> => Boolean(item && typeof item.key === 'string' && item.key))
+    .filter(isStoredEmojiUsage)
     .map((item) => ({
-      key: String(item.key),
-      emojiId: String(item.emojiId || ''),
-      src: String(item.src || ''),
-      alt: String(item.alt || ''),
-      label: String(item.label || ''),
-      shortcut: String(item.shortcut || ''),
-      text: String(item.text || ''),
-      count: Math.max(0, Number(item.count) || 0),
-      lastUsed: Math.max(0, Number(item.lastUsed) || 0)
+      key: item.key,
+      emojiId: item.emojiId,
+      src: item.src,
+      alt: item.alt,
+      label: item.label,
+      shortcut: item.shortcut,
+      text: item.text,
+      count: item.count,
+      lastUsed: item.lastUsed
     }))
     .sort(compareEmojiUsage)
     .slice(0, MAX_EMOJI_USAGE_ENTRIES);
@@ -71,4 +71,23 @@ export function getTopEmojiUsage(usage: EmojiUsage[]): EmojiUsage[] {
 
 function compareEmojiUsage(a: EmojiUsage, b: EmojiUsage): number {
   return (b.count - a.count) || (b.lastUsed - a.lastUsed);
+}
+
+function isStoredEmojiUsage(value: unknown): value is EmojiUsage {
+  if (!value || typeof value !== 'object') return false;
+  const candidate = value as Partial<EmojiUsage>;
+  return typeof candidate.key === 'string' &&
+    Boolean(candidate.key) &&
+    typeof candidate.emojiId === 'string' &&
+    typeof candidate.src === 'string' &&
+    typeof candidate.alt === 'string' &&
+    typeof candidate.label === 'string' &&
+    typeof candidate.shortcut === 'string' &&
+    typeof candidate.text === 'string' &&
+    typeof candidate.count === 'number' &&
+    Number.isFinite(candidate.count) &&
+    candidate.count > 0 &&
+    typeof candidate.lastUsed === 'number' &&
+    Number.isFinite(candidate.lastUsed) &&
+    candidate.lastUsed > 0;
 }

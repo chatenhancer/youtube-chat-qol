@@ -1,7 +1,10 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { getCurrentInboxSourceUrl } from './source-url';
+import {
+  getCurrentYouTubeChatSourceUrl,
+  getYouTubeChatSourceStorageKey
+} from './source-url';
 
-describe('inbox source url scoping', () => {
+describe('YouTube chat source url helpers', () => {
   const originalReferrer = document.referrer;
 
   afterEach(() => {
@@ -15,7 +18,7 @@ describe('inbox source url scoping', () => {
   it('normalizes watch pages to the video id only', () => {
     window.history.replaceState({}, '', '/watch?v=stream-1&t=30s');
 
-    expect(getCurrentInboxSourceUrl()).toBe('https://www.youtube.com/watch?v=stream-1');
+    expect(getCurrentYouTubeChatSourceUrl()).toBe('https://www.youtube.com/watch?v=stream-1');
   });
 
   it('uses the watch-page referrer when running inside a live chat iframe', () => {
@@ -25,18 +28,22 @@ describe('inbox source url scoping', () => {
       value: 'https://www.youtube.com/watch?v=stream-from-referrer'
     });
 
-    expect(getCurrentInboxSourceUrl()).toBe('https://www.youtube.com/watch?v=stream-from-referrer');
+    expect(getCurrentYouTubeChatSourceUrl()).toBe('https://www.youtube.com/watch?v=stream-from-referrer');
   });
 
   it('falls back to a stable live-chat continuation url', () => {
     window.history.replaceState({}, '', '/live_chat_replay?continuation=chat-token&extra=ignored');
 
-    expect(getCurrentInboxSourceUrl()).toBe('http://localhost:3000/live_chat_replay?continuation=chat-token');
+    expect(getCurrentYouTubeChatSourceUrl()).toBe('http://localhost:3000/live_chat_replay?continuation=chat-token');
   });
 
   it('falls back to the page path when no stream identifier exists', () => {
     window.history.replaceState({}, '', '/channel/example?ignored=1');
 
-    expect(getCurrentInboxSourceUrl()).toBe('http://localhost:3000/channel/example');
+    expect(getCurrentYouTubeChatSourceUrl()).toBe('http://localhost:3000/channel/example');
+  });
+
+  it('creates stable per-video storage keys', () => {
+    expect(getYouTubeChatSourceStorageKey('https://www.youtube.com/watch?v=stream-1')).toBe('video:stream-1');
   });
 });

@@ -27,6 +27,11 @@ export type RichTextSegment =
       className: string;
     };
 
+export interface RichTextRenderOptions {
+  emojiClassName?: string;
+  includeEmojiIdAsElementId?: boolean;
+}
+
 export function appendRichMessageText(
   container: HTMLElement,
   text: string,
@@ -120,23 +125,31 @@ function getEmojiSegment(element: Element): RichTextSegment | null {
   };
 }
 
-function createRichTextSegmentNodes(segments: RichTextSegment[]): Node[] {
+export function createRichTextSegmentNodes(
+  segments: RichTextSegment[],
+  options: RichTextRenderOptions = {}
+): Node[] {
   return segments
-    .map(createRichTextSegmentNode)
+    .map((segment) => createRichTextSegmentNode(segment, options))
     .filter((node): node is Node => Boolean(node));
 }
 
-function createRichTextSegmentNode(segment: RichTextSegment): Node | null {
+function createRichTextSegmentNode(segment: RichTextSegment, options: RichTextRenderOptions): Node | null {
   if (segment.type === 'text') return document.createTextNode(segment.text);
   if (!segment.src || !segment.alt) return segment.alt ? document.createTextNode(segment.alt) : null;
 
   const image = document.createElement('img');
-  image.className = segment.className || 'emoji yt-formatted-string style-scope yt-live-chat-text-message-renderer';
+  image.className = segment.className ||
+    options.emojiClassName ||
+    'emoji yt-formatted-string style-scope yt-live-chat-text-message-renderer';
   image.src = segment.src;
   image.alt = segment.alt;
   image.loading = 'lazy';
 
-  if (segment.emojiId) image.setAttribute('data-emoji-id', segment.emojiId);
+  if (segment.emojiId) {
+    image.setAttribute('data-emoji-id', segment.emojiId);
+    if (options.includeEmojiIdAsElementId) image.id = segment.emojiId;
+  }
 
   return image;
 }

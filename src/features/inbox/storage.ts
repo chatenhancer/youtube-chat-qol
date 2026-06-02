@@ -28,7 +28,7 @@ export interface InboxStoredState {
   records: InboxRecord[];
 }
 
-export function loadInboxStoredState(getCurrentHandles: () => string[], sourceUrl: string): Promise<InboxStoredState> {
+export function loadInboxStoredState(sourceUrl: string): Promise<InboxStoredState> {
   const recordsStorageKey = getInboxRecordsStorageKey(sourceUrl);
 
   return new Promise((resolve) => {
@@ -39,7 +39,7 @@ export function loadInboxStoredState(getCurrentHandles: () => string[], sourceUr
       const storedState = stored || {};
       const storedRecords = storedState[recordsStorageKey];
       resolve({
-        records: normalizeStoredRecords(storedRecords, getCurrentHandles),
+        records: normalizeStoredRecords(storedRecords),
         keywords: normalizeStoredKeywords(storedState[INBOX_KEYWORDS_STORAGE_KEY])
       });
     });
@@ -67,7 +67,7 @@ export function serializeInboxRecord(record: InboxRecord): Omit<InboxRecord, 'me
   return {
     id: record.id,
     authorName: record.authorName,
-    contentParts: record.contentParts || [],
+    contentParts: record.contentParts,
     matchedKeywords: record.matchedKeywords,
     mention: record.mention,
     mentionHandles: record.mentionHandles,
@@ -95,43 +95,56 @@ export function getInboxTimestamp(message: HTMLElement, timestampText: string, f
   return parsedTimestamp + getMessageOrderOffset(message, parsedTimestamp);
 }
 
-function normalizeStoredRecords(value: unknown, getCurrentHandles: () => string[]): InboxRecord[] {
+function normalizeStoredRecords(value: unknown): InboxRecord[] {
   if (!Array.isArray(value)) return [];
 
   const normalizedRecords = value
-    .map((record) => normalizeStoredRecord(record, getCurrentHandles))
+    .map(normalizeStoredRecord)
     .filter((record): record is InboxRecord => Boolean(record));
 
   return sortAndTrimRecords(normalizedRecords);
 }
 
-function normalizeStoredRecord(value: unknown, getCurrentHandles: () => string[]): InboxRecord | null {
+function normalizeStoredRecord(value: unknown): InboxRecord | null {
   if (!value || typeof value !== 'object') return null;
   const candidate = value as Partial<InboxRecord>;
+  const id = cleanText(candidate.id);
   const authorName = cleanText(candidate.authorName);
   const text = cleanText(candidate.text);
-  const storedTimestamp = Number(candidate.timestamp);
-  if (!authorName || !text || !Number.isFinite(storedTimestamp)) return null;
-
-  const timestampText = cleanText(candidate.timestampText) || new Intl.DateTimeFormat(undefined, {
-    hour: 'numeric',
-    minute: '2-digit'
-  }).format(storedTimestamp);
+  const timestampText = cleanText(candidate.timestampText);
   const sourceUrl = cleanText(candidate.sourceUrl);
+  const storedTimestamp = Number(candidate.timestamp);
+  const contentParts = normalizeRichTextSegments(candidate.contentParts);
+  if (
+    !id ||
+    !authorName ||
+    !text ||
+    !timestampText ||
+    !sourceUrl ||
+    !Number.isFinite(storedTimestamp) ||
+    !Array.isArray(candidate.contentParts) ||
+    !contentParts.length ||
+    !Array.isArray(candidate.matchedKeywords) ||
+    !Array.isArray(candidate.mentionHandles) ||
+    typeof candidate.mention !== 'boolean' ||
+    typeof candidate.read !== 'boolean'
+  ) {
+    return null;
+  }
+
   const timestamp = getChatTimestampValue(timestampText, storedTimestamp, {
     preferElapsed: isLiveChatReplayUrl(sourceUrl)
   }) ?? storedTimestamp;
-  const mention = candidate.mention !== false;
 
   return {
-    id: cleanText(candidate.id) || `${timestamp}`,
+    id,
     authorName,
-    contentParts: normalizeRichTextSegments(candidate.contentParts),
+    contentParts,
     matchedKeywords: normalizeStoredKeywords(candidate.matchedKeywords),
-    mention,
-    mentionHandles: normalizeMentionHandles(candidate.mentionHandles, text, mention, getCurrentHandles),
+    mention: candidate.mention,
+    mentionHandles: normalizeMentionHandles(candidate.mentionHandles),
     messageId: cleanText(candidate.messageId),
-    read: candidate.read === true,
+    read: candidate.read,
     sourceUrl,
     text,
     timestamp,

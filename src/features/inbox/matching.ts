@@ -23,18 +23,10 @@ export function normalizeStoredKeywords(value: unknown): string[] {
     .slice(-MAX_INBOX_KEYWORDS);
 }
 
-export function normalizeMentionHandles(
-  value: unknown,
-  text: string,
-  mention: boolean,
-  getCurrentHandles: () => string[]
-): string[] {
-  if (Array.isArray(value)) {
-    const storedHandles = mergeStrings([], value.map((item) => cleanText(item)));
-    if (storedHandles.length) return storedHandles;
-  }
-
-  return mention ? getMatchedMentionHandles(text, getCurrentHandles()) : [];
+export function normalizeMentionHandles(value: unknown): string[] {
+  return Array.isArray(value)
+    ? mergeStrings([], value.map((item) => cleanText(item)))
+    : [];
 }
 
 export function getMatchedMentionHandles(text: string, candidates: string[]): string[] {

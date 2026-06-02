@@ -9,8 +9,7 @@ import { CHAT_INPUT_DRAFTS_STORAGE_KEY } from '../../../src/features/chat-drafts
 import {
   clearChatComposer,
   getChatComposerInput,
-  getChatComposerText,
-  setChatComposerText
+  getChatComposerText
 } from '../helpers/composer';
 import {
   getExtensionStorageValues,
@@ -18,7 +17,8 @@ import {
 } from '../helpers/extension-storage';
 import type { BrowserScenario, ChatSurface } from './types';
 
-const RECOVERED_DRAFT_TEXT = 'this draft should survive refresh';
+const RECOVERED_DRAFT_TEXT = 'this draft should survive refresh :draft-emoji:';
+const RECOVERED_DRAFT_EMOJI_ALT = ':draft-emoji:';
 
 export const chatDraftRecoveryScenario: BrowserScenario = async ({ chat, context }) => {
   const page = getReloadableStreamPage(chat, context);
@@ -26,7 +26,7 @@ export const chatDraftRecoveryScenario: BrowserScenario = async ({ chat, context
   await withExtensionStorageSnapshot(context, 'local', async () => {
     await test.step('Type an unsent chat draft', async () => {
       await clearChatComposer(chat);
-      await setChatComposerText(chat, RECOVERED_DRAFT_TEXT);
+      await setChatComposerRichDraft(chat);
     });
 
     await test.step('Wait for the draft to be stored locally', async () => {
@@ -49,6 +49,7 @@ export const chatDraftRecoveryScenario: BrowserScenario = async ({ chat, context
         message: 'Expected the unsent chat draft to be restored after refresh.',
         timeout: 10_000
       }).toBe(RECOVERED_DRAFT_TEXT);
+      await expect(getChatComposerInput(chat).locator(`img[alt="${RECOVERED_DRAFT_EMOJI_ALT}"]`)).toHaveCount(1);
     });
 
     await test.step('Clear restored draft', async () => {
@@ -56,6 +57,43 @@ export const chatDraftRecoveryScenario: BrowserScenario = async ({ chat, context
     });
   });
 };
+
+async function setChatComposerRichDraft(chat: ChatSurface): Promise<void> {
+  const input = getChatComposerInput(chat);
+  await input.waitFor({ state: 'visible', timeout: 10_000 });
+  await input.evaluate((element, emojiAlt) => {
+    element.focus();
+
+    if (element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement) {
+      element.value = `this draft should survive refresh ${emojiAlt}`;
+      element.setSelectionRange(element.value.length, element.value.length);
+    } else {
+      const emoji = document.createElement('img');
+      emoji.className = 'emoji yt-formatted-string style-scope yt-live-chat-text-input-field-renderer';
+      emoji.src = 'https://example.test/draft-emoji.png';
+      emoji.alt = emojiAlt;
+      emoji.id = 'draft-emoji-id';
+      emoji.setAttribute('data-emoji-id', 'draft-emoji-id');
+      emoji.setAttribute('shared-tooltip-text', emojiAlt);
+      element.replaceChildren(
+        document.createTextNode('this draft should survive refresh '),
+        emoji
+      );
+      const range = document.createRange();
+      range.selectNodeContents(element);
+      range.collapse(false);
+      const selection = window.getSelection();
+      selection?.removeAllRanges();
+      selection?.addRange(range);
+    }
+
+    element.dispatchEvent(new InputEvent('input', {
+      bubbles: true,
+      data: emojiAlt,
+      inputType: 'insertText'
+    }));
+  }, RECOVERED_DRAFT_EMOJI_ALT);
+}
 
 function isPageSurface(chat: ChatSurface): chat is Page {
   return 'reload' in chat;

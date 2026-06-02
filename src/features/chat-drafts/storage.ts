@@ -5,6 +5,12 @@
  * browser/profile and one YouTube stream, not a synchronized preference.
  */
 import { getYouTubeChatSourceStorageKey } from '../../youtube/source-url';
+import type { ChatInputSnapshot } from '../../youtube/chat-input';
+import {
+  normalizeRichTextSegments,
+  serializeRichMessageNodes,
+  type RichTextSegment
+} from '../../youtube/rich-text';
 
 export const CHAT_INPUT_DRAFTS_STORAGE_KEY = 'ytcqChatInputDrafts';
 
@@ -14,27 +20,36 @@ const MAX_DRAFT_TEXT_LENGTH = 2000;
 export interface ChatInputDraftRecord {
   sourceUrl: string;
   text: string;
+  contentParts: RichTextSegment[];
   updatedAt: number;
+}
+
+export interface ChatInputDraftContent {
+  text: string;
+  contentParts: RichTextSegment[];
 }
 
 type ChatInputDraftMap = Record<string, ChatInputDraftRecord>;
 
-export function loadChatInputDraft(sourceUrl: string): Promise<string> {
+export function loadChatInputDraft(sourceUrl: string): Promise<ChatInputDraftContent> {
   const draftKey = getChatInputDraftKey(sourceUrl);
 
-  return readStoredDrafts().then((drafts) => drafts[draftKey]?.text || '');
+  return readStoredDrafts().then((drafts) => {
+    const draft = drafts[draftKey];
+    return draft ? toDraftContent(draft) : emptyDraftContent();
+  });
 }
 
-export function saveChatInputDraft(sourceUrl: string, text: string): Promise<void> {
+export function saveChatInputDraft(sourceUrl: string, draft: ChatInputDraftContent): Promise<void> {
   const draftKey = getChatInputDraftKey(sourceUrl);
-  const nextText = normalizeDraftText(text);
+  const nextDraft = normalizeDraftContent(draft);
 
   return readStoredDrafts().then((drafts) => {
     const nextDrafts = { ...drafts };
-    if (nextText.trim()) {
+    if (nextDraft.text.trim()) {
       nextDrafts[draftKey] = {
         sourceUrl,
-        text: nextText,
+        ...nextDraft,
         updatedAt: Date.now()
       };
     } else {
@@ -42,6 +57,18 @@ export function saveChatInputDraft(sourceUrl: string, text: string): Promise<voi
     }
 
     return writeStoredDrafts(trimStoredDrafts(nextDrafts));
+  });
+}
+
+export function createChatInputDraftContent(snapshot: ChatInputSnapshot | null): ChatInputDraftContent {
+  if (!snapshot) return emptyDraftContent();
+
+  const contentParts = serializeRichMessageNodes(snapshot.childNodes);
+  return normalizeDraftContent({
+    text: snapshot.text,
+    contentParts: contentParts.length || !snapshot.text
+      ? contentParts
+      : [{ type: 'text', text: snapshot.text }]
   });
 }
 
@@ -79,12 +106,43 @@ function normalizeStoredDraft(value: unknown): ChatInputDraftRecord | null {
   const text = normalizeDraftText(candidate.text || '');
   const sourceUrl = String(candidate.sourceUrl || '');
   const updatedAt = Number(candidate.updatedAt);
-  if (!text.trim() || !sourceUrl || !Number.isFinite(updatedAt)) return null;
+  const contentParts = normalizeRichTextSegments(candidate.contentParts);
+  if (
+    !text.trim() ||
+    !sourceUrl ||
+    !Number.isFinite(updatedAt) ||
+    !Array.isArray(candidate.contentParts) ||
+    !contentParts.length
+  ) {
+    return null;
+  }
 
   return {
     sourceUrl,
     text,
+    contentParts,
     updatedAt
+  };
+}
+
+function normalizeDraftContent(value: ChatInputDraftContent): ChatInputDraftContent {
+  return {
+    text: normalizeDraftText(value.text || ''),
+    contentParts: normalizeRichTextSegments(value.contentParts)
+  };
+}
+
+function toDraftContent(record: ChatInputDraftRecord): ChatInputDraftContent {
+  return {
+    text: record.text,
+    contentParts: record.contentParts
+  };
+}
+
+function emptyDraftContent(): ChatInputDraftContent {
+  return {
+    text: '',
+    contentParts: []
   };
 }
 
