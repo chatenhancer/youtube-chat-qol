@@ -24,7 +24,7 @@ import {
   mergeInboxRecords,
   recordsEqual
 } from './records';
-import { getCurrentInboxSourceUrl } from './source-url';
+import { getCurrentYouTubeChatSourceUrl } from '../../youtube/source-url';
 import {
   loadInboxStoredState,
   saveInboxKeywords as saveInboxKeywordsToStorage,
@@ -53,7 +53,7 @@ export function loadInboxState(): Promise<void> {
   if (inboxStateLoaded) return Promise.resolve();
   if (inboxStateLoadPromise) return inboxStateLoadPromise;
 
-  inboxStateLoadPromise = loadInboxStoredState(getCurrentMentionCandidates, getCurrentInboxSourceUrl()).then((stored) => {
+  inboxStateLoadPromise = loadInboxStoredState(getCurrentYouTubeChatSourceUrl()).then((stored) => {
     records = stored.records;
     keywords = stored.keywords;
     refreshPreparedKeywords();
@@ -208,7 +208,7 @@ export function getLiveInboxMessage(record: InboxRecord): HTMLElement | null {
 
 export function saveInboxRecords(): Promise<void> {
   records = sortAndTrimRecords(records);
-  return saveInboxRecordsToStorage(records, getCurrentInboxSourceUrl());
+  return saveInboxRecordsToStorage(records, getCurrentYouTubeChatSourceUrl());
 }
 
 export function saveInboxKeywords(): Promise<void> {

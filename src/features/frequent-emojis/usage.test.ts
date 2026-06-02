@@ -12,7 +12,7 @@ describe('frequent emoji usage helpers', () => {
   });
 
   it('normalizes, sorts, and caps stored usage records', () => {
-    const records = Array.from({ length: 85 }, (_, index) => ({
+    const records = Array.from({ length: 85 }, (_, index) => emoji({
       key: `emoji-${index}`,
       count: index,
       lastUsed: 1000 - index
@@ -21,7 +21,7 @@ describe('frequent emoji usage helpers', () => {
     const normalized = normalizeEmojiUsage([
       null,
       { key: '', count: 100 },
-      { key: 'bad-count', count: -20, lastUsed: Number.NaN },
+      emoji({ key: 'bad-count', count: -20, lastUsed: Number.NaN }),
       ...records
     ]);
 

@@ -99,8 +99,8 @@ vi.mock('./records', () => ({
     ...(match as Partial<InboxRecord>)
   }))
 }));
-vi.mock('./source-url', () => ({
-  getCurrentInboxSourceUrl: vi.fn(() => 'https://www.youtube.com/watch?v=video')
+vi.mock('../../youtube/source-url', () => ({
+  getCurrentYouTubeChatSourceUrl: vi.fn(() => 'https://www.youtube.com/watch?v=video')
 }));
 
 import {

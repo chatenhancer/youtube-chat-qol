@@ -70,7 +70,7 @@ export function mergeInboxRecords(
 
   return {
     ...existing,
-    contentParts: existing.contentParts?.length ? existing.contentParts : incoming.contentParts,
+    contentParts: existing.contentParts.length ? existing.contentParts : incoming.contentParts,
     matchedKeywords: nextKeywords,
     messageRef: getLiveMessage(incoming) ? incoming.messageRef : existing.messageRef,
     mention: nextMention,

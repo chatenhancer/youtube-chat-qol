@@ -6,15 +6,23 @@
  * does not appear in another.
  */
 import { registerFeatureLifecycle } from '../../content/lifecycle';
-import { findChatInput, getChatInputText, replaceChatInput } from '../../youtube/chat-input';
+import {
+  findChatInput,
+  getChatInputSnapshot,
+  getChatInputText,
+  replaceChatInputSnapshot
+} from '../../youtube/chat-input';
+import { createRichTextSegmentNodes } from '../../youtube/rich-text';
 import { getCurrentYouTubeChatSourceUrl } from '../../youtube/source-url';
 import { SEND_BUTTON_SELECTOR } from '../../youtube/selectors';
 import {
+  createChatInputDraftContent,
   loadChatInputDraft,
   saveChatInputDraft
 } from './storage';
 
 const CHAT_INPUT_RENDERER_SELECTOR = 'yt-live-chat-message-input-renderer';
+const CHAT_INPUT_EMOJI_CLASS = 'emoji yt-formatted-string style-scope yt-live-chat-text-input-field-renderer';
 const DRAFT_SAVE_DEBOUNCE_MS = 250;
 const POST_SEND_SAVE_DELAY_MS = 500;
 const DRAFT_RESTORE_DELAYS_MS = [100, 300, 800, 1500, 3000, 5000];
@@ -87,11 +95,17 @@ export async function restoreChatInputDraft(sourceUrl = getCurrentYouTubeChatSou
 
   const draft = await loadChatInputDraft(sourceUrl);
   restoreFinished = true;
-  if (!draft.trim()) return false;
+  if (!draft.text.trim()) return false;
 
   replacingDraft = true;
   try {
-    return replaceChatInput(draft);
+    return replaceChatInputSnapshot({
+      childNodes: createRichTextSegmentNodes(draft.contentParts, {
+        emojiClassName: CHAT_INPUT_EMOJI_CLASS,
+        includeEmojiIdAsElementId: true
+      }),
+      text: draft.text
+    });
   } finally {
     window.setTimeout(() => {
       replacingDraft = false;
@@ -101,7 +115,7 @@ export async function restoreChatInputDraft(sourceUrl = getCurrentYouTubeChatSou
 
 export async function saveCurrentChatInputDraft(sourceUrl = getCurrentYouTubeChatSourceUrl()): Promise<void> {
   if (!sourceUrl) return;
-  await saveChatInputDraft(sourceUrl, getChatInputText());
+  await saveChatInputDraft(sourceUrl, createChatInputDraftContent(getChatInputSnapshot()));
 }
 
 function handleDocumentInput(event: Event): void {

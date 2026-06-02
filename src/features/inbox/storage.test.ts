@@ -17,10 +17,10 @@ describe('inbox storage', () => {
     const sourceB = 'https://www.youtube.com/watch?v=stream-b';
     await saveInboxRecords([createRecord({ id: 'a', sourceUrl: sourceA })], sourceA);
 
-    await expect(loadInboxStoredState(() => [], sourceA)).resolves.toMatchObject({
+    await expect(loadInboxStoredState(sourceA)).resolves.toMatchObject({
       records: [expect.objectContaining({ id: 'a', sourceUrl: sourceA })]
     });
-    await expect(loadInboxStoredState(() => [], sourceB)).resolves.toMatchObject({
+    await expect(loadInboxStoredState(sourceB)).resolves.toMatchObject({
       records: []
     });
   });
@@ -54,7 +54,7 @@ function createRecord(overrides: Partial<InboxRecord> = {}): InboxRecord {
   return {
     id: 'record',
     authorName: '@ExampleUser',
-    contentParts: [],
+    contentParts: [{ type: 'text', text: 'hello @currentuser' }],
     matchedKeywords: [],
     mention: true,
     mentionHandles: ['@currentuser'],
