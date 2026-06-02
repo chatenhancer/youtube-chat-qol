@@ -113,7 +113,7 @@
     "stepSettingsBodyBeforeIcon": "L’estensione funziona automaticamente nella live chat. Per le impostazioni complete, clicca l’icona delle estensioni nella barra del browser",
     "stepSettingsBodyMiddle": "e scegli",
     "stepSettingsBodyAfterIcon": "Chat Enhancer per vedere tutte le opzioni. Fissala se vuoi un accesso più rapido.",
-    "supportModalDetailFour": "Puoi anche scriverci a <a href=\"mailto:chatenhanceryt@gmail.com\">chatenhanceryt@gmail.com</a>."
+    "supportModalDetailFour": "Puoi anche scriverci a <a data-contact-email-address></a>."
   },
   "privacy": {
     "eyebrow": "Privacy",

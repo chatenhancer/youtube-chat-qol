@@ -113,7 +113,7 @@
     "stepSettingsBodyBeforeIcon": "Расширение автоматически работает в live chat. Для всех настроек нажмите значок расширений на панели браузера",
     "stepSettingsBodyMiddle": "и выберите",
     "stepSettingsBodyAfterIcon": "Chat Enhancer, чтобы увидеть все параметры. Закрепите его для более быстрого доступа.",
-    "supportModalDetailFour": "Вы также можете написать нам на <a href=\"mailto:chatenhanceryt@gmail.com\">chatenhanceryt@gmail.com</a>."
+    "supportModalDetailFour": "Вы также можете написать нам на <a data-contact-email-address></a>."
   },
   "privacy": {
     "eyebrow": "Конфиденциальность",

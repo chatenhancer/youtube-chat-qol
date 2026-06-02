@@ -113,7 +113,7 @@
     "stepSettingsBodyBeforeIcon": "拡張機能はライブチャット内で自動的に動作します。すべての設定を開くには、ブラウザのツールバーにある拡張機能アイコンをクリックし",
     "stepSettingsBodyMiddle": "次に",
     "stepSettingsBodyAfterIcon": "Chat Enhancerを選んですべてのオプションを表示します。すばやく開きたい場合はピン留めしてください。",
-    "supportModalDetailFour": "メールでも <a href=\"mailto:chatenhanceryt@gmail.com\">chatenhanceryt@gmail.com</a> に連絡できます。"
+    "supportModalDetailFour": "メールでも <a data-contact-email-address></a> に連絡できます。"
   },
   "privacy": {
     "eyebrow": "プライバシー",

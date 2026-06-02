@@ -113,7 +113,7 @@
     "stepSettingsBodyBeforeIcon": "Uzantı canlı sohbette otomatik çalışır. Tüm ayarlar için tarayıcı araç çubuğundaki uzantılar simgesine tıklayın",
     "stepSettingsBodyMiddle": "ve seçin",
     "stepSettingsBodyAfterIcon": "Tüm seçenekleri görmek için Chat Enhancer. Daha hızlı erişim için sabitleyin.",
-    "supportModalDetailFour": "Bize şu adresten de e-posta gönderebilirsin: <a href=\"mailto:chatenhanceryt@gmail.com\">chatenhanceryt@gmail.com</a>."
+    "supportModalDetailFour": "Bize şu adresten de e-posta gönderebilirsin: <a data-contact-email-address></a>."
   },
   "privacy": {
     "eyebrow": "Gizlilik",

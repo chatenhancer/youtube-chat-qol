@@ -113,7 +113,7 @@
     "stepSettingsBodyBeforeIcon": "تعمل الإضافة تلقائيًا في الدردشة المباشرة. للوصول إلى الإعدادات الكاملة، انقر رمز الإضافات في شريط أدوات المتصفح",
     "stepSettingsBodyMiddle": "واختر",
     "stepSettingsBodyAfterIcon": "Chat Enhancer لعرض كل الخيارات. يمكنك تثبيتها للوصول إليها بسرعة أكبر.",
-    "supportModalDetailFour": "يمكنك أيضًا مراسلتنا على <a href=\"mailto:chatenhanceryt@gmail.com\">chatenhanceryt@gmail.com</a>."
+    "supportModalDetailFour": "يمكنك أيضًا مراسلتنا على <a data-contact-email-address></a>."
   },
   "privacy": {
     "eyebrow": "الخصوصية",

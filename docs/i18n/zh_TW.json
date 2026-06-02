@@ -113,7 +113,7 @@
     "stepSettingsBodyBeforeIcon": "擴充功能會在直播聊天室自動運作。若要完整設定，請點擊瀏覽器工具列的擴充功能圖示",
     "stepSettingsBodyMiddle": "並選擇",
     "stepSettingsBodyAfterIcon": "Chat Enhancer 以查看所有選項。需要快速存取可釘選。",
-    "supportModalDetailFour": "你也可以寄信到 <a href=\"mailto:chatenhanceryt@gmail.com\">chatenhanceryt@gmail.com</a>。"
+    "supportModalDetailFour": "你也可以寄信到 <a data-contact-email-address></a>。"
   },
   "privacy": {
     "eyebrow": "隱私",

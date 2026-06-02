@@ -113,7 +113,7 @@
     "stepSettingsBodyBeforeIcon": "A extensão funciona automaticamente no chat ao vivo. Para ver todas as configurações, clique no ícone de extensões na barra do navegador",
     "stepSettingsBodyMiddle": "e escolha",
     "stepSettingsBodyAfterIcon": "Chat Enhancer para mostrar todas as opções. Fixe se quiser acesso mais rápido.",
-    "supportModalDetailFour": "Você também pode enviar email para <a href=\"mailto:chatenhanceryt@gmail.com\">chatenhanceryt@gmail.com</a>."
+    "supportModalDetailFour": "Você também pode enviar email para <a data-contact-email-address></a>."
   },
   "privacy": {
     "eyebrow": "Privacidade",

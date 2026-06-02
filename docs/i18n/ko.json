@@ -113,7 +113,7 @@
     "stepSettingsBodyBeforeIcon": "확장 프로그램은 라이브 채팅에서 자동으로 작동합니다. 전체 설정을 보려면 브라우저 도구 모음의 확장 프로그램 아이콘을 클릭하고",
     "stepSettingsBodyMiddle": "다음에서",
     "stepSettingsBodyAfterIcon": "Chat Enhancer를 선택해 모든 옵션을 표시하세요. 더 빠르게 접근하려면 고정하세요.",
-    "supportModalDetailFour": "이메일로도 <a href=\"mailto:chatenhanceryt@gmail.com\">chatenhanceryt@gmail.com</a>에 문의할 수 있습니다."
+    "supportModalDetailFour": "이메일로도 <a data-contact-email-address></a>에 문의할 수 있습니다."
   },
   "privacy": {
     "eyebrow": "개인정보",

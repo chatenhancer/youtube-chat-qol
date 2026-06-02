@@ -113,7 +113,7 @@
     "stepSettingsBodyBeforeIcon": "افزونه به‌طور خودکار در چت زنده کار می‌کند. برای تنظیمات کامل، روی آیکون افزونه‌ها در نوار ابزار مرورگر کلیک کنید",
     "stepSettingsBodyMiddle": "و انتخاب کنید",
     "stepSettingsBodyAfterIcon": "Chat Enhancer تا همه گزینه‌ها نمایش داده شوند. برای دسترسی سریع‌تر آن را سنجاق کنید.",
-    "supportModalDetailFour": "همچنین می‌توانید به <a href=\"mailto:chatenhanceryt@gmail.com\">chatenhanceryt@gmail.com</a> ایمیل بزنید."
+    "supportModalDetailFour": "همچنین می‌توانید به <a data-contact-email-address></a> ایمیل بزنید."
   },
   "privacy": {
     "eyebrow": "حریم خصوصی",

@@ -9,10 +9,12 @@ import { LANGUAGE_OPTIONS } from '../shared/languages';
 import { playSoftChime } from '../shared/sounds/soft-chime';
 import { getFreshKnownChatTabIds, KNOWN_CHAT_TABS_STORAGE_KEY } from '../shared/known-chat-tabs';
 import { DEFAULT_OPTIONS, getTargetLanguageUpdate, normalizeOptions, type Options } from '../shared/options';
+import contact from '../shared/contact.json';
 
 const LANDING_PAGE_URL = 'https://chatenhancer.com';
 const SOURCE_CODE_URL = 'https://www.chatenhancer.com/source';
 const SUPPORT_URL = 'https://www.chatenhancer.com/support';
+const SUPPORT_EMAIL = contact.supportEmail;
 const BELL_RING_CLASS = 'ytcq-bell-ringing';
 const TRANSLATION_PULSE_CLASS = 'ytcq-translation-pulse';
 const DISPLAY_REFLOW_CLASS = 'ytcq-display-reflow';
@@ -66,7 +68,7 @@ function init(): void {
   });
   controls.supportLink?.addEventListener('click', (event) => {
     event.preventDefault();
-    const confirmed = window.confirm(getExtensionMessage('supportIssueTrackerPrompt'));
+    const confirmed = window.confirm(getExtensionMessage('supportIssueTrackerPrompt', SUPPORT_EMAIL));
     if (!confirmed) return;
     chrome.tabs.create({ url: SUPPORT_URL });
   });

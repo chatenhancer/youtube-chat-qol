@@ -113,7 +113,7 @@
     "stepSettingsBodyBeforeIcon": "L’extension fonctionne automatiquement dans le chat en direct. Pour accéder à tous les réglages, cliquez sur l’icône des extensions dans la barre d’outils du navigateur",
     "stepSettingsBodyMiddle": "puis choisissez",
     "stepSettingsBodyAfterIcon": "Chat Enhancer pour afficher toutes les options. Épinglez-la si vous voulez un accès plus rapide.",
-    "supportModalDetailFour": "Vous pouvez aussi nous écrire à <a href=\"mailto:chatenhanceryt@gmail.com\">chatenhanceryt@gmail.com</a>."
+    "supportModalDetailFour": "Vous pouvez aussi nous écrire à <a data-contact-email-address></a>."
   },
   "privacy": {
     "eyebrow": "Confidentialité",

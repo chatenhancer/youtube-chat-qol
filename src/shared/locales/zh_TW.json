@@ -189,7 +189,7 @@
       "message": "支援與回饋"
     },
     "supportIssueTrackerPrompt": {
-      "message": "你將被重新導向到我們的公開問題追蹤器，用於錯誤回報和功能請求。可能需要帳號。\n\n你也可以寄信到 chatenhanceryt@gmail.com。\n\n繼續前往問題追蹤器？"
+      "message": "你將被重新導向到我們的公開問題追蹤器，用於錯誤回報和功能請求。可能需要帳號。\n\n你也可以寄信到 {supportEmail}。\n\n繼續前往問題追蹤器？"
     },
     "resetAllExtensionData": {
       "message": "重設所有擴充功能設定與本機資料"

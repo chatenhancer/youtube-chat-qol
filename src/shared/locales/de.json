@@ -189,7 +189,7 @@
       "message": "Support und Feedback"
     },
     "supportIssueTrackerPrompt": {
-      "message": "Du wirst zu unserem öffentlichen Issue-Tracker weitergeleitet, um Fehler zu melden oder Funktionen vorzuschlagen. Ein Konto kann erforderlich sein.\n\nDu kannst uns auch per E-Mail erreichen unter chatenhanceryt@gmail.com.\n\nZum Issue-Tracker fortfahren?"
+      "message": "Du wirst zu unserem öffentlichen Issue-Tracker weitergeleitet, um Fehler zu melden oder Funktionen vorzuschlagen. Ein Konto kann erforderlich sein.\n\nDu kannst uns auch per E-Mail erreichen unter {supportEmail}.\n\nZum Issue-Tracker fortfahren?"
     },
     "resetAllExtensionData": {
       "message": "Alle Erweiterungseinstellungen und lokalen Daten zurücksetzen"

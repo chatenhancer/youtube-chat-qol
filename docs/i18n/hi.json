@@ -113,7 +113,7 @@
     "stepSettingsBodyBeforeIcon": "एक्सटेंशन लाइव चैट में अपने आप काम करता है। पूरी सेटिंग्स के लिए, ब्राउजर टूलबार में एक्सटेंशन आइकन पर क्लिक करें",
     "stepSettingsBodyMiddle": "और चुनें",
     "stepSettingsBodyAfterIcon": "सभी विकल्प देखने के लिए Chat Enhancer। तेज पहुंच के लिए इसे पिन कर सकते हैं।",
-    "supportModalDetailFour": "आप हमें <a href=\"mailto:chatenhanceryt@gmail.com\">chatenhanceryt@gmail.com</a> पर ईमेल भी कर सकते हैं।"
+    "supportModalDetailFour": "आप हमें <a data-contact-email-address></a> पर ईमेल भी कर सकते हैं।"
   },
   "privacy": {
     "eyebrow": "गोपनीयता",
