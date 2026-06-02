@@ -49,6 +49,13 @@ export async function getExtensionStorageValues(
   return (await readExtensionStorageSnapshot(context, area, keys)).values;
 }
 
+export async function clearExtensionStorageArea(
+  context: BrowserContext,
+  area: StorageArea
+): Promise<void> {
+  await replaceExtensionStorageValues(context, area, {});
+}
+
 async function readExtensionStorageSnapshot(
   context: BrowserContext,
   area: StorageArea,

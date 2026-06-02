@@ -22,6 +22,7 @@ import {
 import { clearChatComposerIfVisible } from './composer';
 import { dumpDomOnFailure } from './dom-dump';
 import { getInstalledProfileExtensionId } from './extension';
+import { clearExtensionStorageArea } from './extension-storage';
 import {
   createLiveChatFixtureHtml,
   fixtureLoggedOutLiveChatUrl,
@@ -241,9 +242,16 @@ export function skipIfLoggedInYouTubeUnavailable(
 }
 
 async function openMockChatPage(page: Page, url: string): Promise<void> {
+  await page.goto('about:blank', { timeout: 15_000, waitUntil: 'commit' });
+  await clearMockScenarioStorage(page.context());
   await page.goto(url, { timeout: 15_000, waitUntil: 'commit' });
   await expect(page.locator('yt-live-chat-renderer')).toBeVisible({ timeout: 15_000 });
   await expect(page.locator('.ytcq-inbox-button')).toBeVisible({ timeout: 15_000 });
+}
+
+async function clearMockScenarioStorage(context: BrowserContext): Promise<void> {
+  await clearExtensionStorageArea(context, 'local');
+  await clearExtensionStorageArea(context, 'sync');
 }
 
 function getDisposableWorkerProfileDir(prefix: string, workerInfo: {
