@@ -30,9 +30,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-playwright-
       - name: Install Playwright Chromium
-        run: npm run test:browser:install
+        run: npm run ci:install-playwright
       - name: Verify project
-        run: npm run verify
+        run: npm run ci:verify
       - name: Write test summary
         if: always()
         run: npm run ci:test-summary
