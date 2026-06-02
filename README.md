@@ -34,6 +34,7 @@ Not affiliated with YouTube or Google.
 - Click an author name to mention them.
 - Alt/Option-click an author name to quote their message.
 - Use Focus mode to keep one conversation visible while you reply.
+- Recover unsent drafts after refreshing the same stream.
 - Click an avatar to see that user's recent messages and open their channel.
 
 ### <img src="assets/readme-icons/inbox.svg" alt="" width="20" height="20" align="absmiddle"> &nbsp;Inbox
@@ -142,7 +143,7 @@ The `Chat Enhancer for YouTube` name, logo, and store listing assets are not lic
 ## Project layout
 
 - `src/content/` wires features into YouTube live chat.
-- `src/features/` contains chat actions, commands, translation, emoji, focus mode, profile cards, inbox, and sound features.
+- `src/features/` contains chat actions, drafts, commands, translation, emoji, focus mode, profile cards, inbox, and sound features.
 - `src/youtube/` contains YouTube DOM adapters and selectors.
 - `src/shared/` contains shared options, language data, state, and helpers.
 - `src/background/` contains the translation bridge, toolbar status, and active-chat keepalive service worker modules.

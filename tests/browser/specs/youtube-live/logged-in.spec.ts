@@ -11,6 +11,7 @@ import {
   chatCommandAutocompleteScenario,
   chatCommandsSmokeScenario
 } from '../../scenarios/chat-commands';
+import { chatDraftRecoveryScenario } from '../../scenarios/chat-drafts';
 import {
   composerTranslationScenario,
   realComposerTranslationScenario
@@ -37,6 +38,7 @@ test('logged-in live: inbox opens from the chat header', inboxScenario);
 test('logged-in live: profile card opens from a chat avatar', profileScenario);
 test('logged-in live: composer translation controls open', composerTranslationScenario);
 test('logged-in live: composer translation translates draft text with real Google Translate', realComposerTranslationScenario);
+test('logged-in live: unsent chat draft is restored after refresh', chatDraftRecoveryScenario);
 test('logged-in live: frequent emojis are tracked and rendered', frequentEmojiSmokeScenario);
 test('logged-in live: chat commands expand in the composer', chatCommandsSmokeScenario);
 test('logged-in live: chat command autocomplete suggests names and arguments', chatCommandAutocompleteScenario);
