@@ -113,7 +113,7 @@
     "stepSettingsBodyBeforeIcon": "Розширення автоматично працює в живому чаті. Для повних налаштувань натисніть іконку розширень на панелі браузера",
     "stepSettingsBodyMiddle": "і виберіть",
     "stepSettingsBodyAfterIcon": "Chat Enhancer, щоб побачити всі параметри. Закріпіть його для швидшого доступу.",
-    "supportModalDetailFour": "Ви також можете написати нам на <a href=\"mailto:chatenhanceryt@gmail.com\">chatenhanceryt@gmail.com</a>."
+    "supportModalDetailFour": "Ви також можете написати нам на <a data-contact-email-address></a>."
   },
   "privacy": {
     "eyebrow": "Приватність",

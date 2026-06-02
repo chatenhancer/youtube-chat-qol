@@ -192,7 +192,7 @@
       "message": "Dukungan dan masukan"
     },
     "supportIssueTrackerPrompt": {
-      "message": "Anda akan diarahkan ke pelacak isu publik kami untuk laporan bug dan permintaan fitur. Akun mungkin diperlukan.\n\nAnda juga bisa mengirim email ke chatenhanceryt@gmail.com.\n\nLanjut ke pelacak isu?"
+      "message": "Anda akan diarahkan ke pelacak isu publik kami untuk laporan bug dan permintaan fitur. Akun mungkin diperlukan.\n\nAnda juga bisa mengirim email ke {supportEmail}.\n\nLanjut ke pelacak isu?"
     },
     "resetAllExtensionData": {
       "message": "Reset semua pengaturan ekstensi dan data lokal"

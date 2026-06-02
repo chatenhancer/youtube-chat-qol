@@ -113,7 +113,7 @@
     "stepSettingsBodyBeforeIcon": "Ekstensi bekerja otomatis di live chat. Untuk pengaturan lengkap, klik ikon ekstensi di toolbar browser",
     "stepSettingsBodyMiddle": "lalu pilih",
     "stepSettingsBodyAfterIcon": "Chat Enhancer untuk melihat semua opsi. Sematkan jika ingin akses lebih cepat.",
-    "supportModalDetailFour": "Anda juga bisa mengirim email ke <a href=\"mailto:chatenhanceryt@gmail.com\">chatenhanceryt@gmail.com</a>."
+    "supportModalDetailFour": "Anda juga bisa mengirim email ke <a data-contact-email-address></a>."
   },
   "privacy": {
     "eyebrow": "Privasi",

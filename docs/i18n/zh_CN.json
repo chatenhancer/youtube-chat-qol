@@ -113,7 +113,7 @@
     "stepSettingsBodyBeforeIcon": "扩展会在实时聊天中自动运行。要查看完整设置，请点击浏览器工具栏中的扩展图标",
     "stepSettingsBodyMiddle": "然后选择",
     "stepSettingsBodyAfterIcon": "Chat Enhancer 以显示所有选项。如果想更快访问，可以将它固定。",
-    "supportModalDetailFour": "你也可以发送邮件至 <a href=\"mailto:chatenhanceryt@gmail.com\">chatenhanceryt@gmail.com</a>。"
+    "supportModalDetailFour": "你也可以发送邮件至 <a data-contact-email-address></a>。"
   },
   "privacy": {
     "eyebrow": "隐私",

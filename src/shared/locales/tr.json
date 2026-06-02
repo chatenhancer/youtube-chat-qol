@@ -192,7 +192,7 @@
       "message": "Destek ve geri bildirim"
     },
     "supportIssueTrackerPrompt": {
-      "message": "Hata bildirimleri ve özellik istekleri için herkese açık sorun takipçimize yönlendirileceksin. Hesap gerekebilir.\n\nBize şu adresten de e-posta gönderebilirsin: chatenhanceryt@gmail.com.\n\nSorun takipçisine devam edilsin mi?"
+      "message": "Hata bildirimleri ve özellik istekleri için herkese açık sorun takipçimize yönlendirileceksin. Hesap gerekebilir.\n\nBize şu adresten de e-posta gönderebilirsin: {supportEmail}.\n\nSorun takipçisine devam edilsin mi?"
     },
     "resetAllExtensionData": {
       "message": "Tüm uzantı ayarlarını ve yerel verileri sıfırla"

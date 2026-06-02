@@ -192,7 +192,7 @@
       "message": "सपोर्ट और फ़ीडबैक"
     },
     "supportIssueTrackerPrompt": {
-      "message": "Bug reports और feature requests के लिए आपको हमारे public issue tracker पर भेजा जाएगा। खाते की ज़रूरत हो सकती है।\n\nआप हमें chatenhanceryt@gmail.com पर ईमेल भी कर सकते हैं।\n\nIssue tracker पर जाएँ?"
+      "message": "Bug reports और feature requests के लिए आपको हमारे public issue tracker पर भेजा जाएगा। खाते की ज़रूरत हो सकती है।\n\nआप हमें {supportEmail} पर ईमेल भी कर सकते हैं।\n\nIssue tracker पर जाएँ?"
     },
     "resetAllExtensionData": {
       "message": "सभी एक्सटेंशन सेटिंग और लोकल डेटा रीसेट करें"

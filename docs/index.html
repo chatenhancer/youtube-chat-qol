@@ -494,7 +494,7 @@
             </a>
             <p class="install-contact">
               <span data-i18n="install.privateQuestions">You can also email us at</span>
-              <a href="mailto:chatenhanceryt@gmail.com">chatenhanceryt@gmail.com</a>
+              <a data-contact-email-address></a>
             </p>
           </div>
           <div class="install-quickstart" aria-labelledby="install-quickstart-title">
@@ -800,7 +800,7 @@
           <li data-i18n="install.supportModalDetailOne">Posting or commenting on GitHub may require a GitHub account.</li>
           <li data-i18n="install.supportModalDetailTwo">Click the New issue button on GitHub to start a report or request.</li>
           <li data-i18n="install.supportModalDetailThree">The issue forms will ask for the details needed for each kind of report.</li>
-          <li data-i18n-html="install.supportModalDetailFour">You can also email us at <a href="mailto:chatenhanceryt@gmail.com">chatenhanceryt@gmail.com</a>.</li>
+          <li data-i18n-html="install.supportModalDetailFour">You can also email us at <a data-contact-email-address></a>.</li>
         </ul>
         <div class="support-modal-actions">
           <button class="button button-link" type="button" data-support-modal-close data-i18n="install.supportModalCancel">Cancel</button>
@@ -813,9 +813,10 @@
       <p data-i18n="footer.disclaimer">Chat Enhancer for YouTube is not affiliated with YouTube or Google.</p>
       <a href="https://www.chatenhancer.com/privacy" data-i18n="footer.privacy">Privacy</a>
       <a href="https://www.chatenhancer.com/support" data-i18n="footer.support">Support</a>
-      <a href="mailto:chatenhanceryt@gmail.com" data-i18n="footer.email">Email</a>
+      <a data-contact-email-link data-i18n="footer.email">Email</a>
       <a href="https://www.chatenhancer.com/license" data-i18n="footer.license">License</a>
     </footer>
+    <script src="assets/contact.js"></script>
     <script>
       (() => {
         const installActions = document.querySelector("[data-install-actions]");
@@ -827,6 +828,7 @@
         const supportModalContinue = document.querySelector("[data-support-modal-continue]");
 
         setupTopHeaderState();
+        setupContactEmailLinks();
 
         if (languageSwitcher) {
           const path = window.location.pathname;
@@ -943,6 +945,21 @@
           window.addEventListener("scroll", schedule, { passive: true });
           window.addEventListener("resize", schedule);
           update();
+        }
+
+        function setupContactEmailLinks() {
+          const supportEmail = window.YTCQ_CONTACT?.supportEmail;
+          if (typeof supportEmail !== "string" || !supportEmail.trim()) return;
+
+          const email = supportEmail.trim();
+          const href = `mailto:${email}`;
+          document.querySelectorAll("[data-contact-email-address]").forEach((link) => {
+            link.textContent = email;
+            link.setAttribute("href", href);
+          });
+          document.querySelectorAll("[data-contact-email-link]").forEach((link) => {
+            link.setAttribute("href", href);
+          });
         }
 
         function formatStoreList(stores, conjunction) {

@@ -113,7 +113,7 @@
     "stepSettingsBodyBeforeIcon": "Tiện ích hoạt động tự động trong live chat. Để mở toàn bộ cài đặt, click biểu tượng tiện ích trên thanh công cụ trình duyệt",
     "stepSettingsBodyMiddle": "và chọn",
     "stepSettingsBodyAfterIcon": "Chat Enhancer để xem mọi tùy chọn. Ghim lại nếu muốn truy cập nhanh hơn.",
-    "supportModalDetailFour": "Bạn cũng có thể email cho chúng tôi tại <a href=\"mailto:chatenhanceryt@gmail.com\">chatenhanceryt@gmail.com</a>."
+    "supportModalDetailFour": "Bạn cũng có thể email cho chúng tôi tại <a data-contact-email-address></a>."
   },
   "privacy": {
     "eyebrow": "Quyền riêng tư",

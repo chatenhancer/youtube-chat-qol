@@ -65,4 +65,4 @@ The extension does not store recent profile messages or translation results afte
 
 Chat Enhancer for YouTube is not affiliated with YouTube or Google.
 
-For privacy questions, email chatenhanceryt@gmail.com.
+For privacy questions, use the email link on https://www.chatenhancer.com.

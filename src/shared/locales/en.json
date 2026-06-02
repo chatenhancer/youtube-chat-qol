@@ -192,7 +192,7 @@
       "message": "Support and feedback"
     },
     "supportIssueTrackerPrompt": {
-      "message": "You will be redirected to our public issue tracker for bug reports and feature requests. An account may be required.\n\nYou can also email us at chatenhanceryt@gmail.com.\n\nContinue to the issue tracker?"
+      "message": "You will be redirected to our public issue tracker for bug reports and feature requests. An account may be required.\n\nYou can also email us at {supportEmail}.\n\nContinue to the issue tracker?"
     },
     "resetAllExtensionData": {
       "message": "Reset all extension settings and local data"

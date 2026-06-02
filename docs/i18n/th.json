@@ -113,7 +113,7 @@
     "stepSettingsBodyBeforeIcon": "ส่วนขยายทำงานอัตโนมัติใน live chat หากต้องการตั้งค่าเต็ม ให้คลิกไอคอนส่วนขยายบนแถบเครื่องมือเบราว์เซอร์",
     "stepSettingsBodyMiddle": "แล้วเลือก",
     "stepSettingsBodyAfterIcon": "Chat Enhancer เพื่อดูตัวเลือกทั้งหมด ปักหมุดไว้ถ้าต้องการเข้าถึงเร็วขึ้น",
-    "supportModalDetailFour": "คุณสามารถส่งอีเมลหาเราได้ที่ <a href=\"mailto:chatenhanceryt@gmail.com\">chatenhanceryt@gmail.com</a>."
+    "supportModalDetailFour": "คุณสามารถส่งอีเมลหาเราได้ที่ <a data-contact-email-address></a>."
   },
   "privacy": {
     "eyebrow": "ความเป็นส่วนตัว",

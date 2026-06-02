@@ -1,6 +1,7 @@
 import { mkdir, readFile, readdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import contact from '../src/shared/contact.json' with { type: 'json' };
 import { validateDocsLocales } from './validate-docs-locales.mjs';
 
 const SITE_URL = 'https://chatenhancer.com';
@@ -10,6 +11,7 @@ const docsDir = path.join(rootDir, 'docs');
 const i18nDir = path.join(docsDir, 'i18n');
 const templatePath = path.join(docsDir, 'index.html');
 const sitemapPath = path.join(docsDir, 'sitemap.xml');
+const contactScriptPath = path.join(docsDir, 'assets', 'contact.js');
 const generatedComment = createGeneratedComment();
 
 const localeMeta = {
@@ -38,10 +40,12 @@ const localeMeta = {
 };
 
 await validateDocsLocales();
+await writeContactScript();
 
-const template = await readFile(templatePath, 'utf8');
+let template = await readFile(templatePath, 'utf8');
 if (process.env.YTCQ_DOCS_STAMP_SOURCE === '1') {
-  await writeFile(templatePath, addGeneratedHtmlComment(template));
+  template = addGeneratedHtmlComment(template);
+  await writeFile(templatePath, template);
 }
 
 const localeFiles = (await readdir(i18nDir))
@@ -274,4 +278,11 @@ function escapeXmlAttribute(value) {
 
 function escapeRegExp(value) {
   return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+async function writeContactScript() {
+  await writeFile(
+    contactScriptPath,
+    `window.YTCQ_CONTACT=${JSON.stringify({ supportEmail: contact.supportEmail })};\n`
+  );
 }

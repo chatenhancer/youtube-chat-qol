@@ -113,7 +113,7 @@
     "stepSettingsBodyBeforeIcon": "Rozszerzenie działa automatycznie w czacie na żywo. Aby zobaczyć pełne ustawienia, kliknij ikonę rozszerzeń na pasku przeglądarki",
     "stepSettingsBodyMiddle": "i wybierz",
     "stepSettingsBodyAfterIcon": "Chat Enhancer, aby zobaczyć wszystkie opcje. Przypnij je, jeśli chcesz szybszego dostępu.",
-    "supportModalDetailFour": "Można też napisać do nas na <a href=\"mailto:chatenhanceryt@gmail.com\">chatenhanceryt@gmail.com</a>."
+    "supportModalDetailFour": "Można też napisać do nas na <a data-contact-email-address></a>."
   },
   "privacy": {
     "eyebrow": "Prywatność",

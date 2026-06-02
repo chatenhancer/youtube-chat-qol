@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import contact from '../shared/contact.json';
 
 describe('popup', () => {
   beforeEach(async () => {
@@ -246,7 +247,7 @@ describe('popup', () => {
     await import('./index');
     document.querySelector<HTMLAnchorElement>('#supportLink')?.click();
 
-    expect(window.confirm).toHaveBeenCalledWith('supportIssueTrackerPrompt');
+    expect(window.confirm).toHaveBeenCalledWith(`supportIssueTrackerPrompt:${contact.supportEmail}`);
     expect(chrome.tabs.create).toHaveBeenCalledWith({ url: 'https://www.chatenhancer.com/support' });
   });
 

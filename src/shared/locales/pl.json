@@ -189,7 +189,7 @@
       "message": "Pomoc i opinie"
     },
     "supportIssueTrackerPrompt": {
-      "message": "Nastąpi przekierowanie do naszego publicznego trackera zgłoszeń dla błędów i próśb o funkcje. Konto może być wymagane.\n\nMożna też napisać do nas na chatenhanceryt@gmail.com.\n\nPrzejść do trackera zgłoszeń?"
+      "message": "Nastąpi przekierowanie do naszego publicznego trackera zgłoszeń dla błędów i próśb o funkcje. Konto może być wymagane.\n\nMożna też napisać do nas na {supportEmail}.\n\nPrzejść do trackera zgłoszeń?"
     },
     "resetAllExtensionData": {
       "message": "Zresetuj wszystkie ustawienia rozszerzenia i dane lokalne"

@@ -113,7 +113,7 @@
     "stepSettingsBodyBeforeIcon": "התוסף עובד אוטומטית בצ׳אט חי. לכל ההגדרות, לחצו על אייקון התוספים בסרגל הדפדפן",
     "stepSettingsBodyMiddle": "ובחרו",
     "stepSettingsBodyAfterIcon": "Chat Enhancer כדי להציג את כל האפשרויות. נעצו אותו לגישה מהירה.",
-    "supportModalDetailFour": "אפשר גם לשלוח לנו אימייל אל <a href=\"mailto:chatenhanceryt@gmail.com\">chatenhanceryt@gmail.com</a>."
+    "supportModalDetailFour": "אפשר גם לשלוח לנו אימייל אל <a data-contact-email-address></a>."
   },
   "privacy": {
     "eyebrow": "פרטיות",
