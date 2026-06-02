@@ -1,6 +1,6 @@
 {
   "meta": {
-    "title": "Chat Enhancer for YouTube - YouTube Live Chat Tools",
+    "title": "Chat Enhancer for YouTube - YouTube live chat tools",
     "description": "Suite of enhancements that make YouTube live chat easier to follow and participate in.",
     "ogDescription": "Suite of enhancements that make YouTube live chat easier to follow and participate in.",
     "imageAlt": "Chat Enhancer for YouTube showing native-feeling live chat translation, inbox, and emoji tools."
@@ -88,9 +88,9 @@
     "updatePendingAnd": "and",
     "chromeStore": "Chrome Web Store",
     "firefoxAddons": "Firefox Add-ons",
-    "sourceCode": "Source Code",
-    "supportFeedback": "Support / Feedback",
-    "supportModalTitle": "About GitHub Issues",
+    "sourceCode": "Source code",
+    "supportFeedback": "Support / feedback",
+    "supportModalTitle": "About GitHub issues",
     "supportModalBody": "GitHub Issues is the public tracker we use for bug reports and feature requests.",
     "supportModalDetailOne": "Posting or commenting on GitHub may require a GitHub account.",
     "supportModalDetailTwo": "Click the New issue button on GitHub to start a report or request.",

@@ -1,4 +1,4 @@
-# Cloudflare Worker
+# Cloudflare worker
 
 This folder contains the Cloudflare Worker used by `chatenhancer.com`.
 
