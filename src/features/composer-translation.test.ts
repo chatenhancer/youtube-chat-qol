@@ -125,6 +125,41 @@ describe('composer translation', () => {
     expect(input.textContent).toBe('Hola amigo');
   });
 
+  it('does not restore a translated draft after the user clears while translation is in flight', async () => {
+    vi.useFakeTimers();
+    document.body.replaceChildren();
+    setOptions({
+      ...DEFAULT_OPTIONS,
+      composerTranslateLanguage: 'ja'
+    });
+    let resolveTranslation: ((response: unknown) => void) | null = null;
+    vi.mocked(chrome.runtime.sendMessage).mockImplementation(((_message: unknown, callback?: (response: unknown) => void) => {
+      resolveTranslation = (response: unknown) => callback?.(response);
+      return Promise.resolve({});
+    }) as never);
+    const input = createVisibleChatInput();
+    document.body.append(createComposerHost(input));
+
+    initComposerTranslation(vi.fn());
+    scheduleComposerTranslationWire();
+    await vi.runOnlyPendingTimersAsync();
+    input.textContent = 'Hola';
+    input.dispatchEvent(new InputEvent('input', { bubbles: true }));
+    await vi.advanceTimersByTimeAsync(850);
+    input.textContent = '';
+    input.dispatchEvent(new InputEvent('input', { bubbles: true }));
+    const finishTranslation = resolveTranslation as ((response: unknown) => void) | null;
+    if (!finishTranslation) throw new Error('Expected draft translation request to be pending.');
+    finishTranslation({
+      ok: true,
+      sourceLanguage: 'es',
+      translatedText: 'こんにちは'
+    });
+    await flushPromises();
+
+    expect(input.textContent).toBe('');
+  });
+
   it('shows a toast when draft translation fails', async () => {
     vi.useFakeTimers();
     document.body.replaceChildren();

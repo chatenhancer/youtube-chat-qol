@@ -236,6 +236,7 @@ function updateButtonState(): void {
 
 function handleDocumentInput(event: Event): void {
   if (replacingDraft || !getOptions().composerTranslateLanguage || !isFromChatInput(event.target)) return;
+  requestSerial += 1;
   scheduleDraftTranslation();
 }
 
