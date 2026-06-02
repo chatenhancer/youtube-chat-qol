@@ -62,6 +62,11 @@ img {
   background: rgba(255, 255, 255, 0.9);
   border-bottom: 1px solid var(--line);
   backdrop-filter: blur(14px);
+  transition: border-color 180ms ease, padding 180ms ease;
+}
+
+.site-header.site-header-top {
+  border-bottom-color: transparent;
 }
 
 .site-header-actions {
@@ -76,15 +81,39 @@ img {
   gap: 10px;
   min-width: 0;
   font-weight: 700;
+  transition: gap 180ms ease;
 }
 
 .brand img {
   flex: 0 0 auto;
+  width: 32px;
+  height: 32px;
   border-radius: 8px;
+  transition: width 180ms ease, height 180ms ease, border-radius 180ms ease;
 }
 
 .brand span {
+  display: inline-flex;
+  overflow: hidden;
+  max-width: 260px;
+  opacity: 1;
   white-space: nowrap;
+  transition: max-width 180ms ease, opacity 120ms ease;
+}
+
+.site-header.site-header-top .brand {
+  gap: 0;
+}
+
+.site-header.site-header-top .brand img {
+  width: 58px;
+  height: 58px;
+  border-radius: 13px;
+}
+
+.site-header.site-header-top .brand span {
+  max-width: 0;
+  opacity: 0;
 }
 
 .beta-badge {
@@ -186,13 +215,6 @@ img {
   position: relative;
   z-index: 1;
   width: min(610px, 100%);
-}
-
-.hero-icon {
-  width: 64px;
-  height: 64px;
-  margin-bottom: 26px;
-  border-radius: 14px;
 }
 
 .eyebrow {
