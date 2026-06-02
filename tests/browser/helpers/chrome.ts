@@ -69,7 +69,6 @@ export async function launchExtensionContext({
         `--disable-extensions-except=${extensionDir}`,
         `--load-extension=${extensionDir}`,
         '--profile-directory=Default',
-        '--mute-audio',
         '--no-first-run'
       ]
     });
@@ -112,7 +111,6 @@ export async function launchNormalChromeExtensionContext({
   const args = [
     `--user-data-dir=${profileDir}`,
     '--profile-directory=Default',
-    '--mute-audio',
     `--remote-debugging-port=${remoteDebuggingPort}`,
     '--no-first-run',
     ...(headless ? [
