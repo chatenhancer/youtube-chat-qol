@@ -2,7 +2,10 @@
  * Browser scenario for background-tab Inbox alerts.
  *
  * This is mock-only so the test can deterministically append a keyword-matching
- * message and simulate the extension content-script world becoming hidden.
+ * message while the content script sees a hidden document. Headless Chromium
+ * keeps pages visible even when another page is foregrounded, so this scenario
+ * sets visibility in the extension's isolated world and fails if that exact
+ * extension context cannot be found.
  */
 import { expect, test, type CDPSession, type Page } from '@playwright/test';
 import {
@@ -28,10 +31,13 @@ export const tabAlertScenario: BrowserScenario = async ({ chat, context }) => {
       ytcqInboxKeywords: [ALERT_KEYWORD]
     }, async () => {
       await reloadMockChat(chat);
-      await setExtensionWorldVisibility(chat, 'hidden');
-      await appendKeywordMessage(chat);
-      await expectAlertShown(chat);
-      await setExtensionWorldVisibility(chat, 'visible');
+      await setContentScriptVisibility(chat, 'hidden');
+      try {
+        await appendKeywordMessage(chat);
+        await expectAlertShown(chat);
+      } finally {
+        await setContentScriptVisibility(chat, 'visible');
+      }
       await expectAlertCleared(chat);
     });
   });
@@ -71,8 +77,8 @@ async function expectAlertCleared(page: Page): Promise<void> {
   });
 }
 
-async function setExtensionWorldVisibility(page: Page, state: 'hidden' | 'visible'): Promise<void> {
-  await test.step(`Set extension-world visibility to ${state}`, async () => {
+async function setContentScriptVisibility(page: Page, state: 'hidden' | 'visible'): Promise<void> {
+  await test.step(`Set extension content-script visibility to ${state}`, async () => {
     const client = await page.context().newCDPSession(page);
 
     try {
@@ -89,7 +95,7 @@ async function setExtensionWorldVisibility(page: Page, state: 'hidden' | 'visibl
       });
 
       if (result.exceptionDetails) {
-        throw new Error(result.exceptionDetails.text || 'Failed to set extension-world visibility.');
+        throw new Error(result.exceptionDetails.text || 'Failed to set content-script visibility.');
       }
 
       expect(result.result.value).toBe(state);
@@ -114,24 +120,12 @@ async function getContentScriptContextId(
   const deadline = Date.now() + 5_000;
 
   while (Date.now() < deadline) {
-    const context = findExtensionExecutionContext(contexts, extensionId);
+    const context = contexts.find((candidate) => isExtensionContext(candidate, extensionId));
     if (context) return context.id;
     await page.waitForTimeout(50);
   }
 
-  throw new Error(`Could not find extension execution context for ${extensionId}.`);
-}
-
-function findExtensionExecutionContext(
-  contexts: RuntimeExecutionContextDescription[],
-  extensionId: string
-): RuntimeExecutionContextDescription | undefined {
-  return contexts.find((context) => isExtensionContext(context, extensionId)) ||
-    contexts.find((context) => {
-      return context.auxData?.isDefault === false &&
-        context.auxData?.type === 'isolated' &&
-        !context.name?.includes('playwright');
-    });
+  throw new Error(`Could not find extension content-script context for ${extensionId}.`);
 }
 
 function isExtensionContext(context: RuntimeExecutionContextDescription, extensionId: string): boolean {
@@ -145,10 +139,6 @@ interface RuntimeExecutionContextCreatedEvent {
 }
 
 interface RuntimeExecutionContextDescription {
-  auxData?: {
-    isDefault?: boolean;
-    type?: string;
-  };
   id: number;
   name?: string;
   origin?: string;

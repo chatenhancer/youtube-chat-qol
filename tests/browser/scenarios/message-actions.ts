@@ -4,12 +4,13 @@
  * These checks may write local draft text into the YouTube composer, but they
  * never press Enter or click the send button.
  */
-import { expect, test, type ElementHandle } from '@playwright/test';
+import { expect, test, type Locator } from '@playwright/test';
 import {
   clearChatComposer,
   getChatComposerText
 } from '../helpers/composer';
 import { closeFocusPromptIfPresent } from '../helpers/focus-panel';
+import { centerLocatorInViewport } from '../helpers/locator';
 import { cleanVisibleText } from '../helpers/text';
 import {
   NORMAL_CHAT_MESSAGE_SELECTOR,
@@ -40,9 +41,7 @@ async function expectAuthorClickInsertsMentionDraft(chat: ChatSurface): Promise<
   const { authorHandle, authorName } = await getLatestClickableAuthor(chat);
 
   await test.step('Click author name', async () => {
-    await authorHandle.click({ timeout: 2_000 }).catch(async () => {
-      await authorHandle.dispatchEvent('click');
-    });
+    await authorHandle.click({ timeout: 2_000 });
   });
 
   await test.step('Verify composer contains mention draft', async () => {
@@ -65,12 +64,6 @@ async function expectAuthorAltClickInsertsQuoteDraft(chat: ChatSurface): Promise
     await authorHandle.click({
       modifiers: ['Alt'],
       timeout: 2_000
-    }).catch(async () => {
-      await authorHandle.dispatchEvent('click', {
-        altKey: true,
-        bubbles: true,
-        cancelable: true
-      });
     });
   });
 
@@ -92,7 +85,7 @@ async function expectMentionMenuActionInsertsDraft(chat: ChatSurface): Promise<v
   const mentionAction = menu.locator('.ytcq-context-item[data-ytcq-action="mention"]').first();
   await test.step('Click injected Mention action', async () => {
     await expect(mentionAction).toBeVisible({ timeout: 10_000 });
-    await mentionAction.click({ force: true });
+    await mentionAction.click();
   });
 
   await test.step('Verify composer contains mention draft', async () => {
@@ -112,7 +105,7 @@ async function expectQuoteMenuActionInsertsDraft(chat: ChatSurface): Promise<voi
   const { menu, authorName } = await openMessageMenu(chat);
 
   await test.step('Click injected Quote action', async () => {
-    await menu.locator('.ytcq-context-item[data-ytcq-action="quote"]').first().click({ force: true });
+    await menu.locator('.ytcq-context-item[data-ytcq-action="quote"]').first().click();
   });
 
   await test.step('Verify composer contains quote draft', async () => {
@@ -134,7 +127,7 @@ async function clearComposerForAction(chat: ChatSurface, stepName: string): Prom
 }
 
 async function getLatestClickableAuthor(chat: ChatSurface): Promise<{
-  authorHandle: ElementHandle<HTMLElement | SVGElement>;
+  authorHandle: Locator;
   authorName: string;
 }> {
   const messages = chat.locator(NORMAL_CHAT_MESSAGE_SELECTOR);
@@ -145,12 +138,11 @@ async function getLatestClickableAuthor(chat: ChatSurface): Promise<{
   const message = messages.nth(Math.max(0, await messages.count() - 1));
   const author = message.locator('#author-name').first();
   return test.step('Capture author name', async () => {
-    const handle = await author.elementHandle();
-    if (!handle) throw new Error('Could not resolve clickable author element.');
-    const name = cleanVisibleText(await handle.evaluate((element) => element.textContent || ''));
+    await centerLocatorInViewport(message);
+    const name = cleanVisibleText(await author.evaluate((element) => element.textContent || ''));
     expect(name).toMatch(/^@?\S/);
     return {
-      authorHandle: handle,
+      authorHandle: author,
       authorName: name
     };
   });

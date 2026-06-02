@@ -30,7 +30,7 @@ registerFeatureLifecycle({
 export function initFrequentEmojis(): void {
   document.addEventListener('click', handleEmojiPickerClick, true);
   chrome.storage.local.get({ [EMOJI_USAGE_STORAGE_KEY]: [] }, (stored) => {
-    emojiUsage = normalizeEmojiUsage(stored[EMOJI_USAGE_STORAGE_KEY]);
+    emojiUsage = normalizeEmojiUsage((stored || {})[EMOJI_USAGE_STORAGE_KEY]);
     refreshEmojiPickers();
   });
 }

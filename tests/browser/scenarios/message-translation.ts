@@ -250,21 +250,18 @@ async function expectAnyRenderedTranslation({
   targetLanguage: string;
   expectedText?: string;
 }): Promise<void> {
-  const translation = chat.locator(`.ytcq-translation[lang="${targetLanguage}"]`).first();
-  await test.step('Wait for any rendered translation', async () => {
-    await expect(translation).toBeVisible({ timeout: 20_000 });
+  const { sourceText, translation } = await findRenderedTranslation({
+    chat,
+    targetLanguage,
+    expectedText
   });
-  await test.step('Verify rendered translation has text', async () => {
+
+  await test.step('Verify rendered translation differs from source text', async () => {
     await expect.poll(async () => cleanVisibleText(await translation.innerText()), {
-      message: 'Rendered translation text should not be empty.',
+      message: 'Rendered translation text should differ from the original chat message.',
       timeout: 5_000
-    }).not.toBe('');
+    }).not.toBe(sourceText);
   });
-  if (expectedText) {
-    await test.step('Verify mocked translation text', async () => {
-      await expect(translation).toContainText(expectedText);
-    });
-  }
 }
 
 async function findRenderedTranslation({

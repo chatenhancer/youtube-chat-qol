@@ -9,6 +9,7 @@ import {
   appendMockFixtureMessage,
   isMockPageSurface
 } from '../helpers/mock-page';
+import { centerLocatorInViewport } from '../helpers/locator';
 import { cleanVisibleText, getRichVisibleText } from '../helpers/text';
 import {
   NORMAL_CHAT_MESSAGE_SELECTOR,
@@ -68,9 +69,8 @@ async function findRecentMessageSource(chat: ChatSurface): Promise<MessageSource
 }
 
 async function openProfileCardFromAvatar(chat: ChatSurface, source: MessageSource): Promise<void> {
-  const avatar = chat.locator(NORMAL_CHAT_MESSAGE_SELECTOR).filter({
-    has: chat.locator('#author-name').filter({ hasText: source.authorName })
-  }).last().locator('#author-photo');
+  const sourceMessage = getSourceMessage(chat, source);
+  const avatar = sourceMessage.locator('#author-photo').first();
   const profileCard = chat.locator('.ytcq-profile-card:not(.ytcq-inbox-card)');
 
   await test.step('Wait for a chat avatar', async () => {
@@ -78,9 +78,8 @@ async function openProfileCardFromAvatar(chat: ChatSurface, source: MessageSourc
   });
 
   await test.step('Open recent-message profile card', async () => {
-    await avatar.click({ timeout: 2_000 }).catch(async () => {
-      await avatar.dispatchEvent('click');
-    });
+    await centerLocatorInViewport(sourceMessage);
+    await avatar.click({ timeout: 2_000 });
     await expect(profileCard).toBeVisible();
   });
 }
@@ -150,14 +149,11 @@ async function expectProfileCardJumpToMessage(chat: ChatSurface, source: Message
     const sourceMessage = getSourceMessage(chat, source);
     const record = await getProfileCardRecord(chat, source);
 
-    await record.evaluate((element) => {
-      element.scrollIntoView({
-        block: 'center',
-        inline: 'nearest'
-      });
-    }).catch(() => undefined);
+    await centerLocatorInViewport(record);
     await record.hover();
-    await record.locator('.ytcq-profile-card-jump').click();
+    const jumpButton = record.locator('.ytcq-profile-card-jump');
+    await expect(jumpButton).toHaveCSS('opacity', '1');
+    await jumpButton.click();
     await expect(sourceMessage).toHaveClass(/ytcq-message-jump-target/, { timeout: 2_000 });
   });
 }

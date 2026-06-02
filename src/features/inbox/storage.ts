@@ -35,10 +35,11 @@ export function loadInboxStoredState(getCurrentHandles: () => string[], sourceUr
       [recordsStorageKey]: [],
       [INBOX_KEYWORDS_STORAGE_KEY]: []
     }, (stored) => {
-      const storedRecords = stored[recordsStorageKey];
+      const storedState = stored || {};
+      const storedRecords = storedState[recordsStorageKey];
       resolve({
         records: normalizeStoredRecords(storedRecords, getCurrentHandles),
-        keywords: normalizeStoredKeywords(stored[INBOX_KEYWORDS_STORAGE_KEY])
+        keywords: normalizeStoredKeywords(storedState[INBOX_KEYWORDS_STORAGE_KEY])
       });
     });
   });

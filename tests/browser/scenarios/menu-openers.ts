@@ -10,6 +10,10 @@ import {
   NORMAL_CHAT_MESSAGE_SELECTOR,
   type ChatSurface
 } from './types';
+import {
+  centerLocatorInViewport,
+  clickLocatorAtCurrentCenter
+} from '../helpers/locator';
 import { cleanVisibleText } from '../helpers/text';
 
 const MENU_POPUP_SELECTOR = 'ytd-menu-popup-renderer';
@@ -29,7 +33,6 @@ export interface OpenedMessageMenu {
 export async function openSettingsMenu(chat: ChatSurface): Promise<Locator> {
   await test.step('Click chat settings menu button', async () => {
     await closeOpenMenus(chat);
-    await resetOuterPageScroll(chat);
     const menuButton = chat.locator([
       'yt-live-chat-header-renderer #live-chat-header-context-menu button',
       'yt-live-chat-header-renderer #live-chat-header-context-menu yt-icon-button',
@@ -66,13 +69,12 @@ export async function openMessageMenu(chat: ChatSurface): Promise<OpenedMessageM
     const firstCandidate = Math.max(0, count - 8);
     for (let index = count - 1; index >= firstCandidate; index -= 1) {
       const message = messages.nth(index);
-      await centerMessageInViewport(message);
+      await centerLocatorInViewport(message);
       if (!await message.isVisible({ timeout: 500 }).catch(() => false)) continue;
       const authorName = await getMessageAuthorName(message);
       if (!authorName) continue;
 
       await message.hover({ timeout: 2_000 }).catch(() => undefined);
-      await markMessageAsContextSource(message);
       const menuTargets = [
         message.locator('#menu button').first(),
         message.locator('#menu yt-icon-button').first(),
@@ -81,24 +83,20 @@ export async function openMessageMenu(chat: ChatSurface): Promise<OpenedMessageM
 
       for (const menuTarget of menuTargets) {
         if (!await menuTarget.isVisible({ timeout: 500 }).catch(() => false)) continue;
-        await menuTarget.click({ force: true, timeout: 1_000 }).catch(() => undefined);
-        const openedMenu = await waitForVisibleMenu(
-          chat,
-          MESSAGE_MENU_MARKER_SELECTOR,
-          'message context menu popup',
-          1_000
-        ).catch(() => null);
-        if (openedMenu) return { menu: openedMenu, message, authorName };
-        await markMessageAsContextSource(message);
-        await menuTarget.dispatchEvent('click').catch(() => undefined);
-        const dispatchedMenu = await waitForVisibleMenu(
-          chat,
-          MESSAGE_MENU_MARKER_SELECTOR,
-          'message context menu popup',
-          1_000
-        ).catch(() => null);
-        if (dispatchedMenu) return { menu: dispatchedMenu, message, authorName };
-        await closeOpenMenus(chat);
+        for (const activate of [
+          () => clickLocatorAtCurrentCenter(menuTarget),
+          () => menuTarget.press('Enter', { timeout: 1_000 }).then(() => true)
+        ]) {
+          await activate().catch(() => false);
+          const openedMenu = await waitForVisibleMenu(
+            chat,
+            MESSAGE_MENU_MARKER_SELECTOR,
+            'message context menu popup',
+            1_000
+          ).catch(() => null);
+          if (openedMenu) return { menu: openedMenu, message, authorName };
+          await closeOpenMenus(chat);
+        }
       }
     }
 
@@ -107,9 +105,33 @@ export async function openMessageMenu(chat: ChatSurface): Promise<OpenedMessageM
 }
 
 async function closeOpenMenus(chat: ChatSurface): Promise<void> {
-  for (let attempt = 0; attempt < 2; attempt += 1) {
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    const menu = await findVisibleNativeMenu(chat);
+    if (!menu) return;
+    await menu.press('Escape').catch(() => undefined);
     await chat.locator('body').press('Escape').catch(() => undefined);
+    await menu.waitFor({ state: 'hidden', timeout: 500 }).catch(() => undefined);
   }
+}
+
+async function findVisibleNativeMenu(chat: ChatSurface): Promise<Locator | null> {
+  const menus = chat.locator(MENU_POPUP_SELECTOR);
+  const count = await menus.count();
+
+  for (let index = count - 1; index >= 0; index -= 1) {
+    const menu = menus.nth(index);
+    const box = await menu.boundingBox().catch(() => null);
+    if (
+      box &&
+      box.width > 0 &&
+      box.height > 0 &&
+      await menu.isVisible().catch(() => false)
+    ) {
+      return menu;
+    }
+  }
+
+  return null;
 }
 
 async function getMessageAuthorName(message: Locator): Promise<string> {
@@ -123,39 +145,6 @@ async function getMessageAuthorName(message: Locator): Promise<string> {
 function cleanAuthorNameText(text: string): string {
   const cleanAuthorName = cleanVisibleText(text);
   return cleanAuthorName.match(/^@[^\s]+/)?.[0] || cleanAuthorName;
-}
-
-async function markMessageAsContextSource(message: Locator): Promise<void> {
-  await message.dispatchEvent('pointerdown', {
-    bubbles: true,
-    cancelable: true
-  }).catch(() => undefined);
-  await message.dispatchEvent('click', {
-    bubbles: true,
-    cancelable: true
-  }).catch(() => undefined);
-}
-
-async function centerMessageInViewport(message: Locator): Promise<void> {
-  await message.evaluate((element) => {
-    element.scrollIntoView({
-      block: 'center',
-      inline: 'nearest'
-    });
-  }).catch(async () => {
-    await message.scrollIntoViewIfNeeded({ timeout: 2_000 }).catch(() => undefined);
-  });
-}
-
-async function resetOuterPageScroll(chat: ChatSurface): Promise<void> {
-  await chat.locator('body').evaluate(() => {
-    try {
-      window.parent?.scrollTo(0, 0);
-    } catch {
-      // Live chat may be isolated differently by the browser; normal click
-      // actionability still protects us from clicking through top-page chrome.
-    }
-  }).catch(() => undefined);
 }
 
 async function waitForVisibleMenu(

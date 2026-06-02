@@ -5,7 +5,7 @@
  * behavior without reopening Chrome for every test. Test-scoped fixtures reset
  * the mock page or close transient extension surfaces before each assertion.
  */
-import { expect, test as base, type BrowserContext, type FrameLocator, type Page } from '@playwright/test';
+import { expect, test as base, type BrowserContext, type FrameLocator, type Locator, type Page } from '@playwright/test';
 import { existsSync } from 'node:fs';
 import {
   cp,
@@ -51,13 +51,6 @@ const LIVE_HEADLESS_USER_AGENT = [
   'AppleWebKit/537.36 (KHTML, like Gecko)',
   'Chrome/148.0.0.0 Safari/537.36'
 ].join(' ');
-const TOP_LEVEL_TRANSIENT_SURFACE_SELECTOR = [
-  'ytd-popup-container ytd-multi-page-menu-renderer',
-  'ytd-popup-container ytd-menu-popup-renderer',
-  'ytd-popup-container tp-yt-paper-dialog',
-  'ytd-popup-container tp-yt-paper-toast',
-  'tp-yt-iron-dropdown'
-].join(',');
 const ACTIVE_CHROME_PROFILE_FILE_NAMES = new Set([
   'SingletonCookie',
   'SingletonLock',
@@ -68,6 +61,7 @@ const RUNTIME_CHROME_PROFILE_FILE_NAMES = new Set([
   '.ytcq-playwright-profile.lock',
   'DevToolsActivePort'
 ]);
+const CHAT_MENU_POPUP_SELECTOR = 'ytd-menu-popup-renderer';
 
 export interface MockSession {
   context: BrowserContext;
@@ -110,7 +104,7 @@ export const mockTest = base.extend<MockTestFixtures, MockWorkerFixtures>({
     void browserName;
     const context = await launchExtensionContext({
       headless: shouldRunHeadlessBrowserTest(),
-      profileDir: path.join(workerInfo.project.outputDir, 'profiles', `mock-${workerInfo.workerIndex}`)
+      profileDir: getDisposableWorkerProfileDir('mock', workerInfo)
     });
 
     await context.route(/^https:\/\/www\.youtube\.com\/live_chat(?:_replay)?(?:\?|$)/, (route) => {
@@ -166,7 +160,7 @@ export const liveTest = base.extend<LiveTestFixtures, LiveWorkerFixtures>({
     const headless = shouldRunLiveHeadlessBrowserTest();
     const context = await launchExtensionContext({
       headless,
-      profileDir: path.join(workerInfo.project.outputDir, 'profiles', `live-logged-out-${workerInfo.workerIndex}`),
+      profileDir: getDisposableWorkerProfileDir('live-logged-out', workerInfo),
       userAgent: getLiveBrowserUserAgent(headless)
     });
 
@@ -250,6 +244,18 @@ async function openMockChatPage(page: Page, url: string): Promise<void> {
   await page.goto(url, { timeout: 15_000, waitUntil: 'commit' });
   await expect(page.locator('yt-live-chat-renderer')).toBeVisible({ timeout: 15_000 });
   await expect(page.locator('.ytcq-inbox-button')).toBeVisible({ timeout: 15_000 });
+}
+
+function getDisposableWorkerProfileDir(prefix: string, workerInfo: {
+  parallelIndex: number;
+  project: { outputDir: string };
+  workerIndex: number;
+}): string {
+  return path.join(
+    workerInfo.project.outputDir,
+    'profiles',
+    `${prefix}-${process.pid}-${workerInfo.parallelIndex}-${workerInfo.workerIndex}`
+  );
 }
 
 async function createLoggedInLiveSession(): Promise<{
@@ -342,7 +348,6 @@ async function getComposerUnavailableReason(page: Page, chat: FrameLocator): Pro
 }
 
 async function resetLiveScenarioState(session: LiveSession): Promise<void> {
-  await closeTopLevelYouTubeOverlays(session.page);
   await session.page.evaluate(() => {
     window.scrollTo(0, 0);
   }).catch(() => undefined);
@@ -352,21 +357,34 @@ async function resetLiveScenarioState(session: LiveSession): Promise<void> {
   await closeChatNativeMenus(session.chat);
 }
 
-async function closeTopLevelYouTubeOverlays(page: Page): Promise<void> {
+async function closeChatNativeMenus(chat: FrameLocator): Promise<void> {
   for (let attempt = 0; attempt < 3; attempt += 1) {
-    await page.keyboard.press('Escape').catch(() => undefined);
+    const menu = await findOpenChatNativeMenu(chat);
+    if (!menu) return;
+    await menu.press('Escape').catch(() => undefined);
+    await chat.locator('body').press('Escape').catch(() => undefined);
+    await menu.waitFor({ state: 'hidden', timeout: 500 }).catch(() => undefined);
   }
-
-  await page.locator(TOP_LEVEL_TRANSIENT_SURFACE_SELECTOR)
-    .first()
-    .waitFor({ state: 'hidden', timeout: 500 })
-    .catch(() => undefined);
 }
 
-async function closeChatNativeMenus(chat: FrameLocator): Promise<void> {
-  for (let attempt = 0; attempt < 2; attempt += 1) {
-    await chat.locator('body').press('Escape').catch(() => undefined);
+async function findOpenChatNativeMenu(chat: FrameLocator): Promise<Locator | null> {
+  const menus = chat.locator(CHAT_MENU_POPUP_SELECTOR);
+  const count = await menus.count();
+
+  for (let index = count - 1; index >= 0; index -= 1) {
+    const menu = menus.nth(index);
+    const box = await menu.boundingBox().catch(() => null);
+    if (
+      box &&
+      box.width > 0 &&
+      box.height > 0 &&
+      await menu.isVisible().catch(() => false)
+    ) {
+      return menu;
+    }
   }
+
+  return null;
 }
 
 async function closeTransientSurfaces(chat: FrameLocator): Promise<void> {
@@ -434,7 +452,7 @@ async function prepareLoggedInWorkingProfile(sourceProfileDir: string, profileNa
 
   await assertSourceProfileClosed(sourceProfileDir);
   await mkdir(workingProfilesDir, { recursive: true });
-  await rm(profileDir, { recursive: true, force: true });
+  await removeProfilePath(profileDir);
   await cp(sourceProfileDir, profileDir, {
     recursive: true,
     filter: (source) => !isRootChromeRuntimePath(source, sourceProfileDir)
@@ -458,11 +476,17 @@ async function assertSourceProfileClosed(profileDir: string): Promise<void> {
 async function removeChromeRuntimeFiles(profileDir: string): Promise<void> {
   const runtimeFiles = await getExistingRootProfileFiles(profileDir, RUNTIME_CHROME_PROFILE_FILE_NAMES);
   await Promise.all(runtimeFiles.map((fileName) => {
-    return rm(path.join(profileDir, fileName), {
-      force: true,
-      recursive: true
-    });
+    return removeProfilePath(path.join(profileDir, fileName));
   }));
+}
+
+async function removeProfilePath(profilePath: string): Promise<void> {
+  await rm(profilePath, {
+    force: true,
+    maxRetries: 10,
+    recursive: true,
+    retryDelay: 250
+  });
 }
 
 async function getExistingRootProfileFiles(profileDir: string, fileNames: Set<string>): Promise<string[]> {
