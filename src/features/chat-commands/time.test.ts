@@ -54,6 +54,8 @@ describe('chat command time helpers', () => {
   });
 
   it('formats zero-duration /when targets as seconds', () => {
+    vi.setSystemTime(new Date(2026, 4, 29, 14, 0, 0));
+
     const result = formatWhenResult('14:00');
 
     expect(result?.insertion).toMatch(/0/);
