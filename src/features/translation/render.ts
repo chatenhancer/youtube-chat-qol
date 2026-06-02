@@ -15,12 +15,23 @@ import {
   rememberOriginalMessageText,
   restoreReplacedTranslation
 } from '../../youtube/messages';
+import { CHAT_SCROLLER_SELECTOR } from '../../youtube/selectors';
 import {
   createNodesWithPlaceholders,
   restorePlaceholdersToText,
   type ProtectedToken
 } from './protected-placeholders';
 import type { TranslationResult } from './types';
+
+const TOP_SCROLL_TOLERANCE_PX = 2;
+const BOTTOM_SCROLL_TOLERANCE_PX = 6;
+
+interface ChatScrollerSnapshot {
+  scroller: HTMLElement;
+  scrollTop: number;
+  wasAtTop: boolean;
+  wasAtBottom: boolean;
+}
 
 export function renderTranslation(
   message: HTMLElement,
@@ -43,10 +54,12 @@ export function renderTranslation(
 }
 
 export function clearTranslationRenderings(): void {
+  const scrollerSnapshot = captureChatScrollerSnapshot();
   document.querySelectorAll('.ytcq-translation-replaced').forEach(restoreReplacedTranslation);
   document.querySelectorAll('.ytcq-translation').forEach((node) => node.remove());
   document.querySelectorAll<HTMLElement>('[data-ytcq-translation-key]')
     .forEach((message) => delete message.dataset.ytcqTranslationKey);
+  restoreChatScrollerAfterTranslationClear(scrollerSnapshot);
 }
 
 export function removeTranslation(message: HTMLElement): void {
@@ -154,4 +167,52 @@ function hasReliableSourceLanguage(result: TranslationResult): boolean {
 
 function normalizeLanguageCode(language: string): string {
   return String(language || '').toLowerCase().split('-')[0];
+}
+
+function captureChatScrollerSnapshot(): ChatScrollerSnapshot | null {
+  const scroller = document.querySelector<HTMLElement>(CHAT_SCROLLER_SELECTOR);
+  if (!scroller) return null;
+
+  return {
+    scroller,
+    scrollTop: scroller.scrollTop,
+    wasAtTop: scroller.scrollTop <= TOP_SCROLL_TOLERANCE_PX,
+    wasAtBottom: scroller.scrollTop + scroller.clientHeight >= scroller.scrollHeight - BOTTOM_SCROLL_TOLERANCE_PX
+  };
+}
+
+function restoreChatScrollerAfterTranslationClear(snapshot: ChatScrollerSnapshot | null): void {
+  if (!snapshot) return;
+
+  window.requestAnimationFrame(() => {
+    const { scroller } = snapshot;
+    if (!scroller.isConnected) return;
+
+    if (snapshot.wasAtTop) {
+      scroller.scrollTop = 0;
+    } else if (snapshot.wasAtBottom) {
+      scroller.scrollTop = scroller.scrollHeight;
+    } else {
+      const maxScrollTop = Math.max(0, scroller.scrollHeight - scroller.clientHeight);
+      scroller.scrollTop = Math.min(snapshot.scrollTop, maxScrollTop);
+    }
+
+    notifyChatListLayoutChanged(scroller);
+  });
+}
+
+function notifyChatListLayoutChanged(scroller: HTMLElement): void {
+  const listRenderer = scroller.closest('yt-live-chat-item-list-renderer');
+  const chatRenderer = scroller.closest('yt-live-chat-renderer');
+  const resizeTargets = new Set<Element>([scroller]);
+  if (listRenderer) resizeTargets.add(listRenderer);
+  if (chatRenderer) resizeTargets.add(chatRenderer);
+
+  // YouTube's Polymer chat list can cache message row heights while scrolled up.
+  // Bulk translation removal shrinks rows, so notify it before the stale offset shows as blank space.
+  resizeTargets.forEach((target) => {
+    target.dispatchEvent(new CustomEvent('iron-resize', { bubbles: true, composed: true }));
+  });
+  scroller.dispatchEvent(new Event('scroll', { bubbles: true }));
+  window.dispatchEvent(new Event('resize'));
 }
