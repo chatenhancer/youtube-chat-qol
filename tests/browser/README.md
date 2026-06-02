@@ -1,4 +1,4 @@
-# Browser Tests
+# Browser tests
 
 Browser tests run the built extension in Chromium through Playwright. They cover
 the behavior that Vitest cannot see: content-script attachment, YouTube chat
@@ -111,7 +111,7 @@ YTCQ_TEST_HEADLESS=0 npm run test:browser:mock
 YTCQ_TEST_LIVE_HEADLESS=0 npm run test:browser:live
 ```
 
-## Logged-In Live Setup
+## Logged-in live setup
 
 Prepare the dedicated Chrome profile with:
 
@@ -143,7 +143,7 @@ such as:
 Those working profiles are recreated for each run. This lets logged-in live and
 replay specs run in parallel without opening the same Chrome profile twice.
 
-## Adding Behavior Tests
+## Adding behavior tests
 
 Add reusable behavior in `tests/browser/scenarios/`.
 
@@ -184,7 +184,7 @@ debugging a single shared timeline:
 YTCQ_TEST_WORKERS=1 npm run test:browser
 ```
 
-## Adding Performance Tests
+## Adding performance tests
 
 Add performance specs as flattened `yt-mock-perf-*.spec.ts` files under
 `tests/browser/specs/`.
@@ -201,7 +201,7 @@ Keep performance tests mock-only unless there is a specific reason to involve
 real YouTube. Real YouTube performance numbers are harder to compare because
 page load, chat velocity, and network behavior vary.
 
-## Reports and Artifacts
+## Reports and artifacts
 
 Open the combined browser report:
 

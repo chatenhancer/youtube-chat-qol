@@ -8,7 +8,7 @@ tests/browser/scenarios/   reusable Playwright browser behavior checks
 tests/browser/specs/       flattened Playwright spec matrix
 ```
 
-## Test Layers
+## Test layers
 
 **Unit tests**
 
