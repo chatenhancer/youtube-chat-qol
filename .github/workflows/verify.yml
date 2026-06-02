@@ -33,3 +33,6 @@ jobs:
         run: npm run test:browser:install
       - name: Verify project
         run: npm run verify
+      - name: Write test summary
+        if: always()
+        run: npm run ci:test-summary

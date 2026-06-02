@@ -34,6 +34,9 @@ jobs:
         run: node scripts/validate-release-tag.mjs
       - name: Build release archives
         run: npm run zip
+      - name: Write test summary
+        if: always()
+        run: npm run ci:test-summary
       - name: Upload release archives
         uses: actions/upload-artifact@v6
         with:
