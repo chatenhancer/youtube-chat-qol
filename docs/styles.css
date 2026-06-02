@@ -935,38 +935,57 @@ h3 {
   border-top: 1px solid var(--line);
 }
 
-.command-note p {
-  margin: 0;
+.command-note-heading {
+  display: grid;
+  gap: 3px;
+}
+
+.command-note-heading span {
   color: var(--muted);
 }
 
-.command-notes strong {
+.command-note-heading strong {
   display: block;
-  margin-bottom: 4px;
   color: var(--blue);
   font-size: 14px;
   font-weight: 800;
   line-height: 1.5;
 }
 
-.command-notes span {
-  min-width: 0;
-  line-height: 1.55;
+.command-chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 10px;
 }
 
-.command-notes code {
-  color: var(--text);
+.command-chip-list code {
+  display: inline-flex;
+  width: fit-content;
+  white-space: nowrap;
+  overflow-wrap: normal;
 }
 
 .commands code {
-  display: inline-flex;
-  width: fit-content;
+  display: inline;
+  max-width: 100%;
   justify-self: start;
   padding: 0.08em 0.34em;
   color: var(--text);
   background: var(--soft);
   border: 1px solid var(--line);
   border-radius: 6px;
+  box-decoration-break: clone;
+  overflow-wrap: anywhere;
+  white-space: normal;
+  -webkit-box-decoration-break: clone;
+}
+
+.commands .command-chip-list code {
+  display: inline-flex;
+  width: fit-content;
+  overflow-wrap: normal;
+  white-space: nowrap;
 }
 
 .command-groups {
@@ -1007,6 +1026,7 @@ h3 {
 .command-list dt {
   display: grid;
   gap: 6px;
+  min-width: 0;
   font-weight: 800;
 }
 
@@ -1025,14 +1045,18 @@ h3 {
 }
 
 .command-list dd {
+  min-width: 0;
   margin: 0;
   color: var(--muted);
+  overflow-wrap: anywhere;
 }
 
 .command-detail {
-  display: inline-block;
+  display: block;
+  min-width: 0;
   margin-top: 6px;
   font-size: 14px;
+  overflow-wrap: anywhere;
 }
 
 code,
@@ -1618,13 +1642,16 @@ figcaption {
   }
 
   .store-version-alert-top {
-    top: 88px;
-    right: 14px;
-    left: 14px;
-    width: auto;
+    position: static;
+    width: 100%;
     max-width: none;
+    margin: 0;
     padding: 8px 10px;
-    transform: translateY(var(--store-version-alert-offset, 0));
+    border-right: 0;
+    border-left: 0;
+    border-radius: 0;
+    box-shadow: none;
+    transform: none;
   }
 
   .store-version-alert-icon {
