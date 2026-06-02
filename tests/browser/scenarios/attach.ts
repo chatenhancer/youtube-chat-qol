@@ -5,6 +5,7 @@
  * that the popup can see the active live-chat tab.
  */
 import { expect, test } from '@playwright/test';
+import { CHAT_MESSAGE_SELECTOR } from '../../../src/youtube/selectors';
 import { expectPopupReportsActiveStatus } from '../helpers/popup-status';
 import type { BrowserScenario, ChatSurface } from './types';
 
@@ -36,7 +37,7 @@ async function expectReconnectPromptHidden(chat: ChatSurface): Promise<void> {
 
 async function expectVisibleChatMessages(chat: ChatSurface): Promise<void> {
   await test.step('Verify chat has visible messages', async () => {
-    const messages = chat.locator('yt-live-chat-text-message-renderer');
+    const messages = chat.locator(CHAT_MESSAGE_SELECTOR);
     await expect(messages.first()).toBeVisible({ timeout: 45_000 });
     const initialMessageCount = await messages.count();
     expect(initialMessageCount).toBeGreaterThan(0);

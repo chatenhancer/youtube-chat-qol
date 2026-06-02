@@ -8,6 +8,7 @@
 import { expect, test, type Locator } from '@playwright/test';
 import { clearChatComposerIfVisible } from '../helpers/composer';
 import { closeFocusPromptIfPresent } from '../helpers/focus-panel';
+import { centerLocatorInViewport } from '../helpers/locator';
 import {
   appendMockFixtureMessage,
   isMockPageSurface
@@ -20,8 +21,7 @@ import {
 } from './types';
 
 export const focusPanelScenario: BrowserScenario = async ({ chat }) => {
-  const source = await findRecentMessageSource(chat);
-  await openCollapsedFocusPrompt(chat, source);
+  const source = await openCollapsedFocusPromptFromRecentMessage(chat);
   await expandFocusPanel(chat);
   await expectFocusPanelContainsSourceMessage(chat, source);
   await expectMockFocusPanelReceivesNewMessages(chat, source);
@@ -31,12 +31,11 @@ export const focusPanelScenario: BrowserScenario = async ({ chat }) => {
 interface MessageSource {
   authorName: string;
   channelId: string;
-  message: Locator;
   text: string;
 }
 
-async function findRecentMessageSource(chat: ChatSurface): Promise<MessageSource> {
-  return test.step('Find a recent message with readable author and text', async () => {
+async function openCollapsedFocusPromptFromRecentMessage(chat: ChatSurface): Promise<MessageSource> {
+  return test.step('Click a recent author handle to open collapsed focus prompt', async () => {
     const messages = chat.locator(NORMAL_CHAT_MESSAGE_SELECTOR);
     await messages.last().waitFor({ state: 'visible', timeout: 45_000 });
 
@@ -44,36 +43,42 @@ async function findRecentMessageSource(chat: ChatSurface): Promise<MessageSource
     const firstCandidate = Math.max(0, count - 20);
     for (let index = count - 1; index >= firstCandidate; index -= 1) {
       const message = messages.nth(index);
-      const authorName = cleanVisibleText(await message.locator('#author-name').first().innerText().catch(() => ''));
-      const text = cleanVisibleText(await message.locator('#message').first().innerText().catch(() => ''));
-      if (!authorName || !text) continue;
+      const source = await readMessageSource(message);
+      if (!source) continue;
 
-      const channelId = await message.evaluate((element) => {
-        const data = (element as HTMLElement & {
-          data?: { authorExternalChannelId?: string };
-        }).data;
-        return data?.authorExternalChannelId || '';
-      }).catch(() => '');
+      await centerLocatorInViewport(message);
+      const clicked = await message.locator('#author-name').first()
+        .click({ timeout: 2_000 })
+        .then(() => true, () => false);
+      if (!clicked) continue;
 
-      return {
-        authorName,
-        channelId,
-        message,
-        text
-      };
+      const focusPrompt = chat.locator('.ytcq-focus-card-collapsed');
+      if (await focusPrompt.isVisible({ timeout: 5_000 }).catch(() => false)) {
+        return source;
+      }
     }
 
-    throw new Error('Could not find a recent message with readable author and text.');
+    throw new Error('Could not click a recent message author to open the focus prompt.');
   });
 }
 
-async function openCollapsedFocusPrompt(chat: ChatSurface, source: MessageSource): Promise<void> {
-  await test.step('Click author handle to open collapsed focus prompt', async () => {
-    await source.message.locator('#author-name').first().click({ timeout: 2_000 }).catch(async () => {
-      await source.message.locator('#author-name').first().dispatchEvent('click');
-    });
-    await expect(chat.locator('.ytcq-focus-card-collapsed')).toBeVisible({ timeout: 10_000 });
-  });
+async function readMessageSource(message: Locator): Promise<MessageSource | null> {
+  const authorName = cleanVisibleText(await message.locator('#author-name').first().innerText().catch(() => ''));
+  const text = cleanVisibleText(await message.locator('#message').first().innerText().catch(() => ''));
+  if (!authorName || !text) return null;
+
+  const channelId = await message.evaluate((element) => {
+    const data = (element as HTMLElement & {
+      data?: { authorExternalChannelId?: string };
+    }).data;
+    return data?.authorExternalChannelId || '';
+  }).catch(() => '');
+
+  return {
+    authorName,
+    channelId,
+    text
+  };
 }
 
 async function expandFocusPanel(chat: ChatSurface): Promise<void> {

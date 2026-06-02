@@ -155,7 +155,9 @@ async function jumpToInboxRecord(
       hasText: INBOX_KEYWORD
     }).first();
     await record.hover();
-    await record.locator('.ytcq-profile-card-jump').click();
+    const jumpButton = record.locator('.ytcq-profile-card-jump');
+    await expect(jumpButton).toHaveCSS('opacity', '1');
+    await jumpButton.click();
     await expect(chat.locator('.ytcq-inbox-card')).toHaveCount(0);
     await expect(sourceMessage).toHaveClass(/ytcq-message-jump-target/, { timeout: 2_000 });
   });

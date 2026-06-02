@@ -7,6 +7,6 @@ export async function closeFocusPromptIfPresent(chat: ChatSurface): Promise<void
   await chat.locator('body').press('Escape').catch(() => undefined);
   const closeButton = chat.locator('.ytcq-focus-card .ytcq-focus-close').first();
   if (await closeButton.isVisible({ timeout: 500 }).catch(() => false)) {
-    await closeButton.click({ force: true });
+    await closeButton.click();
   }
 }

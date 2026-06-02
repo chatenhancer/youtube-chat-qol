@@ -184,7 +184,7 @@ function getOpenActiveChatTabIds(response: ActiveChatTabsResponse | undefined, o
 
 function updateExtensionStatusSummaryWithKnownTabs(activeTabIds: Set<number>, openTabIds: Set<number>, currentTabId: number | null): void {
   chrome.storage.local.get(KNOWN_CHAT_TABS_STORAGE_KEY, (stored) => {
-    const knownTabIds = getFreshKnownChatTabIds(stored[KNOWN_CHAT_TABS_STORAGE_KEY]);
+    const knownTabIds = getFreshKnownChatTabIds((stored || {})[KNOWN_CHAT_TABS_STORAGE_KEY]);
     const disconnectedKnownChatCount = [...knownTabIds].filter((tabId) => openTabIds.has(tabId) && !activeTabIds.has(tabId)).length;
     updateExtensionStatusSummary(activeTabIds, currentTabId, disconnectedKnownChatCount);
   });

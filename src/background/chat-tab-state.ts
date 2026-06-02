@@ -50,7 +50,7 @@ export function getActiveChatTabIds(): number[] {
 
 export function refreshKnownChatActionStatuses(): void {
   chrome.storage.local.get(KNOWN_CHAT_TABS_STORAGE_KEY, (stored) => {
-    const records = normalizeKnownChatTabs(stored[KNOWN_CHAT_TABS_STORAGE_KEY]);
+    const records = normalizeKnownChatTabs((stored || {})[KNOWN_CHAT_TABS_STORAGE_KEY]);
     Object.keys(records).forEach((tabIdText) => {
       const tabId = Number(tabIdText);
       if (activeChatTabIds.has(tabId)) return;
@@ -72,7 +72,7 @@ function setActionStatus(tabId: number, active: boolean): void {
 
 function rememberKnownChatTab(tabId: number): void {
   chrome.storage.local.get(KNOWN_CHAT_TABS_STORAGE_KEY, (stored) => {
-    const records = normalizeKnownChatTabs(stored[KNOWN_CHAT_TABS_STORAGE_KEY]);
+    const records = normalizeKnownChatTabs((stored || {})[KNOWN_CHAT_TABS_STORAGE_KEY]);
     records[String(tabId)] = Date.now();
     chrome.storage.local.set({ [KNOWN_CHAT_TABS_STORAGE_KEY]: records });
   });
@@ -80,7 +80,7 @@ function rememberKnownChatTab(tabId: number): void {
 
 function forgetKnownChatTab(tabId: number): void {
   chrome.storage.local.get(KNOWN_CHAT_TABS_STORAGE_KEY, (stored) => {
-    const records = normalizeKnownChatTabs(stored[KNOWN_CHAT_TABS_STORAGE_KEY]);
+    const records = normalizeKnownChatTabs((stored || {})[KNOWN_CHAT_TABS_STORAGE_KEY]);
     if (!(String(tabId) in records)) return;
     delete records[String(tabId)];
     chrome.storage.local.set({ [KNOWN_CHAT_TABS_STORAGE_KEY]: records });
