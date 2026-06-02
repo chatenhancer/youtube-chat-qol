@@ -56,7 +56,6 @@ function buildSummary({ browser, unit }) {
     lines.push('', `Missing reports: ${missing.join(', ')}.`);
   }
 
-  lines.push('', `Job summary generated at run-time.`);
   return lines.join('\n');
 }
 
