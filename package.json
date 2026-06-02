@@ -26,6 +26,7 @@
     "test:coverage": "node scripts/run-unit-tests.mjs --coverage && node scripts/generate-readme-badges.mjs",
     "test:youtube-login": "node scripts/open-youtube-test-profile.mjs",
     "test:watch": "vitest",
+    "ci:browser-artifacts": "node scripts/collect-mock-browser-artifacts.mjs",
     "ci:test-summary": "node scripts/write-ci-test-summary.mjs",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",

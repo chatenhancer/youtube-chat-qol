@@ -8,10 +8,21 @@
 import { defineConfig } from '@playwright/test';
 import { readdirSync } from 'node:fs';
 import path from 'node:path';
+import { shouldCaptureBrowserFailureArtifacts } from './tests/browser/helpers/artifact-policy';
 
 const DEFAULT_WORKERS = getBrowserSpecFileCount();
 const reportOutputFolder = process.env.YTCQ_PLAYWRIGHT_REPORT_DIR ?? 'playwright-report/browser';
 const jsonReportPath = process.env.YTCQ_PLAYWRIGHT_JSON_REPORT;
+const failureArtifactUse = {
+  screenshot: 'only-on-failure' as const,
+  trace: 'retain-on-failure' as const,
+  video: 'retain-on-failure' as const
+};
+const disabledArtifactUse = {
+  screenshot: 'off' as const,
+  trace: 'off' as const,
+  video: 'off' as const
+};
 
 export default defineConfig({
   expect: {
@@ -22,11 +33,13 @@ export default defineConfig({
   projects: [
     {
       name: 'youtube-mock',
-      testMatch: /specs\/youtube-mock\/.*\.spec\.ts/
+      testMatch: /specs\/youtube-mock\/.*\.spec\.ts/,
+      use: failureArtifactUse
     },
     {
       name: 'youtube-live',
-      testMatch: /specs\/youtube-live\/.*\.spec\.ts/
+      testMatch: /specs\/youtube-live\/.*\.spec\.ts/,
+      use: shouldCaptureBrowserFailureArtifacts('youtube-live') ? failureArtifactUse : disabledArtifactUse
     }
   ],
   reporter: getReporters(),
@@ -34,10 +47,7 @@ export default defineConfig({
   timeout: 90_000,
   use: {
     actionTimeout: 15_000,
-    navigationTimeout: 30_000,
-    screenshot: 'only-on-failure',
-    trace: 'retain-on-failure',
-    video: 'retain-on-failure'
+    navigationTimeout: 30_000
   },
   workers: getWorkerCount()
 });

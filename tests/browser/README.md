@@ -182,12 +182,19 @@ npx playwright show-report playwright-report/youtube-mock
 npx playwright show-report playwright-report/youtube-live
 ```
 
-Failure artifacts are under `test-results/browser/`. They may include
+Local failure artifacts are under `test-results/browser/`. They may include
 screenshots, videos, traces, and DOM dumps. Open a trace directly with:
 
 ```sh
 npx playwright show-trace test-results/browser/<failed-test>/trace.zip
 ```
+
+GitHub Actions uploads only failed `youtube-mock` artifacts from
+`test-results/browser/mock-artifacts/`. Mock chat content is synthetic. Live
+YouTube screenshots, videos, traces, and DOM dumps can contain real chat text,
+so they are disabled in CI by default. Rerun the failing live test locally for
+full diagnostics, or explicitly set `YTCQ_CAPTURE_LIVE_BROWSER_ARTIFACTS=1` for
+a trusted CI run where live artifact handling is intentionally changed.
 
 ## Rules
 
