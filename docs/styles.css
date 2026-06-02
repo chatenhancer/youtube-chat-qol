@@ -1617,6 +1617,26 @@ figcaption {
     padding: 12px 18px;
   }
 
+  .store-version-alert-top {
+    top: 88px;
+    right: 14px;
+    left: 14px;
+    width: auto;
+    max-width: none;
+    padding: 8px 10px;
+    transform: translateY(var(--store-version-alert-offset, 0));
+  }
+
+  .store-version-alert-icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  .store-version-alert-icon svg {
+    width: 20px;
+    height: 20px;
+  }
+
   .brand span {
     display: none;
   }
