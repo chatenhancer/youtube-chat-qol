@@ -14,6 +14,7 @@
     "zip": "npm run verify && node scripts/zip.mjs --all",
     "cloudflare:dev": "npx wrangler@4 dev --config cloudflare/wrangler.toml",
     "cloudflare:deploy": "npx wrangler@4 deploy --config cloudflare/wrangler.toml",
+    "postinstall": "node scripts/install-playwright-browser.mjs",
     "publish:chrome": "node scripts/submit-chrome-webstore.mjs",
     "publish:firefox": "node scripts/submit-firefox-amo.mjs",
     "test": "node scripts/run-unit-tests.mjs",
@@ -27,12 +28,18 @@
     "test:coverage": "node scripts/run-unit-tests.mjs --coverage && node scripts/generate-readme-badges.mjs",
     "test:youtube-login": "node scripts/open-youtube-test-profile.mjs",
     "test:watch": "vitest",
+    "ci:install-playwright": "npm run test:browser:install",
+    "ci:pages-build": "npm run docs:build",
+    "ci:pages-badges": "npm run test:coverage",
+    "ci:release-validate-tag": "node scripts/validate-release-tag.mjs",
+    "ci:test-browser-gate": "node scripts/run-browser-tests.mjs --no-build tests/browser/specs/yt-mock-logged-in.spec.ts tests/browser/specs/yt-mock-logged-out.spec.ts tests/browser/specs/yt-mock-replay.spec.ts tests/browser/specs/yt-live-logged-out.spec.ts",
     "ci:browser-artifacts": "node scripts/collect-mock-browser-artifacts.mjs",
     "ci:test-summary": "node scripts/write-ci-test-summary.mjs",
+    "ci:verify": "npm run check && npm run test && npm run build && npm run ci:pages-build && npm run ci:test-browser-gate",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "check": "npm run typecheck && npm run lint",
-    "verify": "npm run check && npm run test && npm run build && npm run docs:build && node scripts/run-browser-tests.mjs --no-build tests/browser/specs/yt-mock-logged-in.spec.ts tests/browser/specs/yt-mock-logged-out.spec.ts tests/browser/specs/yt-mock-replay.spec.ts tests/browser/specs/yt-live-logged-out.spec.ts"
+    "verify": "npm run ci:verify"
   },
   "devDependencies": {
     "@eslint/js": "^9.27.0",

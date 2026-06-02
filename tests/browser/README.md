@@ -45,13 +45,22 @@ but read-only chat features should still attach.
 
 ## Commands
 
-Install Playwright's Chromium browser:
+Fresh `npm install` runs a local postinstall helper that installs Playwright's
+Chromium browser. CI skips that helper and installs/caches Chromium explicitly.
+Use this opt-out when dependency-only installs are needed:
+
+```sh
+YTCQ_SKIP_PLAYWRIGHT_INSTALL=1 npm install
+```
+
+Retry the Chromium install manually:
 
 ```sh
 npm run test:browser:install
 ```
 
-Install Chromium plus Linux system dependencies:
+On Linux, install Chromium plus system dependencies if Playwright reports
+missing browser libraries:
 
 ```sh
 npm run test:browser:install-deps
