@@ -13,6 +13,8 @@ import net from 'node:net';
 import path from 'node:path';
 import { extensionDir } from './paths';
 
+const MUTE_AUDIO_ARG = '--mute-audio';
+
 interface LaunchExtensionContextOptions {
   channel?: string;
   headless?: boolean;
@@ -69,7 +71,8 @@ export async function launchExtensionContext({
         `--disable-extensions-except=${extensionDir}`,
         `--load-extension=${extensionDir}`,
         '--profile-directory=Default',
-        '--no-first-run'
+        '--no-first-run',
+        MUTE_AUDIO_ARG
       ]
     });
   } catch (error) {
@@ -113,6 +116,7 @@ export async function launchNormalChromeExtensionContext({
     '--profile-directory=Default',
     `--remote-debugging-port=${remoteDebuggingPort}`,
     '--no-first-run',
+    MUTE_AUDIO_ARG,
     ...(headless ? [
       '--headless=new',
       '--window-size=1280,900'

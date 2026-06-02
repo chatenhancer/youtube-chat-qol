@@ -18,6 +18,36 @@ describe('background active chat keepalive', () => {
     expect(port.onMessage.removeListener).toHaveBeenCalledWith(expect.any(Function));
   });
 
+  it('keeps a tab active until all same-tab keepalive ports disconnect', async () => {
+    await import('./active-chat-keepalive');
+    const chatTabState = await import('./chat-tab-state');
+    const firstPort = createPort({ name: 'ytcq:active-chat', tabId: 41 });
+    const secondPort = createPort({ name: 'ytcq:active-chat', tabId: 41 });
+
+    getConnectListener()(firstPort);
+    getConnectListener()(secondPort);
+    firstPort.disconnect();
+
+    expect(chatTabState.getActiveChatTabIds()).toEqual([41]);
+
+    secondPort.disconnect();
+    expect(chatTabState.getActiveChatTabIds()).toEqual([]);
+  });
+
+  it('accepts active chat ping messages without changing tab state', async () => {
+    await import('./active-chat-keepalive');
+    const chatTabState = await import('./chat-tab-state');
+    const port = createPort({ name: 'ytcq:active-chat', tabId: 41 });
+
+    getConnectListener()(port);
+    const messageListener = vi.mocked(port.onMessage.addListener).mock.calls[0]?.[0] as (message: unknown) => void;
+    messageListener({ type: 'ytcq:active-chat-ping' });
+    messageListener({ type: 'other' });
+    messageListener(undefined);
+
+    expect(chatTabState.getActiveChatTabIds()).toEqual([41]);
+  });
+
   it('ignores unrelated ports and ports without a tab id', async () => {
     await import('./active-chat-keepalive');
     const chatTabState = await import('./chat-tab-state');

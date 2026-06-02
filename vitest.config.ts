@@ -14,10 +14,10 @@ export default defineConfig({
       reporter: ['text', 'html', 'json-summary'],
       reportsDirectory: 'coverage/unit',
       thresholds: {
-        branches: 64,
-        functions: 81,
-        lines: 82,
-        statements: 78
+        branches: 85,
+        functions: 85,
+        lines: 85,
+        statements: 85
       }
     },
     environment: 'jsdom',

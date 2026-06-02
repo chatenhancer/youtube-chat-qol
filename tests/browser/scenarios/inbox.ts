@@ -8,18 +8,18 @@ import { expect, test } from '@playwright/test';
 import {
   withExtensionStorageSnapshot,
   withExtensionStorageValues
-} from '../helpers/extension-storage';
+} from '../support/extension-storage';
 import {
   appendMockFixtureMessage,
   isMockPageSurface
-} from '../helpers/mock-page';
+} from '../support/mock-page';
 import type { BrowserScenario, ChatSurface } from './types';
 
 const INBOX_KEYWORD = 'browser-inbox-keyword';
 const CURRENT_VIEWER_MENTION = '@CurrentViewer';
 const DIRECT_MENTION_TEXT = `Direct browser mention for ${CURRENT_VIEWER_MENTION}`;
 
-export const inboxScenario: BrowserScenario = async ({ chat }) => {
+export const inboxOpensFromHeaderScenario: BrowserScenario = async ({ chat }) => {
   await expectInboxButtonAttached(chat);
   await openInboxPanel(chat);
   await closeInboxPanel(chat);

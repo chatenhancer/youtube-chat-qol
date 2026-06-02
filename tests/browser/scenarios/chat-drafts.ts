@@ -10,11 +10,11 @@ import {
   clearChatComposer,
   getChatComposerInput,
   getChatComposerText
-} from '../helpers/composer';
+} from '../support/composer';
 import {
   getExtensionStorageValues,
   withExtensionStorageSnapshot
-} from '../helpers/extension-storage';
+} from '../support/extension-storage';
 import type { BrowserScenario, ChatSurface } from './types';
 
 const RECOVERED_DRAFT_TEXT = 'this draft should survive refresh :draft-emoji:';

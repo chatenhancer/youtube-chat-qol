@@ -1,29 +1,37 @@
 /**
  * Browser scenario for avatar recent-message cards.
  *
- * It uses the first visible live-chat message so the same behavior can be
- * checked against both the deterministic fixture and real YouTube chat.
+ * Shared scenarios use the first visible live-chat message so the same behavior
+ * can be checked against both the deterministic fixture and real YouTube chat.
+ * Fixture-only update checks are exported separately.
  */
 import { expect, test, type BrowserContext, type Locator } from '@playwright/test';
 import {
   appendMockFixtureMessage,
   isMockPageSurface
-} from '../helpers/mock-page';
-import { centerLocatorInViewport } from '../helpers/locator';
-import { cleanVisibleText, getRichVisibleText } from '../helpers/text';
+} from '../support/mock-page';
+import { centerLocatorInViewport } from '../support/locator';
+import { cleanVisibleText, getRichVisibleText } from '../support/text';
 import {
   NORMAL_CHAT_MESSAGE_SELECTOR,
   type BrowserScenario,
   type ChatSurface
 } from './types';
 
-export const profileScenario: BrowserScenario = async ({ chat, context }) => {
+export const profileCardRecentMessagesScenario: BrowserScenario = async ({ chat, context }) => {
   const source = await findRecentMessageSource(chat);
   await openProfileCardFromAvatar(chat, source);
   await expectProfileCardHasRecentMessages(chat, source);
   await expectProfileCardJumpToMessage(chat, source);
-  await expectMockProfileCardReceivesNewMessages(chat, source);
   await expectProfileChannelButtonOpensChannel(chat, context);
+  await closeProfileCard(chat);
+};
+
+export const profileCardReceivesNewMessagesScenario: BrowserScenario = async ({ chat }) => {
+  const source = await findRecentMessageSource(chat);
+  await openProfileCardFromAvatar(chat, source);
+  await expectProfileCardHasRecentMessages(chat, source);
+  await appendAuthorMessageAndVerifyProfileCardUpdates(chat, source);
   await closeProfileCard(chat);
 };
 
@@ -92,10 +100,8 @@ async function expectProfileCardHasRecentMessages(chat: ChatSurface, source: Mes
   });
 }
 
-async function expectMockProfileCardReceivesNewMessages(chat: ChatSurface, source: MessageSource): Promise<void> {
-  if (!isMockPageSurface(chat)) return;
-
-  await test.step('Mock-only: append a new author message and verify the card updates', async () => {
+async function appendAuthorMessageAndVerifyProfileCardUpdates(chat: ChatSurface, source: MessageSource): Promise<void> {
+  await test.step('Append a new author message and verify the card updates', async () => {
     const text = `Profile follow-up ${Date.now()}`;
     await appendMockFixtureMessage(chat, {
       author: source.authorName,

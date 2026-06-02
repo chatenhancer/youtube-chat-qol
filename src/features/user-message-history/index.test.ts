@@ -45,6 +45,32 @@ describe('user message history', () => {
       ]);
   });
 
+  it('ignores messages without usable author or text', async () => {
+    const history = await import('./index');
+
+    history.recordUserMessage(createMessage({
+      authorName: '',
+      messageId: 'message-0',
+      text: 'has text but no identity'
+    }));
+    history.recordUserMessage(createMessage({
+      authorName: '',
+      channelId: 'empty-author',
+      messageId: 'message-1',
+      text: 'has text'
+    }));
+    history.recordUserMessage(createMessage({
+      authorName: '@NoText',
+      channelId: 'no-text',
+      messageId: 'message-2',
+      text: ''
+    }));
+
+    expect(history.getRecentMessagesForKey('message-content')).toEqual([]);
+    expect(history.getRecentMessagesForIdentity({ channelId: 'empty-author', authorName: '' })).toEqual([]);
+    expect(history.getRecentMessagesForIdentity({ channelId: 'no-text', authorName: '@NoText' })).toEqual([]);
+  });
+
   it('keeps repeated identical messages without stable ids when they come from different live renderers', async () => {
     const history = await import('./index');
     const first = createMessage({
@@ -82,8 +108,63 @@ describe('user message history', () => {
       .toMatchObject([
         {
           text: 'loaded text'
-        }
-      ]);
+      }
+    ]);
+  });
+
+  it('does not duplicate unchanged records for the same renderer state', async () => {
+    const history = await import('./index');
+    const listener = vi.fn();
+    history.onUserMessagesChanged(listener);
+    const message = createMessage({
+      authorName: '@StableRenderer',
+      channelId: 'stable-renderer-channel',
+      messageId: 'message-1',
+      text: 'same text'
+    });
+
+    history.recordUserMessage(message);
+    history.recordUserMessage(message);
+
+    expect(history.getRecentMessagesForIdentity({
+      authorName: '@StableRenderer',
+      channelId: 'stable-renderer-channel'
+    })).toHaveLength(1);
+    expect(listener).toHaveBeenCalledOnce();
+  });
+
+  it('moves a record when the same renderer changes to another author identity', async () => {
+    const history = await import('./index');
+    const message = createMessage({
+      authorName: '@FirstAuthor',
+      channelId: 'first-channel',
+      messageId: 'message-1',
+      text: 'first message'
+    });
+
+    history.recordUserMessage(message);
+    message.data = {
+      authorExternalChannelId: 'second-channel',
+      authorName: { simpleText: '@SecondAuthor' },
+      id: 'message-2',
+      message: { runs: [{ text: 'second message' }] }
+    };
+    message.innerHTML = `
+      <span id="timestamp">12:00 PM</span>
+      <span id="author-photo"></span>
+      <span id="author-name">@SecondAuthor</span>
+      <span id="message">second message</span>
+    `;
+    history.recordUserMessage(message);
+
+    expect(history.getRecentMessagesForIdentity({
+      authorName: '@FirstAuthor',
+      channelId: 'first-channel'
+    })).toEqual([]);
+    expect(history.getRecentMessagesForIdentity({
+      authorName: '@SecondAuthor',
+      channelId: 'second-channel'
+    })).toMatchObject([{ text: 'second message' }]);
   });
 
   it('keeps only the newest messages per user', async () => {
@@ -104,6 +185,27 @@ describe('user message history', () => {
     expect(messages.at(-1)?.text).toBe('message 12');
   });
 
+  it('prunes the oldest users when the in-memory user cap is exceeded', async () => {
+    const history = await import('./index');
+    for (let index = 0; index < 161; index += 1) {
+      vi.mocked(Date.now).mockReturnValue(new Date(Date.UTC(2026, 4, 31, 12, 0, index)).getTime());
+      history.recordUserMessage(createMessage({
+        authorName: `@User${index}`,
+        channelId: `channel-${index}`,
+        messageId: `message-${index}`,
+        text: `message ${index}`
+      }));
+    }
+
+    expect(history.findRecentUsersByHandle('@User0')).toEqual([]);
+    expect(history.findRecentUsersByHandle('@User160')).toMatchObject([
+      {
+        authorName: '@User160',
+        latestMessage: { text: 'message 160' }
+      }
+    ]);
+  });
+
   it('finds channel-id records even when the visible handle changes', async () => {
     const history = await import('./index');
     history.recordUserMessage(createMessage({
@@ -120,6 +222,23 @@ describe('user message history', () => {
         text: 'message before rename'
       }
     ]);
+  });
+
+  it('falls back to author-name records when no channel id is known', async () => {
+    const history = await import('./index');
+    history.recordUserMessage(createMessage({
+      authorName: '@FallbackHandle',
+      messageId: 'message-1',
+      text: 'author-only message'
+    }));
+
+    expect(history.getRecentMessagesForIdentity({ authorName: '@FallbackHandle' }))
+      .toMatchObject([
+        {
+          authorName: '@FallbackHandle',
+          text: 'author-only message'
+        }
+      ]);
   });
 
   it('finds recently seen users by exact handle before prefix matches', async () => {
@@ -164,6 +283,12 @@ describe('user message history', () => {
 
     expect(matches).toHaveLength(1);
     expect(matches[0].latestMessage.text).toBe('second fallback record');
+  });
+
+  it('returns no handle matches for blank queries', async () => {
+    const history = await import('./index');
+
+    expect(history.findRecentUsersByHandle('   ')).toEqual([]);
   });
 
   it('notifies listeners when a user history record changes and stops after unsubscribe', async () => {
@@ -221,6 +346,163 @@ describe('user message history', () => {
 
     latest.remove();
     expect(history.getLiveMessageForRecord(latestRecord!)).toBeNull();
+  });
+
+  it('records visible live messages from the document', async () => {
+    const history = await import('./index');
+    createMessage({
+      authorName: '@VisibleUser',
+      channelId: 'visible-channel',
+      messageId: 'message-1',
+      text: 'visible message'
+    });
+
+    history.recordVisibleUserMessages();
+
+    expect(history.getRecentMessagesForKey('channel:visible-channel')).toMatchObject([
+      { text: 'visible message' }
+    ]);
+  });
+
+  it('records changed messages from the lifecycle mutation collector', async () => {
+    const history = await import('./index');
+    const lifecycle = await import('../../content/lifecycle');
+    const message = createMessage({
+      authorName: '@MutationUser',
+      channelId: 'mutation-channel',
+      messageId: 'message-1',
+      text: 'mutation message'
+    });
+
+    lifecycle.handleFeatureMutations({
+      addedElements: [],
+      changedMessages: [message],
+      mutations: []
+    });
+
+    expect(history.getRecentMessagesForIdentity({
+      authorName: '@MutationUser',
+      channelId: 'mutation-channel'
+    })).toMatchObject([{ text: 'mutation message' }]);
+  });
+
+  it('uses elapsed replay timestamps for replay chat pages', async () => {
+    window.history.replaceState({}, '', '/live_chat_replay?continuation=replay-token');
+    const history = await import('./index');
+    history.recordUserMessage(createMessage({
+      authorName: '@ReplayUser',
+      channelId: 'replay-channel',
+      messageId: 'message-1',
+      text: 'replay message',
+      timestampText: '0:09'
+    }));
+    const expectedTimestamp = new Date(Date.now());
+    expectedTimestamp.setHours(0, 0, 9, 0);
+
+    expect(history.getLatestMessageForIdentity({
+      authorName: '@ReplayUser',
+      channelId: 'replay-channel'
+    })?.timestamp).toBe(expectedTimestamp.getTime());
+  });
+
+  it('mirrors rendered and cleared translations into recent message records', async () => {
+    const history = await import('./index');
+    const lifecycle = await import('../../content/lifecycle');
+    const events = await import('../translation/events');
+    lifecycle.initFeatures({ saveOptions: vi.fn() });
+    const message = createMessage({
+      authorName: '@TranslatedUser',
+      channelId: 'translated-channel',
+      messageId: 'message-1',
+      text: 'hola'
+    });
+    history.recordUserMessage(message);
+
+    events.emitMessageTranslationRendered({
+      message,
+      originalText: 'hola',
+      protectedTokens: [{ fallbackText: '@TranslatedUser', node: null, nodes: [], placeholder: '§0§' }],
+      result: { sourceLanguage: 'es', targetLanguage: 'en', text: 'hello' },
+      sourceText: 'hola'
+    });
+
+    expect(history.getLatestMessageForIdentity({
+      authorName: '@TranslatedUser',
+      channelId: 'translated-channel'
+    })?.translation).toMatchObject({
+      originalText: 'hola',
+      result: { text: 'hello' }
+    });
+
+    events.emitMessageTranslationCleared(message);
+    expect(history.getLatestMessageForIdentity({
+      authorName: '@TranslatedUser',
+      channelId: 'translated-channel'
+    })?.translation).toBeUndefined();
+
+    events.emitMessageTranslationRendered({
+      message,
+      originalText: 'hola',
+      protectedTokens: [],
+      result: { sourceLanguage: 'es', targetLanguage: 'en', text: 'hello again' },
+      sourceText: 'hola'
+    });
+    events.emitMessageTranslationsCleared();
+    expect(history.getLatestMessageForIdentity({
+      authorName: '@TranslatedUser',
+      channelId: 'translated-channel'
+    })?.translation).toBeUndefined();
+  });
+
+  it('ignores translation events for unknown messages and missing translations', async () => {
+    const history = await import('./index');
+    const lifecycle = await import('../../content/lifecycle');
+    const events = await import('../translation/events');
+    lifecycle.initFeatures({ saveOptions: vi.fn() });
+    lifecycle.initFeatures({ saveOptions: vi.fn() });
+    const message = createMessage({
+      authorName: '@NoTranslationYet',
+      channelId: 'no-translation-channel',
+      messageId: 'message-1',
+      text: 'hola'
+    });
+    const unknownMessage = createMessage({
+      authorName: '@UnknownTranslation',
+      channelId: 'unknown-translation-channel',
+      messageId: 'message-2',
+      text: 'hola'
+    });
+    history.recordUserMessage(message);
+
+    events.emitMessageTranslationRendered({
+      message: unknownMessage,
+      originalText: 'hola',
+      protectedTokens: [],
+      result: { sourceLanguage: 'es', targetLanguage: 'en', text: 'hello' },
+      sourceText: 'hola'
+    });
+    events.emitMessageTranslationCleared(message);
+
+    expect(history.getLatestMessageForIdentity({
+      authorName: '@NoTranslationYet',
+      channelId: 'no-translation-channel'
+    })?.translation).toBeUndefined();
+  });
+
+  it('returns null and empty values when identity or record data is unavailable', async () => {
+    const history = await import('./index');
+
+    expect(history.getLatestMessageForIdentity({ authorName: '@MissingUser' })).toBeNull();
+    expect(history.getRecentMessagesForIdentity({ authorName: '' })).toEqual([]);
+    expect(history.getAvatarSrcForIdentity({ authorName: '@MissingUser' })).toBe('');
+    expect(history.getLiveMessageForRecord({
+      authorName: '@Detached',
+      contentParts: [],
+      id: 1,
+      text: 'detached',
+      timestamp: 1,
+      timestampText: '12:00 PM'
+    })).toBeNull();
   });
 });
 

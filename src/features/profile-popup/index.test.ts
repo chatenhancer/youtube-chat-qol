@@ -91,6 +91,7 @@ describe('profile popup coordinator', () => {
 
   afterEach(() => {
     cleanupStaleProfilePopupSurfaces();
+    vi.useRealTimers();
   });
 
   it('opens a profile card from a chat avatar and wires header actions', () => {
@@ -119,6 +120,44 @@ describe('profile popup coordinator', () => {
     });
   });
 
+  it('opens the author channel from the header channel button', () => {
+    const message = createMessage();
+    document.body.append(message);
+
+    wireProfileClick(message);
+    message.querySelector<HTMLElement>('#author-photo')!.click();
+    document.querySelector<HTMLButtonElement>('.ytcq-profile-card-channel')!.click();
+
+    expect(channelMocks.openChannelWindow).toHaveBeenCalledWith('https://www.youtube.com/@ViewerOne');
+  });
+
+  it('renders a profile card without channel actions when no profile URL exists', () => {
+    profileTestState.messageSource = source({ profileUrl: '' });
+    const message = createMessage();
+    document.body.append(message);
+
+    wireProfileClick(message);
+    message.querySelector<HTMLElement>('#author-photo')!.click();
+
+    expect(document.querySelector('.ytcq-profile-card-header-has-channel')).toBeNull();
+    expect(document.querySelector('.ytcq-profile-card-channel')).toBeNull();
+  });
+
+  it('does not rewire a message twice and tolerates messages without avatars', () => {
+    const message = createMessage();
+    const avatar = message.querySelector<HTMLElement>('#author-photo')!;
+    document.body.append(message);
+
+    wireProfileClick(message);
+    wireProfileClick(message);
+    avatar.click();
+    expect(sourceMocks.getMessageProfileSource).toHaveBeenCalledOnce();
+
+    const noAvatar = document.createElement('yt-live-chat-text-message-renderer');
+    wireProfileClick(noAvatar);
+    expect(noAvatar.dataset.ytcqProfileWired).toBe('true');
+  });
+
   it('opens profile cards from participant avatars and names', () => {
     const participant = document.createElement('yt-live-chat-participant-renderer');
     participant.innerHTML = `
@@ -134,6 +173,16 @@ describe('profile popup coordinator', () => {
     expect(sourceMocks.getParticipantProfileSource).toHaveBeenCalledWith(participant);
   });
 
+  it('tolerates participants without clickable avatar or author targets', () => {
+    const participant = document.createElement('yt-live-chat-participant-renderer');
+
+    wireParticipantProfileClick(participant);
+    wireParticipantProfileClick(participant);
+
+    expect(participant.dataset.ytcqProfileWired).toBe('true');
+    expect(sourceMocks.getParticipantProfileSource).not.toHaveBeenCalled();
+  });
+
   it('opens by identity from recent history and refreshes when matching history changes', () => {
     expect(openProfileCardForIdentity({ authorName: '@ViewerOne', channelId: 'viewer-channel' })).toBe(true);
     expect(historyMocks.recordVisibleUserMessages).toHaveBeenCalled();
@@ -143,6 +192,11 @@ describe('profile popup coordinator', () => {
     profileTestState.userMessagesChanged?.('channel:viewer-channel');
 
     expect(messageMocks.renderProfileMessages).toHaveBeenCalledWith(expect.any(HTMLElement), profileTestState.recentMessages, expect.any(Object), expect.any(Function));
+
+    messageMocks.renderProfileMessages.mockClear();
+    messageMocks.shouldRefreshProfileMessages.mockReturnValueOnce(false);
+    profileTestState.userMessagesChanged?.('channel:other-viewer');
+    expect(messageMocks.renderProfileMessages).not.toHaveBeenCalled();
 
     closeProfileCard();
     profileTestState.recentMessages = [];
@@ -159,6 +213,46 @@ describe('profile popup coordinator', () => {
 
     expect(document.querySelector('.ytcq-profile-card')).toBeNull();
     expect(message.hasAttribute('data-ytcq-profile-wired')).toBe(false);
+  });
+
+  it('closes from the header button, outside click, and Escape', async () => {
+    vi.useFakeTimers();
+    const message = createMessage();
+    document.body.append(message);
+    wireProfileClick(message);
+
+    message.querySelector<HTMLElement>('#author-photo')!.click();
+    document.querySelector<HTMLButtonElement>('.ytcq-profile-card-close')!.click();
+    expect(document.querySelector('.ytcq-profile-card')).toBeNull();
+
+    message.querySelector<HTMLElement>('#author-photo')!.click();
+    await vi.runOnlyPendingTimersAsync();
+    document.body.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(document.querySelector('.ytcq-profile-card')).toBeNull();
+
+    message.querySelector<HTMLElement>('#author-photo')!.click();
+    await vi.runOnlyPendingTimersAsync();
+    document.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Escape' }));
+    expect(document.querySelector('.ytcq-profile-card')).toBeNull();
+  });
+
+  it('repositions on resize and closes when the anchor disconnects', async () => {
+    vi.useFakeTimers();
+    const message = createMessage();
+    document.body.append(message);
+    const avatar = message.querySelector<HTMLElement>('#author-photo')!;
+    wireProfileClick(message);
+    avatar.click();
+    await vi.runOnlyPendingTimersAsync();
+
+    window.dispatchEvent(new Event('resize'));
+    await vi.runOnlyPendingTimersAsync();
+    expect(positioningMocks.positionProfileCard).toHaveBeenCalledWith(expect.any(HTMLElement), avatar);
+
+    avatar.remove();
+    window.dispatchEvent(new Event('resize'));
+    await vi.runOnlyPendingTimersAsync();
+    expect(document.querySelector('.ytcq-profile-card')).toBeNull();
   });
 
   it('ignores profile clicks when YouTube source details cannot be read', () => {

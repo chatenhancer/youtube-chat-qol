@@ -6,10 +6,10 @@
  * response-shape changes fail in one clearly named browser test.
  */
 import { expect, test, type BrowserContext, type Locator } from '@playwright/test';
-import { withExtensionStorageValues } from '../helpers/extension-storage';
-import { cleanVisibleText } from '../helpers/text';
-import { withMockedTranslationEndpoint } from '../helpers/translation-endpoint';
-import { openSettingsMenu } from './menu-openers';
+import { withExtensionStorageValues } from '../support/extension-storage';
+import { cleanVisibleText } from '../support/text';
+import { withMockedTranslationEndpoint } from '../support/translation-endpoint';
+import { openSettingsMenu } from '../support/menu-openers';
 import {
   NORMAL_CHAT_MESSAGE_SELECTOR,
   type ChatSurface,

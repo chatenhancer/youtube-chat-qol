@@ -15,6 +15,13 @@ describe('chat command time helpers', () => {
     expect(formatTime('')).toMatch(/\d/);
   });
 
+  it('formats known timezone aliases for /time', () => {
+    expect(formatTime('tokyo')).toMatch(/\d/);
+    expect(formatTime('NYC')).toMatch(/\d/);
+    expect(getTimeZoneOption('utc')?.timeZone).toBe('UTC');
+    expect(getTimeZoneOption('')).toBeNull();
+  });
+
   it('rejects unknown timezone aliases', () => {
     expect(formatTime('not-a-place')).toBe('');
     expect(getTimeZoneOption('pt')?.label).toBe('Los Angeles');
@@ -35,6 +42,33 @@ describe('chat command time helpers', () => {
 
     expect(result).not.toBeNull();
     expect(result?.detail).toContain('Tokyo');
+  });
+
+  it('supports date-only, date-last, seconds, and past /when targets', () => {
+    expect(formatWhenResult('2026-5-30')).toEqual(expect.objectContaining({
+      insertion: expect.stringMatching(/\d/)
+    }));
+    expect(formatWhenResult('8pm 2026-5-29 pt')?.detail).toContain('Los Angeles');
+    expect(formatWhenResult('2026-5-29 12:00:30')?.detail).toContain('12:00');
+    expect(formatWhenResult('2026-5-28 8pm')?.detail).toContain('since');
+  });
+
+  it('formats zero-duration /when targets as seconds', () => {
+    const result = formatWhenResult('14:00');
+
+    expect(result?.insertion).toMatch(/0/);
+    expect(result?.detail).toContain(result?.insertion);
+  });
+
+  it('rejects invalid /when dates and times', () => {
+    expect(formatWhenResult('2026-2-29')).toBeNull();
+    expect(formatWhenResult('2026-13-1 8pm')).toBeNull();
+    expect(formatWhenResult('2026-5-29 25:00')).toBeNull();
+    expect(formatWhenResult('7:61')).toBeNull();
+    expect(formatWhenResult('7:45:61')).toBeNull();
+    expect(formatWhenResult('13pm')).toBeNull();
+    expect(formatWhenResult('24')).toBeNull();
+    expect(formatWhenResult('')).toBeNull();
   });
 
   it('rejects relative day words for /when', () => {

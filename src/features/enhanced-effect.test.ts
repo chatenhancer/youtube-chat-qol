@@ -17,6 +17,9 @@ describe('enhanced startup effect', () => {
       height: 120,
       width: 320
     }));
+    vi.spyOn(window, 'matchMedia').mockReturnValue({
+      matches: false
+    } as MediaQueryList);
   });
 
   afterEach(() => {
@@ -64,6 +67,62 @@ describe('enhanced startup effect', () => {
 
     await vi.advanceTimersByTimeAsync(1_000);
     expect(canvasContext.clearRect).toHaveBeenCalledWith(0, 0, canvas.width, canvas.height);
+  });
+
+  it('skips animation frames when the user prefers reduced motion', async () => {
+    vi.mocked(window.matchMedia).mockReturnValue({
+      matches: true
+    } as MediaQueryList);
+
+    showEnhancedEffect({ animate: true });
+    await vi.advanceTimersByTimeAsync(16);
+
+    expect(canvasContext.createConicGradient).not.toHaveBeenCalled();
+    expect(canvasContext.clearRect).toHaveBeenCalled();
+  });
+
+  it('reuses an existing effect surface and restarts pending activation timers', async () => {
+    showEnhancedEffect({ animate: false });
+    const firstEffect = document.querySelector('.ytcq-enhanced-effect');
+
+    showEnhancedEffect({ animate: false });
+
+    expect(document.querySelectorAll('.ytcq-enhanced-effect')).toHaveLength(1);
+    expect(document.querySelector('.ytcq-enhanced-effect')).toBe(firstEffect);
+    await vi.advanceTimersByTimeAsync(999);
+    expect(firstEffect?.isConnected).toBe(true);
+  });
+
+  it('falls back to viewport dimensions when the canvas has no measured size', async () => {
+    vi.spyOn(HTMLCanvasElement.prototype, 'getBoundingClientRect').mockReturnValue(rect({
+      height: 0,
+      width: 0
+    }));
+    Object.defineProperty(window, 'innerWidth', {
+      configurable: true,
+      value: 200
+    });
+    Object.defineProperty(window, 'innerHeight', {
+      configurable: true,
+      value: 100
+    });
+
+    showEnhancedEffect({ animate: true });
+    const canvas = document.querySelector<HTMLCanvasElement>('.ytcq-enhanced-effect canvas')!;
+    await vi.advanceTimersByTimeAsync(16);
+
+    expect(canvas.width).toBe(140);
+    expect(canvas.height).toBe(70);
+  });
+
+  it('does not draw if the effect disappears before the next animation frame', async () => {
+    showEnhancedEffect({ animate: true });
+    const canvas = document.querySelector('.ytcq-enhanced-effect canvas');
+    canvas?.parentElement?.remove();
+
+    await vi.advanceTimersByTimeAsync(16);
+
+    expect(canvasContext.createConicGradient).not.toHaveBeenCalled();
   });
 });
 

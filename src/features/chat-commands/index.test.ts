@@ -41,6 +41,7 @@ const autocompleteMocks = vi.hoisted(() => ({
   close: vi.fn(),
   handleKeydown: vi.fn(() => false),
   handlePointerDown: vi.fn(),
+  options: null as { isChatInputActive: () => boolean } | null,
   scheduleUpdate: vi.fn()
 }));
 
@@ -57,7 +58,10 @@ const toastMocks = vi.hoisted(() => ({
 
 vi.mock('../../youtube/chat-input', () => chatInputMocks);
 vi.mock('./autocomplete', () => ({
-  createCommandAutocomplete: vi.fn(() => autocompleteMocks)
+  createCommandAutocomplete: vi.fn((options: { isChatInputActive: () => boolean }) => {
+    autocompleteMocks.options = options;
+    return autocompleteMocks;
+  })
 }));
 vi.mock('./cards', () => ({
   createCommandCards: vi.fn(() => cardsMocks)
@@ -79,6 +83,7 @@ vi.mock('./commands', () => ({
         run: () => runtime.replaceLastSentMessage()
       },
       {
+        helpDescriptionKey: 'commandHelpMention',
         helpLabel: '/mention',
         inline: true,
         kind: 'text',
@@ -132,7 +137,53 @@ describe('chat commands entrypoint', () => {
     dispatchDocumentEvent('keydown', keydown('Enter'));
 
     expect(cardsMocks.showHelp).toHaveBeenCalledOnce();
+    const getDescription = cardsMocks.showHelp.mock.calls[0]?.[1] as (command: ChatCommandDefinition) => string;
+    expect(getDescription({
+      helpDescriptionKey: 'commandHelpMention',
+      helpLabel: '/mention',
+      kind: 'text',
+      names: ['mention'],
+      run: vi.fn()
+    })).toContain('Mention');
     expect(toastMocks.showToast).toHaveBeenCalledWith('Press Tab to run this command.');
+  });
+
+  it('ignores composing, prevented, and outside key events', () => {
+    initChatCommands(vi.fn());
+    chatState.text = '/help';
+    const prevented = keydown('Tab');
+    prevented.preventDefault();
+
+    dispatchDocumentEvent('keydown', prevented);
+    dispatchDocumentEvent('keydown', keydown('Tab', { isComposing: true }));
+    dispatchDocumentEvent('keydown', keydown('Tab'), document.createElement('button'));
+
+    expect(cardsMocks.showHelp).not.toHaveBeenCalled();
+  });
+
+  it('lets unknown slash commands pass through unchanged', () => {
+    initChatCommands(vi.fn());
+    chatState.text = '/unknown';
+    const tab = keydown('Tab');
+    const enter = keydown('Enter');
+
+    dispatchDocumentEvent('keydown', tab);
+    dispatchDocumentEvent('keydown', enter);
+
+    expect(tab.defaultPrevented).toBe(false);
+    expect(enter.defaultPrevented).toBe(false);
+    expect(toastMocks.showToast).not.toHaveBeenCalled();
+  });
+
+  it('does not block Shift Enter for known commands', () => {
+    initChatCommands(vi.fn());
+    chatState.text = '/help';
+    const enter = keydown('Enter', { shiftKey: true });
+
+    dispatchDocumentEvent('keydown', enter);
+
+    expect(enter.defaultPrevented).toBe(false);
+    expect(toastMocks.showToast).not.toHaveBeenCalled();
   });
 
   it('expands inline-capable commands at the chat input caret', () => {
@@ -150,6 +201,16 @@ describe('chat commands entrypoint', () => {
     expect(chatState.text).toBe('hello @LatestUser ');
   });
 
+  it('lets autocomplete own keydown handling before command execution', () => {
+    autocompleteMocks.handleKeydown.mockReturnValueOnce(true);
+    initChatCommands(vi.fn());
+    chatState.text = '/help';
+
+    dispatchDocumentEvent('keydown', keydown('Tab'));
+
+    expect(cardsMocks.showHelp).not.toHaveBeenCalled();
+  });
+
   it('remembers sent messages and restores them with /again', () => {
     initChatCommands(vi.fn());
     chatState.text = 'previous message';
@@ -164,6 +225,18 @@ describe('chat commands entrypoint', () => {
     });
   });
 
+  it('reports when restoring a previous message cannot write to the composer', () => {
+    initChatCommands(vi.fn());
+    chatState.text = 'previous message';
+    dispatchDocumentEvent('keydown', keydown('Enter'));
+    chatState.text = '/again';
+    chatInputMocks.replaceChatInputSnapshot.mockReturnValueOnce(false);
+
+    dispatchDocumentEvent('keydown', keydown('Tab'));
+
+    expect(toastMocks.showToast).toHaveBeenCalledWith('Could not find the chat input.');
+  });
+
   it('lets escaped slash commands send after replacing the double slash', () => {
     initChatCommands(vi.fn());
     chatState.text = '//help';
@@ -176,6 +249,114 @@ describe('chat commands entrypoint', () => {
     const secondEnter = keydown('Enter');
     dispatchDocumentEvent('keydown', secondEnter);
     expect(secondEnter.defaultPrevented).toBe(false);
+  });
+
+  it('lets escaped slash commands send from the send button after the first replacement click', () => {
+    initChatCommands(vi.fn());
+    const sendButton = document.createElement('button');
+    sendButton.id = 'send-button';
+    document.body.append(sendButton);
+    chatState.text = '//help';
+    const firstClick = mouseEvent('click');
+
+    dispatchDocumentEvent('click', firstClick, sendButton);
+    expect(firstClick.defaultPrevented).toBe(true);
+    expect(chatState.text).toBe('/help');
+
+    const secondClick = mouseEvent('click');
+    dispatchDocumentEvent('click', secondClick, sendButton);
+    expect(secondClick.defaultPrevented).toBe(false);
+  });
+
+  it('applies the same command blocking rules to send button clicks', () => {
+    initChatCommands(vi.fn());
+    const sendButton = document.createElement('button');
+    sendButton.id = 'send-button';
+    document.body.append(sendButton);
+    chatState.text = '/help';
+    const knownClick = mouseEvent('click');
+
+    dispatchDocumentEvent('click', knownClick, sendButton);
+
+    expect(knownClick.defaultPrevented).toBe(true);
+    expect(toastMocks.showToast).toHaveBeenCalledWith('Press Tab to run this command.');
+
+    toastMocks.showToast.mockClear();
+    chatState.text = '/unknown';
+    const unknownClick = mouseEvent('click');
+    dispatchDocumentEvent('click', unknownClick, sendButton);
+    expect(unknownClick.defaultPrevented).toBe(false);
+    expect(toastMocks.showToast).not.toHaveBeenCalled();
+  });
+
+  it('remembers ordinary send-button text for repeat commands', () => {
+    initChatCommands(vi.fn());
+    const sendButton = document.createElement('button');
+    sendButton.id = 'send-button';
+    document.body.append(sendButton);
+    chatState.text = 'ordinary message';
+
+    dispatchDocumentEvent('click', mouseEvent('click'), sendButton);
+    chatState.text = '/again';
+    dispatchDocumentEvent('keydown', keydown('Tab'));
+
+    expect(chatInputMocks.replaceChatInputSnapshot).toHaveBeenCalledWith({
+      childNodes: [],
+      text: 'ordinary message'
+    });
+  });
+
+  it('reports chat input active state through the autocomplete runtime options', () => {
+    initChatCommands(vi.fn());
+
+    expect(autocompleteMocks.options?.isChatInputActive()).toBe(false);
+
+    chatState.input!.tabIndex = 0;
+    chatState.input?.focus();
+    expect(autocompleteMocks.options?.isChatInputActive()).toBe(true);
+
+    chatState.input = null;
+    expect(autocompleteMocks.options?.isChatInputActive()).toBe(false);
+  });
+
+  it('updates autocomplete from input and selection activity', () => {
+    initChatCommands(vi.fn());
+
+    dispatchDocumentEvent('input', new InputEvent('input', { bubbles: true }));
+    dispatchDocumentEvent('selectionchange', new Event('selectionchange'));
+    dispatchDocumentEvent('mousedown', mouseEvent('mousedown'));
+
+    expect(autocompleteMocks.scheduleUpdate).toHaveBeenCalledTimes(2);
+    expect(autocompleteMocks.handlePointerDown).toHaveBeenCalledOnce();
+  });
+
+  it('shows useful runtime errors when command replacement helpers cannot write', () => {
+    initChatCommands(vi.fn());
+
+    commandState.runtime?.replaceCommandText('', 'Empty command output.');
+    commandState.runtime?.replaceInlineCommandText('', {
+      args: '',
+      end: 5,
+      name: 'mention',
+      start: 0,
+      text: '/mention'
+    }, 'Empty inline output.');
+    chatInputMocks.replaceChatInput.mockReturnValueOnce(false);
+    commandState.runtime?.replaceCommandText('replacement', 'Empty command output.');
+    chatInputMocks.replaceChatInputTextRange.mockReturnValueOnce(false);
+    commandState.runtime?.replaceInlineCommandText('inline', {
+      args: '',
+      end: 5,
+      name: 'mention',
+      start: 0,
+      text: '/mention'
+    }, 'Empty inline output.');
+    commandState.runtime?.replaceLastSentMessage();
+
+    expect(toastMocks.showToast).toHaveBeenCalledWith('Empty command output.');
+    expect(toastMocks.showToast).toHaveBeenCalledWith('Empty inline output.');
+    expect(toastMocks.showToast).toHaveBeenCalledWith('Could not find the chat input.');
+    expect(toastMocks.showToast).toHaveBeenCalledWith('No previous message yet.');
   });
 
   it('cleans command cards and resets command state', () => {
@@ -195,19 +376,27 @@ describe('chat commands entrypoint', () => {
     expect(autocompleteMocks.close).toHaveBeenCalled();
   });
 
-  function dispatchDocumentEvent(type: string, event: Event): void {
+  function dispatchDocumentEvent(type: string, event: Event, target: EventTarget = chatState.input!): void {
     Object.defineProperty(event, 'target', {
       configurable: true,
-      value: chatState.input
+      value: target
     });
     documentListeners[type]?.forEach((listener) => listener(event));
   }
 });
 
-function keydown(key: string): KeyboardEvent {
+function keydown(key: string, options: KeyboardEventInit = {}): KeyboardEvent {
   return new KeyboardEvent('keydown', {
     bubbles: true,
     cancelable: true,
-    key
+    key,
+    ...options
+  });
+}
+
+function mouseEvent(type: string): MouseEvent {
+  return new MouseEvent(type, {
+    bubbles: true,
+    cancelable: true
   });
 }

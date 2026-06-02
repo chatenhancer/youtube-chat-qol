@@ -5,12 +5,12 @@
  * shared option fields that feature modules consume.
  */
 import { expect, test, type BrowserContext, type Locator, type Page } from '@playwright/test';
-import { getExtensionId } from '../helpers/extension';
+import { getExtensionId } from '../support/extension';
 import {
   getExtensionStorageValues,
   withExtensionStorageValues
-} from '../helpers/extension-storage';
-import { openSettingsMenu } from './menu-openers';
+} from '../support/extension-storage';
+import { openSettingsMenu } from '../support/menu-openers';
 import type { BrowserScenario, ChatSurface } from './types';
 
 const SETTINGS_INITIAL_VALUES = {

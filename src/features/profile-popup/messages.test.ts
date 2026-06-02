@@ -1,4 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { DEFAULT_OPTIONS } from '../../shared/options';
+import { setOptions } from '../../shared/state';
 import type { MessageRecord } from '../user-message-history';
 import type { ProfileSource } from './types';
 
@@ -26,6 +28,11 @@ describe('profile card message renderer', () => {
   beforeEach(() => {
     document.body.replaceChildren();
     vi.clearAllMocks();
+    setOptions({
+      ...DEFAULT_OPTIONS,
+      targetLanguage: 'en',
+      translationDisplay: 'below'
+    });
   });
 
   it('renders an empty centered state when there are no recent messages', () => {
@@ -62,6 +69,101 @@ describe('profile card message renderer', () => {
       }
     });
     expect(onClose).toHaveBeenCalledOnce();
+
+    const nextClose = vi.fn();
+    renderProfileMessages(list, [recentMessage], source(), nextClose);
+    list.querySelector<HTMLElement>('.ytcq-profile-card-message')!
+      .dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Enter' }));
+    expect(nextClose).toHaveBeenCalledOnce();
+  });
+
+  it('renders inline translations that match the active target language', () => {
+    const list = document.createElement('div');
+
+    renderProfileMessages(list, [record({
+      text: 'hola',
+      translation: {
+        originalText: 'hola',
+        protectedTokens: [],
+        result: {
+          sourceLanguage: 'es',
+          targetLanguage: 'en',
+          text: 'hello'
+        },
+        sourceText: 'hola'
+      }
+    })], source(), vi.fn());
+
+    expect(list.querySelector('.ytcq-translation')?.textContent).toContain('hello');
+  });
+
+  it('renders replaced translations when replace display mode is selected', () => {
+    setOptions({
+      ...DEFAULT_OPTIONS,
+      targetLanguage: 'en',
+      translationDisplay: 'replace'
+    });
+    const list = document.createElement('div');
+
+    renderProfileMessages(list, [record({
+      text: 'hola',
+      translation: {
+        originalText: 'hola',
+        protectedTokens: [],
+        result: {
+          sourceLanguage: 'es',
+          targetLanguage: 'en',
+          text: 'hello'
+        },
+        sourceText: 'hola'
+      }
+    })], source(), vi.fn());
+
+    const item = list.querySelector<HTMLElement>('.ytcq-profile-card-message')!;
+    const text = list.querySelector<HTMLElement>('.ytcq-profile-card-message-text')!;
+    expect(item.classList.contains('ytcq-translation-replaced')).toBe(true);
+    expect(text.lang).toBe('en');
+    expect(text.textContent).toContain('hello');
+    expect(text.title).toContain('hola');
+  });
+
+  it('hides stale or unchanged profile translations', () => {
+    const list = document.createElement('div');
+
+    renderProfileMessages(list, [
+      record({
+        text: 'hola',
+        translation: {
+          originalText: 'hola',
+          protectedTokens: [],
+          result: {
+            sourceLanguage: 'es',
+            targetLanguage: 'ja',
+            text: 'こんにちは'
+          },
+          sourceText: 'hola'
+        }
+      }),
+      record({
+        id: 2,
+        messageId: 'message-2',
+        text: 'same',
+        translation: {
+          originalText: 'same',
+          protectedTokens: [],
+          result: {
+            sourceLanguage: 'en',
+            targetLanguage: 'en',
+            text: 'same'
+          },
+          sourceText: 'same'
+        }
+      })
+    ], source(), vi.fn());
+
+    expect(list.querySelector('.ytcq-translation')).toBeNull();
+    expect(list.textContent).toContain('hola');
+    expect(list.textContent).toContain('same');
   });
 
   it('adds a jump button when the live message renderer is still connected', () => {
@@ -96,6 +198,7 @@ describe('profile card message renderer', () => {
       authorName: '@SomeoneElse'
     })]);
     expect(shouldRefreshProfileMessages('author:other', source(), 'channel:focused-channel')).toBe(false);
+    expect(shouldRefreshProfileMessages('author:empty', { ...source(), authorName: '' }, 'channel:focused-channel')).toBe(false);
   });
 });
 

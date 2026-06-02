@@ -1,4 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import {
+  bootFeatures,
+  handleFeatureMutations,
+  resetFeatures
+} from '../../content/lifecycle';
 
 const menuMocks = vi.hoisted(() => ({
   cleanupStaleMessageMenuSurfaces: vi.fn(),
@@ -89,6 +94,70 @@ describe('menu router', () => {
 
     expect(menuMocks.cleanupStaleMessageMenuSurfaces).toHaveBeenCalledOnce();
     expect(menuMocks.cleanupStaleSettingsMenuSurfaces).toHaveBeenCalledOnce();
+  });
+
+  it('scans already-open menus during feature boot', async () => {
+    const menu = createMenu(`
+      <div id="items">
+        <yt-live-chat-toggle-renderer></yt-live-chat-toggle-renderer>
+      </div>
+    `);
+    document.body.append(menu);
+
+    bootFeatures();
+    await vi.runAllTimersAsync();
+
+    expect(menuMocks.enhanceSettingsMenu).toHaveBeenCalledWith(menu);
+  });
+
+  it('refreshes settings menus during feature reset', () => {
+    resetFeatures();
+
+    expect(menuMocks.refreshSettingsMenus).toHaveBeenCalledOnce();
+  });
+
+  it('routes menus from mutation targets, added popups, containing popups, and descendants', async () => {
+    menuMocks.isRecentActiveContextMessage.mockReturnValue(true);
+    const targetMenu = createMenu(`
+      <div id="items">
+        <ytd-menu-service-item-renderer></ytd-menu-service-item-renderer>
+      </div>
+    `);
+    const targetChild = targetMenu.querySelector('#items')!;
+    const addedMenu = createMenu(`
+      <div id="items">
+        <yt-live-chat-toggle-renderer></yt-live-chat-toggle-renderer>
+      </div>
+    `);
+    const containingMenu = createMenu(`
+      <div id="items">
+        <ytd-menu-navigation-item-renderer></ytd-menu-navigation-item-renderer>
+      </div>
+    `);
+    const containingChild = document.createElement('span');
+    containingMenu.append(containingChild);
+    const wrapper = document.createElement('div');
+    const descendantMenu = createMenu(`
+      <div id="items">
+        <yt-live-chat-toggle-renderer></yt-live-chat-toggle-renderer>
+      </div>
+    `);
+    wrapper.append(descendantMenu);
+    document.body.append(targetMenu, containingMenu);
+
+    handleFeatureMutations({
+      addedElements: [addedMenu, containingChild, wrapper],
+      changedMessages: [],
+      mutations: [{
+        target: targetChild,
+        type: 'childList'
+      } as unknown as MutationRecord]
+    });
+    await vi.runAllTimersAsync();
+
+    expect(menuMocks.enhanceMessageContextMenu).toHaveBeenCalledWith(targetMenu);
+    expect(menuMocks.enhanceSettingsMenu).toHaveBeenCalledWith(addedMenu);
+    expect(menuMocks.enhanceSettingsMenu).toHaveBeenCalledWith(descendantMenu);
   });
 });
 

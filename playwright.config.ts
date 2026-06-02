@@ -8,7 +8,7 @@
 import { defineConfig } from '@playwright/test';
 import { readdirSync } from 'node:fs';
 import path from 'node:path';
-import { shouldCaptureBrowserFailureArtifacts } from './tests/browser/helpers/artifact-policy';
+import { shouldCaptureBrowserFailureArtifacts } from './tests/browser/support/artifact-policy';
 
 const DEFAULT_WORKERS = getBrowserSpecFileCount();
 const reportOutputFolder = process.env.YTCQ_PLAYWRIGHT_REPORT_DIR ?? 'playwright-report/browser';
@@ -33,12 +33,12 @@ export default defineConfig({
   projects: [
     {
       name: 'youtube-mock',
-      testMatch: /specs\/youtube-mock\/.*\.spec\.ts/,
+      testMatch: /specs\/yt-mock-(?!perf-).*\.spec\.ts/,
       use: failureArtifactUse
     },
     {
       name: 'youtube-live',
-      testMatch: /specs\/youtube-live\/.*\.spec\.ts/,
+      testMatch: /specs\/yt-live-.*\.spec\.ts/,
       use: shouldCaptureBrowserFailureArtifacts('youtube-live') ? failureArtifactUse : disabledArtifactUse
     }
   ],

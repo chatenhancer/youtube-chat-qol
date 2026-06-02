@@ -5,15 +5,15 @@
  * the deterministic YouTube fixture or a real YouTube live chat frame.
  */
 import type { BrowserContext } from '@playwright/test';
-import type { ChatSurface } from '../helpers/chat-surface';
+import {
+  NORMAL_CHAT_MESSAGE_SELECTOR,
+  type ChatSurface
+} from '../support/chat-surface';
 
-export type { ChatSurface };
-
-export const NORMAL_CHAT_MESSAGE_SELECTOR = [
-  'yt-live-chat-text-message-renderer:not([in-banner])',
-  ':not([in-collapsed-banner])',
-  ':not([author-is-owner])'
-].join('');
+export {
+  NORMAL_CHAT_MESSAGE_SELECTOR,
+  type ChatSurface
+};
 
 export interface BrowserScenarioSession {
   /**

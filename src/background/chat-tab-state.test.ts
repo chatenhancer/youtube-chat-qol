@@ -62,6 +62,20 @@ describe('background chat tab state', () => {
     });
   });
 
+  it('does not rewrite storage when clearing an unknown tab', async () => {
+    await chrome.storage.local.set({
+      [KNOWN_CHAT_TABS_STORAGE_KEY]: { 42: Date.now() }
+    });
+    vi.mocked(chrome.storage.local.set).mockClear();
+
+    clearChatTab(99);
+
+    expect(chrome.storage.local.set).not.toHaveBeenCalled();
+    await expect(chrome.storage.local.get(KNOWN_CHAT_TABS_STORAGE_KEY)).resolves.toEqual({
+      [KNOWN_CHAT_TABS_STORAGE_KEY]: { 42: expect.any(Number) }
+    });
+  });
+
   it('refreshes known inactive tabs without overriding active tabs', async () => {
     await chrome.storage.local.set({
       [KNOWN_CHAT_TABS_STORAGE_KEY]: {
@@ -82,5 +96,20 @@ describe('background chat tab state', () => {
       }),
       expect.any(Function)
     );
+  });
+
+  it('refreshes safely when known chat tab storage is missing or malformed', async () => {
+    refreshKnownChatActionStatuses();
+    await Promise.resolve();
+    expect(chrome.action.setIcon).not.toHaveBeenCalled();
+
+    await chrome.storage.local.set({
+      [KNOWN_CHAT_TABS_STORAGE_KEY]: 'not records'
+    });
+
+    refreshKnownChatActionStatuses();
+    await Promise.resolve();
+
+    expect(chrome.action.setIcon).not.toHaveBeenCalled();
   });
 });

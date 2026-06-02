@@ -1,11 +1,11 @@
 /**
  * WebExtension storage helpers for browser tests.
  *
- * Tests use an extension page to read and write chrome.storage because content
- * scripts cannot call extension APIs from the page context.
+ * Tests use the extension service worker to read and write chrome.storage
+ * because content scripts cannot call extension APIs from the page context.
  */
-import type { BrowserContext, Page } from '@playwright/test';
-import { getExtensionId } from './extension';
+import type { BrowserContext, Worker } from '@playwright/test';
+import { getExtensionServiceWorker } from './extension';
 
 type StorageArea = 'local' | 'sync';
 type StorageValues = Record<string, unknown>;
@@ -58,7 +58,7 @@ async function readExtensionStorageSnapshot(
   existingKeys: string[];
   values: StorageValues;
 }> {
-  return withExtensionPage(context, (page) => page.evaluate(
+  return withExtensionServiceWorker(context, (serviceWorker) => serviceWorker.evaluate(
     ({ storageArea, storageKeys }) => new Promise((resolve) => {
       chrome.storage[storageArea].get(storageKeys, (stored) => {
         resolve({
@@ -76,7 +76,7 @@ async function readEntireExtensionStorage(
   context: BrowserContext,
   area: StorageArea
 ): Promise<StorageValues> {
-  return withExtensionPage(context, (page) => page.evaluate(
+  return withExtensionServiceWorker(context, (serviceWorker) => serviceWorker.evaluate(
     ({ storageArea }) => new Promise((resolve) => {
       chrome.storage[storageArea].get(null, (stored) => resolve(stored));
     }),
@@ -89,7 +89,7 @@ async function setExtensionStorageValues(
   area: StorageArea,
   values: StorageValues
 ): Promise<void> {
-  await withExtensionPage(context, (page) => page.evaluate(
+  await withExtensionServiceWorker(context, (serviceWorker) => serviceWorker.evaluate(
     ({ storageArea, storageValues }) => new Promise<void>((resolve) => {
       chrome.storage[storageArea].set(storageValues, () => resolve());
     }),
@@ -102,7 +102,7 @@ async function replaceExtensionStorageValues(
   area: StorageArea,
   values: StorageValues
 ): Promise<void> {
-  await withExtensionPage(context, (page) => page.evaluate(
+  await withExtensionServiceWorker(context, (serviceWorker) => serviceWorker.evaluate(
     ({ storageArea, storageValues }) => new Promise<void>((resolve) => {
       chrome.storage[storageArea].clear(() => {
         chrome.storage[storageArea].set(storageValues, () => resolve());
@@ -124,7 +124,7 @@ async function restoreExtensionStorageValues(
   const keysToRemove = previous.requestedKeys
     .filter((key) => !previous.existingKeys.includes(key));
 
-  await withExtensionPage(context, (page) => page.evaluate(
+  await withExtensionServiceWorker(context, (serviceWorker) => serviceWorker.evaluate(
     ({ storageArea, storageKeys, storageValues }) => new Promise<void>((resolve) => {
       chrome.storage[storageArea].remove(storageKeys, () => {
         chrome.storage[storageArea].set(storageValues, () => resolve());
@@ -138,17 +138,9 @@ async function restoreExtensionStorageValues(
   ));
 }
 
-async function withExtensionPage<T>(
+async function withExtensionServiceWorker<T>(
   context: BrowserContext,
-  callback: (page: Page) => Promise<T>
+  callback: (serviceWorker: Worker) => Promise<T>
 ): Promise<T> {
-  const extensionId = await getExtensionId(context);
-  const page = await context.newPage();
-
-  try {
-    await page.goto(`chrome-extension://${extensionId}/popup.html`);
-    return await callback(page);
-  } finally {
-    await page.close();
-  }
+  return callback(await getExtensionServiceWorker(context));
 }

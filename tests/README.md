@@ -1,48 +1,81 @@
 # Tests
 
-Unit tests are colocated with the source files they cover:
+The project uses three test layers:
 
 ```text
-src/**/*.test.ts
+src/**/*.test.ts           Vitest tests colocated with source files
+tests/browser/scenarios/   reusable Playwright browser behavior checks
+tests/browser/specs/       flattened Playwright spec matrix
 ```
 
-This keeps small parser, storage, formatting, matching, and feature tests close
-to the implementation they protect.
+## Test Layers
 
-This folder contains shared test support and cross-feature browser tests:
+**Unit tests**
 
-- `tests/setup.ts`: Vitest setup used by colocated unit tests
-- `tests/browser/`: Playwright browser smoke tests for the built extension
+`npm run test` runs Vitest against colocated `src/**/*.test.ts` files. These
+cover parser, formatter, matching, storage, command, placeholder, and small
+DOM/module behavior close to the implementation.
 
-Run the main unit-test suite with:
+**Browser behavior tests**
+
+`npm run test:browser` runs Playwright against the built extension. These cover
+content-script attachment, YouTube chat frame wiring, injected menus, cards,
+popup status, composer behavior, and real YouTube DOM compatibility.
+
+**Browser performance tests**
+
+`npm run test:browser:perf` runs deterministic mock YouTube stress checks for
+fast chat, translation backlog, keyword matching, panels, and composer
+translation debounce. These are separate from `verify` so performance budgets
+can be checked intentionally.
+
+## Commands
 
 ```sh
 npm run test
 ```
 
-Generate unit-test coverage with:
+Run Vitest tests.
 
 ```sh
 npm run test:coverage
 ```
 
-This prints a text summary and writes the HTML report to
-`coverage/unit/index.html`. The report intentionally measures unit-testable
-logic only. Browser-mounted entrypoints and UI surfaces are covered by the
-Playwright scenario suite instead, so use those reports and traces for behavior
-that needs a real extension frame.
-
-Run the browser smoke tests with:
+Run Vitest with coverage, write `coverage/unit/index.html`, and refresh README
+coverage badges.
 
 ```sh
-npm run test:browser
 npm run test:browser:mock
+```
+
+Run deterministic mock YouTube browser behavior tests.
+
+```sh
 npm run test:browser:live
 ```
 
-CI runs the mock browser smoke test through `npm run verify`. Real YouTube live
-smoke tests stay local-only because they depend on YouTube, Google auth state,
-and a prepared `.chrome-test-profiles/pristine/`.
+Run real YouTube browser behavior tests. Logged-in tests require the dedicated
+test profile described in `tests/browser/README.md`.
 
-See `tests/browser/README.md` for the browser smoke-test profile and privacy
-notes.
+```sh
+npm run test:browser
+```
+
+Run all mock and live browser behavior specs.
+
+```sh
+npm run test:browser:perf
+```
+
+Run mock browser performance specs.
+
+```sh
+npm run verify
+```
+
+Run the CI-style correctness gate: typecheck, lint, Vitest, build, docs build,
+mock browser behavior specs, and logged-out live behavior specs. Signed-in live
+and performance browser specs stay local/manual.
+
+See `tests/browser/README.md` for browser profile setup, browser report paths,
+failure artifacts, and how to add browser scenarios.

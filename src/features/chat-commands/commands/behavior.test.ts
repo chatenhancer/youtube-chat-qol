@@ -138,6 +138,20 @@ describe('chat command behavior', () => {
     );
   });
 
+  it('reports when a resolved quote user has no quotable message', async () => {
+    mocks.getSingleRecentUser.mockReturnValue({
+      authorName: '@RecentUser',
+      avatarSrc: 'avatar.png',
+      identity: { authorName: '@RecentUser', channelId: 'channel-1' }
+    });
+    mocks.getLatestMessageForIdentity.mockReturnValue(null);
+
+    await command('quote').run(parsed('quote', '@RecentUser'), { saveOptions: vi.fn() });
+
+    expect(mocks.showToast).toHaveBeenCalledWith('No quotable message for that user.');
+    expect(mocks.quoteAuthorRichText).not.toHaveBeenCalled();
+  });
+
   it('runs repeat and help commands through runtime callbacks', async () => {
     await command('again').run(parsed('again'), { saveOptions: vi.fn() });
     await command('help').run(parsed('help'), { saveOptions: vi.fn() });
@@ -215,6 +229,31 @@ describe('chat command behavior', () => {
     expect(runtime.clearInput).toHaveBeenCalledTimes(2);
   });
 
+  it('runs focus from the latest mention when no handle is provided', async () => {
+    mocks.getLatestMentionFocusUser.mockResolvedValue({
+      authorName: '@MentionUser',
+      avatarSrc: 'mention.png',
+      identity: { authorName: '@MentionUser', channelId: 'mention-channel' }
+    });
+    mocks.openFocusModeForAuthor.mockReturnValue(true);
+
+    await command('focus').run(parsed('focus'), { saveOptions: vi.fn() });
+
+    expect(mocks.openFocusModeForAuthor).toHaveBeenCalledWith({
+      authorName: '@MentionUser',
+      avatarSrc: 'mention.png',
+      channelId: 'mention-channel'
+    });
+    expect(runtime.clearInput).toHaveBeenCalledOnce();
+  });
+
+  it('reports who command errors for missing handles', async () => {
+    await command('who').run(parsed('who'), { saveOptions: vi.fn() });
+
+    expect(mocks.showToast).toHaveBeenCalledWith('Add a handle to open a user card.');
+    expect(runtime.clearInput).not.toHaveBeenCalled();
+  });
+
   it('runs translate text commands without auto-sending', async () => {
     mocks.translateCommandText.mockResolvedValue('hola a todos');
 
@@ -229,6 +268,19 @@ describe('chat command behavior', () => {
     );
   });
 
+  it('reports translate text command parse and request failures', async () => {
+    mocks.translateCommandText.mockRejectedValue(new Error('network'));
+
+    await command('translate').run(parsed('translate', 'es'), { saveOptions: vi.fn() });
+    await command('translate').run(parsed('translate', 'es hello everyone'), { saveOptions: vi.fn() });
+    await command('translate').runInline?.(inlineParsed('translate', 'es hello everyone'));
+
+    expect(mocks.translateCommandText).toHaveBeenCalledTimes(2);
+    expect(mocks.showToast).toHaveBeenCalledWith('Could not translate that text.');
+    expect(runtime.replaceCommandText).not.toHaveBeenCalled();
+    expect(runtime.replaceInlineCommandText).not.toHaveBeenCalled();
+  });
+
   it('runs settings commands and clears the input after valid updates', async () => {
     const saveOptions = vi.fn();
 
@@ -236,12 +288,14 @@ describe('chat command behavior', () => {
     await command('lang').run(parsed('lang', 'off'), { saveOptions });
     await command('settranslationdisplay').run(parsed('settranslationdisplay', 'below'), { saveOptions });
     await command('setsound').run(parsed('setsound', 'off'), { saveOptions });
+    await command('setsound').run(parsed('setsound', 'on'), { saveOptions });
 
     expect(saveOptions).toHaveBeenCalledWith({ lastTranslationTarget: 'ja', targetLanguage: 'ja' });
     expect(saveOptions).toHaveBeenCalledWith({ targetLanguage: '' });
     expect(saveOptions).toHaveBeenCalledWith({ translationDisplay: 'below' });
     expect(saveOptions).toHaveBeenCalledWith({ sound: false });
-    expect(runtime.clearInput).toHaveBeenCalledTimes(4);
+    expect(saveOptions).toHaveBeenCalledWith({ sound: true });
+    expect(runtime.clearInput).toHaveBeenCalledTimes(5);
   });
 
   it('reports settings command errors and active language without mutating settings', async () => {

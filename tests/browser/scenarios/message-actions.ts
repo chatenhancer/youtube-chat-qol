@@ -8,16 +8,19 @@ import { expect, test, type Locator } from '@playwright/test';
 import {
   clearChatComposer,
   getChatComposerText
-} from '../helpers/composer';
-import { closeFocusPromptIfPresent } from '../helpers/focus-panel';
-import { centerLocatorInViewport } from '../helpers/locator';
-import { cleanVisibleText } from '../helpers/text';
+} from '../support/composer';
+import { closeFocusPromptIfPresent } from '../support/focus-panel';
+import { centerLocatorInViewport } from '../support/locator';
+import { cleanVisibleText } from '../support/text';
 import {
   NORMAL_CHAT_MESSAGE_SELECTOR,
   type BrowserScenario,
   type ChatSurface
 } from './types';
-import { openMessageMenu } from './menu-openers';
+import { openMessageMenu } from '../support/menu-openers';
+
+const AUTHOR_TARGET_ATTRIBUTE = 'data-ytcq-test-author-target';
+let nextAuthorTargetId = 1;
 
 export const authorMentionDraftScenario: BrowserScenario = async ({ chat }) => {
   await expectAuthorClickInsertsMentionDraft(chat);
@@ -136,9 +139,10 @@ async function getLatestClickableAuthor(chat: ChatSurface): Promise<{
   });
 
   const message = messages.nth(Math.max(0, await messages.count() - 1));
-  const author = message.locator('#author-name').first();
+  const stableMessage = await freezeAuthorTarget(chat, message);
+  const author = stableMessage.locator('#author-name').first();
   return test.step('Capture author name', async () => {
-    await centerLocatorInViewport(message);
+    await centerLocatorInViewport(stableMessage);
     const name = cleanVisibleText(await author.evaluate((element) => element.textContent || ''));
     expect(name).toMatch(/^@?\S/);
     return {
@@ -146,6 +150,21 @@ async function getLatestClickableAuthor(chat: ChatSurface): Promise<{
       authorName: name
     };
   });
+}
+
+async function freezeAuthorTarget(chat: ChatSurface, message: Locator): Promise<Locator> {
+  const targetId = `author-click-${Date.now()}-${nextAuthorTargetId++}`;
+  const didFreeze = await message.evaluate((element, { attribute, value }) => {
+    if (!(element instanceof HTMLElement) || !element.isConnected) return false;
+    element.setAttribute(attribute, value);
+    return true;
+  }, {
+    attribute: AUTHOR_TARGET_ATTRIBUTE,
+    value: targetId
+  }).catch(() => false);
+
+  if (!didFreeze) throw new Error('Could not stabilize the live chat author target before clicking it.');
+  return chat.locator(`[${AUTHOR_TARGET_ATTRIBUTE}="${targetId}"]`).first();
 }
 
 async function expectCollapsedFocusPrompt(chat: ChatSurface): Promise<void> {

@@ -87,6 +87,15 @@ describe('inbox card view', () => {
 
     card.querySelector<HTMLButtonElement>('.ytcq-inbox-keyword-toggle')!.click();
     expect(card.querySelector<HTMLElement>('.ytcq-inbox-keyword-panel')?.hidden).toBe(false);
+    expect(card.querySelector<HTMLButtonElement>('.ytcq-inbox-keyword-toggle')?.getAttribute('aria-expanded')).toBe('true');
+  });
+
+  it('uses the keyword subtitle when only keyword watches are configured', () => {
+    keywords = ['alpha'];
+
+    openInboxCardView(undefined, callbacksForCard());
+
+    expect(document.querySelector('.ytcq-profile-card-subtitle')?.textContent).toBe('Watching mentions and keywords');
   });
 
   it('renders records, quotes rows, mentions authors, and clears records', () => {
@@ -121,6 +130,29 @@ describe('inbox card view', () => {
     expect(callbacks.onClearRecords).toHaveBeenCalledOnce();
   });
 
+  it('quotes inbox rows from keyboard activation and ignores button targets', () => {
+    records = [record({
+      authorName: '@ViewerOne',
+      text: 'keyboard quote'
+    })];
+
+    openInboxCardView(undefined, callbacksForCard());
+    const row = document.querySelector<HTMLElement>('.ytcq-inbox-message')!;
+    const author = row.querySelector<HTMLButtonElement>('.ytcq-inbox-author')!;
+    author.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Enter' }));
+    expect(replyMocks.quoteAuthorRichText).not.toHaveBeenCalled();
+
+    row.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Enter' }));
+    expect(replyMocks.quoteAuthorRichText).toHaveBeenCalledWith('@ViewerOne', 'keyboard quote', {
+      segments: []
+    });
+
+    openInboxCardView(undefined, callbacksForCard());
+    document.querySelector<HTMLElement>('.ytcq-inbox-message')!
+      .dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: ' ' }));
+    expect(replyMocks.quoteAuthorRichText).toHaveBeenCalledTimes(2);
+  });
+
   it('refreshes the open card and jumps to connected live messages', () => {
     const target = document.createElement('yt-live-chat-text-message-renderer');
     document.body.append(target);
@@ -142,6 +174,77 @@ describe('inbox card view', () => {
     card.querySelector<HTMLButtonElement>('.ytcq-profile-card-jump')!.click();
     expect(jumpMocks.jumpToChatMessage).toHaveBeenCalledWith(target);
     expect(isInboxCardOpen()).toBe(false);
+  });
+
+  it('does not render a jump button when the live message is unavailable', () => {
+    records = [record()];
+    liveMessage = null;
+
+    openInboxCardView(undefined, callbacksForCard());
+
+    expect(document.querySelector('.ytcq-profile-card-jump')).toBeNull();
+  });
+
+  it('closes from outside click and Escape while ignoring the inbox header button', async () => {
+    vi.useFakeTimers();
+    openInboxCardView(undefined, callbacksForCard());
+    await vi.runOnlyPendingTimersAsync();
+
+    const inboxButton = document.createElement('button');
+    inboxButton.className = 'ytcq-inbox-button';
+    document.body.append(inboxButton);
+    inboxButton.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(isInboxCardOpen()).toBe(true);
+
+    document.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Escape' }));
+    expect(isInboxCardOpen()).toBe(false);
+
+    openInboxCardView(undefined, callbacksForCard());
+    await vi.runOnlyPendingTimersAsync();
+    document.body.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(isInboxCardOpen()).toBe(false);
+  });
+
+  it('repositions on resize using the provided anchor when connected', async () => {
+    vi.useFakeTimers();
+    const anchor = document.createElement('button');
+    anchor.getBoundingClientRect = () => ({
+      bottom: 44,
+      height: 24,
+      left: 180,
+      right: 220,
+      top: 20,
+      width: 40,
+      x: 180,
+      y: 20,
+      toJSON: () => ({})
+    });
+    document.body.append(anchor);
+
+    openInboxCardView(anchor, callbacksForCard());
+    const card = document.querySelector<HTMLElement>('.ytcq-inbox-card')!;
+    card.getBoundingClientRect = () => ({
+      bottom: 240,
+      height: 120,
+      left: 0,
+      right: 160,
+      top: 120,
+      width: 160,
+      x: 0,
+      y: 120,
+      toJSON: () => ({})
+    });
+    await vi.runOnlyPendingTimersAsync();
+    window.dispatchEvent(new Event('resize'));
+
+    expect(card.style.left).toBe('60px');
+    expect(card.style.top).toBe('52px');
+  });
+
+  it('ignores refresh requests when the inbox card is closed', () => {
+    refreshOpenInboxCard();
+
+    expect(keywordPanelMocks.refreshKeywordToggle).not.toHaveBeenCalled();
   });
 
   it('closes and cleans stale cards', () => {

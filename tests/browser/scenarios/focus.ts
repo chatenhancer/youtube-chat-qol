@@ -1,30 +1,34 @@
 /**
  * Browser scenario for conversation focus mode.
  *
- * The shared steps run against mock and real YouTube chat by opening focus from
- * an author click. The mock-only tail appends a deterministic new message from
- * that author so live runs do not depend on random chat timing.
+ * Each exported scenario has a fixed assertion set. Mock-only checks are split
+ * into separate scenarios so shared mock/live scenarios do not silently skip
+ * assertions depending on the surface.
  */
 import { expect, test, type Locator } from '@playwright/test';
-import { clearChatComposerIfVisible } from '../helpers/composer';
-import { closeFocusPromptIfPresent } from '../helpers/focus-panel';
-import { centerLocatorInViewport } from '../helpers/locator';
-import {
-  appendMockFixtureMessage,
-  isMockPageSurface
-} from '../helpers/mock-page';
-import { cleanVisibleText } from '../helpers/text';
+import { clearChatComposerIfVisible } from '../support/composer';
+import { closeFocusPromptIfPresent } from '../support/focus-panel';
+import { centerLocatorInViewport } from '../support/locator';
+import { appendMockFixtureMessage } from '../support/mock-page';
+import { cleanVisibleText } from '../support/text';
 import {
   NORMAL_CHAT_MESSAGE_SELECTOR,
   type BrowserScenario,
   type ChatSurface
 } from './types';
 
-export const focusPanelScenario: BrowserScenario = async ({ chat }) => {
+export const focusPanelOpensFromAuthorScenario: BrowserScenario = async ({ chat }) => {
   const source = await openCollapsedFocusPromptFromRecentMessage(chat);
   await expandFocusPanel(chat);
   await expectFocusPanelContainsSourceMessage(chat, source);
-  await expectMockFocusPanelReceivesNewMessages(chat, source);
+  await cleanUpFocusPanel(chat);
+};
+
+export const focusPanelReceivesNewMessagesScenario: BrowserScenario = async ({ chat }) => {
+  const source = await openCollapsedFocusPromptFromRecentMessage(chat);
+  await expandFocusPanel(chat);
+  await expectFocusPanelContainsSourceMessage(chat, source);
+  await appendFocusedAuthorMessageAndVerifyItAppears(chat, source);
   await cleanUpFocusPanel(chat);
 };
 
@@ -98,10 +102,8 @@ async function expectFocusPanelContainsSourceMessage(chat: ChatSurface, source: 
   });
 }
 
-async function expectMockFocusPanelReceivesNewMessages(chat: ChatSurface, source: MessageSource): Promise<void> {
-  if (!isMockPageSurface(chat)) return;
-
-  await test.step('Mock-only: append a new focused-author message and verify it appears', async () => {
+async function appendFocusedAuthorMessageAndVerifyItAppears(chat: ChatSurface, source: MessageSource): Promise<void> {
+  await test.step('Append a new focused-author message and verify it appears', async () => {
     const text = `Focus follow-up ${Date.now()}`;
     await appendMockFixtureMessage(chat, {
       author: source.authorName,

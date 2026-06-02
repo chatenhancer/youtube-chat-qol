@@ -6,7 +6,7 @@
  */
 import { expect, test } from '@playwright/test';
 import { CHAT_MESSAGE_SELECTOR } from '../../../src/youtube/selectors';
-import { expectPopupReportsActiveStatus } from '../helpers/popup-status';
+import { expectPopupReportsActiveStatus } from '../support/popup-status';
 import type { BrowserScenario, ChatSurface } from './types';
 
 const EXTENSION_ATTACH_TIMEOUT_MS = 15_000;

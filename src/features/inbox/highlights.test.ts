@@ -51,6 +51,47 @@ describe('inbox highlight helpers', () => {
     expect(message.dataset.ytcqInboxKeywordHighlighting).toBeUndefined();
   });
 
+  it('ignores live chat renderers without author or message text', () => {
+    const message = document.createElement('yt-live-chat-text-message-renderer');
+
+    applyChatKeywordHighlights(message, ['launch'], 'keyword-key');
+
+    expect(message.dataset.ytcqInboxKeywordHighlightKey).toBeUndefined();
+  });
+
+  it('skips work when the same highlight key is already current', () => {
+    const message = createMessage('@LaunchHost', 'ready for launch');
+    applyChatKeywordHighlights(message, ['launch'], 'keyword-key');
+    const existingHighlight = message.querySelector('.ytcq-chat-keyword-highlight');
+
+    applyChatKeywordHighlights(message, ['launch'], 'keyword-key');
+
+    expect(message.querySelector('.ytcq-chat-keyword-highlight')).toBe(existingHighlight);
+  });
+
+  it('skips empty matching work when the same key has no visible highlights', () => {
+    const message = createMessage('@LaunchHost', 'ready for launch');
+    message.dataset.ytcqInboxKeywordHighlightKey = 'empty-key';
+
+    applyChatKeywordHighlights(message, [], 'empty-key');
+
+    expect(message.querySelector('.ytcq-chat-keyword-highlight')).toBeNull();
+    expect(message.dataset.ytcqInboxKeywordHighlightKey).toBe('empty-key');
+  });
+
+  it('supports keyword highlighting when only one live chat text target exists', () => {
+    const textOnly = document.createElement('yt-live-chat-text-message-renderer');
+    textOnly.innerHTML = '<span id="message">launch window</span>';
+    const authorOnly = document.createElement('yt-live-chat-text-message-renderer');
+    authorOnly.innerHTML = '<span id="author-name">@LaunchHost</span>';
+
+    applyChatKeywordHighlights(textOnly, ['launch'], 'text-key');
+    applyChatKeywordHighlights(authorOnly, ['launch'], 'author-key');
+
+    expect(textOnly.querySelector('#message .ytcq-chat-keyword-highlight')?.textContent).toBe('launch');
+    expect(authorOnly.querySelector('#author-name .ytcq-chat-keyword-highlight')?.textContent).toBe('Launch');
+  });
+
   it('clears previous chat keyword highlights before applying new state', () => {
     const message = createMessage('@LaunchHost', 'ready for launch');
     applyChatKeywordHighlights(message, ['launch'], 'keyword-key');
@@ -80,6 +121,25 @@ describe('inbox highlight helpers', () => {
     highlightInboxAuthorMatches(root, record({ matchedKeywords: ['launch'] }));
 
     expect(root.querySelector('.ytcq-inbox-keyword-highlight')?.textContent).toBe('Launch');
+  });
+
+  it('prefers the longest matching keyword when matches start at the same position', () => {
+    const root = document.createElement('span');
+    root.textContent = 'caterpillar launch';
+
+    highlightInboxAuthorMatches(root, record({ matchedKeywords: ['cat', 'caterpillar'] }));
+
+    expect(root.querySelector('.ytcq-inbox-keyword-highlight')?.textContent).toBe('caterpillar');
+  });
+
+  it('ignores empty keyword terms while highlighting inbox metadata', () => {
+    const root = document.createElement('span');
+    root.textContent = '@LaunchHost';
+
+    highlightInboxAuthorMatches(root, record({ matchedKeywords: ['  '] }));
+
+    expect(root.querySelector('.ytcq-inbox-keyword-highlight')).toBeNull();
+    expect(root.textContent).toBe('@LaunchHost');
   });
 });
 
