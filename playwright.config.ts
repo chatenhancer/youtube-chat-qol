@@ -11,6 +11,7 @@ import path from 'node:path';
 
 const DEFAULT_WORKERS = getBrowserSpecFileCount();
 const reportOutputFolder = process.env.YTCQ_PLAYWRIGHT_REPORT_DIR ?? 'playwright-report/browser';
+const jsonReportPath = process.env.YTCQ_PLAYWRIGHT_JSON_REPORT;
 
 export default defineConfig({
   expect: {
@@ -28,10 +29,7 @@ export default defineConfig({
       testMatch: /specs\/youtube-live\/.*\.spec\.ts/
     }
   ],
-  reporter: [
-    ['list'],
-    ['html', { open: 'never', outputFolder: reportOutputFolder }]
-  ],
+  reporter: getReporters(),
   testDir: './tests/browser',
   timeout: 90_000,
   use: {
@@ -43,6 +41,17 @@ export default defineConfig({
   },
   workers: getWorkerCount()
 });
+
+function getReporters() {
+  const reporters: NonNullable<Parameters<typeof defineConfig>[0]['reporter']> = [
+    ['list'],
+    ['html', { open: 'never', outputFolder: reportOutputFolder }]
+  ];
+  if (jsonReportPath) {
+    reporters.push(['json', { outputFile: jsonReportPath }]);
+  }
+  return reporters;
+}
 
 function getWorkerCount(): number {
   const rawWorkerCount = process.env.YTCQ_TEST_WORKERS;

@@ -10,13 +10,16 @@ import { createBrowserTestPlan } from './run-browser-tests-plan.mjs';
 
 const args = process.argv.slice(2);
 const { playwrightArgs, reportOutputFolder, shouldBuild } = createBrowserTestPlan(args);
+const jsonReportPath = process.env.YTCQ_PLAYWRIGHT_JSON_REPORT
+  || (process.env.GITHUB_STEP_SUMMARY ? 'test-results/browser/playwright-report.json' : '');
 
 if (shouldBuild) {
   run(getNpmCommand(), ['run', 'build:chrome']);
 }
 
 run(getPlaywrightCommand(), playwrightArgs, {
-  YTCQ_PLAYWRIGHT_REPORT_DIR: reportOutputFolder
+  YTCQ_PLAYWRIGHT_REPORT_DIR: reportOutputFolder,
+  ...(jsonReportPath ? { YTCQ_PLAYWRIGHT_JSON_REPORT: jsonReportPath } : {})
 });
 
 function run(command, commandArgs, extraEnv = {}) {
