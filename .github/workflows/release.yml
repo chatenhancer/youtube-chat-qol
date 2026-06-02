@@ -37,6 +37,17 @@ jobs:
       - name: Write test summary
         if: always()
         run: npm run ci:test-summary
+      - name: Collect mock browser failure artifacts
+        if: failure()
+        run: npm run ci:browser-artifacts
+      - name: Upload mock browser failure artifacts
+        if: failure()
+        uses: actions/upload-artifact@v6
+        with:
+          name: mock-browser-failure-artifacts
+          path: test-results/browser/mock-artifacts/
+          if-no-files-found: ignore
+          retention-days: 7
       - name: Upload release archives
         uses: actions/upload-artifact@v6
         with:

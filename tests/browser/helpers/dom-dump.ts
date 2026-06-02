@@ -2,12 +2,14 @@
  * Failure-only DOM artifact capture for browser smoke tests.
  *
  * YouTube DOM breakages are easiest to diagnose when the failing run leaves
- * the full live chat frame and watch page markup behind. These dumps are local
- * test artifacts under test-results/ and are intentionally not sanitized.
+ * the full chat frame and watch page markup behind. These dumps are intentionally
+ * not sanitized, so live YouTube dumps are kept local and skipped in public CI
+ * unless the CI run explicitly opts into capturing them.
  */
 import type { BrowserContext, Frame, Page, TestInfo } from '@playwright/test';
 import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
+import { shouldCaptureDomDump } from './artifact-policy';
 
 interface DumpedFile {
   contentType: string;
@@ -37,6 +39,7 @@ export async function dumpDomOnFailure(
   testInfo: TestInfo
 ): Promise<void> {
   if (testInfo.status === testInfo.expectedStatus) return;
+  if (!shouldCaptureDomDump(testInfo)) return;
 
   const outputDir = testInfo.outputPath('dom-dump');
   await mkdir(outputDir, { recursive: true });
