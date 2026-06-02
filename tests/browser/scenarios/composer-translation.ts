@@ -106,10 +106,15 @@ async function translateComposerDraft({
   });
 
   await test.step('Wait for composer draft translation', async () => {
-    await expect.poll(async () => getChatComposerText(chat), {
+    await expect.poll(async () => {
+      const translatedText = await getChatComposerText(chat);
+      if (expectedText) return translatedText.includes(expectedText);
+      if (expectedPattern) return expectedPattern.test(translatedText);
+      return false;
+    }, {
       message: 'Composer translation should replace the draft text.',
       timeout: 15_000
-    }).not.toBe(sourceText);
+    }).toBe(true);
 
     const translatedText = await getChatComposerText(chat);
     if (expectedText) {
