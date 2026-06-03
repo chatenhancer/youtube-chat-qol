@@ -292,6 +292,9 @@
     "unknownStream": {
       "message": "Streaming tidak diketahui"
     },
+    "openStreamInNewWindow": {
+      "message": "Buka {name} di jendela baru"
+    },
     "unknownUser": {
       "message": "Pengguna tidak diketahui"
     },

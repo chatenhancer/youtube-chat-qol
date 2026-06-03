@@ -9,6 +9,8 @@ import { cleanText } from '../shared/text';
 
 export function getCurrentYouTubeChatSourceUrl(): string {
   return getWatchSourceUrl(window.location.href) ||
+    getWatchSourceUrl(getAccessibleWindowHref(window.top)) ||
+    getWatchSourceUrl(getAccessibleWindowHref(window.parent)) ||
     getWatchSourceUrl(document.referrer) ||
     getLiveChatSourceUrl(window.location.href) ||
     getStablePageUrl(window.location.href);
@@ -59,6 +61,16 @@ function getAccessibleDocumentTitle(context: Window | null): string {
 
   try {
     return context.document === document ? '' : getDocumentTitle(context.document);
+  } catch {
+    return '';
+  }
+}
+
+function getAccessibleWindowHref(context: Window | null): string {
+  if (!context || context === window) return '';
+
+  try {
+    return context.location.href;
   } catch {
     return '';
   }

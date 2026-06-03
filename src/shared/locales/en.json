@@ -292,6 +292,9 @@
     "unknownStream": {
       "message": "Unknown stream"
     },
+    "openStreamInNewWindow": {
+      "message": "Open {name} in a new window"
+    },
     "unknownUser": {
       "message": "Unknown user"
     },

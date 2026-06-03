@@ -289,6 +289,9 @@
     "unknownStream": {
       "message": "สตรีมไม่ทราบชื่อ"
     },
+    "openStreamInNewWindow": {
+      "message": "เปิด {name} ในหน้าต่างใหม่"
+    },
     "unknownUser": {
       "message": "ผู้ใช้ไม่ทราบชื่อ"
     },

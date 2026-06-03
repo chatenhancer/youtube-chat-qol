@@ -9,6 +9,7 @@ import { LANGUAGE_OPTIONS } from '../shared/languages';
 import {
   BOOKMARK_FILLED_ICON_PATH,
   BOOKMARK_ICON_PATH,
+  createOpenInNewIcon,
   createSvgIcon,
   MATERIAL_ICON_VIEW_BOX
 } from '../shared/icons';
@@ -232,15 +233,13 @@ function createBookmarkedUserRow(key: string, record: MarkedUserRecord, active: 
   const copy = document.createElement('span');
   copy.className = 'bookmark-copy';
 
-  const name = createBookmarkedUserName(record, channelUrl);
+  const name = createBookmarkedUserName(record);
 
   const date = document.createElement('span');
   date.className = 'bookmark-date';
   date.textContent = formatBookmarkedUserDate(record.markedAt);
 
-  const source = document.createElement('span');
-  source.className = 'bookmark-source';
-  source.textContent = record.markedSourceTitle || record.markedSourceUrl || getExtensionMessage('unknownStream');
+  const source = createBookmarkedUserSource(record);
 
   copy.append(name, date, source);
 
@@ -284,6 +283,7 @@ function createBookmarkedUserAvatar(record: MarkedUserRecord, channelUrl: string
     element.type = 'button';
     element.title = getExtensionMessage('openChannel');
     element.setAttribute('aria-label', getExtensionMessage('openChannel'));
+    element.append(createBookmarkedUserAvatarOpenIcon());
     element.addEventListener('click', () => {
       chrome.tabs.create({ url: channelUrl });
     });
@@ -292,18 +292,40 @@ function createBookmarkedUserAvatar(record: MarkedUserRecord, channelUrl: string
   return element;
 }
 
-function createBookmarkedUserName(record: MarkedUserRecord, channelUrl: string): HTMLElement {
-  const element = channelUrl ? document.createElement('button') : document.createElement('strong');
-  element.className = channelUrl ? 'bookmark-name bookmark-name-button' : 'bookmark-name';
-  element.textContent = record.authorName || getExtensionMessage('unknownUser');
+function createBookmarkedUserAvatarOpenIcon(): SVGSVGElement {
+  const icon = createOpenInNewIcon();
+  icon.classList.add('bookmark-avatar-open-icon');
+  return icon;
+}
 
-  if (channelUrl && element instanceof HTMLButtonElement) {
+function createBookmarkedUserName(record: MarkedUserRecord): HTMLElement {
+  const element = document.createElement('strong');
+  element.className = 'bookmark-name';
+  element.textContent = record.authorName || getExtensionMessage('unknownUser');
+  return element;
+}
+
+function createBookmarkedUserSource(record: MarkedUserRecord): HTMLElement {
+  const sourceText = record.markedSourceTitle || record.markedSourceUrl || getExtensionMessage('unknownStream');
+  const sourceUrl = getBookmarkedUserSourceUrl(record);
+  const element = sourceUrl ? document.createElement('button') : document.createElement('span');
+  element.className = sourceUrl ? 'bookmark-source bookmark-source-button' : 'bookmark-source';
+
+  if (sourceUrl && element instanceof HTMLButtonElement) {
+    const label = document.createElement('span');
+    label.className = 'bookmark-source-label';
+    label.textContent = sourceText;
+
+    const tooltip = getExtensionMessage('openStreamInNewWindow', sourceText);
     element.type = 'button';
-    element.title = getExtensionMessage('openChannel');
-    element.setAttribute('aria-label', getExtensionMessage('openChannel'));
+    element.title = tooltip;
+    element.setAttribute('aria-label', tooltip);
+    element.append(label, createOpenInNewIcon());
     element.addEventListener('click', () => {
-      chrome.tabs.create({ url: channelUrl });
+      chrome.tabs.create({ url: sourceUrl });
     });
+  } else {
+    element.textContent = sourceText;
   }
 
   return element;
@@ -356,6 +378,33 @@ function getBookmarkedUserChannelUrl(record: MarkedUserRecord): string {
 
   const handle = record.authorName.trim().replace(/^@/, '');
   return /^[A-Za-z0-9._-]+$/.test(handle) ? `https://www.youtube.com/@${handle}` : '';
+}
+
+function getBookmarkedUserSourceUrl(record: MarkedUserRecord): string {
+  const sourceUrl = (record.markedSourceUrl || '').trim();
+  if (!sourceUrl) return '';
+
+  try {
+    const url = new URL(sourceUrl);
+    if (url.protocol !== 'https:' || !isYouTubeSourceHost(url.hostname)) return '';
+
+    const videoId = getSourceVideoId(url);
+    return videoId ? `https://www.youtube.com/watch?v=${encodeURIComponent(videoId)}` : '';
+  } catch {
+    return '';
+  }
+}
+
+function isYouTubeSourceHost(hostname: string): boolean {
+  return /(^|\.)youtube\.com$/i.test(hostname) || /^youtu\.be$/i.test(hostname);
+}
+
+function getSourceVideoId(url: URL): string {
+  if (/^youtu\.be$/i.test(url.hostname)) {
+    return decodeURIComponent(url.pathname.split('/').filter(Boolean)[0] || '').trim();
+  }
+
+  return (url.searchParams.get('v') || url.searchParams.get('video_id') || '').trim();
 }
 
 function save(values: Partial<Options>): void {

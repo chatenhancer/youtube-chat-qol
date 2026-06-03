@@ -386,21 +386,47 @@ main {
 }
 
 .bookmark-avatar-button {
+  position: relative;
   padding: 0;
   border: 0;
   font: inherit;
+  overflow: hidden;
   cursor: pointer;
 }
 
-.bookmark-avatar-button:hover,
-.bookmark-avatar-button:focus {
-  filter: brightness(0.94);
-  outline: none;
+.bookmark-avatar-button::after {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: rgba(0, 0, 0, 0.28);
+  opacity: 0;
+  content: "";
 }
 
 .bookmark-avatar-button:focus-visible {
   outline: 2px solid var(--ytcq-popup-action);
   outline-offset: 3px;
+}
+
+.bookmark-avatar-button:hover::after,
+.bookmark-avatar-button:focus::after,
+.bookmark-avatar-button:hover .bookmark-avatar-open-icon,
+.bookmark-avatar-button:focus .bookmark-avatar-open-icon {
+  opacity: 1;
+}
+
+.bookmark-avatar-button:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.bookmark-avatar-open-icon {
+  position: absolute;
+  z-index: 1;
+  width: 12px;
+  height: 12px;
+  fill: #fff;
+  opacity: 0;
+  pointer-events: none;
 }
 
 .bookmark-avatar img {
@@ -427,25 +453,27 @@ main {
   white-space: nowrap;
 }
 
-.bookmark-name-button {
-  display: block;
+.bookmark-source-button {
+  display: inline-flex;
+  align-items: center;
   width: fit-content;
   max-width: 100%;
+  gap: 3px;
   padding: 0;
   border: 0;
   background: transparent;
   cursor: pointer;
+  font: inherit;
   text-align: left;
 }
 
-.bookmark-name-button:hover,
-.bookmark-name-button:focus {
+.bookmark-source-button:hover,
+.bookmark-source-button:focus {
   color: var(--ytcq-popup-action);
   outline: none;
-  text-decoration: underline;
 }
 
-.bookmark-name-button:focus-visible {
+.bookmark-source-button:focus-visible {
   outline: 2px solid var(--ytcq-popup-action);
   outline-offset: 2px;
 }
@@ -458,6 +486,34 @@ main {
   line-height: 14px;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.bookmark-source.bookmark-source-button {
+  color: color-mix(in srgb, var(--ytcq-popup-action) 64%, var(--ytcq-popup-secondary-text));
+}
+
+.bookmark-source-button:hover,
+.bookmark-source-button:focus {
+  color: var(--ytcq-popup-action);
+}
+
+.bookmark-source-label {
+  overflow: hidden;
+  min-width: 0;
+  text-decoration-line: underline;
+  text-decoration-style: dotted;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bookmark-source-button svg {
+  flex: 0 0 auto;
+  width: 11px;
+  height: 11px;
+  fill: currentColor;
+  opacity: 0.82;
 }
 
 .bookmark-actions {

@@ -292,6 +292,9 @@
     "unknownStream": {
       "message": "未知直播"
     },
+    "openStreamInNewWindow": {
+      "message": "在新窗口中打开 {name}"
+    },
     "unknownUser": {
       "message": "未知用户"
     },

@@ -289,6 +289,9 @@
     "unknownStream": {
       "message": "알 수 없는 스트림"
     },
+    "openStreamInNewWindow": {
+      "message": "새 창에서 {name} 열기"
+    },
     "unknownUser": {
       "message": "알 수 없는 사용자"
     },
