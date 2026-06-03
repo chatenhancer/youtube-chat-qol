@@ -34,6 +34,16 @@ describe('YouTube chat source url helpers', () => {
     expect(getCurrentYouTubeChatSourceUrl()).toBe('https://www.youtube.com/watch?v=stream-1');
   });
 
+  it('normalizes chat iframe urls with video ids to watch urls', () => {
+    window.history.replaceState({}, '', '/live_chat?video_id=stream-from-chat&is_popout=1');
+
+    expect(getCurrentYouTubeChatSourceUrl()).toBe('https://www.youtube.com/watch?v=stream-from-chat');
+
+    window.history.replaceState({}, '', '/live_chat_replay?v=stream-from-replay&continuation=iframe-token');
+
+    expect(getCurrentYouTubeChatSourceUrl()).toBe('https://www.youtube.com/watch?v=stream-from-replay');
+  });
+
   it('uses the watch-page referrer when running inside a live chat iframe', () => {
     window.history.replaceState({}, '', '/live_chat?continuation=iframe-token');
     Object.defineProperty(document, 'referrer', {
