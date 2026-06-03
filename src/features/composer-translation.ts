@@ -17,9 +17,11 @@ import { cleanText } from '../shared/text';
 import { showToast } from '../shared/toast';
 import {
   findChatInput,
+  getChatInputNodesText,
   getChatInputSnapshot,
   getChatInputText,
-  replaceNodesInChatInput
+  replaceNodesInChatInput,
+  type ChatInputSnapshot
 } from '../youtube/chat-input';
 import { translateTranslationPlan } from './chat-commands/translate-text';
 import { registerFeatureLifecycle } from '../content/lifecycle';
@@ -316,12 +318,12 @@ function getDraftTranslationCandidate(): {
   if (lastTranslatedText && observedText === lastTranslatedText) return null;
 
   if (lastSourceText && lastTranslatedText && observedText.startsWith(lastTranslatedText)) {
-    const appendedText = cleanText(observedText.slice(lastTranslatedText.length));
-    if (!appendedText) return null;
-    const sourceText = cleanText(`${lastSourceText} ${appendedText}`);
+    const continuation = getTranslatedDraftContinuation(snapshot, observedText);
+    if (!continuation) return null;
+    const sourceText = cleanText(`${lastSourceText} ${continuation.text}`);
     const sourceNodes = [
       ...cloneNodes(lastSourceNodes),
-      document.createTextNode(`${lastSourcePlanText ? ' ' : ''}${appendedText}`)
+      ...createContinuationSourceNodes(continuation.nodes)
     ];
     const plan = createTranslationPlanFromNodes(sourceNodes, sourceText);
 
@@ -344,6 +346,68 @@ function getDraftTranslationCandidate(): {
     sourceNodes,
     sourceText: observedText
   };
+}
+
+function getTranslatedDraftContinuation(
+  snapshot: ChatInputSnapshot | null,
+  observedText: string
+): { nodes: Node[]; text: string } | null {
+  const appendedText = cleanText(observedText.slice(lastTranslatedText.length));
+  if (!appendedText) return null;
+
+  const appendedNodes = snapshot?.childNodes.length
+    ? getNodesAfterPlainTextPrefix(snapshot.childNodes, lastTranslatedText)
+    : null;
+  const nodes = appendedNodes?.length ? appendedNodes : [document.createTextNode(appendedText)];
+  const text = cleanText(getChatInputNodesText(nodes) || appendedText);
+  if (!text) return null;
+
+  return {
+    nodes,
+    text
+  };
+}
+
+function getNodesAfterPlainTextPrefix(nodes: Node[], prefix: string): Node[] | null {
+  let remainingPrefix = prefix;
+  const result: Node[] = [];
+
+  for (const node of nodes) {
+    if (!remainingPrefix) {
+      result.push(node.cloneNode(true));
+      continue;
+    }
+
+    const nodeText = getChatInputNodesText([node]);
+    if (!nodeText) continue;
+
+    if (remainingPrefix.startsWith(nodeText)) {
+      remainingPrefix = remainingPrefix.slice(nodeText.length);
+      continue;
+    }
+
+    if (node.nodeType === Node.TEXT_NODE && nodeText.startsWith(remainingPrefix)) {
+      const remainder = nodeText.slice(remainingPrefix.length);
+      if (remainder) result.push(document.createTextNode(remainder));
+      remainingPrefix = '';
+      continue;
+    }
+
+    return null;
+  }
+
+  return remainingPrefix ? null : result;
+}
+
+function createContinuationSourceNodes(nodes: Node[]): Node[] {
+  const continuationNodes = cloneNodes(nodes);
+  if (!lastSourcePlanText || startsWithWhitespace(continuationNodes)) return continuationNodes;
+  return [document.createTextNode(' '), ...continuationNodes];
+}
+
+function startsWithWhitespace(nodes: Node[]): boolean {
+  const firstText = nodes.length ? getChatInputNodesText([nodes[0]]) : '';
+  return /^\s/u.test(firstText);
 }
 
 function resetDraftMemory(): void {

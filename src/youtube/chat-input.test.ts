@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   findChatInput,
+  getChatInputNodesText,
   getChatInputSnapshot,
   getChatInputText,
   getChatInputTextSelection,
@@ -404,6 +405,7 @@ describe('YouTube chat input adapter', () => {
     document.body.append(input);
 
     expect(getChatInputText()).toBe('hello\n:party::sparkles::text-emoji:');
+    expect(getChatInputNodesText(Array.from(input.childNodes))).toBe('hello\n:party::sparkles::text-emoji:');
   });
 
   it('clicks the visible participant back button before insertion recovery', () => {
