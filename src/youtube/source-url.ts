@@ -8,10 +8,10 @@
 import { cleanText } from '../shared/text';
 
 export function getCurrentYouTubeChatSourceUrl(): string {
-  return getWatchSourceUrl(window.location.href) ||
-    getWatchSourceUrl(getAccessibleWindowHref(window.top)) ||
-    getWatchSourceUrl(getAccessibleWindowHref(window.parent)) ||
-    getWatchSourceUrl(document.referrer) ||
+  return getCanonicalWatchSourceUrl(window.location.href) ||
+    getCanonicalWatchSourceUrl(getAccessibleWindowHref(window.top)) ||
+    getCanonicalWatchSourceUrl(getAccessibleWindowHref(window.parent)) ||
+    getCanonicalWatchSourceUrl(document.referrer) ||
     getLiveChatSourceUrl(window.location.href) ||
     getStablePageUrl(window.location.href);
 }
@@ -30,16 +30,11 @@ export function getYouTubeChatSourceStorageKey(sourceUrl: string): string {
   return `source:${hashStorageKey(cleanSourceUrl || 'unknown')}`;
 }
 
-function getWatchSourceUrl(value: string): string {
+function getCanonicalWatchSourceUrl(value: string): string {
   if (!value) return '';
 
-  try {
-    const url = new URL(value);
-    const videoId = url.searchParams.get('v');
-    return videoId ? `https://www.youtube.com/watch?v=${encodeURIComponent(videoId)}` : '';
-  } catch {
-    return '';
-  }
+  const videoId = getVideoIdFromUrl(value);
+  return videoId ? `https://www.youtube.com/watch?v=${encodeURIComponent(videoId)}` : '';
 }
 
 function getLiveChatSourceUrl(value: string): string {
