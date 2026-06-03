@@ -40,6 +40,20 @@ describe('profile card positioning', () => {
     expect(card.style.left).toBe('212px');
     expect(card.style.top).toBe('172px');
   });
+
+  it('pins cards to the viewport margin when they would move past the top or left edge', () => {
+    setViewport(360, 260);
+    const anchor = elementWithRect({ left: 4, top: -20, width: 20, height: 20 });
+    const card = elementWithRect({ left: -30, top: -15, width: 140, height: 80 });
+
+    positionProfileCard(card, anchor);
+    expect(card.style.left).toBe('32px');
+    expect(card.style.top).toBe('8px');
+
+    keepProfileCardInViewport(card);
+    expect(card.style.left).toBe('8px');
+    expect(card.style.top).toBe('8px');
+  });
 });
 
 function setViewport(width: number, height: number): void {

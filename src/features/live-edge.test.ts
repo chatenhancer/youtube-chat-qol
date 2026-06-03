@@ -36,6 +36,46 @@ describe('live edge recovery', () => {
 
     expect(scroller.scrollTop).toBe(800);
   });
+
+  it('ignores missing scrollers and hidden jump buttons', async () => {
+    const lifecycle = await import('../content/lifecycle');
+    await import('./live-edge');
+    const jumpToBottom = createJumpToBottomButton();
+    jumpToBottom.button.getBoundingClientRect = () => ({
+      bottom: 0,
+      height: 0,
+      left: 0,
+      right: 0,
+      top: 0,
+      width: 0,
+      x: 0,
+      y: 0,
+      toJSON: () => ({})
+    });
+    document.body.append(jumpToBottom.wrapper);
+
+    expect(() => lifecycle.handleFeatureVisibilityChanged('hidden')).not.toThrow();
+    expect(jumpToBottom.button.click).not.toHaveBeenCalled();
+  });
+
+  it('replaces existing retry timers and stops after all retry delays', async () => {
+    const lifecycle = await import('../content/lifecycle');
+    await import('./live-edge');
+    const clearTimeoutSpy = vi.spyOn(window, 'clearTimeout');
+    const scroller = createScroller();
+    document.body.append(scroller);
+
+    lifecycle.handleFeatureVisibilityChanged('visible');
+    lifecycle.handleFeatureVisibilityChanged('visible');
+
+    expect(clearTimeoutSpy).toHaveBeenCalled();
+
+    await vi.advanceTimersByTimeAsync(120 + 500 + 1200);
+    scroller.scrollTop = 0;
+    await vi.runOnlyPendingTimersAsync();
+
+    expect(scroller.scrollTop).toBe(0);
+  });
 });
 
 function createScroller(): HTMLElement {

@@ -1,4 +1,6 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+const originalTopWindow = window.top;
 
 describe('tab alert', () => {
   beforeEach(() => {
@@ -7,6 +9,13 @@ describe('tab alert', () => {
     document.body.replaceChildren();
     document.title = 'Live Stream';
     setVisibilityState('visible');
+  });
+
+  afterEach(() => {
+    Object.defineProperty(window, 'top', {
+      configurable: true,
+      value: originalTopWindow
+    });
   });
 
   it('prefixes the title and swaps favicon links while the tab is inactive', async () => {
@@ -96,6 +105,118 @@ describe('tab alert', () => {
     expect(document.title).toBe('Live Stream');
   });
 
+  it('does not clear an alert from activity while the tab is still hidden', async () => {
+    const { initInboxTabAlert, showInboxTabAlert } = await import('./tab-alert');
+    initInboxTabAlert();
+    setVisibilityState('hidden');
+    showInboxTabAlert(2);
+
+    document.dispatchEvent(new PointerEvent('pointerdown'));
+
+    expect(document.title).toBe('(2) Live Stream');
+    expect(document.documentElement.dataset.ytcqTabAlertActive).toBe('true');
+  });
+
+  it('uses the top watch document when live chat runs inside a frame', async () => {
+    const topDocument = document.implementation.createHTMLDocument('Top Stream');
+    const topWindow = {
+      addEventListener: vi.fn(),
+      document: topDocument
+    };
+    Object.defineProperty(window, 'top', {
+      configurable: true,
+      value: topWindow
+    });
+    setDocumentVisibilityState(topDocument, 'hidden');
+    const { initInboxTabAlert, showInboxTabAlert } = await import('./tab-alert');
+
+    initInboxTabAlert();
+    showInboxTabAlert(3);
+
+    expect(topWindow.addEventListener).toHaveBeenCalledWith('focus', expect.any(Function), expect.any(Object));
+    expect(topDocument.title).toBe('(3) Top Stream');
+    expect(topDocument.querySelectorAll('.ytcq-tab-alert-favicon')).toHaveLength(4);
+
+    setDocumentVisibilityState(topDocument, 'visible');
+    topDocument.dispatchEvent(new Event('visibilitychange'));
+
+    expect(topDocument.title).toBe('Top Stream');
+    expect(topDocument.documentElement.dataset.ytcqTabAlertActive).toBeUndefined();
+  });
+
+  it('treats the tab as active when the top watch document is visible', async () => {
+    const topDocument = document.implementation.createHTMLDocument('Top Stream');
+    Object.defineProperty(window, 'top', {
+      configurable: true,
+      value: {
+        document: topDocument
+      }
+    });
+    setVisibilityState('hidden');
+    setDocumentVisibilityState(topDocument, 'visible');
+    const { showInboxTabAlert } = await import('./tab-alert');
+
+    showInboxTabAlert(3);
+
+    expect(topDocument.title).toBe('Top Stream');
+    expect(topDocument.querySelectorAll('.ytcq-tab-alert-favicon')).toHaveLength(0);
+  });
+
+  it('preserves the original favicon once across repeated alert updates', async () => {
+    const { clearInboxTabAlert, showInboxTabAlert } = await import('./tab-alert');
+    addFavicon('/favicon.ico');
+    setVisibilityState('hidden');
+
+    showInboxTabAlert(1);
+    showInboxTabAlert(2);
+    clearInboxTabAlert();
+
+    expect(document.querySelectorAll('link[href="/favicon.ico"]')).toHaveLength(1);
+    expect(document.querySelectorAll('.ytcq-tab-alert-favicon')).toHaveLength(0);
+  });
+
+  it('cleans up tab activity listeners without clearing the active alert state', async () => {
+    const { cleanupInboxTabAlertListeners, initInboxTabAlert, showInboxTabAlert } = await import('./tab-alert');
+    initInboxTabAlert();
+    setVisibilityState('hidden');
+    showInboxTabAlert(2);
+
+    cleanupInboxTabAlertListeners();
+
+    expect(document.title).toBe('(2) Live Stream');
+  });
+
+  it('falls back safely when top-frame access changes while adding listeners', async () => {
+    const topDocument = document.implementation.createHTMLDocument('Top Stream');
+    let topAccessCount = 0;
+    Object.defineProperty(window, 'top', {
+      configurable: true,
+      get: () => {
+        topAccessCount += 1;
+        if (topAccessCount === 1) return { document: topDocument };
+        throw new Error('top window unavailable');
+      }
+    });
+    const { initInboxTabAlert } = await import('./tab-alert');
+
+    expect(() => initInboxTabAlert()).not.toThrow();
+  });
+
+  it('falls back to the current document when the top document is inaccessible', async () => {
+    Object.defineProperty(window, 'top', {
+      configurable: true,
+      get: () => {
+        throw new Error('top document unavailable');
+      }
+    });
+    const { showInboxTabAlert } = await import('./tab-alert');
+    setVisibilityState('hidden');
+
+    showInboxTabAlert(4);
+
+    expect(document.title).toBe('(4) Live Stream');
+  });
+
   it('strips an existing alert prefix before applying a new one', async () => {
     const { showInboxTabAlert } = await import('./tab-alert');
     setVisibilityState('hidden');
@@ -144,7 +265,15 @@ function addFavicon(href: string): void {
 }
 
 function setVisibilityState(value: DocumentVisibilityState): void {
+  setDocumentVisibilityState(document, value);
+}
+
+function setDocumentVisibilityState(targetDocument: Document, value: DocumentVisibilityState): void {
   Object.defineProperty(document, 'visibilityState', {
+    configurable: true,
+    value
+  });
+  Object.defineProperty(targetDocument, 'visibilityState', {
     configurable: true,
     value
   });

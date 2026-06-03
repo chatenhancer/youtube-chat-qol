@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { DEFAULT_OPTIONS } from '../../shared/options';
 import { setOptions } from '../../shared/state';
+import { replaceChatInput } from '../../youtube/chat-input';
 
 const chatState = vi.hoisted(() => ({
   input: null as HTMLElement | null,
@@ -149,6 +150,19 @@ describe('focus mode entrypoint', () => {
     await vi.runAllTimersAsync();
 
     expect(document.querySelector('.ytcq-focus-card-expanded')).not.toBeNull();
+  });
+
+  it('opens from the collapsed prompt button and closes from the collapsed close button', async () => {
+    showFocusPromptForAuthor({ authorName: '@ButtonViewer', channelId: 'viewer-channel' });
+
+    document.querySelector<HTMLButtonElement>('.ytcq-focus-open')?.click();
+    await vi.runAllTimersAsync();
+    expect(document.querySelector('.ytcq-focus-card-expanded')).not.toBeNull();
+
+    showFocusPromptForAuthor({ authorName: '@ClosedViewer', channelId: 'viewer-channel' });
+    document.querySelector<HTMLButtonElement>('.ytcq-focus-close')?.click();
+
+    expect(document.querySelector('.ytcq-focus-card')).toBeNull();
   });
 
   it('does not replace an already expanded panel with a collapsed prompt for the same author', async () => {
@@ -370,6 +384,30 @@ describe('focus mode entrypoint', () => {
     expect(input.selectionEnd).toBe(input.value.length);
   });
 
+  it('leaves an already-prefixed draft alone when the chat input temporarily cannot be found', async () => {
+    chatState.input = null;
+    chatState.text = '@MissingInputViewer ready';
+
+    expect(openFocusModeForAuthor({ authorName: '@MissingInputViewer', channelId: 'viewer-channel' })).toBe(true);
+    await vi.runAllTimersAsync();
+
+    expect(replaceChatInput).not.toHaveBeenCalled();
+    expect(chatState.text).toBe('@MissingInputViewer ready');
+  });
+
+  it('ignores document clicks that are not send-button element clicks', async () => {
+    initFocusMode();
+    expect(openFocusModeForAuthor({ authorName: '@ClickViewer', channelId: 'viewer-channel' })).toBe(true);
+    await vi.runAllTimersAsync();
+    chatState.text = 'draft before click';
+
+    document.dispatchEvent(new Event('click', { bubbles: true }));
+    document.body.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    await vi.runAllTimersAsync();
+
+    expect(chatState.text).toBe('draft before click');
+  });
+
   it('renders existing translated focus records when translation is enabled', async () => {
     setOptions({ ...DEFAULT_OPTIONS, targetLanguage: 'en' });
     const focusedMessage = createMessage('@TranslatedFocus', 'hola', 'translated-channel');
@@ -387,6 +425,39 @@ describe('focus mode entrypoint', () => {
     await vi.runAllTimersAsync();
 
     expect(document.querySelector('.ytcq-focus-bubble')?.textContent).toContain('hello');
+  });
+
+  it('updates and clears focus rows from translation events while expanded', async () => {
+    initFocusMode();
+    setOptions({ ...DEFAULT_OPTIONS, targetLanguage: 'en' });
+    const focusedMessage = createMessage('@LiveTranslatedFocus', 'hola', 'translated-channel');
+    document.body.append(focusedMessage);
+
+    expect(openFocusModeForAuthor({ authorName: '@LiveTranslatedFocus', channelId: 'translated-channel' })).toBe(true);
+    await vi.runAllTimersAsync();
+
+    translationCallbacks.rendered?.({
+      message: focusedMessage,
+      originalText: 'hola',
+      protectedTokens: [],
+      result: { sourceLanguage: 'es', targetLanguage: 'en', text: 'hello' },
+      sourceText: 'hola'
+    });
+    expect(document.querySelector('.ytcq-focus-bubble')?.textContent).toContain('hello');
+    expect(queueMocks.prioritize).toHaveBeenCalled();
+
+    translationCallbacks.cleared?.({ message: focusedMessage });
+    expect(document.querySelector('.ytcq-focus-bubble')?.textContent).not.toContain('hello');
+
+    translationCallbacks.rendered?.({
+      message: focusedMessage,
+      originalText: 'hola',
+      protectedTokens: [],
+      result: { sourceLanguage: 'es', targetLanguage: 'en', text: 'hello again' },
+      sourceText: 'hola'
+    });
+    translationCallbacks.translationsCleared?.();
+    expect(document.querySelector('.ytcq-focus-bubble')?.textContent).not.toContain('hello again');
   });
 
   it('ignores translation events when no focus record matches', async () => {

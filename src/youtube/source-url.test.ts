@@ -7,13 +7,19 @@ import {
 
 describe('YouTube chat source url helpers', () => {
   const originalReferrer = document.referrer;
+  const originalTopWindow = window.top;
 
   afterEach(() => {
     window.history.replaceState({}, '', '/');
+    document.head.replaceChildren();
     document.title = '';
     Object.defineProperty(document, 'referrer', {
       configurable: true,
       value: originalReferrer
+    });
+    Object.defineProperty(window, 'top', {
+      configurable: true,
+      value: originalTopWindow
     });
   });
 
@@ -49,6 +55,36 @@ describe('YouTube chat source url helpers', () => {
     document.title = '(3) Example Stream - YouTube';
 
     expect(getCurrentYouTubeChatSourceTitle()).toBe('Example Stream');
+  });
+
+  it('uses YouTube title metadata when available', () => {
+    const ogTitle = document.createElement('meta');
+    ogTitle.setAttribute('property', 'og:title');
+    ogTitle.content = '(2) Metadata Stream - YouTube';
+    document.head.append(ogTitle);
+
+    expect(getCurrentYouTubeChatSourceTitle()).toBe('Metadata Stream');
+
+    document.head.replaceChildren();
+    const pageTitle = document.createElement('meta');
+    pageTitle.setAttribute('name', 'title');
+    pageTitle.content = 'Fallback Metadata Stream - YouTube';
+    document.head.append(pageTitle);
+
+    expect(getCurrentYouTubeChatSourceTitle()).toBe('Fallback Metadata Stream');
+  });
+
+  it('uses an accessible top watch document title from a chat frame', () => {
+    const topDocument = document.implementation.createHTMLDocument('Top Stream - YouTube');
+    Object.defineProperty(window, 'top', {
+      configurable: true,
+      value: {
+        document: topDocument
+      }
+    });
+    document.title = 'Live Chat - YouTube';
+
+    expect(getCurrentYouTubeChatSourceTitle()).toBe('Top Stream');
   });
 
   it('ignores generic live chat titles', () => {

@@ -55,6 +55,31 @@ describe('inbox records', () => {
     expect(record?.messageRef?.deref()).toBe(message);
   });
 
+  it('skips unreadable messages and preserves explicit mention handles', () => {
+    const emptyMessage = document.createElement('yt-live-chat-text-message-renderer');
+    const getMentionHandles = vi.fn(() => ['@FallbackViewer']);
+
+    expect(createInboxRecord(emptyMessage, {
+      mention: true
+    }, {
+      getMentionHandles,
+      sourceUrl: 'https://www.youtube.com/watch?v=stream'
+    })).toBeNull();
+
+    const record = createInboxRecord(createMessage(), {
+      keywords: ['launch', 'launch'],
+      mention: true,
+      mentionHandles: ['@ExplicitViewer']
+    }, {
+      getMentionHandles,
+      sourceUrl: 'https://www.youtube.com/watch?v=stream'
+    });
+
+    expect(record?.matchedKeywords).toEqual(['launch']);
+    expect(record?.mentionHandles).toEqual(['@ExplicitViewer']);
+    expect(getMentionHandles).not.toHaveBeenCalled();
+  });
+
   it('merges mention and keyword matches for the same saved message', () => {
     const message = document.createElement('yt-live-chat-text-message-renderer');
     const existing = record({
@@ -82,6 +107,38 @@ describe('inbox records', () => {
     expect(merged.messageRef?.deref()).toBe(message);
   });
 
+  it('preserves existing stored metadata and read state for already-read updates', () => {
+    const existingMessage = document.createElement('yt-live-chat-text-message-renderer');
+    const existing = record({
+      avatarSrc: 'https://example.test/existing-avatar.jpg',
+      channelId: 'existing-channel',
+      contentParts: [{ type: 'text', text: 'existing rich content' }],
+      matchedKeywords: ['launch'],
+      mention: false,
+      messageId: 'existing-message',
+      messageRef: new WeakRef(existingMessage),
+      read: true
+    });
+    const incoming = record({
+      avatarSrc: 'https://example.test/incoming-avatar.jpg',
+      channelId: 'incoming-channel',
+      contentParts: [{ type: 'text', text: 'incoming rich content' }],
+      matchedKeywords: ['status'],
+      mention: true,
+      messageId: 'incoming-message',
+      messageRef: new WeakRef(document.createElement('yt-live-chat-text-message-renderer'))
+    });
+
+    const merged = mergeInboxRecords(existing, incoming, true, () => null);
+
+    expect(merged.avatarSrc).toBe('https://example.test/existing-avatar.jpg');
+    expect(merged.channelId).toBe('existing-channel');
+    expect(merged.contentParts).toEqual([{ type: 'text', text: 'existing rich content' }]);
+    expect(merged.messageId).toBe('existing-message');
+    expect(merged.messageRef?.deref()).toBe(existingMessage);
+    expect(merged.read).toBe(true);
+  });
+
   it('keeps read state when a merge adds no new match', () => {
     const existing = record({
       matchedKeywords: ['launch'],
@@ -106,8 +163,13 @@ describe('inbox records', () => {
 
     expect(recordsEqual(first, second)).toBe(true);
     expect(hasTransientRecordUpdate(first, second, (candidate) => candidate.messageRef?.deref() || null)).toBe(true);
+    expect(hasTransientRecordUpdate(first, first, (candidate) => candidate.messageRef?.deref() || null)).toBe(false);
     expect(recordsEqual(first, record({ avatarSrc: 'https://example.test/avatar.jpg', read: true }))).toBe(false);
     expect(recordsEqual(first, record({ channelId: 'example-channel', read: true }))).toBe(false);
+    expect(recordsEqual(first, record({ messageId: 'other-message', read: true }))).toBe(false);
+    expect(recordsEqual(first, record({ mention: true, read: true }))).toBe(false);
+    expect(recordsEqual(first, record({ matchedKeywords: ['launch'], read: true }))).toBe(false);
+    expect(recordsEqual(first, record({ mentionHandles: ['@Viewer'], read: true }))).toBe(false);
   });
 });
 

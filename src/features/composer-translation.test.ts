@@ -216,6 +216,26 @@ describe('composer translation', () => {
     expect(panel.hidden).toBe(true);
   });
 
+  it('closes the draft translation panel from a second button click and ignores non-Escape keys', async () => {
+    vi.useFakeTimers();
+    document.body.replaceChildren();
+    const input = createVisibleChatInput();
+    document.body.append(createComposerHost(input));
+
+    initComposerTranslation(vi.fn());
+    scheduleComposerTranslationWire();
+    await vi.runOnlyPendingTimersAsync();
+    const button = document.querySelector<HTMLButtonElement>('.ytcq-composer-translate-button')!;
+    const panel = document.querySelector<HTMLElement>('.ytcq-composer-translate-panel')!;
+
+    button.click();
+    expect(panel.hidden).toBe(false);
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'a', bubbles: true }));
+    expect(panel.hidden).toBe(false);
+    button.click();
+    expect(panel.hidden).toBe(true);
+  });
+
   it('does not wire until YouTube exposes the emoji button host', async () => {
     vi.useFakeTimers();
     document.body.replaceChildren(createVisibleChatInput());
@@ -224,6 +244,21 @@ describe('composer translation', () => {
     scheduleComposerTranslationWire();
     await vi.runOnlyPendingTimersAsync();
 
+    expect(document.querySelector('.ytcq-composer-translate-button')).toBeNull();
+  });
+
+  it('coalesces pending wire requests and cleans them before they run', async () => {
+    vi.useFakeTimers();
+    document.body.replaceChildren(createComposerHost(createVisibleChatInput()));
+    const cancelAnimationFrameSpy = vi.spyOn(window, 'cancelAnimationFrame');
+
+    initComposerTranslation(vi.fn());
+    scheduleComposerTranslationWire();
+    scheduleComposerTranslationWire();
+    cleanupStaleComposerTranslation();
+    await vi.runOnlyPendingTimersAsync();
+
+    expect(cancelAnimationFrameSpy).toHaveBeenCalled();
     expect(document.querySelector('.ytcq-composer-translate-button')).toBeNull();
   });
 
@@ -246,6 +281,25 @@ describe('composer translation', () => {
     expect(buttons).toHaveLength(1);
     expect(buttons[0].classList.contains('ytcq-composer-translate-button-active')).toBe(false);
     expect(buttons[0].title).toBe('Draft translation off.');
+  });
+
+  it('removes duplicate controls from the emoji host before wiring a fresh control', async () => {
+    vi.useFakeTimers();
+    document.body.replaceChildren();
+    const input = createVisibleChatInput();
+    const host = createComposerHost(input);
+    const emojiButton = host.querySelector<HTMLElement>('#emoji-picker-button')!;
+    const duplicate = document.createElement('div');
+    duplicate.className = 'ytcq-composer-translate-control';
+    emojiButton.append(duplicate);
+    document.body.append(host);
+
+    initComposerTranslation(vi.fn());
+    scheduleComposerTranslationWire();
+    await vi.runOnlyPendingTimersAsync();
+
+    expect(emojiButton.querySelectorAll(':scope > .ytcq-composer-translate-control')).toHaveLength(1);
+    expect(emojiButton.querySelector(':scope > .ytcq-composer-translate-control')).not.toBe(duplicate);
   });
 
   it('keeps the translation panel open when clicking inside the panel or control', async () => {
@@ -346,6 +400,225 @@ describe('composer translation', () => {
     expect(input.textContent).toContain('友達');
     const emoji = input.querySelector<HTMLImageElement>('img[data-emoji-id="custom-smile-id"]');
     expect(emoji?.alt).toBe(':custom-smile:');
+  });
+
+  it('does not retranslate a translated draft until new text is appended in order', async () => {
+    vi.useFakeTimers();
+    document.body.replaceChildren();
+    setOptions({
+      ...DEFAULT_OPTIONS,
+      composerTranslateLanguage: 'ja'
+    });
+    const requests: string[] = [];
+    vi.mocked(chrome.runtime.sendMessage).mockImplementation(((message: unknown, callback?: (response: unknown) => void) => {
+      const text = (message as { text: string }).text;
+      requests.push(text);
+      callback?.({
+        ok: true,
+        sourceLanguage: 'es',
+        translatedText: text === 'Hola' ? 'こんにちは' : 'こんにちは 友達'
+      });
+      return Promise.resolve({});
+    }) as never);
+    const input = createVisibleChatInput();
+    document.body.append(createComposerHost(input));
+
+    initComposerTranslation(vi.fn());
+    scheduleComposerTranslationWire();
+    await vi.runOnlyPendingTimersAsync();
+    input.textContent = 'Hola';
+    input.dispatchEvent(new InputEvent('input', { bubbles: true }));
+    await vi.advanceTimersByTimeAsync(850);
+    await flushPromises();
+
+    input.dispatchEvent(new InputEvent('input', { bubbles: true }));
+    await vi.advanceTimersByTimeAsync(850);
+    await flushPromises();
+    input.textContent = 'amigo こんにちは';
+    input.dispatchEvent(new InputEvent('input', { bubbles: true }));
+    await vi.advanceTimersByTimeAsync(850);
+    await flushPromises();
+
+    expect(requests).toEqual(['Hola', 'amigo こんにちは']);
+  });
+
+  it('does not retranslate appended text when translated continuation nodes cannot be matched', async () => {
+    vi.useFakeTimers();
+    document.body.replaceChildren();
+    setOptions({
+      ...DEFAULT_OPTIONS,
+      composerTranslateLanguage: 'ja'
+    });
+    const requests: string[] = [];
+    vi.mocked(chrome.runtime.sendMessage).mockImplementation(((message: unknown, callback?: (response: unknown) => void) => {
+      const text = (message as { text: string }).text;
+      requests.push(text);
+      callback?.({
+        ok: true,
+        sourceLanguage: 'es',
+        translatedText: text === 'Hola' ? 'こんにちは' : 'こんにちは 友達'
+      });
+      return Promise.resolve({});
+    }) as never);
+    const input = createVisibleChatInput();
+    document.body.append(createComposerHost(input));
+
+    initComposerTranslation(vi.fn());
+    scheduleComposerTranslationWire();
+    await vi.runOnlyPendingTimersAsync();
+    input.textContent = 'Hola';
+    input.dispatchEvent(new InputEvent('input', { bubbles: true }));
+    await vi.advanceTimersByTimeAsync(850);
+    await flushPromises();
+
+    input.replaceChildren(document.createElement('span'), document.createTextNode('こんにちは amigo'));
+    input.dispatchEvent(new InputEvent('input', { bubbles: true }));
+    await vi.advanceTimersByTimeAsync(850);
+    await flushPromises();
+
+    expect(requests).toEqual(['Hola']);
+    expect(input.textContent).toBe('こんにちは amigo');
+  });
+
+  it('translates textarea drafts and retranslates appended text through the text fallback path', async () => {
+    vi.useFakeTimers();
+    document.body.replaceChildren();
+    setOptions({
+      ...DEFAULT_OPTIONS,
+      composerTranslateLanguage: 'ja'
+    });
+    const requests: string[] = [];
+    vi.mocked(chrome.runtime.sendMessage).mockImplementation(((message: unknown, callback?: (response: unknown) => void) => {
+      const text = (message as { text: string }).text;
+      requests.push(text);
+      callback?.({
+        ok: true,
+        sourceLanguage: 'es',
+        translatedText: text === 'Hola' ? 'こんにちは' : 'こんにちは 友達'
+      });
+      return Promise.resolve({});
+    }) as never);
+    const input = createVisibleTextarea();
+    document.body.append(createComposerHost(input));
+
+    initComposerTranslation(vi.fn());
+    scheduleComposerTranslationWire();
+    await vi.runOnlyPendingTimersAsync();
+    input.value = 'Hola';
+    input.dispatchEvent(new InputEvent('input', { bubbles: true }));
+    await vi.advanceTimersByTimeAsync(850);
+    await flushPromises();
+    await vi.runOnlyPendingTimersAsync();
+
+    input.value = 'こんにちは amigo';
+    input.dispatchEvent(new InputEvent('input', { bubbles: true }));
+    await vi.advanceTimersByTimeAsync(850);
+    await flushPromises();
+
+    expect(requests).toEqual(['Hola', 'Hola amigo']);
+    expect(input.value).toBe('こんにちは 友達');
+  });
+
+  it('ignores unrelated input events but accepts input events from descendants of the chat input', async () => {
+    vi.useFakeTimers();
+    document.body.replaceChildren();
+    setOptions({
+      ...DEFAULT_OPTIONS,
+      composerTranslateLanguage: 'ja'
+    });
+    const requests: string[] = [];
+    vi.mocked(chrome.runtime.sendMessage).mockImplementation(((message: unknown, callback?: (response: unknown) => void) => {
+      requests.push((message as { text: string }).text);
+      callback?.({
+        ok: true,
+        sourceLanguage: 'es',
+        translatedText: 'こんにちは'
+      });
+      return Promise.resolve({});
+    }) as never);
+    const input = createVisibleChatInput();
+    const child = document.createElement('span');
+    child.textContent = 'Hola';
+    input.append(child);
+    document.body.append(createComposerHost(input));
+
+    initComposerTranslation(vi.fn());
+    scheduleComposerTranslationWire();
+    await vi.runOnlyPendingTimersAsync();
+    document.body.dispatchEvent(new InputEvent('input', { bubbles: true }));
+    await vi.advanceTimersByTimeAsync(850);
+    child.dispatchEvent(new InputEvent('input', { bubbles: true }));
+    await vi.advanceTimersByTimeAsync(850);
+    await flushPromises();
+
+    expect(requests).toEqual(['Hola']);
+    expect(input.textContent).toBe('こんにちは');
+  });
+
+  it('does not retranslate translated text with only whitespace appended', async () => {
+    vi.useFakeTimers();
+    document.body.replaceChildren();
+    setOptions({
+      ...DEFAULT_OPTIONS,
+      composerTranslateLanguage: 'ja'
+    });
+    const requests: string[] = [];
+    vi.mocked(chrome.runtime.sendMessage).mockImplementation(((message: unknown, callback?: (response: unknown) => void) => {
+      requests.push((message as { text: string }).text);
+      callback?.({
+        ok: true,
+        sourceLanguage: 'es',
+        translatedText: 'こんにちは'
+      });
+      return Promise.resolve({});
+    }) as never);
+    const input = createVisibleChatInput();
+    document.body.append(createComposerHost(input));
+
+    initComposerTranslation(vi.fn());
+    scheduleComposerTranslationWire();
+    await vi.runOnlyPendingTimersAsync();
+    input.textContent = 'Hola';
+    input.dispatchEvent(new InputEvent('input', { bubbles: true }));
+    await vi.advanceTimersByTimeAsync(850);
+    await flushPromises();
+
+    input.textContent = 'こんにちは   ';
+    input.dispatchEvent(new InputEvent('input', { bubbles: true }));
+    await vi.advanceTimersByTimeAsync(850);
+    await flushPromises();
+
+    expect(requests).toEqual(['Hola']);
+    expect(input.textContent).toBe('こんにちは   ');
+  });
+
+  it('does not replace the draft when translation returns an empty result', async () => {
+    vi.useFakeTimers();
+    document.body.replaceChildren();
+    setOptions({
+      ...DEFAULT_OPTIONS,
+      composerTranslateLanguage: 'ja'
+    });
+    vi.mocked(chrome.runtime.sendMessage).mockImplementation(((_message: unknown, callback?: (response: unknown) => void) => {
+      callback?.({
+        ok: true,
+        sourceLanguage: 'es',
+        translatedText: ''
+      });
+      return Promise.resolve({});
+    }) as never);
+    const input = createVisibleChatInput();
+    document.body.append(createComposerHost(input));
+
+    initComposerTranslation(vi.fn());
+    scheduleComposerTranslationWire();
+    await vi.runOnlyPendingTimersAsync();
+    input.textContent = 'Hola';
+    input.dispatchEvent(new InputEvent('input', { bubbles: true }));
+    await vi.advanceTimersByTimeAsync(850);
+    await flushPromises();
+
+    expect(input.textContent).toBe('Hola');
   });
 
   it('does not replace unchanged translations or stale language responses', async () => {
@@ -458,6 +731,22 @@ function createVisibleChatInput(): HTMLElement {
   const input = document.createElement('div');
   input.id = 'input';
   input.setAttribute('contenteditable', 'true');
+  input.getBoundingClientRect = () => ({
+    bottom: 120,
+    height: 40,
+    left: 0,
+    right: 320,
+    top: 80,
+    width: 320,
+    x: 0,
+    y: 80,
+    toJSON: () => ({})
+  });
+  return input;
+}
+
+function createVisibleTextarea(): HTMLTextAreaElement {
+  const input = document.createElement('textarea');
   input.getBoundingClientRect = () => ({
     bottom: 120,
     height: 40,

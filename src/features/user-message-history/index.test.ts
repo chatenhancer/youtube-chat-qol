@@ -45,6 +45,31 @@ describe('user message history', () => {
       ]);
   });
 
+  it('keeps an existing avatar when a stable message id re-renders without one', async () => {
+    const history = await import('./index');
+    const first = createMessage({
+      authorName: '@AvatarKeeper',
+      channelId: 'avatar-keeper-channel',
+      messageId: 'message-1',
+      text: 'first text'
+    });
+    first.querySelector('#author-photo')?.append(createAvatarImage('https://example.com/original.jpg'));
+    const rerendered = createMessage({
+      authorName: '@AvatarKeeper',
+      channelId: 'avatar-keeper-channel',
+      messageId: 'message-1',
+      text: 'new text'
+    });
+
+    history.recordUserMessage(first);
+    history.recordUserMessage(rerendered);
+
+    expect(history.getAvatarSrcForIdentity({
+      authorName: '@AvatarKeeper',
+      channelId: 'avatar-keeper-channel'
+    })).toBe('https://example.com/original.jpg');
+  });
+
   it('ignores messages without usable author or text', async () => {
     const history = await import('./index');
 
@@ -241,6 +266,28 @@ describe('user message history', () => {
       ]);
   });
 
+  it('dedupes channel and author fallback records with the same stable message id', async () => {
+    const history = await import('./index');
+    history.recordUserMessage(createMessage({
+      authorName: '@DualIdentity',
+      channelId: 'dual-channel',
+      messageId: 'shared-message-id',
+      text: 'channel-backed copy'
+    }));
+    history.recordUserMessage(createMessage({
+      authorName: '@DualIdentity',
+      messageId: 'shared-message-id',
+      text: 'author fallback copy'
+    }));
+
+    expect(history.getRecentMessagesForIdentity({
+      authorName: '@DualIdentity',
+      channelId: 'dual-channel'
+    })).toMatchObject([
+      { text: 'channel-backed copy' }
+    ]);
+  });
+
   it('finds recently seen users by exact handle before prefix matches', async () => {
     const history = await import('./index');
     history.recordUserMessage(createMessage({
@@ -405,6 +452,23 @@ describe('user message history', () => {
     })?.timestamp).toBe(expectedTimestamp.getTime());
   });
 
+  it('falls back to the recorded time when a visible timestamp cannot be parsed', async () => {
+    const history = await import('./index');
+    const recordedAt = Date.now();
+    history.recordUserMessage(createMessage({
+      authorName: '@TimestampFallback',
+      channelId: 'timestamp-fallback-channel',
+      messageId: 'message-1',
+      text: 'fallback timestamp',
+      timestampText: 'not a timestamp'
+    }));
+
+    expect(history.getLatestMessageForIdentity({
+      authorName: '@TimestampFallback',
+      channelId: 'timestamp-fallback-channel'
+    })?.timestamp).toBe(recordedAt);
+  });
+
   it('mirrors rendered and cleared translations into recent message records', async () => {
     const history = await import('./index');
     const lifecycle = await import('../../content/lifecycle');
@@ -452,6 +516,34 @@ describe('user message history', () => {
       authorName: '@TranslatedUser',
       channelId: 'translated-channel'
     })?.translation).toBeUndefined();
+  });
+
+  it('records a not-yet-seen message when a translation render event arrives for it', async () => {
+    const history = await import('./index');
+    const lifecycle = await import('../../content/lifecycle');
+    const events = await import('../translation/events');
+    lifecycle.initFeatures({ saveOptions: vi.fn() });
+    const message = createMessage({
+      authorName: '@EventFirstTranslation',
+      channelId: 'event-first-channel',
+      messageId: 'message-1',
+      text: 'hola'
+    });
+
+    events.emitMessageTranslationRendered({
+      message,
+      originalText: 'hola',
+      protectedTokens: [],
+      result: { sourceLanguage: 'es', targetLanguage: 'en', text: 'hello' },
+      sourceText: 'hola'
+    });
+
+    expect(history.getLatestMessageForIdentity({
+      authorName: '@EventFirstTranslation',
+      channelId: 'event-first-channel'
+    })?.translation).toMatchObject({
+      result: { text: 'hello' }
+    });
   });
 
   it('ignores translation events for unknown messages and missing translations', async () => {
@@ -538,6 +630,7 @@ function createMessage({
 
 function createAvatarImage(src: string): HTMLImageElement {
   const image = document.createElement('img');
-  image.src = src;
+  image.id = 'img';
+  image.setAttribute('src', src);
   return image;
 }

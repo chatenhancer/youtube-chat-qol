@@ -44,6 +44,23 @@ describe('inbox keyword panel', () => {
     expect(onKeywordsChanged).toHaveBeenCalledOnce();
   });
 
+  it('ignores blank keyword submissions and can refresh toggles without a badge', () => {
+    const onKeywordsChanged = vi.fn();
+    const panel = createKeywordPanel({ onKeywordsChanged });
+    const input = panel.querySelector<HTMLInputElement>('.ytcq-inbox-keyword-input')!;
+    const form = panel.querySelector<HTMLFormElement>('form')!;
+    const bareButton = document.createElement('button');
+
+    input.value = '   ';
+    form.dispatchEvent(new SubmitEvent('submit', { bubbles: true, cancelable: true }));
+    refreshKeywordToggle(bareButton);
+
+    expect(getInboxKeywordsSnapshot()).toEqual([]);
+    expect(input.value).toBe('');
+    expect(onKeywordsChanged).not.toHaveBeenCalled();
+    expect(bareButton.classList.contains('ytcq-inbox-keyword-toggle-has-count')).toBe(false);
+  });
+
   it('does not add duplicate keywords and removes existing chips', () => {
     const onKeywordsChanged = vi.fn();
     addInboxKeywordsToState(['launch']);
@@ -60,5 +77,17 @@ describe('inbox keyword panel', () => {
     expect(getInboxKeywordsSnapshot()).toEqual([]);
     expect(panel.querySelector('.ytcq-inbox-keyword-empty')?.textContent).toBe('No keywords');
     expect(onKeywordsChanged).toHaveBeenCalledOnce();
+  });
+
+  it('keeps stale keyword chips untouched when removal no longer changes state', () => {
+    const onKeywordsChanged = vi.fn();
+    addInboxKeywordsToState(['launch']);
+    const panel = createKeywordPanel({ onKeywordsChanged });
+    resetInboxStore();
+
+    panel.querySelector<HTMLButtonElement>('.ytcq-inbox-keyword-remove')?.click();
+
+    expect(panel.querySelector('.ytcq-inbox-keyword-chip')?.textContent).toContain('launch');
+    expect(onKeywordsChanged).not.toHaveBeenCalled();
   });
 });

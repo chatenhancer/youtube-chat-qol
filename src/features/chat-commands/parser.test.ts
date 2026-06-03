@@ -10,6 +10,12 @@ describe('chat command parser', () => {
     });
   });
 
+  it('rejects non-command and malformed slash text', () => {
+    expect(parseCommand('hello /time tokyo')).toBeNull();
+    expect(parseCommand('/')).toBeNull();
+    expect(parseCommand('/ time')).toBeNull();
+  });
+
   it('treats double slash commands as escaped text', () => {
     expect(parseCommand('//time tokyo')).toEqual({
       args: '',
@@ -49,6 +55,28 @@ describe('chat command parser', () => {
       selectionStart: text.length,
       text
     }, new Set(['time']))).toBeNull();
+  });
+
+  it('does not parse inline commands from a selected range or embedded slash token', () => {
+    const inlineCommands = new Set(['time']);
+    const text = 'hello word/time tokyo and /time paris';
+
+    expect(parseInlineTextCommand({
+      selectionEnd: 11,
+      selectionStart: 6,
+      text
+    }, inlineCommands)).toBeNull();
+    expect(parseInlineTextCommand({
+      selectionEnd: 21,
+      selectionStart: 21,
+      text
+    }, inlineCommands)).toEqual({
+      args: 'paris',
+      end: text.length,
+      name: 'time',
+      start: 26,
+      text: '/time paris'
+    });
   });
 
   it('normalizes command tokens for aliases and timezone names', () => {
