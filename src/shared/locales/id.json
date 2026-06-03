@@ -29,6 +29,8 @@
     "jumpToMessage": "Lompat ke pesan",
     "keywordOrPhrase": "Kata kunci atau frasa",
     "lessThanOneMinute": "kurang dari 1 menit",
+    "markUser": "Tandai",
+    "unmarkUser": "Hapus",
     "mention": "Sebut",
     "mentionUser": "Sebut pengguna",
     "mentionUserTitle": "Sebut pengguna. Alt/Option-klik untuk mengutip.",
@@ -156,20 +158,14 @@
     "extensionStatusActiveManyOther": {
       "message": "Aktif di {count} tab lain"
     },
-    "extensionStatusActiveHelper": {
-      "message": "Ekstensi sedang berjalan di live chat YouTube."
-    },
     "extensionStatusInactiveAll": {
       "message": "Tidak aktif di tab terbuka mana pun"
     },
-    "extensionStatusInactiveHelper": {
-      "message": "Buka live chat YouTube agar ekstensi berjalan."
+    "extensionStatusConnected": {
+      "message": "Ekstensi terhubung ke live chat YouTube."
     },
-    "extensionStatusInactiveDisconnectedHelperOne": {
-      "message": "Segarkan live chat YouTube yang terbuka."
-    },
-    "extensionStatusInactiveDisconnectedHelperMany": {
-      "message": "Segarkan live chat YouTube yang terbuka."
+    "extensionStatusDisconnected": {
+      "message": "Ekstensi tidak terhubung ke live chat YouTube."
     },
     "extensionShortName": {
       "message": "Chat Enhancer",
@@ -265,6 +261,48 @@
     },
     "popupResetComplete": {
       "message": "Chat Enhancer telah direset."
+    },
+    "settings": {
+      "message": "Setelan"
+    },
+    "bookmarks": {
+      "message": "Bookmark"
+    },
+    "popupSections": {
+      "message": "Bagian popup"
+    },
+    "bookmarkedUsers": {
+      "message": "Pengguna yang ditandai"
+    },
+    "noBookmarkedUsers": {
+      "message": "Belum ada bookmark"
+    },
+    "bookmarkedUsersCount": {
+      "message": "{count} bookmark"
+    },
+    "bookmarkedUsersEmpty": {
+      "message": "Pengguna yang Anda tandai dari chat YouTube akan muncul di sini."
+    },
+    "markedUserDate": {
+      "message": "Ditandai {date}"
+    },
+    "markedDateUnknown": {
+      "message": "Tanggal tidak diketahui"
+    },
+    "unknownStream": {
+      "message": "Streaming tidak diketahui"
+    },
+    "unknownUser": {
+      "message": "Pengguna tidak diketahui"
+    },
+    "openChannel": {
+      "message": "Buka channel"
+    },
+    "unmarkUser": {
+      "message": "Hapus"
+    },
+    "markUser": {
+      "message": "Tandai"
     }
   }
 }

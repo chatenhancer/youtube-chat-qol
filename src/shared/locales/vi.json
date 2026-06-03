@@ -29,6 +29,8 @@
     "jumpToMessage": "Nhảy đến tin nhắn",
     "keywordOrPhrase": "Từ khóa hoặc cụm từ",
     "lessThanOneMinute": "dưới 1 phút",
+    "markUser": "Đánh dấu",
+    "unmarkUser": "Bỏ dấu",
     "mention": "Nhắc đến",
     "mentionUser": "Nhắc đến người dùng",
     "mentionUserTitle": "Nhắc đến người dùng. Alt/Option-click để trích dẫn.",
@@ -155,20 +157,14 @@
     "extensionStatusActiveManyOther": {
       "message": "Đang hoạt động trong {count} tab khác"
     },
-    "extensionStatusActiveHelper": {
-      "message": "Tiện ích đang chạy trong live chat YouTube."
-    },
     "extensionStatusInactiveAll": {
       "message": "Không hoạt động trong tab đang mở nào"
     },
-    "extensionStatusInactiveHelper": {
-      "message": "Mở live chat YouTube để tiện ích chạy."
+    "extensionStatusConnected": {
+      "message": "Tiện ích đã kết nối với cuộc trò chuyện trực tiếp trên YouTube."
     },
-    "extensionStatusInactiveDisconnectedHelperOne": {
-      "message": "Làm mới live chat YouTube đang mở."
-    },
-    "extensionStatusInactiveDisconnectedHelperMany": {
-      "message": "Làm mới các live chat YouTube đang mở."
+    "extensionStatusDisconnected": {
+      "message": "Tiện ích chưa kết nối với cuộc trò chuyện trực tiếp trên YouTube."
     },
     "extensionShortName": {
       "message": "Chat Enhancer"
@@ -262,6 +258,48 @@
     },
     "popupResetComplete": {
       "message": "Chat Enhancer đã được đặt lại."
+    },
+    "settings": {
+      "message": "Cài đặt"
+    },
+    "bookmarks": {
+      "message": "Dấu trang"
+    },
+    "popupSections": {
+      "message": "Các phần của popup"
+    },
+    "bookmarkedUsers": {
+      "message": "Người dùng đã đánh dấu"
+    },
+    "noBookmarkedUsers": {
+      "message": "Chưa có dấu trang"
+    },
+    "bookmarkedUsersCount": {
+      "message": "{count} dấu trang"
+    },
+    "bookmarkedUsersEmpty": {
+      "message": "Người dùng bạn đánh dấu trong chat YouTube sẽ xuất hiện ở đây."
+    },
+    "markedUserDate": {
+      "message": "Đã đánh dấu {date}"
+    },
+    "markedDateUnknown": {
+      "message": "Không rõ ngày"
+    },
+    "unknownStream": {
+      "message": "Livestream không rõ"
+    },
+    "unknownUser": {
+      "message": "Người dùng không rõ"
+    },
+    "openChannel": {
+      "message": "Mở kênh"
+    },
+    "unmarkUser": {
+      "message": "Bỏ dấu"
+    },
+    "markUser": {
+      "message": "Đánh dấu"
     }
   }
 }

@@ -148,6 +148,30 @@ describe('frequent emoji feature entry points', () => {
     expect(picker.querySelector('.ytcq-frequent-emoji-row')).not.toBeNull();
   });
 
+  it('does not recreate frequent emoji rows from a pending refresh after cleanup', async () => {
+    chrome.storage.local.set({
+      ytcqEmojiUsage: [emoji({
+        count: 2,
+        key: 'text:🎉',
+        label: 'Party',
+        text: '🎉'
+      })]
+    });
+    initFrequentEmojis();
+    const toggle = document.createElement('button');
+    toggle.id = 'emoji';
+    toggle.className = 'style-scope yt-live-chat-message-input-renderer';
+    document.body.append(toggle);
+    const picker = createPicker();
+    document.body.append(picker);
+
+    toggle.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    cleanupStaleFrequentEmojis();
+    await vi.advanceTimersByTimeAsync(50);
+
+    expect(picker.querySelector('.ytcq-frequent-emoji-row')).toBeNull();
+  });
+
   it('enhances picker nodes discovered by lifecycle mutations', () => {
     chrome.storage.local.set({
       ytcqEmojiUsage: [emoji({

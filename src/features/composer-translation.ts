@@ -51,6 +51,7 @@ let lastSourceText = '';
 let lastSourceNodes: Node[] = [];
 let lastSourcePlanText = '';
 let lastTranslatedText = '';
+let composerTranslationListeners = new AbortController();
 
 registerFeatureLifecycle({
   page: {
@@ -72,11 +73,12 @@ registerFeatureLifecycle({
 export function initComposerTranslation(callback: SaveOptions): void {
   saveOptions = callback;
   scheduleComposerTranslationWire();
-  document.addEventListener('input', handleDocumentInput, true);
-  document.addEventListener('click', handleDocumentClick, true);
-  document.addEventListener('keydown', handleDocumentKeydown, true);
-  document.addEventListener('scroll', positionPanel, true);
-  window.addEventListener('resize', positionPanel, true);
+  const options = { capture: true, signal: composerTranslationListeners.signal };
+  document.addEventListener('input', handleDocumentInput, options);
+  document.addEventListener('click', handleDocumentClick, options);
+  document.addEventListener('keydown', handleDocumentKeydown, options);
+  document.addEventListener('scroll', positionPanel, options);
+  window.addEventListener('resize', positionPanel, options);
 }
 
 export function scheduleComposerTranslationWire(): void {
@@ -115,6 +117,12 @@ export function resetComposerTranslation(): void {
 }
 
 export function cleanupStaleComposerTranslation(): void {
+  composerTranslationListeners.abort();
+  composerTranslationListeners = new AbortController();
+  if (wireFrame) {
+    window.cancelAnimationFrame(wireFrame);
+    wireFrame = 0;
+  }
   window.clearTimeout(debounceTimer);
   debounceTimer = 0;
   requestSerial += 1;

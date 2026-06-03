@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import contact from '../shared/contact.json';
+import { MARKED_USERS_STORAGE_KEY } from '../shared/marked-users';
 
 describe('popup', () => {
   beforeEach(async () => {
@@ -9,6 +10,9 @@ describe('popup', () => {
       <a id="sourceCodeLink"></a>
       <a id="supportLink"></a>
       <button id="resetExtension"></button>
+      <button id="settingsTab" data-popup-tab-target="settingsPanel" aria-selected="true"></button>
+      <button id="bookmarksTab" data-popup-tab-target="bookmarksPanel" aria-selected="false"></button>
+      <div id="settingsPanel" data-popup-tab-panel>
       <section data-extension-status>
         <span data-extension-status-text></span>
         <span data-extension-status-helper></span>
@@ -21,6 +25,11 @@ describe('popup', () => {
       <input id="sound" type="checkbox">
       <input id="startupEffect" type="checkbox">
       <span id="version"></span>
+      </div>
+      <div id="bookmarksPanel" data-popup-tab-panel hidden>
+        <span id="bookmarksCount"></span>
+        <div id="bookmarksList"></div>
+      </div>
     `;
     await chrome.storage.local.clear();
     await chrome.storage.sync.clear();
@@ -64,10 +73,11 @@ describe('popup', () => {
 
     expect(document.querySelector('[data-extension-status]')?.getAttribute('data-extension-status')).toBe('active');
     expect(document.querySelector('[data-extension-status-text]')?.textContent).toBe('extensionStatusActiveCurrentAndOne');
-    expect(document.querySelector('[data-extension-status-helper]')?.textContent).toBe('extensionStatusActiveHelper');
+    expect(document.querySelector('[data-extension-status-helper]')?.textContent).toBe('extensionStatusConnected');
+    expect(document.querySelector<HTMLElement>('[data-extension-status-helper]')?.hidden).toBe(false);
   });
 
-  it('uses disconnected known-chat copy when no active content scripts respond', async () => {
+  it('uses disconnected helper copy when no active content scripts respond', async () => {
     await chrome.storage.local.set({
       ytcqKnownChatTabs: {
         10: Date.now()
@@ -93,7 +103,8 @@ describe('popup', () => {
 
     expect(document.querySelector('[data-extension-status]')?.getAttribute('data-extension-status')).toBe('inactive');
     expect(document.querySelector('[data-extension-status-text]')?.textContent).toBe('extensionStatusInactiveAll');
-    expect(document.querySelector('[data-extension-status-helper]')?.textContent).toBe('extensionStatusInactiveDisconnectedHelperOne');
+    expect(document.querySelector('[data-extension-status-helper]')?.textContent).toBe('extensionStatusDisconnected');
+    expect(document.querySelector<HTMLElement>('[data-extension-status-helper]')?.hidden).toBe(false);
   });
 
   it('summarizes active chats in other tabs and handles no open tabs', async () => {
@@ -112,6 +123,7 @@ describe('popup', () => {
     await import('./index');
 
     expect(document.querySelector('[data-extension-status-text]')?.textContent).toBe('extensionStatusActiveManyOther:2');
+    expect(document.querySelector('[data-extension-status-helper]')?.textContent).toBe('extensionStatusConnected');
 
     vi.resetModules();
     vi.mocked(chrome.tabs.query).mockImplementation(((queryInfo: chrome.tabs.QueryInfo, callback?: (tabs: chrome.tabs.Tab[]) => void) => {
@@ -122,7 +134,7 @@ describe('popup', () => {
     await import('./index');
 
     expect(document.querySelector('[data-extension-status-text]')?.textContent).toBe('extensionStatusInactiveAll');
-    expect(document.querySelector('[data-extension-status-helper]')?.textContent).toBe('extensionStatusInactiveHelper');
+    expect(document.querySelector('[data-extension-status-helper]')?.textContent).toBe('extensionStatusDisconnected');
   });
 
   it('summarizes current-tab-only and current-tab-with-many active status states', async () => {
@@ -140,6 +152,7 @@ describe('popup', () => {
 
     await import('./index');
     expect(document.querySelector('[data-extension-status-text]')?.textContent).toBe('extensionStatusActiveCurrent');
+    expect(document.querySelector('[data-extension-status-helper]')?.textContent).toBe('extensionStatusConnected');
 
     vi.resetModules();
     vi.mocked(chrome.runtime.sendMessage).mockImplementation(((_message: unknown, callback?: (response: unknown) => void) => {
@@ -149,6 +162,7 @@ describe('popup', () => {
     await import('./index');
 
     expect(document.querySelector('[data-extension-status-text]')?.textContent).toBe('extensionStatusActiveCurrentAndMany:2');
+    expect(document.querySelector('[data-extension-status-helper]')?.textContent).toBe('extensionStatusConnected');
   });
 
   it('summarizes a single active chat in another tab', async () => {
@@ -167,30 +181,7 @@ describe('popup', () => {
     await import('./index');
 
     expect(document.querySelector('[data-extension-status-text]')?.textContent).toBe('extensionStatusActiveOneOther');
-  });
-
-  it('uses the many-disconnected known-chat helper when multiple open chats are stale', async () => {
-    await chrome.storage.local.set({
-      ytcqKnownChatTabs: {
-        10: Date.now(),
-        20: Date.now()
-      }
-    });
-    vi.mocked(chrome.tabs.query).mockImplementation(((queryInfo: chrome.tabs.QueryInfo, callback?: (tabs: chrome.tabs.Tab[]) => void) => {
-      const tabs = queryInfo.active
-        ? [{ id: 10 } as chrome.tabs.Tab]
-        : [{ id: 10 } as chrome.tabs.Tab, { id: 20 } as chrome.tabs.Tab];
-      callback?.(tabs);
-      return Promise.resolve(tabs);
-    }) as never);
-    vi.mocked(chrome.runtime.sendMessage).mockImplementation(((_message: unknown, callback?: (response: unknown) => void) => {
-      callback?.({ activeTabIds: [] });
-      return Promise.resolve({ activeTabIds: [] });
-    }) as never);
-
-    await import('./index');
-
-    expect(document.querySelector('[data-extension-status-helper]')?.textContent).toBe('extensionStatusInactiveDisconnectedHelperMany');
+    expect(document.querySelector('[data-extension-status-helper]')?.textContent).toBe('extensionStatusConnected');
   });
 
   it('ignores malformed active chat responses', async () => {
@@ -209,7 +200,7 @@ describe('popup', () => {
     expect(document.querySelector('[data-extension-status]')?.getAttribute('data-extension-status')).toBe('inactive');
   });
 
-  it('treats active chat lookup errors as inactive instead of showing active status', async () => {
+  it('treats active chat lookup errors as disconnected', async () => {
     vi.mocked(chrome.tabs.query).mockImplementation(((queryInfo: chrome.tabs.QueryInfo, callback?: (tabs: chrome.tabs.Tab[]) => void) => {
       const tabs = queryInfo.active ? [{ id: 10 } as chrome.tabs.Tab] : [{ id: 10 } as chrome.tabs.Tab];
       callback?.(tabs);
@@ -283,6 +274,69 @@ describe('popup', () => {
 
     expect(chrome.tabs.create).toHaveBeenCalledWith({ url: 'https://chatenhancer.com' });
     expect(chrome.tabs.create).toHaveBeenCalledWith({ url: 'https://www.chatenhancer.com/source' });
+  });
+
+  it('switches to bookmarks and manages marked users', async () => {
+    await chrome.storage.local.set({
+      [MARKED_USERS_STORAGE_KEY]: {
+        'channel:viewer-channel': {
+          authorName: '@ViewerOne',
+          avatarUrl: 'https://yt3.ggpht.com/avatar=s88-c-k',
+          channelId: 'viewer-channel',
+          markedAt: 1_700_000_000_000,
+          markedSourceTitle: 'Example stream',
+          markedSourceUrl: 'https://www.youtube.com/watch?v=stream-a'
+        }
+      }
+    });
+    vi.mocked(chrome.tabs.query).mockImplementation(((_queryInfo: chrome.tabs.QueryInfo, callback?: (tabs: chrome.tabs.Tab[]) => void) => {
+      callback?.([]);
+      return Promise.resolve([]);
+    }) as never);
+
+    await import('./index');
+
+    expect(document.querySelector<HTMLElement>('#settingsPanel')?.hidden).toBe(false);
+    expect(document.querySelector<HTMLElement>('#bookmarksPanel')?.hidden).toBe(true);
+    document.querySelector<HTMLButtonElement>('#bookmarksTab')?.click();
+
+    expect(document.querySelector<HTMLButtonElement>('#bookmarksTab')?.getAttribute('aria-selected')).toBe('true');
+    expect(document.querySelector<HTMLElement>('#settingsPanel')?.hidden).toBe(true);
+    expect(document.querySelector<HTMLElement>('#bookmarksPanel')?.hidden).toBe(false);
+    expect(document.querySelector('#bookmarksCount')?.textContent).toBe('bookmarkedUsersCount:1');
+    expect(document.querySelector('.bookmark-name')?.textContent).toBe('@ViewerOne');
+    expect(document.querySelector<HTMLImageElement>('.bookmark-avatar img')?.src).toBe('https://yt3.ggpht.com/avatar=s88-c-k');
+    expect(document.querySelector('.bookmark-date')?.textContent).toContain('markedUserDate:');
+    expect(document.querySelector('.bookmark-source')?.textContent).toBe('Example stream');
+
+    document.querySelector<HTMLButtonElement>('.bookmark-avatar-button')?.click();
+    expect(chrome.tabs.create).toHaveBeenCalledWith({ url: 'https://www.youtube.com/channel/viewer-channel' });
+    document.querySelector<HTMLButtonElement>('.bookmark-name-button')?.click();
+    expect(chrome.tabs.create).toHaveBeenCalledWith({ url: 'https://www.youtube.com/channel/viewer-channel' });
+
+    const actionButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('.bookmark-action-button'));
+    expect(actionButtons).toHaveLength(1);
+    actionButtons[0]?.click();
+    await expect(chrome.storage.local.get(MARKED_USERS_STORAGE_KEY)).resolves.toEqual({
+      [MARKED_USERS_STORAGE_KEY]: {}
+    });
+    expect(document.querySelector('.bookmark-row')?.classList.contains('bookmark-row-unmarked')).toBe(true);
+    expect(document.querySelector<HTMLButtonElement>('.bookmark-action-button')?.title).toBe('markUser');
+
+    document.querySelector<HTMLButtonElement>('.bookmark-action-button')?.click();
+    await expect(chrome.storage.local.get(MARKED_USERS_STORAGE_KEY)).resolves.toEqual({
+      [MARKED_USERS_STORAGE_KEY]: {
+        'channel:viewer-channel': {
+          authorName: '@ViewerOne',
+          avatarUrl: 'https://yt3.ggpht.com/avatar=s88-c-k',
+          channelId: 'viewer-channel',
+          markedAt: 1_700_000_000_000,
+          markedSourceTitle: 'Example stream',
+          markedSourceUrl: 'https://www.youtube.com/watch?v=stream-a'
+        }
+      }
+    });
+    expect(document.querySelector('.bookmark-row')?.classList.contains('bookmark-row-unmarked')).toBe(false);
   });
 
   it('localizes text, titles, aria labels, and browser UI language', async () => {

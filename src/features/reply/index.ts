@@ -17,6 +17,8 @@ import { insertMentionText, replaceInputWithQuoteNodes, replaceInputWithQuoteTex
 import { createQuoteContentNodes } from './quote-content';
 import type { ReplyInsertOptions, RichQuoteContent } from './types';
 
+let replyWiringListeners = new AbortController();
+
 registerFeatureLifecycle({
   page: { cleanupStale: cleanupStaleReplyWiring },
   message: { enhance: wireAuthorNameMention }
@@ -30,18 +32,28 @@ export function wireAuthorNameMention(message: HTMLElement): void {
   if (!authorName) return;
 
   authorName.title = t('mentionUserTitle');
-  authorName.addEventListener('click', (event) => {
+  const handleClick = (event: MouseEvent): void => {
     if (event.defaultPrevented || event.button !== 0) return;
 
     event.preventDefault();
     event.stopPropagation();
     event.stopImmediatePropagation?.();
     replyToMessage(message, { quote: event.altKey });
-  }, true);
+  };
+  authorName.addEventListener('click', handleClick, {
+    capture: true,
+    signal: replyWiringListeners.signal
+  });
 }
 
 export function cleanupStaleReplyWiring(): void {
+  replyWiringListeners.abort();
+  replyWiringListeners = new AbortController();
   document.querySelectorAll('[data-ytcq-author-mention-wired]').forEach((element) => {
+    const authorName = element.querySelector<HTMLElement>('#author-name');
+    if (authorName?.title === t('mentionUserTitle')) {
+      authorName.removeAttribute('title');
+    }
     element.removeAttribute('data-ytcq-author-mention-wired');
   });
 }

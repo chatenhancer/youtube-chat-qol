@@ -13,6 +13,7 @@ import { clearTranslations, queueMessageTranslation, queueRetroactiveTranslation
 registerFeatureLifecycle({
   page: {
     boot: queueRetroactiveTranslations,
+    cleanupStale: clearTranslations,
     optionsChanged: handleTranslationOptionsChanged,
     reset: clearTranslations,
     visibleRecovery: queueRetroactiveTranslations

@@ -29,6 +29,8 @@
     "jumpToMessage": "메시지로 이동",
     "keywordOrPhrase": "키워드 또는 문구",
     "lessThanOneMinute": "1분 미만",
+    "markUser": "표시",
+    "unmarkUser": "해제",
     "mention": "멘션",
     "mentionUser": "사용자 멘션",
     "mentionUserTitle": "사용자 멘션. Alt/Option 클릭으로 인용.",
@@ -155,20 +157,14 @@
     "extensionStatusActiveManyOther": {
       "message": "다른 탭 {count}개에서 활성화됨"
     },
-    "extensionStatusActiveHelper": {
-      "message": "확장 프로그램이 YouTube 실시간 채팅 안에서 실행 중입니다."
-    },
     "extensionStatusInactiveAll": {
       "message": "열린 탭 어디에서도 활성화되지 않음"
     },
-    "extensionStatusInactiveHelper": {
-      "message": "확장 프로그램을 실행하려면 YouTube 실시간 채팅을 여세요."
+    "extensionStatusConnected": {
+      "message": "확장 프로그램이 YouTube 실시간 채팅에 연결되었습니다."
     },
-    "extensionStatusInactiveDisconnectedHelperOne": {
-      "message": "열려 있는 YouTube 실시간 채팅을 새로고침하세요."
-    },
-    "extensionStatusInactiveDisconnectedHelperMany": {
-      "message": "열려 있는 YouTube 실시간 채팅을 새로고침하세요."
+    "extensionStatusDisconnected": {
+      "message": "확장 프로그램이 YouTube 실시간 채팅에 연결되지 않았습니다."
     },
     "extensionShortName": {
       "message": "Chat Enhancer"
@@ -262,6 +258,48 @@
     },
     "popupResetComplete": {
       "message": "Chat Enhancer가 재설정되었습니다."
+    },
+    "settings": {
+      "message": "설정"
+    },
+    "bookmarks": {
+      "message": "북마크"
+    },
+    "popupSections": {
+      "message": "팝업 섹션"
+    },
+    "bookmarkedUsers": {
+      "message": "북마크한 사용자"
+    },
+    "noBookmarkedUsers": {
+      "message": "아직 북마크가 없습니다"
+    },
+    "bookmarkedUsersCount": {
+      "message": "북마크 {count}개"
+    },
+    "bookmarkedUsersEmpty": {
+      "message": "YouTube 채팅에서 표시한 사용자가 여기에 나타납니다."
+    },
+    "markedUserDate": {
+      "message": "{date}에 표시됨"
+    },
+    "markedDateUnknown": {
+      "message": "날짜 알 수 없음"
+    },
+    "unknownStream": {
+      "message": "알 수 없는 스트림"
+    },
+    "unknownUser": {
+      "message": "알 수 없는 사용자"
+    },
+    "openChannel": {
+      "message": "채널 열기"
+    },
+    "unmarkUser": {
+      "message": "해제"
+    },
+    "markUser": {
+      "message": "표시"
     }
   }
 }

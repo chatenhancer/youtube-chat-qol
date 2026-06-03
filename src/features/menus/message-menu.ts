@@ -8,16 +8,27 @@
 import { CHAT_MESSAGE_SELECTOR } from '../../youtube/selectors';
 import { t } from '../../shared/i18n';
 import {
+  BOOKMARK_FILLED_ICON_PATH,
+  BOOKMARK_ICON_PATH,
+  createSvgIcon,
   MATERIAL_ICON_VIEW_BOX,
   MENTION_ICON_PATH,
   QUOTE_ICON_PATH
 } from '../../shared/icons';
+import { ytcqCreateElement } from '../../shared/managed-dom';
+import {
+  getMessageAuthorMarkTitle,
+  isMessageAuthorMarked,
+  toggleMessageAuthorMark
+} from '../marked-users';
 import { replyToMessage } from '../reply';
 import { registerFeatureLifecycle } from '../../content/lifecycle';
 import { closeMenu, createMenuActionItem } from './common';
 
 let activeContextMessage: HTMLElement | null = null;
 let activeContextMessageAt = 0;
+let messageMenuActivationListeners = new AbortController();
+let contextMenuWiringListeners = new AbortController();
 
 registerFeatureLifecycle({
   page: { init: initMessageMenuActivation },
@@ -25,9 +36,10 @@ registerFeatureLifecycle({
 });
 
 function initMessageMenuActivation(): void {
-  document.addEventListener('pointerdown', handleMessageMenuActivation, true);
-  document.addEventListener('click', handleMessageMenuActivation, true);
-  document.addEventListener('keydown', handleMessageMenuActivation, true);
+  const options = { capture: true, signal: messageMenuActivationListeners.signal };
+  document.addEventListener('pointerdown', handleMessageMenuActivation, options);
+  document.addEventListener('click', handleMessageMenuActivation, options);
+  document.addEventListener('keydown', handleMessageMenuActivation, options);
 }
 
 export function wireMessageContext(message: HTMLElement): void {
@@ -45,9 +57,10 @@ export function wireMessageContext(message: HTMLElement): void {
     setActiveContextMessage(message);
   };
 
-  menu.addEventListener('pointerdown', setActive, true);
-  menu.addEventListener('click', setActive, true);
-  menu.addEventListener('keydown', setActive, true);
+  const options = { capture: true, signal: contextMenuWiringListeners.signal };
+  menu.addEventListener('pointerdown', setActive, options);
+  menu.addEventListener('click', setActive, options);
+  menu.addEventListener('keydown', setActive, options);
 }
 
 export function handleMessageMenuActivation(event: Event): void {
@@ -68,32 +81,26 @@ export function enhanceMessageContextMenu(menu: HTMLElement): void {
     return;
   }
 
+  const markedUser = Boolean(activeContextMessage && isMessageAuthorMarked(activeContextMessage));
+  const markUserLabel = markedUser ? t('unmarkUser') : t('markUser');
+  const markUserTitle = activeContextMessage ? getMessageAuthorMarkTitle(activeContextMessage) : markUserLabel;
+
   list.append(
     createMenuActionItem({
       className: 'ytcq-context-item',
-      action: 'quote',
-      label: t('quote'),
-      iconPath: QUOTE_ICON_PATH,
+      action: 'mark-user',
+      label: markUserLabel,
+      title: markUserTitle,
+      iconPath: markedUser ? BOOKMARK_FILLED_ICON_PATH : BOOKMARK_ICON_PATH,
+      iconViewBox: MATERIAL_ICON_VIEW_BOX,
       onClick: () => {
         if (activeContextMessage?.isConnected) {
-          replyToMessage(activeContextMessage, { quote: true });
+          void toggleMessageAuthorMark(activeContextMessage);
           closeMenu();
         }
       }
     }),
-    createMenuActionItem({
-      className: 'ytcq-context-item',
-      action: 'mention',
-      label: t('mention'),
-      iconPath: MENTION_ICON_PATH,
-      iconViewBox: MATERIAL_ICON_VIEW_BOX,
-      onClick: () => {
-        if (activeContextMessage?.isConnected) {
-          replyToMessage(activeContextMessage, { quote: false });
-          closeMenu();
-        }
-      }
-    })
+    createReplyActionSplitItem()
   );
   clampContextMenuVertically(menu);
 }
@@ -104,6 +111,10 @@ export function isRecentActiveContextMessage(): boolean {
 }
 
 export function cleanupStaleMessageMenuSurfaces(): void {
+  messageMenuActivationListeners.abort();
+  messageMenuActivationListeners = new AbortController();
+  contextMenuWiringListeners.abort();
+  contextMenuWiringListeners = new AbortController();
   activeContextMessage = null;
   activeContextMessageAt = 0;
   document.querySelectorAll('.ytcq-context-item').forEach((item) => item.remove());
@@ -115,6 +126,95 @@ export function cleanupStaleMessageMenuSurfaces(): void {
 function setActiveContextMessage(message: HTMLElement): void {
   activeContextMessage = message;
   activeContextMessageAt = Date.now();
+}
+
+function createReplyActionSplitItem(): HTMLElement {
+  const item = ytcqCreateElement('div');
+  item.className = 'style-scope ytd-menu-popup-renderer ytcq-context-item ytcq-context-split-item';
+  item.setAttribute('system-icons', '');
+  item.setAttribute('role', 'menuitem');
+  item.setAttribute('use-icons', '');
+  item.setAttribute('tabindex', '-1');
+  item.setAttribute('aria-selected', 'false');
+  item.setAttribute('data-ytcq-action', 'reply-actions');
+
+  const row = ytcqCreateElement('div');
+  row.className = 'ytcq-paper-item ytcq-context-split-row';
+  row.setAttribute('role', 'group');
+  row.setAttribute('aria-label', `${t('mention')} / ${t('quote')}`);
+
+  row.append(
+    createReplyActionButton({
+      action: 'mention',
+      label: t('mention'),
+      iconPath: MENTION_ICON_PATH,
+      iconViewBox: MATERIAL_ICON_VIEW_BOX,
+      onClick: () => handleReplyAction(false)
+    }),
+    createReplyActionDivider(),
+    createReplyActionButton({
+      action: 'quote',
+      label: t('quote'),
+      iconPath: QUOTE_ICON_PATH,
+      onClick: () => handleReplyAction(true)
+    })
+  );
+
+  item.append(row);
+  return item;
+}
+
+function createReplyActionButton({
+  action,
+  label,
+  iconPath,
+  iconViewBox,
+  onClick
+}: {
+  action: string;
+  label: string;
+  iconPath: string;
+  iconViewBox?: string;
+  onClick: () => void;
+}): HTMLButtonElement {
+  const button = ytcqCreateElement('button');
+  button.type = 'button';
+  button.className = 'ytcq-context-split-button';
+  button.setAttribute('data-ytcq-action', action);
+  button.setAttribute('aria-label', label);
+  button.title = label;
+
+  const icon = ytcqCreateElement('span');
+  icon.className = 'ytcq-menu-icon';
+  icon.append(createSvgIcon(iconViewBox || '0 0 24 24', iconPath));
+
+  button.append(icon);
+  button.addEventListener('click', (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    onClick();
+  });
+  button.addEventListener('keydown', (event) => {
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    event.preventDefault();
+    event.stopPropagation();
+    onClick();
+  });
+  return button;
+}
+
+function createReplyActionDivider(): HTMLElement {
+  const divider = ytcqCreateElement('span');
+  divider.className = 'ytcq-context-split-divider';
+  divider.setAttribute('aria-hidden', 'true');
+  return divider;
+}
+
+function handleReplyAction(quote: boolean): void {
+  if (!activeContextMessage?.isConnected) return;
+
+  replyToMessage(activeContextMessage, { quote });
+  closeMenu();
 }
 
 function prepareContextMenu(menu: HTMLElement): void {

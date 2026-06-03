@@ -5,6 +5,12 @@
  * chat renderers. The goal is to match YouTube's native density/theme variables
  * while keeping visual changes localized to injected controls.
  */
+:root {
+  --ytcq-hover-background: var(--yt-spec-touch-response, var(--yt-spec-10-percent-layer, rgba(128, 128, 128, 0.16)));
+  --ytcq-hover-background-strong: var(--yt-spec-10-percent-layer, rgba(128, 128, 128, 0.22));
+  --ytcq-control-border: rgba(128, 128, 128, 0.42);
+}
+
 ytd-menu-popup-renderer.ytcq-settings-expanded-menu {
   max-height: min(80vh, 360px) !important;
   transform: translateY(var(--ytcq-context-shift-y, 0px));
@@ -92,7 +98,53 @@ ytd-menu-popup-renderer .ytcq-context-item .ytcq-paper-item {
 
 ytd-menu-popup-renderer .ytcq-settings-item .ytcq-paper-item:hover,
 ytd-menu-popup-renderer .ytcq-context-item .ytcq-paper-item:hover {
-  background: var(--yt-spec-badge-chip-background, rgba(255, 255, 255, 0.1));
+  background: var(--ytcq-hover-background);
+}
+
+ytd-menu-popup-renderer .ytcq-context-split-item .ytcq-paper-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 9px minmax(0, 1fr);
+  gap: 0;
+  padding: 0 8px;
+  width: 100%;
+  cursor: default;
+}
+
+ytd-menu-popup-renderer .ytcq-context-split-item .ytcq-paper-item:hover {
+  background: transparent;
+}
+
+ytd-menu-popup-renderer .ytcq-context-split-row {
+  justify-content: initial;
+}
+
+ytd-menu-popup-renderer .ytcq-context-split-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-width: 0;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  color: var(--yt-spec-text-primary, var(--yt-live-chat-primary-text-color, currentColor));
+  background: transparent;
+  cursor: pointer;
+}
+
+ytd-menu-popup-renderer .ytcq-context-split-button:hover,
+ytd-menu-popup-renderer .ytcq-context-split-button:focus {
+  background: var(--ytcq-hover-background);
+  outline: none;
+}
+
+ytd-menu-popup-renderer .ytcq-context-split-divider {
+  width: 1px;
+  height: 20px;
+  margin: 0 4px;
+  background: var(--yt-spec-10-percent-layer, rgba(128, 128, 128, 0.28));
+  flex: 0 0 auto;
 }
 
 ytd-menu-popup-renderer .ytcq-menu-icon {
@@ -102,6 +154,8 @@ ytd-menu-popup-renderer .ytcq-menu-icon {
   fill: currentColor;
   flex: 0 0 auto;
   display: inline-flex;
+  align-items: center;
+  justify-content: center;
   opacity: 0.86;
 }
 
@@ -325,7 +379,7 @@ ytd-menu-popup-renderer .ytcq-toggle-item[aria-checked="true"] .ytcq-menu-toggle
   max-width: min(280px, 84vw);
   min-height: 42px;
   padding: 6px 8px;
-  border: 1px solid var(--yt-spec-10-percent-layer, rgba(255, 255, 255, 0.16));
+  border: 1px solid var(--ytcq-control-border);
   border-radius: 8px;
   color: var(--yt-live-chat-primary-text-color, var(--yt-spec-text-primary, #fff));
   background: var(--yt-spec-raised-background, var(--yt-live-chat-background-color, #282828));
@@ -354,7 +408,7 @@ ytd-menu-popup-renderer .ytcq-toggle-item[aria-checked="true"] .ytcq-menu-toggle
   max-width: 160px;
   min-height: 28px;
   padding: 3px 6px;
-  border: 1px solid var(--yt-spec-10-percent-layer, rgba(255, 255, 255, 0.16));
+  border: 1px solid var(--ytcq-control-border);
   border-radius: 6px;
   color: var(--yt-live-chat-primary-text-color, var(--yt-spec-text-primary, #fff));
   background: var(--yt-live-chat-action-panel-background-color, var(--yt-spec-raised-background, #181818));
@@ -403,7 +457,7 @@ yt-emoji-picker-renderer .ytcq-frequent-emoji-button {
 
 yt-emoji-picker-renderer .ytcq-frequent-emoji-button:hover,
 yt-emoji-picker-renderer .ytcq-frequent-emoji-button:focus {
-  background: var(--yt-spec-badge-chip-background, rgba(255, 255, 255, 0.1));
+  background: var(--ytcq-hover-background);
   outline: none;
 }
 
@@ -486,7 +540,7 @@ yt-live-chat-header-renderer .ytcq-inbox-badge[hidden] {
   max-height: min(420px, calc(100vh - 16px));
   box-sizing: border-box;
   padding: 12px;
-  border: 1px solid var(--yt-spec-10-percent-layer, rgba(255, 255, 255, 0.12));
+  border: 1px solid var(--ytcq-control-border);
   border-radius: 8px;
   color: var(--yt-spec-text-primary, var(--yt-live-chat-primary-text-color, #f1f1f1));
   background: var(--yt-spec-raised-background, var(--yt-live-chat-background-color, #282828));
@@ -496,13 +550,13 @@ yt-live-chat-header-renderer .ytcq-inbox-badge[hidden] {
 
 .ytcq-profile-card-header {
   display: grid;
-  grid-template-columns: 36px minmax(0, 1fr) 28px;
+  grid-template-columns: 36px minmax(0, 1fr) 28px 28px;
   column-gap: 10px;
   align-items: center;
 }
 
 .ytcq-profile-card-header-has-channel {
-  grid-template-columns: 36px minmax(0, 1fr) 28px 28px;
+  grid-template-columns: 36px minmax(0, 1fr) 28px 28px 28px;
   column-gap: 10px;
 }
 
@@ -624,11 +678,131 @@ yt-live-chat-header-renderer .ytcq-inbox-badge[hidden] {
   height: 16px;
 }
 
+.ytcq-marked-user-toggle svg {
+  width: 17px;
+  height: 16px;
+}
+
 .ytcq-profile-card-header-button:hover,
 .ytcq-profile-card-header-button:focus {
   color: var(--yt-spec-text-primary, var(--yt-live-chat-primary-text-color, #f1f1f1));
-  background: var(--yt-spec-badge-chip-background, rgba(255, 255, 255, 0.1));
+  background: var(--ytcq-hover-background);
   outline: none;
+}
+
+.ytcq-markable-user-avatar {
+  border-radius: 50%;
+}
+
+.ytcq-marked-user-avatar {
+  box-shadow: 0 0 0 2px var(--ytcq-marked-user-color, #3ea6ff);
+  box-shadow:
+    0 0 0 2px var(--ytcq-marked-user-color, #3ea6ff),
+    0 0 0 4px color-mix(in srgb, var(--ytcq-marked-user-color, #3ea6ff) 22%, transparent),
+    0 0 10px color-mix(in srgb, var(--ytcq-marked-user-color, #3ea6ff) 42%, transparent);
+  animation: ytcq-marked-user-ring-pulse 2.8s ease-in-out infinite;
+}
+
+.ytcq-marked-user-avatar.ytcq-marked-user-avatar-entering {
+  box-shadow: none;
+  animation: none;
+}
+
+.ytcq-marked-user-ring-host {
+  position: relative;
+  overflow: visible;
+}
+
+.ytcq-marked-user-ring-animation-host {
+  position: relative;
+}
+
+.ytcq-marked-user-ring-animation {
+  position: absolute;
+  inset: -4px;
+  z-index: 1;
+  pointer-events: none;
+  border-radius: 50%;
+  color: var(--ytcq-marked-user-color, #3ea6ff);
+  transform: translateZ(0);
+}
+
+.ytcq-marked-user-ring-animation-positioned {
+  inset: auto;
+}
+
+.ytcq-marked-user-ring-animation svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  transform: rotate(-90deg);
+}
+
+.ytcq-marked-user-ring-animation circle {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 6;
+  stroke-linecap: round;
+  stroke-dasharray: 100;
+  filter: drop-shadow(0 0 3px currentColor);
+}
+
+.ytcq-marked-user-ring-animation-enter circle {
+  animation: ytcq-marked-user-ring-enter 440ms cubic-bezier(0.2, 0, 0, 1) forwards;
+}
+
+.ytcq-marked-user-ring-animation-exit circle {
+  animation: ytcq-marked-user-ring-exit 360ms cubic-bezier(0.4, 0, 1, 1) forwards;
+}
+
+@keyframes ytcq-marked-user-ring-enter {
+  from {
+    opacity: 0.55;
+    stroke-dashoffset: 100;
+  }
+
+  to {
+    opacity: 1;
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes ytcq-marked-user-ring-exit {
+  from {
+    opacity: 1;
+    stroke-dashoffset: 0;
+  }
+
+  to {
+    opacity: 0;
+    stroke-dashoffset: -100;
+  }
+}
+
+@keyframes ytcq-marked-user-ring-pulse {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 2px var(--ytcq-marked-user-color, #3ea6ff),
+      0 0 0 4px color-mix(in srgb, var(--ytcq-marked-user-color, #3ea6ff) 20%, transparent),
+      0 0 8px color-mix(in srgb, var(--ytcq-marked-user-color, #3ea6ff) 34%, transparent);
+  }
+
+  48% {
+    box-shadow:
+      0 0 0 2px var(--ytcq-marked-user-color, #3ea6ff),
+      0 0 0 5px color-mix(in srgb, var(--ytcq-marked-user-color, #3ea6ff) 28%, transparent),
+      0 0 13px color-mix(in srgb, var(--ytcq-marked-user-color, #3ea6ff) 50%, transparent);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ytcq-marked-user-avatar,
+  .ytcq-marked-user-ring-animation-enter circle,
+  .ytcq-marked-user-ring-animation-exit circle {
+    animation: none;
+  }
 }
 
 .ytcq-inbox-keyword-toggle {
@@ -683,6 +857,34 @@ yt-live-chat-header-renderer .ytcq-inbox-badge[hidden] {
     var(--yt-spec-badge-chip-background, transparent);
   overflow-wrap: anywhere;
   cursor: pointer;
+}
+
+.ytcq-inbox-message-has-avatar {
+  grid-template-columns: 20px auto minmax(0, 1fr);
+}
+
+.ytcq-inbox-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+}
+
+.ytcq-inbox-avatar img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  object-fit: cover;
+}
+
+.ytcq-inbox-message-has-avatar .ytcq-profile-card-message-time {
+  display: inline-flex;
+  align-items: center;
+  min-height: 20px;
+  line-height: 20px;
 }
 
 .ytcq-profile-card-message:hover,
@@ -783,7 +985,7 @@ yt-live-chat-header-renderer .ytcq-inbox-badge[hidden] {
   left: 12px;
   right: 12px;
   box-sizing: border-box;
-  border: 1px solid var(--yt-spec-10-percent-layer, rgba(255, 255, 255, 0.12));
+  border: 1px solid var(--ytcq-control-border);
   border-radius: 8px;
   color: var(--yt-spec-text-primary, var(--yt-live-chat-primary-text-color, #f1f1f1));
   background: var(--yt-spec-raised-background, var(--yt-live-chat-background-color, #282828));
@@ -850,6 +1052,12 @@ yt-live-chat-header-renderer .ytcq-inbox-badge[hidden] {
   gap: 6px;
   color: var(--yt-spec-text-primary, var(--yt-live-chat-primary-text-color, #f1f1f1));
   font: 500 13px/18px Roboto, Arial, sans-serif;
+  overflow: visible;
+  white-space: nowrap;
+}
+
+.ytcq-focus-author-name {
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -865,7 +1073,7 @@ yt-live-chat-header-renderer .ytcq-inbox-badge[hidden] {
 
 .ytcq-focus-author-button:hover,
 .ytcq-focus-author-button:focus {
-  background: var(--yt-spec-badge-chip-background, rgba(255, 255, 255, 0.1));
+  background: var(--ytcq-hover-background);
   outline: none;
 }
 
@@ -877,6 +1085,14 @@ yt-live-chat-header-renderer .ytcq-inbox-badge[hidden] {
   width: 24px;
   height: 24px;
   border-radius: 50%;
+  object-fit: cover;
+}
+
+.ytcq-focus-avatar img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
   object-fit: cover;
 }
 
@@ -899,7 +1115,7 @@ yt-live-chat-header-renderer .ytcq-inbox-badge[hidden] {
 
 .ytcq-focus-open:hover,
 .ytcq-focus-open:focus {
-  background: var(--yt-spec-badge-chip-background, rgba(255, 255, 255, 0.1));
+  background: var(--ytcq-hover-background);
   outline: none;
 }
 
@@ -928,7 +1144,7 @@ yt-live-chat-header-renderer .ytcq-inbox-badge[hidden] {
 .ytcq-focus-close:hover,
 .ytcq-focus-close:focus {
   color: var(--yt-spec-text-primary, var(--yt-live-chat-primary-text-color, #f1f1f1));
-  background: var(--yt-spec-badge-chip-background, rgba(255, 255, 255, 0.1));
+  background: var(--ytcq-hover-background);
   outline: none;
 }
 
@@ -1061,7 +1277,7 @@ yt-live-chat-header-renderer .ytcq-inbox-badge[hidden] {
 
 .ytcq-profile-card-open:hover,
 .ytcq-profile-card-open:focus {
-  background: var(--yt-spec-badge-chip-background, rgba(255, 255, 255, 0.1));
+  background: var(--ytcq-hover-background);
   outline: none;
 }
 
@@ -1146,7 +1362,7 @@ yt-live-chat-header-renderer .ytcq-inbox-badge[hidden] {
   height: 32px;
   box-sizing: border-box;
   padding: 0 10px;
-  border: 1px solid var(--yt-spec-10-percent-layer, rgba(255, 255, 255, 0.18));
+  border: 1px solid var(--ytcq-control-border);
   border-radius: 6px;
   color: var(--yt-spec-text-primary, var(--yt-live-chat-primary-text-color, #f1f1f1));
   background: var(--yt-spec-menu-background, var(--yt-live-chat-background-color, #0f0f0f));
@@ -1171,7 +1387,7 @@ yt-live-chat-header-renderer .ytcq-inbox-badge[hidden] {
 
 .ytcq-inbox-keyword-add:hover,
 .ytcq-inbox-keyword-add:focus {
-  background: var(--yt-spec-badge-chip-background, rgba(255, 255, 255, 0.1));
+  background: var(--ytcq-hover-background);
   outline: none;
 }
 
@@ -1263,7 +1479,7 @@ yt-live-chat-header-renderer .ytcq-inbox-badge[hidden] {
   max-height: min(280px, calc(100vh - 16px));
   box-sizing: border-box;
   padding: 6px;
-  border: 1px solid var(--yt-spec-10-percent-layer, rgba(255, 255, 255, 0.12));
+  border: 1px solid var(--ytcq-control-border);
   border-radius: 8px;
   color: var(--yt-spec-text-primary, var(--yt-live-chat-primary-text-color, #f1f1f1));
   background: var(--yt-spec-raised-background, var(--yt-live-chat-background-color, #282828));
@@ -1297,7 +1513,7 @@ yt-live-chat-header-renderer .ytcq-inbox-badge[hidden] {
 .ytcq-command-autocomplete-option:hover,
 .ytcq-command-autocomplete-option:focus,
 .ytcq-command-autocomplete-option-active {
-  background: var(--yt-spec-badge-chip-background, rgba(255, 255, 255, 0.1));
+  background: var(--ytcq-hover-background);
   outline: none;
 }
 
@@ -1320,7 +1536,7 @@ yt-live-chat-header-renderer .ytcq-inbox-badge[hidden] {
   max-height: min(420px, calc(100vh - 16px));
   box-sizing: border-box;
   padding: 12px;
-  border: 1px solid var(--yt-spec-10-percent-layer, rgba(255, 255, 255, 0.12));
+  border: 1px solid var(--ytcq-control-border);
   border-radius: 8px;
   color: var(--yt-spec-text-primary, var(--yt-live-chat-primary-text-color, #f1f1f1));
   background: var(--yt-spec-raised-background, var(--yt-live-chat-background-color, #282828));
@@ -1365,7 +1581,7 @@ yt-live-chat-header-renderer .ytcq-inbox-badge[hidden] {
 .ytcq-command-help-close:hover,
 .ytcq-command-help-close:focus {
   color: var(--yt-spec-text-primary, var(--yt-live-chat-primary-text-color, #f1f1f1));
-  background: var(--yt-spec-badge-chip-background, rgba(255, 255, 255, 0.1));
+  background: var(--ytcq-hover-background);
   outline: none;
 }
 
@@ -1502,7 +1718,7 @@ yt-live-chat-membership-item-renderer .ytcq-replaced-translation-icon svg,
   border-radius: 999px;
   color: var(--yt-spec-text-primary, var(--yt-live-chat-primary-text-color, #fff));
   fill: currentColor;
-  background: var(--yt-spec-badge-chip-background, rgba(255, 255, 255, 0.1));
+  background: var(--ytcq-hover-background);
   box-shadow: none;
   font: 500 11px/14px Roboto, Arial, sans-serif;
   cursor: pointer;
@@ -1528,7 +1744,7 @@ yt-live-chat-membership-item-renderer .ytcq-replaced-translation-icon svg,
 
 .ytcq-reconnect-button:hover,
 .ytcq-reconnect-button:focus-visible {
-  background: var(--yt-spec-10-percent-layer, rgba(255, 255, 255, 0.16));
+  background: var(--ytcq-hover-background-strong);
   outline: none;
 }
 

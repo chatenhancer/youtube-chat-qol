@@ -34,6 +34,8 @@ import type {
 
 let lastSentMessage: ChatInputSnapshot | null = null;
 let escapedSlashText = '';
+let saveOptionsCallback: SaveOptions = () => {};
+let commandListeners = new AbortController();
 const commandCards = createCommandCards();
 
 const commandRuntime: ChatCommandRuntime = {
@@ -66,12 +68,14 @@ registerFeatureLifecycle({
 });
 
 export function initChatCommands(saveOptions: SaveOptions): void {
-  document.addEventListener('keydown', (event) => handleChatCommandKeydown(event, saveOptions), true);
-  document.addEventListener('input', handleChatCommandInput, true);
-  document.addEventListener('selectionchange', commandAutocomplete.scheduleUpdate, true);
-  document.addEventListener('mousedown', commandAutocomplete.handlePointerDown, true);
-  document.addEventListener('click', handleChatCommandSendClick, true);
-  window.addEventListener('resize', commandAutocomplete.scheduleUpdate, true);
+  saveOptionsCallback = saveOptions;
+  const options = { capture: true, signal: commandListeners.signal };
+  document.addEventListener('keydown', handleChatCommandKeydownEvent, options);
+  document.addEventListener('input', handleChatCommandInput, options);
+  document.addEventListener('selectionchange', commandAutocomplete.scheduleUpdate, options);
+  document.addEventListener('mousedown', commandAutocomplete.handlePointerDown, options);
+  document.addEventListener('click', handleChatCommandSendClick, options);
+  window.addEventListener('resize', commandAutocomplete.scheduleUpdate, options);
 }
 
 export function resetChatCommandsState(): void {
@@ -82,8 +86,16 @@ export function resetChatCommandsState(): void {
 }
 
 export function cleanupStaleChatCommandSurfaces(): void {
+  commandListeners.abort();
+  commandListeners = new AbortController();
+  closeChatCommandHelp();
+  commandAutocomplete.close();
   document.querySelectorAll('.ytcq-command-autocomplete-card, .ytcq-command-help-card')
     .forEach((surface) => surface.remove());
+}
+
+function handleChatCommandKeydownEvent(event: KeyboardEvent): void {
+  handleChatCommandKeydown(event, saveOptionsCallback);
 }
 
 function handleChatCommandKeydown(event: KeyboardEvent, saveOptions: SaveOptions): void {

@@ -6,15 +6,14 @@
  */
 import { normalizeComparableText } from '../../shared/text';
 import {
+  getAuthorChannelId,
   getAuthorName,
-  getRendererData
 } from '../../youtube/messages';
 import type { UserIdentity } from './types';
 
 export function getUserKey(message: HTMLElement): string {
-  const data = getRendererData(message);
   return getUserKeyFromIdentity({
-    channelId: data?.authorExternalChannelId || data?.authorChannelId,
+    channelId: getAuthorChannelId(message),
     authorName: getAuthorName(message)
   });
 }

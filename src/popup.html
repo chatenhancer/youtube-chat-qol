@@ -38,88 +38,105 @@
         </div>
       </header>
 
-      <section class="extension-status" data-extension-status="checking" aria-live="polite">
-        <span class="extension-status-dot" aria-hidden="true"></span>
-        <span class="extension-status-copy">
-          <strong data-extension-status-text data-i18n="extensionStatusChecking">Checking open tabs...</strong>
-          <span data-extension-status-helper data-i18n="extensionStatusCheckingHelper">Looking for YouTube live chat tabs.</span>
-        </span>
-      </section>
+      <nav class="popup-tabs" role="tablist" aria-label="Popup sections" data-i18n-aria-label="popupSections">
+        <button id="settingsTab" class="popup-tab popup-tab-active" type="button" role="tab" aria-selected="true" aria-controls="settingsPanel" data-popup-tab-target="settingsPanel" data-i18n="settings">Settings</button>
+        <button id="bookmarksTab" class="popup-tab" type="button" role="tab" aria-selected="false" aria-controls="bookmarksPanel" data-popup-tab-target="bookmarksPanel" data-i18n="bookmarks">Bookmarks</button>
+      </nav>
 
-      <section class="settings-section" aria-labelledby="translation-heading">
-        <h2 id="translation-heading" data-i18n="translation">Translation</h2>
-
-        <label class="option option-control" title="Choose the language chat messages should be translated into. Off disables automatic translation." data-i18n-title="chooseTranslationLanguageTitle">
-          <span class="option-title">
-            <svg class="option-icon translation-target-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-              <path class="translation-source-mark" d="M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0014.07 6H17V4h-7V2H8v2H1v2h11.17a15.7 15.7 0 01-2.86 4.63A15.07 15.07 0 017.22 7H5.2a17.2 17.2 0 002.77 5.03l-5.09 5.02L4.3 18.47l5.01-5.01 3.11 3.11.45-1.5Z"></path>
-              <path class="translation-target-mark" d="M18.5 10h-2L12 22h2l1.13-3h4.74L21 22h2l-4.5-12Zm-2.62 7l1.62-4.33L19.12 17h-3.24Z"></path>
-            </svg>
-            <span data-i18n="translateTo">Translate to</span>
+      <div id="settingsPanel" class="popup-tab-panel" role="tabpanel" aria-labelledby="settingsTab" data-popup-tab-panel>
+        <section class="extension-status" data-extension-status="checking" aria-live="polite">
+          <span class="extension-status-dot" aria-hidden="true"></span>
+          <span class="extension-status-copy">
+            <strong data-extension-status-text data-i18n="extensionStatusChecking">Checking open tabs...</strong>
+            <span data-extension-status-helper data-i18n="extensionStatusCheckingHelper">Looking for YouTube live chat tabs.</span>
           </span>
-          <span class="option-helper" data-i18n="translationOffHelper">Off disables automatic translation.</span>
-          <select id="targetLanguage" title="Choose the language chat messages should be translated into. Off disables automatic translation." data-i18n-title="chooseTranslationLanguageTitle"></select>
-        </label>
+        </section>
 
-        <label class="option option-control" title="Choose whether translations replace the original message or appear below it." data-i18n-title="translationDisplayTitle">
-          <span class="option-title">
-            <svg class="option-icon translation-display-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-              <path class="translation-display-frame" d="M4 4h16a2 2 0 012 2v12a2 2 0 01-2 2H4a2 2 0 01-2-2V6a2 2 0 012-2Zm0 2v12h16V6H4Z"></path>
-              <path class="translation-display-line translation-display-line-top" d="M6 10h12v2H6v-2Z"></path>
-              <path class="translation-display-line translation-display-line-left" d="M6 14h5v2H6v-2Z"></path>
-              <path class="translation-display-line translation-display-line-right" d="M13 14h5v2h-5v-2Z"></path>
-            </svg>
-            <span data-i18n="display">Display</span>
-          </span>
-          <span class="option-helper" data-i18n="translationDisplayHelper">Replace the message or show the translation below.</span>
-          <select id="translationDisplay" title="Choose whether translations replace the original message or appear below it." data-i18n-title="translationDisplayTitle">
-            <option value="replace" data-i18n="replaceMessage">Replace</option>
-            <option value="below" data-i18n="showBelow">Show below</option>
-          </select>
-        </label>
-      </section>
+        <section class="settings-section" aria-labelledby="translation-heading">
+          <h2 id="translation-heading" data-i18n="translation">Translation</h2>
 
-      <section class="settings-section" aria-labelledby="alerts-heading">
-        <h2 id="alerts-heading" data-i18n="popupAlerts">Alerts</h2>
-
-        <label class="option option-toggle" title="Play a short sound when a chat message is saved to your inbox." data-i18n-title="playInboxSoundTitle">
-          <span class="option-copy">
+          <label class="option option-control" title="Choose the language chat messages should be translated into. Off disables automatic translation." data-i18n-title="chooseTranslationLanguageTitle">
             <span class="option-title">
-              <svg class="option-icon sound-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                <path d="M12 3a4 4 0 00-4 4v3.2c0 1.15-.37 2.27-1.05 3.2L5.2 15.8A1.4 1.4 0 006.33 18h11.34a1.4 1.4 0 001.13-2.2l-1.75-2.4A5.43 5.43 0 0116 10.2V7a4 4 0 00-4-4Zm0 19a3 3 0 002.83-2h-5.66A3 3 0 0012 22Z"></path>
-                <path class="sound-ring" d="M19.7 4.3a1 1 0 00-1.4 1.4A8.92 8.92 0 0121 12a1 1 0 102 0 10.9 10.9 0 00-3.3-7.7ZM5.7 5.7a1 1 0 00-1.4-1.4A10.9 10.9 0 001 12a1 1 0 102 0 8.92 8.92 0 012.7-6.3Z"></path>
+              <svg class="option-icon translation-target-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path class="translation-source-mark" d="M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0014.07 6H17V4h-7V2H8v2H1v2h11.17a15.7 15.7 0 01-2.86 4.63A15.07 15.07 0 017.22 7H5.2a17.2 17.2 0 002.77 5.03l-5.09 5.02L4.3 18.47l5.01-5.01 3.11 3.11.45-1.5Z"></path>
+                <path class="translation-target-mark" d="M18.5 10h-2L12 22h2l1.13-3h4.74L21 22h2l-4.5-12Zm-2.62 7l1.62-4.33L19.12 17h-3.24Z"></path>
               </svg>
-              <span data-i18n="playInboxSound">Play inbox sound</span>
+              <span data-i18n="translateTo">Translate to</span>
             </span>
-            <span class="option-helper" data-i18n="playInboxSoundHelper">Play a short sound for new inbox messages.</span>
-          </span>
-          <input id="sound" type="checkbox" title="Play a short sound when a chat message is saved to your inbox." data-i18n-title="playInboxSoundTitle">
-        </label>
+            <span class="option-helper" data-i18n="translationOffHelper">Off disables automatic translation.</span>
+            <select id="targetLanguage" title="Choose the language chat messages should be translated into. Off disables automatic translation." data-i18n-title="chooseTranslationLanguageTitle"></select>
+          </label>
 
-      </section>
-
-      <section class="settings-section" aria-labelledby="appearance-heading">
-        <h2 id="appearance-heading" data-i18n="appearance">Appearance</h2>
-
-        <label class="option option-toggle" title="Show a brief startup effect when the extension connects to chat. Reduced motion disables it automatically." data-i18n-title="startupShimmerTitle">
-          <span class="option-copy">
+          <label class="option option-control" title="Choose whether translations replace the original message or appear below it." data-i18n-title="translationDisplayTitle">
             <span class="option-title">
-              <svg class="option-icon startup-effect-icon" viewBox="0 -960 960 960" aria-hidden="true" focusable="false">
-                <path class="startup-sparkle startup-sparkle-small-start" d="m306-120-44-92-102-44 102-44 44-92 44 92 102 44-102 44-44 92Z"></path>
-                <path class="startup-sparkle startup-sparkle-large" d="m684-200-76-160-168-76 168-76 76-160 76 160 168 76-168 76-76 160Z"></path>
-                <path class="startup-sparkle startup-sparkle-small-end" d="m306-568-44-92-102-44 102-44 44-92 44 92 102 44-102 44-44 92Z"></path>
+              <svg class="option-icon translation-display-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path class="translation-display-frame" d="M4 4h16a2 2 0 012 2v12a2 2 0 01-2 2H4a2 2 0 01-2-2V6a2 2 0 012-2Zm0 2v12h16V6H4Z"></path>
+                <path class="translation-display-line translation-display-line-top" d="M6 10h12v2H6v-2Z"></path>
+                <path class="translation-display-line translation-display-line-left" d="M6 14h5v2H6v-2Z"></path>
+                <path class="translation-display-line translation-display-line-right" d="M13 14h5v2h-5v-2Z"></path>
               </svg>
-              <span data-i18n="startupShimmer">Startup effect</span>
+              <span data-i18n="display">Display</span>
             </span>
-            <span class="option-helper" data-i18n="startupShimmerHelper">Show a brief edge effect when the extension connects to chat.</span>
-          </span>
-          <input id="startupEffect" type="checkbox" title="Show a brief startup effect when the extension connects to chat. Reduced motion disables it automatically." data-i18n-title="startupShimmerTitle">
-        </label>
-      </section>
+            <span class="option-helper" data-i18n="translationDisplayHelper">Replace the message or show the translation below.</span>
+            <select id="translationDisplay" title="Choose whether translations replace the original message or appear below it." data-i18n-title="translationDisplayTitle">
+              <option value="replace" data-i18n="replaceMessage">Replace</option>
+              <option value="below" data-i18n="showBelow">Show below</option>
+            </select>
+          </label>
+        </section>
 
-      <footer class="footer">
-        <p id="version" class="version" aria-label="Extension version" data-i18n-aria-label="extensionVersion"></p>
-      </footer>
+        <section class="settings-section" aria-labelledby="alerts-heading">
+          <h2 id="alerts-heading" data-i18n="popupAlerts">Alerts</h2>
+
+          <label class="option option-toggle" title="Play a short sound when a chat message is saved to your inbox." data-i18n-title="playInboxSoundTitle">
+            <span class="option-copy">
+              <span class="option-title">
+                <svg class="option-icon sound-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <path d="M12 3a4 4 0 00-4 4v3.2c0 1.15-.37 2.27-1.05 3.2L5.2 15.8A1.4 1.4 0 006.33 18h11.34a1.4 1.4 0 001.13-2.2l-1.75-2.4A5.43 5.43 0 0116 10.2V7a4 4 0 00-4-4Zm0 19a3 3 0 002.83-2h-5.66A3 3 0 0012 22Z"></path>
+                  <path class="sound-ring" d="M19.7 4.3a1 1 0 00-1.4 1.4A8.92 8.92 0 0121 12a1 1 0 102 0 10.9 10.9 0 00-3.3-7.7ZM5.7 5.7a1 1 0 00-1.4-1.4A10.9 10.9 0 001 12a1 1 0 102 0 8.92 8.92 0 012.7-6.3Z"></path>
+                </svg>
+                <span data-i18n="playInboxSound">Play inbox sound</span>
+              </span>
+              <span class="option-helper" data-i18n="playInboxSoundHelper">Play a short sound for new inbox messages.</span>
+            </span>
+            <input id="sound" type="checkbox" title="Play a short sound when a chat message is saved to your inbox." data-i18n-title="playInboxSoundTitle">
+          </label>
+
+        </section>
+
+        <section class="settings-section" aria-labelledby="appearance-heading">
+          <h2 id="appearance-heading" data-i18n="appearance">Appearance</h2>
+
+          <label class="option option-toggle" title="Show a brief startup effect when the extension connects to chat. Reduced motion disables it automatically." data-i18n-title="startupShimmerTitle">
+            <span class="option-copy">
+              <span class="option-title">
+                <svg class="option-icon startup-effect-icon" viewBox="0 -960 960 960" aria-hidden="true" focusable="false">
+                  <path class="startup-sparkle startup-sparkle-small-start" d="m306-120-44-92-102-44 102-44 44-92 44 92 102 44-102 44-44 92Z"></path>
+                  <path class="startup-sparkle startup-sparkle-large" d="m684-200-76-160-168-76 168-76 76-160 76 160 168 76-168 76-76 160Z"></path>
+                  <path class="startup-sparkle startup-sparkle-small-end" d="m306-568-44-92-102-44 102-44 44-92 44 92 102 44-102 44-44 92Z"></path>
+                </svg>
+                <span data-i18n="startupShimmer">Startup effect</span>
+              </span>
+              <span class="option-helper" data-i18n="startupShimmerHelper">Show a brief edge effect when the extension connects to chat.</span>
+            </span>
+            <input id="startupEffect" type="checkbox" title="Show a brief startup effect when the extension connects to chat. Reduced motion disables it automatically." data-i18n-title="startupShimmerTitle">
+          </label>
+        </section>
+
+        <footer class="footer">
+          <p id="version" class="version" aria-label="Extension version" data-i18n-aria-label="extensionVersion"></p>
+        </footer>
+      </div>
+
+      <div id="bookmarksPanel" class="popup-tab-panel" role="tabpanel" aria-labelledby="bookmarksTab" data-popup-tab-panel hidden>
+        <section class="bookmarks-section" aria-labelledby="bookmarks-heading">
+          <header class="bookmarks-header">
+            <h2 id="bookmarks-heading" data-i18n="bookmarkedUsers">Bookmarked users</h2>
+            <span id="bookmarksCount" class="bookmarks-count" data-i18n="noBookmarkedUsers">No bookmarks yet</span>
+          </header>
+          <div id="bookmarksList" class="bookmarks-list" aria-live="polite"></div>
+        </section>
+      </div>
     </main>
     <script src="popup.js"></script>
   </body>

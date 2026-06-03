@@ -29,6 +29,8 @@
     "jumpToMessage": "پرش به پیام",
     "keywordOrPhrase": "کلیدواژه یا عبارت",
     "lessThanOneMinute": "کمتر از ۱ دقیقه",
+    "markUser": "علامت",
+    "unmarkUser": "برداشتن",
     "mention": "منشن",
     "mentionUser": "منشن کاربر",
     "mentionUserTitle": "منشن کاربر. برای نقل‌قول Alt/Option-click کنید.",
@@ -155,20 +157,14 @@
     "extensionStatusActiveManyOther": {
       "message": "در {count} تب دیگر فعال است"
     },
-    "extensionStatusActiveHelper": {
-      "message": "افزونه در چت زنده YouTube در حال اجرا است."
-    },
     "extensionStatusInactiveAll": {
       "message": "در هیچ تب بازی فعال نیست"
     },
-    "extensionStatusInactiveHelper": {
-      "message": "یک چت زنده YouTube را باز کنید تا افزونه اجرا شود."
+    "extensionStatusConnected": {
+      "message": "افزونه به چت زنده YouTube متصل است."
     },
-    "extensionStatusInactiveDisconnectedHelperOne": {
-      "message": "چت زنده باز YouTube را تازه‌سازی کنید."
-    },
-    "extensionStatusInactiveDisconnectedHelperMany": {
-      "message": "چت‌های زنده باز YouTube را تازه‌سازی کنید."
+    "extensionStatusDisconnected": {
+      "message": "افزونه به چت زنده YouTube متصل نیست."
     },
     "extensionShortName": {
       "message": "Chat Enhancer"
@@ -262,6 +258,48 @@
     },
     "popupResetComplete": {
       "message": "Chat Enhancer بازنشانی شد."
+    },
+    "settings": {
+      "message": "تنظیمات"
+    },
+    "bookmarks": {
+      "message": "نشانک‌ها"
+    },
+    "popupSections": {
+      "message": "بخش‌های پنجره"
+    },
+    "bookmarkedUsers": {
+      "message": "کاربران نشان‌شده"
+    },
+    "noBookmarkedUsers": {
+      "message": "هنوز نشانکی نیست"
+    },
+    "bookmarkedUsersCount": {
+      "message": "{count} نشانک"
+    },
+    "bookmarkedUsersEmpty": {
+      "message": "کاربرانی که از چت YouTube نشان می‌کنید اینجا نمایش داده می‌شوند."
+    },
+    "markedUserDate": {
+      "message": "نشان‌شده در {date}"
+    },
+    "markedDateUnknown": {
+      "message": "تاریخ نامشخص"
+    },
+    "unknownStream": {
+      "message": "پخش نامشخص"
+    },
+    "unknownUser": {
+      "message": "کاربر نامشخص"
+    },
+    "openChannel": {
+      "message": "باز کردن کانال"
+    },
+    "unmarkUser": {
+      "message": "برداشتن"
+    },
+    "markUser": {
+      "message": "علامت"
     }
   }
 }

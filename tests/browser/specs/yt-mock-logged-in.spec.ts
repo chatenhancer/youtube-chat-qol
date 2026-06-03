@@ -53,8 +53,8 @@ import {
 import { tabAlertScenario } from '../scenarios/tab-alert';
 import { loggedInMockTest as test } from '../support/scenario-fixtures';
 
-test('logged-in mock: extension attaches and popup reports active status', attachScenario);
-test('logged-in mock: message context menu receives quote and mention actions', messageMenuScenario);
+test('logged-in mock: extension attaches and popup reports connected status', attachScenario);
+test('logged-in mock: message context menu receives mark, quote, and mention actions', messageMenuScenario);
 test('logged-in mock: mention menu action writes a draft only', mentionMenuDraftScenario);
 test('logged-in mock: quote menu action writes a draft only', quoteMenuDraftScenario);
 test('logged-in mock: chat settings menu receives extension controls', settingsMenuScenario);

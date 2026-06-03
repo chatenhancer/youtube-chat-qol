@@ -52,11 +52,14 @@ describe('inbox storage', () => {
   it('serializes records without live DOM references', () => {
     const message = document.createElement('yt-live-chat-text-message-renderer');
     const serialized = serializeInboxRecord(createRecord({
+      channelId: 'example-channel',
       messageRef: new WeakRef(message),
       messageId: 'message-1'
     }));
 
     expect('messageRef' in serialized).toBe(false);
+    expect(serialized.avatarSrc).toBe(undefined);
+    expect(serialized.channelId).toBe('example-channel');
     expect(serialized.messageId).toBe('message-1');
   });
 

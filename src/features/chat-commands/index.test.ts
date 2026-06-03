@@ -123,6 +123,7 @@ describe('chat commands entrypoint', () => {
   });
 
   afterEach(() => {
+    cleanupStaleChatCommandSurfaces();
     resetChatCommandsState();
     addEventListenerSpy.mockRestore();
     document.body.replaceChildren();

@@ -29,6 +29,8 @@
     "jumpToMessage": "Ir al mensaje",
     "keywordOrPhrase": "Palabra clave o frase",
     "lessThanOneMinute": "menos de 1 min",
+    "markUser": "Marcar",
+    "unmarkUser": "Desmarcar",
     "mention": "Mencionar",
     "mentionUser": "Mencionar usuario",
     "mentionUserTitle": "Mencionar usuario. Alt/Opción-clic para citar.",
@@ -155,20 +157,14 @@
     "extensionStatusActiveManyOther": {
       "message": "Activo en {count} pestañas más"
     },
-    "extensionStatusActiveHelper": {
-      "message": "La extensión se está ejecutando en el chat en vivo de YouTube."
-    },
     "extensionStatusInactiveAll": {
       "message": "No activo en ninguna pestaña abierta"
     },
-    "extensionStatusInactiveHelper": {
-      "message": "Abre un chat en vivo de YouTube para que la extensión funcione."
+    "extensionStatusConnected": {
+      "message": "Extensión conectada al chat en directo de YouTube."
     },
-    "extensionStatusInactiveDisconnectedHelperOne": {
-      "message": "Actualiza el chat en vivo de YouTube abierto."
-    },
-    "extensionStatusInactiveDisconnectedHelperMany": {
-      "message": "Actualiza los chats en vivo de YouTube abiertos."
+    "extensionStatusDisconnected": {
+      "message": "Extensión no conectada al chat en directo de YouTube."
     },
     "extensionShortName": {
       "message": "Chat Enhancer"
@@ -262,6 +258,48 @@
     },
     "popupResetComplete": {
       "message": "Chat Enhancer se ha restablecido."
+    },
+    "settings": {
+      "message": "Configuración"
+    },
+    "bookmarks": {
+      "message": "Marcadores"
+    },
+    "popupSections": {
+      "message": "Secciones del popup"
+    },
+    "bookmarkedUsers": {
+      "message": "Usuarios marcados"
+    },
+    "noBookmarkedUsers": {
+      "message": "Aún no hay marcadores"
+    },
+    "bookmarkedUsersCount": {
+      "message": "{count} marcadores"
+    },
+    "bookmarkedUsersEmpty": {
+      "message": "Los usuarios que marques en el chat de YouTube aparecerán aquí."
+    },
+    "markedUserDate": {
+      "message": "Marcado el {date}"
+    },
+    "markedDateUnknown": {
+      "message": "Fecha desconocida"
+    },
+    "unknownStream": {
+      "message": "Transmisión desconocida"
+    },
+    "unknownUser": {
+      "message": "Usuario desconocido"
+    },
+    "openChannel": {
+      "message": "Abrir canal"
+    },
+    "unmarkUser": {
+      "message": "Desmarcar"
+    },
+    "markUser": {
+      "message": "Marcar"
     }
   }
 }

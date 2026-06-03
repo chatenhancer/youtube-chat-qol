@@ -29,6 +29,8 @@
     "jumpToMessage": "الانتقال إلى الرسالة",
     "keywordOrPhrase": "كلمة مفتاحية أو عبارة",
     "lessThanOneMinute": "أقل من دقيقة واحدة",
+    "markUser": "تمييز",
+    "unmarkUser": "إزالة",
     "mention": "إشارة",
     "mentionUser": "الإشارة إلى المستخدم",
     "mentionUserTitle": "الإشارة إلى المستخدم. انقر مع Alt/Option للاقتباس.",
@@ -156,20 +158,14 @@
     "extensionStatusActiveManyOther": {
       "message": "نشط في {count} علامات تبويب أخرى"
     },
-    "extensionStatusActiveHelper": {
-      "message": "الإضافة تعمل في دردشة YouTube المباشرة."
-    },
     "extensionStatusInactiveAll": {
       "message": "غير نشط في أي علامة تبويب مفتوحة"
     },
-    "extensionStatusInactiveHelper": {
-      "message": "افتح دردشة YouTube مباشرة لتعمل الإضافة."
+    "extensionStatusConnected": {
+      "message": "تم ربط الإضافة بدردشة YouTube المباشرة."
     },
-    "extensionStatusInactiveDisconnectedHelperOne": {
-      "message": "حدّث دردشة YouTube المباشرة المفتوحة."
-    },
-    "extensionStatusInactiveDisconnectedHelperMany": {
-      "message": "حدّث دردشات YouTube المباشرة المفتوحة."
+    "extensionStatusDisconnected": {
+      "message": "الإضافة غير مرتبطة بدردشة YouTube المباشرة."
     },
     "extensionShortName": {
       "message": "Chat Enhancer",
@@ -265,6 +261,48 @@
     },
     "popupResetComplete": {
       "message": "تمت إعادة تعيين Chat Enhancer."
+    },
+    "settings": {
+      "message": "الإعدادات"
+    },
+    "bookmarks": {
+      "message": "الإشارات"
+    },
+    "popupSections": {
+      "message": "أقسام النافذة المنبثقة"
+    },
+    "bookmarkedUsers": {
+      "message": "المستخدمون المحفوظون"
+    },
+    "noBookmarkedUsers": {
+      "message": "لا توجد إشارات بعد"
+    },
+    "bookmarkedUsersCount": {
+      "message": "{count} إشارة"
+    },
+    "bookmarkedUsersEmpty": {
+      "message": "سيظهر هنا المستخدمون الذين تحددهم من دردشة YouTube."
+    },
+    "markedUserDate": {
+      "message": "تم التحديد في {date}"
+    },
+    "markedDateUnknown": {
+      "message": "التاريخ غير معروف"
+    },
+    "unknownStream": {
+      "message": "بث غير معروف"
+    },
+    "unknownUser": {
+      "message": "مستخدم غير معروف"
+    },
+    "openChannel": {
+      "message": "فتح القناة"
+    },
+    "unmarkUser": {
+      "message": "إزالة"
+    },
+    "markUser": {
+      "message": "تمييز"
     }
   }
 }

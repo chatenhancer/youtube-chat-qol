@@ -11,6 +11,7 @@ import { captureScrollPosition, restoreScrollPositionAfterRender, scrollElementT
 import { findChatInput, getChatInputText, replaceChatInput } from '../../youtube/chat-input';
 import { CHAT_MESSAGE_SELECTOR, PANEL_PAGES_SELECTOR, SEND_BUTTON_SELECTOR } from '../../youtube/selectors';
 import { getChannelUrl, openChannelWindow } from '../channel-popup';
+import { applyMarkedUserRing } from '../marked-users';
 import { isCurrentUserAuthorName } from '../mention-detection';
 import { registerFeatureLifecycle } from '../../content/lifecycle';
 import {
@@ -42,7 +43,7 @@ let activeTranslationPriorityScope: TranslationPriorityScope | null = null;
 let activeExpanded = false;
 let mentionRestoreTimer = 0;
 let nextRecordId = 1;
-let initialized = false;
+let focusModeListeners = new AbortController();
 const focusRecords: FocusRecord[] = [];
 
 registerFeatureLifecycle({
@@ -60,10 +61,9 @@ registerFeatureLifecycle({
 });
 
 export function initFocusMode(): void {
-  if (initialized) return;
-  initialized = true;
-  document.addEventListener('keydown', handleDocumentKeydown, true);
-  document.addEventListener('click', handleDocumentClick, true);
+  const options = { capture: true, signal: focusModeListeners.signal };
+  document.addEventListener('keydown', handleDocumentKeydown, options);
+  document.addEventListener('click', handleDocumentClick, options);
   onMessageTranslationRendered(recordFocusMessageTranslation);
   onMessageTranslationCleared(({ message }) => clearFocusMessageTranslation(message));
   onMessageTranslationsCleared(clearFocusMessageTranslations);
@@ -74,6 +74,8 @@ export function resetFocusMode(): void {
 }
 
 export function cleanupStaleFocusMode(): void {
+  focusModeListeners.abort();
+  focusModeListeners = new AbortController();
   closeFocusMode();
   document.querySelectorAll<HTMLElement>(`.${FOCUS_ANCHOR_CLASS}`).forEach((anchor) => anchor.remove());
 }
@@ -370,23 +372,39 @@ function createFocusAuthor(source: FocusSource, options: { openChannel: boolean 
       openChannelWindow(channelUrl);
     });
   }
-  author.append(createFocusAvatar(source), document.createTextNode(source.authorName));
+  const authorName = ytcqCreateElement('span');
+  authorName.className = 'ytcq-focus-author-name';
+  authorName.textContent = source.authorName;
+
+  author.append(createFocusAvatar(source), authorName);
   return author;
 }
 
 function createFocusAvatar(source: FocusSource): HTMLElement {
   if (source.avatarSrc) {
+    const surface = ytcqCreateElement('span');
+    surface.className = 'ytcq-focus-avatar';
     const image = ytcqCreateElement('img');
-    image.className = 'ytcq-focus-avatar';
     image.src = source.avatarSrc;
     image.alt = '';
     image.referrerPolicy = 'no-referrer';
-    return image;
+    surface.append(image);
+    applyMarkedUserRing(surface, {
+      authorName: source.authorName,
+      avatarUrl: source.avatarSrc,
+      channelId: source.channelId
+    });
+    return surface;
   }
 
   const fallback = ytcqCreateElement('span');
   fallback.className = 'ytcq-focus-avatar ytcq-focus-avatar-fallback';
   fallback.textContent = getAuthorInitial(source.authorName);
+  applyMarkedUserRing(fallback, {
+    authorName: source.authorName,
+    avatarUrl: source.avatarSrc,
+    channelId: source.channelId
+  });
   return fallback;
 }
 

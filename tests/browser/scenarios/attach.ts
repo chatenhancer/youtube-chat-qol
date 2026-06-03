@@ -2,11 +2,11 @@
  * Browser scenario for extension attachment.
  *
  * This verifies the content script attached to the current chat surface and
- * that the popup can see the active live-chat tab.
+ * that the popup can see a connected live-chat tab.
  */
 import { expect, test } from '@playwright/test';
 import { CHAT_MESSAGE_SELECTOR } from '../../../src/youtube/selectors';
-import { expectPopupReportsActiveStatus } from '../support/popup-status';
+import { expectPopupReportsConnectedStatus } from '../support/popup-status';
 import type { BrowserScenario, ChatSurface } from './types';
 
 const EXTENSION_ATTACH_TIMEOUT_MS = 15_000;
@@ -15,8 +15,8 @@ export const attachScenario: BrowserScenario = async ({ chat, context }) => {
   await expectExtensionUiAttached(chat);
   await expectReconnectPromptHidden(chat);
   await expectVisibleChatMessages(chat);
-  await test.step('Verify popup reports active status', async () => {
-    await expectPopupReportsActiveStatus(context);
+  await test.step('Verify popup reports connected status', async () => {
+    await expectPopupReportsConnectedStatus(context);
   });
 };
 

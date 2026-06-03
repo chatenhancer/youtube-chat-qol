@@ -67,6 +67,8 @@ export function serializeInboxRecord(record: InboxRecord): Omit<InboxRecord, 'me
   return {
     id: record.id,
     authorName: record.authorName,
+    avatarSrc: record.avatarSrc,
+    channelId: record.channelId,
     contentParts: record.contentParts,
     matchedKeywords: record.matchedKeywords,
     mention: record.mention,
@@ -139,6 +141,8 @@ function normalizeStoredRecord(value: unknown): InboxRecord | null {
   return {
     id,
     authorName,
+    avatarSrc: cleanText(candidate.avatarSrc) || undefined,
+    channelId: cleanText(candidate.channelId) || undefined,
     contentParts,
     matchedKeywords: normalizeStoredKeywords(candidate.matchedKeywords),
     mention: candidate.mention,

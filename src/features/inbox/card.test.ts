@@ -43,10 +43,15 @@ const jumpMocks = vi.hoisted(() => ({
   jumpToChatMessage: vi.fn()
 }));
 
+const markedUserMocks = vi.hoisted(() => ({
+  applyMarkedUserRing: vi.fn()
+}));
+
 vi.mock('./state', () => stateMocks);
 vi.mock('./keyword-panel', () => keywordPanelMocks);
 vi.mock('../reply', () => replyMocks);
 vi.mock('../message-jump', () => jumpMocks);
+vi.mock('../marked-users', () => markedUserMocks);
 
 import {
   cleanupStaleInboxCards,
@@ -128,6 +133,24 @@ describe('inbox card view', () => {
     openInboxCardView(undefined, callbacks);
     document.querySelector<HTMLButtonElement>('.ytcq-inbox-clear')!.click();
     expect(callbacks.onClearRecords).toHaveBeenCalledOnce();
+  });
+
+  it('renders stored avatars for inbox rows and applies marked-user rings', () => {
+    records = [record({
+      authorName: '@ViewerOne',
+      avatarSrc: 'https://example.com/avatar.jpg',
+      channelId: 'viewer-channel'
+    })];
+
+    openInboxCardView(undefined, callbacksForCard());
+
+    const avatar = document.querySelector<HTMLElement>('.ytcq-inbox-avatar')!;
+    expect(avatar.querySelector('img')?.src).toBe('https://example.com/avatar.jpg');
+    expect(markedUserMocks.applyMarkedUserRing).toHaveBeenCalledWith(avatar, {
+      authorName: '@ViewerOne',
+      avatarUrl: 'https://example.com/avatar.jpg',
+      channelId: 'viewer-channel'
+    });
   });
 
   it('quotes inbox rows from keyboard activation and ignores button targets', () => {

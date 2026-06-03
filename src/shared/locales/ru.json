@@ -29,6 +29,8 @@
     "jumpToMessage": "Перейти к сообщению",
     "keywordOrPhrase": "Ключевое слово или фраза",
     "lessThanOneMinute": "меньше 1 мин",
+    "markUser": "Отметить",
+    "unmarkUser": "Снять",
     "mention": "Упомянуть",
     "mentionUser": "Упомянуть пользователя",
     "mentionUserTitle": "Упомянуть пользователя. Alt/Option-клик, чтобы процитировать.",
@@ -156,20 +158,14 @@
     "extensionStatusActiveManyOther": {
       "message": "Активно ещё в {count} вкладках"
     },
-    "extensionStatusActiveHelper": {
-      "message": "Расширение работает в чате YouTube Live."
-    },
     "extensionStatusInactiveAll": {
       "message": "Неактивно ни в одной открытой вкладке"
     },
-    "extensionStatusInactiveHelper": {
-      "message": "Откройте чат YouTube Live, чтобы расширение заработало."
+    "extensionStatusConnected": {
+      "message": "Расширение подключено к чату YouTube."
     },
-    "extensionStatusInactiveDisconnectedHelperOne": {
-      "message": "Обновите открытый чат YouTube."
-    },
-    "extensionStatusInactiveDisconnectedHelperMany": {
-      "message": "Обновите открытые чаты YouTube."
+    "extensionStatusDisconnected": {
+      "message": "Расширение не подключено к чату YouTube."
     },
     "extensionShortName": {
       "message": "Chat Enhancer",
@@ -265,6 +261,48 @@
     },
     "popupResetComplete": {
       "message": "Chat Enhancer был сброшен."
+    },
+    "settings": {
+      "message": "Настройки"
+    },
+    "bookmarks": {
+      "message": "Закладки"
+    },
+    "popupSections": {
+      "message": "Разделы всплывающего окна"
+    },
+    "bookmarkedUsers": {
+      "message": "Отмеченные пользователи"
+    },
+    "noBookmarkedUsers": {
+      "message": "Закладок пока нет"
+    },
+    "bookmarkedUsersCount": {
+      "message": "{count} закладок"
+    },
+    "bookmarkedUsersEmpty": {
+      "message": "Пользователи, которых вы отметите в чате YouTube, появятся здесь."
+    },
+    "markedUserDate": {
+      "message": "Отмечено {date}"
+    },
+    "markedDateUnknown": {
+      "message": "Дата неизвестна"
+    },
+    "unknownStream": {
+      "message": "Неизвестная трансляция"
+    },
+    "unknownUser": {
+      "message": "Неизвестный пользователь"
+    },
+    "openChannel": {
+      "message": "Открыть канал"
+    },
+    "unmarkUser": {
+      "message": "Снять"
+    },
+    "markUser": {
+      "message": "Отметить"
     }
   }
 }

@@ -15,6 +15,7 @@ import '../features/composer-translation';
 import '../features/user-message-history';
 import '../features/focus-mode';
 import '../features/live-edge';
+import '../features/marked-users';
 import '../features/menus';
 import '../features/profile-popup';
 import '../features/reply';

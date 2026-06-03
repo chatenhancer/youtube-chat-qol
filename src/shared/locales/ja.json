@@ -29,6 +29,8 @@
     "jumpToMessage": "メッセージへ移動",
     "keywordOrPhrase": "キーワードまたはフレーズ",
     "lessThanOneMinute": "1分未満",
+    "markUser": "マーク",
+    "unmarkUser": "解除",
     "mention": "メンション",
     "mentionUser": "ユーザーをメンション",
     "mentionUserTitle": "ユーザーをメンション。Alt/Option クリックで引用。",
@@ -156,20 +158,14 @@
     "extensionStatusActiveManyOther": {
       "message": "他 {count} 個のタブで有効です"
     },
-    "extensionStatusActiveHelper": {
-      "message": "拡張機能は YouTube ライブチャット内で実行中です。"
-    },
     "extensionStatusInactiveAll": {
       "message": "開いているどのタブでも有効ではありません"
     },
-    "extensionStatusInactiveHelper": {
-      "message": "拡張機能を実行するには YouTube ライブチャットを開いてください。"
+    "extensionStatusConnected": {
+      "message": "拡張機能は YouTube ライブチャットに接続されています。"
     },
-    "extensionStatusInactiveDisconnectedHelperOne": {
-      "message": "開いている YouTube ライブチャットを更新してください。"
-    },
-    "extensionStatusInactiveDisconnectedHelperMany": {
-      "message": "開いている YouTube ライブチャットを更新してください。"
+    "extensionStatusDisconnected": {
+      "message": "拡張機能は YouTube ライブチャットに接続されていません。"
     },
     "extensionShortName": {
       "message": "Chat Enhancer",
@@ -265,6 +261,48 @@
     },
     "popupResetComplete": {
       "message": "Chat Enhancer がリセットされました。"
+    },
+    "settings": {
+      "message": "設定"
+    },
+    "bookmarks": {
+      "message": "ブックマーク"
+    },
+    "popupSections": {
+      "message": "ポップアップのセクション"
+    },
+    "bookmarkedUsers": {
+      "message": "ブックマークしたユーザー"
+    },
+    "noBookmarkedUsers": {
+      "message": "ブックマークはまだありません"
+    },
+    "bookmarkedUsersCount": {
+      "message": "{count} 件のブックマーク"
+    },
+    "bookmarkedUsersEmpty": {
+      "message": "YouTube チャットでマークしたユーザーがここに表示されます。"
+    },
+    "markedUserDate": {
+      "message": "{date} にマーク"
+    },
+    "markedDateUnknown": {
+      "message": "日付不明"
+    },
+    "unknownStream": {
+      "message": "不明な配信"
+    },
+    "unknownUser": {
+      "message": "不明なユーザー"
+    },
+    "openChannel": {
+      "message": "チャンネルを開く"
+    },
+    "unmarkUser": {
+      "message": "解除"
+    },
+    "markUser": {
+      "message": "マーク"
     }
   }
 }

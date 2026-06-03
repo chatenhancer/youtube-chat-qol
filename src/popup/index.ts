@@ -6,8 +6,20 @@
  * option updates as the injected chat settings menu.
  */
 import { LANGUAGE_OPTIONS } from '../shared/languages';
+import {
+  BOOKMARK_FILLED_ICON_PATH,
+  BOOKMARK_ICON_PATH,
+  createSvgIcon,
+  MATERIAL_ICON_VIEW_BOX
+} from '../shared/icons';
+import {
+  getMarkedUserColor,
+  MARKED_USERS_STORAGE_KEY,
+  normalizeStoredMarkedUsers,
+  serializeMarkedUsers,
+  type MarkedUserRecord
+} from '../shared/marked-users';
 import { playSoftChime } from '../shared/sounds/soft-chime';
-import { getFreshKnownChatTabIds, KNOWN_CHAT_TABS_STORAGE_KEY } from '../shared/known-chat-tabs';
 import { DEFAULT_OPTIONS, getTargetLanguageUpdate, normalizeOptions, type Options } from '../shared/options';
 import contact from '../shared/contact.json';
 
@@ -32,9 +44,13 @@ const controls = {
   sourceCodeLink: document.querySelector<HTMLAnchorElement>('#sourceCodeLink'),
   supportLink: document.querySelector<HTMLAnchorElement>('#supportLink'),
   resetExtension: document.querySelector<HTMLButtonElement>('#resetExtension'),
+  tabs: Array.from(document.querySelectorAll<HTMLButtonElement>('[data-popup-tab-target]')),
+  tabPanels: Array.from(document.querySelectorAll<HTMLElement>('[data-popup-tab-panel]')),
   extensionStatus: document.querySelector<HTMLElement>('[data-extension-status]'),
   extensionStatusText: document.querySelector<HTMLElement>('[data-extension-status-text]'),
   extensionStatusHelper: document.querySelector<HTMLElement>('[data-extension-status-helper]'),
+  bookmarksCount: document.querySelector<HTMLElement>('#bookmarksCount'),
+  bookmarksList: document.querySelector<HTMLElement>('#bookmarksList'),
   targetLanguage: document.querySelector<HTMLSelectElement>('#targetLanguage'),
   translationDisplay: document.querySelector<HTMLSelectElement>('#translationDisplay'),
   sound: document.querySelector<HTMLInputElement>('#sound'),
@@ -43,11 +59,14 @@ const controls = {
 };
 
 let lastKnownTranslationTarget = DEFAULT_OPTIONS.lastTranslationTarget;
+const recentlyUnmarkedBookmarks = new Map<string, MarkedUserRecord>();
 
 init();
 
 function init(): void {
   const popupLocale = localizePopup();
+  initPopupTabs();
+  initBookmarksPanel();
   refreshExtensionStatus();
 
   if (!controls.targetLanguage || !controls.translationDisplay || !controls.sound || !controls.startupEffect) {
@@ -115,6 +134,230 @@ function init(): void {
   });
 }
 
+function initPopupTabs(): void {
+  controls.tabs.forEach((tab) => {
+    tab.addEventListener('click', () => {
+      const targetId = tab.dataset.popupTabTarget;
+      if (targetId) selectPopupTab(targetId);
+    });
+  });
+}
+
+function selectPopupTab(targetId: string): void {
+  controls.tabs.forEach((tab) => {
+    const active = tab.dataset.popupTabTarget === targetId;
+    tab.classList.toggle('popup-tab-active', active);
+    tab.setAttribute('aria-selected', String(active));
+  });
+
+  controls.tabPanels.forEach((panel) => {
+    panel.hidden = panel.id !== targetId;
+  });
+}
+
+function initBookmarksPanel(): void {
+  if (!controls.bookmarksCount || !controls.bookmarksList) return;
+
+  refreshBookmarkedUsers();
+  chrome.storage.onChanged.addListener((changes, areaName) => {
+    if (areaName === 'local' && changes[MARKED_USERS_STORAGE_KEY]) {
+      renderBookmarkedUsers(normalizeStoredMarkedUsers(changes[MARKED_USERS_STORAGE_KEY].newValue));
+    }
+  });
+}
+
+function refreshBookmarkedUsers(): void {
+  chrome.storage.local.get({ [MARKED_USERS_STORAGE_KEY]: {} }, (stored) => {
+    renderBookmarkedUsers(normalizeStoredMarkedUsers((stored || {})[MARKED_USERS_STORAGE_KEY]));
+  });
+}
+
+function renderBookmarkedUsers(records: Map<string, MarkedUserRecord>): void {
+  if (!controls.bookmarksCount || !controls.bookmarksList) return;
+
+  const entries = getVisibleBookmarkedUserEntries(records).sort((firstEntry, secondEntry) => {
+    const first = firstEntry.record;
+    const second = secondEntry.record;
+    const firstTime = Number.isFinite(first.markedAt) ? first.markedAt : 0;
+    const secondTime = Number.isFinite(second.markedAt) ? second.markedAt : 0;
+    return secondTime - firstTime || first.authorName.localeCompare(second.authorName);
+  });
+
+  controls.bookmarksCount.textContent = entries.length
+    ? getExtensionMessage('bookmarkedUsersCount', String(entries.length))
+    : getExtensionMessage('noBookmarkedUsers');
+  controls.bookmarksList.replaceChildren();
+  controls.bookmarksList.classList.toggle('bookmarks-list-empty', entries.length === 0);
+
+  if (!entries.length) {
+    const empty = document.createElement('p');
+    empty.className = 'bookmarks-empty';
+    empty.textContent = getExtensionMessage('bookmarkedUsersEmpty');
+    controls.bookmarksList.append(empty);
+    return;
+  }
+
+  const fragment = document.createDocumentFragment();
+  entries.forEach(({ key, record, active }) => {
+    fragment.append(createBookmarkedUserRow(key, record, active));
+  });
+  controls.bookmarksList.append(fragment);
+}
+
+function getVisibleBookmarkedUserEntries(records: Map<string, MarkedUserRecord>): Array<{
+  active: boolean;
+  key: string;
+  record: MarkedUserRecord;
+}> {
+  const entries = Array.from(records.entries()).map(([key, record]) => {
+    recentlyUnmarkedBookmarks.delete(key);
+    return { active: true, key, record };
+  });
+
+  recentlyUnmarkedBookmarks.forEach((record, key) => {
+    if (!records.has(key)) entries.push({ active: false, key, record });
+  });
+
+  return entries;
+}
+
+function createBookmarkedUserRow(key: string, record: MarkedUserRecord, active: boolean): HTMLElement {
+  const row = document.createElement('article');
+  row.className = 'bookmark-row';
+  row.classList.toggle('bookmark-row-unmarked', !active);
+
+  const channelUrl = getBookmarkedUserChannelUrl(record);
+  const avatar = createBookmarkedUserAvatar(record, channelUrl);
+
+  const copy = document.createElement('span');
+  copy.className = 'bookmark-copy';
+
+  const name = createBookmarkedUserName(record, channelUrl);
+
+  const date = document.createElement('span');
+  date.className = 'bookmark-date';
+  date.textContent = formatBookmarkedUserDate(record.markedAt);
+
+  const source = document.createElement('span');
+  source.className = 'bookmark-source';
+  source.textContent = record.markedSourceTitle || record.markedSourceUrl || getExtensionMessage('unknownStream');
+
+  copy.append(name, date, source);
+
+  const actions = document.createElement('span');
+  actions.className = 'bookmark-actions';
+
+  const unmarkButton = document.createElement('button');
+  unmarkButton.type = 'button';
+  unmarkButton.className = 'bookmark-action-button';
+  unmarkButton.title = getExtensionMessage(active ? 'unmarkUser' : 'markUser');
+  unmarkButton.setAttribute('aria-label', getExtensionMessage(active ? 'unmarkUser' : 'markUser'));
+  unmarkButton.append(createSvgIcon(MATERIAL_ICON_VIEW_BOX, active ? BOOKMARK_FILLED_ICON_PATH : BOOKMARK_ICON_PATH));
+  unmarkButton.addEventListener('click', () => {
+    if (active) {
+      unmarkBookmarkedUser(key);
+    } else {
+      markBookmarkedUser(key, record);
+    }
+  });
+  actions.append(unmarkButton);
+
+  row.append(avatar, copy, actions);
+  return row;
+}
+
+function createBookmarkedUserAvatar(record: MarkedUserRecord, channelUrl: string): HTMLElement {
+  const element = channelUrl ? document.createElement('button') : document.createElement('span');
+  element.className = channelUrl ? 'bookmark-avatar bookmark-avatar-button' : 'bookmark-avatar';
+  element.style.setProperty('--bookmark-user-color', getMarkedUserColor(record));
+  if (record.avatarUrl) {
+    const image = document.createElement('img');
+    image.src = record.avatarUrl;
+    image.alt = '';
+    image.referrerPolicy = 'no-referrer';
+    element.append(image);
+  } else {
+    element.textContent = getBookmarkedUserInitial(record.authorName);
+  }
+
+  if (channelUrl && element instanceof HTMLButtonElement) {
+    element.type = 'button';
+    element.title = getExtensionMessage('openChannel');
+    element.setAttribute('aria-label', getExtensionMessage('openChannel'));
+    element.addEventListener('click', () => {
+      chrome.tabs.create({ url: channelUrl });
+    });
+  }
+
+  return element;
+}
+
+function createBookmarkedUserName(record: MarkedUserRecord, channelUrl: string): HTMLElement {
+  const element = channelUrl ? document.createElement('button') : document.createElement('strong');
+  element.className = channelUrl ? 'bookmark-name bookmark-name-button' : 'bookmark-name';
+  element.textContent = record.authorName || getExtensionMessage('unknownUser');
+
+  if (channelUrl && element instanceof HTMLButtonElement) {
+    element.type = 'button';
+    element.title = getExtensionMessage('openChannel');
+    element.setAttribute('aria-label', getExtensionMessage('openChannel'));
+    element.addEventListener('click', () => {
+      chrome.tabs.create({ url: channelUrl });
+    });
+  }
+
+  return element;
+}
+
+function unmarkBookmarkedUser(key: string): void {
+  chrome.storage.local.get({ [MARKED_USERS_STORAGE_KEY]: {} }, (stored) => {
+    const records = normalizeStoredMarkedUsers((stored || {})[MARKED_USERS_STORAGE_KEY]);
+    const record = records.get(key);
+    if (record) {
+      recentlyUnmarkedBookmarks.set(key, record);
+    }
+    records.delete(key);
+    chrome.storage.local.set({ [MARKED_USERS_STORAGE_KEY]: serializeMarkedUsers(records) }, () => {
+      renderBookmarkedUsers(records);
+    });
+  });
+}
+
+function markBookmarkedUser(key: string, record: MarkedUserRecord): void {
+  chrome.storage.local.get({ [MARKED_USERS_STORAGE_KEY]: {} }, (stored) => {
+    const records = normalizeStoredMarkedUsers((stored || {})[MARKED_USERS_STORAGE_KEY]);
+    records.set(key, record);
+    recentlyUnmarkedBookmarks.delete(key);
+    chrome.storage.local.set({ [MARKED_USERS_STORAGE_KEY]: serializeMarkedUsers(records) }, () => {
+      renderBookmarkedUsers(records);
+    });
+  });
+}
+
+function getBookmarkedUserInitial(authorName: string): string {
+  const normalized = authorName.trim().replace(/^@/, '');
+  return (normalized[0] || '?').toUpperCase();
+}
+
+function formatBookmarkedUserDate(timestamp: number): string {
+  if (!Number.isFinite(timestamp) || timestamp <= 0) return getExtensionMessage('markedDateUnknown');
+
+  const formatted = new Intl.DateTimeFormat(undefined, {
+    dateStyle: 'medium',
+    timeStyle: 'short'
+  }).format(timestamp);
+  return getExtensionMessage('markedUserDate', formatted);
+}
+
+function getBookmarkedUserChannelUrl(record: MarkedUserRecord): string {
+  if (record.channelId) {
+    return `https://www.youtube.com/channel/${encodeURIComponent(record.channelId)}`;
+  }
+
+  const handle = record.authorName.trim().replace(/^@/, '');
+  return /^[A-Za-z0-9._-]+$/.test(handle) ? `https://www.youtube.com/@${handle}` : '';
+}
+
 function save(values: Partial<Options>): void {
   chrome.storage.sync.set(values);
 }
@@ -163,7 +406,7 @@ function refreshGlobalExtensionStatus(currentTabId: number | null): void {
       .filter((tabId): tabId is number => typeof tabId === 'number');
 
     if (!tabIds.length) {
-      updateExtensionStatusSummary(new Set(), currentTabId, 0);
+      updateExtensionStatusSummary(new Set(), currentTabId);
       return;
     }
 
@@ -172,7 +415,7 @@ function refreshGlobalExtensionStatus(currentTabId: number | null): void {
       const activeTabIds = chrome.runtime.lastError
         ? new Set<number>()
         : getOpenActiveChatTabIds(response, openTabIds);
-      updateExtensionStatusSummaryWithKnownTabs(activeTabIds, openTabIds, currentTabId);
+      updateExtensionStatusSummary(activeTabIds, currentTabId);
     });
   });
 }
@@ -184,49 +427,37 @@ function getOpenActiveChatTabIds(response: ActiveChatTabsResponse | undefined, o
   }));
 }
 
-function updateExtensionStatusSummaryWithKnownTabs(activeTabIds: Set<number>, openTabIds: Set<number>, currentTabId: number | null): void {
-  chrome.storage.local.get(KNOWN_CHAT_TABS_STORAGE_KEY, (stored) => {
-    const knownTabIds = getFreshKnownChatTabIds((stored || {})[KNOWN_CHAT_TABS_STORAGE_KEY]);
-    const disconnectedKnownChatCount = [...knownTabIds].filter((tabId) => openTabIds.has(tabId) && !activeTabIds.has(tabId)).length;
-    updateExtensionStatusSummary(activeTabIds, currentTabId, disconnectedKnownChatCount);
-  });
-}
-
-function updateExtensionStatusSummary(activeTabIds: Set<number>, currentTabId: number | null, disconnectedKnownChatCount: number): void {
+function updateExtensionStatusSummary(activeTabIds: Set<number>, currentTabId: number | null): void {
   const currentActive = typeof currentTabId === 'number' && activeTabIds.has(currentTabId);
   const otherCount = activeTabIds.size - (currentActive ? 1 : 0);
+  const connectedHelper = getExtensionMessage('extensionStatusConnected');
 
   if (currentActive && otherCount === 0) {
-    setExtensionStatus('active', getExtensionMessage('extensionStatusActiveCurrent'), getExtensionMessage('extensionStatusActiveHelper'));
+    setExtensionStatus('active', getExtensionMessage('extensionStatusActiveCurrent'), connectedHelper);
     return;
   }
 
   if (currentActive && otherCount === 1) {
-    setExtensionStatus('active', getExtensionMessage('extensionStatusActiveCurrentAndOne'), getExtensionMessage('extensionStatusActiveHelper'));
+    setExtensionStatus('active', getExtensionMessage('extensionStatusActiveCurrentAndOne'), connectedHelper);
     return;
   }
 
   if (currentActive && otherCount > 1) {
-    setExtensionStatus('active', getExtensionMessage('extensionStatusActiveCurrentAndMany', String(otherCount)), getExtensionMessage('extensionStatusActiveHelper'));
+    setExtensionStatus('active', getExtensionMessage('extensionStatusActiveCurrentAndMany', String(otherCount)), connectedHelper);
     return;
   }
 
   if (otherCount === 1) {
-    setExtensionStatus('active', getExtensionMessage('extensionStatusActiveOneOther'), getExtensionMessage('extensionStatusActiveHelper'));
+    setExtensionStatus('active', getExtensionMessage('extensionStatusActiveOneOther'), connectedHelper);
     return;
   }
 
   if (otherCount > 1) {
-    setExtensionStatus('active', getExtensionMessage('extensionStatusActiveManyOther', String(otherCount)), getExtensionMessage('extensionStatusActiveHelper'));
+    setExtensionStatus('active', getExtensionMessage('extensionStatusActiveManyOther', String(otherCount)), connectedHelper);
     return;
   }
 
-  const inactiveHelper = disconnectedKnownChatCount === 1
-    ? getExtensionMessage('extensionStatusInactiveDisconnectedHelperOne')
-    : disconnectedKnownChatCount > 1
-      ? getExtensionMessage('extensionStatusInactiveDisconnectedHelperMany')
-      : getExtensionMessage('extensionStatusInactiveHelper');
-  setExtensionStatus('inactive', getExtensionMessage('extensionStatusInactiveAll'), inactiveHelper);
+  setExtensionStatus('inactive', getExtensionMessage('extensionStatusInactiveAll'), getExtensionMessage('extensionStatusDisconnected'));
 }
 
 function setExtensionStatus(status: ExtensionStatus, text: string, helper: string): void {
@@ -238,6 +469,7 @@ function setExtensionStatus(status: ExtensionStatus, text: string, helper: strin
   }
   if (controls.extensionStatusHelper) {
     controls.extensionStatusHelper.textContent = helper;
+    controls.extensionStatusHelper.hidden = !helper;
   }
 }
 

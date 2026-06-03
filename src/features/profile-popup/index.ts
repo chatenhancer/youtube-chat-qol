@@ -21,6 +21,10 @@ import {
 } from '../user-message-history';
 import { registerFeatureLifecycle } from '../../content/lifecycle';
 import { mentionAuthorName } from '../reply';
+import {
+  applyMarkedUserRing,
+  createMarkedUserToggleButton
+} from '../marked-users';
 import { createTranslationPriorityScope, type TranslationPriorityScope } from '../translation/queue';
 import { getChannelUrl, openChannelWindow } from '../channel-popup';
 import { createAvatarElement, createProfileAvatarButton } from './elements';
@@ -31,6 +35,7 @@ import type { ProfileSource } from './types';
 
 let activeProfileCard: HTMLElement | null = null;
 let activeProfileCardCleanup: (() => void) | null = null;
+let profileWiringListeners = new AbortController();
 
 registerFeatureLifecycle({
   page: {
@@ -50,14 +55,18 @@ export function wireProfileClick(message: HTMLElement): void {
 
   avatar.classList.add('ytcq-profile-enabled');
   avatar.title = t('showRecentMessages');
-  avatar.addEventListener('click', (event) => {
+  const handleClick = (event: MouseEvent): void => {
     const source = getMessageProfileSource(message);
     if (!source) return;
 
     event.preventDefault();
     event.stopPropagation();
     showProfileCard(source, avatar);
-  }, true);
+  };
+  avatar.addEventListener('click', handleClick, {
+    capture: true,
+    signal: profileWiringListeners.signal
+  });
 }
 
 export function wireParticipantProfileClick(participant: HTMLElement): void {
@@ -72,20 +81,32 @@ export function wireParticipantProfileClick(participant: HTMLElement): void {
   clickTargets.forEach((target) => {
     target.classList.add('ytcq-profile-enabled');
     target.title = t('showRecentMessages');
-    target.addEventListener('click', (event) => {
+    const handleClick = (event: MouseEvent): void => {
       const source = getParticipantProfileSource(participant);
       if (!source) return;
 
       event.preventDefault();
       event.stopPropagation();
       showProfileCard(source, target);
-    }, true);
+    };
+    target.addEventListener('click', handleClick, {
+      capture: true,
+      signal: profileWiringListeners.signal
+    });
   });
 }
 
 export function cleanupStaleProfilePopupSurfaces(): void {
+  profileWiringListeners.abort();
+  profileWiringListeners = new AbortController();
   closeProfileCard();
   document.querySelectorAll<HTMLElement>('.ytcq-profile-card:not(.ytcq-inbox-card)').forEach((card) => card.remove());
+  document.querySelectorAll<HTMLElement>('.ytcq-profile-enabled').forEach((target) => {
+    target.classList.remove('ytcq-profile-enabled');
+    if (target.title === t('showRecentMessages')) {
+      target.removeAttribute('title');
+    }
+  });
   document.querySelectorAll('[data-ytcq-profile-wired]').forEach((element) => {
     element.removeAttribute('data-ytcq-profile-wired');
   });
@@ -130,7 +151,12 @@ function showProfileCard(source: ProfileSource, anchor: HTMLElement): void {
     : 'ytcq-profile-card-header';
 
   const avatar = createAvatarElement(source.avatarSrc);
-  header.append(source.profileUrl ? createProfileAvatarButton(avatar, source.profileUrl) : avatar);
+  const avatarSurface = source.profileUrl ? createProfileAvatarButton(avatar, source.profileUrl) : avatar;
+  applyMarkedUserRing(avatarSurface, {
+    ...source.identity,
+    avatarUrl: source.avatarSrc
+  });
+  header.append(avatarSurface);
 
   const titleWrap = ytcqCreateElement('div');
   titleWrap.className = 'ytcq-profile-card-title-wrap';
@@ -159,6 +185,11 @@ function showProfileCard(source: ProfileSource, anchor: HTMLElement): void {
 
   titleWrap.append(title, subtitle);
   header.append(titleWrap);
+
+  header.append(createMarkedUserToggleButton({
+    ...source.identity,
+    avatarUrl: source.avatarSrc
+  }));
 
   if (source.profileUrl) {
     const channelButton = ytcqCreateElement('button');
@@ -253,11 +284,10 @@ function showProfileCard(source: ProfileSource, anchor: HTMLElement): void {
     schedulePosition('viewport');
     restoreScrollPositionAfterRender(list, scrollPosition);
   });
+  const cardListeners = new AbortController();
 
   activeProfileCardCleanup = () => {
-    document.removeEventListener('click', handleOutsideClick, true);
-    document.removeEventListener('keydown', handleKeydown, true);
-    window.removeEventListener('resize', handleResize, true);
+    cardListeners.abort();
     if (positionFrame) window.cancelAnimationFrame(positionFrame);
     resizeObserver.disconnect();
     translationPriorityScope.close();
@@ -265,9 +295,10 @@ function showProfileCard(source: ProfileSource, anchor: HTMLElement): void {
   };
 
   window.setTimeout(() => {
-    document.addEventListener('click', handleOutsideClick, true);
-    document.addEventListener('keydown', handleKeydown, true);
-    window.addEventListener('resize', handleResize, true);
+    const options = { capture: true, signal: cardListeners.signal };
+    document.addEventListener('click', handleOutsideClick, options);
+    document.addEventListener('keydown', handleKeydown, options);
+    window.addEventListener('resize', handleResize, options);
   }, 0);
 }
 
