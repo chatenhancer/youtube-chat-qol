@@ -172,12 +172,12 @@ describe('YouTube chat input adapter', () => {
     Object.defineProperty(textarea, 'selectionStart', {
       configurable: true,
       get: () => null,
-      set: () => undefined
+      set: () => {}
     });
     Object.defineProperty(textarea, 'selectionEnd', {
       configurable: true,
       get: () => null,
-      set: () => undefined
+      set: () => {}
     });
 
     expect(getChatInputTextSelection()).toEqual({

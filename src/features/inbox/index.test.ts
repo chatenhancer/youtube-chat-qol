@@ -448,11 +448,15 @@ describe('inbox coordinator', () => {
   it('exposes inbox card callbacks for clearing, marking read, and keyword updates', async () => {
     openInboxCard(document.createElement('button'));
     await Promise.resolve();
-    const callbacks = cardMocks.openInboxCardView.mock.calls.at(-1)?.[1] as {
-      onClearRecords: () => void;
-      onKeywordsChanged: () => void;
-      onMarkRead: () => void;
-    };
+    const latestOpenCall = cardMocks.openInboxCardView.mock.calls.at(-1) as unknown as [
+      HTMLElement,
+      {
+        onClearRecords: () => void;
+        onKeywordsChanged: () => void;
+        onMarkRead: () => void;
+      }
+    ];
+    const callbacks = latestOpenCall[1];
 
     callbacks.onClearRecords();
     expect(stateMocks.clearInboxRecords).toHaveBeenCalled();

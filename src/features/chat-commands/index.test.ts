@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import type { ChatInputSnapshot } from '../../youtube/chat-input';
 import type {
   ChatCommandDefinition,
   ChatCommandRuntime
@@ -20,7 +21,7 @@ const commandState = vi.hoisted(() => ({
 
 const chatInputMocks = vi.hoisted(() => ({
   findChatInput: vi.fn(() => chatState.input),
-  getChatInputSnapshot: vi.fn(() => ({
+  getChatInputSnapshot: vi.fn((): ChatInputSnapshot | null => ({
     childNodes: [],
     text: chatState.text
   })),

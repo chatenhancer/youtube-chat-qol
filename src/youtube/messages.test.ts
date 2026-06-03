@@ -167,7 +167,7 @@ describe('YouTube message adapter fixtures', () => {
       </span>
     `;
 
-    restoreReplacedTranslation(document.createTextNode('not an element'));
+    restoreReplacedTranslation(document.createTextNode('not an element') as unknown as Element);
     restoreReplacedTranslation(message);
 
     expect(message.querySelector('#message')?.classList.contains('ytcq-translation-replaced-text')).toBe(false);
