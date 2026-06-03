@@ -16,6 +16,7 @@ describe('marked users', () => {
   });
 
   afterEach(() => {
+    vi.useRealTimers();
     vi.restoreAllMocks();
   });
 
@@ -146,6 +147,103 @@ describe('marked users', () => {
     expect(button.querySelector('path')?.getAttribute('d')).toBe(BOOKMARK_ICON_PATH);
   });
 
+  it('toggles users from the header button click handler', async () => {
+    const markedUsers = await import('./index');
+    markedUsers.initMarkedUsers();
+    await Promise.resolve();
+
+    const button = markedUsers.createMarkedUserToggleButton({ authorName: '@ViewerOne' });
+    document.body.append(button);
+
+    button.click();
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(markedUsers.isMarkedUser({ authorName: '@ViewerOne' })).toBe(true);
+    expect(button.classList.contains('ytcq-marked-user-toggle-active')).toBe(true);
+    expect(button.querySelector('path')?.getAttribute('d')).toBe(BOOKMARK_FILLED_ICON_PATH);
+  });
+
+  it('loads existing marks from storage before rendering toggle state', async () => {
+    await chrome.storage.local.set({
+      ytcqMarkedUsers: {
+        'author:@viewerone': {
+          authorName: '@ViewerOne',
+          markedAt: 0
+        }
+      }
+    });
+
+    const markedUsers = await import('./index');
+    markedUsers.initMarkedUsers();
+    await Promise.resolve();
+
+    const button = markedUsers.createMarkedUserToggleButton({ authorName: '@ViewerOne' });
+    expect(button.classList.contains('ytcq-marked-user-toggle-active')).toBe(true);
+    expect(button.title).toBe('Unmark');
+  });
+
+  it('refreshes rings and toggle icons when marked users change in storage', async () => {
+    const markedUsers = await import('./index');
+    markedUsers.initMarkedUsers();
+    await Promise.resolve();
+
+    const avatar = document.createElement('span');
+    document.body.append(avatar);
+    markedUsers.applyMarkedUserRing(avatar, { authorName: '@ViewerOne' });
+
+    const button = document.createElement('button');
+    button.className = 'ytcq-marked-user-toggle';
+    button.dataset.ytcqMarkedUserToggleName = '@ViewerOne';
+    document.body.append(button);
+
+    const listener = vi.mocked(chrome.storage.onChanged.addListener).mock.calls.at(-1)?.[0];
+    expect(listener).toBeTypeOf('function');
+
+    listener?.({
+      [markedUsers.MARKED_USERS_STORAGE_KEY]: {
+        newValue: {
+          'author:@viewerone': {
+            authorName: '@ViewerOne',
+            markedAt: 1_700_000_000_000
+          }
+        }
+      } as chrome.storage.StorageChange
+    }, 'sync');
+    expect(avatar.classList.contains('ytcq-marked-user-avatar')).toBe(false);
+
+    listener?.({
+      unrelated: {
+        newValue: true
+      } as chrome.storage.StorageChange
+    }, 'local');
+    expect(avatar.classList.contains('ytcq-marked-user-avatar')).toBe(false);
+
+    listener?.({
+      [markedUsers.MARKED_USERS_STORAGE_KEY]: {
+        newValue: {
+          'author:@viewerone': {
+            authorName: '@ViewerOne',
+            markedAt: 1_700_000_000_000
+          }
+        }
+      } as chrome.storage.StorageChange
+    }, 'local');
+
+    expect(avatar.classList.contains('ytcq-marked-user-avatar')).toBe(true);
+    expect(button.classList.contains('ytcq-marked-user-toggle-active')).toBe(true);
+    expect(button.querySelector('path')?.getAttribute('d')).toBe(BOOKMARK_FILLED_ICON_PATH);
+
+    const unboundButton = document.createElement('button');
+    unboundButton.className = 'ytcq-marked-user-toggle';
+    document.body.append(unboundButton);
+    markedUsers.refreshMarkedUserRings();
+    expect(unboundButton.querySelector('path')?.getAttribute('d')).toBe(BOOKMARK_ICON_PATH);
+
+    markedUsers.cleanupStaleMarkedUsers();
+    expect(chrome.storage.onChanged.removeListener).toHaveBeenCalledWith(listener);
+  });
+
   it('uses stable username colors and ignores empty identities', async () => {
     const markedUsers = await import('./index');
     expect(markedUsers.getMarkedUserColor({ authorName: '@ViewerOne' })).toBe(markedUsers.getMarkedUserColor({ authorName: '@ViewerOne' }));
@@ -155,9 +253,81 @@ describe('marked users', () => {
     markedUsers.applyMarkedUserRing(target, {});
     expect(target.hasAttribute('data-ytcq-marked-user-key')).toBe(false);
     expect(await markedUsers.toggleMarkedUser({})).toBe(false);
+    markedUsers.applyMarkedUserRing(null, { authorName: '@ViewerOne' });
+
+    const emptyButton = markedUsers.createMarkedUserToggleButton({});
+    expect(emptyButton.title).toBe('Mark');
+  });
+
+  it('handles message author mark helpers for missing and present authors', async () => {
+    const markedUsers = await import('./index');
+    const message = document.createElement('yt-live-chat-text-message-renderer');
+
+    expect(markedUsers.getMarkedUserIdentityFromMessage(message)).toBeNull();
+    expect(markedUsers.isMessageAuthorMarked(message)).toBe(false);
+    expect(markedUsers.getMessageAuthorMarkTitle(message)).toBe('Mark');
+    await expect(markedUsers.toggleMessageAuthorMark(message)).resolves.toBe(false);
+
+    const authoredMessage = document.createElement('yt-live-chat-text-message-renderer') as HTMLElement & {
+      data?: unknown;
+    };
+    authoredMessage.data = {
+      authorName: { simpleText: '@ViewerOne' }
+    };
+    authoredMessage.innerHTML = `
+      <span id="author-photo"><img src="https://example.test/avatar.png"></span>
+      <span id="author-name">@ViewerOne</span>
+    `;
+
+    expect(markedUsers.getMarkedUserIdentityFromMessage(authoredMessage)).toEqual({
+      authorName: '@ViewerOne',
+      avatarUrl: 'https://example.test/avatar.png',
+      channelId: undefined
+    });
+    await expect(markedUsers.toggleMessageAuthorMark(authoredMessage)).resolves.toBe(true);
+    expect(markedUsers.isMessageAuthorMarked(authoredMessage)).toBe(true);
+    expect(markedUsers.getMessageAuthorMarkTitle(authoredMessage)).toContain('Unmark');
+  });
+
+  it('renders message rings through the feature lifecycle', async () => {
+    const markedUsers = await import('./index');
+    const lifecycle = await import('../../content/lifecycle');
+    markedUsers.initMarkedUsers();
+    await Promise.resolve();
+
+    const message = document.createElement('yt-live-chat-text-message-renderer') as HTMLElement & {
+      data?: unknown;
+    };
+    message.data = {
+      authorExternalChannelId: 'viewer-channel',
+      authorName: { simpleText: '@ViewerOne' }
+    };
+    message.innerHTML = `
+      <span id="author-photo"></span>
+      <span id="author-name">@ViewerOne</span>
+    `;
+    document.body.append(message);
+
+    lifecycle.handleFeatureMessage(message, { allowTranslate: false });
+
+    const avatar = message.querySelector<HTMLElement>('#author-photo')!;
+    expect(avatar.dataset.ytcqMarkedUserKey).toBe('channel:viewer-channel');
+
+    await markedUsers.toggleMarkedUser({
+      authorName: '@ViewerOne',
+      channelId: 'viewer-channel'
+    });
+
+    expect(avatar.classList.contains('ytcq-marked-user-avatar')).toBe(true);
+
+    const messageWithoutAvatar = document.createElement('yt-live-chat-text-message-renderer');
+    messageWithoutAvatar.innerHTML = '<span id="author-name">@ViewerTwo</span>';
+    lifecycle.handleFeatureMessage(messageWithoutAvatar, { allowTranslate: false });
+    expect(messageWithoutAvatar.querySelector('[data-ytcq-marked-user-key]')).toBeNull();
   });
 
   it('animates marked-user rings when an existing avatar is marked or unmarked', async () => {
+    vi.useFakeTimers();
     const markedUsers = await import('./index');
     markedUsers.initMarkedUsers();
     await Promise.resolve();
@@ -173,12 +343,62 @@ describe('marked users', () => {
     expect(enterAnimation).not.toBeNull();
     expect(avatar.classList.contains('ytcq-marked-user-ring-host')).toBe(true);
     expect(avatar.classList.contains('ytcq-marked-user-avatar-entering')).toBe(true);
+    enterAnimation?.dispatchEvent(new Event('animationend'));
+    expect(enterAnimation?.isConnected).toBe(false);
+    expect(avatar.classList.contains('ytcq-marked-user-avatar-entering')).toBe(false);
 
     await markedUsers.toggleMarkedUser({ authorName: '@ViewerOne' });
     expect(avatar.querySelector(':scope > .ytcq-marked-user-ring-animation-exit')).not.toBeNull();
+    vi.advanceTimersByTime(700);
 
     const button = markedUsers.createMarkedUserToggleButton({ authorName: '@ViewerOne' });
     expect(button.querySelector('svg')).not.toBeNull();
+  });
+
+  it('skips ring overlays for reduced motion and image elements', async () => {
+    vi.mocked(window.matchMedia).mockImplementation((query: string) => ({
+      addEventListener: vi.fn(),
+      addListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+      matches: true,
+      media: query,
+      onchange: null,
+      removeEventListener: vi.fn(),
+      removeListener: vi.fn()
+    }));
+
+    const markedUsers = await import('./index');
+    markedUsers.initMarkedUsers();
+    await Promise.resolve();
+
+    const reducedMotionAvatar = document.createElement('span');
+    document.body.append(reducedMotionAvatar);
+    markedUsers.applyMarkedUserRing(reducedMotionAvatar, { authorName: '@ViewerOne' });
+    await markedUsers.toggleMarkedUser({ authorName: '@ViewerOne' });
+
+    expect(reducedMotionAvatar.classList.contains('ytcq-marked-user-avatar')).toBe(true);
+    expect(reducedMotionAvatar.classList.contains('ytcq-marked-user-avatar-entering')).toBe(false);
+    expect(reducedMotionAvatar.querySelector('.ytcq-marked-user-ring-animation')).toBeNull();
+
+    vi.mocked(window.matchMedia).mockImplementation((query: string) => ({
+      addEventListener: vi.fn(),
+      addListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+      matches: false,
+      media: query,
+      onchange: null,
+      removeEventListener: vi.fn(),
+      removeListener: vi.fn()
+    }));
+
+    const imageAvatar = document.createElement('img');
+    document.body.append(imageAvatar);
+    markedUsers.applyMarkedUserRing(imageAvatar, { authorName: '@ViewerTwo' });
+    await markedUsers.toggleMarkedUser({ authorName: '@ViewerTwo' });
+
+    expect(imageAvatar.classList.contains('ytcq-marked-user-avatar')).toBe(true);
+    expect(imageAvatar.classList.contains('ytcq-marked-user-avatar-entering')).toBe(false);
+    expect(imageAvatar.querySelector('.ytcq-marked-user-ring-animation')).toBeNull();
   });
 
   it('cleans stale marked-user rings and animation hosts', async () => {
@@ -230,6 +450,33 @@ describe('marked users', () => {
     expect(animation?.style.height).toBe('32px');
     expect(avatar.querySelector(':scope > .ytcq-marked-user-ring-animation')).toBeNull();
     expect(avatar.classList.contains('ytcq-marked-user-avatar-entering')).toBe(true);
+
+    await markedUsers.toggleMarkedUser({ authorName: '@ViewerOne' });
+    expect(message.querySelectorAll(':scope > .ytcq-marked-user-ring-animation-enter')).toHaveLength(0);
+  });
+
+  it('falls back to avatar-hosted animation when the message row is not measurable', async () => {
+    const markedUsers = await import('./index');
+    markedUsers.initMarkedUsers();
+    await Promise.resolve();
+
+    const message = document.createElement('yt-live-chat-text-message-renderer');
+    message.getBoundingClientRect = () => rect();
+    message.innerHTML = `
+      <span id="author-photo"></span>
+      <span id="author-name">@ViewerOne</span>
+    `;
+    const avatar = message.querySelector<HTMLElement>('#author-photo')!;
+    avatar.getBoundingClientRect = () => rect({ width: 24, height: 24, left: 110, top: 206 });
+    document.body.append(message);
+
+    markedUsers.applyMarkedUserRing(avatar, { authorName: '@ViewerOne' });
+    await markedUsers.toggleMarkedUser({ authorName: '@ViewerOne' });
+
+    const animation = avatar.querySelector<HTMLElement>(':scope > .ytcq-marked-user-ring-animation-enter');
+    expect(animation).not.toBeNull();
+    expect(animation?.classList.contains('ytcq-marked-user-ring-animation-positioned')).toBe(false);
+    expect(message.querySelector(':scope > .ytcq-marked-user-ring-animation-enter')).toBeNull();
   });
 
   it('applies marked-user rings to participant list avatars', async () => {
@@ -263,6 +510,16 @@ describe('marked users', () => {
     });
 
     expect(avatar.classList.contains('ytcq-marked-user-avatar')).toBe(true);
+
+    const textOnlyParticipant = document.createElement('yt-live-chat-participant-renderer');
+    textOnlyParticipant.textContent = '@ParticipantWithoutAvatar';
+    expect(markedUsers.getMarkedUserIdentityFromParticipant(textOnlyParticipant)).toEqual({
+      authorName: '@ParticipantWithoutAvatar',
+      avatarUrl: undefined,
+      channelId: undefined
+    });
+    lifecycle.handleFeatureParticipant(textOnlyParticipant);
+    expect(textOnlyParticipant.querySelector('[data-ytcq-marked-user-key]')).toBeNull();
   });
 });
 
