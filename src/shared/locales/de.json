@@ -254,7 +254,7 @@
       "message": "Aus"
     },
     "popupResetConfirm": {
-      "message": "Chat Enhancer-Einstellungen zurücksetzen und lokalen Posteingang, Schlüsselwörter und Emoji-Daten löschen?"
+      "message": "Chat Enhancer-Einstellungen zurücksetzen und alle lokalen Erweiterungsdaten löschen? Dazu gehören Inbox-Nachrichten, beobachtete Schlüsselwörter, häufige Emojis, ungesendete Entwürfe und markierte Nutzer."
     },
     "popupResetComplete": {
       "message": "Chat Enhancer wurde zurückgesetzt."

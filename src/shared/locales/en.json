@@ -257,7 +257,7 @@
       "message": "Off"
     },
     "popupResetConfirm": {
-      "message": "Reset Chat Enhancer settings and clear local inbox, keyword, and emoji data?"
+      "message": "Reset Chat Enhancer settings and clear all local extension data? This includes inbox messages, watched keywords, frequent emojis, unsent drafts, and marked users."
     },
     "popupResetComplete": {
       "message": "Chat Enhancer has been reset."

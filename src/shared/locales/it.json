@@ -257,7 +257,7 @@
       "message": "Disattivato"
     },
     "popupResetConfirm": {
-      "message": "Reimpostare le impostazioni di Chat Enhancer e cancellare posta in arrivo locale, parole chiave e dati emoji?"
+      "message": "Reimpostare le impostazioni di Chat Enhancer e cancellare tutti i dati locali dell'estensione? Include messaggi della posta in arrivo, parole chiave monitorate, emoji frequenti, bozze non inviate e utenti contrassegnati."
     },
     "popupResetComplete": {
       "message": "Chat Enhancer e stato reimpostato."

@@ -254,7 +254,7 @@
       "message": "Tắt"
     },
     "popupResetConfirm": {
-      "message": "Đặt lại cài đặt Chat Enhancer và xóa hộp thư, từ khóa, dữ liệu emoji cục bộ?"
+      "message": "Đặt lại cài đặt Chat Enhancer và xóa tất cả dữ liệu tiện ích cục bộ? Bao gồm tin nhắn hộp thư, từ khóa đang theo dõi, emoji thường dùng, bản nháp chưa gửi và người dùng đã đánh dấu."
     },
     "popupResetComplete": {
       "message": "Chat Enhancer đã được đặt lại."
