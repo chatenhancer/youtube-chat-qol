@@ -125,6 +125,16 @@ describe('YouTube chat source url helpers', () => {
     expect(getCurrentYouTubeChatSourceTitle()).toBe('Fallback Metadata Stream');
   });
 
+  it('prefers the live document title over stale YouTube metadata', () => {
+    document.title = 'Current Stream - YouTube';
+    const ogTitle = document.createElement('meta');
+    ogTitle.setAttribute('property', 'og:title');
+    ogTitle.content = 'Stale Previous Video - YouTube';
+    document.head.append(ogTitle);
+
+    expect(getCurrentYouTubeChatSourceTitle()).toBe('Current Stream');
+  });
+
   it('uses an accessible top watch document title from a chat frame', () => {
     const topDocument = document.implementation.createHTMLDocument('Top Stream - YouTube');
     Object.defineProperty(window, 'top', {

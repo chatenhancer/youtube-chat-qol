@@ -72,11 +72,9 @@ function getAccessibleWindowHref(context: Window | null): string {
 }
 
 function getDocumentTitle(sourceDocument: Document): string {
-  return cleanYouTubeTitle(
-    getMetaContent(sourceDocument, 'meta[property="og:title"]') ||
-    getMetaContent(sourceDocument, 'meta[name="title"]') ||
-    sourceDocument.title
-  );
+  return cleanYouTubeTitle(sourceDocument.title) ||
+    cleanYouTubeTitle(getMetaContent(sourceDocument, 'meta[property="og:title"]')) ||
+    cleanYouTubeTitle(getMetaContent(sourceDocument, 'meta[name="title"]'));
 }
 
 function getMetaContent(sourceDocument: Document, selector: string): string {
