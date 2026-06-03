@@ -289,6 +289,9 @@
     "unknownStream": {
       "message": "Livestream không rõ"
     },
+    "openStreamInNewWindow": {
+      "message": "Mở {name} trong cửa sổ mới"
+    },
     "unknownUser": {
       "message": "Người dùng không rõ"
     },

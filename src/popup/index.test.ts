@@ -342,13 +342,17 @@ describe('popup', () => {
     expect(document.querySelector('#bookmarksCount')?.textContent).toBe('bookmarkedUsersCount:1');
     expect(document.querySelector('.bookmark-name')?.textContent).toBe('@ViewerOne');
     expect(document.querySelector<HTMLImageElement>('.bookmark-avatar img')?.src).toBe('https://yt3.ggpht.com/avatar=s88-c-k');
+    expect(document.querySelector('.bookmark-avatar-open-icon')).not.toBeNull();
     expect(document.querySelector('.bookmark-date')?.textContent).toContain('markedUserDate:');
     expect(document.querySelector('.bookmark-source')?.textContent).toBe('Example stream');
+    expect(document.querySelector('.bookmark-source-button')?.textContent).toBe('Example stream');
+    expect(document.querySelector<HTMLButtonElement>('.bookmark-source-button')?.title).toBe('openStreamInNewWindow:Example stream');
+    expect(document.querySelector('.bookmark-name-button')).toBeNull();
 
     document.querySelector<HTMLButtonElement>('.bookmark-avatar-button')?.click();
     expect(chrome.tabs.create).toHaveBeenCalledWith({ url: 'https://www.youtube.com/channel/viewer-channel' });
-    document.querySelector<HTMLButtonElement>('.bookmark-name-button')?.click();
-    expect(chrome.tabs.create).toHaveBeenCalledWith({ url: 'https://www.youtube.com/channel/viewer-channel' });
+    document.querySelector<HTMLButtonElement>('.bookmark-source-button')?.click();
+    expect(chrome.tabs.create).toHaveBeenCalledWith({ url: 'https://www.youtube.com/watch?v=stream-a' });
 
     const actionButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('.bookmark-action-button'));
     expect(actionButtons).toHaveLength(1);
@@ -413,6 +417,9 @@ describe('popup', () => {
     expect(rows[0].querySelector('.bookmark-source')?.textContent).toBe('https://www.youtube.com/watch?v=stream-a');
     expect(rows[1].querySelector('.bookmark-source')?.textContent).toBe('No channel stream');
     expect(rows[2].querySelector('.bookmark-source')?.textContent).toBe('unknownStream');
+    expect(rows[0].querySelector('.bookmark-source-button')).not.toBeNull();
+    expect(rows[1].querySelector('.bookmark-source-button')).toBeNull();
+    expect(rows[2].querySelector('.bookmark-source-button')).toBeNull();
     expect(rows[2].querySelector('.bookmark-date')?.textContent).toBe('markedDateUnknown');
 
     const handleAvatar = rows[0].querySelector<HTMLButtonElement>('.bookmark-avatar-button');
@@ -422,9 +429,13 @@ describe('popup', () => {
     expect(plainAvatar).not.toBeNull();
     expect(plainAvatar?.textContent).toBe('B');
     expect(unknownAvatar?.textContent).toBe('?');
+    expect(handleAvatar?.querySelector('.bookmark-avatar-open-icon')).not.toBeNull();
+    expect(plainAvatar?.querySelector('.bookmark-avatar-open-icon')).toBeNull();
+    expect(unknownAvatar?.querySelector('.bookmark-avatar-open-icon')).not.toBeNull();
 
-    rows[0].querySelector<HTMLButtonElement>('.bookmark-name-button')?.click();
-    expect(chrome.tabs.create).toHaveBeenCalledWith({ url: 'https://www.youtube.com/@AlphaUser' });
+    expect(rows[0].querySelector('.bookmark-name-button')).toBeNull();
+    rows[0].querySelector<HTMLButtonElement>('.bookmark-source-button')?.click();
+    expect(chrome.tabs.create).toHaveBeenCalledWith({ url: 'https://www.youtube.com/watch?v=stream-a' });
 
     const storageListener = vi.mocked(chrome.storage.onChanged.addListener).mock.calls.at(-1)?.[0];
     storageListener?.({
@@ -450,6 +461,46 @@ describe('popup', () => {
       } as chrome.storage.StorageChange
     }, 'local');
     expect(document.querySelector('.bookmark-name')?.textContent).toBe('@FreshUser');
+  });
+
+  it('does not make chat-frame bookmark source urls clickable', async () => {
+    await chrome.storage.local.set({
+      [MARKED_USERS_STORAGE_KEY]: {
+        'author:@framesourceuser': {
+          authorName: '@FrameSourceUser',
+          markedAt: 2_000,
+          markedSourceTitle: 'Frame source stream',
+          markedSourceUrl: 'https://www.youtube.com/live_chat?continuation=chat-frame-token'
+        },
+        'author:@videoiduser': {
+          authorName: '@VideoIdUser',
+          markedAt: 1_000,
+          markedSourceTitle: 'Video id stream',
+          markedSourceUrl: 'https://www.youtube.com/live_chat?video_id=stream-from-chat-frame'
+        }
+      }
+    });
+    vi.mocked(chrome.tabs.query).mockImplementation(((_queryInfo: chrome.tabs.QueryInfo, callback?: (tabs: chrome.tabs.Tab[]) => void) => {
+      callback?.([]);
+      return Promise.resolve([]);
+    }) as never);
+
+    await import('./index');
+    document.querySelector<HTMLButtonElement>('#bookmarksTab')?.click();
+
+    const rows = Array.from(document.querySelectorAll<HTMLElement>('.bookmark-row'));
+    expect(rows).toHaveLength(2);
+    expect(rows[0].querySelector('.bookmark-name')?.textContent).toBe('@FrameSourceUser');
+    expect(rows[0].querySelector('.bookmark-source')?.textContent).toBe('Frame source stream');
+    expect(rows[0].querySelector('.bookmark-source-button')).toBeNull();
+
+    expect(rows[1].querySelector('.bookmark-name')?.textContent).toBe('@VideoIdUser');
+    const sourceButton = rows[1].querySelector<HTMLButtonElement>('.bookmark-source-button');
+    expect(sourceButton?.textContent).toBe('Video id stream');
+    sourceButton?.click();
+    expect(chrome.tabs.create).toHaveBeenCalledWith({
+      url: 'https://www.youtube.com/watch?v=stream-from-chat-frame'
+    });
   });
 
   it('keeps bookmark removal safe when the stored record has already disappeared', async () => {

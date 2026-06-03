@@ -292,6 +292,9 @@
     "unknownStream": {
       "message": "بث غير معروف"
     },
+    "openStreamInNewWindow": {
+      "message": "فتح {name} في نافذة جديدة"
+    },
     "unknownUser": {
       "message": "مستخدم غير معروف"
     },

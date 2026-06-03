@@ -292,6 +292,9 @@
     "unknownStream": {
       "message": "Transmissão desconhecida"
     },
+    "openStreamInNewWindow": {
+      "message": "Abrir {name} em uma nova janela"
+    },
     "unknownUser": {
       "message": "Usuário desconhecido"
     },

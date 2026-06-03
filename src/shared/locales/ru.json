@@ -292,6 +292,9 @@
     "unknownStream": {
       "message": "Неизвестная трансляция"
     },
+    "openStreamInNewWindow": {
+      "message": "Открыть {name} в новом окне"
+    },
     "unknownUser": {
       "message": "Неизвестный пользователь"
     },

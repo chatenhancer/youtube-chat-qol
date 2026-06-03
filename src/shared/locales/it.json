@@ -292,6 +292,9 @@
     "unknownStream": {
       "message": "Live sconosciuta"
     },
+    "openStreamInNewWindow": {
+      "message": "Apri {name} in una nuova finestra"
+    },
     "unknownUser": {
       "message": "Utente sconosciuto"
     },

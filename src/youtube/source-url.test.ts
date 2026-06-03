@@ -8,6 +8,7 @@ import {
 describe('YouTube chat source url helpers', () => {
   const originalReferrer = document.referrer;
   const originalTopWindow = window.top;
+  const originalParentWindow = window.parent;
 
   afterEach(() => {
     window.history.replaceState({}, '', '/');
@@ -20,6 +21,10 @@ describe('YouTube chat source url helpers', () => {
     Object.defineProperty(window, 'top', {
       configurable: true,
       value: originalTopWindow
+    });
+    Object.defineProperty(window, 'parent', {
+      configurable: true,
+      value: originalParentWindow
     });
   });
 
@@ -37,6 +42,42 @@ describe('YouTube chat source url helpers', () => {
     });
 
     expect(getCurrentYouTubeChatSourceUrl()).toBe('https://www.youtube.com/watch?v=stream-from-referrer');
+  });
+
+  it('uses an accessible top watch url before falling back to the chat iframe url', () => {
+    window.history.replaceState({}, '', '/live_chat?continuation=iframe-token');
+    Object.defineProperty(window, 'top', {
+      configurable: true,
+      value: {
+        location: {
+          href: 'https://www.youtube.com/watch?v=stream-from-top&feature=live'
+        }
+      } as Window
+    });
+
+    expect(getCurrentYouTubeChatSourceUrl()).toBe('https://www.youtube.com/watch?v=stream-from-top');
+  });
+
+  it('uses an accessible parent watch url when the top window is unavailable', () => {
+    window.history.replaceState({}, '', '/live_chat?continuation=iframe-token');
+    Object.defineProperty(window, 'top', {
+      configurable: true,
+      value: {
+        get location(): Location {
+          throw new Error('cross-origin top');
+        }
+      } as Window
+    });
+    Object.defineProperty(window, 'parent', {
+      configurable: true,
+      value: {
+        location: {
+          href: 'https://www.youtube.com/watch?v=stream-from-parent&feature=live'
+        }
+      } as Window
+    });
+
+    expect(getCurrentYouTubeChatSourceUrl()).toBe('https://www.youtube.com/watch?v=stream-from-parent');
   });
 
   it('falls back to a stable live-chat continuation url', () => {

@@ -292,6 +292,9 @@
     "unknownStream": {
       "message": "不明な配信"
     },
+    "openStreamInNewWindow": {
+      "message": "{name} を新しいウィンドウで開く"
+    },
     "unknownUser": {
       "message": "不明なユーザー"
     },

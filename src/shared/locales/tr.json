@@ -292,6 +292,9 @@
     "unknownStream": {
       "message": "Bilinmeyen yayın"
     },
+    "openStreamInNewWindow": {
+      "message": "{name} yayınını yeni pencerede aç"
+    },
     "unknownUser": {
       "message": "Bilinmeyen kullanıcı"
     },

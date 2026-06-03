@@ -292,6 +292,9 @@
     "unknownStream": {
       "message": "अज्ञात स्ट्रीम"
     },
+    "openStreamInNewWindow": {
+      "message": "{name} को नई विंडो में खोलें"
+    },
     "unknownUser": {
       "message": "अज्ञात उपयोगकर्ता"
     },
