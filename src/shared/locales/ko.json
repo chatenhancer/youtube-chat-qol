@@ -254,7 +254,7 @@
       "message": "끄기"
     },
     "popupResetConfirm": {
-      "message": "Chat Enhancer 설정을 재설정하고 로컬 받은 편지함, 키워드, 이모티콘 데이터를 지울까요?"
+      "message": "Chat Enhancer 설정을 재설정하고 모든 로컬 확장 프로그램 데이터를 지울까요? 여기에는 받은 편지함 메시지, 감시 중인 키워드, 자주 쓰는 이모지, 보내지 않은 초안, 표시한 사용자가 포함됩니다."
     },
     "popupResetComplete": {
       "message": "Chat Enhancer가 재설정되었습니다."

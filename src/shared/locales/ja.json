@@ -257,7 +257,7 @@
       "message": "オフ"
     },
     "popupResetConfirm": {
-      "message": "Chat Enhancer の設定をリセットし、ローカルの受信トレイ、キーワード、絵文字データを消去しますか？"
+      "message": "Chat Enhancer の設定をリセットし、ローカルの拡張機能データをすべて消去しますか？受信トレイのメッセージ、監視中のキーワード、よく使う絵文字、未送信の下書き、マークしたユーザーが含まれます。"
     },
     "popupResetComplete": {
       "message": "Chat Enhancer がリセットされました。"

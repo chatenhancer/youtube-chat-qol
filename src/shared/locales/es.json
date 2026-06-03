@@ -254,7 +254,7 @@
       "message": "Desactivado"
     },
     "popupResetConfirm": {
-      "message": "¿Restablecer la configuración de Chat Enhancer y borrar la bandeja local, palabras clave y datos de emojis?"
+      "message": "¿Restablecer la configuración de Chat Enhancer y borrar todos los datos locales de la extensión? Esto incluye mensajes de la bandeja, palabras clave vigiladas, emojis frecuentes, borradores sin enviar y usuarios marcados."
     },
     "popupResetComplete": {
       "message": "Chat Enhancer se ha restablecido."

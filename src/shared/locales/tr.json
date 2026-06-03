@@ -257,7 +257,7 @@
       "message": "Kapalı"
     },
     "popupResetConfirm": {
-      "message": "Chat Enhancer ayarları sıfırlansın ve yerel gelen kutusu, anahtar kelime ve emoji verileri temizlensin mi?"
+      "message": "Chat Enhancer ayarları sıfırlansın ve tüm yerel uzantı verileri temizlensin mi? Buna gelen kutusu mesajları, izlenen anahtar kelimeler, sık kullanılan emojiler, gönderilmemiş taslaklar ve işaretlenen kullanıcılar dahildir."
     },
     "popupResetComplete": {
       "message": "Chat Enhancer sıfırlandı."

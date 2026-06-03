@@ -254,7 +254,7 @@
       "message": "Uit"
     },
     "popupResetConfirm": {
-      "message": "Chat Enhancer-instellingen resetten en lokale inbox-, trefwoord- en emojigegevens wissen?"
+      "message": "Chat Enhancer-instellingen resetten en alle lokale extensiegegevens wissen? Dit omvat inboxberichten, gevolgde trefwoorden, frequente emoji's, niet-verzonden concepten en gemarkeerde gebruikers."
     },
     "popupResetComplete": {
       "message": "Chat Enhancer is gereset."
