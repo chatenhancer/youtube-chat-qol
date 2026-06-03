@@ -4,7 +4,7 @@ import { formatTime, formatWhen, formatWhenResult, getTimeZoneOption } from './t
 describe('chat command time helpers', () => {
   beforeEach(() => {
     vi.useFakeTimers();
-    vi.setSystemTime(new Date('2026-05-29T12:00:00Z'));
+    vi.setSystemTime(new Date(2026, 4, 29, 14, 0, 0));
   });
 
   afterEach(() => {
