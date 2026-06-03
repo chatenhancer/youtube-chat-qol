@@ -254,7 +254,7 @@
       "message": "Désactivé"
     },
     "popupResetConfirm": {
-      "message": "Réinitialiser les réglages de Chat Enhancer et effacer toutes les données locales de l'extension ? Cela inclut les messages de la boîte de réception, les mots-clés surveillés, les emojis fréquents, les brouillons non envoyés et les utilisateurs marqués."
+      "message": "Réinitialiser les réglages de Chat Enhancer et effacer toutes les données locales de l'extension ?\n\nCela inclut les messages de la boîte de réception, les mots-clés surveillés, les emojis fréquents, les brouillons non envoyés et les utilisateurs marqués."
     },
     "popupResetComplete": {
       "message": "Chat Enhancer a été réinitialisé."

@@ -254,7 +254,7 @@
       "message": "Wyłączone"
     },
     "popupResetConfirm": {
-      "message": "Zresetować ustawienia Chat Enhancer i wyczyścić wszystkie lokalne dane rozszerzenia? Obejmuje to wiadomości w skrzynce, obserwowane słowa kluczowe, częste emoji, niewysłane wersje robocze i oznaczonych użytkowników."
+      "message": "Zresetować ustawienia Chat Enhancer i wyczyścić wszystkie lokalne dane rozszerzenia?\n\nObejmuje to wiadomości w skrzynce, obserwowane słowa kluczowe, częste emoji, niewysłane wersje robocze i oznaczonych użytkowników."
     },
     "popupResetComplete": {
       "message": "Chat Enhancer został zresetowany."

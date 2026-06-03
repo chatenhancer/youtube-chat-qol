@@ -257,7 +257,7 @@
       "message": "Mati"
     },
     "popupResetConfirm": {
-      "message": "Reset pengaturan Chat Enhancer dan hapus semua data ekstensi lokal? Ini termasuk pesan kotak masuk, kata kunci yang dipantau, emoji yang sering dipakai, draf yang belum dikirim, dan pengguna yang ditandai."
+      "message": "Reset pengaturan Chat Enhancer dan hapus semua data ekstensi lokal?\n\nIni termasuk pesan kotak masuk, kata kunci yang dipantau, emoji yang sering dipakai, draf yang belum dikirim, dan pengguna yang ditandai."
     },
     "popupResetComplete": {
       "message": "Chat Enhancer telah direset."

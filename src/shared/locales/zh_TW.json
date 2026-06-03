@@ -254,7 +254,7 @@
       "message": "關閉"
     },
     "popupResetConfirm": {
-      "message": "要重設 Chat Enhancer 設定並清除所有本機擴充功能資料嗎？這包括收件匣訊息、追蹤的關鍵字、常用 emoji、未送出的草稿和已標記的使用者。"
+      "message": "要重設 Chat Enhancer 設定並清除所有本機擴充功能資料嗎？\n\n這包括收件匣訊息、追蹤的關鍵字、常用 emoji、未送出的草稿和已標記的使用者。"
     },
     "popupResetComplete": {
       "message": "Chat Enhancer 已重設。"

@@ -257,7 +257,7 @@
       "message": "Desativado"
     },
     "popupResetConfirm": {
-      "message": "Redefinir as configurações do Chat Enhancer e limpar todos os dados locais da extensão? Isso inclui mensagens da caixa de entrada, palavras-chave observadas, emojis frequentes, rascunhos não enviados e usuários marcados."
+      "message": "Redefinir as configurações do Chat Enhancer e limpar todos os dados locais da extensão?\n\nIsso inclui mensagens da caixa de entrada, palavras-chave observadas, emojis frequentes, rascunhos não enviados e usuários marcados."
     },
     "popupResetComplete": {
       "message": "Chat Enhancer foi redefinido."

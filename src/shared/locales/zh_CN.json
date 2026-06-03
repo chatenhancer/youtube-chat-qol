@@ -257,7 +257,7 @@
       "message": "关闭"
     },
     "popupResetConfirm": {
-      "message": "重置 Chat Enhancer 设置并清除所有本地扩展数据？这包括收件箱消息、关注的关键词、常用表情、未发送草稿和已标记用户。"
+      "message": "重置 Chat Enhancer 设置并清除所有本地扩展数据？\n\n这包括收件箱消息、关注的关键词、常用表情、未发送草稿和已标记用户。"
     },
     "popupResetComplete": {
       "message": "Chat Enhancer 已重置。"
