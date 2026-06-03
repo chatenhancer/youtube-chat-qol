@@ -29,6 +29,8 @@
     "jumpToMessage": "Перейти до повідомлення",
     "keywordOrPhrase": "Ключове слово або фраза",
     "lessThanOneMinute": "менше ніж 1 хв",
+    "markUser": "Позначити",
+    "unmarkUser": "Зняти",
     "mention": "Згадати",
     "mentionUser": "Згадати користувача",
     "mentionUserTitle": "Згадати користувача. Alt/Option-клік, щоб процитувати.",
@@ -155,20 +157,14 @@
     "extensionStatusActiveManyOther": {
       "message": "Активно ще в {count} вкладках"
     },
-    "extensionStatusActiveHelper": {
-      "message": "Розширення працює в живому чаті YouTube."
-    },
     "extensionStatusInactiveAll": {
       "message": "Неактивно в жодній відкритій вкладці"
     },
-    "extensionStatusInactiveHelper": {
-      "message": "Відкрийте живий чат YouTube, щоб розширення запрацювало."
+    "extensionStatusConnected": {
+      "message": "Розширення підключено до чату YouTube наживо."
     },
-    "extensionStatusInactiveDisconnectedHelperOne": {
-      "message": "Оновіть відкритий чат YouTube наживо."
-    },
-    "extensionStatusInactiveDisconnectedHelperMany": {
-      "message": "Оновіть відкриті чати YouTube наживо."
+    "extensionStatusDisconnected": {
+      "message": "Розширення не підключено до чату YouTube наживо."
     },
     "extensionShortName": {
       "message": "Chat Enhancer"
@@ -262,6 +258,48 @@
     },
     "popupResetComplete": {
       "message": "Chat Enhancer скинуто."
+    },
+    "settings": {
+      "message": "Налаштування"
+    },
+    "bookmarks": {
+      "message": "Закладки"
+    },
+    "popupSections": {
+      "message": "Розділи спливного вікна"
+    },
+    "bookmarkedUsers": {
+      "message": "Позначені користувачі"
+    },
+    "noBookmarkedUsers": {
+      "message": "Закладок поки немає"
+    },
+    "bookmarkedUsersCount": {
+      "message": "{count} закладок"
+    },
+    "bookmarkedUsersEmpty": {
+      "message": "Користувачі, яких ви позначите в чаті YouTube, з’являться тут."
+    },
+    "markedUserDate": {
+      "message": "Позначено {date}"
+    },
+    "markedDateUnknown": {
+      "message": "Дата невідома"
+    },
+    "unknownStream": {
+      "message": "Невідома трансляція"
+    },
+    "unknownUser": {
+      "message": "Невідомий користувач"
+    },
+    "openChannel": {
+      "message": "Відкрити канал"
+    },
+    "unmarkUser": {
+      "message": "Зняти"
+    },
+    "markUser": {
+      "message": "Позначити"
     }
   }
 }

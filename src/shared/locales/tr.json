@@ -29,6 +29,8 @@
     "jumpToMessage": "Mesaja git",
     "keywordOrPhrase": "Anahtar kelime veya ifade",
     "lessThanOneMinute": "1 dakikadan az",
+    "markUser": "İşaretle",
+    "unmarkUser": "Kaldır",
     "mention": "Bahset",
     "mentionUser": "Kullanıcıdan bahset",
     "mentionUserTitle": "Kullanıcıdan bahset. Alıntı yapmak için Alt/Option-tıkla.",
@@ -156,20 +158,14 @@
     "extensionStatusActiveManyOther": {
       "message": "{count} başka sekmede etkin"
     },
-    "extensionStatusActiveHelper": {
-      "message": "Uzantı YouTube canlı sohbetinde çalışıyor."
-    },
     "extensionStatusInactiveAll": {
       "message": "Hiçbir açık sekmede etkin değil"
     },
-    "extensionStatusInactiveHelper": {
-      "message": "Uzantının çalışması için bir YouTube canlı sohbeti açın."
+    "extensionStatusConnected": {
+      "message": "Uzantı YouTube canlı sohbete bağlı."
     },
-    "extensionStatusInactiveDisconnectedHelperOne": {
-      "message": "Açık YouTube canlı sohbetini yenile."
-    },
-    "extensionStatusInactiveDisconnectedHelperMany": {
-      "message": "Açık YouTube canlı sohbetlerini yenile."
+    "extensionStatusDisconnected": {
+      "message": "Uzantı YouTube canlı sohbete bağlı değil."
     },
     "extensionShortName": {
       "message": "Chat Enhancer",
@@ -265,6 +261,48 @@
     },
     "popupResetComplete": {
       "message": "Chat Enhancer sıfırlandı."
+    },
+    "settings": {
+      "message": "Ayarlar"
+    },
+    "bookmarks": {
+      "message": "Yer imleri"
+    },
+    "popupSections": {
+      "message": "Açılır pencere bölümleri"
+    },
+    "bookmarkedUsers": {
+      "message": "İşaretlenen kullanıcılar"
+    },
+    "noBookmarkedUsers": {
+      "message": "Henüz yer imi yok"
+    },
+    "bookmarkedUsersCount": {
+      "message": "{count} yer imi"
+    },
+    "bookmarkedUsersEmpty": {
+      "message": "YouTube sohbetinde işaretlediğiniz kullanıcılar burada görünür."
+    },
+    "markedUserDate": {
+      "message": "{date} tarihinde işaretlendi"
+    },
+    "markedDateUnknown": {
+      "message": "Tarih bilinmiyor"
+    },
+    "unknownStream": {
+      "message": "Bilinmeyen yayın"
+    },
+    "unknownUser": {
+      "message": "Bilinmeyen kullanıcı"
+    },
+    "openChannel": {
+      "message": "Kanalı aç"
+    },
+    "unmarkUser": {
+      "message": "Kaldır"
+    },
+    "markUser": {
+      "message": "İşaretle"
     }
   }
 }

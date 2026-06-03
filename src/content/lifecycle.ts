@@ -255,6 +255,7 @@ const visibilityChangedCallbacks: VisibilityChangedCallback[] = [];
 const participantCallbacks: ParticipantCallback[] = [];
 const observerIgnoreAddedNodeCallbacks: ((element: Element) => boolean)[] = [];
 const observerIgnoreMutationCallbacks: ((element: Element) => boolean)[] = [];
+let featuresSuspended = false;
 
 /**
  * Register lifecycle hooks for one enabled content feature.
@@ -317,6 +318,7 @@ export function initFeatures(context: FeatureLifecycleContext): void {
  * and the first pass over existing YouTube renderers to be complete.
  */
 export function bootFeatures(): void {
+  if (featuresSuspended) return;
   runLifecycleCallbacks(bootCallbacks);
 }
 
@@ -327,6 +329,7 @@ export function bootFeatures(): void {
  * @param nextOptions Current normalized options.
  */
 export function handleFeatureOptionsChanged(previousOptions: Options, nextOptions: Options): void {
+  if (featuresSuspended) return;
   optionsChangedCallbacks.forEach((callback) => callback(previousOptions, nextOptions));
 }
 
@@ -334,6 +337,7 @@ export function handleFeatureOptionsChanged(previousOptions: Options, nextOption
  * Run feature hooks after foreground live-edge recovery rescans messages.
  */
 export function recoverVisibleFeatures(): void {
+  if (featuresSuspended) return;
   runLifecycleCallbacks(visibleRecoveryCallbacks);
 }
 
@@ -355,6 +359,7 @@ export function handleFeatureVisibilityChanged(visibilityState: Document['visibi
  * work such as initial translation queueing is allowed for this pass.
  */
 export function handleFeatureMessage(message: HTMLElement, context: FeatureMessageContext): void {
+  if (featuresSuspended) return;
   runPhasedCallbacks(messageCallbacks, (callback) => callback(message, context));
 }
 
@@ -367,6 +372,7 @@ export function handleFeatureMessage(message: HTMLElement, context: FeatureMessa
  * from scratch.
  */
 export function handleFeatureMutations(batch: FeatureMutationBatch): void {
+  if (featuresSuspended) return;
   runPhasedCallbacks(mutationCallbacks, (callback) => callback(batch));
 }
 
@@ -377,6 +383,7 @@ export function handleFeatureMutations(batch: FeatureMutationBatch): void {
  * not a normal chat message renderer.
  */
 export function handleFeatureParticipant(participant: HTMLElement): void {
+  if (featuresSuspended) return;
   participantCallbacks.forEach((callback) => callback(participant));
 }
 
@@ -410,6 +417,20 @@ export function shouldIgnoreFeatureMutation(element: Element): boolean {
  */
 export function cleanupStaleFeatures(): void {
   runLifecycleCallbacks(staleCleanupCallbacks);
+}
+
+/**
+ * Remove injected UI and stop normal feature dispatch for this page instance.
+ *
+ * This is used when the old content script can still run JavaScript but can no
+ * longer talk to the extension context. In that state feature controls would be
+ * misleading because their actions cannot reliably reach storage/background.
+ * The reconnect/refresh notice is created after this cleanup.
+ */
+export function suspendFeatures(): void {
+  if (featuresSuspended) return;
+  featuresSuspended = true;
+  cleanupStaleFeatures();
 }
 
 /**

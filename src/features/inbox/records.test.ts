@@ -29,6 +29,8 @@ describe('inbox records', () => {
 
     expect(record).toMatchObject({
       authorName: '@ExampleUser',
+      avatarSrc: 'https://example.test/avatar.jpg',
+      channelId: 'example-channel',
       id: expect.stringMatching(/^\d+-4fzyo8$/),
       matchedKeywords: ['launch'],
       mention: true,
@@ -104,6 +106,8 @@ describe('inbox records', () => {
 
     expect(recordsEqual(first, second)).toBe(true);
     expect(hasTransientRecordUpdate(first, second, (candidate) => candidate.messageRef?.deref() || null)).toBe(true);
+    expect(recordsEqual(first, record({ avatarSrc: 'https://example.test/avatar.jpg', read: true }))).toBe(false);
+    expect(recordsEqual(first, record({ channelId: 'example-channel', read: true }))).toBe(false);
   });
 });
 
@@ -113,10 +117,12 @@ function createMessage(): HTMLElement {
   };
   message.data = {
     id: 'message-1',
+    authorExternalChannelId: 'example-channel',
     authorName: { simpleText: '@ExampleUser' }
   };
   message.innerHTML = `
     <span id="author-name">@FallbackUser</span>
+    <span id="author-photo"><img src="https://example.test/avatar.jpg"></span>
     <span id="timestamp">10:30 PM</span>
     <span id="message">hello @CurrentViewer <img class="emoji" alt="🚀" data-emoji-id="rocket" src="https://example.test/rocket.png"></span>
   `;

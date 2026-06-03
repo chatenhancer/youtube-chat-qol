@@ -14,6 +14,12 @@ export function getCurrentYouTubeChatSourceUrl(): string {
     getStablePageUrl(window.location.href);
 }
 
+export function getCurrentYouTubeChatSourceTitle(): string {
+  return getAccessibleDocumentTitle(window.top) ||
+    getAccessibleDocumentTitle(window.parent) ||
+    getDocumentTitle(document);
+}
+
 export function getYouTubeChatSourceStorageKey(sourceUrl: string): string {
   const cleanSourceUrl = cleanText(sourceUrl);
   const videoId = getVideoIdFromUrl(cleanSourceUrl);
@@ -46,6 +52,36 @@ function getLiveChatSourceUrl(value: string): string {
   } catch {
     return '';
   }
+}
+
+function getAccessibleDocumentTitle(context: Window | null): string {
+  if (!context) return '';
+
+  try {
+    return context.document === document ? '' : getDocumentTitle(context.document);
+  } catch {
+    return '';
+  }
+}
+
+function getDocumentTitle(sourceDocument: Document): string {
+  return cleanYouTubeTitle(
+    getMetaContent(sourceDocument, 'meta[property="og:title"]') ||
+    getMetaContent(sourceDocument, 'meta[name="title"]') ||
+    sourceDocument.title
+  );
+}
+
+function getMetaContent(sourceDocument: Document, selector: string): string {
+  return cleanText(sourceDocument.querySelector<HTMLMetaElement>(selector)?.content);
+}
+
+function cleanYouTubeTitle(value: string): string {
+  const title = cleanText(value)
+    .replace(/^\(\d+\)\s+/, '')
+    .replace(/\s+-\s+YouTube$/i, '');
+
+  return /^(youtube|live chat|live chat replay)$/i.test(title) ? '' : title;
 }
 
 function getStablePageUrl(value: string): string {

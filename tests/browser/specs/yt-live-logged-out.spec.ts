@@ -13,7 +13,7 @@ import { settingsMenuScenario } from '../scenarios/menus';
 import { profileCardRecentMessagesScenario } from '../scenarios/profile';
 import { loggedOutLiveTest as test } from '../support/scenario-fixtures';
 
-test('logged-out live: extension attaches and popup reports active status', attachScenario);
+test('logged-out live: extension attaches and popup reports connected status', attachScenario);
 test('logged-out live: chat settings menu receives extension controls', settingsMenuScenario);
 test('logged-out live: incoming chat messages translate through real Google Translate', realMessageTranslationScenario);
 test('logged-out live: focus panel opens from an author and follows their messages', focusPanelOpensFromAuthorScenario);

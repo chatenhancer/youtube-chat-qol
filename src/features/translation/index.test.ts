@@ -28,13 +28,14 @@ describe('translation feature lifecycle wiring', () => {
     lifecycle = lifecycleMocks.registerFeatureLifecycle.mock.calls[0][0] as FeatureLifecycle;
   });
 
-  it('registers boot, reset, and visible recovery translation hooks', () => {
+  it('registers boot, cleanup, reset, and visible recovery translation hooks', () => {
     lifecycle.page?.boot?.();
+    lifecycle.page?.cleanupStale?.();
     lifecycle.page?.reset?.();
     lifecycle.page?.visibleRecovery?.();
 
     expect(queueMocks.queueRetroactiveTranslations).toHaveBeenCalledTimes(2);
-    expect(queueMocks.clearTranslations).toHaveBeenCalledOnce();
+    expect(queueMocks.clearTranslations).toHaveBeenCalledTimes(2);
   });
 
   it('clears and backfills when target language or display changes', () => {

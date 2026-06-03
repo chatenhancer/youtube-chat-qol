@@ -29,6 +29,8 @@
     "jumpToMessage": "Przejdź do wiadomości",
     "keywordOrPhrase": "Słowo kluczowe lub fraza",
     "lessThanOneMinute": "mniej niż 1 min",
+    "markUser": "Oznacz",
+    "unmarkUser": "Usuń",
     "mention": "Wspomnij",
     "mentionUser": "Wspomnij użytkownika",
     "mentionUserTitle": "Wspomnij użytkownika. Alt/Option-klik, aby zacytować.",
@@ -155,20 +157,14 @@
     "extensionStatusActiveManyOther": {
       "message": "Aktywne w {count} innych kartach"
     },
-    "extensionStatusActiveHelper": {
-      "message": "Rozszerzenie działa w czacie na żywo YouTube."
-    },
     "extensionStatusInactiveAll": {
       "message": "Nieaktywne w żadnej otwartej karcie"
     },
-    "extensionStatusInactiveHelper": {
-      "message": "Otwórz czat na żywo YouTube, aby rozszerzenie działało."
+    "extensionStatusConnected": {
+      "message": "Rozszerzenie połączone z czatem na żywo YouTube."
     },
-    "extensionStatusInactiveDisconnectedHelperOne": {
-      "message": "Odśwież otwarty czat na żywo YouTube."
-    },
-    "extensionStatusInactiveDisconnectedHelperMany": {
-      "message": "Odśwież otwarte czaty na żywo YouTube."
+    "extensionStatusDisconnected": {
+      "message": "Rozszerzenie nie jest połączone z czatem na żywo YouTube."
     },
     "extensionShortName": {
       "message": "Chat Enhancer"
@@ -262,6 +258,48 @@
     },
     "popupResetComplete": {
       "message": "Chat Enhancer został zresetowany."
+    },
+    "settings": {
+      "message": "Ustawienia"
+    },
+    "bookmarks": {
+      "message": "Zakładki"
+    },
+    "popupSections": {
+      "message": "Sekcje popupu"
+    },
+    "bookmarkedUsers": {
+      "message": "Oznaczeni użytkownicy"
+    },
+    "noBookmarkedUsers": {
+      "message": "Brak zakładek"
+    },
+    "bookmarkedUsersCount": {
+      "message": "{count} zakładek"
+    },
+    "bookmarkedUsersEmpty": {
+      "message": "Użytkownicy oznaczeni w czacie YouTube pojawią się tutaj."
+    },
+    "markedUserDate": {
+      "message": "Oznaczono {date}"
+    },
+    "markedDateUnknown": {
+      "message": "Data nieznana"
+    },
+    "unknownStream": {
+      "message": "Nieznana transmisja"
+    },
+    "unknownUser": {
+      "message": "Nieznany użytkownik"
+    },
+    "openChannel": {
+      "message": "Otwórz kanał"
+    },
+    "unmarkUser": {
+      "message": "Usuń"
+    },
+    "markUser": {
+      "message": "Oznacz"
     }
   }
 }

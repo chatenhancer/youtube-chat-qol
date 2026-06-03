@@ -9,7 +9,7 @@ import { ytcqCreateElement } from '../shared/managed-dom';
 import { findChatInput, getChatInputText, replaceChatInput } from '../youtube/chat-input';
 import { PANEL_PAGES_SELECTOR } from '../youtube/selectors';
 import { hideEnhancedEffect } from './enhanced-effect';
-import { registerFeatureLifecycle } from '../content/lifecycle';
+import { registerFeatureLifecycle, suspendFeatures } from '../content/lifecycle';
 
 const ACTIVE_CHAT_PORT_NAME = 'ytcq:active-chat';
 const ACTIVE_CHAT_PING_TYPE = 'ytcq:active-chat-ping';
@@ -100,6 +100,7 @@ function scheduleActiveChatReconnect(): void {
 }
 
 function showReconnectNotice(): void {
+  suspendFeatures();
   hideEnhancedEffect();
   reconnectPending = true;
   if (reconnectNotice || document.visibilityState === 'hidden') return;

@@ -29,6 +29,8 @@
     "jumpToMessage": "Naar bericht springen",
     "keywordOrPhrase": "Trefwoord of zin",
     "lessThanOneMinute": "minder dan 1 min",
+    "markUser": "Markeren",
+    "unmarkUser": "Verwijderen",
     "mention": "Vermelden",
     "mentionUser": "Gebruiker vermelden",
     "mentionUserTitle": "Gebruiker vermelden. Alt/Option-klik om te citeren.",
@@ -155,20 +157,14 @@
     "extensionStatusActiveManyOther": {
       "message": "Actief in {count} andere tabbladen"
     },
-    "extensionStatusActiveHelper": {
-      "message": "De extensie draait in YouTube-livechat."
-    },
     "extensionStatusInactiveAll": {
       "message": "Niet actief in een open tabblad"
     },
-    "extensionStatusInactiveHelper": {
-      "message": "Open een YouTube-livechat om de extensie te laten draaien."
+    "extensionStatusConnected": {
+      "message": "Extensie verbonden met YouTube-livechat."
     },
-    "extensionStatusInactiveDisconnectedHelperOne": {
-      "message": "Vernieuw de geopende YouTube-livechat."
-    },
-    "extensionStatusInactiveDisconnectedHelperMany": {
-      "message": "Vernieuw de geopende YouTube-livechats."
+    "extensionStatusDisconnected": {
+      "message": "Extensie niet verbonden met YouTube-livechat."
     },
     "extensionShortName": {
       "message": "Chat Enhancer"
@@ -262,6 +258,48 @@
     },
     "popupResetComplete": {
       "message": "Chat Enhancer is gereset."
+    },
+    "settings": {
+      "message": "Instellingen"
+    },
+    "bookmarks": {
+      "message": "Bladwijzers"
+    },
+    "popupSections": {
+      "message": "Popupsecties"
+    },
+    "bookmarkedUsers": {
+      "message": "Gemarkeerde gebruikers"
+    },
+    "noBookmarkedUsers": {
+      "message": "Nog geen bladwijzers"
+    },
+    "bookmarkedUsersCount": {
+      "message": "{count} bladwijzers"
+    },
+    "bookmarkedUsersEmpty": {
+      "message": "Gebruikers die je markeert in YouTube-chat verschijnen hier."
+    },
+    "markedUserDate": {
+      "message": "Gemarkeerd op {date}"
+    },
+    "markedDateUnknown": {
+      "message": "Datum onbekend"
+    },
+    "unknownStream": {
+      "message": "Onbekende stream"
+    },
+    "unknownUser": {
+      "message": "Onbekende gebruiker"
+    },
+    "openChannel": {
+      "message": "Kanaal openen"
+    },
+    "unmarkUser": {
+      "message": "Verwijderen"
+    },
+    "markUser": {
+      "message": "Markeren"
     }
   }
 }

@@ -1,8 +1,8 @@
 /**
  * Known live-chat tab storage helpers.
  *
- * Normalizes the local tab registry used by the popup to distinguish inactive
- * chats from disconnected previously-known chat tabs.
+ * Normalizes the local tab registry used by the background action icon to keep
+ * recently known chat tabs visually inactive when content scripts disconnect.
  */
 export const KNOWN_CHAT_TABS_STORAGE_KEY = 'ytcqKnownChatTabs';
 export const KNOWN_CHAT_TAB_MAX_AGE_MS = 12 * 60 * 60 * 1000;
@@ -23,8 +23,4 @@ export function normalizeKnownChatTabs(value: unknown, now = Date.now()): KnownC
     records[String(tabId)] = lastSeen;
   }
   return records;
-}
-
-export function getFreshKnownChatTabIds(value: unknown, now = Date.now()): Set<number> {
-  return new Set(Object.keys(normalizeKnownChatTabs(value, now)).map(Number));
 }

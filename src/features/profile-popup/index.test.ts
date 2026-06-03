@@ -45,6 +45,15 @@ const replyMocks = vi.hoisted(() => ({
   mentionAuthorName: vi.fn()
 }));
 
+const markedUserMocks = vi.hoisted(() => ({
+  applyMarkedUserRing: vi.fn(),
+  createMarkedUserToggleButton: vi.fn(() => {
+    const button = document.createElement('button');
+    button.className = 'ytcq-marked-user-toggle';
+    return button;
+  })
+}));
+
 const queueMocks = vi.hoisted(() => {
   const close = vi.fn();
   const prioritize = vi.fn();
@@ -61,6 +70,7 @@ vi.mock('./messages', () => messageMocks);
 vi.mock('./positioning', () => positioningMocks);
 vi.mock('../channel-popup', () => channelMocks);
 vi.mock('../reply', () => replyMocks);
+vi.mock('../marked-users', () => markedUserMocks);
 vi.mock('../translation/queue', () => queueMocks);
 
 import {
@@ -70,6 +80,7 @@ import {
   wireParticipantProfileClick,
   wireProfileClick
 } from './index';
+import { suspendFeatures } from '../../content/lifecycle';
 
 describe('profile popup coordinator', () => {
   beforeEach(() => {
@@ -109,6 +120,15 @@ describe('profile popup coordinator', () => {
     expect(avatar.title).toBe('Show recent messages');
     expect(messageMocks.renderProfileMessages).toHaveBeenCalled();
     expect(positioningMocks.positionProfileCard).toHaveBeenCalledWith(card, avatar);
+    expect(markedUserMocks.applyMarkedUserRing).toHaveBeenCalledWith(
+      expect.any(HTMLElement),
+      {
+        authorName: '@ViewerOne',
+        avatarUrl: 'https://example.com/avatar.jpg',
+        channelId: 'viewer-channel'
+      }
+    );
+    expect(card.querySelector('.ytcq-marked-user-toggle')).not.toBeNull();
 
     card.querySelector<HTMLButtonElement>('.ytcq-profile-card-author')!.click();
     expect(replyMocks.mentionAuthorName).toHaveBeenCalledWith('@ViewerOne', {
@@ -207,12 +227,15 @@ describe('profile popup coordinator', () => {
     const message = createMessage();
     document.body.append(message);
     wireProfileClick(message);
-    message.querySelector<HTMLElement>('#author-photo')!.click();
+    const avatar = message.querySelector<HTMLElement>('#author-photo')!;
+    avatar.click();
 
     cleanupStaleProfilePopupSurfaces();
 
     expect(document.querySelector('.ytcq-profile-card')).toBeNull();
     expect(message.hasAttribute('data-ytcq-profile-wired')).toBe(false);
+    expect(avatar.classList.contains('ytcq-profile-enabled')).toBe(false);
+    expect(avatar.hasAttribute('title')).toBe(false);
   });
 
   it('closes from the header button, outside click, and Escape', async () => {
@@ -273,6 +296,18 @@ describe('profile popup coordinator', () => {
 
     profileTestState.recentMessages = [];
     expect(openProfileCardForIdentity({ authorName: '@ViewerOne' })).toBe(false);
+  });
+
+  it('ignores already-wired avatar clicks after features are suspended', () => {
+    const message = createMessage();
+    document.body.append(message);
+
+    wireProfileClick(message);
+    suspendFeatures();
+    message.querySelector<HTMLElement>('#author-photo')!.click();
+
+    expect(document.querySelector('.ytcq-profile-card')).toBeNull();
+    expect(sourceMocks.getMessageProfileSource).not.toHaveBeenCalled();
   });
 });
 

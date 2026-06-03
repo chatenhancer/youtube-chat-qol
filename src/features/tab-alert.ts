@@ -11,14 +11,11 @@ const TITLE_PREFIX_PATTERN = /^\((?:\d+|99\+)\)\s+/;
 const FAVICON_SELECTOR = 'link[rel~="icon"], link[rel~="shortcut"][rel~="icon"]';
 const ALERT_FAVICON_SIZES = ['32x32', '48x48', '96x96', '144x144'];
 
-let listenersAttached = false;
 let alertActive = false;
 let originalFaviconLinks: HTMLLinkElement[] = [];
+let alertListeners = new AbortController();
 
 export function initInboxTabAlert(): void {
-  if (listenersAttached) return;
-  listenersAttached = true;
-
   addClearListeners(document, window);
 
   const topDocument = getTopDocument();
@@ -59,6 +56,11 @@ export function clearInboxTabAlert(): void {
   originalFaviconLinks = [];
 }
 
+export function cleanupInboxTabAlertListeners(): void {
+  alertListeners.abort();
+  alertListeners = new AbortController();
+}
+
 export function isCurrentTabActive(): boolean {
   const topDocument = getTopDocument();
   if (!topDocument) {
@@ -69,10 +71,11 @@ export function isCurrentTabActive(): boolean {
 }
 
 function addClearListeners(targetDocument: Document, targetWindow: Window): void {
-  targetDocument.addEventListener('visibilitychange', clearAlertIfTabActive, true);
-  targetWindow.addEventListener('focus', clearAlertIfTabActive, true);
-  targetDocument.addEventListener('pointerdown', clearAlertIfTabActive, true);
-  targetDocument.addEventListener('keydown', clearAlertIfTabActive, true);
+  const options = { capture: true, signal: alertListeners.signal };
+  targetDocument.addEventListener('visibilitychange', clearAlertIfTabActive, options);
+  targetWindow.addEventListener('focus', clearAlertIfTabActive, options);
+  targetDocument.addEventListener('pointerdown', clearAlertIfTabActive, options);
+  targetDocument.addEventListener('keydown', clearAlertIfTabActive, options);
 }
 
 function clearAlertIfTabActive(): void {

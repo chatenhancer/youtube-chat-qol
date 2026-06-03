@@ -63,6 +63,11 @@ export function getAuthorNameElement(message: HTMLElement): HTMLElement | null {
   return message.querySelector<HTMLElement>('#author-name');
 }
 
+export function getAuthorChannelId(message: HTMLElement): string {
+  const data = getRendererData(message);
+  return cleanText(data?.authorExternalChannelId || data?.authorChannelId);
+}
+
 export function getMessageAvatarSrc(message: HTMLElement): string {
   const source = message.querySelector<HTMLImageElement>('#author-photo img, #author-photo #img, img#img');
   return source?.src || '';

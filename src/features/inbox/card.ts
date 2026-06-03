@@ -9,6 +9,7 @@ import { createCloseIcon } from '../../shared/icons';
 import { ytcqCreateElement } from '../../shared/managed-dom';
 import { captureScrollPosition, restoreScrollPositionAfterRender, scrollElementToBottom } from '../../shared/scroll';
 import { appendRichMessageText } from '../../youtube/rich-text';
+import { applyMarkedUserRing } from '../marked-users';
 import { createJumpToMessageIcon, jumpToChatMessage } from '../message-jump';
 import { mentionAuthorName, quoteAuthorRichText } from '../reply';
 import {
@@ -123,17 +124,17 @@ export function openInboxCardView(anchor: HTMLElement | undefined, callbacks: In
     if (!activeInboxCard) return;
     positionInboxCard(activeInboxCard, anchor);
   };
+  const cardListeners = new AbortController();
 
   activeInboxCardCleanup = () => {
-    document.removeEventListener('click', handleOutsideClick, true);
-    document.removeEventListener('keydown', handleKeydown, true);
-    window.removeEventListener('resize', handleResize, true);
+    cardListeners.abort();
   };
 
   window.setTimeout(() => {
-    document.addEventListener('click', handleOutsideClick, true);
-    document.addEventListener('keydown', handleKeydown, true);
-    window.addEventListener('resize', handleResize, true);
+    const options = { capture: true, signal: cardListeners.signal };
+    document.addEventListener('click', handleOutsideClick, options);
+    document.addEventListener('keydown', handleKeydown, options);
+    window.addEventListener('resize', handleResize, options);
   }, 0);
 }
 
@@ -195,6 +196,8 @@ function renderInboxList(list: HTMLElement): void {
     item.tabIndex = 0;
     wireQuoteCardItem(item, record);
 
+    const avatar = createInboxAvatar(record);
+    if (avatar) item.classList.add('ytcq-inbox-message-has-avatar');
     const timestamp = ytcqCreateElement('time');
     timestamp.className = 'ytcq-profile-card-message-time';
     timestamp.textContent = record.timestampText;
@@ -225,11 +228,30 @@ function renderInboxList(list: HTMLElement): void {
     highlightInboxMatches(text, record);
 
     body.append(author, spacer, text);
+    if (avatar) item.append(avatar);
     item.append(timestamp, body);
     const jumpButton = createInboxJumpButton(record);
     if (jumpButton) item.append(jumpButton);
     list.append(item);
   });
+}
+
+function createInboxAvatar(record: InboxRecord): HTMLElement | null {
+  if (!record.avatarSrc) return null;
+
+  const surface = ytcqCreateElement('span');
+  surface.className = 'ytcq-inbox-avatar';
+  const image = ytcqCreateElement('img');
+  image.src = record.avatarSrc;
+  image.alt = '';
+  image.referrerPolicy = 'no-referrer';
+  surface.append(image);
+  applyMarkedUserRing(surface, {
+    authorName: record.authorName,
+    avatarUrl: record.avatarSrc,
+    channelId: record.channelId
+  });
+  return surface;
 }
 
 function createCardCloseButton(): HTMLButtonElement {

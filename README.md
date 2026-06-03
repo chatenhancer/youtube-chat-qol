@@ -35,6 +35,7 @@ Not affiliated with YouTube or Google.
 - Alt/Option-click an author name to quote their message.
 - Use Focus mode to keep one conversation visible while you reply.
 - Recover unsent drafts after refreshing the same stream.
+- Mark users you want to recognize later with a colored avatar ring.
 - Click an avatar to see that user's recent messages and open their channel.
 
 ### <img src="assets/readme-icons/inbox.svg" alt="" width="20" height="20" align="absmiddle"> &nbsp;Inbox
@@ -51,7 +52,7 @@ Not affiliated with YouTube or Google.
 
 ### <img src="assets/readme-icons/popup-status.svg" alt="" width="20" height="20" align="absmiddle"> &nbsp;Popup and status
 
-- See whether the extension is active in the current tab or other open live chat tabs.
+- See whether the extension is active in this tab or other open live chat tabs.
 - Manage extension settings and clear local extension data from the popup.
 
 ### <img src="assets/readme-icons/privacy.svg" alt="" width="20" height="20" align="absmiddle"> &nbsp;Privacy
@@ -59,6 +60,7 @@ Not affiliated with YouTube or Google.
 - The extension does not replace YouTube chat.
 - The extension does not run analytics.
 - The extension does not send data to an extension-owned server.
+- Marked users are stored locally so avatar rings can appear across streams.
 - When a translation feature is enabled, incoming message text or draft text you choose to translate is sent to Google Translate so it can be translated.
 
 ## Screenshots

@@ -32,12 +32,13 @@ let restoreTimer = 0;
 let restoreAttempt = 0;
 let restoreFinished = false;
 let replacingDraft = false;
-let initialized = false;
+let chatInputDraftListeners = new AbortController();
 
 registerFeatureLifecycle({
   page: {
     init: initChatInputDrafts,
     boot: scheduleChatInputDraftRestore,
+    cleanupStale: cleanupStaleChatInputDrafts,
     reset: resetChatInputDrafts
   },
   mutation: {
@@ -50,12 +51,11 @@ registerFeatureLifecycle({
 });
 
 export function initChatInputDrafts(): void {
-  if (initialized) return;
-  initialized = true;
-  document.addEventListener('input', handleDocumentInput, true);
-  document.addEventListener('keydown', handleDocumentKeydown, true);
-  document.addEventListener('click', handleDocumentClick, true);
-  window.addEventListener('pagehide', flushChatInputDraftSave);
+  const options = { capture: true, signal: chatInputDraftListeners.signal };
+  document.addEventListener('input', handleDocumentInput, options);
+  document.addEventListener('keydown', handleDocumentKeydown, options);
+  document.addEventListener('click', handleDocumentClick, options);
+  window.addEventListener('pagehide', flushChatInputDraftSave, { signal: chatInputDraftListeners.signal });
 }
 
 export function resetChatInputDrafts(): void {
@@ -64,6 +64,12 @@ export function resetChatInputDrafts(): void {
   restoreAttempt = 0;
   restoreFinished = false;
   replacingDraft = false;
+}
+
+export function cleanupStaleChatInputDrafts(): void {
+  chatInputDraftListeners.abort();
+  chatInputDraftListeners = new AbortController();
+  resetChatInputDrafts();
 }
 
 export function scheduleChatInputDraftRestore(immediate = false): void {

@@ -15,6 +15,7 @@ interface MenuActionItemOptions {
   label: string;
   iconPath: string;
   iconViewBox?: string;
+  title?: string;
   onClick: () => void;
 }
 
@@ -22,6 +23,7 @@ interface PaperItemOptions {
   label: string;
   iconPath: string;
   iconViewBox?: string;
+  title?: string;
 }
 
 export function createMenuActionItem({
@@ -31,6 +33,7 @@ export function createMenuActionItem({
   label,
   iconPath,
   iconViewBox,
+  title,
   onClick
 }: MenuActionItemOptions): HTMLElement {
   const item = ytcqCreateElement('div');
@@ -42,7 +45,8 @@ export function createMenuActionItem({
   item.setAttribute('aria-selected', 'false');
   if (action) item.setAttribute('data-ytcq-action', action);
   if (setting) item.setAttribute('data-ytcq-setting', setting);
-  item.appendChild(createPaperItem({ label, iconPath, iconViewBox }));
+  if (title) item.title = title;
+  item.appendChild(createPaperItem({ label, iconPath, iconViewBox, title }));
   wireMenuItemClick(item, onClick);
   return item;
 }
@@ -75,12 +79,13 @@ export function createMenuToggleItem({
   return item;
 }
 
-export function createPaperItem({ label, iconPath, iconViewBox }: PaperItemOptions): HTMLElement {
+export function createPaperItem({ label, iconPath, iconViewBox, title }: PaperItemOptions): HTMLElement {
   const paperItem = ytcqCreateElement('div');
   paperItem.className = 'ytcq-paper-item';
   paperItem.setAttribute('role', 'option');
   paperItem.setAttribute('tabindex', '0');
   paperItem.setAttribute('aria-disabled', 'false');
+  if (title) paperItem.title = title;
 
   const icon = ytcqCreateElement('span');
   icon.className = 'ytcq-menu-icon';

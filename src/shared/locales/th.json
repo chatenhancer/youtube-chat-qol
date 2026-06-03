@@ -29,6 +29,8 @@
     "jumpToMessage": "ข้ามไปยังข้อความ",
     "keywordOrPhrase": "คำสำคัญหรือวลี",
     "lessThanOneMinute": "น้อยกว่า 1 นาที",
+    "markUser": "ทำเครื่องหมาย",
+    "unmarkUser": "ยกเลิก",
     "mention": "กล่าวถึง",
     "mentionUser": "กล่าวถึงผู้ใช้",
     "mentionUserTitle": "กล่าวถึงผู้ใช้ กด Alt/Option-click เพื่ออ้างอิง",
@@ -155,20 +157,14 @@
     "extensionStatusActiveManyOther": {
       "message": "ทำงานในอีก {count} แท็บ"
     },
-    "extensionStatusActiveHelper": {
-      "message": "ส่วนขยายกำลังทำงานในแชทสดของ YouTube"
-    },
     "extensionStatusInactiveAll": {
       "message": "ไม่ทำงานในแท็บที่เปิดอยู่ใดๆ"
     },
-    "extensionStatusInactiveHelper": {
-      "message": "เปิดแชทสดของ YouTube เพื่อให้ส่วนขยายทำงาน"
+    "extensionStatusConnected": {
+      "message": "ส่วนขยายเชื่อมต่อกับแชทสด YouTube แล้ว"
     },
-    "extensionStatusInactiveDisconnectedHelperOne": {
-      "message": "รีเฟรชแชทสด YouTube ที่เปิดอยู่"
-    },
-    "extensionStatusInactiveDisconnectedHelperMany": {
-      "message": "รีเฟรชแชทสด YouTube ที่เปิดอยู่"
+    "extensionStatusDisconnected": {
+      "message": "ส่วนขยายไม่ได้เชื่อมต่อกับแชทสด YouTube"
     },
     "extensionShortName": {
       "message": "Chat Enhancer"
@@ -262,6 +258,48 @@
     },
     "popupResetComplete": {
       "message": "รีเซ็ต Chat Enhancer แล้ว"
+    },
+    "settings": {
+      "message": "การตั้งค่า"
+    },
+    "bookmarks": {
+      "message": "บุ๊กมาร์ก"
+    },
+    "popupSections": {
+      "message": "ส่วนต่างๆ ของป๊อปอัป"
+    },
+    "bookmarkedUsers": {
+      "message": "ผู้ใช้ที่บุ๊กมาร์กไว้"
+    },
+    "noBookmarkedUsers": {
+      "message": "ยังไม่มีบุ๊กมาร์ก"
+    },
+    "bookmarkedUsersCount": {
+      "message": "{count} บุ๊กมาร์ก"
+    },
+    "bookmarkedUsersEmpty": {
+      "message": "ผู้ใช้ที่คุณทำเครื่องหมายจากแชท YouTube จะแสดงที่นี่"
+    },
+    "markedUserDate": {
+      "message": "ทำเครื่องหมายเมื่อ {date}"
+    },
+    "markedDateUnknown": {
+      "message": "ไม่ทราบวันที่"
+    },
+    "unknownStream": {
+      "message": "สตรีมไม่ทราบชื่อ"
+    },
+    "unknownUser": {
+      "message": "ผู้ใช้ไม่ทราบชื่อ"
+    },
+    "openChannel": {
+      "message": "เปิดช่อง"
+    },
+    "unmarkUser": {
+      "message": "ยกเลิก"
+    },
+    "markUser": {
+      "message": "ทำเครื่องหมาย"
     }
   }
 }

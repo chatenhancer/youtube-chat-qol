@@ -46,17 +46,17 @@ export function createCommandCards(): CommandCards {
     const handleResize = (): void => {
       if (activeCard) positionFloatingCardAboveInput(activeCard);
     };
+    const cardListeners = new AbortController();
 
     cleanup = () => {
-      document.removeEventListener('click', handleOutsideClick, true);
-      document.removeEventListener('keydown', handleKeydown, true);
-      window.removeEventListener('resize', handleResize, true);
+      cardListeners.abort();
     };
 
     window.setTimeout(() => {
-      document.addEventListener('click', handleOutsideClick, true);
-      document.addEventListener('keydown', handleKeydown, true);
-      window.addEventListener('resize', handleResize, true);
+      const options = { capture: true, signal: cardListeners.signal };
+      document.addEventListener('click', handleOutsideClick, options);
+      document.addEventListener('keydown', handleKeydown, options);
+      window.addEventListener('resize', handleResize, options);
     }, 0);
   };
 

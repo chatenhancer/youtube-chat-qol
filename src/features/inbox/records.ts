@@ -6,6 +6,8 @@
  */
 import {
   getAuthorName,
+  getAuthorChannelId,
+  getMessageAvatarSrc,
   getMessageContentSourceNodes,
   getMessageStableId,
   getMessageText,
@@ -39,6 +41,8 @@ export function createInboxRecord(
   return {
     id: `${timestamp}-${Math.random().toString(36).slice(2, 8)}`,
     authorName,
+    avatarSrc: getMessageAvatarSrc(message) || undefined,
+    channelId: getAuthorChannelId(message) || undefined,
     contentParts: serializeRichMessageNodes(getMessageContentSourceNodes(message)),
     matchedKeywords,
     messageRef: new WeakRef(message),
@@ -71,6 +75,8 @@ export function mergeInboxRecords(
   return {
     ...existing,
     contentParts: existing.contentParts.length ? existing.contentParts : incoming.contentParts,
+    avatarSrc: existing.avatarSrc || incoming.avatarSrc,
+    channelId: existing.channelId || incoming.channelId,
     matchedKeywords: nextKeywords,
     messageRef: getLiveMessage(incoming) ? incoming.messageRef : existing.messageRef,
     mention: nextMention,
@@ -82,6 +88,8 @@ export function mergeInboxRecords(
 
 export function recordsEqual(first: InboxRecord, second: InboxRecord): boolean {
   return first.read === second.read &&
+    first.avatarSrc === second.avatarSrc &&
+    first.channelId === second.channelId &&
     first.messageId === second.messageId &&
     first.mention === second.mention &&
     first.matchedKeywords.join('\n') === second.matchedKeywords.join('\n') &&

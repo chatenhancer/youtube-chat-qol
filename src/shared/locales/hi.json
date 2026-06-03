@@ -29,6 +29,8 @@
     "jumpToMessage": "मैसेज पर जाएं",
     "keywordOrPhrase": "कीवर्ड या वाक्यांश",
     "lessThanOneMinute": "1 मिनट से कम",
+    "markUser": "मार्क",
+    "unmarkUser": "हटाएं",
     "mention": "मेंशन",
     "mentionUser": "यूज़र को मेंशन करें",
     "mentionUserTitle": "यूज़र को मेंशन करें. कोट करने के लिए Alt/Option-क्लिक करें.",
@@ -156,20 +158,14 @@
     "extensionStatusActiveManyOther": {
       "message": "{count} अन्य टैब में सक्रिय"
     },
-    "extensionStatusActiveHelper": {
-      "message": "एक्सटेंशन YouTube लाइव चैट में चल रहा है."
-    },
     "extensionStatusInactiveAll": {
       "message": "किसी भी खुले टैब में सक्रिय नहीं"
     },
-    "extensionStatusInactiveHelper": {
-      "message": "एक्सटेंशन चलाने के लिए YouTube लाइव चैट खोलें."
+    "extensionStatusConnected": {
+      "message": "एक्सटेंशन YouTube लाइव चैट से कनेक्ट है."
     },
-    "extensionStatusInactiveDisconnectedHelperOne": {
-      "message": "खुले YouTube लाइव चैट को रीफ़्रेश करें."
-    },
-    "extensionStatusInactiveDisconnectedHelperMany": {
-      "message": "खुले YouTube लाइव चैट रीफ़्रेश करें."
+    "extensionStatusDisconnected": {
+      "message": "एक्सटेंशन YouTube लाइव चैट से कनेक्ट नहीं है."
     },
     "extensionShortName": {
       "message": "Chat Enhancer",
@@ -265,6 +261,48 @@
     },
     "popupResetComplete": {
       "message": "Chat Enhancer रीसेट हो गया है."
+    },
+    "settings": {
+      "message": "सेटिंग्स"
+    },
+    "bookmarks": {
+      "message": "बुकमार्क"
+    },
+    "popupSections": {
+      "message": "पॉपअप सेक्शन"
+    },
+    "bookmarkedUsers": {
+      "message": "बुकमार्क किए गए उपयोगकर्ता"
+    },
+    "noBookmarkedUsers": {
+      "message": "अभी कोई बुकमार्क नहीं"
+    },
+    "bookmarkedUsersCount": {
+      "message": "{count} बुकमार्क"
+    },
+    "bookmarkedUsersEmpty": {
+      "message": "YouTube चैट से जिन उपयोगकर्ताओं को आप मार्क करेंगे, वे यहां दिखेंगे."
+    },
+    "markedUserDate": {
+      "message": "{date} को मार्क किया गया"
+    },
+    "markedDateUnknown": {
+      "message": "तारीख अज्ञात"
+    },
+    "unknownStream": {
+      "message": "अज्ञात स्ट्रीम"
+    },
+    "unknownUser": {
+      "message": "अज्ञात उपयोगकर्ता"
+    },
+    "openChannel": {
+      "message": "चैनल खोलें"
+    },
+    "unmarkUser": {
+      "message": "हटाएं"
+    },
+    "markUser": {
+      "message": "मार्क"
     }
   }
 }

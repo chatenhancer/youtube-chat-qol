@@ -29,6 +29,8 @@
     "jumpToMessage": "Jump to message",
     "keywordOrPhrase": "Keyword or phrase",
     "lessThanOneMinute": "less than 1 min",
+    "markUser": "Mark",
+    "unmarkUser": "Unmark",
     "mention": "Mention",
     "mentionUser": "Mention user",
     "mentionUserTitle": "Mention user. Alt/Option-click to quote.",
@@ -156,20 +158,14 @@
     "extensionStatusActiveManyOther": {
       "message": "Active in {count} other tabs"
     },
-    "extensionStatusActiveHelper": {
-      "message": "Extension is running in YouTube live chat."
-    },
     "extensionStatusInactiveAll": {
       "message": "Not active in any open tab"
     },
-    "extensionStatusInactiveHelper": {
-      "message": "Open a YouTube live chat for the extension to run."
+    "extensionStatusConnected": {
+      "message": "Extension connected to YouTube live chat."
     },
-    "extensionStatusInactiveDisconnectedHelperOne": {
-      "message": "Refresh the open YouTube live chat."
-    },
-    "extensionStatusInactiveDisconnectedHelperMany": {
-      "message": "Refresh the open YouTube live chats."
+    "extensionStatusDisconnected": {
+      "message": "Extension not connected to YouTube live chat."
     },
     "extensionShortName": {
       "message": "Chat Enhancer",
@@ -265,6 +261,48 @@
     },
     "popupResetComplete": {
       "message": "Chat Enhancer has been reset."
+    },
+    "settings": {
+      "message": "Settings"
+    },
+    "bookmarks": {
+      "message": "Bookmarks"
+    },
+    "popupSections": {
+      "message": "Popup sections"
+    },
+    "bookmarkedUsers": {
+      "message": "Bookmarked users"
+    },
+    "noBookmarkedUsers": {
+      "message": "No bookmarks yet"
+    },
+    "bookmarkedUsersCount": {
+      "message": "{count} bookmarks"
+    },
+    "bookmarkedUsersEmpty": {
+      "message": "Users you mark from YouTube chat will appear here."
+    },
+    "markedUserDate": {
+      "message": "Marked {date}"
+    },
+    "markedDateUnknown": {
+      "message": "Date unknown"
+    },
+    "unknownStream": {
+      "message": "Unknown stream"
+    },
+    "unknownUser": {
+      "message": "Unknown user"
+    },
+    "openChannel": {
+      "message": "Open channel"
+    },
+    "unmarkUser": {
+      "message": "Unmark"
+    },
+    "markUser": {
+      "message": "Mark"
     }
   }
 }

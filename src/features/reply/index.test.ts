@@ -69,6 +69,7 @@ describe('reply feature entry points', () => {
     cleanupStaleReplyWiring();
 
     expect(message.hasAttribute('data-ytcq-author-mention-wired')).toBe(false);
+    expect(message.querySelector<HTMLElement>('#author-name')?.hasAttribute('title')).toBe(false);
   });
 
   it('mentions valid authors and reports unreadable names', () => {

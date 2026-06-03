@@ -29,6 +29,8 @@
     "jumpToMessage": "קפיצה להודעה",
     "keywordOrPhrase": "מילת מפתח או ביטוי",
     "lessThanOneMinute": "פחות מדקה",
+    "markUser": "סמן",
+    "unmarkUser": "בטל",
     "mention": "אזכור",
     "mentionUser": "אזכור משתמש",
     "mentionUserTitle": "אזכור משתמש. Alt/Option-קליק כדי לצטט.",
@@ -155,20 +157,14 @@
     "extensionStatusActiveManyOther": {
       "message": "פעיל בעוד {count} לשוניות"
     },
-    "extensionStatusActiveHelper": {
-      "message": "התוסף פועל בצ׳אט החי של YouTube."
-    },
     "extensionStatusInactiveAll": {
       "message": "לא פעיל באף לשונית פתוחה"
     },
-    "extensionStatusInactiveHelper": {
-      "message": "פתחו צ׳אט חי של YouTube כדי שהתוסף יפעל."
+    "extensionStatusConnected": {
+      "message": "התוסף מחובר לצ׳אט החי של YouTube."
     },
-    "extensionStatusInactiveDisconnectedHelperOne": {
-      "message": "רעננו את הצ׳אט החי הפתוח של YouTube."
-    },
-    "extensionStatusInactiveDisconnectedHelperMany": {
-      "message": "רעננו את הצ׳אטים החיים הפתוחים של YouTube."
+    "extensionStatusDisconnected": {
+      "message": "התוסף לא מחובר לצ׳אט החי של YouTube."
     },
     "extensionShortName": {
       "message": "Chat Enhancer"
@@ -262,6 +258,48 @@
     },
     "popupResetComplete": {
       "message": "Chat Enhancer אופס."
+    },
+    "settings": {
+      "message": "הגדרות"
+    },
+    "bookmarks": {
+      "message": "סימניות"
+    },
+    "popupSections": {
+      "message": "חלקי החלונית"
+    },
+    "bookmarkedUsers": {
+      "message": "משתמשים מסומנים"
+    },
+    "noBookmarkedUsers": {
+      "message": "אין סימניות עדיין"
+    },
+    "bookmarkedUsersCount": {
+      "message": "{count} סימניות"
+    },
+    "bookmarkedUsersEmpty": {
+      "message": "משתמשים שתסמנו מצ׳אט YouTube יופיעו כאן."
+    },
+    "markedUserDate": {
+      "message": "סומן ב-{date}"
+    },
+    "markedDateUnknown": {
+      "message": "תאריך לא ידוע"
+    },
+    "unknownStream": {
+      "message": "שידור לא ידוע"
+    },
+    "unknownUser": {
+      "message": "משתמש לא ידוע"
+    },
+    "openChannel": {
+      "message": "פתיחת ערוץ"
+    },
+    "unmarkUser": {
+      "message": "בטל"
+    },
+    "markUser": {
+      "message": "סמן"
     }
   }
 }

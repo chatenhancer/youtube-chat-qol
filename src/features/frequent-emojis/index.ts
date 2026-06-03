@@ -17,6 +17,7 @@ const EMOJI_USAGE_STORAGE_KEY = 'ytcqEmojiUsage';
 let emojiUsage: EmojiUsage[] = [];
 let emojiUsageSaveTimer = 0;
 let emojiPickerRefreshTimer = 0;
+let frequentEmojiListeners = new AbortController();
 
 registerFeatureLifecycle({
   page: {
@@ -28,7 +29,10 @@ registerFeatureLifecycle({
 });
 
 export function initFrequentEmojis(): void {
-  document.addEventListener('click', handleEmojiPickerClick, true);
+  document.addEventListener('click', handleEmojiPickerClick, {
+    capture: true,
+    signal: frequentEmojiListeners.signal
+  });
   chrome.storage.local.get({ [EMOJI_USAGE_STORAGE_KEY]: [] }, (stored) => {
     emojiUsage = normalizeEmojiUsage((stored || {})[EMOJI_USAGE_STORAGE_KEY]);
     refreshEmojiPickers();
@@ -50,6 +54,12 @@ export function resetFrequentEmojis(): void {
 }
 
 export function cleanupStaleFrequentEmojis(): void {
+  frequentEmojiListeners.abort();
+  frequentEmojiListeners = new AbortController();
+  window.clearTimeout(emojiUsageSaveTimer);
+  window.clearTimeout(emojiPickerRefreshTimer);
+  emojiUsageSaveTimer = 0;
+  emojiPickerRefreshTimer = 0;
   document.querySelectorAll('.ytcq-frequent-emoji-row').forEach((row) => row.remove());
 }
 

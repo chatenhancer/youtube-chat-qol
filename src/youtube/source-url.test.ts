@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import {
+  getCurrentYouTubeChatSourceTitle,
   getCurrentYouTubeChatSourceUrl,
   getYouTubeChatSourceStorageKey
 } from './source-url';
@@ -9,6 +10,7 @@ describe('YouTube chat source url helpers', () => {
 
   afterEach(() => {
     window.history.replaceState({}, '', '/');
+    document.title = '';
     Object.defineProperty(document, 'referrer', {
       configurable: true,
       value: originalReferrer
@@ -41,6 +43,18 @@ describe('YouTube chat source url helpers', () => {
     window.history.replaceState({}, '', '/channel/example?ignored=1');
 
     expect(getCurrentYouTubeChatSourceUrl()).toBe('http://localhost:3000/channel/example');
+  });
+
+  it('cleans the current YouTube stream title', () => {
+    document.title = '(3) Example Stream - YouTube';
+
+    expect(getCurrentYouTubeChatSourceTitle()).toBe('Example Stream');
+  });
+
+  it('ignores generic live chat titles', () => {
+    document.title = 'Live Chat - YouTube';
+
+    expect(getCurrentYouTubeChatSourceTitle()).toBe('');
   });
 
   it('creates stable per-video storage keys', () => {

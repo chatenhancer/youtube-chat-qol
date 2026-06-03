@@ -22,6 +22,7 @@ import {
 } from '../mention-detection';
 import { registerFeatureLifecycle } from '../../content/lifecycle';
 import {
+  cleanupInboxTabAlertListeners,
   clearInboxTabAlert,
   initInboxTabAlert,
   isCurrentTabActive,
@@ -204,6 +205,13 @@ export function resetInboxState(): void {
 export function cleanupStaleInboxSurfaces(): void {
   cleanupStaleInboxButtons();
   cleanupStaleInboxCards();
+  clearInboxTabAlert();
+  cleanupInboxTabAlertListeners();
+  document.querySelectorAll<HTMLElement>(CHAT_MESSAGE_SELECTOR).forEach((message) => {
+    clearChatKeywordHighlights(message);
+    delete message.dataset.ytcqInboxKeywordChecked;
+    delete message.dataset.ytcqInboxKeywordHighlightKey;
+  });
 }
 
 function resetInboxFeature(): void {

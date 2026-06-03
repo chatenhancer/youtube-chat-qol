@@ -80,6 +80,39 @@ describe('active chat keepalive', () => {
     expect(document.querySelector('.ytcq-reconnect-button')).not.toBeNull();
   });
 
+  it('suspends feature UI before showing the refresh button', async () => {
+    const staleFeatureUi = document.createElement('div');
+    staleFeatureUi.className = 'ytcq-stale-feature-ui';
+    document.body.append(staleFeatureUi);
+    const firstPort = createMockPort();
+    const connect = vi.fn()
+      .mockReturnValueOnce(firstPort as unknown as chrome.runtime.Port)
+      .mockImplementation(() => {
+        throw new Error('Extension context invalidated.');
+      });
+    chrome.runtime.connect = connect;
+    const lifecycle = await import('../content/lifecycle');
+    const messageHook = vi.fn();
+    lifecycle.registerFeatureLifecycle({
+      page: {
+        cleanupStale: () => staleFeatureUi.remove()
+      },
+      message: {
+        enhance: messageHook
+      }
+    });
+    const { startActiveChatKeepAlive } = await import('./active-chat-keepalive');
+
+    startActiveChatKeepAlive();
+    firstPort.disconnect();
+    await vi.advanceTimersByTimeAsync(250);
+    lifecycle.handleFeatureMessage(document.createElement('yt-live-chat-text-message-renderer'), { allowTranslate: true });
+
+    expect(document.querySelector('.ytcq-stale-feature-ui')).toBeNull();
+    expect(document.querySelector('.ytcq-reconnect-button')).not.toBeNull();
+    expect(messageHook).not.toHaveBeenCalled();
+  });
+
   it('hides the enhanced effect when the initial active chat connection fails', async () => {
     chrome.runtime.connect = vi.fn(() => {
       throw new Error('Extension context invalidated.');

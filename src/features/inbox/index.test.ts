@@ -67,6 +67,7 @@ const highlightMocks = vi.hoisted(() => ({
 }));
 
 const tabAlertMocks = vi.hoisted(() => ({
+  cleanupInboxTabAlertListeners: vi.fn(),
   clearInboxTabAlert: vi.fn(),
   initInboxTabAlert: vi.fn(),
   isCurrentTabActive: vi.fn(() => inboxTestState.currentTabActive),
@@ -409,8 +410,26 @@ describe('inbox coordinator', () => {
     expect(stateMocks.resetInboxStore).toHaveBeenCalled();
     expect(cardMocks.closeInboxCard).toHaveBeenCalled();
     expect(tabAlertMocks.clearInboxTabAlert).toHaveBeenCalled();
+    expect(tabAlertMocks.cleanupInboxTabAlertListeners).toHaveBeenCalled();
     expect(buttonMocks.cleanupStaleInboxButtons).toHaveBeenCalled();
     expect(cardMocks.cleanupStaleInboxCards).toHaveBeenCalled();
+  });
+
+  it('cleans visible inbox highlights and tab alert state from stale pages', () => {
+    const message = createMessage('@ViewerOne', 'hello alpha');
+    message.dataset.ytcqInboxKeywordChecked = 'true';
+    message.dataset.ytcqInboxKeywordHighlightKey = 'alpha';
+    document.body.append(message);
+
+    cleanupStaleInboxSurfaces();
+
+    expect(buttonMocks.cleanupStaleInboxButtons).toHaveBeenCalled();
+    expect(cardMocks.cleanupStaleInboxCards).toHaveBeenCalled();
+    expect(tabAlertMocks.clearInboxTabAlert).toHaveBeenCalled();
+    expect(tabAlertMocks.cleanupInboxTabAlertListeners).toHaveBeenCalled();
+    expect(highlightMocks.clearChatKeywordHighlights).toHaveBeenCalledWith(message);
+    expect(message.dataset.ytcqInboxKeywordChecked).toBeUndefined();
+    expect(message.dataset.ytcqInboxKeywordHighlightKey).toBeUndefined();
   });
 
   it('ignores observer feedback from active keyword highlighting', () => {

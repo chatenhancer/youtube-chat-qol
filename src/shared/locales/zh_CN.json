@@ -29,6 +29,8 @@
     "jumpToMessage": "跳到消息",
     "keywordOrPhrase": "关键词或短语",
     "lessThanOneMinute": "少于 1 分钟",
+    "markUser": "标记",
+    "unmarkUser": "取消",
     "mention": "提及",
     "mentionUser": "提及用户",
     "mentionUserTitle": "提及用户。Alt/Option 点击可引用。",
@@ -156,20 +158,14 @@
     "extensionStatusActiveManyOther": {
       "message": "已在另外 {count} 个标签页中启用"
     },
-    "extensionStatusActiveHelper": {
-      "message": "扩展程序正在 YouTube 实时聊天中运行。"
-    },
     "extensionStatusInactiveAll": {
       "message": "未在任何打开的标签页中启用"
     },
-    "extensionStatusInactiveHelper": {
-      "message": "打开 YouTube 实时聊天以运行扩展程序。"
+    "extensionStatusConnected": {
+      "message": "扩展程序已连接到 YouTube 直播聊天。"
     },
-    "extensionStatusInactiveDisconnectedHelperOne": {
-      "message": "刷新已打开的 YouTube 直播聊天。"
-    },
-    "extensionStatusInactiveDisconnectedHelperMany": {
-      "message": "刷新已打开的 YouTube 直播聊天。"
+    "extensionStatusDisconnected": {
+      "message": "扩展程序未连接到 YouTube 直播聊天。"
     },
     "extensionShortName": {
       "message": "Chat Enhancer",
@@ -265,6 +261,48 @@
     },
     "popupResetComplete": {
       "message": "Chat Enhancer 已重置。"
+    },
+    "settings": {
+      "message": "设置"
+    },
+    "bookmarks": {
+      "message": "书签"
+    },
+    "popupSections": {
+      "message": "弹出窗口分区"
+    },
+    "bookmarkedUsers": {
+      "message": "已标记的用户"
+    },
+    "noBookmarkedUsers": {
+      "message": "还没有书签"
+    },
+    "bookmarkedUsersCount": {
+      "message": "{count} 个书签"
+    },
+    "bookmarkedUsersEmpty": {
+      "message": "你在 YouTube 聊天中标记的用户会显示在这里。"
+    },
+    "markedUserDate": {
+      "message": "标记于 {date}"
+    },
+    "markedDateUnknown": {
+      "message": "日期未知"
+    },
+    "unknownStream": {
+      "message": "未知直播"
+    },
+    "unknownUser": {
+      "message": "未知用户"
+    },
+    "openChannel": {
+      "message": "打开频道"
+    },
+    "unmarkUser": {
+      "message": "取消"
+    },
+    "markUser": {
+      "message": "标记"
     }
   }
 }

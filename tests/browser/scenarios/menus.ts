@@ -50,12 +50,17 @@ async function expectSettingsMenuControlsInjected(menu: Locator): Promise<void> 
 }
 
 async function expectMessageMenuActionsInjected(menu: Locator): Promise<void> {
-  await test.step('Verify Quote action is injected', async () => {
-    await expect(menu.locator('.ytcq-context-item[data-ytcq-action="quote"]').filter({ hasText: 'Quote' })).toBeVisible();
+  await test.step('Verify Mark action is injected', async () => {
+    const markAction = menu.locator('.ytcq-context-item[data-ytcq-action="mark-user"]').first();
+    await expect(markAction).toBeVisible();
+    await expect(markAction.locator('.ytcq-menu-label')).toHaveText(/^(Mark|Unmark)$/);
   });
 
-  await test.step('Verify Mention action is injected', async () => {
-    await expect(menu.locator('.ytcq-context-item[data-ytcq-action="mention"]').filter({ hasText: 'Mention' })).toBeVisible();
+  await test.step('Verify split Quote and Mention actions are injected', async () => {
+    const splitActions = menu.locator('.ytcq-context-item[data-ytcq-action="reply-actions"]').first();
+    await expect(splitActions).toBeVisible();
+    await expect(splitActions.locator('.ytcq-context-split-button[data-ytcq-action="quote"]')).toBeVisible();
+    await expect(splitActions.locator('.ytcq-context-split-button[data-ytcq-action="mention"]')).toBeVisible();
   });
 }
 
