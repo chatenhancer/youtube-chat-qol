@@ -35,7 +35,7 @@ Not affiliated with YouTube or Google.
 - Alt/Option-click an author name to quote their message.
 - Use Focus mode to keep one conversation visible while you reply.
 - Recover unsent drafts after refreshing the same stream.
-- Mark users you want to recognize later with a colored avatar ring.
+- Mark users you want to recognize with a colored avatar ring.
 - Click an avatar to see that user's recent messages and open their channel.
 
 ### <img src="assets/readme-icons/inbox.svg" alt="" width="20" height="20" align="absmiddle"> &nbsp;Inbox
