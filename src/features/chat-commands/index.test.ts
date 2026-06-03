@@ -290,6 +290,38 @@ describe('chat commands entrypoint', () => {
     expect(toastMocks.showToast).not.toHaveBeenCalled();
   });
 
+  it('ignores prevented and non-send clicks before reading command text', () => {
+    initChatCommands(vi.fn());
+    chatState.text = '/help';
+    const prevented = mouseEvent('click');
+    prevented.preventDefault();
+
+    dispatchDocumentEvent('click', prevented, document.createElement('button'));
+    dispatchDocumentEvent('click', mouseEvent('click'), document.body);
+
+    expect(toastMocks.showToast).not.toHaveBeenCalled();
+    expect(cardsMocks.showHelp).not.toHaveBeenCalled();
+  });
+
+  it('handles nested send-button clicks and escaped slash confirmation', () => {
+    initChatCommands(vi.fn());
+    const sendButton = document.createElement('button');
+    sendButton.id = 'send-button';
+    const icon = document.createElement('span');
+    sendButton.append(icon);
+    document.body.append(sendButton);
+    chatState.text = '//again';
+
+    const firstClick = mouseEvent('click');
+    dispatchDocumentEvent('click', firstClick, icon);
+    expect(firstClick.defaultPrevented).toBe(true);
+    expect(chatState.text).toBe('/again');
+
+    const secondClick = mouseEvent('click');
+    dispatchDocumentEvent('click', secondClick, icon);
+    expect(secondClick.defaultPrevented).toBe(false);
+  });
+
   it('remembers ordinary send-button text for repeat commands', () => {
     initChatCommands(vi.fn());
     const sendButton = document.createElement('button');
@@ -305,6 +337,24 @@ describe('chat commands entrypoint', () => {
       childNodes: [],
       text: 'ordinary message'
     });
+  });
+
+  it('does not remember blank sends or sends without a chat input snapshot', () => {
+    initChatCommands(vi.fn());
+    chatState.text = 'remember me';
+    chatInputMocks.getChatInputSnapshot.mockReturnValueOnce(null);
+    dispatchDocumentEvent('keydown', keydown('Enter'));
+    chatState.text = '/again';
+    dispatchDocumentEvent('keydown', keydown('Tab'));
+    expect(toastMocks.showToast).toHaveBeenCalledWith('No previous message yet.');
+
+    resetChatCommandsState();
+    toastMocks.showToast.mockClear();
+    chatState.text = '   ';
+    dispatchDocumentEvent('keydown', keydown('Enter'));
+    chatState.text = '/again';
+    dispatchDocumentEvent('keydown', keydown('Tab'));
+    expect(toastMocks.showToast).toHaveBeenCalledWith('No previous message yet.');
   });
 
   it('reports chat input active state through the autocomplete runtime options', () => {
@@ -324,11 +374,22 @@ describe('chat commands entrypoint', () => {
     initChatCommands(vi.fn());
 
     dispatchDocumentEvent('input', new InputEvent('input', { bubbles: true }));
+    dispatchDocumentEvent('input', new InputEvent('input', { bubbles: true }), document.body);
     dispatchDocumentEvent('selectionchange', new Event('selectionchange'));
     dispatchDocumentEvent('mousedown', mouseEvent('mousedown'));
 
     expect(autocompleteMocks.scheduleUpdate).toHaveBeenCalledTimes(2);
     expect(autocompleteMocks.handlePointerDown).toHaveBeenCalledOnce();
+  });
+
+  it('accepts chat input events from descendants of the input', () => {
+    initChatCommands(vi.fn());
+    const child = document.createElement('span');
+    chatState.input?.append(child);
+
+    dispatchDocumentEvent('input', new InputEvent('input', { bubbles: true }), child);
+
+    expect(autocompleteMocks.scheduleUpdate).toHaveBeenCalledOnce();
   });
 
   it('shows useful runtime errors when command replacement helpers cannot write', () => {

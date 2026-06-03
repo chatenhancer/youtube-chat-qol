@@ -178,6 +178,27 @@ describe('translation protected placeholders', () => {
     expect(plan.protectedTokens[0].fallbackText).toBe(':wave:');
   });
 
+  it('keeps renderer whitespace outside emoji runs when the run is interrupted', () => {
+    const message = document.createElement('yt-live-chat-text-message-renderer') as HTMLElement & {
+      data?: unknown;
+    };
+    message.data = {
+      message: {
+        runs: [
+          { emoji: { shortcuts: [':wave:'] } },
+          { text: '   ' },
+          {},
+          { emoji: { shortcuts: [':sparkles:'] } }
+        ]
+      }
+    };
+
+    const plan = createTranslationPlan(message, ':wave:   :sparkles:');
+
+    expect(plan.text).toBe('§0§ §1§');
+    expect(plan.protectedTokens.map((token) => token.fallbackText)).toEqual([':wave:', ':sparkles:']);
+  });
+
   it('falls back to original text when no DOM nodes or renderer runs are available', () => {
     const message = document.createElement('yt-live-chat-text-message-renderer');
 
@@ -192,6 +213,26 @@ describe('translation protected placeholders', () => {
 
     expect(plan.text).toBe('hello §0§');
     expect(plan.protectedTokens[0].fallbackText).toBe('@ExampleUser');
+  });
+
+  it('protects emoji-like elements by id or class and ignores non-element nodes', () => {
+    const classEmoji = document.createElement('span');
+    classEmoji.className = 'custom-emoji-sprite';
+    classEmoji.textContent = 'plain-custom-emoji';
+    const idEmoji = document.createElement('span');
+    idEmoji.id = 'emoji-renderer';
+    idEmoji.textContent = 'plain-id-emoji';
+    const comment = document.createComment('ignored comment');
+
+    const plan = createTranslationPlanFromNodes([
+      document.createTextNode('hello '),
+      comment,
+      classEmoji,
+      idEmoji
+    ], '');
+
+    expect(plan.text).toBe('hello §0§');
+    expect(plan.protectedTokens[0].fallbackText).toBe('plain-custom-emojiplain-id-emoji');
   });
 
   it('protects emoji-like DOM leaves and ignores replacement icons and menu text', () => {
@@ -247,6 +288,55 @@ describe('translation protected placeholders', () => {
     expect(plan.protectedTokens[0].fallbackText).toBe(':id-emoji::child-image::title-only:');
   });
 
+  it('uses child-image wrapper detection when wrapper text is empty', () => {
+    const wrapper = document.createElement('span');
+    const image = document.createElement('img');
+    image.alt = ':wrapped-only:';
+    wrapper.append(image);
+
+    const plan = createTranslationPlanFromNodes([wrapper], '');
+
+    expect(plan.text).toBe('§0§');
+    expect(plan.protectedTokens[0].fallbackText).toBe(':wrapped-only:');
+  });
+
+  it('does not treat child-image wrappers with visible text as one emoji', () => {
+    const wrapper = document.createElement('span');
+    const image = document.createElement('img');
+    image.alt = 'wrapped image';
+    wrapper.append(image, ' visible label');
+
+    const plan = createTranslationPlanFromNodes([wrapper], '');
+
+    expect(plan.text).toBe('§0§ visible label');
+    expect(plan.protectedTokens[0].fallbackText).toBe('wrapped image');
+  });
+
+  it('protects nested emoji leaves through the single-node token path', () => {
+    const wrapper = document.createElement('span');
+    const nested = document.createElement('span');
+    nested.setAttribute('role', 'img');
+    nested.setAttribute('aria-label', ':nested:');
+    wrapper.append('hello ', nested);
+
+    const plan = createTranslationPlanFromNodes([wrapper], '');
+    const restored = createNodesWithPlaceholders(plan.text, plan.protectedTokens);
+
+    expect(plan.text).toBe('hello §0§');
+    expect(restored.at(-1)).toBeInstanceOf(HTMLSpanElement);
+  });
+
+  it('allows blank emoji fallback text without throwing', () => {
+    const blankEmoji = document.createElement('span');
+    blankEmoji.setAttribute('role', 'img');
+
+    const plan = createTranslationPlanFromNodes([blankEmoji], '');
+
+    expect(plan.text).toBe('§0§');
+    expect(plan.protectedTokens[0].fallbackText).toBe('');
+    expect(restorePlaceholdersToText(plan.text, plan.protectedTokens)).toBe('');
+  });
+
   it('ignores connected elements hidden by CSS while preserving visible siblings', () => {
     const visible = document.createElement('span');
     visible.textContent = 'visible';
@@ -275,6 +365,18 @@ describe('translation protected placeholders', () => {
     expect(restorePlaceholdersToText('hello § 0 §', clones)).toBe('hello :wave:');
   });
 
+  it('restores protected DOM nodes in placeholder positions', () => {
+    const emoji = document.createElement('img');
+    emoji.alt = ':wave:';
+    const plan = createTranslationPlanFromNodes([emoji], '');
+
+    const restoredNodes = createNodesWithPlaceholders('Hola §0§', plan.protectedTokens);
+
+    expect(restoredNodes.at(-1)).toBeInstanceOf(HTMLImageElement);
+    expect(restoredNodes.at(-1)).not.toBe(emoji);
+    expect(getPlainTextFromMessageNodes(restoredNodes)).toBe('Hola :wave:');
+  });
+
   it('returns plain text nodes when there are no placeholder matches', () => {
     const nodes = createNodesWithPlaceholders('plain text', []);
 
@@ -285,9 +387,11 @@ describe('translation protected placeholders', () => {
 
   it('handles nullish and empty placeholder restore inputs', () => {
     const emptyNodes = createNodesWithPlaceholders('', []);
+    const nullOriginal = createTranslationPlanFromNodes([], null as unknown as string);
 
     expect(emptyNodes).toHaveLength(1);
     expect(emptyNodes[0].textContent).toBe('');
+    expect(nullOriginal.text).toBe('');
     expect(hasTextOutsidePlaceholders(null as unknown as string)).toBe(false);
     expect(restorePlaceholdersToText(null as unknown as string, [])).toBe('');
   });
@@ -308,9 +412,26 @@ describe('translation protected placeholders', () => {
       placeholder: '§0§'
     }]);
     const restoredMissingToken = createNodesWithPlaceholders('Hola §3§', []);
+    const restoredUndefinedToken = createNodesWithPlaceholders('Hola', [undefined as never]);
+    const restoredAfterElement = createNodesWithPlaceholders('Hola §0§', [
+      {
+        fallbackText: '@FirstUser',
+        node,
+        nodes: [],
+        placeholder: '§0§'
+      },
+      {
+        fallbackText: '@SecondUser',
+        node: null,
+        nodes: [],
+        placeholder: '§1§'
+      }
+    ]);
 
     expect(getPlainTextFromMessageNodes(restoredWithNode)).toBe('Hola @NodeUser');
     expect(getPlainTextFromMessageNodes(restoredWithFallback)).toBe('Hola @FallbackUser');
     expect(getPlainTextFromMessageNodes(restoredMissingToken)).toBe('Hola ');
+    expect(getPlainTextFromMessageNodes(restoredUndefinedToken)).toBe('Hola');
+    expect(getPlainTextFromMessageNodes(restoredAfterElement)).toBe('Hola @NodeUser@SecondUser');
   });
 });

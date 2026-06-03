@@ -44,6 +44,15 @@ describe('YouTube chat input adapter', () => {
     expect(findChatInput()).toBe(visible);
   });
 
+  it('ignores matching non-HTMLElement contenteditable candidates', () => {
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('contenteditable', 'true');
+    const visible = createContentEditable();
+    document.body.append(svg, visible);
+
+    expect(findChatInput()).toBe(visible);
+  });
+
   it('returns empty/null values when no chat input is visible', () => {
     expect(findChatInput()).toBeNull();
     expect(getChatInputSnapshot()).toBeNull();
@@ -155,6 +164,29 @@ describe('YouTube chat input adapter', () => {
       selectionStart: 2,
       text: 'hello world'
     });
+  });
+
+  it('falls back to textarea length when selection offsets are unavailable', () => {
+    const textarea = createTextArea('hello');
+    document.body.append(textarea);
+    Object.defineProperty(textarea, 'selectionStart', {
+      configurable: true,
+      get: () => null,
+      set: () => undefined
+    });
+    Object.defineProperty(textarea, 'selectionEnd', {
+      configurable: true,
+      get: () => null,
+      set: () => undefined
+    });
+
+    expect(getChatInputTextSelection()).toEqual({
+      selectionEnd: 5,
+      selectionStart: 5,
+      text: 'hello'
+    });
+    expect(insertIntoChatInput(' world')).toBe(true);
+    expect(textarea.value).toBe('hello world');
   });
 
   it('inserts and replaces textarea text with selection preservation', () => {
@@ -270,6 +302,24 @@ describe('YouTube chat input adapter', () => {
     expect(input.textContent).toContain('tail');
   });
 
+  it('inserts nodes into the current contenteditable selection', () => {
+    const input = createContentEditable();
+    input.append('hello world');
+    document.body.append(input);
+    input.focus();
+    const range = document.createRange();
+    range.setStart(input.firstChild!, 6);
+    range.setEnd(input.firstChild!, 11);
+    document.getSelection()?.removeAllRanges();
+    document.getSelection()?.addRange(range);
+
+    const strong = document.createElement('strong');
+    strong.textContent = 'chat';
+    expect(insertNodeIntoChatInput(strong, 'chat')).toBe(true);
+
+    expect(input.textContent).toBe('hello chat');
+  });
+
   it('replaces contenteditable text ranges and inserts node groups', () => {
     const input = createContentEditable();
     input.append('hello world');
@@ -310,6 +360,18 @@ describe('YouTube chat input adapter', () => {
     expect(replaceChatInputTextRange(2, 12, 'X')).toBe(true);
 
     expect(getChatInputText()).toBe('alXamma');
+  });
+
+  it('replaces ranges around plain-text leaf nodes by plain-text offsets', () => {
+    const input = createContentEditable();
+    const image = document.createElement('img');
+    image.alt = ':wave:';
+    input.append('hello ', image, ' world');
+    document.body.append(input);
+
+    expect(replaceChatInputTextRange(6, 12, 'emoji')).toBe(true);
+
+    expect(getChatInputText()).toBe('hello emoji world');
   });
 
   it('falls back when contenteditable execCommand insertion fails', () => {
@@ -406,6 +468,16 @@ describe('YouTube chat input adapter', () => {
 
     expect(getChatInputText()).toBe('hello\n:party::sparkles::text-emoji:');
     expect(getChatInputNodesText(Array.from(input.childNodes))).toBe('hello\n:party::sparkles::text-emoji:');
+  });
+
+  it('reads comments and non-HTMLElement nodes without treating them as hidden UI', () => {
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.textContent = 'svg text';
+    expect(getChatInputNodesText([
+      document.createTextNode('hello'),
+      document.createComment('ignored'),
+      svg
+    ])).toBe('hellosvg text');
   });
 
   it('clicks the visible participant back button before insertion recovery', () => {

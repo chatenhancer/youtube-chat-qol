@@ -62,6 +62,17 @@ describe('active chat keepalive', () => {
     expect(document.querySelector('.ytcq-reconnect-button')).toBeNull();
   });
 
+  it('does not open duplicate active chat ports when started repeatedly', async () => {
+    const connect = vi.fn(() => createMockPort() as unknown as chrome.runtime.Port);
+    chrome.runtime.connect = connect;
+    const { startActiveChatKeepAlive } = await import('./active-chat-keepalive');
+
+    startActiveChatKeepAlive();
+    startActiveChatKeepAlive();
+
+    expect(connect).toHaveBeenCalledOnce();
+  });
+
   it('shows the refresh button when reconnecting fails after a disconnect', async () => {
     const firstPort = createMockPort();
     const connect = vi.fn()
@@ -78,6 +89,60 @@ describe('active chat keepalive', () => {
 
     expect(connect).toHaveBeenCalledTimes(2);
     expect(document.querySelector('.ytcq-reconnect-button')).not.toBeNull();
+  });
+
+  it('anchors the refresh button above YouTube panel pages when they exist', async () => {
+    const panelParent = document.createElement('div');
+    const panelPages = document.createElement('tp-yt-iron-pages');
+    panelPages.id = 'panel-pages';
+    panelParent.append(panelPages);
+    document.body.append(panelParent);
+    const firstPort = createMockPort();
+    chrome.runtime.connect = vi.fn()
+      .mockReturnValueOnce(firstPort as unknown as chrome.runtime.Port)
+      .mockImplementation(() => {
+        throw new Error('Extension context invalidated.');
+      });
+    const { startActiveChatKeepAlive } = await import('./active-chat-keepalive');
+
+    startActiveChatKeepAlive();
+    firstPort.disconnect();
+    await vi.advanceTimersByTimeAsync(250);
+
+    const anchor = document.querySelector('.ytcq-reconnect-anchor');
+    expect(anchor?.parentElement).toBe(panelParent);
+    expect(panelParent.firstElementChild).toBe(anchor);
+  });
+
+  it('does not start another reconnect timer while one is pending', async () => {
+    const firstPort = createMockPort();
+    const connect = vi.fn()
+      .mockReturnValueOnce(firstPort as unknown as chrome.runtime.Port)
+      .mockImplementation(() => {
+        throw new Error('Extension context invalidated.');
+      });
+    chrome.runtime.connect = connect;
+    const { startActiveChatKeepAlive } = await import('./active-chat-keepalive');
+
+    startActiveChatKeepAlive();
+    firstPort.disconnect();
+    firstPort.disconnect();
+    await vi.advanceTimersByTimeAsync(250);
+
+    expect(connect).toHaveBeenCalledTimes(2);
+  });
+
+  it('ignores visibility changes when no reconnect is pending', async () => {
+    chrome.runtime.connect = vi.fn(() => createMockPort() as unknown as chrome.runtime.Port);
+    const { handleFeatureVisibilityChanged } = await import('../content/lifecycle');
+    const { startActiveChatKeepAlive } = await import('./active-chat-keepalive');
+
+    startActiveChatKeepAlive();
+    handleFeatureVisibilityChanged('visible');
+    await vi.advanceTimersByTimeAsync(250);
+
+    expect(chrome.runtime.connect).toHaveBeenCalledOnce();
+    expect(document.querySelector('.ytcq-reconnect-button')).toBeNull();
   });
 
   it('suspends feature UI before showing the refresh button', async () => {
@@ -207,6 +272,23 @@ describe('active chat keepalive', () => {
     expect(chatInputMocks.replaceChatInput).toHaveBeenCalledWith('late draft');
   });
 
+  it('stops retrying reconnect draft restore after the capped attempts are exhausted', async () => {
+    window.sessionStorage.setItem('ytcqReconnectDraft', JSON.stringify({
+      text: 'busy draft',
+      url: location.href
+    }));
+    chatInputMocks.input = document.createElement('div');
+    chatInputMocks.text = 'existing draft';
+    chrome.runtime.connect = vi.fn(() => createMockPort() as unknown as chrome.runtime.Port);
+    const { startActiveChatKeepAlive } = await import('./active-chat-keepalive');
+
+    startActiveChatKeepAlive();
+    await vi.advanceTimersByTimeAsync(10_000);
+
+    expect(chatInputMocks.replaceChatInput).not.toHaveBeenCalled();
+    expect(window.sessionStorage.getItem('ytcqReconnectDraft')).toContain('busy draft');
+  });
+
   it('drops invalid reconnect drafts and cleans stale reconnect notices', async () => {
     window.sessionStorage.setItem('ytcqReconnectDraft', '{bad json');
     const firstPort = createMockPort();
@@ -225,6 +307,30 @@ describe('active chat keepalive', () => {
 
     cleanupStaleReconnectNotice();
     expect(document.querySelector('.ytcq-reconnect-anchor')).toBeNull();
+  });
+
+  it('ignores malformed reconnect draft shapes without throwing', async () => {
+    window.sessionStorage.setItem('ytcqReconnectDraft', JSON.stringify({
+      text: 123,
+      url: null
+    }));
+    chrome.runtime.connect = vi.fn(() => createMockPort() as unknown as chrome.runtime.Port);
+    const { startActiveChatKeepAlive } = await import('./active-chat-keepalive');
+
+    expect(() => startActiveChatKeepAlive()).not.toThrow();
+    expect(chatInputMocks.replaceChatInput).not.toHaveBeenCalled();
+  });
+
+  it('continues when session storage cannot be read during draft restore', async () => {
+    const getItemSpy = vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
+      throw new Error('storage blocked');
+    });
+    chrome.runtime.connect = vi.fn(() => createMockPort() as unknown as chrome.runtime.Port);
+    const { startActiveChatKeepAlive } = await import('./active-chat-keepalive');
+
+    expect(() => startActiveChatKeepAlive()).not.toThrow();
+    expect(chatInputMocks.replaceChatInput).not.toHaveBeenCalled();
+    getItemSpy.mockRestore();
   });
 });
 

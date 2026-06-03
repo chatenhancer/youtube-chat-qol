@@ -1,7 +1,8 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   addInboxKeywordsToState,
   clearInboxRecords,
+  getMatchedMentionHandles,
   getInboxKeywordsSnapshot,
   getInboxRecordsSnapshot,
   getInboxKeywords,
@@ -16,6 +17,8 @@ import {
   markInboxRecordsRead,
   removeInboxKeywordsFromState,
   resetInboxStore,
+  saveInboxKeywords,
+  saveInboxRecords,
   upsertInboxRecord
 } from './state';
 import type { InboxRecord } from './types';
@@ -136,6 +139,29 @@ describe('inbox state store', () => {
     expect(getInboxRecordsSnapshot()).toHaveLength(1);
   });
 
+  it('reports transient-only updates when a matching record gets a fresher live element', () => {
+    const firstMessage = document.createElement('yt-live-chat-text-message-renderer');
+    const secondMessage = document.createElement('yt-live-chat-text-message-renderer');
+    document.body.append(firstMessage, secondMessage);
+    upsertInboxRecord(record({
+      messageId: 'message-1',
+      messageRef: new WeakRef(firstMessage),
+      read: true
+    }), true);
+
+    const result = upsertInboxRecord(record({
+      messageId: 'message-1',
+      messageRef: new WeakRef(secondMessage),
+      read: true
+    }), true);
+
+    expect(result).toEqual({
+      changed: false,
+      transientChanged: true
+    });
+    expect(getLiveInboxMessage(getInboxRecordsSnapshot()[0])).toBe(secondMessage);
+  });
+
   it('returns latest inbox and mention records for commands', async () => {
     upsertInboxRecord(record({ authorName: '@KeywordUser', mention: false, timestamp: 1, text: 'keyword' }), false);
     upsertInboxRecord(record({ authorName: '@MentionUser', mention: true, timestamp: 2, text: 'mention' }), false);
@@ -160,6 +186,38 @@ describe('inbox state store', () => {
     expect(getInboxKeywordsSnapshot()).toEqual(['launch']);
   });
 
+  it('saves loaded inbox records and keywords through the storage adapter', async () => {
+    const recordsStorageKey = await getCurrentInboxRecordsStorageKey();
+    addInboxKeywordsToState(['launch']);
+    upsertInboxRecord(record({
+      contentParts: [{ type: 'text', text: 'hello' }],
+      id: 'saved-record',
+      messageId: 'message-1'
+    }), false);
+
+    await saveInboxKeywords();
+    await saveInboxRecords();
+
+    await expect(chrome.storage.local.get(['ytcqInboxKeywords', recordsStorageKey]))
+      .resolves.toMatchObject({
+        ytcqInboxKeywords: ['launch'],
+        [recordsStorageKey]: [expect.objectContaining({
+          id: 'saved-record',
+          messageId: 'message-1'
+        })]
+      });
+  });
+
+  it('matches current-user mention handles from mention detection candidates', async () => {
+    const surface = document.createElement('yt-live-chat-message-input-renderer');
+    surface.innerHTML = '<span id="author-name">@CurrentViewer</span>';
+    document.body.append(surface);
+    const mentionDetection = await import('../mention-detection');
+    mentionDetection.initMentionDetection();
+
+    expect(getMatchedMentionHandles('hello @CurrentViewer')).toEqual(['@currentviewer']);
+  });
+
   it('returns connected live messages and rejects stale live message refs', () => {
     const message = document.createElement('yt-live-chat-text-message-renderer');
     document.body.append(message);
@@ -171,7 +229,48 @@ describe('inbox state store', () => {
     expect(getLiveInboxMessage(withLiveMessage)).toBeNull();
     expect(getLiveInboxMessage(withoutLiveMessage)).toBeNull();
   });
+
+  it('loads stored inbox state once and shares an in-flight load', async () => {
+    const sourceUrl = await getCurrentInboxSourceUrl();
+    const recordsStorageKey = await getCurrentInboxRecordsStorageKey();
+    await chrome.storage.local.set({
+      ytcqInboxKeywords: ['Launch'],
+      [recordsStorageKey]: [record({
+        contentParts: [{ type: 'text', text: 'loaded' }],
+        id: 'loaded-record',
+        sourceUrl
+      })]
+    });
+    vi.resetModules();
+    const state = await import('./state');
+
+    expect(state.isInboxStateLoaded()).toBe(false);
+    expect(state.getLoadedInboxKeywords()).toEqual([]);
+
+    const firstLoad = state.loadInboxState();
+    const secondLoad = state.loadInboxState();
+    expect(secondLoad).toBe(firstLoad);
+    await firstLoad;
+
+    expect(state.isInboxStateLoaded()).toBe(true);
+    expect(state.getInboxKeywordsSnapshot()).toEqual(['Launch']);
+    expect(state.getInboxRecordsSnapshot()).toHaveLength(1);
+    await expect(state.loadInboxState()).resolves.toBeUndefined();
+  });
 });
+
+async function getCurrentInboxSourceUrl(): Promise<string> {
+  const { getCurrentYouTubeChatSourceUrl } = await import('../../youtube/source-url');
+  return getCurrentYouTubeChatSourceUrl();
+}
+
+async function getCurrentInboxRecordsStorageKey(): Promise<string> {
+  const {
+    getCurrentYouTubeChatSourceUrl,
+    getYouTubeChatSourceStorageKey
+  } = await import('../../youtube/source-url');
+  return `ytcqInboxRecords:${getYouTubeChatSourceStorageKey(getCurrentYouTubeChatSourceUrl())}`;
+}
 
 function record(overrides: Partial<InboxRecord> = {}): InboxRecord {
   return {

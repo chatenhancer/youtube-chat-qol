@@ -61,6 +61,34 @@ describe('reply feature entry points', () => {
     expect(focusMocks.showFocusPromptForMessage).toHaveBeenCalledTimes(2);
   });
 
+  it('does not handle prevented, non-primary, or missing author clicks', () => {
+    const message = createMessage('@ViewerOne', 'ignored message');
+    document.body.append(message);
+
+    wireAuthorNameMention(message);
+    const author = message.querySelector<HTMLElement>('#author-name')!;
+    const prevented = new MouseEvent('click', {
+      bubbles: true,
+      button: 0
+    });
+    Object.defineProperty(prevented, 'defaultPrevented', {
+      configurable: true,
+      value: true
+    });
+    author.dispatchEvent(prevented);
+    author.dispatchEvent(new MouseEvent('click', {
+      bubbles: true,
+      button: 2
+    }));
+
+    const withoutAuthor = document.createElement('yt-live-chat-text-message-renderer');
+    wireAuthorNameMention(withoutAuthor);
+
+    expect(withoutAuthor.dataset.ytcqAuthorMentionWired).toBe('true');
+    expect(inputMocks.insertMentionText).not.toHaveBeenCalled();
+    expect(inputMocks.replaceInputWithQuoteNodes).not.toHaveBeenCalled();
+  });
+
   it('cleans author click wiring markers', () => {
     const message = createMessage('@ViewerOne', 'hello');
     document.body.append(message);
@@ -87,6 +115,18 @@ describe('reply feature entry points', () => {
 
     expect(inputMocks.replaceInputWithQuoteText).toHaveBeenNthCalledWith(1, '@ViewerThree : "hello there" ');
     expect(inputMocks.replaceInputWithQuoteText).toHaveBeenNthCalledWith(2, '@ViewerFour ');
+  });
+
+  it('reports unreadable authors for quote text and rich quote insertion', () => {
+    quoteAuthorText('', 'hello');
+    quoteAuthorRichText('', 'hello', {
+      nodes: [document.createTextNode('hello')]
+    });
+
+    expect(toastMocks.showToast).toHaveBeenCalledTimes(2);
+    expect(toastMocks.showToast).toHaveBeenCalledWith('Could not read that user name.');
+    expect(inputMocks.replaceInputWithQuoteText).not.toHaveBeenCalled();
+    expect(inputMocks.replaceInputWithQuoteNodes).not.toHaveBeenCalled();
   });
 
   it('quotes rich message nodes with a plain-text fallback and trailing space', () => {

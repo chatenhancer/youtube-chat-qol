@@ -159,6 +159,25 @@ describe('menu router', () => {
     expect(menuMocks.enhanceSettingsMenu).toHaveBeenCalledWith(addedMenu);
     expect(menuMocks.enhanceSettingsMenu).toHaveBeenCalledWith(descendantMenu);
   });
+
+  it('ignores unrelated mutations and added elements', async () => {
+    const unrelated = document.createElement('div');
+    const text = document.createTextNode('changed text');
+    unrelated.append(text);
+
+    handleFeatureMutations({
+      addedElements: [unrelated],
+      changedMessages: [],
+      mutations: [{
+        target: text,
+        type: 'characterData'
+      } as unknown as MutationRecord]
+    });
+    await vi.runAllTimersAsync();
+
+    expect(menuMocks.enhanceMessageContextMenu).not.toHaveBeenCalled();
+    expect(menuMocks.enhanceSettingsMenu).not.toHaveBeenCalled();
+  });
 });
 
 function createMenu(html: string): HTMLElement {

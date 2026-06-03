@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { formatTime, formatWhenResult, getTimeZoneOption } from './time';
+import { formatTime, formatWhen, formatWhenResult, getTimeZoneOption } from './time';
 
 describe('chat command time helpers', () => {
   beforeEach(() => {
@@ -13,6 +13,11 @@ describe('chat command time helpers', () => {
 
   it('formats local time when /time has no argument', () => {
     expect(formatTime('')).toMatch(/\d/);
+  });
+
+  it('returns only the insertable duration from the /when wrapper', () => {
+    expect(formatWhen('2026-5-29 13:30')).toMatch(/\d/);
+    expect(formatWhen('not a time')).toBe('');
   });
 
   it('formats known timezone aliases for /time', () => {
@@ -49,8 +54,33 @@ describe('chat command time helpers', () => {
       insertion: expect.stringMatching(/\d/)
     }));
     expect(formatWhenResult('8pm 2026-5-29 pt')?.detail).toContain('Los Angeles');
+    expect(formatWhenResult('2026-5-29T8pm pt')?.detail).toContain('Los Angeles');
     expect(formatWhenResult('2026-5-29 12:00:30')?.detail).toContain('12:00');
     expect(formatWhenResult('2026-5-28 8pm')?.detail).toContain('since');
+  });
+
+  it('handles 12-hour clock edge cases for /when targets', () => {
+    expect(formatWhenResult('12am')?.detail).toContain('since');
+    expect(formatWhenResult('12pm')?.detail).toContain('since');
+    expect(formatWhenResult('12pm')?.insertion).toMatch(/\d/);
+  });
+
+  it('rejects timezone-only /when targets', () => {
+    expect(formatWhenResult('tokyo')).toBeNull();
+    expect(formatWhenResult('pt')).toBeNull();
+  });
+
+  it('falls back to plain duration text when localized unit formatting is unavailable', () => {
+    vi.spyOn(Intl, 'NumberFormat').mockImplementation(function NumberFormat() {
+      throw new Error('unsupported');
+    } as unknown as typeof Intl.NumberFormat);
+    vi.spyOn(Intl, 'ListFormat').mockImplementation(function ListFormat() {
+      throw new Error('unsupported');
+    } as unknown as typeof Intl.ListFormat);
+
+    const result = formatWhenResult('2026-5-29 15:01');
+
+    expect(result?.insertion).toBe('1 hour 1 minute');
   });
 
   it('formats zero-duration /when targets as seconds', () => {

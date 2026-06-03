@@ -7,6 +7,7 @@ import {
   serializeInboxRecord,
   sortAndTrimRecords
 } from './storage';
+import { getYouTubeChatSourceStorageKey } from '../../youtube/source-url';
 import type { InboxRecord } from './types';
 
 describe('inbox storage', () => {
@@ -79,6 +80,66 @@ describe('inbox storage', () => {
       keywords: ['Launch'],
       records: [expect.objectContaining({ id: 'valid' })]
     });
+  });
+
+  it('treats non-array stored record values as empty state', async () => {
+    const sourceUrl = 'https://www.youtube.com/watch?v=stream-a';
+    await chrome.storage.local.set({
+      ytcqInboxKeywords: 'not keywords',
+      'ytcqInboxRecords:video:stream-a': { id: 'not-array' }
+    });
+
+    await expect(loadInboxStoredState(sourceUrl)).resolves.toEqual({
+      keywords: [],
+      records: []
+    });
+  });
+
+  it('normalizes optional stored record fields and mention handle lists', async () => {
+    const sourceUrl = 'https://www.youtube.com/watch?v=stream-a';
+    await chrome.storage.local.set({
+      'ytcqInboxRecords:video:stream-a': [
+        createRecord({
+          avatarSrc: ' https://example.test/avatar.jpg ',
+          channelId: ' example-channel ',
+          matchedKeywords: [' Launch ', 'launch'],
+          mentionHandles: [' @CurrentUser ', '@currentuser', ''],
+          messageId: ' message-1 ',
+          sourceUrl
+        })
+      ]
+    });
+
+    const stored = await loadInboxStoredState(sourceUrl);
+
+    expect(stored.records[0]).toMatchObject({
+      avatarSrc: 'https://example.test/avatar.jpg',
+      channelId: 'example-channel',
+      matchedKeywords: ['Launch'],
+      mentionHandles: ['@CurrentUser'],
+      messageId: 'message-1'
+    });
+  });
+
+  it('uses replay elapsed timestamps for replay-scoped stored records', async () => {
+    const sourceUrl = 'https://www.youtube.com/live_chat_replay?continuation=abc';
+    const recordsStorageKey = `ytcqInboxRecords:${getYouTubeChatSourceStorageKey(sourceUrl)}`;
+    await chrome.storage.local.set({
+      [recordsStorageKey]: [
+        createRecord({
+          id: 'replay-record',
+          sourceUrl,
+          timestamp: new Date('2026-06-01T12:00:00Z').getTime(),
+          timestampText: '0:30'
+        })
+      ]
+    });
+
+    const stored = await loadInboxStoredState(sourceUrl);
+    const startOfDay = new Date('2026-06-01T12:00:00Z');
+    startOfDay.setHours(0, 0, 0, 0);
+
+    expect(stored.records[0].timestamp).toBe(startOfDay.getTime() + 30_000);
   });
 
   it('saves watched keywords separately from stream-scoped records', async () => {

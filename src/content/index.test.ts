@@ -105,6 +105,33 @@ describe('content script entrypoint wiring', () => {
     expect(lifecycleMocks.handleFeatureMessage).toHaveBeenCalledWith(containingMessage, { allowTranslate: false });
   });
 
+  it('handles character-data mutations and nested added participants', async () => {
+    await import('./index');
+    const message = createMessage();
+    const textNode = message.querySelector('#message')!.firstChild!;
+    const wrapper = document.createElement('div');
+    const participant = document.createElement('yt-live-chat-participant-renderer');
+    wrapper.append(participant);
+    document.body.append(message, wrapper);
+    lifecycleMocks.handleFeatureParticipant.mockClear();
+
+    observerCallback?.([
+      mutation({
+        target: textNode,
+        type: 'characterData'
+      }),
+      mutation({
+        addedNodes: [wrapper],
+        target: wrapper,
+        type: 'childList'
+      })
+    ], {} as MutationObserver);
+
+    const batch = lifecycleMocks.handleFeatureMutations.mock.calls[0][0] as FeatureMutationBatch;
+    expect(batch.changedMessages).toEqual([message]);
+    expect(lifecycleMocks.handleFeatureParticipant.mock.calls[0][0]).toBe(participant);
+  });
+
   it('filters observer mutations owned by extension features', async () => {
     await import('./index');
     const ignoredAdded = document.createElement('div');
@@ -146,6 +173,25 @@ describe('content script entrypoint wiring', () => {
     expect(lifecycleMocks.handleFeatureVisibilityChanged).toHaveBeenCalledWith('visible');
     expect(lifecycleMocks.handleFeatureMessage).toHaveBeenCalledWith(message, { allowTranslate: false });
     expect(lifecycleMocks.recoverVisibleFeatures).toHaveBeenCalledOnce();
+  });
+
+  it('coalesces repeated visible recovery requests', async () => {
+    const message = createMessage();
+    document.body.append(message);
+    await import('./index');
+    const clearTimeoutSpy = vi.spyOn(window, 'clearTimeout');
+    lifecycleMocks.handleFeatureMessage.mockClear();
+    Object.defineProperty(document, 'visibilityState', {
+      configurable: true,
+      value: 'visible'
+    });
+
+    visibilityListener?.();
+    visibilityListener?.();
+    await vi.advanceTimersByTimeAsync(300);
+
+    expect(clearTimeoutSpy).toHaveBeenCalled();
+    expect(lifecycleMocks.handleFeatureMessage).toHaveBeenCalledTimes(1);
   });
 
   it('notifies visibility changes without recovery while hidden', async () => {

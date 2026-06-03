@@ -93,6 +93,10 @@ describe('inbox card view', () => {
     card.querySelector<HTMLButtonElement>('.ytcq-inbox-keyword-toggle')!.click();
     expect(card.querySelector<HTMLElement>('.ytcq-inbox-keyword-panel')?.hidden).toBe(false);
     expect(card.querySelector<HTMLButtonElement>('.ytcq-inbox-keyword-toggle')?.getAttribute('aria-expanded')).toBe('true');
+
+    card.querySelector<HTMLButtonElement>('.ytcq-inbox-keyword-toggle')!.click();
+    expect(card.querySelector<HTMLElement>('.ytcq-inbox-keyword-panel')?.hidden).toBe(true);
+    expect(card.querySelector<HTMLButtonElement>('.ytcq-inbox-keyword-toggle')?.getAttribute('aria-expanded')).toBe('false');
   });
 
   it('uses the keyword subtitle when only keyword watches are configured', () => {
@@ -174,6 +178,11 @@ describe('inbox card view', () => {
     document.querySelector<HTMLElement>('.ytcq-inbox-message')!
       .dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: ' ' }));
     expect(replyMocks.quoteAuthorRichText).toHaveBeenCalledTimes(2);
+
+    openInboxCardView(undefined, callbacksForCard());
+    document.querySelector<HTMLElement>('.ytcq-inbox-message')!
+      .dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Escape' }));
+    expect(replyMocks.quoteAuthorRichText).toHaveBeenCalledTimes(2);
   });
 
   it('refreshes the open card and jumps to connected live messages', () => {
@@ -219,6 +228,13 @@ describe('inbox card view', () => {
     inboxButton.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     expect(isInboxCardOpen()).toBe(true);
 
+    document.querySelector<HTMLElement>('.ytcq-inbox-card')!
+      .dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(isInboxCardOpen()).toBe(true);
+
+    document.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Tab' }));
+    expect(isInboxCardOpen()).toBe(true);
+
     document.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Escape' }));
     expect(isInboxCardOpen()).toBe(false);
 
@@ -262,6 +278,54 @@ describe('inbox card view', () => {
 
     expect(card.style.left).toBe('60px');
     expect(card.style.top).toBe('52px');
+  });
+
+  it('clamps the card inside the viewport when positioning would overflow', async () => {
+    vi.useFakeTimers();
+    const anchor = document.createElement('button');
+    anchor.getBoundingClientRect = () => ({
+      bottom: 890,
+      height: 24,
+      left: 2,
+      right: 12,
+      top: 866,
+      width: 10,
+      x: 2,
+      y: 866,
+      toJSON: () => ({})
+    });
+    document.body.append(anchor);
+
+    openInboxCardView(anchor, callbacksForCard());
+    const card = document.querySelector<HTMLElement>('.ytcq-inbox-card')!;
+    card.getBoundingClientRect = () => ({
+      bottom: 1_080,
+      height: 180,
+      left: 0,
+      right: 420,
+      top: 900,
+      width: 420,
+      x: 0,
+      y: 900,
+      toJSON: () => ({})
+    });
+    await vi.runOnlyPendingTimersAsync();
+    window.dispatchEvent(new Event('resize'));
+
+    expect(Number.parseInt(card.style.left, 10)).toBeGreaterThanOrEqual(8);
+    expect(Number.parseInt(card.style.top, 10)).toBeLessThan(866);
+  });
+
+  it('refreshes safely when an open card is missing optional sub-elements', () => {
+    records = [record()];
+    openInboxCardView(undefined, callbacksForCard());
+    document.querySelector('.ytcq-inbox-messages')?.remove();
+    document.querySelector('.ytcq-profile-card-subtitle')?.remove();
+    document.querySelector('.ytcq-inbox-clear')?.remove();
+    document.querySelector('.ytcq-inbox-card-icon')?.remove();
+    document.querySelector('.ytcq-inbox-keyword-toggle')?.remove();
+
+    expect(() => refreshOpenInboxCard()).not.toThrow();
   });
 
   it('ignores refresh requests when the inbox card is closed', () => {

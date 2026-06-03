@@ -102,6 +102,43 @@ describe('message context menu integration', () => {
     expect(replyMocks.replyToMessage).toHaveBeenNthCalledWith(2, message, { quote: false });
   });
 
+  it('supports keyboard activation on split reply actions', () => {
+    const message = createChatMessage();
+    const menu = createContextMenu();
+    document.body.append(message, menu);
+    wireMessageContext(message);
+    message.querySelector<HTMLElement>('#menu')!.click();
+
+    enhanceMessageContextMenu(menu);
+    const mention = menu.querySelector<HTMLElement>('[data-ytcq-action="mention"]')!;
+    const quote = menu.querySelector<HTMLElement>('[data-ytcq-action="quote"]')!;
+    mention.dispatchEvent(new KeyboardEvent('keydown', {
+      bubbles: true,
+      key: 'Escape'
+    }));
+    mention.dispatchEvent(new KeyboardEvent('keydown', {
+      bubbles: true,
+      key: 'Enter'
+    }));
+    quote.dispatchEvent(new KeyboardEvent('keydown', {
+      bubbles: true,
+      key: ' '
+    }));
+
+    expect(replyMocks.replyToMessage).toHaveBeenNthCalledWith(1, message, { quote: false });
+    expect(replyMocks.replyToMessage).toHaveBeenNthCalledWith(2, message, { quote: true });
+  });
+
+  it('does not toggle marks when no active connected message is available', () => {
+    const menu = createContextMenu();
+    document.body.append(menu);
+
+    enhanceMessageContextMenu(menu);
+    menu.querySelector<HTMLElement>('[data-ytcq-action="mark-user"]')!.click();
+
+    expect(markedUserMocks.toggleMessageAuthorMark).not.toHaveBeenCalled();
+  });
+
   it('shows the unmark label when the active message author is already marked', () => {
     markedUserMocks.isMessageAuthorMarked.mockReturnValue(true);
     markedUserMocks.getMessageAuthorMarkTitle.mockReturnValue('Unmark\nNov 14, 2023, 10:13 PM\nExample Stream');
@@ -216,6 +253,24 @@ describe('message context menu integration', () => {
     await vi.runAllTimersAsync();
 
     expect(menu.style.getPropertyValue('--ytcq-context-shift-y')).toBe('58px');
+  });
+
+  it('keeps the native menu rectangle when item children are not measurable', async () => {
+    vi.useFakeTimers();
+    const menu = createContextMenu();
+    document.body.append(menu);
+    menu.getBoundingClientRect = () => rect({ bottom: 80, height: 80, top: 0, width: 200 });
+    menu.querySelector<HTMLElement>('#items')!.firstElementChild!.getBoundingClientRect = () => rect({
+      bottom: 0,
+      height: 0,
+      top: 0,
+      width: 0
+    });
+
+    enhanceMessageContextMenu(menu);
+    await vi.runAllTimersAsync();
+
+    expect(menu.style.getPropertyValue('--ytcq-context-shift-y')).toBe('8px');
   });
 });
 

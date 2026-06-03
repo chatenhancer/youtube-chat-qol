@@ -110,6 +110,7 @@ import {
   shouldIgnoreFeatureAddedNode,
   shouldIgnoreFeatureMutation
 } from '../../content/lifecycle';
+import { createInboxRecord } from './records';
 import {
   addInboxKeywords,
   cleanupStaleInboxSurfaces,
@@ -230,6 +231,20 @@ describe('inbox coordinator', () => {
     );
   });
 
+  it('wires the inbox button when a newly added wrapper contains the chat header', () => {
+    const header = document.createElement('yt-live-chat-header-renderer');
+    const wrapper = document.createElement('div');
+    wrapper.append(header);
+
+    handleFeatureMutations({
+      addedElements: [wrapper],
+      changedMessages: [],
+      mutations: []
+    });
+
+    expect(buttonMocks.scheduleInboxButtonWire).toHaveBeenCalled();
+  });
+
   it('ignores disconnected or empty messages before loading or recording', () => {
     const disconnected = createMessage('@ViewerTwo', 'hello alpha');
     const empty = createMessage('@ViewerTwo', '');
@@ -323,6 +338,21 @@ describe('inbox coordinator', () => {
     expect(tabAlertMocks.showInboxTabAlert).not.toHaveBeenCalled();
   });
 
+  it('does not persist anything when a matched message cannot create an inbox record', async () => {
+    vi.mocked(createInboxRecord).mockReturnValueOnce(null as never);
+    inboxTestState.keywords = ['alpha'];
+    inboxTestState.matchingKeywords = ['alpha'];
+    const message = createMessage('@ViewerNoRecord', 'hello alpha');
+    document.body.append(message);
+
+    handlePotentialInbox(message);
+    await Promise.resolve();
+
+    expect(stateMocks.upsertInboxRecord).not.toHaveBeenCalled();
+    expect(stateMocks.saveInboxRecords).not.toHaveBeenCalled();
+    expect(soundMocks.playAlertSound).not.toHaveBeenCalled();
+  });
+
   it('does nothing when an existing inbox record has no persistent or transient changes', async () => {
     inboxTestState.upsertResult = { changed: false, transientChanged: false };
     inboxTestState.keywords = ['alpha'];
@@ -413,6 +443,50 @@ describe('inbox coordinator', () => {
     expect(tabAlertMocks.cleanupInboxTabAlertListeners).toHaveBeenCalled();
     expect(buttonMocks.cleanupStaleInboxButtons).toHaveBeenCalled();
     expect(cardMocks.cleanupStaleInboxCards).toHaveBeenCalled();
+  });
+
+  it('exposes inbox card callbacks for clearing, marking read, and keyword updates', async () => {
+    openInboxCard(document.createElement('button'));
+    await Promise.resolve();
+    const callbacks = cardMocks.openInboxCardView.mock.calls.at(-1)?.[1] as {
+      onClearRecords: () => void;
+      onKeywordsChanged: () => void;
+      onMarkRead: () => void;
+    };
+
+    callbacks.onClearRecords();
+    expect(stateMocks.clearInboxRecords).toHaveBeenCalled();
+    expect(stateMocks.saveInboxRecords).toHaveBeenCalled();
+    expect(tabAlertMocks.clearInboxTabAlert).toHaveBeenCalled();
+    expect(buttonMocks.refreshInboxSurfaces).toHaveBeenCalled();
+
+    stateMocks.saveInboxRecords.mockClear();
+    stateMocks.markInboxRecordsRead.mockReturnValueOnce(false);
+    callbacks.onMarkRead();
+    expect(stateMocks.saveInboxRecords).not.toHaveBeenCalled();
+    expect(tabAlertMocks.clearInboxTabAlert).toHaveBeenCalled();
+
+    callbacks.onKeywordsChanged();
+    expect(stateMocks.saveInboxKeywords).toHaveBeenCalled();
+    expect(cardMocks.refreshOpenInboxCard).toHaveBeenCalled();
+  });
+
+  it('toggles the inbox card through the wired button options', async () => {
+    scheduleInboxButtonWire();
+    const options = buttonMocks.scheduleInboxButtonWire.mock.calls.at(-1)?.[0] as {
+      getUnreadCount: () => number;
+      onToggle: (anchor: HTMLElement) => void;
+    };
+    const anchor = document.createElement('button');
+
+    expect(options.getUnreadCount()).toBe(1);
+    options.onToggle(anchor);
+    await Promise.resolve();
+    expect(cardMocks.openInboxCardView).toHaveBeenCalled();
+
+    inboxTestState.inboxOpen = true;
+    options.onToggle(anchor);
+    expect(cardMocks.closeInboxCard).toHaveBeenCalled();
   });
 
   it('cleans visible inbox highlights and tab alert state from stale pages', () => {

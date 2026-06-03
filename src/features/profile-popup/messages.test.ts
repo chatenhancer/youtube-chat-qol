@@ -77,6 +77,22 @@ describe('profile card message renderer', () => {
     expect(nextClose).toHaveBeenCalledOnce();
   });
 
+  it('ignores profile message keyboard events from children or unrelated keys', () => {
+    const list = document.createElement('div');
+    const onClose = vi.fn();
+
+    renderProfileMessages(list, [record({ messageId: '' })], source(), onClose);
+    const item = list.querySelector<HTMLElement>('.ytcq-profile-card-message')!;
+    const text = item.querySelector<HTMLElement>('.ytcq-profile-card-message-text')!;
+
+    item.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Escape' }));
+    text.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Enter' }));
+
+    expect(item.dataset.ytcqMessageId).toBeUndefined();
+    expect(replyMocks.quoteAuthorRichText).not.toHaveBeenCalled();
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
   it('renders inline translations that match the active target language', () => {
     const list = document.createElement('div');
 

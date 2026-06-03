@@ -178,6 +178,18 @@ describe('chat command behavior', () => {
     expect(mocks.showToast).toHaveBeenCalledWith(expect.stringContaining('until'));
   });
 
+  it('reports invalid when command input in whole-input and inline modes', async () => {
+    await command('when').run(parsed('when', 'not a date'), { saveOptions: vi.fn() });
+    await command('when').runInline?.(inlineParsed('when', 'not a date'));
+
+    expect(runtime.replaceCommandText).toHaveBeenCalledWith('', 'Could not read that date or time.');
+    expect(runtime.replaceInlineCommandText).toHaveBeenCalledWith(
+      '',
+      expect.objectContaining({ name: 'when' }),
+      'Could not read that date or time.'
+    );
+  });
+
   it('runs watch and unwatch commands through inbox keyword storage', async () => {
     mocks.getInboxKeywords.mockResolvedValue(['launch']);
     mocks.addInboxKeywords.mockResolvedValue({ added: ['status'], duplicates: ['launch'] });
@@ -193,6 +205,23 @@ describe('chat command behavior', () => {
     expect(runtime.clearInput).toHaveBeenCalledTimes(3);
     expect(mocks.showToast).toHaveBeenCalledWith(expect.stringContaining('Watching'));
     expect(mocks.showToast).toHaveBeenCalledWith(expect.stringContaining('Removed'));
+  });
+
+  it('quotes multi-word unwatch autocomplete values', () => {
+    mocks.getLoadedInboxKeywords.mockReturnValue(['launch', 'status update']);
+
+    expect(command('unwatch').argumentOptions?.()).toEqual([
+      {
+        description: 'Remove watched keyword',
+        label: 'launch',
+        value: 'launch'
+      },
+      {
+        description: 'Remove watched keyword',
+        label: 'status update',
+        value: '"status update"'
+      }
+    ]);
   });
 
   it('reports watch and unwatch argument errors without clearing the input', async () => {
@@ -272,6 +301,7 @@ describe('chat command behavior', () => {
     mocks.translateCommandText.mockRejectedValue(new Error('network'));
 
     await command('translate').run(parsed('translate', 'es'), { saveOptions: vi.fn() });
+    await command('translate').runInline?.(inlineParsed('translate', 'es'));
     await command('translate').run(parsed('translate', 'es hello everyone'), { saveOptions: vi.fn() });
     await command('translate').runInline?.(inlineParsed('translate', 'es hello everyone'));
 

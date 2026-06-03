@@ -142,6 +142,17 @@ describe('chat command autocomplete', () => {
     expect(document.querySelector('.ytcq-command-autocomplete-card')).toBeNull();
   });
 
+  it('coalesces repeated scheduled updates before the next animation frame', async () => {
+    selection = select('/');
+    const autocomplete = createAutocomplete();
+
+    autocomplete.scheduleUpdate();
+    autocomplete.scheduleUpdate();
+    await vi.runAllTimersAsync();
+
+    expect(document.querySelectorAll('.ytcq-command-autocomplete-card')).toHaveLength(1);
+  });
+
   it('accepts an open suggestion with Enter but not Shift Enter', async () => {
     selection = select('/');
     const autocomplete = createAutocomplete();
@@ -176,6 +187,17 @@ describe('chat command autocomplete', () => {
     autocomplete.handleKeydown(keyEvent('Tab'));
 
     expect(replaceChatInputTextRange).toHaveBeenCalledWith(0, 1, '/translate ');
+  });
+
+  it('returns false for arrow keys when the current state disappears', async () => {
+    selection = select('/');
+    const autocomplete = createAutocomplete();
+
+    autocomplete.scheduleUpdate();
+    await vi.runAllTimersAsync();
+    selection = null;
+
+    expect(autocomplete.handleKeydown(keyEvent('ArrowDown'))).toBe(false);
   });
 
   it('wraps upward through suggestions with arrow keys', async () => {
@@ -226,6 +248,68 @@ describe('chat command autocomplete', () => {
     await vi.runAllTimersAsync();
 
     expect(document.querySelector('.ytcq-command-autocomplete-card')).toBeNull();
+  });
+
+  it('hides exact command suggestions for aliases that can run without arguments', async () => {
+    const command: ChatCommandDefinition = {
+      acceptsArguments: true,
+      helpDescription: 'Focus a user.',
+      helpLabel: '/focus',
+      kind: 'text',
+      names: ['focus', 'f'],
+      run: vi.fn(),
+      runWithoutArgumentNames: ['f']
+    };
+    selection = select('/f');
+    const autocomplete = createAutocomplete({
+      commandByName: new Map(command.names.map((name) => [name, command])),
+      commands: [command]
+    });
+
+    autocomplete.scheduleUpdate();
+    await vi.runAllTimersAsync();
+
+    expect(document.querySelector('.ytcq-command-autocomplete-card')).toBeNull();
+  });
+
+  it('accepts whole-input commands without appending an argument space', () => {
+    selection = select('/qu');
+    const autocomplete = createAutocomplete();
+
+    expect(autocomplete.handleKeydown(keyEvent('Tab'))).toBe(true);
+
+    expect(replaceChatInputTextRange).toHaveBeenCalledWith(0, 3, '/quote');
+  });
+
+  it('orders exact command matches before prefix matches', async () => {
+    const exact: ChatCommandDefinition = {
+      helpDescription: 'Exact command.',
+      helpLabel: '/a',
+      kind: 'text',
+      names: ['a'],
+      run: vi.fn()
+    };
+    const prefix: ChatCommandDefinition = {
+      helpDescription: 'Prefix command.',
+      helpLabel: '/ab',
+      kind: 'text',
+      names: ['ab'],
+      run: vi.fn()
+    };
+    selection = select('/a');
+    const autocomplete = createAutocomplete({
+      commandByName: new Map([
+        ['a', exact],
+        ['ab', prefix]
+      ]),
+      commands: [prefix, exact]
+    });
+
+    autocomplete.scheduleUpdate();
+    await vi.runAllTimersAsync();
+
+    expect([...document.querySelectorAll('.ytcq-command-autocomplete-name')]
+      .map((node) => node.textContent)).toEqual(['/a', '/ab']);
   });
 
   it('keeps exact argument suggestions when a command opts out of hiding them', async () => {
@@ -327,6 +411,32 @@ describe('chat command autocomplete', () => {
     await vi.runAllTimersAsync();
 
     expect(document.querySelectorAll('.ytcq-command-autocomplete-option')).toHaveLength(8);
+  });
+
+  it('shows no argument suggestions when a command has no argument options', async () => {
+    selection = select('/time ');
+    const autocomplete = createAutocomplete();
+
+    autocomplete.scheduleUpdate();
+    await vi.runAllTimersAsync();
+
+    expect(document.querySelector('.ytcq-command-autocomplete-card')).toBeNull();
+  });
+
+  it('ignores pointer events whose target is not an element or node', async () => {
+    selection = select('/');
+    const autocomplete = createAutocomplete();
+
+    autocomplete.scheduleUpdate();
+    await vi.runAllTimersAsync();
+    const event = new MouseEvent('mousedown', { bubbles: true });
+    Object.defineProperty(event, 'target', {
+      configurable: true,
+      value: null
+    });
+    autocomplete.handlePointerDown(event);
+
+    expect(document.querySelector('.ytcq-command-autocomplete-card')).toBeNull();
   });
 
   it('returns false for unrelated keys when no card is open', () => {

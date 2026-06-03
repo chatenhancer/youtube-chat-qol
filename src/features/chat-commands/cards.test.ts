@@ -64,6 +64,47 @@ describe('chat command cards', () => {
 
     expect(document.querySelector('.ytcq-command-help-card')).toBeNull();
   });
+
+  it('keeps the card open for inside clicks and non-Escape keys', async () => {
+    vi.useFakeTimers();
+    const cards = createCommandCards();
+    cards.showWatchedKeywords(['launch']);
+    await vi.runAllTimersAsync();
+
+    document.querySelector<HTMLElement>('.ytcq-command-help-card')!
+      .dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    document.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Tab' }));
+
+    expect(document.querySelector('.ytcq-command-help-card')).not.toBeNull();
+  });
+
+  it('repositions on resize while open and closes idempotently', async () => {
+    vi.useFakeTimers();
+    const input = document.createElement('div');
+    input.dataset.chatInput = 'true';
+    document.body.append(input);
+    const cards = createCommandCards();
+
+    cards.showWatchedKeywords(['launch']);
+    const card = document.querySelector<HTMLElement>('.ytcq-command-help-card')!;
+    card.getBoundingClientRect = () => ({
+      bottom: 120,
+      height: 80,
+      left: 0,
+      right: 200,
+      top: 40,
+      width: 200,
+      x: 0,
+      y: 40,
+      toJSON: () => ({})
+    });
+    await vi.runAllTimersAsync();
+    window.dispatchEvent(new Event('resize'));
+    cards.close();
+    cards.close();
+
+    expect(document.querySelector('.ytcq-command-help-card')).toBeNull();
+  });
 });
 
 function command(helpLabel: string): ChatCommandDefinition {

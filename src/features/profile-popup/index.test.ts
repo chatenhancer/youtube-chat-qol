@@ -82,10 +82,13 @@ import {
 } from './index';
 import { suspendFeatures } from '../../content/lifecycle';
 
+let resizeObserverCallbacks: ResizeObserverCallback[] = [];
+
 describe('profile popup coordinator', () => {
   beforeEach(() => {
     document.body.replaceChildren();
     vi.clearAllMocks();
+    resizeObserverCallbacks = [];
     profileTestState.recentMessages = [record()];
     profileTestState.messageSource = source();
     profileTestState.participantSource = source({ authorName: '@Participant' });
@@ -93,6 +96,10 @@ describe('profile popup coordinator', () => {
     Object.defineProperty(globalThis, 'ResizeObserver', {
       configurable: true,
       value: class ResizeObserverMock {
+        constructor(callback: ResizeObserverCallback) {
+          resizeObserverCallbacks.push(callback);
+        }
+
         observe = vi.fn();
         disconnect = vi.fn();
         unobserve = vi.fn();
@@ -259,6 +266,21 @@ describe('profile popup coordinator', () => {
     expect(document.querySelector('.ytcq-profile-card')).toBeNull();
   });
 
+  it('keeps the card open for inside clicks and ignores non-Escape keys', async () => {
+    vi.useFakeTimers();
+    const message = createMessage();
+    document.body.append(message);
+    wireProfileClick(message);
+
+    message.querySelector<HTMLElement>('#author-photo')!.click();
+    await vi.runOnlyPendingTimersAsync();
+    const card = document.querySelector<HTMLElement>('.ytcq-profile-card')!;
+    card.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    document.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Enter' }));
+
+    expect(document.querySelector('.ytcq-profile-card')).toBe(card);
+  });
+
   it('repositions on resize and closes when the anchor disconnects', async () => {
     vi.useFakeTimers();
     const message = createMessage();
@@ -276,6 +298,37 @@ describe('profile popup coordinator', () => {
     window.dispatchEvent(new Event('resize'));
     await vi.runOnlyPendingTimersAsync();
     expect(document.querySelector('.ytcq-profile-card')).toBeNull();
+  });
+
+  it('keeps the card in view after resize observer updates and closes if the anchor disappears', async () => {
+    vi.useFakeTimers();
+    const message = createMessage();
+    document.body.append(message);
+    const avatar = message.querySelector<HTMLElement>('#author-photo')!;
+    wireProfileClick(message);
+    avatar.click();
+
+    resizeObserverCallbacks.at(-1)?.([], {} as ResizeObserver);
+    await vi.runOnlyPendingTimersAsync();
+    expect(positioningMocks.keepProfileCardInViewport).toHaveBeenCalledWith(expect.any(HTMLElement));
+
+    avatar.remove();
+    resizeObserverCallbacks.at(-1)?.([], {} as ResizeObserver);
+    await vi.runOnlyPendingTimersAsync();
+    expect(document.querySelector('.ytcq-profile-card')).toBeNull();
+  });
+
+  it('ignores history updates after the active card closes', () => {
+    const message = createMessage();
+    document.body.append(message);
+    wireProfileClick(message);
+    message.querySelector<HTMLElement>('#author-photo')!.click();
+    closeProfileCard();
+    messageMocks.renderProfileMessages.mockClear();
+
+    profileTestState.userMessagesChanged?.('channel:viewer-channel');
+
+    expect(messageMocks.renderProfileMessages).not.toHaveBeenCalled();
   });
 
   it('ignores profile clicks when YouTube source details cannot be read', () => {

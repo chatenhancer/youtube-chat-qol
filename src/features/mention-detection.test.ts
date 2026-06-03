@@ -71,6 +71,20 @@ describe('current-user mention detection', () => {
     expect(onMention).not.toHaveBeenCalled();
   });
 
+  it('continues searching when the first handle occurrence is embedded but a later one is valid', async () => {
+    document.body.append(createIdentitySurface('@CurrentViewer'));
+    const mentionDetection = await import('./mention-detection');
+    const onMention = vi.fn();
+
+    mentionDetection.processPotentialMentionForConsumer(
+      createMessage('@OtherViewer', 'hello @CurrentViewer_name and @CurrentViewer'),
+      'ytcqMentionChecked',
+      onMention
+    );
+
+    expect(onMention).toHaveBeenCalledOnce();
+  });
+
   it('matches handles with punctuation boundaries and ignores messages with no text', async () => {
     document.body.append(createIdentitySurface('@CurrentViewer'));
     const mentionDetection = await import('./mention-detection');
@@ -186,6 +200,51 @@ describe('current-user mention detection', () => {
     expect(mentionDetection.getCurrentMentionCandidates()).toContain('@mutationviewer');
   });
 
+  it('ignores unrelated mutations and coalesces pending identity refreshes', async () => {
+    const setTimeoutSpy = vi.spyOn(window, 'setTimeout');
+    const mentionDetection = await import('./mention-detection');
+    const { handleFeatureMutations } = await import('../content/lifecycle');
+    const unrelated = document.createElement('div');
+    document.body.append(unrelated);
+
+    handleFeatureMutations({
+      addedElements: [],
+      changedMessages: [],
+      mutations: [{
+        addedNodes: [] as unknown as NodeList,
+        attributeName: null,
+        attributeNamespace: null,
+        nextSibling: null,
+        oldValue: null,
+        previousSibling: null,
+        removedNodes: [] as unknown as NodeList,
+        target: unrelated,
+        type: 'childList'
+      }]
+    });
+    expect(setTimeoutSpy).not.toHaveBeenCalled();
+
+    const surface = createIdentitySurface('@CoalescedViewer');
+    document.body.append(surface);
+    const mutation = {
+      addedNodes: [] as unknown as NodeList,
+      attributeName: null,
+      attributeNamespace: null,
+      nextSibling: null,
+      oldValue: null,
+      previousSibling: null,
+      removedNodes: [] as unknown as NodeList,
+      target: surface,
+      type: 'childList' as MutationRecordType
+    };
+    handleFeatureMutations({ addedElements: [], changedMessages: [], mutations: [mutation] });
+    handleFeatureMutations({ addedElements: [], changedMessages: [], mutations: [mutation] });
+    expect(setTimeoutSpy).toHaveBeenCalledTimes(1);
+
+    await vi.runOnlyPendingTimersAsync();
+    expect(mentionDetection.getCurrentMentionCandidates()).toContain('@coalescedviewer');
+  });
+
   it('refreshes identity when character data changes inside the composer identity surface', async () => {
     const surface = createIdentitySurface('@BeforeViewer');
     const author = surface.querySelector('#author-name')!;
@@ -213,6 +272,87 @@ describe('current-user mention detection', () => {
     await vi.runOnlyPendingTimersAsync();
 
     expect(mentionDetection.getCurrentMentionCandidates()).toContain('@afterviewer');
+  });
+
+  it('refreshes identity when the identity container itself is the mutation target', async () => {
+    const mentionDetection = await import('./mention-detection');
+    const { handleFeatureMutations } = await import('../content/lifecycle');
+    const surface = createIdentitySurface('@TargetViewer');
+    document.body.append(surface);
+
+    handleFeatureMutations({
+      addedElements: [],
+      changedMessages: [],
+      mutations: [{
+        addedNodes: [] as unknown as NodeList,
+        attributeName: null,
+        attributeNamespace: null,
+        nextSibling: null,
+        oldValue: null,
+        previousSibling: null,
+        removedNodes: [] as unknown as NodeList,
+        target: surface,
+        type: 'childList'
+      }]
+    });
+    await vi.runOnlyPendingTimersAsync();
+
+    expect(mentionDetection.getCurrentMentionCandidates()).toContain('@targetviewer');
+  });
+
+  it('refreshes identity when an added wrapper contains an identity surface', async () => {
+    const mentionDetection = await import('./mention-detection');
+    const { handleFeatureMutations } = await import('../content/lifecycle');
+    const wrapper = document.createElement('div');
+    wrapper.append(createIdentitySurface('@WrappedViewer'));
+    document.body.append(wrapper);
+
+    handleFeatureMutations({
+      addedElements: [],
+      changedMessages: [],
+      mutations: [{
+        addedNodes: [wrapper] as unknown as NodeList,
+        attributeName: null,
+        attributeNamespace: null,
+        nextSibling: null,
+        oldValue: null,
+        previousSibling: null,
+        removedNodes: [] as unknown as NodeList,
+        target: document.body,
+        type: 'childList'
+      }]
+    });
+    await vi.runOnlyPendingTimersAsync();
+
+    expect(mentionDetection.getCurrentMentionCandidates()).toContain('@wrappedviewer');
+  });
+
+  it('cancels a pending mention identity refresh during stale cleanup', async () => {
+    const mentionDetection = await import('./mention-detection');
+    const { cleanupStaleFeatures, handleFeatureMutations } = await import('../content/lifecycle');
+    const surface = createIdentitySurface('@CanceledViewer');
+    document.body.append(surface);
+
+    handleFeatureMutations({
+      addedElements: [],
+      changedMessages: [],
+      mutations: [{
+        addedNodes: [] as unknown as NodeList,
+        attributeName: null,
+        attributeNamespace: null,
+        nextSibling: null,
+        oldValue: null,
+        previousSibling: null,
+        removedNodes: [] as unknown as NodeList,
+        target: surface,
+        type: 'childList'
+      }]
+    });
+    cleanupStaleFeatures();
+    surface.remove();
+    await vi.runOnlyPendingTimersAsync();
+
+    expect(mentionDetection.getCurrentMentionCandidates()).toEqual([]);
   });
 });
 
