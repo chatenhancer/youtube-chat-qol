@@ -306,6 +306,48 @@ describe('composer translation', () => {
     expect(input.textContent).toBe('こんにちは 友達');
   });
 
+  it('preserves image emoji inserted after an already translated draft when retranslating', async () => {
+    vi.useFakeTimers();
+    document.body.replaceChildren();
+    setOptions({
+      ...DEFAULT_OPTIONS,
+      composerTranslateLanguage: 'ja'
+    });
+    const requests: string[] = [];
+    vi.mocked(chrome.runtime.sendMessage).mockImplementation(((message: unknown, callback?: (response: unknown) => void) => {
+      const text = (message as { text: string }).text;
+      requests.push(text);
+      callback?.({
+        ok: true,
+        sourceLanguage: 'es',
+        translatedText: text.includes('§0§') ? 'こんにちは §0§ 友達' : 'こんにちは'
+      });
+      return Promise.resolve({});
+    }) as never);
+    const input = createVisibleChatInput();
+    document.body.append(createComposerHost(input));
+
+    initComposerTranslation(vi.fn());
+    scheduleComposerTranslationWire();
+    await vi.runOnlyPendingTimersAsync();
+    input.textContent = 'Hola';
+    input.dispatchEvent(new InputEvent('input', { bubbles: true }));
+    await vi.advanceTimersByTimeAsync(850);
+    await flushPromises();
+    await vi.runOnlyPendingTimersAsync();
+
+    input.append(createInputEmoji(':custom-smile:'), document.createTextNode(' amigo'));
+    input.dispatchEvent(new InputEvent('input', { bubbles: true }));
+    await vi.advanceTimersByTimeAsync(850);
+    await flushPromises();
+
+    expect(requests).toEqual(['Hola', 'Hola §0§ amigo']);
+    expect(input.textContent).toContain('こんにちは');
+    expect(input.textContent).toContain('友達');
+    const emoji = input.querySelector<HTMLImageElement>('img[data-emoji-id="custom-smile-id"]');
+    expect(emoji?.alt).toBe(':custom-smile:');
+  });
+
   it('does not replace unchanged translations or stale language responses', async () => {
     vi.useFakeTimers();
     document.body.replaceChildren();
@@ -428,6 +470,17 @@ function createVisibleChatInput(): HTMLElement {
     toJSON: () => ({})
   });
   return input;
+}
+
+function createInputEmoji(alt: string): HTMLImageElement {
+  const emoji = document.createElement('img');
+  emoji.className = 'emoji yt-formatted-string style-scope yt-live-chat-text-input-field-renderer';
+  emoji.src = 'https://example.test/custom-smile.png';
+  emoji.alt = alt;
+  emoji.id = 'custom-smile-id';
+  emoji.setAttribute('data-emoji-id', 'custom-smile-id');
+  emoji.setAttribute('shared-tooltip-text', alt);
+  return emoji;
 }
 
 async function flushPromises(): Promise<void> {

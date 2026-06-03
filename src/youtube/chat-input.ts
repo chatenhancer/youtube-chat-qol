@@ -371,7 +371,11 @@ function dispatchInputReplacement(input: HTMLElement | HTMLTextAreaElement | HTM
 }
 
 function getInputPlainText(input: HTMLElement): string {
-  return Array.from(input.childNodes).map(getNodePlainText).join('');
+  return getChatInputNodesText(Array.from(input.childNodes));
+}
+
+export function getChatInputNodesText(nodes: Node[]): string {
+  return nodes.map(getNodePlainText).join('');
 }
 
 function inputContainsNode(input: HTMLElement, node: Node): boolean {
