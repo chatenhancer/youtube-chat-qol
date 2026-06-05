@@ -24,7 +24,8 @@
     "copy": "流れの速い YouTube ライブチャットを追いやすくし、会話をより理解し、大事なメッセージを見つけて、場所を見失わずに自然に返信できます。",
     "primaryCta": "インストール",
     "secondaryCta": "機能を見る",
-    "disclaimer": "YouTube または Google とは提携していません。"
+    "disclaimer": "YouTube または Google とは提携していません。",
+    "walkthroughCta": "拡張機能の動きを見る"
   },
   "features": {
     "eyebrow": "ライブ配信用",
@@ -41,7 +42,12 @@
     "emojisBody": "よく使うリアクションが YouTube の絵文字ピッカー上部に表示されます。",
     "commandsTitle": "Tab コマンドでもっと便利に",
     "commandsBody": "Tab を押すと、短いコマンドをメンション、引用、時刻ヘルパー、翻訳、受信トレイ監視、設定に展開できます。",
-    "commandsLink": "コマンドリファレンスを見る"
+    "commandsLink": "コマンドリファレンスを見る",
+    "walkthroughTitle": "機能の紹介動画を見る",
+    "walkthroughBody": "翻訳、Inbox、Focus mode、マークしたユーザー、絵文字、コマンド、ポップアップ設定が連携する様子を確認できます。",
+    "walkthroughCta": "紹介動画を見る",
+    "walkthroughModalTitle": "機能紹介",
+    "walkthroughClose": "紹介動画を閉じる"
   },
   "screenshots": {
     "eyebrow": "スクリーンショット",

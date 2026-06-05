@@ -24,7 +24,8 @@
     "copy": "ตามแชทสด YouTube ที่ไหลเร็วให้ทัน เข้าใจสิ่งที่คนอื่นพูดมากขึ้น เจอข้อความสำคัญ และตอบกลับได้เป็นธรรมชาติโดยไม่หลุดจากจุดที่อ่านอยู่",
     "primaryCta": "ติดตั้ง",
     "secondaryCta": "ดูฟีเจอร์",
-    "disclaimer": "ไม่มีความเกี่ยวข้องกับ YouTube หรือ Google"
+    "disclaimer": "ไม่มีความเกี่ยวข้องกับ YouTube หรือ Google",
+    "walkthroughCta": "ดูส่วนขยายขณะทำงาน"
   },
   "features": {
     "eyebrow": "สร้างเพื่อไลฟ์สตรีม",
@@ -41,7 +42,12 @@
     "emojisBody": "รีแอ็กชันที่คุณใช้บ่อยจะอยู่ด้านบนของตัวเลือก emoji ของ YouTube",
     "commandsTitle": "ทำได้มากขึ้นด้วยคำสั่ง Tab",
     "commandsBody": "กด Tab เพื่อขยายคำสั่งสั้น ๆ เป็นเมนชัน คำอ้างอิง ตัวช่วยเวลา คำแปล การติดตาม inbox และการตั้งค่า",
-    "commandsLink": "ดูคู่มือคำสั่ง"
+    "commandsLink": "ดูคู่มือคำสั่ง",
+    "walkthroughTitle": "ดูวิดีโอแนะนำฟีเจอร์",
+    "walkthroughBody": "ดูการทำงานร่วมกันของการแปล, Inbox, Focus mode, ผู้ใช้ที่ทำเครื่องหมายไว้, อีโมจิ, คำสั่ง และการตั้งค่า popup",
+    "walkthroughCta": "ดูวิดีโอแนะนำ",
+    "walkthroughModalTitle": "วิดีโอแนะนำฟีเจอร์",
+    "walkthroughClose": "ปิดวิดีโอแนะนำ"
   },
   "screenshots": {
     "eyebrow": "ภาพหน้าจอ",

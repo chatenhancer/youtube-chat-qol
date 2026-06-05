@@ -24,7 +24,8 @@
     "copy": "Sigue chats en vivo de YouTube que se mueven rápido, entiende mejor lo que dice la gente, encuentra los mensajes importantes y responde con naturalidad sin perder tu lugar.",
     "primaryCta": "Instalar",
     "secondaryCta": "Ver funciones",
-    "disclaimer": "Sin afiliación con YouTube ni Google."
+    "disclaimer": "Sin afiliación con YouTube ni Google.",
+    "walkthroughCta": "Mira la extensión en acción"
   },
   "features": {
     "eyebrow": "Pensado para directos",
@@ -41,7 +42,12 @@
     "emojisBody": "Tus reacciones más usadas se quedan arriba en el selector de emojis de YouTube.",
     "commandsTitle": "Haz más con comandos Tab",
     "commandsBody": "Pulsa Tab para expandir comandos cortos en menciones, citas, ayudas de hora, traducciones, palabras vigiladas y ajustes.",
-    "commandsLink": "Ver referencia de comandos"
+    "commandsLink": "Ver referencia de comandos",
+    "walkthroughTitle": "Mira un recorrido por las funciones",
+    "walkthroughBody": "Ve cómo funcionan juntas la traducción, Inbox, Focus mode, usuarios marcados, emojis, comandos y ajustes del popup.",
+    "walkthroughCta": "Ver recorrido",
+    "walkthroughModalTitle": "Recorrido de funciones",
+    "walkthroughClose": "Cerrar recorrido"
   },
   "screenshots": {
     "eyebrow": "Capturas",

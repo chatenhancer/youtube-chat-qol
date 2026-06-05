@@ -1,4 +1,4 @@
-import { mkdir, readFile, readdir, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, readdir, stat, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import contact from '../src/shared/contact.json' with { type: 'json' };
@@ -12,6 +12,8 @@ const i18nDir = path.join(docsDir, 'i18n');
 const templatePath = path.join(docsDir, 'index.html');
 const sitemapPath = path.join(docsDir, 'sitemap.xml');
 const contactScriptPath = path.join(docsDir, 'assets', 'contact.js');
+const videoScriptPath = path.join(docsDir, 'assets', 'video.js');
+const videosDir = path.join(docsDir, 'videos');
 const generatedComment = createGeneratedComment();
 
 const localeMeta = {
@@ -41,6 +43,7 @@ const localeMeta = {
 
 await validateDocsLocales();
 await writeContactScript();
+await writeVideoScript();
 
 let template = await readFile(templatePath, 'utf8');
 if (process.env.YTCQ_DOCS_STAMP_SOURCE === '1') {
@@ -285,4 +288,27 @@ async function writeContactScript() {
     contactScriptPath,
     `window.YTCQ_CONTACT=${JSON.stringify({ supportEmail: contact.supportEmail })};\n`
   );
+}
+
+async function writeVideoScript() {
+  const walkthroughFileName = await findLatestWalkthroughVideo();
+  const config = walkthroughFileName
+    ? { walkthrough: `videos/${walkthroughFileName}` }
+    : {};
+
+  await writeFile(videoScriptPath, `window.YTCQ_VIDEO=${JSON.stringify(config)};\n`);
+}
+
+async function findLatestWalkthroughVideo() {
+  const entries = await readdir(videosDir).catch(() => []);
+  const candidates = entries.filter((entry) => /^chat-enhancer-walkthrough-[a-f0-9]{8}\.mp4$/.test(entry));
+  if (!candidates.length) return '';
+
+  const files = await Promise.all(candidates.map(async (fileName) => {
+    const fileStat = await stat(path.join(videosDir, fileName));
+    return { fileName, mtimeMs: fileStat.mtimeMs };
+  }));
+
+  files.sort((first, second) => second.mtimeMs - first.mtimeMs || first.fileName.localeCompare(second.fileName));
+  return files[0].fileName;
 }

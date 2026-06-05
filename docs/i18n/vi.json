@@ -24,7 +24,8 @@
     "copy": "Theo kịp các cuộc trò chuyện trực tiếp trên YouTube khi chat chạy nhanh, hiểu rõ hơn mọi người đang nói gì, tìm những tin nhắn quan trọng và trả lời tự nhiên mà không mất vị trí.",
     "primaryCta": "Cài đặt",
     "secondaryCta": "Xem tính năng",
-    "disclaimer": "Không liên kết với YouTube hoặc Google."
+    "disclaimer": "Không liên kết với YouTube hoặc Google.",
+    "walkthroughCta": "Xem tiện ích hoạt động"
   },
   "features": {
     "eyebrow": "Xây cho livestream",
@@ -41,7 +42,12 @@
     "emojisBody": "Các phản ứng bạn dùng nhiều nhất nằm ở đầu trình chọn emoji của YouTube.",
     "commandsTitle": "Làm nhiều hơn với lệnh Tab",
     "commandsBody": "Nhấn Tab để mở rộng lệnh ngắn thành nhắc tên, trích dẫn, trợ giúp thời gian, bản dịch, theo dõi hộp thư và cài đặt.",
-    "commandsLink": "Xem tham chiếu lệnh"
+    "commandsLink": "Xem tham chiếu lệnh",
+    "walkthroughTitle": "Xem phần giới thiệu tính năng",
+    "walkthroughBody": "Xem dịch, Inbox, Focus mode, người dùng đã đánh dấu, emoji, lệnh và cài đặt popup hoạt động cùng nhau.",
+    "walkthroughCta": "Xem giới thiệu",
+    "walkthroughModalTitle": "Giới thiệu tính năng",
+    "walkthroughClose": "Đóng giới thiệu"
   },
   "screenshots": {
     "eyebrow": "Ảnh chụp",

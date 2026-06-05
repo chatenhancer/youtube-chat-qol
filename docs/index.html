@@ -79,7 +79,7 @@
         }
       })();
     </script>
-    <link rel="stylesheet" href="styles.css?v=127">
+    <link rel="stylesheet" href="styles.css?v=129">
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -219,10 +219,23 @@
           </div>
           <p class="hero-disclaimer" data-i18n="hero.disclaimer">Not affiliated with YouTube or Google.</p>
         </div>
-        <div class="hero-media" aria-hidden="true">
-          <img class="hero-chat hero-chat-side hero-chat-left" src="assets/screenshots/hero-img3.png" alt="">
-          <img class="hero-chat hero-chat-main" src="assets/screenshots/hero-img2.png" alt="">
-          <img class="hero-chat hero-chat-side hero-chat-right" src="assets/screenshots/hero-img1.png" alt="">
+        <div class="hero-media-column">
+          <div class="hero-media" aria-hidden="true">
+            <img class="hero-chat hero-chat-side hero-chat-left" src="assets/screenshots/hero-img3.png" alt="">
+            <img class="hero-chat hero-chat-main" src="assets/screenshots/hero-img2.png" alt="">
+            <img class="hero-chat hero-chat-side hero-chat-right" src="assets/screenshots/hero-img1.png" alt="">
+          </div>
+          <div class="hero-walkthrough" hidden data-walkthrough-cta>
+            <button class="hero-walkthrough-button" type="button" data-walkthrough-open>
+              <span class="hero-walkthrough-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" focusable="false">
+                  <path class="walkthrough-play-circle" d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Z"></path>
+                  <path class="walkthrough-play-triangle" d="M10 7.5v9l6-4.5-6-4.5Z"></path>
+                </svg>
+              </span>
+              <span data-i18n="hero.walkthroughCta">See the extension in action</span>
+            </button>
+          </div>
         </div>
       </section>
 
@@ -304,6 +317,19 @@
               </p>
               <a class="feature-link" href="#commands" data-i18n="features.commandsLink">View command reference</a>
             </article>
+          </div>
+          <div class="feature-walkthrough" hidden data-walkthrough-cta>
+            <span class="feature-walkthrough-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <path class="walkthrough-play-circle" d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Z"></path>
+                <path class="walkthrough-play-triangle" d="M10 7.5v9l6-4.5-6-4.5Z"></path>
+              </svg>
+            </span>
+            <span class="feature-walkthrough-copy">
+              <strong data-i18n="features.walkthroughTitle">Watch a walkthrough of the features</strong>
+              <span data-i18n="features.walkthroughBody">See translation, Inbox, Focus mode, marked users, emojis, commands, and popup settings working together.</span>
+            </span>
+            <button class="button button-secondary" type="button" data-walkthrough-open data-i18n="features.walkthroughCta">Watch walkthrough</button>
           </div>
         </div>
       </section>
@@ -809,6 +835,20 @@
       </div>
     </dialog>
 
+    <dialog class="walkthrough-modal" aria-labelledby="walkthrough-modal-title" data-walkthrough-modal>
+      <div class="walkthrough-modal-panel">
+        <div class="walkthrough-modal-heading">
+          <h2 id="walkthrough-modal-title" data-i18n="features.walkthroughModalTitle">Feature walkthrough</h2>
+          <button class="walkthrough-modal-close" type="button" aria-label="Close walkthrough" data-walkthrough-close data-i18n-attr="aria-label:features.walkthroughClose">
+            <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+              <path d="M6.4 5.05 12 10.65l5.6-5.6 1.35 1.35-5.6 5.6 5.6 5.6-1.35 1.35-5.6-5.6-5.6 5.6-1.35-1.35 5.6-5.6-5.6-5.6 1.35-1.35Z"></path>
+            </svg>
+          </button>
+        </div>
+        <video class="walkthrough-video" controls playsinline preload="metadata" data-walkthrough-video></video>
+      </div>
+    </dialog>
+
     <footer class="site-footer">
       <p data-i18n="footer.disclaimer">Chat Enhancer for YouTube is not affiliated with YouTube or Google.</p>
       <a href="https://www.chatenhancer.com/privacy" data-i18n="footer.privacy">Privacy</a>
@@ -817,6 +857,7 @@
       <a href="https://www.chatenhancer.com/license" data-i18n="footer.license">License</a>
     </footer>
     <script src="assets/contact.js"></script>
+    <script src="assets/video.js"></script>
     <script>
       (() => {
         const installActions = document.querySelector("[data-install-actions]");
@@ -826,9 +867,15 @@
         const supportModal = document.querySelector("[data-support-modal]");
         const supportModalClose = document.querySelector("[data-support-modal-close]");
         const supportModalContinue = document.querySelector("[data-support-modal-continue]");
+        const walkthroughCtas = document.querySelectorAll("[data-walkthrough-cta]");
+        const walkthroughOpenButtons = document.querySelectorAll("[data-walkthrough-open]");
+        const walkthroughModal = document.querySelector("[data-walkthrough-modal]");
+        const walkthroughClose = document.querySelector("[data-walkthrough-close]");
+        const walkthroughVideo = document.querySelector("[data-walkthrough-video]");
 
         setupTopHeaderState();
         setupContactEmailLinks();
+        setupWalkthroughVideoModal();
 
         if (languageSwitcher) {
           const path = window.location.pathname;
@@ -865,6 +912,18 @@
 
         supportModal?.addEventListener("click", (event) => {
           if (event.target === supportModal) closeSupportModal();
+        });
+
+        walkthroughClose?.addEventListener("click", () => {
+          closeWalkthroughModal();
+        });
+
+        walkthroughModal?.addEventListener("click", (event) => {
+          if (event.target === walkthroughModal) closeWalkthroughModal();
+        });
+
+        walkthroughModal?.addEventListener("close", () => {
+          if (walkthroughVideo instanceof HTMLVideoElement) walkthroughVideo.pause();
         });
 
         setupStoreVersionAlertScrollFade();
@@ -979,6 +1038,70 @@
 
         function closeSupportModal() {
           if (supportModal && typeof supportModal.close === "function") supportModal.close();
+        }
+
+        function setupWalkthroughVideoModal() {
+          const walkthroughPath = window.YTCQ_VIDEO?.walkthrough;
+          if (
+            !walkthroughCtas.length ||
+            !walkthroughOpenButtons.length ||
+            !walkthroughModal ||
+            !(walkthroughVideo instanceof HTMLVideoElement) ||
+            typeof walkthroughPath !== "string" ||
+            !walkthroughPath
+          ) {
+            return;
+          }
+
+          const videoUrl = getDocsAssetUrl(walkthroughPath);
+          walkthroughVideo.src = videoUrl.href;
+          walkthroughCtas.forEach((cta) => {
+            cta.hidden = false;
+          });
+
+          walkthroughOpenButtons.forEach((button) => {
+            button.addEventListener("click", () => {
+              openWalkthroughModal(videoUrl);
+            });
+          });
+        }
+
+        function openWalkthroughModal(videoUrl) {
+          if (!(walkthroughVideo instanceof HTMLVideoElement)) return;
+
+          if (walkthroughVideo.ended) walkthroughVideo.currentTime = 0;
+          if (walkthroughModal && typeof walkthroughModal.showModal === "function") {
+            walkthroughModal.showModal();
+            walkthroughVideo.focus();
+            startWalkthroughPlayback();
+            return;
+          }
+
+          window.open(videoUrl.href, "_blank", "noopener");
+        }
+
+        function startWalkthroughPlayback() {
+          if (!(walkthroughVideo instanceof HTMLVideoElement)) return;
+
+          walkthroughVideo.muted = false;
+          void walkthroughVideo.play().catch(() => {
+            walkthroughVideo.muted = true;
+            void walkthroughVideo.play().catch(() => undefined);
+          });
+        }
+
+        function closeWalkthroughModal() {
+          if (walkthroughVideo instanceof HTMLVideoElement) walkthroughVideo.pause();
+          if (walkthroughModal && typeof walkthroughModal.close === "function") walkthroughModal.close();
+        }
+
+        function getDocsAssetUrl(relativePath) {
+          const videoScript = document.querySelector('script[src$="assets/video.js"]');
+          const scriptUrl = videoScript instanceof HTMLScriptElement
+            ? videoScript.src
+            : new URL("assets/video.js", window.location.href).href;
+          const docsRoot = new URL("../", scriptUrl);
+          return new URL(relativePath, docsRoot);
         }
 
         async function fetchPublishedVersions() {

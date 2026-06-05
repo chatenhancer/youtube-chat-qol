@@ -24,7 +24,8 @@
     "copy": "Volg snelle YouTube-livechats makkelijker, begrijp beter wat mensen zeggen, vind de berichten die ertoe doen en reageer natuurlijk zonder je plek kwijt te raken.",
     "primaryCta": "Installeren",
     "secondaryCta": "Functies bekijken",
-    "disclaimer": "Niet gelieerd aan YouTube of Google."
+    "disclaimer": "Niet gelieerd aan YouTube of Google.",
+    "walkthroughCta": "Bekijk de extensie in actie"
   },
   "features": {
     "eyebrow": "Gemaakt voor livestreams",
@@ -41,7 +42,12 @@
     "emojisBody": "Je meest gebruikte reacties blijven bovenaan de emoji-kiezer van YouTube staan.",
     "commandsTitle": "Doe meer met Tab-commando’s",
     "commandsBody": "Druk op Tab om korte commando’s uit te vouwen tot vermeldingen, citaten, tijdhulpen, vertalingen, inbox-watches en instellingen.",
-    "commandsLink": "Commandoreferentie bekijken"
+    "commandsLink": "Commandoreferentie bekijken",
+    "walkthroughTitle": "Bekijk een rondleiding door de functies",
+    "walkthroughBody": "Zie hoe vertaling, Inbox, Focus mode, gemarkeerde gebruikers, emoji’s, opdrachten en popupinstellingen samenwerken.",
+    "walkthroughCta": "Rondleiding bekijken",
+    "walkthroughModalTitle": "Functierondleiding",
+    "walkthroughClose": "Rondleiding sluiten"
   },
   "screenshots": {
     "eyebrow": "Screenshots",

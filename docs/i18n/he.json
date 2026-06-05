@@ -24,7 +24,8 @@
     "copy": "עקבו אחרי צ׳אטים חיים ומהירים ב-YouTube, הבינו יותר ממה שאנשים כותבים, מצאו את ההודעות החשובות והשיבו בטבעיות בלי לאבד את המקום.",
     "primaryCta": "התקנה",
     "secondaryCta": "הצגת תכונות",
-    "disclaimer": "לא משויך ל-YouTube או Google."
+    "disclaimer": "לא משויך ל-YouTube או Google.",
+    "walkthroughCta": "ראו את התוסף בפעולה"
   },
   "features": {
     "eyebrow": "נבנה לשידורים חיים",
@@ -41,7 +42,12 @@
     "emojisBody": "התגובות שבהן אתם משתמשים הכי הרבה נשארות בראש בורר האימוג׳ים של YouTube.",
     "commandsTitle": "עשו יותר עם פקודות Tab",
     "commandsBody": "לחצו Tab כדי להרחיב פקודות קצרות לאזכורים, ציטוטים, עזרי זמן, תרגומים, מעקבי תיבה והגדרות.",
-    "commandsLink": "הצגת מדריך הפקודות"
+    "commandsLink": "הצגת מדריך הפקודות",
+    "walkthroughTitle": "צפו בסקירה של התכונות",
+    "walkthroughBody": "ראו איך תרגום, Inbox, מצב פוקוס, משתמשים מסומנים, אימוג׳ים, פקודות והגדרות החלונית עובדים יחד.",
+    "walkthroughCta": "צפו בסקירה",
+    "walkthroughModalTitle": "סקירת תכונות",
+    "walkthroughClose": "סגירת הסקירה"
   },
   "screenshots": {
     "eyebrow": "צילומי מסך",

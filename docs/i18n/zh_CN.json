@@ -24,7 +24,8 @@
     "copy": "轻松跟上快速滚动的 YouTube 直播聊天，更好地理解大家在说什么，找到重要消息，并在不丢失当前位置的情况下自然回复。",
     "primaryCta": "安装",
     "secondaryCta": "查看功能",
-    "disclaimer": "不隶属于 YouTube 或 Google。"
+    "disclaimer": "不隶属于 YouTube 或 Google。",
+    "walkthroughCta": "观看扩展的实际效果"
   },
   "features": {
     "eyebrow": "为直播打造",
@@ -41,7 +42,12 @@
     "emojisBody": "你最常用的反应会保留在 YouTube 表情选择器顶部。",
     "commandsTitle": "用 Tab 命令做更多事",
     "commandsBody": "按 Tab 将短命令展开为提及、引用、时间辅助、翻译、收件箱关注和设置。",
-    "commandsLink": "查看命令参考"
+    "commandsLink": "查看命令参考",
+    "walkthroughTitle": "观看功能演示",
+    "walkthroughBody": "看看翻译、Inbox、Focus mode、标记用户、表情、命令和弹出窗口设置如何配合使用。",
+    "walkthroughCta": "观看演示",
+    "walkthroughModalTitle": "功能演示",
+    "walkthroughClose": "关闭演示"
   },
   "screenshots": {
     "eyebrow": "截图",

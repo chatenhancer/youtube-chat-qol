@@ -24,7 +24,8 @@
     "copy": "빠르게 지나가는 YouTube 실시간 채팅을 따라가고, 사람들이 하는 말을 더 잘 이해하고, 중요한 메시지를 찾고, 흐름을 놓치지 않고 자연스럽게 답장하세요.",
     "primaryCta": "설치",
     "secondaryCta": "기능 보기",
-    "disclaimer": "YouTube 또는 Google과 제휴하지 않았습니다."
+    "disclaimer": "YouTube 또는 Google과 제휴하지 않았습니다.",
+    "walkthroughCta": "확장 프로그램이 작동하는 모습 보기"
   },
   "features": {
     "eyebrow": "라이브 스트림을 위해 제작",
@@ -41,7 +42,12 @@
     "emojisBody": "가장 많이 쓰는 반응이 YouTube 이모지 선택기 맨 위에 유지됩니다.",
     "commandsTitle": "Tab 명령으로 더 빠르게",
     "commandsBody": "Tab을 눌러 짧은 명령을 멘션, 인용, 시간 도우미, 번역, 받은 편지함 감시, 설정으로 확장하세요.",
-    "commandsLink": "명령 참고 보기"
+    "commandsLink": "명령 참고 보기",
+    "walkthroughTitle": "기능 둘러보기 보기",
+    "walkthroughBody": "번역, Inbox, Focus mode, 표시한 사용자, 이모지, 명령어, 팝업 설정이 함께 작동하는 모습을 확인하세요.",
+    "walkthroughCta": "둘러보기 보기",
+    "walkthroughModalTitle": "기능 둘러보기",
+    "walkthroughClose": "둘러보기 닫기"
   },
   "screenshots": {
     "eyebrow": "스크린샷",
