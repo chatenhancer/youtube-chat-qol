@@ -17,7 +17,7 @@ import { fileURLToPath } from 'node:url';
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const profileDir = path.resolve(process.env.YTCQ_CHROME_PROFILE || path.join(repoRoot, '.chrome-test-profiles', 'pristine'));
 const extensionDir = path.join(repoRoot, 'dist', 'extension-chrome');
-const liveUrl = process.env.YTCQ_LIVE_URL || 'https://www.youtube.com/watch?v=EWrX250Zhko';
+const liveUrl = process.env.YTCQ_LIVE_URL || 'https://www.youtube.com/@LofiGirl/live';
 const authCookieNames = [
   'APISID',
   'HSID',

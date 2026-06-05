@@ -12,7 +12,7 @@ const supportDir = path.dirname(fileURLToPath(import.meta.url));
 
 export const repoRoot = path.resolve(supportDir, '..', '..', '..');
 export const extensionDir = path.join(repoRoot, 'dist', 'extension-chrome');
-export const defaultLiveUrl = 'https://www.youtube.com/watch?v=EWrX250Zhko';
+export const defaultLiveUrl = 'https://www.youtube.com/@LofiGirl/live';
 export const defaultReplayUrl = 'https://www.youtube.com/watch?v=SHt3FyE-VIQ';
 
 export function getLiveProfileDir(): string {
