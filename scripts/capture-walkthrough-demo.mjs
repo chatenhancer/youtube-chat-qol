@@ -258,6 +258,7 @@ async function recordWalkthrough(page, chat, context, recorder) {
 
 async function sectionTranslateChat(page, chat, context, recorder) {
   await focusChatHeader(page, chat, recorder, { showFocus: false });
+  await positionDemoChatAtMessage(chat, 'translate-2');
   const settingsButton = chat.locator([
     'yt-live-chat-header-renderer #live-chat-header-context-menu button',
     'yt-live-chat-header-renderer #live-chat-header-context-menu yt-icon-button',
@@ -289,7 +290,6 @@ async function sectionTranslateChat(page, chat, context, recorder) {
   await waitForDemoMessageTranslation(chat, 'translate-2');
   await recorder.refreshCaptureSource();
   await recorder.hold(500);
-  await smoothScrollDemoChatToMessage(chat, 'translate-2', recorder);
   await showDemoCaptionFor(
     page,
     recorder,
@@ -300,7 +300,6 @@ async function sectionTranslateChat(page, chat, context, recorder) {
 
   await setExtensionStorage(context, 'sync', { translationDisplay: 'replace' });
   await recorder.refreshCaptureSource();
-  await smoothScrollDemoChatToMessage(chat, 'translate-2', recorder);
   await recorder.hold(800);
   await showDemoCaptionFor(
     page,
@@ -1080,6 +1079,26 @@ async function stabilizeDemoChatFeed(chat) {
     window.__ytcqDemoManualScrollUntil = 0;
     window.__ytcqDemoStabilizeChat?.();
   }).catch(() => undefined);
+}
+
+async function positionDemoChatAtMessage(chat, messageKey) {
+  await chat.locator('body').evaluate((body, key) => {
+    void body;
+    window.__ytcqDemoManualScrollUntil = Date.now() + 60_000;
+    window.__ytcqDemoStabilizeChat?.();
+    const scroller = document.querySelector('yt-live-chat-item-list-renderer #item-scroller');
+    const message = document.querySelector(`.ytcq-demo-message[data-ytcq-demo-key="${CSS.escape(key)}"]`);
+    const stage = document.querySelector('.ytcq-demo-message-stage');
+    if (!(scroller instanceof HTMLElement) || !(message instanceof HTMLElement) || !(stage instanceof HTMLElement)) return;
+
+    const lastMessage = stage.querySelector('.ytcq-demo-message:last-child');
+    const lastMessageBottom = lastMessage instanceof HTMLElement
+      ? lastMessage.offsetTop + lastMessage.offsetHeight + 4
+      : stage.scrollHeight;
+    const targetTop = message.offsetTop - Math.max(0, (scroller.clientHeight - message.offsetHeight) / 2);
+    const maxTop = Math.max(0, lastMessageBottom - scroller.clientHeight);
+    window.__ytcqDemoSetChatScrollTop?.(Math.max(0, Math.min(maxTop, targetTop)));
+  }, messageKey).catch(() => undefined);
 }
 
 async function smoothScrollDemoChatToMessage(chat, messageKey, recorder) {
