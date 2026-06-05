@@ -199,8 +199,8 @@ async function recordWalkthrough(page, chat, context, recorder) {
     'Chat Enhancer works inside YouTube live chat',
     'Small tools appear where chat already happens, without replacing YouTube chat.'
   );
-  await replayStartupEffect(context);
-  await recorder.hold(3_800);
+  await playDemoStartupEffect(page, recorder, 1_350);
+  await recorder.hold(2_450);
   await hideDemoCaption(page);
   await recorder.hold(360);
   await recorder.hold(900);
@@ -718,10 +718,189 @@ async function setExtensionStorage(context, area, values) {
   }
 }
 
-async function replayStartupEffect(context) {
-  await setExtensionStorage(context, 'sync', { startupEffect: false });
-  await delay(160);
-  await setExtensionStorage(context, 'sync', { startupEffect: true });
+async function playDemoStartupEffect(page, recorder, durationMs) {
+  const frames = durationToFrames(durationMs);
+  await installFrameSteppedStartupEffect(page);
+
+  for (let frame = 0; frame < frames; frame += 1) {
+    const progress = frames <= 1 ? 1 : frame / (frames - 1);
+    await page.evaluate((nextProgress) => {
+      window.__ytcqDemoDrawStartupEffect?.(nextProgress);
+    }, progress);
+    await recorder.captureFrame();
+  }
+
+  await page.evaluate(() => {
+    window.__ytcqDemoClearStartupEffect?.();
+  });
+}
+
+async function installFrameSteppedStartupEffect(page) {
+  await page.evaluate(() => {
+    if (window.__ytcqDemoDrawStartupEffect) return;
+
+    const effectClass = 'ytcq-demo-startup-effect';
+    const canvasScale = 0.7;
+    const glowPadding = 18;
+
+    const getOrCreateEffect = () => {
+      let effect = document.querySelector(`.${effectClass}`);
+      if (!(effect instanceof HTMLDivElement)) {
+        effect = document.createElement('div');
+        effect.className = effectClass;
+        effect.setAttribute('aria-hidden', 'true');
+        Object.assign(effect.style, {
+          inset: '0',
+          overflow: 'visible',
+          pointerEvents: 'none',
+          position: 'fixed',
+          zIndex: '2147483647'
+        });
+      }
+
+      let canvas = effect.querySelector('canvas');
+      if (!(canvas instanceof HTMLCanvasElement)) {
+        canvas = document.createElement('canvas');
+        Object.assign(canvas.style, {
+          display: 'block',
+          filter: 'blur(6px) saturate(1.2) brightness(1.05)',
+          height: '100%',
+          inset: '0',
+          opacity: '1',
+          position: 'absolute',
+          width: '100%'
+        });
+        effect.append(canvas);
+      }
+
+      if (!effect.isConnected) {
+        (document.body || document.documentElement).append(effect);
+      }
+
+      return { canvas, effect };
+    };
+
+    const getChatFrameBox = () => {
+      const frame = document.querySelector('iframe#chatframe');
+      if (!(frame instanceof HTMLIFrameElement)) return null;
+      const rect = frame.getBoundingClientRect();
+      if (!Number.isFinite(rect.width) || !Number.isFinite(rect.height) || rect.width <= 0 || rect.height <= 0) return null;
+      return {
+        height: rect.height,
+        width: rect.width,
+        x: rect.left,
+        y: rect.top
+      };
+    };
+
+    const getActivationOpacity = (progress) => {
+      if (progress < 0.16) return progress / 0.16;
+      if (progress > 0.76) return Math.max(0, (1 - progress) / 0.24);
+      return 1;
+    };
+
+    const easeOutCubic = (value) => 1 - Math.pow(1 - value, 3);
+
+    const strokeRoundedRect = (context, x, y, width, height, radius) => {
+      const safeRadius = Math.max(0, Math.min(radius, width / 2, height / 2));
+      context.beginPath();
+      context.moveTo(x + safeRadius, y);
+      context.lineTo(x + width - safeRadius, y);
+      context.quadraticCurveTo(x + width, y, x + width, y + safeRadius);
+      context.lineTo(x + width, y + height - safeRadius);
+      context.quadraticCurveTo(x + width, y + height, x + width - safeRadius, y + height);
+      context.lineTo(x + safeRadius, y + height);
+      context.quadraticCurveTo(x, y + height, x, y + height - safeRadius);
+      context.lineTo(x, y + safeRadius);
+      context.quadraticCurveTo(x, y, x + safeRadius, y);
+      context.closePath();
+      context.stroke();
+    };
+
+    const drawPerimeterStroke = (context, box, strokeStyle, lineWidth) => {
+      const inset = 2 + glowPadding;
+      const width = box.width + glowPadding * 2;
+      const height = box.height + glowPadding * 2;
+      const radius = Math.min(18, width / 2 - inset, height / 2 - inset);
+
+      context.save();
+      context.strokeStyle = strokeStyle;
+      context.lineWidth = lineWidth;
+      strokeRoundedRect(context, box.x + inset - glowPadding, box.y + inset - glowPadding, width - inset * 2, height - inset * 2, radius);
+      context.restore();
+    };
+
+    const clamp01 = (value) => Math.max(0, Math.min(1, Number.isFinite(value) ? value : 0));
+
+    const getFiniteSize = (candidate, fallback) => {
+      if (Number.isFinite(candidate) && candidate > 0) return candidate;
+      if (Number.isFinite(fallback) && fallback > 0) return fallback;
+      return 1;
+    };
+
+    const createShimmerGradient = (context, box, progress) => {
+      const safeProgress = clamp01(progress);
+      const safeWidth = getFiniteSize(box.width, window.innerWidth);
+      const safeHeight = getFiniteSize(box.height, window.innerHeight);
+      const gradient = context.createConicGradient(
+        safeProgress * Math.PI * 2 - Math.PI * 0.8,
+        box.x + safeWidth / 2,
+        box.y + safeHeight / 2
+      );
+      gradient.addColorStop(0, 'rgba(62, 166, 255, 0)');
+      gradient.addColorStop(0.08, 'rgba(62, 166, 255, 0)');
+      gradient.addColorStop(0.12, 'rgba(62, 166, 255, 0.36)');
+      gradient.addColorStop(0.155, 'rgba(125, 211, 252, 0.9)');
+      gradient.addColorStop(0.175, 'rgba(255, 255, 255, 1)');
+      gradient.addColorStop(0.195, 'rgba(125, 211, 252, 0.9)');
+      gradient.addColorStop(0.25, 'rgba(126, 87, 255, 0.28)');
+      gradient.addColorStop(0.34, 'rgba(62, 166, 255, 0)');
+      gradient.addColorStop(1, 'rgba(62, 166, 255, 0)');
+      return gradient;
+    };
+
+    window.__ytcqDemoDrawStartupEffect = (progress) => {
+      const { canvas } = getOrCreateEffect();
+      const box = getChatFrameBox();
+      if (!box) return;
+      const safeProgress = clamp01(progress);
+      const width = getFiniteSize(window.innerWidth, document.documentElement.clientWidth);
+      const height = getFiniteSize(window.innerHeight, document.documentElement.clientHeight);
+      const pixelWidth = Math.ceil(width * canvasScale);
+      const pixelHeight = Math.ceil(height * canvasScale);
+
+      if (canvas.width !== pixelWidth || canvas.height !== pixelHeight) {
+        canvas.width = pixelWidth;
+        canvas.height = pixelHeight;
+      }
+
+      const context = canvas.getContext('2d');
+      if (!context) return;
+
+      canvas.style.opacity = '1';
+      canvas.style.transition = 'none';
+      context.clearRect(0, 0, pixelWidth, pixelHeight);
+      context.save();
+      context.scale(canvasScale, canvasScale);
+      context.globalAlpha = getActivationOpacity(safeProgress);
+      context.globalCompositeOperation = 'lighter';
+      drawPerimeterStroke(context, box, 'rgba(62, 166, 255, 0.3)', 5);
+      drawPerimeterStroke(context, box, createShimmerGradient(context, box, easeOutCubic(safeProgress)), 13);
+      context.restore();
+    };
+
+    window.__ytcqDemoClearStartupEffect = () => {
+      const effect = document.querySelector(`.${effectClass}`);
+      const canvas = effect?.querySelector('canvas');
+      if (canvas instanceof HTMLCanvasElement) {
+        const context = canvas.getContext('2d');
+        context?.clearRect(0, 0, canvas.width, canvas.height);
+        canvas.style.opacity = '';
+        canvas.style.transition = '';
+      }
+      effect?.remove();
+    };
+  });
 }
 
 async function openWatchPageChatFrame(page, url) {
@@ -2086,6 +2265,13 @@ async function installLiveChatMask(chat) {
           display: none !important;
         }
 
+        #input,
+        #input[contenteditable],
+        yt-live-chat-text-input-field-renderer,
+        yt-live-chat-text-input-field-renderer * {
+          caret-color: transparent !important;
+        }
+
         tp-yt-paper-tooltip,
         paper-tooltip,
         yt-tooltip-renderer {
@@ -2872,26 +3058,7 @@ async function createFrameRecorder(page) {
       screenshotSession = await createScreenshotSession(nextPage);
     },
     async captureFrame() {
-      frameCount += 1;
-      const now = Date.now();
-      if (now - lastProgressAt >= progressUpdateMs) {
-        lastProgressAt = now;
-        writeCaptureProgress({
-          estimatedFrames: estimatedDemoFrames,
-          frameCount,
-          last: false,
-          stage,
-          startedAt
-        });
-      }
-      const screenshot = await screenshotSession.send('Page.captureScreenshot', {
-        format: 'png',
-        fromSurface: true
-      });
-      await writeFile(
-        path.join(framesDir, `frame-${String(frameCount).padStart(5, '0')}.png`),
-        Buffer.from(screenshot.data, 'base64')
-      );
+      await writeScreenshotFrame(await captureScreenshotBuffer());
     },
     async hold(durationMs) {
       const frames = durationToFrames(durationMs);
@@ -2910,6 +3077,33 @@ async function createFrameRecorder(page) {
       await screenshotSession.detach().catch(() => undefined);
     }
   };
+
+  async function captureScreenshotBuffer() {
+    const screenshot = await screenshotSession.send('Page.captureScreenshot', {
+      format: 'png',
+      fromSurface: true
+    });
+    return Buffer.from(screenshot.data, 'base64');
+  }
+
+  async function writeScreenshotFrame(buffer) {
+    frameCount += 1;
+    const now = Date.now();
+    if (now - lastProgressAt >= progressUpdateMs) {
+      lastProgressAt = now;
+      writeCaptureProgress({
+        estimatedFrames: estimatedDemoFrames,
+        frameCount,
+        last: false,
+        stage,
+        startedAt
+      });
+    }
+    await writeFile(
+      path.join(framesDir, `frame-${String(frameCount).padStart(5, '0')}.png`),
+      buffer
+    );
+  }
 }
 
 function writeCaptureProgress({ estimatedFrames, frameCount, last, stage, startedAt }) {
