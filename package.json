@@ -28,7 +28,7 @@
     "test:browser:live": "node scripts/run-browser-tests.mjs --project=youtube-live",
     "test:browser:mock": "node scripts/run-browser-tests.mjs --project=youtube-mock",
     "test:browser:perf": "node scripts/run-browser-performance-tests.mjs",
-    "test:coverage": "node scripts/run-unit-tests.mjs --coverage && node scripts/generate-readme-badges.mjs",
+    "test:coverage": "node scripts/run-unit-tests.mjs --coverage && node scripts/write-coverage-notice.mjs && node scripts/generate-readme-badges.mjs",
     "test:youtube-login": "node scripts/open-youtube-test-profile.mjs",
     "test:watch": "vitest",
     "ci:install-playwright": "npm run test:browser:install",

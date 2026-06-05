@@ -41,8 +41,8 @@ Run Vitest tests.
 npm run test:coverage
 ```
 
-Run Vitest with coverage, write `coverage/unit/index.html`, and refresh README
-coverage badges.
+Run Vitest with coverage, write `coverage/unit/index.html`, refresh README
+coverage badges, and print a notice when coverage is below the target.
 
 ```sh
 npm run test:browser:mock

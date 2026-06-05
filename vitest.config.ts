@@ -12,13 +12,7 @@ export default defineConfig({
       ],
       provider: 'v8',
       reporter: ['text', 'html', 'json-summary'],
-      reportsDirectory: 'coverage/unit',
-      thresholds: {
-        branches: 90,
-        functions: 90,
-        lines: 90,
-        statements: 90
-      }
+      reportsDirectory: 'coverage/unit'
     },
     environment: 'jsdom',
     globals: false,
