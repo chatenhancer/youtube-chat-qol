@@ -1,9 +1,0 @@
-Chrome Web Store ownership verification
-
-This page is published by the maintainer of Chat Enhancer for YouTube for Chrome Web Store ownership verification.
-
-Extension: Chat Enhancer for YouTube
-Extension ID: pkhaaipeppfpakofgpdpcpkflangpghf
-Chrome Web Store support ticket: 2-3449000041219
-
-This public page confirms that the person controlling this website/project is requesting manual ownership verification or transfer of the Chrome Web Store item above.
