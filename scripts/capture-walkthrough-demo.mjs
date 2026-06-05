@@ -31,6 +31,7 @@ const avatarLogoPath = path.join(repoRoot, 'assets', 'icons', 'icon-128.png');
 const pointerCursorPath = path.join(demoCursorDir, 'pointer.svg');
 const handCursorPath = path.join(demoCursorDir, 'hand.svg');
 const cameraSwooshPath = path.join(demoAudioDir, 'swoosh.mp3');
+const clickSoundPath = path.join(demoAudioDir, 'click.mp3');
 const demoResultsDir = path.join(repoRoot, 'test-results', 'demos');
 const finalVideoDir = path.join(repoRoot, 'docs', 'videos');
 const framesRootDir = path.resolve(process.env.YTCQ_DEMO_FRAMES_ROOT || getDefaultFramesRootDir());
@@ -64,6 +65,7 @@ const menuPopupSelector = 'ytd-menu-popup-renderer';
 const inboxRecordsStorageKey = `ytcqInboxRecords:${getSourceStorageKey(sourceUrl)}`;
 const markedUsersStorageKey = 'ytcqMarkedUsers';
 const emojiUsageStorageKey = 'ytcqEmojiUsage';
+const demoLuciaAvatarUrl = 'https://ytcq-demo.invalid/avatar/lucia-live.svg';
 const activeChromeProfileFileNames = new Set([
   'SingletonCookie',
   'SingletonLock',
@@ -105,7 +107,7 @@ const consentButtonNames = [
 const demoInboxRecord = {
   id: 'demo-inbox-keyword',
   authorName: '@LuciaLive',
-  avatarSrc: '',
+  avatarSrc: demoLuciaAvatarUrl,
   channelId: 'UCChatEnhancerDemo',
   contentParts: [
     {
@@ -158,6 +160,7 @@ async function main() {
   let closed = false;
 
   try {
+    await installDemoAssetRoutes(context);
     console.log('[walkthrough] Seeding deterministic extension state...');
     await withTimeout(seedWalkthroughExtensionState(context), 20_000, 'seed walkthrough extension state');
     console.log('[walkthrough] Opening live YouTube chat...');
@@ -178,7 +181,8 @@ async function main() {
     await chromeInstance.close();
     closed = true;
     await withTimeout(encodeFramesToVideo(recorder.frameCount, {
-      cameraSwooshCues: recorder.cameraSwooshCues
+      cameraSwooshCues: recorder.cameraSwooshCues,
+      clickCues: recorder.clickCues
     }), 180_000, 'encode walkthrough video');
     if (shouldHashFinalOutput) {
       outputPath = await withTimeout(applyContentHashToFinalOutput(outputPath), 20_000, 'hash walkthrough video output');
@@ -282,7 +286,7 @@ async function sectionTranslateChat(page, chat, context, recorder) {
     page,
     recorder,
     'Or replace the message',
-    'The Replace display mode can keep chat compact, and you can change it in the extension popup.',
+    'Choose the Replace translation display in the extension settings for a more compact view.',
     { anchorLocator: chat.locator(`${demoChatMessageSelector}[data-ytcq-demo-key="translate-2"]`).first() }
   );
   await closeNativeMenus(chat);
@@ -481,6 +485,7 @@ async function sectionInbox(page, chat, recorder) {
   });
   const inbox = chat.locator('.ytcq-inbox-card').first();
   await inbox.waitFor({ state: 'visible', timeout: 10_000 });
+  await ensureDemoInboxAvatar(chat);
   await showDemoCaptionFor(
     page,
     recorder,
@@ -504,6 +509,31 @@ async function sectionInbox(page, chat, recorder) {
     'The current list is shown as chips you can remove whenever you want.',
     { anchorLocator: keywordPanel }
   );
+}
+
+async function ensureDemoInboxAvatar(chat) {
+  await chat.locator('.ytcq-inbox-card').first().evaluate((card) => {
+    if (!(card instanceof HTMLElement)) return;
+    const row = card.querySelector('.ytcq-inbox-message');
+    if (!(row instanceof HTMLElement)) return;
+
+    let avatar = row.querySelector('.ytcq-inbox-avatar');
+    if (!(avatar instanceof HTMLElement)) {
+      avatar = document.createElement('span');
+      avatar.className = 'ytcq-inbox-avatar';
+      avatar.setAttribute('aria-hidden', 'true');
+      const timestamp = row.querySelector('.ytcq-profile-card-message-time');
+      row.insertBefore(avatar, timestamp || row.firstChild);
+      row.classList.add('ytcq-inbox-message-has-avatar');
+    }
+
+    avatar.classList.add('ytcq-demo-inbox-avatar-fallback');
+    avatar.replaceChildren();
+    const letter = document.createElement('span');
+    letter.className = 'ytcq-demo-inbox-avatar-letter';
+    letter.textContent = 'L';
+    avatar.append(letter);
+  });
 }
 
 async function sectionMarkedUsers(page, chat, context, recorder) {
@@ -685,6 +715,16 @@ async function seedWalkthroughExtensionState(context) {
   } finally {
     await extensionPage.close().catch(() => undefined);
   }
+}
+
+async function installDemoAssetRoutes(context) {
+  await context.route(demoLuciaAvatarUrl, async (route) => {
+    await route.fulfill({
+      body: createDemoAvatarSvg('@LuciaLive'),
+      contentType: 'image/svg+xml',
+      status: 200
+    });
+  });
 }
 
 async function openExtensionPopupPage(context) {
@@ -2339,7 +2379,7 @@ async function installLiveChatMask(chat) {
         .ytcq-demo-message #timestamp {
           color: var(--yt-live-chat-secondary-text-color, var(--yt-spec-text-secondary, #606060)) !important;
           display: none !important;
-          font-size: 11px !important;
+          font-size: 10px !important;
           margin-right: 0 !important;
           white-space: nowrap !important;
         }
@@ -2381,6 +2421,25 @@ async function installLiveChatMask(chat) {
           justify-content: center !important;
           padding: 0 !important;
           width: 28px !important;
+        }
+
+        .ytcq-inbox-card .ytcq-demo-inbox-avatar-fallback {
+          align-items: center !important;
+          background: ${getMarkedUserColor({ authorName: '@LuciaLive' })} !important;
+          color: #fff !important;
+          display: inline-flex !important;
+          font-family: Roboto, "YouTube Sans", Arial, sans-serif !important;
+          font-size: 11px !important;
+          font-weight: 400 !important;
+          justify-content: center !important;
+          line-height: 1 !important;
+          text-align: center !important;
+        }
+
+        .ytcq-inbox-card .ytcq-demo-inbox-avatar-letter {
+          display: block !important;
+          line-height: 1 !important;
+          transform: translate(0.5px, 0.75px) !important;
         }
 
         .ytcq-demo-menu-shell {
@@ -3029,10 +3088,14 @@ async function createFrameRecorder(page) {
   let stage = 'Preparing';
   const startedAt = Date.now();
   const cameraSwooshCues = [];
+  const clickCues = [];
 
   return {
     get cameraSwooshCues() {
       return [...cameraSwooshCues];
+    },
+    get clickCues() {
+      return [...clickCues];
     },
     get frameCount() {
       return frameCount;
@@ -3042,6 +3105,9 @@ async function createFrameRecorder(page) {
       if (cueMs - lastCameraSwooshAtMs < minGapMs) return;
       lastCameraSwooshAtMs = cueMs;
       cameraSwooshCues.push(cueMs);
+    },
+    cueClick() {
+      clickCues.push(Math.max(0, (frameCount / demoFps) * 1_000));
     },
     setStage(nextStage) {
       stage = nextStage;
@@ -3169,6 +3235,7 @@ async function clickWithCursor(page, locator, recorder, label, options = {}) {
   }
   try {
     await page.mouse.click(clickPoint.x, clickPoint.y);
+    recorder.cueClick();
   } finally {
     for (const modifier of modifiers.slice().reverse()) {
       await page.keyboard.up(modifier).catch(() => undefined);
@@ -3483,7 +3550,7 @@ async function readFileDataUrl(filePath, mimeType) {
   return `data:${mimeType};base64,${contents.toString('base64')}`;
 }
 
-async function encodeFramesToVideo(frameCount, { cameraSwooshCues = [] } = {}) {
+async function encodeFramesToVideo(frameCount, { cameraSwooshCues = [], clickCues = [] } = {}) {
   if (frameCount <= 0) throw new Error('No demo frames were captured.');
 
   const args = [
@@ -3512,7 +3579,14 @@ async function encodeFramesToVideo(frameCount, { cameraSwooshCues = [] } = {}) {
       filePath: cameraSwooshPath,
       label: 'camera swoosh',
       tag: 'swoosh',
-      volume: previewMode ? '0.65' : '0.55'
+      volume: previewMode ? '0.5' : '0.45'
+    },
+    {
+      cues: clickCues,
+      filePath: clickSoundPath,
+      label: 'click',
+      tag: 'click',
+      volume: previewMode ? '1.25' : '1.15'
     }
   ].filter((group) => group.cues.length);
   const availableAudioCueGroups = audioCueGroups.filter((group) => {
@@ -3551,7 +3625,7 @@ async function encodeFramesToVideo(frameCount, { cameraSwooshCues = [] } = {}) {
     const mixedInputs = `[1:a]${cueLabels.join('')}`;
     args.push(
       '-filter_complex',
-      `${cueFilters.join(';')};${mixedInputs}amix=inputs=${cueLabels.length + 1}:duration=first:dropout_transition=0[a]`,
+      `${cueFilters.join(';')};${mixedInputs}amix=inputs=${cueLabels.length + 1}:duration=first:dropout_transition=0:normalize=0[a]`,
       '-map',
       '0:v',
       '-map',
@@ -3652,6 +3726,22 @@ function getSourceStorageKey(value) {
   return `source:${hashStorageKey(value || 'unknown')}`;
 }
 
+function createDemoAvatarSvg(handle) {
+  const normalized = String(handle || '').replace(/^@/, '');
+  const initial = (normalized.match(/\p{L}|\p{N}/u)?.[0] || normalized.slice(0, 1) || 'C')
+    .toUpperCase();
+  return [
+    '<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">',
+    `<rect width="64" height="64" rx="32" fill="${getDemoAvatarColor(handle)}"/>`,
+    `<text x="32" y="32" text-anchor="middle" dy=".35em" fill="white" font-family="Roboto, Arial, sans-serif" font-size="30" font-weight="400">${escapeSvgText(initial)}</text>`,
+    '</svg>'
+  ].join('');
+}
+
+function getDemoAvatarColor(handle) {
+  return `hsl(${hashDemoString(String(handle || '').trim() || 'marked-user') % 360} 86% 58%)`;
+}
+
 function getVideoIdFromUrl(value) {
   try {
     const url = new URL(value);
@@ -3668,4 +3758,16 @@ function hashStorageKey(value) {
     hash = Math.imul(hash, 0x01000193);
   }
   return (hash >>> 0).toString(36);
+}
+
+function hashDemoString(value) {
+  let hash = 0;
+  for (let index = 0; index < value.length; index += 1) {
+    hash = Math.imul(hash ^ value.charCodeAt(index), 16777619);
+  }
+  return Math.abs(hash);
+}
+
+function escapeSvgText(value) {
+  return String(value).replace(/[&<>"']/g, '');
 }
