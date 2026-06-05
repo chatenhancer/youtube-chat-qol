@@ -529,13 +529,22 @@ h3 {
 
 .walkthrough-modal-heading {
   display: grid;
-  grid-template-columns: 34px minmax(0, 1fr) 34px;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
   gap: 16px;
 }
 
-.walkthrough-modal-heading::before {
-  content: "";
+.walkthrough-modal-time {
+  justify-self: start;
+  padding: 4px 8px;
+  color: var(--muted);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+  background: var(--soft);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  white-space: nowrap;
 }
 
 .walkthrough-modal h2 {
