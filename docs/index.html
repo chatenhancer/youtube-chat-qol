@@ -79,7 +79,7 @@
         }
       })();
     </script>
-    <link rel="stylesheet" href="styles.css?v=130">
+    <link rel="stylesheet" href="styles.css?v=131">
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -846,7 +846,17 @@
             </svg>
           </button>
         </div>
-        <video class="walkthrough-video" playsinline preload="metadata" tabindex="0" data-walkthrough-video></video>
+        <div class="walkthrough-video-frame">
+          <video class="walkthrough-video" playsinline preload="metadata" tabindex="0" data-walkthrough-video></video>
+          <span class="walkthrough-video-feedback" data-walkthrough-feedback aria-hidden="true">
+            <svg class="walkthrough-video-feedback-icon walkthrough-video-feedback-play" viewBox="0 0 24 24" focusable="false">
+              <path d="M8.5 5.75v12.5l9-6.25-9-6.25Z"></path>
+            </svg>
+            <svg class="walkthrough-video-feedback-icon walkthrough-video-feedback-pause" viewBox="0 0 24 24" focusable="false">
+              <path d="M7.5 5.5h3.5v13H7.5v-13Zm5.5 0h3.5v13H13v-13Z"></path>
+            </svg>
+          </span>
+        </div>
       </div>
     </dialog>
 
@@ -874,6 +884,8 @@
         const walkthroughClose = document.querySelector("[data-walkthrough-close]");
         const walkthroughTime = document.querySelector("[data-walkthrough-time]");
         const walkthroughVideo = document.querySelector("[data-walkthrough-video]");
+        const walkthroughVideoFeedback = document.querySelector("[data-walkthrough-feedback]");
+        let walkthroughFeedbackTimer = 0;
 
         setupTopHeaderState();
         setupContactEmailLinks();
@@ -933,6 +945,9 @@
         });
 
         if (walkthroughVideo instanceof HTMLVideoElement) {
+          walkthroughVideo.addEventListener("click", () => {
+            toggleWalkthroughPlayback();
+          });
           walkthroughVideo.addEventListener("durationchange", updateWalkthroughTimeBadge);
           walkthroughVideo.addEventListener("loadedmetadata", updateWalkthroughTimeBadge);
           walkthroughVideo.addEventListener("timeupdate", updateWalkthroughTimeBadge);
@@ -1084,6 +1099,7 @@
 
           walkthroughVideo.currentTime = 0;
           updateWalkthroughTimeBadge();
+          hideWalkthroughPlaybackFeedback();
           if (walkthroughModal && typeof walkthroughModal.showModal === "function") {
             walkthroughModal.showModal();
             walkthroughVideo.focus();
@@ -1104,12 +1120,19 @@
 
         function closeWalkthroughModal() {
           if (walkthroughVideo instanceof HTMLVideoElement) walkthroughVideo.pause();
+          hideWalkthroughPlaybackFeedback();
           if (walkthroughModal && typeof walkthroughModal.close === "function") walkthroughModal.close();
         }
 
         function handleWalkthroughModalKeydown(event) {
           if (!(walkthroughVideo instanceof HTMLVideoElement)) return;
           if (!walkthroughModal || !walkthroughModal.open) return;
+          if (event.key === " " || event.key === "Spacebar" || event.code === "Space") {
+            if (event.target instanceof Element && event.target.closest("button, a, input, select, textarea, [role='button']")) return;
+            event.preventDefault();
+            toggleWalkthroughPlayback();
+            return;
+          }
           if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
 
           event.preventDefault();
@@ -1118,6 +1141,45 @@
           const nextTime = walkthroughVideo.currentTime + direction * 5;
           walkthroughVideo.currentTime = Math.max(0, duration ? Math.min(duration, nextTime) : nextTime);
           updateWalkthroughTimeBadge();
+        }
+
+        function toggleWalkthroughPlayback() {
+          if (!(walkthroughVideo instanceof HTMLVideoElement)) return;
+
+          if (walkthroughVideo.paused) {
+            walkthroughVideo.volume = 1;
+            walkthroughVideo.muted = false;
+            void walkthroughVideo.play().then(() => {
+              showWalkthroughPlaybackFeedback("play");
+            }).catch(() => undefined);
+            return;
+          }
+
+          walkthroughVideo.pause();
+          showWalkthroughPlaybackFeedback("pause");
+        }
+
+        function showWalkthroughPlaybackFeedback(state) {
+          if (!(walkthroughVideoFeedback instanceof HTMLElement)) return;
+
+          window.clearTimeout(walkthroughFeedbackTimer);
+          walkthroughVideoFeedback.dataset.state = state;
+          walkthroughVideoFeedback.classList.remove("is-visible");
+          void walkthroughVideoFeedback.offsetWidth;
+          walkthroughVideoFeedback.classList.add("is-visible");
+          walkthroughFeedbackTimer = window.setTimeout(() => {
+            hideWalkthroughPlaybackFeedback();
+          }, 760);
+        }
+
+        function hideWalkthroughPlaybackFeedback() {
+          if (walkthroughFeedbackTimer) {
+            window.clearTimeout(walkthroughFeedbackTimer);
+            walkthroughFeedbackTimer = 0;
+          }
+          if (walkthroughVideoFeedback instanceof HTMLElement) {
+            walkthroughVideoFeedback.classList.remove("is-visible");
+          }
         }
 
         function updateWalkthroughTimeBadge() {
