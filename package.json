@@ -14,7 +14,6 @@
     "zip": "npm run verify && node scripts/zip.mjs --all",
     "cloudflare:dev": "npx wrangler@4 dev --config cloudflare/wrangler.toml",
     "cloudflare:deploy": "npx wrangler@4 deploy --config cloudflare/wrangler.toml",
-    "demo:live": "npm run build:chrome && node scripts/capture-live-demo.mjs",
     "demo:walkthrough": "npm run build:chrome && node scripts/capture-walkthrough-demo.mjs",
     "demo:walkthrough:preview": "npm run build:chrome && node scripts/capture-walkthrough-demo.mjs --preview",
     "postinstall": "node scripts/install-playwright-browser.mjs",
