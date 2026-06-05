@@ -847,7 +847,7 @@
           </button>
         </div>
         <div class="walkthrough-video-frame">
-          <video class="walkthrough-video" loop playsinline preload="metadata" tabindex="0" data-walkthrough-video></video>
+          <video class="walkthrough-video" loop playsinline preload="auto" tabindex="0" data-walkthrough-video></video>
           <span class="walkthrough-video-feedback" data-walkthrough-feedback aria-hidden="true">
             <svg class="walkthrough-video-feedback-icon walkthrough-video-feedback-play" viewBox="0 0 24 24" focusable="false">
               <path d="M8.5 5.75v12.5l9-6.25-9-6.25Z"></path>
@@ -1082,6 +1082,8 @@
 
           const videoUrl = getDocsAssetUrl(walkthroughPath);
           walkthroughVideo.src = videoUrl.href;
+          walkthroughVideo.load();
+          preloadWalkthroughVideo(videoUrl);
           updateWalkthroughTimeBadge();
           walkthroughCtas.forEach((cta) => {
             cta.hidden = false;
@@ -1108,6 +1110,18 @@
           }
 
           window.open(videoUrl.href, "_blank", "noopener");
+        }
+
+        function preloadWalkthroughVideo(videoUrl) {
+          if (document.querySelector('link[data-walkthrough-video-preload]')) return;
+
+          const preload = document.createElement("link");
+          preload.rel = "preload";
+          preload.as = "video";
+          preload.href = videoUrl.href;
+          preload.type = "video/mp4";
+          preload.dataset.walkthroughVideoPreload = "";
+          document.head.append(preload);
         }
 
         function startWalkthroughPlayback() {
