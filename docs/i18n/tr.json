@@ -24,7 +24,8 @@
     "copy": "Hızlı akan YouTube canlı sohbetlerini takip edin, insanların ne söylediğini daha iyi anlayın, önemli mesajları bulun ve yerinizi kaybetmeden doğal şekilde yanıt verin.",
     "primaryCta": "Yükle",
     "secondaryCta": "Özellikleri gör",
-    "disclaimer": "YouTube veya Google ile bağlantılı değildir."
+    "disclaimer": "YouTube veya Google ile bağlantılı değildir.",
+    "walkthroughCta": "Uzantıyı çalışırken gör"
   },
   "features": {
     "eyebrow": "Canlı yayınlar için üretildi",
@@ -41,7 +42,12 @@
     "emojisBody": "En sık kullandığınız tepkiler YouTube emoji seçicisinin en üstünde kalır.",
     "commandsTitle": "Tab komutlarıyla daha fazlasını yapın",
     "commandsBody": "Kısa komutları bahsetmelere, alıntılara, zaman yardımcılarına, çevirilere, gelen kutusu takiplerine ve ayarlara genişletmek için Tab’a basın.",
-    "commandsLink": "Komut referansını gör"
+    "commandsLink": "Komut referansını gör",
+    "walkthroughTitle": "Özelliklerin tanıtımını izle",
+    "walkthroughBody": "Çeviri, Inbox, Focus mode, işaretlenen kullanıcılar, emojiler, komutlar ve popup ayarlarının birlikte nasıl çalıştığını gör.",
+    "walkthroughCta": "Tanıtımı izle",
+    "walkthroughModalTitle": "Özellik tanıtımı",
+    "walkthroughClose": "Tanıtımı kapat"
   },
   "screenshots": {
     "eyebrow": "Ekran görüntüleri",

@@ -24,7 +24,8 @@
     "copy": "Nadążaj za szybko płynącymi czatami na żywo w YouTube, lepiej rozumiej rozmowę, znajduj ważne wiadomości i odpowiadaj naturalnie, nie tracąc miejsca.",
     "primaryCta": "Zainstaluj",
     "secondaryCta": "Zobacz funkcje",
-    "disclaimer": "Nie jest powiązane z YouTube ani Google."
+    "disclaimer": "Nie jest powiązane z YouTube ani Google.",
+    "walkthroughCta": "Zobacz rozszerzenie w akcji"
   },
   "features": {
     "eyebrow": "Stworzone dla transmisji na żywo",
@@ -41,7 +42,12 @@
     "emojisBody": "Najczęściej używane reakcje zostają u góry wybieraka emoji YouTube.",
     "commandsTitle": "Rób więcej komendami Tab",
     "commandsBody": "Naciśnij Tab, aby rozwinąć krótkie komendy w wzmianki, cytaty, pomoc czasu, tłumaczenia, obserwacje skrzynki i ustawienia.",
-    "commandsLink": "Zobacz referencję poleceń"
+    "commandsLink": "Zobacz referencję poleceń",
+    "walkthroughTitle": "Obejrzyj prezentację funkcji",
+    "walkthroughBody": "Zobacz, jak tłumaczenie, Inbox, Focus mode, oznaczeni użytkownicy, emoji, komendy i ustawienia popupu działają razem.",
+    "walkthroughCta": "Obejrzyj prezentację",
+    "walkthroughModalTitle": "Prezentacja funkcji",
+    "walkthroughClose": "Zamknij prezentację"
   },
   "screenshots": {
     "eyebrow": "Zrzuty ekranu",

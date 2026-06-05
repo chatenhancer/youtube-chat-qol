@@ -24,7 +24,8 @@
     "copy": "Suivez les chats en direct YouTube les plus actifs, comprenez mieux ce que les gens disent, retrouvez les messages importants et répondez naturellement sans perdre le fil.",
     "primaryCta": "Installer",
     "secondaryCta": "Voir les fonctionnalités",
-    "disclaimer": "Non affilié à YouTube ni à Google."
+    "disclaimer": "Non affilié à YouTube ni à Google.",
+    "walkthroughCta": "Voir l’extension en action"
   },
   "features": {
     "eyebrow": "Pensé pour les lives",
@@ -41,7 +42,12 @@
     "emojisBody": "Vos réactions les plus utilisées restent en haut du sélecteur d’emojis de YouTube.",
     "commandsTitle": "Faites plus avec les commandes Tab",
     "commandsBody": "Appuyez sur Tab pour développer de courtes commandes en mentions, citations, aides horaires, traductions, surveillances de boîte et réglages.",
-    "commandsLink": "Voir la référence des commandes"
+    "commandsLink": "Voir la référence des commandes",
+    "walkthroughTitle": "Regarder une présentation des fonctionnalités",
+    "walkthroughBody": "Voyez la traduction, l’Inbox, le Focus mode, les utilisateurs marqués, les emojis, les commandes et les réglages du popup fonctionner ensemble.",
+    "walkthroughCta": "Voir la présentation",
+    "walkthroughModalTitle": "Présentation des fonctionnalités",
+    "walkthroughClose": "Fermer la présentation"
   },
   "screenshots": {
     "eyebrow": "Captures",

@@ -24,7 +24,8 @@
     "copy": "तेज़ी से चलती YouTube लाइव चैट के साथ बने रहें, लोग क्या कह रहे हैं उसे बेहतर समझें, ज़रूरी संदेश ढूंढें, और अपनी जगह खोए बिना सहजता से जवाब दें.",
     "primaryCta": "इंस्टॉल",
     "secondaryCta": "फीचर्स देखें",
-    "disclaimer": "YouTube या Google से संबद्ध नहीं है।"
+    "disclaimer": "YouTube या Google से संबद्ध नहीं है।",
+    "walkthroughCta": "एक्सटेंशन को काम करते देखें"
   },
   "features": {
     "eyebrow": "लाइव स्ट्रीम के लिए बनाया गया",
@@ -41,7 +42,12 @@
     "emojisBody": "आपकी सबसे ज्यादा इस्तेमाल की जाने वाली reactions YouTube के emoji picker में ऊपर रहती हैं।",
     "commandsTitle": "Tab commands से ज्यादा करें",
     "commandsBody": "छोटे commands को mentions, quotes, time helpers, translations, inbox watches और settings में बदलने के लिए Tab दबाएं।",
-    "commandsLink": "कमांड संदर्भ देखें"
+    "commandsLink": "कमांड संदर्भ देखें",
+    "walkthroughTitle": "फीचर्स का वॉकथ्रू देखें",
+    "walkthroughBody": "देखें कि translation, Inbox, Focus mode, marked users, emojis, commands, और popup settings साथ में कैसे काम करते हैं.",
+    "walkthroughCta": "वॉकथ्रू देखें",
+    "walkthroughModalTitle": "फीचर वॉकथ्रू",
+    "walkthroughClose": "वॉकथ्रू बंद करें"
   },
   "screenshots": {
     "eyebrow": "स्क्रीनशॉट",

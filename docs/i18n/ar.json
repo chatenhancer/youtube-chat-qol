@@ -24,7 +24,8 @@
     "copy": "واكب دردشات YouTube المباشرة السريعة، وافهم المزيد مما يقوله الناس، واعثر على الرسائل المهمة، وردّ بشكل طبيعي دون أن تفقد مكانك.",
     "primaryCta": "تثبيت",
     "secondaryCta": "عرض الميزات",
-    "disclaimer": "غير تابع لـ YouTube أو Google."
+    "disclaimer": "غير تابع لـ YouTube أو Google.",
+    "walkthroughCta": "شاهد الإضافة وهي تعمل"
   },
   "features": {
     "eyebrow": "مصمم للبث المباشر",
@@ -41,7 +42,12 @@
     "emojisBody": "تبقى تفاعلاتك الأكثر استخداما في أعلى منتقي رموز YouTube.",
     "commandsTitle": "أنجز أكثر بأوامر Tab",
     "commandsBody": "اضغط Tab لتوسيع أوامر قصيرة إلى إشارات واقتباسات ومساعدات وقت وترجمات ومراقبة كلمات للصندوق وإعدادات.",
-    "commandsLink": "عرض مرجع الأوامر"
+    "commandsLink": "عرض مرجع الأوامر",
+    "walkthroughTitle": "شاهد شرحًا للميزات",
+    "walkthroughBody": "شاهد الترجمة، وInbox، ووضع التركيز، والمستخدمين المعلّمين، والرموز التعبيرية، والأوامر، وإعدادات النافذة المنبثقة تعمل معًا.",
+    "walkthroughCta": "شاهد الشرح",
+    "walkthroughModalTitle": "شرح الميزات",
+    "walkthroughClose": "إغلاق الشرح"
   },
   "screenshots": {
     "eyebrow": "الصور",

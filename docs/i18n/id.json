@@ -24,7 +24,8 @@
     "copy": "Ikuti live chat YouTube yang bergerak cepat, pahami lebih banyak yang dikatakan orang, temukan pesan penting, dan balas dengan alami tanpa kehilangan posisi.",
     "primaryCta": "Instal",
     "secondaryCta": "Lihat fitur",
-    "disclaimer": "Tidak berafiliasi dengan YouTube atau Google."
+    "disclaimer": "Tidak berafiliasi dengan YouTube atau Google.",
+    "walkthroughCta": "Lihat ekstensi beraksi"
   },
   "features": {
     "eyebrow": "Dibuat untuk live stream",
@@ -41,7 +42,12 @@
     "emojisBody": "Reaksi yang paling sering kamu pakai tetap berada di atas pemilih emoji YouTube.",
     "commandsTitle": "Lakukan lebih banyak dengan perintah Tab",
     "commandsBody": "Tekan Tab untuk mengubah perintah singkat menjadi mention, kutipan, bantuan waktu, terjemahan, pantauan inbox, dan pengaturan.",
-    "commandsLink": "Lihat referensi perintah"
+    "commandsLink": "Lihat referensi perintah",
+    "walkthroughTitle": "Tonton tur fitur",
+    "walkthroughBody": "Lihat terjemahan, Inbox, Focus mode, pengguna yang ditandai, emoji, perintah, dan pengaturan popup bekerja bersama.",
+    "walkthroughCta": "Tonton tur",
+    "walkthroughModalTitle": "Tur fitur",
+    "walkthroughClose": "Tutup tur"
   },
   "screenshots": {
     "eyebrow": "Screenshot",

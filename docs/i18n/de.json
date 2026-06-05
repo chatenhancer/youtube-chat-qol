@@ -24,7 +24,8 @@
     "copy": "Behalte schnelle YouTube-Livechats im Blick, verstehe mehr von dem, was gesagt wird, finde wichtige Nachrichten und antworte natürlich, ohne den Anschluss zu verlieren.",
     "primaryCta": "Installieren",
     "secondaryCta": "Funktionen ansehen",
-    "disclaimer": "Nicht mit YouTube oder Google verbunden."
+    "disclaimer": "Nicht mit YouTube oder Google verbunden.",
+    "walkthroughCta": "Sieh die Erweiterung in Aktion"
   },
   "features": {
     "eyebrow": "Für Livestreams gebaut",
@@ -41,7 +42,12 @@
     "emojisBody": "Deine meistgenutzten Reaktionen bleiben oben in YouTubes Emoji-Auswahl.",
     "commandsTitle": "Mehr mit Tab-Befehlen machen",
     "commandsBody": "Drücke Tab, um kurze Befehle zu Erwähnungen, Zitaten, Zeithilfen, Übersetzungen, Inbox-Watches und Einstellungen zu erweitern.",
-    "commandsLink": "Befehlsreferenz ansehen"
+    "commandsLink": "Befehlsreferenz ansehen",
+    "walkthroughTitle": "Sieh dir die Funktionen im Überblick an",
+    "walkthroughBody": "Sieh, wie Übersetzung, Inbox, Focus mode, markierte Nutzer, Emojis, Befehle und Popup-Einstellungen zusammenspielen.",
+    "walkthroughCta": "Walkthrough ansehen",
+    "walkthroughModalTitle": "Feature-Walkthrough",
+    "walkthroughClose": "Walkthrough schließen"
   },
   "screenshots": {
     "eyebrow": "Screenshots",

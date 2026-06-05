@@ -24,7 +24,8 @@
     "copy": "Keep up with fast-moving YouTube live chats, understand more of what people are saying, find the messages that matter, and reply naturally without losing your place.",
     "primaryCta": "Install",
     "secondaryCta": "See features",
-    "disclaimer": "Not affiliated with YouTube or Google."
+    "disclaimer": "Not affiliated with YouTube or Google.",
+    "walkthroughCta": "See the extension in action"
   },
   "features": {
     "eyebrow": "Built for live streams",
@@ -41,7 +42,12 @@
     "emojisBody": "Your most-used reactions stay at the top of YouTube's emoji picker.",
     "commandsTitle": "Do more with Tab commands",
     "commandsBody": "Press Tab to expand short commands into mentions, quotes, time helpers, translations, inbox watches, and settings.",
-    "commandsLink": "View command reference"
+    "commandsLink": "View command reference",
+    "walkthroughTitle": "Watch a walkthrough of the features",
+    "walkthroughBody": "See translation, Inbox, Focus mode, marked users, emojis, commands, and popup settings working together.",
+    "walkthroughCta": "Watch walkthrough",
+    "walkthroughModalTitle": "Feature walkthrough",
+    "walkthroughClose": "Close walkthrough"
   },
   "screenshots": {
     "eyebrow": "Screenshots",
