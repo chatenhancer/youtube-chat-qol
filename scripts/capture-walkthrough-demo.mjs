@@ -17,7 +17,6 @@ import {
   writeFile
 } from 'node:fs/promises';
 import net from 'node:net';
-import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -34,9 +33,6 @@ const cameraSwooshPath = path.join(demoAudioDir, 'swoosh.mp3');
 const clickSoundPath = path.join(demoAudioDir, 'click.mp3');
 const demoResultsDir = path.join(repoRoot, 'test-results', 'demos');
 const finalVideoDir = path.join(repoRoot, 'docs', 'videos');
-const configuredFramesRootDir = path.resolve(process.env.YTCQ_DEMO_FRAMES_ROOT || getDefaultFramesRootDir());
-let framesRootDir = configuredFramesRootDir;
-let framesDir = path.join(framesRootDir, `youtube-chat-walkthrough-frames-${process.pid}`);
 const diagnosticDir = path.join(demoResultsDir, 'diagnostics');
 const chromeProfilesDir = path.resolve(process.env.YTCQ_CHROME_WORKING_PROFILES || path.join(repoRoot, '.chrome-test-profiles'));
 const sourceProfileDir = path.resolve(process.env.YTCQ_CHROME_PROFILE || path.join(chromeProfilesDir, 'pristine'));
@@ -58,13 +54,10 @@ const estimatedDemoSeconds = readPositiveNumber(process.env.YTCQ_DEMO_ESTIMATED_
 const estimatedDemoFrames = Math.max(demoFps, Math.round(estimatedDemoSeconds * demoFps));
 const progressUpdateMs = readPositiveInteger(process.env.YTCQ_DEMO_PROGRESS_MS, process.stdout.isTTY ? 1_000 : 5_000);
 const deviceScaleFactor = readPositiveNumber(process.env.YTCQ_DEMO_SCALE, getDefaultDemoScale());
-const captureMode = readEnum(process.env.YTCQ_DEMO_CAPTURE_MODE, ['screencast', 'screenshots'], 'screencast');
-const frameSink = readEnum(process.env.YTCQ_DEMO_FRAME_SINK, ['pipe', 'files'], 'pipe');
 const frameFormat = readEnum(process.env.YTCQ_DEMO_FRAME_FORMAT, ['png', 'jpeg'], 'png');
 const frameQuality = readBoundedInteger(process.env.YTCQ_DEMO_FRAME_QUALITY, previewMode ? 92 : 96, 1, 100);
-const frameExtension = frameFormat === 'jpeg' ? 'jpg' : 'png';
+const shouldLogFrameSize = process.env.YTCQ_DEMO_LOG_FRAME_SIZE === '1';
 const pipedVideoPath = path.join(demoResultsDir, `${finalVideoBaseName}-${process.pid}-silent.mp4`);
-const optimizeScreenshotForSpeed = process.env.YTCQ_DEMO_SCREENSHOT_OPTIMIZE_FOR_SPEED !== '0';
 const viewport = { width: 1280, height: 720 };
 const cursorHotspot = { x: 16, y: 12 };
 const normalChatMessageSelector = 'yt-live-chat-text-message-renderer';
@@ -148,7 +141,6 @@ async function main() {
   await mkdir(demoResultsDir, { recursive: true });
   await mkdir(diagnosticDir, { recursive: true });
   await rm(pipedVideoPath, { force: true });
-  const frameStorage = await prepareFrameStorage();
 
   let chromeInstance = null;
   let closed = false;
@@ -162,11 +154,7 @@ async function main() {
         `${demoFps}fps | ${getCaptureSizeLabel()} | scale ${deviceScaleFactor} | ` +
         `${getFrameCaptureLogLabel()} | ${getVideoEncodeLogLabel()} | output ${getOutputLogLabel()}`
     );
-    if (frameSink === 'files') {
-      console.log(`[walkthrough] Frame scratch directory: ${framesDir}`);
-    } else {
-      console.log('[walkthrough] Frame sink: ffmpeg pipe; frames are not written as individual files.');
-    }
+    console.log('[walkthrough] Frame sink: ffmpeg pipe; frames are not written as individual files.');
 
     chromeInstance = await launchNormalChromeDemoContext({
       initialUrl: liveUrl,
@@ -215,7 +203,6 @@ async function main() {
     if (recorder) await recorder.abort().catch(() => undefined);
     if (chromeInstance && !closed) await chromeInstance.close().catch(() => undefined);
     await rm(pipedVideoPath, { force: true }).catch(() => undefined);
-    await cleanupFrameStorage(frameStorage);
   }
 
   console.log(`Saved walkthrough demo video: ${outputPath}`);
@@ -270,7 +257,7 @@ async function recordWalkthrough(page, chat, context, recorder) {
 }
 
 async function sectionTranslateChat(page, chat, context, recorder) {
-  await focusChatHeader(page, chat, recorder);
+  await focusChatHeader(page, chat, recorder, { showFocus: false });
   const settingsButton = chat.locator([
     'yt-live-chat-header-renderer #live-chat-header-context-menu button',
     'yt-live-chat-header-renderer #live-chat-header-context-menu yt-icon-button',
@@ -288,15 +275,19 @@ async function sectionTranslateChat(page, chat, context, recorder) {
   await recorder.hold(240);
   await recorder.holdStill(760);
   if (await translateSetting.getAttribute('aria-checked').catch(() => '') !== 'true') {
-    await clickWithCursor(page, translateSetting, recorder, 'Translate chat setting');
+    await clickWithCursor(page, translateSetting, recorder, 'Translate chat setting', {
+      afterClickHoldMs: 0
+    });
   }
   await setExtensionStorage(context, 'sync', {
     lastTranslationTarget: 'en',
     targetLanguage: 'en'
   });
+  await closeNativeMenus(chat);
+  await recorder.refreshCaptureSource();
 
   await waitForDemoMessageTranslation(chat, 'translate-2');
-  await closeNativeMenus(chat);
+  await recorder.refreshCaptureSource();
   await recorder.hold(500);
   await smoothScrollDemoChatToMessage(chat, 'translate-2', recorder);
   await showDemoCaptionFor(
@@ -308,6 +299,7 @@ async function sectionTranslateChat(page, chat, context, recorder) {
   );
 
   await setExtensionStorage(context, 'sync', { translationDisplay: 'replace' });
+  await recorder.refreshCaptureSource();
   await smoothScrollDemoChatToMessage(chat, 'translate-2', recorder);
   await recorder.hold(800);
   await showDemoCaptionFor(
@@ -411,23 +403,11 @@ async function sectionReplyFaster(page, chat, recorder) {
     recorder,
     'Mention action'
   );
-  await recorder.hold(900);
+  await showComposerDraftResult(page, chat, recorder, 1_650);
   await clearChatComposer(chat);
   await closeFocusPromptIfPresent(chat);
 
-  await smoothScrollDemoChatToMessage(chat, 'reply', recorder);
-  const quoteMenu = await openMessageMenuWithVisibleClick(page, chat, recorder, 'reply');
-  await clickWithCursor(
-    page,
-    quoteMenu.menu.locator('.ytcq-context-split-button[data-ytcq-action="quote"]').first(),
-    recorder,
-    'Quote action'
-  );
-  await recorder.hold(1_000);
-  await clearChatComposer(chat);
-  await closeFocusPromptIfPresent(chat);
-
-  await smoothScrollDemoChatToMessage(chat, 'reply', recorder);
+  await focusReplyComposerOverview(page, recorder);
   const source = await getDemoMessageSource(chat, 'reply', { center: false });
   await waitForDemoMessageWiring(chat, 'reply', ['ytcqAuthorMentionWired']);
   await clickWithCursor(page, source.author, recorder, 'author name', {
@@ -436,14 +416,14 @@ async function sectionReplyFaster(page, chat, recorder) {
       body: 'Author names also support quick mention and quote drafts.'
     }
   });
-  await recorder.hold(900);
+  await showComposerDraftResult(page, chat, recorder, 1_250, { moveCamera: false });
   await clearChatComposer(chat);
   await closeFocusPromptIfPresent(chat);
   await clickWithCursor(page, source.author, recorder, 'Alt-click author name', {
     afterClickHoldMs: 180,
     modifiers: ['Alt']
   });
-  await recorder.hold(900);
+  await showComposerDraftResult(page, chat, recorder, 1_700, { moveCamera: false });
   await clearChatComposer(chat);
   await closeFocusPromptIfPresent(chat);
 }
@@ -567,9 +547,12 @@ async function ensureDemoInboxAvatar(chat) {
 async function sectionMarkedUsers(page, chat, context, recorder) {
   await closeInboxPanelIfPresent(chat);
   await stabilizeDemoChatFeed(chat);
-  await focusMessageArea(page, chat, recorder);
+  await recorder.hold(180);
   await smoothScrollDemoChatToMessage(chat, 'mark', recorder);
-  const source = await openMessageMenuWithVisibleClick(page, chat, recorder, 'mark');
+  const source = await openMessageMenuWithVisibleClick(page, chat, recorder, 'mark', {
+    cameraDurationMs: 980,
+    screenXRatio: 0.9
+  });
   const markAction = source.menu.locator('.ytcq-context-item[data-ytcq-action="mark-user"]').first();
   const messageBox = await getLocatorBox(source.message, 'mark message');
   await setDemoCaption(
@@ -623,7 +606,9 @@ async function sectionEmojiAndCommands(page, chat, recorder) {
     { placement: 'side' }
   );
   await recorder.settleThenHoldStill(700);
-  await typeIntoComposerHuman(chat, recorder, 'the event is in /when 8pm');
+  await typeIntoComposerHuman(chat, recorder, 'the event is in /when 8pm', {
+    pace: 0.58
+  });
   await hideDemoCaption(page);
   await recorder.holdStill(760);
   await getChatComposerInput(chat).press('Tab');
@@ -651,7 +636,7 @@ async function sectionPopupStatus(page, context, recorder) {
   await installPopupPresentationLayer(popup);
   await recorder.usePage(popup);
   try {
-    await recorder.hold(500);
+    await fadeDemoPopupIn(popup, recorder);
     await setDemoCaption(
       popup,
       'Advanced settings live in the extension popup',
@@ -662,6 +647,7 @@ async function sectionPopupStatus(page, context, recorder) {
     await recorder.settleThenHoldStill(2_200);
     await clickWithCursor(popup, popup.locator('#settingsTab'), recorder, 'Settings tab');
     await recorder.settleThenHoldStill(1_600);
+    await fadeDemoPopupOut(popup, recorder);
   } finally {
     await popup.close().catch(() => undefined);
   }
@@ -676,6 +662,7 @@ async function sectionPopupBookmarks(page, context, recorder) {
   await installPopupPresentationLayer(popup);
   await recorder.usePage(popup);
   try {
+    await fadeDemoPopupIn(popup, recorder);
     await popup.locator('#bookmarksTab').click();
     await popup.locator('.bookmark-row').first().waitFor({ state: 'visible', timeout: 10_000 });
     await setDemoCaption(
@@ -687,6 +674,7 @@ async function sectionPopupBookmarks(page, context, recorder) {
     await recorder.settleThenHoldStill(4_000);
     await hideDemoCaption(popup);
     await clearDemoFocus(popup);
+    await fadeDemoPopupOut(popup, recorder);
   } finally {
     await popup.close().catch(() => undefined);
   }
@@ -998,7 +986,7 @@ async function waitForLiveChatRenderer(page, chat) {
   }
 }
 
-async function focusChatHeader(page, chat, recorder) {
+async function focusChatHeader(page, chat, recorder, options = {}) {
   const chatFrame = page.locator('iframe#chatframe').first();
   const box = await getLocatorBox(chatFrame, 'chat frame');
   await setDemoCameraForBox(page, recorder, box, {
@@ -1008,7 +996,9 @@ async function focusChatHeader(page, chat, recorder) {
     screenYRatio: 0.02
   });
   await recorder.hold(240);
-  await setDemoFocusOnLocator(page, chat.locator('yt-live-chat-header-renderer').first(), 10);
+  if (options.showFocus !== false) {
+    await setDemoFocusOnLocator(page, chat.locator('yt-live-chat-header-renderer').first(), 10);
+  }
 }
 
 async function focusMessageArea(page, chat, recorder, options = {}) {
@@ -1016,8 +1006,9 @@ async function focusMessageArea(page, chat, recorder, options = {}) {
   await setDemoCameraForBox(page, recorder, box, {
     focusXRatio: options.alignRight ? 1 : 0.5,
     scale: 1.22,
-    screenXRatio: options.alignRight ? 0.93 : 0.84,
-    screenYRatio: 0.52
+    screenXRatio: options.screenXRatio ?? (options.alignRight ? 0.93 : 0.84),
+    screenYRatio: 0.52,
+    durationMs: options.durationMs
   });
   await recorder.hold(options.afterHoldMs ?? 240);
   await clearDemoFocus(page);
@@ -1031,12 +1022,49 @@ async function focusComposerArea(page, chat, recorder, options = {}) {
     focusYRatio: 1,
     scale: 1.28,
     screenXRatio: 0.84,
-    screenYRatio: 0.88
+    screenYRatio: 0.88,
+    swoosh: options.swoosh
   });
   await recorder.hold(options.afterHoldMs ?? 240);
   if (options.showFocus !== false) {
     await setDemoFocusOnLocator(page, composer, 10);
   }
+}
+
+async function focusReplyComposerOverview(page, recorder) {
+  const box = await getLocatorBox(page.locator('iframe#chatframe').first(), 'chat frame');
+  await setDemoCameraForBox(page, recorder, box, {
+    focusXRatio: 0.72,
+    focusYRatio: 0.58,
+    scale: 1.15,
+    screenXRatio: 0.87,
+    screenYRatio: 0.56,
+    durationMs: 840
+  });
+  await recorder.hold(220);
+  await clearDemoFocus(page);
+}
+
+async function showComposerDraftResult(page, chat, recorder, durationMs, options = {}) {
+  const input = getChatComposerInput(chat);
+  await input.waitFor({ state: 'visible', timeout: 10_000 });
+  await input.evaluate((element) => {
+    if (element instanceof HTMLElement) element.focus();
+  }).catch(() => undefined);
+  if (options.moveCamera !== false) {
+    await focusComposerArea(page, chat, recorder, {
+      afterHoldMs: 180,
+      showFocus: false,
+      swoosh: false
+    });
+  } else {
+    await recorder.hold(180);
+  }
+  await setDemoFocusOnLocator(page, input, 8);
+  await recorder.hold(220);
+  await recorder.holdStill(durationMs);
+  await clearDemoFocus(page);
+  await recorder.hold(160);
 }
 
 async function waitForDemoMessageTranslation(chat, messageKey) {
@@ -1225,13 +1253,17 @@ async function scrubDemoEmojiPicker(chat) {
   });
 }
 
-async function typeIntoComposerHuman(chat, recorder, text) {
+async function typeIntoComposerHuman(chat, recorder, text, options = {}) {
   const input = getChatComposerInput(chat);
   await input.waitFor({ state: 'visible', timeout: 10_000 });
   await input.click();
-  for (const grapheme of splitDemoGraphemes(text)) {
-    await input.pressSequentially(grapheme, { delay: 18 });
-    await recorder.captureThenHoldStill(grapheme === ' ' ? 55 : 75);
+  const graphemes = splitDemoGraphemes(text);
+  for (let index = 0; index < graphemes.length; index += 1) {
+    const grapheme = graphemes[index];
+    await input.pressSequentially(grapheme, {
+      delay: Math.max(4, Math.round(getHumanKeyDelayMs(grapheme, index) * (options.pace ?? 1)))
+    });
+    await recorder.captureThenHoldStill(Math.max(14, Math.round(getHumanTypingHoldMs(grapheme, index, graphemes) * (options.pace ?? 1))));
   }
 }
 
@@ -1362,13 +1394,15 @@ async function openMessageMenu(chat, messageKey = 'reply') {
   throw new Error('Could not open a real YouTube message menu.');
 }
 
-async function openMessageMenuWithVisibleClick(page, chat, recorder, messageKey) {
+async function openMessageMenuWithVisibleClick(page, chat, recorder, messageKey, options = {}) {
   await closeNativeMenus(chat);
   const source = await getDemoMessageSource(chat, messageKey, { center: false });
   await waitForDemoMessageWiring(chat, messageKey, ['ytcqContextWired']);
   await focusMessageArea(page, chat, recorder, {
-    afterHoldMs: 420,
-    alignRight: true
+    afterHoldMs: options.afterCameraHoldMs ?? 420,
+    alignRight: true,
+    durationMs: options.cameraDurationMs,
+    screenXRatio: options.screenXRatio
   });
   await source.message.hover({ timeout: 2_000 }).catch(() => undefined);
   const menuButton = await getFirstVisibleLocator(source.message.locator('#menu button, #menu yt-icon-button, #menu #button'), 2_000);
@@ -1378,7 +1412,7 @@ async function openMessageMenuWithVisibleClick(page, chat, recorder, messageKey)
     recorder,
     'message menu button',
     {
-      afterClickHoldMs: 120,
+      afterClickHoldMs: 0,
       durationMs: 640,
       padding: 6
     }
@@ -1910,14 +1944,7 @@ async function fileExists(filePath) {
 async function setDemoViewport(page, size) {
   await page.setViewportSize(size);
   const session = await page.context().newCDPSession(page);
-  await session.send('Emulation.setDeviceMetricsOverride', {
-    deviceScaleFactor,
-    height: size.height,
-    mobile: false,
-    screenHeight: size.height,
-    screenWidth: size.width,
-    width: size.width
-  });
+  await applyCaptureMetrics(session, size);
   await session.detach().catch(() => undefined);
 }
 
@@ -2337,7 +2364,7 @@ async function installLiveChatMask(chat) {
         #input[contenteditable],
         yt-live-chat-text-input-field-renderer,
         yt-live-chat-text-input-field-renderer * {
-          caret-color: transparent !important;
+          caret-color: currentColor !important;
         }
 
         tp-yt-paper-tooltip,
@@ -2703,6 +2730,7 @@ async function installLiveChatMask(chat) {
         if (splitItem) list.append(splitItem);
       };
 
+      shell.style.opacity = '0';
       document.body.append(shell);
       window.setTimeout(() => {
         let list = shell.querySelector('#items');
@@ -2715,7 +2743,8 @@ async function installLiveChatMask(chat) {
         orderRows(list);
         shell.style.height = 'auto';
         shell.style.maxHeight = 'none';
-      }, 120);
+        shell.style.opacity = '1';
+      }, 80);
       return true;
     };
 
@@ -2990,6 +3019,21 @@ async function installDemoPresentationLayer(page) {
         opacity: 1;
         transform: scale(1);
       }
+
+      html,
+      body {
+        height: 100vh !important;
+        overflow: hidden !important;
+        width: 100vw !important;
+      }
+
+      ytd-app {
+        min-height: 100vh !important;
+        transition: transform 960ms cubic-bezier(0.2, 0, 0, 1) !important;
+        transform-origin: 0 0 !important;
+        width: 100vw !important;
+        will-change: transform !important;
+      }
     `
   });
 
@@ -3030,7 +3074,9 @@ async function installPopupPresentationLayer(page) {
         display: flex !important;
         flex-direction: column !important;
         height: 520px !important;
+        opacity: 0 !important;
         overflow: hidden !important;
+        transition: none !important;
         width: 360px !important;
       }
 
@@ -3065,6 +3111,35 @@ async function installPopupPresentationLayer(page) {
       }
     `
   });
+}
+
+async function fadeDemoPopupIn(page, recorder) {
+  await animateDemoPopupOpacity(page, recorder, 0, 1, 460);
+}
+
+async function fadeDemoPopupOut(page, recorder) {
+  await animateDemoPopupOpacity(page, recorder, 1, 0, 420);
+}
+
+async function animateDemoPopupOpacity(page, recorder, fromOpacity, toOpacity, durationMs) {
+  const frames = durationToFrames(durationMs);
+  for (let frame = 0; frame <= frames; frame += 1) {
+    const progress = easeInOutCubic(frame / frames);
+    const opacity = fromOpacity + (toOpacity - fromOpacity) * progress;
+    await setDemoPopupOpacity(page, opacity);
+    await recorder.captureFrame();
+  }
+}
+
+async function setDemoPopupOpacity(page, opacity) {
+  await page.evaluate((nextOpacity) => {
+    const targets = document.querySelectorAll('main, .popup-shell');
+    targets.forEach((target) => {
+      if (target instanceof HTMLElement) {
+        target.style.setProperty('opacity', String(nextOpacity), 'important');
+      }
+    });
+  }, opacity);
 }
 
 async function installDemoCursor(page) {
@@ -3112,21 +3187,23 @@ async function installDemoCursor(page) {
 }
 
 async function createFrameRecorder(page) {
-  if (captureMode === 'screencast') return createScreencastFrameRecorder(page);
-  return createScreenshotFrameRecorder(page);
+  return createScreencastFrameRecorder(page);
 }
 
 async function createScreencastFrameRecorder(page) {
-  const videoEncoder = frameSink === 'pipe' ? createPipedVideoEncoder(pipedVideoPath) : null;
+  const videoEncoder = createPipedVideoEncoder(pipedVideoPath);
   let currentSource = null;
   let frameCount = 0;
   let latestFrameBuffer = null;
   let lastProgressAt = 0;
   let lastCameraSwooshAtMs = -Infinity;
   let outputLoopPromise = null;
+  let restartPromise = null;
+  let restartScheduled = false;
   let stage = 'Preparing';
   let stopped = false;
   let nextActionFrameAt = Date.now();
+  let lastLoggedFrameSize = '';
   const startedAt = Date.now();
   const cameraSwooshCues = [];
   const clickCues = [];
@@ -3165,11 +3242,12 @@ async function createScreencastFrameRecorder(page) {
       });
     },
     async usePage(nextPage) {
-      latestFrameBuffer = null;
-      resolveFrameWaiters(null);
-      await stopScreencastSource();
-      await startScreencastSource(nextPage);
-      resetActionFrameClock();
+      await restartScreencastSource(nextPage, { clearLatestFrame: true });
+    },
+    async refreshCaptureSource() {
+      const page = currentSource?.page;
+      if (!page) return;
+      await restartScreencastSource(page, { clearLatestFrame: false });
     },
     async captureFrame() {
       await waitForNextActionFrame();
@@ -3214,23 +3292,32 @@ async function createScreencastFrameRecorder(page) {
         captureMs: capturedAt - startedAt,
         encoderFlushMs: finishedAt - flushedAt,
         frameCount,
-        videoPath: videoEncoder ? pipedVideoPath : null
+        videoPath: pipedVideoPath
       };
     }
   };
 
   async function startScreencastSource(nextPage) {
-    const session = await createScreenshotSession(nextPage);
+    const session = await createCaptureSession(nextPage);
     const handleFrame = (event) => {
-      latestFrameBuffer = Buffer.from(event.data, 'base64');
-      resolveFrameWaiters(latestFrameBuffer);
+      const buffer = Buffer.from(event.data, 'base64');
       session.send('Page.screencastFrameAck', {
         sessionId: event.sessionId
       }).catch(() => undefined);
+
+      const dimensions = getImageDimensions(buffer);
+      logFrameSizeIfNeeded(buffer, event.metadata, dimensions);
+      if (latestFrameBuffer && !frameMatchesCaptureSize(dimensions)) {
+        scheduleScreencastSourceRefresh();
+        return;
+      }
+
+      latestFrameBuffer = buffer;
+      resolveFrameWaiters(latestFrameBuffer);
     };
 
     session.on('Page.screencastFrame', handleFrame);
-    currentSource = { handleFrame, session };
+    currentSource = { handleFrame, page: nextPage, session };
     const { height, width } = getCapturePixelSize();
     const options = {
       everyNthFrame: 1,
@@ -3251,6 +3338,37 @@ async function createScreencastFrameRecorder(page) {
     source.session.off('Page.screencastFrame', source.handleFrame);
     await source.session.send('Page.stopScreencast').catch(() => undefined);
     await source.session.detach().catch(() => undefined);
+  }
+
+  function scheduleScreencastSourceRefresh() {
+    const page = currentSource?.page;
+    if (!page || restartPromise || restartScheduled) return;
+    restartScheduled = true;
+    void (async () => {
+      await delay(40);
+      await restartScreencastSource(page, { clearLatestFrame: false });
+    })().finally(() => {
+      restartScheduled = false;
+    });
+  }
+
+  async function restartScreencastSource(nextPage, { clearLatestFrame }) {
+    if (restartPromise) {
+      await restartPromise;
+    }
+
+    restartPromise = (async () => {
+      if (clearLatestFrame) {
+        latestFrameBuffer = null;
+        resolveFrameWaiters(null);
+      }
+      await stopScreencastSource();
+      await startScreencastSource(nextPage);
+      resetActionFrameClock();
+    })().finally(() => {
+      restartPromise = null;
+    });
+    await restartPromise;
   }
 
   async function runOutputLoop() {
@@ -3317,160 +3435,56 @@ async function createScreencastFrameRecorder(page) {
         startedAt
       });
     }
-    if (videoEncoder) {
-      await videoEncoder.writeFrame(buffer);
-      return;
-    }
+    await videoEncoder.writeFrame(buffer);
+  }
 
-    await writeFile(getFramePath(frameCount), buffer);
+  function logFrameSizeIfNeeded(buffer, metadata, dimensions = getImageDimensions(buffer)) {
+    if (!shouldLogFrameSize) return;
+    const metadataSize = metadata && Number.isFinite(metadata.deviceWidth) && Number.isFinite(metadata.deviceHeight)
+      ? `${Math.round(metadata.deviceWidth)}x${Math.round(metadata.deviceHeight)}`
+      : 'unknown';
+    const bufferSize = dimensions ? `${dimensions.width}x${dimensions.height}` : 'unknown';
+    const label = `${bufferSize}|${metadataSize}`;
+    if (label === lastLoggedFrameSize) return;
+    lastLoggedFrameSize = label;
+    console.log(`\n[walkthrough] Raw frame ${bufferSize}; metadata ${metadataSize}; stage ${stage}`);
   }
 }
 
-async function createScreenshotFrameRecorder(page) {
-  let screenshotSession = await createScreenshotSession(page);
-  const videoEncoder = frameSink === 'pipe' ? createPipedVideoEncoder(pipedVideoPath) : null;
-  let frameCount = 0;
-  let lastProgressAt = 0;
-  let lastCameraSwooshAtMs = -Infinity;
-  let stage = 'Preparing';
-  const startedAt = Date.now();
-  const cameraSwooshCues = [];
-  const clickCues = [];
-  let lastFrameBuffer = null;
+function frameMatchesCaptureSize(dimensions) {
+  if (!dimensions) return true;
+  const { height, width } = getCapturePixelSize();
+  return dimensions.width === width && dimensions.height === height;
+}
 
-  return {
-    get cameraSwooshCues() {
-      return [...cameraSwooshCues];
-    },
-    get clickCues() {
-      return [...clickCues];
-    },
-    get frameCount() {
-      return frameCount;
-    },
-    cueCameraSwoosh({ minGapMs = 4_200 } = {}) {
-      const cueMs = Math.max(0, (frameCount / demoFps) * 1_000);
-      if (cueMs - lastCameraSwooshAtMs < minGapMs) return;
-      lastCameraSwooshAtMs = cueMs;
-      cameraSwooshCues.push(cueMs);
-    },
-    cueClick() {
-      clickCues.push(Math.max(0, (frameCount / demoFps) * 1_000));
-    },
-    setStage(nextStage) {
-      stage = nextStage;
-      writeCaptureProgress({
-        estimatedFrames: estimatedDemoFrames,
-        frameCount,
-        last: false,
-        stage,
-        startedAt
-      });
-    },
-    async usePage(nextPage) {
-      await screenshotSession.detach().catch(() => undefined);
-      screenshotSession = await createScreenshotSession(nextPage);
-      lastFrameBuffer = null;
-    },
-    async captureFrame() {
-      const buffer = await captureScreenshotBuffer();
-      lastFrameBuffer = buffer;
-      await writeFrameBuffer(buffer);
-    },
-    async abort() {
-      await screenshotSession.detach().catch(() => undefined);
-      await videoEncoder?.abort();
-    },
-    async captureThenHoldStill(durationMs) {
-      if (durationMs <= 0) return;
-      const frames = durationToFrames(durationMs);
-      await this.captureFrame();
-      await writeRepeatedLastFrame(Math.max(0, frames - 1));
-    },
-    async hold(durationMs) {
-      const frames = durationToFrames(durationMs);
-      for (let frame = 0; frame < frames; frame += 1) {
-        await this.captureFrame();
-      }
-    },
-    async holdStill(durationMs) {
-      if (durationMs <= 0) return;
-      const frames = durationToFrames(durationMs);
-      if (!lastFrameBuffer) {
-        await this.captureFrame();
-        await writeRepeatedLastFrame(Math.max(0, frames - 1));
-        return;
-      }
-
-      await writeRepeatedLastFrame(frames);
-    },
-    async settleThenHoldStill(durationMs, settleMs = 240) {
-      if (durationMs <= 0) return;
-      const dynamicMs = Math.min(durationMs, settleMs);
-      await this.hold(dynamicMs);
-      await this.holdStill(durationMs - dynamicMs);
-    },
-    async close() {
-      const capturedAt = Date.now();
-      writeCaptureProgress({
-        estimatedFrames: estimatedDemoFrames,
-        frameCount,
-        last: true,
-        stage: 'Captured',
-        startedAt
-      });
-      await screenshotSession.detach().catch(() => undefined);
-      const flushedAt = Date.now();
-      await videoEncoder?.close();
-      const finishedAt = Date.now();
-      return {
-        captureFps: frameCount / Math.max(0.001, (capturedAt - startedAt) / 1_000),
-        captureMs: capturedAt - startedAt,
-        encoderFlushMs: finishedAt - flushedAt,
-        frameCount,
-        videoPath: videoEncoder ? pipedVideoPath : null
-      };
-    }
-  };
-
-  async function captureScreenshotBuffer() {
-    const screenshotOptions = {
-      format: frameFormat,
-      fromSurface: true,
-      optimizeForSpeed: optimizeScreenshotForSpeed
+function getImageDimensions(buffer) {
+  if (buffer.length >= 24 && buffer.toString('ascii', 1, 4) === 'PNG') {
+    return {
+      height: buffer.readUInt32BE(20),
+      width: buffer.readUInt32BE(16)
     };
-    if (frameFormat === 'jpeg') screenshotOptions.quality = frameQuality;
-    const screenshot = await screenshotSession.send('Page.captureScreenshot', screenshotOptions);
-    return Buffer.from(screenshot.data, 'base64');
   }
 
-  async function writeFrameBuffer(buffer) {
-    frameCount += 1;
-    const now = Date.now();
-    if (now - lastProgressAt >= progressUpdateMs) {
-      lastProgressAt = now;
-      writeCaptureProgress({
-        estimatedFrames: estimatedDemoFrames,
-        frameCount,
-        last: false,
-        stage,
-        startedAt
-      });
-    }
-    if (videoEncoder) {
-      await videoEncoder.writeFrame(buffer);
-      return;
-    }
-
-    await writeFile(getFramePath(frameCount), buffer);
-  }
-
-  async function writeRepeatedLastFrame(frameTotal) {
-    if (!lastFrameBuffer) return;
-    for (let frame = 0; frame < frameTotal; frame += 1) {
-      await writeFrameBuffer(lastFrameBuffer);
+  if (buffer.length >= 4 && buffer[0] === 0xff && buffer[1] === 0xd8) {
+    let offset = 2;
+    while (offset + 9 < buffer.length) {
+      if (buffer[offset] !== 0xff) {
+        offset += 1;
+        continue;
+      }
+      const marker = buffer[offset + 1];
+      const size = buffer.readUInt16BE(offset + 2);
+      if (marker >= 0xc0 && marker <= 0xcf && ![0xc4, 0xc8, 0xcc].includes(marker)) {
+        return {
+          height: buffer.readUInt16BE(offset + 5),
+          width: buffer.readUInt16BE(offset + 7)
+        };
+      }
+      offset += 2 + size;
     }
   }
+
+  return null;
 }
 
 function createPipedVideoEncoder(videoPath) {
@@ -3556,10 +3570,6 @@ function writeStream(stream, buffer) {
   });
 }
 
-function getFramePath(frameNumber) {
-  return path.join(framesDir, `frame-${String(frameNumber).padStart(5, '0')}.${frameExtension}`);
-}
-
 function writeCaptureProgress({ estimatedFrames, frameCount, last, stage, startedAt }) {
   const elapsedMs = Math.max(1, Date.now() - startedAt);
   const captureFps = frameCount / (elapsedMs / 1_000);
@@ -3583,17 +3593,25 @@ function writeCaptureProgress({ estimatedFrames, frameCount, last, stage, starte
   process.stdout.write(`${last ? '\r' : '\r'}${text}${last ? '\n' : ''}`);
 }
 
-async function createScreenshotSession(page) {
-  const screenshotSession = await page.context().newCDPSession(page);
-  await screenshotSession.send('Emulation.setDeviceMetricsOverride', {
+async function createCaptureSession(page) {
+  const session = await page.context().newCDPSession(page);
+  await applyCaptureMetrics(session, viewport);
+  return session;
+}
+
+async function applyCaptureMetrics(session, size) {
+  await session.send('Emulation.setDeviceMetricsOverride', {
     deviceScaleFactor,
-    height: viewport.height,
+    height: size.height,
     mobile: false,
-    screenHeight: viewport.height,
-    screenWidth: viewport.width,
-    width: viewport.width
+    screenHeight: size.height,
+    screenWidth: size.width,
+    width: size.width
   });
-  return screenshotSession;
+  await session.send('Emulation.setVisibleSize', {
+    height: size.height,
+    width: size.width
+  }).catch(() => undefined);
 }
 
 async function clickWithCursor(page, locator, recorder, label, options = {}) {
@@ -3601,10 +3619,7 @@ async function clickWithCursor(page, locator, recorder, label, options = {}) {
     await recorder.hold(options.beforeFocusHoldMs);
   }
   const box = await getLocatorBox(locator, label);
-  const clickPoint = {
-    x: box.x + box.width / 2,
-    y: box.y + box.height / 2
-  };
+  const clickPoint = getHumanTargetPoint(box, label);
   await setDemoFocusOnLocator(page, locator, options.padding ?? 8);
   if (options.afterFocusHoldMs) {
     await recorder.hold(options.afterFocusHoldMs);
@@ -3614,25 +3629,32 @@ async function clickWithCursor(page, locator, recorder, label, options = {}) {
     await recorder.hold(260);
     await recorder.holdStill(640);
   }
-  await moveCursor(page, clickPoint.x, clickPoint.y, options.durationMs || 760, recorder, {
+  await moveCursor(page, clickPoint.x, clickPoint.y, options.durationMs, recorder, {
+    label,
     hoverBox: box
   });
-  await recorder.hold(180);
+  await recorder.hold(options.clickSettleMs ?? getHumanClickSettleMs(label));
   const modifiers = options.modifiers || [];
   for (const modifier of modifiers) {
     await page.keyboard.down(modifier);
   }
+  let mouseIsDown = false;
   try {
-    await page.mouse.click(clickPoint.x, clickPoint.y);
+    await page.mouse.down();
+    mouseIsDown = true;
     recorder.cueClick();
+    await recorder.hold(options.pressMs ?? getHumanPressMs(label));
+    await page.mouse.up();
+    mouseIsDown = false;
   } finally {
+    if (mouseIsDown) await page.mouse.up().catch(() => undefined);
     for (const modifier of modifiers.slice().reverse()) {
       await page.keyboard.up(modifier).catch(() => undefined);
     }
   }
   await clearDemoFocus(page);
   await setCursorVariant(page, 'pointer');
-  await recorder.hold(options.afterClickHoldMs || 360);
+  await recorder.hold(options.afterClickHoldMs ?? 360);
 }
 
 async function highlightLocator(page, locator, padding = 8) {
@@ -3773,20 +3795,27 @@ async function getLocatorBox(locator, label) {
 
 async function moveCursor(page, x, y, durationMs, recorder, options = {}) {
   const start = await page.evaluate(() => window.__ytcqDemoCursorPosition || { x: 28, y: 36 });
-  const steps = durationToFrames(durationMs);
+  const moveDurationMs = durationMs ?? getHumanCursorDurationMs(start, { x, y });
+  const steps = durationToFrames(moveDurationMs);
   let activeVariant = pointIsInsideBox(start, options.hoverBox) ? 'hand' : 'pointer';
   await setCursorVariant(page, activeVariant);
+  const controlPoints = getHumanCursorControlPoints(start, { x, y }, options.label || '');
 
   for (let step = 1; step <= steps; step += 1) {
     const progress = easeInOutCubic(step / steps);
-    const nextX = start.x + (x - start.x) * progress;
-    const nextY = start.y + (y - start.y) * progress;
+    const point = step === steps
+      ? { x, y }
+      : getCubicBezierPoint(start, controlPoints.first, controlPoints.second, { x, y }, progress);
+    const nextX = point.x;
+    const nextY = point.y;
     const nextVariant = pointIsInsideBox({ x: nextX, y: nextY }, options.hoverBox) ? 'hand' : 'pointer';
     if (nextVariant !== activeVariant) {
       activeVariant = nextVariant;
       await setCursorVariant(page, activeVariant);
     }
-    await page.mouse.move(nextX, nextY);
+    if (step === steps || step % 6 === 0) {
+      await page.mouse.move(nextX, nextY);
+    }
     await page.evaluate(([cursorX, cursorY]) => {
       window.__ytcqDemoCursorPosition = { x: cursorX, y: cursorY };
       const cursor = document.querySelector('.ytcq-demo-cursor');
@@ -3811,12 +3840,16 @@ async function setCursorVariant(page, variant) {
 async function setDemoCameraForBox(page, recorder, box, options = {}) {
   const scale = box ? options.scale || 1.16 : 1;
   await clearDemoFocus(page);
-  await recorder.hold(120);
+  await recorder.hold(options.preHoldMs ?? 100);
   const currentCamera = await getDemoCamera(page);
   const logicalBox = box ? unprojectCameraBox(box, currentCamera) : null;
   const transform = box
     ? getCameraTransformForBox(logicalBox, scale, options)
-    : { scale: 1, x: 0, y: 0 };
+    : getDefaultCamera();
+  if (cameraTransformIsClose(currentCamera, transform)) {
+    await recorder.hold(options.durationMs ?? 220);
+    return;
+  }
   if (shouldCueCameraSwoosh(currentCamera, transform, options)) {
     recorder.cueCameraSwoosh();
   }
@@ -3825,12 +3858,9 @@ async function setDemoCameraForBox(page, recorder, box, options = {}) {
     const app = document.querySelector('ytd-app');
     if (!(app instanceof HTMLElement)) return;
     window.__ytcqDemoCamera = camera;
-    app.style.transformOrigin = '0 0';
-    app.style.willChange = 'transform';
-    app.style.transition = 'transform 960ms cubic-bezier(0.2, 0, 0, 1)';
     app.style.transform = `translate(${camera.x}px, ${camera.y}px) scale(${camera.scale})`;
   }, transform);
-  await recorder.hold(options.durationMs || 1_040);
+  await recorder.hold(options.durationMs ?? getCameraTransitionDurationMs(currentCamera, transform));
 }
 
 function shouldCueCameraSwoosh(currentCamera, nextCamera, options = {}) {
@@ -3840,10 +3870,26 @@ function shouldCueCameraSwoosh(currentCamera, nextCamera, options = {}) {
   return moveDistance >= 80 || scaleDelta >= 0.06;
 }
 
+function cameraTransformIsClose(currentCamera, nextCamera) {
+  const moveDistance = Math.hypot(nextCamera.x - currentCamera.x, nextCamera.y - currentCamera.y);
+  const scaleDelta = Math.abs(nextCamera.scale - currentCamera.scale);
+  return moveDistance < 18 && scaleDelta < 0.012;
+}
+
+function getCameraTransitionDurationMs(currentCamera, nextCamera) {
+  const moveDistance = Math.hypot(nextCamera.x - currentCamera.x, nextCamera.y - currentCamera.y);
+  const scaleDelta = Math.abs(nextCamera.scale - currentCamera.scale);
+  return Math.round(Math.min(1_120, Math.max(760, 620 + moveDistance * 0.38 + scaleDelta * 1_600)));
+}
+
 async function getDemoCamera(page) {
   return page.evaluate(() => {
     return window.__ytcqDemoCamera || { scale: 1, x: 0, y: 0 };
   });
+}
+
+function getDefaultCamera() {
+  return { scale: 1, x: 0, y: 0 };
 }
 
 function unprojectCameraBox(box, camera) {
@@ -3895,6 +3941,97 @@ function pointIsInsideBox(point, box) {
   );
 }
 
+function getHumanTargetPoint(box, label = '') {
+  const seed = getStableSeed(label);
+  const maxOffsetX = Math.min(10, Math.max(0, box.width * 0.18));
+  const maxOffsetY = Math.min(7, Math.max(0, box.height * 0.16));
+  const offsetX = getSeededUnit(seed) * maxOffsetX;
+  const offsetY = getSeededUnit(seed >>> 8) * maxOffsetY;
+  return {
+    x: box.x + box.width / 2 + offsetX,
+    y: box.y + box.height / 2 + offsetY
+  };
+}
+
+function getHumanCursorDurationMs(start, end) {
+  const distance = Math.hypot(end.x - start.x, end.y - start.y);
+  return Math.round(Math.min(980, Math.max(380, 210 + distance * 0.72)));
+}
+
+function getHumanClickSettleMs(label = '') {
+  return 120 + Math.round((getStableSeed(label) % 80) / 2);
+}
+
+function getHumanPressMs(label = '') {
+  return 54 + (getStableSeed(label) % 34);
+}
+
+function getHumanKeyDelayMs(grapheme, index) {
+  if (grapheme === ' ') return 8;
+  if (isVisualEmojiGrapheme(grapheme)) return 18;
+  return 7 + ((index * 5 + grapheme.codePointAt(0)) % 8);
+}
+
+function getHumanTypingHoldMs(grapheme, index, graphemes) {
+  if (isVisualEmojiGrapheme(grapheme)) return 120;
+  if (/[.!?]/.test(grapheme)) return 125;
+  if (grapheme === ' ') return 34 + (index % 3) * 8;
+  const next = graphemes[index + 1] || '';
+  const wordPause = next === ' ' && index > 0 ? 28 + (index % 4) * 9 : 0;
+  return 30 + ((index * 7 + grapheme.codePointAt(0)) % 18) + wordPause;
+}
+
+function isVisualEmojiGrapheme(value) {
+  return /\p{Extended_Pictographic}/u.test(value) || value.includes('\uFE0F');
+}
+
+function getHumanCursorControlPoints(start, end, label = '') {
+  const dx = end.x - start.x;
+  const dy = end.y - start.y;
+  const distance = Math.max(1, Math.hypot(dx, dy));
+  const normalX = -dy / distance;
+  const normalY = dx / distance;
+  const seed = getStableSeed(`${label}:${Math.round(start.x)},${Math.round(start.y)}:${Math.round(end.x)},${Math.round(end.y)}`);
+  const bend = Math.min(80, Math.max(14, distance * 0.13)) * (getSeededUnit(seed) >= 0 ? 1 : -1);
+  const firstBias = 0.32 + Math.abs(getSeededUnit(seed >>> 4)) * 0.08;
+  const secondBias = 0.72 + Math.abs(getSeededUnit(seed >>> 10)) * 0.10;
+  return {
+    first: {
+      x: start.x + dx * firstBias + normalX * bend,
+      y: start.y + dy * firstBias + normalY * bend
+    },
+    second: {
+      x: start.x + dx * secondBias - normalX * bend * 0.42,
+      y: start.y + dy * secondBias - normalY * bend * 0.42
+    }
+  };
+}
+
+function getCubicBezierPoint(start, firstControl, secondControl, end, progress) {
+  const inverse = 1 - progress;
+  const first = inverse * inverse * inverse;
+  const second = 3 * inverse * inverse * progress;
+  const third = 3 * inverse * progress * progress;
+  const fourth = progress * progress * progress;
+  return {
+    x: start.x * first + firstControl.x * second + secondControl.x * third + end.x * fourth,
+    y: start.y * first + firstControl.y * second + secondControl.y * third + end.y * fourth
+  };
+}
+
+function getStableSeed(value) {
+  let hash = 2166136261;
+  for (const char of String(value)) {
+    hash ^= char.codePointAt(0) || 0;
+    hash = Math.imul(hash, 16777619);
+  }
+  return hash >>> 0;
+}
+
+function getSeededUnit(seed) {
+  return ((seed % 2001) / 1000) - 1;
+}
+
 function durationToFrames(durationMs) {
   return Math.max(1, Math.round((durationMs / 1_000) * demoFps));
 }
@@ -3943,67 +4080,6 @@ function readEnum(value, allowedValues, fallback) {
   return allowedValues.includes(normalized) ? normalized : fallback;
 }
 
-async function prepareFrameStorage() {
-  if (frameSink !== 'files') return { type: 'pipe' };
-
-  let ramDisk = null;
-  if (shouldUseFrameRamDisk()) {
-    ramDisk = await createMacFrameRamDisk();
-    framesRootDir = ramDisk.mountPath;
-    framesDir = path.join(framesRootDir, `youtube-chat-walkthrough-frames-${process.pid}`);
-    console.log(`[walkthrough] Using RAM disk for frame files: ${framesRootDir}`);
-  }
-
-  await rm(framesDir, { force: true, recursive: true });
-  await mkdir(framesDir, { recursive: true });
-  return { ramDisk, type: 'files' };
-}
-
-async function cleanupFrameStorage(storage) {
-  if (storage.type !== 'files') return;
-
-  await rm(framesDir, { force: true, recursive: true }).catch(() => undefined);
-  if (!storage.ramDisk) return;
-
-  await runProcess('hdiutil', ['detach', storage.ramDisk.device]).catch((error) => {
-    console.warn(`[walkthrough] Could not detach RAM disk ${storage.ramDisk.device}: ${error.message}`);
-  });
-}
-
-function shouldUseFrameRamDisk() {
-  return process.env.YTCQ_DEMO_RAM_DISK === '1';
-}
-
-async function createMacFrameRamDisk() {
-  if (process.platform !== 'darwin') {
-    throw new Error('YTCQ_DEMO_RAM_DISK=1 is only supported on macOS.');
-  }
-
-  const sizeMb = readBoundedInteger(process.env.YTCQ_DEMO_RAM_DISK_MB, 8_192, 256, 32_768);
-  const sectors = sizeMb * 2_048;
-  const device = (await runProcessCapture('hdiutil', ['attach', '-nomount', `ram://${sectors}`])).trim();
-  if (!device.startsWith('/dev/')) {
-    throw new Error(`Could not create RAM disk. Unexpected hdiutil output: ${device}`);
-  }
-
-  try {
-    await runProcessCapture('diskutil', ['erasevolume', 'HFS+', 'YTCQDemoFrames', device]);
-    const diskInfo = await runProcessCapture('diskutil', ['info', device]);
-    const mountMatch = diskInfo.match(/Mount Point:\s+(.+)/);
-    const mountPath = mountMatch?.[1]?.trim();
-    if (!mountPath) throw new Error(`Could not find RAM disk mount point for ${device}.`);
-    return { device, mountPath };
-  } catch (error) {
-    await runProcess('hdiutil', ['detach', device]).catch(() => undefined);
-    throw error;
-  }
-}
-
-function getDefaultFramesRootDir() {
-  const linuxSharedMemory = '/dev/shm';
-  return existsSync(linuxSharedMemory) ? linuxSharedMemory : tmpdir();
-}
-
 function formatDuration(durationMs) {
   const totalSeconds = Math.max(0, Math.round(durationMs / 1_000));
   const minutes = Math.floor(totalSeconds / 60);
@@ -4023,9 +4099,7 @@ function getDemoModeLabel() {
 
 function getFrameCaptureLogLabel() {
   const quality = frameFormat === 'jpeg' ? ` q${frameQuality}` : '';
-  const speed = optimizeScreenshotForSpeed ? ' speed' : '';
-  const speedLabel = captureMode === 'screenshots' ? speed : '';
-  return `${captureMode} ${frameSink} ${frameFormat}${quality}${speedLabel}`;
+  return `screencast pipe ${frameFormat}${quality}`;
 }
 
 function getCaptureSizeLabel() {
@@ -4065,34 +4139,9 @@ async function readFileDataUrl(filePath, mimeType) {
   return `data:${mimeType};base64,${contents.toString('base64')}`;
 }
 
-async function encodeCapturedVideo(frameCount, { cameraSwooshCues = [], clickCues = [], pipedVideoPath: inputVideoPath = null } = {}) {
-  if (inputVideoPath) {
-    await muxPipedVideoToOutput(inputVideoPath, frameCount, { cameraSwooshCues, clickCues });
-    return;
-  }
-
-  await encodeFrameFilesToVideo(frameCount, { cameraSwooshCues, clickCues });
-}
-
-async function encodeFrameFilesToVideo(frameCount, { cameraSwooshCues = [], clickCues = [] } = {}) {
-  if (frameCount <= 0) throw new Error('No demo frames were captured.');
-
-  const args = [
-    '-y',
-    '-hide_banner',
-    '-loglevel',
-    'error',
-    '-framerate',
-    String(demoFps),
-    '-start_number',
-    '1',
-    '-i',
-    path.join(framesDir, `frame-%05d.${frameExtension}`)
-  ];
-  appendAudioCueArgs(args, frameCount, { cameraSwooshCues, clickCues });
-  args.push(...getVideoEncodeArgs());
-  args.push(outputPath);
-  await runProcess(process.env.YTCQ_FFMPEG || 'ffmpeg', args);
+async function encodeCapturedVideo(frameCount, { cameraSwooshCues = [], clickCues = [], pipedVideoPath: inputVideoPath } = {}) {
+  if (!inputVideoPath) throw new Error('No piped walkthrough video was captured.');
+  await muxPipedVideoToOutput(inputVideoPath, frameCount, { cameraSwooshCues, clickCues });
 }
 
 async function muxPipedVideoToOutput(inputVideoPath, frameCount, { cameraSwooshCues = [], clickCues = [] } = {}) {
@@ -4193,8 +4242,7 @@ function getVideoEncodeArgs() {
   return [
     '-vf',
     [
-      `scale=${width}:${height}:force_original_aspect_ratio=decrease:flags=lanczos`,
-      `pad=${width}:${height}:(ow-iw)/2:(oh-ih)/2:color=white`,
+      `scale=${width}:${height}:flags=lanczos`,
       'setsar=1'
     ].join(','),
     '-c:v',
@@ -4258,31 +4306,6 @@ function runProcess(command, args) {
   });
 }
 
-function runProcessCapture(command, args) {
-  return new Promise((resolve, reject) => {
-    const child = spawn(command, args, { stdio: ['ignore', 'pipe', 'pipe'] });
-    let stdout = '';
-    let stderr = '';
-    child.stdout.setEncoding('utf8');
-    child.stderr.setEncoding('utf8');
-    child.stdout.on('data', (chunk) => {
-      stdout += chunk;
-    });
-    child.stderr.on('data', (chunk) => {
-      stderr += chunk;
-    });
-    child.once('error', reject);
-    child.once('exit', (code, signal) => {
-      if (code === 0) {
-        resolve(stdout);
-        return;
-      }
-
-      const details = stderr.trim() ? `\n${stderr.trim()}` : '';
-      reject(new Error(`${command} failed with ${signal || `exit code ${code}`}.${details}`));
-    });
-  });
-}
 
 async function withTimeout(promise, timeoutMs, label) {
   let timeout;
