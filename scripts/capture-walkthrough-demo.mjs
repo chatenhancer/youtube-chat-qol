@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* global chrome, document, window, CSS, MouseEvent, MutationObserver, PointerEvent, Element, HTMLElement, HTMLImageElement, HTMLInputElement, HTMLTextAreaElement, InputEvent, Node, SVGElement, getComputedStyle */
+/* global chrome, document, window, CSS, MouseEvent, MutationObserver, PointerEvent, Element, HTMLElement, HTMLCanvasElement, HTMLDivElement, HTMLIFrameElement, HTMLImageElement, HTMLInputElement, HTMLTextAreaElement, InputEvent, Node, SVGElement, getComputedStyle */
 
 import { chromium } from '@playwright/test';
 import { createHash } from 'node:crypto';
