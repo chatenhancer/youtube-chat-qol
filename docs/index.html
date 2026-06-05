@@ -845,7 +845,7 @@
             </svg>
           </button>
         </div>
-        <video class="walkthrough-video" controls playsinline preload="metadata" data-walkthrough-video></video>
+        <video class="walkthrough-video" playsinline preload="metadata" tabindex="0" data-walkthrough-video></video>
       </div>
     </dialog>
 
@@ -924,6 +924,10 @@
 
         walkthroughModal?.addEventListener("close", () => {
           if (walkthroughVideo instanceof HTMLVideoElement) walkthroughVideo.pause();
+        });
+
+        walkthroughModal?.addEventListener("keydown", (event) => {
+          handleWalkthroughModalKeydown(event);
         });
 
         setupStoreVersionAlertScrollFade();
@@ -1069,7 +1073,7 @@
         function openWalkthroughModal(videoUrl) {
           if (!(walkthroughVideo instanceof HTMLVideoElement)) return;
 
-          if (walkthroughVideo.ended) walkthroughVideo.currentTime = 0;
+          walkthroughVideo.currentTime = 0;
           if (walkthroughModal && typeof walkthroughModal.showModal === "function") {
             walkthroughModal.showModal();
             walkthroughVideo.focus();
@@ -1083,16 +1087,26 @@
         function startWalkthroughPlayback() {
           if (!(walkthroughVideo instanceof HTMLVideoElement)) return;
 
+          walkthroughVideo.volume = 1;
           walkthroughVideo.muted = false;
-          void walkthroughVideo.play().catch(() => {
-            walkthroughVideo.muted = true;
-            void walkthroughVideo.play().catch(() => undefined);
-          });
+          void walkthroughVideo.play().catch(() => undefined);
         }
 
         function closeWalkthroughModal() {
           if (walkthroughVideo instanceof HTMLVideoElement) walkthroughVideo.pause();
           if (walkthroughModal && typeof walkthroughModal.close === "function") walkthroughModal.close();
+        }
+
+        function handleWalkthroughModalKeydown(event) {
+          if (!(walkthroughVideo instanceof HTMLVideoElement)) return;
+          if (!walkthroughModal || !walkthroughModal.open) return;
+          if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
+
+          event.preventDefault();
+          const duration = Number.isFinite(walkthroughVideo.duration) ? walkthroughVideo.duration : 0;
+          const direction = event.key === "ArrowRight" ? 1 : -1;
+          const nextTime = walkthroughVideo.currentTime + direction * 5;
+          walkthroughVideo.currentTime = Math.max(0, duration ? Math.min(duration, nextTime) : nextTime);
         }
 
         function getDocsAssetUrl(relativePath) {
