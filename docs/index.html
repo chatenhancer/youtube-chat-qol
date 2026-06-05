@@ -79,7 +79,7 @@
         }
       })();
     </script>
-    <link rel="stylesheet" href="styles.css?v=129">
+    <link rel="stylesheet" href="styles.css?v=130">
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -838,6 +838,7 @@
     <dialog class="walkthrough-modal" aria-labelledby="walkthrough-modal-title" data-walkthrough-modal>
       <div class="walkthrough-modal-panel">
         <div class="walkthrough-modal-heading">
+          <span class="walkthrough-modal-time" data-walkthrough-time>0:00 / 0:00</span>
           <h2 id="walkthrough-modal-title" data-i18n="features.walkthroughModalTitle">Feature walkthrough</h2>
           <button class="walkthrough-modal-close" type="button" aria-label="Close walkthrough" data-walkthrough-close data-i18n-attr="aria-label:features.walkthroughClose">
             <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
@@ -871,6 +872,7 @@
         const walkthroughOpenButtons = document.querySelectorAll("[data-walkthrough-open]");
         const walkthroughModal = document.querySelector("[data-walkthrough-modal]");
         const walkthroughClose = document.querySelector("[data-walkthrough-close]");
+        const walkthroughTime = document.querySelector("[data-walkthrough-time]");
         const walkthroughVideo = document.querySelector("[data-walkthrough-video]");
 
         setupTopHeaderState();
@@ -929,6 +931,12 @@
         walkthroughModal?.addEventListener("keydown", (event) => {
           handleWalkthroughModalKeydown(event);
         });
+
+        if (walkthroughVideo instanceof HTMLVideoElement) {
+          walkthroughVideo.addEventListener("durationchange", updateWalkthroughTimeBadge);
+          walkthroughVideo.addEventListener("loadedmetadata", updateWalkthroughTimeBadge);
+          walkthroughVideo.addEventListener("timeupdate", updateWalkthroughTimeBadge);
+        }
 
         setupStoreVersionAlertScrollFade();
         void checkStoreVersionStatus();
@@ -1059,6 +1067,7 @@
 
           const videoUrl = getDocsAssetUrl(walkthroughPath);
           walkthroughVideo.src = videoUrl.href;
+          updateWalkthroughTimeBadge();
           walkthroughCtas.forEach((cta) => {
             cta.hidden = false;
           });
@@ -1074,6 +1083,7 @@
           if (!(walkthroughVideo instanceof HTMLVideoElement)) return;
 
           walkthroughVideo.currentTime = 0;
+          updateWalkthroughTimeBadge();
           if (walkthroughModal && typeof walkthroughModal.showModal === "function") {
             walkthroughModal.showModal();
             walkthroughVideo.focus();
@@ -1107,6 +1117,26 @@
           const direction = event.key === "ArrowRight" ? 1 : -1;
           const nextTime = walkthroughVideo.currentTime + direction * 5;
           walkthroughVideo.currentTime = Math.max(0, duration ? Math.min(duration, nextTime) : nextTime);
+          updateWalkthroughTimeBadge();
+        }
+
+        function updateWalkthroughTimeBadge() {
+          if (!(walkthroughTime instanceof HTMLElement)) return;
+          if (!(walkthroughVideo instanceof HTMLVideoElement)) {
+            walkthroughTime.textContent = "0:00 / 0:00";
+            return;
+          }
+
+          walkthroughTime.textContent = `${formatWalkthroughTime(walkthroughVideo.currentTime)} / ${formatWalkthroughTime(walkthroughVideo.duration)}`;
+        }
+
+        function formatWalkthroughTime(value) {
+          if (!Number.isFinite(value) || value < 0) return "0:00";
+
+          const totalSeconds = Math.floor(value);
+          const minutes = Math.floor(totalSeconds / 60);
+          const seconds = totalSeconds % 60;
+          return `${minutes}:${String(seconds).padStart(2, "0")}`;
         }
 
         function getDocsAssetUrl(relativePath) {
