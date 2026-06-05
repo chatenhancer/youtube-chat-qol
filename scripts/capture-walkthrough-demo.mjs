@@ -58,8 +58,9 @@ const estimatedDemoSeconds = readPositiveNumber(process.env.YTCQ_DEMO_ESTIMATED_
 const estimatedDemoFrames = Math.max(demoFps, Math.round(estimatedDemoSeconds * demoFps));
 const progressUpdateMs = readPositiveInteger(process.env.YTCQ_DEMO_PROGRESS_MS, process.stdout.isTTY ? 1_000 : 5_000);
 const deviceScaleFactor = readPositiveNumber(process.env.YTCQ_DEMO_SCALE, getDefaultDemoScale());
+const captureMode = readEnum(process.env.YTCQ_DEMO_CAPTURE_MODE, ['screencast', 'screenshots'], 'screencast');
 const frameSink = readEnum(process.env.YTCQ_DEMO_FRAME_SINK, ['pipe', 'files'], 'pipe');
-const frameFormat = readEnum(process.env.YTCQ_DEMO_FRAME_FORMAT, ['jpeg', 'png'], 'jpeg');
+const frameFormat = readEnum(process.env.YTCQ_DEMO_FRAME_FORMAT, ['png', 'jpeg'], 'png');
 const frameQuality = readBoundedInteger(process.env.YTCQ_DEMO_FRAME_QUALITY, previewMode ? 92 : 96, 1, 100);
 const frameExtension = frameFormat === 'jpeg' ? 'jpg' : 'png';
 const pipedVideoPath = path.join(demoResultsDir, `${finalVideoBaseName}-${process.pid}-silent.mp4`);
@@ -712,7 +713,7 @@ async function seedWalkthroughExtensionState(context) {
           composerTranslateLanguage: '',
           lastTranslationTarget: 'en',
           sound: false,
-          startupEffect: true,
+          startupEffect: false,
           targetLanguage: '',
           translationDisplay: 'below'
         }, resolve)),
@@ -3072,8 +3073,10 @@ async function installDemoCursor(page) {
   await page.addStyleTag({
     content: `
       .ytcq-demo-cursor {
+        display: block !important;
         height: 44px;
         left: 0;
+        opacity: 1 !important;
         pointer-events: none;
         position: fixed;
         top: 0;
@@ -3086,6 +3089,7 @@ async function installDemoCursor(page) {
       .ytcq-demo-cursor img {
         display: block;
         height: 44px;
+        opacity: 1 !important;
         visibility: visible !important;
         width: 44px;
       }
@@ -3108,6 +3112,221 @@ async function installDemoCursor(page) {
 }
 
 async function createFrameRecorder(page) {
+  if (captureMode === 'screencast') return createScreencastFrameRecorder(page);
+  return createScreenshotFrameRecorder(page);
+}
+
+async function createScreencastFrameRecorder(page) {
+  const videoEncoder = frameSink === 'pipe' ? createPipedVideoEncoder(pipedVideoPath) : null;
+  let currentSource = null;
+  let frameCount = 0;
+  let latestFrameBuffer = null;
+  let lastProgressAt = 0;
+  let lastCameraSwooshAtMs = -Infinity;
+  let outputLoopPromise = null;
+  let stage = 'Preparing';
+  let stopped = false;
+  let nextActionFrameAt = Date.now();
+  const startedAt = Date.now();
+  const cameraSwooshCues = [];
+  const clickCues = [];
+  const frameWaiters = new Set();
+
+  await startScreencastSource(page);
+  outputLoopPromise = runOutputLoop();
+
+  return {
+    get cameraSwooshCues() {
+      return [...cameraSwooshCues];
+    },
+    get clickCues() {
+      return [...clickCues];
+    },
+    get frameCount() {
+      return frameCount;
+    },
+    cueCameraSwoosh({ minGapMs = 4_200 } = {}) {
+      const cueMs = Math.max(0, (frameCount / demoFps) * 1_000);
+      if (cueMs - lastCameraSwooshAtMs < minGapMs) return;
+      lastCameraSwooshAtMs = cueMs;
+      cameraSwooshCues.push(cueMs);
+    },
+    cueClick() {
+      clickCues.push(Math.max(0, (frameCount / demoFps) * 1_000));
+    },
+    setStage(nextStage) {
+      stage = nextStage;
+      writeCaptureProgress({
+        estimatedFrames: estimatedDemoFrames,
+        frameCount,
+        last: false,
+        stage,
+        startedAt
+      });
+    },
+    async usePage(nextPage) {
+      latestFrameBuffer = null;
+      resolveFrameWaiters(null);
+      await stopScreencastSource();
+      await startScreencastSource(nextPage);
+      resetActionFrameClock();
+    },
+    async captureFrame() {
+      await waitForNextActionFrame();
+    },
+    async abort() {
+      stopped = true;
+      resolveFrameWaiters(null);
+      await stopScreencastSource();
+      await videoEncoder?.abort();
+      await outputLoopPromise?.catch(() => undefined);
+    },
+    async captureThenHoldStill(durationMs) {
+      await this.hold(durationMs);
+    },
+    async hold(durationMs) {
+      await delayAndResetActionFrameClock(durationMs);
+    },
+    async holdStill(durationMs) {
+      await delayAndResetActionFrameClock(durationMs);
+    },
+    async settleThenHoldStill(durationMs) {
+      await delayAndResetActionFrameClock(durationMs);
+    },
+    async close() {
+      const capturedAt = Date.now();
+      stopped = true;
+      resolveFrameWaiters(null);
+      writeCaptureProgress({
+        estimatedFrames: estimatedDemoFrames,
+        frameCount,
+        last: true,
+        stage: 'Captured',
+        startedAt
+      });
+      await stopScreencastSource();
+      await outputLoopPromise;
+      const flushedAt = Date.now();
+      await videoEncoder?.close();
+      const finishedAt = Date.now();
+      return {
+        captureFps: frameCount / Math.max(0.001, (capturedAt - startedAt) / 1_000),
+        captureMs: capturedAt - startedAt,
+        encoderFlushMs: finishedAt - flushedAt,
+        frameCount,
+        videoPath: videoEncoder ? pipedVideoPath : null
+      };
+    }
+  };
+
+  async function startScreencastSource(nextPage) {
+    const session = await createScreenshotSession(nextPage);
+    const handleFrame = (event) => {
+      latestFrameBuffer = Buffer.from(event.data, 'base64');
+      resolveFrameWaiters(latestFrameBuffer);
+      session.send('Page.screencastFrameAck', {
+        sessionId: event.sessionId
+      }).catch(() => undefined);
+    };
+
+    session.on('Page.screencastFrame', handleFrame);
+    currentSource = { handleFrame, session };
+    const { height, width } = getCapturePixelSize();
+    const options = {
+      everyNthFrame: 1,
+      format: frameFormat,
+      maxHeight: height,
+      maxWidth: width
+    };
+    if (frameFormat === 'jpeg') options.quality = frameQuality;
+    await session.send('Page.startScreencast', options);
+    await withTimeout(waitForLatestFrame(), 10_000, 'receive first screencast frame');
+    resetActionFrameClock();
+  }
+
+  async function stopScreencastSource() {
+    if (!currentSource) return;
+    const source = currentSource;
+    currentSource = null;
+    source.session.off('Page.screencastFrame', source.handleFrame);
+    await source.session.send('Page.stopScreencast').catch(() => undefined);
+    await source.session.detach().catch(() => undefined);
+  }
+
+  async function runOutputLoop() {
+    let nextFrameAt = Date.now();
+    while (!stopped) {
+      const buffer = latestFrameBuffer || await waitForLatestFrame();
+      if (!buffer || stopped) break;
+      await writeFrameBuffer(buffer);
+      nextFrameAt += getFrameDurationMs();
+      const waitMs = nextFrameAt - Date.now();
+      if (waitMs > 0) {
+        await delay(waitMs);
+      } else if (waitMs < -getFrameDurationMs() * 5) {
+        nextFrameAt = Date.now();
+      }
+    }
+  }
+
+  function waitForLatestFrame() {
+    if (latestFrameBuffer) return Promise.resolve(latestFrameBuffer);
+    if (stopped) return Promise.resolve(null);
+    return new Promise((resolve) => {
+      frameWaiters.add(resolve);
+    });
+  }
+
+  function resolveFrameWaiters(buffer) {
+    const waiters = [...frameWaiters];
+    frameWaiters.clear();
+    waiters.forEach((resolve) => resolve(buffer));
+  }
+
+  async function waitForNextActionFrame() {
+    const frameDurationMs = getFrameDurationMs();
+    nextActionFrameAt += frameDurationMs;
+    const waitMs = nextActionFrameAt - Date.now();
+    if (waitMs > 0) {
+      await delay(waitMs);
+      return;
+    }
+
+    if (waitMs < -frameDurationMs * 4) resetActionFrameClock();
+  }
+
+  async function delayAndResetActionFrameClock(durationMs) {
+    if (durationMs > 0) await delay(durationMs);
+    resetActionFrameClock();
+  }
+
+  function resetActionFrameClock() {
+    nextActionFrameAt = Date.now();
+  }
+
+  async function writeFrameBuffer(buffer) {
+    frameCount += 1;
+    const now = Date.now();
+    if (now - lastProgressAt >= progressUpdateMs) {
+      lastProgressAt = now;
+      writeCaptureProgress({
+        estimatedFrames: estimatedDemoFrames,
+        frameCount,
+        last: false,
+        stage,
+        startedAt
+      });
+    }
+    if (videoEncoder) {
+      await videoEncoder.writeFrame(buffer);
+      return;
+    }
+
+    await writeFile(getFramePath(frameCount), buffer);
+  }
+}
+
+async function createScreenshotFrameRecorder(page) {
   let screenshotSession = await createScreenshotSession(page);
   const videoEncoder = frameSink === 'pipe' ? createPipedVideoEncoder(pipedVideoPath) : null;
   let frameCount = 0;
@@ -3680,6 +3899,10 @@ function durationToFrames(durationMs) {
   return Math.max(1, Math.round((durationMs / 1_000) * demoFps));
 }
 
+function getFrameDurationMs() {
+  return 1_000 / demoFps;
+}
+
 function getDefaultDemoFps() {
   if (previewMode) return 24;
   return 60;
@@ -3801,11 +4024,13 @@ function getDemoModeLabel() {
 function getFrameCaptureLogLabel() {
   const quality = frameFormat === 'jpeg' ? ` q${frameQuality}` : '';
   const speed = optimizeScreenshotForSpeed ? ' speed' : '';
-  return `${frameSink} ${frameFormat}${quality}${speed}`;
+  const speedLabel = captureMode === 'screenshots' ? speed : '';
+  return `${captureMode} ${frameSink} ${frameFormat}${quality}${speedLabel}`;
 }
 
 function getCaptureSizeLabel() {
-  return `${Math.round(viewport.width * deviceScaleFactor)}x${Math.round(viewport.height * deviceScaleFactor)}`;
+  const { height, width } = getCapturePixelSize();
+  return `${width}x${height}`;
 }
 
 function getVideoEncodeLogLabel() {
@@ -3964,7 +4189,14 @@ function getAvailableAudioCueGroups({ cameraSwooshCues = [], clickCues = [] } = 
 }
 
 function getVideoEncodeArgs() {
+  const { height, width } = getCapturePixelSize();
   return [
+    '-vf',
+    [
+      `scale=${width}:${height}:force_original_aspect_ratio=decrease:flags=lanczos`,
+      `pad=${width}:${height}:(ow-iw)/2:(oh-ih)/2:color=white`,
+      'setsar=1'
+    ].join(','),
     '-c:v',
     'libx264',
     '-pix_fmt',
@@ -3974,6 +4206,18 @@ function getVideoEncodeArgs() {
     '-preset',
     process.env.YTCQ_DEMO_PRESET || getDefaultDemoPreset()
   ];
+}
+
+function getCapturePixelSize() {
+  return {
+    height: makeEvenPixelSize(viewport.height * deviceScaleFactor),
+    width: makeEvenPixelSize(viewport.width * deviceScaleFactor)
+  };
+}
+
+function makeEvenPixelSize(value) {
+  const rounded = Math.round(value);
+  return rounded % 2 === 0 ? rounded : rounded + 1;
 }
 
 async function applyContentHashToFinalOutput(unhashedOutputPath) {
