@@ -580,12 +580,78 @@ h3 {
   fill: currentColor;
 }
 
+.walkthrough-video-frame {
+  position: relative;
+  overflow: hidden;
+  background: #000;
+  border-radius: 8px;
+}
+
 .walkthrough-video {
   display: block;
   width: 100%;
   aspect-ratio: 16 / 9;
-  background: #000;
-  border-radius: 8px;
+  cursor: pointer;
+}
+
+.walkthrough-video-feedback {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.walkthrough-video-feedback.is-visible {
+  animation: walkthrough-video-feedback-fade 760ms ease-out;
+}
+
+.walkthrough-video-feedback::before {
+  content: "";
+  position: absolute;
+  width: 78px;
+  height: 78px;
+  background: rgba(15, 23, 42, 0.66);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 999px;
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.24);
+  backdrop-filter: blur(10px);
+}
+
+.walkthrough-video-feedback-icon {
+  position: relative;
+  display: none;
+  width: 42px;
+  height: 42px;
+  fill: #fff;
+}
+
+.walkthrough-video-feedback[data-state="play"] .walkthrough-video-feedback-play,
+.walkthrough-video-feedback[data-state="pause"] .walkthrough-video-feedback-pause {
+  display: block;
+}
+
+@keyframes walkthrough-video-feedback-fade {
+  0% {
+    opacity: 0;
+    transform: scale(0.88);
+  }
+
+  18% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  72% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1.06);
+  }
 }
 
 .section {
