@@ -34,8 +34,9 @@ const cameraSwooshPath = path.join(demoAudioDir, 'swoosh.mp3');
 const clickSoundPath = path.join(demoAudioDir, 'click.mp3');
 const demoResultsDir = path.join(repoRoot, 'test-results', 'demos');
 const finalVideoDir = path.join(repoRoot, 'docs', 'videos');
-const framesRootDir = path.resolve(process.env.YTCQ_DEMO_FRAMES_ROOT || getDefaultFramesRootDir());
-const framesDir = path.join(framesRootDir, `youtube-chat-walkthrough-frames-${process.pid}`);
+const configuredFramesRootDir = path.resolve(process.env.YTCQ_DEMO_FRAMES_ROOT || getDefaultFramesRootDir());
+let framesRootDir = configuredFramesRootDir;
+let framesDir = path.join(framesRootDir, `youtube-chat-walkthrough-frames-${process.pid}`);
 const diagnosticDir = path.join(demoResultsDir, 'diagnostics');
 const chromeProfilesDir = path.resolve(process.env.YTCQ_CHROME_WORKING_PROFILES || path.join(repoRoot, '.chrome-test-profiles'));
 const sourceProfileDir = path.resolve(process.env.YTCQ_CHROME_PROFILE || path.join(chromeProfilesDir, 'pristine'));
@@ -52,11 +53,17 @@ const defaultOutputFileName = previewMode
 let outputPath = path.resolve(process.env.YTCQ_DEMO_OUTPUT || path.join(videoOutputDir, defaultOutputFileName));
 const shouldHashFinalOutput = !previewMode && !process.env.YTCQ_DEMO_OUTPUT;
 const headless = shouldRunHeadlessDemo();
-const demoFps = readPositiveInteger(process.env.YTCQ_DEMO_FPS, previewMode ? 24 : 60);
+const demoFps = readPositiveInteger(process.env.YTCQ_DEMO_FPS, getDefaultDemoFps());
 const estimatedDemoSeconds = readPositiveNumber(process.env.YTCQ_DEMO_ESTIMATED_SECONDS, 125);
 const estimatedDemoFrames = Math.max(demoFps, Math.round(estimatedDemoSeconds * demoFps));
 const progressUpdateMs = readPositiveInteger(process.env.YTCQ_DEMO_PROGRESS_MS, process.stdout.isTTY ? 1_000 : 5_000);
-const deviceScaleFactor = readPositiveNumber(process.env.YTCQ_DEMO_SCALE, previewMode ? 1 : 1.5);
+const deviceScaleFactor = readPositiveNumber(process.env.YTCQ_DEMO_SCALE, getDefaultDemoScale());
+const frameSink = readEnum(process.env.YTCQ_DEMO_FRAME_SINK, ['pipe', 'files'], 'pipe');
+const frameFormat = readEnum(process.env.YTCQ_DEMO_FRAME_FORMAT, ['jpeg', 'png'], 'jpeg');
+const frameQuality = readBoundedInteger(process.env.YTCQ_DEMO_FRAME_QUALITY, previewMode ? 92 : 96, 1, 100);
+const frameExtension = frameFormat === 'jpeg' ? 'jpg' : 'png';
+const pipedVideoPath = path.join(demoResultsDir, `${finalVideoBaseName}-${process.pid}-silent.mp4`);
+const optimizeScreenshotForSpeed = process.env.YTCQ_DEMO_SCREENSHOT_OPTIMIZE_FOR_SPEED !== '0';
 const viewport = { width: 1280, height: 720 };
 const cursorHotspot = { x: 16, y: 12 };
 const normalChatMessageSelector = 'yt-live-chat-text-message-renderer';
@@ -139,27 +146,34 @@ async function main() {
   await mkdir(videoOutputDir, { recursive: true });
   await mkdir(demoResultsDir, { recursive: true });
   await mkdir(diagnosticDir, { recursive: true });
-  await rm(framesDir, { force: true, recursive: true });
-  await mkdir(framesDir, { recursive: true });
+  await rm(pipedVideoPath, { force: true });
+  const frameStorage = await prepareFrameStorage();
 
-  await prepareSignedInWorkingProfile();
-
-  console.log(
-    `[walkthrough] Mode: ${previewMode ? 'preview' : 'final'} | ` +
-      `${demoFps}fps | scale ${deviceScaleFactor} | output ${getOutputLogLabel()}`
-  );
-  console.log(`[walkthrough] Frame scratch directory: ${framesDir}`);
-
-  const chromeInstance = await launchNormalChromeDemoContext({
-    initialUrl: liveUrl,
-    userAgent: headless ? process.env.YTCQ_DEMO_USER_AGENT || headlessUserAgent : undefined
-  });
-  const { context } = chromeInstance;
-  const page = context.pages()[0] || await context.newPage();
-  await setDemoViewport(page, viewport);
+  let chromeInstance = null;
   let closed = false;
+  let recorder = null;
 
   try {
+    await prepareSignedInWorkingProfile();
+
+    console.log(
+      `[walkthrough] Mode: ${getDemoModeLabel()} | ` +
+        `${demoFps}fps | ${getCaptureSizeLabel()} | scale ${deviceScaleFactor} | ` +
+        `${getFrameCaptureLogLabel()} | ${getVideoEncodeLogLabel()} | output ${getOutputLogLabel()}`
+    );
+    if (frameSink === 'files') {
+      console.log(`[walkthrough] Frame scratch directory: ${framesDir}`);
+    } else {
+      console.log('[walkthrough] Frame sink: ffmpeg pipe; frames are not written as individual files.');
+    }
+
+    chromeInstance = await launchNormalChromeDemoContext({
+      initialUrl: liveUrl,
+      userAgent: headless ? process.env.YTCQ_DEMO_USER_AGENT || headlessUserAgent : undefined
+    });
+    const { context } = chromeInstance;
+    const page = context.pages()[0] || await context.newPage();
+    await setDemoViewport(page, viewport);
     await installDemoAssetRoutes(context);
     console.log('[walkthrough] Seeding deterministic extension state...');
     await withTimeout(seedWalkthroughExtensionState(context), 20_000, 'seed walkthrough extension state');
@@ -173,25 +187,36 @@ async function main() {
     await chat.locator(`${demoChatMessageSelector}[data-ytcq-context-wired="true"]`).first().waitFor({ state: 'attached', timeout: 20_000 });
     await withTimeout(installDemoPresentationLayer(page), 10_000, 'install presentation layer');
     await withTimeout(installDemoCursor(page), 10_000, 'install demo cursor');
-    const recorder = await createFrameRecorder(page);
+    recorder = await createFrameRecorder(page);
     console.log('[walkthrough] Recording real extension walkthrough...');
     await withTimeout(recordWalkthrough(page, chat, context, recorder), 1_200_000, 'record walkthrough');
-    await recorder.close();
+    const captureStats = await recorder.close();
+    const cameraSwooshCues = recorder.cameraSwooshCues;
+    const clickCues = recorder.clickCues;
+    recorder = null;
     await withTimeout(page.close(), 20_000, 'close demo page');
     await chromeInstance.close();
     closed = true;
-    await withTimeout(encodeFramesToVideo(recorder.frameCount, {
-      cameraSwooshCues: recorder.cameraSwooshCues,
-      clickCues: recorder.clickCues
+    const encodeStartedAt = Date.now();
+    await withTimeout(encodeCapturedVideo(captureStats.frameCount, {
+      cameraSwooshCues,
+      clickCues,
+      pipedVideoPath: captureStats.videoPath
     }), 180_000, 'encode walkthrough video');
+    writeTimingSummary({
+      captureStats,
+      encodeMs: Date.now() - encodeStartedAt
+    });
     if (shouldHashFinalOutput) {
       outputPath = await withTimeout(applyContentHashToFinalOutput(outputPath), 20_000, 'hash walkthrough video output');
     }
   } finally {
-    if (!closed) await chromeInstance.close().catch(() => undefined);
+    if (recorder) await recorder.abort().catch(() => undefined);
+    if (chromeInstance && !closed) await chromeInstance.close().catch(() => undefined);
+    await rm(pipedVideoPath, { force: true }).catch(() => undefined);
+    await cleanupFrameStorage(frameStorage);
   }
 
-  await rm(framesDir, { force: true, recursive: true });
   console.log(`Saved walkthrough demo video: ${outputPath}`);
 }
 
@@ -204,10 +229,10 @@ async function recordWalkthrough(page, chat, context, recorder) {
     'Small tools appear where chat already happens, without replacing YouTube chat.'
   );
   await playDemoStartupEffect(page, recorder, 1_350);
-  await recorder.hold(2_450);
+  await recorder.holdStill(2_450);
   await hideDemoCaption(page);
   await recorder.hold(360);
-  await recorder.hold(900);
+  await recorder.holdStill(900);
 
   recorder.setStage('Translate chat');
   await sectionTranslateChat(page, chat, context, recorder);
@@ -237,7 +262,8 @@ async function recordWalkthrough(page, chat, context, recorder) {
     'Chat Enhancer Demo',
     'Translation, replies, context, Inbox, bookmarks, emojis, commands, and popup settings working together.'
   );
-  await recorder.hold(4_500);
+  await recorder.hold(360);
+  await recorder.holdStill(4_140);
   await hideDemoCaption(page);
   await recorder.hold(900);
 }
@@ -258,7 +284,8 @@ async function sectionTranslateChat(page, chat, context, recorder) {
   await keepMenuWithinFrameViewport(settingsMenu);
   const translateSetting = settingsMenu.locator('.ytcq-settings-item[data-ytcq-setting="targetLanguage"]').first();
   await highlightLocator(page, translateSetting, 8);
-  await recorder.hold(1_000);
+  await recorder.hold(240);
+  await recorder.holdStill(760);
   if (await translateSetting.getAttribute('aria-checked').catch(() => '') !== 'true') {
     await clickWithCursor(page, translateSetting, recorder, 'Translate chat setting');
   }
@@ -550,10 +577,10 @@ async function sectionMarkedUsers(page, chat, context, recorder) {
     'A subtle colored ring follows marked users in chat and panels.',
     messageBox
   );
-  await recorder.hold(900);
+  await recorder.settleThenHoldStill(900);
   await clickWithCursor(page, markAction, recorder, 'Mark action');
   await source.message.locator('#author-photo').first().waitFor({ state: 'visible', timeout: 10_000 });
-  await recorder.hold(1_000);
+  await recorder.settleThenHoldStill(1_000);
   await hideDemoCaption(page);
   await sectionPopupBookmarks(page, context, recorder);
 }
@@ -594,10 +621,10 @@ async function sectionEmojiAndCommands(page, chat, recorder) {
     composerBox,
     { placement: 'side' }
   );
-  await recorder.hold(700);
+  await recorder.settleThenHoldStill(700);
   await typeIntoComposerHuman(chat, recorder, 'the event is in /when 8pm');
   await hideDemoCaption(page);
-  await recorder.hold(760);
+  await recorder.holdStill(760);
   await getChatComposerInput(chat).press('Tab');
   await poll(async () => {
     const text = await getComposerText(chat);
@@ -629,11 +656,11 @@ async function sectionPopupStatus(page, context, recorder) {
       'Advanced settings live in the extension popup',
       'Check connection status, manage less-frequent options, review bookmarks, and use the reset button here.'
     );
-    await recorder.hold(3_800);
+    await recorder.settleThenHoldStill(3_800);
     await clickWithCursor(popup, popup.locator('#bookmarksTab'), recorder, 'Bookmarks tab');
-    await recorder.hold(2_200);
+    await recorder.settleThenHoldStill(2_200);
     await clickWithCursor(popup, popup.locator('#settingsTab'), recorder, 'Settings tab');
-    await recorder.hold(1_600);
+    await recorder.settleThenHoldStill(1_600);
   } finally {
     await popup.close().catch(() => undefined);
   }
@@ -656,7 +683,7 @@ async function sectionPopupBookmarks(page, context, recorder) {
       'Marked users are managed away from the crowded chat menu.'
     );
     await highlightLocator(popup, popup.locator('.bookmark-row').first(), 10);
-    await recorder.hold(4_000);
+    await recorder.settleThenHoldStill(4_000);
     await hideDemoCaption(popup);
     await clearDemoFocus(popup);
   } finally {
@@ -1203,7 +1230,7 @@ async function typeIntoComposerHuman(chat, recorder, text) {
   await input.click();
   for (const grapheme of splitDemoGraphemes(text)) {
     await input.pressSequentially(grapheme, { delay: 18 });
-    await recorder.hold(grapheme === ' ' ? 55 : 75);
+    await recorder.captureThenHoldStill(grapheme === ' ' ? 55 : 75);
   }
 }
 
@@ -3082,6 +3109,7 @@ async function installDemoCursor(page) {
 
 async function createFrameRecorder(page) {
   let screenshotSession = await createScreenshotSession(page);
+  const videoEncoder = frameSink === 'pipe' ? createPipedVideoEncoder(pipedVideoPath) : null;
   let frameCount = 0;
   let lastProgressAt = 0;
   let lastCameraSwooshAtMs = -Infinity;
@@ -3089,6 +3117,7 @@ async function createFrameRecorder(page) {
   const startedAt = Date.now();
   const cameraSwooshCues = [];
   const clickCues = [];
+  let lastFrameBuffer = null;
 
   return {
     get cameraSwooshCues() {
@@ -3122,9 +3151,22 @@ async function createFrameRecorder(page) {
     async usePage(nextPage) {
       await screenshotSession.detach().catch(() => undefined);
       screenshotSession = await createScreenshotSession(nextPage);
+      lastFrameBuffer = null;
     },
     async captureFrame() {
-      await writeScreenshotFrame(await captureScreenshotBuffer());
+      const buffer = await captureScreenshotBuffer();
+      lastFrameBuffer = buffer;
+      await writeFrameBuffer(buffer);
+    },
+    async abort() {
+      await screenshotSession.detach().catch(() => undefined);
+      await videoEncoder?.abort();
+    },
+    async captureThenHoldStill(durationMs) {
+      if (durationMs <= 0) return;
+      const frames = durationToFrames(durationMs);
+      await this.captureFrame();
+      await writeRepeatedLastFrame(Math.max(0, frames - 1));
     },
     async hold(durationMs) {
       const frames = durationToFrames(durationMs);
@@ -3132,7 +3174,25 @@ async function createFrameRecorder(page) {
         await this.captureFrame();
       }
     },
+    async holdStill(durationMs) {
+      if (durationMs <= 0) return;
+      const frames = durationToFrames(durationMs);
+      if (!lastFrameBuffer) {
+        await this.captureFrame();
+        await writeRepeatedLastFrame(Math.max(0, frames - 1));
+        return;
+      }
+
+      await writeRepeatedLastFrame(frames);
+    },
+    async settleThenHoldStill(durationMs, settleMs = 240) {
+      if (durationMs <= 0) return;
+      const dynamicMs = Math.min(durationMs, settleMs);
+      await this.hold(dynamicMs);
+      await this.holdStill(durationMs - dynamicMs);
+    },
     async close() {
+      const capturedAt = Date.now();
       writeCaptureProgress({
         estimatedFrames: estimatedDemoFrames,
         frameCount,
@@ -3141,18 +3201,31 @@ async function createFrameRecorder(page) {
         startedAt
       });
       await screenshotSession.detach().catch(() => undefined);
+      const flushedAt = Date.now();
+      await videoEncoder?.close();
+      const finishedAt = Date.now();
+      return {
+        captureFps: frameCount / Math.max(0.001, (capturedAt - startedAt) / 1_000),
+        captureMs: capturedAt - startedAt,
+        encoderFlushMs: finishedAt - flushedAt,
+        frameCount,
+        videoPath: videoEncoder ? pipedVideoPath : null
+      };
     }
   };
 
   async function captureScreenshotBuffer() {
-    const screenshot = await screenshotSession.send('Page.captureScreenshot', {
-      format: 'png',
-      fromSurface: true
-    });
+    const screenshotOptions = {
+      format: frameFormat,
+      fromSurface: true,
+      optimizeForSpeed: optimizeScreenshotForSpeed
+    };
+    if (frameFormat === 'jpeg') screenshotOptions.quality = frameQuality;
+    const screenshot = await screenshotSession.send('Page.captureScreenshot', screenshotOptions);
     return Buffer.from(screenshot.data, 'base64');
   }
 
-  async function writeScreenshotFrame(buffer) {
+  async function writeFrameBuffer(buffer) {
     frameCount += 1;
     const now = Date.now();
     if (now - lastProgressAt >= progressUpdateMs) {
@@ -3165,11 +3238,107 @@ async function createFrameRecorder(page) {
         startedAt
       });
     }
-    await writeFile(
-      path.join(framesDir, `frame-${String(frameCount).padStart(5, '0')}.png`),
-      buffer
-    );
+    if (videoEncoder) {
+      await videoEncoder.writeFrame(buffer);
+      return;
+    }
+
+    await writeFile(getFramePath(frameCount), buffer);
   }
+
+  async function writeRepeatedLastFrame(frameTotal) {
+    if (!lastFrameBuffer) return;
+    for (let frame = 0; frame < frameTotal; frame += 1) {
+      await writeFrameBuffer(lastFrameBuffer);
+    }
+  }
+}
+
+function createPipedVideoEncoder(videoPath) {
+  const args = [
+    '-y',
+    '-hide_banner',
+    '-loglevel',
+    'error',
+    '-f',
+    'image2pipe',
+    '-framerate',
+    String(demoFps),
+    '-c:v',
+    frameFormat === 'jpeg' ? 'mjpeg' : 'png',
+    '-i',
+    'pipe:0',
+    ...getVideoEncodeArgs(),
+    videoPath
+  ];
+  const child = spawn(process.env.YTCQ_FFMPEG || 'ffmpeg', args, {
+    stdio: ['pipe', 'ignore', 'pipe']
+  });
+  let stderr = '';
+  child.stderr.setEncoding('utf8');
+  child.stderr.on('data', (chunk) => {
+    stderr += chunk;
+    if (stderr.length > 20_000) stderr = stderr.slice(-20_000);
+  });
+  const exitPromise = new Promise((resolve, reject) => {
+    child.once('error', reject);
+    child.once('exit', (code, signal) => {
+      if (code === 0) {
+        resolve();
+        return;
+      }
+
+      const details = stderr.trim() ? `\n${stderr.trim()}` : '';
+      reject(new Error(`ffmpeg frame pipe failed with ${signal || `exit code ${code}`}.${details}`));
+    });
+  });
+
+  return {
+    async close() {
+      child.stdin.end();
+      await exitPromise;
+    },
+    async abort() {
+      child.stdin.destroy();
+      child.kill('SIGTERM');
+      await exitPromise.catch(() => undefined);
+    },
+    async writeFrame(buffer) {
+      await writeStream(child.stdin, buffer);
+    }
+  };
+}
+
+function writeStream(stream, buffer) {
+  return new Promise((resolve, reject) => {
+    function cleanup() {
+      stream.off('drain', handleDrain);
+      stream.off('error', handleError);
+    }
+
+    function handleDrain() {
+      cleanup();
+      resolve();
+    }
+
+    function handleError(error) {
+      cleanup();
+      reject(error);
+    }
+
+    stream.once('error', handleError);
+    if (stream.write(buffer)) {
+      cleanup();
+      resolve();
+      return;
+    }
+
+    stream.once('drain', handleDrain);
+  });
+}
+
+function getFramePath(frameNumber) {
+  return path.join(framesDir, `frame-${String(frameNumber).padStart(5, '0')}.${frameExtension}`);
 }
 
 function writeCaptureProgress({ estimatedFrames, frameCount, last, stage, startedAt }) {
@@ -3223,7 +3392,8 @@ async function clickWithCursor(page, locator, recorder, label, options = {}) {
   }
   if (options.caption) {
     await setDemoCaption(page, options.caption.title, options.caption.body, box);
-    await recorder.hold(900);
+    await recorder.hold(260);
+    await recorder.holdStill(640);
   }
   await moveCursor(page, clickPoint.x, clickPoint.y, options.durationMs || 760, recorder, {
     hoverBox: box
@@ -3259,7 +3429,10 @@ async function showDemoCaptionFor(page, recorder, title, body, options = {}) {
   } else if (box) {
     await setDemoFocusBox(page, box, options.padding ?? 8);
   }
-  await recorder.hold(options.durationMs || getReadableCaptionDuration(title, body));
+  const durationMs = options.durationMs || getReadableCaptionDuration(title, body);
+  const animationMs = Math.min(360, durationMs);
+  await recorder.hold(animationMs);
+  await recorder.holdStill(durationMs - animationMs);
   await hideDemoCaption(page);
   await clearDemoFocus(page);
   await recorder.hold(320);
@@ -3507,6 +3680,26 @@ function durationToFrames(durationMs) {
   return Math.max(1, Math.round((durationMs / 1_000) * demoFps));
 }
 
+function getDefaultDemoFps() {
+  if (previewMode) return 24;
+  return 60;
+}
+
+function getDefaultDemoScale() {
+  if (previewMode) return 1;
+  return 1.5;
+}
+
+function getDefaultDemoCrf() {
+  if (previewMode) return '26';
+  return '17';
+}
+
+function getDefaultDemoPreset() {
+  if (previewMode) return 'ultrafast';
+  return 'veryfast';
+}
+
 function readPositiveInteger(value, fallback) {
   const parsed = Number.parseInt(String(value || ''), 10);
   return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
@@ -3515,6 +3708,72 @@ function readPositiveInteger(value, fallback) {
 function readPositiveNumber(value, fallback) {
   const parsed = Number.parseFloat(String(value || ''));
   return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+}
+
+function readBoundedInteger(value, fallback, min, max) {
+  const parsed = readPositiveInteger(value, fallback);
+  return Math.min(max, Math.max(min, parsed));
+}
+
+function readEnum(value, allowedValues, fallback) {
+  const normalized = String(value || '').trim().toLowerCase();
+  return allowedValues.includes(normalized) ? normalized : fallback;
+}
+
+async function prepareFrameStorage() {
+  if (frameSink !== 'files') return { type: 'pipe' };
+
+  let ramDisk = null;
+  if (shouldUseFrameRamDisk()) {
+    ramDisk = await createMacFrameRamDisk();
+    framesRootDir = ramDisk.mountPath;
+    framesDir = path.join(framesRootDir, `youtube-chat-walkthrough-frames-${process.pid}`);
+    console.log(`[walkthrough] Using RAM disk for frame files: ${framesRootDir}`);
+  }
+
+  await rm(framesDir, { force: true, recursive: true });
+  await mkdir(framesDir, { recursive: true });
+  return { ramDisk, type: 'files' };
+}
+
+async function cleanupFrameStorage(storage) {
+  if (storage.type !== 'files') return;
+
+  await rm(framesDir, { force: true, recursive: true }).catch(() => undefined);
+  if (!storage.ramDisk) return;
+
+  await runProcess('hdiutil', ['detach', storage.ramDisk.device]).catch((error) => {
+    console.warn(`[walkthrough] Could not detach RAM disk ${storage.ramDisk.device}: ${error.message}`);
+  });
+}
+
+function shouldUseFrameRamDisk() {
+  return process.env.YTCQ_DEMO_RAM_DISK === '1';
+}
+
+async function createMacFrameRamDisk() {
+  if (process.platform !== 'darwin') {
+    throw new Error('YTCQ_DEMO_RAM_DISK=1 is only supported on macOS.');
+  }
+
+  const sizeMb = readBoundedInteger(process.env.YTCQ_DEMO_RAM_DISK_MB, 8_192, 256, 32_768);
+  const sectors = sizeMb * 2_048;
+  const device = (await runProcessCapture('hdiutil', ['attach', '-nomount', `ram://${sectors}`])).trim();
+  if (!device.startsWith('/dev/')) {
+    throw new Error(`Could not create RAM disk. Unexpected hdiutil output: ${device}`);
+  }
+
+  try {
+    await runProcessCapture('diskutil', ['erasevolume', 'HFS+', 'YTCQDemoFrames', device]);
+    const diskInfo = await runProcessCapture('diskutil', ['info', device]);
+    const mountMatch = diskInfo.match(/Mount Point:\s+(.+)/);
+    const mountPath = mountMatch?.[1]?.trim();
+    if (!mountPath) throw new Error(`Could not find RAM disk mount point for ${device}.`);
+    return { device, mountPath };
+  } catch (error) {
+    await runProcess('hdiutil', ['detach', device]).catch(() => undefined);
+    throw error;
+  }
 }
 
 function getDefaultFramesRootDir() {
@@ -3534,6 +3793,37 @@ function getOutputLogLabel() {
   return `${outputPath} -> ${path.join(finalVideoDir, `${finalVideoBaseName}-<hash>.mp4`)}`;
 }
 
+function getDemoModeLabel() {
+  if (previewMode) return 'preview';
+  return 'final';
+}
+
+function getFrameCaptureLogLabel() {
+  const quality = frameFormat === 'jpeg' ? ` q${frameQuality}` : '';
+  const speed = optimizeScreenshotForSpeed ? ' speed' : '';
+  return `${frameSink} ${frameFormat}${quality}${speed}`;
+}
+
+function getCaptureSizeLabel() {
+  return `${Math.round(viewport.width * deviceScaleFactor)}x${Math.round(viewport.height * deviceScaleFactor)}`;
+}
+
+function getVideoEncodeLogLabel() {
+  return `h264 crf ${process.env.YTCQ_DEMO_CRF || getDefaultDemoCrf()} ${process.env.YTCQ_DEMO_PRESET || getDefaultDemoPreset()}`;
+}
+
+function writeTimingSummary({ captureStats, encodeMs }) {
+  const details = [
+    `capture ${formatDuration(captureStats.captureMs)}`,
+    `${captureStats.captureFps.toFixed(1)} capture fps`
+  ];
+  if (captureStats.encoderFlushMs > 100) {
+    details.push(`pipe flush ${formatDuration(captureStats.encoderFlushMs)}`);
+  }
+  details.push(`mux ${formatDuration(encodeMs)}`);
+  console.log(`[walkthrough] Timing: ${details.join(' | ')}`);
+}
+
 function shouldRunHeadlessDemo() {
   const override = process.env.YTCQ_DEMO_HEADLESS || process.env.YTCQ_TEST_LIVE_HEADLESS;
   if (override === '0') return false;
@@ -3550,30 +3840,106 @@ async function readFileDataUrl(filePath, mimeType) {
   return `data:${mimeType};base64,${contents.toString('base64')}`;
 }
 
-async function encodeFramesToVideo(frameCount, { cameraSwooshCues = [], clickCues = [] } = {}) {
+async function encodeCapturedVideo(frameCount, { cameraSwooshCues = [], clickCues = [], pipedVideoPath: inputVideoPath = null } = {}) {
+  if (inputVideoPath) {
+    await muxPipedVideoToOutput(inputVideoPath, frameCount, { cameraSwooshCues, clickCues });
+    return;
+  }
+
+  await encodeFrameFilesToVideo(frameCount, { cameraSwooshCues, clickCues });
+}
+
+async function encodeFrameFilesToVideo(frameCount, { cameraSwooshCues = [], clickCues = [] } = {}) {
   if (frameCount <= 0) throw new Error('No demo frames were captured.');
 
   const args = [
     '-y',
+    '-hide_banner',
+    '-loglevel',
+    'error',
     '-framerate',
     String(demoFps),
     '-start_number',
     '1',
     '-i',
-    path.join(framesDir, 'frame-%05d.png')
+    path.join(framesDir, `frame-%05d.${frameExtension}`)
   ];
-  const outputArgs = [
-    '-c:v',
-    'libx264',
-    '-pix_fmt',
-    'yuv420p',
-    '-crf',
-    process.env.YTCQ_DEMO_CRF || (previewMode ? '26' : '17'),
-    '-preset',
-    process.env.YTCQ_DEMO_PRESET || (previewMode ? 'ultrafast' : 'medium')
-  ];
+  appendAudioCueArgs(args, frameCount, { cameraSwooshCues, clickCues });
+  args.push(...getVideoEncodeArgs());
+  args.push(outputPath);
+  await runProcess(process.env.YTCQ_FFMPEG || 'ffmpeg', args);
+}
 
-  const audioCueGroups = [
+async function muxPipedVideoToOutput(inputVideoPath, frameCount, { cameraSwooshCues = [], clickCues = [] } = {}) {
+  if (frameCount <= 0) throw new Error('No demo frames were captured.');
+
+  const hasAudioCues = cameraSwooshCues.length || clickCues.length;
+  if (!hasAudioCues) {
+    await rename(inputVideoPath, outputPath);
+    return;
+  }
+
+  const args = [
+    '-y',
+    '-hide_banner',
+    '-loglevel',
+    'error',
+    '-i',
+    inputVideoPath
+  ];
+  appendAudioCueArgs(args, frameCount, { cameraSwooshCues, clickCues });
+  args.push('-c:v', 'copy', outputPath);
+  await runProcess(process.env.YTCQ_FFMPEG || 'ffmpeg', args);
+}
+
+function appendAudioCueArgs(args, frameCount, { cameraSwooshCues = [], clickCues = [] } = {}) {
+  const availableAudioCueGroups = getAvailableAudioCueGroups({ cameraSwooshCues, clickCues });
+  if (!availableAudioCueGroups.length) return;
+
+  const videoDurationSeconds = frameCount / demoFps;
+  args.push(
+    '-f',
+    'lavfi',
+    '-t',
+    videoDurationSeconds.toFixed(3),
+    '-i',
+    'anullsrc=channel_layout=stereo:sample_rate=48000'
+  );
+
+  let nextInputIndex = 2;
+  const cueFilters = [];
+  const cueLabels = [];
+  const cueCounts = [];
+  availableAudioCueGroups.forEach((group) => {
+    const cues = group.cues.map((cueMs) => Math.max(0, Math.round(cueMs)));
+    cueCounts.push(`${cues.length} ${group.label}`);
+    cues.forEach((cueMs, index) => {
+      args.push('-i', group.filePath);
+      const label = `${group.tag}${index}`;
+      cueFilters.push(`[${nextInputIndex}:a]adelay=delays=${cueMs}:all=1,volume=${group.volume}[${label}]`);
+      cueLabels.push(`[${label}]`);
+      nextInputIndex += 1;
+    });
+  });
+
+  const mixedInputs = `[1:a]${cueLabels.join('')}`;
+  args.push(
+    '-filter_complex',
+    `${cueFilters.join(';')};${mixedInputs}amix=inputs=${cueLabels.length + 1}:duration=first:dropout_transition=0:normalize=0[a]`,
+    '-map',
+    '0:v',
+    '-map',
+    '[a]',
+    '-c:a',
+    'aac',
+    '-b:a',
+    '160k'
+  );
+  console.log(`[walkthrough] Mixing ${cueCounts.join(' and ')} cue${cueLabels.length === 1 ? '' : 's'} into the video.`);
+}
+
+function getAvailableAudioCueGroups({ cameraSwooshCues = [], clickCues = [] } = {}) {
+  return [
     {
       cues: cameraSwooshCues,
       filePath: cameraSwooshPath,
@@ -3588,59 +3954,26 @@ async function encodeFramesToVideo(frameCount, { cameraSwooshCues = [], clickCue
       tag: 'click',
       volume: previewMode ? '1.25' : '1.15'
     }
-  ].filter((group) => group.cues.length);
-  const availableAudioCueGroups = audioCueGroups.filter((group) => {
-    if (existsSync(group.filePath)) return true;
-    console.warn(`[walkthrough] Skipping ${group.label} cues because ${group.filePath} does not exist.`);
-    return false;
-  });
-
-  if (availableAudioCueGroups.length) {
-    const videoDurationSeconds = frameCount / demoFps;
-    args.push(
-      '-f',
-      'lavfi',
-      '-t',
-      videoDurationSeconds.toFixed(3),
-      '-i',
-      'anullsrc=channel_layout=stereo:sample_rate=48000'
-    );
-
-    let nextInputIndex = 2;
-    const cueFilters = [];
-    const cueLabels = [];
-    const cueCounts = [];
-    availableAudioCueGroups.forEach((group) => {
-      const cues = group.cues.map((cueMs) => Math.max(0, Math.round(cueMs)));
-      cueCounts.push(`${cues.length} ${group.label}`);
-      cues.forEach((cueMs, index) => {
-        args.push('-i', group.filePath);
-        const label = `${group.tag}${index}`;
-        cueFilters.push(`[${nextInputIndex}:a]adelay=delays=${cueMs}:all=1,volume=${group.volume}[${label}]`);
-        cueLabels.push(`[${label}]`);
-        nextInputIndex += 1;
-      });
+  ]
+    .filter((group) => group.cues.length)
+    .filter((group) => {
+      if (existsSync(group.filePath)) return true;
+      console.warn(`[walkthrough] Skipping ${group.label} cues because ${group.filePath} does not exist.`);
+      return false;
     });
+}
 
-    const mixedInputs = `[1:a]${cueLabels.join('')}`;
-    args.push(
-      '-filter_complex',
-      `${cueFilters.join(';')};${mixedInputs}amix=inputs=${cueLabels.length + 1}:duration=first:dropout_transition=0:normalize=0[a]`,
-      '-map',
-      '0:v',
-      '-map',
-      '[a]',
-      '-c:a',
-      'aac',
-      '-b:a',
-      '160k'
-    );
-    console.log(`[walkthrough] Mixing ${cueCounts.join(' and ')} cue${cueLabels.length === 1 ? '' : 's'} into the video.`);
-  }
-
-  args.push(...outputArgs);
-  args.push(outputPath);
-  await runProcess(process.env.YTCQ_FFMPEG || 'ffmpeg', args);
+function getVideoEncodeArgs() {
+  return [
+    '-c:v',
+    'libx264',
+    '-pix_fmt',
+    'yuv420p',
+    '-crf',
+    process.env.YTCQ_DEMO_CRF || getDefaultDemoCrf(),
+    '-preset',
+    process.env.YTCQ_DEMO_PRESET || getDefaultDemoPreset()
+  ];
 }
 
 async function applyContentHashToFinalOutput(unhashedOutputPath) {
@@ -3677,6 +4010,32 @@ function runProcess(command, args) {
       }
 
       reject(new Error(`${command} failed with ${signal || `exit code ${code}`}.`));
+    });
+  });
+}
+
+function runProcessCapture(command, args) {
+  return new Promise((resolve, reject) => {
+    const child = spawn(command, args, { stdio: ['ignore', 'pipe', 'pipe'] });
+    let stdout = '';
+    let stderr = '';
+    child.stdout.setEncoding('utf8');
+    child.stderr.setEncoding('utf8');
+    child.stdout.on('data', (chunk) => {
+      stdout += chunk;
+    });
+    child.stderr.on('data', (chunk) => {
+      stderr += chunk;
+    });
+    child.once('error', reject);
+    child.once('exit', (code, signal) => {
+      if (code === 0) {
+        resolve(stdout);
+        return;
+      }
+
+      const details = stderr.trim() ? `\n${stderr.trim()}` : '';
+      reject(new Error(`${command} failed with ${signal || `exit code ${code}`}.${details}`));
     });
   });
 }
