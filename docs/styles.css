@@ -532,6 +532,7 @@ h3 {
   background: var(--surface);
   color: var(--text);
   box-shadow: 0 30px 90px rgba(23, 25, 31, 0.28);
+  overflow: hidden;
 }
 
 .walkthrough-modal::backdrop {
@@ -541,8 +542,6 @@ h3 {
 
 .walkthrough-modal-panel {
   display: grid;
-  gap: 14px;
-  padding: 16px;
 }
 
 .walkthrough-modal-heading {
@@ -550,6 +549,7 @@ h3 {
   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
   gap: 16px;
+  padding: 16px;
 }
 
 .walkthrough-modal-time {
@@ -603,8 +603,8 @@ h3 {
   overflow: hidden;
   aspect-ratio: 16 / 9;
   background: var(--surface);
-  border-radius: 8px;
-  clip-path: inset(0 round 8px);
+  border-radius: 0 0 11px 11px;
+  clip-path: inset(0 round 0 0 11px 11px);
 }
 
 .walkthrough-video {
