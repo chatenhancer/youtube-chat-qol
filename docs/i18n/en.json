@@ -64,7 +64,7 @@
     "mentionTitle": "Reply naturally with @mentions and quotes",
     "mentionIntro": "Reply without losing your place:",
     "mentionMenuHtml": "Click on a message and <strong>“Quote”</strong> or <strong>“Mention”</strong>.",
-    "mentionAuthorHtml": "Click on a <strong>@username</strong> to mention someone. Alt/Option-click on a <strong>@username</strong> to quote someone.",
+    "mentionAuthorHtml": "Click on a <strong>@username</strong> to mention someone. Alt-click or Option-click on a <strong>@username</strong> to quote someone.",
     "mentionInboxHtml": "<strong>Never miss a mention:</strong> when you’re mentioned in chat, the message is added to your <strong>Inbox</strong>",
     "mentionSound": "You can also turn on a sound for notifications.",
     "extrasTitle": "More ways to keep up when chat is busy",
