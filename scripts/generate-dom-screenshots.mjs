@@ -25,8 +25,8 @@ const readmeAssetsDir = path.join(root, 'assets');
 const distScreenshotsDir = path.join(root, 'dist', 'screenshots');
 
 const viewportSize = {
-  width: 1542,
-  height: 852
+  width: 1280,
+  height: 800
 };
 
 const rawSize = {
