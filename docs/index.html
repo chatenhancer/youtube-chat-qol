@@ -850,6 +850,7 @@
         const walkthroughTime = document.querySelector("[data-walkthrough-time]");
         const walkthroughVideo = document.querySelector("[data-walkthrough-video]");
         const walkthroughVideoFeedback = document.querySelector("[data-walkthrough-feedback]");
+        const walkthroughHash = "#walkthrough";
         const versionBadgeSources = {
           release: {
             image: "https://img.shields.io/github/v/release/chat-enhancer-yt/youtube-chat-qol?label=release",
@@ -936,6 +937,7 @@
 
         walkthroughModal?.addEventListener("close", () => {
           if (walkthroughVideo instanceof HTMLVideoElement) walkthroughVideo.pause();
+          clearWalkthroughHash();
         });
 
         walkthroughModal?.addEventListener("keydown", (event) => {
@@ -1090,21 +1092,46 @@
 
           walkthroughOpenButtons.forEach((button) => {
             button.addEventListener("click", () => {
-              openWalkthroughModal(videoUrl);
+              openWalkthroughModal(videoUrl, { updateHash: true });
             });
           });
+
+          window.addEventListener("hashchange", () => {
+            if (isWalkthroughHash()) {
+              openWalkthroughModal(videoUrl, { allowMutedFallback: true });
+              return;
+            }
+
+            if (walkthroughModal?.open) {
+              closeWalkthroughModal({ clearHash: false });
+            }
+          });
+
+          if (isWalkthroughHash()) {
+            window.requestAnimationFrame(() => {
+              openWalkthroughModal(videoUrl, { allowMutedFallback: true });
+            });
+          }
         }
 
-        function openWalkthroughModal(videoUrl) {
+        function openWalkthroughModal(videoUrl, options = {}) {
           if (!(walkthroughVideo instanceof HTMLVideoElement)) return;
+
+          if (options.updateHash && !isWalkthroughHash()) {
+            history.pushState(null, "", walkthroughHash);
+          }
 
           walkthroughVideo.currentTime = 0;
           updateWalkthroughTimeBadge();
           hideWalkthroughPlaybackFeedback();
           if (walkthroughModal && typeof walkthroughModal.showModal === "function") {
+            if (walkthroughModal.open) {
+              startWalkthroughPlayback({ allowMutedFallback: options.allowMutedFallback === true });
+              return;
+            }
             walkthroughModal.showModal();
             walkthroughVideo.focus();
-            startWalkthroughPlayback();
+            startWalkthroughPlayback({ allowMutedFallback: options.allowMutedFallback === true });
             return;
           }
 
@@ -1123,18 +1150,33 @@
           document.head.append(preload);
         }
 
-        function startWalkthroughPlayback() {
+        function startWalkthroughPlayback(options = {}) {
           if (!(walkthroughVideo instanceof HTMLVideoElement)) return;
 
           walkthroughVideo.volume = 1;
           walkthroughVideo.muted = false;
-          void walkthroughVideo.play().catch(() => undefined);
+          void walkthroughVideo.play().catch(() => {
+            if (!options.allowMutedFallback) return;
+
+            walkthroughVideo.muted = true;
+            void walkthroughVideo.play().catch(() => undefined);
+          });
         }
 
-        function closeWalkthroughModal() {
+        function closeWalkthroughModal(options = {}) {
           if (walkthroughVideo instanceof HTMLVideoElement) walkthroughVideo.pause();
           hideWalkthroughPlaybackFeedback();
           if (walkthroughModal && typeof walkthroughModal.close === "function") walkthroughModal.close();
+          if (options.clearHash !== false) clearWalkthroughHash();
+        }
+
+        function isWalkthroughHash() {
+          return window.location.hash.toLowerCase() === walkthroughHash;
+        }
+
+        function clearWalkthroughHash() {
+          if (!isWalkthroughHash()) return;
+          history.replaceState(null, "", `${window.location.pathname}${window.location.search}`);
         }
 
         function handleWalkthroughModalKeydown(event) {
