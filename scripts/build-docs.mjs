@@ -260,7 +260,16 @@ function injectAlternateLinks(html, locales) {
     `<link rel="alternate" hreflang="x-default" href="${escapeHtmlAttribute(getPageUrl(localeMeta[DEFAULT_LOCALE]))}">`
   );
 
-  return html.replace('    <!-- docs-alternate-links -->', `    ${alternateLinks.join('\n    ')}`);
+  const alternateBlock = [
+    '    <!-- docs-alternate-links:start -->',
+    `    ${alternateLinks.join('\n    ')}`,
+    '    <!-- docs-alternate-links:end -->'
+  ].join('\n');
+
+  return html.replace(
+    / {4}<!-- docs-alternate-links:start -->[\s\S]*? {4}<!-- docs-alternate-links:end -->| {4}<!-- docs-alternate-links -->/,
+    alternateBlock
+  );
 }
 
 function injectDocsConfig(html, config) {
