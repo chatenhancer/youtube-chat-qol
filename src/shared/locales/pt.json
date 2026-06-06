@@ -271,9 +271,6 @@
     "popupSections": {
       "message": "Seções do popup"
     },
-    "bookmarkedUsers": {
-      "message": "Usuários marcados"
-    },
     "noBookmarkedUsers": {
       "message": "Ainda não há marcadores"
     },

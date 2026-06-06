@@ -60,6 +60,8 @@ const shouldLogFrameSize = process.env.YTCQ_DEMO_LOG_FRAME_SIZE === '1';
 const pipedVideoPath = path.join(demoResultsDir, `${finalVideoBaseName}-${process.pid}-silent.mp4`);
 const viewport = { width: 1280, height: 720 };
 const cursorHotspot = { x: 16, y: 12 };
+const defaultDemoCursorPosition = { x: 28, y: 36 };
+let demoCursorPosition = { ...defaultDemoCursorPosition };
 const normalChatMessageSelector = 'yt-live-chat-text-message-renderer';
 const demoChatMessageSelector = `${normalChatMessageSelector}.ytcq-demo-message`;
 const menuPopupSelector = 'ytd-menu-popup-renderer';
@@ -245,6 +247,7 @@ async function recordWalkthrough(page, chat, context, recorder) {
   await setDemoCameraForBox(page, recorder, null);
   await scrollWatchPageToTop(page, recorder);
   await clearDemoFocus(page);
+  await parkDemoCursorForOutro(page, recorder);
   await setDemoCaption(
     page,
     'Chat Enhancer Demo',
@@ -553,12 +556,13 @@ async function sectionMarkedUsers(page, chat, context, recorder) {
     screenXRatio: 0.9
   });
   const markAction = source.menu.locator('.ytcq-context-item[data-ytcq-action="mark-user"]').first();
-  const messageBox = await getLocatorBox(source.message, 'mark message');
+  const markActionBox = await getLocatorBox(markAction, 'Mark action');
   await setDemoCaption(
     page,
-    'Mark users you want to recognize',
-    'A subtle colored ring follows marked users in chat and panels.',
-    messageBox
+    'Add to bookmarks',
+    'It adds an avatar ring so they are easier to spot later.',
+    markActionBox,
+    { gap: 48, placement: 'side' }
   );
   await recorder.settleThenHoldStill(900);
   await clickWithCursor(page, markAction, recorder, 'Mark action');
@@ -3189,20 +3193,36 @@ async function installDemoCursor(page) {
       }
     `
   });
-  await page.evaluate(([pointerSrc, handSrc, hotspot]) => {
-    if (document.querySelector('.ytcq-demo-cursor')) return;
-    const cursor = document.createElement('div');
-    const image = document.createElement('img');
-    cursor.className = 'ytcq-demo-cursor';
-    image.alt = '';
+  await page.evaluate(([pointerSrc, handSrc, hotspot, position]) => {
+    let cursor = document.querySelector('.ytcq-demo-cursor');
+    let image = cursor?.querySelector('img');
+    if (!(cursor instanceof HTMLElement)) {
+      cursor = document.createElement('div');
+      cursor.className = 'ytcq-demo-cursor';
+      document.body.append(cursor);
+    }
+    if (!(image instanceof HTMLImageElement)) {
+      image = document.createElement('img');
+      image.alt = '';
+      cursor.replaceChildren(image);
+    }
     image.src = pointerSrc;
-    cursor.append(image);
-    document.body.append(cursor);
-    window.__ytcqDemoCursorPosition = { x: 28, y: 36 };
+    window.__ytcqDemoCursorPosition = position;
     window.__ytcqDemoCursorImages = { hand: handSrc, pointer: pointerSrc };
     window.__ytcqDemoCursorHotspot = hotspot;
-    cursor.style.transform = `translate(${28 - hotspot.x}px, ${36 - hotspot.y}px)`;
-  }, [pointerCursorSrc, handCursorSrc, cursorHotspot]);
+    cursor.style.transform = `translate(${position.x - hotspot.x}px, ${position.y - hotspot.y}px)`;
+  }, [pointerCursorSrc, handCursorSrc, cursorHotspot, demoCursorPosition]);
+}
+
+async function syncDemoCursorToStoredPosition(page) {
+  await page.evaluate((position) => {
+    window.__ytcqDemoCursorPosition = position;
+    const cursor = document.querySelector('.ytcq-demo-cursor');
+    const hotspot = window.__ytcqDemoCursorHotspot || { x: 16, y: 12 };
+    if (cursor instanceof HTMLElement) {
+      cursor.style.transform = `translate(${position.x - hotspot.x}px, ${position.y - hotspot.y}px)`;
+    }
+  }, demoCursorPosition).catch(() => undefined);
 }
 
 async function createFrameRecorder(page) {
@@ -3261,6 +3281,7 @@ async function createScreencastFrameRecorder(page) {
       });
     },
     async usePage(nextPage) {
+      await syncDemoCursorToStoredPosition(nextPage);
       await restartScreencastSource(nextPage, { clearLatestFrame: true });
     },
     async refreshCaptureSource() {
@@ -3711,7 +3732,7 @@ async function setDemoCaption(page, title, body, anchorBox = null, options = {})
 
     if (targetBox) {
       const viewportPadding = 18;
-      const gap = 72;
+      const gap = captionOptions?.gap ?? 72;
       const verticalGap = 22;
       const captionBox = caption.getBoundingClientRect();
       const captionWidth = Math.min(captionBox.width || 300, 300);
@@ -3812,8 +3833,18 @@ async function getLocatorBox(locator, label) {
   return box;
 }
 
+async function parkDemoCursorForOutro(page, recorder) {
+  await moveCursor(page, viewport.width - 68, viewport.height - 72, 640, recorder, {
+    label: 'outro cursor park'
+  });
+  await recorder.hold(180);
+}
+
 async function moveCursor(page, x, y, durationMs, recorder, options = {}) {
-  const start = await page.evaluate(() => window.__ytcqDemoCursorPosition || { x: 28, y: 36 });
+  const start = await page.evaluate(() => window.__ytcqDemoCursorPosition || null).catch(() => null) ||
+    demoCursorPosition ||
+    defaultDemoCursorPosition;
+  demoCursorPosition = { x: start.x, y: start.y };
   const moveDurationMs = durationMs ?? getHumanCursorDurationMs(start, { x, y });
   const steps = durationToFrames(moveDurationMs);
   let activeVariant = pointIsInsideBox(start, options.hoverBox) ? 'hand' : 'pointer';
@@ -3835,6 +3866,7 @@ async function moveCursor(page, x, y, durationMs, recorder, options = {}) {
     if (step === steps || step % 6 === 0) {
       await page.mouse.move(nextX, nextY);
     }
+    demoCursorPosition = { x: nextX, y: nextY };
     await page.evaluate(([cursorX, cursorY]) => {
       window.__ytcqDemoCursorPosition = { x: cursorX, y: cursorY };
       const cursor = document.querySelector('.ytcq-demo-cursor');

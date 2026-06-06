@@ -271,9 +271,6 @@
     "popupSections": {
       "message": "Разделы всплывающего окна"
     },
-    "bookmarkedUsers": {
-      "message": "Отмеченные пользователи"
-    },
     "noBookmarkedUsers": {
       "message": "Закладок пока нет"
     },

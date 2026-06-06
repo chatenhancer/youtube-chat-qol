@@ -271,9 +271,6 @@
     "popupSections": {
       "message": "Açılır pencere bölümleri"
     },
-    "bookmarkedUsers": {
-      "message": "İşaretlenen kullanıcılar"
-    },
     "noBookmarkedUsers": {
       "message": "Henüz yer imi yok"
     },
