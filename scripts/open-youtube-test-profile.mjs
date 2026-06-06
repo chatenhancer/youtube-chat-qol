@@ -188,7 +188,7 @@ async function waitForChatEnhancerInstalled(browserProcess) {
 }
 
 async function getYouTubePage(context) {
-  const page = context.pages().find((candidate) => candidate.url().includes('youtube.com'));
+  const page = context.pages().find((candidate) => isYouTubeUrl(candidate.url()));
   if (page) {
     return page;
   }
@@ -196,6 +196,15 @@ async function getYouTubePage(context) {
   const newPage = await context.newPage();
   await newPage.goto(liveUrl, { waitUntil: 'domcontentloaded' });
   return newPage;
+}
+
+function isYouTubeUrl(value) {
+  try {
+    const { hostname } = new URL(value);
+    return hostname === 'youtube.com' || hostname.endsWith('.youtube.com');
+  } catch {
+    return false;
+  }
 }
 
 async function isPageSignedIntoYouTube(page) {

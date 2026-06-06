@@ -173,7 +173,7 @@ function createInputEmojiNode(data: {
   emojiId: string;
   tooltip: string;
 }): HTMLImageElement | null {
-  const src = cleanText(data.src);
+  const src = getSafeImageSource(data.src);
   const alt = cleanText(data.alt);
   if (!src || !alt) return null;
 
@@ -192,4 +192,16 @@ function createInputEmojiNode(data: {
   if (tooltip) image.setAttribute('shared-tooltip-text', tooltip);
 
   return image;
+}
+
+function getSafeImageSource(value: string): string {
+  const src = cleanText(value);
+  if (!src) return '';
+
+  try {
+    const url = new URL(src, window.location.href);
+    return url.protocol === 'https:' ? url.href : '';
+  } catch {
+    return '';
+  }
 }

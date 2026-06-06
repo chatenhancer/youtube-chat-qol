@@ -204,5 +204,8 @@ async function readJsonFile(filePath) {
 }
 
 function escapeMarkdown(value) {
-  return String(value).replace(/\|/g, '\\|');
+  return String(value)
+    .replace(/\\/g, '\\\\')
+    .replace(/\|/g, '\\|')
+    .replace(/\r?\n|\r/g, '<br>');
 }

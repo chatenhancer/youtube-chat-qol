@@ -896,10 +896,18 @@
           const localeMatch = path.match(/^\/(ar|de|es|fa|fr|he|hi|id|it|ja|ko|nl|pl|pt|ru|th|tr|uk|vi|zh-CN|zh-TW)(?:\/|$)/);
           languageSwitcher.value = localeMatch ? `/${localeMatch[1]}/` : "/";
           languageSwitcher.addEventListener("change", () => {
-            const locale = languageSwitcher.value === "/" ? "en" : languageSwitcher.value.replace(/^\/|\/$/g, "");
+            const nextPath = getLocalePath(languageSwitcher);
+            const locale = nextPath === "/" ? "en" : nextPath.replace(/^\/|\/$/g, "");
             document.cookie = `ce_lang=${encodeURIComponent(locale)}; Max-Age=31536000; Path=/; SameSite=Lax; Secure`;
-            window.location.href = languageSwitcher.value;
+            window.location.assign(nextPath);
           });
+        }
+
+        function getLocalePath(select) {
+          const value = select.value;
+          const optionExists = Array.from(select.options).some((option) => option.value === value);
+          if (!optionExists) return "/";
+          return /^\/(?:[a-z]{2}(?:-[A-Z]{2})?\/)?$/.test(value) ? value : "/";
         }
 
         document.querySelectorAll("[data-support-modal-trigger]").forEach((trigger) => {

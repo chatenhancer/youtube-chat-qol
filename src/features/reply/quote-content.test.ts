@@ -88,6 +88,20 @@ describe('rich quote content builder', () => {
     expect(result.nodes[0].textContent).toBe(':party:');
   });
 
+  it('falls back to emoji text when the emoji image source is not HTTPS', () => {
+    const emoji = document.createElement('img');
+    emoji.className = 'emoji';
+    emoji.setAttribute('src', 'javascript:alert(1)');
+    emoji.alt = ':party:';
+
+    const result = createQuoteContentNodes({ nodes: [emoji] }, 'fallback');
+
+    expect(result.truncated).toBe(false);
+    expect(result.nodes).toHaveLength(1);
+    expect(result.nodes[0]).not.toBeInstanceOf(HTMLImageElement);
+    expect(result.nodes[0].textContent).toBe(':party:');
+  });
+
   it('does not append emoji segments that have no usable fallback text', () => {
     const result = createQuoteContentNodes({
       segments: [
