@@ -2,6 +2,7 @@ import { cp, mkdir, readFile, readdir, rm, stat, writeFile } from 'node:fs/promi
 import { createHash } from 'node:crypto';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { transform } from 'esbuild';
 import contact from '../src/shared/contact.json' with { type: 'json' };
 import { validateDocsLocales } from './validate-docs-locales.mjs';
 
@@ -42,11 +43,12 @@ const localeMeta = {
 };
 
 await validateDocsLocales();
+const generatedStyles = await minifyGeneratedCss(await readFile(stylePath, 'utf8'));
 const docsAssetVersions = {
-  styles: await getFileAssetVersion(stylePath)
+  styles: getAssetVersion(generatedStyles)
 };
 const docsConfig = await createDocsConfig();
-await prepareSiteOutput();
+await prepareSiteOutput(generatedStyles);
 const localeFiles = (await readdir(i18nDir))
   .filter((file) => file.endsWith('.json'))
   .sort();
@@ -65,7 +67,7 @@ let siteIndex = injectDocsConfig(template, docsConfig);
 if (process.env.YTCQ_DOCS_STAMP_SOURCE === '1') {
   siteIndex = addGeneratedHtmlComment(siteIndex);
 }
-await writeFile(path.join(siteOutputDir, 'index.html'), siteIndex);
+await writeFile(path.join(siteOutputDir, 'index.html'), await minifyGeneratedHtml(siteIndex));
 
 for (const locale of locales) {
   const file = `${locale}.json`;
@@ -82,7 +84,7 @@ for (const locale of locales) {
   );
 
   await mkdir(path.dirname(sitePagePath), { recursive: true });
-  await writeFile(sitePagePath, html);
+  await writeFile(sitePagePath, await minifyGeneratedHtml(html));
 }
 
 await writeSitemap(locales, path.join(siteOutputDir, 'sitemap.xml'));
@@ -274,10 +276,107 @@ function injectAlternateLinks(html, locales) {
 
 function injectDocsConfig(html, config) {
   const json = JSON.stringify(config).replace(/</g, '\\u003c');
+  const configBlock = [
+    '    <!-- docs-config:start -->',
+    `    <script type="application/json" data-docs-config>${json}</script>`,
+    '    <!-- docs-config:end -->'
+  ].join('\n');
+
   return html.replace(
-    /<script type="application\/json" data-docs-config>[\s\S]*?<\/script>/,
-    `<script type="application/json" data-docs-config>${json}</script>`
+    / {4}<!-- docs-config:start -->[\s\S]*? {4}<!-- docs-config:end -->|<script type="application\/json" data-docs-config>[\s\S]*?<\/script>/,
+    configBlock
   );
+}
+
+async function minifyGeneratedHtml(html) {
+  const protectedBlocks = [];
+  let nextHtml = minifyJsonScriptContents(await minifyScriptContents(html));
+
+  nextHtml = nextHtml.replace(/<(script|style|pre|textarea)\b[\s\S]*?<\/\1>/gi, (block) => {
+    const token = `%%YTCQ_DOCS_PROTECTED_${protectedBlocks.length}%%`;
+    protectedBlocks.push(block);
+    return token;
+  });
+
+  nextHtml = nextHtml
+    .replace(/<!--(?! ytcq-docs-generated:)[\s\S]*?-->/g, '')
+    .replace(/\s+/g, (space, offset, source) => {
+      const previous = source[offset - 1] || '';
+      const next = source[offset + space.length] || '';
+      if (previous === '>' && next === '<') return '';
+      return ' ';
+    })
+    .trim();
+
+  return nextHtml.replace(/%%YTCQ_DOCS_PROTECTED_(\d+)%%/g, (_match, index) => protectedBlocks[Number(index)]);
+}
+
+async function minifyScriptContents(html) {
+  const scriptPattern = /<script([^>]*)>([\s\S]*?)<\/script>/gi;
+  let result = '';
+  let index = 0;
+
+  while (true) {
+    const match = scriptPattern.exec(html);
+    if (!match) break;
+
+    const [fullScript, attributes, source] = match;
+    const normalizedAttributes = String(attributes);
+    result += html.slice(index, match.index);
+    index = match.index + fullScript.length;
+
+    if (shouldMinifyScript(normalizedAttributes)) {
+      result += `<script${normalizedAttributes}>${await minifyGeneratedScript(source)}</script>`;
+    } else {
+      result += fullScript;
+    }
+  }
+
+  return result + html.slice(index);
+}
+
+function shouldMinifyScript(attributes) {
+  if (/\bsrc=/i.test(attributes)) return false;
+  const typeMatch = /\btype="([^"]+)"/i.exec(attributes);
+  if (!typeMatch) return true;
+
+  return ['module', 'text/javascript', 'application/javascript'].includes(typeMatch[1].toLowerCase());
+}
+
+async function minifyGeneratedScript(source) {
+  const result = await transform(source, {
+    loader: 'js',
+    minify: true,
+    target: 'es2020'
+  });
+
+  return result.code.trim();
+}
+
+function minifyJsonScriptContents(html) {
+  return html.replace(
+    /<script([^>]*)>([\s\S]*?)<\/script>/gi,
+    (match, attributes, rawJson) => {
+      const normalizedAttributes = String(attributes);
+      const isJsonScript = /\btype="application\/(?:ld\+)?json"/i.test(normalizedAttributes);
+      if (!isJsonScript) return match;
+
+      try {
+        return `<script${normalizedAttributes}>${JSON.stringify(JSON.parse(rawJson))}</script>`;
+      } catch {
+        return match;
+      }
+    }
+  );
+}
+
+async function minifyGeneratedCss(css) {
+  const result = await transform(css, {
+    loader: 'css',
+    minify: true
+  });
+
+  return result.code;
 }
 
 function createLocalizedDocsConfig(config) {
@@ -321,13 +420,14 @@ async function writeSitemap(locales, outputPath) {
   ].join('\n'));
 }
 
-async function prepareSiteOutput() {
+async function prepareSiteOutput(generatedStyles) {
   await rm(siteOutputDir, { recursive: true, force: true });
   await mkdir(siteOutputDir, { recursive: true });
 
-  for (const fileName of ['.nojekyll', 'CNAME', 'robots.txt', 'styles.css']) {
+  for (const fileName of ['.nojekyll', 'CNAME', 'robots.txt']) {
     await cp(path.join(docsDir, fileName), path.join(siteOutputDir, fileName));
   }
+  await writeFile(path.join(siteOutputDir, 'styles.css'), generatedStyles);
 
   for (const directoryName of ['assets', 'badges', 'videos']) {
     const sourceDir = path.join(docsDir, directoryName);
@@ -384,10 +484,6 @@ async function createDocsConfig() {
 
 function getAssetVersion(content) {
   return createHash('sha256').update(content).digest('hex').slice(0, 8);
-}
-
-async function getFileAssetVersion(filePath) {
-  return getAssetVersion(await readFile(filePath));
 }
 
 async function findLatestWalkthroughVideo() {

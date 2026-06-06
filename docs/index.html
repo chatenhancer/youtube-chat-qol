@@ -46,6 +46,7 @@
       content="Chat Enhancer for YouTube showing native-feeling live chat translation, inbox, and emoji tools."
     >
     <!-- docs-alternate-links:start -->
+    <!-- Source fallback; docs build replaces this block with every localized page. -->
     <link rel="alternate" hreflang="en" href="https://chatenhancer.com/">
     <link rel="alternate" hreflang="x-default" href="https://chatenhancer.com/">
     <!-- docs-alternate-links:end -->
@@ -60,6 +61,7 @@
         }
       })();
     </script>
+    <!-- Docs build adds the cache-busting query to this stylesheet in dist/docs. -->
     <link rel="stylesheet" href="styles.css">
     <script type="application/ld+json">
       {
@@ -98,6 +100,7 @@
       <div class="site-header-actions">
         <label class="language-switcher">
           <select data-language-switcher aria-label="Language" data-i18n-attr="aria-label:nav.language">
+            <!-- Source fallback; docs build replaces this list with every supported language. -->
             <option value="/">English</option>
           </select>
         </label>
@@ -827,7 +830,10 @@
       <a data-contact-email-link data-i18n="footer.email">Email</a>
       <a href="https://www.chatenhancer.com/license" data-i18n="footer.license">License</a>
     </footer>
-    <script type="application/json" data-docs-config>{"supportEmail":"hello@example.com","walkthrough":"data:video/mp4,"}</script>
+    <!-- docs-config:start -->
+    <!-- Source fallback; docs build replaces this config with generated contact and video paths. -->
+    <script type="application/json" data-docs-config>{"supportEmail":"hello@example.com","walkthrough":"videos/sample-walkthrough.mp4"}</script>
+    <!-- docs-config:end -->
     <script>
       (() => {
         const docsConfig = readDocsConfig();
