@@ -6,8 +6,8 @@
  *
  * Uploadable screenshot outputs live under dist/screenshots so localized
  * store assets do not flood source control. The English README showcase is
- * also copied to docs/assets/screenshots so GitHub and the docs site can load
- * it from a tracked public asset path.
+ * also copied to assets/readme-showcase.png so GitHub can load it from a
+ * tracked public asset path.
  */
 import { access, mkdir, mkdtemp, readdir, rm, writeFile } from 'node:fs/promises';
 import { constants } from 'node:fs';
@@ -20,8 +20,8 @@ import { spawn, spawnSync } from 'node:child_process';
 import sharp from 'sharp';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const docsDir = path.join(root, 'docs');
-const docsScreenshotsDir = path.join(docsDir, 'assets', 'screenshots');
+const docsBuildDir = path.join(root, 'dist', 'docs');
+const readmeAssetsDir = path.join(root, 'assets');
 const distScreenshotsDir = path.join(root, 'dist', 'screenshots');
 
 const viewportSize = {
@@ -130,12 +130,12 @@ function getSelectedLocales() {
 }
 
 async function getLocalePages() {
-  const entries = await readdir(docsDir, { withFileTypes: true });
+  const entries = await readdir(docsBuildDir, { withFileTypes: true });
   const localizedPages = [];
 
   for (const entry of entries) {
     if (!entry.isDirectory()) continue;
-    const htmlPath = path.join(docsDir, entry.name, 'index.html');
+    const htmlPath = path.join(docsBuildDir, entry.name, 'index.html');
     if (await fileExists(htmlPath)) {
       localizedPages.push({
         htmlPath,
@@ -146,7 +146,7 @@ async function getLocalePages() {
 
   return [
     {
-      htmlPath: path.join(docsDir, 'index.html'),
+      htmlPath: path.join(docsBuildDir, 'index.html'),
       locale: 'en'
     },
     ...localizedPages.sort((a, b) => a.locale.localeCompare(b.locale))
@@ -257,8 +257,8 @@ async function writeReadmeShowcase(sourcePaths, outputPath) {
 }
 
 async function syncEnglishReadmeShowcase(sourcePaths) {
-  await mkdir(docsScreenshotsDir, { recursive: true });
-  await writeReadmeShowcase(sourcePaths, path.join(docsScreenshotsDir, 'readme-showcase.png'));
+  await mkdir(readmeAssetsDir, { recursive: true });
+  await writeReadmeShowcase(sourcePaths, path.join(readmeAssetsDir, 'readme-showcase.png'));
 }
 
 async function findChromeExecutable() {
