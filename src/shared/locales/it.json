@@ -271,9 +271,6 @@
     "popupSections": {
       "message": "Sezioni del popup"
     },
-    "bookmarkedUsers": {
-      "message": "Utenti segnati"
-    },
     "noBookmarkedUsers": {
       "message": "Ancora nessun segnalibro"
     },

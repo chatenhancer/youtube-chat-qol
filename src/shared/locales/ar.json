@@ -271,9 +271,6 @@
     "popupSections": {
       "message": "أقسام النافذة المنبثقة"
     },
-    "bookmarkedUsers": {
-      "message": "المستخدمون المحفوظون"
-    },
     "noBookmarkedUsers": {
       "message": "لا توجد إشارات بعد"
     },

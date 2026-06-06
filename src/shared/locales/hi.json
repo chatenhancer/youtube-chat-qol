@@ -271,9 +271,6 @@
     "popupSections": {
       "message": "पॉपअप सेक्शन"
     },
-    "bookmarkedUsers": {
-      "message": "बुकमार्क किए गए उपयोगकर्ता"
-    },
     "noBookmarkedUsers": {
       "message": "अभी कोई बुकमार्क नहीं"
     },

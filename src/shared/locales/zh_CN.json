@@ -271,9 +271,6 @@
     "popupSections": {
       "message": "弹出窗口分区"
     },
-    "bookmarkedUsers": {
-      "message": "已标记的用户"
-    },
     "noBookmarkedUsers": {
       "message": "还没有书签"
     },

@@ -268,9 +268,6 @@
     "popupSections": {
       "message": "Sections du popup"
     },
-    "bookmarkedUsers": {
-      "message": "Utilisateurs marqués"
-    },
     "noBookmarkedUsers": {
       "message": "Aucun favori pour le moment"
     },

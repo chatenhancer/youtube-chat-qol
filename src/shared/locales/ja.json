@@ -271,9 +271,6 @@
     "popupSections": {
       "message": "ポップアップのセクション"
     },
-    "bookmarkedUsers": {
-      "message": "ブックマークしたユーザー"
-    },
     "noBookmarkedUsers": {
       "message": "ブックマークはまだありません"
     },

@@ -271,9 +271,6 @@
     "popupSections": {
       "message": "Bagian popup"
     },
-    "bookmarkedUsers": {
-      "message": "Pengguna yang ditandai"
-    },
     "noBookmarkedUsers": {
       "message": "Belum ada bookmark"
     },

@@ -268,9 +268,6 @@
     "popupSections": {
       "message": "חלקי החלונית"
     },
-    "bookmarkedUsers": {
-      "message": "משתמשים מסומנים"
-    },
     "noBookmarkedUsers": {
       "message": "אין סימניות עדיין"
     },
