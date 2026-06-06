@@ -114,21 +114,6 @@ img {
   opacity: 0;
 }
 
-.beta-badge {
-  display: inline-flex;
-  align-items: center;
-  min-height: 20px;
-  padding: 3px 8px;
-  color: var(--blue);
-  background: linear-gradient(180deg, #fff, var(--blue-soft));
-  border: 1px solid #cfe3ff;
-  border-radius: 9px;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 4px 12px rgba(62, 166, 255, 0.12);
-  font-size: 11px;
-  font-weight: 800;
-  line-height: 1;
-}
-
 .site-nav {
   display: flex;
   align-items: center;
