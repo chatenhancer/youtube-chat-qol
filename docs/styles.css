@@ -1500,6 +1500,18 @@ kbd {
   line-height: 1.35;
 }
 
+.translation-mode-replace-sample {
+  white-space: nowrap;
+}
+
+.translation-mode-replace-content {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
 .sample-avatar {
   display: inline-block;
   width: 22px;
@@ -1703,6 +1715,10 @@ html[data-screenshot-panel="translation"] .showcase-copy > p {
 html[data-screenshot-panel="translation"] .translation-mode-grid {
   grid-template-columns: minmax(270px, 1fr) minmax(0, 1fr);
   gap: 20px;
+}
+
+html[data-screenshot-panel="translation"] .translation-mode-replace-sample {
+  font-size: 15px;
 }
 
 html[data-screenshot-panel] [data-screenshot-panel="inbox-context"] .showcase-copy {
