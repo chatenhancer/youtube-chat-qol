@@ -437,13 +437,13 @@
             <div class="version-badges" aria-label="Published extension versions">
               <span data-i18n="install.publishedVersions">Published versions</span>
               <a href="https://www.chatenhancer.com/source">
-                <img src="https://img.shields.io/github/v/release/chat-enhancer-yt/youtube-chat-qol?label=release" alt="release version">
+                <img data-version-badge="release" src="https://img.shields.io/github/v/release/chat-enhancer-yt/youtube-chat-qol?label=release&color=2da44e" alt="release version">
               </a>
               <a href="https://www.chatenhancer.com/chrome">
-                <img src="https://img.shields.io/chrome-web-store/v/pkhaaipeppfpakofgpdpcpkflangpghf?label=chrome%20web%20store" alt="chrome web store version">
+                <img data-version-badge="chrome" src="https://img.shields.io/chrome-web-store/v/pkhaaipeppfpakofgpdpcpkflangpghf?label=chrome%20web%20store&color=6b7280" alt="chrome web store version">
               </a>
               <a href="https://www.chatenhancer.com/firefox">
-                <img src="https://img.shields.io/amo/v/chat-enhancer-for-youtube?label=firefox%20add-ons" alt="firefox add-ons version">
+                <img data-version-badge="firefox" src="https://img.shields.io/amo/v/chat-enhancer-for-youtube?label=firefox%20add-ons&color=6b7280" alt="firefox add-ons version">
               </a>
             </div>
           </div>
@@ -850,6 +850,25 @@
         const walkthroughTime = document.querySelector("[data-walkthrough-time]");
         const walkthroughVideo = document.querySelector("[data-walkthrough-video]");
         const walkthroughVideoFeedback = document.querySelector("[data-walkthrough-feedback]");
+        const versionBadgeSources = {
+          release: {
+            image: "https://img.shields.io/github/v/release/chat-enhancer-yt/youtube-chat-qol?label=release",
+            json: "https://img.shields.io/github/v/release/chat-enhancer-yt/youtube-chat-qol.json?label=release"
+          },
+          chrome: {
+            image: "https://img.shields.io/chrome-web-store/v/pkhaaipeppfpakofgpdpcpkflangpghf?label=chrome%20web%20store",
+            json: "https://img.shields.io/chrome-web-store/v/pkhaaipeppfpakofgpdpcpkflangpghf.json?label=chrome%20web%20store"
+          },
+          firefox: {
+            image: "https://img.shields.io/amo/v/chat-enhancer-for-youtube?label=firefox%20add-ons",
+            json: "https://img.shields.io/amo/v/chat-enhancer-for-youtube.json?label=firefox%20add-ons"
+          }
+        };
+        const versionBadgeColors = {
+          current: "2da44e",
+          pending: "c2410c",
+          unknown: "6b7280"
+        };
         let walkthroughFeedbackTimer = 0;
 
         setupTopHeaderState();
@@ -953,6 +972,7 @@
           if (!alert || !message) return;
 
           const versions = await fetchPublishedVersions();
+          updateVersionBadges(versions);
           const releaseVersion = versions.release;
           if (!releaseVersion) return;
 
@@ -1195,15 +1215,34 @@
         }
 
         async function fetchPublishedVersions() {
-          const sources = {
-            release: "https://img.shields.io/github/v/release/chat-enhancer-yt/youtube-chat-qol.json?label=release",
-            chrome: "https://img.shields.io/chrome-web-store/v/pkhaaipeppfpakofgpdpcpkflangpghf.json?label=chrome%20web%20store",
-            firefox: "https://img.shields.io/amo/v/chat-enhancer-for-youtube.json?label=firefox%20add-ons"
-          };
           const entries = await Promise.all(
-            Object.entries(sources).map(async ([key, url]) => [key, await fetchShieldMessage(url)])
+            Object.entries(versionBadgeSources).map(async ([key, source]) => [key, await fetchShieldMessage(source.json)])
           );
           return Object.fromEntries(entries);
+        }
+
+        function updateVersionBadges(versions) {
+          const releaseVersion = versions.release;
+          setVersionBadgeColor("release", versionBadgeColors.current);
+
+          for (const key of ["chrome", "firefox"]) {
+            const storeVersion = versions[key];
+            const color = releaseVersion && storeVersion
+              ? normalizeVersion(storeVersion) === normalizeVersion(releaseVersion)
+                ? versionBadgeColors.current
+                : versionBadgeColors.pending
+              : versionBadgeColors.unknown;
+
+            setVersionBadgeColor(key, color);
+          }
+        }
+
+        function setVersionBadgeColor(key, color) {
+          const image = document.querySelector(`[data-version-badge="${key}"]`);
+          const source = versionBadgeSources[key];
+          if (!(image instanceof HTMLImageElement) || !source) return;
+
+          image.src = `${source.image}&color=${encodeURIComponent(color)}`;
         }
 
         async function fetchShieldMessage(url) {
