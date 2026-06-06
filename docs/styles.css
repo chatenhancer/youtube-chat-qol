@@ -602,8 +602,9 @@ h3 {
   position: relative;
   overflow: hidden;
   aspect-ratio: 16 / 9;
-  background: #000;
+  background: var(--surface);
   border-radius: 8px;
+  clip-path: inset(0 round 8px);
 }
 
 .walkthrough-video {
