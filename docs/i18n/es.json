@@ -33,9 +33,9 @@
     "translationTitle": "Traduce mientras chateas",
     "translationBody": "Lee los mensajes entrantes en tu idioma, o traduce lo que estás escribiendo antes de enviarlo.",
     "mentionTitle": "Menciones, citas y borradores",
-    "mentionBody": "Menciona o cita personas rápido, marca usuarios conocidos, mantén visible una conversación y recupera borradores sin enviar después de actualizar el mismo stream.",
+    "mentionBody": "Menciona o cita a personas rápidamente, mantén visible una conversación y recupera borradores sin enviar después de actualizar el mismo stream.",
     "contextTitle": "Ponte al día con alguien",
-    "contextBody": "Haz clic en un avatar para revisar mensajes recientes, marcar personas que quieras reconocer y abrir su canal cuando lo necesites.",
+    "contextBody": "Haz clic en un avatar para revisar mensajes recientes, marcar usuarios que quieras reconocer y abrir su canal cuando lo necesites.",
     "inboxTitle": "No te pierdas lo importante",
     "inboxBody": "Las menciones y los mensajes con palabras clave personalizadas que elijas van directo a tu bandeja, con alertas de sonido opcionales.",
     "emojisTitle": "Ten tus emojis favoritos cerca",
@@ -44,7 +44,7 @@
     "commandsBody": "Pulsa Tab para expandir comandos cortos en menciones, citas, ayudas de hora, traducciones, palabras vigiladas y ajustes.",
     "commandsLink": "Ver referencia de comandos",
     "walkthroughTitle": "Mira un recorrido por las funciones",
-    "walkthroughBody": "Ve cómo funcionan juntas la traducción, Inbox, Focus mode, usuarios marcados, emojis, comandos y ajustes del popup.",
+    "walkthroughBody": "Ve cómo funcionan juntos la traducción, la bandeja, el modo enfoque, los usuarios marcados, los emojis, los comandos y los ajustes de la ventana emergente.",
     "walkthroughCta": "Ver recorrido",
     "walkthroughModalTitle": "Recorrido de funciones",
     "walkthroughClose": "Cerrar recorrido"
@@ -69,7 +69,7 @@
     "mentionInboxHtml": "<strong>No te pierdas una mención:</strong> cuando te mencionen en el chat, el mensaje se añade a tu <strong>bandeja</strong>",
     "mentionSound": "También puedes activar un sonido para las notificaciones.",
     "extrasTitle": "Más formas de seguir el ritmo cuando el chat está activo",
-    "extrasAvatar": "Haz clic en un avatar para revisar mensajes recientes, marcar usuarios conocidos y abrir su canal.",
+    "extrasAvatar": "Haz clic en un avatar para revisar mensajes recientes, marcar usuarios que quieras reconocer y abrir su canal.",
     "extrasEmoji": "Encuentra tus emojis favoritos en la parte superior del selector.",
     "extrasCommands": "Usa comandos con Tab para atajos útiles, como:",
     "commandReplyBody": "Menciona a la última persona que te mencionó",
@@ -123,7 +123,7 @@
   },
   "privacy": {
     "eyebrow": "Privacidad",
-    "title": "Herramientas de chat locales primero",
+    "title": "Herramientas de chat con enfoque local",
     "copy": "La extensión está diseñada para mantener en tu dispositivo las mejoras rutinarias del chat. La traducción es la única función que necesita un servicio externo y solo se ejecuta después de elegir un idioma de destino.",
     "button": "Leer la política de privacidad completa",
     "summaryAria": "Resumen de privacidad",
@@ -148,8 +148,8 @@
     "timeTranslationCommandsTitle": "Tiempo y traducción",
     "inboxCommandsTitle": "Bandeja",
     "settingCommandsTitle": "Comandos de ajustes",
-    "mentionDescription": "Menciona al autor de tu mensaje más reciente en el inbox.",
-    "quoteDescription": "Sin usuario, cita tu mensaje más reciente del inbox. Con @usuario, cita el último mensaje visto de esa persona.",
+    "mentionDescription": "Menciona al autor de tu mensaje más reciente en la bandeja.",
+    "quoteDescription": "Sin usuario, cita tu mensaje más reciente de la bandeja. Con @usuario, cita el último mensaje visto de esa persona.",
     "repeatDescription": "Restaura tu último mensaje enviado.",
     "focusDescription": "Con @usuario, abre el modo Focus para esa persona. Sin usuario, enfoca a la última persona que te mencionó.",
     "whoDescription": "Abre la tarjeta de un usuario reciente.",
@@ -163,7 +163,7 @@
     "helpDescription": "Muestra esta lista.",
     "setTranslateDescription": "Define el idioma de traducción. Usa off para desactivar la traducción. Usa /lang sin idioma para ver el destino actual.",
     "setDisplayDescription": "Configura cómo se muestran las traducciones.",
-    "setSoundDescription": "Configura el sonido del inbox.",
+    "setSoundDescription": "Configura el sonido de la bandeja.",
     "aliasesLabel": "Alias:",
     "exampleLabel": "Ejemplo:",
     "timeZoneAliases": "Lugares/zonas horarias compatibles:"
@@ -172,7 +172,7 @@
     "disclaimer": "Chat Enhancer for YouTube no está afiliado a YouTube ni a Google.",
     "privacy": "Privacidad",
     "support": "Soporte",
-    "email": "Email",
+    "email": "Correo",
     "license": "Licencia"
   }
 }
