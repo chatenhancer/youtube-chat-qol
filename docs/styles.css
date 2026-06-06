@@ -80,7 +80,7 @@ img {
   align-items: center;
   gap: 10px;
   min-width: 0;
-  font-weight: 700;
+  font-weight: 600;
   transition: gap 180ms ease;
 }
 
