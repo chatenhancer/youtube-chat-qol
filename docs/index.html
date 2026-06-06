@@ -45,29 +45,7 @@
       data-i18n-attr="content:meta.imageAlt"
       content="Chat Enhancer for YouTube showing native-feeling live chat translation, inbox, and emoji tools."
     >
-    <link rel="alternate" hreflang="en" href="https://chatenhancer.com/">
-    <link rel="alternate" hreflang="ar" href="https://chatenhancer.com/ar/">
-    <link rel="alternate" hreflang="de" href="https://chatenhancer.com/de/">
-    <link rel="alternate" hreflang="es" href="https://chatenhancer.com/es/">
-    <link rel="alternate" hreflang="fa" href="https://chatenhancer.com/fa/">
-    <link rel="alternate" hreflang="fr" href="https://chatenhancer.com/fr/">
-    <link rel="alternate" hreflang="he" href="https://chatenhancer.com/he/">
-    <link rel="alternate" hreflang="hi" href="https://chatenhancer.com/hi/">
-    <link rel="alternate" hreflang="id" href="https://chatenhancer.com/id/">
-    <link rel="alternate" hreflang="it" href="https://chatenhancer.com/it/">
-    <link rel="alternate" hreflang="ja" href="https://chatenhancer.com/ja/">
-    <link rel="alternate" hreflang="ko" href="https://chatenhancer.com/ko/">
-    <link rel="alternate" hreflang="nl" href="https://chatenhancer.com/nl/">
-    <link rel="alternate" hreflang="pl" href="https://chatenhancer.com/pl/">
-    <link rel="alternate" hreflang="pt" href="https://chatenhancer.com/pt/">
-    <link rel="alternate" hreflang="ru" href="https://chatenhancer.com/ru/">
-    <link rel="alternate" hreflang="th" href="https://chatenhancer.com/th/">
-    <link rel="alternate" hreflang="tr" href="https://chatenhancer.com/tr/">
-    <link rel="alternate" hreflang="uk" href="https://chatenhancer.com/uk/">
-    <link rel="alternate" hreflang="vi" href="https://chatenhancer.com/vi/">
-    <link rel="alternate" hreflang="zh-CN" href="https://chatenhancer.com/zh-CN/">
-    <link rel="alternate" hreflang="zh-TW" href="https://chatenhancer.com/zh-TW/">
-    <link rel="alternate" hreflang="x-default" href="https://chatenhancer.com/">
+    <!-- docs-alternate-links -->
     <link rel="icon" href="assets/icons/icon-128.png">
     <link rel="apple-touch-icon" href="assets/icons/icon-128.png">
     <link rel="preload" href="assets/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
@@ -79,7 +57,7 @@
         }
       })();
     </script>
-    <link rel="stylesheet" href="styles.css?v=131">
+    <link rel="stylesheet" href="styles.css">
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -116,30 +94,7 @@
       </a>
       <div class="site-header-actions">
         <label class="language-switcher">
-          <select data-language-switcher aria-label="Language" data-i18n-attr="aria-label:nav.language">
-            <option value="/">English</option>
-            <option value="/ar/">العربية</option>
-            <option value="/de/">Deutsch</option>
-            <option value="/es/">Español</option>
-            <option value="/fa/">فارسی</option>
-            <option value="/fr/">Français</option>
-            <option value="/he/">עברית</option>
-            <option value="/hi/">हिन्दी</option>
-            <option value="/id/">Bahasa Indonesia</option>
-            <option value="/it/">Italiano</option>
-            <option value="/ja/">日本語</option>
-            <option value="/ko/">한국어</option>
-            <option value="/nl/">Nederlands</option>
-            <option value="/pl/">Polski</option>
-            <option value="/pt/">Português</option>
-            <option value="/ru/">Русский</option>
-            <option value="/th/">ไทย</option>
-            <option value="/tr/">Türkçe</option>
-            <option value="/uk/">Українська</option>
-            <option value="/vi/">Tiếng Việt</option>
-            <option value="/zh-CN/">中文（简体）</option>
-            <option value="/zh-TW/">中文（繁體）</option>
-          </select>
+          <select data-language-switcher aria-label="Language" data-i18n-attr="aria-label:nav.language"></select>
         </label>
         <a class="button header-install" href="#install">
           <span class="button-icon" data-symbol="install_desktop" aria-hidden="true">
@@ -867,10 +822,10 @@
       <a data-contact-email-link data-i18n="footer.email">Email</a>
       <a href="https://www.chatenhancer.com/license" data-i18n="footer.license">License</a>
     </footer>
-    <script src="assets/contact.js"></script>
-    <script src="assets/video.js"></script>
+    <script type="application/json" data-docs-config>{}</script>
     <script>
       (() => {
+        const docsConfig = readDocsConfig();
         const installActions = document.querySelector("[data-install-actions]");
         const chromeButton = document.querySelector('[data-browser-install="chrome"]');
         const firefoxButton = document.querySelector('[data-browser-install="firefox"]');
@@ -892,9 +847,7 @@
         setupWalkthroughVideoModal();
 
         if (languageSwitcher) {
-          const path = window.location.pathname;
-          const localeMatch = path.match(/^\/(ar|de|es|fa|fr|he|hi|id|it|ja|ko|nl|pl|pt|ru|th|tr|uk|vi|zh-CN|zh-TW)(?:\/|$)/);
-          languageSwitcher.value = localeMatch ? `/${localeMatch[1]}/` : "/";
+          languageSwitcher.value = getCurrentLocalePath(languageSwitcher);
           languageSwitcher.addEventListener("change", () => {
             const nextPath = getLocalePath(languageSwitcher);
             const locale = nextPath === "/" ? "en" : nextPath.replace(/^\/|\/$/g, "");
@@ -908,6 +861,14 @@
           const optionExists = Array.from(select.options).some((option) => option.value === value);
           if (!optionExists) return "/";
           return /^\/(?:[a-z]{2}(?:-[A-Z]{2})?\/)?$/.test(value) ? value : "/";
+        }
+
+        function getCurrentLocalePath(select) {
+          const path = window.location.pathname;
+          const options = Array.from(select.options).map((option) => option.value);
+          return options.find((value) => value !== "/" && path === value.slice(0, -1)) ||
+            options.find((value) => value !== "/" && path.startsWith(value)) ||
+            "/";
         }
 
         document.querySelectorAll("[data-support-modal-trigger]").forEach((trigger) => {
@@ -1042,7 +1003,7 @@
         }
 
         function setupContactEmailLinks() {
-          const supportEmail = window.YTCQ_CONTACT?.supportEmail;
+          const supportEmail = docsConfig.supportEmail;
           if (typeof supportEmail !== "string" || !supportEmail.trim()) return;
 
           const email = supportEmail.trim();
@@ -1076,7 +1037,7 @@
         }
 
         function setupWalkthroughVideoModal() {
-          const walkthroughPath = window.YTCQ_VIDEO?.walkthrough;
+          const walkthroughPath = docsConfig.walkthrough;
           if (
             !walkthroughCtas.length ||
             !walkthroughOpenButtons.length ||
@@ -1088,7 +1049,7 @@
             return;
           }
 
-          const videoUrl = getDocsAssetUrl(walkthroughPath);
+          const videoUrl = new URL(walkthroughPath, window.location.href);
           walkthroughVideo.src = videoUrl.href;
           walkthroughVideo.load();
           preloadWalkthroughVideo(videoUrl);
@@ -1223,15 +1184,6 @@
           return `${minutes}:${String(seconds).padStart(2, "0")}`;
         }
 
-        function getDocsAssetUrl(relativePath) {
-          const videoScript = document.querySelector('script[src$="assets/video.js"]');
-          const scriptUrl = videoScript instanceof HTMLScriptElement
-            ? videoScript.src
-            : new URL("assets/video.js", window.location.href).href;
-          const docsRoot = new URL("../", scriptUrl);
-          return new URL(relativePath, docsRoot);
-        }
-
         async function fetchPublishedVersions() {
           const sources = {
             package: "https://img.shields.io/github/package-json/v/chat-enhancer-yt/youtube-chat-qol.json?label=source",
@@ -1266,6 +1218,18 @@
 
         function capitalize(value) {
           return value.charAt(0).toUpperCase() + value.slice(1);
+        }
+
+        function readDocsConfig() {
+          const configScript = document.querySelector('script[type="application/json"][data-docs-config]');
+          if (!(configScript instanceof HTMLScriptElement)) return {};
+
+          try {
+            const value = JSON.parse(configScript.textContent || "{}");
+            return value && typeof value === "object" && !Array.isArray(value) ? value : {};
+          } catch {
+            return {};
+          }
         }
       })();
     </script>

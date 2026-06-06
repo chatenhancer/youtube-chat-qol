@@ -1,4 +1,5 @@
-import { mkdir, readFile, readdir, stat, writeFile } from 'node:fs/promises';
+import { cp, mkdir, readFile, readdir, rm, stat, writeFile } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import contact from '../src/shared/contact.json' with { type: 'json' };
@@ -8,49 +9,44 @@ const SITE_URL = 'https://chatenhancer.com';
 const DEFAULT_LOCALE = 'en';
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const docsDir = path.join(rootDir, 'docs');
+const siteOutputDir = path.join(rootDir, 'dist', 'docs');
 const i18nDir = path.join(docsDir, 'i18n');
 const templatePath = path.join(docsDir, 'index.html');
-const sitemapPath = path.join(docsDir, 'sitemap.xml');
-const contactScriptPath = path.join(docsDir, 'assets', 'contact.js');
-const videoScriptPath = path.join(docsDir, 'assets', 'video.js');
+const stylePath = path.join(docsDir, 'styles.css');
 const videosDir = path.join(docsDir, 'videos');
 const generatedComment = createGeneratedComment();
 
 const localeMeta = {
-  ar: { dir: 'rtl', ogLocale: 'ar_AR', path: 'ar' },
-  de: { ogLocale: 'de_DE', path: 'de' },
-  en: { ogLocale: 'en_US', path: '' },
-  es: { ogLocale: 'es_ES', path: 'es' },
-  fa: { dir: 'rtl', ogLocale: 'fa_IR', path: 'fa' },
-  fr: { ogLocale: 'fr_FR', path: 'fr' },
-  he: { dir: 'rtl', ogLocale: 'he_IL', path: 'he' },
-  hi: { ogLocale: 'hi_IN', path: 'hi' },
-  id: { ogLocale: 'id_ID', path: 'id' },
-  it: { ogLocale: 'it_IT', path: 'it' },
-  ja: { ogLocale: 'ja_JP', path: 'ja' },
-  ko: { ogLocale: 'ko_KR', path: 'ko' },
-  nl: { ogLocale: 'nl_NL', path: 'nl' },
-  pl: { ogLocale: 'pl_PL', path: 'pl' },
-  pt: { ogLocale: 'pt_BR', path: 'pt' },
-  ru: { ogLocale: 'ru_RU', path: 'ru' },
-  th: { ogLocale: 'th_TH', path: 'th' },
-  tr: { ogLocale: 'tr_TR', path: 'tr' },
-  uk: { ogLocale: 'uk_UA', path: 'uk' },
-  vi: { ogLocale: 'vi_VN', path: 'vi' },
-  zh_CN: { htmlLang: 'zh-CN', ogLocale: 'zh_CN', path: 'zh-CN' },
-  zh_TW: { htmlLang: 'zh-TW', ogLocale: 'zh_TW', path: 'zh-TW' }
+  ar: { dir: 'rtl', label: 'العربية', ogLocale: 'ar_AR', path: 'ar' },
+  de: { label: 'Deutsch', ogLocale: 'de_DE', path: 'de' },
+  en: { label: 'English', ogLocale: 'en_US', path: '' },
+  es: { label: 'Español', ogLocale: 'es_ES', path: 'es' },
+  fa: { dir: 'rtl', label: 'فارسی', ogLocale: 'fa_IR', path: 'fa' },
+  fr: { label: 'Français', ogLocale: 'fr_FR', path: 'fr' },
+  he: { dir: 'rtl', label: 'עברית', ogLocale: 'he_IL', path: 'he' },
+  hi: { label: 'हिन्दी', ogLocale: 'hi_IN', path: 'hi' },
+  id: { label: 'Bahasa Indonesia', ogLocale: 'id_ID', path: 'id' },
+  it: { label: 'Italiano', ogLocale: 'it_IT', path: 'it' },
+  ja: { label: '日本語', ogLocale: 'ja_JP', path: 'ja' },
+  ko: { label: '한국어', ogLocale: 'ko_KR', path: 'ko' },
+  nl: { label: 'Nederlands', ogLocale: 'nl_NL', path: 'nl' },
+  pl: { label: 'Polski', ogLocale: 'pl_PL', path: 'pl' },
+  pt: { label: 'Português', ogLocale: 'pt_BR', path: 'pt' },
+  ru: { label: 'Русский', ogLocale: 'ru_RU', path: 'ru' },
+  th: { label: 'ไทย', ogLocale: 'th_TH', path: 'th' },
+  tr: { label: 'Türkçe', ogLocale: 'tr_TR', path: 'tr' },
+  uk: { label: 'Українська', ogLocale: 'uk_UA', path: 'uk' },
+  vi: { label: 'Tiếng Việt', ogLocale: 'vi_VN', path: 'vi' },
+  zh_CN: { htmlLang: 'zh-CN', label: '中文（简体）', ogLocale: 'zh_CN', path: 'zh-CN' },
+  zh_TW: { htmlLang: 'zh-TW', label: '中文（繁體）', ogLocale: 'zh_TW', path: 'zh-TW' }
 };
 
 await validateDocsLocales();
-await writeContactScript();
-await writeVideoScript();
-
-let template = await readFile(templatePath, 'utf8');
-if (process.env.YTCQ_DOCS_STAMP_SOURCE === '1') {
-  template = addGeneratedHtmlComment(template);
-  await writeFile(templatePath, template);
-}
-
+const docsAssetVersions = {
+  styles: await getFileAssetVersion(stylePath)
+};
+const docsConfig = await createDocsConfig();
+await prepareSiteOutput();
 const localeFiles = (await readdir(i18nDir))
   .filter((file) => file.endsWith('.json'))
   .sort();
@@ -60,6 +56,16 @@ const locales = [
     .map((file) => path.basename(file, '.json'))
     .filter((locale) => locale !== DEFAULT_LOCALE)
 ];
+const sourceTemplate = await readFile(templatePath, 'utf8');
+const template = injectLanguageOptions(
+  injectAlternateLinks(applyDocsAssetVersions(sourceTemplate, docsAssetVersions), locales),
+  locales
+);
+let siteIndex = injectDocsConfig(template, docsConfig);
+if (process.env.YTCQ_DOCS_STAMP_SOURCE === '1') {
+  siteIndex = addGeneratedHtmlComment(siteIndex);
+}
+await writeFile(path.join(siteOutputDir, 'index.html'), siteIndex);
 
 for (const locale of locales) {
   const file = `${locale}.json`;
@@ -69,16 +75,19 @@ for (const locale of locales) {
   if (!meta) throw new Error(`No docs locale metadata for ${locale}`);
 
   const messages = JSON.parse(await readFile(path.join(i18nDir, file), 'utf8'));
-  const pagePath = path.join(docsDir, meta.path, 'index.html');
-  const html = buildLocalizedPage(template, messages, locale, meta);
+  const sitePagePath = path.join(siteOutputDir, meta.path, 'index.html');
+  const html = injectDocsConfig(
+    buildLocalizedPage(template, messages, locale, meta),
+    createLocalizedDocsConfig(docsConfig)
+  );
 
-  await mkdir(path.dirname(pagePath), { recursive: true });
-  await writeFile(pagePath, html);
+  await mkdir(path.dirname(sitePagePath), { recursive: true });
+  await writeFile(sitePagePath, html);
 }
 
-await writeSitemap(locales);
+await writeSitemap(locales, path.join(siteOutputDir, 'sitemap.xml'));
 
-console.log(`Generated ${localeFiles.length - 1} localized docs pages and sitemap.xml.`);
+console.log(`Generated dist/docs Pages output with ${localeFiles.length - 1} localized pages and sitemap.xml.`);
 
 function buildLocalizedPage(source, messages, locale, meta) {
   const htmlLang = meta.htmlLang || locale;
@@ -216,7 +225,60 @@ function rewriteRelativeAssetPaths(html) {
     .replace(/\bhref="styles\.css/g, 'href="../styles.css');
 }
 
-async function writeSitemap(locales) {
+function applyDocsAssetVersions(html, versions) {
+  return html
+    .replace(
+      /\bhref="styles\.css(?:\?v=[^"]*)?"/,
+      `href="styles.css?v=${escapeHtmlAttribute(versions.styles)}"`
+    );
+}
+
+function injectLanguageOptions(html, locales) {
+  const options = locales.map((locale) => {
+    const meta = localeMeta[locale];
+    if (!meta?.label) throw new Error(`No docs locale label for ${locale}`);
+
+    const value = meta.path ? `/${meta.path}/` : '/';
+    return `<option value="${escapeHtmlAttribute(value)}">${escapeHtml(meta.label)}</option>`;
+  }).join('\n            ');
+
+  return html.replace(
+    /(<select\b[^>]*\bdata-language-switcher\b[^>]*>)[\s\S]*?(<\/select>)/,
+    `$1\n            ${options}\n          $2`
+  );
+}
+
+function injectAlternateLinks(html, locales) {
+  const alternateLinks = locales.map((locale) => {
+    const meta = localeMeta[locale];
+    if (!meta) throw new Error(`No docs locale metadata for ${locale}`);
+
+    const hreflang = meta.htmlLang || locale;
+    return `<link rel="alternate" hreflang="${escapeHtmlAttribute(hreflang)}" href="${escapeHtmlAttribute(getPageUrl(meta))}">`;
+  });
+  alternateLinks.push(
+    `<link rel="alternate" hreflang="x-default" href="${escapeHtmlAttribute(getPageUrl(localeMeta[DEFAULT_LOCALE]))}">`
+  );
+
+  return html.replace('    <!-- docs-alternate-links -->', `    ${alternateLinks.join('\n    ')}`);
+}
+
+function injectDocsConfig(html, config) {
+  const json = JSON.stringify(config).replace(/</g, '\\u003c');
+  return html.replace(
+    /<script type="application\/json" data-docs-config>[\s\S]*?<\/script>/,
+    `<script type="application/json" data-docs-config>${json}</script>`
+  );
+}
+
+function createLocalizedDocsConfig(config) {
+  return {
+    ...config,
+    ...(config.walkthrough ? { walkthrough: `../${config.walkthrough}` } : {})
+  };
+}
+
+async function writeSitemap(locales, outputPath) {
   const pages = locales.map((locale) => {
     const meta = localeMeta[locale];
     if (!meta) throw new Error(`No docs locale metadata for ${locale}`);
@@ -241,13 +303,33 @@ async function writeSitemap(locales) {
     ].join('\n'))
     .join('\n');
 
-  await writeFile(sitemapPath, [
+  await writeFile(outputPath, [
     '<?xml version="1.0" encoding="UTF-8"?>',
     '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">',
     urls,
     '</urlset>',
     ''
   ].join('\n'));
+}
+
+async function prepareSiteOutput() {
+  await rm(siteOutputDir, { recursive: true, force: true });
+  await mkdir(siteOutputDir, { recursive: true });
+
+  for (const fileName of ['.nojekyll', 'CNAME', 'robots.txt', 'styles.css']) {
+    await cp(path.join(docsDir, fileName), path.join(siteOutputDir, fileName));
+  }
+
+  for (const directoryName of ['assets', 'badges', 'videos']) {
+    const sourceDir = path.join(docsDir, directoryName);
+    const targetDir = path.join(siteOutputDir, directoryName);
+    await cp(sourceDir, targetDir, {
+      recursive: true,
+      filter: (source) => !['.DS_Store', 'contact.js', 'video.js'].includes(path.basename(source))
+    }).catch((error) => {
+      if (error.code !== 'ENOENT') throw error;
+    });
+  }
 }
 
 function getPageUrl(meta) {
@@ -283,20 +365,20 @@ function escapeRegExp(value) {
   return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-async function writeContactScript() {
-  await writeFile(
-    contactScriptPath,
-    `window.YTCQ_CONTACT=${JSON.stringify({ supportEmail: contact.supportEmail })};\n`
-  );
+async function createDocsConfig() {
+  const walkthroughFileName = await findLatestWalkthroughVideo();
+  return {
+    supportEmail: contact.supportEmail,
+    ...(walkthroughFileName ? { walkthrough: `videos/${walkthroughFileName}` } : {})
+  };
 }
 
-async function writeVideoScript() {
-  const walkthroughFileName = await findLatestWalkthroughVideo();
-  const config = walkthroughFileName
-    ? { walkthrough: `videos/${walkthroughFileName}` }
-    : {};
+function getAssetVersion(content) {
+  return createHash('sha256').update(content).digest('hex').slice(0, 8);
+}
 
-  await writeFile(videoScriptPath, `window.YTCQ_VIDEO=${JSON.stringify(config)};\n`);
+async function getFileAssetVersion(filePath) {
+  return getAssetVersion(await readFile(filePath));
 }
 
 async function findLatestWalkthroughVideo() {

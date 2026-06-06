@@ -3,8 +3,6 @@ node_modules/
 dist/
 coverage/
 docs/badges/
-docs/assets/contact.js
-docs/assets/video.js
 docs/*/index.html
 docs/sitemap.xml
 test-results/
