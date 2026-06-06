@@ -16,6 +16,44 @@ const templatePath = path.join(docsDir, 'index.html');
 const stylePath = path.join(docsDir, 'styles.css');
 const videosDir = path.join(docsDir, 'videos');
 const generatedComment = createGeneratedComment();
+const inlineHtmlTags = new Set([
+  'a',
+  'abbr',
+  'b',
+  'bdi',
+  'bdo',
+  'br',
+  'button',
+  'cite',
+  'code',
+  'data',
+  'em',
+  'i',
+  'img',
+  'input',
+  'kbd',
+  'label',
+  'mark',
+  'q',
+  's',
+  'samp',
+  'small',
+  'span',
+  'strong',
+  'sub',
+  'sup',
+  'svg',
+  'time',
+  'u',
+  'var',
+  'wbr'
+]);
+const voidInlineHtmlTags = new Set([
+  'br',
+  'img',
+  'input',
+  'wbr'
+]);
 
 const localeMeta = {
   ar: { dir: 'rtl', label: 'العربية', ogLocale: 'ar_AR', path: 'ar' },
@@ -303,12 +341,52 @@ async function minifyGeneratedHtml(html) {
     .replace(/\s+/g, (space, offset, source) => {
       const previous = source[offset - 1] || '';
       const next = source[offset + space.length] || '';
-      if (previous === '>' && next === '<') return '';
+      if (previous === '>' && next === '<') {
+        return shouldPreserveInlineElementSpace(source, offset, space.length) ? ' ' : '';
+      }
       return ' ';
     })
     .trim();
 
   return nextHtml.replace(/%%YTCQ_DOCS_PROTECTED_(\d+)%%/g, (_match, index) => protectedBlocks[Number(index)]);
+}
+
+function shouldPreserveInlineElementSpace(source, offset, spaceLength) {
+  const previousTag = getPreviousHtmlTag(source, offset);
+  const nextTag = getNextHtmlTag(source, offset + spaceLength);
+  if (!previousTag || !nextTag) return false;
+  if (previousTag.isOpening && !isVoidInlineTag(previousTag.name)) return false;
+  if (!nextTag.isOpening) return false;
+
+  return isInlineHtmlTag(previousTag.name) && isInlineHtmlTag(nextTag.name);
+}
+
+function getPreviousHtmlTag(source, offset) {
+  const match = source.slice(0, offset).match(/<\/?([a-z][\w:-]*)\b[^>]*>$/i);
+  if (!match) return null;
+
+  return {
+    isOpening: !match[0].startsWith('</'),
+    name: match[1].toLowerCase()
+  };
+}
+
+function getNextHtmlTag(source, offset) {
+  const match = source.slice(offset).match(/^<\/?([a-z][\w:-]*)\b[^>]*>/i);
+  if (!match) return null;
+
+  return {
+    isOpening: !match[0].startsWith('</'),
+    name: match[1].toLowerCase()
+  };
+}
+
+function isInlineHtmlTag(tagName) {
+  return inlineHtmlTags.has(tagName);
+}
+
+function isVoidInlineTag(tagName) {
+  return voidInlineHtmlTags.has(tagName);
 }
 
 async function minifyScriptContents(html) {
