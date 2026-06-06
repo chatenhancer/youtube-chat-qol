@@ -45,7 +45,10 @@
       data-i18n-attr="content:meta.imageAlt"
       content="Chat Enhancer for YouTube showing native-feeling live chat translation, inbox, and emoji tools."
     >
-    <!-- docs-alternate-links -->
+    <!-- docs-alternate-links:start -->
+    <link rel="alternate" hreflang="en" href="https://chatenhancer.com/">
+    <link rel="alternate" hreflang="x-default" href="https://chatenhancer.com/">
+    <!-- docs-alternate-links:end -->
     <link rel="icon" href="assets/icons/icon-128.png">
     <link rel="apple-touch-icon" href="assets/icons/icon-128.png">
     <link rel="preload" href="assets/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
@@ -94,7 +97,9 @@
       </a>
       <div class="site-header-actions">
         <label class="language-switcher">
-          <select data-language-switcher aria-label="Language" data-i18n-attr="aria-label:nav.language"></select>
+          <select data-language-switcher aria-label="Language" data-i18n-attr="aria-label:nav.language">
+            <option value="/">English</option>
+          </select>
         </label>
         <a class="button header-install" href="#install">
           <span class="button-icon" data-symbol="install_desktop" aria-hidden="true">
@@ -822,7 +827,7 @@
       <a data-contact-email-link data-i18n="footer.email">Email</a>
       <a href="https://www.chatenhancer.com/license" data-i18n="footer.license">License</a>
     </footer>
-    <script type="application/json" data-docs-config>{}</script>
+    <script type="application/json" data-docs-config>{"supportEmail":"hello@example.com","walkthrough":"data:video/mp4,"}</script>
     <script>
       (() => {
         const docsConfig = readDocsConfig();
