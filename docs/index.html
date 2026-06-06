@@ -437,7 +437,7 @@
             <div class="version-badges" aria-label="Published extension versions">
               <span data-i18n="install.publishedVersions">Published versions</span>
               <a href="https://www.chatenhancer.com/source">
-                <img src="https://img.shields.io/github/package-json/v/chat-enhancer-yt/youtube-chat-qol?label=source" alt="source version">
+                <img src="https://img.shields.io/github/v/release/chat-enhancer-yt/youtube-chat-qol?label=release" alt="release version">
               </a>
               <a href="https://www.chatenhancer.com/chrome">
                 <img src="https://img.shields.io/chrome-web-store/v/pkhaaipeppfpakofgpdpcpkflangpghf?label=chrome%20web%20store" alt="chrome web store version">
@@ -953,13 +953,13 @@
           if (!alert || !message) return;
 
           const versions = await fetchPublishedVersions();
-          const packageVersion = versions.package;
-          if (!packageVersion) return;
+          const releaseVersion = versions.release;
+          if (!releaseVersion) return;
 
           const pendingStores = [
             ["chrome", versions.chrome],
             ["firefox", versions.firefox]
-          ].filter(([, version]) => version && normalizeVersion(version) !== normalizeVersion(packageVersion));
+          ].filter(([, version]) => version && normalizeVersion(version) !== normalizeVersion(releaseVersion));
 
           if (!pendingStores.length) return;
 
@@ -1196,7 +1196,7 @@
 
         async function fetchPublishedVersions() {
           const sources = {
-            package: "https://img.shields.io/github/package-json/v/chat-enhancer-yt/youtube-chat-qol.json?label=source",
+            release: "https://img.shields.io/github/v/release/chat-enhancer-yt/youtube-chat-qol.json?label=release",
             chrome: "https://img.shields.io/chrome-web-store/v/pkhaaipeppfpakofgpdpcpkflangpghf.json?label=chrome%20web%20store",
             firefox: "https://img.shields.io/amo/v/chat-enhancer-for-youtube.json?label=firefox%20add-ons"
           };

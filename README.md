@@ -7,7 +7,7 @@
 <p>
   <a href="https://www.chatenhancer.com/chrome"><img alt="chrome" src="https://img.shields.io/chrome-web-store/v/pkhaaipeppfpakofgpdpcpkflangpghf?label=chrome&color=4285f4"></a>
   <a href="https://www.chatenhancer.com/firefox"><img alt="firefox" src="https://img.shields.io/amo/v/chat-enhancer-for-youtube?label=firefox&color=ff7139"></a>
-  <img alt="source version" src="https://img.shields.io/github/package-json/v/chat-enhancer-yt/youtube-chat-qol?label=source&color=fd0032">
+  <img alt="release" src="https://img.shields.io/github/v/release/chat-enhancer-yt/youtube-chat-qol?label=release&color=fd0032">
   <a href="https://github.com/chat-enhancer-yt/youtube-chat-qol/actions/workflows/ci.yml"><img alt="CI" src="https://img.shields.io/github/actions/workflow/status/chat-enhancer-yt/youtube-chat-qol/ci.yml?label=ci"></a>
   <img alt="coverage" src="https://img.shields.io/endpoint?url=https%3A%2F%2Fwww.chatenhancer.com%2Fbadges%2Funit-coverage.json">
   <img alt="manifest v3" src="https://img.shields.io/badge/manifest-v3-6b7280">
@@ -119,20 +119,7 @@ npm run build:firefox
 The release workflow builds Chrome, Edge, Firefox, and source archives, then attaches them to a GitHub Release.
 Store submission only runs for exact `vX.Y.Z` tags that match the `package.json` version.
 
-Store submission is automatic on tags when these repository settings are present:
-
-- Repository variables:
-  - `CHROME_WEBSTORE_EXTENSION_ID`
-  - `CHROME_WEBSTORE_PUBLISHER_ID`
-  - `FIREFOX_AMO_ADDON_ID`
-  - optional `FIREFOX_AMO_APPROVAL_NOTES`
-  - optional `FIREFOX_AMO_RELEASE_NOTES`
-- Repository secrets:
-  - `CHROME_WEBSTORE_SERVICE_ACCOUNT_JSON`
-  - `FIREFOX_AMO_API_KEY`
-  - `FIREFOX_AMO_API_SECRET`
-
-If those settings are missing, the workflow still produces release zips and skips store submission.
+Store submission is automatic on tags when maintainer store credentials are configured. If store credentials are missing, the workflow still produces release zips and skips store submission.
 
 ## License
 
