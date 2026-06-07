@@ -119,7 +119,10 @@ export function isMessageAuthorMarked(message: HTMLElement): boolean {
 
 export function getMessageAuthorMarkTitle(message: HTMLElement): string {
   const identity = getMarkedUserIdentityFromMessage(message);
-  return identity ? getMarkedUserActionTitle(identity) : t('markUser');
+  if (!identity) return t('markUser');
+
+  const compactLabel = isMarkedUser(identity) ? t('unmarkUser') : t('markUser');
+  return getMarkedUserActionTitle(identity, compactLabel);
 }
 
 export async function toggleMessageAuthorMark(message: HTMLElement): Promise<boolean> {
@@ -222,7 +225,7 @@ function renderMarkedUserParticipantRing(participant: HTMLElement): void {
 
 function updateMarkedUserToggleButton(button: HTMLButtonElement, identity: MarkedUserIdentity): void {
   const marked = isMarkedUser(identity);
-  const label = marked ? t('unmarkUser') : t('markUser');
+  const label = marked ? t('removeBookmark') : t('bookmarkUser');
   button.title = getMarkedUserActionTitle(identity, label);
   button.setAttribute('aria-label', label);
   button.classList.toggle('ytcq-marked-user-toggle-active', marked);
@@ -288,7 +291,7 @@ function replaceMarkedUsers(records: Map<string, MarkedUserRecord>): void {
   records.forEach((record, key) => markedUsers.set(key, record));
 }
 
-function getMarkedUserActionTitle(identity: MarkedUserIdentity, label = isMarkedUser(identity) ? t('unmarkUser') : t('markUser')): string {
+function getMarkedUserActionTitle(identity: MarkedUserIdentity, label = isMarkedUser(identity) ? t('removeBookmark') : t('bookmarkUser')): string {
   const record = getMarkedUserRecord(identity);
   if (!record) return label;
 

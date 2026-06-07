@@ -31,6 +31,8 @@
     "lessThanOneMinute": "meno di 1 min",
     "markUser": "Contrassegna",
     "unmarkUser": "Rimuovi",
+    "bookmarkUser": "Aggiungi segnalibro",
+    "removeBookmark": "Rimuovi segnalibro",
     "mention": "Menziona",
     "mentionUser": "Menziona utente",
     "mentionUserTitle": "Menziona utente. Alt/Option-clic per citare.",
@@ -257,7 +259,7 @@
       "message": "Disattivato"
     },
     "popupResetConfirm": {
-      "message": "Reimpostare le impostazioni di Chat Enhancer e cancellare tutti i dati locali dell'estensione?\n\nInclude messaggi della posta in arrivo, parole chiave monitorate, emoji frequenti, bozze non inviate e utenti contrassegnati."
+      "message": "Reimpostare le impostazioni di Chat Enhancer e cancellare tutti i dati locali dell’estensione?\n\nQuesto include messaggi dell’inbox, parole chiave monitorate, emoji frequenti, bozze non inviate, utenti aggiunti ai segnalibri."
     },
     "popupResetComplete": {
       "message": "Chat Enhancer e stato reimpostato."
@@ -278,13 +280,13 @@
       "message": "{count} segnalibri"
     },
     "bookmarkedUsersEmpty": {
-      "message": "Gli utenti che segni dalla chat di YouTube appariranno qui."
+      "message": "Gli utenti che aggiungi ai segnalibri dalla chat di YouTube appariranno qui."
     },
     "markedUserDate": {
-      "message": "Segnato il {date}"
+      "message": "Aggiunto ai segnalibri il {date}"
     },
     "markedDateUnknown": {
-      "message": "Data sconosciuta"
+      "message": "Data del segnalibro sconosciuta"
     },
     "unknownStream": {
       "message": "Live sconosciuta"
@@ -303,6 +305,12 @@
     },
     "markUser": {
       "message": "Contrassegna"
+    },
+    "bookmarkUser": {
+      "message": "Aggiungi segnalibro"
+    },
+    "removeBookmark": {
+      "message": "Rimuovi segnalibro"
     }
   }
 }

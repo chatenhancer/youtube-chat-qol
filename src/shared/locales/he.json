@@ -31,6 +31,8 @@
     "lessThanOneMinute": "פחות מדקה",
     "markUser": "סמן",
     "unmarkUser": "בטל",
+    "bookmarkUser": "הוסף לסימניות",
+    "removeBookmark": "הסר מסימניות",
     "mention": "אזכור",
     "mentionUser": "אזכור משתמש",
     "mentionUserTitle": "אזכור משתמש. Alt/Option-קליק כדי לצטט.",
@@ -254,7 +256,7 @@
       "message": "כבוי"
     },
     "popupResetConfirm": {
-      "message": "לאפס את הגדרות Chat Enhancer ולנקות את כל נתוני התוסף המקומיים?\n\nזה כולל הודעות בתיבה, מילות מפתח במעקב, אימוג׳ים נפוצים, טיוטות שלא נשלחו ומשתמשים שסומנו."
+      "message": "לאפס את הגדרות Chat Enhancer ולמחוק את כל הנתונים המקומיים של התוסף?\n\nזה כולל הודעות בתיבה, מילות מפתח במעקב, אימוג׳ים נפוצים, טיוטות שלא נשלחו, משתמשים שנוספו לסימניות."
     },
     "popupResetComplete": {
       "message": "Chat Enhancer אופס."
@@ -275,13 +277,13 @@
       "message": "{count} סימניות"
     },
     "bookmarkedUsersEmpty": {
-      "message": "משתמשים שתסמנו מצ׳אט YouTube יופיעו כאן."
+      "message": "משתמשים שתוסיפו לסימניות מצ׳אט YouTube יופיעו כאן."
     },
     "markedUserDate": {
-      "message": "סומן ב-{date}"
+      "message": "נוסף לסימניות ב-{date}"
     },
     "markedDateUnknown": {
-      "message": "תאריך לא ידוע"
+      "message": "תאריך הסימנייה לא ידוע"
     },
     "unknownStream": {
       "message": "שידור לא ידוע"
@@ -300,6 +302,12 @@
     },
     "markUser": {
       "message": "סמן"
+    },
+    "bookmarkUser": {
+      "message": "הוסף לסימניות"
+    },
+    "removeBookmark": {
+      "message": "הסר מסימניות"
     }
   }
 }

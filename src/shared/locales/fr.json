@@ -31,6 +31,8 @@
     "lessThanOneMinute": "moins de 1 min",
     "markUser": "Marquer",
     "unmarkUser": "Retirer",
+    "bookmarkUser": "Ajouter aux favoris",
+    "removeBookmark": "Retirer des favoris",
     "mention": "Mentionner",
     "mentionUser": "Mentionner l'utilisateur",
     "mentionUserTitle": "Mentionner l'utilisateur. Alt/Option-clic pour citer.",
@@ -254,7 +256,7 @@
       "message": "Désactivé"
     },
     "popupResetConfirm": {
-      "message": "Réinitialiser les réglages de Chat Enhancer et effacer toutes les données locales de l'extension ?\n\nCela inclut les messages de la boîte de réception, les mots-clés surveillés, les emojis fréquents, les brouillons non envoyés et les utilisateurs marqués."
+      "message": "Réinitialiser les paramètres de Chat Enhancer et effacer toutes les données locales de l’extension ?\n\nCela inclut les messages de la boîte de réception, les mots-clés surveillés, les emojis fréquents, les brouillons non envoyés, les utilisateurs ajoutés aux favoris."
     },
     "popupResetComplete": {
       "message": "Chat Enhancer a été réinitialisé."
@@ -275,13 +277,13 @@
       "message": "{count} favoris"
     },
     "bookmarkedUsersEmpty": {
-      "message": "Les utilisateurs que vous marquez dans le chat YouTube apparaîtront ici."
+      "message": "Les utilisateurs que vous ajoutez aux favoris depuis le chat YouTube apparaîtront ici."
     },
     "markedUserDate": {
-      "message": "Marqué le {date}"
+      "message": "Ajouté aux favoris le {date}"
     },
     "markedDateUnknown": {
-      "message": "Date inconnue"
+      "message": "Date d’ajout aux favoris inconnue"
     },
     "unknownStream": {
       "message": "Stream inconnu"
@@ -300,6 +302,12 @@
     },
     "markUser": {
       "message": "Marquer"
+    },
+    "bookmarkUser": {
+      "message": "Ajouter aux favoris"
+    },
+    "removeBookmark": {
+      "message": "Retirer des favoris"
     }
   }
 }

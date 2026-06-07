@@ -361,7 +361,7 @@ describe('popup', () => {
       [MARKED_USERS_STORAGE_KEY]: {}
     });
     expect(document.querySelector('.bookmark-row')?.classList.contains('bookmark-row-unmarked')).toBe(true);
-    expect(document.querySelector<HTMLButtonElement>('.bookmark-action-button')?.title).toBe('markUser');
+    expect(document.querySelector<HTMLButtonElement>('.bookmark-action-button')?.title).toBe('bookmarkUser');
 
     document.querySelector<HTMLButtonElement>('.bookmark-action-button')?.click();
     await expect(chrome.storage.local.get(MARKED_USERS_STORAGE_KEY)).resolves.toEqual({

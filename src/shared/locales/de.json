@@ -31,6 +31,8 @@
     "lessThanOneMinute": "weniger als 1 Min.",
     "markUser": "Markieren",
     "unmarkUser": "Entfernen",
+    "bookmarkUser": "Lesezeichen setzen",
+    "removeBookmark": "Lesezeichen entfernen",
     "mention": "Erwähnen",
     "mentionUser": "Nutzer erwähnen",
     "mentionUserTitle": "Nutzer erwähnen. Alt/Option-Klick zum Zitieren.",
@@ -254,7 +256,7 @@
       "message": "Aus"
     },
     "popupResetConfirm": {
-      "message": "Chat Enhancer-Einstellungen zurücksetzen und alle lokalen Erweiterungsdaten löschen?\n\nDazu gehören Inbox-Nachrichten, beobachtete Schlüsselwörter, häufige Emojis, ungesendete Entwürfe und markierte Nutzer."
+      "message": "Chat Enhancer-Einstellungen zurücksetzen und alle lokalen Erweiterungsdaten löschen?\n\nDazu gehören Inbox-Nachrichten, beobachtete Keywords, häufige Emojis, ungesendete Entwürfe, als Lesezeichen gespeicherte Nutzer."
     },
     "popupResetComplete": {
       "message": "Chat Enhancer wurde zurückgesetzt."
@@ -275,13 +277,13 @@
       "message": "{count} Lesezeichen"
     },
     "bookmarkedUsersEmpty": {
-      "message": "Nutzer, die du im YouTube-Chat markierst, erscheinen hier."
+      "message": "Nutzer, die du im YouTube-Chat als Lesezeichen speicherst, erscheinen hier."
     },
     "markedUserDate": {
-      "message": "Markiert am {date}"
+      "message": "Als Lesezeichen gespeichert am {date}"
     },
     "markedDateUnknown": {
-      "message": "Datum unbekannt"
+      "message": "Lesezeichendatum unbekannt"
     },
     "unknownStream": {
       "message": "Unbekannter Stream"
@@ -300,6 +302,12 @@
     },
     "markUser": {
       "message": "Markieren"
+    },
+    "bookmarkUser": {
+      "message": "Lesezeichen setzen"
+    },
+    "removeBookmark": {
+      "message": "Lesezeichen entfernen"
     }
   }
 }

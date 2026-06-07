@@ -31,6 +31,8 @@
     "lessThanOneMinute": "mniej niż 1 min",
     "markUser": "Oznacz",
     "unmarkUser": "Usuń",
+    "bookmarkUser": "Dodaj zakładkę",
+    "removeBookmark": "Usuń zakładkę",
     "mention": "Wspomnij",
     "mentionUser": "Wspomnij użytkownika",
     "mentionUserTitle": "Wspomnij użytkownika. Alt/Option-klik, aby zacytować.",
@@ -254,7 +256,7 @@
       "message": "Wyłączone"
     },
     "popupResetConfirm": {
-      "message": "Zresetować ustawienia Chat Enhancer i wyczyścić wszystkie lokalne dane rozszerzenia?\n\nObejmuje to wiadomości w skrzynce, obserwowane słowa kluczowe, częste emoji, niewysłane wersje robocze i oznaczonych użytkowników."
+      "message": "Zresetować ustawienia Chat Enhancer i wyczyścić wszystkie lokalne dane rozszerzenia?\n\nObejmuje to wiadomości w skrzynce, obserwowane słowa kluczowe, częste emoji, niewysłane wersje robocze, użytkowników dodanych do zakładek."
     },
     "popupResetComplete": {
       "message": "Chat Enhancer został zresetowany."
@@ -275,13 +277,13 @@
       "message": "{count} zakładek"
     },
     "bookmarkedUsersEmpty": {
-      "message": "Użytkownicy oznaczeni w czacie YouTube pojawią się tutaj."
+      "message": "Użytkownicy dodani do zakładek z czatu YouTube pojawią się tutaj."
     },
     "markedUserDate": {
-      "message": "Oznaczono {date}"
+      "message": "Dodano do zakładek {date}"
     },
     "markedDateUnknown": {
-      "message": "Data nieznana"
+      "message": "Data zakładki nieznana"
     },
     "unknownStream": {
       "message": "Nieznana transmisja"
@@ -300,6 +302,12 @@
     },
     "markUser": {
       "message": "Oznacz"
+    },
+    "bookmarkUser": {
+      "message": "Dodaj zakładkę"
+    },
+    "removeBookmark": {
+      "message": "Usuń zakładkę"
     }
   }
 }

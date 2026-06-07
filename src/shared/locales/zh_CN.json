@@ -31,6 +31,8 @@
     "lessThanOneMinute": "少于 1 分钟",
     "markUser": "标记",
     "unmarkUser": "取消",
+    "bookmarkUser": "加入书签",
+    "removeBookmark": "移除书签",
     "mention": "提及",
     "mentionUser": "提及用户",
     "mentionUserTitle": "提及用户。Alt/Option 点击可引用。",
@@ -257,7 +259,7 @@
       "message": "关闭"
     },
     "popupResetConfirm": {
-      "message": "重置 Chat Enhancer 设置并清除所有本地扩展数据？\n\n这包括收件箱消息、关注的关键词、常用表情、未发送草稿和已标记用户。"
+      "message": "要重置 Chat Enhancer 设置并清除所有本地扩展数据吗？\n\n这包括收件箱消息、关注的关键词、常用表情、未发送草稿、已加入书签的用户。"
     },
     "popupResetComplete": {
       "message": "Chat Enhancer 已重置。"
@@ -278,13 +280,13 @@
       "message": "{count} 个书签"
     },
     "bookmarkedUsersEmpty": {
-      "message": "你在 YouTube 聊天中标记的用户会显示在这里。"
+      "message": "你从 YouTube 聊天中加入书签的用户会显示在这里。"
     },
     "markedUserDate": {
-      "message": "标记于 {date}"
+      "message": "已于 {date} 加入书签"
     },
     "markedDateUnknown": {
-      "message": "日期未知"
+      "message": "书签日期未知"
     },
     "unknownStream": {
       "message": "未知直播"
@@ -303,6 +305,12 @@
     },
     "markUser": {
       "message": "标记"
+    },
+    "bookmarkUser": {
+      "message": "加入书签"
+    },
+    "removeBookmark": {
+      "message": "移除书签"
     }
   }
 }

@@ -31,6 +31,8 @@
     "lessThanOneMinute": "1 मिनट से कम",
     "markUser": "मार्क",
     "unmarkUser": "हटाएं",
+    "bookmarkUser": "बुकमार्क करें",
+    "removeBookmark": "बुकमार्क हटाएं",
     "mention": "मेंशन",
     "mentionUser": "यूज़र को मेंशन करें",
     "mentionUserTitle": "यूज़र को मेंशन करें. कोट करने के लिए Alt/Option-क्लिक करें.",
@@ -257,7 +259,7 @@
       "message": "बंद"
     },
     "popupResetConfirm": {
-      "message": "Chat Enhancer सेटिंग रीसेट करें और सभी स्थानीय एक्सटेंशन डेटा साफ करें?\n\nइसमें इनबॉक्स संदेश, देखे जा रहे कीवर्ड, बार-बार इस्तेमाल होने वाले इमोजी, नहीं भेजे गए ड्राफ़्ट और मार्क किए गए उपयोगकर्ता शामिल हैं."
+      "message": "Chat Enhancer सेटिंग रीसेट करके सभी स्थानीय एक्सटेंशन डेटा साफ़ करें?\n\nइसमें इनबॉक्स संदेश, देखे जा रहे कीवर्ड, अक्सर इस्तेमाल किए गए इमोजी, नहीं भेजे गए ड्राफ़्ट, बुकमार्क किए गए उपयोगकर्ता शामिल हैं।"
     },
     "popupResetComplete": {
       "message": "Chat Enhancer रीसेट हो गया है."
@@ -278,13 +280,13 @@
       "message": "{count} बुकमार्क"
     },
     "bookmarkedUsersEmpty": {
-      "message": "YouTube चैट से जिन उपयोगकर्ताओं को आप मार्क करेंगे, वे यहां दिखेंगे."
+      "message": "YouTube चैट से जिन उपयोगकर्ताओं को आप बुकमार्क करेंगे, वे यहां दिखेंगे."
     },
     "markedUserDate": {
-      "message": "{date} को मार्क किया गया"
+      "message": "{date} को बुकमार्क किया गया"
     },
     "markedDateUnknown": {
-      "message": "तारीख अज्ञात"
+      "message": "बुकमार्क की तारीख अज्ञात"
     },
     "unknownStream": {
       "message": "अज्ञात स्ट्रीम"
@@ -303,6 +305,12 @@
     },
     "markUser": {
       "message": "मार्क"
+    },
+    "bookmarkUser": {
+      "message": "बुकमार्क करें"
+    },
+    "removeBookmark": {
+      "message": "बुकमार्क हटाएं"
     }
   }
 }

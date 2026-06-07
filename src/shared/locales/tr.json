@@ -31,6 +31,8 @@
     "lessThanOneMinute": "1 dakikadan az",
     "markUser": "İşaretle",
     "unmarkUser": "Kaldır",
+    "bookmarkUser": "Yer işaretine ekle",
+    "removeBookmark": "Yer işaretini kaldır",
     "mention": "Bahset",
     "mentionUser": "Kullanıcıdan bahset",
     "mentionUserTitle": "Kullanıcıdan bahset. Alıntı yapmak için Alt/Option-tıkla.",
@@ -257,7 +259,7 @@
       "message": "Kapalı"
     },
     "popupResetConfirm": {
-      "message": "Chat Enhancer ayarları sıfırlansın ve tüm yerel uzantı verileri temizlensin mi?\n\nBuna gelen kutusu mesajları, izlenen anahtar kelimeler, sık kullanılan emojiler, gönderilmemiş taslaklar ve işaretlenen kullanıcılar dahildir."
+      "message": "Chat Enhancer ayarları sıfırlansın ve tüm yerel uzantı verileri temizlensin mi?\n\nBuna gelen kutusu mesajları, izlenen anahtar kelimeler, sık kullanılan emojiler, gönderilmemiş taslaklar, yer işaretine eklenen kullanıcılar dahildir."
     },
     "popupResetComplete": {
       "message": "Chat Enhancer sıfırlandı."
@@ -278,13 +280,13 @@
       "message": "{count} yer imi"
     },
     "bookmarkedUsersEmpty": {
-      "message": "YouTube sohbetinde işaretlediğiniz kullanıcılar burada görünür."
+      "message": "YouTube sohbetinden yer işaretine eklediğiniz kullanıcılar burada görünür."
     },
     "markedUserDate": {
-      "message": "{date} tarihinde işaretlendi"
+      "message": "{date} tarihinde yer işaretine eklendi"
     },
     "markedDateUnknown": {
-      "message": "Tarih bilinmiyor"
+      "message": "Yer işareti tarihi bilinmiyor"
     },
     "unknownStream": {
       "message": "Bilinmeyen yayın"
@@ -303,6 +305,12 @@
     },
     "markUser": {
       "message": "İşaretle"
+    },
+    "bookmarkUser": {
+      "message": "Yer işaretine ekle"
+    },
+    "removeBookmark": {
+      "message": "Yer işaretini kaldır"
     }
   }
 }
