@@ -64,6 +64,17 @@ describe('focus mode translation rendering', () => {
     expect(item.classList.contains('ytcq-translation-replaced')).toBe(true);
     expect(bubble.classList.contains('ytcq-translation-replaced-text')).toBe(true);
     expect(bubble.textContent).toContain('thank you');
+
+    bubble.querySelector<HTMLButtonElement>('.ytcq-replaced-translation-icon')?.click();
+
+    expect(item.dataset.ytcqTranslationView).toBe('original');
+    expect(bubble.textContent).toContain('gracias');
+    expect(bubble.title).toBe('Translated: thank you');
+
+    bubble.querySelector<HTMLButtonElement>('.ytcq-replaced-translation-icon')?.click();
+
+    expect(item.dataset.ytcqTranslationView).toBe('translated');
+    expect(bubble.textContent).toContain('thank you');
   });
 
   it('hides stale translations for a different target language', () => {

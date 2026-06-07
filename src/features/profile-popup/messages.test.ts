@@ -141,6 +141,18 @@ describe('profile card message renderer', () => {
     expect(text.lang).toBe('en');
     expect(text.textContent).toContain('hello');
     expect(text.title).toContain('hola');
+
+    text.querySelector<HTMLButtonElement>('.ytcq-replaced-translation-icon')?.click();
+
+    expect(item.dataset.ytcqTranslationView).toBe('original');
+    expect(text.textContent).toContain('hola');
+    expect(text.title).toBe('Translated: hello');
+    expect(replyMocks.quoteAuthorRichText).not.toHaveBeenCalled();
+
+    text.querySelector<HTMLButtonElement>('.ytcq-replaced-translation-icon')?.click();
+
+    expect(item.dataset.ytcqTranslationView).toBe('translated');
+    expect(text.textContent).toContain('hello');
   });
 
   it('hides stale or unchanged profile translations', () => {

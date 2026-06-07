@@ -45,6 +45,39 @@ describe('translation rendering', () => {
     expect(message.querySelector('#message')?.textContent).toBe('gracias');
   });
 
+  it('toggles replaced translations between translated and original text from the icon', () => {
+    setOptions({ ...DEFAULT_OPTIONS, targetLanguage: 'en', translationDisplay: 'replace' });
+    const message = createMessage('gracias <img alt=":wave:" src="https://example.test/wave.png">');
+    document.body.appendChild(message);
+
+    expect(renderTranslation(message, result({ targetLanguage: 'en', text: 'thank you §0§' }), 'gracias :wave:', [
+      {
+        fallbackText: ':wave:',
+        node: null,
+        nodes: [message.querySelector('img')!.cloneNode(true)],
+        placeholder: '§0§'
+      }
+    ])).toBe(true);
+
+    expect(message.dataset.ytcqTranslationView).toBe('translated');
+    expect(message.querySelector('#message')?.textContent).toContain('thank you');
+    expect(message.querySelector('#message')?.getAttribute('title')).toBe('Original (Spanish): gracias :wave:');
+
+    message.querySelector<HTMLButtonElement>('.ytcq-replaced-translation-icon')?.click();
+
+    expect(message.dataset.ytcqTranslationView).toBe('original');
+    expect(message.querySelector('#message')?.textContent).toContain('gracias');
+    expect(message.querySelector('#message')?.getAttribute('title')).toBe('Translated: thank you :wave:');
+    expect(message.querySelector('#message img')?.getAttribute('alt')).toBe(':wave:');
+    expect(message.querySelector<HTMLButtonElement>('.ytcq-replaced-translation-icon')?.title).toBe('Translated message');
+
+    message.querySelector<HTMLButtonElement>('.ytcq-replaced-translation-icon')?.click();
+
+    expect(message.dataset.ytcqTranslationView).toBe('translated');
+    expect(message.querySelector('#message')?.textContent).toContain('thank you');
+    expect(message.querySelector<HTMLButtonElement>('.ytcq-replaced-translation-icon')?.title).toBe('Original message');
+  });
+
   it('does not render unchanged or disconnected translations', () => {
     const message = createMessage('hello');
 
@@ -184,7 +217,7 @@ describe('translation rendering', () => {
       'hola §0§'
     )).toBe(true);
     expect(createInlineTranslationElement(result({ text: 'hello' })).textContent).toContain('hello');
-    expect(getReplacementTranslationTitle(result({ sourceLanguage: 'es', text: 'hello' }), 'hola')).toContain('hola');
+    expect(getReplacementTranslationTitle(result({ sourceLanguage: 'es', text: 'hello' }), 'hola')).toBe('Original (Spanish): hola');
   });
 });
 

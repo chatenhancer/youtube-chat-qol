@@ -12,6 +12,7 @@ import { getOptions } from '../../shared/state';
 import { normalizeComparableText } from '../../shared/text';
 import {
   getMessageTextElement,
+  getStoredOriginalMessage,
   rememberOriginalMessageText,
   restoreReplacedTranslation
 } from '../../youtube/messages';
@@ -32,6 +33,25 @@ interface ChatScrollerSnapshot {
   wasAtTop: boolean;
   wasAtBottom: boolean;
 }
+
+export type ReplacedTranslationView = 'original' | 'translated';
+
+interface ReplacedTranslationState {
+  originalText: string;
+  protectedTokens: ProtectedToken[];
+  result: TranslationResult;
+}
+
+interface ToggleableReplacementTranslationOptions {
+  host: HTMLElement;
+  originalText: string;
+  protectedTokens?: ProtectedToken[];
+  renderOriginal: (target: HTMLElement) => void;
+  result: TranslationResult;
+  textElement: HTMLElement;
+}
+
+const replacedTranslationStates = new WeakMap<HTMLElement, ReplacedTranslationState>();
 
 export function renderTranslation(
   message: HTMLElement,
@@ -55,7 +75,10 @@ export function renderTranslation(
 
 export function clearTranslationRenderings(): void {
   const scrollerSnapshot = captureChatScrollerSnapshot();
-  document.querySelectorAll('.ytcq-translation-replaced').forEach(restoreReplacedTranslation);
+  document.querySelectorAll('.ytcq-translation-replaced').forEach((message) => {
+    if (message instanceof HTMLElement) replacedTranslationStates.delete(message);
+    restoreReplacedTranslation(message);
+  });
   document.querySelectorAll('.ytcq-translation').forEach((node) => node.remove());
   document.querySelectorAll<HTMLElement>('[data-ytcq-translation-key]')
     .forEach((message) => delete message.dataset.ytcqTranslationKey);
@@ -64,6 +87,7 @@ export function clearTranslationRenderings(): void {
 
 export function removeTranslation(message: HTMLElement): void {
   message.querySelector(':scope .ytcq-translation')?.remove();
+  replacedTranslationStates.delete(message);
   restoreReplacedTranslation(message);
 }
 
@@ -102,11 +126,12 @@ function renderReplacementTranslation(
 
   message.classList.add('ytcq-translation-replaced');
   message.dataset.ytcqReplacedTranslation = 'true';
-  messageText.classList.add('ytcq-translation-replaced-text');
-  messageText.lang = result.targetLanguage;
-  messageText.title = getReplacementTranslationTitle(result, originalText);
-  messageText.replaceChildren(...createNodesWithPlaceholders(result.text, protectedTokens));
-  messageText.appendChild(createReplacedTranslationIcon());
+  replacedTranslationStates.set(message, {
+    originalText,
+    protectedTokens,
+    result
+  });
+  renderReplacedTranslationView(message, 'translated');
 }
 
 export function createInlineTranslationElement(
@@ -144,14 +169,79 @@ export function isMeaningfulTranslation(
 export function getReplacementTranslationTitle(result: TranslationResult, originalText: string): string {
   if (!originalText) return t('originalMessage');
   return hasReliableSourceLanguage(result)
-    ? t('translatedFromOriginal', { language: getLocalizedLanguageLabel(result.sourceLanguage), text: originalText })
+    ? t('originalWithLanguage', { language: getLocalizedLanguageLabel(result.sourceLanguage), text: originalText })
     : t('original', { text: originalText });
 }
 
-export function createReplacedTranslationIcon(): HTMLElement {
-  const icon = ytcqCreateElement('span');
+export function getOriginalReplacementTitle(
+  result: TranslationResult,
+  protectedTokens: ProtectedToken[] = []
+): string {
+  const translatedText = restorePlaceholdersToText(result.text, protectedTokens).trim();
+  return translatedText ? `${t('translated')} ${translatedText}` : t('translatedMessage');
+}
+
+export function renderToggleableReplacementTranslation({
+  host,
+  originalText,
+  protectedTokens = [],
+  renderOriginal,
+  result,
+  textElement
+}: ToggleableReplacementTranslationOptions): void {
+  const renderView = (view: ReplacedTranslationView): void => {
+    host.classList.add('ytcq-translation-replaced');
+    host.dataset.ytcqTranslationView = view;
+    textElement.classList.add('ytcq-translation-replaced-text');
+
+    if (view === 'original') {
+      textElement.removeAttribute('lang');
+      textElement.title = getOriginalReplacementTitle(result, protectedTokens);
+      textElement.replaceChildren();
+      renderOriginal(textElement);
+      textElement.append(createReplacedTranslationIcon({
+        onToggle: () => renderView('translated'),
+        view
+      }));
+      return;
+    }
+
+    textElement.lang = result.targetLanguage;
+    textElement.title = getReplacementTranslationTitle(result, originalText);
+    textElement.replaceChildren(
+      ...createNodesWithPlaceholders(result.text, protectedTokens),
+      createReplacedTranslationIcon({
+        onToggle: () => renderView('original'),
+        view
+      })
+    );
+  };
+
+  renderView('translated');
+}
+
+export function createReplacedTranslationIcon({
+  onToggle,
+  view = 'translated'
+}: {
+  onToggle?: (event: MouseEvent) => void;
+  view?: ReplacedTranslationView;
+} = {}): HTMLElement {
+  const icon = onToggle ? ytcqCreateElement('button') : ytcqCreateElement('span');
   icon.className = 'ytcq-replaced-translation-icon';
-  icon.setAttribute('aria-hidden', 'true');
+  icon.title = view === 'translated' ? t('originalMessage') : t('translatedMessage');
+  icon.dataset.ytcqTranslationView = view;
+  if (icon instanceof HTMLButtonElement) {
+    icon.type = 'button';
+    icon.setAttribute('aria-label', icon.title);
+    icon.addEventListener('click', (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      onToggle?.(event);
+    });
+  } else {
+    icon.setAttribute('aria-hidden', 'true');
+  }
   icon.appendChild(createTranslationSvgIcon());
   return icon;
 }
@@ -163,6 +253,47 @@ function createTranslationSvgIcon(): SVGSVGElement {
 function hasReliableSourceLanguage(result: TranslationResult): boolean {
   if (!result.sourceLanguage || !result.targetLanguage) return false;
   return normalizeLanguageCode(result.sourceLanguage) !== normalizeLanguageCode(result.targetLanguage);
+}
+
+function renderReplacedTranslationView(message: HTMLElement, view: ReplacedTranslationView): void {
+  const messageText = getMessageTextElement(message);
+  const state = replacedTranslationStates.get(message);
+  if (!messageText || !state) return;
+
+  if (view === 'original') {
+    const original = getStoredOriginalMessage(message);
+    if (!original) return;
+
+    messageText.replaceChildren(
+      ...original.childNodes.map((node) => node.cloneNode(true)),
+      createReplacedTranslationIcon({
+        onToggle: () => renderReplacedTranslationView(message, 'translated'),
+        view: 'original'
+      })
+    );
+    messageText.className = original.className;
+    messageText.classList.add('ytcq-translation-replaced-text');
+    if (original.hadLang && original.lang !== null) {
+      messageText.setAttribute('lang', original.lang);
+    } else {
+      messageText.removeAttribute('lang');
+    }
+    messageText.title = getOriginalReplacementTitle(state.result, state.protectedTokens);
+    message.dataset.ytcqTranslationView = 'original';
+    return;
+  }
+
+  messageText.replaceChildren(
+    ...createNodesWithPlaceholders(state.result.text, state.protectedTokens),
+    createReplacedTranslationIcon({
+      onToggle: () => renderReplacedTranslationView(message, 'original'),
+      view: 'translated'
+    })
+  );
+  messageText.classList.add('ytcq-translation-replaced-text');
+  messageText.lang = state.result.targetLanguage;
+  messageText.title = getReplacementTranslationTitle(state.result, state.originalText);
+  message.dataset.ytcqTranslationView = 'translated';
 }
 
 function normalizeLanguageCode(language: string): string {

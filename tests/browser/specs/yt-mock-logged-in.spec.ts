@@ -29,6 +29,7 @@ import {
 import { markedUserMessageMenuScenario } from '../scenarios/marked-users';
 import {
   mockedMessageTranslationScenario,
+  replacedTranslationToggleSurfacesScenario,
   translationDisplayScenario,
   translationSettingsReactScenario
 } from '../scenarios/message-translation';
@@ -65,6 +66,7 @@ test('logged-in mock: extension popup settings persist options', popupSettingsBe
 test('logged-in mock: popup reset restores defaults and clears local data', popupResetScenario);
 test('logged-in mock: incoming chat messages are translated', mockedMessageTranslationScenario);
 test('logged-in mock: translation display modes render correctly', translationDisplayScenario);
+test('logged-in mock: replaced translations toggle across chat surfaces', replacedTranslationToggleSurfacesScenario);
 test('logged-in mock: translate chat setting reacts live', translationSettingsReactScenario);
 test('logged-in mock: background tab alert updates title and favicon', tabAlertScenario);
 test('logged-in mock: focus panel opens from an author and follows their messages', focusPanelOpensFromAuthorScenario);
