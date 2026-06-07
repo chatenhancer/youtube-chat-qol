@@ -13,6 +13,7 @@ import '../features/chat-drafts';
 import '../features/chat-commands';
 import '../features/composer-translation';
 import '../features/user-message-history';
+import '../features/mention-detection';
 import '../features/focus-mode';
 import '../features/live-edge';
 import '../features/marked-users';
