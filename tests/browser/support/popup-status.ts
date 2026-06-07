@@ -12,9 +12,11 @@ export async function expectPopupReportsConnectedStatus(
 
   try {
     await popup.goto(`chrome-extension://${extensionId}/popup.html`);
-    await expect(popup.locator('[data-extension-status]')).toHaveAttribute('data-extension-status', 'active');
-    await expect(popup.locator('[data-extension-status-helper]')).toContainText(/connected/i);
-    await expect(popup.locator('[data-extension-status-helper]')).not.toContainText(/not connected/i);
+    const status = popup.locator('[data-extension-status]');
+    await expect(status).toHaveAttribute('data-extension-status', 'active');
+    await expect(status).toContainText(/Active/i);
+    await expect(status).toHaveAttribute('title', /^Extension connected/i);
+    await expect(status).not.toHaveAttribute('title', /not connected/i);
   } finally {
     await popup.close();
   }

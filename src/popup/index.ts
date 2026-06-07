@@ -20,6 +20,7 @@ import {
   serializeMarkedUsers,
   type MarkedUserRecord
 } from '../shared/marked-users';
+import { KNOWN_CHAT_TABS_STORAGE_KEY } from '../shared/known-chat-tabs';
 import { playSoftChime } from '../shared/sounds/soft-chime';
 import { DEFAULT_OPTIONS, getTargetLanguageUpdate, normalizeOptions, type Options } from '../shared/options';
 import contact from '../shared/contact.json';
@@ -49,7 +50,6 @@ const controls = {
   tabPanels: Array.from(document.querySelectorAll<HTMLElement>('[data-popup-tab-panel]')),
   extensionStatus: document.querySelector<HTMLElement>('[data-extension-status]'),
   extensionStatusText: document.querySelector<HTMLElement>('[data-extension-status-text]'),
-  extensionStatusHelper: document.querySelector<HTMLElement>('[data-extension-status-helper]'),
   bookmarksCount: document.querySelector<HTMLElement>('#bookmarksCount'),
   bookmarksList: document.querySelector<HTMLElement>('#bookmarksList'),
   targetLanguage: document.querySelector<HTMLSelectElement>('#targetLanguage'),
@@ -67,15 +67,15 @@ init();
 function init(): void {
   const popupLocale = localizePopup();
   initPopupTabs();
+  initExtensionStatus();
   initBookmarksPanel();
-  refreshExtensionStatus();
 
   if (!controls.targetLanguage || !controls.translationDisplay || !controls.sound || !controls.startupEffect) {
     return;
   }
 
   if (controls.version) {
-    controls.version.textContent = getExtensionMessage('versionLabel', chrome.runtime.getManifest().version);
+    controls.version.textContent = `v${chrome.runtime.getManifest().version}`;
   }
 
   controls.landingLink?.addEventListener('click', (event) => {
@@ -165,6 +165,19 @@ function initBookmarksPanel(): void {
       renderBookmarkedUsers(normalizeStoredMarkedUsers(changes[MARKED_USERS_STORAGE_KEY].newValue));
     }
   });
+}
+
+function initExtensionStatus(): void {
+  refreshExtensionStatus();
+  chrome.storage.onChanged.addListener(handleExtensionStatusStorageChange);
+}
+
+function handleExtensionStatusStorageChange(
+  changes: Record<string, chrome.storage.StorageChange>,
+  areaName: string
+): void {
+  if (areaName !== 'local' || !changes[KNOWN_CHAT_TABS_STORAGE_KEY]) return;
+  refreshExtensionStatus();
 }
 
 function refreshBookmarkedUsers(): void {
@@ -510,15 +523,14 @@ function updateExtensionStatusSummary(activeTabIds: Set<number>, currentTabId: n
 }
 
 function setExtensionStatus(status: ExtensionStatus, text: string, helper: string): void {
+  const ariaStatusText = helper ? `${text}. ${helper}` : text;
   if (controls.extensionStatus) {
     controls.extensionStatus.dataset.extensionStatus = status;
+    controls.extensionStatus.title = helper || text;
+    controls.extensionStatus.setAttribute('aria-label', ariaStatusText);
   }
   if (controls.extensionStatusText) {
     controls.extensionStatusText.textContent = text;
-  }
-  if (controls.extensionStatusHelper) {
-    controls.extensionStatusHelper.textContent = helper;
-    controls.extensionStatusHelper.hidden = !helper;
   }
 }
 

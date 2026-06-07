@@ -161,7 +161,7 @@
       "message": "{count} başka sekmede etkin"
     },
     "extensionStatusInactiveAll": {
-      "message": "Hiçbir açık sekmede etkin değil"
+      "message": "Etkin değil"
     },
     "extensionStatusConnected": {
       "message": "Uzantı YouTube canlı sohbete bağlı."
@@ -251,9 +251,6 @@
     },
     "extensionVersion": {
       "message": "Uzantı sürümü"
-    },
-    "versionLabel": {
-      "message": "Sürüm {version}"
     },
     "off": {
       "message": "Kapalı"

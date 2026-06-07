@@ -160,7 +160,7 @@
       "message": "Aktywne w {count} innych kartach"
     },
     "extensionStatusInactiveAll": {
-      "message": "Nieaktywne w żadnej otwartej karcie"
+      "message": "Nieaktywne"
     },
     "extensionStatusConnected": {
       "message": "Rozszerzenie połączone z czatem na żywo YouTube."
@@ -248,9 +248,6 @@
     },
     "extensionVersion": {
       "message": "Wersja rozszerzenia"
-    },
-    "versionLabel": {
-      "message": "Wersja {version}"
     },
     "off": {
       "message": "Wyłączone"

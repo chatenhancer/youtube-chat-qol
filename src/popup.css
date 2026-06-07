@@ -50,6 +50,8 @@ body {
 
 main {
   box-sizing: border-box;
+  display: grid;
+  grid-template-rows: auto auto auto auto;
   padding: 10px 12px 8px;
   background: var(--ytcq-popup-card-bg);
 }
@@ -95,11 +97,14 @@ main {
 }
 
 .version {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
   margin: 0;
   color: var(--ytcq-popup-secondary-text);
-  font-size: 12px;
-  line-height: 16px;
-  text-align: center;
+  font-size: 11px;
+  line-height: 14px;
+  text-align: left;
   white-space: nowrap;
 }
 
@@ -160,18 +165,21 @@ main {
 
 .extension-status {
   display: grid;
-  grid-template-columns: 9px minmax(0, 1fr);
-  gap: 9px;
+  grid-template-columns: 6px minmax(0, auto);
+  flex: 0 1 auto;
+  justify-self: start;
+  min-width: 0;
+  max-width: min(150px, 62%);
+  gap: 6px;
   align-items: center;
-  margin: 0 0 7px;
-  padding: 7px 8px;
-  border-radius: 8px;
-  background: var(--ytcq-popup-row-bg);
+  margin: 0;
+  padding: 0;
+  color: var(--ytcq-popup-secondary-text);
 }
 
 .extension-status-dot {
-  width: 9px;
-  height: 9px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   background: var(--ytcq-popup-secondary-text);
   opacity: 0.72;
@@ -182,27 +190,29 @@ main {
   opacity: 1;
 }
 
+.extension-status[data-extension-status="active"] .extension-status-copy {
+  color: var(--ytcq-popup-text);
+}
+
 .extension-status[data-extension-status="inactive"] .extension-status-dot {
   background: var(--ytcq-popup-secondary-text);
 }
 
 .extension-status-copy {
-  display: grid;
-  gap: 1px;
+  display: block;
+  overflow: hidden;
   min-width: 0;
 }
 
 .extension-status strong {
+  display: block;
+  overflow: hidden;
   color: var(--ytcq-popup-text);
-  font-size: 12px;
-  font-weight: 400;
-  line-height: 15px;
-}
-
-.extension-status-copy > span {
-  color: var(--ytcq-popup-secondary-text);
   font-size: 11px;
+  font-weight: 400;
   line-height: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .popup-tabs {
@@ -256,7 +266,21 @@ main {
 }
 
 .popup-tab-panel[hidden] {
-  display: none;
+  display: flex !important;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.popup-tab-panel {
+  grid-row: 3;
+  grid-column: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.popup-tab-panel:not([hidden]) {
+  visibility: visible;
 }
 
 .settings-section {
@@ -270,6 +294,11 @@ main {
 }
 
 .footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  gap: 10px;
   margin-top: 5px;
 }
 
@@ -283,7 +312,11 @@ main {
 }
 
 .bookmarks-section {
-  min-height: 226px;
+  position: relative;
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
   padding: 8px;
   border-radius: 8px;
   background: var(--ytcq-popup-row-bg);
@@ -315,24 +348,32 @@ main {
 
 .bookmarks-list {
   display: grid;
+  flex: 1 1 auto;
   gap: 4px;
   max-height: 270px;
+  min-height: 0;
   overflow-y: auto;
   padding-right: 2px;
 }
 
 .bookmarks-list-empty {
-  min-height: 184px;
-  place-items: center;
+  max-height: none;
+  min-height: 0;
+  place-items: stretch;
 }
 
 .bookmarks-empty {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: min(200px, calc(100% - 32px));
   max-width: 200px;
   margin: 0;
   color: var(--ytcq-popup-secondary-text);
   font-size: 12px;
   line-height: 16px;
   text-align: center;
+  transform: translate(-50%, -50%);
 }
 
 .bookmark-row {

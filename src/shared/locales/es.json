@@ -160,7 +160,7 @@
       "message": "Activo en {count} pestañas más"
     },
     "extensionStatusInactiveAll": {
-      "message": "No activo en ninguna pestaña abierta"
+      "message": "Inactivo"
     },
     "extensionStatusConnected": {
       "message": "Extensión conectada al chat en directo de YouTube."
@@ -248,9 +248,6 @@
     },
     "extensionVersion": {
       "message": "Versión de la extensión"
-    },
-    "versionLabel": {
-      "message": "Versión {version}"
     },
     "off": {
       "message": "Desactivado"

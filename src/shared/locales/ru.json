@@ -161,7 +161,7 @@
       "message": "Активно ещё в {count} вкладках"
     },
     "extensionStatusInactiveAll": {
-      "message": "Неактивно ни в одной открытой вкладке"
+      "message": "Неактивно"
     },
     "extensionStatusConnected": {
       "message": "Расширение подключено к чату YouTube."
@@ -251,9 +251,6 @@
     },
     "extensionVersion": {
       "message": "Версия расширения"
-    },
-    "versionLabel": {
-      "message": "Версия {version}"
     },
     "off": {
       "message": "Выключено"

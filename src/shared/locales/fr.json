@@ -160,7 +160,7 @@
       "message": "Actif dans {count} autres onglets"
     },
     "extensionStatusInactiveAll": {
-      "message": "Inactif dans tous les onglets ouverts"
+      "message": "Inactif"
     },
     "extensionStatusConnected": {
       "message": "Extension connectée au chat en direct YouTube."
@@ -248,9 +248,6 @@
     },
     "extensionVersion": {
       "message": "Version de l'extension"
-    },
-    "versionLabel": {
-      "message": "Version {version}"
     },
     "off": {
       "message": "Désactivé"

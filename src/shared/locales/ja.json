@@ -161,7 +161,7 @@
       "message": "他 {count} 個のタブで有効です"
     },
     "extensionStatusInactiveAll": {
-      "message": "開いているどのタブでも有効ではありません"
+      "message": "非アクティブ"
     },
     "extensionStatusConnected": {
       "message": "拡張機能は YouTube ライブチャットに接続されています。"
@@ -251,9 +251,6 @@
     },
     "extensionVersion": {
       "message": "拡張機能のバージョン"
-    },
-    "versionLabel": {
-      "message": "バージョン {version}"
     },
     "off": {
       "message": "オフ"

@@ -160,7 +160,7 @@
       "message": "ทำงานในอีก {count} แท็บ"
     },
     "extensionStatusInactiveAll": {
-      "message": "ไม่ทำงานในแท็บที่เปิดอยู่ใดๆ"
+      "message": "ไม่ทำงาน"
     },
     "extensionStatusConnected": {
       "message": "ส่วนขยายเชื่อมต่อกับแชทสด YouTube แล้ว"
@@ -248,9 +248,6 @@
     },
     "extensionVersion": {
       "message": "เวอร์ชันส่วนขยาย"
-    },
-    "versionLabel": {
-      "message": "เวอร์ชัน {version}"
     },
     "off": {
       "message": "ปิด"

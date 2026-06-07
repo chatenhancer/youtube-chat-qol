@@ -160,7 +160,7 @@
       "message": "In {count} weiteren Tabs aktiv"
     },
     "extensionStatusInactiveAll": {
-      "message": "In keinem offenen Tab aktiv"
+      "message": "Inaktiv"
     },
     "extensionStatusConnected": {
       "message": "Erweiterung mit YouTube-Livechat verbunden."
@@ -248,9 +248,6 @@
     },
     "extensionVersion": {
       "message": "Erweiterungsversion"
-    },
-    "versionLabel": {
-      "message": "Version {version}"
     },
     "off": {
       "message": "Aus"

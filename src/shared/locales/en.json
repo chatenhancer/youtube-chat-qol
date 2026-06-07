@@ -161,7 +161,7 @@
       "message": "Active in {count} other tabs"
     },
     "extensionStatusInactiveAll": {
-      "message": "Not active in any open tab"
+      "message": "Inactive"
     },
     "extensionStatusConnected": {
       "message": "Extension connected to YouTube live chat."
@@ -251,9 +251,6 @@
     },
     "extensionVersion": {
       "message": "Extension version"
-    },
-    "versionLabel": {
-      "message": "Version {version}"
     },
     "off": {
       "message": "Off"

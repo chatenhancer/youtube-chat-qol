@@ -161,7 +161,7 @@
       "message": "{count} अन्य टैब में सक्रिय"
     },
     "extensionStatusInactiveAll": {
-      "message": "किसी भी खुले टैब में सक्रिय नहीं"
+      "message": "निष्क्रिय"
     },
     "extensionStatusConnected": {
       "message": "एक्सटेंशन YouTube लाइव चैट से कनेक्ट है."
@@ -251,9 +251,6 @@
     },
     "extensionVersion": {
       "message": "एक्सटेंशन वर्ज़न"
-    },
-    "versionLabel": {
-      "message": "वर्ज़न {version}"
     },
     "off": {
       "message": "बंद"

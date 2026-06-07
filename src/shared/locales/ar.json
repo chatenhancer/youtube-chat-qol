@@ -161,7 +161,7 @@
       "message": "نشط في {count} علامات تبويب أخرى"
     },
     "extensionStatusInactiveAll": {
-      "message": "غير نشط في أي علامة تبويب مفتوحة"
+      "message": "غير نشط"
     },
     "extensionStatusConnected": {
       "message": "تم ربط الإضافة بدردشة YouTube المباشرة."
@@ -251,9 +251,6 @@
     },
     "extensionVersion": {
       "message": "إصدار الإضافة"
-    },
-    "versionLabel": {
-      "message": "الإصدار {version}"
     },
     "off": {
       "message": "متوقف"

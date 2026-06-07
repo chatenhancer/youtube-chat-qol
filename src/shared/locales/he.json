@@ -160,7 +160,7 @@
       "message": "פעיל בעוד {count} לשוניות"
     },
     "extensionStatusInactiveAll": {
-      "message": "לא פעיל באף לשונית פתוחה"
+      "message": "לא פעיל"
     },
     "extensionStatusConnected": {
       "message": "התוסף מחובר לצ׳אט החי של YouTube."
@@ -248,9 +248,6 @@
     },
     "extensionVersion": {
       "message": "גרסת התוסף"
-    },
-    "versionLabel": {
-      "message": "גרסה {version}"
     },
     "off": {
       "message": "כבוי"

@@ -161,7 +161,7 @@
       "message": "Ativo em mais {count} abas"
     },
     "extensionStatusInactiveAll": {
-      "message": "Não ativo em nenhuma aba aberta"
+      "message": "Inativo"
     },
     "extensionStatusConnected": {
       "message": "Extensão conectada ao chat ao vivo do YouTube."
@@ -251,9 +251,6 @@
     },
     "extensionVersion": {
       "message": "Versão da extensão"
-    },
-    "versionLabel": {
-      "message": "Versão {version}"
     },
     "off": {
       "message": "Desativado"

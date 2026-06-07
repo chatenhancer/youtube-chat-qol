@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import contact from '../shared/contact.json';
+import { KNOWN_CHAT_TABS_STORAGE_KEY } from '../shared/known-chat-tabs';
 import { MARKED_USERS_STORAGE_KEY } from '../shared/marked-users';
 
 describe('popup', () => {
@@ -13,10 +14,6 @@ describe('popup', () => {
       <button id="settingsTab" data-popup-tab-target="settingsPanel" aria-selected="true"></button>
       <button id="bookmarksTab" data-popup-tab-target="bookmarksPanel" aria-selected="false"></button>
       <div id="settingsPanel" data-popup-tab-panel>
-      <section data-extension-status>
-        <span data-extension-status-text></span>
-        <span data-extension-status-helper></span>
-      </section>
       <select id="targetLanguage"></select>
       <select id="translationDisplay">
         <option value="replace">Replace</option>
@@ -24,12 +21,17 @@ describe('popup', () => {
       </select>
       <input id="sound" type="checkbox">
       <input id="startupEffect" type="checkbox">
-      <span id="version"></span>
       </div>
       <div id="bookmarksPanel" data-popup-tab-panel hidden>
         <span id="bookmarksCount"></span>
         <div id="bookmarksList"></div>
       </div>
+      <footer>
+        <span id="version"></span>
+        <div data-extension-status>
+          <span data-extension-status-text></span>
+        </div>
+      </footer>
     `;
     await chrome.storage.local.clear();
     await chrome.storage.sync.clear();
@@ -37,6 +39,7 @@ describe('popup', () => {
     vi.mocked(chrome.tabs.sendMessage).mockClear();
     vi.mocked(chrome.storage.local.clear).mockClear();
     vi.mocked(chrome.storage.local.get).mockClear();
+    vi.mocked(chrome.storage.onChanged.addListener).mockClear();
     vi.mocked(chrome.storage.sync.clear).mockClear();
     vi.mocked(chrome.storage.sync.get).mockClear();
     vi.mocked(chrome.storage.sync.set).mockClear();
@@ -72,9 +75,13 @@ describe('popup', () => {
     await import('./index');
 
     expect(document.querySelector('[data-extension-status]')?.getAttribute('data-extension-status')).toBe('active');
+    expect(document.querySelector('[data-extension-status]')?.getAttribute('title')).toBe(
+      'extensionStatusConnected'
+    );
+    expect(document.querySelector('[data-extension-status]')?.getAttribute('aria-label')).toBe(
+      'extensionStatusActiveCurrentAndOne. extensionStatusConnected'
+    );
     expect(document.querySelector('[data-extension-status-text]')?.textContent).toBe('extensionStatusActiveCurrentAndOne');
-    expect(document.querySelector('[data-extension-status-helper]')?.textContent).toBe('extensionStatusConnected');
-    expect(document.querySelector<HTMLElement>('[data-extension-status-helper]')?.hidden).toBe(false);
   });
 
   it('uses disconnected helper copy when no active content scripts respond', async () => {
@@ -102,9 +109,61 @@ describe('popup', () => {
     await import('./index');
 
     expect(document.querySelector('[data-extension-status]')?.getAttribute('data-extension-status')).toBe('inactive');
+    expect(document.querySelector('[data-extension-status]')?.getAttribute('title')).toBe(
+      'extensionStatusDisconnected'
+    );
+    expect(document.querySelector('[data-extension-status]')?.getAttribute('aria-label')).toBe(
+      'extensionStatusInactiveAll. extensionStatusDisconnected'
+    );
     expect(document.querySelector('[data-extension-status-text]')?.textContent).toBe('extensionStatusInactiveAll');
-    expect(document.querySelector('[data-extension-status-helper]')?.textContent).toBe('extensionStatusDisconnected');
-    expect(document.querySelector<HTMLElement>('[data-extension-status-helper]')?.hidden).toBe(false);
+  });
+
+  it('renders the compact manifest version in the footer', async () => {
+    vi.mocked(chrome.runtime.getManifest).mockReturnValue({ version: '1.2.3' } as chrome.runtime.Manifest);
+    vi.mocked(chrome.tabs.query).mockImplementation(((_queryInfo: chrome.tabs.QueryInfo, callback?: (tabs: chrome.tabs.Tab[]) => void) => {
+      callback?.([]);
+      return Promise.resolve([]);
+    }) as never);
+
+    await import('./index');
+
+    expect(document.querySelector('#version')?.textContent).toBe('v1.2.3');
+  });
+
+  it('refreshes active chat status while the popup remains open', async () => {
+    let activeTabIds: number[] = [];
+    vi.mocked(chrome.tabs.query).mockImplementation(((queryInfo: chrome.tabs.QueryInfo, callback?: (tabs: chrome.tabs.Tab[]) => void) => {
+      const tabs = queryInfo.active ? [{ id: 10 } as chrome.tabs.Tab] : [{ id: 10 } as chrome.tabs.Tab];
+      callback?.(tabs);
+      return Promise.resolve(tabs);
+    }) as never);
+    vi.mocked(chrome.runtime.sendMessage).mockImplementation(((_message: unknown, callback?: (response: unknown) => void) => {
+      callback?.({ activeTabIds });
+      return Promise.resolve({ activeTabIds });
+    }) as never);
+
+    await import('./index');
+
+    expect(document.querySelector('[data-extension-status]')?.getAttribute('data-extension-status')).toBe('inactive');
+    expect(document.querySelector('[data-extension-status-text]')?.textContent).toBe('extensionStatusInactiveAll');
+
+    const statusStorageListener = vi.mocked(chrome.storage.onChanged.addListener).mock.calls[0]?.[0] as (
+      changes: Record<string, chrome.storage.StorageChange>,
+      areaName: string
+    ) => void;
+
+    activeTabIds = [10];
+    statusStorageListener({
+      [KNOWN_CHAT_TABS_STORAGE_KEY]: {
+        newValue: { '10': Date.now() }
+      } as chrome.storage.StorageChange
+    }, 'local');
+
+    expect(document.querySelector('[data-extension-status]')?.getAttribute('data-extension-status')).toBe('active');
+    expect(document.querySelector('[data-extension-status-text]')?.textContent).toBe('extensionStatusActiveCurrent');
+    expect(document.querySelector('[data-extension-status]')?.getAttribute('title')).toBe(
+      'extensionStatusConnected'
+    );
   });
 
   it('summarizes active chats in other tabs and handles no open tabs', async () => {
@@ -123,7 +182,7 @@ describe('popup', () => {
     await import('./index');
 
     expect(document.querySelector('[data-extension-status-text]')?.textContent).toBe('extensionStatusActiveManyOther:2');
-    expect(document.querySelector('[data-extension-status-helper]')?.textContent).toBe('extensionStatusConnected');
+    expect(document.querySelector('[data-extension-status]')?.getAttribute('title')).toBe('extensionStatusConnected');
 
     vi.resetModules();
     vi.mocked(chrome.tabs.query).mockImplementation(((queryInfo: chrome.tabs.QueryInfo, callback?: (tabs: chrome.tabs.Tab[]) => void) => {
@@ -134,7 +193,7 @@ describe('popup', () => {
     await import('./index');
 
     expect(document.querySelector('[data-extension-status-text]')?.textContent).toBe('extensionStatusInactiveAll');
-    expect(document.querySelector('[data-extension-status-helper]')?.textContent).toBe('extensionStatusDisconnected');
+    expect(document.querySelector('[data-extension-status]')?.getAttribute('title')).toBe('extensionStatusDisconnected');
   });
 
   it('summarizes current-tab-only and current-tab-with-many active status states', async () => {
@@ -152,7 +211,7 @@ describe('popup', () => {
 
     await import('./index');
     expect(document.querySelector('[data-extension-status-text]')?.textContent).toBe('extensionStatusActiveCurrent');
-    expect(document.querySelector('[data-extension-status-helper]')?.textContent).toBe('extensionStatusConnected');
+    expect(document.querySelector('[data-extension-status]')?.getAttribute('title')).toBe('extensionStatusConnected');
 
     vi.resetModules();
     vi.mocked(chrome.runtime.sendMessage).mockImplementation(((_message: unknown, callback?: (response: unknown) => void) => {
@@ -162,7 +221,7 @@ describe('popup', () => {
     await import('./index');
 
     expect(document.querySelector('[data-extension-status-text]')?.textContent).toBe('extensionStatusActiveCurrentAndMany:2');
-    expect(document.querySelector('[data-extension-status-helper]')?.textContent).toBe('extensionStatusConnected');
+    expect(document.querySelector('[data-extension-status]')?.getAttribute('title')).toBe('extensionStatusConnected');
   });
 
   it('summarizes a single active chat in another tab', async () => {
@@ -181,7 +240,7 @@ describe('popup', () => {
     await import('./index');
 
     expect(document.querySelector('[data-extension-status-text]')?.textContent).toBe('extensionStatusActiveOneOther');
-    expect(document.querySelector('[data-extension-status-helper]')?.textContent).toBe('extensionStatusConnected');
+    expect(document.querySelector('[data-extension-status]')?.getAttribute('title')).toBe('extensionStatusConnected');
   });
 
   it('ignores malformed active chat responses', async () => {
@@ -216,7 +275,7 @@ describe('popup', () => {
     await import('./index');
 
     expect(document.querySelector('[data-extension-status-text]')?.textContent).toBe('extensionStatusActiveOneOther');
-    expect(document.querySelector('[data-extension-status-helper]')?.textContent).toBe('extensionStatusConnected');
+    expect(document.querySelector('[data-extension-status]')?.getAttribute('title')).toBe('extensionStatusConnected');
   });
 
   it('treats missing active tab responses as disconnected', async () => {
@@ -233,7 +292,7 @@ describe('popup', () => {
     await import('./index');
 
     expect(document.querySelector('[data-extension-status]')?.getAttribute('data-extension-status')).toBe('inactive');
-    expect(document.querySelector('[data-extension-status-helper]')?.textContent).toBe('extensionStatusDisconnected');
+    expect(document.querySelector('[data-extension-status]')?.getAttribute('title')).toBe('extensionStatusDisconnected');
   });
 
   it('treats active chat lookup errors as disconnected', async () => {
