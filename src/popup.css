@@ -265,22 +265,33 @@ main {
   content: "";
 }
 
-.popup-tab-panel[hidden] {
-  display: flex !important;
+.popup-tab-panels {
+  position: relative;
+  display: grid;
+  min-height: 0;
+}
+
+.popup-tab-panel {
+  grid-area: 1 / 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+#settingsPanel[hidden] {
+  display: flex;
   visibility: hidden;
   pointer-events: none;
 }
 
-.popup-tab-panel {
-  grid-row: 3;
-  grid-column: 1;
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
+#bookmarksPanel[hidden] {
+  display: none;
 }
 
-.popup-tab-panel:not([hidden]) {
-  visibility: visible;
+#bookmarksPanel:not([hidden]) {
+  position: absolute;
+  inset: 0;
 }
 
 .settings-section {
@@ -352,7 +363,6 @@ main {
   flex: 1 1 auto;
   gap: 4px;
   grid-auto-rows: max-content;
-  max-height: 270px;
   min-height: 0;
   overflow-y: auto;
   padding-right: 2px;

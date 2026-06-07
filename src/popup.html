@@ -43,9 +43,10 @@
         <button id="bookmarksTab" class="popup-tab" type="button" role="tab" aria-selected="false" aria-controls="bookmarksPanel" data-popup-tab-target="bookmarksPanel" data-i18n="bookmarks">Bookmarks</button>
       </nav>
 
-      <div id="settingsPanel" class="popup-tab-panel" role="tabpanel" aria-labelledby="settingsTab" data-popup-tab-panel>
-        <section class="settings-section" aria-labelledby="translation-heading">
-          <h2 id="translation-heading" data-i18n="translation">Translation</h2>
+      <div class="popup-tab-panels">
+        <div id="settingsPanel" class="popup-tab-panel" role="tabpanel" aria-labelledby="settingsTab" data-popup-tab-panel>
+          <section class="settings-section" aria-labelledby="translation-heading">
+            <h2 id="translation-heading" data-i18n="translation">Translation</h2>
 
           <label class="option option-control" title="Choose the language chat messages should be translated into. Off disables automatic translation." data-i18n-title="chooseTranslationLanguageTitle">
             <span class="option-title">
@@ -113,17 +114,18 @@
             </span>
             <input id="startupEffect" type="checkbox" title="Show a brief startup effect when the extension connects to chat. Reduced motion disables it automatically." data-i18n-title="startupShimmerTitle">
           </label>
-        </section>
-      </div>
+          </section>
+        </div>
 
-      <div id="bookmarksPanel" class="popup-tab-panel" role="tabpanel" aria-labelledby="bookmarksTab" data-popup-tab-panel hidden>
-        <section class="bookmarks-section" aria-labelledby="bookmarks-heading">
-          <header class="bookmarks-header">
-            <h2 id="bookmarks-heading" data-i18n="bookmarks">Bookmarks</h2>
-            <span id="bookmarksCount" class="bookmarks-count" data-i18n="noBookmarkedUsers">No bookmarks yet</span>
-          </header>
-          <div id="bookmarksList" class="bookmarks-list" aria-live="polite"></div>
-        </section>
+        <div id="bookmarksPanel" class="popup-tab-panel" role="tabpanel" aria-labelledby="bookmarksTab" data-popup-tab-panel hidden>
+          <section class="bookmarks-section" aria-labelledby="bookmarks-heading">
+            <header class="bookmarks-header">
+              <h2 id="bookmarks-heading" data-i18n="bookmarks">Bookmarks</h2>
+              <span id="bookmarksCount" class="bookmarks-count" data-i18n="noBookmarkedUsers">No bookmarks yet</span>
+            </header>
+            <div id="bookmarksList" class="bookmarks-list" aria-live="polite"></div>
+          </section>
+        </div>
       </div>
 
       <footer class="footer">
