@@ -70,7 +70,7 @@ jobs:
           gh api "repos/${GITHUB_REPOSITORY}/releases/generate-notes" \
             -f tag_name="${GITHUB_REF_NAME}" \
             --jq .body > release-notes.md
-          sed -i 's/Full Changelog:/Full changelog:/g' release-notes.md
+          perl -0pi -e 's/Full Changelog/Full changelog/g' release-notes.md
       - name: Create GitHub release
         uses: softprops/action-gh-release@b4309332981a82ec1c5618f44dd2e27cc8bfbfda # v3
         with:
