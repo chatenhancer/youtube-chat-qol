@@ -300,6 +300,33 @@
     },
     "markUser": {
       "message": "סמן"
+    },
+    "recentStreams": {
+      "message": "צ׳אטים אחרונים"
+    },
+    "noRecentStreams": {
+      "message": "אין צ׳אטים עדיין"
+    },
+    "recentStreamsCount": {
+      "message": "{count} צ׳אטים"
+    },
+    "recentStreamsEmpty": {
+      "message": "צ׳אטים חיים שתפתח יופיעו כאן."
+    },
+    "visitedStreamDate": {
+      "message": "נצפה {date}"
+    },
+    "recentStreamCurrentlyOpen": {
+      "message": "פעיל עכשיו"
+    },
+    "visitedDateUnknown": {
+      "message": "תאריך הצפייה לא ידוע"
+    },
+    "removeRecentStream": {
+      "message": "הסרת צ׳אט"
+    },
+    "switchToOpenStream": {
+      "message": "מעבר אל {name}"
     }
   }
 }

@@ -300,6 +300,33 @@
     },
     "markUser": {
       "message": "Đánh dấu"
+    },
+    "recentStreams": {
+      "message": "Chat gần đây"
+    },
+    "noRecentStreams": {
+      "message": "Chưa có chat nào"
+    },
+    "recentStreamsCount": {
+      "message": "{count} chat"
+    },
+    "recentStreamsEmpty": {
+      "message": "Các live chat bạn mở sẽ xuất hiện tại đây."
+    },
+    "visitedStreamDate": {
+      "message": "Đã truy cập {date}"
+    },
+    "recentStreamCurrentlyOpen": {
+      "message": "Đang hoạt động"
+    },
+    "visitedDateUnknown": {
+      "message": "Không rõ ngày truy cập"
+    },
+    "removeRecentStream": {
+      "message": "Xóa chat"
+    },
+    "switchToOpenStream": {
+      "message": "Chuyển đến {name}"
     }
   }
 }

@@ -5,9 +5,9 @@
  * extension consumes, giving the browser smoke test a stable local page while
  * still exercising the real content script.
  */
-export const fixtureLoggedInLiveChatUrl = 'https://www.youtube.com/live_chat?continuation=ytcq-fixture&ytcq-auth=logged-in';
-export const fixtureLoggedOutLiveChatUrl = 'https://www.youtube.com/live_chat?continuation=ytcq-fixture&ytcq-auth=logged-out';
-export const fixtureLoggedInReplayChatUrl = 'https://www.youtube.com/live_chat_replay?continuation=ytcq-fixture-replay&ytcq-auth=logged-in';
+export const fixtureLoggedInLiveChatUrl = 'https://www.youtube.com/live_chat?continuation=ytcq-fixture&video_id=ytcq-mock-live&ytcq-auth=logged-in';
+export const fixtureLoggedOutLiveChatUrl = 'https://www.youtube.com/live_chat?continuation=ytcq-fixture&video_id=ytcq-mock-live&ytcq-auth=logged-out';
+export const fixtureLoggedInReplayChatUrl = 'https://www.youtube.com/live_chat_replay?continuation=ytcq-fixture-replay&video_id=ytcq-mock-replay&ytcq-auth=logged-in';
 
 interface LiveChatFixtureOptions {
   loggedIn?: boolean;

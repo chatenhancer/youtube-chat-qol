@@ -303,6 +303,33 @@
     },
     "markUser": {
       "message": "İşaretle"
+    },
+    "recentStreams": {
+      "message": "Son sohbetler"
+    },
+    "noRecentStreams": {
+      "message": "Henüz sohbet yok"
+    },
+    "recentStreamsCount": {
+      "message": "{count} sohbet"
+    },
+    "recentStreamsEmpty": {
+      "message": "Açtığın canlı sohbetler burada görünür."
+    },
+    "visitedStreamDate": {
+      "message": "{date} ziyaret edildi"
+    },
+    "recentStreamCurrentlyOpen": {
+      "message": "Şimdi aktif"
+    },
+    "visitedDateUnknown": {
+      "message": "Ziyaret tarihi bilinmiyor"
+    },
+    "removeRecentStream": {
+      "message": "Sohbeti kaldır"
+    },
+    "switchToOpenStream": {
+      "message": "{name} sekmesine geç"
     }
   }
 }

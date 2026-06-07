@@ -300,6 +300,33 @@
     },
     "markUser": {
       "message": "Markeren"
+    },
+    "recentStreams": {
+      "message": "Recente chats"
+    },
+    "noRecentStreams": {
+      "message": "Nog geen chats"
+    },
+    "recentStreamsCount": {
+      "message": "{count} chats"
+    },
+    "recentStreamsEmpty": {
+      "message": "Live chats die je opent verschijnen hier."
+    },
+    "visitedStreamDate": {
+      "message": "Bezocht {date}"
+    },
+    "recentStreamCurrentlyOpen": {
+      "message": "Nu actief"
+    },
+    "visitedDateUnknown": {
+      "message": "Bezoekdatum onbekend"
+    },
+    "removeRecentStream": {
+      "message": "Chat verwijderen"
+    },
+    "switchToOpenStream": {
+      "message": "Ga naar {name}"
     }
   }
 }

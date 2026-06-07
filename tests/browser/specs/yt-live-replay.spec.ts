@@ -13,9 +13,11 @@ import { markedUserMessageMenuScenario } from '../scenarios/marked-users';
 import { realMessageTranslationScenario } from '../scenarios/message-translation';
 import { messageMenuScenario, settingsMenuScenario } from '../scenarios/menus';
 import { profileCardRecentMessagesScenario } from '../scenarios/profile';
+import { recentStreamsPopupScenario } from '../scenarios/recent-streams';
 import { loggedInLiveReplayTest as test } from '../support/scenario-fixtures';
 
 test('logged-in live replay: extension attaches and popup reports connected status', attachScenario);
+test('logged-in live replay: popup shows recent chats', recentStreamsPopupScenario);
 test('logged-in live replay: chat settings menu receives extension controls', settingsMenuScenario);
 test('logged-in live replay: message context menu receives mark, quote, and mention actions', messageMenuScenario);
 test('logged-in live replay: mark user from message menu persists and shows avatar ring', markedUserMessageMenuScenario);

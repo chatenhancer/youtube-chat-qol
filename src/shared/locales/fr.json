@@ -300,6 +300,33 @@
     },
     "markUser": {
       "message": "Marquer"
+    },
+    "recentStreams": {
+      "message": "Chats récents"
+    },
+    "noRecentStreams": {
+      "message": "Aucun chat pour le moment"
+    },
+    "recentStreamsCount": {
+      "message": "{count} chats"
+    },
+    "recentStreamsEmpty": {
+      "message": "Les chats en direct que vous ouvrez apparaîtront ici."
+    },
+    "visitedStreamDate": {
+      "message": "Consulté {date}"
+    },
+    "recentStreamCurrentlyOpen": {
+      "message": "Actif maintenant"
+    },
+    "visitedDateUnknown": {
+      "message": "Date de consultation inconnue"
+    },
+    "removeRecentStream": {
+      "message": "Supprimer le chat"
+    },
+    "switchToOpenStream": {
+      "message": "Basculer vers {name}"
     }
   }
 }

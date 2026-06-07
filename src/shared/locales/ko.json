@@ -300,6 +300,33 @@
     },
     "markUser": {
       "message": "표시"
+    },
+    "recentStreams": {
+      "message": "최근 채팅"
+    },
+    "noRecentStreams": {
+      "message": "아직 채팅 없음"
+    },
+    "recentStreamsCount": {
+      "message": "채팅 {count}개"
+    },
+    "recentStreamsEmpty": {
+      "message": "열어 본 실시간 채팅이 여기에 표시됩니다."
+    },
+    "visitedStreamDate": {
+      "message": "{date} 방문"
+    },
+    "recentStreamCurrentlyOpen": {
+      "message": "지금 활성"
+    },
+    "visitedDateUnknown": {
+      "message": "방문 날짜 알 수 없음"
+    },
+    "removeRecentStream": {
+      "message": "채팅 삭제"
+    },
+    "switchToOpenStream": {
+      "message": "{name}(으)로 전환"
     }
   }
 }

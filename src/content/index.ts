@@ -28,6 +28,7 @@ import { DEFAULT_OPTIONS, getTargetLanguageUpdate, normalizeOptions, type Option
 import { getOptions, setOptions } from '../shared/state';
 import { initUiLocaleFromDocument } from '../shared/i18n';
 import { CHAT_MESSAGE_SELECTOR, PARTICIPANT_SELECTOR } from '../youtube/selectors';
+import { getCurrentYouTubeChatSourceUrl } from '../youtube/source-url';
 
 let observer: MutationObserver | null = null;
 let visibilityRecoveryTimer = 0;
@@ -67,7 +68,10 @@ function init(): void {
 }
 
 function notifyChatAttached(): void {
-  chrome.runtime.sendMessage({ type: 'ytcq:chat-attached' }, () => {
+  chrome.runtime.sendMessage({
+    sourceUrl: getCurrentYouTubeChatSourceUrl(),
+    type: 'ytcq:chat-attached'
+  }, () => {
     void chrome.runtime.lastError;
   });
 }

@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import contact from '../shared/contact.json';
 import { MARKED_USERS_STORAGE_KEY } from '../shared/marked-users';
+import { RECENT_STREAMS_STORAGE_KEY } from '../shared/recent-streams';
 
 describe('popup', () => {
   beforeEach(async () => {
@@ -12,6 +13,7 @@ describe('popup', () => {
       <button id="resetExtension"></button>
       <button id="settingsTab" data-popup-tab-target="settingsPanel" aria-selected="true"></button>
       <button id="bookmarksTab" data-popup-tab-target="bookmarksPanel" aria-selected="false"></button>
+      <button id="streamsTab" data-popup-tab-target="streamsPanel" aria-selected="false"></button>
       <div id="settingsPanel" data-popup-tab-panel>
       <section data-extension-status>
         <span data-extension-status-text></span>
@@ -30,11 +32,17 @@ describe('popup', () => {
         <span id="bookmarksCount"></span>
         <div id="bookmarksList"></div>
       </div>
+      <div id="streamsPanel" data-popup-tab-panel hidden>
+        <span id="streamsCount"></span>
+        <div id="streamsList"></div>
+      </div>
     `;
     await chrome.storage.local.clear();
     await chrome.storage.sync.clear();
     vi.mocked(chrome.tabs.create).mockClear();
     vi.mocked(chrome.tabs.sendMessage).mockClear();
+    vi.mocked(chrome.tabs.update).mockClear();
+    vi.mocked(chrome.windows.update).mockClear();
     vi.mocked(chrome.storage.local.clear).mockClear();
     vi.mocked(chrome.storage.local.get).mockClear();
     vi.mocked(chrome.storage.sync.clear).mockClear();
@@ -303,6 +311,14 @@ describe('popup', () => {
       callback?.([]);
       return Promise.resolve([]);
     }) as never);
+    vi.mocked(chrome.runtime.sendMessage).mockImplementation(((message: unknown, callback?: (response: unknown) => void) => {
+      const type = (message as { type?: string }).type;
+      const response = type === 'ytcq:get-open-recent-stream-tabs'
+        ? { openStreamTabs: { 'video:stream-a': 42 } }
+        : { activeTabIds: [] };
+      callback?.(response);
+      return Promise.resolve(response);
+    }) as never);
 
     await import('./index');
     document.querySelector<HTMLAnchorElement>('#landingLink')?.click();
@@ -437,29 +453,32 @@ describe('popup', () => {
     rows[0].querySelector<HTMLButtonElement>('.bookmark-source-button')?.click();
     expect(chrome.tabs.create).toHaveBeenCalledWith({ url: 'https://www.youtube.com/watch?v=stream-a' });
 
-    const storageListener = vi.mocked(chrome.storage.onChanged.addListener).mock.calls.at(-1)?.[0];
-    storageListener?.({
-      [MARKED_USERS_STORAGE_KEY]: {
-        newValue: {
-          'author:@freshuser': {
-            authorName: '@FreshUser',
-            markedAt: 3_000
+    vi.mocked(chrome.storage.onChanged.addListener).mock.calls.forEach(([listener]) => {
+      listener({
+        [MARKED_USERS_STORAGE_KEY]: {
+          newValue: {
+            'author:@freshuser': {
+              authorName: '@FreshUser',
+              markedAt: 3_000
+            }
           }
-        }
-      } as chrome.storage.StorageChange
-    }, 'sync');
+        } as chrome.storage.StorageChange
+      }, 'sync');
+    });
     expect(document.querySelector('.bookmark-name')?.textContent).toBe('@AlphaUser');
 
-    storageListener?.({
-      [MARKED_USERS_STORAGE_KEY]: {
-        newValue: {
-          'author:@freshuser': {
-            authorName: '@FreshUser',
-            markedAt: 3_000
+    vi.mocked(chrome.storage.onChanged.addListener).mock.calls.forEach(([listener]) => {
+      listener({
+        [MARKED_USERS_STORAGE_KEY]: {
+          newValue: {
+            'author:@freshuser': {
+              authorName: '@FreshUser',
+              markedAt: 3_000
+            }
           }
-        }
-      } as chrome.storage.StorageChange
-    }, 'local');
+        } as chrome.storage.StorageChange
+      }, 'local');
+    });
     expect(document.querySelector('.bookmark-name')?.textContent).toBe('@FreshUser');
   });
 
@@ -501,6 +520,107 @@ describe('popup', () => {
     expect(chrome.tabs.create).toHaveBeenCalledWith({
       url: 'https://www.youtube.com/watch?v=stream-from-chat-frame'
     });
+  });
+
+  it('switches to streams and manages recent stream rows', async () => {
+    await chrome.storage.local.set({
+      [RECENT_STREAMS_STORAGE_KEY]: {
+        'video:stream-a': {
+          channelName: 'Example channel',
+          lastVisitedAt: 1_700_000_000_000,
+          title: 'Example stream',
+          url: 'https://www.youtube.com/watch?v=stream-a',
+          visitCount: 2
+        },
+        'video:stream-b': {
+          lastVisitedAt: 1_600_000_000_000,
+          title: 'Older stream',
+          url: 'https://www.youtube.com/watch?v=stream-b',
+          visitCount: 1
+        }
+      }
+    });
+    vi.mocked(chrome.tabs.query).mockImplementation(((_queryInfo: chrome.tabs.QueryInfo, callback?: (tabs: chrome.tabs.Tab[]) => void) => {
+      callback?.([]);
+      return Promise.resolve([]);
+    }) as never);
+
+    await import('./index');
+
+    expect(document.querySelector<HTMLElement>('#streamsPanel')?.hidden).toBe(true);
+    document.querySelector<HTMLButtonElement>('#streamsTab')?.click();
+
+    expect(document.querySelector<HTMLButtonElement>('#streamsTab')?.getAttribute('aria-selected')).toBe('true');
+    expect(document.querySelector<HTMLElement>('#settingsPanel')?.hidden).toBe(true);
+    expect(document.querySelector<HTMLElement>('#streamsPanel')?.hidden).toBe(false);
+    expect(document.querySelector('#streamsCount')?.textContent).toBe('recentStreamsCount:2');
+
+    const rows = Array.from(document.querySelectorAll<HTMLElement>('.stream-row'));
+    expect(rows).toHaveLength(2);
+    expect(rows.map((row) => row.querySelector('.stream-title-label')?.textContent)).toEqual([
+      'Example stream',
+      'Older stream'
+    ]);
+    expect(rows[0].querySelector('.stream-meta')?.textContent).toBe('recentStreamCurrentlyOpen');
+    expect(rows[1].querySelector('.stream-meta')?.textContent).toContain('visitedStreamDate:');
+    expect(rows[0].querySelector<HTMLImageElement>('.stream-thumbnail-button img')?.getAttribute('src')).toBe(
+      'https://i.ytimg.com/vi/stream-a/mqdefault.jpg'
+    );
+    expect(rows[0].querySelector('.stream-online-dot')).not.toBeNull();
+    expect(rows[1].querySelector('.stream-online-dot')).toBeNull();
+    expect(rows[0].querySelector<HTMLButtonElement>('.stream-title-button')?.title).toBe('switchToOpenStream:Example stream');
+
+    rows[0].querySelector<HTMLButtonElement>('.stream-title-button')?.click();
+    expect(chrome.tabs.update).toHaveBeenCalledWith(42, { active: true }, expect.any(Function));
+    expect(chrome.windows.update).toHaveBeenCalledWith(1, { focused: true }, expect.any(Function));
+
+    rows[0].querySelector<HTMLButtonElement>('.stream-thumbnail-button')?.click();
+    expect(chrome.tabs.update).toHaveBeenLastCalledWith(42, { active: true }, expect.any(Function));
+
+    rows[1].querySelector<HTMLButtonElement>('.stream-title-button')?.click();
+    expect(chrome.tabs.create).toHaveBeenCalledWith({ url: 'https://www.youtube.com/watch?v=stream-b' });
+
+    rows[0].querySelector<HTMLButtonElement>('.stream-action-button')?.click();
+    await expect(chrome.storage.local.get(RECENT_STREAMS_STORAGE_KEY)).resolves.toEqual({
+      [RECENT_STREAMS_STORAGE_KEY]: {
+        'video:stream-b': {
+          lastVisitedAt: 1_600_000_000_000,
+          title: 'Older stream',
+          url: 'https://www.youtube.com/watch?v=stream-b',
+          visitCount: 1
+        }
+      }
+    });
+    expect(document.querySelector('#streamsCount')?.textContent).toBe('recentStreamsCount:1');
+
+    vi.mocked(chrome.storage.onChanged.addListener).mock.calls.forEach(([listener]) => {
+      listener({
+        [RECENT_STREAMS_STORAGE_KEY]: {
+          newValue: {
+            'video:fresh-stream': {
+              lastVisitedAt: 3_000,
+              title: 'Fresh stream',
+              url: 'https://www.youtube.com/watch?v=fresh-stream',
+              visitCount: 1
+            }
+          }
+        } as chrome.storage.StorageChange
+      }, 'local');
+    });
+    expect(document.querySelector('.stream-title-label')?.textContent).toBe('Fresh stream');
+  });
+
+  it('renders an empty streams tab when no recent streams are stored', async () => {
+    vi.mocked(chrome.tabs.query).mockImplementation(((_queryInfo: chrome.tabs.QueryInfo, callback?: (tabs: chrome.tabs.Tab[]) => void) => {
+      callback?.([]);
+      return Promise.resolve([]);
+    }) as never);
+
+    await import('./index');
+    document.querySelector<HTMLButtonElement>('#streamsTab')?.click();
+
+    expect(document.querySelector('#streamsCount')?.textContent).toBe('noRecentStreams');
+    expect(document.querySelector('.streams-empty')?.textContent).toBe('recentStreamsEmpty');
   });
 
   it('keeps bookmark removal safe when the stored record has already disappeared', async () => {

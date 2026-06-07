@@ -300,6 +300,33 @@
     },
     "markUser": {
       "message": "Позначити"
+    },
+    "recentStreams": {
+      "message": "Останні чати"
+    },
+    "noRecentStreams": {
+      "message": "Чатів поки немає"
+    },
+    "recentStreamsCount": {
+      "message": "{count} чатів"
+    },
+    "recentStreamsEmpty": {
+      "message": "Відкриті вами live-чати з’являться тут."
+    },
+    "visitedStreamDate": {
+      "message": "Переглянуто {date}"
+    },
+    "recentStreamCurrentlyOpen": {
+      "message": "Активний зараз"
+    },
+    "visitedDateUnknown": {
+      "message": "Дата перегляду невідома"
+    },
+    "removeRecentStream": {
+      "message": "Видалити чат"
+    },
+    "switchToOpenStream": {
+      "message": "Перейти до {name}"
     }
   }
 }

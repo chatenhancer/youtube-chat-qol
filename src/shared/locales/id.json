@@ -303,6 +303,33 @@
     },
     "markUser": {
       "message": "Tandai"
+    },
+    "recentStreams": {
+      "message": "Chat terbaru"
+    },
+    "noRecentStreams": {
+      "message": "Belum ada chat"
+    },
+    "recentStreamsCount": {
+      "message": "{count} chat"
+    },
+    "recentStreamsEmpty": {
+      "message": "Live chat yang kamu buka akan muncul di sini."
+    },
+    "visitedStreamDate": {
+      "message": "Dikunjungi {date}"
+    },
+    "recentStreamCurrentlyOpen": {
+      "message": "Aktif sekarang"
+    },
+    "visitedDateUnknown": {
+      "message": "Tanggal kunjungan tidak diketahui"
+    },
+    "removeRecentStream": {
+      "message": "Hapus chat"
+    },
+    "switchToOpenStream": {
+      "message": "Beralih ke {name}"
     }
   }
 }

@@ -300,6 +300,33 @@
     },
     "markUser": {
       "message": "Markieren"
+    },
+    "recentStreams": {
+      "message": "Letzte Chats"
+    },
+    "noRecentStreams": {
+      "message": "Noch keine Chats"
+    },
+    "recentStreamsCount": {
+      "message": "{count} Chats"
+    },
+    "recentStreamsEmpty": {
+      "message": "Live-Chats, die du öffnest, erscheinen hier."
+    },
+    "visitedStreamDate": {
+      "message": "Besucht {date}"
+    },
+    "recentStreamCurrentlyOpen": {
+      "message": "Jetzt aktiv"
+    },
+    "visitedDateUnknown": {
+      "message": "Besuchsdatum unbekannt"
+    },
+    "removeRecentStream": {
+      "message": "Chat entfernen"
+    },
+    "switchToOpenStream": {
+      "message": "Zu {name} wechseln"
     }
   }
 }

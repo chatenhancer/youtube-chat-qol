@@ -300,6 +300,33 @@
     },
     "markUser": {
       "message": "علامت"
+    },
+    "recentStreams": {
+      "message": "چت‌های اخیر"
+    },
+    "noRecentStreams": {
+      "message": "هنوز چتی نیست"
+    },
+    "recentStreamsCount": {
+      "message": "{count} چت"
+    },
+    "recentStreamsEmpty": {
+      "message": "چت‌های زنده‌ای که باز می‌کنید اینجا ظاهر می‌شوند."
+    },
+    "visitedStreamDate": {
+      "message": "بازدید در {date}"
+    },
+    "recentStreamCurrentlyOpen": {
+      "message": "اکنون فعال است"
+    },
+    "visitedDateUnknown": {
+      "message": "تاریخ بازدید نامشخص است"
+    },
+    "removeRecentStream": {
+      "message": "حذف چت"
+    },
+    "switchToOpenStream": {
+      "message": "رفتن به {name}"
     }
   }
 }

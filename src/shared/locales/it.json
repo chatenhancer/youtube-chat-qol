@@ -303,6 +303,33 @@
     },
     "markUser": {
       "message": "Contrassegna"
+    },
+    "recentStreams": {
+      "message": "Chat recenti"
+    },
+    "noRecentStreams": {
+      "message": "Ancora nessuna chat"
+    },
+    "recentStreamsCount": {
+      "message": "{count} chat"
+    },
+    "recentStreamsEmpty": {
+      "message": "Le chat live che apri appariranno qui."
+    },
+    "visitedStreamDate": {
+      "message": "Visitato {date}"
+    },
+    "recentStreamCurrentlyOpen": {
+      "message": "Attivo ora"
+    },
+    "visitedDateUnknown": {
+      "message": "Data di visita sconosciuta"
+    },
+    "removeRecentStream": {
+      "message": "Rimuovi chat"
+    },
+    "switchToOpenStream": {
+      "message": "Passa a {name}"
     }
   }
 }

@@ -41,6 +41,7 @@
       <nav class="popup-tabs" role="tablist" aria-label="Popup sections" data-i18n-aria-label="popupSections">
         <button id="settingsTab" class="popup-tab popup-tab-active" type="button" role="tab" aria-selected="true" aria-controls="settingsPanel" data-popup-tab-target="settingsPanel" data-i18n="settings">Settings</button>
         <button id="bookmarksTab" class="popup-tab" type="button" role="tab" aria-selected="false" aria-controls="bookmarksPanel" data-popup-tab-target="bookmarksPanel" data-i18n="bookmarks">Bookmarks</button>
+        <button id="streamsTab" class="popup-tab" type="button" role="tab" aria-selected="false" aria-controls="streamsPanel" data-popup-tab-target="streamsPanel" data-i18n="recentStreams">Recent chats</button>
       </nav>
 
       <div id="settingsPanel" class="popup-tab-panel" role="tabpanel" aria-labelledby="settingsTab" data-popup-tab-panel>
@@ -135,6 +136,16 @@
             <span id="bookmarksCount" class="bookmarks-count" data-i18n="noBookmarkedUsers">No bookmarks yet</span>
           </header>
           <div id="bookmarksList" class="bookmarks-list" aria-live="polite"></div>
+        </section>
+      </div>
+
+      <div id="streamsPanel" class="popup-tab-panel" role="tabpanel" aria-labelledby="streamsTab" data-popup-tab-panel hidden>
+        <section class="streams-section" aria-labelledby="streams-heading">
+          <header class="streams-header">
+            <h2 id="streams-heading" data-i18n="recentStreams">Recent chats</h2>
+            <span id="streamsCount" class="streams-count" data-i18n="noRecentStreams">No chats yet</span>
+          </header>
+          <div id="streamsList" class="streams-list" aria-live="polite"></div>
         </section>
       </div>
     </main>

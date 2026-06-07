@@ -300,6 +300,33 @@
     },
     "markUser": {
       "message": "ทำเครื่องหมาย"
+    },
+    "recentStreams": {
+      "message": "แชตล่าสุด"
+    },
+    "noRecentStreams": {
+      "message": "ยังไม่มีแชต"
+    },
+    "recentStreamsCount": {
+      "message": "{count} แชต"
+    },
+    "recentStreamsEmpty": {
+      "message": "แชตสดที่คุณเปิดจะแสดงที่นี่"
+    },
+    "visitedStreamDate": {
+      "message": "เข้าชม {date}"
+    },
+    "recentStreamCurrentlyOpen": {
+      "message": "ใช้งานอยู่ตอนนี้"
+    },
+    "visitedDateUnknown": {
+      "message": "ไม่ทราบวันที่เข้าชม"
+    },
+    "removeRecentStream": {
+      "message": "ลบแชต"
+    },
+    "switchToOpenStream": {
+      "message": "สลับไปที่ {name}"
     }
   }
 }

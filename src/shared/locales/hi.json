@@ -303,6 +303,33 @@
     },
     "markUser": {
       "message": "मार्क"
+    },
+    "recentStreams": {
+      "message": "हाल के चैट"
+    },
+    "noRecentStreams": {
+      "message": "अभी कोई चैट नहीं"
+    },
+    "recentStreamsCount": {
+      "message": "{count} चैट"
+    },
+    "recentStreamsEmpty": {
+      "message": "आप जो लाइव चैट खोलेंगे वे यहां दिखाई देंगी।"
+    },
+    "visitedStreamDate": {
+      "message": "देखा गया {date}"
+    },
+    "recentStreamCurrentlyOpen": {
+      "message": "अभी सक्रिय है"
+    },
+    "visitedDateUnknown": {
+      "message": "देखने की तारीख अज्ञात है"
+    },
+    "removeRecentStream": {
+      "message": "चैट हटाएं"
+    },
+    "switchToOpenStream": {
+      "message": "{name} पर जाएं"
     }
   }
 }

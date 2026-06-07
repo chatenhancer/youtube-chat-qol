@@ -26,6 +26,7 @@ import {
   profileCardReceivesNewMessagesScenario,
   profileCardRecentMessagesScenario
 } from '../scenarios/profile';
+import { recentStreamsPopupScenario } from '../scenarios/recent-streams';
 import {
   popupSettingsBehaviorScenario,
   settingsMenuBehaviorScenario
@@ -34,6 +35,7 @@ import { tabAlertScenario } from '../scenarios/tab-alert';
 import { loggedOutMockTest as test } from '../support/scenario-fixtures';
 
 test('logged-out mock: extension attaches and popup reports connected status', attachScenario);
+test('logged-out mock: popup shows recent chats', recentStreamsPopupScenario);
 test('logged-out mock: chat settings menu receives extension controls', settingsMenuScenario);
 test('logged-out mock: chat settings menu toggles persist options', settingsMenuBehaviorScenario);
 test('logged-out mock: extension popup settings persist options', popupSettingsBehaviorScenario);

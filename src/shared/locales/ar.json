@@ -303,6 +303,33 @@
     },
     "markUser": {
       "message": "تمييز"
+    },
+    "recentStreams": {
+      "message": "الدردشات الأخيرة"
+    },
+    "noRecentStreams": {
+      "message": "لا توجد دردشات بعد"
+    },
+    "recentStreamsCount": {
+      "message": "{count} دردشات"
+    },
+    "recentStreamsEmpty": {
+      "message": "ستظهر هنا دردشات البث المباشر التي تفتحها."
+    },
+    "visitedStreamDate": {
+      "message": "تمت الزيارة {date}"
+    },
+    "recentStreamCurrentlyOpen": {
+      "message": "نشط الآن"
+    },
+    "visitedDateUnknown": {
+      "message": "تاريخ الزيارة غير معروف"
+    },
+    "removeRecentStream": {
+      "message": "إزالة الدردشة"
+    },
+    "switchToOpenStream": {
+      "message": "التبديل إلى {name}"
     }
   }
 }

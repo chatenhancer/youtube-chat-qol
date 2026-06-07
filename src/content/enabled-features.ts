@@ -18,6 +18,7 @@ import '../features/live-edge';
 import '../features/marked-users';
 import '../features/menus';
 import '../features/profile-popup';
+import '../features/recent-streams';
 import '../features/reply';
 import '../features/inbox';
 import '../features/frequent-emojis';

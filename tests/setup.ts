@@ -57,6 +57,16 @@ const chromeMock = {
     },
     sendMessage: vi.fn((_tabId: number, _message: unknown, callback?: () => void) => {
       callback?.();
+    }),
+    update: vi.fn((_tabId: number, _updateProperties: chrome.tabs.UpdateProperties, callback?: (tab?: chrome.tabs.Tab) => void) => {
+      callback?.({ windowId: 1 } as chrome.tabs.Tab);
+      return Promise.resolve({ windowId: 1 } as chrome.tabs.Tab);
+    })
+  },
+  windows: {
+    update: vi.fn((_windowId: number, _updateInfo: chrome.windows.UpdateInfo, callback?: (window?: chrome.windows.Window) => void) => {
+      callback?.({ id: 1 } as chrome.windows.Window);
+      return Promise.resolve({ id: 1 } as chrome.windows.Window);
     })
   }
 } as unknown as typeof chrome;

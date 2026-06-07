@@ -300,6 +300,33 @@
     },
     "markUser": {
       "message": "標記"
+    },
+    "recentStreams": {
+      "message": "最近的聊天"
+    },
+    "noRecentStreams": {
+      "message": "尚無聊天"
+    },
+    "recentStreamsCount": {
+      "message": "{count} 個聊天"
+    },
+    "recentStreamsEmpty": {
+      "message": "你開啟過的直播聊天會顯示在這裡。"
+    },
+    "visitedStreamDate": {
+      "message": "造訪於 {date}"
+    },
+    "recentStreamCurrentlyOpen": {
+      "message": "目前有效"
+    },
+    "visitedDateUnknown": {
+      "message": "造訪日期不明"
+    },
+    "removeRecentStream": {
+      "message": "移除聊天"
+    },
+    "switchToOpenStream": {
+      "message": "切換到{name}"
     }
   }
 }

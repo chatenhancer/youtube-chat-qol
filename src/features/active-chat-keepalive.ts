@@ -8,6 +8,7 @@ import { createRefreshIcon } from '../shared/icons';
 import { ytcqCreateElement } from '../shared/managed-dom';
 import { findChatInput, getChatInputText, replaceChatInput } from '../youtube/chat-input';
 import { PANEL_PAGES_SELECTOR } from '../youtube/selectors';
+import { getCurrentYouTubeChatSourceUrl } from '../youtube/source-url';
 import { hideEnhancedEffect } from './enhanced-effect';
 import { registerFeatureLifecycle, suspendFeatures } from '../content/lifecycle';
 
@@ -79,6 +80,7 @@ export function cleanupStaleReconnectNotice(): void {
 function sendActiveChatPing(): void {
   try {
     keepAlivePort?.postMessage({
+      sourceUrl: getCurrentYouTubeChatSourceUrl(),
       type: ACTIVE_CHAT_PING_TYPE
     });
   } catch {

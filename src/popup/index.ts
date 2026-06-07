@@ -9,6 +9,7 @@ import { LANGUAGE_OPTIONS } from '../shared/languages';
 import {
   BOOKMARK_FILLED_ICON_PATH,
   BOOKMARK_ICON_PATH,
+  createCloseIcon,
   createOpenInNewIcon,
   createSvgIcon,
   MATERIAL_ICON_VIEW_BOX
@@ -20,6 +21,14 @@ import {
   serializeMarkedUsers,
   type MarkedUserRecord
 } from '../shared/marked-users';
+import {
+  getRecentStreamThumbnailUrl,
+  getSortedRecentStreamEntries,
+  RECENT_STREAMS_STORAGE_KEY,
+  normalizeStoredRecentStreams,
+  serializeRecentStreams,
+  type RecentStreamRecord
+} from '../shared/recent-streams';
 import { playSoftChime } from '../shared/sounds/soft-chime';
 import { DEFAULT_OPTIONS, getTargetLanguageUpdate, normalizeOptions, type Options } from '../shared/options';
 import contact from '../shared/contact.json';
@@ -40,6 +49,10 @@ interface ActiveChatTabsResponse {
   activeTabIds?: unknown;
 }
 
+interface OpenRecentStreamTabsResponse {
+  openStreamTabs?: unknown;
+}
+
 const controls = {
   landingLink: document.querySelector<HTMLAnchorElement>('#landingLink'),
   sourceCodeLink: document.querySelector<HTMLAnchorElement>('#sourceCodeLink'),
@@ -52,6 +65,8 @@ const controls = {
   extensionStatusHelper: document.querySelector<HTMLElement>('[data-extension-status-helper]'),
   bookmarksCount: document.querySelector<HTMLElement>('#bookmarksCount'),
   bookmarksList: document.querySelector<HTMLElement>('#bookmarksList'),
+  streamsCount: document.querySelector<HTMLElement>('#streamsCount'),
+  streamsList: document.querySelector<HTMLElement>('#streamsList'),
   targetLanguage: document.querySelector<HTMLSelectElement>('#targetLanguage'),
   translationDisplay: document.querySelector<HTMLSelectElement>('#translationDisplay'),
   sound: document.querySelector<HTMLInputElement>('#sound'),
@@ -68,6 +83,7 @@ function init(): void {
   const popupLocale = localizePopup();
   initPopupTabs();
   initBookmarksPanel();
+  initRecentStreamsPanel();
   refreshExtensionStatus();
 
   if (!controls.targetLanguage || !controls.translationDisplay || !controls.sound || !controls.startupEffect) {
@@ -167,9 +183,32 @@ function initBookmarksPanel(): void {
   });
 }
 
+function initRecentStreamsPanel(): void {
+  if (!controls.streamsCount || !controls.streamsList) return;
+
+  refreshRecentStreams();
+  chrome.storage.onChanged.addListener((changes, areaName) => {
+    if (areaName === 'local' && changes[RECENT_STREAMS_STORAGE_KEY]) {
+      const records = normalizeStoredRecentStreams(changes[RECENT_STREAMS_STORAGE_KEY].newValue);
+      getOpenRecentStreamTabs((openStreamTabs) => {
+        renderRecentStreams(records, openStreamTabs);
+      });
+    }
+  });
+}
+
 function refreshBookmarkedUsers(): void {
   chrome.storage.local.get({ [MARKED_USERS_STORAGE_KEY]: {} }, (stored) => {
     renderBookmarkedUsers(normalizeStoredMarkedUsers((stored || {})[MARKED_USERS_STORAGE_KEY]));
+  });
+}
+
+function refreshRecentStreams(): void {
+  chrome.storage.local.get({ [RECENT_STREAMS_STORAGE_KEY]: {} }, (stored) => {
+    const records = normalizeStoredRecentStreams((stored || {})[RECENT_STREAMS_STORAGE_KEY]);
+    getOpenRecentStreamTabs((openStreamTabs) => {
+      renderRecentStreams(records, openStreamTabs);
+    });
   });
 }
 
@@ -203,6 +242,31 @@ function renderBookmarkedUsers(records: Map<string, MarkedUserRecord>): void {
     fragment.append(createBookmarkedUserRow(key, record, active));
   });
   controls.bookmarksList.append(fragment);
+}
+
+function renderRecentStreams(records: Map<string, RecentStreamRecord>, openStreamTabs = new Map<string, number>()): void {
+  if (!controls.streamsCount || !controls.streamsList) return;
+
+  const entries = getSortedRecentStreamEntries(records);
+  controls.streamsCount.textContent = entries.length
+    ? getExtensionMessage('recentStreamsCount', String(entries.length))
+    : getExtensionMessage('noRecentStreams');
+  controls.streamsList.replaceChildren();
+  controls.streamsList.classList.toggle('streams-list-empty', entries.length === 0);
+
+  if (!entries.length) {
+    const empty = document.createElement('p');
+    empty.className = 'streams-empty';
+    empty.textContent = getExtensionMessage('recentStreamsEmpty');
+    controls.streamsList.append(empty);
+    return;
+  }
+
+  const fragment = document.createDocumentFragment();
+  entries.forEach(([key, record]) => {
+    fragment.append(createRecentStreamRow(key, record, openStreamTabs.get(key)));
+  });
+  controls.streamsList.append(fragment);
 }
 
 function getVisibleBookmarkedUserEntries(records: Map<string, MarkedUserRecord>): Array<{
@@ -263,6 +327,104 @@ function createBookmarkedUserRow(key: string, record: MarkedUserRecord, active: 
 
   row.append(avatar, copy, actions);
   return row;
+}
+
+function createRecentStreamRow(key: string, record: RecentStreamRecord, openTabId?: number): HTMLElement {
+  const row = document.createElement('article');
+  row.className = 'stream-row';
+  row.classList.toggle('stream-row-open', typeof openTabId === 'number');
+
+  const thumbnail = createRecentStreamThumbnail(record, openTabId);
+
+  const copy = document.createElement('span');
+  copy.className = 'stream-copy';
+
+  const titleButton = document.createElement('button');
+  titleButton.type = 'button';
+  titleButton.className = 'stream-title stream-title-button';
+  titleButton.title = getRecentStreamOpenLabel(record, openTabId);
+  titleButton.setAttribute('aria-label', getRecentStreamOpenLabel(record, openTabId));
+  titleButton.append(createStreamTitleLabel(record.title), createOpenInNewIcon());
+  titleButton.addEventListener('click', () => {
+    openRecentStream(record, openTabId);
+  });
+
+  const meta = document.createElement('span');
+  meta.className = 'stream-meta';
+  meta.textContent = typeof openTabId === 'number'
+    ? getExtensionMessage('recentStreamCurrentlyOpen')
+    : formatRecentStreamDate(record.lastVisitedAt);
+
+  copy.append(titleButton, meta);
+
+  const actions = document.createElement('span');
+  actions.className = 'stream-actions';
+
+  const removeButton = document.createElement('button');
+  removeButton.type = 'button';
+  removeButton.className = 'stream-action-button';
+  removeButton.title = getExtensionMessage('removeRecentStream');
+  removeButton.setAttribute('aria-label', getExtensionMessage('removeRecentStream'));
+  removeButton.append(createCloseIcon());
+  removeButton.addEventListener('click', () => {
+    removeRecentStream(key);
+  });
+  actions.append(removeButton);
+
+  row.append(thumbnail, copy, actions);
+  return row;
+}
+
+function createRecentStreamThumbnail(record: RecentStreamRecord, openTabId?: number): HTMLButtonElement {
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = 'stream-thumbnail-button';
+  button.title = getRecentStreamOpenLabel(record, openTabId);
+  button.setAttribute('aria-label', getRecentStreamOpenLabel(record, openTabId));
+
+  const fallback = document.createElement('span');
+  fallback.className = 'stream-thumbnail-fallback';
+  button.append(fallback);
+
+  const thumbnailUrl = getRecentStreamThumbnailUrl(record.url);
+  if (thumbnailUrl) {
+    const image = document.createElement('img');
+    image.src = thumbnailUrl;
+    image.alt = '';
+    image.loading = 'lazy';
+    image.decoding = 'async';
+    image.referrerPolicy = 'no-referrer';
+    image.addEventListener('error', () => {
+      image.remove();
+    }, { once: true });
+    button.append(image);
+  }
+
+  if (typeof openTabId === 'number') {
+    const onlineIndicator = document.createElement('span');
+    onlineIndicator.className = 'stream-online-dot';
+    onlineIndicator.setAttribute('aria-hidden', 'true');
+    button.append(onlineIndicator);
+  }
+
+  button.addEventListener('click', () => {
+    openRecentStream(record, openTabId);
+  });
+  return button;
+}
+
+function getRecentStreamOpenLabel(record: RecentStreamRecord, openTabId?: number): string {
+  const title = record.title || getExtensionMessage('unknownStream');
+  return typeof openTabId === 'number'
+    ? getExtensionMessage('switchToOpenStream', title)
+    : getExtensionMessage('openStreamInNewWindow', title);
+}
+
+function createStreamTitleLabel(title: string): HTMLElement {
+  const label = document.createElement('span');
+  label.className = 'stream-title-label';
+  label.textContent = title || getExtensionMessage('unknownStream');
+  return label;
 }
 
 function createBookmarkedUserAvatar(record: MarkedUserRecord, channelUrl: string): HTMLElement {
@@ -356,6 +518,59 @@ function markBookmarkedUser(key: string, record: MarkedUserRecord): void {
   });
 }
 
+function removeRecentStream(key: string): void {
+  chrome.storage.local.get({ [RECENT_STREAMS_STORAGE_KEY]: {} }, (stored) => {
+    const records = normalizeStoredRecentStreams((stored || {})[RECENT_STREAMS_STORAGE_KEY]);
+    records.delete(key);
+    chrome.storage.local.set({ [RECENT_STREAMS_STORAGE_KEY]: serializeRecentStreams(records) }, () => {
+      renderRecentStreams(records);
+    });
+  });
+}
+
+function getOpenRecentStreamTabs(callback: (openStreamTabs: Map<string, number>) => void): void {
+  chrome.runtime.sendMessage({ type: 'ytcq:get-open-recent-stream-tabs' }, (response?: OpenRecentStreamTabsResponse) => {
+    if (chrome.runtime.lastError) {
+      callback(new Map());
+      return;
+    }
+    callback(normalizeOpenRecentStreamTabsResponse(response));
+  });
+}
+
+function normalizeOpenRecentStreamTabsResponse(response: OpenRecentStreamTabsResponse | undefined): Map<string, number> {
+  const openStreamTabs = new Map<string, number>();
+  if (!response?.openStreamTabs || typeof response.openStreamTabs !== 'object' || Array.isArray(response.openStreamTabs)) {
+    return openStreamTabs;
+  }
+
+  Object.entries(response.openStreamTabs as Record<string, unknown>).forEach(([key, tabId]) => {
+    if (!key || typeof tabId !== 'number' || !Number.isInteger(tabId) || tabId < 0) return;
+    openStreamTabs.set(key, tabId);
+  });
+  return openStreamTabs;
+}
+
+function openRecentStream(record: RecentStreamRecord, openTabId?: number): void {
+  if (typeof openTabId !== 'number') {
+    chrome.tabs.create({ url: record.url });
+    return;
+  }
+
+  chrome.tabs.update(openTabId, { active: true }, (tab) => {
+    if (chrome.runtime.lastError) {
+      chrome.tabs.create({ url: record.url });
+      return;
+    }
+
+    if (typeof tab?.windowId === 'number') {
+      chrome.windows.update(tab.windowId, { focused: true }, () => {
+        void chrome.runtime.lastError;
+      });
+    }
+  });
+}
+
 function getBookmarkedUserInitial(authorName: string): string {
   const normalized = authorName.trim().replace(/^@/, '');
   return (normalized[0] || '?').toUpperCase();
@@ -369,6 +584,16 @@ function formatBookmarkedUserDate(timestamp: number): string {
     timeStyle: 'short'
   }).format(timestamp);
   return getExtensionMessage('markedUserDate', formatted);
+}
+
+function formatRecentStreamDate(timestamp: number): string {
+  if (!Number.isFinite(timestamp) || timestamp <= 0) return getExtensionMessage('visitedDateUnknown');
+
+  const formatted = new Intl.DateTimeFormat(undefined, {
+    dateStyle: 'medium',
+    timeStyle: 'short'
+  }).format(timestamp);
+  return getExtensionMessage('visitedStreamDate', formatted);
 }
 
 function getBookmarkedUserChannelUrl(record: MarkedUserRecord): string {

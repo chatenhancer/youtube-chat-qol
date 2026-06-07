@@ -303,6 +303,33 @@
     },
     "markUser": {
       "message": "Mark"
+    },
+    "recentStreams": {
+      "message": "Recent chats"
+    },
+    "noRecentStreams": {
+      "message": "No chats yet"
+    },
+    "recentStreamsCount": {
+      "message": "{count} chats"
+    },
+    "recentStreamsEmpty": {
+      "message": "Live chats you open will appear here."
+    },
+    "visitedStreamDate": {
+      "message": "Visited {date}"
+    },
+    "recentStreamCurrentlyOpen": {
+      "message": "Active now"
+    },
+    "visitedDateUnknown": {
+      "message": "Visit date unknown"
+    },
+    "removeRecentStream": {
+      "message": "Remove chat"
+    },
+    "switchToOpenStream": {
+      "message": "Switch to {name}"
     }
   }
 }

@@ -303,6 +303,33 @@
     },
     "markUser": {
       "message": "マーク"
+    },
+    "recentStreams": {
+      "message": "最近のチャット"
+    },
+    "noRecentStreams": {
+      "message": "チャットはまだありません"
+    },
+    "recentStreamsCount": {
+      "message": "{count} 件のチャット"
+    },
+    "recentStreamsEmpty": {
+      "message": "開いたライブチャットがここに表示されます。"
+    },
+    "visitedStreamDate": {
+      "message": "{date} に表示"
+    },
+    "recentStreamCurrentlyOpen": {
+      "message": "現在アクティブ"
+    },
+    "visitedDateUnknown": {
+      "message": "表示日時不明"
+    },
+    "removeRecentStream": {
+      "message": "チャットを削除"
+    },
+    "switchToOpenStream": {
+      "message": "{name} に切り替え"
     }
   }
 }

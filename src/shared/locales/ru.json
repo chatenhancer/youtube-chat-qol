@@ -303,6 +303,33 @@
     },
     "markUser": {
       "message": "Отметить"
+    },
+    "recentStreams": {
+      "message": "Недавние чаты"
+    },
+    "noRecentStreams": {
+      "message": "Чатов пока нет"
+    },
+    "recentStreamsCount": {
+      "message": "{count} чатов"
+    },
+    "recentStreamsEmpty": {
+      "message": "Открытые вами live-чаты появятся здесь."
+    },
+    "visitedStreamDate": {
+      "message": "Просмотрено {date}"
+    },
+    "recentStreamCurrentlyOpen": {
+      "message": "Активен сейчас"
+    },
+    "visitedDateUnknown": {
+      "message": "Дата просмотра неизвестна"
+    },
+    "removeRecentStream": {
+      "message": "Удалить чат"
+    },
+    "switchToOpenStream": {
+      "message": "Перейти к {name}"
     }
   }
 }

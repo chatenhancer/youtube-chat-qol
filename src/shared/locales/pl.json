@@ -300,6 +300,33 @@
     },
     "markUser": {
       "message": "Oznacz"
+    },
+    "recentStreams": {
+      "message": "Ostatnie czaty"
+    },
+    "noRecentStreams": {
+      "message": "Brak czatów"
+    },
+    "recentStreamsCount": {
+      "message": "{count} czatów"
+    },
+    "recentStreamsEmpty": {
+      "message": "Otwarte czaty na żywo pojawią się tutaj."
+    },
+    "visitedStreamDate": {
+      "message": "Odwiedzono {date}"
+    },
+    "recentStreamCurrentlyOpen": {
+      "message": "Aktywny teraz"
+    },
+    "visitedDateUnknown": {
+      "message": "Nieznana data odwiedzin"
+    },
+    "removeRecentStream": {
+      "message": "Usuń czat"
+    },
+    "switchToOpenStream": {
+      "message": "Przełącz na {name}"
     }
   }
 }
