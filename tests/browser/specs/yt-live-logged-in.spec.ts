@@ -26,6 +26,7 @@ import {
   quoteMenuDraftScenario
 } from '../scenarios/message-actions';
 import { markedUserMessageMenuScenario } from '../scenarios/marked-users';
+import { realReplacedTranslationToggleScenario } from '../scenarios/message-translation';
 import { settingsMenuScenario } from '../scenarios/menus';
 import { profileCardRecentMessagesScenario } from '../scenarios/profile';
 import { loggedInLiveTest as test } from '../support/scenario-fixtures';
@@ -35,6 +36,7 @@ test('logged-in live: mark user from message menu persists and shows avatar ring
 test('logged-in live: mention menu action writes a draft only', mentionMenuDraftScenario);
 test('logged-in live: quote menu action writes a draft only', quoteMenuDraftScenario);
 test('logged-in live: chat settings menu receives extension controls', settingsMenuScenario);
+test('logged-in live: replaced translations toggle from the inline icon', realReplacedTranslationToggleScenario);
 test('logged-in live: focus panel opens from an author and follows their messages', focusPanelOpensFromAuthorScenario);
 test('logged-in live: inbox opens from the chat header', inboxOpensFromHeaderScenario);
 test('logged-in live: profile card opens from a chat avatar', profileCardRecentMessagesScenario);

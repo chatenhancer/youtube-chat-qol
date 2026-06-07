@@ -6,12 +6,10 @@
  */
 import { getOptions } from '../../shared/state';
 import { appendRichMessageText } from '../../youtube/rich-text';
-import { createNodesWithPlaceholders } from '../translation/protected-placeholders';
 import {
   createInlineTranslationElement,
-  createReplacedTranslationIcon,
-  getReplacementTranslationTitle,
-  isMeaningfulTranslation
+  isMeaningfulTranslation,
+  renderToggleableReplacementTranslation
 } from '../translation/render';
 import type { MessageTranslationRecord } from '../translation/types';
 import type { FocusRecord } from './types';
@@ -20,14 +18,14 @@ export function renderFocusMessageText(item: HTMLElement, bubble: HTMLElement, r
   const translation = getVisibleFocusMessageTranslation(record);
 
   if (translation && getOptions().translationDisplay === 'replace') {
-    item.classList.add('ytcq-translation-replaced');
-    bubble.classList.add('ytcq-translation-replaced-text');
-    bubble.lang = translation.result.targetLanguage;
-    bubble.title = getReplacementTranslationTitle(translation.result, record.text);
-    bubble.append(
-      ...createNodesWithPlaceholders(translation.result.text, translation.protectedTokens),
-      createReplacedTranslationIcon()
-    );
+    renderToggleableReplacementTranslation({
+      host: item,
+      originalText: record.text,
+      protectedTokens: translation.protectedTokens,
+      renderOriginal: (target) => appendRichMessageText(target, record.text, [], record.contentParts),
+      result: translation.result,
+      textElement: bubble
+    });
     return;
   }
 

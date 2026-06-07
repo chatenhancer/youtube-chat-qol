@@ -9,12 +9,10 @@ import { t } from '../../shared/i18n';
 import { ytcqCreateElement } from '../../shared/managed-dom';
 import { normalizeComparableText } from '../../shared/text';
 import { appendRichMessageText } from '../../youtube/rich-text';
-import { createNodesWithPlaceholders } from '../translation/protected-placeholders';
 import {
   createInlineTranslationElement,
-  createReplacedTranslationIcon,
-  getReplacementTranslationTitle,
-  isMeaningfulTranslation
+  isMeaningfulTranslation,
+  renderToggleableReplacementTranslation
 } from '../translation/render';
 import {
   getLiveMessageForRecord,
@@ -92,14 +90,14 @@ function renderProfileMessageText(
   const translation = getVisibleProfileMessageTranslation(recentMessage);
 
   if (translation && getOptions().translationDisplay === 'replace') {
-    item.classList.add('ytcq-translation-replaced');
-    text.classList.add('ytcq-translation-replaced-text');
-    text.lang = translation.result.targetLanguage;
-    text.title = getReplacementTranslationTitle(translation.result, recentMessage.text);
-    text.append(
-      ...createNodesWithPlaceholders(translation.result.text, translation.protectedTokens),
-      createReplacedTranslationIcon()
-    );
+    renderToggleableReplacementTranslation({
+      host: item,
+      originalText: recentMessage.text,
+      protectedTokens: translation.protectedTokens,
+      renderOriginal: (target) => appendRichMessageText(target, recentMessage.text, [], recentMessage.contentParts),
+      result: translation.result,
+      textElement: text
+    });
     return;
   }
 
