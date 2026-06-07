@@ -348,8 +348,10 @@ main {
 
 .bookmarks-list {
   display: grid;
+  align-content: start;
   flex: 1 1 auto;
   gap: 4px;
+  grid-auto-rows: max-content;
   max-height: 270px;
   min-height: 0;
   overflow-y: auto;
