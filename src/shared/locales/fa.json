@@ -160,7 +160,7 @@
       "message": "در {count} تب دیگر فعال است"
     },
     "extensionStatusInactiveAll": {
-      "message": "در هیچ تب بازی فعال نیست"
+      "message": "غیرفعال"
     },
     "extensionStatusConnected": {
       "message": "افزونه به چت زنده YouTube متصل است."
@@ -248,9 +248,6 @@
     },
     "extensionVersion": {
       "message": "نسخه افزونه"
-    },
-    "versionLabel": {
-      "message": "نسخه {version}"
     },
     "off": {
       "message": "خاموش"

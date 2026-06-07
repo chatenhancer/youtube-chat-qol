@@ -160,7 +160,7 @@
       "message": "Đang hoạt động trong {count} tab khác"
     },
     "extensionStatusInactiveAll": {
-      "message": "Không hoạt động trong tab đang mở nào"
+      "message": "Không hoạt động"
     },
     "extensionStatusConnected": {
       "message": "Tiện ích đã kết nối với cuộc trò chuyện trực tiếp trên YouTube."
@@ -248,9 +248,6 @@
     },
     "extensionVersion": {
       "message": "Phiên bản tiện ích"
-    },
-    "versionLabel": {
-      "message": "Phiên bản {version}"
     },
     "off": {
       "message": "Tắt"

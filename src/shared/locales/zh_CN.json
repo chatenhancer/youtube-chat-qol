@@ -161,7 +161,7 @@
       "message": "已在另外 {count} 个标签页中启用"
     },
     "extensionStatusInactiveAll": {
-      "message": "未在任何打开的标签页中启用"
+      "message": "未启用"
     },
     "extensionStatusConnected": {
       "message": "扩展程序已连接到 YouTube 直播聊天。"
@@ -251,9 +251,6 @@
     },
     "extensionVersion": {
       "message": "扩展版本"
-    },
-    "versionLabel": {
-      "message": "版本 {version}"
     },
     "off": {
       "message": "关闭"

@@ -160,7 +160,7 @@
       "message": "다른 탭 {count}개에서 활성화됨"
     },
     "extensionStatusInactiveAll": {
-      "message": "열린 탭 어디에서도 활성화되지 않음"
+      "message": "비활성"
     },
     "extensionStatusConnected": {
       "message": "확장 프로그램이 YouTube 실시간 채팅에 연결되었습니다."
@@ -248,9 +248,6 @@
     },
     "extensionVersion": {
       "message": "확장 프로그램 버전"
-    },
-    "versionLabel": {
-      "message": "버전 {version}"
     },
     "off": {
       "message": "끄기"

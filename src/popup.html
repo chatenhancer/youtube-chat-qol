@@ -44,14 +44,6 @@
       </nav>
 
       <div id="settingsPanel" class="popup-tab-panel" role="tabpanel" aria-labelledby="settingsTab" data-popup-tab-panel>
-        <section class="extension-status" data-extension-status="checking" aria-live="polite">
-          <span class="extension-status-dot" aria-hidden="true"></span>
-          <span class="extension-status-copy">
-            <strong data-extension-status-text data-i18n="extensionStatusChecking">Checking open tabs...</strong>
-            <span data-extension-status-helper data-i18n="extensionStatusCheckingHelper">Looking for YouTube live chat tabs.</span>
-          </span>
-        </section>
-
         <section class="settings-section" aria-labelledby="translation-heading">
           <h2 id="translation-heading" data-i18n="translation">Translation</h2>
 
@@ -122,10 +114,6 @@
             <input id="startupEffect" type="checkbox" title="Show a brief startup effect when the extension connects to chat. Reduced motion disables it automatically." data-i18n-title="startupShimmerTitle">
           </label>
         </section>
-
-        <footer class="footer">
-          <p id="version" class="version" aria-label="Extension version" data-i18n-aria-label="extensionVersion"></p>
-        </footer>
       </div>
 
       <div id="bookmarksPanel" class="popup-tab-panel" role="tabpanel" aria-labelledby="bookmarksTab" data-popup-tab-panel hidden>
@@ -137,6 +125,16 @@
           <div id="bookmarksList" class="bookmarks-list" aria-live="polite"></div>
         </section>
       </div>
+
+      <footer class="footer">
+        <p id="version" class="version" aria-label="Extension version" data-i18n-aria-label="extensionVersion"></p>
+        <div class="extension-status" data-extension-status="checking" aria-live="polite">
+          <span class="extension-status-dot" aria-hidden="true"></span>
+          <span class="extension-status-copy">
+            <strong data-extension-status-text data-i18n="extensionStatusChecking">Checking open tabs...</strong>
+          </span>
+        </div>
+      </footer>
     </main>
     <script src="popup.js"></script>
   </body>

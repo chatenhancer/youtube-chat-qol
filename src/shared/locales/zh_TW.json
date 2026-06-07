@@ -160,7 +160,7 @@
       "message": "已在另外 {count} 個分頁中啟用"
     },
     "extensionStatusInactiveAll": {
-      "message": "未在任何開啟的分頁中啟用"
+      "message": "未啟用"
     },
     "extensionStatusConnected": {
       "message": "擴充功能已連線到 YouTube 直播聊天室。"
@@ -248,9 +248,6 @@
     },
     "extensionVersion": {
       "message": "擴充功能版本"
-    },
-    "versionLabel": {
-      "message": "版本 {version}"
     },
     "off": {
       "message": "關閉"

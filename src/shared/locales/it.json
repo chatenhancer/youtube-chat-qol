@@ -161,7 +161,7 @@
       "message": "Attivo in altre {count} schede"
     },
     "extensionStatusInactiveAll": {
-      "message": "Non attivo in nessuna scheda aperta"
+      "message": "Inattivo"
     },
     "extensionStatusConnected": {
       "message": "Estensione connessa alla chat live di YouTube."
@@ -251,9 +251,6 @@
     },
     "extensionVersion": {
       "message": "Versione estensione"
-    },
-    "versionLabel": {
-      "message": "Versione {version}"
     },
     "off": {
       "message": "Disattivato"

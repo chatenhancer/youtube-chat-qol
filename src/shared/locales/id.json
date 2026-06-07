@@ -161,7 +161,7 @@
       "message": "Aktif di {count} tab lain"
     },
     "extensionStatusInactiveAll": {
-      "message": "Tidak aktif di tab terbuka mana pun"
+      "message": "Tidak aktif"
     },
     "extensionStatusConnected": {
       "message": "Ekstensi terhubung ke live chat YouTube."
@@ -251,9 +251,6 @@
     },
     "extensionVersion": {
       "message": "Versi ekstensi"
-    },
-    "versionLabel": {
-      "message": "Versi {version}"
     },
     "off": {
       "message": "Mati"
