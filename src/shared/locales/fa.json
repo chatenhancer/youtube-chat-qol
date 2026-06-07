@@ -31,6 +31,8 @@
     "lessThanOneMinute": "کمتر از ۱ دقیقه",
     "markUser": "علامت",
     "unmarkUser": "برداشتن",
+    "bookmarkUser": "نشانک",
+    "removeBookmark": "حذف نشانک",
     "mention": "منشن",
     "mentionUser": "منشن کاربر",
     "mentionUserTitle": "منشن کاربر. برای نقل‌قول Alt/Option-click کنید.",
@@ -254,7 +256,7 @@
       "message": "خاموش"
     },
     "popupResetConfirm": {
-      "message": "تنظیمات Chat Enhancer بازنشانی و همه داده‌های محلی افزونه پاک شوند؟\n\nاین شامل پیام‌های صندوق ورودی، کلیدواژه‌های دنبال‌شده، ایموجی‌های پرتکرار، پیش‌نویس‌های ارسال‌نشده و کاربران علامت‌گذاری‌شده است."
+      "message": "تنظیمات Chat Enhancer بازنشانی شود و همه داده‌های محلی افزونه پاک شود؟\n\nاین شامل پیام‌های صندوق، کلیدواژه‌های زیر نظر، ایموجی‌های پرتکرار، پیش‌نویس‌های ارسال‌نشده، کاربران نشانک‌شده است."
     },
     "popupResetComplete": {
       "message": "Chat Enhancer بازنشانی شد."
@@ -275,13 +277,13 @@
       "message": "{count} نشانک"
     },
     "bookmarkedUsersEmpty": {
-      "message": "کاربرانی که از چت YouTube نشان می‌کنید اینجا نمایش داده می‌شوند."
+      "message": "کاربرانی که از چت YouTube نشانک می‌کنید اینجا نمایش داده می‌شوند."
     },
     "markedUserDate": {
-      "message": "نشان‌شده در {date}"
+      "message": "در {date} نشانک شد"
     },
     "markedDateUnknown": {
-      "message": "تاریخ نامشخص"
+      "message": "تاریخ نشانک نامشخص است"
     },
     "unknownStream": {
       "message": "پخش نامشخص"
@@ -300,6 +302,12 @@
     },
     "markUser": {
       "message": "علامت"
+    },
+    "bookmarkUser": {
+      "message": "نشانک"
+    },
+    "removeBookmark": {
+      "message": "حذف نشانک"
     }
   }
 }

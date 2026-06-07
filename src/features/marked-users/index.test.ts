@@ -63,7 +63,7 @@ describe('marked users', () => {
       timeStyle: 'short'
     }).format(1_700_000_000_000);
 
-    expect(button.title).toContain('Unmark');
+    expect(button.title).toContain('Remove bookmark');
     expect(button.title).toContain(formattedDate);
     expect(button.title).toContain('Example Stream');
     expect(button.classList.contains('ytcq-marked-user-toggle-active')).toBe(true);
@@ -180,7 +180,7 @@ describe('marked users', () => {
 
     const button = markedUsers.createMarkedUserToggleButton({ authorName: '@ViewerOne' });
     expect(button.classList.contains('ytcq-marked-user-toggle-active')).toBe(true);
-    expect(button.title).toBe('Unmark');
+    expect(button.title).toBe('Remove bookmark');
   });
 
   it('refreshes rings and toggle icons when marked users change in storage', async () => {
@@ -256,7 +256,7 @@ describe('marked users', () => {
     markedUsers.applyMarkedUserRing(null, { authorName: '@ViewerOne' });
 
     const emptyButton = markedUsers.createMarkedUserToggleButton({});
-    expect(emptyButton.title).toBe('Mark');
+    expect(emptyButton.title).toBe('Bookmark');
   });
 
   it('handles message author mark helpers for missing and present authors', async () => {

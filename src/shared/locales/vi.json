@@ -31,6 +31,8 @@
     "lessThanOneMinute": "dưới 1 phút",
     "markUser": "Đánh dấu",
     "unmarkUser": "Bỏ dấu",
+    "bookmarkUser": "Lưu dấu trang",
+    "removeBookmark": "Xóa dấu trang",
     "mention": "Nhắc đến",
     "mentionUser": "Nhắc đến người dùng",
     "mentionUserTitle": "Nhắc đến người dùng. Alt/Option-click để trích dẫn.",
@@ -254,7 +256,7 @@
       "message": "Tắt"
     },
     "popupResetConfirm": {
-      "message": "Đặt lại cài đặt Chat Enhancer và xóa tất cả dữ liệu tiện ích cục bộ?\n\nBao gồm tin nhắn hộp thư, từ khóa đang theo dõi, emoji thường dùng, bản nháp chưa gửi và người dùng đã đánh dấu."
+      "message": "Đặt lại cài đặt Chat Enhancer và xóa toàn bộ dữ liệu tiện ích cục bộ?\n\nBao gồm tin nhắn trong hộp thư, từ khóa đang theo dõi, emoji thường dùng, bản nháp chưa gửi, người dùng đã lưu dấu trang."
     },
     "popupResetComplete": {
       "message": "Chat Enhancer đã được đặt lại."
@@ -275,13 +277,13 @@
       "message": "{count} dấu trang"
     },
     "bookmarkedUsersEmpty": {
-      "message": "Người dùng bạn đánh dấu trong chat YouTube sẽ xuất hiện ở đây."
+      "message": "Người dùng bạn lưu dấu trang từ chat YouTube sẽ xuất hiện ở đây."
     },
     "markedUserDate": {
-      "message": "Đã đánh dấu {date}"
+      "message": "Đã lưu dấu trang {date}"
     },
     "markedDateUnknown": {
-      "message": "Không rõ ngày"
+      "message": "Không rõ ngày lưu dấu trang"
     },
     "unknownStream": {
       "message": "Livestream không rõ"
@@ -300,6 +302,12 @@
     },
     "markUser": {
       "message": "Đánh dấu"
+    },
+    "bookmarkUser": {
+      "message": "Lưu dấu trang"
+    },
+    "removeBookmark": {
+      "message": "Xóa dấu trang"
     }
   }
 }

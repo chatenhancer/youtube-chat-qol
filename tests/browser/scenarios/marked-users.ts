@@ -1,8 +1,8 @@
 /**
- * Browser scenario for marking chat users.
+ * Browser scenario for bookmarking chat users.
  *
  * This covers the user-visible path: Mark from YouTube's message context menu,
- * see the avatar ring, find the user in the extension popup, then unmark them
+ * see the avatar ring, find the user in the extension popup, then remove the bookmark
  * from the popup and verify the ring is removed.
  */
 import { expect, test, type BrowserContext, type Locator, type Page } from '@playwright/test';
@@ -31,7 +31,7 @@ export const markedUserMessageMenuScenario: BrowserScenario = async ({ chat, con
     await expectMarkedUserStorageCount(context, 0);
 
     const source = await markUserFromMessageMenu(chat);
-    await expectMarkedUserStored(context, source.authorName);
+    await expectBookmarkedUserStored(context, source.authorName);
     await expectMarkedUserRingVisible(source.message);
     await expectMarkedUserListedInPopupAndUnmark(context, source.authorName);
     await expectMarkedUserStorageCount(context, 0);
@@ -52,8 +52,8 @@ async function markUserFromMessageMenu(chat: Parameters<BrowserScenario>[0]['cha
   return source;
 }
 
-async function expectMarkedUserStored(context: BrowserContext, authorName: string): Promise<void> {
-  await test.step('Verify marked user is saved in extension storage', async () => {
+async function expectBookmarkedUserStored(context: BrowserContext, authorName: string): Promise<void> {
+  await test.step('Verify bookmarked user is saved in extension storage', async () => {
     await expect.poll(async () => {
       const records = await getStoredMarkedUserRecords(context);
       return records.some((record) => {
@@ -62,7 +62,7 @@ async function expectMarkedUserStored(context: BrowserContext, authorName: strin
           Boolean(record.markedSourceTitle || record.markedSourceUrl);
       });
     }, {
-      message: 'Marked user should be stored with author and stream context.',
+      message: 'Bookmarked user should be stored with author and stream context.',
       timeout: 10_000
     }).toBe(true);
   });
@@ -92,7 +92,7 @@ async function expectMarkedUserRingRemoved(message: Locator): Promise<void> {
 }
 
 async function expectMarkedUserListedInPopupAndUnmark(context: BrowserContext, authorName: string): Promise<void> {
-  await test.step('Open popup Bookmarks tab and unmark the user', async () => {
+  await test.step('Open popup Bookmarks tab and remove the bookmark', async () => {
     const popup = await openExtensionPopup(context);
 
     try {
@@ -103,10 +103,10 @@ async function expectMarkedUserListedInPopupAndUnmark(context: BrowserContext, a
       await expect(row.locator('.bookmark-source')).not.toHaveText('');
 
       const action = row.locator('.bookmark-action-button').first();
-      await expect(action).toHaveAttribute('aria-label', 'Unmark');
+      await expect(action).toHaveAttribute('aria-label', 'Remove bookmark');
       await action.click();
       await expect(row).toHaveClass(/bookmark-row-unmarked/);
-      await expect(action).toHaveAttribute('aria-label', 'Mark');
+      await expect(action).toHaveAttribute('aria-label', 'Bookmark');
     } finally {
       await popup.close().catch(() => undefined);
     }

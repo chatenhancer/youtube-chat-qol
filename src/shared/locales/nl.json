@@ -31,6 +31,8 @@
     "lessThanOneMinute": "minder dan 1 min",
     "markUser": "Markeren",
     "unmarkUser": "Verwijderen",
+    "bookmarkUser": "Bladwijzer maken",
+    "removeBookmark": "Bladwijzer verwijderen",
     "mention": "Vermelden",
     "mentionUser": "Gebruiker vermelden",
     "mentionUserTitle": "Gebruiker vermelden. Alt/Option-klik om te citeren.",
@@ -254,7 +256,7 @@
       "message": "Uit"
     },
     "popupResetConfirm": {
-      "message": "Chat Enhancer-instellingen resetten en alle lokale extensiegegevens wissen?\n\nDit omvat inboxberichten, gevolgde trefwoorden, frequente emoji's, niet-verzonden concepten en gemarkeerde gebruikers."
+      "message": "Chat Enhancer-instellingen resetten en alle lokale extensiegegevens wissen?\n\nDit omvat inboxberichten, gevolgde trefwoorden, veelgebruikte emoji’s, niet-verzonden concepten, gebruikers met bladwijzer."
     },
     "popupResetComplete": {
       "message": "Chat Enhancer is gereset."
@@ -275,13 +277,13 @@
       "message": "{count} bladwijzers"
     },
     "bookmarkedUsersEmpty": {
-      "message": "Gebruikers die je markeert in YouTube-chat verschijnen hier."
+      "message": "Gebruikers die je vanuit YouTube-chat als bladwijzer opslaat, verschijnen hier."
     },
     "markedUserDate": {
-      "message": "Gemarkeerd op {date}"
+      "message": "Als bladwijzer opgeslagen op {date}"
     },
     "markedDateUnknown": {
-      "message": "Datum onbekend"
+      "message": "Bladwijzerdatum onbekend"
     },
     "unknownStream": {
       "message": "Onbekende stream"
@@ -300,6 +302,12 @@
     },
     "markUser": {
       "message": "Markeren"
+    },
+    "bookmarkUser": {
+      "message": "Bladwijzer maken"
+    },
+    "removeBookmark": {
+      "message": "Bladwijzer verwijderen"
     }
   }
 }

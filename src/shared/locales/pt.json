@@ -31,6 +31,8 @@
     "lessThanOneMinute": "menos de 1 min",
     "markUser": "Marcar",
     "unmarkUser": "Desmarcar",
+    "bookmarkUser": "Salvar favorito",
+    "removeBookmark": "Remover favorito",
     "mention": "Mencionar",
     "mentionUser": "Mencionar usuário",
     "mentionUserTitle": "Mencionar usuário. Alt/Option-clique para citar.",
@@ -257,7 +259,7 @@
       "message": "Desativado"
     },
     "popupResetConfirm": {
-      "message": "Redefinir as configurações do Chat Enhancer e limpar todos os dados locais da extensão?\n\nIsso inclui mensagens da caixa de entrada, palavras-chave observadas, emojis frequentes, rascunhos não enviados e usuários marcados."
+      "message": "Redefinir as configurações do Chat Enhancer e limpar todos os dados locais da extensão?\n\nIsso inclui mensagens da caixa de entrada, palavras-chave monitoradas, emojis frequentes, rascunhos não enviados, usuários salvos como favoritos."
     },
     "popupResetComplete": {
       "message": "Chat Enhancer foi redefinido."
@@ -278,13 +280,13 @@
       "message": "{count} marcadores"
     },
     "bookmarkedUsersEmpty": {
-      "message": "Os usuários que você marcar no chat do YouTube aparecerão aqui."
+      "message": "Os usuários que você salvar como favoritos no chat do YouTube aparecerão aqui."
     },
     "markedUserDate": {
-      "message": "Marcado em {date}"
+      "message": "Salvo como favorito em {date}"
     },
     "markedDateUnknown": {
-      "message": "Data desconhecida"
+      "message": "Data do favorito desconhecida"
     },
     "unknownStream": {
       "message": "Transmissão desconhecida"
@@ -303,6 +305,12 @@
     },
     "markUser": {
       "message": "Marcar"
+    },
+    "bookmarkUser": {
+      "message": "Salvar favorito"
+    },
+    "removeBookmark": {
+      "message": "Remover favorito"
     }
   }
 }

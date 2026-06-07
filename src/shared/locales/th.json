@@ -31,6 +31,8 @@
     "lessThanOneMinute": "น้อยกว่า 1 นาที",
     "markUser": "ทำเครื่องหมาย",
     "unmarkUser": "ยกเลิก",
+    "bookmarkUser": "บุ๊กมาร์ก",
+    "removeBookmark": "ลบบุ๊กมาร์ก",
     "mention": "กล่าวถึง",
     "mentionUser": "กล่าวถึงผู้ใช้",
     "mentionUserTitle": "กล่าวถึงผู้ใช้ กด Alt/Option-click เพื่ออ้างอิง",
@@ -254,7 +256,7 @@
       "message": "ปิด"
     },
     "popupResetConfirm": {
-      "message": "รีเซ็ตการตั้งค่า Chat Enhancer และล้างข้อมูลส่วนขยายในเครื่องทั้งหมดหรือไม่?\n\nซึ่งรวมถึงข้อความในกล่องข้อความ คำสำคัญที่ติดตาม อีโมจิที่ใช้บ่อย แบบร่างที่ยังไม่ส่ง และผู้ใช้ที่ทำเครื่องหมายไว้"
+      "message": "รีเซ็ตการตั้งค่า Chat Enhancer และล้างข้อมูลส่วนขยายในเครื่องทั้งหมดหรือไม่?\n\nซึ่งรวมถึงข้อความในกล่องข้อความ คำสำคัญที่ติดตาม อีโมจิที่ใช้บ่อย แบบร่างที่ยังไม่ได้ส่ง ผู้ใช้ที่บุ๊กมาร์กไว้"
     },
     "popupResetComplete": {
       "message": "รีเซ็ต Chat Enhancer แล้ว"
@@ -275,13 +277,13 @@
       "message": "{count} บุ๊กมาร์ก"
     },
     "bookmarkedUsersEmpty": {
-      "message": "ผู้ใช้ที่คุณทำเครื่องหมายจากแชท YouTube จะแสดงที่นี่"
+      "message": "ผู้ใช้ที่คุณบุ๊กมาร์กจากแชท YouTube จะแสดงที่นี่"
     },
     "markedUserDate": {
-      "message": "ทำเครื่องหมายเมื่อ {date}"
+      "message": "บุ๊กมาร์กเมื่อ {date}"
     },
     "markedDateUnknown": {
-      "message": "ไม่ทราบวันที่"
+      "message": "ไม่ทราบวันที่บุ๊กมาร์ก"
     },
     "unknownStream": {
       "message": "สตรีมไม่ทราบชื่อ"
@@ -300,6 +302,12 @@
     },
     "markUser": {
       "message": "ทำเครื่องหมาย"
+    },
+    "bookmarkUser": {
+      "message": "บุ๊กมาร์ก"
+    },
+    "removeBookmark": {
+      "message": "ลบบุ๊กมาร์ก"
     }
   }
 }

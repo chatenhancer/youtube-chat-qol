@@ -31,6 +31,8 @@
     "lessThanOneMinute": "menos de 1 min",
     "markUser": "Marcar",
     "unmarkUser": "Desmarcar",
+    "bookmarkUser": "Guardar marcador",
+    "removeBookmark": "Eliminar marcador",
     "mention": "Mencionar",
     "mentionUser": "Mencionar usuario",
     "mentionUserTitle": "Mencionar usuario. Alt/Opción-clic para citar.",
@@ -254,7 +256,7 @@
       "message": "Desactivado"
     },
     "popupResetConfirm": {
-      "message": "¿Restablecer la configuración de Chat Enhancer y borrar todos los datos locales de la extensión?\n\nEsto incluye mensajes de la bandeja, palabras clave vigiladas, emojis frecuentes, borradores sin enviar y usuarios marcados."
+      "message": "¿Restablecer la configuración de Chat Enhancer y borrar todos los datos locales de la extensión?\n\nEsto incluye mensajes del buzón, palabras clave vigiladas, emojis frecuentes, borradores sin enviar, usuarios guardados como marcadores."
     },
     "popupResetComplete": {
       "message": "Chat Enhancer se ha restablecido."
@@ -275,13 +277,13 @@
       "message": "{count} marcadores"
     },
     "bookmarkedUsersEmpty": {
-      "message": "Los usuarios que marques en el chat de YouTube aparecerán aquí."
+      "message": "Los usuarios que guardes como marcador desde el chat de YouTube aparecerán aquí."
     },
     "markedUserDate": {
-      "message": "Marcado el {date}"
+      "message": "Guardado como marcador el {date}"
     },
     "markedDateUnknown": {
-      "message": "Fecha desconocida"
+      "message": "Fecha del marcador desconocida"
     },
     "unknownStream": {
       "message": "Transmisión desconocida"
@@ -300,6 +302,12 @@
     },
     "markUser": {
       "message": "Marcar"
+    },
+    "bookmarkUser": {
+      "message": "Guardar marcador"
+    },
+    "removeBookmark": {
+      "message": "Eliminar marcador"
     }
   }
 }

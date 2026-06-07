@@ -31,6 +31,8 @@
     "lessThanOneMinute": "less than 1 min",
     "markUser": "Mark",
     "unmarkUser": "Unmark",
+    "bookmarkUser": "Bookmark",
+    "removeBookmark": "Remove bookmark",
     "mention": "Mention",
     "mentionUser": "Mention user",
     "mentionUserTitle": "Mention user. Alt/Option-click to quote.",
@@ -257,7 +259,7 @@
       "message": "Off"
     },
     "popupResetConfirm": {
-      "message": "Reset Chat Enhancer settings and clear all local extension data?\n\nThis includes inbox messages, watched keywords, frequent emojis, unsent drafts, and marked users."
+      "message": "Reset Chat Enhancer settings and clear all local extension data?\n\nThis includes inbox messages, watched keywords, frequent emojis, unsent drafts, bookmarked users."
     },
     "popupResetComplete": {
       "message": "Chat Enhancer has been reset."
@@ -278,13 +280,13 @@
       "message": "{count} bookmarks"
     },
     "bookmarkedUsersEmpty": {
-      "message": "Users you mark from YouTube chat will appear here."
+      "message": "Users you bookmark from YouTube chat will appear here."
     },
     "markedUserDate": {
-      "message": "Marked {date}"
+      "message": "Bookmarked {date}"
     },
     "markedDateUnknown": {
-      "message": "Date unknown"
+      "message": "Bookmark date unknown"
     },
     "unknownStream": {
       "message": "Unknown stream"
@@ -303,6 +305,12 @@
     },
     "markUser": {
       "message": "Mark"
+    },
+    "bookmarkUser": {
+      "message": "Bookmark"
+    },
+    "removeBookmark": {
+      "message": "Remove bookmark"
     }
   }
 }

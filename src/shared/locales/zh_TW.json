@@ -31,6 +31,8 @@
     "lessThanOneMinute": "少於 1 分鐘",
     "markUser": "標記",
     "unmarkUser": "取消",
+    "bookmarkUser": "加入書籤",
+    "removeBookmark": "移除書籤",
     "mention": "提及",
     "mentionUser": "提及使用者",
     "mentionUserTitle": "提及使用者。Alt/Option 點擊可引用。",
@@ -254,7 +256,7 @@
       "message": "關閉"
     },
     "popupResetConfirm": {
-      "message": "要重設 Chat Enhancer 設定並清除所有本機擴充功能資料嗎？\n\n這包括收件匣訊息、追蹤的關鍵字、常用 emoji、未送出的草稿和已標記的使用者。"
+      "message": "要重設 Chat Enhancer 設定並清除所有本機擴充功能資料嗎？\n\n這包括收件匣訊息、追蹤的關鍵字、常用表情符號、未送出的草稿、已加入書籤的使用者。"
     },
     "popupResetComplete": {
       "message": "Chat Enhancer 已重設。"
@@ -275,13 +277,13 @@
       "message": "{count} 個書籤"
     },
     "bookmarkedUsersEmpty": {
-      "message": "你在 YouTube 聊天中標記的使用者會顯示在這裡。"
+      "message": "你從 YouTube 聊天中加入書籤的使用者會顯示在這裡。"
     },
     "markedUserDate": {
-      "message": "標記於 {date}"
+      "message": "已於 {date} 加入書籤"
     },
     "markedDateUnknown": {
-      "message": "日期未知"
+      "message": "書籤日期未知"
     },
     "unknownStream": {
       "message": "未知直播"
@@ -300,6 +302,12 @@
     },
     "markUser": {
       "message": "標記"
+    },
+    "bookmarkUser": {
+      "message": "加入書籤"
+    },
+    "removeBookmark": {
+      "message": "移除書籤"
     }
   }
 }

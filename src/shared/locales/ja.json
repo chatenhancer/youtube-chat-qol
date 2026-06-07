@@ -31,6 +31,8 @@
     "lessThanOneMinute": "1分未満",
     "markUser": "マーク",
     "unmarkUser": "解除",
+    "bookmarkUser": "ブックマーク",
+    "removeBookmark": "ブックマーク解除",
     "mention": "メンション",
     "mentionUser": "ユーザーをメンション",
     "mentionUserTitle": "ユーザーをメンション。Alt/Option クリックで引用。",
@@ -257,7 +259,7 @@
       "message": "オフ"
     },
     "popupResetConfirm": {
-      "message": "Chat Enhancer の設定をリセットし、ローカルの拡張機能データをすべて消去しますか？\n\n受信トレイのメッセージ、監視中のキーワード、よく使う絵文字、未送信の下書き、マークしたユーザーが含まれます。"
+      "message": "Chat Enhancer の設定をリセットし、ローカルの拡張機能データをすべて削除しますか？\n\nこれには、受信箱のメッセージ、監視中のキーワード、よく使う絵文字、未送信の下書き、ブックマークしたユーザーが含まれます。"
     },
     "popupResetComplete": {
       "message": "Chat Enhancer がリセットされました。"
@@ -278,13 +280,13 @@
       "message": "{count} 件のブックマーク"
     },
     "bookmarkedUsersEmpty": {
-      "message": "YouTube チャットでマークしたユーザーがここに表示されます。"
+      "message": "YouTube チャットでブックマークしたユーザーがここに表示されます。"
     },
     "markedUserDate": {
-      "message": "{date} にマーク"
+      "message": "{date} にブックマーク"
     },
     "markedDateUnknown": {
-      "message": "日付不明"
+      "message": "ブックマーク日時不明"
     },
     "unknownStream": {
       "message": "不明な配信"
@@ -303,6 +305,12 @@
     },
     "markUser": {
       "message": "マーク"
+    },
+    "bookmarkUser": {
+      "message": "ブックマーク"
+    },
+    "removeBookmark": {
+      "message": "ブックマーク解除"
     }
   }
 }

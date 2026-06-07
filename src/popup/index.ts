@@ -249,8 +249,8 @@ function createBookmarkedUserRow(key: string, record: MarkedUserRecord, active: 
   const unmarkButton = document.createElement('button');
   unmarkButton.type = 'button';
   unmarkButton.className = 'bookmark-action-button';
-  unmarkButton.title = getExtensionMessage(active ? 'unmarkUser' : 'markUser');
-  unmarkButton.setAttribute('aria-label', getExtensionMessage(active ? 'unmarkUser' : 'markUser'));
+  unmarkButton.title = getExtensionMessage(active ? 'removeBookmark' : 'bookmarkUser');
+  unmarkButton.setAttribute('aria-label', getExtensionMessage(active ? 'removeBookmark' : 'bookmarkUser'));
   unmarkButton.append(createSvgIcon(MATERIAL_ICON_VIEW_BOX, active ? BOOKMARK_FILLED_ICON_PATH : BOOKMARK_ICON_PATH));
   unmarkButton.addEventListener('click', () => {
     if (active) {
