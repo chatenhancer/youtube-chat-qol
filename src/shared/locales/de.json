@@ -65,7 +65,7 @@
     "timeHours": "{count} Std.",
     "timeMinutes": "{count} Min.",
     "timeSeconds": "{count} Sek.",
-    "translateChat": "Chat übersetzen",
+    "translateChat": "Übersetzen",
     "translated": "Übersetzt:",
     "translatedFrom": "Übersetzt aus {language}",
     "translatedMessage": "Übersetzte Nachricht",
@@ -186,6 +186,9 @@
     "supportAndFeedback": {
       "message": "Support und Feedback"
     },
+    "playgroundComingSoon": {
+      "message": "Spielplatz (demnächst)"
+    },
     "supportIssueTrackerPrompt": {
       "message": "Du wirst zu unserem öffentlichen Issue-Tracker weitergeleitet, um Fehler zu melden oder Funktionen vorzuschlagen. Ein Konto kann erforderlich sein.\n\nDu kannst uns auch per E-Mail erreichen unter {supportEmail}.\n\nZum Issue-Tracker fortfahren?"
     },
@@ -199,13 +202,13 @@
       "message": "Übersetzung"
     },
     "chooseTranslationLanguageTitle": {
-      "message": "Wähle die Sprache, in die Chatnachrichten übersetzt werden sollen. Aus deaktiviert die automatische Übersetzung."
+      "message": "Wähle die Sprache aus, in die Chatnachrichten übersetzt werden sollen. \"Aus\" deaktiviert die automatische Übersetzung."
     },
     "translateTo": {
-      "message": "Chat übersetzen in"
+      "message": "Zielsprache"
     },
     "translationOffHelper": {
-      "message": "Aus deaktiviert die automatische Übersetzung."
+      "message": "Wähle eine Sprache aus, um die automatische Übersetzung zu aktivieren."
     },
     "display": {
       "message": "Anzeige"
@@ -225,6 +228,9 @@
     "popupAlerts": {
       "message": "Hinweise"
     },
+    "effects": {
+      "message": "Effekte"
+    },
     "playInboxSound": {
       "message": "Posteingangston abspielen"
     },
@@ -232,19 +238,19 @@
       "message": "Spielt einen kurzen Ton ab, wenn eine Chatnachricht im Posteingang gespeichert wird."
     },
     "playInboxSoundHelper": {
-      "message": "Spielt einen kurzen Ton für neue Posteingangsnachrichten ab."
+      "message": "Spielt einen kurzen Benachrichtigungston für neue Inbox-Nachrichten."
     },
     "appearance": {
       "message": "Darstellung"
     },
     "startupShimmer": {
-      "message": "Starteffekt"
+      "message": "Startanimation"
     },
     "startupShimmerTitle": {
-      "message": "Zeigt kurz einen Starteffekt, wenn die Erweiterung eine Verbindung zum Chat herstellt. Reduzierte Bewegung deaktiviert ihn automatisch."
+      "message": "Zeigt eine kurze Startanimation, wenn die Erweiterung eine Verbindung zum Chat herstellt. Reduzierte Bewegung deaktiviert sie automatisch."
     },
     "startupShimmerHelper": {
-      "message": "Zeigt kurz einen Randeffekt, wenn die Erweiterung eine Verbindung zum Chat herstellt."
+      "message": "Zeigt eine kurze Randanimation, wenn die Erweiterung eine Verbindung zum Chat herstellt."
     },
     "extensionVersion": {
       "message": "Erweiterungsversion"

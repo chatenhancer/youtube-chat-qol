@@ -110,20 +110,24 @@ main {
 
 .header-actions {
   display: inline-flex;
-  justify-self: end;
+  justify-self: center;
   align-items: center;
-  gap: 6px;
+  gap: 0;
+  overflow: hidden;
+  border: 1px solid var(--ytcq-popup-control-border);
+  border-radius: 6px;
+  background: var(--ytcq-popup-control-tint);
 }
 
 .header-icon-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
+  width: 27px;
+  height: 26px;
   padding: 0;
-  border: 1px solid var(--ytcq-popup-control-border);
-  border-radius: 50%;
+  border: 0;
+  border-radius: 0;
   color: var(--ytcq-popup-secondary-text);
   background: transparent;
   cursor: pointer;
@@ -131,24 +135,29 @@ main {
 
 .header-icon-button svg {
   display: block;
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   fill: currentColor;
 }
 
 .header-icon-button .support-icon {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
 }
 
 .header-icon-button .source-icon {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
+}
+
+.header-icon-button .playground-icon {
+  width: 17px;
+  height: 17px;
 }
 
 .header-icon-button .reset-icon {
-  width: 17px;
-  height: 17px;
+  width: 15px;
+  height: 15px;
 }
 
 .header-icon-button:hover,
@@ -158,9 +167,21 @@ main {
   outline: none;
 }
 
+.header-icon-button[aria-disabled="true"] {
+  color: var(--ytcq-popup-muted-text);
+  opacity: 0.42;
+  cursor: default;
+}
+
+.header-icon-button[aria-disabled="true"]:hover,
+.header-icon-button[aria-disabled="true"]:focus {
+  color: var(--ytcq-popup-muted-text);
+  background: transparent;
+}
+
 .header-icon-button:focus-visible {
-  outline: 2px solid var(--ytcq-popup-action);
-  outline-offset: 2px;
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--ytcq-popup-action);
 }
 
 .extension-status {

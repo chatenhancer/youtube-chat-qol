@@ -65,7 +65,7 @@
     "timeHours": "{count} h",
     "timeMinutes": "{count} min",
     "timeSeconds": "{count} s",
-    "translateChat": "Traduzir chat",
+    "translateChat": "Traduzir",
     "translated": "Traduzido:",
     "translatedFrom": "Traduzido de {language}",
     "translatedMessage": "Mensagem traduzida",
@@ -189,6 +189,9 @@
     "supportAndFeedback": {
       "message": "Suporte e feedback"
     },
+    "playgroundComingSoon": {
+      "message": "Área de jogos (em breve)"
+    },
     "supportIssueTrackerPrompt": {
       "message": "Você será redirecionado para nosso rastreador público de problemas para relatórios de bugs e pedidos de recursos. Uma conta pode ser necessária.\n\nVocê também pode enviar email para {supportEmail}.\n\nContinuar para o rastreador de problemas?"
     },
@@ -202,13 +205,13 @@
       "message": "Tradução"
     },
     "chooseTranslationLanguageTitle": {
-      "message": "Escolha o idioma para o qual as mensagens do chat devem ser traduzidas. Desativado desliga a tradução automática."
+      "message": "Escolha o idioma para o qual as mensagens do chat serão traduzidas. “Desativado” desativa a tradução automática."
     },
     "translateTo": {
-      "message": "Traduzir chat para"
+      "message": "Idioma de destino"
     },
     "translationOffHelper": {
-      "message": "Desativado desliga a tradução automática."
+      "message": "Escolha um idioma para ativar a tradução automática."
     },
     "display": {
       "message": "Exibição"
@@ -228,6 +231,9 @@
     "popupAlerts": {
       "message": "Alertas"
     },
+    "effects": {
+      "message": "Efeitos"
+    },
     "playInboxSound": {
       "message": "Tocar som da caixa de entrada"
     },
@@ -235,19 +241,19 @@
       "message": "Toca um som curto quando uma mensagem do chat é salva na sua caixa de entrada."
     },
     "playInboxSoundHelper": {
-      "message": "Toca um som curto para novas mensagens da caixa de entrada."
+      "message": "Reproduz um som de notificação curto para novas mensagens da caixa de entrada."
     },
     "appearance": {
       "message": "Aparência"
     },
     "startupShimmer": {
-      "message": "Efeito inicial"
+      "message": "Animação inicial"
     },
     "startupShimmerTitle": {
-      "message": "Mostra um breve efeito inicial quando a extensão se conecta ao chat. Movimento reduzido o desativa automaticamente."
+      "message": "Mostra uma breve animação inicial quando a extensão se conecta ao chat. Movimento reduzido a desativa automaticamente."
     },
     "startupShimmerHelper": {
-      "message": "Mostra um breve efeito na borda quando a extensão se conecta ao chat."
+      "message": "Mostra uma breve animação na borda quando a extensão se conecta ao chat."
     },
     "extensionVersion": {
       "message": "Versão da extensão"

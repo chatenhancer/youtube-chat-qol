@@ -65,7 +65,7 @@
     "timeHours": "{count} שעות",
     "timeMinutes": "{count} דק׳",
     "timeSeconds": "{count} שנ׳",
-    "translateChat": "תרגום צ׳אט",
+    "translateChat": "תרגום",
     "translated": "תורגם:",
     "translatedFrom": "תורגם מ{language}",
     "translatedMessage": "הודעה מתורגמת",
@@ -186,6 +186,9 @@
     "supportAndFeedback": {
       "message": "תמיכה ומשוב"
     },
+    "playgroundComingSoon": {
+      "message": "אזור משחקים (בקרוב)"
+    },
     "supportIssueTrackerPrompt": {
       "message": "תופנו אל כלי המעקב הציבורי שלנו לבעיות עבור דיווחי באגים ובקשות לפיצ׳רים. ייתכן שיידרש חשבון.\n\nאפשר גם לשלוח לנו אימייל אל {supportEmail}.\n\nלהמשיך אל כלי המעקב?"
     },
@@ -199,13 +202,13 @@
       "message": "תרגום"
     },
     "chooseTranslationLanguageTitle": {
-      "message": "בחר לאיזו שפה לתרגם הודעות צ׳אט. כבוי משבית תרגום אוטומטי."
+      "message": "בחר את השפה שאליה הודעות הצ׳אט יתורגמו. \"כבוי\" משבית תרגום אוטומטי."
     },
     "translateTo": {
-      "message": "תרגום הצ׳אט אל"
+      "message": "שפת יעד"
     },
     "translationOffHelper": {
-      "message": "כבוי משבית תרגום אוטומטי."
+      "message": "בחר שפה כדי להפעיל תרגום אוטומטי."
     },
     "display": {
       "message": "תצוגה"
@@ -225,6 +228,9 @@
     "popupAlerts": {
       "message": "התראות"
     },
+    "effects": {
+      "message": "אפקטים"
+    },
     "playInboxSound": {
       "message": "השמעת צליל תיבה"
     },
@@ -232,19 +238,19 @@
       "message": "השמע צליל קצר כאשר הודעת צ׳אט נשמרת בתיבה."
     },
     "playInboxSoundHelper": {
-      "message": "השמע צליל קצר להודעות חדשות בתיבה."
+      "message": "השמע צליל התראה קצר להודעות חדשות בתיבת הדואר."
     },
     "appearance": {
       "message": "מראה"
     },
     "startupShimmer": {
-      "message": "אפקט בהפעלה"
+      "message": "אנימציית הפעלה"
     },
     "startupShimmerTitle": {
-      "message": "הצגת אפקט קצר בהפעלה כשהתוסף מתחבר לצ׳אט. העדפת צמצום תנועה משביתה זאת אוטומטית."
+      "message": "הצג אנימציית הפעלה קצרה כשהתוסף מתחבר לצ׳אט. צמצום תנועה משבית אותה אוטומטית."
     },
     "startupShimmerHelper": {
-      "message": "הצגת אפקט קצר בקצה כשהתוסף מתחבר לצ׳אט."
+      "message": "הצג אנימציית קצה קצרה כשהתוסף מתחבר לצ׳אט."
     },
     "extensionVersion": {
       "message": "גרסת התוסף"

@@ -22,7 +22,7 @@ describe('runtime i18n', () => {
     i18n.initUiLocaleFromDocument();
 
     expect(i18n.getUiLocale()).toBe('es');
-    expect(i18n.t('translateChat')).toBe('Traducir chat');
+    expect(i18n.t('translateChat')).toBe('Traducir');
   });
 
   it('normalizes Chinese page-language variants to supported catalogs', async () => {
@@ -101,7 +101,7 @@ describe('runtime i18n', () => {
     i18n.initUiLocaleFromDocument();
 
     expect(i18n.getUiLocale()).toBe('de');
-    expect(i18n.t('translateChat')).toBe('Chat übersetzen');
+    expect(i18n.t('translateChat')).toBe('Übersetzen');
 
     vi.resetModules();
     vi.mocked(chrome.i18n.getUILanguage).mockReturnValue('unknown-locale');
@@ -109,7 +109,7 @@ describe('runtime i18n', () => {
     i18n.initUiLocaleFromDocument();
 
     expect(i18n.getUiLocale()).toBe('en');
-    expect(i18n.t('translateChat')).toBe('Translate chat');
+    expect(i18n.t('translateChat')).toBe('Translate');
   });
 
   it('formats parameters and plural messages', async () => {

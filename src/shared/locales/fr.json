@@ -65,7 +65,7 @@
     "timeHours": "{count} h",
     "timeMinutes": "{count} min",
     "timeSeconds": "{count} s",
-    "translateChat": "Traduire le chat",
+    "translateChat": "Traduire",
     "translated": "Traduit :",
     "translatedFrom": "Traduit du {language}",
     "translatedMessage": "Message traduit",
@@ -186,6 +186,9 @@
     "supportAndFeedback": {
       "message": "Assistance et retours"
     },
+    "playgroundComingSoon": {
+      "message": "Espace jeux (bientôt)"
+    },
     "supportIssueTrackerPrompt": {
       "message": "Vous serez redirigé vers notre suivi public des problèmes pour les rapports de bugs et les demandes de fonctionnalités. Un compte peut être nécessaire.\n\nVous pouvez aussi nous écrire à {supportEmail}.\n\nContinuer vers le suivi des problèmes ?"
     },
@@ -199,13 +202,13 @@
       "message": "Traduction"
     },
     "chooseTranslationLanguageTitle": {
-      "message": "Choisissez la langue dans laquelle les messages du chat doivent être traduits. Désactivé coupe la traduction automatique."
+      "message": "Choisis la langue dans laquelle les messages du chat doivent être traduits. « Désactivé » désactive la traduction automatique."
     },
     "translateTo": {
-      "message": "Traduire le chat en"
+      "message": "Langue cible"
     },
     "translationOffHelper": {
-      "message": "Désactivé coupe la traduction automatique."
+      "message": "Choisis une langue pour activer la traduction automatique."
     },
     "display": {
       "message": "Affichage"
@@ -225,6 +228,9 @@
     "popupAlerts": {
       "message": "Alertes"
     },
+    "effects": {
+      "message": "Effets"
+    },
     "playInboxSound": {
       "message": "Jouer un son de boîte de réception"
     },
@@ -232,19 +238,19 @@
       "message": "Joue un court son quand un message du chat est enregistré dans votre boîte de réception."
     },
     "playInboxSoundHelper": {
-      "message": "Joue un court son pour les nouveaux messages de la boîte de réception."
+      "message": "Joue un court son de notification pour les nouveaux messages de la boîte de réception."
     },
     "appearance": {
       "message": "Apparence"
     },
     "startupShimmer": {
-      "message": "Effet de démarrage"
+      "message": "Animation de démarrage"
     },
     "startupShimmerTitle": {
-      "message": "Affiche un bref effet au démarrage lorsque l’extension se connecte au chat. Le mode mouvements réduits le désactive automatiquement."
+      "message": "Affiche une brève animation au démarrage lorsque l’extension se connecte au chat. Le mode mouvements réduits la désactive automatiquement."
     },
     "startupShimmerHelper": {
-      "message": "Affiche un bref effet sur le bord lorsque l’extension se connecte au chat."
+      "message": "Affiche une brève animation sur le bord lorsque l’extension se connecte au chat."
     },
     "extensionVersion": {
       "message": "Version de l'extension"

@@ -65,7 +65,7 @@
     "timeHours": "{count} h",
     "timeMinutes": "{count} min",
     "timeSeconds": "{count} sec",
-    "translateChat": "Traduci chat",
+    "translateChat": "Traduci",
     "translated": "Tradotto:",
     "translatedFrom": "Tradotto da {language}",
     "translatedMessage": "Messaggio tradotto",
@@ -189,6 +189,9 @@
     "supportAndFeedback": {
       "message": "Supporto e feedback"
     },
+    "playgroundComingSoon": {
+      "message": "Area giochi (presto)"
+    },
     "supportIssueTrackerPrompt": {
       "message": "Verrai reindirizzato al nostro tracker pubblico dei problemi per segnalazioni di bug e richieste di funzionalità. Potrebbe essere necessario un account.\n\nPuoi anche scriverci a {supportEmail}.\n\nContinuare al tracker dei problemi?"
     },
@@ -202,13 +205,13 @@
       "message": "Traduzione"
     },
     "chooseTranslationLanguageTitle": {
-      "message": "Scegli la lingua in cui tradurre i messaggi della chat. Disattivato spegne la traduzione automatica."
+      "message": "Scegli la lingua in cui tradurre i messaggi della chat. “Disattivato” disattiva la traduzione automatica."
     },
     "translateTo": {
-      "message": "Traduci la chat in"
+      "message": "Lingua di destinazione"
     },
     "translationOffHelper": {
-      "message": "Disattivato spegne la traduzione automatica."
+      "message": "Scegli una lingua per attivare la traduzione automatica."
     },
     "display": {
       "message": "Visualizzazione"
@@ -228,6 +231,9 @@
     "popupAlerts": {
       "message": "Avvisi"
     },
+    "effects": {
+      "message": "Effetti"
+    },
     "playInboxSound": {
       "message": "Riproduci suono posta in arrivo"
     },
@@ -235,19 +241,19 @@
       "message": "Riproduce un breve suono quando un messaggio della chat viene salvato nella posta in arrivo."
     },
     "playInboxSoundHelper": {
-      "message": "Riproduce un breve suono per i nuovi messaggi nella posta in arrivo."
+      "message": "Riproduci un breve suono di notifica per i nuovi messaggi nella posta in arrivo."
     },
     "appearance": {
       "message": "Aspetto"
     },
     "startupShimmer": {
-      "message": "Effetto iniziale"
+      "message": "Animazione iniziale"
     },
     "startupShimmerTitle": {
-      "message": "Mostra un breve effetto iniziale quando l’estensione si connette alla chat. Movimento ridotto lo disattiva automaticamente."
+      "message": "Mostra una breve animazione iniziale quando l’estensione si connette alla chat. Movimento ridotto la disattiva automaticamente."
     },
     "startupShimmerHelper": {
-      "message": "Mostra un breve effetto sul bordo quando l’estensione si connette alla chat."
+      "message": "Mostra una breve animazione sul bordo quando l’estensione si connette alla chat."
     },
     "extensionVersion": {
       "message": "Versione estensione"

@@ -65,7 +65,7 @@
     "timeHours": "{count}시간",
     "timeMinutes": "{count}분",
     "timeSeconds": "{count}초",
-    "translateChat": "채팅 번역",
+    "translateChat": "번역",
     "translated": "번역:",
     "translatedFrom": "{language}에서 번역됨",
     "translatedMessage": "번역된 메시지",
@@ -186,6 +186,9 @@
     "supportAndFeedback": {
       "message": "지원 및 피드백"
     },
+    "playgroundComingSoon": {
+      "message": "플레이그라운드(곧 제공)"
+    },
     "supportIssueTrackerPrompt": {
       "message": "버그 신고와 기능 요청을 위해 공개 이슈 트래커로 이동합니다. 계정이 필요할 수 있습니다.\n\n이메일로도 {supportEmail}에 문의할 수 있습니다.\n\n이슈 트래커로 이동할까요?"
     },
@@ -199,13 +202,13 @@
       "message": "번역"
     },
     "chooseTranslationLanguageTitle": {
-      "message": "채팅 메시지를 번역할 언어를 선택하세요. 끄면 자동 번역이 비활성화됩니다."
+      "message": "채팅 메시지를 번역할 언어를 선택하세요. “끄기”는 자동 번역을 비활성화합니다."
     },
     "translateTo": {
-      "message": "채팅 번역 언어"
+      "message": "대상 언어"
     },
     "translationOffHelper": {
-      "message": "끄면 자동 번역이 비활성화됩니다."
+      "message": "자동 번역을 활성화하려면 언어를 선택하세요."
     },
     "display": {
       "message": "표시 방식"
@@ -225,6 +228,9 @@
     "popupAlerts": {
       "message": "알림"
     },
+    "effects": {
+      "message": "효과"
+    },
     "playInboxSound": {
       "message": "받은 편지함 소리 재생"
     },
@@ -232,19 +238,19 @@
       "message": "채팅 메시지가 받은 편지함에 저장될 때 짧은 소리를 재생합니다."
     },
     "playInboxSoundHelper": {
-      "message": "새 받은 편지함 메시지에 짧은 소리를 재생합니다."
+      "message": "새 받은 편지함 메시지에 짧은 알림음을 재생합니다."
     },
     "appearance": {
       "message": "모양"
     },
     "startupShimmer": {
-      "message": "시작 효과"
+      "message": "시작 애니메이션"
     },
     "startupShimmerTitle": {
-      "message": "확장 프로그램이 채팅에 연결될 때 짧은 시작 효과를 표시합니다. 동작 줄이기 설정에서는 자동으로 비활성화됩니다."
+      "message": "확장 프로그램이 채팅에 연결될 때 짧은 시작 애니메이션을 표시합니다. 동작 줄이기가 켜져 있으면 자동으로 비활성화됩니다."
     },
     "startupShimmerHelper": {
-      "message": "확장 프로그램이 채팅에 연결될 때 가장자리에 짧은 효과를 표시합니다."
+      "message": "확장 프로그램이 채팅에 연결될 때 가장자리에 짧은 애니메이션을 표시합니다."
     },
     "extensionVersion": {
       "message": "확장 프로그램 버전"

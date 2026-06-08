@@ -65,7 +65,7 @@
     "timeHours": "{count} godz.",
     "timeMinutes": "{count} min",
     "timeSeconds": "{count} s",
-    "translateChat": "Tłumacz czat",
+    "translateChat": "Tłumacz",
     "translated": "Przetłumaczono:",
     "translatedFrom": "Przetłumaczono z {language}",
     "translatedMessage": "Przetłumaczona wiadomość",
@@ -186,6 +186,9 @@
     "supportAndFeedback": {
       "message": "Pomoc i opinie"
     },
+    "playgroundComingSoon": {
+      "message": "Gry (wkrótce)"
+    },
     "supportIssueTrackerPrompt": {
       "message": "Nastąpi przekierowanie do naszego publicznego trackera zgłoszeń dla błędów i próśb o funkcje. Konto może być wymagane.\n\nMożna też napisać do nas na {supportEmail}.\n\nPrzejść do trackera zgłoszeń?"
     },
@@ -199,13 +202,13 @@
       "message": "Tłumaczenie"
     },
     "chooseTranslationLanguageTitle": {
-      "message": "Wybierz język, na który mają być tłumaczone wiadomości czatu. Wyłączone zatrzymuje automatyczne tłumaczenie."
+      "message": "Wybierz język, na który mają być tłumaczone wiadomości czatu. „Wyłączone” wyłącza automatyczne tłumaczenie."
     },
     "translateTo": {
-      "message": "Tłumacz czat na"
+      "message": "Język docelowy"
     },
     "translationOffHelper": {
-      "message": "Wyłączone zatrzymuje automatyczne tłumaczenie."
+      "message": "Wybierz język, aby włączyć automatyczne tłumaczenie."
     },
     "display": {
       "message": "Wyświetlanie"
@@ -225,6 +228,9 @@
     "popupAlerts": {
       "message": "Alerty"
     },
+    "effects": {
+      "message": "Efekty"
+    },
     "playInboxSound": {
       "message": "Odtwarzaj dźwięk skrzynki"
     },
@@ -232,19 +238,19 @@
       "message": "Odtwórz krótki dźwięk, gdy wiadomość czatu zostanie zapisana w skrzynce."
     },
     "playInboxSoundHelper": {
-      "message": "Odtwarzaj krótki dźwięk dla nowych wiadomości w skrzynce."
+      "message": "Odtwarzaj krótki dźwięk powiadomienia dla nowych wiadomości w Inboxie."
     },
     "appearance": {
       "message": "Wygląd"
     },
     "startupShimmer": {
-      "message": "Efekt startowy"
+      "message": "Animacja startowa"
     },
     "startupShimmerTitle": {
-      "message": "Pokaż krótki efekt startowy, gdy rozszerzenie łączy się z czatem. Ograniczenie ruchu wyłącza go automatycznie."
+      "message": "Pokaż krótką animację startową, gdy rozszerzenie łączy się z czatem. Ograniczenie ruchu wyłącza ją automatycznie."
     },
     "startupShimmerHelper": {
-      "message": "Pokaż krótki efekt na krawędzi, gdy rozszerzenie łączy się z czatem."
+      "message": "Pokaż krótką animację krawędzi, gdy rozszerzenie łączy się z czatem."
     },
     "extensionVersion": {
       "message": "Wersja rozszerzenia"

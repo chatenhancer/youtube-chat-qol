@@ -30,6 +30,11 @@
               <path d="M480-200q66 0 113-47t47-113v-160q0-66-47-113t-113-47q-66 0-113 47t-47 113v160q0 66 47 113t113 47Zm-80-120h160v-80H400v80Zm0-160h160v-80H400v80Zm80 40Zm0 320q-65 0-120.5-32T272-240H160v-80h84q-3-20-3.5-40t-.5-40h-80v-80h80q0-20 .5-40t3.5-40h-84v-80h112q14-23 31.5-43t40.5-35l-64-66 56-56 86 86q28-9 57-9t57 9l88-86 56 56-66 66q23 15 41.5 34.5T688-640h112v80h-84q3 20 3.5 40t.5 40h80v80h-80q0 20-.5 40t-3.5 40h84v80H688q-32 56-87.5 88T480-120Z"></path>
             </svg>
           </a>
+          <button id="playgroundButton" class="header-icon-button playground-button" type="button" title="Playground (coming soon)" aria-label="Playground (coming soon)" aria-disabled="true" tabindex="-1" data-i18n-title="playgroundComingSoon" data-i18n-aria-label="playgroundComingSoon">
+            <svg class="playground-icon" viewBox="0 -960 960 960" aria-hidden="true" focusable="false">
+              <path d="m272-440 208 120 208-120-168-97v137h-80v-137l-168 97Zm168-189v-17q-44-13-72-49.5T340-780q0-58 41-99t99-41q58 0 99 41t41 99q0 48-28 84.5T520-646v17l280 161q19 11 29.5 29.5T840-398v76q0 22-10.5 40.5T800-252L520-91q-19 11-40 11t-40-11L160-252q-19-11-29.5-29.5T120-322v-76q0-22 10.5-40.5T160-468l280-161Zm0 378L200-389v67l280 162 280-162v-67L520-251q-19 11-40 11t-40-11Zm82.5-486.5Q540-755 540-780t-17.5-42.5Q505-840 480-840t-42.5 17.5Q420-805 420-780t17.5 42.5Q455-720 480-720t42.5-17.5ZM480-160Z"></path>
+            </svg>
+          </button>
           <button id="resetExtension" class="header-icon-button reset-button" type="button" title="Reset all extension settings and local data" aria-label="Reset extension" data-i18n-title="resetAllExtensionData" data-i18n-aria-label="resetExtension">
             <svg class="reset-icon" viewBox="0 -960 960 960" aria-hidden="true" focusable="false">
               <path d="M440-520h80v-280q0-17-11.5-28.5T480-840q-17 0-28.5 11.5T440-800v280ZM200-360h560v-80H200v80Zm-58 240h98v-80q0-17 11.5-28.5T280-240q17 0 28.5 11.5T320-200v80h120v-80q0-17 11.5-28.5T480-240q17 0 28.5 11.5T520-200v80h120v-80q0-17 11.5-28.5T680-240q17 0 28.5 11.5T720-200v80h98l-40-160H182l-40 160Zm676 80H142q-39 0-63-31t-14-69l55-220v-80q0-33 23.5-56.5T200-520h160v-280q0-50 35-85t85-35q50 0 85 35t35 85v280h160q33 0 56.5 23.5T840-440v80l55 220q13 38-11.5 69T818-40Zm-58-400H200h560Zm-240-80h-80 80Z"></path>
@@ -48,16 +53,16 @@
           <section class="settings-section" aria-labelledby="translation-heading">
             <h2 id="translation-heading" data-i18n="translation">Translation</h2>
 
-          <label class="option option-control" title="Choose the language chat messages should be translated into. Off disables automatic translation." data-i18n-title="chooseTranslationLanguageTitle">
+          <label class="option option-control" title="Choose the language chat messages should be translated into. &quot;Off&quot; disables automatic translation." data-i18n-title="chooseTranslationLanguageTitle">
             <span class="option-title">
               <svg class="option-icon translation-target-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                 <path class="translation-source-mark" d="M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0014.07 6H17V4h-7V2H8v2H1v2h11.17a15.7 15.7 0 01-2.86 4.63A15.07 15.07 0 017.22 7H5.2a17.2 17.2 0 002.77 5.03l-5.09 5.02L4.3 18.47l5.01-5.01 3.11 3.11.45-1.5Z"></path>
                 <path class="translation-target-mark" d="M18.5 10h-2L12 22h2l1.13-3h4.74L21 22h2l-4.5-12Zm-2.62 7l1.62-4.33L19.12 17h-3.24Z"></path>
               </svg>
-              <span data-i18n="translateTo">Translate to</span>
+              <span data-i18n="translateTo">Target language</span>
             </span>
-            <span class="option-helper" data-i18n="translationOffHelper">Off disables automatic translation.</span>
-            <select id="targetLanguage" title="Choose the language chat messages should be translated into. Off disables automatic translation." data-i18n-title="chooseTranslationLanguageTitle"></select>
+            <span class="option-helper" data-i18n="translationOffHelper">Pick a language to enable automatic translation.</span>
+            <select id="targetLanguage" title="Choose the language chat messages should be translated into. &quot;Off&quot; disables automatic translation." data-i18n-title="chooseTranslationLanguageTitle"></select>
           </label>
 
           <label class="option option-control" title="Choose whether translations replace the original message or appear below it." data-i18n-title="translationDisplayTitle">
@@ -78,8 +83,8 @@
           </label>
         </section>
 
-        <section class="settings-section" aria-labelledby="alerts-heading">
-          <h2 id="alerts-heading" data-i18n="popupAlerts">Alerts</h2>
+        <section class="settings-section" aria-labelledby="effects-heading">
+          <h2 id="effects-heading" data-i18n="effects">Effects</h2>
 
           <label class="option option-toggle" title="Play a short sound when a chat message is saved to your inbox." data-i18n-title="playInboxSoundTitle">
             <span class="option-copy">
@@ -90,17 +95,11 @@
                 </svg>
                 <span data-i18n="playInboxSound">Play inbox sound</span>
               </span>
-              <span class="option-helper" data-i18n="playInboxSoundHelper">Play a short sound for new inbox messages.</span>
+              <span class="option-helper" data-i18n="playInboxSoundHelper">Play a short notification sound for new inbox messages.</span>
             </span>
             <input id="sound" type="checkbox" title="Play a short sound when a chat message is saved to your inbox." data-i18n-title="playInboxSoundTitle">
           </label>
-
-        </section>
-
-        <section class="settings-section" aria-labelledby="appearance-heading">
-          <h2 id="appearance-heading" data-i18n="appearance">Appearance</h2>
-
-          <label class="option option-toggle" title="Show a brief startup effect when the extension connects to chat. Reduced motion disables it automatically." data-i18n-title="startupShimmerTitle">
+          <label class="option option-toggle" title="Show a brief startup animation when the extension connects to chat. Reduced motion disables it automatically." data-i18n-title="startupShimmerTitle">
             <span class="option-copy">
               <span class="option-title">
                 <svg class="option-icon startup-effect-icon" viewBox="0 -960 960 960" aria-hidden="true" focusable="false">
@@ -108,13 +107,13 @@
                   <path class="startup-sparkle startup-sparkle-large" d="m684-200-76-160-168-76 168-76 76-160 76 160 168 76-168 76-76 160Z"></path>
                   <path class="startup-sparkle startup-sparkle-small-end" d="m306-568-44-92-102-44 102-44 44-92 44 92 102 44-102 44-44 92Z"></path>
                 </svg>
-                <span data-i18n="startupShimmer">Startup effect</span>
+                <span data-i18n="startupShimmer">Startup animation</span>
               </span>
-              <span class="option-helper" data-i18n="startupShimmerHelper">Show a brief edge effect when the extension connects to chat.</span>
+              <span class="option-helper" data-i18n="startupShimmerHelper">Show a brief edge animation when the extension connects to chat.</span>
             </span>
-            <input id="startupEffect" type="checkbox" title="Show a brief startup effect when the extension connects to chat. Reduced motion disables it automatically." data-i18n-title="startupShimmerTitle">
+            <input id="startupEffect" type="checkbox" title="Show a brief startup animation when the extension connects to chat. Reduced motion disables it automatically." data-i18n-title="startupShimmerTitle">
           </label>
-          </section>
+        </section>
         </div>
 
         <div id="bookmarksPanel" class="popup-tab-panel" role="tabpanel" aria-labelledby="bookmarksTab" data-popup-tab-panel hidden>

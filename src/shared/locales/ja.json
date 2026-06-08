@@ -65,7 +65,7 @@
     "timeHours": "{count}時間",
     "timeMinutes": "{count}分",
     "timeSeconds": "{count}秒",
-    "translateChat": "チャットを翻訳",
+    "translateChat": "翻訳",
     "translated": "翻訳:",
     "translatedFrom": "{language}から翻訳",
     "translatedMessage": "翻訳済みメッセージ",
@@ -189,6 +189,9 @@
     "supportAndFeedback": {
       "message": "サポートとフィードバック"
     },
+    "playgroundComingSoon": {
+      "message": "プレイグラウンド（近日公開）"
+    },
     "supportIssueTrackerPrompt": {
       "message": "バグ報告と機能リクエストのために、公開の課題トラッカーへ移動します。アカウントが必要な場合があります。\n\nメールでも {supportEmail} に連絡できます。\n\n課題トラッカーに進みますか？"
     },
@@ -202,13 +205,13 @@
       "message": "翻訳"
     },
     "chooseTranslationLanguageTitle": {
-      "message": "チャットメッセージの翻訳先言語を選びます。オフにすると自動翻訳は無効になります。"
+      "message": "チャットメッセージの翻訳先言語を選びます。「オフ」にすると自動翻訳は無効になります。"
     },
     "translateTo": {
-      "message": "チャットの翻訳先"
+      "message": "翻訳先の言語"
     },
     "translationOffHelper": {
-      "message": "オフにすると自動翻訳は無効になります。"
+      "message": "自動翻訳を有効にするには言語を選択してください。"
     },
     "display": {
       "message": "表示"
@@ -228,6 +231,9 @@
     "popupAlerts": {
       "message": "通知"
     },
+    "effects": {
+      "message": "エフェクト"
+    },
     "playInboxSound": {
       "message": "受信トレイの音を鳴らす"
     },
@@ -235,19 +241,19 @@
       "message": "チャットメッセージが受信トレイに保存されたときに短い音を鳴らします。"
     },
     "playInboxSoundHelper": {
-      "message": "新しい受信トレイメッセージに短い音を鳴らします。"
+      "message": "新しい受信箱メッセージに短い通知音を鳴らします。"
     },
     "appearance": {
       "message": "表示"
     },
     "startupShimmer": {
-      "message": "起動時の効果"
+      "message": "起動時のアニメーション"
     },
     "startupShimmerTitle": {
-      "message": "拡張機能がチャットに接続したとき、短い起動効果を表示します。視差効果を減らす設定では自動的に無効になります。"
+      "message": "拡張機能がチャットに接続したとき、短い起動アニメーションを表示します。視差効果を減らす設定では自動的に無効になります。"
     },
     "startupShimmerHelper": {
-      "message": "拡張機能がチャットに接続したとき、端に短い効果を表示します。"
+      "message": "拡張機能がチャットに接続したとき、端に短いアニメーションを表示します。"
     },
     "extensionVersion": {
       "message": "拡張機能のバージョン"
