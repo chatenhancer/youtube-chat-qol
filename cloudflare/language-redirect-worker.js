@@ -44,7 +44,7 @@ export default {
     const preferredLocale = cookieLocale || headerLocale;
 
     if (!preferredLocale || preferredLocale === DEFAULT_LOCALE) {
-      return fetch(request);
+      return fetchHomepage(request);
     }
 
     return redirectIfLocalePageExists(request, url, preferredLocale);
@@ -66,7 +66,7 @@ async function redirectWithLocaleCookie(request, url, locale) {
   if (locale !== DEFAULT_LOCALE) {
     const localePageExists = await localePageExistsAt(request, destinationUrl);
     if (!localePageExists) {
-      return fetch(request);
+      return fetchHomepage(request);
     }
   }
 
@@ -76,9 +76,22 @@ async function redirectWithLocaleCookie(request, url, locale) {
 async function redirectIfLocalePageExists(request, url, locale) {
   const destinationUrl = new URL(`/${locale}/`, url);
   const localePageExists = await localePageExistsAt(request, destinationUrl);
-  if (!localePageExists) return fetch(request);
+  if (!localePageExists) return fetchHomepage(request);
 
   return createRedirect(destinationUrl, locale);
+}
+
+async function fetchHomepage(request) {
+  const response = await fetch(request);
+  const nextHeaders = new Headers(response.headers);
+  appendVary(nextHeaders, 'Accept-Language');
+  appendVary(nextHeaders, 'Cookie');
+
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers: nextHeaders
+  });
 }
 
 async function localePageExistsAt(request, destinationUrl) {
@@ -104,6 +117,17 @@ function createRedirect(destinationUrl, locale) {
       Vary: 'Accept-Language, Cookie'
     }
   });
+}
+
+function appendVary(headers, value) {
+  const current = headers.get('Vary') || '';
+  const existing = current
+    .split(',')
+    .map((part) => part.trim().toLowerCase())
+    .filter(Boolean);
+
+  if (existing.includes('*') || existing.includes(value.toLowerCase())) return;
+  headers.set('Vary', current ? `${current}, ${value}` : value);
 }
 
 function createForwardHeaders(request) {
