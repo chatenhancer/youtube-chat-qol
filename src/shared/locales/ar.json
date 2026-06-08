@@ -65,7 +65,7 @@
     "timeHours": "{count} س",
     "timeMinutes": "{count} د",
     "timeSeconds": "{count} ث",
-    "translateChat": "ترجمة الدردشة",
+    "translateChat": "ترجمة",
     "translated": "تمت الترجمة:",
     "translatedFrom": "تمت الترجمة من {language}",
     "translatedMessage": "رسالة مترجمة",
@@ -189,6 +189,9 @@
     "supportAndFeedback": {
       "message": "الدعم والملاحظات"
     },
+    "playgroundComingSoon": {
+      "message": "ساحة اللعب (قريبًا)"
+    },
     "supportIssueTrackerPrompt": {
       "message": "ستتم إعادة توجيهك إلى متتبّع المشكلات العام الخاص بنا للإبلاغ عن الأخطاء وطلب الميزات. قد تحتاج إلى حساب.\n\nيمكنك أيضًا مراسلتنا على {supportEmail}.\n\nهل تريد المتابعة إلى متتبّع المشكلات؟"
     },
@@ -202,13 +205,13 @@
       "message": "الترجمة"
     },
     "chooseTranslationLanguageTitle": {
-      "message": "اختر اللغة التي ستترجم إليها رسائل الدردشة. خيار الإيقاف يعطل الترجمة التلقائية."
+      "message": "اختر اللغة التي ستُترجم إليها رسائل الدردشة. خيار \"إيقاف\" يعطل الترجمة التلقائية."
     },
     "translateTo": {
-      "message": "ترجمة الدردشة إلى"
+      "message": "اللغة المستهدفة"
     },
     "translationOffHelper": {
-      "message": "الإيقاف يعطل الترجمة التلقائية."
+      "message": "اختر لغة لتفعيل الترجمة التلقائية."
     },
     "display": {
       "message": "العرض"
@@ -228,6 +231,9 @@
     "popupAlerts": {
       "message": "التنبيهات"
     },
+    "effects": {
+      "message": "التأثيرات"
+    },
     "playInboxSound": {
       "message": "تشغيل صوت صندوق الوارد"
     },
@@ -235,19 +241,19 @@
       "message": "تشغيل صوت قصير عند حفظ رسالة دردشة في صندوق الوارد."
     },
     "playInboxSoundHelper": {
-      "message": "تشغيل صوت قصير للرسائل الجديدة في صندوق الوارد."
+      "message": "شغّل صوت إشعار قصيرًا لرسائل البريد الوارد الجديدة."
     },
     "appearance": {
       "message": "المظهر"
     },
     "startupShimmer": {
-      "message": "تأثير البداية"
+      "message": "رسوم بدء التشغيل المتحركة"
     },
     "startupShimmerTitle": {
-      "message": "إظهار تأثير بداية قصير عند اتصال الإضافة بالدردشة. يتم تعطيله تلقائيًا عند تفعيل تقليل الحركة."
+      "message": "اعرض رسومًا متحركة قصيرة عند اتصال الإضافة بالدردشة. يتم تعطيلها تلقائيًا عند تفعيل تقليل الحركة."
     },
     "startupShimmerHelper": {
-      "message": "إظهار تأثير قصير على الحافة عند اتصال الإضافة بالدردشة."
+      "message": "اعرض رسومًا متحركة قصيرة على الحافة عند اتصال الإضافة بالدردشة."
     },
     "extensionVersion": {
       "message": "إصدار الإضافة"

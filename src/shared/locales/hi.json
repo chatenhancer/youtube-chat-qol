@@ -65,7 +65,7 @@
     "timeHours": "{count} घंटे",
     "timeMinutes": "{count} मिनट",
     "timeSeconds": "{count} सेकंड",
-    "translateChat": "चैट का अनुवाद करें",
+    "translateChat": "अनुवाद करें",
     "translated": "अनुवादित:",
     "translatedFrom": "{language} से अनुवादित",
     "translatedMessage": "अनुवादित मैसेज",
@@ -189,6 +189,9 @@
     "supportAndFeedback": {
       "message": "सपोर्ट और फ़ीडबैक"
     },
+    "playgroundComingSoon": {
+      "message": "प्लेग्राउंड (जल्द आ रहा है)"
+    },
     "supportIssueTrackerPrompt": {
       "message": "Bug reports और feature requests के लिए आपको हमारे public issue tracker पर भेजा जाएगा। खाते की ज़रूरत हो सकती है।\n\nआप हमें {supportEmail} पर ईमेल भी कर सकते हैं।\n\nIssue tracker पर जाएँ?"
     },
@@ -202,13 +205,13 @@
       "message": "अनुवाद"
     },
     "chooseTranslationLanguageTitle": {
-      "message": "वह भाषा चुनें जिसमें चैट मैसेज का अनुवाद होना चाहिए. बंद करने से ऑटोमैटिक अनुवाद बंद हो जाता है."
+      "message": "वह भाषा चुनें जिसमें चैट संदेशों का अनुवाद होना चाहिए। “बंद” अपने-आप अनुवाद को बंद करता है।"
     },
     "translateTo": {
-      "message": "चैट को इसमें अनुवाद करें"
+      "message": "लक्ष्य भाषा"
     },
     "translationOffHelper": {
-      "message": "बंद करने से ऑटोमैटिक अनुवाद बंद हो जाता है."
+      "message": "अपने-आप अनुवाद चालू करने के लिए कोई भाषा चुनें।"
     },
     "display": {
       "message": "दिखावट"
@@ -228,6 +231,9 @@
     "popupAlerts": {
       "message": "अलर्ट"
     },
+    "effects": {
+      "message": "प्रभाव"
+    },
     "playInboxSound": {
       "message": "इनबॉक्स साउंड चलाएं"
     },
@@ -235,19 +241,19 @@
       "message": "जब कोई चैट मैसेज आपके इनबॉक्स में सेव हो, तो छोटा साउंड चलाएं."
     },
     "playInboxSoundHelper": {
-      "message": "नए इनबॉक्स मैसेज के लिए छोटा साउंड चलाएं."
+      "message": "नए इनबॉक्स संदेशों के लिए छोटी सूचना ध्वनि चलाएं।"
     },
     "appearance": {
       "message": "रूप"
     },
     "startupShimmer": {
-      "message": "शुरुआती प्रभाव"
+      "message": "स्टार्टअप एनिमेशन"
     },
     "startupShimmerTitle": {
-      "message": "एक्सटेंशन के चैट से जुड़ने पर एक छोटा शुरुआती प्रभाव दिखाएं। कम गति की सेटिंग इसे अपने आप बंद कर देती है।"
+      "message": "एक्सटेंशन के चैट से जुड़ने पर छोटा स्टार्टअप एनिमेशन दिखाएं। रिड्यूस्ड मोशन इसे अपने-आप बंद कर देता है।"
     },
     "startupShimmerHelper": {
-      "message": "एक्सटेंशन के चैट से जुड़ने पर किनारे पर छोटा प्रभाव दिखाएं।"
+      "message": "एक्सटेंशन के चैट से जुड़ने पर छोटा एज एनिमेशन दिखाएं।"
     },
     "extensionVersion": {
       "message": "एक्सटेंशन वर्ज़न"

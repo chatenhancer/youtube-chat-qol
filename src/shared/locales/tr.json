@@ -65,7 +65,7 @@
     "timeHours": "{count} sa",
     "timeMinutes": "{count} dk",
     "timeSeconds": "{count} sn",
-    "translateChat": "Sohbeti çevir",
+    "translateChat": "Çevir",
     "translated": "Çevrildi:",
     "translatedFrom": "{language} dilinden çevrildi",
     "translatedMessage": "Çevrilmiş mesaj",
@@ -189,6 +189,9 @@
     "supportAndFeedback": {
       "message": "Destek ve geri bildirim"
     },
+    "playgroundComingSoon": {
+      "message": "Oyun alanı (yakında)"
+    },
     "supportIssueTrackerPrompt": {
       "message": "Hata bildirimleri ve özellik istekleri için herkese açık sorun takipçimize yönlendirileceksin. Hesap gerekebilir.\n\nBize şu adresten de e-posta gönderebilirsin: {supportEmail}.\n\nSorun takipçisine devam edilsin mi?"
     },
@@ -202,13 +205,13 @@
       "message": "Çeviri"
     },
     "chooseTranslationLanguageTitle": {
-      "message": "Sohbet mesajlarının çevrileceği dili seçin. Kapalı seçeneği otomatik çeviriyi devre dışı bırakır."
+      "message": "Sohbet mesajlarının çevrileceği dili seç. “Kapalı” otomatik çeviriyi devre dışı bırakır."
     },
     "translateTo": {
-      "message": "Sohbeti şuna çevir"
+      "message": "Hedef dil"
     },
     "translationOffHelper": {
-      "message": "Kapalı seçeneği otomatik çeviriyi devre dışı bırakır."
+      "message": "Otomatik çeviriyi etkinleştirmek için bir dil seç."
     },
     "display": {
       "message": "Görünüm"
@@ -228,6 +231,9 @@
     "popupAlerts": {
       "message": "Uyarılar"
     },
+    "effects": {
+      "message": "Efektler"
+    },
     "playInboxSound": {
       "message": "Gelen kutusu sesi çal"
     },
@@ -235,19 +241,19 @@
       "message": "Bir sohbet mesajı gelen kutunuza kaydedildiğinde kısa bir ses çalar."
     },
     "playInboxSoundHelper": {
-      "message": "Yeni gelen kutusu mesajları için kısa bir ses çalar."
+      "message": "Yeni gelen kutusu mesajları için kısa bir bildirim sesi çal."
     },
     "appearance": {
       "message": "Görünüm"
     },
     "startupShimmer": {
-      "message": "Başlangıç efekti"
+      "message": "Başlangıç animasyonu"
     },
     "startupShimmerTitle": {
-      "message": "Uzantı sohbete bağlandığında kısa bir başlangıç efekti gösterir. Hareketi azaltma ayarı bunu otomatik olarak kapatır."
+      "message": "Uzantı sohbete bağlandığında kısa bir başlangıç animasyonu göster. Azaltılmış hareket bunu otomatik olarak kapatır."
     },
     "startupShimmerHelper": {
-      "message": "Uzantı sohbete bağlandığında kenarda kısa bir efekt gösterir."
+      "message": "Uzantı sohbete bağlandığında kısa bir kenar animasyonu göster."
     },
     "extensionVersion": {
       "message": "Uzantı sürümü"

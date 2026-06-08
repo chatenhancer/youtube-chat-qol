@@ -65,7 +65,7 @@
     "timeHours": "{count} uur",
     "timeMinutes": "{count} min",
     "timeSeconds": "{count} sec",
-    "translateChat": "Chat vertalen",
+    "translateChat": "Vertalen",
     "translated": "Vertaald:",
     "translatedFrom": "Vertaald uit {language}",
     "translatedMessage": "Vertaald bericht",
@@ -186,6 +186,9 @@
     "supportAndFeedback": {
       "message": "Support en feedback"
     },
+    "playgroundComingSoon": {
+      "message": "Speelruimte (binnenkort)"
+    },
     "supportIssueTrackerPrompt": {
       "message": "Je wordt doorgestuurd naar onze openbare issue-tracker voor bugmeldingen en functieverzoeken. Een account kan nodig zijn.\n\nJe kunt ons ook mailen op {supportEmail}.\n\nDoorgaan naar de issue-tracker?"
     },
@@ -199,13 +202,13 @@
       "message": "Vertaling"
     },
     "chooseTranslationLanguageTitle": {
-      "message": "Kies de taal waarnaar chatberichten moeten worden vertaald. Uit schakelt automatische vertaling uit."
+      "message": "Kies de taal waarin chatberichten moeten worden vertaald. “Uit” schakelt automatische vertaling uit."
     },
     "translateTo": {
-      "message": "Chat vertalen naar"
+      "message": "Doeltaal"
     },
     "translationOffHelper": {
-      "message": "Uit schakelt automatische vertaling uit."
+      "message": "Kies een taal om automatische vertaling in te schakelen."
     },
     "display": {
       "message": "Weergave"
@@ -225,6 +228,9 @@
     "popupAlerts": {
       "message": "Meldingen"
     },
+    "effects": {
+      "message": "Effecten"
+    },
     "playInboxSound": {
       "message": "Inboxgeluid afspelen"
     },
@@ -232,19 +238,19 @@
       "message": "Speel een kort geluid af wanneer een chatbericht in je inbox wordt opgeslagen."
     },
     "playInboxSoundHelper": {
-      "message": "Speel een kort geluid af voor nieuwe inboxberichten."
+      "message": "Speel een kort meldingsgeluid af voor nieuwe inboxberichten."
     },
     "appearance": {
       "message": "Weergave"
     },
     "startupShimmer": {
-      "message": "Starteffect"
+      "message": "Startanimatie"
     },
     "startupShimmerTitle": {
-      "message": "Toon een kort starteffect wanneer de extensie verbinding maakt met de chat. Verminderde beweging schakelt dit automatisch uit."
+      "message": "Toon een korte startanimatie wanneer de extensie verbinding maakt met chat. Minder beweging schakelt dit automatisch uit."
     },
     "startupShimmerHelper": {
-      "message": "Toon kort een effect langs de rand wanneer de extensie verbinding maakt met de chat."
+      "message": "Toon een korte randanimatie wanneer de extensie verbinding maakt met chat."
     },
     "extensionVersion": {
       "message": "Extensieversie"

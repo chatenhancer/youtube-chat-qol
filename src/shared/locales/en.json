@@ -65,7 +65,7 @@
     "timeHours": "{count} hrs",
     "timeMinutes": "{count} min",
     "timeSeconds": "{count} sec",
-    "translateChat": "Translate chat",
+    "translateChat": "Translate",
     "translated": "Translated:",
     "translatedFrom": "Translated from {language}",
     "translatedMessage": "Translated message",
@@ -189,6 +189,9 @@
     "supportAndFeedback": {
       "message": "Support and feedback"
     },
+    "playgroundComingSoon": {
+      "message": "Playground (coming soon)"
+    },
     "supportIssueTrackerPrompt": {
       "message": "You will be redirected to our public issue tracker for bug reports and feature requests. An account may be required.\n\nYou can also email us at {supportEmail}.\n\nContinue to the issue tracker?"
     },
@@ -202,13 +205,13 @@
       "message": "Translation"
     },
     "chooseTranslationLanguageTitle": {
-      "message": "Choose the language chat messages should be translated into. Off disables automatic translation."
+      "message": "Choose the language chat messages should be translated into. \"Off\" disables automatic translation."
     },
     "translateTo": {
-      "message": "Translate chat to"
+      "message": "Target language"
     },
     "translationOffHelper": {
-      "message": "Off disables automatic translation."
+      "message": "Pick a language to enable automatic translation."
     },
     "display": {
       "message": "Display"
@@ -228,6 +231,9 @@
     "popupAlerts": {
       "message": "Alerts"
     },
+    "effects": {
+      "message": "Effects"
+    },
     "playInboxSound": {
       "message": "Play inbox sound"
     },
@@ -235,19 +241,19 @@
       "message": "Play a short sound when a chat message is saved to your inbox."
     },
     "playInboxSoundHelper": {
-      "message": "Play a short sound for new inbox messages."
+      "message": "Play a short notification sound for new inbox messages."
     },
     "appearance": {
       "message": "Appearance"
     },
     "startupShimmer": {
-      "message": "Startup effect"
+      "message": "Startup animation"
     },
     "startupShimmerTitle": {
-      "message": "Show a brief startup effect when the extension connects to chat. Reduced motion disables it automatically."
+      "message": "Show a brief startup animation when the extension connects to chat. Reduced motion disables it automatically."
     },
     "startupShimmerHelper": {
-      "message": "Show a brief edge effect when the extension connects to chat."
+      "message": "Show a brief edge animation when the extension connects to chat."
     },
     "extensionVersion": {
       "message": "Extension version"

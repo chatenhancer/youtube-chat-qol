@@ -65,7 +65,7 @@
     "timeHours": "{count} jam",
     "timeMinutes": "{count} menit",
     "timeSeconds": "{count} detik",
-    "translateChat": "Terjemahkan chat",
+    "translateChat": "Terjemahkan",
     "translated": "Diterjemahkan:",
     "translatedFrom": "Diterjemahkan dari {language}",
     "translatedMessage": "Pesan terjemahan",
@@ -189,6 +189,9 @@
     "supportAndFeedback": {
       "message": "Dukungan dan masukan"
     },
+    "playgroundComingSoon": {
+      "message": "Ruang bermain (segera hadir)"
+    },
     "supportIssueTrackerPrompt": {
       "message": "Anda akan diarahkan ke pelacak isu publik kami untuk laporan bug dan permintaan fitur. Akun mungkin diperlukan.\n\nAnda juga bisa mengirim email ke {supportEmail}.\n\nLanjut ke pelacak isu?"
     },
@@ -202,13 +205,13 @@
       "message": "Terjemahan"
     },
     "chooseTranslationLanguageTitle": {
-      "message": "Pilih bahasa tujuan terjemahan pesan chat. Mati menonaktifkan terjemahan otomatis."
+      "message": "Pilih bahasa untuk menerjemahkan pesan chat. “Nonaktif” mematikan terjemahan otomatis."
     },
     "translateTo": {
-      "message": "Terjemahkan chat ke"
+      "message": "Bahasa target"
     },
     "translationOffHelper": {
-      "message": "Mati menonaktifkan terjemahan otomatis."
+      "message": "Pilih bahasa untuk mengaktifkan terjemahan otomatis."
     },
     "display": {
       "message": "Tampilan"
@@ -228,6 +231,9 @@
     "popupAlerts": {
       "message": "Peringatan"
     },
+    "effects": {
+      "message": "Efek"
+    },
     "playInboxSound": {
       "message": "Putar suara kotak masuk"
     },
@@ -235,19 +241,19 @@
       "message": "Putar suara singkat saat pesan chat disimpan ke kotak masuk Anda."
     },
     "playInboxSoundHelper": {
-      "message": "Putar suara singkat untuk pesan kotak masuk baru."
+      "message": "Putar suara notifikasi singkat untuk pesan inbox baru."
     },
     "appearance": {
       "message": "Tampilan"
     },
     "startupShimmer": {
-      "message": "Efek awal"
+      "message": "Animasi awal"
     },
     "startupShimmerTitle": {
-      "message": "Tampilkan efek awal singkat saat ekstensi terhubung ke chat. Preferensi kurangi gerakan menonaktifkannya otomatis."
+      "message": "Tampilkan animasi awal singkat saat ekstensi terhubung ke chat. Kurangi gerakan akan menonaktifkannya otomatis."
     },
     "startupShimmerHelper": {
-      "message": "Tampilkan efek singkat di tepi saat ekstensi terhubung ke chat."
+      "message": "Tampilkan animasi tepi singkat saat ekstensi terhubung ke chat."
     },
     "extensionVersion": {
       "message": "Versi ekstensi"

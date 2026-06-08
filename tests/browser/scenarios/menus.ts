@@ -24,8 +24,8 @@ export const messageMenuScenario: BrowserScenario = async ({ chat }) => {
 };
 
 async function expectSettingsMenuControlsInjected(menu: Locator): Promise<void> {
-  await test.step('Verify Translate chat setting is injected', async () => {
-    await expect(menu.locator('.ytcq-settings-item').filter({ hasText: 'Translate chat' })).toBeVisible();
+  await test.step('Verify Translate setting is injected', async () => {
+    await expect(menu.locator('.ytcq-settings-item').filter({ hasText: 'Translate' })).toBeVisible();
   });
 
   await test.step('Verify Inbox sound setting is injected', async () => {

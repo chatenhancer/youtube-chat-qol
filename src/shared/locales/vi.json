@@ -65,7 +65,7 @@
     "timeHours": "{count} giờ",
     "timeMinutes": "{count} phút",
     "timeSeconds": "{count} giây",
-    "translateChat": "Dịch chat",
+    "translateChat": "Dịch",
     "translated": "Đã dịch:",
     "translatedFrom": "Dịch từ {language}",
     "translatedMessage": "Tin nhắn đã dịch",
@@ -186,6 +186,9 @@
     "supportAndFeedback": {
       "message": "Hỗ trợ và góp ý"
     },
+    "playgroundComingSoon": {
+      "message": "Khu trò chơi (sắp ra mắt)"
+    },
     "supportIssueTrackerPrompt": {
       "message": "Bạn sẽ được chuyển đến trình theo dõi vấn đề công khai của chúng tôi để báo lỗi và yêu cầu tính năng. Có thể cần tài khoản.\n\nBạn cũng có thể email cho chúng tôi tại {supportEmail}.\n\nTiếp tục đến trình theo dõi vấn đề?"
     },
@@ -199,13 +202,13 @@
       "message": "Dịch"
     },
     "chooseTranslationLanguageTitle": {
-      "message": "Chọn ngôn ngữ để dịch tin nhắn chat sang. Tắt sẽ tắt dịch tự động."
+      "message": "Chọn ngôn ngữ để dịch tin nhắn trò chuyện. “Tắt” sẽ tắt dịch tự động."
     },
     "translateTo": {
-      "message": "Dịch chat sang"
+      "message": "Ngôn ngữ đích"
     },
     "translationOffHelper": {
-      "message": "Tắt sẽ tắt dịch tự động."
+      "message": "Chọn một ngôn ngữ để bật dịch tự động."
     },
     "display": {
       "message": "Hiển thị"
@@ -225,6 +228,9 @@
     "popupAlerts": {
       "message": "Cảnh báo"
     },
+    "effects": {
+      "message": "Hiệu ứng"
+    },
     "playInboxSound": {
       "message": "Phát âm thanh hộp thư"
     },
@@ -232,19 +238,19 @@
       "message": "Phát âm thanh ngắn khi tin nhắn chat được lưu vào hộp thư."
     },
     "playInboxSoundHelper": {
-      "message": "Phát âm thanh ngắn cho tin nhắn hộp thư mới."
+      "message": "Phát âm thanh thông báo ngắn cho tin nhắn hộp thư mới."
     },
     "appearance": {
       "message": "Giao diện"
     },
     "startupShimmer": {
-      "message": "Hiệu ứng khởi động"
+      "message": "Hoạt ảnh khởi động"
     },
     "startupShimmerTitle": {
-      "message": "Hiển thị hiệu ứng khởi động ngắn khi tiện ích kết nối với cuộc trò chuyện. Tùy chọn giảm chuyển động sẽ tự động tắt hiệu ứng này."
+      "message": "Hiển thị hoạt ảnh khởi động ngắn khi tiện ích kết nối với cuộc trò chuyện. Giảm chuyển động sẽ tự động tắt tính năng này."
     },
     "startupShimmerHelper": {
-      "message": "Hiển thị hiệu ứng ngắn ở cạnh khi tiện ích kết nối với cuộc trò chuyện."
+      "message": "Hiển thị hoạt ảnh viền ngắn khi tiện ích kết nối với cuộc trò chuyện."
     },
     "extensionVersion": {
       "message": "Phiên bản tiện ích"

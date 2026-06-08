@@ -39,7 +39,7 @@ describe('chat settings menu integration', () => {
 
     expect(items).toHaveLength(2);
     expect(items[0].getAttribute('data-ytcq-setting')).toBe('targetLanguage');
-    expect(items[0].querySelector('.ytcq-menu-label')?.textContent).toBe('Translate chat');
+    expect(items[0].querySelector('.ytcq-menu-label')?.textContent).toBe('Translate');
     expect(items[0].getAttribute('aria-checked')).toBe('false');
     expect(items[1].getAttribute('data-ytcq-setting')).toBe('sound');
     expect(items[1].querySelector('.ytcq-menu-label')?.textContent).toBe('Inbox sound');

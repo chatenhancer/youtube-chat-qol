@@ -65,7 +65,7 @@
     "timeHours": "{count} 小時",
     "timeMinutes": "{count} 分",
     "timeSeconds": "{count} 秒",
-    "translateChat": "翻譯聊天室",
+    "translateChat": "翻譯",
     "translated": "已翻譯：",
     "translatedFrom": "從{language}翻譯",
     "translatedMessage": "已翻譯訊息",
@@ -186,6 +186,9 @@
     "supportAndFeedback": {
       "message": "支援與回饋"
     },
+    "playgroundComingSoon": {
+      "message": "遊戲區（即將推出）"
+    },
     "supportIssueTrackerPrompt": {
       "message": "你將被重新導向到我們的公開問題追蹤器，用於錯誤回報和功能請求。可能需要帳號。\n\n你也可以寄信到 {supportEmail}。\n\n繼續前往問題追蹤器？"
     },
@@ -199,13 +202,13 @@
       "message": "翻譯"
     },
     "chooseTranslationLanguageTitle": {
-      "message": "選擇聊天室訊息要翻譯成的語言。關閉會停用自動翻譯。"
+      "message": "選擇聊天室訊息要翻譯成的語言。「關閉」會停用自動翻譯。"
     },
     "translateTo": {
-      "message": "將聊天室翻譯成"
+      "message": "目標語言"
     },
     "translationOffHelper": {
-      "message": "關閉會停用自動翻譯。"
+      "message": "選擇一種語言即可啟用自動翻譯。"
     },
     "display": {
       "message": "顯示"
@@ -225,6 +228,9 @@
     "popupAlerts": {
       "message": "提醒"
     },
+    "effects": {
+      "message": "效果"
+    },
     "playInboxSound": {
       "message": "播放收件匣音效"
     },
@@ -232,19 +238,19 @@
       "message": "聊天室訊息儲存到收件匣時播放短音效。"
     },
     "playInboxSoundHelper": {
-      "message": "新收件匣訊息播放短音效。"
+      "message": "為新的收件箱訊息播放短提示音。"
     },
     "appearance": {
       "message": "外觀"
     },
     "startupShimmer": {
-      "message": "啟動效果"
+      "message": "啟動動畫"
     },
     "startupShimmerTitle": {
-      "message": "擴充功能連接到聊天室時顯示短暫啟動效果。啟用減少動態效果時會自動停用。"
+      "message": "擴充功能連接到聊天室時顯示短暫的啟動動畫。啟用減少動態效果後會自動停用。"
     },
     "startupShimmerHelper": {
-      "message": "擴充功能連接到聊天室時，在邊緣顯示短暫效果。"
+      "message": "擴充功能連接到聊天室時顯示短暫的邊緣動畫。"
     },
     "extensionVersion": {
       "message": "擴充功能版本"

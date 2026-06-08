@@ -65,7 +65,7 @@
     "timeHours": "{count} 小时",
     "timeMinutes": "{count} 分钟",
     "timeSeconds": "{count} 秒",
-    "translateChat": "翻译聊天",
+    "translateChat": "翻译",
     "translated": "已翻译：",
     "translatedFrom": "从{language}翻译",
     "translatedMessage": "已翻译消息",
@@ -189,6 +189,9 @@
     "supportAndFeedback": {
       "message": "支持和反馈"
     },
+    "playgroundComingSoon": {
+      "message": "游戏区（即将推出）"
+    },
     "supportIssueTrackerPrompt": {
       "message": "你将被重定向到我们的公开问题跟踪器，用于报告错误和提交功能请求。可能需要账户。\n\n你也可以发送邮件至 {supportEmail}。\n\n继续前往问题跟踪器？"
     },
@@ -202,13 +205,13 @@
       "message": "翻译"
     },
     "chooseTranslationLanguageTitle": {
-      "message": "选择聊天消息要翻译成的语言。关闭会停用自动翻译。"
+      "message": "选择聊天消息要翻译成的语言。“关闭”会停用自动翻译。"
     },
     "translateTo": {
-      "message": "将聊天翻译为"
+      "message": "目标语言"
     },
     "translationOffHelper": {
-      "message": "关闭会停用自动翻译。"
+      "message": "选择一种语言即可启用自动翻译。"
     },
     "display": {
       "message": "显示"
@@ -228,6 +231,9 @@
     "popupAlerts": {
       "message": "提醒"
     },
+    "effects": {
+      "message": "效果"
+    },
     "playInboxSound": {
       "message": "播放收件箱提示音"
     },
@@ -235,19 +241,19 @@
       "message": "当聊天消息保存到收件箱时播放短提示音。"
     },
     "playInboxSoundHelper": {
-      "message": "有新的收件箱消息时播放短提示音。"
+      "message": "为新的收件箱消息播放短提示音。"
     },
     "appearance": {
       "message": "外观"
     },
     "startupShimmer": {
-      "message": "启动效果"
+      "message": "启动动画"
     },
     "startupShimmerTitle": {
-      "message": "扩展连接到聊天时显示短暂启动效果。开启减少动态效果时会自动停用。"
+      "message": "扩展连接到聊天时显示短暂的启动动画。启用减少动态效果后会自动停用。"
     },
     "startupShimmerHelper": {
-      "message": "扩展连接到聊天时，在边缘显示短暂效果。"
+      "message": "扩展连接到聊天时显示短暂的边缘动画。"
     },
     "extensionVersion": {
       "message": "扩展版本"

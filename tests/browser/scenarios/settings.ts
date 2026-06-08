@@ -55,18 +55,18 @@ async function toggleTranslationFromChatSettings({
 }): Promise<void> {
   const item = menu.locator('.ytcq-settings-item[data-ytcq-setting="targetLanguage"]').first();
 
-  await test.step('Verify Translate chat starts off in chat settings', async () => {
+  await test.step('Verify Translate starts off in chat settings', async () => {
     await expect(item).toHaveAttribute('aria-checked', 'false');
   });
 
-  await test.step('Enable Translate chat from chat settings', async () => {
+  await test.step('Enable Translate from chat settings', async () => {
     await item.click();
     await expectStorageValue(context, 'targetLanguage', 'ja');
     await expectStorageValue(context, 'lastTranslationTarget', 'ja');
     await expect(item).toHaveAttribute('aria-checked', 'true');
   });
 
-  await test.step('Disable Translate chat from chat settings', async () => {
+  await test.step('Disable Translate from chat settings', async () => {
     await item.click();
     await expectStorageValue(context, 'targetLanguage', '');
     await expect(item).toHaveAttribute('aria-checked', 'false');

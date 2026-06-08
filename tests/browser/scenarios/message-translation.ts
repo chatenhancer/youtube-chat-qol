@@ -597,7 +597,7 @@ async function expectTranslateSettingReactsLive({
         const translateItem = menu.locator('.ytcq-settings-item[data-ytcq-setting="targetLanguage"]').first();
         await findTranslatableSourceMessage(chat);
 
-        await test.step('Enable Translate chat and verify existing message translates', async () => {
+        await test.step('Enable Translate and verify existing message translates', async () => {
           await expect(translateItem).toHaveAttribute('aria-checked', 'false');
           await translateItem.click();
           await expect(translateItem).toHaveAttribute('aria-checked', 'true');
@@ -608,7 +608,7 @@ async function expectTranslateSettingReactsLive({
           });
         });
 
-        await test.step('Disable Translate chat and verify visible translation clears', async () => {
+        await test.step('Disable Translate and verify visible translation clears', async () => {
           await translateItem.click();
           await expect(translateItem).toHaveAttribute('aria-checked', 'false');
           await expect(chat.locator('.ytcq-translation')).toHaveCount(0, { timeout: 5_000 });
