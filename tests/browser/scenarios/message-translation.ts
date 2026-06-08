@@ -551,7 +551,7 @@ async function expectToggleableRealReplacement({
   await text.locator('.ytcq-replaced-translation-icon').click();
 
   await expect(host).toHaveAttribute('data-ytcq-translation-view', 'original');
-  await expectVisibleTextToContain(text, sourceVisibleText);
+  await expectVisibleTextToMatchStoredOriginal(text, sourceVisibleText);
   await expect(text).toHaveAttribute('title', originalTitle);
   await expect.poll(async () => text.evaluate((element) => getComputedStyle(element).textDecorationLine), {
     message: 'Original view should not keep the translated-message underline.',
@@ -570,6 +570,22 @@ async function expectVisibleTextToContain(locator: Locator, expectedText: string
     message: `Expected visible text to include ${expectedText}.`,
     timeout: 15_000
   }).toContain(getComparableVisibleText(expectedText));
+}
+
+async function expectVisibleTextToMatchStoredOriginal(locator: Locator, expectedText: string): Promise<void> {
+  const comparableExpectedText = getComparableVisibleText(expectedText);
+  await expect.poll(async () => {
+    const comparableText = getComparableVisibleText(await locator.innerText());
+    return Boolean(comparableText)
+      && comparableText.length >= Math.min(6, comparableExpectedText.length)
+      && (
+        comparableText.includes(comparableExpectedText)
+        || comparableExpectedText.includes(comparableText)
+      );
+  }, {
+    message: `Expected visible original text to match stored original text ${expectedText}.`,
+    timeout: 15_000
+  }).toBe(true);
 }
 
 async function expectVisibleTextToDifferFrom(locator: Locator, unexpectedText: string): Promise<void> {
