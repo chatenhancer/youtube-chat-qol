@@ -129,7 +129,53 @@
     "draftTranslationTo": "Conceptvertaling naar {language}.",
     "whenUntilTarget": "{duration} tot {target}",
     "whenSinceTarget": "{duration} sinds {target}",
-    "whenTargetInPlace": "{target} in {place}"
+    "whenTargetInPlace": "{target} in {place}",
+    "playground": "Playground",
+    "games": "Games",
+    "gamesChess": "Schaken",
+    "gamesAvailability": "Beschikbaarheid",
+    "gamesAvailableToPlay": "Beschikbaar om te spelen",
+    "gamesAvailableHelper": "Zichtbaar voor andere spelers in deze stream.",
+    "gamesActiveGame": "Actief spel",
+    "gamesResume": "Hervatten",
+    "gamesMinimize": "Minimaliseren",
+    "gamesLeave": "Verlaten",
+    "gamesInvites": "Uitnodigingen",
+    "gamesNoInvites": "Geen uitnodigingen",
+    "gamesInviteFrom": "{user} heeft je uitgenodigd voor {game}.",
+    "gamesInviteHelper": "Accepteer om het spelpaneel te openen.",
+    "gamesAccept": "Accepteren",
+    "gamesPlayWith": "Kies iemand om mee te spelen",
+    "gamesBack": "Terug",
+    "gamesPlayers": "Spelers",
+    "gamesAvailableNow": "Nu beschikbaar",
+    "gamesWaitingForReply": "Wachten op antwoord...",
+    "gamesCancelInvite": "Annuleren",
+    "gamesInvite": "Uitnodigen",
+    "gamesIgnore": "Negeren",
+    "gamesPlayersOnline": {
+      "one": "{count} speler online",
+      "other": "{count} spelers online"
+    },
+    "gamesNoPlayersAvailable": "Er zijn geen spelers beschikbaar.",
+    "gamesConnectingTitle": "Verbinden...",
+    "gamesConnectingNoticeTitle": "Verbinden met Playground",
+    "gamesConnectingHelper": "De gameverbinding wordt gecontroleerd.",
+    "gamesUnavailableTitle": "Niet beschikbaar",
+    "gamesUnavailableHelper": "Probeer het later opnieuw.",
+    "gamesReconnect": "Opnieuw verbinden",
+    "gamesStartGame": "Start een spel",
+    "gamesOpponentLeft": "De tegenstander heeft het spel verlaten.",
+    "gamesCheck": "Schaak",
+    "gamesCheckmate": "Schaakmat",
+    "gamesDraw": "Remise",
+    "gamesResigned": "Opgegeven",
+    "gamesNotYourTurn": "Je bent niet aan zet",
+    "gamesInvalidMove": "Ongeldige zet",
+    "gamesChooseOwnPiece": "Kies je stuk",
+    "gamesMuteSounds": "Spelgeluiden dempen",
+    "gamesUnmuteSounds": "Spelgeluiden inschakelen",
+    "gamesUnavailableNoticeTitle": "Kan geen verbinding maken"
   },
   "extension": {
     "extensionName": {
@@ -185,9 +231,6 @@
     },
     "supportAndFeedback": {
       "message": "Support en feedback"
-    },
-    "playgroundComingSoon": {
-      "message": "Speelruimte (binnenkort)"
     },
     "supportIssueTrackerPrompt": {
       "message": "Je wordt doorgestuurd naar onze openbare issue-tracker voor bugmeldingen en functieverzoeken. Een account kan nodig zijn.\n\nJe kunt ons ook mailen op {supportEmail}.\n\nDoorgaan naar de issue-tracker?"
@@ -311,6 +354,27 @@
     },
     "removeBookmark": {
       "message": "Bladwijzer verwijderen"
+    },
+    "playground": {
+      "message": "Playground"
+    },
+    "joinPlayground": {
+      "message": "Deelnemen aan Playground"
+    },
+    "playgroundBetaHelper": {
+      "message": "Probeer vroege experimenten. Sommige kunnen verbinding maken met chatenhancer.com om te werken."
+    },
+    "games": {
+      "message": "Games"
+    },
+    "playgroundGamesAvailable": {
+      "message": "Standaard beschikbaar zijn voor games"
+    },
+    "playgroundGamesAvailableHelper": {
+      "message": "Je verschijnt in de lijst met beschikbare spelers en kunt tijdens streams game-uitnodigingen ontvangen."
+    },
+    "learnMore": {
+      "message": "Meer informatie"
     }
   }
 }

@@ -2,6 +2,7 @@
 node_modules/
 dist/
 coverage/
+.wrangler/
 docs/badges/
 docs/*/index.html
 docs/sitemap.xml

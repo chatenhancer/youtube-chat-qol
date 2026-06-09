@@ -20,6 +20,7 @@ const chromeMock = {
     getUILanguage: vi.fn(() => 'en')
   },
   runtime: {
+    getURL: vi.fn((path: string) => `chrome-extension://test/${path}`),
     getManifest: vi.fn(() => ({ version: '0.0.0' })),
     lastError: undefined,
     onConnect: {
@@ -90,6 +91,25 @@ Object.defineProperty(window, 'cancelAnimationFrame', {
   configurable: true,
   writable: true,
   value: (handle: number) => window.clearTimeout(handle)
+});
+
+Object.defineProperty(HTMLCanvasElement.prototype, 'getContext', {
+  configurable: true,
+  value: vi.fn((contextId: string) => {
+    if (contextId !== '2d') return null;
+
+    return {
+      clearRect: vi.fn(),
+      drawImage: vi.fn(),
+      fillRect: vi.fn(),
+      fillStyle: '',
+      imageSmoothingEnabled: false,
+      lineWidth: 1,
+      setTransform: vi.fn(),
+      strokeRect: vi.fn(),
+      strokeStyle: ''
+    } as unknown as CanvasRenderingContext2D;
+  })
 });
 
 function createStorageArea(): chrome.storage.StorageArea {

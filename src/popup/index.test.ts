@@ -13,6 +13,7 @@ describe('popup', () => {
       <button id="resetExtension"></button>
       <button id="settingsTab" data-popup-tab-target="settingsPanel" aria-selected="true"></button>
       <button id="bookmarksTab" data-popup-tab-target="bookmarksPanel" aria-selected="false"></button>
+      <button id="playgroundTab" data-popup-tab-target="playgroundPanel" aria-selected="false"></button>
       <div id="settingsPanel" data-popup-tab-panel>
       <select id="targetLanguage"></select>
       <select id="translationDisplay">
@@ -25,6 +26,18 @@ describe('popup', () => {
       <div id="bookmarksPanel" data-popup-tab-panel hidden>
         <span id="bookmarksCount"></span>
         <div id="bookmarksList"></div>
+      </div>
+      <div id="playgroundPanel" data-popup-tab-panel hidden>
+        <label id="playgroundOption" class="option option-toggle">
+          <span class="option-helper">
+            <span id="playgroundHelper">Try early experiments.</span>
+            <a class="option-helper-link" href="https://www.chatenhancer.com/privacy" target="_blank" rel="noreferrer">Learn more</a>
+          </span>
+          <input id="playgroundEnabled" type="checkbox">
+        </label>
+        <section id="playgroundGamesSection" hidden>
+          <input id="playgroundGamesAvailable" type="checkbox">
+        </section>
       </div>
       <footer>
         <span id="version"></span>
@@ -393,11 +406,13 @@ describe('popup', () => {
 
     expect(document.querySelector<HTMLElement>('#settingsPanel')?.hidden).toBe(false);
     expect(document.querySelector<HTMLElement>('#bookmarksPanel')?.hidden).toBe(true);
+    expect(document.querySelector<HTMLElement>('#playgroundPanel')?.hidden).toBe(true);
     document.querySelector<HTMLButtonElement>('#bookmarksTab')?.click();
 
     expect(document.querySelector<HTMLButtonElement>('#bookmarksTab')?.getAttribute('aria-selected')).toBe('true');
     expect(document.querySelector<HTMLElement>('#settingsPanel')?.hidden).toBe(true);
     expect(document.querySelector<HTMLElement>('#bookmarksPanel')?.hidden).toBe(false);
+    expect(document.querySelector<HTMLElement>('#playgroundPanel')?.hidden).toBe(true);
     expect(document.querySelector('#bookmarksCount')?.textContent).toBe('bookmarkedUsersCount:1');
     expect(document.querySelector('.bookmark-name')?.textContent).toBe('@ViewerOne');
     expect(document.querySelector<HTMLImageElement>('.bookmark-avatar img')?.src).toBe('https://yt3.ggpht.com/avatar=s88-c-k');
@@ -660,6 +675,8 @@ describe('popup', () => {
     `;
     await chrome.storage.sync.set({
       lastTranslationTarget: 'ko',
+      playgroundEnabled: true,
+      playgroundGamesAvailable: true,
       sound: false,
       startupEffect: true,
       targetLanguage: 'ja',
@@ -675,11 +692,17 @@ describe('popup', () => {
     const translationDisplay = document.querySelector<HTMLSelectElement>('#translationDisplay')!;
     const sound = document.querySelector<HTMLInputElement>('#sound')!;
     const startupEffect = document.querySelector<HTMLInputElement>('#startupEffect')!;
+    const playgroundEnabled = document.querySelector<HTMLInputElement>('#playgroundEnabled')!;
+    const playgroundGamesSection = document.querySelector<HTMLElement>('#playgroundGamesSection')!;
+    const playgroundGamesAvailable = document.querySelector<HTMLInputElement>('#playgroundGamesAvailable')!;
 
     expect(targetLanguage.value).toBe('ja');
     expect(translationDisplay.value).toBe('below');
     expect(sound.checked).toBe(false);
     expect(startupEffect.checked).toBe(true);
+    expect(playgroundEnabled.checked).toBe(true);
+    expect(playgroundGamesSection.hidden).toBe(false);
+    expect(playgroundGamesAvailable.checked).toBe(true);
 
     targetLanguage.value = '';
     targetLanguage.dispatchEvent(new Event('change', { bubbles: true }));
@@ -696,13 +719,45 @@ describe('popup', () => {
     sound.dispatchEvent(new Event('change', { bubbles: true }));
     startupEffect.checked = true;
     startupEffect.dispatchEvent(new Event('change', { bubbles: true }));
+    playgroundEnabled.checked = false;
+    playgroundEnabled.dispatchEvent(new Event('change', { bubbles: true }));
 
     expect(document.querySelector('.translation-target-icon')?.classList.contains('ytcq-translation-pulse')).toBe(true);
     expect(document.querySelector('.translation-display-icon')?.classList.contains('ytcq-display-reflow')).toBe(true);
     expect(document.querySelector('.sound-icon')?.classList.contains('ytcq-bell-ringing')).toBe(true);
     expect(document.querySelector('.startup-effect-icon')?.classList.contains('ytcq-sparkle-burst')).toBe(true);
+    expect(playgroundGamesSection.hidden).toBe(false);
+    expect(playgroundGamesSection.classList.contains('playground-group-collapsed')).toBe(true);
+    expect(playgroundGamesAvailable.checked).toBe(false);
+    expect(chrome.storage.sync.set).toHaveBeenCalledWith({
+      playgroundEnabled: false,
+      playgroundGamesAvailable: false
+    });
+    await vi.advanceTimersByTimeAsync(180);
+    expect(playgroundGamesSection.hidden).toBe(true);
     await vi.advanceTimersByTimeAsync(1000);
     expect(document.querySelector('.startup-effect-icon')?.classList.contains('ytcq-sparkle-burst')).toBe(false);
+  });
+
+  it('lets the Playground helper text toggle while the helper link stays a link', async () => {
+    vi.mocked(chrome.tabs.query).mockImplementation(((_queryInfo: chrome.tabs.QueryInfo, callback?: (tabs: chrome.tabs.Tab[]) => void) => {
+      callback?.([]);
+      return Promise.resolve([]);
+    }) as never);
+
+    await import('./index');
+    const playgroundEnabled = document.querySelector<HTMLInputElement>('#playgroundEnabled')!;
+    const helper = document.querySelector<HTMLElement>('#playgroundHelper')!;
+    const helperLink = document.querySelector<HTMLAnchorElement>('.option-helper-link')!;
+
+    expect(playgroundEnabled.checked).toBe(false);
+    helper.click();
+    expect(playgroundEnabled.checked).toBe(true);
+
+    const linkClick = new MouseEvent('click', { bubbles: true, cancelable: true });
+    helperLink.dispatchEvent(linkClick);
+    expect(linkClick.defaultPrevented).toBe(false);
+    expect(playgroundEnabled.checked).toBe(true);
   });
 
   it('does not animate icons and disables startup effect when reduced motion is preferred', async () => {

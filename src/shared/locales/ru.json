@@ -129,7 +129,53 @@
     "draftTranslationTo": "Перевод черновика на {language}.",
     "whenUntilTarget": "{duration} до {target}",
     "whenSinceTarget": "{duration} с {target}",
-    "whenTargetInPlace": "{target} в {place}"
+    "whenTargetInPlace": "{target} в {place}",
+    "playground": "Playground",
+    "games": "Игры",
+    "gamesChess": "Шахматы",
+    "gamesAvailability": "Доступность",
+    "gamesAvailableToPlay": "Готов играть",
+    "gamesAvailableHelper": "Будет видно другим игрокам в этом стриме.",
+    "gamesActiveGame": "Активная игра",
+    "gamesResume": "Продолжить",
+    "gamesMinimize": "Свернуть",
+    "gamesLeave": "Выйти",
+    "gamesInvites": "Приглашения",
+    "gamesNoInvites": "Нет приглашений",
+    "gamesInviteFrom": "{user} приглашает вас в {game}.",
+    "gamesInviteHelper": "Примите, чтобы открыть игровую панель.",
+    "gamesAccept": "Принять",
+    "gamesPlayWith": "Выберите, с кем играть",
+    "gamesBack": "Назад",
+    "gamesPlayers": "Игроки",
+    "gamesAvailableNow": "Доступен сейчас",
+    "gamesWaitingForReply": "Ожидание ответа...",
+    "gamesCancelInvite": "Отмена",
+    "gamesInvite": "Пригласить",
+    "gamesIgnore": "Игнорировать",
+    "gamesPlayersOnline": {
+      "one": "{count} игрок онлайн",
+      "other": "{count} игроков онлайн"
+    },
+    "gamesNoPlayersAvailable": "Нет доступных игроков.",
+    "gamesConnectingTitle": "Подключение...",
+    "gamesConnectingNoticeTitle": "Подключение к Playground",
+    "gamesConnectingHelper": "Проверяем подключение к играм.",
+    "gamesUnavailableTitle": "Недоступно",
+    "gamesUnavailableHelper": "Повторите попытку позже.",
+    "gamesReconnect": "Переподключиться",
+    "gamesStartGame": "Начать игру",
+    "gamesOpponentLeft": "Соперник покинул игру.",
+    "gamesCheck": "Шах",
+    "gamesCheckmate": "Мат",
+    "gamesDraw": "Ничья",
+    "gamesResigned": "Сдался",
+    "gamesNotYourTurn": "Сейчас не ваш ход",
+    "gamesInvalidMove": "Недопустимый ход",
+    "gamesChooseOwnPiece": "Выберите свою фигуру",
+    "gamesMuteSounds": "Отключить звуки игры",
+    "gamesUnmuteSounds": "Включить звуки игры",
+    "gamesUnavailableNoticeTitle": "Не удалось подключиться"
   },
   "extension": {
     "extensionName": {
@@ -188,9 +234,6 @@
     },
     "supportAndFeedback": {
       "message": "Поддержка и обратная связь"
-    },
-    "playgroundComingSoon": {
-      "message": "Игровая зона (скоро)"
     },
     "supportIssueTrackerPrompt": {
       "message": "Вы будете перенаправлены в наш публичный трекер задач для сообщений об ошибках и запросов функций. Может потребоваться аккаунт.\n\nВы также можете написать нам на {supportEmail}.\n\nПерейти в трекер задач?"
@@ -314,6 +357,27 @@
     },
     "removeBookmark": {
       "message": "Удалить из закладок"
+    },
+    "playground": {
+      "message": "Playground"
+    },
+    "joinPlayground": {
+      "message": "Присоединиться к Playground"
+    },
+    "playgroundBetaHelper": {
+      "message": "Пробуйте ранние эксперименты. Некоторые могут подключаться к chatenhancer.com для работы."
+    },
+    "games": {
+      "message": "Игры"
+    },
+    "playgroundGamesAvailable": {
+      "message": "Быть доступным для игр по умолчанию"
+    },
+    "playgroundGamesAvailableHelper": {
+      "message": "Вы будете появляться в списке доступных игроков и сможете получать приглашения в игры во время стримов."
+    },
+    "learnMore": {
+      "message": "Подробнее"
     }
   }
 }

@@ -129,7 +129,53 @@
     "draftTranslationTo": "Entwurfsübersetzung in {language}.",
     "whenUntilTarget": "{duration} bis {target}",
     "whenSinceTarget": "{duration} seit {target}",
-    "whenTargetInPlace": "{target} in {place}"
+    "whenTargetInPlace": "{target} in {place}",
+    "playground": "Playground",
+    "games": "Spiele",
+    "gamesChess": "Schach",
+    "gamesAvailability": "Verfügbarkeit",
+    "gamesAvailableToPlay": "Zum Spielen verfügbar",
+    "gamesAvailableHelper": "Wird anderen Spielern in diesem Stream angezeigt.",
+    "gamesActiveGame": "Aktives Spiel",
+    "gamesResume": "Fortsetzen",
+    "gamesMinimize": "Minimieren",
+    "gamesLeave": "Verlassen",
+    "gamesInvites": "Einladungen",
+    "gamesNoInvites": "Keine Einladungen",
+    "gamesInviteFrom": "{user} hat dich zu {game} eingeladen.",
+    "gamesInviteHelper": "Annehmen, um das Spielfeld zu öffnen.",
+    "gamesAccept": "Annehmen",
+    "gamesPlayWith": "Wähle jemanden zum Spielen aus",
+    "gamesBack": "Zurück",
+    "gamesPlayers": "Spieler",
+    "gamesAvailableNow": "Jetzt verfügbar",
+    "gamesWaitingForReply": "Warten auf Antwort...",
+    "gamesCancelInvite": "Abbrechen",
+    "gamesInvite": "Einladen",
+    "gamesIgnore": "Ignorieren",
+    "gamesPlayersOnline": {
+      "one": "{count} Spieler online",
+      "other": "{count} Spieler online"
+    },
+    "gamesNoPlayersAvailable": "Keine Spieler verfügbar.",
+    "gamesConnectingTitle": "Verbinden...",
+    "gamesConnectingNoticeTitle": "Verbindung zu Playground wird hergestellt",
+    "gamesConnectingHelper": "Die Spieleverbindung wird geprüft.",
+    "gamesUnavailableTitle": "Nicht verfügbar",
+    "gamesUnavailableHelper": "Versuche es später erneut.",
+    "gamesReconnect": "Neu verbinden",
+    "gamesStartGame": "Spiel starten",
+    "gamesOpponentLeft": "Der Gegner hat das Spiel verlassen.",
+    "gamesCheck": "Schach",
+    "gamesCheckmate": "Schachmatt",
+    "gamesDraw": "Remis",
+    "gamesResigned": "Aufgegeben",
+    "gamesNotYourTurn": "Du bist nicht am Zug",
+    "gamesInvalidMove": "Ungültiger Zug",
+    "gamesChooseOwnPiece": "Wähle deine Figur",
+    "gamesMuteSounds": "Spielgeräusche stummschalten",
+    "gamesUnmuteSounds": "Spielgeräusche einschalten",
+    "gamesUnavailableNoticeTitle": "Verbindung nicht möglich"
   },
   "extension": {
     "extensionName": {
@@ -185,9 +231,6 @@
     },
     "supportAndFeedback": {
       "message": "Support und Feedback"
-    },
-    "playgroundComingSoon": {
-      "message": "Spielplatz (demnächst)"
     },
     "supportIssueTrackerPrompt": {
       "message": "Du wirst zu unserem öffentlichen Issue-Tracker weitergeleitet, um Fehler zu melden oder Funktionen vorzuschlagen. Ein Konto kann erforderlich sein.\n\nDu kannst uns auch per E-Mail erreichen unter {supportEmail}.\n\nZum Issue-Tracker fortfahren?"
@@ -311,6 +354,27 @@
     },
     "removeBookmark": {
       "message": "Lesezeichen entfernen"
+    },
+    "playground": {
+      "message": "Playground"
+    },
+    "joinPlayground": {
+      "message": "Playground beitreten"
+    },
+    "playgroundBetaHelper": {
+      "message": "Teste frühe Experimente. Einige können sich mit chatenhancer.com verbinden, damit sie funktionieren."
+    },
+    "games": {
+      "message": "Spiele"
+    },
+    "playgroundGamesAvailable": {
+      "message": "Standardmäßig für Spiele verfügbar sein"
+    },
+    "playgroundGamesAvailableHelper": {
+      "message": "Du erscheinst in der Liste verfügbarer Spieler und kannst während Streams Spieleinladungen erhalten."
+    },
+    "learnMore": {
+      "message": "Mehr erfahren"
     }
   }
 }

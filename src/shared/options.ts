@@ -14,9 +14,17 @@ export interface Options {
   translationDisplay: TranslationDisplay;
   sound: boolean;
   startupEffect: boolean;
+  playgroundEnabled: boolean;
+  playgroundGamesAvailable: boolean;
 }
 
+export type PlaygroundOptionKey = 'playgroundGamesAvailable';
+
 export const DEFAULT_TRANSLATION_TARGET = 'en';
+
+export const DISABLED_PLAYGROUND_OPTIONS: Pick<Options, PlaygroundOptionKey> = {
+  playgroundGamesAvailable: false
+};
 
 export const DEFAULT_OPTIONS: Options = {
   composerTranslateLanguage: '',
@@ -24,7 +32,9 @@ export const DEFAULT_OPTIONS: Options = {
   lastTranslationTarget: DEFAULT_TRANSLATION_TARGET,
   translationDisplay: 'replace',
   sound: true,
-  startupEffect: true
+  startupEffect: true,
+  playgroundEnabled: false,
+  ...DISABLED_PLAYGROUND_OPTIONS
 };
 
 export const TRANSLATION_DISPLAY_OPTIONS: readonly (readonly [TranslationDisplay, string])[] = [
@@ -47,7 +57,9 @@ export function normalizeOptions(value: Partial<Options> | Record<string, unknow
     lastTranslationTarget,
     translationDisplay,
     sound: candidate.sound !== false,
-    startupEffect: candidate.startupEffect !== false
+    startupEffect: candidate.startupEffect !== false,
+    playgroundEnabled: candidate.playgroundEnabled === true,
+    playgroundGamesAvailable: candidate.playgroundGamesAvailable === true
   };
 }
 
@@ -65,4 +77,11 @@ export function getTargetLanguageUpdate(targetLanguage: string, lastTranslationT
     : lastTranslationTarget
       ? { targetLanguage: '', lastTranslationTarget }
       : { targetLanguage: '' };
+}
+
+export function getPlaygroundDisabledUpdate(): Pick<Options, 'playgroundEnabled' | PlaygroundOptionKey> {
+  return {
+    playgroundEnabled: false,
+    ...DISABLED_PLAYGROUND_OPTIONS
+  };
 }

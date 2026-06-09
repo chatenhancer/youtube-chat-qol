@@ -129,7 +129,53 @@
     "draftTranslationTo": "Dịch bản nháp sang {language}.",
     "whenUntilTarget": "{duration} đến {target}",
     "whenSinceTarget": "{duration} kể từ {target}",
-    "whenTargetInPlace": "{target} ở {place}"
+    "whenTargetInPlace": "{target} ở {place}",
+    "playground": "Playground",
+    "games": "Trò chơi",
+    "gamesChess": "Cờ vua",
+    "gamesAvailability": "Trạng thái sẵn sàng",
+    "gamesAvailableToPlay": "Sẵn sàng chơi",
+    "gamesAvailableHelper": "Hiển thị với người chơi khác trong livestream này.",
+    "gamesActiveGame": "Trò chơi đang mở",
+    "gamesResume": "Tiếp tục",
+    "gamesMinimize": "Thu nhỏ",
+    "gamesLeave": "Rời",
+    "gamesInvites": "Lời mời",
+    "gamesNoInvites": "Không có lời mời",
+    "gamesInviteFrom": "{user} mời bạn chơi {game}.",
+    "gamesInviteHelper": "Chấp nhận để mở bảng trò chơi.",
+    "gamesAccept": "Chấp nhận",
+    "gamesPlayWith": "Chọn người để chơi cùng",
+    "gamesBack": "Quay lại",
+    "gamesPlayers": "Người chơi",
+    "gamesAvailableNow": "Đang sẵn sàng",
+    "gamesWaitingForReply": "Đang chờ phản hồi...",
+    "gamesCancelInvite": "Hủy",
+    "gamesInvite": "Mời",
+    "gamesIgnore": "Bỏ qua",
+    "gamesPlayersOnline": {
+      "one": "{count} người chơi online",
+      "other": "{count} người chơi online"
+    },
+    "gamesNoPlayersAvailable": "Không có người chơi nào sẵn sàng.",
+    "gamesConnectingTitle": "Đang kết nối...",
+    "gamesConnectingNoticeTitle": "Đang kết nối với Playground",
+    "gamesConnectingHelper": "Đang kiểm tra kết nối trò chơi.",
+    "gamesUnavailableTitle": "Không khả dụng",
+    "gamesUnavailableHelper": "Hãy thử lại sau.",
+    "gamesReconnect": "Kết nối lại",
+    "gamesStartGame": "Bắt đầu trò chơi",
+    "gamesOpponentLeft": "Đối thủ đã rời trò chơi.",
+    "gamesCheck": "Chiếu",
+    "gamesCheckmate": "Chiếu hết",
+    "gamesDraw": "Hòa",
+    "gamesResigned": "Đầu hàng",
+    "gamesNotYourTurn": "Chưa đến lượt bạn",
+    "gamesInvalidMove": "Nước đi không hợp lệ",
+    "gamesChooseOwnPiece": "Chọn quân của bạn",
+    "gamesMuteSounds": "Tắt âm thanh trò chơi",
+    "gamesUnmuteSounds": "Bật âm thanh trò chơi",
+    "gamesUnavailableNoticeTitle": "Không thể kết nối"
   },
   "extension": {
     "extensionName": {
@@ -185,9 +231,6 @@
     },
     "supportAndFeedback": {
       "message": "Hỗ trợ và góp ý"
-    },
-    "playgroundComingSoon": {
-      "message": "Khu trò chơi (sắp ra mắt)"
     },
     "supportIssueTrackerPrompt": {
       "message": "Bạn sẽ được chuyển đến trình theo dõi vấn đề công khai của chúng tôi để báo lỗi và yêu cầu tính năng. Có thể cần tài khoản.\n\nBạn cũng có thể email cho chúng tôi tại {supportEmail}.\n\nTiếp tục đến trình theo dõi vấn đề?"
@@ -311,6 +354,27 @@
     },
     "removeBookmark": {
       "message": "Xóa dấu trang"
+    },
+    "playground": {
+      "message": "Playground"
+    },
+    "joinPlayground": {
+      "message": "Tham gia Playground"
+    },
+    "playgroundBetaHelper": {
+      "message": "Thử nghiệm các tính năng sớm. Một số có thể kết nối tới chatenhancer.com để hoạt động."
+    },
+    "games": {
+      "message": "Trò chơi"
+    },
+    "playgroundGamesAvailable": {
+      "message": "Mặc định sẵn sàng chơi trò chơi"
+    },
+    "playgroundGamesAvailableHelper": {
+      "message": "Bạn sẽ xuất hiện trong danh sách người chơi đang sẵn sàng và có thể nhận lời mời chơi trong lúc phát trực tiếp."
+    },
+    "learnMore": {
+      "message": "Tìm hiểu thêm"
     }
   }
 }

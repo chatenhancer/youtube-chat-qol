@@ -129,7 +129,53 @@
     "draftTranslationTo": "แปลข้อความร่างเป็น {language}",
     "whenUntilTarget": "อีก {duration} ถึง {target}",
     "whenSinceTarget": "{duration} ตั้งแต่ {target}",
-    "whenTargetInPlace": "{target} ใน{place}"
+    "whenTargetInPlace": "{target} ใน{place}",
+    "playground": "Playground",
+    "games": "เกม",
+    "gamesChess": "หมากรุก",
+    "gamesAvailability": "สถานะว่าง",
+    "gamesAvailableToPlay": "พร้อมเล่น",
+    "gamesAvailableHelper": "แสดงให้ผู้เล่นคนอื่นในสตรีมนี้เห็น",
+    "gamesActiveGame": "เกมที่กำลังเล่น",
+    "gamesResume": "เล่นต่อ",
+    "gamesMinimize": "ย่อ",
+    "gamesLeave": "ออก",
+    "gamesInvites": "คำเชิญ",
+    "gamesNoInvites": "ไม่มีคำเชิญ",
+    "gamesInviteFrom": "{user} เชิญคุณเล่น {game}",
+    "gamesInviteHelper": "ยอมรับเพื่อเปิดแผงเกม",
+    "gamesAccept": "ยอมรับ",
+    "gamesPlayWith": "เลือกคนที่จะเล่นด้วย",
+    "gamesBack": "กลับ",
+    "gamesPlayers": "ผู้เล่น",
+    "gamesAvailableNow": "พร้อมตอนนี้",
+    "gamesWaitingForReply": "รอการตอบกลับ...",
+    "gamesCancelInvite": "ยกเลิก",
+    "gamesInvite": "เชิญ",
+    "gamesIgnore": "ไม่สนใจ",
+    "gamesPlayersOnline": {
+      "one": "ผู้เล่นออนไลน์ {count} คน",
+      "other": "ผู้เล่นออนไลน์ {count} คน"
+    },
+    "gamesNoPlayersAvailable": "ไม่มีผู้เล่นที่พร้อมใช้งาน",
+    "gamesConnectingTitle": "กำลังเชื่อมต่อ...",
+    "gamesConnectingNoticeTitle": "กำลังเชื่อมต่อกับ Playground",
+    "gamesConnectingHelper": "กำลังตรวจสอบการเชื่อมต่อเกม",
+    "gamesUnavailableTitle": "ไม่พร้อมใช้งาน",
+    "gamesUnavailableHelper": "ลองอีกครั้งภายหลัง",
+    "gamesReconnect": "เชื่อมต่อใหม่",
+    "gamesStartGame": "เริ่มเกม",
+    "gamesOpponentLeft": "คู่แข่งออกจากเกมแล้ว",
+    "gamesCheck": "รุก",
+    "gamesCheckmate": "รุกฆาต",
+    "gamesDraw": "เสมอ",
+    "gamesResigned": "ยอมแพ้",
+    "gamesNotYourTurn": "ยังไม่ถึงตาคุณ",
+    "gamesInvalidMove": "เดินไม่ถูกต้อง",
+    "gamesChooseOwnPiece": "เลือกตัวหมากของคุณ",
+    "gamesMuteSounds": "ปิดเสียงเกม",
+    "gamesUnmuteSounds": "เปิดเสียงเกม",
+    "gamesUnavailableNoticeTitle": "ไม่สามารถเชื่อมต่อได้"
   },
   "extension": {
     "extensionName": {
@@ -185,9 +231,6 @@
     },
     "supportAndFeedback": {
       "message": "ช่วยเหลือและความเห็น"
-    },
-    "playgroundComingSoon": {
-      "message": "พื้นที่เล่น (เร็ว ๆ นี้)"
     },
     "supportIssueTrackerPrompt": {
       "message": "คุณจะถูกส่งต่อไปยังตัวติดตามปัญหาสาธารณะของเราสำหรับรายงานบั๊กและคำขอฟีเจอร์ อาจต้องมีบัญชี\n\nคุณสามารถส่งอีเมลหาเราได้ที่ {supportEmail}.\n\nต้องการไปต่อที่ตัวติดตามปัญหาหรือไม่?"
@@ -311,6 +354,27 @@
     },
     "removeBookmark": {
       "message": "ลบบุ๊กมาร์ก"
+    },
+    "playground": {
+      "message": "Playground"
+    },
+    "joinPlayground": {
+      "message": "เข้าร่วม Playground"
+    },
+    "playgroundBetaHelper": {
+      "message": "ลองฟีเจอร์ทดลองก่อนใคร บางอย่างอาจเชื่อมต่อกับ chatenhancer.com เพื่อให้ทำงานได้"
+    },
+    "games": {
+      "message": "เกม"
+    },
+    "playgroundGamesAvailable": {
+      "message": "พร้อมเล่นเกมเป็นค่าเริ่มต้น"
+    },
+    "playgroundGamesAvailableHelper": {
+      "message": "คุณจะปรากฏในรายชื่อผู้เล่นที่พร้อมเล่น และรับคำเชิญเล่นเกมระหว่างสตรีมได้"
+    },
+    "learnMore": {
+      "message": "เรียนรู้เพิ่มเติม"
     }
   }
 }

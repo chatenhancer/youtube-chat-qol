@@ -129,7 +129,53 @@
     "draftTranslationTo": "Traduzione della bozza in {language}.",
     "whenUntilTarget": "{duration} fino a {target}",
     "whenSinceTarget": "{duration} da {target}",
-    "whenTargetInPlace": "{target} a {place}"
+    "whenTargetInPlace": "{target} a {place}",
+    "playground": "Playground",
+    "games": "Giochi",
+    "gamesChess": "Scacchi",
+    "gamesAvailability": "Disponibilità",
+    "gamesAvailableToPlay": "Disponibile a giocare",
+    "gamesAvailableHelper": "Visibile agli altri giocatori in questa live.",
+    "gamesActiveGame": "Partita attiva",
+    "gamesResume": "Riprendi",
+    "gamesMinimize": "Riduci",
+    "gamesLeave": "Esci",
+    "gamesInvites": "Inviti",
+    "gamesNoInvites": "Nessun invito",
+    "gamesInviteFrom": "{user} ti ha invitato a {game}.",
+    "gamesInviteHelper": "Accetta per aprire il pannello di gioco.",
+    "gamesAccept": "Accetta",
+    "gamesPlayWith": "Scegli con chi giocare",
+    "gamesBack": "Indietro",
+    "gamesPlayers": "Giocatori",
+    "gamesAvailableNow": "Disponibile ora",
+    "gamesWaitingForReply": "In attesa di risposta...",
+    "gamesCancelInvite": "Annulla",
+    "gamesInvite": "Invita",
+    "gamesIgnore": "Ignora",
+    "gamesPlayersOnline": {
+      "one": "{count} giocatore online",
+      "other": "{count} giocatori online"
+    },
+    "gamesNoPlayersAvailable": "Nessun giocatore disponibile.",
+    "gamesConnectingTitle": "Connessione...",
+    "gamesConnectingNoticeTitle": "Connessione a Playground",
+    "gamesConnectingHelper": "Controllo della connessione ai giochi.",
+    "gamesUnavailableTitle": "Non disponibile",
+    "gamesUnavailableHelper": "Riprova più tardi.",
+    "gamesReconnect": "Riconnetti",
+    "gamesStartGame": "Avvia una partita",
+    "gamesOpponentLeft": "L’avversario ha lasciato la partita.",
+    "gamesCheck": "Scacco",
+    "gamesCheckmate": "Scacco matto",
+    "gamesDraw": "Patta",
+    "gamesResigned": "Abbandono",
+    "gamesNotYourTurn": "Non è il tuo turno",
+    "gamesInvalidMove": "Mossa non valida",
+    "gamesChooseOwnPiece": "Scegli il tuo pezzo",
+    "gamesMuteSounds": "Disattiva suoni di gioco",
+    "gamesUnmuteSounds": "Attiva suoni di gioco",
+    "gamesUnavailableNoticeTitle": "Impossibile connettersi"
   },
   "extension": {
     "extensionName": {
@@ -188,9 +234,6 @@
     },
     "supportAndFeedback": {
       "message": "Supporto e feedback"
-    },
-    "playgroundComingSoon": {
-      "message": "Area giochi (presto)"
     },
     "supportIssueTrackerPrompt": {
       "message": "Verrai reindirizzato al nostro tracker pubblico dei problemi per segnalazioni di bug e richieste di funzionalità. Potrebbe essere necessario un account.\n\nPuoi anche scriverci a {supportEmail}.\n\nContinuare al tracker dei problemi?"
@@ -314,6 +357,27 @@
     },
     "removeBookmark": {
       "message": "Rimuovi segnalibro"
+    },
+    "playground": {
+      "message": "Playground"
+    },
+    "joinPlayground": {
+      "message": "Partecipa a Playground"
+    },
+    "playgroundBetaHelper": {
+      "message": "Prova esperimenti in anticipo. Alcuni possono connettersi a chatenhancer.com per funzionare."
+    },
+    "games": {
+      "message": "Giochi"
+    },
+    "playgroundGamesAvailable": {
+      "message": "Essere disponibile per i giochi per impostazione predefinita"
+    },
+    "playgroundGamesAvailableHelper": {
+      "message": "Apparirai nell’elenco dei giocatori disponibili e potrai ricevere inviti di gioco durante gli stream."
+    },
+    "learnMore": {
+      "message": "Scopri di più"
     }
   }
 }

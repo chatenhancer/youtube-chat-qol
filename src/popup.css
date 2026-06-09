@@ -41,7 +41,7 @@
 }
 
 body {
-  width: 360px;
+  width: 350px;
   margin: 0;
   color: var(--ytcq-popup-text);
   font-family: "Inter", Arial, sans-serif;
@@ -150,11 +150,6 @@ main {
   height: 18px;
 }
 
-.header-icon-button .playground-icon {
-  width: 17px;
-  height: 17px;
-}
-
 .header-icon-button .reset-icon {
   width: 15px;
   height: 15px;
@@ -238,7 +233,7 @@ main {
 
 .popup-tabs {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 34px;
   gap: 4px;
   margin: 0 0 6px;
   padding: 0 2px;
@@ -286,6 +281,26 @@ main {
   content: "";
 }
 
+.popup-tab-icon-only {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding-right: 6px;
+  padding-left: 6px;
+}
+
+.popup-tab-icon-only::after {
+  right: 8px;
+  left: 8px;
+}
+
+.popup-tab-icon-only svg {
+  display: block;
+  width: 17px;
+  height: 17px;
+  fill: currentColor;
+}
+
 .popup-tab-panels {
   position: relative;
   display: grid;
@@ -306,16 +321,19 @@ main {
   pointer-events: none;
 }
 
-#bookmarksPanel[hidden] {
+#bookmarksPanel[hidden],
+#playgroundPanel[hidden] {
   display: none;
 }
 
-#bookmarksPanel:not([hidden]) {
+#bookmarksPanel:not([hidden]),
+#playgroundPanel:not([hidden]) {
   position: absolute;
   inset: 0;
 }
 
 .settings-section {
+  overflow: hidden;
   padding: 7px 8px;
   border-radius: 8px;
   background: var(--ytcq-popup-row-bg);
@@ -341,6 +359,34 @@ main {
   font-weight: 550;
   line-height: 14px;
   text-transform: uppercase;
+}
+
+#playgroundGamesSection {
+  max-height: 140px;
+  opacity: 1;
+  transform: translateY(0);
+  transition:
+    max-height 180ms ease,
+    margin-top 180ms ease,
+    padding-top 180ms ease,
+    padding-bottom 180ms ease,
+    opacity 140ms ease,
+    transform 180ms ease;
+}
+
+#playgroundGamesSection.playground-group-collapsed {
+  max-height: 0;
+  margin-top: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  opacity: 0;
+  transform: translateY(-5px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #playgroundGamesSection {
+    transition: none;
+  }
 }
 
 .bookmarks-section {
@@ -667,6 +713,21 @@ main {
   font-weight: 400;
 }
 
+.option-beta-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 13px;
+  padding: 0 5px;
+  border: 1px solid color-mix(in srgb, var(--ytcq-popup-action) 36%, transparent);
+  border-radius: 5px;
+  color: var(--ytcq-popup-action);
+  background: color-mix(in srgb, var(--ytcq-popup-action) 10%, transparent);
+  font-size: 9px;
+  font-weight: 600;
+  line-height: 12px;
+  text-transform: uppercase;
+}
+
 .option-control .option-title {
   align-self: end;
 }
@@ -682,6 +743,17 @@ main {
   font-size: 11px;
   font-weight: 400;
   line-height: 14px;
+}
+
+.option-helper-link {
+  color: var(--ytcq-popup-action);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.option-helper-link:hover,
+.option-helper-link:focus {
+  text-decoration: underline;
 }
 
 .option-control .option-helper {

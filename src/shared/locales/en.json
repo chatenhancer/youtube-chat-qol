@@ -129,7 +129,53 @@
     "draftTranslationTo": "Draft translation to {language}.",
     "whenUntilTarget": "{duration} until {target}",
     "whenSinceTarget": "{duration} since {target}",
-    "whenTargetInPlace": "{target} in {place}"
+    "whenTargetInPlace": "{target} in {place}",
+    "playground": "Playground",
+    "games": "Games",
+    "gamesChess": "Chess",
+    "gamesAvailability": "Availability",
+    "gamesAvailableToPlay": "Available to play",
+    "gamesAvailableHelper": "Shown to other players in this stream.",
+    "gamesActiveGame": "Active game",
+    "gamesResume": "Resume",
+    "gamesMinimize": "Minimize",
+    "gamesLeave": "Leave",
+    "gamesInvites": "Invites",
+    "gamesNoInvites": "No invites",
+    "gamesInviteFrom": "{user} invited you to {game}.",
+    "gamesInviteHelper": "Accept to open the game panel.",
+    "gamesAccept": "Accept",
+    "gamesPlayWith": "Choose someone to play with",
+    "gamesBack": "Back",
+    "gamesPlayers": "Players",
+    "gamesAvailableNow": "Available now",
+    "gamesWaitingForReply": "Waiting for reply...",
+    "gamesCancelInvite": "Cancel",
+    "gamesInvite": "Invite",
+    "gamesIgnore": "Ignore",
+    "gamesPlayersOnline": {
+      "one": "{count} player online",
+      "other": "{count} players online"
+    },
+    "gamesNoPlayersAvailable": "There are no players available.",
+    "gamesConnectingTitle": "Connecting...",
+    "gamesConnectingNoticeTitle": "Connecting to Playground",
+    "gamesConnectingHelper": "Setting up the games lobby, please wait.",
+    "gamesUnavailableTitle": "Unavailable",
+    "gamesUnavailableHelper": "Please try again later.",
+    "gamesReconnect": "Reconnect",
+    "gamesStartGame": "Start a game",
+    "gamesOpponentLeft": "Opponent left the game.",
+    "gamesCheck": "Check",
+    "gamesCheckmate": "Checkmate",
+    "gamesDraw": "Draw",
+    "gamesResigned": "Resigned",
+    "gamesNotYourTurn": "Not your turn",
+    "gamesInvalidMove": "Invalid move",
+    "gamesChooseOwnPiece": "Choose your piece",
+    "gamesMuteSounds": "Mute game sounds",
+    "gamesUnmuteSounds": "Unmute game sounds",
+    "gamesUnavailableNoticeTitle": "Unable to connect"
   },
   "extension": {
     "extensionName": {
@@ -188,9 +234,6 @@
     },
     "supportAndFeedback": {
       "message": "Support and feedback"
-    },
-    "playgroundComingSoon": {
-      "message": "Playground (coming soon)"
     },
     "supportIssueTrackerPrompt": {
       "message": "You will be redirected to our public issue tracker for bug reports and feature requests. An account may be required.\n\nYou can also email us at {supportEmail}.\n\nContinue to the issue tracker?"
@@ -314,6 +357,27 @@
     },
     "removeBookmark": {
       "message": "Remove bookmark"
+    },
+    "playground": {
+      "message": "Playground"
+    },
+    "joinPlayground": {
+      "message": "Join Playground"
+    },
+    "playgroundBetaHelper": {
+      "message": "Try early experiments. Some may connect to chatenhancer.com to work."
+    },
+    "games": {
+      "message": "Games"
+    },
+    "playgroundGamesAvailable": {
+      "message": "Show me as available by default"
+    },
+    "playgroundGamesAvailableHelper": {
+      "message": "You can receive game invites automatically when you join a stream."
+    },
+    "learnMore": {
+      "message": "Learn more"
     }
   }
 }

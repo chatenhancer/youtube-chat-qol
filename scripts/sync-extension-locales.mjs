@@ -1,9 +1,9 @@
 /*
  * Generate WebExtension `_locales` files from the shared locale catalogs.
  *
- * The popup and manifest use browser-native chrome.i18n messages, while the
- * injected YouTube UI imports the same source catalogs at runtime so it can
- * follow YouTube's language instead of the browser language.
+ * The popup and manifest use browser-native chrome.i18n messages. The injected
+ * YouTube UI loads one copied source catalog at runtime so it can follow
+ * YouTube's language instead of the browser language.
  */
 import { mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';

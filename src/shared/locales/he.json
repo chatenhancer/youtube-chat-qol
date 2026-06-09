@@ -129,7 +129,53 @@
     "draftTranslationTo": "תרגום הטיוטה אל {language}.",
     "whenUntilTarget": "{duration} עד {target}",
     "whenSinceTarget": "{duration} מאז {target}",
-    "whenTargetInPlace": "{target} ב־{place}"
+    "whenTargetInPlace": "{target} ב־{place}",
+    "playground": "מגרש ניסויים",
+    "games": "משחקים",
+    "gamesChess": "שחמט",
+    "gamesAvailability": "זמינות",
+    "gamesAvailableToPlay": "זמין למשחק",
+    "gamesAvailableHelper": "יוצג לשחקנים אחרים בשידור הזה.",
+    "gamesActiveGame": "משחק פעיל",
+    "gamesResume": "המשך",
+    "gamesMinimize": "מזער",
+    "gamesLeave": "עזוב",
+    "gamesInvites": "הזמנות",
+    "gamesNoInvites": "אין הזמנות",
+    "gamesInviteFrom": "{user} הזמין אותך ל-{game}.",
+    "gamesInviteHelper": "אשר כדי לפתוח את חלונית המשחק.",
+    "gamesAccept": "אישור",
+    "gamesPlayWith": "בחרו מישהו לשחק איתו",
+    "gamesBack": "חזרה",
+    "gamesPlayers": "שחקנים",
+    "gamesAvailableNow": "זמין עכשיו",
+    "gamesWaitingForReply": "ממתין לתשובה...",
+    "gamesCancelInvite": "ביטול",
+    "gamesInvite": "הזמן",
+    "gamesIgnore": "התעלם",
+    "gamesPlayersOnline": {
+      "one": "{count} שחקן מחובר",
+      "other": "{count} שחקנים מחוברים"
+    },
+    "gamesNoPlayersAvailable": "אין שחקנים זמינים.",
+    "gamesConnectingTitle": "מתחבר...",
+    "gamesConnectingNoticeTitle": "מתחבר ל-Playground",
+    "gamesConnectingHelper": "בודק את חיבור המשחקים.",
+    "gamesUnavailableTitle": "לא זמין",
+    "gamesUnavailableHelper": "נסה שוב מאוחר יותר.",
+    "gamesReconnect": "התחבר שוב",
+    "gamesStartGame": "התחל משחק",
+    "gamesOpponentLeft": "היריב עזב את המשחק.",
+    "gamesCheck": "שח",
+    "gamesCheckmate": "מט",
+    "gamesDraw": "תיקו",
+    "gamesResigned": "נכנע",
+    "gamesNotYourTurn": "זה לא התור שלך",
+    "gamesInvalidMove": "מהלך לא חוקי",
+    "gamesChooseOwnPiece": "בחר את הכלי שלך",
+    "gamesMuteSounds": "השתק צלילי משחק",
+    "gamesUnmuteSounds": "בטל השתקת צלילי משחק",
+    "gamesUnavailableNoticeTitle": "לא ניתן להתחבר"
   },
   "extension": {
     "extensionName": {
@@ -185,9 +231,6 @@
     },
     "supportAndFeedback": {
       "message": "תמיכה ומשוב"
-    },
-    "playgroundComingSoon": {
-      "message": "אזור משחקים (בקרוב)"
     },
     "supportIssueTrackerPrompt": {
       "message": "תופנו אל כלי המעקב הציבורי שלנו לבעיות עבור דיווחי באגים ובקשות לפיצ׳רים. ייתכן שיידרש חשבון.\n\nאפשר גם לשלוח לנו אימייל אל {supportEmail}.\n\nלהמשיך אל כלי המעקב?"
@@ -311,6 +354,27 @@
     },
     "removeBookmark": {
       "message": "הסר מסימניות"
+    },
+    "playground": {
+      "message": "מגרש ניסויים"
+    },
+    "joinPlayground": {
+      "message": "הצטרפות למגרש הניסויים"
+    },
+    "playgroundBetaHelper": {
+      "message": "נסו ניסויים מוקדמים. חלקם עשויים להתחבר אל chatenhancer.com כדי לפעול."
+    },
+    "games": {
+      "message": "משחקים"
+    },
+    "playgroundGamesAvailable": {
+      "message": "להיות זמינים למשחקים כברירת מחדל"
+    },
+    "playgroundGamesAvailableHelper": {
+      "message": "תופיעו ברשימת השחקנים הזמינים ותוכלו לקבל הזמנות למשחקים במהלך סטרימים."
+    },
+    "learnMore": {
+      "message": "מידע נוסף"
     }
   }
 }

@@ -54,12 +54,13 @@ Not affiliated with YouTube or Google.
 
 - See whether the extension is active in this tab or other open live chat tabs.
 - Manage extension settings and clear local extension data from the popup.
+- Opt in to Playground experiments. The current beta can connect users in the same stream for chess games.
 
 ### <img src="assets/readme-icons/privacy.svg" alt="" width="20" height="20" align="absmiddle"> &nbsp;Privacy
 
 - The extension does not replace YouTube chat.
 - The extension does not run analytics.
-- The extension does not send data to an extension-owned server.
+- Except for opt-in Playground games, the extension does not send data to an extension-owned server.
 - Bookmarked users are stored locally so avatar rings can appear across streams.
 - When a translation feature is enabled, incoming message text or draft text you choose to translate is sent to Google Translate so it can be translated.
 
@@ -135,8 +136,9 @@ The `Chat Enhancer for YouTube` name, logo, and store listing assets are not lic
 - `src/features/` contains chat actions, drafts, commands, translation, emoji, focus mode, profile cards, inbox, and sound features.
 - `src/youtube/` contains YouTube DOM adapters and selectors.
 - `src/shared/` contains shared options, language data, state, and helpers.
-- `src/background/` contains the translation bridge, toolbar status, and active-chat keepalive service worker modules.
+- `src/background/` contains the translation bridge, toolbar status, active-chat keepalive, and Playground transport service worker modules.
 - `src/popup/` contains the extension action popup.
+- `cloudflare/` contains the language redirect and opt-in Playground backend workers.
 - `scripts/` contains build, icon, and release packaging scripts.
 
 See [PRIVACY.md](PRIVACY.md) for the current data-use disclosure.

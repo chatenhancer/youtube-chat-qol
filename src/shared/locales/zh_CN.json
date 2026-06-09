@@ -129,7 +129,53 @@
     "draftTranslationTo": "草稿翻译为 {language}。",
     "whenUntilTarget": "距离{target}还有{duration}",
     "whenSinceTarget": "自{target}起已过{duration}",
-    "whenTargetInPlace": "{place}的{target}"
+    "whenTargetInPlace": "{place}的{target}",
+    "playground": "Playground",
+    "games": "游戏",
+    "gamesChess": "国际象棋",
+    "gamesAvailability": "可玩状态",
+    "gamesAvailableToPlay": "可以一起玩",
+    "gamesAvailableHelper": "会显示给此直播中的其他玩家。",
+    "gamesActiveGame": "进行中的游戏",
+    "gamesResume": "继续",
+    "gamesMinimize": "最小化",
+    "gamesLeave": "离开",
+    "gamesInvites": "邀请",
+    "gamesNoInvites": "没有邀请",
+    "gamesInviteFrom": "{user} 邀请你玩 {game}。",
+    "gamesInviteHelper": "接受后会打开游戏面板。",
+    "gamesAccept": "接受",
+    "gamesPlayWith": "选择一起玩的用户",
+    "gamesBack": "返回",
+    "gamesPlayers": "玩家",
+    "gamesAvailableNow": "当前可玩",
+    "gamesWaitingForReply": "等待回复...",
+    "gamesCancelInvite": "取消",
+    "gamesInvite": "邀请",
+    "gamesIgnore": "忽略",
+    "gamesPlayersOnline": {
+      "one": "{count} 位玩家在线",
+      "other": "{count} 位玩家在线"
+    },
+    "gamesNoPlayersAvailable": "没有可用的玩家。",
+    "gamesConnectingTitle": "正在连接...",
+    "gamesConnectingNoticeTitle": "正在连接 Playground",
+    "gamesConnectingHelper": "正在检查游戏连接。",
+    "gamesUnavailableTitle": "不可用",
+    "gamesUnavailableHelper": "请稍后再试。",
+    "gamesReconnect": "重新连接",
+    "gamesStartGame": "开始游戏",
+    "gamesOpponentLeft": "对手已离开游戏。",
+    "gamesCheck": "将军",
+    "gamesCheckmate": "将死",
+    "gamesDraw": "和棋",
+    "gamesResigned": "认输",
+    "gamesNotYourTurn": "还没轮到你",
+    "gamesInvalidMove": "无效走法",
+    "gamesChooseOwnPiece": "选择你的棋子",
+    "gamesMuteSounds": "关闭游戏声音",
+    "gamesUnmuteSounds": "开启游戏声音",
+    "gamesUnavailableNoticeTitle": "无法连接"
   },
   "extension": {
     "extensionName": {
@@ -188,9 +234,6 @@
     },
     "supportAndFeedback": {
       "message": "支持和反馈"
-    },
-    "playgroundComingSoon": {
-      "message": "游戏区（即将推出）"
     },
     "supportIssueTrackerPrompt": {
       "message": "你将被重定向到我们的公开问题跟踪器，用于报告错误和提交功能请求。可能需要账户。\n\n你也可以发送邮件至 {supportEmail}。\n\n继续前往问题跟踪器？"
@@ -314,6 +357,27 @@
     },
     "removeBookmark": {
       "message": "移除书签"
+    },
+    "playground": {
+      "message": "Playground"
+    },
+    "joinPlayground": {
+      "message": "加入 Playground"
+    },
+    "playgroundBetaHelper": {
+      "message": "提前试用实验功能。部分功能可能会连接到 chatenhancer.com 才能工作。"
+    },
+    "games": {
+      "message": "游戏"
+    },
+    "playgroundGamesAvailable": {
+      "message": "默认显示可参与游戏"
+    },
+    "playgroundGamesAvailableHelper": {
+      "message": "你会显示在可用玩家列表中，并可在直播期间接收游戏邀请。"
+    },
+    "learnMore": {
+      "message": "了解更多"
     }
   }
 }

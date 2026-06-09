@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import {
+  getCurrentYouTubeChatStreamKey,
   getCurrentYouTubeChatSourceTitle,
   getCurrentYouTubeChatSourceUrl,
   getYouTubeChatSourceStorageKey
@@ -38,6 +39,7 @@ describe('YouTube chat source url helpers', () => {
     window.history.replaceState({}, '', '/live_chat?video_id=stream-from-chat&is_popout=1');
 
     expect(getCurrentYouTubeChatSourceUrl()).toBe('https://www.youtube.com/watch?v=stream-from-chat');
+    expect(getCurrentYouTubeChatStreamKey()).toBe('stream-from-chat');
 
     window.history.replaceState({}, '', '/live_chat_replay?v=stream-from-replay&continuation=iframe-token');
 
@@ -52,6 +54,18 @@ describe('YouTube chat source url helpers', () => {
     });
 
     expect(getCurrentYouTubeChatSourceUrl()).toBe('https://www.youtube.com/watch?v=stream-from-referrer');
+  });
+
+  it('recovers the video id from direct live chat continuation urls when YouTube encodes it there', () => {
+    window.history.replaceState(
+      {},
+      '',
+      '/live_chat?continuation=0ofMyAOAARpeQ2lrcUp3b1lWVU0xVDNKRWRrdzVSSE5qY0dOQmMzUjZOMHB1VVVkQkVnc3RUMlpCTURSQ1JEUkhRUm9UNnFqZHVRRU5DZ3N0VDJaQk1EUkNSRFJIUVNBQk1BQSUzRDABggEICAQYAiAAKACIAQGgAdih0vjL-pQDqAEAsgEA&dark_theme=true&authuser=0'
+    );
+
+    expect(getCurrentYouTubeChatSourceUrl()).toBe('https://www.youtube.com/watch?v=-OfA04BD4GA');
+    expect(getCurrentYouTubeChatStreamKey()).toBe('-OfA04BD4GA');
+    expect(getYouTubeChatSourceStorageKey(getCurrentYouTubeChatSourceUrl())).toBe('video:-OfA04BD4GA');
   });
 
   it('uses an accessible top watch url before falling back to the chat iframe url', () => {
@@ -94,6 +108,7 @@ describe('YouTube chat source url helpers', () => {
     window.history.replaceState({}, '', '/live_chat_replay?continuation=chat-token&extra=ignored');
 
     expect(getCurrentYouTubeChatSourceUrl()).toBe('http://localhost:3000/live_chat_replay?continuation=chat-token');
+    expect(getCurrentYouTubeChatStreamKey()).toMatch(/^source-[a-z0-9]+$/);
   });
 
   it('falls back to the page path when no stream identifier exists', () => {

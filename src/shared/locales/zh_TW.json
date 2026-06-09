@@ -129,7 +129,53 @@
     "draftTranslationTo": "草稿翻譯為 {language}。",
     "whenUntilTarget": "距離{target}還有{duration}",
     "whenSinceTarget": "自{target}起已過{duration}",
-    "whenTargetInPlace": "{place}的{target}"
+    "whenTargetInPlace": "{place}的{target}",
+    "playground": "Playground",
+    "games": "遊戲",
+    "gamesChess": "西洋棋",
+    "gamesAvailability": "可玩狀態",
+    "gamesAvailableToPlay": "可以一起玩",
+    "gamesAvailableHelper": "會顯示給此直播中的其他玩家。",
+    "gamesActiveGame": "進行中的遊戲",
+    "gamesResume": "繼續",
+    "gamesMinimize": "最小化",
+    "gamesLeave": "離開",
+    "gamesInvites": "邀請",
+    "gamesNoInvites": "沒有邀請",
+    "gamesInviteFrom": "{user} 邀請你玩 {game}。",
+    "gamesInviteHelper": "接受後會開啟遊戲面板。",
+    "gamesAccept": "接受",
+    "gamesPlayWith": "選擇一起玩的使用者",
+    "gamesBack": "返回",
+    "gamesPlayers": "玩家",
+    "gamesAvailableNow": "目前可玩",
+    "gamesWaitingForReply": "等待回覆...",
+    "gamesCancelInvite": "取消",
+    "gamesInvite": "邀請",
+    "gamesIgnore": "忽略",
+    "gamesPlayersOnline": {
+      "one": "{count} 位玩家在線",
+      "other": "{count} 位玩家在線"
+    },
+    "gamesNoPlayersAvailable": "沒有可用的玩家。",
+    "gamesConnectingTitle": "正在連線...",
+    "gamesConnectingNoticeTitle": "正在連線到 Playground",
+    "gamesConnectingHelper": "正在檢查遊戲連線。",
+    "gamesUnavailableTitle": "無法使用",
+    "gamesUnavailableHelper": "請稍後再試。",
+    "gamesReconnect": "重新連線",
+    "gamesStartGame": "開始遊戲",
+    "gamesOpponentLeft": "對手已離開遊戲。",
+    "gamesCheck": "將軍",
+    "gamesCheckmate": "將死",
+    "gamesDraw": "和棋",
+    "gamesResigned": "認輸",
+    "gamesNotYourTurn": "還沒輪到你",
+    "gamesInvalidMove": "無效走法",
+    "gamesChooseOwnPiece": "選擇你的棋子",
+    "gamesMuteSounds": "關閉遊戲音效",
+    "gamesUnmuteSounds": "開啟遊戲音效",
+    "gamesUnavailableNoticeTitle": "無法連線"
   },
   "extension": {
     "extensionName": {
@@ -185,9 +231,6 @@
     },
     "supportAndFeedback": {
       "message": "支援與回饋"
-    },
-    "playgroundComingSoon": {
-      "message": "遊戲區（即將推出）"
     },
     "supportIssueTrackerPrompt": {
       "message": "你將被重新導向到我們的公開問題追蹤器，用於錯誤回報和功能請求。可能需要帳號。\n\n你也可以寄信到 {supportEmail}。\n\n繼續前往問題追蹤器？"
@@ -311,6 +354,27 @@
     },
     "removeBookmark": {
       "message": "移除書籤"
+    },
+    "playground": {
+      "message": "Playground"
+    },
+    "joinPlayground": {
+      "message": "加入 Playground"
+    },
+    "playgroundBetaHelper": {
+      "message": "提前試用實驗功能。部分功能可能會連線到 chatenhancer.com 才能運作。"
+    },
+    "games": {
+      "message": "遊戲"
+    },
+    "playgroundGamesAvailable": {
+      "message": "預設顯示可參與遊戲"
+    },
+    "playgroundGamesAvailableHelper": {
+      "message": "你會顯示在可用玩家列表中，並可在直播期間接收遊戲邀請。"
+    },
+    "learnMore": {
+      "message": "了解更多"
     }
   }
 }

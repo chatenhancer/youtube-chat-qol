@@ -16,7 +16,12 @@ export default defineConfig({
     },
     environment: 'jsdom',
     globals: false,
-    include: ['src/**/*.test.ts', 'scripts/**/*.test.mjs'],
+    include: [
+      'cloudflare/language-redirect/src/**/*.test.ts',
+      'cloudflare/playground/src/**/*.test.ts',
+      'src/**/*.test.ts',
+      'scripts/**/*.test.mjs'
+    ],
     restoreMocks: true,
     setupFiles: ['tests/setup.ts']
   }

@@ -21,6 +21,7 @@ const targetOutputDirs = {
   firefox: path.join(root, 'dist', 'extension-firefox')
 };
 const targets = getRequestedTargets();
+const playgroundBackendOrigin = getPlaygroundBackendOrigin();
 
 await generateIcons();
 await validateExtensionLocales();
@@ -33,7 +34,10 @@ const sharedBuildOptions = {
   target: 'es2022',
   legalComments: 'none',
   logLevel: 'info',
-  sourcemap: false
+  sourcemap: false,
+  define: {
+    'globalThis.YTCQ_PLAYGROUND_BACKEND_ORIGIN': JSON.stringify(playgroundBackendOrigin)
+  }
 };
 
 for (const target of targets) {
@@ -77,9 +81,11 @@ async function buildTarget(target) {
     copyFile(path.join(root, 'assets', 'logo.png'), path.join(extensionDir, 'logo.png')),
     copyFile(path.join(root, 'assets', 'logo-white.png'), path.join(extensionDir, 'logo-white.png')),
     syncExtensionLocales(path.join(extensionDir, '_locales')),
-    cp(path.join(root, 'assets', 'fonts'), path.join(extensionDir, 'fonts'), { recursive: true }),
-    cp(path.join(root, 'assets', 'icons'), path.join(extensionDir, 'icons'), { recursive: true }),
-    cp(path.join(root, 'licenses'), path.join(extensionDir, 'licenses'), { recursive: true })
+    copyStaticDirectory(path.join(root, 'src', 'shared', 'locales'), path.join(extensionDir, 'locales')),
+    copyStaticDirectory(path.join(root, 'assets', 'fonts'), path.join(extensionDir, 'fonts')),
+    copyStaticDirectory(path.join(root, 'assets', 'games'), path.join(extensionDir, 'games')),
+    copyStaticDirectory(path.join(root, 'assets', 'icons'), path.join(extensionDir, 'icons')),
+    copyStaticDirectory(path.join(root, 'licenses'), path.join(extensionDir, 'licenses'))
   ]);
 
   await writeFile(
@@ -104,6 +110,31 @@ function createManifest(target) {
     script.css = script.css.map(stripBuildPrefix);
   }
 
+  if (isLocalPlaygroundBackendOrigin(playgroundBackendOrigin)) {
+    const localPlaygroundSocketOrigin = getSocketOrigin(playgroundBackendOrigin);
+    manifest.host_permissions = [
+      ...new Set([
+        ...(manifest.host_permissions || []),
+        'http://127.0.0.1/*',
+        'http://localhost/*'
+      ])
+    ];
+    manifest.content_security_policy = {
+      extension_pages: [
+        "script-src 'self'",
+        "object-src 'self'",
+        [
+          "connect-src 'self'",
+          'https://translate.googleapis.com',
+          'https://playground.chatenhancer.com',
+          'wss://playground.chatenhancer.com',
+          playgroundBackendOrigin,
+          localPlaygroundSocketOrigin
+        ].join(' ')
+      ].join('; ')
+    };
+  }
+
   if (target === 'firefox') {
     manifest.background = {
       scripts: [manifest.background.service_worker]
@@ -126,6 +157,13 @@ function stripBuildPrefix(value) {
   return String(value).replace(/^dist\/extension(?:-chrome)?\//, '');
 }
 
+function copyStaticDirectory(source, destination) {
+  return cp(source, destination, {
+    recursive: true,
+    filter: (entry) => !path.basename(entry).startsWith('.')
+  });
+}
+
 function getRequestedTargets() {
   const args = new Set(process.argv.slice(2));
   if (args.has('--all')) return ['chrome', 'edge', 'firefox'];
@@ -135,6 +173,50 @@ function getRequestedTargets() {
     throw new Error(`Unsupported build target: ${target}`);
   }
   return [target];
+}
+
+function getPlaygroundBackendOrigin() {
+  const args = process.argv.slice(2);
+  const originArg = args.find((arg) => arg.startsWith('--playground-backend='));
+  const rawOrigin = originArg
+    ? originArg.slice('--playground-backend='.length)
+    : process.env.YTCQ_PLAYGROUND_BACKEND_ORIGIN || '';
+  if (!rawOrigin) return '';
+
+  const normalized = normalizeHttpOrigin(rawOrigin);
+  if (!normalized) {
+    throw new Error(`Invalid playground backend origin: ${rawOrigin}`);
+  }
+  return normalized;
+}
+
+function normalizeHttpOrigin(value) {
+  try {
+    const url = new URL(String(value).trim());
+    if (url.protocol !== 'http:' && url.protocol !== 'https:') return '';
+    url.pathname = '';
+    url.search = '';
+    url.hash = '';
+    return url.toString().replace(/\/$/, '');
+  } catch {
+    return '';
+  }
+}
+
+function isLocalPlaygroundBackendOrigin(value) {
+  if (!value) return false;
+  const { hostname, protocol } = new URL(value);
+  return protocol === 'http:' && (
+    hostname === '127.0.0.1' ||
+    hostname === 'localhost' ||
+    hostname === '[::1]'
+  );
+}
+
+function getSocketOrigin(value) {
+  const url = new URL(value);
+  url.protocol = url.protocol === 'http:' ? 'ws:' : 'wss:';
+  return url.toString().replace(/\/$/, '');
 }
 
 async function syncVersionedSourceFiles() {

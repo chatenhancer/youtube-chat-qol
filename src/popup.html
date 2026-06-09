@@ -30,11 +30,6 @@
               <path d="M480-200q66 0 113-47t47-113v-160q0-66-47-113t-113-47q-66 0-113 47t-47 113v160q0 66 47 113t113 47Zm-80-120h160v-80H400v80Zm0-160h160v-80H400v80Zm80 40Zm0 320q-65 0-120.5-32T272-240H160v-80h84q-3-20-3.5-40t-.5-40h-80v-80h80q0-20 .5-40t3.5-40h-84v-80h112q14-23 31.5-43t40.5-35l-64-66 56-56 86 86q28-9 57-9t57 9l88-86 56 56-66 66q23 15 41.5 34.5T688-640h112v80h-84q3 20 3.5 40t.5 40h80v80h-80q0 20-.5 40t-3.5 40h84v80H688q-32 56-87.5 88T480-120Z"></path>
             </svg>
           </a>
-          <button id="playgroundButton" class="header-icon-button playground-button" type="button" title="Playground (coming soon)" aria-label="Playground (coming soon)" aria-disabled="true" tabindex="-1" data-i18n-title="playgroundComingSoon" data-i18n-aria-label="playgroundComingSoon">
-            <svg class="playground-icon" viewBox="0 -960 960 960" aria-hidden="true" focusable="false">
-              <path d="m272-440 208 120 208-120-168-97v137h-80v-137l-168 97Zm168-189v-17q-44-13-72-49.5T340-780q0-58 41-99t99-41q58 0 99 41t41 99q0 48-28 84.5T520-646v17l280 161q19 11 29.5 29.5T840-398v76q0 22-10.5 40.5T800-252L520-91q-19 11-40 11t-40-11L160-252q-19-11-29.5-29.5T120-322v-76q0-22 10.5-40.5T160-468l280-161Zm0 378L200-389v67l280 162 280-162v-67L520-251q-19 11-40 11t-40-11Zm82.5-486.5Q540-755 540-780t-17.5-42.5Q505-840 480-840t-42.5 17.5Q420-805 420-780t17.5 42.5Q455-720 480-720t42.5-17.5ZM480-160Z"></path>
-            </svg>
-          </button>
           <button id="resetExtension" class="header-icon-button reset-button" type="button" title="Reset all extension settings and local data" aria-label="Reset extension" data-i18n-title="resetAllExtensionData" data-i18n-aria-label="resetExtension">
             <svg class="reset-icon" viewBox="0 -960 960 960" aria-hidden="true" focusable="false">
               <path d="M440-520h80v-280q0-17-11.5-28.5T480-840q-17 0-28.5 11.5T440-800v280ZM200-360h560v-80H200v80Zm-58 240h98v-80q0-17 11.5-28.5T280-240q17 0 28.5 11.5T320-200v80h120v-80q0-17 11.5-28.5T480-240q17 0 28.5 11.5T520-200v80h120v-80q0-17 11.5-28.5T680-240q17 0 28.5 11.5T720-200v80h98l-40-160H182l-40 160Zm676 80H142q-39 0-63-31t-14-69l55-220v-80q0-33 23.5-56.5T200-520h160v-280q0-50 35-85t85-35q50 0 85 35t35 85v280h160q33 0 56.5 23.5T840-440v80l55 220q13 38-11.5 69T818-40Zm-58-400H200h560Zm-240-80h-80 80Z"></path>
@@ -46,6 +41,11 @@
       <nav class="popup-tabs" role="tablist" aria-label="Popup sections" data-i18n-aria-label="popupSections">
         <button id="settingsTab" class="popup-tab popup-tab-active" type="button" role="tab" aria-selected="true" aria-controls="settingsPanel" data-popup-tab-target="settingsPanel" data-i18n="settings">Settings</button>
         <button id="bookmarksTab" class="popup-tab" type="button" role="tab" aria-selected="false" aria-controls="bookmarksPanel" data-popup-tab-target="bookmarksPanel" data-i18n="bookmarks">Bookmarks</button>
+        <button id="playgroundTab" class="popup-tab popup-tab-icon-only" type="button" role="tab" aria-selected="false" aria-controls="playgroundPanel" data-popup-tab-target="playgroundPanel" title="Playground" aria-label="Playground" data-i18n-title="playground" data-i18n-aria-label="playground">
+          <svg class="playground-icon" viewBox="0 -960 960 960" aria-hidden="true" focusable="false">
+            <path d="m272-440 208 120 208-120-168-97v137h-80v-137l-168 97Zm168-189v-17q-44-13-72-49.5T340-780q0-58 41-99t99-41q58 0 99 41t41 99q0 48-28 84.5T520-646v17l280 161q19 11 29.5 29.5T840-398v76q0 22-10.5 40.5T800-252L520-91q-19 11-40 11t-40-11L160-252q-19-11-29.5-29.5T120-322v-76q0-22 10.5-40.5T160-468l280-161Zm0 378L200-389v67l280 162 280-162v-67L520-251q-19 11-40 11t-40-11Zm82.5-486.5Q540-755 540-780t-17.5-42.5Q505-840 480-840t-42.5 17.5Q420-805 420-780t17.5 42.5Q455-720 480-720t42.5-17.5ZM480-160Z"></path>
+          </svg>
+        </button>
       </nav>
 
       <div class="popup-tab-panels">
@@ -123,6 +123,43 @@
               <span id="bookmarksCount" class="bookmarks-count" data-i18n="noBookmarkedUsers">No bookmarks yet</span>
             </header>
             <div id="bookmarksList" class="bookmarks-list" aria-live="polite"></div>
+          </section>
+        </div>
+
+        <div id="playgroundPanel" class="popup-tab-panel" role="tabpanel" aria-labelledby="playgroundTab" data-popup-tab-panel hidden>
+          <section class="settings-section" aria-labelledby="playground-heading">
+            <h2 id="playground-heading" data-i18n="playground">Playground</h2>
+            <label class="option option-toggle" title="Try early experiments. Some may connect to chatenhancer.com to work." data-i18n-title="playgroundBetaHelper">
+              <span class="option-copy">
+                <span class="option-title">
+                  <svg class="option-icon playground-option-icon" viewBox="0 -960 960 960" aria-hidden="true" focusable="false">
+                    <path d="m272-440 208 120 208-120-168-97v137h-80v-137l-168 97Zm168-189v-17q-44-13-72-49.5T340-780q0-58 41-99t99-41q58 0 99 41t41 99q0 48-28 84.5T520-646v17l280 161q19 11 29.5 29.5T840-398v76q0 22-10.5 40.5T800-252L520-91q-19 11-40 11t-40-11L160-252q-19-11-29.5-29.5T120-322v-76q0-22 10.5-40.5T160-468l280-161Zm0 378L200-389v67l280 162 280-162v-67L520-251q-19 11-40 11t-40-11Zm82.5-486.5Q540-755 540-780t-17.5-42.5Q505-840 480-840t-42.5 17.5Q420-805 420-780t17.5 42.5Q455-720 480-720t42.5-17.5ZM480-160Z"></path>
+                  </svg>
+                  <span data-i18n="joinPlayground">Join Playground</span>
+                  <span class="option-beta-badge">Beta</span>
+                </span>
+                <span class="option-helper">
+                  <span data-i18n="playgroundBetaHelper">Try early experiments. Some may connect to chatenhancer.com to work.</span>
+                  <a class="option-helper-link" href="https://www.chatenhancer.com/privacy" target="_blank" rel="noreferrer" data-i18n="learnMore">Learn more</a>
+                </span>
+              </span>
+              <input id="playgroundEnabled" type="checkbox" title="Try early experiments. Some may connect to chatenhancer.com to work." data-i18n-title="playgroundBetaHelper">
+            </label>
+          </section>
+          <section id="playgroundGamesSection" class="settings-section" aria-labelledby="playground-games-heading" hidden>
+            <h2 id="playground-games-heading" data-i18n="games">Games</h2>
+            <label class="option option-toggle" title="You can receive game invites automatically when you join a stream." data-i18n-title="playgroundGamesAvailableHelper">
+              <span class="option-copy">
+                <span class="option-title">
+                  <svg class="option-icon playground-option-icon" viewBox="0 -960 960 960" aria-hidden="true" focusable="false">
+                    <path d="M189-160q-60 0-102.5-43T42-307q0-9 1-18t3-18l84-336q14-54 57-87.5t98-33.5h390q55 0 98 33.5t57 87.5l84 336q2 9 3.5 18.5T919-306q0 61-43.5 103.5T771-160q-42 0-78-22t-54-60l-28-58q-5-10-15-15t-21-5H385q-11 0-21 5t-15 15l-28 58q-18 38-54 60t-78 22Zm3-80q19 0 34.5-10t23.5-27l28-57q15-31 44-48.5t63-17.5h190q34 0 63 18t45 48l28 57q8 17 23.5 27t34.5 10q28 0 48-18.5t21-46.5q0 1-2-19l-84-335q-7-27-28-44t-49-17H285q-28 0-49.5 17T208-659l-84 335q-2 6-2 18 0 28 20.5 47t49.5 19Zm376.5-291.5Q580-543 580-560t-11.5-28.5Q557-600 540-600t-28.5 11.5Q500-577 500-560t11.5 28.5Q523-520 540-520t28.5-11.5Zm80-80Q660-623 660-640t-11.5-28.5Q637-680 620-680t-28.5 11.5Q580-657 580-640t11.5 28.5Q603-600 620-600t28.5-11.5Zm0 160Q660-463 660-480t-11.5-28.5Q637-520 620-520t-28.5 11.5Q580-497 580-480t11.5 28.5Q603-440 620-440t28.5-11.5Zm80-80Q740-543 740-560t-11.5-28.5Q717-600 700-600t-28.5 11.5Q660-577 660-560t11.5 28.5Q683-520 700-520t28.5-11.5Zm-367 63Q370-477 370-490v-40h40q13 0 21.5-8.5T440-560q0-13-8.5-21.5T410-590h-40v-40q0-13-8.5-21.5T340-660q-13 0-21.5 8.5T310-630v40h-40q-13 0-21.5 8.5T240-560q0 13 8.5 21.5T270-530h40v40q0 13 8.5 21.5T340-460q13 0 21.5-8.5ZM480-480Z"></path>
+                  </svg>
+                  <span data-i18n="playgroundGamesAvailable">Show me as available by default</span>
+                </span>
+                <span class="option-helper" data-i18n="playgroundGamesAvailableHelper">You can receive game invites automatically when you join a stream.</span>
+              </span>
+              <input id="playgroundGamesAvailable" type="checkbox" title="You can receive game invites automatically when you join a stream." data-i18n-title="playgroundGamesAvailableHelper">
+            </label>
           </section>
         </div>
       </div>

@@ -129,7 +129,53 @@
     "draftTranslationTo": "ترجمه پیش‌نویس به {language}.",
     "whenUntilTarget": "{duration} تا {target}",
     "whenSinceTarget": "{duration} از {target}",
-    "whenTargetInPlace": "{target} در {place}"
+    "whenTargetInPlace": "{target} در {place}",
+    "playground": "محیط آزمایشی",
+    "games": "بازی‌ها",
+    "gamesChess": "شطرنج",
+    "gamesAvailability": "دردسترس بودن",
+    "gamesAvailableToPlay": "آماده بازی",
+    "gamesAvailableHelper": "به بازیکنان دیگر در این پخش نشان داده می‌شود.",
+    "gamesActiveGame": "بازی فعال",
+    "gamesResume": "ادامه",
+    "gamesMinimize": "کوچک کردن",
+    "gamesLeave": "ترک کردن",
+    "gamesInvites": "دعوت‌ها",
+    "gamesNoInvites": "دعوتی نیست",
+    "gamesInviteFrom": "{user} شما را به {game} دعوت کرد.",
+    "gamesInviteHelper": "برای باز کردن پنل بازی بپذیرید.",
+    "gamesAccept": "پذیرفتن",
+    "gamesPlayWith": "یک نفر را برای بازی انتخاب کنید",
+    "gamesBack": "بازگشت",
+    "gamesPlayers": "بازیکنان",
+    "gamesAvailableNow": "اکنون آماده است",
+    "gamesWaitingForReply": "در انتظار پاسخ...",
+    "gamesCancelInvite": "لغو",
+    "gamesInvite": "دعوت",
+    "gamesIgnore": "نادیده گرفتن",
+    "gamesPlayersOnline": {
+      "one": "{count} بازیکن آنلاین",
+      "other": "{count} بازیکن آنلاین"
+    },
+    "gamesNoPlayersAvailable": "هیچ بازیکنی در دسترس نیست.",
+    "gamesConnectingTitle": "در حال اتصال...",
+    "gamesConnectingNoticeTitle": "در حال اتصال به Playground",
+    "gamesConnectingHelper": "در حال بررسی اتصال بازی‌ها.",
+    "gamesUnavailableTitle": "در دسترس نیست",
+    "gamesUnavailableHelper": "بعداً دوباره امتحان کنید.",
+    "gamesReconnect": "اتصال دوباره",
+    "gamesStartGame": "شروع بازی",
+    "gamesOpponentLeft": "حریف بازی را ترک کرد.",
+    "gamesCheck": "کیش",
+    "gamesCheckmate": "کیش و مات",
+    "gamesDraw": "مساوی",
+    "gamesResigned": "تسلیم شد",
+    "gamesNotYourTurn": "نوبت تو نیست",
+    "gamesInvalidMove": "حرکت نامعتبر است",
+    "gamesChooseOwnPiece": "مهره خودت را انتخاب کن",
+    "gamesMuteSounds": "قطع صدای بازی",
+    "gamesUnmuteSounds": "وصل صدای بازی",
+    "gamesUnavailableNoticeTitle": "امکان اتصال نیست"
   },
   "extension": {
     "extensionName": {
@@ -185,9 +231,6 @@
     },
     "supportAndFeedback": {
       "message": "پشتیبانی و بازخورد"
-    },
-    "playgroundComingSoon": {
-      "message": "محیط بازی (به‌زودی)"
     },
     "supportIssueTrackerPrompt": {
       "message": "برای گزارش باگ و درخواست قابلیت‌ها به ردیاب عمومی مشکلات ما هدایت می‌شوید. ممکن است حساب لازم باشد.\n\nهمچنین می‌توانید به {supportEmail} ایمیل بزنید.\n\nبه ردیاب مشکلات ادامه می‌دهید؟"
@@ -311,6 +354,27 @@
     },
     "removeBookmark": {
       "message": "حذف نشانک"
+    },
+    "playground": {
+      "message": "محیط آزمایشی"
+    },
+    "joinPlayground": {
+      "message": "پیوستن به محیط آزمایشی"
+    },
+    "playgroundBetaHelper": {
+      "message": "قابلیت‌های آزمایشی را زودتر امتحان کنید. برخی ممکن است برای کارکردن به chatenhancer.com وصل شوند."
+    },
+    "games": {
+      "message": "بازی‌ها"
+    },
+    "playgroundGamesAvailable": {
+      "message": "به‌طور پیش‌فرض برای بازی‌ها در دسترس باشید"
+    },
+    "playgroundGamesAvailableHelper": {
+      "message": "در فهرست بازیکنان در دسترس ظاهر می‌شوید و می‌توانید هنگام پخش‌ها دعوت‌نامهٔ بازی دریافت کنید."
+    },
+    "learnMore": {
+      "message": "بیشتر بدانید"
     }
   }
 }

@@ -129,7 +129,53 @@
     "draftTranslationTo": "ترجمة المسودة إلى {language}.",
     "whenUntilTarget": "{duration} حتى {target}",
     "whenSinceTarget": "{duration} منذ {target}",
-    "whenTargetInPlace": "{target} في {place}"
+    "whenTargetInPlace": "{target} في {place}",
+    "playground": "ساحة التجارب",
+    "games": "الألعاب",
+    "gamesChess": "شطرنج",
+    "gamesAvailability": "التوفر",
+    "gamesAvailableToPlay": "متاح للعب",
+    "gamesAvailableHelper": "يظهر للاعبين الآخرين في هذا البث.",
+    "gamesActiveGame": "لعبة نشطة",
+    "gamesResume": "استئناف",
+    "gamesMinimize": "تصغير",
+    "gamesLeave": "مغادرة",
+    "gamesInvites": "دعوات",
+    "gamesNoInvites": "لا توجد دعوات",
+    "gamesInviteFrom": "دعاك {user} إلى {game}.",
+    "gamesInviteHelper": "اقبل لفتح لوحة اللعبة.",
+    "gamesAccept": "قبول",
+    "gamesPlayWith": "اختر شخصًا لتلعب معه",
+    "gamesBack": "رجوع",
+    "gamesPlayers": "اللاعبون",
+    "gamesAvailableNow": "متاح الآن",
+    "gamesWaitingForReply": "بانتظار الرد...",
+    "gamesCancelInvite": "إلغاء",
+    "gamesInvite": "دعوة",
+    "gamesIgnore": "تجاهل",
+    "gamesPlayersOnline": {
+      "one": "{count} لاعب متصل",
+      "other": "{count} لاعبين متصلون"
+    },
+    "gamesNoPlayersAvailable": "لا يوجد لاعبون متاحون.",
+    "gamesConnectingTitle": "جارٍ الاتصال...",
+    "gamesConnectingNoticeTitle": "جارٍ الاتصال بـ Playground",
+    "gamesConnectingHelper": "يتم التحقق من اتصال الألعاب.",
+    "gamesUnavailableTitle": "غير متاح",
+    "gamesUnavailableHelper": "حاول مرة أخرى لاحقاً.",
+    "gamesReconnect": "إعادة الاتصال",
+    "gamesStartGame": "ابدأ لعبة",
+    "gamesOpponentLeft": "غادر الخصم اللعبة.",
+    "gamesCheck": "كش",
+    "gamesCheckmate": "كش مات",
+    "gamesDraw": "تعادل",
+    "gamesResigned": "استسلام",
+    "gamesNotYourTurn": "ليس دورك",
+    "gamesInvalidMove": "نقلة غير صالحة",
+    "gamesChooseOwnPiece": "اختر قطعتك",
+    "gamesMuteSounds": "كتم أصوات اللعبة",
+    "gamesUnmuteSounds": "إلغاء كتم أصوات اللعبة",
+    "gamesUnavailableNoticeTitle": "تعذر الاتصال"
   },
   "extension": {
     "extensionName": {
@@ -188,9 +234,6 @@
     },
     "supportAndFeedback": {
       "message": "الدعم والملاحظات"
-    },
-    "playgroundComingSoon": {
-      "message": "ساحة اللعب (قريبًا)"
     },
     "supportIssueTrackerPrompt": {
       "message": "ستتم إعادة توجيهك إلى متتبّع المشكلات العام الخاص بنا للإبلاغ عن الأخطاء وطلب الميزات. قد تحتاج إلى حساب.\n\nيمكنك أيضًا مراسلتنا على {supportEmail}.\n\nهل تريد المتابعة إلى متتبّع المشكلات؟"
@@ -314,6 +357,27 @@
     },
     "removeBookmark": {
       "message": "إزالة الإشارة المرجعية"
+    },
+    "playground": {
+      "message": "ساحة التجارب"
+    },
+    "joinPlayground": {
+      "message": "الانضمام إلى ساحة التجارب"
+    },
+    "playgroundBetaHelper": {
+      "message": "جرّب تجارب مبكرة. قد يتصل بعضها بـ chatenhancer.com ليعمل."
+    },
+    "games": {
+      "message": "الألعاب"
+    },
+    "playgroundGamesAvailable": {
+      "message": "كن متاحاً للألعاب افتراضياً"
+    },
+    "playgroundGamesAvailableHelper": {
+      "message": "ستظهر في قائمة اللاعبين المتاحين ويمكنك تلقي دعوات الألعاب أثناء البث."
+    },
+    "learnMore": {
+      "message": "تعرّف على المزيد"
     }
   }
 }
