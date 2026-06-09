@@ -129,7 +129,53 @@
     "draftTranslationTo": "Taslak çevirisi {language}.",
     "whenUntilTarget": "{target} için {duration} kaldı",
     "whenSinceTarget": "{target} üzerinden {duration} geçti",
-    "whenTargetInPlace": "{place} için {target}"
+    "whenTargetInPlace": "{place} için {target}",
+    "playground": "Playground",
+    "games": "Oyunlar",
+    "gamesChess": "Satranç",
+    "gamesAvailability": "Uygunluk",
+    "gamesAvailableToPlay": "Oynamaya uygun",
+    "gamesAvailableHelper": "Bu yayındaki diğer oyunculara gösterilir.",
+    "gamesActiveGame": "Aktif oyun",
+    "gamesResume": "Sürdür",
+    "gamesMinimize": "Küçült",
+    "gamesLeave": "Ayrıl",
+    "gamesInvites": "Davetler",
+    "gamesNoInvites": "Davet yok",
+    "gamesInviteFrom": "{user} seni {game} oyununa davet etti.",
+    "gamesInviteHelper": "Oyun panelini açmak için kabul et.",
+    "gamesAccept": "Kabul et",
+    "gamesPlayWith": "Oynamak için birini seç",
+    "gamesBack": "Geri",
+    "gamesPlayers": "Oyuncular",
+    "gamesAvailableNow": "Şu an uygun",
+    "gamesWaitingForReply": "Yanıt bekleniyor...",
+    "gamesCancelInvite": "İptal",
+    "gamesInvite": "Davet et",
+    "gamesIgnore": "Yok say",
+    "gamesPlayersOnline": {
+      "one": "{count} oyuncu çevrimiçi",
+      "other": "{count} oyuncu çevrimiçi"
+    },
+    "gamesNoPlayersAvailable": "Uygun oyuncu yok.",
+    "gamesConnectingTitle": "Bağlanılıyor...",
+    "gamesConnectingNoticeTitle": "Playground'a bağlanılıyor",
+    "gamesConnectingHelper": "Oyun bağlantısı kontrol ediliyor.",
+    "gamesUnavailableTitle": "Kullanılamıyor",
+    "gamesUnavailableHelper": "Daha sonra tekrar deneyin.",
+    "gamesReconnect": "Yeniden bağlan",
+    "gamesStartGame": "Oyun başlat",
+    "gamesOpponentLeft": "Rakip oyundan ayrıldı.",
+    "gamesCheck": "Şah",
+    "gamesCheckmate": "Şah mat",
+    "gamesDraw": "Berabere",
+    "gamesResigned": "Terk edildi",
+    "gamesNotYourTurn": "Sıra sende değil",
+    "gamesInvalidMove": "Geçersiz hamle",
+    "gamesChooseOwnPiece": "Kendi taşını seç",
+    "gamesMuteSounds": "Oyun seslerini kapat",
+    "gamesUnmuteSounds": "Oyun seslerini aç",
+    "gamesUnavailableNoticeTitle": "Bağlanılamıyor"
   },
   "extension": {
     "extensionName": {
@@ -188,9 +234,6 @@
     },
     "supportAndFeedback": {
       "message": "Destek ve geri bildirim"
-    },
-    "playgroundComingSoon": {
-      "message": "Oyun alanı (yakında)"
     },
     "supportIssueTrackerPrompt": {
       "message": "Hata bildirimleri ve özellik istekleri için herkese açık sorun takipçimize yönlendirileceksin. Hesap gerekebilir.\n\nBize şu adresten de e-posta gönderebilirsin: {supportEmail}.\n\nSorun takipçisine devam edilsin mi?"
@@ -314,6 +357,27 @@
     },
     "removeBookmark": {
       "message": "Yer işaretini kaldır"
+    },
+    "playground": {
+      "message": "Playground"
+    },
+    "joinPlayground": {
+      "message": "Playground’a katıl"
+    },
+    "playgroundBetaHelper": {
+      "message": "Erken deneyleri dene. Bazıları çalışmak için chatenhancer.com'a bağlanabilir."
+    },
+    "games": {
+      "message": "Oyunlar"
+    },
+    "playgroundGamesAvailable": {
+      "message": "Oyunlar için varsayılan olarak müsait ol"
+    },
+    "playgroundGamesAvailableHelper": {
+      "message": "Uygun oyuncular listesinde görünürsün ve yayınlar sırasında oyun davetleri alabilirsin."
+    },
+    "learnMore": {
+      "message": "Daha fazla bilgi"
     }
   }
 }

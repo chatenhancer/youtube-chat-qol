@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   DEFAULT_OPTIONS,
   DEFAULT_TRANSLATION_TARGET,
+  getPlaygroundDisabledUpdate,
   getTargetLanguageUpdate,
   getTranslationToggleTarget,
   normalizeOptions
@@ -12,6 +13,8 @@ describe('shared option helpers', () => {
     expect(normalizeOptions({
       composerTranslateLanguage: 123,
       lastTranslationTarget: '',
+      playgroundEnabled: 'yes',
+      playgroundGamesAvailable: 'yes',
       sound: 'yes',
       startupEffect: null,
       targetLanguage: 456,
@@ -25,11 +28,22 @@ describe('shared option helpers', () => {
     expect(normalizeOptions({
       sound: false,
       startupEffect: false,
+      playgroundEnabled: true,
+      playgroundGamesAvailable: true,
       translationDisplay: 'below'
     })).toMatchObject({
       sound: false,
       startupEffect: false,
+      playgroundEnabled: true,
+      playgroundGamesAvailable: true,
       translationDisplay: 'below'
+    });
+  });
+
+  it('clears child playground options when playground is disabled', () => {
+    expect(getPlaygroundDisabledUpdate()).toEqual({
+      playgroundEnabled: false,
+      playgroundGamesAvailable: false
     });
   });
 

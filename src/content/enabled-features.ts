@@ -21,6 +21,7 @@ import '../features/menus';
 import '../features/profile-popup';
 import '../features/reply';
 import '../features/inbox';
+import '../features/playground';
 import '../features/frequent-emojis';
 import '../features/enhanced-effect';
 import '../features/translation';

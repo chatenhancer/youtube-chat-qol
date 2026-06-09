@@ -10,5 +10,13 @@
     "skipLibCheck": true,
     "noEmit": true
   },
-  "include": ["src/**/*.ts", "tests/**/*.ts", "vitest.config.ts", "playwright.config.ts", "playwright.perf.config.ts"]
+  "include": [
+    "cloudflare/language-redirect/src/**/*.ts",
+    "cloudflare/playground/src/**/*.ts",
+    "src/**/*.ts",
+    "tests/**/*.ts",
+    "vitest.config.ts",
+    "playwright.config.ts",
+    "playwright.perf.config.ts"
+  ]
 }

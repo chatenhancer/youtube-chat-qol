@@ -32,11 +32,11 @@ import { CHAT_MESSAGE_SELECTOR, PARTICIPANT_SELECTOR } from '../youtube/selector
 let observer: MutationObserver | null = null;
 let visibilityRecoveryTimer = 0;
 
-init();
+void init();
 
-function init(): void {
+async function init(): Promise<void> {
   cleanupStaleFeatures();
-  initUiLocaleFromDocument();
+  await initUiLocaleFromDocument();
   initFeatures({ saveOptions });
 
   chrome.storage.sync.get(DEFAULT_OPTIONS, (storedOptions) => {

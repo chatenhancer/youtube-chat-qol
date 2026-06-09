@@ -129,7 +129,53 @@
     "draftTranslationTo": "Переклад чернетки на {language}.",
     "whenUntilTarget": "{duration} до {target}",
     "whenSinceTarget": "{duration} від {target}",
-    "whenTargetInPlace": "{target} у {place}"
+    "whenTargetInPlace": "{target} у {place}",
+    "playground": "Playground",
+    "games": "Ігри",
+    "gamesChess": "Шахи",
+    "gamesAvailability": "Доступність",
+    "gamesAvailableToPlay": "Готовий грати",
+    "gamesAvailableHelper": "Буде видно іншим гравцям у цій трансляції.",
+    "gamesActiveGame": "Активна гра",
+    "gamesResume": "Продовжити",
+    "gamesMinimize": "Згорнути",
+    "gamesLeave": "Вийти",
+    "gamesInvites": "Запрошення",
+    "gamesNoInvites": "Немає запрошень",
+    "gamesInviteFrom": "{user} запрошує вас у {game}.",
+    "gamesInviteHelper": "Прийміть, щоб відкрити ігрову панель.",
+    "gamesAccept": "Прийняти",
+    "gamesPlayWith": "Виберіть, з ким грати",
+    "gamesBack": "Назад",
+    "gamesPlayers": "Гравці",
+    "gamesAvailableNow": "Доступний зараз",
+    "gamesWaitingForReply": "Очікування відповіді...",
+    "gamesCancelInvite": "Скасувати",
+    "gamesInvite": "Запросити",
+    "gamesIgnore": "Ігнорувати",
+    "gamesPlayersOnline": {
+      "one": "{count} гравець онлайн",
+      "other": "{count} гравців онлайн"
+    },
+    "gamesNoPlayersAvailable": "Немає доступних гравців.",
+    "gamesConnectingTitle": "Підключення...",
+    "gamesConnectingNoticeTitle": "Підключення до Playground",
+    "gamesConnectingHelper": "Перевіряємо підключення до ігор.",
+    "gamesUnavailableTitle": "Недоступно",
+    "gamesUnavailableHelper": "Спробуйте ще раз пізніше.",
+    "gamesReconnect": "Підключитися знову",
+    "gamesStartGame": "Почати гру",
+    "gamesOpponentLeft": "Суперник залишив гру.",
+    "gamesCheck": "Шах",
+    "gamesCheckmate": "Мат",
+    "gamesDraw": "Нічия",
+    "gamesResigned": "Здався",
+    "gamesNotYourTurn": "Зараз не ваш хід",
+    "gamesInvalidMove": "Недійсний хід",
+    "gamesChooseOwnPiece": "Виберіть свою фігуру",
+    "gamesMuteSounds": "Вимкнути звуки гри",
+    "gamesUnmuteSounds": "Увімкнути звуки гри",
+    "gamesUnavailableNoticeTitle": "Не вдалося підключитися"
   },
   "extension": {
     "extensionName": {
@@ -185,9 +231,6 @@
     },
     "supportAndFeedback": {
       "message": "Підтримка та відгуки"
-    },
-    "playgroundComingSoon": {
-      "message": "Ігровий простір (незабаром)"
     },
     "supportIssueTrackerPrompt": {
       "message": "Вас буде перенаправлено до нашого публічного трекера звернень для звітів про помилки й запитів функцій. Може знадобитися обліковий запис.\n\nВи також можете написати нам на {supportEmail}.\n\nПерейти до трекера звернень?"
@@ -311,6 +354,27 @@
     },
     "removeBookmark": {
       "message": "Видалити закладку"
+    },
+    "playground": {
+      "message": "Playground"
+    },
+    "joinPlayground": {
+      "message": "Приєднатися до Playground"
+    },
+    "playgroundBetaHelper": {
+      "message": "Спробуйте ранні експерименти. Деякі можуть підключатися до chatenhancer.com, щоб працювати."
+    },
+    "games": {
+      "message": "Ігри"
+    },
+    "playgroundGamesAvailable": {
+      "message": "Бути доступним для ігор за замовчуванням"
+    },
+    "playgroundGamesAvailableHelper": {
+      "message": "Ви з’являтиметеся у списку доступних гравців і зможете отримувати запрошення до ігор під час стримів."
+    },
+    "learnMore": {
+      "message": "Докладніше"
     }
   }
 }

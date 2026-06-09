@@ -1,17 +1,39 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import deCatalog from './locales/de.json';
+import esCatalog from './locales/es.json';
+import frCatalog from './locales/fr.json';
+import itCatalog from './locales/it.json';
+import zhCnCatalog from './locales/zh_CN.json';
+import zhTwCatalog from './locales/zh_TW.json';
 
 describe('runtime i18n', () => {
   const originalUrl = window.location.href;
+  const runtimeCatalogs = new Map<string, unknown>([
+    ['chrome-extension://test/locales/de.json', deCatalog],
+    ['chrome-extension://test/locales/es.json', esCatalog],
+    ['chrome-extension://test/locales/fr.json', frCatalog],
+    ['chrome-extension://test/locales/it.json', itCatalog],
+    ['chrome-extension://test/locales/zh_CN.json', zhCnCatalog],
+    ['chrome-extension://test/locales/zh_TW.json', zhTwCatalog]
+  ]);
 
   beforeEach(() => {
     vi.resetModules();
     document.documentElement.lang = '';
     vi.mocked(chrome.i18n.getUILanguage).mockReturnValue('en');
     window.history.replaceState({}, '', originalUrl);
+    vi.stubGlobal('fetch', vi.fn(async (input: RequestInfo | URL) => {
+      const catalog = runtimeCatalogs.get(String(input));
+      return {
+        json: vi.fn(async () => catalog || {}),
+        ok: !!catalog
+      } as unknown as Response;
+    }));
   });
 
   afterEach(() => {
     window.history.replaceState({}, '', originalUrl);
+    vi.unstubAllGlobals();
   });
 
   it('uses the YouTube document language before the browser UI language', async () => {
@@ -19,27 +41,29 @@ describe('runtime i18n', () => {
     vi.mocked(chrome.i18n.getUILanguage).mockReturnValue('ja');
     const i18n = await import('./i18n');
 
-    i18n.initUiLocaleFromDocument();
+    await i18n.initUiLocaleFromDocument();
 
     expect(i18n.getUiLocale()).toBe('es');
     expect(i18n.t('translateChat')).toBe('Traducir');
+    expect(fetch).toHaveBeenCalledWith('chrome-extension://test/locales/es.json');
   });
 
   it('normalizes Chinese page-language variants to supported catalogs', async () => {
     document.documentElement.lang = 'zh-Hans-CN';
     const i18n = await import('./i18n');
 
-    i18n.initUiLocaleFromDocument();
+    await i18n.initUiLocaleFromDocument();
 
     expect(i18n.getUiLocale()).toBe('zh-CN');
     expect(i18n.t('inbox')).toBe('收件箱');
+    expect(fetch).toHaveBeenCalledWith('chrome-extension://test/locales/zh_CN.json');
   });
 
   it('normalizes Traditional Chinese and URL language fallbacks', async () => {
     document.documentElement.lang = ' zh_Hant_HK ';
     let i18n = await import('./i18n');
 
-    i18n.initUiLocaleFromDocument();
+    await i18n.initUiLocaleFromDocument();
     expect(i18n.getUiLocale()).toBe('zh-TW');
 
     vi.resetModules();
@@ -47,7 +71,7 @@ describe('runtime i18n', () => {
     window.history.replaceState({}, '', `${originalUrl.split('?')[0]}?hl=fr`);
     i18n = await import('./i18n');
 
-    i18n.initUiLocaleFromDocument();
+    await i18n.initUiLocaleFromDocument();
     expect(i18n.getUiLocale()).toBe('fr');
   });
 
@@ -64,7 +88,7 @@ describe('runtime i18n', () => {
     });
     const i18n = await import('./i18n');
 
-    i18n.initUiLocaleFromDocument();
+    await i18n.initUiLocaleFromDocument();
 
     expect(i18n.getUiLocale()).toBe('it');
 
@@ -84,7 +108,7 @@ describe('runtime i18n', () => {
     });
     const i18n = await import('./i18n');
 
-    i18n.initUiLocaleFromDocument();
+    await i18n.initUiLocaleFromDocument();
 
     expect(i18n.getUiLocale()).toBe('en');
 
@@ -98,7 +122,7 @@ describe('runtime i18n', () => {
     vi.mocked(chrome.i18n.getUILanguage).mockReturnValue('de-DE');
     let i18n = await import('./i18n');
 
-    i18n.initUiLocaleFromDocument();
+    await i18n.initUiLocaleFromDocument();
 
     expect(i18n.getUiLocale()).toBe('de');
     expect(i18n.t('translateChat')).toBe('Übersetzen');
@@ -106,7 +130,17 @@ describe('runtime i18n', () => {
     vi.resetModules();
     vi.mocked(chrome.i18n.getUILanguage).mockReturnValue('unknown-locale');
     i18n = await import('./i18n');
-    i18n.initUiLocaleFromDocument();
+    await i18n.initUiLocaleFromDocument();
+
+    expect(i18n.getUiLocale()).toBe('en');
+    expect(i18n.t('translateChat')).toBe('Translate');
+  });
+
+  it('falls back to English when the selected runtime catalog cannot be loaded', async () => {
+    document.documentElement.lang = 'pt-BR';
+    const i18n = await import('./i18n');
+
+    await i18n.initUiLocaleFromDocument();
 
     expect(i18n.getUiLocale()).toBe('en');
     expect(i18n.t('translateChat')).toBe('Translate');

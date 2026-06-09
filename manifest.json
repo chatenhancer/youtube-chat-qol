@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "__MSG_extensionName__",
   "short_name": "__MSG_extensionShortName__",
-  "version": "0.12.4",
+  "version": "0.13.0",
   "description": "__MSG_extensionDescription__",
   "default_locale": "en",
   "icons": {
@@ -17,6 +17,7 @@
     "https://www.youtube.com/live_chat_replay*",
     "https://studio.youtube.com/live_chat*",
     "https://studio.youtube.com/live_chat_replay*",
+    "https://playground.chatenhancer.com/*",
     "https://translate.googleapis.com/*"
   ],
   "background": {
@@ -44,6 +45,19 @@
       "css": ["dist/extension-chrome/content.css"],
       "run_at": "document_idle",
       "all_frames": true
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "games/*/*.mp3",
+        "games/*/*.png",
+        "locales/*.json"
+      ],
+      "matches": [
+        "https://www.youtube.com/*",
+        "https://studio.youtube.com/*"
+      ]
     }
   ]
 }

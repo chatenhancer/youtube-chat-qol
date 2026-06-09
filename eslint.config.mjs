@@ -7,7 +7,7 @@ export default [
     ignores: ['coverage/**', 'dist/**', 'node_modules/**']
   },
   {
-    files: ['src/**/*.ts', 'tests/**/*.ts'],
+    files: ['cloudflare/language-redirect/src/**/*.ts', 'cloudflare/playground/src/**/*.ts', 'src/**/*.ts', 'tests/**/*.ts'],
     languageOptions: {
       parser: tseslint.parser,
       parserOptions: {
@@ -16,7 +16,8 @@ export default [
       },
       globals: {
         ...globals.browser,
-        chrome: 'readonly'
+        chrome: 'readonly',
+        WebSocketPair: 'readonly'
       }
     },
     plugins: {

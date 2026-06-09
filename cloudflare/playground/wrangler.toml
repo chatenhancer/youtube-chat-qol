@@ -1,0 +1,19 @@
+name = "chat-enhancer-playground"
+main = "src/index.ts"
+compatibility_date = "2026-06-09"
+workers_dev = false
+
+routes = [
+  { pattern = "playground.chatenhancer.com", custom_domain = true }
+]
+
+[vars]
+ALLOWED_ORIGINS = "https://chatenhancer.com,https://www.chatenhancer.com,chrome-extension://pkhaaipeppfpakofgpdpcpkflangpghf,chrome-extension://pjmcgbmponmimjcopjekelpffkdjekkp"
+
+[[durable_objects.bindings]]
+name = "STREAM_ROOMS"
+class_name = "StreamRoom"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["StreamRoom"]

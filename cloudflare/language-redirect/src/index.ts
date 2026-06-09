@@ -26,8 +26,13 @@ const SUPPORTED_LOCALES = new Set([
   'zh-CN'
 ]);
 
+interface LanguagePreference {
+  locale: string;
+  quality: number;
+}
+
 export default {
-  async fetch(request) {
+  async fetch(request: Request): Promise<Response> {
     const url = new URL(request.url);
 
     if (!shouldHandleRequest(request, url)) {
@@ -51,14 +56,14 @@ export default {
   }
 };
 
-function shouldHandleRequest(request, url) {
+export function shouldHandleRequest(request: Request, url: URL): boolean {
   if (request.method !== 'GET' && request.method !== 'HEAD') return false;
   if (url.pathname !== '/' && url.pathname !== '/index.html') return false;
   if (isBot(request.headers.get('User-Agent'))) return false;
   return true;
 }
 
-async function redirectWithLocaleCookie(request, url, locale) {
+async function redirectWithLocaleCookie(request: Request, url: URL, locale: string): Promise<Response> {
   const destinationPath = locale === DEFAULT_LOCALE ? '/' : `/${locale}/`;
   const destinationUrl = new URL(destinationPath, url);
   destinationUrl.search = '';
@@ -73,7 +78,7 @@ async function redirectWithLocaleCookie(request, url, locale) {
   return createRedirect(destinationUrl, locale);
 }
 
-async function redirectIfLocalePageExists(request, url, locale) {
+async function redirectIfLocalePageExists(request: Request, url: URL, locale: string): Promise<Response> {
   const destinationUrl = new URL(`/${locale}/`, url);
   const localePageExists = await localePageExistsAt(request, destinationUrl);
   if (!localePageExists) return fetchHomepage(request);
@@ -81,23 +86,23 @@ async function redirectIfLocalePageExists(request, url, locale) {
   return createRedirect(destinationUrl, locale);
 }
 
-async function fetchHomepage(request) {
+async function fetchHomepage(request: Request): Promise<Response> {
   const response = await fetch(request);
   const nextHeaders = new Headers(response.headers);
   appendVary(nextHeaders, 'Accept-Language');
   appendVary(nextHeaders, 'Cookie');
 
   return new Response(response.body, {
+    headers: nextHeaders,
     status: response.status,
-    statusText: response.statusText,
-    headers: nextHeaders
+    statusText: response.statusText
   });
 }
 
-async function localePageExistsAt(request, destinationUrl) {
+async function localePageExistsAt(request: Request, destinationUrl: URL): Promise<boolean> {
   const probeRequest = new Request(destinationUrl.toString(), {
-    method: 'HEAD',
-    headers: createForwardHeaders(request)
+    headers: createForwardHeaders(request),
+    method: 'HEAD'
   });
 
   try {
@@ -108,18 +113,18 @@ async function localePageExistsAt(request, destinationUrl) {
   }
 }
 
-function createRedirect(destinationUrl, locale) {
+function createRedirect(destinationUrl: URL, locale: string): Response {
   return new Response(null, {
-    status: 302,
     headers: {
       Location: destinationUrl.toString(),
       'Set-Cookie': createLanguageCookie(locale),
       Vary: 'Accept-Language, Cookie'
-    }
+    },
+    status: 302
   });
 }
 
-function appendVary(headers, value) {
+export function appendVary(headers: Headers, value: string): void {
   const current = headers.get('Vary') || '';
   const existing = current
     .split(',')
@@ -130,14 +135,14 @@ function appendVary(headers, value) {
   headers.set('Vary', current ? `${current}, ${value}` : value);
 }
 
-function createForwardHeaders(request) {
+function createForwardHeaders(request: Request): Headers {
   const headers = new Headers(request.headers);
   headers.set('Accept', 'text/html,*/*;q=0.8');
   headers.delete('Cookie');
   return headers;
 }
 
-function pickAcceptLanguage(header) {
+export function pickAcceptLanguage(header: string | null): string {
   if (!header) return '';
 
   return header
@@ -149,7 +154,7 @@ function pickAcceptLanguage(header) {
     .find(Boolean) || '';
 }
 
-function parseLanguagePreference(part) {
+function parseLanguagePreference(part: string): LanguagePreference {
   const [rawLocale, ...params] = part.trim().split(';');
   const qualityParam = params.find((param) => param.trim().startsWith('q='));
   const quality = qualityParam ? Number(qualityParam.trim().slice(2)) : 1;
@@ -160,7 +165,7 @@ function parseLanguagePreference(part) {
   };
 }
 
-function normalizeLocale(value) {
+export function normalizeLocale(value: unknown): string {
   const locale = decodeURIComponent(String(value || '')).trim().toLowerCase().replace('_', '-');
   if (!locale) return '';
   if (
@@ -184,7 +189,7 @@ function normalizeLocale(value) {
   return SUPPORTED_LOCALES.has(baseLocale) ? baseLocale : '';
 }
 
-function getCookie(request, name) {
+export function getCookie(request: Request, name: string): string {
   const cookieHeader = request.headers.get('Cookie') || '';
   const cookie = cookieHeader
     .split(';')
@@ -194,10 +199,10 @@ function getCookie(request, name) {
   return cookie ? cookie.slice(name.length + 1) : '';
 }
 
-function createLanguageCookie(locale) {
+export function createLanguageCookie(locale: string): string {
   return `${LANGUAGE_COOKIE}=${encodeURIComponent(locale)}; Max-Age=${COOKIE_MAX_AGE}; Path=/; SameSite=Lax; Secure`;
 }
 
-function isBot(userAgent) {
-  return /\b(bot|crawler|spider|crawling|facebookexternalhit|slurp|duckduckbot|bingpreview)\b/i.test(userAgent || '');
+export function isBot(userAgent: string | null): boolean {
+  return /(bot|crawler|spider|crawling|facebookexternalhit|slurp|duckduckbot|bingpreview)/i.test(userAgent || '');
 }

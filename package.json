@@ -1,19 +1,24 @@
 {
   "name": "youtube-chat-qol",
-  "version": "0.12.4",
+  "version": "0.13.0",
   "private": true,
   "license": "GPL-3.0-or-later",
   "type": "module",
   "scripts": {
     "build": "node scripts/build.mjs --all",
     "build:chrome": "node scripts/build.mjs --target=chrome",
+    "build:chrome:playground-local": "node scripts/build.mjs --target=chrome --playground-backend=http://127.0.0.1:8787",
     "build:edge": "node scripts/build.mjs --target=edge",
     "build:firefox": "node scripts/build.mjs --target=firefox",
+    "build:firefox:playground-local": "node scripts/build.mjs --target=firefox --playground-backend=http://127.0.0.1:8787",
+    "build:playground-local": "npm run build:chrome:playground-local && npm run build:firefox:playground-local",
     "docs:screenshots": "npm run docs:build && node scripts/generate-dom-screenshots.mjs",
     "docs:build": "node scripts/build-docs.mjs",
     "zip": "npm run verify && node scripts/zip.mjs --all",
-    "cloudflare:dev": "npx wrangler@4 dev --config cloudflare/wrangler.toml",
-    "cloudflare:deploy": "npx wrangler@4 deploy --config cloudflare/wrangler.toml",
+    "cloudflare:language-redirect:dev": "npx wrangler@4 dev --config cloudflare/language-redirect/wrangler.toml",
+    "cloudflare:language-redirect:deploy": "npx wrangler@4 deploy --config cloudflare/language-redirect/wrangler.toml",
+    "cloudflare:playground:dev": "npx wrangler@4 dev --config cloudflare/playground/wrangler.toml",
+    "cloudflare:playground:deploy": "npx wrangler@4 deploy --config cloudflare/playground/wrangler.toml",
     "demo:walkthrough": "npm run build:chrome && node scripts/capture-walkthrough-demo.mjs",
     "demo:walkthrough:preview": "npm run build:chrome && node scripts/capture-walkthrough-demo.mjs --preview",
     "postinstall": "node scripts/install-playwright-browser.mjs",
@@ -57,5 +62,8 @@
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.32.1",
     "vitest": "^4.1.7"
+  },
+  "dependencies": {
+    "chess.js": "^1.4.0"
   }
 }

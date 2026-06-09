@@ -6,4 +6,5 @@
  */
 import './action-status';
 import './active-chat-keepalive';
+import './playground';
 import './translate';

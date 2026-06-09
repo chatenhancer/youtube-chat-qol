@@ -129,7 +129,53 @@
     "draftTranslationTo": "Terjemahan draf ke {language}.",
     "whenUntilTarget": "{duration} sampai {target}",
     "whenSinceTarget": "{duration} sejak {target}",
-    "whenTargetInPlace": "{target} di {place}"
+    "whenTargetInPlace": "{target} di {place}",
+    "playground": "Playground",
+    "games": "Game",
+    "gamesChess": "Catur",
+    "gamesAvailability": "Ketersediaan",
+    "gamesAvailableToPlay": "Tersedia untuk bermain",
+    "gamesAvailableHelper": "Ditampilkan ke pemain lain di live ini.",
+    "gamesActiveGame": "Game aktif",
+    "gamesResume": "Lanjutkan",
+    "gamesMinimize": "Minimalkan",
+    "gamesLeave": "Keluar",
+    "gamesInvites": "Undangan",
+    "gamesNoInvites": "Tidak ada undangan",
+    "gamesInviteFrom": "{user} mengundang Anda ke {game}.",
+    "gamesInviteHelper": "Terima untuk membuka panel game.",
+    "gamesAccept": "Terima",
+    "gamesPlayWith": "Pilih seseorang untuk bermain",
+    "gamesBack": "Kembali",
+    "gamesPlayers": "Pemain",
+    "gamesAvailableNow": "Tersedia sekarang",
+    "gamesWaitingForReply": "Menunggu balasan...",
+    "gamesCancelInvite": "Batal",
+    "gamesInvite": "Undang",
+    "gamesIgnore": "Abaikan",
+    "gamesPlayersOnline": {
+      "one": "{count} pemain online",
+      "other": "{count} pemain online"
+    },
+    "gamesNoPlayersAvailable": "Tidak ada pemain yang tersedia.",
+    "gamesConnectingTitle": "Menghubungkan...",
+    "gamesConnectingNoticeTitle": "Menghubungkan ke Playground",
+    "gamesConnectingHelper": "Memeriksa koneksi game.",
+    "gamesUnavailableTitle": "Tidak tersedia",
+    "gamesUnavailableHelper": "Coba lagi nanti.",
+    "gamesReconnect": "Sambungkan ulang",
+    "gamesStartGame": "Mulai game",
+    "gamesOpponentLeft": "Lawan meninggalkan permainan.",
+    "gamesCheck": "Skak",
+    "gamesCheckmate": "Skakmat",
+    "gamesDraw": "Seri",
+    "gamesResigned": "Menyerah",
+    "gamesNotYourTurn": "Belum giliranmu",
+    "gamesInvalidMove": "Langkah tidak valid",
+    "gamesChooseOwnPiece": "Pilih bidakmu",
+    "gamesMuteSounds": "Bisukan suara game",
+    "gamesUnmuteSounds": "Aktifkan suara game",
+    "gamesUnavailableNoticeTitle": "Tidak dapat terhubung"
   },
   "extension": {
     "extensionName": {
@@ -188,9 +234,6 @@
     },
     "supportAndFeedback": {
       "message": "Dukungan dan masukan"
-    },
-    "playgroundComingSoon": {
-      "message": "Ruang bermain (segera hadir)"
     },
     "supportIssueTrackerPrompt": {
       "message": "Anda akan diarahkan ke pelacak isu publik kami untuk laporan bug dan permintaan fitur. Akun mungkin diperlukan.\n\nAnda juga bisa mengirim email ke {supportEmail}.\n\nLanjut ke pelacak isu?"
@@ -314,6 +357,27 @@
     },
     "removeBookmark": {
       "message": "Hapus bookmark"
+    },
+    "playground": {
+      "message": "Playground"
+    },
+    "joinPlayground": {
+      "message": "Gabung Playground"
+    },
+    "playgroundBetaHelper": {
+      "message": "Coba eksperimen lebih awal. Sebagian mungkin tersambung ke chatenhancer.com agar berfungsi."
+    },
+    "games": {
+      "message": "Game"
+    },
+    "playgroundGamesAvailable": {
+      "message": "Tersedia untuk game secara default"
+    },
+    "playgroundGamesAvailableHelper": {
+      "message": "Anda akan muncul di daftar pemain yang tersedia dan dapat menerima undangan game selama streaming."
+    },
+    "learnMore": {
+      "message": "Pelajari selengkapnya"
     }
   }
 }

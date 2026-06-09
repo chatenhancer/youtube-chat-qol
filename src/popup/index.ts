@@ -22,7 +22,13 @@ import {
 } from '../shared/marked-users';
 import { KNOWN_CHAT_TABS_STORAGE_KEY } from '../shared/known-chat-tabs';
 import { playSoftChime } from '../shared/sounds/soft-chime';
-import { DEFAULT_OPTIONS, getTargetLanguageUpdate, normalizeOptions, type Options } from '../shared/options';
+import {
+  DEFAULT_OPTIONS,
+  getPlaygroundDisabledUpdate,
+  getTargetLanguageUpdate,
+  normalizeOptions,
+  type Options
+} from '../shared/options';
 import contact from '../shared/contact.json';
 
 const LANDING_PAGE_URL = 'https://chatenhancer.com';
@@ -34,6 +40,8 @@ const TRANSLATION_PULSE_CLASS = 'ytcq-translation-pulse';
 const DISPLAY_REFLOW_CLASS = 'ytcq-display-reflow';
 const SPARKLE_BURST_CLASS = 'ytcq-sparkle-burst';
 const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)';
+const PLAYGROUND_GROUP_COLLAPSED_CLASS = 'playground-group-collapsed';
+const PLAYGROUND_GROUP_ANIMATION_MS = 180;
 
 type ExtensionStatus = 'checking' | 'active' | 'inactive';
 
@@ -56,10 +64,14 @@ const controls = {
   translationDisplay: document.querySelector<HTMLSelectElement>('#translationDisplay'),
   sound: document.querySelector<HTMLInputElement>('#sound'),
   startupEffect: document.querySelector<HTMLInputElement>('#startupEffect'),
+  playgroundEnabled: document.querySelector<HTMLInputElement>('#playgroundEnabled'),
+  playgroundGamesSection: document.querySelector<HTMLElement>('#playgroundGamesSection'),
+  playgroundGamesAvailable: document.querySelector<HTMLInputElement>('#playgroundGamesAvailable'),
   version: document.querySelector<HTMLElement>('#version')
 };
 
 let lastKnownTranslationTarget = DEFAULT_OPTIONS.lastTranslationTarget;
+let playgroundGamesVisibilityToken = 0;
 const recentlyUnmarkedBookmarks = new Map<string, MarkedUserRecord>();
 
 init();
@@ -67,10 +79,19 @@ init();
 function init(): void {
   const popupLocale = localizePopup();
   initPopupTabs();
+  initOptionHelperLinks();
   initExtensionStatus();
   initBookmarksPanel();
 
-  if (!controls.targetLanguage || !controls.translationDisplay || !controls.sound || !controls.startupEffect) {
+  if (
+    !controls.targetLanguage ||
+    !controls.translationDisplay ||
+    !controls.sound ||
+    !controls.startupEffect ||
+    !controls.playgroundEnabled ||
+    !controls.playgroundGamesSection ||
+    !controls.playgroundGamesAvailable
+  ) {
     return;
   }
 
@@ -101,7 +122,17 @@ function init(): void {
   }
 
   chrome.storage.sync.get(DEFAULT_OPTIONS, (storedOptions: Partial<Options>) => {
-    if (!controls.targetLanguage || !controls.translationDisplay || !controls.sound || !controls.startupEffect) return;
+    if (
+      !controls.targetLanguage ||
+      !controls.translationDisplay ||
+      !controls.sound ||
+      !controls.startupEffect ||
+      !controls.playgroundEnabled ||
+      !controls.playgroundGamesSection ||
+      !controls.playgroundGamesAvailable
+    ) {
+      return;
+    }
     applyOptionsToControls(storedOptions);
   });
 
@@ -133,6 +164,17 @@ function init(): void {
     if (enabled) animatePopupStartupEffectIcon();
     save({ startupEffect: enabled });
   });
+
+  controls.playgroundEnabled.addEventListener('change', () => {
+    const enabled = Boolean(controls.playgroundEnabled?.checked);
+    if (!enabled) clearPlaygroundOptionControls();
+    updatePlaygroundGamesVisibility(enabled, true);
+    save(enabled ? { playgroundEnabled: true } : getPlaygroundDisabledUpdate());
+  });
+
+  controls.playgroundGamesAvailable.addEventListener('change', () => {
+    save({ playgroundGamesAvailable: Boolean(controls.playgroundGamesAvailable?.checked) });
+  });
 }
 
 function initPopupTabs(): void {
@@ -140,6 +182,14 @@ function initPopupTabs(): void {
     tab.addEventListener('click', () => {
       const targetId = tab.dataset.popupTabTarget;
       if (targetId) selectPopupTab(targetId);
+    });
+  });
+}
+
+function initOptionHelperLinks(): void {
+  document.querySelectorAll<HTMLAnchorElement>('.option-helper-link').forEach((link) => {
+    link.addEventListener('click', (event) => {
+      event.stopPropagation();
     });
   });
 }
@@ -570,7 +620,17 @@ function broadcastPageReset(callback: () => void): void {
 }
 
 function applyOptionsToControls(options: Partial<Options>): void {
-  if (!controls.targetLanguage || !controls.translationDisplay || !controls.sound || !controls.startupEffect) return;
+  if (
+    !controls.targetLanguage ||
+    !controls.translationDisplay ||
+    !controls.sound ||
+    !controls.startupEffect ||
+    !controls.playgroundEnabled ||
+    !controls.playgroundGamesSection ||
+    !controls.playgroundGamesAvailable
+  ) {
+    return;
+  }
 
   const normalized = normalizeOptions(options);
   lastKnownTranslationTarget = normalized.lastTranslationTarget;
@@ -579,6 +639,49 @@ function applyOptionsToControls(options: Partial<Options>): void {
   controls.sound.checked = normalized.sound;
   controls.startupEffect.disabled = prefersReducedMotion();
   controls.startupEffect.checked = normalized.startupEffect && !controls.startupEffect.disabled;
+  controls.playgroundEnabled.checked = normalized.playgroundEnabled;
+  controls.playgroundGamesAvailable.checked = normalized.playgroundEnabled && normalized.playgroundGamesAvailable;
+  updatePlaygroundGamesVisibility(normalized.playgroundEnabled);
+}
+
+function updatePlaygroundGamesVisibility(playgroundEnabled: boolean, animated = false): void {
+  const section = controls.playgroundGamesSection;
+  if (!section) return;
+
+  const token = ++playgroundGamesVisibilityToken;
+  const shouldAnimate = animated && !prefersReducedMotion();
+
+  if (playgroundEnabled) {
+    section.hidden = false;
+    if (!shouldAnimate) {
+      section.classList.remove(PLAYGROUND_GROUP_COLLAPSED_CLASS);
+      return;
+    }
+
+    section.classList.add(PLAYGROUND_GROUP_COLLAPSED_CLASS);
+    window.setTimeout(() => {
+      if (token === playgroundGamesVisibilityToken) {
+        section.classList.remove(PLAYGROUND_GROUP_COLLAPSED_CLASS);
+      }
+    }, 0);
+    return;
+  }
+
+  section.classList.add(PLAYGROUND_GROUP_COLLAPSED_CLASS);
+  if (!shouldAnimate) {
+    section.hidden = true;
+    return;
+  }
+
+  window.setTimeout(() => {
+    if (token === playgroundGamesVisibilityToken) section.hidden = true;
+  }, PLAYGROUND_GROUP_ANIMATION_MS);
+}
+
+function clearPlaygroundOptionControls(): void {
+  if (controls.playgroundGamesAvailable) {
+    controls.playgroundGamesAvailable.checked = false;
+  }
 }
 
 function createLanguageOption(value: string, label: string): HTMLOptionElement {

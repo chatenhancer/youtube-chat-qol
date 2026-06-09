@@ -3100,7 +3100,7 @@ async function installPopupPresentationLayer(page) {
         opacity: 0 !important;
         overflow: hidden !important;
         transition: none !important;
-        width: 360px !important;
+        width: 350px !important;
       }
 
       .popup-tab-panel {
