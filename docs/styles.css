@@ -255,7 +255,8 @@ h1 {
   margin-bottom: 22px;
   font-size: clamp(44px, 7vw, 78px);
   line-height: 0.98;
-  letter-spacing: 0;
+  letter-spacing: -2px;
+  font-weight: 750;
 }
 
 h2 {
