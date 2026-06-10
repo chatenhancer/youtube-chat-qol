@@ -1,5 +1,5 @@
 export interface Env {
-  ALLOWED_ORIGINS?: string;
+  ALLOWED_ORIGIN_PATTERNS?: string;
   STREAM_ROOMS: DurableObjectNamespace;
 }
 
