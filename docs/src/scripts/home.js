@@ -45,7 +45,7 @@
     languageSwitcher.value = getCurrentLocalePath(languageSwitcher);
     languageSwitcher.addEventListener("change", () => {
       const nextPath = getLocalePath(languageSwitcher);
-      const locale = nextPath === "/" ? "en" : nextPath.replace(/^\/|\/$/g, "");
+      const locale = languageSwitcher.selectedOptions[0]?.dataset.locale || (nextPath === "/" ? "en" : nextPath.split("/").filter(Boolean)[0]);
       document.cookie = `ce_lang=${encodeURIComponent(locale)}; Max-Age=31536000; Path=/; SameSite=Lax; Secure`;
       window.location.assign(nextPath);
     });
@@ -55,13 +55,13 @@
     const value = select.value;
     const optionExists = Array.from(select.options).some((option) => option.value === value);
     if (!optionExists) return "/";
-    return /^\/(?:[a-z]{2}(?:-[A-Z]{2})?\/)?$/.test(value) ? value : "/";
+    return value.startsWith("/") && !value.startsWith("//") ? value : "/";
   }
 
   function getCurrentLocalePath(select) {
-    const path = window.location.pathname;
+    const path = window.location.pathname.endsWith("/") ? window.location.pathname : `${window.location.pathname}/`;
     const options = Array.from(select.options).map((option) => option.value);
-    return options.find((value) => value !== "/" && path === value.slice(0, -1)) ||
+    return options.find((value) => path === value) ||
       options.find((value) => value !== "/" && path.startsWith(value)) ||
       "/";
   }

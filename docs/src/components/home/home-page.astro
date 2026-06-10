@@ -1,5 +1,6 @@
 ---
 import type { CollectionEntry } from 'astro:content';
+import type { Locale } from '../../data/locales';
 import type { Messages } from '../../data/site';
 import Commands from './commands.astro';
 import Features from './features.astro';
@@ -10,7 +11,8 @@ import Playground from './playground.astro';
 import Privacy from './privacy.astro';
 import Screenshots from './screenshots.astro';
 
-const { messages, posts, rootPrefix } = Astro.props as {
+const { locale, messages, posts, rootPrefix } = Astro.props as {
+  locale: Locale;
   messages: Messages;
   posts: CollectionEntry<'blog'>[];
   rootPrefix: string;
@@ -24,4 +26,4 @@ const { messages, posts, rootPrefix } = Astro.props as {
 <Install messages={messages} rootPrefix={rootPrefix} />
 <Privacy messages={messages} />
 <Commands messages={messages} />
-<LatestUpdates posts={posts} rootPrefix={rootPrefix} />
+<LatestUpdates locale={locale} posts={posts} />

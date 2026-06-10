@@ -1,7 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import { Image } from 'astro:assets';
-import BlogLayout from '../../layouts/blog-layout.astro';
+import BlogLayout from '../../../layouts/blog-layout.astro';
 import {
   getBlogEntryFolder,
   getBlogIndexAlternateLinks,
@@ -10,12 +10,21 @@ import {
   getBlogMessages,
   getBlogPostPath,
   getLocalizedBlogPosts
-} from '../../data/blog';
-import { getBlogCoverVideoUrl } from '../../data/blog-media';
-import { getMessages, htmlLangFor } from '../../data/locales';
+} from '../../../data/blog';
+import { getBlogCoverVideoUrl } from '../../../data/blog-media';
+import { getLocaleFromPath, getMessages, htmlLangFor, localeMeta, locales } from '../../../data/locales';
 
-const locale = 'en';
-const messages = getMessages('en');
+export function getStaticPaths() {
+  return locales
+    .filter((locale) => locale !== 'en')
+    .map((locale) => ({
+      params: { locale: localeMeta[locale].path },
+      props: { resolvedLocale: locale }
+    }));
+}
+
+const locale = Astro.props.resolvedLocale ?? getLocaleFromPath(Astro.params.locale || '');
+const messages = getMessages(locale);
 const blog = getBlogMessages(locale);
 const posts = getLocalizedBlogPosts(await getCollection('blog'), locale);
 const formatter = new Intl.DateTimeFormat(htmlLangFor(locale), {
@@ -33,6 +42,7 @@ const BLOG_CARD_IMAGE_WIDTH = 1280;
   languageUrls={getBlogIndexLanguageUrls()}
   locale={locale}
   messages={messages}
+  rootPrefix="../../"
   title={blog.updates}
   xDefaultUrl={getBlogIndexUrl('en')}
 >

@@ -18,13 +18,13 @@ const timezoneAliases = ['utc', 'tokyo', 'jst', 'seoul', 'kst', 'london', 'paris
     <h2 id="commands-title">{m.commands.title}</h2>
     <p class="section-copy">{m.commands.copy}</p>
 
-    <div class="command-notes" aria-label="Command usage notes">
+    <div class="command-notes" aria-label={m.commands.title}>
       <article class="command-note">
         <div class="command-note-heading">
           <strong>{m.commands.inlineTitle}</strong>
           <span>{m.commands.inlineBody}</span>
         </div>
-        <div class="command-chip-list" aria-label="Inline commands">
+        <div class="command-chip-list" aria-label={m.commands.inlineTitle.replace(/:$/, '')}>
           {inlineCommands.map((command) => <code>{command}</code>)}
         </div>
       </article>
@@ -33,7 +33,7 @@ const timezoneAliases = ['utc', 'tokyo', 'jst', 'seoul', 'kst', 'london', 'paris
           <strong>{m.commands.wholeTitle}</strong>
           <span>{m.commands.wholeBody}</span>
         </div>
-        <div class="command-chip-list" aria-label="Whole-input commands">
+        <div class="command-chip-list" aria-label={m.commands.wholeTitle.replace(/:$/, '')}>
           {wholeCommands.map((command) => <code>{command}</code>)}
         </div>
       </article>

@@ -1,7 +1,7 @@
 ---
 import { getCollection, render } from 'astro:content';
 import { Image } from 'astro:assets';
-import BlogLayout from '../../../layouts/blog-layout.astro';
+import BlogLayout from '../../../../layouts/blog-layout.astro';
 import {
   getBlogEntryFolder,
   getBlogIndexPath,
@@ -10,19 +10,25 @@ import {
   getBlogPostLanguageUrls,
   getBlogPostUrl,
   getPostLocale
-} from '../../../data/blog';
-import { getBlogCoverVideoUrl } from '../../../data/blog-media';
-import { getMessages, htmlLangFor } from '../../../data/locales';
-import { site } from '../../../data/site';
+} from '../../../../data/blog';
+import { getBlogCoverVideoUrl } from '../../../../data/blog-media';
+import { getMessages, htmlLangFor, localeMeta } from '../../../../data/locales';
+import { site } from '../../../../data/site';
 
 export async function getStaticPaths() {
   const posts = await getCollection('blog');
   return posts
-    .filter((post) => post.data.locale === 'en')
-    .map((post) => ({
-      params: { slug: post.data.slug },
-      props: { allPosts: posts, post }
-    }));
+    .filter((post) => post.data.locale !== 'en')
+    .map((post) => {
+      const locale = getPostLocale(post);
+      return {
+        params: {
+          locale: localeMeta[locale].path,
+          slug: post.data.slug
+        },
+        props: { allPosts: posts, post }
+      };
+    });
 }
 
 const { allPosts, post } = Astro.props;
@@ -94,18 +100,18 @@ function escapeHtml(value: string): string {
 ---
 
 <BlogLayout
+  alternateLinks={getBlogPostAlternateLinks(allPosts, post)}
   canonicalUrl={canonicalUrl}
   description={post.data.description}
   image={coverUrl}
-  alternateLinks={getBlogPostAlternateLinks(allPosts, post)}
   languageUrls={getBlogPostLanguageUrls(allPosts, post)}
   locale={locale}
   messages={messages}
   ogType="article"
-  rootPrefix="../../"
+  rootPrefix="../../../"
   structuredData={blogPostStructuredData}
   title={post.data.title}
-  xDefaultUrl={getBlogPostUrl(post)}
+  xDefaultUrl={getBlogPostUrl(allPosts.find((candidate) => candidate.data.translationKey === post.data.translationKey && candidate.data.locale === 'en') || post)}
 >
   <article class="blog-post">
     <header class="blog-post-header">
