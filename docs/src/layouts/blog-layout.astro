@@ -2,6 +2,8 @@
 import BaseLayout from './base-layout.astro';
 import Header from '../components/home/header.astro';
 import Footer from '../components/home/footer.astro';
+import type { AlternateLink } from '../data/blog';
+import type { Locale } from '../data/locales';
 import type { Messages } from '../data/site';
 
 type JsonLdData = Record<string, unknown> | Record<string, unknown>[] | null;
@@ -10,37 +12,45 @@ const {
   canonicalUrl,
   description,
   image,
+  languageUrls = {},
+  locale,
   messages,
   ogType = 'website',
   rootPrefix = '../',
   structuredData = null,
-  title
+  title,
+  alternateLinks = [],
+  xDefaultUrl = null
 } = Astro.props as {
+  alternateLinks?: AlternateLink[];
   canonicalUrl: string;
   description: string;
   image?: string;
+  languageUrls?: Partial<Record<Locale, string>>;
+  locale: Locale;
   messages: Messages;
   ogType?: string;
   rootPrefix?: string;
   structuredData?: JsonLdData;
   title: string;
+  xDefaultUrl?: string | null;
 };
 ---
 
 <BaseLayout
-  alternateLinks={[]}
+  alternateLinks={alternateLinks}
   canonicalUrl={canonicalUrl}
   description={description}
   image={image}
-  locale="en"
+  locale={locale}
   messages={messages}
   ogType={ogType}
   rootPrefix={rootPrefix}
   structuredData={structuredData}
   title={`${title} - Chat Enhancer for YouTube`}
-  xDefaultUrl={null}
+  xDefaultUrl={xDefaultUrl}
 >
-  <Header messages={messages} rootPrefix={rootPrefix} />
+  <Header languageUrls={languageUrls} locale={locale} messages={messages} />
   <main class="blog-page">
     <slot />
   </main>

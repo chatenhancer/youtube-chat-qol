@@ -1,0 +1,48 @@
+---
+title: "Playground の紹介：ライブチャットの合間に遊べる小さなゲーム"
+date: 2026-06-10
+description: "Playground は Chat Enhancer 拡張機能の新機能で、ライブチャット中にチェスのようなコンパクトなゲームを他のユーザーと遊べます。"
+locale: "ja"
+slug: "introducing-playground-tiny-games-for-live-chat-breaks"
+translationKey: "introducing-playground-tiny-games-for-live-chat-breaks"
+image: "./cover.png"
+video: "./cover.mp4"
+tags:
+  - "playground"
+  - "chat"
+  - "games"
+  - "chess"
+  - "extension"
+---
+
+## Playground が登場しました！
+
+Playground は拡張機能の中にあるゲームハブです。同じ拡張機能を入れている他のユーザーと一緒に遊べます。
+
+配信者が少し席を外したところですか？戻ってくるまで Playground を開いてみてください。
+
+:::media-right
+
+![YouTube ライブチャットの上に浮かぶコンパクトなチェスゲームパネル](./game-panel.png){shadow=smooth rotation=-2}
+
+ゲームはコンパクトで、これより大きくなりすぎることはありません。パネルはドラッグできるので、チャット内の好きな場所に置けます。
+
+最初に遊べるゲームは、定番のチェスです。新しい配信仲間をどれくらい早くチェックメイトできますか？
+
+:::
+
+拡張機能の設定のこのセクションで Playground のオプションを探してください。
+
+:::media-left
+
+![Chat Enhancer ポップアップ内の Playground 設定](./settings.png){crop=1.04;focus=26.3%,0%;rotate=0.5deg}
+
+「Playground に参加」を有効にすると、チャットにゲームアイコンが表示されます。
+
+ゲームパネルを開いたら、他のプレイヤーから見えるように「ゲームに参加可能」を有効にします。または拡張機能の設定で「デフォルトで参加可能」を有効にして、常にオンにしておくこともできます。選び方は自由です。
+
+:::
+
+今後さらにゲームが追加される予定です！
+
+提案があれば [hello@chatenhancer.com](mailto:hello@chatenhancer.com) までメールしてください。

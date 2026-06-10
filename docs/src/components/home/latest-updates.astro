@@ -1,15 +1,19 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import { Image } from 'astro:assets';
+import { getBlogEntryFolder, getBlogIndexPath, getBlogMessages, getBlogPostPath } from '../../data/blog';
 import { getBlogCoverVideoUrl } from '../../data/blog-media';
+import { htmlLangFor } from '../../data/locales';
+import type { Locale } from '../../data/locales';
 
-const { posts, rootPrefix } = Astro.props as {
+const { locale, posts } = Astro.props as {
+  locale: Locale;
   posts: CollectionEntry<'blog'>[];
-  rootPrefix: string;
 };
 
 const latestPosts = posts.slice(0, 3);
-const formatter = new Intl.DateTimeFormat('en', {
+const blog = getBlogMessages(locale);
+const formatter = new Intl.DateTimeFormat(htmlLangFor(locale), {
   day: 'numeric',
   month: 'short',
   year: 'numeric'
@@ -22,17 +26,17 @@ const BLOG_CARD_IMAGE_WIDTH = 1280;
     <div class="section-inner latest-updates-inner">
       <div class="latest-updates-heading">
         <div>
-          <p class="eyebrow">Updates</p>
-          <h2 id="latest-updates-title">Latest notes</h2>
+          <p class="eyebrow">{blog.updates}</p>
+          <h2 id="latest-updates-title">{blog.latestNotes}</h2>
         </div>
-        <a class="feature-link" href={`${rootPrefix}blog/`} data-blog-archive-link>View all updates</a>
+        <a class="feature-link" href={getBlogIndexPath(locale)} data-blog-archive-link>{blog.viewAllUpdates}</a>
       </div>
       <div class="latest-updates-grid" data-blog-latest-list>
         {latestPosts.map((post) => {
-          const coverVideoUrl = getBlogCoverVideoUrl(post.data.slug, post.data.video);
+          const coverVideoUrl = getBlogCoverVideoUrl(getBlogEntryFolder(post), post.data.video);
 
           return (
-            <a class="latest-update-card" href={`${rootPrefix}blog/${post.data.slug}/`}>
+            <a class="latest-update-card" href={getBlogPostPath(post)}>
               <span class="latest-update-media">
                 {post.data.image && (coverVideoUrl ? (
                   <video src={coverVideoUrl} poster={post.data.image.src} autoplay muted loop playsinline preload="metadata" aria-hidden="true" />

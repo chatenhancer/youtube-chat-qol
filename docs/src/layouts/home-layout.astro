@@ -17,7 +17,7 @@ const { clientConfig = {}, locale, messages, rootPrefix } = Astro.props as {
 ---
 
 <BaseLayout clientConfig={clientConfig} locale={locale} messages={messages} rootPrefix={rootPrefix}>
-  <Header messages={messages} rootPrefix={rootPrefix} />
+  <Header locale={locale} messages={messages} />
   <StoreVersionAlert messages={messages} />
   <main id="top">
     <slot />

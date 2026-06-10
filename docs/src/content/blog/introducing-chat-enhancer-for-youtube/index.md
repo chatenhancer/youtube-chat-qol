@@ -2,7 +2,9 @@
 title: "Introducing Chat Enhancer for YouTube"
 date: 2026-06-01
 description: "Chat Enhancer for YouTube is a free, open-source extension that aims to improve the YouTube live chat experience."
+locale: "en"
 slug: "introducing-chat-enhancer-for-youtube"
+translationKey: "introducing-chat-enhancer-for-youtube"
 image: "./cover.png"
 tags:
   - "youtube"

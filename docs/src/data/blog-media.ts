@@ -4,9 +4,9 @@ const blogCoverVideos = import.meta.glob('../content/blog/**/cover.mp4', {
   query: '?url'
 }) as Record<string, string>;
 
-export function getBlogCoverVideoUrl(slug: string, videoPath?: string): string | undefined {
+export function getBlogCoverVideoUrl(folder: string, videoPath?: string): string | undefined {
   if (!videoPath) return undefined;
 
   const normalizedVideoPath = videoPath.replace(/^\.\//, '');
-  return blogCoverVideos[`../content/blog/${slug}/${normalizedVideoPath}`];
+  return blogCoverVideos[`../content/blog/${folder}/${normalizedVideoPath}`];
 }

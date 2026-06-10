@@ -1,6 +1,6 @@
 import { getCollection } from 'astro:content';
+import { getBlogIndexUrl, getBlogPostUrl } from '../data/blog';
 import { canonicalUrlFor, locales } from '../data/locales';
-import { site } from '../data/site';
 
 export async function GET() {
   const posts = await getCollection('blog');
@@ -17,12 +17,19 @@ export async function GET() {
     {
       changefreq: 'weekly',
       lastmod: latestPostLastmod,
-      loc: `${site.url}/blog/`
+      loc: getBlogIndexUrl('en')
     },
+    ...locales
+      .filter((locale) => locale !== 'en')
+      .map((locale) => ({
+        changefreq: 'weekly',
+        lastmod: latestPostLastmod,
+        loc: getBlogIndexUrl(locale)
+      })),
     ...posts.map((post) => ({
       changefreq: 'monthly',
       lastmod: post.data.date.toISOString().slice(0, 10),
-      loc: `${site.url}/blog/${post.data.slug}/`
+      loc: getBlogPostUrl(post)
     }))
   ];
 
