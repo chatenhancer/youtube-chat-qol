@@ -11,15 +11,24 @@ import type { Env } from './types';
 
 describe('playground HTTP helpers', () => {
   const env = {
-    ALLOWED_ORIGINS: 'https://chatenhancer.com, chrome-extension://abc'
+    ALLOWED_ORIGIN_PATTERNS: 'https://chatenhancer.com, chrome-extension://, moz-extension://, http://localhost:, http://127.0.0.1:'
   } as Env;
 
-  it('allows configured origins and browser extension origins', () => {
+  it('allows configured exact origins and prefix patterns', () => {
     expect(isAllowedOrigin('https://chatenhancer.com', env)).toBe(true);
     expect(isAllowedOrigin('chrome-extension://abc', env)).toBe(true);
     expect(isAllowedOrigin('moz-extension://generated-id', env)).toBe(true);
     expect(isAllowedOrigin('http://localhost:8787', env)).toBe(true);
     expect(isAllowedOrigin('https://example.com', env)).toBe(false);
+  });
+
+  it('does not allow extension origins unless the pattern is configured', () => {
+    const strictEnv = {
+      ALLOWED_ORIGIN_PATTERNS: 'https://chatenhancer.com'
+    } as Env;
+
+    expect(isAllowedOrigin('chrome-extension://abc', strictEnv)).toBe(false);
+    expect(isAllowedOrigin('moz-extension://generated-id', strictEnv)).toBe(false);
   });
 
   it('creates CORS headers only for allowed origins', () => {

@@ -1,12 +1,5 @@
 import type { Env } from './types';
 
-const DEFAULT_ALLOWED_ORIGIN_PREFIXES = [
-  'chrome-extension://',
-  'moz-extension://',
-  'http://localhost:',
-  'http://127.0.0.1:'
-];
-
 export function createJsonResponse(body: unknown, init: ResponseInit = {}): Response {
   const headers = new Headers(init.headers);
   headers.set('Content-Type', 'application/json; charset=utf-8');
@@ -44,13 +37,22 @@ export function createCorsHeaders(request: Request, env: Env): Headers {
 export function isAllowedOrigin(origin: string, env: Env): boolean {
   if (!origin) return true;
 
-  const configured = (env.ALLOWED_ORIGINS || '')
+  return getAllowedOriginPatterns(env).some((pattern) => {
+    return isOriginPrefixPattern(pattern)
+      ? origin.startsWith(pattern)
+      : origin === pattern;
+  });
+}
+
+function getAllowedOriginPatterns(env: Env): string[] {
+  return (env.ALLOWED_ORIGIN_PATTERNS || '')
     .split(',')
     .map((value) => value.trim())
     .filter(Boolean);
+}
 
-  if (configured.includes(origin)) return true;
-  return DEFAULT_ALLOWED_ORIGIN_PREFIXES.some((prefix) => origin.startsWith(prefix));
+function isOriginPrefixPattern(pattern: string): boolean {
+  return pattern.endsWith('://') || pattern.endsWith(':');
 }
 
 export function isWebSocketUpgrade(request: Request): boolean {

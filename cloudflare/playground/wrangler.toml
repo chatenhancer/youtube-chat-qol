@@ -15,7 +15,7 @@ head_sampling_rate = 1
 invocation_logs = false
 
 [vars]
-ALLOWED_ORIGINS = "https://chatenhancer.com,https://www.chatenhancer.com,chrome-extension://pkhaaipeppfpakofgpdpcpkflangpghf,chrome-extension://pjmcgbmponmimjcopjekelpffkdjekkp"
+ALLOWED_ORIGIN_PATTERNS = "https://chatenhancer.com,https://www.chatenhancer.com,chrome-extension://,moz-extension://,http://localhost:,http://127.0.0.1:"
 
 [[durable_objects.bindings]]
 name = "STREAM_ROOMS"

@@ -117,7 +117,7 @@ function createEnv(fetchRoom: DurableObjectStub['fetch'] = async () => new Respo
   };
 
   return {
-    ALLOWED_ORIGINS: 'https://chatenhancer.com,chrome-extension://abc',
+    ALLOWED_ORIGIN_PATTERNS: 'https://chatenhancer.com,chrome-extension://',
     STREAM_ROOMS: namespace
   };
 }
