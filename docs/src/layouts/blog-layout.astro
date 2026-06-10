@@ -4,32 +4,41 @@ import Header from '../components/home/header.astro';
 import Footer from '../components/home/footer.astro';
 import type { Messages } from '../data/site';
 
+type JsonLdData = Record<string, unknown> | Record<string, unknown>[] | null;
+
 const {
   canonicalUrl,
   description,
   image,
   messages,
+  ogType = 'website',
   rootPrefix = '../',
+  structuredData = null,
   title
 } = Astro.props as {
   canonicalUrl: string;
   description: string;
   image?: string;
   messages: Messages;
+  ogType?: string;
   rootPrefix?: string;
+  structuredData?: JsonLdData;
   title: string;
 };
 ---
 
 <BaseLayout
+  alternateLinks={[]}
   canonicalUrl={canonicalUrl}
   description={description}
   image={image}
   locale="en"
   messages={messages}
-  ogType="article"
+  ogType={ogType}
   rootPrefix={rootPrefix}
+  structuredData={structuredData}
   title={`${title} - Chat Enhancer for YouTube`}
+  xDefaultUrl={null}
 >
   <Header messages={messages} rootPrefix={rootPrefix} />
   <main class="blog-page">

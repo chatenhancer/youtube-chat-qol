@@ -4,13 +4,19 @@ import { site } from '../data/site';
 
 export async function GET() {
   const posts = await getCollection('blog');
+  const postLastmodDates = posts
+    .map((post) => post.data.date.toISOString().slice(0, 10))
+    .sort();
+  const latestPostLastmod = postLastmodDates[postLastmodDates.length - 1];
   const urls = [
     ...locales.map((locale) => ({
       changefreq: 'weekly',
+      lastmod: latestPostLastmod,
       loc: canonicalUrlFor(locale)
     })),
     {
       changefreq: 'weekly',
+      lastmod: latestPostLastmod,
       loc: `${site.url}/blog/`
     },
     ...posts.map((post) => ({

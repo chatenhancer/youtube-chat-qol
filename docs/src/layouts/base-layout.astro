@@ -6,7 +6,15 @@ import { canonicalUrlFor, htmlLangFor, localeMeta, locales } from '../data/local
 import { site, supportEmail } from '../data/site';
 import type { Messages } from '../data/site';
 
+type AlternateLink = {
+  href: string;
+  hreflang: string;
+};
+
+type JsonLdData = Record<string, unknown> | Record<string, unknown>[] | null;
+
 const {
+  alternateLinks,
   children,
   locale,
   messages,
@@ -17,8 +25,11 @@ const {
   image = `${site.url}/assets/social-card.png`,
   imageAlt = messages.meta.imageAlt,
   ogType = 'website',
+  structuredData,
+  xDefaultUrl,
   clientConfig = {}
 } = Astro.props as {
+  alternateLinks?: AlternateLink[];
   canonicalUrl?: string;
   clientConfig?: Record<string, unknown>;
   children: unknown;
@@ -29,20 +40,53 @@ const {
   messages: Messages;
   ogType?: string;
   rootPrefix?: string;
+  structuredData?: JsonLdData;
   title?: string;
+  xDefaultUrl?: string | null;
 };
 
 const meta = localeMeta[locale];
 const htmlLang = htmlLangFor(locale);
-const alternateLinks = locales.map((entry) => ({
+const isLocalizedHomePage = canonicalUrl === canonicalUrlFor(locale);
+const defaultAlternateLinks = isLocalizedHomePage ? locales.map((entry) => ({
   href: canonicalUrlFor(entry),
   hreflang: htmlLangFor(entry)
-}));
+})) : [];
+const resolvedAlternateLinks = alternateLinks ?? defaultAlternateLinks;
+const resolvedXDefaultUrl = xDefaultUrl ?? (isLocalizedHomePage ? canonicalUrlFor('en') : null);
 const stylesheetPreload = `${rootPrefix}assets/fonts/InterVariable.woff2`;
 const docsConfig = {
   supportEmail,
   ...clientConfig
 };
+const defaultStructuredData = ogType === 'website' ? {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: site.title,
+  description,
+  url: canonicalUrl,
+  image,
+  applicationCategory: 'BrowserApplication',
+  operatingSystem: 'Chrome, Firefox',
+  offers: {
+    '@type': 'Offer',
+    price: '0',
+    priceCurrency: 'USD'
+  },
+  downloadUrl: [
+    site.chromeUrl,
+    site.firefoxUrl
+  ],
+  sameAs: [
+    site.sourceUrl,
+    site.chromeUrl,
+    site.firefoxUrl
+  ]
+} : null;
+const resolvedStructuredData = structuredData === undefined ? defaultStructuredData : structuredData;
+const structuredDataJson = resolvedStructuredData
+  ? JSON.stringify(resolvedStructuredData).replace(/</g, '\\u003c')
+  : null;
 ---
 
 <!doctype html>
@@ -55,7 +99,7 @@ const docsConfig = {
     <meta name="robots" content="index, follow">
     <meta name="theme-color" content="#ffffff">
     <link rel="canonical" href={canonicalUrl}>
-    <meta property="og:title" content={site.title}>
+    <meta property="og:title" content={title}>
     <meta property="og:description" content={description}>
     <meta property="og:type" content={ogType}>
     <meta property="og:url" content={canonicalUrl}>
@@ -68,12 +112,12 @@ const docsConfig = {
     <meta property="og:image:height" content="630">
     <meta property="og:image:alt" content={imageAlt}>
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content={site.title}>
+    <meta name="twitter:title" content={title}>
     <meta name="twitter:description" content={description}>
     <meta name="twitter:image" content={image}>
     <meta name="twitter:image:alt" content={imageAlt}>
-    {alternateLinks.map((link) => <link rel="alternate" hreflang={link.hreflang} href={link.href} />)}
-    <link rel="alternate" hreflang="x-default" href={canonicalUrlFor('en')}>
+    {resolvedAlternateLinks.map((link) => <link rel="alternate" hreflang={link.hreflang} href={link.href} />)}
+    {resolvedXDefaultUrl && <link rel="alternate" hreflang="x-default" href={resolvedXDefaultUrl} />}
     <link rel="icon" href={`${rootPrefix}assets/icons/icon-128.png`}>
     <link rel="apple-touch-icon" href={`${rootPrefix}assets/icons/icon-128.png`}>
     <link rel="preload" href={stylesheetPreload} as="font" type="font/woff2" crossorigin>
@@ -85,30 +129,7 @@ const docsConfig = {
         }
       })();
     </script>
-    <script type="application/ld+json" set:html={JSON.stringify({
-      '@context': 'https://schema.org',
-      '@type': 'SoftwareApplication',
-      name: site.title,
-      description,
-      url: canonicalUrl,
-      image,
-      applicationCategory: 'BrowserApplication',
-      operatingSystem: 'Chrome, Firefox',
-      offers: {
-        '@type': 'Offer',
-        price: '0',
-        priceCurrency: 'USD'
-      },
-      downloadUrl: [
-        site.chromeUrl,
-        site.firefoxUrl
-      ],
-      sameAs: [
-        site.sourceUrl,
-        site.chromeUrl,
-        site.firefoxUrl
-      ]
-    })}></script>
+    {structuredDataJson && <script type="application/ld+json" set:html={structuredDataJson}></script>}
   </head>
   <body>
     <slot />
