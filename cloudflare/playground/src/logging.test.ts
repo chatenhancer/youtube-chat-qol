@@ -19,7 +19,7 @@ describe('playground logging', () => {
       user: undefined
     });
 
-    expect(info).toHaveBeenCalledWith('[Chat Enhancer Playground]', {
+    expect(info).toHaveBeenCalledWith('[Chat Enhancer Playground] game_started', {
       event: 'game_started',
       game: 'game_123',
       room: hashLogValue('stream-id'),
@@ -34,11 +34,11 @@ describe('playground logging', () => {
     logPlaygroundEvent('origin_rejected', {}, 'warn');
     logPlaygroundEvent('room_fetch_failed', {}, 'error');
 
-    expect(warn).toHaveBeenCalledWith('[Chat Enhancer Playground]', {
+    expect(warn).toHaveBeenCalledWith('[Chat Enhancer Playground] origin_rejected', {
       event: 'origin_rejected',
       service: 'chat-enhancer-playground'
     });
-    expect(error).toHaveBeenCalledWith('[Chat Enhancer Playground]', {
+    expect(error).toHaveBeenCalledWith('[Chat Enhancer Playground] room_fetch_failed', {
       event: 'room_fetch_failed',
       service: 'chat-enhancer-playground'
     });

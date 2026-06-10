@@ -91,7 +91,7 @@ describe('playground stream room', () => {
     room.handleInviteResponse(bob, inviteReceived.invite.inviteId, true);
     const gameStarted = lastMessage(alice, 'gameStarted');
     const startedChessGame = gameStarted.game as PublicChessGame;
-    expect(console.info).toHaveBeenCalledWith('[Chat Enhancer Playground]', expect.objectContaining({
+    expect(console.info).toHaveBeenCalledWith('[Chat Enhancer Playground] game_started', expect.objectContaining({
       event: 'game_started',
       game: expect.stringMatching(/^game_[\w-]+$/),
       gameType: 'chess',
@@ -311,7 +311,7 @@ describe('playground stream room', () => {
       message: 'Slow down before sending more playground messages.',
       type: 'error'
     });
-    expect(console.warn).toHaveBeenCalledWith('[Chat Enhancer Playground]', expect.objectContaining({
+    expect(console.warn).toHaveBeenCalledWith('[Chat Enhancer Playground] rate_limit_rejected', expect.objectContaining({
       code: 'rate_limited',
       event: 'rate_limit_rejected',
       service: 'chat-enhancer-playground',

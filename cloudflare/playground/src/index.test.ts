@@ -36,7 +36,7 @@ describe('playground worker routes', () => {
     }), createEnv());
 
     expect(response.status).toBe(403);
-    expect(console.warn).toHaveBeenCalledWith('[Chat Enhancer Playground]', expect.objectContaining({
+    expect(console.warn).toHaveBeenCalledWith('[Chat Enhancer Playground] origin_rejected', expect.objectContaining({
       event: 'origin_rejected',
       origin: expect.stringMatching(/^h_[a-z0-9]+$/),
       service: 'chat-enhancer-playground'

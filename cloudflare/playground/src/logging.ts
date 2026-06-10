@@ -15,7 +15,7 @@ export function logPlaygroundEvent(
     ...compactDetails(details)
   };
 
-  getConsoleMethod(level)(LOG_PREFIX, payload);
+  getConsoleMethod(level)(`${LOG_PREFIX} ${event}`, payload);
 }
 
 export function hashLogValue(value: string): string {
