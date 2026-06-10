@@ -48,6 +48,19 @@
     "walkthroughModalTitle": "Feature-Walkthrough",
     "walkthroughClose": "Walkthrough schließen"
   },
+  "playground": {
+    "eyebrow": "Playground",
+    "title": "Kleine Spiele für<br>Pausen im Livechat",
+    "copy": "Playground ist ein optionaler Bereich für Experimente, die Streams interaktiver machen. Schach kommt zuerst: Lade einen verfügbaren Zuschauer* ein, starte das Spiel und behalte den Chat daneben.",
+    "tagsAria": "Playground-Highlights",
+    "tagOptIn": "Optionale Beta",
+    "tagStream": "Stream-Lobbys",
+    "tagChess": "Schnelle Spiele",
+    "primaryCta": "In der Erweiterung ausprobieren",
+    "secondaryCta": "Wie Playground mit Daten umgeht",
+    "imageAlt": "Schwebendes Schachfenster im YouTube-Livechat",
+    "note": "* Beide Spieler brauchen die Erweiterung, um zusammen zu spielen"
+  },
   "screenshots": {
     "eyebrow": "Screenshots",
     "title": "Chat-Verbesserungen<br>im nativen Stil",

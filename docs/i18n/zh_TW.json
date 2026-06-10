@@ -48,6 +48,19 @@
     "walkthroughModalTitle": "功能導覽",
     "walkthroughClose": "關閉導覽"
   },
+  "playground": {
+    "eyebrow": "Playground",
+    "title": "直播聊天空檔裡的<br>小遊戲",
+    "copy": "Playground 是一個可選擇加入的實驗空間，讓直播更有互動感。首先推出的是西洋棋：邀請一位可用的觀眾*，開始遊戲，同時繼續看聊天。",
+    "tagsAria": "Playground 亮點",
+    "tagOptIn": "可選測試版",
+    "tagStream": "直播大廳",
+    "tagChess": "快速遊戲",
+    "primaryCta": "在擴充功能中試用",
+    "secondaryCta": "Playground 如何處理資料",
+    "imageAlt": "YouTube 直播聊天中的浮動西洋棋遊戲面板",
+    "note": "* 兩位玩家都需要安裝擴充功能才能一起玩"
+  },
   "screenshots": {
     "eyebrow": "截圖",
     "title": "自然融入的<br>聊天室改善",

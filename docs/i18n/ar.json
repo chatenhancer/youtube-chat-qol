@@ -48,6 +48,19 @@
     "walkthroughModalTitle": "شرح الميزات",
     "walkthroughClose": "إغلاق الشرح"
   },
+  "playground": {
+    "eyebrow": "Playground",
+    "title": "ألعاب صغيرة<br>للحظات هدوء الدردشة",
+    "copy": "Playground مساحة اختيارية للتجارب التي تجعل البثوث أكثر تفاعلاً. الشطرنج أول لعبة: ادعُ مشاهدًا متاحًا*، وابدأ اللعبة، وتابع الدردشة بجانبها.",
+    "tagsAria": "أبرز مزايا Playground",
+    "tagOptIn": "تجريبي اختياري",
+    "tagStream": "ردهات لكل بث",
+    "tagChess": "ألعاب سريعة",
+    "primaryCta": "جرّبه داخل الإضافة",
+    "secondaryCta": "كيف يتعامل Playground مع البيانات",
+    "imageAlt": "لوحة شطرنج عائمة داخل دردشة YouTube المباشرة",
+    "note": "* يحتاج اللاعبان إلى الإضافة للعب معًا"
+  },
   "screenshots": {
     "eyebrow": "الصور",
     "title": "تحسينات دردشة<br>بطابع أصلي",

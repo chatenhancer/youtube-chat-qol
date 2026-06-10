@@ -48,6 +48,19 @@
     "walkthroughModalTitle": "Functierondleiding",
     "walkthroughClose": "Rondleiding sluiten"
   },
+  "playground": {
+    "eyebrow": "Playground",
+    "title": "Kleine games voor<br>pauzes in livechat",
+    "copy": "Playground is een optionele ruimte voor experimenten die streams interactiever maken. Schaken komt eerst: nodig een beschikbare kijker* uit, start de game en blijf de chat volgen.",
+    "tagsAria": "Playground-hoogtepunten",
+    "tagOptIn": "Optionele bèta",
+    "tagStream": "Streamlobby’s",
+    "tagChess": "Snelle games",
+    "primaryCta": "Probeer het in de extensie",
+    "secondaryCta": "Hoe Playground met gegevens omgaat",
+    "imageAlt": "Zwevend schaakpaneel in YouTube-livechat",
+    "note": "* Beide spelers hebben de extensie nodig om samen te spelen"
+  },
   "screenshots": {
     "eyebrow": "Screenshots",
     "title": "Chatverbeteringen<br>die native aanvoelen",

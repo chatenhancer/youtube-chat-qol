@@ -48,6 +48,19 @@
     "walkthroughModalTitle": "Prezentacja funkcji",
     "walkthroughClose": "Zamknij prezentację"
   },
+  "playground": {
+    "eyebrow": "Playground",
+    "title": "Małe gry na<br>przerwy w czacie na żywo",
+    "copy": "Playground to opcjonalna przestrzeń eksperymentów, które sprawiają, że transmisje są bardziej interaktywne. Najpierw szachy: zaproś dostępnego widza*, rozpocznij grę i miej czat pod ręką.",
+    "tagsAria": "Najważniejsze informacje o Playground",
+    "tagOptIn": "Opcjonalna beta",
+    "tagStream": "Lobby transmisji",
+    "tagChess": "Szybkie gry",
+    "primaryCta": "Wypróbuj w rozszerzeniu",
+    "secondaryCta": "Jak Playground obsługuje dane",
+    "imageAlt": "Pływający panel gry w szachy w czacie na żywo YouTube",
+    "note": "* Obaj gracze potrzebują rozszerzenia, aby grać razem"
+  },
   "screenshots": {
     "eyebrow": "Zrzuty ekranu",
     "title": "Ulepszenia czatu<br>wyglądające naturalnie",

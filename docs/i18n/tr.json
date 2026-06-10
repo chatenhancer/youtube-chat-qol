@@ -48,6 +48,19 @@
     "walkthroughModalTitle": "Özellik tanıtımı",
     "walkthroughClose": "Tanıtımı kapat"
   },
+  "playground": {
+    "eyebrow": "Playground",
+    "title": "Canlı sohbet molaları için<br>küçük oyunlar",
+    "copy": "Playground, yayınları daha etkileşimli hale getiren deneyler için isteğe bağlı bir alandır. İlk oyun satranç: uygun bir izleyiciyi* davet edin, oyunu başlatın ve sohbeti yanında izlemeye devam edin.",
+    "tagsAria": "Playground öne çıkanları",
+    "tagOptIn": "İsteğe bağlı beta",
+    "tagStream": "Yayın lobileri",
+    "tagChess": "Hızlı oyunlar",
+    "primaryCta": "Uzantıda dene",
+    "secondaryCta": "Playground verileri nasıl işler",
+    "imageAlt": "YouTube canlı sohbet içinde yüzen satranç oyun paneli",
+    "note": "* Birlikte oynamak için iki oyuncuda da uzantı gerekir"
+  },
   "screenshots": {
     "eyebrow": "Ekran görüntüleri",
     "title": "Yerel hissettiren<br>sohbet geliştirmeleri",

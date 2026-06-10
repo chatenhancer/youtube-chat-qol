@@ -48,6 +48,19 @@
     "walkthroughModalTitle": "Tour dos recursos",
     "walkthroughClose": "Fechar tour"
   },
+  "playground": {
+    "eyebrow": "Playground",
+    "title": "Jogos pequenos para<br>pausas no chat ao vivo",
+    "copy": "Playground é um espaço opcional para experimentos que deixam as transmissões mais interativas. O xadrez vem primeiro: convide um espectador disponível*, comece o jogo e acompanhe o chat por perto.",
+    "tagsAria": "Destaques do Playground",
+    "tagOptIn": "Beta opcional",
+    "tagStream": "Salas por transmissão",
+    "tagChess": "Jogos rápidos",
+    "primaryCta": "Experimente na extensão",
+    "secondaryCta": "Como o Playground lida com dados",
+    "imageAlt": "Painel flutuante de jogo de xadrez no chat ao vivo do YouTube",
+    "note": "* Os dois jogadores precisam da extensão para jogar juntos"
+  },
   "screenshots": {
     "eyebrow": "Capturas",
     "title": "Melhorias de chat<br>com aparência nativa",

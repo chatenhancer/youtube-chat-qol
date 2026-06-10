@@ -190,9 +190,8 @@
           <div class="hero-walkthrough" hidden data-walkthrough-cta>
             <button class="hero-walkthrough-button" type="button" data-walkthrough-open>
               <span class="hero-walkthrough-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" focusable="false">
-                  <path class="walkthrough-play-circle" d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Z"></path>
-                  <path class="walkthrough-play-triangle" d="M10 7.5v9l6-4.5-6-4.5Z"></path>
+                <svg viewBox="0 -960 960 960" focusable="false">
+                  <path d="m426-330 195-125q14-9 14-25t-14-25L426-630q-15-10-30.5-1.5T380-605v250q0 18 15.5 26.5T426-330Zm54 250q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Z"></path>
                 </svg>
               </span>
               <span data-i18n="hero.walkthroughCta">See the extension in action</span>
@@ -282,9 +281,8 @@
           </div>
           <div class="feature-walkthrough" hidden data-walkthrough-cta>
             <span class="feature-walkthrough-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" focusable="false">
-                <path class="walkthrough-play-circle" d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Z"></path>
-                <path class="walkthrough-play-triangle" d="M10 7.5v9l6-4.5-6-4.5Z"></path>
+              <svg viewBox="0 -960 960 960" focusable="false">
+                <path d="m426-330 195-125q14-9 14-25t-14-25L426-630q-15-10-30.5-1.5T380-605v250q0 18 15.5 26.5T426-330Zm54 250q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Z"></path>
               </svg>
             </span>
             <span class="feature-walkthrough-copy">
@@ -296,10 +294,49 @@
         </div>
       </section>
 
+      <section class="playground-section" id="playground" aria-labelledby="playground-title">
+        <div class="playground-inner">
+          <div class="playground-copy">
+            <div class="playground-heading-row">
+              <span class="playground-section-icon" aria-hidden="true">
+                <svg viewBox="0 -960 960 960" focusable="false">
+                  <path d="m272-440 208 120 208-120-168-97v137h-80v-137l-168 97Zm168-189v-17q-44-13-72-49.5T340-780q0-58 41-99t99-41q58 0 99 41t41 99q0 48-28 84.5T520-646v17l280 161q19 11 29.5 29.5T840-398v76q0 22-10.5 40.5T800-252L520-91q-19 11-40 11t-40-11L160-252q-19-11-29.5-29.5T120-322v-76q0-22 10.5-40.5T160-468l280-161Zm0 378L200-389v67l280 162 280-162v-67L520-251q-19 11-40 11t-40-11Zm82.5-486.5Q540-755 540-780t-17.5-42.5Q505-840 480-840t-42.5 17.5Q420-805 420-780t17.5 42.5Q455-720 480-720t42.5-17.5ZM480-160Z"></path>
+                </svg>
+              </span>
+              <span class="playground-eyebrow" data-i18n="playground.eyebrow">Playground</span>
+              <span class="playground-beta-badge">Beta</span>
+            </div>
+            <h2 id="playground-title" data-i18n-html="playground.title">Tiny games for<br>live chat breaks</h2>
+            <p data-i18n="playground.copy">
+              Playground is an opt-in space for experiments that make streams more interactive.
+              Chess is first: invite an available viewer*, start the game, and keep chat nearby.
+            </p>
+            <div class="playground-tags" aria-label="Playground highlights" data-i18n-attr="aria-label:playground.tagsAria">
+              <span data-i18n="playground.tagOptIn">Opt-in beta</span>
+              <span data-i18n="playground.tagStream">Stream lobbies</span>
+              <span data-i18n="playground.tagChess">Quick games</span>
+            </div>
+            <div class="playground-actions">
+              <a class="button button-primary" href="#install" data-i18n="playground.primaryCta">Try it in the extension</a>
+              <a class="button playground-link" href="https://www.chatenhancer.com/privacy" data-i18n="playground.secondaryCta">How Playground handles data</a>
+            </div>
+            <p class="playground-note" data-i18n="playground.note">* Players both need the extension to play together</p>
+          </div>
+          <figure class="playground-preview">
+            <img src="assets/playground/chess-preview.png" alt="Floating chess game panel inside YouTube live chat" loading="lazy" decoding="async" data-i18n-attr="alt:playground.imageAlt">
+          </figure>
+        </div>
+      </section>
+
       <section class="section screenshots" id="screenshots" aria-labelledby="screenshots-title">
         <div class="section-inner screenshots-inner">
           <p class="eyebrow" data-i18n="screenshots.eyebrow">Screenshots</p>
           <h2 id="screenshots-title" data-i18n-html="screenshots.title">Native-feeling chat<br/>improvements</h2>
+          <div class="screenshots-heading-divider" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
           <div class="screenshot-grid">
             <figure class="showcase-figure">
               <div class="showcase-stack">

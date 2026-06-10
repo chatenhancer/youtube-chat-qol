@@ -48,6 +48,19 @@
     "walkthroughModalTitle": "Tur fitur",
     "walkthroughClose": "Tutup tur"
   },
+  "playground": {
+    "eyebrow": "Playground",
+    "title": "Game kecil untuk<br>jeda live chat",
+    "copy": "Playground adalah ruang opsional untuk eksperimen yang membuat stream lebih interaktif. Catur hadir lebih dulu: undang penonton yang tersedia*, mulai game, dan tetap ikuti chat.",
+    "tagsAria": "Sorotan Playground",
+    "tagOptIn": "Beta opsional",
+    "tagStream": "Lobi stream",
+    "tagChess": "Game cepat",
+    "primaryCta": "Coba di ekstensi",
+    "secondaryCta": "Cara Playground menangani data",
+    "imageAlt": "Panel game catur mengambang di dalam live chat YouTube",
+    "note": "* Kedua pemain perlu ekstensi untuk bermain bersama"
+  },
   "screenshots": {
     "eyebrow": "Tangkapan layar",
     "title": "Peningkatan chat<br>yang terasa menyatu",
