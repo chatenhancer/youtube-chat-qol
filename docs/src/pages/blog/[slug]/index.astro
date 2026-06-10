@@ -22,8 +22,43 @@ const formatter = new Intl.DateTimeFormat('en', {
   month: 'long',
   year: 'numeric'
 });
+const canonicalUrl = `${site.url}/blog/${post.data.slug}/`;
 const coverUrl = post.data.image ? new URL(post.data.image.src, site.url).toString() : undefined;
 const coverVideoUrl = getBlogCoverVideoUrl(post.data.slug, post.data.video);
+const postDate = post.data.date.toISOString();
+const blogPostStructuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: post.data.title,
+  description: post.data.description,
+  url: canonicalUrl,
+  mainEntityOfPage: {
+    '@type': 'WebPage',
+    '@id': canonicalUrl
+  },
+  datePublished: postDate,
+  dateModified: postDate,
+  inLanguage: 'en',
+  ...(coverUrl ? { image: [coverUrl] } : {}),
+  author: {
+    '@type': 'Organization',
+    name: site.title,
+    url: site.url
+  },
+  publisher: {
+    '@type': 'Organization',
+    name: site.title,
+    logo: {
+      '@type': 'ImageObject',
+      url: `${site.url}/assets/icons/icon-128.png`
+    }
+  },
+  isPartOf: {
+    '@type': 'Blog',
+    name: `${site.title} updates`,
+    url: `${site.url}/blog/`
+  }
+};
 
 const titleHtml = decorateBrandMentions(post.data.title);
 const descriptionHtml = decorateBrandMentions(post.data.description);
@@ -46,11 +81,13 @@ function escapeHtml(value: string): string {
 ---
 
 <BlogLayout
-  canonicalUrl={`${site.url}/blog/${post.data.slug}/`}
+  canonicalUrl={canonicalUrl}
   description={post.data.description}
   image={coverUrl}
   messages={messages}
+  ogType="article"
   rootPrefix="../../"
+  structuredData={blogPostStructuredData}
   title={post.data.title}
 >
   <article class="blog-post">
