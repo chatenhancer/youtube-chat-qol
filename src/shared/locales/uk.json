@@ -133,19 +133,18 @@
     "playground": "Playground",
     "games": "Ігри",
     "gamesChess": "Шахи",
-    "gamesAvailability": "Доступність",
     "gamesAvailableToPlay": "Готовий грати",
-    "gamesAvailableHelper": "Буде видно іншим гравцям у цій трансляції.",
+    "gamesAvailableHelper": "Отримуйте ігрові запрошення в цій трансляції.",
     "gamesActiveGame": "Активна гра",
     "gamesResume": "Продовжити",
     "gamesMinimize": "Згорнути",
     "gamesLeave": "Вийти",
     "gamesInvites": "Запрошення",
-    "gamesNoInvites": "Немає запрошень",
+    "gamesNoInvites": "Запрошень поки немає.",
     "gamesInviteFrom": "{user} запрошує вас у {game}.",
     "gamesInviteHelper": "Прийміть, щоб відкрити ігрову панель.",
     "gamesAccept": "Прийняти",
-    "gamesPlayWith": "Виберіть, з ким грати",
+    "gamesPlayWith": "Запросити гравця",
     "gamesBack": "Назад",
     "gamesPlayers": "Гравці",
     "gamesAvailableNow": "Доступний зараз",
@@ -368,10 +367,10 @@
       "message": "Ігри"
     },
     "playgroundGamesAvailable": {
-      "message": "Бути доступним для ігор за замовчуванням"
+      "message": "Доступний за замовчуванням"
     },
     "playgroundGamesAvailableHelper": {
-      "message": "Ви з’являтиметеся у списку доступних гравців і зможете отримувати запрошення до ігор під час стримів."
+      "message": "Коли ви приєднуєтеся до трансляції, ви автоматично з'являтиметеся у списку доступних гравців і зможете отримувати запрошення до гри."
     },
     "learnMore": {
       "message": "Докладніше"

@@ -133,19 +133,18 @@
     "playground": "Playground",
     "games": "Giochi",
     "gamesChess": "Scacchi",
-    "gamesAvailability": "Disponibilità",
     "gamesAvailableToPlay": "Disponibile a giocare",
-    "gamesAvailableHelper": "Visibile agli altri giocatori in questa live.",
+    "gamesAvailableHelper": "Ricevi inviti di gioco per questa live.",
     "gamesActiveGame": "Partita attiva",
     "gamesResume": "Riprendi",
     "gamesMinimize": "Riduci",
     "gamesLeave": "Esci",
     "gamesInvites": "Inviti",
-    "gamesNoInvites": "Nessun invito",
+    "gamesNoInvites": "Nessun invito ricevuto per ora.",
     "gamesInviteFrom": "{user} ti ha invitato a {game}.",
     "gamesInviteHelper": "Accetta per aprire il pannello di gioco.",
     "gamesAccept": "Accetta",
-    "gamesPlayWith": "Scegli con chi giocare",
+    "gamesPlayWith": "Invita un giocatore",
     "gamesBack": "Indietro",
     "gamesPlayers": "Giocatori",
     "gamesAvailableNow": "Disponibile ora",
@@ -371,10 +370,10 @@
       "message": "Giochi"
     },
     "playgroundGamesAvailable": {
-      "message": "Essere disponibile per i giochi per impostazione predefinita"
+      "message": "Disponibile per impostazione predefinita"
     },
     "playgroundGamesAvailableHelper": {
-      "message": "Apparirai nell’elenco dei giocatori disponibili e potrai ricevere inviti di gioco durante gli stream."
+      "message": "Quando entri in una live, comparirai automaticamente nella lista dei giocatori disponibili per ricevere inviti di gioco."
     },
     "learnMore": {
       "message": "Scopri di più"

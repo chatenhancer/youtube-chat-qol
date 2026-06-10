@@ -133,19 +133,18 @@
     "playground": "Playground",
     "games": "Jogos",
     "gamesChess": "Xadrez",
-    "gamesAvailability": "Disponibilidade",
     "gamesAvailableToPlay": "Disponível para jogar",
-    "gamesAvailableHelper": "Mostrado a outros jogadores nesta live.",
+    "gamesAvailableHelper": "Receba convites de jogo para esta live.",
     "gamesActiveGame": "Jogo ativo",
     "gamesResume": "Continuar",
     "gamesMinimize": "Minimizar",
     "gamesLeave": "Sair",
     "gamesInvites": "Convites",
-    "gamesNoInvites": "Sem convites",
+    "gamesNoInvites": "Nenhum convite recebido ainda.",
     "gamesInviteFrom": "{user} convidou você para {game}.",
     "gamesInviteHelper": "Aceite para abrir o painel do jogo.",
     "gamesAccept": "Aceitar",
-    "gamesPlayWith": "Escolha alguém para jogar",
+    "gamesPlayWith": "Convidar jogador",
     "gamesBack": "Voltar",
     "gamesPlayers": "Jogadores",
     "gamesAvailableNow": "Disponível agora",
@@ -371,10 +370,10 @@
       "message": "Jogos"
     },
     "playgroundGamesAvailable": {
-      "message": "Ficar disponível para jogos por padrão"
+      "message": "Disponível por padrão"
     },
     "playgroundGamesAvailableHelper": {
-      "message": "Você aparecerá na lista de jogadores disponíveis e poderá receber convites para jogos durante as streams."
+      "message": "Ao entrar numa live, você aparecerá automaticamente na lista de jogadores disponíveis para receber convites de jogo."
     },
     "learnMore": {
       "message": "Saiba mais"

@@ -133,19 +133,18 @@
     "playground": "Playground",
     "games": "Spiele",
     "gamesChess": "Schach",
-    "gamesAvailability": "Verfügbarkeit",
     "gamesAvailableToPlay": "Zum Spielen verfügbar",
-    "gamesAvailableHelper": "Wird anderen Spielern in diesem Stream angezeigt.",
+    "gamesAvailableHelper": "Spieleinladungen für diesen Stream erhalten.",
     "gamesActiveGame": "Aktives Spiel",
     "gamesResume": "Fortsetzen",
     "gamesMinimize": "Minimieren",
     "gamesLeave": "Verlassen",
     "gamesInvites": "Einladungen",
-    "gamesNoInvites": "Keine Einladungen",
+    "gamesNoInvites": "Noch keine Einladungen erhalten.",
     "gamesInviteFrom": "{user} hat dich zu {game} eingeladen.",
     "gamesInviteHelper": "Annehmen, um das Spielfeld zu öffnen.",
     "gamesAccept": "Annehmen",
-    "gamesPlayWith": "Wähle jemanden zum Spielen aus",
+    "gamesPlayWith": "Spieler einladen",
     "gamesBack": "Zurück",
     "gamesPlayers": "Spieler",
     "gamesAvailableNow": "Jetzt verfügbar",
@@ -368,10 +367,10 @@
       "message": "Spiele"
     },
     "playgroundGamesAvailable": {
-      "message": "Standardmäßig für Spiele verfügbar sein"
+      "message": "Standardmäßig verfügbar"
     },
     "playgroundGamesAvailableHelper": {
-      "message": "Du erscheinst in der Liste verfügbarer Spieler und kannst während Streams Spieleinladungen erhalten."
+      "message": "Wenn du einem Stream beitrittst, erscheinst du automatisch in der Liste verfügbarer Spieler und kannst Spieleinladungen erhalten."
     },
     "learnMore": {
       "message": "Mehr erfahren"

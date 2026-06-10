@@ -133,19 +133,18 @@
     "playground": "Playground",
     "games": "Games",
     "gamesChess": "Chess",
-    "gamesAvailability": "Availability",
     "gamesAvailableToPlay": "Available to play",
-    "gamesAvailableHelper": "Shown to other players in this stream.",
+    "gamesAvailableHelper": "Receive game invites for this stream.",
     "gamesActiveGame": "Active game",
     "gamesResume": "Resume",
     "gamesMinimize": "Minimize",
     "gamesLeave": "Leave",
     "gamesInvites": "Invites",
-    "gamesNoInvites": "No invites",
+    "gamesNoInvites": "No invites received yet.",
     "gamesInviteFrom": "{user} invited you to {game}.",
     "gamesInviteHelper": "Accept to open the game panel.",
     "gamesAccept": "Accept",
-    "gamesPlayWith": "Choose someone to play with",
+    "gamesPlayWith": "Invite a player",
     "gamesBack": "Back",
     "gamesPlayers": "Players",
     "gamesAvailableNow": "Available now",
@@ -371,10 +370,10 @@
       "message": "Games"
     },
     "playgroundGamesAvailable": {
-      "message": "Show me as available by default"
+      "message": "Available by default"
     },
     "playgroundGamesAvailableHelper": {
-      "message": "You can receive game invites automatically when you join a stream."
+      "message": "When you join a stream you'll automatically appear in the available players list to receive game invites."
     },
     "learnMore": {
       "message": "Learn more"

@@ -133,19 +133,18 @@
     "playground": "محیط آزمایشی",
     "games": "بازی‌ها",
     "gamesChess": "شطرنج",
-    "gamesAvailability": "دردسترس بودن",
     "gamesAvailableToPlay": "آماده بازی",
-    "gamesAvailableHelper": "به بازیکنان دیگر در این پخش نشان داده می‌شود.",
+    "gamesAvailableHelper": "دعوت‌های بازی را برای این پخش دریافت کنید.",
     "gamesActiveGame": "بازی فعال",
     "gamesResume": "ادامه",
     "gamesMinimize": "کوچک کردن",
     "gamesLeave": "ترک کردن",
     "gamesInvites": "دعوت‌ها",
-    "gamesNoInvites": "دعوتی نیست",
+    "gamesNoInvites": "هنوز دعوتی دریافت نشده است.",
     "gamesInviteFrom": "{user} شما را به {game} دعوت کرد.",
     "gamesInviteHelper": "برای باز کردن پنل بازی بپذیرید.",
     "gamesAccept": "پذیرفتن",
-    "gamesPlayWith": "یک نفر را برای بازی انتخاب کنید",
+    "gamesPlayWith": "دعوت از بازیکن",
     "gamesBack": "بازگشت",
     "gamesPlayers": "بازیکنان",
     "gamesAvailableNow": "اکنون آماده است",
@@ -368,10 +367,10 @@
       "message": "بازی‌ها"
     },
     "playgroundGamesAvailable": {
-      "message": "به‌طور پیش‌فرض برای بازی‌ها در دسترس باشید"
+      "message": "به‌طور پیش‌فرض آماده"
     },
     "playgroundGamesAvailableHelper": {
-      "message": "در فهرست بازیکنان در دسترس ظاهر می‌شوید و می‌توانید هنگام پخش‌ها دعوت‌نامهٔ بازی دریافت کنید."
+      "message": "وقتی وارد یک پخش می‌شوید، به‌طور خودکار در فهرست بازیکنان آماده برای دریافت دعوت بازی نمایش داده می‌شوید."
     },
     "learnMore": {
       "message": "بیشتر بدانید"

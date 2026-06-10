@@ -133,19 +133,18 @@
     "playground": "Playground",
     "games": "遊戲",
     "gamesChess": "西洋棋",
-    "gamesAvailability": "可玩狀態",
     "gamesAvailableToPlay": "可以一起玩",
-    "gamesAvailableHelper": "會顯示給此直播中的其他玩家。",
+    "gamesAvailableHelper": "接收此直播的遊戲邀請。",
     "gamesActiveGame": "進行中的遊戲",
     "gamesResume": "繼續",
     "gamesMinimize": "最小化",
     "gamesLeave": "離開",
     "gamesInvites": "邀請",
-    "gamesNoInvites": "沒有邀請",
+    "gamesNoInvites": "尚未收到邀請。",
     "gamesInviteFrom": "{user} 邀請你玩 {game}。",
     "gamesInviteHelper": "接受後會開啟遊戲面板。",
     "gamesAccept": "接受",
-    "gamesPlayWith": "選擇一起玩的使用者",
+    "gamesPlayWith": "邀請玩家",
     "gamesBack": "返回",
     "gamesPlayers": "玩家",
     "gamesAvailableNow": "目前可玩",
@@ -368,10 +367,10 @@
       "message": "遊戲"
     },
     "playgroundGamesAvailable": {
-      "message": "預設顯示可參與遊戲"
+      "message": "預設顯示為可玩"
     },
     "playgroundGamesAvailableHelper": {
-      "message": "你會顯示在可用玩家列表中，並可在直播期間接收遊戲邀請。"
+      "message": "加入直播時，你會自動出現在可邀請玩家清單中，以接收遊戲邀請。"
     },
     "learnMore": {
       "message": "了解更多"

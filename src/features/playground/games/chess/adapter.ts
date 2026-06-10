@@ -15,6 +15,7 @@ import {
   showChessGameEndedNotice,
   updateChessGamePanel
 } from './panel';
+import { renderChessPreview } from './preview';
 import type { PlaygroundClientState } from '../client';
 import type { GamePanelAdapter } from '../adapter';
 
@@ -23,7 +24,7 @@ export const chessGameAdapter: GamePanelAdapter = {
   definition: {
     id: 'chess',
     labelKey: 'gamesChess',
-    thumbnailPath: 'games/chess/thumbnail.png'
+    renderPreview: renderChessPreview
   },
   getActiveGameId: getActiveChessGameId,
   getOpponentLabel: getChessOpponentLabel,

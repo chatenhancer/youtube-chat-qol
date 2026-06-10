@@ -133,19 +133,18 @@
     "playground": "Playground",
     "games": "게임",
     "gamesChess": "체스",
-    "gamesAvailability": "참여 가능 상태",
     "gamesAvailableToPlay": "게임 가능",
-    "gamesAvailableHelper": "이 스트림의 다른 플레이어에게 표시됩니다.",
+    "gamesAvailableHelper": "이 스트림의 게임 초대를 받습니다.",
     "gamesActiveGame": "진행 중인 게임",
     "gamesResume": "계속",
     "gamesMinimize": "최소화",
     "gamesLeave": "나가기",
     "gamesInvites": "초대",
-    "gamesNoInvites": "초대 없음",
+    "gamesNoInvites": "아직 받은 초대가 없습니다.",
     "gamesInviteFrom": "{user}님이 {game}에 초대했습니다.",
     "gamesInviteHelper": "수락하면 게임 패널이 열립니다.",
     "gamesAccept": "수락",
-    "gamesPlayWith": "함께 플레이할 사람 선택",
+    "gamesPlayWith": "플레이어 초대",
     "gamesBack": "뒤로",
     "gamesPlayers": "플레이어",
     "gamesAvailableNow": "지금 가능",
@@ -368,10 +367,10 @@
       "message": "게임"
     },
     "playgroundGamesAvailable": {
-      "message": "기본적으로 게임 가능 상태로 표시"
+      "message": "기본적으로 가능"
     },
     "playgroundGamesAvailableHelper": {
-      "message": "스트림 중 사용 가능한 플레이어 목록에 표시되고 게임 초대를 받을 수 있습니다."
+      "message": "스트림에 참여하면 게임 초대를 받을 수 있도록 사용 가능한 플레이어 목록에 자동으로 표시됩니다."
     },
     "learnMore": {
       "message": "자세히 알아보기"

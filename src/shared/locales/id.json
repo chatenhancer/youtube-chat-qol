@@ -133,19 +133,18 @@
     "playground": "Playground",
     "games": "Game",
     "gamesChess": "Catur",
-    "gamesAvailability": "Ketersediaan",
     "gamesAvailableToPlay": "Tersedia untuk bermain",
-    "gamesAvailableHelper": "Ditampilkan ke pemain lain di live ini.",
+    "gamesAvailableHelper": "Terima undangan game untuk live ini.",
     "gamesActiveGame": "Game aktif",
     "gamesResume": "Lanjutkan",
     "gamesMinimize": "Minimalkan",
     "gamesLeave": "Keluar",
     "gamesInvites": "Undangan",
-    "gamesNoInvites": "Tidak ada undangan",
+    "gamesNoInvites": "Belum ada undangan diterima.",
     "gamesInviteFrom": "{user} mengundang Anda ke {game}.",
     "gamesInviteHelper": "Terima untuk membuka panel game.",
     "gamesAccept": "Terima",
-    "gamesPlayWith": "Pilih seseorang untuk bermain",
+    "gamesPlayWith": "Undang pemain",
     "gamesBack": "Kembali",
     "gamesPlayers": "Pemain",
     "gamesAvailableNow": "Tersedia sekarang",
@@ -371,10 +370,10 @@
       "message": "Game"
     },
     "playgroundGamesAvailable": {
-      "message": "Tersedia untuk game secara default"
+      "message": "Tersedia secara default"
     },
     "playgroundGamesAvailableHelper": {
-      "message": "Anda akan muncul di daftar pemain yang tersedia dan dapat menerima undangan game selama streaming."
+      "message": "Saat kamu bergabung ke live, kamu otomatis muncul di daftar pemain yang tersedia untuk menerima undangan game."
     },
     "learnMore": {
       "message": "Pelajari selengkapnya"

@@ -133,19 +133,18 @@
     "playground": "Playground",
     "games": "Trò chơi",
     "gamesChess": "Cờ vua",
-    "gamesAvailability": "Trạng thái sẵn sàng",
     "gamesAvailableToPlay": "Sẵn sàng chơi",
-    "gamesAvailableHelper": "Hiển thị với người chơi khác trong livestream này.",
+    "gamesAvailableHelper": "Nhận lời mời chơi game trong livestream này.",
     "gamesActiveGame": "Trò chơi đang mở",
     "gamesResume": "Tiếp tục",
     "gamesMinimize": "Thu nhỏ",
     "gamesLeave": "Rời",
     "gamesInvites": "Lời mời",
-    "gamesNoInvites": "Không có lời mời",
+    "gamesNoInvites": "Chưa nhận được lời mời nào.",
     "gamesInviteFrom": "{user} mời bạn chơi {game}.",
     "gamesInviteHelper": "Chấp nhận để mở bảng trò chơi.",
     "gamesAccept": "Chấp nhận",
-    "gamesPlayWith": "Chọn người để chơi cùng",
+    "gamesPlayWith": "Mời người chơi",
     "gamesBack": "Quay lại",
     "gamesPlayers": "Người chơi",
     "gamesAvailableNow": "Đang sẵn sàng",
@@ -368,10 +367,10 @@
       "message": "Trò chơi"
     },
     "playgroundGamesAvailable": {
-      "message": "Mặc định sẵn sàng chơi trò chơi"
+      "message": "Sẵn sàng theo mặc định"
     },
     "playgroundGamesAvailableHelper": {
-      "message": "Bạn sẽ xuất hiện trong danh sách người chơi đang sẵn sàng và có thể nhận lời mời chơi trong lúc phát trực tiếp."
+      "message": "Khi tham gia một livestream, bạn sẽ tự động xuất hiện trong danh sách người chơi sẵn sàng để nhận lời mời chơi game."
     },
     "learnMore": {
       "message": "Tìm hiểu thêm"

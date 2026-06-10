@@ -133,19 +133,18 @@
     "playground": "Playground",
     "games": "गेम",
     "gamesChess": "शतरंज",
-    "gamesAvailability": "उपलब्धता",
     "gamesAvailableToPlay": "खेलने के लिए उपलब्ध",
-    "gamesAvailableHelper": "इस स्ट्रीम में दूसरे खिलाड़ियों को दिखेगा.",
+    "gamesAvailableHelper": "इस स्ट्रीम के लिए गेम आमंत्रण पाएं.",
     "gamesActiveGame": "सक्रिय गेम",
     "gamesResume": "फिर शुरू करें",
     "gamesMinimize": "छोटा करें",
     "gamesLeave": "छोड़ें",
     "gamesInvites": "निमंत्रण",
-    "gamesNoInvites": "कोई निमंत्रण नहीं",
+    "gamesNoInvites": "अभी तक कोई निमंत्रण नहीं मिला.",
     "gamesInviteFrom": "{user} ने आपको {game} के लिए बुलाया.",
     "gamesInviteHelper": "गेम पैनल खोलने के लिए स्वीकार करें.",
     "gamesAccept": "स्वीकार करें",
-    "gamesPlayWith": "साथ खेलने के लिए किसी को चुनें",
+    "gamesPlayWith": "खिलाड़ी को आमंत्रित करें",
     "gamesBack": "वापस",
     "gamesPlayers": "खिलाड़ी",
     "gamesAvailableNow": "अभी उपलब्ध",
@@ -371,10 +370,10 @@
       "message": "गेम"
     },
     "playgroundGamesAvailable": {
-      "message": "गेम के लिए डिफ़ॉल्ट रूप से उपलब्ध रहें"
+      "message": "डिफ़ॉल्ट रूप से उपलब्ध"
     },
     "playgroundGamesAvailableHelper": {
-      "message": "आप उपलब्ध खिलाड़ियों की सूची में दिखेंगे और स्ट्रीम के दौरान गेम आमंत्रण पा सकेंगे।"
+      "message": "जब आप किसी स्ट्रीम में शामिल होंगे, तो गेम आमंत्रण पाने के लिए आप अपने-आप उपलब्ध खिलाड़ियों की सूची में दिखेंगे."
     },
     "learnMore": {
       "message": "और जानें"

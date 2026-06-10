@@ -133,19 +133,18 @@
     "playground": "Playground",
     "games": "ゲーム",
     "gamesChess": "チェス",
-    "gamesAvailability": "空き状況",
     "gamesAvailableToPlay": "プレイ可能",
-    "gamesAvailableHelper": "この配信の他のプレイヤーに表示されます。",
+    "gamesAvailableHelper": "この配信のゲーム招待を受け取ります。",
     "gamesActiveGame": "進行中のゲーム",
     "gamesResume": "再開",
     "gamesMinimize": "最小化",
     "gamesLeave": "退出",
     "gamesInvites": "招待",
-    "gamesNoInvites": "招待はありません",
+    "gamesNoInvites": "まだ招待は届いていません。",
     "gamesInviteFrom": "{user} が {game} に招待しました。",
     "gamesInviteHelper": "承諾するとゲームパネルが開きます。",
     "gamesAccept": "承諾",
-    "gamesPlayWith": "一緒に遊ぶ相手を選択",
+    "gamesPlayWith": "プレイヤーを招待",
     "gamesBack": "戻る",
     "gamesPlayers": "プレイヤー",
     "gamesAvailableNow": "現在プレイ可能",
@@ -371,10 +370,10 @@
       "message": "ゲーム"
     },
     "playgroundGamesAvailable": {
-      "message": "デフォルトでゲームに参加可能にする"
+      "message": "デフォルトでプレイ可能"
     },
     "playgroundGamesAvailableHelper": {
-      "message": "配信中、参加可能なプレイヤー一覧に表示され、ゲーム招待を受け取れます。"
+      "message": "配信に参加すると、ゲーム招待を受け取れるプレイヤーとして自動的に一覧に表示されます。"
     },
     "learnMore": {
       "message": "詳細を見る"

@@ -21,6 +21,7 @@ import {
 const PLAYGROUND_IDENTITY_STORAGE_KEY = 'ytcqPlaygroundIdentity:v1';
 const SIGNATURE_PREFIX = 'chat-enhancer-playground:';
 const MAX_QUEUED_CLIENT_MESSAGES = 20;
+const PLAYGROUND_HEARTBEAT_INTERVAL_MS = 20_000;
 
 interface StoredPlaygroundIdentity {
   privateKeyJwk: JsonWebKey;
@@ -44,6 +45,7 @@ export class PlaygroundBackgroundSession {
   private streamKey = '';
   private userId = '';
   private socket: WebSocket | null = null;
+  private heartbeatTimer: ReturnType<typeof setInterval> | null = null;
 
   constructor(port: chrome.runtime.Port) {
     this.port = port;
@@ -134,6 +136,7 @@ export class PlaygroundBackgroundSession {
       if (this.socket === socket) {
         this.socket = null;
         this.userId = '';
+        this.stopHeartbeat();
         this.postDisconnected();
       }
     });
@@ -155,6 +158,7 @@ export class PlaygroundBackgroundSession {
 
     if (message.type === 'helloAccepted') {
       this.userId = message.userId;
+      this.startHeartbeat(socket);
       this.postPortMessage({
         status: 'connected',
         type: 'ytcq:playground:status'
@@ -167,6 +171,8 @@ export class PlaygroundBackgroundSession {
       this.flushPendingClientMessages();
       return;
     }
+
+    if (message.type === 'pong') return;
 
     if (message.type === 'presenceSnapshot') {
       this.postPortMessage({
@@ -236,6 +242,7 @@ export class PlaygroundBackgroundSession {
   private closeSocket(): void {
     const socket = this.socket;
     this.socket = null;
+    this.stopHeartbeat();
     if (!socket) return;
     socket.close();
   }
@@ -244,6 +251,7 @@ export class PlaygroundBackgroundSession {
     if (this.socket !== socket) return;
     this.socket = null;
     this.userId = '';
+    this.stopHeartbeat();
     try {
       socket.close();
     } catch {
@@ -258,6 +266,23 @@ export class PlaygroundBackgroundSession {
       status: 'disconnected',
       type: 'ytcq:playground:status'
     });
+  }
+
+  private startHeartbeat(socket: WebSocket): void {
+    this.stopHeartbeat();
+    this.heartbeatTimer = setInterval(() => {
+      if (this.socket !== socket || socket.readyState !== WebSocket.OPEN || !this.userId) return;
+      this.sendSocketMessage(socket, {
+        id: `heartbeat-${Date.now().toString(36)}`,
+        type: 'ping'
+      });
+    }, PLAYGROUND_HEARTBEAT_INTERVAL_MS);
+  }
+
+  private stopHeartbeat(): void {
+    if (this.heartbeatTimer === null) return;
+    clearInterval(this.heartbeatTimer);
+    this.heartbeatTimer = null;
   }
 
   private postPortMessage(message: PlaygroundBackgroundMessage): void {

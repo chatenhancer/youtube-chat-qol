@@ -133,19 +133,18 @@
     "playground": "Playground",
     "games": "Juegos",
     "gamesChess": "Ajedrez",
-    "gamesAvailability": "Disponibilidad",
     "gamesAvailableToPlay": "Disponible para jugar",
-    "gamesAvailableHelper": "Se muestra a otros jugadores en este directo.",
+    "gamesAvailableHelper": "Recibe invitaciones de juego para este directo.",
     "gamesActiveGame": "Partida activa",
     "gamesResume": "Continuar",
     "gamesMinimize": "Minimizar",
     "gamesLeave": "Salir",
     "gamesInvites": "Invitaciones",
-    "gamesNoInvites": "Sin invitaciones",
+    "gamesNoInvites": "Aún no has recibido invitaciones.",
     "gamesInviteFrom": "{user} te invitó a {game}.",
     "gamesInviteHelper": "Acepta para abrir el panel del juego.",
     "gamesAccept": "Aceptar",
-    "gamesPlayWith": "Elige a alguien para jugar",
+    "gamesPlayWith": "Invitar a un jugador",
     "gamesBack": "Volver",
     "gamesPlayers": "Jugadores",
     "gamesAvailableNow": "Disponible ahora",
@@ -368,10 +367,10 @@
       "message": "Juegos"
     },
     "playgroundGamesAvailable": {
-      "message": "Estar disponible para juegos de forma predeterminada"
+      "message": "Disponible de forma predeterminada"
     },
     "playgroundGamesAvailableHelper": {
-      "message": "Aparecerás en la lista de jugadores disponibles y podrás recibir invitaciones a juegos durante los streams."
+      "message": "Al unirte a un directo, aparecerás automáticamente en la lista de jugadores disponibles para recibir invitaciones de juego."
     },
     "learnMore": {
       "message": "Más información"

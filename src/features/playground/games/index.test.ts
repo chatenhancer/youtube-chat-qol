@@ -133,18 +133,16 @@ describe('playground games header button', () => {
     expect(document.querySelector('.ytcq-profile-card-subtitle')?.textContent).toBe('0 players online');
     expect(document.querySelector('.ytcq-games-availability-toggle')?.getAttribute('aria-checked')).toBe('false');
     expect(document.querySelector('.ytcq-games-availability-toggle .ytcq-menu-toggle')).not.toBeNull();
-    expect(getGamesSectionTitles()).toEqual(['Availability', 'Invites', 'Start a game']);
-    expect(document.querySelector('.ytcq-games-section-empty')?.textContent).toBe('No invites');
+    expect(getGamesSectionTitles()).toEqual(['Invites', 'Start a game']);
+    expect(document.querySelector('.ytcq-games-section-empty')?.textContent).toBe('No invites received yet.');
     expect(getGameCards()).toHaveLength(1);
-    expect(document.querySelectorAll('.ytcq-games-preview-board')).toHaveLength(0);
-    expect(document.querySelector<HTMLImageElement>('.ytcq-games-preview-chess .ytcq-games-preview-image')?.src)
-      .toBe('chrome-extension://test/games/chess/thumbnail.png');
+    expect(document.querySelector('.ytcq-games-preview-chess .ytcq-games-preview-canvas')).not.toBeNull();
     expect(getGameLabels()).toEqual(['Chess']);
 
     getGameCards()[0].click();
     expect(document.querySelector('.ytcq-profile-card-title')?.textContent).toBe('Chess');
     expect(document.querySelector<HTMLElement>('.ytcq-games-beta-badge')?.hidden).toBe(true);
-    expect(document.querySelector('.ytcq-profile-card-subtitle')?.textContent).toBe('Choose someone to play with');
+    expect(document.querySelector('.ytcq-profile-card-subtitle')?.textContent).toBe('Invite a player');
     expect(document.querySelector('.ytcq-games-section-empty')?.textContent).toBe('There are no players available.');
     expect(document.querySelector('.ytcq-games-player-row')).toBeNull();
     getActionButton('Back').click();
@@ -231,11 +229,11 @@ describe('playground games header button', () => {
     expect(canvas?.getAttribute('aria-label')).toBe('Chess');
 
     gamesButton.click();
-    expect(getGamesSectionTitles()).toEqual(['Availability', 'Active game', 'Invites', 'Start a game']);
+    expect(getGamesSectionTitles()).toEqual(['Active game', 'Invites', 'Start a game']);
     expect(document.querySelector('.ytcq-games-active-row')?.textContent).toContain('Chess');
     expect(document.querySelector('.ytcq-games-active-row')?.textContent).toContain('Luna Chat');
     expect(document.querySelector('.ytcq-games-invite-row')).toBeNull();
-    expect(document.querySelector('.ytcq-games-section-empty')?.textContent).toBe('No invites');
+    expect(document.querySelector('.ytcq-games-section-empty')?.textContent).toBe('No invites received yet.');
     expect(getActionButtonLabels()).toEqual(['Minimize', 'Leave']);
 
     getActionButton('Minimize').click();
@@ -263,7 +261,7 @@ describe('playground games header button', () => {
     getGameCards()[0].click();
 
     expect(document.querySelector('.ytcq-profile-card-title')?.textContent).toBe('Chess');
-    expect(document.querySelector('.ytcq-profile-card-subtitle')?.textContent).toBe('Choose someone to play with');
+    expect(document.querySelector('.ytcq-profile-card-subtitle')?.textContent).toBe('Invite a player');
     expect(document.querySelectorAll('.ytcq-games-player-row')).toHaveLength(2);
     expect(document.querySelector('.ytcq-games-player-row')?.textContent).toContain('Luna Chat');
 

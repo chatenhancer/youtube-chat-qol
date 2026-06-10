@@ -133,19 +133,18 @@
     "playground": "ساحة التجارب",
     "games": "الألعاب",
     "gamesChess": "شطرنج",
-    "gamesAvailability": "التوفر",
     "gamesAvailableToPlay": "متاح للعب",
-    "gamesAvailableHelper": "يظهر للاعبين الآخرين في هذا البث.",
+    "gamesAvailableHelper": "تلقي دعوات الألعاب لهذا البث.",
     "gamesActiveGame": "لعبة نشطة",
     "gamesResume": "استئناف",
     "gamesMinimize": "تصغير",
     "gamesLeave": "مغادرة",
     "gamesInvites": "دعوات",
-    "gamesNoInvites": "لا توجد دعوات",
+    "gamesNoInvites": "لم تصلك أي دعوات بعد.",
     "gamesInviteFrom": "دعاك {user} إلى {game}.",
     "gamesInviteHelper": "اقبل لفتح لوحة اللعبة.",
     "gamesAccept": "قبول",
-    "gamesPlayWith": "اختر شخصًا لتلعب معه",
+    "gamesPlayWith": "ادعُ لاعبًا",
     "gamesBack": "رجوع",
     "gamesPlayers": "اللاعبون",
     "gamesAvailableNow": "متاح الآن",
@@ -371,10 +370,10 @@
       "message": "الألعاب"
     },
     "playgroundGamesAvailable": {
-      "message": "كن متاحاً للألعاب افتراضياً"
+      "message": "متاح افتراضيًا"
     },
     "playgroundGamesAvailableHelper": {
-      "message": "ستظهر في قائمة اللاعبين المتاحين ويمكنك تلقي دعوات الألعاب أثناء البث."
+      "message": "عند الانضمام إلى بث، ستظهر تلقائيًا في قائمة اللاعبين المتاحين لتلقي دعوات الألعاب."
     },
     "learnMore": {
       "message": "تعرّف على المزيد"
