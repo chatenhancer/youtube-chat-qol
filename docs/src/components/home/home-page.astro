@@ -1,5 +1,6 @@
 ---
 import type { CollectionEntry } from 'astro:content';
+import { getBlogPostPath } from '../../data/blog';
 import type { Locale } from '../../data/locales';
 import type { Messages } from '../../data/site';
 import Commands from './commands.astro';
@@ -17,11 +18,16 @@ const { locale, messages, posts, rootPrefix } = Astro.props as {
   posts: CollectionEntry<'blog'>[];
   rootPrefix: string;
 };
+const playgroundPost = posts.find((post) => post.data.translationKey === 'introducing-playground-tiny-games-for-live-chat-breaks');
+if (!playgroundPost) {
+  throw new Error('Missing required Playground blog post.');
+}
+const playgroundPostPath = getBlogPostPath(playgroundPost);
 ---
 
 <Hero messages={messages} rootPrefix={rootPrefix} />
 <Features messages={messages} />
-<Playground messages={messages} rootPrefix={rootPrefix} />
+<Playground messages={messages} playgroundPostPath={playgroundPostPath} rootPrefix={rootPrefix} />
 <Screenshots messages={messages} rootPrefix={rootPrefix} />
 <Install messages={messages} rootPrefix={rootPrefix} />
 <Privacy messages={messages} />

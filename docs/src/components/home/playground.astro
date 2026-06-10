@@ -1,10 +1,10 @@
 ---
 import Icon from '../common/icon.astro';
-import { site } from '../../data/site';
 import type { Messages } from '../../data/site';
 
-const { messages: m, rootPrefix } = Astro.props as {
+const { messages: m, playgroundPostPath, rootPrefix } = Astro.props as {
   messages: Messages;
+  playgroundPostPath: string;
   rootPrefix: string;
 };
 ---
@@ -28,7 +28,7 @@ const { messages: m, rootPrefix } = Astro.props as {
       </div>
       <div class="playground-actions">
         <a class="button button-primary" href="#install">{m.playground.primaryCta}</a>
-        <a class="button playground-link" href={site.privacyUrl}>{m.playground.secondaryCta}</a>
+        <a class="button playground-link" href={playgroundPostPath}>{m.playground.secondaryCta}</a>
       </div>
       <p class="playground-note">{m.playground.note}</p>
     </div>
