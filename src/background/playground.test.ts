@@ -288,7 +288,8 @@ describe('background playground bridge', () => {
     expect(FakeWebSocket.instances[0].url).toBe('wss://playground.chatenhancer.com/v1/streams/outer-stream/socket');
   });
 
-  it('waits for an explicit init before reconnecting a dropped socket', async () => {
+  it('reconnects an unexpectedly dropped socket and keeps queued commands', async () => {
+    vi.useFakeTimers();
     await import('./playground');
     const port = createFakePort();
     getConnectListener()(port as unknown as chrome.runtime.Port);
@@ -311,20 +312,14 @@ describe('background playground bridge', () => {
     });
 
     expect(port.messages.at(-1)).toEqual({
-      error: undefined,
-      status: 'disconnected',
+      status: 'connecting',
       type: 'ytcq:playground:status'
     });
     expect(FakeWebSocket.instances).toHaveLength(1);
 
-    port.emit({
-      availableGames: ['chess'],
-      profile: {
-        displayName: 'Local Player'
-      },
-      streamKey: 'stream-a',
-      type: 'ytcq:playground:init'
-    });
+    await vi.advanceTimersByTimeAsync(749);
+    expect(FakeWebSocket.instances).toHaveLength(1);
+    await vi.advanceTimersByTimeAsync(1);
     expect(FakeWebSocket.instances).toHaveLength(2);
     expect(port.messages.at(-1)).toEqual({
       status: 'connecting',
@@ -359,8 +354,36 @@ describe('background playground bridge', () => {
           displayName: 'Local Player'
         },
         type: 'hello'
-      })
+      }),
+      {
+        gameId: 'chess',
+        toUserId: 'user-2',
+        type: 'invite'
+      }
     ]);
+  });
+
+  it('does not reconnect after an explicit playground disconnect', async () => {
+    vi.useFakeTimers();
+    await import('./playground');
+    const port = createFakePort();
+    getConnectListener()(port as unknown as chrome.runtime.Port);
+
+    port.emit({
+      availableGames: ['chess'],
+      streamKey: 'stream-a',
+      type: 'ytcq:playground:init'
+    });
+
+    const socket = FakeWebSocket.instances[0];
+    port.emit({
+      type: 'ytcq:playground:disconnect'
+    });
+    socket.emit('close');
+    await vi.advanceTimersByTimeAsync(20_000);
+
+    expect(FakeWebSocket.instances).toHaveLength(1);
+    expect(socket.readyState).toBe(3);
   });
 });
 

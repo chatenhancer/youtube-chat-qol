@@ -22,6 +22,7 @@ const PLAYGROUND_IDENTITY_STORAGE_KEY = 'ytcqPlaygroundIdentity:v1';
 const SIGNATURE_PREFIX = 'chat-enhancer-playground:';
 const MAX_QUEUED_CLIENT_MESSAGES = 20;
 const PLAYGROUND_HEARTBEAT_INTERVAL_MS = 20_000;
+const PLAYGROUND_RECONNECT_DELAYS_MS = [750, 2_000, 5_000, 10_000] as const;
 
 interface StoredPlaygroundIdentity {
   privateKeyJwk: JsonWebKey;
@@ -46,6 +47,8 @@ export class PlaygroundBackgroundSession {
   private userId = '';
   private socket: WebSocket | null = null;
   private heartbeatTimer: ReturnType<typeof setInterval> | null = null;
+  private reconnectAttempt = 0;
+  private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor(port: chrome.runtime.Port) {
     this.port = port;
@@ -66,7 +69,7 @@ export class PlaygroundBackgroundSession {
         this.streamKey = this.senderStreamKey || message.streamKey;
         this.availableGames = message.availableGames;
         this.profile = message.profile;
-        void this.connectSocket({ resetPendingMessages: true });
+        void this.connectSocket({ resetPendingMessages: true, resetReconnectAttempts: true });
         return;
       case 'ytcq:playground:set-availability':
         this.availableGames = message.availableGames;
@@ -98,7 +101,7 @@ export class PlaygroundBackgroundSession {
         });
         return;
       case 'ytcq:playground:disconnect':
-        this.closeSocket();
+        this.closeSocket({ allowReconnect: false });
         return;
     }
   };
@@ -107,13 +110,18 @@ export class PlaygroundBackgroundSession {
     this.port?.onMessage.removeListener(this.handlePortMessage);
     this.port?.onDisconnect.removeListener(this.handlePortDisconnect);
     this.port = null;
-    this.closeSocket();
+    this.closeSocket({ allowReconnect: false });
   };
 
-  private async connectSocket(options: { resetPendingMessages?: boolean } = {}): Promise<void> {
+  private async connectSocket(options: {
+    resetPendingMessages?: boolean;
+    resetReconnectAttempts?: boolean;
+  } = {}): Promise<void> {
     if (!this.streamKey || !this.port) return;
-    this.closeSocket();
+    this.clearReconnectTimer();
+    this.closeSocket({ allowReconnect: false });
     if (options.resetPendingMessages) this.pendingClientMessages = [];
+    if (options.resetReconnectAttempts) this.reconnectAttempt = 0;
     this.userId = '';
     this.postPortMessage({
       status: 'connecting',
@@ -124,7 +132,7 @@ export class PlaygroundBackgroundSession {
     try {
       socket = new WebSocket(getPlaygroundSocketUrl(this.streamKey));
     } catch (error) {
-      this.postDisconnected(error);
+      this.scheduleReconnect(error);
       return;
     }
 
@@ -137,7 +145,7 @@ export class PlaygroundBackgroundSession {
         this.socket = null;
         this.userId = '';
         this.stopHeartbeat();
-        this.postDisconnected();
+        this.scheduleReconnect();
       }
     });
     socket.addEventListener('error', () => {
@@ -158,6 +166,7 @@ export class PlaygroundBackgroundSession {
 
     if (message.type === 'helloAccepted') {
       this.userId = message.userId;
+      this.reconnectAttempt = 0;
       this.startHeartbeat(socket);
       this.postPortMessage({
         status: 'connected',
@@ -239,11 +248,14 @@ export class PlaygroundBackgroundSession {
     }
   }
 
-  private closeSocket(): void {
+  private closeSocket({ allowReconnect }: { allowReconnect: boolean }): void {
     const socket = this.socket;
     this.socket = null;
     this.stopHeartbeat();
     if (!socket) return;
+    if (!allowReconnect) {
+      this.clearReconnectTimer();
+    }
     socket.close();
   }
 
@@ -257,7 +269,7 @@ export class PlaygroundBackgroundSession {
     } catch {
       // The connection is already unusable.
     }
-    this.postDisconnected(error);
+    this.scheduleReconnect(error);
   }
 
   private postDisconnected(error?: unknown): void {
@@ -285,12 +297,43 @@ export class PlaygroundBackgroundSession {
     this.heartbeatTimer = null;
   }
 
+  private scheduleReconnect(error?: unknown): void {
+    if (!this.port || !this.streamKey) {
+      this.postDisconnected(error);
+      return;
+    }
+
+    const delay = PLAYGROUND_RECONNECT_DELAYS_MS[this.reconnectAttempt];
+    if (delay === undefined) {
+      this.reconnectAttempt = 0;
+      this.postDisconnected(error);
+      return;
+    }
+
+    this.reconnectAttempt += 1;
+    this.postPortMessage({
+      status: 'connecting',
+      type: 'ytcq:playground:status'
+    });
+    this.clearReconnectTimer();
+    this.reconnectTimer = setTimeout(() => {
+      this.reconnectTimer = null;
+      void this.connectSocket();
+    }, delay);
+  }
+
+  private clearReconnectTimer(): void {
+    if (this.reconnectTimer === null) return;
+    clearTimeout(this.reconnectTimer);
+    this.reconnectTimer = null;
+  }
+
   private postPortMessage(message: PlaygroundBackgroundMessage): void {
     try {
       this.port?.postMessage(message);
     } catch {
       this.port = null;
-      this.closeSocket();
+      this.closeSocket({ allowReconnect: false });
     }
   }
 
