@@ -133,19 +133,18 @@
     "playground": "מגרש ניסויים",
     "games": "משחקים",
     "gamesChess": "שחמט",
-    "gamesAvailability": "זמינות",
     "gamesAvailableToPlay": "זמין למשחק",
-    "gamesAvailableHelper": "יוצג לשחקנים אחרים בשידור הזה.",
+    "gamesAvailableHelper": "קבלת הזמנות למשחק בשידור הזה.",
     "gamesActiveGame": "משחק פעיל",
     "gamesResume": "המשך",
     "gamesMinimize": "מזער",
     "gamesLeave": "עזוב",
     "gamesInvites": "הזמנות",
-    "gamesNoInvites": "אין הזמנות",
+    "gamesNoInvites": "עדיין לא התקבלו הזמנות.",
     "gamesInviteFrom": "{user} הזמין אותך ל-{game}.",
     "gamesInviteHelper": "אשר כדי לפתוח את חלונית המשחק.",
     "gamesAccept": "אישור",
-    "gamesPlayWith": "בחרו מישהו לשחק איתו",
+    "gamesPlayWith": "הזמנת שחקן",
     "gamesBack": "חזרה",
     "gamesPlayers": "שחקנים",
     "gamesAvailableNow": "זמין עכשיו",
@@ -368,10 +367,10 @@
       "message": "משחקים"
     },
     "playgroundGamesAvailable": {
-      "message": "להיות זמינים למשחקים כברירת מחדל"
+      "message": "זמין כברירת מחדל"
     },
     "playgroundGamesAvailableHelper": {
-      "message": "תופיעו ברשימת השחקנים הזמינים ותוכלו לקבל הזמנות למשחקים במהלך סטרימים."
+      "message": "כשמצטרפים לשידור, תופיעו אוטומטית ברשימת השחקנים הזמינים לקבלת הזמנות למשחק."
     },
     "learnMore": {
       "message": "מידע נוסף"

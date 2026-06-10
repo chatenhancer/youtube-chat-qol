@@ -12,7 +12,7 @@ import type { PlaygroundClientState } from './client';
 export interface GameDefinition {
   id: GameId;
   labelKey: MessageKey;
-  thumbnailPath: string;
+  renderPreview: (container: HTMLElement) => void;
 }
 
 export type SendGameAction = (gameId: string, action: string, payload?: Record<string, unknown>) => void;

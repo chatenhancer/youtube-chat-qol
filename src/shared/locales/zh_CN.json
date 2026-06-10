@@ -133,19 +133,18 @@
     "playground": "Playground",
     "games": "游戏",
     "gamesChess": "国际象棋",
-    "gamesAvailability": "可玩状态",
     "gamesAvailableToPlay": "可以一起玩",
-    "gamesAvailableHelper": "会显示给此直播中的其他玩家。",
+    "gamesAvailableHelper": "接收此直播的游戏邀请。",
     "gamesActiveGame": "进行中的游戏",
     "gamesResume": "继续",
     "gamesMinimize": "最小化",
     "gamesLeave": "离开",
     "gamesInvites": "邀请",
-    "gamesNoInvites": "没有邀请",
+    "gamesNoInvites": "还没有收到邀请。",
     "gamesInviteFrom": "{user} 邀请你玩 {game}。",
     "gamesInviteHelper": "接受后会打开游戏面板。",
     "gamesAccept": "接受",
-    "gamesPlayWith": "选择一起玩的用户",
+    "gamesPlayWith": "邀请玩家",
     "gamesBack": "返回",
     "gamesPlayers": "玩家",
     "gamesAvailableNow": "当前可玩",
@@ -371,10 +370,10 @@
       "message": "游戏"
     },
     "playgroundGamesAvailable": {
-      "message": "默认显示可参与游戏"
+      "message": "默认显示为可玩"
     },
     "playgroundGamesAvailableHelper": {
-      "message": "你会显示在可用玩家列表中，并可在直播期间接收游戏邀请。"
+      "message": "加入直播时，你会自动出现在可邀请玩家列表中，以接收游戏邀请。"
     },
     "learnMore": {
       "message": "了解更多"

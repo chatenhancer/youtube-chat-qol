@@ -147,6 +147,59 @@ describe('background playground bridge', () => {
     });
   });
 
+  it('keeps authenticated playground sockets alive with heartbeat pings', async () => {
+    vi.useFakeTimers();
+    await import('./playground');
+    const port = createFakePort();
+    getConnectListener()(port as unknown as chrome.runtime.Port);
+
+    port.emit({
+      availableGames: ['chess'],
+      streamKey: 'stream-a',
+      type: 'ytcq:playground:init'
+    });
+
+    const socket = FakeWebSocket.instances[0];
+    socket.emit('message', {
+      challenge: 'challenge-1',
+      issuedAt: Date.now(),
+      protocolVersion: PLAYGROUND_PROTOCOL_VERSION,
+      type: 'challenge'
+    });
+
+    await vi.waitFor(() => {
+      expect(socket.sent).toHaveLength(1);
+    });
+    socket.emit('message', {
+      snapshot: {
+        games: [],
+        invites: [],
+        users: []
+      },
+      type: 'helloAccepted',
+      userId: 'user-1'
+    });
+
+    await vi.advanceTimersByTimeAsync(19_999);
+    expect(socket.sent).toHaveLength(1);
+    await vi.advanceTimersByTimeAsync(1);
+    expect(socket.sent.at(-1)).toMatchObject({
+      id: expect.stringMatching(/^heartbeat-/),
+      type: 'ping'
+    });
+
+    const messageCount = port.messages.length;
+    socket.emit('message', {
+      id: 'heartbeat-reply',
+      type: 'pong'
+    });
+    expect(port.messages).toHaveLength(messageCount);
+
+    socket.emit('close');
+    await vi.advanceTimersByTimeAsync(20_000);
+    expect(socket.sent.filter((message) => message.type === 'ping')).toHaveLength(1);
+  });
+
   it('forwards content commands to the authenticated socket', async () => {
     await import('./playground');
     const port = createFakePort();

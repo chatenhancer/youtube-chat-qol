@@ -21,9 +21,8 @@ export function getGameLabel(gameId: GameId): string {
   return t(GAMES.find((game) => game.id === gameId)?.labelKey || 'games');
 }
 
-export function getGameThumbnailUrl(gameId: GameId): string {
-  const thumbnailPath = GAMES.find((game) => game.id === gameId)?.thumbnailPath;
-  return thumbnailPath ? chrome.runtime.getURL(thumbnailPath) : '';
+export function renderGamePreview(gameId: GameId, container: HTMLElement): void {
+  GAMES.find((game) => game.id === gameId)?.renderPreview(container);
 }
 
 export function isSupportedGameId(gameId: GameId): boolean {

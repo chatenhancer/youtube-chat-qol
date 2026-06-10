@@ -12,8 +12,8 @@ import {
   GAMES,
   getGameLabel,
   getGameOpponentLabel,
-  getGameThumbnailUrl,
-  isActiveGamePanelOpen
+  isActiveGamePanelOpen,
+  renderGamePreview
 } from './registry';
 import {
   getAvailablePlayers,
@@ -123,7 +123,7 @@ function getUnavailableNoticeHelper(state: GamesPanelState): string {
 }
 
 function createAvailabilitySection(state: GamesPanelState, actions: GamesViewActions): HTMLElement {
-  const section = createGamesSection(t('gamesAvailability'));
+  const section = createGamesSection();
   const item = ytcqCreateElement('div');
   item.className = 'ytcq-games-availability';
 
@@ -314,10 +314,10 @@ function createPlayerRow(player: PresenceUser, state: GamesPanelState, actions: 
   return row;
 }
 
-function createGamesSection(titleText: string): HTMLElement {
+function createGamesSection(titleText?: string): HTMLElement {
   const section = ytcqCreateElement('section');
   section.className = 'ytcq-games-section';
-  section.append(createGamesSectionTitle(titleText));
+  if (titleText) section.append(createGamesSectionTitle(titleText));
   return section;
 }
 
@@ -353,13 +353,6 @@ function createGameCardLabel(label: string): HTMLElement {
 function createGamePreview(gameId: GameId): HTMLElement {
   const preview = ytcqCreateElement('span');
   preview.className = `ytcq-games-preview ytcq-games-preview-${gameId}`;
-
-  const image = ytcqCreateElement('img');
-  image.className = 'ytcq-games-preview-image';
-  image.alt = '';
-  image.decoding = 'async';
-  image.loading = 'eager';
-  image.src = getGameThumbnailUrl(gameId);
-  preview.append(image);
+  renderGamePreview(gameId, preview);
   return preview;
 }

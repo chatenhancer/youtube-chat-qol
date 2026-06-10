@@ -133,19 +133,18 @@
     "playground": "Playground",
     "games": "Oyunlar",
     "gamesChess": "Satranç",
-    "gamesAvailability": "Uygunluk",
     "gamesAvailableToPlay": "Oynamaya uygun",
-    "gamesAvailableHelper": "Bu yayındaki diğer oyunculara gösterilir.",
+    "gamesAvailableHelper": "Bu yayın için oyun davetleri al.",
     "gamesActiveGame": "Aktif oyun",
     "gamesResume": "Sürdür",
     "gamesMinimize": "Küçült",
     "gamesLeave": "Ayrıl",
     "gamesInvites": "Davetler",
-    "gamesNoInvites": "Davet yok",
+    "gamesNoInvites": "Henüz davet alınmadı.",
     "gamesInviteFrom": "{user} seni {game} oyununa davet etti.",
     "gamesInviteHelper": "Oyun panelini açmak için kabul et.",
     "gamesAccept": "Kabul et",
-    "gamesPlayWith": "Oynamak için birini seç",
+    "gamesPlayWith": "Oyuncu davet et",
     "gamesBack": "Geri",
     "gamesPlayers": "Oyuncular",
     "gamesAvailableNow": "Şu an uygun",
@@ -371,10 +370,10 @@
       "message": "Oyunlar"
     },
     "playgroundGamesAvailable": {
-      "message": "Oyunlar için varsayılan olarak müsait ol"
+      "message": "Varsayılan olarak uygun"
     },
     "playgroundGamesAvailableHelper": {
-      "message": "Uygun oyuncular listesinde görünürsün ve yayınlar sırasında oyun davetleri alabilirsin."
+      "message": "Bir yayına katıldığında, oyun davetleri almak için otomatik olarak uygun oyuncular listesinde görünürsün."
     },
     "learnMore": {
       "message": "Daha fazla bilgi"

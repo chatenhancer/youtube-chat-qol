@@ -133,19 +133,18 @@
     "playground": "Playground",
     "games": "Games",
     "gamesChess": "Schaken",
-    "gamesAvailability": "Beschikbaarheid",
     "gamesAvailableToPlay": "Beschikbaar om te spelen",
-    "gamesAvailableHelper": "Zichtbaar voor andere spelers in deze stream.",
+    "gamesAvailableHelper": "Ontvang game-uitnodigingen voor deze stream.",
     "gamesActiveGame": "Actief spel",
     "gamesResume": "Hervatten",
     "gamesMinimize": "Minimaliseren",
     "gamesLeave": "Verlaten",
     "gamesInvites": "Uitnodigingen",
-    "gamesNoInvites": "Geen uitnodigingen",
+    "gamesNoInvites": "Nog geen uitnodigingen ontvangen.",
     "gamesInviteFrom": "{user} heeft je uitgenodigd voor {game}.",
     "gamesInviteHelper": "Accepteer om het spelpaneel te openen.",
     "gamesAccept": "Accepteren",
-    "gamesPlayWith": "Kies iemand om mee te spelen",
+    "gamesPlayWith": "Speler uitnodigen",
     "gamesBack": "Terug",
     "gamesPlayers": "Spelers",
     "gamesAvailableNow": "Nu beschikbaar",
@@ -368,10 +367,10 @@
       "message": "Games"
     },
     "playgroundGamesAvailable": {
-      "message": "Standaard beschikbaar zijn voor games"
+      "message": "Standaard beschikbaar"
     },
     "playgroundGamesAvailableHelper": {
-      "message": "Je verschijnt in de lijst met beschikbare spelers en kunt tijdens streams game-uitnodigingen ontvangen."
+      "message": "Wanneer je een stream opent, verschijn je automatisch in de lijst met beschikbare spelers om game-uitnodigingen te ontvangen."
     },
     "learnMore": {
       "message": "Meer informatie"

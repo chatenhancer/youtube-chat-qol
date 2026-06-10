@@ -133,19 +133,18 @@
     "playground": "Playground",
     "games": "เกม",
     "gamesChess": "หมากรุก",
-    "gamesAvailability": "สถานะว่าง",
     "gamesAvailableToPlay": "พร้อมเล่น",
-    "gamesAvailableHelper": "แสดงให้ผู้เล่นคนอื่นในสตรีมนี้เห็น",
+    "gamesAvailableHelper": "รับคำเชิญเล่นเกมสำหรับสตรีมนี้",
     "gamesActiveGame": "เกมที่กำลังเล่น",
     "gamesResume": "เล่นต่อ",
     "gamesMinimize": "ย่อ",
     "gamesLeave": "ออก",
     "gamesInvites": "คำเชิญ",
-    "gamesNoInvites": "ไม่มีคำเชิญ",
+    "gamesNoInvites": "ยังไม่มีคำเชิญ",
     "gamesInviteFrom": "{user} เชิญคุณเล่น {game}",
     "gamesInviteHelper": "ยอมรับเพื่อเปิดแผงเกม",
     "gamesAccept": "ยอมรับ",
-    "gamesPlayWith": "เลือกคนที่จะเล่นด้วย",
+    "gamesPlayWith": "เชิญผู้เล่น",
     "gamesBack": "กลับ",
     "gamesPlayers": "ผู้เล่น",
     "gamesAvailableNow": "พร้อมตอนนี้",
@@ -368,10 +367,10 @@
       "message": "เกม"
     },
     "playgroundGamesAvailable": {
-      "message": "พร้อมเล่นเกมเป็นค่าเริ่มต้น"
+      "message": "พร้อมเล่นเป็นค่าเริ่มต้น"
     },
     "playgroundGamesAvailableHelper": {
-      "message": "คุณจะปรากฏในรายชื่อผู้เล่นที่พร้อมเล่น และรับคำเชิญเล่นเกมระหว่างสตรีมได้"
+      "message": "เมื่อคุณเข้าร่วมสตรีม คุณจะแสดงในรายชื่อผู้เล่นที่พร้อมรับคำเชิญเล่นเกมโดยอัตโนมัติ"
     },
     "learnMore": {
       "message": "เรียนรู้เพิ่มเติม"
