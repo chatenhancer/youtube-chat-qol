@@ -3,7 +3,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const localesDir = path.join(rootDir, 'docs', 'i18n');
+const localesDir = path.join(rootDir, 'docs', 'src', 'i18n');
 const baseLocale = 'en.json';
 const basePath = path.join(localesDir, baseLocale);
 

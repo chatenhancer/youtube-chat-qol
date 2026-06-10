@@ -79,7 +79,7 @@ export function createMenuToggleItem({
   return item;
 }
 
-export function createPaperItem({ label, iconPath, iconViewBox, title }: PaperItemOptions): HTMLElement {
+function createPaperItem({ label, iconPath, iconViewBox, title }: PaperItemOptions): HTMLElement {
   const paperItem = ytcqCreateElement('div');
   paperItem.className = 'ytcq-paper-item';
   paperItem.setAttribute('role', 'option');

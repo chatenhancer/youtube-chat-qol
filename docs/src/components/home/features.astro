@@ -1,0 +1,44 @@
+---
+import Icon from '../common/icon.astro';
+import type { Messages } from '../../data/site';
+
+const { messages: m } = Astro.props as { messages: Messages };
+const features = [
+  ['translate', m.features.translationTitle, m.features.translationBody],
+  ['alternate_email', m.features.mentionTitle, m.features.mentionBody],
+  ['person_search', m.features.contextTitle, m.features.contextBody],
+  ['inbox', m.features.inboxTitle, m.features.inboxBody],
+  ['mood', m.features.emojisTitle, m.features.emojisBody],
+  ['terminal', m.features.commandsTitle, m.features.commandsBody]
+] as const;
+---
+
+<section class="section feature-band" id="features" aria-labelledby="features-title">
+  <div class="section-inner feature-inner">
+    <p class="eyebrow">{m.features.eyebrow}</p>
+    <h2 id="features-title" set:html={m.features.title}></h2>
+    <div class="feature-grid">
+      {features.map(([icon, title, body]) => (
+        <article class="feature">
+          <span class:list={['feature-icon', icon === 'inbox' && 'feature-icon-inbox']} data-symbol={icon} aria-hidden="true">
+            <Icon name={icon} viewBox={icon === 'inbox' ? '0 0 24 24' : '0 -960 960 960'} />
+            {icon === 'inbox' && <span class="feature-icon-badge">1</span>}
+          </span>
+          <h3>{title}</h3>
+          <p>{body}</p>
+          {icon === 'terminal' && <a class="feature-link" href="#commands">{m.features.commandsLink}</a>}
+        </article>
+      ))}
+    </div>
+    <div class="feature-walkthrough" hidden data-walkthrough-cta>
+      <span class="feature-walkthrough-icon" aria-hidden="true">
+        <Icon name="play_circle" />
+      </span>
+      <span class="feature-walkthrough-copy">
+        <strong>{m.features.walkthroughTitle}</strong>
+        <span>{m.features.walkthroughBody}</span>
+      </span>
+      <button class="button button-secondary" type="button" data-walkthrough-open>{m.features.walkthroughCta}</button>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,37 @@
+---
+import Icon from '../common/icon.astro';
+import { site } from '../../data/site';
+import type { Messages } from '../../data/site';
+
+const { messages: m } = Astro.props as { messages: Messages };
+const items = [
+  [m.privacy.scopeTitle, m.privacy.scopeBody],
+  [m.privacy.storageTitle, m.privacy.storageBody],
+  [m.privacy.translationTitle, m.privacy.translationBody],
+  [m.privacy.trackingTitle, m.privacy.trackingBody]
+] as const;
+---
+
+<section class="section privacy" id="privacy" aria-labelledby="privacy-title">
+  <div class="section-inner privacy-inner">
+    <div class="privacy-heading">
+      <span class="privacy-icon" data-symbol="privacy_tip" aria-hidden="true">
+        <Icon name="privacy_tip" />
+      </span>
+      <p class="eyebrow">{m.privacy.eyebrow}</p>
+      <h2 id="privacy-title">{m.privacy.title}</h2>
+      <p>{m.privacy.copy}</p>
+      <div class="privacy-actions">
+        <a class="button button-secondary" href={site.privacyUrl}>{m.privacy.button}</a>
+      </div>
+    </div>
+    <dl class="privacy-list" aria-label={m.privacy.summaryAria}>
+      {items.map(([title, body]) => (
+        <div>
+          <dt>{title}</dt>
+          <dd>{body}</dd>
+        </div>
+      ))}
+    </dl>
+  </div>
+</section>

@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="theme-color" content="#faf9f6">
+    <title>Le Papier</title>
+    <link rel="icon" href="../../assets/icons/icon-128.png" data-app-icon>
+    <link rel="apple-touch-icon" href="../../assets/icons/icon-128.png" data-app-icon>
+    <link rel="preload" href="../../assets/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="lepapier.css">
+  </head>
+  <body>
+    <header class="editor-header">
+      <a class="brand" href="../../" aria-label="Le Papier home" data-app-home>
+        <img src="../../assets/icons/icon.svg" width="32" height="28" alt="" data-app-logo>
+      </a>
+      <div class="header-actions">
+        <span class="save-state" data-save-state>Saved locally</span>
+        <button class="text-button" type="button" data-theme-toggle aria-pressed="false">Dark mode</button>
+      </div>
+    </header>
+
+    <main class="editor-shell">
+      <aside class="documents-sidebar" data-documents-sidebar aria-label="Documents">
+        <div class="documents-heading">
+          <div>
+            <h2>Documents</h2>
+          </div>
+          <button class="icon-button" type="button" data-add-document aria-label="New document" title="New document">
+            <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+              <path d="M12 4a1 1 0 0 1 1 1v6h6a1 1 0 1 1 0 2h-6v6a1 1 0 1 1-2 0v-6H5a1 1 0 1 1 0-2h6V5a1 1 0 0 1 1-1Z"></path>
+            </svg>
+          </button>
+        </div>
+        <div class="document-list" data-document-list></div>
+        <input type="file" webkitdirectory directory multiple data-open-post-folder-files hidden>
+        <button class="secondary-button full-button" type="button" data-open-post-folder>Open post folder</button>
+        <button class="secondary-button full-button" type="button" data-open-editable-folder>Open editable folder</button>
+        <button class="secondary-button full-button" type="button" data-download-all>Download all posts</button>
+      </aside>
+
+      <section class="writing-column" aria-labelledby="editor-title">
+        <div class="toolbar" aria-label="Writing tools">
+          <div class="toolbar-group">
+            <button type="button" data-insert="heading">Heading</button>
+            <button type="button" data-insert="bold">Bold</button>
+            <button type="button" data-insert="italic">Italic</button>
+            <button type="button" data-insert="quote">Quote</button>
+            <button type="button" data-insert="list">List</button>
+            <button type="button" data-insert="link">Link</button>
+            <button type="button" data-insert="image">Image</button>
+            <button type="button" data-insert="code">Code</button>
+          </div>
+          <button class="preview-toggle" type="button" data-preview-toggle aria-pressed="false" title="Preview">
+            <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+              <path d="M12 5.5c4.18 0 7.45 2.55 9.25 6.5-1.8 3.95-5.07 6.5-9.25 6.5S4.55 15.95 2.75 12C4.55 8.05 7.82 5.5 12 5.5Zm0 2C8.92 7.5 6.43 9.12 4.98 12c1.45 2.88 3.94 4.5 7.02 4.5s5.57-1.62 7.02-4.5C17.57 9.12 15.08 7.5 12 7.5Zm0 1.5a3 3 0 1 1 0 6 3 3 0 0 1 0-6Z"></path>
+            </svg>
+            <span>Preview</span>
+          </button>
+        </div>
+
+        <article class="paper" aria-labelledby="editor-title">
+          <h1 id="editor-title" class="sr-only">Post body</h1>
+          <input type="hidden" data-field="image">
+          <label class="sr-only" for="body">Post body</label>
+          <textarea
+            id="body"
+            class="body-input"
+            data-field="body"
+            spellcheck="true"
+            placeholder="Start writing..."
+          ></textarea>
+          <article class="preview" data-preview hidden></article>
+          <button class="paper-width-resize paper-width-resize-left" type="button" data-paper-resize="left" aria-label="Resize writing sheet from left edge" title="Resize writing sheet"></button>
+          <button class="paper-width-resize paper-width-resize-right" type="button" data-paper-resize="right" aria-label="Resize writing sheet from right edge" title="Resize writing sheet"></button>
+        </article>
+      </section>
+
+      <aside class="sidebar" data-sidebar aria-label="Settings">
+        <div class="sidebar-scroll">
+          <div class="field-stack">
+            <div class="field">
+              <div class="field-heading">
+                <label for="title">Title</label>
+                <button class="metadata-refresh" type="button" data-ai-regenerate="title" title="Regenerate title with Chrome AI" aria-label="Regenerate title with Chrome AI">
+                  <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+                    <path d="M12 5a7 7 0 0 1 6.32 4H16a1 1 0 1 0 0 2h4.5a1 1 0 0 0 1-1V5.5a1 1 0 1 0-2 0v1.72A9 9 0 0 0 3.52 9.18a1 1 0 0 0 1.86.74A7 7 0 0 1 12 5Zm-8.5 8a1 1 0 0 0-1 1v4.5a1 1 0 1 0 2 0v-1.72a9 9 0 0 0 15.98-1.96 1 1 0 1 0-1.86-.74A7 7 0 0 1 5.68 15H8a1 1 0 1 0 0-2H3.5Z"></path>
+                  </svg>
+                </button>
+              </div>
+              <input id="title" type="text" data-field="title" placeholder="Release notes for version 0.13.0">
+            </div>
+            <label class="field">
+              <span>Date</span>
+              <input type="date" data-field="date">
+            </label>
+            <label class="field">
+              <span>Slug</span>
+              <input type="text" data-field="slug" placeholder="release-notes-0-13-0">
+            </label>
+            <div class="field">
+              <div class="field-heading">
+                <label for="description">Description</label>
+                <button class="metadata-refresh" type="button" data-ai-regenerate="description" title="Regenerate description with Chrome AI" aria-label="Regenerate description with Chrome AI">
+                  <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+                    <path d="M12 5a7 7 0 0 1 6.32 4H16a1 1 0 1 0 0 2h4.5a1 1 0 0 0 1-1V5.5a1 1 0 1 0-2 0v1.72A9 9 0 0 0 3.52 9.18a1 1 0 0 0 1.86.74A7 7 0 0 1 12 5Zm-8.5 8a1 1 0 0 0-1 1v4.5a1 1 0 1 0 2 0v-1.72a9 9 0 0 0 15.98-1.96 1 1 0 1 0-1.86-.74A7 7 0 0 1 5.68 15H8a1 1 0 1 0 0-2H3.5Z"></path>
+                  </svg>
+                </button>
+              </div>
+              <textarea id="description" data-field="description" rows="5" placeholder="A short summary for cards, feeds, and metadata."></textarea>
+            </div>
+            <div class="field">
+              <div class="field-heading">
+                <label for="tags">Tags</label>
+                <button class="metadata-refresh" type="button" data-ai-regenerate="tags" title="Regenerate tags with Chrome AI" aria-label="Regenerate tags with Chrome AI">
+                  <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+                    <path d="M12 5a7 7 0 0 1 6.32 4H16a1 1 0 1 0 0 2h4.5a1 1 0 0 0 1-1V5.5a1 1 0 1 0-2 0v1.72A9 9 0 0 0 3.52 9.18a1 1 0 0 0 1.86.74A7 7 0 0 1 12 5Zm-8.5 8a1 1 0 0 0-1 1v4.5a1 1 0 1 0 2 0v-1.72a9 9 0 0 0 15.98-1.96 1 1 0 1 0-1.86-.74A7 7 0 0 1 5.68 15H8a1 1 0 1 0 0-2H3.5Z"></path>
+                  </svg>
+                </button>
+              </div>
+              <input id="tags" type="text" data-field="tags" placeholder="release, playground">
+            </div>
+            <label class="checkbox-field">
+              <input type="checkbox" data-smart-punctuation>
+              <span>
+                <strong>Smart punctuation</strong>
+                <small>Use curly apostrophes and «quotes» while typing.</small>
+              </span>
+            </label>
+          </div>
+
+          <section class="sidebar-section" aria-labelledby="cover-title">
+            <div class="section-heading">
+              <h3 id="cover-title">Cover image</h3>
+              <span data-cover-status>No cover</span>
+            </div>
+            <label class="file-drop">
+              <input type="file" accept="image/*" data-cover-picker>
+              <span>Choose cover image</span>
+            </label>
+            <div class="cover-preview" data-cover-preview hidden>
+              <img alt="">
+              <code data-cover-path></code>
+            </div>
+          </section>
+
+          <section class="sidebar-section" aria-labelledby="images-title">
+            <div class="section-heading">
+              <h3 id="images-title">Images</h3>
+            </div>
+            <p class="helper">Images are exported into the post folder.</p>
+            <label class="file-drop file-drop-small">
+              <input type="file" accept="image/*" multiple data-image-picker>
+              <span>Add images</span>
+            </label>
+            <div class="image-list" data-image-list></div>
+          </section>
+
+          <section class="sidebar-section" aria-labelledby="ai-title">
+            <div class="section-heading">
+              <h3 id="ai-title">Metadata helper</h3>
+            </div>
+            <p class="helper">
+              Uses Chrome built-in AI when available. The model runs locally after Chrome installs it.
+            </p>
+            <button class="secondary-button" type="button" data-ai-enable>Retry metadata helper</button>
+            <p class="ai-status" data-ai-status>Starting automatically...</p>
+          </section>
+
+          <section class="sidebar-section" aria-labelledby="download-title">
+            <div class="section-heading">
+              <h3 id="download-title">Export</h3>
+            </div>
+            <p class="helper">
+              Downloads ready-to-commit Astro blog source files.
+            </p>
+            <label class="checkbox-field">
+              <input type="checkbox" data-randomize-image-names>
+              <span>
+                <strong>Randomize image file names</strong>
+                <small>Applies only to the downloaded ZIP.</small>
+              </span>
+            </label>
+            <button class="primary-button full-button" type="button" data-download>Download post</button>
+            <button class="text-button full-button" type="button" data-reset>Reset local draft</button>
+          </section>
+
+          <details class="sidebar-section output-panel">
+            <summary>
+              <span>Generated Markdown</span>
+              <button class="output-copy-button" type="button" data-copy aria-label="Copy generated markdown" title="Copy">
+                <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+                  <path d="M7 4a3 3 0 0 1 3-3h7a3 3 0 0 1 3 3v10a3 3 0 0 1-3 3h-1v1a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V8a3 3 0 0 1 3-3h1V4Zm2 1h4a3 3 0 0 1 3 3v7h1a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1h-7a1 1 0 0 0-1 1v1ZM6 7a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1H6Z"></path>
+                </svg>
+              </button>
+            </summary>
+            <pre class="markdown-output" data-output></pre>
+          </details>
+        </div>
+      </aside>
+    </main>
+
+    <template data-image-row-template>
+      <article class="image-row">
+        <img alt="">
+        <div>
+          <strong data-image-name></strong>
+          <code data-image-path></code>
+          <div class="image-actions">
+            <button type="button" data-insert-image>Insert</button>
+            <button type="button" data-insert-inline-image>Inline</button>
+            <a data-download-image>Download</a>
+          </div>
+        </div>
+      </article>
+    </template>
+
+    <script src="lepapier.js" defer></script>
+  </body>
+</html>

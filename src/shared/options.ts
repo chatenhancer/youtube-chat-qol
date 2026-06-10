@@ -22,7 +22,7 @@ export type PlaygroundOptionKey = 'playgroundGamesAvailable';
 
 export const DEFAULT_TRANSLATION_TARGET = 'en';
 
-export const DISABLED_PLAYGROUND_OPTIONS: Pick<Options, PlaygroundOptionKey> = {
+const DISABLED_PLAYGROUND_OPTIONS: Pick<Options, PlaygroundOptionKey> = {
   playgroundGamesAvailable: false
 };
 
@@ -37,7 +37,7 @@ export const DEFAULT_OPTIONS: Options = {
   ...DISABLED_PLAYGROUND_OPTIONS
 };
 
-export const TRANSLATION_DISPLAY_OPTIONS: readonly (readonly [TranslationDisplay, string])[] = [
+const TRANSLATION_DISPLAY_OPTIONS: readonly (readonly [TranslationDisplay, string])[] = [
   ['replace', 'Replace'],
   ['below', 'Show below']
 ];

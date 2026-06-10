@@ -1,0 +1,42 @@
+---
+import Icon from '../common/icon.astro';
+import type { Messages } from '../../data/site';
+
+const { messages: m, rootPrefix } = Astro.props as {
+  messages: Messages;
+  rootPrefix: string;
+};
+---
+
+<section class="hero" aria-labelledby="hero-title">
+  <div class="hero-content">
+    <p class="eyebrow">{m.hero.eyebrow}</p>
+    <h1 id="hero-title">{m.hero.title}</h1>
+    <p class="hero-copy">{m.hero.copy}</p>
+    <div class="hero-actions">
+      <a class="button button-primary" href="#install">
+        <span class="button-icon" data-symbol="install_desktop" aria-hidden="true">
+          <Icon name="install_desktop" />
+        </span>
+        <span>{m.hero.primaryCta}</span>
+      </a>
+      <a class="button button-secondary" href="#features">{m.hero.secondaryCta}</a>
+    </div>
+    <p class="hero-disclaimer">{m.hero.disclaimer}</p>
+  </div>
+  <div class="hero-media-column">
+    <div class="hero-media" aria-hidden="true">
+      <img class="hero-chat hero-chat-side hero-chat-left" src={`${rootPrefix}assets/screenshots/hero-img3.png`} alt="">
+      <img class="hero-chat hero-chat-main" src={`${rootPrefix}assets/screenshots/hero-img2.png`} alt="">
+      <img class="hero-chat hero-chat-side hero-chat-right" src={`${rootPrefix}assets/screenshots/hero-img1.png`} alt="">
+    </div>
+    <div class="hero-walkthrough" hidden data-walkthrough-cta>
+      <button class="hero-walkthrough-button" type="button" data-walkthrough-open>
+        <span class="hero-walkthrough-icon" aria-hidden="true">
+          <Icon name="play_circle" />
+        </span>
+        <span>{m.hero.walkthroughCta}</span>
+      </button>
+    </div>
+  </div>
+</section>

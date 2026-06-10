@@ -1,0 +1,19 @@
+---
+import { getCollection } from 'astro:content';
+import HomeLayout from '../layouts/home-layout.astro';
+import HomePage from '../components/home/home-page.astro';
+import { findLatestWalkthroughVideo } from '../data/media';
+import { getMessages } from '../data/locales';
+
+const locale = 'en';
+const messages = getMessages(locale);
+const posts = (await getCollection('blog')).sort((first, second) => second.data.date.valueOf() - first.data.date.valueOf());
+const walkthroughFileName = await findLatestWalkthroughVideo();
+const clientConfig = {
+  ...(walkthroughFileName ? { walkthrough: `videos/${walkthroughFileName}` } : {})
+};
+---
+
+<HomeLayout clientConfig={clientConfig} locale={locale} messages={messages} rootPrefix="">
+  <HomePage messages={messages} posts={posts} rootPrefix="" />
+</HomeLayout>

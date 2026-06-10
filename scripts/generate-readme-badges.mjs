@@ -3,7 +3,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const badgesDir = path.join(rootDir, 'docs', 'badges');
+const badgesDir = path.join(rootDir, 'docs', 'public', 'badges');
 
 fs.mkdirSync(badgesDir, { recursive: true });
 

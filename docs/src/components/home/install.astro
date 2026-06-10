@@ -1,0 +1,116 @@
+---
+import Icon from '../common/icon.astro';
+import { site } from '../../data/site';
+import type { Messages } from '../../data/site';
+
+const { messages: m, rootPrefix } = Astro.props as {
+  messages: Messages;
+  rootPrefix: string;
+};
+
+---
+
+<section class="section install" id="install" aria-labelledby="install-title">
+  <div class="section-inner install-inner">
+    <div class="install-copy">
+      <p class="eyebrow">{m.install.eyebrow}</p>
+      <h2 id="install-title">{m.install.title}</h2>
+      <p>{m.install.copy}</p>
+      <div class="version-badges" aria-label={m.install.publishedVersions}>
+        <span>{m.install.publishedVersions}</span>
+        <a href={site.sourceUrl}>
+          <img data-version-badge="release" src="https://img.shields.io/github/v/release/chat-enhancer-yt/youtube-chat-qol?label=release&color=2da44e" alt="release version">
+        </a>
+        <a href={site.chromeUrl}>
+          <img data-version-badge="chrome" src="https://img.shields.io/chrome-web-store/v/pkhaaipeppfpakofgpdpcpkflangpghf?label=chrome%20web%20store&color=6b7280" alt="chrome web store version">
+        </a>
+        <a href={site.firefoxUrl}>
+          <img data-version-badge="firefox" src="https://img.shields.io/amo/v/chat-enhancer-for-youtube?label=firefox%20add-ons&color=6b7280" alt="firefox add-ons version">
+        </a>
+      </div>
+    </div>
+    <div class="install-actions" data-install-actions>
+      <a class="button button-primary" href={site.chromeUrl} data-browser-install="chrome">
+        <span class="button-icon" data-symbol="storefront" aria-hidden="true"><Icon name="storefront" /></span>
+        <span>{m.install.chromeStore}</span>
+      </a>
+      <a class="button button-secondary" href={site.firefoxUrl} data-browser-install="firefox">
+        <span class="button-icon" data-symbol="extension" aria-hidden="true"><Icon name="extension" /></span>
+        <span>{m.install.firefoxAddons}</span>
+      </a>
+      <a class="button button-link" href={site.sourceUrl}>
+        <span class="button-icon" data-symbol="code" aria-hidden="true"><Icon name="code" /></span>
+        <span>{m.install.sourceCode}</span>
+      </a>
+      <a class="button button-link" href={site.supportUrl} data-support-modal-trigger>
+        <span class="button-icon" data-symbol="bug_report" aria-hidden="true"><Icon name="bug_report" /></span>
+        <span>{m.install.supportFeedback}</span>
+      </a>
+      <p class="install-contact">
+        <span>{m.install.privateQuestions}</span>
+        <a data-contact-email-address></a>
+      </p>
+    </div>
+    <div class="install-quickstart" aria-labelledby="install-quickstart-title">
+      <div class="install-quickstart-heading">
+        <img class="install-quickstart-app-icon" src={`${rootPrefix}assets/icons/icon-128.png`} width="42" height="42" alt="">
+        <div>
+          <h3 id="install-quickstart-title">{m.install.gettingStartedTitle}</h3>
+          <p>{m.install.gettingStartedBody}</p>
+        </div>
+      </div>
+      <ol class="install-quickstart-list">
+        <li>
+          <span class="install-quickstart-icon" data-symbol="storefront" aria-hidden="true">
+            <Icon name="storefront" />
+          </span>
+          <span class="install-quickstart-copy">
+            <strong>{m.install.stepStoreTitle}</strong>
+            <span>{m.install.stepStoreBody}</span>
+          </span>
+        </li>
+        <li>
+          <span class="install-quickstart-icon" data-symbol="refresh" aria-hidden="true">
+            <Icon name="refresh" />
+          </span>
+          <span class="install-quickstart-copy">
+            <strong>{m.install.stepRefreshTitle}</strong>
+            <span>
+              <span>{m.install.stepRefreshBodyBeforeIcon}</span>
+              <span class="inline-symbol" data-symbol="inbox" aria-hidden="true">
+                <Icon name="inbox" viewBox="0 0 24 24" />
+              </span>
+              <span>{m.install.stepRefreshBodyAfterIcon}</span>
+            </span>
+          </span>
+        </li>
+        <li>
+          <span class="install-quickstart-icon" data-symbol="extension" aria-hidden="true">
+            <Icon name="extension" />
+          </span>
+          <span class="install-quickstart-copy">
+            <strong>{m.install.stepSettingsTitle}</strong>
+            <span>
+              <span>{m.install.stepSettingsBodyBeforeIcon}</span>
+              <span class="inline-symbol" data-symbol="extension" aria-hidden="true">
+                <Icon name="extension" />
+              </span>,
+              <span>{m.install.stepSettingsBodyMiddle}</span>
+              <img class="inline-app-icon" src={`${rootPrefix}assets/icons/icon-128.png`} width="16" height="16" alt="">
+              <span>{m.install.stepSettingsBodyAfterIcon}</span>
+            </span>
+          </span>
+        </li>
+        <li>
+          <span class="install-quickstart-icon" data-symbol="ads_click" aria-hidden="true">
+            <Icon name="ads_click" />
+          </span>
+          <span class="install-quickstart-copy">
+            <strong>{m.install.stepUseTitle}</strong>
+            <span>{m.install.stepUseBody}</span>
+          </span>
+        </li>
+      </ol>
+    </div>
+  </div>
+</section>

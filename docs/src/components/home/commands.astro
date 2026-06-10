@@ -1,0 +1,125 @@
+---
+import Icon from '../common/icon.astro';
+import type { Messages } from '../../data/site';
+
+const { messages: m } = Astro.props as { messages: Messages };
+
+const inlineCommands = ['/mention', '/m', '/reply', '/r', '/time', '/t', '/when', '/wh', '/timeuntil', '/tu', '/timesince', '/ts', '/translate', '/tr'];
+const wholeCommands = ['/quote', '/q', '/again', '/repeat', '/watch', '/w', '/unwatch', '/uw', '/focus', '/f', '/who', '/help', '/set...'];
+const timezoneAliases = ['utc', 'tokyo', 'jst', 'seoul', 'kst', 'london', 'paris', 'madrid', 'newyork', 'nyc', 'et', 'eastern', 'losangeles', 'la', 'pt', 'pacific'];
+---
+
+<section class="section commands" id="commands" aria-labelledby="commands-title">
+  <div class="section-inner">
+    <span class="section-icon" data-symbol="terminal" aria-hidden="true">
+      <Icon name="terminal" />
+    </span>
+    <p class="eyebrow">{m.commands.eyebrow}</p>
+    <h2 id="commands-title">{m.commands.title}</h2>
+    <p class="section-copy">{m.commands.copy}</p>
+
+    <div class="command-notes" aria-label="Command usage notes">
+      <article class="command-note">
+        <div class="command-note-heading">
+          <strong>{m.commands.inlineTitle}</strong>
+          <span>{m.commands.inlineBody}</span>
+        </div>
+        <div class="command-chip-list" aria-label="Inline commands">
+          {inlineCommands.map((command) => <code>{command}</code>)}
+        </div>
+      </article>
+      <article class="command-note">
+        <div class="command-note-heading">
+          <strong>{m.commands.wholeTitle}</strong>
+          <span>{m.commands.wholeBody}</span>
+        </div>
+        <div class="command-chip-list" aria-label="Whole-input commands">
+          {wholeCommands.map((command) => <code>{command}</code>)}
+        </div>
+      </article>
+    </div>
+
+    <div class="command-groups">
+      <div class="command-column">
+        <article class="command-group">
+          <h3>{m.commands.textCommandsTitle}</h3>
+          <dl class="command-list">
+            <div>
+              <dt><code>/mention</code><span class="command-aliases">{m.commands.aliasesLabel} <code>/m</code> <code>/reply</code> <code>/r</code></span></dt>
+              <dd>{m.commands.mentionDescription}</dd>
+            </div>
+            <div>
+              <dt><code>/quote</code><span class="command-aliases">{m.commands.aliasesLabel} <code>/q</code></span></dt>
+              <dd>{m.commands.quoteDescription}</dd>
+            </div>
+            <div>
+              <dt><code>/again</code><span class="command-aliases">{m.commands.aliasesLabel} <code>/repeat</code></span></dt>
+              <dd>{m.commands.repeatDescription}</dd>
+            </div>
+            <div>
+              <dt><code>/focus @handle</code><span class="command-aliases">{m.commands.aliasesLabel} <code>/f</code></span></dt>
+              <dd>{m.commands.focusDescription}</dd>
+            </div>
+            <div>
+              <dt><code>/who @handle</code></dt>
+              <dd>{m.commands.whoDescription}</dd>
+            </div>
+            <div>
+              <dt><code>/help</code></dt>
+              <dd>{m.commands.helpDescription}</dd>
+            </div>
+          </dl>
+        </article>
+        <article class="command-group">
+          <h3>{m.commands.inboxCommandsTitle}</h3>
+          <dl class="command-list">
+            <div>
+              <dt><code>/watch keyword</code><span class="command-aliases">{m.commands.aliasesLabel} <code>/w</code></span></dt>
+              <dd>{m.commands.watchDescription}</dd>
+            </div>
+            <div>
+              <dt><code>/unwatch keyword</code><span class="command-aliases">{m.commands.aliasesLabel} <code>/uw</code></span></dt>
+              <dd>{m.commands.unwatchDescription}</dd>
+            </div>
+          </dl>
+        </article>
+      </div>
+      <div class="command-column">
+        <article class="command-group">
+          <h3>{m.commands.timeTranslationCommandsTitle}</h3>
+          <dl class="command-list">
+            <div>
+              <dt><code>/time</code><span class="command-aliases">{m.commands.aliasesLabel} <code>/t</code> {m.commands.exampleLabel} <code>/time utc</code></span></dt>
+              <dd>{m.commands.timeDescription}<br><span class="command-detail">{m.commands.timeAliases} {timezoneAliases.map((alias) => <><code>{alias}</code>{' '}</>)}</span></dd>
+            </div>
+            <div>
+              <dt><code>/when 2026-05-29 8pm pt</code><span class="command-aliases">{m.commands.aliasesLabel} <code>/wh</code> <code>/timeuntil</code> <code>/tu</code> <code>/timesince</code> <code>/ts</code></span></dt>
+              <dd>{m.commands.whenDescription}<br><span class="command-detail">{m.commands.timeUntilFormats} <code>2026-05-29 8pm pt</code>, <code>2026-06-12 19:00 london</code>, <code>8pm 2026-06-12 london</code>, <code>tokyo 7pm</code>, <code>7pm tokyo</code>.</span><br><span class="command-detail">{m.commands.timeZoneAliases} {timezoneAliases.map((alias) => <><code>{alias}</code>{' '}</>)}</span></dd>
+            </div>
+            <div>
+              <dt><code>/translate es hello</code><span class="command-aliases">{m.commands.aliasesLabel} <code>/tr</code></span></dt>
+              <dd>{m.commands.translateDescription}</dd>
+            </div>
+          </dl>
+        </article>
+        <article class="command-group">
+          <h3>{m.commands.settingCommandsTitle}</h3>
+          <dl class="command-list">
+            <div>
+              <dt><code>/settranslateto english</code><span class="command-aliases">{m.commands.aliasesLabel} <code>/lang en</code> <code>/lang off</code></span></dt>
+              <dd>{m.commands.setTranslateDescription}</dd>
+            </div>
+            <div>
+              <dt><code>/settranslationdisplay replace|below</code></dt>
+              <dd>{m.commands.setDisplayDescription}</dd>
+            </div>
+            <div>
+              <dt><code>/setsound on|off</code></dt>
+              <dd>{m.commands.setSoundDescription}</dd>
+            </div>
+          </dl>
+        </article>
+      </div>
+    </div>
+  </div>
+</section>
