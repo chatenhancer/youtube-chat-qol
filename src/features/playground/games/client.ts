@@ -1,3 +1,10 @@
+/**
+ * Playground Games content-side client.
+ *
+ * Owns the connection from the live chat page to the background Playground
+ * bridge, normalizes lobby snapshots into local state, and exposes small
+ * commands for availability, invites, and game actions.
+ */
 import {
   PLAYGROUND_PORT_NAME,
   type ClientProfile,
@@ -9,9 +16,10 @@ import {
   type PublicGame,
   type PublicInvite,
   type ServerMessage
-} from '../../shared/playground-protocol';
-import { cleanText } from '../../shared/text';
-import { getCurrentYouTubeChatStreamKey } from '../../youtube/source-url';
+} from '../../../shared/playground-protocol';
+import { cleanText } from '../../../shared/text';
+import { getCurrentYouTubeChatStreamKey } from '../../../youtube/source-url';
+import { getAvailableGameIds } from './registry';
 
 export interface PlaygroundClientState {
   endedGame: PlaygroundEndedGame | null;
@@ -238,7 +246,7 @@ function setState(nextState: PlaygroundClientState): void {
 }
 
 function getAvailableGames(): GameId[] {
-  return available ? ['chess'] : [];
+  return available ? getAvailableGameIds() : [];
 }
 
 function postPlaygroundMessage(message: PlaygroundContentMessage): void {

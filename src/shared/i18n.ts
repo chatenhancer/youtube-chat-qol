@@ -15,7 +15,7 @@ type MessageValue = string | PluralMessage;
 type LocaleCatalog = {
   messages: Partial<Record<MessageKey, MessageValue>>;
 };
-type MessageKey = keyof typeof enCatalog.messages;
+export type MessageKey = keyof typeof enCatalog.messages;
 
 const EN_MESSAGES = enCatalog.messages as Record<MessageKey, MessageValue>;
 const SUPPORTED_LOCALES = new Set([
