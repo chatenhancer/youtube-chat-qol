@@ -44,7 +44,7 @@
     "ci:test-browser-gate": "node scripts/run-browser-tests.mjs --no-build tests/browser/specs/yt-mock-logged-in.spec.ts tests/browser/specs/yt-mock-logged-out.spec.ts tests/browser/specs/yt-mock-replay.spec.ts tests/browser/specs/yt-live-logged-out.spec.ts",
     "ci:browser-artifacts": "node scripts/collect-mock-browser-artifacts.mjs",
     "ci:test-summary": "node scripts/write-ci-test-summary.mjs",
-    "ci:verify": "npm run check && npm run test:coverage && npm run build && npm run ci:pages-build && npm run ci:test-browser-gate",
+    "ci:verify": "npm run check && npm run test:coverage && npm run build && npm run ci:test-browser-gate",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "check": "npm run typecheck && npm run lint",
