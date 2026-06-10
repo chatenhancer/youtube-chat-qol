@@ -1,0 +1,54 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { Image } from 'astro:assets';
+import { getBlogCoverVideoUrl } from '../../data/blog-media';
+
+const { posts, rootPrefix } = Astro.props as {
+  posts: CollectionEntry<'blog'>[];
+  rootPrefix: string;
+};
+
+const latestPosts = posts.slice(0, 3);
+const formatter = new Intl.DateTimeFormat('en', {
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric'
+});
+const BLOG_CARD_IMAGE_WIDTH = 1280;
+---
+
+{latestPosts.length > 0 && (
+  <section class="section latest-updates" aria-labelledby="latest-updates-title" data-blog-latest>
+    <div class="section-inner latest-updates-inner">
+      <div class="latest-updates-heading">
+        <div>
+          <p class="eyebrow">Updates</p>
+          <h2 id="latest-updates-title">Latest notes</h2>
+        </div>
+        <a class="feature-link" href={`${rootPrefix}blog/`} data-blog-archive-link>View all updates</a>
+      </div>
+      <div class="latest-updates-grid" data-blog-latest-list>
+        {latestPosts.map((post) => {
+          const coverVideoUrl = getBlogCoverVideoUrl(post.data.slug, post.data.video);
+
+          return (
+            <a class="latest-update-card" href={`${rootPrefix}blog/${post.data.slug}/`}>
+              <span class="latest-update-media">
+                {post.data.image && (coverVideoUrl ? (
+                  <video src={coverVideoUrl} poster={post.data.image.src} autoplay muted loop playsinline preload="metadata" aria-hidden="true" />
+                ) : (
+                  <Image src={post.data.image} alt="" width={BLOG_CARD_IMAGE_WIDTH} loading="lazy" decoding="async" />
+                ))}
+              </span>
+              <span class="latest-update-copy">
+                <time datetime={post.data.date.toISOString().slice(0, 10)}>{formatter.format(post.data.date)}</time>
+                <strong>{post.data.title}</strong>
+                <span>{post.data.description}</span>
+              </span>
+            </a>
+          );
+        })}
+      </div>
+    </div>
+  </section>
+)}

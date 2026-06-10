@@ -36,7 +36,7 @@ chrome.runtime.onConnect.addListener((port) => {
   session.attach();
 });
 
-export class PlaygroundBackgroundSession {
+class PlaygroundBackgroundSession {
   private availableGames: GameId[] = [];
   private identityPromise: Promise<StoredPlaygroundIdentity> | null = null;
   private pendingClientMessages: ClientMessage[] = [];
@@ -343,7 +343,7 @@ export class PlaygroundBackgroundSession {
   }
 }
 
-export function getPlaygroundSocketUrl(streamKey: string): string {
+function getPlaygroundSocketUrl(streamKey: string): string {
   const url = new URL(`/v1/streams/${encodeURIComponent(streamKey)}/socket`, PLAYGROUND_BACKEND_ORIGIN);
   url.protocol = url.protocol === 'http:' ? 'ws:' : 'wss:';
   return url.toString();
@@ -360,7 +360,7 @@ function getVideoIdFromUrl(value: string): string {
   }
 }
 
-export async function createSignedPlaygroundIdentity(
+async function createSignedPlaygroundIdentity(
   challenge: string,
   identity: StoredPlaygroundIdentity
 ): Promise<SignedClientIdentity> {

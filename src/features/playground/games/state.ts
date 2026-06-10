@@ -57,7 +57,7 @@ export function getAvailablePlayers(state: GamesPanelState, gameId: GameId): Pre
     .filter((user) => user.userId !== currentUserId && user.availableGames.includes(gameId));
 }
 
-export function isUserAvailableForSupportedGame(user: PresenceUser): boolean {
+function isUserAvailableForSupportedGame(user: PresenceUser): boolean {
   return user.availableGames.some(isSupportedGameId);
 }
 

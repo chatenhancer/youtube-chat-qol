@@ -1,0 +1,137 @@
+---
+import Icon from '../common/icon.astro';
+import type { Messages } from '../../data/site';
+
+const { messages: m, rootPrefix } = Astro.props as {
+  messages: Messages;
+  rootPrefix: string;
+};
+---
+
+<section class="section screenshots" id="screenshots" aria-labelledby="screenshots-title">
+  <div class="section-inner screenshots-inner">
+    <p class="eyebrow">{m.screenshots.eyebrow}</p>
+    <h2 id="screenshots-title" set:html={m.screenshots.title}></h2>
+    <div class="screenshots-heading-divider" aria-hidden="true">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+
+    <div class="screenshot-grid">
+      <figure class="showcase-figure">
+        <div class="showcase-stack">
+          <article class="showcase-panel" data-screenshot-panel="translation">
+            <div class="showcase-copy showcase-copy-balanced">
+              <div class="showcase-brand">
+                <img src={`${rootPrefix}assets/logo.png`} width="178" height="60" alt="Chat Enhancer for YouTube">
+              </div>
+              <h3 set:html={m.screenshots.translationTitle}></h3>
+              <p>{m.screenshots.translationBody}</p>
+              <p>
+                <span set:html={m.screenshots.translationHighlightHtml}></span>
+                <span class="translate-mark translate-mark-inline" aria-hidden="true">
+                  <Icon name="translate" />
+                </span>
+              </p>
+              <p>{m.screenshots.translationModesIntro}</p>
+              <div class="translation-mode-grid" aria-label={m.screenshots.translationModesAria}>
+                <div class="translation-mode">
+                  <strong>{m.screenshots.replaceMode}</strong>
+                  <p class="translation-mode-replace-sample">
+                    <img class="sample-avatar" src={`${rootPrefix}assets/avatar.png`} width="22" height="22" alt="" aria-hidden="true">
+                    <span class="translation-mode-replace-content">
+                      <span class="sample-muted">@猫爪软乎乎</span>
+                      <span class="translation-sample-result">
+                        <span class="showcase-underline">{m.screenshots.replaceModeSample}</span>
+                        <span class="translate-mark" aria-hidden="true">
+                          <Icon name="translate" />
+                        </span>
+                      </span>
+                    </span>
+                  </p>
+                </div>
+                <div class="translation-mode">
+                  <strong>{m.screenshots.belowMode}</strong>
+                  <p>
+                    <img class="sample-avatar" src={`${rootPrefix}assets/avatar.png`} width="22" height="22" alt="" aria-hidden="true">
+                    <span class="sample-muted">@猫爪软乎乎</span>
+                    <span class="sample-original">{m.screenshots.belowModeOriginalSample}</span>
+                    <span class="translation-line">{m.screenshots.belowModeSample}</span>
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="showcase-media showcase-media-translation">
+              <img src={`${rootPrefix}assets/screenshots/hero-img1.png`} alt={m.screenshots.translationAlt}>
+            </div>
+          </article>
+
+          <article class="showcase-panel showcase-panel-reverse" data-screenshot-panel="inbox-context">
+            <div class="showcase-media showcase-media-inbox-context">
+              <img src={`${rootPrefix}assets/screenshots/hero-img2.png`} alt={m.screenshots.mentionAlt}>
+            </div>
+            <div class="showcase-copy">
+              <div class="showcase-brand">
+                <img src={`${rootPrefix}assets/logo.png`} width="178" height="60" alt="Chat Enhancer for YouTube">
+              </div>
+              <h3>{m.screenshots.mentionTitle}</h3>
+              <p>{m.screenshots.mentionIntro}</p>
+              <ul class="showcase-list">
+                <li set:html={m.screenshots.mentionMenuHtml}></li>
+                <li set:html={m.screenshots.mentionAuthorHtml}></li>
+                <li>{m.screenshots.mentionFocus}</li>
+              </ul>
+              <p>
+                <span set:html={m.screenshots.mentionInboxHtml}></span>
+                <span class="inline-symbol showcase-inline-icon" aria-hidden="true">
+                  <Icon name="inbox" viewBox="0 0 24 24" />
+                </span>.
+              </p>
+              <p>{m.screenshots.mentionSound}</p>
+            </div>
+          </article>
+
+          <article class="showcase-panel" data-screenshot-panel="extras">
+            <div class="showcase-copy showcase-copy-balanced">
+              <div class="showcase-brand">
+                <img src={`${rootPrefix}assets/logo.png`} width="178" height="60" alt="Chat Enhancer for YouTube">
+              </div>
+              <h3>{m.screenshots.extrasTitle}</h3>
+              <ul class="showcase-list">
+                <li>{m.screenshots.extrasAvatar}</li>
+                <li>{m.screenshots.extrasEmoji}</li>
+                <li>{m.screenshots.extrasCommands}</li>
+              </ul>
+              <dl class="showcase-command-list">
+                <div>
+                  <dt><code>/reply</code><code>/mention</code></dt>
+                  <dd>{m.screenshots.commandReplyBody}</dd>
+                </div>
+                <div>
+                  <dt><code>/time &lt;place&gt;</code></dt>
+                  <dd>{m.screenshots.commandTimeBody}</dd>
+                </div>
+                <div>
+                  <dt><code>/timeuntil &lt;time&gt;</code></dt>
+                  <dd>{m.screenshots.commandTimeUntilBody}</dd>
+                </div>
+                <div>
+                  <dt><code>/watch &lt;word&gt;</code></dt>
+                  <dd>{m.screenshots.commandWatchBody}</dd>
+                </div>
+              </dl>
+              <a class="feature-link showcase-command-link" href="#commands">
+                <span class="showcase-command-link-default">{m.screenshots.commandsFullLink}</span>
+                <span class="showcase-command-link-screenshot">{m.screenshots.commandsFullLinkScreenshot}</span>
+              </a>
+            </div>
+            <div class="showcase-media showcase-media-extras">
+              <img src={`${rootPrefix}assets/screenshots/hero-img3.png`} alt={m.screenshots.extrasAlt}>
+            </div>
+          </article>
+        </div>
+      </figure>
+    </div>
+  </div>
+</section>

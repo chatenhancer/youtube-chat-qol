@@ -158,7 +158,7 @@ export function getMessageStableId(message: HTMLElement): string {
   );
 }
 
-export function getTextFromRuns(runs: RendererRun[] | undefined): string {
+function getTextFromRuns(runs: RendererRun[] | undefined): string {
   if (!Array.isArray(runs)) return '';
   return runs.map((run) => run.text || getEmojiTextFromRun(run) || '').join('');
 }

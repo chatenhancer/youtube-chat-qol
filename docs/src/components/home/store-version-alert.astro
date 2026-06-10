@@ -1,0 +1,38 @@
+---
+import type { Messages } from '../../data/site';
+
+const { messages: m } = Astro.props as { messages: Messages };
+---
+
+<div
+  class="store-version-alert store-version-alert-top"
+  role="status"
+  aria-live="polite"
+  hidden
+  data-store-version-alert
+  data-alert-body={m.install.updatePendingBody}
+  data-alert-and={m.install.updatePendingAnd}
+  data-alert-chrome={m.install.chromeStore}
+  data-alert-firefox={m.install.firefoxAddons}
+>
+  <span class="store-version-alert-icon" aria-hidden="true">
+    <svg class="store-version-hourglass" viewBox="0 0 24 24" focusable="false">
+      <defs>
+        <clipPath id="store-version-hourglass-top-clip">
+          <path d="M8 4h8v3q0 1.65-1.175 2.825T12 11T9.175 9.825T8 7V4Z"></path>
+        </clipPath>
+        <clipPath id="store-version-hourglass-bottom-clip">
+          <path d="M8 20h8v-3q0-1.65-1.175-2.825T12 13t-2.825 1.175T8 17v3Z"></path>
+        </clipPath>
+      </defs>
+      <path class="store-version-hourglass-frame" d="M4 22v-2h2v-3q0-1.525.713-2.863T8.7 12q-1.275-.8-1.987-2.137T6 7V4H4V2h16v2h-2v3q0 1.525-.712 2.863T15.3 12q1.275.8 1.988 2.138T18 17v3h2v2H4Z"></path>
+      <rect class="store-version-hourglass-top-sand" x="8" y="4" width="8" height="7" clip-path="url(#store-version-hourglass-top-clip)"></rect>
+      <rect class="store-version-hourglass-bottom-sand" x="8" y="13" width="8" height="7" clip-path="url(#store-version-hourglass-bottom-clip)"></rect>
+      <path class="store-version-hourglass-stream" d="M12 10.8v4.7"></path>
+    </svg>
+  </span>
+  <span class="store-version-alert-copy">
+    <strong>{m.install.updatePendingTitle}</strong>
+    <span data-store-version-alert-message></span>
+  </span>
+</div>

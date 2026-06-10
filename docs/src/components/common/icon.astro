@@ -1,0 +1,19 @@
+---
+import { materialIcons } from '../../data/icons';
+
+type IconName = keyof typeof materialIcons;
+
+const {
+  class: className,
+  name,
+  viewBox = '0 -960 960 960'
+} = Astro.props as {
+  class?: string;
+  name: IconName;
+  viewBox?: string;
+};
+---
+
+<svg class={className} viewBox={viewBox} focusable="false" aria-hidden="true">
+  <path d={materialIcons[name]}></path>
+</svg>

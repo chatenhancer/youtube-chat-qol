@@ -1,0 +1,27 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import type { Messages } from '../../data/site';
+import Commands from './commands.astro';
+import Features from './features.astro';
+import Hero from './hero.astro';
+import Install from './install.astro';
+import LatestUpdates from './latest-updates.astro';
+import Playground from './playground.astro';
+import Privacy from './privacy.astro';
+import Screenshots from './screenshots.astro';
+
+const { messages, posts, rootPrefix } = Astro.props as {
+  messages: Messages;
+  posts: CollectionEntry<'blog'>[];
+  rootPrefix: string;
+};
+---
+
+<Hero messages={messages} rootPrefix={rootPrefix} />
+<Features messages={messages} />
+<Playground messages={messages} rootPrefix={rootPrefix} />
+<Screenshots messages={messages} rootPrefix={rootPrefix} />
+<Install messages={messages} rootPrefix={rootPrefix} />
+<Privacy messages={messages} />
+<Commands messages={messages} />
+<LatestUpdates posts={posts} rootPrefix={rootPrefix} />

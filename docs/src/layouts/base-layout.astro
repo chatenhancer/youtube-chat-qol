@@ -1,0 +1,118 @@
+---
+import '../styles/site.css';
+import homeScriptUrl from '../scripts/home.js?url';
+import type { Locale } from '../data/locales';
+import { canonicalUrlFor, htmlLangFor, localeMeta, locales } from '../data/locales';
+import { site, supportEmail } from '../data/site';
+import type { Messages } from '../data/site';
+
+const {
+  children,
+  locale,
+  messages,
+  rootPrefix = '',
+  title = messages.meta.title,
+  description = messages.meta.description,
+  canonicalUrl = canonicalUrlFor(locale),
+  image = `${site.url}/assets/social-card.png`,
+  imageAlt = messages.meta.imageAlt,
+  ogType = 'website',
+  clientConfig = {}
+} = Astro.props as {
+  canonicalUrl?: string;
+  clientConfig?: Record<string, unknown>;
+  children: unknown;
+  description?: string;
+  image?: string;
+  imageAlt?: string;
+  locale: Locale;
+  messages: Messages;
+  ogType?: string;
+  rootPrefix?: string;
+  title?: string;
+};
+
+const meta = localeMeta[locale];
+const htmlLang = htmlLangFor(locale);
+const alternateLinks = locales.map((entry) => ({
+  href: canonicalUrlFor(entry),
+  hreflang: htmlLangFor(entry)
+}));
+const stylesheetPreload = `${rootPrefix}assets/fonts/InterVariable.woff2`;
+const docsConfig = {
+  supportEmail,
+  ...clientConfig
+};
+---
+
+<!doctype html>
+<html lang={htmlLang} dir={meta.dir}>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{title}</title>
+    <meta name="description" content={description}>
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#ffffff">
+    <link rel="canonical" href={canonicalUrl}>
+    <meta property="og:title" content={site.title}>
+    <meta property="og:description" content={description}>
+    <meta property="og:type" content={ogType}>
+    <meta property="og:url" content={canonicalUrl}>
+    <meta property="og:site_name" content={site.title}>
+    <meta property="og:locale" content={meta.ogLocale}>
+    <meta property="og:image" content={image}>
+    <meta property="og:image:secure_url" content={image}>
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content={imageAlt}>
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content={site.title}>
+    <meta name="twitter:description" content={description}>
+    <meta name="twitter:image" content={image}>
+    <meta name="twitter:image:alt" content={imageAlt}>
+    {alternateLinks.map((link) => <link rel="alternate" hreflang={link.hreflang} href={link.href} />)}
+    <link rel="alternate" hreflang="x-default" href={canonicalUrlFor('en')}>
+    <link rel="icon" href={`${rootPrefix}assets/icons/icon-128.png`}>
+    <link rel="apple-touch-icon" href={`${rootPrefix}assets/icons/icon-128.png`}>
+    <link rel="preload" href={stylesheetPreload} as="font" type="font/woff2" crossorigin>
+    <script is:inline>
+      (() => {
+        const screenshotPanel = new URLSearchParams(window.location.search).get('ytcq-screenshot');
+        if (screenshotPanel) {
+          document.documentElement.dataset.screenshotPanel = screenshotPanel;
+        }
+      })();
+    </script>
+    <script type="application/ld+json" set:html={JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'SoftwareApplication',
+      name: site.title,
+      description,
+      url: canonicalUrl,
+      image,
+      applicationCategory: 'BrowserApplication',
+      operatingSystem: 'Chrome, Firefox',
+      offers: {
+        '@type': 'Offer',
+        price: '0',
+        priceCurrency: 'USD'
+      },
+      downloadUrl: [
+        site.chromeUrl,
+        site.firefoxUrl
+      ],
+      sameAs: [
+        site.sourceUrl,
+        site.chromeUrl,
+        site.firefoxUrl
+      ]
+    })}></script>
+  </head>
+  <body>
+    <slot />
+    <script type="application/json" data-docs-config set:html={JSON.stringify(docsConfig).replace(/</g, '\\u003c')}></script>
+    <script src={homeScriptUrl}></script>
+  </body>
+</html>

@@ -1,0 +1,39 @@
+---
+import BaseLayout from './base-layout.astro';
+import Header from '../components/home/header.astro';
+import Footer from '../components/home/footer.astro';
+import type { Messages } from '../data/site';
+
+const {
+  canonicalUrl,
+  description,
+  image,
+  messages,
+  rootPrefix = '../',
+  title
+} = Astro.props as {
+  canonicalUrl: string;
+  description: string;
+  image?: string;
+  messages: Messages;
+  rootPrefix?: string;
+  title: string;
+};
+---
+
+<BaseLayout
+  canonicalUrl={canonicalUrl}
+  description={description}
+  image={image}
+  locale="en"
+  messages={messages}
+  ogType="article"
+  rootPrefix={rootPrefix}
+  title={`${title} - Chat Enhancer for YouTube`}
+>
+  <Header messages={messages} rootPrefix={rootPrefix} />
+  <main class="blog-page">
+    <slot />
+  </main>
+  <Footer messages={messages} />
+</BaseLayout>

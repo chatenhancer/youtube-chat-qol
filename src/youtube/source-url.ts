@@ -22,10 +22,6 @@ export function getCurrentYouTubeChatSourceTitle(): string {
     getDocumentTitle(document);
 }
 
-export function getCurrentYouTubeChatVideoId(): string {
-  return getVideoIdFromUrl(getCurrentYouTubeChatSourceUrl());
-}
-
 export function getCurrentYouTubeChatStreamKey(): string {
   const sourceUrl = getCurrentYouTubeChatSourceUrl();
   return getVideoIdFromUrl(sourceUrl) ||

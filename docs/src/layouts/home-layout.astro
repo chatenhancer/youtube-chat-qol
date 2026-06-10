@@ -1,0 +1,28 @@
+---
+import BaseLayout from './base-layout.astro';
+import Footer from '../components/home/footer.astro';
+import Header from '../components/home/header.astro';
+import StoreVersionAlert from '../components/home/store-version-alert.astro';
+import SupportModal from '../components/home/support-modal.astro';
+import WalkthroughModal from '../components/home/walkthrough-modal.astro';
+import type { Locale } from '../data/locales';
+import type { Messages } from '../data/site';
+
+const { clientConfig = {}, locale, messages, rootPrefix } = Astro.props as {
+  clientConfig?: Record<string, unknown>;
+  locale: Locale;
+  messages: Messages;
+  rootPrefix: string;
+};
+---
+
+<BaseLayout clientConfig={clientConfig} locale={locale} messages={messages} rootPrefix={rootPrefix}>
+  <Header messages={messages} rootPrefix={rootPrefix} />
+  <StoreVersionAlert messages={messages} />
+  <main id="top">
+    <slot />
+  </main>
+  <SupportModal messages={messages} />
+  <WalkthroughModal messages={messages} />
+  <Footer messages={messages} />
+</BaseLayout>
