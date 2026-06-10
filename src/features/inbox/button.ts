@@ -7,6 +7,7 @@
 import { t } from '../../shared/i18n';
 import { ytcqCreateElement } from '../../shared/managed-dom';
 import { createInboxIcon, formatBadgeCount, setInboxIcon } from './icons';
+import { INBOX_BUTTON_CLASS, INBOX_BUTTON_HAS_UNREAD_CLASS, INBOX_BUTTON_SELECTOR } from './selectors';
 
 const HEADER_SELECTOR = 'yt-live-chat-header-renderer';
 const INBOX_BUTTON_OWNER_ID = `${Date.now()}-${Math.random()}`;
@@ -32,7 +33,7 @@ export function wireInboxButton(options: InboxButtonOptions): void {
   if (!header) return;
 
   const anchor = getInboxHeaderAnchor(header);
-  const existing = header.querySelector<HTMLButtonElement>('.ytcq-inbox-button');
+  const existing = header.querySelector<HTMLButtonElement>(INBOX_BUTTON_SELECTOR);
   if (existing?.dataset.ytcqInboxOwner === INBOX_BUTTON_OWNER_ID) {
     moveInboxButton(existing, header, anchor);
     refreshInboxButton(existing, options.getUnreadCount());
@@ -48,7 +49,7 @@ export function wireInboxButton(options: InboxButtonOptions): void {
 function createInboxButton(options: InboxButtonOptions): HTMLButtonElement {
   const button = ytcqCreateElement('button');
   button.type = 'button';
-  button.className = 'ytcq-inbox-button';
+  button.className = INBOX_BUTTON_CLASS;
   button.dataset.ytcqInboxOwner = INBOX_BUTTON_OWNER_ID;
   button.title = t('inbox');
   button.setAttribute('aria-label', getInboxAriaLabel(options.getUnreadCount()));
@@ -62,12 +63,12 @@ function createInboxButton(options: InboxButtonOptions): HTMLButtonElement {
 }
 
 export function refreshInboxSurfaces(getUnreadCount: () => number): void {
-  document.querySelectorAll<HTMLButtonElement>('.ytcq-inbox-button')
+  document.querySelectorAll<HTMLButtonElement>(INBOX_BUTTON_SELECTOR)
     .forEach((button) => refreshInboxButton(button, getUnreadCount()));
 }
 
 export function cleanupStaleInboxButtons(): void {
-  document.querySelectorAll<HTMLButtonElement>('.ytcq-inbox-button').forEach((button) => button.remove());
+  document.querySelectorAll<HTMLButtonElement>(INBOX_BUTTON_SELECTOR).forEach((button) => button.remove());
 }
 
 function refreshInboxButton(button: HTMLButtonElement, unread: number): void {
@@ -78,8 +79,8 @@ function refreshInboxButton(button: HTMLButtonElement, unread: number): void {
   if (button.getAttribute('aria-label') !== ariaLabel) {
     button.setAttribute('aria-label', ariaLabel);
   }
-  if (button.classList.contains('ytcq-inbox-button-has-unread') !== hasUnread) {
-    button.classList.toggle('ytcq-inbox-button-has-unread', hasUnread);
+  if (button.classList.contains(INBOX_BUTTON_HAS_UNREAD_CLASS) !== hasUnread) {
+    button.classList.toggle(INBOX_BUTTON_HAS_UNREAD_CLASS, hasUnread);
   }
   setInboxIcon(button, hasUnread);
 

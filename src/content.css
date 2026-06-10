@@ -1725,6 +1725,8 @@ yt-live-chat-header-renderer .ytcq-inbox-badge[hidden] {
   white-space: nowrap;
 }
 
+.ytcq-game-panel-close,
+.ytcq-game-sound-toggle,
 .ytcq-chess-game-close,
 .ytcq-chess-game-sound-toggle {
   display: inline-flex;
@@ -1741,10 +1743,15 @@ yt-live-chat-header-renderer .ytcq-inbox-badge[hidden] {
   cursor: pointer;
 }
 
+.ytcq-game-sound-toggle[aria-pressed="false"],
 .ytcq-chess-game-sound-toggle[aria-pressed="false"] {
   opacity: 0.78;
 }
 
+.ytcq-game-panel-close:hover,
+.ytcq-game-panel-close:focus,
+.ytcq-game-sound-toggle:hover,
+.ytcq-game-sound-toggle:focus,
 .ytcq-chess-game-close:hover,
 .ytcq-chess-game-close:focus,
 .ytcq-chess-game-sound-toggle:hover,
@@ -1754,6 +1761,8 @@ yt-live-chat-header-renderer .ytcq-inbox-badge[hidden] {
   outline: none;
 }
 
+.ytcq-game-panel-close svg,
+.ytcq-game-sound-toggle svg,
 .ytcq-chess-game-close svg,
 .ytcq-chess-game-sound-toggle svg {
   display: block;
@@ -1780,6 +1789,7 @@ yt-live-chat-header-renderer .ytcq-inbox-badge[hidden] {
   image-rendering: crisp-edges;
 }
 
+.ytcq-game-status,
 .ytcq-chess-game-status {
   position: absolute;
   top: 0;
@@ -1799,10 +1809,12 @@ yt-live-chat-header-renderer .ytcq-inbox-badge[hidden] {
   pointer-events: none;
 }
 
+.ytcq-game-status[hidden],
 .ytcq-chess-game-status[hidden] {
   display: none;
 }
 
+.ytcq-game-feedback-message,
 .ytcq-chess-feedback-message {
   position: fixed;
   z-index: 2147483647;
@@ -1823,10 +1835,10 @@ yt-live-chat-header-renderer .ytcq-inbox-badge[hidden] {
   pointer-events: none;
   text-align: center;
   transform: translate(-50%, -100%);
-  animation: ytcq-chess-feedback-float 1.1s ease-out forwards;
+  animation: ytcq-game-feedback-float 1.1s ease-out forwards;
 }
 
-@keyframes ytcq-chess-feedback-float {
+@keyframes ytcq-game-feedback-float {
   0% {
     opacity: 0;
     transform: translate(-50%, -82%) scale(0.96);

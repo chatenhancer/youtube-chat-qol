@@ -28,6 +28,7 @@ import {
   getLiveInboxMessage,
   getUnreadInboxCount
 } from './state';
+import { INBOX_BUTTON_SELECTOR } from './selectors';
 import type { InboxRecord } from './types';
 
 export interface InboxCardCallbacks {
@@ -114,7 +115,7 @@ export function openInboxCardView(anchor: HTMLElement | undefined, callbacks: In
 
   const handleOutsideClick = (event: MouseEvent): void => {
     if (activeInboxCard?.contains(event.target as Node)) return;
-    if ((event.target as Element | null)?.closest?.('.ytcq-inbox-button')) return;
+    if ((event.target as Element | null)?.closest?.(INBOX_BUTTON_SELECTOR)) return;
     closeInboxCard();
   };
   const handleKeydown = (event: KeyboardEvent): void => {

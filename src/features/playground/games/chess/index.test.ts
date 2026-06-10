@@ -2,10 +2,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   closeChessGamePanel,
   openChessGamePanel,
-  PLAYGROUND_GAME_SOUNDS_STORAGE_KEY,
   updateChessGamePanel,
   type PublicChessGame
-} from './chess';
+} from './panel';
+import { PLAYGROUND_GAME_SOUNDS_STORAGE_KEY } from '../sound';
 
 interface AudioMock {
   play: ReturnType<typeof vi.fn>;

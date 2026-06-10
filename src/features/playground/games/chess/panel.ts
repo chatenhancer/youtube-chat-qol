@@ -1,15 +1,28 @@
+/**
+ * Chess game panel.
+ *
+ * Renders the draggable chess board canvas, handles local click/hover feedback,
+ * plays move sounds, and emits validated move intents back to the chess adapter.
+ */
 import { Chess, type Move, type Square } from 'chess.js';
-import { createCloseIcon, createGamesIcon, createVolumeOffIcon, createVolumeUpIcon } from '../../shared/icons';
-import { t } from '../../shared/i18n';
-import { ytcqCreateElement } from '../../shared/managed-dom';
-import type { PublicGame, PublicUserIdentity } from '../../shared/playground-protocol';
+import { createGamesIcon } from '../../../../shared/icons';
+import { t } from '../../../../shared/i18n';
+import { ytcqCreateElement } from '../../../../shared/managed-dom';
+import type { PublicGame, PublicUserIdentity } from '../../../../shared/playground-protocol';
+import {
+  createGamePanelStatusOverlay,
+  showGamePanelFeedbackBubble,
+  type GamePanelStatusMessage,
+  type GamePanelStatusOverlay
+} from '../panel-feedback';
+import { createGamePanelShell } from '../panel-shell';
+import { createGameSoundController, type GameSoundController } from '../sound';
 
 const BOARD_PATH = 'games/chess/board.png';
 const CAPTURE_SOUND_PATH = 'games/chess/capture.mp3';
 const MOVE_SOUND_PATH = 'games/chess/move.mp3';
 const WHITE_PIECES_PATH = 'games/chess/white-pieces.png';
 const BLACK_PIECES_PATH = 'games/chess/black-pieces.png';
-export const PLAYGROUND_GAME_SOUNDS_STORAGE_KEY = 'ytcqPlaygroundGameSoundsEnabled:v1';
 const BOARD_SIZE = 8;
 const CANVAS_CSS_SIZE = 224;
 const PIECE_SOURCE_SIZE = 32;
@@ -48,7 +61,6 @@ interface ChessGamePanelState {
   assets: ChessAssets | null;
   canvas: HTMLCanvasElement;
   currentUserId: string;
-  dragOffset: { x: number; y: number } | null;
   game: PublicChessGame;
   hoverSquare: BoardSquare | null;
   listeners: AbortController;
@@ -57,12 +69,9 @@ interface ChessGamePanelState {
   panel: HTMLElement;
   pixelRatio: number;
   selectedSquare: BoardSquare | null;
-  soundButton: HTMLButtonElement;
-  soundsEnabled: boolean;
-  soundsPreferenceTouched: boolean;
-  statusElement: HTMLElement;
-  statusMessageKey: string | null;
-  statusMessageTimeout: number | null;
+  soundController: GameSoundController;
+  statusOverlay: GamePanelStatusOverlay;
+  subtitleElement: HTMLElement;
 }
 
 const PIECE_SOURCE: Record<PieceKind, { x: number; y: number }> = {
@@ -100,69 +109,42 @@ export function openChessGamePanel(
 ): void {
   closeChessGamePanel({ notify: false });
 
-  const panel = ytcqCreateElement('section');
-  panel.className = 'ytcq-chess-game-panel';
-  panel.setAttribute('role', 'dialog');
-  panel.setAttribute('aria-label', t('gamesChess'));
+  const listeners = new AbortController();
 
-  const header = ytcqCreateElement('div');
-  header.className = 'ytcq-chess-game-header';
+  const soundController = createGameSoundController({
+    className: 'ytcq-chess-game-sound-toggle',
+    signal: listeners.signal
+  });
 
-  const icon = ytcqCreateElement('span');
-  icon.className = 'ytcq-chess-game-icon';
-  icon.append(createGamesIcon());
-
-  const titleWrap = ytcqCreateElement('div');
-  titleWrap.className = 'ytcq-chess-game-title-wrap';
-
-  const title = ytcqCreateElement('div');
-  title.className = 'ytcq-chess-game-title';
-  title.textContent = t('gamesChess');
-
-  const subtitle = ytcqCreateElement('div');
-  subtitle.className = 'ytcq-chess-game-subtitle';
-  subtitle.textContent = getChessOpponentLabel(game, currentUserId);
-
-  const soundButton = ytcqCreateElement('button');
-  soundButton.type = 'button';
-  soundButton.className = 'ytcq-chess-game-sound-toggle';
-  setChessSoundToggleButtonState(soundButton, true);
-  soundButton.addEventListener('click', toggleChessSounds);
-
-  const closeButton = ytcqCreateElement('button');
-  closeButton.type = 'button';
-  closeButton.className = 'ytcq-chess-game-close';
-  closeButton.setAttribute('aria-label', t('gamesMinimize'));
-  closeButton.title = t('gamesMinimize');
-  closeButton.append(createCloseIcon());
-  closeButton.addEventListener('click', () => closeChessGamePanel());
-
-  titleWrap.append(title, subtitle);
-  header.append(icon, titleWrap, soundButton, closeButton);
-  header.addEventListener('pointerdown', handleChessPanelPointerDown);
-
-  const body = ytcqCreateElement('div');
-  body.className = 'ytcq-chess-game-body';
+  const {
+    body,
+    panel,
+    subtitleElement
+  } = createGamePanelShell({
+    ariaLabel: t('gamesChess'),
+    classNamePrefix: 'ytcq-chess-game',
+    closeLabel: t('gamesMinimize'),
+    headerActions: [soundController.button],
+    icon: createGamesIcon(),
+    onClose: () => closeChessGamePanel(),
+    signal: listeners.signal,
+    subtitle: getChessOpponentLabel(game, currentUserId),
+    title: t('gamesChess')
+  });
 
   const canvas = ytcqCreateElement('canvas');
   canvas.className = 'ytcq-chess-board-canvas';
   canvas.setAttribute('aria-label', t('gamesChess'));
   const pixelRatio = configureChessCanvas(canvas);
-  const statusElement = ytcqCreateElement('div');
-  statusElement.className = 'ytcq-chess-game-status';
-  statusElement.hidden = true;
-  statusElement.setAttribute('aria-live', 'polite');
-  body.append(canvas, statusElement);
+  const statusOverlay = createGamePanelStatusOverlay({
+    classNamePrefix: 'ytcq-chess-game'
+  });
+  body.append(canvas, statusOverlay.element);
 
-  panel.append(header, body);
-  document.body.append(panel);
-
-  const listeners = new AbortController();
   activeChessGamePanel = {
     assets: null,
     canvas,
     currentUserId,
-    dragOffset: null,
     game,
     hoverSquare: null,
     listeners,
@@ -171,27 +153,14 @@ export function openChessGamePanel(
     panel,
     pixelRatio,
     selectedSquare: null,
-    soundButton,
-    soundsEnabled: true,
-    soundsPreferenceTouched: false,
-    statusElement,
-    statusMessageKey: null,
-    statusMessageTimeout: null
+    soundController,
+    statusOverlay,
+    subtitleElement
   };
 
   canvas.addEventListener('click', handleChessCanvasClick, { signal: listeners.signal });
   canvas.addEventListener('mousemove', handleChessCanvasMouseMove, { signal: listeners.signal });
   canvas.addEventListener('mouseleave', handleChessCanvasMouseLeave, { signal: listeners.signal });
-  document.addEventListener('keydown', handleChessPanelKeydown, { capture: true, signal: listeners.signal });
-  document.addEventListener('pointermove', handleChessPanelPointerMove, { signal: listeners.signal });
-  document.addEventListener('pointerup', handleChessPanelPointerUp, { signal: listeners.signal });
-
-  void getStoredChessSoundsEnabled().then((enabled) => {
-    if (!activeChessGamePanel || activeChessGamePanel.soundButton !== soundButton) return;
-    if (activeChessGamePanel.soundsPreferenceTouched) return;
-    activeChessGamePanel.soundsEnabled = enabled;
-    setChessSoundToggleButtonState(soundButton, enabled);
-  });
 
   syncChessGameStatusMessage();
   renderChessBoard();
@@ -209,10 +178,9 @@ export function updateChessGamePanel(game: PublicChessGame, currentUserId: strin
   activeChessGamePanel.currentUserId = currentUserId;
   activeChessGamePanel.selectedSquare = null;
   syncChessGameStatusMessage();
-  const subtitle = activeChessGamePanel.panel.querySelector<HTMLElement>('.ytcq-chess-game-subtitle');
-  if (subtitle) subtitle.textContent = getChessOpponentLabel(game, currentUserId);
+  activeChessGamePanel.subtitleElement.textContent = getChessOpponentLabel(game, currentUserId);
   renderChessBoard();
-  if (moveSoundPath && activeChessGamePanel.soundsEnabled) playChessSound(moveSoundPath);
+  if (moveSoundPath) activeChessGamePanel.soundController.play(moveSoundPath);
 }
 
 export function showChessGameEndedNotice(message: string): void {
@@ -229,7 +197,7 @@ export function showChessGameEndedNotice(message: string): void {
 
 export function closeChessGamePanel({ notify = true }: { notify?: boolean } = {}): void {
   const onVisibilityChanged = activeChessGamePanel?.onVisibilityChanged || null;
-  clearChessStatusMessage();
+  activeChessGamePanel?.statusOverlay.clear();
   activeChessGamePanel?.listeners.abort();
   activeChessGamePanel?.panel.remove();
   activeChessGamePanel = null;
@@ -254,7 +222,7 @@ export function isPublicChessGame(game: PublicGame | undefined): game is PublicC
 
 function handleChessCanvasClick(event: MouseEvent): void {
   if (!activeChessGamePanel || activeChessGamePanel.game.status !== 'active') return;
-  if (!activeChessGamePanel.statusElement.hidden && activeChessGamePanel.statusElement.dataset.temporary !== 'true') return;
+  if (!activeChessGamePanel.statusOverlay.element.hidden && activeChessGamePanel.statusOverlay.element.dataset.temporary !== 'true') return;
 
   const square = getChessCanvasSquare(event);
   if (!square) return;
@@ -310,24 +278,11 @@ function handleChessCanvasClick(event: MouseEvent): void {
 }
 
 function showChessFeedbackMessage(event: MouseEvent, message: string): void {
-  if (!activeChessGamePanel) return;
-
-  const bubble = ytcqCreateElement('div');
-  bubble.className = 'ytcq-chess-feedback-message';
-  bubble.textContent = message;
-  bubble.style.visibility = 'hidden';
-  document.body.append(bubble);
-  positionChessFeedbackMessage(bubble, event);
-  bubble.style.visibility = '';
-
-  const removeBubble = (): void => bubble.remove();
-  bubble.addEventListener('animationend', removeBubble, { once: true });
-  window.setTimeout(removeBubble, 1300);
-}
-
-function positionChessFeedbackMessage(bubble: HTMLElement, event: MouseEvent): void {
-  bubble.style.left = `${Math.round(event.clientX)}px`;
-  bubble.style.top = `${Math.round(event.clientY)}px`;
+  showGamePanelFeedbackBubble({
+    className: 'ytcq-chess-feedback-message',
+    event,
+    message
+  });
 }
 
 function syncChessGameStatusMessage(): void {
@@ -346,40 +301,16 @@ function showChessStatusMessage({
   key,
   message,
   temporary
-}: {
-  key: string;
-  message: string;
-  temporary: boolean;
-}): void {
-  if (!activeChessGamePanel || activeChessGamePanel.statusMessageKey === key) return;
-
-  clearChessStatusMessage();
-  activeChessGamePanel.statusMessageKey = key;
-  activeChessGamePanel.statusElement.textContent = message;
-  activeChessGamePanel.statusElement.dataset.temporary = temporary ? 'true' : 'false';
-  activeChessGamePanel.statusElement.hidden = false;
-
-  if (temporary) {
-    activeChessGamePanel.statusMessageTimeout = window.setTimeout(() => {
-      clearChessStatusMessage();
-    }, 1500);
-  }
+}: GamePanelStatusMessage): void {
+  if (!activeChessGamePanel) return;
+  activeChessGamePanel.statusOverlay.show({ key, message, temporary });
 }
 
 function clearChessStatusMessage({ resetKey = false }: { resetKey?: boolean } = {}): void {
-  if (!activeChessGamePanel) return;
-
-  if (activeChessGamePanel.statusMessageTimeout !== null) {
-    window.clearTimeout(activeChessGamePanel.statusMessageTimeout);
-    activeChessGamePanel.statusMessageTimeout = null;
-  }
-  activeChessGamePanel.statusElement.hidden = true;
-  activeChessGamePanel.statusElement.textContent = '';
-  delete activeChessGamePanel.statusElement.dataset.temporary;
-  if (resetKey) activeChessGamePanel.statusMessageKey = null;
+  activeChessGamePanel?.statusOverlay.clear({ resetKey });
 }
 
-function getChessGameStatusMessage(game: PublicChessGame): { key: string; message: string; temporary: boolean } | null {
+function getChessGameStatusMessage(game: PublicChessGame): GamePanelStatusMessage | null {
   switch (game.status) {
     case 'checkmate':
       return {
@@ -429,40 +360,6 @@ function getFenPieceCount(fen: string): number {
   return parseFenPieces(fen).length;
 }
 
-function playChessSound(path: string): void {
-  try {
-    const audio = new Audio(chrome.runtime.getURL(path));
-    void audio.play().catch(() => undefined);
-  } catch {
-    // Audio playback failures should never affect the game UI.
-  }
-}
-
-function toggleChessSounds(): void {
-  if (!activeChessGamePanel) return;
-
-  const enabled = !activeChessGamePanel.soundsEnabled;
-  activeChessGamePanel.soundsEnabled = enabled;
-  activeChessGamePanel.soundsPreferenceTouched = true;
-  setChessSoundToggleButtonState(activeChessGamePanel.soundButton, enabled);
-  chrome.storage.local.set({ [PLAYGROUND_GAME_SOUNDS_STORAGE_KEY]: enabled });
-}
-
-function setChessSoundToggleButtonState(button: HTMLButtonElement, enabled: boolean): void {
-  button.setAttribute('aria-pressed', String(enabled));
-  button.setAttribute('aria-label', t(enabled ? 'gamesMuteSounds' : 'gamesUnmuteSounds'));
-  button.title = t(enabled ? 'gamesMuteSounds' : 'gamesUnmuteSounds');
-  button.replaceChildren(enabled ? createVolumeUpIcon() : createVolumeOffIcon());
-}
-
-function getStoredChessSoundsEnabled(): Promise<boolean> {
-  return new Promise((resolve) => {
-    chrome.storage.local.get({ [PLAYGROUND_GAME_SOUNDS_STORAGE_KEY]: true }, (stored) => {
-      resolve(stored[PLAYGROUND_GAME_SOUNDS_STORAGE_KEY] !== false);
-    });
-  });
-}
-
 function handleChessCanvasMouseMove(event: MouseEvent): void {
   if (!activeChessGamePanel) return;
 
@@ -478,48 +375,6 @@ function handleChessCanvasMouseLeave(): void {
   if (!activeChessGamePanel?.hoverSquare) return;
   activeChessGamePanel.hoverSquare = null;
   renderChessBoard();
-}
-
-function handleChessPanelKeydown(event: KeyboardEvent): void {
-  if (event.key === 'Escape') closeChessGamePanel();
-}
-
-function handleChessPanelPointerDown(event: PointerEvent): void {
-  if (!activeChessGamePanel) return;
-  if ((event.target as Element | null)?.closest('button')) return;
-
-  const rect = activeChessGamePanel.panel.getBoundingClientRect();
-  activeChessGamePanel.dragOffset = {
-    x: event.clientX - rect.left,
-    y: event.clientY - rect.top
-  };
-  activeChessGamePanel.panel.classList.add('ytcq-chess-game-panel-dragging');
-  activeChessGamePanel.panel.style.left = `${Math.round(rect.left)}px`;
-  activeChessGamePanel.panel.style.top = `${Math.round(rect.top)}px`;
-  activeChessGamePanel.panel.style.right = 'auto';
-  activeChessGamePanel.panel.style.bottom = 'auto';
-  activeChessGamePanel.panel.setPointerCapture?.(event.pointerId);
-  event.preventDefault();
-}
-
-function handleChessPanelPointerMove(event: PointerEvent): void {
-  if (!activeChessGamePanel?.dragOffset) return;
-
-  const rect = activeChessGamePanel.panel.getBoundingClientRect();
-  const maxLeft = Math.max(8, window.innerWidth - rect.width - 8);
-  const maxTop = Math.max(8, window.innerHeight - rect.height - 8);
-  const left = Math.min(maxLeft, Math.max(8, event.clientX - activeChessGamePanel.dragOffset.x));
-  const top = Math.min(maxTop, Math.max(8, event.clientY - activeChessGamePanel.dragOffset.y));
-  activeChessGamePanel.panel.style.left = `${Math.round(left)}px`;
-  activeChessGamePanel.panel.style.top = `${Math.round(top)}px`;
-}
-
-function handleChessPanelPointerUp(event: PointerEvent): void {
-  if (!activeChessGamePanel?.dragOffset) return;
-
-  activeChessGamePanel.dragOffset = null;
-  activeChessGamePanel.panel.classList.remove('ytcq-chess-game-panel-dragging');
-  activeChessGamePanel.panel.releasePointerCapture?.(event.pointerId);
 }
 
 function renderChessBoard(): void {

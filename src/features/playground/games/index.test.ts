@@ -1,13 +1,13 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { DEFAULT_OPTIONS } from '../../shared/options';
-import type { LobbySnapshot, PlaygroundBackgroundMessage, PublicGame } from '../../shared/playground-protocol';
-import { setOptions } from '../../shared/state';
+import { DEFAULT_OPTIONS } from '../../../shared/options';
+import type { LobbySnapshot, PlaygroundBackgroundMessage, PublicGame } from '../../../shared/playground-protocol';
+import { setOptions } from '../../../shared/state';
 import {
   cleanupStaleGamesButtons,
   refreshGamesButton,
   scheduleGamesButtonWire,
   wireGamesButton
-} from './games';
+} from './index';
 
 describe('playground games header button', () => {
   beforeEach(() => {
