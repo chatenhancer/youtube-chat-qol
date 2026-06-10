@@ -48,6 +48,19 @@
     "walkthroughModalTitle": "Panoramica delle funzioni",
     "walkthroughClose": "Chiudi panoramica"
   },
+  "playground": {
+    "eyebrow": "Playground",
+    "title": "Piccoli giochi per<br>le pause della chat live",
+    "copy": "Playground è uno spazio opzionale per esperimenti che rendono gli stream più interattivi. Si parte dagli scacchi: invita uno spettatore disponibile*, avvia la partita e continua a seguire la chat.",
+    "tagsAria": "Punti salienti di Playground",
+    "tagOptIn": "Beta opzionale",
+    "tagStream": "Lobby per stream",
+    "tagChess": "Giochi rapidi",
+    "primaryCta": "Provalo nell’estensione",
+    "secondaryCta": "Come Playground gestisce i dati",
+    "imageAlt": "Pannello di scacchi flottante nella chat live di YouTube",
+    "note": "* Entrambi i giocatori devono avere l’estensione per giocare insieme"
+  },
   "screenshots": {
     "eyebrow": "Screenshot",
     "title": "Miglioramenti chat<br>in stile nativo",

@@ -48,6 +48,19 @@
     "walkthroughModalTitle": "Feature walkthrough",
     "walkthroughClose": "Close walkthrough"
   },
+  "playground": {
+    "eyebrow": "Playground",
+    "title": "Tiny games for<br>live chat breaks",
+    "copy": "Playground is an opt-in space for experiments that make streams more interactive. Chess is first: invite an available viewer*, start the game, and keep chat nearby.",
+    "tagsAria": "Playground highlights",
+    "tagOptIn": "Opt-in beta",
+    "tagStream": "Stream lobbies",
+    "tagChess": "Quick games",
+    "primaryCta": "Try it in the extension",
+    "secondaryCta": "How Playground handles data",
+    "imageAlt": "Floating chess game panel inside YouTube live chat",
+    "note": "* Players both need the extension to play together"
+  },
   "screenshots": {
     "eyebrow": "Screenshots",
     "title": "Native-feeling chat<br>improvements",
