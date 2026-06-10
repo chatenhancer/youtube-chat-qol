@@ -948,12 +948,15 @@ h3 {
 }
 
 .playground-copy h2 {
-  max-width: 500px;
+  max-width: 640px;
   margin: 0;
   color: var(--text);
-  font-size: clamp(30px, 4vw, 46px);
-  line-height: 1.02;
+  font-size: clamp(30px, 3.6vw, 44px);
+  line-height: 1.08;
   letter-spacing: 0;
+  overflow-wrap: normal;
+  text-wrap: balance;
+  word-break: keep-all;
 }
 
 .playground-copy p {
@@ -2259,6 +2262,7 @@ figcaption {
 
   .playground-copy h2 {
     font-size: clamp(32px, 11vw, 44px);
+    word-break: normal;
   }
 
   .playground-copy p {
