@@ -1122,7 +1122,7 @@ h3 {
   left: 50%;
   z-index: 30;
   width: fit-content;
-  max-width: min(400px, calc(100% - 64px));
+  max-width: min(420px, calc(100% - 64px));
   margin: 0;
   border-radius: 10px;
   box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
