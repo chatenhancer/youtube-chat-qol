@@ -68,14 +68,14 @@ img {
 .site-header::after {
   content: "";
   position: absolute;
-  bottom: -1px;
+  bottom: -12px;
   left: 50%;
-  width: 168px;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(44, 118, 230, 0.18), transparent);
-  border-radius: 999px;
+  width: min(420px, calc(100% - 56px));
+  height: 14px;
+  background: radial-gradient(ellipse at top, rgba(23, 105, 209, 0.13), rgba(23, 105, 209, 0.045) 44%, transparent 74%);
   opacity: 0;
-  transform: translateX(-50%) scaleX(0.85);
+  transform: translateX(-50%) translateY(-2px) scaleX(0.88);
+  transform-origin: top center;
   transition: opacity 180ms ease, transform 180ms ease;
   pointer-events: none;
 }
@@ -86,7 +86,7 @@ img {
 
 .site-header.site-header-top::after {
   opacity: 1;
-  transform: translateX(-50%);
+  transform: translateX(-50%) translateY(0) scaleX(1);
 }
 
 .site-header-actions {
