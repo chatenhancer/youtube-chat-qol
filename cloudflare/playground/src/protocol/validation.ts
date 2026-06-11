@@ -70,24 +70,6 @@ export function sanitizeStreamKey(value: string): string {
   return streamKey;
 }
 
-export function sanitizeDisplayName(value: unknown): string {
-  const displayName = typeof value === 'string' ? value.trim().replace(/\s+/g, ' ') : '';
-  return displayName.slice(0, 60) || 'Player';
-}
-
-export function sanitizeAvatarUrl(value: unknown): string | undefined {
-  if (typeof value !== 'string') return undefined;
-  const text = value.trim();
-  if (!text || text.length > 400) return undefined;
-
-  try {
-    const url = new URL(text);
-    return url.protocol === 'https:' ? url.toString() : undefined;
-  } catch {
-    return undefined;
-  }
-}
-
 function parseHelloMessage(value: Record<string, unknown>): ClientMessage {
   if (value.protocolVersion !== PLAYGROUND_PROTOCOL_VERSION) {
     throw new ProtocolError('protocol_version', `Expected protocol version ${PLAYGROUND_PROTOCOL_VERSION}.`);
@@ -96,17 +78,11 @@ function parseHelloMessage(value: Record<string, unknown>): ClientMessage {
   const identity = value.identity;
   if (!isRecord(identity)) throw new ProtocolError('identity_required', 'Signed identity is required.');
 
-  const profile = isRecord(value.profile) ? value.profile : {};
-
   return {
     availableGames: parseGameList(value.availableGames || []),
     identity: {
       publicKeyJwk: parsePublicKey(identity.publicKeyJwk),
       signature: getString(identity, 'signature')
-    },
-    profile: {
-      avatarUrl: sanitizeAvatarUrl(profile.avatarUrl),
-      displayName: sanitizeDisplayName(profile.displayName)
     },
     protocolVersion: PLAYGROUND_PROTOCOL_VERSION,
     type: 'hello'

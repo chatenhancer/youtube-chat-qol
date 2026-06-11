@@ -146,7 +146,7 @@
     "translationTitle": "Dịch",
     "translationBody": "Tắt theo mặc định. Nếu bật, văn bản chat đến hoặc bản nháp bạn chọn dịch sẽ được gửi đến Google Translate mà không kèm cookie hay thông tin đăng nhập YouTube của bạn.",
     "trackingTitle": "Theo dõi",
-    "trackingBody": "Không có phân tích, không thu thập lịch sử duyệt web, không bán dữ liệu, không có máy chủ riêng của tiện ích."
+    "trackingBody": "Không có phân tích, không thu thập lịch sử duyệt web, không bán dữ liệu."
   },
   "commands": {
     "eyebrow": "Tham chiếu",

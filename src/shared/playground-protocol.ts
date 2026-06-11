@@ -13,7 +13,6 @@ export type GameEndReason = 'playerLeft';
 export type InviteStatus = 'accepted' | 'ignored' | 'pending';
 
 export interface PublicUserIdentity {
-  avatarUrl?: string;
   displayName: string;
   userId: string;
 }
@@ -56,7 +55,6 @@ export type ClientMessage =
 export interface HelloClientMessage {
   availableGames?: GameId[];
   identity: SignedClientIdentity;
-  profile?: ClientProfile;
   protocolVersion: typeof PLAYGROUND_PROTOCOL_VERSION;
   type: 'hello';
 }
@@ -64,11 +62,6 @@ export interface HelloClientMessage {
 export interface SignedClientIdentity {
   publicKeyJwk: JsonWebKey;
   signature: string;
-}
-
-export interface ClientProfile {
-  avatarUrl?: string;
-  displayName?: string;
 }
 
 export interface SetAvailabilityClientMessage {
@@ -184,7 +177,6 @@ export type PlaygroundContentMessage =
 
 export interface PlaygroundInitMessage {
   availableGames: GameId[];
-  profile?: ClientProfile;
   streamKey: string;
   type: 'ytcq:playground:init';
 }

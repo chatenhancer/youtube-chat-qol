@@ -31,7 +31,8 @@ sending YouTube cookies or credentials.
 
 Playground traffic is scoped to the current stream. It can include presence,
 available games, invites, invite responses, and game actions such as chess
-moves. It should not include live chat message text.
+moves. It should not include live chat message text, YouTube handles, or
+YouTube avatar URLs.
 
 ## Room model
 

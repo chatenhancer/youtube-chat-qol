@@ -146,7 +146,7 @@
     "translationTitle": "Übersetzung",
     "translationBody": "Standardmäßig aus. Wenn aktiviert, wird eingehender Chattext oder Entwurfstext, den du übersetzen lässt, ohne deine YouTube-Cookies oder Zugangsdaten an Google Translate gesendet.",
     "trackingTitle": "Nachverfolgung",
-    "trackingBody": "Keine Analysen, keine Sammlung des Browserverlaufs, kein Datenverkauf und kein eigener Erweiterungsserver."
+    "trackingBody": "Keine Analysen, keine Sammlung des Browserverlaufs und kein Datenverkauf."
   },
   "commands": {
     "eyebrow": "Referenz",

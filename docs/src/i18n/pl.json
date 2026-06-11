@@ -146,7 +146,7 @@
     "translationTitle": "Tłumaczenie",
     "translationBody": "Domyślnie wyłączone. Po włączeniu tekst przychodzącego czatu lub szkic, który wybierzesz do tłumaczenia, jest wysyłany do Google Translate bez Twoich ciasteczek ani danych logowania YouTube.",
     "trackingTitle": "Śledzenie",
-    "trackingBody": "Brak analityki, zbierania historii przeglądania, sprzedaży danych i serwera należącego do rozszerzenia."
+    "trackingBody": "Brak analityki, zbierania historii przeglądania i sprzedaży danych."
   },
   "commands": {
     "eyebrow": "Referencja",

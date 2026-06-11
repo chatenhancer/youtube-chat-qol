@@ -15,7 +15,7 @@ import {
   type PublicUserIdentity,
   type ServerMessage
 } from '../protocol/messages';
-import { parseClientMessage, ProtocolError, sanitizeAvatarUrl, sanitizeDisplayName, sanitizeStreamKey } from '../protocol/validation';
+import { parseClientMessage, ProtocolError, sanitizeStreamKey } from '../protocol/validation';
 import { TokenBucket, type TokenBucketOptions } from '../rate-limit';
 import type { DurableObjectState, Env, ServerWebSocket } from '../types';
 
@@ -41,7 +41,6 @@ const MESSAGE_RATE_COSTS: { [Type in ClientMessage['type']]: number } = {
 
 interface ClientSession {
   availableGames: Set<GameId>;
-  avatarUrl?: string;
   challenge: string;
   connectionId: string;
   displayName: string;
@@ -202,8 +201,7 @@ export class StreamRoom {
 
     const identity = await verifySignedIdentity(session.challenge, message.identity);
     session.userId = identity.userId;
-    session.displayName = sanitizeDisplayName(message.profile?.displayName);
-    session.avatarUrl = sanitizeAvatarUrl(message.profile?.avatarUrl);
+    session.displayName = getPlayerDisplayName(identity.userId);
     session.availableGames = new Set(message.availableGames || []);
     this.userAvailableGames.set(session.userId, [...session.availableGames]);
     session.joinedAt = Date.now();
@@ -444,7 +442,6 @@ export class StreamRoom {
       const existing = users.get(client.userId);
       users.set(client.userId, {
         availableGames: this.userAvailableGames.get(client.userId) || [...client.availableGames],
-        avatarUrl: client.avatarUrl || existing?.avatarUrl,
         displayName: client.displayName || existing?.displayName || 'Player',
         joinedAt: Math.min(existing?.joinedAt || client.joinedAt, client.joinedAt),
         userId: client.userId
@@ -465,8 +462,7 @@ export class StreamRoom {
   private getPublicUser(userId: string): PublicUserIdentity {
     const presence = this.getUserPresence(userId);
     return {
-      avatarUrl: presence?.avatarUrl,
-      displayName: presence?.displayName || 'Player',
+      displayName: presence?.displayName || getPlayerDisplayName(userId),
       userId
     };
   }
@@ -540,4 +536,9 @@ function createId(prefix: string): string {
   const bytes = new Uint8Array(12);
   crypto.getRandomValues(bytes);
   return `${prefix}_${Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0')).join('')}`;
+}
+
+function getPlayerDisplayName(userId: string): string {
+  const code = userId.replace(/[^a-z0-9]/gi, '').slice(0, 4).toUpperCase();
+  return `Player ${code || '0000'}`;
 }

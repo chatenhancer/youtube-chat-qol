@@ -146,7 +146,7 @@
     "translationTitle": "Çeviri",
     "translationBody": "Varsayılan olarak kapalıdır. Etkinse gelen sohbet metni veya çevirmeyi seçtiğin taslak metin, YouTube çerezlerin ya da kimlik bilgilerin olmadan Google Translate’e gönderilir.",
     "trackingTitle": "İzleme",
-    "trackingBody": "Analitik, tarama geçmişi toplama, veri satışı veya uzantıya ait sunucu yoktur."
+    "trackingBody": "Analitik, tarama geçmişi toplama veya veri satışı yoktur."
   },
   "commands": {
     "eyebrow": "Referans",

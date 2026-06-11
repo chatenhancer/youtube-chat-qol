@@ -20,7 +20,6 @@ import type { DurableObjectState, Env } from '../types';
 
 interface TestSession {
   availableGames: Set<GameId>;
-  avatarUrl?: string;
   challenge: string;
   connectionId: string;
   displayName: string;
@@ -79,14 +78,21 @@ describe('playground stream room', () => {
 
     await room.handleHello(alice, await createHello(alice.challenge, 'Alice', ['chess']));
     await room.handleHello(bob, await createHello(bob.challenge, 'Bob', ['chess']));
+    const aliceDisplayName = alice.displayName;
+    const bobDisplayName = bob.displayName;
+    expect(aliceDisplayName).toMatch(/^Player [A-Z0-9]{4}$/);
+    expect(bobDisplayName).toMatch(/^Player [A-Z0-9]{4}$/);
 
     const alicePresence = lastMessage(alice, 'presenceSnapshot');
-    expect(alicePresence.snapshot.users.map((user) => user.displayName)).toEqual(['Alice', 'Bob']);
+    expect(alicePresence.snapshot.users.map((user) => user.displayName)).toEqual(expect.arrayContaining([
+      aliceDisplayName,
+      bobDisplayName
+    ]));
 
     room.handleInvite(alice, 'chess', bob.userId);
     const inviteReceived = lastMessage(bob, 'inviteReceived');
-    expect(inviteReceived.invite.fromUser.displayName).toBe('Alice');
-    expect(inviteReceived.invite.toUser.displayName).toBe('Bob');
+    expect(inviteReceived.invite.fromUser.displayName).toBe(aliceDisplayName);
+    expect(inviteReceived.invite.toUser.displayName).toBe(bobDisplayName);
 
     room.handleInviteResponse(bob, inviteReceived.invite.inviteId, true);
     const gameStarted = lastMessage(alice, 'gameStarted');
@@ -98,8 +104,8 @@ describe('playground stream room', () => {
       service: 'chat-enhancer-playground'
     }));
     expect(startedChessGame.gameType).toBe('chess');
-    expect(startedChessGame.players.white.displayName).toBe('Alice');
-    expect(startedChessGame.players.black.displayName).toBe('Bob');
+    expect(startedChessGame.players.white.displayName).toBe(aliceDisplayName);
+    expect(startedChessGame.players.black.displayName).toBe(bobDisplayName);
 
     room.handleGameAction(alice, startedChessGame.gameId, {
       action: 'move',
@@ -378,17 +384,13 @@ function createSession(connectionId: string): TestSession {
 
 async function createHello(
   challenge: string,
-  displayName: string,
+  _displayName: string,
   availableGames: GameId[],
   keyPair?: CryptoKeyPair
 ): Promise<Extract<ClientMessage, { type: 'hello' }>> {
   return {
     availableGames,
     identity: await createSignedIdentity(challenge, keyPair),
-    profile: {
-      avatarUrl: `https://example.com/${displayName}.png`,
-      displayName
-    },
     protocolVersion: PLAYGROUND_PROTOCOL_VERSION,
     type: 'hello'
   };

@@ -146,7 +146,7 @@
     "translationTitle": "Traduction",
     "translationBody": "Désactivée par défaut. Si elle est activée, le texte du chat entrant ou le brouillon que vous choisissez de traduire est envoyé à Google Translate sans vos cookies ni identifiants YouTube.",
     "trackingTitle": "Suivi",
-    "trackingBody": "Pas d'analytics, de collecte d'historique de navigation, de revente de données ni de serveur appartenant à l'extension."
+    "trackingBody": "Pas d'analytics, de collecte d'historique de navigation ni de revente de données."
   },
   "commands": {
     "eyebrow": "Référence",
