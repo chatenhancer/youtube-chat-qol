@@ -15,7 +15,7 @@ does not grow into a general extension backend.
 ## Boundaries
 
 The static docs site is still built from `docs/` and deployed by GitHub Actions.
-The browser extension builds stay under `src/`, `assets/`, and `scripts/`.
+The browser extension builds stay under `src/`, `src/assets/`, and `scripts/`.
 
 Cloudflare workers should stay narrow, explicit, and feature-scoped. Add a new
 worker when a feature needs a different runtime shape instead of expanding an
