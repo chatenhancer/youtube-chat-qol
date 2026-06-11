@@ -7,7 +7,6 @@
  */
 import {
   PLAYGROUND_PORT_NAME,
-  type ClientProfile,
   type GameEndReason,
   type GameId,
   type LobbySnapshot,
@@ -17,7 +16,6 @@ import {
   type PublicInvite,
   type ServerMessage
 } from '../../../shared/playground-protocol';
-import { cleanText } from '../../../shared/text';
 import { getCurrentYouTubeChatStreamKey } from '../../../youtube/source-url';
 import { getAvailableGameIds } from './registry';
 
@@ -106,7 +104,6 @@ export function startPlaygroundClient(nextAvailable = available): void {
 
   postPlaygroundMessage({
     availableGames: getAvailableGames(),
-    profile: getCurrentChatProfile(),
     streamKey,
     type: 'ytcq:playground:init'
   });
@@ -273,71 +270,4 @@ function mergeGame(games: PublicGame[], game: PublicGame): PublicGame[] {
     ...games.filter((candidate) => candidate.gameId !== game.gameId),
     game
   ];
-}
-
-const CHAT_INPUT_RENDERER_SELECTOR = 'yt-live-chat-message-input-renderer';
-const CHAT_PROFILE_NAME_SELECTORS = [
-  '#author-name',
-  '[id*="author"]:not(#author-photo)'
-];
-const CHAT_PROFILE_AVATAR_SELECTORS = [
-  '#author-photo img',
-  '#author-photo #img',
-  'yt-img-shadow#author-photo img',
-  'img#img',
-  'img'
-];
-const CHAT_PROFILE_AVATAR_SELECTOR = CHAT_PROFILE_AVATAR_SELECTORS.join(',');
-
-function getCurrentChatProfile(): ClientProfile {
-  const inputRenderer = document.querySelector<HTMLElement>(CHAT_INPUT_RENDERER_SELECTOR);
-  const avatar = getCurrentChatAvatar(inputRenderer);
-
-  return {
-    avatarUrl: avatar?.currentSrc || avatar?.src || undefined,
-    displayName: getCurrentChatDisplayName(inputRenderer, avatar) || undefined
-  };
-}
-
-function getCurrentChatAvatar(inputRenderer: HTMLElement | null): HTMLImageElement | null {
-  return inputRenderer?.querySelector<HTMLImageElement>(CHAT_PROFILE_AVATAR_SELECTOR) ||
-    document.querySelector<HTMLImageElement>(
-      CHAT_PROFILE_AVATAR_SELECTORS
-        .map((selector) => `${CHAT_INPUT_RENDERER_SELECTOR} ${selector}`)
-        .join(',')
-    );
-}
-
-function getCurrentChatDisplayName(
-  inputRenderer: HTMLElement | null,
-  avatar: HTMLImageElement | null
-): string {
-  const nameElementCandidates = inputRenderer
-    ? CHAT_PROFILE_NAME_SELECTORS
-      .map((selector) => inputRenderer.querySelector<HTMLElement>(selector)?.textContent)
-    : [];
-
-  const avatarContainer = avatar?.closest<HTMLElement>('#author-photo, yt-img-shadow, [aria-label], [title]');
-  const attributeCandidates = [
-    avatar?.alt,
-    avatar?.title,
-    avatar?.getAttribute('aria-label'),
-    avatarContainer?.getAttribute('aria-label'),
-    avatarContainer?.getAttribute('title')
-  ];
-
-  return [...nameElementCandidates, ...attributeCandidates]
-    .map(normalizeProfileDisplayName)
-    .find(Boolean) || '';
-}
-
-function normalizeProfileDisplayName(value: unknown): string {
-  const text = cleanText(value);
-  if (!text) return '';
-
-  const handle = text.match(/@[\p{L}\p{N}._-]{2,}/u)?.[0];
-  if (handle) return handle;
-
-  if (/^(avatar|image|photo|profile picture|open channel|open profile)$/i.test(text)) return '';
-  return text;
 }

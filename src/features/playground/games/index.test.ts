@@ -33,7 +33,7 @@ describe('playground games header button', () => {
 
     expect(document.querySelector('.ytcq-games-button')).toBeNull();
 
-    setOptions({ ...DEFAULT_OPTIONS, playgroundEnabled: true });
+    setOptions({ ...DEFAULT_OPTIONS, playgroundEnabled: true, playgroundGamesAvailable: true });
     refreshGamesButton();
     await vi.runOnlyPendingTimersAsync();
 
@@ -46,7 +46,7 @@ describe('playground games header button', () => {
     inbox.className = 'ytcq-inbox-button';
     header.prepend(inbox);
     document.body.append(header);
-    setOptions({ ...DEFAULT_OPTIONS, playgroundEnabled: true });
+    setOptions({ ...DEFAULT_OPTIONS, playgroundEnabled: true, playgroundGamesAvailable: true });
 
     wireGamesButton();
 
@@ -61,7 +61,7 @@ describe('playground games header button', () => {
   it('falls back to the native menu anchor when Inbox is absent', () => {
     const header = createHeader();
     document.body.append(header);
-    setOptions({ ...DEFAULT_OPTIONS, playgroundEnabled: true });
+    setOptions({ ...DEFAULT_OPTIONS, playgroundEnabled: true, playgroundGamesAvailable: true });
 
     wireGamesButton();
 
@@ -87,10 +87,6 @@ describe('playground games header button', () => {
   it('toggles the games panel from the header button', () => {
     const header = createHeader();
     document.body.append(header);
-    document.body.append(createCurrentUserInput({
-      avatarUrl: 'https://yt3.example/current=s88-c-k',
-      name: '@FirefoxViewer'
-    }));
     setOptions({ ...DEFAULT_OPTIONS, playgroundEnabled: true, playgroundGamesAvailable: false });
 
     wireGamesButton();
@@ -114,10 +110,6 @@ describe('playground games header button', () => {
     expect(document.querySelector('.ytcq-games-availability-toggle')).toBeNull();
     expect(lastMockPort()?.messages.at(-1)).toMatchObject({
       availableGames: [],
-      profile: {
-        avatarUrl: 'https://yt3.example/current=s88-c-k',
-        displayName: '@FirefoxViewer'
-      },
       streamKey: 'stream-a',
       type: 'ytcq:playground:init'
     });
@@ -153,23 +145,20 @@ describe('playground games header button', () => {
     expect(document.querySelector('.ytcq-games-card')).toBeNull();
   });
 
-  it('falls back to avatar labels for the current playground profile', () => {
+  it('does not send the visible YouTube profile to Playground', () => {
     const header = createHeader();
     document.body.append(header);
     document.body.append(createCurrentUserInput({
       avatarLabel: 'Open @AvatarFallback channel',
       avatarUrl: 'https://yt3.example/avatar-fallback=s88-c-k'
     }));
-    setOptions({ ...DEFAULT_OPTIONS, playgroundEnabled: true });
+    setOptions({ ...DEFAULT_OPTIONS, playgroundEnabled: true, playgroundGamesAvailable: true });
 
     wireGamesButton();
     header.querySelector<HTMLButtonElement>('.ytcq-games-button')!.click();
 
-    expect(lastMockPort()?.messages.at(-1)).toMatchObject({
-      profile: {
-        avatarUrl: 'https://yt3.example/avatar-fallback=s88-c-k',
-        displayName: '@AvatarFallback'
-      },
+    expect(lastMockPort()?.messages.at(-1)).toEqual({
+      availableGames: ['chess'],
       streamKey: 'stream-a',
       type: 'ytcq:playground:init'
     });

@@ -9,7 +9,7 @@ The short version:
 - Most extension features run locally in your browser.
 - Translation is off by default.
 - When translation is enabled, the text being translated is sent to Google Translate.
-- Playground games are off by default. If you enable and use Playground, game presence, invites, and game actions are sent to the Chat Enhancer Playground backend.
+- Playground games are off by default. If you enable and use Playground, game presence, invites, and game actions are sent to the Chat Enhancer Playground backend under a generated player name.
 - The extension does not run analytics, sell data, or collect browsing history.
 
 ## Where the extension runs
@@ -56,9 +56,9 @@ When translation or Playground features are enabled, data may be sent to these s
 
   Playground is off by default. If you enable Playground and use the games panel, the extension connects to the Playground backend so opted-in users in the same stream can see availability, exchange invites, and play games.
 
-  Playground messages may include the stream/video key, your generated Playground public key and signature, the display name and avatar URL currently visible in YouTube chat when available, your available game list, invites and invite responses, and game actions such as chess moves.
+  Playground messages may include the stream/video key, your generated Playground public key and signature, your generated player name, your available game list, invites and invite responses, and game actions such as chess moves.
 
-  Playground does not send chat message text, YouTube cookies, or YouTube credentials to the Playground backend.
+  Playground does not send chat message text, your YouTube display name, your YouTube avatar URL, YouTube cookies, or YouTube credentials to the Playground backend.
 
   Like any web service, the Playground backend may receive normal connection metadata such as IP address and user agent from the browser or network provider.
 

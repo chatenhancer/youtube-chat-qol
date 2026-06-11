@@ -146,7 +146,7 @@
     "translationTitle": "Terjemahan",
     "translationBody": "Mati secara default. Jika diaktifkan, teks chat masuk atau teks draf yang Anda pilih untuk diterjemahkan dikirim ke Google Translate tanpa cookie atau kredensial YouTube Anda.",
     "trackingTitle": "Pelacakan",
-    "trackingBody": "Tidak ada analitik, pengumpulan riwayat penelusuran, penjualan data, atau server milik ekstensi."
+    "trackingBody": "Tidak ada analitik, pengumpulan riwayat penelusuran, atau penjualan data."
   },
   "commands": {
     "eyebrow": "Referensi",

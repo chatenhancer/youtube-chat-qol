@@ -3,8 +3,6 @@ import { PLAYGROUND_PROTOCOL_VERSION } from './messages';
 import {
   parseClientMessage,
   ProtocolError,
-  sanitizeAvatarUrl,
-  sanitizeDisplayName,
   sanitizeStreamKey
 } from './validation';
 
@@ -36,20 +34,12 @@ describe('playground protocol validation', () => {
         },
         signature: 'signature'
       },
-      profile: {
-        avatarUrl: 'https://example.com/avatar.png',
-        displayName: '  Example   player  '
-      },
       protocolVersion: PLAYGROUND_PROTOCOL_VERSION,
       type: 'hello'
     }));
 
     expect(message).toMatchObject({
       availableGames: ['chess'],
-      profile: {
-        avatarUrl: 'https://example.com/avatar.png',
-        displayName: 'Example player'
-      },
       type: 'hello'
     });
   });
@@ -132,16 +122,11 @@ describe('playground protocol validation', () => {
     });
   });
 
-  it('sanitizes stream keys and profile display values', () => {
+  it('sanitizes stream keys', () => {
     expect(sanitizeStreamKey('abc_123-Z')).toBe('abc_123-Z');
     expect(() => sanitizeStreamKey('../abc')).toThrowError(new ProtocolError(
       'invalid_stream',
       'Stream key must be a YouTube-style video ID.'
     ));
-
-    expect(sanitizeDisplayName('  A   player  ')).toBe('A player');
-    expect(sanitizeDisplayName('')).toBe('Player');
-    expect(sanitizeAvatarUrl('https://example.com/avatar.png')).toBe('https://example.com/avatar.png');
-    expect(sanitizeAvatarUrl('http://example.com/avatar.png')).toBeUndefined();
   });
 });

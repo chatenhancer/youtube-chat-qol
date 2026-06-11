@@ -84,9 +84,6 @@ describe('background playground bridge', () => {
 
     port.emit({
       availableGames: ['chess'],
-      profile: {
-        displayName: 'Local Player'
-      },
       streamKey: 'stream-a',
       type: 'ytcq:playground:init'
     });
@@ -109,9 +106,6 @@ describe('background playground bridge', () => {
     });
     expect(FakeWebSocket.instances[0].sent[0]).toMatchObject({
       availableGames: ['chess'],
-      profile: {
-        displayName: 'Local Player'
-      },
       protocolVersion: PLAYGROUND_PROTOCOL_VERSION,
       type: 'hello'
     });
@@ -296,9 +290,6 @@ describe('background playground bridge', () => {
 
     port.emit({
       availableGames: ['chess'],
-      profile: {
-        displayName: 'Local Player'
-      },
       streamKey: 'stream-a',
       type: 'ytcq:playground:init'
     });
@@ -350,9 +341,6 @@ describe('background playground bridge', () => {
     expect(secondSocket.sent).toEqual([
       expect.objectContaining({
         availableGames: ['chess'],
-        profile: {
-          displayName: 'Local Player'
-        },
         type: 'hello'
       }),
       {

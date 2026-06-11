@@ -146,7 +146,7 @@
     "translationTitle": "Translation",
     "translationBody": "Off by default. If enabled, incoming chat text or draft text you choose to translate is sent to Google Translate without your YouTube cookies or credentials.",
     "trackingTitle": "Tracking",
-    "trackingBody": "No analytics, browsing history collection, data resale, or extension-owned server."
+    "trackingBody": "No analytics, browsing history collection, or data resale."
   },
   "commands": {
     "eyebrow": "Reference",

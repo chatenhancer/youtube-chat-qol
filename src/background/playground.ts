@@ -9,7 +9,6 @@ import {
   PLAYGROUND_BACKEND_ORIGIN,
   PLAYGROUND_PORT_NAME,
   PLAYGROUND_PROTOCOL_VERSION,
-  type ClientProfile,
   type ClientMessage,
   type GameId,
   type PlaygroundBackgroundMessage,
@@ -41,7 +40,6 @@ class PlaygroundBackgroundSession {
   private identityPromise: Promise<StoredPlaygroundIdentity> | null = null;
   private pendingClientMessages: ClientMessage[] = [];
   private port: chrome.runtime.Port | null;
-  private profile: ClientProfile | undefined;
   private readonly senderStreamKey: string;
   private streamKey = '';
   private userId = '';
@@ -68,7 +66,6 @@ class PlaygroundBackgroundSession {
       case 'ytcq:playground:init':
         this.streamKey = this.senderStreamKey || message.streamKey;
         this.availableGames = message.availableGames;
-        this.profile = message.profile;
         void this.connectSocket({ resetPendingMessages: true, resetReconnectAttempts: true });
         return;
       case 'ytcq:playground:set-availability':
@@ -212,7 +209,6 @@ class PlaygroundBackgroundSession {
       this.sendSocketMessage(socket, {
         availableGames: this.availableGames,
         identity: await createSignedPlaygroundIdentity(challenge, identity),
-        profile: this.profile,
         protocolVersion: PLAYGROUND_PROTOCOL_VERSION,
         type: 'hello'
       });

@@ -146,7 +146,7 @@
     "translationTitle": "翻译",
     "translationBody": "默认关闭。启用后，收到的聊天文本或你选择翻译的草稿文本会发送到 Google Translate，但不会附带你的 YouTube Cookie 或凭据。",
     "trackingTitle": "跟踪",
-    "trackingBody": "没有分析、浏览历史收集、数据转售或扩展自有服务器。"
+    "trackingBody": "没有分析、浏览历史收集或数据转售。"
   },
   "commands": {
     "eyebrow": "参考",

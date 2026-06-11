@@ -146,7 +146,7 @@
     "translationTitle": "번역",
     "translationBody": "기본값은 꺼짐입니다. 사용하면 들어오는 채팅 텍스트 또는 번역하기로 선택한 초안 텍스트가 YouTube 쿠키나 인증 정보 없이 Google Translate로 전송됩니다.",
     "trackingTitle": "추적",
-    "trackingBody": "분석, 방문 기록 수집, 데이터 판매, 확장 프로그램 소유 서버가 없습니다."
+    "trackingBody": "분석, 방문 기록 수집, 데이터 판매가 없습니다."
   },
   "commands": {
     "eyebrow": "참고",

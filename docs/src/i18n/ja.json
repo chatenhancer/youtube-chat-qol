@@ -146,7 +146,7 @@
     "translationTitle": "翻訳",
     "translationBody": "デフォルトではオフです。有効にすると、受信チャット本文または翻訳を選んだ下書き本文が、YouTube の Cookie や認証情報なしで Google Translate に送信されます。",
     "trackingTitle": "トラッキング",
-    "trackingBody": "解析、閲覧履歴の収集、データ販売、拡張機能所有のサーバーはありません。"
+    "trackingBody": "解析、閲覧履歴の収集、データ販売はありません。"
   },
   "commands": {
     "eyebrow": "リファレンス",

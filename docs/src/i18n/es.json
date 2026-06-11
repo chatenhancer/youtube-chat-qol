@@ -146,7 +146,7 @@
     "translationTitle": "Traducción",
     "translationBody": "Desactivada por defecto. Si la activas, el texto del chat entrante o el borrador que elijas traducir se envía a Google Translate sin tus cookies ni credenciales de YouTube.",
     "trackingTitle": "Seguimiento",
-    "trackingBody": "Sin analíticas, recopilación de historial de navegación, reventa de datos ni servidor propio de la extensión."
+    "trackingBody": "Sin analíticas, recopilación de historial de navegación ni reventa de datos."
   },
   "commands": {
     "eyebrow": "Referencia",

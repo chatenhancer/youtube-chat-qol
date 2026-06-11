@@ -146,7 +146,7 @@
     "translationTitle": "Vertaling",
     "translationBody": "Standaard uit. Als je dit inschakelt, wordt binnenkomende chattekst of concepttekst die je wilt vertalen naar Google Translate gestuurd zonder je YouTube-cookies of inloggegevens.",
     "trackingTitle": "Tracking",
-    "trackingBody": "Geen analytics, geen verzameling van browsegeschiedenis, geen dataverkoop en geen eigen extensieserver."
+    "trackingBody": "Geen analytics, geen verzameling van browsegeschiedenis en geen dataverkoop."
   },
   "commands": {
     "eyebrow": "Referentie",
