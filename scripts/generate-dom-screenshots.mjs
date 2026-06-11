@@ -6,7 +6,7 @@
  *
  * Uploadable screenshot outputs live under dist/screenshots so localized
  * store assets do not flood source control. The English README showcase is
- * also copied to assets/readme-showcase.png so GitHub can load it from a
+ * also copied to assets/readme/showcase.png so GitHub can load it from a
  * tracked public asset path.
  */
 import { access, mkdir, mkdtemp, readdir, rm, writeFile } from 'node:fs/promises';
@@ -21,7 +21,7 @@ import sharp from 'sharp';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const docsBuildDir = path.join(root, 'dist', 'docs');
-const readmeAssetsDir = path.join(root, 'assets');
+const readmeAssetsDir = path.join(root, 'assets', 'readme');
 const distScreenshotsDir = path.join(root, 'dist', 'screenshots');
 
 const viewportSize = {
@@ -258,7 +258,7 @@ async function writeReadmeShowcase(sourcePaths, outputPath) {
 
 async function syncEnglishReadmeShowcase(sourcePaths) {
   await mkdir(readmeAssetsDir, { recursive: true });
-  await writeReadmeShowcase(sourcePaths, path.join(readmeAssetsDir, 'readme-showcase.png'));
+  await writeReadmeShowcase(sourcePaths, path.join(readmeAssetsDir, 'showcase.png'));
 }
 
 async function findChromeExecutable() {

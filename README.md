@@ -1,5 +1,5 @@
 <p>
-  <img src="assets/icons/icon-128.png" alt="Chat Enhancer for YouTube icon" width="96" height="96">
+  <img src="src/assets/icons/icon-128.png" alt="Chat Enhancer for YouTube icon" width="96" height="96">
 </p>
 
 # Chat Enhancer for YouTube
@@ -22,13 +22,13 @@ Not affiliated with YouTube or Google.
 
 ## Features
 
-### <img src="assets/readme-icons/translation.svg" alt="" width="20" height="20" align="absmiddle"> &nbsp;Translation
+### <img src="assets/readme/icons/translation.svg" alt="" width="20" height="20" align="absmiddle"> &nbsp;Translation
 
 - Translate live chat messages, with translation off by default.
 - Choose whether translations replace the original message or appear below it.
 - Translate the message you're typing before sending it, while keeping mentions and emojis intact.
 
-### <img src="assets/readme-icons/reply-context.svg" alt="" width="20" height="20" align="absmiddle"> &nbsp;Reply and context
+### <img src="assets/readme/icons/reply-context.svg" alt="" width="20" height="20" align="absmiddle"> &nbsp;Reply and context
 
 - Mention or quote messages from YouTube's existing message menu.
 - Click an author name to mention them.
@@ -38,25 +38,25 @@ Not affiliated with YouTube or Google.
 - Bookmark users with a colored avatar ring.
 - Click an avatar to see that user's recent messages and open their channel.
 
-### <img src="assets/readme-icons/inbox.svg" alt="" width="20" height="20" align="absmiddle"> &nbsp;Inbox
+### <img src="assets/readme/icons/inbox.svg" alt="" width="20" height="20" align="absmiddle"> &nbsp;Inbox
 
 - Keep a local inbox for messages that mention your handle or match watched keywords/phrases.
 - Highlight mentions and watched keywords in chat and in the inbox.
 - Jump back to saved messages while they are still visible in chat.
 - Optionally play a subtle sound and show tab alerts for new inbox messages.
 
-### <img src="assets/readme-icons/emoji-commands.svg" alt="" width="20" height="20" align="absmiddle"> &nbsp;Emoji and commands
+### <img src="assets/readme/icons/emoji-commands.svg" alt="" width="20" height="20" align="absmiddle"> &nbsp;Emoji and commands
 
 - Reuse your most-used emojis from a local row in the emoji picker.
 - Use Tab-expanded chat commands and autocomplete for mentions, quotes, time helpers, translations, inbox watches, and settings.
 
-### <img src="assets/readme-icons/popup-status.svg" alt="" width="20" height="20" align="absmiddle"> &nbsp;Popup and status
+### <img src="assets/readme/icons/popup-status.svg" alt="" width="20" height="20" align="absmiddle"> &nbsp;Popup and status
 
 - See whether the extension is active in this tab or other open live chat tabs.
 - Manage extension settings and clear local extension data from the popup.
 - Opt in to Playground experiments. The current beta can connect users in the same stream for chess games.
 
-### <img src="assets/readme-icons/privacy.svg" alt="" width="20" height="20" align="absmiddle"> &nbsp;Privacy
+### <img src="assets/readme/icons/privacy.svg" alt="" width="20" height="20" align="absmiddle"> &nbsp;Privacy
 
 - The extension does not replace YouTube chat.
 - The extension does not run analytics.
@@ -66,7 +66,7 @@ Not affiliated with YouTube or Google.
 
 ## Screenshots
 
-![Chat Enhancer for YouTube screenshots](assets/readme-showcase.png)
+![Chat Enhancer for YouTube screenshots](assets/readme/showcase.png)
 
 ## Development
 

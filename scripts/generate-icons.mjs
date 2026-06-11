@@ -10,7 +10,7 @@ import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const iconDir = path.join(root, 'assets', 'icons');
+const iconDir = path.join(root, 'src', 'assets', 'icons');
 const sourcePath = path.join(iconDir, 'icon.svg');
 const sizes = [16, 32, 48, 128];
 

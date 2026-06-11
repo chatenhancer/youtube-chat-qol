@@ -15,6 +15,7 @@ import { syncExtensionLocales } from './sync-extension-locales.mjs';
 import { validateExtensionLocales } from './validate-extension-locales.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const extensionAssetsDir = path.join(root, 'src', 'assets');
 const targetOutputDirs = {
   chrome: path.join(root, 'dist', 'extension-chrome'),
   edge: path.join(root, 'dist', 'extension-edge'),
@@ -78,13 +79,13 @@ async function buildTarget(target) {
     copyFile(path.join(root, 'src', 'popup.html'), path.join(extensionDir, 'popup.html')),
     copyFile(path.join(root, 'LICENSE'), path.join(extensionDir, 'LICENSE')),
     copyFile(path.join(root, 'THIRD_PARTY_NOTICES.md'), path.join(extensionDir, 'THIRD_PARTY_NOTICES.md')),
-    copyFile(path.join(root, 'assets', 'logo.png'), path.join(extensionDir, 'logo.png')),
-    copyFile(path.join(root, 'assets', 'logo-white.png'), path.join(extensionDir, 'logo-white.png')),
+    copyFile(path.join(extensionAssetsDir, 'logos', 'logo.png'), path.join(extensionDir, 'logo.png')),
+    copyFile(path.join(extensionAssetsDir, 'logos', 'logo-white.png'), path.join(extensionDir, 'logo-white.png')),
     syncExtensionLocales(path.join(extensionDir, '_locales')),
     copyStaticDirectory(path.join(root, 'src', 'shared', 'locales'), path.join(extensionDir, 'locales')),
-    copyStaticDirectory(path.join(root, 'assets', 'fonts'), path.join(extensionDir, 'fonts')),
-    copyStaticDirectory(path.join(root, 'assets', 'games'), path.join(extensionDir, 'games')),
-    copyStaticDirectory(path.join(root, 'assets', 'icons'), path.join(extensionDir, 'icons')),
+    copyStaticDirectory(path.join(extensionAssetsDir, 'fonts'), path.join(extensionDir, 'fonts')),
+    copyStaticDirectory(path.join(extensionAssetsDir, 'games'), path.join(extensionDir, 'games')),
+    copyStaticDirectory(path.join(extensionAssetsDir, 'icons'), path.join(extensionDir, 'icons')),
     copyStaticDirectory(path.join(root, 'licenses'), path.join(extensionDir, 'licenses'))
   ]);
 
