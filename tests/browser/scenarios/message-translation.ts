@@ -10,7 +10,7 @@ import { withExtensionStorageValues } from '../support/extension-storage';
 import { closeFocusPromptIfPresent } from '../support/focus-panel';
 import { centerLocatorInViewport } from '../support/locator';
 import { appendMockFixtureMessage } from '../support/mock-page';
-import { cleanVisibleText } from '../support/text';
+import { cleanVisibleText, getRichVisibleText } from '../support/text';
 import { withMockedTranslationEndpoint } from '../support/translation-endpoint';
 import { openSettingsMenu } from '../support/menu-openers';
 import {
@@ -566,7 +566,7 @@ async function expectToggleableRealReplacement({
 }
 
 async function expectVisibleTextToContain(locator: Locator, expectedText: string): Promise<void> {
-  await expect.poll(async () => getComparableVisibleText(await locator.innerText()), {
+  await expect.poll(async () => getComparableLocatorText(locator), {
     message: `Expected visible text to include ${expectedText}.`,
     timeout: 15_000
   }).toContain(getComparableVisibleText(expectedText));
@@ -575,7 +575,7 @@ async function expectVisibleTextToContain(locator: Locator, expectedText: string
 async function expectVisibleTextToMatchStoredOriginal(locator: Locator, expectedText: string): Promise<void> {
   const comparableExpectedText = getComparableVisibleText(expectedText);
   await expect.poll(async () => {
-    const comparableText = getComparableVisibleText(await locator.innerText());
+    const comparableText = await getComparableLocatorText(locator);
     return Boolean(comparableText)
       && comparableText.length >= Math.min(6, comparableExpectedText.length)
       && (
@@ -591,7 +591,7 @@ async function expectVisibleTextToMatchStoredOriginal(locator: Locator, expected
 async function expectVisibleTextToDifferFrom(locator: Locator, unexpectedText: string): Promise<void> {
   const comparableUnexpectedText = getComparableVisibleText(unexpectedText);
   await expect.poll(async () => {
-    const comparableText = getComparableVisibleText(await locator.innerText());
+    const comparableText = await getComparableLocatorText(locator);
     return Boolean(comparableText) && comparableText !== comparableUnexpectedText;
   }, {
     message: `Expected visible text to differ from ${unexpectedText}.`,
@@ -851,6 +851,13 @@ function getComparableVisibleText(text: string): string {
     .replace(/\ufe0f/g, '')
     .replace(/\s+/g, ' ')
     .trim();
+}
+
+async function getComparableLocatorText(locator: Locator): Promise<string> {
+  const visibleText = await getRichVisibleText(locator, {
+    ignoredSelector: '.ytcq-replaced-translation-icon'
+  });
+  return getComparableVisibleText(visibleText);
 }
 
 function escapeCssAttributeValue(value: string): string {
