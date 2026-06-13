@@ -1,0 +1,47 @@
+---
+title: "Novità in 0.14.0: HELP-A-FRIEND! Trivia"
+date: 2026-06-12
+description: "Un nuovo gioco Playground in cui i momenti dei replay di YouTube diventano domande trivia in stile chat."
+locale: "it"
+slug: "new-in-0-14-0-help-a-friend-trivia"
+image: "./logo.png"
+translationKey: "new-in-0-14-0-help-a-friend-trivia"
+tags:
+  - "trivia"
+  - "game"
+  - "multiplayer"
+  - "chat"
+  - "online"
+---
+
+Il secondo gioco Playground è arrivato: **HELP-A-FRIEND! Trivia**
+
+:::media-right
+
+![Logo di HELP-A-FRIEND! Trivia](./2026-06-12-new-in-0-14-0-help-a-friend-trivia-assets/1708318b4060743a.png){shadow=smooth}
+
+Invece di una plancia da quiz, *HELP-A-FRIEND! Trivia* si svolge come una piccola chat di gruppo. Uno dei tuoi amici chiaramente non stava seguendo lo stream e ora ha bisogno di aiuto... hai le conoscenze giuste?
+
+Le risposte corrette ricevono la reazione 🏆.
+
+Le risposte sbagliate vengono giudicate *con gentilezza*.
+
+:::
+
+## Come funziona
+
+Avvia una partita Playground da un replay di YouTube (una live stream terminata), invita un altro giocatore e attendi qualche secondo mentre vengono preparate le domande.
+
+Quando il gioco inizia, il tuo “amico” fa una domanda sul replay, compaiono quattro possibili risposte, ed entrambi i giocatori scelgono prima che il tempo scada. Rispondi in fretta. Il tuo compagno non è paziente.
+
+## Creato per i replay
+
+Ogni partita viene generata dalla trascrizione del replay che stai guardando, quindi il gioco può fare domande su momenti realmente accaduti in quello stream: rivelazioni, premi, battute, digressioni e qualsiasi altra cosa sia finita nel video.
+
+## Provalo!
+
+*HELP-A-FRIEND! Trivia* fa parte di Playground, che è ancora opzionale. Abilita Playground dalle impostazioni dell’estensione, apri un replay con live chat e avvia una partita dal pannello Giochi. Cerca l’icona del controller nella chat.
+
+Disponibile in inglese per ora.
+
+![reel](./reel.png){align=center}

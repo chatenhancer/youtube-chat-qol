@@ -2,6 +2,7 @@
 title: "New in 0.14.0: HELP-A-FRIEND! Trivia"
 date: 2026-06-12
 description: "A new Playground game where YouTube replay moments become chat-style trivia questions."
+locale: "en"
 slug: "new-in-0-14-0-help-a-friend-trivia"
 image: "./logo.png"
 translationKey: "new-in-0-14-0-help-a-friend-trivia"
