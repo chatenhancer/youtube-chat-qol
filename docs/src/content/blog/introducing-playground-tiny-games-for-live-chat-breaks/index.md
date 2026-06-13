@@ -2,10 +2,10 @@
 title: "Introducing Playground: Tiny games for live chat breaks"
 date: 2026-06-10
 description: "Playground is a new feature in the Chat Enhancer extension that allows users to play compact games like chess with each other during live chats."
-locale: "en"
 slug: "introducing-playground-tiny-games-for-live-chat-breaks"
+image: "./90af004f7c5daeab.png"
+locale: "en"
 translationKey: "introducing-playground-tiny-games-for-live-chat-breaks"
-image: "./cover.png"
 video: "./cover.mp4"
 tags:
   - "playground"
@@ -23,7 +23,7 @@ Is your streamer on a bathroom break? Open Playground until they’re back.
 
 :::media-right
 
-![Compact chess game panel floating over YouTube live chat](./game-panel.png){shadow=smooth rotation=-2}
+![Compact chess game panel floating over YouTube live chat](./f779ebcc57f8280d.png){shadow=smooth rotation=-2}
 
 Games are compact and won’t get much bigger than this. The panel is draggable, so you can place them anywhere in chat.
 
@@ -35,7 +35,7 @@ Look for the Playground options in this section of the extension settings.
 
 :::media-left
 
-![Playground settings in the Chat Enhancer popup](./settings.png){crop=1.04;focus=26.3%,0%;rotate=0.5deg}
+![Playground settings in the Chat Enhancer popup](./c99cee6a87fb4253.png)
 
 Enable the “Join Playground” setting for the Games icon to appear in chat.
 
