@@ -366,6 +366,12 @@
     "playgroundBetaHelper": {
       "message": "Thử nghiệm các tính năng sớm. Một số có thể kết nối tới chatenhancer.com để hoạt động."
     },
+    "playgroundProfile": {
+      "message": "Hồ sơ của bạn"
+    },
+    "playgroundProfileHelper": {
+      "message": "Đây là tên mà người dùng Playground khác sẽ thấy. Tên người dùng YouTube thật của bạn không được chatenhancer.com thu thập và không hiển thị cho người dùng khác khi dùng trải nghiệm Playground."
+    },
     "games": {
       "message": "Trò chơi"
     },

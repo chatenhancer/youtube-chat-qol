@@ -366,6 +366,12 @@
     "playgroundBetaHelper": {
       "message": "Prueba experimentos antes. Algunos pueden conectarse a chatenhancer.com para funcionar."
     },
+    "playgroundProfile": {
+      "message": "Tu perfil"
+    },
+    "playgroundProfileHelper": {
+      "message": "Así te ven otros usuarios de Playground. chatenhancer.com no recopila tu nombre de usuario real de YouTube ni lo muestra a otros usuarios mientras usas experiencias de Playground."
+    },
     "games": {
       "message": "Juegos"
     },

@@ -17,6 +17,16 @@ import {
   type SignedClientIdentity
 } from '../shared/playground-protocol';
 import {
+  PLAYGROUND_IDENTITY_STORAGE_KEY,
+  encodeBase64Url,
+  getPlaygroundDisplayName,
+  getPlaygroundUserId,
+  isPlaygroundProfileMessage,
+  isStoredPlaygroundIdentity,
+  type PlaygroundProfileResponse,
+  type StoredPlaygroundIdentity
+} from '../shared/playground-identity';
+import {
   REPLAY_TRIVIA_QUESTIONS_BACKGROUND_MESSAGE,
   REPLAY_TRIVIA_QUESTIONS_ROUTE,
   type ReplayTriviaQuestionsBackgroundMessage,
@@ -24,16 +34,10 @@ import {
   type ReplayTriviaQuestionsResponse
 } from '../shared/playground-trivia';
 
-const PLAYGROUND_IDENTITY_STORAGE_KEY = 'ytcqPlaygroundIdentity:v1';
 const SIGNATURE_PREFIX = 'chat-enhancer-playground:';
 const MAX_QUEUED_CLIENT_MESSAGES = 20;
 const PLAYGROUND_HEARTBEAT_INTERVAL_MS = 20_000;
 const PLAYGROUND_RECONNECT_DELAYS_MS = [750, 2_000, 5_000, 10_000] as const;
-
-interface StoredPlaygroundIdentity {
-  privateKeyJwk: JsonWebKey;
-  publicKeyJwk: JsonWebKey;
-}
 
 chrome.runtime.onConnect.addListener((port) => {
   if (port.name !== PLAYGROUND_PORT_NAME) return;
@@ -43,6 +47,21 @@ chrome.runtime.onConnect.addListener((port) => {
 });
 
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+  if (isPlaygroundProfileMessage(message)) {
+    void getStoredPlaygroundProfile()
+      .then((profile) => sendResponse({
+        ok: true,
+        profile
+      } satisfies PlaygroundProfileResponse))
+      .catch((error: unknown) => {
+        sendResponse({
+          error: error instanceof Error ? error.message : 'Playground profile unavailable.',
+          ok: false
+        } satisfies PlaygroundProfileResponse);
+      });
+    return true;
+  }
+
   if (!isReplayTriviaQuestionsBackgroundMessage(message)) return false;
 
   void requestReplayTriviaQuestions(message).then(sendResponse);
@@ -490,42 +509,17 @@ async function createStoredPlaygroundIdentity(): Promise<StoredPlaygroundIdentit
   };
 }
 
-function isStoredPlaygroundIdentity(value: unknown): value is StoredPlaygroundIdentity {
-  if (!value || typeof value !== 'object') return false;
-  const candidate = value as Partial<StoredPlaygroundIdentity>;
-  return isP256PrivateKey(candidate.privateKeyJwk) && isP256PublicKey(candidate.publicKeyJwk);
-}
-
-function isP256PrivateKey(value: unknown): value is JsonWebKey {
-  return isRecord(value) &&
-    value.kty === 'EC' &&
-    value.crv === 'P-256' &&
-    typeof value.x === 'string' &&
-    typeof value.y === 'string' &&
-    typeof value.d === 'string';
-}
-
-function isP256PublicKey(value: unknown): value is JsonWebKey {
-  return isRecord(value) &&
-    value.kty === 'EC' &&
-    value.crv === 'P-256' &&
-    typeof value.x === 'string' &&
-    typeof value.y === 'string';
+async function getStoredPlaygroundProfile(): Promise<{ displayName: string; userId: string }> {
+  const identity = await getStoredPlaygroundIdentity();
+  const userId = await getPlaygroundUserId(identity.publicKeyJwk);
+  return {
+    displayName: getPlaygroundDisplayName(userId),
+    userId
+  };
 }
 
 function createSignaturePayload(challenge: string): ArrayBuffer {
   return toArrayBuffer(new TextEncoder().encode(`${SIGNATURE_PREFIX}${challenge}`));
-}
-
-function encodeBase64Url(bytes: Uint8Array): string {
-  let binary = '';
-  bytes.forEach((byte) => {
-    binary += String.fromCharCode(byte);
-  });
-  return btoa(binary)
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_')
-    .replace(/=+$/g, '');
 }
 
 function parseServerMessage(data: unknown): ServerMessage | null {

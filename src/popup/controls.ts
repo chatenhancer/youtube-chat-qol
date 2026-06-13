@@ -16,6 +16,10 @@ export const controls = {
   playgroundEnabled: document.querySelector<HTMLInputElement>('#playgroundEnabled'),
   playgroundGamesSection: document.querySelector<HTMLElement>('#playgroundGamesSection'),
   playgroundGamesAvailable: document.querySelector<HTMLInputElement>('#playgroundGamesAvailable'),
+  playgroundProfile: document.querySelector<HTMLElement>('#playgroundProfile'),
+  playgroundProfileDetails: document.querySelector<HTMLElement>('#playgroundProfileDetails'),
+  playgroundProfileName: document.querySelector<HTMLElement>('#playgroundProfileName'),
+  playgroundProfileToggle: document.querySelector<HTMLButtonElement>('#playgroundProfileToggle'),
   version: document.querySelector<HTMLElement>('#version')
 };
 
@@ -23,6 +27,10 @@ export interface PopupSettingsControls {
   playgroundEnabled: HTMLInputElement;
   playgroundGamesAvailable: HTMLInputElement;
   playgroundGamesSection: HTMLElement;
+  playgroundProfile: HTMLElement;
+  playgroundProfileDetails: HTMLElement;
+  playgroundProfileName: HTMLElement;
+  playgroundProfileToggle: HTMLButtonElement;
   sound: HTMLInputElement;
   startupEffect: HTMLInputElement;
   targetLanguage: HTMLSelectElement;
@@ -37,7 +45,11 @@ export function getSettingsControls(): PopupSettingsControls | null {
     startupEffect,
     playgroundEnabled,
     playgroundGamesSection,
-    playgroundGamesAvailable
+    playgroundGamesAvailable,
+    playgroundProfile,
+    playgroundProfileDetails,
+    playgroundProfileName,
+    playgroundProfileToggle
   } = controls;
 
   if (
@@ -47,7 +59,11 @@ export function getSettingsControls(): PopupSettingsControls | null {
     !startupEffect ||
     !playgroundEnabled ||
     !playgroundGamesSection ||
-    !playgroundGamesAvailable
+    !playgroundGamesAvailable ||
+    !playgroundProfile ||
+    !playgroundProfileDetails ||
+    !playgroundProfileName ||
+    !playgroundProfileToggle
   ) {
     return null;
   }
@@ -56,6 +72,10 @@ export function getSettingsControls(): PopupSettingsControls | null {
     playgroundEnabled,
     playgroundGamesAvailable,
     playgroundGamesSection,
+    playgroundProfile,
+    playgroundProfileDetails,
+    playgroundProfileName,
+    playgroundProfileToggle,
     sound,
     startupEffect,
     targetLanguage,

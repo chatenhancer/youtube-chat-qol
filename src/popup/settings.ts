@@ -1,4 +1,8 @@
 import { LANGUAGE_OPTIONS } from '../shared/languages';
+import {
+  PLAYGROUND_PROFILE_MESSAGE_TYPE,
+  type PlaygroundProfileResponse
+} from '../shared/playground-identity';
 import { playSoftChime } from '../shared/sounds/soft-chime';
 import {
   DEFAULT_OPTIONS,
@@ -22,6 +26,7 @@ const PLAYGROUND_GROUP_ANIMATION_MS = 180;
 
 let lastKnownTranslationTarget = DEFAULT_OPTIONS.lastTranslationTarget;
 let playgroundGamesVisibilityToken = 0;
+let playgroundProfileRequestToken = 0;
 
 export function initSettingsControls(popupLocale: string): void {
   const settingsControls = getSettingsControls();
@@ -33,7 +38,8 @@ export function initSettingsControls(popupLocale: string): void {
     sound,
     startupEffect,
     playgroundEnabled,
-    playgroundGamesAvailable
+    playgroundGamesAvailable,
+    playgroundProfileToggle
   } = settingsControls;
 
   targetLanguage.appendChild(createLanguageOption('', getExtensionMessage('off')));
@@ -77,12 +83,18 @@ export function initSettingsControls(popupLocale: string): void {
   playgroundEnabled.addEventListener('change', () => {
     const enabled = playgroundEnabled.checked;
     if (!enabled) clearPlaygroundOptionControls();
+    updatePlaygroundProfile(enabled);
     updatePlaygroundGamesVisibility(enabled, true);
     save(enabled ? { playgroundEnabled: true } : getPlaygroundDisabledUpdate());
   });
 
   playgroundGamesAvailable.addEventListener('change', () => {
     save({ playgroundGamesAvailable: playgroundGamesAvailable.checked });
+  });
+
+  playgroundProfileToggle.addEventListener('click', () => {
+    const expanded = playgroundProfileToggle.getAttribute('aria-expanded') === 'true';
+    setPlaygroundProfileDetailsExpanded(!expanded);
   });
 }
 
@@ -108,6 +120,7 @@ export function applyOptionsToControls(options: Partial<Options>): void {
   startupEffect.checked = normalized.startupEffect && !startupEffect.disabled;
   playgroundEnabled.checked = normalized.playgroundEnabled;
   playgroundGamesAvailable.checked = normalized.playgroundEnabled && normalized.playgroundGamesAvailable;
+  updatePlaygroundProfile(normalized.playgroundEnabled);
   updatePlaygroundGamesVisibility(normalized.playgroundEnabled);
 }
 
@@ -155,6 +168,40 @@ function clearPlaygroundOptionControls(): void {
   if (settingsControls) {
     settingsControls.playgroundGamesAvailable.checked = false;
   }
+}
+
+function updatePlaygroundProfile(playgroundEnabled: boolean): void {
+  const settingsControls = getSettingsControls();
+  if (!settingsControls) return;
+
+  const { playgroundProfile, playgroundProfileName } = settingsControls;
+  const token = ++playgroundProfileRequestToken;
+  setPlaygroundProfileDetailsExpanded(false);
+  playgroundProfile.hidden = true;
+  playgroundProfileName.textContent = '';
+
+  if (!playgroundEnabled) return;
+
+  chrome.runtime.sendMessage({ type: PLAYGROUND_PROFILE_MESSAGE_TYPE }, (response?: PlaygroundProfileResponse) => {
+    if (token !== playgroundProfileRequestToken) return;
+    if (chrome.runtime.lastError || !response?.ok) return;
+
+    const displayName = typeof response.profile?.displayName === 'string'
+      ? response.profile.displayName.trim()
+      : '';
+    if (!displayName) return;
+
+    playgroundProfileName.textContent = displayName;
+    playgroundProfile.hidden = false;
+  });
+}
+
+function setPlaygroundProfileDetailsExpanded(expanded: boolean): void {
+  const settingsControls = getSettingsControls();
+  if (!settingsControls) return;
+
+  settingsControls.playgroundProfileToggle.setAttribute('aria-expanded', String(expanded));
+  settingsControls.playgroundProfileDetails.hidden = !expanded;
 }
 
 function createLanguageOption(value: string, label: string): HTMLOptionElement {

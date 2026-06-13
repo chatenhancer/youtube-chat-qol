@@ -366,6 +366,12 @@
     "playgroundBetaHelper": {
       "message": "Essayez des expériences en avance. Certaines peuvent se connecter à chatenhancer.com pour fonctionner."
     },
+    "playgroundProfile": {
+      "message": "Votre profil"
+    },
+    "playgroundProfileHelper": {
+      "message": "C’est le nom que les autres utilisateurs de Playground voient. Votre vrai pseudo YouTube n’est pas collecté par chatenhancer.com et n’est pas montré aux autres utilisateurs pendant les expériences Playground."
+    },
     "games": {
       "message": "Jeux"
     },

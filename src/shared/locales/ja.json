@@ -369,6 +369,12 @@
     "playgroundBetaHelper": {
       "message": "実験的な機能を早めに試せます。一部は動作のために chatenhancer.com に接続する場合があります。"
     },
+    "playgroundProfile": {
+      "message": "あなたのプロフィール"
+    },
+    "playgroundProfileHelper": {
+      "message": "他の Playground ユーザーにはこの名前で表示されます。実際の YouTube ハンドルは chatenhancer.com に収集されず、Playground 体験の利用中に他のユーザーへ表示されません。"
+    },
     "games": {
       "message": "ゲーム"
     },

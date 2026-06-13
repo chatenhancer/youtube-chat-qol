@@ -366,6 +366,12 @@
     "playgroundBetaHelper": {
       "message": "Teste frühe Experimente. Einige können sich mit chatenhancer.com verbinden, damit sie funktionieren."
     },
+    "playgroundProfile": {
+      "message": "Dein Profil"
+    },
+    "playgroundProfileHelper": {
+      "message": "So sehen dich andere Playground-Nutzer. Dein echter YouTube-Handle wird von chatenhancer.com nicht erfasst und anderen Nutzern bei Playground-Erlebnissen nicht angezeigt."
+    },
     "games": {
       "message": "Spiele"
     },
