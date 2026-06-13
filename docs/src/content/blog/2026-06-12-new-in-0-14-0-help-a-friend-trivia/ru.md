@@ -1,10 +1,10 @@
 ---
-title: "Новое в 0.14.0: HELP-A-FRIEND! Trivia"
+title: "Новое в Chat Enhancer 0.14.0: HELP-A-FRIEND! Trivia"
 date: 2026-06-12
 description: "Новая игра Playground, где моменты из повторов YouTube превращаются в вопросы викторины в стиле чата."
 locale: "ru"
 slug: "new-in-0-14-0-help-a-friend-trivia"
-image: "./logo.png"
+image: "./0e5e4f69e6fa7b45.png"
 translationKey: "new-in-0-14-0-help-a-friend-trivia"
 tags:
   - "trivia"
@@ -18,7 +18,7 @@ tags:
 
 :::media-right
 
-![Логотип HELP-A-FRIEND! Trivia](./2026-06-12-new-in-0-14-0-help-a-friend-trivia-assets/1708318b4060743a.png){shadow=smooth}
+![Логотип HELP-A-FRIEND! Trivia](./2026-06-12-new-in-0-14-0-help-a-friend-trivia-assets/6ef6d6f2584f127f.png){shadow=smooth;rotate=-8deg}
 
 Вместо доски с вопросами *HELP-A-FRIEND! Trivia* разыгрывается как небольшой групповой чат. Один из твоих друзей явно не следил за стримом и теперь нуждается в помощи... у тебя есть нужные знания?
 
@@ -38,10 +38,14 @@ tags:
 
 Каждый матч создается из расшифровки повтора, который ты смотришь, поэтому игра может спрашивать о моментах, которые действительно произошли в этом стриме: раскрытиях, наградах, шутках, отступлениях и всем остальном, что попало в видео.
 
+:::media-left
+
+![Скриншот HELP-A-FRIEND! Trivia](./f6e02e23a9bb8118.png)
+
 ## Попробуй!
 
 *HELP-A-FRIEND! Trivia* — часть Playground, который все еще включается по желанию. Включи Playground в настройках расширения, открой повтор с живым чатом и запусти матч из панели Games. Ищи значок контроллера в чате.
 
 Пока доступно на английском.
 
-![reel](./reel.png){align=center}
+:::

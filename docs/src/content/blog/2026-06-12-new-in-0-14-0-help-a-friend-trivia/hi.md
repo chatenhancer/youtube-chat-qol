@@ -1,10 +1,10 @@
 ---
-title: "0.14.0 में नया: HELP-A-FRIEND! Trivia"
+title: "Chat Enhancer 0.14.0 में नया: HELP-A-FRIEND! Trivia"
 date: 2026-06-12
 description: "एक नया Playground गेम, जहां YouTube रीप्ले के पल चैट-स्टाइल ट्रिविया सवाल बन जाते हैं।"
 locale: "hi"
 slug: "new-in-0-14-0-help-a-friend-trivia"
-image: "./logo.png"
+image: "./0e5e4f69e6fa7b45.png"
 translationKey: "new-in-0-14-0-help-a-friend-trivia"
 tags:
   - "trivia"
@@ -18,7 +18,7 @@ tags:
 
 :::media-right
 
-![HELP-A-FRIEND! Trivia लोगो](./2026-06-12-new-in-0-14-0-help-a-friend-trivia-assets/1708318b4060743a.png){shadow=smooth}
+![HELP-A-FRIEND! Trivia लोगो](./2026-06-12-new-in-0-14-0-help-a-friend-trivia-assets/6ef6d6f2584f127f.png){shadow=smooth;rotate=-8deg}
 
 क्विज बोर्ड के बजाय, *HELP-A-FRIEND! Trivia* एक छोटे ग्रुप चैट जैसा चलता है। तुम्हारा एक दोस्त साफ तौर पर स्ट्रीम पर ध्यान नहीं दे रहा था और अब उसे मदद चाहिए... क्या तुम्हें जवाब पता हैं?
 
@@ -38,10 +38,14 @@ YouTube रीप्ले (एक लाइव स्ट्रीम जो ख
 
 हर मैच उस रीप्ले की ट्रांसक्रिप्ट से बनाया जाता है जिसे तुम देख रहे हो, इसलिए गेम उस स्ट्रीम में सचमुच हुए पलों के बारे में पूछ सकता है: खुलासे, पुरस्कार, मज़ाक, भटकती बातें, और वीडियो में आई बाकी हर चीज़।
 
+:::media-left
+
+![HELP-A-FRIEND! Trivia स्क्रीनशॉट](./f6e02e23a9bb8118.png)
+
 ## इसे आज़माएँ!
 
 *HELP-A-FRIEND! Trivia* Playground का हिस्सा है, जो अभी भी वैकल्पिक है। एक्सटेंशन सेटिंग्स से Playground चालू करें, लाइव चैट वाला रीप्ले खोलें, और Games पैनल से मैच शुरू करें। चैट में कंट्रोलर आइकन देखें।
 
 अभी के लिए अंग्रेज़ी में उपलब्ध है।
 
-![reel](./reel.png){align=center}
+:::

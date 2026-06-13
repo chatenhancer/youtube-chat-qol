@@ -5,7 +5,7 @@ description: "Playground is een nieuwe functie in de Chat Enhancer-extensie waar
 locale: "nl"
 slug: "introducing-playground-tiny-games-for-live-chat-breaks"
 translationKey: "introducing-playground-tiny-games-for-live-chat-breaks"
-image: "./cover.png"
+image: "./90af004f7c5daeab.png"
 video: "./cover.mp4"
 tags:
   - "playground"
@@ -23,7 +23,7 @@ Is je streamer even weg? Open Playground tot die terug is.
 
 :::media-right
 
-![Compact schaakpaneel boven YouTube-livechat](./game-panel.png){shadow=smooth rotation=-2}
+![Compact schaakpaneel boven YouTube-livechat](./f779ebcc57f8280d.png){shadow=smooth rotation=-2}
 
 Games zijn compact en worden niet veel groter dan dit. Het paneel is versleepbaar, dus je kunt het overal in de chat plaatsen.
 
@@ -35,7 +35,7 @@ Zoek de Playground-opties in dit gedeelte van de extensie-instellingen.
 
 :::media-left
 
-![Playground-instellingen in de Chat Enhancer-popup](./settings.png){crop=1.04;focus=26.3%,0%;rotate=0.5deg}
+![Playground-instellingen in de Chat Enhancer-popup](./c99cee6a87fb4253.png)
 
 Schakel “Meedoen met Playground” in om het Games-pictogram in de chat te laten verschijnen.
 

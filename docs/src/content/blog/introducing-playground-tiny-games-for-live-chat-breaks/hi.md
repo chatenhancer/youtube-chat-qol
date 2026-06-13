@@ -5,7 +5,7 @@ description: "Playground, Chat Enhancer extension की नई feature है �
 locale: "hi"
 slug: "introducing-playground-tiny-games-for-live-chat-breaks"
 translationKey: "introducing-playground-tiny-games-for-live-chat-breaks"
-image: "./cover.png"
+image: "./90af004f7c5daeab.png"
 video: "./cover.mp4"
 tags:
   - "playground"
@@ -23,7 +23,7 @@ Playground extension के अंदर रहने वाला games hub ह
 
 :::media-right
 
-![YouTube live chat के ऊपर floating compact chess game panel](./game-panel.png){shadow=smooth rotation=-2}
+![YouTube live chat के ऊपर floating compact chess game panel](./f779ebcc57f8280d.png){shadow=smooth rotation=-2}
 
 Games compact हैं और इससे बहुत बड़े नहीं होंगे. Panel draggable है, इसलिए आप इसे chat में कहीं भी रख सकते हैं.
 
@@ -35,7 +35,7 @@ Extension settings के इस section में Playground options देख�
 
 :::media-left
 
-![Chat Enhancer popup में Playground settings](./settings.png){crop=1.04;focus=26.3%,0%;rotate=0.5deg}
+![Chat Enhancer popup में Playground settings](./c99cee6a87fb4253.png)
 
 Chat में Games icon दिखाने के लिए “Join Playground” setting enable करें.
 

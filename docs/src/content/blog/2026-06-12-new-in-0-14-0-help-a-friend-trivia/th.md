@@ -1,10 +1,10 @@
 ---
-title: "ใหม่ใน 0.14.0: HELP-A-FRIEND! Trivia"
+title: "ใหม่ใน Chat Enhancer 0.14.0: HELP-A-FRIEND! Trivia"
 date: 2026-06-12
 description: "เกม Playground ใหม่ที่เปลี่ยนช่วงต่างๆ ในรีเพลย์ YouTube ให้เป็นคำถามทริเวียสไตล์แชต"
 locale: "th"
 slug: "new-in-0-14-0-help-a-friend-trivia"
-image: "./logo.png"
+image: "./0e5e4f69e6fa7b45.png"
 translationKey: "new-in-0-14-0-help-a-friend-trivia"
 tags:
   - "trivia"
@@ -18,7 +18,7 @@ tags:
 
 :::media-right
 
-![โลโก้ HELP-A-FRIEND! Trivia](./2026-06-12-new-in-0-14-0-help-a-friend-trivia-assets/1708318b4060743a.png){shadow=smooth}
+![โลโก้ HELP-A-FRIEND! Trivia](./2026-06-12-new-in-0-14-0-help-a-friend-trivia-assets/6ef6d6f2584f127f.png){shadow=smooth;rotate=-8deg}
 
 แทนที่จะเป็นกระดานควิซ *HELP-A-FRIEND! Trivia* จะเล่นเหมือนแชตกลุ่มเล็กๆ เพื่อนคนหนึ่งของคุณดูเหมือนจะไม่ได้ตั้งใจดูสตรีม และตอนนี้ต้องการความช่วยเหลือ... คุณมีความรู้พอไหม?
 
@@ -38,10 +38,14 @@ tags:
 
 แต่ละแมตช์สร้างจากทรานสคริปต์ของรีเพลย์ที่คุณกำลังดูอยู่ เกมจึงถามเกี่ยวกับช่วงเวลาที่เกิดขึ้นจริงในสตรีมนั้นได้ ไม่ว่าจะเป็นการเปิดเผย รางวัล มุกตลก การคุยนอกเรื่อง และทุกอย่างที่อยู่ในวิดีโอ
 
+:::media-left
+
+![ภาพหน้าจอ HELP-A-FRIEND! Trivia](./f6e02e23a9bb8118.png)
+
 ## ลองเล่นเลย!
 
 *HELP-A-FRIEND! Trivia* เป็นส่วนหนึ่งของ Playground ซึ่งยังเป็นฟีเจอร์ที่ต้องเลือกเปิดเอง เปิดใช้ Playground จากการตั้งค่าส่วนขยาย เปิดรีเพลย์ที่มีแชตสด แล้วเริ่มแมตช์จากแผง Games มองหาไอคอนคอนโทรลเลอร์ในแชต
 
 ตอนนี้มีให้เล่นเป็นภาษาอังกฤษ
 
-![reel](./reel.png){align=center}
+:::

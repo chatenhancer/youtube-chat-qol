@@ -1,10 +1,10 @@
 ---
-title: "0.14.0 の新機能: HELP-A-FRIEND! Trivia"
+title: "Chat Enhancer 0.14.0 の新機能: HELP-A-FRIEND! Trivia"
 date: 2026-06-12
 description: "YouTube のリプレイ中の出来事がチャット風のトリビア問題になる、新しい Playground ゲームです。"
 locale: "ja"
 slug: "new-in-0-14-0-help-a-friend-trivia"
-image: "./logo.png"
+image: "./0e5e4f69e6fa7b45.png"
 translationKey: "new-in-0-14-0-help-a-friend-trivia"
 tags:
   - "trivia"
@@ -18,7 +18,7 @@ tags:
 
 :::media-right
 
-![HELP-A-FRIEND! Trivia のロゴ](./2026-06-12-new-in-0-14-0-help-a-friend-trivia-assets/1708318b4060743a.png){shadow=smooth}
+![HELP-A-FRIEND! Trivia のロゴ](./2026-06-12-new-in-0-14-0-help-a-friend-trivia-assets/6ef6d6f2584f127f.png){shadow=smooth;rotate=-8deg}
 
 *HELP-A-FRIEND! Trivia* は、クイズボードではなく、小さなグループチャットのように進みます。友だちのひとりが明らかに配信をちゃんと見ていなかったようで、今まさに助けを必要としています... あなたには答えがわかりますか？
 
@@ -38,10 +38,14 @@ YouTube のリプレイ（終了済みのライブ配信）から Playground の
 
 各対戦は、視聴中のリプレイの文字起こしから生成されます。そのため、ゲームはその配信で実際に起きた場面、発表、受賞、ジョーク、脱線、そして動画に残ったあらゆる出来事について質問できます。
 
+:::media-left
+
+![HELP-A-FRIEND! Trivia のスクリーンショット](./f6e02e23a9bb8118.png)
+
 ## 試してみよう！
 
 *HELP-A-FRIEND! Trivia* は Playground の一部で、まだオプトイン機能です。拡張機能の設定で Playground を有効にし、ライブチャット付きのリプレイを開いて、ゲームパネルから対戦を開始してください。チャット内のコントローラーアイコンを探します。
 
 現在は英語で利用できます。
 
-![reel](./reel.png){align=center}
+:::

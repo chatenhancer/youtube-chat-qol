@@ -1,10 +1,10 @@
 ---
-title: "تازه در 0.14.0: HELP-A-FRIEND! Trivia"
+title: "تازه در Chat Enhancer 0.14.0: HELP-A-FRIEND! Trivia"
 date: 2026-06-12
 description: "یک بازی جدید Playground که در آن لحظه‌های بازپخش YouTube به پرسش‌های اطلاعات عمومی به سبک چت تبدیل می‌شوند."
 locale: "fa"
 slug: "new-in-0-14-0-help-a-friend-trivia"
-image: "./logo.png"
+image: "./0e5e4f69e6fa7b45.png"
 translationKey: "new-in-0-14-0-help-a-friend-trivia"
 tags:
   - "trivia"
@@ -18,7 +18,7 @@ tags:
 
 :::media-right
 
-![لوگوی HELP-A-FRIEND! Trivia](./2026-06-12-new-in-0-14-0-help-a-friend-trivia-assets/1708318b4060743a.png){shadow=smooth}
+![لوگوی HELP-A-FRIEND! Trivia](./2026-06-12-new-in-0-14-0-help-a-friend-trivia-assets/6ef6d6f2584f127f.png){shadow=smooth;rotate=-8deg}
 
 به جای یک صفحه آزمون، *HELP-A-FRIEND! Trivia* مثل یک چت گروهی کوچک پیش می‌رود. یکی از دوستانت ظاهرا حواسش به استریم نبوده و حالا کمک می‌خواهد... آیا جواب‌ها را می‌دانی؟
 
@@ -38,10 +38,14 @@ tags:
 
 هر مسابقه از متن بازپخشی که تماشا می‌کنی ساخته می‌شود، پس بازی می‌تواند درباره لحظه‌هایی بپرسد که واقعا در همان استریم رخ داده‌اند: رونمایی‌ها، جایزه‌ها، شوخی‌ها، حاشیه‌ها، و هر چیز دیگری که وارد ویدیو شده است.
 
+:::media-left
+
+![اسکرین‌شات HELP-A-FRIEND! Trivia](./f6e02e23a9bb8118.png)
+
 ## امتحانش کن!
 
 *HELP-A-FRIEND! Trivia* بخشی از Playground است که هنوز اختیاری است. Playground را از تنظیمات افزونه فعال کن، یک بازپخش دارای چت زنده را باز کن، و از پنل بازی‌ها یک مسابقه شروع کن. در چت دنبال آیکون کنترلر بگرد.
 
 فعلا به زبان انگلیسی در دسترس است.
 
-![reel](./reel.png){align=center}
+:::

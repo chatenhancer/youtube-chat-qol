@@ -5,7 +5,7 @@ description: "Playground es una nueva función de la extensión Chat Enhancer qu
 locale: "es"
 slug: "introducing-playground-tiny-games-for-live-chat-breaks"
 translationKey: "introducing-playground-tiny-games-for-live-chat-breaks"
-image: "./cover.png"
+image: "./90af004f7c5daeab.png"
 video: "./cover.mp4"
 tags:
   - "playground"
@@ -23,7 +23,7 @@ Playground es un hub de juegos dentro de la extensión donde puedes jugar con ot
 
 :::media-right
 
-![Panel compacto de ajedrez flotando sobre el chat en directo de YouTube](./game-panel.png){shadow=smooth rotation=-2}
+![Panel compacto de ajedrez flotando sobre el chat en directo de YouTube](./f779ebcc57f8280d.png){shadow=smooth rotation=-2}
 
 Los juegos son compactos y no crecerán mucho más que esto. El panel se puede arrastrar, así que puedes colocarlo en cualquier parte del chat.
 
@@ -35,7 +35,7 @@ Busca las opciones de Playground en esta sección de los ajustes de la extensió
 
 :::media-left
 
-![Ajustes de Playground en el popup de Chat Enhancer](./settings.png){crop=1.04;focus=26.3%,0%;rotate=0.5deg}
+![Ajustes de Playground en el popup de Chat Enhancer](./c99cee6a87fb4253.png)
 
 Activa el ajuste “Unirse a Playground” para que aparezca el icono de Juegos en el chat.
 
