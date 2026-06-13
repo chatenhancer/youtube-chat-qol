@@ -112,7 +112,7 @@ npm run build:firefox
 
 ## Release
 
-1. Run `npm run version:bump -- patch`, `npm run version:bump -- minor`, or `npm run version:bump -- major`.
+1. Run `npm run version:bump` for a patch release, or `npm run version:bump -- minor` / `npm run version:bump -- major`.
 2. Run `npm run verify`.
 3. Commit the version bump.
 4. Run `npm run release:tag`.

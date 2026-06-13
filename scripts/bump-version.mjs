@@ -3,14 +3,15 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const bumpTypes = new Set(['major', 'minor', 'patch']);
-const bumpType = process.argv[2];
+const bumpType = process.argv[2] || 'patch';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const packageJsonPath = path.join(root, 'package.json');
 const packageLockPath = path.join(root, 'package-lock.json');
 const manifestPath = path.join(root, 'manifest.json');
 
 if (!bumpTypes.has(bumpType)) {
-  console.error('Usage: npm run version:bump -- <major|minor|patch>');
+  console.error('Usage: npm run version:bump [-- <major|minor|patch>]');
+  console.error('Defaults to patch when no bump type is provided.');
   process.exit(1);
 }
 
