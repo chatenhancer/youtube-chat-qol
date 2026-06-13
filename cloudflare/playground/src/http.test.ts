@@ -39,7 +39,7 @@ describe('playground HTTP helpers', () => {
     }), env);
 
     expect(allowedHeaders.get('Access-Control-Allow-Origin')).toBe('https://chatenhancer.com');
-    expect(allowedHeaders.get('Access-Control-Allow-Methods')).toBe('GET, OPTIONS');
+    expect(allowedHeaders.get('Access-Control-Allow-Methods')).toBe('GET, POST, OPTIONS');
 
     const deniedHeaders = createCorsHeaders(new Request('https://playground.chatenhancer.com/health', {
       headers: {

@@ -16,6 +16,7 @@ import {
   type PublicInvite,
   type ServerMessage
 } from '../../../shared/playground-protocol';
+import type { ReplayTriviaGenerationToken } from '../../../shared/playground-trivia';
 import { getCurrentYouTubeChatStreamKey } from '../../../youtube/source-url';
 import { getAvailableGameIds } from './registry';
 
@@ -24,6 +25,7 @@ export interface PlaygroundClientState {
   error: string;
   games: PublicGame[];
   invites: PublicInvite[];
+  replayTriviaGenerationTokens: Record<string, ReplayTriviaGenerationToken>;
   status: 'connected' | 'connecting' | 'disconnected';
   users: LobbySnapshot['users'];
   userId: string;
@@ -42,6 +44,7 @@ const DEFAULT_STATE: PlaygroundClientState = {
   error: '',
   games: [],
   invites: [],
+  replayTriviaGenerationTokens: {},
   status: 'disconnected',
   users: [],
   userId: ''
@@ -80,10 +83,12 @@ export function startPlaygroundClient(nextAvailable = available): void {
     return;
   }
 
+  const streamChanged = currentStreamKey !== streamKey;
   currentStreamKey = streamKey;
   setState({
     ...state,
     error: '',
+    replayTriviaGenerationTokens: streamChanged ? {} : state.replayTriviaGenerationTokens,
     status: 'connecting'
   });
 
@@ -173,6 +178,7 @@ function handleBackgroundMessage(message: PlaygroundBackgroundMessage): void {
         error: '',
         games: message.snapshot.games,
         invites: message.snapshot.invites,
+        replayTriviaGenerationTokens: state.status === 'connected' ? state.replayTriviaGenerationTokens : {},
         status: 'connected',
         users: message.snapshot.users,
         userId: message.userId
@@ -217,7 +223,21 @@ function handleServerMessage(message: ServerMessage): void {
           reason: message.reason,
           userId: message.userId
         },
-        games: state.games.filter((game) => game.gameId !== message.gameId)
+        games: state.games.filter((game) => game.gameId !== message.gameId),
+        replayTriviaGenerationTokens: omitRecordKey(state.replayTriviaGenerationTokens, message.gameId)
+      });
+      return;
+    case 'replayTriviaGenerationToken':
+      setState({
+        ...state,
+        replayTriviaGenerationTokens: {
+          ...state.replayTriviaGenerationTokens,
+          [message.gameId]: {
+            expiresAt: message.expiresAt,
+            gameId: message.gameId,
+            generationToken: message.generationToken
+          }
+        }
       });
       return;
     case 'error':
@@ -270,4 +290,10 @@ function mergeGame(games: PublicGame[], game: PublicGame): PublicGame[] {
     ...games.filter((candidate) => candidate.gameId !== game.gameId),
     game
   ];
+}
+
+function omitRecordKey<T>(record: Record<string, T>, key: string): Record<string, T> {
+  const next = { ...record };
+  delete next[key];
+  return next;
 }

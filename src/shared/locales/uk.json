@@ -133,6 +133,8 @@
     "playground": "Playground",
     "games": "Ігри",
     "gamesChess": "Шахи",
+    "gamesReplayTrivia": "HELP-A-FRIEND! Trivia",
+    "gamesReplayTriviaReplayOnly": "Available on chat replays.",
     "gamesAvailableToPlay": "Готовий грати",
     "gamesAvailableHelper": "Отримуйте ігрові запрошення в цій трансляції.",
     "gamesActiveGame": "Активна гра",
@@ -153,6 +155,7 @@
     "gamesInvite": "Запросити",
     "gamesIgnore": "Ігнорувати",
     "gamesPlayersOnline": {
+      "zero": "Немає гравців онлайн",
       "one": "{count} гравець онлайн",
       "other": "{count} гравців онлайн"
     },

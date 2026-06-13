@@ -123,6 +123,18 @@ describe('current-user mention detection', () => {
     expect(mentionDetection.getCurrentMentionCandidates()).not.toContain('@ab');
   });
 
+  it('returns a display handle for local-only UI copy', async () => {
+    const surface = document.createElement('yt-live-chat-message-input-renderer');
+    surface.innerHTML = '<span id="author-name">CurrentViewer</span>';
+    document.body.append(surface);
+    const mentionDetection = await import('./mention-detection');
+
+    expect(mentionDetection.getCurrentMentionDisplayHandle()).toBe('@CurrentViewer');
+
+    surface.querySelector('#author-name')!.textContent = '/@CurrentViewerAlt';
+    expect(mentionDetection.getCurrentMentionDisplayHandle()).toBe('@CurrentViewerAlt');
+  });
+
   it('ignores already-checked and disconnected messages', async () => {
     document.body.append(createIdentitySurface('@CurrentViewer'));
     const mentionDetection = await import('./mention-detection');

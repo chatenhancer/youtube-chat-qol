@@ -133,6 +133,8 @@
     "playground": "Playground",
     "games": "Jogos",
     "gamesChess": "Xadrez",
+    "gamesReplayTrivia": "HELP-A-FRIEND! Trivia",
+    "gamesReplayTriviaReplayOnly": "Available on chat replays.",
     "gamesAvailableToPlay": "Disponível para jogar",
     "gamesAvailableHelper": "Receba convites de jogo para esta live.",
     "gamesActiveGame": "Jogo ativo",
@@ -153,6 +155,7 @@
     "gamesInvite": "Convidar",
     "gamesIgnore": "Ignorar",
     "gamesPlayersOnline": {
+      "zero": "Nenhum jogador online",
       "one": "{count} jogador online",
       "other": "{count} jogadores online"
     },

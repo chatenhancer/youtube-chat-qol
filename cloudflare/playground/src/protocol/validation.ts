@@ -112,7 +112,7 @@ function parseGameList(value: unknown): GameId[] {
 
 function parseGameId(value: unknown): GameId {
   if (SUPPORTED_GAMES.includes(value as GameId)) return value as GameId;
-  throw new ProtocolError('unsupported_game', 'Only chess is supported.');
+  throw new ProtocolError('unsupported_game', 'Unsupported game.');
 }
 
 function parseActionPayload(value: unknown): Record<string, unknown> | undefined {

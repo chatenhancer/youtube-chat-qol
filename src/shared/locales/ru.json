@@ -133,6 +133,8 @@
     "playground": "Playground",
     "games": "Игры",
     "gamesChess": "Шахматы",
+    "gamesReplayTrivia": "HELP-A-FRIEND! Trivia",
+    "gamesReplayTriviaReplayOnly": "Available on chat replays.",
     "gamesAvailableToPlay": "Готов играть",
     "gamesAvailableHelper": "Получайте игровые приглашения в этом стриме.",
     "gamesActiveGame": "Активная игра",
@@ -153,6 +155,7 @@
     "gamesInvite": "Пригласить",
     "gamesIgnore": "Игнорировать",
     "gamesPlayersOnline": {
+      "zero": "Нет игроков онлайн",
       "one": "{count} игрок онлайн",
       "other": "{count} игроков онлайн"
     },

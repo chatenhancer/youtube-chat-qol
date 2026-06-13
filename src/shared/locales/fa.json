@@ -133,6 +133,8 @@
     "playground": "محیط آزمایشی",
     "games": "بازی‌ها",
     "gamesChess": "شطرنج",
+    "gamesReplayTrivia": "HELP-A-FRIEND! Trivia",
+    "gamesReplayTriviaReplayOnly": "Available on chat replays.",
     "gamesAvailableToPlay": "آماده بازی",
     "gamesAvailableHelper": "دعوت‌های بازی را برای این پخش دریافت کنید.",
     "gamesActiveGame": "بازی فعال",
@@ -153,6 +155,7 @@
     "gamesInvite": "دعوت",
     "gamesIgnore": "نادیده گرفتن",
     "gamesPlayersOnline": {
+      "zero": "هیچ بازیکنی آنلاین نیست",
       "one": "{count} بازیکن آنلاین",
       "other": "{count} بازیکن آنلاین"
     },

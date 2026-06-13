@@ -9,6 +9,7 @@
  */
 import { registerFeatureLifecycle, type FeatureMutationBatch } from '../content/lifecycle';
 import { cleanText, normalizeComparableText } from '../shared/text';
+import { cleanAuthorNameText } from '../youtube/authors';
 import { getMessageDetails } from '../youtube/messages';
 
 const MAX_PENDING_MENTION_MESSAGES = 40;
@@ -54,6 +55,12 @@ export function registerMentionProcessor(processor: MentionProcessor): void {
 
 export function getCurrentMentionCandidates(): string[] {
   return [...getMentionCandidates()];
+}
+
+export function getCurrentMentionDisplayHandle(): string {
+  return getRawMentionCandidates()
+    .map(getDisplayHandleCandidate)
+    .find(Boolean) || '';
 }
 
 export function isCurrentUserAuthorName(authorName: string): boolean {
@@ -127,6 +134,16 @@ function getRawMentionCandidates(): string[] {
     .map((element) => cleanText(element.textContent || ''));
 
   return localCandidates.filter(Boolean);
+}
+
+function getDisplayHandleCandidate(value: string): string {
+  const clean = cleanText(value);
+  const embeddedHandle = clean.match(/@[\p{L}\p{N}._-]{2,}/u)?.[0] || '';
+  if (embeddedHandle) return embeddedHandle;
+
+  const authorName = cleanAuthorNameText(clean);
+  if (/^@[\p{L}\p{N}._-]{2,}$/u.test(authorName)) return authorName;
+  return /^[\p{L}\p{N}._-]{3,}$/u.test(authorName) ? `@${authorName}` : '';
 }
 
 function scheduleMentionCandidateRefresh(): void {

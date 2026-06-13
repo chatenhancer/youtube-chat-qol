@@ -10,7 +10,7 @@ import enCatalog from './locales/en.json';
 import { getLanguageLabel } from './languages';
 
 type MessageParams = Record<string, number | string>;
-type PluralMessage = { one?: string; other: string };
+type PluralMessage = { one?: string; other: string; zero?: string };
 type MessageValue = string | PluralMessage;
 type LocaleCatalog = {
   messages: Partial<Record<MessageKey, MessageValue>>;
@@ -103,6 +103,7 @@ function formatMessage(message: MessageValue, params: MessageParams): string {
 }
 
 function selectPluralMessage(message: PluralMessage, params: MessageParams): string {
+  if (params.count === 0 && message.zero) return message.zero;
   return params.count === 1 && message.one ? message.one : message.other;
 }
 

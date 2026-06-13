@@ -133,6 +133,8 @@
     "playground": "Playground",
     "games": "เกม",
     "gamesChess": "หมากรุก",
+    "gamesReplayTrivia": "HELP-A-FRIEND! Trivia",
+    "gamesReplayTriviaReplayOnly": "Available on chat replays.",
     "gamesAvailableToPlay": "พร้อมเล่น",
     "gamesAvailableHelper": "รับคำเชิญเล่นเกมสำหรับสตรีมนี้",
     "gamesActiveGame": "เกมที่กำลังเล่น",
@@ -153,6 +155,7 @@
     "gamesInvite": "เชิญ",
     "gamesIgnore": "ไม่สนใจ",
     "gamesPlayersOnline": {
+      "zero": "ไม่มีผู้เล่นออนไลน์",
       "one": "ผู้เล่นออนไลน์ {count} คน",
       "other": "ผู้เล่นออนไลน์ {count} คน"
     },

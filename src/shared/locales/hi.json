@@ -133,6 +133,8 @@
     "playground": "Playground",
     "games": "गेम",
     "gamesChess": "शतरंज",
+    "gamesReplayTrivia": "HELP-A-FRIEND! Trivia",
+    "gamesReplayTriviaReplayOnly": "Available on chat replays.",
     "gamesAvailableToPlay": "खेलने के लिए उपलब्ध",
     "gamesAvailableHelper": "इस स्ट्रीम के लिए गेम आमंत्रण पाएं.",
     "gamesActiveGame": "सक्रिय गेम",
@@ -153,6 +155,7 @@
     "gamesInvite": "बुलाएं",
     "gamesIgnore": "अनदेखा करें",
     "gamesPlayersOnline": {
+      "zero": "कोई खिलाड़ी ऑनलाइन नहीं",
       "one": "{count} खिलाड़ी ऑनलाइन",
       "other": "{count} खिलाड़ी ऑनलाइन"
     },

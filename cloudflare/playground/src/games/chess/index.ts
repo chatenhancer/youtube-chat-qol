@@ -1,7 +1,13 @@
+/**
+ * Chess realtime game module.
+ *
+ * This owns chess state transitions and public serialization for the stream
+ * room. The transport layer only sees the generic `GameModule` contract.
+ */
 import { Chess } from 'chess.js';
-import type { PublicGame, PublicUserIdentity } from '../protocol/messages';
-import { ProtocolError } from '../protocol/validation';
-import type { GameActionInput, GameModule, GameRecord } from './types';
+import type { PublicGame, PublicUserIdentity } from '../../protocol/messages';
+import { ProtocolError } from '../../protocol/validation';
+import type { GameActionInput, GameModule, GameRecord } from '../types';
 
 export type PlayerColor = 'black' | 'white';
 export type ChessGameStatus = 'active' | 'checkmate' | 'draw' | 'resigned';

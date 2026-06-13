@@ -133,6 +133,8 @@
     "playground": "Playground",
     "games": "Oyunlar",
     "gamesChess": "Satranç",
+    "gamesReplayTrivia": "HELP-A-FRIEND! Trivia",
+    "gamesReplayTriviaReplayOnly": "Available on chat replays.",
     "gamesAvailableToPlay": "Oynamaya uygun",
     "gamesAvailableHelper": "Bu yayın için oyun davetleri al.",
     "gamesActiveGame": "Aktif oyun",
@@ -153,6 +155,7 @@
     "gamesInvite": "Davet et",
     "gamesIgnore": "Yok say",
     "gamesPlayersOnline": {
+      "zero": "Çevrimiçi oyuncu yok",
       "one": "{count} oyuncu çevrimiçi",
       "other": "{count} oyuncu çevrimiçi"
     },

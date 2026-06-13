@@ -133,6 +133,8 @@
     "playground": "Playground",
     "games": "Games",
     "gamesChess": "Schaken",
+    "gamesReplayTrivia": "HELP-A-FRIEND! Trivia",
+    "gamesReplayTriviaReplayOnly": "Available on chat replays.",
     "gamesAvailableToPlay": "Beschikbaar om te spelen",
     "gamesAvailableHelper": "Ontvang game-uitnodigingen voor deze stream.",
     "gamesActiveGame": "Actief spel",
@@ -153,6 +155,7 @@
     "gamesInvite": "Uitnodigen",
     "gamesIgnore": "Negeren",
     "gamesPlayersOnline": {
+      "zero": "Geen spelers online",
       "one": "{count} speler online",
       "other": "{count} spelers online"
     },

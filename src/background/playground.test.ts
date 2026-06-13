@@ -7,6 +7,7 @@ import {
   type PlaygroundContentMessage,
   type ServerMessage
 } from '../shared/playground-protocol';
+import { REPLAY_TRIVIA_QUESTIONS_BACKGROUND_MESSAGE } from '../shared/playground-trivia';
 
 class FakeWebSocket {
   static instances: FakeWebSocket[] = [];
@@ -268,6 +269,103 @@ describe('background playground bridge', () => {
     ]);
   });
 
+  it('posts Replay Trivia question requests from the background context', async () => {
+    const responseBody = {
+      generatedAt: '2026-06-12T00:00:00.000Z',
+      languageCode: 'en',
+      model: 'gpt-test',
+      questions: [],
+      transcriptWindow: {
+        endSeconds: 10,
+        segmentCount: 1,
+        startSeconds: 0,
+        videoId: 'SHt3FyE-VIQ'
+      }
+    };
+    const fetchMock = vi.fn(async () => new Response(JSON.stringify(responseBody), {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }));
+    vi.stubGlobal('fetch', fetchMock);
+
+    await import('./playground');
+
+    const request = {
+      endSeconds: 10,
+      gameId: 'game-replay-trivia',
+      generationToken: 'rtg_1234567890abcdef',
+      languageCode: 'en',
+      segments: [{ durationSeconds: 2, startSeconds: 1, text: 'The winner is announced.' }],
+      startSeconds: 0,
+      videoId: 'SHt3FyE-VIQ'
+    };
+    const sendResponse = vi.fn();
+    const keepAlive = getMessageListener()({
+      request,
+      streamKey: 'SHt3FyE-VIQ',
+      type: REPLAY_TRIVIA_QUESTIONS_BACKGROUND_MESSAGE
+    }, {} as chrome.runtime.MessageSender, sendResponse);
+
+    expect(keepAlive).toBe(true);
+    await vi.waitFor(() => {
+      expect(sendResponse).toHaveBeenCalledWith({
+        ok: true,
+        response: responseBody
+      });
+    });
+    expect(fetchMock).toHaveBeenCalledWith(
+      'https://playground.chatenhancer.com/v1/streams/SHt3FyE-VIQ/replay-trivia/questions',
+      {
+        body: JSON.stringify(request),
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        method: 'POST'
+      }
+    );
+  });
+
+  it('returns Replay Trivia question request errors to the content script', async () => {
+    const fetchMock = vi.fn(async () => new Response(JSON.stringify({
+      error: {
+        code: 'openai_not_configured',
+        message: 'Replay Trivia question generation is not configured.'
+      }
+    }), {
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      status: 503
+    }));
+    vi.stubGlobal('fetch', fetchMock);
+
+    await import('./playground');
+
+    const sendResponse = vi.fn();
+    getMessageListener()({
+      request: {
+        endSeconds: 10,
+        gameId: 'game-replay-trivia',
+        generationToken: 'rtg_1234567890abcdef',
+        segments: [{ startSeconds: 1, text: 'The winner is announced.' }],
+        startSeconds: 0,
+        videoId: 'SHt3FyE-VIQ'
+      },
+      streamKey: 'SHt3FyE-VIQ',
+      type: REPLAY_TRIVIA_QUESTIONS_BACKGROUND_MESSAGE
+    }, {} as chrome.runtime.MessageSender, sendResponse);
+
+    await vi.waitFor(() => {
+      expect(sendResponse).toHaveBeenCalledWith({
+        code: 'openai_not_configured',
+        error: 'Replay Trivia question generation is not configured.',
+        ok: false,
+        status: 503
+      });
+    });
+  });
+
   it('prefers the outer sender tab video id over an iframe fallback key', async () => {
     await import('./playground');
     const port = createFakePort('https://www.youtube.com/watch?v=outer-stream&feature=live');
@@ -379,6 +477,20 @@ function getConnectListener(): (port: chrome.runtime.Port) => void {
   const listener = vi.mocked(chrome.runtime.onConnect.addListener).mock.calls.at(-1)?.[0];
   if (!listener) throw new Error('No runtime connect listener registered.');
   return listener as (port: chrome.runtime.Port) => void;
+}
+
+function getMessageListener(): (
+  message: unknown,
+  sender: chrome.runtime.MessageSender,
+  sendResponse: (response?: unknown) => void
+) => boolean | undefined {
+  const listener = vi.mocked(chrome.runtime.onMessage.addListener).mock.calls.at(-1)?.[0];
+  if (!listener) throw new Error('No runtime message listener registered.');
+  return listener as (
+    message: unknown,
+    sender: chrome.runtime.MessageSender,
+    sendResponse: (response?: unknown) => void
+  ) => boolean | undefined;
 }
 
 function createFakePort(senderTabUrl?: string): FakePort {

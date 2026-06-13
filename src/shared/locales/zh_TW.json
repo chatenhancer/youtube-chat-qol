@@ -133,6 +133,8 @@
     "playground": "Playground",
     "games": "遊戲",
     "gamesChess": "西洋棋",
+    "gamesReplayTrivia": "HELP-A-FRIEND! Trivia",
+    "gamesReplayTriviaReplayOnly": "Available on chat replays.",
     "gamesAvailableToPlay": "可以一起玩",
     "gamesAvailableHelper": "接收此直播的遊戲邀請。",
     "gamesActiveGame": "進行中的遊戲",
@@ -153,6 +155,7 @@
     "gamesInvite": "邀請",
     "gamesIgnore": "忽略",
     "gamesPlayersOnline": {
+      "zero": "沒有玩家在線",
       "one": "{count} 位玩家在線",
       "other": "{count} 位玩家在線"
     },

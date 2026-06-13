@@ -1,0 +1,27 @@
+/**
+ * Enabled realtime Playground games.
+ *
+ * Add a game module here when the Durable Object should allow users to invite,
+ * start, and exchange actions for that game. HTTP-only game features can expose
+ * routes separately without appearing in this list yet.
+ */
+import { chessGameModule } from './chess';
+import { replayTriviaGameModule } from './replay-trivia';
+import type { GameModule } from './types';
+import type { GameId } from '../protocol/messages';
+
+export interface EnabledGameModule {
+  gameId: GameId;
+  module: GameModule;
+}
+
+export const ENABLED_GAME_MODULES: readonly EnabledGameModule[] = [
+  {
+    gameId: 'chess',
+    module: chessGameModule
+  },
+  {
+    gameId: 'replay-trivia',
+    module: replayTriviaGameModule
+  }
+];

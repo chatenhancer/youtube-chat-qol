@@ -22,9 +22,9 @@ describe('playground protocol validation', () => {
     ));
   });
 
-  it('parses a signed hello message for chess availability', () => {
+  it('parses a signed hello message for game availability', () => {
     const message = parseClientMessage(JSON.stringify({
-      availableGames: ['chess'],
+      availableGames: ['chess', 'replay-trivia'],
       identity: {
         publicKeyJwk: {
           crv: 'P-256',
@@ -39,7 +39,7 @@ describe('playground protocol validation', () => {
     }));
 
     expect(message).toMatchObject({
-      availableGames: ['chess'],
+      availableGames: ['chess', 'replay-trivia'],
       type: 'hello'
     });
   });
@@ -78,7 +78,7 @@ describe('playground protocol validation', () => {
     expect(() => parseClientMessage(JSON.stringify({
       availableGames: ['tic-tac-toe'],
       type: 'setAvailability'
-    }))).toThrowError(new ProtocolError('unsupported_game', 'Only chess is supported.'));
+    }))).toThrowError(new ProtocolError('unsupported_game', 'Unsupported game.'));
   });
 
   it('validates game action envelopes without knowing game rules', () => {

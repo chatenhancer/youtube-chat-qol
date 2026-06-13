@@ -151,6 +151,7 @@ describe('runtime i18n', () => {
 
     expect(i18n.t('translateToLanguage', { language: 'Japanese' })).toBe('Translate to Japanese.');
     expect(i18n.t('translateToLanguage')).toBe('Translate to {language}.');
+    expect(i18n.t('gamesPlayersOnline', { count: 0 })).toBe('No players online');
     expect(i18n.t('unreadMessages', { count: 1 })).toBe('1 new message');
     expect(i18n.t('unreadMessages', { count: 3 })).toBe('3 new messages');
   });

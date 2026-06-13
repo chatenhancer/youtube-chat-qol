@@ -122,14 +122,20 @@ describe('playground games header button', () => {
 
     expect(document.querySelector('.ytcq-games-connection-notice')).toBeNull();
     expect(document.querySelector('.ytcq-profile-card-title')?.textContent).toBe('Games');
-    expect(document.querySelector('.ytcq-profile-card-subtitle')?.textContent).toBe('0 players online');
+    expect(document.querySelector('.ytcq-profile-card-subtitle')?.textContent).toBe('No players online');
     expect(document.querySelector('.ytcq-games-availability-toggle')?.getAttribute('aria-checked')).toBe('false');
     expect(document.querySelector('.ytcq-games-availability-toggle .ytcq-menu-toggle')).not.toBeNull();
     expect(getGamesSectionTitles()).toEqual(['Invites', 'Start a game']);
     expect(document.querySelector('.ytcq-games-section-empty')?.textContent).toBe('No invites received yet.');
-    expect(getGameCards()).toHaveLength(1);
+    expect(getGameCards()).toHaveLength(2);
     expect(document.querySelector('.ytcq-games-preview-chess .ytcq-games-preview-canvas')).not.toBeNull();
-    expect(getGameLabels()).toEqual(['Chess']);
+    expect(document.querySelector('.ytcq-games-preview-replay-trivia .ytcq-games-preview-canvas')).not.toBeNull();
+    expect(getGameLabels()).toEqual(['Chess', 'HELP-A-FRIEND! Trivia']);
+    expect(getGameCards()[0].getAttribute('aria-disabled')).toBe('false');
+    expect(getGameCards()[1].getAttribute('aria-disabled')).toBe('true');
+    expect(getGameCards()[1].title).toBe('Available on chat replays.');
+    getGameCards()[1].click();
+    expect(document.querySelector('.ytcq-profile-card-title')?.textContent).toBe('Games');
 
     getGameCards()[0].click();
     expect(document.querySelector('.ytcq-profile-card-title')?.textContent).toBe('Chess');
@@ -161,6 +167,48 @@ describe('playground games header button', () => {
       availableGames: ['chess'],
       streamKey: 'stream-a',
       type: 'ytcq:playground:init'
+    });
+  });
+
+  it('advertises Replay Trivia only inside chat replay', () => {
+    window.history.replaceState({}, '', '/live_chat_replay?video_id=stream-a');
+    const header = createHeader();
+    document.body.append(header);
+    setOptions({ ...DEFAULT_OPTIONS, playgroundEnabled: true, playgroundGamesAvailable: true });
+
+    wireGamesButton();
+    header.querySelector<HTMLButtonElement>('.ytcq-games-button')!.click();
+    lastMockPort()?.emit(createSnapshotMessage(createLobbySnapshot()));
+
+    expect(lastMockPort()?.messages[0]).toEqual({
+      availableGames: ['chess', 'replay-trivia'],
+      streamKey: 'stream-a',
+      type: 'ytcq:playground:init'
+    });
+    expect(getGameCards()[1].getAttribute('aria-disabled')).toBe('false');
+    expect(getGameCards()[1].title).toBe('');
+  });
+
+  it('offers replay trivia through the normal invite flow', () => {
+    window.history.replaceState({}, '', '/live_chat_replay?video_id=stream-a');
+    const header = createHeader();
+    document.body.append(header);
+    setOptions({ ...DEFAULT_OPTIONS, playgroundEnabled: true, playgroundGamesAvailable: true });
+
+    wireGamesButton();
+    header.querySelector<HTMLButtonElement>('.ytcq-games-button')!.click();
+    lastMockPort()?.emit(createSnapshotMessage(createLobbySnapshot()));
+
+    expect(getGameLabels()).toEqual(['Chess', 'HELP-A-FRIEND! Trivia']);
+    getGameCards()[1].click();
+
+    expect(document.querySelector('.ytcq-profile-card-title')?.textContent).toBe('HELP-A-FRIEND! Trivia');
+    expect(document.querySelectorAll('.ytcq-games-player-row')).toHaveLength(2);
+    getActionButton('Invite').click();
+    expect(lastMockPort()?.messages.at(-1)).toMatchObject({
+      gameId: 'replay-trivia',
+      toUserId: 'luna-user',
+      type: 'ytcq:playground:invite'
     });
   });
 
@@ -478,19 +526,19 @@ function createLobbySnapshot(): LobbySnapshot {
     ],
     users: [
       {
-        availableGames: ['chess'],
+        availableGames: ['chess', 'replay-trivia'],
         displayName: 'Me',
         joinedAt: Date.now(),
         userId: 'me-user'
       },
       {
-        availableGames: ['chess'],
+        availableGames: ['chess', 'replay-trivia'],
         displayName: 'Luna Chat',
         joinedAt: Date.now(),
         userId: 'luna-user'
       },
       {
-        availableGames: ['chess'],
+        availableGames: ['chess', 'replay-trivia'],
         displayName: 'Marco Vibes',
         joinedAt: Date.now(),
         userId: 'marco-user'

@@ -1,5 +1,13 @@
+/**
+ * Minimal Cloudflare Worker and Durable Object types used by tests and source.
+ *
+ * Keeping these local avoids coupling the rest of the backend to a broader
+ * runtime type surface than it needs.
+ */
 export interface Env {
   ALLOWED_ORIGIN_PATTERNS?: string;
+  OPENAI_API_KEY?: string;
+  OPENAI_MODEL?: string;
   STREAM_ROOMS: DurableObjectNamespace;
 }
 

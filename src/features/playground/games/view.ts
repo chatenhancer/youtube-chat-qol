@@ -9,11 +9,10 @@ import { t } from '../../../shared/i18n';
 import { ytcqCreateElement } from '../../../shared/managed-dom';
 import type { GameId, PresenceUser, PublicGame, PublicInvite } from '../../../shared/playground-protocol';
 import {
-  GAMES,
+  getActiveGamePanelId,
+  getGamePickerCards,
   getGameLabel,
-  getGameOpponentLabel,
-  isActiveGamePanelOpen,
-  renderGamePreview
+  getGameOpponentLabel
 } from './registry';
 import {
   getAvailablePlayers,
@@ -66,7 +65,10 @@ export function updateGamesCardHeader(card: HTMLElement, state: GamesPanelState)
 export function renderGamesPanelBody(body: HTMLElement, state: GamesPanelState, actions: GamesViewActions): void {
   body.replaceChildren();
   if (shouldShowTransportNotice(state)) {
-    body.append(createTransportNotice(state, actions));
+    body.append(
+      createTransportNotice(state, actions),
+      createGamesGrid(actions, { includeRealtime: false })
+    );
     return;
   }
 
@@ -186,7 +188,7 @@ function createActiveGameSection(state: GamesPanelState, actions: GamesViewActio
 
   const actionsWrap = ytcqCreateElement('span');
   actionsWrap.className = 'ytcq-games-row-actions';
-  const isPanelOpen = isActiveGamePanelOpen();
+  const isPanelOpen = getActiveGamePanelId() === game.gameId;
   const togglePanel = createSmallActionButton(t(isPanelOpen ? 'gamesMinimize' : 'gamesResume'));
   togglePanel.addEventListener('click', () => actions.onToggleActiveGame(game));
   const leave = createSmallActionButton(t('gamesLeave'));
@@ -239,17 +241,28 @@ function createInviteRow(invite: PublicInvite, actions: GamesViewActions): HTMLE
   return item;
 }
 
-function createGamesGrid(actions: GamesViewActions): HTMLElement {
+function createGamesGrid(
+  actions: GamesViewActions,
+  { includeRealtime = true }: { includeRealtime?: boolean } = {}
+): HTMLElement {
   const section = createGamesSection(t('gamesStartGame'));
   const grid = ytcqCreateElement('div');
   grid.className = 'ytcq-games-grid';
 
-  GAMES.forEach((game) => {
+  getGamePickerCards({ includeRealtime }).forEach((game) => {
     const card = ytcqCreateElement('button');
     card.type = 'button';
     card.className = 'ytcq-games-game-card';
-    card.append(createGamePreview(game.id), createGameCardLabel(getGameLabel(game.id)));
-    card.addEventListener('click', () => actions.onSelectGame(game.id));
+    card.classList.toggle('ytcq-games-game-card-disabled', game.disabled);
+    card.setAttribute('aria-disabled', String(game.disabled));
+    if (game.disabled && game.disabledReason) {
+      card.title = game.disabledReason;
+      card.setAttribute('aria-label', `${game.label}. ${game.disabledReason}`);
+    }
+    card.append(createGamePreview(game.id, game.renderPreview), createGameCardLabel(game.label));
+    if (!game.disabled) {
+      card.addEventListener('click', () => actions.onSelectGame(game.id));
+    }
     grid.append(card);
   });
 
@@ -350,9 +363,9 @@ function createGameCardLabel(label: string): HTMLElement {
   return text;
 }
 
-function createGamePreview(gameId: GameId): HTMLElement {
+function createGamePreview(gameId: string, renderPreview: (container: HTMLElement) => void): HTMLElement {
   const preview = ytcqCreateElement('span');
   preview.className = `ytcq-games-preview ytcq-games-preview-${gameId}`;
-  renderGamePreview(gameId, preview);
+  renderPreview(preview);
   return preview;
 }
