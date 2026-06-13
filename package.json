@@ -40,6 +40,7 @@
     "test:watch": "vitest",
     "ci:install-playwright": "npm run test:browser:install",
     "ci:pages-build": "npm run docs:build",
+    "version:bump": "node scripts/bump-version.mjs",
     "ci:release-validate-tag": "node scripts/validate-release-tag.mjs",
     "ci:test-browser-gate": "node scripts/run-browser-tests.mjs --no-build tests/browser/specs/yt-mock-logged-in.spec.ts tests/browser/specs/yt-mock-logged-out.spec.ts tests/browser/specs/yt-mock-replay.spec.ts tests/browser/specs/yt-live-logged-out.spec.ts",
     "ci:browser-artifacts": "node scripts/collect-mock-browser-artifacts.mjs",
