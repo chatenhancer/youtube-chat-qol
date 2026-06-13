@@ -6,8 +6,8 @@ import {
   resignChessGame,
   toPublicChessGame,
   type PublicChessGame
-} from './chess';
-import { ProtocolError } from '../protocol/validation';
+} from './index';
+import { ProtocolError } from '../../protocol/validation';
 
 describe('playground chess game rules', () => {
   it('creates a new chess game with white to move', () => {

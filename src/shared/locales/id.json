@@ -133,6 +133,8 @@
     "playground": "Playground",
     "games": "Game",
     "gamesChess": "Catur",
+    "gamesReplayTrivia": "HELP-A-FRIEND! Trivia",
+    "gamesReplayTriviaReplayOnly": "Available on chat replays.",
     "gamesAvailableToPlay": "Tersedia untuk bermain",
     "gamesAvailableHelper": "Terima undangan game untuk live ini.",
     "gamesActiveGame": "Game aktif",
@@ -153,6 +155,7 @@
     "gamesInvite": "Undang",
     "gamesIgnore": "Abaikan",
     "gamesPlayersOnline": {
+      "zero": "Tidak ada pemain online",
       "one": "{count} pemain online",
       "other": "{count} pemain online"
     },

@@ -6,7 +6,7 @@
  */
 import type { GameId, PresenceUser, PublicGame, PublicInvite } from '../../../shared/playground-protocol';
 import type { PlaygroundClientState } from './client';
-import { isSupportedGameId } from './registry';
+import { isPlayableGameId, isSupportedGameId } from './registry';
 
 export type GamesPanelMode = 'lobby' | 'players';
 
@@ -48,17 +48,20 @@ export function isCurrentUserAvailable(state: PlaygroundClientState, fallbackAva
 export function getPendingInvites(state: GamesPanelState): PublicInvite[] {
   const currentUserId = state.transport.userId || '';
   return state.transport.invites
-    .filter((invite) => invite.status === 'pending' && invite.toUser.userId === currentUserId);
+    .filter((invite) => invite.status === 'pending' && invite.toUser.userId === currentUserId)
+    .filter((invite) => isPlayableGameId(invite.gameId));
 }
 
 export function getAvailablePlayers(state: GamesPanelState, gameId: GameId): PresenceUser[] {
+  if (!isPlayableGameId(gameId)) return [];
+
   const currentUserId = state.transport.userId || '';
   return state.transport.users
     .filter((user) => user.userId !== currentUserId && user.availableGames.includes(gameId));
 }
 
 function isUserAvailableForSupportedGame(user: PresenceUser): boolean {
-  return user.availableGames.some(isSupportedGameId);
+  return user.availableGames.some(isPlayableGameId);
 }
 
 export function getFirstSupportedGame(games: PublicGame[]): PublicGame | null {

@@ -4,6 +4,7 @@ node_modules/
 dist/
 coverage/
 .wrangler/
+.dev.vars*
 docs/public/badges/
 docs/*/index.html
 docs/sitemap.xml

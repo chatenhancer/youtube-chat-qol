@@ -6,7 +6,7 @@ export const PLAYGROUND_BACKEND_ORIGIN =
   normalizePlaygroundBackendOrigin(configuredPlaygroundBackendOrigin) || DEFAULT_PLAYGROUND_BACKEND_ORIGIN;
 export const PLAYGROUND_PORT_NAME = 'ytcq:playground';
 export const PLAYGROUND_PROTOCOL_VERSION = 1;
-export const SUPPORTED_GAMES = ['chess'] as const;
+export const SUPPORTED_GAMES = ['chess', 'replay-trivia'] as const;
 
 export type GameId = typeof SUPPORTED_GAMES[number];
 export type GameEndReason = 'playerLeft';
@@ -103,6 +103,7 @@ export type ServerMessage =
   | GameStartedServerMessage
   | GameUpdatedServerMessage
   | GameEndedServerMessage
+  | ReplayTriviaGenerationTokenServerMessage
   | ErrorServerMessage
   | PongServerMessage;
 
@@ -154,6 +155,13 @@ export interface GameEndedServerMessage {
   reason: GameEndReason;
   userId: string;
   type: 'gameEnded';
+}
+
+export interface ReplayTriviaGenerationTokenServerMessage {
+  expiresAt: number;
+  gameId: string;
+  generationToken: string;
+  type: 'replayTriviaGenerationToken';
 }
 
 export interface ErrorServerMessage {

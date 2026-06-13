@@ -133,6 +133,8 @@
     "playground": "ساحة التجارب",
     "games": "الألعاب",
     "gamesChess": "شطرنج",
+    "gamesReplayTrivia": "HELP-A-FRIEND! Trivia",
+    "gamesReplayTriviaReplayOnly": "Available on chat replays.",
     "gamesAvailableToPlay": "متاح للعب",
     "gamesAvailableHelper": "تلقي دعوات الألعاب لهذا البث.",
     "gamesActiveGame": "لعبة نشطة",
@@ -153,6 +155,7 @@
     "gamesInvite": "دعوة",
     "gamesIgnore": "تجاهل",
     "gamesPlayersOnline": {
+      "zero": "لا يوجد لاعبون متصلون",
       "one": "{count} لاعب متصل",
       "other": "{count} لاعبين متصلون"
     },

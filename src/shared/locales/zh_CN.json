@@ -133,6 +133,8 @@
     "playground": "Playground",
     "games": "游戏",
     "gamesChess": "国际象棋",
+    "gamesReplayTrivia": "HELP-A-FRIEND! Trivia",
+    "gamesReplayTriviaReplayOnly": "Available on chat replays.",
     "gamesAvailableToPlay": "可以一起玩",
     "gamesAvailableHelper": "接收此直播的游戏邀请。",
     "gamesActiveGame": "进行中的游戏",
@@ -153,6 +155,7 @@
     "gamesInvite": "邀请",
     "gamesIgnore": "忽略",
     "gamesPlayersOnline": {
+      "zero": "没有玩家在线",
       "one": "{count} 位玩家在线",
       "other": "{count} 位玩家在线"
     },

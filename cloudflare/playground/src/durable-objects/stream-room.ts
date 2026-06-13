@@ -1,5 +1,13 @@
+/**
+ * Stream-scoped realtime room.
+ *
+ * One Durable Object instance owns the Playground lobby for one YouTube stream:
+ * WebSocket sessions, presence, invites, and active realtime game records.
+ * Game-specific rules are delegated through `games/registry.ts`.
+ */
 import { getGameModule, getGameModuleForRecord } from '../games/registry';
 import type { GameRecord } from '../games/types';
+import { createErrorResponse, createJsonResponse } from '../http';
 import { hashLogValue, logPlaygroundEvent, shortLogId } from '../logging';
 import {
   createChallenge,
@@ -20,7 +28,7 @@ import { TokenBucket, type TokenBucketOptions } from '../rate-limit';
 import type { DurableObjectState, Env, ServerWebSocket } from '../types';
 
 const INVITE_TTL_MS = 2 * 60 * 1000;
-const MAX_MESSAGE_BYTES = 8_192;
+const MAX_MESSAGE_BYTES = 32_768;
 const CLOSE_POLICY_VIOLATION = 1008;
 const CONNECTION_RATE_LIMIT: TokenBucketOptions = {
   capacity: 30,
@@ -29,6 +37,14 @@ const CONNECTION_RATE_LIMIT: TokenBucketOptions = {
 const USER_RATE_LIMIT: TokenBucketOptions = {
   capacity: 45,
   refillPerSecond: 10
+};
+const GENERATION_TOKEN_ROOM_RATE_LIMIT: TokenBucketOptions = {
+  capacity: 6,
+  refillPerSecond: 1 / 30
+};
+const GENERATION_TOKEN_USER_RATE_LIMIT: TokenBucketOptions = {
+  capacity: 3,
+  refillPerSecond: 1 / 60
 };
 const MESSAGE_RATE_COSTS: { [Type in ClientMessage['type']]: number } = {
   gameAction: 3,
@@ -60,8 +76,17 @@ interface PendingInvite {
   toUserId: string;
 }
 
+interface GenerationTokenRecord {
+  expiresAt: number;
+  gameId: string;
+  userId: string;
+}
+
 export class StreamRoom {
   private readonly clients = new Map<string, ClientSession>();
+  private readonly generationTokens = new Map<string, GenerationTokenRecord>();
+  private readonly generationTokenRoomRateLimit = new TokenBucket(GENERATION_TOKEN_ROOM_RATE_LIMIT);
+  private readonly generationTokenUserRateLimits = new Map<string, TokenBucket>();
   private readonly invites = new Map<string, PendingInvite>();
   private readonly games = new Map<string, GameRecord>();
   private readonly userAvailableGames = new Map<string, GameId[]>();
@@ -74,6 +99,10 @@ export class StreamRoom {
     const url = new URL(request.url);
     const streamKey = request.headers.get('X-Chat-Enhancer-Stream-Key') || url.searchParams.get('streamKey') || '';
     this.streamKey = sanitizeStreamKey(streamKey);
+
+    if (url.pathname.endsWith('/internal/replay-trivia/generation-token/consume')) {
+      return this.handleGenerationTokenConsume(request);
+    }
 
     if (url.pathname.endsWith('/snapshot')) {
       return new Response(`${JSON.stringify(this.createSnapshot())}\n`, {
@@ -298,10 +327,14 @@ export class StreamRoom {
       this.handleLeaveGame(session, game);
       return;
     }
+    if (action.action === 'requestGenerationToken') {
+      this.handleGenerationTokenRequest(session, game);
+      return;
+    }
 
     const nextGame = getGameModuleForRecord(game).applyAction(game, action);
     this.games.set(gameId, nextGame);
-    if (game.status !== nextGame.status && nextGame.status !== 'active') {
+    if (game.status !== nextGame.status && isTerminalGameStatus(nextGame.status)) {
       this.logEvent('game_ended', {
         game: shortLogId(nextGame.gameId),
         gameType: nextGame.gameType,
@@ -334,6 +367,110 @@ export class StreamRoom {
     });
   }
 
+  private handleGenerationTokenRequest(session: ClientSession, game: GameRecord): void {
+    const gameModule = getGameModuleForRecord(game);
+    if (!gameModule.createGenerationToken) {
+      throw new ProtocolError('unsupported_action', 'This game does not support generated content.');
+    }
+
+    const now = Date.now();
+    this.assertWithinGenerationTokenRateLimit(session, now);
+    this.pruneExpiredGenerationTokens(now);
+
+    const grant = gameModule.createGenerationToken(game, {
+      now,
+      userId: session.userId
+    });
+    const generationToken = createId('rtg');
+    this.generationTokens.set(generationToken, {
+      expiresAt: grant.expiresAt,
+      gameId: game.gameId,
+      userId: session.userId
+    });
+
+    this.logEvent('generation_token_created', {
+      game: shortLogId(game.gameId),
+      gameType: game.gameType,
+      user: hashLogValue(session.userId)
+    });
+    sendMessage(session.socket, {
+      expiresAt: grant.expiresAt,
+      gameId: game.gameId,
+      generationToken,
+      type: 'replayTriviaGenerationToken'
+    });
+  }
+
+  private async handleGenerationTokenConsume(request: Request): Promise<Response> {
+    if (request.method !== 'POST') {
+      return createErrorResponse('method_not_allowed', 'Only POST is supported.', 405);
+    }
+
+    let payload: unknown;
+    try {
+      payload = await request.json();
+    } catch {
+      return createErrorResponse('invalid_json', 'Request body must be valid JSON.', 400);
+    }
+    if (!isRecord(payload)) {
+      return createErrorResponse('invalid_request', 'Request body must be an object.', 400);
+    }
+
+    const gameId = typeof payload.gameId === 'string' ? payload.gameId.trim() : '';
+    const generationToken = typeof payload.generationToken === 'string' ? payload.generationToken.trim() : '';
+    if (!gameId || !generationToken) {
+      return createErrorResponse('invalid_generation_token', 'Replay Trivia generation token is invalid.', 403);
+    }
+
+    const now = Date.now();
+    this.pruneExpiredGenerationTokens(now);
+    const token = this.generationTokens.get(generationToken);
+    this.generationTokens.delete(generationToken);
+    if (!token || token.gameId !== gameId || token.expiresAt <= now) {
+      this.logEvent('generation_token_rejected', {
+        game: gameId ? shortLogId(gameId) : undefined
+      }, 'warn');
+      return createErrorResponse('invalid_generation_token', 'Replay Trivia generation token is invalid or expired.', 403);
+    }
+
+    const game = this.games.get(token.gameId);
+    if (!game) {
+      return createErrorResponse('game_not_found', 'Game not found.', 404);
+    }
+
+    const gameModule = getGameModuleForRecord(game);
+    if (!gameModule.validateGenerationToken) {
+      return createErrorResponse('unsupported_action', 'This game does not support generated content.', 400);
+    }
+
+    try {
+      gameModule.validateGenerationToken(game, {
+        now,
+        userId: token.userId
+      });
+    } catch (error) {
+      const protocolError = normalizeError(error);
+      this.logEvent('generation_token_rejected', {
+        code: protocolError.code,
+        game: shortLogId(game.gameId),
+        gameType: game.gameType,
+        user: hashLogValue(token.userId)
+      }, 'warn');
+      return createErrorResponse(protocolError.code, protocolError.message, 403);
+    }
+
+    this.logEvent('generation_token_consumed', {
+      game: shortLogId(game.gameId),
+      gameType: game.gameType,
+      user: hashLogValue(token.userId)
+    });
+    return createJsonResponse({
+      gameId: token.gameId,
+      ok: true,
+      userId: token.userId
+    });
+  }
+
   private assertWithinRateLimit(session: ClientSession, message: ClientMessage): void {
     const cost = MESSAGE_RATE_COSTS[message.type];
     if (!session.rateLimit.consume(cost)) {
@@ -353,6 +490,19 @@ export class StreamRoom {
     const bucket = new TokenBucket(USER_RATE_LIMIT);
     this.userRateLimits.set(userId, bucket);
     return bucket;
+  }
+
+  private assertWithinGenerationTokenRateLimit(session: ClientSession, now: number): void {
+    if (!this.generationTokenRoomRateLimit.consume(1, now)) {
+      throw new ProtocolError('rate_limited', 'Slow down before requesting more generated content.');
+    }
+
+    const existing = this.generationTokenUserRateLimits.get(session.userId);
+    const bucket = existing || new TokenBucket(GENERATION_TOKEN_USER_RATE_LIMIT, now);
+    if (!existing) this.generationTokenUserRateLimits.set(session.userId, bucket);
+    if (!bucket.consume(1, now)) {
+      throw new ProtocolError('rate_limited', 'Slow down before requesting more generated content.');
+    }
   }
 
   private createSnapshot(forUserId = ''): LobbySnapshot {
@@ -434,6 +584,12 @@ export class StreamRoom {
     });
   }
 
+  private pruneExpiredGenerationTokens(now = Date.now()): void {
+    this.generationTokens.forEach((token, value) => {
+      if (token.expiresAt <= now) this.generationTokens.delete(value);
+    });
+  }
+
   private getPresenceUsers(): PresenceUser[] {
     const users = new Map<string, PresenceUser>();
 
@@ -484,6 +640,7 @@ export class StreamRoom {
     this.logEvent(event, {
       code: error.code,
       connection: shortLogId(session.connectionId),
+      message: truncateLogMessage(error.message),
       user: session.userId ? hashLogValue(session.userId) : undefined
     }, error.code === 'internal_error' ? 'error' : 'warn');
   }
@@ -511,6 +668,11 @@ function sendMessage(socket: ServerWebSocket, message: ServerMessage): void {
 function normalizeError(error: unknown): ProtocolError {
   if (error instanceof ProtocolError) return error;
   return new ProtocolError('internal_error', 'Something went wrong.');
+}
+
+function truncateLogMessage(message: string): string {
+  if (message.length <= 180) return message;
+  return `${message.slice(0, 177)}...`;
 }
 
 function getProtocolLogEvent(code: string): string {
@@ -541,4 +703,15 @@ function createId(prefix: string): string {
 function getPlayerDisplayName(userId: string): string {
   const code = userId.replace(/[^a-z0-9]/gi, '').slice(0, 4).toUpperCase();
   return `Player ${code || '0000'}`;
+}
+
+function isTerminalGameStatus(status: string): boolean {
+  return status === 'checkmate' ||
+    status === 'draw' ||
+    status === 'finished' ||
+    status === 'resigned';
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
 }

@@ -133,6 +133,8 @@
     "playground": "Playground",
     "games": "Spiele",
     "gamesChess": "Schach",
+    "gamesReplayTrivia": "HELP-A-FRIEND! Trivia",
+    "gamesReplayTriviaReplayOnly": "Available on chat replays.",
     "gamesAvailableToPlay": "Zum Spielen verfügbar",
     "gamesAvailableHelper": "Spieleinladungen für diesen Stream erhalten.",
     "gamesActiveGame": "Aktives Spiel",
@@ -153,6 +155,7 @@
     "gamesInvite": "Einladen",
     "gamesIgnore": "Ignorieren",
     "gamesPlayersOnline": {
+      "zero": "Keine Spieler online",
       "one": "{count} Spieler online",
       "other": "{count} Spieler online"
     },

@@ -31,6 +31,7 @@ interface TestSession {
 
 interface PrivateStreamRoom {
   createSnapshot(forUserId?: string): LobbySnapshot;
+  fetch(request: Request): Promise<Response>;
   handleGameAction(
     session: TestSession,
     gameId: string,
@@ -123,6 +124,55 @@ describe('playground stream room', () => {
 
     expect(room.createSnapshot(alice.userId).games).toHaveLength(1);
     expect(room.createSnapshot('other-user').games).toHaveLength(0);
+  });
+
+  it('mints one-use Replay Trivia generation tokens for the question provider', async () => {
+    const room = createRoom();
+    const alice = createSession('alice-connection');
+    const bob = createSession('bob-connection');
+
+    await room.handleHello(alice, await createHello(alice.challenge, 'Alice', ['replay-trivia']));
+    await room.handleHello(bob, await createHello(bob.challenge, 'Bob', ['replay-trivia']));
+    room.handleInvite(alice, 'replay-trivia', bob.userId);
+    room.handleInviteResponse(bob, lastMessage(bob, 'inviteReceived').invite.inviteId, true);
+    const gameId = lastMessage(alice, 'gameStarted').game.gameId;
+
+    expect(() => room.handleGameAction(bob, gameId, {
+      action: 'requestGenerationToken',
+      userId: bob.userId
+    })).toThrowError(new ProtocolError(
+      'not_question_provider',
+      'Only the question provider can generate Replay Trivia questions.'
+    ));
+
+    room.handleGameAction(alice, gameId, {
+      action: 'requestGenerationToken',
+      userId: alice.userId
+    });
+    const tokenMessage = lastMessage(alice, 'replayTriviaGenerationToken');
+    expect(tokenMessage).toMatchObject({
+      expiresAt: expect.any(Number),
+      gameId,
+      generationToken: expect.stringMatching(/^rtg_[a-f0-9]+$/),
+      type: 'replayTriviaGenerationToken'
+    });
+
+    const consumeResponse = await consumeGenerationToken(room, gameId, tokenMessage.generationToken);
+    expect(consumeResponse.status).toBe(200);
+    expect(await consumeResponse.json()).toMatchObject({
+      gameId,
+      ok: true,
+      userId: alice.userId
+    });
+
+    const replayResponse = await consumeGenerationToken(room, gameId, tokenMessage.generationToken);
+    expect(replayResponse.status).toBe(403);
+    expect(await replayResponse.json()).toEqual({
+      error: {
+        code: 'invalid_generation_token',
+        message: 'Replay Trivia generation token is invalid or expired.'
+      }
+    });
   });
 
   it('keeps ignored invites from starting a game', async () => {
@@ -380,6 +430,20 @@ function createSession(connectionId: string): TestSession {
     socket: new FakeSocket(),
     userId: ''
   };
+}
+
+function consumeGenerationToken(room: PrivateStreamRoom, gameId: string, generationToken: string): Promise<Response> {
+  return room.fetch(new Request('https://playground.chatenhancer.com/internal/replay-trivia/generation-token/consume', {
+    body: JSON.stringify({
+      gameId,
+      generationToken
+    }),
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Chat-Enhancer-Stream-Key': 'SHt3FyE-VIQ'
+    },
+    method: 'POST'
+  }));
 }
 
 async function createHello(

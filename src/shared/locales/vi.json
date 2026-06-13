@@ -133,6 +133,8 @@
     "playground": "Playground",
     "games": "Trò chơi",
     "gamesChess": "Cờ vua",
+    "gamesReplayTrivia": "HELP-A-FRIEND! Trivia",
+    "gamesReplayTriviaReplayOnly": "Available on chat replays.",
     "gamesAvailableToPlay": "Sẵn sàng chơi",
     "gamesAvailableHelper": "Nhận lời mời chơi game trong livestream này.",
     "gamesActiveGame": "Trò chơi đang mở",
@@ -153,6 +155,7 @@
     "gamesInvite": "Mời",
     "gamesIgnore": "Bỏ qua",
     "gamesPlayersOnline": {
+      "zero": "Không có người chơi online",
       "one": "{count} người chơi online",
       "other": "{count} người chơi online"
     },

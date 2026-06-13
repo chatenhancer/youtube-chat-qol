@@ -1,3 +1,9 @@
+/**
+ * Shared HTTP response helpers for the Worker boundary and route handlers.
+ *
+ * CORS policy is centralized here so routes can return plain JSON/error
+ * responses and the entrypoint can wrap them consistently.
+ */
 import type { Env } from './types';
 
 export function createJsonResponse(body: unknown, init: ResponseInit = {}): Response {
@@ -28,7 +34,7 @@ export function createCorsHeaders(request: Request, env: Env): Headers {
     headers.set('Access-Control-Allow-Origin', origin);
     headers.set('Vary', 'Origin');
   }
-  headers.set('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   headers.set('Access-Control-Allow-Headers', 'Content-Type');
   headers.set('Access-Control-Max-Age', '86400');
   return headers;

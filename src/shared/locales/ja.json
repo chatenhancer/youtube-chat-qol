@@ -133,6 +133,8 @@
     "playground": "Playground",
     "games": "ゲーム",
     "gamesChess": "チェス",
+    "gamesReplayTrivia": "HELP-A-FRIEND! Trivia",
+    "gamesReplayTriviaReplayOnly": "Available on chat replays.",
     "gamesAvailableToPlay": "プレイ可能",
     "gamesAvailableHelper": "この配信のゲーム招待を受け取ります。",
     "gamesActiveGame": "進行中のゲーム",
@@ -153,6 +155,7 @@
     "gamesInvite": "招待",
     "gamesIgnore": "無視",
     "gamesPlayersOnline": {
+      "zero": "オンラインのプレイヤーはいません",
       "one": "{count}人がオンライン",
       "other": "{count}人がオンライン"
     },

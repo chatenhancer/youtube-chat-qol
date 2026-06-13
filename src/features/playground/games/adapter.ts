@@ -10,7 +10,9 @@ import type { GameId, PublicGame } from '../../../shared/playground-protocol';
 import type { PlaygroundClientState } from './client';
 
 export interface GameDefinition {
+  disabledReasonKey?: MessageKey;
   id: GameId;
+  isPlayable?: () => boolean;
   labelKey: MessageKey;
   renderPreview: (container: HTMLElement) => void;
 }
