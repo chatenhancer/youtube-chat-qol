@@ -114,8 +114,8 @@ npm run build:firefox
 
 1. Run `npm run version:bump -- patch`, `npm run version:bump -- minor`, or `npm run version:bump -- major`.
 2. Run `npm run verify`.
-3. Commit the version bump and create a tag such as `v0.7.6`.
-4. Push the commit and tag.
+3. Commit the version bump.
+4. Run `npm run release:tag`.
 
 The release workflow builds Chrome, Edge, Firefox, and source archives, then attaches them to a GitHub Release.
 Store submission only runs for exact `vX.Y.Z` tags that match the `package.json` version.
