@@ -5,7 +5,7 @@ description: "Playground est une nouvelle fonctionnalité de l’extension Chat 
 locale: "fr"
 slug: "introducing-playground-tiny-games-for-live-chat-breaks"
 translationKey: "introducing-playground-tiny-games-for-live-chat-breaks"
-image: "./cover.png"
+image: "./90af004f7c5daeab.png"
 video: "./cover.mp4"
 tags:
   - "playground"
@@ -23,7 +23,7 @@ Votre streamer fait une pause ? Ouvrez Playground jusqu’à son retour.
 
 :::media-right
 
-![Panneau d’échecs compact flottant au-dessus du chat en direct YouTube](./game-panel.png){shadow=smooth rotation=-2}
+![Panneau d’échecs compact flottant au-dessus du chat en direct YouTube](./f779ebcc57f8280d.png){shadow=smooth rotation=-2}
 
 Les jeux sont compacts et ne deviendront pas beaucoup plus grands que ça. Le panneau est déplaçable, vous pouvez donc le placer où vous voulez dans le chat.
 
@@ -35,7 +35,7 @@ Cherchez les options Playground dans cette section des paramètres de l’extens
 
 :::media-left
 
-![Paramètres Playground dans le popup Chat Enhancer](./settings.png){crop=1.04;focus=26.3%,0%;rotate=0.5deg}
+![Paramètres Playground dans le popup Chat Enhancer](./c99cee6a87fb4253.png)
 
 Activez le réglage « Rejoindre Playground » pour faire apparaître l’icône Jeux dans le chat.
 

@@ -1,10 +1,10 @@
 ---
-title: "חדש ב-0.14.0: HELP-A-FRIEND! Trivia"
+title: "חדש ב-Chat Enhancer 0.14.0: HELP-A-FRIEND! Trivia"
 date: 2026-06-12
 description: "משחק Playground חדש שבו רגעים משידור חוזר ב-YouTube הופכים לשאלות טריוויה בסגנון צ'אט."
 locale: "he"
 slug: "new-in-0-14-0-help-a-friend-trivia"
-image: "./logo.png"
+image: "./0e5e4f69e6fa7b45.png"
 translationKey: "new-in-0-14-0-help-a-friend-trivia"
 tags:
   - "trivia"
@@ -18,7 +18,7 @@ tags:
 
 :::media-right
 
-![הלוגו של HELP-A-FRIEND! Trivia](./2026-06-12-new-in-0-14-0-help-a-friend-trivia-assets/1708318b4060743a.png){shadow=smooth}
+![הלוגו של HELP-A-FRIEND! Trivia](./2026-06-12-new-in-0-14-0-help-a-friend-trivia-assets/6ef6d6f2584f127f.png){shadow=smooth;rotate=-8deg}
 
 במקום לוח חידון, *HELP-A-FRIEND! Trivia* מתנהל כמו צ'אט קבוצתי קטן. אחד החברים שלך בבירור לא הקשיב לשידור ועכשיו צריך עזרה... יש לך את הידע?
 
@@ -38,10 +38,14 @@ tags:
 
 כל משחק נוצר מתוך התמלול של השידור החוזר שבו אתה צופה, כך שהמשחק יכול לשאול על רגעים שבאמת קרו באותו שידור: חשיפות, פרסים, בדיחות, סטיות מהנושא וכל דבר אחר שנכנס לסרטון.
 
+:::media-left
+
+![צילום מסך של HELP-A-FRIEND! Trivia](./f6e02e23a9bb8118.png)
+
 ## נסה את זה!
 
 *HELP-A-FRIEND! Trivia* הוא חלק מ-Playground, שעדיין נשאר אופציונלי. הפעל את Playground מהגדרות התוסף, פתח שידור חוזר עם צ'אט חי, והתחל משחק מלוח המשחקים. חפש את סמל הבקר בצ'אט.
 
 זמין באנגלית לעת עתה.
 
-![reel](./reel.png){align=center}
+:::

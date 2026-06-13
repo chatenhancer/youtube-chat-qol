@@ -5,7 +5,7 @@ description: "Playground היא תכונה חדשה בתוסף Chat Enhancer ש�
 locale: "he"
 slug: "introducing-playground-tiny-games-for-live-chat-breaks"
 translationKey: "introducing-playground-tiny-games-for-live-chat-breaks"
-image: "./cover.png"
+image: "./90af004f7c5daeab.png"
 video: "./cover.mp4"
 tags:
   - "playground"
@@ -23,7 +23,7 @@ Playground הוא מרכז משחקים בתוך התוסף, שבו אפשר ל�
 
 :::media-right
 
-![פאנל שחמט קומפקטי שמרחף מעל הצ’אט החי של YouTube](./game-panel.png){shadow=smooth rotation=-2}
+![פאנל שחמט קומפקטי שמרחף מעל הצ’אט החי של YouTube](./f779ebcc57f8280d.png){shadow=smooth rotation=-2}
 
 המשחקים קומפקטיים ולא יגדלו הרבה מעבר לזה. אפשר לגרור את הפאנל, כך שאפשר למקם אותו בכל מקום בצ’אט.
 
@@ -35,7 +35,7 @@ Playground הוא מרכז משחקים בתוך התוסף, שבו אפשר ל�
 
 :::media-left
 
-![הגדרות Playground בפופאפ של Chat Enhancer](./settings.png){crop=1.04;focus=26.3%,0%;rotate=0.5deg}
+![הגדרות Playground בפופאפ של Chat Enhancer](./c99cee6a87fb4253.png)
 
 הפעילו את ההגדרה “הצטרפות ל-Playground” כדי שסמל המשחקים יופיע בצ’אט.
 

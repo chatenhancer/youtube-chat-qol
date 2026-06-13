@@ -5,7 +5,7 @@ description: "Playground는 Chat Enhancer 확장 프로그램의 새로운 기�
 locale: "ko"
 slug: "introducing-playground-tiny-games-for-live-chat-breaks"
 translationKey: "introducing-playground-tiny-games-for-live-chat-breaks"
-image: "./cover.png"
+image: "./90af004f7c5daeab.png"
 video: "./cover.mp4"
 tags:
   - "playground"
@@ -23,7 +23,7 @@ Playground는 확장 프로그램 안에 있는 게임 허브로, 같은 확장 
 
 :::media-right
 
-![YouTube 라이브 채팅 위에 떠 있는 컴팩트한 체스 게임 패널](./game-panel.png){shadow=smooth rotation=-2}
+![YouTube 라이브 채팅 위에 떠 있는 컴팩트한 체스 게임 패널](./f779ebcc57f8280d.png){shadow=smooth rotation=-2}
 
 게임은 컴팩트하며 이보다 훨씬 커지지 않습니다. 패널은 드래그할 수 있으므로 채팅 어디에든 놓을 수 있습니다.
 
@@ -35,7 +35,7 @@ Playground는 확장 프로그램 안에 있는 게임 허브로, 같은 확장 
 
 :::media-left
 
-![Chat Enhancer 팝업의 Playground 설정](./settings.png){crop=1.04;focus=26.3%,0%;rotate=0.5deg}
+![Chat Enhancer 팝업의 Playground 설정](./c99cee6a87fb4253.png)
 
 채팅에 게임 아이콘이 나타나도록 “Playground 참여” 설정을 켜세요.
 

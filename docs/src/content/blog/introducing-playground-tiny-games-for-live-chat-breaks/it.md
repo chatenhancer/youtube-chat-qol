@@ -5,7 +5,7 @@ description: "Playground è una nuova funzione dell’estensione Chat Enhancer c
 locale: "it"
 slug: "introducing-playground-tiny-games-for-live-chat-breaks"
 translationKey: "introducing-playground-tiny-games-for-live-chat-breaks"
-image: "./cover.png"
+image: "./90af004f7c5daeab.png"
 video: "./cover.mp4"
 tags:
   - "playground"
@@ -23,7 +23,7 @@ Il tuo streamer è in pausa bagno? Apri Playground finché non torna.
 
 :::media-right
 
-![Pannello compatto di scacchi sopra la live chat di YouTube](./game-panel.png){shadow=smooth rotation=-2}
+![Pannello compatto di scacchi sopra la live chat di YouTube](./f779ebcc57f8280d.png){shadow=smooth rotation=-2}
 
 I giochi sono compatti e non diventeranno molto più grandi di così. Il pannello è trascinabile, quindi puoi metterlo ovunque nella chat.
 
@@ -35,7 +35,7 @@ Trovi le opzioni di Playground in questa sezione delle impostazioni dell’esten
 
 :::media-left
 
-![Impostazioni di Playground nel popup di Chat Enhancer](./settings.png){crop=1.04;focus=26.3%,0%;rotate=0.5deg}
+![Impostazioni di Playground nel popup di Chat Enhancer](./c99cee6a87fb4253.png)
 
 Attiva l’impostazione “Unisciti a Playground” per far comparire l’icona Giochi nella chat.
 

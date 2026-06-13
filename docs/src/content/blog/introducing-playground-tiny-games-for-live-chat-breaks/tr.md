@@ -5,7 +5,7 @@ description: "Playground, Chat Enhancer uzantısında kullanıcıların canlı s
 locale: "tr"
 slug: "introducing-playground-tiny-games-for-live-chat-breaks"
 translationKey: "introducing-playground-tiny-games-for-live-chat-breaks"
-image: "./cover.png"
+image: "./90af004f7c5daeab.png"
 video: "./cover.mp4"
 tags:
   - "playground"
@@ -23,7 +23,7 @@ Yayıncınız kısa bir mola mı verdi? Geri gelene kadar Playground’u açın.
 
 :::media-right
 
-![YouTube canlı sohbet üzerinde yüzen kompakt satranç paneli](./game-panel.png){shadow=smooth rotation=-2}
+![YouTube canlı sohbet üzerinde yüzen kompakt satranç paneli](./f779ebcc57f8280d.png){shadow=smooth rotation=-2}
 
 Oyunlar kompakttır ve bundan çok daha büyük olmaz. Panel sürüklenebilir, bu yüzden sohbet içinde istediğiniz yere yerleştirebilirsiniz.
 
@@ -35,7 +35,7 @@ Playground seçeneklerini uzantı ayarlarının bu bölümünde bulabilirsiniz.
 
 :::media-left
 
-![Chat Enhancer popup’ında Playground ayarları](./settings.png){crop=1.04;focus=26.3%,0%;rotate=0.5deg}
+![Chat Enhancer popup’ında Playground ayarları](./c99cee6a87fb4253.png)
 
 Sohbette Oyunlar simgesinin görünmesi için “Playground’a katıl” ayarını etkinleştirin.
 

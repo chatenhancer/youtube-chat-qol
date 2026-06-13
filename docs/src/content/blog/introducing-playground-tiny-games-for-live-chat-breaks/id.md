@@ -5,7 +5,7 @@ description: "Playground adalah fitur baru di ekstensi Chat Enhancer yang memung
 locale: "id"
 slug: "introducing-playground-tiny-games-for-live-chat-breaks"
 translationKey: "introducing-playground-tiny-games-for-live-chat-breaks"
-image: "./cover.png"
+image: "./90af004f7c5daeab.png"
 video: "./cover.mp4"
 tags:
   - "playground"
@@ -23,7 +23,7 @@ Streamer Anda sedang istirahat? Buka Playground sampai mereka kembali.
 
 :::media-right
 
-![Panel catur ringkas melayang di atas live chat YouTube](./game-panel.png){shadow=smooth rotation=-2}
+![Panel catur ringkas melayang di atas live chat YouTube](./f779ebcc57f8280d.png){shadow=smooth rotation=-2}
 
 Game dibuat ringkas dan tidak akan jauh lebih besar dari ini. Panel bisa diseret, jadi Anda dapat menaruhnya di mana saja di chat.
 
@@ -35,7 +35,7 @@ Cari opsi Playground di bagian pengaturan ekstensi ini.
 
 :::media-left
 
-![Pengaturan Playground di popup Chat Enhancer](./settings.png){crop=1.04;focus=26.3%,0%;rotate=0.5deg}
+![Pengaturan Playground di popup Chat Enhancer](./c99cee6a87fb4253.png)
 
 Aktifkan pengaturan “Gabung Playground” agar ikon Game muncul di chat.
 

@@ -1,10 +1,10 @@
 ---
-title: "الجديد في 0.14.0: HELP-A-FRIEND! Trivia"
+title: "الجديد في Chat Enhancer 0.14.0: HELP-A-FRIEND! Trivia"
 date: 2026-06-12
 description: "لعبة Playground جديدة تتحول فيها لحظات إعادة تشغيل YouTube إلى أسئلة معلومات بأسلوب الدردشة."
 locale: "ar"
 slug: "new-in-0-14-0-help-a-friend-trivia"
-image: "./logo.png"
+image: "./0e5e4f69e6fa7b45.png"
 translationKey: "new-in-0-14-0-help-a-friend-trivia"
 tags:
   - "trivia"
@@ -18,7 +18,7 @@ tags:
 
 :::media-right
 
-![شعار HELP-A-FRIEND! Trivia](./2026-06-12-new-in-0-14-0-help-a-friend-trivia-assets/1708318b4060743a.png){shadow=smooth}
+![شعار HELP-A-FRIEND! Trivia](./2026-06-12-new-in-0-14-0-help-a-friend-trivia-assets/6ef6d6f2584f127f.png){shadow=smooth;rotate=-8deg}
 
 بدلا من لوحة أسئلة، تعمل *HELP-A-FRIEND! Trivia* مثل دردشة جماعية صغيرة. من الواضح أن أحد أصدقائك لم يكن منتبها للبث ويحتاج الآن إلى مساعدة... هل لديك المعرفة الكافية؟
 
@@ -38,10 +38,14 @@ tags:
 
 يتم إنشاء كل مباراة من نص إعادة التشغيل الذي تشاهده، لذلك يمكن للعبة أن تسأل عن لحظات حدثت فعلا في ذلك البث: كشوفات، جوائز، نكات، تفرعات جانبية، وكل ما دخل إلى الفيديو.
 
+:::media-left
+
+![لقطة شاشة للعبة HELP-A-FRIEND! Trivia](./f6e02e23a9bb8118.png)
+
 ## جرّبها!
 
 *HELP-A-FRIEND! Trivia* جزء من Playground، وما زالت اختيارية. فعّل Playground من إعدادات الإضافة، وافتح إعادة تشغيل فيها دردشة مباشرة، وابدأ مباراة من لوحة الألعاب. ابحث عن أيقونة وحدة التحكم في الدردشة.
 
 متاحة باللغة الإنجليزية حاليا.
 
-![reel](./reel.png){align=center}
+:::
