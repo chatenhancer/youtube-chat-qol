@@ -211,6 +211,36 @@ describe('playground worker routes', () => {
     });
   });
 
+  it('logs rejected Replay Trivia request body sizes', async () => {
+    const response = await worker.fetch(new Request(
+      'https://playground.chatenhancer.com/v1/streams/SHt3FyE-VIQ/replay-trivia/questions',
+      {
+        body: '{}',
+        headers: {
+          'Content-Length': '512001',
+          'Content-Type': 'application/json',
+          Origin: 'chrome-extension://abc'
+        },
+        method: 'POST'
+      }
+    ), createEnv());
+
+    expect(response.status).toBe(413);
+    expect(console.warn).toHaveBeenCalledWith('[Chat Enhancer Playground] replay_trivia_request_too_large', expect.objectContaining({
+      bytes: 512001,
+      event: 'replay_trivia_request_too_large',
+      maxBytes: 512000,
+      room: expect.stringMatching(/^h_[a-z0-9]+$/),
+      service: 'chat-enhancer-playground'
+    }));
+    expect(await response.json()).toEqual({
+      error: {
+        code: 'request_too_large',
+        message: 'Request body must be 512000 bytes or less.'
+      }
+    });
+  });
+
   it('rejects Replay Trivia requests when OpenAI is not configured or the payload is invalid', async () => {
     const missingKey = await worker.fetch(new Request(
       'https://playground.chatenhancer.com/v1/streams/SHt3FyE-VIQ/replay-trivia/questions',
