@@ -22,154 +22,154 @@ const blogMessages: Record<Locale, BlogMessages> = {
   ar: {
     archiveCopy: 'ملاحظات الإصدارات وتحديثات المشروع لـ Chat Enhancer for YouTube.',
     backToUpdates: 'العودة إلى التحديثات',
-    latestNotes: 'أحدث الملاحظات',
+    latestNotes: 'The Backlog',
     updates: 'التحديثات',
     viewAllUpdates: 'عرض كل التحديثات'
   },
   de: {
     archiveCopy: 'Versionshinweise und Projektupdates für Chat Enhancer for YouTube.',
     backToUpdates: 'Zurück zu den Updates',
-    latestNotes: 'Neueste Notizen',
+    latestNotes: 'The Backlog',
     updates: 'Updates',
     viewAllUpdates: 'Alle Updates anzeigen'
   },
   en: {
     archiveCopy: 'Release notes and project updates for Chat Enhancer for YouTube.',
     backToUpdates: 'Back to updates',
-    latestNotes: 'Latest notes',
+    latestNotes: 'The Backlog',
     updates: 'Updates',
     viewAllUpdates: 'View all updates'
   },
   es: {
     archiveCopy: 'Notas de versión y novedades del proyecto Chat Enhancer for YouTube.',
     backToUpdates: 'Volver a las novedades',
-    latestNotes: 'Últimas notas',
+    latestNotes: 'The Backlog',
     updates: 'Novedades',
     viewAllUpdates: 'Ver todas las novedades'
   },
   fa: {
     archiveCopy: 'یادداشت‌های انتشار و به‌روزرسانی‌های پروژه Chat Enhancer for YouTube.',
     backToUpdates: 'بازگشت به به‌روزرسانی‌ها',
-    latestNotes: 'آخرین یادداشت‌ها',
+    latestNotes: 'The Backlog',
     updates: 'به‌روزرسانی‌ها',
     viewAllUpdates: 'مشاهده همه به‌روزرسانی‌ها'
   },
   fr: {
     archiveCopy: 'Notes de version et actualités du projet Chat Enhancer for YouTube.',
     backToUpdates: 'Retour aux actualités',
-    latestNotes: 'Dernières notes',
+    latestNotes: 'The Backlog',
     updates: 'Actualités',
     viewAllUpdates: 'Voir toutes les actualités'
   },
   he: {
     archiveCopy: 'הערות גרסה ועדכוני פרויקט עבור Chat Enhancer for YouTube.',
     backToUpdates: 'חזרה לעדכונים',
-    latestNotes: 'הערות אחרונות',
+    latestNotes: 'The Backlog',
     updates: 'עדכונים',
     viewAllUpdates: 'הצגת כל העדכונים'
   },
   hi: {
     archiveCopy: 'Chat Enhancer for YouTube के रिलीज़ नोट्स और प्रोजेक्ट अपडेट।',
     backToUpdates: 'अपडेट पर वापस जाएँ',
-    latestNotes: 'ताज़ा नोट्स',
+    latestNotes: 'The Backlog',
     updates: 'अपडेट',
     viewAllUpdates: 'सभी अपडेट देखें'
   },
   id: {
     archiveCopy: 'Catatan rilis dan pembaruan proyek untuk Chat Enhancer for YouTube.',
     backToUpdates: 'Kembali ke pembaruan',
-    latestNotes: 'Catatan terbaru',
+    latestNotes: 'The Backlog',
     updates: 'Pembaruan',
     viewAllUpdates: 'Lihat semua pembaruan'
   },
   it: {
     archiveCopy: 'Note di rilascio e aggiornamenti del progetto Chat Enhancer for YouTube.',
     backToUpdates: 'Torna agli aggiornamenti',
-    latestNotes: 'Ultime note',
+    latestNotes: 'The Backlog',
     updates: 'Aggiornamenti',
     viewAllUpdates: 'Vedi tutti gli aggiornamenti'
   },
   ja: {
     archiveCopy: 'Chat Enhancer for YouTube のリリースノートとプロジェクト更新情報です。',
     backToUpdates: '更新情報に戻る',
-    latestNotes: '最新ノート',
+    latestNotes: 'The Backlog',
     updates: '更新情報',
     viewAllUpdates: 'すべての更新情報を見る'
   },
   ko: {
     archiveCopy: 'Chat Enhancer for YouTube의 릴리스 노트와 프로젝트 업데이트입니다.',
     backToUpdates: '업데이트로 돌아가기',
-    latestNotes: '최신 노트',
+    latestNotes: 'The Backlog',
     updates: '업데이트',
     viewAllUpdates: '모든 업데이트 보기'
   },
   nl: {
     archiveCopy: 'Release notes en projectupdates voor Chat Enhancer for YouTube.',
     backToUpdates: 'Terug naar updates',
-    latestNotes: 'Laatste notities',
+    latestNotes: 'The Backlog',
     updates: 'Updates',
     viewAllUpdates: 'Alle updates bekijken'
   },
   pl: {
     archiveCopy: 'Informacje o wydaniach i aktualizacje projektu Chat Enhancer for YouTube.',
     backToUpdates: 'Wróć do aktualizacji',
-    latestNotes: 'Najnowsze notatki',
+    latestNotes: 'The Backlog',
     updates: 'Aktualizacje',
     viewAllUpdates: 'Zobacz wszystkie aktualizacje'
   },
   pt: {
     archiveCopy: 'Notas de versão e atualizações do projeto Chat Enhancer for YouTube.',
     backToUpdates: 'Voltar para atualizações',
-    latestNotes: 'Notas recentes',
+    latestNotes: 'The Backlog',
     updates: 'Atualizações',
     viewAllUpdates: 'Ver todas as atualizações'
   },
   ru: {
     archiveCopy: 'Заметки о выпусках и обновления проекта Chat Enhancer for YouTube.',
     backToUpdates: 'Назад к обновлениям',
-    latestNotes: 'Последние заметки',
+    latestNotes: 'The Backlog',
     updates: 'Обновления',
     viewAllUpdates: 'Все обновления'
   },
   th: {
     archiveCopy: 'บันทึกการเปิดตัวและอัปเดตโปรเจกต์สำหรับ Chat Enhancer for YouTube',
     backToUpdates: 'กลับไปที่อัปเดต',
-    latestNotes: 'บันทึกล่าสุด',
+    latestNotes: 'The Backlog',
     updates: 'อัปเดต',
     viewAllUpdates: 'ดูอัปเดตทั้งหมด'
   },
   tr: {
     archiveCopy: 'Chat Enhancer for YouTube için sürüm notları ve proje güncellemeleri.',
     backToUpdates: 'Güncellemelere dön',
-    latestNotes: 'Son notlar',
+    latestNotes: 'The Backlog',
     updates: 'Güncellemeler',
     viewAllUpdates: 'Tüm güncellemeleri gör'
   },
   uk: {
     archiveCopy: 'Нотатки про випуски й оновлення проєкту Chat Enhancer for YouTube.',
     backToUpdates: 'Назад до оновлень',
-    latestNotes: 'Останні нотатки',
+    latestNotes: 'The Backlog',
     updates: 'Оновлення',
     viewAllUpdates: 'Переглянути всі оновлення'
   },
   vi: {
     archiveCopy: 'Ghi chú phát hành và cập nhật dự án cho Chat Enhancer for YouTube.',
     backToUpdates: 'Quay lại cập nhật',
-    latestNotes: 'Ghi chú mới nhất',
+    latestNotes: 'The Backlog',
     updates: 'Cập nhật',
     viewAllUpdates: 'Xem tất cả cập nhật'
   },
   zh_CN: {
     archiveCopy: 'Chat Enhancer for YouTube 的发布说明和项目更新。',
     backToUpdates: '返回更新',
-    latestNotes: '最新笔记',
+    latestNotes: 'The Backlog',
     updates: '更新',
     viewAllUpdates: '查看所有更新'
   },
   zh_TW: {
     archiveCopy: 'Chat Enhancer for YouTube 的版本說明與專案更新。',
     backToUpdates: '返回更新',
-    latestNotes: '最新筆記',
+    latestNotes: 'The Backlog',
     updates: '更新',
     viewAllUpdates: '查看所有更新'
   }
