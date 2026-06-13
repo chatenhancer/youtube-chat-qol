@@ -83,6 +83,7 @@ async function handleReplayTriviaQuestionsRequest(
       logPlaygroundEvent('replay_trivia_failed', {
         code: error.code,
         errorType: getLogErrorType(error),
+        ...error.details,
         room: hashLogValue(streamKey),
         status: error.status
       }, error.status >= 500 ? 'error' : 'warn');
