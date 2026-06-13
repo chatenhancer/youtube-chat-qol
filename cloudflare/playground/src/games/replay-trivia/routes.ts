@@ -14,7 +14,7 @@ import { ReplayTriviaError } from './errors';
 import { generateReplayTriviaQuestions } from './openai';
 import { getTranscriptCharLength, parseReplayTriviaQuestionsRequest } from './validation';
 
-const MAX_REQUEST_BYTES = 512_000;
+const MAX_REQUEST_BYTES = 1_000_000;
 
 export const replayTriviaRouteModule = {
   streamRoutes: [

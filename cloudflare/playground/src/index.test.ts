@@ -217,7 +217,7 @@ describe('playground worker routes', () => {
       {
         body: '{}',
         headers: {
-          'Content-Length': '512001',
+          'Content-Length': '1000001',
           'Content-Type': 'application/json',
           Origin: 'chrome-extension://abc'
         },
@@ -227,16 +227,16 @@ describe('playground worker routes', () => {
 
     expect(response.status).toBe(413);
     expect(console.warn).toHaveBeenCalledWith('[Chat Enhancer Playground] replay_trivia_request_too_large', expect.objectContaining({
-      bytes: 512001,
+      bytes: 1000001,
       event: 'replay_trivia_request_too_large',
-      maxBytes: 512000,
+      maxBytes: 1000000,
       room: expect.stringMatching(/^h_[a-z0-9]+$/),
       service: 'chat-enhancer-playground'
     }));
     expect(await response.json()).toEqual({
       error: {
         code: 'request_too_large',
-        message: 'Request body must be 512000 bytes or less.'
+        message: 'Request body must be 1000000 bytes or less.'
       }
     });
   });
@@ -249,7 +249,7 @@ describe('playground worker routes', () => {
           endSeconds: 1000,
           gameId: 'game-replay-trivia',
           generationToken: 'rtg_1234567890abcdef',
-          segments: Array.from({ length: 601 }, (_value, index) => ({
+          segments: Array.from({ length: 801 }, (_value, index) => ({
             startSeconds: index,
             text: 'x'.repeat(500)
           })),
@@ -268,10 +268,10 @@ describe('playground worker routes', () => {
 
     expect(response.status).toBe(413);
     expect(console.warn).toHaveBeenCalledWith('[Chat Enhancer Playground] replay_trivia_failed', expect.objectContaining({
-      chars: 300500,
+      chars: 400500,
       code: 'transcript_too_large',
       event: 'replay_trivia_failed',
-      maxChars: 300000,
+      maxChars: 400000,
       room: expect.stringMatching(/^h_[a-z0-9]+$/),
       service: 'chat-enhancer-playground',
       status: 413
@@ -279,7 +279,7 @@ describe('playground worker routes', () => {
     expect(await response.json()).toEqual({
       error: {
         code: 'transcript_too_large',
-        message: 'Transcript text must be 300000 characters or less.'
+        message: 'Transcript text must be 400000 characters or less.'
       }
     });
   });
