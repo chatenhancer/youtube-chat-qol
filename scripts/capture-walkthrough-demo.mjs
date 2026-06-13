@@ -3085,7 +3085,6 @@ async function installPopupPresentationLayer(page) {
         background: #f6f7f8 !important;
         display: flex !important;
         justify-content: center;
-        min-height: 100vh;
         width: 100% !important;
       }
 
@@ -3094,43 +3093,9 @@ async function installPopupPresentationLayer(page) {
         border-radius: 18px !important;
         box-shadow: 0 18px 48px rgba(15, 23, 42, 0.18);
         box-sizing: border-box !important;
-        display: flex !important;
-        flex-direction: column !important;
-        height: 520px !important;
         opacity: 0 !important;
-        overflow: hidden !important;
         transition: none !important;
         width: 350px !important;
-      }
-
-      .popup-tab-panel {
-        flex: 1 1 auto !important;
-        min-height: 0 !important;
-      }
-
-      #settingsPanel,
-      #bookmarksPanel {
-        min-height: 0 !important;
-      }
-
-      #bookmarksPanel {
-        display: flex !important;
-      }
-
-      #bookmarksPanel[hidden] {
-        display: none !important;
-      }
-
-      #bookmarksPanel .bookmarks-section {
-        display: flex !important;
-        flex: 1 1 auto !important;
-        flex-direction: column !important;
-        min-height: 0 !important;
-      }
-
-      #bookmarksPanel .bookmarks-list {
-        flex: 1 1 auto !important;
-        max-height: none !important;
       }
     `
   });
