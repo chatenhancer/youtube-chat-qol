@@ -3,7 +3,7 @@ title: "New in 0.14.0: HELP-A-FRIEND! Trivia"
 date: 2026-06-12
 description: "A new Playground game where YouTube replay moments become chat-style trivia questions."
 slug: "new-in-0-14-0-help-a-friend-trivia"
-image: "./haf.png"
+image: "./logo.png"
 translationKey: "new-in-0-14-0-help-a-friend-trivia"
 tags:
   - "trivia"
@@ -37,14 +37,10 @@ Once the game begins, your “friend” asks about the replay, four possible ans
 
 Each match is generated from the transcript of the replay you’re watching, so the game can ask about moments that actually happened in that stream: reveals, awards, jokes, tangents, and whatever else made it into the video.
 
-:::media-right
-
-![HELP-A-FRIEND! Trivia countdown](./2026-06-12-new-in-0-14-0-help-a-friend-trivia-assets/b44c4886b38b1f56.png){align=center;shadow=smooth}
-
 ## Try it!
 
 *HELP-A-FRIEND! Trivia* is part of Playground, which is still opt-in. Enable Playground from the extension settings, open a replay with live chat, and start a match from the Games panel. Look for the controller icon in chat.
 
 Available in English for now.
 
-:::
+![reel](./reel.png){align=center}
