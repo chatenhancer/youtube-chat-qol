@@ -14,7 +14,7 @@ const DEFAULT_QUESTION_COUNT = 10;
 const MAX_QUESTION_COUNT = 10;
 const MAX_SEGMENTS = 5_000;
 const MAX_SEGMENT_TEXT_LENGTH = 500;
-const MAX_TRANSCRIPT_CHARS = 150_000;
+const MAX_TRANSCRIPT_CHARS = 300_000;
 const MAX_WINDOW_SECONDS = 24 * 60 * 60;
 const GAME_ID_PATTERN = /^[a-zA-Z0-9_-]{4,80}$/;
 const GENERATION_TOKEN_PATTERN = /^[a-zA-Z0-9_-]{8,120}$/;
@@ -87,8 +87,17 @@ function parseSegments(value: unknown, startSeconds: number, endSeconds: number)
   if (!segments.length) {
     throw new ReplayTriviaError('empty_window', 'No transcript segments overlap the requested window.', 400);
   }
-  if (getTranscriptCharLength(segments) > MAX_TRANSCRIPT_CHARS) {
-    throw new ReplayTriviaError('transcript_too_large', `Transcript text must be ${MAX_TRANSCRIPT_CHARS} characters or less.`, 413);
+  const transcriptChars = getTranscriptCharLength(segments);
+  if (transcriptChars > MAX_TRANSCRIPT_CHARS) {
+    throw new ReplayTriviaError(
+      'transcript_too_large',
+      `Transcript text must be ${MAX_TRANSCRIPT_CHARS} characters or less.`,
+      413,
+      {
+        chars: transcriptChars,
+        maxChars: MAX_TRANSCRIPT_CHARS
+      }
+    );
   }
 
   return segments;

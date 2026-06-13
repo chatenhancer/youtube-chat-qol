@@ -241,6 +241,49 @@ describe('playground worker routes', () => {
     });
   });
 
+  it('logs rejected Replay Trivia transcript text sizes', async () => {
+    const response = await worker.fetch(new Request(
+      'https://playground.chatenhancer.com/v1/streams/SHt3FyE-VIQ/replay-trivia/questions',
+      {
+        body: JSON.stringify({
+          endSeconds: 1000,
+          gameId: 'game-replay-trivia',
+          generationToken: 'rtg_1234567890abcdef',
+          segments: Array.from({ length: 601 }, (_value, index) => ({
+            startSeconds: index,
+            text: 'x'.repeat(500)
+          })),
+          startSeconds: 0,
+          videoId: 'SHt3FyE-VIQ'
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+          Origin: 'chrome-extension://abc'
+        },
+        method: 'POST'
+      }
+    ), createEnv(undefined, {
+      OPENAI_API_KEY: 'test-key'
+    }));
+
+    expect(response.status).toBe(413);
+    expect(console.warn).toHaveBeenCalledWith('[Chat Enhancer Playground] replay_trivia_failed', expect.objectContaining({
+      chars: 300500,
+      code: 'transcript_too_large',
+      event: 'replay_trivia_failed',
+      maxChars: 300000,
+      room: expect.stringMatching(/^h_[a-z0-9]+$/),
+      service: 'chat-enhancer-playground',
+      status: 413
+    }));
+    expect(await response.json()).toEqual({
+      error: {
+        code: 'transcript_too_large',
+        message: 'Transcript text must be 300000 characters or less.'
+      }
+    });
+  });
+
   it('rejects Replay Trivia requests when OpenAI is not configured or the payload is invalid', async () => {
     const missingKey = await worker.fetch(new Request(
       'https://playground.chatenhancer.com/v1/streams/SHt3FyE-VIQ/replay-trivia/questions',
