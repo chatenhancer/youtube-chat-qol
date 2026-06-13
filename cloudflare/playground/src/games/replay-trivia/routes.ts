@@ -43,6 +43,11 @@ async function handleReplayTriviaQuestionsRequest(
 
   const contentLength = Number(request.headers.get('Content-Length') || '0');
   if (contentLength > MAX_REQUEST_BYTES) {
+    logPlaygroundEvent('replay_trivia_request_too_large', {
+      bytes: contentLength,
+      maxBytes: MAX_REQUEST_BYTES,
+      room: hashLogValue(streamKey)
+    }, 'warn');
     return createErrorResponse('request_too_large', `Request body must be ${MAX_REQUEST_BYTES} bytes or less.`, 413);
   }
 
