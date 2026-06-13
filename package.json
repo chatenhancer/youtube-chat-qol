@@ -1,6 +1,6 @@
 {
   "name": "youtube-chat-qol",
-  "version": "0.14.0",
+  "version": "0.14.1",
   "private": true,
   "license": "GPL-3.0-or-later",
   "type": "module",
