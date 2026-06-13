@@ -366,6 +366,12 @@
     "playgroundBetaHelper": {
       "message": "ลองฟีเจอร์ทดลองก่อนใคร บางอย่างอาจเชื่อมต่อกับ chatenhancer.com เพื่อให้ทำงานได้"
     },
+    "playgroundProfile": {
+      "message": "โปรไฟล์ของคุณ"
+    },
+    "playgroundProfileHelper": {
+      "message": "นี่คือชื่อที่ผู้ใช้ Playground คนอื่นจะเห็นคุณ แฮนเดิล YouTube จริงของคุณจะไม่ถูก chatenhancer.com เก็บรวบรวม และจะไม่แสดงให้ผู้ใช้อื่นเห็นขณะใช้ประสบการณ์ Playground"
+    },
     "games": {
       "message": "เกม"
     },

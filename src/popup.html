@@ -145,6 +145,13 @@
               </span>
               <input id="playgroundEnabled" type="checkbox" title="Try early experiments. Some may connect to chatenhancer.com to work." data-i18n-title="playgroundBetaHelper">
             </label>
+            <div id="playgroundProfile" class="playground-profile" hidden>
+              <button id="playgroundProfileToggle" class="playground-profile-toggle" type="button" aria-expanded="false" aria-controls="playgroundProfileDetails">
+                <span class="playground-profile-label" data-i18n="playgroundProfile">Your profile</span>
+                <span id="playgroundProfileName" class="playground-profile-name" aria-live="polite"></span>
+              </button>
+              <p id="playgroundProfileDetails" class="playground-profile-details" data-i18n="playgroundProfileHelper" hidden>This is what other Playground users see you as. Your real YouTube handle is not collected by chatenhancer.com and is not shown to other users while using Playground experiences.</p>
+            </div>
           </section>
           <section id="playgroundGamesSection" class="settings-section" aria-labelledby="playground-games-heading" hidden>
             <h2 id="playground-games-heading" data-i18n="games">Games</h2>

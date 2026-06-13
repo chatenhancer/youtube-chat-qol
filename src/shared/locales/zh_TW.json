@@ -366,6 +366,12 @@
     "playgroundBetaHelper": {
       "message": "提前試用實驗功能。部分功能可能會連線到 chatenhancer.com 才能運作。"
     },
+    "playgroundProfile": {
+      "message": "你的個人資料"
+    },
+    "playgroundProfileHelper": {
+      "message": "其他 Playground 使用者會看到這個名稱。chatenhancer.com 不會收集你的真實 YouTube 使用者名稱，也不會在你使用 Playground 體驗時向其他使用者顯示。"
+    },
     "games": {
       "message": "遊戲"
     },

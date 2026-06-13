@@ -369,6 +369,12 @@
     "playgroundBetaHelper": {
       "message": "Erken deneyleri dene. Bazıları çalışmak için chatenhancer.com'a bağlanabilir."
     },
+    "playgroundProfile": {
+      "message": "Profilin"
+    },
+    "playgroundProfileHelper": {
+      "message": "Diğer Playground kullanıcıları sizi bu adla görür. Gerçek YouTube kullanıcı adınız chatenhancer.com tarafından toplanmaz ve Playground deneyimlerini kullanırken diğer kullanıcılara gösterilmez."
+    },
     "games": {
       "message": "Oyunlar"
     },

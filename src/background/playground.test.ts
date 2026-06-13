@@ -7,6 +7,7 @@ import {
   type PlaygroundContentMessage,
   type ServerMessage
 } from '../shared/playground-protocol';
+import { PLAYGROUND_PROFILE_MESSAGE_TYPE } from '../shared/playground-identity';
 import { REPLAY_TRIVIA_QUESTIONS_BACKGROUND_MESSAGE } from '../shared/playground-trivia';
 
 class FakeWebSocket {
@@ -139,6 +140,37 @@ describe('background playground bridge', () => {
     expect(stored['ytcqPlaygroundIdentity:v1']).toMatchObject({
       privateKeyJwk: expect.any(Object),
       publicKeyJwk: expect.any(Object)
+    });
+  });
+
+  it('returns the stable local playground profile without opening a socket', async () => {
+    await import('./playground');
+
+    const sendResponse = vi.fn();
+    const keepAlive = getMessageListener()({
+      type: PLAYGROUND_PROFILE_MESSAGE_TYPE
+    }, {} as chrome.runtime.MessageSender, sendResponse);
+
+    expect(keepAlive).toBe(true);
+    await vi.waitFor(() => {
+      expect(sendResponse).toHaveBeenCalledWith({
+        ok: true,
+        profile: {
+          displayName: expect.stringMatching(/^Player [A-Z0-9]{4}$/),
+          userId: expect.stringMatching(/^[A-Za-z0-9_-]{32}$/)
+        }
+      });
+    });
+    expect(FakeWebSocket.instances).toHaveLength(0);
+
+    const firstResponse = sendResponse.mock.calls[0]?.[0];
+    sendResponse.mockClear();
+    getMessageListener()({
+      type: PLAYGROUND_PROFILE_MESSAGE_TYPE
+    }, {} as chrome.runtime.MessageSender, sendResponse);
+
+    await vi.waitFor(() => {
+      expect(sendResponse).toHaveBeenCalledWith(firstResponse);
     });
   });
 

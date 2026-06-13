@@ -369,6 +369,12 @@
     "playgroundBetaHelper": {
       "message": "Пробуйте ранние эксперименты. Некоторые могут подключаться к chatenhancer.com для работы."
     },
+    "playgroundProfile": {
+      "message": "Ваш профиль"
+    },
+    "playgroundProfileHelper": {
+      "message": "Так вас видят другие пользователи Playground. Ваш настоящий ник YouTube не собирается chatenhancer.com и не показывается другим пользователям во время использования возможностей Playground."
+    },
     "games": {
       "message": "Игры"
     },

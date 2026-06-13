@@ -366,6 +366,12 @@
     "playgroundBetaHelper": {
       "message": "Probeer vroege experimenten. Sommige kunnen verbinding maken met chatenhancer.com om te werken."
     },
+    "playgroundProfile": {
+      "message": "Je profiel"
+    },
+    "playgroundProfileHelper": {
+      "message": "Dit is de naam waarmee andere Playground-gebruikers je zien. Je echte YouTube-handle wordt niet door chatenhancer.com verzameld en wordt tijdens Playground-ervaringen niet aan andere gebruikers getoond."
+    },
     "games": {
       "message": "Games"
     },

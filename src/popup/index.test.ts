@@ -35,6 +35,13 @@ describe('popup', () => {
           </span>
           <input id="playgroundEnabled" type="checkbox">
         </label>
+        <div id="playgroundProfile" hidden>
+          <button id="playgroundProfileToggle" type="button" aria-expanded="false" aria-controls="playgroundProfileDetails">
+            <span data-i18n="playgroundProfile"></span>
+            <span id="playgroundProfileName"></span>
+          </button>
+          <p id="playgroundProfileDetails" data-i18n="playgroundProfileHelper" hidden></p>
+        </div>
         <section id="playgroundGamesSection" hidden>
           <input id="playgroundGamesAvailable" type="checkbox">
         </section>
@@ -624,6 +631,7 @@ describe('popup', () => {
 
     expect(document.documentElement.lang).toBe('es-ES');
     expect(document.querySelector('[data-i18n="translation"]')?.textContent).toBe('translation');
+    expect(document.querySelector('[data-i18n="playgroundProfileHelper"]')?.textContent).toBe('playgroundProfileHelper');
     expect(document.querySelector('[data-i18n-title="openChannel"]')?.getAttribute('title')).toBe('openChannel');
     expect(document.querySelector('[data-i18n-aria-label="close"]')?.getAttribute('aria-label')).toBe('close');
     expect(document.querySelector('[data-i18n=""]')?.textContent).toBe('unchanged text');
@@ -686,6 +694,15 @@ describe('popup', () => {
       callback?.([]);
       return Promise.resolve([]);
     }) as never);
+    vi.mocked(chrome.runtime.sendMessage).mockImplementation(((message: unknown, callback?: (response: unknown) => void) => {
+      const response = typeof message === 'object' &&
+        message !== null &&
+        (message as { type?: string }).type === 'ytcq:playground:get-profile'
+        ? { ok: true, profile: { displayName: 'Player TEST', userId: 'test-user' } }
+        : { activeTabIds: [] };
+      callback?.(response);
+      return Promise.resolve(response);
+    }) as never);
 
     await import('./index');
     const targetLanguage = document.querySelector<HTMLSelectElement>('#targetLanguage')!;
@@ -693,6 +710,10 @@ describe('popup', () => {
     const sound = document.querySelector<HTMLInputElement>('#sound')!;
     const startupEffect = document.querySelector<HTMLInputElement>('#startupEffect')!;
     const playgroundEnabled = document.querySelector<HTMLInputElement>('#playgroundEnabled')!;
+    const playgroundProfile = document.querySelector<HTMLElement>('#playgroundProfile')!;
+    const playgroundProfileDetails = document.querySelector<HTMLElement>('#playgroundProfileDetails')!;
+    const playgroundProfileName = document.querySelector<HTMLElement>('#playgroundProfileName')!;
+    const playgroundProfileToggle = document.querySelector<HTMLButtonElement>('#playgroundProfileToggle')!;
     const playgroundGamesSection = document.querySelector<HTMLElement>('#playgroundGamesSection')!;
     const playgroundGamesAvailable = document.querySelector<HTMLInputElement>('#playgroundGamesAvailable')!;
 
@@ -701,8 +722,19 @@ describe('popup', () => {
     expect(sound.checked).toBe(false);
     expect(startupEffect.checked).toBe(true);
     expect(playgroundEnabled.checked).toBe(true);
+    expect(playgroundProfile.hidden).toBe(false);
+    expect(playgroundProfileDetails.hidden).toBe(true);
+    expect(playgroundProfileName.textContent).toBe('Player TEST');
     expect(playgroundGamesSection.hidden).toBe(false);
     expect(playgroundGamesAvailable.checked).toBe(true);
+
+    playgroundProfileToggle.click();
+    expect(playgroundProfileToggle.getAttribute('aria-expanded')).toBe('true');
+    expect(playgroundProfileDetails.hidden).toBe(false);
+    playgroundProfileToggle.click();
+    expect(playgroundProfileToggle.getAttribute('aria-expanded')).toBe('false');
+    expect(playgroundProfileDetails.hidden).toBe(true);
+    playgroundProfileToggle.click();
 
     targetLanguage.value = '';
     targetLanguage.dispatchEvent(new Event('change', { bubbles: true }));
@@ -728,6 +760,10 @@ describe('popup', () => {
     expect(document.querySelector('.startup-effect-icon')?.classList.contains('ytcq-sparkle-burst')).toBe(true);
     expect(playgroundGamesSection.hidden).toBe(false);
     expect(playgroundGamesSection.classList.contains('playground-group-collapsed')).toBe(true);
+    expect(playgroundProfile.hidden).toBe(true);
+    expect(playgroundProfileDetails.hidden).toBe(true);
+    expect(playgroundProfileToggle.getAttribute('aria-expanded')).toBe('false');
+    expect(playgroundProfileName.textContent).toBe('');
     expect(playgroundGamesAvailable.checked).toBe(false);
     expect(chrome.storage.sync.set).toHaveBeenCalledWith({
       playgroundEnabled: false,

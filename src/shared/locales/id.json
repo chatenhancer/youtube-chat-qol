@@ -369,6 +369,12 @@
     "playgroundBetaHelper": {
       "message": "Coba eksperimen lebih awal. Sebagian mungkin tersambung ke chatenhancer.com agar berfungsi."
     },
+    "playgroundProfile": {
+      "message": "Profil Anda"
+    },
+    "playgroundProfileHelper": {
+      "message": "Ini adalah nama yang dilihat pengguna Playground lain. Handle YouTube asli Anda tidak dikumpulkan oleh chatenhancer.com dan tidak ditampilkan kepada pengguna lain saat menggunakan pengalaman Playground."
+    },
     "games": {
       "message": "Game"
     },
