@@ -113,7 +113,7 @@ function escapeHtml(value: string): string {
   title={post.data.title}
   xDefaultUrl={getBlogPostUrl(allPosts.find((candidate) => candidate.data.translationKey === post.data.translationKey && candidate.data.locale === 'en') || post)}
 >
-  <article class="blog-post">
+  <article class="blog-post blog-post-page">
     <header class="blog-post-header">
       <a class="feature-link" href={getBlogIndexPath(locale)}>{blog.backToUpdates}</a>
       <time datetime={post.data.date.toISOString().slice(0, 10)}>{formatter.format(post.data.date)}</time>
