@@ -3,6 +3,8 @@ import { getCurrentYouTubeChatStreamKey } from '../../../../youtube/source-url';
 
 const DEFAULT_LANGUAGE_CODES = ['en'] as const;
 const DEFAULT_WINDOW_SECONDS = 5 * 60;
+const MAX_COMPACT_SEGMENT_GAP_SECONDS = 1.5;
+const MAX_COMPACT_SEGMENT_TEXT_LENGTH = 480;
 const INNERTUBE_ANDROID_CONTEXT = {
   client: {
     clientName: 'ANDROID',
@@ -48,6 +50,12 @@ export interface ReplayTriviaTranscriptWindow {
   videoId: string;
 }
 
+interface CompactTranscriptSegmentDraft {
+  endSeconds: number;
+  startSeconds: number;
+  text: string;
+}
+
 export async function fetchReplayTriviaTranscriptWindow(
   options: FetchReplayTriviaTranscriptOptions = {}
 ): Promise<ReplayTriviaTranscriptWindow> {
@@ -78,7 +86,7 @@ export async function fetchReplayTriviaTranscriptWindow(
   return {
     endSeconds: transcriptWindow.endSeconds,
     languageCode: transcriptWindow.track.languageCode || languageCodes[0],
-    segments: transcriptWindow.segments,
+    segments: compactTranscriptSegments(transcriptWindow.segments),
     startSeconds,
     videoId
   };
@@ -413,6 +421,61 @@ export function createTranscriptWindow(
       : segment.startSeconds;
     return segment.startSeconds < endSeconds && segmentEnd > startSeconds;
   });
+}
+
+export function compactTranscriptSegments(
+  segments: ReplayTriviaTranscriptSegment[]
+): ReplayTriviaTranscriptSegment[] {
+  const compacted: ReplayTriviaTranscriptSegment[] = [];
+  let current: CompactTranscriptSegmentDraft | null = null;
+
+  const flushCurrent = (): void => {
+    if (!current) return;
+    compacted.push(createCompactSegment(current.startSeconds, current.endSeconds, current.text));
+    current = null;
+  };
+
+  for (const segment of segments) {
+    const text = segment.text.replace(/\s+/g, ' ').trim();
+    if (!text) continue;
+
+    const startSeconds = segment.startSeconds;
+    const endSeconds = getSegmentEndSeconds(segment);
+    if (!current) {
+      current = { endSeconds, startSeconds, text };
+      continue;
+    }
+
+    const nextText: string = `${current.text} ${text}`;
+    const gapSeconds = startSeconds - current.endSeconds;
+    if (gapSeconds <= MAX_COMPACT_SEGMENT_GAP_SECONDS && nextText.length <= MAX_COMPACT_SEGMENT_TEXT_LENGTH) {
+      current = {
+        endSeconds: Math.max(current.endSeconds, endSeconds),
+        startSeconds: current.startSeconds,
+        text: nextText
+      };
+      continue;
+    }
+
+    flushCurrent();
+    current = { endSeconds, startSeconds, text };
+  }
+
+  flushCurrent();
+  return compacted;
+}
+
+function createCompactSegment(startSeconds: number, endSeconds: number, text: string): ReplayTriviaTranscriptSegment {
+  const durationSeconds = Math.max(0, endSeconds - startSeconds);
+  return durationSeconds > 0
+    ? { durationSeconds, startSeconds, text }
+    : { startSeconds, text };
+}
+
+function getSegmentEndSeconds(segment: ReplayTriviaTranscriptSegment): number {
+  return segment.durationSeconds !== undefined
+    ? segment.startSeconds + Math.max(0, segment.durationSeconds)
+    : segment.startSeconds;
 }
 
 function fetchWatchHtml(videoId: string): Promise<string> {

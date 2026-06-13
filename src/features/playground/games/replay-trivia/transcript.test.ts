@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
+  compactTranscriptSegments,
   createTranscriptPanelParams,
   createTranscriptWindow,
   extractInitialPlayerResponse,
@@ -178,6 +179,37 @@ describe('Replay Trivia transcript collection', () => {
       { durationSeconds: 2.5, startSeconds: 8, text: 'line' },
       { startSeconds: 20, text: 'last' }
     ])).toBe(20);
+  });
+
+  it('compacts adjacent transcript segments without crossing larger gaps', () => {
+    const compacted = compactTranscriptSegments([
+      { durationSeconds: 1, startSeconds: 1, text: 'first' },
+      { durationSeconds: 1, startSeconds: 2, text: 'second' },
+      { durationSeconds: 1, startSeconds: 3.2, text: 'third' },
+      { durationSeconds: 1, startSeconds: 10, text: 'after gap' }
+    ]);
+
+    expect(compacted).toEqual([
+      {
+        durationSeconds: 3.2,
+        startSeconds: 1,
+        text: 'first second third'
+      },
+      {
+        durationSeconds: 1,
+        startSeconds: 10,
+        text: 'after gap'
+      }
+    ]);
+  });
+
+  it('keeps compacted transcript segments under the backend segment size', () => {
+    const compacted = compactTranscriptSegments([
+      { durationSeconds: 1, startSeconds: 1, text: 'a'.repeat(300) },
+      { durationSeconds: 1, startSeconds: 2, text: 'b'.repeat(300) }
+    ]);
+
+    expect(compacted.map((segment) => segment.text.length)).toEqual([300, 300]);
   });
 
   it('fetches a compact transcript window from the selected caption track', async () => {

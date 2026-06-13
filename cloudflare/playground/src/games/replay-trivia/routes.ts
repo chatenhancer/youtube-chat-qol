@@ -54,6 +54,7 @@ async function handleReplayTriviaQuestionsRequest(
   try {
     const requestBody = parseReplayTriviaQuestionsRequest(await request.json());
     logPlaygroundEvent('replay_trivia_requested', {
+      bytes: contentLength || undefined,
       chars: getTranscriptCharLength(requestBody.segments),
       game: hashLogValue(requestBody.gameId),
       questionCount: requestBody.questionCount,
