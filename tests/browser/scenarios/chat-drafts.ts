@@ -102,10 +102,24 @@ function isPageSurface(chat: ChatSurface): chat is Page {
 function getReloadableStreamPage(chat: ChatSurface, context: BrowserContext): Page {
   if (isPageSurface(chat)) return chat;
 
-  const page = context.pages().find((candidate) => /youtube\.com\/watch/.test(candidate.url()));
+  const ownerPage = chat.owner().page();
+  if (isReloadableYouTubeStreamPage(ownerPage)) return ownerPage;
+
+  const page = context.pages().find((candidate) => {
+    return isReloadableYouTubeStreamPage(candidate) ||
+      candidate.frames().some((frame) => frame.url().includes('youtube.com/live_chat'));
+  });
   if (!page) {
-    throw new Error('Could not find the YouTube watch page for draft recovery reload.');
+    throw new Error('Could not find the YouTube stream page for draft recovery reload.');
   }
 
   return page;
+}
+
+function isReloadableYouTubeStreamPage(page: Page): boolean {
+  const url = page.url();
+  if (!/youtube\.com/.test(url)) return false;
+
+  return /\/watch(?:\?|$)/.test(url) ||
+    /\/@[^/]+\/live(?:[/?#]|$)/.test(url);
 }
