@@ -25,6 +25,7 @@ import {
 } from '../protocol/messages';
 import { parseClientMessage, ProtocolError, sanitizeStreamKey } from '../protocol/validation';
 import { TokenBucket, type TokenBucketOptions } from '../rate-limit';
+import { attachBotClientsToRoom } from '../bots/room-adapter';
 import type { DurableObjectState, Env, ServerWebSocket } from '../types';
 
 const INVITE_TTL_MS = 2 * 60 * 1000;
@@ -93,7 +94,18 @@ export class StreamRoom {
   private readonly userRateLimits = new Map<string, TokenBucket>();
   private streamKey = '';
 
-  constructor(_state: DurableObjectState, _env: Env) {}
+  constructor(private readonly state: DurableObjectState, _env: Env) {
+    attachBotClientsToRoom({
+      clients: this.clients,
+      connectionRateLimitOptions: CONNECTION_RATE_LIMIT,
+      createSnapshot: (userId) => this.createSnapshot(userId),
+      getGame: (gameId) => this.games.get(gameId),
+      handleMessage: (session, message) => this.handleSocketMessage(session, message),
+      logEvent: (event, details, level) => this.logEvent(event, details, level),
+      setAvailableGames: (userId, availableGames) => this.userAvailableGames.set(userId, availableGames),
+      waitUntil: (promise) => this.state.waitUntil(promise)
+    });
+  }
 
   async fetch(request: Request): Promise<Response> {
     const url = new URL(request.url);
