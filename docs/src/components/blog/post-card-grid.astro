@@ -1,0 +1,43 @@
+---
+import { Image } from 'astro:assets';
+import type { BlogPost } from '../../data/blog';
+import { getBlogEntryFolder, getBlogPostPath } from '../../data/blog';
+import { getBlogCoverVideoUrl } from '../../data/blog-media';
+import { htmlLangFor } from '../../data/locales';
+import type { Locale } from '../../data/locales';
+
+const { locale, posts } = Astro.props as {
+  locale: Locale;
+  posts: BlogPost[];
+};
+
+const formatter = new Intl.DateTimeFormat(htmlLangFor(locale), {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric'
+});
+const BLOG_CARD_IMAGE_WIDTH = 1280;
+---
+
+<div class="blog-archive-grid">
+  {posts.map((post) => {
+    const coverVideoUrl = getBlogCoverVideoUrl(getBlogEntryFolder(post), post.data.video);
+
+    return (
+      <a class="latest-update-card blog-archive-card" href={getBlogPostPath(post)}>
+        <span class="latest-update-media">
+          {post.data.image && (coverVideoUrl ? (
+            <video src={coverVideoUrl} poster={post.data.image.src} autoplay muted loop playsinline preload="metadata" aria-hidden="true" />
+          ) : (
+            <Image src={post.data.image} alt="" width={BLOG_CARD_IMAGE_WIDTH} loading="lazy" decoding="async" />
+          ))}
+        </span>
+        <span class="latest-update-copy">
+          <time datetime={post.data.date.toISOString().slice(0, 10)}>{formatter.format(post.data.date)}</time>
+          <strong>{post.data.title}</strong>
+          <span>{post.data.description}</span>
+        </span>
+      </a>
+    );
+  })}
+</div>

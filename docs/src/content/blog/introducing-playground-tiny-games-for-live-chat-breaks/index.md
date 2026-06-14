@@ -9,10 +9,8 @@ translationKey: "introducing-playground-tiny-games-for-live-chat-breaks"
 video: "./cover.mp4"
 tags:
   - "playground"
-  - "chat"
   - "games"
   - "chess"
-  - "extension"
 ---
 
 ## Playground is here!

@@ -11,7 +11,6 @@ tags:
   - "games"
   - "chess"
   - "trivia"
-  - "extension"
 ---
 
 अब Playground में तुरंत कूदना आसान है: आप **Computer** के खिलाफ खेल सकते हैं।

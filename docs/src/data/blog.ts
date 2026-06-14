@@ -10,11 +10,42 @@ export interface AlternateLink {
   hreflang: string;
 }
 
+export interface BlogTagArchive {
+  posts: BlogPost[];
+  tag: string;
+  tagSlug: string;
+}
+
 export function getLocalizedBlogPosts(posts: BlogPost[], locale: Locale): BlogPost[] {
   return Array.from(groupPostsByTranslationKey(posts).values())
     .map((translations) => findPostForLocale(translations, locale) || findPostForLocale(translations, defaultLocale))
     .filter((post): post is BlogPost => Boolean(post))
     .sort(comparePostsByDate);
+}
+
+export function getBlogTagArchives(posts: BlogPost[], locale: Locale): BlogTagArchive[] {
+  const archives = new Map<string, BlogTagArchive>();
+
+  for (const post of getLocalizedBlogPosts(posts, locale)) {
+    const postTagSlugs = new Set<string>();
+
+    for (const tag of post.data.tags) {
+      const tagSlug = getBlogTagSlug(tag);
+      if (!tagSlug || postTagSlugs.has(tagSlug)) continue;
+
+      postTagSlugs.add(tagSlug);
+      const archive = archives.get(tagSlug) || {
+        posts: [],
+        tag: tag.trim(),
+        tagSlug
+      };
+
+      archive.posts.push(post);
+      archives.set(tagSlug, archive);
+    }
+  }
+
+  return Array.from(archives.values()).sort((first, second) => first.tag.localeCompare(second.tag));
 }
 
 export function getRelatedBlogPosts(posts: BlogPost[], post: BlogPost, locale: Locale, limit = 3): BlogPost[] {
@@ -55,12 +86,23 @@ export function getBlogPostPath(post: BlogPost): string {
   return `${getLocaleUrl(getPostLocale(post))}blog/${post.data.slug}/`;
 }
 
+export function getBlogTagPath(locale: Locale, tag: string): string {
+  const tagSlug = getBlogTagSlug(tag);
+  if (!tagSlug) throw new Error(`Unsupported blog tag: ${tag}`);
+
+  return `${getLocaleUrl(locale)}blog/tags/${tagSlug}/`;
+}
+
 export function getBlogIndexUrl(locale: Locale): string {
   return `${site.url}${getBlogIndexPath(locale)}`;
 }
 
 export function getBlogPostUrl(post: BlogPost): string {
   return `${site.url}${getBlogPostPath(post)}`;
+}
+
+export function getBlogTagUrl(locale: Locale, tag: string): string {
+  return `${site.url}${getBlogTagPath(locale, tag)}`;
 }
 
 export function getBlogIndexAlternateLinks(): AlternateLink[] {
@@ -77,6 +119,13 @@ export function getBlogPostAlternateLinks(posts: BlogPost[], post: BlogPost): Al
   }));
 }
 
+export function getBlogTagAlternateLinks(posts: BlogPost[], tag: string): AlternateLink[] {
+  return getBlogTagLocales(posts, tag).map((locale) => ({
+    href: getBlogTagUrl(locale, tag),
+    hreflang: htmlLangFor(locale)
+  }));
+}
+
 export function getBlogIndexLanguageUrls(): Partial<Record<Locale, string>> {
   return Object.fromEntries(locales.map((locale) => [locale, getBlogIndexPath(locale)]));
 }
@@ -88,6 +137,10 @@ export function getBlogPostLanguageUrls(posts: BlogPost[], post: BlogPost): Part
       getBlogPostPath(translation)
     ])
   );
+}
+
+export function getBlogTagLanguageUrls(posts: BlogPost[], tag: string): Partial<Record<Locale, string>> {
+  return Object.fromEntries(getBlogTagLocales(posts, tag).map((locale) => [locale, getBlogTagPath(locale, tag)]));
 }
 
 export function getBlogEntryFolder(post: BlogPost): string {
@@ -104,6 +157,21 @@ export function getBlogEntryFolder(post: BlogPost): string {
 export function toLocale(value: string): Locale {
   if (isLocale(value)) return value;
   throw new Error(`Unsupported blog locale: ${value}`);
+}
+
+export function getBlogTagSlug(tag: string): string {
+  return tag
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+function getBlogTagLocales(posts: BlogPost[], tag: string): Locale[] {
+  const tagSlug = getBlogTagSlug(tag);
+  return locales.filter((locale) =>
+    getBlogTagArchives(posts, locale).some((archive) => archive.tagSlug === tagSlug)
+  );
 }
 
 function groupPostsByTranslationKey(posts: BlogPost[]): Map<string, BlogPost[]> {

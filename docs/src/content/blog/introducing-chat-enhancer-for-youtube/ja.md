@@ -8,10 +8,8 @@ translationKey: "introducing-chat-enhancer-for-youtube"
 image: "./cover.png"
 tags:
   - "youtube"
-  - "chat-enhancer"
-  - "chrome-extension"
   - "live-chat"
-  - "youtube-tweaks"
+  - "extension"
 ---
 
 ## なぜ Chat Enhancer なのか

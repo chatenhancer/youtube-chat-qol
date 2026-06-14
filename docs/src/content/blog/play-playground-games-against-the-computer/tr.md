@@ -11,7 +11,6 @@ tags:
   - "games"
   - "chess"
   - "trivia"
-  - "extension"
 ---
 
 Playground’a atlamak artık daha kolay: **Computer**’a karşı oynayabilirsiniz.

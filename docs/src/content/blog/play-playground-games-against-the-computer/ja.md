@@ -11,7 +11,6 @@ tags:
   - "games"
   - "chess"
   - "trivia"
-  - "extension"
 ---
 
 Playground に入りやすくなりました。**Computer** と対戦できます。

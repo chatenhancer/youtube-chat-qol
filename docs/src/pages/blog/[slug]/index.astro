@@ -10,6 +10,7 @@ import {
   getBlogPostAlternateLinks,
   getBlogPostLanguageUrls,
   getBlogPostUrl,
+  getBlogTagPath,
   getPostLocale
 } from '../../../data/blog';
 import { getBlogCoverVideoUrl } from '../../../data/blog-media';
@@ -119,6 +120,13 @@ function escapeHtml(value: string): string {
       <time datetime={post.data.date.toISOString().slice(0, 10)}>{formatter.format(post.data.date)}</time>
       <h1 set:html={titleHtml} />
       <p set:html={descriptionHtml} />
+      {post.data.tags.length > 0 && (
+        <ul class="blog-post-tags">
+          {post.data.tags.map((tag) => (
+            <li><a href={getBlogTagPath(locale, tag)}>#{tag}</a></li>
+          ))}
+        </ul>
+      )}
     </header>
     {post.data.image && (
       <figure class="blog-post-cover">

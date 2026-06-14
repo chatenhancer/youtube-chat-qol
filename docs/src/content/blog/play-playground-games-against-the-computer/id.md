@@ -11,7 +11,6 @@ tags:
   - "games"
   - "chess"
   - "trivia"
-  - "extension"
 ---
 
 Sekarang lebih mudah langsung masuk ke Playground: Anda bisa bermain melawan **Computer**.
