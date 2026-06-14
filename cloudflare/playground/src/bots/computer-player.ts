@@ -18,6 +18,12 @@ import type { ServerWebSocket } from '../types';
 
 type ChoiceIndex = 0 | 1 | 2 | 3;
 type ChessBotMove = Pick<ChessMoveInput, 'from' | 'promotion' | 'to'>;
+type ChessBotFallbackReason = 'stockfish_error' | 'stockfish_no_move';
+
+export interface ChessBotFallback {
+  error?: unknown;
+  reason: ChessBotFallbackReason;
+}
 
 export const COMPUTER_PLAYER_CONNECTION_ID = 'server:computer';
 export const COMPUTER_PLAYER_USER_ID = 'server:computer';
@@ -33,6 +39,7 @@ const TRIVIA_BOT_ANSWER_ACCURACY = 0.65;
 export interface ComputerPlayerHost {
   getGame(gameId: string): GameRecord | undefined;
   onActionError?(gameId: string, error: unknown): void;
+  onChessBotFallback?(gameId: string, fallback: ChessBotFallback): void;
   sendClientMessage(message: Exclude<ClientMessage, { type: 'hello' }>): void;
   waitUntil(promise: Promise<unknown>): void;
 }
@@ -52,16 +59,26 @@ export function createComputerPlayer(host: ComputerPlayerHost): ComputerPlayer {
 
 export async function createStockfishChessBotAction(
   game: GameRecord,
-  userId: string
+  userId: string,
+  onFallback?: (fallback: ChessBotFallback) => void
 ): Promise<GameActionInput | null> {
   const chessGame = getChessBotGame(game);
   if (!chessGame) return null;
   if (chessGame.status !== 'active') return null;
   if (chessGame.players[chessGame.turn] !== userId) return null;
 
-  const stockfishMove = await getStockfishBestMove(chessGame.fen).catch(() => null);
+  let stockfishMove: StockfishMove | null = null;
+  let fallback: ChessBotFallback | null = null;
+  try {
+    stockfishMove = await getStockfishBestMove(chessGame.fen);
+    if (!stockfishMove) fallback = { reason: 'stockfish_no_move' };
+  } catch (error) {
+    fallback = { error, reason: 'stockfish_error' };
+  }
+
   const move = stockfishMove || getFallbackLegalMove(chessGame.fen);
   if (!move) return null;
+  if (!stockfishMove && fallback) onFallback?.(fallback);
 
   return {
     action: 'move',
@@ -182,7 +199,9 @@ class ServerComputerPlayer implements ComputerPlayer {
   private createAction(game: GameRecord): Promise<GameActionInput | null> | GameActionInput | null {
     switch (game.gameType) {
       case 'chess':
-        return createStockfishChessBotAction(game, COMPUTER_PLAYER_USER_ID);
+        return createStockfishChessBotAction(game, COMPUTER_PLAYER_USER_ID, (fallback) => {
+          this.host.onChessBotFallback?.(game.gameId, fallback);
+        });
       case 'replay-trivia':
         return createReplayTriviaBotAnswerAction(game, COMPUTER_PLAYER_USER_ID);
       default:

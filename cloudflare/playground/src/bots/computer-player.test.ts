@@ -1,9 +1,10 @@
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   COMPUTER_PLAYER_USER_ID,
   createReplayTriviaBotAnswerAction,
   createStockfishChessBotAction
 } from './computer-player';
+import { getStockfishBestMove } from './stockfish';
 import { createChessGame } from '../games/chess';
 import {
   advanceReplayTriviaGame,
@@ -16,6 +17,12 @@ vi.mock('./stockfish', () => ({
 }));
 
 describe('computer player', () => {
+  const getStockfishBestMoveMock = vi.mocked(getStockfishBestMove);
+
+  beforeEach(() => {
+    getStockfishBestMoveMock.mockResolvedValue(null);
+  });
+
   it('creates chess move actions in the computer player', async () => {
     const game = createChessGame('game-1', COMPUTER_PLAYER_USER_ID, 'human-user');
 
@@ -26,6 +33,33 @@ describe('computer player', () => {
         to: expect.any(String)
       },
       userId: COMPUTER_PLAYER_USER_ID
+    });
+  });
+
+  it('reports when the chess bot falls back after Stockfish returns no move', async () => {
+    const game = createChessGame('game-1', COMPUTER_PLAYER_USER_ID, 'human-user');
+    const onFallback = vi.fn();
+
+    await createStockfishChessBotAction(game, COMPUTER_PLAYER_USER_ID, onFallback);
+
+    expect(onFallback).toHaveBeenCalledTimes(1);
+    expect(onFallback).toHaveBeenCalledWith({
+      reason: 'stockfish_no_move'
+    });
+  });
+
+  it('reports when the chess bot falls back after a Stockfish error', async () => {
+    const error = new Error('Stockfish failed.');
+    const game = createChessGame('game-1', COMPUTER_PLAYER_USER_ID, 'human-user');
+    const onFallback = vi.fn();
+    getStockfishBestMoveMock.mockRejectedValueOnce(error);
+
+    await createStockfishChessBotAction(game, COMPUTER_PLAYER_USER_ID, onFallback);
+
+    expect(onFallback).toHaveBeenCalledTimes(1);
+    expect(onFallback).toHaveBeenCalledWith({
+      error,
+      reason: 'stockfish_error'
     });
   });
 
