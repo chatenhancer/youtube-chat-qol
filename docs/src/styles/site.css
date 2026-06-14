@@ -1499,6 +1499,41 @@ h3 {
   border-radius: 0.22em;
 }
 
+.blog-post-editor-credit {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 650;
+  line-height: 1.2;
+  text-decoration: none;
+}
+
+.blog-post-editor-credit img {
+  flex: 0 0 auto;
+  width: 22px;
+  height: auto;
+}
+
+.blog-post-editor-credit span {
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+}
+
+.blog-post-editor-credit:hover,
+.blog-post-editor-credit:focus-visible {
+  color: var(--text);
+}
+
+.blog-archive-editor-credit {
+  display: flex;
+  margin-top: 28px;
+}
+
 .blog-image {
   width: var(--blog-image-width);
   max-width: 100%;
