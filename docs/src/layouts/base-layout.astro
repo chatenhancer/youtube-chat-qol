@@ -54,7 +54,11 @@ const defaultAlternateLinks = isLocalizedHomePage ? locales.map((entry) => ({
 })) : [];
 const resolvedAlternateLinks = alternateLinks ?? defaultAlternateLinks;
 const resolvedXDefaultUrl = xDefaultUrl ?? (isLocalizedHomePage ? canonicalUrlFor('en') : null);
-const stylesheetPreload = `${rootPrefix}assets/fonts/InterVariable.woff2`;
+const fontPreloads = [
+  `${rootPrefix}assets/fonts/InterVariable.woff2`,
+  `${rootPrefix}assets/fonts/InterDisplay-Bold.woff2`,
+  `${rootPrefix}assets/fonts/InterDisplay-ExtraBold.woff2`
+];
 const docsConfig = {
   supportEmail,
   ...clientConfig
@@ -120,7 +124,7 @@ const structuredDataJson = resolvedStructuredData
     {resolvedXDefaultUrl && <link rel="alternate" hreflang="x-default" href={resolvedXDefaultUrl} />}
     <link rel="icon" href={`${rootPrefix}assets/icons/icon-128.png`}>
     <link rel="apple-touch-icon" href={`${rootPrefix}assets/icons/icon-128.png`}>
-    <link rel="preload" href={stylesheetPreload} as="font" type="font/woff2" crossorigin>
+    {fontPreloads.map((href) => <link rel="preload" href={href} as="font" type="font/woff2" crossorigin />)}
     <script is:inline>
       (() => {
         const screenshotPanel = new URLSearchParams(window.location.search).get('ytcq-screenshot');

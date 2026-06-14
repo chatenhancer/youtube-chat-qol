@@ -21,19 +21,26 @@ const { messages: m, playgroundPostPath, rootPrefix } = Astro.props as {
       </div>
       <h2 id="playground-title" set:html={m.playground.title}></h2>
       <p>{m.playground.copy}</p>
-      <div class="playground-tags" aria-label={m.playground.tagsAria}>
-        <span>{m.playground.tagOptIn}</span>
-        <span>{m.playground.tagStream}</span>
-        <span>{m.playground.tagChess}</span>
-      </div>
       <div class="playground-actions">
-        <a class="button button-primary" href="#install">{m.playground.primaryCta}</a>
-        <a class="button playground-link" href={playgroundPostPath}>{m.playground.secondaryCta}</a>
+        <a class="button button-primary" href="#install">
+          <span class="button-icon" data-symbol="extension" aria-hidden="true">
+            <Icon name="extension" />
+          </span>
+          {m.playground.primaryCta}
+        </a>
+        <a class="button playground-link" href={playgroundPostPath}>
+          <span class="button-icon" data-symbol="ads_click" aria-hidden="true">
+            <Icon name="ads_click" />
+          </span>
+          {m.playground.secondaryCta}
+        </a>
       </div>
       <p class="playground-note">{m.playground.note}</p>
     </div>
     <figure class="playground-preview">
-      <img src={`${rootPrefix}assets/playground/chess-preview.png`} alt={m.playground.imageAlt} loading="lazy" decoding="async">
+      <img class="playground-preview-card playground-preview-card-back playground-preview-card-back-right" src={`${rootPrefix}assets/playground/trivia-preview.png`} alt="" loading="lazy" decoding="async" aria-hidden="true">
+      <img class="playground-preview-card playground-preview-card-back playground-preview-card-back-left" src={`${rootPrefix}assets/playground/trivia-results-preview.png`} alt="" loading="lazy" decoding="async" aria-hidden="true">
+      <img class="playground-preview-card playground-preview-card-main" src={`${rootPrefix}assets/playground/chess-preview.png`} alt={m.playground.imageAlt} loading="lazy" decoding="async">
     </figure>
   </div>
 </section>

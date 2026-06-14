@@ -12,6 +12,8 @@
   --logo-red-end: #fd0032;
   --logo-red-hover-start: #ec002f;
   --logo-red-hover-end: #df002c;
+  --font-body: "Inter", sans-serif;
+  --font-title: "Inter Display", "Inter", sans-serif;
   --header-scroll-offset: 67px;
 }
 
@@ -21,6 +23,22 @@
   font-weight: 100 900;
   font-display: swap;
   src: url("/assets/fonts/InterVariable.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Inter Display";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/assets/fonts/InterDisplay-Bold.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Inter Display";
+  font-style: normal;
+  font-weight: 750 900;
+  font-display: swap;
+  src: url("/assets/fonts/InterDisplay-ExtraBold.woff2") format("woff2");
 }
 
 * {
@@ -36,7 +54,7 @@ body {
   margin: 0;
   background: var(--background);
   color: var(--text);
-  font-family: "Inter", sans-serif;
+  font-family: var(--font-body);
   line-height: 1.55;
 }
 
@@ -322,6 +340,20 @@ h2,
 h3,
 p {
   margin-top: 0;
+}
+
+h1,
+h2,
+h3,
+.feature-walkthrough-copy strong,
+.latest-update-copy strong,
+.blog-card-copy strong,
+.store-version-alert strong,
+.install-quickstart-list strong,
+.command-note-heading strong,
+.command-list dt,
+.privacy-list dt {
+  font-family: var(--font-title);
 }
 
 h1 {
@@ -999,6 +1031,9 @@ h3 {
 }
 
 .playground-section {
+  --playground-accent: #318bdf;
+  --playground-accent-strong: #186fc1;
+
   position: relative;
   overflow: hidden;
   padding: clamp(42px, 6vw, 66px) 24px;
@@ -1026,7 +1061,7 @@ h3 {
   position: relative;
   z-index: 1;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(220px, 292px);
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 368px);
   gap: clamp(24px, 5vw, 54px);
   align-items: center;
   width: min(980px, 100%);
@@ -1042,18 +1077,16 @@ h3 {
   align-items: center;
   gap: 8px;
   margin: 0 0 12px;
+  margin-inline-start: clamp(-30px, calc(20px - 5vw), 0px);
 }
 
 .playground-section-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 30px;
-  height: 30px;
-  color: var(--blue);
-  background: color-mix(in srgb, var(--blue) 9%, transparent);
-  border: 1px solid color-mix(in srgb, var(--blue) 18%, transparent);
-  border-radius: 8px;
+  width: 22px;
+  height: 22px;
+  color: var(--playground-accent);
 }
 
 .playground-section-icon svg {
@@ -1063,7 +1096,7 @@ h3 {
 }
 
 .playground-eyebrow {
-  color: var(--blue);
+  color: var(--playground-accent);
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -1075,9 +1108,9 @@ h3 {
   align-items: center;
   min-height: 13px;
   padding: 0 5px;
-  color: var(--blue);
-  background: color-mix(in srgb, var(--blue) 10%, transparent);
-  border: 1px solid color-mix(in srgb, var(--blue) 36%, transparent);
+  color: var(--playground-accent);
+  background: color-mix(in srgb, var(--playground-accent) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--playground-accent) 34%, transparent);
   border-radius: 5px;
   font-size: 9px;
   font-weight: 600;
@@ -1102,33 +1135,6 @@ h3 {
   margin: 14px 0 0;
   color: var(--muted);
   font-size: 16px;
-}
-
-.playground-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 14px;
-  margin-top: 18px;
-}
-
-.playground-tags span {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  min-height: 0;
-  padding: 0;
-  color: #154f9a;
-  font-size: 13px;
-  font-weight: 600;
-}
-
-.playground-tags span::before {
-  content: "";
-  width: 5px;
-  height: 5px;
-  background: currentColor;
-  border-radius: 50%;
-  opacity: 0.62;
 }
 
 .playground-actions {
@@ -1171,17 +1177,28 @@ h3 {
   border-color: color-mix(in srgb, var(--logo-red-end) 34%, rgba(255, 255, 255, 0.8));
 }
 
-.playground-link {
-  color: #154f9a;
-  background: rgba(255, 255, 255, 0.34);
-  border-color: rgba(255, 255, 255, 0.66);
+.playground-actions .playground-link {
+  color: var(--playground-accent-strong);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.64), rgba(255, 255, 255, 0.2)),
+    color-mix(in srgb, var(--playground-accent) 14%, transparent);
+  border-color: color-mix(in srgb, var(--playground-accent) 30%, rgba(255, 255, 255, 0.74));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.72),
+    inset 0 -1px 0 color-mix(in srgb, var(--playground-accent) 12%, transparent),
+    0 10px 24px color-mix(in srgb, var(--playground-accent) 12%, transparent);
 }
 
-.playground-link:hover,
-.playground-link:focus {
-  color: var(--blue);
-  background: rgba(255, 255, 255, 0.58);
-  border-color: rgba(255, 255, 255, 0.86);
+.playground-actions .playground-link:hover,
+.playground-actions .playground-link:focus {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.74), rgba(255, 255, 255, 0.28)),
+    color-mix(in srgb, var(--playground-accent) 19%, transparent);
+  border-color: color-mix(in srgb, var(--playground-accent) 38%, rgba(255, 255, 255, 0.82));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.78),
+    inset 0 -1px 0 color-mix(in srgb, var(--playground-accent) 14%, transparent),
+    0 12px 26px color-mix(in srgb, var(--playground-accent) 16%, transparent);
 }
 
 .playground-copy .playground-note {
@@ -1193,45 +1210,57 @@ h3 {
 .playground-preview {
   position: relative;
   justify-self: center;
-  width: min(100%, 292px);
+  width: min(100%, 368px);
   margin: 0;
-  padding-bottom: 18px;
+  padding: 30px 42px 34px 34px;
   isolation: isolate;
 }
 
-.playground-preview::before,
-.playground-preview::after {
+.playground-preview::before {
   content: "";
   position: absolute;
+  z-index: 0;
+  inset: 44px 36px 24px 24px;
   pointer-events: none;
   border-radius: 8px;
-  box-shadow: 0 16px 34px rgba(35, 74, 120, 0.1);
-}
-
-.playground-preview::before {
-  inset: 14px 12px 0 -7px;
-  z-index: 1;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(227, 238, 253, 0.76)),
-    linear-gradient(135deg, rgba(23, 105, 209, 0.16), rgba(255, 255, 255, 0.3));
-  transform: rotate(-3deg);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.48), rgba(227, 238, 253, 0.54)),
+    linear-gradient(135deg, rgba(23, 105, 209, 0.12), rgba(255, 255, 255, 0.24));
+  box-shadow: 0 16px 34px rgba(35, 74, 120, 0.08);
+  transform: rotate(-1deg);
 }
 
-.playground-preview::after {
-  inset: 27px -10px -11px 19px;
-  z-index: 0;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.58), rgba(219, 233, 251, 0.7)),
-    linear-gradient(135deg, rgba(62, 166, 255, 0.13), rgba(255, 255, 255, 0.25));
-  transform: rotate(4deg);
-}
-
-.playground-preview img {
-  position: relative;
-  z-index: 2;
+.playground-preview-card {
   display: block;
-  width: 100%;
   border-radius: 8px;
+}
+
+.playground-preview-card-back {
+  position: absolute;
+  width: calc(100% - 92px);
+  box-shadow: 0 16px 38px rgba(35, 74, 120, 0.14);
+}
+
+.playground-preview-card-back-right {
+  z-index: 2;
+  top: 0;
+  right: 0;
+  transform: rotate(7deg);
+  transform-origin: 46% 58%;
+}
+
+.playground-preview-card-back-left {
+  z-index: 1;
+  bottom: 0;
+  left: 0;
+  transform: rotate(-7deg);
+  transform-origin: 56% 44%;
+}
+
+.playground-preview-card-main {
+  position: relative;
+  z-index: 3;
+  width: 100%;
   box-shadow: 0 18px 44px rgba(35, 74, 120, 0.18);
   transform: rotate(1deg);
 }
@@ -1418,19 +1447,23 @@ h3 {
 
 .blog-post-tags a {
   display: block;
-  padding: 4px 9px;
-  color: var(--tag);
-  background: var(--blue-soft);
-  border: 1px solid #d8e8ff;
+  padding: 4px 10px;
+  color: color-mix(in srgb, var(--blue) 78%, var(--muted));
+  background: color-mix(in srgb, var(--blue-soft) 58%, #ffffff);
   border-radius: 999px;
   font-size: 13px;
-  font-weight: 650;
+  font-weight: 600;
 }
 
 .blog-post-tags a:hover,
 .blog-post-tags a:focus-visible {
   color: var(--blue);
-  border-color: #a9cffc;
+  background: color-mix(in srgb, var(--blue-soft) 76%, #ffffff);
+}
+
+.blog-post-tags a:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--blue) 22%, transparent);
+  outline-offset: 2px;
 }
 
 .blog-post-cover {
@@ -2834,7 +2867,12 @@ figcaption {
 
   .playground-preview {
     justify-self: start;
-    width: min(100%, 260px);
+    width: min(100%, 338px);
+    padding: 28px 38px 32px 30px;
+  }
+
+  .playground-preview-card-back {
+    width: calc(100% - 82px);
   }
 
   .privacy-list {
@@ -2970,7 +3008,12 @@ figcaption {
 
   .playground-preview {
     justify-self: center;
-    width: min(100%, 240px);
+    width: min(100%, 304px);
+    padding: 24px 34px 30px 28px;
+  }
+
+  .playground-preview-card-back {
+    width: calc(100% - 72px);
   }
 
   .showcase-stack {
