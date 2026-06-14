@@ -1366,6 +1366,11 @@ h3 {
   font-size: 19px;
 }
 
+.blog-tag-archive .feature-link {
+  display: inline-block;
+  margin-bottom: 18px;
+}
+
 .blog-empty {
   grid-column: 1 / -1;
   margin: 0;
@@ -1408,6 +1413,11 @@ h3 {
 }
 
 .blog-post-tags li {
+  display: block;
+}
+
+.blog-post-tags a {
+  display: block;
   padding: 4px 9px;
   color: var(--tag);
   background: var(--blue-soft);
@@ -1415,6 +1425,12 @@ h3 {
   border-radius: 999px;
   font-size: 13px;
   font-weight: 650;
+}
+
+.blog-post-tags a:hover,
+.blog-post-tags a:focus-visible {
+  color: var(--blue);
+  border-color: #a9cffc;
 }
 
 .blog-post-cover {

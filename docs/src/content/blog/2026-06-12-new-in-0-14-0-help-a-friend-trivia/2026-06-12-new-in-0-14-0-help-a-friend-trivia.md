@@ -7,11 +7,9 @@ image: "./0e5e4f69e6fa7b45.png"
 locale: "en"
 translationKey: "new-in-0-14-0-help-a-friend-trivia"
 tags:
+  - "playground"
+  - "games"
   - "trivia"
-  - "game"
-  - "multiplayer"
-  - "chat"
-  - "online"
 ---
 
 The second Playground game is here: **HELP-A-FRIEND! Trivia**

@@ -7,11 +7,9 @@ slug: "new-in-0-14-0-help-a-friend-trivia"
 image: "./0e5e4f69e6fa7b45.png"
 translationKey: "new-in-0-14-0-help-a-friend-trivia"
 tags:
+  - "playground"
+  - "games"
   - "trivia"
-  - "game"
-  - "multiplayer"
-  - "chat"
-  - "online"
 ---
 
 وصلت لعبة Playground الثانية: **HELP-A-FRIEND! Trivia**

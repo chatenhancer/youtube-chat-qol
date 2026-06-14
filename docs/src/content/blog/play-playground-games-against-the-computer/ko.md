@@ -11,7 +11,6 @@ tags:
   - "games"
   - "chess"
   - "trivia"
-  - "extension"
 ---
 
 이제 Playground에 더 쉽게 들어갈 수 있습니다. **Computer**와 플레이할 수 있습니다.

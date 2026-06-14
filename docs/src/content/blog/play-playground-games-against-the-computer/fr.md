@@ -11,7 +11,6 @@ tags:
   - "games"
   - "chess"
   - "trivia"
-  - "extension"
 ---
 
 Playground est maintenant plus facile à lancer : vous pouvez jouer contre **Computer**.

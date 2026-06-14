@@ -9,10 +9,8 @@ image: "./90af004f7c5daeab.png"
 video: "./cover.mp4"
 tags:
   - "playground"
-  - "chat"
   - "games"
   - "chess"
-  - "extension"
 ---
 
 ## Playground وصل!
