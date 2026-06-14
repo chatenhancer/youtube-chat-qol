@@ -6,11 +6,12 @@
  * routing their outbound messages through the room's existing message handler.
  */
 import {
+  type ChessBotFallback,
   COMPUTER_PLAYER_CONNECTION_ID,
   createComputerPlayer
 } from './computer-player';
 import type { GameRecord } from '../games/types';
-import { hashLogValue, shortLogId } from '../logging';
+import { getLogErrorType, hashLogValue, shortLogId } from '../logging';
 import type { ClientMessage, GameId, LobbySnapshot, ServerMessage } from '../protocol/messages';
 import { ProtocolError } from '../protocol/validation';
 import { TokenBucket, type TokenBucketOptions } from '../rate-limit';
@@ -29,6 +30,7 @@ export interface BotClientSession {
 interface BotClientsHost {
   getGame(gameId: string): GameRecord | undefined;
   onActionError?(connectionId: string, gameId: string, error: unknown): void;
+  onChessBotFallback?(connectionId: string, gameId: string, fallback: ChessBotFallback): void;
   sendClientMessage(connectionId: string, message: Exclude<ClientMessage, { type: 'hello' }>): void;
   waitUntil(promise: Promise<unknown>): void;
 }
@@ -63,6 +65,10 @@ export function attachBotClientsToRoom(options: AttachBotClientsToRoomOptions): 
     onActionError: (connectionId, gameId, error) => {
       const session = options.clients.get(connectionId);
       logBotClientActionFailure(options, session, connectionId, gameId, error);
+    },
+    onChessBotFallback: (connectionId, gameId, fallback) => {
+      const session = options.clients.get(connectionId);
+      logChessBotFallback(options, session, connectionId, gameId, fallback);
     },
     sendClientMessage: (connectionId, message) => {
       const session = options.clients.get(connectionId);
@@ -113,6 +119,24 @@ function logBotClientActionFailure(
   }, 'warn');
 }
 
+function logChessBotFallback(
+  options: AttachBotClientsToRoomOptions,
+  session: ConnectedBotClientSession | undefined,
+  connectionId: string,
+  gameId: string,
+  fallback: ChessBotFallback
+): void {
+  const game = options.getGame(gameId);
+  options.logEvent('chess_bot_stockfish_fallback', {
+    connection: shortLogId(connectionId),
+    errorType: fallback.error === undefined ? undefined : getLogErrorType(fallback.error),
+    game: gameId ? shortLogId(gameId) : undefined,
+    gameType: game?.gameType,
+    reason: fallback.reason,
+    user: session?.userId ? hashLogValue(session.userId) : undefined
+  }, 'warn');
+}
+
 function createBotClients(host: BotClientsHost): BotClients {
   return new BuiltInBotClients(host);
 }
@@ -125,6 +149,9 @@ class BuiltInBotClients implements BotClients {
       createComputerPlayer({
         getGame: host.getGame,
         onActionError: (gameId, error) => host.onActionError?.(COMPUTER_PLAYER_CONNECTION_ID, gameId, error),
+        onChessBotFallback: (gameId, fallback) => {
+          host.onChessBotFallback?.(COMPUTER_PLAYER_CONNECTION_ID, gameId, fallback);
+        },
         sendClientMessage: (message) => host.sendClientMessage(COMPUTER_PLAYER_CONNECTION_ID, message),
         waitUntil: host.waitUntil
       })

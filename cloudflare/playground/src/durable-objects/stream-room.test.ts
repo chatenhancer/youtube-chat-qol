@@ -20,6 +20,10 @@ import {
 import { ProtocolError } from '../protocol/validation';
 import type { DurableObjectState, DurableObjectStorage, Env } from '../types';
 
+vi.mock('../bots/stockfish', () => ({
+  getStockfishBestMove: vi.fn(() => Promise.resolve(null))
+}));
+
 interface TestSession {
   availableGames: Set<GameId>;
   challenge: string;
@@ -190,6 +194,43 @@ describe('playground stream room', () => {
       userId: COMPUTER_PLAYER_USER_ID
     });
     expect(room.createSnapshot(alice.userId).games.map((game) => game.gameId)).toEqual([startedChessGame.gameId]);
+  });
+
+  it('logs when the computer chess player falls back from Stockfish', async () => {
+    const harness = createRoomHarness();
+    const room = harness.room;
+    const alice = createSession('alice-connection');
+
+    vi.useFakeTimers();
+    try {
+      await room.handleHello(alice, await createHello(alice.challenge, 'Alice', ['chess']));
+      room.handleInvite(alice, 'chess', COMPUTER_PLAYER_USER_ID);
+      const gameId = lastMessage(alice, 'gameStarted').game.gameId;
+
+      room.handleGameAction(alice, gameId, {
+        action: 'move',
+        payload: {
+          from: 'e2',
+          to: 'e4'
+        },
+        userId: alice.userId
+      });
+
+      await vi.runOnlyPendingTimersAsync();
+      await harness.state.flushWaitUntil();
+    } finally {
+      vi.useRealTimers();
+    }
+
+    expect(console.warn).toHaveBeenCalledWith(
+      '[Chat Enhancer Playground] chess_bot_stockfish_fallback',
+      expect.objectContaining({
+        event: 'chess_bot_stockfish_fallback',
+        gameType: 'chess',
+        reason: 'stockfish_no_move',
+        service: 'chat-enhancer-playground'
+      })
+    );
   });
 
   it('submits Replay Trivia computer answers through normal game updates', async () => {
