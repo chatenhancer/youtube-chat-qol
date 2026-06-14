@@ -11,6 +11,7 @@ import type { PlaygroundClientState } from '../client';
 import {
   closeReplayTriviaGamePanel,
   getActiveReplayTriviaGameId,
+  getReplayTriviaGamePanelOverlay,
   isPublicReplayTriviaGame,
   isReplayTriviaGamePanelOpen,
   openReplayTriviaGamePanel,
@@ -29,6 +30,7 @@ export const replayTriviaGameAdapter: GamePanelAdapter = {
   },
   getActiveGameId: getActiveReplayTriviaGameId,
   getOpponentLabel: getReplayTriviaOpponentLabel,
+  getPanelOverlay: getReplayTriviaGamePanelOverlay,
   isGame: isPublicReplayTriviaGame,
   isPanelOpen: isReplayTriviaGamePanelOpen,
   openPanel: openReplayTriviaPanel,
@@ -58,11 +60,6 @@ function updateReplayTriviaPanel(nextState: PlaygroundClientState): void {
   const activeGameId = getActiveReplayTriviaGameId();
   if (!activeGameId || !nextState.userId) return;
 
-  if (nextState.endedGame?.gameId === activeGameId) {
-    closeReplayTriviaGamePanel({ notify: false });
-    return;
-  }
-
   const game = nextState.games.find((candidate) => candidate.gameId === activeGameId);
   if (isPublicReplayTriviaGame(game)) {
     updateReplayTriviaGamePanel(
@@ -71,8 +68,5 @@ function updateReplayTriviaPanel(nextState: PlaygroundClientState): void {
       nextState.replayTriviaGenerationTokens[activeGameId],
       nextState.error
     );
-    return;
   }
-
-  closeReplayTriviaGamePanel({ notify: false });
 }

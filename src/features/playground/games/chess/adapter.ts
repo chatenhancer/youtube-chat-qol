@@ -4,15 +4,14 @@
  * Translates the generic Games lobby contract into the chess panel API,
  * including move payloads sent to the Playground backend.
  */
-import { t } from '../../../../shared/i18n';
 import type { PublicGame } from '../../../../shared/playground-protocol';
 import {
   closeChessGamePanel,
   getActiveChessGameId,
+  getChessGamePanelOverlay,
   isChessGamePanelOpen,
   isPublicChessGame,
   openChessGamePanel,
-  showChessGameEndedNotice,
   updateChessGamePanel
 } from './panel';
 import { renderChessPreview } from './preview';
@@ -28,6 +27,7 @@ export const chessGameAdapter: GamePanelAdapter = {
   },
   getActiveGameId: getActiveChessGameId,
   getOpponentLabel: getChessOpponentLabel,
+  getPanelOverlay: getChessGamePanelOverlay,
   isGame: isPublicChessGame,
   isPanelOpen: isChessGamePanelOpen,
   openPanel: openChessPanel,
@@ -59,15 +59,6 @@ function openChessPanel(
 function updateChessPanel(nextState: PlaygroundClientState): void {
   const activeChessGameId = getActiveChessGameId();
   if (!activeChessGameId || !nextState.userId) return;
-
-  if (nextState.endedGame?.gameId === activeChessGameId) {
-    if (nextState.endedGame.userId === nextState.userId) {
-      closeChessGamePanel({ notify: false });
-    } else {
-      showChessGameEndedNotice(t('gamesOpponentLeft'));
-    }
-    return;
-  }
 
   const game = nextState.games.find((candidate) => candidate.gameId === activeChessGameId);
   if (isPublicChessGame(game)) {

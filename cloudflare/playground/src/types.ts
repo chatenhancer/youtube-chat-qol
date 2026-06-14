@@ -25,6 +25,7 @@ export interface DurableObjectStub {
 }
 
 export interface DurableObjectState {
+  blockConcurrencyWhile(callback: () => Promise<void> | void): void;
   id: DurableObjectId;
   storage: DurableObjectStorage;
   waitUntil(promise: Promise<unknown>): void;
@@ -32,6 +33,8 @@ export interface DurableObjectState {
 
 export interface DurableObjectStorage {
   deleteAll(): Promise<void>;
+  get<T = unknown>(key: string): Promise<T | undefined>;
+  put<T = unknown>(key: string, value: T): Promise<void>;
 }
 
 export interface ServerWebSocket extends WebSocket {

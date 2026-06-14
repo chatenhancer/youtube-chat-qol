@@ -5,7 +5,8 @@
  * creation stay in the computer player.
  */
 
-const STOCKFISH_SEARCH_DEPTH = 2;
+const STOCKFISH_ELO = 1350;
+const STOCKFISH_MOVE_TIME_MS = 200;
 const STOCKFISH_SEARCH_TIMEOUT_MS = 3_000;
 const STOCKFISH_STOP_TIMEOUT_MS = 1_000;
 
@@ -64,7 +65,7 @@ async function getStockfishMove(fen: string): Promise<StockfishMove | null> {
     bestMoveLine = await waitForStockfishLine(
       runtime,
       (line) => line.startsWith('bestmove '),
-      () => sendStockfishCommand(runtime.module, `go depth ${STOCKFISH_SEARCH_DEPTH}`, true),
+      () => sendStockfishCommand(runtime.module, `go movetime ${STOCKFISH_MOVE_TIME_MS}`, true),
       STOCKFISH_SEARCH_TIMEOUT_MS
     );
   } catch (error) {
@@ -119,6 +120,8 @@ async function createStockfishRuntime(): Promise<StockfishRuntime> {
   await waitForStockfishLine(runtime, (line) => line === 'uciok', () => {
     sendStockfishCommand(module, 'uci');
   });
+  sendStockfishCommand(module, 'setoption name UCI_LimitStrength value true');
+  sendStockfishCommand(module, `setoption name UCI_Elo value ${STOCKFISH_ELO}`);
   await waitForStockfishLine(runtime, (line) => line === 'readyok', () => {
     sendStockfishCommand(module, 'isready');
   });
