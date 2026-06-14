@@ -74,6 +74,7 @@ import type {
 
 const TROPHY_ICON_CROP: SourceRect = { drawOffsetY: 3, height: 48, width: 38, x: 28, y: 17 };
 const WRONG_ICON_CROP: SourceRect = { drawScale: 0.54, height: 31, width: 31, x: 23, y: 15 };
+const REPLAY_TRIVIA_SOUND_PATHS = [MESSAGE_SOUND_PATH, STAMP_SOUND_PATH] as const;
 
 let activeReplayTriviaPanel: ReplayTriviaGameState | null = null;
 let activeReplayTriviaFallback: ReplayTriviaFallbackState | null = null;
@@ -89,6 +90,7 @@ export function openReplayTriviaGamePanel(
   const listeners = new AbortController();
   const soundController = createGameSoundController({
     className: 'ytcq-replay-trivia-game-sound-toggle',
+    preloadPaths: REPLAY_TRIVIA_SOUND_PATHS,
     signal: listeners.signal
   });
   const { body, panel } = createGamePanelShell({
