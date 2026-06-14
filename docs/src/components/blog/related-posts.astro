@@ -1,0 +1,55 @@
+---
+import { Image } from 'astro:assets';
+import type { BlogPost } from '../../data/blog';
+import {
+  getBlogEntryFolder,
+  getBlogPostPath,
+  getRelatedBlogPosts
+} from '../../data/blog';
+import { getBlogCoverVideoUrl } from '../../data/blog-media';
+import { getMessages, htmlLangFor } from '../../data/locales';
+import type { Locale } from '../../data/locales';
+
+const { allPosts, locale, post } = Astro.props as {
+  allPosts: BlogPost[];
+  locale: Locale;
+  post: BlogPost;
+};
+
+const relatedPosts = getRelatedBlogPosts(allPosts, post, locale);
+const blog = getMessages(locale).blog;
+const formatter = new Intl.DateTimeFormat(htmlLangFor(locale), {
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric'
+});
+const BLOG_CARD_IMAGE_WIDTH = 960;
+---
+
+{relatedPosts.length > 0 && (
+  <section class="blog-related" aria-labelledby="blog-related-title">
+    <h2 id="blog-related-title">{blog.similarPosts}</h2>
+    <div class="latest-updates-grid blog-related-grid">
+      {relatedPosts.map((relatedPost) => {
+        const coverVideoUrl = getBlogCoverVideoUrl(getBlogEntryFolder(relatedPost), relatedPost.data.video);
+
+        return (
+          <a class="latest-update-card blog-related-card" href={getBlogPostPath(relatedPost)}>
+            <span class="latest-update-media">
+              {relatedPost.data.image && (coverVideoUrl ? (
+                <video src={coverVideoUrl} poster={relatedPost.data.image.src} autoplay muted loop playsinline preload="metadata" aria-hidden="true" />
+              ) : (
+                <Image src={relatedPost.data.image} alt="" width={BLOG_CARD_IMAGE_WIDTH} loading="lazy" decoding="async" />
+              ))}
+            </span>
+            <span class="latest-update-copy">
+              <time datetime={relatedPost.data.date.toISOString().slice(0, 10)}>{formatter.format(relatedPost.data.date)}</time>
+              <strong>{relatedPost.data.title}</strong>
+              <span>{relatedPost.data.description}</span>
+            </span>
+          </a>
+        );
+      })}
+    </div>
+  </section>
+)}

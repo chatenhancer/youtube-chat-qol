@@ -17,6 +17,15 @@
   "brand": {
     "homeAria": "Início do Chat Enhancer for YouTube"
   },
+  "blog": {
+    "archiveCopy": "Notas de versão e atualizações do projeto Chat Enhancer for YouTube.",
+    "backToUpdates": "Voltar para atualizações",
+    "latestNotes": "The Backlog",
+    "similarPosts": "A seguir",
+    "updates": "Atualizações",
+    "viewAllUpdates": "Ver todas as atualizações",
+    "editorCredit": "Editado com lepapier.app"
+  },
   "hero": {
     "eyebrow": "Extensão de navegador para o chat ao vivo do YouTube",
     "title": "Chat Enhancer for YouTube",

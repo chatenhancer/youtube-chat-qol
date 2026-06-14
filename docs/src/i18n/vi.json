@@ -17,6 +17,15 @@
   "brand": {
     "homeAria": "Trang chủ Chat Enhancer for YouTube"
   },
+  "blog": {
+    "archiveCopy": "Ghi chú phát hành và cập nhật dự án cho Chat Enhancer for YouTube.",
+    "backToUpdates": "Quay lại cập nhật",
+    "latestNotes": "The Backlog",
+    "similarPosts": "Tiếp theo",
+    "updates": "Cập nhật",
+    "viewAllUpdates": "Xem tất cả cập nhật",
+    "editorCredit": "Đã chỉnh sửa bằng lepapier.app"
+  },
   "hero": {
     "eyebrow": "Tiện ích trình duyệt cho chat trực tiếp trên YouTube",
     "title": "Chat Enhancer for YouTube",

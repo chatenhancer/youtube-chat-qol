@@ -17,6 +17,15 @@
   "brand": {
     "homeAria": "דף הבית של Chat Enhancer for YouTube"
   },
+  "blog": {
+    "archiveCopy": "הערות גרסה ועדכוני פרויקט עבור Chat Enhancer for YouTube.",
+    "backToUpdates": "חזרה לעדכונים",
+    "latestNotes": "The Backlog",
+    "similarPosts": "הבא בתור",
+    "updates": "עדכונים",
+    "viewAllUpdates": "הצגת כל העדכונים",
+    "editorCredit": "נערך באמצעות lepapier.app"
+  },
   "hero": {
     "eyebrow": "תוסף דפדפן לצ׳אט חי של YouTube",
     "title": "Chat Enhancer for YouTube",

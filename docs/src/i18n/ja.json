@@ -17,6 +17,15 @@
   "brand": {
     "homeAria": "Chat Enhancer for YouTube ホーム"
   },
+  "blog": {
+    "archiveCopy": "Chat Enhancer for YouTube のリリースノートとプロジェクト更新情報です。",
+    "backToUpdates": "更新情報に戻る",
+    "latestNotes": "The Backlog",
+    "similarPosts": "次はこちら",
+    "updates": "更新情報",
+    "viewAllUpdates": "すべての更新情報を見る",
+    "editorCredit": "lepapier.appで編集"
+  },
   "hero": {
     "eyebrow": "YouTube ライブチャット用ブラウザ拡張機能",
     "title": "Chat Enhancer for YouTube",

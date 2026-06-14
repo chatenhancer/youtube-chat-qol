@@ -17,6 +17,15 @@
   "brand": {
     "homeAria": "Chat Enhancer for YouTube होम"
   },
+  "blog": {
+    "archiveCopy": "Chat Enhancer for YouTube के रिलीज़ नोट्स और प्रोजेक्ट अपडेट।",
+    "backToUpdates": "अपडेट पर वापस जाएँ",
+    "latestNotes": "The Backlog",
+    "similarPosts": "आगे पढ़ें",
+    "updates": "अपडेट",
+    "viewAllUpdates": "सभी अपडेट देखें",
+    "editorCredit": "lepapier.app से संपादित"
+  },
   "hero": {
     "eyebrow": "YouTube लाइव चैट के लिए ब्राउजर एक्सटेंशन",
     "title": "Chat Enhancer for YouTube",

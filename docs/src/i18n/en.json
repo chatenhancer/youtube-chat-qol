@@ -17,6 +17,15 @@
   "brand": {
     "homeAria": "Chat Enhancer for YouTube home"
   },
+  "blog": {
+    "archiveCopy": "Release notes and project updates for Chat Enhancer for YouTube.",
+    "backToUpdates": "Back to updates",
+    "latestNotes": "The Backlog",
+    "similarPosts": "Next up",
+    "updates": "Updates",
+    "viewAllUpdates": "View all updates",
+    "editorCredit": "Edited with lepapier.app"
+  },
   "hero": {
     "eyebrow": "Browser extension for YouTube live chat",
     "title": "Chat Enhancer for YouTube",

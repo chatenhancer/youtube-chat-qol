@@ -1484,6 +1484,19 @@ h3 {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
 }
 
+.blog-related {
+  display: grid;
+  gap: 18px;
+  padding-top: 26px;
+  border-top: 1px solid var(--line);
+}
+
+.blog-related h2 {
+  margin: 0;
+  font-size: 28px;
+  line-height: 1.16;
+}
+
 .blog-brand-inline {
   display: inline-flex;
   align-items: center;
