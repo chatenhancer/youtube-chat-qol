@@ -1,11 +1,13 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { StreamRoom } from './stream-room';
 import type { PublicChessGame } from '../games/chess';
+import { COMPUTER_PLAYER_DISPLAY_NAME, COMPUTER_PLAYER_USER_ID } from '../bots/computer-player';
 import {
   createChallenge,
   createSignaturePayload,
   encodeBase64Url
 } from '../protocol/identity';
+import type { PublicReplayTriviaGame } from '../games/replay-trivia';
 import { TokenBucket } from '../rate-limit';
 import {
   PLAYGROUND_PROTOCOL_VERSION,
@@ -124,6 +126,64 @@ describe('playground stream room', () => {
 
     expect(room.createSnapshot(alice.userId).games).toHaveLength(1);
     expect(room.createSnapshot('other-user').games).toHaveLength(0);
+  });
+
+  it('exposes the computer as an available player and auto-starts computer games', async () => {
+    const room = createRoom();
+    const alice = createSession('alice-connection');
+
+    await room.handleHello(alice, await createHello(alice.challenge, 'Alice', ['chess']));
+    const computerPresence = getPresenceUser(room, alice.userId, COMPUTER_PLAYER_USER_ID);
+    expect(computerPresence).toMatchObject({
+      availableGames: ['chess', 'replay-trivia'],
+      displayName: COMPUTER_PLAYER_DISPLAY_NAME,
+      userId: COMPUTER_PLAYER_USER_ID
+    });
+
+    room.handleInvite(alice, 'chess', COMPUTER_PLAYER_USER_ID);
+
+    expect(lastMessage(alice, 'inviteUpdated').invite.status).toBe('accepted');
+    const startedChessGame = lastMessage(alice, 'gameStarted').game as PublicChessGame;
+    expect(startedChessGame.players.white.userId).toBe(alice.userId);
+    expect(startedChessGame.players.black).toEqual({
+      displayName: COMPUTER_PLAYER_DISPLAY_NAME,
+      userId: COMPUTER_PLAYER_USER_ID
+    });
+    expect(room.createSnapshot(alice.userId).games.map((game) => game.gameId)).toEqual([startedChessGame.gameId]);
+  });
+
+  it('submits Replay Trivia computer answers through normal game updates', async () => {
+    const room = createRoom();
+    const alice = createSession('alice-connection');
+    const now = Date.now();
+
+    vi.useFakeTimers();
+    vi.setSystemTime(now);
+    try {
+      await room.handleHello(alice, await createHello(alice.challenge, 'Alice', ['replay-trivia']));
+      room.handleInvite(alice, 'replay-trivia', COMPUTER_PLAYER_USER_ID);
+      const gameId = lastMessage(alice, 'gameStarted').game.gameId;
+
+      room.handleGameAction(alice, gameId, {
+        action: 'submitQuestions',
+        payload: { questions: [createReplayTriviaQuestion()] },
+        userId: alice.userId
+      });
+      vi.setSystemTime(now + 3_000);
+      room.handleGameAction(alice, gameId, {
+        action: 'advance',
+        userId: alice.userId
+      });
+
+      await vi.runOnlyPendingTimersAsync();
+      await Promise.resolve();
+    } finally {
+      vi.useRealTimers();
+    }
+
+    const updatedTriviaGame = lastMessage(alice, 'gameUpdated').game as PublicReplayTriviaGame;
+    expect(updatedTriviaGame.status).toBe('question');
+    expect(updatedTriviaGame.answers.guest).toEqual({ answered: true });
   });
 
   it('mints one-use Replay Trivia generation tokens for the question provider', async () => {
@@ -444,6 +504,18 @@ function consumeGenerationToken(room: PrivateStreamRoom, gameId: string, generat
     },
     method: 'POST'
   }));
+}
+
+function createReplayTriviaQuestion() {
+  return {
+    choices: ['God of War', 'Celeste', 'Monster Hunter', 'Red Dead Redemption 2'],
+    correctChoiceIndex: 0,
+    friendIntro: 'chat emergency, who won Game of the Year here?',
+    id: 'q_1',
+    prompt: 'Which game won Game of the Year in this segment?',
+    rightReply: 'wow, you knew the trophy one.',
+    wrongReply: 'you missed it. it was God of War.'
+  };
 }
 
 async function createHello(

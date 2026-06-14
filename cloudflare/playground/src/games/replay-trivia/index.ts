@@ -19,13 +19,14 @@ type ChoiceIndex = 0 | 1 | 2 | 3;
 type PlayerRole = 'guest' | 'host';
 
 const COUNTDOWN_MS = 3_000;
-const QUESTION_READ_MS = 2_900;
-const ANSWER_TIME_MS = 9_000;
 const REVEAL_MS = 4_300;
 const SCORE_MS = 2_200;
 const GENERATION_TOKEN_TTL_MS = 2 * 60 * 1000;
 const MIN_QUESTIONS = 1;
 const MAX_QUESTIONS = 10;
+
+export const REPLAY_TRIVIA_QUESTION_READ_MS = 2_900;
+export const REPLAY_TRIVIA_ANSWER_TIME_MS = 9_000;
 
 export interface PublicReplayTriviaGame extends PublicGame {
   answers: Partial<Record<PlayerRole, ReplayTriviaPublicAnswer>>;
@@ -409,7 +410,7 @@ function getReplayTriviaWinnerUserId(game: ReplayTriviaGameRecord): string | nul
 }
 
 function isQuestionDeadlinePassed(game: ReplayTriviaGameRecord, now: number): boolean {
-  return now - game.phaseStartedAt >= QUESTION_READ_MS + ANSWER_TIME_MS;
+  return now - game.phaseStartedAt >= REPLAY_TRIVIA_QUESTION_READ_MS + REPLAY_TRIVIA_ANSWER_TIME_MS;
 }
 
 function shouldRevealAnswers(status: ReplayTriviaGameStatus): boolean {

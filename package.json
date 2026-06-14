@@ -3,6 +3,12 @@
   "version": "0.14.2",
   "private": true,
   "license": "GPL-3.0-or-later",
+  "browser": {
+    "fs": false,
+    "path": false,
+    "readline": false,
+    "worker_threads": false
+  },
   "type": "module",
   "scripts": {
     "build": "node scripts/build.mjs --all",
@@ -69,6 +75,7 @@
     "vitest": "^4.1.7"
   },
   "dependencies": {
-    "chess.js": "^1.4.0"
+    "chess.js": "^1.4.0",
+    "stockfish": "^18.0.7"
   }
 }
