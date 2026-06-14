@@ -8,6 +8,7 @@
 import type { MessageKey } from '../../../shared/i18n';
 import type { GameId, PublicGame } from '../../../shared/playground-protocol';
 import type { PlaygroundClientState } from './client';
+import type { GamePanelOverlay } from './panel-feedback';
 
 export interface GameDefinition {
   disabledReasonKey?: MessageKey;
@@ -24,6 +25,7 @@ export interface GamePanelAdapter {
   definition: GameDefinition;
   getActiveGameId: () => string;
   getOpponentLabel: (game: PublicGame, currentUserId: string) => string;
+  getPanelOverlay: () => GamePanelOverlay | null;
   isGame: (game: PublicGame | undefined) => boolean;
   isPanelOpen: () => boolean;
   openPanel: (

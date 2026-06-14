@@ -1,4 +1,5 @@
 import type { GameSoundController } from '../sound';
+import type { GamePanelStatusOverlay } from '../panel-feedback';
 import type { PublicGame, PublicUserIdentity } from '../../../../shared/playground-protocol';
 import type {
   ReplayTriviaGenerationToken,
@@ -118,6 +119,7 @@ export interface ReplayTriviaGameState {
   sentActionIds: Set<string>;
   selectedAt: number | null;
   soundController: GameSoundController;
+  statusOverlay: GamePanelStatusOverlay;
   userAnswerIndex: number | null;
   userScore: number;
 }

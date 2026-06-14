@@ -13,7 +13,8 @@ import {
   createGamePanelStatusOverlay,
   showGamePanelFeedbackBubble,
   type GamePanelStatusMessage,
-  type GamePanelStatusOverlay
+  type GamePanelStatusOverlay,
+  toGamePanelStatusMessage
 } from '../panel-feedback';
 import { createGamePanelShell } from '../panel-shell';
 import { createGameSoundController, type GameSoundController } from '../sound';
@@ -183,18 +184,6 @@ export function updateChessGamePanel(game: PublicChessGame, currentUserId: strin
   if (moveSoundPath) activeChessGamePanel.soundController.play(moveSoundPath);
 }
 
-export function showChessGameEndedNotice(message: string): void {
-  if (!activeChessGamePanel) return;
-  activeChessGamePanel.selectedSquare = null;
-  activeChessGamePanel.hoverSquare = null;
-  showChessStatusMessage({
-    key: `ended:${message}`,
-    message,
-    temporary: false
-  });
-  renderChessBoard();
-}
-
 export function closeChessGamePanel({ notify = true }: { notify?: boolean } = {}): void {
   const onVisibilityChanged = activeChessGamePanel?.onVisibilityChanged || null;
   activeChessGamePanel?.statusOverlay.clear();
@@ -212,6 +201,10 @@ export function getActiveChessGameId(): string {
   return activeChessGamePanel?.game.gameId || '';
 }
 
+export function getChessGamePanelOverlay(): GamePanelStatusOverlay | null {
+  return activeChessGamePanel?.statusOverlay || null;
+}
+
 export function isPublicChessGame(game: PublicGame | undefined): game is PublicChessGame {
   return Boolean(game) &&
     game?.gameType === 'chess' &&
@@ -222,7 +215,7 @@ export function isPublicChessGame(game: PublicGame | undefined): game is PublicC
 
 function handleChessCanvasClick(event: MouseEvent): void {
   if (!activeChessGamePanel || activeChessGamePanel.game.status !== 'active') return;
-  if (!activeChessGamePanel.statusOverlay.element.hidden && activeChessGamePanel.statusOverlay.element.dataset.temporary !== 'true') return;
+  if (activeChessGamePanel.statusOverlay.isBlocking()) return;
 
   const square = getChessCanvasSquare(event);
   if (!square) return;
@@ -303,11 +296,11 @@ function showChessStatusMessage({
   temporary
 }: GamePanelStatusMessage): void {
   if (!activeChessGamePanel) return;
-  activeChessGamePanel.statusOverlay.show({ key, message, temporary });
+  activeChessGamePanel.statusOverlay.show(toGamePanelStatusMessage({ key, message, temporary }));
 }
 
 function clearChessStatusMessage({ resetKey = false }: { resetKey?: boolean } = {}): void {
-  activeChessGamePanel?.statusOverlay.clear({ resetKey });
+  activeChessGamePanel?.statusOverlay.clear({ owner: 'game', resetKey });
 }
 
 function getChessGameStatusMessage(game: PublicChessGame): GamePanelStatusMessage | null {
@@ -362,6 +355,13 @@ function getFenPieceCount(fen: string): number {
 
 function handleChessCanvasMouseMove(event: MouseEvent): void {
   if (!activeChessGamePanel) return;
+  if (activeChessGamePanel.statusOverlay.isBlocking()) {
+    if (!activeChessGamePanel.hoverSquare) return;
+
+    activeChessGamePanel.hoverSquare = null;
+    renderChessBoard();
+    return;
+  }
 
   const nextHover = getChessCanvasSquare(event);
 

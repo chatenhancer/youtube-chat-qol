@@ -96,7 +96,63 @@ export function openSupportedGamePanel(
 }
 
 export function updateOpenGamePanel(nextState: PlaygroundClientState): void {
-  GAME_ADAPTER_LIST.forEach((adapter) => adapter.updatePanel(nextState));
+  const adapter = getActiveGameAdapter();
+  if (!adapter) return;
+
+  const activeGameId = adapter.getActiveGameId();
+  if (!activeGameId) return;
+
+  const overlay = adapter.getPanelOverlay();
+  if (nextState.status === 'connecting') {
+    overlay?.show({
+      key: `connection:reconnecting:${activeGameId}`,
+      message: t('gamesConnectionLost'),
+      owner: 'system',
+      temporary: false
+    });
+    return;
+  }
+
+  if (nextState.status === 'disconnected') {
+    overlay?.show({
+      key: `connection:failed:${activeGameId}`,
+      message: t('gamesReconnectFailed'),
+      owner: 'system',
+      temporary: false
+    });
+    return;
+  }
+
+  if (nextState.endedGame?.gameId === activeGameId) {
+    if (nextState.endedGame.userId === nextState.userId) {
+      adapter.closePanel({ notify: false });
+      return;
+    }
+
+    overlay?.show({
+      key: `game-ended:opponent-left:${activeGameId}`,
+      message: t('gamesOpponentLeft'),
+      owner: 'system',
+      temporary: false
+    });
+    return;
+  }
+
+  const game = nextState.games.find((candidate) => candidate.gameId === activeGameId);
+  if (!game || !adapter.isGame(game)) {
+    if (overlay?.has({ keyPrefix: 'game-ended:', owner: 'system' })) return;
+
+    overlay?.show({
+      key: `game-unavailable:${activeGameId}`,
+      message: t('gamesGameCouldNotRestore'),
+      owner: 'system',
+      temporary: false
+    });
+    return;
+  }
+
+  overlay?.clear({ owner: 'system' });
+  adapter.updatePanel(nextState);
 }
 
 function getGameAdapter(game: PublicGame | undefined): GamePanelAdapter | null {

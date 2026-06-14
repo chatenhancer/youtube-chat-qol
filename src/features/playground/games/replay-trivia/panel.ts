@@ -9,6 +9,8 @@ import { createGamesIcon } from '../../../../shared/icons';
 import { ytcqCreateElement } from '../../../../shared/managed-dom';
 import type { ReplayTriviaGenerationToken, ReplayTriviaQuestion } from '../../../../shared/playground-trivia';
 import { createGamePanelShell } from '../panel-shell';
+import { createGamePanelStatusOverlay } from '../panel-feedback';
+import type { GamePanelStatusOverlay } from '../panel-feedback';
 import { createGameSoundController } from '../sound';
 import { generateReplayTriviaQuestions } from './client';
 import { EMPTY_REPLAY_TRIVIA_ASSETS, getReplayTriviaAssets } from './assets';
@@ -106,7 +108,10 @@ export function openReplayTriviaGamePanel(
   canvas.setAttribute('aria-label', GAME_TITLE);
   canvas.setAttribute('role', 'application');
   canvas.tabIndex = 0;
-  body.append(canvas);
+  const statusOverlay = createGamePanelStatusOverlay({
+    classNamePrefix: 'ytcq-replay-trivia-game'
+  });
+  body.append(canvas, statusOverlay.element);
 
   let context: CanvasRenderingContext2D | null = null;
   try {
@@ -158,6 +163,7 @@ export function openReplayTriviaGamePanel(
     sentActionIds: new Set<string>(),
     selectedAt: null,
     soundController,
+    statusOverlay,
     userAnswerIndex: null,
     userScore: getReplayTriviaRoleScore(game, getCurrentUserRole(game, currentUserId))
   };
@@ -194,6 +200,7 @@ export function closeReplayTriviaGamePanel({ notify = true }: { notify?: boolean
   if (!state) return;
 
   if (state.frameId !== null) cancelScheduledFrame(state.frameId);
+  state.statusOverlay.clear();
   state.listeners.abort();
   state.panel.remove();
   activeReplayTriviaPanel = null;
@@ -208,6 +215,10 @@ export function getActiveReplayTriviaGameId(): string {
   return activeReplayTriviaPanel?.game.gameId || '';
 }
 
+export function getReplayTriviaGamePanelOverlay(): GamePanelStatusOverlay | null {
+  return activeReplayTriviaPanel?.statusOverlay || null;
+}
+
 export function updateReplayTriviaGamePanel(
   game: PublicReplayTriviaGame,
   currentUserId: string,
@@ -220,6 +231,7 @@ export function updateReplayTriviaGamePanel(
     generationToken,
     preparationError
   });
+  activeReplayTriviaPanel.statusOverlay.clear({ owner: 'game', resetKey: true });
   maybeGenerateReplayTriviaQuestions(activeReplayTriviaPanel);
   renderReplayTriviaGame(getNow());
 }
@@ -439,6 +451,7 @@ function playTimedSound(
 function handleReplayTriviaCanvasClick(event: MouseEvent): void {
   const state = activeReplayTriviaPanel;
   if (!state) return;
+  if (hasPersistentReplayTriviaStatus(state)) return;
 
   const point = getCanvasPoint(state.canvas, event);
   if (state.phase === 'finished') {
@@ -462,6 +475,7 @@ function handleReplayTriviaCanvasClick(event: MouseEvent): void {
 function handleReplayTriviaCanvasKeydown(event: KeyboardEvent): void {
   const state = activeReplayTriviaPanel;
   if (!state) return;
+  if (hasPersistentReplayTriviaStatus(state)) return;
 
   if (state.phase === 'finished' && (event.key === 'Enter' || event.key === ' ')) {
     event.preventDefault();
@@ -481,9 +495,19 @@ function handleReplayTriviaCanvasKeydown(event: KeyboardEvent): void {
   renderReplayTriviaGame(getNow());
 }
 
+function hasPersistentReplayTriviaStatus(state: ReplayTriviaGameState): boolean {
+  return state.statusOverlay.isBlocking();
+}
+
 function handleReplayTriviaCanvasMouseMove(event: MouseEvent): void {
   const state = activeReplayTriviaPanel;
   if (!state) return;
+  if (hasPersistentReplayTriviaStatus(state)) {
+    state.hoveredAnswerIndex = null;
+    state.hoveredCloseButton = false;
+    state.canvas.style.cursor = 'default';
+    return;
+  }
 
   const point = getCanvasPoint(state.canvas, event);
   if (state.phase === 'finished') {

@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   closeReplayTriviaGamePanel,
+  getReplayTriviaGamePanelOverlay,
   openReplayTriviaGamePanel,
   updateReplayTriviaGamePanel
 } from './panel';
@@ -70,6 +71,44 @@ describe('Replay Trivia panel', () => {
     const drawnText = context.fillText.mock.calls.map(([text]) => String(text)).join(' ');
     expect(drawnText).toContain('Could not prepare trivia.');
     expect(drawnText).toContain('Close this game and start a new match.');
+  });
+
+  it('exposes the shared overlay with system priority', () => {
+    openReplayTriviaGamePanel(
+      createReplayTriviaGame(),
+      'host-user',
+      vi.fn()
+    );
+
+    const overlay = getReplayTriviaGamePanelOverlay();
+    overlay?.show({
+      key: 'connection:reconnecting',
+      message: 'Connection lost. Trying to reconnect...',
+      owner: 'system',
+      temporary: false
+    });
+
+    const status = document.querySelector<HTMLElement>('.ytcq-replay-trivia-game-status');
+    expect(status?.textContent).toBe('Connection lost. Trying to reconnect...');
+    expect(status?.hidden).toBe(false);
+
+    overlay?.show({
+      key: 'game:loading',
+      message: 'Preparing next question...',
+      owner: 'game',
+      temporary: false
+    });
+
+    expect(status?.textContent).toBe('Connection lost. Trying to reconnect...');
+    expect(status?.hidden).toBe(false);
+
+    overlay?.clear({ owner: 'system' });
+    expect(status?.textContent).toBe('Preparing next question...');
+
+    updateReplayTriviaGamePanel(createReplayTriviaGame(), 'host-user');
+
+    expect(status?.textContent).toBe('');
+    expect(status?.hidden).toBe(true);
   });
 });
 

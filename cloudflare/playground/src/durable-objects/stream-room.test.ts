@@ -18,7 +18,7 @@ import {
   type SignedClientIdentity
 } from '../protocol/messages';
 import { ProtocolError } from '../protocol/validation';
-import type { DurableObjectState, Env } from '../types';
+import type { DurableObjectState, DurableObjectStorage, Env } from '../types';
 
 interface TestSession {
   availableGames: Set<GameId>;
@@ -60,6 +60,46 @@ class FakeSocket {
 
   send(data: string): void {
     this.messages.push(JSON.parse(data) as ServerMessage);
+  }
+}
+
+class FakeDurableObjectStorage implements DurableObjectStorage {
+  private readonly records = new Map<string, unknown>();
+
+  async deleteAll(): Promise<void> {
+    this.records.clear();
+  }
+
+  async get<T = unknown>(key: string): Promise<T | undefined> {
+    return cloneStoredValue(this.records.get(key)) as T | undefined;
+  }
+
+  async put<T = unknown>(key: string, value: T): Promise<void> {
+    this.records.set(key, cloneStoredValue(value));
+  }
+}
+
+class FakeDurableObjectState implements DurableObjectState {
+  readonly id = {
+    toString: () => 'stream-room-id'
+  };
+
+  private readonly pending: Promise<unknown>[] = [];
+
+  constructor(readonly storage: FakeDurableObjectStorage) {}
+
+  blockConcurrencyWhile(callback: () => Promise<void> | void): void {
+    this.waitUntil(Promise.resolve(callback()));
+  }
+
+  waitUntil(promise: Promise<unknown>): void {
+    this.pending.push(promise);
+  }
+
+  async flushWaitUntil(): Promise<void> {
+    while (this.pending.length > 0) {
+      await Promise.all(this.pending.splice(0));
+    }
   }
 }
 
@@ -269,6 +309,73 @@ describe('playground stream room', () => {
     expect(room.createSnapshot(alice.userId).games.map((game) => game.gameId)).toEqual([gameId]);
   });
 
+  it('restores active games from Durable Object storage after restart', async () => {
+    const storage = new FakeDurableObjectStorage();
+    const first = createRoomHarness(storage);
+    const room = first.room;
+    const alice = createSession('alice-connection');
+    const bob = createSession('bob-connection');
+    const aliceKeyPair = await createIdentityKeyPair();
+    const bobKeyPair = await createIdentityKeyPair();
+
+    await room.handleHello(alice, await createHello(alice.challenge, 'Alice', ['chess'], aliceKeyPair));
+    await room.handleHello(bob, await createHello(bob.challenge, 'Bob', ['chess'], bobKeyPair));
+    room.handleInvite(alice, 'chess', bob.userId);
+    room.handleInviteResponse(bob, lastMessage(bob, 'inviteReceived').invite.inviteId, true);
+    const gameId = lastMessage(alice, 'gameStarted').game.gameId;
+    await first.state.flushWaitUntil();
+
+    const restarted = createRoomHarness(storage);
+    await restarted.state.flushWaitUntil();
+    const reconnectedAlice = createSession('alice-reconnected');
+    await restarted.room.handleHello(
+      reconnectedAlice,
+      await createHello(reconnectedAlice.challenge, 'Alice', ['chess'], aliceKeyPair)
+    );
+
+    expect(lastMessage(reconnectedAlice, 'helloAccepted').snapshot.games.map((game) => game.gameId)).toEqual([gameId]);
+
+    restarted.room.handleGameAction(reconnectedAlice, gameId, {
+      action: 'move',
+      payload: {
+        from: 'e2',
+        to: 'e4'
+      },
+      userId: reconnectedAlice.userId
+    });
+
+    const updatedChessGame = lastMessage(reconnectedAlice, 'gameUpdated').game as PublicChessGame;
+    expect(updatedChessGame.lastMoveSan).toBe('e4');
+  });
+
+  it('restores active computer games from Durable Object storage after restart', async () => {
+    const storage = new FakeDurableObjectStorage();
+    const first = createRoomHarness(storage);
+    const room = first.room;
+    const alice = createSession('alice-connection');
+    const aliceKeyPair = await createIdentityKeyPair();
+
+    await room.handleHello(alice, await createHello(alice.challenge, 'Alice', ['chess'], aliceKeyPair));
+    room.handleInvite(alice, 'chess', COMPUTER_PLAYER_USER_ID);
+    const gameId = lastMessage(alice, 'gameStarted').game.gameId;
+    await first.state.flushWaitUntil();
+
+    const restarted = createRoomHarness(storage);
+    await restarted.state.flushWaitUntil();
+    const reconnectedAlice = createSession('alice-reconnected');
+    await restarted.room.handleHello(
+      reconnectedAlice,
+      await createHello(reconnectedAlice.challenge, 'Alice', ['chess'], aliceKeyPair)
+    );
+
+    const restoredGame = lastMessage(reconnectedAlice, 'helloAccepted').snapshot.games[0] as PublicChessGame;
+    expect(restoredGame.gameId).toBe(gameId);
+    expect(restoredGame.players.black).toEqual({
+      displayName: COMPUTER_PLAYER_DISPLAY_NAME,
+      userId: COMPUTER_PLAYER_USER_ID
+    });
+  });
+
   it('destroys an active game when a player explicitly leaves', async () => {
     const room = createRoom();
     const alice = createSession('alice-connection');
@@ -463,17 +570,23 @@ describe('playground stream room', () => {
 });
 
 function createRoom(): PrivateStreamRoom {
-  const state: DurableObjectState = {
-    id: {
-      toString: () => 'stream-room-id'
-    },
-    storage: {
-      deleteAll: async () => undefined
-    },
-    waitUntil: () => undefined
-  };
+  return createRoomHarness().room;
+}
+
+function createRoomHarness(storage = new FakeDurableObjectStorage()): {
+  room: PrivateStreamRoom;
+  state: FakeDurableObjectState;
+} {
+  const state = new FakeDurableObjectState(storage);
   const env = {} as Env;
-  return new StreamRoom(state, env) as unknown as PrivateStreamRoom;
+  return {
+    room: new StreamRoom(state, env) as unknown as PrivateStreamRoom,
+    state
+  };
+}
+
+function cloneStoredValue<T>(value: T): T {
+  return value === undefined ? value : JSON.parse(JSON.stringify(value)) as T;
 }
 
 function createSession(connectionId: string): TestSession {

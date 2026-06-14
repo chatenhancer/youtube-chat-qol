@@ -353,6 +353,83 @@ describe('playground games header button', () => {
     expect(document.querySelector('.ytcq-games-active-row')).toBeNull();
   });
 
+  it('shows active chess games as the backend connection state changes', () => {
+    const header = createHeader();
+    document.body.append(header);
+    setOptions({ ...DEFAULT_OPTIONS, playgroundEnabled: true, playgroundGamesAvailable: true });
+
+    wireGamesButton();
+    header.querySelector<HTMLButtonElement>('.ytcq-games-button')!.click();
+    lastMockPort()?.emit(createSnapshotMessage(createLobbySnapshot()));
+    getActionButton('Accept').click();
+    lastMockPort()?.emit({
+      message: {
+        game: createChessGame(),
+        type: 'gameStarted'
+      },
+      type: 'ytcq:playground:server-message'
+    });
+
+    expect(document.querySelector('.ytcq-chess-game-panel')).not.toBeNull();
+
+    lastMockPort()?.emit({
+      error: 'Playground connection failed.',
+      status: 'connecting',
+      type: 'ytcq:playground:status'
+    });
+
+    const status = document.querySelector<HTMLElement>('.ytcq-chess-game-status');
+    expect(status?.textContent).toBe('Connection lost. Trying to reconnect...');
+    expect(status?.hidden).toBe(false);
+
+    lastMockPort()?.emit({
+      error: 'Playground connection failed.',
+      status: 'disconnected',
+      type: 'ytcq:playground:status'
+    });
+
+    expect(status?.textContent).toBe('Could not reconnect. Open Games to try again.');
+    expect(status?.hidden).toBe(false);
+
+    lastMockPort()?.emit(createSnapshotMessage({
+      ...createLobbySnapshot(),
+      games: [createChessGame()]
+    }));
+
+    expect(status?.hidden).toBe(true);
+    expect(status?.textContent).toBe('');
+  });
+
+  it('shows when an active chess game cannot be restored after reconnecting', () => {
+    const header = createHeader();
+    document.body.append(header);
+    setOptions({ ...DEFAULT_OPTIONS, playgroundEnabled: true, playgroundGamesAvailable: true });
+
+    wireGamesButton();
+    const gamesButton = header.querySelector<HTMLButtonElement>('.ytcq-games-button')!;
+    gamesButton.click();
+    lastMockPort()?.emit(createSnapshotMessage(createLobbySnapshot()));
+    getActionButton('Accept').click();
+    lastMockPort()?.emit({
+      message: {
+        game: createChessGame(),
+        type: 'gameStarted'
+      },
+      type: 'ytcq:playground:server-message'
+    });
+
+    lastMockPort()?.emit(createSnapshotMessage({
+      ...createLobbySnapshot(),
+      games: []
+    }));
+
+    expect(document.querySelector('.ytcq-chess-game-panel')).not.toBeNull();
+    expect(document.querySelector('.ytcq-chess-game-status')?.textContent).toBe('This game could not be restored.');
+
+    gamesButton.click();
+    expect(document.querySelector('.ytcq-games-active-row')).toBeNull();
+  });
+
   it('shows a reconnect notice when the games backend is unavailable', () => {
     const header = createHeader();
     document.body.append(header);

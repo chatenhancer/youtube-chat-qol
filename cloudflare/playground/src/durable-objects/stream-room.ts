@@ -31,6 +31,7 @@ import type { DurableObjectState, Env, ServerWebSocket } from '../types';
 const INVITE_TTL_MS = 2 * 60 * 1000;
 const MAX_MESSAGE_BYTES = 32_768;
 const CLOSE_POLICY_VIOLATION = 1008;
+const ROOM_STATE_STORAGE_KEY = 'roomState:v1';
 const CONNECTION_RATE_LIMIT: TokenBucketOptions = {
   capacity: 30,
   refillPerSecond: 10
@@ -83,6 +84,10 @@ interface GenerationTokenRecord {
   userId: string;
 }
 
+interface StoredRoomState {
+  games: unknown[];
+}
+
 export class StreamRoom {
   private readonly clients = new Map<string, ClientSession>();
   private readonly generationTokens = new Map<string, GenerationTokenRecord>();
@@ -92,9 +97,17 @@ export class StreamRoom {
   private readonly games = new Map<string, GameRecord>();
   private readonly userAvailableGames = new Map<string, GameId[]>();
   private readonly userRateLimits = new Map<string, TokenBucket>();
+  private storageWriteQueue: Promise<unknown> = Promise.resolve();
   private streamKey = '';
 
   constructor(private readonly state: DurableObjectState, _env: Env) {
+    this.state.blockConcurrencyWhile(async () => {
+      await this.loadStoredRoomState();
+      this.attachBotClients();
+    });
+  }
+
+  private attachBotClients(): void {
     attachBotClientsToRoom({
       clients: this.clients,
       connectionRateLimitOptions: CONNECTION_RATE_LIMIT,
@@ -314,6 +327,7 @@ export class StreamRoom {
 
     const game = getGameModule(invite.gameId).createGame(createId('game'), [invite.fromUserId, invite.toUserId]);
     this.games.set(game.gameId, game);
+    this.queueStoredRoomStateWrite();
     this.logEvent('game_started', {
       game: shortLogId(game.gameId),
       gameType: game.gameType,
@@ -346,6 +360,7 @@ export class StreamRoom {
 
     const nextGame = getGameModuleForRecord(game).applyAction(game, action);
     this.games.set(gameId, nextGame);
+    this.queueStoredRoomStateWrite();
     if (game.status !== nextGame.status && isTerminalGameStatus(nextGame.status)) {
       this.logEvent('game_ended', {
         game: shortLogId(nextGame.gameId),
@@ -363,6 +378,7 @@ export class StreamRoom {
     }
 
     this.games.delete(game.gameId);
+    this.queueStoredRoomStateWrite();
     this.logEvent('game_ended', {
       game: shortLogId(game.gameId),
       gameType: game.gameType,
@@ -529,6 +545,51 @@ export class StreamRoom {
         .map((invite) => this.toPublicInvite(invite)),
       users: this.getPresenceUsers()
     };
+  }
+
+  private async loadStoredRoomState(): Promise<void> {
+    let stored: unknown;
+    try {
+      stored = await this.state.storage.get<StoredRoomState>(ROOM_STATE_STORAGE_KEY);
+    } catch {
+      this.logEvent('room_state_restore_failed', {}, 'warn');
+      return;
+    }
+
+    if (!isStoredRoomState(stored)) return;
+
+    stored.games.forEach((game) => {
+      if (!isSupportedStoredGame(game)) {
+        this.logEvent('stored_game_ignored', {
+          game: isRecord(game) && typeof game.gameId === 'string' ? shortLogId(game.gameId) : undefined
+        }, 'warn');
+        return;
+      }
+
+      this.games.set(game.gameId, game);
+    });
+
+    if (this.games.size > 0) {
+      this.logEvent('room_state_restored', {
+        gameCount: this.games.size
+      });
+    }
+  }
+
+  private queueStoredRoomStateWrite(): void {
+    const write = this.storageWriteQueue
+      .then(() => this.writeStoredRoomState())
+      .catch(() => {
+        this.logEvent('room_state_persist_failed', {}, 'warn');
+      });
+    this.storageWriteQueue = write.catch(() => undefined);
+    this.state.waitUntil(write);
+  }
+
+  private async writeStoredRoomState(): Promise<void> {
+    await this.state.storage.put(ROOM_STATE_STORAGE_KEY, {
+      games: [...this.games.values()]
+    } satisfies StoredRoomState);
   }
 
   private broadcastPresence(): void {
@@ -722,6 +783,24 @@ function isTerminalGameStatus(status: string): boolean {
     status === 'draw' ||
     status === 'finished' ||
     status === 'resigned';
+}
+
+function isStoredRoomState(value: unknown): value is StoredRoomState {
+  return isRecord(value) && Array.isArray(value.games);
+}
+
+function isSupportedStoredGame(value: unknown): value is GameRecord {
+  if (!isRecord(value)) return false;
+  if (typeof value.gameId !== 'string' || typeof value.gameType !== 'string' || typeof value.status !== 'string') {
+    return false;
+  }
+
+  try {
+    getGameModuleForRecord(value as unknown as GameRecord);
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
