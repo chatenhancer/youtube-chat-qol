@@ -17,6 +17,15 @@
   "brand": {
     "homeAria": "خانه Chat Enhancer for YouTube"
   },
+  "blog": {
+    "archiveCopy": "یادداشت‌های انتشار و به‌روزرسانی‌های پروژه Chat Enhancer for YouTube.",
+    "backToUpdates": "بازگشت به به‌روزرسانی‌ها",
+    "latestNotes": "The Backlog",
+    "similarPosts": "بعدی",
+    "updates": "به‌روزرسانی‌ها",
+    "viewAllUpdates": "مشاهده همه به‌روزرسانی‌ها",
+    "editorCredit": "ویرایش‌شده با lepapier.app"
+  },
   "hero": {
     "eyebrow": "افزونه مرورگر برای چت زنده YouTube",
     "title": "Chat Enhancer for YouTube",

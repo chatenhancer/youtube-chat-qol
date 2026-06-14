@@ -1,9 +1,9 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import { Image } from 'astro:assets';
-import { getBlogEntryFolder, getBlogIndexPath, getBlogMessages, getBlogPostPath } from '../../data/blog';
+import { getBlogEntryFolder, getBlogIndexPath, getBlogPostPath } from '../../data/blog';
 import { getBlogCoverVideoUrl } from '../../data/blog-media';
-import { htmlLangFor } from '../../data/locales';
+import { getMessages, htmlLangFor } from '../../data/locales';
 import type { Locale } from '../../data/locales';
 
 const { locale, posts } = Astro.props as {
@@ -12,7 +12,7 @@ const { locale, posts } = Astro.props as {
 };
 
 const latestPosts = posts.slice(0, 3);
-const blog = getBlogMessages(locale);
+const blog = getMessages(locale).blog;
 const formatter = new Intl.DateTimeFormat(htmlLangFor(locale), {
   day: 'numeric',
   month: 'short',

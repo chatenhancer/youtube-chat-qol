@@ -21,6 +21,7 @@
     "docs:screenshots": "npm run docs:build && node scripts/generate-dom-screenshots.mjs",
     "docs:playground-cover": "node scripts/generate-playground-blog-cover.mjs",
     "docs:dev": "astro dev --config astro.docs.config.mjs --force",
+    "docs:check": "astro check --config astro.docs.config.mjs",
     "docs:build": "node scripts/validate-docs-locales.mjs && astro build --config astro.docs.config.mjs --force",
     "docs:preview": "npm run docs:build && astro preview --config astro.docs.config.mjs",
     "zip": "npm run verify && node scripts/zip.mjs --all",
@@ -55,10 +56,11 @@
     "ci:verify": "npm run check && npm run test:coverage && npm run build && npm run ci:test-browser-gate",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
-    "check": "npm run typecheck && npm run lint",
+    "check": "npm run typecheck && npm run lint && npm run docs:check",
     "verify": "npm run ci:verify"
   },
   "devDependencies": {
+    "@astrojs/check": "^0.9.9",
     "@eslint/js": "^9.27.0",
     "@playwright/test": "^1.60.0",
     "@types/chrome": "^0.0.315",

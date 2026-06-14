@@ -17,6 +17,15 @@
   "brand": {
     "homeAria": "Chat Enhancer for YouTube 首頁"
   },
+  "blog": {
+    "archiveCopy": "Chat Enhancer for YouTube 的版本說明與專案更新。",
+    "backToUpdates": "返回更新",
+    "latestNotes": "The Backlog",
+    "similarPosts": "接下來",
+    "updates": "更新",
+    "viewAllUpdates": "查看所有更新",
+    "editorCredit": "使用 lepapier.app 編輯"
+  },
   "hero": {
     "eyebrow": "YouTube 直播聊天室瀏覽器擴充功能",
     "title": "Chat Enhancer for YouTube",

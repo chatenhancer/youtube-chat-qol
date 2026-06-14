@@ -17,6 +17,15 @@
   "brand": {
     "homeAria": "Chat Enhancer for YouTube 홈"
   },
+  "blog": {
+    "archiveCopy": "Chat Enhancer for YouTube의 릴리스 노트와 프로젝트 업데이트입니다.",
+    "backToUpdates": "업데이트로 돌아가기",
+    "latestNotes": "The Backlog",
+    "similarPosts": "다음으로",
+    "updates": "업데이트",
+    "viewAllUpdates": "모든 업데이트 보기",
+    "editorCredit": "lepapier.app으로 편집됨"
+  },
   "hero": {
     "eyebrow": "YouTube 라이브 채팅용 브라우저 확장 프로그램",
     "title": "Chat Enhancer for YouTube",

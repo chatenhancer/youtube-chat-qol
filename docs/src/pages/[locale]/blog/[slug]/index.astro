@@ -1,11 +1,12 @@
 ---
 import { getCollection, render } from 'astro:content';
 import { Image } from 'astro:assets';
+import RelatedPosts from '../../../../components/blog/related-posts.astro';
 import BlogLayout from '../../../../layouts/blog-layout.astro';
+import type { BlogPost } from '../../../../data/blog';
 import {
   getBlogEntryFolder,
   getBlogIndexPath,
-  getBlogMessages,
   getBlogPostAlternateLinks,
   getBlogPostLanguageUrls,
   getBlogPostUrl,
@@ -15,8 +16,13 @@ import { getBlogCoverVideoUrl } from '../../../../data/blog-media';
 import { getMessages, htmlLangFor, localeMeta } from '../../../../data/locales';
 import { site } from '../../../../data/site';
 
+interface Props {
+  allPosts: BlogPost[];
+  post: BlogPost;
+}
+
 export async function getStaticPaths() {
-  const posts = await getCollection('blog');
+  const posts: BlogPost[] = await getCollection('blog');
   return posts
     .filter((post) => post.data.locale !== 'en')
     .map((post) => {
@@ -31,11 +37,11 @@ export async function getStaticPaths() {
     });
 }
 
-const { allPosts, post } = Astro.props;
+const { allPosts, post } = Astro.props as Props;
 const { Content } = await render(post);
 const locale = getPostLocale(post);
 const messages = getMessages(locale);
-const blog = getBlogMessages(locale);
+const blog = messages.blog;
 const formatter = new Intl.DateTimeFormat(htmlLangFor(locale), {
   day: 'numeric',
   month: 'long',
@@ -132,9 +138,10 @@ function escapeHtml(value: string): string {
     <div class="blog-post-body">
       <Content />
     </div>
+    <RelatedPosts allPosts={allPosts} locale={locale} post={post} />
     <a class="blog-post-editor-credit" href="https://lepapier.app/" target="_blank" rel="noopener noreferrer">
       <img src="/assets/lepapier.svg" alt="" width="524" height="584" loading="lazy" decoding="async">
-      <span>Edited with lepapier.app</span>
+      <span>{blog.editorCredit}</span>
     </a>
   </article>
 </BlogLayout>

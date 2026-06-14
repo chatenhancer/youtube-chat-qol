@@ -17,6 +17,15 @@
   "brand": {
     "homeAria": "Chat Enhancer for YouTube ana sayfası"
   },
+  "blog": {
+    "archiveCopy": "Chat Enhancer for YouTube için sürüm notları ve proje güncellemeleri.",
+    "backToUpdates": "Güncellemelere dön",
+    "latestNotes": "The Backlog",
+    "similarPosts": "Sıradaki",
+    "updates": "Güncellemeler",
+    "viewAllUpdates": "Tüm güncellemeleri gör",
+    "editorCredit": "lepapier.app ile düzenlendi"
+  },
   "hero": {
     "eyebrow": "YouTube canlı sohbeti için tarayıcı uzantısı",
     "title": "Chat Enhancer for YouTube",

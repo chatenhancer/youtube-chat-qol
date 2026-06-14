@@ -17,6 +17,15 @@
   "brand": {
     "homeAria": "Beranda Chat Enhancer for YouTube"
   },
+  "blog": {
+    "archiveCopy": "Catatan rilis dan pembaruan proyek untuk Chat Enhancer for YouTube.",
+    "backToUpdates": "Kembali ke pembaruan",
+    "latestNotes": "The Backlog",
+    "similarPosts": "Selanjutnya",
+    "updates": "Pembaruan",
+    "viewAllUpdates": "Lihat semua pembaruan",
+    "editorCredit": "Diedit dengan lepapier.app"
+  },
   "hero": {
     "eyebrow": "Ekstensi browser untuk chat langsung YouTube",
     "title": "Chat Enhancer for YouTube",

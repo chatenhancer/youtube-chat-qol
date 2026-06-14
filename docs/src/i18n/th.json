@@ -17,6 +17,15 @@
   "brand": {
     "homeAria": "หน้าแรก Chat Enhancer for YouTube"
   },
+  "blog": {
+    "archiveCopy": "บันทึกการเปิดตัวและอัปเดตโปรเจกต์สำหรับ Chat Enhancer for YouTube",
+    "backToUpdates": "กลับไปที่อัปเดต",
+    "latestNotes": "The Backlog",
+    "similarPosts": "ถัดไป",
+    "updates": "อัปเดต",
+    "viewAllUpdates": "ดูอัปเดตทั้งหมด",
+    "editorCredit": "แก้ไขด้วย lepapier.app"
+  },
   "hero": {
     "eyebrow": "ส่วนขยายเบราว์เซอร์สำหรับแชทสดของ YouTube",
     "title": "Chat Enhancer for YouTube",

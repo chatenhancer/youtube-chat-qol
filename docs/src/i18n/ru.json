@@ -17,6 +17,15 @@
   "brand": {
     "homeAria": "Главная Chat Enhancer for YouTube"
   },
+  "blog": {
+    "archiveCopy": "Заметки о выпусках и обновления проекта Chat Enhancer for YouTube.",
+    "backToUpdates": "Назад к обновлениям",
+    "latestNotes": "The Backlog",
+    "similarPosts": "Далее",
+    "updates": "Обновления",
+    "viewAllUpdates": "Все обновления",
+    "editorCredit": "Отредактировано в lepapier.app"
+  },
   "hero": {
     "eyebrow": "Расширение браузера для прямого чата YouTube",
     "title": "Chat Enhancer for YouTube",

@@ -17,6 +17,15 @@
   "brand": {
     "homeAria": "Startpagina van Chat Enhancer for YouTube"
   },
+  "blog": {
+    "archiveCopy": "Release notes en projectupdates voor Chat Enhancer for YouTube.",
+    "backToUpdates": "Terug naar updates",
+    "latestNotes": "The Backlog",
+    "similarPosts": "Volgende",
+    "updates": "Updates",
+    "viewAllUpdates": "Alle updates bekijken",
+    "editorCredit": "Bewerkt met lepapier.app"
+  },
   "hero": {
     "eyebrow": "Browserextensie voor YouTube-livechat",
     "title": "Chat Enhancer for YouTube",
