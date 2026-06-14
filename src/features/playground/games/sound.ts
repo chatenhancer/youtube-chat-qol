@@ -16,11 +16,16 @@ export interface GameSoundController {
   play: (path: string) => void;
 }
 
+const gameSoundCache = new Map<string, HTMLAudioElement>();
+let gameSoundAudioConstructor: typeof Audio | null = null;
+
 export function createGameSoundController({
   className,
+  preloadPaths = [],
   signal
 }: {
   className?: string;
+  preloadPaths?: readonly string[];
   signal: AbortSignal;
 }): GameSoundController {
   let enabled = true;
@@ -43,6 +48,7 @@ export function createGameSoundController({
     enabled = storedEnabled;
     setGameSoundToggleButtonState(button, enabled);
   });
+  preloadGameSounds(preloadPaths);
 
   return {
     button,
@@ -68,11 +74,74 @@ function getStoredGameSoundsEnabled(): Promise<boolean> {
   });
 }
 
+export function preloadGameSounds(paths: readonly string[]): void {
+  paths.forEach((path) => {
+    preloadGameSound(path);
+  });
+}
+
 function playGameSound(path: string): void {
+  const audio = getPlayableGameSound(path);
+  if (!audio) return;
+
   try {
-    const audio = new Audio(chrome.runtime.getURL(path));
+    audio.currentTime = 0;
+  } catch {
+    // Some browsers reject seeking before enough metadata is available.
+  }
+
+  try {
     void audio.play().catch(() => undefined);
   } catch {
     // Audio playback failures should never affect the game UI.
+  }
+}
+
+function getPlayableGameSound(path: string): HTMLAudioElement | null {
+  const cachedAudio = preloadGameSound(path);
+  if (!cachedAudio) return null;
+
+  if (!isAudioPlaying(cachedAudio)) return cachedAudio;
+
+  try {
+    const audio = cachedAudio.cloneNode(true) as HTMLAudioElement;
+    audio.preload = 'auto';
+    return audio;
+  } catch {
+    return cachedAudio;
+  }
+}
+
+function preloadGameSound(path: string): HTMLAudioElement | null {
+  const AudioConstructor = getAudioConstructor();
+  if (!AudioConstructor) return null;
+
+  if (gameSoundAudioConstructor !== AudioConstructor) {
+    gameSoundCache.clear();
+    gameSoundAudioConstructor = AudioConstructor;
+  }
+
+  const cachedAudio = gameSoundCache.get(path);
+  if (cachedAudio) return cachedAudio;
+
+  try {
+    const audio = new AudioConstructor(chrome.runtime.getURL(path));
+    audio.preload = 'auto';
+    gameSoundCache.set(path, audio);
+    return audio;
+  } catch {
+    return null;
+  }
+}
+
+function isAudioPlaying(audio: HTMLAudioElement): boolean {
+  return audio.paused === false && audio.ended !== true;
+}
+
+function getAudioConstructor(): typeof Audio | null {
+  try {
+    return Audio;
+  } catch {
+    return null;
   }
 }

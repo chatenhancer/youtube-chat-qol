@@ -22,6 +22,7 @@ import { createGameSoundController, type GameSoundController } from '../sound';
 const BOARD_PATH = 'games/chess/board.png';
 const CAPTURE_SOUND_PATH = 'games/chess/capture.mp3';
 const MOVE_SOUND_PATH = 'games/chess/move.mp3';
+const CHESS_SOUND_PATHS = [MOVE_SOUND_PATH, CAPTURE_SOUND_PATH] as const;
 const WHITE_PIECES_PATH = 'games/chess/white-pieces.png';
 const BLACK_PIECES_PATH = 'games/chess/black-pieces.png';
 const BOARD_SIZE = 8;
@@ -114,6 +115,7 @@ export function openChessGamePanel(
 
   const soundController = createGameSoundController({
     className: 'ytcq-chess-game-sound-toggle',
+    preloadPaths: CHESS_SOUND_PATHS,
     signal: listeners.signal
   });
 

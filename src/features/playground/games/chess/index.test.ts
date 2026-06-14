@@ -104,19 +104,18 @@ describe('playground chess panel feedback', () => {
   it('plays the move sound when a received update changes the board position', () => {
     openChessGamePanel(createChessGame({ turn: 'white' }), 'me-user', vi.fn());
 
-    expect(audioMocks).toHaveLength(0);
+    expect(getPlayedAudioMocks()).toHaveLength(0);
 
     updateChessGamePanel(createChessGame({ turn: 'white' }), 'me-user');
-    expect(audioMocks).toHaveLength(0);
+    expect(getPlayedAudioMocks()).toHaveLength(0);
 
     updateChessGamePanel(createChessGame({
       fen: 'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1',
       turn: 'black'
     }), 'me-user');
 
-    expect(audioMocks).toHaveLength(1);
-    expect(audioMocks[0].src).toBe('chrome-extension://test/games/chess/move.mp3');
-    expect(audioMocks[0].play).toHaveBeenCalledOnce();
+    expect(getAudioMock('games/chess/move.mp3').play).toHaveBeenCalledOnce();
+    expect(getAudioMock('games/chess/capture.mp3').play).not.toHaveBeenCalled();
   });
 
   it('plays the capture sound when a received update removes a piece', () => {
@@ -130,9 +129,8 @@ describe('playground chess panel feedback', () => {
       turn: 'black'
     }), 'me-user');
 
-    expect(audioMocks).toHaveLength(1);
-    expect(audioMocks[0].src).toBe('chrome-extension://test/games/chess/capture.mp3');
-    expect(audioMocks[0].play).toHaveBeenCalledOnce();
+    expect(getAudioMock('games/chess/capture.mp3').play).toHaveBeenCalledOnce();
+    expect(getAudioMock('games/chess/move.mp3').play).not.toHaveBeenCalled();
   });
 
   it('shows game sounds enabled by default', () => {
@@ -162,7 +160,7 @@ describe('playground chess panel feedback', () => {
       turn: 'black'
     }), 'me-user');
 
-    expect(audioMocks).toHaveLength(0);
+    expect(getPlayedAudioMocks()).toHaveLength(0);
 
     button.click();
     expect(button.getAttribute('aria-pressed')).toBe('true');
@@ -171,11 +169,11 @@ describe('playground chess panel feedback', () => {
     });
 
     updateChessGamePanel(createChessGame({
-      fen: 'rnbqkbnr/pppppppp/8/8/4P3/8/5P2/PPPP2PP/RNBQKBNR b KQkq - 0 1',
-      turn: 'black'
+      fen: 'rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2',
+      turn: 'white'
     }), 'me-user');
 
-    expect(audioMocks).toHaveLength(1);
+    expect(getAudioMock('games/chess/move.mp3').play).toHaveBeenCalledOnce();
     await expect(chrome.storage.local.get(PLAYGROUND_GAME_SOUNDS_STORAGE_KEY)).resolves.toEqual({
       [PLAYGROUND_GAME_SOUNDS_STORAGE_KEY]: true
     });
@@ -195,7 +193,7 @@ describe('playground chess panel feedback', () => {
       turn: 'black'
     }), 'me-user');
 
-    expect(audioMocks).toHaveLength(0);
+    expect(getPlayedAudioMocks()).toHaveLength(0);
   });
 
   it('shows check as a temporary centered status message', () => {
@@ -309,6 +307,17 @@ function getSoundToggleButton(): HTMLButtonElement {
   const button = document.querySelector<HTMLButtonElement>('.ytcq-chess-game-sound-toggle');
   if (!button) throw new Error('Missing chess sound toggle.');
   return button;
+}
+
+function getAudioMock(path: string): AudioMock {
+  const src = `chrome-extension://test/${path}`;
+  const audio = audioMocks.find((mock) => mock.src === src);
+  if (!audio) throw new Error(`Missing audio mock for ${src}.`);
+  return audio;
+}
+
+function getPlayedAudioMocks(): AudioMock[] {
+  return audioMocks.filter((mock) => mock.play.mock.calls.length > 0);
 }
 
 function getStatusMessage(): string {
