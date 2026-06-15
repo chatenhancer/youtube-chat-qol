@@ -6,7 +6,7 @@ import type { DurableObjectState } from '../../types';
 type LogDetails = Record<string, boolean | number | string | undefined>;
 type LogEvent = (event: string, details?: LogDetails, level?: 'error' | 'info' | 'warn') => void;
 
-const ROOM_STATE_STORAGE_KEY = 'roomState';
+const ROOM_STATE_STORAGE_KEY = 'roomState:v1';
 
 interface StoredRoomState {
   games: unknown[];

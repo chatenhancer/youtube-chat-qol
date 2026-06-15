@@ -294,7 +294,7 @@ describe('playground stream room', () => {
     room.handleInviteResponse(bob, lastMessage(bob, 'inviteReceived').invite.inviteId, true);
     const gameId = lastMessage(alice, 'gameStarted').game.gameId;
     await first.state.flushWaitUntil();
-    await expect(storage.get('roomState')).resolves.toMatchObject({
+    await expect(storage.get('roomState:v1')).resolves.toMatchObject({
       games: [expect.objectContaining({ gameId })]
     });
 
