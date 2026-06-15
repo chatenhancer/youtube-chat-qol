@@ -10,6 +10,7 @@ import {
   COMPUTER_PLAYER_CONNECTION_ID,
   createComputerPlayer
 } from './computer-player';
+import type { StockfishMove } from './stockfish';
 import type { GameRecord } from '../games/types';
 import { getLogErrorType, hashLogValue, shortLogId } from '../logging';
 import type { ClientMessage, GameId, LobbySnapshot, ServerMessage } from '../protocol/messages';
@@ -32,6 +33,7 @@ interface BotClientsHost {
   getGame(gameId: string): GameRecord | undefined;
   onActionError?(connectionId: string, gameId: string, error: unknown): void;
   onChessBotFallback?(connectionId: string, gameId: string, fallback: ChessBotFallback): void;
+  onChessBotStockfishMove?(connectionId: string, gameId: string, move: StockfishMove): void;
   sendClientMessage(connectionId: string, message: Exclude<ClientMessage, { type: 'hello' }>): void;
   waitUntil(promise: Promise<unknown>): void;
 }
@@ -70,6 +72,10 @@ export function attachBotClientsToRoom(options: AttachBotClientsToRoomOptions): 
     onChessBotFallback: (connectionId, gameId, fallback) => {
       const session = options.clients.get(connectionId);
       logChessBotFallback(options, session, connectionId, gameId, fallback);
+    },
+    onChessBotStockfishMove: (connectionId, gameId, move) => {
+      const session = options.clients.get(connectionId);
+      logChessBotStockfishMove(options, session, connectionId, gameId, move);
     },
     sendClientMessage: (connectionId, message) => {
       const session = options.clients.get(connectionId);
@@ -146,6 +152,23 @@ function getFallbackErrorMessage(error: unknown): string | undefined {
   return `${message.slice(0, MAX_LOG_MESSAGE_LENGTH - 3)}...`;
 }
 
+function logChessBotStockfishMove(
+  options: AttachBotClientsToRoomOptions,
+  session: ConnectedBotClientSession | undefined,
+  connectionId: string,
+  gameId: string,
+  move: StockfishMove
+): void {
+  const game = options.getGame(gameId);
+  options.logEvent('chess_bot_stockfish_move', {
+    connection: shortLogId(connectionId),
+    game: gameId ? shortLogId(gameId) : undefined,
+    gameType: game?.gameType,
+    promotion: move.promotion,
+    user: session?.userId ? hashLogValue(session.userId) : undefined
+  });
+}
+
 function createBotClients(host: BotClientsHost): BotClients {
   return new BuiltInBotClients(host);
 }
@@ -160,6 +183,9 @@ class BuiltInBotClients implements BotClients {
         onActionError: (gameId, error) => host.onActionError?.(COMPUTER_PLAYER_CONNECTION_ID, gameId, error),
         onChessBotFallback: (gameId, fallback) => {
           host.onChessBotFallback?.(COMPUTER_PLAYER_CONNECTION_ID, gameId, fallback);
+        },
+        onChessBotStockfishMove: (gameId, move) => {
+          host.onChessBotStockfishMove?.(COMPUTER_PLAYER_CONNECTION_ID, gameId, move);
         },
         sendClientMessage: (message) => host.sendClientMessage(COMPUTER_PLAYER_CONNECTION_ID, message),
         waitUntil: host.waitUntil
