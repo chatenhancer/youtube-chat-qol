@@ -31,8 +31,7 @@ export async function getStockfishBestMove(
     throw new Error('Stockfish container binding is not configured.');
   }
 
-  const containerId = env.STOCKFISH_ENGINE.idFromName(STOCKFISH_CONTAINER_NAME);
-  const container = env.STOCKFISH_ENGINE.get(containerId);
+  const container = getStockfishContainer(env.STOCKFISH_ENGINE);
   const response = await withTimeout(
     container.fetch('https://stockfish.local/best-move', {
       body: JSON.stringify({
@@ -111,6 +110,11 @@ function getContainerErrorMessage(payload: unknown): string {
   if (isRecord(payload) && typeof payload.message === 'string') return payload.message;
   if (isRecord(payload) && typeof payload.error === 'string') return payload.error;
   return 'unknown error';
+}
+
+function getStockfishContainer(stockfishEngine: NonNullable<Env['STOCKFISH_ENGINE']>): { fetch: typeof fetch } {
+  const containerId = stockfishEngine.idFromName(STOCKFISH_CONTAINER_NAME);
+  return stockfishEngine.get(containerId);
 }
 
 function withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
