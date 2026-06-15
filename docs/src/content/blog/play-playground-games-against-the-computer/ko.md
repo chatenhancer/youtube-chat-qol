@@ -1,7 +1,7 @@
 ---
 title: "Playground 게임을 컴퓨터와 플레이하기"
 date: 2026-06-14
-description: "다른 플레이어가 없을 때도 Playground에서 Chess 또는 HELP-A-FRIEND! Trivia를 플레이하세요."
+description: "다른 플레이어가 없을 때도 Playground에서 세 가지 Computer 상대와 Chess를 하거나 HELP-A-FRIEND! Trivia를 플레이하세요."
 locale: "ko"
 slug: "play-playground-games-against-the-computer"
 image: "./cover.png"
@@ -19,16 +19,22 @@ tags:
 
 ## 작동 방식
 
-Games 패널에서 Playground를 열고 플레이어 목록에서 Computer를 찾으세요. 다른 플레이어를 초대하듯이 Computer를 초대하면 됩니다. 매치는 자동으로 시작되며, Playground를 사용하는 방식은 그대로입니다.
+Games 패널에서 Playground를 열고 플레이어 목록에서 Computer 플레이어를 찾으세요. 다른 플레이어를 초대하듯이 그중 하나를 초대하면 됩니다. 매치는 자동으로 시작되며, Playground를 사용하는 방식은 그대로입니다.
 
-Computer는 다음 게임에서 사용할 수 있습니다.
+Computer 상대는 다음 게임에서 사용할 수 있습니다.
 
-- **Chess**, 빠른 일대일 매치.
+- **Chess**, **Computer (Beginner)**, **Computer (Club)**, **Computer (Master)** 중에서 더 가벼운 매치, 중간 매치, 더 어려운 매치를 선택할 수 있습니다.
 - **HELP-A-FRIEND! Trivia**, 아무도 시간이 없을 때도 리플레이 trivia를 계속 플레이할 수 있습니다.
+
+## Chess 난이도를 선택하세요
+
+Chess에는 이제 세 가지 Computer 상대가 있습니다. Beginner는 몸풀기에 가장 쉬운 상대, Club은 더 안정적인 중간 난이도 상대, Master는 가장 어려운 옵션입니다.
+
+별도 설정은 필요 없습니다. 플레이어 목록에서 원하는 Computer 프로필을 선택하고 초대를 보내면 됩니다.
 
 ## 여전히 Playground답게 느껴집니다
 
-별도의 솔로 모드나 새 화면이 아닙니다. Computer는 일반 Playground 상대처럼 동작하므로 흐름은 익숙합니다. 패널을 열고, 게임을 고르고, 초대를 보내고, 플레이하면 됩니다.
+별도의 솔로 모드나 새 화면이 아닙니다. Computer 플레이어는 일반 Playground 상대처럼 동작하므로 흐름은 익숙합니다. 패널을 열고, 게임을 고르고, 초대를 보내고, 플레이하면 됩니다.
 
 Chess에서는 Computer가 짧은 pause 후에 수를 둡니다. 게임이 즉시 진행되거나 너무 기계적으로 느껴지지 않도록 하기 위해서입니다.
 
@@ -42,6 +48,6 @@ Playground는 함께 플레이할 사람이 있을 때 가장 재미있지만, l
 
 ![Chat Enhancer 팝업의 Playground 설정](./extension-settings.png)
 
-Playground는 계속 opt-in입니다. 확장 프로그램 설정에서 **Playground 참여**를 켜고, 채팅에서 Games 패널을 연 다음 매치를 원할 때 Computer를 초대하세요.
+Playground는 계속 opt-in입니다. 확장 프로그램 설정에서 **Playground 참여**를 켜고, 채팅에서 Games 패널을 연 다음 매치를 원할 때 Computer 상대를 초대하세요.
 
 :::

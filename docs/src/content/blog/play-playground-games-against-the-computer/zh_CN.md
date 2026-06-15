@@ -1,7 +1,7 @@
 ---
 title: "和电脑一起玩 Playground 游戏"
 date: 2026-06-14
-description: "即使没有其他玩家，也可以在 Playground 中玩 Chess 或 HELP-A-FRIEND! Trivia。"
+description: "没有其他玩家时，也可以在 Playground 中和三个 Computer 对手下 Chess，或玩 HELP-A-FRIEND! Trivia。"
 locale: "zh_CN"
 slug: "play-playground-games-against-the-computer"
 image: "./cover.png"
@@ -19,16 +19,22 @@ tags:
 
 ## 工作方式
 
-从 Games 面板打开 Playground，在玩家列表中找到 Computer。像邀请其他玩家一样邀请 Computer。比赛会自动开始，你可以照常使用 Playground 来玩。
+从 Games 面板打开 Playground，在玩家列表中找到 Computer 玩家。像邀请其他玩家一样邀请其中一个。比赛会自动开始，你可以照常使用 Playground 来玩。
 
-Computer 支持：
+Computer 对手支持：
 
-- **Chess**，适合快速一对一对局。
+- **Chess**，提供 **Computer (Beginner)**、**Computer (Club)** 和 **Computer (Master)**，让你选择更轻松、中等或更困难的对局。
 - **HELP-A-FRIEND! Trivia**，这样在没有人有空时，也还能玩回放 trivia。
+
+## 选择 Chess 难度
+
+Chess 现在有三个 Computer 对手。Beginner 最适合热身，Club 是更稳定的中等对手，Master 是最困难的选项。
+
+不需要单独设置：在玩家列表中选择你想要的 Computer 资料，然后发送邀请。
 
 ## 仍然像 Playground
 
-这不是单独的单人模式，也不是新的页面。Computer 会像普通 Playground 对手一样行动，所以流程保持熟悉：打开面板，选择游戏，发送邀请，然后开始玩。
+这不是单独的单人模式，也不是新的页面。Computer 玩家会像普通 Playground 对手一样行动，所以流程保持熟悉：打开面板，选择游戏，发送邀请，然后开始玩。
 
 在 Chess 中，Computer 会在短暂停顿后走棋，让游戏不会显得过于瞬间或机械。
 
@@ -42,6 +48,6 @@ Computer 支持：
 
 ![Chat Enhancer 弹窗中的 Playground 设置](./extension-settings.png)
 
-Playground 仍然是可选功能。在扩展设置中启用 **加入 Playground**，在聊天中打开 Games 面板，然后在想开始对局时邀请 Computer。
+Playground 仍然是可选功能。在扩展设置中启用 **加入 Playground**，在聊天中打开 Games 面板，然后在想开始对局时邀请 Computer 对手。
 
 :::

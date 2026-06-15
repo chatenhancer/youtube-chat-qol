@@ -1,7 +1,7 @@
 ---
 title: "Play Playground games against the computer"
 date: 2026-06-14
-description: "Play Chess or HELP-A-FRIEND! Trivia in Playground even when another player is not around."
+description: "Play Chess against three Computer opponents or play HELP-A-FRIEND! Trivia in Playground when another player is not around."
 slug: "play-playground-games-against-the-computer"
 image: "./cover.png"
 locale: "en"
@@ -19,16 +19,22 @@ Sometimes chat is quiet. Sometimes your friends are watching a different stream.
 
 ## How it works
 
-Open Playground from the Games panel and look for Computer in the player list. Invite Computer the same way you would invite another player. The match starts automatically, and you can play without changing how you use Playground.
+Open Playground from the Games panel and look for a Computer player in the player list. Invite one the same way you would invite another player. The match starts automatically, and you can play without changing how you use Playground.
 
-Computer is available for:
+Computer opponents are available for:
 
-- **Chess**, for a quick one-on-one match.
+- **Chess**, with **Computer (Beginner)**, **Computer (Club)**, and **Computer (Master)** so you can choose a lighter, middle, or tougher match.
 - **HELP-A-FRIEND! Trivia**, so replay trivia can still be played when nobody else is free.
+
+## Pick your Chess difficulty
+
+Chess now has three Computer opponents. Beginner is the easiest way to warm up, Club is a steadier mid-level opponent, and Master is the toughest option.
+
+No separate setting is needed: choose the Computer profile you want from the player list and send an invite.
 
 ## Still feels like Playground
 
-This is not a separate solo mode or a new screen. Computer behaves like a normal Playground opponent, so the flow stays familiar: open the panel, pick a game, send an invite, and play.
+This is not a separate solo mode or a new screen. Computer players behave like normal Playground opponents, so the flow stays familiar: open the panel, pick a game, send an invite, and play.
 
 For Chess, Computer makes its moves after a short pause so the game does not feel instant or robotic.
 
@@ -42,6 +48,6 @@ Playground is most fun when there is someone nearby to play with, but live chat 
 
 ![Playground settings in the Chat Enhancer popup](./extension-settings.png)
 
-Playground is still opt-in. Enable **Join Playground** from the extension settings, open the Games panel in chat, and invite Computer when you want a match.
+Playground is still opt-in. Enable **Join Playground** from the extension settings, open the Games panel in chat, and invite a Computer opponent when you want a match.
 
 :::

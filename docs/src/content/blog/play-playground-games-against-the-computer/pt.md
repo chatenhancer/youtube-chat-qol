@@ -1,7 +1,7 @@
 ---
 title: "Jogue os jogos do Playground contra o computador"
 date: 2026-06-14
-description: "Jogue Chess ou HELP-A-FRIEND! Trivia no Playground mesmo quando não houver outro jogador por perto."
+description: "Jogue Chess contra três oponentes Computer ou HELP-A-FRIEND! Trivia no Playground quando não houver outro jogador por perto."
 locale: "pt"
 slug: "play-playground-games-against-the-computer"
 image: "./cover.png"
@@ -19,16 +19,22 @@ Agora ficou mais fácil entrar no Playground: você pode jogar contra **Computer
 
 ## Como funciona
 
-Abra o Playground pelo painel Games e procure Computer na lista de jogadores. Convide Computer da mesma forma que convidaria outro jogador. A partida começa automaticamente, e você pode jogar sem mudar a forma como usa o Playground.
+Abra o Playground pelo painel Games e procure um jogador Computer na lista de jogadores. Convide um deles da mesma forma que convidaria outro jogador. A partida começa automaticamente, e você pode jogar sem mudar a forma como usa o Playground.
 
-Computer está disponível para:
+Os oponentes Computer estão disponíveis para:
 
-- **Chess**, para uma partida rápida um contra um.
+- **Chess**, com **Computer (Beginner)**, **Computer (Club)** e **Computer (Master)**, para escolher uma partida mais leve, intermediária ou mais difícil.
 - **HELP-A-FRIEND! Trivia**, para que a trivia de replays continue jogável quando ninguém estiver livre.
+
+## Escolha sua dificuldade de Chess
+
+Chess agora tem três oponentes Computer. Beginner é a opção mais fácil para aquecer, Club é um oponente intermediário mais estável e Master é a opção mais difícil.
+
+Não é preciso mudar nenhuma configuração: escolha o perfil Computer que quiser na lista de jogadores e envie um convite.
 
 ## Ainda parece Playground
 
-Não é um modo solo separado nem uma nova tela. Computer se comporta como um oponente normal do Playground, então o fluxo continua familiar: abra o painel, escolha um jogo, envie um convite e jogue.
+Não é um modo solo separado nem uma nova tela. Os jogadores Computer se comportam como oponentes normais do Playground, então o fluxo continua familiar: abra o painel, escolha um jogo, envie um convite e jogue.
 
 No Chess, Computer faz as jogadas depois de uma pequena pausa para que a partida não pareça instantânea ou robótica demais.
 
@@ -42,6 +48,6 @@ O Playground é mais divertido quando há alguém por perto para jogar, mas o ch
 
 ![Configurações do Playground no popup do Chat Enhancer](./extension-settings.png)
 
-O Playground continua sendo opcional. Ative **Entrar no Playground** nas configurações da extensão, abra o painel Games no chat e convide Computer quando quiser uma partida.
+O Playground continua sendo opcional. Ative **Entrar no Playground** nas configurações da extensão, abra o painel Games no chat e convide um oponente Computer quando quiser uma partida.
 
 :::

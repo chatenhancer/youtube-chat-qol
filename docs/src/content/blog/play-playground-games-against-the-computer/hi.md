@@ -1,7 +1,7 @@
 ---
 title: "Playground games को कंप्यूटर के खिलाफ खेलें"
 date: 2026-06-14
-description: "Playground में Chess या HELP-A-FRIEND! Trivia खेलें, तब भी जब कोई दूसरा खिलाड़ी उपलब्ध न हो."
+description: "जब कोई दूसरा खिलाड़ी उपलब्ध न हो, तब Playground में तीन Computer opponents के खिलाफ Chess या HELP-A-FRIEND! Trivia खेलें."
 locale: "hi"
 slug: "play-playground-games-against-the-computer"
 image: "./cover.png"
@@ -19,16 +19,22 @@ tags:
 
 ## यह कैसे काम करता है
 
-Games panel से Playground खोलें और player list में Computer देखें। Computer को वैसे ही invite करें जैसे आप किसी दूसरे player को invite करते हैं। Match अपने-आप शुरू हो जाता है, और आप Playground इस्तेमाल करने का तरीका बदले बिना खेल सकते हैं।
+Games panel से Playground खोलें और player list में कोई Computer player देखें। उनमें से किसी एक को वैसे ही invite करें जैसे आप किसी दूसरे player को invite करते हैं। Match अपने-आप शुरू हो जाता है, और आप Playground इस्तेमाल करने का तरीका बदले बिना खेल सकते हैं।
 
-Computer इन games के लिए उपलब्ध है:
+Computer opponents इन games के लिए उपलब्ध हैं:
 
-- **Chess**, एक quick one-on-one match के लिए।
+- **Chess**, **Computer (Beginner)**, **Computer (Club)** और **Computer (Master)** के साथ, ताकि आप हल्का, middle या मुश्किल match चुन सकें।
 - **HELP-A-FRIEND! Trivia**, ताकि replay trivia तब भी खेली जा सके जब कोई और free न हो।
+
+## अपनी Chess difficulty चुनें
+
+Chess में अब तीन Computer opponents हैं। Beginner warm up करने का सबसे आसान तरीका है, Club एक ज्यादा steady middle-level opponent है, और Master सबसे मुश्किल option है।
+
+अलग setting की जरूरत नहीं है: player list से अपना Computer profile चुनें और invite भेजें।
 
 ## यह अभी भी Playground जैसा ही लगता है
 
-यह कोई अलग solo mode या नई screen नहीं है। Computer एक normal Playground opponent की तरह व्यवहार करता है, इसलिए flow वही रहता है: panel खोलें, game चुनें, invite भेजें और खेलें।
+यह कोई अलग solo mode या नई screen नहीं है। Computer players normal Playground opponents की तरह व्यवहार करते हैं, इसलिए flow वही रहता है: panel खोलें, game चुनें, invite भेजें और खेलें।
 
 Chess में, Computer थोड़े pause के बाद अपनी moves करता है ताकि game instant या बहुत robotic न लगे।
 
@@ -42,6 +48,6 @@ Playground सबसे मजेदार तब होता है जब ख
 
 ![Chat Enhancer popup में Playground settings](./extension-settings.png)
 
-Playground अभी भी opt-in है। Extension settings से **Join Playground** enable करें, chat में Games panel खोलें और जब match खेलना हो तो Computer को invite करें।
+Playground अभी भी opt-in है। Extension settings से **Join Playground** enable करें, chat में Games panel खोलें और जब match खेलना हो तो किसी Computer opponent को invite करें।
 
 :::
