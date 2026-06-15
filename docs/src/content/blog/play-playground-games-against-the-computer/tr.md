@@ -1,7 +1,7 @@
 ---
 title: "Playground oyunlarını bilgisayara karşı oynayın"
 date: 2026-06-14
-description: "Başka bir oyuncu yokken bile Playground’da Chess veya HELP-A-FRIEND! Trivia oynayın."
+description: "Başka bir oyuncu yokken Playground’da üç Computer rakibine karşı Chess veya HELP-A-FRIEND! Trivia oynayın."
 locale: "tr"
 slug: "play-playground-games-against-the-computer"
 image: "./cover.png"
@@ -19,16 +19,22 @@ Bazen sohbet sessiz olur. Bazen arkadaşlarınız başka bir stream izliyordur. 
 
 ## Nasıl çalışır?
 
-Games panelinden Playground’u açın ve oyuncu listesinde Computer’ı bulun. Computer’ı başka bir oyuncuyu davet eder gibi davet edin. Maç otomatik olarak başlar ve Playground’u kullanma şeklinizi değiştirmeden oynayabilirsiniz.
+Games panelinden Playground’u açın ve oyuncu listesinde bir Computer oyuncusu bulun. Onlardan birini başka bir oyuncuyu davet eder gibi davet edin. Maç otomatik olarak başlar ve Playground’u kullanma şeklinizi değiştirmeden oynayabilirsiniz.
 
-Computer şu oyunlarda kullanılabilir:
+Computer rakipleri şu oyunlarda kullanılabilir:
 
-- **Chess**, hızlı bir bire bir maç için.
+- **Chess**, daha hafif, orta veya daha zor bir maç seçebilmeniz için **Computer (Beginner)**, **Computer (Club)** ve **Computer (Master)** ile.
 - **HELP-A-FRIEND! Trivia**, kimse uygun değilken replay trivia hâlâ oynanabilsin diye.
+
+## Chess zorluğunu seçin
+
+Chess artık üç Computer rakibine sahip. Beginner ısınmak için en kolay seçenek, Club daha dengeli orta seviye rakip, Master ise en zor seçenektir.
+
+Ayrı bir ayara gerek yok: oyuncu listesinden istediğiniz Computer profilini seçin ve davet gönderin.
 
 ## Hâlâ Playground gibi hissettirir
 
-Bu ayrı bir solo mod ya da yeni bir ekran değil. Computer normal bir Playground rakibi gibi davranır, bu yüzden akış tanıdık kalır: paneli açın, oyun seçin, davet gönderin ve oynayın.
+Bu ayrı bir solo mod ya da yeni bir ekran değil. Computer oyuncuları normal Playground rakipleri gibi davranır, bu yüzden akış tanıdık kalır: paneli açın, oyun seçin, davet gönderin ve oynayın.
 
 Chess’te Computer hamlelerini kısa bir duraklamadan sonra yapar, böylece oyun anında gerçekleşiyor ya da fazla robotik hissettirmez.
 
@@ -42,6 +48,6 @@ Playground, oynayacak biri olduğunda en eğlenceli hâlini alır; ancak canlı 
 
 ![Chat Enhancer popup içindeki Playground ayarları](./extension-settings.png)
 
-Playground hâlâ isteğe bağlıdır. Uzantı ayarlarından **Playground’a katıl** seçeneğini açın, sohbette Games panelini açın ve bir maç istediğinizde Computer’ı davet edin.
+Playground hâlâ isteğe bağlıdır. Uzantı ayarlarından **Playground’a katıl** seçeneğini açın, sohbette Games panelini açın ve bir maç istediğinizde bir Computer rakibini davet edin.
 
 :::

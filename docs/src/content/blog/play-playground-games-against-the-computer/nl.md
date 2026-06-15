@@ -1,7 +1,7 @@
 ---
 title: "Speel Playground-games tegen de computer"
 date: 2026-06-14
-description: "Speel Chess of HELP-A-FRIEND! Trivia in Playground, ook wanneer er geen andere speler beschikbaar is."
+description: "Speel Chess tegen drie Computer-tegenstanders of speel HELP-A-FRIEND! Trivia in Playground wanneer er geen andere speler beschikbaar is."
 locale: "nl"
 slug: "play-playground-games-against-the-computer"
 image: "./cover.png"
@@ -19,16 +19,22 @@ Soms is de chat rustig. Soms kijken je vrienden naar een andere stream. Soms wil
 
 ## Zo werkt het
 
-Open Playground via het Games-paneel en zoek Computer in de spelerslijst. Nodig Computer uit zoals je een andere speler zou uitnodigen. De match start automatisch en je kunt spelen zonder iets te veranderen aan hoe je Playground gebruikt.
+Open Playground via het Games-paneel en zoek een Computer-speler in de spelerslijst. Nodig er een uit zoals je een andere speler zou uitnodigen. De match start automatisch en je kunt spelen zonder iets te veranderen aan hoe je Playground gebruikt.
 
-Computer is beschikbaar voor:
+Computer-tegenstanders zijn beschikbaar voor:
 
-- **Chess**, voor een snelle een-op-eenmatch.
+- **Chess**, met **Computer (Beginner)**, **Computer (Club)** en **Computer (Master)**, zodat je een lichtere, middelzware of moeilijkere match kunt kiezen.
 - **HELP-A-FRIEND! Trivia**, zodat replay trivia speelbaar blijft wanneer niemand anders vrij is.
+
+## Kies je Chess-moeilijkheid
+
+Chess heeft nu drie Computer-tegenstanders. Beginner is de makkelijkste manier om op te warmen, Club is een stevigere middenoptie en Master is de moeilijkste optie.
+
+Er is geen aparte instelling nodig: kies het Computer-profiel dat je wilt in de spelerslijst en stuur een uitnodiging.
 
 ## Het blijft aanvoelen als Playground
 
-Dit is geen aparte solomodus en geen nieuw scherm. Computer gedraagt zich als een gewone Playground-tegenstander, dus de flow blijft vertrouwd: open het paneel, kies een game, stuur een uitnodiging en speel.
+Dit is geen aparte solomodus en geen nieuw scherm. Computer-spelers gedragen zich als gewone Playground-tegenstanders, dus de flow blijft vertrouwd: open het paneel, kies een game, stuur een uitnodiging en speel.
 
 Bij Chess doet Computer zijn zetten na een korte pauze, zodat de game niet direct of te robotachtig aanvoelt.
 
@@ -42,6 +48,6 @@ Playground is het leukst wanneer er iemand is om mee te spelen, maar live chat i
 
 ![Playground-instellingen in de Chat Enhancer-popup](./extension-settings.png)
 
-Playground blijft opt-in. Schakel **Deelnemen aan Playground** in via de extensie-instellingen, open het Games-paneel in de chat en nodig Computer uit wanneer je een match wilt spelen.
+Playground blijft opt-in. Schakel **Deelnemen aan Playground** in via de extensie-instellingen, open het Games-paneel in de chat en nodig een Computer-tegenstander uit wanneer je een match wilt spelen.
 
 :::
