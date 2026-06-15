@@ -26,6 +26,7 @@ import {
 import { parseClientMessage, ProtocolError, sanitizeStreamKey } from '../protocol/validation';
 import { TokenBucket, type TokenBucketOptions } from '../rate-limit';
 import { attachBotClientsToRoom } from '../bots/room-adapter';
+import { createStockfishBestMoveProvider } from '../bots/stockfish';
 import type { DurableObjectState, Env, ServerWebSocket } from '../types';
 
 const INVITE_TTL_MS = 2 * 60 * 1000;
@@ -100,7 +101,7 @@ export class StreamRoom {
   private storageWriteQueue: Promise<unknown> = Promise.resolve();
   private streamKey = '';
 
-  constructor(private readonly state: DurableObjectState, _env: Env) {
+  constructor(private readonly state: DurableObjectState, private readonly env: Env) {
     this.state.blockConcurrencyWhile(async () => {
       await this.loadStoredRoomState();
       this.attachBotClients();
@@ -113,6 +114,7 @@ export class StreamRoom {
       connectionRateLimitOptions: CONNECTION_RATE_LIMIT,
       createSnapshot: (userId) => this.createSnapshot(userId),
       getGame: (gameId) => this.games.get(gameId),
+      getStockfishBestMove: createStockfishBestMoveProvider(this.env),
       handleMessage: (session, message) => this.handleSocketMessage(session, message),
       logEvent: (event, details, level) => this.logEvent(event, details, level),
       setAvailableGames: (userId, availableGames) => this.userAvailableGames.set(userId, availableGames),

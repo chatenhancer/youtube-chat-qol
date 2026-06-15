@@ -1,13 +1,15 @@
 /**
- * Stockfish library adapter.
+ * Stockfish engine adapter.
  *
- * This file owns the UCI/runtime boundary only. Game-state checks and action
- * creation stay in the computer player.
+ * The engine runs in a Cloudflare Container so CPU-heavy search cannot reset
+ * the stream room Durable Object.
  */
+import type { Env } from '../types';
+
+const STOCKFISH_CONTAINER_NAME = 'stockfish-engine';
 const STOCKFISH_ELO = 1350;
 const STOCKFISH_MOVE_TIME_MS = 200;
-const STOCKFISH_SEARCH_TIMEOUT_MS = 3_000;
-const STOCKFISH_STOP_TIMEOUT_MS = 1_000;
+const STOCKFISH_REQUEST_TIMEOUT_MS = 6_000;
 
 export interface StockfishMove {
   from: string;
@@ -15,28 +17,37 @@ export interface StockfishMove {
   to: string;
 }
 
-interface StockfishModule {
-  ccall: (
-    name: string,
-    returnType: null,
-    argTypes: ['string'],
-    args: [string],
-    options?: { async?: boolean }
-  ) => unknown;
-  listener?: (line: string) => void;
-  terminate?: () => void;
+export type StockfishBestMoveProvider = (fen: string) => Promise<StockfishMove | null>;
+
+export function createStockfishBestMoveProvider(env: Pick<Env, 'STOCKFISH_ENGINE'>): StockfishBestMoveProvider {
+  return (fen) => getStockfishBestMove(fen, env);
 }
 
-interface StockfishRuntime {
-  module: StockfishModule;
-  waiters: Set<(line: string) => void>;
-}
+export async function getStockfishBestMove(
+  fen: string,
+  env?: Pick<Env, 'STOCKFISH_ENGINE'>
+): Promise<StockfishMove | null> {
+  if (!env?.STOCKFISH_ENGINE) {
+    throw new Error('Stockfish container binding is not configured.');
+  }
 
-let stockfishRuntimePromise: Promise<StockfishRuntime> | null = null;
-let stockfishQueue: Promise<unknown> = Promise.resolve();
+  const containerId = env.STOCKFISH_ENGINE.idFromName(STOCKFISH_CONTAINER_NAME);
+  const container = env.STOCKFISH_ENGINE.get(containerId);
+  const response = await withTimeout(
+    container.fetch('https://stockfish.local/best-move', {
+      body: JSON.stringify({
+        elo: STOCKFISH_ELO,
+        fen,
+        moveTimeMs: STOCKFISH_MOVE_TIME_MS
+      }),
+      headers: { 'Content-Type': 'application/json' },
+      method: 'POST'
+    }),
+    STOCKFISH_REQUEST_TIMEOUT_MS
+  );
 
-export function getStockfishBestMove(fen: string): Promise<StockfishMove | null> {
-  return getQueuedStockfishMove(fen);
+  const payload = await readStockfishResponse(response);
+  return parseStockfishContainerMove(payload.move);
 }
 
 export function parseStockfishBestMove(line: string): StockfishMove | null {
@@ -50,34 +61,61 @@ export function parseStockfishBestMove(line: string): StockfishMove | null {
   };
 }
 
-function getQueuedStockfishMove(fen: string): Promise<StockfishMove | null> {
-  const result = stockfishQueue.then(() => getStockfishMove(fen));
-  stockfishQueue = result.catch(() => undefined);
-  return result;
-}
-
-async function getStockfishMove(fen: string): Promise<StockfishMove | null> {
-  const runtime = await withTimeout(getStockfishRuntime(), STOCKFISH_SEARCH_TIMEOUT_MS);
-  sendStockfishCommand(runtime.module, `position fen ${fen}`);
-  let bestMoveLine: string;
+async function readStockfishResponse(response: Response): Promise<StockfishContainerResponse> {
+  let payload: unknown;
   try {
-    bestMoveLine = await waitForStockfishLine(
-      runtime,
-      (line) => line.startsWith('bestmove '),
-      () => sendStockfishCommand(runtime.module, `go movetime ${STOCKFISH_MOVE_TIME_MS}`, true),
-      STOCKFISH_SEARCH_TIMEOUT_MS
-    );
-  } catch (error) {
-    await stopTimedOutSearch(runtime);
-    throw error;
+    payload = await response.json();
+  } catch {
+    throw new Error(`Stockfish container returned invalid JSON with status ${response.status}.`);
   }
 
-  return parseStockfishBestMove(bestMoveLine);
+  if (!response.ok) {
+    throw new Error(`Stockfish container failed with status ${response.status}: ${getContainerErrorMessage(payload)}`);
+  }
+
+  if (!isRecord(payload)) {
+    throw new Error('Stockfish container response must be an object.');
+  }
+
+  return payload as StockfishContainerResponse;
+}
+
+function parseStockfishContainerMove(value: unknown): StockfishMove | null {
+  if (value === null) return null;
+  if (!isRecord(value)) throw new Error('Stockfish container move must be an object.');
+
+  const from = getSquare(value.from, 'from');
+  const to = getSquare(value.to, 'to');
+  const promotion = getPromotion(value.promotion);
+  return promotion ? { from, promotion, to } : { from, to };
+}
+
+function getSquare(value: unknown, key: string): string {
+  if (typeof value !== 'string' || !/^[a-h][1-8]$/.test(value)) {
+    throw new Error(`Stockfish container move ${key} must be a chess square.`);
+  }
+  return value;
+}
+
+function getPromotion(value: unknown): StockfishMove['promotion'] {
+  if (value === undefined) return undefined;
+  if (value === 'b' || value === 'n' || value === 'q' || value === 'r') return value;
+  throw new Error('Stockfish container promotion must be b, n, q, or r.');
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return Boolean(value && typeof value === 'object' && !Array.isArray(value));
+}
+
+function getContainerErrorMessage(payload: unknown): string {
+  if (isRecord(payload) && typeof payload.message === 'string') return payload.message;
+  if (isRecord(payload) && typeof payload.error === 'string') return payload.error;
+  return 'unknown error';
 }
 
 function withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
   return new Promise((resolve, reject) => {
-    const timeout = setTimeout(() => reject(new Error('Timed out waiting for Stockfish.')), timeoutMs);
+    const timeout = setTimeout(() => reject(new Error('Timed out waiting for Stockfish container.')), timeoutMs);
     promise.then(
       (value) => {
         clearTimeout(timeout);
@@ -85,170 +123,13 @@ function withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
       },
       (error: unknown) => {
         clearTimeout(timeout);
-        reject(error instanceof Error ? error : new Error('Stockfish failed.'));
+        reject(error instanceof Error ? error : new Error('Stockfish container failed.'));
       }
     );
   });
 }
 
-async function getStockfishRuntime(): Promise<StockfishRuntime> {
-  stockfishRuntimePromise ||= createStockfishRuntime();
-  return stockfishRuntimePromise;
-}
-
-async function createStockfishRuntime(): Promise<StockfishRuntime> {
-  const [stockfishModuleFactory, stockfishWasmModule] = await Promise.all([
-    importStockfishModuleFactory(),
-    importStockfishWasmModule()
-  ]);
-  const waiters = new Set<(line: string) => void>();
-  const module = await stockfishModuleFactory({
-    instantiateWasm(imports, successCallback) {
-      void instantiateStockfishWasm(stockfishWasmModule, imports, successCallback);
-      return {};
-    },
-    listener(line) {
-      waiters.forEach((waiter) => waiter(line));
-    }
-  }) as StockfishModule;
-  const runtime = { module, waiters };
-
-  await waitForStockfishLine(runtime, (line) => line === 'uciok', () => {
-    sendStockfishCommand(module, 'uci');
-  });
-  sendStockfishCommand(module, 'setoption name UCI_LimitStrength value true');
-  sendStockfishCommand(module, `setoption name UCI_Elo value ${STOCKFISH_ELO}`);
-  await waitForStockfishLine(runtime, (line) => line === 'readyok', () => {
-    sendStockfishCommand(module, 'isready');
-  });
-
-  return runtime;
-}
-
-async function importStockfishModuleFactory(): Promise<StockfishModuleFactory> {
-  ensureStockfishLocationGlobal();
-  const stockfishModule = await import('stockfish/bin/stockfish-18-lite-single.js');
-  return resolveStockfishModuleFactory(stockfishModule.default);
-}
-
-async function importStockfishWasmModule(): Promise<WebAssembly.Module | BufferSource> {
-  const { default: stockfishWasmModule } = await import('stockfish/bin/stockfish-18-lite-single.wasm');
-  return stockfishWasmModule as WebAssembly.Module | BufferSource;
-}
-
-export function resolveStockfishModuleFactory(stockfishExport: unknown): StockfishModuleFactory {
-  if (typeof stockfishExport !== 'function') {
-    throw new TypeError('Stockfish module export is not a function.');
-  }
-
-  if (stockfishExport.length > 0) return stockfishExport as StockfishModuleFactory;
-
-  const stockfishModuleFactory = stockfishExport();
-  if (typeof stockfishModuleFactory !== 'function') {
-    throw new TypeError('Stockfish module factory export did not return a function.');
-  }
-
-  return stockfishModuleFactory as StockfishModuleFactory;
-}
-
-function ensureStockfishLocationGlobal(): void {
-  const workerGlobal = globalThis as typeof globalThis & {
-    self?: {
-      location?: StockfishLocationShim;
-    };
-  };
-  if (!workerGlobal.self || workerGlobal.self.location) return;
-
-  Object.defineProperty(workerGlobal.self, 'location', {
-    configurable: true,
-    value: {
-      hash: '',
-      origin: 'https://playground.chatenhancer.com',
-      pathname: '/stockfish-18-lite-single.js'
-    }
-  });
-}
-
-async function instantiateStockfishWasm(
-  stockfishWasmModule: WebAssembly.Module | BufferSource,
-  imports: WebAssembly.Imports,
-  successCallback: (instance: WebAssembly.Instance) => void
-): Promise<void> {
-  const result = await WebAssembly.instantiate(
-    stockfishWasmModule,
-    imports
-  ) as WebAssembly.Instance | WebAssembly.WebAssemblyInstantiatedSource;
-  successCallback(result instanceof WebAssembly.Instance ? result : result.instance);
-}
-
-interface StockfishModuleConfig {
-  instantiateWasm?: (
-    imports: WebAssembly.Imports,
-    successCallback: (instance: WebAssembly.Instance) => void
-  ) => WebAssembly.Exports | Record<string, never>;
-  listener?: (line: string) => void;
-}
-
-type StockfishModuleFactory = (config: StockfishModuleConfig) => Promise<StockfishModule>;
-
-interface StockfishLocationShim {
-  hash: string;
-  origin: string;
-  pathname: string;
-}
-
-function waitForStockfishLine(
-  runtime: StockfishRuntime,
-  predicate: (line: string) => boolean,
-  start: () => void,
-  timeoutMs = STOCKFISH_SEARCH_TIMEOUT_MS
-): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const timeout = setTimeout(() => {
-      runtime.waiters.delete(waiter);
-      reject(new Error('Timed out waiting for Stockfish.'));
-    }, timeoutMs);
-    const waiter = (line: string): void => {
-      if (!predicate(line)) return;
-      clearTimeout(timeout);
-      runtime.waiters.delete(waiter);
-      resolve(line);
-    };
-
-    runtime.waiters.add(waiter);
-    start();
-  });
-}
-
-function sendStockfishCommand(module: StockfishModule, command: string, async = false): void {
-  module.ccall('command', null, ['string'], [command], async ? { async: true } : undefined);
-}
-
-async function stopTimedOutSearch(runtime: StockfishRuntime): Promise<void> {
-  let stopped = false;
-  try {
-    stopped = await waitForStockfishLine(
-      runtime,
-      (line) => line.startsWith('bestmove '),
-      () => sendStockfishCommand(runtime.module, 'stop'),
-      STOCKFISH_STOP_TIMEOUT_MS
-    ).then(
-      () => true,
-      () => false
-    );
-  } catch {
-    stopped = false;
-  }
-
-  if (!stopped) resetStockfishRuntime(runtime);
-}
-
-function resetStockfishRuntime(runtime: StockfishRuntime): void {
-  stockfishRuntimePromise = null;
-  runtime.waiters.clear();
-  try {
-    runtime.module.terminate?.();
-  } catch {
-    // The next request will create a fresh runtime.
-  }
+interface StockfishContainerResponse {
+  elapsedMs?: number;
+  move?: unknown;
 }

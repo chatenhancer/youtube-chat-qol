@@ -22,6 +22,7 @@ import { ProtocolError } from '../protocol/validation';
 import type { DurableObjectState, DurableObjectStorage, Env } from '../types';
 
 vi.mock('../bots/stockfish', () => ({
+  createStockfishBestMoveProvider: () => getStockfishBestMove,
   getStockfishBestMove: vi.fn(() => Promise.resolve(null))
 }));
 
@@ -202,7 +203,7 @@ describe('playground stream room', () => {
     const harness = createRoomHarness();
     const room = harness.room;
     const alice = createSession('alice-connection');
-    vi.mocked(getStockfishBestMove).mockRejectedValueOnce(new TypeError('Stockfish module factory import failed.'));
+    vi.mocked(getStockfishBestMove).mockRejectedValueOnce(new TypeError('Stockfish container failed.'));
 
     vi.useFakeTimers();
     try {
@@ -228,7 +229,7 @@ describe('playground stream room', () => {
     expect(console.warn).toHaveBeenCalledWith(
       '[Chat Enhancer Playground] chess_bot_stockfish_fallback',
       expect.objectContaining({
-        errorMessage: 'Stockfish module factory import failed.',
+        errorMessage: 'Stockfish container failed.',
         errorType: 'TypeError',
         event: 'chess_bot_stockfish_fallback',
         gameType: 'chess',
@@ -272,7 +273,9 @@ describe('playground stream room', () => {
       '[Chat Enhancer Playground] chess_bot_stockfish_move',
       expect.objectContaining({
         event: 'chess_bot_stockfish_move',
+        from: 'e7',
         gameType: 'chess',
+        source: 'container',
         service: 'chat-enhancer-playground'
       })
     );

@@ -1,8 +1,15 @@
 import { vi } from 'vitest';
 
-vi.mock('stockfish/bin/stockfish-18-lite-single.wasm', () => ({
-  default: new WebAssembly.Module(new Uint8Array([0, 97, 115, 109, 1, 0, 0, 0]))
+vi.mock('@cloudflare/containers', () => ({
+  Container: class {},
+  getContainer: (binding: ContainerTestNamespace, name = 'cf-singleton-container') => binding.get(binding.idFromName(name)),
+  getRandom: (binding: ContainerTestNamespace, _instances = 3) => Promise.resolve(binding.get(binding.idFromName('instance-0')))
 }));
+
+type ContainerTestNamespace = {
+  get(id: { toString(): string }): { fetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response> };
+  idFromName(name: string): { toString(): string };
+};
 
 const localStorageArea = createStorageArea();
 const syncStorageArea = createStorageArea();

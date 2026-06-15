@@ -13,6 +13,8 @@ The backend is organized around stream-local rooms.
 - The worker accepts extension clients and routes them to the correct stream
   room.
 - A Durable Object owns each room's presence, invites, and active game state.
+- A Cloudflare Container runs Stockfish for the server-owned chess computer so
+  engine search cannot consume stream-room Durable Object CPU.
 - Shared protocol types keep the extension and backend aligned.
 - Game-specific rules live in game modules instead of the room transport.
 
@@ -63,6 +65,12 @@ Game modules should own:
 
 Production origins should stay tight. Browser-extension origins are handled in a
 way that supports both Chromium and Firefox extension pages.
+
+Deploying the Playground worker now also builds and pushes the Stockfish
+container image from `stockfish-container/Dockerfile`. Docker, or a compatible
+Docker CLI and engine, must be available locally for `wrangler deploy`. If the
+Stockfish container is cold, unavailable, or times out, the chess computer logs
+`chess_bot_stockfish_fallback` and uses the local legal-move fallback.
 
 For current entrypoints, scripts, routes, and Durable Object configuration, use
 the source files, `wrangler.toml`, and root package scripts as the source of
