@@ -273,6 +273,21 @@ describe('computer player Durable Object', () => {
     );
   });
 
+  it('does not close as idle while an active chess game is running', async () => {
+    vi.useFakeTimers();
+    const harness = createComputerPlayerHarness();
+    await startComputerPlayer(harness);
+    emitAuthenticatedComputerPlayer(harness);
+
+    emitBotTurnChessGame(harness);
+
+    await vi.advanceTimersByTimeAsync(30_000);
+    await harness.state.flushWaitUntil();
+
+    expect(harness.room.socket.readyState).toBe(FakeSocket.OPEN);
+    expect(getStockfishBestMove).toHaveBeenCalledTimes(1);
+  });
+
   it('retries a Stockfish chess move after a transient failure', async () => {
     vi.useFakeTimers();
     const harness = createComputerPlayerHarness();

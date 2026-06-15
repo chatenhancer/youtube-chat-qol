@@ -73,6 +73,7 @@ export class StreamRoom {
 
     this.state.blockConcurrencyWhile(async () => {
       await this.gameState.load();
+      this.sessions.rememberUsers(this.gameState.getKnownUsers());
     });
   }
 
@@ -211,6 +212,7 @@ export class StreamRoom {
 
     const identity = await verifySignedIdentity(session.challenge, message.identity);
     this.sessions.authenticate(session, identity.userId, message.availableGames || []);
+    this.gameState.setKnownUser(this.sessions.getPublicUser(session.userId));
     this.logEvent('client_authenticated', {
       availableGameCount: session.availableGames.size,
       connection: shortLogId(session.connectionId),

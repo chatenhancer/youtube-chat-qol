@@ -52,6 +52,7 @@ type WebSocketResponse = Response & {
 };
 
 export class ComputerPlayer {
+  private readonly activeGameIds = new Set<string>();
   private readonly actionTimers = new Map<string, ReturnType<typeof setTimeout>>();
   private readonly stockfishRetryAttempts = new Map<string, number>();
   private idleCloseTimer: ReturnType<typeof setTimeout> | null = null;
@@ -153,6 +154,7 @@ export class ComputerPlayer {
         this.handleGameChanged(message.game);
         return;
       case 'gameEnded':
+        this.activeGameIds.delete(message.gameId);
         this.clearGameActionState(message.gameId);
         return;
       case 'error':
@@ -179,6 +181,7 @@ export class ComputerPlayer {
   }
 
   private handleSnapshot(snapshot: LobbySnapshot): void {
+    this.activeGameIds.clear();
     snapshot.games.forEach((game) => this.handleGameChanged(game));
     this.updateIdleClose(snapshot);
   }
@@ -186,7 +189,8 @@ export class ComputerPlayer {
   private updateIdleClose(snapshot: LobbySnapshot): void {
     if (!this.userId) return;
     const hasOtherParticipant = snapshot.users.some((user) => user.userId !== this.userId);
-    if (hasOtherParticipant) {
+    const hasActiveGame = this.activeGameIds.size > 0 || snapshot.games.some(isActivePublicGame);
+    if (hasOtherParticipant || hasActiveGame) {
       this.clearIdleCloseTimer();
       return;
     }
@@ -194,11 +198,21 @@ export class ComputerPlayer {
     if (this.idleCloseTimer) return;
     this.idleCloseTimer = setTimeout(() => {
       this.idleCloseTimer = null;
+      this.logEvent('computer_player_idle_closed', {
+        activeGameCount: this.activeGameIds.size
+      });
       this.closeSocket({ reconnect: false });
     }, IDLE_CLOSE_MS);
   }
 
   private handleGameChanged(game: PublicGame): void {
+    if (isActivePublicGame(game)) {
+      this.activeGameIds.add(game.gameId);
+      this.clearIdleCloseTimer();
+    } else {
+      this.activeGameIds.delete(game.gameId);
+    }
+
     this.clearGameActionState(game.gameId);
     if (!this.userId || !shouldComputerPlayerActFromPublicGame(game, this.userId)) return;
 
@@ -474,6 +488,13 @@ function isStoredComputerIdentity(value: unknown): value is StoredComputerIdenti
 
 function isJsonWebKey(value: unknown): value is JsonWebKey {
   return Boolean(value && typeof value === 'object' && !Array.isArray(value));
+}
+
+function isActivePublicGame(game: PublicGame): boolean {
+  return game.status !== 'checkmate'
+    && game.status !== 'draw'
+    && game.status !== 'finished'
+    && game.status !== 'resigned';
 }
 
 function getStockfishFailureErrorMessage(error: unknown): string | undefined {
