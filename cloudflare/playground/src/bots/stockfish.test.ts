@@ -18,9 +18,9 @@ describe('Stockfish bot adapter', () => {
       expect(request.url).toBe('https://stockfish.local/best-move');
       expect(request.method).toBe('POST');
       await expect(request.json()).resolves.toMatchObject({
-        elo: 1350,
+        elo: 1700,
         fen: 'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1',
-        moveTimeMs: 200
+        moveTimeMs: 500
       });
 
       return Response.json({
