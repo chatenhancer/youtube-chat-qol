@@ -8,6 +8,10 @@ import {
 } from '../../protocol/identity';
 import { TokenBucket } from '../../rate-limit';
 import {
+  COMPUTER_PLAYER_AVAILABLE_GAMES,
+  COMPUTER_PLAYER_USER_ID
+} from '../../features/computer-player/actions';
+import {
   PLAYGROUND_PROTOCOL_VERSION,
   type ClientMessage,
   type GameId,
@@ -26,7 +30,6 @@ interface TestSession {
   joinedAt: number;
   rateLimit: TokenBucket;
   socket: FakeSocket;
-  trustedDisplayName?: string;
   userId: string;
 }
 
@@ -167,40 +170,29 @@ describe('playground stream room', () => {
     expect(room.createSnapshot('other-user').games).toHaveLength(0);
   });
 
-  it('uses authenticated client display names for presence and games', async () => {
-    const room = createRoom();
+  it('uses the built-in Computer player for presence and games', async () => {
+    const { room, state } = createRoomHarness();
     const alice = createSession('alice-connection');
-    const computer = createSession('computer-connection');
-    computer.trustedDisplayName = 'Computer';
 
     await room.handleHello(alice, await createHello(alice.challenge, 'Alice', ['chess']));
-    await room.handleHello(computer, await createHello(computer.challenge, 'Computer', ['chess', 'replay-trivia']));
-    const computerPresence = getPresenceUser(room, alice.userId, computer.userId);
+    const computerPresence = getPresenceUser(room, alice.userId, COMPUTER_PLAYER_USER_ID);
     expect(computerPresence).toMatchObject({
-      availableGames: ['chess', 'replay-trivia'],
+      availableGames: [...COMPUTER_PLAYER_AVAILABLE_GAMES],
       displayName: 'Computer',
-      userId: computer.userId
+      userId: COMPUTER_PLAYER_USER_ID
     });
 
-    room.handleInvite(alice, 'chess', computer.userId);
-    const inviteReceived = lastMessage(computer, 'inviteReceived');
-    room.handleInviteResponse(computer, inviteReceived.invite.inviteId, true);
+    room.handleInvite(alice, 'chess', COMPUTER_PLAYER_USER_ID);
+    await state.flushWaitUntil();
 
     expect(lastMessage(alice, 'inviteUpdated').invite.status).toBe('accepted');
     const startedChessGame = lastMessage(alice, 'gameStarted').game as PublicChessGame;
     expect(startedChessGame.players.white.userId).toBe(alice.userId);
     expect(startedChessGame.players.black).toEqual({
       displayName: 'Computer',
-      userId: computer.userId
+      userId: COMPUTER_PLAYER_USER_ID
     });
     expect(room.createSnapshot(alice.userId).games.map((game) => game.gameId)).toEqual([startedChessGame.gameId]);
-
-    room.removeClient(computer.connectionId);
-    const gameAfterDisconnect = room.createSnapshot(alice.userId).games[0] as PublicChessGame;
-    expect(gameAfterDisconnect.players.black).toEqual({
-      displayName: 'Computer',
-      userId: computer.userId
-    });
   });
 
   it('mints one-use Replay Trivia generation tokens for the question provider', async () => {
@@ -328,30 +320,20 @@ describe('playground stream room', () => {
     expect(updatedChessGame.lastMoveSan).toBe('e4');
   });
 
-  it('restores known display names for active games after restart', async () => {
+  it('restores the built-in Computer display name for active games after restart', async () => {
     const storage = new FakeDurableObjectStorage();
     const first = createRoomHarness(storage);
     const room = first.room;
     const alice = createSession('alice-connection');
-    const computer = createSession('computer-connection');
     const aliceKeyPair = await createIdentityKeyPair();
-    const computerKeyPair = await createIdentityKeyPair();
-    computer.trustedDisplayName = 'Computer';
 
     await room.handleHello(alice, await createHello(alice.challenge, 'Alice', ['chess'], aliceKeyPair));
-    await room.handleHello(computer, await createHello(computer.challenge, 'Computer', ['chess'], computerKeyPair));
-    room.handleInvite(alice, 'chess', computer.userId);
-    room.handleInviteResponse(computer, lastMessage(computer, 'inviteReceived').invite.inviteId, true);
+    room.handleInvite(alice, 'chess', COMPUTER_PLAYER_USER_ID);
+    await first.state.flushWaitUntil();
     const gameId = lastMessage(alice, 'gameStarted').game.gameId;
     await first.state.flushWaitUntil();
     await expect(storage.get('roomState:v1')).resolves.toMatchObject({
-      games: [expect.objectContaining({ gameId })],
-      knownUsers: expect.arrayContaining([
-        expect.objectContaining({
-          displayName: 'Computer',
-          userId: computer.userId
-        })
-      ])
+      games: [expect.objectContaining({ gameId })]
     });
 
     const restarted = createRoomHarness(storage);
@@ -365,7 +347,7 @@ describe('playground stream room', () => {
     const restoredGame = lastMessage(reconnectedAlice, 'helloAccepted').snapshot.games[0] as PublicChessGame;
     expect(restoredGame.players.black).toEqual({
       displayName: 'Computer',
-      userId: computer.userId
+      userId: COMPUTER_PLAYER_USER_ID
     });
   });
 

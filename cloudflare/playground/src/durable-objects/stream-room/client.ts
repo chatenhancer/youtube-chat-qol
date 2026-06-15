@@ -2,40 +2,19 @@ import type { Env } from '../../types';
 
 const REPLAY_TRIVIA_GENERATION_TOKEN_CONSUME_URL =
   'https://stream-room.internal/internal/replay-trivia/generation-token/consume';
-const STREAM_ROOM_CLIENT_DISPLAY_NAME_HEADER = 'X-Chat-Enhancer-Client-Display-Name';
 const STREAM_ROOM_STREAM_KEY_HEADER = 'X-Chat-Enhancer-Stream-Key';
-
-interface StreamRoomForwardOptions {
-  stripClientDisplayName?: boolean;
-}
 
 export interface ReplayTriviaGenerationTokenInput {
   gameId: string;
   generationToken: string;
 }
 
-export function connectStreamRoomSocket(
-  env: Pick<Env, 'STREAM_ROOMS'>,
-  streamKey: string,
-  displayName: string
-): Promise<Response> {
-  return getStreamRoom(env, streamKey).fetch(new Request(`https://stream-room.internal/v1/streams/${streamKey}/socket`, {
-    headers: {
-      [STREAM_ROOM_CLIENT_DISPLAY_NAME_HEADER]: displayName,
-      [STREAM_ROOM_STREAM_KEY_HEADER]: streamKey,
-      Upgrade: 'websocket'
-    }
-  }));
-}
-
 export function forwardStreamRoomRequest(
   env: Pick<Env, 'STREAM_ROOMS'>,
   streamKey: string,
-  request: Request,
-  options: StreamRoomForwardOptions = {}
+  request: Request
 ): Promise<Response> {
   const headers = new Headers(request.headers);
-  if (options.stripClientDisplayName) headers.delete(STREAM_ROOM_CLIENT_DISPLAY_NAME_HEADER);
   headers.set(STREAM_ROOM_STREAM_KEY_HEADER, streamKey);
   return getStreamRoom(env, streamKey).fetch(new Request(request, { headers }));
 }

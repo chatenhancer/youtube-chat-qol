@@ -4,7 +4,7 @@ import {
   createReplayTriviaBotAnswerAction,
   createStockfishChessBotAction
 } from './actions';
-import { getStockfishBestMove } from '../stockfish-container/client';
+import { getStockfishBestMove } from '../../durable-objects/stockfish-container/client';
 import { createChessGame } from '../../games/chess';
 import {
   advanceReplayTriviaGame,
@@ -12,7 +12,7 @@ import {
   submitReplayTriviaQuestions
 } from '../../games/replay-trivia';
 
-vi.mock('../stockfish-container/client', () => ({
+vi.mock('../../durable-objects/stockfish-container/client', () => ({
   getStockfishBestMove: vi.fn(() => Promise.resolve(createStockfishResult(null)))
 }));
 

@@ -22,6 +22,7 @@ import {
 } from '../../protocol/messages';
 import { parseClientMessage, ProtocolError, sanitizeStreamKey } from '../../protocol/validation';
 import { TokenBucket, type TokenBucketOptions } from '../../rate-limit';
+import { attachComputerPlayerToRoom } from '../../features/computer-player/room-adapter';
 import { GameState } from './game-state';
 import { GenerationTokens } from './generation-token';
 import { InviteManager } from './invite-manager';
@@ -31,7 +32,6 @@ import type { DurableObjectState, Env } from '../../types';
 const INVITE_TTL_MS = 2 * 60 * 1000;
 const MAX_MESSAGE_BYTES = 32_768;
 const CLOSE_POLICY_VIOLATION = 1008;
-const TRUSTED_DISPLAY_NAME_HEADER = 'X-Chat-Enhancer-Client-Display-Name';
 const CONNECTION_RATE_LIMIT: TokenBucketOptions = {
   capacity: 30,
   refillPerSecond: 10
@@ -68,12 +68,21 @@ export class StreamRoom {
   private readonly userRateLimits = new Map<string, TokenBucket>();
   private streamKey = '';
 
-  constructor(private readonly state: DurableObjectState, _env: Env) {
+  constructor(private readonly state: DurableObjectState, private readonly env: Env) {
     this.gameState = new GameState(this.state, (event, details, level) => this.logEvent(event, details, level));
+    attachComputerPlayerToRoom({
+      connectionRateLimitOptions: CONNECTION_RATE_LIMIT,
+      createSnapshot: (userId) => this.createSnapshot(userId),
+      env: this.env,
+      getGame: (gameId) => this.gameState.get(gameId),
+      handleMessage: (session, message) => this.handleSocketMessage(session, message),
+      logEvent: (event, details, level) => this.logEvent(event, details, level),
+      sessions: this.sessions,
+      waitUntil: (promise) => this.state.waitUntil(promise)
+    });
 
     this.state.blockConcurrencyWhile(async () => {
       await this.gameState.load();
-      this.sessions.rememberUsers(this.gameState.getKnownUsers());
     });
   }
 
@@ -96,10 +105,10 @@ export class StreamRoom {
       return new Response('Expected WebSocket upgrade.', { status: 426 });
     }
 
-    return this.handleSocket(request);
+    return this.handleSocket();
   }
 
-  private handleSocket(request: Request): Response {
+  private handleSocket(): Response {
     const pair = new WebSocketPair();
     const client = pair[0];
     const socket = pair[1];
@@ -115,7 +124,6 @@ export class StreamRoom {
       joinedAt: Date.now(),
       rateLimit: new TokenBucket(CONNECTION_RATE_LIMIT),
       socket,
-      trustedDisplayName: getTrustedDisplayName(request),
       userId: ''
     };
     this.logEvent('websocket_accepted', {
@@ -212,7 +220,6 @@ export class StreamRoom {
 
     const identity = await verifySignedIdentity(session.challenge, message.identity);
     this.sessions.authenticate(session, identity.userId, message.availableGames || []);
-    this.gameState.setKnownUser(this.sessions.getPublicUser(session.userId));
     this.logEvent('client_authenticated', {
       availableGameCount: session.availableGames.size,
       connection: shortLogId(session.connectionId),
@@ -582,12 +589,6 @@ function getProtocolLogEvent(code: string): string {
     default:
       return 'protocol_error';
   }
-}
-
-function getTrustedDisplayName(request: Request): string | undefined {
-  const displayName = (request.headers.get(TRUSTED_DISPLAY_NAME_HEADER) || '').trim().replace(/\s+/g, ' ');
-  if (!displayName) return undefined;
-  return displayName.slice(0, 32);
 }
 
 function createId(prefix: string): string {

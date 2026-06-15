@@ -8,16 +8,14 @@ import {
   getStockfishBestMove,
   type StockfishBestMoveProvider,
   type StockfishResult
-} from '../stockfish-container/client';
+} from '../../durable-objects/stockfish-container/client';
 import type { ChessGameRecord, ChessMoveInput } from '../../games/chess';
-import type { PublicChessGame } from '../../games/chess';
 import {
-  type PublicReplayTriviaGame,
   REPLAY_TRIVIA_ANSWER_TIME_MS,
   REPLAY_TRIVIA_QUESTION_READ_MS
 } from '../../games/replay-trivia';
 import type { GameActionInput, GameRecord } from '../../games/types';
-import type { GameId, PublicGame } from '../../protocol/messages';
+import type { GameId } from '../../protocol/messages';
 
 type ChoiceIndex = 0 | 1 | 2 | 3;
 type ChessBotMove = Pick<ChessMoveInput, 'from' | 'promotion' | 'to'>;
@@ -91,47 +89,6 @@ export function createComputerPlayerAction(
       return createReplayTriviaBotAnswerAction(
         game,
         COMPUTER_PLAYER_USER_ID,
-        options.random,
-        options.now
-      );
-    default:
-      return null;
-  }
-}
-
-export function shouldComputerPlayerActFromPublicGame(
-  game: PublicGame,
-  userId: string,
-  now = Date.now()
-): boolean {
-  switch (game.gameType) {
-    case 'chess':
-      return isPublicChessTurnForPlayer(game as PublicChessGame, userId);
-    case 'replay-trivia':
-      return isPublicReplayTriviaAnswerNeeded(game as PublicReplayTriviaGame, userId, now);
-    default:
-      return false;
-  }
-}
-
-export function createComputerPlayerActionFromPublicGame(
-  game: PublicGame,
-  userId: string,
-  options: ComputerActionOptions = {}
-): Promise<GameActionInput | null> | GameActionInput | null {
-  switch (game.gameType) {
-    case 'chess':
-      return createStockfishChessBotAction(
-        toChessGameRecord(game as PublicChessGame),
-        userId,
-        options.onChessBotStockfishFailure,
-        options.onChessBotStockfishMove,
-        options.getStockfishBestMove
-      );
-    case 'replay-trivia':
-      return createPublicReplayTriviaBotAnswerAction(
-        game as PublicReplayTriviaGame,
-        userId,
         options.random,
         options.now
       );
@@ -217,11 +174,6 @@ function isChessTurnForPlayer(game: GameRecord, userId: string): boolean {
   return chessGame.players[chessGame.turn] === userId;
 }
 
-function isPublicChessTurnForPlayer(game: PublicChessGame, userId: string): boolean {
-  if (game.status !== 'active') return false;
-  return game.players[game.turn]?.userId === userId;
-}
-
 function isReplayTriviaAnswerNeeded(game: GameRecord, userId: string, now: number): boolean {
   const triviaGame = getReplayTriviaBotGame(game);
   return Boolean(
@@ -229,17 +181,6 @@ function isReplayTriviaAnswerNeeded(game: GameRecord, userId: string, now: numbe
       && triviaGame.status === 'question'
       && triviaGame.answers[userId] === undefined
       && !isReplayTriviaQuestionDeadlinePassed(triviaGame, now)
-  );
-}
-
-function isPublicReplayTriviaAnswerNeeded(game: PublicReplayTriviaGame, userId: string, now: number): boolean {
-  const role = getPublicReplayTriviaPlayerRole(game, userId);
-  return Boolean(
-    role
-      && game.status === 'question'
-      && game.currentQuestion
-      && game.answers[role] === undefined
-      && now - game.phaseStartedAt < REPLAY_TRIVIA_ANSWER_TIME_MS
   );
 }
 
@@ -252,49 +193,6 @@ function getGamePlayers(game: GameRecord): Record<string, string> {
 function getChessBotGame(game: GameRecord): ChessGameRecord | null {
   if (game.gameType !== 'chess') return null;
   return game as ChessGameRecord;
-}
-
-function toChessGameRecord(game: PublicChessGame): ChessGameRecord {
-  return {
-    fen: game.fen,
-    gameId: game.gameId,
-    gameType: 'chess',
-    lastMoveSan: game.lastMoveSan,
-    pgn: game.pgn,
-    players: {
-      black: game.players.black.userId,
-      white: game.players.white.userId
-    },
-    status: game.status,
-    turn: game.turn,
-    winner: game.winner
-  };
-}
-
-function createPublicReplayTriviaBotAnswerAction(
-  game: PublicReplayTriviaGame,
-  userId: string,
-  random = Math.random,
-  now = Date.now()
-): GameActionInput | null {
-  if (!isPublicReplayTriviaAnswerNeeded(game, userId, now)) return null;
-
-  return {
-    action: 'answer',
-    payload: {
-      choiceIndex: Math.floor(random() * 4) as ChoiceIndex
-    },
-    userId
-  };
-}
-
-function getPublicReplayTriviaPlayerRole(
-  game: PublicReplayTriviaGame,
-  userId: string
-): 'guest' | 'host' | null {
-  if (game.players.host.userId === userId) return 'host';
-  if (game.players.guest.userId === userId) return 'guest';
-  return null;
 }
 
 function toChessMovePayload(move: ChessBotMove): Record<string, unknown> {
