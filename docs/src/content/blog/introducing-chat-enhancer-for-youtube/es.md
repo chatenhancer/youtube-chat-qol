@@ -50,7 +50,7 @@ Es algo pequeño, pero hace que quienes participan a menudo se sientan mucho men
 
 ## Emojis más usados
 
-Uso los mismos emojis constantemente. Tener que recorrer todo el selector cada vez era absurdo, porque aparentemente soy un hombre sencillo con un rango emocional fijo.
+Uso los mismos emojis constantemente. Tener que recorrer todo el selector cada vez se volvió molesto enseguida.
 
 Chat Enhancer añade una fila para tus emojis más usados, para que los que realmente usas estén más a mano.
 

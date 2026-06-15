@@ -50,7 +50,7 @@ To drobiazg, ale sprawia, że stali uczestnicy czatu są dużo mniej anonimowi.
 
 ## Najczęściej używane emoji
 
-Ciągle używam tych samych emoji. Przewijanie całego selektora za każdym razem wydawało się absurdalne, bo najwyraźniej jestem prostym człowiekiem o stałym zakresie emocji.
+Ciągle używam tych samych emoji. Przewijanie całego selektora za każdym razem szybko stało się męczące.
 
 Chat Enhancer dodaje rząd z najczęściej używanymi emoji, dzięki czemu te, których naprawdę używasz, są łatwiej dostępne.
 

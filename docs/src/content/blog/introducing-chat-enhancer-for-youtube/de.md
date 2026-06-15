@@ -50,7 +50,7 @@ Das ist eine Kleinigkeit, aber wiederkehrende Chatter wirken dadurch deutlich we
 
 ## Meistgenutzte Emojis
 
-Ich verwende ständig dieselben Emojis. Jedes Mal durch den kompletten Emoji-Picker zu scrollen fühlte sich lächerlich an, weil ich offenbar ein einfacher Mensch mit festem emotionalem Spektrum bin.
+Ich verwende ständig dieselben Emojis. Jedes Mal durch den kompletten Emoji-Picker zu scrollen wurde schnell lästig.
 
 Chat Enhancer fügt eine Zeile für deine meistgenutzten Emojis hinzu, damit die Emojis, die du tatsächlich nutzt, leichter erreichbar sind.
 

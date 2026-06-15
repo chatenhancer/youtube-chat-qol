@@ -50,7 +50,7 @@ Küçük bir şey, ama düzenli sohbet edenleri çok daha az anonim hissettirir.
 
 ## En çok kullanılan emojiler
 
-Sürekli aynı emojileri kullanıyorum. Her seferinde tüm emoji seçicisini kaydırmak komik derecede saçmaydı; görünüşe göre sabit bir duygusal aralığı olan basit bir insanım.
+Sürekli aynı emojileri kullanıyorum. Her seferinde tüm emoji seçicisini kaydırmak kısa sürede can sıkıcı hale geldi.
 
 Chat Enhancer, en çok kullandığınız emojiler için bir sıra ekler; gerçekten kullandıklarınıza ulaşmak daha kolay olur.
 

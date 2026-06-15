@@ -50,7 +50,7 @@ Ini hal kecil, tetapi membuat pengguna yang sering muncul terasa jauh lebih tida
 
 ## Emoji yang paling sering digunakan
 
-Saya terus-menerus memakai emoji yang sama. Harus menggulir seluruh pemilih emoji setiap kali terasa konyol, karena rupanya saya orang sederhana dengan rentang emosi yang tetap.
+Saya terus-menerus memakai emoji yang sama. Harus menggulir seluruh pemilih emoji setiap kali cepat terasa melelahkan.
 
 Chat Enhancer menambahkan baris untuk emoji yang paling sering Anda gunakan, sehingga emoji yang benar-benar dipakai lebih mudah dijangkau.
 

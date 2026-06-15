@@ -50,7 +50,7 @@ It is a small thing, but it makes recurring chatters feel a lot less anonymous.
 
 ## Most-used emojis
 
-I use the same emojis constantly. Having to scroll through the full emoji picker every time felt ridiculous, because apparently I am a simple man with a fixed emotional range.
+I use the same emojis constantly. Scrolling through the full emoji picker every time got old fast.
 
 Chat Enhancer adds a row for your most-used emojis, so the ones you actually use are easier to reach.
 

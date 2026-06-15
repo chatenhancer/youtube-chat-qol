@@ -50,7 +50,7 @@ C’est un petit détail, mais les habitués du chat paraissent beaucoup moins a
 
 ## Emojis les plus utilisés
 
-J’utilise constamment les mêmes emojis. Devoir parcourir tout le sélecteur à chaque fois semblait ridicule, car je suis apparemment une personne simple avec une palette émotionnelle fixe.
+J’utilise constamment les mêmes emojis. Devoir parcourir tout le sélecteur à chaque fois est vite devenu pénible.
 
 Chat Enhancer ajoute une rangée pour vos emojis les plus utilisés, afin que ceux que vous utilisez vraiment soient plus faciles à atteindre.
 
