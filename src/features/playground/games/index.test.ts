@@ -252,13 +252,34 @@ describe('playground games header button', () => {
     expect(document.querySelector('.ytcq-games-card')).toBeNull();
 
     gamesButton.click();
-    const activeRows = Array.from(document.querySelectorAll<HTMLElement>('.ytcq-games-active-row'))
-      .map((row) => row.textContent || '');
-    expect(activeRows).toHaveLength(2);
-    expect(activeRows[0]).toContain('Chess');
-    expect(activeRows[0]).toContain('Luna Chat');
-    expect(activeRows[1]).toContain('HELP-A-FRIEND! Trivia');
-    expect(activeRows[1]).toContain('Luna Chat');
+    expect(document.querySelector('.ytcq-games-active-row')?.textContent).toContain('Chess');
+    expect(document.querySelector('.ytcq-games-active-row')?.textContent).toContain('Luna Chat');
+    expect(document.querySelector('.ytcq-games-active-count')?.textContent).toBe('1/2');
+    document.querySelectorAll<HTMLButtonElement>('.ytcq-games-cycle-action')[1].click();
+    expect(document.querySelector('.ytcq-games-active-row')?.textContent).toContain('HELP-A-FRIEND! Trivia');
+    expect(document.querySelector('.ytcq-games-active-row')?.textContent).toContain('Luna Chat');
+  });
+
+  it('does not offer duplicate active game invites for the same player', () => {
+    window.history.replaceState({}, '', '/live_chat_replay?video_id=stream-a');
+    const header = createHeader();
+    document.body.append(header);
+    setOptions({ ...DEFAULT_OPTIONS, playgroundEnabled: true, playgroundGamesAvailable: true });
+
+    wireGamesButton();
+    header.querySelector<HTMLButtonElement>('.ytcq-games-button')!.click();
+    lastMockPort()?.emit(createSnapshotMessage({
+      ...createLobbySnapshot(),
+      games: [createChessGame()],
+      invites: []
+    }));
+
+    getGameCards()[0].click();
+    expect(getPlayerNames()).toEqual(['Marco Vibes']);
+
+    getActionButton('Back').click();
+    getGameCards()[1].click();
+    expect(getPlayerNames()).toEqual(['Luna Chat', 'Marco Vibes']);
   });
 
   it('renders server-backed invites, players, and active chess games inside the panel', () => {
@@ -315,7 +336,7 @@ describe('playground games header button', () => {
     expect(canvas?.getAttribute('aria-label')).toBe('Chess');
 
     gamesButton.click();
-    expect(getGamesSectionTitles()).toEqual(['Active game', 'Invites', 'Start a game']);
+    expect(getGamesSectionTitles()).toEqual(['Active games', 'Invites', 'Start a game']);
     expect(document.querySelector('.ytcq-games-active-row')?.textContent).toContain('Chess');
     expect(document.querySelector('.ytcq-games-active-row')?.textContent).toContain('Luna Chat');
     expect(document.querySelector('.ytcq-games-invite-row')).toBeNull();
@@ -327,22 +348,29 @@ describe('playground games header button', () => {
     expect(getActionButtonLabels()).toEqual(['Resume', 'Leave']);
     getActionButton('Resume').click();
     expect(document.querySelector('.ytcq-chess-game-panel')).not.toBeNull();
-    expect(document.querySelector('.ytcq-games-card')).toBeNull();
-    gamesButton.click();
+    expect(document.querySelector('.ytcq-games-card')).not.toBeNull();
     expect(getActionButtonLabels()).toEqual(['Minimize', 'Leave']);
     document.querySelector<HTMLButtonElement>('.ytcq-chess-game-close')!.click();
     expect(document.querySelector('.ytcq-chess-game-panel')).toBeNull();
     expect(getActionButtonLabels()).toEqual(['Resume', 'Leave']);
     getActionButton('Resume').click();
     expect(document.querySelector('.ytcq-chess-game-panel')).not.toBeNull();
-    expect(document.querySelector('.ytcq-games-card')).toBeNull();
-    gamesButton.click();
+    expect(document.querySelector('.ytcq-games-card')).not.toBeNull();
     getActionButton('Leave').click();
     expect(lastMockPort()?.messages.at(-1)).toEqual({
       action: 'leave',
       gameId: 'game-1',
       payload: undefined,
       type: 'ytcq:playground:game-action'
+    });
+    lastMockPort()?.emit({
+      message: {
+        gameId: 'game-1',
+        reason: 'playerLeft',
+        type: 'gameEnded',
+        userId: 'me-user'
+      },
+      type: 'ytcq:playground:server-message'
     });
     getGameCards()[0].click();
 
@@ -762,7 +790,12 @@ function getPlayerAvatarBackgrounds(): string[] {
     .map((avatar) => avatar.style.getPropertyValue('--ytcq-games-player-avatar-bg'));
 }
 
+function getPlayerNames(): string[] {
+  return Array.from(document.querySelectorAll<HTMLElement>('.ytcq-games-player-row .ytcq-games-row-title'))
+    .map((title) => title.textContent || '');
+}
+
 function getGamesSectionTitles(): string[] {
-  return Array.from(document.querySelectorAll<HTMLElement>('.ytcq-games-section:not([hidden]) > .ytcq-games-section-title'))
+  return Array.from(document.querySelectorAll<HTMLElement>('.ytcq-games-section:not([hidden]) .ytcq-games-section-title'))
     .map((title) => title.textContent || '');
 }

@@ -170,6 +170,45 @@ describe('playground stream room', () => {
     expect(room.createSnapshot('other-user').games).toHaveLength(0);
   });
 
+  it('rejects duplicate active games with the same player and game type', async () => {
+    const room = createRoom();
+    const alice = createSession('alice-connection');
+    const bob = createSession('bob-connection');
+
+    await room.handleHello(alice, await createHello(alice.challenge, 'Alice', ['chess', 'replay-trivia']));
+    await room.handleHello(bob, await createHello(bob.challenge, 'Bob', ['chess', 'replay-trivia']));
+    room.handleInvite(alice, 'chess', bob.userId);
+    room.handleInviteResponse(bob, lastMessage(bob, 'inviteReceived').invite.inviteId, true);
+
+    expect(() => room.handleInvite(alice, 'chess', bob.userId)).toThrowError(new ProtocolError(
+      'game_already_active',
+      'You already have this game active with that player.'
+    ));
+
+    room.handleInvite(alice, 'replay-trivia', bob.userId);
+    expect(lastMessage(bob, 'inviteReceived').invite.gameId).toBe('replay-trivia');
+  });
+
+  it('rejects accepting a stale duplicate same-game invite', async () => {
+    const room = createRoom();
+    const alice = createSession('alice-connection');
+    const bob = createSession('bob-connection');
+
+    await room.handleHello(alice, await createHello(alice.challenge, 'Alice', ['chess']));
+    await room.handleHello(bob, await createHello(bob.challenge, 'Bob', ['chess']));
+    room.handleInvite(alice, 'chess', bob.userId);
+    const aliceInviteId = lastMessage(bob, 'inviteReceived').invite.inviteId;
+    room.handleInvite(bob, 'chess', alice.userId);
+    const bobInviteId = lastMessage(alice, 'inviteReceived').invite.inviteId;
+
+    room.handleInviteResponse(bob, aliceInviteId, true);
+
+    expect(() => room.handleInviteResponse(alice, bobInviteId, true)).toThrowError(new ProtocolError(
+      'game_already_active',
+      'You already have this game active with that player.'
+    ));
+  });
+
   it('uses the built-in Computer players for presence and games', async () => {
     const { room, state } = createRoomHarness();
     const alice = createSession('alice-connection');

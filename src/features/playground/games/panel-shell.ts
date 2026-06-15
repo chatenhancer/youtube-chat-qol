@@ -41,7 +41,7 @@ export function createGamePanelShell({
   title
 }: GamePanelShellOptions): GamePanelShell {
   const panel = ytcqCreateElement('section');
-  panel.className = `${classNamePrefix}-panel`;
+  panel.className = `ytcq-game-panel ${classNamePrefix}-panel`;
   panel.setAttribute('role', 'dialog');
   panel.setAttribute('aria-label', ariaLabel);
 

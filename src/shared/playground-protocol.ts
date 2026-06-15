@@ -41,6 +41,7 @@ export interface PublicInvite {
 export interface PublicGame {
   gameId: string;
   gameType: GameId;
+  players?: Partial<Record<string, PublicUserIdentity>>;
   status: string;
 }
 

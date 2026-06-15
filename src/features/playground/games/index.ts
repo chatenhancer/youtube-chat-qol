@@ -30,6 +30,7 @@ import {
 import { createGamesCard, installGamesCardListeners } from './card';
 import {
   createInitialGamesPanelState,
+  getSupportedGames,
   isCurrentUserAvailable,
   type GamesPanelState
 } from './state';
@@ -194,7 +195,7 @@ function ensureGamesClientSubscription(): void {
 
 function handlePlaygroundClientStateChanged(nextState: PlaygroundClientState): void {
   updateOpenGamePanel(nextState);
-  if (openPendingStartedGame(nextState)) return;
+  openPendingStartedGame(nextState);
 
   if (!gamesPanelState) {
     return;
@@ -220,6 +221,7 @@ function createGamesViewActions(): GamesViewActions {
     onAcceptInvite: acceptInvite,
     onBackToLobby: showLobbyView,
     onCancelInvite: cancelPlayerInvite,
+    onCycleActiveGame: cycleActiveGame,
     onIgnoreInvite: ignoreInvite,
     onInvitePlayer: invitePlayer,
     onLeaveGame: leaveGame,
@@ -283,7 +285,7 @@ function toggleActiveGamePanel(game: PublicGame): void {
   }
 
   openGamePanel(game, gamesPanelState.transport.userId);
-  closeGamesCard();
+  renderGamesPanel();
 }
 
 function leaveGame(game: PublicGame): void {
@@ -316,7 +318,23 @@ function openPendingStartedGame(nextState: PlaygroundClientState): boolean {
   if (!game) return false;
 
   pendingStartedGameOpen = null;
+  showLobbyView();
+  selectActiveGame(game.gameId, nextState);
   openGamePanel(game, nextState.userId);
   closeGamesCard();
   return true;
+}
+
+function cycleActiveGame(step: number): void {
+  if (!gamesPanelState) return;
+  const games = getSupportedGames(gamesPanelState.transport.games);
+  if (games.length <= 1) return;
+  gamesPanelState.activeGameIndex = (gamesPanelState.activeGameIndex + step + games.length) % games.length;
+  renderGamesPanel();
+}
+
+function selectActiveGame(gameId: string, state: PlaygroundClientState): void {
+  if (!gamesPanelState) return;
+  const index = getSupportedGames(state.games).findIndex((game) => game.gameId === gameId);
+  if (index >= 0) gamesPanelState.activeGameIndex = index;
 }

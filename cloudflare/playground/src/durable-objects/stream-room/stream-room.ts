@@ -242,6 +242,7 @@ export class StreamRoom {
     if (!target.availableGames.includes(gameId)) {
       throw new ProtocolError('user_unavailable', 'That player is not available for this game.');
     }
+    this.assertNoActiveGameBetweenUsers(gameId, session.userId, toUserId);
 
     const now = Date.now();
     const invite = this.invites.createInvite({
@@ -273,6 +274,7 @@ export class StreamRoom {
     if (invite.toUserId !== userId) {
       throw new ProtocolError('not_your_invite', 'That invite is not for you.');
     }
+    if (accept) this.assertNoActiveGameBetweenUsers(invite.gameId, invite.fromUserId, invite.toUserId);
 
     this.invites.setInviteStatus(invite, accept ? 'accepted' : 'ignored');
     this.logEvent(accept ? 'invite_accepted' : 'invite_ignored', {
@@ -322,6 +324,17 @@ export class StreamRoom {
     }
 
     this.applyGameAction(game, action);
+  }
+
+  private assertNoActiveGameBetweenUsers(gameId: GameId, userA: string, userB: string): void {
+    const hasActiveGame = this.gameState.values().some((game) => {
+      if (game.gameType !== gameId || isTerminalGameStatus(game.status)) return false;
+      const recipientUserIds = getGameModuleForRecord(game).getRecipientUserIds(game);
+      return recipientUserIds.includes(userA) && recipientUserIds.includes(userB);
+    });
+    if (hasActiveGame) {
+      throw new ProtocolError('game_already_active', 'You already have this game active with that player.');
+    }
   }
 
   private applyGameAction(

@@ -70,6 +70,7 @@ export function installGamesCardListeners({
   const handleOutsideClick = (event: MouseEvent): void => {
     if (getCard()?.contains(event.target as Node)) return;
     if ((event.target as Element | null)?.closest?.('.ytcq-games-button')) return;
+    if ((event.target as Element | null)?.closest?.('.ytcq-game-panel')) return;
     onClose();
   };
   const handleKeydown = (event: KeyboardEvent): void => {
