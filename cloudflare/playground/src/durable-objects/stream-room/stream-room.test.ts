@@ -194,6 +194,13 @@ describe('playground stream room', () => {
       userId: computer.userId
     });
     expect(room.createSnapshot(alice.userId).games.map((game) => game.gameId)).toEqual([startedChessGame.gameId]);
+
+    room.removeClient(computer.connectionId);
+    const gameAfterDisconnect = room.createSnapshot(alice.userId).games[0] as PublicChessGame;
+    expect(gameAfterDisconnect.players.black).toEqual({
+      displayName: 'Computer',
+      userId: computer.userId
+    });
   });
 
   it('mints one-use Replay Trivia generation tokens for the question provider', async () => {
@@ -319,6 +326,47 @@ describe('playground stream room', () => {
 
     const updatedChessGame = lastMessage(reconnectedAlice, 'gameUpdated').game as PublicChessGame;
     expect(updatedChessGame.lastMoveSan).toBe('e4');
+  });
+
+  it('restores known display names for active games after restart', async () => {
+    const storage = new FakeDurableObjectStorage();
+    const first = createRoomHarness(storage);
+    const room = first.room;
+    const alice = createSession('alice-connection');
+    const computer = createSession('computer-connection');
+    const aliceKeyPair = await createIdentityKeyPair();
+    const computerKeyPair = await createIdentityKeyPair();
+    computer.trustedDisplayName = 'Computer';
+
+    await room.handleHello(alice, await createHello(alice.challenge, 'Alice', ['chess'], aliceKeyPair));
+    await room.handleHello(computer, await createHello(computer.challenge, 'Computer', ['chess'], computerKeyPair));
+    room.handleInvite(alice, 'chess', computer.userId);
+    room.handleInviteResponse(computer, lastMessage(computer, 'inviteReceived').invite.inviteId, true);
+    const gameId = lastMessage(alice, 'gameStarted').game.gameId;
+    await first.state.flushWaitUntil();
+    await expect(storage.get('roomState:v1')).resolves.toMatchObject({
+      games: [expect.objectContaining({ gameId })],
+      knownUsers: expect.arrayContaining([
+        expect.objectContaining({
+          displayName: 'Computer',
+          userId: computer.userId
+        })
+      ])
+    });
+
+    const restarted = createRoomHarness(storage);
+    await restarted.state.flushWaitUntil();
+    const reconnectedAlice = createSession('alice-reconnected');
+    await restarted.room.handleHello(
+      reconnectedAlice,
+      await createHello(reconnectedAlice.challenge, 'Alice', ['chess'], aliceKeyPair)
+    );
+
+    const restoredGame = lastMessage(reconnectedAlice, 'helloAccepted').snapshot.games[0] as PublicChessGame;
+    expect(restoredGame.players.black).toEqual({
+      displayName: 'Computer',
+      userId: computer.userId
+    });
   });
 
   it('destroys an active game when a player explicitly leaves', async () => {

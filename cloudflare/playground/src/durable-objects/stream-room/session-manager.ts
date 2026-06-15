@@ -23,14 +23,16 @@ export interface ClientSession {
 export class SessionManager {
   private readonly sessions = new Map<string, ClientSession>();
   private readonly userAvailableGames = new Map<string, GameId[]>();
+  private readonly userDisplayNames = new Map<string, string>();
 
   authenticate(session: ClientSession, userId: string, availableGames: GameId[]): void {
     session.userId = userId;
-    session.displayName = session.trustedDisplayName || getPlayerDisplayName(userId);
+    session.displayName = session.trustedDisplayName || this.userDisplayNames.get(userId) || getPlayerDisplayName(userId);
     session.availableGames = new Set(availableGames);
     session.joinedAt = Date.now();
     this.sessions.set(session.connectionId, session);
     this.userAvailableGames.set(userId, availableGames);
+    this.userDisplayNames.set(userId, session.displayName);
   }
 
   get(connectionId: string): ClientSession | undefined {
@@ -61,7 +63,7 @@ export class SessionManager {
   getPublicUser(userId: string): PublicUserIdentity {
     const presence = this.getPresenceUser(userId);
     return {
-      displayName: presence?.displayName || getPlayerDisplayName(userId),
+      displayName: presence?.displayName || this.userDisplayNames.get(userId) || getPlayerDisplayName(userId),
       userId
     };
   }
@@ -90,6 +92,13 @@ export class SessionManager {
   setAvailability(session: ClientSession, availableGames: GameId[]): void {
     session.availableGames = new Set(availableGames);
     this.userAvailableGames.set(session.userId, availableGames);
+  }
+
+  rememberUsers(users: PublicUserIdentity[]): void {
+    users.forEach((user) => {
+      if (!user.userId || !user.displayName) return;
+      this.userDisplayNames.set(user.userId, user.displayName);
+    });
   }
 
   broadcastPresence(createSnapshot: (userId: string) => LobbySnapshot): void {
