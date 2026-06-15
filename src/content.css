@@ -1713,7 +1713,7 @@ yt-live-chat-header-renderer .ytcq-inbox-badge[hidden] {
   height: 11px;
   border-bottom-right-radius: 9px;
   border-bottom-left-radius: 9px;
-  background: rgba(128, 128, 128, 0.16);
+  background: var(--ytcq-control-border);
   content: "";
   pointer-events: none;
   transform: translateX(-50%);
@@ -1727,7 +1727,7 @@ yt-live-chat-header-renderer .ytcq-inbox-badge[hidden] {
   height: 11px;
   border-bottom-right-radius: 9px;
   border-bottom-left-radius: 9px;
-  background: rgba(128, 128, 128, 0.16);
+  background: var(--ytcq-control-border);
   content: "";
   pointer-events: none;
   transform: translateX(-50%);
