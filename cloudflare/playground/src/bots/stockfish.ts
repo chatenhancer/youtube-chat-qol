@@ -9,7 +9,7 @@ import type { Env } from '../types';
 const STOCKFISH_CONTAINER_NAME = 'stockfish-engine';
 const STOCKFISH_ELO = 1350;
 const STOCKFISH_MOVE_TIME_MS = 200;
-const STOCKFISH_REQUEST_TIMEOUT_MS = 6_000;
+const STOCKFISH_REQUEST_TIMEOUT_MS = 20_000;
 
 export interface StockfishMove {
   from: string;
