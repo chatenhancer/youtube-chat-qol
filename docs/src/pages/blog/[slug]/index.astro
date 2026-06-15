@@ -45,6 +45,7 @@ const formatter = new Intl.DateTimeFormat(htmlLangFor(locale), {
 const canonicalUrl = getBlogPostUrl(post);
 const coverUrl = post.data.image ? new URL(post.data.image.src, site.url).toString() : undefined;
 const coverVideoUrl = getBlogCoverVideoUrl(getBlogEntryFolder(post), post.data.video);
+const coverStyle = post.data.cover_width ? `--blog-post-cover-width: ${post.data.cover_width}%;` : undefined;
 const postDate = post.data.date.toISOString();
 const blogPostStructuredData = {
   '@context': 'https://schema.org',
@@ -129,7 +130,7 @@ function escapeHtml(value: string): string {
       )}
     </header>
     {post.data.image && (
-      <figure class="blog-post-cover">
+      <figure class="blog-post-cover" style={coverStyle}>
         {coverVideoUrl ? (
           <video src={coverVideoUrl} poster={post.data.image.src} autoplay muted loop playsinline preload="metadata" aria-hidden="true" />
         ) : (

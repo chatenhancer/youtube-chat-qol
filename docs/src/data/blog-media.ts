@@ -1,4 +1,4 @@
-const blogCoverVideos = import.meta.glob('../content/blog/**/cover.mp4', {
+const blogCoverVideos = import.meta.glob('../content/blog/**/*.mp4', {
   eager: true,
   import: 'default',
   query: '?url'
