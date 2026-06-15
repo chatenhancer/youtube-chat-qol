@@ -37,6 +37,7 @@
     "demo:walkthrough:preview": "npm run build:chrome && node scripts/capture-walkthrough-demo.mjs --preview",
     "postinstall": "node scripts/install-playwright-browser.mjs",
     "publish:chrome": "node scripts/submit-chrome-webstore.mjs",
+    "publish:chrome:deferred": "node scripts/publish-deferred-chrome-webstore.mjs",
     "publish:firefox": "node scripts/submit-firefox-amo.mjs",
     "test": "node scripts/run-unit-tests.mjs",
     "test:browser": "node scripts/run-browser-tests.mjs",
