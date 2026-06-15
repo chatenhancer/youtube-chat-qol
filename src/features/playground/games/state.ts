@@ -4,7 +4,13 @@
  * Keeps filtering and derived state separate from DOM rendering and network
  * commands, so the lobby view can stay declarative.
  */
-import type { GameId, PresenceUser, PublicGame, PublicInvite } from '../../../shared/playground-protocol';
+import {
+  isPlaygroundComputerUserId,
+  type GameId,
+  type PresenceUser,
+  type PublicGame,
+  type PublicInvite
+} from '../../../shared/playground-protocol';
 import type { PlaygroundClientState } from './client';
 import { isPlayableGameId, isSupportedGameId } from './registry';
 
@@ -38,6 +44,7 @@ export function getOnlinePlayerCount(state: GamesPanelState): number {
   const currentUserId = state.transport.userId || '';
   return state.transport.users
     .filter((user) => user.userId !== currentUserId)
+    .filter((user) => !isPlaygroundComputerUserId(user.userId))
     .filter(isUserAvailableForSupportedGame)
     .length;
 }
