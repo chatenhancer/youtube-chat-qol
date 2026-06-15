@@ -37,7 +37,7 @@
   },
   "features": {
     "eyebrow": "مصمم للبث المباشر",
-    "title": "تحسينات في المكان الذي تحدث فيه الدردشة",
+    "title": "تحسينات في المكان الذي تحدث فيه <span class=\"title-emphasis\">الدردشة</span>",
     "translationTitle": "ترجم أثناء الدردشة",
     "translationBody": "اقرأ الرسائل الواردة بلغتك، أو ترجم ما تكتبه قبل إرساله.",
     "mentionTitle": "الإشارات والاقتباسات والمسودات",
@@ -59,7 +59,7 @@
   },
   "playground": {
     "eyebrow": "Playground",
-    "title": "ألعاب صغيرة<br>للحظات هدوء الدردشة",
+    "title": "<span class=\"title-emphasis\">ألعاب صغيرة</span><br>للحظات هدوء الدردشة",
     "copy": "Playground مساحة اختيارية للتجارب التي تجعل البثوث أكثر تفاعلاً. الشطرنج أول لعبة: ادعُ مشاهدًا متاحًا*، وابدأ اللعبة، وتابع الدردشة بجانبها.",
     "primaryCta": "جرّبه داخل الإضافة",
     "secondaryCta": "معرفة المزيد",
@@ -68,7 +68,7 @@
   },
   "screenshots": {
     "eyebrow": "الصور",
-    "title": "تحسينات دردشة<br>بطابع أصلي",
+    "title": "تحسينات <span class=\"title-emphasis\">دردشة</span><br>بطابع أصلي",
     "translationTitle": "اقرأ واكتب<br>بلغات مختلفة",
     "translationBody": "يمكن ترجمة الرسائل الواردة تلقائيا. ويمكن لحقل الدردشة أيضا ترجمة ما تكتبه قبل إرساله.",
     "translationHighlightHtml": "تظهر الترجمات التلقائية مع <span class=\"showcase-underline\">تسطير خفيف</span> وأيقونة Google Translate",

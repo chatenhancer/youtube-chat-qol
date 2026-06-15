@@ -37,7 +37,7 @@
   },
   "features": {
     "eyebrow": "Gemaakt voor livestreams",
-    "title": "Verbeteringen precies waar chat al gebeurt",
+    "title": "Verbeteringen precies waar <span class=\"title-emphasis\">chat</span> al gebeurt",
     "translationTitle": "Vertaal terwijl je chat",
     "translationBody": "Lees binnenkomende berichten in je eigen taal, of vertaal wat je typt voordat je het verstuurt.",
     "mentionTitle": "Vermeldingen, citaten en concepten",
@@ -59,7 +59,7 @@
   },
   "playground": {
     "eyebrow": "Playground",
-    "title": "Kleine games voor<br>pauzes in livechat",
+    "title": "<span class=\"title-emphasis\">Kleine games</span> voor<br>pauzes in livechat",
     "copy": "Playground is een optionele ruimte voor experimenten die streams interactiever maken. Schaken komt eerst: nodig een beschikbare kijker* uit, start de game en blijf de chat volgen.",
     "primaryCta": "Probeer het in de extensie",
     "secondaryCta": "Meer informatie",
@@ -68,7 +68,7 @@
   },
   "screenshots": {
     "eyebrow": "Screenshots",
-    "title": "Chatverbeteringen<br>die native aanvoelen",
+    "title": "<span class=\"title-emphasis\">Chat</span>verbeteringen<br>die native aanvoelen",
     "translationTitle": "Lees en schrijf<br>in andere talen",
     "translationBody": "Binnenkomende berichten kunnen automatisch worden vertaald. Ook de chatinvoer kan vertalen wat je typt voordat je het verstuurt.",
     "translationHighlightHtml": "Automatische vertalingen worden gemarkeerd met een <span class=\"showcase-underline\">subtiele onderstreping</span> en een Google Translate-pictogram",

@@ -37,7 +37,7 @@
   },
   "features": {
     "eyebrow": "ライブ配信用",
-    "title": "チャットが行われる場所に改善機能を追加",
+    "title": "<span class=\"title-emphasis\">チャット</span>が行われる場所に改善機能を追加",
     "translationTitle": "チャットしながら翻訳",
     "translationBody": "届いたメッセージを自分の言語で読み、送信前に入力中の文章も翻訳できます。",
     "mentionTitle": "メンション、引用、下書き",
@@ -59,7 +59,7 @@
   },
   "playground": {
     "eyebrow": "Playground",
-    "title": "ライブチャットの合間に<br>小さなゲーム",
+    "title": "ライブチャットの合間に<br><span class=\"title-emphasis\">小さなゲーム</span>",
     "copy": "Playground は、配信をもっとインタラクティブにする実験用の任意参加スペースです。最初はチェス。参加可能な視聴者*を招待し、ゲームを開始して、チャットも近くで追えます。",
     "primaryCta": "拡張機能で試す",
     "secondaryCta": "詳しく見る",
@@ -68,7 +68,7 @@
   },
   "screenshots": {
     "eyebrow": "スクリーンショット",
-    "title": "ネイティブ感のある<br>チャット改善",
+    "title": "ネイティブ感のある<br><span class=\"title-emphasis\">チャット</span>改善",
     "translationTitle": "他の言語で<br>読んで書く",
     "translationBody": "受信メッセージは自動翻訳できます。チャット入力欄でも、送信前に入力中の内容を翻訳できます。",
     "translationHighlightHtml": "自動翻訳は <span class=\"showcase-underline\">控えめな下線</span> と Google Translate アイコンで表示されます",

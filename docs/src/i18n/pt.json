@@ -27,7 +27,7 @@
     "editorCredit": "Editado com lepapier.app"
   },
   "hero": {
-    "eyebrow": "Extensão de navegador para o chat ao vivo do YouTube",
+    "eyebrow": "Extensão para o live chat do YouTube",
     "title": "Chat Enhancer for YouTube",
     "copy": "Acompanhe chats ao vivo do YouTube que se movem rápido, entenda melhor o que as pessoas dizem, encontre as mensagens importantes e responda naturalmente sem perder o lugar.",
     "primaryCta": "Instalar",
@@ -37,7 +37,7 @@
   },
   "features": {
     "eyebrow": "Feito para lives",
-    "title": "Melhorias onde o chat já acontece",
+    "title": "Melhorias onde o <span class=\"title-emphasis\">chat</span> já acontece",
     "translationTitle": "Traduza enquanto conversa",
     "translationBody": "Leia mensagens recebidas no seu idioma, ou traduza o que você está digitando antes de enviar.",
     "mentionTitle": "Menções, citações e rascunhos",
@@ -59,7 +59,7 @@
   },
   "playground": {
     "eyebrow": "Playground",
-    "title": "Minijogos para<br>pausas no chat ao vivo",
+    "title": "<span class=\"title-emphasis\">Minijogos</span> para<br>pausas no chat ao vivo",
     "copy": "Playground é um espaço opcional para experimentos que deixam as transmissões mais interativas. O xadrez vem primeiro: convide um espectador disponível*, comece o jogo e acompanhe o chat por perto.",
     "primaryCta": "Experimente na extensão",
     "secondaryCta": "Saiba mais",
@@ -68,7 +68,7 @@
   },
   "screenshots": {
     "eyebrow": "Capturas",
-    "title": "Melhorias de chat<br>com aparência nativa",
+    "title": "Melhorias de <span class=\"title-emphasis\">chat</span><br>com aparência nativa",
     "translationTitle": "Leia e escreva<br>em outros idiomas",
     "translationBody": "As mensagens recebidas podem ser traduzidas automaticamente. O campo de chat também pode traduzir o que você digita antes de enviar.",
     "translationHighlightHtml": "As traduções automáticas aparecem com um <span class=\"showcase-underline\">sublinhado sutil</span> e um ícone do Google Translate",

@@ -1,0 +1,13 @@
+---
+import Icon from '../common/icon.astro';
+
+const { href, label } = Astro.props as {
+  href: string;
+  label: string;
+};
+---
+
+<a class="blog-back-link" href={href}>
+  <Icon class="back-link-icon" name="chevron_backward" />
+  <span>{label}</span>
+</a>

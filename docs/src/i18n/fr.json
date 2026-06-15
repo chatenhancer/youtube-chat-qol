@@ -27,7 +27,7 @@
     "editorCredit": "Modifié avec lepapier.app"
   },
   "hero": {
-    "eyebrow": "Extension de navigateur pour le chat en direct YouTube",
+    "eyebrow": "Extension pour le live chat YouTube",
     "title": "Chat Enhancer for YouTube",
     "copy": "Suivez les chats en direct YouTube les plus actifs, comprenez mieux ce que les gens disent, retrouvez les messages importants et répondez naturellement sans perdre le fil.",
     "primaryCta": "Installer",
@@ -37,7 +37,7 @@
   },
   "features": {
     "eyebrow": "Pensé pour les lives",
-    "title": "Des améliorations là où le chat existe déjà",
+    "title": "Des améliorations là où le <span class=\"title-emphasis\">chat</span> existe déjà",
     "translationTitle": "Traduisez pendant le chat",
     "translationBody": "Lisez les messages entrants dans votre langue, ou traduisez ce que vous écrivez avant de l’envoyer.",
     "mentionTitle": "Mentions, citations et brouillons",
@@ -59,7 +59,7 @@
   },
   "playground": {
     "eyebrow": "Playground",
-    "title": "De petits jeux pour<br>les pauses du chat en direct",
+    "title": "<span class=\"title-emphasis\">Petits jeux</span> pour<br>les pauses du chat en direct",
     "copy": "Playground est un espace optionnel pour des expériences qui rendent les streams plus interactifs. Les échecs arrivent en premier : invitez un spectateur disponible*, lancez la partie et suivez le chat à côté.",
     "primaryCta": "Essayer dans l’extension",
     "secondaryCta": "En savoir plus",
@@ -68,7 +68,7 @@
   },
   "screenshots": {
     "eyebrow": "Captures",
-    "title": "Améliorations du chat<br>au style natif",
+    "title": "Améliorations du <span class=\"title-emphasis\">chat</span><br>au style natif",
     "translationTitle": "Lire et écrire<br>dans d’autres langues",
     "translationBody": "Les messages entrants peuvent être traduits automatiquement. Le champ de chat peut aussi traduire ce que vous écrivez avant l’envoi.",
     "translationHighlightHtml": "Les traductions automatiques sont signalées par un <span class=\"showcase-underline\">soulignement discret</span> et une icône Google Translate",

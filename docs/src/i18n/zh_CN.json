@@ -37,7 +37,7 @@
   },
   "features": {
     "eyebrow": "为直播打造",
-    "title": "在聊天发生的地方加入增强功能",
+    "title": "在<span class=\"title-emphasis\">聊天</span>发生的地方加入增强功能",
     "translationTitle": "边聊边翻译",
     "translationBody": "用你的语言阅读收到的消息，或在发送前翻译你正在输入的内容。",
     "mentionTitle": "提及、引用和草稿",
@@ -59,7 +59,7 @@
   },
   "playground": {
     "eyebrow": "Playground",
-    "title": "直播聊天间隙里的<br>小游戏",
+    "title": "直播聊天间隙里的<br><span class=\"title-emphasis\">小游戏</span>",
     "copy": "Playground 是一个可选择加入的实验空间，让直播更有互动感。首先推出的是国际象棋：邀请一位可用的观众*，开始游戏，同时继续关注聊天。",
     "primaryCta": "在扩展中试用",
     "secondaryCta": "了解更多",
@@ -68,7 +68,7 @@
   },
   "screenshots": {
     "eyebrow": "截图",
-    "title": "原生感的聊天<br>增强功能",
+    "title": "原生感的<span class=\"title-emphasis\">聊天</span><br>增强功能",
     "translationTitle": "跨语言<br>阅读和发言",
     "translationBody": "收到的消息可以自动翻译。聊天输入框也可以在发送前翻译你正在输入的内容。",
     "translationHighlightHtml": "自动翻译会用<span class=\"showcase-underline\">轻微下划线</span>和 Google Translate 图标标出",
