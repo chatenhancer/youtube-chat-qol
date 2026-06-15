@@ -66,6 +66,7 @@ export interface AttachBotClientsToRoomOptions extends Omit<BotClientsHost, 'onA
 export function attachBotClientsToRoom(options: AttachBotClientsToRoomOptions): void {
   const botClients = createBotClients({
     getGame: options.getGame,
+    getStockfishBestMove: options.getStockfishBestMove,
     onActionError: (connectionId, gameId, error) => {
       const session = options.clients.get(connectionId);
       logBotClientActionFailure(options, session, connectionId, gameId, error);
