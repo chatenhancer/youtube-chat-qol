@@ -6,6 +6,7 @@
  * feature handling live behind `router.ts` so this stays small.
  */
 import { StreamRoom } from './durable-objects/stream-room';
+import { StockfishContainer } from './containers/stockfish-container';
 import {
   createCorsHeaders,
   createErrorResponse,
@@ -16,7 +17,7 @@ import { hashLogValue, logPlaygroundEvent } from './logging';
 import { handlePlaygroundRoute } from './router';
 import type { Env } from './types';
 
-export { StreamRoom };
+export { StockfishContainer, StreamRoom };
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {

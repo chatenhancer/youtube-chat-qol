@@ -6,7 +6,7 @@
  * client messages back to the room.
  */
 import { Chess, type Move } from 'chess.js';
-import { getStockfishBestMove, type StockfishMove } from './stockfish';
+import { getStockfishBestMove, type StockfishBestMoveProvider, type StockfishMove } from './stockfish';
 import type { ChessGameRecord, ChessMoveInput } from '../games/chess';
 import {
   REPLAY_TRIVIA_ANSWER_TIME_MS,
@@ -38,6 +38,7 @@ const TRIVIA_BOT_ANSWER_ACCURACY = 0.65;
 
 export interface ComputerPlayerHost {
   getGame(gameId: string): GameRecord | undefined;
+  getStockfishBestMove?: StockfishBestMoveProvider;
   onActionError?(gameId: string, error: unknown): void;
   onChessBotFallback?(gameId: string, fallback: ChessBotFallback): void;
   onChessBotStockfishMove?(gameId: string, move: StockfishMove): void;
@@ -62,7 +63,8 @@ export async function createStockfishChessBotAction(
   game: GameRecord,
   userId: string,
   onFallback?: (fallback: ChessBotFallback) => void,
-  onStockfishMove?: (move: StockfishMove) => void
+  onStockfishMove?: (move: StockfishMove) => void,
+  getBestMove: StockfishBestMoveProvider = getStockfishBestMove
 ): Promise<GameActionInput | null> {
   const chessGame = getChessBotGame(game);
   if (!chessGame) return null;
@@ -72,7 +74,7 @@ export async function createStockfishChessBotAction(
   let stockfishMove: StockfishMove | null = null;
   let fallback: ChessBotFallback | null = null;
   try {
-    stockfishMove = await getStockfishBestMove(chessGame.fen);
+    stockfishMove = await getBestMove(chessGame.fen);
     if (!stockfishMove) fallback = { reason: 'stockfish_no_move' };
   } catch (error) {
     fallback = { error, reason: 'stockfish_error' };
@@ -206,7 +208,8 @@ class ServerComputerPlayer implements ComputerPlayer {
           game,
           COMPUTER_PLAYER_USER_ID,
           (fallback) => this.host.onChessBotFallback?.(game.gameId, fallback),
-          (move) => this.host.onChessBotStockfishMove?.(game.gameId, move)
+          (move) => this.host.onChessBotStockfishMove?.(game.gameId, move),
+          this.host.getStockfishBestMove
         );
       case 'replay-trivia':
         return createReplayTriviaBotAnswerAction(game, COMPUTER_PLAYER_USER_ID);

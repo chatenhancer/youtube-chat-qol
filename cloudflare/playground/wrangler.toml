@@ -21,6 +21,20 @@ ALLOWED_ORIGIN_PATTERNS = "https://chatenhancer.com,https://www.chatenhancer.com
 name = "STREAM_ROOMS"
 class_name = "StreamRoom"
 
+[[durable_objects.bindings]]
+name = "STOCKFISH_ENGINE"
+class_name = "StockfishContainer"
+
+[[containers]]
+class_name = "StockfishContainer"
+image = "./stockfish-container/Dockerfile"
+instance_type = "basic"
+max_instances = 1
+
 [[migrations]]
 tag = "v1"
 new_sqlite_classes = ["StreamRoom"]
+
+[[migrations]]
+tag = "v2"
+new_sqlite_classes = ["StockfishContainer"]

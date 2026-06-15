@@ -8,6 +8,7 @@ export interface Env {
   ALLOWED_ORIGIN_PATTERNS?: string;
   OPENAI_API_KEY?: string;
   OPENAI_MODEL?: string;
+  STOCKFISH_ENGINE?: DurableObjectNamespace;
   STREAM_ROOMS: DurableObjectNamespace;
 }
 
