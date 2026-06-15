@@ -16,10 +16,10 @@ import {
 } from './registry';
 import {
   getAvailablePlayers,
-  getFirstSupportedGame,
   getOnlinePlayerCount,
   getPendingInvites,
   getPlayerInitial,
+  getSupportedGames,
   shouldShowTransportNotice,
   type GamesPanelState
 } from './state';
@@ -168,12 +168,19 @@ function createGamesAvailabilityToggle(state: GamesPanelState, actions: GamesVie
 
 function createActiveGameSection(state: GamesPanelState, actions: GamesViewActions): HTMLElement {
   const section = createGamesSection(t('gamesActiveGame'));
-  const game = getFirstSupportedGame(state.transport.games);
-  if (!game || !state.transport.userId) {
+  const games = getSupportedGames(state.transport.games);
+  if (!games.length || !state.transport.userId) {
     section.hidden = true;
     return section;
   }
 
+  games.forEach((game) => {
+    section.append(createActiveGameRow(game, state.transport.userId, actions));
+  });
+  return section;
+}
+
+function createActiveGameRow(game: PublicGame, currentUserId: string, actions: GamesViewActions): HTMLElement {
   const item = ytcqCreateElement('div');
   item.className = 'ytcq-games-active-row';
   const copy = ytcqCreateElement('span');
@@ -183,7 +190,7 @@ function createActiveGameSection(state: GamesPanelState, actions: GamesViewActio
   title.textContent = getGameLabel(game.gameType);
   const helper = ytcqCreateElement('span');
   helper.className = 'ytcq-games-row-helper';
-  helper.textContent = getGameOpponentLabel(game, state.transport.userId);
+  helper.textContent = getGameOpponentLabel(game, currentUserId);
   copy.append(title, helper);
 
   const actionsWrap = ytcqCreateElement('span');
@@ -195,8 +202,7 @@ function createActiveGameSection(state: GamesPanelState, actions: GamesViewActio
   leave.addEventListener('click', () => actions.onLeaveGame(game));
   actionsWrap.append(togglePanel, leave);
   item.append(copy, actionsWrap);
-  section.append(item);
-  return section;
+  return item;
 }
 
 function createInvitesSection(state: GamesPanelState, actions: GamesViewActions): HTMLElement {
