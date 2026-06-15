@@ -4,7 +4,6 @@
  * This file owns the UCI/runtime boundary only. Game-state checks and action
  * creation stay in the computer player.
  */
-import createStockfishModuleFactory from 'stockfish/bin/stockfish-18-lite-single.js';
 import stockfishWasmModule from 'stockfish/bin/stockfish-18-lite-single.wasm';
 
 const STOCKFISH_ELO = 1350;
@@ -100,6 +99,7 @@ async function getStockfishRuntime(): Promise<StockfishRuntime> {
 }
 
 async function createStockfishRuntime(): Promise<StockfishRuntime> {
+  const createStockfishModuleFactory = await importStockfishModuleFactory();
   const waiters = new Set<(line: string) => void>();
   const stockfishModuleFactory = createStockfishModuleFactory();
   const module = await stockfishModuleFactory({
@@ -125,6 +125,30 @@ async function createStockfishRuntime(): Promise<StockfishRuntime> {
   return runtime;
 }
 
+async function importStockfishModuleFactory(): Promise<() => (config: StockfishModuleConfig) => Promise<StockfishModule>> {
+  ensureStockfishLocationGlobal();
+  const { default: createStockfishModuleFactory } = await import('stockfish/bin/stockfish-18-lite-single.js');
+  return createStockfishModuleFactory;
+}
+
+function ensureStockfishLocationGlobal(): void {
+  const workerGlobal = globalThis as typeof globalThis & {
+    self?: {
+      location?: StockfishLocationShim;
+    };
+  };
+  if (!workerGlobal.self || workerGlobal.self.location) return;
+
+  Object.defineProperty(workerGlobal.self, 'location', {
+    configurable: true,
+    value: {
+      hash: '',
+      origin: 'https://playground.chatenhancer.com',
+      pathname: '/stockfish-18-lite-single.js'
+    }
+  });
+}
+
 async function instantiateStockfishWasm(
   imports: WebAssembly.Imports,
   successCallback: (instance: WebAssembly.Instance) => void
@@ -134,6 +158,20 @@ async function instantiateStockfishWasm(
     imports
   ) as WebAssembly.Instance | WebAssembly.WebAssemblyInstantiatedSource;
   successCallback(result instanceof WebAssembly.Instance ? result : result.instance);
+}
+
+interface StockfishModuleConfig {
+  instantiateWasm?: (
+    imports: WebAssembly.Imports,
+    successCallback: (instance: WebAssembly.Instance) => void
+  ) => WebAssembly.Exports | Record<string, never>;
+  listener?: (line: string) => void;
+}
+
+interface StockfishLocationShim {
+  hash: string;
+  origin: string;
+  pathname: string;
 }
 
 function waitForStockfishLine(
