@@ -4,9 +4,10 @@ date: 2026-06-10
 description: "Playground is a new feature in the Chat Enhancer extension that allows users to play compact games like chess with each other during live chats."
 slug: "introducing-playground-tiny-games-for-live-chat-breaks"
 image: "./90af004f7c5daeab.png"
+cover_width: 73
 locale: "en"
 translationKey: "introducing-playground-tiny-games-for-live-chat-breaks"
-video: "./cover.mp4"
+video: "./ba98da5bf0abb611.mp4"
 tags:
   - "playground"
   - "games"

@@ -1467,7 +1467,9 @@ h3 {
 }
 
 .blog-post-cover {
-  width: 100%;
+  width: var(--blog-post-cover-width, 100%);
+  max-width: 100%;
+  margin: 0 auto;
   overflow: hidden;
   border-radius: 8px;
 }

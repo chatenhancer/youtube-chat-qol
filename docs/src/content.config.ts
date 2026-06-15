@@ -14,6 +14,7 @@ const blog = defineCollection({
   schema: ({ image }) => z.object({
     date: z.date(),
     description: z.string(),
+    cover_width: z.number().min(25).max(100).optional(),
     image: image().optional(),
     locale: z.string().default('en'),
     slug: z.string(),
