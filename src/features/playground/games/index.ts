@@ -30,7 +30,6 @@ import {
 import { createGamesCard, installGamesCardListeners } from './card';
 import {
   createInitialGamesPanelState,
-  getFirstSupportedGame,
   isCurrentUserAvailable,
   type GamesPanelState
 } from './state';
@@ -55,7 +54,12 @@ let activeGamesAnchor: HTMLElement | null = null;
 let activeGamesCardCleanup: (() => void) | null = null;
 let activeGamesClientCleanup: (() => void) | null = null;
 let gamesPanelState: GamesPanelState | null = null;
-let shouldOpenNextStartedGame = false;
+let pendingStartedGameOpen: PendingStartedGameOpen | null = null;
+
+interface PendingStartedGameOpen {
+  gameType: GameId;
+  knownGameIds: Set<string>;
+}
 
 registerFeatureLifecycle({
   page: {
@@ -114,6 +118,7 @@ export function cleanupStaleGamesButtons(): void {
     window.clearTimeout(gamesWireTimer);
     gamesWireTimer = null;
   }
+  pendingStartedGameOpen = null;
   closeActiveGamePanel({ notify: false });
   closeGamesCard();
   activeGamesClientCleanup?.();
@@ -188,25 +193,15 @@ function ensureGamesClientSubscription(): void {
 }
 
 function handlePlaygroundClientStateChanged(nextState: PlaygroundClientState): void {
+  updateOpenGamePanel(nextState);
+  if (openPendingStartedGame(nextState)) return;
+
   if (!gamesPanelState) {
-    updateOpenGamePanel(nextState);
     return;
   }
 
   gamesPanelState.transport = nextState;
   gamesPanelState.available = isCurrentUserAvailable(nextState, gamesPanelState.available);
-  updateOpenGamePanel(nextState);
-
-  if (shouldOpenNextStartedGame) {
-    const game = getFirstSupportedGame(nextState.games);
-    if (game) {
-      shouldOpenNextStartedGame = false;
-      openGamePanel(game, nextState.userId);
-      closeGamesCard();
-      return;
-    }
-  }
-
   renderGamesPanel();
 }
 
@@ -241,7 +236,7 @@ function reconnectGamesClient(): void {
 }
 
 function acceptInvite(invite: PublicInvite): void {
-  shouldOpenNextStartedGame = true;
+  queueStartedGameOpen(invite.gameId);
   respondToPlaygroundInvite(invite.inviteId, true);
 }
 
@@ -268,7 +263,7 @@ function showLobbyView(): void {
 function invitePlayer(player: PresenceUser): void {
   if (!gamesPanelState?.selectedGameId) return;
   gamesPanelState.invitedPlayer = player.userId;
-  shouldOpenNextStartedGame = true;
+  queueStartedGameOpen(gamesPanelState.selectedGameId);
   sendPlaygroundInvite(gamesPanelState.selectedGameId, player.userId);
   renderGamesPanel();
 }
@@ -276,6 +271,7 @@ function invitePlayer(player: PresenceUser): void {
 function cancelPlayerInvite(player: PresenceUser): void {
   if (!gamesPanelState || gamesPanelState.invitedPlayer !== player.userId) return;
   gamesPanelState.invitedPlayer = '';
+  pendingStartedGameOpen = null;
   renderGamesPanel();
 }
 
@@ -298,4 +294,29 @@ function leaveGame(game: PublicGame): void {
 
 function openGamePanel(game: PublicGame, currentUserId: string): void {
   openSupportedGamePanel(game, currentUserId, sendPlaygroundGameAction, renderGamesPanel);
+}
+
+function queueStartedGameOpen(gameType: GameId): void {
+  const games = gamesPanelState?.transport.games || getPlaygroundClientState().games;
+  pendingStartedGameOpen = {
+    gameType,
+    knownGameIds: new Set(games.map((game) => game.gameId))
+  };
+}
+
+function openPendingStartedGame(nextState: PlaygroundClientState): boolean {
+  const pending = pendingStartedGameOpen;
+  if (!pending || !nextState.userId) return false;
+
+  const game = nextState.games.find((candidate) =>
+    candidate.gameType === pending.gameType &&
+    !pending.knownGameIds.has(candidate.gameId) &&
+    isSupportedPublicGame(candidate)
+  );
+  if (!game) return false;
+
+  pendingStartedGameOpen = null;
+  openGamePanel(game, nextState.userId);
+  closeGamesCard();
+  return true;
 }

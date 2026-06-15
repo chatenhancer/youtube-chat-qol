@@ -216,6 +216,51 @@ describe('playground games header button', () => {
     });
   });
 
+  it('opens the newly invited game when another game is already active', () => {
+    window.history.replaceState({}, '', '/live_chat_replay?video_id=stream-a');
+    const header = createHeader();
+    document.body.append(header);
+    setOptions({ ...DEFAULT_OPTIONS, playgroundEnabled: true, playgroundGamesAvailable: true });
+
+    wireGamesButton();
+    const gamesButton = header.querySelector<HTMLButtonElement>('.ytcq-games-button')!;
+    gamesButton.click();
+    lastMockPort()?.emit(createSnapshotMessage({
+      ...createLobbySnapshot(),
+      games: [createChessGame()],
+      invites: []
+    }));
+
+    getGameCards()[1].click();
+    getActionButton('Invite').click();
+    expect(lastMockPort()?.messages.at(-1)).toMatchObject({
+      gameId: 'replay-trivia',
+      toUserId: 'luna-user',
+      type: 'ytcq:playground:invite'
+    });
+
+    lastMockPort()?.emit({
+      message: {
+        game: createReplayTriviaGame(),
+        type: 'gameStarted'
+      },
+      type: 'ytcq:playground:server-message'
+    });
+
+    expect(document.querySelector('.ytcq-replay-trivia-game-panel')).not.toBeNull();
+    expect(document.querySelector('.ytcq-chess-game-panel')).toBeNull();
+    expect(document.querySelector('.ytcq-games-card')).toBeNull();
+
+    gamesButton.click();
+    const activeRows = Array.from(document.querySelectorAll<HTMLElement>('.ytcq-games-active-row'))
+      .map((row) => row.textContent || '');
+    expect(activeRows).toHaveLength(2);
+    expect(activeRows[0]).toContain('Chess');
+    expect(activeRows[0]).toContain('Luna Chat');
+    expect(activeRows[1]).toContain('HELP-A-FRIEND! Trivia');
+    expect(activeRows[1]).toContain('Luna Chat');
+  });
+
   it('renders server-backed invites, players, and active chess games inside the panel', () => {
     const header = createHeader();
     document.body.append(header);
@@ -330,6 +375,7 @@ describe('playground games header button', () => {
     const gamesButton = header.querySelector<HTMLButtonElement>('.ytcq-games-button')!;
     gamesButton.click();
     lastMockPort()?.emit(createSnapshotMessage(createLobbySnapshot()));
+    getActionButton('Accept').click();
     lastMockPort()?.emit({
       message: {
         game: createChessGame(),
@@ -652,6 +698,41 @@ function createChessGame(): PublicGame {
     },
     status: 'active',
     turn: 'white'
+  } as PublicGame;
+}
+
+function createReplayTriviaGame(): PublicGame {
+  return {
+    answers: {},
+    currentQuestion: {
+      choices: ['Choice A', 'Choice B', 'Choice C', 'Choice D'],
+      friendIntro: 'help me answer this',
+      id: 'question-1',
+      prompt: 'Which answer is right?',
+      rightReply: 'that helped',
+      wrongReply: 'not quite'
+    },
+    currentQuestionIndex: 0,
+    gameId: 'game-2',
+    gameType: 'replay-trivia',
+    phaseStartedAt: Date.now(),
+    players: {
+      guest: {
+        displayName: 'Luna Chat',
+        userId: 'luna-user'
+      },
+      host: {
+        displayName: 'Me',
+        userId: 'me-user'
+      }
+    },
+    questionProviderUserId: 'me-user',
+    scores: {
+      guest: 0,
+      host: 0
+    },
+    status: 'question',
+    totalQuestions: 1
   } as PublicGame;
 }
 

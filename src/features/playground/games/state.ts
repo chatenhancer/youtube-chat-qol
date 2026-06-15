@@ -64,8 +64,8 @@ function isUserAvailableForSupportedGame(user: PresenceUser): boolean {
   return user.availableGames.some(isPlayableGameId);
 }
 
-export function getFirstSupportedGame(games: PublicGame[]): PublicGame | null {
-  return games.find((game) => isSupportedGameId(game.gameType)) || null;
+export function getSupportedGames(games: PublicGame[]): PublicGame[] {
+  return games.filter((game) => isSupportedGameId(game.gameType));
 }
 
 export function getPlayerInitial(player: string): string {
