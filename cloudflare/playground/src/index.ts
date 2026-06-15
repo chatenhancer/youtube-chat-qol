@@ -16,7 +16,6 @@ import { handlePlaygroundRoute } from './router';
 import type { Env } from './types';
 
 // Wrangler discovers Durable Object and Container entrypoints by these named exports.
-export { ComputerPlayer } from './durable-objects/computer-player/computer-player';
 export { StockfishContainer } from './durable-objects/stockfish-container/container';
 export { StreamRoom } from './durable-objects/stream-room/stream-room';
 

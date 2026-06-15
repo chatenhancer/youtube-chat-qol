@@ -1,7 +1,6 @@
 import { getGameModuleForRecord } from '../../games/registry';
 import type { GameRecord } from '../../games/types';
 import { shortLogId } from '../../logging';
-import type { PublicUserIdentity } from '../../protocol/messages';
 import type { DurableObjectState } from '../../types';
 
 type LogDetails = Record<string, boolean | number | string | undefined>;
@@ -11,12 +10,10 @@ const ROOM_STATE_STORAGE_KEY = 'roomState:v1';
 
 interface StoredRoomState {
   games: unknown[];
-  knownUsers: unknown[];
 }
 
 export class GameState {
   private readonly games = new Map<string, GameRecord>();
-  private readonly knownUsers = new Map<string, PublicUserIdentity>();
   private storageWriteQueue: Promise<unknown> = Promise.resolve();
 
   constructor(
@@ -38,17 +35,6 @@ export class GameState {
     this.queueWrite();
   }
 
-  setKnownUser(user: PublicUserIdentity): void {
-    const existing = this.knownUsers.get(user.userId);
-    if (existing?.displayName === user.displayName) return;
-    this.knownUsers.set(user.userId, user);
-    this.queueWrite();
-  }
-
-  getKnownUsers(): PublicUserIdentity[] {
-    return [...this.knownUsers.values()];
-  }
-
   values(): GameRecord[] {
     return [...this.games.values()];
   }
@@ -63,14 +49,9 @@ export class GameState {
     }
 
     const games = getStoredGames(stored);
-    const knownUsers = getStoredKnownUsers(stored);
-    if (!games && !knownUsers.length) return;
+    if (!games) return;
 
-    knownUsers.forEach((user) => {
-      this.knownUsers.set(user.userId, user);
-    });
-
-    games?.forEach((game) => {
+    games.forEach((game) => {
       if (!isSupportedStoredGame(game)) {
         this.logEvent('stored_game_ignored', {
           game: isRecord(game) && typeof game.gameId === 'string' ? shortLogId(game.gameId) : undefined
@@ -83,8 +64,7 @@ export class GameState {
 
     if (this.games.size > 0) {
       this.logEvent('room_state_restored', {
-        gameCount: this.games.size,
-        knownUserCount: this.knownUsers.size
+        gameCount: this.games.size
       });
     }
   }
@@ -101,8 +81,7 @@ export class GameState {
 
   private async write(): Promise<void> {
     await this.state.storage.put(ROOM_STATE_STORAGE_KEY, {
-      games: this.values(),
-      knownUsers: this.getKnownUsers()
+      games: this.values()
     } satisfies StoredRoomState);
   }
 }
@@ -110,15 +89,6 @@ export class GameState {
 function getStoredGames(value: unknown): unknown[] | null {
   if (!isRecord(value)) return null;
   return Array.isArray(value.games) ? value.games : null;
-}
-
-function getStoredKnownUsers(value: unknown): PublicUserIdentity[] {
-  if (!isRecord(value) || !Array.isArray(value.knownUsers)) return [];
-  return value.knownUsers.filter(isStoredPublicUser);
-}
-
-function isStoredPublicUser(value: unknown): value is PublicUserIdentity {
-  return isRecord(value) && typeof value.userId === 'string' && typeof value.displayName === 'string';
 }
 
 function isSupportedStoredGame(value: unknown): value is GameRecord {

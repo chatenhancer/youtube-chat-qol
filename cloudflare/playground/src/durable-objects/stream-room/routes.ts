@@ -8,7 +8,6 @@
 import { createErrorResponse, isWebSocketUpgrade } from '../../http';
 import { getLogErrorType, hashLogValue, logPlaygroundEvent } from '../../logging';
 import { createRouteResult, type RouteModule, type RouteResult, type StreamRouteContext } from '../../routes/types';
-import { connectComputerPlayer } from '../computer-player/client';
 import { forwardStreamRoomRequest } from './client';
 
 export const streamRoomRouteModule = {
@@ -53,13 +52,9 @@ async function handleStreamRoomRoute(
     return createRouteResult(createErrorResponse('method_not_allowed', 'Only GET is supported.', 405));
   }
 
-  if (endpoint === 'socket') await connectComputerPlayerWithLogging(env, streamKey);
-
   let response: Response;
   try {
-    response = await forwardStreamRoomRequest(env, streamKey, request, {
-      stripClientDisplayName: true
-    });
+    response = await forwardStreamRoomRequest(env, streamKey, request);
     logPlaygroundEvent('room_fetch_succeeded', {
       endpoint,
       room: hashLogValue(streamKey),
@@ -76,31 +71,6 @@ async function handleStreamRoomRoute(
   }
 
   return createRouteResult(response, endpoint !== 'socket');
-}
-
-async function connectComputerPlayerWithLogging(env: StreamRouteContext['env'], streamKey: string): Promise<void> {
-  try {
-    const response = await connectComputerPlayer(env, streamKey);
-    if (!response.ok) {
-      logPlaygroundEvent('computer_player_start_failed', {
-        errorMessage: `Computer player returned status ${response.status}.`,
-        room: hashLogValue(streamKey),
-        status: response.status
-      }, 'warn');
-      return;
-    }
-
-    logPlaygroundEvent('computer_player_start_succeeded', {
-      room: hashLogValue(streamKey),
-      status: response.status
-    });
-  } catch (error) {
-    logPlaygroundEvent('computer_player_start_failed', {
-      errorMessage: getRouteErrorMessage(error),
-      errorType: getLogErrorType(error),
-      room: hashLogValue(streamKey)
-    }, 'warn');
-  }
 }
 
 function getRouteErrorMessage(error: unknown): string {

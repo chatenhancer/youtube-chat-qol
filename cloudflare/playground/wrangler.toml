@@ -24,10 +24,6 @@ name = "STREAM_ROOMS"
 class_name = "StreamRoom"
 
 [[durable_objects.bindings]]
-name = "COMPUTER_PLAYERS"
-class_name = "ComputerPlayer"
-
-[[durable_objects.bindings]]
 name = "STOCKFISH_ENGINE"
 class_name = "StockfishContainer"
 
@@ -48,3 +44,7 @@ new_sqlite_classes = ["StockfishContainer"]
 [[migrations]]
 tag = "v3"
 new_sqlite_classes = ["ComputerPlayer"]
+
+[[migrations]]
+tag = "v4"
+deleted_classes = ["ComputerPlayer"]
