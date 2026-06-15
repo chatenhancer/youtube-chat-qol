@@ -1644,8 +1644,8 @@ yt-live-chat-header-renderer .ytcq-inbox-badge[hidden] {
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  color: #fff;
-  background: var(--yt-spec-call-to-action, #3ea6ff);
+  color: var(--ytcq-games-player-avatar-fg, #fff);
+  background: var(--ytcq-games-player-avatar-bg, var(--yt-spec-call-to-action, #3ea6ff));
   font: 500 12px/1 Roboto, Arial, sans-serif;
 }
 
