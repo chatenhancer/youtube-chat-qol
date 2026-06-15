@@ -35,23 +35,30 @@ export interface StockfishSettings {
   moveTimeMs: number;
 }
 
+export interface StockfishRequestSettings {
+  elo?: number;
+  moveTimeMs?: number;
+}
+
 export type StockfishBestMoveProvider = (fen: string) => Promise<StockfishResult>;
 
 export function createStockfishBestMoveProvider(
-  env: Pick<Env, 'STOCKFISH_ELO' | 'STOCKFISH_ENGINE' | 'STOCKFISH_MOVE_TIME_MS'>
+  env: Pick<Env, 'STOCKFISH_ELO' | 'STOCKFISH_ENGINE' | 'STOCKFISH_MOVE_TIME_MS'>,
+  requestSettings: StockfishRequestSettings = {}
 ): StockfishBestMoveProvider {
-  return (fen) => getStockfishBestMove(fen, env);
+  return (fen) => getStockfishBestMove(fen, env, requestSettings);
 }
 
 export async function getStockfishBestMove(
   fen: string,
-  env?: Pick<Env, 'STOCKFISH_ELO' | 'STOCKFISH_ENGINE' | 'STOCKFISH_MOVE_TIME_MS'>
+  env?: Pick<Env, 'STOCKFISH_ELO' | 'STOCKFISH_ENGINE' | 'STOCKFISH_MOVE_TIME_MS'>,
+  requestSettings: StockfishRequestSettings = {}
 ): Promise<StockfishResult> {
   if (!env?.STOCKFISH_ENGINE) {
     throw new Error('Stockfish container binding is not configured.');
   }
 
-  const settings = getStockfishSettings(env);
+  const settings = getStockfishSettings(env, requestSettings);
   const container = getStockfishContainer(env.STOCKFISH_ENGINE);
   const response = await withTimeout(
     container.fetch('https://stockfish.local/best-move', {
@@ -149,11 +156,19 @@ function getContainerErrorMessage(payload: unknown): string {
   return 'unknown error';
 }
 
-function getStockfishSettings(env: Pick<Env, 'STOCKFISH_ELO' | 'STOCKFISH_MOVE_TIME_MS'>): StockfishSettings {
+function getStockfishSettings(
+  env: Pick<Env, 'STOCKFISH_ELO' | 'STOCKFISH_MOVE_TIME_MS'>,
+  requestSettings: StockfishRequestSettings
+): StockfishSettings {
   return {
-    elo: getClampedInteger(env.STOCKFISH_ELO, DEFAULT_STOCKFISH_ELO, MIN_STOCKFISH_ELO, MAX_STOCKFISH_ELO),
+    elo: getClampedInteger(
+      requestSettings.elo ?? env.STOCKFISH_ELO,
+      DEFAULT_STOCKFISH_ELO,
+      MIN_STOCKFISH_ELO,
+      MAX_STOCKFISH_ELO
+    ),
     moveTimeMs: getClampedInteger(
-      env.STOCKFISH_MOVE_TIME_MS,
+      requestSettings.moveTimeMs ?? env.STOCKFISH_MOVE_TIME_MS,
       DEFAULT_STOCKFISH_MOVE_TIME_MS,
       MIN_STOCKFISH_MOVE_TIME_MS,
       MAX_STOCKFISH_MOVE_TIME_MS
@@ -161,8 +176,9 @@ function getStockfishSettings(env: Pick<Env, 'STOCKFISH_ELO' | 'STOCKFISH_MOVE_T
   };
 }
 
-function getClampedInteger(value: string | undefined, defaultValue: number, min: number, max: number): number {
-  if (value === undefined || value.trim() === '') return defaultValue;
+function getClampedInteger(value: number | string | undefined, defaultValue: number, min: number, max: number): number {
+  if (value === undefined) return defaultValue;
+  if (typeof value === 'string' && value.trim() === '') return defaultValue;
   const parsed = Number(value);
   if (!Number.isInteger(parsed)) return defaultValue;
   return Math.max(min, Math.min(max, parsed));

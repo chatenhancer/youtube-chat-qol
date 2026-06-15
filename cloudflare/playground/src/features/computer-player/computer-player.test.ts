@@ -1,19 +1,24 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createComputerPlayer } from './computer-player';
 import {
+  CHESS_COMPUTER_PLAYER_CLUB_PROFILE,
   COMPUTER_PLAYER_AVAILABLE_GAMES,
-  COMPUTER_PLAYER_CONNECTION_ID,
   COMPUTER_PLAYER_DISPLAY_NAME,
-  COMPUTER_PLAYER_USER_ID
+  COMPUTER_PLAYER_PROFILE,
+  COMPUTER_PLAYER_USER_ID,
+  type ComputerPlayerProfile
 } from './actions';
 import { applyChessMove, createChessGame, toPublicChessGame, type ChessGameRecord } from '../../games/chess';
-import { getStockfishBestMove } from '../../durable-objects/stockfish-container/client';
+import {
+  createStockfishBestMoveProvider,
+  getStockfishBestMove
+} from '../../durable-objects/stockfish-container/client';
 import type { GameRecord } from '../../games/types';
 import type { ClientMessage, ServerMessage } from '../../protocol/messages';
 import type { Env } from '../../types';
 
 vi.mock('../../durable-objects/stockfish-container/client', () => ({
-  createStockfishBestMoveProvider: () => getStockfishBestMove,
+  createStockfishBestMoveProvider: vi.fn(() => getStockfishBestMove),
   getStockfishBestMove: vi.fn(() => Promise.resolve(createStockfishResult({
     from: 'e7',
     to: 'e5'
@@ -22,6 +27,8 @@ vi.mock('../../durable-objects/stockfish-container/client', () => ({
 
 describe('in-room computer player', () => {
   beforeEach(() => {
+    vi.mocked(createStockfishBestMoveProvider).mockClear();
+    vi.mocked(createStockfishBestMoveProvider).mockReturnValue(getStockfishBestMove);
     vi.mocked(getStockfishBestMove).mockClear();
     vi.mocked(getStockfishBestMove).mockResolvedValue(createStockfishResult({
       from: 'e7',
@@ -35,9 +42,9 @@ describe('in-room computer player', () => {
   });
 
   it('exposes a server-owned Computer session and accepts invites', () => {
-    const harness = createComputerPlayerHarness();
+    const harness = createComputerPlayerHarness(COMPUTER_PLAYER_PROFILE);
 
-    expect(harness.player.connectionId).toBe(COMPUTER_PLAYER_CONNECTION_ID);
+    expect(harness.player.connectionId).toBe(COMPUTER_PLAYER_PROFILE.connectionId);
     expect(harness.player.displayName).toBe(COMPUTER_PLAYER_DISPLAY_NAME);
     expect(harness.player.userId).toBe(COMPUTER_PLAYER_USER_ID);
     expect(harness.player.availableGames).toEqual(COMPUTER_PLAYER_AVAILABLE_GAMES);
@@ -47,7 +54,7 @@ describe('in-room computer player', () => {
         createdAt: Date.now(),
         expiresAt: Date.now() + 60_000,
         fromUser: { displayName: 'Alice', userId: 'human-user' },
-        gameId: 'chess',
+        gameId: 'replay-trivia',
         inviteId: 'inv_1',
         status: 'pending',
         toUser: { displayName: 'Computer', userId: COMPUTER_PLAYER_USER_ID }
@@ -87,6 +94,9 @@ describe('in-room computer player', () => {
     await harness.flushWaitUntil();
 
     expect(getStockfishBestMove).toHaveBeenCalledWith(game.fen);
+    expect(createStockfishBestMoveProvider).toHaveBeenCalledWith(expect.any(Object), {
+      elo: CHESS_COMPUTER_PLAYER_CLUB_PROFILE.chessElo
+    });
     expect(harness.sentMessages.at(-1)).toEqual({
       action: 'move',
       gameId: 'game_chess_1',
@@ -131,10 +141,10 @@ describe('in-room computer player', () => {
         games: [toPublicChessGame(game, getPlayerInfo)],
         invites: [],
         users: [{
-          availableGames: [...COMPUTER_PLAYER_AVAILABLE_GAMES],
-          displayName: 'Computer',
+          availableGames: [...CHESS_COMPUTER_PLAYER_CLUB_PROFILE.availableGames],
+          displayName: CHESS_COMPUTER_PLAYER_CLUB_PROFILE.displayName,
           joinedAt: Date.now(),
-          userId: COMPUTER_PLAYER_USER_ID
+          userId: CHESS_COMPUTER_PLAYER_CLUB_PROFILE.userId
         }]
       },
       type: 'presenceSnapshot'
@@ -245,7 +255,9 @@ describe('in-room computer player', () => {
   });
 });
 
-function createComputerPlayerHarness(): {
+function createComputerPlayerHarness(
+  profile: ComputerPlayerProfile = CHESS_COMPUTER_PLAYER_CLUB_PROFILE
+): {
   flushWaitUntil(): Promise<void>;
   games: Map<string, GameRecord>;
   logEvent: ReturnType<typeof vi.fn>;
@@ -266,7 +278,7 @@ function createComputerPlayerHarness(): {
     waitUntil: (promise) => {
       pending.push(promise);
     }
-  });
+  }, profile);
 
   return {
     async flushWaitUntil() {
@@ -281,8 +293,8 @@ function createComputerPlayerHarness(): {
   };
 }
 
-function setBotTurnChessGame(harness: { games: Map<string, GameRecord> }): ChessGameRecord {
-  const game = applyChessMove(createChessGame('game_chess_1', 'human-user', COMPUTER_PLAYER_USER_ID), {
+function setBotTurnChessGame(harness: { games: Map<string, GameRecord>; player: ReturnType<typeof createComputerPlayer> }): ChessGameRecord {
+  const game = applyChessMove(createChessGame('game_chess_1', 'human-user', harness.player.userId), {
     from: 'e2',
     to: 'e4',
     userId: 'human-user'
@@ -300,7 +312,9 @@ function sendServerMessage(
 
 function getPlayerInfo(userId: string): { displayName: string; userId: string } {
   return {
-    displayName: userId === COMPUTER_PLAYER_USER_ID ? 'Computer' : 'Alice',
+    displayName: userId === CHESS_COMPUTER_PLAYER_CLUB_PROFILE.userId
+      ? CHESS_COMPUTER_PLAYER_CLUB_PROFILE.displayName
+      : 'Alice',
     userId
   };
 }

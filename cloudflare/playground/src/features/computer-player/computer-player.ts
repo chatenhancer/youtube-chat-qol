@@ -7,12 +7,11 @@
  * Durable Object lifecycle for the bot to lose.
  */
 import {
-  COMPUTER_PLAYER_AVAILABLE_GAMES,
-  COMPUTER_PLAYER_CONNECTION_ID,
-  COMPUTER_PLAYER_DISPLAY_NAME,
-  COMPUTER_PLAYER_USER_ID,
+  COMPUTER_PLAYER_PROFILE,
+  type ComputerPlayerProfile,
   createComputerPlayerAction,
   getComputerPlayerActionDelayMs,
+  isComputerPlayerUserId,
   shouldComputerPlayerAct,
   type ChessBotStockfishFailure
 } from './actions';
@@ -40,6 +39,7 @@ export interface ComputerPlayerHost {
 
 export interface ComputerPlayer {
   readonly availableGames: readonly GameId[];
+  readonly chessElo?: number;
   readonly connectionId: string;
   readonly displayName: string;
   readonly socket: ServerWebSocket;
@@ -47,20 +47,33 @@ export interface ComputerPlayer {
   reset(): void;
 }
 
-export function createComputerPlayer(host: ComputerPlayerHost): ComputerPlayer {
-  return new StreamRoomComputerPlayer(host);
+export function createComputerPlayer(
+  host: ComputerPlayerHost,
+  profile: ComputerPlayerProfile = COMPUTER_PLAYER_PROFILE
+): ComputerPlayer {
+  return new StreamRoomComputerPlayer(host, profile);
 }
 
 class StreamRoomComputerPlayer implements ComputerPlayer {
-  readonly availableGames = COMPUTER_PLAYER_AVAILABLE_GAMES;
-  readonly connectionId = COMPUTER_PLAYER_CONNECTION_ID;
-  readonly displayName = COMPUTER_PLAYER_DISPLAY_NAME;
+  readonly availableGames: readonly GameId[];
+  readonly chessElo?: number;
+  readonly connectionId: string;
+  readonly displayName: string;
   readonly socket = createComputerSocket((message) => this.receive(message), () => this.reset());
-  readonly userId = COMPUTER_PLAYER_USER_ID;
+  readonly userId: string;
   private readonly actionTimers = new Map<string, ReturnType<typeof setTimeout>>();
   private readonly stockfishRetryAttempts = new Map<string, number>();
 
-  constructor(private readonly host: ComputerPlayerHost) {}
+  constructor(
+    private readonly host: ComputerPlayerHost,
+    profile: ComputerPlayerProfile
+  ) {
+    this.availableGames = profile.availableGames;
+    this.chessElo = profile.chessElo;
+    this.connectionId = profile.connectionId;
+    this.displayName = profile.displayName;
+    this.userId = profile.userId;
+  }
 
   reset(): void {
     this.actionTimers.forEach((timer) => clearTimeout(timer));
@@ -74,7 +87,7 @@ class StreamRoomComputerPlayer implements ComputerPlayer {
         message.snapshot.games.forEach((game) => this.handleGameChanged(game.gameId));
         return;
       case 'presenceSnapshot':
-        if (!message.snapshot.users.some((user) => user.userId !== this.userId)) {
+        if (!message.snapshot.users.some((user) => !isComputerPlayerUserId(user.userId))) {
           this.reset();
           return;
         }
@@ -152,12 +165,15 @@ class StreamRoomComputerPlayer implements ComputerPlayer {
 
     let stockfishFailure: ChessBotStockfishFailure | null = null;
     const action = await createComputerPlayerAction(game, {
-      getStockfishBestMove: createStockfishBestMoveProvider(this.host.env),
+      getStockfishBestMove: createStockfishBestMoveProvider(this.host.env, {
+        elo: this.chessElo
+      }),
       onChessBotStockfishFailure: (failure) => {
         stockfishFailure = failure;
         this.logChessBotStockfishFailure(game, failure);
       },
-      onChessBotStockfishMove: (result) => this.logChessBotStockfishMove(game, result)
+      onChessBotStockfishMove: (result) => this.logChessBotStockfishMove(game, result),
+      userId: this.userId
     });
     if (!action) {
       if (stockfishFailure) this.scheduleStockfishRetry(game, stockfishFailure);

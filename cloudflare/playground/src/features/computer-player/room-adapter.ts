@@ -13,7 +13,7 @@ import {
   SessionManager
 } from '../../durable-objects/stream-room/session-manager';
 import type { Env } from '../../types';
-import { COMPUTER_PLAYER_CONNECTION_ID } from './actions';
+import { COMPUTER_PLAYER_PROFILES } from './actions';
 import { createComputerPlayer } from './computer-player';
 
 type LogDetails = Record<string, boolean | number | string | undefined>;
@@ -30,39 +30,42 @@ export interface AttachComputerPlayerToRoomOptions {
 }
 
 export function attachComputerPlayerToRoom(options: AttachComputerPlayerToRoomOptions): void {
-  const computerPlayer = createComputerPlayer({
-    env: options.env,
-    getGame: options.getGame,
-    logEvent: options.logEvent,
-    sendClientMessage: (message) => sendComputerPlayerMessage(options, message),
-    waitUntil: options.waitUntil
-  });
-  if (options.sessions.get(computerPlayer.connectionId)) return;
+  COMPUTER_PLAYER_PROFILES.forEach((profile) => {
+    const computerPlayer = createComputerPlayer({
+      env: options.env,
+      getGame: options.getGame,
+      logEvent: options.logEvent,
+      sendClientMessage: (message) => sendComputerPlayerMessage(options, profile.connectionId, message),
+      waitUntil: options.waitUntil
+    }, profile);
+    if (options.sessions.get(computerPlayer.connectionId)) return;
 
-  const availableGames = [...computerPlayer.availableGames];
-  const session: ClientSession = {
-    availableGames: new Set(),
-    challenge: '',
-    connectionId: computerPlayer.connectionId,
-    displayName: computerPlayer.displayName,
-    joinedAt: Date.now(),
-    rateLimit: new TokenBucket(options.connectionRateLimitOptions),
-    socket: computerPlayer.socket,
-    userId: ''
-  };
-  options.sessions.authenticate(session, computerPlayer.userId, availableGames, computerPlayer.displayName);
-  sendMessage(computerPlayer.socket, {
-    snapshot: options.createSnapshot(computerPlayer.userId),
-    type: 'helloAccepted',
-    userId: computerPlayer.userId
+    const availableGames = [...computerPlayer.availableGames];
+    const session: ClientSession = {
+      availableGames: new Set(),
+      challenge: '',
+      connectionId: computerPlayer.connectionId,
+      displayName: computerPlayer.displayName,
+      joinedAt: Date.now(),
+      rateLimit: new TokenBucket(options.connectionRateLimitOptions),
+      socket: computerPlayer.socket,
+      userId: ''
+    };
+    options.sessions.authenticate(session, computerPlayer.userId, availableGames, computerPlayer.displayName);
+    sendMessage(computerPlayer.socket, {
+      snapshot: options.createSnapshot(computerPlayer.userId),
+      type: 'helloAccepted',
+      userId: computerPlayer.userId
+    });
   });
 }
 
 function sendComputerPlayerMessage(
   options: AttachComputerPlayerToRoomOptions,
+  connectionId: string,
   message: Exclude<ClientMessage, { type: 'hello' }>
 ): void {
-  const session = options.sessions.get(COMPUTER_PLAYER_CONNECTION_ID);
+  const session = options.sessions.get(connectionId);
   if (!session) return;
   options.waitUntil(options.handleMessage(session, JSON.stringify(message)));
 }
