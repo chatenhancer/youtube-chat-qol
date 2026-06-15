@@ -21,8 +21,13 @@ export class StockfishContainer extends Container<Env> {
 
   override onError(error: unknown): never {
     logPlaygroundEvent('stockfish_container_error', {
+      errorMessage: getErrorMessage(error),
       errorType: getLogErrorType(error)
     }, 'error');
     throw error;
   }
+}
+
+function getErrorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
 }
