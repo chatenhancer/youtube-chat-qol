@@ -1,7 +1,6 @@
 import { getGameModuleForRecord } from '../../games/registry';
 import type { GameRecord } from '../../games/types';
 import { shortLogId } from '../../logging';
-import type { DurableObjectState } from '../../types';
 
 type LogDetails = Record<string, boolean | number | string | undefined>;
 type LogEvent = (event: string, details?: LogDetails, level?: 'error' | 'info' | 'warn') => void;

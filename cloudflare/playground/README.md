@@ -73,6 +73,12 @@ Docker, or a compatible Docker CLI and engine, must be available locally for
 out, the chess computer logs `chess_bot_stockfish_unavailable`, retries a
 bounded number of times, then leaves the game if the engine still cannot move.
 
+Use `npm run cloudflare:playground:check` to validate the Worker, routes,
+Durable Object bindings, migrations, and environment bindings without requiring
+Docker. Use `npm run cloudflare:playground:check:containers` when Docker is
+running and you also want Wrangler to validate the configured Stockfish
+container build path.
+
 For current entrypoints, scripts, routes, and Durable Object configuration, use
 the source files, `wrangler.toml`, and root package scripts as the source of
 truth.

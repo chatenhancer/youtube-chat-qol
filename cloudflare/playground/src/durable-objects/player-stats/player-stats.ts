@@ -1,6 +1,5 @@
 import { SUPPORTED_GAMES, type GameId } from '../../protocol/messages';
 import { createErrorResponse, createJsonResponse } from '../../http';
-import type { DurableObjectState } from '../../types';
 
 const PLAYER_STATS_KEY_PREFIX = 'playerStats:';
 const STATS_KEY_VERSION = ':v1';

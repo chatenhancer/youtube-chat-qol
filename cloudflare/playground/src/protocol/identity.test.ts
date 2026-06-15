@@ -53,8 +53,8 @@ async function createSignedIdentity(challenge: string): Promise<{
     },
     true,
     ['sign', 'verify']
-  );
-  const publicKeyJwk = await crypto.subtle.exportKey('jwk', keyPair.publicKey);
+  ) as CryptoKeyPair;
+  const publicKeyJwk = await crypto.subtle.exportKey('jwk', keyPair.publicKey) as JsonWebKey;
   const signature = new Uint8Array(await crypto.subtle.sign(
     {
       hash: 'SHA-256',

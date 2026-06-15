@@ -1,6 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { getStockfishBestMove, parseStockfishBestMove } from './client';
-import type { DurableObjectNamespace, DurableObjectStub } from '../../types';
 
 describe('Stockfish container client', () => {
   beforeEach(() => {
@@ -164,7 +163,8 @@ function createNamespace(fetch: DurableObjectStub['fetch']): DurableObjectNamesp
   return {
     get: () => ({ fetch }),
     idFromName: (name: string) => ({
+      equals: (other: DurableObjectId) => other.toString() === name,
       toString: () => name
     })
-  };
+  } as unknown as DurableObjectNamespace;
 }

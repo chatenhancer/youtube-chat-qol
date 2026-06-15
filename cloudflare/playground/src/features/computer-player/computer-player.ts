@@ -22,7 +22,7 @@ import {
 import type { GameRecord } from '../../games/types';
 import { getLogErrorType, hashLogValue, shortLogId } from '../../logging';
 import type { ClientMessage, GameId, ServerMessage } from '../../protocol/messages';
-import type { Env, ServerWebSocket } from '../../types';
+import type { Env } from '../../types';
 
 const STOCKFISH_RETRY_DELAYS_MS = [2_000, 5_000, 10_000] as const;
 const MAX_LOG_MESSAGE_LENGTH = 180;
@@ -42,7 +42,7 @@ export interface ComputerPlayer {
   readonly chessElo?: number;
   readonly connectionId: string;
   readonly displayName: string;
-  readonly socket: ServerWebSocket;
+  readonly socket: WebSocket;
   readonly userId: string;
   reset(): void;
 }
@@ -297,7 +297,7 @@ class StreamRoomComputerPlayer implements ComputerPlayer {
 function createComputerSocket(
   receive: (message: ServerMessage) => void,
   reset: () => void
-): ServerWebSocket {
+): WebSocket {
   let closed = false;
   return {
     accept: () => undefined,
@@ -309,7 +309,7 @@ function createComputerSocket(
       if (closed) return;
       receive(JSON.parse(data) as ServerMessage);
     }
-  } as unknown as ServerWebSocket;
+  } as unknown as WebSocket;
 }
 
 function getStockfishFailureErrorMessage(error: unknown): string | undefined {

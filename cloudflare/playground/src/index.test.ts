@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import worker from './index';
-import type { DurableObjectId, DurableObjectNamespace, DurableObjectStub, Env } from './types';
+import type { Env } from './types';
 
 describe('playground worker routes', () => {
   beforeEach(() => {
@@ -473,6 +473,7 @@ function createEnv(
   overrides: Partial<Env> = {}
 ): Env {
   const id: DurableObjectId = {
+    equals: (other) => other.toString() === 'stream-id',
     toString: () => 'stream-id'
   };
 
@@ -481,7 +482,7 @@ function createEnv(
       fetch: fetchRoom
     }),
     idFromName: () => id
-  };
+  } as unknown as DurableObjectNamespace;
 
   return {
     ALLOWED_ORIGIN_PATTERNS: 'https://chatenhancer.com,chrome-extension://',

@@ -20,7 +20,7 @@ import {
   type SignedClientIdentity
 } from '../../protocol/messages';
 import { ProtocolError } from '../../protocol/validation';
-import type { DurableObjectNamespace, DurableObjectState, DurableObjectStorage, Env } from '../../types';
+import type { Env } from '../../types';
 
 interface TestSession {
   availableGames: Set<GameId>;
@@ -65,7 +65,7 @@ class FakeSocket {
   }
 }
 
-class FakeDurableObjectStorage implements DurableObjectStorage {
+class FakeDurableObjectStorage {
   private readonly records = new Map<string, unknown>();
 
   async deleteAll(): Promise<void> {
@@ -81,8 +81,9 @@ class FakeDurableObjectStorage implements DurableObjectStorage {
   }
 }
 
-class FakeDurableObjectState implements DurableObjectState {
+class FakeDurableObjectState {
   readonly id = {
+    equals: (other: DurableObjectId) => other.toString() === 'stream-room-id',
     toString: () => 'stream-room-id'
   };
 
@@ -105,7 +106,7 @@ class FakeDurableObjectState implements DurableObjectState {
   }
 }
 
-class FakePlayerStatsNamespace implements DurableObjectNamespace {
+class FakePlayerStatsNamespace {
   private readonly wins = new Map<string, Map<string, number>>();
 
   idFromName(name: string): { toString(): string } {
@@ -680,11 +681,11 @@ function createRoomHarness(storage = new FakeDurableObjectStorage()): {
   const state = new FakeDurableObjectState(storage);
   const playerStats = new FakePlayerStatsNamespace();
   const env = {
-    PLAYER_STATS: playerStats
+    PLAYER_STATS: playerStats as unknown as DurableObjectNamespace
   } as unknown as Env;
   return {
     playerStats,
-    room: new StreamRoom(state, env) as unknown as PrivateStreamRoom,
+    room: new StreamRoom(state as unknown as DurableObjectState, env) as unknown as PrivateStreamRoom,
     state
   };
 }
@@ -745,7 +746,7 @@ async function createIdentityKeyPair(): Promise<CryptoKeyPair> {
     },
     true,
     ['sign', 'verify']
-  );
+  ) as Promise<CryptoKeyPair>;
 }
 
 async function createSignedIdentity(
@@ -753,7 +754,7 @@ async function createSignedIdentity(
   keyPair?: CryptoKeyPair
 ): Promise<SignedClientIdentity> {
   const signingKeyPair = keyPair || await createIdentityKeyPair();
-  const publicKeyJwk = await crypto.subtle.exportKey('jwk', signingKeyPair.publicKey);
+  const publicKeyJwk = await crypto.subtle.exportKey('jwk', signingKeyPair.publicKey) as JsonWebKey;
   const signature = new Uint8Array(await crypto.subtle.sign(
     {
       hash: 'SHA-256',
