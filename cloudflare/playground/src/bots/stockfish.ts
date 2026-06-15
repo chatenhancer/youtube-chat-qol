@@ -4,8 +4,6 @@
  * This file owns the UCI/runtime boundary only. Game-state checks and action
  * creation stay in the computer player.
  */
-import stockfishWasmModule from 'stockfish/bin/stockfish-18-lite-single.wasm';
-
 const STOCKFISH_ELO = 1350;
 const STOCKFISH_MOVE_TIME_MS = 200;
 const STOCKFISH_SEARCH_TIMEOUT_MS = 3_000;
@@ -99,11 +97,14 @@ async function getStockfishRuntime(): Promise<StockfishRuntime> {
 }
 
 async function createStockfishRuntime(): Promise<StockfishRuntime> {
-  const stockfishModuleFactory = await importStockfishModuleFactory();
+  const [stockfishModuleFactory, stockfishWasmModule] = await Promise.all([
+    importStockfishModuleFactory(),
+    importStockfishWasmModule()
+  ]);
   const waiters = new Set<(line: string) => void>();
   const module = await stockfishModuleFactory({
     instantiateWasm(imports, successCallback) {
-      void instantiateStockfishWasm(imports, successCallback);
+      void instantiateStockfishWasm(stockfishWasmModule, imports, successCallback);
       return {};
     },
     listener(line) {
@@ -128,6 +129,11 @@ async function importStockfishModuleFactory(): Promise<StockfishModuleFactory> {
   ensureStockfishLocationGlobal();
   const stockfishModule = await import('stockfish/bin/stockfish-18-lite-single.js');
   return resolveStockfishModuleFactory(stockfishModule.default);
+}
+
+async function importStockfishWasmModule(): Promise<WebAssembly.Module | BufferSource> {
+  const { default: stockfishWasmModule } = await import('stockfish/bin/stockfish-18-lite-single.wasm');
+  return stockfishWasmModule as WebAssembly.Module | BufferSource;
 }
 
 export function resolveStockfishModuleFactory(stockfishExport: unknown): StockfishModuleFactory {
@@ -164,11 +170,12 @@ function ensureStockfishLocationGlobal(): void {
 }
 
 async function instantiateStockfishWasm(
+  stockfishWasmModule: WebAssembly.Module | BufferSource,
   imports: WebAssembly.Imports,
   successCallback: (instance: WebAssembly.Instance) => void
 ): Promise<void> {
   const result = await WebAssembly.instantiate(
-    stockfishWasmModule as WebAssembly.Module | BufferSource,
+    stockfishWasmModule,
     imports
   ) as WebAssembly.Instance | WebAssembly.WebAssemblyInstantiatedSource;
   successCallback(result instanceof WebAssembly.Instance ? result : result.instance);

@@ -63,6 +63,7 @@ async function handleStreamRoomRoute(
   } catch (error) {
     logPlaygroundEvent('room_fetch_failed', {
       endpoint,
+      errorMessage: getRouteErrorMessage(error),
       errorType: getLogErrorType(error),
       room: hashLogValue(streamKey)
     }, 'error');
@@ -70,4 +71,10 @@ async function handleStreamRoomRoute(
   }
 
   return createRouteResult(response, endpoint !== 'socket');
+}
+
+function getRouteErrorMessage(error: unknown): string {
+  const message = error instanceof Error ? error.message : String(error);
+  if (message.length <= 180) return message;
+  return `${message.slice(0, 177)}...`;
 }
