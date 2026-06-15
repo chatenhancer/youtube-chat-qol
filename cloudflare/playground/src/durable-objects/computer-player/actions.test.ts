@@ -3,75 +3,84 @@ import {
   COMPUTER_PLAYER_USER_ID,
   createReplayTriviaBotAnswerAction,
   createStockfishChessBotAction
-} from './computer-player';
-import { getStockfishBestMove } from './stockfish';
-import { createChessGame } from '../games/chess';
+} from './actions';
+import { getStockfishBestMove } from '../stockfish-container/client';
+import { createChessGame } from '../../games/chess';
 import {
   advanceReplayTriviaGame,
   createReplayTriviaGame,
   submitReplayTriviaQuestions
-} from '../games/replay-trivia';
+} from '../../games/replay-trivia';
 
-vi.mock('./stockfish', () => ({
-  getStockfishBestMove: vi.fn(() => Promise.resolve(null))
+vi.mock('../stockfish-container/client', () => ({
+  getStockfishBestMove: vi.fn(() => Promise.resolve(createStockfishResult(null)))
 }));
 
 describe('computer player', () => {
   const getStockfishBestMoveMock = vi.mocked(getStockfishBestMove);
 
   beforeEach(() => {
-    getStockfishBestMoveMock.mockResolvedValue(null);
+    getStockfishBestMoveMock.mockResolvedValue(createStockfishResult(null));
   });
 
-  it('creates chess move actions in the computer player', async () => {
+  it('creates chess move actions from Stockfish in the computer player', async () => {
+    getStockfishBestMoveMock.mockResolvedValueOnce(createStockfishResult({ from: 'e2', to: 'e4' }));
     const game = createChessGame('game-1', COMPUTER_PLAYER_USER_ID, 'human-user');
 
     await expect(createStockfishChessBotAction(game, COMPUTER_PLAYER_USER_ID)).resolves.toEqual({
       action: 'move',
       payload: {
-        from: expect.any(String),
-        to: expect.any(String)
+        from: 'e2',
+        to: 'e4'
       },
       userId: COMPUTER_PLAYER_USER_ID
     });
   });
 
   it('reports when Stockfish provides the chess bot move', async () => {
-    const stockfishMove = { from: 'e2', to: 'e4' };
+    const stockfishResult = createStockfishResult({ from: 'e2', to: 'e4' });
     const game = createChessGame('game-1', COMPUTER_PLAYER_USER_ID, 'human-user');
-    const onFallback = vi.fn();
+    const onStockfishFailure = vi.fn();
     const onStockfishMove = vi.fn();
-    getStockfishBestMoveMock.mockResolvedValueOnce(stockfishMove);
+    getStockfishBestMoveMock.mockResolvedValueOnce(stockfishResult);
 
-    await createStockfishChessBotAction(game, COMPUTER_PLAYER_USER_ID, onFallback, onStockfishMove);
+    await createStockfishChessBotAction(game, COMPUTER_PLAYER_USER_ID, onStockfishFailure, onStockfishMove);
 
-    expect(onFallback).not.toHaveBeenCalled();
+    expect(onStockfishFailure).not.toHaveBeenCalled();
     expect(onStockfishMove).toHaveBeenCalledTimes(1);
-    expect(onStockfishMove).toHaveBeenCalledWith(stockfishMove);
+    expect(onStockfishMove).toHaveBeenCalledWith(stockfishResult);
   });
 
-  it('reports when the chess bot falls back after Stockfish returns no move', async () => {
+  it('does not create a chess move when Stockfish returns no move', async () => {
     const game = createChessGame('game-1', COMPUTER_PLAYER_USER_ID, 'human-user');
-    const onFallback = vi.fn();
+    const onStockfishFailure = vi.fn();
 
-    await createStockfishChessBotAction(game, COMPUTER_PLAYER_USER_ID, onFallback);
+    await expect(createStockfishChessBotAction(
+      game,
+      COMPUTER_PLAYER_USER_ID,
+      onStockfishFailure
+    )).resolves.toBeNull();
 
-    expect(onFallback).toHaveBeenCalledTimes(1);
-    expect(onFallback).toHaveBeenCalledWith({
+    expect(onStockfishFailure).toHaveBeenCalledTimes(1);
+    expect(onStockfishFailure).toHaveBeenCalledWith({
       reason: 'stockfish_no_move'
     });
   });
 
-  it('reports when the chess bot falls back after a Stockfish error', async () => {
+  it('does not create a chess move after a Stockfish error', async () => {
     const error = new Error('Stockfish failed.');
     const game = createChessGame('game-1', COMPUTER_PLAYER_USER_ID, 'human-user');
-    const onFallback = vi.fn();
+    const onStockfishFailure = vi.fn();
     getStockfishBestMoveMock.mockRejectedValueOnce(error);
 
-    await createStockfishChessBotAction(game, COMPUTER_PLAYER_USER_ID, onFallback);
+    await expect(createStockfishChessBotAction(
+      game,
+      COMPUTER_PLAYER_USER_ID,
+      onStockfishFailure
+    )).resolves.toBeNull();
 
-    expect(onFallback).toHaveBeenCalledTimes(1);
-    expect(onFallback).toHaveBeenCalledWith({
+    expect(onStockfishFailure).toHaveBeenCalledTimes(1);
+    expect(onStockfishFailure).toHaveBeenCalledWith({
       error,
       reason: 'stockfish_error'
     });
@@ -109,5 +118,15 @@ function createQuestion() {
     prompt: 'Which game won Game of the Year in this segment?',
     rightReply: 'wow, you knew the trophy one.',
     wrongReply: 'you missed it. it was God of War.'
+  };
+}
+
+function createStockfishResult(move: { from: string; to: string } | null) {
+  return {
+    elapsedMs: 512,
+    elo: 1700,
+    fenHash: 'h_testfen',
+    move,
+    moveTimeMs: 500
   };
 }

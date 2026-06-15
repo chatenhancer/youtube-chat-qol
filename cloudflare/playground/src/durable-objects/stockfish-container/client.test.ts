@@ -1,8 +1,16 @@
-import { describe, expect, it, vi } from 'vitest';
-import { getStockfishBestMove, parseStockfishBestMove } from './stockfish';
-import type { DurableObjectNamespace, DurableObjectStub } from '../types';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { getStockfishBestMove, parseStockfishBestMove } from './client';
+import type { DurableObjectNamespace, DurableObjectStub } from '../../types';
 
-describe('Stockfish bot adapter', () => {
+describe('Stockfish container client', () => {
+  beforeEach(() => {
+    vi.spyOn(console, 'info').mockImplementation(() => undefined);
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   it('parses Stockfish UCI best move output', () => {
     expect(parseStockfishBestMove('bestmove e7e8q ponder a2a1q')).toEqual({
       from: 'e7',
@@ -25,10 +33,12 @@ describe('Stockfish bot adapter', () => {
 
       return Response.json({
         elapsedMs: 215,
+        elo: 1700,
         move: {
           from: 'e7',
           to: 'e5'
-        }
+        },
+        moveTimeMs: 500
       });
     });
     const env = {
@@ -39,8 +49,14 @@ describe('Stockfish bot adapter', () => {
       'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1',
       env
     )).resolves.toEqual({
-      from: 'e7',
-      to: 'e5'
+      elapsedMs: 215,
+      elo: 1700,
+      fenHash: expect.stringMatching(/^h_[a-z0-9]+$/),
+      move: {
+        from: 'e7',
+        to: 'e5'
+      },
+      moveTimeMs: 500
     });
     expect(fetch).toHaveBeenCalledTimes(1);
   });
@@ -50,7 +66,42 @@ describe('Stockfish bot adapter', () => {
       STOCKFISH_ENGINE: createNamespace(async () => Response.json({ move: null }))
     };
 
-    await expect(getStockfishBestMove('8/8/8/8/8/8/8/8 w - - 0 1', env)).resolves.toBeNull();
+    await expect(getStockfishBestMove('8/8/8/8/8/8/8/8 w - - 0 1', env)).resolves.toMatchObject({
+      elo: 1700,
+      move: null,
+      moveTimeMs: 500
+    });
+  });
+
+  it('uses configured Stockfish strength settings from the environment', async () => {
+    const fetch = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+      const request = new Request(input, init);
+      await expect(request.json()).resolves.toMatchObject({
+        elo: 1900,
+        moveTimeMs: 750
+      });
+      return Response.json({
+        elo: 1900,
+        move: {
+          from: 'g8',
+          to: 'f6'
+        },
+        moveTimeMs: 750
+      });
+    });
+
+    await expect(getStockfishBestMove('startpos', {
+      STOCKFISH_ELO: '1900',
+      STOCKFISH_ENGINE: createNamespace(fetch),
+      STOCKFISH_MOVE_TIME_MS: '750'
+    })).resolves.toMatchObject({
+      elo: 1900,
+      move: {
+        from: 'g8',
+        to: 'f6'
+      },
+      moveTimeMs: 750
+    });
   });
 
   it('throws when the Stockfish container binding is missing', async () => {

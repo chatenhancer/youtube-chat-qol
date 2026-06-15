@@ -1,14 +1,19 @@
 /**
- * Stockfish engine adapter.
+ * Stockfish container client.
  *
  * The engine runs in a Cloudflare Container so CPU-heavy search cannot reset
  * the stream room Durable Object.
  */
-import type { Env } from '../types';
+import { hashLogValue, logPlaygroundEvent } from '../../logging';
+import type { Env } from '../../types';
 
 const STOCKFISH_CONTAINER_NAME = 'stockfish-engine';
-const STOCKFISH_ELO = 1700;
-const STOCKFISH_MOVE_TIME_MS = 500;
+const DEFAULT_STOCKFISH_ELO = 1700;
+const DEFAULT_STOCKFISH_MOVE_TIME_MS = 500;
+const MAX_STOCKFISH_ELO = 3190;
+const MAX_STOCKFISH_MOVE_TIME_MS = 2_000;
+const MIN_STOCKFISH_ELO = 1320;
+const MIN_STOCKFISH_MOVE_TIME_MS = 10;
 const STOCKFISH_REQUEST_TIMEOUT_MS = 20_000;
 
 export interface StockfishMove {
@@ -17,27 +22,43 @@ export interface StockfishMove {
   to: string;
 }
 
-export type StockfishBestMoveProvider = (fen: string) => Promise<StockfishMove | null>;
+export interface StockfishResult {
+  elapsedMs?: number;
+  elo: number;
+  fenHash: string;
+  move: StockfishMove | null;
+  moveTimeMs: number;
+}
 
-export function createStockfishBestMoveProvider(env: Pick<Env, 'STOCKFISH_ENGINE'>): StockfishBestMoveProvider {
+export interface StockfishSettings {
+  elo: number;
+  moveTimeMs: number;
+}
+
+export type StockfishBestMoveProvider = (fen: string) => Promise<StockfishResult>;
+
+export function createStockfishBestMoveProvider(
+  env: Pick<Env, 'STOCKFISH_ELO' | 'STOCKFISH_ENGINE' | 'STOCKFISH_MOVE_TIME_MS'>
+): StockfishBestMoveProvider {
   return (fen) => getStockfishBestMove(fen, env);
 }
 
 export async function getStockfishBestMove(
   fen: string,
-  env?: Pick<Env, 'STOCKFISH_ENGINE'>
-): Promise<StockfishMove | null> {
+  env?: Pick<Env, 'STOCKFISH_ELO' | 'STOCKFISH_ENGINE' | 'STOCKFISH_MOVE_TIME_MS'>
+): Promise<StockfishResult> {
   if (!env?.STOCKFISH_ENGINE) {
     throw new Error('Stockfish container binding is not configured.');
   }
 
+  const settings = getStockfishSettings(env);
   const container = getStockfishContainer(env.STOCKFISH_ENGINE);
   const response = await withTimeout(
     container.fetch('https://stockfish.local/best-move', {
       body: JSON.stringify({
-        elo: STOCKFISH_ELO,
+        elo: settings.elo,
         fen,
-        moveTimeMs: STOCKFISH_MOVE_TIME_MS
+        moveTimeMs: settings.moveTimeMs
       }),
       headers: { 'Content-Type': 'application/json' },
       method: 'POST'
@@ -46,7 +67,23 @@ export async function getStockfishBestMove(
   );
 
   const payload = await readStockfishResponse(response);
-  return parseStockfishContainerMove(payload.move);
+  const result = {
+    elapsedMs: getOptionalPositiveInteger(payload.elapsedMs),
+    elo: getPositiveInteger(payload.elo, settings.elo),
+    fenHash: hashLogValue(fen),
+    move: parseStockfishContainerMove(payload.move),
+    moveTimeMs: getPositiveInteger(payload.moveTimeMs, settings.moveTimeMs)
+  };
+  logPlaygroundEvent('stockfish_container_best_move_succeeded', {
+    elapsedMs: result.elapsedMs,
+    elo: result.elo,
+    fen: result.fenHash,
+    from: result.move?.from,
+    moveTimeMs: result.moveTimeMs,
+    promotion: result.move?.promotion,
+    to: result.move?.to
+  });
+  return result;
 }
 
 export function parseStockfishBestMove(line: string): StockfishMove | null {
@@ -112,6 +149,35 @@ function getContainerErrorMessage(payload: unknown): string {
   return 'unknown error';
 }
 
+function getStockfishSettings(env: Pick<Env, 'STOCKFISH_ELO' | 'STOCKFISH_MOVE_TIME_MS'>): StockfishSettings {
+  return {
+    elo: getClampedInteger(env.STOCKFISH_ELO, DEFAULT_STOCKFISH_ELO, MIN_STOCKFISH_ELO, MAX_STOCKFISH_ELO),
+    moveTimeMs: getClampedInteger(
+      env.STOCKFISH_MOVE_TIME_MS,
+      DEFAULT_STOCKFISH_MOVE_TIME_MS,
+      MIN_STOCKFISH_MOVE_TIME_MS,
+      MAX_STOCKFISH_MOVE_TIME_MS
+    )
+  };
+}
+
+function getClampedInteger(value: string | undefined, defaultValue: number, min: number, max: number): number {
+  if (value === undefined || value.trim() === '') return defaultValue;
+  const parsed = Number(value);
+  if (!Number.isInteger(parsed)) return defaultValue;
+  return Math.max(min, Math.min(max, parsed));
+}
+
+function getOptionalPositiveInteger(value: unknown): number | undefined {
+  if (typeof value !== 'number' || !Number.isInteger(value) || value < 0) return undefined;
+  return value;
+}
+
+function getPositiveInteger(value: unknown, fallback: number): number {
+  if (typeof value !== 'number' || !Number.isInteger(value) || value <= 0) return fallback;
+  return value;
+}
+
 function getStockfishContainer(stockfishEngine: NonNullable<Env['STOCKFISH_ENGINE']>): { fetch: typeof fetch } {
   const containerId = stockfishEngine.idFromName(STOCKFISH_CONTAINER_NAME);
   return stockfishEngine.get(containerId);
@@ -135,5 +201,7 @@ function withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
 
 interface StockfishContainerResponse {
   elapsedMs?: number;
+  elo?: number;
   move?: unknown;
+  moveTimeMs?: number;
 }

@@ -1,11 +1,11 @@
 /**
  * Generic backend route dispatcher.
  *
- * Backend capabilities expose route modules, and `enabled-routes.ts` decides
+ * Backend capabilities expose route modules, and `routes/enabled-routes.ts` decides
  * which ones are active. Static routes match exact paths; stream routes share
  * `/v1/streams/:streamKey/...` and receive the sanitized stream key.
  */
-import { ENABLED_ROUTE_MODULES } from './enabled-routes';
+import { ENABLED_ROUTE_MODULES } from './routes/enabled-routes';
 import { createErrorResponse } from './http';
 import { getLogErrorType, logPlaygroundEvent } from './logging';
 import { sanitizeStreamKey } from './protocol/validation';

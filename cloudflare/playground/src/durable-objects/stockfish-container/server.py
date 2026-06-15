@@ -8,8 +8,8 @@ import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 
-DEFAULT_ELO = 1350
-DEFAULT_MOVE_TIME_MS = 200
+DEFAULT_ELO = 1700
+DEFAULT_MOVE_TIME_MS = 500
 MAX_BODY_BYTES = 4096
 MAX_MOVE_TIME_MS = 2000
 REQUEST_TIMEOUT_SECONDS = 4.0
@@ -19,6 +19,7 @@ STOCKFISH_PATH = os.environ.get("STOCKFISH_PATH") or shutil.which("stockfish") o
 class StockfishEngine:
   def __init__(self, path):
     self.path = path
+    self.current_elo = None
     self.lock = threading.Lock()
     self.process = None
     self.lines = queue.Queue()
@@ -26,7 +27,8 @@ class StockfishEngine:
 
   def best_move(self, fen, move_time_ms=DEFAULT_MOVE_TIME_MS, elo=DEFAULT_ELO):
     with self.lock:
-      self._ensure_ready(elo)
+      self._ensure_ready()
+      self._configure_strength(elo)
       self._send(f"position fen {fen}")
       self._send(f"go movetime {move_time_ms}")
       try:
@@ -41,7 +43,7 @@ class StockfishEngine:
 
       return parse_bestmove(line)
 
-  def _ensure_ready(self, elo):
+  def _ensure_ready(self):
     if self.process and self.process.poll() is None:
       return
 
@@ -56,13 +58,21 @@ class StockfishEngine:
     self.lines = queue.Queue()
     self.reader = threading.Thread(target=self._read_stdout, daemon=True)
     self.reader.start()
+    self.current_elo = None
 
     self._send("uci")
     self._read_until(lambda value: value == "uciok", REQUEST_TIMEOUT_SECONDS)
     self._send("setoption name UCI_LimitStrength value true")
+    self._send("isready")
+    self._read_until(lambda value: value == "readyok", REQUEST_TIMEOUT_SECONDS)
+
+  def _configure_strength(self, elo):
+    if self.current_elo == elo:
+      return
     self._send(f"setoption name UCI_Elo value {elo}")
     self._send("isready")
     self._read_until(lambda value: value == "readyok", REQUEST_TIMEOUT_SECONDS)
+    self.current_elo = elo
 
   def _read_stdout(self):
     if not self.process or not self.process.stdout:
@@ -93,6 +103,7 @@ class StockfishEngine:
     if self.process and self.process.poll() is None:
       self.process.kill()
     self.process = None
+    self.current_elo = None
     self.lines = queue.Queue()
 
 
@@ -129,7 +140,9 @@ class Handler(BaseHTTPRequestHandler):
 
     self._write_json(200, {
       "elapsedMs": round((time.monotonic() - started_at) * 1000),
+      "elo": elo,
       "move": move,
+      "moveTimeMs": move_time_ms,
     })
 
   def _read_json(self):
@@ -193,7 +206,8 @@ def parse_bestmove(line):
 
 def main():
   port = int(os.environ.get("PORT", "8080"))
-  ENGINE._ensure_ready(DEFAULT_ELO)
+  ENGINE._ensure_ready()
+  ENGINE._configure_strength(DEFAULT_ELO)
   server = ThreadingHTTPServer(("0.0.0.0", port), Handler)
   server.serve_forever()
 

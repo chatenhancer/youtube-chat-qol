@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+*.ts
+*.test.ts
+.DS_Store
+server_test.py

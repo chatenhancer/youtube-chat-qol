@@ -67,10 +67,11 @@ Production origins should stay tight. Browser-extension origins are handled in a
 way that supports both Chromium and Firefox extension pages.
 
 Deploying the Playground worker now also builds and pushes the Stockfish
-container image from `stockfish-container/Dockerfile`. Docker, or a compatible
-Docker CLI and engine, must be available locally for `wrangler deploy`. If the
-Stockfish container is cold, unavailable, or times out, the chess computer logs
-`chess_bot_stockfish_fallback` and uses the local legal-move fallback.
+container image from `src/durable-objects/stockfish-container/Dockerfile`.
+Docker, or a compatible Docker CLI and engine, must be available locally for
+`wrangler deploy`. If the Stockfish container is cold, unavailable, or times
+out, the chess computer logs `chess_bot_stockfish_unavailable`, retries a
+bounded number of times, then leaves the game if the engine still cannot move.
 
 For current entrypoints, scripts, routes, and Durable Object configuration, use
 the source files, `wrangler.toml`, and root package scripts as the source of

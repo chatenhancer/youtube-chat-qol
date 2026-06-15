@@ -5,34 +5,33 @@
  * WebSocket sessions, presence, invites, and active realtime game records.
  * Game-specific rules are delegated through `games/registry.ts`.
  */
-import { getGameModule, getGameModuleForRecord } from '../games/registry';
-import type { GameRecord } from '../games/types';
-import { createErrorResponse, createJsonResponse } from '../http';
-import { hashLogValue, logPlaygroundEvent, shortLogId } from '../logging';
+import { getGameModule, getGameModuleForRecord } from '../../games/registry';
+import type { GameRecord } from '../../games/types';
+import { createErrorResponse, createJsonResponse } from '../../http';
+import { hashLogValue, logPlaygroundEvent, shortLogId } from '../../logging';
 import {
   createChallenge,
   verifySignedIdentity
-} from '../protocol/identity';
+} from '../../protocol/identity';
 import {
   PLAYGROUND_PROTOCOL_VERSION,
   type ClientMessage,
   type GameId,
   type LobbySnapshot,
-  type PresenceUser,
-  type PublicInvite,
-  type PublicUserIdentity,
   type ServerMessage
-} from '../protocol/messages';
-import { parseClientMessage, ProtocolError, sanitizeStreamKey } from '../protocol/validation';
-import { TokenBucket, type TokenBucketOptions } from '../rate-limit';
-import { attachBotClientsToRoom } from '../bots/room-adapter';
-import { createStockfishBestMoveProvider } from '../bots/stockfish';
-import type { DurableObjectState, Env, ServerWebSocket } from '../types';
+} from '../../protocol/messages';
+import { parseClientMessage, ProtocolError, sanitizeStreamKey } from '../../protocol/validation';
+import { TokenBucket, type TokenBucketOptions } from '../../rate-limit';
+import { GameState } from './game-state';
+import { GenerationTokens } from './generation-token';
+import { InviteManager } from './invite-manager';
+import { type ClientSession, sendMessage, SessionManager } from './session-manager';
+import type { DurableObjectState, Env } from '../../types';
 
 const INVITE_TTL_MS = 2 * 60 * 1000;
 const MAX_MESSAGE_BYTES = 32_768;
 const CLOSE_POLICY_VIOLATION = 1008;
-const ROOM_STATE_STORAGE_KEY = 'roomState:v1';
+const TRUSTED_DISPLAY_NAME_HEADER = 'X-Chat-Enhancer-Client-Display-Name';
 const CONNECTION_RATE_LIMIT: TokenBucketOptions = {
   capacity: 30,
   refillPerSecond: 10
@@ -58,67 +57,22 @@ const MESSAGE_RATE_COSTS: { [Type in ClientMessage['type']]: number } = {
   setAvailability: 2
 };
 
-interface ClientSession {
-  availableGames: Set<GameId>;
-  challenge: string;
-  connectionId: string;
-  displayName: string;
-  joinedAt: number;
-  rateLimit: TokenBucket;
-  socket: ServerWebSocket;
-  userId: string;
-}
-
-interface PendingInvite {
-  createdAt: number;
-  expiresAt: number;
-  fromUserId: string;
-  gameId: GameId;
-  inviteId: string;
-  status: 'accepted' | 'ignored' | 'pending';
-  toUserId: string;
-}
-
-interface GenerationTokenRecord {
-  expiresAt: number;
-  gameId: string;
-  userId: string;
-}
-
-interface StoredRoomState {
-  games: unknown[];
-}
-
 export class StreamRoom {
-  private readonly clients = new Map<string, ClientSession>();
-  private readonly generationTokens = new Map<string, GenerationTokenRecord>();
-  private readonly generationTokenRoomRateLimit = new TokenBucket(GENERATION_TOKEN_ROOM_RATE_LIMIT);
-  private readonly generationTokenUserRateLimits = new Map<string, TokenBucket>();
-  private readonly invites = new Map<string, PendingInvite>();
-  private readonly games = new Map<string, GameRecord>();
-  private readonly userAvailableGames = new Map<string, GameId[]>();
+  private readonly gameState: GameState;
+  private readonly generationTokens = new GenerationTokens(
+    GENERATION_TOKEN_ROOM_RATE_LIMIT,
+    GENERATION_TOKEN_USER_RATE_LIMIT
+  );
+  private readonly invites = new InviteManager();
+  private readonly sessions = new SessionManager();
   private readonly userRateLimits = new Map<string, TokenBucket>();
-  private storageWriteQueue: Promise<unknown> = Promise.resolve();
   private streamKey = '';
 
-  constructor(private readonly state: DurableObjectState, private readonly env: Env) {
-    this.state.blockConcurrencyWhile(async () => {
-      await this.loadStoredRoomState();
-      this.attachBotClients();
-    });
-  }
+  constructor(private readonly state: DurableObjectState, _env: Env) {
+    this.gameState = new GameState(this.state, (event, details, level) => this.logEvent(event, details, level));
 
-  private attachBotClients(): void {
-    attachBotClientsToRoom({
-      clients: this.clients,
-      connectionRateLimitOptions: CONNECTION_RATE_LIMIT,
-      createSnapshot: (userId) => this.createSnapshot(userId),
-      getGame: (gameId) => this.games.get(gameId),
-      getStockfishBestMove: createStockfishBestMoveProvider(this.env),
-      handleMessage: (session, message) => this.handleSocketMessage(session, message),
-      logEvent: (event, details, level) => this.logEvent(event, details, level),
-      setAvailableGames: (userId, availableGames) => this.userAvailableGames.set(userId, availableGames),
-      waitUntil: (promise) => this.state.waitUntil(promise)
+    this.state.blockConcurrencyWhile(async () => {
+      await this.gameState.load();
     });
   }
 
@@ -141,10 +95,10 @@ export class StreamRoom {
       return new Response('Expected WebSocket upgrade.', { status: 426 });
     }
 
-    return this.handleSocket();
+    return this.handleSocket(request);
   }
 
-  private handleSocket(): Response {
+  private handleSocket(request: Request): Response {
     const pair = new WebSocketPair();
     const client = pair[0];
     const socket = pair[1];
@@ -160,6 +114,7 @@ export class StreamRoom {
       joinedAt: Date.now(),
       rateLimit: new TokenBucket(CONNECTION_RATE_LIMIT),
       socket,
+      trustedDisplayName: getTrustedDisplayName(request),
       userId: ''
     };
     this.logEvent('websocket_accepted', {
@@ -207,13 +162,13 @@ export class StreamRoom {
     } catch (error) {
       const protocolError = normalizeError(error);
       this.logProtocolError(session, protocolError);
-      sendMessage(session.socket, {
+      if (session.socket) sendMessage(session.socket, {
         code: protocolError.code,
         message: protocolError.message,
         type: 'error'
       });
       if (protocolError.code === 'hello_required' || protocolError.code === 'invalid_signature') {
-        session.socket.close(CLOSE_POLICY_VIOLATION, protocolError.message);
+        session.socket?.close(CLOSE_POLICY_VIOLATION, protocolError.message);
       }
     }
   }
@@ -224,8 +179,7 @@ export class StreamRoom {
         await this.handleHello(session, message);
         return;
       case 'setAvailability':
-        session.availableGames = new Set(message.availableGames);
-        this.userAvailableGames.set(session.userId, message.availableGames);
+        this.sessions.setAvailability(session, message.availableGames);
         this.logEvent('availability_changed', {
           availableGameCount: message.availableGames.length,
           connection: shortLogId(session.connectionId),
@@ -247,7 +201,7 @@ export class StreamRoom {
         });
         return;
       case 'ping':
-        sendMessage(session.socket, { id: message.id, type: 'pong' });
+        if (session.socket) sendMessage(session.socket, { id: message.id, type: 'pong' });
         return;
     }
   }
@@ -256,19 +210,14 @@ export class StreamRoom {
     if (session.userId) throw new ProtocolError('already_authenticated', 'This connection is already authenticated.');
 
     const identity = await verifySignedIdentity(session.challenge, message.identity);
-    session.userId = identity.userId;
-    session.displayName = getPlayerDisplayName(identity.userId);
-    session.availableGames = new Set(message.availableGames || []);
-    this.userAvailableGames.set(session.userId, [...session.availableGames]);
-    session.joinedAt = Date.now();
-    this.clients.set(session.connectionId, session);
+    this.sessions.authenticate(session, identity.userId, message.availableGames || []);
     this.logEvent('client_authenticated', {
       availableGameCount: session.availableGames.size,
       connection: shortLogId(session.connectionId),
       user: hashLogValue(session.userId)
     });
 
-    sendMessage(session.socket, {
+    if (session.socket) sendMessage(session.socket, {
       snapshot: this.createSnapshot(session.userId),
       type: 'helloAccepted',
       userId: session.userId
@@ -279,25 +228,23 @@ export class StreamRoom {
   private handleInvite(session: ClientSession, gameId: GameId, toUserId: string): void {
     if (session.userId === toUserId) throw new ProtocolError('self_invite', 'Choose another player.');
 
-    const target = this.getUserPresence(toUserId);
+    const target = this.sessions.getPresenceUser(toUserId);
     if (!target) throw new ProtocolError('user_not_found', 'That player is not connected.');
     if (!target.availableGames.includes(gameId)) {
       throw new ProtocolError('user_unavailable', 'That player is not available for this game.');
     }
 
     const now = Date.now();
-    const invite: PendingInvite = {
-      createdAt: now,
-      expiresAt: now + INVITE_TTL_MS,
+    const invite = this.invites.createInvite({
       fromUserId: session.userId,
       gameId,
       inviteId: createId('inv'),
-      status: 'pending',
-      toUserId
-    };
-    this.invites.set(invite.inviteId, invite);
+      now,
+      toUserId,
+      ttlMs: INVITE_TTL_MS
+    });
 
-    const publicInvite = this.toPublicInvite(invite);
+    const publicInvite = this.invites.toPublicInvite(invite, (userId) => this.sessions.getPublicUser(userId));
     this.logEvent('invite_created', {
       fromUser: hashLogValue(invite.fromUserId),
       gameType: invite.gameId,
@@ -309,33 +256,38 @@ export class StreamRoom {
   }
 
   private handleInviteResponse(session: ClientSession, inviteId: string, accept: boolean): void {
-    const invite = this.getPendingInvite(inviteId);
-    if (invite.toUserId !== session.userId) {
+    this.handleInviteResponseForUser(session.userId, inviteId, accept);
+  }
+
+  private handleInviteResponseForUser(userId: string, inviteId: string, accept: boolean): void {
+    const invite = this.invites.getPendingInvite(inviteId);
+    if (invite.toUserId !== userId) {
       throw new ProtocolError('not_your_invite', 'That invite is not for you.');
     }
 
-    invite.status = accept ? 'accepted' : 'ignored';
+    this.invites.setInviteStatus(invite, accept ? 'accepted' : 'ignored');
     this.logEvent(accept ? 'invite_accepted' : 'invite_ignored', {
       fromUser: hashLogValue(invite.fromUserId),
       gameType: invite.gameId,
       invite: shortLogId(invite.inviteId),
       toUser: hashLogValue(invite.toUserId)
     });
-    const publicInvite = this.toPublicInvite(invite);
+    const publicInvite = this.invites.toPublicInvite(invite, (publicUserId) => this.sessions.getPublicUser(publicUserId));
     this.sendToUser(invite.fromUserId, { invite: publicInvite, type: 'inviteUpdated' });
     this.sendToUser(invite.toUserId, { invite: publicInvite, type: 'inviteUpdated' });
 
     if (!accept) return;
 
     const game = getGameModule(invite.gameId).createGame(createId('game'), [invite.fromUserId, invite.toUserId]);
-    this.games.set(game.gameId, game);
-    this.queueStoredRoomStateWrite();
+    this.gameState.set(game);
     this.logEvent('game_started', {
       game: shortLogId(game.gameId),
       gameType: game.gameType,
       playerCount: getGameModuleForRecord(game).getRecipientUserIds(game).length
     });
-    const publicGame = getGameModuleForRecord(game).toPublicGame(game, (userId) => this.getPublicUser(userId));
+    const publicGame = getGameModuleForRecord(game).toPublicGame(game, (publicUserId) => {
+      return this.sessions.getPublicUser(publicUserId);
+    });
     this.sendToUser(invite.fromUserId, { game: publicGame, type: 'gameStarted' });
     this.sendToUser(invite.toUserId, { game: publicGame, type: 'gameStarted' });
   }
@@ -349,10 +301,10 @@ export class StreamRoom {
       userId: string;
     }
   ): void {
-    const game = this.games.get(gameId);
+    const game = this.gameState.get(gameId);
     if (!game) throw new ProtocolError('game_not_found', 'Game not found.');
     if (action.action === 'leave') {
-      this.handleLeaveGame(session, game);
+      this.handleLeaveGame(session.userId, game);
       return;
     }
     if (action.action === 'requestGenerationToken') {
@@ -360,9 +312,19 @@ export class StreamRoom {
       return;
     }
 
+    this.applyGameAction(game, action);
+  }
+
+  private applyGameAction(
+    game: GameRecord,
+    action: {
+      action: string;
+      payload?: Record<string, unknown>;
+      userId: string;
+    }
+  ): void {
     const nextGame = getGameModuleForRecord(game).applyAction(game, action);
-    this.games.set(gameId, nextGame);
-    this.queueStoredRoomStateWrite();
+    this.gameState.set(nextGame);
     if (game.status !== nextGame.status && isTerminalGameStatus(nextGame.status)) {
       this.logEvent('game_ended', {
         game: shortLogId(nextGame.gameId),
@@ -373,26 +335,25 @@ export class StreamRoom {
     this.broadcastGame(nextGame);
   }
 
-  private handleLeaveGame(session: ClientSession, game: GameRecord): void {
+  private handleLeaveGame(userId: string, game: GameRecord): void {
     const gameModule = getGameModuleForRecord(game);
-    if (!gameModule.canUserAccessGame(game, session.userId)) {
+    if (!gameModule.canUserAccessGame(game, userId)) {
       throw new ProtocolError('not_in_game', 'You are not a player in this game.');
     }
 
-    this.games.delete(game.gameId);
-    this.queueStoredRoomStateWrite();
+    this.gameState.delete(game.gameId);
     this.logEvent('game_ended', {
       game: shortLogId(game.gameId),
       gameType: game.gameType,
       reason: 'playerLeft',
-      user: hashLogValue(session.userId)
+      user: hashLogValue(userId)
     });
-    gameModule.getRecipientUserIds(game).forEach((userId) => {
-      this.sendToUser(userId, {
+    gameModule.getRecipientUserIds(game).forEach((recipientUserId) => {
+      this.sendToUser(recipientUserId, {
         gameId: game.gameId,
         reason: 'playerLeft',
         type: 'gameEnded',
-        userId: session.userId
+        userId
       });
     });
   }
@@ -404,17 +365,18 @@ export class StreamRoom {
     }
 
     const now = Date.now();
-    this.assertWithinGenerationTokenRateLimit(session, now);
-    this.pruneExpiredGenerationTokens(now);
+    this.generationTokens.assertWithinRateLimit(session.userId, now);
 
     const grant = gameModule.createGenerationToken(game, {
       now,
       userId: session.userId
     });
     const generationToken = createId('rtg');
-    this.generationTokens.set(generationToken, {
+    this.generationTokens.create({
       expiresAt: grant.expiresAt,
+      generationToken,
       gameId: game.gameId,
+      now,
       userId: session.userId
     });
 
@@ -423,7 +385,7 @@ export class StreamRoom {
       gameType: game.gameType,
       user: hashLogValue(session.userId)
     });
-    sendMessage(session.socket, {
+    if (session.socket) sendMessage(session.socket, {
       expiresAt: grant.expiresAt,
       gameId: game.gameId,
       generationToken,
@@ -453,17 +415,15 @@ export class StreamRoom {
     }
 
     const now = Date.now();
-    this.pruneExpiredGenerationTokens(now);
-    const token = this.generationTokens.get(generationToken);
-    this.generationTokens.delete(generationToken);
-    if (!token || token.gameId !== gameId || token.expiresAt <= now) {
+    const token = this.generationTokens.consume(gameId, generationToken, now);
+    if (!token) {
       this.logEvent('generation_token_rejected', {
         game: gameId ? shortLogId(gameId) : undefined
       }, 'warn');
       return createErrorResponse('invalid_generation_token', 'Replay Trivia generation token is invalid or expired.', 403);
     }
 
-    const game = this.games.get(token.gameId);
+    const game = this.gameState.get(token.gameId);
     if (!game) {
       return createErrorResponse('game_not_found', 'Game not found.', 404);
     }
@@ -522,106 +482,37 @@ export class StreamRoom {
     return bucket;
   }
 
-  private assertWithinGenerationTokenRateLimit(session: ClientSession, now: number): void {
-    if (!this.generationTokenRoomRateLimit.consume(1, now)) {
-      throw new ProtocolError('rate_limited', 'Slow down before requesting more generated content.');
-    }
-
-    const existing = this.generationTokenUserRateLimits.get(session.userId);
-    const bucket = existing || new TokenBucket(GENERATION_TOKEN_USER_RATE_LIMIT, now);
-    if (!existing) this.generationTokenUserRateLimits.set(session.userId, bucket);
-    if (!bucket.consume(1, now)) {
-      throw new ProtocolError('rate_limited', 'Slow down before requesting more generated content.');
-    }
-  }
-
   private createSnapshot(forUserId = ''): LobbySnapshot {
-    this.pruneExpiredInvites();
     return {
-      games: [...this.games.values()]
+      games: this.gameState.values()
         .filter((game) => Boolean(forUserId) && getGameModuleForRecord(game).canUserAccessGame(game, forUserId))
-        .map((game) => getGameModuleForRecord(game).toPublicGame(game, (userId) => this.getPublicUser(userId))),
-      invites: [...this.invites.values()]
-        .filter((invite) => invite.status === 'pending')
-        .filter((invite) => Boolean(forUserId) && (invite.fromUserId === forUserId || invite.toUserId === forUserId))
-        .map((invite) => this.toPublicInvite(invite)),
-      users: this.getPresenceUsers()
+        .map((game) => getGameModuleForRecord(game).toPublicGame(game, (userId) => {
+          return this.sessions.getPublicUser(userId);
+        })),
+      invites: this.invites.getPublicInvites(forUserId, (userId) => this.sessions.getPublicUser(userId)),
+      users: this.sessions.getPresenceUsers()
     };
   }
 
-  private async loadStoredRoomState(): Promise<void> {
-    let stored: unknown;
-    try {
-      stored = await this.state.storage.get<StoredRoomState>(ROOM_STATE_STORAGE_KEY);
-    } catch {
-      this.logEvent('room_state_restore_failed', {}, 'warn');
-      return;
-    }
-
-    if (!isStoredRoomState(stored)) return;
-
-    stored.games.forEach((game) => {
-      if (!isSupportedStoredGame(game)) {
-        this.logEvent('stored_game_ignored', {
-          game: isRecord(game) && typeof game.gameId === 'string' ? shortLogId(game.gameId) : undefined
-        }, 'warn');
-        return;
-      }
-
-      this.games.set(game.gameId, game);
-    });
-
-    if (this.games.size > 0) {
-      this.logEvent('room_state_restored', {
-        gameCount: this.games.size
-      });
-    }
-  }
-
-  private queueStoredRoomStateWrite(): void {
-    const write = this.storageWriteQueue
-      .then(() => this.writeStoredRoomState())
-      .catch(() => {
-        this.logEvent('room_state_persist_failed', {}, 'warn');
-      });
-    this.storageWriteQueue = write.catch(() => undefined);
-    this.state.waitUntil(write);
-  }
-
-  private async writeStoredRoomState(): Promise<void> {
-    await this.state.storage.put(ROOM_STATE_STORAGE_KEY, {
-      games: [...this.games.values()]
-    } satisfies StoredRoomState);
-  }
-
   private broadcastPresence(): void {
-    this.clients.forEach((client) => {
-      if (!client.userId) return;
-      sendMessage(client.socket, {
-        snapshot: this.createSnapshot(client.userId),
-        type: 'presenceSnapshot'
-      });
-    });
+    this.sessions.broadcastPresence((userId) => this.createSnapshot(userId));
   }
 
   private broadcastGame(game: GameRecord): void {
     const gameModule = getGameModuleForRecord(game);
-    const publicGame = gameModule.toPublicGame(game, (userId) => this.getPublicUser(userId));
+    const publicGame = gameModule.toPublicGame(game, (userId) => this.sessions.getPublicUser(userId));
     gameModule.getRecipientUserIds(game).forEach((userId) => {
       this.sendToUser(userId, { game: publicGame, type: 'gameUpdated' });
     });
   }
 
   private sendToUser(userId: string, message: ServerMessage): void {
-    this.clients.forEach((client) => {
-      if (client.userId === userId) sendMessage(client.socket, message);
-    });
+    this.sessions.sendToUser(userId, message);
   }
 
   private removeClient(connectionId: string, reason = 'unknown'): void {
-    const session = this.clients.get(connectionId);
-    const removed = this.clients.delete(connectionId);
-    if (!removed) {
+    const session = this.sessions.remove(connectionId);
+    if (!session) {
       this.logEvent('websocket_disconnected', {
         authenticated: false,
         connection: shortLogId(connectionId),
@@ -637,77 +528,7 @@ export class StreamRoom {
       user: session?.userId ? hashLogValue(session.userId) : undefined
     });
 
-    if (session?.userId && !this.hasConnectedUser(session.userId)) {
-      this.userAvailableGames.delete(session.userId);
-    }
     this.broadcastPresence();
-  }
-
-  private getPendingInvite(inviteId: string): PendingInvite {
-    this.pruneExpiredInvites();
-    const invite = this.invites.get(inviteId);
-    if (!invite || invite.status !== 'pending') {
-      throw new ProtocolError('invite_not_found', 'Invite not found.');
-    }
-    return invite;
-  }
-
-  private pruneExpiredInvites(): void {
-    const now = Date.now();
-    this.invites.forEach((invite, inviteId) => {
-      if (invite.expiresAt <= now) this.invites.delete(inviteId);
-    });
-  }
-
-  private pruneExpiredGenerationTokens(now = Date.now()): void {
-    this.generationTokens.forEach((token, value) => {
-      if (token.expiresAt <= now) this.generationTokens.delete(value);
-    });
-  }
-
-  private getPresenceUsers(): PresenceUser[] {
-    const users = new Map<string, PresenceUser>();
-
-    this.clients.forEach((client) => {
-      if (!client.userId) return;
-      const existing = users.get(client.userId);
-      users.set(client.userId, {
-        availableGames: this.userAvailableGames.get(client.userId) || [...client.availableGames],
-        displayName: client.displayName || existing?.displayName || 'Player',
-        joinedAt: Math.min(existing?.joinedAt || client.joinedAt, client.joinedAt),
-        userId: client.userId
-      });
-    });
-
-    return [...users.values()].sort((a, b) => a.displayName.localeCompare(b.displayName));
-  }
-
-  private hasConnectedUser(userId: string): boolean {
-    return [...this.clients.values()].some((client) => client.userId === userId);
-  }
-
-  private getUserPresence(userId: string): PresenceUser | undefined {
-    return this.getPresenceUsers().find((user) => user.userId === userId);
-  }
-
-  private getPublicUser(userId: string): PublicUserIdentity {
-    const presence = this.getUserPresence(userId);
-    return {
-      displayName: presence?.displayName || getPlayerDisplayName(userId),
-      userId
-    };
-  }
-
-  private toPublicInvite(invite: PendingInvite): PublicInvite {
-    return {
-      createdAt: invite.createdAt,
-      expiresAt: invite.expiresAt,
-      fromUser: this.getPublicUser(invite.fromUserId),
-      gameId: invite.gameId,
-      inviteId: invite.inviteId,
-      status: invite.status,
-      toUser: this.getPublicUser(invite.toUserId)
-    };
   }
 
   private logProtocolError(session: ClientSession, error: ProtocolError): void {
@@ -729,14 +550,6 @@ export class StreamRoom {
       room: this.streamKey ? hashLogValue(this.streamKey) : undefined,
       ...details
     }, level);
-  }
-}
-
-function sendMessage(socket: ServerWebSocket, message: ServerMessage): void {
-  try {
-    socket.send(JSON.stringify(message));
-  } catch {
-    socket.close();
   }
 }
 
@@ -769,15 +582,16 @@ function getProtocolLogEvent(code: string): string {
   }
 }
 
+function getTrustedDisplayName(request: Request): string | undefined {
+  const displayName = (request.headers.get(TRUSTED_DISPLAY_NAME_HEADER) || '').trim().replace(/\s+/g, ' ');
+  if (!displayName) return undefined;
+  return displayName.slice(0, 32);
+}
+
 function createId(prefix: string): string {
   const bytes = new Uint8Array(12);
   crypto.getRandomValues(bytes);
   return `${prefix}_${Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0')).join('')}`;
-}
-
-function getPlayerDisplayName(userId: string): string {
-  const code = userId.replace(/[^a-z0-9]/gi, '').slice(0, 4).toUpperCase();
-  return `Player ${code || '0000'}`;
 }
 
 function isTerminalGameStatus(status: string): boolean {
@@ -785,24 +599,6 @@ function isTerminalGameStatus(status: string): boolean {
     status === 'draw' ||
     status === 'finished' ||
     status === 'resigned';
-}
-
-function isStoredRoomState(value: unknown): value is StoredRoomState {
-  return isRecord(value) && Array.isArray(value.games);
-}
-
-function isSupportedStoredGame(value: unknown): value is GameRecord {
-  if (!isRecord(value)) return false;
-  if (typeof value.gameId !== 'string' || typeof value.gameType !== 'string' || typeof value.status !== 'string') {
-    return false;
-  }
-
-  try {
-    getGameModuleForRecord(value as unknown as GameRecord);
-    return true;
-  } catch {
-    return false;
-  }
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
