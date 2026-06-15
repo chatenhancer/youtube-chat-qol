@@ -61,20 +61,10 @@ export const CHESS_COMPUTER_PLAYER_BEGINNER_PROFILE = createChessComputerPlayerP
   'Computer (Beginner)',
   1320
 );
-export const CHESS_COMPUTER_PLAYER_CASUAL_PROFILE = createChessComputerPlayerProfile(
-  'casual',
-  'Computer (Casual)',
-  1500
-);
 export const CHESS_COMPUTER_PLAYER_CLUB_PROFILE = createChessComputerPlayerProfile(
   'club',
   'Computer (Club)',
   1700
-);
-export const CHESS_COMPUTER_PLAYER_EXPERT_PROFILE = createChessComputerPlayerProfile(
-  'expert',
-  'Computer (Expert)',
-  2100
 );
 export const CHESS_COMPUTER_PLAYER_MASTER_PROFILE = createChessComputerPlayerProfile(
   'master',
@@ -83,9 +73,7 @@ export const CHESS_COMPUTER_PLAYER_MASTER_PROFILE = createChessComputerPlayerPro
 );
 export const CHESS_COMPUTER_PLAYER_PROFILES: readonly ComputerPlayerProfile[] = [
   CHESS_COMPUTER_PLAYER_BEGINNER_PROFILE,
-  CHESS_COMPUTER_PLAYER_CASUAL_PROFILE,
   CHESS_COMPUTER_PLAYER_CLUB_PROFILE,
-  CHESS_COMPUTER_PLAYER_EXPERT_PROFILE,
   CHESS_COMPUTER_PLAYER_MASTER_PROFILE
 ];
 export const COMPUTER_PLAYER_PROFILES: readonly ComputerPlayerProfile[] = [
