@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { StreamRoom } from './stream-room';
 import type { PublicChessGame } from '../games/chess';
 import { COMPUTER_PLAYER_DISPLAY_NAME, COMPUTER_PLAYER_USER_ID } from '../bots/computer-player';
+import { getStockfishBestMove } from '../bots/stockfish';
 import {
   createChallenge,
   createSignaturePayload,
@@ -112,6 +113,7 @@ describe('playground stream room', () => {
     vi.spyOn(console, 'error').mockImplementation(() => undefined);
     vi.spyOn(console, 'info').mockImplementation(() => undefined);
     vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    vi.mocked(getStockfishBestMove).mockResolvedValue(null);
   });
 
   afterEach(() => {
@@ -200,6 +202,7 @@ describe('playground stream room', () => {
     const harness = createRoomHarness();
     const room = harness.room;
     const alice = createSession('alice-connection');
+    vi.mocked(getStockfishBestMove).mockRejectedValueOnce(new TypeError('Stockfish module factory import failed.'));
 
     vi.useFakeTimers();
     try {
@@ -225,9 +228,11 @@ describe('playground stream room', () => {
     expect(console.warn).toHaveBeenCalledWith(
       '[Chat Enhancer Playground] chess_bot_stockfish_fallback',
       expect.objectContaining({
+        errorMessage: 'Stockfish module factory import failed.',
+        errorType: 'TypeError',
         event: 'chess_bot_stockfish_fallback',
         gameType: 'chess',
-        reason: 'stockfish_no_move',
+        reason: 'stockfish_error',
         service: 'chat-enhancer-playground'
       })
     );

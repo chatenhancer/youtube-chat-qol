@@ -18,6 +18,7 @@ import { TokenBucket, type TokenBucketOptions } from '../rate-limit';
 import type { ServerWebSocket } from '../types';
 
 type LogDetails = Record<string, boolean | number | string | undefined>;
+const MAX_LOG_MESSAGE_LENGTH = 180;
 
 export interface BotClientSession {
   availableGames: readonly GameId[];
@@ -129,12 +130,20 @@ function logChessBotFallback(
   const game = options.getGame(gameId);
   options.logEvent('chess_bot_stockfish_fallback', {
     connection: shortLogId(connectionId),
+    errorMessage: getFallbackErrorMessage(fallback.error),
     errorType: fallback.error === undefined ? undefined : getLogErrorType(fallback.error),
     game: gameId ? shortLogId(gameId) : undefined,
     gameType: game?.gameType,
     reason: fallback.reason,
     user: session?.userId ? hashLogValue(session.userId) : undefined
   }, 'warn');
+}
+
+function getFallbackErrorMessage(error: unknown): string | undefined {
+  if (error === undefined) return undefined;
+  const message = error instanceof Error ? error.message : String(error);
+  if (message.length <= MAX_LOG_MESSAGE_LENGTH) return message;
+  return `${message.slice(0, MAX_LOG_MESSAGE_LENGTH - 3)}...`;
 }
 
 function createBotClients(host: BotClientsHost): BotClients {

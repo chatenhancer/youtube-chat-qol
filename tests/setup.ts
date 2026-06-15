@@ -1,5 +1,9 @@
 import { vi } from 'vitest';
 
+vi.mock('stockfish/bin/stockfish-18-lite-single.wasm', () => ({
+  default: new WebAssembly.Module(new Uint8Array([0, 97, 115, 109, 1, 0, 0, 0]))
+}));
+
 const localStorageArea = createStorageArea();
 const syncStorageArea = createStorageArea();
 
