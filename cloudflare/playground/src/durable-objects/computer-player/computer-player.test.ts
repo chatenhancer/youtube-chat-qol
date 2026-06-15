@@ -9,6 +9,9 @@ import {
 import {
   PLAYGROUND_PROTOCOL_VERSION,
   type ClientMessage,
+  type GameId,
+  type LobbySnapshot,
+  type PublicGame,
   type ServerMessage
 } from '../../protocol/messages';
 import type { DurableObjectNamespace, DurableObjectState, DurableObjectStorage, Env } from '../../types';
@@ -164,15 +167,7 @@ describe('computer player Durable Object', () => {
     });
     expect(harness.room.requests[0].headers.get('X-Chat-Enhancer-Client-Display-Name')).toBe(COMPUTER_PLAYER_DISPLAY_NAME);
 
-    harness.room.socket.emit('message', {
-      snapshot: {
-        games: [],
-        invites: [],
-        users: [{ availableGames: [...COMPUTER_PLAYER_AVAILABLE_GAMES], displayName: 'Computer', joinedAt: Date.now(), userId: 'bot-user' }]
-      },
-      type: 'helloAccepted',
-      userId: 'bot-user'
-    });
+    emitAuthenticatedComputerPlayer(harness);
     expect(console.info).toHaveBeenCalledWith(
       '[Chat Enhancer Playground] computer_player_authenticated',
       expect.objectContaining({
@@ -205,15 +200,7 @@ describe('computer player Durable Object', () => {
     vi.useFakeTimers();
     const harness = createComputerPlayerHarness();
     await startComputerPlayer(harness);
-    harness.room.socket.emit('message', {
-      snapshot: {
-        games: [],
-        invites: [],
-        users: [{ availableGames: [...COMPUTER_PLAYER_AVAILABLE_GAMES], displayName: 'Computer', joinedAt: Date.now(), userId: 'bot-user' }]
-      },
-      type: 'helloAccepted',
-      userId: 'bot-user'
-    });
+    emitAuthenticatedComputerPlayer(harness);
 
     const game = applyChessMove(createChessGame('game_chess_1', 'human-user', 'bot-user'), {
       from: 'e2',
@@ -273,19 +260,61 @@ describe('computer player Durable Object', () => {
     );
   });
 
-  it('does not close as idle while an active chess game is running', async () => {
+  it('leaves active games and closes only after the human is absent for the grace period', async () => {
     vi.useFakeTimers();
     const harness = createComputerPlayerHarness();
     await startComputerPlayer(harness);
     emitAuthenticatedComputerPlayer(harness);
 
-    emitBotTurnChessGame(harness);
+    const { publicGame } = emitBotTurnChessGame(harness);
+    emitPresenceSnapshot(harness, { games: [publicGame], humanConnected: false });
 
     await vi.advanceTimersByTimeAsync(30_000);
     await harness.state.flushWaitUntil();
 
     expect(harness.room.socket.readyState).toBe(FakeSocket.OPEN);
     expect(getStockfishBestMove).toHaveBeenCalledTimes(1);
+
+    await vi.advanceTimersByTimeAsync(90_000);
+    await harness.state.flushWaitUntil();
+
+    expect(harness.room.socket.sent.at(-1)).toEqual({
+      action: 'leave',
+      gameId: 'game_chess_1',
+      type: 'gameAction'
+    });
+    expect(harness.room.socket.readyState).toBe(FakeSocket.CLOSED);
+    expect(console.info).toHaveBeenCalledWith(
+      '[Chat Enhancer Playground] computer_player_human_absent_closed',
+      expect.objectContaining({
+        activeGameCount: 1,
+        event: 'computer_player_human_absent_closed'
+      })
+    );
+  });
+
+  it('cancels the human absence close when a human reconnects', async () => {
+    vi.useFakeTimers();
+    const harness = createComputerPlayerHarness();
+    await startComputerPlayer(harness);
+    emitAuthenticatedComputerPlayer(harness);
+
+    const { publicGame } = emitBotTurnChessGame(harness);
+    emitPresenceSnapshot(harness, { games: [publicGame], humanConnected: false });
+
+    await vi.advanceTimersByTimeAsync(60_000);
+    await harness.state.flushWaitUntil();
+    emitPresenceSnapshot(harness, { games: [publicGame], humanConnected: true });
+
+    await vi.advanceTimersByTimeAsync(120_000);
+    await harness.state.flushWaitUntil();
+
+    expect(harness.room.socket.readyState).toBe(FakeSocket.OPEN);
+    expect(harness.room.socket.sent).not.toContainEqual({
+      action: 'leave',
+      gameId: 'game_chess_1',
+      type: 'gameAction'
+    });
   });
 
   it('retries a Stockfish chess move after a transient failure', async () => {
@@ -298,7 +327,7 @@ describe('computer player Durable Object', () => {
     await startComputerPlayer(harness);
     emitAuthenticatedComputerPlayer(harness);
 
-    const game = emitBotTurnChessGame(harness);
+    const { game } = emitBotTurnChessGame(harness);
     const sentBeforeAction = harness.room.socket.sent.length;
 
     await vi.advanceTimersByTimeAsync(1_500);
@@ -420,13 +449,12 @@ async function startComputerPlayer(harness: { player: ComputerPlayer; state: Fak
   await harness.state.flushWaitUntil();
 }
 
-function emitAuthenticatedComputerPlayer(harness: { room: FakeRoomNamespace }): void {
+function emitAuthenticatedComputerPlayer(
+  harness: { room: FakeRoomNamespace },
+  options: { games?: PublicGame[]; humanConnected?: boolean } = {}
+): void {
   harness.room.socket.emit('message', {
-    snapshot: {
-      games: [],
-      invites: [],
-      users: [{ availableGames: [...COMPUTER_PLAYER_AVAILABLE_GAMES], displayName: 'Computer', joinedAt: Date.now(), userId: 'bot-user' }]
-    },
+    snapshot: createLobbySnapshot(options),
     type: 'helloAccepted',
     userId: 'bot-user'
   });
@@ -438,14 +466,53 @@ function emitBotTurnChessGame(harness: { room: FakeRoomNamespace }) {
     to: 'e4',
     userId: 'human-user'
   });
+  const publicGame = toPublicChessGame(game, getPlayerInfo);
   harness.room.socket.emit('message', {
-    game: toPublicChessGame(game, (userId) => ({
-      displayName: userId === 'bot-user' ? 'Computer' : 'Alice',
-      userId
-    })),
+    game: publicGame,
     type: 'gameUpdated'
   });
-  return game;
+  return { game, publicGame };
+}
+
+function emitPresenceSnapshot(
+  harness: { room: FakeRoomNamespace },
+  options: { games?: PublicGame[]; humanConnected?: boolean }
+): void {
+  harness.room.socket.emit('message', {
+    snapshot: createLobbySnapshot(options),
+    type: 'presenceSnapshot'
+  });
+}
+
+function createLobbySnapshot(
+  options: { games?: PublicGame[]; humanConnected?: boolean } = {}
+): LobbySnapshot {
+  const humanConnected = options.humanConnected ?? true;
+  return {
+    games: options.games ?? [],
+    invites: [],
+    users: [
+      {
+        availableGames: [...COMPUTER_PLAYER_AVAILABLE_GAMES],
+        displayName: 'Computer',
+        joinedAt: Date.now(),
+        userId: 'bot-user'
+      },
+      ...(humanConnected ? [{
+        availableGames: ['chess' as GameId],
+        displayName: 'Alice',
+        joinedAt: Date.now(),
+        userId: 'human-user'
+      }] : [])
+    ]
+  };
+}
+
+function getPlayerInfo(userId: string): { displayName: string; userId: string } {
+  return {
+    displayName: userId === 'bot-user' ? 'Computer' : 'Alice',
+    userId
+  };
 }
 
 function createStockfishResult(move: { from: string; to: string } | null) {

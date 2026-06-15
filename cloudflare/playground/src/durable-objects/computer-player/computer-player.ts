@@ -34,7 +34,7 @@ import { getLogErrorType, hashLogValue, logPlaygroundEvent, shortLogId } from '.
 import type { DurableObjectState, Env } from '../../types';
 
 const IDENTITY_STORAGE_KEY = 'computerPlayerIdentity:v1';
-const IDLE_CLOSE_MS = 30_000;
+const HUMAN_ABSENCE_GRACE_MS = 2 * 60_000;
 const RECONNECT_DELAYS_MS = [750, 2_000, 5_000, 10_000] as const;
 const STOCKFISH_RETRY_DELAYS_MS = [2_000, 5_000, 10_000] as const;
 const MAX_LOG_MESSAGE_LENGTH = 180;
@@ -52,10 +52,10 @@ type WebSocketResponse = Response & {
 };
 
 export class ComputerPlayer {
-  private readonly activeGameIds = new Set<string>();
+  private readonly activeGames = new Map<string, PublicGame>();
   private readonly actionTimers = new Map<string, ReturnType<typeof setTimeout>>();
   private readonly stockfishRetryAttempts = new Map<string, number>();
-  private idleCloseTimer: ReturnType<typeof setTimeout> | null = null;
+  private humanAbsentCloseTimer: ReturnType<typeof setTimeout> | null = null;
   private reconnectAttempt = 0;
   private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
   private socket: ClientWebSocket | null = null;
@@ -154,7 +154,7 @@ export class ComputerPlayer {
         this.handleGameChanged(message.game);
         return;
       case 'gameEnded':
-        this.activeGameIds.delete(message.gameId);
+        this.activeGames.delete(message.gameId);
         this.clearGameActionState(message.gameId);
         return;
       case 'error':
@@ -181,36 +181,28 @@ export class ComputerPlayer {
   }
 
   private handleSnapshot(snapshot: LobbySnapshot): void {
-    this.activeGameIds.clear();
+    this.activeGames.clear();
     snapshot.games.forEach((game) => this.handleGameChanged(game));
-    this.updateIdleClose(snapshot);
+    this.updateHumanAbsence(snapshot);
   }
 
-  private updateIdleClose(snapshot: LobbySnapshot): void {
+  private updateHumanAbsence(snapshot: LobbySnapshot): void {
     if (!this.userId) return;
     const hasOtherParticipant = snapshot.users.some((user) => user.userId !== this.userId);
-    const hasActiveGame = this.activeGameIds.size > 0 || snapshot.games.some(isActivePublicGame);
-    if (hasOtherParticipant || hasActiveGame) {
-      this.clearIdleCloseTimer();
+    if (hasOtherParticipant) {
+      this.clearHumanAbsentCloseTimer();
       return;
     }
 
-    if (this.idleCloseTimer) return;
-    this.idleCloseTimer = setTimeout(() => {
-      this.idleCloseTimer = null;
-      this.logEvent('computer_player_idle_closed', {
-        activeGameCount: this.activeGameIds.size
-      });
-      this.closeSocket({ reconnect: false });
-    }, IDLE_CLOSE_MS);
+    this.scheduleHumanAbsentClose();
   }
 
   private handleGameChanged(game: PublicGame): void {
     if (isActivePublicGame(game)) {
-      this.activeGameIds.add(game.gameId);
-      this.clearIdleCloseTimer();
+      this.activeGames.set(game.gameId, game);
+      this.resetHumanAbsentCloseTimer();
     } else {
-      this.activeGameIds.delete(game.gameId);
+      this.activeGames.delete(game.gameId);
     }
 
     this.clearGameActionState(game.gameId);
@@ -228,6 +220,29 @@ export class ComputerPlayer {
       gameType: game.gameType,
       user: hashLogValue(this.userId)
     });
+  }
+
+  private scheduleHumanAbsentClose(): void {
+    if (this.humanAbsentCloseTimer) return;
+    this.humanAbsentCloseTimer = setTimeout(() => {
+      this.humanAbsentCloseTimer = null;
+      const activeGames = [...this.activeGames.values()];
+      activeGames.forEach((game) => this.sendGameAction(game, 'leave'));
+      this.logEvent('computer_player_human_absent_closed', {
+        activeGameCount: activeGames.length
+      });
+      this.closeSocket({ reconnect: false });
+    }, HUMAN_ABSENCE_GRACE_MS);
+    this.logEvent('computer_player_human_absent_close_scheduled', {
+      activeGameCount: this.activeGames.size,
+      delayMs: HUMAN_ABSENCE_GRACE_MS
+    });
+  }
+
+  private resetHumanAbsentCloseTimer(): void {
+    if (!this.humanAbsentCloseTimer) return;
+    this.clearHumanAbsentCloseTimer();
+    this.scheduleHumanAbsentClose();
   }
 
   private async runAction(game: PublicGame): Promise<void> {
@@ -375,7 +390,7 @@ export class ComputerPlayer {
     const socket = this.socket;
     this.socket = null;
     this.userId = '';
-    this.clearIdleCloseTimer();
+    this.clearHumanAbsentCloseTimer();
     this.clearActionTimers();
     if (!socket) return;
     try {
@@ -406,10 +421,10 @@ export class ComputerPlayer {
     this.reconnectTimer = null;
   }
 
-  private clearIdleCloseTimer(): void {
-    if (!this.idleCloseTimer) return;
-    clearTimeout(this.idleCloseTimer);
-    this.idleCloseTimer = null;
+  private clearHumanAbsentCloseTimer(): void {
+    if (!this.humanAbsentCloseTimer) return;
+    clearTimeout(this.humanAbsentCloseTimer);
+    this.humanAbsentCloseTimer = null;
   }
 
   private clearActionTimer(gameId: string): void {
