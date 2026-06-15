@@ -8,6 +8,10 @@ export const PLAYGROUND_PORT_NAME = 'ytcq:playground';
 export const PLAYGROUND_PROTOCOL_VERSION = 1;
 export const SUPPORTED_GAMES = ['chess', 'replay-trivia'] as const;
 
+export function isPlaygroundComputerUserId(userId: string): boolean {
+  return userId === 'server:computer' || userId.startsWith('server:computer:');
+}
+
 export type GameId = typeof SUPPORTED_GAMES[number];
 export type GameEndReason = 'playerLeft';
 export type InviteStatus = 'accepted' | 'ignored' | 'pending';

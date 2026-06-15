@@ -216,6 +216,37 @@ describe('playground games header button', () => {
     });
   });
 
+  it('does not count built-in Computer players in the online player total', () => {
+    const header = createHeader();
+    document.body.append(header);
+    setOptions({ ...DEFAULT_OPTIONS, playgroundEnabled: true, playgroundGamesAvailable: true });
+
+    wireGamesButton();
+    header.querySelector<HTMLButtonElement>('.ytcq-games-button')!.click();
+    lastMockPort()?.emit(createSnapshotMessage({
+      games: [],
+      invites: [],
+      users: [
+        {
+          availableGames: ['chess'],
+          displayName: 'Me',
+          joinedAt: Date.now(),
+          userId: 'me-user'
+        },
+        ...createComputerUsers()
+      ]
+    }));
+
+    expect(document.querySelector('.ytcq-profile-card-subtitle')?.textContent).toBe('No players online');
+
+    getGameCards()[0].click();
+    expect(getPlayerNames()).toEqual([
+      'Computer (Beginner)',
+      'Computer (Club)',
+      'Computer (Master)'
+    ]);
+  });
+
   it('opens the newly invited game when another game is already active', () => {
     window.history.replaceState({}, '', '/live_chat_replay?video_id=stream-a');
     const header = createHeader();
@@ -706,6 +737,35 @@ function createLobbySnapshot(): LobbySnapshot {
       }
     ]
   };
+}
+
+function createComputerUsers(): LobbySnapshot['users'] {
+  return [
+    {
+      availableGames: ['chess'],
+      displayName: 'Computer (Beginner)',
+      joinedAt: Date.now(),
+      userId: 'server:computer:beginner'
+    },
+    {
+      availableGames: ['chess'],
+      displayName: 'Computer (Club)',
+      joinedAt: Date.now(),
+      userId: 'server:computer:club'
+    },
+    {
+      availableGames: ['chess'],
+      displayName: 'Computer (Master)',
+      joinedAt: Date.now(),
+      userId: 'server:computer:master'
+    },
+    {
+      availableGames: ['replay-trivia'],
+      displayName: 'Computer',
+      joinedAt: Date.now(),
+      userId: 'server:computer'
+    }
+  ];
 }
 
 function createChessGame(): PublicGame {
