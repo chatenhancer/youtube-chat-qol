@@ -35,12 +35,63 @@ export interface ComputerActionOptions extends ComputerActionCallbacks {
   getStockfishBestMove?: StockfishBestMoveProvider;
   now?: number;
   random?: () => number;
+  userId?: string;
+}
+
+export interface ComputerPlayerProfile {
+  availableGames: readonly GameId[];
+  chessElo?: number;
+  connectionId: string;
+  displayName: string;
+  userId: string;
 }
 
 export const COMPUTER_PLAYER_CONNECTION_ID = 'server:computer';
 export const COMPUTER_PLAYER_USER_ID = 'server:computer';
 export const COMPUTER_PLAYER_DISPLAY_NAME = 'Computer';
-export const COMPUTER_PLAYER_AVAILABLE_GAMES: readonly GameId[] = ['chess', 'replay-trivia'];
+export const COMPUTER_PLAYER_AVAILABLE_GAMES: readonly GameId[] = ['replay-trivia'];
+export const COMPUTER_PLAYER_PROFILE: ComputerPlayerProfile = {
+  availableGames: COMPUTER_PLAYER_AVAILABLE_GAMES,
+  connectionId: COMPUTER_PLAYER_CONNECTION_ID,
+  displayName: COMPUTER_PLAYER_DISPLAY_NAME,
+  userId: COMPUTER_PLAYER_USER_ID
+};
+export const CHESS_COMPUTER_PLAYER_BEGINNER_PROFILE = createChessComputerPlayerProfile(
+  'beginner',
+  'Computer (Beginner)',
+  1320
+);
+export const CHESS_COMPUTER_PLAYER_CASUAL_PROFILE = createChessComputerPlayerProfile(
+  'casual',
+  'Computer (Casual)',
+  1500
+);
+export const CHESS_COMPUTER_PLAYER_CLUB_PROFILE = createChessComputerPlayerProfile(
+  'club',
+  'Computer (Club)',
+  1700
+);
+export const CHESS_COMPUTER_PLAYER_EXPERT_PROFILE = createChessComputerPlayerProfile(
+  'expert',
+  'Computer (Expert)',
+  2100
+);
+export const CHESS_COMPUTER_PLAYER_MASTER_PROFILE = createChessComputerPlayerProfile(
+  'master',
+  'Computer (Master)',
+  2500
+);
+export const CHESS_COMPUTER_PLAYER_PROFILES: readonly ComputerPlayerProfile[] = [
+  CHESS_COMPUTER_PLAYER_BEGINNER_PROFILE,
+  CHESS_COMPUTER_PLAYER_CASUAL_PROFILE,
+  CHESS_COMPUTER_PLAYER_CLUB_PROFILE,
+  CHESS_COMPUTER_PLAYER_EXPERT_PROFILE,
+  CHESS_COMPUTER_PLAYER_MASTER_PROFILE
+];
+export const COMPUTER_PLAYER_PROFILES: readonly ComputerPlayerProfile[] = [
+  COMPUTER_PLAYER_PROFILE,
+  ...CHESS_COMPUTER_PLAYER_PROFILES
+];
 
 const CHESS_RESPONSE_MIN_DELAY_MS = 700;
 const CHESS_RESPONSE_MAX_DELAY_MS = 1_500;
@@ -76,11 +127,12 @@ export function createComputerPlayerAction(
   game: GameRecord,
   options: ComputerActionOptions = {}
 ): Promise<GameActionInput | null> | GameActionInput | null {
+  const userId = options.userId ?? COMPUTER_PLAYER_USER_ID;
   switch (game.gameType) {
     case 'chess':
       return createStockfishChessBotAction(
         game,
-        COMPUTER_PLAYER_USER_ID,
+        userId,
         options.onChessBotStockfishFailure,
         options.onChessBotStockfishMove,
         options.getStockfishBestMove
@@ -88,13 +140,28 @@ export function createComputerPlayerAction(
     case 'replay-trivia':
       return createReplayTriviaBotAnswerAction(
         game,
-        COMPUTER_PLAYER_USER_ID,
+        userId,
         options.random,
         options.now
       );
     default:
       return null;
   }
+}
+
+export function isComputerPlayerUserId(userId: string): boolean {
+  return COMPUTER_PLAYER_PROFILES.some((profile) => profile.userId === userId);
+}
+
+function createChessComputerPlayerProfile(slug: string, displayName: string, chessElo: number): ComputerPlayerProfile {
+  const id = `server:computer:${slug}`;
+  return {
+    availableGames: ['chess'],
+    chessElo,
+    connectionId: id,
+    displayName,
+    userId: id
+  };
 }
 
 export async function createStockfishChessBotAction(

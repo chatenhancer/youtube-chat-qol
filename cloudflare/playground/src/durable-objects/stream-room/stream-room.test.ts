@@ -8,8 +8,8 @@ import {
 } from '../../protocol/identity';
 import { TokenBucket } from '../../rate-limit';
 import {
-  COMPUTER_PLAYER_AVAILABLE_GAMES,
-  COMPUTER_PLAYER_USER_ID
+  CHESS_COMPUTER_PLAYER_CLUB_PROFILE,
+  CHESS_COMPUTER_PLAYER_PROFILES
 } from '../../features/computer-player/actions';
 import {
   PLAYGROUND_PROTOCOL_VERSION,
@@ -170,27 +170,33 @@ describe('playground stream room', () => {
     expect(room.createSnapshot('other-user').games).toHaveLength(0);
   });
 
-  it('uses the built-in Computer player for presence and games', async () => {
+  it('uses the built-in Computer players for presence and games', async () => {
     const { room, state } = createRoomHarness();
     const alice = createSession('alice-connection');
 
     await room.handleHello(alice, await createHello(alice.challenge, 'Alice', ['chess']));
-    const computerPresence = getPresenceUser(room, alice.userId, COMPUTER_PLAYER_USER_ID);
+    const chessComputerUsers = room.createSnapshot(alice.userId).users
+      .filter((user) => user.userId !== alice.userId && user.availableGames.includes('chess'));
+    expect(chessComputerUsers.map((user) => user.displayName)).toEqual(
+      CHESS_COMPUTER_PLAYER_PROFILES.map((profile) => profile.displayName)
+    );
+
+    const computerPresence = getPresenceUser(room, alice.userId, CHESS_COMPUTER_PLAYER_CLUB_PROFILE.userId);
     expect(computerPresence).toMatchObject({
-      availableGames: [...COMPUTER_PLAYER_AVAILABLE_GAMES],
-      displayName: 'Computer',
-      userId: COMPUTER_PLAYER_USER_ID
+      availableGames: [...CHESS_COMPUTER_PLAYER_CLUB_PROFILE.availableGames],
+      displayName: CHESS_COMPUTER_PLAYER_CLUB_PROFILE.displayName,
+      userId: CHESS_COMPUTER_PLAYER_CLUB_PROFILE.userId
     });
 
-    room.handleInvite(alice, 'chess', COMPUTER_PLAYER_USER_ID);
+    room.handleInvite(alice, 'chess', CHESS_COMPUTER_PLAYER_CLUB_PROFILE.userId);
     await state.flushWaitUntil();
 
     expect(lastMessage(alice, 'inviteUpdated').invite.status).toBe('accepted');
     const startedChessGame = lastMessage(alice, 'gameStarted').game as PublicChessGame;
     expect(startedChessGame.players.white.userId).toBe(alice.userId);
     expect(startedChessGame.players.black).toEqual({
-      displayName: 'Computer',
-      userId: COMPUTER_PLAYER_USER_ID
+      displayName: CHESS_COMPUTER_PLAYER_CLUB_PROFILE.displayName,
+      userId: CHESS_COMPUTER_PLAYER_CLUB_PROFILE.userId
     });
     expect(room.createSnapshot(alice.userId).games.map((game) => game.gameId)).toEqual([startedChessGame.gameId]);
   });
@@ -328,7 +334,7 @@ describe('playground stream room', () => {
     const aliceKeyPair = await createIdentityKeyPair();
 
     await room.handleHello(alice, await createHello(alice.challenge, 'Alice', ['chess'], aliceKeyPair));
-    room.handleInvite(alice, 'chess', COMPUTER_PLAYER_USER_ID);
+    room.handleInvite(alice, 'chess', CHESS_COMPUTER_PLAYER_CLUB_PROFILE.userId);
     await first.state.flushWaitUntil();
     const gameId = lastMessage(alice, 'gameStarted').game.gameId;
     await first.state.flushWaitUntil();
@@ -346,8 +352,8 @@ describe('playground stream room', () => {
 
     const restoredGame = lastMessage(reconnectedAlice, 'helloAccepted').snapshot.games[0] as PublicChessGame;
     expect(restoredGame.players.black).toEqual({
-      displayName: 'Computer',
-      userId: COMPUTER_PLAYER_USER_ID
+      displayName: CHESS_COMPUTER_PLAYER_CLUB_PROFILE.displayName,
+      userId: CHESS_COMPUTER_PLAYER_CLUB_PROFILE.userId
     });
   });
 

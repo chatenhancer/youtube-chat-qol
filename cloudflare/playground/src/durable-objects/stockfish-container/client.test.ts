@@ -104,6 +104,40 @@ describe('Stockfish container client', () => {
     });
   });
 
+  it('uses explicit Stockfish strength settings over the environment defaults', async () => {
+    const fetch = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+      const request = new Request(input, init);
+      await expect(request.json()).resolves.toMatchObject({
+        elo: 2100,
+        moveTimeMs: 600
+      });
+      return Response.json({
+        elo: 2100,
+        move: {
+          from: 'c7',
+          to: 'c5'
+        },
+        moveTimeMs: 600
+      });
+    });
+
+    await expect(getStockfishBestMove('startpos', {
+      STOCKFISH_ELO: '1500',
+      STOCKFISH_ENGINE: createNamespace(fetch),
+      STOCKFISH_MOVE_TIME_MS: '300'
+    }, {
+      elo: 2100,
+      moveTimeMs: 600
+    })).resolves.toMatchObject({
+      elo: 2100,
+      move: {
+        from: 'c7',
+        to: 'c5'
+      },
+      moveTimeMs: 600
+    });
+  });
+
   it('throws when the Stockfish container binding is missing', async () => {
     await expect(getStockfishBestMove('8/8/8/8/8/8/8/8 w - - 0 1')).rejects.toThrow(
       'Stockfish container binding is not configured.'
