@@ -1,5 +1,6 @@
 import { LANGUAGE_OPTIONS } from '../shared/languages';
 import {
+  getPlaygroundAvatarPresentation,
   PLAYGROUND_PROFILE_MESSAGE_TYPE,
   type PlaygroundProfileResponse
 } from '../shared/playground-identity';
@@ -174,11 +175,20 @@ function updatePlaygroundProfile(playgroundEnabled: boolean): void {
   const settingsControls = getSettingsControls();
   if (!settingsControls) return;
 
-  const { playgroundProfile, playgroundProfileName } = settingsControls;
+  const {
+    playgroundProfile,
+    playgroundProfileAvatar,
+    playgroundProfileName,
+    playgroundProfileWins,
+    playgroundProfileWinsCount
+  } = settingsControls;
   const token = ++playgroundProfileRequestToken;
   setPlaygroundProfileDetailsExpanded(false);
   playgroundProfile.hidden = true;
+  playgroundProfileAvatar.textContent = '';
+  playgroundProfileAvatar.style.removeProperty('--playground-profile-avatar-bg');
   playgroundProfileName.textContent = '';
+  updatePlaygroundProfileWins(playgroundProfileWins, playgroundProfileWinsCount, 0);
 
   if (!playgroundEnabled) return;
 
@@ -191,7 +201,14 @@ function updatePlaygroundProfile(playgroundEnabled: boolean): void {
       : '';
     if (!displayName) return;
 
+    const avatar = getPlaygroundAvatarPresentation({
+      displayName,
+      userId: response.profile?.userId || ''
+    });
     playgroundProfileName.textContent = displayName;
+    playgroundProfileAvatar.textContent = avatar.initial;
+    playgroundProfileAvatar.style.setProperty('--playground-profile-avatar-bg', avatar.backgroundColor);
+    updatePlaygroundProfileWins(playgroundProfileWins, playgroundProfileWinsCount, response.profile?.wins);
     playgroundProfile.hidden = false;
   });
 }
@@ -209,4 +226,13 @@ function createLanguageOption(value: string, label: string): HTMLOptionElement {
   option.value = value;
   option.textContent = label;
   return option;
+}
+
+function updatePlaygroundProfileWins(container: HTMLElement, countElement: HTMLElement, value: unknown): void {
+  const numericValue = typeof value === 'number' ? value : 0;
+  const wins = Number.isFinite(numericValue) && numericValue > 0 ? Math.floor(numericValue) : 0;
+  const label = `${getExtensionMessage('playgroundWins')}: ${wins}`;
+  countElement.textContent = String(wins);
+  container.title = label;
+  container.setAttribute('aria-label', label);
 }

@@ -372,8 +372,11 @@
     "playgroundProfile": {
       "message": "โปรไฟล์ของคุณ"
     },
+    "playgroundWins": {
+      "message": "ชนะ"
+    },
     "playgroundProfileHelper": {
-      "message": "นี่คือชื่อที่ผู้ใช้ Playground คนอื่นจะเห็นคุณ แฮนเดิล YouTube จริงของคุณจะไม่ถูก chatenhancer.com เก็บรวบรวม และจะไม่แสดงให้ผู้ใช้อื่นเห็นขณะใช้ประสบการณ์ Playground"
+      "message": "แสดงให้ผู้ใช้ Playground เห็น ระบบจะไม่เก็บหรือแชร์ชื่อผู้ใช้ YouTube ของคุณ"
     },
     "games": {
       "message": "เกม"

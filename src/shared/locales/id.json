@@ -375,8 +375,11 @@
     "playgroundProfile": {
       "message": "Profil Anda"
     },
+    "playgroundWins": {
+      "message": "Kemenangan"
+    },
     "playgroundProfileHelper": {
-      "message": "Ini adalah nama yang dilihat pengguna Playground lain. Handle YouTube asli Anda tidak dikumpulkan oleh chatenhancer.com dan tidak ditampilkan kepada pengguna lain saat menggunakan pengalaman Playground."
+      "message": "Ditampilkan kepada pengguna Playground. Handle YouTube Anda tidak dikumpulkan atau dibagikan."
     },
     "games": {
       "message": "Game"

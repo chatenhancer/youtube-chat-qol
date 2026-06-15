@@ -372,8 +372,11 @@
     "playgroundProfile": {
       "message": "Je profiel"
     },
+    "playgroundWins": {
+      "message": "Overwinningen"
+    },
     "playgroundProfileHelper": {
-      "message": "Dit is de naam waarmee andere Playground-gebruikers je zien. Je echte YouTube-handle wordt niet door chatenhancer.com verzameld en wordt tijdens Playground-ervaringen niet aan andere gebruikers getoond."
+      "message": "Zichtbaar voor Playground-gebruikers. Je YouTube-handle wordt niet verzameld of gedeeld."
     },
     "games": {
       "message": "Games"

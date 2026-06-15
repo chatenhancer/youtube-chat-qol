@@ -18,11 +18,13 @@ import {
 } from '../shared/playground-protocol';
 import {
   PLAYGROUND_IDENTITY_STORAGE_KEY,
+  PLAYGROUND_PROFILE_STATS_ROUTE,
   encodeBase64Url,
   getPlaygroundDisplayName,
   getPlaygroundUserId,
   isPlaygroundProfileMessage,
   isStoredPlaygroundIdentity,
+  type PlaygroundProfile,
   type PlaygroundProfileResponse,
   type StoredPlaygroundIdentity
 } from '../shared/playground-identity';
@@ -509,13 +511,29 @@ async function createStoredPlaygroundIdentity(): Promise<StoredPlaygroundIdentit
   };
 }
 
-async function getStoredPlaygroundProfile(): Promise<{ displayName: string; userId: string }> {
+async function getStoredPlaygroundProfile(): Promise<PlaygroundProfile> {
   const identity = await getStoredPlaygroundIdentity();
   const userId = await getPlaygroundUserId(identity.publicKeyJwk);
   return {
     displayName: getPlaygroundDisplayName(userId),
-    userId
+    userId,
+    wins: await getRemotePlaygroundProfileWins(userId).catch(() => 0)
   };
+}
+
+async function getRemotePlaygroundProfileWins(userId: string): Promise<number> {
+  const url = new URL(PLAYGROUND_PROFILE_STATS_ROUTE, PLAYGROUND_BACKEND_ORIGIN);
+  url.searchParams.set('userId', userId);
+  const response = await fetch(url.toString(), {
+    headers: {
+      Accept: 'application/json'
+    }
+  });
+  if (!response.ok) return 0;
+
+  const payload = await response.json();
+  const stats = isRecord(payload) ? payload.stats : undefined;
+  return isRecord(stats) ? getWinCount(stats) : 0;
 }
 
 function createSignaturePayload(challenge: string): ArrayBuffer {
@@ -538,6 +556,13 @@ function isReplayTriviaQuestionsBackgroundMessage(value: unknown): value is Repl
   return value.type === REPLAY_TRIVIA_QUESTIONS_BACKGROUND_MESSAGE &&
     typeof value.streamKey === 'string' &&
     isRecord(value.request);
+}
+
+function getWinCount(value: unknown): number {
+  if (!isRecord(value) || typeof value.wins !== 'number' || !Number.isFinite(value.wins) || value.wins <= 0) {
+    return 0;
+  }
+  return Math.floor(value.wins);
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

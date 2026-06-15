@@ -372,8 +372,11 @@
     "playgroundProfile": {
       "message": "نمایه شما"
     },
+    "playgroundWins": {
+      "message": "بردها"
+    },
     "playgroundProfileHelper": {
-      "message": "این همان نامی است که دیگر کاربران Playground از شما می‌بینند. هندل واقعی YouTube شما توسط chatenhancer.com جمع‌آوری نمی‌شود و هنگام استفاده از تجربه‌های Playground به کاربران دیگر نشان داده نمی‌شود."
+      "message": "برای کاربران Playground نمایش داده می‌شود. نام کاربری YouTube شما جمع‌آوری یا هم‌رسانی نمی‌شود."
     },
     "games": {
       "message": "بازی‌ها"

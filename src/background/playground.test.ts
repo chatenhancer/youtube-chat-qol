@@ -144,6 +144,14 @@ describe('background playground bridge', () => {
   });
 
   it('returns the stable local playground profile without opening a socket', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => new Response(JSON.stringify({
+      ok: true,
+      stats: {
+        games: {},
+        userId: 'ignored',
+        wins: 0
+      }
+    }))));
     await import('./playground');
 
     const sendResponse = vi.fn();
@@ -157,7 +165,8 @@ describe('background playground bridge', () => {
         ok: true,
         profile: {
           displayName: expect.stringMatching(/^Player [A-Z0-9]{4}$/),
-          userId: expect.stringMatching(/^[A-Za-z0-9_-]{32}$/)
+          userId: expect.stringMatching(/^[A-Za-z0-9_-]{32}$/),
+          wins: 0
         }
       });
     });
@@ -172,6 +181,47 @@ describe('background playground bridge', () => {
     await vi.waitFor(() => {
       expect(sendResponse).toHaveBeenCalledWith(firstResponse);
     });
+  });
+
+  it('returns total wins from the global player stats route', async () => {
+    const fetchMock = vi.fn(async () => new Response(JSON.stringify({
+      ok: true,
+      stats: {
+        games: {
+          chess: {
+            wins: 2
+          },
+          'replay-trivia': {
+            wins: 3
+          }
+        },
+        userId: 'ignored',
+        wins: 5
+      }
+    })));
+    vi.stubGlobal('fetch', fetchMock);
+    await import('./playground');
+
+    const sendResponse = vi.fn();
+    const keepAlive = getMessageListener()({
+      type: PLAYGROUND_PROFILE_MESSAGE_TYPE
+    }, {} as chrome.runtime.MessageSender, sendResponse);
+
+    expect(keepAlive).toBe(true);
+    await vi.waitFor(() => {
+      expect(sendResponse).toHaveBeenCalledWith({
+        ok: true,
+        profile: expect.objectContaining({
+          wins: 5
+        })
+      });
+    });
+    const fetchCalls = fetchMock.mock.calls as unknown as Array<[string, RequestInit?]>;
+    const calledUrl = new URL(fetchCalls[0]?.[0] || '');
+    expect(calledUrl.origin).toBe('https://playground.chatenhancer.com');
+    expect(calledUrl.pathname).toBe('/v1/player-stats');
+    expect(calledUrl.searchParams.get('userId')).toMatch(/^[A-Za-z0-9_-]{32}$/);
+    expect(FakeWebSocket.instances).toHaveLength(0);
   });
 
   it('keeps authenticated playground sockets alive with heartbeat pings', async () => {

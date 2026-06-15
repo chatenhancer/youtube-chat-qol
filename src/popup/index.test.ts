@@ -37,8 +37,14 @@ describe('popup', () => {
         </label>
         <div id="playgroundProfile" hidden>
           <button id="playgroundProfileToggle" type="button" aria-expanded="false" aria-controls="playgroundProfileDetails">
-            <span data-i18n="playgroundProfile"></span>
-            <span id="playgroundProfileName"></span>
+            <span id="playgroundProfileAvatar"></span>
+            <span>
+              <span data-i18n="playgroundProfile"></span>
+              <span id="playgroundProfileName"></span>
+            </span>
+            <span id="playgroundProfileWins">
+              <span id="playgroundProfileWinsCount"></span>
+            </span>
           </button>
           <p id="playgroundProfileDetails" data-i18n="playgroundProfileHelper" hidden></p>
         </div>
@@ -698,7 +704,7 @@ describe('popup', () => {
       const response = typeof message === 'object' &&
         message !== null &&
         (message as { type?: string }).type === 'ytcq:playground:get-profile'
-        ? { ok: true, profile: { displayName: 'Player TEST', userId: 'test-user' } }
+        ? { ok: true, profile: { displayName: 'Player TEST', userId: 'test-user', wins: 7 } }
         : { activeTabIds: [] };
       callback?.(response);
       return Promise.resolve(response);
@@ -711,9 +717,12 @@ describe('popup', () => {
     const startupEffect = document.querySelector<HTMLInputElement>('#startupEffect')!;
     const playgroundEnabled = document.querySelector<HTMLInputElement>('#playgroundEnabled')!;
     const playgroundProfile = document.querySelector<HTMLElement>('#playgroundProfile')!;
+    const playgroundProfileAvatar = document.querySelector<HTMLElement>('#playgroundProfileAvatar')!;
     const playgroundProfileDetails = document.querySelector<HTMLElement>('#playgroundProfileDetails')!;
     const playgroundProfileName = document.querySelector<HTMLElement>('#playgroundProfileName')!;
     const playgroundProfileToggle = document.querySelector<HTMLButtonElement>('#playgroundProfileToggle')!;
+    const playgroundProfileWins = document.querySelector<HTMLElement>('#playgroundProfileWins')!;
+    const playgroundProfileWinsCount = document.querySelector<HTMLElement>('#playgroundProfileWinsCount')!;
     const playgroundGamesSection = document.querySelector<HTMLElement>('#playgroundGamesSection')!;
     const playgroundGamesAvailable = document.querySelector<HTMLInputElement>('#playgroundGamesAvailable')!;
 
@@ -724,7 +733,12 @@ describe('popup', () => {
     expect(playgroundEnabled.checked).toBe(true);
     expect(playgroundProfile.hidden).toBe(false);
     expect(playgroundProfileDetails.hidden).toBe(true);
+    expect(playgroundProfileAvatar.textContent).toBe('T');
+    expect(playgroundProfileAvatar.style.getPropertyValue('--playground-profile-avatar-bg')).toBe('hsl(11 62% 28%)');
     expect(playgroundProfileName.textContent).toBe('Player TEST');
+    expect(playgroundProfileWins.title).toBe('playgroundWins: 7');
+    expect(playgroundProfileWins.getAttribute('aria-label')).toBe('playgroundWins: 7');
+    expect(playgroundProfileWinsCount.textContent).toBe('7');
     expect(playgroundGamesSection.hidden).toBe(false);
     expect(playgroundGamesAvailable.checked).toBe(true);
 
@@ -763,7 +777,12 @@ describe('popup', () => {
     expect(playgroundProfile.hidden).toBe(true);
     expect(playgroundProfileDetails.hidden).toBe(true);
     expect(playgroundProfileToggle.getAttribute('aria-expanded')).toBe('false');
+    expect(playgroundProfileAvatar.textContent).toBe('');
+    expect(playgroundProfileAvatar.style.getPropertyValue('--playground-profile-avatar-bg')).toBe('');
     expect(playgroundProfileName.textContent).toBe('');
+    expect(playgroundProfileWins.title).toBe('playgroundWins: 0');
+    expect(playgroundProfileWins.getAttribute('aria-label')).toBe('playgroundWins: 0');
+    expect(playgroundProfileWinsCount.textContent).toBe('0');
     expect(playgroundGamesAvailable.checked).toBe(false);
     expect(chrome.storage.sync.set).toHaveBeenCalledWith({
       playgroundEnabled: false,

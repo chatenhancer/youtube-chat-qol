@@ -375,8 +375,11 @@
     "playgroundProfile": {
       "message": "Ваш профиль"
     },
+    "playgroundWins": {
+      "message": "Победы"
+    },
     "playgroundProfileHelper": {
-      "message": "Так вас видят другие пользователи Playground. Ваш настоящий ник YouTube не собирается chatenhancer.com и не показывается другим пользователям во время использования возможностей Playground."
+      "message": "Видно пользователям Playground. Ваш YouTube-хэндл не собирается и не передается."
     },
     "games": {
       "message": "Игры"

@@ -83,8 +83,3 @@ function hasActiveGameWithPlayer(
 export function getSupportedGames(games: PublicGame[]): PublicGame[] {
   return games.filter((game) => isSupportedGameId(game.gameType));
 }
-
-export function getPlayerInitial(player: string): string {
-  const handle = player.replace(/^@/, '').trim();
-  return (handle[0] || '?').toUpperCase();
-}

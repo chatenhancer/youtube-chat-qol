@@ -132,6 +132,7 @@ describe('playground replay trivia game rules', () => {
 
     const publicGame = toPublicReplayTriviaGame(game, (userId) => ({ displayName: userId, userId }));
     expect(publicGame.winnerUserId).toBe('host-user');
+    expect(replayTriviaGameModule.getWinnerUserId?.(game)).toBe('host-user');
   });
 
   it('handles actions through the game module interface', () => {

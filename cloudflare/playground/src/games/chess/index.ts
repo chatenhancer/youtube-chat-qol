@@ -63,6 +63,9 @@ export const chessGameModule: GameModule = {
     const chessGame = assertChessGame(game);
     return [chessGame.players.white, chessGame.players.black];
   },
+  getWinnerUserId(game) {
+    return getChessWinnerUserId(assertChessGame(game));
+  },
   toPublicGame(game, getUser) {
     return toPublicChessGame(assertChessGame(game), getUser);
   }
@@ -141,6 +144,11 @@ export function getPlayerColor(game: ChessGameRecord, userId: string): PlayerCol
 
 export function canSeeChessGame(game: ChessGameRecord, userId: string): boolean {
   return game.players.white === userId || game.players.black === userId;
+}
+
+export function getChessWinnerUserId(game: ChessGameRecord): string | null {
+  if (!game.winner) return null;
+  return game.players[game.winner] || null;
 }
 
 export function toPublicChessGame(

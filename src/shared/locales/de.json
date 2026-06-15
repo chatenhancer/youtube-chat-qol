@@ -372,8 +372,11 @@
     "playgroundProfile": {
       "message": "Dein Profil"
     },
+    "playgroundWins": {
+      "message": "Siege"
+    },
     "playgroundProfileHelper": {
-      "message": "So sehen dich andere Playground-Nutzer. Dein echter YouTube-Handle wird von chatenhancer.com nicht erfasst und anderen Nutzern bei Playground-Erlebnissen nicht angezeigt."
+      "message": "Für Playground-Nutzer sichtbar. Dein YouTube-Handle wird nicht erfasst oder geteilt."
     },
     "games": {
       "message": "Spiele"

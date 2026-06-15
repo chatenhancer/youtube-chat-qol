@@ -375,8 +375,11 @@
     "playgroundProfile": {
       "message": "あなたのプロフィール"
     },
+    "playgroundWins": {
+      "message": "勝利"
+    },
     "playgroundProfileHelper": {
-      "message": "他の Playground ユーザーにはこの名前で表示されます。実際の YouTube ハンドルは chatenhancer.com に収集されず、Playground 体験の利用中に他のユーザーへ表示されません。"
+      "message": "Playground ユーザーに表示されます。YouTube ハンドルは収集も共有もされません。"
     },
     "games": {
       "message": "ゲーム"
