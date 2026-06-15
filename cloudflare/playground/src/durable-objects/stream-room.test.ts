@@ -238,6 +238,46 @@ describe('playground stream room', () => {
     );
   });
 
+  it('logs when the computer chess player uses a Stockfish move', async () => {
+    const harness = createRoomHarness();
+    const room = harness.room;
+    const alice = createSession('alice-connection');
+    vi.mocked(getStockfishBestMove).mockResolvedValueOnce({
+      from: 'e7',
+      to: 'e5'
+    });
+
+    vi.useFakeTimers();
+    try {
+      await room.handleHello(alice, await createHello(alice.challenge, 'Alice', ['chess']));
+      room.handleInvite(alice, 'chess', COMPUTER_PLAYER_USER_ID);
+      const gameId = lastMessage(alice, 'gameStarted').game.gameId;
+
+      room.handleGameAction(alice, gameId, {
+        action: 'move',
+        payload: {
+          from: 'e2',
+          to: 'e4'
+        },
+        userId: alice.userId
+      });
+
+      await vi.runOnlyPendingTimersAsync();
+      await harness.state.flushWaitUntil();
+    } finally {
+      vi.useRealTimers();
+    }
+
+    expect(console.info).toHaveBeenCalledWith(
+      '[Chat Enhancer Playground] chess_bot_stockfish_move',
+      expect.objectContaining({
+        event: 'chess_bot_stockfish_move',
+        gameType: 'chess',
+        service: 'chat-enhancer-playground'
+      })
+    );
+  });
+
   it('submits Replay Trivia computer answers through normal game updates', async () => {
     const room = createRoom();
     const alice = createSession('alice-connection');

@@ -36,6 +36,20 @@ describe('computer player', () => {
     });
   });
 
+  it('reports when Stockfish provides the chess bot move', async () => {
+    const stockfishMove = { from: 'e2', to: 'e4' };
+    const game = createChessGame('game-1', COMPUTER_PLAYER_USER_ID, 'human-user');
+    const onFallback = vi.fn();
+    const onStockfishMove = vi.fn();
+    getStockfishBestMoveMock.mockResolvedValueOnce(stockfishMove);
+
+    await createStockfishChessBotAction(game, COMPUTER_PLAYER_USER_ID, onFallback, onStockfishMove);
+
+    expect(onFallback).not.toHaveBeenCalled();
+    expect(onStockfishMove).toHaveBeenCalledTimes(1);
+    expect(onStockfishMove).toHaveBeenCalledWith(stockfishMove);
+  });
+
   it('reports when the chess bot falls back after Stockfish returns no move', async () => {
     const game = createChessGame('game-1', COMPUTER_PLAYER_USER_ID, 'human-user');
     const onFallback = vi.fn();

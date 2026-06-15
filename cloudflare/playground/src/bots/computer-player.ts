@@ -40,6 +40,7 @@ export interface ComputerPlayerHost {
   getGame(gameId: string): GameRecord | undefined;
   onActionError?(gameId: string, error: unknown): void;
   onChessBotFallback?(gameId: string, fallback: ChessBotFallback): void;
+  onChessBotStockfishMove?(gameId: string, move: StockfishMove): void;
   sendClientMessage(message: Exclude<ClientMessage, { type: 'hello' }>): void;
   waitUntil(promise: Promise<unknown>): void;
 }
@@ -60,7 +61,8 @@ export function createComputerPlayer(host: ComputerPlayerHost): ComputerPlayer {
 export async function createStockfishChessBotAction(
   game: GameRecord,
   userId: string,
-  onFallback?: (fallback: ChessBotFallback) => void
+  onFallback?: (fallback: ChessBotFallback) => void,
+  onStockfishMove?: (move: StockfishMove) => void
 ): Promise<GameActionInput | null> {
   const chessGame = getChessBotGame(game);
   if (!chessGame) return null;
@@ -79,6 +81,7 @@ export async function createStockfishChessBotAction(
   const move = stockfishMove || getFallbackLegalMove(chessGame.fen);
   if (!move) return null;
   if (!stockfishMove && fallback) onFallback?.(fallback);
+  if (stockfishMove) onStockfishMove?.(stockfishMove);
 
   return {
     action: 'move',
@@ -199,9 +202,12 @@ class ServerComputerPlayer implements ComputerPlayer {
   private createAction(game: GameRecord): Promise<GameActionInput | null> | GameActionInput | null {
     switch (game.gameType) {
       case 'chess':
-        return createStockfishChessBotAction(game, COMPUTER_PLAYER_USER_ID, (fallback) => {
-          this.host.onChessBotFallback?.(game.gameId, fallback);
-        });
+        return createStockfishChessBotAction(
+          game,
+          COMPUTER_PLAYER_USER_ID,
+          (fallback) => this.host.onChessBotFallback?.(game.gameId, fallback),
+          (move) => this.host.onChessBotStockfishMove?.(game.gameId, move)
+        );
       case 'replay-trivia':
         return createReplayTriviaBotAnswerAction(game, COMPUTER_PLAYER_USER_ID);
       default:
