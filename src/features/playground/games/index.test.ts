@@ -204,6 +204,10 @@ describe('playground games header button', () => {
 
     expect(document.querySelector('.ytcq-profile-card-title')?.textContent).toBe('HELP-A-FRIEND! Trivia');
     expect(document.querySelectorAll('.ytcq-games-player-row')).toHaveLength(2);
+    expect(getPlayerAvatarBackgrounds()).toEqual([
+      'hsl(89 62% 28%)',
+      'hsl(195 62% 28%)'
+    ]);
     getActionButton('Invite').click();
     expect(lastMockPort()?.messages.at(-1)).toMatchObject({
       gameId: 'replay-trivia',
@@ -670,6 +674,11 @@ function getGameCards(): HTMLButtonElement[] {
 function getGameLabels(): string[] {
   return Array.from(document.querySelectorAll<HTMLElement>('.ytcq-games-game-label'))
     .map((label) => label.textContent || '');
+}
+
+function getPlayerAvatarBackgrounds(): string[] {
+  return Array.from(document.querySelectorAll<HTMLElement>('.ytcq-games-player-avatar'))
+    .map((avatar) => avatar.style.getPropertyValue('--ytcq-games-player-avatar-bg'));
 }
 
 function getGamesSectionTitles(): string[] {

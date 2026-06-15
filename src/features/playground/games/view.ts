@@ -298,6 +298,8 @@ function createPlayerRow(player: PresenceUser, state: GamesPanelState, actions: 
   const avatar = ytcqCreateElement('span');
   avatar.className = 'ytcq-games-player-avatar';
   avatar.textContent = getPlayerInitial(player.displayName);
+  avatar.style.setProperty('--ytcq-games-player-avatar-bg', getPlayerAvatarColor(player));
+  avatar.style.setProperty('--ytcq-games-player-avatar-fg', '#fff');
 
   const copy = ytcqCreateElement('span');
   copy.className = 'ytcq-games-section-copy';
@@ -368,4 +370,17 @@ function createGamePreview(gameId: string, renderPreview: (container: HTMLElemen
   preview.className = `ytcq-games-preview ytcq-games-preview-${gameId}`;
   renderPreview(preview);
   return preview;
+}
+
+function getPlayerAvatarColor(player: PresenceUser): string {
+  const value = player.userId || player.displayName;
+  return `hsl(${getStableHash(value) % 360} 62% 28%)`;
+}
+
+function getStableHash(value: string): number {
+  let hash = 0x811c9dc5;
+  for (let index = 0; index < value.length; index += 1) {
+    hash = Math.imul(hash ^ value.charCodeAt(index), 0x01000193);
+  }
+  return hash >>> 0;
 }
