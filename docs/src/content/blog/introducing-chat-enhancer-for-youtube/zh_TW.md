@@ -50,7 +50,7 @@ Chat Enhancer 為提及和追蹤關鍵字加入 Inbox，讓你可以回頭查看
 
 ## 最常使用的 emoji
 
-我一直使用同樣的 emoji。每次都要捲完整個 emoji 選擇器很荒謬，因為顯然我是個情緒範圍固定的簡單人類。
+我一直使用同樣的 emoji。每次都要捲完整個 emoji 選擇器很快就變得麻煩。
 
 Chat Enhancer 會加入一排最常使用的 emoji，讓你真正會用的 emoji 更容易取得。
 

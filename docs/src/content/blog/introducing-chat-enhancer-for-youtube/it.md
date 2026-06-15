@@ -50,7 +50,7 @@ Con Chat Enhancer, cliccando sull’avatar di un utente si apre un pannello prof
 
 ## Emoji più usate
 
-Uso sempre le stesse emoji. Dover scorrere tutto il selettore ogni volta sembrava ridicolo, perché a quanto pare sono una persona semplice con una gamma emotiva fissa.
+Uso sempre le stesse emoji. Dover scorrere tutto il selettore ogni volta è diventato presto fastidioso.
 
 Chat Enhancer aggiunge una riga per le emoji più usate, così quelle che usi davvero sono più facili da raggiungere.
 

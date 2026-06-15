@@ -50,7 +50,7 @@ Com o Chat Enhancer, clicar no avatar de um usuário abre um painel de perfil co
 
 ## Emojis mais usados
 
-Eu uso os mesmos emojis o tempo todo. Ter que rolar pelo seletor inteiro toda vez parecia ridículo, porque aparentemente sou uma pessoa simples com uma faixa emocional fixa.
+Eu uso os mesmos emojis o tempo todo. Ter que rolar pelo seletor inteiro toda vez cansava rápido.
 
 O Chat Enhancer adiciona uma linha para seus emojis mais usados, para que os que você realmente usa fiquem mais fáceis de alcançar.
 

@@ -50,7 +50,7 @@ Het is iets kleins, maar terugkerende chatters voelen daardoor veel minder anoni
 
 ## Meestgebruikte emoji’s
 
-Ik gebruik constant dezelfde emoji’s. Elke keer door de volledige emoji-kiezer scrollen voelde belachelijk, want blijkbaar ben ik een simpel mens met een vast emotioneel bereik.
+Ik gebruik constant dezelfde emoji’s. Elke keer door de volledige emoji-kiezer scrollen werd al snel vervelend.
 
 Chat Enhancer voegt een rij toe voor je meestgebruikte emoji’s, zodat de emoji’s die je echt gebruikt makkelijker bereikbaar zijn.
 
