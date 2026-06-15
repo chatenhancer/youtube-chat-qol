@@ -1,15 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { StreamRoom } from './stream-room';
-import type { PublicChessGame } from '../games/chess';
-import { COMPUTER_PLAYER_DISPLAY_NAME, COMPUTER_PLAYER_USER_ID } from '../bots/computer-player';
-import { getStockfishBestMove } from '../bots/stockfish';
+import type { PublicChessGame } from '../../games/chess';
 import {
   createChallenge,
   createSignaturePayload,
   encodeBase64Url
-} from '../protocol/identity';
-import type { PublicReplayTriviaGame } from '../games/replay-trivia';
-import { TokenBucket } from '../rate-limit';
+} from '../../protocol/identity';
+import { TokenBucket } from '../../rate-limit';
 import {
   PLAYGROUND_PROTOCOL_VERSION,
   type ClientMessage,
@@ -17,14 +14,9 @@ import {
   type LobbySnapshot,
   type ServerMessage,
   type SignedClientIdentity
-} from '../protocol/messages';
-import { ProtocolError } from '../protocol/validation';
-import type { DurableObjectState, DurableObjectStorage, Env } from '../types';
-
-vi.mock('../bots/stockfish', () => ({
-  createStockfishBestMoveProvider: () => getStockfishBestMove,
-  getStockfishBestMove: vi.fn(() => Promise.resolve(null))
-}));
+} from '../../protocol/messages';
+import { ProtocolError } from '../../protocol/validation';
+import type { DurableObjectState, DurableObjectStorage, Env } from '../../types';
 
 interface TestSession {
   availableGames: Set<GameId>;
@@ -34,6 +26,7 @@ interface TestSession {
   joinedAt: number;
   rateLimit: TokenBucket;
   socket: FakeSocket;
+  trustedDisplayName?: string;
   userId: string;
 }
 
@@ -114,7 +107,6 @@ describe('playground stream room', () => {
     vi.spyOn(console, 'error').mockImplementation(() => undefined);
     vi.spyOn(console, 'info').mockImplementation(() => undefined);
     vi.spyOn(console, 'warn').mockImplementation(() => undefined);
-    vi.mocked(getStockfishBestMove).mockResolvedValue(null);
   });
 
   afterEach(() => {
@@ -175,144 +167,33 @@ describe('playground stream room', () => {
     expect(room.createSnapshot('other-user').games).toHaveLength(0);
   });
 
-  it('exposes the computer as an available player and auto-starts computer games', async () => {
+  it('uses authenticated client display names for presence and games', async () => {
     const room = createRoom();
     const alice = createSession('alice-connection');
+    const computer = createSession('computer-connection');
+    computer.trustedDisplayName = 'Computer';
 
     await room.handleHello(alice, await createHello(alice.challenge, 'Alice', ['chess']));
-    const computerPresence = getPresenceUser(room, alice.userId, COMPUTER_PLAYER_USER_ID);
+    await room.handleHello(computer, await createHello(computer.challenge, 'Computer', ['chess', 'replay-trivia']));
+    const computerPresence = getPresenceUser(room, alice.userId, computer.userId);
     expect(computerPresence).toMatchObject({
       availableGames: ['chess', 'replay-trivia'],
-      displayName: COMPUTER_PLAYER_DISPLAY_NAME,
-      userId: COMPUTER_PLAYER_USER_ID
+      displayName: 'Computer',
+      userId: computer.userId
     });
 
-    room.handleInvite(alice, 'chess', COMPUTER_PLAYER_USER_ID);
+    room.handleInvite(alice, 'chess', computer.userId);
+    const inviteReceived = lastMessage(computer, 'inviteReceived');
+    room.handleInviteResponse(computer, inviteReceived.invite.inviteId, true);
 
     expect(lastMessage(alice, 'inviteUpdated').invite.status).toBe('accepted');
     const startedChessGame = lastMessage(alice, 'gameStarted').game as PublicChessGame;
     expect(startedChessGame.players.white.userId).toBe(alice.userId);
     expect(startedChessGame.players.black).toEqual({
-      displayName: COMPUTER_PLAYER_DISPLAY_NAME,
-      userId: COMPUTER_PLAYER_USER_ID
+      displayName: 'Computer',
+      userId: computer.userId
     });
     expect(room.createSnapshot(alice.userId).games.map((game) => game.gameId)).toEqual([startedChessGame.gameId]);
-  });
-
-  it('logs when the computer chess player falls back from Stockfish', async () => {
-    const harness = createRoomHarness();
-    const room = harness.room;
-    const alice = createSession('alice-connection');
-    vi.mocked(getStockfishBestMove).mockRejectedValueOnce(new TypeError('Stockfish container failed.'));
-
-    vi.useFakeTimers();
-    try {
-      await room.handleHello(alice, await createHello(alice.challenge, 'Alice', ['chess']));
-      room.handleInvite(alice, 'chess', COMPUTER_PLAYER_USER_ID);
-      const gameId = lastMessage(alice, 'gameStarted').game.gameId;
-
-      room.handleGameAction(alice, gameId, {
-        action: 'move',
-        payload: {
-          from: 'e2',
-          to: 'e4'
-        },
-        userId: alice.userId
-      });
-
-      await vi.runOnlyPendingTimersAsync();
-      await harness.state.flushWaitUntil();
-    } finally {
-      vi.useRealTimers();
-    }
-
-    expect(console.warn).toHaveBeenCalledWith(
-      '[Chat Enhancer Playground] chess_bot_stockfish_fallback',
-      expect.objectContaining({
-        errorMessage: 'Stockfish container failed.',
-        errorType: 'TypeError',
-        event: 'chess_bot_stockfish_fallback',
-        gameType: 'chess',
-        reason: 'stockfish_error',
-        service: 'chat-enhancer-playground'
-      })
-    );
-  });
-
-  it('logs when the computer chess player uses a Stockfish move', async () => {
-    const harness = createRoomHarness();
-    const room = harness.room;
-    const alice = createSession('alice-connection');
-    vi.mocked(getStockfishBestMove).mockResolvedValueOnce({
-      from: 'e7',
-      to: 'e5'
-    });
-
-    vi.useFakeTimers();
-    try {
-      await room.handleHello(alice, await createHello(alice.challenge, 'Alice', ['chess']));
-      room.handleInvite(alice, 'chess', COMPUTER_PLAYER_USER_ID);
-      const gameId = lastMessage(alice, 'gameStarted').game.gameId;
-
-      room.handleGameAction(alice, gameId, {
-        action: 'move',
-        payload: {
-          from: 'e2',
-          to: 'e4'
-        },
-        userId: alice.userId
-      });
-
-      await vi.runOnlyPendingTimersAsync();
-      await harness.state.flushWaitUntil();
-    } finally {
-      vi.useRealTimers();
-    }
-
-    expect(console.info).toHaveBeenCalledWith(
-      '[Chat Enhancer Playground] chess_bot_stockfish_move',
-      expect.objectContaining({
-        event: 'chess_bot_stockfish_move',
-        from: 'e7',
-        gameType: 'chess',
-        source: 'container',
-        service: 'chat-enhancer-playground'
-      })
-    );
-  });
-
-  it('submits Replay Trivia computer answers through normal game updates', async () => {
-    const room = createRoom();
-    const alice = createSession('alice-connection');
-    const now = Date.now();
-
-    vi.useFakeTimers();
-    vi.setSystemTime(now);
-    try {
-      await room.handleHello(alice, await createHello(alice.challenge, 'Alice', ['replay-trivia']));
-      room.handleInvite(alice, 'replay-trivia', COMPUTER_PLAYER_USER_ID);
-      const gameId = lastMessage(alice, 'gameStarted').game.gameId;
-
-      room.handleGameAction(alice, gameId, {
-        action: 'submitQuestions',
-        payload: { questions: [createReplayTriviaQuestion()] },
-        userId: alice.userId
-      });
-      vi.setSystemTime(now + 3_000);
-      room.handleGameAction(alice, gameId, {
-        action: 'advance',
-        userId: alice.userId
-      });
-
-      await vi.runOnlyPendingTimersAsync();
-      await Promise.resolve();
-    } finally {
-      vi.useRealTimers();
-    }
-
-    const updatedTriviaGame = lastMessage(alice, 'gameUpdated').game as PublicReplayTriviaGame;
-    expect(updatedTriviaGame.status).toBe('question');
-    expect(updatedTriviaGame.answers.guest).toEqual({ answered: true });
   });
 
   it('mints one-use Replay Trivia generation tokens for the question provider', async () => {
@@ -413,6 +294,9 @@ describe('playground stream room', () => {
     room.handleInviteResponse(bob, lastMessage(bob, 'inviteReceived').invite.inviteId, true);
     const gameId = lastMessage(alice, 'gameStarted').game.gameId;
     await first.state.flushWaitUntil();
+    await expect(storage.get('roomState')).resolves.toMatchObject({
+      games: [expect.objectContaining({ gameId })]
+    });
 
     const restarted = createRoomHarness(storage);
     await restarted.state.flushWaitUntil();
@@ -435,34 +319,6 @@ describe('playground stream room', () => {
 
     const updatedChessGame = lastMessage(reconnectedAlice, 'gameUpdated').game as PublicChessGame;
     expect(updatedChessGame.lastMoveSan).toBe('e4');
-  });
-
-  it('restores active computer games from Durable Object storage after restart', async () => {
-    const storage = new FakeDurableObjectStorage();
-    const first = createRoomHarness(storage);
-    const room = first.room;
-    const alice = createSession('alice-connection');
-    const aliceKeyPair = await createIdentityKeyPair();
-
-    await room.handleHello(alice, await createHello(alice.challenge, 'Alice', ['chess'], aliceKeyPair));
-    room.handleInvite(alice, 'chess', COMPUTER_PLAYER_USER_ID);
-    const gameId = lastMessage(alice, 'gameStarted').game.gameId;
-    await first.state.flushWaitUntil();
-
-    const restarted = createRoomHarness(storage);
-    await restarted.state.flushWaitUntil();
-    const reconnectedAlice = createSession('alice-reconnected');
-    await restarted.room.handleHello(
-      reconnectedAlice,
-      await createHello(reconnectedAlice.challenge, 'Alice', ['chess'], aliceKeyPair)
-    );
-
-    const restoredGame = lastMessage(reconnectedAlice, 'helloAccepted').snapshot.games[0] as PublicChessGame;
-    expect(restoredGame.gameId).toBe(gameId);
-    expect(restoredGame.players.black).toEqual({
-      displayName: COMPUTER_PLAYER_DISPLAY_NAME,
-      userId: COMPUTER_PLAYER_USER_ID
-    });
   });
 
   it('destroys an active game when a player explicitly leaves', async () => {
@@ -706,18 +562,6 @@ function consumeGenerationToken(room: PrivateStreamRoom, gameId: string, generat
     },
     method: 'POST'
   }));
-}
-
-function createReplayTriviaQuestion() {
-  return {
-    choices: ['God of War', 'Celeste', 'Monster Hunter', 'Red Dead Redemption 2'],
-    correctChoiceIndex: 0,
-    friendIntro: 'chat emergency, who won Game of the Year here?',
-    id: 'q_1',
-    prompt: 'Which game won Game of the Year in this segment?',
-    rightReply: 'wow, you knew the trophy one.',
-    wrongReply: 'you missed it. it was God of War.'
-  };
 }
 
 async function createHello(

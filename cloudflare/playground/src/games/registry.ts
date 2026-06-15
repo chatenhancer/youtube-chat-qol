@@ -10,8 +10,14 @@ import { ProtocolError } from '../protocol/validation';
 import type { GameModule, GameRecord } from './types';
 import { ENABLED_GAME_MODULES } from './enabled-games';
 
+export interface EnabledGameModule {
+  gameId: GameId;
+  module: GameModule;
+}
+
+const ENABLED_MODULES: readonly EnabledGameModule[] = ENABLED_GAME_MODULES;
 const GAME_MODULES: Partial<Record<GameId, GameModule>> = Object.fromEntries(
-  ENABLED_GAME_MODULES.map(({ gameId, module }) => [gameId, module])
+  ENABLED_MODULES.map(({ gameId, module }) => [gameId, module])
 ) as Partial<Record<GameId, GameModule>>;
 
 export function getGameModule(gameId: GameId): GameModule {

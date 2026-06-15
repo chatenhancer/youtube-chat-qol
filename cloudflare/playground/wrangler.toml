@@ -16,10 +16,16 @@ invocation_logs = false
 
 [vars]
 ALLOWED_ORIGIN_PATTERNS = "https://chatenhancer.com,https://www.chatenhancer.com,chrome-extension://,moz-extension://,http://localhost:,http://127.0.0.1:"
+STOCKFISH_ELO = "1700"
+STOCKFISH_MOVE_TIME_MS = "500"
 
 [[durable_objects.bindings]]
 name = "STREAM_ROOMS"
 class_name = "StreamRoom"
+
+[[durable_objects.bindings]]
+name = "COMPUTER_PLAYERS"
+class_name = "ComputerPlayer"
 
 [[durable_objects.bindings]]
 name = "STOCKFISH_ENGINE"
@@ -27,7 +33,7 @@ class_name = "StockfishContainer"
 
 [[containers]]
 class_name = "StockfishContainer"
-image = "./stockfish-container/Dockerfile"
+image = "./src/durable-objects/stockfish-container/Dockerfile"
 instance_type = "basic"
 max_instances = 1
 
@@ -38,3 +44,7 @@ new_sqlite_classes = ["StreamRoom"]
 [[migrations]]
 tag = "v2"
 new_sqlite_classes = ["StockfishContainer"]
+
+[[migrations]]
+tag = "v3"
+new_sqlite_classes = ["ComputerPlayer"]

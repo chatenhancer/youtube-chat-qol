@@ -6,9 +6,12 @@
  */
 export interface Env {
   ALLOWED_ORIGIN_PATTERNS?: string;
+  COMPUTER_PLAYERS?: DurableObjectNamespace;
   OPENAI_API_KEY?: string;
   OPENAI_MODEL?: string;
+  STOCKFISH_ELO?: string;
   STOCKFISH_ENGINE?: DurableObjectNamespace;
+  STOCKFISH_MOVE_TIME_MS?: string;
   STREAM_ROOMS: DurableObjectNamespace;
 }
 

@@ -5,8 +5,6 @@
  * checks, and applying CORS to normal HTTP responses. Route matching and game
  * feature handling live behind `router.ts` so this stays small.
  */
-import { StreamRoom } from './durable-objects/stream-room';
-import { StockfishContainer } from './containers/stockfish-container';
 import {
   createCorsHeaders,
   createErrorResponse,
@@ -17,7 +15,10 @@ import { hashLogValue, logPlaygroundEvent } from './logging';
 import { handlePlaygroundRoute } from './router';
 import type { Env } from './types';
 
-export { StockfishContainer, StreamRoom };
+// Wrangler discovers Durable Object and Container entrypoints by these named exports.
+export { ComputerPlayer } from './durable-objects/computer-player/computer-player';
+export { StockfishContainer } from './durable-objects/stockfish-container/container';
+export { StreamRoom } from './durable-objects/stream-room/stream-room';
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {

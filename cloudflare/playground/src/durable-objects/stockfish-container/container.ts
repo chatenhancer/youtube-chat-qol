@@ -1,6 +1,6 @@
 import { Container, type StopParams } from '@cloudflare/containers';
-import { getLogErrorType, logPlaygroundEvent } from '../logging';
-import type { Env } from '../types';
+import { getLogErrorType, logPlaygroundEvent } from '../../logging';
+import type { Env } from '../../types';
 
 export class StockfishContainer extends Container<Env> {
   defaultPort = 8080;

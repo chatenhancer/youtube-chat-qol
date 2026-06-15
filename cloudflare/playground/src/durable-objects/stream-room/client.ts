@@ -1,0 +1,64 @@
+import type { Env } from '../../types';
+
+const REPLAY_TRIVIA_GENERATION_TOKEN_CONSUME_URL =
+  'https://stream-room.internal/internal/replay-trivia/generation-token/consume';
+const STREAM_ROOM_CLIENT_DISPLAY_NAME_HEADER = 'X-Chat-Enhancer-Client-Display-Name';
+const STREAM_ROOM_STREAM_KEY_HEADER = 'X-Chat-Enhancer-Stream-Key';
+
+interface StreamRoomForwardOptions {
+  stripClientDisplayName?: boolean;
+}
+
+export interface ReplayTriviaGenerationTokenInput {
+  gameId: string;
+  generationToken: string;
+}
+
+export function connectStreamRoomSocket(
+  env: Pick<Env, 'STREAM_ROOMS'>,
+  streamKey: string,
+  displayName: string
+): Promise<Response> {
+  return getStreamRoom(env, streamKey).fetch(new Request(`https://stream-room.internal/v1/streams/${streamKey}/socket`, {
+    headers: {
+      [STREAM_ROOM_CLIENT_DISPLAY_NAME_HEADER]: displayName,
+      [STREAM_ROOM_STREAM_KEY_HEADER]: streamKey,
+      Upgrade: 'websocket'
+    }
+  }));
+}
+
+export function forwardStreamRoomRequest(
+  env: Pick<Env, 'STREAM_ROOMS'>,
+  streamKey: string,
+  request: Request,
+  options: StreamRoomForwardOptions = {}
+): Promise<Response> {
+  const headers = new Headers(request.headers);
+  if (options.stripClientDisplayName) headers.delete(STREAM_ROOM_CLIENT_DISPLAY_NAME_HEADER);
+  headers.set(STREAM_ROOM_STREAM_KEY_HEADER, streamKey);
+  return getStreamRoom(env, streamKey).fetch(new Request(request, { headers }));
+}
+
+export function consumeReplayTriviaGenerationToken(
+  env: Pick<Env, 'STREAM_ROOMS'>,
+  streamKey: string,
+  input: ReplayTriviaGenerationTokenInput
+): Promise<Response> {
+  return getStreamRoom(env, streamKey).fetch(new Request(REPLAY_TRIVIA_GENERATION_TOKEN_CONSUME_URL, {
+    body: JSON.stringify({
+      gameId: input.gameId,
+      generationToken: input.generationToken
+    }),
+    headers: {
+      'Content-Type': 'application/json',
+      [STREAM_ROOM_STREAM_KEY_HEADER]: streamKey
+    },
+    method: 'POST'
+  }));
+}
+
+function getStreamRoom(env: Pick<Env, 'STREAM_ROOMS'>, streamKey: string): { fetch: typeof fetch } {
+  const durableObjectId = env.STREAM_ROOMS.idFromName(streamKey);
+  return env.STREAM_ROOMS.get(durableObjectId);
+}

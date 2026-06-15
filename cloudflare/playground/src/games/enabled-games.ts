@@ -7,15 +7,8 @@
  */
 import { chessGameModule } from './chess';
 import { replayTriviaGameModule } from './replay-trivia';
-import type { GameModule } from './types';
-import type { GameId } from '../protocol/messages';
 
-export interface EnabledGameModule {
-  gameId: GameId;
-  module: GameModule;
-}
-
-export const ENABLED_GAME_MODULES: readonly EnabledGameModule[] = [
+export const ENABLED_GAME_MODULES = [
   {
     gameId: 'chess',
     module: chessGameModule
@@ -24,4 +17,4 @@ export const ENABLED_GAME_MODULES: readonly EnabledGameModule[] = [
     gameId: 'replay-trivia',
     module: replayTriviaGameModule
   }
-];
+] as const;

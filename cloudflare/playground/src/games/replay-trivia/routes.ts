@@ -6,6 +6,7 @@
  * request handler because this game currently has only one support route.
  */
 import { REPLAY_TRIVIA_QUESTIONS_ROUTE } from '../../../../../src/shared/playground-trivia';
+import { consumeReplayTriviaGenerationToken as consumeStreamRoomReplayTriviaGenerationToken } from '../../durable-objects/stream-room/client';
 import { createErrorResponse, createJsonResponse } from '../../http';
 import { getLogErrorType, hashLogValue, logPlaygroundEvent } from '../../logging';
 import { createRouteResult, type RouteModule, type RouteResult, type StreamRouteContext } from '../../routes/types';
@@ -106,22 +107,7 @@ async function consumeReplayTriviaGenerationToken(
     generationToken: string;
   }
 ): Promise<Response | null> {
-  const durableObjectId = env.STREAM_ROOMS.idFromName(streamKey);
-  const room = env.STREAM_ROOMS.get(durableObjectId);
-  const response = await room.fetch(new Request(
-    'https://internal.chat-enhancer.local/internal/replay-trivia/generation-token/consume',
-    {
-      body: JSON.stringify({
-        gameId: requestBody.gameId,
-        generationToken: requestBody.generationToken
-      }),
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Chat-Enhancer-Stream-Key': streamKey
-      },
-      method: 'POST'
-    }
-  ));
+  const response = await consumeStreamRoomReplayTriviaGenerationToken(env, streamKey, requestBody);
   if (response.ok) return null;
 
   let code = 'invalid_generation_token';

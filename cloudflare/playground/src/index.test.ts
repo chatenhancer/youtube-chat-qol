@@ -70,6 +70,14 @@ describe('playground worker routes', () => {
     expect(response.status).toBe(200);
     expect(await response.json()).toEqual({ ok: true });
     expect(forwardedRequest?.headers.get('X-Chat-Enhancer-Stream-Key')).toBe('abc_123-Z');
+    expect(console.info).toHaveBeenCalledWith(
+      '[Chat Enhancer Playground] room_fetch_succeeded',
+      expect.objectContaining({
+        endpoint: 'snapshot',
+        event: 'room_fetch_succeeded',
+        status: 200
+      })
+    );
   });
 
   it('rejects invalid stream keys and missing WebSocket upgrades', async () => {
@@ -176,7 +184,7 @@ describe('playground worker routes', () => {
     }));
 
     expect(response.status).toBe(200);
-    expect(tokenConsumeRequest?.url).toBe('https://internal.chat-enhancer.local/internal/replay-trivia/generation-token/consume');
+    expect(tokenConsumeRequest?.url).toBe('https://stream-room.internal/internal/replay-trivia/generation-token/consume');
     expect(tokenConsumeRequest?.headers.get('X-Chat-Enhancer-Stream-Key')).toBe('SHt3FyE-VIQ');
     expect(await tokenConsumeRequest?.json()).toEqual({
       gameId: 'game-replay-trivia',
