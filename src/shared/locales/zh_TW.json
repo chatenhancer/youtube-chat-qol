@@ -372,8 +372,11 @@
     "playgroundProfile": {
       "message": "你的個人資料"
     },
+    "playgroundWins": {
+      "message": "勝利"
+    },
     "playgroundProfileHelper": {
-      "message": "其他 Playground 使用者會看到這個名稱。chatenhancer.com 不會收集你的真實 YouTube 使用者名稱，也不會在你使用 Playground 體驗時向其他使用者顯示。"
+      "message": "顯示給 Playground 使用者。你的 YouTube 帳號名稱不會被收集或分享。"
     },
     "games": {
       "message": "遊戲"

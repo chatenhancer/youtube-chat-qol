@@ -97,6 +97,10 @@ export const replayTriviaGameModule: GameModule = {
     const triviaGame = assertReplayTriviaGame(game);
     return [triviaGame.players.host, triviaGame.players.guest];
   },
+  getWinnerUserId(game) {
+    const triviaGame = assertReplayTriviaGame(game);
+    return triviaGame.status === 'finished' ? getReplayTriviaWinnerUserId(triviaGame) : null;
+  },
   toPublicGame(game, getUser) {
     return toPublicReplayTriviaGame(assertReplayTriviaGame(game), getUser);
   },

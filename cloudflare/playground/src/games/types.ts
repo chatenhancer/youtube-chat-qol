@@ -34,6 +34,7 @@ export interface GameModule {
   canUserAccessGame(game: GameRecord, userId: string): boolean;
   createGenerationToken?(game: GameRecord, input: GameGenerationTokenInput): GameGenerationTokenGrant;
   getRecipientUserIds(game: GameRecord): string[];
+  getWinnerUserId?(game: GameRecord): string | null;
   toPublicGame(game: GameRecord, getUser: (userId: string) => PublicUserIdentity): PublicGame;
   validateGenerationToken?(game: GameRecord, input: GameGenerationTokenInput): void;
 }

@@ -372,8 +372,11 @@
     "playgroundProfile": {
       "message": "Hồ sơ của bạn"
     },
+    "playgroundWins": {
+      "message": "Chiến thắng"
+    },
     "playgroundProfileHelper": {
-      "message": "Đây là tên mà người dùng Playground khác sẽ thấy. Tên người dùng YouTube thật của bạn không được chatenhancer.com thu thập và không hiển thị cho người dùng khác khi dùng trải nghiệm Playground."
+      "message": "Hiển thị cho người dùng Playground. Tên YouTube của bạn không được thu thập hoặc chia sẻ."
     },
     "games": {
       "message": "Trò chơi"

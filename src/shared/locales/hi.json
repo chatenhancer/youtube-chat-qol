@@ -375,8 +375,11 @@
     "playgroundProfile": {
       "message": "आपकी प्रोफ़ाइल"
     },
+    "playgroundWins": {
+      "message": "जीतें"
+    },
     "playgroundProfileHelper": {
-      "message": "दूसरे Playground उपयोगकर्ता आपको इसी नाम से देखते हैं. आपका असली YouTube हैंडल chatenhancer.com द्वारा एकत्र नहीं किया जाता और Playground अनुभवों का उपयोग करते समय दूसरे उपयोगकर्ताओं को नहीं दिखाया जाता."
+      "message": "Playground उपयोगकर्ताओं को दिखता है। आपका YouTube हैंडल इकट्ठा या शेयर नहीं किया जाता."
     },
     "games": {
       "message": "गेम"

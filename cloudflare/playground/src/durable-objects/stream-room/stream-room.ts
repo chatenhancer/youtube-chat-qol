@@ -23,6 +23,7 @@ import {
 import { parseClientMessage, ProtocolError, sanitizeStreamKey } from '../../protocol/validation';
 import { TokenBucket, type TokenBucketOptions } from '../../rate-limit';
 import { attachComputerPlayerToRoom } from '../../features/computer-player/room-adapter';
+import { recordPlayerWin } from '../player-stats/client';
 import { GameState } from './game-state';
 import { GenerationTokens } from './generation-token';
 import { InviteManager } from './invite-manager';
@@ -347,6 +348,7 @@ export class StreamRoom {
   ): void {
     const nextGame = getGameModuleForRecord(game).applyAction(game, action);
     this.gameState.set(nextGame);
+    const recordedWin = this.recordTerminalGameWin(game, nextGame);
     if (game.status !== nextGame.status && isTerminalGameStatus(nextGame.status)) {
       this.logEvent('game_ended', {
         game: shortLogId(nextGame.gameId),
@@ -355,6 +357,36 @@ export class StreamRoom {
       });
     }
     this.broadcastGame(nextGame);
+    if (recordedWin) this.recordGlobalGameWin(nextGame, recordedWin);
+  }
+
+  private recordTerminalGameWin(previousGame: GameRecord, nextGame: GameRecord): string {
+    if (previousGame.status === nextGame.status || !isTerminalGameStatus(nextGame.status)) return '';
+
+    const winnerUserId = getGameModuleForRecord(nextGame).getWinnerUserId?.(nextGame);
+    return winnerUserId || '';
+  }
+
+  private recordGlobalGameWin(game: GameRecord, winnerUserId: string): void {
+    const write = recordPlayerWin(this.env, {
+      gameId: game.gameType,
+      userId: winnerUserId
+    }).then((stats) => {
+      this.logEvent('game_win_recorded', {
+        game: shortLogId(game.gameId),
+        gameType: game.gameType,
+        user: hashLogValue(winnerUserId),
+        wins: stats.games[game.gameType]?.wins
+      });
+    }).catch((error: unknown) => {
+      this.logEvent('game_win_record_failed', {
+        errorType: error instanceof Error ? error.name : typeof error,
+        game: shortLogId(game.gameId),
+        gameType: game.gameType,
+        user: hashLogValue(winnerUserId)
+      }, 'warn');
+    });
+    this.state.waitUntil(write);
   }
 
   private handleLeaveGame(userId: string, game: GameRecord): void {

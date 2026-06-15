@@ -375,8 +375,11 @@
     "playgroundProfile": {
       "message": "ملفك الشخصي"
     },
+    "playgroundWins": {
+      "message": "الفوز"
+    },
     "playgroundProfileHelper": {
-      "message": "هذا هو الاسم الذي يراه مستخدمو Playground الآخرون لك. لا يجمع chatenhancer.com اسمك الحقيقي على YouTube ولا يعرضه للمستخدمين الآخرين أثناء استخدام تجارب Playground."
+      "message": "يظهر لمستخدمي Playground. لا يتم جمع اسمك على YouTube أو مشاركته."
     },
     "games": {
       "message": "الألعاب"

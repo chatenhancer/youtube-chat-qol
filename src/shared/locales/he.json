@@ -372,8 +372,11 @@
     "playgroundProfile": {
       "message": "הפרופיל שלך"
     },
+    "playgroundWins": {
+      "message": "ניצחונות"
+    },
     "playgroundProfileHelper": {
-      "message": "כך משתמשי Playground אחרים רואים אותך. שם המשתמש האמיתי שלך ב-YouTube לא נאסף על ידי chatenhancer.com ולא מוצג למשתמשים אחרים בזמן שימוש בחוויות Playground."
+      "message": "מוצג למשתמשי Playground. שם המשתמש שלך ב-YouTube לא נאסף או משותף."
     },
     "games": {
       "message": "משחקים"

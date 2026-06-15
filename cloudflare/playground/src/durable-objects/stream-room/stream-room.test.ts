@@ -20,7 +20,7 @@ import {
   type SignedClientIdentity
 } from '../../protocol/messages';
 import { ProtocolError } from '../../protocol/validation';
-import type { DurableObjectState, DurableObjectStorage, Env } from '../../types';
+import type { DurableObjectNamespace, DurableObjectState, DurableObjectStorage, Env } from '../../types';
 
 interface TestSession {
   availableGames: Set<GameId>;
@@ -102,6 +102,56 @@ class FakeDurableObjectState implements DurableObjectState {
     while (this.pending.length > 0) {
       await Promise.all(this.pending.splice(0));
     }
+  }
+}
+
+class FakePlayerStatsNamespace implements DurableObjectNamespace {
+  private readonly wins = new Map<string, Map<string, number>>();
+
+  idFromName(name: string): { toString(): string } {
+    return {
+      toString: () => name
+    };
+  }
+
+  get(): { fetch: typeof fetch } {
+    return {
+      fetch: async (request) => this.handleFetch(request)
+    };
+  }
+
+  getWins(userId: string, gameId: GameId): number {
+    return this.wins.get(userId)?.get(gameId) || 0;
+  }
+
+  private async handleFetch(request: RequestInfo | URL): Promise<Response> {
+    const requestObject = request instanceof Request ? request : new Request(request);
+    const url = new URL(requestObject.url);
+    if (url.pathname !== '/internal/player-stats/record-win') {
+      return Response.json({ error: { code: 'not_found', message: 'Not found.' } }, { status: 404 });
+    }
+
+    const body = await requestObject.json() as { gameId?: GameId; userId?: string };
+    const userId = body.userId || '';
+    const gameId = body.gameId || 'chess';
+    let userWins = this.wins.get(userId);
+    if (!userWins) {
+      userWins = new Map();
+      this.wins.set(userId, userWins);
+    }
+    userWins.set(gameId, (userWins.get(gameId) || 0) + 1);
+
+    return Response.json({
+      ok: true,
+      stats: {
+        games: Object.fromEntries([...userWins.entries()].map(([storedGameId, wins]) => [
+          storedGameId,
+          { wins }
+        ])),
+        userId,
+        wins: [...userWins.values()].reduce((total, wins) => total + wins, 0)
+      }
+    });
   }
 }
 
@@ -321,6 +371,35 @@ describe('playground stream room', () => {
 
     expect(alice.socket.messages.some((message) => message.type === 'gameEnded')).toBe(false);
     expect(room.createSnapshot(alice.userId).games.map((game) => game.gameId)).toEqual([gameId]);
+  });
+
+  it('records completed game wins by user and game type', async () => {
+    const storage = new FakeDurableObjectStorage();
+    const { playerStats, room, state } = createRoomHarness(storage);
+    const alice = createSession('alice-connection');
+    const bob = createSession('bob-connection');
+
+    await room.handleHello(alice, await createHello(alice.challenge, 'Alice', ['chess']));
+    await room.handleHello(bob, await createHello(bob.challenge, 'Bob', ['chess']));
+    room.handleInvite(alice, 'chess', bob.userId);
+    room.handleInviteResponse(bob, lastMessage(bob, 'inviteReceived').invite.inviteId, true);
+    const gameId = lastMessage(alice, 'gameStarted').game.gameId;
+
+    room.handleGameAction(bob, gameId, {
+      action: 'resign',
+      userId: bob.userId
+    });
+
+    await state.flushWaitUntil();
+
+    expect(playerStats.getWins(alice.userId, 'chess')).toBe(1);
+    expect(console.info).toHaveBeenCalledWith('[Chat Enhancer Playground] game_win_recorded', expect.objectContaining({
+      event: 'game_win_recorded',
+      game: expect.stringMatching(/^game_[\w-]+$/),
+      gameType: 'chess',
+      service: 'chat-enhancer-playground',
+      wins: 1
+    }));
   });
 
   it('restores active games from Durable Object storage after restart', async () => {
@@ -594,12 +673,17 @@ function createRoom(): PrivateStreamRoom {
 }
 
 function createRoomHarness(storage = new FakeDurableObjectStorage()): {
+  playerStats: FakePlayerStatsNamespace;
   room: PrivateStreamRoom;
   state: FakeDurableObjectState;
 } {
   const state = new FakeDurableObjectState(storage);
-  const env = {} as Env;
+  const playerStats = new FakePlayerStatsNamespace();
+  const env = {
+    PLAYER_STATS: playerStats
+  } as unknown as Env;
   return {
+    playerStats,
     room: new StreamRoom(state, env) as unknown as PrivateStreamRoom,
     state
   };

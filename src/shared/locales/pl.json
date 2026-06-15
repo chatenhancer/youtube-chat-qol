@@ -372,8 +372,11 @@
     "playgroundProfile": {
       "message": "Twój profil"
     },
+    "playgroundWins": {
+      "message": "Wygrane"
+    },
     "playgroundProfileHelper": {
-      "message": "Tak widzą cię inni użytkownicy Playground. Twój prawdziwy nick z YouTube nie jest zbierany przez chatenhancer.com i nie jest pokazywany innym użytkownikom podczas korzystania z doświadczeń Playground."
+      "message": "Widoczne dla użytkowników Playground. Twój identyfikator YouTube nie jest zbierany ani udostępniany."
     },
     "games": {
       "message": "Gry"

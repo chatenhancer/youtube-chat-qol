@@ -372,8 +372,11 @@
     "playgroundProfile": {
       "message": "Ваш профіль"
     },
+    "playgroundWins": {
+      "message": "Перемоги"
+    },
     "playgroundProfileHelper": {
-      "message": "Так вас бачать інші користувачі Playground. Ваш справжній нік YouTube не збирається chatenhancer.com і не показується іншим користувачам під час використання можливостей Playground."
+      "message": "Видно користувачам Playground. Ваш YouTube-ідентифікатор не збирається й не передається."
     },
     "games": {
       "message": "Ігри"

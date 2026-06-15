@@ -27,6 +27,10 @@ class_name = "StreamRoom"
 name = "STOCKFISH_ENGINE"
 class_name = "StockfishContainer"
 
+[[durable_objects.bindings]]
+name = "PLAYER_STATS"
+class_name = "PlayerStats"
+
 [[containers]]
 class_name = "StockfishContainer"
 image = "./src/durable-objects/stockfish-container/Dockerfile"
@@ -48,3 +52,7 @@ new_sqlite_classes = ["ComputerPlayer"]
 [[migrations]]
 tag = "v4"
 deleted_classes = ["ComputerPlayer"]
+
+[[migrations]]
+tag = "v5"
+new_sqlite_classes = ["PlayerStats"]

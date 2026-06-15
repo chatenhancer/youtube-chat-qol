@@ -375,8 +375,11 @@
     "playgroundProfile": {
       "message": "Seu perfil"
     },
+    "playgroundWins": {
+      "message": "Vitórias"
+    },
     "playgroundProfileHelper": {
-      "message": "É assim que outros usuários do Playground veem você. Seu identificador real do YouTube não é coletado pelo chatenhancer.com e não é mostrado a outros usuários enquanto você usa experiências do Playground."
+      "message": "Visível para usuários do Playground. Seu identificador do YouTube não é coletado nem compartilhado."
     },
     "games": {
       "message": "Jogos"

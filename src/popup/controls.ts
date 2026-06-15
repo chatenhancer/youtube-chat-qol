@@ -17,9 +17,12 @@ export const controls = {
   playgroundGamesSection: document.querySelector<HTMLElement>('#playgroundGamesSection'),
   playgroundGamesAvailable: document.querySelector<HTMLInputElement>('#playgroundGamesAvailable'),
   playgroundProfile: document.querySelector<HTMLElement>('#playgroundProfile'),
+  playgroundProfileAvatar: document.querySelector<HTMLElement>('#playgroundProfileAvatar'),
   playgroundProfileDetails: document.querySelector<HTMLElement>('#playgroundProfileDetails'),
   playgroundProfileName: document.querySelector<HTMLElement>('#playgroundProfileName'),
   playgroundProfileToggle: document.querySelector<HTMLButtonElement>('#playgroundProfileToggle'),
+  playgroundProfileWins: document.querySelector<HTMLElement>('#playgroundProfileWins'),
+  playgroundProfileWinsCount: document.querySelector<HTMLElement>('#playgroundProfileWinsCount'),
   version: document.querySelector<HTMLElement>('#version')
 };
 
@@ -28,9 +31,12 @@ export interface PopupSettingsControls {
   playgroundGamesAvailable: HTMLInputElement;
   playgroundGamesSection: HTMLElement;
   playgroundProfile: HTMLElement;
+  playgroundProfileAvatar: HTMLElement;
   playgroundProfileDetails: HTMLElement;
   playgroundProfileName: HTMLElement;
   playgroundProfileToggle: HTMLButtonElement;
+  playgroundProfileWins: HTMLElement;
+  playgroundProfileWinsCount: HTMLElement;
   sound: HTMLInputElement;
   startupEffect: HTMLInputElement;
   targetLanguage: HTMLSelectElement;
@@ -47,9 +53,12 @@ export function getSettingsControls(): PopupSettingsControls | null {
     playgroundGamesSection,
     playgroundGamesAvailable,
     playgroundProfile,
+    playgroundProfileAvatar,
     playgroundProfileDetails,
     playgroundProfileName,
-    playgroundProfileToggle
+    playgroundProfileToggle,
+    playgroundProfileWins,
+    playgroundProfileWinsCount
   } = controls;
 
   if (
@@ -61,9 +70,12 @@ export function getSettingsControls(): PopupSettingsControls | null {
     !playgroundGamesSection ||
     !playgroundGamesAvailable ||
     !playgroundProfile ||
+    !playgroundProfileAvatar ||
     !playgroundProfileDetails ||
     !playgroundProfileName ||
-    !playgroundProfileToggle
+    !playgroundProfileToggle ||
+    !playgroundProfileWins ||
+    !playgroundProfileWinsCount
   ) {
     return null;
   }
@@ -73,9 +85,12 @@ export function getSettingsControls(): PopupSettingsControls | null {
     playgroundGamesAvailable,
     playgroundGamesSection,
     playgroundProfile,
+    playgroundProfileAvatar,
     playgroundProfileDetails,
     playgroundProfileName,
     playgroundProfileToggle,
+    playgroundProfileWins,
+    playgroundProfileWinsCount,
     sound,
     startupEffect,
     targetLanguage,

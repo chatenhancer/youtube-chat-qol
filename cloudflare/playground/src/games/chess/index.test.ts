@@ -116,6 +116,7 @@ describe('playground chess game rules', () => {
 
     expect(nextGame.status).toBe('resigned');
     expect(publicGame.winner).toBe('white');
+    expect(chessGameModule.getWinnerUserId?.(nextGame)).toBe('white-user');
   });
 
   it('rejects invalid chess actions through the game module interface', () => {

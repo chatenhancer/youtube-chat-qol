@@ -375,8 +375,11 @@
     "playgroundProfile": {
       "message": "Il tuo profilo"
     },
+    "playgroundWins": {
+      "message": "Vittorie"
+    },
     "playgroundProfileHelper": {
-      "message": "Questo è il nome con cui ti vedono gli altri utenti di Playground. Il tuo vero handle YouTube non viene raccolto da chatenhancer.com e non viene mostrato agli altri utenti durante le esperienze Playground."
+      "message": "Visibile agli utenti di Playground. Il tuo handle YouTube non viene raccolto né condiviso."
     },
     "games": {
       "message": "Giochi"
