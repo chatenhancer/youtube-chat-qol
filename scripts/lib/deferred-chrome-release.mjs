@@ -3,6 +3,10 @@ import { writeFile } from 'node:fs/promises';
 export const deferredChromeIssueTitle = 'Deferred Chrome Web Store release';
 export const deferredChromeIssueLabel = 'release-state';
 
+export function getDeferredChromeIssueTitle(release) {
+  return `${deferredChromeIssueTitle}: ${release.tag || `v${release.version}`}`;
+}
+
 export function createDeferredChromeRelease({ env = process.env, statusDescription, version }) {
   const tag = env.GITHUB_REF_NAME || `v${version}`;
   const repository = env.GITHUB_REPOSITORY || null;
@@ -57,7 +61,7 @@ export async function queueDeferredChromeRelease({ config, release }) {
 
 export async function findDeferredChromeIssue(config) {
   const issues = await githubJson(config, `${repoPath(config.repository)}/issues?state=open&per_page=100`);
-  return issues.find((issue) => !issue.pull_request && issue.title === deferredChromeIssueTitle) || null;
+  return issues.find((issue) => !issue.pull_request && isDeferredChromeIssueTitle(issue.title)) || null;
 }
 
 export function parseDeferredChromeRelease(body) {
@@ -138,7 +142,7 @@ async function createDeferredChromeIssue(config, release) {
   return githubJson(config, `${repoPath(config.repository)}/issues`, {
     method: 'POST',
     body: JSON.stringify({
-      title: deferredChromeIssueTitle,
+      title: getDeferredChromeIssueTitle(release),
       body: buildDeferredChromeIssueBody(release),
       labels
     })
@@ -149,6 +153,7 @@ async function updateDeferredChromeIssue(config, issueNumber, release) {
   return githubJson(config, `${repoPath(config.repository)}/issues/${issueNumber}`, {
     method: 'PATCH',
     body: JSON.stringify({
+      title: getDeferredChromeIssueTitle(release),
       body: buildDeferredChromeIssueBody(release)
     })
   });
@@ -189,6 +194,10 @@ async function ensureDeferredChromeIssueLabel(config) {
 
 function isNewerVersion(left, right) {
   return compareSemverVersions(left, right) > 0;
+}
+
+function isDeferredChromeIssueTitle(title) {
+  return title === deferredChromeIssueTitle || title.startsWith(`${deferredChromeIssueTitle}: `);
 }
 
 function parseSemverVersion(version) {

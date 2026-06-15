@@ -3,6 +3,7 @@ import {
   buildDeferredChromeIssueBody,
   compareSemverVersions,
   deferredChromeIssueTitle,
+  getDeferredChromeIssueTitle,
   parseDeferredChromeRelease,
   queueDeferredChromeRelease
 } from './deferred-chrome-release.mjs';
@@ -26,6 +27,7 @@ describe('deferred Chrome release state', () => {
     };
 
     expect(parseDeferredChromeRelease(buildDeferredChromeIssueBody(release))).toEqual(release);
+    expect(getDeferredChromeIssueTitle(release)).toBe('Deferred Chrome Web Store release: v1.2.5');
   });
 
   it('compares semver versions', () => {
@@ -39,7 +41,7 @@ describe('deferred Chrome release state', () => {
       tag: 'v1.2.5',
       version: '1.2.5',
       chrome_asset_name: 'youtube-chat-qol-1.2.5-chrome.zip'
-    });
+    }, deferredChromeIssueTitle);
     const fetchMock = vi.fn(async () => jsonResponse([issue]));
     vi.stubGlobal('fetch', fetchMock);
 
@@ -86,14 +88,16 @@ describe('deferred Chrome release state', () => {
     expect(result.action).toBe('updated');
     expect(fetchMock).toHaveBeenCalledTimes(2);
     expect(fetchMock.mock.calls[1][1].method).toBe('PATCH');
-    expect(parseDeferredChromeRelease(JSON.parse(fetchMock.mock.calls[1][1].body).body).tag).toBe('v1.2.5');
+    const updateBody = JSON.parse(fetchMock.mock.calls[1][1].body);
+    expect(updateBody.title).toBe('Deferred Chrome Web Store release: v1.2.5');
+    expect(parseDeferredChromeRelease(updateBody.body).tag).toBe('v1.2.5');
   });
 });
 
-function createIssue(release) {
+function createIssue(release, title = getDeferredChromeIssueTitle(release)) {
   return {
     number: 12,
-    title: deferredChromeIssueTitle,
+    title,
     pull_request: null,
     body: buildDeferredChromeIssueBody(release)
   };
