@@ -11,6 +11,7 @@ import { isPlayableGameId, isSupportedGameId } from './registry';
 export type GamesPanelMode = 'lobby' | 'players';
 
 export interface GamesPanelState {
+  activeGameIndex: number;
   available: boolean;
   invitedPlayer: string;
   mode: GamesPanelMode;
@@ -20,6 +21,7 @@ export interface GamesPanelState {
 
 export function createInitialGamesPanelState(available: boolean, transport: PlaygroundClientState): GamesPanelState {
   return {
+    activeGameIndex: 0,
     available,
     invitedPlayer: '',
     mode: 'lobby',
@@ -57,11 +59,25 @@ export function getAvailablePlayers(state: GamesPanelState, gameId: GameId): Pre
 
   const currentUserId = state.transport.userId || '';
   return state.transport.users
-    .filter((user) => user.userId !== currentUserId && user.availableGames.includes(gameId));
+    .filter((user) => user.userId !== currentUserId && user.availableGames.includes(gameId))
+    .filter((user) => !hasActiveGameWithPlayer(state.transport.games, gameId, currentUserId, user.userId));
 }
 
 function isUserAvailableForSupportedGame(user: PresenceUser): boolean {
   return user.availableGames.some(isPlayableGameId);
+}
+
+function hasActiveGameWithPlayer(
+  games: PublicGame[],
+  gameId: GameId,
+  currentUserId: string,
+  playerUserId: string
+): boolean {
+  return games.some((game) => {
+    if (!isSupportedGameId(game.gameType) || game.gameType !== gameId) return false;
+    const playerUserIds = Object.values(game.players || {}).map((player) => player?.userId);
+    return playerUserIds.includes(currentUserId) && playerUserIds.includes(playerUserId);
+  });
 }
 
 export function getSupportedGames(games: PublicGame[]): PublicGame[] {

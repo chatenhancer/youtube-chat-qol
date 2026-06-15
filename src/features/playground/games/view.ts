@@ -5,6 +5,7 @@
  * DOM for the Games panel. All mutations that affect network or panel state are
  * delegated through `GamesViewActions`.
  */
+import { createChevronBackwardIcon } from '../../../shared/icons';
 import { t } from '../../../shared/i18n';
 import { ytcqCreateElement } from '../../../shared/managed-dom';
 import type { GameId, PresenceUser, PublicGame, PublicInvite } from '../../../shared/playground-protocol';
@@ -28,6 +29,7 @@ export interface GamesViewActions {
   onAcceptInvite: (invite: PublicInvite) => void;
   onBackToLobby: () => void;
   onCancelInvite: (player: PresenceUser) => void;
+  onCycleActiveGame: (step: number) => void;
   onIgnoreInvite: (invite: PublicInvite) => void;
   onInvitePlayer: (player: PresenceUser) => void;
   onLeaveGame: (game: PublicGame) => void;
@@ -167,17 +169,49 @@ function createGamesAvailabilityToggle(state: GamesPanelState, actions: GamesVie
 }
 
 function createActiveGameSection(state: GamesPanelState, actions: GamesViewActions): HTMLElement {
-  const section = createGamesSection(t('gamesActiveGame'));
+  const section = createGamesSection();
   const games = getSupportedGames(state.transport.games);
   if (!games.length || !state.transport.userId) {
     section.hidden = true;
     return section;
   }
 
-  games.forEach((game) => {
-    section.append(createActiveGameRow(game, state.transport.userId, actions));
-  });
+  const gameIndex = getClampedActiveGameIndex(state.activeGameIndex, games.length);
+  const game = games[gameIndex];
+  section.append(
+    createActiveGameHeader(games, gameIndex, state.transport.userId, actions),
+    createActiveGameRow(game, state.transport.userId, actions)
+  );
   return section;
+}
+
+function createActiveGameHeader(
+  games: PublicGame[],
+  gameIndex: number,
+  currentUserId: string,
+  actions: GamesViewActions
+): HTMLElement {
+  const header = ytcqCreateElement('div');
+  header.className = 'ytcq-games-section-header';
+  header.append(createGamesSectionTitle(t('gamesActiveGame')));
+  if (games.length <= 1) return header;
+
+  const previousGame = games[getWrappedIndex(gameIndex - 1, games.length)];
+  const nextGame = games[getWrappedIndex(gameIndex + 1, games.length)];
+  const controls = ytcqCreateElement('span');
+  controls.className = 'ytcq-games-active-controls';
+  const previous = createCycleButton(getActiveGameControlLabel(previousGame, currentUserId), () => {
+    actions.onCycleActiveGame(-1);
+  });
+  const count = ytcqCreateElement('span');
+  count.className = 'ytcq-games-active-count';
+  count.textContent = `${gameIndex + 1}/${games.length}`;
+  const next = createCycleButton(getActiveGameControlLabel(nextGame, currentUserId), () => {
+    actions.onCycleActiveGame(1);
+  }, 'next');
+  controls.append(previous, count, next);
+  header.append(controls);
+  return header;
 }
 
 function createActiveGameRow(game: PublicGame, currentUserId: string, actions: GamesViewActions): HTMLElement {
@@ -203,6 +237,10 @@ function createActiveGameRow(game: PublicGame, currentUserId: string, actions: G
   actionsWrap.append(togglePanel, leave);
   item.append(copy, actionsWrap);
   return item;
+}
+
+function getActiveGameControlLabel(game: PublicGame, currentUserId: string): string {
+  return `${getGameLabel(game.gameType)} - ${getGameOpponentLabel(game, currentUserId)}`;
 }
 
 function createInvitesSection(state: GamesPanelState, actions: GamesViewActions): HTMLElement {
@@ -362,6 +400,30 @@ function createSmallActionButton(label: string): HTMLButtonElement {
   button.className = 'ytcq-games-small-action';
   button.textContent = label;
   return button;
+}
+
+function createCycleButton(
+  targetLabel: string,
+  onClick: () => void,
+  direction: 'next' | 'previous' = 'previous'
+): HTMLButtonElement {
+  const button = createSmallActionButton('');
+  button.classList.add('ytcq-games-cycle-action');
+  if (direction === 'next') button.classList.add('ytcq-games-cycle-action-next');
+  button.setAttribute('aria-label', targetLabel);
+  button.title = targetLabel;
+  button.append(createChevronBackwardIcon());
+  button.addEventListener('click', onClick);
+  return button;
+}
+
+function getClampedActiveGameIndex(index: number, length: number): number {
+  if (length <= 1) return 0;
+  return Math.min(Math.max(index, 0), length - 1);
+}
+
+function getWrappedIndex(index: number, length: number): number {
+  return (index + length) % length;
 }
 
 function createGameCardLabel(label: string): HTMLElement {
