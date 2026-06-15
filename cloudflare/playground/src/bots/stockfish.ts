@@ -99,9 +99,8 @@ async function getStockfishRuntime(): Promise<StockfishRuntime> {
 }
 
 async function createStockfishRuntime(): Promise<StockfishRuntime> {
-  const createStockfishModuleFactory = await importStockfishModuleFactory();
+  const stockfishModuleFactory = await importStockfishModuleFactory();
   const waiters = new Set<(line: string) => void>();
-  const stockfishModuleFactory = createStockfishModuleFactory();
   const module = await stockfishModuleFactory({
     instantiateWasm(imports, successCallback) {
       void instantiateStockfishWasm(imports, successCallback);
@@ -125,10 +124,25 @@ async function createStockfishRuntime(): Promise<StockfishRuntime> {
   return runtime;
 }
 
-async function importStockfishModuleFactory(): Promise<() => (config: StockfishModuleConfig) => Promise<StockfishModule>> {
+async function importStockfishModuleFactory(): Promise<StockfishModuleFactory> {
   ensureStockfishLocationGlobal();
-  const { default: createStockfishModuleFactory } = await import('stockfish/bin/stockfish-18-lite-single.js');
-  return createStockfishModuleFactory;
+  const stockfishModule = await import('stockfish/bin/stockfish-18-lite-single.js');
+  return resolveStockfishModuleFactory(stockfishModule.default);
+}
+
+export function resolveStockfishModuleFactory(stockfishExport: unknown): StockfishModuleFactory {
+  if (typeof stockfishExport !== 'function') {
+    throw new TypeError('Stockfish module export is not a function.');
+  }
+
+  if (stockfishExport.length > 0) return stockfishExport as StockfishModuleFactory;
+
+  const stockfishModuleFactory = stockfishExport();
+  if (typeof stockfishModuleFactory !== 'function') {
+    throw new TypeError('Stockfish module factory export did not return a function.');
+  }
+
+  return stockfishModuleFactory as StockfishModuleFactory;
 }
 
 function ensureStockfishLocationGlobal(): void {
@@ -167,6 +181,8 @@ interface StockfishModuleConfig {
   ) => WebAssembly.Exports | Record<string, never>;
   listener?: (line: string) => void;
 }
+
+type StockfishModuleFactory = (config: StockfishModuleConfig) => Promise<StockfishModule>;
 
 interface StockfishLocationShim {
   hash: string;
