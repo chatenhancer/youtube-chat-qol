@@ -6,7 +6,8 @@ locale: "pl"
 slug: "introducing-playground-tiny-games-for-live-chat-breaks"
 translationKey: "introducing-playground-tiny-games-for-live-chat-breaks"
 image: "./90af004f7c5daeab.png"
-video: "./cover.mp4"
+cover_width: 73
+video: "./ba98da5bf0abb611.mp4"
 tags:
   - "playground"
   - "games"
