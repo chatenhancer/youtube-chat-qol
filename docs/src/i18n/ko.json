@@ -37,7 +37,7 @@
   },
   "features": {
     "eyebrow": "라이브 스트림을 위해 제작",
-    "title": "채팅이 이미 일어나는 곳에 개선 기능을 추가",
+    "title": "<span class=\"title-emphasis\">채팅</span>이 이미 일어나는 곳에 개선 기능을 추가",
     "translationTitle": "채팅하면서 번역하기",
     "translationBody": "들어오는 메시지를 내 언어로 읽거나, 보내기 전에 입력 중인 내용을 번역할 수 있습니다.",
     "mentionTitle": "멘션, 인용, 초안",
@@ -59,7 +59,7 @@
   },
   "playground": {
     "eyebrow": "Playground",
-    "title": "라이브 채팅 쉬는 순간을 위한<br>작은 게임",
+    "title": "라이브 채팅 쉬는 순간을 위한<br><span class=\"title-emphasis\">작은 게임</span>",
     "copy": "Playground는 스트림을 더 상호작용적으로 만드는 선택형 실험 공간입니다. 첫 게임은 체스입니다. 참여 가능한 시청자*를 초대하고, 게임을 시작한 뒤 채팅도 계속 볼 수 있습니다.",
     "primaryCta": "확장 프로그램에서 사용해 보기",
     "secondaryCta": "자세히 보기",
@@ -68,7 +68,7 @@
   },
   "screenshots": {
     "eyebrow": "스크린샷",
-    "title": "기본 UI처럼 느껴지는<br>채팅 개선",
+    "title": "기본 UI처럼 느껴지는<br><span class=\"title-emphasis\">채팅</span> 개선",
     "translationTitle": "다른 언어로<br>읽고 쓰기",
     "translationBody": "들어오는 메시지는 자동으로 번역할 수 있습니다. 채팅 입력창도 보내기 전에 입력 중인 내용을 번역할 수 있습니다.",
     "translationHighlightHtml": "자동 번역은 <span class=\"showcase-underline\">은은한 밑줄</span>과 Google Translate 아이콘으로 표시됩니다",

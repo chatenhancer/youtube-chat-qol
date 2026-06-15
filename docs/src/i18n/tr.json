@@ -37,7 +37,7 @@
   },
   "features": {
     "eyebrow": "Canlı yayınlar için üretildi",
-    "title": "Sohbetin zaten olduğu yerde iyileştirmeler",
+    "title": "<span class=\"title-emphasis\">Sohbetin</span> zaten olduğu yerde iyileştirmeler",
     "translationTitle": "Sohbet ederken çevirin",
     "translationBody": "Gelen mesajları kendi dilinizde okuyun veya göndermeden önce yazdığınız metni çevirin.",
     "mentionTitle": "Etiketler, alıntılar ve taslaklar",
@@ -59,7 +59,7 @@
   },
   "playground": {
     "eyebrow": "Playground",
-    "title": "Canlı sohbet molaları için<br>küçük oyunlar",
+    "title": "Canlı sohbet molaları için<br><span class=\"title-emphasis\">küçük oyunlar</span>",
     "copy": "Playground, yayınları daha etkileşimli hale getiren deneyler için isteğe bağlı bir alandır. İlk oyun satranç: uygun bir izleyiciyi* davet edin, oyunu başlatın ve sohbeti yanında izlemeye devam edin.",
     "primaryCta": "Uzantıda dene",
     "secondaryCta": "Daha fazla bilgi",
@@ -68,7 +68,7 @@
   },
   "screenshots": {
     "eyebrow": "Ekran görüntüleri",
-    "title": "Yerel hissettiren<br>sohbet geliştirmeleri",
+    "title": "Yerel hissettiren<br><span class=\"title-emphasis\">sohbet</span> geliştirmeleri",
     "translationTitle": "Farklı dillerde<br>oku ve yaz",
     "translationBody": "Gelen mesajlar otomatik çevrilebilir. Sohbet girişi de göndermeden önce yazdığın metni çevirebilir.",
     "translationHighlightHtml": "Otomatik çeviriler <span class=\"showcase-underline\">ince bir alt çizgi</span> ve Google Translate simgesiyle belirtilir",

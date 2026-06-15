@@ -37,7 +37,7 @@
   },
   "features": {
     "eyebrow": "Built for live streams",
-    "title": "Enhancements where chat<br>already happens",
+    "title": "Enhancements where <span class=\"title-emphasis\">chat</span><br>already happens",
     "translationTitle": "Translate as you chat",
     "translationBody": "Read incoming messages in your language, or translate what you're typing before you send it.",
     "mentionTitle": "Mentions, quotes, and drafts",
@@ -59,7 +59,7 @@
   },
   "playground": {
     "eyebrow": "Playground",
-    "title": "Tiny games for<br>live chat breaks",
+    "title": "<span class=\"title-emphasis\">Tiny games</span> for<br>live chat breaks",
     "copy": "Playground is an opt-in space for experiments that make streams more interactive. Chess is first: invite an available viewer*, start the game, and keep chat nearby.",
     "primaryCta": "Try it in the extension",
     "secondaryCta": "Learn more",
@@ -68,7 +68,7 @@
   },
   "screenshots": {
     "eyebrow": "Screenshots",
-    "title": "Native-feeling chat<br>improvements",
+    "title": "Native-feeling <span class=\"title-emphasis\">chat</span><br>improvements",
     "translationTitle": "Read and write<br>across languages",
     "translationBody": "Incoming messages can be translated automatically. The chat box can also translate what you're typing before you send it.",
     "translationHighlightHtml": "Automated translations are highlighted with a <span class=\"showcase-underline\">subtle underline</span> and a Google Translate icon",

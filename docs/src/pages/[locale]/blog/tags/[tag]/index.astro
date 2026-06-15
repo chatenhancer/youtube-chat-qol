@@ -1,5 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
+import BackToUpdatesLink from '../../../../../components/blog/back-to-updates-link.astro';
 import PostCardGrid from '../../../../../components/blog/post-card-grid.astro';
 import BlogLayout from '../../../../../layouts/blog-layout.astro';
 import type { BlogPost, BlogTagArchive } from '../../../../../data/blog';
@@ -72,7 +73,7 @@ const blogTagStructuredData = {
   xDefaultUrl={languageUrls.en ? getBlogTagUrl('en', archive.tag) : null}
 >
   <section class="blog-archive blog-tag-archive">
-    <a class="feature-link" href={getBlogIndexPath(locale)}>{blog.backToUpdates}</a>
+    <BackToUpdatesLink href={getBlogIndexPath(locale)} label={blog.backToUpdates} />
     <h1>{pageTitle}</h1>
     <p class="blog-archive-copy">{blog.archiveCopy}</p>
     <PostCardGrid locale={locale} posts={archive.posts} />

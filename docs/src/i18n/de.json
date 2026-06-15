@@ -37,7 +37,7 @@
   },
   "features": {
     "eyebrow": "Für Livestreams gebaut",
-    "title": "Verbesserungen dort, wo der Chat schon stattfindet",
+    "title": "Verbesserungen dort, wo der <span class=\"title-emphasis\">Chat</span> schon stattfindet",
     "translationTitle": "Beim Chatten übersetzen",
     "translationBody": "Lies eingehende Nachrichten in deiner Sprache oder übersetze, was du tippst, bevor du es sendest.",
     "mentionTitle": "Erwähnungen, Zitate und Entwürfe",
@@ -59,7 +59,7 @@
   },
   "playground": {
     "eyebrow": "Playground",
-    "title": "Kleine Spiele für<br>Pausen im Livechat",
+    "title": "<span class=\"title-emphasis\">Kleine Spiele</span> für<br>Pausen im Livechat",
     "copy": "Playground ist ein optionaler Bereich für Experimente, die Streams interaktiver machen. Schach kommt zuerst: Lade einen verfügbaren Zuschauer* ein, starte das Spiel und behalte den Chat daneben.",
     "primaryCta": "In der Erweiterung ausprobieren",
     "secondaryCta": "Mehr erfahren",
@@ -68,7 +68,7 @@
   },
   "screenshots": {
     "eyebrow": "Screenshots",
-    "title": "Chat-Verbesserungen<br>im nativen Stil",
+    "title": "<span class=\"title-emphasis\">Chat</span>-Verbesserungen<br>im nativen Stil",
     "translationTitle": "In anderen Sprachen<br>lesen und schreiben",
     "translationBody": "Eingehende Nachrichten können automatisch übersetzt werden. Auch das Chat-Eingabefeld kann übersetzen, was du vor dem Senden tippst.",
     "translationHighlightHtml": "Automatische Übersetzungen werden mit einer <span class=\"showcase-underline\">dezenten Unterstreichung</span> und einem Google-Translate-Symbol markiert",

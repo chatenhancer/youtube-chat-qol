@@ -27,7 +27,7 @@
     "editorCredit": "Editado con lepapier.app"
   },
   "hero": {
-    "eyebrow": "Extensión de navegador para el chat en vivo de YouTube",
+    "eyebrow": "Extensión para el live chat de YouTube",
     "title": "Chat Enhancer for YouTube",
     "copy": "Sigue chats en vivo de YouTube que se mueven rápido, entiende mejor lo que dice la gente, encuentra los mensajes importantes y responde con naturalidad sin perder tu lugar.",
     "primaryCta": "Instalar",
@@ -37,7 +37,7 @@
   },
   "features": {
     "eyebrow": "Pensado para directos",
-    "title": "Colección de mejoras donde ya ocurre el chat",
+    "title": "Colección de mejoras donde ya ocurre el <span class=\"title-emphasis\">chat</span>",
     "translationTitle": "Traduce mientras chateas",
     "translationBody": "Lee los mensajes entrantes en tu idioma, o traduce lo que estás escribiendo antes de enviarlo.",
     "mentionTitle": "Menciones, citas y borradores",
@@ -59,7 +59,7 @@
   },
   "playground": {
     "eyebrow": "Playground",
-    "title": "Mini-juegos para<br>pausas del chat en vivo",
+    "title": "<span class=\"title-emphasis\">Minijuegos</span> para<br>pausas del chat en vivo",
     "copy": "Playground es un espacio opcional para experimentos que hacen los directos más interactivos. El ajedrez va primero: invita a un espectador disponible*, empieza la partida y mantén el chat cerca.",
     "primaryCta": "Pruébalo en la extensión",
     "secondaryCta": "Más información",
@@ -68,7 +68,7 @@
   },
   "screenshots": {
     "eyebrow": "Capturas",
-    "title": "Mejoras de chat<br>con aspecto nativo",
+    "title": "Mejoras de <span class=\"title-emphasis\">chat</span><br>con aspecto nativo",
     "translationTitle": "Lee y escribe<br>en otros idiomas",
     "translationBody": "Los mensajes entrantes pueden traducirse automáticamente. El campo de chat también puede traducir lo que estás escribiendo antes de enviarlo.",
     "translationHighlightHtml": "Las traducciones automáticas se resaltan con un <span class=\"showcase-underline\">subrayado sutil</span> y un icono de Google Translate",

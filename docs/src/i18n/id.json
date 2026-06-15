@@ -37,7 +37,7 @@
   },
   "features": {
     "eyebrow": "Dibuat untuk siaran langsung",
-    "title": "Peningkatan di tempat<br>chat sudah berjalan",
+    "title": "Peningkatan di tempat<br><span class=\"title-emphasis\">chat</span> sudah berjalan",
     "translationTitle": "Terjemahkan sambil chat",
     "translationBody": "Baca pesan masuk dalam bahasamu, atau terjemahkan yang sedang kamu ketik sebelum dikirim.",
     "mentionTitle": "Sebut, kutip, dan simpan draf",
@@ -59,7 +59,7 @@
   },
   "playground": {
     "eyebrow": "Playground",
-    "title": "Game kecil untuk<br>jeda live chat",
+    "title": "<span class=\"title-emphasis\">Game kecil</span> untuk<br>jeda live chat",
     "copy": "Playground adalah ruang opsional untuk eksperimen yang membuat stream lebih interaktif. Catur hadir lebih dulu: undang penonton yang tersedia*, mulai game, dan tetap ikuti chat.",
     "primaryCta": "Coba di ekstensi",
     "secondaryCta": "Pelajari lebih lanjut",
@@ -68,7 +68,7 @@
   },
   "screenshots": {
     "eyebrow": "Tangkapan layar",
-    "title": "Peningkatan chat<br>yang terasa menyatu",
+    "title": "Peningkatan <span class=\"title-emphasis\">chat</span><br>yang terasa menyatu",
     "translationTitle": "Baca dan tulis<br>dalam bahasa lain",
     "translationBody": "Pesan masuk dapat diterjemahkan otomatis. Kolom chat juga dapat menerjemahkan apa yang Anda ketik sebelum dikirim.",
     "translationHighlightHtml": "Terjemahan otomatis ditandai dengan <span class=\"showcase-underline\">garis bawah halus</span> dan ikon Google Translate",

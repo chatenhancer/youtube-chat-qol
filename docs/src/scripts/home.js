@@ -39,6 +39,7 @@
   setupTopHeaderState();
   setupActiveNavigation();
   setupContactEmailLinks();
+  setupCommandDemo();
   setupWalkthroughVideoModal();
 
   if (languageSwitcher) {
@@ -284,6 +285,234 @@
     });
     document.querySelectorAll("[data-contact-email-link]").forEach((link) => {
       link.setAttribute("href", href);
+    });
+  }
+
+  function setupCommandDemo() {
+    const demo = document.querySelector("[data-command-demo]");
+    if (!demo) return;
+
+    const input = demo.querySelector("[data-command-input]");
+    const inputWrap = demo.querySelector("[data-command-input-wrap]");
+    const cycleCurrent = demo.querySelector("[data-command-cycle-current]");
+    const cycleNext = demo.querySelector("[data-command-cycle-next]");
+    const tabHint = demo.querySelector("[data-command-tab-hint]");
+    const menu = demo.querySelector("[data-command-menu]");
+    const options = Array.from(demo.querySelectorAll("[data-command-option]"))
+      .filter((option) => option instanceof HTMLElement);
+
+    if (!(input instanceof HTMLInputElement) || !(menu instanceof HTMLElement) || !options.length) return;
+
+    const initialOption = options.find((option) => option.classList.contains("is-active")) || options[0];
+    const cycleDelayMs = 3200;
+    const cycleAnimationMs = 460;
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let isAutoCycling = inputWrap instanceof HTMLElement && cycleCurrent instanceof HTMLElement && cycleNext instanceof HTMLElement;
+    let cycleTimer = 0;
+    let cycleAnimationTimer = 0;
+    let cycleIndex = Math.max(0, options.indexOf(initialOption));
+    let activeIndex = -1;
+    const optionTemplate = (option) => option?.dataset.commandTemplate || option?.dataset.commandValue || "";
+    const optionAfter = (index) => options[(index + 1) % options.length] || options[0];
+    const visibleOptions = () => options.filter((option) => !option.hidden);
+    const setActiveOption = (nextOption) => {
+      if (!nextOption) return;
+      options.forEach((option) => {
+        const isActive = option === nextOption;
+        option.classList.toggle("is-active", isActive);
+        option.setAttribute("aria-selected", isActive ? "true" : "false");
+        option.setAttribute("tabindex", isActive ? "0" : "-1");
+      });
+      activeIndex = visibleOptions().indexOf(nextOption);
+    };
+    const updateCycleText = (currentOption) => {
+      if (!(cycleCurrent instanceof HTMLElement) || !(cycleNext instanceof HTMLElement)) return;
+      const currentIndex = Math.max(0, options.indexOf(currentOption));
+      cycleCurrent.textContent = optionTemplate(currentOption);
+      cycleNext.textContent = optionTemplate(optionAfter(currentIndex));
+    };
+    const setCycleState = (enabled) => {
+      if (!(inputWrap instanceof HTMLElement)) return;
+      inputWrap.classList.toggle("is-cycling", enabled);
+      if (!enabled) inputWrap.classList.remove("is-sliding");
+    };
+    const pulseTabHint = () => {
+      if (reducedMotion.matches || !(tabHint instanceof HTMLElement)) return;
+      tabHint.classList.remove("is-pressing");
+      void tabHint.offsetWidth;
+      tabHint.classList.add("is-pressing");
+    };
+    const keepOptionVisible = (option) => {
+      const optionTop = option.offsetTop;
+      const optionBottom = optionTop + option.offsetHeight;
+      const menuBottom = menu.scrollTop + menu.clientHeight;
+
+      if (optionTop < menu.scrollTop) {
+        menu.scrollTop = optionTop;
+      } else if (optionBottom > menuBottom) {
+        menu.scrollTop = optionBottom - menu.clientHeight;
+      }
+    };
+    const showOptions = (matches) => {
+      const visible = matches.length ? matches : options;
+      options.forEach((option) => {
+        option.hidden = !visible.includes(option);
+      });
+      menu.hidden = false;
+      setActiveOption(visible.includes(initialOption) ? initialOption : visible[0]);
+    };
+    const selectCycleOption = (option) => {
+      if (!option) return;
+      options.forEach((candidate) => {
+        candidate.hidden = false;
+      });
+      menu.hidden = false;
+      setActiveOption(option);
+      cycleIndex = Math.max(0, options.indexOf(option));
+      input.value = optionTemplate(option);
+      updateCycleText(option);
+    };
+    const stopCycleTimers = () => {
+      window.clearTimeout(cycleTimer);
+      window.clearTimeout(cycleAnimationTimer);
+      cycleTimer = 0;
+      cycleAnimationTimer = 0;
+    };
+    const pauseAutoCycle = () => {
+      if (!isAutoCycling) return;
+      isAutoCycling = false;
+      stopCycleTimers();
+      setCycleState(false);
+      const activeOption = visibleOptions()[activeIndex] || options[cycleIndex] || initialOption;
+      cycleIndex = Math.max(0, options.indexOf(activeOption));
+      input.value = optionTemplate(activeOption);
+      updateCycleText(activeOption);
+    };
+    const scheduleCycle = () => {
+      if (!isAutoCycling || document.hidden) return;
+      window.clearTimeout(cycleTimer);
+      cycleTimer = window.setTimeout(cycleToNextOption, cycleDelayMs);
+    };
+    const cycleToOption = (nextOption) => {
+      if (!isAutoCycling || !nextOption) return;
+      const nextIndex = Math.max(0, options.indexOf(nextOption));
+      const completeCycle = () => {
+        if (!isAutoCycling) return;
+        cycleIndex = nextIndex;
+        selectCycleOption(nextOption);
+        if (inputWrap instanceof HTMLElement) inputWrap.classList.remove("is-sliding");
+        scheduleCycle();
+      };
+
+      if (reducedMotion.matches || !(inputWrap instanceof HTMLElement) || !(cycleCurrent instanceof HTMLElement) || !(cycleNext instanceof HTMLElement)) {
+        completeCycle();
+        return;
+      }
+
+      cycleCurrent.textContent = optionTemplate(options[cycleIndex] || initialOption);
+      cycleNext.textContent = optionTemplate(nextOption);
+      setActiveOption(nextOption);
+      pulseTabHint();
+      inputWrap.classList.remove("is-sliding");
+      void inputWrap.offsetWidth;
+      inputWrap.classList.add("is-sliding");
+      window.clearTimeout(cycleAnimationTimer);
+      cycleAnimationTimer = window.setTimeout(completeCycle, cycleAnimationMs);
+    };
+    function cycleToNextOption() {
+      cycleToOption(optionAfter(cycleIndex));
+    }
+    const filterMenu = () => {
+      const rawQuery = input.value.trim().toLowerCase();
+      const query = rawQuery.replace(/^\/+/, "");
+      if (!rawQuery) {
+        showOptions(options);
+        return;
+      }
+
+      const matches = options.filter((option) => {
+        const search = option.dataset.commandSearch || "";
+        const command = option.dataset.commandValue || "";
+        const normalizedCommand = command.replace(/^\/+/, "");
+        const isCommandMatch = command.startsWith(rawQuery) || normalizedCommand.startsWith(query);
+        const isTextMatch = query.length > 1 && (search.includes(rawQuery) || search.includes(query));
+        return isCommandMatch || isTextMatch;
+      });
+      showOptions(matches);
+    };
+    const applyOption = (option) => {
+      if (!option) return;
+      const template = option.dataset.commandTemplate || option.dataset.commandValue || "";
+      if (template) input.value = template;
+      cycleIndex = Math.max(0, options.indexOf(option));
+      updateCycleText(option);
+      filterMenu();
+      input.focus();
+    };
+    const moveActiveOption = (direction) => {
+      const visible = visibleOptions();
+      if (!visible.length) return;
+      const currentIndex = activeIndex >= 0 ? activeIndex : 0;
+      const nextIndex = (currentIndex + direction + visible.length) % visible.length;
+      const nextOption = visible[nextIndex];
+      setActiveOption(nextOption);
+      keepOptionVisible(nextOption);
+    };
+
+    input.addEventListener("input", () => {
+      pauseAutoCycle();
+      filterMenu();
+    });
+    input.addEventListener("focus", () => {
+      pauseAutoCycle();
+      filterMenu();
+    });
+    input.addEventListener("keydown", (event) => {
+      if (event.key === "ArrowDown") {
+        event.preventDefault();
+        pauseAutoCycle();
+        filterMenu();
+        moveActiveOption(1);
+        return;
+      }
+      if (event.key === "ArrowUp") {
+        event.preventDefault();
+        pauseAutoCycle();
+        filterMenu();
+        moveActiveOption(-1);
+        return;
+      }
+      if (event.key === "Tab" || event.key === "Enter") {
+        const activeOption = visibleOptions()[activeIndex];
+        if (activeOption) {
+          event.preventDefault();
+          applyOption(activeOption);
+        }
+      }
+    });
+
+    options.forEach((option) => {
+      option.addEventListener("click", () => {
+        pauseAutoCycle();
+        applyOption(option);
+      });
+    });
+    if (tabHint instanceof HTMLElement) {
+      tabHint.addEventListener("animationend", () => {
+        tabHint.classList.remove("is-pressing");
+      });
+    }
+
+    selectCycleOption(initialOption);
+    setCycleState(isAutoCycling);
+    scheduleCycle();
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) {
+        stopCycleTimers();
+        return;
+      }
+      scheduleCycle();
     });
   }
 

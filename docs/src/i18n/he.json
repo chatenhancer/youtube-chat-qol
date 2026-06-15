@@ -37,7 +37,7 @@
   },
   "features": {
     "eyebrow": "נבנה לשידורים חיים",
-    "title": "שיפורים בדיוק איפה שהצ׳אט כבר נמצא",
+    "title": "שיפורים בדיוק איפה שה<span class=\"title-emphasis\">צ׳אט</span> כבר נמצא",
     "translationTitle": "תרגמו בזמן הצ׳אט",
     "translationBody": "קראו הודעות נכנסות בשפה שלכם, או תרגמו את מה שאתם מקלידים לפני השליחה.",
     "mentionTitle": "אזכורים, ציטוטים וטיוטות",
@@ -59,7 +59,7 @@
   },
   "playground": {
     "eyebrow": "Playground",
-    "title": "משחקים קטנים<br>להפסקות בצ׳אט חי",
+    "title": "<span class=\"title-emphasis\">משחקים קטנים</span><br>להפסקות בצ׳אט חי",
     "copy": "Playground הוא מרחב הצטרפות ניסיוני לחוויות שהופכות סטרימים לאינטראקטיביים יותר. שחמט מגיע ראשון: מזמינים צופה זמין*, מתחילים את המשחק ושומרים את הצ׳אט לידו.",
     "primaryCta": "לנסות בתוך התוסף",
     "secondaryCta": "מידע נוסף",
@@ -68,7 +68,7 @@
   },
   "screenshots": {
     "eyebrow": "צילומי מסך",
-    "title": "שיפורי צ׳אט<br>שמגישים כמו חלק טבעי",
+    "title": "שיפורי <span class=\"title-emphasis\">צ׳אט</span><br>שמגישים כמו חלק טבעי",
     "translationTitle": "לקרוא ולכתוב<br>בשפות אחרות",
     "translationBody": "אפשר לתרגם הודעות נכנסות אוטומטית. גם שדה הצ׳אט יכול לתרגם את מה שנכתב לפני השליחה.",
     "translationHighlightHtml": "תרגומים אוטומטיים מסומנים עם <span class=\"showcase-underline\">קו תחתון עדין</span> ואייקון Google Translate",

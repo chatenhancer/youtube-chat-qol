@@ -1,5 +1,5 @@
 ---
-title: "Introducing Playground: Tiny games for live chat breaks"
+title: "Introducing Playground:\nTiny games for live chat breaks"
 date: 2026-06-10
 description: "Playground is a new feature in the Chat Enhancer extension that allows users to play compact games like chess with each other during live chats."
 slug: "introducing-playground-tiny-games-for-live-chat-breaks"

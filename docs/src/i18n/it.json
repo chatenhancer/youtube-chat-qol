@@ -37,7 +37,7 @@
   },
   "features": {
     "eyebrow": "Creato per le live",
-    "title": "Miglioramenti dove la chat esiste già",
+    "title": "Miglioramenti dove la <span class=\"title-emphasis\">chat</span> esiste già",
     "translationTitle": "Traduci mentre chatti",
     "translationBody": "Leggi i messaggi in arrivo nella tua lingua, oppure traduci ciò che stai scrivendo prima di inviarlo.",
     "mentionTitle": "Menzioni, citazioni e bozze",
@@ -59,7 +59,7 @@
   },
   "playground": {
     "eyebrow": "Playground",
-    "title": "Piccoli giochi per<br>le pause della chat live",
+    "title": "<span class=\"title-emphasis\">Piccoli giochi</span> per<br>le pause della chat live",
     "copy": "Playground è uno spazio opzionale per esperimenti che rendono gli stream più interattivi. Si parte dagli scacchi: invita uno spettatore disponibile*, avvia la partita e continua a seguire la chat.",
     "primaryCta": "Provalo nell’estensione",
     "secondaryCta": "Scopri di più",
@@ -68,7 +68,7 @@
   },
   "screenshots": {
     "eyebrow": "Screenshot",
-    "title": "Miglioramenti chat<br>in stile nativo",
+    "title": "Miglioramenti <span class=\"title-emphasis\">chat</span><br>in stile nativo",
     "translationTitle": "Leggi e scrivi<br>in altre lingue",
     "translationBody": "I messaggi in arrivo possono essere tradotti automaticamente. Anche il campo chat può tradurre ciò che stai scrivendo prima dell’invio.",
     "translationHighlightHtml": "Le traduzioni automatiche sono evidenziate con una <span class=\"showcase-underline\">sottolineatura discreta</span> e un’icona Google Translate",

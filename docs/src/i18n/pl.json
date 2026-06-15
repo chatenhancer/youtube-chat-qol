@@ -27,7 +27,7 @@
     "editorCredit": "Edytowano w lepapier.app"
   },
   "hero": {
-    "eyebrow": "Rozszerzenie przeglądarki dla czatu na żywo YouTube",
+    "eyebrow": "Rozszerzenie do czatu live YouTube",
     "title": "Chat Enhancer for YouTube",
     "copy": "Nadążaj za szybko płynącymi czatami na żywo w YouTube, lepiej rozumiej rozmowę, znajduj ważne wiadomości i odpowiadaj naturalnie, nie tracąc miejsca.",
     "primaryCta": "Zainstaluj",
@@ -37,7 +37,7 @@
   },
   "features": {
     "eyebrow": "Stworzone dla transmisji na żywo",
-    "title": "Ulepszenia tam, gdzie już dzieje się czat",
+    "title": "Ulepszenia tam, gdzie już dzieje się <span class=\"title-emphasis\">czat</span>",
     "translationTitle": "Tłumacz podczas czatu",
     "translationBody": "Czytaj przychodzące wiadomości w swoim języku albo tłumacz to, co piszesz, zanim wyślesz.",
     "mentionTitle": "Wzmianki, cytaty i szkice",
@@ -59,7 +59,7 @@
   },
   "playground": {
     "eyebrow": "Playground",
-    "title": "Małe gry na<br>przerwy w czacie na żywo",
+    "title": "<span class=\"title-emphasis\">Małe gry</span> na<br>przerwy w czacie na żywo",
     "copy": "Playground to opcjonalna przestrzeń eksperymentów, które sprawiają, że transmisje są bardziej interaktywne. Najpierw szachy: zaproś dostępnego widza*, rozpocznij grę i miej czat pod ręką.",
     "primaryCta": "Wypróbuj w rozszerzeniu",
     "secondaryCta": "Dowiedz się więcej",
@@ -68,7 +68,7 @@
   },
   "screenshots": {
     "eyebrow": "Zrzuty ekranu",
-    "title": "Ulepszenia czatu<br>wyglądające naturalnie",
+    "title": "Ulepszenia <span class=\"title-emphasis\">czatu</span><br>wyglądające naturalnie",
     "translationTitle": "Czytaj i pisz<br>w innych językach",
     "translationBody": "Przychodzące wiadomości mogą być tłumaczone automatycznie. Pole czatu może też przetłumaczyć to, co wpisujesz przed wysłaniem.",
     "translationHighlightHtml": "Automatyczne tłumaczenia są oznaczone <span class=\"showcase-underline\">subtelnym podkreśleniem</span> i ikoną Google Translate",

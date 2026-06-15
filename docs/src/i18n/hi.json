@@ -37,7 +37,7 @@
   },
   "features": {
     "eyebrow": "लाइव स्ट्रीम के लिए बनाया गया",
-    "title": "जहां चैट होती है<br>वहीं बेहतर अनुभव",
+    "title": "जहां <span class=\"title-emphasis\">चैट</span> होती है<br>वहीं बेहतर अनुभव",
     "translationTitle": "चैट करते समय अनुवाद करें",
     "translationBody": "आने वाले संदेश अपनी भाषा में पढ़ें, या भेजने से पहले जो लिख रहे हैं उसे अनुवाद करें।",
     "mentionTitle": "मेंशन, कोट और ड्राफ्ट",
@@ -59,7 +59,7 @@
   },
   "playground": {
     "eyebrow": "Playground",
-    "title": "लाइव चैट के विरामों के लिए<br>छोटे गेम",
+    "title": "लाइव चैट के विरामों के लिए<br><span class=\"title-emphasis\">छोटे गेम</span>",
     "copy": "Playground वैकल्पिक प्रयोगों की जगह है जो स्ट्रीम को ज़्यादा इंटरैक्टिव बनाती है। शतरंज पहले है: उपलब्ध दर्शक* को आमंत्रित करें, गेम शुरू करें, और चैट पास में रखें।",
     "primaryCta": "एक्सटेंशन में आज़माएँ",
     "secondaryCta": "और जानें",
@@ -68,7 +68,7 @@
   },
   "screenshots": {
     "eyebrow": "स्क्रीनशॉट",
-    "title": "चैट सुधार<br>जो YouTube जैसे लगें",
+    "title": "<span class=\"title-emphasis\">चैट</span> सुधार<br>जो YouTube जैसे लगें",
     "translationTitle": "दूसरी भाषाओं में<br>पढ़ें और लिखें",
     "translationBody": "आने वाले संदेश अपने आप अनुवादित किए जा सकते हैं। चैट बॉक्स भी भेजने से पहले आपके लिखे संदेश का अनुवाद कर सकता है।",
     "translationHighlightHtml": "स्वचालित अनुवादों को <span class=\"showcase-underline\">हल्की अंडरलाइन</span> और Google Translate आइकन से दिखाया जाता है",
