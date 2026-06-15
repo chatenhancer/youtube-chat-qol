@@ -6,7 +6,6 @@ import type {
   PublicUserIdentity,
   ServerMessage
 } from '../../protocol/messages';
-import type { ServerWebSocket } from '../../types';
 
 export interface ClientSession {
   availableGames: Set<GameId>;
@@ -15,7 +14,7 @@ export interface ClientSession {
   displayName: string;
   joinedAt: number;
   rateLimit: TokenBucket;
-  socket?: ServerWebSocket;
+  socket?: WebSocket;
   userId: string;
 }
 
@@ -112,7 +111,7 @@ export function getPlayerDisplayName(userId: string): string {
   return `Player ${code || '0000'}`;
 }
 
-export function sendMessage(socket: ServerWebSocket, message: ServerMessage): void {
+export function sendMessage(socket: WebSocket, message: ServerMessage): void {
   try {
     socket.send(JSON.stringify(message));
   } catch {

@@ -11,8 +11,6 @@
     "noEmit": true
   },
   "include": [
-    "cloudflare/language-redirect/src/**/*.ts",
-    "cloudflare/playground/src/**/*.ts",
     "src/**/*.ts",
     "tests/**/*.ts",
     "vitest.config.ts",

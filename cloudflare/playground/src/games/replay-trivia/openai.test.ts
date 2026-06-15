@@ -98,9 +98,10 @@ function createEnv(): Env {
         fetch: async () => new Response('{}')
       }),
       idFromName: () => ({
+        equals: (other: DurableObjectId) => other.toString() === 'stream-id',
         toString: () => 'stream-id'
       })
-    }
+    } as unknown as Env['STREAM_ROOMS']
   };
 }
 

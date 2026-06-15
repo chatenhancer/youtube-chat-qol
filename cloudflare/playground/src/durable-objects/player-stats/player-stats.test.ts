@@ -1,8 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { PlayerStats } from './player-stats';
-import type { DurableObjectState, DurableObjectStorage } from '../../types';
 
-class FakeDurableObjectStorage implements DurableObjectStorage {
+class FakeDurableObjectStorage {
   private readonly records = new Map<string, unknown>();
 
   async deleteAll(): Promise<void> {
@@ -18,8 +17,9 @@ class FakeDurableObjectStorage implements DurableObjectStorage {
   }
 }
 
-class FakeDurableObjectState implements DurableObjectState {
+class FakeDurableObjectState {
   readonly id = {
+    equals: (other: DurableObjectId) => other.toString() === 'player-stats-id',
     toString: () => 'player-stats-id'
   };
 
@@ -35,7 +35,7 @@ class FakeDurableObjectState implements DurableObjectState {
 describe('playground player stats', () => {
   it('records global wins by user and game type', async () => {
     const storage = new FakeDurableObjectStorage();
-    const stats = new PlayerStats(new FakeDurableObjectState(storage));
+    const stats = new PlayerStats(new FakeDurableObjectState(storage) as unknown as DurableObjectState);
 
     await recordWin(stats, 'user-1', 'chess');
     await recordWin(stats, 'user-1', 'replay-trivia');

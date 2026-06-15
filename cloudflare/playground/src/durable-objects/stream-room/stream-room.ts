@@ -28,7 +28,7 @@ import { GameState } from './game-state';
 import { GenerationTokens } from './generation-token';
 import { InviteManager } from './invite-manager';
 import { type ClientSession, sendMessage, SessionManager } from './session-manager';
-import type { DurableObjectState, Env } from '../../types';
+import type { Env } from '../../types';
 
 const INVITE_TTL_MS = 2 * 60 * 1000;
 const MAX_MESSAGE_BYTES = 32_768;
