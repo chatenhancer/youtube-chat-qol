@@ -230,6 +230,22 @@ describe('playground worker routes', () => {
     });
   });
 
+  it('renders the Replay Trivia captcha page without shadowing the Turnstile global', async () => {
+    const response = await worker.fetch(new Request(
+      'https://playground.chatenhancer.com/turnstile/replay-trivia?gameId=game-replay-trivia&requestId=rtv_1234567890abcdef&streamKey=SHt3FyE-VIQ&userId=user-123'
+    ), createEnv(undefined, {
+      TURNSTILE_SITE_KEY: 'site-key'
+    }));
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get('Content-Type')).toBe('text/html; charset=utf-8');
+    const html = await response.text();
+    expect(html).toContain('id="turnstile-widget"');
+    expect(html).not.toContain('id="turnstile"');
+    expect(html).toContain('const turnstileApi = window.turnstile;');
+    expect(html).toContain("turnstileApi.render('#turnstile-widget'");
+  });
+
   it('generates Replay Trivia questions through OpenAI with CORS headers', async () => {
     let captchaConsumeRequest: Request | undefined;
     let tokenConsumeRequest: Request | undefined;
