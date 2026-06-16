@@ -20,6 +20,10 @@ describe('playground protocol validation', () => {
       'unsupported_message',
       'Unsupported message type: unknown.'
     ));
+    expect(() => parseClientMessage(JSON.stringify({}))).toThrowError(new ProtocolError(
+      'invalid_field',
+      'type must be a non-empty string.'
+    ));
   });
 
   it('parses a signed hello message for game availability', () => {
@@ -64,6 +68,20 @@ describe('playground protocol validation', () => {
       protocolVersion: PLAYGROUND_PROTOCOL_VERSION,
       type: 'hello'
     }))).toThrowError(new ProtocolError('invalid_public_key', 'Public key must be a P-256 EC JWK.'));
+
+    expect(() => parseClientMessage(JSON.stringify({
+      protocolVersion: PLAYGROUND_PROTOCOL_VERSION,
+      type: 'hello'
+    }))).toThrowError(new ProtocolError('identity_required', 'Signed identity is required.'));
+
+    expect(() => parseClientMessage(JSON.stringify({
+      identity: {
+        publicKeyJwk: 'not-a-key',
+        signature: 'signature'
+      },
+      protocolVersion: PLAYGROUND_PROTOCOL_VERSION,
+      type: 'hello'
+    }))).toThrowError(new ProtocolError('invalid_public_key', 'Public key must be a JWK object.'));
   });
 
   it('deduplicates supported games and rejects unsupported games', () => {
@@ -79,6 +97,14 @@ describe('playground protocol validation', () => {
       availableGames: ['tic-tac-toe'],
       type: 'setAvailability'
     }))).toThrowError(new ProtocolError('unsupported_game', 'Unsupported game.'));
+
+    expect(parseClientMessage(JSON.stringify({
+      availableGames: 'chess',
+      type: 'setAvailability'
+    }))).toEqual({
+      availableGames: [],
+      type: 'setAvailability'
+    });
   });
 
   it('validates game action envelopes without knowing game rules', () => {
@@ -108,9 +134,49 @@ describe('playground protocol validation', () => {
       payload: 'e2e4',
       type: 'gameAction'
     }))).toThrowError(new ProtocolError('invalid_payload', 'Action payload must be an object.'));
+
+    expect(parseClientMessage(JSON.stringify({
+      action: 'leave',
+      gameId: 'game_1',
+      type: 'gameAction'
+    }))).toEqual({
+      action: 'leave',
+      gameId: 'game_1',
+      payload: undefined,
+      type: 'gameAction'
+    });
   });
 
-  it('truncates ping ids to a small echo value', () => {
+  it('validates invites, invite responses, and ping ids', () => {
+    expect(parseClientMessage(JSON.stringify({
+      gameId: 'chess',
+      toUserId: 'target-user',
+      type: 'invite'
+    }))).toEqual({
+      gameId: 'chess',
+      toUserId: 'target-user',
+      type: 'invite'
+    });
+    expect(() => parseClientMessage(JSON.stringify({
+      gameId: 'chess',
+      toUserId: '   ',
+      type: 'invite'
+    }))).toThrowError(new ProtocolError('invalid_field', 'toUserId must be a non-empty string.'));
+    expect(parseClientMessage(JSON.stringify({
+      accept: false,
+      inviteId: 'invite-1',
+      type: 'respondInvite'
+    }))).toEqual({
+      accept: false,
+      inviteId: 'invite-1',
+      type: 'respondInvite'
+    });
+    expect(() => parseClientMessage(JSON.stringify({
+      accept: 'yes',
+      inviteId: 'invite-1',
+      type: 'respondInvite'
+    }))).toThrowError(new ProtocolError('invalid_field', 'accept must be a boolean.'));
+
     const message = parseClientMessage(JSON.stringify({
       id: 'x'.repeat(120),
       type: 'ping'
@@ -118,6 +184,12 @@ describe('playground protocol validation', () => {
 
     expect(message).toEqual({
       id: 'x'.repeat(80),
+      type: 'ping'
+    });
+    expect(parseClientMessage(JSON.stringify({
+      type: 'ping'
+    }))).toEqual({
+      id: undefined,
       type: 'ping'
     });
   });

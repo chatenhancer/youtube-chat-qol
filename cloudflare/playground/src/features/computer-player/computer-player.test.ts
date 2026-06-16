@@ -69,6 +69,63 @@ describe('in-room computer player', () => {
     });
   });
 
+  it('ignores unrelated invites, logs socket errors, and stops receiving after close', () => {
+    const harness = createComputerPlayerHarness(COMPUTER_PLAYER_PROFILE);
+
+    harness.player.socket.accept();
+    sendServerMessage(harness, {
+      invite: {
+        createdAt: Date.now(),
+        expiresAt: Date.now() + 60_000,
+        fromUser: { displayName: 'Alice', userId: 'human-user' },
+        gameId: 'replay-trivia',
+        inviteId: 'inv_ignored',
+        status: 'pending',
+        toUser: { displayName: 'Other bot', userId: 'server:computer:other' }
+      },
+      type: 'inviteReceived'
+    });
+    expect(harness.sentMessages).toEqual([]);
+
+    sendServerMessage(harness, {
+      code: 'bad_message',
+      message: 'x'.repeat(220),
+      type: 'error'
+    });
+
+    expect(harness.logEvent).toHaveBeenCalledWith(
+      'computer_player_socket_error',
+      expect.objectContaining({
+        code: 'bad_message',
+        message: `${'x'.repeat(177)}...`
+      }),
+      'warn'
+    );
+
+    sendServerMessage(harness, {
+      gameId: 'missing-game',
+      reason: 'playerLeft',
+      type: 'gameEnded',
+      userId: 'human-user'
+    });
+
+    harness.player.socket.close();
+    sendServerMessage(harness, {
+      invite: {
+        createdAt: Date.now(),
+        expiresAt: Date.now() + 60_000,
+        fromUser: { displayName: 'Alice', userId: 'human-user' },
+        gameId: 'replay-trivia',
+        inviteId: 'inv_after_close',
+        status: 'pending',
+        toUser: { displayName: 'Computer', userId: COMPUTER_PLAYER_USER_ID }
+      },
+      type: 'inviteReceived'
+    });
+
+    expect(harness.sentMessages).toEqual([]);
+  });
+
   it('submits a Stockfish chess move as a normal game action', async () => {
     vi.useFakeTimers();
     const harness = createComputerPlayerHarness();
@@ -124,6 +181,131 @@ describe('in-room computer player', () => {
         gameType: 'chess'
       }),
       'info'
+    );
+  });
+
+  it('schedules from hello snapshots and clears timers when a game disappears', async () => {
+    vi.useFakeTimers();
+    const harness = createComputerPlayerHarness();
+    const game = setBotTurnChessGame(harness);
+
+    sendServerMessage(harness, {
+      snapshot: {
+        games: [toPublicChessGame(game, getPlayerInfo)],
+        invites: [],
+        users: [
+          {
+            availableGames: ['chess'],
+            displayName: 'Alice',
+            joinedAt: Date.now(),
+            userId: 'human-user'
+          },
+          {
+            availableGames: [...CHESS_COMPUTER_PLAYER_CLUB_PROFILE.availableGames],
+            displayName: CHESS_COMPUTER_PLAYER_CLUB_PROFILE.displayName,
+            joinedAt: Date.now(),
+            userId: CHESS_COMPUTER_PLAYER_CLUB_PROFILE.userId
+          }
+        ]
+      },
+      type: 'helloAccepted',
+      userId: CHESS_COMPUTER_PLAYER_CLUB_PROFILE.userId
+    });
+
+    harness.games.delete(game.gameId);
+    sendServerMessage(harness, {
+      game: toPublicChessGame(game, getPlayerInfo),
+      type: 'gameUpdated'
+    });
+
+    await vi.runAllTimersAsync();
+    await harness.flushWaitUntil();
+
+    expect(getStockfishBestMove).not.toHaveBeenCalled();
+  });
+
+  it('skips a pending action when the bot no longer needs to act', async () => {
+    vi.useFakeTimers();
+    const harness = createComputerPlayerHarness();
+    const game = setBotTurnChessGame(harness);
+
+    sendServerMessage(harness, {
+      game: toPublicChessGame(game, getPlayerInfo),
+      type: 'gameUpdated'
+    });
+    harness.games.set(game.gameId, {
+      ...game,
+      turn: 'white'
+    } as ChessGameRecord);
+
+    await vi.runAllTimersAsync();
+    await harness.flushWaitUntil();
+
+    expect(getStockfishBestMove).not.toHaveBeenCalled();
+    expect(harness.sentMessages).toEqual([]);
+  });
+
+  it('logs and suppresses Stockfish no-move responses before retrying', async () => {
+    vi.useFakeTimers();
+    const harness = createComputerPlayerHarness();
+    vi.mocked(getStockfishBestMove).mockResolvedValueOnce(createStockfishResult(null));
+    const game = setBotTurnChessGame(harness);
+
+    sendServerMessage(harness, {
+      game: toPublicChessGame(game, getPlayerInfo),
+      type: 'gameUpdated'
+    });
+
+    await vi.advanceTimersByTimeAsync(1_500);
+    await harness.flushWaitUntil();
+
+    expect(harness.sentMessages).toEqual([]);
+    expect(harness.logEvent).toHaveBeenCalledWith(
+      'chess_bot_stockfish_unavailable',
+      expect.objectContaining({
+        errorMessage: undefined,
+        errorType: undefined,
+        reason: 'stockfish_no_move'
+      }),
+      'warn'
+    );
+    expect(harness.logEvent).toHaveBeenCalledWith(
+      'chess_bot_stockfish_retry_scheduled',
+      expect.objectContaining({
+        attempt: 1,
+        delayMs: 2_000,
+        reason: 'stockfish_no_move'
+      }),
+      'info'
+    );
+  });
+
+  it('logs send failures when a computed action cannot be sent', async () => {
+    vi.useFakeTimers();
+    const harness = createComputerPlayerHarness(CHESS_COMPUTER_PLAYER_CLUB_PROFILE, {
+      sendClientMessage: () => {
+        throw new Error('room rejected bot action');
+      }
+    });
+    const game = setBotTurnChessGame(harness);
+
+    sendServerMessage(harness, {
+      game: toPublicChessGame(game, getPlayerInfo),
+      type: 'gameUpdated'
+    });
+
+    await vi.runAllTimersAsync();
+    await harness.flushWaitUntil();
+
+    expect(harness.sentMessages).toEqual([]);
+    expect(harness.logEvent).toHaveBeenCalledWith(
+      'computer_player_action_send_failed',
+      expect.objectContaining({
+        action: 'move',
+        errorType: 'Error',
+        game: 'game_chess_1'
+      }),
+      'warn'
     );
   });
 
@@ -256,7 +438,10 @@ describe('in-room computer player', () => {
 });
 
 function createComputerPlayerHarness(
-  profile: ComputerPlayerProfile = CHESS_COMPUTER_PLAYER_CLUB_PROFILE
+  profile: ComputerPlayerProfile = CHESS_COMPUTER_PLAYER_CLUB_PROFILE,
+  options: {
+    sendClientMessage?: (message: Exclude<ClientMessage, { type: 'hello' }>) => void;
+  } = {}
 ): {
   flushWaitUntil(): Promise<void>;
   games: Map<string, GameRecord>;
@@ -273,6 +458,7 @@ function createComputerPlayerHarness(
     getGame: (gameId) => games.get(gameId),
     logEvent: (event, details = {}, level = 'info') => logEvent(event, details, level),
     sendClientMessage: (message) => {
+      options.sendClientMessage?.(message);
       sentMessages.push(message);
     },
     waitUntil: (promise) => {

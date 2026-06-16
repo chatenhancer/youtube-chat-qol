@@ -13,13 +13,16 @@ import { REPLAY_TRIVIA_QUESTIONS_BACKGROUND_MESSAGE } from '../shared/playground
 class FakeWebSocket {
   static instances: FakeWebSocket[] = [];
   static OPEN = 1;
+  static constructorError: Error | null = null;
 
+  failNextSend = false;
   listeners = new Map<string, Set<(event: { data?: string }) => void>>();
   readyState = FakeWebSocket.OPEN;
   sent: ClientMessage[] = [];
   url: string;
 
   constructor(url: string) {
+    if (FakeWebSocket.constructorError) throw FakeWebSocket.constructorError;
     this.url = url;
     FakeWebSocket.instances.push(this);
   }
@@ -40,6 +43,10 @@ class FakeWebSocket {
   }
 
   send(data: string): void {
+    if (this.failNextSend) {
+      this.failNextSend = false;
+      throw new Error('send failed');
+    }
     this.sent.push(JSON.parse(data) as ClientMessage);
   }
 }
@@ -72,11 +79,13 @@ describe('background playground bridge', () => {
     vi.clearAllMocks();
     await chrome.storage.local.clear();
     FakeWebSocket.instances = [];
+    FakeWebSocket.constructorError = null;
     vi.stubGlobal('WebSocket', FakeWebSocket);
   });
 
   afterEach(() => {
     vi.useRealTimers();
+    vi.unstubAllGlobals();
   });
 
   it('opens the playground socket, signs the challenge, and forwards the accepted snapshot', async () => {
@@ -143,6 +152,44 @@ describe('background playground bridge', () => {
     });
   });
 
+  it('ignores unrelated runtime ports and malformed socket messages', async () => {
+    await import('./playground');
+    const port = createFakePort();
+    port.name = 'other-port';
+    getConnectListener()(port as unknown as chrome.runtime.Port);
+
+    port.emit({
+      availableGames: ['chess'],
+      streamKey: 'stream-a',
+      type: 'ytcq:playground:init'
+    });
+
+    expect(FakeWebSocket.instances).toHaveLength(0);
+
+    port.name = PLAYGROUND_PORT_NAME;
+    getConnectListener()(port as unknown as chrome.runtime.Port);
+    port.emit({
+      availableGames: ['chess'],
+      streamKey: '',
+      type: 'ytcq:playground:init'
+    });
+
+    expect(FakeWebSocket.instances).toHaveLength(0);
+
+    port.emit({
+      availableGames: ['chess'],
+      streamKey: 'stream-a',
+      type: 'ytcq:playground:init'
+    });
+    const socket = FakeWebSocket.instances[0];
+    const messageCount = port.messages.length;
+    socket.listeners.get('message')?.forEach((listener) => listener({ data: undefined }));
+    socket.listeners.get('message')?.forEach((listener) => listener({ data: '{' }));
+    socket.listeners.get('message')?.forEach((listener) => listener({ data: JSON.stringify({}) }));
+
+    expect(port.messages).toHaveLength(messageCount);
+  });
+
   it('returns the stable local playground profile without opening a socket', async () => {
     vi.stubGlobal('fetch', vi.fn(async () => new Response(JSON.stringify({
       ok: true,
@@ -180,6 +227,52 @@ describe('background playground bridge', () => {
 
     await vi.waitFor(() => {
       expect(sendResponse).toHaveBeenCalledWith(firstResponse);
+    });
+  });
+
+  it('returns a profile error when local identity creation fails', async () => {
+    vi.stubGlobal('crypto', {
+      subtle: {
+        generateKey: vi.fn(async () => {
+          throw new Error('key store unavailable');
+        })
+      }
+    });
+    await import('./playground');
+
+    const sendResponse = vi.fn();
+    getMessageListener()({
+      type: PLAYGROUND_PROFILE_MESSAGE_TYPE
+    }, {} as chrome.runtime.MessageSender, sendResponse);
+
+    await vi.waitFor(() => {
+      expect(sendResponse).toHaveBeenCalledWith({
+        error: 'key store unavailable',
+        ok: false
+      });
+    });
+  });
+
+  it('uses fallback profile errors for non-Error identity failures', async () => {
+    vi.stubGlobal('crypto', {
+      subtle: {
+        generateKey: vi.fn(async () => {
+          throw 'key store unavailable';
+        })
+      }
+    });
+    await import('./playground');
+
+    const sendResponse = vi.fn();
+    getMessageListener()({
+      type: PLAYGROUND_PROFILE_MESSAGE_TYPE
+    }, {} as chrome.runtime.MessageSender, sendResponse);
+
+    await vi.waitFor(() => {
+      expect(sendResponse).toHaveBeenCalledWith({
+        error: 'Playground profile unavailable.',
+        ok: false
+      });
     });
   });
 
@@ -222,6 +315,38 @@ describe('background playground bridge', () => {
     expect(calledUrl.pathname).toBe('/v1/player-stats');
     expect(calledUrl.searchParams.get('userId')).toMatch(/^[A-Za-z0-9_-]{32}$/);
     expect(FakeWebSocket.instances).toHaveLength(0);
+  });
+
+  it('falls back to zero wins when profile stats are unavailable or malformed', async () => {
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(new Response('down', { status: 503 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ ok: true })));
+    vi.stubGlobal('fetch', fetchMock);
+    await import('./playground');
+
+    const sendResponse = vi.fn();
+    getMessageListener()({
+      type: PLAYGROUND_PROFILE_MESSAGE_TYPE
+    }, {} as chrome.runtime.MessageSender, sendResponse);
+    await vi.waitFor(() => {
+      expect(sendResponse).toHaveBeenCalledWith({
+        ok: true,
+        profile: expect.objectContaining({ wins: 0 })
+      });
+    });
+
+    await chrome.storage.local.clear();
+    sendResponse.mockClear();
+    getMessageListener()({
+      type: PLAYGROUND_PROFILE_MESSAGE_TYPE
+    }, {} as chrome.runtime.MessageSender, sendResponse);
+
+    await vi.waitFor(() => {
+      expect(sendResponse).toHaveBeenCalledWith({
+        ok: true,
+        profile: expect.objectContaining({ wins: 0 })
+      });
+    });
   });
 
   it('keeps authenticated playground sockets alive with heartbeat pings', async () => {
@@ -277,6 +402,106 @@ describe('background playground bridge', () => {
     expect(socket.sent.filter((message) => message.type === 'ping')).toHaveLength(1);
   });
 
+  it('skips heartbeat sends when the tracked socket is no longer open', async () => {
+    vi.useFakeTimers();
+    await import('./playground');
+    const port = createFakePort();
+    getConnectListener()(port as unknown as chrome.runtime.Port);
+
+    port.emit({
+      availableGames: ['chess'],
+      streamKey: 'stream-a',
+      type: 'ytcq:playground:init'
+    });
+    const socket = FakeWebSocket.instances[0];
+    socket.emit('message', {
+      snapshot: {
+        games: [],
+        invites: [],
+        users: []
+      },
+      type: 'helloAccepted',
+      userId: 'user-1'
+    });
+    socket.readyState = 3;
+
+    await vi.advanceTimersByTimeAsync(20_000);
+
+    expect(socket.sent).toEqual([]);
+  });
+
+  it('forwards socket presence and error events to the content port', async () => {
+    await import('./playground');
+    const port = createFakePort();
+    getConnectListener()(port as unknown as chrome.runtime.Port);
+    port.emit({
+      availableGames: ['chess'],
+      streamKey: 'stream-a',
+      type: 'ytcq:playground:init'
+    });
+    const socket = FakeWebSocket.instances[0];
+    socket.emit('message', {
+      snapshot: {
+        games: [],
+        invites: [],
+        users: []
+      },
+      type: 'helloAccepted',
+      userId: 'user-1'
+    });
+
+    socket.emit('message', {
+      snapshot: {
+        games: [],
+        invites: [],
+        users: [
+          {
+            availableGames: ['chess'],
+            displayName: 'Player One',
+            joinedAt: 1,
+            userId: 'user-1'
+          }
+        ]
+      },
+      type: 'presenceSnapshot'
+    });
+    socket.emit('message', {
+      code: 'bad_action',
+      message: 'Bad action.',
+      type: 'error'
+    });
+
+    expect(port.messages.at(-3)).toEqual({
+      snapshot: {
+        games: [],
+        invites: [],
+        users: [
+          {
+            availableGames: ['chess'],
+            displayName: 'Player One',
+            joinedAt: 1,
+            userId: 'user-1'
+          }
+        ]
+      },
+      type: 'ytcq:playground:snapshot',
+      userId: 'user-1'
+    });
+    expect(port.messages.at(-2)).toEqual({
+      code: 'bad_action',
+      message: 'Bad action.',
+      type: 'ytcq:playground:error'
+    });
+    expect(port.messages.at(-1)).toEqual({
+      message: {
+        code: 'bad_action',
+        message: 'Bad action.',
+        type: 'error'
+      },
+      type: 'ytcq:playground:server-message'
+    });
+  });
+
   it('forwards content commands to the authenticated socket', async () => {
     await import('./playground');
     const port = createFakePort();
@@ -304,6 +529,11 @@ describe('background playground bridge', () => {
         to: 'e4'
       },
       type: 'ytcq:playground:game-action'
+    });
+    port.emit({
+      accept: true,
+      inviteId: 'invite-1',
+      type: 'ytcq:playground:respond-invite'
     });
 
     expect(FakeWebSocket.instances[0].sent).toEqual([]);
@@ -347,8 +577,70 @@ describe('background playground bridge', () => {
           to: 'e4'
         },
         type: 'gameAction'
+      },
+      {
+        accept: true,
+        inviteId: 'invite-1',
+        type: 'respondInvite'
       }
     ]);
+  });
+
+  it('requeues a connected command when socket send fails', async () => {
+    await import('./playground');
+    const port = createFakePort();
+    getConnectListener()(port as unknown as chrome.runtime.Port);
+    port.emit({
+      availableGames: ['chess'],
+      streamKey: 'stream-a',
+      type: 'ytcq:playground:init'
+    });
+    const socket = FakeWebSocket.instances[0];
+    socket.emit('message', {
+      snapshot: {
+        games: [],
+        invites: [],
+        users: []
+      },
+      type: 'helloAccepted',
+      userId: 'user-1'
+    });
+    socket.failNextSend = true;
+
+    port.emit({
+      gameId: 'chess',
+      toUserId: 'user-2',
+      type: 'ytcq:playground:invite'
+    });
+
+    expect(socket.readyState).toBe(3);
+    expect(port.messages.at(-1)).toMatchObject({
+      status: 'connecting',
+      type: 'ytcq:playground:status'
+    });
+  });
+
+  it('handles socket error events by scheduling reconnect', async () => {
+    vi.useFakeTimers();
+    await import('./playground');
+    const port = createFakePort();
+    getConnectListener()(port as unknown as chrome.runtime.Port);
+    port.emit({
+      availableGames: ['chess'],
+      streamKey: 'stream-a',
+      type: 'ytcq:playground:init'
+    });
+
+    const socket = FakeWebSocket.instances[0];
+    socket.emit('error');
+
+    expect(socket.readyState).toBe(3);
+    expect(port.messages.at(-1)).toEqual({
+      status: 'connecting',
+      type: 'ytcq:playground:status'
+    });
+    await vi.advanceTimersByTimeAsync(750);
+    expect(FakeWebSocket.instances).toHaveLength(2);
   });
 
   it('posts Replay Trivia question requests from the background context', async () => {
@@ -448,6 +740,74 @@ describe('background playground bridge', () => {
     });
   });
 
+  it('returns Replay Trivia validation, non-json, and network request errors', async () => {
+    await import('./playground');
+    const sendResponse = vi.fn();
+
+    expect(getMessageListener()({
+      request: {},
+      streamKey: 'bad key',
+      type: REPLAY_TRIVIA_QUESTIONS_BACKGROUND_MESSAGE
+    }, {} as chrome.runtime.MessageSender, sendResponse)).toBe(true);
+    await vi.waitFor(() => {
+      expect(sendResponse).toHaveBeenCalledWith({
+        error: 'A YouTube stream key is required for Replay Trivia.',
+        ok: false
+      });
+    });
+
+    sendResponse.mockClear();
+    vi.stubGlobal('fetch', vi.fn(async () => new Response('not json', { status: 500 })));
+    getMessageListener()({
+      request: {},
+      streamKey: 'stream-a',
+      type: REPLAY_TRIVIA_QUESTIONS_BACKGROUND_MESSAGE
+    }, {} as chrome.runtime.MessageSender, sendResponse);
+    await vi.waitFor(() => {
+      expect(sendResponse).toHaveBeenCalledWith({
+        error: 'Replay Trivia request failed with 500.',
+        ok: false,
+        status: 500
+      });
+    });
+
+    sendResponse.mockClear();
+    vi.stubGlobal('fetch', vi.fn(async () => {
+      throw new Error('network down');
+    }));
+    getMessageListener()({
+      request: {},
+      streamKey: 'stream-a',
+      type: REPLAY_TRIVIA_QUESTIONS_BACKGROUND_MESSAGE
+    }, {} as chrome.runtime.MessageSender, sendResponse);
+    await vi.waitFor(() => {
+      expect(sendResponse).toHaveBeenCalledWith({
+        error: 'network down',
+        ok: false
+      });
+    });
+
+    sendResponse.mockClear();
+    vi.stubGlobal('fetch', vi.fn(async () => {
+      throw 'network down';
+    }));
+    getMessageListener()({
+      request: {},
+      streamKey: 'stream-a',
+      type: REPLAY_TRIVIA_QUESTIONS_BACKGROUND_MESSAGE
+    }, {} as chrome.runtime.MessageSender, sendResponse);
+    await vi.waitFor(() => {
+      expect(sendResponse).toHaveBeenCalledWith({
+        error: 'Replay Trivia request failed.',
+        ok: false
+      });
+    });
+
+    expect(getMessageListener()({
+      type: 'unknown'
+    }, {} as chrome.runtime.MessageSender, vi.fn())).toBe(false);
+  });
+
   it('prefers the outer sender tab video id over an iframe fallback key', async () => {
     await import('./playground');
     const port = createFakePort('https://www.youtube.com/watch?v=outer-stream&feature=live');
@@ -460,6 +820,44 @@ describe('background playground bridge', () => {
     });
 
     expect(FakeWebSocket.instances[0].url).toBe('wss://playground.chatenhancer.com/v1/streams/outer-stream/socket');
+  });
+
+  it('uses the sender frame video_id parameter when no tab URL is available', async () => {
+    await import('./playground');
+    const port = createFakePort();
+    port.sender = {
+      url: 'https://www.youtube.com/live_chat?video_id=frame-stream'
+    };
+    getConnectListener()(port as unknown as chrome.runtime.Port);
+
+    port.emit({
+      availableGames: [],
+      streamKey: 'source-fallback',
+      type: 'ytcq:playground:init'
+    });
+
+    expect(FakeWebSocket.instances[0].url).toBe('wss://playground.chatenhancer.com/v1/streams/frame-stream/socket');
+  });
+
+  it('falls back to the provided stream key when sender URLs are malformed or missing video ids', async () => {
+    await import('./playground');
+    const malformedPort = createFakePort('not a url');
+    getConnectListener()(malformedPort as unknown as chrome.runtime.Port);
+    malformedPort.emit({
+      availableGames: [],
+      streamKey: 'source-fallback',
+      type: 'ytcq:playground:init'
+    });
+    expect(FakeWebSocket.instances[0].url).toBe('wss://playground.chatenhancer.com/v1/streams/source-fallback/socket');
+
+    const noVideoIdPort = createFakePort('https://www.youtube.com/watch?feature=live');
+    getConnectListener()(noVideoIdPort as unknown as chrome.runtime.Port);
+    noVideoIdPort.emit({
+      availableGames: [],
+      streamKey: 'source-fallback-2',
+      type: 'ytcq:playground:init'
+    });
+    expect(FakeWebSocket.instances[1].url).toBe('wss://playground.chatenhancer.com/v1/streams/source-fallback-2/socket');
   });
 
   it('reconnects an unexpectedly dropped socket and keeps queued commands', async () => {
@@ -531,6 +929,28 @@ describe('background playground bridge', () => {
     ]);
   });
 
+  it('clears a scheduled reconnect when a fresh init message arrives', async () => {
+    vi.useFakeTimers();
+    await import('./playground');
+    const port = createFakePort();
+    getConnectListener()(port as unknown as chrome.runtime.Port);
+    port.emit({
+      availableGames: ['chess'],
+      streamKey: 'stream-a',
+      type: 'ytcq:playground:init'
+    });
+    FakeWebSocket.instances[0].emit('close');
+
+    port.emit({
+      availableGames: ['chess'],
+      streamKey: 'stream-a',
+      type: 'ytcq:playground:init'
+    });
+    await vi.advanceTimersByTimeAsync(750);
+
+    expect(FakeWebSocket.instances).toHaveLength(2);
+  });
+
   it('does not reconnect after an explicit playground disconnect', async () => {
     vi.useFakeTimers();
     await import('./playground');
@@ -552,6 +972,74 @@ describe('background playground bridge', () => {
 
     expect(FakeWebSocket.instances).toHaveLength(1);
     expect(socket.readyState).toBe(3);
+  });
+
+  it('stops reconnecting after all retry delays fail', async () => {
+    vi.useFakeTimers();
+    FakeWebSocket.constructorError = new Error('constructor failed');
+    await import('./playground');
+    const port = createFakePort();
+    getConnectListener()(port as unknown as chrome.runtime.Port);
+
+    port.emit({
+      availableGames: ['chess'],
+      streamKey: 'stream-a',
+      type: 'ytcq:playground:init'
+    });
+
+    await vi.advanceTimersByTimeAsync(750 + 2_000 + 5_000 + 10_000);
+
+    expect(FakeWebSocket.instances).toHaveLength(0);
+    expect(port.messages.at(-1)).toEqual({
+      error: 'constructor failed',
+      status: 'disconnected',
+      type: 'ytcq:playground:status'
+    });
+  });
+
+  it('removes listeners and closes the socket when the port disconnects', async () => {
+    await import('./playground');
+    const port = createFakePort();
+    getConnectListener()(port as unknown as chrome.runtime.Port);
+    port.emit({
+      availableGames: ['chess'],
+      streamKey: 'stream-a',
+      type: 'ytcq:playground:init'
+    });
+
+    const disconnect = vi.mocked(port.onDisconnect.addListener).mock.calls[0]?.[0];
+    disconnect?.();
+
+    expect(port.onMessage.removeListener).toHaveBeenCalled();
+    expect(port.onDisconnect.removeListener).toHaveBeenCalled();
+    expect(FakeWebSocket.instances[0].readyState).toBe(3);
+  });
+
+  it('drops the content port when posting back fails', async () => {
+    await import('./playground');
+    const port = createFakePort();
+    port.postMessage = vi.fn(() => {
+      throw new Error('port closed');
+    });
+    getConnectListener()(port as unknown as chrome.runtime.Port);
+
+    port.emit({
+      availableGames: ['chess'],
+      streamKey: 'stream-a',
+      type: 'ytcq:playground:init'
+    });
+
+    expect(FakeWebSocket.instances[0]?.readyState).toBe(FakeWebSocket.OPEN);
+    FakeWebSocket.instances[0].emit('message', {
+      snapshot: {
+        games: [],
+        invites: [],
+        users: []
+      },
+      type: 'helloAccepted',
+      userId: 'user-1'
+    });
+    expect(port.postMessage).toHaveBeenCalledOnce();
   });
 });
 

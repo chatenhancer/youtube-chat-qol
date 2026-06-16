@@ -68,6 +68,24 @@ describe('YouTube chat source url helpers', () => {
     expect(getYouTubeChatSourceStorageKey(getCurrentYouTubeChatSourceUrl())).toBe('video:-OfA04BD4GA');
   });
 
+  it('chooses the most repeated video-id candidate from plain continuation text', () => {
+    window.history.replaceState(
+      {},
+      '',
+      '/live_chat?continuation=AAAAAAAAAAA.BBBBBBBBBBB.AAAAAAAAAAA'
+    );
+
+    expect(getCurrentYouTubeChatSourceUrl()).toBe('https://www.youtube.com/watch?v=AAAAAAAAAAA');
+  });
+
+  it('falls back for live chat urls without usable continuations', () => {
+    window.history.replaceState({}, '', '/live_chat');
+    expect(getCurrentYouTubeChatSourceUrl()).toBe('http://localhost:3000/live_chat');
+
+    window.history.replaceState({}, '', '/live_chat?continuation=%E0%A4%A');
+    expect(getCurrentYouTubeChatStreamKey()).toMatch(/^source-[a-z0-9]+$/);
+  });
+
   it('uses an accessible top watch url before falling back to the chat iframe url', () => {
     window.history.replaceState({}, '', '/live_chat?continuation=iframe-token');
     Object.defineProperty(window, 'top', {
@@ -163,6 +181,24 @@ describe('YouTube chat source url helpers', () => {
     expect(getCurrentYouTubeChatSourceTitle()).toBe('Top Stream');
   });
 
+  it('falls back when parent title contexts are missing or inaccessible', () => {
+    Object.defineProperty(window, 'top', {
+      configurable: true,
+      value: null
+    });
+    Object.defineProperty(window, 'parent', {
+      configurable: true,
+      value: {
+        get document(): Document {
+          throw new Error('cross-origin parent');
+        }
+      }
+    });
+    document.title = 'Fallback Stream - YouTube';
+
+    expect(getCurrentYouTubeChatSourceTitle()).toBe('Fallback Stream');
+  });
+
   it('ignores generic live chat titles', () => {
     document.title = 'Live Chat - YouTube';
 
@@ -184,5 +220,7 @@ describe('YouTube chat source url helpers', () => {
 
   it('keeps invalid urls as stable page source fallbacks', () => {
     expect(getYouTubeChatSourceStorageKey('not a url')).toMatch(/^source:/);
+    window.history.replaceState({}, '', '/watch?v=');
+    expect(getCurrentYouTubeChatSourceUrl()).toBe('http://localhost:3000/watch');
   });
 });

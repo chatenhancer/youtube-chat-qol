@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import {
   applyChessMove,
+  type ChessGameRecord,
   chessGameModule,
   createChessGame,
+  getChessWinnerUserId,
   resignChessGame,
   toPublicChessGame,
   type PublicChessGame
@@ -65,12 +67,45 @@ describe('playground chess game rules', () => {
     expect(game.lastMoveSan).toBe('Qh4#');
   });
 
+  it('rejects moves after a chess game has finished', () => {
+    const game = {
+      ...createChessGame('game-1', 'white-user', 'black-user'),
+      status: 'draw'
+    } as ChessGameRecord;
+
+    expect(() => applyChessMove(game, {
+      from: 'e2',
+      to: 'e4',
+      userId: 'white-user'
+    })).toThrowError(new ProtocolError('game_finished', 'This chess game is already finished.'));
+  });
+
+  it('detects draw positions after legal moves', () => {
+    const game = {
+      ...createChessGame('game-1', 'white-user', 'black-user'),
+      fen: '8/8/8/8/8/8/8/K6k w - - 0 1',
+      pgn: '',
+      turn: 'white'
+    } as ChessGameRecord;
+
+    const nextGame = applyChessMove(game, {
+      from: 'a1',
+      to: 'a2',
+      userId: 'white-user'
+    });
+
+    expect(nextGame.status).toBe('draw');
+  });
+
   it('marks the opponent as winner when a player resigns', () => {
     const game = createChessGame('game-1', 'white-user', 'black-user');
     const nextGame = resignChessGame(game, 'white-user');
 
     expect(nextGame.status).toBe('resigned');
     expect(nextGame.winner).toBe('black');
+
+    expect(resignChessGame(game, 'black-user').winner).toBe('white');
+    expect(() => resignChessGame(game, 'spectator-user')).toThrowError(new ProtocolError('not_in_game', 'You are not a player in this game.'));
   });
 
   it('serializes public chess game state with public user identities', () => {
@@ -101,6 +136,7 @@ describe('playground chess game rules', () => {
     expect(chessGameModule.getRecipientUserIds(nextGame)).toEqual(['white-user', 'black-user']);
     expect(chessGameModule.canUserAccessGame(nextGame, 'white-user')).toBe(true);
     expect(chessGameModule.canUserAccessGame(nextGame, 'other-user')).toBe(false);
+    expect(chessGameModule.getWinnerUserId?.(nextGame)).toBeNull();
   });
 
   it('handles resign actions through the game module interface', () => {
@@ -122,6 +158,32 @@ describe('playground chess game rules', () => {
   it('rejects invalid chess actions through the game module interface', () => {
     const game = chessGameModule.createGame('game-1', ['white-user', 'black-user']);
 
+    expect(() => chessGameModule.applyAction({
+      ...game,
+      gameType: 'replay-trivia'
+    }, {
+      action: 'move',
+      payload: {
+        from: 'e2',
+        to: 'e4'
+      },
+      userId: 'white-user'
+    })).toThrowError(new ProtocolError('unsupported_game', 'Expected a chess game.'));
+
+    expect(() => chessGameModule.applyAction(game, {
+      action: 'move',
+      userId: 'white-user'
+    })).toThrowError(new ProtocolError('invalid_square', 'from must be a chess square.'));
+
+    expect(() => chessGameModule.applyAction(game, {
+      action: 'move',
+      payload: {
+        from: 12,
+        to: 'e4'
+      },
+      userId: 'white-user'
+    })).toThrowError(new ProtocolError('invalid_square', 'from must be a chess square.'));
+
     expect(() => chessGameModule.applyAction(game, {
       action: 'move',
       payload: {
@@ -132,8 +194,50 @@ describe('playground chess game rules', () => {
     })).toThrowError(new ProtocolError('invalid_square', 'from must be a chess square.'));
 
     expect(() => chessGameModule.applyAction(game, {
+      action: 'move',
+      payload: {
+        from: 'e2',
+        promotion: 'king',
+        to: 'e4'
+      },
+      userId: 'white-user'
+    })).toThrowError(new ProtocolError('invalid_promotion', 'Promotion must be b, n, q, or r.'));
+
+    expect(() => chessGameModule.applyAction(game, {
       action: 'castleTheBoard',
       userId: 'white-user'
     })).toThrowError(new ProtocolError('unsupported_action', 'Unsupported chess action.'));
+  });
+
+  it('accepts promotion values through module move payloads and handles missing winner records', () => {
+    const game = {
+      ...createChessGame('game-1', 'white-user', 'black-user'),
+      fen: '8/P7/8/8/8/8/8/k6K w - - 0 1',
+      pgn: '',
+      turn: 'white'
+    } as ChessGameRecord;
+
+    const promoted = chessGameModule.applyAction(game, {
+      action: 'move',
+      payload: {
+        from: 'a7',
+        promotion: 'q',
+        to: 'a8'
+      },
+      userId: 'white-user'
+    }) as ChessGameRecord;
+
+    expect(promoted.lastMoveSan).toContain('=Q');
+    expect(getChessWinnerUserId({
+      ...game,
+      winner: 'white'
+    })).toBe('white-user');
+    expect(getChessWinnerUserId({
+      ...game,
+      players: {
+        black: 'black-user'
+      } as ChessGameRecord['players'],
+      winner: 'white'
+    })).toBeNull();
   });
 });

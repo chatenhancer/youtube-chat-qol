@@ -52,6 +52,7 @@ import {
   popupSettingsBehaviorScenario,
   settingsMenuBehaviorScenario
 } from '../scenarios/settings';
+import { playgroundChessInviteAndMoveScenario } from '../scenarios/playground-games';
 import { tabAlertScenario } from '../scenarios/tab-alert';
 import { loggedInMockTest as test } from '../support/scenario-fixtures';
 
@@ -85,3 +86,4 @@ test('logged-in mock: chat commands expand and apply settings', chatCommandsExpa
 test('logged-in mock: chat command autocomplete suggests names and arguments', chatCommandAutocompleteScenario);
 test('logged-in mock: author click writes a mention draft only', authorMentionDraftScenario);
 test('logged-in mock: author Alt-click writes a quote draft only', authorQuoteDraftScenario);
+test('logged-in mock: Playground Games invites a chess opponent and sends a move', playgroundChessInviteAndMoveScenario);

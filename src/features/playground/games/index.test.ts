@@ -3,11 +3,27 @@ import { DEFAULT_OPTIONS } from '../../../shared/options';
 import type { LobbySnapshot, PlaygroundBackgroundMessage, PublicGame } from '../../../shared/playground-protocol';
 import { setOptions } from '../../../shared/state';
 import {
+  handleFeatureMutations,
+  handleFeatureOptionsChanged
+} from '../../../content/lifecycle';
+import {
   cleanupStaleGamesButtons,
   refreshGamesButton,
   scheduleGamesButtonWire,
   wireGamesButton
 } from './index';
+import {
+  createGamesButton,
+  getGamesHeaderAnchor,
+  moveGamesButton,
+  positionGamesCard,
+  setGamesButtonExpanded,
+  shouldWireGamesButton
+} from './button';
+import {
+  createGamesCard,
+  installGamesCardListeners
+} from './card';
 
 describe('playground games header button', () => {
   beforeEach(() => {
@@ -67,6 +83,68 @@ describe('playground games header button', () => {
 
     const button = header.querySelector<HTMLButtonElement>('.ytcq-games-button')!;
     expect(button.nextElementSibling?.id).toBe('live-chat-header-context-menu');
+  });
+
+  it('detects header mutations and falls back through header anchor selectors', () => {
+    const wrapper = document.createElement('div');
+    const header = createHeader();
+    wrapper.append(header);
+    const mutation = {
+      target: header,
+      type: 'childList'
+    } as unknown as MutationRecord;
+
+    expect(shouldWireGamesButton([], [mutation])).toBe(true);
+    expect(shouldWireGamesButton([wrapper], [])).toBe(true);
+    expect(shouldWireGamesButton([document.createElement('div')], [])).toBe(false);
+
+    header.replaceChildren();
+    const moreWrapper = document.createElement('span');
+    const moreButton = document.createElement('button');
+    moreButton.setAttribute('aria-label', 'More options');
+    moreWrapper.append(moreButton);
+    header.append(moreWrapper);
+    expect(getGamesHeaderAnchor(header)).toBe(moreWrapper);
+
+    moreButton.removeAttribute('aria-label');
+    moreButton.title = 'More options';
+    expect(getGamesHeaderAnchor(header)).toBe(moreWrapper);
+
+    moreWrapper.remove();
+    const closeButton = document.createElement('button');
+    closeButton.id = 'close-button';
+    header.append(closeButton);
+    expect(getGamesHeaderAnchor(header)).toBe(closeButton);
+  });
+
+  it('appends, expands, and positions games buttons and cards across viewport edges', () => {
+    const header = createHeader();
+    header.replaceChildren();
+    document.body.append(header);
+    const button = createGamesButton('owner', vi.fn());
+
+    moveGamesButton(button, header, null);
+    expect(header.lastElementChild).toBe(button);
+
+    setGamesButtonExpanded(button, true);
+    expect(button.getAttribute('aria-expanded')).toBe('true');
+    setGamesButtonExpanded(document.createElement('div'), false);
+
+    const card = document.createElement('section');
+    mockRect(card, { height: 180, left: 0, top: 0, width: 240 });
+    const anchor = document.createElement('button');
+    document.body.append(anchor, card);
+    mockRect(anchor, { height: 20, left: 4, top: 4, width: 20 });
+    Object.defineProperty(window, 'innerWidth', { configurable: true, value: 260 });
+    Object.defineProperty(window, 'innerHeight', { configurable: true, value: 220 });
+
+    positionGamesCard(card, anchor);
+    expect(card.style.left).toBe('8px');
+    expect(card.style.top).toBe('32px');
+
+    anchor.remove();
+    positionGamesCard(card, anchor);
+    expect(card.style.left).toBe('12px');
   });
 
   it('reuses this content script button and replaces stale owner buttons', () => {
@@ -592,6 +670,64 @@ describe('playground games header button', () => {
     expect(document.querySelector('.ytcq-chess-game-panel')).toBeNull();
   });
 
+  it('keeps the active games card positioned and closes it from an outside click listener', async () => {
+    const header = createHeader();
+    document.body.append(header);
+    setOptions({ ...DEFAULT_OPTIONS, playgroundEnabled: true });
+
+    wireGamesButton();
+    const button = header.querySelector<HTMLButtonElement>('.ytcq-games-button')!;
+    mockRect(button, { height: 20, left: 80, top: 10, width: 24 });
+    button.click();
+    const card = document.querySelector<HTMLElement>('.ytcq-games-card')!;
+    mockRect(card, { height: 180, left: 0, top: 0, width: 240 });
+    await vi.runOnlyPendingTimersAsync();
+
+    window.dispatchEvent(new Event('resize'));
+    expect(card.style.left).not.toBe('');
+
+    document.body.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+    expect(document.querySelector('.ytcq-games-card')).toBeNull();
+    expect(button.getAttribute('aria-expanded')).toBe('false');
+  });
+
+  it('installs card listeners for outside click, escape, resize, and cleanup', async () => {
+    const onClose = vi.fn();
+    const { card } = createGamesCard(onClose);
+    const anchor = document.createElement('button');
+    anchor.className = 'ytcq-games-button';
+    document.body.append(anchor, card);
+    mockRect(card, { height: 100, left: 0, top: 0, width: 120 });
+    mockRect(anchor, { height: 20, left: 40, top: 40, width: 20 });
+
+    const cleanup = installGamesCardListeners({
+      getAnchor: () => anchor,
+      getCard: () => card,
+      onClose
+    });
+    await vi.runOnlyPendingTimersAsync();
+
+    card.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    anchor.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    const panel = document.createElement('section');
+    panel.className = 'ytcq-game-panel';
+    document.body.append(panel);
+    panel.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(onClose).not.toHaveBeenCalled();
+
+    window.dispatchEvent(new Event('resize'));
+    expect(card.style.left).not.toBe('');
+
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+    expect(onClose).toHaveBeenCalledOnce();
+
+    onClose.mockClear();
+    cleanup();
+    document.body.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
   it('cancels pending wiring and removes buttons during cleanup', async () => {
     document.body.append(createHeader());
     setOptions({ ...DEFAULT_OPTIONS, playgroundEnabled: true });
@@ -601,6 +737,141 @@ describe('playground games header button', () => {
     await vi.runOnlyPendingTimersAsync();
 
     expect(document.querySelector('.ytcq-games-button')).toBeNull();
+  });
+
+  it('coalesces scheduled wiring and skips wiring when options are disabled before the frame runs', async () => {
+    document.body.append(createHeader());
+    setOptions({ ...DEFAULT_OPTIONS, playgroundEnabled: true });
+
+    scheduleGamesButtonWire();
+    scheduleGamesButtonWire();
+    setOptions({ ...DEFAULT_OPTIONS, playgroundEnabled: false });
+    await vi.runOnlyPendingTimersAsync();
+
+    expect(document.querySelector('.ytcq-games-button')).toBeNull();
+  });
+
+  it('does nothing when wiring runs before the YouTube header exists', () => {
+    setOptions({ ...DEFAULT_OPTIONS, playgroundEnabled: true });
+
+    wireGamesButton();
+
+    expect(document.querySelector('.ytcq-games-button')).toBeNull();
+  });
+
+  it('responds to lifecycle mutation batches by wiring the Games button', async () => {
+    const wrapper = document.createElement('div');
+    const header = createHeader();
+    wrapper.append(header);
+    document.body.append(wrapper);
+    setOptions({ ...DEFAULT_OPTIONS, playgroundEnabled: true });
+
+    handleFeatureMutations({
+      addedElements: [wrapper],
+      changedMessages: [],
+      mutations: []
+    });
+    await vi.runOnlyPendingTimersAsync();
+
+    expect(header.querySelector('.ytcq-games-button')).not.toBeNull();
+  });
+
+  it('ignores lifecycle mutation batches when disabled or unrelated', async () => {
+    const wrapper = document.createElement('div');
+    const header = createHeader();
+    wrapper.append(header);
+    document.body.append(wrapper);
+
+    setOptions({ ...DEFAULT_OPTIONS, playgroundEnabled: false });
+    handleFeatureMutations({
+      addedElements: [wrapper],
+      changedMessages: [],
+      mutations: []
+    });
+    await vi.runOnlyPendingTimersAsync();
+    expect(header.querySelector('.ytcq-games-button')).toBeNull();
+
+    setOptions({ ...DEFAULT_OPTIONS, playgroundEnabled: true });
+    handleFeatureMutations({
+      addedElements: [document.createElement('div')],
+      changedMessages: [],
+      mutations: []
+    });
+    await vi.runOnlyPendingTimersAsync();
+    expect(header.querySelector('.ytcq-games-button')).toBeNull();
+  });
+
+  it('refreshes after unrelated enabled option changes without changing availability', async () => {
+    const header = createHeader();
+    document.body.append(header);
+    setOptions({ ...DEFAULT_OPTIONS, playgroundEnabled: true, playgroundGamesAvailable: true });
+
+    handleFeatureOptionsChanged(
+      { ...DEFAULT_OPTIONS, playgroundEnabled: true, playgroundGamesAvailable: true },
+      { ...DEFAULT_OPTIONS, playgroundEnabled: true, playgroundGamesAvailable: true }
+    );
+    await vi.runOnlyPendingTimersAsync();
+
+    expect(header.querySelector('.ytcq-games-button')).not.toBeNull();
+    expect(lastMockPort()?.messages.at(-1)).toEqual({
+      availableGames: ['chess'],
+      streamKey: 'stream-a',
+      type: 'ytcq:playground:init'
+    });
+  });
+
+  it('responds to lifecycle option changes while the card is open', () => {
+    const header = createHeader();
+    document.body.append(header);
+    setOptions({ ...DEFAULT_OPTIONS, playgroundEnabled: true, playgroundGamesAvailable: true });
+    wireGamesButton();
+    header.querySelector<HTMLButtonElement>('.ytcq-games-button')!.click();
+    lastMockPort()?.emit(createSnapshotMessage(createLobbySnapshot()));
+
+    setOptions({ ...DEFAULT_OPTIONS, playgroundEnabled: true, playgroundGamesAvailable: false });
+    handleFeatureOptionsChanged(
+      { ...DEFAULT_OPTIONS, playgroundEnabled: true, playgroundGamesAvailable: true },
+      { ...DEFAULT_OPTIONS, playgroundEnabled: true, playgroundGamesAvailable: false }
+    );
+
+    expect(lastMockPort()?.messages.at(-1)).toEqual({
+      availableGames: [],
+      type: 'ytcq:playground:set-availability'
+    });
+    expect(document.querySelector('.ytcq-games-availability-toggle')?.getAttribute('aria-checked')).toBe('false');
+
+    setOptions({ ...DEFAULT_OPTIONS, playgroundEnabled: false, playgroundGamesAvailable: false });
+    handleFeatureOptionsChanged(
+      { ...DEFAULT_OPTIONS, playgroundEnabled: true, playgroundGamesAvailable: false },
+      { ...DEFAULT_OPTIONS, playgroundEnabled: false, playgroundGamesAvailable: false }
+    );
+
+    expect(document.querySelector('.ytcq-games-card')).toBeNull();
+    expect(document.querySelector('.ytcq-games-button')).toBeNull();
+  });
+
+  it('ignores invites and cancels pending player invites from the lobby UI', () => {
+    const header = createHeader();
+    document.body.append(header);
+    setOptions({ ...DEFAULT_OPTIONS, playgroundEnabled: true, playgroundGamesAvailable: true });
+    wireGamesButton();
+    header.querySelector<HTMLButtonElement>('.ytcq-games-button')!.click();
+    lastMockPort()?.emit(createSnapshotMessage(createLobbySnapshot()));
+
+    getActionButton('Ignore').click();
+    expect(lastMockPort()?.messages.at(-1)).toEqual({
+      accept: false,
+      inviteId: 'invite-1',
+      type: 'ytcq:playground:respond-invite'
+    });
+
+    getGameCards()[0].click();
+    getActionButton('Invite').click();
+    expect(document.querySelector('.ytcq-games-player-row')?.textContent).toContain('Waiting for reply...');
+    getActionButton('Cancel').click();
+
+    expect(document.querySelector('.ytcq-games-player-row')?.textContent).toContain('Available now');
+    expect(getActionButton('Invite')).not.toBeNull();
   });
 });
 
@@ -858,4 +1129,29 @@ function getPlayerNames(): string[] {
 function getGamesSectionTitles(): string[] {
   return Array.from(document.querySelectorAll<HTMLElement>('.ytcq-games-section:not([hidden]) .ytcq-games-section-title'))
     .map((title) => title.textContent || '');
+}
+
+function mockRect(
+  element: Element,
+  rect: {
+    height: number;
+    left: number;
+    top: number;
+    width: number;
+  }
+): void {
+  Object.defineProperty(element, 'getBoundingClientRect', {
+    configurable: true,
+    value: () => ({
+      bottom: rect.top + rect.height,
+      height: rect.height,
+      left: rect.left,
+      right: rect.left + rect.width,
+      toJSON: () => ({}),
+      top: rect.top,
+      width: rect.width,
+      x: rect.left,
+      y: rect.top
+    } as DOMRect)
+  });
 }

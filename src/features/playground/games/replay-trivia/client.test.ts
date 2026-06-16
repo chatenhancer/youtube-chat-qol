@@ -5,7 +5,12 @@ import {
 import { generateReplayTriviaQuestions, requestReplayTriviaQuestions } from './client';
 
 afterEach(() => {
+  vi.clearAllMocks();
   vi.unstubAllGlobals();
+  Object.defineProperty(chrome.runtime, 'lastError', {
+    configurable: true,
+    value: undefined
+  });
 });
 
 describe('Replay Trivia client', () => {
@@ -98,6 +103,26 @@ describe('Replay Trivia client', () => {
       .rejects.toThrow('Replay Trivia question generation is not configured.');
   });
 
+  it('rejects when the background bridge does not answer or reports lastError', async () => {
+    vi.mocked(chrome.runtime.sendMessage).mockImplementation(((_message: unknown, callback?: (response: unknown) => void) => {
+      callback?.(undefined);
+    }) as typeof chrome.runtime.sendMessage);
+
+    await expect(requestReplayTriviaQuestions('SHt3FyE-VIQ', createQuestionsRequest()))
+      .rejects.toThrow('Replay Trivia request failed.');
+
+    vi.mocked(chrome.runtime.sendMessage).mockImplementation(((_message: unknown, callback?: (response: unknown) => void) => {
+      Object.defineProperty(chrome.runtime, 'lastError', {
+        configurable: true,
+        value: { message: 'extension context invalidated' }
+      });
+      callback?.(undefined);
+    }) as typeof chrome.runtime.sendMessage);
+
+    await expect(requestReplayTriviaQuestions('SHt3FyE-VIQ', createQuestionsRequest()))
+      .rejects.toThrow('extension context invalidated');
+  });
+
   it('rejects an incomplete generated question pack before room submission', async () => {
     vi.mocked(chrome.runtime.sendMessage).mockImplementation(((_message: unknown, callback?: (response: unknown) => void) => {
       const response = createQuestionsResponse();
@@ -124,6 +149,52 @@ describe('Replay Trivia client', () => {
     })).rejects.toThrow('Replay Trivia generation authorization is required.');
 
     expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it('requires a normalized stream key before fetching transcript data', async () => {
+    const fetchMock = vi.fn();
+    vi.stubGlobal('fetch', fetchMock);
+
+    await expect(generateReplayTriviaQuestions({
+      gameId: 'game-replay-trivia',
+      generationToken: 'rtg_1234567890abcdef',
+      streamKey: 'bad stream!',
+      videoId: 'SHt3FyE-VIQ'
+    })).rejects.toThrow('A YouTube stream key is required for Replay Trivia.');
+
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ['non-object response', null],
+    ['invalid generatedAt', { ...createQuestionsResponse(), generatedAt: null }],
+    ['invalid languageCode', { ...createQuestionsResponse(), languageCode: 12 }],
+    ['invalid model', { ...createQuestionsResponse(), model: false }],
+    ['empty questions', { ...createQuestionsResponse(), questions: [] }],
+    ['missing transcript window', { ...createQuestionsResponse(), transcriptWindow: null }],
+    ['non-object question', { ...createQuestionsResponse(), questions: [null] }],
+    ['invalid choices', mutateFirstQuestion({ choices: ['A', 'B', 'C'] })],
+    ['blank choice', mutateFirstQuestion({ choices: ['A', 'B', ' ', 'D'] })],
+    ['invalid answer index', mutateFirstQuestion({ correctChoiceIndex: 9 })],
+    ['invalid difficulty', mutateFirstQuestion({ difficulty: 'hard' })],
+    ['blank explanation', mutateFirstQuestion({ explanation: '' })],
+    ['blank friend intro', mutateFirstQuestion({ friendIntro: ' ' })],
+    ['blank id', mutateFirstQuestion({ id: '' })],
+    ['blank prompt', mutateFirstQuestion({ prompt: '' })],
+    ['blank right reply', mutateFirstQuestion({ rightReply: '' })],
+    ['invalid source end', mutateFirstQuestion({ sourceEndSeconds: Number.POSITIVE_INFINITY })],
+    ['invalid source start', mutateFirstQuestion({ sourceStartSeconds: '1' })],
+    ['blank wrong reply', mutateFirstQuestion({ wrongReply: '' })]
+  ])('rejects malformed background question responses: %s', async (_name, response) => {
+    vi.mocked(chrome.runtime.sendMessage).mockImplementation(((_message: unknown, callback?: (response: unknown) => void) => {
+      callback?.({
+        ok: true,
+        response
+      });
+    }) as typeof chrome.runtime.sendMessage);
+
+    await expect(requestReplayTriviaQuestions('SHt3FyE-VIQ', createQuestionsRequest()))
+      .rejects.toThrow('Replay Trivia question generation returned an incomplete question pack.');
   });
 });
 
@@ -171,5 +242,18 @@ function createQuestionsResponse() {
       startSeconds: 0,
       videoId: 'SHt3FyE-VIQ'
     }
+  };
+}
+
+function mutateFirstQuestion(overrides: Record<string, unknown>) {
+  const response = createQuestionsResponse();
+  return {
+    ...response,
+    questions: [
+      {
+        ...response.questions[0],
+        ...overrides
+      }
+    ]
   };
 }

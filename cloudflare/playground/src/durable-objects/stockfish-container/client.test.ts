@@ -1,5 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { getStockfishBestMove, parseStockfishBestMove } from './client';
+import {
+  createStockfishBestMoveProvider,
+  getStockfishBestMove,
+  parseStockfishBestMove
+} from './client';
 
 describe('Stockfish container client', () => {
   beforeEach(() => {
@@ -7,6 +11,7 @@ describe('Stockfish container client', () => {
   });
 
   afterEach(() => {
+    vi.useRealTimers();
     vi.restoreAllMocks();
   });
 
@@ -15,6 +20,11 @@ describe('Stockfish container client', () => {
       from: 'e7',
       promotion: 'q',
       to: 'e8'
+    });
+    expect(parseStockfishBestMove('  bestmove b1c3  ')).toEqual({
+      from: 'b1',
+      promotion: undefined,
+      to: 'c3'
     });
     expect(parseStockfishBestMove('bestmove 0000')).toBeNull();
   });
@@ -137,6 +147,73 @@ describe('Stockfish container client', () => {
     });
   });
 
+  it('creates reusable best-move providers with normalized request settings', async () => {
+    const fetch = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+      const request = new Request(input, init);
+      await expect(request.json()).resolves.toMatchObject({
+        elo: 3190,
+        moveTimeMs: 10
+      });
+      return Response.json({
+        elapsedMs: -1,
+        elo: -20,
+        move: {
+          from: 'a7',
+          promotion: 'r',
+          to: 'a8'
+        },
+        moveTimeMs: 0
+      });
+    });
+    const provider = createStockfishBestMoveProvider({
+      STOCKFISH_ELO: ' ',
+      STOCKFISH_ENGINE: createNamespace(fetch),
+      STOCKFISH_MOVE_TIME_MS: 'bad'
+    }, {
+      elo: 9999,
+      moveTimeMs: -5
+    });
+
+    await expect(provider('promotion-fen')).resolves.toMatchObject({
+      elapsedMs: undefined,
+      elo: 3190,
+      move: {
+        from: 'a7',
+        promotion: 'r',
+        to: 'a8'
+      },
+      moveTimeMs: 10
+    });
+  });
+
+  it('falls back to default settings for non-integer inputs', async () => {
+    const fetch = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+      const request = new Request(input, init);
+      await expect(request.json()).resolves.toMatchObject({
+        elo: 1700,
+        moveTimeMs: 500
+      });
+      return Response.json({
+        move: {
+          from: 'b8',
+          to: 'c6'
+        }
+      });
+    });
+
+    await expect(getStockfishBestMove('startpos', {
+      STOCKFISH_ELO: '1700.5',
+      STOCKFISH_ENGINE: createNamespace(fetch),
+      STOCKFISH_MOVE_TIME_MS: undefined
+    }, {
+      elo: Number.NaN,
+      moveTimeMs: 12.5
+    })).resolves.toMatchObject({
+      elo: 1700,
+      moveTimeMs: 500
+    });
+  });
+
   it('throws when the Stockfish container binding is missing', async () => {
     await expect(getStockfishBestMove('8/8/8/8/8/8/8/8 w - - 0 1')).rejects.toThrow(
       'Stockfish container binding is not configured.'
@@ -156,6 +233,71 @@ describe('Stockfish container client', () => {
     await expect(getStockfishBestMove('8/8/8/8/8/8/8/8 w - - 0 1', env)).rejects.toThrow(
       'Stockfish container move from must be a chess square.'
     );
+  });
+
+  it('throws for malformed Stockfish container responses', async () => {
+    await expect(getStockfishBestMove('fen', {
+      STOCKFISH_ENGINE: createNamespace(async () => new Response('not-json', { status: 200 }))
+    })).rejects.toThrow('Stockfish container returned invalid JSON with status 200.');
+
+    await expect(getStockfishBestMove('fen', {
+      STOCKFISH_ENGINE: createNamespace(async () => Response.json(['not', 'an', 'object']))
+    })).rejects.toThrow('Stockfish container response must be an object.');
+
+    await expect(getStockfishBestMove('fen', {
+      STOCKFISH_ENGINE: createNamespace(async () => Response.json({
+        move: {
+          from: 'e2',
+          promotion: 'x',
+          to: 'e4'
+        }
+      }))
+    })).rejects.toThrow('Stockfish container promotion must be b, n, q, or r.');
+
+    await expect(getStockfishBestMove('fen', {
+      STOCKFISH_ENGINE: createNamespace(async () => Response.json({
+        move: {
+          from: 'e2',
+          to: 12
+        }
+      }))
+    })).rejects.toThrow('Stockfish container move to must be a chess square.');
+  });
+
+  it('surfaces Stockfish container error payloads', async () => {
+    await expect(getStockfishBestMove('fen', {
+      STOCKFISH_ENGINE: createNamespace(async () => Response.json({
+        message: 'engine overloaded'
+      }, { status: 503 }))
+    })).rejects.toThrow('Stockfish container failed with status 503: engine overloaded');
+
+    await expect(getStockfishBestMove('fen', {
+      STOCKFISH_ENGINE: createNamespace(async () => Response.json({
+        error: 'bad fen'
+      }, { status: 400 }))
+    })).rejects.toThrow('Stockfish container failed with status 400: bad fen');
+
+    await expect(getStockfishBestMove('fen', {
+      STOCKFISH_ENGINE: createNamespace(async () => Response.json({}, { status: 500 }))
+    })).rejects.toThrow('Stockfish container failed with status 500: unknown error');
+  });
+
+  it('normalizes non-Error container fetch failures', async () => {
+    await expect(getStockfishBestMove('fen', {
+      STOCKFISH_ENGINE: createNamespace(() => Promise.reject('network down'))
+    })).rejects.toThrow('Stockfish container failed.');
+  });
+
+  it('times out when the Stockfish container does not respond', async () => {
+    vi.useFakeTimers();
+    const promise = getStockfishBestMove('fen', {
+      STOCKFISH_ENGINE: createNamespace(() => new Promise<Response>(() => undefined))
+    });
+    const expectation = expect(promise).rejects.toThrow('Timed out waiting for Stockfish container.');
+
+    await vi.advanceTimersByTimeAsync(20_000);
+
+    await expectation;
   });
 });
 

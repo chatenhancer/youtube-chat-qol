@@ -40,6 +40,132 @@ describe('Replay Trivia OpenAI adapter', () => {
     await expect(generateReplayTriviaQuestions(createEnv(), createRequest()))
       .rejects.toThrow('Replay Trivia question generation returned a wrong reply without the correct answer.');
   });
+
+  it('uses nested output text and request defaults when optional request fields are omitted', async () => {
+    let openAIRequest: Record<string, unknown> | undefined;
+    vi.stubGlobal('fetch', vi.fn(async (_input: RequestInfo | URL, init?: RequestInit) => {
+      openAIRequest = JSON.parse(String(init?.body)) as Record<string, unknown>;
+      return createNestedOpenAIResponse({
+        questions: [createGeneratedQuestion({
+          choices: ['  Roger Clark  ', 'Christopher Judge', 'Nolan North', 'Troy Baker'],
+          difficulty: 'medium'
+        })]
+      });
+    }));
+
+    const response = await generateReplayTriviaQuestions({
+      ...createEnv(),
+      OPENAI_MODEL: 'gpt-test'
+    }, {
+      ...createRequest(),
+      languageCode: '',
+      locale: '',
+      questionCount: undefined
+    });
+
+    expect(getUserPayload(openAIRequest)).toEqual(expect.objectContaining({
+      languageCode: 'en',
+      locale: 'en',
+      questionCount: 10,
+      transcript: '[0:10] Roger Clark won best performance for Red Dead Redemption 2.'
+    }));
+    expect(response.languageCode).toBe('en');
+    expect(response.model).toBe('gpt-test');
+    expect(response.questions[0]).toEqual(expect.objectContaining({
+      choices: ['Roger Clark', 'Christopher Judge', 'Nolan North', 'Troy Baker'],
+      difficulty: 'medium',
+      id: 'q_1'
+    }));
+  });
+
+  it('formats transcript timestamps with hours in OpenAI requests', async () => {
+    let openAIRequest: Record<string, unknown> | undefined;
+    vi.stubGlobal('fetch', vi.fn(async (_input: RequestInfo | URL, init?: RequestInit) => {
+      openAIRequest = JSON.parse(String(init?.body)) as Record<string, unknown>;
+      return createOpenAIOutputResponse({
+        questions: [createGeneratedQuestion()]
+      });
+    }));
+
+    await generateReplayTriviaQuestions(createEnv(), {
+      ...createRequest(),
+      endSeconds: 3_721,
+      segments: [
+        {
+          durationSeconds: 4,
+          startSeconds: 3_661.9,
+          text: 'A late stream segment mentions Roger Clark.'
+        },
+        {
+          durationSeconds: 2,
+          startSeconds: -2,
+          text: 'A clipped segment starts before zero.'
+        }
+      ],
+      startSeconds: 3_600
+    });
+
+    expect(getUserPayload(openAIRequest)?.transcript).toBe([
+      '[1:01:01] A late stream segment mentions Roger Clark.',
+      '[0:00] A clipped segment starts before zero.'
+    ].join('\n'));
+  });
+
+  it('rejects OpenAI requests when the backend is not configured or unreachable', async () => {
+    await expect(generateReplayTriviaQuestions({
+      ...createEnv(),
+      OPENAI_API_KEY: ''
+    }, createRequest())).rejects.toThrow('Replay Trivia question generation is not configured.');
+
+    vi.stubGlobal('fetch', vi.fn(async () => {
+      throw new Error('network down');
+    }));
+
+    await expect(generateReplayTriviaQuestions(createEnv(), createRequest()))
+      .rejects.toThrow('Replay Trivia could not reach OpenAI from the Playground backend.');
+  });
+
+  it('surfaces OpenAI error responses with provider or fallback messages', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => Response.json({
+      error: { message: 'model overloaded' }
+    }, { status: 429 })));
+
+    await expect(generateReplayTriviaQuestions(createEnv(), createRequest()))
+      .rejects.toThrow('model overloaded');
+
+    vi.stubGlobal('fetch', vi.fn(async () => new Response('not-json', { status: 500 })));
+
+    await expect(generateReplayTriviaQuestions(createEnv(), createRequest()))
+      .rejects.toThrow('Replay Trivia question generation failed.');
+  });
+
+  it('rejects empty or invalid OpenAI output text', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => Response.json({ output: [{ content: [{ type: 'refusal', text: '' }] }] })));
+    await expect(generateReplayTriviaQuestions(createEnv(), createRequest()))
+      .rejects.toThrow('Replay Trivia question generation returned no output.');
+
+    vi.stubGlobal('fetch', vi.fn(async () => Response.json({ output_text: '{not-json' })));
+    await expect(generateReplayTriviaQuestions(createEnv(), createRequest()))
+      .rejects.toThrow('Replay Trivia question generation returned invalid JSON.');
+  });
+
+  it.each([
+    ['missing questions array', {}, 'Replay Trivia question generation returned malformed output.'],
+    ['empty question list', { questions: [] }, 'Replay Trivia question generation returned no questions.'],
+    ['non-object question', { questions: [null] }, 'Replay Trivia question generation returned an invalid question.'],
+    ['invalid answer index', { questions: [createGeneratedQuestion({ correctChoiceIndex: 4 })] }, 'Replay Trivia question generation returned an invalid answer.'],
+    ['invalid difficulty', { questions: [createGeneratedQuestion({ difficulty: 'hard' })] }, 'Replay Trivia question generation returned invalid difficulty.'],
+    ['invalid choices', { questions: [createGeneratedQuestion({ choices: ['Roger Clark', 'Christopher Judge', 'Nolan North'] })] }, 'Replay Trivia question generation returned invalid choices.'],
+    ['empty choice after trim', { questions: [createGeneratedQuestion({ choices: ['Roger Clark', ' ', 'Nolan North', 'Troy Baker'] })] }, 'Replay Trivia question generation returned invalid choices.'],
+    ['missing prompt', { questions: [createGeneratedQuestion({ prompt: ' ' })] }, 'Replay Trivia question generation omitted prompt.'],
+    ['missing explanation', { questions: [createGeneratedQuestion({ explanation: undefined })] }, 'Replay Trivia question generation omitted explanation.'],
+    ['missing source start', { questions: [createGeneratedQuestion({ sourceStartSeconds: Number.NaN })] }, 'Replay Trivia question generation omitted sourceStartSeconds.'],
+    ['missing source end', { questions: [createGeneratedQuestion({ sourceEndSeconds: '13' })] }, 'Replay Trivia question generation omitted sourceEndSeconds.']
+  ])('rejects malformed generated question payloads: %s', async (_name, payload, message) => {
+    vi.stubGlobal('fetch', vi.fn(async () => createOpenAIOutputResponse(payload)));
+
+    await expect(generateReplayTriviaQuestions(createEnv(), createRequest())).rejects.toThrow(message);
+  });
 });
 
 function createRequest() {
@@ -66,28 +192,57 @@ function createOpenAIResponse(overrides: {
   prompt: string;
   wrongReply?: string;
 }): Response {
+  const questionOverrides: Record<string, unknown> = {
+    friendIntro: overrides.friendIntro,
+    prompt: overrides.prompt
+  };
+  if (overrides.choices) questionOverrides.choices = overrides.choices;
+  if (overrides.wrongReply !== undefined) questionOverrides.wrongReply = overrides.wrongReply;
+
+  return createOpenAIOutputResponse({
+    questions: [
+      createGeneratedQuestion(questionOverrides)
+    ]
+  });
+}
+
+function createOpenAIOutputResponse(output: unknown): Response {
   return new Response(JSON.stringify({
-    output_text: JSON.stringify({
-      questions: [
-        {
-          choices: overrides.choices || ['Roger Clark', 'Christopher Judge', 'Nolan North', 'Troy Baker'],
-          correctChoiceIndex: 0,
-          difficulty: 'easy',
-          explanation: 'The transcript says Roger Clark won best performance.',
-          friendIntro: overrides.friendIntro,
-          prompt: overrides.prompt,
-          rightReply: 'thank you, Arthur would tip his hat to that one.',
-          sourceEndSeconds: 13,
-          sourceStartSeconds: 10,
-          wrongReply: overrides.wrongReply || 'you missed it. it was Roger Clark.'
-        }
-      ]
-    })
+    output_text: JSON.stringify(output)
   }), {
     headers: {
       'Content-Type': 'application/json'
     }
   });
+}
+
+function createNestedOpenAIResponse(output: unknown): Response {
+  return Response.json({
+    output: [
+      {
+        content: [
+          { text: 'ignored text', type: 'input_text' },
+          { text: JSON.stringify(output), type: 'output_text' }
+        ]
+      }
+    ]
+  });
+}
+
+function createGeneratedQuestion(overrides: Record<string, unknown> = {}): Record<string, unknown> {
+  return {
+    choices: ['Roger Clark', 'Christopher Judge', 'Nolan North', 'Troy Baker'],
+    correctChoiceIndex: 0,
+    difficulty: 'easy',
+    explanation: 'The transcript says Roger Clark won best performance.',
+    friendIntro: 'actor check, chat',
+    prompt: 'who won best performance for playing Arthur Morgan?',
+    rightReply: 'thank you, Arthur would tip his hat to that one.',
+    sourceEndSeconds: 13,
+    sourceStartSeconds: 10,
+    wrongReply: 'you missed it. it was Roger Clark.',
+    ...overrides
+  };
 }
 
 function createEnv(): Env {
@@ -111,4 +266,14 @@ function getSystemPrompt(request: Record<string, unknown> | undefined): string {
 
   const firstMessage = input[0] as { content?: unknown } | undefined;
   return typeof firstMessage?.content === 'string' ? firstMessage.content : '';
+}
+
+function getUserPayload(request: Record<string, unknown> | undefined): Record<string, unknown> | null {
+  const input = request?.input;
+  if (!Array.isArray(input)) return null;
+
+  const secondMessage = input[1] as { content?: unknown } | undefined;
+  return typeof secondMessage?.content === 'string'
+    ? JSON.parse(secondMessage.content) as Record<string, unknown>
+    : null;
 }
