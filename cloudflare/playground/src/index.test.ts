@@ -240,6 +240,11 @@ describe('playground worker routes', () => {
     expect(response.status).toBe(200);
     expect(response.headers.get('Content-Type')).toBe('text/html; charset=utf-8');
     const html = await response.text();
+    expect(html).toContain('aria-label="Chat Enhancer for YouTube"');
+    expect(html).toContain('<span>Chat Enhancer</span>');
+    expect(html).toContain('Verify before generating');
+    expect(html).toContain('One quick security check before Replay Trivia creates questions.');
+    expect(html).toContain('This window closes automatically when verification finishes.');
     expect(html).toContain('id="turnstile-widget"');
     expect(html).not.toContain('id="turnstile"');
     expect(html).toContain('const turnstileApi = window.turnstile;');
