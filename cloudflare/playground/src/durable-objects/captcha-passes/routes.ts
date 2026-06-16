@@ -254,10 +254,26 @@ function createTurnstilePage(config: Record<string, string>): string {
     }
     main {
       display: grid;
-      gap: 16px;
+      gap: 14px;
       justify-items: center;
       padding: 24px;
       text-align: center;
+    }
+    .brand {
+      align-items: center;
+      display: grid;
+      gap: 8px;
+      justify-items: center;
+    }
+    .brand svg {
+      display: block;
+      height: 50px;
+      width: 60px;
+    }
+    .brand span {
+      font-size: 13px;
+      font-weight: 650;
+      letter-spacing: 0;
     }
     h1 {
       font-size: 20px;
@@ -279,8 +295,34 @@ function createTurnstilePage(config: Record<string, string>): string {
 </head>
 <body>
   <main>
-    <h1>Verify Replay Trivia</h1>
-    <p id="status">Complete the check to generate questions.</p>
+    <div class="brand" aria-label="Chat Enhancer for YouTube">
+      <svg width="60" height="50" viewBox="0 0 60 50" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+        <path d="M0 24.6622C0 4.35287 4.35287 0 24.6622 0H34.527C54.8363 0 59.1892 4.35287 59.1892 24.6622C59.1892 44.9715 54.8363 49.3243 34.527 49.3243H24.6622C4.35287 49.3243 0 44.9715 0 24.6622Z" fill="url(#paint0_linear_39_813)"/>
+        <g filter="url(#filter0_d_39_813)">
+          <path d="M40.2454 18.4114C42.1615 18.733 43.9292 19.6468 45.2991 21.0247C48.0348 24.1959 48.0348 32.2988 45.2991 35.47C44.8198 35.9902 44.2611 36.4312 43.6438 36.7766L43.3469 38.6233C43.2679 39.086 43.0748 39.5221 42.7844 39.8909C42.4941 40.2596 42.116 40.5503 41.6848 40.7356C41.2537 40.9208 40.7829 40.9945 40.3157 40.9514C39.8484 40.9083 39.399 40.7495 39.009 40.4885L36.0989 38.554C36.0327 38.5074 35.9532 38.4834 35.8723 38.4846C31.795 38.4671 28.3794 37.3344 26.759 35.47C26.5223 35.1881 26.3125 34.8846 26.1321 34.5637C31.272 34.4593 35.4537 32.9781 37.5969 30.4866C39.9145 27.8033 40.803 22.8197 40.2454 18.4114ZM25.5745 9.20728C30.3934 9.20728 34.3971 10.5092 36.2825 12.6907C39.444 16.3474 39.444 25.6864 36.2825 29.344C34.4294 31.4871 30.4922 32.785 25.7483 32.8157C25.5914 32.8135 25.437 32.8564 25.304 32.9397L21.8684 35.2297C21.4515 35.5083 20.9713 35.6778 20.4719 35.7229C19.9727 35.768 19.47 35.6878 19.01 35.4885C18.5501 35.2893 18.1477 34.9773 17.8391 34.5823C17.5305 34.1871 17.3254 33.7205 17.2434 33.2258L16.8586 30.9133C16.1097 30.5098 15.4366 29.9792 14.8684 29.3459C11.7051 25.6867 11.7049 16.3473 14.8665 12.6897C16.7518 10.5091 20.7556 9.20728 25.5745 9.20728ZM23.5793 17.595C23.0941 17.3548 22.5247 17.7078 22.5247 18.2493V24.9514C22.5247 25.4929 23.0941 25.8459 23.5793 25.6057L30.3508 22.2551C30.8924 21.987 30.8924 21.2137 30.3508 20.9456L23.5793 17.595Z" fill="white"/>
+        </g>
+        <defs>
+          <filter id="filter0_d_39_813" x="10.0917" y="8.00534" width="39.6632" height="36.5638" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+            <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+            <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+            <feOffset dy="1.20194"/>
+            <feGaussianBlur stdDeviation="1.20194"/>
+            <feComposite in2="hardAlpha" operator="out"/>
+            <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.1 0"/>
+            <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_39_813"/>
+            <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_39_813" result="shape"/>
+          </filter>
+          <linearGradient id="paint0_linear_39_813" x1="39.3179" y1="50.6269" x2="30.7317" y2="0.271356" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#FD0032"/>
+            <stop offset="1" stop-color="#FE0031"/>
+          </linearGradient>
+        </defs>
+      </svg>
+      <span>Chat Enhancer</span>
+    </div>
+    <h1>Verify before generating</h1>
+    <p id="status">One quick security check before Replay Trivia creates questions.</p>
+    <p>This window closes automatically when verification finishes.</p>
     <div id="turnstile-widget"></div>
   </main>
   <script>
