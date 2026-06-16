@@ -240,9 +240,6 @@
     "supportAndFeedback": {
       "message": "Supporto e feedback"
     },
-    "supportIssueTrackerPrompt": {
-      "message": "Verrai reindirizzato al nostro tracker pubblico dei problemi per segnalazioni di bug e richieste di funzionalità. Potrebbe essere necessario un account.\n\nPuoi anche scriverci a {supportEmail}.\n\nContinuare al tracker dei problemi?"
-    },
     "resetAllExtensionData": {
       "message": "Reimposta tutte le impostazioni e i dati locali dell'estensione"
     },

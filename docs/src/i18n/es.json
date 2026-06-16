@@ -113,13 +113,6 @@
     "firefoxAddons": "Firefox Add-ons",
     "sourceCode": "Código fuente",
     "supportFeedback": "Soporte",
-    "supportModalTitle": "Acerca de GitHub Issues",
-    "supportModalBody": "GitHub Issues es el sistema público que usamos para informes de errores y solicitudes de funciones.",
-    "supportModalDetailOne": "Publicar o comentar en GitHub puede requerir una cuenta de GitHub.",
-    "supportModalDetailTwo": "Haz clic en el botón New issue de GitHub para iniciar un informe o solicitud.",
-    "supportModalDetailThree": "Los formularios de issues pedirán los detalles necesarios según el tipo de informe.",
-    "supportModalCancel": "Cancelar",
-    "supportModalContinue": "Continuar a GitHub Issues",
     "privateQuestions": "También puedes escribirnos a",
     "gettingStartedTitle": "Primeros pasos",
     "gettingStartedBody": "Instala, refresca YouTube una vez si ya estaba abierto y usa la extensión donde ya está el chat en vivo.",
@@ -135,8 +128,7 @@
     "stepRefreshBodyAfterIcon": "aparezca en el chat de YouTube.",
     "stepSettingsBodyBeforeIcon": "La extensión funciona automáticamente en el chat en vivo. Para la configuración completa, haz clic en el icono de extensiones de la barra del navegador",
     "stepSettingsBodyMiddle": "y elige",
-    "stepSettingsBodyAfterIcon": "Chat Enhancer para ver todas las opciones. Fíjala si quieres acceso más rápido.",
-    "supportModalDetailFour": "También puedes escribirnos a <a data-contact-email-address></a>."
+    "stepSettingsBodyAfterIcon": "Chat Enhancer para ver todas las opciones. Fíjala si quieres acceso más rápido."
   },
   "privacy": {
     "eyebrow": "Privacidad",

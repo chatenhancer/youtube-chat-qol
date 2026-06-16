@@ -113,13 +113,6 @@
     "firefoxAddons": "Firefox Add-ons",
     "sourceCode": "کد منبع",
     "supportFeedback": "پشتیبانی",
-    "supportModalTitle": "درباره GitHub Issues",
-    "supportModalBody": "GitHub Issues رهگیر عمومی‌ای است که برای گزارش باگ و درخواست قابلیت‌ها استفاده می‌کنیم.",
-    "supportModalDetailOne": "ارسال یا نظر دادن در GitHub ممکن است به حساب GitHub نیاز داشته باشد.",
-    "supportModalDetailTwo": "برای شروع گزارش یا درخواست، روی دکمه New issue در GitHub کلیک کنید.",
-    "supportModalDetailThree": "فرم‌های issue جزئیات لازم برای هر نوع گزارش را درخواست می‌کنند.",
-    "supportModalCancel": "لغو",
-    "supportModalContinue": "ادامه به GitHub Issues",
     "privateQuestions": "همچنین می‌توانید به ما ایمیل بزنید به",
     "gettingStartedTitle": "شروع کار",
     "gettingStartedBody": "نصب کنید، اگر YouTube از قبل باز بود یک بار تازه‌سازی کنید، سپس افزونه را همان‌جا که چت زنده قرار دارد استفاده کنید.",
@@ -135,8 +128,7 @@
     "stepRefreshBodyAfterIcon": "در چت YouTube ظاهر شد، یعنی بهبودهای چت آماده استفاده هستند.",
     "stepSettingsBodyBeforeIcon": "افزونه به‌طور خودکار در چت زنده کار می‌کند. برای تنظیمات کامل، روی آیکون افزونه‌ها در نوار ابزار مرورگر کلیک کنید",
     "stepSettingsBodyMiddle": "و انتخاب کنید",
-    "stepSettingsBodyAfterIcon": "Chat Enhancer تا همه گزینه‌ها نمایش داده شوند. برای دسترسی سریع‌تر آن را سنجاق کنید.",
-    "supportModalDetailFour": "همچنین می‌توانید به <a data-contact-email-address></a> ایمیل بزنید."
+    "stepSettingsBodyAfterIcon": "Chat Enhancer تا همه گزینه‌ها نمایش داده شوند. برای دسترسی سریع‌تر آن را سنجاق کنید."
   },
   "privacy": {
     "eyebrow": "حریم خصوصی",

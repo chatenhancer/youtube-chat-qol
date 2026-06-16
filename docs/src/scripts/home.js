@@ -4,9 +4,6 @@
   const chromeButton = document.querySelector('[data-browser-install="chrome"]');
   const firefoxButton = document.querySelector('[data-browser-install="firefox"]');
   const languageSwitcher = document.querySelector("[data-language-switcher]");
-  const supportModal = document.querySelector("[data-support-modal]");
-  const supportModalClose = document.querySelector("[data-support-modal-close]");
-  const supportModalContinue = document.querySelector("[data-support-modal-continue]");
   const walkthroughCtas = document.querySelectorAll("[data-walkthrough-cta]");
   const walkthroughOpenButtons = document.querySelectorAll("[data-walkthrough-open]");
   const walkthroughModal = document.querySelector("[data-walkthrough-modal]");
@@ -66,32 +63,6 @@
       options.find((value) => value !== "/" && path.startsWith(value)) ||
       "/";
   }
-
-  document.querySelectorAll("[data-support-modal-trigger]").forEach((trigger) => {
-    trigger.addEventListener("click", (event) => {
-      if (event instanceof MouseEvent && (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0)) return;
-      event.preventDefault();
-      const href = trigger.getAttribute("href") || "";
-
-      if (supportModal && typeof supportModal.showModal === "function" && supportModalContinue) {
-        supportModalContinue.setAttribute("href", href);
-        supportModal.showModal();
-        return;
-      }
-
-      if (window.confirm(getSupportModalPlainText())) {
-        window.location.href = href;
-      }
-    });
-  });
-
-  supportModalClose?.addEventListener("click", () => {
-    closeSupportModal();
-  });
-
-  supportModal?.addEventListener("click", (event) => {
-    if (event.target === supportModal) closeSupportModal();
-  });
 
   walkthroughClose?.addEventListener("click", () => {
     closeWalkthroughModal();
@@ -519,20 +490,6 @@
   function formatStoreList(stores, conjunction) {
     if (stores.length <= 2) return stores.join(` ${conjunction} `);
     return `${stores.slice(0, -1).join(", ")} ${conjunction} ${stores.at(-1)}`;
-  }
-
-  function getSupportModalPlainText() {
-    const title = document.querySelector("#support-modal-title")?.textContent?.trim();
-    const body = supportModal?.querySelector("p")?.textContent?.trim();
-    const details = Array.from(supportModal?.querySelectorAll("li") || [])
-      .map((item) => item.textContent?.trim())
-      .filter(Boolean)
-      .map((item) => `- ${item}`);
-    return [title, body, details.join("\n")].filter(Boolean).join("\n\n");
-  }
-
-  function closeSupportModal() {
-    if (supportModal && typeof supportModal.close === "function") supportModal.close();
   }
 
   function setupWalkthroughVideoModal() {

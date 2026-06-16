@@ -240,9 +240,6 @@
     "supportAndFeedback": {
       "message": "Suporte e feedback"
     },
-    "supportIssueTrackerPrompt": {
-      "message": "Você será redirecionado para nosso rastreador público de problemas para relatórios de bugs e pedidos de recursos. Uma conta pode ser necessária.\n\nVocê também pode enviar email para {supportEmail}.\n\nContinuar para o rastreador de problemas?"
-    },
     "resetAllExtensionData": {
       "message": "Redefinir todas as configurações e dados locais da extensão"
     },

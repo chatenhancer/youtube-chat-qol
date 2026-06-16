@@ -113,13 +113,6 @@
     "firefoxAddons": "Firefox Add-ons",
     "sourceCode": "الكود المصدري",
     "supportFeedback": "الدعم",
-    "supportModalTitle": "حول GitHub Issues",
-    "supportModalBody": "GitHub Issues هو المتتبّع العام الذي نستخدمه لبلاغات الأخطاء وطلبات الميزات.",
-    "supportModalDetailOne": "نشر مشكلة أو تعليق على GitHub قد يتطلب حساب GitHub.",
-    "supportModalDetailTwo": "انقر زر New issue في GitHub لبدء بلاغ أو طلب.",
-    "supportModalDetailThree": "ستعرض نماذج المشكلات الحقول المناسبة حسب نوع البلاغ.",
-    "supportModalCancel": "إلغاء",
-    "supportModalContinue": "المتابعة إلى GitHub Issues",
     "privateQuestions": "يمكنك أيضًا مراسلتنا على",
     "gettingStartedTitle": "البدء",
     "gettingStartedBody": "ثبت الإضافة، وحدث YouTube مرة واحدة إذا كان مفتوحا بالفعل، ثم استخدم الإضافة حيث توجد الدردشة المباشرة.",
@@ -135,8 +128,7 @@
     "stepRefreshBodyAfterIcon": "في دردشة YouTube.",
     "stepSettingsBodyBeforeIcon": "تعمل الإضافة تلقائيًا في الدردشة المباشرة. للوصول إلى الإعدادات الكاملة، انقر رمز الإضافات في شريط أدوات المتصفح",
     "stepSettingsBodyMiddle": "واختر",
-    "stepSettingsBodyAfterIcon": "Chat Enhancer لعرض كل الخيارات. يمكنك تثبيتها للوصول إليها بسرعة أكبر.",
-    "supportModalDetailFour": "يمكنك أيضًا مراسلتنا على <a data-contact-email-address></a>."
+    "stepSettingsBodyAfterIcon": "Chat Enhancer لعرض كل الخيارات. يمكنك تثبيتها للوصول إليها بسرعة أكبر."
   },
   "privacy": {
     "eyebrow": "الخصوصية",
