@@ -10,9 +10,15 @@ const { messages: m, rootPrefix } = Astro.props as {
 
 <section class="hero" aria-labelledby="hero-title">
   <div class="hero-content">
-    <p class="eyebrow">{m.hero.eyebrow}</p>
     <h1 id="hero-title">{m.hero.title}</h1>
     <p class="hero-copy">{m.hero.copy}</p>
+    <p class="hero-platform">
+      <span class="hero-platform-icons" aria-hidden="true">
+        <img class="hero-browser-icon hero-browser-icon-chrome" src={`${rootPrefix}assets/browser-icons/chrome.svg`} alt="">
+        <img class="hero-browser-icon hero-browser-icon-firefox" src={`${rootPrefix}assets/browser-icons/firefox.svg`} alt="">
+      </span>
+      <span class="hero-platform-label">{m.hero.eyebrow}</span>
+    </p>
     <div class="hero-actions">
       <a class="button button-primary" href="#install">
         <span class="button-icon" data-symbol="install_desktop" aria-hidden="true">
