@@ -1,5 +1,9 @@
 export const REPLAY_TRIVIA_QUESTIONS_ROUTE = 'replay-trivia/questions';
 export const REPLAY_TRIVIA_QUESTIONS_BACKGROUND_MESSAGE = 'ytcq:playground:replay-trivia-questions';
+export const REPLAY_TRIVIA_CAPTCHA_ROUTE = '/v1/captcha/replay-trivia';
+export const REPLAY_TRIVIA_CAPTCHA_PAGE_ROUTE = '/turnstile/replay-trivia';
+export const REPLAY_TRIVIA_CAPTCHA_POST_MESSAGE_SOURCE = 'chat-enhancer-playground';
+export const REPLAY_TRIVIA_CAPTCHA_POST_MESSAGE_TYPE = 'replayTriviaCaptchaPass';
 
 export interface ReplayTriviaTranscriptSegment {
   durationSeconds?: number;
@@ -14,6 +18,7 @@ export interface ReplayTriviaGenerationToken {
 }
 
 export interface ReplayTriviaQuestionsRequest {
+  captchaPass: string;
   endSeconds: number;
   gameId: string;
   generationToken: string;

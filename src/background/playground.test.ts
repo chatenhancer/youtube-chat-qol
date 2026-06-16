@@ -666,6 +666,7 @@ describe('background playground bridge', () => {
     await import('./playground');
 
     const request = {
+      captchaPass: 'cap_1234567890abcdef',
       endSeconds: 10,
       gameId: 'game-replay-trivia',
       generationToken: 'rtg_1234567890abcdef',
@@ -719,6 +720,7 @@ describe('background playground bridge', () => {
     const sendResponse = vi.fn();
     getMessageListener()({
       request: {
+        captchaPass: 'cap_1234567890abcdef',
         endSeconds: 10,
         gameId: 'game-replay-trivia',
         generationToken: 'rtg_1234567890abcdef',

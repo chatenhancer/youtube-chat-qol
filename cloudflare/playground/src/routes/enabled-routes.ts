@@ -5,6 +5,7 @@
  * the worker. The route module itself should live with the feature that owns
  * the behavior, such as `games/replay-trivia/routes.ts`.
  */
+import { captchaPassesRouteModule } from '../durable-objects/captcha-passes/routes';
 import { streamRoomRouteModule } from '../durable-objects/stream-room/routes';
 import { playerStatsRouteModule } from '../durable-objects/player-stats/routes';
 import { replayTriviaRouteModule } from '../games/replay-trivia/routes';
@@ -13,6 +14,7 @@ import type { RouteModule } from './types';
 
 export const ENABLED_ROUTE_MODULES: readonly RouteModule[] = [
   healthRouteModule,
+  captchaPassesRouteModule,
   playerStatsRouteModule,
   streamRoomRouteModule,
   replayTriviaRouteModule

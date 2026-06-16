@@ -1,10 +1,18 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
+  REPLAY_TRIVIA_CAPTCHA_POST_MESSAGE_SOURCE,
+  REPLAY_TRIVIA_CAPTCHA_POST_MESSAGE_TYPE,
   REPLAY_TRIVIA_QUESTIONS_BACKGROUND_MESSAGE
 } from '../../../../shared/playground-trivia';
-import { generateReplayTriviaQuestions, requestReplayTriviaQuestions } from './client';
+import { PLAYGROUND_BACKEND_ORIGIN } from '../../../../shared/playground-protocol';
+import {
+  generateReplayTriviaQuestions,
+  requestReplayTriviaCaptchaPass,
+  requestReplayTriviaQuestions
+} from './client';
 
 afterEach(() => {
+  vi.restoreAllMocks();
   vi.clearAllMocks();
   vi.unstubAllGlobals();
   Object.defineProperty(chrome.runtime, 'lastError', {
@@ -16,7 +24,7 @@ afterEach(() => {
 describe('Replay Trivia client', () => {
   it('requests question generation through the extension background bridge by default', async () => {
     const request = createQuestionsRequest();
-    vi.mocked(chrome.runtime.sendMessage).mockImplementation(((message: unknown, callback?: (response: unknown) => void) => {
+    vi.mocked(chrome.runtime.sendMessage).mockImplementation(((_message: unknown, callback?: (response: unknown) => void) => {
       callback?.({
         ok: true,
         response: createQuestionsResponse()
@@ -63,7 +71,8 @@ describe('Replay Trivia client', () => {
       throw new Error(`Unexpected direct fetch: ${url}`);
     });
     vi.stubGlobal('fetch', fetchMock);
-    vi.mocked(chrome.runtime.sendMessage).mockImplementation(((message: unknown, callback?: (response: unknown) => void) => {
+    const popup = mockCaptchaPopup();
+    vi.mocked(chrome.runtime.sendMessage).mockImplementation(((_message: unknown, callback?: (response: unknown) => void) => {
       callback?.({
         ok: true,
         response: createQuestionsResponse()
@@ -77,9 +86,11 @@ describe('Replay Trivia client', () => {
       questionCount: 10,
       startSeconds: 0,
       streamKey: 'SHt3FyE-VIQ',
+      userId: 'user-123',
       videoId: 'SHt3FyE-VIQ'
     })).resolves.toEqual(createQuestionsResponse());
 
+    expect(popup.close).toHaveBeenCalled();
     expect(fetchMock).toHaveBeenCalledTimes(2);
     expect(chrome.runtime.sendMessage).toHaveBeenCalledWith({
       request: {
@@ -159,10 +170,21 @@ describe('Replay Trivia client', () => {
       gameId: 'game-replay-trivia',
       generationToken: 'rtg_1234567890abcdef',
       streamKey: 'bad stream!',
+      userId: 'user-123',
       videoId: 'SHt3FyE-VIQ'
     })).rejects.toThrow('A YouTube stream key is required for Replay Trivia.');
 
     expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it('reports a blocked Replay Trivia verification window', async () => {
+    vi.spyOn(window, 'open').mockReturnValue(null);
+
+    await expect(requestReplayTriviaCaptchaPass({
+      gameId: 'game-replay-trivia',
+      streamKey: 'SHt3FyE-VIQ',
+      userId: 'user-123'
+    })).rejects.toThrow('Verification window was blocked. Allow popups for this stream and try again.');
   });
 
   it.each([
@@ -200,6 +222,7 @@ describe('Replay Trivia client', () => {
 
 function createQuestionsRequest() {
   return {
+    captchaPass: 'cap_1234567890abcdef',
     endSeconds: 10,
     gameId: 'game-replay-trivia',
     generationToken: 'rtg_1234567890abcdef',
@@ -214,6 +237,31 @@ function createQuestionsRequest() {
     startSeconds: 0,
     videoId: 'SHt3FyE-VIQ'
   };
+}
+
+function mockCaptchaPopup() {
+  const popup = {
+    closed: false,
+    close: vi.fn(() => {
+      popup.closed = true;
+    })
+  };
+  vi.spyOn(window, 'open').mockImplementation((url) => {
+    const requestId = new URL(String(url)).searchParams.get('requestId') || '';
+    queueMicrotask(() => {
+      window.dispatchEvent(new MessageEvent('message', {
+        data: {
+          captchaPass: 'cap_1234567890abcdef',
+          requestId,
+          source: REPLAY_TRIVIA_CAPTCHA_POST_MESSAGE_SOURCE,
+          type: REPLAY_TRIVIA_CAPTCHA_POST_MESSAGE_TYPE
+        },
+        origin: PLAYGROUND_BACKEND_ORIGIN
+      }));
+    });
+    return popup as unknown as Window;
+  });
+  return popup;
 }
 
 function createQuestionsResponse() {

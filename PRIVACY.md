@@ -1,6 +1,6 @@
 # Privacy
 
-Last updated: June 9, 2026
+Last updated: June 17, 2026
 
 Chat Enhancer for YouTube is a browser extension for YouTube live chat. It is designed to add small chat features without replacing YouTube chat or collecting analytics.
 
@@ -72,7 +72,11 @@ When translation or Playground features are enabled, data may be sent to these s
 
   Playground messages may include the stream/video key, your generated Playground public key and signature, your generated player name, your available game list, invites and invite responses, and game actions such as chess moves.
 
-  Playground does not send chat message text, your YouTube display name, your YouTube avatar URL, YouTube cookies, or YouTube credentials to the Playground backend.
+  HELP-A-FRIEND! Trivia question generation may send selected YouTube replay transcript excerpts and game identifiers to the Playground backend. The backend uses OpenAI to generate trivia questions from those excerpts.
+
+  Replay Trivia generation may require Cloudflare Turnstile verification on `https://playground.chatenhancer.com`. Cloudflare may receive normal verification data such as IP address, user agent, and the challenge result.
+
+  Playground does not send live chat message text, your YouTube display name, your YouTube avatar URL, YouTube cookies, or YouTube credentials to the Playground backend.
 
   Like any web service, the Playground backend may receive normal connection metadata such as IP address and user agent from the browser or network provider.
 

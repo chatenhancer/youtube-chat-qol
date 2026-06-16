@@ -8,6 +8,7 @@ import {
 describe('Replay Trivia request validation', () => {
   it('normalizes a valid generation request', () => {
     expect(parseReplayTriviaQuestionsRequest({
+      captchaPass: 'cap_1234567890abcdef',
       endSeconds: 20,
       gameId: 'game-replay-trivia',
       generationToken: 'rtg_1234567890abcdef',
@@ -28,6 +29,7 @@ describe('Replay Trivia request validation', () => {
       startSeconds: 10,
       videoId: 'SHt3FyE-VIQ'
     })).toEqual({
+      captchaPass: 'cap_1234567890abcdef',
       endSeconds: 20,
       gameId: 'game-replay-trivia',
       generationToken: 'rtg_1234567890abcdef',
@@ -48,6 +50,7 @@ describe('Replay Trivia request validation', () => {
 
   it('defaults optional fields and counts transcript characters', () => {
     const request = parseReplayTriviaQuestionsRequest({
+      captchaPass: 'cap_1234567890abcdef',
       endSeconds: 20,
       gameId: 'game-replay-trivia',
       generationToken: 'rtg_1234567890abcdef',
@@ -79,6 +82,7 @@ describe('Replay Trivia request validation', () => {
     ['invalid_video_id', { ...baseRequest(), videoId: 'bad' }],
     ['invalid_game_id', { ...baseRequest(), gameId: 'bad id' }],
     ['invalid_generation_token', { ...baseRequest(), generationToken: 'short' }],
+    ['invalid_captcha_pass', { ...baseRequest(), captchaPass: 'bad' }],
     ['invalid_window', { ...baseRequest(), startSeconds: -1 }],
     ['invalid_window', { ...baseRequest(), endSeconds: 10, startSeconds: 10 }],
     ['invalid_window', { ...baseRequest(), endSeconds: 90_001, startSeconds: 0 }],
@@ -111,6 +115,7 @@ describe('Replay Trivia request validation', () => {
 
 function baseRequest() {
   return {
+    captchaPass: 'cap_1234567890abcdef',
     endSeconds: 20,
     gameId: 'game-replay-trivia',
     generationToken: 'rtg_1234567890abcdef',

@@ -328,7 +328,8 @@ function maybeGenerateReplayTriviaQuestions(state: ReplayTriviaGameState): void 
   void generateReplayTriviaQuestions({
     gameId: state.game.gameId,
     generationToken: state.generationToken.generationToken,
-    questionCount: 10
+    questionCount: 10,
+    userId: state.currentUserId
   }).then((response) => {
     if (!activeReplayTriviaPanel || activeReplayTriviaPanel.game.gameId !== state.game.gameId) return;
     activeReplayTriviaPanel.onAction(activeReplayTriviaPanel.game.gameId, 'submitQuestions', {
