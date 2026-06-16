@@ -974,6 +974,27 @@ describe('background playground bridge', () => {
     expect(socket.readyState).toBe(3);
   });
 
+  it('clears a pending reconnect when disconnect arrives after the socket closed', async () => {
+    vi.useFakeTimers();
+    await import('./playground');
+    const port = createFakePort();
+    getConnectListener()(port as unknown as chrome.runtime.Port);
+
+    port.emit({
+      availableGames: ['chess'],
+      streamKey: 'stream-a',
+      type: 'ytcq:playground:init'
+    });
+
+    FakeWebSocket.instances[0].emit('close');
+    port.emit({
+      type: 'ytcq:playground:disconnect'
+    });
+    await vi.advanceTimersByTimeAsync(750);
+
+    expect(FakeWebSocket.instances).toHaveLength(1);
+  });
+
   it('stops reconnecting after all retry delays fail', async () => {
     vi.useFakeTimers();
     FakeWebSocket.constructorError = new Error('constructor failed');

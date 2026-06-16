@@ -283,10 +283,10 @@ class PlaygroundBackgroundSession {
     const socket = this.socket;
     this.socket = null;
     this.stopHeartbeat();
-    if (!socket) return;
     if (!allowReconnect) {
       this.clearReconnectTimer();
     }
+    if (!socket) return;
     socket.close();
   }
 
