@@ -20,6 +20,7 @@
   "blog": {
     "archiveCopy": "Ghi chú phát hành và cập nhật dự án cho Chat Enhancer for YouTube.",
     "backToUpdates": "Quay lại cập nhật",
+    "backToHome": "Quay lại trang chủ",
     "latestNotes": "The Backlog",
     "similarPosts": "Tiếp theo",
     "updates": "Cập nhật",
@@ -37,7 +38,7 @@
   },
   "features": {
     "eyebrow": "Dành cho buổi phát trực tiếp",
-    "title": "Cải tiến ngay nơi<br><span class=\"title-emphasis\">chat</span> đang diễn ra",
+    "title": "Thay đổi ngay nơi<br><span class=\"title-emphasis\">chat</span> đang diễn ra",
     "translationTitle": "Dịch ngay khi trò chuyện",
     "translationBody": "Đọc tin nhắn đến bằng ngôn ngữ của bạn, hoặc dịch nội dung bạn đang gõ trước khi gửi.",
     "mentionTitle": "Nhắc tên, trích dẫn và bản nháp",
@@ -68,7 +69,7 @@
   },
   "screenshots": {
     "eyebrow": "Ảnh chụp",
-    "title": "Cải tiến <span class=\"title-emphasis\">chat</span><br>trông như gốc",
+    "title": "Cải tiến<br><span class=\"title-emphasis\">chat</span> mang cảm giác nguyên bản",
     "translationTitle": "Đọc và viết<br>bằng ngôn ngữ khác",
     "translationBody": "Tin nhắn đến có thể được dịch tự động. Ô nhập chat cũng có thể dịch nội dung bạn đang nhập trước khi gửi.",
     "translationHighlightHtml": "Bản dịch tự động được đánh dấu bằng <span class=\"showcase-underline\">gạch chân nhẹ</span> và biểu tượng Google Translate",
@@ -132,7 +133,7 @@
   },
   "privacy": {
     "eyebrow": "Quyền riêng tư",
-    "title": "Công cụ chat ưu tiên lưu cục bộ",
+    "title": "Chúng tôi tôn trọng quyền riêng tư của bạn",
     "copy": "Tiện ích được thiết kế để giữ các cải tiến chat thường ngày trên thiết bị của bạn. Dịch là tính năng duy nhất cần dịch vụ bên ngoài, và chỉ chạy sau khi bạn chọn ngôn ngữ đích.",
     "button": "Đọc toàn bộ chính sách quyền riêng tư",
     "summaryAria": "Tóm tắt quyền riêng tư",
@@ -147,8 +148,9 @@
   },
   "commands": {
     "eyebrow": "Tham chiếu",
-    "title": "Lệnh chat mở rộng bằng Tab",
-    "copy": "Nhập lệnh trong ô chat YouTube rồi nhấn Tab. Lệnh không tự gửi, và lệnh slash không rõ sẽ được giữ nguyên. Dùng // để gửi lệnh slash theo nghĩa đen.",
+    "title": "Chat nhanh hơn bằng lệnh",
+    "copy": "Dùng các lệnh ngắn cho lượt nhắc tên, trích dẫn, kiểm tra thời gian, bản dịch, theo dõi Inbox và cài đặt mà không cần rời khỏi ô chat.",
+    "actionCopy": "Nhấn Tab để điền tin nhắn, xem lại rồi gửi khi bạn sẵn sàng.",
     "inlineTitle": "Lệnh trong câu:",
     "inlineBody": "Có thể mở rộng trong một câu.",
     "wholeTitle": "Lệnh toàn bộ ô nhập:",

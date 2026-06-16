@@ -20,6 +20,7 @@
   "blog": {
     "archiveCopy": "Notas de versão e atualizações do projeto Chat Enhancer for YouTube.",
     "backToUpdates": "Voltar para atualizações",
+    "backToHome": "Voltar ao início",
     "latestNotes": "The Backlog",
     "similarPosts": "A seguir",
     "updates": "Atualizações",
@@ -37,7 +38,7 @@
   },
   "features": {
     "eyebrow": "Feito para lives",
-    "title": "Melhorias onde o <span class=\"title-emphasis\">chat</span> já acontece",
+    "title": "Mudanças onde o <span class=\"title-emphasis\">chat</span> já acontece",
     "translationTitle": "Traduza enquanto conversa",
     "translationBody": "Leia mensagens recebidas no seu idioma, ou traduza o que você está digitando antes de enviar.",
     "mentionTitle": "Menções, citações e rascunhos",
@@ -68,7 +69,7 @@
   },
   "screenshots": {
     "eyebrow": "Capturas",
-    "title": "Melhorias de <span class=\"title-emphasis\">chat</span><br>com aparência nativa",
+    "title": "Melhorias de<br><span class=\"title-emphasis\">chat</span> com aparência nativa",
     "translationTitle": "Leia e escreva<br>em outros idiomas",
     "translationBody": "As mensagens recebidas podem ser traduzidas automaticamente. O campo de chat também pode traduzir o que você digita antes de enviar.",
     "translationHighlightHtml": "As traduções automáticas aparecem com um <span class=\"showcase-underline\">sublinhado sutil</span> e um ícone do Google Translate",
@@ -132,7 +133,7 @@
   },
   "privacy": {
     "eyebrow": "Privacidade",
-    "title": "Ferramentas de chat com foco local",
+    "title": "Respeitamos sua privacidade",
     "copy": "A extensão foi projetada para manter melhorias rotineiras do chat no seu dispositivo. A tradução é o único recurso que precisa de um serviço externo, e só roda depois que você escolhe um idioma de destino.",
     "button": "Ler a política de privacidade completa",
     "summaryAria": "Resumo de privacidade",
@@ -147,8 +148,9 @@
   },
   "commands": {
     "eyebrow": "Referência",
-    "title": "Comandos do chat expandem com Tab",
-    "copy": "Digite um comando no campo do chat do YouTube e pressione Tab. Comandos não são enviados automaticamente, e comandos com barra desconhecidos são deixados como estão. Use // para enviar um comando com barra literal.",
+    "title": "Converse mais rápido com comandos",
+    "copy": "Use comandos curtos para menções, citações, consultas de horário, traduções, monitoramentos da caixa de entrada e configurações sem sair do campo do chat.",
+    "actionCopy": "Pressione Tab para preencher a mensagem, revise-a e envie quando estiver pronto.",
     "inlineTitle": "Comandos inline:",
     "inlineBody": "Podem expandir dentro de uma frase.",
     "wholeTitle": "Comandos de entrada inteira:",

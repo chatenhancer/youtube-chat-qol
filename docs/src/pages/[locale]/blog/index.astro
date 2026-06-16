@@ -1,5 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
+import BackToUpdatesLink from '../../../components/blog/back-to-updates-link.astro';
 import PostCardGrid from '../../../components/blog/post-card-grid.astro';
 import BlogLayout from '../../../layouts/blog-layout.astro';
 import {
@@ -8,7 +9,7 @@ import {
   getBlogIndexUrl,
   getLocalizedBlogPosts
 } from '../../../data/blog';
-import { getLocaleFromPath, getMessages, localeMeta, locales } from '../../../data/locales';
+import { getLocaleFromPath, getLocaleUrl, getMessages, localeMeta, locales } from '../../../data/locales';
 
 export function getStaticPaths() {
   return locales
@@ -37,7 +38,7 @@ const posts = getLocalizedBlogPosts(await getCollection('blog'), locale);
   xDefaultUrl={getBlogIndexUrl('en')}
 >
   <section class="blog-archive">
-    <p class="eyebrow">{blog.updates}</p>
+    <BackToUpdatesLink href={getLocaleUrl(locale)} label={blog.backToHome} />
     <h1>{blog.latestNotes}</h1>
     <p class="blog-archive-copy">{blog.archiveCopy}</p>
     <PostCardGrid locale={locale} posts={posts} />

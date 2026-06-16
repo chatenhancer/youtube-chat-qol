@@ -266,8 +266,9 @@
     const input = demo.querySelector("[data-command-input]");
     const inputWrap = demo.querySelector("[data-command-input-wrap]");
     const cycleCurrent = demo.querySelector("[data-command-cycle-current]");
+    const cycleCurrentText = demo.querySelector("[data-command-cycle-current-text]");
     const cycleNext = demo.querySelector("[data-command-cycle-next]");
-    const tabHint = demo.querySelector("[data-command-tab-hint]");
+    const cycleNextText = demo.querySelector("[data-command-cycle-next-text]");
     const menu = demo.querySelector("[data-command-menu]");
     const options = Array.from(demo.querySelectorAll("[data-command-option]"))
       .filter((option) => option instanceof HTMLElement);
@@ -278,13 +279,18 @@
     const cycleDelayMs = 3200;
     const cycleAnimationMs = 460;
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-    let isAutoCycling = inputWrap instanceof HTMLElement && cycleCurrent instanceof HTMLElement && cycleNext instanceof HTMLElement;
+    let isAutoCycling = inputWrap instanceof HTMLElement && cycleCurrent instanceof HTMLElement && cycleCurrentText instanceof HTMLElement && cycleNext instanceof HTMLElement && cycleNextText instanceof HTMLElement;
     let cycleTimer = 0;
     let cycleAnimationTimer = 0;
     let cycleIndex = Math.max(0, options.indexOf(initialOption));
     let activeIndex = -1;
     const optionTemplate = (option) => option?.dataset.commandTemplate || option?.dataset.commandValue || "";
     const optionAfter = (index) => options[(index + 1) % options.length] || options[0];
+    const setInputTemplateWidth = (template) => {
+      if (!(inputWrap instanceof HTMLElement)) return;
+      const width = Math.min(Math.max(template.length + 1, 9), 34);
+      inputWrap.style.setProperty("--command-input-text-width", `${width}ch`);
+    };
     const visibleOptions = () => options.filter((option) => !option.hidden);
     const setActiveOption = (nextOption) => {
       if (!nextOption) return;
@@ -297,21 +303,17 @@
       activeIndex = visibleOptions().indexOf(nextOption);
     };
     const updateCycleText = (currentOption) => {
-      if (!(cycleCurrent instanceof HTMLElement) || !(cycleNext instanceof HTMLElement)) return;
+      if (!(cycleCurrentText instanceof HTMLElement) || !(cycleNextText instanceof HTMLElement)) return;
       const currentIndex = Math.max(0, options.indexOf(currentOption));
-      cycleCurrent.textContent = optionTemplate(currentOption);
-      cycleNext.textContent = optionTemplate(optionAfter(currentIndex));
+      const currentTemplate = optionTemplate(currentOption);
+      cycleCurrentText.textContent = currentTemplate;
+      cycleNextText.textContent = optionTemplate(optionAfter(currentIndex));
+      setInputTemplateWidth(currentTemplate);
     };
     const setCycleState = (enabled) => {
       if (!(inputWrap instanceof HTMLElement)) return;
       inputWrap.classList.toggle("is-cycling", enabled);
       if (!enabled) inputWrap.classList.remove("is-sliding");
-    };
-    const pulseTabHint = () => {
-      if (reducedMotion.matches || !(tabHint instanceof HTMLElement)) return;
-      tabHint.classList.remove("is-pressing");
-      void tabHint.offsetWidth;
-      tabHint.classList.add("is-pressing");
     };
     const keepOptionVisible = (option) => {
       const optionTop = option.offsetTop;
@@ -375,15 +377,17 @@
         scheduleCycle();
       };
 
-      if (reducedMotion.matches || !(inputWrap instanceof HTMLElement) || !(cycleCurrent instanceof HTMLElement) || !(cycleNext instanceof HTMLElement)) {
+      if (reducedMotion.matches || !(inputWrap instanceof HTMLElement) || !(cycleCurrent instanceof HTMLElement) || !(cycleCurrentText instanceof HTMLElement) || !(cycleNext instanceof HTMLElement) || !(cycleNextText instanceof HTMLElement)) {
         completeCycle();
         return;
       }
 
-      cycleCurrent.textContent = optionTemplate(options[cycleIndex] || initialOption);
-      cycleNext.textContent = optionTemplate(nextOption);
+      const currentTemplate = optionTemplate(options[cycleIndex] || initialOption);
+      const nextTemplate = optionTemplate(nextOption);
+      cycleCurrentText.textContent = currentTemplate;
+      cycleNextText.textContent = nextTemplate;
+      setInputTemplateWidth(currentTemplate.length > nextTemplate.length ? currentTemplate : nextTemplate);
       setActiveOption(nextOption);
-      pulseTabHint();
       inputWrap.classList.remove("is-sliding");
       void inputWrap.offsetWidth;
       inputWrap.classList.add("is-sliding");
@@ -415,6 +419,7 @@
       if (!option) return;
       const template = option.dataset.commandTemplate || option.dataset.commandValue || "";
       if (template) input.value = template;
+      setInputTemplateWidth(template || input.value);
       cycleIndex = Math.max(0, options.indexOf(option));
       updateCycleText(option);
       filterMenu();
@@ -432,6 +437,7 @@
 
     input.addEventListener("input", () => {
       pauseAutoCycle();
+      setInputTemplateWidth(input.value);
       filterMenu();
     });
     input.addEventListener("focus", () => {
@@ -468,12 +474,6 @@
         applyOption(option);
       });
     });
-    if (tabHint instanceof HTMLElement) {
-      tabHint.addEventListener("animationend", () => {
-        tabHint.classList.remove("is-pressing");
-      });
-    }
-
     selectCycleOption(initialOption);
     setCycleState(isAutoCycling);
     scheduleCycle();

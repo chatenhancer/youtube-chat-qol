@@ -20,6 +20,7 @@
   "blog": {
     "archiveCopy": "Chat Enhancer for YouTube のリリースノートとプロジェクト更新情報です。",
     "backToUpdates": "更新情報に戻る",
+    "backToHome": "ホームに戻る",
     "latestNotes": "The Backlog",
     "similarPosts": "次はこちら",
     "updates": "更新情報",
@@ -37,7 +38,7 @@
   },
   "features": {
     "eyebrow": "ライブ配信用",
-    "title": "<span class=\"title-emphasis\">チャット</span>が行われる場所に改善機能を追加",
+    "title": "<span class=\"title-emphasis\">チャット</span>が行われる場所に変化を追加",
     "translationTitle": "チャットしながら翻訳",
     "translationBody": "届いたメッセージを自分の言語で読み、送信前に入力中の文章も翻訳できます。",
     "mentionTitle": "メンション、引用、下書き",
@@ -132,7 +133,7 @@
   },
   "privacy": {
     "eyebrow": "プライバシー",
-    "title": "ローカル優先のチャットツール",
+    "title": "プライバシーを尊重します",
     "copy": "この拡張機能は、日常的なチャット改善をできるだけ端末内に保つように設計されています。翻訳だけは外部サービスを必要とし、翻訳先言語を選んだ後にのみ実行されます。",
     "button": "プライバシーポリシー全文を読む",
     "summaryAria": "プライバシー概要",
@@ -147,8 +148,9 @@
   },
   "commands": {
     "eyebrow": "リファレンス",
-    "title": "チャットコマンドは Tab で展開",
-    "copy": "YouTube のチャット入力欄にコマンドを入力して Tab を押します。コマンドは自動送信されず、未知のスラッシュコマンドはそのまま残ります。スラッシュコマンドを文字通り送るには // を使います。",
+    "title": "コマンドでチャットをすばやく",
+    "copy": "チャット欄を離れずに、メンション、引用、時刻確認、翻訳、Inbox のウォッチ、設定を短いコマンドで使えます。",
+    "actionCopy": "Tab を押してメッセージを入力し、確認してから準備できたら送信します。",
     "inlineTitle": "インラインコマンド:",
     "inlineBody": "文中で展開できます。",
     "wholeTitle": "入力全体で使うコマンド:",

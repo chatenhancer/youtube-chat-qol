@@ -1,4 +1,5 @@
 ---
+import Icon from '../common/icon.astro';
 import type { CollectionEntry } from 'astro:content';
 import { Image } from 'astro:assets';
 import { getBlogEntryFolder, getBlogIndexPath, getBlogPostPath } from '../../data/blog';
@@ -25,9 +26,12 @@ const BLOG_CARD_IMAGE_WIDTH = 1280;
   <section class="section latest-updates" aria-labelledby="latest-updates-title" data-blog-latest>
     <div class="section-inner latest-updates-inner">
       <div class="latest-updates-heading">
-        <div>
-          <p class="eyebrow">{blog.updates}</p>
+        <div class="latest-updates-title-group">
+          <span class="section-icon latest-updates-title-icon" data-symbol="campaign" aria-hidden="true">
+            <Icon name="campaign" />
+          </span>
           <h2 id="latest-updates-title">{blog.latestNotes}</h2>
+          <p class="latest-updates-copy">{blog.archiveCopy}</p>
         </div>
         <a class="feature-link" href={getBlogIndexPath(locale)} data-blog-archive-link>{blog.viewAllUpdates}</a>
       </div>

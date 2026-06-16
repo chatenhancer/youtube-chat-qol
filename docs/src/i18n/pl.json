@@ -20,6 +20,7 @@
   "blog": {
     "archiveCopy": "Informacje o wydaniach i aktualizacje projektu Chat Enhancer for YouTube.",
     "backToUpdates": "Wróć do aktualizacji",
+    "backToHome": "Wróć do strony głównej",
     "latestNotes": "The Backlog",
     "similarPosts": "Następne",
     "updates": "Aktualizacje",
@@ -37,7 +38,7 @@
   },
   "features": {
     "eyebrow": "Stworzone dla transmisji na żywo",
-    "title": "Ulepszenia tam, gdzie już dzieje się <span class=\"title-emphasis\">czat</span>",
+    "title": "Zmiany tam, gdzie już dzieje się <span class=\"title-emphasis\">czat</span>",
     "translationTitle": "Tłumacz podczas czatu",
     "translationBody": "Czytaj przychodzące wiadomości w swoim języku albo tłumacz to, co piszesz, zanim wyślesz.",
     "mentionTitle": "Wzmianki, cytaty i szkice",
@@ -68,7 +69,7 @@
   },
   "screenshots": {
     "eyebrow": "Zrzuty ekranu",
-    "title": "Ulepszenia <span class=\"title-emphasis\">czatu</span><br>wyglądające naturalnie",
+    "title": "Naturalne<br>ulepszenia <span class=\"title-emphasis\">czatu</span>",
     "translationTitle": "Czytaj i pisz<br>w innych językach",
     "translationBody": "Przychodzące wiadomości mogą być tłumaczone automatycznie. Pole czatu może też przetłumaczyć to, co wpisujesz przed wysłaniem.",
     "translationHighlightHtml": "Automatyczne tłumaczenia są oznaczone <span class=\"showcase-underline\">subtelnym podkreśleniem</span> i ikoną Google Translate",
@@ -132,7 +133,7 @@
   },
   "privacy": {
     "eyebrow": "Prywatność",
-    "title": "Lokalne narzędzia do czatu",
+    "title": "Szanujemy Twoją prywatność",
     "copy": "Rozszerzenie zaprojektowano tak, aby typowe ulepszenia czatu zostawały na Twoim urządzeniu. Tłumaczenie jest jedyną funkcją wymagającą usługi zewnętrznej i działa dopiero po wybraniu języka docelowego.",
     "button": "Przeczytaj pełną politykę prywatności",
     "summaryAria": "Podsumowanie prywatności",
@@ -147,8 +148,9 @@
   },
   "commands": {
     "eyebrow": "Referencja",
-    "title": "Polecenia czatu rozwijają się przez Tab",
-    "copy": "Wpisz polecenie w polu czatu YouTube, a potem naciśnij Tab. Polecenia nie wysyłają się automatycznie, a nieznane polecenia slash pozostają bez zmian. Użyj //, aby wysłać dosłowne polecenie slash.",
+    "title": "Czatuj szybciej za pomocą poleceń",
+    "copy": "Używaj krótkich poleceń do wzmianek, cytatów, sprawdzania czasu, tłumaczeń, obserwacji skrzynki odbiorczej i ustawień bez opuszczania pola czatu.",
+    "actionCopy": "Naciśnij Tab, aby wypełnić wiadomość, sprawdź ją, a potem wyślij, gdy będzie gotowa.",
     "inlineTitle": "Polecenia inline:",
     "inlineBody": "Mogą rozwijać się w zdaniu.",
     "wholeTitle": "Polecenia jako cała treść:",
