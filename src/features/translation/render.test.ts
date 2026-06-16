@@ -4,6 +4,8 @@ import { setOptions } from '../../shared/state';
 import {
   clearTranslationRenderings,
   createInlineTranslationElement,
+  createReplacedTranslationIcon,
+  getOriginalReplacementTitle,
   getReplacementTranslationTitle,
   isMeaningfulTranslation,
   removeTranslation,
@@ -78,6 +80,20 @@ describe('translation rendering', () => {
     expect(message.querySelector<HTMLButtonElement>('.ytcq-replaced-translation-icon')?.title).toBe('Original message');
   });
 
+  it('restores original language metadata when toggling back to original text', () => {
+    setOptions({ ...DEFAULT_OPTIONS, targetLanguage: 'en', translationDisplay: 'replace' });
+    const message = createMessage('gracias');
+    const messageText = message.querySelector<HTMLElement>('#message')!;
+    messageText.lang = 'es-MX';
+    document.body.appendChild(message);
+
+    expect(renderTranslation(message, result({ targetLanguage: 'en', text: 'thank you' }), 'gracias')).toBe(true);
+    message.querySelector<HTMLButtonElement>('.ytcq-replaced-translation-icon')?.click();
+
+    expect(messageText.lang).toBe('es-MX');
+    expect(messageText.getAttribute('lang')).toBe('es-MX');
+  });
+
   it('does not render unchanged or disconnected translations', () => {
     const message = createMessage('hello');
 
@@ -90,7 +106,10 @@ describe('translation rendering', () => {
     setOptions({ ...DEFAULT_OPTIONS, targetLanguage: 'ja', translationDisplay: 'below' });
     const message = createMessage('gracias');
     message.dataset.ytcqTranslationKey = 'message-key';
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.classList.add('ytcq-translation-replaced');
     document.body.appendChild(message);
+    document.body.appendChild(svg);
     renderTranslation(message, result({ text: 'ありがとう' }), 'gracias');
 
     clearTranslationRenderings();
@@ -144,6 +163,10 @@ describe('translation rendering', () => {
       targetLanguage: 'ja',
       text: 'hello'
     }), 'ありがとう')).toContain('ありがとう');
+    expect(getOriginalReplacementTitle(result({ text: '' }))).toBe('Translated message');
+    const staticIcon = createReplacedTranslationIcon();
+    expect(staticIcon).toBeInstanceOf(HTMLSpanElement);
+    expect(staticIcon.getAttribute('aria-hidden')).toBe('true');
   });
 
   it('preserves the chat scroller top position and nudges YouTube layout after clearing translations', async () => {

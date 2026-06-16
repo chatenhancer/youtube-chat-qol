@@ -259,6 +259,42 @@ describe('marked users', () => {
     expect(emptyButton.title).toBe('Bookmark');
   });
 
+  it('handles channel-only identities and clears stale empty ring targets', async () => {
+    const markedUsers = await import('./index');
+    markedUsers.initMarkedUsers();
+    await Promise.resolve();
+
+    await expect(markedUsers.toggleMarkedUser({ channelId: 'channel-only' })).resolves.toBe(true);
+    await expect(chrome.storage.local.get(markedUsers.MARKED_USERS_STORAGE_KEY)).resolves.toMatchObject({
+      [markedUsers.MARKED_USERS_STORAGE_KEY]: {
+        'channel:channel-only': {
+          authorName: '',
+          channelId: 'channel-only'
+        }
+      }
+    });
+
+    const avatar = document.createElement('span');
+    document.body.append(avatar);
+    markedUsers.applyMarkedUserRing(avatar, { channelId: 'channel-only' });
+    expect(avatar.dataset.ytcqMarkedUserName).toBe('channel:channel-only');
+    expect(avatar.classList.contains('ytcq-marked-user-avatar')).toBe(true);
+
+    const stale = document.createElement('span');
+    stale.dataset.ytcqMarkedUserKey = '';
+    stale.className = 'ytcq-markable-user-avatar ytcq-marked-user-avatar';
+    const staleAnimation = document.createElement('span');
+    staleAnimation.className = 'ytcq-marked-user-ring-animation';
+    stale.append(staleAnimation);
+    document.body.append(stale);
+
+    markedUsers.refreshMarkedUserRings();
+
+    expect(stale.hasAttribute('data-ytcq-marked-user-key')).toBe(false);
+    expect(stale.classList.contains('ytcq-marked-user-avatar')).toBe(false);
+    expect(stale.querySelector('.ytcq-marked-user-ring-animation')).toBeNull();
+  });
+
   it('handles message author mark helpers for missing and present authors', async () => {
     const markedUsers = await import('./index');
     const message = document.createElement('yt-live-chat-text-message-renderer');
@@ -284,6 +320,7 @@ describe('marked users', () => {
       avatarUrl: 'https://example.test/avatar.png',
       channelId: undefined
     });
+    expect(markedUsers.getMessageAuthorMarkTitle(authoredMessage)).toContain('Mark');
     await expect(markedUsers.toggleMessageAuthorMark(authoredMessage)).resolves.toBe(true);
     expect(markedUsers.isMessageAuthorMarked(authoredMessage)).toBe(true);
     expect(markedUsers.getMessageAuthorMarkTitle(authoredMessage)).toContain('Unmark');

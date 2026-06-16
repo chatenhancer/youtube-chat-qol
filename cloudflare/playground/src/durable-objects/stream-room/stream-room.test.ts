@@ -156,6 +156,22 @@ class FakePlayerStatsNamespace {
   }
 }
 
+class FailingPlayerStatsNamespace {
+  idFromName(name: string): { toString(): string } {
+    return {
+      toString: () => name
+    };
+  }
+
+  get(): { fetch: typeof fetch } {
+    return {
+      fetch: async () => {
+        throw new Error('stats unavailable');
+      }
+    };
+  }
+}
+
 describe('playground stream room', () => {
   beforeEach(() => {
     vi.spyOn(console, 'error').mockImplementation(() => undefined);
@@ -543,6 +559,161 @@ describe('playground stream room', () => {
     })).toThrowError(new ProtocolError('not_your_turn', 'It is not your turn.'));
   });
 
+  it('routes game actions and pings through parsed socket messages', async () => {
+    const room = createRoom();
+    const alice = createSession('alice-connection');
+    const bob = createSession('bob-connection');
+
+    await room.handleHello(alice, await createHello(alice.challenge, 'Alice', ['chess']));
+    await room.handleHello(bob, await createHello(bob.challenge, 'Bob', ['chess']));
+    room.handleInvite(alice, 'chess', bob.userId);
+    room.handleInviteResponse(bob, lastMessage(bob, 'inviteReceived').invite.inviteId, true);
+    const gameId = lastMessage(alice, 'gameStarted').game.gameId;
+
+    await room.handleSocketMessage(alice, JSON.stringify({
+      action: 'move',
+      gameId,
+      payload: {
+        from: 'e2',
+        to: 'e4'
+      },
+      type: 'gameAction'
+    }));
+    await room.handleSocketMessage(alice, JSON.stringify({
+      id: 'ping-1',
+      type: 'ping'
+    }));
+
+    expect(lastMessage(bob, 'gameUpdated').game).toMatchObject({
+      gameId,
+      lastMoveSan: 'e4'
+    });
+    expect(lastMessage(alice, 'pong')).toEqual({
+      id: 'ping-1',
+      type: 'pong'
+    });
+  });
+
+  it('rejects repeat hello, missing invite targets, wrong invite owners, and missing games', async () => {
+    const room = createRoom();
+    const alice = createSession('alice-connection');
+    const bob = createSession('bob-connection');
+    const charlie = createSession('charlie-connection');
+
+    await room.handleHello(alice, await createHello(alice.challenge, 'Alice', ['chess']));
+    await room.handleHello(bob, await createHello(bob.challenge, 'Bob', ['chess']));
+    await room.handleHello(charlie, await createHello(charlie.challenge, 'Charlie', ['chess']));
+
+    await expect(room.handleHello(alice, await createHello(alice.challenge, 'Alice', ['chess']))).rejects.toThrowError(new ProtocolError(
+      'already_authenticated',
+      'This connection is already authenticated.'
+    ));
+    expect(() => room.handleInvite(alice, 'chess', 'missing-user')).toThrowError(new ProtocolError(
+      'user_not_found',
+      'That player is not connected.'
+    ));
+    room.handleInvite(alice, 'chess', bob.userId);
+    const inviteId = lastMessage(bob, 'inviteReceived').invite.inviteId;
+    expect(() => room.handleInviteResponse(alice, inviteId, true)).toThrowError(new ProtocolError(
+      'not_your_invite',
+      'That invite is not for you.'
+    ));
+    expect(() => room.handleGameAction(alice, 'missing-game', {
+      action: 'move',
+      payload: { from: 'e2', to: 'e4' },
+      userId: alice.userId
+    })).toThrowError(new ProtocolError('game_not_found', 'Game not found.'));
+
+    room.handleInviteResponse(bob, inviteId, true);
+    const gameId = lastMessage(alice, 'gameStarted').game.gameId;
+    expect(() => room.handleGameAction(charlie, gameId, {
+      action: 'leave',
+      userId: charlie.userId
+    })).toThrowError(new ProtocolError('not_in_game', 'You are not a player in this game.'));
+  });
+
+  it('authenticates hello messages without advertised games through socket parsing', async () => {
+    const room = createRoom();
+    const session = createSession('alice-connection');
+
+    await room.handleSocketMessage(session, JSON.stringify({
+      identity: await createSignedIdentity(session.challenge),
+      protocolVersion: PLAYGROUND_PROTOCOL_VERSION,
+      type: 'hello'
+    }));
+
+    expect(session.userId).not.toBe('');
+    expect(session.availableGames.size).toBe(0);
+    expect(lastMessage(session, 'helloAccepted').snapshot.users).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ userId: session.userId })
+      ])
+    );
+  });
+
+  it('logs protocol-version, public-key, internal, and long protocol failures', async () => {
+    const room = createRoom();
+    const session = createSession('anonymous-connection');
+
+    await room.handleSocketMessage(session, JSON.stringify({
+      identity: {},
+      protocolVersion: 'old',
+      type: 'hello'
+    }));
+    expect(lastMessage(session, 'error')).toMatchObject({
+      code: 'protocol_version',
+      type: 'error'
+    });
+    expect(console.warn).toHaveBeenCalledWith('[Chat Enhancer Playground] protocol_version_mismatch', expect.objectContaining({
+      code: 'protocol_version',
+      event: 'protocol_version_mismatch'
+    }));
+
+    await room.handleSocketMessage(session, JSON.stringify({
+      identity: {
+        publicKeyJwk: {},
+        signature: 'abc'
+      },
+      protocolVersion: PLAYGROUND_PROTOCOL_VERSION,
+      type: 'hello'
+    }));
+    expect(lastMessage(session, 'error')).toMatchObject({
+      code: 'invalid_public_key',
+      type: 'error'
+    });
+
+    const alice = createSession('alice-connection');
+    await room.handleHello(alice, await createHello(alice.challenge, 'Alice', ['chess']));
+    alice.rateLimit.consume = vi.fn(() => {
+      throw new Error('unexpected failure');
+    });
+    await room.handleSocketMessage(alice, JSON.stringify({
+      id: 'ping-internal',
+      type: 'ping'
+    }));
+    expect(lastMessage(alice, 'error')).toEqual({
+      code: 'internal_error',
+      message: 'Something went wrong.',
+      type: 'error'
+    });
+    expect(console.error).toHaveBeenCalledWith('[Chat Enhancer Playground] internal_error', expect.objectContaining({
+      code: 'internal_error',
+      event: 'internal_error'
+    }));
+
+    alice.rateLimit.consume = vi.fn(() => {
+      throw new ProtocolError('custom_long', 'x'.repeat(220));
+    });
+    await room.handleSocketMessage(alice, JSON.stringify({
+      id: 'ping-long',
+      type: 'ping'
+    }));
+    expect(console.warn).toHaveBeenCalledWith('[Chat Enhancer Playground] protocol_error', expect.objectContaining({
+      code: 'custom_long',
+      message: `${'x'.repeat(177)}...`
+    }));
+  });
+
   it('sends an error and closes when messages arrive before hello', async () => {
     const room = createRoom();
     const session = createSession('anonymous-connection');
@@ -667,13 +838,185 @@ describe('playground stream room', () => {
       'That player is not available for this game.'
     ));
   });
+
+  it('serves snapshots and rejects non-WebSocket socket requests through fetch', async () => {
+    const room = createRoom();
+
+    const snapshotResponse = await room.fetch(new Request('https://playground.chatenhancer.com/snapshot?streamKey=stream-a'));
+    await expect(snapshotResponse.json()).resolves.toMatchObject({
+      games: [],
+      invites: [],
+      users: expect.arrayContaining([
+        expect.objectContaining({
+          displayName: 'Computer',
+          userId: 'server:computer'
+        }),
+        expect.objectContaining({
+          displayName: 'Computer (Club)',
+          userId: 'server:computer:club'
+        })
+      ])
+    });
+
+    const socketResponse = await room.fetch(new Request('https://playground.chatenhancer.com/socket?streamKey=stream-a'));
+    expect(socketResponse.status).toBe(426);
+    await expect(socketResponse.text()).resolves.toBe('Expected WebSocket upgrade.');
+  });
+
+  it('reports malformed socket messages without crashing the room', async () => {
+    const room = createRoom();
+    const session = createSession('anonymous-connection');
+
+    await room.handleSocketMessage(session, {});
+    expect(lastMessage(session, 'error')).toEqual({
+      code: 'invalid_message',
+      message: 'Messages must be strings.',
+      type: 'error'
+    });
+    expect(session.socket.closed).toBe(false);
+
+    await room.handleSocketMessage(session, 'x'.repeat(32_769));
+    expect(lastMessage(session, 'error')).toEqual({
+      code: 'message_too_large',
+      message: 'Message is too large.',
+      type: 'error'
+    });
+
+    await room.handleSocketMessage(session, '{not-json');
+    expect(lastMessage(session, 'error')).toMatchObject({
+      code: 'invalid_json',
+      type: 'error'
+    });
+  });
+
+  it('closes the socket when identity verification fails', async () => {
+    const room = createRoom();
+    const session = createSession('anonymous-connection');
+    const hello = await createHello('different-challenge', 'Alice', ['chess']);
+
+    await room.handleSocketMessage(session, JSON.stringify(hello));
+
+    expect(lastMessage(session, 'error')).toMatchObject({
+      code: 'invalid_signature',
+      type: 'error'
+    });
+    expect(session.socket.closed).toBe(true);
+    expect(session.socket.closeCode).toBe(1008);
+  });
+
+  it('rejects unsupported generated-content requests and invalid consume calls', async () => {
+    const room = createRoom();
+    const alice = createSession('alice-connection');
+    const bob = createSession('bob-connection');
+
+    await room.handleHello(alice, await createHello(alice.challenge, 'Alice', ['chess']));
+    await room.handleHello(bob, await createHello(bob.challenge, 'Bob', ['chess']));
+    room.handleInvite(alice, 'chess', bob.userId);
+    room.handleInviteResponse(bob, lastMessage(bob, 'inviteReceived').invite.inviteId, true);
+    const chessGameId = lastMessage(alice, 'gameStarted').game.gameId;
+
+    expect(() => room.handleGameAction(alice, chessGameId, {
+      action: 'requestGenerationToken',
+      userId: alice.userId
+    })).toThrowError(new ProtocolError(
+      'unsupported_action',
+      'This game does not support generated content.'
+    ));
+
+    const getResponse = await room.fetch(new Request('https://playground.chatenhancer.com/internal/replay-trivia/generation-token/consume?streamKey=stream-a', {
+      method: 'GET'
+    }));
+    expect(getResponse.status).toBe(405);
+
+    const invalidJsonResponse = await room.fetch(new Request('https://playground.chatenhancer.com/internal/replay-trivia/generation-token/consume?streamKey=stream-a', {
+      body: '{bad',
+      method: 'POST'
+    }));
+    expect(invalidJsonResponse.status).toBe(400);
+
+    const invalidBodyResponse = await room.fetch(new Request('https://playground.chatenhancer.com/internal/replay-trivia/generation-token/consume?streamKey=stream-a', {
+      body: '[]',
+      method: 'POST'
+    }));
+    expect(invalidBodyResponse.status).toBe(400);
+
+    const missingTokenResponse = await room.fetch(new Request('https://playground.chatenhancer.com/internal/replay-trivia/generation-token/consume?streamKey=stream-a', {
+      body: JSON.stringify({ gameId: 'game-1', generationToken: '' }),
+      method: 'POST'
+    }));
+    expect(missingTokenResponse.status).toBe(403);
+  });
+
+  it('rejects consumed generation tokens after their game leaves the room', async () => {
+    const room = createRoom();
+    const alice = createSession('alice-connection');
+    const bob = createSession('bob-connection');
+
+    await room.handleHello(alice, await createHello(alice.challenge, 'Alice', ['replay-trivia']));
+    await room.handleHello(bob, await createHello(bob.challenge, 'Bob', ['replay-trivia']));
+    room.handleInvite(alice, 'replay-trivia', bob.userId);
+    room.handleInviteResponse(bob, lastMessage(bob, 'inviteReceived').invite.inviteId, true);
+    const gameId = lastMessage(alice, 'gameStarted').game.gameId;
+    room.handleGameAction(alice, gameId, {
+      action: 'requestGenerationToken',
+      userId: alice.userId
+    });
+    const tokenMessage = lastMessage(alice, 'replayTriviaGenerationToken');
+    room.handleGameAction(bob, gameId, {
+      action: 'leave',
+      userId: bob.userId
+    });
+
+    const response = await consumeGenerationToken(room, gameId, tokenMessage.generationToken);
+
+    expect(response.status).toBe(404);
+    await expect(response.json()).resolves.toEqual({
+      error: {
+        code: 'game_not_found',
+        message: 'Game not found.'
+      }
+    });
+  });
+
+  it('logs when completed game win recording fails', async () => {
+    const storage = new FakeDurableObjectStorage();
+    const { room, state } = createRoomHarness(storage, {
+      playerStats: new FailingPlayerStatsNamespace() as unknown as DurableObjectNamespace
+    });
+    const alice = createSession('alice-connection');
+    const bob = createSession('bob-connection');
+
+    await room.handleHello(alice, await createHello(alice.challenge, 'Alice', ['chess']));
+    await room.handleHello(bob, await createHello(bob.challenge, 'Bob', ['chess']));
+    room.handleInvite(alice, 'chess', bob.userId);
+    room.handleInviteResponse(bob, lastMessage(bob, 'inviteReceived').invite.inviteId, true);
+    const gameId = lastMessage(alice, 'gameStarted').game.gameId;
+
+    room.handleGameAction(bob, gameId, {
+      action: 'resign',
+      userId: bob.userId
+    });
+    await state.flushWaitUntil();
+
+    expect(console.warn).toHaveBeenCalledWith('[Chat Enhancer Playground] game_win_record_failed', expect.objectContaining({
+      errorType: 'Error',
+      event: 'game_win_record_failed',
+      gameType: 'chess',
+      service: 'chat-enhancer-playground'
+    }));
+  });
 });
 
 function createRoom(): PrivateStreamRoom {
   return createRoomHarness().room;
 }
 
-function createRoomHarness(storage = new FakeDurableObjectStorage()): {
+function createRoomHarness(
+  storage = new FakeDurableObjectStorage(),
+  options: {
+    playerStats?: DurableObjectNamespace;
+  } = {}
+): {
   playerStats: FakePlayerStatsNamespace;
   room: PrivateStreamRoom;
   state: FakeDurableObjectState;
@@ -681,7 +1024,7 @@ function createRoomHarness(storage = new FakeDurableObjectStorage()): {
   const state = new FakeDurableObjectState(storage);
   const playerStats = new FakePlayerStatsNamespace();
   const env = {
-    PLAYER_STATS: playerStats as unknown as DurableObjectNamespace
+    PLAYER_STATS: options.playerStats || playerStats as unknown as DurableObjectNamespace
   } as unknown as Env;
   return {
     playerStats,

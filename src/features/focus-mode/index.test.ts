@@ -144,6 +144,7 @@ describe('focus mode entrypoint', () => {
     const collapsed = document.querySelector<HTMLElement>('.ytcq-focus-card-collapsed')!;
     const label = collapsed.querySelector<HTMLElement>('.ytcq-focus-label')!;
     label.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Enter' }));
+    collapsed.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'ArrowDown' }));
     expect(document.querySelector('.ytcq-focus-card-expanded')).toBeNull();
 
     collapsed.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: ' ' }));
@@ -214,6 +215,12 @@ describe('focus mode entrypoint', () => {
     expect(replyMocks.quoteAuthorRichText).not.toHaveBeenCalled();
 
     row.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Enter' }));
+    await vi.runAllTimersAsync();
+
+    expect(replyMocks.quoteAuthorRichText).toHaveBeenCalledOnce();
+
+    replyMocks.quoteAuthorRichText.mockClear();
+    row.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: ' ' }));
     await vi.runAllTimersAsync();
 
     expect(replyMocks.quoteAuthorRichText).toHaveBeenCalledOnce();
@@ -342,6 +349,17 @@ describe('focus mode entrypoint', () => {
     expect(chatState.text).toBe('@DraftViewer draft text');
   });
 
+  it('replaces a pending focus mention restore timer when focus changes quickly', async () => {
+    const clearTimeoutSpy = vi.spyOn(window, 'clearTimeout');
+
+    expect(openFocusModeForAuthor({ authorName: '@FirstTimerViewer', channelId: 'first-channel' })).toBe(true);
+    expect(openFocusModeForAuthor({ authorName: '@SecondTimerViewer', channelId: 'second-channel' })).toBe(true);
+    await vi.runAllTimersAsync();
+
+    expect(clearTimeoutSpy).toHaveBeenCalled();
+    expect(chatState.text).toBe('@SecondTimerViewer ');
+  });
+
   it('does not restore the fixed focus mention for Shift+Enter or non-input Enter', async () => {
     initFocusMode();
     expect(openFocusModeForAuthor({ authorName: '@FocusedViewer', channelId: 'viewer-channel' })).toBe(true);
@@ -458,6 +476,33 @@ describe('focus mode entrypoint', () => {
     });
     translationCallbacks.translationsCleared?.();
     expect(document.querySelector('.ytcq-focus-bubble')?.textContent).not.toContain('hello again');
+  });
+
+  it('ignores translation clears for untranslated records and prioritizes detached live refs', async () => {
+    initFocusMode();
+    setOptions({ ...DEFAULT_OPTIONS, targetLanguage: 'en' });
+    const focusedMessage = createMessage('@DetachedTranslatedFocus', 'hola', 'translated-channel');
+    document.body.append(focusedMessage);
+
+    expect(openFocusModeForAuthor({ authorName: '@DetachedTranslatedFocus', channelId: 'translated-channel' })).toBe(true);
+    await vi.runAllTimersAsync();
+
+    translationCallbacks.cleared?.({ message: focusedMessage });
+    expect(document.querySelector('.ytcq-focus-bubble')?.textContent).toContain('hola');
+
+    translationCallbacks.rendered?.({
+      message: focusedMessage,
+      originalText: 'hola',
+      protectedTokens: [],
+      result: { sourceLanguage: 'es', targetLanguage: 'en', text: 'hello' },
+      sourceText: 'hola'
+    });
+    focusedMessage.remove();
+    queueMocks.prioritize.mockClear();
+
+    translationCallbacks.translationsCleared?.();
+
+    expect(queueMocks.prioritize).toHaveBeenCalledWith([null]);
   });
 
   it('ignores translation events when no focus record matches', async () => {

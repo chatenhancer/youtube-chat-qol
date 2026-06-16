@@ -1,6 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   closeChessGamePanel,
+  getActiveChessGameId,
+  getChessGamePanelOverlay,
+  isChessGamePanelOpen,
+  isPublicChessGame,
   openChessGamePanel,
   updateChessGamePanel,
   type PublicChessGame
@@ -26,6 +30,20 @@ describe('playground chess panel feedback', () => {
       this.play = vi.fn(() => Promise.resolve());
       audioMocks.push(this);
     } as unknown as typeof Audio);
+    vi.stubGlobal('Image', class {
+      complete = true;
+      decoding = 'async';
+      height = 64;
+      naturalHeight = 64;
+      naturalWidth = 64;
+      onerror: (() => void) | null = null;
+      onload: (() => void) | null = null;
+      width = 64;
+
+      set src(_value: string) {
+        queueMicrotask(() => this.onload?.());
+      }
+    } as unknown as typeof Image);
   });
 
   afterEach(() => {
@@ -46,6 +64,93 @@ describe('playground chess panel feedback', () => {
 
     vi.advanceTimersByTime(1300);
     expect(getFeedbackMessages()).toEqual([]);
+  });
+
+  it('tracks panel state, active game id, and public game shape', () => {
+    expect(isChessGamePanelOpen()).toBe(false);
+    expect(getActiveChessGameId()).toBe('');
+    expect(getChessGamePanelOverlay()).toBeNull();
+    expect(isPublicChessGame(undefined)).toBe(false);
+    expect(isPublicChessGame({ gameId: 'game-1', gameType: 'replay-trivia' } as never)).toBe(false);
+    expect(isPublicChessGame(createChessGame({ turn: 'white' }))).toBe(true);
+
+    const visibilityChanged = vi.fn();
+    openChessGamePanel(createChessGame({ turn: 'white' }), 'me-user', vi.fn(), visibilityChanged);
+
+    expect(isChessGamePanelOpen()).toBe(true);
+    expect(getActiveChessGameId()).toBe('game-1');
+
+    closeChessGamePanel();
+
+    expect(isChessGamePanelOpen()).toBe(false);
+    expect(visibilityChanged).toHaveBeenCalledOnce();
+  });
+
+  it('ignores clicks when the game is inactive or no board square can be mapped', () => {
+    const inactiveMove = vi.fn();
+    openChessGamePanel(createChessGame({ status: 'draw', turn: 'white' }), 'me-user', inactiveMove);
+    const inactiveCanvas = prepareChessCanvas();
+
+    clickChessSquare(inactiveCanvas, 'e2');
+
+    expect(inactiveMove).not.toHaveBeenCalled();
+    expect(getFeedbackMessages()).toEqual([]);
+
+    closeChessGamePanel({ notify: false });
+
+    const onMove = vi.fn();
+    openChessGamePanel(createChessGame({ turn: 'white' }), 'me-user', onMove);
+    const canvas = prepareChessCanvas();
+
+    canvas.dispatchEvent(new MouseEvent('click', {
+      bubbles: true,
+      clientX: -4,
+      clientY: 14
+    }));
+    mockRect(canvas, { height: 0, left: 0, top: 0, width: 0 });
+    clickDisplayedSquare(canvas, { x: 4, y: 6 });
+
+    expect(onMove).not.toHaveBeenCalled();
+    expect(getFeedbackMessages()).toEqual([]);
+  });
+
+  it('ignores stale game updates and updates the opponent subtitle for active games', () => {
+    openChessGamePanel(createChessGame({ turn: 'white' }), 'me-user', vi.fn());
+    const subtitle = document.querySelector<HTMLElement>('.ytcq-chess-game-subtitle');
+    expect(subtitle?.textContent).toBe('Other player');
+
+    updateChessGamePanel({
+      ...createChessGame({ turn: 'white' }),
+      gameId: 'other-game',
+      players: {
+        black: {
+          displayName: 'Ignored player',
+          userId: 'other-user'
+        },
+        white: {
+          displayName: 'Me',
+          userId: 'me-user'
+        }
+      }
+    }, 'me-user');
+
+    expect(subtitle?.textContent).toBe('Other player');
+
+    updateChessGamePanel({
+      ...createChessGame({ turn: 'white' }),
+      players: {
+        black: {
+          displayName: '',
+          userId: 'other-user'
+        },
+        white: {
+          displayName: 'Me',
+          userId: 'me-user'
+        }
+      }
+    }, 'me-user');
+
+    expect(subtitle?.textContent).toBe('Player');
   });
 
   it('centers floating messages above the click by default', () => {
@@ -71,6 +176,19 @@ describe('playground chess panel feedback', () => {
     expect(onMove).not.toHaveBeenCalled();
   });
 
+  it('uses the white board perspective for spectators and blocks spectator moves', () => {
+    const onMove = vi.fn();
+    openChessGamePanel(createChessGame({ turn: 'white' }), 'spectator-user', onMove);
+    const canvas = prepareChessCanvas();
+
+    expect(document.querySelector<HTMLElement>('.ytcq-chess-game-subtitle')?.textContent).toBe('Me');
+
+    clickChessSquare(canvas, 'e2');
+
+    expect(getFeedbackMessages()).toEqual(['Not your turn']);
+    expect(onMove).not.toHaveBeenCalled();
+  });
+
   it('shows a floating message for invalid moves and keeps the piece selected', () => {
     const onMove = vi.fn();
     openChessGamePanel(createChessGame({ turn: 'white' }), 'me-user', onMove);
@@ -87,6 +205,70 @@ describe('playground chess panel feedback', () => {
     expect(onMove).toHaveBeenCalledWith('game-1', 'e2', 'e4', undefined);
   });
 
+  it('deselects a selected piece and retargets another own piece', () => {
+    const onMove = vi.fn();
+    openChessGamePanel(createChessGame({ turn: 'white' }), 'me-user', onMove);
+    const canvas = prepareChessCanvas();
+
+    clickChessSquare(canvas, 'e2');
+    clickChessSquare(canvas, 'e2');
+    clickChessSquare(canvas, 'e4');
+
+    expect(getFeedbackMessages()).toEqual(['Choose your piece']);
+    expect(onMove).not.toHaveBeenCalled();
+
+    clickChessSquare(canvas, 'e2');
+    clickChessSquare(canvas, 'd2');
+    clickChessSquare(canvas, 'd4');
+
+    expect(onMove).toHaveBeenCalledWith('game-1', 'd2', 'd4', undefined);
+  });
+
+  it('sends promotion moves with the promoted piece from chess.js', () => {
+    const onMove = vi.fn();
+    openChessGamePanel(createChessGame({
+      fen: '7k/4P3/8/8/8/8/8/4K3 w - - 0 1',
+      turn: 'white'
+    }), 'me-user', onMove);
+    const canvas = prepareChessCanvas();
+
+    clickChessSquare(canvas, 'e7');
+    clickChessSquare(canvas, 'e8');
+
+    expect(onMove).toHaveBeenCalledWith('game-1', 'e7', 'e8', expect.stringMatching(/^[bnqr]$/));
+  });
+
+  it('keeps malformed chess positions inert instead of throwing', () => {
+    const onMove = vi.fn();
+    openChessGamePanel(createChessGame({
+      fen: '4K3/8/8/8/8/8/4P3/4K3 w - - 0 1',
+      turn: 'white'
+    }), 'me-user', onMove);
+    const canvas = prepareChessCanvas();
+
+    clickChessSquare(canvas, 'e2');
+    clickChessSquare(canvas, 'e4');
+
+    expect(getFeedbackMessages()).toEqual(['Invalid move']);
+    expect(onMove).not.toHaveBeenCalled();
+  });
+
+  it('renders empty and overfull FEN board rows defensively', () => {
+    const context = createMockChessCanvasContext();
+    const getContext = vi.spyOn(HTMLCanvasElement.prototype, 'getContext')
+      .mockReturnValue(context as unknown as CanvasRenderingContext2D);
+
+    openChessGamePanel(createChessGame({ fen: '', turn: 'white' }), 'me-user', vi.fn());
+    updateChessGamePanel(createChessGame({
+      fen: '9P/8/8/8/8/8/8/8 w - - 0 1',
+      turn: 'white'
+    }), 'me-user');
+
+    expect(context.clearRect).toHaveBeenCalled();
+
+    getContext.mockRestore();
+  });
+
   it('maps black player clicks through the flipped board perspective', () => {
     const onMove = vi.fn();
     openChessGamePanel(createChessGame({
@@ -99,6 +281,77 @@ describe('playground chess panel feedback', () => {
     clickDisplayedSquare(canvas, { x: 3, y: 4 });
 
     expect(onMove).toHaveBeenCalledWith('game-1', 'e7', 'e5', undefined);
+  });
+
+  it('updates hover highlights unless a blocking status overlay is active', () => {
+    openChessGamePanel(createChessGame({ turn: 'white' }), 'me-user', vi.fn());
+    const canvas = prepareChessCanvas();
+
+    moveDisplayedSquare(canvas, { x: 4, y: 6 });
+    expect(canvas.style.cursor).toBe('');
+
+    getChessGamePanelOverlay()?.show({
+      key: 'connection:reconnecting',
+      message: 'Connection lost.',
+      owner: 'system',
+      temporary: false
+    });
+    moveDisplayedSquare(canvas, { x: 5, y: 6 });
+    canvas.dispatchEvent(new MouseEvent('mouseleave', { bubbles: true }));
+
+    expect(getStatusMessage()).toBe('Connection lost.');
+  });
+
+  it('skips redundant hover redraws and clears hover on mouseleave', () => {
+    const context = createMockChessCanvasContext();
+    const getContext = vi.spyOn(HTMLCanvasElement.prototype, 'getContext')
+      .mockReturnValue(context as unknown as CanvasRenderingContext2D);
+    openChessGamePanel(createChessGame({ turn: 'white' }), 'me-user', vi.fn());
+    const canvas = prepareChessCanvas();
+
+    context.fillRect.mockClear();
+    canvas.dispatchEvent(new MouseEvent('mouseleave', { bubbles: true }));
+    expect(context.fillRect).not.toHaveBeenCalled();
+
+    moveDisplayedSquare(canvas, { x: 4, y: 6 });
+    expect(context.fillRect).toHaveBeenCalled();
+
+    context.fillRect.mockClear();
+    moveDisplayedSquare(canvas, { x: 4, y: 6 });
+    expect(context.fillRect).not.toHaveBeenCalled();
+
+    canvas.dispatchEvent(new MouseEvent('mouseleave', { bubbles: true }));
+    expect(context.fillRect).toHaveBeenCalled();
+
+    context.fillRect.mockClear();
+    getChessGamePanelOverlay()?.show({
+      key: 'connection:reconnecting',
+      message: 'Connection lost.',
+      owner: 'system',
+      temporary: false
+    });
+    moveDisplayedSquare(canvas, { x: 5, y: 6 });
+    expect(context.fillRect).not.toHaveBeenCalled();
+
+    getContext.mockRestore();
+  });
+
+  it('blocks moves while a persistent status overlay is active', () => {
+    const onMove = vi.fn();
+    openChessGamePanel(createChessGame({ turn: 'white' }), 'me-user', onMove);
+    const canvas = prepareChessCanvas();
+    getChessGamePanelOverlay()?.show({
+      key: 'connection:reconnecting',
+      message: 'Connection lost.',
+      owner: 'system',
+      temporary: false
+    });
+
+    clickChessSquare(canvas, 'e2');
+    clickChessSquare(canvas, 'e4');
+
+    expect(onMove).not.toHaveBeenCalled();
+    expect(getFeedbackMessages()).toEqual([]);
   });
 
   it('plays the move sound when a received update changes the board position', () => {
@@ -131,6 +384,57 @@ describe('playground chess panel feedback', () => {
 
     expect(getAudioMock('games/chess/capture.mp3').play).toHaveBeenCalledOnce();
     expect(getAudioMock('games/chess/move.mp3').play).not.toHaveBeenCalled();
+  });
+
+  it('continues rendering when canvas context is missing or unavailable', () => {
+    const getContext = vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValueOnce(null);
+
+    expect(() => openChessGamePanel(createChessGame({ turn: 'white' }), 'me-user', vi.fn())).not.toThrow();
+
+    closeChessGamePanel({ notify: false });
+    getContext.mockImplementationOnce(() => {
+      throw new Error('canvas unavailable');
+    });
+
+    expect(() => openChessGamePanel(createChessGame({ turn: 'white' }), 'me-user', vi.fn())).not.toThrow();
+  });
+
+  it('loads image assets and redraws pieces with updated pixel ratio', async () => {
+    const restorePixelRatio = setDevicePixelRatio(2);
+    try {
+      openChessGamePanel(createChessGame({ turn: 'white' }), 'me-user', vi.fn());
+      const canvas = prepareChessCanvas();
+
+      await Promise.resolve();
+      updateChessGamePanel(createChessGame({
+        fen: '8/8/8/8/8/8/8/RNBQKBNR w - - 0 1',
+        turn: 'white'
+      }), 'me-user');
+
+      expect(canvas.width).toBe(448);
+      expect(canvas.height).toBe(448);
+    } finally {
+      restorePixelRatio();
+    }
+  });
+
+  it('uses a minimum canvas pixel ratio and resizes when the ratio changes', () => {
+    const restorePixelRatio = setDevicePixelRatio(0);
+    try {
+      openChessGamePanel(createChessGame({ turn: 'white' }), 'me-user', vi.fn());
+      const canvas = prepareChessCanvas();
+
+      expect(canvas.width).toBe(224);
+      expect(canvas.height).toBe(224);
+
+      setDevicePixelRatio(2);
+      updateChessGamePanel(createChessGame({ turn: 'white' }), 'me-user');
+
+      expect(canvas.width).toBe(448);
+      expect(canvas.height).toBe(448);
+    } finally {
+      restorePixelRatio();
+    }
   });
 
   it('shows game sounds enabled by default', () => {
@@ -290,6 +594,17 @@ function clickDisplayedSquare(canvas: HTMLCanvasElement, square: { x: number; y:
   }));
 }
 
+function moveDisplayedSquare(canvas: HTMLCanvasElement, square: { x: number; y: number }): void {
+  const tileSize = 224 / 8;
+  const clientX = square.x * tileSize + tileSize / 2;
+  const clientY = square.y * tileSize + tileSize / 2;
+  canvas.dispatchEvent(new MouseEvent('mousemove', {
+    bubbles: true,
+    clientX,
+    clientY
+  }));
+}
+
 function getFeedbackMessages(): string[] {
   return getFeedbackBubbles()
     .map((element) => element.textContent || '');
@@ -349,4 +664,35 @@ function mockRect(
     configurable: true,
     value: () => fullRect
   });
+}
+
+function createMockChessCanvasContext() {
+  return {
+    clearRect: vi.fn(),
+    drawImage: vi.fn(),
+    fillRect: vi.fn(),
+    fillStyle: '',
+    imageSmoothingEnabled: false,
+    lineWidth: 1,
+    setTransform: vi.fn(),
+    strokeRect: vi.fn(),
+    strokeStyle: ''
+  };
+}
+
+function setDevicePixelRatio(value: number): () => void {
+  const descriptor = Object.getOwnPropertyDescriptor(window, 'devicePixelRatio');
+  Object.defineProperty(window, 'devicePixelRatio', {
+    configurable: true,
+    value
+  });
+
+  return () => {
+    if (descriptor) {
+      Object.defineProperty(window, 'devicePixelRatio', descriptor);
+      return;
+    }
+
+    Reflect.deleteProperty(window, 'devicePixelRatio');
+  };
 }

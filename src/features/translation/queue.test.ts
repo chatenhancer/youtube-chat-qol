@@ -133,6 +133,8 @@ describe('translation queue', () => {
   });
 
   it('does not translate messages without meaningful language text', async () => {
+    queueMessageTranslation(createTextMessage(''));
+    queueMessageTranslation(createTextMessage('   \n   '));
     queueMessageTranslation(createTextMessage('https://example.com'));
     queueMessageTranslation(createTextMessage('12345 !!!'));
     queueMessageTranslation(createTextMessage('😀😀😀'));
@@ -165,6 +167,29 @@ describe('translation queue', () => {
     expect(second.querySelector('.ytcq-translation')?.textContent).toContain('hello world');
   });
 
+  it('evicts a cached translation when a later message can no longer render it', async () => {
+    const cleared = vi.fn();
+    const unsubscribe = onMessageTranslationCleared(cleared);
+    const first = createTextMessage('Mensaje cache desconectado');
+    const disconnected = createTextMessage('Mensaje cache desconectado');
+
+    queueMessageTranslation(first);
+    await flushPromises();
+    vi.mocked(chrome.runtime.sendMessage).mockClear();
+    disconnected.remove();
+
+    queueMessageTranslation(disconnected);
+    await flushPromises();
+    unsubscribe();
+
+    expect(disconnected.dataset.ytcqTranslationKey).toBeUndefined();
+    expect(cleared).toHaveBeenCalledWith({ message: disconnected });
+
+    queueMessageTranslation(createTextMessage('Mensaje cache desconectado'));
+    await flushPromises();
+    expect(chrome.runtime.sendMessage).toHaveBeenCalledOnce();
+  });
+
   it('shares one pending request across duplicate messages and renders both responses', async () => {
     const requests = mockDeferredRuntimeSendMessages();
     const first = createTextMessage('Mensaje duplicado');
@@ -183,6 +208,26 @@ describe('translation queue', () => {
     expect(requests).toHaveLength(1);
     expect(first.querySelector('.ytcq-translation')?.textContent).toContain('duplicated message');
     expect(second.querySelector('.ytcq-translation')?.textContent).toContain('duplicated message');
+  });
+
+  it('shares one pending backfill request across duplicate backfill messages', async () => {
+    const requests = mockDeferredRuntimeSendMessages();
+    const first = createTextMessage('Mensaje duplicado historial');
+    const second = createTextMessage('Mensaje duplicado historial');
+
+    queueMessageTranslation(first, { backfill: true });
+    queueMessageTranslation(second, { backfill: true });
+    await waitForRuntimeRequestCount(requests, 1);
+    requests[0].resolve({
+      ok: true,
+      sourceLanguage: 'es',
+      translatedText: 'duplicate history message'
+    });
+    await flushPromises();
+
+    expect(requests).toHaveLength(1);
+    expect(first.querySelector('.ytcq-translation')?.textContent).toContain('duplicate history message');
+    expect(second.querySelector('.ytcq-translation')?.textContent).toContain('duplicate history message');
   });
 
   it('does not queue the same message again while its translation key is unchanged', async () => {
@@ -287,15 +332,39 @@ describe('translation queue', () => {
   it('ignores invalid priority messages and allows priority scopes to close idempotently', async () => {
     const requests = mockDeferredRuntimeSendMessages();
     const disconnected = createTextMessage('Mensaje desconectado');
+    const punctuationOnly = createTextMessage('12345 !!!');
     disconnected.remove();
     const scope = createTranslationPriorityScope();
 
-    scope.prioritize([null, undefined, disconnected]);
+    scope.prioritize([null, undefined, disconnected, punctuationOnly]);
     scope.close();
     scope.close();
     await flushPromises();
 
     expect(requests).toHaveLength(0);
+  });
+
+  it('does not retain unrelated messages just because another priority scope is open', async () => {
+    const requests = mockDeferredRuntimeSendMessages();
+    const priorityMessage = createTextMessage('Mensaje prioritario aislado');
+    const unrelatedLiveMessage = createTextMessage('Mensaje vivo sin prioridad activa');
+    const laterLiveMessage = createTextMessage('Mensaje vivo posterior sin prioridad');
+    const scope = createTranslationPriorityScope();
+
+    scope.prioritize([priorityMessage]);
+    queueMessageTranslation(unrelatedLiveMessage);
+    queueMessageTranslation(laterLiveMessage);
+    scope.close();
+    await waitForRuntimeRequestCount(requests, 2);
+
+    expect(requests[0].message).toEqual(expect.objectContaining({
+      text: 'Mensaje prioritario aislado'
+    }));
+    expect(requests[1].message).toEqual(expect.objectContaining({
+      text: 'Mensaje vivo sin prioridad activa'
+    }));
+
+    await resolveAllRuntimeRequests(requests);
   });
 
   it('queues unqueued messages from an open priority scope and ignores prioritize after close', async () => {
@@ -365,6 +434,27 @@ describe('translation queue', () => {
 
     expect(requests[2].message).toEqual(expect.objectContaining({
       text: 'Mensaje de historial promocion tres'
+    }));
+
+    await resolveAllRuntimeRequests(requests);
+  });
+
+  it('clears the backfill delay when a delayed backfill is promoted by a live duplicate', async () => {
+    const requests = mockDeferredRuntimeSendMessages();
+    const delayedBackfill = createTextMessage('Mensaje de historial con retardo');
+
+    queueMessageTranslation(createTextMessage('Mensaje de historial inicial'), { backfill: true });
+    queueMessageTranslation(createTextMessage('Mensaje de historial segundo'), { backfill: true });
+    queueMessageTranslation(delayedBackfill, { backfill: true });
+    await waitForRuntimeRequestCount(requests, 2);
+    requests[0].resolve();
+    await flushPromises();
+
+    queueMessageTranslation(createTextMessage('Mensaje de historial con retardo'));
+    await waitForRuntimeRequestCount(requests, 3);
+
+    expect(requests[2].message).toEqual(expect.objectContaining({
+      text: 'Mensaje de historial con retardo'
     }));
 
     await resolveAllRuntimeRequests(requests);

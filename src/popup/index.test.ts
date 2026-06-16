@@ -788,10 +788,67 @@ describe('popup', () => {
       playgroundEnabled: false,
       playgroundGamesAvailable: false
     });
+    playgroundGamesAvailable.checked = true;
+    playgroundGamesAvailable.dispatchEvent(new Event('change', { bubbles: true }));
+    expect(chrome.storage.sync.set).toHaveBeenCalledWith({
+      playgroundGamesAvailable: true
+    });
     await vi.advanceTimersByTimeAsync(180);
     expect(playgroundGamesSection.hidden).toBe(true);
     await vi.advanceTimersByTimeAsync(1000);
     expect(document.querySelector('.startup-effect-icon')?.classList.contains('ytcq-sparkle-burst')).toBe(false);
+  });
+
+  it('ignores stale, failed, and blank Playground profile responses', async () => {
+    type RuntimeCallback = (response: unknown) => void;
+    const profileCallbacks: RuntimeCallback[] = [];
+    await chrome.storage.sync.set({
+      playgroundEnabled: true
+    });
+    vi.mocked(chrome.tabs.query).mockImplementation(((_queryInfo: chrome.tabs.QueryInfo, callback?: (tabs: chrome.tabs.Tab[]) => void) => {
+      callback?.([]);
+      return Promise.resolve([]);
+    }) as never);
+    vi.mocked(chrome.runtime.sendMessage).mockImplementation(((message: unknown, callback?: RuntimeCallback) => {
+      if (typeof message === 'object' &&
+        message !== null &&
+        (message as { type?: string }).type === 'ytcq:playground:get-profile') {
+        if (callback) profileCallbacks.push(callback);
+        return Promise.resolve(undefined);
+      }
+      callback?.({ activeTabIds: [] });
+      return Promise.resolve({ activeTabIds: [] });
+    }) as never);
+
+    await import('./index');
+    const playgroundEnabled = document.querySelector<HTMLInputElement>('#playgroundEnabled')!;
+    const playgroundProfile = document.querySelector<HTMLElement>('#playgroundProfile')!;
+    const playgroundProfileName = document.querySelector<HTMLElement>('#playgroundProfileName')!;
+
+    playgroundEnabled.checked = false;
+    playgroundEnabled.dispatchEvent(new Event('change', { bubbles: true }));
+    profileCallbacks[0]?.({
+      ok: true,
+      profile: { displayName: 'Stale Player', userId: 'stale-user', wins: 4 }
+    });
+
+    expect(playgroundProfile.hidden).toBe(true);
+    expect(playgroundProfileName.textContent).toBe('');
+
+    playgroundEnabled.checked = true;
+    playgroundEnabled.dispatchEvent(new Event('change', { bubbles: true }));
+    profileCallbacks[1]?.({ ok: false });
+    expect(playgroundProfile.hidden).toBe(true);
+
+    playgroundEnabled.checked = false;
+    playgroundEnabled.dispatchEvent(new Event('change', { bubbles: true }));
+    playgroundEnabled.checked = true;
+    playgroundEnabled.dispatchEvent(new Event('change', { bubbles: true }));
+    profileCallbacks[2]?.({
+      ok: true,
+      profile: { displayName: '   ', wins: 'many' }
+    });
+    expect(playgroundProfile.hidden).toBe(true);
   });
 
   it('lets the Playground helper text toggle while the helper link stays a link', async () => {

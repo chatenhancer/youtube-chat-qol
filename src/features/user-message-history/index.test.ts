@@ -332,6 +332,29 @@ describe('user message history', () => {
     expect(matches[0].latestMessage.text).toBe('second fallback record');
   });
 
+  it('keeps author names without handles in recent user matches', async () => {
+    const history = await import('./index');
+    history.recordUserMessage(createMessage({
+      authorName: '😀',
+      channelId: 'emoji-author-channel',
+      messageId: 'message-0',
+      text: 'message from emoji display name'
+    }));
+    history.recordUserMessage(createMessage({
+      authorName: 'Display Name',
+      channelId: 'display-name-channel',
+      messageId: 'message-1',
+      text: 'message from display name'
+    }));
+
+    expect(history.findRecentUsersByHandle('display')).toMatchObject([
+      {
+        authorName: 'Display Name',
+        latestMessage: { text: 'message from display name' }
+      }
+    ]);
+  });
+
   it('returns no handle matches for blank queries', async () => {
     const history = await import('./index');
 
@@ -579,6 +602,72 @@ describe('user message history', () => {
       authorName: '@NoTranslationYet',
       channelId: 'no-translation-channel'
     })?.translation).toBeUndefined();
+  });
+
+  it('only notifies users whose stored translation records were cleared', async () => {
+    const history = await import('./index');
+    const lifecycle = await import('../../content/lifecycle');
+    const events = await import('../translation/events');
+    lifecycle.initFeatures({ saveOptions: vi.fn() });
+    const translated = createMessage({
+      authorName: '@TranslatedOne',
+      channelId: 'translated-one-channel',
+      messageId: 'message-1',
+      text: 'hola'
+    });
+    const untranslated = createMessage({
+      authorName: '@UntranslatedOne',
+      channelId: 'untranslated-one-channel',
+      messageId: 'message-2',
+      text: 'adios'
+    });
+    const listener = vi.fn();
+    history.recordUserMessage(translated);
+    history.recordUserMessage(untranslated);
+    history.onUserMessagesChanged(listener);
+    events.emitMessageTranslationRendered({
+      message: translated,
+      originalText: 'hola',
+      protectedTokens: [],
+      result: { sourceLanguage: 'es', targetLanguage: 'en', text: 'hello' },
+      sourceText: 'hola'
+    });
+    listener.mockClear();
+
+    events.emitMessageTranslationsCleared();
+
+    expect(listener).toHaveBeenCalledOnce();
+    expect(listener).toHaveBeenCalledWith('channel:translated-one-channel');
+    expect(history.getLatestMessageForIdentity({
+      authorName: '@TranslatedOne',
+      channelId: 'translated-one-channel'
+    })?.translation).toBeUndefined();
+    expect(history.getLatestMessageForIdentity({
+      authorName: '@UntranslatedOne',
+      channelId: 'untranslated-one-channel'
+    })?.text).toBe('adios');
+  });
+
+  it('returns null when a recorded element no longer has a matching user record', async () => {
+    const history = await import('./index');
+    const message = createMessage({
+      authorName: '@RemovedRecord',
+      channelId: 'removed-record-channel',
+      messageId: 'message-1',
+      text: 'first record'
+    });
+    history.recordUserMessage(message);
+    for (let index = 0; index < 161; index += 1) {
+      vi.mocked(Date.now).mockReturnValue(new Date(Date.UTC(2026, 4, 31, 12, 1, index)).getTime());
+      history.recordUserMessage(createMessage({
+        authorName: `@PruneUser${index}`,
+        channelId: `prune-channel-${index}`,
+        messageId: `prune-message-${index}`,
+        text: `prune message ${index}`
+      }));
+    }
+
+    expect(history.getUserMessageRecordForMessage(message)).toBeNull();
   });
 
   it('returns null and empty values when identity or record data is unavailable', async () => {
