@@ -272,7 +272,7 @@ function createTurnstilePage(config: Record<string, string>): string {
       margin: 0;
       max-width: 32ch;
     }
-    #turnstile {
+    #turnstile-widget {
       min-height: 65px;
     }
   </style>
@@ -281,11 +281,12 @@ function createTurnstilePage(config: Record<string, string>): string {
   <main>
     <h1>Verify Replay Trivia</h1>
     <p id="status">Complete the check to generate questions.</p>
-    <div id="turnstile"></div>
+    <div id="turnstile-widget"></div>
   </main>
   <script>
     const config = ${serializedConfig};
     const status = document.getElementById('status');
+    let widgetRendered = false;
 
     function postResult(payload) {
       if (window.opener) {
@@ -336,12 +337,21 @@ function createTurnstilePage(config: Record<string, string>): string {
     }
 
     function renderTurnstile() {
+      if (widgetRendered) return;
       if (!config.streamKey || !config.gameId || !config.userId || !config.requestId) {
         status.textContent = 'Verification details are missing.';
         postResult({ error: 'Verification details are missing.' });
         return;
       }
-      turnstile.render('#turnstile', {
+      const turnstileApi = window.turnstile;
+      if (!turnstileApi || typeof turnstileApi.render !== 'function') {
+        const message = 'Verification could not load. Try again.';
+        status.textContent = message;
+        postResult({ error: message });
+        return;
+      }
+      widgetRendered = true;
+      turnstileApi.render('#turnstile-widget', {
         action: config.action,
         callback: submitToken,
         sitekey: config.siteKey
