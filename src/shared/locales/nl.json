@@ -237,9 +237,6 @@
     "supportAndFeedback": {
       "message": "Support en feedback"
     },
-    "supportIssueTrackerPrompt": {
-      "message": "Je wordt doorgestuurd naar onze openbare issue-tracker voor bugmeldingen en functieverzoeken. Een account kan nodig zijn.\n\nJe kunt ons ook mailen op {supportEmail}.\n\nDoorgaan naar de issue-tracker?"
-    },
     "resetAllExtensionData": {
       "message": "Alle extensie-instellingen en lokale gegevens resetten"
     },

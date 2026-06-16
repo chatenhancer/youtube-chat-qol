@@ -240,9 +240,6 @@
     "supportAndFeedback": {
       "message": "支持和反馈"
     },
-    "supportIssueTrackerPrompt": {
-      "message": "你将被重定向到我们的公开问题跟踪器，用于报告错误和提交功能请求。可能需要账户。\n\n你也可以发送邮件至 {supportEmail}。\n\n继续前往问题跟踪器？"
-    },
     "resetAllExtensionData": {
       "message": "重置所有扩展设置和本地数据"
     },

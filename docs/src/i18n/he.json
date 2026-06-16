@@ -113,13 +113,6 @@
     "firefoxAddons": "Firefox Add-ons",
     "sourceCode": "קוד מקור",
     "supportFeedback": "תמיכה",
-    "supportModalTitle": "על GitHub Issues",
-    "supportModalBody": "GitHub Issues הוא כלי המעקב הציבורי שבו אנו משתמשים לדיווחי באגים ובקשות לפיצ׳רים.",
-    "supportModalDetailOne": "פרסום או תגובה ב-GitHub עשויים לדרוש חשבון GitHub.",
-    "supportModalDetailTwo": "לחצו על הכפתור New issue ב-GitHub כדי להתחיל דיווח או בקשה.",
-    "supportModalDetailThree": "טופסי ה-issue יבקשו את הפרטים המתאימים לכל סוג דיווח.",
-    "supportModalCancel": "ביטול",
-    "supportModalContinue": "המשך אל GitHub Issues",
     "privateQuestions": "אפשר גם לשלוח לנו אימייל אל",
     "gettingStartedTitle": "תחילת עבודה",
     "gettingStartedBody": "התקינו, רעננו את YouTube פעם אחת אם הוא כבר היה פתוח, ואז השתמשו בתוסף איפה שהצ׳אט החי כבר נמצא.",
@@ -135,8 +128,7 @@
     "stepRefreshBodyAfterIcon": "יופיע בצ׳אט YouTube.",
     "stepSettingsBodyBeforeIcon": "התוסף עובד אוטומטית בצ׳אט חי. לכל ההגדרות, לחצו על אייקון התוספים בסרגל הדפדפן",
     "stepSettingsBodyMiddle": "ובחרו",
-    "stepSettingsBodyAfterIcon": "Chat Enhancer כדי להציג את כל האפשרויות. נעצו אותו לגישה מהירה.",
-    "supportModalDetailFour": "אפשר גם לשלוח לנו אימייל אל <a data-contact-email-address></a>."
+    "stepSettingsBodyAfterIcon": "Chat Enhancer כדי להציג את כל האפשרויות. נעצו אותו לגישה מהירה."
   },
   "privacy": {
     "eyebrow": "פרטיות",

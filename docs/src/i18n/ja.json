@@ -113,13 +113,6 @@
     "firefoxAddons": "Firefox Add-ons",
     "sourceCode": "ソースコード",
     "supportFeedback": "サポート・要望",
-    "supportModalTitle": "GitHub Issues について",
-    "supportModalBody": "GitHub Issues は、バグ報告と機能リクエストに使用している公開トラッカーです。",
-    "supportModalDetailOne": "GitHub で投稿またはコメントするには、GitHub アカウントが必要な場合があります。",
-    "supportModalDetailTwo": "GitHub の New issue ボタンをクリックして、報告またはリクエストを開始します。",
-    "supportModalDetailThree": "Issue フォームが、報告の種類に応じて必要な詳細を案内します。",
-    "supportModalCancel": "キャンセル",
-    "supportModalContinue": "GitHub Issues に進む",
     "privateQuestions": "メールでも連絡できます:",
     "gettingStartedTitle": "はじめ方",
     "gettingStartedBody": "インストールし、YouTube をすでに開いていた場合は一度更新してから、ライブチャット上で拡張機能を使います。",
@@ -135,8 +128,7 @@
     "stepRefreshBodyAfterIcon": "が表示されればチャット機能の準備は完了です。",
     "stepSettingsBodyBeforeIcon": "拡張機能はライブチャット内で自動的に動作します。すべての設定を開くには、ブラウザのツールバーにある拡張機能アイコンをクリックし",
     "stepSettingsBodyMiddle": "次に",
-    "stepSettingsBodyAfterIcon": "Chat Enhancerを選んですべてのオプションを表示します。すばやく開きたい場合はピン留めしてください。",
-    "supportModalDetailFour": "メールでも <a data-contact-email-address></a> に連絡できます。"
+    "stepSettingsBodyAfterIcon": "Chat Enhancerを選んですべてのオプションを表示します。すばやく開きたい場合はピン留めしてください。"
   },
   "privacy": {
     "eyebrow": "プライバシー",

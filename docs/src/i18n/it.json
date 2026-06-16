@@ -113,13 +113,6 @@
     "firefoxAddons": "Firefox Add-ons",
     "sourceCode": "Codice sorgente",
     "supportFeedback": "Supporto",
-    "supportModalTitle": "Informazioni su GitHub Issues",
-    "supportModalBody": "GitHub Issues è il tracker pubblico che usiamo per segnalazioni di bug e richieste di funzionalità.",
-    "supportModalDetailOne": "Pubblicare o commentare su GitHub può richiedere un account GitHub.",
-    "supportModalDetailTwo": "Fai clic sul pulsante New issue su GitHub per iniziare una segnalazione o richiesta.",
-    "supportModalDetailThree": "I moduli degli issue chiederanno i dettagli necessari per ogni tipo di segnalazione.",
-    "supportModalCancel": "Annulla",
-    "supportModalContinue": "Continua su GitHub Issues",
     "privateQuestions": "Puoi anche scriverci a",
     "gettingStartedTitle": "Primi passi",
     "gettingStartedBody": "Installa, aggiorna YouTube una volta se era già aperto, poi usa l'estensione dove la chat live si trova già.",
@@ -135,8 +128,7 @@
     "stepRefreshBodyAfterIcon": "appare nella chat di YouTube.",
     "stepSettingsBodyBeforeIcon": "L’estensione funziona automaticamente nella live chat. Per le impostazioni complete, clicca l’icona delle estensioni nella barra del browser",
     "stepSettingsBodyMiddle": "e scegli",
-    "stepSettingsBodyAfterIcon": "Chat Enhancer per vedere tutte le opzioni. Fissala se vuoi un accesso più rapido.",
-    "supportModalDetailFour": "Puoi anche scriverci a <a data-contact-email-address></a>."
+    "stepSettingsBodyAfterIcon": "Chat Enhancer per vedere tutte le opzioni. Fissala se vuoi un accesso più rapido."
   },
   "privacy": {
     "eyebrow": "Privacy",

@@ -1,5 +1,4 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import contact from '../shared/contact.json';
 import { KNOWN_CHAT_TABS_STORAGE_KEY } from '../shared/known-chat-tabs';
 import { MARKED_USERS_STORAGE_KEY } from '../shared/marked-users';
 
@@ -345,7 +344,7 @@ describe('popup', () => {
     expect(document.querySelector('[data-extension-status]')?.getAttribute('data-extension-status')).toBe('inactive');
   });
 
-  it('explains support before opening the support page', async () => {
+  it('opens the support page from the popup', async () => {
     vi.mocked(chrome.tabs.query).mockImplementation(((_queryInfo: chrome.tabs.QueryInfo, callback?: (tabs: chrome.tabs.Tab[]) => void) => {
       callback?.([]);
       return Promise.resolve([]);
@@ -354,16 +353,13 @@ describe('popup', () => {
       callback?.({ activeTabIds: [] });
       return Promise.resolve({ activeTabIds: [] });
     }) as never);
-    vi.spyOn(window, 'confirm').mockReturnValue(true);
-
     await import('./index');
     document.querySelector<HTMLAnchorElement>('#supportLink')?.click();
 
-    expect(window.confirm).toHaveBeenCalledWith(`supportIssueTrackerPrompt:${contact.supportEmail}`);
     expect(chrome.tabs.create).toHaveBeenCalledWith({ url: 'https://www.chatenhancer.com/support' });
   });
 
-  it('does not open support or reset state when confirmation is canceled', async () => {
+  it('does not reset state when opening support from the popup', async () => {
     vi.mocked(chrome.tabs.query).mockImplementation(((_queryInfo: chrome.tabs.QueryInfo, callback?: (tabs: chrome.tabs.Tab[]) => void) => {
       callback?.([]);
       return Promise.resolve([]);
@@ -372,13 +368,11 @@ describe('popup', () => {
       callback?.({ activeTabIds: [] });
       return Promise.resolve({ activeTabIds: [] });
     }) as never);
-    vi.spyOn(window, 'confirm').mockReturnValue(false);
-
     await import('./index');
     document.querySelector<HTMLAnchorElement>('#supportLink')?.click();
     document.querySelector<HTMLButtonElement>('#resetExtension')?.click();
 
-    expect(chrome.tabs.create).not.toHaveBeenCalled();
+    expect(chrome.tabs.create).toHaveBeenCalledWith({ url: 'https://www.chatenhancer.com/support' });
     expect(chrome.storage.local.clear).not.toHaveBeenCalled();
     expect(chrome.storage.sync.clear).not.toHaveBeenCalled();
   });

@@ -113,13 +113,6 @@
     "firefoxAddons": "Firefox Add-ons",
     "sourceCode": "Kode sumber",
     "supportFeedback": "Dukungan",
-    "supportModalTitle": "Tentang GitHub Issues",
-    "supportModalBody": "GitHub Issues adalah pelacak publik yang kami gunakan untuk laporan bug dan permintaan fitur.",
-    "supportModalDetailOne": "Membuat posting atau komentar di GitHub mungkin memerlukan akun GitHub.",
-    "supportModalDetailTwo": "Klik tombol New issue di GitHub untuk memulai laporan atau permintaan.",
-    "supportModalDetailThree": "Formulir issue akan meminta detail yang diperlukan untuk setiap jenis laporan.",
-    "supportModalCancel": "Batal",
-    "supportModalContinue": "Lanjut ke GitHub Issues",
     "privateQuestions": "Anda juga bisa mengirim email ke",
     "gettingStartedTitle": "Mulai menggunakan",
     "gettingStartedBody": "Instal, muat ulang YouTube sekali jika sudah terbuka, lalu gunakan ekstensi di tempat chat langsung berada.",
@@ -135,8 +128,7 @@
     "stepRefreshBodyAfterIcon": "muncul di chat YouTube.",
     "stepSettingsBodyBeforeIcon": "Ekstensi bekerja otomatis di chat langsung. Untuk pengaturan lengkap, klik ikon ekstensi di toolbar browser",
     "stepSettingsBodyMiddle": "lalu pilih",
-    "stepSettingsBodyAfterIcon": "Chat Enhancer untuk melihat semua opsi. Sematkan jika ingin akses lebih cepat.",
-    "supportModalDetailFour": "Anda juga bisa mengirim email ke <a data-contact-email-address></a>."
+    "stepSettingsBodyAfterIcon": "Chat Enhancer untuk melihat semua opsi. Sematkan jika ingin akses lebih cepat."
   },
   "privacy": {
     "eyebrow": "Privasi",

@@ -1,0 +1,137 @@
+---
+import Icon from '../../components/common/icon.astro';
+import BlogLayout from '../../layouts/blog-layout.astro';
+import { getMessages, htmlLangFor } from '../../data/locales';
+import { site, supportEmail } from '../../data/site';
+
+const locale = 'en';
+const messages = getMessages(locale);
+const canonicalUrl = `${site.url}/support/`;
+const title = 'Support and feedback';
+const description = 'Choose how to contact Chat Enhancer for YouTube for bug reports, feature ideas, and private questions.';
+const supportStructuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'ContactPage',
+  name: `${site.title} support and feedback`,
+  description,
+  url: canonicalUrl,
+  inLanguage: htmlLangFor(locale),
+  isPartOf: {
+    '@type': 'WebSite',
+    name: site.title,
+    url: site.url
+  },
+  publisher: {
+    '@type': 'Organization',
+    name: site.title,
+    url: site.url,
+    logo: {
+      '@type': 'ImageObject',
+      url: `${site.url}/assets/icons/icon-128.png`
+    }
+  },
+  contactPoint: {
+    '@type': 'ContactPoint',
+    contactType: 'customer support',
+    email: supportEmail,
+    url: canonicalUrl
+  }
+};
+---
+
+<BlogLayout
+  alternateLinks={[{ href: canonicalUrl, hreflang: htmlLangFor(locale) }]}
+  canonicalUrl={canonicalUrl}
+  description={description}
+  languageUrls={{ en: '/support/' }}
+  locale={locale}
+  messages={messages}
+  rootPrefix="../"
+  structuredData={supportStructuredData}
+  title={title}
+  xDefaultUrl={canonicalUrl}
+>
+  <article class="support-page" aria-labelledby="support-title">
+    <header class="support-hero">
+      <div class="support-hero-copy">
+        <p class="eyebrow">Support</p>
+        <h1 id="support-title">Choose the support route</h1>
+        <p>Pick email when the details should stay private; pick GitHub Issues when a public thread helps fix or prioritize the work.</p>
+      </div>
+    </header>
+
+    <div class="support-main">
+      <section class="support-picker" aria-label="Support options">
+        <div class="support-picker-heading">
+          <span>Pick one</span>
+          <strong>If you are unsure, email first.</strong>
+        </div>
+
+        <a class="support-route support-route-email" href={`mailto:${supportEmail}`}>
+          <span class="support-route-icon" aria-hidden="true">
+            <Icon name="alternate_email" />
+          </span>
+          <div class="support-route-copy">
+            <div class="support-route-title">
+              <h2>Email</h2>
+              <span>Private, quick, no account</span>
+            </div>
+            <p>Best for screenshots with personal details, store questions, setup-specific problems, and anything you would not want posted publicly.</p>
+          </div>
+          <span class="button button-primary support-route-action">
+            <span>Email support</span>
+          </span>
+        </a>
+
+        <a class="support-route support-route-github" href={site.issuesUrl}>
+          <span class="support-route-icon" aria-hidden="true">
+            <Icon name="bug_report" />
+          </span>
+          <div class="support-route-copy">
+            <div class="support-route-title">
+              <h2>GitHub Issues</h2>
+              <span>Public, trackable</span>
+            </div>
+            <p>Best for reproducible bugs, feature requests, public follow-up, and details other users can confirm or search for later.</p>
+          </div>
+          <span class="button button-secondary support-route-action">
+            <span>Open GitHub Issues</span>
+          </span>
+        </a>
+
+        <aside class="support-note" aria-label="Before you share">
+          <span class="support-note-label">Share safely</span>
+          <div class="support-note-rule">
+            <strong>Email keeps private details private.</strong>
+            <p>Use GitHub Issues only for public steps, non-sensitive screenshots, and details other users can search or confirm.</p>
+          </div>
+        </aside>
+      </section>
+
+      <div class="support-chat-preview" aria-hidden="true">
+        <div class="support-chat-header">
+          <img src="../assets/icons/icon-128.png" width="38" height="38" alt="">
+          <div>
+            <strong>Chat Enhancer</strong>
+            <span>Support routing</span>
+          </div>
+        </div>
+        <div class="support-chat-line">
+          <span class="support-chat-avatar">P</span>
+          <p>I have a private screenshot.</p>
+          <strong>Email</strong>
+        </div>
+        <div class="support-chat-line">
+          <span class="support-chat-avatar">B</span>
+          <p>I can reproduce a bug.</p>
+          <strong>GitHub issue</strong>
+        </div>
+        <div class="support-chat-line">
+          <span class="support-chat-avatar">Q</span>
+          <p>I am not sure where this belongs.</p>
+          <strong>Email first</strong>
+        </div>
+      </div>
+    </div>
+  </article>
+</BlogLayout>

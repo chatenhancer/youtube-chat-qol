@@ -237,9 +237,6 @@
     "supportAndFeedback": {
       "message": "Assistance et retours"
     },
-    "supportIssueTrackerPrompt": {
-      "message": "Vous serez redirigé vers notre suivi public des problèmes pour les rapports de bugs et les demandes de fonctionnalités. Un compte peut être nécessaire.\n\nVous pouvez aussi nous écrire à {supportEmail}.\n\nContinuer vers le suivi des problèmes ?"
-    },
     "resetAllExtensionData": {
       "message": "Réinitialiser tous les réglages et les données locales"
     },

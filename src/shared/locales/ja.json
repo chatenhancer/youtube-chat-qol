@@ -240,9 +240,6 @@
     "supportAndFeedback": {
       "message": "サポートとフィードバック"
     },
-    "supportIssueTrackerPrompt": {
-      "message": "バグ報告と機能リクエストのために、公開の課題トラッカーへ移動します。アカウントが必要な場合があります。\n\nメールでも {supportEmail} に連絡できます。\n\n課題トラッカーに進みますか？"
-    },
     "resetAllExtensionData": {
       "message": "拡張機能のすべての設定とローカルデータをリセット"
     },

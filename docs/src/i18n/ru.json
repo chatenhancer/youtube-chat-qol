@@ -113,13 +113,6 @@
     "firefoxAddons": "Firefox Add-ons",
     "sourceCode": "Исходный код",
     "supportFeedback": "Поддержка",
-    "supportModalTitle": "О GitHub Issues",
-    "supportModalBody": "GitHub Issues — это публичный трекер, который мы используем для сообщений об ошибках и запросов функций.",
-    "supportModalDetailOne": "Для публикации или комментариев на GitHub может потребоваться аккаунт GitHub.",
-    "supportModalDetailTwo": "Нажмите кнопку New issue на GitHub, чтобы начать обращение или запрос.",
-    "supportModalDetailThree": "Формы issues запросят нужные сведения для каждого типа обращения.",
-    "supportModalCancel": "Отмена",
-    "supportModalContinue": "Перейти в GitHub Issues",
     "privateQuestions": "Вы также можете написать нам на",
     "gettingStartedTitle": "Начало работы",
     "gettingStartedBody": "Установите, один раз обновите YouTube, если он уже был открыт, и используйте расширение там, где уже находится прямой чат.",
@@ -135,8 +128,7 @@
     "stepRefreshBodyAfterIcon": "появится в чате YouTube.",
     "stepSettingsBodyBeforeIcon": "Расширение автоматически работает в live-чате. Для всех настроек нажмите значок расширений на панели браузера",
     "stepSettingsBodyMiddle": "и выберите",
-    "stepSettingsBodyAfterIcon": "Chat Enhancer, чтобы увидеть все параметры. Закрепите его для более быстрого доступа.",
-    "supportModalDetailFour": "Вы также можете написать нам на <a data-contact-email-address></a>."
+    "stepSettingsBodyAfterIcon": "Chat Enhancer, чтобы увидеть все параметры. Закрепите его для более быстрого доступа."
   },
   "privacy": {
     "eyebrow": "Конфиденциальность",

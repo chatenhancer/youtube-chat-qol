@@ -113,13 +113,6 @@
     "firefoxAddons": "Firefox Add-ons",
     "sourceCode": "Kaynak kod",
     "supportFeedback": "Destek",
-    "supportModalTitle": "GitHub Issues hakkında",
-    "supportModalBody": "GitHub Issues, hata bildirimleri ve özellik istekleri için kullandığımız herkese açık izleyicidir.",
-    "supportModalDetailOne": "GitHub’da paylaşım yapmak veya yorum yazmak GitHub hesabı gerektirebilir.",
-    "supportModalDetailTwo": "Bir bildirim veya istek başlatmak için GitHub’daki New issue düğmesine tıkla.",
-    "supportModalDetailThree": "Issue formları, her bildirim türü için gereken ayrıntıları sorar.",
-    "supportModalCancel": "İptal",
-    "supportModalContinue": "GitHub Issues’a devam et",
     "privateQuestions": "Bize şu adresten de e-posta gönderebilirsin:",
     "gettingStartedTitle": "Başlarken",
     "gettingStartedBody": "Yükleyin, YouTube zaten açıksa bir kez yenileyin, sonra uzantıyı canlı sohbetin zaten olduğu yerde kullanın.",
@@ -135,8 +128,7 @@
     "stepRefreshBodyAfterIcon": "YouTube sohbetinde göründüğünde sohbet iyileştirmeleri kullanıma hazırdır.",
     "stepSettingsBodyBeforeIcon": "Uzantı canlı sohbette otomatik çalışır. Tüm ayarlar için tarayıcı araç çubuğundaki uzantılar simgesine tıklayın",
     "stepSettingsBodyMiddle": "ve",
-    "stepSettingsBodyAfterIcon": "tüm seçenekleri görmek için Chat Enhancer'ı seçin. Daha hızlı erişim için sabitleyin.",
-    "supportModalDetailFour": "Bize şu adresten de e-posta gönderebilirsin: <a data-contact-email-address></a>."
+    "stepSettingsBodyAfterIcon": "tüm seçenekleri görmek için Chat Enhancer'ı seçin. Daha hızlı erişim için sabitleyin."
   },
   "privacy": {
     "eyebrow": "Gizlilik",

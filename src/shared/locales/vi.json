@@ -237,9 +237,6 @@
     "supportAndFeedback": {
       "message": "Hỗ trợ và góp ý"
     },
-    "supportIssueTrackerPrompt": {
-      "message": "Bạn sẽ được chuyển đến trình theo dõi vấn đề công khai của chúng tôi để báo lỗi và yêu cầu tính năng. Có thể cần tài khoản.\n\nBạn cũng có thể email cho chúng tôi tại {supportEmail}.\n\nTiếp tục đến trình theo dõi vấn đề?"
-    },
     "resetAllExtensionData": {
       "message": "Đặt lại mọi cài đặt tiện ích và dữ liệu cục bộ"
     },

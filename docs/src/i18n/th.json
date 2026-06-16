@@ -113,13 +113,6 @@
     "firefoxAddons": "Firefox Add-ons",
     "sourceCode": "ซอร์สโค้ด",
     "supportFeedback": "ช่วยเหลือ",
-    "supportModalTitle": "เกี่ยวกับ GitHub Issues",
-    "supportModalBody": "GitHub Issues เป็นตัวติดตามสาธารณะที่เราใช้สำหรับรายงานบั๊กและคำขอฟีเจอร์",
-    "supportModalDetailOne": "การโพสต์หรือแสดงความคิดเห็นบน GitHub อาจต้องใช้บัญชี GitHub",
-    "supportModalDetailTwo": "คลิกปุ่ม New issue บน GitHub เพื่อเริ่มรายงานหรือคำขอ",
-    "supportModalDetailThree": "ฟอร์ม issue จะถามรายละเอียดที่จำเป็นสำหรับรายงานแต่ละประเภท",
-    "supportModalCancel": "ยกเลิก",
-    "supportModalContinue": "ไปต่อที่ GitHub Issues",
     "privateQuestions": "คุณสามารถส่งอีเมลหาเราได้ที่",
     "gettingStartedTitle": "เริ่มต้นใช้งาน",
     "gettingStartedBody": "ติดตั้ง รีเฟรช YouTube หนึ่งครั้งถ้าเปิดอยู่แล้ว จากนั้นใช้ส่วนขยายในพื้นที่แชทสดได้เลย",
@@ -135,8 +128,7 @@
     "stepRefreshBodyAfterIcon": "ปรากฏในแชท YouTube แปลว่าฟีเจอร์เสริมของแชทพร้อมใช้งานแล้ว",
     "stepSettingsBodyBeforeIcon": "ส่วนขยายทำงานอัตโนมัติในแชทสด หากต้องการตั้งค่าเต็ม ให้คลิกไอคอนส่วนขยายบนแถบเครื่องมือเบราว์เซอร์",
     "stepSettingsBodyMiddle": "แล้วเลือก",
-    "stepSettingsBodyAfterIcon": "Chat Enhancer เพื่อดูตัวเลือกทั้งหมด ปักหมุดไว้ถ้าต้องการเข้าถึงเร็วขึ้น",
-    "supportModalDetailFour": "คุณสามารถส่งอีเมลหาเราได้ที่ <a data-contact-email-address></a>."
+    "stepSettingsBodyAfterIcon": "Chat Enhancer เพื่อดูตัวเลือกทั้งหมด ปักหมุดไว้ถ้าต้องการเข้าถึงเร็วขึ้น"
   },
   "privacy": {
     "eyebrow": "ความเป็นส่วนตัว",

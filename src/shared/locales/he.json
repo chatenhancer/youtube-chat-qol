@@ -237,9 +237,6 @@
     "supportAndFeedback": {
       "message": "תמיכה ומשוב"
     },
-    "supportIssueTrackerPrompt": {
-      "message": "תופנו אל כלי המעקב הציבורי שלנו לבעיות עבור דיווחי באגים ובקשות לפיצ׳רים. ייתכן שיידרש חשבון.\n\nאפשר גם לשלוח לנו אימייל אל {supportEmail}.\n\nלהמשיך אל כלי המעקב?"
-    },
     "resetAllExtensionData": {
       "message": "איפוס כל הגדרות התוסף והנתונים המקומיים"
     },

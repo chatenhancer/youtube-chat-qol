@@ -113,13 +113,6 @@
     "firefoxAddons": "Firefox Add-ons",
     "sourceCode": "सोर्स कोड",
     "supportFeedback": "सहायता",
-    "supportModalTitle": "GitHub Issues के बारे में",
-    "supportModalBody": "GitHub Issues हमारा सार्वजनिक ट्रैकर है, जिसका उपयोग हम बग रिपोर्ट और सुविधा अनुरोधों के लिए करते हैं।",
-    "supportModalDetailOne": "GitHub पर पोस्ट या टिप्पणी करने के लिए GitHub खाते की ज़रूरत हो सकती है।",
-    "supportModalDetailTwo": "रिपोर्ट या अनुरोध शुरू करने के लिए GitHub पर New issue बटन क्लिक करें।",
-    "supportModalDetailThree": "Issue फ़ॉर्म हर तरह की रिपोर्ट के लिए ज़रूरी जानकारी पूछेंगे।",
-    "supportModalCancel": "रद्द करें",
-    "supportModalContinue": "GitHub Issues पर जाएँ",
     "privateQuestions": "आप हमें ईमेल भी कर सकते हैं",
     "gettingStartedTitle": "शुरू करना",
     "gettingStartedBody": "इंस्टॉल करें, अगर YouTube पहले से खुला था तो उसे एक बार रिफ्रेश करें, फिर जहां लाइव चैट है वहीं एक्सटेंशन का उपयोग करें।",
@@ -135,8 +128,7 @@
     "stepRefreshBodyAfterIcon": "YouTube चैट में दिखे, तो समझें कि चैट सुधार तैयार हैं।",
     "stepSettingsBodyBeforeIcon": "एक्सटेंशन लाइव चैट में अपने आप काम करता है। पूरी सेटिंग्स के लिए, ब्राउजर टूलबार में एक्सटेंशन आइकन पर क्लिक करें",
     "stepSettingsBodyMiddle": "और",
-    "stepSettingsBodyAfterIcon": "सभी विकल्प देखने के लिए Chat Enhancer चुनें। तेज पहुंच के लिए इसे पिन कर सकते हैं।",
-    "supportModalDetailFour": "आप हमें <a data-contact-email-address></a> पर ईमेल भी कर सकते हैं।"
+    "stepSettingsBodyAfterIcon": "सभी विकल्प देखने के लिए Chat Enhancer चुनें। तेज पहुंच के लिए इसे पिन कर सकते हैं।"
   },
   "privacy": {
     "eyebrow": "गोपनीयता",
