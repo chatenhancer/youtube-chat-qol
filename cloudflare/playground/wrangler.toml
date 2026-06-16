@@ -15,9 +15,11 @@ head_sampling_rate = 1
 invocation_logs = false
 
 [vars]
-ALLOWED_ORIGIN_PATTERNS = "https://chatenhancer.com,https://www.chatenhancer.com,chrome-extension://,moz-extension://,http://localhost:,http://127.0.0.1:"
+ALLOWED_ORIGIN_PATTERNS = "https://playground.chatenhancer.com,https://chatenhancer.com,https://www.chatenhancer.com,chrome-extension://,moz-extension://,http://localhost:,http://127.0.0.1:"
 STOCKFISH_ELO = "1700"
 STOCKFISH_MOVE_TIME_MS = "500"
+TURNSTILE_EXPECTED_HOSTNAME = "playground.chatenhancer.com"
+TURNSTILE_SITE_KEY = "0x4AAAAAADmFa61ZAh7yJeQG"
 
 [[durable_objects.bindings]]
 name = "STREAM_ROOMS"
@@ -30,6 +32,10 @@ class_name = "StockfishContainer"
 [[durable_objects.bindings]]
 name = "PLAYER_STATS"
 class_name = "PlayerStats"
+
+[[durable_objects.bindings]]
+name = "CAPTCHA_PASSES"
+class_name = "CaptchaPasses"
 
 [[containers]]
 class_name = "StockfishContainer"
@@ -56,3 +62,7 @@ deleted_classes = ["ComputerPlayer"]
 [[migrations]]
 tag = "v5"
 new_sqlite_classes = ["PlayerStats"]
+
+[[migrations]]
+tag = "v6"
+new_sqlite_classes = ["CaptchaPasses"]

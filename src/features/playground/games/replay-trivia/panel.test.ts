@@ -182,7 +182,8 @@ describe('Replay Trivia panel', () => {
     expect(generateReplayTriviaQuestionsMock).toHaveBeenCalledWith({
       gameId: 'game-replay-trivia',
       generationToken: 'token-123456',
-      questionCount: 10
+      questionCount: 10,
+      userId: 'host-user'
     });
     expect(onAction).toHaveBeenCalledWith('game-replay-trivia', 'submitQuestions', {
       questions: [{

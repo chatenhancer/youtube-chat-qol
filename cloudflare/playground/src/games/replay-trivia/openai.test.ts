@@ -170,6 +170,7 @@ describe('Replay Trivia OpenAI adapter', () => {
 
 function createRequest() {
   return {
+    captchaPass: 'cap_1234567890abcdef',
     endSeconds: 20,
     gameId: 'game-replay-trivia',
     generationToken: 'rtg_1234567890abcdef',

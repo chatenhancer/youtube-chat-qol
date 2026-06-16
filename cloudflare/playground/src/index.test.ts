@@ -112,7 +112,126 @@ describe('playground worker routes', () => {
     expect(response.headers.get('Access-Control-Allow-Origin')).toBe('https://chatenhancer.com');
   });
 
+  it('creates Replay Trivia captcha passes after Turnstile verification', async () => {
+    let captchaCreateRequest: Request | undefined;
+    const turnstileFetch = vi.fn(async (_input: RequestInfo | URL, init?: RequestInit) => {
+      const body = init?.body as URLSearchParams;
+      expect(body.get('secret')).toBe('turnstile-secret');
+      expect(body.get('response')).toBe('turnstile-token');
+      expect(body.get('idempotency_key')).toBe('rtv_1234567890abcdef');
+      return new Response(JSON.stringify({
+        action: 'replay_trivia_generate',
+        hostname: 'playground.chatenhancer.com',
+        success: true
+      }), {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+    });
+    vi.stubGlobal('fetch', turnstileFetch);
+
+    const response = await worker.fetch(new Request(
+      'https://playground.chatenhancer.com/v1/captcha/replay-trivia',
+      {
+        body: JSON.stringify({
+          gameId: 'game-replay-trivia',
+          requestId: 'rtv_1234567890abcdef',
+          streamKey: 'SHt3FyE-VIQ',
+          turnstileToken: 'turnstile-token',
+          userId: 'user-123'
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+          Origin: 'https://playground.chatenhancer.com'
+        },
+        method: 'POST'
+      }
+    ), createEnv(undefined, {
+      TURNSTILE_EXPECTED_HOSTNAME: 'playground.chatenhancer.com',
+      TURNSTILE_SECRET_KEY: 'turnstile-secret'
+    }, async (request) => {
+      captchaCreateRequest = request instanceof Request ? request : new Request(request);
+      return new Response(JSON.stringify({
+        captchaPass: 'cap_1234567890abcdef',
+        expiresAt: 1_800_000_000_000,
+        ok: true,
+        requestId: 'rtv_1234567890abcdef'
+      }), {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+    }));
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get('Access-Control-Allow-Origin')).toBe('https://playground.chatenhancer.com');
+    expect(turnstileFetch).toHaveBeenCalledWith(
+      'https://challenges.cloudflare.com/turnstile/v0/siteverify',
+      expect.objectContaining({
+        method: 'POST'
+      })
+    );
+    expect(captchaCreateRequest?.url).toBe('https://captcha-passes.internal/internal/captcha/replay-trivia/create');
+    expect(await captchaCreateRequest?.json()).toEqual({
+      gameId: 'game-replay-trivia',
+      purpose: 'replay-trivia-generation',
+      requestId: 'rtv_1234567890abcdef',
+      streamKey: 'SHt3FyE-VIQ',
+      userId: 'user-123'
+    });
+    expect(await response.json()).toEqual({
+      captchaPass: 'cap_1234567890abcdef',
+      expiresAt: 1_800_000_000_000,
+      ok: true,
+      requestId: 'rtv_1234567890abcdef'
+    });
+  });
+
+  it('rejects Replay Trivia captcha requests when Turnstile fails', async () => {
+    const turnstileFetch = vi.fn(async () => new Response(JSON.stringify({
+      'error-codes': ['invalid-input-response'],
+      success: false
+    }), {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }));
+    const captchaFetch = vi.fn();
+    vi.stubGlobal('fetch', turnstileFetch);
+
+    const response = await worker.fetch(new Request(
+      'https://playground.chatenhancer.com/v1/captcha/replay-trivia',
+      {
+        body: JSON.stringify({
+          gameId: 'game-replay-trivia',
+          requestId: 'rtv_1234567890abcdef',
+          streamKey: 'SHt3FyE-VIQ',
+          turnstileToken: 'turnstile-token',
+          userId: 'user-123'
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+          Origin: 'https://playground.chatenhancer.com'
+        },
+        method: 'POST'
+      }
+    ), createEnv(undefined, {
+      TURNSTILE_SECRET_KEY: 'turnstile-secret'
+    }, captchaFetch));
+
+    expect(response.status).toBe(403);
+    expect(captchaFetch).not.toHaveBeenCalled();
+    expect(await response.json()).toEqual({
+      error: {
+        code: 'captcha_failed',
+        message: 'Complete the verification to generate Replay Trivia.'
+      }
+    });
+  });
+
   it('generates Replay Trivia questions through OpenAI with CORS headers', async () => {
+    let captchaConsumeRequest: Request | undefined;
     let tokenConsumeRequest: Request | undefined;
     const openAIFetch = vi.fn(async (_input: RequestInfo | URL, init?: RequestInit) => {
       const body = JSON.parse(String(init?.body));
@@ -150,6 +269,7 @@ describe('playground worker routes', () => {
       'https://playground.chatenhancer.com/v1/streams/SHt3FyE-VIQ/replay-trivia/questions',
       {
         body: JSON.stringify({
+          captchaPass: 'cap_1234567890abcdef',
           endSeconds: 13690,
           gameId: 'game-replay-trivia',
           generationToken: 'rtg_1234567890abcdef',
@@ -173,7 +293,11 @@ describe('playground worker routes', () => {
       }
     ), createEnv(async (request) => {
       tokenConsumeRequest = request instanceof Request ? request : new Request(request);
-      return new Response(JSON.stringify({ ok: true }), {
+      return new Response(JSON.stringify({
+        gameId: 'game-replay-trivia',
+        ok: true,
+        userId: 'user-123'
+      }), {
         headers: {
           'Content-Type': 'application/json'
         }
@@ -181,6 +305,13 @@ describe('playground worker routes', () => {
     }, {
       OPENAI_API_KEY: 'test-key',
       OPENAI_MODEL: 'gpt-test'
+    }, async (request) => {
+      captchaConsumeRequest = request instanceof Request ? request : new Request(request);
+      return new Response(JSON.stringify({ ok: true }), {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
     }));
 
     expect(response.status).toBe(200);
@@ -189,6 +320,14 @@ describe('playground worker routes', () => {
     expect(await tokenConsumeRequest?.json()).toEqual({
       gameId: 'game-replay-trivia',
       generationToken: 'rtg_1234567890abcdef'
+    });
+    expect(captchaConsumeRequest?.url).toBe('https://captcha-passes.internal/internal/captcha/replay-trivia/consume');
+    expect(await captchaConsumeRequest?.json()).toEqual({
+      captchaPass: 'cap_1234567890abcdef',
+      gameId: 'game-replay-trivia',
+      purpose: 'replay-trivia-generation',
+      streamKey: 'SHt3FyE-VIQ',
+      userId: 'user-123'
     });
     expect(response.headers.get('Access-Control-Allow-Origin')).toBe('chrome-extension://abc');
     expect(await response.json()).toEqual({
@@ -254,6 +393,7 @@ describe('playground worker routes', () => {
       'https://playground.chatenhancer.com/v1/streams/SHt3FyE-VIQ/replay-trivia/questions',
       {
         body: JSON.stringify({
+          captchaPass: 'cap_1234567890abcdef',
           endSeconds: 1000,
           gameId: 'game-replay-trivia',
           generationToken: 'rtg_1234567890abcdef',
@@ -297,6 +437,7 @@ describe('playground worker routes', () => {
       'https://playground.chatenhancer.com/v1/streams/SHt3FyE-VIQ/replay-trivia/questions',
       {
         body: JSON.stringify({
+          captchaPass: 'cap_1234567890abcdef',
           endSeconds: 30,
           gameId: 'game-replay-trivia',
           generationToken: 'rtg_1234567890abcdef',
@@ -324,6 +465,7 @@ describe('playground worker routes', () => {
       'https://playground.chatenhancer.com/v1/streams/SHt3FyE-VIQ/replay-trivia/questions',
       {
         body: JSON.stringify({
+          captchaPass: 'cap_1234567890abcdef',
           endSeconds: 30,
           gameId: 'game-replay-trivia',
           generationToken: 'rtg_1234567890abcdef',
@@ -359,6 +501,7 @@ describe('playground worker routes', () => {
       'https://playground.chatenhancer.com/v1/streams/SHt3FyE-VIQ/replay-trivia/questions',
       {
         body: JSON.stringify({
+          captchaPass: 'cap_1234567890abcdef',
           endSeconds: 30,
           gameId: 'game-replay-trivia',
           generationToken: 'rtg_1234567890abcdef',
@@ -428,6 +571,7 @@ describe('playground worker routes', () => {
       'https://playground.chatenhancer.com/v1/streams/SHt3FyE-VIQ/replay-trivia/questions',
       {
         body: JSON.stringify({
+          captchaPass: 'cap_1234567890abcdef',
           endSeconds: 30,
           gameId: 'game-replay-trivia',
           generationToken: 'rtg_1234567890abcdef',
@@ -466,27 +610,102 @@ describe('playground worker routes', () => {
     });
     expect(openAIFetch).not.toHaveBeenCalled();
   });
+
+  it('rejects Replay Trivia requests when the captcha pass is denied', async () => {
+    const openAIFetch = vi.fn();
+    vi.stubGlobal('fetch', openAIFetch);
+
+    const response = await worker.fetch(new Request(
+      'https://playground.chatenhancer.com/v1/streams/SHt3FyE-VIQ/replay-trivia/questions',
+      {
+        body: JSON.stringify({
+          captchaPass: 'cap_1234567890abcdef',
+          endSeconds: 30,
+          gameId: 'game-replay-trivia',
+          generationToken: 'rtg_1234567890abcdef',
+          languageCode: 'en',
+          questionCount: 1,
+          segments: [{ startSeconds: 1, text: 'hello' }],
+          startSeconds: 0,
+          videoId: 'SHt3FyE-VIQ'
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+          Origin: 'chrome-extension://abc'
+        },
+        method: 'POST'
+      }
+    ), createEnv(async () => new Response(JSON.stringify({
+      gameId: 'game-replay-trivia',
+      ok: true,
+      userId: 'user-123'
+    }), {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }), {
+      OPENAI_API_KEY: 'test-key'
+    }, async () => new Response(JSON.stringify({
+      error: {
+        code: 'invalid_captcha_pass',
+        message: 'Replay Trivia verification is invalid or expired.'
+      }
+    }), {
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      status: 403
+    })));
+
+    expect(response.status).toBe(403);
+    expect(await response.json()).toEqual({
+      error: {
+        code: 'invalid_captcha_pass',
+        message: 'Replay Trivia verification is invalid or expired.'
+      }
+    });
+    expect(openAIFetch).not.toHaveBeenCalled();
+  });
 });
 
 function createEnv(
-  fetchRoom: DurableObjectStub['fetch'] = async () => new Response('{}'),
-  overrides: Partial<Env> = {}
+  fetchRoom: DurableObjectStub['fetch'] = async () => new Response(JSON.stringify({
+    gameId: 'game-replay-trivia',
+    ok: true,
+    userId: 'user-123'
+  }), {
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  }),
+  overrides: Partial<Env> = {},
+  fetchCaptcha: DurableObjectStub['fetch'] = async () => new Response(JSON.stringify({ ok: true }), {
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  })
 ): Env {
+  const streamNamespace = createNamespace('stream-id', fetchRoom);
+  const captchaNamespace = createNamespace('captcha-id', fetchCaptcha);
+
+  return {
+    ALLOWED_ORIGIN_PATTERNS: 'https://playground.chatenhancer.com,https://chatenhancer.com,chrome-extension://',
+    CAPTCHA_PASSES: captchaNamespace,
+    STREAM_ROOMS: streamNamespace,
+    ...overrides
+  };
+}
+
+function createNamespace(idValue: string, fetchHandler: DurableObjectStub['fetch']): DurableObjectNamespace {
   const id: DurableObjectId = {
-    equals: (other) => other.toString() === 'stream-id',
-    toString: () => 'stream-id'
+    equals: (other) => other.toString() === idValue,
+    toString: () => idValue
   };
 
-  const namespace: DurableObjectNamespace = {
+  return {
     get: () => ({
-      fetch: fetchRoom
+      fetch: fetchHandler
     }),
     idFromName: () => id
   } as unknown as DurableObjectNamespace;
-
-  return {
-    ALLOWED_ORIGIN_PATTERNS: 'https://chatenhancer.com,chrome-extension://',
-    STREAM_ROOMS: namespace,
-    ...overrides
-  };
 }

@@ -16,6 +16,7 @@ const MAX_SEGMENTS = 5_000;
 const MAX_SEGMENT_TEXT_LENGTH = 500;
 const MAX_TRANSCRIPT_CHARS = 400_000;
 const MAX_WINDOW_SECONDS = 24 * 60 * 60;
+const CAPTCHA_PASS_PATTERN = /^cap_[a-zA-Z0-9_-]{16,160}$/;
 const GAME_ID_PATTERN = /^[a-zA-Z0-9_-]{4,80}$/;
 const GENERATION_TOKEN_PATTERN = /^[a-zA-Z0-9_-]{8,120}$/;
 const YOUTUBE_VIDEO_ID_PATTERN = /^[a-zA-Z0-9_-]{11}$/;
@@ -40,6 +41,11 @@ export function parseReplayTriviaQuestionsRequest(value: unknown): ReplayTriviaQ
     throw new ReplayTriviaError('invalid_generation_token', 'generationToken must be a valid Replay Trivia generation token.', 400);
   }
 
+  const captchaPass = getString(value, 'captchaPass');
+  if (!CAPTCHA_PASS_PATTERN.test(captchaPass)) {
+    throw new ReplayTriviaError('invalid_captcha_pass', 'captchaPass must be a valid Replay Trivia verification pass.', 400);
+  }
+
   const startSeconds = getFiniteNumber(value, 'startSeconds');
   const endSeconds = getFiniteNumber(value, 'endSeconds');
   if (startSeconds < 0 || endSeconds <= startSeconds || endSeconds - startSeconds > MAX_WINDOW_SECONDS) {
@@ -54,6 +60,7 @@ export function parseReplayTriviaQuestionsRequest(value: unknown): ReplayTriviaQ
   const segments = parseSegments(value.segments, startSeconds, endSeconds);
 
   return {
+    captchaPass,
     endSeconds,
     gameId,
     generationToken,
