@@ -1,5 +1,4 @@
 ---
-import Icon from '../../components/common/icon.astro';
 import BlogLayout from '../../layouts/blog-layout.astro';
 import { getMessages, htmlLangFor } from '../../data/locales';
 import { site, supportEmail } from '../../data/site';
@@ -56,6 +55,7 @@ const supportStructuredData = {
       <div class="support-hero-copy">
         <p class="eyebrow">Support</p>
         <h1 id="support-title">Choose the support route</h1>
+        <p class="support-reassurance">We're here to help.</p>
         <p>Pick email when the details should stay private; pick GitHub Issues when a public thread helps fix or prioritize the work.</p>
       </div>
     </header>
@@ -67,44 +67,34 @@ const supportStructuredData = {
           <strong>If you are unsure, email first.</strong>
         </div>
 
-        <a class="support-route support-route-email" href={`mailto:${supportEmail}`}>
-          <span class="support-route-icon" aria-hidden="true">
-            <Icon name="alternate_email" />
-          </span>
-          <div class="support-route-copy">
-            <div class="support-route-title">
+        <div class="support-choice-panel">
+          <a class="support-choice" href={`mailto:${supportEmail}`}>
+            <span class="support-choice-kicker">Private route</span>
+            <div class="support-choice-copy">
               <h2>Email</h2>
-              <span>Private, quick, no account</span>
+              <strong>Private, quick, no account</strong>
+              <p>Best for screenshots with personal details, store questions, setup-specific problems, and anything you would not want posted publicly.</p>
             </div>
-            <p>Best for screenshots with personal details, store questions, setup-specific problems, and anything you would not want posted publicly.</p>
-          </div>
-          <span class="button button-primary support-route-action">
-            <span>Email support</span>
-          </span>
-        </a>
+            <span class="button button-primary support-route-action">
+              <span>Email support</span>
+            </span>
+          </a>
 
-        <a class="support-route support-route-github" href={site.issuesUrl}>
-          <span class="support-route-icon" aria-hidden="true">
-            <Icon name="bug_report" />
-          </span>
-          <div class="support-route-copy">
-            <div class="support-route-title">
+          <a class="support-choice" href={site.issuesUrl}>
+            <span class="support-choice-kicker">Public route</span>
+            <div class="support-choice-copy">
               <h2>GitHub Issues</h2>
-              <span>Public, trackable</span>
+              <strong>Trackable and searchable</strong>
+              <p>Best for reproducible bugs, feature requests, public follow-up, and details other users can confirm or search for later.</p>
             </div>
-            <p>Best for reproducible bugs, feature requests, public follow-up, and details other users can confirm or search for later.</p>
-          </div>
-          <span class="button button-secondary support-route-action">
-            <span>Open GitHub Issues</span>
-          </span>
-        </a>
+            <span class="button button-secondary support-route-action">
+              <span>Open GitHub Issues</span>
+            </span>
+          </a>
+        </div>
 
         <aside class="support-note" aria-label="Before you share">
-          <span class="support-note-label">Share safely</span>
-          <div class="support-note-rule">
-            <strong>Email keeps private details private.</strong>
-            <p>Use GitHub Issues only for public steps, non-sensitive screenshots, and details other users can search or confirm.</p>
-          </div>
+          <p>For anything sensitive, use email. GitHub Issues are public, so keep them to reproducible steps, non-sensitive screenshots, and details others can confirm.</p>
         </aside>
       </section>
 
