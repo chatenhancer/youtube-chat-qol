@@ -73,7 +73,7 @@
     "@types/chrome": "^0.0.315",
     "@types/node": "^25.9.1",
     "@vitest/coverage-v8": "^4.1.7",
-    "astro": "^6.4.5",
+    "astro": "^6.4.6",
     "cross-env": "^7.0.3",
     "esbuild": "^0.28.1",
     "eslint": "^9.27.0",
