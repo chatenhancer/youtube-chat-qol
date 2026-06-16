@@ -25,7 +25,16 @@ const blog = defineCollection({
   })
 });
 
-export const collections = { blog };
+const privacyPolicy = defineCollection({
+  loader: glob({
+    base: '.',
+    generateId: () => 'privacy-policy',
+    pattern: 'PRIVACY.md'
+  }),
+  schema: z.object({})
+});
+
+export const collections = { blog, privacyPolicy };
 
 function getLocaleFromBlogEntry(entry: string): string {
   const fileName = entry.split('/').pop() || '';

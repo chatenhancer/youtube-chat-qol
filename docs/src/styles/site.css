@@ -1583,6 +1583,23 @@ html[dir="rtl"] .back-link-icon {
   line-height: 1.74;
 }
 
+.privacy-policy-page {
+  max-width: 860px;
+}
+
+.privacy-policy-body h1 {
+  margin: 0 0 14px;
+  font-size: clamp(42px, 6vw, 68px);
+  line-height: 1.11;
+  letter-spacing: 0;
+}
+
+.privacy-policy-body > p:first-of-type {
+  color: var(--muted);
+  font-size: 15px;
+  font-weight: 650;
+}
+
 .blog-post-body h2,
 .blog-post-body h3 {
   margin: 42px 0 14px;
@@ -1600,9 +1617,14 @@ html[dir="rtl"] .back-link-icon {
 
 .blog-post-body p,
 .blog-post-body ul,
+.blog-post-body ol,
 .blog-post-body blockquote,
 .blog-post-body pre {
   margin-bottom: 22px;
+}
+
+.blog-post-body li + li {
+  margin-top: 7px;
 }
 
 .blog-post-body a {
