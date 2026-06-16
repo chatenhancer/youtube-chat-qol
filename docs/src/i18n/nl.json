@@ -20,6 +20,7 @@
   "blog": {
     "archiveCopy": "Release notes en projectupdates voor Chat Enhancer for YouTube.",
     "backToUpdates": "Terug naar updates",
+    "backToHome": "Terug naar startpagina",
     "latestNotes": "The Backlog",
     "similarPosts": "Volgende",
     "updates": "Updates",
@@ -37,7 +38,7 @@
   },
   "features": {
     "eyebrow": "Gemaakt voor livestreams",
-    "title": "Verbeteringen precies waar <span class=\"title-emphasis\">chat</span> al gebeurt",
+    "title": "Veranderingen precies waar <span class=\"title-emphasis\">chat</span> al gebeurt",
     "translationTitle": "Vertaal terwijl je chat",
     "translationBody": "Lees binnenkomende berichten in je eigen taal, of vertaal wat je typt voordat je het verstuurt.",
     "mentionTitle": "Vermeldingen, citaten en concepten",
@@ -68,7 +69,7 @@
   },
   "screenshots": {
     "eyebrow": "Screenshots",
-    "title": "<span class=\"title-emphasis\">Chat</span>verbeteringen<br>die native aanvoelen",
+    "title": "Native aanvoelende<br><span class=\"title-emphasis\">chat</span>verbeteringen",
     "translationTitle": "Lees en schrijf<br>in andere talen",
     "translationBody": "Binnenkomende berichten kunnen automatisch worden vertaald. Ook de chatinvoer kan vertalen wat je typt voordat je het verstuurt.",
     "translationHighlightHtml": "Automatische vertalingen worden gemarkeerd met een <span class=\"showcase-underline\">subtiele onderstreping</span> en een Google Translate-pictogram",
@@ -132,7 +133,7 @@
   },
   "privacy": {
     "eyebrow": "Privacy",
-    "title": "Chattools met lokale opslag als basis",
+    "title": "We respecteren je privacy",
     "copy": "De extensie is ontworpen om dagelijkse chatverbeteringen op je apparaat te houden. Vertaling is de enige functie die een externe dienst nodig heeft, en die draait pas nadat je een doeltaal kiest.",
     "button": "Lees het volledige privacybeleid",
     "summaryAria": "Privacyoverzicht",
@@ -147,8 +148,9 @@
   },
   "commands": {
     "eyebrow": "Referentie",
-    "title": "Chatcommando’s vouwen uit met Tab",
-    "copy": "Typ een commando in YouTube’s chatinvoer en druk op Tab. Commando’s worden niet automatisch verzonden, en onbekende slashcommando’s blijven staan. Gebruik // om een letterlijk slashcommando te verzenden.",
+    "title": "Chat sneller met commando's",
+    "copy": "Gebruik korte commando's voor vermeldingen, citaten, tijdchecks, vertalingen, inbox-watches en instellingen zonder het chatvak te verlaten.",
+    "actionCopy": "Druk op Tab om het bericht in te vullen, controleer het en verstuur het wanneer je klaar bent.",
     "inlineTitle": "Commando’s binnen een zin:",
     "inlineBody": "Kunnen binnen een zin uitvouwen.",
     "wholeTitle": "Commando’s als volledige invoer:",

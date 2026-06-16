@@ -20,6 +20,7 @@
   "blog": {
     "archiveCopy": "Chat Enhancer for YouTube için sürüm notları ve proje güncellemeleri.",
     "backToUpdates": "Güncellemelere dön",
+    "backToHome": "Ana sayfaya dön",
     "latestNotes": "The Backlog",
     "similarPosts": "Sıradaki",
     "updates": "Güncellemeler",
@@ -37,7 +38,7 @@
   },
   "features": {
     "eyebrow": "Canlı yayınlar için üretildi",
-    "title": "<span class=\"title-emphasis\">Sohbetin</span> zaten olduğu yerde iyileştirmeler",
+    "title": "<span class=\"title-emphasis\">Sohbetin</span> zaten olduğu yerde değişiklikler",
     "translationTitle": "Sohbet ederken çevirin",
     "translationBody": "Gelen mesajları kendi dilinizde okuyun veya göndermeden önce yazdığınız metni çevirin.",
     "mentionTitle": "Etiketler, alıntılar ve taslaklar",
@@ -68,7 +69,7 @@
   },
   "screenshots": {
     "eyebrow": "Ekran görüntüleri",
-    "title": "Yerel hissettiren<br><span class=\"title-emphasis\">sohbet</span> geliştirmeleri",
+    "title": "Yerel hissettiren<br><span class=\"title-emphasis\">sohbet</span> iyileştirmeleri",
     "translationTitle": "Farklı dillerde<br>oku ve yaz",
     "translationBody": "Gelen mesajlar otomatik çevrilebilir. Sohbet girişi de göndermeden önce yazdığın metni çevirebilir.",
     "translationHighlightHtml": "Otomatik çeviriler <span class=\"showcase-underline\">ince bir alt çizgi</span> ve Google Translate simgesiyle belirtilir",
@@ -132,7 +133,7 @@
   },
   "privacy": {
     "eyebrow": "Gizlilik",
-    "title": "Yerel depolamaya öncelik veren sohbet araçları",
+    "title": "Gizliliğinize saygı duyuyoruz",
     "copy": "Uzantı, rutin sohbet iyileştirmelerini cihazınızda tutmak için tasarlandı. Çeviri harici hizmet gerektiren tek özelliktir ve yalnızca hedef dil seçtikten sonra çalışır.",
     "button": "Tam gizlilik politikasını oku",
     "summaryAria": "Gizlilik özeti",
@@ -147,8 +148,9 @@
   },
   "commands": {
     "eyebrow": "Referans",
-    "title": "Sohbet komutları Tab ile genişler",
-    "copy": "YouTube sohbet girişine bir komut yazın, sonra Tab'a basın. Komutlar otomatik gönderilmez ve bilinmeyen slash komutları olduğu gibi bırakılır. Gerçek slash komutu göndermek için // kullanın.",
+    "title": "Komutlarla daha hızlı sohbet edin",
+    "copy": "Sohbet kutusundan ayrılmadan bahsetmeler, alıntılar, saat kontrolleri, çeviriler, gelen kutusu izlemeleri ve ayarlar için kısa komutlar kullanın.",
+    "actionCopy": "Mesajı doldurmak için Tab'a basın, gözden geçirin ve hazır olduğunuzda gönderin.",
     "inlineTitle": "Satır içi komutlar:",
     "inlineBody": "Bir cümlenin içinde genişleyebilir.",
     "wholeTitle": "Tam giriş komutları:",

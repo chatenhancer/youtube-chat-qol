@@ -20,6 +20,7 @@
   "blog": {
     "archiveCopy": "Chat Enhancer for YouTube 的版本說明與專案更新。",
     "backToUpdates": "返回更新",
+    "backToHome": "返回首頁",
     "latestNotes": "The Backlog",
     "similarPosts": "接下來",
     "updates": "更新",
@@ -37,7 +38,7 @@
   },
   "features": {
     "eyebrow": "為直播打造",
-    "title": "在<span class=\"title-emphasis\">聊天室</span>所在的位置加入增強功能",
+    "title": "在<span class=\"title-emphasis\">聊天室</span>所在的位置加入變化",
     "translationTitle": "邊聊邊翻譯",
     "translationBody": "用你的語言閱讀收到的訊息，或在送出前翻譯你正在輸入的內容。",
     "mentionTitle": "提及、引用與草稿",
@@ -68,7 +69,7 @@
   },
   "screenshots": {
     "eyebrow": "截圖",
-    "title": "自然融入的<br><span class=\"title-emphasis\">聊天室</span>改善",
+    "title": "更像原生的<br><span class=\"title-emphasis\">聊天</span>增強功能",
     "translationTitle": "跨語言<br>閱讀和發言",
     "translationBody": "收到的訊息可以自動翻譯。聊天室輸入框也可以在傳送前翻譯你正在輸入的內容。",
     "translationHighlightHtml": "自動翻譯會以 <span class=\"showcase-underline\">細微底線</span> 和 Google Translate 圖示標示",
@@ -132,7 +133,7 @@
   },
   "privacy": {
     "eyebrow": "隱私",
-    "title": "優先在本機處理的聊天工具",
+    "title": "我們尊重你的隱私",
     "copy": "擴充功能設計上會將日常聊天改善保留在你的裝置上。翻譯是唯一需要外部服務的功能，且只有在你選擇目標語言後才會執行。",
     "button": "閱讀完整隱私權政策",
     "summaryAria": "隱私摘要",
@@ -147,8 +148,9 @@
   },
   "commands": {
     "eyebrow": "參考",
-    "title": "聊天室指令用 Tab 展開",
-    "copy": "在 YouTube 聊天輸入框輸入指令，然後按 Tab。指令不會自動送出，未知的 slash 指令會保持原樣。使用 // 可送出字面上的 slash 指令。",
+    "title": "用指令更快聊天",
+    "copy": "不用離開聊天框，就能用短指令處理提及、引用、時間查詢、翻譯、Inbox 監看和設定。",
+    "actionCopy": "按 Tab 填入訊息，檢查後在準備好時送出。",
     "inlineTitle": "行內指令：",
     "inlineBody": "可以在句子中展開。",
     "wholeTitle": "整段輸入指令：",

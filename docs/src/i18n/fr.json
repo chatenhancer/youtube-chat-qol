@@ -20,6 +20,7 @@
   "blog": {
     "archiveCopy": "Notes de version et actualités du projet Chat Enhancer for YouTube.",
     "backToUpdates": "Retour aux actualités",
+    "backToHome": "Retour à l’accueil",
     "latestNotes": "The Backlog",
     "similarPosts": "À suivre",
     "updates": "Actualités",
@@ -37,7 +38,7 @@
   },
   "features": {
     "eyebrow": "Pensé pour les lives",
-    "title": "Des améliorations là où le <span class=\"title-emphasis\">chat</span> existe déjà",
+    "title": "Des changements là où le <span class=\"title-emphasis\">chat</span> existe déjà",
     "translationTitle": "Traduisez pendant le chat",
     "translationBody": "Lisez les messages entrants dans votre langue, ou traduisez ce que vous écrivez avant de l’envoyer.",
     "mentionTitle": "Mentions, citations et brouillons",
@@ -68,7 +69,7 @@
   },
   "screenshots": {
     "eyebrow": "Captures",
-    "title": "Améliorations du <span class=\"title-emphasis\">chat</span><br>au style natif",
+    "title": "Améliorations<br>du <span class=\"title-emphasis\">chat</span> au style natif",
     "translationTitle": "Lire et écrire<br>dans d’autres langues",
     "translationBody": "Les messages entrants peuvent être traduits automatiquement. Le champ de chat peut aussi traduire ce que vous écrivez avant l’envoi.",
     "translationHighlightHtml": "Les traductions automatiques sont signalées par un <span class=\"showcase-underline\">soulignement discret</span> et une icône Google Translate",
@@ -132,7 +133,7 @@
   },
   "privacy": {
     "eyebrow": "Confidentialité",
-    "title": "Outils de chat pensés pour rester locaux",
+    "title": "Nous respectons votre confidentialité",
     "copy": "L'extension est conçue pour garder les améliorations courantes du chat sur votre appareil. La traduction est la seule fonction qui nécessite un service externe, et elle ne s'exécute qu'après le choix d'une langue cible.",
     "button": "Lire la politique de confidentialité complète",
     "summaryAria": "Résumé de confidentialité",
@@ -147,8 +148,9 @@
   },
   "commands": {
     "eyebrow": "Référence",
-    "title": "Les commandes du chat se développent avec Tab",
-    "copy": "Tapez une commande dans le champ du chat YouTube, puis appuyez sur Tab. Les commandes ne sont pas envoyées automatiquement et les commandes slash inconnues sont laissées telles quelles. Utilisez // pour envoyer une commande slash littérale.",
+    "title": "Discutez plus vite avec les commandes",
+    "copy": "Utilisez des commandes courtes pour les mentions, les citations, les vérifications d'heure, les traductions, les surveillances de boîte de réception et les réglages sans quitter le champ du chat.",
+    "actionCopy": "Appuyez sur Tab pour remplir le message, relisez-le, puis envoyez-le quand vous êtes prêt.",
     "inlineTitle": "Commandes en ligne :",
     "inlineBody": "Peuvent se développer dans une phrase.",
     "wholeTitle": "Commandes en saisie complète :",

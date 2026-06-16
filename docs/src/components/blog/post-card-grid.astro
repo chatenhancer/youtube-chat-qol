@@ -17,9 +17,12 @@ const formatter = new Intl.DateTimeFormat(htmlLangFor(locale), {
   year: 'numeric'
 });
 const BLOG_CARD_IMAGE_WIDTH = 1280;
+const GRID_COLUMNS = 3;
+const shouldCenterGrid = posts.length > 0 && posts.length <= 2;
+const skeletonCards = posts.length > GRID_COLUMNS && posts.length % GRID_COLUMNS === 1 ? [true] : [];
 ---
 
-<div class="blog-archive-grid">
+<div class:list={['blog-archive-grid', shouldCenterGrid && 'blog-archive-grid-centered']}>
   {posts.map((post) => {
     const coverVideoUrl = getBlogCoverVideoUrl(getBlogEntryFolder(post), post.data.video);
 
@@ -40,4 +43,15 @@ const BLOG_CARD_IMAGE_WIDTH = 1280;
       </a>
     );
   })}
+  {skeletonCards.map(() => (
+    <div class="latest-update-card blog-archive-card blog-archive-skeleton-card" aria-hidden="true">
+      <span class="latest-update-media blog-archive-skeleton-media"></span>
+      <span class="latest-update-copy blog-archive-skeleton-copy">
+        <span class="blog-skeleton-line blog-skeleton-line-date"></span>
+        <span class="blog-skeleton-line blog-skeleton-line-title"></span>
+        <span class="blog-skeleton-line"></span>
+        <span class="blog-skeleton-line blog-skeleton-line-copy-short"></span>
+      </span>
+    </div>
+  ))}
 </div>

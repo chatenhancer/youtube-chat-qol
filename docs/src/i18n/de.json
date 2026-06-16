@@ -20,6 +20,7 @@
   "blog": {
     "archiveCopy": "Versionshinweise und Projektupdates für Chat Enhancer for YouTube.",
     "backToUpdates": "Zurück zu den Updates",
+    "backToHome": "Zur Startseite",
     "latestNotes": "The Backlog",
     "similarPosts": "Als Nächstes",
     "updates": "Updates",
@@ -37,7 +38,7 @@
   },
   "features": {
     "eyebrow": "Für Livestreams gebaut",
-    "title": "Verbesserungen dort, wo der <span class=\"title-emphasis\">Chat</span> schon stattfindet",
+    "title": "Änderungen dort, wo der <span class=\"title-emphasis\">Chat</span> schon stattfindet",
     "translationTitle": "Beim Chatten übersetzen",
     "translationBody": "Lies eingehende Nachrichten in deiner Sprache oder übersetze, was du tippst, bevor du es sendest.",
     "mentionTitle": "Erwähnungen, Zitate und Entwürfe",
@@ -68,7 +69,7 @@
   },
   "screenshots": {
     "eyebrow": "Screenshots",
-    "title": "<span class=\"title-emphasis\">Chat</span>-Verbesserungen<br>im nativen Stil",
+    "title": "Nativ wirkende<br><span class=\"title-emphasis\">Chat</span>-Verbesserungen",
     "translationTitle": "In anderen Sprachen<br>lesen und schreiben",
     "translationBody": "Eingehende Nachrichten können automatisch übersetzt werden. Auch das Chat-Eingabefeld kann übersetzen, was du vor dem Senden tippst.",
     "translationHighlightHtml": "Automatische Übersetzungen werden mit einer <span class=\"showcase-underline\">dezenten Unterstreichung</span> und einem Google-Translate-Symbol markiert",
@@ -132,7 +133,7 @@
   },
   "privacy": {
     "eyebrow": "Datenschutz",
-    "title": "Chat-Werkzeuge mit lokalem Fokus",
+    "title": "Wir respektieren deine Privatsphäre",
     "copy": "Die Erweiterung ist darauf ausgelegt, alltägliche Chat-Verbesserungen auf deinem Gerät zu behalten. Übersetzung ist die einzige Funktion, die einen externen Dienst benötigt, und sie läuft erst nach Auswahl einer Zielsprache.",
     "button": "Vollständige Datenschutzerklärung lesen",
     "summaryAria": "Datenschutz-Zusammenfassung",
@@ -147,8 +148,9 @@
   },
   "commands": {
     "eyebrow": "Referenz",
-    "title": "Chatbefehle erweitern sich mit Tab",
-    "copy": "Gib einen Befehl in YouTubes Chatfeld ein und drücke Tab. Befehle werden nicht automatisch gesendet, und unbekannte Slash-Befehle bleiben unverändert. Nutze //, um einen wörtlichen Slash-Befehl zu senden.",
+    "title": "Mit Befehlen schneller chatten",
+    "copy": "Nutze kurze Befehle für Erwähnungen, Zitate, Zeitabfragen, Übersetzungen, Inbox-Watches und Einstellungen, ohne das Chatfeld zu verlassen.",
+    "actionCopy": "Drücke Tab, um die Nachricht auszufüllen, prüfe sie und sende sie, wenn du bereit bist.",
     "inlineTitle": "Inline-Befehle:",
     "inlineBody": "Können innerhalb eines Satzes erweitert werden.",
     "wholeTitle": "Befehle als gesamte Eingabe:",

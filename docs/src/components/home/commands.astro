@@ -47,63 +47,107 @@ const demoCommands = commandSections.flatMap((section) => section.commands.map((
 const defaultCommand = demoCommands.find(({ command }) => command === '/translate') || demoCommands[0];
 const defaultCommandIndex = Math.max(0, demoCommands.findIndex(({ command }) => command === defaultCommand.command));
 const nextCommand = demoCommands[(defaultCommandIndex + 1) % demoCommands.length] || defaultCommand;
+const commandCopyParagraphs = [m.commands.copy, m.commands.actionCopy].filter(Boolean);
 ---
 
 <section class="section commands" id="commands" aria-labelledby="commands-title">
   <div class="section-inner">
-    <span class="section-icon" data-symbol="terminal" aria-hidden="true">
-      <Icon name="terminal" />
-    </span>
-    <p class="eyebrow">{m.commands.eyebrow}</p>
-    <h2 id="commands-title">{m.commands.title}</h2>
-    <p class="section-copy">{m.commands.copy}</p>
-
-    <div class="command-showcase" data-command-demo>
-      <div class="command-playground">
-        <div class="command-menu" id="command-demo-menu" data-command-menu role="listbox" aria-label={m.commands.title}>
-          {demoCommands.map((item) => (
-            <button
-              class:list={['command-menu-item', item.command === defaultCommand.command && 'is-active']}
-              type="button"
-              role="option"
-              aria-selected={item.command === defaultCommand.command ? 'true' : 'false'}
-              data-command-option
-              data-command-value={item.command}
-              data-command-template={item.template}
-              data-command-description={item.description}
-              data-command-search={`${item.command} ${item.aliases.join(' ')} ${item.template} ${item.description} ${item.detail || ''}`.toLowerCase()}
-              tabindex={item.command === defaultCommand.command ? '0' : '-1'}
-            >
-              <span class="command-menu-command">
-                <code>{item.command}</code>
-                {item.aliases.slice(0, 2).map((alias) => <code class="command-alias-code">{alias}</code>)}
-              </span>
-              <span class="command-menu-copy">
-                <strong>{item.section}</strong>
-                <span>{item.description}</span>
-              </span>
-            </button>
-          ))}
+    <div class="commands-layout">
+      <div class="commands-copy">
+        <span class="section-icon" data-symbol="terminal" aria-hidden="true">
+          <Icon name="terminal" />
+        </span>
+        <h2 id="commands-title">{m.commands.title}</h2>
+        <div class="commands-copy-body">
+          {commandCopyParagraphs.map((copy) => <p class="section-copy">{copy}</p>)}
         </div>
-        <div class="command-composer">
-          <div class="command-input-wrap" data-command-input-wrap>
-            <input
-              id="command-demo-input"
-              data-command-input
-              value={defaultCommand.template}
-              placeholder={defaultCommand.template}
-              autocomplete="off"
-              spellcheck="false"
-              aria-label={m.commands.title}
-              aria-controls="command-demo-menu"
-              aria-autocomplete="list"
-            >
-            <span class="command-input-cycle" data-command-cycle aria-hidden="true">
-              <span data-command-cycle-current>{defaultCommand.template}</span>
-              <span data-command-cycle-next>{nextCommand.template}</span>
+      </div>
+
+      <div class="command-showcase" data-command-demo>
+        <div class="command-playground">
+          <div class="command-menu" id="command-demo-menu" data-command-menu role="listbox" aria-label={m.commands.title}>
+            {demoCommands.map((item) => (
+              <button
+                class:list={['command-menu-item', item.command === defaultCommand.command && 'is-active']}
+                type="button"
+                role="option"
+                aria-selected={item.command === defaultCommand.command ? 'true' : 'false'}
+                data-command-option
+                data-command-value={item.command}
+                data-command-template={item.template}
+                data-command-description={item.description}
+                data-command-search={`${item.command} ${item.aliases.join(' ')} ${item.template} ${item.description} ${item.detail || ''}`.toLowerCase()}
+                tabindex={item.command === defaultCommand.command ? '0' : '-1'}
+              >
+                <span class="command-menu-command">
+                  <code>{item.command}</code>
+                  {item.aliases.slice(0, 2).map((alias) => <code class="command-alias-code">{alias}</code>)}
+                </span>
+                <span class="command-menu-copy">
+                  <strong>{item.section}</strong>
+                  <span>{item.description}</span>
+                </span>
+              </button>
+            ))}
+          </div>
+          <div class="command-composer-row">
+            <div class="command-composer">
+              <div class="command-input-wrap" data-command-input-wrap style={`--command-input-text-width: ${Math.min(Math.max(defaultCommand.template.length + 1, 9), 34)}ch`}>
+                <span class="command-input-main">
+                  <input
+                    id="command-demo-input"
+                    data-command-input
+                    value={defaultCommand.template}
+                    placeholder={defaultCommand.template}
+                    autocomplete="off"
+                    spellcheck="false"
+                    aria-label={m.commands.title}
+                    aria-controls="command-demo-menu"
+                    aria-autocomplete="list"
+                  >
+                  <span class="command-input-cycle" data-command-cycle aria-hidden="true">
+                    <span class="command-cycle-row" data-command-cycle-current>
+                      <span class="command-cycle-template" data-command-cycle-current-text>{defaultCommand.template}</span>
+                      <span class="command-tab-hint">
+                        <span class="command-tab-plus" aria-hidden="true">+</span>
+                        <svg class="command-tab-icon" viewBox="0 0 115 58" fill="none" aria-label="Tab" role="img">
+                          <rect width="115" height="58" rx="13" fill="#3E3E3E"></rect>
+                          <path d="M36.1227 44.8847C35.4918 45.5114 34.418 45.0645 34.418 44.1752V31.4029C34.418 30.5136 35.4918 30.0667 36.1227 30.6935L42.5514 37.0796C42.9451 37.4707 42.9451 38.1075 42.5514 38.4985L36.1227 44.8847ZM17 39.5664C16.4477 39.5664 16 39.1187 16 38.5664V36.9727C16 36.4204 16.4477 35.9727 17 35.9727H36.4062C36.9585 35.9727 37.4062 36.4204 37.4062 36.9727V38.5664C37.4062 39.1187 36.9585 39.5664 36.4062 39.5664H17ZM47.1172 46.5391C46.5649 46.5391 46.1172 46.0913 46.1172 45.5391V30C46.1172 29.4477 46.5649 29 47.1172 29H48.6914C49.2437 29 49.6914 29.4477 49.6914 30V45.5391C49.6914 46.0913 49.2437 46.5391 48.6914 46.5391H47.1172Z" fill="white"></path>
+                        </svg>
+                      </span>
+                    </span>
+                    <span class="command-cycle-row" data-command-cycle-next>
+                      <span class="command-cycle-template" data-command-cycle-next-text>{nextCommand.template}</span>
+                      <span class="command-tab-hint">
+                        <span class="command-tab-plus" aria-hidden="true">+</span>
+                        <svg class="command-tab-icon" viewBox="0 0 115 58" fill="none" aria-label="Tab" role="img">
+                          <rect width="115" height="58" rx="13" fill="#3E3E3E"></rect>
+                          <path d="M36.1227 44.8847C35.4918 45.5114 34.418 45.0645 34.418 44.1752V31.4029C34.418 30.5136 35.4918 30.0667 36.1227 30.6935L42.5514 37.0796C42.9451 37.4707 42.9451 38.1075 42.5514 38.4985L36.1227 44.8847ZM17 39.5664C16.4477 39.5664 16 39.1187 16 38.5664V36.9727C16 36.4204 16.4477 35.9727 17 35.9727H36.4062C36.9585 35.9727 37.4062 36.4204 37.4062 36.9727V38.5664C37.4062 39.1187 36.9585 39.5664 36.4062 39.5664H17ZM47.1172 46.5391C46.5649 46.5391 46.1172 46.0913 46.1172 45.5391V30C46.1172 29.4477 46.5649 29 47.1172 29H48.6914C49.2437 29 49.6914 29.4477 49.6914 30V45.5391C49.6914 46.0913 49.2437 46.5391 48.6914 46.5391H47.1172Z" fill="white"></path>
+                        </svg>
+                      </span>
+                    </span>
+                  </span>
+                </span>
+              </div>
+              <span class="command-input-actions" aria-hidden="true">
+                <span class="command-input-action">
+                  <svg viewBox="0 0 24 24" focusable="false">
+                    <path d="M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0014.07 6H17V4h-7V2H8v2H1v2h11.17a15.7 15.7 0 01-2.86 4.63A15.07 15.07 0 017.22 7H5.2a17.2 17.2 0 002.77 5.03l-5.09 5.02L4.3 18.47l5.01-5.01 3.11 3.11.45-1.5ZM18.5 10h-2L12 22h2l1.13-3h4.74L21 22h2l-4.5-12Zm-2.62 7l1.62-4.33L19.12 17h-3.24Z"></path>
+                  </svg>
+                </span>
+                <span class="command-input-action">
+                  <svg viewBox="0 0 24 24" focusable="false">
+                    <path d="M12 1C5.925 1 1 5.925 1 12s4.925 11 11 11 11-4.925 11-11S18.075 1 12 1Zm0 2a9 9 0 110 18.001A9 9 0 0112 3ZM9 8.5a1.5 1.5 0 100 3 1.5 1.5 0 000-3Zm6 0a1.5 1.5 0 100 3 1.5 1.5 0 000-3Zm-.525 5.475a3.5 3.5 0 01-4.95 0 1 1 0 10-1.414 1.414 5.5 5.5 0 007.778 0 1 1 0 00-1.414-1.414Z"></path>
+                  </svg>
+                </span>
+              </span>
+            </div>
+            <span class="command-send-button" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <path d="m21.5 12.867 1.496-.865-1.495-.866L4.65 1.38c-1.513-.876-3.26.7-2.544 2.295l3.743 8.327-3.743 8.325c-.717 1.594 1.03 3.172 2.543 2.296l16.85-9.756ZM7.59 11 4.185 3.421l13.089 7.58H7.59Zm.003 2h9.688L4.185 20.581l3.408-7.58Z"></path>
+              </svg>
             </span>
           </div>
-          <span class="command-tab-hint" data-command-tab-hint>Press Tab</span>
         </div>
       </div>
     </div>

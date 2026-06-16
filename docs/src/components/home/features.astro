@@ -15,7 +15,13 @@ const features = [
 
 <section class="section feature-band" id="features" aria-labelledby="features-title">
   <div class="section-inner feature-inner">
-    <p class="eyebrow">{m.features.eyebrow}</p>
+    <span class="section-icon section-title-icon" data-symbol="startup-effect" aria-hidden="true">
+      <svg class="option-icon startup-effect-icon" viewBox="0 -960 960 960" focusable="false">
+        <path class="startup-sparkle startup-sparkle-small-start" d="m306-120-44-92-102-44 102-44 44-92 44 92 102 44-102 44-44 92Z"></path>
+        <path class="startup-sparkle startup-sparkle-large" d="m684-200-76-160-168-76 168-76 76-160 76 160 168 76-168 76-76 160Z"></path>
+        <path class="startup-sparkle startup-sparkle-small-end" d="m306-568-44-92-102-44 102-44 44-92 44 92 102 44-102 44-44 92Z"></path>
+      </svg>
+    </span>
     <h2 id="features-title" set:html={m.features.title}></h2>
     <div class="feature-grid">
       {features.map(([icon, title, body]) => (

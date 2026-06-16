@@ -20,6 +20,7 @@
   "blog": {
     "archiveCopy": "Catatan rilis dan pembaruan proyek untuk Chat Enhancer for YouTube.",
     "backToUpdates": "Kembali ke pembaruan",
+    "backToHome": "Kembali ke beranda",
     "latestNotes": "The Backlog",
     "similarPosts": "Selanjutnya",
     "updates": "Pembaruan",
@@ -37,7 +38,7 @@
   },
   "features": {
     "eyebrow": "Dibuat untuk siaran langsung",
-    "title": "Peningkatan di tempat<br><span class=\"title-emphasis\">chat</span> sudah berjalan",
+    "title": "Perubahan di tempat<br><span class=\"title-emphasis\">chat</span> sudah berjalan",
     "translationTitle": "Terjemahkan sambil chat",
     "translationBody": "Baca pesan masuk dalam bahasamu, atau terjemahkan yang sedang kamu ketik sebelum dikirim.",
     "mentionTitle": "Sebut, kutip, dan simpan draf",
@@ -68,7 +69,7 @@
   },
   "screenshots": {
     "eyebrow": "Tangkapan layar",
-    "title": "Peningkatan <span class=\"title-emphasis\">chat</span><br>yang terasa menyatu",
+    "title": "Peningkatan<br><span class=\"title-emphasis\">chat</span> yang terasa menyatu",
     "translationTitle": "Baca dan tulis<br>dalam bahasa lain",
     "translationBody": "Pesan masuk dapat diterjemahkan otomatis. Kolom chat juga dapat menerjemahkan apa yang Anda ketik sebelum dikirim.",
     "translationHighlightHtml": "Terjemahan otomatis ditandai dengan <span class=\"showcase-underline\">garis bawah halus</span> dan ikon Google Translate",
@@ -132,7 +133,7 @@
   },
   "privacy": {
     "eyebrow": "Privasi",
-    "title": "Alat chat yang mengutamakan penyimpanan lokal",
+    "title": "Kami menghormati privasi Anda",
     "copy": "Ekstensi dirancang untuk menjaga peningkatan chat rutin tetap di perangkat Anda. Terjemahan adalah satu-satunya fitur yang membutuhkan layanan eksternal, dan hanya berjalan setelah Anda memilih bahasa target.",
     "button": "Baca kebijakan privasi lengkap",
     "summaryAria": "Ringkasan privasi",
@@ -147,8 +148,9 @@
   },
   "commands": {
     "eyebrow": "Referensi",
-    "title": "Perintah chat diperluas dengan Tab",
-    "copy": "Ketik perintah di kolom chat YouTube, lalu tekan Tab. Perintah tidak dikirim otomatis, dan perintah slash yang tidak dikenal dibiarkan apa adanya. Gunakan // untuk mengirim perintah slash secara literal.",
+    "title": "Chat lebih cepat dengan perintah",
+    "copy": "Gunakan perintah singkat untuk mention, kutipan, cek waktu, terjemahan, pantauan inbox, dan pengaturan tanpa meninggalkan kotak chat.",
+    "actionCopy": "Tekan Tab untuk mengisi pesan, tinjau, lalu kirim saat Anda siap.",
     "inlineTitle": "Perintah di dalam kalimat:",
     "inlineBody": "Bisa diperluas di dalam kalimat.",
     "wholeTitle": "Perintah sebagai seluruh input:",

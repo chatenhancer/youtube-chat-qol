@@ -20,6 +20,7 @@
   "blog": {
     "archiveCopy": "Chat Enhancer for YouTube 的发布说明和项目更新。",
     "backToUpdates": "返回更新",
+    "backToHome": "返回首页",
     "latestNotes": "The Backlog",
     "similarPosts": "接下来",
     "updates": "更新",
@@ -37,7 +38,7 @@
   },
   "features": {
     "eyebrow": "为直播打造",
-    "title": "在<span class=\"title-emphasis\">聊天</span>发生的地方加入增强功能",
+    "title": "在<span class=\"title-emphasis\">聊天</span>发生的地方加入变化",
     "translationTitle": "边聊边翻译",
     "translationBody": "用你的语言阅读收到的消息，或在发送前翻译你正在输入的内容。",
     "mentionTitle": "提及、引用和草稿",
@@ -68,7 +69,7 @@
   },
   "screenshots": {
     "eyebrow": "截图",
-    "title": "原生感的<span class=\"title-emphasis\">聊天</span><br>增强功能",
+    "title": "更像原生的<br><span class=\"title-emphasis\">聊天</span>增强功能",
     "translationTitle": "跨语言<br>阅读和发言",
     "translationBody": "收到的消息可以自动翻译。聊天输入框也可以在发送前翻译你正在输入的内容。",
     "translationHighlightHtml": "自动翻译会用<span class=\"showcase-underline\">轻微下划线</span>和 Google Translate 图标标出",
@@ -132,7 +133,7 @@
   },
   "privacy": {
     "eyebrow": "隐私",
-    "title": "优先本地处理的聊天工具",
+    "title": "我们尊重你的隐私",
     "copy": "扩展旨在将日常聊天增强保留在你的设备上。翻译是唯一需要外部服务的功能，并且只会在你选择目标语言后运行。",
     "button": "阅读完整隐私政策",
     "summaryAria": "隐私摘要",
@@ -147,8 +148,9 @@
   },
   "commands": {
     "eyebrow": "参考",
-    "title": "聊天命令用 Tab 展开",
-    "copy": "在 YouTube 聊天输入框中输入命令，然后按 Tab。命令不会自动发送，未知的斜杠命令会保持不变。使用 // 可发送字面意义的斜杠命令。",
+    "title": "用命令更快聊天",
+    "copy": "无需离开聊天框，就能用短命令处理提及、引用、时间查询、翻译、Inbox 关注和设置。",
+    "actionCopy": "按 Tab 填入消息，检查后在准备好时发送。",
     "inlineTitle": "行内命令：",
     "inlineBody": "可以在句子中展开。",
     "wholeTitle": "整条输入命令：",

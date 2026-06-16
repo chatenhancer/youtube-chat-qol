@@ -20,6 +20,7 @@
   "blog": {
     "archiveCopy": "Release notes and project updates for Chat Enhancer for YouTube.",
     "backToUpdates": "Back to updates",
+    "backToHome": "Back to home",
     "latestNotes": "The Backlog",
     "similarPosts": "Next up",
     "updates": "Updates",
@@ -37,7 +38,7 @@
   },
   "features": {
     "eyebrow": "Built for live streams",
-    "title": "Enhancements where <span class=\"title-emphasis\">chat</span><br>already happens",
+    "title": "Changes where <span class=\"title-emphasis\">chat</span><br>already happens",
     "translationTitle": "Translate as you chat",
     "translationBody": "Read incoming messages in your language, or translate what you're typing before you send it.",
     "mentionTitle": "Mentions, quotes, and drafts",
@@ -68,7 +69,7 @@
   },
   "screenshots": {
     "eyebrow": "Screenshots",
-    "title": "Native-feeling <span class=\"title-emphasis\">chat</span><br>improvements",
+    "title": "Native-feeling<br><span class=\"title-emphasis\">chat</span> improvements",
     "translationTitle": "Read and write<br>across languages",
     "translationBody": "Incoming messages can be translated automatically. The chat box can also translate what you're typing before you send it.",
     "translationHighlightHtml": "Automated translations are highlighted with a <span class=\"showcase-underline\">subtle underline</span> and a Google Translate icon",
@@ -132,7 +133,7 @@
   },
   "privacy": {
     "eyebrow": "Privacy",
-    "title": "Local-first chat tools",
+    "title": "We respect your privacy",
     "copy": "The extension is designed to keep routine chat enhancements on your device. Translation is the one feature that needs an external service, and it only runs after you choose a target language.",
     "button": "Read the full privacy policy",
     "summaryAria": "Privacy summary",
@@ -147,8 +148,9 @@
   },
   "commands": {
     "eyebrow": "Reference",
-    "title": "Chat commands expand with Tab",
-    "copy": "Type a command in YouTube's chat box, then press Tab. Commands do not send automatically, and unknown slash commands are left alone. Use // to send a literal slash command.",
+    "title": "Chat faster with commands",
+    "copy": "Use short commands for mentions, quotes, time checks, translations, inbox watches, and settings without leaving the chat box.",
+    "actionCopy": "Press Tab to fill the message, review it, then send when you're ready.",
     "inlineTitle": "Inline commands:",
     "inlineBody": "Can expand inside a sentence.",
     "wholeTitle": "Whole-input commands:",

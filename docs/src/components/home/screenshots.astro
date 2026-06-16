@@ -10,7 +10,9 @@ const { messages: m, rootPrefix } = Astro.props as {
 
 <section class="section screenshots" id="screenshots" aria-labelledby="screenshots-title">
   <div class="section-inner screenshots-inner">
-    <p class="eyebrow">{m.screenshots.eyebrow}</p>
+    <span class="section-icon section-title-icon" data-symbol="imagesmode" aria-hidden="true">
+      <Icon name="imagesmode" />
+    </span>
     <h2 id="screenshots-title" set:html={m.screenshots.title}></h2>
     <div class="screenshots-heading-divider" aria-hidden="true">
       <span></span>

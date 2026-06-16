@@ -13,7 +13,9 @@ const { messages: m, rootPrefix } = Astro.props as {
 <section class="section install" id="install" aria-labelledby="install-title">
   <div class="section-inner install-inner">
     <div class="install-copy">
-      <p class="eyebrow">{m.install.eyebrow}</p>
+      <span class="section-icon section-title-icon install-title-icon" data-symbol="install_desktop" aria-hidden="true">
+        <Icon name="install_desktop" />
+      </span>
       <h2 id="install-title">{m.install.title}</h2>
       <p>{m.install.copy}</p>
       <div class="version-badges" aria-label={m.install.publishedVersions}>
