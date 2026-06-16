@@ -320,10 +320,10 @@ function createTurnstilePage(config: Record<string, string>): string {
       </svg>
       <span>Chat Enhancer</span>
     </div>
-    <h1>Verify before generating</h1>
-    <p id="status">One quick security check before Replay Trivia creates questions.</p>
-    <p>This window closes automatically when verification finishes.</p>
+    <h1>Verify before playing</h1>
+    <p id="status">One quick security check before Replay Trivia begins.</p>
     <div id="turnstile-widget"></div>
+    <p>This window closes automatically when verification finishes.</p>
   </main>
   <script>
     const config = ${serializedConfig};
