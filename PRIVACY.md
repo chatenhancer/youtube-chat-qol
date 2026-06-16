@@ -22,21 +22,35 @@ The extension uses the browser `storage` permission, plus host access for YouTub
 
 The extension stores some data so its features can work between page reloads.
 
-- Settings are stored with `chrome.storage.sync`. Depending on your browser settings, the browser may sync those extension settings across your own signed-in browser installs.
+- **Settings are stored with `chrome.storage.sync`:**
 
-- Inbox data is stored with `chrome.storage.local`. This includes watched keywords and up to 100 inbox records per stream or replay. Inbox records may include message text, author name, timestamp, YouTube message/source metadata, match metadata, and emoji/image display data needed to show the saved message.
+  Depending on your browser settings, the browser may sync those extension settings across your own signed-in browser installs.
 
-- Frequent emoji data is stored with `chrome.storage.local`. This includes local usage counts and emoji display metadata used to build the frequent emoji row.
+- **Inbox data is stored with `chrome.storage.local`:**
 
-- Bookmarked user data is stored with `chrome.storage.local`. This includes the bookmarked user's handle, channel ID when available, and the time the bookmark was created. Bookmarked users are global across streams in the current browser profile and are used to show colored avatar rings.
+  This includes watched keywords and up to 100 inbox records per stream or replay. Inbox records may include message text, author name, timestamp, YouTube message/source metadata, match metadata, and emoji/image display data needed to show the saved message.
 
-- Unsent chat drafts are stored with `chrome.storage.local` per stream so they can be restored after a page refresh. Drafts are removed when the chat input is cleared, the message is sent, or extension data is reset.
+- **Frequent emoji data is stored with `chrome.storage.local`:**
 
-- Live chat tab status is stored with `chrome.storage.local`. This is limited to browser tab IDs and last-seen timestamps for recently active YouTube live chat tabs, and is used to show whether the extension is currently connected or disconnected. These records expire after 12 hours.
+  This includes local usage counts and emoji display metadata used to build the frequent emoji row.
 
-- Playground identity data is stored with `chrome.storage.local` if Playground is used. This is a generated public/private key pair used to sign Playground connection challenges, so the same browser install can keep the same pseudonymous Playground identity. It is not your YouTube identity.
+- **Bookmarked user data is stored with `chrome.storage.local`:**
 
-- Recent profile messages, command state, and translation results are kept only in memory for the current live chat page. They are cleared when the page unloads.
+  This includes the bookmarked user's handle, channel ID when available, and the time the bookmark was created. Bookmarked users are global across streams in the current browser profile and are used to show colored avatar rings.
+
+- **Unsent chat drafts are stored with `chrome.storage.local` per stream:**
+  
+  They are restored after a page refresh. Drafts are removed when the chat input is cleared, the message is sent, or extension data is reset.
+
+- **Live chat tab status is stored with `chrome.storage.local`:**
+
+  This is limited to browser tab IDs and last-seen timestamps for recently active YouTube live chat tabs, and is used to show whether the extension is currently connected or disconnected. These records expire after 12 hours.
+
+- **Playground identity data is stored with `chrome.storage.local` if Playground is used:**
+
+  This is a generated public/private key pair used to sign Playground connection challenges, so the same browser install can keep the same pseudonymous Playground identity. It is not your YouTube identity.
+
+- **Recent profile messages, command state, and translation results are kept only in memory for the current live chat page. They are cleared when the page unloads.**
 
 ## Data sent outside your browser
 
@@ -44,7 +58,7 @@ Chat translation and draft translation are off by default.
 
 When translation or Playground features are enabled, data may be sent to these services:
 
-- Google Translate at `https://translate.googleapis.com/translate_a/single`.
+- **Google Translate at `https://translate.googleapis.com/translate_a/single`**
 
   Chat translation sends eligible visible and incoming chat message text. Draft translation sends the draft text you choose to translate from the chat box.
 
@@ -52,7 +66,7 @@ When translation or Playground features are enabled, data may be sent to these s
 
   Google Translate access through `translate.googleapis.com` is unofficial and may be rate-limited, changed, or unavailable.
 
-- Chat Enhancer Playground at `https://playground.chatenhancer.com`.
+- **Chat Enhancer Playground at `https://playground.chatenhancer.com`**
 
   Playground is off by default. If you enable Playground and use the games panel, the extension connects to the Playground backend so opted-in users in the same stream can see availability, exchange invites, and play games.
 
