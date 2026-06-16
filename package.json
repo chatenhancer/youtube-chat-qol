@@ -19,7 +19,6 @@
     "build:firefox:playground-local": "node scripts/build.mjs --target=firefox --playground-backend=http://127.0.0.1:8787",
     "build:playground-local": "npm run build:chrome:playground-local && npm run build:firefox:playground-local",
     "docs:screenshots": "npm run docs:build && node scripts/generate-dom-screenshots.mjs",
-    "docs:playground-cover": "node scripts/generate-playground-blog-cover.mjs",
     "docs:dev": "astro dev --config astro.docs.config.mjs --force",
     "docs:check": "astro check --config astro.docs.config.mjs",
     "docs:build": "node scripts/validate-docs-locales.mjs && astro build --config astro.docs.config.mjs --force",
