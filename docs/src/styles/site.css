@@ -401,9 +401,49 @@ h3 {
 
 .hero-copy {
   max-width: 600px;
-  margin-bottom: 30px;
+  margin-bottom: 24px;
   color: var(--muted);
   font-size: 18px;
+}
+
+.hero-platform {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 100%;
+  margin: 0 0 30px;
+  color: var(--blue);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.hero-platform-icons {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  width: 42px;
+}
+
+.hero-browser-icon {
+  position: relative;
+  flex: 0 0 auto;
+  width: 27px;
+  height: 27px;
+  border-radius: 999px;
+}
+
+.hero-browser-icon-chrome {
+  z-index: 2;
+}
+
+.hero-browser-icon-firefox {
+  z-index: 1;
+  margin-left: -12px;
+}
+
+.hero-platform-label {
+  min-width: 0;
 }
 
 .hero-actions {
@@ -3240,6 +3280,10 @@ figcaption {
 
   .hero-copy {
     font-size: 17px;
+  }
+
+  .hero-platform {
+    font-size: 13px;
   }
 
   .section {
