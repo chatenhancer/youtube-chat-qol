@@ -1956,7 +1956,7 @@ html[dir="rtl"] .back-link-icon {
 
 .store-version-alert-top {
   position: fixed;
-  top: 82px;
+  top: 100px;
   left: 50%;
   z-index: 30;
   width: fit-content;
