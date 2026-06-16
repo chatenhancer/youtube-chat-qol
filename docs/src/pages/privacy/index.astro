@@ -1,0 +1,59 @@
+---
+import { getCollection, render } from 'astro:content';
+import BlogLayout from '../../layouts/blog-layout.astro';
+import { getMessages, htmlLangFor } from '../../data/locales';
+import { getPrivacyPolicyLanguageUrls, getPrivacyPolicyUrl } from '../../data/privacy';
+import { site } from '../../data/site';
+
+const locale = 'en';
+const messages = getMessages(locale);
+const policies = await getCollection('privacyPolicy');
+const policy = policies[0];
+if (!policy) throw new Error('Missing PRIVACY.md content for docs privacy page');
+
+const { Content } = await render(policy);
+const title = 'Privacy policy';
+const description = 'How Chat Enhancer for YouTube handles local storage, translation, Playground data, and privacy controls.';
+const canonicalUrl = getPrivacyPolicyUrl();
+const privacyStructuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'WebPage',
+  name: `${site.title} privacy policy`,
+  description,
+  url: canonicalUrl,
+  inLanguage: htmlLangFor(locale),
+  isPartOf: {
+    '@type': 'WebSite',
+    name: site.title,
+    url: site.url
+  },
+  publisher: {
+    '@type': 'Organization',
+    name: site.title,
+    url: site.url,
+    logo: {
+      '@type': 'ImageObject',
+      url: `${site.url}/assets/icons/icon-128.png`
+    }
+  }
+};
+---
+
+<BlogLayout
+  alternateLinks={[{ href: canonicalUrl, hreflang: htmlLangFor(locale) }]}
+  canonicalUrl={canonicalUrl}
+  description={description}
+  languageUrls={getPrivacyPolicyLanguageUrls()}
+  locale={locale}
+  messages={messages}
+  rootPrefix="../"
+  structuredData={privacyStructuredData}
+  title={title}
+  xDefaultUrl={canonicalUrl}
+>
+  <article class="blog-post blog-post-page privacy-policy-page">
+    <div class="blog-post-body privacy-policy-body">
+      <Content />
+    </div>
+  </article>
+</BlogLayout>
