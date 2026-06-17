@@ -8,12 +8,15 @@ import {
   type ReplayTriviaQuestionsResponse
 } from '../../../../shared/playground-trivia';
 import { PLAYGROUND_BACKEND_ORIGIN } from '../../../../shared/playground-protocol';
+import { getChatAdjacentWindowFeatures } from '../../../chat-adjacent-window';
 import { getCurrentYouTubeChatStreamKey } from '../../../../youtube/source-url';
 import { fetchReplayTriviaTranscriptWindow, type FetchReplayTriviaTranscriptOptions } from './transcript';
 
 const MALFORMED_QUESTIONS_ERROR = 'Replay Trivia question generation returned an incomplete question pack.';
 const CAPTCHA_WINDOW_POLL_MS = 500;
 const CAPTCHA_WINDOW_TIMEOUT_MS = 5 * 60 * 1000;
+const CAPTCHA_WINDOW_HEIGHT = 560;
+const CAPTCHA_WINDOW_WIDTH = 420;
 
 export interface GenerateReplayTriviaOptions extends FetchReplayTriviaTranscriptOptions {
   gameId?: string;
@@ -70,7 +73,7 @@ export function requestReplayTriviaCaptchaPass(input: {
   url.searchParams.set('userId', input.userId);
 
   return new Promise((resolve, reject) => {
-    const popup = window.open(url.toString(), 'ytcq-replay-trivia-verify', 'popup,width=420,height=560');
+    const popup = window.open(url.toString(), 'ytcq-replay-trivia-verify', getReplayTriviaCaptchaWindowFeatures());
     if (!popup) {
       reject(new Error('Verification window was blocked. Allow popups for this stream and try again.'));
       return;
@@ -116,6 +119,13 @@ export function requestReplayTriviaCaptchaPass(input: {
       if (popup.closed) finish(new Error('Replay Trivia verification was closed before it finished.'));
     }, CAPTCHA_WINDOW_POLL_MS);
     window.addEventListener('message', handleMessage);
+  });
+}
+
+function getReplayTriviaCaptchaWindowFeatures(): string {
+  return getChatAdjacentWindowFeatures({
+    height: CAPTCHA_WINDOW_HEIGHT,
+    width: CAPTCHA_WINDOW_WIDTH
   });
 }
 
