@@ -18,6 +18,7 @@ const DEFAULT_OPENAI_MODEL = 'gpt-5.4-mini';
 const OPENAI_RESPONSES_URL = 'https://api.openai.com/v1/responses';
 const OPENAI_PUBLIC_UNAVAILABLE_MESSAGE = 'Replay Trivia is temporarily unavailable. Try again later.';
 const MAX_PROVIDER_ERROR_MESSAGE_LENGTH = 300;
+const CHOICE_INDEXES = [0, 1, 2, 3] as const satisfies readonly ReplayTriviaQuestion['correctChoiceIndex'][];
 
 interface OpenAIResponsePayload {
   error?: {
@@ -103,7 +104,7 @@ export async function generateReplayTriviaQuestions(
     generatedAt: new Date().toISOString(),
     languageCode: request.languageCode || 'en',
     model,
-    questions: parseGeneratedQuestions(parsedOutput),
+    questions: distributeCorrectChoiceIndexes(parseGeneratedQuestions(parsedOutput), request),
     transcriptWindow: {
       endSeconds: request.endSeconds,
       segmentCount: request.segments.length,
@@ -220,6 +221,59 @@ function parseGeneratedQuestions(value: unknown): ReplayTriviaQuestion[] {
     throw new ReplayTriviaError('openai_no_questions', 'Replay Trivia question generation returned no questions.', 502);
   }
   return questions;
+}
+
+function distributeCorrectChoiceIndexes(
+  questions: ReplayTriviaQuestion[],
+  request: ReplayTriviaQuestionsRequest
+): ReplayTriviaQuestion[] {
+  const pattern = getCorrectChoiceIndexPattern(request);
+  return questions.map((question, index) => moveCorrectChoice(
+    question,
+    pattern[index % pattern.length]
+  ));
+}
+
+function getCorrectChoiceIndexPattern(request: ReplayTriviaQuestionsRequest): ReplayTriviaQuestion['correctChoiceIndex'][] {
+  const indexes = [...CHOICE_INDEXES];
+  let seed = hashString(`${request.gameId}:${request.generationToken}:${request.videoId}`);
+  for (let index = indexes.length - 1; index > 0; index -= 1) {
+    seed = nextSeed(seed);
+    const swapIndex = seed % (index + 1);
+    const choiceIndex = indexes[index];
+    indexes[index] = indexes[swapIndex];
+    indexes[swapIndex] = choiceIndex;
+  }
+  return indexes;
+}
+
+function hashString(value: string): number {
+  let hash = 0;
+  for (const char of value) {
+    hash = (hash * 31 + char.charCodeAt(0)) >>> 0;
+  }
+  return hash;
+}
+
+function nextSeed(seed: number): number {
+  return (seed * 1_664_525 + 1_013_904_223) >>> 0;
+}
+
+function moveCorrectChoice(
+  question: ReplayTriviaQuestion,
+  targetIndex: ReplayTriviaQuestion['correctChoiceIndex']
+): ReplayTriviaQuestion {
+  if (question.correctChoiceIndex === targetIndex) return question;
+
+  const choices = [...question.choices] as ReplayTriviaQuestion['choices'];
+  const displacedChoice = choices[targetIndex];
+  choices[targetIndex] = choices[question.correctChoiceIndex];
+  choices[question.correctChoiceIndex] = displacedChoice;
+  return {
+    ...question,
+    choices,
+    correctChoiceIndex: targetIndex
+  };
 }
 
 function parseGeneratedQuestion(value: unknown, index: number): ReplayTriviaQuestion {

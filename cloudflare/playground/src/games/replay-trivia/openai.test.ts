@@ -54,6 +54,23 @@ describe('Replay Trivia OpenAI adapter', () => {
       .rejects.toThrow('Replay Trivia question generation returned a wrong reply without the correct answer.');
   });
 
+  it('balances correct answer positions even when OpenAI puts every answer first', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => createOpenAIOutputResponse({
+      questions: Array.from({ length: 8 }, (_value, index) => createGeneratedQuestion({
+        explanation: `The transcript says Roger Clark won best performance. ${index + 1}`,
+        prompt: `which q${index + 1} answer was Roger Clark?`
+      }))
+    })));
+
+    const response = await generateReplayTriviaQuestions(createEnv(), createRequest());
+    const correctIndexes = response.questions.map((question) => question.correctChoiceIndex);
+    const countsByIndex = [0, 1, 2, 3].map((index) => correctIndexes.filter((answerIndex) => answerIndex === index).length);
+
+    expect(countsByIndex).toEqual([2, 2, 2, 2]);
+    expect(response.questions[0].correctChoiceIndex).not.toBe(0);
+    expect(response.questions.every((question) => question.choices[question.correctChoiceIndex] === 'Roger Clark')).toBe(true);
+  });
+
   it('uses nested output text and request defaults when optional request fields are omitted', async () => {
     let openAIRequest: Record<string, unknown> | undefined;
     vi.stubGlobal('fetch', vi.fn(async (_input: RequestInfo | URL, init?: RequestInit) => {
@@ -85,10 +102,16 @@ describe('Replay Trivia OpenAI adapter', () => {
     expect(response.languageCode).toBe('en');
     expect(response.model).toBe('gpt-test');
     expect(response.questions[0]).toEqual(expect.objectContaining({
-      choices: ['Roger Clark', 'Christopher Judge', 'Nolan North', 'Troy Baker'],
       difficulty: 'medium',
       id: 'q_1'
     }));
+    expect([...response.questions[0].choices].sort()).toEqual([
+      'Christopher Judge',
+      'Nolan North',
+      'Roger Clark',
+      'Troy Baker'
+    ]);
+    expect(response.questions[0].choices[response.questions[0].correctChoiceIndex]).toBe('Roger Clark');
   });
 
   it('formats transcript timestamps with hours in OpenAI requests', async () => {
