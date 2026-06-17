@@ -91,6 +91,12 @@ describe('Replay Trivia client', () => {
     })).resolves.toEqual(createQuestionsResponse());
 
     expect(popup.close).toHaveBeenCalled();
+    const captchaFeatures = String(vi.mocked(window.open).mock.calls[0]?.[2]);
+    expect(captchaFeatures).toContain('popup=yes');
+    expect(captchaFeatures).toContain('width=420');
+    expect(captchaFeatures).toContain('height=560');
+    expect(captchaFeatures).toContain('left=');
+    expect(captchaFeatures).toContain('top=');
     expect(fetchMock).toHaveBeenCalledTimes(2);
     expect(chrome.runtime.sendMessage).toHaveBeenCalledWith({
       request: {
