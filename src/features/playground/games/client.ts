@@ -21,6 +21,7 @@ import { getCurrentYouTubeChatStreamKey } from '../../../youtube/source-url';
 import { getAvailableGameIds } from './registry';
 
 export interface PlaygroundClientState {
+  available: boolean;
   endedGame: PlaygroundEndedGame | null;
   error: string;
   games: PublicGame[];
@@ -40,6 +41,7 @@ export interface PlaygroundEndedGame {
 type PlaygroundClientListener = (state: PlaygroundClientState) => void;
 
 const DEFAULT_STATE: PlaygroundClientState = {
+  available: false,
   endedGame: null,
   error: '',
   games: [],
@@ -51,6 +53,7 @@ const DEFAULT_STATE: PlaygroundClientState = {
 };
 
 let available = false;
+let availabilityStreamKey = '';
 let currentStreamKey = '';
 let listeners = new Set<PlaygroundClientListener>();
 let playgroundPort: chrome.runtime.Port | null = null;
@@ -68,8 +71,12 @@ export function getPlaygroundClientState(): PlaygroundClientState {
   return state;
 }
 
-export function startPlaygroundClient(nextAvailable = available): void {
-  available = nextAvailable;
+export function getPlaygroundAvailability(defaultAvailable = false): boolean {
+  const streamKey = getCurrentYouTubeChatStreamKey();
+  return streamKey && streamKey === availabilityStreamKey ? available : defaultAvailable;
+}
+
+export function startPlaygroundClient(defaultAvailable = available): void {
   const streamKey = getCurrentYouTubeChatStreamKey();
   if (!streamKey) {
     setState({
@@ -77,6 +84,11 @@ export function startPlaygroundClient(nextAvailable = available): void {
       error: 'Stream unavailable.'
     });
     return;
+  }
+
+  if (availabilityStreamKey !== streamKey) {
+    availabilityStreamKey = streamKey;
+    available = defaultAvailable;
   }
 
   if (playgroundPort && currentStreamKey === streamKey && state.status !== 'disconnected') {
@@ -87,6 +99,7 @@ export function startPlaygroundClient(nextAvailable = available): void {
   currentStreamKey = streamKey;
   setState({
     ...state,
+    available,
     error: '',
     replayTriviaGenerationTokens: streamChanged ? {} : state.replayTriviaGenerationTokens,
     status: 'connecting'
@@ -117,6 +130,8 @@ export function startPlaygroundClient(nextAvailable = available): void {
 export function stopPlaygroundClient(): void {
   const port = playgroundPort;
   playgroundPort = null;
+  available = false;
+  availabilityStreamKey = '';
   currentStreamKey = '';
   if (port) {
     port.onMessage.removeListener(handleBackgroundMessage);
@@ -130,6 +145,10 @@ export function stopPlaygroundClient(): void {
 
 export function setPlaygroundAvailability(nextAvailable: boolean): void {
   available = nextAvailable;
+  setState({
+    ...state,
+    available
+  });
   startPlaygroundClient(available);
   postPlaygroundMessage({
     availableGames: getAvailableGames(),
@@ -167,6 +186,7 @@ function handleBackgroundMessage(message: PlaygroundBackgroundMessage): void {
     case 'ytcq:playground:status':
       setState({
         ...state,
+        available,
         error: message.error || '',
         status: message.status
       });
@@ -174,6 +194,7 @@ function handleBackgroundMessage(message: PlaygroundBackgroundMessage): void {
     case 'ytcq:playground:snapshot':
       setState({
         ...state,
+        available,
         endedGame: null,
         error: '',
         games: message.snapshot.games,

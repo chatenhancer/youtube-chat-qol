@@ -107,6 +107,7 @@ describe('playground games panel state selectors', () => {
 
 function createTransport(overrides: Partial<PlaygroundClientState> = {}): PlaygroundClientState {
   return {
+    available: false,
     endedGame: null,
     error: '',
     games: [],

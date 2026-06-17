@@ -7,6 +7,7 @@ import type {
   PublicInvite
 } from '../../../shared/playground-protocol';
 import {
+  getPlaygroundAvailability,
   getPlaygroundClientState,
   respondToPlaygroundInvite,
   sendPlaygroundGameAction,
@@ -100,6 +101,35 @@ describe('Playground games client', () => {
     expect(port.onMessage.removeListener).toHaveBeenCalledOnce();
     expect(port.onDisconnect.removeListener).toHaveBeenCalledOnce();
     expect(getPlaygroundClientState().status).toBe('disconnected');
+  });
+
+  it('preserves current-stream availability until the stream changes', () => {
+    startPlaygroundClient(false);
+    const port = lastMockPort()!;
+
+    expect(getPlaygroundAvailability(true)).toBe(false);
+    expect(getPlaygroundClientState().available).toBe(false);
+
+    setPlaygroundAvailability(true);
+    expect(getPlaygroundAvailability(false)).toBe(true);
+    expect(getPlaygroundClientState().available).toBe(true);
+
+    startPlaygroundClient(false);
+    expect(port.messages.at(-1)).toEqual({
+      availableGames: ['chess'],
+      type: 'ytcq:playground:set-availability'
+    });
+
+    window.history.replaceState({}, '', '/watch?v=stream-b');
+    expect(getPlaygroundAvailability(false)).toBe(false);
+    startPlaygroundClient(false);
+
+    expect(getPlaygroundClientState().available).toBe(false);
+    expect(port.messages.at(-1)).toEqual({
+      availableGames: [],
+      streamKey: 'stream-b',
+      type: 'ytcq:playground:init'
+    });
   });
 
   it('posts availability, invites, invite responses, and game actions when connected', () => {

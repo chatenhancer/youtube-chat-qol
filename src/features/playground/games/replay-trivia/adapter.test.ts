@@ -123,6 +123,7 @@ function createReplayTriviaGame(overrides: Partial<PublicGame> = {}): PublicGame
 
 function createClientState(overrides: Partial<PlaygroundClientState> = {}): PlaygroundClientState {
   return {
+    available: false,
     endedGame: null,
     error: '',
     games: [],
