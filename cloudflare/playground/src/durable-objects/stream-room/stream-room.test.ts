@@ -230,6 +230,10 @@ describe('playground stream room', () => {
 
     const gameUpdated = lastMessage(bob, 'gameUpdated');
     const updatedChessGame = gameUpdated.game as PublicChessGame;
+    expect(updatedChessGame.lastMove).toEqual({
+      from: 'e2',
+      to: 'e4'
+    });
     expect(updatedChessGame.lastMoveSan).toBe('e4');
     expect(updatedChessGame.turn).toBe('black');
 
@@ -458,6 +462,10 @@ describe('playground stream room', () => {
     });
 
     const updatedChessGame = lastMessage(reconnectedAlice, 'gameUpdated').game as PublicChessGame;
+    expect(updatedChessGame.lastMove).toEqual({
+      from: 'e2',
+      to: 'e4'
+    });
     expect(updatedChessGame.lastMoveSan).toBe('e4');
   });
 

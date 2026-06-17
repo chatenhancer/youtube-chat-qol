@@ -35,10 +35,12 @@ type PieceKind = 'bishop' | 'king' | 'knight' | 'pawn' | 'queen' | 'rook';
 type PromotionPiece = 'b' | 'n' | 'q' | 'r';
 type BoardSquare = { x: number; y: number };
 type PromotionPickerOption = BoardSquare & { piece: PromotionPiece };
+type ChessLastMove = { from: string; promotion?: PromotionPiece; to: string };
 
 export interface PublicChessGame extends PublicGame {
   fen: string;
   gameType: 'chess';
+  lastMove?: ChessLastMove;
   lastMoveSan?: string;
   pgn: string;
   players: Record<PieceColor, PublicUserIdentity>;
@@ -470,6 +472,7 @@ function renderChessBoard(): void {
   drawBoard(context, activeChessGamePanel.assets);
 
   const perspective = getChessBoardPerspective(activeChessGamePanel);
+  drawLastMoveSquares(context, activeChessGamePanel.game.lastMove, perspective);
   drawSelectedSquare(context, activeChessGamePanel.selectedSquare, perspective);
   drawHoverSquare(context, activeChessGamePanel.hoverSquare, perspective);
   if (activeChessGamePanel.assets) drawPieces(context, activeChessGamePanel.assets, parseFenPieces(activeChessGamePanel.game.fen), perspective);
@@ -607,6 +610,29 @@ function drawPromotionPickerPiece(
   context.textAlign = 'center';
   context.textBaseline = 'middle';
   context.fillText(PROMOTION_PIECE_LABEL[option.piece], x + tileSize / 2, y + tileSize / 2 + 1);
+}
+
+function drawLastMoveSquares(context: CanvasRenderingContext2D, lastMove: ChessLastMove | undefined, perspective: PieceColor): void {
+  if (!lastMove) return;
+
+  const from = fromChessSquare(lastMove.from);
+  const to = fromChessSquare(lastMove.to);
+  if (!from || !to) return;
+
+  const tileSize = CANVAS_CSS_SIZE / BOARD_SIZE;
+  [from, to].forEach((square, index) => {
+    const displaySquare = toDisplaySquare(square, perspective);
+    const x = displaySquare.x * tileSize;
+    const y = displaySquare.y * tileSize;
+
+    context.fillStyle = index === 0
+      ? 'rgba(255, 214, 10, 0.24)'
+      : 'rgba(255, 214, 10, 0.34)';
+    context.fillRect(x, y, tileSize, tileSize);
+    context.strokeStyle = 'rgba(47, 51, 54, 0.62)';
+    context.lineWidth = 2;
+    context.strokeRect(x + 4, y + 4, tileSize - 8, tileSize - 8);
+  });
 }
 
 function parseFenPieces(fen: string): ChessPiece[] {
