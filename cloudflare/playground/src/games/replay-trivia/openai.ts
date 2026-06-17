@@ -16,6 +16,8 @@ import { ReplayTriviaError } from './errors';
 
 const DEFAULT_OPENAI_MODEL = 'gpt-5.5';
 const OPENAI_RESPONSES_URL = 'https://api.openai.com/v1/responses';
+const OPENAI_PUBLIC_UNAVAILABLE_MESSAGE = 'Replay Trivia is temporarily unavailable. Try again later.';
+const MAX_PROVIDER_ERROR_MESSAGE_LENGTH = 300;
 
 interface OpenAIResponsePayload {
   error?: {
@@ -52,11 +54,15 @@ export async function generateReplayTriviaQuestions(
       },
       method: 'POST'
     });
-  } catch {
+  } catch (error) {
     throw new ReplayTriviaError(
       'openai_unreachable',
-      'Replay Trivia could not reach OpenAI from the Playground backend.',
-      502
+      OPENAI_PUBLIC_UNAVAILABLE_MESSAGE,
+      502,
+      {
+        provider: 'openai',
+        providerErrorType: error instanceof Error ? error.name : typeof error
+      }
     );
   }
 
@@ -70,8 +76,14 @@ export async function generateReplayTriviaQuestions(
   if (!response.ok) {
     throw new ReplayTriviaError(
       'openai_request_failed',
-      payload.error?.message || 'Replay Trivia question generation failed.',
-      502
+      OPENAI_PUBLIC_UNAVAILABLE_MESSAGE,
+      502,
+      {
+        provider: 'openai',
+        providerCode: payload.error?.code || '',
+        providerMessage: getProviderErrorMessage(payload.error?.message),
+        providerStatus: response.status
+      }
     );
   }
 
@@ -183,6 +195,12 @@ function getOutputText(payload: OpenAIResponsePayload): string {
     ?.flatMap((item) => item.content || [])
     .find((content) => typeof content.text === 'string' && (!content.type || content.type === 'output_text'))
     ?.text || '';
+}
+
+function getProviderErrorMessage(value: unknown): string {
+  return typeof value === 'string'
+    ? value.slice(0, MAX_PROVIDER_ERROR_MESSAGE_LENGTH)
+    : '';
 }
 
 function parseGeneratedQuestions(value: unknown): ReplayTriviaQuestion[] {
