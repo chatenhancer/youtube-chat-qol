@@ -42,6 +42,10 @@ class StockfishServerTest(unittest.TestCase):
     self.assertEqual(engine.commands.count("setoption name UCI_Elo value 1900"), 1)
     self.assertEqual(engine.commands.count("go movetime 500"), 3)
 
+  def test_clamp_int_allows_beginner_elo_floor(self):
+    self.assertEqual(server.clamp_int(750, server.DEFAULT_ELO, 750, 3190), 750)
+    self.assertEqual(server.clamp_int(100, server.DEFAULT_ELO, 750, 3190), 750)
+
 
 if __name__ == "__main__":
   unittest.main()

@@ -147,6 +147,35 @@ describe('Stockfish container client', () => {
     });
   });
 
+  it('allows the low Beginner chess strength setting', async () => {
+    const fetch = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+      const request = new Request(input, init);
+      await expect(request.json()).resolves.toMatchObject({
+        elo: 750
+      });
+      return Response.json({
+        elo: 750,
+        move: {
+          from: 'b8',
+          to: 'c6'
+        },
+        moveTimeMs: 500
+      });
+    });
+
+    await expect(getStockfishBestMove('startpos', {
+      STOCKFISH_ENGINE: createNamespace(fetch)
+    }, {
+      elo: 750
+    })).resolves.toMatchObject({
+      elo: 750,
+      move: {
+        from: 'b8',
+        to: 'c6'
+      }
+    });
+  });
+
   it('creates reusable best-move providers with normalized request settings', async () => {
     const fetch = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
       const request = new Request(input, init);

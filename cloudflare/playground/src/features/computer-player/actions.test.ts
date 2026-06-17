@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
+  CHESS_COMPUTER_PLAYER_BEGINNER_PROFILE,
   CHESS_COMPUTER_PLAYER_CLUB_PROFILE,
   COMPUTER_PLAYER_USER_ID,
   createComputerPlayerAction,
@@ -28,6 +29,14 @@ describe('computer player', () => {
   beforeEach(() => {
     getStockfishBestMoveMock.mockReset();
     getStockfishBestMoveMock.mockResolvedValue(createStockfishResult(null));
+  });
+
+  it('uses a 750 ELO Beginner chess profile', () => {
+    expect(CHESS_COMPUTER_PLAYER_BEGINNER_PROFILE).toMatchObject({
+      chessElo: 750,
+      displayName: 'Computer (Beginner)',
+      userId: 'server:computer:beginner'
+    });
   });
 
   it('creates chess move actions from Stockfish in the computer player', async () => {
