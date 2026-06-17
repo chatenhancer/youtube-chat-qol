@@ -108,8 +108,8 @@ async function getNormalizedChatComposerText(chat: ChatSurface): Promise<string>
 }
 
 async function expectDisplayCommandApplies(chat: ChatSurface, context: BrowserContext): Promise<void> {
-  await test.step('Apply /settranslationdisplay command', async () => {
-    await runCommand(chat, '/settranslationdisplay below');
+  await test.step('Apply /display command', async () => {
+    await runCommand(chat, '/display below');
     await expectStorageValue(context, 'sync', 'translationDisplay', 'below');
     await expectComposerCleared(chat);
   });

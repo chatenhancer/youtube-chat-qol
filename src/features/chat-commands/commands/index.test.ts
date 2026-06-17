@@ -12,6 +12,13 @@ describe('chat command registry', () => {
     expect(commandByPrimaryName.get('time')).toEqual(['time', 't']);
     expect(commandByPrimaryName.get('translate')).toEqual(['translate', 'tr']);
     expect(commandByPrimaryName.get('when')).toEqual(['when', 'wh', 'timeuntil', 'tu', 'timesince', 'ts']);
+    expect(commandByPrimaryName.get('lang')).toEqual(['lang']);
+    expect(commandByPrimaryName.get('display')).toEqual(['display']);
+    expect(commandByPrimaryName.get('mute')).toEqual(['mute']);
+    expect(commandByPrimaryName.get('unmute')).toEqual(['unmute']);
+    expect(commandByPrimaryName.has('settranslateto')).toBe(false);
+    expect(commandByPrimaryName.has('settranslationdisplay')).toBe(false);
+    expect(commandByPrimaryName.has('setsound')).toBe(false);
   });
 
   it('keeps only sentence-friendly commands inline-capable', () => {

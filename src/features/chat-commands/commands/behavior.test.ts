@@ -83,7 +83,7 @@ describe('chat command behavior', () => {
     vi.clearAllMocks();
     runtime = createRuntime();
     commands = new Map(createChatCommands(runtime).flatMap((command) => {
-      return [...command.names, ...(command.hiddenAliases || [])].map((name) => [name, command]);
+      return command.names.map((name) => [name, command]);
     }));
     mocks.getOptions.mockReturnValue({ ...DEFAULT_OPTIONS });
     mocks.findChatInput.mockReturnValue(document.createElement('div'));
@@ -316,9 +316,9 @@ describe('chat command behavior', () => {
 
     await command('lang').run(parsed('lang', 'ja'), { saveOptions });
     await command('lang').run(parsed('lang', 'off'), { saveOptions });
-    await command('settranslationdisplay').run(parsed('settranslationdisplay', 'below'), { saveOptions });
-    await command('setsound').run(parsed('setsound', 'off'), { saveOptions });
-    await command('setsound').run(parsed('setsound', 'on'), { saveOptions });
+    await command('display').run(parsed('display', 'below'), { saveOptions });
+    await command('mute').run(parsed('mute'), { saveOptions });
+    await command('unmute').run(parsed('unmute'), { saveOptions });
 
     expect(saveOptions).toHaveBeenCalledWith({ lastTranslationTarget: 'ja', targetLanguage: 'ja' });
     expect(saveOptions).toHaveBeenCalledWith({ targetLanguage: '' });
@@ -334,8 +334,7 @@ describe('chat command behavior', () => {
 
     await command('lang').run(parsed('lang'), { saveOptions });
     await command('lang').run(parsed('lang', 'not-a-language'), { saveOptions });
-    await command('settranslationdisplay').run(parsed('settranslationdisplay', 'sideways'), { saveOptions });
-    await command('setsound').run(parsed('setsound', 'maybe'), { saveOptions });
+    await command('display').run(parsed('display', 'sideways'), { saveOptions });
 
     mocks.getOptions.mockReturnValue({ ...DEFAULT_OPTIONS, targetLanguage: 'ja' });
     await command('lang').run(parsed('lang'), { saveOptions });
@@ -345,7 +344,6 @@ describe('chat command behavior', () => {
     expect(mocks.showToast).toHaveBeenCalledWith('Translation off.');
     expect(mocks.showToast).toHaveBeenCalledWith('Unknown translation language.');
     expect(mocks.showToast).toHaveBeenCalledWith('Use replace or below.');
-    expect(mocks.showToast).toHaveBeenCalledWith('Use on or off.');
     expect(mocks.showToast).toHaveBeenCalledWith(expect.stringContaining('Japanese'));
   });
 

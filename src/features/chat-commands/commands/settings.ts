@@ -21,9 +21,9 @@ export function createSettingCommands(runtime: ChatCommandRuntime): ChatCommandD
     {
       argumentOptions: createTranslationTargetOptions,
       helpDescriptionKey: 'commandHelpSetTranslateTo',
-      helpLabel: '/settranslateto, /lang',
+      helpLabel: '/lang',
       kind: 'setting',
-      names: ['settranslateto', 'lang'],
+      names: ['lang'],
       run: (parsed, { saveOptions }) => executeSetTranslateToCommand(parsed, saveOptions, runtime),
       runWithoutArgumentNames: ['lang']
     },
@@ -41,35 +41,24 @@ export function createSettingCommands(runtime: ChatCommandRuntime): ChatCommandD
         }
       ],
       helpDescriptionKey: 'commandHelpSetTranslationDisplay',
-      helpLabel: '/settranslationdisplay replace/below',
+      helpLabel: '/display replace/below',
       kind: 'setting',
-      names: ['settranslationdisplay'],
+      names: ['display'],
       run: (parsed, { saveOptions }) => executeSetTranslationDisplayCommand(parsed, saveOptions, runtime)
     },
     {
-      argumentOptions: () => [
-        {
-          description: t('settingState', { label: t('inboxSound'), state: t('stateOn') }),
-          label: 'on',
-          value: 'on'
-        },
-        {
-          description: t('settingState', { label: t('inboxSound'), state: t('stateOff') }),
-          label: 'off',
-          value: 'off'
-        }
-      ],
       helpDescriptionKey: 'commandHelpSetSound',
-      helpLabel: '/setsound on/off',
+      helpLabel: '/mute',
       kind: 'setting',
-      names: ['setsound'],
-      run: (parsed, { saveOptions }) => executeBooleanSetCommand(
-        parsed,
-        saveOptions,
-        runtime,
-        'sound',
-        t('inboxSound')
-      )
+      names: ['mute'],
+      run: (_parsed, { saveOptions }) => executeSetSoundCommand(saveOptions, runtime, false)
+    },
+    {
+      helpDescriptionKey: 'commandHelpSetSound',
+      helpLabel: '/unmute',
+      kind: 'setting',
+      names: ['unmute'],
+      run: (_parsed, { saveOptions }) => executeSetSoundCommand(saveOptions, runtime, true)
     }
   ];
 }
@@ -126,22 +115,14 @@ function executeSetTranslationDisplayCommand(
   showToast(display === 'replace' ? t('translationsReplaceMessages') : t('translationsShowBelowMessages'));
 }
 
-function executeBooleanSetCommand(
-  parsed: ParsedCommand,
+function executeSetSoundCommand(
   saveOptions: SaveOptions,
   runtime: ChatCommandRuntime,
-  option: 'sound',
-  label: string
+  value: boolean
 ): void {
-  const value = getBooleanCommandTarget(parsed.args);
-  if (value === null) {
-    showToast(t('useOnOrOff'));
-    return;
-  }
-
-  saveOptions({ [option]: value });
+  saveOptions({ sound: value });
   runtime.clearInput();
-  showToast(t('settingState', { label, state: value ? t('stateOn') : t('stateOff') }));
+  showToast(t('settingState', { label: t('inboxSound'), state: value ? t('stateOn') : t('stateOff') }));
 }
 
 function getTranslateCommandTarget(value: string): string | null {
@@ -155,13 +136,6 @@ function getTranslationDisplayCommandTarget(value: string): TranslationDisplay |
   const normalized = normalizeCommandToken(value);
   if (normalized === 'replace') return 'replace';
   if (normalized === 'below' || normalized === 'showbelow') return 'below';
-  return null;
-}
-
-function getBooleanCommandTarget(value: string): boolean | null {
-  const normalized = normalizeCommandToken(value);
-  if (['on', 'true', 'yes', 'enabled'].includes(normalized)) return true;
-  if (['off', 'false', 'no', 'disabled'].includes(normalized)) return false;
   return null;
 }
 

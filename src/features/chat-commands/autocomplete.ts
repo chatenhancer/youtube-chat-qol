@@ -415,7 +415,7 @@ function createCommandAutocompleteCard(): HTMLElement {
 }
 
 function needsArgumentSpace(command: ChatCommandDefinition): boolean {
-  return command.kind === 'setting' || Boolean(command.acceptsArguments);
+  return Boolean(command.argumentOptions || command.acceptsArguments);
 }
 
 function wrapIndex(index: number, length: number): number {
