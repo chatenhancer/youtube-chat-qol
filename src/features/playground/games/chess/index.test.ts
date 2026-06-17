@@ -224,7 +224,7 @@ describe('playground chess panel feedback', () => {
     expect(onMove).toHaveBeenCalledWith('game-1', 'd2', 'd4', undefined);
   });
 
-  it('sends promotion moves with the promoted piece from chess.js', () => {
+  it('opens a canvas promotion picker and sends the chosen queen', () => {
     const onMove = vi.fn();
     openChessGamePanel(createChessGame({
       fen: '7k/4P3/8/8/8/8/8/4K3 w - - 0 1',
@@ -235,7 +235,41 @@ describe('playground chess panel feedback', () => {
     clickChessSquare(canvas, 'e7');
     clickChessSquare(canvas, 'e8');
 
-    expect(onMove).toHaveBeenCalledWith('game-1', 'e7', 'e8', expect.stringMatching(/^[bnqr]$/));
+    expect(onMove).not.toHaveBeenCalled();
+
+    clickChessSquare(canvas, 'e8');
+
+    expect(onMove).toHaveBeenCalledWith('game-1', 'e7', 'e8', 'q');
+  });
+
+  it('supports underpromotion from the canvas promotion picker', () => {
+    const onMove = vi.fn();
+    openChessGamePanel(createChessGame({
+      fen: '7k/4P3/8/8/8/8/8/4K3 w - - 0 1',
+      turn: 'white'
+    }), 'me-user', onMove);
+    const canvas = prepareChessCanvas();
+
+    clickChessSquare(canvas, 'e7');
+    clickChessSquare(canvas, 'e8');
+    clickDisplayedSquare(canvas, { x: 4, y: 3 });
+
+    expect(onMove).toHaveBeenCalledWith('game-1', 'e7', 'e8', 'n');
+  });
+
+  it('maps black promotion choices through the flipped board perspective', () => {
+    const onMove = vi.fn();
+    openChessGamePanel(createChessGame({
+      fen: '7k/8/8/8/8/8/4p3/7K b - - 0 1',
+      turn: 'black'
+    }), 'other-user', onMove);
+    const canvas = prepareChessCanvas();
+
+    clickDisplayedSquare(canvas, { x: 3, y: 1 });
+    clickDisplayedSquare(canvas, { x: 3, y: 0 });
+    clickDisplayedSquare(canvas, { x: 3, y: 1 });
+
+    expect(onMove).toHaveBeenCalledWith('game-1', 'e2', 'e1', 'r');
   });
 
   it('keeps malformed chess positions inert instead of throwing', () => {
