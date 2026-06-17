@@ -25,6 +25,7 @@ import {
   ANSWER_TIME_MS,
   ANSWER_UI_DELAY_MS,
   COUNTDOWN_MS,
+  REVEAL_FRIEND_REPLY_DELAY_MS,
   REVEAL_MS,
   SCORE_FLAP_ANIMATION_MS,
   SCORE_MS,
@@ -404,6 +405,42 @@ describe('Replay Trivia panel', () => {
     expect(drawnText).toContain('The Last of Us');
     expect(drawnText).toContain('God of War');
     expect(drawnText).not.toContain('No answer');
+  });
+
+  it('draws the correct answer in bold inside the friend reply', () => {
+    const fillTextCalls: Array<{ font: string; text: string }> = [];
+    context.fillText.mockImplementation((text) => {
+      fillTextCalls.push({
+        font: context.font,
+        text: String(text)
+      });
+    });
+    const game = createReplayTriviaGame({
+      answers: {
+        guest: { answered: true, choiceIndex: 0, correct: true },
+        host: { answered: true, choiceIndex: 1, correct: false }
+      },
+      currentQuestion: {
+        ...createReplayTriviaQuestion(),
+        correctChoiceIndex: 0,
+        wrongReply: 'wow, what a let down. it was The Last of Us.'
+      },
+      status: 'reveal'
+    });
+    openReplayTriviaGamePanel(game, 'host-user', vi.fn());
+    fillTextCalls.length = 0;
+    setNow(REVEAL_FRIEND_REPLY_DELAY_MS + 20);
+    updateReplayTriviaGamePanel(game, 'host-user');
+
+    expect(fillTextCalls).toEqual(expect.arrayContaining([
+      expect.objectContaining({ font: expect.stringContaining('700'), text: 'The' }),
+      expect.objectContaining({ font: expect.stringContaining('700'), text: 'Last' }),
+      expect.objectContaining({ font: expect.stringContaining('700'), text: 'of' }),
+      expect.objectContaining({ font: expect.stringContaining('700'), text: 'Us' })
+    ]));
+    expect(fillTextCalls).toEqual(expect.arrayContaining([
+      expect.objectContaining({ font: expect.stringContaining('400'), text: 'wow,' })
+    ]));
   });
 
   it('accepts a keyboard answer once the question UI is ready', () => {
