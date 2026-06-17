@@ -358,14 +358,20 @@ describe('playground worker routes', () => {
       userId: 'user-123'
     });
     expect(response.headers.get('Access-Control-Allow-Origin')).toBe('chrome-extension://abc');
-    expect(await response.json()).toEqual({
+    const body = await response.json() as {
+      questions: {
+        choices: string[];
+        correctChoiceIndex: number;
+      }[];
+    };
+    expect(body).toEqual({
       generatedAt: expect.any(String),
       languageCode: 'en',
       model: 'gpt-test',
       questions: [
         {
-          choices: ['God of War', 'Celeste', 'Monster Hunter', 'Red Dead Redemption 2'],
-          correctChoiceIndex: 0,
+          choices: expect.arrayContaining(['God of War', 'Celeste', 'Monster Hunter', 'Red Dead Redemption 2']),
+          correctChoiceIndex: expect.any(Number),
           difficulty: 'easy',
           explanation: 'The transcript says the Game of the Year goes to God of War.',
           friendIntro: 'chat emergency, awards memory check',
@@ -384,6 +390,7 @@ describe('playground worker routes', () => {
         videoId: 'SHt3FyE-VIQ'
       }
     });
+    expect(body.questions[0]?.choices[body.questions[0].correctChoiceIndex]).toBe('God of War');
   });
 
   it('logs rejected Replay Trivia request body sizes', async () => {
