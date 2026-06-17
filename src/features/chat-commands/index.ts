@@ -261,7 +261,7 @@ function showWatchedKeywordsCard(keywords: string[]): void {
 function createCommandMap(commands: ChatCommandDefinition[]): Map<string, ChatCommandDefinition> {
   const map = new Map<string, ChatCommandDefinition>();
   commands.forEach((command) => {
-    [...command.names, ...(command.hiddenAliases || [])].forEach((name) => {
+    command.names.forEach((name) => {
       map.set(name, command);
     });
   });

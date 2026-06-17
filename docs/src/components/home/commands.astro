@@ -37,9 +37,10 @@ const commandSections = [
   {
     title: m.commands.settingCommandsTitle,
     commands: [
-      { command: '/settranslateto', aliases: ['/lang'], description: m.commands.setTranslateDescription, template: '/settranslateto english', mode: wholeInputLabel },
-      { command: '/settranslationdisplay', aliases: [], description: m.commands.setDisplayDescription, template: '/settranslationdisplay below', mode: wholeInputLabel },
-      { command: '/setsound', aliases: [], description: m.commands.setSoundDescription, template: '/setsound on', mode: wholeInputLabel }
+      { command: '/lang', aliases: [], description: m.commands.setTranslateDescription, template: '/lang english', mode: wholeInputLabel },
+      { command: '/display', aliases: [], description: m.commands.setDisplayDescription, template: '/display below', mode: wholeInputLabel },
+      { command: '/mute', aliases: [], description: m.commands.setSoundDescription, template: '/mute', mode: wholeInputLabel },
+      { command: '/unmute', aliases: [], description: m.commands.setSoundDescription, template: '/unmute', mode: wholeInputLabel }
     ]
   }
 ];

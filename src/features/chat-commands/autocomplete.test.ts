@@ -274,11 +274,19 @@ describe('chat command autocomplete', () => {
 
   it('accepts whole-input commands without appending an argument space', () => {
     selection = select('/qu');
-    const autocomplete = createAutocomplete();
+    let autocomplete = createAutocomplete();
 
     expect(autocomplete.handleKeydown(keyEvent('Tab'))).toBe(true);
 
     expect(replaceChatInputTextRange).toHaveBeenCalledWith(0, 3, '/quote');
+
+    vi.mocked(replaceChatInputTextRange).mockClear();
+    selection = select('/mu');
+    autocomplete = createAutocomplete();
+
+    expect(autocomplete.handleKeydown(keyEvent('Tab'))).toBe(true);
+
+    expect(replaceChatInputTextRange).toHaveBeenCalledWith(0, 3, '/mute');
   });
 
   it('orders exact command matches before prefix matches', async () => {
@@ -504,6 +512,13 @@ function createCommands(): ChatCommandDefinition[] {
       helpLabel: '/quote',
       kind: 'text',
       names: ['quote', 'q'],
+      run: vi.fn()
+    },
+    {
+      helpDescription: 'Mute inbox sound.',
+      helpLabel: '/mute',
+      kind: 'setting',
+      names: ['mute'],
       run: vi.fn()
     },
     {

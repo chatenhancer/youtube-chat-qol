@@ -72,7 +72,6 @@ export interface ChatCommandDefinition {
   helpDescription?: string;
   helpDescriptionKey?: MessageKey;
   helpLabel: string;
-  hiddenAliases?: string[];
   inline?: boolean;
   kind: ChatCommandKind;
   names: string[];
