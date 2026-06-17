@@ -31,12 +31,12 @@ import { createGamesCard, installGamesCardListeners } from './card';
 import {
   createInitialGamesPanelState,
   getSupportedGames,
-  isCurrentUserAvailable,
   type GamesPanelState
 } from './state';
 import { renderGamesPanelBody, updateGamesCardHeader, type GamesViewActions } from './view';
 import {
   getPlaygroundClientState,
+  getPlaygroundAvailability,
   respondToPlaygroundInvite,
   sendPlaygroundGameAction,
   sendPlaygroundInvite,
@@ -128,18 +128,10 @@ export function cleanupStaleGamesButtons(): void {
   document.querySelectorAll<HTMLButtonElement>('.ytcq-games-button').forEach((button) => button.remove());
 }
 
-function handlePlaygroundOptionsChanged(previousOptions: Options, nextOptions: Options): void {
+function handlePlaygroundOptionsChanged(_previousOptions: Options, nextOptions: Options): void {
   if (!nextOptions.playgroundEnabled) {
     cleanupStaleGamesButtons();
     return;
-  }
-
-  if (previousOptions.playgroundGamesAvailable !== nextOptions.playgroundGamesAvailable) {
-    setPlaygroundAvailability(nextOptions.playgroundGamesAvailable);
-    if (gamesPanelState) {
-      gamesPanelState.available = nextOptions.playgroundGamesAvailable;
-      renderGamesPanel();
-    }
   }
 
   refreshGamesButton();
@@ -166,7 +158,10 @@ function openGamesCard(anchor: HTMLElement): void {
   document.body.append(card);
   activeGamesCard = card;
   activeGamesAnchor = anchor;
-  gamesPanelState = createInitialGamesPanelState(getOptions().playgroundGamesAvailable, getPlaygroundClientState());
+  gamesPanelState = createInitialGamesPanelState(
+    getPlaygroundAvailability(getOptions().playgroundGamesAvailable),
+    getPlaygroundClientState()
+  );
   startPlaygroundClient(gamesPanelState.available);
   ensureGamesClientSubscription();
   renderGamesPanel();
@@ -202,7 +197,7 @@ function handlePlaygroundClientStateChanged(nextState: PlaygroundClientState): v
   }
 
   gamesPanelState.transport = nextState;
-  gamesPanelState.available = isCurrentUserAvailable(nextState, gamesPanelState.available);
+  gamesPanelState.available = nextState.available;
   renderGamesPanel();
 }
 

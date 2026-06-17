@@ -503,6 +503,44 @@ describe('playground games header button', () => {
     expect(document.querySelector('.ytcq-profile-card-subtitle')?.textContent).toBe('2 players online');
   });
 
+  it('keeps stream availability separate from the default setting while reopening the card', () => {
+    const header = createHeader();
+    document.body.append(header);
+    setOptions({ ...DEFAULT_OPTIONS, playgroundEnabled: true, playgroundGamesAvailable: true });
+
+    wireGamesButton();
+    const gamesButton = header.querySelector<HTMLButtonElement>('.ytcq-games-button')!;
+    gamesButton.click();
+    lastMockPort()?.emit(createSnapshotMessage(createLobbySnapshot()));
+
+    expect(document.querySelector('.ytcq-games-availability-toggle')?.getAttribute('aria-checked')).toBe('true');
+
+    document.querySelector<HTMLButtonElement>('.ytcq-games-availability-toggle')!.click();
+    expect(document.querySelector('.ytcq-games-availability-toggle')?.getAttribute('aria-checked')).toBe('false');
+    expect(lastMockPort()?.messages.at(-1)).toEqual({
+      availableGames: [],
+      type: 'ytcq:playground:set-availability'
+    });
+
+    gamesButton.click();
+    gamesButton.click();
+
+    expect(document.querySelector('.ytcq-games-availability-toggle')?.getAttribute('aria-checked')).toBe('false');
+
+    gamesButton.click();
+    window.history.replaceState({}, '', '/watch?v=stream-b');
+    gamesButton.click();
+
+    expect(lastMockPort()?.messages.at(-1)).toEqual({
+      availableGames: ['chess'],
+      streamKey: 'stream-b',
+      type: 'ytcq:playground:init'
+    });
+
+    lastMockPort()?.emit(createSnapshotMessage(createLobbySnapshot()));
+    expect(document.querySelector('.ytcq-games-availability-toggle')?.getAttribute('aria-checked')).toBe('true');
+  });
+
   it('removes ended games and tells the remaining player when the opponent leaves', () => {
     const header = createHeader();
     document.body.append(header);
@@ -835,10 +873,11 @@ describe('playground games header button', () => {
     );
 
     expect(lastMockPort()?.messages.at(-1)).toEqual({
-      availableGames: [],
-      type: 'ytcq:playground:set-availability'
+      availableGames: ['chess'],
+      streamKey: 'stream-a',
+      type: 'ytcq:playground:init'
     });
-    expect(document.querySelector('.ytcq-games-availability-toggle')?.getAttribute('aria-checked')).toBe('false');
+    expect(document.querySelector('.ytcq-games-availability-toggle')?.getAttribute('aria-checked')).toBe('true');
 
     setOptions({ ...DEFAULT_OPTIONS, playgroundEnabled: false, playgroundGamesAvailable: false });
     handleFeatureOptionsChanged(
