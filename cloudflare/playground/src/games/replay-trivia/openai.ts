@@ -14,7 +14,7 @@ import type {
 import type { Env } from '../../types';
 import { ReplayTriviaError } from './errors';
 
-const DEFAULT_OPENAI_MODEL = 'gpt-5.5';
+const DEFAULT_OPENAI_MODEL = 'gpt-5.4-mini';
 const OPENAI_RESPONSES_URL = 'https://api.openai.com/v1/responses';
 const OPENAI_PUBLIC_UNAVAILABLE_MESSAGE = 'Replay Trivia is temporarily unavailable. Try again later.';
 const MAX_PROVIDER_ERROR_MESSAGE_LENGTH = 300;
@@ -126,6 +126,7 @@ function createOpenAIRequest(model: string, request: ReplayTriviaQuestionsReques
           'Answer choices must be clean standalone answers.',
           'Do not include explanatory suffixes or clue restatements in choices, such as "Roger Clark as Arthur Morgan"; use "Roger Clark".',
           'Distractor choices should be the same kind of entity as the answer, plausible, concise, and not obviously formatted differently.',
+          'Distribute correctChoiceIndex across the answer choices. Do not put the correct answer first every time.',
           'Write prompt like a real person asking in chat: casual sentence casing, not headline/title casing.',
           'prompt should usually start lowercase unless it starts with a proper name.',
           'Use lowercase for generic award/category phrases like "game of the year" or "best performance"; keep names and titles correctly capitalized.',
@@ -140,7 +141,8 @@ function createOpenAIRequest(model: string, request: ReplayTriviaQuestionsReques
           'friendIntro must not include the trivia question, repeat prompt, ask who/what/which/when/where/how, or contain a question mark.',
           'Keep friendIntro short.',
           'rightReply should thank the user for getting it right.',
-          'wrongReply should lightly roast you for missing it, and must say the correct answer.'
+          'wrongReply should lightly roast you for missing it, must say the correct answer, and must be valid for any wrong choice.',
+          'Do not mention a specific wrong choice in wrongReply.'
         ].join(' '),
         role: 'system'
       },
@@ -158,13 +160,18 @@ function createOpenAIRequest(model: string, request: ReplayTriviaQuestionsReques
     ],
     max_output_tokens: 5000,
     model,
+    reasoning: {
+      effort: 'low'
+    },
+    store: false,
     text: {
       format: {
         name: 'replay_trivia_questions',
         schema: REPLAY_TRIVIA_SCHEMA,
         strict: true,
         type: 'json_schema'
-      }
+      },
+      verbosity: 'medium'
     }
   };
 }

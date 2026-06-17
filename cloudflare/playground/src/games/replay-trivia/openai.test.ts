@@ -19,9 +19,22 @@ describe('Replay Trivia OpenAI adapter', () => {
 
     const response = await generateReplayTriviaQuestions(createEnv(), createRequest());
 
+    expect(openAIRequest).toEqual(expect.objectContaining({
+      max_output_tokens: 5000,
+      model: 'gpt-5.4-mini',
+      reasoning: {
+        effort: 'low'
+      },
+      store: false,
+      text: expect.objectContaining({
+        verbosity: 'medium'
+      })
+    }));
     expect(getSystemPrompt(openAIRequest)).toContain('friendIntro must not include the trivia question');
     expect(getSystemPrompt(openAIRequest)).toContain('Answer choices must be clean standalone answers.');
     expect(getSystemPrompt(openAIRequest)).toContain('About half of friendIntro lines can be lightly humorous');
+    expect(getSystemPrompt(openAIRequest)).toContain('Do not put the correct answer first every time.');
+    expect(getSystemPrompt(openAIRequest)).toContain('must be valid for any wrong choice');
     expect(getSystemPrompt(openAIRequest)).toContain('Write prompt like a real person asking in chat');
     expect(getSystemPrompt(openAIRequest)).toContain('Use plain "you"');
     expect(response.questions[0].friendIntro).toBe('chat, actor check');
