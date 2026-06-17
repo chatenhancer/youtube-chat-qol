@@ -260,8 +260,12 @@ describe('playground worker routes', () => {
     const openAIFetch = vi.fn(async (_input: RequestInfo | URL, init?: RequestInit) => {
       const body = JSON.parse(String(init?.body));
       expect(body.model).toBe('gpt-test');
+      expect(body.max_output_tokens).toBe(5000);
+      expect(body.reasoning).toEqual({ effort: 'low' });
+      expect(body.store).toBe(false);
       expect(body.text.format.type).toBe('json_schema');
       expect(body.text.format.name).toBe('replay_trivia_questions');
+      expect(body.text.verbosity).toBe('medium');
       expect(new Headers(init?.headers).get('Authorization')).toBe('Bearer test-key');
 
       return new Response(JSON.stringify({
