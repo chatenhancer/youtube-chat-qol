@@ -516,7 +516,7 @@ describe('playground worker routes', () => {
     });
   });
 
-  it('returns a provider error when OpenAI cannot be reached', async () => {
+  it('returns a generic service error when OpenAI cannot be reached', async () => {
     vi.stubGlobal('fetch', vi.fn(async () => {
       throw new TypeError('fetch failed');
     }));
@@ -547,7 +547,7 @@ describe('playground worker routes', () => {
     expect(await response.json()).toEqual({
       error: {
         code: 'openai_unreachable',
-        message: 'Replay Trivia could not reach OpenAI from the Playground backend.'
+        message: 'Replay Trivia is temporarily unavailable. Try again later.'
       }
     });
   });

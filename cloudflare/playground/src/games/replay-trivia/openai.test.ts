@@ -122,21 +122,49 @@ describe('Replay Trivia OpenAI adapter', () => {
     }));
 
     await expect(generateReplayTriviaQuestions(createEnv(), createRequest()))
-      .rejects.toThrow('Replay Trivia could not reach OpenAI from the Playground backend.');
+      .rejects.toMatchObject({
+        code: 'openai_unreachable',
+        details: {
+          provider: 'openai',
+          providerErrorType: 'Error'
+        },
+        message: 'Replay Trivia is temporarily unavailable. Try again later.'
+      });
   });
 
-  it('surfaces OpenAI error responses with provider or fallback messages', async () => {
+  it('hides OpenAI error responses behind a public service message', async () => {
     vi.stubGlobal('fetch', vi.fn(async () => Response.json({
-      error: { message: 'model overloaded' }
+      error: {
+        code: 'insufficient_quota',
+        message: 'You exceeded your current quota.'
+      }
     }, { status: 429 })));
 
     await expect(generateReplayTriviaQuestions(createEnv(), createRequest()))
-      .rejects.toThrow('model overloaded');
+      .rejects.toMatchObject({
+        code: 'openai_request_failed',
+        details: {
+          provider: 'openai',
+          providerCode: 'insufficient_quota',
+          providerMessage: 'You exceeded your current quota.',
+          providerStatus: 429
+        },
+        message: 'Replay Trivia is temporarily unavailable. Try again later.'
+      });
 
     vi.stubGlobal('fetch', vi.fn(async () => new Response('not-json', { status: 500 })));
 
     await expect(generateReplayTriviaQuestions(createEnv(), createRequest()))
-      .rejects.toThrow('Replay Trivia question generation failed.');
+      .rejects.toMatchObject({
+        code: 'openai_request_failed',
+        details: {
+          provider: 'openai',
+          providerCode: '',
+          providerMessage: '',
+          providerStatus: 500
+        },
+        message: 'Replay Trivia is temporarily unavailable. Try again later.'
+      });
   });
 
   it('rejects empty or invalid OpenAI output text', async () => {
