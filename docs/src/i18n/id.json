@@ -185,5 +185,26 @@
     "support": "Dukungan",
     "email": "Email",
     "license": "Lisensi"
+  },
+  "supportPage": {
+    "title": "Dukungan dan masukan",
+    "description": "Pilih cara menghubungi Chat Enhancer for YouTube untuk laporan bug, ide fitur, dan pertanyaan pribadi.",
+    "eyebrow": "Dukungan",
+    "heading": "Pilih jalur dukungan",
+    "reassurance": "Kami siap membantu.",
+    "intro": "Pilih email saat detailnya harus tetap pribadi; pilih GitHub Issues saat utas publik membantu memperbaiki atau memprioritaskan pekerjaan.",
+    "optionsAria": "Opsi dukungan",
+    "pickerTitle": "Pilih yang sesuai",
+    "pickerHint": "Jika ragu, kirim email terlebih dahulu.",
+    "emailTitle": "Email",
+    "emailBody": "Terbaik untuk tangkapan layar dengan detail pribadi, pertanyaan toko, masalah khusus pengaturan, dan apa pun yang tidak ingin Anda unggah secara publik.",
+    "emailCta": "Email dukungan",
+    "issuesTitle": "GitHub Issues",
+    "issuesBody": "Terbaik untuk bug yang bisa direproduksi, permintaan fitur, tindak lanjut publik, dan detail yang dapat dikonfirmasi atau dicari pengguna lain nanti.",
+    "issuesCta": "Buka GitHub Issues"
+  },
+  "privacyPolicy": {
+    "title": "Kebijakan privasi",
+    "description": "Cara Chat Enhancer for YouTube menangani penyimpanan lokal, terjemahan, data Playground, dan kontrol privasi."
   }
 }

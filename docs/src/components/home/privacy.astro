@@ -1,9 +1,13 @@
 ---
 import Icon from '../common/icon.astro';
-import { site } from '../../data/site';
+import { getPrivacyPolicyUrl } from '../../data/privacy';
+import type { Locale } from '../../data/locales';
 import type { Messages } from '../../data/site';
 
-const { messages: m } = Astro.props as { messages: Messages };
+const { locale, messages: m } = Astro.props as {
+  locale: Locale;
+  messages: Messages;
+};
 const items = [
   [m.privacy.scopeTitle, m.privacy.scopeBody],
   [m.privacy.storageTitle, m.privacy.storageBody],
@@ -21,7 +25,7 @@ const items = [
       <h2 id="privacy-title">{m.privacy.title}</h2>
       <p>{m.privacy.copy}</p>
       <div class="privacy-actions">
-        <a class="button button-secondary" href={site.privacyUrl}>{m.privacy.button}</a>
+        <a class="button button-secondary" href={getPrivacyPolicyUrl(locale)}>{m.privacy.button}</a>
       </div>
     </div>
     <dl class="privacy-list" aria-label={m.privacy.summaryAria}>

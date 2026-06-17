@@ -185,5 +185,26 @@
     "support": "Destek",
     "email": "E-posta",
     "license": "Lisans"
+  },
+  "supportPage": {
+    "title": "Destek ve geri bildirim",
+    "description": "Hata bildirimleri, özellik fikirleri ve özel sorular için Chat Enhancer for YouTube ile nasıl iletişime geçeceğinizi seçin.",
+    "eyebrow": "Destek",
+    "heading": "Destek yolunu seçin",
+    "reassurance": "Yardım etmek için buradayız.",
+    "intro": "Ayrıntıların özel kalması gerekiyorsa e-postayı; herkese açık bir konu işi düzeltmeye veya önceliklendirmeye yardımcı olacaksa GitHub Issues’ı seçin.",
+    "optionsAria": "Destek seçenekleri",
+    "pickerTitle": "Uygun olanı seçin",
+    "pickerHint": "Emin değilseniz önce e-posta gönderin.",
+    "emailTitle": "E-posta",
+    "emailBody": "Kişisel ayrıntılar içeren ekran görüntüleri, mağaza soruları, kuruluma özel sorunlar ve herkese açık paylaşmak istemeyeceğiniz şeyler için en iyisi.",
+    "emailCta": "Desteğe e-posta gönder",
+    "issuesTitle": "GitHub Issues",
+    "issuesBody": "Tekrarlanabilir hatalar, özellik istekleri, herkese açık takip ve diğer kullanıcıların sonradan doğrulayabileceği veya arayabileceği ayrıntılar için en iyisi.",
+    "issuesCta": "GitHub Issues’ı aç"
+  },
+  "privacyPolicy": {
+    "title": "Gizlilik politikası",
+    "description": "Chat Enhancer for YouTube yerel depolamayı, çeviriyi, Playground verilerini ve gizlilik kontrollerini nasıl işler."
   }
 }

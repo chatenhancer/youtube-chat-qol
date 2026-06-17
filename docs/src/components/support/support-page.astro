@@ -1,0 +1,49 @@
+---
+import { site, supportEmail } from '../../data/site';
+import type { Messages } from '../../data/site';
+
+const { messages: m } = Astro.props as { messages: Messages };
+const support = m.supportPage;
+---
+
+<article class="support-page" aria-labelledby="support-title">
+  <header class="support-hero">
+    <div class="support-hero-copy">
+      <p class="eyebrow">{support.eyebrow}</p>
+      <h1 id="support-title">{support.heading}</h1>
+      <p class="support-reassurance">{support.reassurance}</p>
+      <p>{support.intro}</p>
+    </div>
+  </header>
+
+  <div class="support-main">
+    <section class="support-picker" aria-label={support.optionsAria}>
+      <div class="support-picker-heading">
+        <strong>{support.pickerTitle}</strong>
+        <span>{support.pickerHint}</span>
+      </div>
+
+      <div class="support-choice-panel">
+        <a class="support-choice" href={`mailto:${supportEmail}`}>
+          <div class="support-choice-copy">
+            <h2>{support.emailTitle}</h2>
+            <p>{support.emailBody}</p>
+          </div>
+          <span class="button button-primary support-route-action">
+            <span>{support.emailCta}</span>
+          </span>
+        </a>
+
+        <a class="support-choice" href={site.issuesUrl}>
+          <div class="support-choice-copy">
+            <h2>{support.issuesTitle}</h2>
+            <p>{support.issuesBody}</p>
+          </div>
+          <span class="button button-secondary support-route-action">
+            <span>{support.issuesCta}</span>
+          </span>
+        </a>
+      </div>
+    </section>
+  </div>
+</article>

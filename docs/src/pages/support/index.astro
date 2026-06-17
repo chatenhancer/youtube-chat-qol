@@ -1,18 +1,19 @@
 ---
 import BlogLayout from '../../layouts/blog-layout.astro';
+import SupportPage from '../../components/support/support-page.astro';
 import { getMessages, htmlLangFor } from '../../data/locales';
+import { getSupportAlternateLinks, getSupportLanguageUrls, getSupportUrl } from '../../data/support';
 import { site, supportEmail } from '../../data/site';
 
 const locale = 'en';
 const messages = getMessages(locale);
-const canonicalUrl = `${site.url}/support/`;
-const title = 'Support and feedback';
-const description = 'Choose how to contact Chat Enhancer for YouTube for bug reports, feature ideas, and private questions.';
+const support = messages.supportPage;
+const canonicalUrl = getSupportUrl(locale);
 const supportStructuredData = {
   '@context': 'https://schema.org',
   '@type': 'ContactPage',
-  name: `${site.title} support and feedback`,
-  description,
+  name: `${site.title} ${support.title}`,
+  description: support.description,
   url: canonicalUrl,
   inLanguage: htmlLangFor(locale),
   isPartOf: {
@@ -39,56 +40,16 @@ const supportStructuredData = {
 ---
 
 <BlogLayout
-  alternateLinks={[{ href: canonicalUrl, hreflang: htmlLangFor(locale) }]}
+  alternateLinks={getSupportAlternateLinks()}
   canonicalUrl={canonicalUrl}
-  description={description}
-  languageUrls={{ en: '/support/' }}
+  description={support.description}
+  languageUrls={getSupportLanguageUrls()}
   locale={locale}
   messages={messages}
   rootPrefix="../"
   structuredData={supportStructuredData}
-  title={title}
-  xDefaultUrl={canonicalUrl}
+  title={support.title}
+  xDefaultUrl={getSupportUrl('en')}
 >
-  <article class="support-page" aria-labelledby="support-title">
-    <header class="support-hero">
-      <div class="support-hero-copy">
-        <p class="eyebrow">Support</p>
-        <h1 id="support-title">Choose the support route</h1>
-        <p class="support-reassurance">We're here to help.</p>
-        <p>Pick email when the details should stay private; pick GitHub Issues when a public thread helps fix or prioritize the work.</p>
-      </div>
-    </header>
-
-    <div class="support-main">
-      <section class="support-picker" aria-label="Support options">
-        <div class="support-picker-heading">
-          <strong>Choose what fits</strong>
-          <span>If you are unsure, email first.</span>
-        </div>
-
-        <div class="support-choice-panel">
-          <a class="support-choice" href={`mailto:${supportEmail}`}>
-            <div class="support-choice-copy">
-              <h2>Email</h2>
-              <p>Best for screenshots with personal details, store questions, setup-specific problems, and anything you would not want posted publicly.</p>
-            </div>
-            <span class="button button-primary support-route-action">
-              <span>Email support</span>
-            </span>
-          </a>
-
-          <a class="support-choice" href={site.issuesUrl}>
-            <div class="support-choice-copy">
-              <h2>GitHub Issues</h2>
-              <p>Best for reproducible bugs, feature requests, public follow-up, and details other users can confirm or search for later.</p>
-            </div>
-            <span class="button button-secondary support-route-action">
-              <span>Open GitHub Issues</span>
-            </span>
-          </a>
-        </div>
-      </section>
-    </div>
-  </article>
+  <SupportPage messages={messages} />
 </BlogLayout>
