@@ -62,6 +62,7 @@ export async function generateReplayTriviaQuestions(
       502,
       {
         provider: 'openai',
+        providerErrorMessage: getProviderErrorMessage(error instanceof Error ? error.message : String(error)),
         providerErrorType: error instanceof Error ? error.name : typeof error
       }
     );

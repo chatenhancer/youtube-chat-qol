@@ -453,6 +453,8 @@ describe('playground worker routes', () => {
     expect(console.warn).toHaveBeenCalledWith('[Chat Enhancer Playground] replay_trivia_failed', expect.objectContaining({
       chars: 400500,
       code: 'transcript_too_large',
+      errorMessage: 'Transcript text must be 400000 characters or less.',
+      errorType: 'ReplayTriviaError',
       event: 'replay_trivia_failed',
       maxChars: 400000,
       room: expect.stringMatching(/^h_[a-z0-9]+$/),

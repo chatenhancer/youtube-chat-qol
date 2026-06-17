@@ -3,6 +3,7 @@ export type PlaygroundLogValue = boolean | number | string | undefined;
 export type PlaygroundLogDetails = Record<string, PlaygroundLogValue>;
 
 const LOG_PREFIX = '[Chat Enhancer Playground]';
+const MAX_LOG_ERROR_MESSAGE_LENGTH = 500;
 
 export function logPlaygroundEvent(
   event: string,
@@ -32,6 +33,12 @@ export function shortLogId(value: string): string {
 
 export function getLogErrorType(error: unknown): string {
   return error instanceof Error ? error.name : typeof error;
+}
+
+export function getLogErrorMessage(error: unknown): string {
+  const message = error instanceof Error ? error.message : String(error);
+  if (message.length <= MAX_LOG_ERROR_MESSAGE_LENGTH) return message;
+  return `${message.slice(0, MAX_LOG_ERROR_MESSAGE_LENGTH - 3)}...`;
 }
 
 function compactDetails(details: PlaygroundLogDetails): PlaygroundLogDetails {

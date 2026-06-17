@@ -1,5 +1,5 @@
 import { Container, type StopParams } from '@cloudflare/containers';
-import { getLogErrorType, logPlaygroundEvent } from '../../logging';
+import { getLogErrorMessage, getLogErrorType, logPlaygroundEvent } from '../../logging';
 import type { Env } from '../../types';
 
 export class StockfishContainer extends Container<Env> {
@@ -21,13 +21,9 @@ export class StockfishContainer extends Container<Env> {
 
   override onError(error: unknown): never {
     logPlaygroundEvent('stockfish_container_error', {
-      errorMessage: getErrorMessage(error),
+      errorMessage: getLogErrorMessage(error),
       errorType: getLogErrorType(error)
     }, 'error');
     throw error;
   }
-}
-
-function getErrorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : String(error);
 }

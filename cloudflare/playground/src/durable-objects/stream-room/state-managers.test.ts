@@ -62,7 +62,10 @@ describe('stream room state managers', () => {
     });
     const failedGames = new GameState(failedState, failedLog);
     await failedGames.load();
-    expect(failedLog).toHaveBeenCalledWith('room_state_restore_failed', {}, 'warn');
+    expect(failedLog).toHaveBeenCalledWith('room_state_restore_failed', {
+      errorMessage: 'storage unavailable',
+      errorType: 'Error'
+    }, 'warn');
   });
 
   it('queues game state writes and logs persist failures', async () => {
@@ -86,7 +89,10 @@ describe('stream room state managers', () => {
     failedGames.set(createStoredGame('game-2', 'chess'));
     await Promise.all(failedState.pending);
 
-    expect(logEvent).toHaveBeenCalledWith('room_state_persist_failed', {}, 'warn');
+    expect(logEvent).toHaveBeenCalledWith('room_state_persist_failed', {
+      errorMessage: 'write failed',
+      errorType: 'Error'
+    }, 'warn');
   });
 
   it('creates, consumes, expires, and rate limits generation tokens', () => {

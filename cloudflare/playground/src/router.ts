@@ -7,7 +7,7 @@
  */
 import { ENABLED_ROUTE_MODULES } from './routes/enabled-routes';
 import { createErrorResponse } from './http';
-import { getLogErrorType, logPlaygroundEvent } from './logging';
+import { getLogErrorMessage, getLogErrorType, logPlaygroundEvent } from './logging';
 import { sanitizeStreamKey } from './protocol/validation';
 import {
   createRouteResult,
@@ -51,6 +51,7 @@ function getSanitizedStreamKey(rawStreamKey: string, routeName: string): string 
     const message = error instanceof Error ? error.message : 'Invalid stream key.';
     logPlaygroundEvent('invalid_stream_key', {
       endpoint: routeName,
+      errorMessage: getLogErrorMessage(error),
       errorType: getLogErrorType(error)
     }, 'warn');
     return createErrorResponse('invalid_stream', message, 400);

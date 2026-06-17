@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
+  getLogErrorMessage,
   hashLogValue,
   logPlaygroundEvent,
   shortLogId
@@ -49,5 +50,11 @@ describe('playground logging', () => {
     expect(hashLogValue('stream-id')).toBe(hashLogValue('stream-id'));
     expect(hashLogValue('stream-id')).not.toBe('stream-id');
     expect(shortLogId('game_1234567890abcdef_extra')).toBe('game_1234567890abc');
+  });
+
+  it('formats error messages for log details', () => {
+    expect(getLogErrorMessage(new Error('storage unavailable'))).toBe('storage unavailable');
+    expect(getLogErrorMessage('plain failure')).toBe('plain failure');
+    expect(getLogErrorMessage(new Error('x'.repeat(600)))).toHaveLength(500);
   });
 });

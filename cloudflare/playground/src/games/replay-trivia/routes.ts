@@ -9,7 +9,7 @@ import { REPLAY_TRIVIA_QUESTIONS_ROUTE } from '../../../../../src/shared/playgro
 import { consumeReplayTriviaCaptchaPass } from '../../durable-objects/captcha-passes/client';
 import { consumeReplayTriviaGenerationToken as consumeStreamRoomReplayTriviaGenerationToken } from '../../durable-objects/stream-room/client';
 import { createErrorResponse, createJsonResponse } from '../../http';
-import { getLogErrorType, hashLogValue, logPlaygroundEvent } from '../../logging';
+import { getLogErrorMessage, getLogErrorType, hashLogValue, logPlaygroundEvent } from '../../logging';
 import { createRouteResult, type RouteModule, type RouteResult, type StreamRouteContext } from '../../routes/types';
 import type { Env } from '../../types';
 import { ReplayTriviaError } from './errors';
@@ -91,6 +91,7 @@ async function handleReplayTriviaQuestionsRequest(
     if (error instanceof ReplayTriviaError) {
       logPlaygroundEvent('replay_trivia_failed', {
         code: error.code,
+        errorMessage: getLogErrorMessage(error),
         errorType: getLogErrorType(error),
         ...error.details,
         room: hashLogValue(streamKey),
@@ -100,6 +101,7 @@ async function handleReplayTriviaQuestionsRequest(
     }
 
     logPlaygroundEvent('replay_trivia_failed', {
+      errorMessage: getLogErrorMessage(error),
       errorType: getLogErrorType(error),
       room: hashLogValue(streamKey)
     }, 'error');

@@ -302,6 +302,7 @@ describe('in-room computer player', () => {
       'computer_player_action_send_failed',
       expect.objectContaining({
         action: 'move',
+        errorMessage: 'room rejected bot action',
         errorType: 'Error',
         game: 'game_chess_1'
       }),

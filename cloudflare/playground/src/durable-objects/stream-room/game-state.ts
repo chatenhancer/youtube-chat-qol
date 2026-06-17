@@ -1,6 +1,6 @@
 import { getGameModuleForRecord } from '../../games/registry';
 import type { GameRecord } from '../../games/types';
-import { shortLogId } from '../../logging';
+import { getLogErrorMessage, getLogErrorType, shortLogId } from '../../logging';
 
 type LogDetails = Record<string, boolean | number | string | undefined>;
 type LogEvent = (event: string, details?: LogDetails, level?: 'error' | 'info' | 'warn') => void;
@@ -42,8 +42,11 @@ export class GameState {
     let stored: unknown;
     try {
       stored = await this.state.storage.get<StoredRoomState>(ROOM_STATE_STORAGE_KEY);
-    } catch {
-      this.logEvent('room_state_restore_failed', {}, 'warn');
+    } catch (error) {
+      this.logEvent('room_state_restore_failed', {
+        errorMessage: getLogErrorMessage(error),
+        errorType: getLogErrorType(error)
+      }, 'warn');
       return;
     }
 
@@ -71,8 +74,11 @@ export class GameState {
   private queueWrite(): void {
     const write = this.storageWriteQueue
       .then(() => this.write())
-      .catch(() => {
-        this.logEvent('room_state_persist_failed', {}, 'warn');
+      .catch((error: unknown) => {
+        this.logEvent('room_state_persist_failed', {
+          errorMessage: getLogErrorMessage(error),
+          errorType: getLogErrorType(error)
+        }, 'warn');
       });
     this.storageWriteQueue = write.catch(() => undefined);
     this.state.waitUntil(write);

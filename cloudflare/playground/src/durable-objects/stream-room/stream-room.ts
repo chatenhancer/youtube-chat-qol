@@ -8,7 +8,7 @@
 import { getGameModule, getGameModuleForRecord } from '../../games/registry';
 import type { GameRecord } from '../../games/types';
 import { createErrorResponse, createJsonResponse } from '../../http';
-import { hashLogValue, logPlaygroundEvent, shortLogId } from '../../logging';
+import { getLogErrorMessage, getLogErrorType, hashLogValue, logPlaygroundEvent, shortLogId } from '../../logging';
 import {
   createChallenge,
   verifySignedIdentity
@@ -171,7 +171,7 @@ export class StreamRoom {
       await this.handleClientMessage(session, message);
     } catch (error) {
       const protocolError = normalizeError(error);
-      this.logProtocolError(session, protocolError);
+      this.logProtocolError(session, protocolError, error);
       if (session.socket) sendMessage(session.socket, {
         code: protocolError.code,
         message: protocolError.message,
@@ -380,7 +380,8 @@ export class StreamRoom {
       });
     }).catch((error: unknown) => {
       this.logEvent('game_win_record_failed', {
-        errorType: error instanceof Error ? error.name : typeof error,
+        errorMessage: getLogErrorMessage(error),
+        errorType: getLogErrorType(error),
         game: shortLogId(game.gameId),
         gameType: game.gameType,
         user: hashLogValue(winnerUserId)
@@ -496,6 +497,7 @@ export class StreamRoom {
       const protocolError = normalizeError(error);
       this.logEvent('generation_token_rejected', {
         code: protocolError.code,
+        errorMessage: getLogErrorMessage(error),
         game: shortLogId(game.gameId),
         gameType: game.gameType,
         user: hashLogValue(token.userId)
@@ -585,11 +587,13 @@ export class StreamRoom {
     this.broadcastPresence();
   }
 
-  private logProtocolError(session: ClientSession, error: ProtocolError): void {
+  private logProtocolError(session: ClientSession, error: ProtocolError, originalError: unknown): void {
     const event = getProtocolLogEvent(error.code);
     this.logEvent(event, {
       code: error.code,
       connection: shortLogId(session.connectionId),
+      errorMessage: getLogErrorMessage(originalError),
+      errorType: getLogErrorType(originalError),
       message: truncateLogMessage(error.message),
       user: session.userId ? hashLogValue(session.userId) : undefined
     }, error.code === 'internal_error' ? 'error' : 'warn');

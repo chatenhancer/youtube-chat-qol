@@ -11,6 +11,7 @@ export class ProtocolError extends Error {
     message: string
   ) {
     super(message);
+    this.name = 'ProtocolError';
   }
 }
 
