@@ -145,7 +145,8 @@ function createOpenAIRequest(model: string, request: ReplayTriviaQuestionsReques
           'friendIntro must not include the trivia question, repeat prompt, ask who/what/which/when/where/how, or contain a question mark.',
           'Keep friendIntro short.',
           'rightReply should sound relieved and thank the user for saving the friend.',
-          'wrongReply should be a roast or polite judgment for fumbling the save, must say the correct answer, and must be valid for any wrong choice.',
+          'wrongReply should be a roast or judgment, must say the correct answer, and must be valid for any wrong choice.',
+          'wrongReply can sound annoyed, betrayed, or mock-disappointed.',
           'wrongReply should be more teasing than neutral.',
           'Do not mention a specific wrong choice in wrongReply.'
         ].join(' '),
