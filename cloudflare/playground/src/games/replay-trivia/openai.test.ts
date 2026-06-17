@@ -34,6 +34,9 @@ describe('Replay Trivia OpenAI adapter', () => {
     expect(getSystemPrompt(openAIRequest)).toContain('Answer choices must be clean standalone answers.');
     expect(getSystemPrompt(openAIRequest)).toContain('About half of friendIntro lines can be lightly humorous');
     expect(getSystemPrompt(openAIRequest)).toContain('Do not put the correct answer first every time.');
+    expect(getSystemPrompt(openAIRequest)).toContain('The game is called HELP-A-FRIEND! Trivia.');
+    expect(getSystemPrompt(openAIRequest)).toContain('one friend clearly did not pay attention');
+    expect(getSystemPrompt(openAIRequest)).toContain('playful roast or polite judgment for fumbling the save');
     expect(getSystemPrompt(openAIRequest)).toContain('must be valid for any wrong choice');
     expect(getSystemPrompt(openAIRequest)).toContain('Write prompt like a real person asking in chat');
     expect(getSystemPrompt(openAIRequest)).toContain('Use plain "you"');
