@@ -27,6 +27,8 @@ const WHITE_PIECES_PATH = 'games/chess/white-pieces.png';
 const BLACK_PIECES_PATH = 'games/chess/black-pieces.png';
 const BOARD_SIZE = 8;
 const CANVAS_CSS_SIZE = 224;
+const LEGAL_CAPTURE_RING_RADIUS = 11;
+const LEGAL_MOVE_DOT_RADIUS = 4;
 const PIECE_SOURCE_SIZE = 32;
 const PIECE_DRAW_SIZE = 32;
 
@@ -36,6 +38,7 @@ type PromotionPiece = 'b' | 'n' | 'q' | 'r';
 type BoardSquare = { x: number; y: number };
 type PromotionPickerOption = BoardSquare & { piece: PromotionPiece };
 type ChessLastMove = { from: string; promotion?: PromotionPiece; to: string };
+type LegalMoveHint = BoardSquare & { capture: boolean };
 
 export interface PublicChessGame extends PublicGame {
   fen: string;
@@ -476,6 +479,7 @@ function renderChessBoard(): void {
   drawSelectedSquare(context, activeChessGamePanel.selectedSquare, perspective);
   drawHoverSquare(context, activeChessGamePanel.hoverSquare, perspective);
   if (activeChessGamePanel.assets) drawPieces(context, activeChessGamePanel.assets, parseFenPieces(activeChessGamePanel.game.fen), perspective);
+  drawLegalMoveHints(context, activeChessGamePanel.game, activeChessGamePanel.selectedSquare, perspective);
   drawPromotionPicker(
     context,
     activeChessGamePanel.assets,
@@ -523,6 +527,54 @@ function drawSelectedSquare(context: CanvasRenderingContext2D, square: BoardSqua
   context.strokeStyle = 'rgba(255, 183, 77, 0.95)';
   context.lineWidth = 2;
   context.strokeRect(displaySquare.x * tileSize + 1, displaySquare.y * tileSize + 1, tileSize - 2, tileSize - 2);
+}
+
+function drawLegalMoveHints(
+  context: CanvasRenderingContext2D,
+  game: PublicChessGame,
+  selectedSquare: BoardSquare | null,
+  perspective: PieceColor
+): void {
+  const hints = getLegalMoveHints(game, selectedSquare);
+  if (!hints.length) return;
+  if (!canDrawLegalMoveHints(context)) return;
+
+  const tileSize = CANVAS_CSS_SIZE / BOARD_SIZE;
+  hints.forEach((hint) => {
+    const displaySquare = toDisplaySquare(hint, perspective);
+    const centerX = displaySquare.x * tileSize + tileSize / 2;
+    const centerY = displaySquare.y * tileSize + tileSize / 2;
+
+    if (hint.capture) {
+      context.beginPath();
+      context.arc(centerX, centerY, LEGAL_CAPTURE_RING_RADIUS, 0, Math.PI * 2);
+      context.strokeStyle = 'rgba(47, 51, 54, 0.72)';
+      context.lineWidth = 4;
+      context.stroke();
+
+      context.beginPath();
+      context.arc(centerX, centerY, LEGAL_CAPTURE_RING_RADIUS, 0, Math.PI * 2);
+      context.strokeStyle = 'rgba(255, 255, 255, 0.92)';
+      context.lineWidth = 2;
+      context.stroke();
+      return;
+    }
+
+    context.beginPath();
+    context.arc(centerX, centerY, LEGAL_MOVE_DOT_RADIUS, 0, Math.PI * 2);
+    context.fillStyle = 'rgba(255, 255, 255, 0.84)';
+    context.fill();
+    context.strokeStyle = 'rgba(47, 51, 54, 0.58)';
+    context.lineWidth = 1;
+    context.stroke();
+  });
+}
+
+function canDrawLegalMoveHints(context: CanvasRenderingContext2D): boolean {
+  return typeof context.beginPath === 'function' &&
+    typeof context.arc === 'function' &&
+    typeof context.fill === 'function' &&
+    typeof context.stroke === 'function';
 }
 
 function drawPieces(context: CanvasRenderingContext2D, assets: ChessAssets, pieces: ChessPiece[], perspective: PieceColor): void {
@@ -626,12 +678,14 @@ function drawLastMoveSquares(context: CanvasRenderingContext2D, lastMove: ChessL
     const y = displaySquare.y * tileSize;
 
     context.fillStyle = index === 0
-      ? 'rgba(255, 214, 10, 0.24)'
-      : 'rgba(255, 214, 10, 0.34)';
+      ? 'rgba(255, 214, 10, 0.14)'
+      : 'rgba(255, 214, 10, 0.2)';
     context.fillRect(x, y, tileSize, tileSize);
-    context.strokeStyle = 'rgba(47, 51, 54, 0.62)';
-    context.lineWidth = 2;
-    context.strokeRect(x + 4, y + 4, tileSize - 8, tileSize - 8);
+    context.strokeStyle = index === 0
+      ? 'rgba(255, 214, 10, 0.38)'
+      : 'rgba(255, 214, 10, 0.52)';
+    context.lineWidth = 1;
+    context.strokeRect(x + 2.5, y + 2.5, tileSize - 5, tileSize - 5);
   });
 }
 
@@ -674,6 +728,31 @@ function getLegalChessMoves(game: PublicChessGame, from: string, to: string): Mo
   try {
     const chess = new Chess(game.fen);
     return chess.moves({ square: from, verbose: true }).filter((move) => move.to === to);
+  } catch {
+    return [];
+  }
+}
+
+function getLegalMoveHints(game: PublicChessGame, selectedSquare: BoardSquare | null): LegalMoveHint[] {
+  if (!selectedSquare) return [];
+
+  const from = toChessSquare(selectedSquare);
+  if (!isChessSquare(from)) return [];
+
+  try {
+    const chess = new Chess(game.fen);
+    const hintsBySquare = new Map<string, LegalMoveHint>();
+    chess.moves({ square: from, verbose: true }).forEach((move) => {
+      const square = fromChessSquare(move.to);
+      if (!square) return;
+
+      const existing = hintsBySquare.get(move.to);
+      hintsBySquare.set(move.to, {
+        ...square,
+        capture: Boolean(move.captured) || Boolean(existing?.capture)
+      });
+    });
+    return Array.from(hintsBySquare.values());
   } catch {
     return [];
   }
