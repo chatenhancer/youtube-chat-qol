@@ -34,6 +34,7 @@ type PieceColor = 'black' | 'white';
 type PieceKind = 'bishop' | 'king' | 'knight' | 'pawn' | 'queen' | 'rook';
 type PromotionPiece = 'b' | 'n' | 'q' | 'r';
 type BoardSquare = { x: number; y: number };
+type PromotionPickerOption = BoardSquare & { piece: PromotionPiece };
 
 export interface PublicChessGame extends PublicGame {
   fen: string;
@@ -64,16 +65,25 @@ interface ChessGamePanelState {
   canvas: HTMLCanvasElement;
   currentUserId: string;
   game: PublicChessGame;
+  hoverPromotionPiece: PromotionPiece | null;
   hoverSquare: BoardSquare | null;
   listeners: AbortController;
   onMove: (gameId: string, from: string, to: string, promotion?: PromotionPiece) => void;
   onVisibilityChanged: (() => void) | null;
   panel: HTMLElement;
+  pendingPromotion: PendingPromotion | null;
   pixelRatio: number;
   selectedSquare: BoardSquare | null;
   soundController: GameSoundController;
   statusOverlay: GamePanelStatusOverlay;
   subtitleElement: HTMLElement;
+}
+
+interface PendingPromotion {
+  color: PieceColor;
+  from: string;
+  pieces: PromotionPiece[];
+  to: string;
 }
 
 const PIECE_SOURCE: Record<PieceKind, { x: number; y: number }> = {
@@ -99,6 +109,21 @@ const PIECE_BY_FEN: Record<string, { color: PieceColor; kind: PieceKind }> = {
   Q: { color: 'white', kind: 'queen' },
   R: { color: 'white', kind: 'rook' }
 };
+
+const PROMOTION_PICKER_ORDER: readonly PromotionPiece[] = ['q', 'r', 'b', 'n'];
+const PROMOTION_PIECE_KIND: Record<PromotionPiece, PieceKind> = {
+  b: 'bishop',
+  n: 'knight',
+  q: 'queen',
+  r: 'rook'
+};
+const PROMOTION_PIECE_LABEL: Record<PromotionPiece, string> = {
+  b: 'B',
+  n: 'N',
+  q: 'Q',
+  r: 'R'
+};
+const PROMOTION_PIECE_DRAW_SIZE = 24;
 
 let activeChessGamePanel: ChessGamePanelState | null = null;
 let chessAssetsPromise: Promise<ChessAssets> | null = null;
@@ -149,11 +174,13 @@ export function openChessGamePanel(
     canvas,
     currentUserId,
     game,
+    hoverPromotionPiece: null,
     hoverSquare: null,
     listeners,
     onMove,
     onVisibilityChanged: onVisibilityChanged || null,
     panel,
+    pendingPromotion: null,
     pixelRatio,
     selectedSquare: null,
     soundController,
@@ -179,6 +206,8 @@ export function updateChessGamePanel(game: PublicChessGame, currentUserId: strin
   const moveSoundPath = getChessMoveSoundPath(activeChessGamePanel.game.fen, game.fen);
   activeChessGamePanel.game = game;
   activeChessGamePanel.currentUserId = currentUserId;
+  activeChessGamePanel.hoverPromotionPiece = null;
+  activeChessGamePanel.pendingPromotion = null;
   activeChessGamePanel.selectedSquare = null;
   syncChessGameStatusMessage();
   activeChessGamePanel.subtitleElement.textContent = getChessOpponentLabel(game, currentUserId);
@@ -219,6 +248,23 @@ function handleChessCanvasClick(event: MouseEvent): void {
   if (!activeChessGamePanel || activeChessGamePanel.game.status !== 'active') return;
   if (activeChessGamePanel.statusOverlay.isBlocking()) return;
 
+  if (activeChessGamePanel.pendingPromotion) {
+    const promotion = getPromotionPieceAt(event);
+    const pendingPromotion = activeChessGamePanel.pendingPromotion;
+    activeChessGamePanel.hoverPromotionPiece = null;
+    activeChessGamePanel.pendingPromotion = null;
+    if (promotion) {
+      activeChessGamePanel.onMove(
+        activeChessGamePanel.game.gameId,
+        pendingPromotion.from,
+        pendingPromotion.to,
+        promotion
+      );
+    }
+    renderChessBoard();
+    return;
+  }
+
   const square = getChessCanvasSquare(event);
   if (!square) return;
 
@@ -245,18 +291,32 @@ function handleChessCanvasClick(event: MouseEvent): void {
 
     const from = toChessSquare(selected);
     const to = toChessSquare(square);
-    const move = getLegalChessMove(activeChessGamePanel.game, from, to);
-    if (!move) {
+    const moves = getLegalChessMoves(activeChessGamePanel.game, from, to);
+    if (moves.length === 0) {
       showChessFeedbackMessage(event, t('gamesInvalidMove'));
       return;
     }
 
+    const promotionPieces = getPromotionPieces(moves);
     activeChessGamePanel.selectedSquare = null;
+    if (promotionPieces.length > 1) {
+      activeChessGamePanel.pendingPromotion = {
+        color: ownColor,
+        from,
+        pieces: promotionPieces,
+        to
+      };
+      activeChessGamePanel.hoverPromotionPiece = null;
+      renderChessBoard();
+      return;
+    }
+
+    const move = moves.find((candidate) => !getChessPromotion(candidate)) || moves[0];
     activeChessGamePanel.onMove(
       activeChessGamePanel.game.gameId,
       from,
       to,
-      getChessPromotion(move)
+      promotionPieces[0] || getChessPromotion(move)
     );
     renderChessBoard();
     return;
@@ -358,8 +418,19 @@ function getFenPieceCount(fen: string): number {
 function handleChessCanvasMouseMove(event: MouseEvent): void {
   if (!activeChessGamePanel) return;
   if (activeChessGamePanel.statusOverlay.isBlocking()) {
-    if (!activeChessGamePanel.hoverSquare) return;
+    if (!activeChessGamePanel.hoverSquare && !activeChessGamePanel.hoverPromotionPiece) return;
 
+    activeChessGamePanel.hoverPromotionPiece = null;
+    activeChessGamePanel.hoverSquare = null;
+    renderChessBoard();
+    return;
+  }
+
+  if (activeChessGamePanel.pendingPromotion) {
+    const hoverPromotionPiece = getPromotionPieceAt(event);
+    if (activeChessGamePanel.hoverPromotionPiece === hoverPromotionPiece) return;
+
+    activeChessGamePanel.hoverPromotionPiece = hoverPromotionPiece;
     activeChessGamePanel.hoverSquare = null;
     renderChessBoard();
     return;
@@ -374,7 +445,8 @@ function handleChessCanvasMouseMove(event: MouseEvent): void {
 }
 
 function handleChessCanvasMouseLeave(): void {
-  if (!activeChessGamePanel?.hoverSquare) return;
+  if (!activeChessGamePanel?.hoverSquare && !activeChessGamePanel?.hoverPromotionPiece) return;
+  activeChessGamePanel.hoverPromotionPiece = null;
   activeChessGamePanel.hoverSquare = null;
   renderChessBoard();
 }
@@ -401,6 +473,13 @@ function renderChessBoard(): void {
   drawSelectedSquare(context, activeChessGamePanel.selectedSquare, perspective);
   drawHoverSquare(context, activeChessGamePanel.hoverSquare, perspective);
   if (activeChessGamePanel.assets) drawPieces(context, activeChessGamePanel.assets, parseFenPieces(activeChessGamePanel.game.fen), perspective);
+  drawPromotionPicker(
+    context,
+    activeChessGamePanel.assets,
+    activeChessGamePanel.pendingPromotion,
+    activeChessGamePanel.hoverPromotionPiece,
+    perspective
+  );
 }
 
 function drawBoard(context: CanvasRenderingContext2D, assets: ChessAssets | null): void {
@@ -465,6 +544,71 @@ function drawPieces(context: CanvasRenderingContext2D, assets: ChessAssets, piec
   });
 }
 
+function drawPromotionPicker(
+  context: CanvasRenderingContext2D,
+  assets: ChessAssets | null,
+  pendingPromotion: PendingPromotion | null,
+  hoverPromotionPiece: PromotionPiece | null,
+  perspective: PieceColor
+): void {
+  if (!pendingPromotion) return;
+
+  const tileSize = CANVAS_CSS_SIZE / BOARD_SIZE;
+  getPromotionPickerOptions(pendingPromotion, perspective).forEach((option) => {
+    const x = option.x * tileSize;
+    const y = option.y * tileSize;
+    const hovered = option.piece === hoverPromotionPiece;
+
+    context.fillStyle = hovered
+      ? 'rgba(62, 166, 255, 0.92)'
+      : pendingPromotion.color === 'white'
+        ? 'rgba(32, 33, 36, 0.94)'
+        : 'rgba(255, 255, 255, 0.96)';
+    context.fillRect(x + 1, y + 1, tileSize - 2, tileSize - 2);
+    context.strokeStyle = hovered ? 'rgba(255, 255, 255, 0.96)' : 'rgba(15, 15, 15, 0.42)';
+    context.lineWidth = hovered ? 2 : 1;
+    context.strokeRect(x + 1, y + 1, tileSize - 2, tileSize - 2);
+    drawPromotionPickerPiece(context, assets, option, pendingPromotion.color, tileSize);
+  });
+}
+
+function drawPromotionPickerPiece(
+  context: CanvasRenderingContext2D,
+  assets: ChessAssets | null,
+  option: PromotionPickerOption,
+  color: PieceColor,
+  tileSize: number
+): void {
+  const x = option.x * tileSize;
+  const y = option.y * tileSize;
+  const offset = (tileSize - PROMOTION_PIECE_DRAW_SIZE) / 2;
+  const kind = PROMOTION_PIECE_KIND[option.piece];
+
+  if (assets) {
+    const source = PIECE_SOURCE[kind];
+    const image = color === 'white' ? assets.whitePieces : assets.blackPieces;
+    context.drawImage(
+      image,
+      source.x * PIECE_SOURCE_SIZE,
+      source.y * PIECE_SOURCE_SIZE,
+      PIECE_SOURCE_SIZE,
+      PIECE_SOURCE_SIZE,
+      x + offset,
+      y + offset,
+      PROMOTION_PIECE_DRAW_SIZE,
+      PROMOTION_PIECE_DRAW_SIZE
+    );
+    return;
+  }
+
+  if (typeof context.fillText !== 'function') return;
+  context.fillStyle = color === 'white' ? '#fff' : '#111';
+  context.font = '700 16px system-ui, sans-serif';
+  context.textAlign = 'center';
+  context.textBaseline = 'middle';
+  context.fillText(PROMOTION_PIECE_LABEL[option.piece], x + tileSize / 2, y + tileSize / 2 + 1);
+}
+
 function parseFenPieces(fen: string): ChessPiece[] {
   const board = fen.split(/\s+/)[0] || '';
   const rows = board.split('/');
@@ -498,15 +642,24 @@ function getChessPieceAt(game: PublicChessGame, square: BoardSquare): ChessPiece
   return parseFenPieces(game.fen).find((piece) => piece.x === square.x && piece.y === square.y);
 }
 
-function getLegalChessMove(game: PublicChessGame, from: string, to: string): Move | null {
-  if (!isChessSquare(from) || !isChessSquare(to)) return null;
+function getLegalChessMoves(game: PublicChessGame, from: string, to: string): Move[] {
+  if (!isChessSquare(from) || !isChessSquare(to)) return [];
 
   try {
     const chess = new Chess(game.fen);
-    return chess.moves({ square: from, verbose: true }).find((move) => move.to === to) || null;
+    return chess.moves({ square: from, verbose: true }).filter((move) => move.to === to);
   } catch {
-    return null;
+    return [];
   }
+}
+
+function getPromotionPieces(moves: Move[]): PromotionPiece[] {
+  const pieces = new Set<PromotionPiece>();
+  moves.forEach((move) => {
+    const promotion = getChessPromotion(move);
+    if (promotion) pieces.add(promotion);
+  });
+  return PROMOTION_PICKER_ORDER.filter((piece) => pieces.has(piece));
 }
 
 function getChessPromotion(move: Move): PromotionPiece | undefined {
@@ -524,19 +677,56 @@ function isChessSquare(value: string): value is Square {
 
 function getChessCanvasSquare(event: MouseEvent): BoardSquare | null {
   if (!activeChessGamePanel) return null;
+  const displaySquare = getChessCanvasDisplaySquare(event);
+  return displaySquare ? toBoardSquare(displaySquare, getChessBoardPerspective(activeChessGamePanel)) : null;
+}
 
+function getChessCanvasDisplaySquare(event: MouseEvent): BoardSquare | null {
+  if (!activeChessGamePanel) return null;
   const rect = activeChessGamePanel.canvas.getBoundingClientRect();
   if (!rect.width || !rect.height) return null;
 
   const x = Math.floor(((event.clientX - rect.left) / rect.width) * BOARD_SIZE);
   const y = Math.floor(((event.clientY - rect.top) / rect.height) * BOARD_SIZE);
   return x >= 0 && x < BOARD_SIZE && y >= 0 && y < BOARD_SIZE
-    ? toBoardSquare({ x, y }, getChessBoardPerspective(activeChessGamePanel))
+    ? { x, y }
     : null;
 }
 
 function toChessSquare(square: BoardSquare): string {
   return `${'abcdefgh'[square.x]}${8 - square.y}`;
+}
+
+function fromChessSquare(square: string): BoardSquare | null {
+  if (!isChessSquare(square)) return null;
+  return {
+    x: 'abcdefgh'.indexOf(square[0]),
+    y: BOARD_SIZE - Number(square[1])
+  };
+}
+
+function getPromotionPieceAt(event: MouseEvent): PromotionPiece | null {
+  if (!activeChessGamePanel?.pendingPromotion) return null;
+
+  const displaySquare = getChessCanvasDisplaySquare(event);
+  if (!displaySquare) return null;
+
+  const perspective = getChessBoardPerspective(activeChessGamePanel);
+  return getPromotionPickerOptions(activeChessGamePanel.pendingPromotion, perspective)
+    .find((option) => option.x === displaySquare.x && option.y === displaySquare.y)?.piece || null;
+}
+
+function getPromotionPickerOptions(pendingPromotion: PendingPromotion, perspective: PieceColor): PromotionPickerOption[] {
+  const targetSquare = fromChessSquare(pendingPromotion.to);
+  if (!targetSquare) return [];
+
+  const displayTarget = toDisplaySquare(targetSquare, perspective);
+  const direction = displayTarget.y + pendingPromotion.pieces.length <= BOARD_SIZE ? 1 : -1;
+  return pendingPromotion.pieces.map((piece, index) => ({
+    piece,
+    x: displayTarget.x,
+    y: displayTarget.y + index * direction
+  }));
 }
 
 function getChessBoardPerspective(state: ChessGamePanelState): PieceColor {
