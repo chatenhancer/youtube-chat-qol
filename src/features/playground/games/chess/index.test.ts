@@ -330,8 +330,8 @@ describe('playground chess panel feedback', () => {
       turn: 'black'
     }), 'me-user', vi.fn());
 
-    expect(context.strokeRect).toHaveBeenCalledWith(116, 172, 20, 20);
-    expect(context.strokeRect).toHaveBeenCalledWith(116, 116, 20, 20);
+    expect(context.strokeRect).toHaveBeenCalledWith(114.5, 170.5, 23, 23);
+    expect(context.strokeRect).toHaveBeenCalledWith(114.5, 114.5, 23, 23);
 
     getContext.mockRestore();
   });
@@ -349,8 +349,29 @@ describe('playground chess panel feedback', () => {
       turn: 'white'
     }), 'other-user', vi.fn());
 
-    expect(context.strokeRect).toHaveBeenCalledWith(88, 172, 20, 20);
-    expect(context.strokeRect).toHaveBeenCalledWith(88, 116, 20, 20);
+    expect(context.strokeRect).toHaveBeenCalledWith(86.5, 170.5, 23, 23);
+    expect(context.strokeRect).toHaveBeenCalledWith(86.5, 114.5, 23, 23);
+
+    getContext.mockRestore();
+  });
+
+  it('draws legal move dots and capture rings for the selected piece', () => {
+    const context = createMockChessCanvasContext();
+    const getContext = vi.spyOn(HTMLCanvasElement.prototype, 'getContext')
+      .mockReturnValue(context as unknown as CanvasRenderingContext2D);
+
+    openChessGamePanel(createChessGame({
+      fen: '7k/8/8/3p1p2/4P3/8/8/4K3 w - - 0 1',
+      turn: 'white'
+    }), 'me-user', vi.fn());
+    const canvas = prepareChessCanvas();
+
+    context.arc.mockClear();
+    clickChessSquare(canvas, 'e4');
+
+    expect(context.arc).toHaveBeenCalledWith(126, 98, 4, 0, Math.PI * 2);
+    expect(context.arc).toHaveBeenCalledWith(98, 98, 11, 0, Math.PI * 2);
+    expect(context.arc).toHaveBeenCalledWith(154, 98, 11, 0, Math.PI * 2);
 
     getContext.mockRestore();
   });
@@ -743,13 +764,17 @@ function mockRect(
 
 function createMockChessCanvasContext() {
   return {
+    arc: vi.fn(),
+    beginPath: vi.fn(),
     clearRect: vi.fn(),
     drawImage: vi.fn(),
+    fill: vi.fn(),
     fillRect: vi.fn(),
     fillStyle: '',
     imageSmoothingEnabled: false,
     lineWidth: 1,
     setTransform: vi.fn(),
+    stroke: vi.fn(),
     strokeRect: vi.fn(),
     strokeStyle: ''
   };
