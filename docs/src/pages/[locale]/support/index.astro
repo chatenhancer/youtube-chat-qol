@@ -1,0 +1,64 @@
+---
+import BlogLayout from '../../../layouts/blog-layout.astro';
+import SupportPage from '../../../components/support/support-page.astro';
+import { getLocaleFromPath, getMessages, htmlLangFor, localeMeta, locales } from '../../../data/locales';
+import { getSupportAlternateLinks, getSupportLanguageUrls, getSupportUrl } from '../../../data/support';
+import { site, supportEmail } from '../../../data/site';
+
+export function getStaticPaths() {
+  return locales
+    .filter((locale) => locale !== 'en')
+    .map((locale) => ({
+      params: { locale: localeMeta[locale].path },
+      props: { resolvedLocale: locale }
+    }));
+}
+
+const locale = Astro.props.resolvedLocale ?? getLocaleFromPath(Astro.params.locale || '');
+const messages = getMessages(locale);
+const support = messages.supportPage;
+const canonicalUrl = getSupportUrl(locale);
+const supportStructuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'ContactPage',
+  name: `${site.title} ${support.title}`,
+  description: support.description,
+  url: canonicalUrl,
+  inLanguage: htmlLangFor(locale),
+  isPartOf: {
+    '@type': 'WebSite',
+    name: site.title,
+    url: site.url
+  },
+  publisher: {
+    '@type': 'Organization',
+    name: site.title,
+    url: site.url,
+    logo: {
+      '@type': 'ImageObject',
+      url: `${site.url}/assets/icons/icon-128.png`
+    }
+  },
+  contactPoint: {
+    '@type': 'ContactPoint',
+    contactType: 'customer support',
+    email: supportEmail,
+    url: canonicalUrl
+  }
+};
+---
+
+<BlogLayout
+  alternateLinks={getSupportAlternateLinks()}
+  canonicalUrl={canonicalUrl}
+  description={support.description}
+  languageUrls={getSupportLanguageUrls()}
+  locale={locale}
+  messages={messages}
+  rootPrefix="../../"
+  structuredData={supportStructuredData}
+  title={support.title}
+  xDefaultUrl={getSupportUrl('en')}
+>
+  <SupportPage messages={messages} />
+</BlogLayout>

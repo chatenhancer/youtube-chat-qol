@@ -185,5 +185,26 @@
     "support": "Support",
     "email": "E-Mail",
     "license": "Lizenz"
+  },
+  "supportPage": {
+    "title": "Support und Feedback",
+    "description": "Wähle aus, wie du Chat Enhancer for YouTube für Fehlermeldungen, Funktionsideen und private Fragen kontaktieren möchtest.",
+    "eyebrow": "Support",
+    "heading": "Wähle den passenden Supportweg",
+    "reassurance": "Wir helfen gerne.",
+    "intro": "Nutze E-Mail, wenn Details privat bleiben sollen; nutze GitHub Issues, wenn ein öffentlicher Thread beim Beheben oder Priorisieren hilft.",
+    "optionsAria": "Supportoptionen",
+    "pickerTitle": "Wähle, was passt",
+    "pickerHint": "Wenn du unsicher bist, schreibe zuerst eine E-Mail.",
+    "emailTitle": "E-Mail",
+    "emailBody": "Am besten für Screenshots mit persönlichen Details, Store-Fragen, einrichtungsspezifische Probleme und alles, was du nicht öffentlich posten möchtest.",
+    "emailCta": "Support per E-Mail",
+    "issuesTitle": "GitHub Issues",
+    "issuesBody": "Am besten für reproduzierbare Fehler, Funktionswünsche, öffentliche Nachverfolgung und Details, die andere Nutzer später bestätigen oder finden können.",
+    "issuesCta": "GitHub Issues öffnen"
+  },
+  "privacyPolicy": {
+    "title": "Datenschutzerklärung",
+    "description": "Wie Chat Enhancer for YouTube lokale Speicherung, Übersetzung, Playground-Daten und Datenschutzeinstellungen handhabt."
   }
 }

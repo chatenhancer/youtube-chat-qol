@@ -1,9 +1,12 @@
 ---
 import Icon from '../common/icon.astro';
+import { getSupportUrl } from '../../data/support';
+import type { Locale } from '../../data/locales';
 import { site } from '../../data/site';
 import type { Messages } from '../../data/site';
 
-const { messages: m, rootPrefix } = Astro.props as {
+const { locale, messages: m, rootPrefix } = Astro.props as {
+  locale: Locale;
   messages: Messages;
   rootPrefix: string;
 };
@@ -44,7 +47,7 @@ const { messages: m, rootPrefix } = Astro.props as {
         <span class="button-icon" data-symbol="code" aria-hidden="true"><Icon name="code" /></span>
         <span>{m.install.sourceCode}</span>
       </a>
-      <a class="button button-link" href={site.supportUrl}>
+      <a class="button button-link" href={getSupportUrl(locale)}>
         <span class="button-icon" data-symbol="bug_report" aria-hidden="true"><Icon name="bug_report" /></span>
         <span>{m.install.supportFeedback}</span>
       </a>

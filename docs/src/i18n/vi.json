@@ -185,5 +185,26 @@
     "support": "Hỗ trợ",
     "email": "Email",
     "license": "Giấy phép"
+  },
+  "supportPage": {
+    "title": "Hỗ trợ và phản hồi",
+    "description": "Chọn cách liên hệ với Chat Enhancer for YouTube để báo lỗi, góp ý tính năng hoặc hỏi riêng.",
+    "eyebrow": "Hỗ trợ",
+    "heading": "Chọn kênh hỗ trợ",
+    "reassurance": "Chúng tôi luôn sẵn sàng hỗ trợ.",
+    "intro": "Chọn email khi chi tiết cần giữ riêng tư; chọn GitHub Issues khi một chủ đề công khai giúp sửa lỗi hoặc ưu tiên công việc.",
+    "optionsAria": "Tùy chọn hỗ trợ",
+    "pickerTitle": "Chọn cách phù hợp",
+    "pickerHint": "Nếu chưa chắc, hãy gửi email trước.",
+    "emailTitle": "Email",
+    "emailBody": "Phù hợp nhất cho ảnh chụp màn hình có thông tin cá nhân, câu hỏi về cửa hàng, vấn đề theo thiết lập cụ thể và mọi nội dung bạn không muốn đăng công khai.",
+    "emailCta": "Gửi email hỗ trợ",
+    "issuesTitle": "GitHub Issues",
+    "issuesBody": "Phù hợp nhất cho lỗi có thể tái hiện, yêu cầu tính năng, theo dõi công khai và chi tiết mà người dùng khác có thể xác nhận hoặc tìm lại sau.",
+    "issuesCta": "Mở GitHub Issues"
+  },
+  "privacyPolicy": {
+    "title": "Chính sách quyền riêng tư",
+    "description": "Cách Chat Enhancer for YouTube xử lý lưu trữ cục bộ, bản dịch, dữ liệu Playground và các kiểm soát quyền riêng tư."
   }
 }

@@ -2,6 +2,7 @@ import { getCollection } from 'astro:content';
 import { getBlogIndexUrl, getBlogPostUrl, getBlogTagArchives, getBlogTagUrl } from '../data/blog';
 import { canonicalUrlFor, locales } from '../data/locales';
 import { getPrivacyPolicyUrl } from '../data/privacy';
+import { getSupportUrl } from '../data/support';
 
 export async function GET() {
   const posts = await getCollection('blog');
@@ -22,11 +23,16 @@ export async function GET() {
       lastmod: latestPostLastmod,
       loc: getBlogIndexUrl('en')
     },
-    {
+    ...locales.map((locale) => ({
       changefreq: 'yearly',
       lastmod: privacyPolicyLastmod,
-      loc: getPrivacyPolicyUrl()
-    },
+      loc: getPrivacyPolicyUrl(locale)
+    })),
+    ...locales.map((locale) => ({
+      changefreq: 'yearly',
+      lastmod: latestPostLastmod,
+      loc: getSupportUrl(locale)
+    })),
     ...locales
       .filter((locale) => locale !== 'en')
       .map((locale) => ({

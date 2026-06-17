@@ -55,7 +55,8 @@ export function getMessages(locale: Locale): Messages {
 }
 
 export function htmlLangFor(locale: Locale): string {
-  return localeMeta[locale].htmlLang || locale;
+  const meta = localeMeta[locale];
+  return 'htmlLang' in meta ? meta.htmlLang : locale;
 }
 
 export function canonicalUrlFor(locale: Locale): string {

@@ -1,4 +1,5 @@
 import { defineCollection, z } from 'astro:content';
+import type { SchemaContext } from 'astro:content';
 import { glob } from 'astro/loaders';
 
 const blog = defineCollection({
@@ -11,7 +12,7 @@ const blog = defineCollection({
     },
     pattern: '**/*.md'
   }),
-  schema: ({ image }) => z.object({
+  schema: ({ image }: SchemaContext) => z.object({
     date: z.date(),
     description: z.string(),
     cover_width: z.number().min(25).max(100).optional(),
@@ -34,7 +35,20 @@ const privacyPolicy = defineCollection({
   schema: z.object({})
 });
 
-export const collections = { blog, privacyPolicy };
+const privacyPolicyTranslations = defineCollection({
+  loader: glob({
+    base: './docs/src/content/privacy-policy',
+    generateId: ({ data }) => String(data.locale),
+    pattern: '*.md'
+  }),
+  schema: z.object({
+    description: z.string(),
+    locale: z.string(),
+    title: z.string()
+  })
+});
+
+export const collections = { blog, privacyPolicy, privacyPolicyTranslations };
 
 function getLocaleFromBlogEntry(entry: string): string {
   const fileName = entry.split('/').pop() || '';

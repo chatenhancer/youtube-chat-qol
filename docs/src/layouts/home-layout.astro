@@ -22,5 +22,5 @@ const { clientConfig = {}, locale, messages, rootPrefix } = Astro.props as {
     <slot />
   </main>
   <WalkthroughModal messages={messages} />
-  <Footer messages={messages} />
+  <Footer locale={locale} messages={messages} />
 </BaseLayout>

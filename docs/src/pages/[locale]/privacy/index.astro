@@ -1,0 +1,75 @@
+---
+import { getCollection, render } from 'astro:content';
+import BlogLayout from '../../../layouts/blog-layout.astro';
+import { getLocaleFromPath, getMessages, htmlLangFor, localeMeta, locales } from '../../../data/locales';
+import { getPrivacyPolicyAlternateLinks, getPrivacyPolicyLanguageUrls, getPrivacyPolicyUrl } from '../../../data/privacy';
+import { site } from '../../../data/site';
+
+export async function getStaticPaths() {
+  const policies = await getCollection('privacyPolicyTranslations');
+  const availableLocales = new Set(policies.map((policy) => policy.data.locale));
+
+  return locales
+    .filter((locale) => locale !== 'en')
+    .map((locale) => {
+      if (!availableLocales.has(locale)) {
+        throw new Error(`Missing translated privacy policy for ${locale}`);
+      }
+
+      return {
+        params: { locale: localeMeta[locale].path },
+        props: { resolvedLocale: locale }
+      };
+    });
+}
+
+const locale = Astro.props.resolvedLocale ?? getLocaleFromPath(Astro.params.locale || '');
+const messages = getMessages(locale);
+const policies = await getCollection('privacyPolicyTranslations');
+const policy = policies.find((entry) => entry.data.locale === locale);
+if (!policy) throw new Error(`Missing translated privacy policy for ${locale}`);
+
+const { Content } = await render(policy);
+const canonicalUrl = getPrivacyPolicyUrl(locale);
+const privacyStructuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'WebPage',
+  name: `${site.title} ${policy.data.title}`,
+  description: policy.data.description,
+  url: canonicalUrl,
+  inLanguage: htmlLangFor(locale),
+  isPartOf: {
+    '@type': 'WebSite',
+    name: site.title,
+    url: site.url
+  },
+  publisher: {
+    '@type': 'Organization',
+    name: site.title,
+    url: site.url,
+    logo: {
+      '@type': 'ImageObject',
+      url: `${site.url}/assets/icons/icon-128.png`
+    }
+  }
+};
+---
+
+<BlogLayout
+  alternateLinks={getPrivacyPolicyAlternateLinks()}
+  canonicalUrl={canonicalUrl}
+  description={policy.data.description}
+  languageUrls={getPrivacyPolicyLanguageUrls()}
+  locale={locale}
+  messages={messages}
+  rootPrefix="../../"
+  structuredData={privacyStructuredData}
+  title={policy.data.title}
+  xDefaultUrl={getPrivacyPolicyUrl('en')}
+>
+  <article class="blog-post blog-post-page privacy-policy-page">
+    <div class="blog-post-body privacy-policy-body">
+      <Content />
+    </div>
+  </article>
+</BlogLayout>

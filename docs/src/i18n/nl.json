@@ -185,5 +185,26 @@
     "support": "Support",
     "email": "E-mail",
     "license": "Licentie"
+  },
+  "supportPage": {
+    "title": "Support en feedback",
+    "description": "Kies hoe je contact opneemt met Chat Enhancer for YouTube voor bugmeldingen, functie-ideeën en privévragen.",
+    "eyebrow": "Support",
+    "heading": "Kies de supportroute",
+    "reassurance": "We helpen graag.",
+    "intro": "Kies e-mail wanneer details privé moeten blijven; kies GitHub Issues wanneer een openbare thread helpt om werk op te lossen of te prioriteren.",
+    "optionsAria": "Supportopties",
+    "pickerTitle": "Kies wat past",
+    "pickerHint": "Als je twijfelt, mail dan eerst.",
+    "emailTitle": "E-mail",
+    "emailBody": "Het beste voor screenshots met persoonlijke details, storevragen, setup-specifieke problemen en alles wat je niet openbaar wilt plaatsen.",
+    "emailCta": "Support mailen",
+    "issuesTitle": "GitHub Issues",
+    "issuesBody": "Het beste voor reproduceerbare bugs, functieverzoeken, openbare opvolging en details die andere gebruikers later kunnen bevestigen of zoeken.",
+    "issuesCta": "GitHub Issues openen"
+  },
+  "privacyPolicy": {
+    "title": "Privacybeleid",
+    "description": "Hoe Chat Enhancer for YouTube lokale opslag, vertaling, Playground-gegevens en privacy-instellingen behandelt."
   }
 }

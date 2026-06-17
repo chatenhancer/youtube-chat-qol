@@ -1,14 +1,20 @@
 ---
+import { getPrivacyPolicyUrl } from '../../data/privacy';
+import { getSupportUrl } from '../../data/support';
+import type { Locale } from '../../data/locales';
 import { site } from '../../data/site';
 import type { Messages } from '../../data/site';
 
-const { messages: m } = Astro.props as { messages: Messages };
+const { locale, messages: m } = Astro.props as {
+  locale: Locale;
+  messages: Messages;
+};
 ---
 
 <footer class="site-footer">
   <p>{m.footer.disclaimer}</p>
-  <a href={site.privacyUrl}>{m.footer.privacy}</a>
-  <a href={site.supportUrl}>{m.footer.support}</a>
+  <a href={getPrivacyPolicyUrl(locale)}>{m.footer.privacy}</a>
+  <a href={getSupportUrl(locale)}>{m.footer.support}</a>
   <a data-contact-email-link>{m.footer.email}</a>
   <a href={site.licenseUrl}>{m.footer.license}</a>
 </footer>

@@ -185,5 +185,26 @@
     "support": "지원",
     "email": "이메일",
     "license": "라이선스"
+  },
+  "supportPage": {
+    "title": "지원 및 피드백",
+    "description": "버그 신고, 기능 아이디어, 비공개 질문을 위해 Chat Enhancer for YouTube에 연락하는 방법을 선택하세요.",
+    "eyebrow": "지원",
+    "heading": "지원 경로 선택",
+    "reassurance": "도움을 드리겠습니다.",
+    "intro": "세부 정보가 비공개여야 하면 이메일을, 공개 스레드가 수정이나 우선순위 결정에 도움이 되면 GitHub Issues를 선택하세요.",
+    "optionsAria": "지원 옵션",
+    "pickerTitle": "알맞은 방법 선택",
+    "pickerHint": "확실하지 않다면 먼저 이메일을 보내세요.",
+    "emailTitle": "이메일",
+    "emailBody": "개인 정보가 포함된 스크린샷, 스토어 관련 질문, 설정별 문제, 공개하고 싶지 않은 내용에 가장 적합합니다.",
+    "emailCta": "지원팀에 이메일 보내기",
+    "issuesTitle": "GitHub Issues",
+    "issuesBody": "재현 가능한 버그, 기능 요청, 공개 후속 조치, 다른 사용자가 나중에 확인하거나 검색할 수 있는 세부 정보에 가장 적합합니다.",
+    "issuesCta": "GitHub Issues 열기"
+  },
+  "privacyPolicy": {
+    "title": "개인정보 처리방침",
+    "description": "Chat Enhancer for YouTube가 로컬 저장소, 번역, Playground 데이터, 개인정보 설정을 처리하는 방식입니다."
   }
 }

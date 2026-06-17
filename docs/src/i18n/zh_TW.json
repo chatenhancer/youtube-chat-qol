@@ -185,5 +185,26 @@
     "support": "支援",
     "email": "電子郵件",
     "license": "授權"
+  },
+  "supportPage": {
+    "title": "支援與意見回饋",
+    "description": "選擇如何聯絡 Chat Enhancer for YouTube，以回報錯誤、提出功能想法或詢問私人問題。",
+    "eyebrow": "支援",
+    "heading": "選擇支援方式",
+    "reassurance": "我們會協助你。",
+    "intro": "如果細節應保持私密，請選擇電子郵件；如果公開討論有助於修正或排定優先順序，請選擇 GitHub Issues。",
+    "optionsAria": "支援選項",
+    "pickerTitle": "選擇適合的方式",
+    "pickerHint": "如果不確定，請先寄電子郵件。",
+    "emailTitle": "電子郵件",
+    "emailBody": "適合包含個人資訊的截圖、商店相關問題、特定設定問題，以及任何你不想公開張貼的內容。",
+    "emailCta": "寄信給支援團隊",
+    "issuesTitle": "GitHub Issues",
+    "issuesBody": "適合可重現的錯誤、功能請求、公開後續追蹤，以及其他使用者日後可確認或搜尋的細節。",
+    "issuesCta": "開啟 GitHub Issues"
+  },
+  "privacyPolicy": {
+    "title": "隱私權政策",
+    "description": "Chat Enhancer for YouTube 如何處理本機儲存、翻譯、Playground 資料與隱私控制。"
   }
 }
