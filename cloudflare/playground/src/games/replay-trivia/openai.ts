@@ -299,8 +299,7 @@ function parseGeneratedQuestion(value: unknown, index: number): ReplayTriviaQues
   const choices = getChoices(value.choices);
   const answerIndex = correctChoiceIndex as 0 | 1 | 2 | 3;
   const correctChoice = choices[answerIndex];
-  const wrongReply = getRequiredString(value, 'wrongReply');
-  validateWrongReply(wrongReply, correctChoice);
+  const wrongReply = ensureWrongReplyIncludesCorrectChoice(getRequiredString(value, 'wrongReply'), correctChoice);
   return {
     choices,
     correctChoiceIndex: answerIndex,
@@ -336,9 +335,10 @@ function getRequiredString(value: Record<string, unknown>, key: string): string 
   return field.trim();
 }
 
-function validateWrongReply(wrongReply: string, correctChoice: string): void {
-  if (wrongReply.toLowerCase().includes(correctChoice.toLowerCase())) return;
-  throw new ReplayTriviaError('openai_invalid_reply', 'Replay Trivia question generation returned a wrong reply without the correct answer.', 502);
+function ensureWrongReplyIncludesCorrectChoice(wrongReply: string, correctChoice: string): string {
+  if (wrongReply.toLowerCase().includes(correctChoice.toLowerCase())) return wrongReply;
+  const separator = /[.!?]$/.test(wrongReply) ? ' ' : '. ';
+  return `${wrongReply}${separator}it was ${correctChoice}.`;
 }
 
 function getRequiredNumber(value: Record<string, unknown>, key: string): number {

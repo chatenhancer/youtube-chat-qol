@@ -36,7 +36,8 @@ describe('Replay Trivia OpenAI adapter', () => {
     expect(getSystemPrompt(openAIRequest)).toContain('Do not put the correct answer first every time.');
     expect(getSystemPrompt(openAIRequest)).toContain('The game is called HELP-A-FRIEND! Trivia.');
     expect(getSystemPrompt(openAIRequest)).toContain('one friend clearly did not pay attention');
-    expect(getSystemPrompt(openAIRequest)).toContain('playful roast or polite judgment for fumbling the save');
+    expect(getSystemPrompt(openAIRequest)).toContain('roast or judgment');
+    expect(getSystemPrompt(openAIRequest)).toContain('tied to missing the replay moment');
     expect(getSystemPrompt(openAIRequest)).toContain('must be valid for any wrong choice');
     expect(getSystemPrompt(openAIRequest)).toContain('Write prompt like a real person asking in chat');
     expect(getSystemPrompt(openAIRequest)).toContain('Use plain "you"');
@@ -46,15 +47,16 @@ describe('Replay Trivia OpenAI adapter', () => {
     expect(response.questions[0].wrongReply).toBe('you missed it. it was Roger Clark.');
   });
 
-  it('rejects wrong replies that do not include the correct answer', async () => {
+  it('adds the correct answer to wrong replies when OpenAI omits it', async () => {
     vi.stubGlobal('fetch', vi.fn(async () => createOpenAIResponse({
       friendIntro: 'actor check, chat',
       prompt: 'who won best performance for playing Arthur Morgan?',
-      wrongReply: 'you were so confident too.'
+      wrongReply: 'wow. thanks for nothing'
     })));
 
-    await expect(generateReplayTriviaQuestions(createEnv(), createRequest()))
-      .rejects.toThrow('Replay Trivia question generation returned a wrong reply without the correct answer.');
+    const response = await generateReplayTriviaQuestions(createEnv(), createRequest());
+
+    expect(response.questions[0].wrongReply).toBe('wow. thanks for nothing. it was Roger Clark.');
   });
 
   it('balances correct answer positions even when OpenAI puts every answer first', async () => {
