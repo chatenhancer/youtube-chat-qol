@@ -76,6 +76,16 @@ const TROPHY_ICON_CROP: SourceRect = { drawOffsetY: 3, height: 48, width: 38, x:
 const WRONG_ICON_CROP: SourceRect = { drawScale: 0.54, height: 31, width: 31, x: 23, y: 15 };
 const REPLAY_TRIVIA_SOUND_PATHS = [MESSAGE_SOUND_PATH, STAMP_SOUND_PATH] as const;
 
+interface FriendBubbleTextSegment {
+  bold?: boolean;
+  text: string;
+}
+
+interface FriendBubbleTextLine {
+  segments: FriendBubbleTextSegment[];
+  width: number;
+}
+
 let activeReplayTriviaPanel: ReplayTriviaGameState | null = null;
 let activeReplayTriviaFallback: ReplayTriviaFallbackState | null = null;
 
@@ -871,6 +881,7 @@ function drawRevealedAnswers(
   );
 
   const reply = userCorrect ? question.rightReply : question.wrongReply;
+  const correctAnswer = question.correctIndex === undefined ? '' : question.answers[question.correctIndex] || '';
   const replyProgress = state.phase === 'reveal'
     ? getDelayedProgress(elapsed, REVEAL_FRIEND_REPLY_DELAY_MS, CHAT_MESSAGE_ANIMATION_MS)
     : 1;
@@ -878,7 +889,7 @@ function drawRevealedAnswers(
     playTimedMessageSound(state, 'reveal-reply', elapsed, REVEAL_FRIEND_REPLY_DELAY_MS);
   }
   if (replyProgress > 0) {
-    drawAnimatedFriendBubble(context, reply, 28, 300 + offsetY, 376, 76, 18, replyProgress, {
+    drawAnimatedFriendBubble(context, boldFriendReplyAnswer(reply, correctAnswer), 28, 300 + offsetY, 376, 76, 18, replyProgress, {
       flipImage: true,
       image: state.assets.greyBubbleTail,
       kind: 'right-tail',
@@ -1373,7 +1384,7 @@ function drawPickAnswerPrompt(context: CanvasRenderingContext2D, centerX: number
 
 function drawAnimatedFriendBubble(
   context: CanvasRenderingContext2D,
-  text: string,
+  text: string | readonly FriendBubbleTextSegment[],
   x: number,
   y: number,
   width: number,
@@ -1400,7 +1411,7 @@ function drawAnimatedFriendBubble(
 
 function drawFriendBubble(
   context: CanvasRenderingContext2D,
-  text: string,
+  text: string | readonly FriendBubbleTextSegment[],
   x: number,
   y: number,
   width: number,
@@ -1414,11 +1425,10 @@ function drawFriendBubble(
   }: FriendBubbleOptions
 ): number {
   const scaledFontSize = scaleFontSize(fontSize);
-  context.font = `400 ${scaledFontSize}px ${FONT_STACK}`;
   const horizontalPadding = Math.max(16, Math.ceil(scaledFontSize * 0.9));
   const lineHeight = scaledFontSize + 6;
-  const lines = wrapText(context, text, width - (horizontalPadding * 2), 3);
-  const textWidth = lines.reduce((maxWidth, line) => Math.max(maxWidth, context.measureText(line).width), 0);
+  const lines = wrapFriendBubbleText(context, text, width - (horizontalPadding * 2), 3, scaledFontSize);
+  const textWidth = lines.reduce((maxWidth, line) => Math.max(maxWidth, line.width), 0);
   const bubbleWidth = Math.min(width, Math.ceil(textWidth + (horizontalPadding * 2)));
   const height = Math.max(minHeight, 18 + (lines.length * lineHeight));
   if (image) {
@@ -1436,14 +1446,165 @@ function drawFriendBubble(
   context.fillStyle = '#303033';
   context.textAlign = 'left';
   context.textBaseline = 'middle';
-  drawWrappedLines(
+  drawFriendBubbleLines(
     context,
     lines,
     x + horizontalPadding,
     getBubbleTextBlockStartY(y, height, lines.length, lineHeight, kind),
-    lineHeight
+    lineHeight,
+    scaledFontSize
   );
   return height;
+}
+
+function boldFriendReplyAnswer(reply: string, correctAnswer: string): string | FriendBubbleTextSegment[] {
+  if (!correctAnswer) return reply;
+
+  const answer = correctAnswer.trim();
+  if (!answer) return reply;
+
+  const lowerReply = reply.toLowerCase();
+  const lowerAnswer = answer.toLowerCase();
+  const segments: FriendBubbleTextSegment[] = [];
+  let cursor = 0;
+  let matchIndex = findFriendReplyAnswerMatch(lowerReply, lowerAnswer, cursor);
+
+  while (matchIndex >= 0) {
+    if (matchIndex > cursor) {
+      segments.push({ text: reply.slice(cursor, matchIndex) });
+    }
+    segments.push({
+      bold: true,
+      text: reply.slice(matchIndex, matchIndex + answer.length)
+    });
+    cursor = matchIndex + answer.length;
+    matchIndex = findFriendReplyAnswerMatch(lowerReply, lowerAnswer, cursor);
+  }
+
+  if (cursor === 0) return reply;
+  if (cursor < reply.length) segments.push({ text: reply.slice(cursor) });
+  return segments;
+}
+
+function findFriendReplyAnswerMatch(reply: string, answer: string, startIndex: number): number {
+  let index = reply.indexOf(answer, startIndex);
+  while (index >= 0) {
+    const before = index - 1;
+    const after = index + answer.length;
+    if (isFriendReplyAnswerBoundary(reply, before) && isFriendReplyAnswerBoundary(reply, after)) return index;
+    index = reply.indexOf(answer, index + answer.length);
+  }
+  return -1;
+}
+
+function isFriendReplyAnswerBoundary(text: string, index: number): boolean {
+  if (index < 0 || index >= text.length) return true;
+  return !/[a-z0-9]/i.test(text[index]);
+}
+
+function wrapFriendBubbleText(
+  context: CanvasRenderingContext2D,
+  text: string | readonly FriendBubbleTextSegment[],
+  maxWidth: number,
+  maxLines: number,
+  fontSize: number
+): FriendBubbleTextLine[] {
+  const words = toFriendBubbleWords(text);
+  if (words.length === 0) return [{ segments: [{ text: '' }], width: 0 }];
+
+  const lines: FriendBubbleTextLine[] = [];
+  let current: FriendBubbleTextSegment[] = [];
+
+  words.forEach((word) => {
+    const candidate = current.length > 0
+      ? [...current, { text: ' ' }, word]
+      : [word];
+
+    if (measureFriendBubbleSegments(context, candidate, fontSize) <= maxWidth) {
+      current = candidate;
+      return;
+    }
+
+    if (current.length > 0) lines.push(toFriendBubbleTextLine(context, current, fontSize));
+    current = [word];
+  });
+
+  if (current.length > 0) lines.push(toFriendBubbleTextLine(context, current, fontSize));
+  return truncateFriendBubbleLines(context, lines, maxLines, fontSize);
+}
+
+function toFriendBubbleWords(text: string | readonly FriendBubbleTextSegment[]): FriendBubbleTextSegment[] {
+  const segments = typeof text === 'string' ? [{ text }] : text;
+  return segments.flatMap((segment) =>
+    segment.text
+      .split(/\s+/)
+      .filter(Boolean)
+      .map((word) => ({
+        bold: segment.bold,
+        text: word
+      }))
+  );
+}
+
+function truncateFriendBubbleLines(
+  context: CanvasRenderingContext2D,
+  lines: FriendBubbleTextLine[],
+  maxLines: number,
+  fontSize: number
+): FriendBubbleTextLine[] {
+  if (lines.length <= maxLines) return lines;
+
+  const trimmed = lines.slice(0, maxLines).map((line) => ({
+    segments: line.segments.map((segment) => ({ ...segment })),
+    width: line.width
+  }));
+  const lastLine = trimmed[trimmed.length - 1];
+  const lastSegment = lastLine?.segments[lastLine.segments.length - 1];
+  if (lastSegment) {
+    lastSegment.text = `${lastSegment.text.replace(/\.*$/, '')}...`;
+    lastLine.width = measureFriendBubbleSegments(context, lastLine.segments, fontSize);
+  }
+  return trimmed;
+}
+
+function drawFriendBubbleLines(
+  context: CanvasRenderingContext2D,
+  lines: readonly FriendBubbleTextLine[],
+  x: number,
+  y: number,
+  lineHeight: number,
+  fontSize: number
+): void {
+  lines.forEach((line, lineIndex) => {
+    let segmentX = x;
+    line.segments.forEach((segment) => {
+      context.font = `${segment.bold ? 700 : 400} ${fontSize}px ${FONT_STACK}`;
+      context.fillText(segment.text, segmentX, y + (lineIndex * lineHeight));
+      segmentX += context.measureText(segment.text).width;
+    });
+  });
+}
+
+function toFriendBubbleTextLine(
+  context: CanvasRenderingContext2D,
+  segments: FriendBubbleTextSegment[],
+  fontSize: number
+): FriendBubbleTextLine {
+  return {
+    segments,
+    width: measureFriendBubbleSegments(context, segments, fontSize)
+  };
+}
+
+function measureFriendBubbleSegments(
+  context: CanvasRenderingContext2D,
+  segments: readonly FriendBubbleTextSegment[],
+  fontSize: number
+): number {
+  return segments.reduce((width, segment) => {
+    context.font = `${segment.bold ? 700 : 400} ${fontSize}px ${FONT_STACK}`;
+    return width + context.measureText(segment.text).width;
+  }, 0);
 }
 
 function drawPlayerBubble(
