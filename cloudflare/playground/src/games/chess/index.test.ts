@@ -31,6 +31,10 @@ describe('playground chess game rules', () => {
     });
 
     expect(nextGame.turn).toBe('black');
+    expect(nextGame.lastMove).toEqual({
+      from: 'e2',
+      to: 'e4'
+    });
     expect(nextGame.lastMoveSan).toBe('e4');
     expect(nextGame.pgn).toContain('1. e4');
   });
@@ -109,7 +113,11 @@ describe('playground chess game rules', () => {
   });
 
   it('serializes public chess game state with public user identities', () => {
-    const game = createChessGame('game-1', 'white-user', 'black-user');
+    const game = applyChessMove(createChessGame('game-1', 'white-user', 'black-user'), {
+      from: 'e2',
+      to: 'e4',
+      userId: 'white-user'
+    });
     const publicGame = toPublicChessGame(game, (userId) => ({
       displayName: userId === 'white-user' ? 'White player' : 'Black player',
       userId
@@ -119,6 +127,10 @@ describe('playground chess game rules', () => {
     expect(publicGame.players.black.displayName).toBe('Black player');
     expect(publicGame.fen).toBe(game.fen);
     expect(publicGame.gameType).toBe('chess');
+    expect(publicGame.lastMove).toEqual({
+      from: 'e2',
+      to: 'e4'
+    });
   });
 
   it('handles chess actions through the game module interface', () => {
@@ -228,6 +240,11 @@ describe('playground chess game rules', () => {
     }) as ChessGameRecord;
 
     expect(promoted.lastMoveSan).toContain('=Q');
+    expect(promoted.lastMove).toEqual({
+      from: 'a7',
+      promotion: 'q',
+      to: 'a8'
+    });
     expect(getChessWinnerUserId({
       ...game,
       winner: 'white'

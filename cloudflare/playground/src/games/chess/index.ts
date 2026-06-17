@@ -11,10 +11,18 @@ import type { GameActionInput, GameModule, GameRecord } from '../types';
 
 export type PlayerColor = 'black' | 'white';
 export type ChessGameStatus = 'active' | 'checkmate' | 'draw' | 'resigned';
+export type ChessPromotionPiece = 'b' | 'n' | 'q' | 'r';
+
+export interface ChessLastMove {
+  from: string;
+  promotion?: ChessPromotionPiece;
+  to: string;
+}
 
 export interface PublicChessGame extends PublicGame {
   fen: string;
   gameType: 'chess';
+  lastMove?: ChessLastMove;
   lastMoveSan?: string;
   pgn: string;
   players: Record<PlayerColor, PublicUserIdentity>;
@@ -26,6 +34,7 @@ export interface PublicChessGame extends PublicGame {
 export interface ChessGameRecord extends GameRecord {
   fen: string;
   gameType: 'chess';
+  lastMove?: ChessLastMove;
   lastMoveSan?: string;
   pgn: string;
   players: Record<PlayerColor, string>;
@@ -36,7 +45,7 @@ export interface ChessGameRecord extends GameRecord {
 
 export interface ChessMoveInput {
   from: string;
-  promotion?: 'b' | 'n' | 'q' | 'r';
+  promotion?: ChessPromotionPiece;
   to: string;
   userId: string;
 }
@@ -110,6 +119,7 @@ export function applyChessMove(game: ChessGameRecord, input: ChessMoveInput): Ch
   const nextGame: ChessGameRecord = {
     ...game,
     fen: chess.fen(),
+    lastMove: toChessLastMove(move),
     lastMoveSan: move.san,
     pgn: chess.pgn(),
     turn: chess.turn() === 'w' ? 'white' : 'black'
@@ -159,6 +169,7 @@ export function toPublicChessGame(
     fen: game.fen,
     gameType: 'chess',
     gameId: game.gameId,
+    lastMove: game.lastMove ? { ...game.lastMove } : undefined,
     lastMoveSan: game.lastMoveSan,
     pgn: game.pgn,
     players: {
@@ -194,8 +205,24 @@ function getChessSquare(value: Record<string, unknown>, key: string): string {
   return square;
 }
 
-function getPromotion(value: unknown): 'b' | 'n' | 'q' | 'r' | undefined {
+function getPromotion(value: unknown): ChessPromotionPiece | undefined {
   if (value === undefined) return undefined;
   if (value === 'b' || value === 'n' || value === 'q' || value === 'r') return value;
   throw new ProtocolError('invalid_promotion', 'Promotion must be b, n, q, or r.');
+}
+
+function toChessLastMove(move: { from: string; promotion?: string; to: string }): ChessLastMove {
+  const lastMove: ChessLastMove = {
+    from: move.from,
+    to: move.to
+  };
+  const promotion = getMovePromotion(move.promotion);
+  if (promotion) lastMove.promotion = promotion;
+  return lastMove;
+}
+
+function getMovePromotion(value: string | undefined): ChessPromotionPiece | undefined {
+  return value === 'b' || value === 'n' || value === 'q' || value === 'r'
+    ? value
+    : undefined;
 }

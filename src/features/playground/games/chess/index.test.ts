@@ -317,6 +317,44 @@ describe('playground chess panel feedback', () => {
     expect(onMove).toHaveBeenCalledWith('game-1', 'e7', 'e5', undefined);
   });
 
+  it('draws the last move squares on the board', () => {
+    const context = createMockChessCanvasContext();
+    const getContext = vi.spyOn(HTMLCanvasElement.prototype, 'getContext')
+      .mockReturnValue(context as unknown as CanvasRenderingContext2D);
+
+    openChessGamePanel(createChessGame({
+      lastMove: {
+        from: 'e2',
+        to: 'e4'
+      },
+      turn: 'black'
+    }), 'me-user', vi.fn());
+
+    expect(context.strokeRect).toHaveBeenCalledWith(116, 172, 20, 20);
+    expect(context.strokeRect).toHaveBeenCalledWith(116, 116, 20, 20);
+
+    getContext.mockRestore();
+  });
+
+  it('draws the last move squares through the black board perspective', () => {
+    const context = createMockChessCanvasContext();
+    const getContext = vi.spyOn(HTMLCanvasElement.prototype, 'getContext')
+      .mockReturnValue(context as unknown as CanvasRenderingContext2D);
+
+    openChessGamePanel(createChessGame({
+      lastMove: {
+        from: 'e7',
+        to: 'e5'
+      },
+      turn: 'white'
+    }), 'other-user', vi.fn());
+
+    expect(context.strokeRect).toHaveBeenCalledWith(88, 172, 20, 20);
+    expect(context.strokeRect).toHaveBeenCalledWith(88, 116, 20, 20);
+
+    getContext.mockRestore();
+  });
+
   it('updates hover highlights unless a blocking status overlay is active', () => {
     openChessGamePanel(createChessGame({ turn: 'white' }), 'me-user', vi.fn());
     const canvas = prepareChessCanvas();
@@ -570,10 +608,12 @@ describe('playground chess panel feedback', () => {
 
 function createChessGame({
   fen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
+  lastMove,
   status = 'active',
   turn
 }: {
   fen?: string;
+  lastMove?: PublicChessGame['lastMove'];
   status?: PublicChessGame['status'];
   turn: 'black' | 'white';
 }): PublicChessGame {
@@ -581,6 +621,7 @@ function createChessGame({
     fen,
     gameId: 'game-1',
     gameType: 'chess',
+    lastMove,
     pgn: '',
     players: {
       black: {
