@@ -698,6 +698,8 @@ describe('playground stream room', () => {
     });
     expect(console.error).toHaveBeenCalledWith('[Chat Enhancer Playground] internal_error', expect.objectContaining({
       code: 'internal_error',
+      errorMessage: 'unexpected failure',
+      errorType: 'Error',
       event: 'internal_error'
     }));
 
@@ -999,6 +1001,7 @@ describe('playground stream room', () => {
     await state.flushWaitUntil();
 
     expect(console.warn).toHaveBeenCalledWith('[Chat Enhancer Playground] game_win_record_failed', expect.objectContaining({
+      errorMessage: 'stats unavailable',
       errorType: 'Error',
       event: 'game_win_record_failed',
       gameType: 'chess',

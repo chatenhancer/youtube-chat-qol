@@ -166,6 +166,7 @@ describe('Replay Trivia OpenAI adapter', () => {
         code: 'openai_unreachable',
         details: {
           provider: 'openai',
+          providerErrorMessage: 'network down',
           providerErrorType: 'Error'
         },
         message: 'Replay Trivia is temporarily unavailable. Try again later.'

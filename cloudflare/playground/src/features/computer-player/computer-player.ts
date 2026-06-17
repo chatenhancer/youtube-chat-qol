@@ -20,7 +20,7 @@ import {
   type StockfishResult
 } from '../../durable-objects/stockfish-container/client';
 import type { GameRecord } from '../../games/types';
-import { getLogErrorType, hashLogValue, shortLogId } from '../../logging';
+import { getLogErrorMessage, getLogErrorType, hashLogValue, shortLogId } from '../../logging';
 import type { ClientMessage, GameId, ServerMessage } from '../../protocol/messages';
 import type { Env } from '../../types';
 
@@ -151,6 +151,7 @@ class StreamRoomComputerPlayer implements ComputerPlayer {
     this.host.waitUntil(this.runAction(gameId).catch((error) => {
       const game = this.host.getGame(gameId);
       this.logEvent('computer_player_action_failed', {
+        errorMessage: getLogErrorMessage(error),
         errorType: getLogErrorType(error),
         game: shortLogId(gameId),
         gameType: game?.gameType,
@@ -237,6 +238,7 @@ class StreamRoomComputerPlayer implements ComputerPlayer {
     } catch (error) {
       this.logEvent('computer_player_action_send_failed', {
         action,
+        errorMessage: getLogErrorMessage(error),
         errorType: getLogErrorType(error),
         game: shortLogId(game.gameId),
         gameType: game.gameType,

@@ -5,7 +5,7 @@ import {
   REPLAY_TRIVIA_CAPTCHA_ROUTE
 } from '../../../../../src/shared/playground-trivia';
 import { createErrorResponse, createJsonResponse } from '../../http';
-import { getLogErrorType, hashLogValue, logPlaygroundEvent } from '../../logging';
+import { getLogErrorMessage, getLogErrorType, hashLogValue, logPlaygroundEvent } from '../../logging';
 import { createRouteResult, type RouteContext, type RouteModule, type RouteResult } from '../../routes/types';
 import type { Env } from '../../types';
 import { createReplayTriviaCaptchaPass } from './client';
@@ -110,6 +110,7 @@ async function handleReplayTriviaCaptchaRoute({ env, request }: RouteContext): P
     return createRouteResult(createJsonResponse(pass));
   } catch (error) {
     logPlaygroundEvent('replay_trivia_captcha_failed', {
+      errorMessage: getLogErrorMessage(error),
       errorType: getLogErrorType(error),
       game: hashLogValue(parsed.gameId),
       room: hashLogValue(parsed.streamKey),
