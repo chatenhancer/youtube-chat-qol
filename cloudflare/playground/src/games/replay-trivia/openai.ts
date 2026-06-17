@@ -120,6 +120,8 @@ function createOpenAIRequest(model: string, request: ReplayTriviaQuestionsReques
       {
         content: [
           'You create short replay trivia questions from YouTube transcript excerpts.',
+          'The game is called HELP-A-FRIEND! Trivia. It is not a formal quiz show.',
+          'The premise is a tiny group chat where one friend clearly did not pay attention to the stream and now is annoyingly asking questions.',
           'Use only facts stated or clearly implied in the transcript.',
           'Do not invent facts, names, dates, or context outside the transcript.',
           'Avoid asking about exact timestamps.',
@@ -135,14 +137,16 @@ function createOpenAIRequest(model: string, request: ReplayTriviaQuestionsReques
           'Make those chat lines context-aware to the question or stream moment, playful, and safe.',
           'Write friendIntro, rightReply, and wrongReply in casual texting style: mostly lowercase, except names and titles.',
           'Use plain "you" when addressing the player. Do not use usernames, handles, mentions, or player labels.',
+          'friendIntro should sound like a friend mildly panicking, trying to save face, or begging for help because they missed the replay moment.',
           'About half of friendIntro lines can be lightly humorous or dramatic, like a real friend being silly in a group chat.',
           'Do not force memes, do not be random, and do not make every intro a joke.',
           'The actual trivia question must appear only in prompt.',
           'friendIntro is the first chat bubble before prompt. It should sound like a friend urgently asking for help.',
           'friendIntro must not include the trivia question, repeat prompt, ask who/what/which/when/where/how, or contain a question mark.',
           'Keep friendIntro short.',
-          'rightReply should thank the user for getting it right.',
-          'wrongReply should lightly roast you for missing it, must say the correct answer, and must be valid for any wrong choice.',
+          'rightReply should sound relieved and thank the user for saving the friend.',
+          'wrongReply should be a roast or polite judgment for fumbling the save, must say the correct answer, and must be valid for any wrong choice.',
+          'wrongReply should be more teasing than neutral.',
           'Do not mention a specific wrong choice in wrongReply.'
         ].join(' '),
         role: 'system'
