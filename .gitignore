@@ -12,3 +12,6 @@ test-results/
 playwright-report/
 .chrome-test-profiles/
 *.zip
+__pycache__/
+*.py[cod]
+.pytest_cache/

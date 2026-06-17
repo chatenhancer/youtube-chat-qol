@@ -126,7 +126,7 @@ class Handler(BaseHTTPRequestHandler):
       payload = self._read_json()
       fen = require_text(payload, "fen")
       move_time_ms = clamp_int(payload.get("moveTimeMs"), DEFAULT_MOVE_TIME_MS, 10, MAX_MOVE_TIME_MS)
-      elo = clamp_int(payload.get("elo"), DEFAULT_ELO, 1320, 3190)
+      elo = clamp_int(payload.get("elo"), DEFAULT_ELO, 750, 3190)
     except ValueError as error:
       self._write_json(400, {"error": "bad_request", "message": str(error)})
       return

@@ -59,7 +59,7 @@ export const COMPUTER_PLAYER_PROFILE: ComputerPlayerProfile = {
 export const CHESS_COMPUTER_PLAYER_BEGINNER_PROFILE = createChessComputerPlayerProfile(
   'beginner',
   'Computer (Beginner)',
-  1320
+  750
 );
 export const CHESS_COMPUTER_PLAYER_CLUB_PROFILE = createChessComputerPlayerProfile(
   'club',
