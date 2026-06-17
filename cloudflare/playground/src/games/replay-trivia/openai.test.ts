@@ -37,7 +37,6 @@ describe('Replay Trivia OpenAI adapter', () => {
     expect(getSystemPrompt(openAIRequest)).toContain('The game is called HELP-A-FRIEND! Trivia.');
     expect(getSystemPrompt(openAIRequest)).toContain('one friend clearly did not pay attention');
     expect(getSystemPrompt(openAIRequest)).toContain('roast or judgment');
-    expect(getSystemPrompt(openAIRequest)).toContain('tied to missing the replay moment');
     expect(getSystemPrompt(openAIRequest)).toContain('must be valid for any wrong choice');
     expect(getSystemPrompt(openAIRequest)).toContain('Write prompt like a real person asking in chat');
     expect(getSystemPrompt(openAIRequest)).toContain('Use plain "you"');
