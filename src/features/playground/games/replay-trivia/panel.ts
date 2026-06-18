@@ -72,10 +72,13 @@ import type {
 const TROPHY_ICON_CROP: SourceRect = { drawOffsetY: 3, height: 48, width: 38, x: 28, y: 17 };
 const WRONG_ICON_CROP: SourceRect = { drawScale: 0.54, height: 31, width: 31, x: 23, y: 15 };
 const REPLAY_TRIVIA_SOUND_PATHS = [MESSAGE_SOUND_PATH, STAMP_SOUND_PATH] as const;
+const REPLAY_TRIVIA_ACCENT_BLUE = '#2290FF';
+const COUNTDOWN_BEEP_WINDOW_MS = 260;
 const FRIEND_BUBBLE_MIN_HEIGHT = 45;
 
 interface FriendBubbleTextSegment {
   bold?: boolean;
+  color?: string;
   text: string;
 }
 
@@ -605,7 +608,21 @@ function drawCountdown(
   [3, 2, 1].forEach((value, index) => {
     const progress = (elapsed - (index * COUNTDOWN_NUMBER_STAGGER_MS)) / COUNTDOWN_NUMBER_DURATION_MS;
     if (progress < 0 || progress >= 1) return;
+    playCountdownBeep(state, value, elapsed - (index * COUNTDOWN_NUMBER_STAGGER_MS));
     drawCountdownNumber(context, value, progress);
+  });
+}
+
+function playCountdownBeep(state: ReplayTriviaPanelRuntime, value: number, elapsed: number): void {
+  if (elapsed > COUNTDOWN_BEEP_WINDOW_MS) return;
+
+  const id = `countdown:${state.currentQuestionIndex}:${value}`;
+  if (state.playedSoundIds.has(id)) return;
+  state.playedSoundIds.add(id);
+  state.soundController.beep({
+    durationMs: 86,
+    frequency: 820,
+    volume: 0.045
   });
 }
 
@@ -688,7 +705,10 @@ function drawChatRound(
   }
 
   if (promptProgress > 0) {
-    promptHeight = drawAnimatedFriendBubble(context, question.prompt, 28, promptY, 376, FRIEND_BUBBLE_MIN_HEIGHT, 18, promptProgress, {
+    promptHeight = drawAnimatedFriendBubble(context, [{
+      bold: true,
+      text: question.prompt
+    }], 28, promptY, 376, FRIEND_BUBBLE_MIN_HEIGHT, 18, promptProgress, {
       flipImage: true,
       image: state.assets.greyBubbleTail,
       kind: 'right-tail',
@@ -802,7 +822,7 @@ function drawTimer(
 function getAnswerFillColor(state: ReplayTriviaPanelRuntime, answerIndex: number): string {
   if (state.userAnswerIndex === answerIndex) return '#070707';
   if (state.userAnswerIndex !== null) return '#6ab9f7';
-  return state.hoveredAnswerIndex === answerIndex ? '#070707' : '#3aa7ff';
+  return state.hoveredAnswerIndex === answerIndex ? '#070707' : REPLAY_TRIVIA_ACCENT_BLUE;
 }
 
 function drawSelectedAnswerTarget(
@@ -1346,12 +1366,12 @@ function drawPickAnswerPrompt(context: CanvasRenderingContext2D, centerX: number
 
   context.fillStyle = '#111111';
   context.fillText(prefix, startX, 0);
-  context.fillStyle = '#3aa7ff';
+  context.fillStyle = REPLAY_TRIVIA_ACCENT_BLUE;
   context.fillText(answer, answerX, 0);
   context.fillStyle = '#111111';
   context.fillText(suffix, answerX + answerWidth, 0);
 
-  context.strokeStyle = '#3aa7ff';
+  context.strokeStyle = REPLAY_TRIVIA_ACCENT_BLUE;
   context.lineWidth = 3;
   context.beginPath();
   context.moveTo(answerX, 7);
@@ -1454,6 +1474,7 @@ function boldFriendReplyAnswer(reply: string, correctAnswer: string): string | F
     }
     segments.push({
       bold: true,
+      color: REPLAY_TRIVIA_ACCENT_BLUE,
       text: reply.slice(matchIndex, matchEnd)
     });
     cursor = matchEnd;
@@ -1528,6 +1549,7 @@ function toFriendBubbleWords(text: string | readonly FriendBubbleTextSegment[]):
       .filter(Boolean)
       .map((word) => ({
         bold: segment.bold,
+        color: segment.color,
         text: word
       }))
   );
@@ -1566,6 +1588,7 @@ function drawFriendBubbleLines(
     let segmentX = x;
     line.segments.forEach((segment) => {
       context.font = `${segment.bold ? 700 : 400} ${fontSize}px ${FONT_STACK}`;
+      context.fillStyle = segment.color || '#303033';
       context.fillText(segment.text, segmentX, y + (lineIndex * lineHeight));
       segmentX += context.measureText(segment.text).width;
     });

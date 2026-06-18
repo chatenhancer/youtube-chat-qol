@@ -11,13 +11,22 @@ import { ytcqCreateElement } from '../../../shared/managed-dom';
 export const PLAYGROUND_GAME_SOUNDS_STORAGE_KEY = 'ytcqPlaygroundGameSoundsEnabled:v1';
 
 export interface GameSoundController {
+  beep: (options?: GameSoundToneOptions) => void;
   button: HTMLButtonElement;
   isEnabled: () => boolean;
   play: (path: string) => void;
 }
 
+export interface GameSoundToneOptions {
+  durationMs?: number;
+  frequency?: number;
+  type?: OscillatorType;
+  volume?: number;
+}
+
 const gameSoundCache = new Map<string, HTMLAudioElement>();
 let gameSoundAudioConstructor: typeof Audio | null = null;
+let gameSoundAudioContext: AudioContext | null = null;
 
 export function createGameSoundController({
   className,
@@ -51,12 +60,58 @@ export function createGameSoundController({
   preloadGameSounds(preloadPaths);
 
   return {
+    beep: (options) => {
+      if (enabled) playGameBeep(options);
+    },
     button,
     isEnabled: () => enabled,
     play: (path) => {
       if (enabled) playGameSound(path);
     }
   };
+}
+
+function playGameBeep({
+  durationMs = 90,
+  frequency = 880,
+  type = 'sine',
+  volume = 0.04
+}: GameSoundToneOptions = {}): void {
+  const AudioContextConstructor = getAudioContextConstructor();
+  if (!AudioContextConstructor) return;
+
+  try {
+    const audioContext = getGameSoundAudioContext(AudioContextConstructor);
+    const oscillator = audioContext.createOscillator();
+    const gain = audioContext.createGain();
+    const now = audioContext.currentTime;
+    const durationSeconds = Math.max(0.03, durationMs / 1000);
+    const safeVolume = Math.min(0.2, Math.max(0.001, volume));
+
+    oscillator.type = type;
+    oscillator.frequency.setValueAtTime(frequency, now);
+    gain.gain.setValueAtTime(0.001, now);
+    gain.gain.exponentialRampToValueAtTime(safeVolume, now + 0.012);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + durationSeconds);
+    oscillator.connect(gain);
+    gain.connect(audioContext.destination);
+    oscillator.start(now);
+    oscillator.stop(now + durationSeconds + 0.012);
+    oscillator.onended = () => {
+      oscillator.disconnect();
+      gain.disconnect();
+    };
+    void audioContext.resume?.().catch(() => undefined);
+  } catch {
+    // Game sounds should never affect game controls or rendering.
+  }
+}
+
+function getGameSoundAudioContext(AudioContextConstructor: typeof AudioContext): AudioContext {
+  if (!gameSoundAudioContext || gameSoundAudioContext.state === 'closed') {
+    gameSoundAudioContext = new AudioContextConstructor();
+  }
+  return gameSoundAudioContext;
 }
 
 function setGameSoundToggleButtonState(button: HTMLButtonElement, enabled: boolean): void {
@@ -141,6 +196,15 @@ function isAudioPlaying(audio: HTMLAudioElement): boolean {
 function getAudioConstructor(): typeof Audio | null {
   try {
     return Audio;
+  } catch {
+    return null;
+  }
+}
+
+function getAudioContextConstructor(): typeof AudioContext | null {
+  try {
+    const audioWindow = window as typeof window & { webkitAudioContext?: typeof AudioContext };
+    return audioWindow.AudioContext || audioWindow.webkitAudioContext || null;
   } catch {
     return null;
   }

@@ -35,6 +35,37 @@ import type { PublicReplayTriviaGame } from './types';
 
 let shellControllers: AbortController[] = [];
 let shellCleanups: Array<() => void> = [];
+const oscillatorMocks: OscillatorMock[] = [];
+
+interface AudioContextMock {
+  createGain: ReturnType<typeof vi.fn>;
+  createOscillator: ReturnType<typeof vi.fn>;
+  currentTime: number;
+  destination: Record<string, never>;
+  resume: ReturnType<typeof vi.fn>;
+  state: AudioContextState;
+}
+
+interface OscillatorMock {
+  connect: ReturnType<typeof vi.fn>;
+  disconnect: ReturnType<typeof vi.fn>;
+  frequency: {
+    setValueAtTime: ReturnType<typeof vi.fn>;
+  };
+  onended: (() => void) | null;
+  start: ReturnType<typeof vi.fn>;
+  stop: ReturnType<typeof vi.fn>;
+  type: OscillatorType;
+}
+
+interface GainMock {
+  connect: ReturnType<typeof vi.fn>;
+  disconnect: ReturnType<typeof vi.fn>;
+  gain: {
+    exponentialRampToValueAtTime: ReturnType<typeof vi.fn>;
+    setValueAtTime: ReturnType<typeof vi.fn>;
+  };
+}
 
 describe('Replay Trivia panel', () => {
   let context: ReturnType<typeof createMockCanvasContext>;
@@ -50,6 +81,7 @@ describe('Replay Trivia panel', () => {
     now = 1;
     shellControllers = [];
     shellCleanups = [];
+    oscillatorMocks.length = 0;
     context = createMockCanvasContext();
     vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(context as unknown as CanvasRenderingContext2D);
     vi.spyOn(HTMLCanvasElement.prototype, 'getBoundingClientRect').mockReturnValue({
@@ -78,6 +110,7 @@ describe('Replay Trivia panel', () => {
     shellControllers.forEach((controller) => controller.abort());
     shellCleanups.forEach((cleanup) => cleanup());
     vi.restoreAllMocks();
+    vi.unstubAllGlobals();
   });
 
   it('tracks open state and active game id while the panel is visible', () => {
@@ -394,10 +427,11 @@ describe('Replay Trivia panel', () => {
     expect(drawnText).not.toContain('No answer');
   });
 
-  it('draws the correct answer in bold inside the friend reply', () => {
-    const fillTextCalls: Array<{ font: string; text: string }> = [];
+  it('draws the correct answer in bold blue inside the friend reply', () => {
+    const fillTextCalls: Array<{ fillStyle: string; font: string; text: string }> = [];
     context.fillText.mockImplementation((text) => {
       fillTextCalls.push({
+        fillStyle: context.fillStyle,
         font: context.font,
         text: String(text)
       });
@@ -420,13 +454,13 @@ describe('Replay Trivia panel', () => {
     updateReplayTriviaGamePanel(game, 'host-user');
 
     expect(fillTextCalls).toEqual(expect.arrayContaining([
-      expect.objectContaining({ font: expect.stringContaining('700'), text: 'The' }),
-      expect.objectContaining({ font: expect.stringContaining('700'), text: 'Last' }),
-      expect.objectContaining({ font: expect.stringContaining('700'), text: 'of' }),
-      expect.objectContaining({ font: expect.stringContaining('700'), text: 'Us.' })
+      expect.objectContaining({ fillStyle: '#2290FF', font: expect.stringContaining('700'), text: 'The' }),
+      expect.objectContaining({ fillStyle: '#2290FF', font: expect.stringContaining('700'), text: 'Last' }),
+      expect.objectContaining({ fillStyle: '#2290FF', font: expect.stringContaining('700'), text: 'of' }),
+      expect.objectContaining({ fillStyle: '#2290FF', font: expect.stringContaining('700'), text: 'Us.' })
     ]));
     expect(fillTextCalls).toEqual(expect.arrayContaining([
-      expect.objectContaining({ font: expect.stringContaining('400'), text: 'wow,' })
+      expect.objectContaining({ fillStyle: '#303033', font: expect.stringContaining('400'), text: 'wow,' })
     ]));
   });
 
@@ -684,6 +718,18 @@ describe('Replay Trivia panel', () => {
     expect(drawnText()).toContain('2');
   });
 
+  it('plays one countdown beep for each visible countdown number', () => {
+    installAudioContextMock();
+
+    openReplayTriviaGamePanel(createReplayTriviaGame({ status: 'countdown' }), 'host-user', vi.fn());
+    runNextFrame(851);
+    runNextFrame(1_701);
+    runNextFrame(1_801);
+
+    expect(oscillatorMocks).toHaveLength(3);
+    expect(oscillatorMocks.every((oscillator) => oscillator.start.mock.calls.length === 1)).toBe(true);
+  });
+
   it('does not auto-advance phases for non-provider players', () => {
     const onAction = vi.fn();
 
@@ -800,6 +846,14 @@ describe('Replay Trivia panel', () => {
 
     openReplayTriviaGamePanel(game, 'host-user', vi.fn());
     await flushPromises();
+    const fillTextCalls: Array<{ fillStyle: string; font: string; text: string }> = [];
+    context.fillText.mockImplementation((text) => {
+      fillTextCalls.push({
+        fillStyle: context.fillStyle,
+        font: context.font,
+        text: String(text)
+      });
+    });
     context.drawImage.mockClear();
 
     setNow(CHAT_PROMPT_DELAY_MS + 1_000);
@@ -809,6 +863,9 @@ describe('Replay Trivia panel', () => {
       .filter(([image]) => image === assets.greyBubbleTail)
       .map((call) => call[8]);
     expect(promptBubbleHeights).toContain(45);
+    expect(fillTextCalls).toEqual(expect.arrayContaining([
+      expect.objectContaining({ fillStyle: '#303033', font: expect.stringContaining('700'), text: 'which' })
+    ]));
   });
 
   it('keeps punctuation attached to bolded friend reply answers', () => {
@@ -1384,4 +1441,48 @@ function createImage(width = 64, height = 64): HTMLImageElement {
     width: { configurable: true, value: width }
   });
   return image;
+}
+
+function installAudioContextMock(): void {
+  vi.stubGlobal('AudioContext', function AudioContext(this: AudioContextMock) {
+    return createAudioContextMock();
+  } as unknown as typeof AudioContext);
+}
+
+function createAudioContextMock(): AudioContextMock {
+  return {
+    createGain: vi.fn(createGainMock),
+    createOscillator: vi.fn(createOscillatorMock),
+    currentTime: 0,
+    destination: {},
+    resume: vi.fn(() => Promise.resolve()),
+    state: 'running'
+  };
+}
+
+function createOscillatorMock(): OscillatorMock {
+  const oscillator: OscillatorMock = {
+    connect: vi.fn(),
+    disconnect: vi.fn(),
+    frequency: {
+      setValueAtTime: vi.fn()
+    },
+    onended: null,
+    start: vi.fn(),
+    stop: vi.fn(),
+    type: 'sine'
+  };
+  oscillatorMocks.push(oscillator);
+  return oscillator;
+}
+
+function createGainMock(): GainMock {
+  return {
+    connect: vi.fn(),
+    disconnect: vi.fn(),
+    gain: {
+      exponentialRampToValueAtTime: vi.fn(),
+      setValueAtTime: vi.fn()
+    }
+  };
 }

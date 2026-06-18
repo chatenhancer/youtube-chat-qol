@@ -15,11 +15,47 @@ interface AudioMock {
   src: string;
 }
 
+interface AudioContextMock {
+  createGain: ReturnType<typeof vi.fn>;
+  createOscillator: ReturnType<typeof vi.fn>;
+  currentTime: number;
+  destination: Record<string, never>;
+  resume: ReturnType<typeof vi.fn>;
+  state: AudioContextState;
+}
+
+interface OscillatorMock {
+  connect: ReturnType<typeof vi.fn>;
+  disconnect: ReturnType<typeof vi.fn>;
+  frequency: {
+    setValueAtTime: ReturnType<typeof vi.fn>;
+  };
+  onended: (() => void) | null;
+  start: ReturnType<typeof vi.fn>;
+  stop: ReturnType<typeof vi.fn>;
+  type: OscillatorType;
+}
+
+interface GainMock {
+  connect: ReturnType<typeof vi.fn>;
+  disconnect: ReturnType<typeof vi.fn>;
+  gain: {
+    exponentialRampToValueAtTime: ReturnType<typeof vi.fn>;
+    setValueAtTime: ReturnType<typeof vi.fn>;
+  };
+}
+
 const audioMocks: AudioMock[] = [];
+const audioContextMocks: AudioContextMock[] = [];
+const oscillatorMocks: OscillatorMock[] = [];
+const gainMocks: GainMock[] = [];
 
 describe('playground game sounds', () => {
   beforeEach(async () => {
     audioMocks.length = 0;
+    audioContextMocks.length = 0;
+    oscillatorMocks.length = 0;
+    gainMocks.length = 0;
     await chrome.storage.local.clear();
     vi.mocked(chrome.storage.local.set).mockClear();
   });
@@ -100,6 +136,30 @@ describe('playground game sounds', () => {
       [PLAYGROUND_GAME_SOUNDS_STORAGE_KEY]: false
     });
   });
+
+  it('plays synthesized beeps through the shared sound preference', () => {
+    installAudioContextMock();
+    const controller = createGameSoundController({
+      signal: new AbortController().signal
+    });
+
+    controller.beep({
+      durationMs: 120,
+      frequency: 660,
+      volume: 0.03
+    });
+
+    expect(audioContextMocks).toHaveLength(1);
+    expect(oscillatorMocks[0]?.frequency.setValueAtTime).toHaveBeenCalledWith(660, 0);
+    expect(gainMocks[0]?.gain.exponentialRampToValueAtTime).toHaveBeenCalledWith(0.03, 0.012);
+    expect(oscillatorMocks[0]?.start).toHaveBeenCalledWith(0);
+    expect(oscillatorMocks[0]?.stop).toHaveBeenCalledWith(0.132);
+
+    controller.button.click();
+    controller.beep();
+
+    expect(oscillatorMocks).toHaveLength(1);
+  });
 });
 
 function installAudioMock(factory = createAudioMock): void {
@@ -127,4 +187,52 @@ function getAudioMock(path: string): AudioMock {
   const audio = audioMocks.find((mock) => mock.src === src);
   if (!audio) throw new Error(`Missing audio mock for ${src}.`);
   return audio;
+}
+
+function installAudioContextMock(): void {
+  vi.stubGlobal('AudioContext', function AudioContext(this: AudioContextMock) {
+    const audioContext = createAudioContextMock();
+    audioContextMocks.push(audioContext);
+    return audioContext;
+  } as unknown as typeof AudioContext);
+}
+
+function createAudioContextMock(): AudioContextMock {
+  return {
+    createGain: vi.fn(createGainMock),
+    createOscillator: vi.fn(createOscillatorMock),
+    currentTime: 0,
+    destination: {},
+    resume: vi.fn(() => Promise.resolve()),
+    state: 'running'
+  };
+}
+
+function createOscillatorMock(): OscillatorMock {
+  const oscillator: OscillatorMock = {
+    connect: vi.fn(),
+    disconnect: vi.fn(),
+    frequency: {
+      setValueAtTime: vi.fn()
+    },
+    onended: null,
+    start: vi.fn(),
+    stop: vi.fn(),
+    type: 'sine'
+  };
+  oscillatorMocks.push(oscillator);
+  return oscillator;
+}
+
+function createGainMock(): GainMock {
+  const gain: GainMock = {
+    connect: vi.fn(),
+    disconnect: vi.fn(),
+    gain: {
+      exponentialRampToValueAtTime: vi.fn(),
+      setValueAtTime: vi.fn()
+    }
+  };
+  gainMocks.push(gain);
+  return gain;
 }
