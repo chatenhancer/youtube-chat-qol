@@ -75,7 +75,7 @@ import type {
 const TROPHY_ICON_CROP: SourceRect = { drawOffsetY: 3, height: 48, width: 38, x: 28, y: 17 };
 const WRONG_ICON_CROP: SourceRect = { drawScale: 0.54, height: 31, width: 31, x: 23, y: 15 };
 const REPLAY_TRIVIA_SOUND_PATHS = [MESSAGE_SOUND_PATH, STAMP_SOUND_PATH] as const;
-const FRIEND_REPLY_MIN_HEIGHT = 45;
+const FRIEND_BUBBLE_MIN_HEIGHT = 45;
 
 interface FriendBubbleTextSegment {
   bold?: boolean;
@@ -688,7 +688,7 @@ function drawChatRound(
   const introProgress = getDelayedProgress(elapsed, CHAT_INTRO_DELAY_MS, CHAT_MESSAGE_ANIMATION_MS);
   const promptProgress = getDelayedProgress(elapsed, CHAT_PROMPT_DELAY_MS, CHAT_MESSAGE_ANIMATION_MS);
   const introY = 30 + offsetY;
-  let introHeight = 45;
+  let introHeight = FRIEND_BUBBLE_MIN_HEIGHT;
   let chatBottom = introY;
 
   if (state.phase === 'question') {
@@ -696,7 +696,7 @@ function drawChatRound(
   }
 
   if (introProgress > 0) {
-    introHeight = drawAnimatedFriendBubble(context, question.friendIntro, 28, introY, 322, 45, 18, introProgress, {
+    introHeight = drawAnimatedFriendBubble(context, question.friendIntro, 28, introY, 322, FRIEND_BUBBLE_MIN_HEIGHT, 18, introProgress, {
       image: state.assets.greyBubbleNoTail,
       kind: 'no-tail',
       tail: false
@@ -705,13 +705,13 @@ function drawChatRound(
   }
 
   const promptY = introY + introHeight + 8;
-  let promptHeight = 78;
+  let promptHeight = FRIEND_BUBBLE_MIN_HEIGHT;
   if (state.phase === 'question') {
     playTimedMessageSound(state, 'question-prompt', elapsed, CHAT_PROMPT_DELAY_MS);
   }
 
   if (promptProgress > 0) {
-    promptHeight = drawAnimatedFriendBubble(context, question.prompt, 28, promptY, 376, 78, 18, promptProgress, {
+    promptHeight = drawAnimatedFriendBubble(context, question.prompt, 28, promptY, 376, FRIEND_BUBBLE_MIN_HEIGHT, 18, promptProgress, {
       flipImage: true,
       image: state.assets.greyBubbleTail,
       kind: 'right-tail',
@@ -890,7 +890,7 @@ function drawRevealedAnswers(
     playTimedMessageSound(state, 'reveal-reply', elapsed, REVEAL_FRIEND_REPLY_DELAY_MS);
   }
   if (replyProgress > 0) {
-    drawAnimatedFriendBubble(context, boldFriendReplyAnswer(reply, correctAnswer), 28, 300 + offsetY, 376, FRIEND_REPLY_MIN_HEIGHT, 18, replyProgress, {
+    drawAnimatedFriendBubble(context, boldFriendReplyAnswer(reply, correctAnswer), 28, 300 + offsetY, 376, FRIEND_BUBBLE_MIN_HEIGHT, 18, replyProgress, {
       flipImage: true,
       image: state.assets.greyBubbleTail,
       kind: 'right-tail',
