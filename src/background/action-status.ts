@@ -1,27 +1,28 @@
 /**
  * Per-tab toolbar status.
  *
- * The manifest defaults the action icon to an inactive gray version. When the
- * live-chat content script actually boots, it tells the background page to use
- * the full-color icon for that tab.
+ * The manifest defaults the action icon to an inactive gray version. The
+ * active-chat keepalive port marks a tab active only while the content script is
+ * connected to this background context.
  */
-import { clearChatTab, getActiveChatTabIds, markChatTabActive, refreshKnownChatActionStatuses } from './chat-tab-state';
+import { clearChatTab, getActiveChatStatus, getActiveChatTabIds, refreshKnownChatActionStatuses } from './chat-tab-state';
 
 interface ActionStatusMessage {
   type?: string;
+  currentTabId?: unknown;
 }
 
-chrome.runtime.onMessage.addListener((message: ActionStatusMessage, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener((message: ActionStatusMessage, _sender, sendResponse) => {
+  if (message?.type === 'ytcq:get-active-chat-status') {
+    sendResponse({ status: getActiveChatStatus(normalizeTabId(message.currentTabId)) });
+    return false;
+  }
+
   if (message?.type === 'ytcq:get-active-chat-tabs') {
     sendResponse({ activeTabIds: getActiveChatTabIds() });
     return false;
   }
 
-  if (message?.type !== 'ytcq:chat-attached') return false;
-  const tabId = sender.tab?.id;
-  if (typeof tabId !== 'number') return false;
-
-  markChatTabActive(tabId);
   return false;
 });
 
@@ -35,3 +36,7 @@ chrome.tabs.onRemoved.addListener((tabId) => {
 });
 
 refreshKnownChatActionStatuses();
+
+function normalizeTabId(value: unknown): number | null {
+  return typeof value === 'number' && Number.isInteger(value) && value >= 0 ? value : null;
+}

@@ -79,7 +79,7 @@ describe('content script entrypoint wiring', () => {
       subtree: true,
       characterData: true
     });
-    expect(chrome.runtime.sendMessage).toHaveBeenCalledWith({ type: 'ytcq:chat-attached' }, expect.any(Function));
+    expect(chrome.runtime.sendMessage).not.toHaveBeenCalled();
   });
 
   it('normalizes observer mutations before dispatching feature hooks', async () => {

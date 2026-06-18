@@ -15,7 +15,6 @@ type JsonLdData = Record<string, unknown> | Record<string, unknown>[] | null;
 
 const {
   alternateLinks,
-  children,
   locale,
   messages,
   rootPrefix = '',
@@ -32,7 +31,6 @@ const {
   alternateLinks?: AlternateLink[];
   canonicalUrl?: string;
   clientConfig?: Record<string, unknown>;
-  children: unknown;
   description?: string;
   image?: string;
   imageAlt?: string;
@@ -47,6 +45,7 @@ const {
 
 const meta = localeMeta[locale];
 const htmlLang = htmlLangFor(locale);
+const textDirection = 'dir' in meta ? meta.dir : 'ltr';
 const isLocalizedHomePage = canonicalUrl === canonicalUrlFor(locale);
 const defaultAlternateLinks = isLocalizedHomePage ? locales.map((entry) => ({
   href: canonicalUrlFor(entry),
@@ -94,7 +93,7 @@ const structuredDataJson = resolvedStructuredData
 ---
 
 <!doctype html>
-<html lang={htmlLang} dir={meta.dir}>
+<html lang={htmlLang} dir={textDirection}>
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">

@@ -8,15 +8,22 @@ describe('background action status wiring', () => {
     await chrome.storage.local.clear();
   });
 
-  it('marks a tab active when content reports that chat attached', async () => {
+  it('returns active chat status for the current tab and other tabs', async () => {
     await import('./action-status');
+    const chatTabState = await import('./chat-tab-state');
     const messageListener = getRuntimeMessageListener();
     const sendResponse = vi.fn();
 
-    expect(messageListener({ type: 'ytcq:chat-attached' }, { tab: { id: 17 } as chrome.tabs.Tab }, vi.fn())).toBe(false);
-    expect(messageListener({ type: 'ytcq:get-active-chat-tabs' }, {}, sendResponse)).toBe(false);
+    chatTabState.markChatTabActive(17);
+    chatTabState.markChatTabActive(23);
 
-    expect(sendResponse).toHaveBeenCalledWith({ activeTabIds: [17] });
+    expect(messageListener({ type: 'ytcq:get-active-chat-status', currentTabId: 17 }, {}, sendResponse)).toBe(false);
+    expect(sendResponse).toHaveBeenCalledWith({
+      status: {
+        currentActive: true,
+        otherActiveCount: 1
+      }
+    });
     expect(chrome.action.setIcon).toHaveBeenCalledWith(
       expect.objectContaining({
         path: expect.objectContaining({ '16': 'icons/icon-16.png' }),
@@ -29,21 +36,24 @@ describe('background action status wiring', () => {
     });
   });
 
-  it('ignores unrelated messages and attached messages without a numeric tab id', async () => {
+  it('keeps the legacy active-tab list endpoint and ignores unrelated messages', async () => {
     await import('./action-status');
+    const chatTabState = await import('./chat-tab-state');
     const messageListener = getRuntimeMessageListener();
+    const sendResponse = vi.fn();
 
     expect(messageListener(undefined, {}, vi.fn())).toBe(false);
     expect(messageListener({ type: 'other' }, {}, vi.fn())).toBe(false);
-    expect(messageListener({ type: 'ytcq:chat-attached' }, { tab: {} as chrome.tabs.Tab }, vi.fn())).toBe(false);
-    expect(messageListener({ type: 'ytcq:chat-attached' }, { tab: { id: undefined } as chrome.tabs.Tab }, vi.fn())).toBe(false);
+    chatTabState.markChatTabActive(17);
+    expect(messageListener({ type: 'ytcq:get-active-chat-tabs' }, {}, sendResponse)).toBe(false);
 
-    expect(chrome.action.setIcon).not.toHaveBeenCalled();
+    expect(sendResponse).toHaveBeenCalledWith({ activeTabIds: [17] });
   });
 
   it('clears active state when the tab reloads or closes', async () => {
     await import('./action-status');
-    getRuntimeMessageListener()({ type: 'ytcq:chat-attached' }, { tab: { id: 23 } as chrome.tabs.Tab }, vi.fn());
+    const chatTabState = await import('./chat-tab-state');
+    chatTabState.markChatTabActive(23);
     const updatedListener = getTabUpdatedListener();
     const removedListener = getTabRemovedListener();
 
@@ -57,7 +67,7 @@ describe('background action status wiring', () => {
     getRuntimeMessageListener()({ type: 'ytcq:get-active-chat-tabs' }, {}, sendResponse);
     expect(sendResponse).toHaveBeenCalledWith({ activeTabIds: [] });
 
-    getRuntimeMessageListener()({ type: 'ytcq:chat-attached' }, { tab: { id: 23 } as chrome.tabs.Tab }, vi.fn());
+    chatTabState.markChatTabActive(23);
     removedListener(23, { isWindowClosing: false, windowId: 1 });
     sendResponse = vi.fn();
     getRuntimeMessageListener()({ type: 'ytcq:get-active-chat-tabs' }, {}, sendResponse);
