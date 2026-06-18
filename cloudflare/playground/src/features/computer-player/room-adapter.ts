@@ -47,6 +47,7 @@ export function attachComputerPlayerToRoom(options: AttachComputerPlayerToRoomOp
       connectionId: computerPlayer.connectionId,
       displayName: computerPlayer.displayName,
       joinedAt: Date.now(),
+      languageCode: 'en',
       rateLimit: new TokenBucket(options.connectionRateLimitOptions),
       socket: computerPlayer.socket,
       userId: ''

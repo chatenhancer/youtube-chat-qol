@@ -376,6 +376,7 @@ describe('playground worker routes', () => {
           explanation: 'The transcript says the Game of the Year goes to God of War.',
           friendIntro: 'chat emergency, awards memory check',
           id: 'q_1',
+          localizations: [],
           prompt: 'which game won game of the year in this segment?',
           rightReply: 'wow, you actually remembered. thank you.',
           sourceEndSeconds: 13680,

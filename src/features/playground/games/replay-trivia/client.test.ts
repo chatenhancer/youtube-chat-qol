@@ -101,6 +101,7 @@ describe('Replay Trivia client', () => {
     expect(chrome.runtime.sendMessage).toHaveBeenCalledWith({
       request: {
         ...createQuestionsRequest(),
+        locale: 'en',
         questionCount: 10
       },
       streamKey: 'SHt3FyE-VIQ',

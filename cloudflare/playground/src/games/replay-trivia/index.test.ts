@@ -15,6 +15,14 @@ type QuestionFixture = {
   correctChoiceIndex: 0 | 1 | 2 | 3;
   friendIntro: string;
   id: string;
+  localizations?: {
+    choices: [string, string, string, string];
+    friendIntro: string;
+    languageCode: string;
+    prompt: string;
+    rightReply: string;
+    wrongReply: string;
+  }[];
   prompt: string;
   rightReply: string;
   wrongReply: string;
@@ -115,6 +123,41 @@ describe('playground replay trivia game rules', () => {
     expect(publicGame.answers.host).toEqual({ answered: true, choiceIndex: 0, correct: true });
     expect(publicGame.answers.guest).toEqual({ answered: true, choiceIndex: 1, correct: false });
     expect(publicGame.currentQuestion?.correctChoiceIndex).toBe(0);
+  });
+
+  it('publishes localized question text for the recipient language', () => {
+    const game = submitReplayTriviaQuestions(createReplayTriviaGame('game-1', 'host-user', 'guest-user', 0), {
+      action: 'submitQuestions',
+      payload: {
+        questions: [createQuestion({
+          localizations: [
+            {
+              choices: ['God of War', 'Celeste', 'Monster Hunter', 'Red Dead Redemption 2'],
+              friendIntro: 'chat, necesito ayuda',
+              languageCode: 'es',
+              prompt: 'Que juego gano el premio en este segmento?',
+              rightReply: 'gracias, salvada total.',
+              wrongReply: 'fallaste. era God of War.'
+            }
+          ]
+        })]
+      },
+      userId: 'host-user'
+    }, 0);
+
+    const englishGame = toPublicReplayTriviaGame(game, (userId) => ({ displayName: userId, userId }), {
+      getUserLanguage: () => ({ languageCode: 'en' }),
+      recipientUserId: 'host-user'
+    });
+    const spanishGame = toPublicReplayTriviaGame(game, (userId) => ({ displayName: userId, userId }), {
+      getUserLanguage: () => ({ languageCode: 'es' }),
+      recipientUserId: 'guest-user'
+    });
+
+    expect(englishGame.currentQuestion?.prompt).toBe('Which game won Game of the Year in this segment?');
+    expect(spanishGame.currentQuestion?.prompt).toBe('Que juego gano el premio en este segmento?');
+    expect(spanishGame.currentQuestion?.choices[0]).toBe('God of War');
+    expect(spanishGame.currentQuestion?.correctChoiceIndex).toBeUndefined();
   });
 
   it('times out unanswered rounds and marks the final winner', () => {

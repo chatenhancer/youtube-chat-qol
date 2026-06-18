@@ -85,6 +85,8 @@ function parseHelloMessage(value: Record<string, unknown>): ClientMessage {
       publicKeyJwk: parsePublicKey(identity.publicKeyJwk),
       signature: getString(identity, 'signature')
     },
+    languageCode: normalizeOptionalLanguageCode(value.languageCode, 'languageCode') || 'en',
+    locale: normalizeOptionalLanguageCode(value.locale, 'locale'),
     protocolVersion: PLAYGROUND_PROTOCOL_VERSION,
     type: 'hello'
   };
@@ -133,6 +135,18 @@ function getString(value: Record<string, unknown>, key: string): string {
 function getBoolean(value: Record<string, unknown>, key: string): boolean {
   if (typeof value[key] !== 'boolean') throw new ProtocolError('invalid_field', `${key} must be a boolean.`);
   return value[key];
+}
+
+function normalizeOptionalLanguageCode(value: unknown, key: string): string | undefined {
+  if (value === undefined) return undefined;
+  if (typeof value !== 'string') throw new ProtocolError('invalid_field', `${key} must be a string.`);
+
+  const code = value.trim();
+  if (!code) return undefined;
+  if (!/^[a-zA-Z]{2,3}(?:[-_][a-zA-Z0-9]{2,8})?$/.test(code)) {
+    throw new ProtocolError('invalid_field', `${key} must be a valid language or locale code.`);
+  }
+  return code.replace('_', '-');
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

@@ -75,7 +75,10 @@ async function handleReplayTriviaQuestionsRequest(
     });
     if (captchaError) return captchaError;
 
-    const response = await generateReplayTriviaQuestions(env, requestBody);
+    const response = await generateReplayTriviaQuestions(env, {
+      ...requestBody,
+      targetLanguages: tokenResult.targetLanguages
+    });
     logPlaygroundEvent('replay_trivia_generated', {
       game: hashLogValue(requestBody.gameId),
       model: response.model,
@@ -116,14 +119,23 @@ async function consumeReplayTriviaGenerationToken(
     gameId: string;
     generationToken: string;
   }
-): Promise<Response | { gameId: string; userId: string }> {
+): Promise<Response | {
+  gameId: string;
+  targetLanguages?: { languageCode: string; locale?: string }[];
+  userId: string;
+}> {
   const response = await consumeStreamRoomReplayTriviaGenerationToken(env, streamKey, requestBody);
   if (response.ok) {
     try {
-      const body = await response.json() as { gameId?: unknown; userId?: unknown };
+      const body = await response.json() as {
+        gameId?: unknown;
+        targetLanguages?: unknown;
+        userId?: unknown;
+      };
       if (body.gameId === requestBody.gameId && typeof body.userId === 'string' && body.userId) {
         return {
           gameId: body.gameId,
+          targetLanguages: parseTokenTargetLanguages(body.targetLanguages),
           userId: body.userId
         };
       }
@@ -156,6 +168,25 @@ async function consumeReplayTriviaGenerationToken(
     status: response.status
   }, 'warn');
   return createErrorResponse(code, message, response.status);
+}
+
+function parseTokenTargetLanguages(value: unknown): { languageCode: string; locale?: string }[] | undefined {
+  if (!Array.isArray(value)) return undefined;
+
+  const languages: { languageCode: string; locale?: string }[] = [];
+  value.forEach((item) => {
+    if (!item || typeof item !== 'object' || Array.isArray(item)) return;
+    const record = item as Record<string, unknown>;
+    const languageCode = typeof record.languageCode === 'string' ? record.languageCode.trim() : '';
+    const locale = typeof record.locale === 'string' ? record.locale.trim() : '';
+    if (!languageCode) return;
+    languages.push({
+      languageCode,
+      locale: locale || undefined
+    });
+  });
+
+  return languages.length ? languages : undefined;
 }
 
 async function consumeCaptchaPass(

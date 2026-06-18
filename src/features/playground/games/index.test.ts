@@ -244,6 +244,8 @@ describe('playground games header button', () => {
 
     expect(lastMockPort()?.messages.at(-1)).toEqual({
       availableGames: ['chess'],
+      languageCode: 'en',
+      locale: 'en',
       streamKey: 'stream-a',
       type: 'ytcq:playground:init'
     });
@@ -261,6 +263,8 @@ describe('playground games header button', () => {
 
     expect(lastMockPort()?.messages[0]).toEqual({
       availableGames: ['chess', 'replay-trivia'],
+      languageCode: 'en',
+      locale: 'en',
       streamKey: 'stream-a',
       type: 'ytcq:playground:init'
     });
@@ -534,6 +538,8 @@ describe('playground games header button', () => {
 
     expect(lastMockPort()?.messages.at(-1)).toEqual({
       availableGames: ['chess'],
+      languageCode: 'en',
+      locale: 'en',
       streamKey: 'stream-b',
       type: 'ytcq:playground:init'
     });
@@ -882,6 +888,8 @@ describe('playground games header button', () => {
     expect(header.querySelector('.ytcq-games-button')).not.toBeNull();
     expect(lastMockPort()?.messages.at(-1)).toEqual({
       availableGames: ['chess'],
+      languageCode: 'en',
+      locale: 'en',
       streamKey: 'stream-a',
       type: 'ytcq:playground:init'
     });
@@ -903,6 +911,8 @@ describe('playground games header button', () => {
 
     expect(lastMockPort()?.messages.at(-1)).toEqual({
       availableGames: ['chess'],
+      languageCode: 'en',
+      locale: 'en',
       streamKey: 'stream-a',
       type: 'ytcq:playground:init'
     });

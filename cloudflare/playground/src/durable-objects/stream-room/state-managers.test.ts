@@ -336,6 +336,7 @@ function createSession(connectionId: string, socket?: ReturnType<typeof createSo
     connectionId,
     displayName: '',
     joinedAt: 0,
+    languageCode: 'en',
     rateLimit: {} as ClientSession['rateLimit'],
     socket: socket as unknown as WebSocket | undefined,
     userId: ''

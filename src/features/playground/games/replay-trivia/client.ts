@@ -8,6 +8,7 @@ import {
   type ReplayTriviaQuestionsResponse
 } from '../../../../shared/playground-trivia';
 import { PLAYGROUND_BACKEND_ORIGIN } from '../../../../shared/playground-protocol';
+import { getUiLocale } from '../../../../shared/i18n';
 import { getChatAdjacentWindowFeatures } from '../../../chat-adjacent-window';
 import { getCurrentYouTubeChatStreamKey } from '../../../../youtube/source-url';
 import { fetchReplayTriviaTranscriptWindow, type FetchReplayTriviaTranscriptOptions } from './transcript';
@@ -21,6 +22,7 @@ const CAPTCHA_WINDOW_WIDTH = 420;
 export interface GenerateReplayTriviaOptions extends FetchReplayTriviaTranscriptOptions {
   gameId?: string;
   generationToken?: string;
+  languageCode?: string;
   locale?: string;
   questionCount?: number;
   streamKey?: string;
@@ -49,13 +51,16 @@ export async function generateReplayTriviaQuestions(
     streamKey,
     userId
   });
+  const languageCode = normalizeLanguageCode(options.languageCode || options.locale || getUiLocale()) ||
+    transcriptWindow.languageCode;
 
   return requestReplayTriviaQuestions(streamKey, {
     ...transcriptWindow,
     captchaPass,
     gameId,
     generationToken,
-    locale: options.locale,
+    languageCode,
+    locale: normalizeLanguageCode(options.locale || getUiLocale()) || languageCode,
     questionCount: options.questionCount
   });
 }
@@ -180,6 +185,11 @@ function normalizeUserId(value: string): string {
   return /^[a-zA-Z0-9_-]{1,128}$/.test(trimmed) ? trimmed : '';
 }
 
+function normalizeLanguageCode(value: string): string {
+  const code = value.trim();
+  return /^[a-zA-Z]{2,3}(?:[-_][a-zA-Z0-9]{2,8})?$/.test(code) ? code.replace('_', '-') : '';
+}
+
 function createCaptchaRequestId(): string {
   const bytes = new Uint8Array(12);
   crypto.getRandomValues(bytes);
@@ -222,11 +232,24 @@ function isReplayTriviaQuestion(value: unknown): boolean {
     isNonEmptyString(value.explanation) &&
     isNonEmptyString(value.friendIntro) &&
     isNonEmptyString(value.id) &&
+    isReplayTriviaLocalizations(value.localizations) &&
     isNonEmptyString(value.prompt) &&
     isNonEmptyString(value.rightReply) &&
     isFiniteNumber(value.sourceEndSeconds) &&
     isFiniteNumber(value.sourceStartSeconds) &&
     isNonEmptyString(value.wrongReply);
+}
+
+function isReplayTriviaLocalizations(value: unknown): boolean {
+  if (value === undefined) return true;
+  if (!Array.isArray(value)) return false;
+  return value.every((localization) => isRecord(localization) &&
+    isChoices(localization.choices) &&
+    isNonEmptyString(localization.friendIntro) &&
+    isNonEmptyString(localization.languageCode) &&
+    isNonEmptyString(localization.prompt) &&
+    isNonEmptyString(localization.rightReply) &&
+    isNonEmptyString(localization.wrongReply));
 }
 
 function isChoices(value: unknown): boolean {

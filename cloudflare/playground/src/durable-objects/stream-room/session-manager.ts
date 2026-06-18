@@ -2,10 +2,13 @@ import { TokenBucket } from '../../rate-limit';
 import type {
   GameId,
   LobbySnapshot,
+  PlaygroundUserLanguage,
   PresenceUser,
   PublicUserIdentity,
   ServerMessage
 } from '../../protocol/messages';
+
+const DEFAULT_USER_LANGUAGE: PlaygroundUserLanguage = { languageCode: 'en' };
 
 export interface ClientSession {
   availableGames: Set<GameId>;
@@ -13,6 +16,8 @@ export interface ClientSession {
   connectionId: string;
   displayName: string;
   joinedAt: number;
+  languageCode: string;
+  locale?: string;
   rateLimit: TokenBucket;
   socket?: WebSocket;
   userId: string;
@@ -21,19 +26,27 @@ export interface ClientSession {
 export class SessionManager {
   private readonly sessions = new Map<string, ClientSession>();
   private readonly userAvailableGames = new Map<string, GameId[]>();
+  private readonly userLanguages = new Map<string, PlaygroundUserLanguage>();
 
   authenticate(
     session: ClientSession,
     userId: string,
     availableGames: GameId[],
-    displayName = getPlayerDisplayName(userId)
+    displayName = getPlayerDisplayName(userId),
+    language: PlaygroundUserLanguage = DEFAULT_USER_LANGUAGE
   ): void {
     session.userId = userId;
     session.displayName = displayName;
     session.availableGames = new Set(availableGames);
     session.joinedAt = Date.now();
+    session.languageCode = language.languageCode || DEFAULT_USER_LANGUAGE.languageCode;
+    session.locale = language.locale;
     this.sessions.set(session.connectionId, session);
     this.userAvailableGames.set(userId, availableGames);
+    this.userLanguages.set(userId, {
+      languageCode: session.languageCode,
+      locale: session.locale
+    });
   }
 
   get(connectionId: string): ClientSession | undefined {
@@ -69,6 +82,10 @@ export class SessionManager {
     };
   }
 
+  getUserLanguage(userId: string): PlaygroundUserLanguage {
+    return this.userLanguages.get(userId) || DEFAULT_USER_LANGUAGE;
+  }
+
   hasConnectedUser(userId: string): boolean {
     return [...this.sessions.values()].some((session) => session.userId === userId);
   }
@@ -80,6 +97,7 @@ export class SessionManager {
     this.sessions.delete(connectionId);
     if (session.userId && !this.hasConnectedUser(session.userId)) {
       this.userAvailableGames.delete(session.userId);
+      this.userLanguages.delete(session.userId);
     }
     return session;
   }

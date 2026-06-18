@@ -77,6 +77,8 @@ class PlaygroundBackgroundSession {
   private port: chrome.runtime.Port | null;
   private readonly senderStreamKey: string;
   private streamKey = '';
+  private languageCode = getDefaultPlaygroundLanguageCode();
+  private locale = '';
   private userId = '';
   private socket: WebSocket | null = null;
   private heartbeatTimer: ReturnType<typeof setInterval> | null = null;
@@ -101,6 +103,8 @@ class PlaygroundBackgroundSession {
       case 'ytcq:playground:init':
         this.streamKey = this.senderStreamKey || message.streamKey;
         this.availableGames = message.availableGames;
+        this.languageCode = normalizeLanguageCode(message.languageCode) || getDefaultPlaygroundLanguageCode();
+        this.locale = normalizeLanguageCode(message.locale) || this.languageCode;
         void this.connectSocket({ resetPendingMessages: true, resetReconnectAttempts: true });
         return;
       case 'ytcq:playground:set-availability':
@@ -244,6 +248,8 @@ class PlaygroundBackgroundSession {
       this.sendSocketMessage(socket, {
         availableGames: this.availableGames,
         identity: await createSignedPlaygroundIdentity(challenge, identity),
+        languageCode: this.languageCode,
+        locale: this.locale,
         protocolVersion: PLAYGROUND_PROTOCOL_VERSION,
         type: 'hello'
       });
@@ -439,6 +445,18 @@ function getVideoIdFromUrl(value: string): string {
 function normalizeStreamKey(value: string): string {
   const trimmed = value.trim();
   return /^[a-zA-Z0-9_-]{4,80}$/.test(trimmed) ? trimmed : '';
+}
+
+function normalizeLanguageCode(value: unknown): string {
+  if (typeof value !== 'string') return '';
+  const code = value.trim();
+  return /^[a-zA-Z]{2,3}(?:[-_][a-zA-Z0-9]{2,8})?$/.test(code) ? code.replace('_', '-') : '';
+}
+
+function getDefaultPlaygroundLanguageCode(): string {
+  return normalizeLanguageCode(chrome.i18n?.getUILanguage?.()) ||
+    normalizeLanguageCode(navigator.language) ||
+    'en';
 }
 
 async function getReplayTriviaError(response: Response): Promise<{ code?: string; error: string }> {

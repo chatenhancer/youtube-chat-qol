@@ -21,6 +21,11 @@ export interface PublicUserIdentity {
   userId: string;
 }
 
+export interface PlaygroundUserLanguage {
+  languageCode: string;
+  locale?: string;
+}
+
 export interface PresenceUser extends PublicUserIdentity {
   availableGames: GameId[];
   joinedAt: number;
@@ -60,6 +65,8 @@ export type ClientMessage =
 export interface HelloClientMessage {
   availableGames?: GameId[];
   identity: SignedClientIdentity;
+  languageCode?: string;
+  locale?: string;
   protocolVersion: typeof PLAYGROUND_PROTOCOL_VERSION;
   type: 'hello';
 }
@@ -190,6 +197,8 @@ export type PlaygroundContentMessage =
 
 export interface PlaygroundInitMessage {
   availableGames: GameId[];
+  languageCode?: string;
+  locale?: string;
   streamKey: string;
   type: 'ytcq:playground:init';
 }

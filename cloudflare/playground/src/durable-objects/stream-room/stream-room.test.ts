@@ -988,6 +988,65 @@ describe('playground stream room', () => {
     });
   });
 
+  it('sends Replay Trivia updates in each player language', async () => {
+    const room = createRoom();
+    const alice = createSession('alice-connection');
+    const bob = createSession('bob-connection');
+    const aliceHello = await createHello(alice.challenge, 'Alice', ['replay-trivia']);
+    aliceHello.languageCode = 'es';
+    aliceHello.locale = 'es';
+    const bobHello = await createHello(bob.challenge, 'Bob', ['replay-trivia']);
+    bobHello.languageCode = 'en';
+    bobHello.locale = 'en';
+
+    await room.handleHello(alice, aliceHello);
+    await room.handleHello(bob, bobHello);
+    room.handleInvite(alice, 'replay-trivia', bob.userId);
+    room.handleInviteResponse(bob, lastMessage(bob, 'inviteReceived').invite.inviteId, true);
+    const gameId = lastMessage(alice, 'gameStarted').game.gameId;
+
+    room.handleGameAction(alice, gameId, {
+      action: 'submitQuestions',
+      payload: {
+        questions: [
+          {
+            choices: ['God of War', 'Celeste', 'Monster Hunter', 'Red Dead Redemption 2'],
+            correctChoiceIndex: 0,
+            friendIntro: 'chat emergency',
+            id: 'q_1',
+            localizations: [
+              {
+                choices: ['God of War ES', 'Celeste ES', 'Monster Hunter ES', 'Red Dead Redemption 2 ES'],
+                friendIntro: 'emergencia del chat',
+                languageCode: 'es',
+                prompt: 'Que juego gano?',
+                rightReply: 'bien salvado.',
+                wrongReply: 'fallaste. era God of War ES.'
+              }
+            ],
+            prompt: 'Which game won?',
+            rightReply: 'nice save.',
+            wrongReply: 'you missed it. it was God of War.'
+          }
+        ]
+      },
+      userId: alice.userId
+    });
+
+    expect(lastMessage(alice, 'gameUpdated').game).toMatchObject({
+      currentQuestion: {
+        choices: ['God of War ES', 'Celeste ES', 'Monster Hunter ES', 'Red Dead Redemption 2 ES'],
+        prompt: 'Que juego gano?'
+      }
+    });
+    expect(lastMessage(bob, 'gameUpdated').game).toMatchObject({
+      currentQuestion: {
+        choices: ['God of War', 'Celeste', 'Monster Hunter', 'Red Dead Redemption 2'],
+        prompt: 'Which game won?'
+      }
+    });
+  });
+
   it('logs when completed game win recording fails', async () => {
     const storage = new FakeDurableObjectStorage();
     const { room, state } = createRoomHarness(storage, {
