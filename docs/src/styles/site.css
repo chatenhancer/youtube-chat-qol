@@ -1914,26 +1914,26 @@ html[dir="rtl"] .back-link-icon {
 
 .blog-media-block {
   display: grid;
-  grid-template-columns: minmax(0, 0.76fr) minmax(0, 1fr);
-  gap: clamp(18px, 3vw, 30px);
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: clamp(22px, 3.5vw, 38px);
   align-items: center;
   margin: 34px 0;
 }
 
 .blog-media-block[data-media-direction="left"] {
-  grid-template-columns: minmax(0, 1fr) minmax(0, 0.76fr);
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
 }
 
 .blog-media-block .blog-image {
   justify-self: center;
-  width: min(var(--blog-image-width), 310px);
+  width: min(var(--blog-image-width), clamp(360px, 38vw, 430px));
   margin: 0;
 }
 
 .blog-media-block .blog-image img {
-  width: auto;
+  width: 100%;
   max-width: 100%;
-  max-height: min(340px, 62vh);
+  max-height: min(480px, 68vh);
   object-fit: contain;
 }
 
