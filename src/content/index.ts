@@ -66,12 +66,6 @@ async function init(): Promise<void> {
   });
 }
 
-function notifyChatAttached(): void {
-  chrome.runtime.sendMessage({ type: 'ytcq:chat-attached' }, () => {
-    void chrome.runtime.lastError;
-  });
-}
-
 function boot(): void {
   processExistingMessages();
   processExistingParticipants();
@@ -89,7 +83,6 @@ function boot(): void {
     subtree: true,
     characterData: true
   });
-  notifyChatAttached();
 }
 
 function processExistingMessages(): void {

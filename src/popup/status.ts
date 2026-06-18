@@ -1,11 +1,15 @@
+import { CHAT_STATUS_UPDATED_STORAGE_KEY } from '../shared/chat-status';
 import { KNOWN_CHAT_TABS_STORAGE_KEY } from '../shared/known-chat-tabs';
 import { controls } from './controls';
 import { getExtensionMessage } from './i18n';
 
 type ExtensionStatus = 'checking' | 'active' | 'inactive';
 
-interface ActiveChatTabsResponse {
-  activeTabIds?: unknown;
+interface ActiveChatStatusResponse {
+  status?: {
+    currentActive?: unknown;
+    otherActiveCount?: unknown;
+  };
 }
 
 export function initExtensionStatus(): void {
@@ -17,7 +21,8 @@ function handleExtensionStatusStorageChange(
   changes: Record<string, chrome.storage.StorageChange>,
   areaName: string
 ): void {
-  if (areaName !== 'local' || !changes[KNOWN_CHAT_TABS_STORAGE_KEY]) return;
+  if (areaName !== 'local') return;
+  if (!changes[KNOWN_CHAT_TABS_STORAGE_KEY] && !changes[CHAT_STATUS_UPDATED_STORAGE_KEY]) return;
   refreshExtensionStatus();
 }
 
@@ -26,65 +31,55 @@ function refreshExtensionStatus(): void {
 
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     const currentTabId = tabs[0]?.id;
-    refreshGlobalExtensionStatus(typeof currentTabId === 'number' ? currentTabId : null);
+    refreshCurrentExtensionStatus(typeof currentTabId === 'number' ? currentTabId : null);
   });
 }
 
-function refreshGlobalExtensionStatus(currentTabId: number | null): void {
-  chrome.tabs.query({}, (tabs) => {
-    const tabIds = tabs
-      .map((tab) => tab.id)
-      .filter((tabId): tabId is number => typeof tabId === 'number');
-
-    if (!tabIds.length) {
-      updateExtensionStatusSummary(new Set(), currentTabId);
-      return;
+function refreshCurrentExtensionStatus(currentTabId: number | null): void {
+  chrome.runtime.sendMessage(
+    { type: 'ytcq:get-active-chat-status', currentTabId },
+    (response?: ActiveChatStatusResponse) => {
+      const status = chrome.runtime.lastError ? null : normalizeActiveChatStatus(response);
+      updateExtensionStatusSummary(status);
     }
-
-    const openTabIds = new Set(tabIds);
-    chrome.runtime.sendMessage({ type: 'ytcq:get-active-chat-tabs' }, (response?: ActiveChatTabsResponse) => {
-      const activeTabIds = chrome.runtime.lastError
-        ? new Set<number>()
-        : getOpenActiveChatTabIds(response, openTabIds);
-      updateExtensionStatusSummary(activeTabIds, currentTabId);
-    });
-  });
+  );
 }
 
-function getOpenActiveChatTabIds(response: ActiveChatTabsResponse | undefined, openTabIds: Set<number>): Set<number> {
-  if (!Array.isArray(response?.activeTabIds)) return new Set();
-  return new Set(response.activeTabIds.filter((tabId): tabId is number => {
-    return typeof tabId === 'number' && openTabIds.has(tabId);
-  }));
+function normalizeActiveChatStatus(response: ActiveChatStatusResponse | undefined): {
+  currentActive: boolean;
+  otherActiveCount: number;
+} | null {
+  const currentActive = response?.status?.currentActive;
+  const otherActiveCount = response?.status?.otherActiveCount;
+  if (
+    typeof currentActive !== 'boolean' ||
+    typeof otherActiveCount !== 'number' ||
+    !Number.isFinite(otherActiveCount) ||
+    otherActiveCount < 0
+  ) {
+    return null;
+  }
+  return {
+    currentActive,
+    otherActiveCount: Math.floor(otherActiveCount)
+  };
 }
 
-function updateExtensionStatusSummary(activeTabIds: Set<number>, currentTabId: number | null): void {
-  const currentActive = typeof currentTabId === 'number' && activeTabIds.has(currentTabId);
-  const otherCount = activeTabIds.size - (currentActive ? 1 : 0);
+function updateExtensionStatusSummary(status: { currentActive: boolean; otherActiveCount: number } | null): void {
   const connectedHelper = getExtensionMessage('extensionStatusConnected');
 
-  if (currentActive && otherCount === 0) {
+  if (status?.currentActive) {
     setExtensionStatus('active', getExtensionMessage('extensionStatusActiveCurrent'), connectedHelper);
     return;
   }
 
-  if (currentActive && otherCount === 1) {
-    setExtensionStatus('active', getExtensionMessage('extensionStatusActiveCurrentAndOne'), connectedHelper);
-    return;
-  }
-
-  if (currentActive && otherCount > 1) {
-    setExtensionStatus('active', getExtensionMessage('extensionStatusActiveCurrentAndMany', String(otherCount)), connectedHelper);
-    return;
-  }
-
-  if (otherCount === 1) {
+  if (status?.otherActiveCount === 1) {
     setExtensionStatus('active', getExtensionMessage('extensionStatusActiveOneOther'), connectedHelper);
     return;
   }
 
-  if (otherCount > 1) {
-    setExtensionStatus('active', getExtensionMessage('extensionStatusActiveManyOther', String(otherCount)), connectedHelper);
+  if (status && status.otherActiveCount > 1) {
+    setExtensionStatus('active', getExtensionMessage('extensionStatusActiveManyOther', String(status.otherActiveCount)), connectedHelper);
     return;
   }
 

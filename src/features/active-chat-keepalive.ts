@@ -3,11 +3,7 @@
  * live chat frame is open. This helps Chrome defer extension updates until the
  * user leaves chat, instead of invalidating the content script mid-stream.
  */
-import { t } from '../shared/i18n';
-import { createRefreshIcon } from '../shared/icons';
-import { ytcqCreateElement } from '../shared/managed-dom';
 import { findChatInput, getChatInputText, replaceChatInput } from '../youtube/chat-input';
-import { PANEL_PAGES_SELECTOR } from '../youtube/selectors';
 import { hideEnhancedEffect } from './enhanced-effect';
 import { registerFeatureLifecycle, suspendFeatures } from '../content/lifecycle';
 
@@ -22,8 +18,8 @@ const DRAFT_RESTORE_DELAYS_MS = [300, 800, 1500, 3000, 5000];
 let keepAlivePort: chrome.runtime.Port | null = null;
 let keepAliveTimer = 0;
 let reconnectTimer = 0;
-let reconnectNotice: HTMLButtonElement | null = null;
 let reconnectPending = false;
+let reloadPending = false;
 
 interface ReconnectDraft {
   text: string;
@@ -34,7 +30,7 @@ registerFeatureLifecycle({
   page: {
     init: startActiveChatKeepAlive,
     cleanupStale: cleanupStaleReconnectNotice,
-    visibilityChanged: showPendingReconnectNotice
+    visibilityChanged: resumePendingReconnect
   }
 });
 
@@ -60,8 +56,7 @@ function connectActiveChatPort(): boolean {
   });
 
   reconnectPending = false;
-  reconnectNotice?.remove();
-  reconnectNotice = null;
+  reloadPending = false;
   clearReconnectTimer();
   sendActiveChatPing();
   clearKeepAliveTimer();
@@ -71,7 +66,6 @@ function connectActiveChatPort(): boolean {
 
 export function cleanupStaleReconnectNotice(): void {
   document.querySelectorAll<HTMLElement>(`.${RECONNECT_ANCHOR_CLASS}`).forEach((anchor) => anchor.remove());
-  reconnectNotice = null;
   reconnectPending = false;
   clearReconnectTimer();
 }
@@ -90,43 +84,28 @@ function sendActiveChatPing(): void {
 
 function scheduleActiveChatReconnect(): void {
   reconnectPending = true;
-  if (document.visibilityState === 'hidden' || reconnectTimer) return;
+  if (document.visibilityState === 'hidden' || reconnectTimer || reloadPending) return;
 
   reconnectTimer = window.setTimeout(() => {
     reconnectTimer = 0;
     if (connectActiveChatPort()) return;
-    showReconnectNotice();
+    reloadDisconnectedChat();
   }, ACTIVE_CHAT_RECONNECT_DELAY_MS);
 }
 
-function showReconnectNotice(): void {
+function reloadDisconnectedChat(): void {
+  if (reloadPending) return;
+  reloadPending = true;
+  reconnectPending = false;
+  saveReconnectDraft();
+  clearKeepAliveTimer();
+  clearReconnectTimer();
   suspendFeatures();
   hideEnhancedEffect();
-  reconnectPending = true;
-  if (reconnectNotice || document.visibilityState === 'hidden') return;
-  reconnectPending = false;
-
-  const button = ytcqCreateElement('button');
-  button.type = 'button';
-  button.className = 'ytcq-reconnect-button';
-  button.title = t('refreshChatTitle');
-  button.setAttribute('aria-label', t('refreshChatTitle'));
-
-  const label = ytcqCreateElement('span');
-  label.textContent = t('refreshChat');
-
-  button.append(createRefreshIcon(), label);
-  button.addEventListener('click', () => {
-    saveReconnectDraft();
-    button.disabled = true;
-    location.reload();
-  });
-
-  getReconnectAnchor().replaceChildren(button);
-  reconnectNotice = button;
+  location.reload();
 }
 
-function showPendingReconnectNotice(visibilityState: Document['visibilityState']): void {
+function resumePendingReconnect(visibilityState: Document['visibilityState']): void {
   if (!reconnectPending || visibilityState === 'hidden') return;
   scheduleActiveChatReconnect();
 }
@@ -190,24 +169,6 @@ function readReconnectDraft(): ReconnectDraft | null {
     removeSessionStorageValue(RECONNECT_DRAFT_STORAGE_KEY);
     return null;
   }
-}
-
-function getReconnectAnchor(): HTMLElement {
-  const existing = document.querySelector<HTMLElement>(`.${RECONNECT_ANCHOR_CLASS}`);
-  const panelPages = document.querySelector<HTMLElement>(PANEL_PAGES_SELECTOR);
-  const parent = panelPages?.parentElement || document.body;
-  if (existing && existing.parentElement === parent) return existing;
-
-  existing?.remove();
-
-  const anchor = ytcqCreateElement('div');
-  anchor.className = RECONNECT_ANCHOR_CLASS;
-  if (panelPages) {
-    parent.insertBefore(anchor, panelPages);
-  } else {
-    parent.append(anchor);
-  }
-  return anchor;
 }
 
 function getSessionStorageValue(key: string): string {

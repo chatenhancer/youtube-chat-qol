@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { KNOWN_CHAT_TABS_STORAGE_KEY } from '../shared/known-chat-tabs';
+import { CHAT_STATUS_UPDATED_STORAGE_KEY } from '../shared/chat-status';
 import { MARKED_USERS_STORAGE_KEY } from '../shared/marked-users';
 
 describe('popup', () => {
@@ -76,25 +76,15 @@ describe('popup', () => {
     vi.useRealTimers();
   });
 
-  it('summarizes active chat status across the current tab and other tabs', async () => {
+  it('summarizes active chat status for the current tab', async () => {
     vi.mocked(chrome.tabs.query).mockImplementation(((queryInfo: chrome.tabs.QueryInfo, callback?: (tabs: chrome.tabs.Tab[]) => void) => {
-      if (queryInfo.active) {
-        const tabs = [{ id: 10 } as chrome.tabs.Tab];
-        callback?.(tabs);
-        return Promise.resolve(tabs);
-      }
-
-      const tabs = [
-        { id: 10 } as chrome.tabs.Tab,
-        { id: 20 } as chrome.tabs.Tab,
-        { id: 30 } as chrome.tabs.Tab
-      ];
+      const tabs = queryInfo.active ? [{ id: 10 } as chrome.tabs.Tab] : [];
       callback?.(tabs);
       return Promise.resolve(tabs);
     }) as never);
     vi.mocked(chrome.runtime.sendMessage).mockImplementation(((_message: unknown, callback?: (response: unknown) => void) => {
-      callback?.({ activeTabIds: [10, 20] });
-      return Promise.resolve({ activeTabIds: [10, 20] });
+      callback?.({ status: { currentActive: true, otherActiveCount: 1 } });
+      return Promise.resolve({ status: { currentActive: true, otherActiveCount: 1 } });
     }) as never);
 
     await import('./index');
@@ -104,9 +94,9 @@ describe('popup', () => {
       'extensionStatusConnected'
     );
     expect(document.querySelector('[data-extension-status]')?.getAttribute('aria-label')).toBe(
-      'extensionStatusActiveCurrentAndOne. extensionStatusConnected'
+      'extensionStatusActiveCurrent. extensionStatusConnected'
     );
-    expect(document.querySelector('[data-extension-status-text]')?.textContent).toBe('extensionStatusActiveCurrentAndOne');
+    expect(document.querySelector('[data-extension-status-text]')?.textContent).toBe('extensionStatusActiveCurrent');
   });
 
   it('uses disconnected helper copy when no active content scripts respond', async () => {
@@ -116,19 +106,13 @@ describe('popup', () => {
       }
     });
     vi.mocked(chrome.tabs.query).mockImplementation(((queryInfo: chrome.tabs.QueryInfo, callback?: (tabs: chrome.tabs.Tab[]) => void) => {
-      if (queryInfo.active) {
-        const tabs = [{ id: 10 } as chrome.tabs.Tab];
-        callback?.(tabs);
-        return Promise.resolve(tabs);
-      }
-
-      const tabs = [{ id: 10 } as chrome.tabs.Tab];
+      const tabs = queryInfo.active ? [{ id: 10 } as chrome.tabs.Tab] : [];
       callback?.(tabs);
       return Promise.resolve(tabs);
     }) as never);
     vi.mocked(chrome.runtime.sendMessage).mockImplementation(((_message: unknown, callback?: (response: unknown) => void) => {
-      callback?.({ activeTabIds: [] });
-      return Promise.resolve({ activeTabIds: [] });
+      callback?.({ status: { currentActive: false, otherActiveCount: 0 } });
+      return Promise.resolve({ status: { currentActive: false, otherActiveCount: 0 } });
     }) as never);
 
     await import('./index');
@@ -145,7 +129,7 @@ describe('popup', () => {
 
   it('renders the compact manifest version in the footer', async () => {
     vi.mocked(chrome.runtime.getManifest).mockReturnValue({ version: '1.2.3' } as chrome.runtime.Manifest);
-    vi.mocked(chrome.tabs.query).mockImplementation(((_queryInfo: chrome.tabs.QueryInfo, callback?: (tabs: chrome.tabs.Tab[]) => void) => {
+    vi.mocked(chrome.tabs.query).mockImplementation(((queryInfo: chrome.tabs.QueryInfo, callback?: (tabs: chrome.tabs.Tab[]) => void) => {
       callback?.([]);
       return Promise.resolve([]);
     }) as never);
@@ -156,15 +140,15 @@ describe('popup', () => {
   });
 
   it('refreshes active chat status while the popup remains open', async () => {
-    let activeTabIds: number[] = [];
+    let activeStatus = { currentActive: false, otherActiveCount: 0 };
     vi.mocked(chrome.tabs.query).mockImplementation(((queryInfo: chrome.tabs.QueryInfo, callback?: (tabs: chrome.tabs.Tab[]) => void) => {
-      const tabs = queryInfo.active ? [{ id: 10 } as chrome.tabs.Tab] : [{ id: 10 } as chrome.tabs.Tab];
+      const tabs = queryInfo.active ? [{ id: 10 } as chrome.tabs.Tab] : [];
       callback?.(tabs);
       return Promise.resolve(tabs);
     }) as never);
     vi.mocked(chrome.runtime.sendMessage).mockImplementation(((_message: unknown, callback?: (response: unknown) => void) => {
-      callback?.({ activeTabIds });
-      return Promise.resolve({ activeTabIds });
+      callback?.({ status: activeStatus });
+      return Promise.resolve({ status: activeStatus });
     }) as never);
 
     await import('./index');
@@ -177,10 +161,10 @@ describe('popup', () => {
       areaName: string
     ) => void;
 
-    activeTabIds = [10];
+    activeStatus = { currentActive: true, otherActiveCount: 0 };
     statusStorageListener({
-      [KNOWN_CHAT_TABS_STORAGE_KEY]: {
-        newValue: { '10': Date.now() }
+      [CHAT_STATUS_UPDATED_STORAGE_KEY]: {
+        newValue: Date.now()
       } as chrome.storage.StorageChange
     }, 'local');
 
@@ -193,15 +177,13 @@ describe('popup', () => {
 
   it('summarizes active chats in other tabs and handles no open tabs', async () => {
     vi.mocked(chrome.tabs.query).mockImplementation(((queryInfo: chrome.tabs.QueryInfo, callback?: (tabs: chrome.tabs.Tab[]) => void) => {
-      const tabs = queryInfo.active
-        ? [{ id: 10 } as chrome.tabs.Tab]
-        : [{ id: 10 } as chrome.tabs.Tab, { id: 20 } as chrome.tabs.Tab, { id: 30 } as chrome.tabs.Tab];
+      const tabs = queryInfo.active ? [{ id: 10 } as chrome.tabs.Tab] : [];
       callback?.(tabs);
       return Promise.resolve(tabs);
     }) as never);
     vi.mocked(chrome.runtime.sendMessage).mockImplementation(((_message: unknown, callback?: (response: unknown) => void) => {
-      callback?.({ activeTabIds: [20, 30, 999] });
-      return Promise.resolve({ activeTabIds: [20, 30, 999] });
+      callback?.({ status: { currentActive: false, otherActiveCount: 2 } });
+      return Promise.resolve({ status: { currentActive: false, otherActiveCount: 2 } });
     }) as never);
 
     await import('./index');
@@ -211,9 +193,13 @@ describe('popup', () => {
 
     vi.resetModules();
     vi.mocked(chrome.tabs.query).mockImplementation(((queryInfo: chrome.tabs.QueryInfo, callback?: (tabs: chrome.tabs.Tab[]) => void) => {
-      const tabs = queryInfo.active ? [] : [];
+      const tabs: chrome.tabs.Tab[] = [];
       callback?.(tabs);
       return Promise.resolve(tabs);
+    }) as never);
+    vi.mocked(chrome.runtime.sendMessage).mockImplementation(((_message: unknown, callback?: (response: unknown) => void) => {
+      callback?.({ status: { currentActive: false, otherActiveCount: 0 } });
+      return Promise.resolve({ status: { currentActive: false, otherActiveCount: 0 } });
     }) as never);
     await import('./index');
 
@@ -221,17 +207,15 @@ describe('popup', () => {
     expect(document.querySelector('[data-extension-status]')?.getAttribute('title')).toBe('extensionStatusDisconnected');
   });
 
-  it('summarizes current-tab-only and current-tab-with-many active status states', async () => {
+  it('keeps current-tab active status focused even when other tabs are active', async () => {
     vi.mocked(chrome.tabs.query).mockImplementation(((queryInfo: chrome.tabs.QueryInfo, callback?: (tabs: chrome.tabs.Tab[]) => void) => {
-      const tabs = queryInfo.active
-        ? [{ id: 10 } as chrome.tabs.Tab]
-        : [{ id: 10 } as chrome.tabs.Tab, { id: 20 } as chrome.tabs.Tab, { id: 30 } as chrome.tabs.Tab, { id: 40 } as chrome.tabs.Tab];
+      const tabs = queryInfo.active ? [{ id: 10 } as chrome.tabs.Tab] : [];
       callback?.(tabs);
       return Promise.resolve(tabs);
     }) as never);
     vi.mocked(chrome.runtime.sendMessage).mockImplementation(((_message: unknown, callback?: (response: unknown) => void) => {
-      callback?.({ activeTabIds: [10] });
-      return Promise.resolve({ activeTabIds: [10] });
+      callback?.({ status: { currentActive: true, otherActiveCount: 0 } });
+      return Promise.resolve({ status: { currentActive: true, otherActiveCount: 0 } });
     }) as never);
 
     await import('./index');
@@ -240,26 +224,24 @@ describe('popup', () => {
 
     vi.resetModules();
     vi.mocked(chrome.runtime.sendMessage).mockImplementation(((_message: unknown, callback?: (response: unknown) => void) => {
-      callback?.({ activeTabIds: [10, 20, 30] });
-      return Promise.resolve({ activeTabIds: [10, 20, 30] });
+      callback?.({ status: { currentActive: true, otherActiveCount: 2 } });
+      return Promise.resolve({ status: { currentActive: true, otherActiveCount: 2 } });
     }) as never);
     await import('./index');
 
-    expect(document.querySelector('[data-extension-status-text]')?.textContent).toBe('extensionStatusActiveCurrentAndMany:2');
+    expect(document.querySelector('[data-extension-status-text]')?.textContent).toBe('extensionStatusActiveCurrent');
     expect(document.querySelector('[data-extension-status]')?.getAttribute('title')).toBe('extensionStatusConnected');
   });
 
   it('summarizes a single active chat in another tab', async () => {
     vi.mocked(chrome.tabs.query).mockImplementation(((queryInfo: chrome.tabs.QueryInfo, callback?: (tabs: chrome.tabs.Tab[]) => void) => {
-      const tabs = queryInfo.active
-        ? [{ id: 10 } as chrome.tabs.Tab]
-        : [{ id: 10 } as chrome.tabs.Tab, { id: 20 } as chrome.tabs.Tab];
+      const tabs = queryInfo.active ? [{ id: 10 } as chrome.tabs.Tab] : [];
       callback?.(tabs);
       return Promise.resolve(tabs);
     }) as never);
     vi.mocked(chrome.runtime.sendMessage).mockImplementation(((_message: unknown, callback?: (response: unknown) => void) => {
-      callback?.({ activeTabIds: [20] });
-      return Promise.resolve({ activeTabIds: [20] });
+      callback?.({ status: { currentActive: false, otherActiveCount: 1 } });
+      return Promise.resolve({ status: { currentActive: false, otherActiveCount: 1 } });
     }) as never);
 
     await import('./index');
@@ -270,13 +252,13 @@ describe('popup', () => {
 
   it('ignores malformed active chat responses', async () => {
     vi.mocked(chrome.tabs.query).mockImplementation(((queryInfo: chrome.tabs.QueryInfo, callback?: (tabs: chrome.tabs.Tab[]) => void) => {
-      const tabs = queryInfo.active ? [{ id: 10 } as chrome.tabs.Tab] : [{ id: 10 } as chrome.tabs.Tab];
+      const tabs = queryInfo.active ? [{ id: 10 } as chrome.tabs.Tab] : [];
       callback?.(tabs);
       return Promise.resolve(tabs);
     }) as never);
     vi.mocked(chrome.runtime.sendMessage).mockImplementation(((_message: unknown, callback?: (response: unknown) => void) => {
-      callback?.({ activeTabIds: ['10', null, 999] });
-      return Promise.resolve({ activeTabIds: ['10', null, 999] });
+      callback?.({ status: { currentActive: 'yes', otherActiveCount: -1 } });
+      return Promise.resolve({ status: { currentActive: 'yes', otherActiveCount: -1 } });
     }) as never);
 
     await import('./index');
@@ -286,15 +268,13 @@ describe('popup', () => {
 
   it('summarizes active tabs when the current active tab has no usable id', async () => {
     vi.mocked(chrome.tabs.query).mockImplementation(((queryInfo: chrome.tabs.QueryInfo, callback?: (tabs: chrome.tabs.Tab[]) => void) => {
-      const tabs = queryInfo.active
-        ? [{ id: undefined } as chrome.tabs.Tab]
-        : [{ id: undefined } as chrome.tabs.Tab, { id: 20 } as chrome.tabs.Tab];
+      const tabs = queryInfo.active ? [{ id: undefined } as chrome.tabs.Tab] : [];
       callback?.(tabs);
       return Promise.resolve(tabs);
     }) as never);
     vi.mocked(chrome.runtime.sendMessage).mockImplementation(((_message: unknown, callback?: (response: unknown) => void) => {
-      callback?.({ activeTabIds: [20] });
-      return Promise.resolve({ activeTabIds: [20] });
+      callback?.({ status: { currentActive: false, otherActiveCount: 1 } });
+      return Promise.resolve({ status: { currentActive: false, otherActiveCount: 1 } });
     }) as never);
 
     await import('./index');
@@ -305,7 +285,7 @@ describe('popup', () => {
 
   it('treats missing active tab responses as disconnected', async () => {
     vi.mocked(chrome.tabs.query).mockImplementation(((queryInfo: chrome.tabs.QueryInfo, callback?: (tabs: chrome.tabs.Tab[]) => void) => {
-      const tabs = queryInfo.active ? [{ id: 10 } as chrome.tabs.Tab] : [{ id: 10 } as chrome.tabs.Tab];
+      const tabs = queryInfo.active ? [{ id: 10 } as chrome.tabs.Tab] : [];
       callback?.(tabs);
       return Promise.resolve(tabs);
     }) as never);
@@ -322,7 +302,7 @@ describe('popup', () => {
 
   it('treats active chat lookup errors as disconnected', async () => {
     vi.mocked(chrome.tabs.query).mockImplementation(((queryInfo: chrome.tabs.QueryInfo, callback?: (tabs: chrome.tabs.Tab[]) => void) => {
-      const tabs = queryInfo.active ? [{ id: 10 } as chrome.tabs.Tab] : [{ id: 10 } as chrome.tabs.Tab];
+      const tabs = queryInfo.active ? [{ id: 10 } as chrome.tabs.Tab] : [];
       callback?.(tabs);
       return Promise.resolve(tabs);
     }) as never);
@@ -331,7 +311,7 @@ describe('popup', () => {
         configurable: true,
         value: { message: 'background unavailable' }
       });
-      callback?.({ activeTabIds: [10] });
+      callback?.({ status: { currentActive: true, otherActiveCount: 0 } });
       Object.defineProperty(chrome.runtime, 'lastError', {
         configurable: true,
         value: undefined

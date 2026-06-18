@@ -73,7 +73,7 @@ describe('active chat keepalive', () => {
     expect(connect).toHaveBeenCalledOnce();
   });
 
-  it('shows the refresh button when reconnecting fails after a disconnect', async () => {
+  it('reloads chat when reconnecting fails after a disconnect', async () => {
     const firstPort = createMockPort();
     const connect = vi.fn()
       .mockReturnValueOnce(firstPort as unknown as chrome.runtime.Port)
@@ -88,30 +88,21 @@ describe('active chat keepalive', () => {
     await vi.advanceTimersByTimeAsync(250);
 
     expect(connect).toHaveBeenCalledTimes(2);
-    expect(document.querySelector('.ytcq-reconnect-button')).not.toBeNull();
+    expect(document.querySelector('.ytcq-reconnect-button')).toBeNull();
+    expect(enhancedEffectMocks.hideEnhancedEffect).toHaveBeenCalled();
   });
 
-  it('anchors the refresh button above YouTube panel pages when they exist', async () => {
-    const panelParent = document.createElement('div');
-    const panelPages = document.createElement('tp-yt-iron-pages');
-    panelPages.id = 'panel-pages';
-    panelParent.append(panelPages);
-    document.body.append(panelParent);
-    const firstPort = createMockPort();
-    chrome.runtime.connect = vi.fn()
-      .mockReturnValueOnce(firstPort as unknown as chrome.runtime.Port)
-      .mockImplementation(() => {
-        throw new Error('Extension context invalidated.');
-      });
-    const { startActiveChatKeepAlive } = await import('./active-chat-keepalive');
+  it('cleans stale reconnect anchors left by older content script instances', async () => {
+    const anchor = document.createElement('div');
+    anchor.className = 'ytcq-reconnect-anchor';
+    document.body.append(anchor);
+    chrome.runtime.connect = vi.fn(() => createMockPort() as unknown as chrome.runtime.Port);
+    const { cleanupStaleReconnectNotice, startActiveChatKeepAlive } = await import('./active-chat-keepalive');
 
     startActiveChatKeepAlive();
-    firstPort.disconnect();
-    await vi.advanceTimersByTimeAsync(250);
+    cleanupStaleReconnectNotice();
 
-    const anchor = document.querySelector('.ytcq-reconnect-anchor');
-    expect(anchor?.parentElement).toBe(panelParent);
-    expect(panelParent.firstElementChild).toBe(anchor);
+    expect(document.querySelector('.ytcq-reconnect-anchor')).toBeNull();
   });
 
   it('does not start another reconnect timer while one is pending', async () => {
@@ -145,10 +136,11 @@ describe('active chat keepalive', () => {
     expect(document.querySelector('.ytcq-reconnect-button')).toBeNull();
   });
 
-  it('suspends feature UI before showing the refresh button', async () => {
+  it('suspends feature UI before reloading disconnected chat', async () => {
     const staleFeatureUi = document.createElement('div');
     staleFeatureUi.className = 'ytcq-stale-feature-ui';
     document.body.append(staleFeatureUi);
+    chatInputMocks.text = 'draft before reload';
     const firstPort = createMockPort();
     const connect = vi.fn()
       .mockReturnValueOnce(firstPort as unknown as chrome.runtime.Port)
@@ -174,8 +166,9 @@ describe('active chat keepalive', () => {
     lifecycle.handleFeatureMessage(document.createElement('yt-live-chat-text-message-renderer'), { allowTranslate: true });
 
     expect(document.querySelector('.ytcq-stale-feature-ui')).toBeNull();
-    expect(document.querySelector('.ytcq-reconnect-button')).not.toBeNull();
+    expect(document.querySelector('.ytcq-reconnect-button')).toBeNull();
     expect(messageHook).not.toHaveBeenCalled();
+    expect(window.sessionStorage.getItem('ytcqReconnectDraft')).toContain('draft before reload');
   });
 
   it('hides the enhanced effect when the initial active chat connection fails', async () => {
@@ -221,13 +214,15 @@ describe('active chat keepalive', () => {
     await vi.advanceTimersByTimeAsync(250);
     expect(connect).toHaveBeenCalledTimes(1);
     expect(document.querySelector('.ytcq-reconnect-button')).toBeNull();
+    expect(enhancedEffectMocks.hideEnhancedEffect).not.toHaveBeenCalled();
 
     setVisibilityState('visible');
     handleFeatureVisibilityChanged('visible');
     await vi.advanceTimersByTimeAsync(250);
 
     expect(connect).toHaveBeenCalledTimes(2);
-    expect(document.querySelector('.ytcq-reconnect-button')).not.toBeNull();
+    expect(document.querySelector('.ytcq-reconnect-button')).toBeNull();
+    expect(enhancedEffectMocks.hideEnhancedEffect).toHaveBeenCalled();
   });
 
   it('restores reconnect drafts for the same chat URL and removes mismatched drafts', async () => {
@@ -291,6 +286,9 @@ describe('active chat keepalive', () => {
 
   it('drops invalid reconnect drafts and cleans stale reconnect notices', async () => {
     window.sessionStorage.setItem('ytcqReconnectDraft', '{bad json');
+    const anchor = document.createElement('div');
+    anchor.className = 'ytcq-reconnect-anchor';
+    document.body.append(anchor);
     const firstPort = createMockPort();
     chrome.runtime.connect = vi.fn()
       .mockReturnValueOnce(firstPort as unknown as chrome.runtime.Port)
@@ -303,7 +301,7 @@ describe('active chat keepalive', () => {
     expect(window.sessionStorage.getItem('ytcqReconnectDraft')).toBeNull();
     firstPort.disconnect();
     await vi.advanceTimersByTimeAsync(250);
-    expect(document.querySelector('.ytcq-reconnect-button')).not.toBeNull();
+    expect(document.querySelector('.ytcq-reconnect-button')).toBeNull();
 
     cleanupStaleReconnectNotice();
     expect(document.querySelector('.ytcq-reconnect-anchor')).toBeNull();
