@@ -2,6 +2,9 @@ name = "chat-enhancer-playground"
 main = "src/index.ts"
 compatibility_date = "2026-06-09"
 workers_dev = false
+rules = [
+  { type = "Text", globs = ["**/*.html"], fallthrough = true }
+]
 
 routes = [
   { pattern = "playground.chatenhancer.com", custom_domain = true }
