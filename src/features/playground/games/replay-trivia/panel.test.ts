@@ -24,6 +24,7 @@ import {
 import {
   ANSWER_TIME_MS,
   ANSWER_UI_DELAY_MS,
+  CHAT_PROMPT_DELAY_MS,
   COUNTDOWN_MS,
   REVEAL_FRIEND_REPLY_DELAY_MS,
   REVEAL_MS,
@@ -797,6 +798,31 @@ describe('Replay Trivia panel', () => {
       .filter(([image]) => image === assets.greyBubbleTail)
       .map((call) => call[8]);
     expect(replyBubbleHeights).toContain(45);
+  });
+
+  it('keeps one-line friend prompt bubbles compact', async () => {
+    const assets = createLoadedReplayTriviaAssets();
+    getReplayTriviaAssetsMock.mockResolvedValue(assets);
+    const game = createReplayTriviaGame({
+      currentQuestion: {
+        ...createReplayTriviaQuestion(),
+        friendIntro: 'help me out',
+        prompt: 'which game won best role-playing game'
+      },
+      status: 'question'
+    });
+
+    openReplayTriviaGamePanel(game, 'host-user', vi.fn());
+    await flushPromises();
+    context.drawImage.mockClear();
+
+    setNow(CHAT_PROMPT_DELAY_MS + 1_000);
+    updateReplayTriviaGamePanel(game, 'host-user');
+
+    const promptBubbleHeights = context.drawImage.mock.calls
+      .filter(([image]) => image === assets.greyBubbleTail)
+      .map((call) => call[8]);
+    expect(promptBubbleHeights).toContain(45);
   });
 
   it('keeps punctuation attached to bolded friend reply answers', () => {
