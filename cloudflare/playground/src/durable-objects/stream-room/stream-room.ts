@@ -123,6 +123,7 @@ export class StreamRoom {
       connectionId,
       displayName: 'Player',
       joinedAt: Date.now(),
+      languageCode: 'en',
       rateLimit: new TokenBucket(CONNECTION_RATE_LIMIT),
       socket,
       userId: ''
@@ -220,7 +221,10 @@ export class StreamRoom {
     if (session.userId) throw new ProtocolError('already_authenticated', 'This connection is already authenticated.');
 
     const identity = await verifySignedIdentity(session.challenge, message.identity);
-    this.sessions.authenticate(session, identity.userId, message.availableGames || []);
+    this.sessions.authenticate(session, identity.userId, message.availableGames || [], undefined, {
+      languageCode: message.languageCode || 'en',
+      locale: message.locale
+    });
     this.logEvent('client_authenticated', {
       availableGameCount: session.availableGames.size,
       connection: shortLogId(session.connectionId),
@@ -297,11 +301,8 @@ export class StreamRoom {
       gameType: game.gameType,
       playerCount: getGameModuleForRecord(game).getRecipientUserIds(game).length
     });
-    const publicGame = getGameModuleForRecord(game).toPublicGame(game, (publicUserId) => {
-      return this.sessions.getPublicUser(publicUserId);
-    });
-    this.sendToUser(invite.fromUserId, { game: publicGame, type: 'gameStarted' });
-    this.sendToUser(invite.toUserId, { game: publicGame, type: 'gameStarted' });
+    this.sendGameToUser(game, invite.fromUserId, 'gameStarted');
+    this.sendGameToUser(game, invite.toUserId, 'gameStarted');
   }
 
   private handleGameAction(
@@ -513,6 +514,7 @@ export class StreamRoom {
     return createJsonResponse({
       gameId: token.gameId,
       ok: true,
+      targetLanguages: this.getGameTargetLanguages(game),
       userId: token.userId
     });
   }
@@ -544,7 +546,7 @@ export class StreamRoom {
         .filter((game) => Boolean(forUserId) && getGameModuleForRecord(game).canUserAccessGame(game, forUserId))
         .map((game) => getGameModuleForRecord(game).toPublicGame(game, (userId) => {
           return this.sessions.getPublicUser(userId);
-        })),
+        }, this.createPublicGameContext(forUserId))),
       invites: this.invites.getPublicInvites(forUserId, (userId) => this.sessions.getPublicUser(userId)),
       users: this.sessions.getPresenceUsers()
     };
@@ -556,10 +558,34 @@ export class StreamRoom {
 
   private broadcastGame(game: GameRecord): void {
     const gameModule = getGameModuleForRecord(game);
-    const publicGame = gameModule.toPublicGame(game, (userId) => this.sessions.getPublicUser(userId));
     gameModule.getRecipientUserIds(game).forEach((userId) => {
-      this.sendToUser(userId, { game: publicGame, type: 'gameUpdated' });
+      this.sendGameToUser(game, userId, 'gameUpdated');
     });
+  }
+
+  private sendGameToUser(game: GameRecord, userId: string, type: 'gameStarted' | 'gameUpdated'): void {
+    const publicGame = getGameModuleForRecord(game).toPublicGame(
+      game,
+      (publicUserId) => this.sessions.getPublicUser(publicUserId),
+      this.createPublicGameContext(userId)
+    );
+    this.sendToUser(userId, { game: publicGame, type });
+  }
+
+  private createPublicGameContext(recipientUserId: string) {
+    return {
+      getUserLanguage: (userId: string) => this.sessions.getUserLanguage(userId),
+      recipientUserId
+    };
+  }
+
+  private getGameTargetLanguages(game: GameRecord) {
+    const languages = new Map<string, { languageCode: string; locale?: string }>();
+    getGameModuleForRecord(game).getRecipientUserIds(game).forEach((userId) => {
+      const language = this.sessions.getUserLanguage(userId);
+      languages.set(language.locale || language.languageCode, language);
+    });
+    return [...languages.values()];
   }
 
   private sendToUser(userId: string, message: ServerMessage): void {

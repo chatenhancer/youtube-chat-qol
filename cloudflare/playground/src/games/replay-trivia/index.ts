@@ -5,7 +5,7 @@
  * the active match and owns answers, scoring, round transitions, and public
  * serialization for both players.
  */
-import type { PublicGame, PublicUserIdentity } from '../../protocol/messages';
+import type { PlaygroundUserLanguage, PublicGame, PublicUserIdentity } from '../../protocol/messages';
 import { ProtocolError } from '../../protocol/validation';
 import type {
   ReplayTriviaGameStatus,
@@ -13,7 +13,7 @@ import type {
   ReplayTriviaPublicQuestion,
   ReplayTriviaQuestion
 } from '../../../../../src/shared/playground-trivia';
-import type { GameActionInput, GameModule, GameRecord } from '../types';
+import type { GameActionInput, GameModule, GameRecord, PublicGameContext } from '../types';
 
 type ChoiceIndex = 0 | 1 | 2 | 3;
 type PlayerRole = 'guest' | 'host';
@@ -47,6 +47,16 @@ interface ReplayTriviaStoredQuestion {
   correctChoiceIndex: ChoiceIndex;
   friendIntro: string;
   id: string;
+  localizations: ReplayTriviaStoredQuestionLocalization[];
+  prompt: string;
+  rightReply: string;
+  wrongReply: string;
+}
+
+interface ReplayTriviaStoredQuestionLocalization {
+  choices: [string, string, string, string];
+  friendIntro: string;
+  languageCode: string;
   prompt: string;
   rightReply: string;
   wrongReply: string;
@@ -101,8 +111,8 @@ export const replayTriviaGameModule: GameModule = {
     const triviaGame = assertReplayTriviaGame(game);
     return triviaGame.status === 'finished' ? getReplayTriviaWinnerUserId(triviaGame) : null;
   },
-  toPublicGame(game, getUser) {
-    return toPublicReplayTriviaGame(assertReplayTriviaGame(game), getUser);
+  toPublicGame(game, getUser, context) {
+    return toPublicReplayTriviaGame(assertReplayTriviaGame(game), getUser, context);
   },
   validateGenerationToken(game, input) {
     assertReplayTriviaQuestionProviderCanGenerate(assertReplayTriviaGame(game), input.userId);
@@ -252,13 +262,15 @@ export function advanceReplayTriviaGame(
 
 export function toPublicReplayTriviaGame(
   game: ReplayTriviaGameRecord,
-  getUser: (userId: string) => PublicUserIdentity
+  getUser: (userId: string) => PublicUserIdentity,
+  context?: PublicGameContext
 ): PublicReplayTriviaGame {
   const currentQuestion = game.questions[game.currentQuestionIndex];
   const revealAnswers = shouldRevealAnswers(game.status);
+  const language = getReplayTriviaRecipientLanguage(context);
   return {
     answers: toPublicReplayTriviaAnswers(game, revealAnswers),
-    currentQuestion: currentQuestion ? toPublicReplayTriviaQuestion(currentQuestion, revealAnswers) : undefined,
+    currentQuestion: currentQuestion ? toPublicReplayTriviaQuestion(currentQuestion, revealAnswers, language) : undefined,
     currentQuestionIndex: game.currentQuestionIndex,
     gameId: game.gameId,
     gameType: 'replay-trivia',
@@ -325,16 +337,18 @@ function toPublicReplayTriviaAnswers(
 
 function toPublicReplayTriviaQuestion(
   question: ReplayTriviaStoredQuestion,
-  revealAnswer: boolean
+  revealAnswer: boolean,
+  language: PlaygroundUserLanguage | null
 ): ReplayTriviaPublicQuestion {
+  const text = getLocalizedQuestionText(question, language);
   return {
-    choices: question.choices,
+    choices: text.choices,
     correctChoiceIndex: revealAnswer ? question.correctChoiceIndex : undefined,
-    friendIntro: question.friendIntro,
+    friendIntro: text.friendIntro,
     id: question.id,
-    prompt: question.prompt,
-    rightReply: question.rightReply,
-    wrongReply: question.wrongReply
+    prompt: text.prompt,
+    rightReply: text.rightReply,
+    wrongReply: text.wrongReply
   };
 }
 
@@ -358,10 +372,35 @@ function parseQuestion(value: unknown): ReplayTriviaStoredQuestion {
     correctChoiceIndex: parseChoiceIndex(generated.correctChoiceIndex),
     friendIntro: getGeneratedText(question.friendIntro, 'friendIntro', 140),
     id: getGeneratedText(question.id, 'id', 80),
+    localizations: parseQuestionLocalizations(generated.localizations),
     prompt: getGeneratedText(generated.prompt, 'prompt', 260),
     rightReply: getGeneratedText(question.rightReply, 'rightReply', 180),
     wrongReply: getGeneratedText(question.wrongReply, 'wrongReply', 220)
   };
+}
+
+function parseQuestionLocalizations(value: unknown): ReplayTriviaStoredQuestionLocalization[] {
+  if (value === undefined) return [];
+  if (!Array.isArray(value)) {
+    throw new ProtocolError('invalid_question', 'Replay Trivia question localizations must be an array.');
+  }
+
+  const localizations = new Map<string, ReplayTriviaStoredQuestionLocalization>();
+  value.forEach((item) => {
+    const localization = getRecord(item, 'question localization');
+    const languageCode = getGeneratedLanguageCode(localization.languageCode);
+    const choices = parseChoices(localization.choices);
+    localizations.set(languageCode.toLowerCase(), {
+      choices,
+      friendIntro: getGeneratedText(localization.friendIntro, 'localized friendIntro', 140),
+      languageCode,
+      prompt: getGeneratedText(localization.prompt, 'localized prompt', 260),
+      rightReply: getGeneratedText(localization.rightReply, 'localized rightReply', 180),
+      wrongReply: getGeneratedText(localization.wrongReply, 'localized wrongReply', 220)
+    });
+  });
+
+  return [...localizations.values()];
 }
 
 function parseChoices(value: unknown): [string, string, string, string] {
@@ -381,6 +420,14 @@ function getGeneratedText(value: unknown, field: string, maxLength: number): str
   const text = typeof value === 'string' ? value.trim() : '';
   if (!text) throw new ProtocolError('invalid_question', `Replay Trivia questions must include ${field}.`);
   return text.slice(0, maxLength);
+}
+
+function getGeneratedLanguageCode(value: unknown): string {
+  const text = getGeneratedText(value, 'localized languageCode', 16);
+  if (!/^[a-zA-Z]{2,3}(?:[-_][a-zA-Z0-9]{2,8})?$/.test(text)) {
+    throw new ProtocolError('invalid_question', 'Replay Trivia question localizations must include valid languageCode.');
+  }
+  return text.replace('_', '-');
 }
 
 function getRecord(value: unknown, field: string): Record<string, unknown> {
@@ -411,6 +458,29 @@ function getCurrentStoredQuestion(game: ReplayTriviaGameRecord): ReplayTriviaSto
 function getReplayTriviaWinnerUserId(game: ReplayTriviaGameRecord): string | null {
   if (game.scores.host === game.scores.guest) return null;
   return game.scores.host > game.scores.guest ? game.players.host : game.players.guest;
+}
+
+function getReplayTriviaRecipientLanguage(context?: PublicGameContext): PlaygroundUserLanguage | null {
+  if (!context?.recipientUserId || !context.getUserLanguage) return null;
+  return context.getUserLanguage(context.recipientUserId);
+}
+
+function getLocalizedQuestionText(
+  question: ReplayTriviaStoredQuestion,
+  language: PlaygroundUserLanguage | null
+): ReplayTriviaStoredQuestionLocalization | ReplayTriviaStoredQuestion {
+  if (!language) return question;
+
+  const preferredCodes = [
+    language.locale,
+    language.languageCode,
+    language.locale?.split('-')[0],
+    language.languageCode.split('-')[0]
+  ].filter(Boolean).map((code) => String(code).toLowerCase());
+  return question.localizations.find((localization) =>
+    preferredCodes.includes(localization.languageCode.toLowerCase()) ||
+    preferredCodes.includes(localization.languageCode.split('-')[0].toLowerCase())
+  ) || question;
 }
 
 function isQuestionDeadlinePassed(game: ReplayTriviaGameRecord, now: number): boolean {

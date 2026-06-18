@@ -44,6 +44,12 @@ describe('Replay Trivia request validation', () => {
         }
       ],
       startSeconds: 10,
+      targetLanguages: [
+        {
+          languageCode: 'EN-us',
+          locale: 'es-MX'
+        }
+      ],
       videoId: 'SHt3FyE-VIQ'
     });
   });
@@ -74,6 +80,7 @@ describe('Replay Trivia request validation', () => {
     expect(request.languageCode).toBe('en');
     expect(request.locale).toBeUndefined();
     expect(request.questionCount).toBe(10);
+    expect(request.targetLanguages).toEqual([{ languageCode: 'en', locale: undefined }]);
     expect(getTranscriptCharLength(request.segments)).toBe(7);
   });
 

@@ -88,6 +88,8 @@ describe('Playground games client', () => {
     expect(port.messages).toEqual([
       {
         availableGames: ['chess'],
+        languageCode: 'en',
+        locale: 'en',
         streamKey: 'stream-a',
         type: 'ytcq:playground:init'
       }
@@ -128,6 +130,8 @@ describe('Playground games client', () => {
     expect(getPlaygroundClientState().available).toBe(false);
     expect(port.messages.at(-1)).toEqual({
       availableGames: [],
+      languageCode: 'en',
+      locale: 'en',
       streamKey: 'stream-b',
       type: 'ytcq:playground:init'
     });

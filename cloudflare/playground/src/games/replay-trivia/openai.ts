@@ -8,8 +8,10 @@
 import type {
   ReplayTriviaDifficulty,
   ReplayTriviaQuestion,
+  ReplayTriviaQuestionLocalization,
   ReplayTriviaQuestionsRequest,
-  ReplayTriviaQuestionsResponse
+  ReplayTriviaQuestionsResponse,
+  ReplayTriviaTargetLanguage
 } from '../../../../../src/shared/playground-trivia';
 import type { Env } from '../../types';
 import { ReplayTriviaError } from './errors';
@@ -105,7 +107,7 @@ export async function generateReplayTriviaQuestions(
     generatedAt: new Date().toISOString(),
     languageCode: request.languageCode || 'en',
     model,
-    questions: distributeCorrectChoiceIndexes(parseGeneratedQuestions(parsedOutput), request),
+    questions: distributeCorrectChoiceIndexes(parseGeneratedQuestions(parsedOutput, request), request),
     transcriptWindow: {
       endSeconds: request.endSeconds,
       segmentCount: request.segments.length,
@@ -116,6 +118,7 @@ export async function generateReplayTriviaQuestions(
 }
 
 function createOpenAIRequest(model: string, request: ReplayTriviaQuestionsRequest): Record<string, unknown> {
+  const targetLanguages = getTargetLanguages(request);
   return {
     input: [
       {
@@ -149,7 +152,12 @@ function createOpenAIRequest(model: string, request: ReplayTriviaQuestionsReques
           'wrongReply should be a roast or judgment, must say the correct answer, and must be valid for any wrong choice.',
           'wrongReply can sound annoyed, betrayed, or mock-disappointed.',
           'wrongReply should be more teasing than neutral.',
-          'Do not mention a specific wrong choice in wrongReply.'
+          'Do not mention a specific wrong choice in wrongReply.',
+          'Write the main question fields in languageCode.',
+          'For each requested target language other than languageCode, add one localizations entry.',
+          'Localized entries must translate prompt, choices, friendIntro, rightReply, and wrongReply into that language.',
+          'Localized choices must preserve exact answer order and meaning: choices[0] translates the main choices[0], choices[1] translates choices[1], and so on.',
+          'Do not include correctChoiceIndex in localized entries.'
         ].join(' '),
         role: 'system'
       },
@@ -160,12 +168,13 @@ function createOpenAIRequest(model: string, request: ReplayTriviaQuestionsReques
           locale: request.locale || request.languageCode || 'en',
           questionCount: request.questionCount || 10,
           startSeconds: request.startSeconds,
+          targetLanguages,
           transcript: formatTranscript(request)
         }),
         role: 'user'
       }
     ],
-    max_output_tokens: 5000,
+    max_output_tokens: getMaxOutputTokens(targetLanguages.length),
     model,
     reasoning: {
       effort: 'low'
@@ -217,12 +226,13 @@ function getProviderErrorMessage(value: unknown): string {
     : '';
 }
 
-function parseGeneratedQuestions(value: unknown): ReplayTriviaQuestion[] {
+function parseGeneratedQuestions(value: unknown, request: ReplayTriviaQuestionsRequest): ReplayTriviaQuestion[] {
   if (!isRecord(value) || !Array.isArray(value.questions)) {
     throw new ReplayTriviaError('openai_invalid_output', 'Replay Trivia question generation returned malformed output.', 502);
   }
 
-  const questions = value.questions.map(parseGeneratedQuestion);
+  const questions = value.questions.map((question, index) =>
+    parseGeneratedQuestion(question, index, request.languageCode || 'en'));
   if (!questions.length) {
     throw new ReplayTriviaError('openai_no_questions', 'Replay Trivia question generation returned no questions.', 502);
   }
@@ -271,18 +281,30 @@ function moveCorrectChoice(
 ): ReplayTriviaQuestion {
   if (question.correctChoiceIndex === targetIndex) return question;
 
-  const choices = [...question.choices] as ReplayTriviaQuestion['choices'];
-  const displacedChoice = choices[targetIndex];
-  choices[targetIndex] = choices[question.correctChoiceIndex];
-  choices[question.correctChoiceIndex] = displacedChoice;
   return {
     ...question,
-    choices,
-    correctChoiceIndex: targetIndex
+    choices: swapChoices(question.choices, question.correctChoiceIndex, targetIndex),
+    correctChoiceIndex: targetIndex,
+    localizations: question.localizations?.map((localization) => ({
+      ...localization,
+      choices: swapChoices(localization.choices, question.correctChoiceIndex, targetIndex)
+    }))
   };
 }
 
-function parseGeneratedQuestion(value: unknown, index: number): ReplayTriviaQuestion {
+function swapChoices(
+  choices: ReplayTriviaQuestion['choices'],
+  fromIndex: ReplayTriviaQuestion['correctChoiceIndex'],
+  toIndex: ReplayTriviaQuestion['correctChoiceIndex']
+): ReplayTriviaQuestion['choices'] {
+  const nextChoices = [...choices] as ReplayTriviaQuestion['choices'];
+  const displacedChoice = nextChoices[toIndex];
+  nextChoices[toIndex] = nextChoices[fromIndex];
+  nextChoices[fromIndex] = displacedChoice;
+  return nextChoices;
+}
+
+function parseGeneratedQuestion(value: unknown, index: number, languageCode: string): ReplayTriviaQuestion {
   if (!isRecord(value)) {
     throw new ReplayTriviaError('openai_invalid_question', 'Replay Trivia question generation returned an invalid question.', 502);
   }
@@ -300,7 +322,11 @@ function parseGeneratedQuestion(value: unknown, index: number): ReplayTriviaQues
   const choices = getChoices(value.choices);
   const answerIndex = correctChoiceIndex as 0 | 1 | 2 | 3;
   const correctChoice = choices[answerIndex];
-  const wrongReply = ensureWrongReplyIncludesCorrectChoice(getRequiredString(value, 'wrongReply'), correctChoice);
+  const wrongReply = ensureWrongReplyIncludesCorrectChoice(
+    getRequiredString(value, 'wrongReply'),
+    correctChoice,
+    languageCode
+  );
   return {
     choices,
     correctChoiceIndex: answerIndex,
@@ -308,12 +334,50 @@ function parseGeneratedQuestion(value: unknown, index: number): ReplayTriviaQues
     explanation: getRequiredString(value, 'explanation'),
     friendIntro: getRequiredString(value, 'friendIntro'),
     id: `q_${index + 1}`,
+    localizations: parseGeneratedLocalizations(value.localizations, answerIndex),
     prompt,
     rightReply: getRequiredString(value, 'rightReply'),
     sourceEndSeconds: getRequiredNumber(value, 'sourceEndSeconds'),
     sourceStartSeconds: getRequiredNumber(value, 'sourceStartSeconds'),
     wrongReply
   };
+}
+
+function parseGeneratedLocalizations(
+  value: unknown,
+  correctChoiceIndex: ReplayTriviaQuestion['correctChoiceIndex']
+): ReplayTriviaQuestionLocalization[] {
+  if (value === undefined) return [];
+  if (!Array.isArray(value)) {
+    throw new ReplayTriviaError('openai_invalid_localizations', 'Replay Trivia question generation returned invalid localizations.', 502);
+  }
+
+  const localizations = new Map<string, ReplayTriviaQuestionLocalization>();
+  value.forEach((item) => {
+    if (!isRecord(item)) {
+      throw new ReplayTriviaError('openai_invalid_localizations', 'Replay Trivia question generation returned invalid localizations.', 502);
+    }
+
+    const languageCode = normalizeLanguageCode(getRequiredString(item, 'languageCode'));
+    if (!languageCode) {
+      throw new ReplayTriviaError('openai_invalid_localizations', 'Replay Trivia question generation returned invalid localization language.', 502);
+    }
+
+    const choices = getChoices(item.choices);
+    localizations.set(languageCode, {
+      choices,
+      friendIntro: getRequiredString(item, 'friendIntro'),
+      languageCode,
+      prompt: getRequiredString(item, 'prompt'),
+      rightReply: getRequiredString(item, 'rightReply'),
+      wrongReply: ensureLocalizedWrongReplyIncludesCorrectChoice(
+        getRequiredString(item, 'wrongReply'),
+        choices[correctChoiceIndex]
+      )
+    });
+  });
+
+  return [...localizations.values()];
 }
 
 function getChoices(value: unknown): [string, string, string, string] {
@@ -336,10 +400,17 @@ function getRequiredString(value: Record<string, unknown>, key: string): string 
   return field.trim();
 }
 
-function ensureWrongReplyIncludesCorrectChoice(wrongReply: string, correctChoice: string): string {
+function ensureWrongReplyIncludesCorrectChoice(wrongReply: string, correctChoice: string, languageCode: string): string {
   if (wrongReply.toLowerCase().includes(correctChoice.toLowerCase())) return wrongReply;
   const separator = /[.!?]$/.test(wrongReply) ? ' ' : '. ';
-  return `${wrongReply}${separator}it was ${correctChoice}.`;
+  const prefix = languageCode.toLowerCase().startsWith('en') ? 'it was ' : '';
+  return `${wrongReply}${separator}${prefix}${correctChoice}.`;
+}
+
+function ensureLocalizedWrongReplyIncludesCorrectChoice(wrongReply: string, correctChoice: string): string {
+  if (wrongReply.toLowerCase().includes(correctChoice.toLowerCase())) return wrongReply;
+  const separator = /[.!?]$/.test(wrongReply) ? ' ' : '. ';
+  return `${wrongReply}${separator}${correctChoice}.`;
 }
 
 function getRequiredNumber(value: Record<string, unknown>, key: string): number {
@@ -352,6 +423,36 @@ function getRequiredNumber(value: Record<string, unknown>, key: string): number 
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function getTargetLanguages(request: ReplayTriviaQuestionsRequest): ReplayTriviaTargetLanguage[] {
+  const requested = request.targetLanguages?.length
+    ? request.targetLanguages
+    : [{
+      languageCode: request.languageCode || 'en',
+      locale: request.locale || request.languageCode || 'en'
+    }];
+  const languages = new Map<string, ReplayTriviaTargetLanguage>();
+  requested.forEach((language) => {
+    const languageCode = normalizeLanguageCode(language.languageCode);
+    if (!languageCode) return;
+    const locale = normalizeLanguageCode(language.locale);
+    languages.set(locale || languageCode, {
+      languageCode,
+      locale: locale || undefined
+    });
+  });
+  return [...languages.values()];
+}
+
+function normalizeLanguageCode(value: unknown): string {
+  if (typeof value !== 'string') return '';
+  const code = value.trim();
+  return /^[a-zA-Z]{2,3}(?:[-_][a-zA-Z0-9]{2,8})?$/.test(code) ? code.replace('_', '-') : '';
+}
+
+function getMaxOutputTokens(targetLanguageCount: number): number {
+  return Math.min(10_000, 5_000 + (Math.max(1, targetLanguageCount) - 1) * 2_200);
 }
 
 const REPLAY_TRIVIA_SCHEMA = {
@@ -378,6 +479,34 @@ const REPLAY_TRIVIA_SCHEMA = {
           },
           explanation: { type: 'string' },
           friendIntro: { type: 'string' },
+          localizations: {
+            items: {
+              additionalProperties: false,
+              properties: {
+                choices: {
+                  items: { type: 'string' },
+                  maxItems: 4,
+                  minItems: 4,
+                  type: 'array'
+                },
+                friendIntro: { type: 'string' },
+                languageCode: { type: 'string' },
+                prompt: { type: 'string' },
+                rightReply: { type: 'string' },
+                wrongReply: { type: 'string' }
+              },
+              required: [
+                'languageCode',
+                'prompt',
+                'choices',
+                'friendIntro',
+                'rightReply',
+                'wrongReply'
+              ],
+              type: 'object'
+            },
+            type: 'array'
+          },
           prompt: { type: 'string' },
           rightReply: { type: 'string' },
           sourceEndSeconds: { type: 'number' },
@@ -393,6 +522,7 @@ const REPLAY_TRIVIA_SCHEMA = {
           'sourceEndSeconds',
           'difficulty',
           'friendIntro',
+          'localizations',
           'rightReply',
           'wrongReply'
         ],

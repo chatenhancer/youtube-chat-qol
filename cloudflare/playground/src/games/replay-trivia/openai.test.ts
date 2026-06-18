@@ -75,6 +75,45 @@ describe('Replay Trivia OpenAI adapter', () => {
     expect(response.questions.every((question) => question.choices[question.correctChoiceIndex] === 'Roger Clark')).toBe(true);
   });
 
+  it('requests target languages and preserves localized answer order when balancing choices', async () => {
+    let openAIRequest: Record<string, unknown> | undefined;
+    vi.stubGlobal('fetch', vi.fn(async (_input: RequestInfo | URL, init?: RequestInit) => {
+      openAIRequest = JSON.parse(String(init?.body)) as Record<string, unknown>;
+      return createOpenAIOutputResponse({
+        questions: [
+          createGeneratedQuestion({
+            localizations: [
+              {
+                choices: ['Roger Clark ES', 'Christopher Judge ES', 'Nolan North ES', 'Troy Baker ES'],
+                friendIntro: 'actor check en es',
+                languageCode: 'es',
+                prompt: 'quien gano best performance?',
+                rightReply: 'gracias por salvar esto.',
+                wrongReply: 'fallaste. era Roger Clark ES.'
+              }
+            ]
+          })
+        ]
+      });
+    }));
+
+    const response = await generateReplayTriviaQuestions(createEnv(), {
+      ...createRequest(),
+      targetLanguages: [
+        { languageCode: 'en', locale: 'en-US' },
+        { languageCode: 'es', locale: 'es' }
+      ]
+    });
+
+    expect(getUserPayload(openAIRequest)?.targetLanguages).toEqual([
+      { languageCode: 'en', locale: 'en-US' },
+      { languageCode: 'es', locale: 'es' }
+    ]);
+    expect(response.questions[0].choices[response.questions[0].correctChoiceIndex]).toBe('Roger Clark');
+    expect(response.questions[0].localizations?.[0]?.choices[response.questions[0].correctChoiceIndex])
+      .toBe('Roger Clark ES');
+  });
+
   it('uses nested output text and request defaults when optional request fields are omitted', async () => {
     let openAIRequest: Record<string, unknown> | undefined;
     vi.stubGlobal('fetch', vi.fn(async (_input: RequestInfo | URL, init?: RequestInit) => {

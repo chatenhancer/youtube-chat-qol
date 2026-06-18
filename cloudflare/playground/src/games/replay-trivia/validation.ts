@@ -12,6 +12,7 @@ import { ReplayTriviaError } from './errors';
 
 const DEFAULT_QUESTION_COUNT = 10;
 const MAX_QUESTION_COUNT = 10;
+const MAX_TARGET_LANGUAGES = 4;
 const MAX_SEGMENTS = 5_000;
 const MAX_SEGMENT_TEXT_LENGTH = 500;
 const MAX_TRANSCRIPT_CHARS = 400_000;
@@ -58,6 +59,7 @@ export function parseReplayTriviaQuestionsRequest(value: unknown): ReplayTriviaQ
   const languageCode = normalizeOptionalCode(value.languageCode, 'languageCode') || 'en';
   const locale = normalizeOptionalCode(value.locale, 'locale');
   const segments = parseSegments(value.segments, startSeconds, endSeconds);
+  const targetLanguages = parseTargetLanguages(value.targetLanguages, languageCode, locale);
 
   return {
     captchaPass,
@@ -69,6 +71,7 @@ export function parseReplayTriviaQuestionsRequest(value: unknown): ReplayTriviaQ
     questionCount,
     segments,
     startSeconds,
+    targetLanguages,
     videoId
   };
 }
@@ -173,6 +176,40 @@ function normalizeOptionalCode(value: unknown, key: string): string | undefined 
     throw new ReplayTriviaError('invalid_field', `${key} must be a valid language or locale code.`, 400);
   }
   return code.replace('_', '-');
+}
+
+function parseTargetLanguages(
+  value: unknown,
+  fallbackLanguageCode: string,
+  fallbackLocale?: string
+): ReplayTriviaQuestionsRequest['targetLanguages'] {
+  if (value === undefined) {
+    return [{ languageCode: fallbackLanguageCode, locale: fallbackLocale }];
+  }
+  if (!Array.isArray(value)) {
+    throw new ReplayTriviaError('invalid_field', 'targetLanguages must be an array.', 400);
+  }
+  if (value.length > MAX_TARGET_LANGUAGES) {
+    throw new ReplayTriviaError('too_many_target_languages', `At most ${MAX_TARGET_LANGUAGES} target languages are allowed.`, 400);
+  }
+
+  const languages = new Map<string, { languageCode: string; locale?: string }>();
+  value.forEach((item) => {
+    if (!isRecord(item)) {
+      throw new ReplayTriviaError('invalid_field', 'targetLanguages entries must be objects.', 400);
+    }
+    const languageCode = normalizeOptionalCode(item.languageCode, 'target languageCode');
+    if (!languageCode) {
+      throw new ReplayTriviaError('invalid_field', 'target languageCode must be a valid language code.', 400);
+    }
+    const locale = normalizeOptionalCode(item.locale, 'target locale');
+    languages.set(locale || languageCode, {
+      languageCode,
+      locale
+    });
+  });
+
+  return [...languages.values()];
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

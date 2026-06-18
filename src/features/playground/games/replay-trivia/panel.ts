@@ -6,6 +6,7 @@
  */
 import { ytcqCreateElement } from '../../../../shared/managed-dom';
 import type { ReplayTriviaGenerationToken, ReplayTriviaQuestion } from '../../../../shared/playground-trivia';
+import { getUiLocale, t } from '../../../../shared/i18n';
 import type { GamePanelShell } from '../panel-shell';
 import { createGameSoundController } from '../sound';
 import { generateReplayTriviaQuestions } from './client';
@@ -39,7 +40,6 @@ import {
   COUNTDOWN_NUMBER_DURATION_MS,
   COUNTDOWN_NUMBER_STAGGER_MS,
   FONT_STACK,
-  GAME_TITLE,
   MESSAGE_SOUND_PATH,
   QUESTION_SCENE_OFFSET_Y,
   REVEAL_FRIEND_REPLY_DELAY_MS,
@@ -111,7 +111,7 @@ export function openReplayTriviaGamePanel(
 
   const canvas = ytcqCreateElement('canvas');
   canvas.className = 'ytcq-replay-trivia-canvas';
-  canvas.setAttribute('aria-label', GAME_TITLE);
+  canvas.setAttribute('aria-label', t('gamesReplayTrivia'));
   canvas.setAttribute('role', 'application');
   canvas.tabIndex = 0;
   body.append(canvas);
@@ -126,7 +126,7 @@ export function openReplayTriviaGamePanel(
   if (!context || !canRenderReplayTriviaCanvas(context)) {
     const fallback = ytcqCreateElement('div');
     fallback.className = 'ytcq-replay-trivia-game-fallback';
-    fallback.textContent = 'Canvas is unavailable.';
+    fallback.textContent = t('gamesReplayTriviaCanvasUnavailable');
     body.replaceChildren(fallback, statusOverlay.element);
     activeReplayTriviaFallback = {
       content: fallback,
@@ -340,10 +340,10 @@ function getReplayTriviaPreparationError(error: unknown): string {
     : typeof error === 'string'
       ? error
       : '';
-  if (!message) return 'Could not load trivia.';
+  if (!message) return t('gamesReplayTriviaCouldNotLoad');
   if (message.includes('Replay Trivia question generation returned an incomplete question pack.') ||
     message.includes('Replay Trivia questions must include')) {
-    return 'Could not prepare trivia. Close this game and start a new match.';
+    return t('gamesReplayTriviaCouldNotPrepare');
   }
   return message;
 }
@@ -354,6 +354,14 @@ function toReplayTriviaQuestionPayload(question: ReplayTriviaQuestion): Record<s
     correctChoiceIndex: question.correctChoiceIndex,
     friendIntro: question.friendIntro,
     id: question.id,
+    localizations: question.localizations?.map((localization) => ({
+      choices: localization.choices,
+      friendIntro: localization.friendIntro,
+      languageCode: localization.languageCode,
+      prompt: localization.prompt,
+      rightReply: localization.rightReply,
+      wrongReply: localization.wrongReply
+    })),
     prompt: question.prompt,
     rightReply: question.rightReply,
     wrongReply: question.wrongReply
@@ -589,8 +597,8 @@ function drawLoadingState(context: CanvasRenderingContext2D, state: ReplayTrivia
   context.textBaseline = 'middle';
   const text = state.preparationError || (
     state.currentUserId === state.game.questionProviderUserId
-      ? 'Loading...'
-      : 'Waiting for trivia...'
+      ? t('gamesReplayTriviaLoading')
+      : t('gamesReplayTriviaWaiting')
   );
   context.font = `400 ${fitFontSize(context, text, CANVAS_WIDTH - 80, scaleFontSize(21), scaleFontSize(13), 2, 400)}px ${FONT_STACK}`;
   const lines = wrapText(context, text, CANVAS_WIDTH - 80, 2);
@@ -773,7 +781,11 @@ function drawAnswerPicker(
   const remaining = Math.max(0, Math.ceil((ANSWER_TIME_MS - elapsed) / 1000));
   drawTimer(context, remaining, elapsed / ANSWER_TIME_MS, getTimerY(gridBottom, offsetY));
 
-  drawInputBar(context, state.userAnswerIndex === null ? 'Waiting for your response...' : 'Locked in...', offsetY);
+  drawInputBar(
+    context,
+    state.userAnswerIndex === null ? t('gamesReplayTriviaWaitingForResponse') : t('gamesReplayTriviaLockedIn'),
+    offsetY
+  );
 }
 
 function getPickAnswerPromptY(chatBottom: number): number {
@@ -794,7 +806,7 @@ function drawTimer(
   progress: number,
   centerY: number
 ): void {
-  const label = `${remaining}s left`;
+  const label = t('gamesReplayTriviaSecondsLeft', { seconds: remaining });
   context.font = `800 ${scaleFontSize(21)}px ${FONT_STACK}`;
   const labelWidth = context.measureText(label).width;
   const iconRadius = 16;
@@ -851,8 +863,8 @@ function drawRevealedAnswers(
 ): void {
   const question = getCurrentQuestion(state);
   const elapsed = now - state.phaseStartedAt;
-  const userAnswer = state.userAnswerIndex === null ? 'No answer' : question.answers[state.userAnswerIndex];
-  const opponentAnswer = state.opponentAnswerIndex === null ? 'No answer' : question.answers[state.opponentAnswerIndex];
+  const userAnswer = state.userAnswerIndex === null ? t('gamesReplayTriviaNoAnswer') : question.answers[state.userAnswerIndex];
+  const opponentAnswer = state.opponentAnswerIndex === null ? t('gamesReplayTriviaNoAnswer') : question.answers[state.opponentAnswerIndex];
   const userCorrect = question.correctIndex !== undefined && state.userAnswerIndex === question.correctIndex;
   const opponentCorrect = question.correctIndex !== undefined && state.opponentAnswerIndex === question.correctIndex;
 
@@ -893,7 +905,11 @@ function drawRevealedAnswers(
       tail: true
     });
   }
-  drawInputBar(context, userCorrect ? 'Results are in! Nice save.' : 'Results are in! Better luck next time.', offsetY);
+  drawInputBar(
+    context,
+    userCorrect ? t('gamesReplayTriviaNiceSave') : t('gamesReplayTriviaBetterLuck'),
+    offsetY
+  );
 }
 
 function drawScoreModal(
@@ -912,10 +928,10 @@ function drawScoreModal(
   const userCorrect = question.correctIndex !== undefined && state.userAnswerIndex === question.correctIndex;
   const opponentCorrect = question.correctIndex !== undefined && state.opponentAnswerIndex === question.correctIndex;
   const title = userCorrect
-    ? 'You got this one right'
+    ? t('gamesReplayTriviaYouCorrect')
     : opponentCorrect
-      ? `${getOpponentDisplayName(state)} got this one right`
-      : 'Nobody got this one right';
+      ? t('gamesReplayTriviaOpponentCorrect', { player: getOpponentDisplayName(state) })
+      : t('gamesReplayTriviaNobodyCorrect');
   drawScoreTitle(context, title, getOpponentDisplayName(state), modal.x + (modal.width / 2), modal.y + 42);
   const progress = easeOutCubic(Math.min(1, Math.max(0, (now - state.phaseStartedAt) / SCORE_FLAP_ANIMATION_MS)));
   const previousOpponentScore = state.opponentScore - (opponentCorrect ? 1 : 0);
@@ -932,14 +948,14 @@ function drawScoreModal(
   );
   context.fillStyle = '#000000';
   context.font = `400 ${scaleFontSize(22)}px ${FONT_STACK}`;
-  context.fillText('vs.', modal.x + (modal.width / 2), modal.y + 174);
+  context.fillText(t('gamesReplayTriviaVs'), modal.x + (modal.width / 2), modal.y + 174);
   drawScoreCard(
     context,
     modal.x + 230,
     modal.y + 82,
     previousUserScore,
     state.userScore,
-    'You',
+    t('gamesReplayTriviaYou'),
     '#2b96f4',
     userCorrect ? progress : 1
   );
@@ -1098,40 +1114,25 @@ function drawFinalModal(
   context.textBaseline = 'middle';
   context.font = `400 ${scaleFontSize(19)}px ${FONT_STACK}`;
   if (isTie) {
-    context.fillText('It\'s a tie!', modal.x + (modal.width / 2), modal.y + 42);
-    if (state.assets.tie) {
+    context.fillText(t('gamesReplayTriviaTie'), modal.x + (modal.width / 2), modal.y + 42);
+    if (state.assets.tie && shouldUseEnglishReplayTriviaArt()) {
       drawStampImage(context, state.assets.tie, modal.x + 18, modal.y + 70, 288, 190, stampProgress, -1);
     } else {
-      context.strokeStyle = '#ffd400';
-      context.lineWidth = 7;
-      context.strokeRect(modal.x + 62, modal.y + 118, 176, 82);
-      context.fillStyle = '#ffd400';
-      context.font = `800 ${scaleFontSize(38)}px ${FONT_STACK}`;
-      context.fillText('OKAY! :)', modal.x + (modal.width / 2), modal.y + 160);
+      drawFinalStampFallback(context, t('gamesReplayTriviaStampOkay'), modal.x + 62, modal.y + 118, '#ffd400');
     }
   } else if (won) {
-    drawWinnerLine(context, 'You', 'won this match!', '#2b96f4', modal.x + (modal.width / 2), modal.y + 42);
-    if (state.assets.bestie) {
+    drawWinnerLine(context, t('gamesReplayTriviaYou'), t('gamesReplayTriviaWonMatch'), '#2b96f4', modal.x + (modal.width / 2), modal.y + 42);
+    if (state.assets.bestie && shouldUseEnglishReplayTriviaArt()) {
       drawStampImage(context, state.assets.bestie, modal.x + 18, modal.y + 70, 288, 190, stampProgress, -1);
     } else {
-      context.strokeStyle = '#00df32';
-      context.lineWidth = 7;
-      context.strokeRect(modal.x + 62, modal.y + 118, 176, 82);
-      context.fillStyle = '#00df32';
-      context.font = `800 ${scaleFontSize(38)}px ${FONT_STACK}`;
-      context.fillText('BESTIE', modal.x + (modal.width / 2), modal.y + 160);
+      drawFinalStampFallback(context, t('gamesReplayTriviaStampBestie'), modal.x + 62, modal.y + 118, '#00df32');
     }
   } else {
-    drawWinnerLine(context, getOpponentShortLabel(state), 'won this match!', '#00d329', modal.x + (modal.width / 2), modal.y + 42);
-    if (state.assets.blocked) {
+    drawWinnerLine(context, getOpponentShortLabel(state), t('gamesReplayTriviaWonMatch'), '#00d329', modal.x + (modal.width / 2), modal.y + 42);
+    if (state.assets.blocked && shouldUseEnglishReplayTriviaArt()) {
       drawStampImage(context, state.assets.blocked, modal.x + 18, modal.y + 70, 288, 190, stampProgress, 1);
     } else {
-      context.strokeStyle = '#ff1616';
-      context.lineWidth = 7;
-      context.strokeRect(modal.x + 62, modal.y + 118, 176, 82);
-      context.fillStyle = '#ff1616';
-      context.font = `800 ${scaleFontSize(38)}px ${FONT_STACK}`;
-      context.fillText('BLOCKED', modal.x + (modal.width / 2), modal.y + 160);
+      drawFinalStampFallback(context, t('gamesReplayTriviaStampBlocked'), modal.x + 62, modal.y + 118, '#ff1616');
     }
   }
 
@@ -1152,6 +1153,32 @@ function getFinalCloseButtonRect(modal: Rect): Rect {
   };
 }
 
+function shouldUseEnglishReplayTriviaArt(): boolean {
+  return getUiLocale().toLowerCase().startsWith('en');
+}
+
+function drawFinalStampFallback(
+  context: CanvasRenderingContext2D,
+  label: string,
+  x: number,
+  y: number,
+  color: string
+): void {
+  const width = 176;
+  const height = 82;
+  context.strokeStyle = color;
+  context.lineWidth = 7;
+  context.strokeRect(x, y, width, height);
+  context.fillStyle = color;
+  context.textAlign = 'center';
+  context.textBaseline = 'middle';
+  const fontSize = fitFontSize(context, label, width - 24, scaleFontSize(38), scaleFontSize(18), 2, 800);
+  context.font = `800 ${fontSize}px ${FONT_STACK}`;
+  const lineHeight = fontSize + 3;
+  const lines = wrapText(context, label, width - 24, 2);
+  drawWrappedLines(context, lines, x + (width / 2), y + (height / 2) - (((lines.length - 1) * lineHeight) / 2), lineHeight);
+}
+
 function drawCloseGameButton(
   context: CanvasRenderingContext2D,
   rect: Rect,
@@ -1169,7 +1196,7 @@ function drawCloseGameButton(
   context.font = `400 ${scaleFontSize(17)}px ${FONT_STACK}`;
   context.textAlign = 'center';
   context.textBaseline = 'middle';
-  context.fillText('Close game', rect.x + (rect.width / 2), rect.y + (rect.height / 2) + 1);
+  context.fillText(t('gamesReplayTriviaCloseGame'), rect.x + (rect.width / 2), rect.y + (rect.height / 2) + 1);
 }
 
 function drawStampImage(
@@ -1306,9 +1333,9 @@ function drawWinnerLine(
   x: number,
   y: number
 ): void {
-  const chipWidth = player === 'You' ? 58 : 84;
   const gap = 8;
   context.font = `400 ${scaleFontSize(19)}px ${FONT_STACK}`;
+  const chipWidth = Math.min(112, Math.max(58, context.measureText(player).width + 26));
   context.textAlign = 'center';
   context.textBaseline = 'middle';
   const suffixWidth = context.measureText(suffix).width;
@@ -1353,28 +1380,18 @@ function drawPickAnswerPrompt(context: CanvasRenderingContext2D, centerX: number
   context.textAlign = 'left';
   context.textBaseline = 'alphabetic';
   context.font = `800 ${scaleFontSize(24)}px ${FONT_STACK}`;
-  const prefix = 'Pick your ';
-  const answer = 'answer';
-  const suffix = '!';
-  const prefixWidth = context.measureText(prefix).width;
-  const answerWidth = context.measureText(answer).width;
-  const suffixWidth = context.measureText(suffix).width;
-  const totalWidth = prefixWidth + answerWidth + suffixWidth;
-  const startX = -(totalWidth / 2);
-  const answerX = startX + prefixWidth;
+  const prompt = t('gamesReplayTriviaPickAnswer');
+  const promptWidth = context.measureText(prompt).width;
+  const startX = -(promptWidth / 2);
 
   context.fillStyle = '#111111';
-  context.fillText(prefix, startX, 0);
-  context.fillStyle = REPLAY_TRIVIA_ACCENT_BLUE;
-  context.fillText(answer, answerX, 0);
-  context.fillStyle = '#111111';
-  context.fillText(suffix, answerX + answerWidth, 0);
+  context.fillText(prompt, startX, 0);
 
   context.strokeStyle = REPLAY_TRIVIA_ACCENT_BLUE;
   context.lineWidth = 3;
   context.beginPath();
-  context.moveTo(answerX, 7);
-  context.lineTo(answerX + answerWidth, 7);
+  context.moveTo(startX, 7);
+  context.lineTo(startX + promptWidth, 7);
   context.stroke();
   context.restore();
 }

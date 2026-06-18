@@ -27,23 +27,37 @@ export interface ReplayTriviaQuestionsRequest {
   questionCount?: number;
   segments: ReplayTriviaTranscriptSegment[];
   startSeconds: number;
+  targetLanguages?: ReplayTriviaTargetLanguage[];
   videoId: string;
 }
 
 export type ReplayTriviaDifficulty = 'easy' | 'medium';
 
-export interface ReplayTriviaQuestion {
+export interface ReplayTriviaTargetLanguage {
+  languageCode: string;
+  locale?: string;
+}
+
+export interface ReplayTriviaQuestionText {
   choices: [string, string, string, string];
+  friendIntro: string;
+  prompt: string;
+  rightReply: string;
+  wrongReply: string;
+}
+
+export interface ReplayTriviaQuestionLocalization extends ReplayTriviaQuestionText {
+  languageCode: string;
+}
+
+export interface ReplayTriviaQuestion extends ReplayTriviaQuestionText {
   correctChoiceIndex: 0 | 1 | 2 | 3;
   difficulty: ReplayTriviaDifficulty;
   explanation: string;
-  friendIntro: string;
   id: string;
-  prompt: string;
-  rightReply: string;
+  localizations?: ReplayTriviaQuestionLocalization[];
   sourceEndSeconds: number;
   sourceStartSeconds: number;
-  wrongReply: string;
 }
 
 export interface ReplayTriviaQuestionsResponse {

@@ -19,6 +19,8 @@ import {
   openReplayTriviaGamePanel as mountReplayTriviaGamePanel,
   updateReplayTriviaGamePanel
 } from './panel';
+import esCatalog from '../../../../shared/locales/es.json';
+import { initUiLocaleFromDocument } from '../../../../shared/i18n';
 import { createGamePanelShell } from '../panel-shell';
 import {
   ANSWER_TIME_MS,
@@ -105,10 +107,12 @@ describe('Replay Trivia panel', () => {
     vi.spyOn(window, 'cancelAnimationFrame').mockImplementation(() => undefined);
   });
 
-  afterEach(() => {
+  afterEach(async () => {
     closeReplayTriviaGamePanel({ notify: false });
     shellControllers.forEach((controller) => controller.abort());
     shellCleanups.forEach((cleanup) => cleanup());
+    document.documentElement.lang = 'en';
+    await initUiLocaleFromDocument();
     vi.restoreAllMocks();
     vi.unstubAllGlobals();
   });
@@ -939,6 +943,36 @@ describe('Replay Trivia panel', () => {
     expect(context.fillRect).toHaveBeenCalled();
   });
 
+  it('uses localized final stamp text instead of English stamp art outside English', async () => {
+    document.documentElement.lang = 'es';
+    vi.stubGlobal('fetch', vi.fn(async (input: RequestInfo | URL) => ({
+      json: vi.fn(async () => String(input).endsWith('/es.json') ? esCatalog : {}),
+      ok: String(input).endsWith('/es.json')
+    }) as unknown as Response));
+    await initUiLocaleFromDocument();
+
+    const assets = createLoadedReplayTriviaAssets();
+    getReplayTriviaAssetsMock.mockResolvedValue(assets);
+    const finishedGame = createReplayTriviaGame({
+      scores: {
+        guest: 0,
+        host: 3
+      },
+      status: 'finished'
+    });
+
+    openReplayTriviaGamePanel(finishedGame, 'host-user', vi.fn());
+    await flushPromises();
+    context.drawImage.mockClear();
+    context.fillText.mockClear();
+
+    setNow(STAMP_ANIMATION_MS + 600);
+    updateReplayTriviaGamePanel(finishedGame, 'host-user');
+
+    expect(context.drawImage).not.toHaveBeenCalledWith(assets.bestie, expect.any(Number), expect.any(Number), expect.any(Number), expect.any(Number));
+    expect(drawnText()).toContain('MEJOR AMIGO');
+  });
+
   it('renders finished results and closes from keyboard or canvas controls', () => {
     const onAction = vi.fn();
     openReplayTriviaGamePanel(createReplayTriviaGame({
@@ -949,7 +983,7 @@ describe('Replay Trivia panel', () => {
       status: 'finished'
     }), 'host-user', onAction);
 
-    expect(drawnText()).toContain('It\'s a tie!');
+    expect(drawnText()).toContain('It is a tie!');
     getCanvas().dispatchEvent(new KeyboardEvent('keydown', {
       bubbles: true,
       cancelable: true,

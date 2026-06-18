@@ -16,6 +16,7 @@ import {
   type PublicInvite,
   type ServerMessage
 } from '../../../shared/playground-protocol';
+import { getUiLocale } from '../../../shared/i18n';
 import { getCurrentYouTubeChatStreamKey } from '../../../youtube/source-url';
 import {
   getAvailableGameIds,
@@ -126,6 +127,8 @@ export function startPlaygroundClient(defaultAvailable = available): void {
 
   postPlaygroundMessage({
     availableGames: getAvailableGames(),
+    languageCode: getPlaygroundLanguageCode(),
+    locale: getUiLocale(),
     streamKey,
     type: 'ytcq:playground:init'
   });
@@ -286,6 +289,10 @@ function notifyListeners(): void {
 
 function getAvailableGames(): GameId[] {
   return available ? getAvailableGameIds() : [];
+}
+
+function getPlaygroundLanguageCode(): string {
+  return getUiLocale() || navigator.language || 'en';
 }
 
 function postPlaygroundMessage(message: PlaygroundContentMessage): void {
