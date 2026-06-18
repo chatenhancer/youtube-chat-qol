@@ -75,6 +75,7 @@ import type {
 const TROPHY_ICON_CROP: SourceRect = { drawOffsetY: 3, height: 48, width: 38, x: 28, y: 17 };
 const WRONG_ICON_CROP: SourceRect = { drawScale: 0.54, height: 31, width: 31, x: 23, y: 15 };
 const REPLAY_TRIVIA_SOUND_PATHS = [MESSAGE_SOUND_PATH, STAMP_SOUND_PATH] as const;
+const FRIEND_REPLY_MIN_HEIGHT = 45;
 
 interface FriendBubbleTextSegment {
   bold?: boolean;
@@ -889,7 +890,7 @@ function drawRevealedAnswers(
     playTimedMessageSound(state, 'reveal-reply', elapsed, REVEAL_FRIEND_REPLY_DELAY_MS);
   }
   if (replyProgress > 0) {
-    drawAnimatedFriendBubble(context, boldFriendReplyAnswer(reply, correctAnswer), 28, 300 + offsetY, 376, 76, 18, replyProgress, {
+    drawAnimatedFriendBubble(context, boldFriendReplyAnswer(reply, correctAnswer), 28, 300 + offsetY, 376, FRIEND_REPLY_MIN_HEIGHT, 18, replyProgress, {
       flipImage: true,
       image: state.assets.greyBubbleTail,
       kind: 'right-tail',
@@ -1470,14 +1471,15 @@ function boldFriendReplyAnswer(reply: string, correctAnswer: string): string | F
   let matchIndex = findFriendReplyAnswerMatch(lowerReply, lowerAnswer, cursor);
 
   while (matchIndex >= 0) {
+    const matchEnd = getFriendReplyAnswerMatchEnd(reply, matchIndex + answer.length);
     if (matchIndex > cursor) {
       segments.push({ text: reply.slice(cursor, matchIndex) });
     }
     segments.push({
       bold: true,
-      text: reply.slice(matchIndex, matchIndex + answer.length)
+      text: reply.slice(matchIndex, matchEnd)
     });
-    cursor = matchIndex + answer.length;
+    cursor = matchEnd;
     matchIndex = findFriendReplyAnswerMatch(lowerReply, lowerAnswer, cursor);
   }
 
@@ -1495,6 +1497,14 @@ function findFriendReplyAnswerMatch(reply: string, answer: string, startIndex: n
     index = reply.indexOf(answer, index + answer.length);
   }
   return -1;
+}
+
+function getFriendReplyAnswerMatchEnd(reply: string, end: number): number {
+  let nextEnd = end;
+  while (nextEnd < reply.length && /[.!?,;:]/.test(reply[nextEnd])) {
+    nextEnd += 1;
+  }
+  return nextEnd;
 }
 
 function isFriendReplyAnswerBoundary(text: string, index: number): boolean {

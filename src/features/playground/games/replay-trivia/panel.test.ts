@@ -436,7 +436,7 @@ describe('Replay Trivia panel', () => {
       expect.objectContaining({ font: expect.stringContaining('700'), text: 'The' }),
       expect.objectContaining({ font: expect.stringContaining('700'), text: 'Last' }),
       expect.objectContaining({ font: expect.stringContaining('700'), text: 'of' }),
-      expect.objectContaining({ font: expect.stringContaining('700'), text: 'Us' })
+      expect.objectContaining({ font: expect.stringContaining('700'), text: 'Us.' })
     ]));
     expect(fillTextCalls).toEqual(expect.arrayContaining([
       expect.objectContaining({ font: expect.stringContaining('400'), text: 'wow,' })
@@ -768,6 +768,59 @@ describe('Replay Trivia panel', () => {
     }), 'host-user', vi.fn());
 
     expect(drawnText()).toContain('Nobody got this one right');
+  });
+
+  it('keeps one-line friend reveal replies compact', async () => {
+    const assets = createLoadedReplayTriviaAssets();
+    getReplayTriviaAssetsMock.mockResolvedValue(assets);
+    const game = createReplayTriviaGame({
+      answers: {
+        guest: { answered: true, choiceIndex: 0, correct: true },
+        host: { answered: true, choiceIndex: 1, correct: false }
+      },
+      currentQuestion: {
+        ...createReplayTriviaQuestion(),
+        correctChoiceIndex: 0,
+        wrongReply: 'it was The Last of Us.'
+      },
+      status: 'reveal'
+    });
+
+    openReplayTriviaGamePanel(game, 'host-user', vi.fn());
+    await flushPromises();
+    context.drawImage.mockClear();
+
+    setNow(REVEAL_FRIEND_REPLY_DELAY_MS + 1_000);
+    updateReplayTriviaGamePanel(game, 'host-user');
+
+    const replyBubbleHeights = context.drawImage.mock.calls
+      .filter(([image]) => image === assets.greyBubbleTail)
+      .map((call) => call[8]);
+    expect(replyBubbleHeights).toContain(45);
+  });
+
+  it('keeps punctuation attached to bolded friend reply answers', () => {
+    const game = createReplayTriviaGame({
+      answers: {
+        guest: { answered: true, choiceIndex: 0, correct: true },
+        host: { answered: true, choiceIndex: 1, correct: false }
+      },
+      currentQuestion: {
+        ...createReplayTriviaQuestion(),
+        choices: ['Monster Hunter: World', 'Balatro', 'Astro Bot', 'Metaphor'] as [string, string, string, string],
+        correctChoiceIndex: 0,
+        wrongReply: 'nah, it was Monster Hunter: World. brutal miss'
+      },
+      status: 'reveal'
+    });
+
+    openReplayTriviaGamePanel(game, 'host-user', vi.fn());
+    setNow(REVEAL_FRIEND_REPLY_DELAY_MS + 1_000);
+    updateReplayTriviaGamePanel(game, 'host-user');
+
+    const textCalls = context.fillText.mock.calls.map(([text]) => String(text));
+    expect(textCalls).toContain('World.');
+    expect(textCalls).not.toContain('.');
   });
 
   it('renders completed score and final stamp animation states', async () => {
