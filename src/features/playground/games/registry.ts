@@ -5,15 +5,26 @@
  * adapter to `enabled-games.ts` when that game should be offered by the
  * extension.
  */
+import { createGamesIcon } from '../../../shared/icons';
 import { t } from '../../../shared/i18n';
-import type { GameId, PublicGame } from '../../../shared/playground-protocol';
+import type { GameId, PublicGame, ServerMessage } from '../../../shared/playground-protocol';
 import type { PlaygroundClientState } from './client';
-import { ENABLED_GAME_ADAPTERS } from './enabled-games';
-import type { GameDefinition, GamePanelAdapter, SendGameAction } from './adapter';
+import { ENABLED_GAMES } from './enabled-games';
+import type { AnyEnabledGame, AnyGamePanelAdapter, GameDefinition, GamePanelMount, SendGameAction } from './adapter';
+import { createGamePanelShell, type GamePanelShell } from './panel-shell';
 
-const GAME_ADAPTER_LIST: readonly GamePanelAdapter[] = ENABLED_GAME_ADAPTERS;
+const ENABLED_GAME_LIST: readonly AnyEnabledGame[] = ENABLED_GAMES;
+let activeGamePanel: ActiveGamePanel | null = null;
 
-export const GAMES: readonly GameDefinition[] = GAME_ADAPTER_LIST.map((adapter) => adapter.definition);
+interface ActiveGamePanel {
+  adapter: AnyGamePanelAdapter;
+  gameType: GameId;
+  mount: GamePanelMount;
+  shell: GamePanelShell;
+  shellController: AbortController;
+}
+
+export const GAMES: readonly GameDefinition[] = ENABLED_GAME_LIST.map((game) => game.definition);
 
 export type GamePickerCard = RealtimeGamePickerCard;
 
@@ -53,6 +64,18 @@ export function renderGamePreview(gameId: GameId, container: HTMLElement): void 
   GAMES.find((game) => game.id === gameId)?.renderPreview(container);
 }
 
+export function notifyGameClientReset(): void {
+  ENABLED_GAME_LIST.forEach((game) => game.onClientReset?.());
+}
+
+export function notifyGameEnded(gameId: string): void {
+  ENABLED_GAME_LIST.forEach((game) => game.onGameEnded?.(gameId));
+}
+
+export function handleGameServerMessage(message: ServerMessage): boolean {
+  return ENABLED_GAME_LIST.some((game) => game.handleServerMessage?.(message));
+}
+
 export function isSupportedGameId(gameId: GameId): boolean {
   return GAMES.some((game) => game.id === gameId);
 }
@@ -63,23 +86,28 @@ export function isPlayableGameId(gameId: GameId): boolean {
 }
 
 export function getActiveGamePanelId(): string {
-  return getActiveGameAdapter()?.getActiveGameId() || '';
+  return getConnectedActiveGamePanel()?.mount.gameId || '';
 }
 
 export function closeActiveGamePanel(options?: { notify?: boolean }): void {
-  GAME_ADAPTER_LIST.forEach((adapter) => adapter.closePanel(options));
+  const panel = activeGamePanel;
+  if (!panel) return;
+
+  activeGamePanel = null;
+  disposeGamePanel(panel, options);
 }
 
 export function isActiveGamePanelOpen(): boolean {
-  return GAME_ADAPTER_LIST.some((adapter) => adapter.isPanelOpen());
+  return Boolean(getConnectedActiveGamePanel());
 }
 
 export function isSupportedPublicGame(game: PublicGame): boolean {
-  return Boolean(getGameAdapter(game));
+  return Boolean(getEnabledGame(game));
 }
 
 export function getGameOpponentLabel(game: PublicGame, currentUserId: string): string {
-  return getGameAdapter(game)?.getOpponentLabel(game, currentUserId) || 'Player';
+  return getEnabledGame(game)?.getOpponentLabel?.(game, currentUserId) ||
+    getGenericGameOpponentLabel(game, currentUserId);
 }
 
 export function openSupportedGamePanel(
@@ -88,23 +116,57 @@ export function openSupportedGamePanel(
   sendGameAction: SendGameAction,
   onPanelChange: () => void
 ): void {
-  const adapter = getGameAdapter(game);
-  if (!adapter) return;
+  const enabledGame = getEnabledGame(game);
+  if (!enabledGame) return;
 
   closeActiveGamePanel({ notify: false });
-  adapter.openPanel(game, currentUserId, sendGameAction, onPanelChange);
+  const { adapter, definition } = enabledGame;
+  const shellController = new AbortController();
+  const title = getGameLabel(definition.id);
+  const shell = createGamePanelShell({
+    ariaLabel: title,
+    classNamePrefix: definition.classNamePrefix,
+    closeLabel: t('gamesMinimize'),
+    icon: createGamesIcon(),
+    onClose: () => closeActiveGamePanel(),
+    signal: shellController.signal,
+    subtitle: getGameOpponentLabel(game, currentUserId),
+    title
+  });
+  let mount: GamePanelMount;
+  try {
+    mount = adapter.mountPanel(game, {
+      closePanel: closeActiveGamePanel,
+      currentUserId,
+      onPanelChange: () => {
+        closeDisconnectedActiveGamePanel();
+        onPanelChange();
+      },
+      sendGameAction,
+      shell
+    });
+  } catch (error) {
+    releaseGamePanelShell({ shell, shellController });
+    throw error;
+  }
+  activeGamePanel = {
+    adapter,
+    gameType: game.gameType,
+    mount,
+    shell,
+    shellController
+  };
 }
 
 export function updateOpenGamePanel(nextState: PlaygroundClientState): void {
-  const adapter = getActiveGameAdapter();
-  if (!adapter) return;
+  const panel = getConnectedActiveGamePanel();
+  if (!panel) return;
 
-  const activeGameId = adapter.getActiveGameId();
-  if (!activeGameId) return;
-
-  const overlay = adapter.getPanelOverlay();
+  const { adapter, gameType, mount, shell } = panel;
+  const activeGameId = mount.gameId;
+  const { statusOverlay: overlay } = shell;
   if (nextState.status === 'connecting') {
-    overlay?.show({
+    overlay.show({
       key: `connection:reconnecting:${activeGameId}`,
       message: t('gamesConnectionLost'),
       owner: 'system',
@@ -114,7 +176,7 @@ export function updateOpenGamePanel(nextState: PlaygroundClientState): void {
   }
 
   if (nextState.status === 'disconnected') {
-    overlay?.show({
+    overlay.show({
       key: `connection:failed:${activeGameId}`,
       message: t('gamesReconnectFailed'),
       owner: 'system',
@@ -123,13 +185,16 @@ export function updateOpenGamePanel(nextState: PlaygroundClientState): void {
     return;
   }
 
+  const currentUserId = nextState.userId;
+  if (!currentUserId) return;
+
   if (nextState.endedGame?.gameId === activeGameId) {
-    if (nextState.endedGame.userId === nextState.userId) {
-      adapter.closePanel({ notify: false });
+    if (nextState.endedGame.userId === currentUserId) {
+      closeActiveGamePanel({ notify: false });
       return;
     }
 
-    overlay?.show({
+    overlay.show({
       key: `game-ended:opponent-left:${activeGameId}`,
       message: t('gamesOpponentLeft'),
       owner: 'system',
@@ -139,10 +204,10 @@ export function updateOpenGamePanel(nextState: PlaygroundClientState): void {
   }
 
   const game = nextState.games.find((candidate) => candidate.gameId === activeGameId);
-  if (!game || !adapter.isGame(game)) {
-    if (overlay?.has({ keyPrefix: 'game-ended:', owner: 'system' })) return;
+  if (!game || game.gameType !== gameType) {
+    if (overlay.has({ keyPrefix: 'game-ended:', owner: 'system' })) return;
 
-    overlay?.show({
+    overlay.show({
       key: `game-unavailable:${activeGameId}`,
       message: t('gamesGameCouldNotRestore'),
       owner: 'system',
@@ -151,16 +216,48 @@ export function updateOpenGamePanel(nextState: PlaygroundClientState): void {
     return;
   }
 
-  overlay?.clear({ owner: 'system' });
-  adapter.updatePanel(nextState);
+  overlay.clear({ owner: 'system' });
+  adapter.updatePanel(game, {
+    clientState: nextState,
+    currentUserId,
+  });
 }
 
-function getGameAdapter(game: PublicGame | undefined): GamePanelAdapter | null {
-  return GAME_ADAPTER_LIST.find((adapter) => adapter.isGame(game)) || null;
+function getEnabledGame(game: PublicGame | undefined): AnyEnabledGame | null {
+  return ENABLED_GAME_LIST.find(({ definition }) => definition.id === game?.gameType) || null;
 }
 
-function getActiveGameAdapter(): GamePanelAdapter | null {
-  return GAME_ADAPTER_LIST.find((adapter) => adapter.getActiveGameId()) || null;
+function getGenericGameOpponentLabel(game: PublicGame, currentUserId: string): string {
+  const opponent = Object.values(game.players || {})
+    .find((player) => player?.userId && player.userId !== currentUserId);
+  return opponent?.displayName || 'Player';
+}
+
+function getConnectedActiveGamePanel(): ActiveGamePanel | null {
+  closeDisconnectedActiveGamePanel();
+  return activeGamePanel;
+}
+
+function closeDisconnectedActiveGamePanel(): void {
+  const panel = activeGamePanel;
+  if (!panel || panel.shell.panel.isConnected) return;
+
+  activeGamePanel = null;
+  disposeGamePanel(panel, { notify: false });
+}
+
+function disposeGamePanel(panel: ActiveGamePanel, options?: { notify?: boolean }): void {
+  releaseGamePanelShell(panel);
+  panel.mount.close(options);
+}
+
+function releaseGamePanelShell({
+  shell,
+  shellController
+}: Pick<ActiveGamePanel, 'shell' | 'shellController'>): void {
+  shell.statusOverlay.clear();
+  shellController.abort();
+  shell.panel.remove();
 }
 
 function isGameDefinitionPlayable(game: GameDefinition): boolean {

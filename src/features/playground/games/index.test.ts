@@ -24,6 +24,7 @@ import {
   createGamesCard,
   installGamesCardListeners
 } from './card';
+import { isChessGamePanelOpen } from './chess/panel';
 
 describe('playground games header button', () => {
   beforeEach(() => {
@@ -623,6 +624,34 @@ describe('playground games header button', () => {
 
     expect(status?.hidden).toBe(true);
     expect(status?.textContent).toBe('');
+  });
+
+  it('cleans up game runtime when the shared panel shell is removed externally', () => {
+    const header = createHeader();
+    document.body.append(header);
+    setOptions({ ...DEFAULT_OPTIONS, playgroundEnabled: true, playgroundGamesAvailable: true });
+
+    wireGamesButton();
+    header.querySelector<HTMLButtonElement>('.ytcq-games-button')!.click();
+    lastMockPort()?.emit(createSnapshotMessage(createLobbySnapshot()));
+    getActionButton('Accept').click();
+    lastMockPort()?.emit({
+      message: {
+        game: createChessGame(),
+        type: 'gameStarted'
+      },
+      type: 'ytcq:playground:server-message'
+    });
+
+    expect(isChessGamePanelOpen()).toBe(true);
+
+    document.querySelector('.ytcq-chess-game-panel')?.remove();
+    lastMockPort()?.emit(createSnapshotMessage({
+      ...createLobbySnapshot(),
+      games: [createChessGame()]
+    }));
+
+    expect(isChessGamePanelOpen()).toBe(false);
   });
 
   it('shows when an active chess game cannot be restored after reconnecting', () => {

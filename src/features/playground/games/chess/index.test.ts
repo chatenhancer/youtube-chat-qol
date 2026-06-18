@@ -2,14 +2,13 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   closeChessGamePanel,
   getActiveChessGameId,
-  getChessGamePanelOverlay,
   isChessGamePanelOpen,
-  isPublicChessGame,
-  openChessGamePanel,
-  updateChessGamePanel,
-  type PublicChessGame
+  openChessGamePanel as mountChessGamePanel,
+  updateChessGamePanel
 } from './panel';
+import { createGamePanelShell } from '../panel-shell';
 import { PLAYGROUND_GAME_SOUNDS_STORAGE_KEY } from '../sound';
+import type { PublicChessGame } from './types';
 
 interface AudioMock {
   play: ReturnType<typeof vi.fn>;
@@ -17,10 +16,14 @@ interface AudioMock {
 }
 
 let audioMocks: AudioMock[] = [];
+let shellControllers: AbortController[] = [];
+let shellCleanups: Array<() => void> = [];
 
 describe('playground chess panel feedback', () => {
   beforeEach(async () => {
     document.body.replaceChildren();
+    shellControllers = [];
+    shellCleanups = [];
     await chrome.storage.local.clear();
     vi.mocked(chrome.storage.local.set).mockClear();
     vi.useFakeTimers();
@@ -48,6 +51,8 @@ describe('playground chess panel feedback', () => {
 
   afterEach(() => {
     closeChessGamePanel({ notify: false });
+    shellControllers.forEach((controller) => controller.abort());
+    shellCleanups.forEach((cleanup) => cleanup());
     vi.useRealTimers();
     vi.unstubAllGlobals();
   });
@@ -66,13 +71,10 @@ describe('playground chess panel feedback', () => {
     expect(getFeedbackMessages()).toEqual([]);
   });
 
-  it('tracks panel state, active game id, and public game shape', () => {
+  it('tracks panel state and active game id', () => {
     expect(isChessGamePanelOpen()).toBe(false);
     expect(getActiveChessGameId()).toBe('');
-    expect(getChessGamePanelOverlay()).toBeNull();
-    expect(isPublicChessGame(undefined)).toBe(false);
-    expect(isPublicChessGame({ gameId: 'game-1', gameType: 'replay-trivia' } as never)).toBe(false);
-    expect(isPublicChessGame(createChessGame({ turn: 'white' }))).toBe(true);
+    expect(document.querySelector('.ytcq-chess-game-status')).toBeNull();
 
     const visibilityChanged = vi.fn();
     openChessGamePanel(createChessGame({ turn: 'white' }), 'me-user', vi.fn(), visibilityChanged);
@@ -377,13 +379,13 @@ describe('playground chess panel feedback', () => {
   });
 
   it('updates hover highlights unless a blocking status overlay is active', () => {
-    openChessGamePanel(createChessGame({ turn: 'white' }), 'me-user', vi.fn());
+    const overlay = openChessGamePanel(createChessGame({ turn: 'white' }), 'me-user', vi.fn());
     const canvas = prepareChessCanvas();
 
     moveDisplayedSquare(canvas, { x: 4, y: 6 });
     expect(canvas.style.cursor).toBe('');
 
-    getChessGamePanelOverlay()?.show({
+    overlay.show({
       key: 'connection:reconnecting',
       message: 'Connection lost.',
       owner: 'system',
@@ -399,7 +401,7 @@ describe('playground chess panel feedback', () => {
     const context = createMockChessCanvasContext();
     const getContext = vi.spyOn(HTMLCanvasElement.prototype, 'getContext')
       .mockReturnValue(context as unknown as CanvasRenderingContext2D);
-    openChessGamePanel(createChessGame({ turn: 'white' }), 'me-user', vi.fn());
+    const overlay = openChessGamePanel(createChessGame({ turn: 'white' }), 'me-user', vi.fn());
     const canvas = prepareChessCanvas();
 
     context.fillRect.mockClear();
@@ -417,7 +419,7 @@ describe('playground chess panel feedback', () => {
     expect(context.fillRect).toHaveBeenCalled();
 
     context.fillRect.mockClear();
-    getChessGamePanelOverlay()?.show({
+    overlay.show({
       key: 'connection:reconnecting',
       message: 'Connection lost.',
       owner: 'system',
@@ -431,9 +433,9 @@ describe('playground chess panel feedback', () => {
 
   it('blocks moves while a persistent status overlay is active', () => {
     const onMove = vi.fn();
-    openChessGamePanel(createChessGame({ turn: 'white' }), 'me-user', onMove);
+    const overlay = openChessGamePanel(createChessGame({ turn: 'white' }), 'me-user', onMove);
     const canvas = prepareChessCanvas();
-    getChessGamePanelOverlay()?.show({
+    overlay.show({
       key: 'connection:reconnecting',
       message: 'Connection lost.',
       owner: 'system',
@@ -626,6 +628,50 @@ describe('playground chess panel feedback', () => {
     expect(getStatusElement()?.hidden).toBe(false);
   });
 });
+
+function openChessGamePanel(
+  game: PublicChessGame,
+  currentUserId: string,
+  onMove: (gameId: string, from: string, to: string, promotion?: string) => void,
+  onVisibilityChanged?: () => void
+) {
+  const controller = new AbortController();
+  shellControllers.push(controller);
+  let shell: ReturnType<typeof createGamePanelShell>;
+  const closePanel = (options?: { notify?: boolean }) => {
+    closeChessGamePanel(options);
+    controller.abort();
+    shell.panel.remove();
+  };
+  shell = createGamePanelShell({
+    ariaLabel: 'Chess',
+    classNamePrefix: 'ytcq-chess-game',
+    closeLabel: 'Minimize',
+    icon: document.createElement('span'),
+    onClose: () => closePanel(),
+    signal: controller.signal,
+    subtitle: getChessOpponentLabelForTest(game, currentUserId),
+    title: 'Chess'
+  });
+  shellCleanups.push(() => {
+    controller.abort();
+    shell.panel.remove();
+  });
+  mountChessGamePanel(shell, game, currentUserId, onMove, onVisibilityChanged);
+  return shell.statusOverlay;
+}
+
+function getChessOpponentLabelForTest(game: PublicChessGame, currentUserId: string): string {
+  const currentUserColor = game.players.white.userId === currentUserId
+    ? 'white'
+    : game.players.black.userId === currentUserId
+      ? 'black'
+      : null;
+  const opponent = currentUserColor === 'white'
+    ? game.players.black
+    : game.players.white;
+  return opponent.displayName || 'Player';
+}
 
 function createChessGame({
   fen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',

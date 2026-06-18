@@ -1,15 +1,10 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import type { PublicGame } from '../../../../shared/playground-protocol';
+import type { GamePanelMountContext, GamePanelUpdateContext } from '../adapter';
 import type { PlaygroundClientState } from '../client';
+import type { PublicReplayTriviaGame } from './types';
 
 const panelMock = vi.hoisted(() => ({
   closeReplayTriviaGamePanel: vi.fn(),
-  getActiveReplayTriviaGameId: vi.fn(() => ''),
-  getReplayTriviaGamePanelOverlay: vi.fn(() => null),
-  isPublicReplayTriviaGame: vi.fn((game: unknown) =>
-    Boolean(game && typeof game === 'object' && (game as { gameType?: unknown }).gameType === 'replay-trivia')
-  ),
-  isReplayTriviaGamePanelOpen: vi.fn(() => false),
   openReplayTriviaGamePanel: vi.fn(),
   updateReplayTriviaGamePanel: vi.fn()
 }));
@@ -17,60 +12,54 @@ const panelMock = vi.hoisted(() => ({
 vi.mock('./panel', () => panelMock);
 
 import { replayTriviaGameAdapter } from './adapter';
+import { handleReplayTriviaServerMessage, resetReplayTriviaClientData } from './client-data';
 
 describe('Replay Trivia game adapter', () => {
   afterEach(() => {
+    resetReplayTriviaClientData();
     vi.clearAllMocks();
-    panelMock.getActiveReplayTriviaGameId.mockReturnValue('');
-    panelMock.isPublicReplayTriviaGame.mockImplementation((game: unknown) =>
-      Boolean(game && typeof game === 'object' && (game as { gameType?: unknown }).gameType === 'replay-trivia')
-    );
   });
 
-  it('returns opponent labels with defensive fallbacks', () => {
-    expect(replayTriviaGameAdapter.getOpponentLabel({ gameType: 'chess' } as PublicGame, 'host-user')).toBe('Player');
-    expect(replayTriviaGameAdapter.getOpponentLabel(createReplayTriviaGame(), 'host-user')).toBe('Guest Player');
-    expect(replayTriviaGameAdapter.getOpponentLabel(createReplayTriviaGame(), 'guest-user')).toBe('Host Player');
-    expect(replayTriviaGameAdapter.getOpponentLabel(createReplayTriviaGame({
-      players: {
-        guest: { displayName: '', userId: 'guest-user' },
-        host: { displayName: '', userId: 'host-user' }
-      }
-    }), 'host-user')).toBe('Player');
-  });
-
-  it('opens only valid Replay Trivia panels', () => {
+  it('opens Replay Trivia panels and returns a handle', () => {
     const sendGameAction = vi.fn();
     const onPanelChange = vi.fn();
 
-    replayTriviaGameAdapter.openPanel({ gameType: 'chess' } as PublicGame, 'host-user', sendGameAction, onPanelChange);
-    expect(panelMock.openReplayTriviaGamePanel).not.toHaveBeenCalled();
-
     const game = createReplayTriviaGame();
-    replayTriviaGameAdapter.openPanel(game, 'host-user', sendGameAction, onPanelChange);
+    const context = createMountContext({
+      onPanelChange,
+      sendGameAction
+    });
+    const handle = replayTriviaGameAdapter.mountPanel(game, context);
 
     expect(panelMock.openReplayTriviaGamePanel).toHaveBeenCalledWith(
+      context.shell,
       game,
       'host-user',
       sendGameAction,
-      onPanelChange
+      onPanelChange,
+      context.closePanel
     );
+    expect(handle.gameId).toBe('game-1');
+    handle.close();
+    expect(panelMock.closeReplayTriviaGamePanel).toHaveBeenCalledOnce();
   });
 
   it('updates the active Replay Trivia panel from client state', () => {
     const game = createReplayTriviaGame();
-    panelMock.getActiveReplayTriviaGameId.mockReturnValue('game-1');
-
-    replayTriviaGameAdapter.updatePanel(createClientState({
+    const clientState = createClientState({
       games: [game],
-      replayTriviaGenerationTokens: {
-        'game-1': {
-          expiresAt: 123,
-          gameId: 'game-1',
-          generationToken: 'rtg_1234567890abcdef'
-        }
-      },
       userId: 'host-user'
+    });
+    handleReplayTriviaServerMessage({
+      expiresAt: 123,
+      gameId: 'game-1',
+      generationToken: 'rtg_1234567890abcdef',
+      type: 'replayTriviaGenerationToken'
+    });
+
+    replayTriviaGameAdapter.updatePanel(game, createUpdateContext({
+      clientState,
+      currentUserId: 'host-user'
     }));
 
     expect(panelMock.updateReplayTriviaGamePanel).toHaveBeenCalledWith(
@@ -85,27 +74,44 @@ describe('Replay Trivia game adapter', () => {
     );
   });
 
-  it('ignores inactive, anonymous, missing, or invalid panel update states', () => {
-    replayTriviaGameAdapter.updatePanel(createClientState({ userId: 'host-user' }));
-    panelMock.getActiveReplayTriviaGameId.mockReturnValue('game-1');
-    replayTriviaGameAdapter.updatePanel(createClientState({ userId: '' }));
-    replayTriviaGameAdapter.updatePanel(createClientState({
-      games: [],
+  it('passes preparation errors from the update state', () => {
+    const game = createReplayTriviaGame();
+    const clientState = createClientState({
+      error: 'Replay Trivia questions must include friendIntro.',
       userId: 'host-user'
-    }));
-    replayTriviaGameAdapter.updatePanel(createClientState({
-      games: [{ gameId: 'game-1', gameType: 'chess', status: 'active' } as PublicGame],
-      userId: 'host-user'
+    });
+    handleReplayTriviaServerMessage({
+      expiresAt: 123,
+      gameId: 'game-1',
+      generationToken: 'rtg_1234567890abcdef',
+      type: 'replayTriviaGenerationToken'
+    });
+
+    replayTriviaGameAdapter.updatePanel(game, createUpdateContext({
+      clientState,
+      currentUserId: 'host-user'
     }));
 
-    expect(panelMock.updateReplayTriviaGamePanel).not.toHaveBeenCalled();
+    expect(panelMock.updateReplayTriviaGamePanel).toHaveBeenCalledWith(
+      game,
+      'host-user',
+      {
+        expiresAt: 123,
+        gameId: 'game-1',
+        generationToken: 'rtg_1234567890abcdef'
+      },
+      'Replay Trivia questions must include friendIntro.'
+    );
   });
 });
 
-function createReplayTriviaGame(overrides: Partial<PublicGame> = {}): PublicGame {
+function createReplayTriviaGame(overrides: Partial<PublicReplayTriviaGame> = {}): PublicReplayTriviaGame {
   return {
+    answers: {},
+    currentQuestionIndex: 0,
     gameId: 'game-1',
     gameType: 'replay-trivia',
+    phaseStartedAt: 0,
     players: {
       guest: {
         displayName: 'Guest Player',
@@ -116,9 +122,34 @@ function createReplayTriviaGame(overrides: Partial<PublicGame> = {}): PublicGame
         userId: 'host-user'
       }
     },
+    questionProviderUserId: 'host-user',
+    scores: {
+      guest: 0,
+      host: 0
+    },
     status: 'question',
+    totalQuestions: 1,
     ...overrides
-  } as PublicGame;
+  };
+}
+
+function createMountContext(overrides: Partial<GamePanelMountContext> = {}): GamePanelMountContext {
+  return {
+    closePanel: vi.fn(),
+    currentUserId: 'host-user',
+    onPanelChange: vi.fn(),
+    sendGameAction: vi.fn(),
+    shell: {} as GamePanelMountContext['shell'],
+    ...overrides
+  };
+}
+
+function createUpdateContext(overrides: Partial<GamePanelUpdateContext> = {}): GamePanelUpdateContext {
+  return {
+    clientState: createClientState({ userId: 'host-user' }),
+    currentUserId: 'host-user',
+    ...overrides
+  };
 }
 
 function createClientState(overrides: Partial<PlaygroundClientState> = {}): PlaygroundClientState {
@@ -128,7 +159,6 @@ function createClientState(overrides: Partial<PlaygroundClientState> = {}): Play
     error: '',
     games: [],
     invites: [],
-    replayTriviaGenerationTokens: {},
     status: 'connected',
     userId: '',
     users: [],

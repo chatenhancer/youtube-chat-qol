@@ -2,17 +2,17 @@
  * Shared floating game panel shell.
  *
  * Owns the common draggable dialog frame used by individual games. Game modules
- * provide the body content and game-specific header actions, while this shell
- * handles the close button, Escape close behavior, and drag positioning.
+ * provide the body content while this shell handles the close button, Escape
+ * close behavior, shared status overlay, and drag positioning.
  */
 import { createCloseIcon } from '../../../shared/icons';
 import { ytcqCreateElement } from '../../../shared/managed-dom';
+import { createGamePanelStatusOverlay, type GamePanelStatusOverlay } from './panel-feedback';
 
 interface GamePanelShellOptions {
   ariaLabel: string;
   classNamePrefix: string;
   closeLabel: string;
-  headerActions?: Node[];
   icon: Node;
   onClose: () => void;
   signal: AbortSignal;
@@ -25,6 +25,7 @@ export interface GamePanelShell {
   closeButton: HTMLButtonElement;
   header: HTMLElement;
   panel: HTMLElement;
+  statusOverlay: GamePanelStatusOverlay;
   subtitleElement: HTMLElement;
   titleElement: HTMLElement;
 }
@@ -33,7 +34,6 @@ export function createGamePanelShell({
   ariaLabel,
   classNamePrefix,
   closeLabel,
-  headerActions = [],
   icon,
   onClose,
   signal,
@@ -72,10 +72,12 @@ export function createGamePanelShell({
   closeButton.addEventListener('click', onClose, { signal });
 
   titleWrap.append(titleElement, subtitleElement);
-  header.append(iconWrap, titleWrap, ...headerActions, closeButton);
+  header.append(iconWrap, titleWrap, closeButton);
 
   const body = ytcqCreateElement('div');
   body.className = `${classNamePrefix}-body`;
+  const statusOverlay = createGamePanelStatusOverlay({ classNamePrefix });
+  body.append(statusOverlay.element);
 
   panel.append(header, body);
   document.body.append(panel);
@@ -93,6 +95,7 @@ export function createGamePanelShell({
     closeButton,
     header,
     panel,
+    statusOverlay,
     subtitleElement,
     titleElement
   };

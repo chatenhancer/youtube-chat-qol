@@ -1996,6 +1996,7 @@ yt-live-chat-header-renderer .ytcq-inbox-badge[hidden] {
 .ytcq-game-status,
 .ytcq-chess-game-status {
   position: absolute;
+  z-index: 1;
   top: 0;
   right: 10px;
   bottom: 10px;

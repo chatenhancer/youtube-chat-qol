@@ -17,6 +17,7 @@ import {
   stopPlaygroundClient,
   subscribePlaygroundClient
 } from './client';
+import { getReplayTriviaGenerationToken } from './replay-trivia/client-data';
 
 describe('Playground games client', () => {
   beforeEach(() => {
@@ -255,7 +256,7 @@ describe('Playground games client', () => {
       },
       type: 'ytcq:playground:server-message'
     });
-    expect(getPlaygroundClientState().replayTriviaGenerationTokens['game-1']).toEqual({
+    expect(getReplayTriviaGenerationToken('game-1')).toEqual({
       expiresAt: 123_000,
       gameId: 'game-1',
       generationToken: 'rtg_1234567890abcdef'
@@ -276,9 +277,9 @@ describe('Playground games client', () => {
         reason: 'playerLeft',
         userId: 'luna-user'
       },
-      games: [],
-      replayTriviaGenerationTokens: {}
+      games: []
     });
+    expect(getReplayTriviaGenerationToken('game-1')).toBeUndefined();
 
     port.emit({
       message: {
@@ -298,7 +299,7 @@ describe('Playground games client', () => {
     unsubscribe();
   });
 
-  it('resets token state on first snapshot and stream changes', () => {
+  it('resets game client data on first snapshot and stream changes', () => {
     startPlaygroundClient(true);
     const firstPort = lastMockPort()!;
     firstPort.emit({
@@ -311,14 +312,14 @@ describe('Playground games client', () => {
       type: 'ytcq:playground:server-message'
     });
 
-    expect(getPlaygroundClientState().replayTriviaGenerationTokens['game-1']).toBeDefined();
+    expect(getReplayTriviaGenerationToken('game-1')).toBeDefined();
 
     firstPort.emit(createSnapshotMessage({
       games: [],
       invites: [],
       users: []
     }));
-    expect(getPlaygroundClientState().replayTriviaGenerationTokens).toEqual({});
+    expect(getReplayTriviaGenerationToken('game-1')).toBeUndefined();
 
     firstPort.emit({
       message: {
@@ -337,7 +338,7 @@ describe('Playground games client', () => {
       streamKey: 'stream-b',
       type: 'ytcq:playground:init'
     });
-    expect(getPlaygroundClientState().replayTriviaGenerationTokens).toEqual({});
+    expect(getReplayTriviaGenerationToken('game-1')).toBeUndefined();
   });
 
   it('handles port disconnects and postMessage failures defensively', () => {

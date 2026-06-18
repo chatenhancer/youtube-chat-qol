@@ -16,9 +16,13 @@ import {
   type PublicInvite,
   type ServerMessage
 } from '../../../shared/playground-protocol';
-import type { ReplayTriviaGenerationToken } from '../../../shared/playground-trivia';
 import { getCurrentYouTubeChatStreamKey } from '../../../youtube/source-url';
-import { getAvailableGameIds } from './registry';
+import {
+  getAvailableGameIds,
+  handleGameServerMessage,
+  notifyGameClientReset,
+  notifyGameEnded
+} from './registry';
 
 export interface PlaygroundClientState {
   available: boolean;
@@ -26,7 +30,6 @@ export interface PlaygroundClientState {
   error: string;
   games: PublicGame[];
   invites: PublicInvite[];
-  replayTriviaGenerationTokens: Record<string, ReplayTriviaGenerationToken>;
   status: 'connected' | 'connecting' | 'disconnected';
   users: LobbySnapshot['users'];
   userId: string;
@@ -46,7 +49,6 @@ const DEFAULT_STATE: PlaygroundClientState = {
   error: '',
   games: [],
   invites: [],
-  replayTriviaGenerationTokens: {},
   status: 'disconnected',
   users: [],
   userId: ''
@@ -79,6 +81,7 @@ export function getPlaygroundAvailability(defaultAvailable = false): boolean {
 export function startPlaygroundClient(defaultAvailable = available): void {
   const streamKey = getCurrentYouTubeChatStreamKey();
   if (!streamKey) {
+    notifyGameClientReset();
     setState({
       ...DEFAULT_STATE,
       error: 'Stream unavailable.'
@@ -96,12 +99,12 @@ export function startPlaygroundClient(defaultAvailable = available): void {
   }
 
   const streamChanged = currentStreamKey !== streamKey;
+  if (streamChanged) notifyGameClientReset();
   currentStreamKey = streamKey;
   setState({
     ...state,
     available,
     error: '',
-    replayTriviaGenerationTokens: streamChanged ? {} : state.replayTriviaGenerationTokens,
     status: 'connecting'
   });
 
@@ -109,6 +112,7 @@ export function startPlaygroundClient(defaultAvailable = available): void {
     try {
       playgroundPort = chrome.runtime.connect({ name: PLAYGROUND_PORT_NAME });
     } catch (error) {
+      notifyGameClientReset();
       setState({
         ...DEFAULT_STATE,
         error: error instanceof Error ? error.message : 'Playground unavailable.'
@@ -133,6 +137,7 @@ export function stopPlaygroundClient(): void {
   available = false;
   availabilityStreamKey = '';
   currentStreamKey = '';
+  notifyGameClientReset();
   if (port) {
     port.onMessage.removeListener(handleBackgroundMessage);
     port.onDisconnect.removeListener(handlePortDisconnect);
@@ -192,6 +197,7 @@ function handleBackgroundMessage(message: PlaygroundBackgroundMessage): void {
       });
       return;
     case 'ytcq:playground:snapshot':
+      if (state.status !== 'connected') notifyGameClientReset();
       setState({
         ...state,
         available,
@@ -199,7 +205,6 @@ function handleBackgroundMessage(message: PlaygroundBackgroundMessage): void {
         error: '',
         games: message.snapshot.games,
         invites: message.snapshot.invites,
-        replayTriviaGenerationTokens: state.status === 'connected' ? state.replayTriviaGenerationTokens : {},
         status: 'connected',
         users: message.snapshot.users,
         userId: message.userId
@@ -218,6 +223,11 @@ function handleBackgroundMessage(message: PlaygroundBackgroundMessage): void {
 }
 
 function handleServerMessage(message: ServerMessage): void {
+  if (handleGameServerMessage(message)) {
+    notifyListeners();
+    return;
+  }
+
   switch (message.type) {
     case 'inviteCreated':
     case 'inviteReceived':
@@ -237,6 +247,7 @@ function handleServerMessage(message: ServerMessage): void {
       });
       return;
     case 'gameEnded':
+      notifyGameEnded(message.gameId);
       setState({
         ...state,
         endedGame: {
@@ -244,21 +255,7 @@ function handleServerMessage(message: ServerMessage): void {
           reason: message.reason,
           userId: message.userId
         },
-        games: state.games.filter((game) => game.gameId !== message.gameId),
-        replayTriviaGenerationTokens: omitRecordKey(state.replayTriviaGenerationTokens, message.gameId)
-      });
-      return;
-    case 'replayTriviaGenerationToken':
-      setState({
-        ...state,
-        replayTriviaGenerationTokens: {
-          ...state.replayTriviaGenerationTokens,
-          [message.gameId]: {
-            expiresAt: message.expiresAt,
-            gameId: message.gameId,
-            generationToken: message.generationToken
-          }
-        }
+        games: state.games.filter((game) => game.gameId !== message.gameId)
       });
       return;
     case 'error':
@@ -280,6 +277,10 @@ function handlePortDisconnect(): void {
 
 function setState(nextState: PlaygroundClientState): void {
   state = nextState;
+  notifyListeners();
+}
+
+function notifyListeners(): void {
   listeners.forEach((listener) => listener(state));
 }
 
@@ -311,10 +312,4 @@ function mergeGame(games: PublicGame[], game: PublicGame): PublicGame[] {
     ...games.filter((candidate) => candidate.gameId !== game.gameId),
     game
   ];
-}
-
-function omitRecordKey<T>(record: Record<string, T>, key: string): Record<string, T> {
-  const next = { ...record };
-  delete next[key];
-  return next;
 }
