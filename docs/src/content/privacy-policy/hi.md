@@ -4,24 +4,92 @@ title: "गोपनीयता नीति"
 description: "Chat Enhancer for YouTube स्थानीय संग्रहण, अनुवाद, Playground डेटा और गोपनीयता नियंत्रणों को कैसे संभालता है।"
 ---
 
-# गोपनीयता नीति
+# गोपनीयता
 
 अंतिम अपडेट: 17 जून 2026
 
-यह अनुवाद सुविधा के लिए दिया गया है। /privacy/ पर अंग्रेज़ी संस्करण मुख्य संदर्भ है।
+Chat Enhancer for YouTube, YouTube लाइव चैट के लिए एक ब्राउज़र एक्सटेंशन है। इसे YouTube चैट को बदले बिना या एनालिटिक्स इकट्ठा किए बिना छोटे चैट फीचर जोड़ने के लिए बनाया गया है।
 
-Chat Enhancer for YouTube की अधिकांश सुविधाएँ आपके ब्राउज़र में स्थानीय रूप से चलती हैं। अनुवाद डिफ़ॉल्ट रूप से बंद है; चालू करने पर अनुवाद किया जा रहा पाठ Google Translate को भेजा जाता है। Playground गेम डिफ़ॉल्ट रूप से बंद हैं। यदि आप उन्हें चालू करके उपयोग करते हैं, तो गेम उपलब्धता, निमंत्रण और गेम क्रियाएँ बनाए गए खिलाड़ी नाम के तहत Chat Enhancer Playground backend को भेजी जाती हैं।
+संक्षेप में:
 
-## ब्राउज़र में संग्रहीत डेटा
+- एक्सटेंशन की अधिकांश सुविधाएँ आपके ब्राउज़र में स्थानीय रूप से चलती हैं।
+- अनुवाद डिफ़ॉल्ट रूप से बंद है।
+- जब अनुवाद चालू होता है, अनुवाद किया जा रहा टेक्स्ट Google Translate को भेजा जाता है।
+- Playground गेम डिफ़ॉल्ट रूप से बंद हैं। यदि आप Playground चालू करके उसका उपयोग करते हैं, तो गेम उपस्थिति, आमंत्रण और गेम कार्रवाइयाँ एक जनरेट किए गए खिलाड़ी नाम के तहत Chat Enhancer Playground backend को भेजी जाती हैं।
+- एक्सटेंशन एनालिटिक्स नहीं चलाता, डेटा नहीं बेचता और ब्राउज़िंग इतिहास इकट्ठा नहीं करता।
 
-एक्सटेंशन सेटिंग, Inbox डेटा, देखे जा रहे कीवर्ड, बार-बार उपयोग होने वाले emoji, बुकमार्क किए गए उपयोगकर्ता, प्रत्येक stream के न भेजे गए chat draft और live chat tab status के लिए ब्राउज़र storage का उपयोग करता है। यदि Playground उपयोग किया जाता है तो एक छद्म Playground पहचान स्थानीय रूप से सहेजी जाती है। हाल के profile messages और translation results केवल वर्तमान live chat page की memory में रहते हैं और page छोड़ने पर मिट जाते हैं।
+## एक्सटेंशन कहाँ चलता है
 
-## ब्राउज़र के बाहर भेजा गया डेटा
+एक्सटेंशन केवल उन YouTube लाइव चैट और लाइव चैट रीप्ले पेजों पर चलता है जो एक्सटेंशन manifest से मेल खाते हैं।
 
-डेटा केवल तब ब्राउज़र से बाहर भेजा जा सकता है जब translation या Playground सक्षम हो। Translation requests Google Translate को जाती हैं और उनमें आपके YouTube cookies या credentials शामिल नहीं होते। Playground stream/video key, generated public key और signature, generated player name, available games, invites और chess moves जैसी game actions प्राप्त कर सकता है। HELP-A-FRIEND! Trivia चुने हुए YouTube replay transcript excerpts और game identifiers को Playground backend को भेज सकता है, जो questions बनाने के लिए OpenAI का उपयोग करता है। Replay Trivia के लिए Cloudflare Turnstile verification की आवश्यकता हो सकती है, और Cloudflare सामान्य verification data जैसे IP address, user agent और challenge result प्राप्त कर सकता है।
+एक्सटेंशन ब्राउज़र की `storage` अनुमति का उपयोग करता है, साथ ही YouTube लाइव चैट पेजों, Google के अनुवाद endpoint और opt-in Playground backend के लिए host access का उपयोग करता है। यह सामान्य ब्राउज़िंग-इतिहास, टैब-पढ़ने, scripting या web-navigation अनुमतियाँ नहीं मांगता।
 
-## नियंत्रण और सीमाएँ
+## आपके ब्राउज़र में संग्रहीत डेटा
 
-आप extension popup में reset button से extension data साफ़ कर सकते हैं, या browser से extension हटा सकते हैं। Extension analytics नहीं चलाता, browsing history नहीं जुटाता और user data नहीं बेचता। ऊपर बताए गए opt-in Playground games को छोड़कर, यह extension-owned server को data नहीं भेजता। Chat Enhancer for YouTube, YouTube या Google से संबद्ध नहीं है।
+एक्सटेंशन कुछ डेटा संग्रहीत करता है ताकि इसके फीचर पेज reload के बीच काम कर सकें।
 
-गोपनीयता संबंधी सवालों के लिए https://www.chatenhancer.com पर ईमेल लिंक का उपयोग करें।
+- **सेटिंग्स `chrome.storage.sync` में संग्रहीत होती हैं:** आपकी ब्राउज़र सेटिंग्स के आधार पर, ब्राउज़र उन एक्सटेंशन सेटिंग्स को आपके अपने signed-in ब्राउज़र installs के बीच sync कर सकता है।
+
+- **Inbox डेटा `chrome.storage.local` में संग्रहीत होता है:** इसमें watched keywords और प्रति stream या replay अधिकतम 100 inbox records शामिल हैं। Inbox records में message text, author name, timestamp, YouTube message/source metadata, match metadata, और saved message दिखाने के लिए आवश्यक emoji/image display data शामिल हो सकते हैं।
+
+- **Frequent emoji डेटा `chrome.storage.local` में संग्रहीत होता है:** इसमें local usage counts और frequent emoji row बनाने के लिए उपयोग होने वाला emoji display metadata शामिल है।
+
+- **Bookmarked user डेटा `chrome.storage.local` में संग्रहीत होता है:** इसमें bookmarked user का handle, उपलब्ध होने पर channel ID, और bookmark बनाए जाने का समय शामिल है। Bookmarked users मौजूदा browser profile में streams के बीच global होते हैं और colored avatar rings दिखाने के लिए उपयोग होते हैं।
+
+- **Unsent chat drafts प्रति stream `chrome.storage.local` में संग्रहीत होते हैं:** वे page refresh के बाद restore होते हैं। Drafts तब हटते हैं जब chat input साफ किया जाता है, message भेजा जाता है, या extension data reset किया जाता है।
+
+- **Live chat tab status `chrome.storage.local` में संग्रहीत होता है:** यह हाल में सक्रिय YouTube live chat tabs के browser tab IDs और last-seen timestamps तक सीमित है, और यह दिखाने के लिए उपयोग होता है कि extension अभी connected है या disconnected। ये records 12 घंटे बाद expire हो जाते हैं।
+
+- **यदि Playground उपयोग किया जाता है, तो Playground identity data `chrome.storage.local` में संग्रहीत होता है:** यह Playground connection challenges पर signature करने के लिए generated public/private key pair है, ताकि वही browser install वही pseudonymous Playground identity रख सके। यह आपकी YouTube identity नहीं है।
+
+- **Recent profile messages, command state, और translation results केवल वर्तमान live chat page के लिए memory में रखे जाते हैं। Page unload होने पर वे साफ हो जाते हैं।**
+
+## आपके ब्राउज़र के बाहर भेजा गया डेटा
+
+Chat translation और draft translation डिफ़ॉल्ट रूप से बंद हैं।
+
+जब translation या Playground features चालू होते हैं, डेटा इन सेवाओं को भेजा जा सकता है:
+
+- **Google Translate at `https://translate.googleapis.com/translate_a/single`**
+
+  Chat translation योग्य visible और incoming chat message text भेजता है। Draft translation वह draft text भेजता है जिसे आप chat box से translate करना चुनते हैं।
+
+  Translation requests में translate करने वाला text और target language शामिल होते हैं। एक्सटेंशन translation requests के साथ आपकी YouTube cookies या YouTube credentials नहीं भेजता।
+
+  `translate.googleapis.com` के माध्यम से Google Translate access unofficial है और rate-limited, changed या unavailable हो सकता है।
+
+- **Chat Enhancer Playground at `https://playground.chatenhancer.com`**
+
+  Playground डिफ़ॉल्ट रूप से बंद है। यदि आप Playground चालू करते हैं और games panel का उपयोग करते हैं, तो extension Playground backend से connect होता है ताकि उसी stream में opted-in users availability देख सकें, invites exchange कर सकें और games खेल सकें।
+
+  Playground messages में stream/video key, आपकी generated Playground public key और signature, आपका generated player name, आपकी available game list, invites और invite responses, तथा chess moves जैसी game actions शामिल हो सकती हैं।
+
+  HELP-A-FRIEND! Trivia question generation चयनित YouTube replay transcript excerpts और game identifiers को Playground backend को भेज सकता है। Backend उन excerpts से trivia questions generate करने के लिए OpenAI का उपयोग करता है।
+
+  Replay Trivia generation को `https://playground.chatenhancer.com` पर Cloudflare Turnstile verification की आवश्यकता हो सकती है। Cloudflare सामान्य verification data जैसे IP address, user agent, और challenge result प्राप्त कर सकता है।
+
+  Playground live chat message text, आपका YouTube display name, आपका YouTube avatar URL, YouTube cookies, या YouTube credentials Playground backend को नहीं भेजता।
+
+  किसी भी web service की तरह, Playground backend browser या network provider से सामान्य connection metadata जैसे IP address और user agent प्राप्त कर सकता है।
+
+## डेटा नियंत्रण
+
+आप extension popup में reset button का उपयोग करके extension data साफ कर सकते हैं। यह local extension data और synced extension settings को साफ करता है, फिर default settings restore करता है।
+
+आप अपने browser से extension भी हटा सकते हैं। Browser के आधार पर, extension हटाने से उसका local extension storage भी हट सकता है।
+
+## क्या इकट्ठा नहीं किया जाता
+
+एक्सटेंशन analytics नहीं चलाता।
+
+एक्सटेंशन browsing history इकट्ठा नहीं करता।
+
+एक्सटेंशन user data नहीं बेचता।
+
+ऊपर वर्णित opt-in Playground games को छोड़कर, extension किसी extension-owned server को data नहीं भेजता।
+
+Live chat page unload होने के बाद extension recent profile messages या translation results संग्रहीत नहीं करता।
+
+Chat Enhancer for YouTube, YouTube या Google से संबद्ध नहीं है।
+
+गोपनीयता संबंधी प्रश्नों के लिए, https://www.chatenhancer.com पर email link का उपयोग करें।
