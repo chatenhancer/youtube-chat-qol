@@ -22,13 +22,10 @@ describe('game panel shell', () => {
   it('creates the shared floating panel structure and wires close actions', () => {
     const controller = new AbortController();
     const onClose = vi.fn();
-    const headerAction = document.createElement('button');
-    headerAction.textContent = 'Action';
     const shell = createGamePanelShell({
       ariaLabel: 'Replay Trivia panel',
       classNamePrefix: 'ytcq-replay-trivia',
       closeLabel: 'Close Replay Trivia',
-      headerActions: [headerAction],
       icon: document.createElement('span'),
       onClose,
       signal: controller.signal,
@@ -41,7 +38,9 @@ describe('game panel shell', () => {
     expect(shell.panel.getAttribute('aria-label')).toBe('Replay Trivia panel');
     expect(shell.titleElement.textContent).toBe('Replay Trivia');
     expect(shell.subtitleElement.textContent).toBe('Round 1');
-    expect(shell.header.contains(headerAction)).toBe(true);
+    expect(shell.statusOverlay.element.parentElement).toBe(shell.body);
+    expect(shell.statusOverlay.element.className).toContain('ytcq-replay-trivia-status');
+    expect(shell.statusOverlay.element.hidden).toBe(true);
 
     shell.closeButton.click();
     document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
@@ -128,12 +127,10 @@ describe('game panel shell', () => {
       value: 100
     });
     const controller = new AbortController();
-    const headerAction = document.createElement('button');
     const shell = createGamePanelShell({
       ariaLabel: 'Replay Trivia panel',
       classNamePrefix: 'ytcq-replay-trivia',
       closeLabel: 'Close',
-      headerActions: [headerAction],
       icon: document.createElement('span'),
       onClose: vi.fn(),
       signal: controller.signal,
@@ -149,7 +146,7 @@ describe('game panel shell', () => {
       width: 160
     }));
 
-    headerAction.dispatchEvent(createPointerEvent('pointerdown', {
+    shell.closeButton.dispatchEvent(createPointerEvent('pointerdown', {
       clientX: 20,
       clientY: 20,
       pointerId: 1

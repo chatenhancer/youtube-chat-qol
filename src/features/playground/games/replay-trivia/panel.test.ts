@@ -15,12 +15,11 @@ vi.mock('./assets', () => ({
 import {
   closeReplayTriviaGamePanel,
   getActiveReplayTriviaGameId,
-  getReplayTriviaGamePanelOverlay,
-  isPublicReplayTriviaGame,
   isReplayTriviaGamePanelOpen,
-  openReplayTriviaGamePanel,
+  openReplayTriviaGamePanel as mountReplayTriviaGamePanel,
   updateReplayTriviaGamePanel
 } from './panel';
+import { createGamePanelShell } from '../panel-shell';
 import {
   ANSWER_TIME_MS,
   ANSWER_UI_DELAY_MS,
@@ -34,6 +33,9 @@ import {
 } from './constants';
 import type { PublicReplayTriviaGame } from './types';
 
+let shellControllers: AbortController[] = [];
+let shellCleanups: Array<() => void> = [];
+
 describe('Replay Trivia panel', () => {
   let context: ReturnType<typeof createMockCanvasContext>;
   let frameCallbacks: FrameRequestCallback[];
@@ -46,6 +48,8 @@ describe('Replay Trivia panel', () => {
     getReplayTriviaAssetsMock.mockResolvedValue(createEmptyReplayTriviaAssets());
     frameCallbacks = [];
     now = 1;
+    shellControllers = [];
+    shellCleanups = [];
     context = createMockCanvasContext();
     vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(context as unknown as CanvasRenderingContext2D);
     vi.spyOn(HTMLCanvasElement.prototype, 'getBoundingClientRect').mockReturnValue({
@@ -71,6 +75,8 @@ describe('Replay Trivia panel', () => {
 
   afterEach(() => {
     closeReplayTriviaGamePanel({ notify: false });
+    shellControllers.forEach((controller) => controller.abort());
+    shellCleanups.forEach((cleanup) => cleanup());
     vi.restoreAllMocks();
   });
 
@@ -82,27 +88,6 @@ describe('Replay Trivia panel', () => {
 
     expect(isReplayTriviaGamePanelOpen()).toBe(true);
     expect(getActiveReplayTriviaGameId()).toBe('game-replay-trivia');
-  });
-
-  it('validates public Replay Trivia game shapes defensively', () => {
-    expect(isPublicReplayTriviaGame(createReplayTriviaGame())).toBe(true);
-    expect(isPublicReplayTriviaGame(null)).toBe(false);
-    expect(isPublicReplayTriviaGame({})).toBe(false);
-    expect(isPublicReplayTriviaGame({
-      ...createReplayTriviaGame(),
-      gameId: 123
-    })).toBe(false);
-    expect(isPublicReplayTriviaGame({
-      ...createReplayTriviaGame(),
-      gameType: 'chess'
-    })).toBe(false);
-    expect(isPublicReplayTriviaGame({
-      ...createReplayTriviaGame(),
-      players: {
-        guest: { displayName: 'Guest', userId: '' },
-        host: { displayName: 'Host', userId: 'host-user' }
-      }
-    })).toBe(false);
   });
 
   it('renders a fallback when the canvas context is unavailable', () => {
@@ -125,10 +110,11 @@ describe('Replay Trivia panel', () => {
       throw new Error('canvas blocked');
     });
 
-    openReplayTriviaGamePanel(createReplayTriviaGame(), 'host-user', vi.fn());
+    const overlay = openReplayTriviaGamePanel(createReplayTriviaGame(), 'host-user', vi.fn());
 
     expect(document.querySelector('.ytcq-replay-trivia-game-fallback')?.textContent).toBe('Canvas is unavailable.');
-    expect(getReplayTriviaGamePanelOverlay()).toBeNull();
+    expect(overlay.element.parentElement?.classList.contains('ytcq-replay-trivia-game-body')).toBe(true);
+    expect(overlay.element.hidden).toBe(true);
   });
 
   it('closes without notifying visibility listeners when notify is false', () => {
@@ -496,10 +482,10 @@ describe('Replay Trivia panel', () => {
 
   it('ignores answer input while a blocking status is visible', () => {
     const onAction = vi.fn();
-    openReplayTriviaGamePanel(createReplayTriviaGame({ status: 'question' }), 'host-user', onAction);
+    const overlay = openReplayTriviaGamePanel(createReplayTriviaGame({ status: 'question' }), 'host-user', onAction);
     setNow(ANSWER_UI_DELAY_MS + 25);
     updateReplayTriviaGamePanel(createReplayTriviaGame({ status: 'question' }), 'host-user');
-    getReplayTriviaGamePanelOverlay()?.show({
+    overlay.show({
       key: 'connection:lost',
       message: 'Connection lost.',
       owner: 'system',
@@ -613,7 +599,7 @@ describe('Replay Trivia panel', () => {
 
   it('ignores pointer answers outside hitboxes and resets blocking hover state', () => {
     const onAction = vi.fn();
-    openReplayTriviaGamePanel(createReplayTriviaGame({ status: 'question' }), 'host-user', onAction);
+    const overlay = openReplayTriviaGamePanel(createReplayTriviaGame({ status: 'question' }), 'host-user', onAction);
     setNow(ANSWER_UI_DELAY_MS + 25);
     updateReplayTriviaGamePanel(createReplayTriviaGame({ status: 'question' }), 'host-user');
     const canvas = getCanvas();
@@ -625,7 +611,7 @@ describe('Replay Trivia panel', () => {
     }));
     expect(canvas.style.cursor).toBe('pointer');
 
-    getReplayTriviaGamePanelOverlay()?.show({
+    overlay.show({
       key: 'connection:lost',
       message: 'Connection lost.',
       owner: 'system',
@@ -1158,14 +1144,13 @@ describe('Replay Trivia panel', () => {
   });
 
   it('exposes the shared overlay with system priority', () => {
-    openReplayTriviaGamePanel(
+    const overlay = openReplayTriviaGamePanel(
       createReplayTriviaGame(),
       'host-user',
       vi.fn()
     );
 
-    const overlay = getReplayTriviaGamePanelOverlay();
-    overlay?.show({
+    overlay.show({
       key: 'connection:reconnecting',
       message: 'Connection lost. Trying to reconnect...',
       owner: 'system',
@@ -1176,7 +1161,7 @@ describe('Replay Trivia panel', () => {
     expect(status?.textContent).toBe('Connection lost. Trying to reconnect...');
     expect(status?.hidden).toBe(false);
 
-    overlay?.show({
+    overlay.show({
       key: 'game:loading',
       message: 'Preparing next question...',
       owner: 'game',
@@ -1186,7 +1171,7 @@ describe('Replay Trivia panel', () => {
     expect(status?.textContent).toBe('Connection lost. Trying to reconnect...');
     expect(status?.hidden).toBe(false);
 
-    overlay?.clear({ owner: 'system' });
+    overlay.clear({ owner: 'system' });
     expect(status?.textContent).toBe('Preparing next question...');
 
     updateReplayTriviaGamePanel(createReplayTriviaGame(), 'host-user');
@@ -1210,6 +1195,44 @@ describe('Replay Trivia panel', () => {
     return context.fillText.mock.calls.map(([text]) => String(text)).join(' ');
   }
 });
+
+function openReplayTriviaGamePanel(
+  game: PublicReplayTriviaGame,
+  currentUserId: string,
+  onAction: (gameId: string, action: string, payload?: Record<string, unknown>) => void,
+  onVisibilityChanged?: () => void
+) {
+  const controller = new AbortController();
+  shellControllers.push(controller);
+  let shell: ReturnType<typeof createGamePanelShell>;
+  const closePanel = (options?: { notify?: boolean }) => {
+    closeReplayTriviaGamePanel(options);
+    controller.abort();
+    shell.panel.remove();
+  };
+  shell = createGamePanelShell({
+    ariaLabel: 'Replay Trivia',
+    classNamePrefix: 'ytcq-replay-trivia-game',
+    closeLabel: 'Minimize',
+    icon: document.createElement('span'),
+    onClose: () => closePanel(),
+    signal: controller.signal,
+    subtitle: getReplayTriviaOpponentLabelForTest(game, currentUserId),
+    title: 'Replay Trivia'
+  });
+  shellCleanups.push(() => {
+    controller.abort();
+    shell.panel.remove();
+  });
+  mountReplayTriviaGamePanel(shell, game, currentUserId, onAction, onVisibilityChanged, closePanel);
+  return shell.statusOverlay;
+}
+
+function getReplayTriviaOpponentLabelForTest(game: PublicReplayTriviaGame, currentUserId: string): string {
+  const currentUserRole = game.players.host.userId === currentUserId ? 'host' : 'guest';
+  const opponentRole = currentUserRole === 'host' ? 'guest' : 'host';
+  return game.players[opponentRole].displayName || 'Player';
+}
 
 function createReplayTriviaGame(overrides: Partial<PublicReplayTriviaGame> = {}): PublicReplayTriviaGame {
   return {

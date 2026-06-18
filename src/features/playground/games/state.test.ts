@@ -112,7 +112,6 @@ function createTransport(overrides: Partial<PlaygroundClientState> = {}): Playgr
     error: '',
     games: [],
     invites: [],
-    replayTriviaGenerationTokens: {},
     status: 'connected',
     userId: 'me-user',
     users: [],

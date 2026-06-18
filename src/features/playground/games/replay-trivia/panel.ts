@@ -4,13 +4,9 @@
  * Renders the chat-style canvas, keeps local animation timing smooth, and sends
  * answer/phase intents back to the Playground room state machine.
  */
-import { t } from '../../../../shared/i18n';
-import { createGamesIcon } from '../../../../shared/icons';
 import { ytcqCreateElement } from '../../../../shared/managed-dom';
 import type { ReplayTriviaGenerationToken, ReplayTriviaQuestion } from '../../../../shared/playground-trivia';
-import { createGamePanelShell } from '../panel-shell';
-import { createGamePanelStatusOverlay } from '../panel-feedback';
-import type { GamePanelStatusOverlay } from '../panel-feedback';
+import type { GamePanelShell } from '../panel-shell';
 import { createGameSoundController } from '../sound';
 import { generateReplayTriviaQuestions } from './client';
 import { EMPTY_REPLAY_TRIVIA_ASSETS, getReplayTriviaAssets } from './assets';
@@ -66,9 +62,10 @@ import type {
   ReplayTriviaGameStatus,
   PublicReplayTriviaGame,
   Rect,
-  ReplayTriviaFallbackState,
+  ReplayTriviaClosePanel,
+  ReplayTriviaFallbackRuntime,
   ReplayTriviaCanvasQuestion,
-  ReplayTriviaGameState,
+  ReplayTriviaPanelRuntime,
   SourceRect
 } from './types';
 
@@ -87,14 +84,16 @@ interface FriendBubbleTextLine {
   width: number;
 }
 
-let activeReplayTriviaPanel: ReplayTriviaGameState | null = null;
-let activeReplayTriviaFallback: ReplayTriviaFallbackState | null = null;
+let activeReplayTriviaPanel: ReplayTriviaPanelRuntime | null = null;
+let activeReplayTriviaFallback: ReplayTriviaFallbackRuntime | null = null;
 
 export function openReplayTriviaGamePanel(
+  shell: GamePanelShell,
   game: PublicReplayTriviaGame,
   currentUserId: string,
   onAction: (gameId: string, action: string, payload?: Record<string, unknown>) => void,
-  onVisibilityChanged?: () => void
+  onVisibilityChanged: (() => void) | undefined,
+  closePanel: ReplayTriviaClosePanel
 ): void {
   closeReplayTriviaGamePanel({ notify: false });
 
@@ -104,27 +103,16 @@ export function openReplayTriviaGamePanel(
     preloadPaths: REPLAY_TRIVIA_SOUND_PATHS,
     signal: listeners.signal
   });
-  const { body, panel } = createGamePanelShell({
-    ariaLabel: GAME_TITLE,
-    classNamePrefix: 'ytcq-replay-trivia-game',
-    closeLabel: t('gamesMinimize'),
-    headerActions: [soundController.button],
-    icon: createGamesIcon(),
-    onClose: () => closeReplayTriviaGamePanel(),
-    signal: listeners.signal,
-    subtitle: getReplayTriviaOpponentLabel(game, currentUserId),
-    title: GAME_TITLE
-  });
+  const { body, closeButton, statusOverlay, subtitleElement } = shell;
+  closeButton.before(soundController.button);
+  subtitleElement.textContent = getReplayTriviaOpponentLabel(game, currentUserId);
 
   const canvas = ytcqCreateElement('canvas');
   canvas.className = 'ytcq-replay-trivia-canvas';
   canvas.setAttribute('aria-label', GAME_TITLE);
   canvas.setAttribute('role', 'application');
   canvas.tabIndex = 0;
-  const statusOverlay = createGamePanelStatusOverlay({
-    classNamePrefix: 'ytcq-replay-trivia-game'
-  });
-  body.append(canvas, statusOverlay.element);
+  body.append(canvas);
 
   let context: CanvasRenderingContext2D | null = null;
   try {
@@ -137,11 +125,12 @@ export function openReplayTriviaGamePanel(
     const fallback = ytcqCreateElement('div');
     fallback.className = 'ytcq-replay-trivia-game-fallback';
     fallback.textContent = 'Canvas is unavailable.';
-    body.replaceChildren(fallback);
+    body.replaceChildren(fallback, statusOverlay.element);
     activeReplayTriviaFallback = {
+      content: fallback,
       listeners,
       onVisibilityChanged: onVisibilityChanged || null,
-      panel
+      soundController
     };
     onVisibilityChanged?.();
     return;
@@ -150,6 +139,7 @@ export function openReplayTriviaGamePanel(
   activeReplayTriviaPanel = {
     assets: EMPTY_REPLAY_TRIVIA_ASSETS,
     canvas,
+    closePanel,
     closeButtonRect: null,
     context,
     currentQuestionIndex: game.currentQuestionIndex,
@@ -166,7 +156,6 @@ export function openReplayTriviaGamePanel(
     onVisibilityChanged: onVisibilityChanged || null,
     opponentAnswerIndex: null,
     opponentScore: getReplayTriviaRoleScore(game, getOpponentRole(game, currentUserId)),
-    panel,
     phase: game.status,
     phaseStartedAt: getNow(),
     pixelRatio: configureReplayTriviaCanvas(canvas),
@@ -204,7 +193,8 @@ export function closeReplayTriviaGamePanel({ notify = true }: { notify?: boolean
   const fallback = activeReplayTriviaFallback;
   if (fallback) {
     fallback.listeners.abort();
-    fallback.panel.remove();
+    fallback.content.remove();
+    fallback.soundController.button.remove();
     activeReplayTriviaFallback = null;
     if (notify) fallback.onVisibilityChanged?.();
   }
@@ -215,7 +205,8 @@ export function closeReplayTriviaGamePanel({ notify = true }: { notify?: boolean
   if (state.frameId !== null) cancelScheduledFrame(state.frameId);
   state.statusOverlay.clear();
   state.listeners.abort();
-  state.panel.remove();
+  state.canvas.remove();
+  state.soundController.button.remove();
   activeReplayTriviaPanel = null;
   if (notify) state.onVisibilityChanged?.();
 }
@@ -226,10 +217,6 @@ export function isReplayTriviaGamePanelOpen(): boolean {
 
 export function getActiveReplayTriviaGameId(): string {
   return activeReplayTriviaPanel?.game.gameId || '';
-}
-
-export function getReplayTriviaGamePanelOverlay(): GamePanelStatusOverlay | null {
-  return activeReplayTriviaPanel?.statusOverlay || null;
 }
 
 export function updateReplayTriviaGamePanel(
@@ -249,16 +236,6 @@ export function updateReplayTriviaGamePanel(
   renderReplayTriviaGame(getNow());
 }
 
-export function isPublicReplayTriviaGame(game: unknown): game is PublicReplayTriviaGame {
-  const candidate = game as Partial<PublicReplayTriviaGame> | undefined;
-  return Boolean(candidate) &&
-    candidate?.gameType === 'replay-trivia' &&
-    typeof candidate.gameId === 'string' &&
-    typeof candidate.status === 'string' &&
-    Boolean(candidate.players?.host?.userId) &&
-    Boolean(candidate.players?.guest?.userId);
-}
-
 function startReplayTriviaLoop(): void {
   const state = activeReplayTriviaPanel;
   if (!state) return;
@@ -272,7 +249,7 @@ function startReplayTriviaLoop(): void {
 }
 
 function syncReplayTriviaPanelFromGame(
-  state: ReplayTriviaGameState,
+  state: ReplayTriviaPanelRuntime,
   game: PublicReplayTriviaGame,
   currentUserId: string,
   {
@@ -321,7 +298,7 @@ function syncReplayTriviaPanelFromGame(
   state.opponentAnswerIndex = getPublicReplayTriviaAnswerIndex(game, getOpponentRole(game, currentUserId));
 }
 
-function maybeGenerateReplayTriviaQuestions(state: ReplayTriviaGameState): void {
+function maybeGenerateReplayTriviaQuestions(state: ReplayTriviaPanelRuntime): void {
   if (state.game.status !== 'preparing') return;
   if (state.preparationError) return;
   if (state.questionGenerationStarted || state.currentUserId !== state.game.questionProviderUserId) return;
@@ -382,7 +359,7 @@ function toReplayTriviaQuestionPayload(question: ReplayTriviaQuestion): Record<s
 }
 
 function sendReplayTriviaActionOnce(
-  state: ReplayTriviaGameState,
+  state: ReplayTriviaPanelRuntime,
   id: string,
   action: string,
   payload?: Record<string, unknown>
@@ -418,7 +395,7 @@ function advanceReplayTriviaGame(now: number): void {
   }
 }
 
-function setReplayTriviaPhase(state: ReplayTriviaGameState, phase: ReplayTriviaGameStatus, now: number): void {
+function setReplayTriviaPhase(state: ReplayTriviaPanelRuntime, phase: ReplayTriviaGameStatus, now: number): void {
   state.phase = phase;
   state.phaseStartedAt = now;
   state.hitboxes = [];
@@ -428,11 +405,11 @@ function setReplayTriviaPhase(state: ReplayTriviaGameState, phase: ReplayTriviaG
   state.sentActionIds.clear();
 }
 
-function isQuestionAnswerUiReady(state: ReplayTriviaGameState, now: number): boolean {
+function isQuestionAnswerUiReady(state: ReplayTriviaPanelRuntime, now: number): boolean {
   return now - state.phaseStartedAt >= ANSWER_UI_DELAY_MS;
 }
 
-function getQuestionAnswerElapsed(state: ReplayTriviaGameState, now: number): number {
+function getQuestionAnswerElapsed(state: ReplayTriviaPanelRuntime, now: number): number {
   return Math.max(0, now - state.phaseStartedAt - ANSWER_UI_DELAY_MS);
 }
 
@@ -441,7 +418,7 @@ function getDelayedProgress(elapsed: number, delay: number, duration: number): n
 }
 
 function playTimedMessageSound(
-  state: ReplayTriviaGameState,
+  state: ReplayTriviaPanelRuntime,
   id: string,
   elapsed: number,
   delay: number
@@ -450,7 +427,7 @@ function playTimedMessageSound(
 }
 
 function playTimedSound(
-  state: ReplayTriviaGameState,
+  state: ReplayTriviaPanelRuntime,
   id: string,
   elapsed: number,
   delay: number,
@@ -471,7 +448,7 @@ function handleReplayTriviaCanvasClick(event: MouseEvent): void {
   if (state.phase === 'finished') {
     if (state.closeButtonRect && isPointInRect(point, state.closeButtonRect)) {
       state.onAction(state.game.gameId, 'leave');
-      closeReplayTriviaGamePanel();
+      state.closePanel();
     }
     return;
   }
@@ -494,7 +471,7 @@ function handleReplayTriviaCanvasKeydown(event: KeyboardEvent): void {
   if (state.phase === 'finished' && (event.key === 'Enter' || event.key === ' ')) {
     event.preventDefault();
     state.onAction(state.game.gameId, 'leave');
-    closeReplayTriviaGamePanel();
+    state.closePanel();
     return;
   }
 
@@ -509,7 +486,7 @@ function handleReplayTriviaCanvasKeydown(event: KeyboardEvent): void {
   renderReplayTriviaGame(getNow());
 }
 
-function hasPersistentReplayTriviaStatus(state: ReplayTriviaGameState): boolean {
+function hasPersistentReplayTriviaStatus(state: ReplayTriviaPanelRuntime): boolean {
   return state.statusOverlay.isBlocking();
 }
 
@@ -555,7 +532,7 @@ function handleReplayTriviaCanvasMouseLeave(): void {
   renderReplayTriviaGame(getNow());
 }
 
-function selectReplayTriviaAnswer(state: ReplayTriviaGameState, userAnswerIndex: number, now: number): void {
+function selectReplayTriviaAnswer(state: ReplayTriviaPanelRuntime, userAnswerIndex: number, now: number): void {
   state.userAnswerIndex = userAnswerIndex;
   state.selectedAt = now;
   state.hoveredAnswerIndex = null;
@@ -603,7 +580,7 @@ function drawReplayTriviaSurface(context: CanvasRenderingContext2D): void {
   context.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 }
 
-function drawLoadingState(context: CanvasRenderingContext2D, state: ReplayTriviaGameState): void {
+function drawLoadingState(context: CanvasRenderingContext2D, state: ReplayTriviaPanelRuntime): void {
   drawIntroLogo(context, state);
   context.fillStyle = '#3f3f42';
   context.textAlign = 'center';
@@ -620,7 +597,7 @@ function drawLoadingState(context: CanvasRenderingContext2D, state: ReplayTrivia
 
 function drawCountdown(
   context: CanvasRenderingContext2D,
-  state: ReplayTriviaGameState,
+  state: ReplayTriviaPanelRuntime,
   now: number
 ): void {
   drawIntroLogo(context, state);
@@ -656,7 +633,7 @@ function drawCountdownNumber(
   context.restore();
 }
 
-function drawIntroLogo(context: CanvasRenderingContext2D, state: ReplayTriviaGameState): void {
+function drawIntroLogo(context: CanvasRenderingContext2D, state: ReplayTriviaPanelRuntime): void {
   const logo = state.assets.logo;
   if (logo) {
     drawContainedImage(context, logo, 18, 38, 412, 268);
@@ -679,7 +656,7 @@ function drawIntroLogo(context: CanvasRenderingContext2D, state: ReplayTriviaGam
 
 function drawChatRound(
   context: CanvasRenderingContext2D,
-  state: ReplayTriviaGameState,
+  state: ReplayTriviaPanelRuntime,
   offsetY: number,
   now: number
 ): number {
@@ -735,7 +712,7 @@ function drawChatRound(
 
 function drawAnswerPicker(
   context: CanvasRenderingContext2D,
-  state: ReplayTriviaGameState,
+  state: ReplayTriviaPanelRuntime,
   now: number,
   chatBottom: number,
   offsetY: number
@@ -822,7 +799,7 @@ function drawTimer(
   context.fillText(label, centerX + iconRadius + gap, centerY + 1);
 }
 
-function getAnswerFillColor(state: ReplayTriviaGameState, answerIndex: number): string {
+function getAnswerFillColor(state: ReplayTriviaPanelRuntime, answerIndex: number): string {
   if (state.userAnswerIndex === answerIndex) return '#070707';
   if (state.userAnswerIndex !== null) return '#6ab9f7';
   return state.hoveredAnswerIndex === answerIndex ? '#070707' : '#3aa7ff';
@@ -830,7 +807,7 @@ function getAnswerFillColor(state: ReplayTriviaGameState, answerIndex: number): 
 
 function drawSelectedAnswerTarget(
   context: CanvasRenderingContext2D,
-  state: ReplayTriviaGameState
+  state: ReplayTriviaPanelRuntime
 ): void {
   if (state.userAnswerIndex === null || !state.assets.target) return;
 
@@ -849,7 +826,7 @@ function drawSelectedAnswerTarget(
 
 function drawRevealedAnswers(
   context: CanvasRenderingContext2D,
-  state: ReplayTriviaGameState,
+  state: ReplayTriviaPanelRuntime,
   offsetY: number,
   now: number
 ): void {
@@ -902,7 +879,7 @@ function drawRevealedAnswers(
 
 function drawScoreModal(
   context: CanvasRenderingContext2D,
-  state: ReplayTriviaGameState,
+  state: ReplayTriviaPanelRuntime,
   now: number
 ): void {
   drawScrim(context);
@@ -1085,7 +1062,7 @@ function drawScoreFlapEdge(
 
 function drawFinalModal(
   context: CanvasRenderingContext2D,
-  state: ReplayTriviaGameState,
+  state: ReplayTriviaPanelRuntime,
   now: number
 ): void {
   drawScrim(context);
@@ -2043,7 +2020,7 @@ function easeOutCubic(progress: number): number {
   return 1 - ((1 - progress) ** 3);
 }
 
-function getCurrentQuestion(state: ReplayTriviaGameState): ReplayTriviaCanvasQuestion {
+function getCurrentQuestion(state: ReplayTriviaPanelRuntime): ReplayTriviaCanvasQuestion {
   const question = state.game.currentQuestion;
   if (!question) {
     return {
@@ -2093,11 +2070,11 @@ function getReplayTriviaOpponentLabel(game: PublicReplayTriviaGame, currentUserI
   return game.players[getOpponentRole(game, currentUserId)].displayName || 'Player';
 }
 
-function getOpponentDisplayName(state: ReplayTriviaGameState): string {
+function getOpponentDisplayName(state: ReplayTriviaPanelRuntime): string {
   return getReplayTriviaOpponentLabel(state.game, state.currentUserId);
 }
 
-function getOpponentShortLabel(state: ReplayTriviaGameState): string {
+function getOpponentShortLabel(state: ReplayTriviaPanelRuntime): string {
   return getShortPlayerLabel(getOpponentDisplayName(state));
 }
 

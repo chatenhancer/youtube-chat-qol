@@ -5,19 +5,17 @@
  * plays move sounds, and emits validated move intents back to the chess adapter.
  */
 import { Chess, type Move, type Square } from 'chess.js';
-import { createGamesIcon } from '../../../../shared/icons';
 import { t } from '../../../../shared/i18n';
 import { ytcqCreateElement } from '../../../../shared/managed-dom';
-import type { PublicGame, PublicUserIdentity } from '../../../../shared/playground-protocol';
 import {
-  createGamePanelStatusOverlay,
   showGamePanelFeedbackBubble,
   type GamePanelStatusMessage,
   type GamePanelStatusOverlay,
   toGamePanelStatusMessage
 } from '../panel-feedback';
-import { createGamePanelShell } from '../panel-shell';
+import type { GamePanelShell } from '../panel-shell';
 import { createGameSoundController, type GameSoundController } from '../sound';
+import type { ChessLastMove, ChessPieceColor, ChessPromotionPiece, PublicChessGame } from './types';
 
 const BOARD_PATH = 'games/chess/board.png';
 const CAPTURE_SOUND_PATH = 'games/chess/capture.mp3';
@@ -32,25 +30,12 @@ const LEGAL_MOVE_DOT_RADIUS = 4;
 const PIECE_SOURCE_SIZE = 32;
 const PIECE_DRAW_SIZE = 32;
 
-type PieceColor = 'black' | 'white';
+type PieceColor = ChessPieceColor;
 type PieceKind = 'bishop' | 'king' | 'knight' | 'pawn' | 'queen' | 'rook';
-type PromotionPiece = 'b' | 'n' | 'q' | 'r';
+type PromotionPiece = ChessPromotionPiece;
 type BoardSquare = { x: number; y: number };
 type PromotionPickerOption = BoardSquare & { piece: PromotionPiece };
-type ChessLastMove = { from: string; promotion?: PromotionPiece; to: string };
 type LegalMoveHint = BoardSquare & { capture: boolean };
-
-export interface PublicChessGame extends PublicGame {
-  fen: string;
-  gameType: 'chess';
-  lastMove?: ChessLastMove;
-  lastMoveSan?: string;
-  pgn: string;
-  players: Record<PieceColor, PublicUserIdentity>;
-  status: 'active' | 'checkmate' | 'draw' | 'resigned';
-  turn: PieceColor;
-  winner?: PieceColor;
-}
 
 interface ChessPiece {
   color: PieceColor;
@@ -65,7 +50,7 @@ interface ChessAssets {
   whitePieces: HTMLImageElement;
 }
 
-interface ChessGamePanelState {
+interface ChessGamePanelRuntime {
   assets: ChessAssets | null;
   canvas: HTMLCanvasElement;
   currentUserId: string;
@@ -75,7 +60,6 @@ interface ChessGamePanelState {
   listeners: AbortController;
   onMove: (gameId: string, from: string, to: string, promotion?: PromotionPiece) => void;
   onVisibilityChanged: (() => void) | null;
-  panel: HTMLElement;
   pendingPromotion: PendingPromotion | null;
   pixelRatio: number;
   selectedSquare: BoardSquare | null;
@@ -130,10 +114,11 @@ const PROMOTION_PIECE_LABEL: Record<PromotionPiece, string> = {
 };
 const PROMOTION_PIECE_DRAW_SIZE = 24;
 
-let activeChessGamePanel: ChessGamePanelState | null = null;
+let activeChessGamePanel: ChessGamePanelRuntime | null = null;
 let chessAssetsPromise: Promise<ChessAssets> | null = null;
 
 export function openChessGamePanel(
+  shell: GamePanelShell,
   game: PublicChessGame,
   currentUserId: string,
   onMove: (gameId: string, from: string, to: string, promotion?: PromotionPiece) => void,
@@ -151,28 +136,18 @@ export function openChessGamePanel(
 
   const {
     body,
-    panel,
+    closeButton,
+    statusOverlay,
     subtitleElement
-  } = createGamePanelShell({
-    ariaLabel: t('gamesChess'),
-    classNamePrefix: 'ytcq-chess-game',
-    closeLabel: t('gamesMinimize'),
-    headerActions: [soundController.button],
-    icon: createGamesIcon(),
-    onClose: () => closeChessGamePanel(),
-    signal: listeners.signal,
-    subtitle: getChessOpponentLabel(game, currentUserId),
-    title: t('gamesChess')
-  });
+  } = shell;
+  closeButton.before(soundController.button);
+  subtitleElement.textContent = getChessOpponentLabel(game, currentUserId);
 
   const canvas = ytcqCreateElement('canvas');
   canvas.className = 'ytcq-chess-board-canvas';
   canvas.setAttribute('aria-label', t('gamesChess'));
   const pixelRatio = configureChessCanvas(canvas);
-  const statusOverlay = createGamePanelStatusOverlay({
-    classNamePrefix: 'ytcq-chess-game'
-  });
-  body.append(canvas, statusOverlay.element);
+  body.append(canvas);
 
   activeChessGamePanel = {
     assets: null,
@@ -184,7 +159,6 @@ export function openChessGamePanel(
     listeners,
     onMove,
     onVisibilityChanged: onVisibilityChanged || null,
-    panel,
     pendingPromotion: null,
     pixelRatio,
     selectedSquare: null,
@@ -206,25 +180,13 @@ export function openChessGamePanel(
   }).catch(() => undefined);
 }
 
-export function updateChessGamePanel(game: PublicChessGame, currentUserId: string): void {
-  if (!activeChessGamePanel || activeChessGamePanel.game.gameId !== game.gameId) return;
-  const moveSoundPath = getChessMoveSoundPath(activeChessGamePanel.game.fen, game.fen);
-  activeChessGamePanel.game = game;
-  activeChessGamePanel.currentUserId = currentUserId;
-  activeChessGamePanel.hoverPromotionPiece = null;
-  activeChessGamePanel.pendingPromotion = null;
-  activeChessGamePanel.selectedSquare = null;
-  syncChessGameStatusMessage();
-  activeChessGamePanel.subtitleElement.textContent = getChessOpponentLabel(game, currentUserId);
-  renderChessBoard();
-  if (moveSoundPath) activeChessGamePanel.soundController.play(moveSoundPath);
-}
-
 export function closeChessGamePanel({ notify = true }: { notify?: boolean } = {}): void {
-  const onVisibilityChanged = activeChessGamePanel?.onVisibilityChanged || null;
-  activeChessGamePanel?.statusOverlay.clear();
-  activeChessGamePanel?.listeners.abort();
-  activeChessGamePanel?.panel.remove();
+  const runtime = activeChessGamePanel;
+  const onVisibilityChanged = runtime?.onVisibilityChanged || null;
+  runtime?.statusOverlay.clear();
+  runtime?.listeners.abort();
+  runtime?.canvas.remove();
+  runtime?.soundController.button.remove();
   activeChessGamePanel = null;
   if (notify) onVisibilityChanged?.();
 }
@@ -237,16 +199,18 @@ export function getActiveChessGameId(): string {
   return activeChessGamePanel?.game.gameId || '';
 }
 
-export function getChessGamePanelOverlay(): GamePanelStatusOverlay | null {
-  return activeChessGamePanel?.statusOverlay || null;
-}
-
-export function isPublicChessGame(game: PublicGame | undefined): game is PublicChessGame {
-  return Boolean(game) &&
-    game?.gameType === 'chess' &&
-    typeof (game as Partial<PublicChessGame>).fen === 'string' &&
-    Boolean((game as Partial<PublicChessGame>).players?.white?.userId) &&
-    Boolean((game as Partial<PublicChessGame>).players?.black?.userId);
+export function updateChessGamePanel(game: PublicChessGame, currentUserId: string): void {
+  if (!activeChessGamePanel || activeChessGamePanel.game.gameId !== game.gameId) return;
+  const moveSoundPath = getChessMoveSoundPath(activeChessGamePanel.game.fen, game.fen);
+  activeChessGamePanel.game = game;
+  activeChessGamePanel.currentUserId = currentUserId;
+  activeChessGamePanel.hoverPromotionPiece = null;
+  activeChessGamePanel.pendingPromotion = null;
+  activeChessGamePanel.selectedSquare = null;
+  syncChessGameStatusMessage();
+  activeChessGamePanel.subtitleElement.textContent = getChessOpponentLabel(game, currentUserId);
+  renderChessBoard();
+  if (moveSoundPath) activeChessGamePanel.soundController.play(moveSoundPath);
 }
 
 function handleChessCanvasClick(event: MouseEvent): void {
@@ -834,8 +798,8 @@ function getPromotionPickerOptions(pendingPromotion: PendingPromotion, perspecti
   }));
 }
 
-function getChessBoardPerspective(state: ChessGamePanelState): PieceColor {
-  return getCurrentUserColor(state.game, state.currentUserId) || 'white';
+function getChessBoardPerspective(runtime: ChessGamePanelRuntime): PieceColor {
+  return getCurrentUserColor(runtime.game, runtime.currentUserId) || 'white';
 }
 
 function toDisplaySquare(square: BoardSquare, perspective: PieceColor): BoardSquare {
@@ -869,14 +833,14 @@ function configureChessCanvas(canvas: HTMLCanvasElement): number {
   return pixelRatio;
 }
 
-function syncChessCanvasPixelRatio(state: ChessGamePanelState): void {
+function syncChessCanvasPixelRatio(runtime: ChessGamePanelRuntime): void {
   const pixelRatio = getCanvasPixelRatio();
   const backingSize = CANVAS_CSS_SIZE * pixelRatio;
-  if (state.canvas.width !== backingSize || state.canvas.height !== backingSize) {
-    state.canvas.width = backingSize;
-    state.canvas.height = backingSize;
+  if (runtime.canvas.width !== backingSize || runtime.canvas.height !== backingSize) {
+    runtime.canvas.width = backingSize;
+    runtime.canvas.height = backingSize;
   }
-  state.pixelRatio = pixelRatio;
+  runtime.pixelRatio = pixelRatio;
 }
 
 function getCanvasPixelRatio(): number {

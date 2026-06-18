@@ -90,9 +90,12 @@ export interface FriendBubbleOptions {
   tail?: boolean;
 }
 
-export interface ReplayTriviaGameState {
+export type ReplayTriviaClosePanel = (options?: { notify?: boolean }) => void;
+
+export interface ReplayTriviaPanelRuntime {
   assets: ReplayTriviaAssets;
   canvas: HTMLCanvasElement;
+  closePanel: ReplayTriviaClosePanel;
   closeButtonRect: Rect | null;
   context: CanvasRenderingContext2D;
   currentUserId: string;
@@ -109,7 +112,6 @@ export interface ReplayTriviaGameState {
   onVisibilityChanged: (() => void) | null;
   opponentAnswerIndex: number | null;
   opponentScore: number;
-  panel: HTMLElement;
   phase: ReplayTriviaGameStatus;
   phaseStartedAt: number;
   pixelRatio: number;
@@ -124,8 +126,9 @@ export interface ReplayTriviaGameState {
   userScore: number;
 }
 
-export interface ReplayTriviaFallbackState {
+export interface ReplayTriviaFallbackRuntime {
+  content: HTMLElement;
   listeners: AbortController;
   onVisibilityChanged: (() => void) | null;
-  panel: HTMLElement;
+  soundController: GameSoundController;
 }
