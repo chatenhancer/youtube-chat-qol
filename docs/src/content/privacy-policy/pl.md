@@ -4,24 +4,92 @@ title: "Polityka prywatności"
 description: "Jak Chat Enhancer for YouTube obsługuje lokalne przechowywanie, tłumaczenie, dane Playground i ustawienia prywatności."
 ---
 
-# Polityka prywatności
+# Prywatność
 
 Ostatnia aktualizacja: 17 czerwca 2026
 
-To tłumaczenie jest udostępnione dla wygody. Angielska wersja pod /privacy/ jest głównym odniesieniem.
+Chat Enhancer for YouTube to rozszerzenie przeglądarki dla czatu na żywo YouTube. Zostało zaprojektowane, aby dodawać drobne funkcje czatu bez zastępowania czatu YouTube ani zbierania analityki.
 
-Większość funkcji Chat Enhancer for YouTube działa lokalnie w przeglądarce. Tłumaczenie jest domyślnie wyłączone; po włączeniu tekst do tłumaczenia jest wysyłany do Google Translate. Gry Playground są domyślnie wyłączone. Jeśli je włączysz i użyjesz, obecność w grze, zaproszenia i akcje gry są wysyłane do backendu Chat Enhancer Playground pod wygenerowaną nazwą gracza.
+W skrócie:
 
-## Dane przechowywane w przeglądarce
+- Większość funkcji rozszerzenia działa lokalnie w Twojej przeglądarce.
+- Tłumaczenie jest domyślnie wyłączone.
+- Gdy tłumaczenie jest włączone, tłumaczony tekst jest wysyłany do Google Translate.
+- Gry Playground są domyślnie wyłączone. Jeśli włączysz i użyjesz Playground, obecność w grze, zaproszenia i akcje gry są wysyłane do backendu Chat Enhancer Playground pod wygenerowaną nazwą gracza.
+- Rozszerzenie nie uruchamia analityki, nie sprzedaje danych i nie zbiera historii przeglądania.
 
-Rozszerzenie używa pamięci przeglądarki do ustawień, danych Inbox, obserwowanych słów kluczowych, częstych emoji, zapisanych użytkowników, niewysłanych szkiców czatu dla każdego streamu i statusu kart live chat. Pseudonimowa tożsamość Playground jest zapisywana lokalnie, jeśli Playground jest używany. Ostatnie wiadomości profilu i wyniki tłumaczeń pozostają tylko w pamięci bieżącej strony live chat i są usuwane po jej opuszczeniu.
+## Gdzie działa rozszerzenie
 
-## Dane wysyłane poza przeglądarkę
+Rozszerzenie działa tylko na stronach czatu na żywo YouTube i powtórek czatu na żywo, które pasują do manifestu rozszerzenia.
 
-Dane mogą być wysyłane poza przeglądarkę tylko wtedy, gdy włączone jest tłumaczenie lub Playground. Żądania tłumaczenia trafiają do Google Translate i nie zawierają ciasteczek ani danych logowania YouTube. Playground może otrzymać klucz streamu/wideo, wygenerowany klucz publiczny i podpis, wygenerowaną nazwę gracza, dostępne gry, zaproszenia oraz akcje gry, takie jak ruchy szachowe. HELP-A-FRIEND! Trivia może wysłać wybrane fragmenty transkrypcji replayu YouTube i identyfikatory gry do backendu Playground, który używa OpenAI do generowania pytań. Replay Trivia może wymagać weryfikacji Cloudflare Turnstile, a Cloudflare może otrzymać normalne dane weryfikacyjne, takie jak adres IP, user agent i wynik wyzwania.
+Rozszerzenie używa uprawnienia przeglądarki `storage`, a także dostępu hosta do stron czatu na żywo YouTube, endpointu tłumaczenia Google oraz opcjonalnego backendu Playground. Nie prosi o ogólne uprawnienia do historii przeglądania, czytania kart, skryptów ani nawigacji internetowej.
 
-## Kontrole i ograniczenia
+## Dane przechowywane w Twojej przeglądarce
 
-Możesz wyczyścić dane rozszerzenia w popupie przyciskiem resetowania albo usunąć rozszerzenie z przeglądarki. Rozszerzenie nie uruchamia analytics, nie zbiera historii przeglądania i nie sprzedaje danych użytkowników. Poza opisanymi wyżej opcjonalnymi grami Playground nie wysyła danych do serwera należącego do rozszerzenia. Chat Enhancer for YouTube nie jest powiązany z YouTube ani Google.
+Rozszerzenie przechowuje część danych, aby jego funkcje mogły działać między przeładowaniami strony.
+
+- **Ustawienia są przechowywane za pomocą `chrome.storage.sync`:** w zależności od ustawień przeglądarki, przeglądarka może synchronizować te ustawienia rozszerzenia między Twoimi zalogowanymi instalacjami przeglądarki.
+
+- **Dane Inbox są przechowywane za pomocą `chrome.storage.local`:** obejmuje to obserwowane słowa kluczowe i do 100 rekordów inbox na stream lub powtórkę. Rekordy Inbox mogą zawierać tekst wiadomości, nazwę autora, znacznik czasu, metadane wiadomości/źródła YouTube, metadane dopasowania oraz dane wyświetlania emoji/obrazu potrzebne do pokazania zapisanej wiadomości.
+
+- **Dane częstych emoji są przechowywane za pomocą `chrome.storage.local`:** obejmuje to lokalne liczniki użycia i metadane wyświetlania emoji używane do budowy wiersza częstych emoji.
+
+- **Dane zapisanych użytkowników są przechowywane za pomocą `chrome.storage.local`:** obejmuje to handle zapisanego użytkownika, ID kanału, jeśli jest dostępne, oraz czas utworzenia zakładki. Zapisani użytkownicy są globalni między streamami w bieżącym profilu przeglądarki i służą do wyświetlania kolorowych pierścieni awatarów.
+
+- **Niewysłane szkice czatu są przechowywane za pomocą `chrome.storage.local` dla każdego streamu:** są przywracane po odświeżeniu strony. Szkice są usuwane, gdy pole czatu zostanie wyczyszczone, wiadomość zostanie wysłana lub dane rozszerzenia zostaną zresetowane.
+
+- **Status karty czatu na żywo jest przechowywany za pomocą `chrome.storage.local`:** ogranicza się do ID kart przeglądarki i znaczników czasu ostatniej aktywności dla niedawno aktywnych kart czatu na żywo YouTube, i służy do pokazywania, czy rozszerzenie jest obecnie połączone czy rozłączone. Te rekordy wygasają po 12 godzinach.
+
+- **Dane tożsamości Playground są przechowywane za pomocą `chrome.storage.local`, jeśli używany jest Playground:** jest to wygenerowana para kluczy publiczny/prywatny służąca do podpisywania wyzwań połączenia Playground, aby ta sama instalacja przeglądarki mogła zachować tę samą pseudonimową tożsamość Playground. To nie jest Twoja tożsamość YouTube.
+
+- **Ostatnie wiadomości profilu, stan komend i wyniki tłumaczeń są przechowywane tylko w pamięci dla bieżącej strony czatu na żywo. Są czyszczone, gdy strona zostanie opuszczona.**
+
+## Dane wysyłane poza Twoją przeglądarkę
+
+Tłumaczenie czatu i tłumaczenie szkiców są domyślnie wyłączone.
+
+Gdy funkcje tłumaczenia lub Playground są włączone, dane mogą być wysyłane do tych usług:
+
+- **Google Translate pod `https://translate.googleapis.com/translate_a/single`**
+
+  Tłumaczenie czatu wysyła kwalifikujący się widoczny i przychodzący tekst wiadomości czatu. Tłumaczenie szkiców wysyła tekst szkicu, który wybierzesz do tłumaczenia z pola czatu.
+
+  Żądania tłumaczenia zawierają tekst do przetłumaczenia i język docelowy. Rozszerzenie nie wysyła Twoich plików cookie YouTube ani danych logowania YouTube z żądaniami tłumaczenia.
+
+  Dostęp do Google Translate przez `translate.googleapis.com` jest nieoficjalny i może być limitowany, zmieniony lub niedostępny.
+
+- **Chat Enhancer Playground pod `https://playground.chatenhancer.com`**
+
+  Playground jest domyślnie wyłączony. Jeśli włączysz Playground i użyjesz panelu gier, rozszerzenie połączy się z backendem Playground, aby użytkownicy opt-in w tym samym streamie mogli widzieć dostępność, wymieniać zaproszenia i grać.
+
+  Wiadomości Playground mogą zawierać klucz streamu/wideo, wygenerowany publiczny klucz Playground i podpis, wygenerowaną nazwę gracza, listę dostępnych gier, zaproszenia i odpowiedzi na zaproszenia oraz akcje gry, takie jak ruchy szachowe.
+
+  Generowanie pytań HELP-A-FRIEND! Trivia może wysyłać wybrane fragmenty transkrypcji powtórki YouTube i identyfikatory gry do backendu Playground. Backend używa OpenAI do generowania pytań trivia z tych fragmentów.
+
+  Generowanie Replay Trivia może wymagać weryfikacji Cloudflare Turnstile na `https://playground.chatenhancer.com`. Cloudflare może otrzymać normalne dane weryfikacyjne, takie jak adres IP, user agent i wynik wyzwania.
+
+  Playground nie wysyła tekstu czatu na żywo, Twojej nazwy wyświetlanej YouTube, URL awatara YouTube, plików cookie YouTube ani danych logowania YouTube do backendu Playground.
+
+  Jak każda usługa webowa, backend Playground może otrzymać normalne metadane połączenia, takie jak adres IP i user agent, od przeglądarki lub dostawcy sieci.
+
+## Kontrola danych
+
+Możesz wyczyścić dane rozszerzenia z popupu rozszerzenia, używając przycisku resetowania. Czyści to lokalne dane rozszerzenia i zsynchronizowane ustawienia rozszerzenia, a następnie przywraca ustawienia domyślne.
+
+Możesz także usunąć rozszerzenie z przeglądarki. W zależności od przeglądarki usunięcie rozszerzenia może też usunąć jego lokalną pamięć.
+
+## Czego nie zbieramy
+
+Rozszerzenie nie uruchamia analityki.
+
+Rozszerzenie nie zbiera historii przeglądania.
+
+Rozszerzenie nie sprzedaje danych użytkowników.
+
+Poza opisanymi wyżej opcjonalnymi grami Playground, rozszerzenie nie wysyła danych do serwera należącego do rozszerzenia.
+
+Rozszerzenie nie przechowuje ostatnich wiadomości profilu ani wyników tłumaczeń po opuszczeniu strony czatu na żywo.
+
+Chat Enhancer for YouTube nie jest powiązany z YouTube ani Google.
 
 W sprawach prywatności użyj linku e-mail na https://www.chatenhancer.com.

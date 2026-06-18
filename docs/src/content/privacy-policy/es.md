@@ -8,70 +8,75 @@ description: "Cómo Chat Enhancer for YouTube gestiona el almacenamiento local, 
 
 Última actualización: 17 de junio de 2026
 
-Esta traducción se ofrece para comodidad. La versión en inglés de /privacy/ es la referencia principal.
-
-Chat Enhancer for YouTube es una extensión de navegador para el chat en directo de YouTube. Está diseñada para añadir pequeñas mejoras al chat sin reemplazarlo ni recopilar analíticas.
+Chat Enhancer for YouTube es una extensión de navegador para el chat en directo de YouTube. Está diseñada para añadir pequeñas funciones al chat sin reemplazar el chat de YouTube ni recopilar analíticas.
 
 Resumen:
 
-- La mayoría de funciones se ejecutan localmente en tu navegador.
+- La mayoría de las funciones de la extensión se ejecutan localmente en tu navegador.
 - La traducción está desactivada por defecto.
-- Cuando activas la traducción, el texto que se traduce se envía a Google Translate.
-- Los juegos de Playground están desactivados por defecto. Si los activas y los usas, la presencia de juego, las invitaciones y las acciones de juego se envían al backend de Chat Enhancer Playground con un nombre de jugador generado.
-- La extensión no ejecuta analíticas, no vende datos y no recopila historial de navegación.
+- Cuando la traducción está activada, el texto que se traduce se envía a Google Translate.
+- Los juegos de Playground están desactivados por defecto. Si activas y usas Playground, la presencia de juego, las invitaciones y las acciones de juego se envían al backend de Chat Enhancer Playground bajo un nombre de jugador generado.
+- La extensión no ejecuta analíticas, no vende datos ni recopila historial de navegación.
 
 ## Dónde se ejecuta la extensión
 
-La extensión se ejecuta solo en páginas de chat en directo y repetición de chat en directo de YouTube que coinciden con el manifiesto de la extensión.
+La extensión se ejecuta solo en páginas de chat en directo y de repetición de chat en directo de YouTube que coinciden con el manifiesto de la extensión.
 
-La extensión usa el permiso de almacenamiento del navegador y acceso de host para páginas de chat en directo de YouTube, el endpoint de traducción de Google y el backend opcional de Playground. No solicita permisos generales de historial de navegación, lectura de pestañas, scripting ni navegación web.
+La extensión usa el permiso de almacenamiento del navegador, además de acceso de host para páginas de chat en directo de YouTube, el endpoint de traducción de Google y el backend opcional de Playground. No solicita permisos generales de historial de navegación, lectura de pestañas, scripting ni navegación web.
 
 ## Datos almacenados en tu navegador
 
-La extensión guarda algunos datos para que sus funciones sigan funcionando entre recargas.
+La extensión almacena algunos datos para que sus funciones funcionen entre recargas de página.
 
-- **La configuración se guarda con `chrome.storage.sync`:** según la configuración de tu navegador, el navegador puede sincronizar esos ajustes entre tus instalaciones iniciadas con sesión.
-- **Los datos de Inbox se guardan con `chrome.storage.local`:** esto incluye palabras clave vigiladas y hasta 100 registros de Inbox por stream o repetición. Los registros pueden incluir texto del mensaje, nombre del autor, marca de tiempo, metadatos de YouTube, metadatos de coincidencia y datos de emoji/imagen necesarios para mostrar el mensaje guardado.
-- **Los datos de emojis frecuentes se guardan con `chrome.storage.local`:** esto incluye contadores locales y metadatos de emoji usados para crear la fila de emojis frecuentes.
-- **Los usuarios marcados se guardan con `chrome.storage.local`:** esto incluye el handle, el ID del canal cuando está disponible y la hora de creación. Los marcadores son globales entre streams dentro del perfil actual del navegador y se usan para mostrar anillos de avatar de color.
-- **Los borradores no enviados se guardan con `chrome.storage.local` por stream:** se restauran tras recargar la página y se eliminan cuando se limpia el cuadro de chat, se envía el mensaje o se restablecen los datos de la extensión.
-- **El estado de las pestañas de chat en directo se guarda con `chrome.storage.local`:** se limita a IDs de pestaña y marcas de tiempo recientes, y se usa para indicar si la extensión está conectada o desconectada. Estos registros caducan después de 12 horas.
-- **Los datos de identidad de Playground se guardan con `chrome.storage.local` si usas Playground:** es un par de claves público/privado generado para firmar desafíos de conexión, de modo que la misma instalación conserve la misma identidad seudónima. No es tu identidad de YouTube.
+- **La configuración se almacena con `chrome.storage.sync`:** según la configuración de tu navegador, el navegador puede sincronizar esos ajustes de la extensión entre tus propias instalaciones del navegador con sesión iniciada.
+
+- **Los datos de Inbox se almacenan con `chrome.storage.local`:** esto incluye palabras clave vigiladas y hasta 100 registros de Inbox por stream o repetición. Los registros de Inbox pueden incluir texto del mensaje, nombre del autor, marca de tiempo, metadatos de mensaje/fuente de YouTube, metadatos de coincidencia y datos de visualización de emoji/imagen necesarios para mostrar el mensaje guardado.
+
+- **Los datos de emojis frecuentes se almacenan con `chrome.storage.local`:** esto incluye contadores de uso locales y metadatos de visualización de emojis usados para construir la fila de emojis frecuentes.
+
+- **Los datos de usuarios marcados se almacenan con `chrome.storage.local`:** esto incluye el handle del usuario marcado, el ID del canal cuando está disponible y la hora en que se creó el marcador. Los usuarios marcados son globales entre streams en el perfil actual del navegador y se usan para mostrar anillos de avatar de color.
+
+- **Los borradores de chat no enviados se almacenan con `chrome.storage.local` por stream:** se restauran después de actualizar la página. Los borradores se eliminan cuando se limpia el cuadro de chat, se envía el mensaje o se restablecen los datos de la extensión.
+
+- **El estado de las pestañas de chat en directo se almacena con `chrome.storage.local`:** se limita a IDs de pestañas del navegador y marcas de tiempo de última actividad de pestañas de chat en directo de YouTube activas recientemente, y se usa para mostrar si la extensión está conectada o desconectada. Estos registros caducan después de 12 horas.
+
+- **Los datos de identidad de Playground se almacenan con `chrome.storage.local` si se usa Playground:** es un par de claves pública/privada generado para firmar desafíos de conexión de Playground, de modo que la misma instalación del navegador pueda conservar la misma identidad seudónima de Playground. No es tu identidad de YouTube.
+
 - **Los mensajes recientes de perfil, el estado de comandos y los resultados de traducción se mantienen solo en memoria para la página actual de chat en directo. Se borran cuando la página se descarga.**
 
 ## Datos enviados fuera de tu navegador
 
-La traducción del chat y de borradores está desactivada por defecto.
+La traducción del chat y la traducción de borradores están desactivadas por defecto.
 
-Cuando activas traducción o Playground, pueden enviarse datos a estos servicios:
+Cuando las funciones de traducción o Playground están activadas, pueden enviarse datos a estos servicios:
 
 - **Google Translate en `https://translate.googleapis.com/translate_a/single`**
 
-  La traducción del chat envía texto de mensajes visibles y entrantes elegibles. La traducción de borradores envía el texto que eliges traducir desde el cuadro de chat.
+  La traducción del chat envía el texto de mensajes de chat visibles y entrantes elegibles. La traducción de borradores envía el texto del borrador que eliges traducir desde el cuadro de chat.
 
-  Las solicitudes incluyen el texto y el idioma de destino. La extensión no envía tus cookies ni credenciales de YouTube con estas solicitudes.
+  Las solicitudes de traducción incluyen el texto que se va a traducir y el idioma de destino. La extensión no envía tus cookies de YouTube ni tus credenciales de YouTube con las solicitudes de traducción.
 
-  El acceso a Google Translate mediante `translate.googleapis.com` no es oficial y puede tener límites, cambiar o dejar de estar disponible.
+  El acceso a Google Translate mediante `translate.googleapis.com` no es oficial y puede estar sujeto a límites de uso, cambiar o dejar de estar disponible.
 
 - **Chat Enhancer Playground en `https://playground.chatenhancer.com`**
 
-  Playground está desactivado por defecto. Si lo activas y usas el panel de juegos, la extensión se conecta al backend de Playground para que usuarios que también hayan optado por participar en el mismo stream puedan ver disponibilidad, intercambiar invitaciones y jugar.
+  Playground está desactivado por defecto. Si activas Playground y usas el panel de juegos, la extensión se conecta al backend de Playground para que los usuarios que hayan optado por participar en el mismo stream puedan ver disponibilidad, intercambiar invitaciones y jugar.
 
-  Los mensajes de Playground pueden incluir la clave del stream o vídeo, tu clave pública y firma generadas, tu nombre de jugador generado, tu lista de juegos disponibles, invitaciones y respuestas, y acciones de juego como movimientos de ajedrez.
+  Los mensajes de Playground pueden incluir la clave del stream/vídeo, tu clave pública y firma de Playground generadas, tu nombre de jugador generado, tu lista de juegos disponibles, invitaciones y respuestas a invitaciones, y acciones de juego como movimientos de ajedrez.
 
-  La generación de preguntas de HELP-A-FRIEND! Trivia puede enviar fragmentos seleccionados de la transcripción de una repetición de YouTube e identificadores de juego al backend de Playground. El backend usa OpenAI para generar preguntas a partir de esos fragmentos.
+  La generación de preguntas de HELP-A-FRIEND! Trivia puede enviar fragmentos seleccionados de transcripciones de repeticiones de YouTube e identificadores de juego al backend de Playground. El backend usa OpenAI para generar preguntas de trivia a partir de esos fragmentos.
 
   La generación de Replay Trivia puede requerir verificación de Cloudflare Turnstile en `https://playground.chatenhancer.com`. Cloudflare puede recibir datos normales de verificación, como dirección IP, agente de usuario y resultado del desafío.
 
-  Playground no envía al backend texto del chat en directo, tu nombre visible de YouTube, la URL de tu avatar de YouTube, cookies de YouTube ni credenciales de YouTube.
+  Playground no envía al backend de Playground texto del chat en directo, tu nombre visible de YouTube, la URL de tu avatar de YouTube, cookies de YouTube ni credenciales de YouTube.
 
-  Como cualquier servicio web, el backend de Playground puede recibir metadatos normales de conexión, como dirección IP y agente de usuario, desde el navegador o proveedor de red.
+  Como cualquier servicio web, el backend de Playground puede recibir metadatos normales de conexión, como dirección IP y agente de usuario, desde el navegador o el proveedor de red.
 
 ## Controles de datos
 
-Puedes borrar los datos de la extensión desde el popup usando el botón de restablecimiento. Esto borra los datos locales y los ajustes sincronizados de la extensión, y luego restaura la configuración predeterminada.
+Puedes borrar los datos de la extensión desde el popup de la extensión usando el botón de restablecimiento. Esto borra los datos locales de la extensión y los ajustes sincronizados de la extensión, y luego restaura la configuración predeterminada.
 
-También puedes quitar la extensión de tu navegador. Según el navegador, al quitarla también puede eliminarse su almacenamiento local.
+También puedes quitar la extensión de tu navegador. Según el navegador, al quitar la extensión también puede eliminarse su almacenamiento local.
 
 ## Qué no se recopila
 
@@ -83,7 +88,7 @@ La extensión no vende datos de usuario.
 
 Salvo los juegos opcionales de Playground descritos arriba, la extensión no envía datos a un servidor propiedad de la extensión.
 
-La extensión no almacena mensajes recientes de perfil ni resultados de traducción después de descargar la página de chat en directo.
+La extensión no almacena mensajes recientes de perfil ni resultados de traducción después de que la página de chat en directo se descarga.
 
 Chat Enhancer for YouTube no está afiliado a YouTube ni a Google.
 

@@ -22,33 +22,19 @@ The extension uses the browser `storage` permission, plus host access for YouTub
 
 The extension stores some data so its features can work between page reloads.
 
-- **Settings are stored with `chrome.storage.sync`:**
+- **Settings are stored with `chrome.storage.sync`:** depending on your browser settings, the browser may sync those extension settings across your own signed-in browser installs.
 
-  Depending on your browser settings, the browser may sync those extension settings across your own signed-in browser installs.
+- **Inbox data is stored with `chrome.storage.local`:** this includes watched keywords and up to 100 inbox records per stream or replay. Inbox records may include message text, author name, timestamp, YouTube message/source metadata, match metadata, and emoji/image display data needed to show the saved message.
 
-- **Inbox data is stored with `chrome.storage.local`:**
+- **Frequent emoji data is stored with `chrome.storage.local`:** this includes local usage counts and emoji display metadata used to build the frequent emoji row.
 
-  This includes watched keywords and up to 100 inbox records per stream or replay. Inbox records may include message text, author name, timestamp, YouTube message/source metadata, match metadata, and emoji/image display data needed to show the saved message.
+- **Bookmarked user data is stored with `chrome.storage.local`:** this includes the bookmarked user's handle, channel ID when available, and the time the bookmark was created. Bookmarked users are global across streams in the current browser profile and are used to show colored avatar rings.
 
-- **Frequent emoji data is stored with `chrome.storage.local`:**
+- **Unsent chat drafts are stored with `chrome.storage.local` per stream:** they are restored after a page refresh. Drafts are removed when the chat input is cleared, the message is sent, or extension data is reset.
 
-  This includes local usage counts and emoji display metadata used to build the frequent emoji row.
+- **Live chat tab status is stored with `chrome.storage.local`:** this is limited to browser tab IDs and last-seen timestamps for recently active YouTube live chat tabs, and is used to show whether the extension is currently connected or disconnected. These records expire after 12 hours.
 
-- **Bookmarked user data is stored with `chrome.storage.local`:**
-
-  This includes the bookmarked user's handle, channel ID when available, and the time the bookmark was created. Bookmarked users are global across streams in the current browser profile and are used to show colored avatar rings.
-
-- **Unsent chat drafts are stored with `chrome.storage.local` per stream:**
-  
-  They are restored after a page refresh. Drafts are removed when the chat input is cleared, the message is sent, or extension data is reset.
-
-- **Live chat tab status is stored with `chrome.storage.local`:**
-
-  This is limited to browser tab IDs and last-seen timestamps for recently active YouTube live chat tabs, and is used to show whether the extension is currently connected or disconnected. These records expire after 12 hours.
-
-- **Playground identity data is stored with `chrome.storage.local` if Playground is used:**
-
-  This is a generated public/private key pair used to sign Playground connection challenges, so the same browser install can keep the same pseudonymous Playground identity. It is not your YouTube identity.
+- **Playground identity data is stored with `chrome.storage.local` if Playground is used:** this is a generated public/private key pair used to sign Playground connection challenges, so the same browser install can keep the same pseudonymous Playground identity. It is not your YouTube identity.
 
 - **Recent profile messages, command state, and translation results are kept only in memory for the current live chat page. They are cleared when the page unloads.**
 
