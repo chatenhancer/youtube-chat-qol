@@ -427,7 +427,7 @@ describe('Replay Trivia panel', () => {
     expect(drawnText).not.toContain('No answer');
   });
 
-  it('draws the correct answer in bold blue inside the friend reply', () => {
+  it('draws the correct answer in bold inside the friend reply', () => {
     const fillTextCalls: Array<{ fillStyle: string; font: string; text: string }> = [];
     context.fillText.mockImplementation((text) => {
       fillTextCalls.push({
@@ -454,10 +454,10 @@ describe('Replay Trivia panel', () => {
     updateReplayTriviaGamePanel(game, 'host-user');
 
     expect(fillTextCalls).toEqual(expect.arrayContaining([
-      expect.objectContaining({ fillStyle: '#2290FF', font: expect.stringContaining('700'), text: 'The' }),
-      expect.objectContaining({ fillStyle: '#2290FF', font: expect.stringContaining('700'), text: 'Last' }),
-      expect.objectContaining({ fillStyle: '#2290FF', font: expect.stringContaining('700'), text: 'of' }),
-      expect.objectContaining({ fillStyle: '#2290FF', font: expect.stringContaining('700'), text: 'Us.' })
+      expect.objectContaining({ fillStyle: '#303033', font: expect.stringContaining('700'), text: 'The' }),
+      expect.objectContaining({ fillStyle: '#303033', font: expect.stringContaining('700'), text: 'Last' }),
+      expect.objectContaining({ fillStyle: '#303033', font: expect.stringContaining('700'), text: 'of' }),
+      expect.objectContaining({ fillStyle: '#303033', font: expect.stringContaining('700'), text: 'Us.' })
     ]));
     expect(fillTextCalls).toEqual(expect.arrayContaining([
       expect.objectContaining({ fillStyle: '#303033', font: expect.stringContaining('400'), text: 'wow,' })
