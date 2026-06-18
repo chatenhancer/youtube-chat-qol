@@ -78,7 +78,6 @@ const FRIEND_BUBBLE_MIN_HEIGHT = 45;
 
 interface FriendBubbleTextSegment {
   bold?: boolean;
-  color?: string;
   text: string;
 }
 
@@ -1474,7 +1473,6 @@ function boldFriendReplyAnswer(reply: string, correctAnswer: string): string | F
     }
     segments.push({
       bold: true,
-      color: REPLAY_TRIVIA_ACCENT_BLUE,
       text: reply.slice(matchIndex, matchEnd)
     });
     cursor = matchEnd;
@@ -1549,7 +1547,6 @@ function toFriendBubbleWords(text: string | readonly FriendBubbleTextSegment[]):
       .filter(Boolean)
       .map((word) => ({
         bold: segment.bold,
-        color: segment.color,
         text: word
       }))
   );
@@ -1588,7 +1585,7 @@ function drawFriendBubbleLines(
     let segmentX = x;
     line.segments.forEach((segment) => {
       context.font = `${segment.bold ? 700 : 400} ${fontSize}px ${FONT_STACK}`;
-      context.fillStyle = segment.color || '#303033';
+      context.fillStyle = '#303033';
       context.fillText(segment.text, segmentX, y + (lineIndex * lineHeight));
       segmentX += context.measureText(segment.text).width;
     });
