@@ -26,6 +26,7 @@ export interface ClientSession {
 export class SessionManager {
   private readonly sessions = new Map<string, ClientSession>();
   private readonly userAvailableGames = new Map<string, GameId[]>();
+  private readonly userDisplayNames = new Map<string, string>();
   private readonly userLanguages = new Map<string, PlaygroundUserLanguage>();
 
   authenticate(
@@ -35,14 +36,16 @@ export class SessionManager {
     displayName = getPlayerDisplayName(userId),
     language: PlaygroundUserLanguage = DEFAULT_USER_LANGUAGE
   ): void {
+    const resolvedDisplayName = displayName || this.userDisplayNames.get(userId) || getPlayerDisplayName(userId);
     session.userId = userId;
-    session.displayName = displayName;
+    session.displayName = resolvedDisplayName;
     session.availableGames = new Set(availableGames);
     session.joinedAt = Date.now();
     session.languageCode = language.languageCode || DEFAULT_USER_LANGUAGE.languageCode;
     session.locale = language.locale;
     this.sessions.set(session.connectionId, session);
     this.userAvailableGames.set(userId, availableGames);
+    this.userDisplayNames.set(userId, resolvedDisplayName);
     this.userLanguages.set(userId, {
       languageCode: session.languageCode,
       locale: session.locale
@@ -65,7 +68,7 @@ export class SessionManager {
       const existing = users.get(session.userId);
       users.set(session.userId, {
         availableGames: this.userAvailableGames.get(session.userId) || [...session.availableGames],
-        displayName: session.displayName || existing?.displayName || 'Player',
+        displayName: this.userDisplayNames.get(session.userId) || session.displayName || existing?.displayName || 'Player',
         joinedAt: Math.min(existing?.joinedAt || session.joinedAt, session.joinedAt),
         userId: session.userId
       });
@@ -77,7 +80,7 @@ export class SessionManager {
   getPublicUser(userId: string): PublicUserIdentity {
     const presence = this.getPresenceUser(userId);
     return {
-      displayName: presence?.displayName || getPlayerDisplayName(userId),
+      displayName: presence?.displayName || this.userDisplayNames.get(userId) || getPlayerDisplayName(userId),
       userId
     };
   }
@@ -111,6 +114,14 @@ export class SessionManager {
   setAvailability(session: ClientSession, availableGames: GameId[]): void {
     session.availableGames = new Set(availableGames);
     this.userAvailableGames.set(session.userId, availableGames);
+  }
+
+  setDisplayName(session: ClientSession, displayName: string): void {
+    if (!session.userId || !displayName) return;
+    this.sessions.forEach((candidate) => {
+      if (candidate.userId === session.userId) candidate.displayName = displayName;
+    });
+    this.userDisplayNames.set(session.userId, displayName);
   }
 
   broadcastPresence(createSnapshot: (userId: string) => LobbySnapshot): void {

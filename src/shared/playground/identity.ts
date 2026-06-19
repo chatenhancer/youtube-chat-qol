@@ -2,11 +2,14 @@
  * Playground identity helpers shared by the popup and background bridge.
  *
  * The private key stays in chrome.storage.local. UI surfaces only need the
- * stable public fingerprint and the backend-compatible Player XXXX label.
+ * stable public fingerprint and a local display label.
  */
+export const PLAYGROUND_DISPLAY_NAME_STORAGE_KEY = 'ytcqPlaygroundDisplayName:v1';
 export const PLAYGROUND_IDENTITY_STORAGE_KEY = 'ytcqPlaygroundIdentity:v1';
 export const PLAYGROUND_PROFILE_MESSAGE_TYPE = 'ytcq:playground:get-profile';
+export const PLAYGROUND_PROFILE_UPDATE_MESSAGE_TYPE = 'ytcq:playground:update-profile';
 export const PLAYGROUND_PROFILE_STATS_ROUTE = '/v1/player-stats';
+export const PLAYGROUND_DISPLAY_NAME_MAX_LENGTH = 24;
 
 export interface StoredPlaygroundIdentity {
   privateKeyJwk: JsonWebKey;
@@ -14,7 +17,9 @@ export interface StoredPlaygroundIdentity {
 }
 
 export interface PlaygroundProfile {
+  customDisplayName: string;
   displayName: string;
+  generatedDisplayName: string;
   userId: string;
   wins: number;
 }
@@ -69,6 +74,11 @@ export interface PlaygroundProfileMessage {
   type: typeof PLAYGROUND_PROFILE_MESSAGE_TYPE;
 }
 
+export interface PlaygroundProfileUpdateMessage {
+  displayName: string;
+  type: typeof PLAYGROUND_PROFILE_UPDATE_MESSAGE_TYPE;
+}
+
 export type PlaygroundProfileResponse =
   | {
     ok: true;
@@ -78,6 +88,8 @@ export type PlaygroundProfileResponse =
     error: string;
     ok: false;
   };
+
+export type PlaygroundProfileUpdateResponse = PlaygroundProfileResponse;
 
 export async function getPlaygroundUserId(publicKeyJwk: JsonWebKey): Promise<string> {
   const canonicalKey = JSON.stringify({
@@ -90,9 +102,23 @@ export async function getPlaygroundUserId(publicKeyJwk: JsonWebKey): Promise<str
   return encodeBase64Url(new Uint8Array(digest)).slice(0, 32);
 }
 
-export function getPlaygroundDisplayName(userId: string): string {
+export function getPlaygroundDisplayName(userId: string, customDisplayName = ''): string {
+  return normalizePlaygroundDisplayName(customDisplayName) || getGeneratedPlaygroundDisplayName(userId);
+}
+
+export function getGeneratedPlaygroundDisplayName(userId: string): string {
   const code = userId.replace(/[^a-z0-9]/gi, '').slice(0, 4).toUpperCase();
   return `Player ${code || '0000'}`;
+}
+
+export function normalizePlaygroundDisplayName(value: unknown): string {
+  const displayName = normalizePlaygroundDisplayNameText(value);
+  return isAllowedPlaygroundDisplayName(displayName) ? displayName : '';
+}
+
+export function isValidPlaygroundDisplayName(value: unknown): boolean {
+  const displayName = normalizePlaygroundDisplayNameText(value);
+  return Boolean(displayName) && isAllowedPlaygroundDisplayName(displayName);
 }
 
 export function getPlaygroundAvatarInitial(displayName: string, userId = ''): string {
@@ -126,6 +152,12 @@ export function getPlaygroundAvatarColor(seed: string): string {
 
 export function isPlaygroundProfileMessage(value: unknown): value is PlaygroundProfileMessage {
   return isRecord(value) && value.type === PLAYGROUND_PROFILE_MESSAGE_TYPE;
+}
+
+export function isPlaygroundProfileUpdateMessage(value: unknown): value is PlaygroundProfileUpdateMessage {
+  return isRecord(value) &&
+    value.type === PLAYGROUND_PROFILE_UPDATE_MESSAGE_TYPE &&
+    typeof value.displayName === 'string';
 }
 
 export function isStoredPlaygroundIdentity(value: unknown): value is StoredPlaygroundIdentity {
@@ -164,6 +196,37 @@ function isP256PublicKey(value: unknown): value is JsonWebKey {
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function normalizePlaygroundDisplayNameText(value: unknown): string {
+  if (typeof value !== 'string') return '';
+  return replaceControlCharacters(value)
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function replaceControlCharacters(value: string): string {
+  let normalized = '';
+  for (let index = 0; index < value.length; index += 1) {
+    const code = value.charCodeAt(index);
+    normalized += code <= 0x1f || code === 0x7f ? ' ' : value[index];
+  }
+  return normalized;
+}
+
+function isAllowedPlaygroundDisplayName(displayName: string): boolean {
+  return displayName.length > 0 &&
+    displayName.length <= PLAYGROUND_DISPLAY_NAME_MAX_LENGTH &&
+    !isReservedPlaygroundDisplayName(displayName) &&
+    !looksLikeUrl(displayName);
+}
+
+function isReservedPlaygroundDisplayName(displayName: string): boolean {
+  return /^(?:computer(?:\s*\([^)]*\))?|beginner|club|master)$/i.test(displayName);
+}
+
+function looksLikeUrl(displayName: string): boolean {
+  return /(?:https?:\/\/|www\.)/i.test(displayName);
 }
 
 function getFirstAsciiLetter(value: string): string {

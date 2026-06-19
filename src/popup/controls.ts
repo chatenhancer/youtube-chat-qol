@@ -16,6 +16,7 @@ export const controls = {
   playgroundEnabled: document.querySelector<HTMLInputElement>('#playgroundEnabled'),
   playgroundGamesSection: document.querySelector<HTMLElement>('#playgroundGamesSection'),
   playgroundGamesAvailable: document.querySelector<HTMLInputElement>('#playgroundGamesAvailable'),
+  playgroundDisplayName: document.querySelector<HTMLInputElement>('#playgroundDisplayName'),
   playgroundProfile: document.querySelector<HTMLElement>('#playgroundProfile'),
   playgroundProfileAvatar: document.querySelector<HTMLElement>('#playgroundProfileAvatar'),
   playgroundProfileDetails: document.querySelector<HTMLElement>('#playgroundProfileDetails'),
@@ -28,6 +29,7 @@ export const controls = {
 
 export interface PopupSettingsControls {
   playgroundEnabled: HTMLInputElement;
+  playgroundDisplayName: HTMLInputElement;
   playgroundGamesAvailable: HTMLInputElement;
   playgroundGamesSection: HTMLElement;
   playgroundProfile: HTMLElement;
@@ -50,6 +52,7 @@ export function getSettingsControls(): PopupSettingsControls | null {
     sound,
     startupEffect,
     playgroundEnabled,
+    playgroundDisplayName,
     playgroundGamesSection,
     playgroundGamesAvailable,
     playgroundProfile,
@@ -67,6 +70,7 @@ export function getSettingsControls(): PopupSettingsControls | null {
     !sound ||
     !startupEffect ||
     !playgroundEnabled ||
+    !playgroundDisplayName ||
     !playgroundGamesSection ||
     !playgroundGamesAvailable ||
     !playgroundProfile ||
@@ -82,6 +86,7 @@ export function getSettingsControls(): PopupSettingsControls | null {
 
   return {
     playgroundEnabled,
+    playgroundDisplayName,
     playgroundGamesAvailable,
     playgroundGamesSection,
     playgroundProfile,

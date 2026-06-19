@@ -7,7 +7,11 @@ import {
   type PlaygroundContentMessage,
   type ServerMessage
 } from '../shared/playground/protocol';
-import { PLAYGROUND_PROFILE_MESSAGE_TYPE } from '../shared/playground/identity';
+import {
+  PLAYGROUND_DISPLAY_NAME_STORAGE_KEY,
+  PLAYGROUND_PROFILE_MESSAGE_TYPE,
+  PLAYGROUND_PROFILE_UPDATE_MESSAGE_TYPE
+} from '../shared/playground/identity';
 import { REPLAY_TRIVIA_QUESTIONS_BACKGROUND_MESSAGE } from '../shared/playground/trivia';
 
 class FakeWebSocket {
@@ -211,7 +215,9 @@ describe('background playground bridge', () => {
       expect(sendResponse).toHaveBeenCalledWith({
         ok: true,
         profile: {
+          customDisplayName: '',
           displayName: expect.stringMatching(/^Player [A-Z0-9]{4}$/),
+          generatedDisplayName: expect.stringMatching(/^Player [A-Z0-9]{4}$/),
           userId: expect.stringMatching(/^[A-Za-z0-9_-]{32}$/),
           wins: 0
         }
@@ -228,6 +234,105 @@ describe('background playground bridge', () => {
     await vi.waitFor(() => {
       expect(sendResponse).toHaveBeenCalledWith(firstResponse);
     });
+  });
+
+  it('stores custom playground display names and pushes them to active sockets', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => new Response(JSON.stringify({
+      ok: true,
+      stats: {
+        games: {},
+        userId: 'ignored',
+        wins: 0
+      }
+    }))));
+    await import('./playground');
+    const port = createFakePort();
+    getConnectListener()(port as unknown as chrome.runtime.Port);
+    port.emit({
+      availableGames: ['chess'],
+      streamKey: 'stream-a',
+      type: 'ytcq:playground:init'
+    });
+
+    const socket = FakeWebSocket.instances[0];
+    socket.emit('message', {
+      challenge: 'challenge-1',
+      issuedAt: Date.now(),
+      protocolVersion: PLAYGROUND_PROTOCOL_VERSION,
+      type: 'challenge'
+    });
+    await vi.waitFor(() => {
+      expect(socket.sent).toHaveLength(1);
+    });
+    expect(socket.sent[0]).toMatchObject({
+      displayName: expect.stringMatching(/^Player [A-Z0-9]{4}$/),
+      type: 'hello'
+    });
+    socket.emit('message', {
+      snapshot: {
+        games: [],
+        invites: [],
+        users: []
+      },
+      type: 'helloAccepted',
+      userId: 'user-1'
+    });
+
+    const sendResponse = vi.fn();
+    getMessageListener()({
+      displayName: '  Luna Chat  ',
+      type: PLAYGROUND_PROFILE_UPDATE_MESSAGE_TYPE
+    }, {} as chrome.runtime.MessageSender, sendResponse);
+
+    await vi.waitFor(() => {
+      expect(sendResponse).toHaveBeenCalledWith({
+        ok: true,
+        profile: expect.objectContaining({
+          customDisplayName: 'Luna Chat',
+          displayName: 'Luna Chat'
+        })
+      });
+    });
+    await expect(chrome.storage.local.get(PLAYGROUND_DISPLAY_NAME_STORAGE_KEY)).resolves.toEqual({
+      [PLAYGROUND_DISPLAY_NAME_STORAGE_KEY]: 'Luna Chat'
+    });
+    expect(socket.sent.at(-1)).toEqual({
+      displayName: 'Luna Chat',
+      type: 'setDisplayName'
+    });
+
+    const profileResponse = vi.fn();
+    getMessageListener()({
+      type: PLAYGROUND_PROFILE_MESSAGE_TYPE
+    }, {} as chrome.runtime.MessageSender, profileResponse);
+    await vi.waitFor(() => {
+      expect(profileResponse).toHaveBeenCalledWith({
+        ok: true,
+        profile: expect.objectContaining({
+          customDisplayName: 'Luna Chat',
+          displayName: 'Luna Chat',
+          generatedDisplayName: expect.stringMatching(/^Player [A-Z0-9]{4}$/)
+        })
+      });
+    });
+  });
+
+  it('rejects invalid custom playground display names', async () => {
+    await import('./playground');
+
+    const sendResponse = vi.fn();
+    getMessageListener()({
+      displayName: 'https://example.com',
+      type: PLAYGROUND_PROFILE_UPDATE_MESSAGE_TYPE
+    }, {} as chrome.runtime.MessageSender, sendResponse);
+
+    await vi.waitFor(() => {
+      expect(sendResponse).toHaveBeenCalledWith({
+        error: 'Choose a shorter display name without URLs or reserved Playground names.',
+        ok: false
+      });
+    });
+    await expect(chrome.storage.local.get(PLAYGROUND_DISPLAY_NAME_STORAGE_KEY)).resolves.toEqual({});
   });
 
   it('returns a profile error when local identity creation fails', async () => {

@@ -17,15 +17,20 @@ import {
   type SignedClientIdentity
 } from '../shared/playground/protocol';
 import {
+  PLAYGROUND_DISPLAY_NAME_STORAGE_KEY,
   PLAYGROUND_IDENTITY_STORAGE_KEY,
   PLAYGROUND_PROFILE_STATS_ROUTE,
   encodeBase64Url,
+  getGeneratedPlaygroundDisplayName,
   getPlaygroundDisplayName,
   getPlaygroundUserId,
   isPlaygroundProfileMessage,
+  isPlaygroundProfileUpdateMessage,
   isStoredPlaygroundIdentity,
+  normalizePlaygroundDisplayName,
   type PlaygroundProfile,
   type PlaygroundProfileResponse,
+  type PlaygroundProfileUpdateResponse,
   type StoredPlaygroundIdentity
 } from '../shared/playground/identity';
 import {
@@ -40,6 +45,7 @@ const SIGNATURE_PREFIX = 'chat-enhancer-playground:';
 const MAX_QUEUED_CLIENT_MESSAGES = 20;
 const PLAYGROUND_HEARTBEAT_INTERVAL_MS = 20_000;
 const PLAYGROUND_RECONNECT_DELAYS_MS = [750, 2_000, 5_000, 10_000] as const;
+const activePlaygroundSessions = new Set<PlaygroundBackgroundSession>();
 
 chrome.runtime.onConnect.addListener((port) => {
   if (port.name !== PLAYGROUND_PORT_NAME) return;
@@ -60,6 +66,24 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
           error: error instanceof Error ? error.message : 'Playground profile unavailable.',
           ok: false
         } satisfies PlaygroundProfileResponse);
+      });
+    return true;
+  }
+
+  if (isPlaygroundProfileUpdateMessage(message)) {
+    void setStoredPlaygroundProfileDisplayName(message.displayName)
+      .then((profile) => {
+        activePlaygroundSessions.forEach((session) => session.updateDisplayName(profile.displayName));
+        sendResponse({
+          ok: true,
+          profile
+        } satisfies PlaygroundProfileUpdateResponse);
+      })
+      .catch((error: unknown) => {
+        sendResponse({
+          error: error instanceof Error ? error.message : 'Playground profile could not be updated.',
+          ok: false
+        } satisfies PlaygroundProfileUpdateResponse);
       });
     return true;
   }
@@ -94,8 +118,17 @@ class PlaygroundBackgroundSession {
     const port = this.port;
     if (!port) return;
 
+    activePlaygroundSessions.add(this);
     port.onMessage.addListener(this.handlePortMessage);
     port.onDisconnect.addListener(this.handlePortDisconnect);
+  }
+
+  updateDisplayName(displayName: string): void {
+    if (!displayName) return;
+    this.sendClientMessage({
+      displayName,
+      type: 'setDisplayName'
+    });
   }
 
   private handlePortMessage = (message: PlaygroundContentMessage): void => {
@@ -145,6 +178,7 @@ class PlaygroundBackgroundSession {
   private handlePortDisconnect = (): void => {
     this.port?.onMessage.removeListener(this.handlePortMessage);
     this.port?.onDisconnect.removeListener(this.handlePortDisconnect);
+    activePlaygroundSessions.delete(this);
     this.port = null;
     this.closeSocket({ allowReconnect: false });
   };
@@ -247,6 +281,7 @@ class PlaygroundBackgroundSession {
       const identity = await this.getIdentity();
       this.sendSocketMessage(socket, {
         availableGames: this.availableGames,
+        displayName: await getStoredPlaygroundSocketDisplayName(identity),
         identity: await createSignedPlaygroundIdentity(challenge, identity),
         languageCode: this.languageCode,
         locale: this.locale,
@@ -369,6 +404,7 @@ class PlaygroundBackgroundSession {
     try {
       this.port?.postMessage(message);
     } catch {
+      activePlaygroundSessions.delete(this);
       this.port = null;
       this.closeSocket({ allowReconnect: false });
     }
@@ -532,11 +568,41 @@ async function createStoredPlaygroundIdentity(): Promise<StoredPlaygroundIdentit
 async function getStoredPlaygroundProfile(): Promise<PlaygroundProfile> {
   const identity = await getStoredPlaygroundIdentity();
   const userId = await getPlaygroundUserId(identity.publicKeyJwk);
+  const customDisplayName = await getStoredPlaygroundCustomDisplayName();
+  const generatedDisplayName = getGeneratedPlaygroundDisplayName(userId);
   return {
-    displayName: getPlaygroundDisplayName(userId),
+    customDisplayName,
+    displayName: getPlaygroundDisplayName(userId, customDisplayName),
+    generatedDisplayName,
     userId,
     wins: await getRemotePlaygroundProfileWins(userId).catch(() => 0)
   };
+}
+
+async function setStoredPlaygroundProfileDisplayName(value: string): Promise<PlaygroundProfile> {
+  const requested = String(value || '');
+  const customDisplayName = normalizePlaygroundDisplayName(requested);
+  if (requested.trim() && !customDisplayName) {
+    throw new Error('Choose a shorter display name without URLs or reserved Playground names.');
+  }
+
+  if (customDisplayName) {
+    await chrome.storage.local.set({ [PLAYGROUND_DISPLAY_NAME_STORAGE_KEY]: customDisplayName });
+  } else {
+    await chrome.storage.local.remove(PLAYGROUND_DISPLAY_NAME_STORAGE_KEY);
+  }
+
+  return getStoredPlaygroundProfile();
+}
+
+async function getStoredPlaygroundSocketDisplayName(identity: StoredPlaygroundIdentity): Promise<string> {
+  const userId = await getPlaygroundUserId(identity.publicKeyJwk);
+  return getPlaygroundDisplayName(userId, await getStoredPlaygroundCustomDisplayName());
+}
+
+async function getStoredPlaygroundCustomDisplayName(): Promise<string> {
+  const stored = await chrome.storage.local.get(PLAYGROUND_DISPLAY_NAME_STORAGE_KEY);
+  return normalizePlaygroundDisplayName(stored[PLAYGROUND_DISPLAY_NAME_STORAGE_KEY]);
 }
 
 async function getRemotePlaygroundProfileWins(userId: string): Promise<number> {

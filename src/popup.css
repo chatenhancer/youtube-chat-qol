@@ -330,6 +330,14 @@ main {
 #playgroundPanel:not([hidden]) {
   position: absolute;
   inset: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+
+#playgroundPanel:not([hidden]) > .settings-section {
+  flex: 0 0 auto;
 }
 
 .settings-section {
@@ -362,7 +370,7 @@ main {
 }
 
 #playgroundGamesSection {
-  max-height: 140px;
+  max-height: none;
   opacity: 1;
   transform: translateY(0);
   transition:
@@ -511,16 +519,57 @@ main {
 }
 
 .playground-profile-details {
-  margin: 0;
-  padding: 6px 10px 7px;
+  display: grid;
+  gap: 6px;
+  padding: 7px 10px 8px;
   color: var(--ytcq-popup-secondary-text);
   font-size: 10px;
   line-height: 13px;
-  text-align: center;
 }
 
 .playground-profile-details[hidden] {
   display: none;
+}
+
+.playground-profile-details p {
+  margin: 0;
+}
+
+.playground-display-name-field {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 142px;
+  gap: 8px;
+  align-items: center;
+  color: var(--ytcq-popup-text);
+  font-size: 11px;
+  line-height: 14px;
+}
+
+.playground-display-name-field input {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  height: 26px;
+  padding: 3px 7px;
+  border: 1px solid var(--ytcq-popup-control-border);
+  border-radius: 6px;
+  color: var(--ytcq-popup-text);
+  background: var(--ytcq-popup-control-bg);
+  font: inherit;
+}
+
+.playground-display-name-field input:focus {
+  border-color: var(--ytcq-popup-action);
+  outline: none;
+}
+
+.playground-display-name-field input::placeholder {
+  color: var(--ytcq-popup-secondary-text);
+  opacity: 0.78;
+}
+
+.playground-display-name-helper {
+  color: var(--ytcq-popup-secondary-text);
 }
 
 .bookmarks-section {

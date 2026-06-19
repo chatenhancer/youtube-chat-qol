@@ -159,7 +159,14 @@
                   <span id="playgroundProfileWinsCount" class="playground-profile-wins-count">0</span>
                 </span>
               </button>
-              <p id="playgroundProfileDetails" class="playground-profile-details" data-i18n="playgroundProfileHelper" hidden>Shown to other Playground users. Your YouTube handle is not collected or shared.</p>
+              <div id="playgroundProfileDetails" class="playground-profile-details" hidden>
+                <p data-i18n="playgroundProfileHelper">Shown to other Playground users. Your YouTube handle is not collected or shared.</p>
+                <label class="playground-display-name-field" for="playgroundDisplayName">
+                  <span data-i18n="playgroundDisplayName">Display name</span>
+                  <input id="playgroundDisplayName" type="text" maxlength="24" autocomplete="off" spellcheck="false" title="How you appear in Playground rooms." data-i18n-title="playgroundDisplayNameTitle">
+                </label>
+                <p class="playground-display-name-helper" data-i18n="playgroundDisplayNameHelper">Leave blank to use your generated Player name.</p>
+              </div>
             </div>
           </section>
           <section id="playgroundGamesSection" class="settings-section" aria-labelledby="playground-games-heading" hidden>
