@@ -16,12 +16,22 @@ interface AudioMock {
 }
 
 interface AudioContextMock {
+  createBufferSource: ReturnType<typeof vi.fn>;
   createGain: ReturnType<typeof vi.fn>;
   createOscillator: ReturnType<typeof vi.fn>;
   currentTime: number;
+  decodeAudioData: ReturnType<typeof vi.fn>;
   destination: Record<string, never>;
   resume: ReturnType<typeof vi.fn>;
   state: AudioContextState;
+}
+
+interface AudioBufferSourceMock {
+  buffer: AudioBuffer | null;
+  connect: ReturnType<typeof vi.fn>;
+  disconnect: ReturnType<typeof vi.fn>;
+  onended: (() => void) | null;
+  start: ReturnType<typeof vi.fn>;
 }
 
 interface OscillatorMock {
@@ -47,6 +57,7 @@ interface GainMock {
 
 const audioMocks: AudioMock[] = [];
 const audioContextMocks: AudioContextMock[] = [];
+const audioBufferSourceMocks: AudioBufferSourceMock[] = [];
 const oscillatorMocks: OscillatorMock[] = [];
 const gainMocks: GainMock[] = [];
 
@@ -54,6 +65,7 @@ describe('playground game sounds', () => {
   beforeEach(async () => {
     audioMocks.length = 0;
     audioContextMocks.length = 0;
+    audioBufferSourceMocks.length = 0;
     oscillatorMocks.length = 0;
     gainMocks.length = 0;
     await chrome.storage.local.clear();
@@ -63,6 +75,8 @@ describe('playground game sounds', () => {
   afterEach(() => {
     vi.restoreAllMocks();
     vi.unstubAllGlobals();
+    Reflect.deleteProperty(window, 'AudioContext');
+    Reflect.deleteProperty(window, 'webkitAudioContext');
   });
 
   it('returns no-op playable audio when Audio is unavailable or construction fails', () => {
@@ -98,6 +112,35 @@ describe('playground game sounds', () => {
     expect(cachedAudio.cloneNode).toHaveBeenCalledWith(true);
     expect(clone.preload).toBe('auto');
     expect(clone.play).toHaveBeenCalledOnce();
+  });
+
+  it('plays decoded Web Audio buffers once preload finishes', async () => {
+    installAudioMock();
+    const decodedBuffer = {} as AudioBuffer;
+    const response = {
+      arrayBuffer: vi.fn(() => Promise.resolve(new ArrayBuffer(8))),
+      ok: true
+    };
+    vi.stubGlobal('fetch', vi.fn(() => Promise.resolve(response)));
+    installAudioContextMock({ decodedBuffer });
+    preloadGameSounds(['games/bounty-hunting/claim-ricochet-01.mp3']);
+    await flushPromises();
+    await (audioContextMocks[0]?.decodeAudioData.mock.results[0]?.value as Promise<AudioBuffer>);
+    await flushPromises();
+    const controller = createGameSoundController({
+      signal: new AbortController().signal
+    });
+
+    controller.play('games/bounty-hunting/claim-ricochet-01.mp3');
+
+    expect(response.arrayBuffer).toHaveBeenCalledOnce();
+    expect(audioContextMocks[0]?.decodeAudioData).toHaveBeenCalledOnce();
+    expect(audioBufferSourceMocks).toHaveLength(1);
+    expect(audioBufferSourceMocks[0]?.buffer).toBe(decodedBuffer);
+    expect(audioBufferSourceMocks[0]?.connect).toHaveBeenCalledWith(audioContextMocks[0]?.destination);
+    expect(audioBufferSourceMocks[0]?.start).toHaveBeenCalledWith(0);
+    expect(audioContextMocks[0]?.resume).toHaveBeenCalledOnce();
+    expect(getAudioMock('games/bounty-hunting/claim-ricochet-01.mp3').play).not.toHaveBeenCalled();
   });
 
   it('ignores seek and playback failures', () => {
@@ -189,23 +232,42 @@ function getAudioMock(path: string): AudioMock {
   return audio;
 }
 
-function installAudioContextMock(): void {
-  vi.stubGlobal('AudioContext', function AudioContext(this: AudioContextMock) {
-    const audioContext = createAudioContextMock();
+function installAudioContextMock({ decodedBuffer = {} as AudioBuffer }: { decodedBuffer?: AudioBuffer } = {}): void {
+  const AudioContextConstructor = function AudioContext(this: AudioContextMock) {
+    const audioContext = createAudioContextMock(decodedBuffer);
     audioContextMocks.push(audioContext);
     return audioContext;
-  } as unknown as typeof AudioContext);
+  } as unknown as typeof AudioContext;
+  vi.stubGlobal('AudioContext', AudioContextConstructor);
+  Object.defineProperty(window, 'AudioContext', {
+    configurable: true,
+    value: AudioContextConstructor
+  });
 }
 
-function createAudioContextMock(): AudioContextMock {
+function createAudioContextMock(decodedBuffer: AudioBuffer): AudioContextMock {
   return {
+    createBufferSource: vi.fn(createAudioBufferSourceMock),
     createGain: vi.fn(createGainMock),
     createOscillator: vi.fn(createOscillatorMock),
     currentTime: 0,
+    decodeAudioData: vi.fn(() => Promise.resolve(decodedBuffer)),
     destination: {},
     resume: vi.fn(() => Promise.resolve()),
     state: 'running'
   };
+}
+
+function createAudioBufferSourceMock(): AudioBufferSourceMock {
+  const source: AudioBufferSourceMock = {
+    buffer: null,
+    connect: vi.fn(),
+    disconnect: vi.fn(),
+    onended: null,
+    start: vi.fn()
+  };
+  audioBufferSourceMocks.push(source);
+  return source;
 }
 
 function createOscillatorMock(): OscillatorMock {
@@ -235,4 +297,10 @@ function createGainMock(): GainMock {
   };
   gainMocks.push(gain);
   return gain;
+}
+
+async function flushPromises(): Promise<void> {
+  for (let index = 0; index < 5; index += 1) {
+    await Promise.resolve();
+  }
 }

@@ -162,15 +162,15 @@ describe('runtime i18n', () => {
 
     await i18n.initUiLocaleFromDocument();
 
-    expect(i18n.t('gamesBountyHuntingWanted')).toBe('RECHERCHÉ');
+    expect(i18n.t('addKeywords')).toBe('Ajouter des mots-clés');
     expect(i18n.tWithEnglishFallbackWhenUnsupported(
-      'gamesBountyHuntingWanted',
+      'addKeywords',
       (text) => /^[ !$,\-.0-9:?A-Za-z]*$/.test(text)
-    )).toBe('WANTED');
+    )).toBe('Add keywords');
     expect(i18n.tWithEnglishFallbackWhenUnsupported(
-      'gamesBountyHuntingWanted',
+      'addKeywords',
       () => true
-    )).toBe('RECHERCHÉ');
+    )).toBe('Ajouter des mots-clés');
     expect(i18n.tWithEnglishFallbackWhenUnsupported(
       'translateToLanguage',
       () => false,

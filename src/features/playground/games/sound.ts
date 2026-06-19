@@ -25,8 +25,16 @@ export interface GameSoundToneOptions {
 }
 
 const gameSoundCache = new Map<string, HTMLAudioElement>();
+const gameSoundBufferCache = new Map<string, GameSoundBufferPreload>();
 let gameSoundAudioConstructor: typeof Audio | null = null;
 let gameSoundAudioContext: AudioContext | null = null;
+let gameSoundAudioContextConstructor: typeof AudioContext | null = null;
+let gameSoundBufferAudioContextConstructor: typeof AudioContext | null = null;
+
+interface GameSoundBufferPreload {
+  buffer: AudioBuffer | null;
+  promise: Promise<AudioBuffer | null>;
+}
 
 export function createGameSoundController({
   className,
@@ -108,8 +116,13 @@ function playGameBeep({
 }
 
 function getGameSoundAudioContext(AudioContextConstructor: typeof AudioContext): AudioContext {
-  if (!gameSoundAudioContext || gameSoundAudioContext.state === 'closed') {
+  if (
+    !gameSoundAudioContext ||
+    gameSoundAudioContext.state === 'closed' ||
+    gameSoundAudioContextConstructor !== AudioContextConstructor
+  ) {
     gameSoundAudioContext = new AudioContextConstructor();
+    gameSoundAudioContextConstructor = AudioContextConstructor;
   }
   return gameSoundAudioContext;
 }
@@ -131,12 +144,15 @@ function getStoredGameSoundsEnabled(): Promise<boolean> {
 
 export function preloadGameSounds(paths: readonly string[]): void {
   paths.forEach((path) => {
-    preloadGameSound(path);
+    preloadHtmlGameSound(path);
+    preloadBufferedGameSound(path);
   });
 }
 
 function playGameSound(path: string): void {
-  const audio = getPlayableGameSound(path);
+  if (playBufferedGameSound(path)) return;
+
+  const audio = getPlayableHtmlGameSound(path);
   if (!audio) return;
 
   try {
@@ -152,8 +168,31 @@ function playGameSound(path: string): void {
   }
 }
 
-function getPlayableGameSound(path: string): HTMLAudioElement | null {
-  const cachedAudio = preloadGameSound(path);
+function playBufferedGameSound(path: string): boolean {
+  const preload = preloadBufferedGameSound(path);
+  if (!preload?.buffer) return false;
+
+  const AudioContextConstructor = getAudioContextConstructor();
+  if (!AudioContextConstructor) return false;
+
+  try {
+    const audioContext = getGameSoundAudioContext(AudioContextConstructor);
+    const source = audioContext.createBufferSource();
+    source.buffer = preload.buffer;
+    source.connect(audioContext.destination);
+    source.start(0);
+    source.onended = () => {
+      source.disconnect();
+    };
+    void audioContext.resume?.().catch(() => undefined);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function getPlayableHtmlGameSound(path: string): HTMLAudioElement | null {
+  const cachedAudio = preloadHtmlGameSound(path);
   if (!cachedAudio) return null;
 
   if (!isAudioPlaying(cachedAudio)) return cachedAudio;
@@ -167,7 +206,7 @@ function getPlayableGameSound(path: string): HTMLAudioElement | null {
   }
 }
 
-function preloadGameSound(path: string): HTMLAudioElement | null {
+function preloadHtmlGameSound(path: string): HTMLAudioElement | null {
   const AudioConstructor = getAudioConstructor();
   if (!AudioConstructor) return null;
 
@@ -189,6 +228,37 @@ function preloadGameSound(path: string): HTMLAudioElement | null {
   }
 }
 
+function preloadBufferedGameSound(path: string): GameSoundBufferPreload | null {
+  const AudioContextConstructor = getAudioContextConstructor();
+  if (!AudioContextConstructor || typeof fetch !== 'function') return null;
+
+  if (gameSoundBufferAudioContextConstructor !== AudioContextConstructor) {
+    gameSoundBufferCache.clear();
+    gameSoundBufferAudioContextConstructor = AudioContextConstructor;
+  }
+
+  const cachedPreload = gameSoundBufferCache.get(path);
+  if (cachedPreload) return cachedPreload;
+
+  const preload: GameSoundBufferPreload = {
+    buffer: null,
+    promise: Promise.resolve(null)
+  };
+  preload.promise = fetch(chrome.runtime.getURL(path))
+    .then((response) => {
+      if (!response.ok) throw new Error(`Failed to preload ${path}`);
+      return response.arrayBuffer();
+    })
+    .then((bytes) => getGameSoundAudioContext(AudioContextConstructor).decodeAudioData(bytes))
+    .then((buffer) => {
+      preload.buffer = buffer;
+      return buffer;
+    })
+    .catch(() => null);
+  gameSoundBufferCache.set(path, preload);
+  return preload;
+}
+
 function isAudioPlaying(audio: HTMLAudioElement): boolean {
   return audio.paused === false && audio.ended !== true;
 }
@@ -204,7 +274,15 @@ function getAudioConstructor(): typeof Audio | null {
 function getAudioContextConstructor(): typeof AudioContext | null {
   try {
     const audioWindow = window as typeof window & { webkitAudioContext?: typeof AudioContext };
-    return audioWindow.AudioContext || audioWindow.webkitAudioContext || null;
+    const audioGlobal = globalThis as typeof globalThis & {
+      AudioContext?: typeof AudioContext;
+      webkitAudioContext?: typeof AudioContext;
+    };
+    return audioWindow.AudioContext ||
+      audioWindow.webkitAudioContext ||
+      audioGlobal.AudioContext ||
+      audioGlobal.webkitAudioContext ||
+      null;
   } catch {
     return null;
   }
