@@ -11,3 +11,7 @@ export function canRenderBountyHuntingBartleText(text: string): boolean {
 export function canRenderBountyHuntingTexMexText(text: string): boolean {
   return LIMITED_WESTERN_DISPLAY_TEXT.test(text);
 }
+
+export function formatBountyHuntingTexMexTitleText(text: string): string {
+  return text.toUpperCase();
+}

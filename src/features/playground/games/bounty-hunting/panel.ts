@@ -54,7 +54,8 @@ import {
 import {
   canRenderBountyHuntingBarnumText,
   canRenderBountyHuntingBartleText,
-  canRenderBountyHuntingTexMexText
+  canRenderBountyHuntingTexMexText,
+  formatBountyHuntingTexMexTitleText
 } from './font-support';
 import type {
   PublicBountyHuntingGame,
@@ -170,7 +171,9 @@ function tBountyHuntingBartle(key: MessageKey, params: MessageParams = {}): stri
 }
 
 function tBountyHuntingTexMex(key: MessageKey, params: MessageParams = {}): string {
-  return tWithEnglishFallbackWhenUnsupported(key, canRenderBountyHuntingTexMexText, params);
+  return formatBountyHuntingTexMexTitleText(
+    tWithEnglishFallbackWhenUnsupported(key, canRenderBountyHuntingTexMexText, params)
+  );
 }
 
 let activeBountyHuntingPanel: BountyHuntingPanelRuntime | null = null;
@@ -1020,7 +1023,7 @@ function drawBountyHuntingCompactBountyStamp(
   if (claimed) {
     context.translate(x + 118, y + 11);
     context.rotate(-0.2);
-    if (assets.bountyClaimedStamp && shouldUseBountyHuntingClaimedStampAsset()) {
+    if (assets.bountyClaimedStamp) {
       context.drawImage(
         assets.bountyClaimedStamp,
         -COMPACT_BOUNTY_CLAIMED_STAMP_WIDTH / 2,
@@ -1031,7 +1034,7 @@ function drawBountyHuntingCompactBountyStamp(
     } else {
       drawCompactBountyStampFallback(context, tBountyHuntingBarnum('gamesBountyHuntingClaimed'), -24, -8, '#a8302d');
     }
-  } else if (assets.bountyOpenStamp && shouldUseBountyHuntingOpenStampAsset()) {
+  } else if (assets.bountyOpenStamp) {
     context.drawImage(
       assets.bountyOpenStamp,
       x + 94,
@@ -1217,10 +1220,10 @@ function drawBountyHuntingRoundOver(runtime: BountyHuntingPanelRuntime): void {
     drawBountyHuntingPaper(runtime);
   }
 
-  const title = tBountyHuntingBarnum('gamesBountyHuntingRoundOver');
-  if (assets.roundOverTitle && title === 'ROUND OVER') {
+  if (assets.roundOverTitle) {
     context.drawImage(assets.roundOverTitle, 33, 64, 382, 296);
   } else {
+    const title = tBountyHuntingBarnum('gamesBountyHuntingRoundOver');
     drawCenteredFittedText(context, title, 224, 205, 330, {
       color: '#f6deb2',
       font: `700 72px ${BARNUM_STACK}`,
@@ -1532,7 +1535,7 @@ function drawBountyHuntingBountyClaimAvatar(
 
 function drawOpenStamp(runtime: BountyHuntingPanelRuntime, y: number): void {
   const { assets, context } = runtime;
-  if (assets.bountyOpenStamp && shouldUseBountyHuntingOpenStampAsset()) {
+  if (assets.bountyOpenStamp) {
     context.drawImage(assets.bountyOpenStamp, 332 + BOUNTY_STAMP_X_OFFSET, y - 11, 70, 62);
     return;
   }
@@ -1550,7 +1553,7 @@ function drawClaimedStamp(runtime: BountyHuntingPanelRuntime, y: number): void {
   context.save();
   context.translate(360 + BOUNTY_STAMP_X_OFFSET, y + 15);
   context.rotate(-0.22);
-  if (assets.bountyClaimedStamp && shouldUseBountyHuntingClaimedStampAsset()) {
+  if (assets.bountyClaimedStamp) {
     context.drawImage(assets.bountyClaimedStamp, -30, -23, 60, 46);
   } else {
     drawStampFallback(
@@ -1562,14 +1565,6 @@ function drawClaimedStamp(runtime: BountyHuntingPanelRuntime, y: number): void {
     );
   }
   context.restore();
-}
-
-function shouldUseBountyHuntingOpenStampAsset(): boolean {
-  return tBountyHuntingBarnum('gamesBountyHuntingOpen') === 'OPEN';
-}
-
-function shouldUseBountyHuntingClaimedStampAsset(): boolean {
-  return tBountyHuntingBarnum('gamesBountyHuntingClaimed') === 'CLAIMED';
 }
 
 function drawStampFallback(

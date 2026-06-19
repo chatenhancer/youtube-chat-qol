@@ -535,6 +535,23 @@ describe('Bounty Hunting panel', () => {
     expect(context.lineTo).toHaveBeenCalledWith(420, 136);
   });
 
+  it('prefers the loaded round over title image over text fallback', async () => {
+    const roundOverTitle = document.createElement('img');
+    assetMock.getAssets.mockResolvedValue({
+      ...assetMock.emptyAssets,
+      roundOverTitle
+    });
+
+    openBountyHuntingGamePanel({
+      ...createBountyHuntingGame(),
+      roundEndsAt: undefined,
+      status: 'roundOver'
+    }, 'host-user', vi.fn());
+    await Promise.resolve();
+
+    expect(context.drawImage).toHaveBeenCalledWith(roundOverTitle, 33, 64, 382, 296);
+  });
+
   it('draws the round over loading button higher with cream text', () => {
     const loadingLabels: Array<{ color: string; x: number; y: number }> = [];
     context.fillText.mockImplementation((text: string, x: number, y: number) => {
