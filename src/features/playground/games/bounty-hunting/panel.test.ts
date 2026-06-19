@@ -21,6 +21,7 @@ import {
   setBountyHuntingCompactMode,
   updateBountyHuntingGamePanel
 } from './panel';
+import type { GamePanelControls } from '../adapter';
 import type { BountyHuntingAssets, PublicBountyHuntingGame } from './types';
 
 let shellControllers: AbortController[] = [];
@@ -156,18 +157,23 @@ describe('Bounty Hunting panel', () => {
     expect(canvas.style.maxWidth).toBe('336px');
   });
 
-  it('renders a one-row compact score and timer strip', () => {
-    openBountyHuntingGamePanel(createBountyHuntingGame(), 'host-user', vi.fn());
+  it('renders a compact hunt belt with score, timer, and bounty chips', () => {
+    openBountyHuntingGamePanel({
+      ...createBountyHuntingGame(),
+      bounties: createCompactBounties()
+    }, 'host-user', vi.fn());
 
     const canvas = getBountyHuntingCanvas();
     setBountyHuntingCompactMode(true);
 
     expect(canvas.width).toBe(448);
-    expect(canvas.height).toBe(64);
-    expect(canvas.style.aspectRatio).toBe('448 / 64');
+    expect(canvas.height).toBe(128);
+    expect(canvas.style.aspectRatio).toBe('448 / 128');
     expect(canvas.classList.contains('ytcq-bounty-hunting-canvas-compact')).toBe(true);
     expect(context.fillText).toHaveBeenCalledWith('00:60', 224, 26);
     expect(context.fillText).toHaveBeenCalledWith('TIME REMAINING', 224, 46);
+    expect(context.fillText).toHaveBeenCalledWith('mod', 55, 81);
+    expect(context.fillText).toHaveBeenCalledWith('member', 347, 113);
 
     setBountyHuntingCompactMode(false);
 
@@ -189,7 +195,36 @@ describe('Bounty Hunting panel', () => {
 
     setBountyHuntingCompactMode(true);
 
-    expect(context.drawImage).toHaveBeenCalledWith(liveScoreBg, 0, -1, 448, 66);
+    expect(context.drawImage).toHaveBeenCalledWith(liveScoreBg, 0, -1, 448, 130);
+  });
+
+  it('overlays compact bounty stamps when assets are loaded', async () => {
+    const bountyClaimedStamp = document.createElement('img');
+    const bountyOpenStamp = document.createElement('img');
+    assetMock.getAssets.mockResolvedValue({
+      ...assetMock.emptyAssets,
+      bountyClaimedStamp,
+      bountyOpenStamp
+    });
+    openBountyHuntingGamePanel({
+      ...createBountyHuntingGame(),
+      bounties: [
+        createClaimedBounty('claimed-compact', 'guest'),
+        {
+          amount: 75,
+          description: 'a message with a number',
+          id: 'open-compact',
+          matcher: { kind: 'number' }
+        }
+      ]
+    }, 'host-user', vi.fn());
+    await Promise.resolve();
+    context.drawImage.mockClear();
+
+    setBountyHuntingCompactMode(true);
+
+    expect(context.drawImage).toHaveBeenCalledWith(bountyClaimedStamp, -24, -17, 48, 34);
+    expect(context.drawImage).toHaveBeenCalledWith(bountyOpenStamp, 248, 60, 44, 38);
   });
 
   it('draws dollar signs above the paired money amount', () => {
@@ -236,6 +271,31 @@ describe('Bounty Hunting panel', () => {
     expect(context.fillText).toHaveBeenCalledWith('low bounty', 124, 166);
     expect(context.fillText).toHaveBeenCalledWith('mid bounty', 124, 208);
     expect(context.fillText).toHaveBeenCalledWith('high bounty', 124, 250);
+  });
+
+  it('dims claimed bounty rows in the expanded wanted list', () => {
+    const descriptionAlpha = new Map<string, number>();
+    context.fillText.mockImplementation((text: string) => {
+      if (text === 'a claimed message' || text === 'an open message') {
+        descriptionAlpha.set(text, context.globalAlpha);
+      }
+    });
+
+    openBountyHuntingGamePanel({
+      ...createBountyHuntingGame(),
+      bounties: [
+        createClaimedBounty('first', 'guest'),
+        {
+          amount: 50,
+          description: 'an open message',
+          id: 'second',
+          matcher: { kind: 'question' as const }
+        }
+      ]
+    }, 'host-user', vi.fn());
+
+    expect(descriptionAlpha.get('a claimed message')).toBe(0.66);
+    expect(descriptionAlpha.get('an open message')).toBe(1);
   });
 
   it('uses the title color for the timer until the active round starts', () => {
@@ -458,6 +518,49 @@ describe('Bounty Hunting panel', () => {
     expect(getPlayedAudio(audioElements)?.src).toContain('sting.mp3');
   });
 
+  it('requests compact top-center placement when the active round starts', () => {
+    const controls = {
+      setCompactMode: vi.fn(),
+      setPosition: vi.fn()
+    };
+    const game = {
+      ...createBountyHuntingGame(),
+      phaseStartedAt: 100_000,
+      roundEndsAt: undefined,
+      status: 'countdown' as const
+    };
+    openBountyHuntingGamePanel(game, 'host-user', vi.fn(), controls);
+
+    updateBountyHuntingGamePanel({
+      ...game,
+      phaseStartedAt: 103_000,
+      roundEndsAt: 163_000,
+      status: 'active'
+    }, 'host-user');
+
+    expect(controls.setCompactMode).toHaveBeenCalledWith(true);
+    expect(controls.setPosition).toHaveBeenCalledWith({ placement: 'top-center' });
+  });
+
+  it('expands back to the round over page when the active round ends', () => {
+    const controls = {
+      setCompactMode: vi.fn(),
+      setPosition: vi.fn()
+    };
+    const game = createBountyHuntingGame();
+    openBountyHuntingGamePanel(game, 'host-user', vi.fn(), controls);
+
+    updateBountyHuntingGamePanel({
+      ...game,
+      phaseStartedAt: 160_000,
+      roundEndsAt: undefined,
+      status: 'roundOver'
+    }, 'host-user');
+
+    expect(controls.setCompactMode).toHaveBeenCalledWith(false);
+    expect(controls.setPosition).not.toHaveBeenCalled();
+  });
+
   it('shows a pre-round countdown before starting the round', () => {
     const onAction = vi.fn();
     const game = {
@@ -536,12 +639,46 @@ describe('Bounty Hunting panel', () => {
       [294, 423]
     ]);
   });
+
+  it('activates the compact ready button', () => {
+    const onAction = vi.fn();
+    const game = {
+      ...createBountyHuntingGame(),
+      readyPlayers: {
+        guest: true,
+        host: false
+      },
+      status: 'ready' as const
+    };
+    openBountyHuntingGamePanel(game, 'host-user', onAction);
+    setBountyHuntingCompactMode(true);
+    vi.spyOn(HTMLCanvasElement.prototype, 'getBoundingClientRect').mockReturnValue({
+      bottom: 128,
+      height: 128,
+      left: 0,
+      right: 448,
+      top: 0,
+      width: 448,
+      x: 0,
+      y: 0,
+      toJSON: () => ({})
+    } as DOMRect);
+
+    getBountyHuntingCanvas().dispatchEvent(new MouseEvent('click', {
+      bubbles: true,
+      clientX: 224,
+      clientY: 32
+    }));
+
+    expect(onAction).toHaveBeenCalledWith('game-bounty-hunting', 'ready');
+  });
 });
 
 function openBountyHuntingGamePanel(
   game: PublicBountyHuntingGame,
   currentUserId: string,
-  onAction: (gameId: string, action: string, payload?: Record<string, unknown>) => void
+  onAction: (gameId: string, action: string, payload?: Record<string, unknown>) => void,
+  controls: GamePanelControls | null = null
 ): void {
   const controller = new AbortController();
   shellControllers.push(controller);
@@ -565,7 +702,7 @@ function openBountyHuntingGamePanel(
     controller.abort();
     shell.panel.remove();
   });
-  mountBountyHuntingGamePanel(shell, game, currentUserId, onAction, undefined, closePanel);
+  mountBountyHuntingGamePanel(shell, game, currentUserId, onAction, undefined, closePanel, controls);
 }
 
 function createBountyHuntingGame(): PublicBountyHuntingGame {
@@ -621,6 +758,47 @@ function createFinishedBountyHuntingGame(): PublicBountyHuntingGame {
     status: 'finished',
     winnerUserId: 'host-user'
   };
+}
+
+function createCompactBounties(): PublicBountyHuntingGame['bounties'] {
+  return [
+    {
+      amount: 50,
+      description: 'a message by a moderator',
+      id: 'moderator',
+      matcher: { kind: 'moderatorAuthor' }
+    },
+    {
+      amount: 50,
+      description: 'a message with a number',
+      id: 'number',
+      matcher: { kind: 'number' }
+    },
+    {
+      amount: 75,
+      description: 'a message by the channel owner',
+      id: 'owner',
+      matcher: { kind: 'channelOwnerAuthor' }
+    },
+    {
+      amount: 75,
+      description: 'a message that mentions a user',
+      id: 'mention',
+      matcher: { kind: 'mention' }
+    },
+    {
+      amount: 100,
+      description: 'a message by a top fan',
+      id: 'top-fan',
+      matcher: { kind: 'topFanAuthor' }
+    },
+    {
+      amount: 125,
+      description: 'a message by a channel member',
+      id: 'member',
+      matcher: { kind: 'channelMemberAuthor' }
+    }
+  ];
 }
 
 function createClaimedBounty(id: string, role: 'guest' | 'host'): PublicBountyHuntingGame['bounties'][number] {

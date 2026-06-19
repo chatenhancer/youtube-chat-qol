@@ -2121,6 +2121,11 @@ yt-live-chat-header-renderer .ytcq-inbox-badge[hidden] {
   touch-action: manipulation;
 }
 
+.ytcq-bounty-hunting-canvas-compact {
+  background: transparent;
+  box-shadow: none;
+}
+
 .ytcq-replay-trivia-game-fallback {
   display: flex;
   align-items: center;

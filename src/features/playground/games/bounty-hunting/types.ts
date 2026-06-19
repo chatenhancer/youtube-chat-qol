@@ -1,4 +1,5 @@
 import type { GameSoundController } from '../sound';
+import type { GamePanelControls } from '../adapter';
 import type { GamePanelStatusOverlay } from '../panel-feedback';
 import type { PublicGame, PublicUserIdentity } from '../../../../shared/playground/protocol';
 import type {
@@ -69,6 +70,7 @@ export interface BountyHuntingPanelRuntime {
   listeners: AbortController;
   onAction: (gameId: string, action: string, payload?: Record<string, unknown>) => void;
   onVisibilityChanged: (() => void) | null;
+  panelControls: GamePanelControls | null;
   pendingWitnesses: Map<string, Set<string>>;
   pixelRatio: number;
   preparationMessages: Map<string, BountyHuntingObservedMessage>;

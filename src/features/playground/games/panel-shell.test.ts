@@ -146,6 +146,182 @@ describe('game panel shell', () => {
     expect(shell.panel.style.bottom).toBe('auto');
   });
 
+  it('smoothly animates compact mode size changes', () => {
+    const controller = new AbortController();
+    const shell = createGamePanelShell({
+      ariaLabel: 'Bounty Hunting panel',
+      classNamePrefix: 'ytcq-bounty-hunting-game',
+      closeLabel: 'Hide',
+      icon: document.createElement('span'),
+      onClose: vi.fn(),
+      signal: controller.signal,
+      subtitle: 'Player TEST',
+      title: 'Bounty Hunting'
+    });
+    shell.setCompactModeEnabled({
+      compactLabel: 'Minimize',
+      expandLabel: 'Expand',
+      onChange: vi.fn()
+    });
+    const animation = {
+      addEventListener: vi.fn(),
+      cancel: vi.fn()
+    } as unknown as Animation;
+    const animate = vi.fn(() => animation);
+    Object.defineProperty(shell.panel, 'animate', {
+      configurable: true,
+      value: animate
+    });
+    vi.spyOn(shell.panel, 'getBoundingClientRect')
+      .mockReturnValueOnce(createRect({
+        bottom: 470,
+        height: 420,
+        left: 120,
+        right: 471,
+        top: 50,
+        width: 351
+      }))
+      .mockReturnValueOnce(createRect({
+        bottom: 470,
+        height: 420,
+        left: 120,
+        right: 471,
+        top: 50,
+        width: 351
+      }))
+      .mockReturnValueOnce(createRect({
+        bottom: 170,
+        height: 120,
+        left: 120,
+        right: 471,
+        top: 50,
+        width: 351
+      }));
+
+    shell.setCompactMode(true);
+
+    expect(animate).toHaveBeenCalledWith([
+      { height: '420px', width: '351px' },
+      { height: '120px', width: '351px' }
+    ], {
+      duration: 260,
+      easing: 'cubic-bezier(0.2, 0, 0, 1)'
+    });
+  });
+
+  it('positions the panel at the top center of the chat viewport', () => {
+    const controller = new AbortController();
+    const shell = createGamePanelShell({
+      ariaLabel: 'Bounty Hunting panel',
+      classNamePrefix: 'ytcq-bounty-hunting-game',
+      closeLabel: 'Hide',
+      icon: document.createElement('span'),
+      onClose: vi.fn(),
+      signal: controller.signal,
+      subtitle: 'Player TEST',
+      title: 'Bounty Hunting'
+    });
+
+    shell.setPosition({ inset: 10, placement: 'top-center' });
+
+    expect(shell.panel.style.top).toBe('10px');
+    expect(shell.panel.style.left).toBe('50%');
+    expect(shell.panel.style.right).toBe('auto');
+    expect(shell.panel.style.bottom).toBe('auto');
+    expect(shell.panel.style.transform).toBe('translateX(-50%)');
+  });
+
+  it('positions the panel at a clamped cursor point without animation', () => {
+    const controller = new AbortController();
+    const shell = createGamePanelShell({
+      ariaLabel: 'Bounty Hunting panel',
+      classNamePrefix: 'ytcq-bounty-hunting-game',
+      closeLabel: 'Hide',
+      icon: document.createElement('span'),
+      onClose: vi.fn(),
+      signal: controller.signal,
+      subtitle: 'Player TEST',
+      title: 'Bounty Hunting'
+    });
+    const animate = vi.fn();
+    Object.defineProperty(shell.panel, 'animate', {
+      configurable: true,
+      value: animate
+    });
+    vi.spyOn(shell.panel, 'getBoundingClientRect').mockReturnValue(createRect({
+      bottom: 420,
+      height: 120,
+      left: 100,
+      right: 451,
+      top: 300,
+      width: 351
+    }));
+
+    shell.setPosition({
+      inset: 10,
+      placement: 'cursor',
+      x: 760,
+      y: 480
+    }, { animate: false });
+
+    expect(shell.panel.style.left).toBe('439px');
+    expect(shell.panel.style.top).toBe('370px');
+    expect(shell.panel.style.right).toBe('auto');
+    expect(shell.panel.style.bottom).toBe('auto');
+    expect(shell.panel.style.transform).toBe('');
+    expect(animate).not.toHaveBeenCalled();
+  });
+
+  it('smoothly animates programmatic panel position changes', () => {
+    const controller = new AbortController();
+    const shell = createGamePanelShell({
+      ariaLabel: 'Bounty Hunting panel',
+      classNamePrefix: 'ytcq-bounty-hunting-game',
+      closeLabel: 'Hide',
+      icon: document.createElement('span'),
+      onClose: vi.fn(),
+      signal: controller.signal,
+      subtitle: 'Player TEST',
+      title: 'Bounty Hunting'
+    });
+    const animation = {
+      addEventListener: vi.fn(),
+      cancel: vi.fn()
+    } as unknown as Animation;
+    const animate = vi.fn(() => animation);
+    Object.defineProperty(shell.panel, 'animate', {
+      configurable: true,
+      value: animate
+    });
+    vi.spyOn(shell.panel, 'getBoundingClientRect')
+      .mockReturnValueOnce(createRect({
+        bottom: 420,
+        height: 120,
+        left: 100,
+        right: 451,
+        top: 300,
+        width: 351
+      }))
+      .mockReturnValueOnce(createRect({
+        bottom: 130,
+        height: 120,
+        left: 224,
+        right: 575,
+        top: 10,
+        width: 351
+      }));
+
+    shell.setPosition({ inset: 10, placement: 'top-center' });
+
+    expect(animate).toHaveBeenCalledWith([
+      { transform: 'translate(-124px, 290px) translateX(-50%)' },
+      { transform: 'translateX(-50%)' }
+    ], {
+      duration: 260,
+      easing: 'cubic-bezier(0.2, 0, 0, 1)'
+    });
+  });
+
   it('drags the panel while clamping it to the viewport', () => {
     const controller = new AbortController();
     const onClose = vi.fn();
@@ -169,6 +345,7 @@ describe('game panel shell', () => {
     }));
     shell.panel.setPointerCapture = vi.fn();
     shell.panel.releasePointerCapture = vi.fn();
+    shell.panel.style.transform = 'translateX(-50%)';
 
     const down = createPointerEvent('pointerdown', {
       clientX: 150,
@@ -184,6 +361,7 @@ describe('game panel shell', () => {
     expect(shell.panel.style.top).toBe('20px');
     expect(shell.panel.style.right).toBe('auto');
     expect(shell.panel.style.bottom).toBe('auto');
+    expect(shell.panel.style.transform).toBe('');
     expect(shell.panel.setPointerCapture).toHaveBeenCalledWith(7);
 
     document.dispatchEvent(createPointerEvent('pointermove', {

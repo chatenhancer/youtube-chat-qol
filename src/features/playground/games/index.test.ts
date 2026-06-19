@@ -512,6 +512,69 @@ describe('playground games header button', () => {
     expect(document.querySelector('.ytcq-profile-card-subtitle')?.textContent).toBe('2 players online');
   });
 
+  it('remembers compact mode only when resuming an active Bounty Hunting game', () => {
+    vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(createMockCanvasContext() as unknown as CanvasRenderingContext2D);
+    const header = createHeader();
+    document.body.append(header);
+    setOptions({ ...DEFAULT_OPTIONS, playgroundEnabled: true, playgroundGamesAvailable: true });
+
+    wireGamesButton();
+    header.querySelector<HTMLButtonElement>('.ytcq-games-button')!.click();
+    lastMockPort()?.emit(createSnapshotMessage({
+      ...createLobbySnapshot(),
+      games: [createBountyHuntingGame()],
+      invites: []
+    }));
+
+    getActionButton('Resume').click();
+    expect(document.querySelector('.ytcq-bounty-hunting-game-panel')).not.toBeNull();
+
+    document.querySelector<HTMLButtonElement>('.ytcq-bounty-hunting-game-compact-toggle')!.click();
+    expect(document.querySelector('.ytcq-bounty-hunting-game-panel')?.classList.contains('ytcq-game-panel-compact')).toBe(true);
+
+    getActionButton('Hide').click();
+    expect(document.querySelector('.ytcq-bounty-hunting-game-panel')).toBeNull();
+
+    getActionButton('Resume').click();
+    expect(document.querySelector('.ytcq-bounty-hunting-game-panel')?.classList.contains('ytcq-game-panel-compact')).toBe(true);
+    expect(document.querySelector('.ytcq-bounty-hunting-canvas')?.classList.contains('ytcq-bounty-hunting-canvas-compact')).toBe(true);
+
+    getActionButton('Hide').click();
+    const bountyInvite = {
+      ...createLobbySnapshot().invites[0],
+      gameId: 'bounty-hunting' as const,
+      inviteId: 'invite-bounty-hunting'
+    };
+    lastMockPort()?.emit(createSnapshotMessage({
+      ...createLobbySnapshot(),
+      games: [createBountyHuntingGame()],
+      invites: [bountyInvite]
+    }));
+
+    document.dispatchEvent(createPointerEvent('pointermove', {
+      clientX: 180,
+      clientY: 90,
+      pointerId: 4
+    }));
+    getActionButton('Accept').click();
+    lastMockPort()?.emit({
+      message: {
+        game: {
+          ...createBountyHuntingGame(),
+          gameId: 'game-bounty-hunting-2'
+        },
+        type: 'gameStarted'
+      },
+      type: 'ytcq:playground:server-message'
+    });
+
+    const panel = document.querySelector<HTMLElement>('.ytcq-bounty-hunting-game-panel');
+    expect(panel?.classList.contains('ytcq-game-panel-compact')).toBe(false);
+    expect(panel?.style.left).toBe('180px');
+    expect(panel?.style.top).toBe('90px');
+    expect(document.querySelector('.ytcq-bounty-hunting-canvas')?.classList.contains('ytcq-bounty-hunting-canvas-compact')).toBe(false);
+  });
+
   it('keeps stream availability separate from the default setting while reopening the card', () => {
     const header = createHeader();
     document.body.append(header);
@@ -1209,6 +1272,65 @@ function createReplayTriviaGame(): PublicGame {
   } as PublicGame;
 }
 
+function createBountyHuntingGame(): PublicGame {
+  return {
+    bounties: [{
+      amount: 50,
+      description: 'a message with 3+ emojis',
+      id: 'emoji',
+      matcher: { kind: 'emojiCount', min: 3 }
+    }],
+    bountyProviderUserId: 'me-user',
+    gameId: 'game-bounty-hunting',
+    gameType: 'bounty-hunting',
+    phaseStartedAt: Date.now(),
+    players: {
+      guest: {
+        displayName: 'Luna Chat',
+        userId: 'luna-user'
+      },
+      host: {
+        displayName: 'Me',
+        userId: 'me-user'
+      }
+    },
+    readyPlayers: {
+      guest: true,
+      host: true
+    },
+    roundEndsAt: Date.now() + 60_000,
+    scores: {
+      guest: 0,
+      host: 0
+    },
+    status: 'active'
+  } as PublicGame;
+}
+
+function createMockCanvasContext(): Partial<CanvasRenderingContext2D> {
+  return {
+    arc: vi.fn(),
+    beginPath: vi.fn(),
+    clearRect: vi.fn(),
+    closePath: vi.fn(),
+    drawImage: vi.fn(),
+    fill: vi.fn(),
+    fillRect: vi.fn(),
+    fillText: vi.fn(),
+    lineTo: vi.fn(),
+    measureText: vi.fn((text: string) => ({ width: text.length * 8 }) as TextMetrics),
+    moveTo: vi.fn(),
+    quadraticCurveTo: vi.fn(),
+    restore: vi.fn(),
+    rotate: vi.fn(),
+    save: vi.fn(),
+    setTransform: vi.fn(),
+    stroke: vi.fn(),
+    strokeRect: vi.fn(),
+    translate: vi.fn()
+  };
+}
+
 function getActionButton(label: string): HTMLButtonElement {
   const button = Array.from(document.querySelectorAll<HTMLButtonElement>('.ytcq-games-small-action'))
     .find((candidate) => candidate.textContent === label);
@@ -1243,6 +1365,23 @@ function getPlayerNames(): string[] {
 function getGamesSectionTitles(): string[] {
   return Array.from(document.querySelectorAll<HTMLElement>('.ytcq-games-section:not([hidden]) .ytcq-games-section-title'))
     .map((title) => title.textContent || '');
+}
+
+function createPointerEvent(type: string, options: {
+  clientX: number;
+  clientY: number;
+  pointerId: number;
+}): Event {
+  const event = new Event(type, {
+    bubbles: true,
+    cancelable: true
+  });
+  Object.defineProperties(event, {
+    clientX: { value: options.clientX },
+    clientY: { value: options.clientY },
+    pointerId: { value: options.pointerId }
+  });
+  return event;
 }
 
 function mockRect(

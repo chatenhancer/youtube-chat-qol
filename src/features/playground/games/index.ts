@@ -16,6 +16,7 @@ import {
   isActiveGamePanelOpen,
   isSupportedPublicGame,
   openSupportedGamePanel,
+  type OpenSupportedGamePanelOptions,
   updateOpenGamePanel
 } from './registry';
 import {
@@ -54,8 +55,15 @@ let activeGamesCard: HTMLElement | null = null;
 let activeGamesAnchor: HTMLElement | null = null;
 let activeGamesCardCleanup: (() => void) | null = null;
 let activeGamesClientCleanup: (() => void) | null = null;
+let activeGamesPointerCleanup: (() => void) | null = null;
 let gamesPanelState: GamesPanelState | null = null;
+let lastGamesPointerPosition: GamesPointerPosition | null = null;
 let pendingStartedGameOpen: PendingStartedGameOpen | null = null;
+
+interface GamesPointerPosition {
+  x: number;
+  y: number;
+}
 
 interface PendingStartedGameOpen {
   gameType: GameId;
@@ -122,6 +130,7 @@ export function cleanupStaleGamesButtons(): void {
   pendingStartedGameOpen = null;
   closeActiveGamePanel({ notify: false });
   closeGamesCard();
+  lastGamesPointerPosition = null;
   activeGamesClientCleanup?.();
   activeGamesClientCleanup = null;
   stopPlaygroundClient();
@@ -172,11 +181,14 @@ function openGamesCard(anchor: HTMLElement): void {
     getCard: () => activeGamesCard,
     onClose: closeGamesCard
   });
+  activeGamesPointerCleanup = installGamesPointerTracking();
 }
 
 function closeGamesCard(): void {
   activeGamesCardCleanup?.();
   activeGamesCardCleanup = null;
+  activeGamesPointerCleanup?.();
+  activeGamesPointerCleanup = null;
   activeGamesCard?.remove();
   activeGamesCard = null;
   gamesPanelState = null;
@@ -289,8 +301,15 @@ function leaveGame(game: PublicGame): void {
   sendPlaygroundGameAction(game.gameId, 'leave');
 }
 
-function openGamePanel(game: PublicGame, currentUserId: string): void {
-  openSupportedGamePanel(game, currentUserId, sendPlaygroundGameAction, renderGamesPanel);
+function openGamePanel(
+  game: PublicGame,
+  currentUserId: string,
+  options?: OpenSupportedGamePanelOptions
+): void {
+  openSupportedGamePanel(game, currentUserId, sendPlaygroundGameAction, renderGamesPanel, {
+    ...options,
+    initialPosition: options?.initialPosition || getInitialGamePanelPosition()
+  });
 }
 
 function queueStartedGameOpen(gameType: GameId): void {
@@ -315,7 +334,7 @@ function openPendingStartedGame(nextState: PlaygroundClientState): boolean {
   pendingStartedGameOpen = null;
   showLobbyView();
   selectActiveGame(game.gameId, nextState);
-  openGamePanel(game, nextState.userId);
+  openGamePanel(game, nextState.userId, { restoreCompactPreference: false });
   closeGamesCard();
   return true;
 }
@@ -326,6 +345,36 @@ function cycleActiveGame(step: number): void {
   if (games.length <= 1) return;
   gamesPanelState.activeGameIndex = (gamesPanelState.activeGameIndex + step + games.length) % games.length;
   renderGamesPanel();
+}
+
+function installGamesPointerTracking(): () => void {
+  const controller = new AbortController();
+  const rememberPointerPosition = (event: PointerEvent): void => {
+    lastGamesPointerPosition = {
+      x: event.clientX,
+      y: event.clientY
+    };
+  };
+  document.addEventListener('pointerdown', rememberPointerPosition, {
+    capture: true,
+    passive: true,
+    signal: controller.signal
+  });
+  document.addEventListener('pointermove', rememberPointerPosition, {
+    capture: true,
+    passive: true,
+    signal: controller.signal
+  });
+  return () => controller.abort();
+}
+
+function getInitialGamePanelPosition(): OpenSupportedGamePanelOptions['initialPosition'] | undefined {
+  if (!lastGamesPointerPosition) return undefined;
+  return {
+    placement: 'cursor',
+    x: lastGamesPointerPosition.x,
+    y: lastGamesPointerPosition.y
+  };
 }
 
 function selectActiveGame(gameId: string, state: PlaygroundClientState): void {

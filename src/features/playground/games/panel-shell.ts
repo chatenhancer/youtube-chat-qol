@@ -9,6 +9,10 @@ import { createCloseIcon, createExpandIcon, createMinimizeIcon } from '../../../
 import { ytcqCreateElement } from '../../../shared/managed-dom';
 import { createGamePanelStatusOverlay, type GamePanelStatusOverlay } from './panel-feedback';
 
+const PANEL_POSITION_ANIMATION_MS = 260;
+const panelPositionAnimations = new WeakMap<HTMLElement, Animation>();
+const panelSizeAnimations = new WeakMap<HTMLElement, Animation>();
+
 interface GamePanelShellOptions {
   ariaLabel: string;
   classNamePrefix: string;
@@ -29,9 +33,26 @@ export interface GamePanelShell {
   panel: HTMLElement;
   setCompactMode: (compact: boolean) => void;
   setCompactModeEnabled: (options: GamePanelShellCompactOptions | null) => void;
+  setPosition: (position: GamePanelShellPosition, options?: GamePanelShellPositionOptions) => void;
   statusOverlay: GamePanelStatusOverlay;
   subtitleElement: HTMLElement;
   titleElement: HTMLElement;
+}
+
+export type GamePanelShellPosition =
+  | {
+      inset?: number;
+      placement: 'top-center' | 'top-right';
+    }
+  | {
+      inset?: number;
+      placement: 'cursor';
+      x: number;
+      y: number;
+    };
+
+export interface GamePanelShellPositionOptions {
+  animate?: boolean;
 }
 
 export interface GamePanelShellCompactOptions {
@@ -126,10 +147,27 @@ export function createGamePanelShell({
   }
 
   function setCompactMode(compact: boolean): void {
+    if (compactMode === compact) return;
     anchorGamePanelPosition(panel);
-    compactMode = compact;
-    panel.classList.toggle('ytcq-game-panel-compact', compactMode);
-    syncCompactButton();
+    animateGamePanelSizeChange(panel, () => {
+      compactMode = compact;
+      panel.classList.toggle('ytcq-game-panel-compact', compactMode);
+      syncCompactButton();
+    });
+  }
+
+  function setPosition(
+    position: GamePanelShellPosition,
+    { animate = true }: GamePanelShellPositionOptions = {}
+  ): void {
+    if (!animate) {
+      cancelGamePanelPositionAnimation(panel);
+      applyGamePanelPosition(panel, position);
+      return;
+    }
+    animateGamePanelPositionChange(panel, () => {
+      applyGamePanelPosition(panel, position);
+    });
   }
 
   function syncCompactButton(): void {
@@ -151,10 +189,151 @@ export function createGamePanelShell({
     panel,
     setCompactMode,
     setCompactModeEnabled,
+    setPosition,
     statusOverlay,
     subtitleElement,
     titleElement
   };
+}
+
+function applyGamePanelPosition(panel: HTMLElement, position: GamePanelShellPosition): void {
+  const inset = position.inset ?? 12;
+  const { placement } = position;
+  if (placement === 'cursor') {
+    const rect = panel.getBoundingClientRect();
+    anchorGamePanelAtPoint(
+      panel,
+      clampNumber(position.x, inset, Math.max(inset, window.innerWidth - rect.width - inset)),
+      clampNumber(position.y, inset, Math.max(inset, window.innerHeight - rect.height - inset))
+    );
+    return;
+  }
+
+  panel.style.top = `${Math.round(inset)}px`;
+  panel.style.bottom = 'auto';
+  if (placement === 'top-center') {
+    panel.style.left = '50%';
+    panel.style.right = 'auto';
+    panel.style.transform = 'translateX(-50%)';
+    return;
+  }
+  panel.style.left = 'auto';
+  panel.style.right = `${Math.round(inset)}px`;
+  panel.style.transform = '';
+}
+
+function clampNumber(value: number, min: number, max: number): number {
+  return Math.min(max, Math.max(min, value));
+}
+
+function animateGamePanelPositionChange(panel: HTMLElement, applyPosition: () => void): void {
+  const before = panel.getBoundingClientRect();
+  cancelGamePanelPositionAnimation(panel);
+  applyPosition();
+  const after = panel.getBoundingClientRect();
+  const deltaX = before.left - after.left;
+  const deltaY = before.top - after.top;
+  if (!shouldAnimateGamePanelPosition(panel, before, after, deltaX, deltaY)) return;
+
+  const finalTransform = panel.style.transform || 'none';
+  const startTransform = finalTransform === 'none'
+    ? `translate(${Math.round(deltaX)}px, ${Math.round(deltaY)}px)`
+    : `translate(${Math.round(deltaX)}px, ${Math.round(deltaY)}px) ${finalTransform}`;
+  const animation = panel.animate([
+    { transform: startTransform },
+    { transform: finalTransform }
+  ], {
+    duration: PANEL_POSITION_ANIMATION_MS,
+    easing: 'cubic-bezier(0.2, 0, 0, 1)'
+  });
+  panelPositionAnimations.set(panel, animation);
+  animation.addEventListener('finish', () => {
+    if (panelPositionAnimations.get(panel) === animation) panelPositionAnimations.delete(panel);
+  }, { once: true });
+  animation.addEventListener('cancel', () => {
+    if (panelPositionAnimations.get(panel) === animation) panelPositionAnimations.delete(panel);
+  }, { once: true });
+}
+
+function shouldAnimateGamePanelPosition(
+  panel: HTMLElement,
+  before: DOMRect,
+  after: DOMRect,
+  deltaX: number,
+  deltaY: number
+): boolean {
+  if (typeof panel.animate !== 'function') return false;
+  if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return false;
+  if (before.width <= 0 || before.height <= 0 || after.width <= 0 || after.height <= 0) return false;
+  return Math.abs(deltaX) > 1 || Math.abs(deltaY) > 1;
+}
+
+function cancelGamePanelPositionAnimation(panel: HTMLElement): void {
+  const animation = panelPositionAnimations.get(panel);
+  if (!animation) return;
+  animation.cancel();
+  panelPositionAnimations.delete(panel);
+}
+
+function animateGamePanelSizeChange(panel: HTMLElement, applySizeChange: () => void): void {
+  const before = panel.getBoundingClientRect();
+  cancelGamePanelSizeAnimation(panel);
+  applySizeChange();
+  const after = panel.getBoundingClientRect();
+  if (!shouldAnimateGamePanelSize(panel, before, after)) return;
+
+  const animation = panel.animate([
+    {
+      height: `${Math.round(before.height)}px`,
+      width: `${Math.round(before.width)}px`
+    },
+    {
+      height: `${Math.round(after.height)}px`,
+      width: `${Math.round(after.width)}px`
+    }
+  ], {
+    duration: PANEL_POSITION_ANIMATION_MS,
+    easing: 'cubic-bezier(0.2, 0, 0, 1)'
+  });
+  panelSizeAnimations.set(panel, animation);
+  animation.addEventListener('finish', () => {
+    if (panelSizeAnimations.get(panel) === animation) panelSizeAnimations.delete(panel);
+  }, { once: true });
+  animation.addEventListener('cancel', () => {
+    if (panelSizeAnimations.get(panel) === animation) panelSizeAnimations.delete(panel);
+  }, { once: true });
+}
+
+function shouldAnimateGamePanelSize(panel: HTMLElement, before: DOMRect, after: DOMRect): boolean {
+  if (typeof panel.animate !== 'function') return false;
+  if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return false;
+  if (before.width <= 0 || before.height <= 0 || after.width <= 0 || after.height <= 0) return false;
+  return Math.abs(before.width - after.width) > 1 || Math.abs(before.height - after.height) > 1;
+}
+
+function cancelGamePanelSizeAnimation(panel: HTMLElement): void {
+  const animation = panelSizeAnimations.get(panel);
+  if (!animation) return;
+  animation.cancel();
+  panelSizeAnimations.delete(panel);
+}
+
+function anchorGamePanelAtRect(panel: HTMLElement, rect: DOMRect): void {
+  cancelGamePanelPositionAnimation(panel);
+  panel.style.left = `${Math.round(rect.left)}px`;
+  panel.style.top = `${Math.round(rect.top)}px`;
+  panel.style.right = 'auto';
+  panel.style.bottom = 'auto';
+  panel.style.transform = '';
+}
+
+function anchorGamePanelAtPoint(panel: HTMLElement, left: number, top: number): void {
+  cancelGamePanelPositionAnimation(panel);
+  panel.style.left = `${Math.round(left)}px`;
+  panel.style.top = `${Math.round(top)}px`;
+  panel.style.right = 'auto';
+  panel.style.bottom = 'auto';
+  panel.style.transform = '';
 }
 
 function wireGamePanelShellDrag({
@@ -181,10 +360,7 @@ function wireGamePanelShellDrag({
       y: event.clientY - rect.top
     };
     panel.classList.add(draggingClassName);
-    panel.style.left = `${Math.round(rect.left)}px`;
-    panel.style.top = `${Math.round(rect.top)}px`;
-    panel.style.right = 'auto';
-    panel.style.bottom = 'auto';
+    anchorGamePanelAtRect(panel, rect);
     panel.setPointerCapture?.(event.pointerId);
     event.preventDefault();
   }, { signal });
@@ -197,8 +373,7 @@ function wireGamePanelShellDrag({
     const maxTop = Math.max(8, window.innerHeight - rect.height - 8);
     const left = Math.min(maxLeft, Math.max(8, event.clientX - dragOffset.x));
     const top = Math.min(maxTop, Math.max(8, event.clientY - dragOffset.y));
-    panel.style.left = `${Math.round(left)}px`;
-    panel.style.top = `${Math.round(top)}px`;
+    anchorGamePanelAtPoint(panel, left, top);
   }, { signal });
 
   document.addEventListener('pointerup', (event) => {
@@ -215,11 +390,7 @@ function wireGamePanelShellDrag({
 }
 
 function anchorGamePanelPosition(panel: HTMLElement): void {
-  const rect = panel.getBoundingClientRect();
-  panel.style.left = `${Math.round(rect.left)}px`;
-  panel.style.top = `${Math.round(rect.top)}px`;
-  panel.style.right = 'auto';
-  panel.style.bottom = 'auto';
+  anchorGamePanelAtRect(panel, panel.getBoundingClientRect());
 }
 
 function clampGamePanelPosition(panel: HTMLElement): void {
@@ -228,8 +399,5 @@ function clampGamePanelPosition(panel: HTMLElement): void {
   const maxTop = Math.max(8, window.innerHeight - rect.height - 8);
   const left = Math.min(maxLeft, Math.max(8, rect.left));
   const top = Math.min(maxTop, Math.max(8, rect.top));
-  panel.style.left = `${Math.round(left)}px`;
-  panel.style.top = `${Math.round(top)}px`;
-  panel.style.right = 'auto';
-  panel.style.bottom = 'auto';
+  anchorGamePanelAtPoint(panel, left, top);
 }
