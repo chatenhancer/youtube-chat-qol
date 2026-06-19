@@ -34,6 +34,7 @@ const sharedBuildOptions = {
   bundle: true,
   target: 'es2022',
   legalComments: 'none',
+  minify: true,
   logLevel: 'info',
   sourcemap: false,
   define: {
