@@ -1117,6 +1117,12 @@ function createComputerUsers(): LobbySnapshot['users'] {
       displayName: 'Computer',
       joinedAt: Date.now(),
       userId: 'server:computer'
+    },
+    {
+      availableGames: ['bounty-hunting'],
+      displayName: 'Computer (Bounty Hunter)',
+      joinedAt: Date.now(),
+      userId: 'server:computer:bounty-hunter'
     }
   ];
 }
