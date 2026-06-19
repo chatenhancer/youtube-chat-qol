@@ -52,6 +52,100 @@ describe('game panel shell', () => {
     expect(onClose).toHaveBeenCalledTimes(2);
   });
 
+  it('supports opt-in compact mode toggling', () => {
+    const controller = new AbortController();
+    const onCompactChange = vi.fn();
+    const shell = createGamePanelShell({
+      ariaLabel: 'Bounty Hunting panel',
+      classNamePrefix: 'ytcq-bounty-hunting-game',
+      closeLabel: 'Hide',
+      icon: document.createElement('span'),
+      onClose: vi.fn(),
+      signal: controller.signal,
+      subtitle: 'Player TEST',
+      title: 'Bounty Hunting'
+    });
+
+    expect(shell.compactButton.hidden).toBe(true);
+    expect(shell.panel.classList.contains('ytcq-game-panel-has-compact')).toBe(false);
+
+    shell.setCompactModeEnabled({
+      compactLabel: 'Minimize',
+      expandLabel: 'Expand',
+      onChange: onCompactChange
+    });
+
+    expect(shell.compactButton.hidden).toBe(false);
+    expect(shell.compactButton.getAttribute('aria-label')).toBe('Minimize');
+    expect(shell.compactButton.getAttribute('aria-pressed')).toBe('false');
+    expect(shell.panel.classList.contains('ytcq-game-panel-has-compact')).toBe(true);
+
+    shell.compactButton.click();
+
+    expect(shell.isCompactMode()).toBe(true);
+    expect(onCompactChange).toHaveBeenCalledWith(true);
+    expect(shell.compactButton.getAttribute('aria-label')).toBe('Expand');
+    expect(shell.compactButton.getAttribute('aria-pressed')).toBe('true');
+    expect(shell.panel.classList.contains('ytcq-game-panel-compact')).toBe(true);
+
+    shell.compactButton.click();
+
+    expect(shell.isCompactMode()).toBe(false);
+    expect(onCompactChange).toHaveBeenLastCalledWith(false);
+    expect(shell.compactButton.getAttribute('aria-label')).toBe('Minimize');
+    expect(shell.compactButton.getAttribute('aria-pressed')).toBe('false');
+    expect(shell.panel.classList.contains('ytcq-game-panel-compact')).toBe(false);
+
+    shell.setCompactModeEnabled(null);
+
+    expect(shell.compactButton.hidden).toBe(true);
+    expect(shell.panel.classList.contains('ytcq-game-panel-has-compact')).toBe(false);
+  });
+
+  it('keeps the panel at its current top-left position when compact mode changes content height', () => {
+    const controller = new AbortController();
+    let rect = createRect({
+      bottom: 470,
+      height: 420,
+      left: 120,
+      right: 471,
+      top: 50,
+      width: 351
+    });
+    const shell = createGamePanelShell({
+      ariaLabel: 'Bounty Hunting panel',
+      classNamePrefix: 'ytcq-bounty-hunting-game',
+      closeLabel: 'Hide',
+      icon: document.createElement('span'),
+      onClose: vi.fn(),
+      signal: controller.signal,
+      subtitle: 'Player TEST',
+      title: 'Bounty Hunting'
+    });
+    vi.spyOn(shell.panel, 'getBoundingClientRect').mockImplementation(() => rect);
+    shell.setCompactModeEnabled({
+      compactLabel: 'Minimize',
+      expandLabel: 'Expand',
+      onChange: () => {
+        rect = createRect({
+          bottom: 170,
+          height: 120,
+          left: 120,
+          right: 471,
+          top: 50,
+          width: 351
+        });
+      }
+    });
+
+    shell.compactButton.click();
+
+    expect(shell.panel.style.left).toBe('120px');
+    expect(shell.panel.style.top).toBe('50px');
+    expect(shell.panel.style.right).toBe('auto');
+    expect(shell.panel.style.bottom).toBe('auto');
+  });
+
   it('drags the panel while clamping it to the viewport', () => {
     const controller = new AbortController();
     const onClose = vi.fn();

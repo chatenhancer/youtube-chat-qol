@@ -1,0 +1,1461 @@
+/**
+ * Bounty Hunting game panel.
+ *
+ * Draws the western bounty board as a square canvas, prepares host-side bounty
+ * candidates from live chat, and lets players claim open bounties by clicking
+ * matching live chat messages.
+ */
+import { registerFeatureLifecycle } from '../../../../content/lifecycle';
+import { t } from '../../../../shared/i18n';
+import { ytcqCreateElement } from '../../../../shared/managed-dom';
+import { drawPlaygroundCanvasAvatar } from '../../../../shared/playground-avatar';
+import {
+  BOUNTY_HUNTING_COUNTDOWN_MS,
+  BOUNTY_HUNTING_ROUND_MS,
+  BOUNTY_HUNTING_ROUND_OVER_MS,
+  type PublicBountyHuntingBounty
+} from '../../../../shared/playground-bounty-hunting';
+import { CHAT_MESSAGE_SELECTOR } from '../../../../youtube/selectors';
+import {
+  cancelScheduledFrame,
+  getNow,
+  isPointInRect,
+  scheduleFrame
+} from '../replay-trivia/canvas';
+import type { GamePanelShell } from '../panel-shell';
+import { createGameSoundController } from '../sound';
+import {
+  BOUNTY_HUNTING_FONT_BARNUM,
+  BOUNTY_HUNTING_FONT_BARTLE,
+  BOUNTY_HUNTING_FONT_TEX_MEX,
+  EMPTY_BOUNTY_HUNTING_ASSETS,
+  getBountyHuntingAssets
+} from './assets';
+import {
+  createBountyHuntingBountiesFromMessages,
+  findBountyHuntingMatchingBounty,
+  getBountyHuntingObservedMessage
+} from './candidates';
+import type {
+  PublicBountyHuntingGame,
+  Rect,
+  BountyHuntingClosePanel,
+  BountyHuntingFallbackRuntime,
+  BountyHuntingObservedMessage,
+  BountyHuntingPanelRuntime,
+  BountyHuntingPlayerRole
+} from './types';
+
+const LAYOUT_WIDTH = 448;
+const LAYOUT_HEIGHT = 448;
+const COMPACT_LAYOUT_HEIGHT = 64;
+const CANVAS_WIDTH = LAYOUT_WIDTH;
+const CANVAS_HEIGHT = LAYOUT_HEIGHT;
+const CANVAS_DISPLAY_SCALE = 0.75;
+const CANVAS_DISPLAY_WIDTH = LAYOUT_WIDTH * CANVAS_DISPLAY_SCALE;
+const PREPARATION_MS = 2_000;
+const BUTTON_RECT: Rect = { height: 58, width: 164, x: 142, y: 394 };
+const BOUNTY_AMOUNT_X = 114;
+const BOUNTY_DESCRIPTION_X = 124;
+const BOUNTY_DESCRIPTION_STAMP_GAP = 8;
+const BOUNTY_LIST_X = 45;
+const BOUNTY_LIST_Y = 146;
+const BOUNTY_ROW_HEIGHT = 39;
+const BOUNTY_ROW_GAP = 3;
+const BOUNTY_ROW_WIDTH = 358;
+const BOUNTY_STAMP_X_OFFSET = 0;
+const LIVE_SCORE_AVATAR_RADIUS = 17;
+const LIVE_SCORE_LEFT_TEXT_X = 104;
+const LIVE_SCORE_MONEY_Y = 126;
+const LIVE_SCORE_NAME_Y = 106;
+const LIVE_SCORE_RIGHT_TEXT_X = 344;
+const LIVE_SCORE_Y_OFFSET = -8;
+const LEDGER_AVATAR_X = 92;
+const LEDGER_BOUNTIES_X = 304;
+const LEDGER_CLOSE_BUTTON_Y = 386;
+const LEDGER_DIVIDER_X = 92;
+const LEDGER_DIVIDER_WIDTH = 328;
+const LEDGER_HEADER_TOP_Y = 96;
+const LEDGER_HEADER_X = 304;
+const LEDGER_LABEL_X = 136;
+const LEDGER_MONEY_X = 382;
+const LEDGER_RANK_STAR_HEIGHT = 45;
+const LEDGER_RANK_STAR_WIDTH = 43;
+const LEDGER_RANK_STAR_X_OFFSET = 44;
+const LEDGER_RANK_STAR_Y_OFFSET = 44;
+const LEDGER_RANK_TEXT_FONT_SIZE = 22;
+const LEDGER_RANK_TEXT_X_OFFSET = 22;
+const LEDGER_RANK_TEXT_Y_OFFSET = 20;
+const LEDGER_ROW_DIVIDER_OFFSET_Y = 33;
+const LEDGER_ROW_Y = [164, 234] as const;
+const LEDGER_RIBBON_Y = 282;
+const LEDGER_TITLE_FONT_SIZE = 56;
+const LEDGER_TITLE_Y = 18;
+const LEDGER_WINNER_Y = 318;
+const READY_BUTTON_FLASH_MS = 520;
+const ROUND_OVER_BUTTON_LABEL_COLOR = '#F4DAA5';
+const ROUND_OVER_BUTTON_Y = 382;
+const TIMER_START_PULSE_MS = 720;
+const READY_STACK_AVATAR_OFFSET_X = 12;
+const READY_STACK_AVATAR_OVERLAP = 12;
+const READY_STACK_AVATAR_RADIUS = 10;
+const BOUNTY_HUNTING_PLAYER_ROLES: BountyHuntingPlayerRole[] = ['host', 'guest'];
+const BOUNTY_HUNTING_READY_SOUND_PATH = 'games/bounty-hunting/ready-gun-cock.mp3';
+const BOUNTY_HUNTING_ROUND_OVER_SOUND_PATH = 'games/bounty-hunting/sting.mp3';
+const BOUNTY_HUNTING_FINAL_TICK_SOUND_PATH = 'games/bounty-hunting/final-10-clock-tick.mp3';
+const BOUNTY_HUNTING_ROUND_START_SOUND_PATH = 'games/bounty-hunting/round-start-cue.mp3';
+const BOUNTY_HUNTING_CLAIM_SOUND_PATHS = [
+  'games/bounty-hunting/claim-ricochet-01.mp3',
+  'games/bounty-hunting/claim-ricochet-02.mp3',
+  'games/bounty-hunting/claim-ricochet-03.mp3',
+  'games/bounty-hunting/claim-ricochet-04.mp3',
+  'games/bounty-hunting/claim-ricochet-05.mp3',
+  'games/bounty-hunting/claim-ricochet-06.mp3',
+  'games/bounty-hunting/claim-ricochet-07.mp3',
+  'games/bounty-hunting/claim-ricochet-08.mp3',
+  'games/bounty-hunting/claim-ricochet-09.mp3',
+  'games/bounty-hunting/claim-ricochet-10.mp3'
+] as const;
+const PAPER_TEXT = '#352c24';
+const RED_TEXT = '#8f1d25';
+const GREEN_STAMP = '#26833c';
+const SHADOW = 'rgba(0, 0, 0, 0.28)';
+const BARNUM_STACK = `"${BOUNTY_HUNTING_FONT_BARNUM}", Georgia, serif`;
+const BARTLE_STACK = `"${BOUNTY_HUNTING_FONT_BARTLE}", Impact, sans-serif`;
+const TEX_MEX_STACK = `"${BOUNTY_HUNTING_FONT_TEX_MEX}", Impact, sans-serif`;
+
+let activeBountyHuntingPanel: BountyHuntingPanelRuntime | null = null;
+let activeBountyHuntingFallback: BountyHuntingFallbackRuntime | null = null;
+
+registerFeatureLifecycle({
+  message: { collect: handleBountyHuntingLifecycleMessage },
+  mutation: {
+    collect({ changedMessages }) {
+      changedMessages.forEach(handleBountyHuntingLifecycleMessage);
+    }
+  }
+});
+
+export function openBountyHuntingGamePanel(
+  shell: GamePanelShell,
+  game: PublicBountyHuntingGame,
+  currentUserId: string,
+  onAction: (gameId: string, action: string, payload?: Record<string, unknown>) => void,
+  onVisibilityChanged: (() => void) | undefined,
+  closePanel: BountyHuntingClosePanel
+): void {
+  closeBountyHuntingGamePanel({ notify: false });
+
+  const listeners = new AbortController();
+  const soundController = createGameSoundController({
+    className: 'ytcq-bounty-hunting-game-sound-toggle',
+    preloadPaths: [
+      BOUNTY_HUNTING_READY_SOUND_PATH,
+      BOUNTY_HUNTING_ROUND_OVER_SOUND_PATH,
+      BOUNTY_HUNTING_FINAL_TICK_SOUND_PATH,
+      BOUNTY_HUNTING_ROUND_START_SOUND_PATH,
+      ...BOUNTY_HUNTING_CLAIM_SOUND_PATHS
+    ],
+    signal: listeners.signal
+  });
+  const { body, compactButton, statusOverlay, subtitleElement } = shell;
+  compactButton.before(soundController.button);
+  subtitleElement.textContent = getBountyHuntingOpponentLabel(game, currentUserId);
+
+  const canvas = ytcqCreateElement('canvas');
+  canvas.className = 'ytcq-bounty-hunting-canvas';
+  canvas.setAttribute('aria-label', t('gamesBountyHuntingPanelTitle'));
+  canvas.setAttribute('role', 'application');
+  canvas.tabIndex = 0;
+  body.append(canvas);
+
+  let context: CanvasRenderingContext2D | null = null;
+  try {
+    context = canvas.getContext('2d');
+  } catch {
+    context = null;
+  }
+
+  if (!context || !canRenderBountyHuntingCanvas(context)) {
+    const fallback = ytcqCreateElement('div');
+    fallback.className = 'ytcq-bounty-hunting-game-fallback';
+    fallback.textContent = t('gamesBountyHuntingCanvasUnavailable');
+    body.replaceChildren(fallback, statusOverlay.element);
+    activeBountyHuntingFallback = {
+      content: fallback,
+      listeners,
+      onVisibilityChanged: onVisibilityChanged || null,
+      soundController
+    };
+    onVisibilityChanged?.();
+    return;
+  }
+
+  activeBountyHuntingPanel = {
+    assets: EMPTY_BOUNTY_HUNTING_ASSETS,
+    canvas,
+    claimSoundIndex: 0,
+    closePanel,
+    compactMode: false,
+    context,
+    currentUserId,
+    finalTickPlayedForGameId: null,
+    finishSent: false,
+    frameId: null,
+    game,
+    hitboxes: [],
+    hoveredAction: null,
+    listeners,
+    onAction,
+    onVisibilityChanged: onVisibilityChanged || null,
+    pixelRatio: configureBountyHuntingCanvas(canvas),
+    preparationMessages: new Map(),
+    preparationStarted: false,
+    preparationTimer: null,
+    readyButtonFlashUntil: 0,
+    roundOverStingPlayedForGameId: null,
+    sentClaimKeys: new Set(),
+    soundController,
+    startRoundSent: false,
+    statusOverlay,
+    subtitleElement,
+    timerStartPulseUntil: 0,
+    timeoutSent: false
+  };
+
+  canvas.addEventListener('click', handleBountyHuntingCanvasClick, { signal: listeners.signal });
+  canvas.addEventListener('mousemove', handleBountyHuntingCanvasMouseMove, { signal: listeners.signal });
+  canvas.addEventListener('mouseleave', handleBountyHuntingCanvasMouseLeave, { signal: listeners.signal });
+  canvas.addEventListener('keydown', handleBountyHuntingCanvasKeydown, { signal: listeners.signal });
+  document.addEventListener('click', handleBountyHuntingDocumentClick, {
+    capture: true,
+    signal: listeners.signal
+  });
+
+  maybeStartBountyHuntingPreparation(activeBountyHuntingPanel);
+  renderBountyHuntingGame(getNow());
+  maybePlayBountyHuntingRoundOverSting(activeBountyHuntingPanel);
+  startBountyHuntingLoop();
+  onVisibilityChanged?.();
+
+  void getBountyHuntingAssets().then((assets) => {
+    if (!activeBountyHuntingPanel || activeBountyHuntingPanel.canvas !== canvas) return;
+    activeBountyHuntingPanel.assets = assets;
+    renderBountyHuntingGame(getNow());
+  }).catch(() => undefined);
+}
+
+export function closeBountyHuntingGamePanel({ notify = true }: { notify?: boolean } = {}): void {
+  const fallback = activeBountyHuntingFallback;
+  if (fallback) {
+    fallback.listeners.abort();
+    fallback.content.remove();
+    fallback.soundController.button.remove();
+    activeBountyHuntingFallback = null;
+    if (notify) fallback.onVisibilityChanged?.();
+  }
+
+  const runtime = activeBountyHuntingPanel;
+  if (!runtime) return;
+  if (runtime.frameId !== null) cancelScheduledFrame(runtime.frameId);
+  if (runtime.preparationTimer !== null) window.clearTimeout(runtime.preparationTimer);
+  runtime.statusOverlay.clear();
+  runtime.listeners.abort();
+  runtime.canvas.remove();
+  runtime.soundController.button.remove();
+  activeBountyHuntingPanel = null;
+  if (notify) runtime.onVisibilityChanged?.();
+}
+
+export function isBountyHuntingGamePanelOpen(): boolean {
+  return Boolean(activeBountyHuntingPanel || activeBountyHuntingFallback);
+}
+
+export function getActiveBountyHuntingGameId(): string {
+  return activeBountyHuntingPanel?.game.gameId || '';
+}
+
+export function setBountyHuntingCompactMode(compact: boolean): void {
+  const runtime = activeBountyHuntingPanel;
+  if (!runtime || runtime.compactMode === compact) return;
+  runtime.compactMode = compact;
+  runtime.hoveredAction = null;
+  runtime.canvas.style.cursor = 'default';
+  runtime.pixelRatio = configureBountyHuntingCanvas(runtime.canvas, compact);
+  renderBountyHuntingGame(getNow());
+  runtime.onVisibilityChanged?.();
+}
+
+export function updateBountyHuntingGamePanel(game: PublicBountyHuntingGame, currentUserId: string): void {
+  if (!activeBountyHuntingPanel || activeBountyHuntingPanel.game.gameId !== game.gameId) return;
+
+  const previousGame = activeBountyHuntingPanel.game;
+  const previousStatus = activeBountyHuntingPanel.game.status;
+  const previousClaimCount = getClaimedBountyCount(activeBountyHuntingPanel.game);
+  activeBountyHuntingPanel.game = game;
+  activeBountyHuntingPanel.currentUserId = currentUserId;
+  activeBountyHuntingPanel.subtitleElement.textContent = getBountyHuntingOpponentLabel(game, currentUserId);
+
+  if (previousStatus !== game.status) {
+    activeBountyHuntingPanel.startRoundSent = false;
+    activeBountyHuntingPanel.timeoutSent = false;
+    activeBountyHuntingPanel.finishSent = false;
+    if (game.status === 'active') {
+      activeBountyHuntingPanel.timerStartPulseUntil = getNow() + TIMER_START_PULSE_MS;
+      activeBountyHuntingPanel.soundController.play(BOUNTY_HUNTING_ROUND_START_SOUND_PATH);
+    }
+  }
+  if (getClaimedBountyCount(game) > previousClaimCount) {
+    playBountyHuntingClaimFeedback(activeBountyHuntingPanel);
+  }
+  if (hasNewBountyHuntingReadyPlayer(previousGame, game)) {
+    playBountyHuntingReadyFeedback(activeBountyHuntingPanel);
+  }
+  maybePlayBountyHuntingRoundOverSting(activeBountyHuntingPanel);
+
+  maybeStartBountyHuntingPreparation(activeBountyHuntingPanel);
+  renderBountyHuntingGame(getNow());
+}
+
+function handleBountyHuntingLifecycleMessage(message: HTMLElement): void {
+  const runtime = activeBountyHuntingPanel;
+  if (!runtime || !message.isConnected) return;
+  const observed = getBountyHuntingObservedMessage(message);
+  if (!observed) return;
+
+  if (runtime.game.status === 'preparing' && runtime.currentUserId === runtime.game.bountyProviderUserId) {
+    runtime.preparationMessages.set(observed.messageId, observed);
+    return;
+  }
+
+  // Active-round claims are intentionally click-driven. Newly observed messages
+  // are only used to prepare the bounty board before the round starts.
+}
+
+function maybeStartBountyHuntingPreparation(runtime: BountyHuntingPanelRuntime): void {
+  if (runtime.preparationStarted) return;
+  if (runtime.game.status !== 'preparing') return;
+  if (runtime.currentUserId !== runtime.game.bountyProviderUserId) return;
+
+  runtime.preparationStarted = true;
+  collectVisibleBountyHuntingMessages(runtime);
+  runtime.preparationTimer = window.setTimeout(() => {
+    runtime.preparationTimer = null;
+    if (!activeBountyHuntingPanel || activeBountyHuntingPanel.canvas !== runtime.canvas) return;
+    if (runtime.game.status !== 'preparing') return;
+    collectVisibleBountyHuntingMessages(runtime);
+    runtime.onAction(runtime.game.gameId, 'submitBounties', {
+      bounties: createBountyHuntingBountiesFromMessages([...runtime.preparationMessages.values()])
+    });
+  }, PREPARATION_MS);
+}
+
+function collectVisibleBountyHuntingMessages(runtime: BountyHuntingPanelRuntime): void {
+  document.querySelectorAll<HTMLElement>(CHAT_MESSAGE_SELECTOR).forEach((message) => {
+    const observed = getBountyHuntingObservedMessage(message);
+    if (observed) runtime.preparationMessages.set(observed.messageId, observed);
+  });
+}
+
+function maybeClaimBountyHuntingBounty(
+  runtime: BountyHuntingPanelRuntime,
+  message: BountyHuntingObservedMessage
+): void {
+  if (runtime.game.status !== 'active') return;
+  if (Date.now() >= runtime.game.phaseStartedAt + BOUNTY_HUNTING_ROUND_MS) return;
+
+  const openBounties = runtime.game.bounties.filter((bounty) => !bounty.claim);
+  const bounty = findBountyHuntingMatchingBounty(openBounties, message);
+  if (!bounty) return;
+
+  const claimKey = `${message.messageId}:${bounty.id}`;
+  if (runtime.sentClaimKeys.has(claimKey)) return;
+  runtime.sentClaimKeys.add(claimKey);
+  runtime.onAction(runtime.game.gameId, 'claimBounty', {
+    authorName: message.authorName,
+    bountyId: bounty.id,
+    emojiCount: message.emojiCount,
+    isVerifiedAuthor: message.isVerifiedAuthor,
+    messageId: message.messageId,
+    text: message.text
+  });
+}
+
+function handleBountyHuntingDocumentClick(event: MouseEvent): void {
+  const runtime = activeBountyHuntingPanel;
+  if (!runtime || runtime.statusOverlay.isBlocking()) return;
+  if (!(event.target instanceof Element)) return;
+
+  const message = event.target.closest<HTMLElement>(CHAT_MESSAGE_SELECTOR);
+  if (!message) return;
+  const observed = getBountyHuntingObservedMessage(message);
+  if (observed) maybeClaimBountyHuntingBounty(runtime, observed);
+}
+
+function handleBountyHuntingCanvasClick(event: MouseEvent): void {
+  const runtime = activeBountyHuntingPanel;
+  if (!runtime || runtime.statusOverlay.isBlocking()) return;
+
+  const action = getBountyHuntingCanvasAction(runtime, event);
+  if (!action) return;
+  if (action === 'ready') {
+    if (runtime.game.status !== 'ready') return;
+    const role = getBountyHuntingCurrentRole(runtime.game, runtime.currentUserId);
+    if (role) {
+      const nextReady = !runtime.game.readyPlayers[role];
+      if (nextReady) playBountyHuntingReadyFeedback(runtime);
+      runtime.game = {
+        ...runtime.game,
+        readyPlayers: {
+          ...runtime.game.readyPlayers,
+          [role]: nextReady
+        }
+      };
+      runtime.onAction(runtime.game.gameId, 'ready');
+      renderBountyHuntingGame(getNow());
+    }
+    return;
+  }
+
+  runtime.onAction(runtime.game.gameId, 'leave');
+  runtime.closePanel();
+}
+
+function flashBountyHuntingReadyButton(runtime: BountyHuntingPanelRuntime, now = getNow()): void {
+  runtime.readyButtonFlashUntil = now + READY_BUTTON_FLASH_MS;
+}
+
+function playBountyHuntingReadyFeedback(runtime: BountyHuntingPanelRuntime): void {
+  flashBountyHuntingReadyButton(runtime);
+  runtime.soundController.play(BOUNTY_HUNTING_READY_SOUND_PATH);
+}
+
+function playBountyHuntingClaimFeedback(runtime: BountyHuntingPanelRuntime): void {
+  const soundPath = BOUNTY_HUNTING_CLAIM_SOUND_PATHS[runtime.claimSoundIndex % BOUNTY_HUNTING_CLAIM_SOUND_PATHS.length];
+  runtime.claimSoundIndex = (runtime.claimSoundIndex + 1) % BOUNTY_HUNTING_CLAIM_SOUND_PATHS.length;
+  runtime.soundController.play(soundPath);
+}
+
+function maybePlayBountyHuntingRoundOverSting(runtime: BountyHuntingPanelRuntime): void {
+  if (runtime.game.status !== 'roundOver') return;
+  if (runtime.roundOverStingPlayedForGameId === runtime.game.gameId) return;
+  runtime.roundOverStingPlayedForGameId = runtime.game.gameId;
+  runtime.soundController.play(BOUNTY_HUNTING_ROUND_OVER_SOUND_PATH);
+}
+
+function handleBountyHuntingCanvasKeydown(event: KeyboardEvent): void {
+  if (event.key !== 'Enter' && event.key !== ' ') return;
+  const runtime = activeBountyHuntingPanel;
+  if (!runtime) return;
+  const action = runtime.hitboxes.find((hitbox) => hitbox.action === 'ready' || hitbox.action === 'close')?.action;
+  if (!action) return;
+  event.preventDefault();
+  const canvasRect = runtime.canvas.getBoundingClientRect();
+  const point = getBountyHuntingClientPoint(runtime.canvas, {
+    x: BUTTON_RECT.x + BUTTON_RECT.width / 2,
+    y: BUTTON_RECT.y + BUTTON_RECT.height / 2
+  });
+  handleBountyHuntingCanvasClick(new MouseEvent('click', {
+    clientX: canvasRect.left + point.x,
+    clientY: canvasRect.top + point.y
+  }));
+}
+
+function handleBountyHuntingCanvasMouseMove(event: MouseEvent): void {
+  const runtime = activeBountyHuntingPanel;
+  if (!runtime) return;
+  const action = getBountyHuntingCanvasAction(runtime, event);
+  if (action === runtime.hoveredAction) return;
+  runtime.hoveredAction = action;
+  runtime.canvas.style.cursor = action ? 'pointer' : 'default';
+  renderBountyHuntingGame(getNow());
+}
+
+function handleBountyHuntingCanvasMouseLeave(): void {
+  const runtime = activeBountyHuntingPanel;
+  if (!runtime) return;
+  runtime.hoveredAction = null;
+  runtime.canvas.style.cursor = 'default';
+  renderBountyHuntingGame(getNow());
+}
+
+function getBountyHuntingCanvasAction(runtime: BountyHuntingPanelRuntime, event: MouseEvent): 'close' | 'ready' | null {
+  const point = getBountyHuntingCanvasPoint(runtime.canvas, event);
+  return runtime.hitboxes.find((hitbox) => isPointInRect(point, hitbox.rect))?.action || null;
+}
+
+function startBountyHuntingLoop(): void {
+  const runtime = activeBountyHuntingPanel;
+  if (!runtime || runtime.frameId !== null) return;
+  const tick = (now: number): void => {
+    const active = activeBountyHuntingPanel;
+    if (!active) return;
+    active.pixelRatio = syncBountyHuntingCanvasPixelRatio(active.canvas, active.pixelRatio, active.compactMode);
+    maybeSendBountyHuntingTimerActions(active);
+    renderBountyHuntingGame(now);
+    active.frameId = scheduleFrame(tick);
+  };
+  runtime.frameId = scheduleFrame(tick);
+}
+
+function maybeSendBountyHuntingTimerActions(runtime: BountyHuntingPanelRuntime): void {
+  if (runtime.game.status === 'countdown' && !runtime.startRoundSent) {
+    if (Date.now() - runtime.game.phaseStartedAt >= BOUNTY_HUNTING_COUNTDOWN_MS) {
+      runtime.startRoundSent = true;
+      runtime.onAction(runtime.game.gameId, 'startRound');
+    }
+  }
+
+  if (runtime.game.status === 'active' && !runtime.timeoutSent) {
+    maybePlayBountyHuntingFinalTick(runtime);
+    if (Date.now() - runtime.game.phaseStartedAt >= BOUNTY_HUNTING_ROUND_MS) {
+      runtime.timeoutSent = true;
+      runtime.onAction(runtime.game.gameId, 'timeout');
+    }
+  }
+
+  if (runtime.game.status === 'roundOver' && !runtime.finishSent) {
+    if (Date.now() - runtime.game.phaseStartedAt >= BOUNTY_HUNTING_ROUND_OVER_MS) {
+      runtime.finishSent = true;
+      runtime.onAction(runtime.game.gameId, 'finish');
+    }
+  }
+}
+
+function maybePlayBountyHuntingFinalTick(runtime: BountyHuntingPanelRuntime): void {
+  if (runtime.finalTickPlayedForGameId === runtime.game.gameId) return;
+  const remainingMs = runtime.game.phaseStartedAt + BOUNTY_HUNTING_ROUND_MS - Date.now();
+  if (remainingMs > 10_000 || remainingMs <= 0) return;
+  runtime.finalTickPlayedForGameId = runtime.game.gameId;
+  runtime.soundController.play(BOUNTY_HUNTING_FINAL_TICK_SOUND_PATH);
+}
+
+function renderBountyHuntingGame(now: number): void {
+  const runtime = activeBountyHuntingPanel;
+  if (!runtime) return;
+
+  const context = runtime.context;
+  context.setTransform(
+    runtime.pixelRatio,
+    0,
+    0,
+    runtime.pixelRatio,
+    0,
+    0
+  );
+  context.clearRect(0, 0, LAYOUT_WIDTH, LAYOUT_HEIGHT);
+  context.imageSmoothingEnabled = true;
+  context.imageSmoothingQuality = 'high';
+  runtime.hitboxes = [];
+
+  if (runtime.compactMode) {
+    drawBountyHuntingCompact(runtime, now);
+    return;
+  }
+
+  switch (runtime.game.status) {
+    case 'preparing':
+      drawBountyHuntingLoading(runtime);
+      break;
+    case 'ready':
+    case 'active':
+    case 'countdown':
+      drawBountyHuntingWanted(runtime, now);
+      break;
+    case 'roundOver':
+      drawBountyHuntingRoundOver(runtime);
+      break;
+    case 'finished':
+      drawBountyHuntingLedger(runtime);
+      break;
+  }
+}
+
+function drawBountyHuntingCompact(runtime: BountyHuntingPanelRuntime, now: number): void {
+  const { context, game } = runtime;
+  const currentRole = getBountyHuntingCurrentRole(game, runtime.currentUserId) || 'host';
+  const opponentRole = currentRole === 'host' ? 'guest' : 'host';
+
+  drawBountyHuntingCompactBackground(runtime);
+  drawBountyHuntingAvatar(runtime, opponentRole, 31, 32, 14);
+  drawBountyHuntingAvatar(runtime, currentRole, 417, 32, 14);
+
+  context.textBaseline = 'middle';
+  context.textAlign = 'left';
+  context.fillStyle = PAPER_TEXT;
+  context.font = `700 16px ${BARNUM_STACK}`;
+  context.fillText('Them', 52, 24);
+  drawBountyHuntingMoneyText(context, game.scores[opponentRole] || 0, 52, 43, {
+    align: 'left',
+    amountFont: `1000 18px ${BARNUM_STACK}`,
+    color: '#2f8d2e',
+    dollarFont: `1000 13px ${BARNUM_STACK}`
+  });
+
+  context.textAlign = 'right';
+  context.fillStyle = PAPER_TEXT;
+  context.font = `700 16px ${BARNUM_STACK}`;
+  context.fillText('You', 396, 24);
+  drawBountyHuntingMoneyText(context, game.scores[currentRole] || 0, 396, 43, {
+    align: 'right',
+    amountFont: `1000 18px ${BARNUM_STACK}`,
+    color: '#2f8d2e',
+    dollarFont: `1000 13px ${BARNUM_STACK}`
+  });
+
+  drawBountyHuntingCompactStatus(runtime, now);
+}
+
+function drawBountyHuntingCompactBackground(runtime: BountyHuntingPanelRuntime): void {
+  const { assets, context } = runtime;
+  if (assets.liveScoreBg && runtime.game.status !== 'preparing') {
+    context.drawImage(assets.liveScoreBg, 0, -1, LAYOUT_WIDTH, COMPACT_LAYOUT_HEIGHT + 2);
+    return;
+  }
+  if (assets.paperBg) {
+    context.drawImage(assets.paperBg, 0, 75, LAYOUT_WIDTH, COMPACT_LAYOUT_HEIGHT, 0, 0, LAYOUT_WIDTH, COMPACT_LAYOUT_HEIGHT);
+    return;
+  }
+  drawRoundedRect(context, 0, 0, LAYOUT_WIDTH, COMPACT_LAYOUT_HEIGHT, 8, '#ead8ad', '#8c6d35');
+}
+
+function drawBountyHuntingCompactStatus(runtime: BountyHuntingPanelRuntime, now: number): void {
+  const { context, game } = runtime;
+  context.textAlign = 'center';
+  context.textBaseline = 'middle';
+
+  if (game.status === 'countdown') {
+    const remainingMs = Math.max(0, game.phaseStartedAt + BOUNTY_HUNTING_COUNTDOWN_MS - Date.now());
+    const seconds = Math.max(1, Math.ceil(remainingMs / 1000));
+    drawCenteredText(context, String(seconds), 224, 28, {
+      color: RED_TEXT,
+      font: `400 32px ${TEX_MEX_STACK}`,
+      shadow: false
+    });
+    drawCenteredText(context, 'STARTING', 224, 49, {
+      color: PAPER_TEXT,
+      font: `700 10px ${BARNUM_STACK}`,
+      shadow: false
+    });
+    return;
+  }
+
+  if (game.status === 'preparing') {
+    drawCenteredText(context, 'LOADING', 224, 32, {
+      color: PAPER_TEXT,
+      font: `800 18px ${BARTLE_STACK}`,
+      shadow: false
+    });
+    return;
+  }
+
+  if (game.status === 'roundOver') {
+    drawCenteredText(context, 'ROUND OVER', 224, 32, {
+      color: PAPER_TEXT,
+      font: `700 22px ${BARNUM_STACK}`,
+      shadow: false
+    });
+    return;
+  }
+
+  if (game.status === 'finished') {
+    drawCenteredText(context, `WINNER: ${getBountyHuntingWinnerLabel(runtime)}`, 224, 32, {
+      color: PAPER_TEXT,
+      font: `700 22px ${BARNUM_STACK}`,
+      shadow: false
+    });
+    return;
+  }
+
+  const timerPulseAmount = getBountyHuntingTimerStartPulseAmount(runtime, now);
+  const timerFontSize = 20 + Math.round(timerPulseAmount * 7);
+  const timerColor = game.status === 'active' ? RED_TEXT : PAPER_TEXT;
+  if (timerPulseAmount > 0) {
+    context.save();
+    context.globalAlpha = 0.28 + timerPulseAmount * 0.46;
+    context.shadowBlur = 20 * timerPulseAmount;
+    context.shadowColor = 'rgba(255, 236, 158, 0.95)';
+    drawCenteredText(context, getBountyHuntingTimerText(game), 224, 26, {
+      color: '#f7d88a',
+      font: `800 ${timerFontSize + 3}px ${BARTLE_STACK}`,
+      shadow: false
+    });
+    context.restore();
+  }
+  drawCenteredText(context, getBountyHuntingTimerText(game), 224, 26, {
+    color: timerColor,
+    font: `800 ${timerFontSize}px ${BARTLE_STACK}`,
+    shadow: false
+  });
+  drawCenteredText(context, 'TIME REMAINING', 224, 46, {
+    color: PAPER_TEXT,
+    font: `700 10px ${BARNUM_STACK}`,
+    shadow: false
+  });
+}
+
+function drawBountyHuntingLoading(runtime: BountyHuntingPanelRuntime): void {
+  const { context } = runtime;
+  context.fillStyle = '#fff';
+  context.fillRect(0, 0, LAYOUT_WIDTH, LAYOUT_HEIGHT);
+
+  if (runtime.assets.logo) {
+    context.drawImage(runtime.assets.logo, 118, 50, 212, 318);
+  } else {
+    drawBountyHuntingLoadingLogoFallback(context);
+  }
+
+  drawCenteredText(context, 'Loading...', 224, 398, {
+    color: '#444',
+    font: '400 22px Roboto, Arial, sans-serif',
+    shadow: false
+  });
+}
+
+function drawBountyHuntingLoadingLogoFallback(context: CanvasRenderingContext2D): void {
+  drawCenteredText(context, 'THE', 224, 85, {
+    color: '#f20d0d',
+    font: `700 43px ${BARNUM_STACK}`,
+    shadow: false
+  });
+  drawCenteredText(context, 'Wild', 224, 132, {
+    color: '#f20d0d',
+    font: `700 71px ${BARNUM_STACK}`,
+    shadow: false
+  });
+  drawCenteredText(context, 'WILD', 224, 190, {
+    color: '#f20d0d',
+    font: `800 76px ${BARNUM_STACK}`,
+    shadow: false
+  });
+  drawCenteredText(context, 'CHAT', 224, 274, {
+    color: '#f20d0d',
+    font: `800 112px ${BARNUM_STACK}`,
+    shadow: false
+  });
+  drawCenteredText(context, 'RELOADED', 224, 328, {
+    color: '#050505',
+    font: `800 33px ${TEX_MEX_STACK}`,
+    shadow: false
+  });
+}
+
+function drawBountyHuntingWanted(runtime: BountyHuntingPanelRuntime, now: number): void {
+  drawBountyHuntingPaper(runtime);
+  drawBountyHuntingTitle(runtime, 'WANTED', 18, 90, TEX_MEX_STACK, {
+    decorOffsetY: 7,
+    textOffsetY: 8,
+    weight: 400
+  });
+  drawBountyHuntingLiveScore(runtime, now);
+  runtime.game.bounties.forEach((bounty, index) => drawBountyHuntingBounty(runtime, bounty, index));
+  runtime.game.bounties.forEach((bounty, index) => drawBountyHuntingBountyClaimAvatar(runtime, bounty, index));
+  drawBountyHuntingActionButton(runtime, 'READY', runtime.game.status === 'ready' ? 'ready' : null, {
+    flashAmount: getBountyHuntingReadyButtonFlashAmount(runtime, now),
+    readyStack: true
+  });
+  if (runtime.game.status === 'countdown') drawBountyHuntingCountdown(runtime);
+}
+
+function drawBountyHuntingCountdown(runtime: BountyHuntingPanelRuntime): void {
+  const { context, game } = runtime;
+  const remainingMs = Math.max(0, game.phaseStartedAt + BOUNTY_HUNTING_COUNTDOWN_MS - Date.now());
+  const seconds = Math.max(1, Math.ceil(remainingMs / 1000));
+  context.save();
+  context.globalAlpha = 0.82;
+  context.fillStyle = '#2f261e';
+  context.beginPath();
+  context.arc(224, 224, 57, 0, Math.PI * 2);
+  context.fill();
+  context.restore();
+  drawCenteredText(context, String(seconds), 224, 228, {
+    color: '#f2ddb6',
+    font: `400 82px ${TEX_MEX_STACK}`
+  });
+}
+
+function drawBountyHuntingRoundOver(runtime: BountyHuntingPanelRuntime): void {
+  const { assets, context } = runtime;
+  if (assets.roundOverBg) {
+    context.drawImage(assets.roundOverBg, 0, 0, LAYOUT_WIDTH, LAYOUT_HEIGHT);
+  } else {
+    drawBountyHuntingPaper(runtime);
+  }
+
+  if (assets.roundOverTitle) {
+    context.drawImage(assets.roundOverTitle, 33, 64, 382, 296);
+  } else {
+    drawCenteredText(context, 'ROUND', 224, 165, {
+      color: '#f6deb2',
+      font: `700 72px ${BARNUM_STACK}`
+    });
+    drawCenteredText(context, 'OVER', 224, 238, {
+      color: '#f6deb2',
+      font: `700 72px ${BARNUM_STACK}`
+    });
+  }
+  drawBountyHuntingActionButton(runtime, 'LOADING', null, {
+    darker: true,
+    labelColor: ROUND_OVER_BUTTON_LABEL_COLOR,
+    y: ROUND_OVER_BUTTON_Y
+  });
+}
+
+function drawBountyHuntingLedger(runtime: BountyHuntingPanelRuntime): void {
+  const { context } = runtime;
+  drawBountyHuntingPaper(runtime);
+  drawBountyHuntingTitle(runtime, 'THE LEDGER', LEDGER_TITLE_Y, LEDGER_TITLE_FONT_SIZE, TEX_MEX_STACK, {
+    decorOffsetY: 7,
+    textOffsetY: 8,
+    weight: 400
+  });
+
+  context.fillStyle = RED_TEXT;
+  context.font = `700 13px ${BARNUM_STACK}`;
+  context.textAlign = 'center';
+  context.textBaseline = 'middle';
+  context.fillText('BOUNTIES', LEDGER_HEADER_X, LEDGER_HEADER_TOP_Y);
+  context.fillText('CLAIMED', LEDGER_HEADER_X, LEDGER_HEADER_TOP_Y + 20);
+  context.fillText('MONEY', LEDGER_MONEY_X, LEDGER_HEADER_TOP_Y);
+  context.fillText('EARNED', LEDGER_MONEY_X, LEDGER_HEADER_TOP_Y + 20);
+
+  const rows = getBountyHuntingLedgerRows(runtime);
+  rows.forEach((row, index) => {
+    const y = LEDGER_ROW_Y[index];
+    drawBountyHuntingDivider(runtime, y - LEDGER_ROW_DIVIDER_OFFSET_Y);
+    drawBountyHuntingRankedAvatar(runtime, row.role, index + 1, LEDGER_AVATAR_X, y - 3);
+    context.fillStyle = PAPER_TEXT;
+    context.textAlign = 'left';
+    context.font = `700 34px ${BARNUM_STACK}`;
+    context.fillText(row.label, LEDGER_LABEL_X, y);
+    context.textAlign = 'center';
+    context.font = `1000 36px ${BARNUM_STACK}`;
+    context.fillText(String(row.claims), LEDGER_BOUNTIES_X, y);
+    drawBountyHuntingMoneyText(context, row.money, LEDGER_MONEY_X, y, {
+      align: 'center',
+      amountFont: `1000 36px ${BARNUM_STACK}`,
+      color: PAPER_TEXT,
+      dollarFont: `1000 24px ${BARNUM_STACK}`
+    });
+  });
+
+  const winnerLabel = getBountyHuntingWinnerLabel(runtime);
+  if (runtime.assets.woodenRibbon) {
+    context.drawImage(runtime.assets.woodenRibbon, 42, LEDGER_RIBBON_Y, 364, 72);
+  } else {
+    drawRoundedRect(context, 42, LEDGER_RIBBON_Y + 10, 364, 52, 8, '#7f3d20', '#512411');
+  }
+  drawCenteredText(context, `WINNER: ${winnerLabel}`, 224, LEDGER_WINNER_Y, {
+    color: '#e9ddbf',
+    font: `700 29px ${BARNUM_STACK}`
+  });
+
+  drawBountyHuntingActionButton(runtime, 'CLOSE', 'close', { y: LEDGER_CLOSE_BUTTON_Y });
+}
+
+function drawBountyHuntingPaper(runtime: BountyHuntingPanelRuntime): void {
+  const { assets, context } = runtime;
+  if (assets.paperBg) {
+    context.drawImage(assets.paperBg, 0, 0, LAYOUT_WIDTH, LAYOUT_HEIGHT);
+    return;
+  }
+
+  context.fillStyle = '#e8d1a2';
+  context.fillRect(0, 0, LAYOUT_WIDTH, LAYOUT_HEIGHT);
+  context.strokeStyle = '#8d6a34';
+  context.lineWidth = 2;
+  context.strokeRect(18, 18, LAYOUT_WIDTH - 36, LAYOUT_HEIGHT - 36);
+}
+
+function drawBountyHuntingTitle(
+  runtime: BountyHuntingPanelRuntime,
+  text: string,
+  y: number,
+  fontSize: number,
+  fontStack = BARNUM_STACK,
+  options: {
+    decorOffsetY?: number;
+    textOffsetY?: number;
+    weight?: number;
+  } = {}
+): void {
+  const { assets, context } = runtime;
+  const fontWeight = options.weight ?? 800;
+  const font = `${fontWeight} ${fontSize}px ${fontStack}`;
+  const decorWidth = 98;
+  const decorGap = 32;
+  const decorEdgeInset = 8;
+  const decorY = y - 4 + (options.decorOffsetY ?? 0);
+  context.save();
+  context.font = font;
+  const titleWidth = context.measureText(text).width;
+  context.restore();
+  const leftDecorX = Math.max(
+    decorEdgeInset,
+    Math.round((LAYOUT_WIDTH / 2) - (titleWidth / 2) - decorGap - decorWidth)
+  );
+  const rightDecorX = Math.min(
+    LAYOUT_WIDTH - decorWidth - decorEdgeInset,
+    Math.round((LAYOUT_WIDTH / 2) + (titleWidth / 2) + decorGap)
+  );
+  if (assets.titleDecorLeft) context.drawImage(assets.titleDecorLeft, leftDecorX, decorY, decorWidth, 44);
+  if (assets.titleDecorRight) context.drawImage(assets.titleDecorRight, rightDecorX, decorY, decorWidth, 44);
+  drawCenteredText(context, text, 224, y + 20 + (options.textOffsetY ?? 0), {
+    color: PAPER_TEXT,
+    font,
+    shadow: false
+  });
+}
+
+function drawBountyHuntingLiveScore(runtime: BountyHuntingPanelRuntime, now: number): void {
+  const { assets, context, game } = runtime;
+  const currentRole = getBountyHuntingCurrentRole(game, runtime.currentUserId) || 'host';
+  const opponentRole = currentRole === 'host' ? 'guest' : 'host';
+  const offsetY = LIVE_SCORE_Y_OFFSET;
+  if (assets.liveScoreBg) {
+    context.drawImage(assets.liveScoreBg, 37, 83 + offsetY, 374, 66);
+  } else {
+    drawRoundedRect(context, 37, 83 + offsetY, 374, 66, 0, 'rgba(255, 250, 235, 0.62)', '#8c6d35');
+  }
+
+  drawBountyHuntingAvatar(runtime, opponentRole, 79, 116 + offsetY, LIVE_SCORE_AVATAR_RADIUS);
+  drawBountyHuntingAvatar(runtime, currentRole, 369, 116 + offsetY, LIVE_SCORE_AVATAR_RADIUS);
+
+  context.textAlign = 'left';
+  context.textBaseline = 'middle';
+  context.fillStyle = PAPER_TEXT;
+  context.font = `700 18px ${BARNUM_STACK}`;
+  context.fillText('Them', LIVE_SCORE_LEFT_TEXT_X, LIVE_SCORE_NAME_Y + offsetY);
+  drawBountyHuntingMoneyText(context, game.scores[opponentRole] || 0, LIVE_SCORE_LEFT_TEXT_X, LIVE_SCORE_MONEY_Y + offsetY, {
+    align: 'left',
+    amountFont: `1000 20px ${BARNUM_STACK}`,
+    color: '#2f8d2e',
+    dollarFont: `1000 15px ${BARNUM_STACK}`
+  });
+
+  context.textAlign = 'right';
+  context.fillStyle = PAPER_TEXT;
+  context.font = `700 18px ${BARNUM_STACK}`;
+  context.fillText('You', LIVE_SCORE_RIGHT_TEXT_X, LIVE_SCORE_NAME_Y + offsetY);
+  drawBountyHuntingMoneyText(context, game.scores[currentRole] || 0, LIVE_SCORE_RIGHT_TEXT_X, LIVE_SCORE_MONEY_Y + offsetY, {
+    align: 'right',
+    amountFont: `1000 20px ${BARNUM_STACK}`,
+    color: '#2f8d2e',
+    dollarFont: `1000 15px ${BARNUM_STACK}`
+  });
+
+  context.textAlign = 'center';
+  const timerPulseAmount = getBountyHuntingTimerStartPulseAmount(runtime, now);
+  const timerFontSize = 19 + Math.round(timerPulseAmount * 8);
+  context.fillStyle = game.status === 'active' ? RED_TEXT : PAPER_TEXT;
+  context.font = `800 ${timerFontSize}px ${BARTLE_STACK}`;
+  if (timerPulseAmount > 0) {
+    context.save();
+    context.globalAlpha = 0.28 + timerPulseAmount * 0.46;
+    context.shadowBlur = 20 * timerPulseAmount;
+    context.shadowColor = 'rgba(255, 236, 158, 0.95)';
+    context.fillStyle = '#f7d88a';
+    context.font = `800 ${timerFontSize + 3}px ${BARTLE_STACK}`;
+    context.fillText(getBountyHuntingTimerText(game), 224, 111 + offsetY);
+    context.restore();
+  }
+  context.fillText(getBountyHuntingTimerText(game), 224, 111 + offsetY);
+  context.font = `700 11px ${BARNUM_STACK}`;
+  context.fillText('TIME REMAINING', 224, 129 + offsetY);
+}
+
+function drawBountyHuntingBounty(
+  runtime: BountyHuntingPanelRuntime,
+  bounty: PublicBountyHuntingBounty,
+  index: number
+): void {
+  const { assets, context } = runtime;
+  const y = BOUNTY_LIST_Y + index * (BOUNTY_ROW_HEIGHT + BOUNTY_ROW_GAP);
+  if (assets.bountyDescBg) {
+    context.drawImage(assets.bountyDescBg, BOUNTY_LIST_X, y, BOUNTY_ROW_WIDTH, BOUNTY_ROW_HEIGHT);
+  } else {
+    drawRoundedRect(context, BOUNTY_LIST_X, y, BOUNTY_ROW_WIDTH, BOUNTY_ROW_HEIGHT, 0, 'rgba(255, 250, 235, 0.48)', '#896832');
+  }
+
+  context.textBaseline = 'middle';
+  context.textAlign = 'right';
+  drawBountyHuntingMoneyText(context, bounty.amount, BOUNTY_AMOUNT_X, y + 21, {
+    align: 'right',
+    amountFont: `1000 25px ${BARNUM_STACK}`,
+    color: RED_TEXT,
+    dollarFont: `1000 17px ${BARNUM_STACK}`
+  });
+
+  context.textAlign = 'left';
+  context.fillStyle = PAPER_TEXT;
+  context.font = '400 13px Roboto, Arial, sans-serif';
+  drawFittedText(
+    context,
+    bounty.description,
+    BOUNTY_DESCRIPTION_X,
+    y + 20,
+    (332 + BOUNTY_STAMP_X_OFFSET) - BOUNTY_DESCRIPTION_X - BOUNTY_DESCRIPTION_STAMP_GAP,
+    13
+  );
+
+  if (bounty.claim) {
+    drawClaimedStamp(runtime, y);
+  } else {
+    drawOpenStamp(runtime, y);
+  }
+}
+
+function drawBountyHuntingBountyClaimAvatar(
+  runtime: BountyHuntingPanelRuntime,
+  bounty: PublicBountyHuntingBounty,
+  index: number
+): void {
+  if (!bounty.claim) return;
+  const y = BOUNTY_LIST_Y + index * (BOUNTY_ROW_HEIGHT + BOUNTY_ROW_GAP);
+  drawBountyHuntingAvatar(runtime, bounty.claim.role, 386, y + 34, 15);
+}
+
+function drawOpenStamp(runtime: BountyHuntingPanelRuntime, y: number): void {
+  const { assets, context } = runtime;
+  if (assets.bountyOpenStamp) {
+    context.drawImage(assets.bountyOpenStamp, 332 + BOUNTY_STAMP_X_OFFSET, y - 11, 70, 62);
+    return;
+  }
+  drawStampFallback(context, 'OPEN', 339 + BOUNTY_STAMP_X_OFFSET, y + 6, GREEN_STAMP);
+}
+
+function drawClaimedStamp(runtime: BountyHuntingPanelRuntime, y: number): void {
+  const { assets, context } = runtime;
+  context.save();
+  context.translate(360 + BOUNTY_STAMP_X_OFFSET, y + 15);
+  context.rotate(-0.22);
+  if (assets.bountyClaimedStamp) {
+    context.drawImage(assets.bountyClaimedStamp, -30, -23, 60, 46);
+  } else {
+    drawStampFallback(context, 'CLAIMED', -31, -13, '#b7312d');
+  }
+  context.restore();
+}
+
+function drawStampFallback(
+  context: CanvasRenderingContext2D,
+  text: string,
+  x: number,
+  y: number,
+  color: string
+): void {
+  context.strokeStyle = color;
+  context.lineWidth = 3;
+  context.strokeRect(x, y, 56, 26);
+  context.fillStyle = color;
+  context.textAlign = 'center';
+  context.font = `700 14px ${BARNUM_STACK}`;
+  context.fillText(text, x + 28, y + 15);
+}
+
+function drawBountyHuntingActionButton(
+  runtime: BountyHuntingPanelRuntime,
+  label: string,
+  action: 'close' | 'ready' | null,
+  options: { darker?: boolean; flashAmount?: number; labelColor?: string; readyStack?: boolean; y?: number } = {}
+): void {
+  const { assets, context } = runtime;
+  const rect = { ...BUTTON_RECT, y: options.y ?? BUTTON_RECT.y };
+  const image = options.darker ? assets.buttonBgDarker : assets.buttonBg;
+  const hover = action && runtime.hoveredAction === action;
+  context.save();
+  if (hover) context.globalAlpha = 0.86;
+  if (image) {
+    context.drawImage(image, rect.x, rect.y, rect.width, rect.height);
+  } else {
+    drawRoundedRect(context, rect.x, rect.y + 6, rect.width, rect.height - 14, 999, '#b8a177', '#7f6a42');
+  }
+  context.restore();
+  if (options.flashAmount && options.flashAmount > 0) {
+    drawBountyHuntingButtonFlash(context, rect, options.flashAmount, image);
+  }
+  drawCenteredText(context, label, rect.x + rect.width / 2, rect.y + 29, {
+    color: options.labelColor ?? PAPER_TEXT,
+    font: `800 14px ${BARTLE_STACK}`,
+    shadow: false
+  });
+  if (options.readyStack) drawBountyHuntingReadyStack(runtime, rect);
+  if (action) runtime.hitboxes.push({ action, rect });
+}
+
+function drawBountyHuntingReadyStack(runtime: BountyHuntingPanelRuntime, rect: Rect): void {
+  const readyRoles = BOUNTY_HUNTING_PLAYER_ROLES.filter((role) => runtime.game.readyPlayers[role]);
+  readyRoles.forEach((role, index) => {
+    const stackIndex = readyRoles.length - 1 - index;
+    drawBountyHuntingAvatar(
+      runtime,
+      role,
+      rect.x + rect.width - READY_STACK_AVATAR_OFFSET_X - stackIndex * READY_STACK_AVATAR_OVERLAP,
+      rect.y + rect.height / 2,
+      READY_STACK_AVATAR_RADIUS
+    );
+  });
+}
+
+function drawBountyHuntingButtonFlash(
+  context: CanvasRenderingContext2D,
+  rect: Rect,
+  amount: number,
+  image: HTMLImageElement | null
+): void {
+  context.save();
+  context.shadowBlur = 18 * amount;
+  context.shadowColor = 'rgba(255, 238, 156, 0.95)';
+  if (image) {
+    context.globalAlpha = 0.68 + amount * 0.32;
+    context.globalCompositeOperation = 'lighter';
+    context.filter = `brightness(${1.55 + amount * 1.85}) saturate(${1.2 + amount * 0.55})`;
+    context.drawImage(image, rect.x, rect.y, rect.width, rect.height);
+    context.globalAlpha = 0.38 + amount * 0.42;
+    context.shadowBlur = 0;
+    context.filter = `brightness(${2.3 + amount * 1.7}) saturate(1.45)`;
+    context.drawImage(image, rect.x, rect.y, rect.width, rect.height);
+  } else {
+    context.globalAlpha = 0.18 + amount * 0.38;
+    drawRoundedRect(context, rect.x, rect.y, rect.width, rect.height, 999, '#fff1a8');
+  }
+  context.restore();
+}
+
+function getBountyHuntingReadyButtonFlashAmount(runtime: BountyHuntingPanelRuntime, now: number): number {
+  const remainingMs = runtime.readyButtonFlashUntil - now;
+  if (remainingMs <= 0) return 0;
+  return Math.min(1, remainingMs / READY_BUTTON_FLASH_MS);
+}
+
+function getBountyHuntingTimerStartPulseAmount(runtime: BountyHuntingPanelRuntime, now: number): number {
+  const remainingMs = runtime.timerStartPulseUntil - now;
+  if (remainingMs <= 0) return 0;
+  const progress = 1 - Math.min(1, remainingMs / TIMER_START_PULSE_MS);
+  return Math.sin(progress * Math.PI);
+}
+
+function hasNewBountyHuntingReadyPlayer(
+  previousGame: PublicBountyHuntingGame,
+  nextGame: PublicBountyHuntingGame
+): boolean {
+  return BOUNTY_HUNTING_PLAYER_ROLES.some((role) => !previousGame.readyPlayers[role] && Boolean(nextGame.readyPlayers[role]));
+}
+
+function drawBountyHuntingRankedAvatar(
+  runtime: BountyHuntingPanelRuntime,
+  role: BountyHuntingPlayerRole,
+  rank: number,
+  x: number,
+  y: number
+): void {
+  drawBountyHuntingAvatar(runtime, role, x, y, 28);
+  if (runtime.assets.avatarRing) {
+    runtime.context.drawImage(runtime.assets.avatarRing, x - 31, y - 32, 62, 64);
+  }
+  const star = rank === 1 ? runtime.assets.goldStar : runtime.assets.silverStar;
+  if (star) {
+    runtime.context.drawImage(
+      star,
+      x - LEDGER_RANK_STAR_X_OFFSET,
+      y - LEDGER_RANK_STAR_Y_OFFSET,
+      LEDGER_RANK_STAR_WIDTH,
+      LEDGER_RANK_STAR_HEIGHT
+    );
+  } else {
+    drawStarFallback(runtime.context, x - 30, y - 32, rank === 1 ? '#d8a51d' : '#b6b8bc');
+  }
+  runtime.context.fillStyle = PAPER_TEXT;
+  runtime.context.textAlign = 'center';
+  runtime.context.font = `800 ${LEDGER_RANK_TEXT_FONT_SIZE}px ${BARNUM_STACK}`;
+  runtime.context.fillText(String(rank), x - LEDGER_RANK_TEXT_X_OFFSET, y - LEDGER_RANK_TEXT_Y_OFFSET);
+}
+
+function drawBountyHuntingAvatar(
+  runtime: BountyHuntingPanelRuntime,
+  role: BountyHuntingPlayerRole,
+  x: number,
+  y: number,
+  radius: number
+): void {
+  const player = runtime.game.players[role];
+  drawPlaygroundCanvasAvatar(runtime.context, player, x, y, radius);
+}
+
+function drawBountyHuntingDivider(runtime: BountyHuntingPanelRuntime, y: number): void {
+  if (runtime.assets.divider) {
+    runtime.context.drawImage(runtime.assets.divider, LEDGER_DIVIDER_X, y, LEDGER_DIVIDER_WIDTH, 10);
+    return;
+  }
+  runtime.context.strokeStyle = '#796633';
+  runtime.context.lineWidth = 2;
+  runtime.context.beginPath();
+  runtime.context.moveTo(LEDGER_DIVIDER_X, y + 5);
+  runtime.context.lineTo(LEDGER_DIVIDER_X + LEDGER_DIVIDER_WIDTH, y + 5);
+  runtime.context.stroke();
+}
+
+function drawStarFallback(context: CanvasRenderingContext2D, x: number, y: number, color: string): void {
+  context.fillStyle = color;
+  context.beginPath();
+  for (let point = 0; point < 10; point += 1) {
+    const angle = -Math.PI / 2 + point * Math.PI / 5;
+    const radius = point % 2 === 0 ? 21 : 9;
+    const px = x + Math.cos(angle) * radius;
+    const py = y + Math.sin(angle) * radius;
+    if (point === 0) context.moveTo(px, py);
+    else context.lineTo(px, py);
+  }
+  context.closePath();
+  context.fill();
+}
+
+function drawCenteredText(
+  context: CanvasRenderingContext2D,
+  text: string,
+  x: number,
+  y: number,
+  options: {
+    color: string;
+    font: string;
+    shadow?: boolean;
+  }
+): void {
+  context.save();
+  context.font = options.font;
+  context.textAlign = 'center';
+  context.textBaseline = 'middle';
+  if (options.shadow !== false) {
+    context.shadowBlur = 0;
+    context.shadowColor = SHADOW;
+    context.shadowOffsetX = 4;
+    context.shadowOffsetY = 4;
+  }
+  context.fillStyle = options.color;
+  context.fillText(text, x, y);
+  context.restore();
+}
+
+function drawBountyHuntingMoneyText(
+  context: CanvasRenderingContext2D,
+  amount: number,
+  x: number,
+  y: number,
+  options: {
+    align: CanvasTextAlign;
+    amountFont: string;
+    color: string;
+    dollarFont: string;
+  }
+): void {
+  const amountText = String(amount);
+  context.save();
+  context.textAlign = 'left';
+  context.textBaseline = 'middle';
+  context.fillStyle = options.color;
+
+  context.font = options.dollarFont;
+  const dollarWidth = context.measureText('$').width;
+  context.font = options.amountFont;
+  const amountWidth = context.measureText(amountText).width;
+  const totalWidth = dollarWidth + amountWidth;
+  const startX = options.align === 'right'
+    ? x - totalWidth
+    : options.align === 'center'
+      ? x - totalWidth / 2
+      : x;
+  const dollarY = y - getBountyHuntingDollarSuperscriptOffset(options.amountFont);
+
+  context.font = options.dollarFont;
+  context.fillText('$', startX, dollarY);
+  context.font = options.amountFont;
+  context.fillText(amountText, startX + dollarWidth, y);
+  context.restore();
+}
+
+function getBountyHuntingDollarSuperscriptOffset(amountFont: string): number {
+  return Math.max(4, Math.round(getBountyHuntingFontPixelSize(amountFont) * 0.22));
+}
+
+function getBountyHuntingFontPixelSize(font: string): number {
+  const match = /(\d+(?:\.\d+)?)px/.exec(font);
+  return match ? Number(match[1]) : 20;
+}
+
+function drawFittedText(
+  context: CanvasRenderingContext2D,
+  text: string,
+  x: number,
+  y: number,
+  maxWidth: number,
+  fontSize: number
+): void {
+  let nextText = text;
+  while (nextText.length > 3 && context.measureText(nextText).width > maxWidth) {
+    nextText = `${nextText.slice(0, -4).trim()}...`;
+  }
+  context.font = `400 ${fontSize}px Roboto, Arial, sans-serif`;
+  context.fillText(nextText, x, y);
+}
+
+function drawRoundedRect(
+  context: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  radius: number,
+  fill: string,
+  stroke?: string
+): void {
+  const safeRadius = Math.min(radius, width / 2, height / 2);
+  context.beginPath();
+  context.moveTo(x + safeRadius, y);
+  context.lineTo(x + width - safeRadius, y);
+  context.quadraticCurveTo(x + width, y, x + width, y + safeRadius);
+  context.lineTo(x + width, y + height - safeRadius);
+  context.quadraticCurveTo(x + width, y + height, x + width - safeRadius, y + height);
+  context.lineTo(x + safeRadius, y + height);
+  context.quadraticCurveTo(x, y + height, x, y + height - safeRadius);
+  context.lineTo(x, y + safeRadius);
+  context.quadraticCurveTo(x, y, x + safeRadius, y);
+  context.closePath();
+  context.fillStyle = fill;
+  context.fill();
+  if (stroke) {
+    context.strokeStyle = stroke;
+    context.lineWidth = 2;
+    context.stroke();
+  }
+}
+
+function getBountyHuntingLedgerRows(runtime: BountyHuntingPanelRuntime): Array<{
+  claims: number;
+  label: 'THEM' | 'YOU';
+  money: number;
+  role: BountyHuntingPlayerRole;
+}> {
+  const currentRole = getBountyHuntingCurrentRole(runtime.game, runtime.currentUserId) || 'host';
+  const opponentRole: BountyHuntingPlayerRole = currentRole === 'host' ? 'guest' : 'host';
+  return [
+    {
+      claims: getBountyHuntingRoleClaimCount(runtime.game, currentRole),
+      label: 'YOU' as const,
+      money: runtime.game.scores[currentRole] || 0,
+      role: currentRole
+    },
+    {
+      claims: getBountyHuntingRoleClaimCount(runtime.game, opponentRole),
+      label: 'THEM' as const,
+      money: runtime.game.scores[opponentRole] || 0,
+      role: opponentRole
+    }
+  ].sort((a, b) => b.money - a.money || b.claims - a.claims || (a.label === 'YOU' ? -1 : 1));
+}
+
+function getBountyHuntingWinnerLabel(runtime: BountyHuntingPanelRuntime): string {
+  if (!runtime.game.winnerUserId) return 'TIE';
+  return runtime.game.winnerUserId === runtime.currentUserId ? 'YOU' : 'THEM';
+}
+
+function getBountyHuntingTimerText(game: PublicBountyHuntingGame): string {
+  const remainingMs = game.status === 'active'
+    ? Math.max(0, game.phaseStartedAt + BOUNTY_HUNTING_ROUND_MS - Date.now())
+    : BOUNTY_HUNTING_ROUND_MS;
+  const seconds = Math.ceil(remainingMs / 1000);
+  return `00:${String(seconds).padStart(2, '0')}`;
+}
+
+function getClaimedBountyCount(game: PublicBountyHuntingGame): number {
+  return game.bounties.filter((bounty) => bounty.claim).length;
+}
+
+function getBountyHuntingRoleClaimCount(game: PublicBountyHuntingGame, role: BountyHuntingPlayerRole): number {
+  return game.bounties.filter((bounty) => bounty.claim?.role === role).length;
+}
+
+function getBountyHuntingCurrentRole(
+  game: PublicBountyHuntingGame,
+  currentUserId: string
+): BountyHuntingPlayerRole | null {
+  if (game.players.host.userId === currentUserId) return 'host';
+  if (game.players.guest.userId === currentUserId) return 'guest';
+  return null;
+}
+
+function getBountyHuntingOpponentLabel(game: PublicBountyHuntingGame, currentUserId: string): string {
+  const role = getBountyHuntingCurrentRole(game, currentUserId);
+  const opponentRole = role === 'host' ? 'guest' : 'host';
+  return game.players[opponentRole]?.displayName || 'Player';
+}
+
+function configureBountyHuntingCanvas(canvas: HTMLCanvasElement, compactMode = false): number {
+  const pixelRatio = getBountyHuntingPixelRatio();
+  const layoutHeight = compactMode ? COMPACT_LAYOUT_HEIGHT : CANVAS_HEIGHT;
+  canvas.width = Math.round(CANVAS_WIDTH * pixelRatio);
+  canvas.height = Math.round(layoutHeight * pixelRatio);
+  canvas.style.width = '100%';
+  canvas.style.maxWidth = `${CANVAS_DISPLAY_WIDTH}px`;
+  canvas.style.height = 'auto';
+  canvas.style.aspectRatio = `${LAYOUT_WIDTH} / ${layoutHeight}`;
+  canvas.classList.toggle('ytcq-bounty-hunting-canvas-compact', compactMode);
+  return pixelRatio;
+}
+
+function syncBountyHuntingCanvasPixelRatio(
+  canvas: HTMLCanvasElement,
+  pixelRatio: number,
+  compactMode: boolean
+): number {
+  const nextPixelRatio = getBountyHuntingPixelRatio();
+  if (pixelRatio !== nextPixelRatio) configureBountyHuntingCanvas(canvas, compactMode);
+  return nextPixelRatio;
+}
+
+function getBountyHuntingCanvasPoint(canvas: HTMLCanvasElement, event: MouseEvent): { x: number; y: number } {
+  const rect = canvas.getBoundingClientRect();
+  return {
+    x: ((event.clientX - rect.left) / rect.width) * LAYOUT_WIDTH,
+    y: ((event.clientY - rect.top) / rect.height) * LAYOUT_HEIGHT
+  };
+}
+
+function getBountyHuntingClientPoint(
+  canvas: HTMLCanvasElement,
+  point: { x: number; y: number }
+): { x: number; y: number } {
+  const rect = canvas.getBoundingClientRect();
+  return {
+    x: (point.x / LAYOUT_WIDTH) * rect.width,
+    y: (point.y / LAYOUT_HEIGHT) * rect.height
+  };
+}
+
+function canRenderBountyHuntingCanvas(context: CanvasRenderingContext2D): boolean {
+  const candidate = context as unknown as Record<string, unknown>;
+  return [
+    'arc',
+    'beginPath',
+    'clearRect',
+    'closePath',
+    'drawImage',
+    'fill',
+    'fillRect',
+    'fillText',
+    'lineTo',
+    'measureText',
+    'moveTo',
+    'quadraticCurveTo',
+    'restore',
+    'rotate',
+    'save',
+    'setTransform',
+    'stroke',
+    'strokeRect',
+    'translate'
+  ].every((method) => typeof candidate[method] === 'function');
+}
+
+function getBountyHuntingPixelRatio(): number {
+  return Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+}

@@ -7,11 +7,16 @@
  */
 import { chessGameModule } from './chess';
 import { replayTriviaGameModule } from './replay-trivia';
+import { bountyHuntingGameModule } from './bounty-hunting';
 
 export const ENABLED_GAME_MODULES = [
   {
     gameId: 'chess',
     module: chessGameModule
+  },
+  {
+    gameId: 'bounty-hunting',
+    module: bountyHuntingGameModule
   },
   {
     gameId: 'replay-trivia',

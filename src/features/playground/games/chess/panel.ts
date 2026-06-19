@@ -136,11 +136,11 @@ export function openChessGamePanel(
 
   const {
     body,
-    closeButton,
+    compactButton,
     statusOverlay,
     subtitleElement
   } = shell;
-  closeButton.before(soundController.button);
+  compactButton.before(soundController.button);
   subtitleElement.textContent = getChessOpponentLabel(game, currentUserId);
 
   const canvas = ytcqCreateElement('canvas');

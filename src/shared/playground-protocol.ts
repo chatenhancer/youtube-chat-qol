@@ -6,7 +6,7 @@ export const PLAYGROUND_BACKEND_ORIGIN =
   normalizePlaygroundBackendOrigin(configuredPlaygroundBackendOrigin) || DEFAULT_PLAYGROUND_BACKEND_ORIGIN;
 export const PLAYGROUND_PORT_NAME = 'ytcq:playground';
 export const PLAYGROUND_PROTOCOL_VERSION = 1;
-export const SUPPORTED_GAMES = ['chess', 'replay-trivia'] as const;
+export const SUPPORTED_GAMES = ['chess', 'bounty-hunting', 'replay-trivia'] as const;
 
 export function isPlaygroundComputerUserId(userId: string): boolean {
   return userId === 'server:computer' || userId.startsWith('server:computer:');

@@ -1677,6 +1677,18 @@ yt-live-chat-header-renderer .ytcq-inbox-badge[hidden] {
   image-rendering: auto;
 }
 
+.ytcq-games-preview-bounty-hunting {
+  background: #e8d1a2;
+}
+
+.ytcq-games-preview-bounty-hunting::after {
+  content: none;
+}
+
+.ytcq-games-preview-bounty-hunting .ytcq-games-preview-canvas {
+  image-rendering: auto;
+}
+
 .ytcq-games-detail-nav {
   display: flex;
   align-items: center;
@@ -1735,6 +1747,23 @@ yt-live-chat-header-renderer .ytcq-inbox-badge[hidden] {
     0 1px 2px rgba(0, 0, 0, 0.18);
 }
 
+.ytcq-bounty-hunting-game-panel {
+  position: fixed;
+  right: 12px;
+  bottom: 12px;
+  z-index: 2147483645;
+  display: grid;
+  width: min(351px, calc(100vw - 24px));
+  overflow: hidden;
+  border: 1px solid var(--ytcq-control-border);
+  border-radius: 8px;
+  color: var(--yt-spec-text-primary, var(--yt-live-chat-primary-text-color, #f1f1f1));
+  background: var(--yt-spec-menu-background, var(--yt-live-chat-background-color, #0f0f0f));
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.28),
+    0 1px 2px rgba(0, 0, 0, 0.18);
+}
+
 .ytcq-chess-game-header {
   position: relative;
   display: grid;
@@ -1746,7 +1775,24 @@ yt-live-chat-header-renderer .ytcq-inbox-badge[hidden] {
   user-select: none;
 }
 
+.ytcq-game-panel-has-compact .ytcq-chess-game-header,
+.ytcq-game-panel-has-compact .ytcq-replay-trivia-game-header,
+.ytcq-game-panel-has-compact .ytcq-bounty-hunting-game-header {
+  grid-template-columns: 32px minmax(0, 1fr) 28px 28px 28px;
+}
+
 .ytcq-replay-trivia-game-header {
+  position: relative;
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr) 28px 28px;
+  gap: 6px;
+  align-items: center;
+  padding: 16px 10px 8px;
+  cursor: grab;
+  user-select: none;
+}
+
+.ytcq-bounty-hunting-game-header {
   position: relative;
   display: grid;
   grid-template-columns: 32px minmax(0, 1fr) 28px 28px;
@@ -1773,6 +1819,21 @@ yt-live-chat-header-renderer .ytcq-inbox-badge[hidden] {
 }
 
 .ytcq-replay-trivia-game-header::before {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 42px;
+  height: 11px;
+  border-bottom-right-radius: 9px;
+  border-bottom-left-radius: 9px;
+  background: rgba(128, 128, 128, 0.16);
+  background: color-mix(in srgb, var(--ytcq-control-border) 40%, transparent);
+  content: "";
+  pointer-events: none;
+  transform: translateX(-50%);
+}
+
+.ytcq-bounty-hunting-game-header::before {
   position: absolute;
   top: 0;
   left: 50%;
@@ -1817,11 +1878,30 @@ yt-live-chat-header-renderer .ytcq-inbox-badge[hidden] {
   transform: translateX(-50%);
 }
 
+.ytcq-bounty-hunting-game-header::after {
+  position: absolute;
+  top: 4px;
+  left: 50%;
+  width: 25px;
+  height: 4px;
+  background:
+    radial-gradient(circle, var(--yt-live-chat-secondary-text-color, var(--yt-spec-text-secondary, #aaa)) 1px, transparent 1.4px)
+    0 0 / 6px 4px repeat-x;
+  content: "";
+  opacity: 0.52;
+  pointer-events: none;
+  transform: translateX(-50%);
+}
+
 .ytcq-chess-game-panel-dragging .ytcq-chess-game-header {
   cursor: grabbing;
 }
 
 .ytcq-replay-trivia-game-panel-dragging .ytcq-replay-trivia-game-header {
+  cursor: grabbing;
+}
+
+.ytcq-bounty-hunting-game-panel-dragging .ytcq-bounty-hunting-game-header {
   cursor: grabbing;
 }
 
@@ -1849,6 +1929,18 @@ yt-live-chat-header-renderer .ytcq-inbox-badge[hidden] {
   background: var(--yt-spec-badge-chip-background, rgba(62, 166, 255, 0.12));
 }
 
+.ytcq-bounty-hunting-game-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 7px;
+  color: var(--yt-spec-call-to-action, #3ea6ff);
+  fill: currentColor;
+  background: var(--yt-spec-badge-chip-background, rgba(62, 166, 255, 0.12));
+}
+
 .ytcq-chess-game-icon svg {
   display: block;
   width: 22px;
@@ -1856,6 +1948,12 @@ yt-live-chat-header-renderer .ytcq-inbox-badge[hidden] {
 }
 
 .ytcq-replay-trivia-game-icon svg {
+  display: block;
+  width: 22px;
+  height: 22px;
+}
+
+.ytcq-bounty-hunting-game-icon svg {
   display: block;
   width: 22px;
   height: 22px;
@@ -1873,12 +1971,23 @@ yt-live-chat-header-renderer .ytcq-inbox-badge[hidden] {
   gap: 1px;
 }
 
+.ytcq-bounty-hunting-game-title-wrap {
+  display: grid;
+  min-width: 0;
+  gap: 1px;
+}
+
 .ytcq-chess-game-title {
   color: var(--yt-spec-text-primary, var(--yt-live-chat-primary-text-color, #f1f1f1));
   font: 500 13px/17px Roboto, Arial, sans-serif;
 }
 
 .ytcq-replay-trivia-game-title {
+  color: var(--yt-spec-text-primary, var(--yt-live-chat-primary-text-color, #f1f1f1));
+  font: 500 13px/17px Roboto, Arial, sans-serif;
+}
+
+.ytcq-bounty-hunting-game-title {
   color: var(--yt-spec-text-primary, var(--yt-live-chat-primary-text-color, #f1f1f1));
   font: 500 13px/17px Roboto, Arial, sans-serif;
 }
@@ -1901,7 +2010,17 @@ yt-live-chat-header-renderer .ytcq-inbox-badge[hidden] {
   white-space: nowrap;
 }
 
+.ytcq-bounty-hunting-game-subtitle {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--yt-live-chat-secondary-text-color, var(--yt-spec-text-secondary, #aaa));
+  font: 400 11px/14px Roboto, Arial, sans-serif;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .ytcq-game-panel-close,
+.ytcq-game-panel-compact-toggle,
 .ytcq-game-sound-toggle,
 .ytcq-chess-game-close,
 .ytcq-chess-game-sound-toggle {
@@ -1926,6 +2045,8 @@ yt-live-chat-header-renderer .ytcq-inbox-badge[hidden] {
 
 .ytcq-game-panel-close:hover,
 .ytcq-game-panel-close:focus,
+.ytcq-game-panel-compact-toggle:hover,
+.ytcq-game-panel-compact-toggle:focus,
 .ytcq-game-sound-toggle:hover,
 .ytcq-game-sound-toggle:focus,
 .ytcq-chess-game-close:hover,
@@ -1938,6 +2059,7 @@ yt-live-chat-header-renderer .ytcq-inbox-badge[hidden] {
 }
 
 .ytcq-game-panel-close svg,
+.ytcq-game-panel-compact-toggle svg,
 .ytcq-game-sound-toggle svg,
 .ytcq-chess-game-close svg,
 .ytcq-chess-game-sound-toggle svg {
@@ -1954,6 +2076,15 @@ yt-live-chat-header-renderer .ytcq-inbox-badge[hidden] {
 .ytcq-replay-trivia-game-body {
   position: relative;
   padding: 0 7.5px 7.5px;
+}
+
+.ytcq-bounty-hunting-game-body {
+  position: relative;
+  padding: 0 7.5px 7.5px;
+}
+
+.ytcq-game-panel-compact .ytcq-bounty-hunting-game-body {
+  padding-bottom: 7.5px;
 }
 
 .ytcq-chess-board-canvas {
@@ -1980,7 +2111,30 @@ yt-live-chat-header-renderer .ytcq-inbox-badge[hidden] {
   touch-action: manipulation;
 }
 
+.ytcq-bounty-hunting-canvas {
+  display: block;
+  width: min(336px, 100%);
+  aspect-ratio: 1;
+  border-radius: 6px;
+  background: #fff;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08);
+  touch-action: manipulation;
+}
+
 .ytcq-replay-trivia-game-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: min(336px, 100%);
+  min-height: min(336px, calc(100vw - 39px));
+  border-radius: 6px;
+  color: #303033;
+  background: #fff;
+  font: 500 14px/18px Roboto, Arial, sans-serif;
+  text-align: center;
+}
+
+.ytcq-bounty-hunting-game-fallback {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2012,6 +2166,13 @@ yt-live-chat-header-renderer .ytcq-inbox-badge[hidden] {
   font: 500 14px/18px Roboto, Arial, sans-serif;
   text-align: center;
   pointer-events: none;
+}
+
+.ytcq-replay-trivia-game-status,
+.ytcq-bounty-hunting-game-status {
+  right: 7.5px;
+  bottom: 7.5px;
+  left: 7.5px;
 }
 
 .ytcq-game-status[hidden],

@@ -122,11 +122,11 @@ export function openSupportedGamePanel(
   closeActiveGamePanel({ notify: false });
   const { adapter, definition } = enabledGame;
   const shellController = new AbortController();
-  const title = getGameLabel(definition.id);
+  const title = t(definition.panelTitleKey || definition.labelKey);
   const shell = createGamePanelShell({
     ariaLabel: title,
     classNamePrefix: definition.classNamePrefix,
-    closeLabel: t('gamesMinimize'),
+    closeLabel: t('gamesHide'),
     icon: createGamesIcon(),
     onClose: () => closeActiveGamePanel(),
     signal: shellController.signal,
@@ -148,6 +148,13 @@ export function openSupportedGamePanel(
   } catch (error) {
     releaseGamePanelShell({ shell, shellController });
     throw error;
+  }
+  if (mount.setCompactMode) {
+    shell.setCompactModeEnabled({
+      compactLabel: t('gamesMinimize'),
+      expandLabel: t('gamesExpand'),
+      onChange: (compact) => mount.setCompactMode?.(compact)
+    });
   }
   activeGamePanel = {
     adapter,

@@ -206,14 +206,16 @@ describe('playground games header button', () => {
     expect(document.querySelector('.ytcq-games-availability-toggle .ytcq-menu-toggle')).not.toBeNull();
     expect(getGamesSectionTitles()).toEqual(['Invites', 'Start a game']);
     expect(document.querySelector('.ytcq-games-section-empty')?.textContent).toBe('No invites received yet.');
-    expect(getGameCards()).toHaveLength(2);
+    expect(getGameCards()).toHaveLength(3);
     expect(document.querySelector('.ytcq-games-preview-chess .ytcq-games-preview-canvas')).not.toBeNull();
+    expect(document.querySelector('.ytcq-games-preview-bounty-hunting .ytcq-games-preview-canvas')).not.toBeNull();
     expect(document.querySelector('.ytcq-games-preview-replay-trivia .ytcq-games-preview-canvas')).not.toBeNull();
-    expect(getGameLabels()).toEqual(['Chess', 'HELP-A-FRIEND! Trivia']);
+    expect(getGameLabels()).toEqual(['Chess', 'The Wild Wild Chat', 'HELP-A-FRIEND! Trivia']);
     expect(getGameCards()[0].getAttribute('aria-disabled')).toBe('false');
-    expect(getGameCards()[1].getAttribute('aria-disabled')).toBe('true');
-    expect(getGameCards()[1].title).toBe('Available on chat replays.');
-    getGameCards()[1].click();
+    expect(getGameCards()[1].getAttribute('aria-disabled')).toBe('false');
+    expect(getGameCards()[2].getAttribute('aria-disabled')).toBe('true');
+    expect(getGameCards()[2].title).toBe('Available on chat replays.');
+    getGameCards()[2].click();
     expect(document.querySelector('.ytcq-profile-card-title')?.textContent).toBe('Games');
 
     getGameCards()[0].click();
@@ -243,7 +245,7 @@ describe('playground games header button', () => {
     header.querySelector<HTMLButtonElement>('.ytcq-games-button')!.click();
 
     expect(lastMockPort()?.messages.at(-1)).toEqual({
-      availableGames: ['chess'],
+      availableGames: ['chess', 'bounty-hunting'],
       languageCode: 'en',
       locale: 'en',
       streamKey: 'stream-a',
@@ -268,8 +270,10 @@ describe('playground games header button', () => {
       streamKey: 'stream-a',
       type: 'ytcq:playground:init'
     });
-    expect(getGameCards()[1].getAttribute('aria-disabled')).toBe('false');
-    expect(getGameCards()[1].title).toBe('');
+    expect(getGameCards()[1].getAttribute('aria-disabled')).toBe('true');
+    expect(getGameCards()[1].title).toBe('Available on live chat.');
+    expect(getGameCards()[2].getAttribute('aria-disabled')).toBe('false');
+    expect(getGameCards()[2].title).toBe('');
   });
 
   it('offers replay trivia through the normal invite flow', () => {
@@ -282,8 +286,8 @@ describe('playground games header button', () => {
     header.querySelector<HTMLButtonElement>('.ytcq-games-button')!.click();
     lastMockPort()?.emit(createSnapshotMessage(createLobbySnapshot()));
 
-    expect(getGameLabels()).toEqual(['Chess', 'HELP-A-FRIEND! Trivia']);
-    getGameCards()[1].click();
+    expect(getGameLabels()).toEqual(['Chess', 'The Wild Wild Chat', 'HELP-A-FRIEND! Trivia']);
+    getGameCards()[2].click();
 
     expect(document.querySelector('.ytcq-profile-card-title')?.textContent).toBe('HELP-A-FRIEND! Trivia');
     expect(document.querySelectorAll('.ytcq-games-player-row')).toHaveLength(2);
@@ -311,7 +315,7 @@ describe('playground games header button', () => {
       invites: [],
       users: [
         {
-          availableGames: ['chess'],
+          availableGames: ['chess', 'bounty-hunting'],
           displayName: 'Me',
           joinedAt: Date.now(),
           userId: 'me-user'
@@ -345,7 +349,7 @@ describe('playground games header button', () => {
       invites: []
     }));
 
-    getGameCards()[1].click();
+    getGameCards()[2].click();
     getActionButton('Invite').click();
     expect(lastMockPort()?.messages.at(-1)).toMatchObject({
       gameId: 'replay-trivia',
@@ -392,7 +396,7 @@ describe('playground games header button', () => {
     expect(getPlayerNames()).toEqual(['Marco Vibes']);
 
     getActionButton('Back').click();
-    getGameCards()[1].click();
+    getGameCards()[2].click();
     expect(getPlayerNames()).toEqual(['Luna Chat', 'Marco Vibes']);
   });
 
@@ -455,15 +459,15 @@ describe('playground games header button', () => {
     expect(document.querySelector('.ytcq-games-active-row')?.textContent).toContain('Luna Chat');
     expect(document.querySelector('.ytcq-games-invite-row')).toBeNull();
     expect(document.querySelector('.ytcq-games-section-empty')?.textContent).toBe('No invites received yet.');
-    expect(getActionButtonLabels()).toEqual(['Minimize', 'Leave']);
+    expect(getActionButtonLabels()).toEqual(['Hide', 'Leave']);
 
-    getActionButton('Minimize').click();
+    getActionButton('Hide').click();
     expect(document.querySelector('.ytcq-chess-game-panel')).toBeNull();
     expect(getActionButtonLabels()).toEqual(['Resume', 'Leave']);
     getActionButton('Resume').click();
     expect(document.querySelector('.ytcq-chess-game-panel')).not.toBeNull();
     expect(document.querySelector('.ytcq-games-card')).not.toBeNull();
-    expect(getActionButtonLabels()).toEqual(['Minimize', 'Leave']);
+    expect(getActionButtonLabels()).toEqual(['Hide', 'Leave']);
     document.querySelector<HTMLButtonElement>('.ytcq-chess-game-close')!.click();
     expect(document.querySelector('.ytcq-chess-game-panel')).toBeNull();
     expect(getActionButtonLabels()).toEqual(['Resume', 'Leave']);
@@ -537,7 +541,7 @@ describe('playground games header button', () => {
     gamesButton.click();
 
     expect(lastMockPort()?.messages.at(-1)).toEqual({
-      availableGames: ['chess'],
+      availableGames: ['chess', 'bounty-hunting'],
       languageCode: 'en',
       locale: 'en',
       streamKey: 'stream-b',
@@ -887,7 +891,7 @@ describe('playground games header button', () => {
 
     expect(header.querySelector('.ytcq-games-button')).not.toBeNull();
     expect(lastMockPort()?.messages.at(-1)).toEqual({
-      availableGames: ['chess'],
+      availableGames: ['chess', 'bounty-hunting'],
       languageCode: 'en',
       locale: 'en',
       streamKey: 'stream-a',
@@ -910,7 +914,7 @@ describe('playground games header button', () => {
     );
 
     expect(lastMockPort()?.messages.at(-1)).toEqual({
-      availableGames: ['chess'],
+      availableGames: ['chess', 'bounty-hunting'],
       languageCode: 'en',
       locale: 'en',
       streamKey: 'stream-a',
@@ -1061,19 +1065,19 @@ function createLobbySnapshot(): LobbySnapshot {
     ],
     users: [
       {
-        availableGames: ['chess', 'replay-trivia'],
+        availableGames: ['chess', 'bounty-hunting', 'replay-trivia'],
         displayName: 'Me',
         joinedAt: Date.now(),
         userId: 'me-user'
       },
       {
-        availableGames: ['chess', 'replay-trivia'],
+        availableGames: ['chess', 'bounty-hunting', 'replay-trivia'],
         displayName: 'Luna Chat',
         joinedAt: Date.now(),
         userId: 'luna-user'
       },
       {
-        availableGames: ['chess', 'replay-trivia'],
+        availableGames: ['chess', 'bounty-hunting', 'replay-trivia'],
         displayName: 'Marco Vibes',
         joinedAt: Date.now(),
         userId: 'marco-user'
