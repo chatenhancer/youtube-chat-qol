@@ -396,7 +396,7 @@
       "message": "실험 기능을 미리 사용해 보세요. 일부는 작동을 위해 chatenhancer.com에 연결될 수 있습니다."
     },
     "playgroundProfile": {
-      "message": "내 프로필"
+      "message": "Your Playground identity"
     },
     "playgroundWins": {
       "message": "승리"

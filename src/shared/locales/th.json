@@ -396,7 +396,7 @@
       "message": "ลองฟีเจอร์ทดลองก่อนใคร บางอย่างอาจเชื่อมต่อกับ chatenhancer.com เพื่อให้ทำงานได้"
     },
     "playgroundProfile": {
-      "message": "โปรไฟล์ของคุณ"
+      "message": "Your Playground identity"
     },
     "playgroundWins": {
       "message": "ชนะ"
