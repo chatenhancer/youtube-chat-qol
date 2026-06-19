@@ -158,7 +158,7 @@
     "gamesReplayTriviaTie": "Ничья!",
     "gamesReplayTriviaWonMatch": "выиграл этот матч!",
     "gamesReplayTriviaCloseGame": "Закрыть игру",
-    "gamesReplayTriviaPickAnswer": "Выберите ответ!",
+    "gamesReplayTriviaPickAnswer": "Выберите [[ответ]]!",
     "gamesReplayTriviaStampOkay": "ОК! :)",
     "gamesReplayTriviaStampBestie": "ЛУЧШИЙ ДРУГ",
     "gamesReplayTriviaStampBlocked": "ЗАБЛОКИРОВАНО",

@@ -82,6 +82,11 @@ interface FriendBubbleTextSegment {
   text: string;
 }
 
+interface PickAnswerPromptSegment {
+  highlighted?: boolean;
+  text: string;
+}
+
 interface FriendBubbleTextLine {
   segments: FriendBubbleTextSegment[];
   width: number;
@@ -1392,20 +1397,59 @@ function drawPickAnswerPrompt(context: CanvasRenderingContext2D, centerX: number
   context.textAlign = 'left';
   context.textBaseline = 'alphabetic';
   context.font = `800 ${scaleFontSize(24)}px ${FONT_STACK}`;
-  const prompt = t('gamesReplayTriviaPickAnswer');
-  const promptWidth = context.measureText(prompt).width;
+  const segments = parsePickAnswerPromptSegments(t('gamesReplayTriviaPickAnswer'));
+  const measuredSegments = segments.map((segment) => ({
+    ...segment,
+    width: context.measureText(segment.text).width
+  }));
+  const promptWidth = measuredSegments.reduce((width, segment) => width + segment.width, 0);
   const startX = -(promptWidth / 2);
+  const underlineRanges: Array<{ width: number; x: number }> = [];
 
-  context.fillStyle = '#111111';
-  context.fillText(prompt, startX, 0);
+  let x = startX;
+  measuredSegments.forEach((segment) => {
+    if (!segment.text) return;
+    context.fillStyle = segment.highlighted ? REPLAY_TRIVIA_ACCENT_BLUE : '#111111';
+    context.fillText(segment.text, x, 0);
+    if (segment.highlighted) underlineRanges.push({ width: segment.width, x });
+    x += segment.width;
+  });
 
   context.strokeStyle = REPLAY_TRIVIA_ACCENT_BLUE;
   context.lineWidth = 3;
-  context.beginPath();
-  context.moveTo(startX, 7);
-  context.lineTo(startX + promptWidth, 7);
-  context.stroke();
+  const ranges = underlineRanges.length ? underlineRanges : [{ width: promptWidth, x: startX }];
+  ranges.forEach((range) => {
+    context.beginPath();
+    context.moveTo(range.x, 7);
+    context.lineTo(range.x + range.width, 7);
+    context.stroke();
+  });
   context.restore();
+}
+
+function parsePickAnswerPromptSegments(prompt: string): PickAnswerPromptSegment[] {
+  const segments: PickAnswerPromptSegment[] = [];
+  const markerPattern = /\[\[([^\]]+)\]\]/g;
+  let cursor = 0;
+  let match = markerPattern.exec(prompt);
+
+  while (match) {
+    if (match.index > cursor) {
+      segments.push({ text: prompt.slice(cursor, match.index) });
+    }
+    segments.push({
+      highlighted: true,
+      text: match[1]
+    });
+    cursor = match.index + match[0].length;
+    match = markerPattern.exec(prompt);
+  }
+
+  if (cursor < prompt.length) {
+    segments.push({ text: prompt.slice(cursor) });
+  }
+
+  return segments.length ? segments : [{ text: prompt }];
 }
 
 function drawAnimatedFriendBubble(
