@@ -6,7 +6,7 @@
  */
 import { ytcqCreateElement } from '../../../../shared/managed-dom';
 import type { ReplayTriviaGenerationToken, ReplayTriviaQuestion } from '../../../../shared/playground/trivia';
-import { getUiLocale, t } from '../../../../shared/i18n';
+import { t } from '../../../../shared/i18n';
 import { drawGameLoadingSpinner } from '../loading-spinner';
 import type { GamePanelShell } from '../panel-shell';
 import { createGameSoundController } from '../sound';
@@ -1132,21 +1132,21 @@ function drawFinalModal(
   context.font = `400 ${scaleFontSize(19)}px ${FONT_STACK}`;
   if (isTie) {
     context.fillText(t('gamesReplayTriviaTie'), modal.x + (modal.width / 2), modal.y + 42);
-    if (state.assets.tie && shouldUseEnglishReplayTriviaArt()) {
+    if (state.assets.tie) {
       drawStampImage(context, state.assets.tie, modal.x + 18, modal.y + 70, 288, 190, stampProgress, -1);
     } else {
       drawFinalStampFallback(context, t('gamesReplayTriviaStampOkay'), modal.x + 62, modal.y + 118, '#ffd400');
     }
   } else if (won) {
     drawWinnerLine(context, t('gamesReplayTriviaYou'), t('gamesReplayTriviaWonMatch'), '#2b96f4', modal.x + (modal.width / 2), modal.y + 42);
-    if (state.assets.bestie && shouldUseEnglishReplayTriviaArt()) {
+    if (state.assets.bestie) {
       drawStampImage(context, state.assets.bestie, modal.x + 18, modal.y + 70, 288, 190, stampProgress, -1);
     } else {
       drawFinalStampFallback(context, t('gamesReplayTriviaStampBestie'), modal.x + 62, modal.y + 118, '#00df32');
     }
   } else {
     drawWinnerLine(context, getOpponentShortLabel(state), t('gamesReplayTriviaWonMatch'), '#00d329', modal.x + (modal.width / 2), modal.y + 42);
-    if (state.assets.blocked && shouldUseEnglishReplayTriviaArt()) {
+    if (state.assets.blocked) {
       drawStampImage(context, state.assets.blocked, modal.x + 18, modal.y + 70, 288, 190, stampProgress, 1);
     } else {
       drawFinalStampFallback(context, t('gamesReplayTriviaStampBlocked'), modal.x + 62, modal.y + 118, '#ff1616');
@@ -1168,10 +1168,6 @@ function getFinalCloseButtonRect(modal: Rect): Rect {
     x: modal.x + ((modal.width - 142) / 2),
     y: modal.y + 282
   };
-}
-
-function shouldUseEnglishReplayTriviaArt(): boolean {
-  return getUiLocale().toLowerCase().startsWith('en');
 }
 
 function drawFinalStampFallback(

@@ -987,7 +987,7 @@ describe('Replay Trivia panel', () => {
     expect(context.fillRect).toHaveBeenCalled();
   });
 
-  it('uses localized final stamp text instead of English stamp art outside English', async () => {
+  it('uses final stamp art outside English when the image is available', async () => {
     document.documentElement.lang = 'es';
     vi.stubGlobal('fetch', vi.fn(async (input: RequestInfo | URL) => ({
       json: vi.fn(async () => String(input).endsWith('/es.json') ? esCatalog : {}),
@@ -1013,8 +1013,8 @@ describe('Replay Trivia panel', () => {
     setNow(STAMP_ANIMATION_MS + 600);
     updateReplayTriviaGamePanel(finishedGame, 'host-user');
 
-    expect(context.drawImage).not.toHaveBeenCalledWith(assets.bestie, expect.any(Number), expect.any(Number), expect.any(Number), expect.any(Number));
-    expect(drawnText()).toContain('MEJOR AMIGO');
+    expect(context.drawImage).toHaveBeenCalledWith(assets.bestie, expect.any(Number), expect.any(Number), expect.any(Number), expect.any(Number));
+    expect(drawnText()).not.toContain('MEJOR AMIGO');
   });
 
   it('renders finished results and closes from keyboard or canvas controls', () => {
