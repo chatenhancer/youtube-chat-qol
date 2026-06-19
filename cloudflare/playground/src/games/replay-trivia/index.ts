@@ -471,13 +471,14 @@ function getLocalizedQuestionText(
 ): ReplayTriviaStoredQuestionLocalization | ReplayTriviaStoredQuestion {
   if (!language) return question;
 
+  const localizations = Array.isArray(question.localizations) ? question.localizations : [];
   const preferredCodes = [
     language.locale,
     language.languageCode,
     language.locale?.split('-')[0],
     language.languageCode.split('-')[0]
   ].filter(Boolean).map((code) => String(code).toLowerCase());
-  return question.localizations.find((localization) =>
+  return localizations.find((localization) =>
     preferredCodes.includes(localization.languageCode.toLowerCase()) ||
     preferredCodes.includes(localization.languageCode.split('-')[0].toLowerCase())
   ) || question;

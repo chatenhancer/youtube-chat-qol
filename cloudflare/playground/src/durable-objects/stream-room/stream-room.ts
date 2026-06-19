@@ -18,7 +18,8 @@ import {
   type ClientMessage,
   type GameId,
   type LobbySnapshot,
-  type ServerMessage
+  type ServerMessage,
+  isPlaygroundComputerUserId
 } from '../../protocol/messages';
 import { parseClientMessage, ProtocolError, sanitizeStreamKey } from '../../protocol/validation';
 import { TokenBucket, type TokenBucketOptions } from '../../rate-limit';
@@ -378,6 +379,16 @@ export class StreamRoom {
   }
 
   private recordGlobalGameWin(game: GameRecord, winnerUserId: string): void {
+    if (isPlaygroundComputerUserId(winnerUserId)) {
+      this.logEvent('game_win_record_skipped', {
+        game: shortLogId(game.gameId),
+        gameType: game.gameType,
+        reason: 'computerPlayer',
+        user: hashLogValue(winnerUserId)
+      });
+      return;
+    }
+
     const write = recordPlayerWin(this.env, {
       gameId: game.gameType,
       userId: winnerUserId

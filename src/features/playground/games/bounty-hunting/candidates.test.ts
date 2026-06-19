@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   collectBountyHuntingTopFanAuthorKeys,
+  countBountyHuntingObservedCandidateTypes,
   createBountyHuntingBountiesFromMessages,
   findBountyHuntingMatchingBounty,
   getBountyHuntingObservedMessage
@@ -9,7 +10,7 @@ import type { BountyHuntingObservedMessage } from './types';
 
 describe('Bounty Hunting bounty candidates', () => {
   it('chooses six bounties from observed chat signals', () => {
-    const bounties = createBountyHuntingBountiesFromMessages([
+    const messages = [
       message('m1', { hasAllCaps: true }),
       message('m2', { hasQuestion: true }),
       message('m3', { emojiCount: 3, hasMention: true }),
@@ -17,13 +18,15 @@ describe('Bounty Hunting bounty candidates', () => {
       message('m5', { isTopFanAuthor: true }),
       message('m6', { isVerifiedAuthor: true }),
       message('m7', { isVerifiedAuthor: true })
-    ]);
+    ];
+    const bounties = createBountyHuntingBountiesFromMessages(messages);
 
     expect(bounties).toHaveLength(6);
     expect(bounties.map((bounty) => bounty.id)).not.toContain('has-link');
     expect(bounties.map((bounty) => bounty.id)).toContain('top-chatters');
     expect(bounties.map((bounty) => bounty.id)).toContain('verified-author');
     expect(bounties.every((bounty) => bounty.description)).toBe(true);
+    expect(countBountyHuntingObservedCandidateTypes(messages)).toBe(7);
   });
 
   it('adds YouTube-native privacy-safe bounties when those facts are observed', () => {

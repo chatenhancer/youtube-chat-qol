@@ -17,6 +17,7 @@ import { getParticipantAuthorName } from '../../../../youtube/participants';
 import type { BountyHuntingObservedMessage } from './types';
 
 interface BountyCandidate extends BountyHuntingBounty {
+  observedCount: number;
   score: number;
 }
 
@@ -46,8 +47,29 @@ const CUSTOM_EMOJI_SHORTCUT_PATTERN = /^:[^:\s]+:$/;
 export function createBountyHuntingBountiesFromMessages(
   messages: readonly BountyHuntingObservedMessage[]
 ): BountyHuntingBounty[] {
+  const selected = dedupeBountyHuntingCandidates(createBountyHuntingCandidatePool(messages))
+    .sort((a, b) => b.score - a.score || b.amount - a.amount || a.id.localeCompare(b.id))
+    .slice(0, BOUNTY_HUNTING_BOUNTY_COUNT);
+
+  for (const fallback of getBountyHuntingFallbackBounties()) {
+    if (selected.length >= BOUNTY_HUNTING_BOUNTY_COUNT) break;
+    if (!selected.some((bounty) => bounty.id === fallback.id)) selected.push(fallback);
+  }
+
+  return selected.map(({ observedCount: _observedCount, score: _score, ...bounty }) => bounty);
+}
+
+export function countBountyHuntingObservedCandidateTypes(
+  messages: readonly BountyHuntingObservedMessage[]
+): number {
+  return dedupeBountyHuntingCandidates(createBountyHuntingCandidatePool(messages))
+    .filter((candidate) => candidate.observedCount > 0)
+    .length;
+}
+
+function createBountyHuntingCandidatePool(messages: readonly BountyHuntingObservedMessage[]): BountyCandidate[] {
   const stats = collectBountyHuntingStats(messages);
-  const candidates: BountyCandidate[] = [
+  return [
     createCandidate('emoji-3', 50, 'a message that has 3+ emojis', { kind: 'emojiCount', min: 3 }, stats.emojiHeavy),
     createCandidate('all-caps', 50, 'a message in all caps', { kind: 'allCaps' }, stats.allCaps),
     createCandidate('verified-author', 75, 'a message by a verified account', { kind: 'verifiedAuthor' }, stats.verifiedAuthors),
@@ -100,17 +122,6 @@ export function createBountyHuntingBountiesFromMessages(
       )]
       : [])
   ];
-
-  const selected = dedupeBountyHuntingCandidates(candidates)
-    .sort((a, b) => b.score - a.score || b.amount - a.amount || a.id.localeCompare(b.id))
-    .slice(0, BOUNTY_HUNTING_BOUNTY_COUNT);
-
-  for (const fallback of getBountyHuntingFallbackBounties()) {
-    if (selected.length >= BOUNTY_HUNTING_BOUNTY_COUNT) break;
-    if (!selected.some((bounty) => bounty.id === fallback.id)) selected.push(fallback);
-  }
-
-  return selected.map(({ score: _score, ...bounty }) => bounty);
 }
 
 export function getBountyHuntingObservedMessage(
@@ -212,6 +223,7 @@ function createCandidate(
     description,
     id,
     matcher,
+    observedCount,
     score: observedCount > 0 ? observedCount * 10 + amount / 25 : amount / 100
   };
 }
