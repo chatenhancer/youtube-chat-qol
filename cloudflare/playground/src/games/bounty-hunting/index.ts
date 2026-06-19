@@ -513,9 +513,15 @@ function parseBountyHuntingMatcher(value: unknown): BountyHuntingBountyMatcher {
         kind: 'emojiCount',
         min: getBoundedInteger(matcher.min, 1, 10, 'min')
       };
+    case 'channelMemberAuthor':
+    case 'channelOwnerAuthor':
+    case 'customEmoji':
     case 'mention':
+    case 'moderatorAuthor':
     case 'number':
+    case 'onlyEmojis':
     case 'question':
+    case 'superChat':
     case 'topFanAuthor':
     case 'verifiedAuthor':
       return { kind: matcher.kind };

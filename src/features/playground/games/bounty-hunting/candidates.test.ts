@@ -26,6 +26,26 @@ describe('Bounty Hunting bounty candidates', () => {
     expect(bounties.every((bounty) => bounty.description)).toBe(true);
   });
 
+  it('adds YouTube-native privacy-safe bounties when those facts are observed', () => {
+    const bounties = createBountyHuntingBountiesFromMessages([
+      message('m1', { isChannelMemberAuthor: true }),
+      message('m2', { isModeratorAuthor: true }),
+      message('m3', { isChannelOwnerAuthor: true }),
+      message('m4', { isSuperChat: true }),
+      message('m5', { hasCustomEmoji: true }),
+      message('m6', { hasOnlyEmojis: true })
+    ]);
+
+    expect(bounties.map((bounty) => bounty.id)).toEqual([
+      'channel-owner',
+      'super-chat',
+      'channel-member',
+      'moderator',
+      'only-emojis',
+      'custom-emoji'
+    ]);
+  });
+
   it('finds the highest value open bounty for a message', () => {
     const bounties = createBountyHuntingBountiesFromMessages([]);
     const match = findBountyHuntingMatchingBounty(bounties, message('m1', {
@@ -65,6 +85,38 @@ describe('Bounty Hunting bounty candidates', () => {
     });
     expect(observed).not.toHaveProperty('authorName');
   });
+
+  it('detects badges, Super Chats, custom emoji, and emoji-only messages locally', () => {
+    const message = document.createElement('yt-live-chat-paid-message-renderer') as HTMLElement & {
+      data?: unknown;
+    };
+    message.data = {
+      id: 'message-2',
+      message: {
+        runs: [
+          { emoji: { emojiId: 'custom-1', shortcuts: [':party_parrot:'] } },
+          { emoji: { shortcuts: ['🤠'] } }
+        ]
+      }
+    };
+    message.innerHTML = `
+      <yt-live-chat-author-badge-renderer type="member"></yt-live-chat-author-badge-renderer>
+      <yt-live-chat-author-badge-renderer type="moderator"></yt-live-chat-author-badge-renderer>
+      <yt-live-chat-author-badge-renderer aria-label="Channel owner"></yt-live-chat-author-badge-renderer>
+    `;
+
+    const observed = getBountyHuntingObservedMessage(message);
+
+    expect(observed).toMatchObject({
+      hasCustomEmoji: true,
+      hasOnlyEmojis: true,
+      isChannelMemberAuthor: true,
+      isChannelOwnerAuthor: true,
+      isModeratorAuthor: true,
+      isSuperChat: true,
+      messageId: 'message-2'
+    });
+  });
 });
 
 function message(
@@ -74,9 +126,15 @@ function message(
   return {
     emojiCount: 0,
     hasAllCaps: false,
+    hasCustomEmoji: false,
     hasMention: false,
     hasNumber: false,
+    hasOnlyEmojis: false,
     hasQuestion: false,
+    isChannelMemberAuthor: false,
+    isChannelOwnerAuthor: false,
+    isModeratorAuthor: false,
+    isSuperChat: false,
     isTopFanAuthor: false,
     isVerifiedAuthor: false,
     messageId,

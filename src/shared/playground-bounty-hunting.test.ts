@@ -11,18 +11,30 @@ describe('Bounty Hunting bounty matching', () => {
     const message = {
       emojiCount: 3,
       hasAllCaps: true,
+      hasCustomEmoji: true,
       hasMention: true,
       hasNumber: true,
+      hasOnlyEmojis: true,
       hasQuestion: true,
+      isChannelMemberAuthor: true,
+      isChannelOwnerAuthor: true,
+      isModeratorAuthor: true,
+      isSuperChat: true,
       isTopFanAuthor: true,
       isVerifiedAuthor: true
     };
 
     expect(matches({ kind: 'emojiCount', min: 3 }, message)).toBe(true);
     expect(matches({ kind: 'allCaps' }, message)).toBe(true);
+    expect(matches({ kind: 'channelMemberAuthor' }, message)).toBe(true);
+    expect(matches({ kind: 'channelOwnerAuthor' }, message)).toBe(true);
+    expect(matches({ kind: 'customEmoji' }, message)).toBe(true);
     expect(matches({ kind: 'question' }, message)).toBe(true);
     expect(matches({ kind: 'mention' }, message)).toBe(true);
+    expect(matches({ kind: 'moderatorAuthor' }, message)).toBe(true);
     expect(matches({ kind: 'number' }, message)).toBe(true);
+    expect(matches({ kind: 'onlyEmojis' }, message)).toBe(true);
+    expect(matches({ kind: 'superChat' }, message)).toBe(true);
     expect(matches({ kind: 'topFanAuthor' }, message)).toBe(true);
     expect(matches({ kind: 'verifiedAuthor' }, message)).toBe(true);
   });

@@ -10,10 +10,16 @@ export type BountyHuntingPlayerRole = 'guest' | 'host';
 
 export type BountyHuntingBountyMatcher =
   | { kind: 'allCaps' }
+  | { kind: 'channelMemberAuthor' }
+  | { kind: 'channelOwnerAuthor' }
+  | { kind: 'customEmoji' }
   | { kind: 'emojiCount'; min: number }
   | { kind: 'mention' }
+  | { kind: 'moderatorAuthor' }
   | { kind: 'number' }
+  | { kind: 'onlyEmojis' }
   | { kind: 'question' }
+  | { kind: 'superChat' }
   | { kind: 'topFanAuthor' }
   | { kind: 'verifiedAuthor' };
 
@@ -39,9 +45,15 @@ export interface PublicBountyHuntingBounty extends BountyHuntingBounty {
 export interface BountyHuntingMessageFacts {
   emojiCount: number;
   hasAllCaps: boolean;
+  hasCustomEmoji: boolean;
   hasMention: boolean;
   hasNumber: boolean;
+  hasOnlyEmojis: boolean;
   hasQuestion: boolean;
+  isChannelMemberAuthor: boolean;
+  isChannelOwnerAuthor: boolean;
+  isModeratorAuthor: boolean;
+  isSuperChat: boolean;
   isTopFanAuthor: boolean;
   isVerifiedAuthor: boolean;
 }
@@ -55,14 +67,26 @@ export function doesBountyHuntingBountyMatch(
   switch (matcher.kind) {
     case 'allCaps':
       return message.hasAllCaps;
+    case 'channelMemberAuthor':
+      return message.isChannelMemberAuthor;
+    case 'channelOwnerAuthor':
+      return message.isChannelOwnerAuthor;
+    case 'customEmoji':
+      return message.hasCustomEmoji;
     case 'emojiCount':
       return message.emojiCount >= matcher.min;
     case 'mention':
       return message.hasMention;
+    case 'moderatorAuthor':
+      return message.isModeratorAuthor;
     case 'number':
       return message.hasNumber;
+    case 'onlyEmojis':
+      return message.hasOnlyEmojis;
     case 'question':
       return message.hasQuestion;
+    case 'superChat':
+      return message.isSuperChat;
     case 'topFanAuthor':
       return message.isTopFanAuthor;
     case 'verifiedAuthor':
