@@ -59,7 +59,12 @@ async function init(): Promise<void> {
     notifyFeatureOptionsChanged(previousOptions, getOptions());
   });
 
-  chrome.runtime.onMessage.addListener((message: { type?: string }) => {
+  chrome.runtime.onMessage.addListener((message: { type?: string }, _sender, sendResponse) => {
+    if (message?.type === 'ytcq:chat-attached-ping') {
+      sendResponse({ attached: true });
+      return false;
+    }
+
     if (message?.type !== 'ytcq:reset-page') return false;
     resetPageState();
     return false;

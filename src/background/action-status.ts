@@ -6,6 +6,7 @@
  * connected to this background context.
  */
 import { clearChatTab, getActiveChatStatus, getActiveChatTabIds, refreshKnownChatActionStatuses } from './chat-tab-state';
+import { hasActiveChatPort } from './active-chat-keepalive';
 
 interface ActionStatusMessage {
   type?: string;
@@ -28,6 +29,7 @@ chrome.runtime.onMessage.addListener((message: ActionStatusMessage, _sender, sen
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
   if (changeInfo.status !== 'loading') return;
+  if (hasActiveChatPort(tabId)) return;
   clearChatTab(tabId);
 });
 

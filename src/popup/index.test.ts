@@ -127,6 +127,29 @@ describe('popup', () => {
     expect(document.querySelector('[data-extension-status-text]')?.textContent).toBe('extensionStatusInactiveAll');
   });
 
+  it('uses direct content-script liveness when background active state is empty', async () => {
+    vi.mocked(chrome.tabs.query).mockImplementation(((queryInfo: chrome.tabs.QueryInfo, callback?: (tabs: chrome.tabs.Tab[]) => void) => {
+      const tabs = queryInfo.active
+        ? [{ id: 99 } as chrome.tabs.Tab]
+        : [{ id: 10 } as chrome.tabs.Tab, { id: 99 } as chrome.tabs.Tab];
+      callback?.(tabs);
+      return Promise.resolve(tabs);
+    }) as never);
+    vi.mocked(chrome.runtime.sendMessage).mockImplementation(((_message: unknown, callback?: (response: unknown) => void) => {
+      callback?.({ status: { currentActive: false, otherActiveCount: 0 } });
+      return Promise.resolve({ status: { currentActive: false, otherActiveCount: 0 } });
+    }) as never);
+    vi.mocked(chrome.tabs.sendMessage).mockImplementation(((tabId: number, _message: unknown, callback?: (response: unknown) => void) => {
+      callback?.(tabId === 10 ? { attached: true } : undefined);
+      return Promise.resolve();
+    }) as never);
+
+    await import('./index');
+
+    expect(document.querySelector('[data-extension-status]')?.getAttribute('data-extension-status')).toBe('active');
+    expect(document.querySelector('[data-extension-status-text]')?.textContent).toBe('extensionStatusActiveOneOther');
+  });
+
   it('renders the compact manifest version in the footer', async () => {
     vi.mocked(chrome.runtime.getManifest).mockReturnValue({ version: '1.2.3' } as chrome.runtime.Manifest);
     vi.mocked(chrome.tabs.query).mockImplementation(((queryInfo: chrome.tabs.QueryInfo, callback?: (tabs: chrome.tabs.Tab[]) => void) => {
@@ -964,8 +987,12 @@ describe('popup', () => {
       callback?.({ activeTabIds: [] });
       return Promise.resolve({ activeTabIds: [] });
     }) as never);
-    vi.mocked(chrome.tabs.sendMessage).mockImplementation(((_tabId: number, _message: unknown, callback?: () => void) => {
-      resetCallbacks.push(() => callback?.());
+    vi.mocked(chrome.tabs.sendMessage).mockImplementation(((_tabId: number, message: unknown, callback?: () => void) => {
+      if ((message as { type?: string })?.type === 'ytcq:reset-page') {
+        resetCallbacks.push(() => callback?.());
+      } else {
+        callback?.();
+      }
       return Promise.resolve();
     }) as never);
     vi.spyOn(window, 'confirm').mockReturnValue(true);

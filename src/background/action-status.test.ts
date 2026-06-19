@@ -73,6 +73,29 @@ describe('background action status wiring', () => {
     getRuntimeMessageListener()({ type: 'ytcq:get-active-chat-tabs' }, {}, sendResponse);
     expect(sendResponse).toHaveBeenCalledWith({ activeTabIds: [] });
   });
+
+  it('keeps active state during tab loading while a chat keepalive port is connected', async () => {
+    await import('./action-status');
+    const updatedListener = getTabUpdatedListener();
+    const sendResponse = vi.fn();
+    const port = createPort({ name: 'ytcq:active-chat', tabId: 23 });
+
+    getConnectListener()(port);
+    updatedListener(23, { status: 'loading' }, {} as chrome.tabs.Tab);
+
+    getRuntimeMessageListener()({ type: 'ytcq:get-active-chat-status', currentTabId: 23 }, {}, sendResponse);
+    expect(sendResponse).toHaveBeenCalledWith({
+      status: {
+        currentActive: true,
+        otherActiveCount: 0
+      }
+    });
+
+    port.disconnect();
+    const nextSendResponse = vi.fn();
+    getRuntimeMessageListener()({ type: 'ytcq:get-active-chat-tabs' }, {}, nextSendResponse);
+    expect(nextSendResponse).toHaveBeenCalledWith({ activeTabIds: [] });
+  });
 });
 
 function getRuntimeMessageListener(): (
@@ -113,4 +136,41 @@ function getTabRemovedListener(): (
     tabId: number,
     removeInfo: chrome.tabs.TabRemoveInfo
   ) => void;
+}
+
+function getConnectListener(): (port: chrome.runtime.Port) => void {
+  const listener = vi.mocked(chrome.runtime.onConnect.addListener).mock.calls.at(-1)?.[0];
+  if (!listener) throw new Error('No runtime connect listener registered');
+  return listener as (port: chrome.runtime.Port) => void;
+}
+
+function createPort({
+  name,
+  tabId
+}: {
+  name: string;
+  tabId: number;
+}): chrome.runtime.Port & {
+  disconnect: () => void;
+} {
+  const disconnectListeners: (() => void)[] = [];
+  const port = {
+    name,
+    onDisconnect: {
+      addListener: vi.fn((listener: () => void) => {
+        disconnectListeners.push(listener);
+      }),
+      removeListener: vi.fn()
+    },
+    onMessage: {
+      addListener: vi.fn(),
+      removeListener: vi.fn()
+    },
+    postMessage: vi.fn(),
+    sender: { tab: { id: tabId } },
+    disconnect: () => {
+      disconnectListeners.forEach((listener) => listener());
+    }
+  };
+  return port as unknown as chrome.runtime.Port & { disconnect: () => void };
 }

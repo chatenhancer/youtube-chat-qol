@@ -15,6 +15,10 @@ interface ActiveChatKeepAliveMessage {
 
 const activeChatPortsByTabId = new Map<number, Set<chrome.runtime.Port>>();
 
+export function hasActiveChatPort(tabId: number): boolean {
+  return Boolean(activeChatPortsByTabId.get(tabId)?.size);
+}
+
 chrome.runtime.onConnect.addListener((port) => {
   if (port.name !== ACTIVE_CHAT_PORT_NAME) return;
 
