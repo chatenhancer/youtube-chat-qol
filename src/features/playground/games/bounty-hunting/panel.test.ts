@@ -14,6 +14,7 @@ vi.mock('./assets', () => ({
 }));
 
 import { handleFeatureMessage } from '../../../../content/lifecycle';
+import { initMentionDetection } from '../../../mention-detection';
 import { createGamePanelShell } from '../panel-shell';
 import {
   closeBountyHuntingGamePanel,
@@ -34,6 +35,7 @@ describe('Bounty Hunting panel', () => {
 
   beforeEach(() => {
     document.body.replaceChildren();
+    initMentionDetection();
     assetMock.getAssets.mockReset();
     assetMock.getAssets.mockResolvedValue(assetMock.emptyAssets);
     frameCallbacks = [];
@@ -99,6 +101,33 @@ describe('Bounty Hunting panel', () => {
       bountyId: 'mention-user',
       messageId: 'msg-1'
     });
+  });
+
+  it('does not claim bounties from the current user authored chat messages', () => {
+    appendCurrentUserIdentity('@CurrentViewer');
+    initMentionDetection();
+    const onAction = vi.fn();
+    const game = createBountyHuntingGame();
+    openBountyHuntingGamePanel(game, 'host-user', onAction);
+    const message = appendChatMessage('msg-own', '@CurrentViewer', 'look @Marco');
+
+    handleFeatureMessage(message, { allowTranslate: true });
+    updateBountyHuntingGamePanel(game, 'host-user');
+
+    expect(onAction).toHaveBeenCalledWith('game-bounty-hunting', 'observeBountyMessage', {
+      observations: [{
+        bountyIds: ['mention-user'],
+        messageId: 'msg-own'
+      }]
+    });
+
+    message.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+    expect(onAction).not.toHaveBeenCalledWith(
+      'game-bounty-hunting',
+      'claimBounty',
+      expect.anything()
+    );
   });
 
   it('sends all matching witness bounty IDs in one playground action', () => {
@@ -937,6 +966,16 @@ function appendChatMessage(messageId: string, authorName: string, text: string):
   message.append(author, body);
   document.body.append(message);
   return message;
+}
+
+function appendCurrentUserIdentity(authorName: string): HTMLElement {
+  const identity = document.createElement('yt-live-chat-message-input-renderer');
+  const author = document.createElement('span');
+  author.id = 'author-name';
+  author.textContent = authorName;
+  identity.append(author);
+  document.body.append(identity);
+  return identity;
 }
 
 function getBountyHuntingCanvas(): HTMLCanvasElement {

@@ -6,6 +6,7 @@
  * matching live chat messages.
  */
 import { registerFeatureLifecycle } from '../../../../content/lifecycle';
+import { isCurrentUserAuthorName } from '../../../mention-detection';
 import { t } from '../../../../shared/i18n';
 import { ytcqCreateElement } from '../../../../shared/managed-dom';
 import { drawPlaygroundCanvasAvatar } from '../../../../shared/playground/avatar';
@@ -16,6 +17,7 @@ import {
   BOUNTY_HUNTING_ROUND_OVER_MS,
   type PublicBountyHuntingBounty
 } from '../../../../shared/playground/bounty-hunting';
+import { getAuthorName } from '../../../../youtube/messages';
 import { CHAT_MESSAGE_SELECTOR } from '../../../../youtube/selectors';
 import {
   cancelScheduledFrame,
@@ -548,10 +550,16 @@ function handleBountyHuntingDocumentClick(event: MouseEvent): void {
 
   const message = event.target.closest<HTMLElement>(CHAT_MESSAGE_SELECTOR);
   if (!message) return;
+  if (isCurrentUserBountyHuntingMessage(message)) return;
   const observed = getBountyHuntingObservedMessage(message, {
     topFanAuthorKeys: runtime.topFanAuthorKeys
   });
   if (observed) maybeClaimBountyHuntingBounty(runtime, observed);
+}
+
+function isCurrentUserBountyHuntingMessage(message: HTMLElement): boolean {
+  const authorName = getAuthorName(message);
+  return Boolean(authorName && isCurrentUserAuthorName(authorName));
 }
 
 function handleBountyHuntingCanvasClick(event: MouseEvent): void {
