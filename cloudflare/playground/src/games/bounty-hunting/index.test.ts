@@ -211,7 +211,7 @@ describe('playground Bounty Hunting game rules', () => {
         messageId: 'msg-1'
       },
       userId: 'guest-user'
-    }, 3_900);
+    }, 5_200);
 
     expect(game.scores.host).toBe(0);
     expect(game.claims).toHaveLength(0);
