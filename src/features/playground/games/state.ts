@@ -10,7 +10,7 @@ import {
   type PresenceUser,
   type PublicGame,
   type PublicInvite
-} from '../../../shared/playground-protocol';
+} from '../../../shared/playground/protocol';
 import type { PlaygroundClientState } from './client';
 import { isPlayableGameId, isSupportedGameId } from './registry';
 

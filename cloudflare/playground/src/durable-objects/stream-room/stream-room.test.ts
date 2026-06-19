@@ -859,11 +859,11 @@ describe('playground stream room', () => {
       users: expect.arrayContaining([
         expect.objectContaining({
           displayName: 'Computer',
-          userId: 'server:computer'
+          userId: 'server:computer:replay-trivia'
         }),
         expect.objectContaining({
           displayName: 'Computer (Club)',
-          userId: 'server:computer:club'
+          userId: 'server:computer:chess:club'
         })
       ])
     });

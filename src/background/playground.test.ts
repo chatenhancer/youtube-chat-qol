@@ -6,9 +6,9 @@ import {
   type PlaygroundBackgroundMessage,
   type PlaygroundContentMessage,
   type ServerMessage
-} from '../shared/playground-protocol';
-import { PLAYGROUND_PROFILE_MESSAGE_TYPE } from '../shared/playground-identity';
-import { REPLAY_TRIVIA_QUESTIONS_BACKGROUND_MESSAGE } from '../shared/playground-trivia';
+} from '../shared/playground/protocol';
+import { PLAYGROUND_PROFILE_MESSAGE_TYPE } from '../shared/playground/identity';
+import { REPLAY_TRIVIA_QUESTIONS_BACKGROUND_MESSAGE } from '../shared/playground/trivia';
 
 class FakeWebSocket {
   static instances: FakeWebSocket[] = [];

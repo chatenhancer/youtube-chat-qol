@@ -14,13 +14,13 @@ import type {
   BountyHuntingClaim,
   BountyHuntingGameStatus,
   BountyHuntingPlayerRole
-} from '../../../../../src/shared/playground-bounty-hunting';
+} from '../../../../../src/shared/playground/bounty-hunting';
 import {
   BOUNTY_HUNTING_BOUNTY_COUNT,
   BOUNTY_HUNTING_COUNTDOWN_MS,
   BOUNTY_HUNTING_ROUND_MS,
   BOUNTY_HUNTING_ROUND_OVER_MS
-} from '../../../../../src/shared/playground-bounty-hunting';
+} from '../../../../../src/shared/playground/bounty-hunting';
 import type { GameActionInput, GameModule, GameRecord } from '../types';
 
 type PlayerRole = BountyHuntingPlayerRole;

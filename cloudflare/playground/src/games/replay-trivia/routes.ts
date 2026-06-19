@@ -5,7 +5,7 @@
  * response job rather than realtime room state. The route also owns the small
  * request handler because this game currently has only one support route.
  */
-import { REPLAY_TRIVIA_QUESTIONS_ROUTE } from '../../../../../src/shared/playground-trivia';
+import { REPLAY_TRIVIA_QUESTIONS_ROUTE } from '../../../../../src/shared/playground/trivia';
 import { consumeReplayTriviaCaptchaPass } from '../../durable-objects/captcha-passes/client';
 import { consumeReplayTriviaGenerationToken as consumeStreamRoomReplayTriviaGenerationToken } from '../../durable-objects/stream-room/client';
 import { createErrorResponse, createJsonResponse } from '../../http';

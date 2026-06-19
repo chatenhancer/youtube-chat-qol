@@ -1,12 +1,12 @@
 import type { GameSoundController } from '../sound';
 import type { GamePanelStatusOverlay } from '../panel-feedback';
-import type { PublicGame, PublicUserIdentity } from '../../../../shared/playground-protocol';
+import type { PublicGame, PublicUserIdentity } from '../../../../shared/playground/protocol';
 import type {
   PublicBountyHuntingBounty,
   BountyHuntingGameStatus,
   BountyHuntingMessageFacts,
   BountyHuntingPlayerRole
-} from '../../../../shared/playground-bounty-hunting';
+} from '../../../../shared/playground/bounty-hunting';
 
 export type { BountyHuntingMessageFacts, BountyHuntingPlayerRole };
 

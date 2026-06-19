@@ -1,7 +1,7 @@
 import {
   getPlaygroundAvatarPresentation,
   type PlaygroundAvatarIdentity
-} from './playground-identity';
+} from './identity';
 
 export interface PlaygroundCanvasAvatarOptions {
   fontFamily?: string;

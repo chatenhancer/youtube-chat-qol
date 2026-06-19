@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type { GameId, PublicGame } from '../../../shared/playground-protocol';
+import type { GameId, PublicGame } from '../../../shared/playground/protocol';
 import type { PlaygroundClientState } from './client';
 import {
   createInitialGamesPanelState,
@@ -37,7 +37,7 @@ describe('playground games panel state selectors', () => {
         createUser('human-chess-two', ['chess']),
         createUser('human-replay', ['replay-trivia']),
         createUser('quiet-user', []),
-        createUser('server:computer:club', ['chess'])
+        createUser('server:computer:chess:club', ['chess'])
       ]
     }));
 

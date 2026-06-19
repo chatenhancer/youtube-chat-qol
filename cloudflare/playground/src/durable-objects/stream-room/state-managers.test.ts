@@ -272,7 +272,7 @@ describe('stream room state managers', () => {
 
     expect(socket.close).toHaveBeenCalledOnce();
     expect(getPlayerDisplayName('')).toBe('Player 0000');
-    expect(getPlayerDisplayName('server:computer:club')).toBe('Player SERV');
+    expect(getPlayerDisplayName('server:computer:chess:club')).toBe('Player SERV');
   });
 });
 

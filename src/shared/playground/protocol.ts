@@ -9,7 +9,7 @@ export const PLAYGROUND_PROTOCOL_VERSION = 1;
 export const SUPPORTED_GAMES = ['chess', 'bounty-hunting', 'replay-trivia'] as const;
 
 export function isPlaygroundComputerUserId(userId: string): boolean {
-  return userId === 'server:computer' || userId.startsWith('server:computer:');
+  return userId.startsWith('server:computer:');
 }
 
 export type GameId = typeof SUPPORTED_GAMES[number];

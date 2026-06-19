@@ -8,13 +8,13 @@
 import { registerFeatureLifecycle } from '../../../../content/lifecycle';
 import { t } from '../../../../shared/i18n';
 import { ytcqCreateElement } from '../../../../shared/managed-dom';
-import { drawPlaygroundCanvasAvatar } from '../../../../shared/playground-avatar';
+import { drawPlaygroundCanvasAvatar } from '../../../../shared/playground/avatar';
 import {
   BOUNTY_HUNTING_COUNTDOWN_MS,
   BOUNTY_HUNTING_ROUND_MS,
   BOUNTY_HUNTING_ROUND_OVER_MS,
   type PublicBountyHuntingBounty
-} from '../../../../shared/playground-bounty-hunting';
+} from '../../../../shared/playground/bounty-hunting';
 import { CHAT_MESSAGE_SELECTOR } from '../../../../youtube/selectors';
 import {
   cancelScheduledFrame,

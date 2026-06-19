@@ -6,8 +6,8 @@ import {
   type ReplayTriviaQuestionsBackgroundResponse,
   type ReplayTriviaQuestionsRequest,
   type ReplayTriviaQuestionsResponse
-} from '../../../../shared/playground-trivia';
-import { PLAYGROUND_BACKEND_ORIGIN } from '../../../../shared/playground-protocol';
+} from '../../../../shared/playground/trivia';
+import { PLAYGROUND_BACKEND_ORIGIN } from '../../../../shared/playground/protocol';
 import { getUiLocale } from '../../../../shared/i18n';
 import { getChatAdjacentWindowFeatures } from '../../../chat-adjacent-window';
 import { getCurrentYouTubeChatStreamKey } from '../../../../youtube/source-url';

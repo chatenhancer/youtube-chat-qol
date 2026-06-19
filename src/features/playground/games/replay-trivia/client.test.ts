@@ -3,8 +3,8 @@ import {
   REPLAY_TRIVIA_CAPTCHA_POST_MESSAGE_SOURCE,
   REPLAY_TRIVIA_CAPTCHA_POST_MESSAGE_TYPE,
   REPLAY_TRIVIA_QUESTIONS_BACKGROUND_MESSAGE
-} from '../../../../shared/playground-trivia';
-import { PLAYGROUND_BACKEND_ORIGIN } from '../../../../shared/playground-protocol';
+} from '../../../../shared/playground/trivia';
+import { PLAYGROUND_BACKEND_ORIGIN } from '../../../../shared/playground/protocol';
 import {
   generateReplayTriviaQuestions,
   requestReplayTriviaCaptchaPass,

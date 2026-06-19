@@ -12,7 +12,7 @@ import type {
   ReplayTriviaQuestionsRequest,
   ReplayTriviaQuestionsResponse,
   ReplayTriviaTargetLanguage
-} from '../../../../../src/shared/playground-trivia';
+} from '../../../../../src/shared/playground/trivia';
 import type { Env } from '../../types';
 import { ReplayTriviaError } from './errors';
 

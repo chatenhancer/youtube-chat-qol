@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { DEFAULT_OPTIONS } from '../../../shared/options';
-import type { LobbySnapshot, PlaygroundBackgroundMessage, PublicGame } from '../../../shared/playground-protocol';
+import type { LobbySnapshot, PlaygroundBackgroundMessage, PublicGame } from '../../../shared/playground/protocol';
 import { setOptions } from '../../../shared/state';
 import {
   handleFeatureMutations,
@@ -713,6 +713,7 @@ describe('playground games header button', () => {
     expect(document.querySelector('.ytcq-games-connection-notice')?.textContent).toContain('Unable to connect');
     expect(document.querySelector('.ytcq-games-connection-notice')?.textContent).toContain('Playground connection failed. Please try again later.');
     expect(document.querySelector('.ytcq-games-availability-toggle')).toBeNull();
+    expect(getGamesSectionTitles()).not.toContain('Start a game');
     expect(getActionButton('Reconnect').hidden).toBe(false);
 
     const messagesBeforeReconnect = lastMockPort()?.messages.length || 0;
@@ -726,6 +727,31 @@ describe('playground games header button', () => {
     expect(document.querySelector('.ytcq-profile-card-subtitle')?.textContent).toBe('Connecting...');
     reconnectButton.click();
     expect(lastMockPort()?.messages).toHaveLength(messagesBeforeReconnect + 1);
+  });
+
+  it('does not show the game picker heading while a selected game view is disconnected', () => {
+    const header = createHeader();
+    document.body.append(header);
+    setOptions({ ...DEFAULT_OPTIONS, playgroundEnabled: true, playgroundGamesAvailable: true });
+
+    wireGamesButton();
+    header.querySelector<HTMLButtonElement>('.ytcq-games-button')!.click();
+    lastMockPort()?.emit(createSnapshotMessage(createLobbySnapshot()));
+
+    getGameCards()[0].click();
+    expect(document.querySelector('.ytcq-profile-card-title')?.textContent).toBe('Chess');
+    expect(document.querySelector('.ytcq-profile-card-subtitle')?.textContent).toBe('Invite a player');
+
+    lastMockPort()?.emit({
+      error: 'Playground connection failed.',
+      status: 'disconnected',
+      type: 'ytcq:playground:status'
+    });
+
+    expect(document.querySelector('.ytcq-profile-card-title')?.textContent).toBe('Chess');
+    expect(document.querySelector('.ytcq-games-connection-notice')?.textContent).toContain('Unable to connect');
+    expect(getGamesSectionTitles()).not.toContain('Start a game');
+    expect(document.querySelector('.ytcq-games-game-card')).toBeNull();
   });
 
   it('closes the games panel from the card close button and cleanup', () => {
@@ -1098,31 +1124,31 @@ function createComputerUsers(): LobbySnapshot['users'] {
       availableGames: ['chess'],
       displayName: 'Computer (Beginner)',
       joinedAt: Date.now(),
-      userId: 'server:computer:beginner'
+      userId: 'server:computer:chess:beginner'
     },
     {
       availableGames: ['chess'],
       displayName: 'Computer (Club)',
       joinedAt: Date.now(),
-      userId: 'server:computer:club'
+      userId: 'server:computer:chess:club'
     },
     {
       availableGames: ['chess'],
       displayName: 'Computer (Master)',
       joinedAt: Date.now(),
-      userId: 'server:computer:master'
+      userId: 'server:computer:chess:master'
     },
     {
       availableGames: ['replay-trivia'],
       displayName: 'Computer',
       joinedAt: Date.now(),
-      userId: 'server:computer'
+      userId: 'server:computer:replay-trivia'
     },
     {
       availableGames: ['bounty-hunting'],
       displayName: 'Computer (Bounty Hunter)',
       joinedAt: Date.now(),
-      userId: 'server:computer:bounty-hunter'
+      userId: 'server:computer:bounty-hunting'
     }
   ];
 }

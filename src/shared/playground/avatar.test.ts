@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 import {
   drawPlaygroundCanvasAvatar,
   getPlaygroundCanvasAvatarBaselineOffset
-} from './playground-avatar';
+} from './avatar';
 
 describe('Playground canvas avatar', () => {
   it('uses text metrics to optically center avatar initials', () => {

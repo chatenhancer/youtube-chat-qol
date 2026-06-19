@@ -12,7 +12,7 @@ describe('playground protocol backend origin', () => {
   it('uses the production playground backend by default', async () => {
     vi.resetModules();
 
-    const protocol = await import('./playground-protocol');
+    const protocol = await import('./protocol');
 
     expect(protocol.PLAYGROUND_BACKEND_ORIGIN).toBe('https://playground.chatenhancer.com');
   });
@@ -21,7 +21,7 @@ describe('playground protocol backend origin', () => {
     vi.resetModules();
     (globalThis as PlaygroundBackendGlobal).YTCQ_PLAYGROUND_BACKEND_ORIGIN = 'http://127.0.0.1:8787/';
 
-    const protocol = await import('./playground-protocol');
+    const protocol = await import('./protocol');
 
     expect(protocol.PLAYGROUND_BACKEND_ORIGIN).toBe('http://127.0.0.1:8787');
   });
@@ -30,8 +30,19 @@ describe('playground protocol backend origin', () => {
     vi.resetModules();
     (globalThis as PlaygroundBackendGlobal).YTCQ_PLAYGROUND_BACKEND_ORIGIN = 'ws://127.0.0.1:8787';
 
-    const protocol = await import('./playground-protocol');
+    const protocol = await import('./protocol');
 
     expect(protocol.PLAYGROUND_BACKEND_ORIGIN).toBe('https://playground.chatenhancer.com');
+  });
+
+  it('recognizes game-scoped computer player ids', async () => {
+    vi.resetModules();
+
+    const protocol = await import('./protocol');
+
+    expect(protocol.isPlaygroundComputerUserId('server:computer:chess:club')).toBe(true);
+    expect(protocol.isPlaygroundComputerUserId('server:computer:bounty-hunting')).toBe(true);
+    expect(protocol.isPlaygroundComputerUserId('server:computer')).toBe(false);
+    expect(protocol.isPlaygroundComputerUserId('human-user')).toBe(false);
   });
 });

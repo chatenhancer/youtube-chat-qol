@@ -22,7 +22,7 @@ import {
   type BountyHuntingClaim,
   type BountyHuntingGameStatus,
   type BountyHuntingPlayerRole
-} from '../../../../../src/shared/playground-bounty-hunting';
+} from '../../../../../src/shared/playground/bounty-hunting';
 
 type ChoiceIndex = 0 | 1 | 2 | 3;
 type ChessBotMove = Pick<ChessMoveInput, 'from' | 'promotion' | 'to'>;
@@ -53,8 +53,8 @@ export interface ComputerPlayerProfile {
   userId: string;
 }
 
-export const COMPUTER_PLAYER_CONNECTION_ID = 'server:computer';
-export const COMPUTER_PLAYER_USER_ID = 'server:computer';
+export const COMPUTER_PLAYER_CONNECTION_ID = 'server:computer:replay-trivia';
+export const COMPUTER_PLAYER_USER_ID = COMPUTER_PLAYER_CONNECTION_ID;
 export const COMPUTER_PLAYER_DISPLAY_NAME = 'Computer';
 export const COMPUTER_PLAYER_AVAILABLE_GAMES: readonly GameId[] = ['replay-trivia'];
 export const COMPUTER_PLAYER_PROFILE: ComputerPlayerProfile = {
@@ -79,7 +79,8 @@ export const CHESS_COMPUTER_PLAYER_MASTER_PROFILE = createChessComputerPlayerPro
   2500
 );
 export const BOUNTY_HUNTING_COMPUTER_PLAYER_PROFILE = createComputerPlayerProfile(
-  'bounty-hunter',
+  'bounty-hunting',
+  null,
   'Computer (Bounty Hunter)',
   ['bounty-hunting']
 );
@@ -170,17 +171,18 @@ export function isComputerPlayerUserId(userId: string): boolean {
 
 function createChessComputerPlayerProfile(slug: string, displayName: string, chessElo: number): ComputerPlayerProfile {
   return {
-    ...createComputerPlayerProfile(slug, displayName, ['chess']),
+    ...createComputerPlayerProfile('chess', slug, displayName, ['chess']),
     chessElo
   };
 }
 
 function createComputerPlayerProfile(
-  slug: string,
+  gameId: GameId,
+  slug: string | null,
   displayName: string,
   availableGames: readonly GameId[]
 ): ComputerPlayerProfile {
-  const id = `server:computer:${slug}`;
+  const id = slug ? `server:computer:${gameId}:${slug}` : `server:computer:${gameId}`;
   return {
     availableGames,
     connectionId: id,

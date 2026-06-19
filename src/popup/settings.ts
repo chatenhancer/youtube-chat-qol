@@ -3,7 +3,7 @@ import {
   getPlaygroundAvatarPresentation,
   PLAYGROUND_PROFILE_MESSAGE_TYPE,
   type PlaygroundProfileResponse
-} from '../shared/playground-identity';
+} from '../shared/playground/identity';
 import { playSoftChime } from '../shared/sounds/soft-chime';
 import {
   DEFAULT_OPTIONS,
