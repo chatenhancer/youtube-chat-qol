@@ -10,6 +10,7 @@ import { ProtocolError } from '../../protocol/validation';
 import type {
   PublicBountyHuntingBounty,
   BountyHuntingBounty,
+  BountyHuntingBountyDescriptionKey,
   BountyHuntingBountyMatcher,
   BountyHuntingClaim,
   BountyHuntingGameStatus,
@@ -17,6 +18,7 @@ import type {
 } from '../../../../../src/shared/playground/bounty-hunting';
 import {
   BOUNTY_HUNTING_BOUNTY_COUNT,
+  BOUNTY_HUNTING_BOUNTY_DESCRIPTION_KEYS,
   BOUNTY_HUNTING_COUNTDOWN_MS,
   BOUNTY_HUNTING_ROUND_MS,
   BOUNTY_HUNTING_ROUND_OVER_MS
@@ -494,13 +496,26 @@ function parseBountyHuntingBounties(value: unknown): BountyHuntingBounty[] {
     const id = getPayloadText(bounty.id, `bounty ${index + 1} id`, 80);
     if (seenIds.has(id)) throw new ProtocolError('duplicate_bounty', 'Bounty IDs must be unique.');
     seenIds.add(id);
-    return {
+    const parsedBounty: BountyHuntingBounty = {
       amount: getBountyAmount(bounty.amount),
       description: getPayloadText(bounty.description, `bounty ${index + 1} description`, MAX_DESCRIPTION_LENGTH),
       id,
       matcher: parseBountyHuntingMatcher(bounty.matcher)
     };
+    const descriptionKey = parseBountyHuntingDescriptionKey(bounty.descriptionKey);
+    return descriptionKey ? { ...parsedBounty, descriptionKey } : parsedBounty;
   });
+}
+
+function parseBountyHuntingDescriptionKey(value: unknown): BountyHuntingBountyDescriptionKey | undefined {
+  if (value === undefined || value === null) return undefined;
+  if (
+    typeof value === 'string' &&
+    BOUNTY_HUNTING_BOUNTY_DESCRIPTION_KEYS.includes(value as BountyHuntingBountyDescriptionKey)
+  ) {
+    return value as BountyHuntingBountyDescriptionKey;
+  }
+  throw new ProtocolError('invalid_bounty', 'Bounty description key is not supported.');
 }
 
 function parseBountyHuntingMatcher(value: unknown): BountyHuntingBountyMatcher {

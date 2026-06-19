@@ -26,6 +26,7 @@ describe('Bounty Hunting bounty candidates', () => {
     expect(bounties.map((bounty) => bounty.id)).toContain('top-chatters');
     expect(bounties.map((bounty) => bounty.id)).toContain('verified-author');
     expect(bounties.every((bounty) => bounty.description)).toBe(true);
+    expect(bounties.every((bounty) => bounty.descriptionKey)).toBe(true);
     expect(countBountyHuntingObservedCandidateTypes(messages)).toBe(7);
   });
 

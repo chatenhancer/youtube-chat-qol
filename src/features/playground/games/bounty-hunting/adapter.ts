@@ -5,6 +5,7 @@
  * live-chat-only availability separate from Replay Trivia's replay-only flow.
  */
 import { isLiveChatReplayUrl } from '../../../../youtube/timestamps';
+import { t } from '../../../../shared/i18n';
 import type {
   EnabledGame,
   GameDefinition,
@@ -60,5 +61,5 @@ function getBountyHuntingOpponentLabel(game: PublicBountyHuntingGame, currentUse
   const opponent = game.players.host.userId === currentUserId
     ? game.players.guest
     : game.players.host;
-  return opponent.displayName || 'Player';
+  return opponent.displayName || t('gamesBountyHuntingPlayer');
 }

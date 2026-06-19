@@ -379,6 +379,22 @@ describe('Bounty Hunting panel', () => {
     expect(context.fillText).toHaveBeenCalledWith('high bounty', 124, 250);
   });
 
+  it('renders bounty descriptions from localization keys when available', () => {
+    openBountyHuntingGamePanel({
+      ...createBountyHuntingGame(),
+      bounties: [{
+        amount: 75,
+        description: 'fallback description',
+        descriptionKey: 'gamesBountyHuntingBountyNumber',
+        id: 'has-number',
+        matcher: { kind: 'number' }
+      }]
+    }, 'host-user', vi.fn());
+
+    expect(context.fillText).toHaveBeenCalledWith('a message with a number', 124, 166);
+    expect(context.fillText).not.toHaveBeenCalledWith('fallback description', 124, 166);
+  });
+
   it('dims claimed bounty rows in the expanded wanted list', () => {
     const descriptionAlpha = new Map<string, number>();
     context.fillText.mockImplementation((text: string) => {

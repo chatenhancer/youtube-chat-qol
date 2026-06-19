@@ -4,9 +4,25 @@ export const BOUNTY_HUNTING_BOUNTY_COUNT = 6;
 export const BOUNTY_HUNTING_COUNTDOWN_MS = 3_000;
 export const BOUNTY_HUNTING_ROUND_MS = 60_000;
 export const BOUNTY_HUNTING_ROUND_OVER_MS = 2_000;
+export const BOUNTY_HUNTING_BOUNTY_DESCRIPTION_KEYS = [
+  'gamesBountyHuntingBountyAllCaps',
+  'gamesBountyHuntingBountyChannelMember',
+  'gamesBountyHuntingBountyChannelOwner',
+  'gamesBountyHuntingBountyCustomEmoji',
+  'gamesBountyHuntingBountyEmoji3',
+  'gamesBountyHuntingBountyMention',
+  'gamesBountyHuntingBountyModerator',
+  'gamesBountyHuntingBountyNumber',
+  'gamesBountyHuntingBountyOnlyEmojis',
+  'gamesBountyHuntingBountyQuestion',
+  'gamesBountyHuntingBountySuperChat',
+  'gamesBountyHuntingBountyTopChatters',
+  'gamesBountyHuntingBountyVerifiedAuthor'
+] as const;
 
 export type BountyHuntingGameStatus = 'active' | 'countdown' | 'finished' | 'preparing' | 'ready' | 'roundOver';
 export type BountyHuntingPlayerRole = 'guest' | 'host';
+export type BountyHuntingBountyDescriptionKey = typeof BOUNTY_HUNTING_BOUNTY_DESCRIPTION_KEYS[number];
 
 export type BountyHuntingBountyMatcher =
   | { kind: 'allCaps' }
@@ -26,6 +42,7 @@ export type BountyHuntingBountyMatcher =
 export interface BountyHuntingBounty {
   amount: number;
   description: string;
+  descriptionKey?: BountyHuntingBountyDescriptionKey;
   id: string;
   matcher: BountyHuntingBountyMatcher;
 }

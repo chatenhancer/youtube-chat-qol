@@ -319,6 +319,31 @@ describe('playground Bounty Hunting game rules', () => {
     ]);
   });
 
+  it('preserves validated bounty description keys', () => {
+    const bounties = createBounties().map((bounty) => ({
+      ...bounty,
+      descriptionKey: 'gamesBountyHuntingBountyQuestion'
+    }));
+    const game = submitBountyHunting(createBountyHuntingGame('game-1', 'host-user', 'guest-user', 0), {
+      action: 'submitBounties',
+      payload: { bounties },
+      userId: 'host-user'
+    }, 0);
+
+    expect(game.bounties.every((bounty) => bounty.descriptionKey === 'gamesBountyHuntingBountyQuestion')).toBe(true);
+
+    expect(() => submitBountyHunting(createBountyHuntingGame('game-2', 'host-user', 'guest-user', 0), {
+      action: 'submitBounties',
+      payload: {
+        bounties: createBounties().map((bounty, index) => ({
+          ...bounty,
+          descriptionKey: index === 0 ? 'gamesBountyHuntingBountyNope' : 'gamesBountyHuntingBountyQuestion'
+        }))
+      },
+      userId: 'host-user'
+    }, 0)).toThrowError(new ProtocolError('invalid_bounty', 'Bounty description key is not supported.'));
+  });
+
   it('handles actions through the game module interface', () => {
     const game = bountyHuntingGameModule.createGame('game-1', ['host-user', 'guest-user']);
     const readyGame = bountyHuntingGameModule.applyAction(game, {
