@@ -214,7 +214,7 @@ describe('playground games header button', () => {
     expect(getGameCards()[0].getAttribute('aria-disabled')).toBe('false');
     expect(getGameCards()[1].getAttribute('aria-disabled')).toBe('false');
     expect(getGameCards()[2].getAttribute('aria-disabled')).toBe('true');
-    expect(getGameCards()[2].title).toBe('Available on chat replays.');
+    expect(getGameCards()[2].title).toBe('Can only be played during a live replay (a stream that has already ended).');
     getGameCards()[2].click();
     expect(document.querySelector('.ytcq-profile-card-title')?.textContent).toBe('Games');
 
@@ -271,7 +271,7 @@ describe('playground games header button', () => {
       type: 'ytcq:playground:init'
     });
     expect(getGameCards()[1].getAttribute('aria-disabled')).toBe('true');
-    expect(getGameCards()[1].title).toBe('Available on live chat.');
+    expect(getGameCards()[1].title).toBe('Can only be played during live chat.');
     expect(getGameCards()[2].getAttribute('aria-disabled')).toBe('false');
     expect(getGameCards()[2].title).toBe('');
   });

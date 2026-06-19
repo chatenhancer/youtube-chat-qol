@@ -4,11 +4,11 @@ import type { PublicGame, PublicUserIdentity } from '../../../../shared/playgrou
 import type {
   PublicBountyHuntingBounty,
   BountyHuntingGameStatus,
-  BountyHuntingMessageSignal,
+  BountyHuntingMessageFacts,
   BountyHuntingPlayerRole
 } from '../../../../shared/playground-bounty-hunting';
 
-export type { BountyHuntingMessageSignal, BountyHuntingPlayerRole };
+export type { BountyHuntingMessageFacts, BountyHuntingPlayerRole };
 
 export interface PublicBountyHuntingGame extends PublicGame {
   bounties: PublicBountyHuntingBounty[];
@@ -69,6 +69,7 @@ export interface BountyHuntingPanelRuntime {
   listeners: AbortController;
   onAction: (gameId: string, action: string, payload?: Record<string, unknown>) => void;
   onVisibilityChanged: (() => void) | null;
+  pendingWitnesses: Map<string, Set<string>>;
   pixelRatio: number;
   preparationMessages: Map<string, BountyHuntingObservedMessage>;
   preparationStarted: boolean;
@@ -77,20 +78,19 @@ export interface BountyHuntingPanelRuntime {
   readyButtonFlashUntil: number;
   roundOverStingPlayedForGameId: string | null;
   sentClaimKeys: Set<string>;
+  sentWitnessKeys: Set<string>;
   soundController: GameSoundController;
   startRoundSent: boolean;
   statusOverlay: GamePanelStatusOverlay;
   subtitleElement: HTMLElement;
   timerStartPulseUntil: number;
   timeoutSent: boolean;
+  topFanAuthorKeys: Set<string>;
+  witnessFlushTimer: number | null;
 }
 
-export interface BountyHuntingObservedMessage extends BountyHuntingMessageSignal {
-  authorName: string;
-  emojiCount: number;
-  isVerifiedAuthor: boolean;
+export interface BountyHuntingObservedMessage extends BountyHuntingMessageFacts {
   messageId: string;
-  text: string;
 }
 
 export interface BountyHuntingFallbackRuntime {
