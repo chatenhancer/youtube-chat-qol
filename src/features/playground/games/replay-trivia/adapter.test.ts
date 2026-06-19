@@ -136,6 +136,10 @@ function createReplayTriviaGame(overrides: Partial<PublicReplayTriviaGame> = {})
 function createMountContext(overrides: Partial<GamePanelMountContext> = {}): GamePanelMountContext {
   return {
     closePanel: vi.fn(),
+    controls: {
+      setCompactMode: vi.fn(),
+      setPosition: vi.fn()
+    },
     currentUserId: 'host-user',
     onPanelChange: vi.fn(),
     sendGameAction: vi.fn(),

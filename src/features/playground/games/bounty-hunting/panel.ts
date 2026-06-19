@@ -22,6 +22,7 @@ import {
   isPointInRect,
   scheduleFrame
 } from '../replay-trivia/canvas';
+import type { GamePanelControls } from '../adapter';
 import type { GamePanelShell } from '../panel-shell';
 import { createGameSoundController } from '../sound';
 import {
@@ -50,7 +51,7 @@ import type {
 
 const LAYOUT_WIDTH = 448;
 const LAYOUT_HEIGHT = 448;
-const COMPACT_LAYOUT_HEIGHT = 64;
+const COMPACT_LAYOUT_HEIGHT = 128;
 const CANVAS_WIDTH = LAYOUT_WIDTH;
 const CANVAS_HEIGHT = LAYOUT_HEIGHT;
 const CANVAS_DISPLAY_SCALE = 0.75;
@@ -66,6 +67,18 @@ const BOUNTY_ROW_HEIGHT = 39;
 const BOUNTY_ROW_GAP = 3;
 const BOUNTY_ROW_WIDTH = 358;
 const BOUNTY_STAMP_X_OFFSET = 0;
+const CLAIMED_BOUNTY_ROW_ALPHA = 0.66;
+const COMPACT_BOUNTY_COLUMNS = 3;
+const COMPACT_BOUNTY_CHIP_GAP = 6;
+const COMPACT_BOUNTY_CHIP_HEIGHT = 26;
+const COMPACT_BOUNTY_CHIP_WIDTH = 140;
+const COMPACT_BOUNTY_CHIP_X = 8;
+const COMPACT_BOUNTY_CHIP_Y = 67;
+const COMPACT_BOUNTY_CLAIMED_STAMP_HEIGHT = 34;
+const COMPACT_BOUNTY_CLAIMED_STAMP_WIDTH = 48;
+const COMPACT_BOUNTY_OPEN_STAMP_HEIGHT = 38;
+const COMPACT_BOUNTY_OPEN_STAMP_WIDTH = 44;
+const COMPACT_READY_BUTTON_RECT: Rect = { height: 38, width: 116, x: 166, y: 13 };
 const LIVE_SCORE_AVATAR_RADIUS = 17;
 const LIVE_SCORE_LEFT_TEXT_X = 104;
 const LIVE_SCORE_MONEY_Y = 126;
@@ -147,7 +160,8 @@ export function openBountyHuntingGamePanel(
   currentUserId: string,
   onAction: (gameId: string, action: string, payload?: Record<string, unknown>) => void,
   onVisibilityChanged: (() => void) | undefined,
-  closePanel: BountyHuntingClosePanel
+  closePanel: BountyHuntingClosePanel,
+  panelControls: GamePanelControls | null = null
 ): void {
   closeBountyHuntingGamePanel({ notify: false });
 
@@ -213,6 +227,7 @@ export function openBountyHuntingGamePanel(
     listeners,
     onAction,
     onVisibilityChanged: onVisibilityChanged || null,
+    panelControls,
     pendingWitnesses: new Map(),
     pixelRatio: configureBountyHuntingCanvas(canvas),
     preparationMessages: new Map(),
@@ -312,8 +327,12 @@ export function updateBountyHuntingGamePanel(game: PublicBountyHuntingGame, curr
     activeBountyHuntingPanel.timeoutSent = false;
     activeBountyHuntingPanel.finishSent = false;
     if (game.status === 'active') {
+      moveBountyHuntingPanelToActiveRoundPosition(activeBountyHuntingPanel);
       activeBountyHuntingPanel.timerStartPulseUntil = getNow() + TIMER_START_PULSE_MS;
       activeBountyHuntingPanel.soundController.play(BOUNTY_HUNTING_ROUND_START_SOUND_PATH);
+    } else if (game.status === 'roundOver') {
+      moveBountyHuntingPanelToRoundOverPosition(activeBountyHuntingPanel);
+      clearBountyHuntingWitnessQueue(activeBountyHuntingPanel);
     } else {
       clearBountyHuntingWitnessQueue(activeBountyHuntingPanel);
     }
@@ -329,6 +348,15 @@ export function updateBountyHuntingGamePanel(game: PublicBountyHuntingGame, curr
   maybeStartBountyHuntingPreparation(activeBountyHuntingPanel);
   maybeObserveVisibleBountyHuntingMessages(activeBountyHuntingPanel);
   renderBountyHuntingGame(getNow());
+}
+
+function moveBountyHuntingPanelToActiveRoundPosition(runtime: BountyHuntingPanelRuntime): void {
+  runtime.panelControls?.setCompactMode(true);
+  runtime.panelControls?.setPosition({ placement: 'top-center' });
+}
+
+function moveBountyHuntingPanelToRoundOverPosition(runtime: BountyHuntingPanelRuntime): void {
+  runtime.panelControls?.setCompactMode(false);
 }
 
 function handleBountyHuntingLifecycleMessage(message: HTMLElement): void {
@@ -555,13 +583,13 @@ function handleBountyHuntingCanvasKeydown(event: KeyboardEvent): void {
   if (event.key !== 'Enter' && event.key !== ' ') return;
   const runtime = activeBountyHuntingPanel;
   if (!runtime) return;
-  const action = runtime.hitboxes.find((hitbox) => hitbox.action === 'ready' || hitbox.action === 'close')?.action;
-  if (!action) return;
+  const hitbox = runtime.hitboxes.find((candidate) => candidate.action === 'ready' || candidate.action === 'close');
+  if (!hitbox) return;
   event.preventDefault();
   const canvasRect = runtime.canvas.getBoundingClientRect();
   const point = getBountyHuntingClientPoint(runtime.canvas, {
-    x: BUTTON_RECT.x + BUTTON_RECT.width / 2,
-    y: BUTTON_RECT.y + BUTTON_RECT.height / 2
+    x: hitbox.rect.x + hitbox.rect.width / 2,
+    y: hitbox.rect.y + hitbox.rect.height / 2
   });
   handleBountyHuntingCanvasClick(new MouseEvent('click', {
     clientX: canvasRect.left + point.x,
@@ -712,6 +740,7 @@ function drawBountyHuntingCompact(runtime: BountyHuntingPanelRuntime, now: numbe
   });
 
   drawBountyHuntingCompactStatus(runtime, now);
+  drawBountyHuntingCompactBounties(runtime);
 }
 
 function drawBountyHuntingCompactBackground(runtime: BountyHuntingPanelRuntime): void {
@@ -775,6 +804,11 @@ function drawBountyHuntingCompactStatus(runtime: BountyHuntingPanelRuntime, now:
     return;
   }
 
+  if (game.status === 'ready') {
+    drawBountyHuntingCompactReadyButton(runtime, now);
+    return;
+  }
+
   const timerPulseAmount = getBountyHuntingTimerStartPulseAmount(runtime, now);
   const timerFontSize = 20 + Math.round(timerPulseAmount * 7);
   const timerColor = game.status === 'active' ? RED_TEXT : PAPER_TEXT;
@@ -800,6 +834,187 @@ function drawBountyHuntingCompactStatus(runtime: BountyHuntingPanelRuntime, now:
     font: `700 10px ${BARNUM_STACK}`,
     shadow: false
   });
+}
+
+function drawBountyHuntingCompactReadyButton(runtime: BountyHuntingPanelRuntime, now: number): void {
+  const { assets, context } = runtime;
+  const image = assets.buttonBg;
+  const hover = runtime.hoveredAction === 'ready';
+  context.save();
+  if (hover) context.globalAlpha = 0.86;
+  if (image) {
+    context.drawImage(image, COMPACT_READY_BUTTON_RECT.x, COMPACT_READY_BUTTON_RECT.y, COMPACT_READY_BUTTON_RECT.width, COMPACT_READY_BUTTON_RECT.height);
+  } else {
+    drawRoundedRect(
+      context,
+      COMPACT_READY_BUTTON_RECT.x,
+      COMPACT_READY_BUTTON_RECT.y + 4,
+      COMPACT_READY_BUTTON_RECT.width,
+      COMPACT_READY_BUTTON_RECT.height - 9,
+      999,
+      '#b8a177',
+      '#7f6a42'
+    );
+  }
+  context.restore();
+
+  const flashAmount = getBountyHuntingReadyButtonFlashAmount(runtime, now);
+  if (flashAmount > 0) drawBountyHuntingButtonFlash(context, COMPACT_READY_BUTTON_RECT, flashAmount, image);
+
+  drawCenteredText(
+    context,
+    'READY',
+    COMPACT_READY_BUTTON_RECT.x + COMPACT_READY_BUTTON_RECT.width / 2,
+    COMPACT_READY_BUTTON_RECT.y + COMPACT_READY_BUTTON_RECT.height / 2,
+    {
+      color: PAPER_TEXT,
+      font: `800 12px ${BARTLE_STACK}`,
+      shadow: false
+    }
+  );
+  drawBountyHuntingReadyStack(runtime, COMPACT_READY_BUTTON_RECT);
+  runtime.hitboxes.push({ action: 'ready', rect: COMPACT_READY_BUTTON_RECT });
+}
+
+function drawBountyHuntingCompactBounties(runtime: BountyHuntingPanelRuntime): void {
+  if (runtime.game.status === 'preparing') return;
+  const displayBounties = getBountyHuntingDisplayBounties(runtime.game.bounties);
+  displayBounties.forEach((bounty, index) => drawBountyHuntingCompactBounty(runtime, bounty, index));
+}
+
+function drawBountyHuntingCompactBounty(
+  runtime: BountyHuntingPanelRuntime,
+  bounty: PublicBountyHuntingBounty,
+  index: number
+): void {
+  const { context } = runtime;
+  const column = index % COMPACT_BOUNTY_COLUMNS;
+  const row = Math.floor(index / COMPACT_BOUNTY_COLUMNS);
+  const x = COMPACT_BOUNTY_CHIP_X + column * (COMPACT_BOUNTY_CHIP_WIDTH + COMPACT_BOUNTY_CHIP_GAP);
+  const y = COMPACT_BOUNTY_CHIP_Y + row * (COMPACT_BOUNTY_CHIP_HEIGHT + COMPACT_BOUNTY_CHIP_GAP);
+  const claimed = Boolean(bounty.claim);
+
+  context.save();
+  context.globalAlpha = claimed ? 0.66 : 1;
+  drawRoundedRect(
+    context,
+    x,
+    y,
+    COMPACT_BOUNTY_CHIP_WIDTH,
+    COMPACT_BOUNTY_CHIP_HEIGHT,
+    3,
+    claimed ? 'rgba(240, 218, 174, 0.48)' : 'rgba(255, 250, 235, 0.62)',
+    claimed ? '#8a6f4a' : '#8c6d35'
+  );
+
+  drawBountyHuntingMoneyText(context, bounty.amount, x + 7, y + 15, {
+    align: 'left',
+    amountFont: `1000 15px ${BARNUM_STACK}`,
+    color: RED_TEXT,
+    dollarFont: `1000 10px ${BARNUM_STACK}`
+  });
+
+  context.textAlign = 'left';
+  context.textBaseline = 'middle';
+  context.fillStyle = PAPER_TEXT;
+  context.font = '400 10px Roboto, Arial, sans-serif';
+  drawFittedText(
+    context,
+    getBountyHuntingCompactBountyLabel(bounty),
+    x + 47,
+    y + 14,
+    76,
+    10
+  );
+
+  context.restore();
+
+  drawBountyHuntingCompactBountyStamp(runtime, claimed, x, y);
+
+  if (bounty.claim) {
+    drawBountyHuntingAvatar(runtime, bounty.claim.role, x + COMPACT_BOUNTY_CHIP_WIDTH - 8, y + COMPACT_BOUNTY_CHIP_HEIGHT - 4, 7);
+  }
+}
+
+function drawBountyHuntingCompactBountyStamp(
+  runtime: BountyHuntingPanelRuntime,
+  claimed: boolean,
+  x: number,
+  y: number
+): void {
+  const { assets, context } = runtime;
+  context.save();
+  if (claimed) {
+    context.translate(x + 118, y + 11);
+    context.rotate(-0.2);
+    if (assets.bountyClaimedStamp) {
+      context.drawImage(
+        assets.bountyClaimedStamp,
+        -COMPACT_BOUNTY_CLAIMED_STAMP_WIDTH / 2,
+        -COMPACT_BOUNTY_CLAIMED_STAMP_HEIGHT / 2,
+        COMPACT_BOUNTY_CLAIMED_STAMP_WIDTH,
+        COMPACT_BOUNTY_CLAIMED_STAMP_HEIGHT
+      );
+    } else {
+      drawCompactBountyStampFallback(context, 'CLAIMED', -24, -8, '#a8302d');
+    }
+  } else if (assets.bountyOpenStamp) {
+    context.drawImage(
+      assets.bountyOpenStamp,
+      x + 94,
+      y - 7,
+      COMPACT_BOUNTY_OPEN_STAMP_WIDTH,
+      COMPACT_BOUNTY_OPEN_STAMP_HEIGHT
+    );
+  } else {
+    drawCompactBountyStampFallback(context, 'OPEN', x + COMPACT_BOUNTY_CHIP_WIDTH - 39, y + 6, GREEN_STAMP);
+  }
+  context.restore();
+}
+
+function drawCompactBountyStampFallback(
+  context: CanvasRenderingContext2D,
+  text: string,
+  x: number,
+  y: number,
+  color: string
+): void {
+  context.textAlign = 'center';
+  context.textBaseline = 'middle';
+  context.fillStyle = color;
+  context.font = `700 9px ${BARNUM_STACK}`;
+  context.fillText(text, x + 21, y + 8);
+}
+
+function getBountyHuntingCompactBountyLabel(bounty: PublicBountyHuntingBounty): string {
+  switch (bounty.matcher.kind) {
+    case 'allCaps':
+      return 'ALL CAPS';
+    case 'channelMemberAuthor':
+      return 'member';
+    case 'channelOwnerAuthor':
+      return 'owner';
+    case 'customEmoji':
+      return 'custom emoji';
+    case 'emojiCount':
+      return `${bounty.matcher.min}+ emojis`;
+    case 'mention':
+      return 'mention';
+    case 'moderatorAuthor':
+      return 'mod';
+    case 'number':
+      return 'number';
+    case 'onlyEmojis':
+      return 'only emojis';
+    case 'question':
+      return 'question';
+    case 'superChat':
+      return 'Super Chat';
+    case 'topFanAuthor':
+      return 'top fan';
+    case 'verifiedAuthor':
+      return 'verified';
+  }
 }
 
 function drawBountyHuntingLoading(runtime: BountyHuntingPanelRuntime): void {
@@ -1089,6 +1304,9 @@ function drawBountyHuntingBounty(
 ): void {
   const { assets, context } = runtime;
   const y = BOUNTY_LIST_Y + index * (BOUNTY_ROW_HEIGHT + BOUNTY_ROW_GAP);
+  const claimed = Boolean(bounty.claim);
+  context.save();
+  context.globalAlpha = claimed ? CLAIMED_BOUNTY_ROW_ALPHA : 1;
   if (assets.bountyDescBg) {
     context.drawImage(assets.bountyDescBg, BOUNTY_LIST_X, y, BOUNTY_ROW_WIDTH, BOUNTY_ROW_HEIGHT);
   } else {
@@ -1115,6 +1333,7 @@ function drawBountyHuntingBounty(
     (332 + BOUNTY_STAMP_X_OFFSET) - BOUNTY_DESCRIPTION_X - BOUNTY_DESCRIPTION_STAMP_GAP,
     13
   );
+  context.restore();
 
   if (bounty.claim) {
     drawClaimedStamp(runtime, y);
@@ -1532,9 +1751,10 @@ function syncBountyHuntingCanvasPixelRatio(
 
 function getBountyHuntingCanvasPoint(canvas: HTMLCanvasElement, event: MouseEvent): { x: number; y: number } {
   const rect = canvas.getBoundingClientRect();
+  const layoutHeight = getBountyHuntingCanvasLayoutHeight(canvas);
   return {
     x: ((event.clientX - rect.left) / rect.width) * LAYOUT_WIDTH,
-    y: ((event.clientY - rect.top) / rect.height) * LAYOUT_HEIGHT
+    y: ((event.clientY - rect.top) / rect.height) * layoutHeight
   };
 }
 
@@ -1543,10 +1763,16 @@ function getBountyHuntingClientPoint(
   point: { x: number; y: number }
 ): { x: number; y: number } {
   const rect = canvas.getBoundingClientRect();
+  const layoutHeight = getBountyHuntingCanvasLayoutHeight(canvas);
   return {
     x: (point.x / LAYOUT_WIDTH) * rect.width,
-    y: (point.y / LAYOUT_HEIGHT) * rect.height
+    y: (point.y / layoutHeight) * rect.height
   };
+}
+
+function getBountyHuntingCanvasLayoutHeight(canvas: HTMLCanvasElement): number {
+  if (canvas.width > 0 && canvas.height > 0) return (canvas.height / canvas.width) * LAYOUT_WIDTH;
+  return LAYOUT_HEIGHT;
 }
 
 function canRenderBountyHuntingCanvas(context: CanvasRenderingContext2D): boolean {

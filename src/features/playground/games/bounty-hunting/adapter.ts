@@ -44,8 +44,8 @@ export const bountyHuntingGame: EnabledGame<PublicBountyHuntingGame> = {
 };
 
 function mountBountyHuntingPanel(game: PublicBountyHuntingGame, context: GamePanelMountContext): GamePanelMount {
-  const { closePanel, currentUserId, onPanelChange, sendGameAction, shell } = context;
-  openBountyHuntingGamePanel(shell, game, currentUserId, sendGameAction, onPanelChange, closePanel);
+  const { closePanel, controls, currentUserId, onPanelChange, sendGameAction, shell } = context;
+  openBountyHuntingGamePanel(shell, game, currentUserId, sendGameAction, onPanelChange, closePanel, controls);
   return {
     close: closeBountyHuntingGamePanel,
     gameId: game.gameId,

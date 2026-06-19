@@ -30,7 +30,8 @@ describe('Bounty Hunting game adapter', () => {
       'host-user',
       context.sendGameAction,
       context.onPanelChange,
-      context.closePanel
+      context.closePanel,
+      context.controls
     );
     expect(handle.gameId).toBe('game-1');
     handle.setCompactMode?.(true);
@@ -84,6 +85,10 @@ function createBountyHuntingGame(overrides: Partial<PublicBountyHuntingGame> = {
 function createMountContext(overrides: Partial<GamePanelMountContext> = {}): GamePanelMountContext {
   return {
     closePanel: vi.fn(),
+    controls: {
+      setCompactMode: vi.fn(),
+      setPosition: vi.fn()
+    },
     currentUserId: 'host-user',
     onPanelChange: vi.fn(),
     sendGameAction: vi.fn(),

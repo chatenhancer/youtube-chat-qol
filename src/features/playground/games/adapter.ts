@@ -8,7 +8,7 @@
 import type { MessageKey } from '../../../shared/i18n';
 import type { GameId, PublicGame, ServerMessage } from '../../../shared/playground/protocol';
 import type { PlaygroundClientState } from './client';
-import type { GamePanelShell } from './panel-shell';
+import type { GamePanelShell, GamePanelShellPosition } from './panel-shell';
 
 export interface GameDefinition {
   classNamePrefix: string;
@@ -24,8 +24,14 @@ export type SendGameAction = (gameId: string, action: string, payload?: Record<s
 
 export type CloseGamePanel = (options?: { notify?: boolean }) => void;
 
+export interface GamePanelControls {
+  setCompactMode(compact: boolean): void;
+  setPosition(position: GamePanelShellPosition): void;
+}
+
 export interface GamePanelMountContext {
   closePanel: CloseGamePanel;
+  controls: GamePanelControls;
   currentUserId: string;
   onPanelChange: () => void;
   sendGameAction: SendGameAction;

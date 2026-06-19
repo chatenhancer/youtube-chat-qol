@@ -11,10 +11,11 @@ import type { GameId, PublicGame, ServerMessage } from '../../../shared/playgrou
 import type { PlaygroundClientState } from './client';
 import { ENABLED_GAMES } from './enabled-games';
 import type { AnyEnabledGame, AnyGamePanelAdapter, GameDefinition, GamePanelMount, SendGameAction } from './adapter';
-import { createGamePanelShell, type GamePanelShell } from './panel-shell';
+import { createGamePanelShell, type GamePanelShell, type GamePanelShellPosition } from './panel-shell';
 
 const ENABLED_GAME_LIST: readonly AnyEnabledGame[] = ENABLED_GAMES;
 let activeGamePanel: ActiveGamePanel | null = null;
+const gamePanelPreferences = new Map<GameId, GamePanelPreferences>();
 
 interface ActiveGamePanel {
   adapter: AnyGamePanelAdapter;
@@ -22,6 +23,15 @@ interface ActiveGamePanel {
   mount: GamePanelMount;
   shell: GamePanelShell;
   shellController: AbortController;
+}
+
+interface GamePanelPreferences {
+  compactMode?: boolean;
+}
+
+export interface OpenSupportedGamePanelOptions {
+  initialPosition?: GamePanelShellPosition;
+  restoreCompactPreference?: boolean;
 }
 
 export const GAMES: readonly GameDefinition[] = ENABLED_GAME_LIST.map((game) => game.definition);
@@ -114,10 +124,12 @@ export function openSupportedGamePanel(
   game: PublicGame,
   currentUserId: string,
   sendGameAction: SendGameAction,
-  onPanelChange: () => void
+  onPanelChange: () => void,
+  options: OpenSupportedGamePanelOptions = {}
 ): void {
   const enabledGame = getEnabledGame(game);
   if (!enabledGame) return;
+  const { initialPosition, restoreCompactPreference = true } = options;
 
   closeActiveGamePanel({ notify: false });
   const { adapter, definition } = enabledGame;
@@ -133,10 +145,25 @@ export function openSupportedGamePanel(
     subtitle: getGameOpponentLabel(game, currentUserId),
     title
   });
-  let mount: GamePanelMount;
+  let mount: GamePanelMount | null = null;
+  const setPanelCompactMode = (
+    compact: boolean,
+    { syncShell = true }: { syncShell?: boolean } = {}
+  ): void => {
+    gamePanelPreferences.set(definition.id, {
+      ...gamePanelPreferences.get(definition.id),
+      compactMode: compact
+    });
+    if (syncShell && shell.isCompactMode() !== compact) shell.setCompactMode(compact);
+    mount?.setCompactMode?.(compact);
+  };
   try {
     mount = adapter.mountPanel(game, {
       closePanel: closeActiveGamePanel,
+      controls: {
+        setCompactMode: (compact) => setPanelCompactMode(compact),
+        setPosition: (position) => shell.setPosition(position)
+      },
       currentUserId,
       onPanelChange: () => {
         closeDisconnectedActiveGamePanel();
@@ -149,12 +176,25 @@ export function openSupportedGamePanel(
     releaseGamePanelShell({ shell, shellController });
     throw error;
   }
+  if (!mount) {
+    releaseGamePanelShell({ shell, shellController });
+    return;
+  }
+
+  if (initialPosition) shell.setPosition(initialPosition, { animate: false });
+
   if (mount.setCompactMode) {
     shell.setCompactModeEnabled({
       compactLabel: t('gamesMinimize'),
       expandLabel: t('gamesExpand'),
-      onChange: (compact) => mount.setCompactMode?.(compact)
+      onChange: (compact) => setPanelCompactMode(compact, { syncShell: false })
     });
+    const preferredCompactMode = gamePanelPreferences.get(definition.id)?.compactMode;
+    if (restoreCompactPreference) {
+      if (preferredCompactMode !== undefined) setPanelCompactMode(preferredCompactMode);
+    } else {
+      setPanelCompactMode(false);
+    }
   }
   activeGamePanel = {
     adapter,

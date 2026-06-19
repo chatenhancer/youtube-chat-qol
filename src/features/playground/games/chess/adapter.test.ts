@@ -99,6 +99,10 @@ function createChessGame(overrides: Partial<PublicChessGame> = {}): PublicChessG
 function createMountContext(overrides: Partial<GamePanelMountContext> = {}): GamePanelMountContext {
   return {
     closePanel: vi.fn(),
+    controls: {
+      setCompactMode: vi.fn(),
+      setPosition: vi.fn()
+    },
     currentUserId: 'white-user',
     onPanelChange: vi.fn(),
     sendGameAction: vi.fn(),
