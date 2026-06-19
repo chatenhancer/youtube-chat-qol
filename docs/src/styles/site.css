@@ -1248,6 +1248,64 @@ h3 {
   font-size: 13px;
 }
 
+.playground-game-logos {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.playground-game-logo {
+  display: block;
+  flex: 0 0 auto;
+  height: 36px;
+  width: auto;
+  object-fit: contain;
+}
+
+.playground-game-logo-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  line-height: 0;
+  border-radius: 4px;
+  transition: opacity 160ms ease;
+}
+
+.playground-game-logo-link:hover {
+  opacity: 0.82;
+}
+
+.playground-game-logo-link:focus-visible {
+  outline: 2px solid var(--playground-accent);
+  outline-offset: 3px;
+}
+
+.playground-game-logo-chess {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  image-rendering: pixelated;
+}
+
+.playground-game-logo-chess-piece {
+  position: absolute;
+  display: block;
+  left: 2px;
+  top: 2px;
+  width: 32px;
+  height: 32px;
+  background-repeat: no-repeat;
+  background-position: -32px 0;
+  background-size: 64px 96px;
+  image-rendering: pixelated;
+}
+
+.playground-game-logo-trivia {
+  max-width: 74px;
+}
+
 .playground-preview {
   position: relative;
   justify-self: center;

@@ -23,11 +23,25 @@ if (!playgroundPost) {
   throw new Error('Missing required Playground blog post.');
 }
 const playgroundPostPath = getBlogPostPath(playgroundPost);
+const gamePostPaths = {
+  chess: playgroundPostPath,
+  trivia: getRequiredBlogPostPath('new-in-0-14-0-help-a-friend-trivia'),
+  wild: getRequiredBlogPostPath('the-wild-wild-chat-coming-to-chat-enhancer-0-15-0')
+};
+
+function getRequiredBlogPostPath(translationKey: string): string {
+  const post = posts.find((candidate) => candidate.data.translationKey === translationKey);
+  if (!post) {
+    throw new Error(`Missing required blog post: ${translationKey}`);
+  }
+
+  return getBlogPostPath(post);
+}
 ---
 
 <Hero messages={messages} rootPrefix={rootPrefix} />
 <Features messages={messages} />
-<Playground messages={messages} playgroundPostPath={playgroundPostPath} rootPrefix={rootPrefix} />
+<Playground messages={messages} playgroundPostPath={playgroundPostPath} gamePostPaths={gamePostPaths} rootPrefix={rootPrefix} />
 <Screenshots messages={messages} rootPrefix={rootPrefix} />
 <Install locale={locale} messages={messages} rootPrefix={rootPrefix} />
 <Privacy locale={locale} messages={messages} />
