@@ -13,8 +13,8 @@ import {
   SessionManager
 } from '../../durable-objects/stream-room/session-manager';
 import type { Env } from '../../types';
-import { COMPUTER_PLAYER_PROFILES } from './actions';
 import { createComputerPlayer } from './computer-player';
+import { COMPUTER_PLAYER_PROFILES } from './profiles';
 
 type LogDetails = Record<string, boolean | number | string | undefined>;
 

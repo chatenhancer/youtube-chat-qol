@@ -7,14 +7,17 @@
  * Durable Object lifecycle for the bot to lose.
  */
 import {
-  COMPUTER_PLAYER_PROFILE,
-  type ComputerPlayerProfile,
   createComputerPlayerAction,
   getComputerPlayerActionDelayMs,
-  isComputerPlayerUserId,
   shouldComputerPlayerAct,
   type ChessBotStockfishFailure
 } from './actions';
+import {
+  DEFAULT_COMPUTER_PLAYER_PROFILE,
+  type ComputerPlayerProfile,
+  getChessComputerPlayerStockfishElo,
+  isComputerPlayerUserId
+} from './profiles';
 import {
   createStockfishBestMoveProvider,
   type StockfishResult
@@ -39,7 +42,6 @@ export interface ComputerPlayerHost {
 
 export interface ComputerPlayer {
   readonly availableGames: readonly GameId[];
-  readonly chessElo?: number;
   readonly connectionId: string;
   readonly displayName: string;
   readonly socket: WebSocket;
@@ -49,14 +51,13 @@ export interface ComputerPlayer {
 
 export function createComputerPlayer(
   host: ComputerPlayerHost,
-  profile: ComputerPlayerProfile = COMPUTER_PLAYER_PROFILE
+  profile: ComputerPlayerProfile = DEFAULT_COMPUTER_PLAYER_PROFILE
 ): ComputerPlayer {
   return new StreamRoomComputerPlayer(host, profile);
 }
 
 class StreamRoomComputerPlayer implements ComputerPlayer {
   readonly availableGames: readonly GameId[];
-  readonly chessElo?: number;
   readonly connectionId: string;
   readonly displayName: string;
   readonly socket = createComputerSocket((message) => this.receive(message), () => this.reset());
@@ -69,7 +70,6 @@ class StreamRoomComputerPlayer implements ComputerPlayer {
     profile: ComputerPlayerProfile
   ) {
     this.availableGames = profile.availableGames;
-    this.chessElo = profile.chessElo;
     this.connectionId = profile.connectionId;
     this.displayName = profile.displayName;
     this.userId = profile.userId;
@@ -133,7 +133,7 @@ class StreamRoomComputerPlayer implements ComputerPlayer {
     this.clearGameActionState(game.gameId);
     if (!shouldComputerPlayerAct(game, this.userId)) return;
 
-    const delayMs = getComputerPlayerActionDelayMs(game);
+    const delayMs = getComputerPlayerActionDelayMs(game, Math.random, this.userId);
     const timer = setTimeout(() => {
       this.actionTimers.delete(game.gameId);
       this.runActionInBackground(game.gameId);
@@ -167,7 +167,7 @@ class StreamRoomComputerPlayer implements ComputerPlayer {
     let stockfishFailure: ChessBotStockfishFailure | null = null;
     const action = await createComputerPlayerAction(game, {
       getStockfishBestMove: createStockfishBestMoveProvider(this.host.env, {
-        elo: this.chessElo
+        elo: getChessComputerPlayerStockfishElo(this.userId)
       }),
       onChessBotStockfishFailure: (failure) => {
         stockfishFailure = failure;

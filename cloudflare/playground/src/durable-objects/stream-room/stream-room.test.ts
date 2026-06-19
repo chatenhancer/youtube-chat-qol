@@ -10,7 +10,7 @@ import { TokenBucket } from '../../rate-limit';
 import {
   CHESS_COMPUTER_PLAYER_CLUB_PROFILE,
   CHESS_COMPUTER_PLAYER_PROFILES
-} from '../../features/computer-player/actions';
+} from '../../features/computer-player/profiles';
 import {
   PLAYGROUND_PROTOCOL_VERSION,
   type ClientMessage,

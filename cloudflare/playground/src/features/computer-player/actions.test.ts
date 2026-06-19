@@ -1,17 +1,20 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
-  BOUNTY_HUNTING_COMPUTER_PLAYER_PROFILE,
-  CHESS_COMPUTER_PLAYER_BEGINNER_PROFILE,
-  CHESS_COMPUTER_PLAYER_CLUB_PROFILE,
-  COMPUTER_PLAYER_USER_ID,
   createBountyHuntingBotAction,
   createComputerPlayerAction,
   createReplayTriviaBotAnswerAction,
   createStockfishChessBotAction,
   getComputerPlayerActionDelayMs,
-  isComputerPlayerUserId,
   shouldComputerPlayerAct
 } from './actions';
+import {
+  BOUNTY_HUNTING_COMPUTER_PLAYER_PROFILE,
+  CHESS_COMPUTER_PLAYER_BEGINNER_PROFILE,
+  CHESS_COMPUTER_PLAYER_CLUB_PROFILE,
+  REPLAY_TRIVIA_COMPUTER_PLAYER_PROFILE,
+  getChessComputerPlayerStockfishElo,
+  isComputerPlayerUserId
+} from './profiles';
 import { getStockfishBestMove } from '../../durable-objects/stockfish-container/client';
 import { createChessGame } from '../../games/chess';
 import {
@@ -41,11 +44,13 @@ describe('computer player', () => {
   });
 
   it('uses a 750 ELO Beginner chess profile', () => {
-    expect(CHESS_COMPUTER_PLAYER_BEGINNER_PROFILE).toMatchObject({
-      chessElo: 750,
+    expect(CHESS_COMPUTER_PLAYER_BEGINNER_PROFILE).toEqual({
+      availableGames: ['chess'],
+      connectionId: 'server:computer:chess:beginner',
       displayName: 'Computer (Beginner)',
       userId: 'server:computer:chess:beginner'
     });
+    expect(getChessComputerPlayerStockfishElo(CHESS_COMPUTER_PLAYER_BEGINNER_PROFILE.userId)).toBe(750);
   });
 
   it('uses one Bounty Hunting computer profile', () => {
@@ -57,17 +62,26 @@ describe('computer player', () => {
     });
   });
 
+  it('uses one Replay Trivia computer profile', () => {
+    expect(REPLAY_TRIVIA_COMPUTER_PLAYER_PROFILE).toEqual({
+      availableGames: ['replay-trivia'],
+      connectionId: 'server:computer:replay-trivia',
+      displayName: 'Computer',
+      userId: 'server:computer:replay-trivia'
+    });
+  });
+
   it('creates chess move actions from Stockfish in the computer player', async () => {
     getStockfishBestMoveMock.mockResolvedValueOnce(createStockfishResult({ from: 'e2', to: 'e4' }));
-    const game = createChessGame('game-1', COMPUTER_PLAYER_USER_ID, 'human-user');
+    const game = createChessGame('game-1', CHESS_COMPUTER_PLAYER_CLUB_PROFILE.userId, 'human-user');
 
-    await expect(createStockfishChessBotAction(game, COMPUTER_PLAYER_USER_ID)).resolves.toEqual({
+    await expect(createStockfishChessBotAction(game, CHESS_COMPUTER_PLAYER_CLUB_PROFILE.userId)).resolves.toEqual({
       action: 'move',
       payload: {
         from: 'e2',
         to: 'e4'
       },
-      userId: COMPUTER_PLAYER_USER_ID
+      userId: CHESS_COMPUTER_PLAYER_CLUB_PROFILE.userId
     });
   });
 
@@ -78,29 +92,29 @@ describe('computer player', () => {
       to: 'e8'
     }));
     const game = {
-      ...createChessGame('game-1', COMPUTER_PLAYER_USER_ID, 'human-user'),
+      ...createChessGame('game-1', CHESS_COMPUTER_PLAYER_CLUB_PROFILE.userId, 'human-user'),
       fen: '4k3/4P3/8/8/8/8/8/4K3 w - - 0 1'
     };
 
-    await expect(createStockfishChessBotAction(game, COMPUTER_PLAYER_USER_ID)).resolves.toEqual({
+    await expect(createStockfishChessBotAction(game, CHESS_COMPUTER_PLAYER_CLUB_PROFILE.userId)).resolves.toEqual({
       action: 'move',
       payload: {
         from: 'e7',
         promotion: 'q',
         to: 'e8'
       },
-      userId: COMPUTER_PLAYER_USER_ID
+      userId: CHESS_COMPUTER_PLAYER_CLUB_PROFILE.userId
     });
   });
 
   it('reports when Stockfish provides the chess bot move', async () => {
     const stockfishResult = createStockfishResult({ from: 'e2', to: 'e4' });
-    const game = createChessGame('game-1', COMPUTER_PLAYER_USER_ID, 'human-user');
+    const game = createChessGame('game-1', CHESS_COMPUTER_PLAYER_CLUB_PROFILE.userId, 'human-user');
     const onStockfishFailure = vi.fn();
     const onStockfishMove = vi.fn();
     getStockfishBestMoveMock.mockResolvedValueOnce(stockfishResult);
 
-    await createStockfishChessBotAction(game, COMPUTER_PLAYER_USER_ID, onStockfishFailure, onStockfishMove);
+    await createStockfishChessBotAction(game, CHESS_COMPUTER_PLAYER_CLUB_PROFILE.userId, onStockfishFailure, onStockfishMove);
 
     expect(onStockfishFailure).not.toHaveBeenCalled();
     expect(onStockfishMove).toHaveBeenCalledTimes(1);
@@ -108,12 +122,12 @@ describe('computer player', () => {
   });
 
   it('does not create a chess move when Stockfish returns no move', async () => {
-    const game = createChessGame('game-1', COMPUTER_PLAYER_USER_ID, 'human-user');
+    const game = createChessGame('game-1', CHESS_COMPUTER_PLAYER_CLUB_PROFILE.userId, 'human-user');
     const onStockfishFailure = vi.fn();
 
     await expect(createStockfishChessBotAction(
       game,
-      COMPUTER_PLAYER_USER_ID,
+      CHESS_COMPUTER_PLAYER_CLUB_PROFILE.userId,
       onStockfishFailure
     )).resolves.toBeNull();
 
@@ -125,13 +139,13 @@ describe('computer player', () => {
 
   it('does not create a chess move after a Stockfish error', async () => {
     const error = new Error('Stockfish failed.');
-    const game = createChessGame('game-1', COMPUTER_PLAYER_USER_ID, 'human-user');
+    const game = createChessGame('game-1', CHESS_COMPUTER_PLAYER_CLUB_PROFILE.userId, 'human-user');
     const onStockfishFailure = vi.fn();
     getStockfishBestMoveMock.mockRejectedValueOnce(error);
 
     await expect(createStockfishChessBotAction(
       game,
-      COMPUTER_PLAYER_USER_ID,
+      CHESS_COMPUTER_PLAYER_CLUB_PROFILE.userId,
       onStockfishFailure
     )).resolves.toBeNull();
 
@@ -144,19 +158,19 @@ describe('computer player', () => {
 
   it('does not ask Stockfish when the game is not an active chess turn for the bot', async () => {
     const inactiveGame = {
-      ...createChessGame('game-1', COMPUTER_PLAYER_USER_ID, 'human-user'),
+      ...createChessGame('game-1', CHESS_COMPUTER_PLAYER_CLUB_PROFILE.userId, 'human-user'),
       status: 'draw'
     };
-    const waitingGame = createChessGame('game-2', 'human-user', COMPUTER_PLAYER_USER_ID);
+    const waitingGame = createChessGame('game-2', 'human-user', CHESS_COMPUTER_PLAYER_CLUB_PROFILE.userId);
     const unknownGame = {
       gameId: 'game-3',
       gameType: 'replay-trivia',
       status: 'question'
     } as GameRecord;
 
-    await expect(createStockfishChessBotAction(inactiveGame, COMPUTER_PLAYER_USER_ID)).resolves.toBeNull();
-    await expect(createStockfishChessBotAction(waitingGame, COMPUTER_PLAYER_USER_ID)).resolves.toBeNull();
-    await expect(createStockfishChessBotAction(unknownGame, COMPUTER_PLAYER_USER_ID)).resolves.toBeNull();
+    await expect(createStockfishChessBotAction(inactiveGame, CHESS_COMPUTER_PLAYER_CLUB_PROFILE.userId)).resolves.toBeNull();
+    await expect(createStockfishChessBotAction(waitingGame, CHESS_COMPUTER_PLAYER_CLUB_PROFILE.userId)).resolves.toBeNull();
+    await expect(createStockfishChessBotAction(unknownGame, CHESS_COMPUTER_PLAYER_CLUB_PROFILE.userId)).resolves.toBeNull();
     expect(getStockfishBestMoveMock).not.toHaveBeenCalled();
   });
 
@@ -189,7 +203,7 @@ describe('computer player', () => {
       ...activeChess,
       status: 'checkmate'
     };
-    let triviaGame = submitReplayTriviaQuestions(createReplayTriviaGame('trivia-1', 'host-user', COMPUTER_PLAYER_USER_ID, 0), {
+    let triviaGame = submitReplayTriviaQuestions(createReplayTriviaGame('trivia-1', 'host-user', REPLAY_TRIVIA_COMPUTER_PLAYER_PROFILE.userId, 0), {
       action: 'submitQuestions',
       payload: { questions: [createQuestion()] },
       userId: 'host-user'
@@ -208,8 +222,8 @@ describe('computer player', () => {
     expect(shouldComputerPlayerAct(activeChess, CHESS_COMPUTER_PLAYER_CLUB_PROFILE.userId)).toBe(true);
     expect(shouldComputerPlayerAct(waitingChess, CHESS_COMPUTER_PLAYER_CLUB_PROFILE.userId)).toBe(false);
     expect(shouldComputerPlayerAct(finishedChess, CHESS_COMPUTER_PLAYER_CLUB_PROFILE.userId)).toBe(false);
-    expect(shouldComputerPlayerAct(triviaGame, COMPUTER_PLAYER_USER_ID, 4_000)).toBe(true);
-    expect(shouldComputerPlayerAct(triviaGame, COMPUTER_PLAYER_USER_ID, 15_000)).toBe(false);
+    expect(shouldComputerPlayerAct(triviaGame, REPLAY_TRIVIA_COMPUTER_PLAYER_PROFILE.userId, 4_000)).toBe(true);
+    expect(shouldComputerPlayerAct(triviaGame, REPLAY_TRIVIA_COMPUTER_PLAYER_PROFILE.userId, 15_000)).toBe(false);
     expect(shouldComputerPlayerAct(bountyGame, BOUNTY_HUNTING_COMPUTER_PLAYER_PROFILE.userId, 2_000)).toBe(true);
     bountyGame = readyBountyHuntingPlayer(bountyGame, BOUNTY_HUNTING_COMPUTER_PLAYER_PROFILE.userId, 2_000);
     expect(shouldComputerPlayerAct(bountyGame, BOUNTY_HUNTING_COMPUTER_PLAYER_PROFILE.userId, 2_500)).toBe(false);
@@ -228,7 +242,7 @@ describe('computer player', () => {
     expect(shouldComputerPlayerAct({
       gameId: 'unknown-1',
       gameType: 'unknown-game',
-      players: { host: COMPUTER_PLAYER_USER_ID },
+      players: { host: REPLAY_TRIVIA_COMPUTER_PLAYER_PROFILE.userId },
       status: 'active'
     } as unknown as GameRecord)).toBe(false);
     expect(shouldComputerPlayerAct({
@@ -246,6 +260,27 @@ describe('computer player', () => {
   });
 
   it('computes deterministic computer action delays by game type', () => {
+    let bountyWitnessGame = submitBountyHunting(
+      createBountyHuntingGame('bounty-witness-1', 'host-user', BOUNTY_HUNTING_COMPUTER_PLAYER_PROFILE.userId, 0),
+      {
+        action: 'submitBounties',
+        payload: { bounties: createBounties() },
+        userId: 'host-user'
+      },
+      1_000
+    );
+    bountyWitnessGame = readyBountyHuntingPlayer(bountyWitnessGame, BOUNTY_HUNTING_COMPUTER_PLAYER_PROFILE.userId, 2_000);
+    bountyWitnessGame = readyBountyHuntingPlayer(bountyWitnessGame, 'host-user', 2_000);
+    bountyWitnessGame = startBountyHuntingRound(bountyWitnessGame, 5_000);
+    bountyWitnessGame = observeBountyHuntingMessage(bountyWitnessGame, {
+      action: 'observeBountyMessage',
+      payload: {
+        bountyIds: ['question'],
+        messageId: 'msg-question-1'
+      },
+      userId: 'host-user'
+    }, 6_000);
+
     expect(getComputerPlayerActionDelayMs({
       gameId: 'chess-1',
       gameType: 'chess',
@@ -266,6 +301,11 @@ describe('computer player', () => {
       gameType: 'bounty-hunting',
       status: 'active'
     }, () => 0.5)).toBe(2_400);
+    expect(getComputerPlayerActionDelayMs(
+      bountyWitnessGame,
+      () => 0.5,
+      BOUNTY_HUNTING_COMPUTER_PLAYER_PROFILE.userId
+    )).toBe(120);
     expect(getComputerPlayerActionDelayMs({
       gameId: 'unknown-1',
       gameType: 'unknown-game',
@@ -274,9 +314,9 @@ describe('computer player', () => {
   });
 
   it('dispatches computer actions for supported game types', async () => {
-    const chessGame = createChessGame('chess-1', COMPUTER_PLAYER_USER_ID, 'human-user');
+    const chessGame = createChessGame('chess-1', CHESS_COMPUTER_PLAYER_CLUB_PROFILE.userId, 'human-user');
     const stockfish = vi.fn(async () => createStockfishResult({ from: 'g1', to: 'f3' }));
-    let triviaGame = submitReplayTriviaQuestions(createReplayTriviaGame('trivia-1', 'host-user', COMPUTER_PLAYER_USER_ID, 0), {
+    let triviaGame = submitReplayTriviaQuestions(createReplayTriviaGame('trivia-1', 'host-user', REPLAY_TRIVIA_COMPUTER_PLAYER_PROFILE.userId, 0), {
       action: 'submitQuestions',
       payload: { questions: [createQuestion()] },
       userId: 'host-user'
@@ -293,7 +333,8 @@ describe('computer player', () => {
     );
 
     await expect(createComputerPlayerAction(chessGame, {
-      getStockfishBestMove: stockfish
+      getStockfishBestMove: stockfish,
+      userId: CHESS_COMPUTER_PLAYER_CLUB_PROFILE.userId
     })).resolves.toMatchObject({
       action: 'move',
       payload: {
@@ -307,7 +348,7 @@ describe('computer player', () => {
     })).toEqual({
       action: 'answer',
       payload: { choiceIndex: 0 },
-      userId: COMPUTER_PLAYER_USER_ID
+      userId: REPLAY_TRIVIA_COMPUTER_PLAYER_PROFILE.userId
     });
     expect(createComputerPlayerAction(bountyGame, {
       userId: BOUNTY_HUNTING_COMPUTER_PLAYER_PROFILE.userId
@@ -336,6 +377,42 @@ describe('computer player', () => {
     }, 6_000);
     expect(createComputerPlayerAction(bountyGame, {
       now: 7_000,
+      random: () => 0.1,
+      userId: BOUNTY_HUNTING_COMPUTER_PLAYER_PROFILE.userId
+    })).toEqual({
+      action: 'observeBountyMessage',
+      payload: {
+        observations: [
+          {
+            bountyIds: ['question'],
+            messageId: 'msg-question-1'
+          },
+          {
+            bountyIds: ['verified'],
+            messageId: 'msg-verified-1'
+          }
+        ]
+      },
+      userId: BOUNTY_HUNTING_COMPUTER_PLAYER_PROFILE.userId
+    });
+    bountyGame = observeBountyHuntingMessage(bountyGame, {
+      action: 'observeBountyMessage',
+      payload: {
+        observations: [
+          {
+            bountyIds: ['question'],
+            messageId: 'msg-question-1'
+          },
+          {
+            bountyIds: ['verified'],
+            messageId: 'msg-verified-1'
+          }
+        ]
+      },
+      userId: BOUNTY_HUNTING_COMPUTER_PLAYER_PROFILE.userId
+    }, 7_100);
+    expect(createComputerPlayerAction(bountyGame, {
+      now: 7_200,
       random: () => 0.1,
       userId: BOUNTY_HUNTING_COMPUTER_PLAYER_PROFILE.userId
     })).toEqual({
@@ -382,6 +459,22 @@ describe('computer player', () => {
       },
       userId: 'host-user'
     }, 6_000);
+    game = observeBountyHuntingMessage(game, {
+      action: 'observeBountyMessage',
+      payload: {
+        observations: [
+          {
+            bountyIds: ['question'],
+            messageId: 'msg-question-1'
+          },
+          {
+            bountyIds: ['verified'],
+            messageId: 'msg-verified-1'
+          }
+        ]
+      },
+      userId: BOUNTY_HUNTING_COMPUTER_PLAYER_PROFILE.userId
+    }, 6_100);
 
     const randomValues = [0.9, 0];
     expect(createBountyHuntingBotAction(
@@ -429,7 +522,7 @@ describe('computer player', () => {
   });
 
   it('recognizes every built-in computer player profile user id', () => {
-    expect(isComputerPlayerUserId(COMPUTER_PLAYER_USER_ID)).toBe(true);
+    expect(isComputerPlayerUserId(REPLAY_TRIVIA_COMPUTER_PLAYER_PROFILE.userId)).toBe(true);
     expect(isComputerPlayerUserId(BOUNTY_HUNTING_COMPUTER_PLAYER_PROFILE.userId)).toBe(true);
     expect(isComputerPlayerUserId(CHESS_COMPUTER_PLAYER_CLUB_PROFILE.userId)).toBe(true);
     expect(isComputerPlayerUserId('human-user')).toBe(false);
