@@ -51,7 +51,10 @@
     {
       "resources": [
         "games/*/*.mp3",
+        "games/*/*.otf",
         "games/*/*.png",
+        "games/*/*.ttf",
+        "games/*/*.webp",
         "locales/*.json"
       ],
       "matches": [

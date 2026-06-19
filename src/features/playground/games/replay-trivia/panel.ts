@@ -105,8 +105,8 @@ export function openReplayTriviaGamePanel(
     preloadPaths: REPLAY_TRIVIA_SOUND_PATHS,
     signal: listeners.signal
   });
-  const { body, closeButton, statusOverlay, subtitleElement } = shell;
-  closeButton.before(soundController.button);
+  const { body, compactButton, statusOverlay, subtitleElement } = shell;
+  compactButton.before(soundController.button);
   subtitleElement.textContent = getReplayTriviaOpponentLabel(game, currentUserId);
 
   const canvas = ytcqCreateElement('canvas');

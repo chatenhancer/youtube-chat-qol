@@ -5,7 +5,7 @@
  * provide the body content while this shell handles the close button, Escape
  * close behavior, shared status overlay, and drag positioning.
  */
-import { createCloseIcon } from '../../../shared/icons';
+import { createCloseIcon, createExpandIcon, createMinimizeIcon } from '../../../shared/icons';
 import { ytcqCreateElement } from '../../../shared/managed-dom';
 import { createGamePanelStatusOverlay, type GamePanelStatusOverlay } from './panel-feedback';
 
@@ -23,11 +23,21 @@ interface GamePanelShellOptions {
 export interface GamePanelShell {
   body: HTMLElement;
   closeButton: HTMLButtonElement;
+  compactButton: HTMLButtonElement;
   header: HTMLElement;
+  isCompactMode: () => boolean;
   panel: HTMLElement;
+  setCompactMode: (compact: boolean) => void;
+  setCompactModeEnabled: (options: GamePanelShellCompactOptions | null) => void;
   statusOverlay: GamePanelStatusOverlay;
   subtitleElement: HTMLElement;
   titleElement: HTMLElement;
+}
+
+export interface GamePanelShellCompactOptions {
+  compactLabel: string;
+  expandLabel: string;
+  onChange: (compact: boolean) => void;
 }
 
 export function createGamePanelShell({
@@ -71,8 +81,22 @@ export function createGamePanelShell({
   closeButton.append(createCloseIcon());
   closeButton.addEventListener('click', onClose, { signal });
 
+  let compactMode = false;
+  let compactOptions: GamePanelShellCompactOptions | null = null;
+  const compactButton = ytcqCreateElement('button');
+  compactButton.type = 'button';
+  compactButton.className = `ytcq-game-panel-compact-toggle ${classNamePrefix}-compact-toggle`;
+  compactButton.hidden = true;
+  compactButton.addEventListener('click', () => {
+    if (!compactOptions) return;
+    setCompactMode(!compactMode);
+    compactOptions.onChange(compactMode);
+    clampGamePanelPosition(panel);
+  }, { signal });
+  syncCompactButton();
+
   titleWrap.append(titleElement, subtitleElement);
-  header.append(iconWrap, titleWrap, closeButton);
+  header.append(iconWrap, titleWrap, compactButton, closeButton);
 
   const body = ytcqCreateElement('div');
   body.className = `${classNamePrefix}-body`;
@@ -90,11 +114,43 @@ export function createGamePanelShell({
     signal
   });
 
+  function setCompactModeEnabled(options: GamePanelShellCompactOptions | null): void {
+    compactOptions = options;
+    compactButton.hidden = !options;
+    panel.classList.toggle('ytcq-game-panel-has-compact', Boolean(options));
+    if (!options) {
+      compactMode = false;
+      panel.classList.remove('ytcq-game-panel-compact');
+    }
+    syncCompactButton();
+  }
+
+  function setCompactMode(compact: boolean): void {
+    anchorGamePanelPosition(panel);
+    compactMode = compact;
+    panel.classList.toggle('ytcq-game-panel-compact', compactMode);
+    syncCompactButton();
+  }
+
+  function syncCompactButton(): void {
+    const label = compactMode
+      ? compactOptions?.expandLabel || ''
+      : compactOptions?.compactLabel || '';
+    compactButton.setAttribute('aria-label', label);
+    compactButton.setAttribute('aria-pressed', String(compactMode));
+    compactButton.title = label;
+    compactButton.replaceChildren(compactMode ? createExpandIcon() : createMinimizeIcon());
+  }
+
   return {
     body,
     closeButton,
+    compactButton,
     header,
+    isCompactMode: () => compactMode,
     panel,
+    setCompactMode,
+    setCompactModeEnabled,
     statusOverlay,
     subtitleElement,
     titleElement
@@ -156,4 +212,24 @@ function wireGamePanelShellDrag({
   document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') onClose();
   }, { capture: true, signal });
+}
+
+function anchorGamePanelPosition(panel: HTMLElement): void {
+  const rect = panel.getBoundingClientRect();
+  panel.style.left = `${Math.round(rect.left)}px`;
+  panel.style.top = `${Math.round(rect.top)}px`;
+  panel.style.right = 'auto';
+  panel.style.bottom = 'auto';
+}
+
+function clampGamePanelPosition(panel: HTMLElement): void {
+  const rect = panel.getBoundingClientRect();
+  const maxLeft = Math.max(8, window.innerWidth - rect.width - 8);
+  const maxTop = Math.max(8, window.innerHeight - rect.height - 8);
+  const left = Math.min(maxLeft, Math.max(8, rect.left));
+  const top = Math.min(maxTop, Math.max(8, rect.top));
+  panel.style.left = `${Math.round(left)}px`;
+  panel.style.top = `${Math.round(top)}px`;
+  panel.style.right = 'auto';
+  panel.style.bottom = 'auto';
 }

@@ -230,7 +230,7 @@ function createActiveGameRow(game: PublicGame, currentUserId: string, actions: G
   const actionsWrap = ytcqCreateElement('span');
   actionsWrap.className = 'ytcq-games-row-actions';
   const isPanelOpen = getActiveGamePanelId() === game.gameId;
-  const togglePanel = createSmallActionButton(t(isPanelOpen ? 'gamesMinimize' : 'gamesResume'));
+  const togglePanel = createSmallActionButton(t(isPanelOpen ? 'gamesHide' : 'gamesResume'));
   togglePanel.addEventListener('click', () => actions.onToggleActiveGame(game));
   const leave = createSmallActionButton(t('gamesLeave'));
   leave.addEventListener('click', () => actions.onLeaveGame(game));

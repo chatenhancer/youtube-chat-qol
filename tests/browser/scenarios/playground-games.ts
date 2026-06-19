@@ -35,7 +35,8 @@ export const playgroundChessInviteAndMoveScenario: BrowserScenario = async ({ ch
     await expect(card.locator('.ytcq-profile-card-title')).toHaveText('Games');
     await expect(card.locator('.ytcq-profile-card-subtitle')).toHaveText('2 players online');
     await expect(card.locator('.ytcq-games-availability-toggle')).toHaveAttribute('aria-checked', 'true');
-    await expect(card.locator('.ytcq-games-game-label')).toHaveText(['Chess', 'HELP-A-FRIEND! Trivia']);
+    await expect(card.locator('.ytcq-games-game-label')).toHaveText(['Chess', 'The Wild Wild Chat', 'HELP-A-FRIEND! Trivia']);
+    await expect(getGameCard(card, 'The Wild Wild Chat')).toHaveAttribute('aria-disabled', 'false');
     await expect(getGameCard(card, 'HELP-A-FRIEND! Trivia')).toHaveAttribute('aria-disabled', 'true');
 
     await getGameCard(card, 'Chess').click();
@@ -88,7 +89,8 @@ export const playgroundReplayTriviaInviteScenario: BrowserScenario = async ({ ch
 
     const card = chat.locator('.ytcq-games-card');
     await expect(card).toBeVisible();
-    await expect(card.locator('.ytcq-games-game-label')).toHaveText(['Chess', 'HELP-A-FRIEND! Trivia']);
+    await expect(card.locator('.ytcq-games-game-label')).toHaveText(['Chess', 'The Wild Wild Chat', 'HELP-A-FRIEND! Trivia']);
+    await expect(getGameCard(card, 'The Wild Wild Chat')).toHaveAttribute('aria-disabled', 'true');
     await expect(getGameCard(card, 'HELP-A-FRIEND! Trivia')).toHaveAttribute('aria-disabled', 'false');
 
     await getGameCard(card, 'HELP-A-FRIEND! Trivia').click();

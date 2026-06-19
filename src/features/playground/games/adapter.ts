@@ -16,6 +16,7 @@ export interface GameDefinition {
   id: GameId;
   isPlayable?: () => boolean;
   labelKey: MessageKey;
+  panelTitleKey?: MessageKey;
   renderPreview: (container: HTMLElement) => void;
 }
 
@@ -34,6 +35,7 @@ export interface GamePanelMountContext {
 export interface GamePanelMount {
   close(options?: { notify?: boolean }): void;
   gameId: string;
+  setCompactMode?(compact: boolean): void;
 }
 
 export interface GamePanelUpdateContext {
