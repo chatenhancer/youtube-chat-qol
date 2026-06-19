@@ -468,6 +468,50 @@ describe('Replay Trivia panel', () => {
     ]));
   });
 
+  it('highlights only the marked word in the pick answer prompt', async () => {
+    const fillTextCalls: Array<{ fillStyle: string; text: string }> = [];
+    openReplayTriviaGamePanel(createReplayTriviaGame({ status: 'question' }), 'host-user', vi.fn());
+    context.fillText.mockImplementation((text) => {
+      fillTextCalls.push({
+        fillStyle: context.fillStyle,
+        text: String(text)
+      });
+    });
+    context.moveTo.mockClear();
+    context.lineTo.mockClear();
+
+    setNow(ANSWER_UI_DELAY_MS + 25);
+    updateReplayTriviaGamePanel(createReplayTriviaGame({ status: 'question' }), 'host-user');
+
+    expect(fillTextCalls).toEqual(expect.arrayContaining([
+      expect.objectContaining({ fillStyle: '#111111', text: 'Pick your ' }),
+      expect.objectContaining({ fillStyle: '#2290FF', text: 'answer' }),
+      expect.objectContaining({ fillStyle: '#111111', text: '!' })
+    ]));
+    expect(context.moveTo).toHaveBeenCalledWith(12, 7);
+    expect(context.lineTo).toHaveBeenCalledWith(60, 7);
+
+    closeReplayTriviaGamePanel({ notify: false });
+    document.documentElement.lang = 'es';
+    vi.stubGlobal('fetch', vi.fn(async (input: RequestInfo | URL) => ({
+      json: vi.fn(async () => String(input).endsWith('/es.json') ? esCatalog : {}),
+      ok: String(input).endsWith('/es.json')
+    }) as unknown as Response));
+    await initUiLocaleFromDocument();
+    fillTextCalls.length = 0;
+
+    setNow(1);
+    openReplayTriviaGamePanel(createReplayTriviaGame({ status: 'question' }), 'host-user', vi.fn());
+    setNow(ANSWER_UI_DELAY_MS + 25);
+    updateReplayTriviaGamePanel(createReplayTriviaGame({ status: 'question' }), 'host-user');
+
+    expect(fillTextCalls).toEqual(expect.arrayContaining([
+      expect.objectContaining({ fillStyle: '#111111', text: '¡Elige tu ' }),
+      expect.objectContaining({ fillStyle: '#2290FF', text: 'respuesta' }),
+      expect.objectContaining({ fillStyle: '#111111', text: '!' })
+    ]));
+  });
+
   it('accepts a keyboard answer once the question UI is ready', () => {
     const onAction = vi.fn();
     openReplayTriviaGamePanel(createReplayTriviaGame({ status: 'question' }), 'host-user', onAction);
