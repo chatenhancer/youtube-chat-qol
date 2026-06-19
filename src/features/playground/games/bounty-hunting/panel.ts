@@ -7,7 +7,12 @@
  */
 import { registerFeatureLifecycle } from '../../../../content/lifecycle';
 import { isCurrentUserAuthorName } from '../../../mention-detection';
-import { t, type MessageKey } from '../../../../shared/i18n';
+import {
+  t,
+  tWithEnglishFallbackWhenUnsupported,
+  type MessageKey,
+  type MessageParams
+} from '../../../../shared/i18n';
 import { ytcqCreateElement } from '../../../../shared/managed-dom';
 import { drawPlaygroundCanvasAvatar } from '../../../../shared/playground/avatar';
 import {
@@ -46,6 +51,11 @@ import {
   getBountyHuntingObservedMessage,
   getBountyHuntingTopFanAuthorKeyFromParticipant
 } from './candidates';
+import {
+  canRenderBountyHuntingBarnumText,
+  canRenderBountyHuntingBartleText,
+  canRenderBountyHuntingTexMexText
+} from './font-support';
 import type {
   PublicBountyHuntingGame,
   Rect,
@@ -150,6 +160,18 @@ const SHADOW = 'rgba(0, 0, 0, 0.28)';
 const BARNUM_STACK = `"${BOUNTY_HUNTING_FONT_BARNUM}", Georgia, serif`;
 const BARTLE_STACK = `"${BOUNTY_HUNTING_FONT_BARTLE}", Impact, sans-serif`;
 const TEX_MEX_STACK = `"${BOUNTY_HUNTING_FONT_TEX_MEX}", Impact, sans-serif`;
+
+function tBountyHuntingBarnum(key: MessageKey, params: MessageParams = {}): string {
+  return tWithEnglishFallbackWhenUnsupported(key, canRenderBountyHuntingBarnumText, params);
+}
+
+function tBountyHuntingBartle(key: MessageKey, params: MessageParams = {}): string {
+  return tWithEnglishFallbackWhenUnsupported(key, canRenderBountyHuntingBartleText, params);
+}
+
+function tBountyHuntingTexMex(key: MessageKey, params: MessageParams = {}): string {
+  return tWithEnglishFallbackWhenUnsupported(key, canRenderBountyHuntingTexMexText, params);
+}
 
 let activeBountyHuntingPanel: BountyHuntingPanelRuntime | null = null;
 let activeBountyHuntingFallback: BountyHuntingFallbackRuntime | null = null;
@@ -757,7 +779,7 @@ function drawBountyHuntingCompact(runtime: BountyHuntingPanelRuntime, now: numbe
   context.textAlign = 'left';
   context.fillStyle = PAPER_TEXT;
   context.font = `700 16px ${BARNUM_STACK}`;
-  drawFittedText(context, t('gamesBountyHuntingThem'), 52, 24, 63, 16, {
+  drawFittedText(context, tBountyHuntingBarnum('gamesBountyHuntingThem'), 52, 24, 63, 16, {
     fontStack: BARNUM_STACK,
     weight: 700
   });
@@ -771,7 +793,7 @@ function drawBountyHuntingCompact(runtime: BountyHuntingPanelRuntime, now: numbe
   context.textAlign = 'right';
   context.fillStyle = PAPER_TEXT;
   context.font = `700 16px ${BARNUM_STACK}`;
-  drawFittedText(context, t('gamesBountyHuntingYou'), 396, 24, 63, 16, {
+  drawFittedText(context, tBountyHuntingBarnum('gamesBountyHuntingYou'), 396, 24, 63, 16, {
     align: 'right',
     fontStack: BARNUM_STACK,
     weight: 700
@@ -813,7 +835,7 @@ function drawBountyHuntingCompactStatus(runtime: BountyHuntingPanelRuntime, now:
       font: `400 32px ${TEX_MEX_STACK}`,
       shadow: false
     });
-    drawCenteredFittedText(context, t('gamesBountyHuntingStarting'), 224, 49, 94, {
+    drawCenteredFittedText(context, tBountyHuntingBarnum('gamesBountyHuntingStarting'), 224, 49, 94, {
       color: PAPER_TEXT,
       font: `700 10px ${BARNUM_STACK}`,
       minFontSize: 8,
@@ -823,7 +845,7 @@ function drawBountyHuntingCompactStatus(runtime: BountyHuntingPanelRuntime, now:
   }
 
   if (game.status === 'preparing') {
-    drawCenteredFittedText(context, t('gamesBountyHuntingLoadingStatus'), 224, 32, 116, {
+    drawCenteredFittedText(context, tBountyHuntingBartle('gamesBountyHuntingLoadingStatus'), 224, 32, 116, {
       color: PAPER_TEXT,
       font: `800 18px ${BARTLE_STACK}`,
       minFontSize: 11,
@@ -833,7 +855,7 @@ function drawBountyHuntingCompactStatus(runtime: BountyHuntingPanelRuntime, now:
   }
 
   if (game.status === 'roundOver') {
-    drawCenteredFittedText(context, t('gamesBountyHuntingRoundOver'), 224, 32, 150, {
+    drawCenteredFittedText(context, tBountyHuntingBarnum('gamesBountyHuntingRoundOver'), 224, 32, 150, {
       color: PAPER_TEXT,
       font: `700 22px ${BARNUM_STACK}`,
       minFontSize: 13,
@@ -877,7 +899,7 @@ function drawBountyHuntingCompactStatus(runtime: BountyHuntingPanelRuntime, now:
     font: `800 ${timerFontSize}px ${BARTLE_STACK}`,
     shadow: false
   });
-  drawCenteredFittedText(context, t('gamesBountyHuntingTimeRemaining'), 224, 46, 122, {
+  drawCenteredFittedText(context, tBountyHuntingBarnum('gamesBountyHuntingTimeRemaining'), 224, 46, 122, {
     color: PAPER_TEXT,
     font: `700 10px ${BARNUM_STACK}`,
     minFontSize: 8,
@@ -912,7 +934,7 @@ function drawBountyHuntingCompactReadyButton(runtime: BountyHuntingPanelRuntime,
 
   drawCenteredText(
     context,
-    t('gamesBountyHuntingReady'),
+    tBountyHuntingBartle('gamesBountyHuntingReady'),
     COMPACT_READY_BUTTON_RECT.x + COMPACT_READY_BUTTON_RECT.width / 2,
     COMPACT_READY_BUTTON_RECT.y + COMPACT_READY_BUTTON_RECT.height / 2,
     {
@@ -1007,7 +1029,7 @@ function drawBountyHuntingCompactBountyStamp(
         COMPACT_BOUNTY_CLAIMED_STAMP_HEIGHT
       );
     } else {
-      drawCompactBountyStampFallback(context, t('gamesBountyHuntingClaimed'), -24, -8, '#a8302d');
+      drawCompactBountyStampFallback(context, tBountyHuntingBarnum('gamesBountyHuntingClaimed'), -24, -8, '#a8302d');
     }
   } else if (assets.bountyOpenStamp && shouldUseBountyHuntingOpenStampAsset()) {
     context.drawImage(
@@ -1018,7 +1040,13 @@ function drawBountyHuntingCompactBountyStamp(
       COMPACT_BOUNTY_OPEN_STAMP_HEIGHT
     );
   } else {
-    drawCompactBountyStampFallback(context, t('gamesBountyHuntingOpen'), x + COMPACT_BOUNTY_CHIP_WIDTH - 39, y + 6, GREEN_STAMP);
+    drawCompactBountyStampFallback(
+      context,
+      tBountyHuntingBarnum('gamesBountyHuntingOpen'),
+      x + COMPACT_BOUNTY_CHIP_WIDTH - 39,
+      y + 6,
+      GREEN_STAMP
+    );
   }
   context.restore();
 }
@@ -1131,7 +1159,8 @@ function drawBountyHuntingLoadingLogoFallback(context: CanvasRenderingContext2D)
 
 function drawBountyHuntingWanted(runtime: BountyHuntingPanelRuntime, now: number): void {
   drawBountyHuntingPaper(runtime);
-  drawBountyHuntingTitle(runtime, t('gamesBountyHuntingWanted'), 18, 90, TEX_MEX_STACK, {
+  const title = tBountyHuntingTexMex('gamesBountyHuntingWanted');
+  drawBountyHuntingTitle(runtime, title, 18, 90, TEX_MEX_STACK, {
     decorOffsetY: 7,
     maxTextWidth: 230,
     minFontSize: 42,
@@ -1142,10 +1171,15 @@ function drawBountyHuntingWanted(runtime: BountyHuntingPanelRuntime, now: number
   const displayBounties = getBountyHuntingDisplayBounties(runtime.game.bounties);
   displayBounties.forEach((bounty, index) => drawBountyHuntingBounty(runtime, bounty, index));
   displayBounties.forEach((bounty, index) => drawBountyHuntingBountyClaimAvatar(runtime, bounty, index));
-  drawBountyHuntingActionButton(runtime, t('gamesBountyHuntingReady'), runtime.game.status === 'ready' ? 'ready' : null, {
-    flashAmount: getBountyHuntingReadyButtonFlashAmount(runtime, now),
-    readyStack: true
-  });
+  drawBountyHuntingActionButton(
+    runtime,
+    tBountyHuntingBartle('gamesBountyHuntingReady'),
+    runtime.game.status === 'ready' ? 'ready' : null,
+    {
+      flashAmount: getBountyHuntingReadyButtonFlashAmount(runtime, now),
+      readyStack: true
+    }
+  );
   if (runtime.game.status === 'countdown') drawBountyHuntingCountdown(runtime);
 }
 
@@ -1183,16 +1217,17 @@ function drawBountyHuntingRoundOver(runtime: BountyHuntingPanelRuntime): void {
     drawBountyHuntingPaper(runtime);
   }
 
-  if (assets.roundOverTitle && t('gamesBountyHuntingRoundOver') === 'ROUND OVER') {
+  const title = tBountyHuntingBarnum('gamesBountyHuntingRoundOver');
+  if (assets.roundOverTitle && title === 'ROUND OVER') {
     context.drawImage(assets.roundOverTitle, 33, 64, 382, 296);
   } else {
-    drawCenteredFittedText(context, t('gamesBountyHuntingRoundOver'), 224, 205, 330, {
+    drawCenteredFittedText(context, title, 224, 205, 330, {
       color: '#f6deb2',
       font: `700 72px ${BARNUM_STACK}`,
       minFontSize: 36
     });
   }
-  drawBountyHuntingActionButton(runtime, t('gamesBountyHuntingLoadingStatus'), null, {
+  drawBountyHuntingActionButton(runtime, tBountyHuntingBartle('gamesBountyHuntingLoadingStatus'), null, {
     darker: true,
     labelColor: ROUND_OVER_BUTTON_LABEL_COLOR,
     y: ROUND_OVER_BUTTON_Y
@@ -1202,7 +1237,8 @@ function drawBountyHuntingRoundOver(runtime: BountyHuntingPanelRuntime): void {
 function drawBountyHuntingLedger(runtime: BountyHuntingPanelRuntime): void {
   const { context } = runtime;
   drawBountyHuntingPaper(runtime);
-  drawBountyHuntingTitle(runtime, t('gamesBountyHuntingLedger'), LEDGER_TITLE_Y, LEDGER_TITLE_FONT_SIZE, TEX_MEX_STACK, {
+  const title = tBountyHuntingTexMex('gamesBountyHuntingLedger');
+  drawBountyHuntingTitle(runtime, title, LEDGER_TITLE_Y, LEDGER_TITLE_FONT_SIZE, TEX_MEX_STACK, {
     decorOffsetY: 7,
     maxTextWidth: 230,
     minFontSize: 30,
@@ -1214,20 +1250,34 @@ function drawBountyHuntingLedger(runtime: BountyHuntingPanelRuntime): void {
   context.font = `700 13px ${BARNUM_STACK}`;
   context.textAlign = 'center';
   context.textBaseline = 'middle';
-  drawFittedTextBlock(context, t('gamesBountyHuntingBountiesClaimed'), LEDGER_HEADER_X, LEDGER_HEADER_TOP_Y, 74, {
-    color: RED_TEXT,
-    font: `700 13px ${BARNUM_STACK}`,
-    lineHeight: 20,
-    maxLines: 2,
-    minFontSize: 9
-  });
-  drawFittedTextBlock(context, t('gamesBountyHuntingMoneyEarned'), LEDGER_MONEY_X, LEDGER_HEADER_TOP_Y, 74, {
-    color: RED_TEXT,
-    font: `700 13px ${BARNUM_STACK}`,
-    lineHeight: 20,
-    maxLines: 2,
-    minFontSize: 9
-  });
+  drawFittedTextBlock(
+    context,
+    tBountyHuntingBarnum('gamesBountyHuntingBountiesClaimed'),
+    LEDGER_HEADER_X,
+    LEDGER_HEADER_TOP_Y,
+    74,
+    {
+      color: RED_TEXT,
+      font: `700 13px ${BARNUM_STACK}`,
+      lineHeight: 20,
+      maxLines: 2,
+      minFontSize: 9
+    }
+  );
+  drawFittedTextBlock(
+    context,
+    tBountyHuntingBarnum('gamesBountyHuntingMoneyEarned'),
+    LEDGER_MONEY_X,
+    LEDGER_HEADER_TOP_Y,
+    74,
+    {
+      color: RED_TEXT,
+      font: `700 13px ${BARNUM_STACK}`,
+      lineHeight: 20,
+      maxLines: 2,
+      minFontSize: 9
+    }
+  );
 
   const rows = getBountyHuntingLedgerRows(runtime);
   rows.forEach((row, index) => {
@@ -1264,7 +1314,12 @@ function drawBountyHuntingLedger(runtime: BountyHuntingPanelRuntime): void {
     minFontSize: 18
   });
 
-  drawBountyHuntingActionButton(runtime, t('gamesBountyHuntingClose'), 'close', { y: LEDGER_CLOSE_BUTTON_Y });
+  drawBountyHuntingActionButton(
+    runtime,
+    tBountyHuntingBartle('gamesBountyHuntingClose'),
+    'close',
+    { y: LEDGER_CLOSE_BUTTON_Y }
+  );
 }
 
 function drawBountyHuntingPaper(runtime: BountyHuntingPanelRuntime): void {
@@ -1348,10 +1403,18 @@ function drawBountyHuntingLiveScore(runtime: BountyHuntingPanelRuntime, now: num
   context.textBaseline = 'middle';
   context.fillStyle = PAPER_TEXT;
   context.font = `700 18px ${BARNUM_STACK}`;
-  drawFittedText(context, t('gamesBountyHuntingThem'), LIVE_SCORE_LEFT_TEXT_X, LIVE_SCORE_NAME_Y + offsetY, 75, 18, {
-    fontStack: BARNUM_STACK,
-    weight: 700
-  });
+  drawFittedText(
+    context,
+    tBountyHuntingBarnum('gamesBountyHuntingThem'),
+    LIVE_SCORE_LEFT_TEXT_X,
+    LIVE_SCORE_NAME_Y + offsetY,
+    75,
+    18,
+    {
+      fontStack: BARNUM_STACK,
+      weight: 700
+    }
+  );
   drawBountyHuntingMoneyText(context, game.scores[opponentRole] || 0, LIVE_SCORE_LEFT_TEXT_X, LIVE_SCORE_MONEY_Y + offsetY, {
     align: 'left',
     amountFont: `1000 20px ${BARNUM_STACK}`,
@@ -1362,11 +1425,19 @@ function drawBountyHuntingLiveScore(runtime: BountyHuntingPanelRuntime, now: num
   context.textAlign = 'right';
   context.fillStyle = PAPER_TEXT;
   context.font = `700 18px ${BARNUM_STACK}`;
-  drawFittedText(context, t('gamesBountyHuntingYou'), LIVE_SCORE_RIGHT_TEXT_X, LIVE_SCORE_NAME_Y + offsetY, 75, 18, {
-    align: 'right',
-    fontStack: BARNUM_STACK,
-    weight: 700
-  });
+  drawFittedText(
+    context,
+    tBountyHuntingBarnum('gamesBountyHuntingYou'),
+    LIVE_SCORE_RIGHT_TEXT_X,
+    LIVE_SCORE_NAME_Y + offsetY,
+    75,
+    18,
+    {
+      align: 'right',
+      fontStack: BARNUM_STACK,
+      weight: 700
+    }
+  );
   drawBountyHuntingMoneyText(context, game.scores[currentRole] || 0, LIVE_SCORE_RIGHT_TEXT_X, LIVE_SCORE_MONEY_Y + offsetY, {
     align: 'right',
     amountFont: `1000 20px ${BARNUM_STACK}`,
@@ -1391,7 +1462,7 @@ function drawBountyHuntingLiveScore(runtime: BountyHuntingPanelRuntime, now: num
   }
   context.fillText(getBountyHuntingTimerText(game), 224, 111 + offsetY);
   context.font = `700 11px ${BARNUM_STACK}`;
-  drawCenteredFittedText(context, t('gamesBountyHuntingTimeRemaining'), 224, 129 + offsetY, 122, {
+  drawCenteredFittedText(context, tBountyHuntingBarnum('gamesBountyHuntingTimeRemaining'), 224, 129 + offsetY, 122, {
     color: context.fillStyle as string,
     font: `700 11px ${BARNUM_STACK}`,
     minFontSize: 8,
@@ -1465,7 +1536,13 @@ function drawOpenStamp(runtime: BountyHuntingPanelRuntime, y: number): void {
     context.drawImage(assets.bountyOpenStamp, 332 + BOUNTY_STAMP_X_OFFSET, y - 11, 70, 62);
     return;
   }
-  drawStampFallback(context, t('gamesBountyHuntingOpen'), 339 + BOUNTY_STAMP_X_OFFSET, y + 6, GREEN_STAMP);
+  drawStampFallback(
+    context,
+    tBountyHuntingBarnum('gamesBountyHuntingOpen'),
+    339 + BOUNTY_STAMP_X_OFFSET,
+    y + 6,
+    GREEN_STAMP
+  );
 }
 
 function drawClaimedStamp(runtime: BountyHuntingPanelRuntime, y: number): void {
@@ -1476,17 +1553,23 @@ function drawClaimedStamp(runtime: BountyHuntingPanelRuntime, y: number): void {
   if (assets.bountyClaimedStamp && shouldUseBountyHuntingClaimedStampAsset()) {
     context.drawImage(assets.bountyClaimedStamp, -30, -23, 60, 46);
   } else {
-    drawStampFallback(context, t('gamesBountyHuntingClaimed'), -31, -13, '#b7312d');
+    drawStampFallback(
+      context,
+      tBountyHuntingBarnum('gamesBountyHuntingClaimed'),
+      -31,
+      -13,
+      '#b7312d'
+    );
   }
   context.restore();
 }
 
 function shouldUseBountyHuntingOpenStampAsset(): boolean {
-  return t('gamesBountyHuntingOpen') === 'OPEN';
+  return tBountyHuntingBarnum('gamesBountyHuntingOpen') === 'OPEN';
 }
 
 function shouldUseBountyHuntingClaimedStampAsset(): boolean {
-  return t('gamesBountyHuntingClaimed') === 'CLAIMED';
+  return tBountyHuntingBarnum('gamesBountyHuntingClaimed') === 'CLAIMED';
 }
 
 function drawStampFallback(
@@ -1967,14 +2050,14 @@ function getBountyHuntingLedgerRows(runtime: BountyHuntingPanelRuntime): Array<{
     {
       claims: getBountyHuntingRoleClaimCount(runtime.game, currentRole),
       isCurrentUser: true,
-      label: getBountyHuntingEmphasisText(t('gamesBountyHuntingYou')),
+      label: getBountyHuntingEmphasisText(tBountyHuntingBarnum('gamesBountyHuntingYou')),
       money: runtime.game.scores[currentRole] || 0,
       role: currentRole
     },
     {
       claims: getBountyHuntingRoleClaimCount(runtime.game, opponentRole),
       isCurrentUser: false,
-      label: getBountyHuntingEmphasisText(t('gamesBountyHuntingThem')),
+      label: getBountyHuntingEmphasisText(tBountyHuntingBarnum('gamesBountyHuntingThem')),
       money: runtime.game.scores[opponentRole] || 0,
       role: opponentRole
     }
@@ -1982,17 +2065,17 @@ function getBountyHuntingLedgerRows(runtime: BountyHuntingPanelRuntime): Array<{
 }
 
 function getBountyHuntingWinnerLabel(runtime: BountyHuntingPanelRuntime): string {
-  let label = t('gamesBountyHuntingTie');
+  let label = tBountyHuntingBarnum('gamesBountyHuntingTie');
   if (runtime.game.winnerUserId) {
     label = runtime.game.winnerUserId === runtime.currentUserId
-      ? t('gamesBountyHuntingYou')
-      : t('gamesBountyHuntingThem');
+      ? tBountyHuntingBarnum('gamesBountyHuntingYou')
+      : tBountyHuntingBarnum('gamesBountyHuntingThem');
   }
   return getBountyHuntingEmphasisText(label);
 }
 
 function getBountyHuntingWinnerText(runtime: BountyHuntingPanelRuntime): string {
-  return t('gamesBountyHuntingWinner', {
+  return tBountyHuntingBarnum('gamesBountyHuntingWinner', {
     winner: getBountyHuntingWinnerLabel(runtime)
   });
 }
