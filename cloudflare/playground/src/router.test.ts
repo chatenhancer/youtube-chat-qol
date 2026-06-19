@@ -34,7 +34,7 @@ describe('playground router', () => {
         message: 'Stream key must be a YouTube-style video ID.'
       }
     });
-    expect(console.warn).toHaveBeenCalledWith('[Chat Enhancer Playground] invalid_stream_key', expect.objectContaining({
+    expect(console.warn).toHaveBeenCalledWith('[playground] invalid_stream_key', expect.objectContaining({
       endpoint: 'snapshot',
       errorMessage: 'Stream key must be a YouTube-style video ID.',
       errorType: 'ProtocolError',

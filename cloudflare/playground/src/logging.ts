@@ -2,7 +2,7 @@ export type PlaygroundLogLevel = 'error' | 'info' | 'warn';
 export type PlaygroundLogValue = boolean | number | string | undefined;
 export type PlaygroundLogDetails = Record<string, PlaygroundLogValue>;
 
-const LOG_PREFIX = '[Chat Enhancer Playground]';
+const LOG_PREFIX = '[playground]';
 const MAX_LOG_ERROR_MESSAGE_LENGTH = 500;
 
 export function logPlaygroundEvent(
