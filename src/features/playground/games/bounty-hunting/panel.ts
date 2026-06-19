@@ -190,7 +190,7 @@ export function openBountyHuntingGamePanel(
 
   const canvas = ytcqCreateElement('canvas');
   canvas.className = 'ytcq-bounty-hunting-canvas';
-  canvas.setAttribute('aria-label', t('gamesBountyHuntingPanelTitle'));
+  canvas.setAttribute('aria-label', t('gamesBountyHunting'));
   canvas.setAttribute('role', 'application');
   canvas.tabIndex = 0;
   body.append(canvas);

@@ -134,7 +134,7 @@ export function openSupportedGamePanel(
   closeActiveGamePanel({ notify: false });
   const { adapter, definition } = enabledGame;
   const shellController = new AbortController();
-  const title = t(definition.panelTitleKey || definition.labelKey);
+  const title = t(definition.labelKey);
   const shell = createGamePanelShell({
     ariaLabel: title,
     classNamePrefix: definition.classNamePrefix,

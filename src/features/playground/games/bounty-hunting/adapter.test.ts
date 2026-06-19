@@ -49,9 +49,9 @@ describe('Bounty Hunting game adapter', () => {
     expect(panelMock.updateBountyHuntingGamePanel).toHaveBeenCalledWith(game, 'host-user');
   });
 
-  it('uses the full game label and short panel title keys', () => {
+  it('uses one game label key for lobby and panel surfaces', () => {
     expect(bountyHuntingGameDefinition.labelKey).toBe('gamesBountyHunting');
-    expect(bountyHuntingGameDefinition.panelTitleKey).toBe('gamesBountyHuntingPanelTitle');
+    expect('panelTitleKey' in bountyHuntingGameDefinition).toBe(false);
   });
 });
 

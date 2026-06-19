@@ -528,6 +528,7 @@ describe('playground games header button', () => {
 
     getActionButton('Resume').click();
     expect(document.querySelector('.ytcq-bounty-hunting-game-panel')).not.toBeNull();
+    expect(document.querySelector('.ytcq-bounty-hunting-game-title')?.textContent).toBe('The Wild Wild Chat');
 
     document.querySelector<HTMLButtonElement>('.ytcq-bounty-hunting-game-compact-toggle')!.click();
     expect(document.querySelector('.ytcq-bounty-hunting-game-panel')?.classList.contains('ytcq-game-panel-compact')).toBe(true);
