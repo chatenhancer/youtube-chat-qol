@@ -399,7 +399,7 @@
       "message": "提前试用实验功能。部分功能可能会连接到 chatenhancer.com 才能工作。"
     },
     "playgroundProfile": {
-      "message": "你的个人资料"
+      "message": "Your Playground identity"
     },
     "playgroundWins": {
       "message": "胜利"

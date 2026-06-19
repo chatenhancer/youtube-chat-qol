@@ -399,7 +399,7 @@
       "message": "実験的な機能を早めに試せます。一部は動作のために chatenhancer.com に接続する場合があります。"
     },
     "playgroundProfile": {
-      "message": "あなたのプロフィール"
+      "message": "Your Playground identity"
     },
     "playgroundWins": {
       "message": "勝利"
