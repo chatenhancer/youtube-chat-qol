@@ -156,6 +156,28 @@ describe('runtime i18n', () => {
     expect(i18n.t('unreadMessages', { count: 3 })).toBe('3 new messages');
   });
 
+  it('falls back to formatted English when caller text support rejects the localized message', async () => {
+    document.documentElement.lang = 'fr';
+    const i18n = await import('./i18n');
+
+    await i18n.initUiLocaleFromDocument();
+
+    expect(i18n.t('gamesBountyHuntingWanted')).toBe('RECHERCHÉ');
+    expect(i18n.tWithEnglishFallbackWhenUnsupported(
+      'gamesBountyHuntingWanted',
+      (text) => /^[ !$,\-.0-9:?A-Za-z]*$/.test(text)
+    )).toBe('WANTED');
+    expect(i18n.tWithEnglishFallbackWhenUnsupported(
+      'gamesBountyHuntingWanted',
+      () => true
+    )).toBe('RECHERCHÉ');
+    expect(i18n.tWithEnglishFallbackWhenUnsupported(
+      'translateToLanguage',
+      () => false,
+      { language: 'Japanese' }
+    )).toBe('Translate to Japanese.');
+  });
+
   it('returns localized language labels with a static fallback', async () => {
     const i18n = await import('./i18n');
 

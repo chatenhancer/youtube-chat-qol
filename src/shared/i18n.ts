@@ -9,7 +9,7 @@
 import enCatalog from './locales/en.json';
 import { getLanguageLabel } from './languages';
 
-type MessageParams = Record<string, number | string>;
+export type MessageParams = Record<string, number | string>;
 type PluralMessage = { one?: string; other: string; zero?: string };
 type MessageValue = string | PluralMessage;
 type LocaleCatalog = {
@@ -78,6 +78,17 @@ export function getUiLocale(): string {
 export function t(key: MessageKey, params: MessageParams = {}): string {
   const message = LOCALES[currentUiLocale]?.messages[key] || EN_MESSAGES[key];
   return formatMessage(message, params);
+}
+
+export function tWithEnglishFallbackWhenUnsupported(
+  key: MessageKey,
+  supportsText: (text: string) => boolean,
+  params: MessageParams = {}
+): string {
+  const localizedText = t(key, params);
+  return supportsText(localizedText)
+    ? localizedText
+    : formatMessage(EN_MESSAGES[key], params);
 }
 
 export function getLocalizedLanguageLabel(languageCode: string): string {
