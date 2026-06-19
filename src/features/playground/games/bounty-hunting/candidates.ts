@@ -22,10 +22,16 @@ interface BountyCandidate extends BountyHuntingBounty {
 
 interface MessageStats {
   allCaps: number;
+  channelMemberAuthors: number;
+  channelOwnerAuthors: number;
+  customEmojis: number;
   emojiHeavy: number;
   mentions: number;
+  moderatorAuthors: number;
   numbers: number;
+  onlyEmojis: number;
   questions: number;
+  superChats: number;
   topFanAuthors: number;
   verifiedAuthors: number;
 }
@@ -35,6 +41,7 @@ interface BountyHuntingObservedMessageOptions {
 }
 
 const TOP_FAN_LABEL_PATTERN = /\btop\s+(?:fans?|chatters?)\b/i;
+const CUSTOM_EMOJI_SHORTCUT_PATTERN = /^:[^:\s]+:$/;
 
 export function createBountyHuntingBountiesFromMessages(
   messages: readonly BountyHuntingObservedMessage[]
@@ -47,6 +54,42 @@ export function createBountyHuntingBountiesFromMessages(
     createCandidate('question', 75, 'a message that asks a question', { kind: 'question' }, stats.questions),
     createCandidate('mention-user', 125, 'a message that mentions a user', { kind: 'mention' }, stats.mentions),
     createCandidate('has-number', 75, 'a message with a number', { kind: 'number' }, stats.numbers),
+    ...createCandidateWhenObserved(
+      'channel-member',
+      100,
+      'a message from a channel member',
+      { kind: 'channelMemberAuthor' },
+      stats.channelMemberAuthors
+    ),
+    ...createCandidateWhenObserved(
+      'moderator',
+      100,
+      'a message from a moderator',
+      { kind: 'moderatorAuthor' },
+      stats.moderatorAuthors
+    ),
+    ...createCandidateWhenObserved(
+      'channel-owner',
+      125,
+      'a message from the channel owner',
+      { kind: 'channelOwnerAuthor' },
+      stats.channelOwnerAuthors
+    ),
+    ...createCandidateWhenObserved('super-chat', 125, 'a Super Chat', { kind: 'superChat' }, stats.superChats),
+    ...createCandidateWhenObserved(
+      'custom-emoji',
+      75,
+      'a message with a custom emoji',
+      { kind: 'customEmoji' },
+      stats.customEmojis
+    ),
+    ...createCandidateWhenObserved(
+      'only-emojis',
+      100,
+      'a message with only emojis',
+      { kind: 'onlyEmojis' },
+      stats.onlyEmojis
+    ),
     ...(stats.topFanAuthors > 0
       ? [createCandidate(
         'top-chatters',
@@ -75,16 +118,23 @@ export function getBountyHuntingObservedMessage(
   options: BountyHuntingObservedMessageOptions = {}
 ): BountyHuntingObservedMessage | null {
   const text = getMessageText(message);
-  if (!text) return null;
+  const isSuperChat = isBountyHuntingSuperChatMessage(message);
+  if (!text && !isSuperChat) return null;
   const emojiCount = countBountyHuntingMessageEmojis(message);
   const authorKey = getBountyHuntingAuthorKey(getAuthorName(message));
 
   return {
     emojiCount,
     hasAllCaps: isBountyHuntingAllCapsMessage(text),
+    hasCustomEmoji: hasBountyHuntingCustomEmoji(message),
     hasMention: /(^|\s)@[\p{L}\p{N}._-]{2,}/u.test(text),
     hasNumber: /\p{N}/u.test(text),
+    hasOnlyEmojis: isBountyHuntingOnlyEmojiMessage(message, text, emojiCount),
     hasQuestion: /[?？]/u.test(text),
+    isChannelMemberAuthor: hasBountyHuntingAuthorBadge(message, 'member'),
+    isChannelOwnerAuthor: hasBountyHuntingAuthorBadge(message, 'owner'),
+    isModeratorAuthor: hasBountyHuntingAuthorBadge(message, 'moderator'),
+    isSuperChat,
     isTopFanAuthor: Boolean(authorKey && options.topFanAuthorKeys?.has(authorKey)),
     isVerifiedAuthor: isBountyHuntingVerifiedAuthor(message),
     messageId: getBountyHuntingMessageId(message)
@@ -117,10 +167,16 @@ export function findBountyHuntingMatchingBounty(
 function collectBountyHuntingStats(messages: readonly BountyHuntingObservedMessage[]): MessageStats {
   const stats: MessageStats = {
     allCaps: 0,
+    channelMemberAuthors: 0,
+    channelOwnerAuthors: 0,
+    customEmojis: 0,
     emojiHeavy: 0,
     mentions: 0,
+    moderatorAuthors: 0,
     numbers: 0,
+    onlyEmojis: 0,
     questions: 0,
+    superChats: 0,
     topFanAuthors: 0,
     verifiedAuthors: 0
   };
@@ -128,9 +184,15 @@ function collectBountyHuntingStats(messages: readonly BountyHuntingObservedMessa
   messages.forEach((message) => {
     if (message.emojiCount >= 3) stats.emojiHeavy += 1;
     if (message.hasAllCaps) stats.allCaps += 1;
+    if (message.hasCustomEmoji) stats.customEmojis += 1;
     if (message.hasQuestion) stats.questions += 1;
     if (message.hasMention) stats.mentions += 1;
     if (message.hasNumber) stats.numbers += 1;
+    if (message.hasOnlyEmojis) stats.onlyEmojis += 1;
+    if (message.isChannelMemberAuthor) stats.channelMemberAuthors += 1;
+    if (message.isChannelOwnerAuthor) stats.channelOwnerAuthors += 1;
+    if (message.isModeratorAuthor) stats.moderatorAuthors += 1;
+    if (message.isSuperChat) stats.superChats += 1;
     if (message.isTopFanAuthor) stats.topFanAuthors += 1;
     if (message.isVerifiedAuthor) stats.verifiedAuthors += 1;
   });
@@ -152,6 +214,18 @@ function createCandidate(
     matcher,
     score: observedCount > 0 ? observedCount * 10 + amount / 25 : amount / 100
   };
+}
+
+function createCandidateWhenObserved(
+  id: string,
+  amount: number,
+  description: string,
+  matcher: BountyHuntingBountyMatcher,
+  observedCount: number
+): BountyCandidate[] {
+  return observedCount > 0
+    ? [createCandidate(id, amount, description, matcher, observedCount)]
+    : [];
 }
 
 function dedupeBountyHuntingCandidates(candidates: BountyCandidate[]): BountyCandidate[] {
@@ -257,6 +331,57 @@ function countBountyHuntingMessageEmojis(message: HTMLElement): number {
   return Math.max(visualEmojiCount, countBountyHuntingTextEmojis(getMessageText(message)));
 }
 
+function hasBountyHuntingCustomEmoji(message: HTMLElement): boolean {
+  const runs = getMessageRuns(message);
+  if (runs?.some((run) => {
+    const shortcut = cleanText(run.emoji?.shortcuts?.[0] || '');
+    return Boolean(run.emoji?.emojiId || CUSTOM_EMOJI_SHORTCUT_PATTERN.test(shortcut));
+  })) {
+    return true;
+  }
+
+  const selector = [
+    'img[shared-tooltip-text^=":"]',
+    'img[alt^=":"]',
+    '[data-emoji-id]'
+  ].join(',');
+  try {
+    return Boolean(message.querySelector(selector));
+  } catch {
+    return false;
+  }
+}
+
+function isBountyHuntingOnlyEmojiMessage(message: HTMLElement, text: string, emojiCount: number): boolean {
+  if (emojiCount <= 0) return false;
+
+  const runs = getMessageRuns(message);
+  if (runs?.length) {
+    return runs.every((run) => Boolean(run.emoji) || !cleanText(run.text || ''));
+  }
+
+  const messageText = message.querySelector<HTMLElement>('#message');
+  if (messageText) {
+    const nodes = Array.from(messageText.childNodes);
+    const hasNonEmojiNode = nodes.some((node) => {
+      if (node.nodeType === Node.TEXT_NODE) {
+        return hasBountyHuntingNonEmojiText(node.textContent || '');
+      }
+      if (node instanceof HTMLElement) {
+        return !node.matches('img[alt], img[shared-tooltip-text], [data-emoji-id], [class*="emoji" i]');
+      }
+      return false;
+    });
+    return !hasNonEmojiNode;
+  }
+
+  return !hasBountyHuntingNonEmojiText(text);
+}
+
+function hasBountyHuntingNonEmojiText(value: string): boolean {
+  return Boolean(cleanText(value.replace(/\p{Extended_Pictographic}/gu, '')).replace(/\s/g, ''));
+}
+
 function isBountyHuntingVerifiedAuthor(message: HTMLElement): boolean {
   const badgeSelector = [
     'yt-live-chat-author-badge-renderer[type="verified"]',
@@ -270,6 +395,53 @@ function isBountyHuntingVerifiedAuthor(message: HTMLElement): boolean {
   } catch {
     return false;
   }
+}
+
+function hasBountyHuntingAuthorBadge(
+  message: HTMLElement,
+  type: 'member' | 'moderator' | 'owner'
+): boolean {
+  const labelPattern = getBountyHuntingAuthorBadgePattern(type);
+  const typeValues = getBountyHuntingAuthorBadgeTypeValues(type);
+  const badges = message.querySelectorAll<HTMLElement>('yt-live-chat-author-badge-renderer');
+
+  for (const badge of badges) {
+    const badgeType = cleanText(badge.getAttribute('type')).toLocaleLowerCase();
+    if (typeValues.includes(badgeType)) return true;
+    const label = cleanText([
+      badge.getAttribute('aria-label'),
+      badge.getAttribute('title')
+    ].join(' '));
+    if (labelPattern.test(label)) return true;
+  }
+
+  return false;
+}
+
+function getBountyHuntingAuthorBadgePattern(type: 'member' | 'moderator' | 'owner'): RegExp {
+  switch (type) {
+    case 'member':
+      return /\bmember\b/i;
+    case 'moderator':
+      return /\bmoderator\b/i;
+    case 'owner':
+      return /\b(?:owner|creator)\b/i;
+  }
+}
+
+function getBountyHuntingAuthorBadgeTypeValues(type: 'member' | 'moderator' | 'owner'): string[] {
+  switch (type) {
+    case 'member':
+      return ['member', 'membership'];
+    case 'moderator':
+      return ['moderator'];
+    case 'owner':
+      return ['owner', 'creator'];
+  }
+}
+
+function isBountyHuntingSuperChatMessage(message: HTMLElement): boolean {
+  return message.matches('yt-live-chat-paid-message-renderer, yt-live-chat-paid-sticker-renderer');
 }
 
 function getBountyHuntingMessageId(message: HTMLElement): string {

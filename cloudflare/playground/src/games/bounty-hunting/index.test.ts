@@ -262,6 +262,63 @@ describe('playground Bounty Hunting game rules', () => {
     expect(game.claims.map((claim) => claim.bountyId)).toEqual(['question', 'has-number']);
   });
 
+  it('accepts YouTube-native privacy-safe bounty matchers', () => {
+    const game = submitBountyHunting(createBountyHuntingGame('game-1', 'host-user', 'guest-user', 0), {
+      action: 'submitBounties',
+      payload: {
+        bounties: [
+          {
+            amount: 100,
+            description: 'a message from a channel member',
+            id: 'channel-member',
+            matcher: { kind: 'channelMemberAuthor' }
+          },
+          {
+            amount: 100,
+            description: 'a message from a moderator',
+            id: 'moderator',
+            matcher: { kind: 'moderatorAuthor' }
+          },
+          {
+            amount: 125,
+            description: 'a message from the channel owner',
+            id: 'channel-owner',
+            matcher: { kind: 'channelOwnerAuthor' }
+          },
+          {
+            amount: 125,
+            description: 'a Super Chat',
+            id: 'super-chat',
+            matcher: { kind: 'superChat' }
+          },
+          {
+            amount: 75,
+            description: 'a message with a custom emoji',
+            id: 'custom-emoji',
+            matcher: { kind: 'customEmoji' }
+          },
+          {
+            amount: 100,
+            description: 'a message with only emojis',
+            id: 'only-emojis',
+            matcher: { kind: 'onlyEmojis' }
+          }
+        ]
+      },
+      userId: 'host-user'
+    }, 0);
+
+    expect(game.status).toBe('ready');
+    expect(game.bounties.map((bounty) => bounty.matcher.kind)).toEqual([
+      'channelMemberAuthor',
+      'moderatorAuthor',
+      'channelOwnerAuthor',
+      'superChat',
+      'customEmoji',
+      'onlyEmojis'
+    ]);
+  });
+
   it('handles actions through the game module interface', () => {
     const game = bountyHuntingGameModule.createGame('game-1', ['host-user', 'guest-user']);
     const readyGame = bountyHuntingGameModule.applyAction(game, {
