@@ -407,6 +407,21 @@
     "playgroundProfileHelper": {
       "message": "Видно пользователям Playground. Ваш YouTube-хэндл не собирается и не передается."
     },
+    "playgroundDisplayName": {
+      "message": "Display name"
+    },
+    "playgroundDisplayNameTitle": {
+      "message": "How you appear in Playground rooms."
+    },
+    "playgroundDisplayNameHelper": {
+      "message": "Leave blank to use your generated Player name."
+    },
+    "playgroundDisplayNameInvalid": {
+      "message": "Use 24 characters or fewer. URLs and reserved Playground names are not allowed."
+    },
+    "playgroundDisplayNameSaveFailed": {
+      "message": "Could not save that display name."
+    },
     "games": {
       "message": "Игры"
     },

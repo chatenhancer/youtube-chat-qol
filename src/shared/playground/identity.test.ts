@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { getPlaygroundAvatarInitial, getPlaygroundAvatarPresentation } from './identity';
+import {
+  getPlaygroundAvatarInitial,
+  getPlaygroundAvatarPresentation,
+  getPlaygroundDisplayName,
+  isValidPlaygroundDisplayName,
+  normalizePlaygroundDisplayName
+} from './identity';
 
 describe('playground identity helpers', () => {
   it('uses the generated player code for anonymous avatar initials', () => {
@@ -21,6 +27,14 @@ describe('playground identity helpers', () => {
       foregroundColor: '#fff',
       initial: 'T'
     });
+  });
+
+  it('normalizes custom display names and falls back to generated labels', () => {
+    expect(normalizePlaygroundDisplayName('  Luna   Chat  ')).toBe('Luna Chat');
+    expect(getPlaygroundDisplayName('abc123-user', '  Luna Chat  ')).toBe('Luna Chat');
+    expect(getPlaygroundDisplayName('abc123-user', 'Computer')).toBe('Player ABC1');
+    expect(isValidPlaygroundDisplayName('https://example.com')).toBe(false);
+    expect(isValidPlaygroundDisplayName('A very long Playground display name')).toBe(false);
   });
 
   it('uses built-in Computer profile labels for avatar initials and colors', () => {

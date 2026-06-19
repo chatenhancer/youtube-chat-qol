@@ -241,6 +241,43 @@ describe('playground stream room', () => {
     expect(room.createSnapshot('other-user').games).toHaveLength(0);
   });
 
+  it('uses custom display names from hello and broadcasts display name updates', async () => {
+    const room = createRoom();
+    const alice = createSession('alice-connection');
+    const bob = createSession('bob-connection');
+    const aliceHello = await createHello(alice.challenge, 'Alice', ['chess']);
+    aliceHello.displayName = 'Alice Live';
+
+    await room.handleHello(alice, aliceHello);
+    await room.handleHello(bob, await createHello(bob.challenge, 'Bob', ['chess']));
+
+    expect(alice.displayName).toBe('Alice Live');
+    expect(lastMessage(bob, 'presenceSnapshot').snapshot.users).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        displayName: 'Alice Live',
+        userId: alice.userId
+      })
+    ]));
+
+    await room.handleSocketMessage(alice, JSON.stringify({
+      displayName: 'Luna Chat',
+      type: 'setDisplayName'
+    }));
+
+    expect(alice.displayName).toBe('Luna Chat');
+    expect(lastMessage(bob, 'presenceSnapshot').snapshot.users).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        displayName: 'Luna Chat',
+        userId: alice.userId
+      })
+    ]));
+    expect(console.info).toHaveBeenCalledWith('[playground] display_name_changed', expect.objectContaining({
+      event: 'display_name_changed',
+      service: 'chat-enhancer-playground',
+      user: expect.any(String)
+    }));
+  });
+
   it('rejects duplicate active games with the same player and game type', async () => {
     const room = createRoom();
     const alice = createSession('alice-connection');

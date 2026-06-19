@@ -404,6 +404,21 @@
     "playgroundProfileHelper": {
       "message": "Für Playground-Nutzer sichtbar. Dein YouTube-Handle wird nicht erfasst oder geteilt."
     },
+    "playgroundDisplayName": {
+      "message": "Display name"
+    },
+    "playgroundDisplayNameTitle": {
+      "message": "How you appear in Playground rooms."
+    },
+    "playgroundDisplayNameHelper": {
+      "message": "Leave blank to use your generated Player name."
+    },
+    "playgroundDisplayNameInvalid": {
+      "message": "Use 24 characters or fewer. URLs and reserved Playground names are not allowed."
+    },
+    "playgroundDisplayNameSaveFailed": {
+      "message": "Could not save that display name."
+    },
     "games": {
       "message": "Spiele"
     },

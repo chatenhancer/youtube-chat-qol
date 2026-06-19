@@ -29,6 +29,7 @@ describe('playground protocol validation', () => {
   it('parses a signed hello message for game availability', () => {
     const message = parseClientMessage(JSON.stringify({
       availableGames: ['chess', 'replay-trivia'],
+      displayName: '  Luna Chat  ',
       identity: {
         publicKeyJwk: {
           crv: 'P-256',
@@ -44,6 +45,7 @@ describe('playground protocol validation', () => {
 
     expect(message).toMatchObject({
       availableGames: ['chess', 'replay-trivia'],
+      displayName: 'Luna Chat',
       type: 'hello'
     });
   });
@@ -105,6 +107,26 @@ describe('playground protocol validation', () => {
       availableGames: [],
       type: 'setAvailability'
     });
+  });
+
+  it('validates display name updates', () => {
+    expect(parseClientMessage(JSON.stringify({
+      displayName: '  Luna   Chat  ',
+      type: 'setDisplayName'
+    }))).toEqual({
+      displayName: 'Luna Chat',
+      type: 'setDisplayName'
+    });
+
+    expect(() => parseClientMessage(JSON.stringify({
+      displayName: 'Computer',
+      type: 'setDisplayName'
+    }))).toThrowError(new ProtocolError('invalid_field', 'displayName must be a valid Playground display name.'));
+
+    expect(() => parseClientMessage(JSON.stringify({
+      displayName: 'https://example.com',
+      type: 'setDisplayName'
+    }))).toThrowError(new ProtocolError('invalid_field', 'displayName must be a valid Playground display name.'));
   });
 
   it('validates game action envelopes without knowing game rules', () => {

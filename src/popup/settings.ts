@@ -2,6 +2,10 @@ import { LANGUAGE_OPTIONS } from '../shared/languages';
 import {
   getPlaygroundAvatarPresentation,
   PLAYGROUND_PROFILE_MESSAGE_TYPE,
+  PLAYGROUND_PROFILE_UPDATE_MESSAGE_TYPE,
+  isValidPlaygroundDisplayName,
+  normalizePlaygroundDisplayName,
+  type PlaygroundProfile,
   type PlaygroundProfileResponse
 } from '../shared/playground/identity';
 import { playSoftChime } from '../shared/sounds/soft-chime';
@@ -40,6 +44,7 @@ export function initSettingsControls(popupLocale: string): void {
     startupEffect,
     playgroundEnabled,
     playgroundGamesAvailable,
+    playgroundDisplayName,
     playgroundProfileToggle
   } = settingsControls;
 
@@ -91,6 +96,18 @@ export function initSettingsControls(popupLocale: string): void {
 
   playgroundGamesAvailable.addEventListener('change', () => {
     save({ playgroundGamesAvailable: playgroundGamesAvailable.checked });
+  });
+
+  playgroundDisplayName.addEventListener('input', () => {
+    playgroundDisplayName.setCustomValidity('');
+  });
+
+  playgroundDisplayName.addEventListener('change', () => {
+    savePlaygroundDisplayName();
+  });
+
+  playgroundDisplayName.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') playgroundDisplayName.blur();
   });
 
   playgroundProfileToggle.addEventListener('click', () => {
@@ -178,6 +195,7 @@ function updatePlaygroundProfile(playgroundEnabled: boolean): void {
   const {
     playgroundProfile,
     playgroundProfileAvatar,
+    playgroundDisplayName,
     playgroundProfileName,
     playgroundProfileWins,
     playgroundProfileWinsCount
@@ -187,6 +205,9 @@ function updatePlaygroundProfile(playgroundEnabled: boolean): void {
   playgroundProfile.hidden = true;
   playgroundProfileAvatar.textContent = '';
   playgroundProfileAvatar.style.removeProperty('--playground-profile-avatar-bg');
+  playgroundDisplayName.value = '';
+  playgroundDisplayName.placeholder = '';
+  playgroundDisplayName.setCustomValidity('');
   playgroundProfileName.textContent = '';
   updatePlaygroundProfileWins(playgroundProfileWins, playgroundProfileWinsCount, 0);
 
@@ -201,16 +222,72 @@ function updatePlaygroundProfile(playgroundEnabled: boolean): void {
       : '';
     if (!displayName) return;
 
-    const avatar = getPlaygroundAvatarPresentation({
-      displayName,
-      userId: response.profile?.userId || ''
-    });
-    playgroundProfileName.textContent = displayName;
-    playgroundProfileAvatar.textContent = avatar.initial;
-    playgroundProfileAvatar.style.setProperty('--playground-profile-avatar-bg', avatar.backgroundColor);
-    updatePlaygroundProfileWins(playgroundProfileWins, playgroundProfileWinsCount, response.profile?.wins);
-    playgroundProfile.hidden = false;
+    renderPlaygroundProfile(response.profile);
   });
+}
+
+function savePlaygroundDisplayName(): void {
+  const settingsControls = getSettingsControls();
+  if (!settingsControls || !settingsControls.playgroundEnabled.checked) return;
+
+  const input = settingsControls.playgroundDisplayName;
+  const requested = input.value;
+  const displayName = normalizePlaygroundDisplayName(requested);
+  if (requested.trim() && !isValidPlaygroundDisplayName(requested)) {
+    input.setCustomValidity(getExtensionMessage('playgroundDisplayNameInvalid'));
+    input.reportValidity();
+    return;
+  }
+
+  input.value = displayName;
+  input.setCustomValidity('');
+  const token = ++playgroundProfileRequestToken;
+  chrome.runtime.sendMessage({
+    displayName,
+    type: PLAYGROUND_PROFILE_UPDATE_MESSAGE_TYPE
+  }, (response?: PlaygroundProfileResponse) => {
+    if (token !== playgroundProfileRequestToken) return;
+    if (chrome.runtime.lastError || !response?.ok) {
+      input.setCustomValidity(response?.ok === false
+        ? response.error
+        : getExtensionMessage('playgroundDisplayNameSaveFailed'));
+      input.reportValidity();
+      return;
+    }
+
+    renderPlaygroundProfile(response.profile);
+  });
+}
+
+function renderPlaygroundProfile(profile: PlaygroundProfile): void {
+  const settingsControls = getSettingsControls();
+  if (!settingsControls) return;
+
+  const displayName = typeof profile.displayName === 'string' ? profile.displayName.trim() : '';
+  if (!displayName) return;
+
+  const customDisplayName = typeof profile.customDisplayName === 'string'
+    ? profile.customDisplayName.trim()
+    : '';
+  const generatedDisplayName = typeof profile.generatedDisplayName === 'string'
+    ? profile.generatedDisplayName.trim()
+    : displayName;
+  const avatar = getPlaygroundAvatarPresentation({
+    displayName,
+    userId: profile.userId || ''
+  });
+
+  settingsControls.playgroundProfileName.textContent = displayName;
+  settingsControls.playgroundDisplayName.value = customDisplayName;
+  settingsControls.playgroundDisplayName.placeholder = generatedDisplayName;
+  settingsControls.playgroundProfileAvatar.textContent = avatar.initial;
+  settingsControls.playgroundProfileAvatar.style.setProperty('--playground-profile-avatar-bg', avatar.backgroundColor);
+  updatePlaygroundProfileWins(
+    settingsControls.playgroundProfileWins,
+    settingsControls.playgroundProfileWinsCount,
+    profile.wins
+  );
+  settingsControls.playgroundProfile.hidden = false;
 }
 
 function setPlaygroundProfileDetailsExpanded(expanded: boolean): void {

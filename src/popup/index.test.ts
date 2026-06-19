@@ -45,7 +45,14 @@ describe('popup', () => {
               <span id="playgroundProfileWinsCount"></span>
             </span>
           </button>
-          <p id="playgroundProfileDetails" data-i18n="playgroundProfileHelper" hidden></p>
+          <div id="playgroundProfileDetails" hidden>
+            <p data-i18n="playgroundProfileHelper"></p>
+            <label for="playgroundDisplayName">
+              <span data-i18n="playgroundDisplayName"></span>
+              <input id="playgroundDisplayName" type="text" maxlength="24" title="How you appear in Playground rooms." data-i18n-title="playgroundDisplayNameTitle">
+            </label>
+            <p data-i18n="playgroundDisplayNameHelper"></p>
+          </div>
         </div>
         <section id="playgroundGamesSection" hidden>
           <input id="playgroundGamesAvailable" type="checkbox">
@@ -698,11 +705,32 @@ describe('popup', () => {
       return Promise.resolve([]);
     }) as never);
     vi.mocked(chrome.runtime.sendMessage).mockImplementation(((message: unknown, callback?: (response: unknown) => void) => {
-      const response = typeof message === 'object' &&
-        message !== null &&
-        (message as { type?: string }).type === 'ytcq:playground:get-profile'
-        ? { ok: true, profile: { displayName: 'Player TEST', userId: 'test-user', wins: 7 } }
-        : { activeTabIds: [] };
+      const type = typeof message === 'object' && message !== null
+        ? (message as { type?: string }).type
+        : '';
+      const response = type === 'ytcq:playground:get-profile'
+        ? {
+            ok: true,
+            profile: {
+              customDisplayName: '',
+              displayName: 'Player TEST',
+              generatedDisplayName: 'Player TEST',
+              userId: 'test-user',
+              wins: 7
+            }
+          }
+        : type === 'ytcq:playground:update-profile'
+          ? {
+              ok: true,
+              profile: {
+                customDisplayName: 'Luna Chat',
+                displayName: 'Luna Chat',
+                generatedDisplayName: 'Player TEST',
+                userId: 'test-user',
+                wins: 7
+              }
+            }
+          : { activeTabIds: [] };
       callback?.(response);
       return Promise.resolve(response);
     }) as never);
@@ -716,6 +744,7 @@ describe('popup', () => {
     const playgroundProfile = document.querySelector<HTMLElement>('#playgroundProfile')!;
     const playgroundProfileAvatar = document.querySelector<HTMLElement>('#playgroundProfileAvatar')!;
     const playgroundProfileDetails = document.querySelector<HTMLElement>('#playgroundProfileDetails')!;
+    const playgroundDisplayName = document.querySelector<HTMLInputElement>('#playgroundDisplayName')!;
     const playgroundProfileName = document.querySelector<HTMLElement>('#playgroundProfileName')!;
     const playgroundProfileToggle = document.querySelector<HTMLButtonElement>('#playgroundProfileToggle')!;
     const playgroundProfileWins = document.querySelector<HTMLElement>('#playgroundProfileWins')!;
@@ -733,6 +762,8 @@ describe('popup', () => {
     expect(playgroundProfileAvatar.textContent).toBe('T');
     expect(playgroundProfileAvatar.style.getPropertyValue('--playground-profile-avatar-bg')).toBe('hsl(255 45% 37%)');
     expect(playgroundProfileName.textContent).toBe('Player TEST');
+    expect(playgroundDisplayName.value).toBe('');
+    expect(playgroundDisplayName.placeholder).toBe('Player TEST');
     expect(playgroundProfileWins.title).toBe('playgroundWins: 7');
     expect(playgroundProfileWins.getAttribute('aria-label')).toBe('playgroundWins: 7');
     expect(playgroundProfileWinsCount.textContent).toBe('7');
@@ -746,6 +777,17 @@ describe('popup', () => {
     expect(playgroundProfileToggle.getAttribute('aria-expanded')).toBe('false');
     expect(playgroundProfileDetails.hidden).toBe(true);
     playgroundProfileToggle.click();
+
+    playgroundDisplayName.value = '  Luna Chat  ';
+    playgroundDisplayName.dispatchEvent(new Event('change', { bubbles: true }));
+    expect(chrome.runtime.sendMessage).toHaveBeenCalledWith({
+      displayName: 'Luna Chat',
+      type: 'ytcq:playground:update-profile'
+    }, expect.any(Function));
+    expect(playgroundProfileAvatar.textContent).toBe('L');
+    expect(playgroundProfileName.textContent).toBe('Luna Chat');
+    expect(playgroundDisplayName.value).toBe('Luna Chat');
+    expect(playgroundDisplayName.placeholder).toBe('Player TEST');
 
     targetLanguage.value = '';
     targetLanguage.dispatchEvent(new Event('change', { bubbles: true }));
@@ -776,6 +818,8 @@ describe('popup', () => {
     expect(playgroundProfileToggle.getAttribute('aria-expanded')).toBe('false');
     expect(playgroundProfileAvatar.textContent).toBe('');
     expect(playgroundProfileAvatar.style.getPropertyValue('--playground-profile-avatar-bg')).toBe('');
+    expect(playgroundDisplayName.value).toBe('');
+    expect(playgroundDisplayName.placeholder).toBe('');
     expect(playgroundProfileName.textContent).toBe('');
     expect(playgroundProfileWins.title).toBe('playgroundWins: 0');
     expect(playgroundProfileWins.getAttribute('aria-label')).toBe('playgroundWins: 0');
@@ -846,6 +890,48 @@ describe('popup', () => {
       profile: { displayName: '   ', wins: 'many' }
     });
     expect(playgroundProfile.hidden).toBe(true);
+  });
+
+  it('validates Playground display names before saving from the popup', async () => {
+    await chrome.storage.sync.set({
+      playgroundEnabled: true
+    });
+    vi.mocked(chrome.tabs.query).mockImplementation(((_queryInfo: chrome.tabs.QueryInfo, callback?: (tabs: chrome.tabs.Tab[]) => void) => {
+      callback?.([]);
+      return Promise.resolve([]);
+    }) as never);
+    vi.mocked(chrome.runtime.sendMessage).mockImplementation(((message: unknown, callback?: (response: unknown) => void) => {
+      const response = typeof message === 'object' &&
+        message !== null &&
+        (message as { type?: string }).type === 'ytcq:playground:get-profile'
+        ? {
+            ok: true,
+            profile: {
+              customDisplayName: '',
+              displayName: 'Player TEST',
+              generatedDisplayName: 'Player TEST',
+              userId: 'test-user',
+              wins: 0
+            }
+          }
+        : { activeTabIds: [] };
+      callback?.(response);
+      return Promise.resolve(response);
+    }) as never);
+
+    await import('./index');
+    const displayName = document.querySelector<HTMLInputElement>('#playgroundDisplayName')!;
+    const reportValidity = vi.spyOn(displayName, 'reportValidity').mockReturnValue(false);
+    vi.mocked(chrome.runtime.sendMessage).mockClear();
+
+    displayName.value = 'https://example.com';
+    displayName.dispatchEvent(new Event('change', { bubbles: true }));
+
+    expect(reportValidity).toHaveBeenCalled();
+    expect(displayName.validationMessage).toBe('playgroundDisplayNameInvalid');
+    expect(chrome.runtime.sendMessage).not.toHaveBeenCalledWith(expect.objectContaining({
+      type: 'ytcq:playground:update-profile'
+    }), expect.any(Function));
   });
 
   it('lets the Playground helper text toggle while the helper link stays a link', async () => {

@@ -57,6 +57,7 @@ export interface PublicGame {
 export type ClientMessage =
   | HelloClientMessage
   | SetAvailabilityClientMessage
+  | SetDisplayNameClientMessage
   | InviteClientMessage
   | RespondInviteClientMessage
   | GameActionClientMessage
@@ -64,6 +65,7 @@ export type ClientMessage =
 
 export interface HelloClientMessage {
   availableGames?: GameId[];
+  displayName?: string;
   identity: SignedClientIdentity;
   languageCode?: string;
   locale?: string;
@@ -79,6 +81,11 @@ export interface SignedClientIdentity {
 export interface SetAvailabilityClientMessage {
   availableGames: GameId[];
   type: 'setAvailability';
+}
+
+export interface SetDisplayNameClientMessage {
+  displayName: string;
+  type: 'setDisplayName';
 }
 
 export interface InviteClientMessage {

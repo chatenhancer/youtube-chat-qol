@@ -217,11 +217,21 @@ describe('stream room state managers', () => {
 
     sessions.setAvailability(first, ['chess', 'replay-trivia']);
     expect(sessions.getPresenceUser('alice')?.availableGames).toEqual(['chess', 'replay-trivia']);
+    sessions.setDisplayName(second, 'Luna Chat');
+    expect(sessions.getPresenceUser('alice')?.displayName).toBe('Luna Chat');
+    expect(sessions.getPublicUser('alice')).toEqual({
+      displayName: 'Luna Chat',
+      userId: 'alice'
+    });
     expect(sessions.remove('missing')).toBeUndefined();
     expect(sessions.remove('connection-1')).toBe(first);
     expect(sessions.getPresenceUser('alice')?.availableGames).toEqual(['chess', 'replay-trivia']);
     expect(sessions.remove('connection-2')).toBe(second);
     expect(sessions.getPresenceUser('alice')).toBeUndefined();
+    expect(sessions.getPublicUser('alice')).toEqual({
+      displayName: 'Luna Chat',
+      userId: 'alice'
+    });
   });
 
   it('sends direct and broadcast messages only to authenticated socket sessions', () => {

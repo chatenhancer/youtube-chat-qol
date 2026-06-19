@@ -404,6 +404,21 @@
     "playgroundProfileHelper": {
       "message": "برای کاربران Playground نمایش داده می‌شود. نام کاربری YouTube شما جمع‌آوری یا هم‌رسانی نمی‌شود."
     },
+    "playgroundDisplayName": {
+      "message": "Display name"
+    },
+    "playgroundDisplayNameTitle": {
+      "message": "How you appear in Playground rooms."
+    },
+    "playgroundDisplayNameHelper": {
+      "message": "Leave blank to use your generated Player name."
+    },
+    "playgroundDisplayNameInvalid": {
+      "message": "Use 24 characters or fewer. URLs and reserved Playground names are not allowed."
+    },
+    "playgroundDisplayNameSaveFailed": {
+      "message": "Could not save that display name."
+    },
     "games": {
       "message": "بازی‌ها"
     },

@@ -1,4 +1,8 @@
 import {
+  isValidPlaygroundDisplayName,
+  normalizePlaygroundDisplayName
+} from '../../../../src/shared/playground/identity';
+import {
   PLAYGROUND_PROTOCOL_VERSION,
   SUPPORTED_GAMES,
   type ClientMessage,
@@ -32,6 +36,11 @@ export function parseClientMessage(text: string): ClientMessage {
     case 'setAvailability':
       return {
         availableGames: parseGameList(value.availableGames),
+        type
+      };
+    case 'setDisplayName':
+      return {
+        displayName: parseDisplayName(value.displayName),
         type
       };
     case 'invite':
@@ -81,6 +90,7 @@ function parseHelloMessage(value: Record<string, unknown>): ClientMessage {
 
   return {
     availableGames: parseGameList(value.availableGames || []),
+    displayName: parseOptionalDisplayName(value.displayName),
     identity: {
       publicKeyJwk: parsePublicKey(identity.publicKeyJwk),
       signature: getString(identity, 'signature')
@@ -90,6 +100,18 @@ function parseHelloMessage(value: Record<string, unknown>): ClientMessage {
     protocolVersion: PLAYGROUND_PROTOCOL_VERSION,
     type: 'hello'
   };
+}
+
+function parseOptionalDisplayName(value: unknown): string | undefined {
+  if (value === undefined) return undefined;
+  return parseDisplayName(value);
+}
+
+function parseDisplayName(value: unknown): string {
+  if (typeof value !== 'string' || !isValidPlaygroundDisplayName(value)) {
+    throw new ProtocolError('invalid_field', 'displayName must be a valid Playground display name.');
+  }
+  return normalizePlaygroundDisplayName(value);
 }
 
 function parsePublicKey(value: unknown): JsonWebKey {

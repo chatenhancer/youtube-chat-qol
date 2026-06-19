@@ -55,7 +55,8 @@ const MESSAGE_RATE_COSTS: { [Type in ClientMessage['type']]: number } = {
   invite: 12,
   ping: 1,
   respondInvite: 4,
-  setAvailability: 2
+  setAvailability: 2,
+  setDisplayName: 3
 };
 
 export class StreamRoom {
@@ -198,6 +199,14 @@ export class StreamRoom {
         });
         this.broadcastPresence();
         return;
+      case 'setDisplayName':
+        this.sessions.setDisplayName(session, message.displayName);
+        this.logEvent('display_name_changed', {
+          connection: shortLogId(session.connectionId),
+          user: hashLogValue(session.userId)
+        });
+        this.broadcastPresence();
+        return;
       case 'invite':
         this.handleInvite(session, message.gameId, message.toUserId);
         return;
@@ -221,7 +230,7 @@ export class StreamRoom {
     if (session.userId) throw new ProtocolError('already_authenticated', 'This connection is already authenticated.');
 
     const identity = await verifySignedIdentity(session.challenge, message.identity);
-    this.sessions.authenticate(session, identity.userId, message.availableGames || [], undefined, {
+    this.sessions.authenticate(session, identity.userId, message.availableGames || [], message.displayName, {
       languageCode: message.languageCode || 'en',
       locale: message.locale
     });

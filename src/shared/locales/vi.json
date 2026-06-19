@@ -404,6 +404,21 @@
     "playgroundProfileHelper": {
       "message": "Hiển thị cho người dùng Playground. Tên YouTube của bạn không được thu thập hoặc chia sẻ."
     },
+    "playgroundDisplayName": {
+      "message": "Display name"
+    },
+    "playgroundDisplayNameTitle": {
+      "message": "How you appear in Playground rooms."
+    },
+    "playgroundDisplayNameHelper": {
+      "message": "Leave blank to use your generated Player name."
+    },
+    "playgroundDisplayNameInvalid": {
+      "message": "Use 24 characters or fewer. URLs and reserved Playground names are not allowed."
+    },
+    "playgroundDisplayNameSaveFailed": {
+      "message": "Could not save that display name."
+    },
     "games": {
       "message": "Trò chơi"
     },

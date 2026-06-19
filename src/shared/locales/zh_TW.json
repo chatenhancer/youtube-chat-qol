@@ -404,6 +404,21 @@
     "playgroundProfileHelper": {
       "message": "顯示給 Playground 使用者。你的 YouTube 帳號名稱不會被收集或分享。"
     },
+    "playgroundDisplayName": {
+      "message": "Display name"
+    },
+    "playgroundDisplayNameTitle": {
+      "message": "How you appear in Playground rooms."
+    },
+    "playgroundDisplayNameHelper": {
+      "message": "Leave blank to use your generated Player name."
+    },
+    "playgroundDisplayNameInvalid": {
+      "message": "Use 24 characters or fewer. URLs and reserved Playground names are not allowed."
+    },
+    "playgroundDisplayNameSaveFailed": {
+      "message": "Could not save that display name."
+    },
     "games": {
       "message": "遊戲"
     },
