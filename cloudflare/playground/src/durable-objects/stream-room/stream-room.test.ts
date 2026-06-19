@@ -460,6 +460,33 @@ describe('playground stream room', () => {
     }));
   });
 
+  it('skips global win stats for built-in Computer players', async () => {
+    const storage = new FakeDurableObjectStorage();
+    const { playerStats, room, state } = createRoomHarness(storage);
+    const alice = createSession('alice-connection');
+
+    await room.handleHello(alice, await createHello(alice.challenge, 'Alice', ['chess']));
+    room.handleInvite(alice, 'chess', CHESS_COMPUTER_PLAYER_CLUB_PROFILE.userId);
+    await state.flushWaitUntil();
+    const gameId = lastMessage(alice, 'gameStarted').game.gameId;
+
+    room.handleGameAction(alice, gameId, {
+      action: 'resign',
+      userId: alice.userId
+    });
+
+    await state.flushWaitUntil();
+
+    expect(playerStats.getWins(CHESS_COMPUTER_PLAYER_CLUB_PROFILE.userId, 'chess')).toBe(0);
+    expect(console.info).toHaveBeenCalledWith('[playground] game_win_record_skipped', expect.objectContaining({
+      event: 'game_win_record_skipped',
+      gameType: 'chess',
+      reason: 'computerPlayer',
+      service: 'chat-enhancer-playground'
+    }));
+    expect(console.warn).not.toHaveBeenCalledWith('[playground] game_win_record_failed', expect.anything());
+  });
+
   it('restores active games from Durable Object storage after restart', async () => {
     const storage = new FakeDurableObjectStorage();
     const first = createRoomHarness(storage);
@@ -504,6 +531,66 @@ describe('playground stream room', () => {
       to: 'e4'
     });
     expect(updatedChessGame.lastMoveSan).toBe('e4');
+  });
+
+  it('restores legacy Replay Trivia questions without localizations', async () => {
+    const storage = new FakeDurableObjectStorage();
+    const first = createRoomHarness(storage);
+    const room = first.room;
+    const alice = createSession('alice-connection');
+    const bob = createSession('bob-connection');
+    const aliceKeyPair = await createIdentityKeyPair();
+    const bobKeyPair = await createIdentityKeyPair();
+
+    await room.handleHello(alice, await createHello(alice.challenge, 'Alice', ['replay-trivia'], aliceKeyPair));
+    await room.handleHello(bob, await createHello(bob.challenge, 'Bob', ['replay-trivia'], bobKeyPair));
+    room.handleInvite(alice, 'replay-trivia', bob.userId);
+    room.handleInviteResponse(bob, lastMessage(bob, 'inviteReceived').invite.inviteId, true);
+    const gameId = lastMessage(alice, 'gameStarted').game.gameId;
+
+    room.handleGameAction(alice, gameId, {
+      action: 'submitQuestions',
+      payload: {
+        questions: [
+          {
+            choices: ['God of War', 'Celeste', 'Monster Hunter', 'Red Dead Redemption 2'],
+            correctChoiceIndex: 0,
+            friendIntro: 'chat emergency',
+            id: 'q_1',
+            prompt: 'Which game won?',
+            rightReply: 'nice save.',
+            wrongReply: 'you missed it. it was God of War.'
+          }
+        ]
+      },
+      userId: alice.userId
+    });
+    await first.state.flushWaitUntil();
+
+    const stored = await storage.get<{ games: Array<Record<string, unknown>> }>('roomState:v1');
+    if (!stored) throw new Error('Expected stored room state.');
+    const storedGame = stored.games.find((game) => game.gameId === gameId);
+    if (!storedGame) throw new Error('Expected stored Replay Trivia game.');
+    const questions = storedGame.questions as Array<Record<string, unknown>>;
+    delete questions[0].localizations;
+    await storage.put('roomState:v1', stored);
+
+    const restarted = createRoomHarness(storage);
+    await restarted.state.flushWaitUntil();
+    const reconnectedAlice = createSession('alice-reconnected');
+    await restarted.room.handleHello(
+      reconnectedAlice,
+      await createHello(reconnectedAlice.challenge, 'Alice', ['replay-trivia'], aliceKeyPair)
+    );
+
+    const restoredGame = lastMessage(reconnectedAlice, 'helloAccepted').snapshot.games[0];
+    expect(restoredGame).toMatchObject({
+      currentQuestion: {
+        prompt: 'Which game won?'
+      },
+      gameId
+    });
+    expect(console.error).not.toHaveBeenCalled();
   });
 
   it('restores the built-in Computer display name for active games after restart', async () => {

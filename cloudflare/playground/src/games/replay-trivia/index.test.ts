@@ -160,6 +160,27 @@ describe('playground replay trivia game rules', () => {
     expect(spanishGame.currentQuestion?.correctChoiceIndex).toBeUndefined();
   });
 
+  it('serializes restored questions that predate localizations', () => {
+    const game = submitReplayTriviaQuestions(createReplayTriviaGame('game-1', 'host-user', 'guest-user', 0), {
+      action: 'submitQuestions',
+      payload: { questions: [createQuestion()] },
+      userId: 'host-user'
+    }, 0);
+    const legacyQuestion = { ...game.questions[0] } as Partial<typeof game.questions[number]>;
+    delete legacyQuestion.localizations;
+    const legacyGame = {
+      ...game,
+      questions: [legacyQuestion as typeof game.questions[number]]
+    };
+
+    const publicGame = toPublicReplayTriviaGame(legacyGame, (userId) => ({ displayName: userId, userId }), {
+      getUserLanguage: () => ({ languageCode: 'es' }),
+      recipientUserId: 'guest-user'
+    });
+
+    expect(publicGame.currentQuestion?.prompt).toBe('Which game won Game of the Year in this segment?');
+  });
+
   it('times out unanswered rounds and marks the final winner', () => {
     let game = submitReplayTriviaQuestions(createReplayTriviaGame('game-1', 'host-user', 'guest-user', 0), {
       action: 'submitQuestions',

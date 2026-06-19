@@ -1125,6 +1125,15 @@ describe('Replay Trivia panel', () => {
     expect(context.fillText).toHaveBeenCalled();
   });
 
+  it('draws a spinner while preparing questions', () => {
+    openReplayTriviaGamePanel(createReplayTriviaGame({
+      status: 'preparing'
+    }), 'host-user', vi.fn());
+
+    expect(context.arc).toHaveBeenCalledWith(224, 394, 10, 0, Math.PI * 2);
+    expect(context.stroke).toHaveBeenCalled();
+  });
+
   it('wraps long question and answer text down to the minimum font size', () => {
     context.measureText.mockImplementation((text: string) => ({ width: text.length * 40 }));
     const longQuestion = {

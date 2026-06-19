@@ -7,6 +7,7 @@
 import { ytcqCreateElement } from '../../../../shared/managed-dom';
 import type { ReplayTriviaGenerationToken, ReplayTriviaQuestion } from '../../../../shared/playground/trivia';
 import { getUiLocale, t } from '../../../../shared/i18n';
+import { drawGameLoadingSpinner } from '../loading-spinner';
 import type { GamePanelShell } from '../panel-shell';
 import { createGameSoundController } from '../sound';
 import { generateReplayTriviaQuestions } from './client';
@@ -561,7 +562,7 @@ function renderReplayTriviaGame(now: number): void {
   drawReplayTriviaSurface(context);
 
   if (state.phase === 'preparing') {
-    drawLoadingState(context, state);
+    drawLoadingState(context, state, now);
     return;
   }
 
@@ -590,11 +591,12 @@ function drawReplayTriviaSurface(context: CanvasRenderingContext2D): void {
   context.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 }
 
-function drawLoadingState(context: CanvasRenderingContext2D, state: ReplayTriviaPanelRuntime): void {
+function drawLoadingState(context: CanvasRenderingContext2D, state: ReplayTriviaPanelRuntime, now: number): void {
   drawIntroLogo(context, state);
   context.fillStyle = '#3f3f42';
   context.textAlign = 'center';
   context.textBaseline = 'middle';
+  const hasPreparationError = Boolean(state.preparationError);
   const text = state.preparationError || (
     state.currentUserId === state.game.questionProviderUserId
       ? t('gamesReplayTriviaLoading')
@@ -603,6 +605,16 @@ function drawLoadingState(context: CanvasRenderingContext2D, state: ReplayTrivia
   context.font = `400 ${fitFontSize(context, text, CANVAS_WIDTH - 80, scaleFontSize(21), scaleFontSize(13), 2, 400)}px ${FONT_STACK}`;
   const lines = wrapText(context, text, CANVAS_WIDTH - 80, 2);
   drawWrappedLines(context, lines, CANVAS_WIDTH / 2, 356 - ((lines.length - 1) * 12), 24);
+  if (!hasPreparationError) {
+    drawGameLoadingSpinner(context, {
+      color: REPLAY_TRIVIA_ACCENT_BLUE,
+      now,
+      radius: 10,
+      trackColor: 'rgba(34, 144, 255, 0.16)',
+      x: CANVAS_WIDTH / 2,
+      y: 394
+    });
+  }
 }
 
 function drawCountdown(

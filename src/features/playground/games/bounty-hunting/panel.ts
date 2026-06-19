@@ -11,6 +11,7 @@ import { ytcqCreateElement } from '../../../../shared/managed-dom';
 import { drawPlaygroundCanvasAvatar } from '../../../../shared/playground/avatar';
 import {
   BOUNTY_HUNTING_COUNTDOWN_MS,
+  BOUNTY_HUNTING_BOUNTY_COUNT,
   BOUNTY_HUNTING_ROUND_MS,
   BOUNTY_HUNTING_ROUND_OVER_MS,
   type PublicBountyHuntingBounty
@@ -23,6 +24,7 @@ import {
   scheduleFrame
 } from '../replay-trivia/canvas';
 import type { GamePanelControls } from '../adapter';
+import { drawGameLoadingSpinner } from '../loading-spinner';
 import type { GamePanelShell } from '../panel-shell';
 import { createGameSoundController } from '../sound';
 import {
@@ -34,6 +36,7 @@ import {
 } from './assets';
 import {
   collectBountyHuntingTopFanAuthorKeys,
+  countBountyHuntingObservedCandidateTypes,
   createBountyHuntingBountiesFromMessages,
   findBountyHuntingMatchingBounty,
   getBountyHuntingObservedMessage,
@@ -56,7 +59,9 @@ const CANVAS_WIDTH = LAYOUT_WIDTH;
 const CANVAS_HEIGHT = LAYOUT_HEIGHT;
 const CANVAS_DISPLAY_SCALE = 0.75;
 const CANVAS_DISPLAY_WIDTH = LAYOUT_WIDTH * CANVAS_DISPLAY_SCALE;
-const PREPARATION_MS = 2_000;
+const PREPARATION_MAX_MS = 6_000;
+const PREPARATION_MIN_MS = 2_000;
+const PREPARATION_RECHECK_MS = 1_000;
 const BUTTON_RECT: Rect = { height: 58, width: 164, x: 142, y: 394 };
 const BOUNTY_AMOUNT_X = 114;
 const BOUNTY_DESCRIPTION_X = 124;
@@ -389,15 +394,36 @@ function maybeStartBountyHuntingPreparation(runtime: BountyHuntingPanelRuntime):
 
   runtime.preparationStarted = true;
   collectVisibleBountyHuntingMessages(runtime);
+  scheduleBountyHuntingPreparationCheck(runtime, Date.now(), PREPARATION_MIN_MS);
+}
+
+function scheduleBountyHuntingPreparationCheck(
+  runtime: BountyHuntingPanelRuntime,
+  startedAt: number,
+  delay: number
+): void {
   runtime.preparationTimer = window.setTimeout(() => {
     runtime.preparationTimer = null;
     if (!activeBountyHuntingPanel || activeBountyHuntingPanel.canvas !== runtime.canvas) return;
     if (runtime.game.status !== 'preparing') return;
     collectVisibleBountyHuntingMessages(runtime);
+    const elapsedMs = Date.now() - startedAt;
+    if (
+      elapsedMs < PREPARATION_MAX_MS &&
+      countBountyHuntingObservedCandidateTypes([...runtime.preparationMessages.values()]) < BOUNTY_HUNTING_BOUNTY_COUNT
+    ) {
+      scheduleBountyHuntingPreparationCheck(
+        runtime,
+        startedAt,
+        Math.min(PREPARATION_RECHECK_MS, PREPARATION_MAX_MS - elapsedMs)
+      );
+      return;
+    }
+
     runtime.onAction(runtime.game.gameId, 'submitBounties', {
       bounties: createBountyHuntingBountiesFromMessages([...runtime.preparationMessages.values()])
     });
-  }, PREPARATION_MS);
+  }, delay);
 }
 
 function collectVisibleBountyHuntingMessages(runtime: BountyHuntingPanelRuntime): void {
@@ -691,7 +717,7 @@ function renderBountyHuntingGame(now: number): void {
 
   switch (runtime.game.status) {
     case 'preparing':
-      drawBountyHuntingLoading(runtime);
+      drawBountyHuntingLoading(runtime, now);
       break;
     case 'ready':
     case 'active':
@@ -1017,7 +1043,7 @@ function getBountyHuntingCompactBountyLabel(bounty: PublicBountyHuntingBounty): 
   }
 }
 
-function drawBountyHuntingLoading(runtime: BountyHuntingPanelRuntime): void {
+function drawBountyHuntingLoading(runtime: BountyHuntingPanelRuntime, now: number): void {
   const { context } = runtime;
   context.fillStyle = '#fff';
   context.fillRect(0, 0, LAYOUT_WIDTH, LAYOUT_HEIGHT);
@@ -1032,6 +1058,15 @@ function drawBountyHuntingLoading(runtime: BountyHuntingPanelRuntime): void {
     color: '#444',
     font: '400 22px Roboto, Arial, sans-serif',
     shadow: false
+  });
+  drawGameLoadingSpinner(context, {
+    color: '#f20d0d',
+    lineWidth: 3,
+    now,
+    radius: 9,
+    trackColor: 'rgba(242, 13, 13, 0.14)',
+    x: 224,
+    y: 424
   });
 }
 

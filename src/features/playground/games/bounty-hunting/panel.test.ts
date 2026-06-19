@@ -67,6 +67,7 @@ describe('Bounty Hunting panel', () => {
     closeBountyHuntingGamePanel({ notify: false });
     shellControllers.forEach((controller) => controller.abort());
     shellCleanups.forEach((cleanup) => cleanup());
+    vi.useRealTimers();
     vi.restoreAllMocks();
     vi.unstubAllGlobals();
   });
@@ -135,6 +136,82 @@ describe('Bounty Hunting panel', () => {
         ]
       }
     ]);
+  });
+
+  it('submits prepared bounties after the minimum wait when chat has enough diversity', async () => {
+    vi.useFakeTimers();
+    let now = 100_000;
+    vi.spyOn(Date, 'now').mockImplementation(() => now);
+    appendChatMessage('msg-all-caps', '@Luna', 'LOUD');
+    appendChatMessage('msg-question', '@Luna', 'howdy?');
+    appendChatMessage('msg-mention', '@Luna', 'hello @Marco');
+    appendChatMessage('msg-number', '@Luna', 'number 123');
+    appendChatMessage('msg-emoji', '@Luna', '🤠🤠🤠');
+    const verifiedMessage = appendChatMessage('msg-verified', '@Luna', 'verified message');
+    const verifiedBadge = document.createElement('yt-live-chat-author-badge-renderer');
+    verifiedBadge.setAttribute('type', 'verified');
+    verifiedMessage.append(verifiedBadge);
+    const memberMessage = appendChatMessage('msg-member', '@Luna', 'member message');
+    const memberBadge = document.createElement('yt-live-chat-author-badge-renderer');
+    memberBadge.setAttribute('type', 'member');
+    memberMessage.append(memberBadge);
+    const moderatorMessage = appendChatMessage('msg-moderator', '@Luna', 'moderator message');
+    const moderatorBadge = document.createElement('yt-live-chat-author-badge-renderer');
+    moderatorBadge.setAttribute('type', 'moderator');
+    moderatorMessage.append(moderatorBadge);
+    const onAction = vi.fn();
+
+    openBountyHuntingGamePanel(createPreparingBountyHuntingGame(), 'host-user', onAction);
+    await vi.advanceTimersByTimeAsync(1_999);
+    expect(onAction).not.toHaveBeenCalledWith(
+      'game-bounty-hunting',
+      'submitBounties',
+      expect.anything()
+    );
+
+    now = 102_000;
+    await vi.advanceTimersByTimeAsync(1);
+
+    const submitCalls = onAction.mock.calls.filter((call) => call[1] === 'submitBounties');
+    expect(submitCalls).toHaveLength(1);
+    expect(submitCalls[0][2]).toMatchObject({
+      bounties: expect.arrayContaining([
+        expect.objectContaining({ id: 'mention-user' }),
+        expect.objectContaining({ id: 'channel-member' }),
+        expect.objectContaining({ id: 'moderator' }),
+        expect.objectContaining({ id: 'has-number' }),
+        expect.objectContaining({ id: 'question' }),
+        expect.objectContaining({ id: 'verified-author' })
+      ])
+    });
+  });
+
+  it('keeps preparing until the maximum wait when chat diversity stays low', async () => {
+    vi.useFakeTimers();
+    let now = 100_000;
+    vi.spyOn(Date, 'now').mockImplementation(() => now);
+    const onAction = vi.fn();
+
+    openBountyHuntingGamePanel(createPreparingBountyHuntingGame(), 'host-user', onAction);
+
+    for (const elapsed of [2_000, 3_000, 4_000, 5_000]) {
+      now = 100_000 + elapsed;
+      await vi.advanceTimersByTimeAsync(elapsed === 2_000 ? 2_000 : 1_000);
+      expect(onAction.mock.calls.some((call) => call[1] === 'submitBounties')).toBe(false);
+    }
+
+    now = 106_000;
+    await vi.advanceTimersByTimeAsync(1_000);
+
+    const submitCalls = onAction.mock.calls.filter((call) => call[1] === 'submitBounties');
+    expect(submitCalls).toHaveLength(1);
+    expect(submitCalls[0][2]).toMatchObject({
+      bounties: expect.arrayContaining([
+        expect.objectContaining({ id: 'emoji-3' }),
+        expect.objectContaining({ id: 'all-caps' }),
+        expect.objectContaining({ id: 'question' })
+      ])
+    });
   });
 
   it('ignores clicked messages that do not match open bounties', () => {
@@ -430,6 +507,13 @@ describe('Bounty Hunting panel', () => {
       x: 224,
       y: 411
     });
+  });
+
+  it('draws a spinner on the logo loading screen', () => {
+    openBountyHuntingGamePanel(createPreparingBountyHuntingGame(), 'host-user', vi.fn());
+
+    expect(context.arc).toHaveBeenCalledWith(224, 424, 9, 0, Math.PI * 2);
+    expect(context.stroke).toHaveBeenCalled();
   });
 
   it('flashes the ready button when another player turns ready', () => {
@@ -740,6 +824,16 @@ function createBountyHuntingGame(): PublicBountyHuntingGame {
   };
 }
 
+function createPreparingBountyHuntingGame(): PublicBountyHuntingGame {
+  return {
+    ...createBountyHuntingGame(),
+    bounties: [],
+    readyPlayers: {},
+    roundEndsAt: undefined,
+    status: 'preparing'
+  };
+}
+
 function createFinishedBountyHuntingGame(): PublicBountyHuntingGame {
   return {
     ...createBountyHuntingGame(),
@@ -818,8 +912,19 @@ function createClaimedBounty(id: string, role: 'guest' | 'host'): PublicBountyHu
 }
 
 function appendChatMessage(messageId: string, authorName: string, text: string): HTMLElement {
-  const message = document.createElement('yt-live-chat-text-message-renderer');
+  const message = document.createElement('yt-live-chat-text-message-renderer') as HTMLElement & {
+    data?: {
+      authorName: { simpleText: string };
+      id: string;
+      message: { runs: Array<{ text: string }> };
+    };
+  };
   message.setAttribute('data-message-id', messageId);
+  message.data = {
+    authorName: { simpleText: authorName },
+    id: messageId,
+    message: { runs: [{ text }] }
+  };
 
   const author = document.createElement('span');
   author.id = 'author-name';
