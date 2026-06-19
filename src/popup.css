@@ -233,7 +233,7 @@ main {
 
 .popup-tabs {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 34px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 4px;
   margin: 0 0 6px;
   padding: 0 2px;
@@ -279,26 +279,6 @@ main {
   border-radius: 2px 2px 0 0;
   background: currentColor;
   content: "";
-}
-
-.popup-tab-icon-only {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding-right: 6px;
-  padding-left: 6px;
-}
-
-.popup-tab-icon-only::after {
-  right: 8px;
-  left: 8px;
-}
-
-.popup-tab-icon-only svg {
-  display: block;
-  width: 17px;
-  height: 17px;
-  fill: currentColor;
 }
 
 .popup-tab-panels {
