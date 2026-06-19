@@ -132,11 +132,11 @@ const structuredDataJson = resolvedStructuredData
         }
       })();
     </script>
-    {structuredDataJson && <script type="application/ld+json" set:html={structuredDataJson}></script>}
+    {structuredDataJson && <script is:inline type="application/ld+json" set:html={structuredDataJson}></script>}
   </head>
   <body>
     <slot />
-    <script type="application/json" data-docs-config set:html={JSON.stringify(docsConfig).replace(/</g, '\\u003c')}></script>
-    <script src={homeScriptUrl}></script>
+    <script is:inline type="application/json" data-docs-config set:html={JSON.stringify(docsConfig).replace(/</g, '\\u003c')}></script>
+    <script is:inline src={homeScriptUrl}></script>
   </body>
 </html>
