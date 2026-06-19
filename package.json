@@ -30,7 +30,7 @@
     "cloudflare:language-redirect:deploy": "cross-env WRANGLER_LOG_PATH=.wrangler/logs wrangler deploy --config cloudflare/language-redirect/wrangler.toml",
     "cloudflare:playground:check": "cross-env WRANGLER_LOG_PATH=.wrangler/logs wrangler deploy --config cloudflare/playground/wrangler.toml --dry-run --containers-rollout=none",
     "cloudflare:playground:check:containers": "cross-env WRANGLER_LOG_PATH=.wrangler/logs wrangler deploy --config cloudflare/playground/wrangler.toml --dry-run",
-    "cloudflare:playground:dev": "cross-env WRANGLER_LOG_PATH=.wrangler/logs wrangler dev --config cloudflare/playground/wrangler.toml",
+    "cloudflare:playground:dev": "node scripts/start-cloudflare-playground-dev.mjs",
     "cloudflare:playground:deploy": "cross-env WRANGLER_LOG_PATH=.wrangler/logs wrangler deploy --config cloudflare/playground/wrangler.toml",
     "demo:walkthrough": "npm run build:chrome && node scripts/capture-walkthrough-demo.mjs",
     "demo:walkthrough:preview": "npm run build:chrome && node scripts/capture-walkthrough-demo.mjs --preview",

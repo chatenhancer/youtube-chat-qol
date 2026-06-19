@@ -209,7 +209,7 @@ describe('playground stream room', () => {
     room.handleInviteResponse(bob, inviteReceived.invite.inviteId, true);
     const gameStarted = lastMessage(alice, 'gameStarted');
     const startedChessGame = gameStarted.game as PublicChessGame;
-    expect(console.info).toHaveBeenCalledWith('[Chat Enhancer Playground] game_started', expect.objectContaining({
+    expect(console.info).toHaveBeenCalledWith('[playground] game_started', expect.objectContaining({
       event: 'game_started',
       game: expect.stringMatching(/^game_[\w-]+$/),
       gameType: 'chess',
@@ -414,7 +414,7 @@ describe('playground stream room', () => {
     await state.flushWaitUntil();
 
     expect(playerStats.getWins(alice.userId, 'chess')).toBe(1);
-    expect(console.info).toHaveBeenCalledWith('[Chat Enhancer Playground] game_win_recorded', expect.objectContaining({
+    expect(console.info).toHaveBeenCalledWith('[playground] game_win_recorded', expect.objectContaining({
       event: 'game_win_recorded',
       game: expect.stringMatching(/^game_[\w-]+$/),
       gameType: 'chess',
@@ -672,7 +672,7 @@ describe('playground stream room', () => {
       code: 'protocol_version',
       type: 'error'
     });
-    expect(console.warn).toHaveBeenCalledWith('[Chat Enhancer Playground] protocol_version_mismatch', expect.objectContaining({
+    expect(console.warn).toHaveBeenCalledWith('[playground] protocol_version_mismatch', expect.objectContaining({
       code: 'protocol_version',
       event: 'protocol_version_mismatch'
     }));
@@ -704,7 +704,7 @@ describe('playground stream room', () => {
       message: 'Something went wrong.',
       type: 'error'
     });
-    expect(console.error).toHaveBeenCalledWith('[Chat Enhancer Playground] internal_error', expect.objectContaining({
+    expect(console.error).toHaveBeenCalledWith('[playground] internal_error', expect.objectContaining({
       code: 'internal_error',
       errorMessage: 'unexpected failure',
       errorType: 'Error',
@@ -718,7 +718,7 @@ describe('playground stream room', () => {
       id: 'ping-long',
       type: 'ping'
     }));
-    expect(console.warn).toHaveBeenCalledWith('[Chat Enhancer Playground] protocol_error', expect.objectContaining({
+    expect(console.warn).toHaveBeenCalledWith('[playground] protocol_error', expect.objectContaining({
       code: 'custom_long',
       message: `${'x'.repeat(177)}...`
     }));
@@ -815,7 +815,7 @@ describe('playground stream room', () => {
       message: 'Slow down before sending more playground messages.',
       type: 'error'
     });
-    expect(console.warn).toHaveBeenCalledWith('[Chat Enhancer Playground] rate_limit_rejected', expect.objectContaining({
+    expect(console.warn).toHaveBeenCalledWith('[playground] rate_limit_rejected', expect.objectContaining({
       code: 'rate_limited',
       event: 'rate_limit_rejected',
       service: 'chat-enhancer-playground',
@@ -1067,7 +1067,7 @@ describe('playground stream room', () => {
     });
     await state.flushWaitUntil();
 
-    expect(console.warn).toHaveBeenCalledWith('[Chat Enhancer Playground] game_win_record_failed', expect.objectContaining({
+    expect(console.warn).toHaveBeenCalledWith('[playground] game_win_record_failed', expect.objectContaining({
       errorMessage: 'stats unavailable',
       errorType: 'Error',
       event: 'game_win_record_failed',

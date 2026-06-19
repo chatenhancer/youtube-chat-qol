@@ -37,7 +37,7 @@ describe('playground worker routes', () => {
     }), createEnv());
 
     expect(response.status).toBe(403);
-    expect(console.warn).toHaveBeenCalledWith('[Chat Enhancer Playground] origin_rejected', expect.objectContaining({
+    expect(console.warn).toHaveBeenCalledWith('[playground] origin_rejected', expect.objectContaining({
       event: 'origin_rejected',
       origin: expect.stringMatching(/^h_[a-z0-9]+$/),
       service: 'chat-enhancer-playground'
@@ -71,7 +71,7 @@ describe('playground worker routes', () => {
     expect(await response.json()).toEqual({ ok: true });
     expect(forwardedRequest?.headers.get('X-Chat-Enhancer-Stream-Key')).toBe('abc_123-Z');
     expect(console.info).toHaveBeenCalledWith(
-      '[Chat Enhancer Playground] room_fetch_succeeded',
+      '[playground] room_fetch_succeeded',
       expect.objectContaining({
         endpoint: 'snapshot',
         event: 'room_fetch_succeeded',
@@ -409,7 +409,7 @@ describe('playground worker routes', () => {
     ), createEnv());
 
     expect(response.status).toBe(413);
-    expect(console.warn).toHaveBeenCalledWith('[Chat Enhancer Playground] replay_trivia_request_too_large', expect.objectContaining({
+    expect(console.warn).toHaveBeenCalledWith('[playground] replay_trivia_request_too_large', expect.objectContaining({
       bytes: 1000001,
       event: 'replay_trivia_request_too_large',
       maxBytes: 1000000,
@@ -451,7 +451,7 @@ describe('playground worker routes', () => {
     }));
 
     expect(response.status).toBe(413);
-    expect(console.warn).toHaveBeenCalledWith('[Chat Enhancer Playground] replay_trivia_failed', expect.objectContaining({
+    expect(console.warn).toHaveBeenCalledWith('[playground] replay_trivia_failed', expect.objectContaining({
       chars: 400500,
       code: 'transcript_too_large',
       errorMessage: 'Transcript text must be 400000 characters or less.',
