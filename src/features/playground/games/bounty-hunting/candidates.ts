@@ -4,6 +4,7 @@ import {
   isBountyHuntingAllCapsMessage,
   BOUNTY_HUNTING_BOUNTY_COUNT,
   type BountyHuntingBounty,
+  type BountyHuntingBountyDescriptionKey,
   type BountyHuntingBountyMatcher
 } from '../../../../shared/playground/bounty-hunting';
 import { cleanText } from '../../../../shared/text';
@@ -43,6 +44,21 @@ interface BountyHuntingObservedMessageOptions {
 
 const TOP_FAN_LABEL_PATTERN = /\btop\s+(?:fans?|chatters?)\b/i;
 const CUSTOM_EMOJI_SHORTCUT_PATTERN = /^:[^:\s]+:$/;
+const BOUNTY_HUNTING_ENGLISH_DESCRIPTIONS: Record<BountyHuntingBountyDescriptionKey, string> = {
+  gamesBountyHuntingBountyAllCaps: 'a message in all caps',
+  gamesBountyHuntingBountyChannelMember: 'a message from a channel member',
+  gamesBountyHuntingBountyChannelOwner: 'a message from the channel owner',
+  gamesBountyHuntingBountyCustomEmoji: 'a message with a custom emoji',
+  gamesBountyHuntingBountyEmoji3: 'a message that has 3+ emojis',
+  gamesBountyHuntingBountyMention: 'a message that mentions a user',
+  gamesBountyHuntingBountyModerator: 'a message from a moderator',
+  gamesBountyHuntingBountyNumber: 'a message with a number',
+  gamesBountyHuntingBountyOnlyEmojis: 'a message with only emojis',
+  gamesBountyHuntingBountyQuestion: 'a message that asks a question',
+  gamesBountyHuntingBountySuperChat: 'a Super Chat',
+  gamesBountyHuntingBountyTopChatters: 'a message by the top 3 chatters',
+  gamesBountyHuntingBountyVerifiedAuthor: 'a message by a verified account'
+};
 
 export function createBountyHuntingBountiesFromMessages(
   messages: readonly BountyHuntingObservedMessage[]
@@ -70,45 +86,45 @@ export function countBountyHuntingObservedCandidateTypes(
 function createBountyHuntingCandidatePool(messages: readonly BountyHuntingObservedMessage[]): BountyCandidate[] {
   const stats = collectBountyHuntingStats(messages);
   return [
-    createCandidate('emoji-3', 50, 'a message that has 3+ emojis', { kind: 'emojiCount', min: 3 }, stats.emojiHeavy),
-    createCandidate('all-caps', 50, 'a message in all caps', { kind: 'allCaps' }, stats.allCaps),
-    createCandidate('verified-author', 75, 'a message by a verified account', { kind: 'verifiedAuthor' }, stats.verifiedAuthors),
-    createCandidate('question', 75, 'a message that asks a question', { kind: 'question' }, stats.questions),
-    createCandidate('mention-user', 125, 'a message that mentions a user', { kind: 'mention' }, stats.mentions),
-    createCandidate('has-number', 75, 'a message with a number', { kind: 'number' }, stats.numbers),
+    createCandidate('emoji-3', 50, 'gamesBountyHuntingBountyEmoji3', { kind: 'emojiCount', min: 3 }, stats.emojiHeavy),
+    createCandidate('all-caps', 50, 'gamesBountyHuntingBountyAllCaps', { kind: 'allCaps' }, stats.allCaps),
+    createCandidate('verified-author', 75, 'gamesBountyHuntingBountyVerifiedAuthor', { kind: 'verifiedAuthor' }, stats.verifiedAuthors),
+    createCandidate('question', 75, 'gamesBountyHuntingBountyQuestion', { kind: 'question' }, stats.questions),
+    createCandidate('mention-user', 125, 'gamesBountyHuntingBountyMention', { kind: 'mention' }, stats.mentions),
+    createCandidate('has-number', 75, 'gamesBountyHuntingBountyNumber', { kind: 'number' }, stats.numbers),
     ...createCandidateWhenObserved(
       'channel-member',
       100,
-      'a message from a channel member',
+      'gamesBountyHuntingBountyChannelMember',
       { kind: 'channelMemberAuthor' },
       stats.channelMemberAuthors
     ),
     ...createCandidateWhenObserved(
       'moderator',
       100,
-      'a message from a moderator',
+      'gamesBountyHuntingBountyModerator',
       { kind: 'moderatorAuthor' },
       stats.moderatorAuthors
     ),
     ...createCandidateWhenObserved(
       'channel-owner',
       125,
-      'a message from the channel owner',
+      'gamesBountyHuntingBountyChannelOwner',
       { kind: 'channelOwnerAuthor' },
       stats.channelOwnerAuthors
     ),
-    ...createCandidateWhenObserved('super-chat', 125, 'a Super Chat', { kind: 'superChat' }, stats.superChats),
+    ...createCandidateWhenObserved('super-chat', 125, 'gamesBountyHuntingBountySuperChat', { kind: 'superChat' }, stats.superChats),
     ...createCandidateWhenObserved(
       'custom-emoji',
       75,
-      'a message with a custom emoji',
+      'gamesBountyHuntingBountyCustomEmoji',
       { kind: 'customEmoji' },
       stats.customEmojis
     ),
     ...createCandidateWhenObserved(
       'only-emojis',
       100,
-      'a message with only emojis',
+      'gamesBountyHuntingBountyOnlyEmojis',
       { kind: 'onlyEmojis' },
       stats.onlyEmojis
     ),
@@ -116,7 +132,7 @@ function createBountyHuntingCandidatePool(messages: readonly BountyHuntingObserv
       ? [createCandidate(
         'top-chatters',
         100,
-        'a message by the top 3 chatters',
+        'gamesBountyHuntingBountyTopChatters',
         { kind: 'topFanAuthor' },
         stats.topFanAuthors
       )]
@@ -214,13 +230,14 @@ function collectBountyHuntingStats(messages: readonly BountyHuntingObservedMessa
 function createCandidate(
   id: string,
   amount: number,
-  description: string,
+  descriptionKey: BountyHuntingBountyDescriptionKey,
   matcher: BountyHuntingBountyMatcher,
   observedCount: number
 ): BountyCandidate {
   return {
     amount,
-    description,
+    description: BOUNTY_HUNTING_ENGLISH_DESCRIPTIONS[descriptionKey],
+    descriptionKey,
     id,
     matcher,
     observedCount,
@@ -231,12 +248,12 @@ function createCandidate(
 function createCandidateWhenObserved(
   id: string,
   amount: number,
-  description: string,
+  descriptionKey: BountyHuntingBountyDescriptionKey,
   matcher: BountyHuntingBountyMatcher,
   observedCount: number
 ): BountyCandidate[] {
   return observedCount > 0
-    ? [createCandidate(id, amount, description, matcher, observedCount)]
+    ? [createCandidate(id, amount, descriptionKey, matcher, observedCount)]
     : [];
 }
 
@@ -250,12 +267,12 @@ function dedupeBountyHuntingCandidates(candidates: BountyCandidate[]): BountyCan
 
 function getBountyHuntingFallbackBounties(): BountyCandidate[] {
   return [
-    createCandidate('emoji-3', 50, 'a message that has 3+ emojis', { kind: 'emojiCount', min: 3 }, 0),
-    createCandidate('all-caps', 50, 'a message in all caps', { kind: 'allCaps' }, 0),
-    createCandidate('verified-author', 75, 'a message by a verified account', { kind: 'verifiedAuthor' }, 0),
-    createCandidate('question', 75, 'a message that asks a question', { kind: 'question' }, 0),
-    createCandidate('mention-user', 125, 'a message that mentions a user', { kind: 'mention' }, 0),
-    createCandidate('has-number', 75, 'a message with a number', { kind: 'number' }, 0)
+    createCandidate('emoji-3', 50, 'gamesBountyHuntingBountyEmoji3', { kind: 'emojiCount', min: 3 }, 0),
+    createCandidate('all-caps', 50, 'gamesBountyHuntingBountyAllCaps', { kind: 'allCaps' }, 0),
+    createCandidate('verified-author', 75, 'gamesBountyHuntingBountyVerifiedAuthor', { kind: 'verifiedAuthor' }, 0),
+    createCandidate('question', 75, 'gamesBountyHuntingBountyQuestion', { kind: 'question' }, 0),
+    createCandidate('mention-user', 125, 'gamesBountyHuntingBountyMention', { kind: 'mention' }, 0),
+    createCandidate('has-number', 75, 'gamesBountyHuntingBountyNumber', { kind: 'number' }, 0)
   ];
 }
 

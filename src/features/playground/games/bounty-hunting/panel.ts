@@ -7,14 +7,16 @@
  */
 import { registerFeatureLifecycle } from '../../../../content/lifecycle';
 import { isCurrentUserAuthorName } from '../../../mention-detection';
-import { t } from '../../../../shared/i18n';
+import { t, type MessageKey } from '../../../../shared/i18n';
 import { ytcqCreateElement } from '../../../../shared/managed-dom';
 import { drawPlaygroundCanvasAvatar } from '../../../../shared/playground/avatar';
 import {
   BOUNTY_HUNTING_COUNTDOWN_MS,
   BOUNTY_HUNTING_BOUNTY_COUNT,
+  BOUNTY_HUNTING_BOUNTY_DESCRIPTION_KEYS,
   BOUNTY_HUNTING_ROUND_MS,
   BOUNTY_HUNTING_ROUND_OVER_MS,
+  type BountyHuntingBountyDescriptionKey,
   type PublicBountyHuntingBounty
 } from '../../../../shared/playground/bounty-hunting';
 import { getAuthorName } from '../../../../youtube/messages';
@@ -124,6 +126,7 @@ const READY_STACK_AVATAR_OFFSET_X = 12;
 const READY_STACK_AVATAR_OVERLAP = 12;
 const READY_STACK_AVATAR_RADIUS = 10;
 const BOUNTY_HUNTING_PLAYER_ROLES: BountyHuntingPlayerRole[] = ['host', 'guest'];
+const BOUNTY_HUNTING_DESCRIPTION_KEYS = new Set<string>(BOUNTY_HUNTING_BOUNTY_DESCRIPTION_KEYS);
 const BOUNTY_HUNTING_READY_SOUND_PATH = 'games/bounty-hunting/ready-gun-cock.mp3';
 const BOUNTY_HUNTING_ROUND_OVER_SOUND_PATH = 'games/bounty-hunting/sting.mp3';
 const BOUNTY_HUNTING_FINAL_TICK_SOUND_PATH = 'games/bounty-hunting/final-10-clock-tick.mp3';
@@ -754,7 +757,10 @@ function drawBountyHuntingCompact(runtime: BountyHuntingPanelRuntime, now: numbe
   context.textAlign = 'left';
   context.fillStyle = PAPER_TEXT;
   context.font = `700 16px ${BARNUM_STACK}`;
-  context.fillText('Them', 52, 24);
+  drawFittedText(context, t('gamesBountyHuntingThem'), 52, 24, 63, 16, {
+    fontStack: BARNUM_STACK,
+    weight: 700
+  });
   drawBountyHuntingMoneyText(context, game.scores[opponentRole] || 0, 52, 43, {
     align: 'left',
     amountFont: `1000 18px ${BARNUM_STACK}`,
@@ -765,7 +771,11 @@ function drawBountyHuntingCompact(runtime: BountyHuntingPanelRuntime, now: numbe
   context.textAlign = 'right';
   context.fillStyle = PAPER_TEXT;
   context.font = `700 16px ${BARNUM_STACK}`;
-  context.fillText('You', 396, 24);
+  drawFittedText(context, t('gamesBountyHuntingYou'), 396, 24, 63, 16, {
+    align: 'right',
+    fontStack: BARNUM_STACK,
+    weight: 700
+  });
   drawBountyHuntingMoneyText(context, game.scores[currentRole] || 0, 396, 43, {
     align: 'right',
     amountFont: `1000 18px ${BARNUM_STACK}`,
@@ -803,36 +813,40 @@ function drawBountyHuntingCompactStatus(runtime: BountyHuntingPanelRuntime, now:
       font: `400 32px ${TEX_MEX_STACK}`,
       shadow: false
     });
-    drawCenteredText(context, 'STARTING', 224, 49, {
+    drawCenteredFittedText(context, t('gamesBountyHuntingStarting'), 224, 49, 94, {
       color: PAPER_TEXT,
       font: `700 10px ${BARNUM_STACK}`,
+      minFontSize: 8,
       shadow: false
     });
     return;
   }
 
   if (game.status === 'preparing') {
-    drawCenteredText(context, 'LOADING', 224, 32, {
+    drawCenteredFittedText(context, t('gamesBountyHuntingLoadingStatus'), 224, 32, 116, {
       color: PAPER_TEXT,
       font: `800 18px ${BARTLE_STACK}`,
+      minFontSize: 11,
       shadow: false
     });
     return;
   }
 
   if (game.status === 'roundOver') {
-    drawCenteredText(context, 'ROUND OVER', 224, 32, {
+    drawCenteredFittedText(context, t('gamesBountyHuntingRoundOver'), 224, 32, 150, {
       color: PAPER_TEXT,
       font: `700 22px ${BARNUM_STACK}`,
+      minFontSize: 13,
       shadow: false
     });
     return;
   }
 
   if (game.status === 'finished') {
-    drawCenteredText(context, `WINNER: ${getBountyHuntingWinnerLabel(runtime)}`, 224, 32, {
+    drawCenteredFittedText(context, getBountyHuntingWinnerText(runtime), 224, 32, 172, {
       color: PAPER_TEXT,
       font: `700 22px ${BARNUM_STACK}`,
+      minFontSize: 13,
       shadow: false
     });
     return;
@@ -863,9 +877,10 @@ function drawBountyHuntingCompactStatus(runtime: BountyHuntingPanelRuntime, now:
     font: `800 ${timerFontSize}px ${BARTLE_STACK}`,
     shadow: false
   });
-  drawCenteredText(context, 'TIME REMAINING', 224, 46, {
+  drawCenteredFittedText(context, t('gamesBountyHuntingTimeRemaining'), 224, 46, 122, {
     color: PAPER_TEXT,
     font: `700 10px ${BARNUM_STACK}`,
+    minFontSize: 8,
     shadow: false
   });
 }
@@ -897,12 +912,14 @@ function drawBountyHuntingCompactReadyButton(runtime: BountyHuntingPanelRuntime,
 
   drawCenteredText(
     context,
-    'READY',
+    t('gamesBountyHuntingReady'),
     COMPACT_READY_BUTTON_RECT.x + COMPACT_READY_BUTTON_RECT.width / 2,
     COMPACT_READY_BUTTON_RECT.y + COMPACT_READY_BUTTON_RECT.height / 2,
     {
       color: PAPER_TEXT,
       font: `800 12px ${BARTLE_STACK}`,
+      maxWidth: COMPACT_READY_BUTTON_RECT.width - 36,
+      minFontSize: 8,
       shadow: false
     }
   );
@@ -981,7 +998,7 @@ function drawBountyHuntingCompactBountyStamp(
   if (claimed) {
     context.translate(x + 118, y + 11);
     context.rotate(-0.2);
-    if (assets.bountyClaimedStamp) {
+    if (assets.bountyClaimedStamp && shouldUseBountyHuntingClaimedStampAsset()) {
       context.drawImage(
         assets.bountyClaimedStamp,
         -COMPACT_BOUNTY_CLAIMED_STAMP_WIDTH / 2,
@@ -990,9 +1007,9 @@ function drawBountyHuntingCompactBountyStamp(
         COMPACT_BOUNTY_CLAIMED_STAMP_HEIGHT
       );
     } else {
-      drawCompactBountyStampFallback(context, 'CLAIMED', -24, -8, '#a8302d');
+      drawCompactBountyStampFallback(context, t('gamesBountyHuntingClaimed'), -24, -8, '#a8302d');
     }
-  } else if (assets.bountyOpenStamp) {
+  } else if (assets.bountyOpenStamp && shouldUseBountyHuntingOpenStampAsset()) {
     context.drawImage(
       assets.bountyOpenStamp,
       x + 94,
@@ -1001,7 +1018,7 @@ function drawBountyHuntingCompactBountyStamp(
       COMPACT_BOUNTY_OPEN_STAMP_HEIGHT
     );
   } else {
-    drawCompactBountyStampFallback(context, 'OPEN', x + COMPACT_BOUNTY_CHIP_WIDTH - 39, y + 6, GREEN_STAMP);
+    drawCompactBountyStampFallback(context, t('gamesBountyHuntingOpen'), x + COMPACT_BOUNTY_CHIP_WIDTH - 39, y + 6, GREEN_STAMP);
   }
   context.restore();
 }
@@ -1017,37 +1034,42 @@ function drawCompactBountyStampFallback(
   context.textBaseline = 'middle';
   context.fillStyle = color;
   context.font = `700 9px ${BARNUM_STACK}`;
-  context.fillText(text, x + 21, y + 8);
+  drawCenteredFittedText(context, text, x + 21, y + 8, 38, {
+    color,
+    font: `700 9px ${BARNUM_STACK}`,
+    minFontSize: 7,
+    shadow: false
+  });
 }
 
 function getBountyHuntingCompactBountyLabel(bounty: PublicBountyHuntingBounty): string {
   switch (bounty.matcher.kind) {
     case 'allCaps':
-      return 'ALL CAPS';
+      return t('gamesBountyHuntingCompactAllCaps');
     case 'channelMemberAuthor':
-      return 'member';
+      return t('gamesBountyHuntingCompactMember');
     case 'channelOwnerAuthor':
-      return 'owner';
+      return t('gamesBountyHuntingCompactOwner');
     case 'customEmoji':
-      return 'custom emoji';
+      return t('gamesBountyHuntingCompactCustomEmoji');
     case 'emojiCount':
-      return `${bounty.matcher.min}+ emojis`;
+      return t('gamesBountyHuntingCompactEmojiCount', { count: bounty.matcher.min });
     case 'mention':
-      return 'mention';
+      return t('gamesBountyHuntingCompactMention');
     case 'moderatorAuthor':
-      return 'mod';
+      return t('gamesBountyHuntingCompactModerator');
     case 'number':
-      return 'number';
+      return t('gamesBountyHuntingCompactNumber');
     case 'onlyEmojis':
-      return 'only emojis';
+      return t('gamesBountyHuntingCompactOnlyEmojis');
     case 'question':
-      return 'question';
+      return t('gamesBountyHuntingCompactQuestion');
     case 'superChat':
-      return 'Super Chat';
+      return t('gamesBountyHuntingCompactSuperChat');
     case 'topFanAuthor':
-      return 'top fan';
+      return t('gamesBountyHuntingCompactTopFan');
     case 'verifiedAuthor':
-      return 'verified';
+      return t('gamesBountyHuntingCompactVerified');
   }
 }
 
@@ -1062,9 +1084,10 @@ function drawBountyHuntingLoading(runtime: BountyHuntingPanelRuntime, now: numbe
     drawBountyHuntingLoadingLogoFallback(context);
   }
 
-  drawCenteredText(context, 'Loading...', 224, 398, {
+  drawCenteredFittedText(context, t('gamesBountyHuntingLoading'), 224, 398, 220, {
     color: '#444',
     font: '400 22px Roboto, Arial, sans-serif',
+    minFontSize: 14,
     shadow: false
   });
   drawGameLoadingSpinner(context, {
@@ -1108,8 +1131,10 @@ function drawBountyHuntingLoadingLogoFallback(context: CanvasRenderingContext2D)
 
 function drawBountyHuntingWanted(runtime: BountyHuntingPanelRuntime, now: number): void {
   drawBountyHuntingPaper(runtime);
-  drawBountyHuntingTitle(runtime, 'WANTED', 18, 90, TEX_MEX_STACK, {
+  drawBountyHuntingTitle(runtime, t('gamesBountyHuntingWanted'), 18, 90, TEX_MEX_STACK, {
     decorOffsetY: 7,
+    maxTextWidth: 230,
+    minFontSize: 42,
     textOffsetY: 8,
     weight: 400
   });
@@ -1117,7 +1142,7 @@ function drawBountyHuntingWanted(runtime: BountyHuntingPanelRuntime, now: number
   const displayBounties = getBountyHuntingDisplayBounties(runtime.game.bounties);
   displayBounties.forEach((bounty, index) => drawBountyHuntingBounty(runtime, bounty, index));
   displayBounties.forEach((bounty, index) => drawBountyHuntingBountyClaimAvatar(runtime, bounty, index));
-  drawBountyHuntingActionButton(runtime, 'READY', runtime.game.status === 'ready' ? 'ready' : null, {
+  drawBountyHuntingActionButton(runtime, t('gamesBountyHuntingReady'), runtime.game.status === 'ready' ? 'ready' : null, {
     flashAmount: getBountyHuntingReadyButtonFlashAmount(runtime, now),
     readyStack: true
   });
@@ -1158,19 +1183,16 @@ function drawBountyHuntingRoundOver(runtime: BountyHuntingPanelRuntime): void {
     drawBountyHuntingPaper(runtime);
   }
 
-  if (assets.roundOverTitle) {
+  if (assets.roundOverTitle && t('gamesBountyHuntingRoundOver') === 'ROUND OVER') {
     context.drawImage(assets.roundOverTitle, 33, 64, 382, 296);
   } else {
-    drawCenteredText(context, 'ROUND', 224, 165, {
+    drawCenteredFittedText(context, t('gamesBountyHuntingRoundOver'), 224, 205, 330, {
       color: '#f6deb2',
-      font: `700 72px ${BARNUM_STACK}`
-    });
-    drawCenteredText(context, 'OVER', 224, 238, {
-      color: '#f6deb2',
-      font: `700 72px ${BARNUM_STACK}`
+      font: `700 72px ${BARNUM_STACK}`,
+      minFontSize: 36
     });
   }
-  drawBountyHuntingActionButton(runtime, 'LOADING', null, {
+  drawBountyHuntingActionButton(runtime, t('gamesBountyHuntingLoadingStatus'), null, {
     darker: true,
     labelColor: ROUND_OVER_BUTTON_LABEL_COLOR,
     y: ROUND_OVER_BUTTON_Y
@@ -1180,8 +1202,10 @@ function drawBountyHuntingRoundOver(runtime: BountyHuntingPanelRuntime): void {
 function drawBountyHuntingLedger(runtime: BountyHuntingPanelRuntime): void {
   const { context } = runtime;
   drawBountyHuntingPaper(runtime);
-  drawBountyHuntingTitle(runtime, 'THE LEDGER', LEDGER_TITLE_Y, LEDGER_TITLE_FONT_SIZE, TEX_MEX_STACK, {
+  drawBountyHuntingTitle(runtime, t('gamesBountyHuntingLedger'), LEDGER_TITLE_Y, LEDGER_TITLE_FONT_SIZE, TEX_MEX_STACK, {
     decorOffsetY: 7,
+    maxTextWidth: 230,
+    minFontSize: 30,
     textOffsetY: 8,
     weight: 400
   });
@@ -1190,10 +1214,20 @@ function drawBountyHuntingLedger(runtime: BountyHuntingPanelRuntime): void {
   context.font = `700 13px ${BARNUM_STACK}`;
   context.textAlign = 'center';
   context.textBaseline = 'middle';
-  context.fillText('BOUNTIES', LEDGER_HEADER_X, LEDGER_HEADER_TOP_Y);
-  context.fillText('CLAIMED', LEDGER_HEADER_X, LEDGER_HEADER_TOP_Y + 20);
-  context.fillText('MONEY', LEDGER_MONEY_X, LEDGER_HEADER_TOP_Y);
-  context.fillText('EARNED', LEDGER_MONEY_X, LEDGER_HEADER_TOP_Y + 20);
+  drawFittedTextBlock(context, t('gamesBountyHuntingBountiesClaimed'), LEDGER_HEADER_X, LEDGER_HEADER_TOP_Y, 74, {
+    color: RED_TEXT,
+    font: `700 13px ${BARNUM_STACK}`,
+    lineHeight: 20,
+    maxLines: 2,
+    minFontSize: 9
+  });
+  drawFittedTextBlock(context, t('gamesBountyHuntingMoneyEarned'), LEDGER_MONEY_X, LEDGER_HEADER_TOP_Y, 74, {
+    color: RED_TEXT,
+    font: `700 13px ${BARNUM_STACK}`,
+    lineHeight: 20,
+    maxLines: 2,
+    minFontSize: 9
+  });
 
   const rows = getBountyHuntingLedgerRows(runtime);
   rows.forEach((row, index) => {
@@ -1203,7 +1237,11 @@ function drawBountyHuntingLedger(runtime: BountyHuntingPanelRuntime): void {
     context.fillStyle = PAPER_TEXT;
     context.textAlign = 'left';
     context.font = `700 34px ${BARNUM_STACK}`;
-    context.fillText(row.label, LEDGER_LABEL_X, y);
+    drawFittedText(context, row.label, LEDGER_LABEL_X, y, 118, 34, {
+      fontStack: BARNUM_STACK,
+      minFontSize: 20,
+      weight: 700
+    });
     context.textAlign = 'center';
     context.font = `1000 36px ${BARNUM_STACK}`;
     context.fillText(String(row.claims), LEDGER_BOUNTIES_X, y);
@@ -1215,18 +1253,18 @@ function drawBountyHuntingLedger(runtime: BountyHuntingPanelRuntime): void {
     });
   });
 
-  const winnerLabel = getBountyHuntingWinnerLabel(runtime);
   if (runtime.assets.woodenRibbon) {
     context.drawImage(runtime.assets.woodenRibbon, 42, LEDGER_RIBBON_Y, 364, 72);
   } else {
     drawRoundedRect(context, 42, LEDGER_RIBBON_Y + 10, 364, 52, 8, '#7f3d20', '#512411');
   }
-  drawCenteredText(context, `WINNER: ${winnerLabel}`, 224, LEDGER_WINNER_Y, {
+  drawCenteredFittedText(context, getBountyHuntingWinnerText(runtime), 224, LEDGER_WINNER_Y, 300, {
     color: '#e9ddbf',
-    font: `700 29px ${BARNUM_STACK}`
+    font: `700 29px ${BARNUM_STACK}`,
+    minFontSize: 18
   });
 
-  drawBountyHuntingActionButton(runtime, 'CLOSE', 'close', { y: LEDGER_CLOSE_BUTTON_Y });
+  drawBountyHuntingActionButton(runtime, t('gamesBountyHuntingClose'), 'close', { y: LEDGER_CLOSE_BUTTON_Y });
 }
 
 function drawBountyHuntingPaper(runtime: BountyHuntingPanelRuntime): void {
@@ -1251,6 +1289,8 @@ function drawBountyHuntingTitle(
   fontStack = BARNUM_STACK,
   options: {
     decorOffsetY?: number;
+    maxTextWidth?: number;
+    minFontSize?: number;
     textOffsetY?: number;
     weight?: number;
   } = {}
@@ -1258,13 +1298,20 @@ function drawBountyHuntingTitle(
   const { assets, context } = runtime;
   const fontWeight = options.weight ?? 800;
   const font = `${fontWeight} ${fontSize}px ${fontStack}`;
+  const fittedTitle = getFittedCanvasText(
+    context,
+    text,
+    font,
+    options.maxTextWidth ?? 232,
+    options.minFontSize ?? 28
+  );
   const decorWidth = 98;
   const decorGap = 32;
   const decorEdgeInset = 8;
   const decorY = y - 4 + (options.decorOffsetY ?? 0);
   context.save();
-  context.font = font;
-  const titleWidth = context.measureText(text).width;
+  context.font = fittedTitle.font;
+  const titleWidth = context.measureText(fittedTitle.text).width;
   context.restore();
   const leftDecorX = Math.max(
     decorEdgeInset,
@@ -1276,9 +1323,9 @@ function drawBountyHuntingTitle(
   );
   if (assets.titleDecorLeft) context.drawImage(assets.titleDecorLeft, leftDecorX, decorY, decorWidth, 44);
   if (assets.titleDecorRight) context.drawImage(assets.titleDecorRight, rightDecorX, decorY, decorWidth, 44);
-  drawCenteredText(context, text, 224, y + 20 + (options.textOffsetY ?? 0), {
+  drawCenteredText(context, fittedTitle.text, 224, y + 20 + (options.textOffsetY ?? 0), {
     color: PAPER_TEXT,
-    font,
+    font: fittedTitle.font,
     shadow: false
   });
 }
@@ -1301,7 +1348,10 @@ function drawBountyHuntingLiveScore(runtime: BountyHuntingPanelRuntime, now: num
   context.textBaseline = 'middle';
   context.fillStyle = PAPER_TEXT;
   context.font = `700 18px ${BARNUM_STACK}`;
-  context.fillText('Them', LIVE_SCORE_LEFT_TEXT_X, LIVE_SCORE_NAME_Y + offsetY);
+  drawFittedText(context, t('gamesBountyHuntingThem'), LIVE_SCORE_LEFT_TEXT_X, LIVE_SCORE_NAME_Y + offsetY, 75, 18, {
+    fontStack: BARNUM_STACK,
+    weight: 700
+  });
   drawBountyHuntingMoneyText(context, game.scores[opponentRole] || 0, LIVE_SCORE_LEFT_TEXT_X, LIVE_SCORE_MONEY_Y + offsetY, {
     align: 'left',
     amountFont: `1000 20px ${BARNUM_STACK}`,
@@ -1312,7 +1362,11 @@ function drawBountyHuntingLiveScore(runtime: BountyHuntingPanelRuntime, now: num
   context.textAlign = 'right';
   context.fillStyle = PAPER_TEXT;
   context.font = `700 18px ${BARNUM_STACK}`;
-  context.fillText('You', LIVE_SCORE_RIGHT_TEXT_X, LIVE_SCORE_NAME_Y + offsetY);
+  drawFittedText(context, t('gamesBountyHuntingYou'), LIVE_SCORE_RIGHT_TEXT_X, LIVE_SCORE_NAME_Y + offsetY, 75, 18, {
+    align: 'right',
+    fontStack: BARNUM_STACK,
+    weight: 700
+  });
   drawBountyHuntingMoneyText(context, game.scores[currentRole] || 0, LIVE_SCORE_RIGHT_TEXT_X, LIVE_SCORE_MONEY_Y + offsetY, {
     align: 'right',
     amountFont: `1000 20px ${BARNUM_STACK}`,
@@ -1337,7 +1391,12 @@ function drawBountyHuntingLiveScore(runtime: BountyHuntingPanelRuntime, now: num
   }
   context.fillText(getBountyHuntingTimerText(game), 224, 111 + offsetY);
   context.font = `700 11px ${BARNUM_STACK}`;
-  context.fillText('TIME REMAINING', 224, 129 + offsetY);
+  drawCenteredFittedText(context, t('gamesBountyHuntingTimeRemaining'), 224, 129 + offsetY, 122, {
+    color: context.fillStyle as string,
+    font: `700 11px ${BARNUM_STACK}`,
+    minFontSize: 8,
+    shadow: false
+  });
 }
 
 function drawBountyHuntingBounty(
@@ -1370,11 +1429,16 @@ function drawBountyHuntingBounty(
   context.font = '400 13px Roboto, Arial, sans-serif';
   drawFittedText(
     context,
-    bounty.description,
+    getBountyHuntingBountyDescription(bounty),
     BOUNTY_DESCRIPTION_X,
     y + 20,
     (332 + BOUNTY_STAMP_X_OFFSET) - BOUNTY_DESCRIPTION_X - BOUNTY_DESCRIPTION_STAMP_GAP,
-    13
+    13,
+    {
+      fontStack: 'Roboto, Arial, sans-serif',
+      minFontSize: 10,
+      weight: 400
+    }
   );
   context.restore();
 
@@ -1397,11 +1461,11 @@ function drawBountyHuntingBountyClaimAvatar(
 
 function drawOpenStamp(runtime: BountyHuntingPanelRuntime, y: number): void {
   const { assets, context } = runtime;
-  if (assets.bountyOpenStamp) {
+  if (assets.bountyOpenStamp && shouldUseBountyHuntingOpenStampAsset()) {
     context.drawImage(assets.bountyOpenStamp, 332 + BOUNTY_STAMP_X_OFFSET, y - 11, 70, 62);
     return;
   }
-  drawStampFallback(context, 'OPEN', 339 + BOUNTY_STAMP_X_OFFSET, y + 6, GREEN_STAMP);
+  drawStampFallback(context, t('gamesBountyHuntingOpen'), 339 + BOUNTY_STAMP_X_OFFSET, y + 6, GREEN_STAMP);
 }
 
 function drawClaimedStamp(runtime: BountyHuntingPanelRuntime, y: number): void {
@@ -1409,12 +1473,20 @@ function drawClaimedStamp(runtime: BountyHuntingPanelRuntime, y: number): void {
   context.save();
   context.translate(360 + BOUNTY_STAMP_X_OFFSET, y + 15);
   context.rotate(-0.22);
-  if (assets.bountyClaimedStamp) {
+  if (assets.bountyClaimedStamp && shouldUseBountyHuntingClaimedStampAsset()) {
     context.drawImage(assets.bountyClaimedStamp, -30, -23, 60, 46);
   } else {
-    drawStampFallback(context, 'CLAIMED', -31, -13, '#b7312d');
+    drawStampFallback(context, t('gamesBountyHuntingClaimed'), -31, -13, '#b7312d');
   }
   context.restore();
+}
+
+function shouldUseBountyHuntingOpenStampAsset(): boolean {
+  return t('gamesBountyHuntingOpen') === 'OPEN';
+}
+
+function shouldUseBountyHuntingClaimedStampAsset(): boolean {
+  return t('gamesBountyHuntingClaimed') === 'CLAIMED';
 }
 
 function drawStampFallback(
@@ -1430,7 +1502,12 @@ function drawStampFallback(
   context.fillStyle = color;
   context.textAlign = 'center';
   context.font = `700 14px ${BARNUM_STACK}`;
-  context.fillText(text, x + 28, y + 15);
+  drawCenteredFittedText(context, text, x + 28, y + 15, 50, {
+    color,
+    font: `700 14px ${BARNUM_STACK}`,
+    minFontSize: 8,
+    shadow: false
+  });
 }
 
 function drawBountyHuntingActionButton(
@@ -1598,11 +1675,16 @@ function drawCenteredText(
   options: {
     color: string;
     font: string;
+    maxWidth?: number;
+    minFontSize?: number;
     shadow?: boolean;
   }
 ): void {
+  const fitted = options.maxWidth
+    ? getFittedCanvasText(context, text, options.font, options.maxWidth, options.minFontSize ?? 8)
+    : { font: options.font, text };
   context.save();
-  context.font = options.font;
+  context.font = fitted.font;
   context.textAlign = 'center';
   context.textBaseline = 'middle';
   if (options.shadow !== false) {
@@ -1612,8 +1694,27 @@ function drawCenteredText(
     context.shadowOffsetY = 4;
   }
   context.fillStyle = options.color;
-  context.fillText(text, x, y);
+  context.fillText(fitted.text, x, y);
   context.restore();
+}
+
+function drawCenteredFittedText(
+  context: CanvasRenderingContext2D,
+  text: string,
+  x: number,
+  y: number,
+  maxWidth: number,
+  options: {
+    color: string;
+    font: string;
+    minFontSize?: number;
+    shadow?: boolean;
+  }
+): void {
+  drawCenteredText(context, text, x, y, {
+    ...options,
+    maxWidth
+  });
 }
 
 function drawBountyHuntingMoneyText(
@@ -1668,14 +1769,158 @@ function drawFittedText(
   x: number,
   y: number,
   maxWidth: number,
-  fontSize: number
+  fontSize: number,
+  options: {
+    align?: CanvasTextAlign;
+    fontStack?: string;
+    minFontSize?: number;
+    weight?: number;
+  } = {}
 ): void {
-  let nextText = text;
-  while (nextText.length > 3 && context.measureText(nextText).width > maxWidth) {
-    nextText = `${nextText.slice(0, -4).trim()}...`;
+  const fontStack = options.fontStack ?? 'Roboto, Arial, sans-serif';
+  const weight = options.weight ?? 400;
+  const fitted = getFittedCanvasText(
+    context,
+    text,
+    `${weight} ${fontSize}px ${fontStack}`,
+    maxWidth,
+    options.minFontSize ?? 8
+  );
+  context.save();
+  context.font = fitted.font;
+  if (options.align) context.textAlign = options.align;
+  context.textBaseline = 'middle';
+  context.fillText(fitted.text, x, y);
+  context.restore();
+}
+
+function drawFittedTextBlock(
+  context: CanvasRenderingContext2D,
+  text: string,
+  centerX: number,
+  firstLineY: number,
+  maxWidth: number,
+  options: {
+    color: string;
+    font: string;
+    lineHeight: number;
+    maxLines: number;
+    minFontSize: number;
   }
-  context.font = `400 ${fontSize}px Roboto, Arial, sans-serif`;
-  context.fillText(nextText, x, y);
+): void {
+  context.save();
+  context.fillStyle = options.color;
+  context.textAlign = 'center';
+  context.textBaseline = 'middle';
+
+  const baseFontSize = getBountyHuntingFontPixelSize(options.font);
+  let fontSize = baseFontSize;
+  let font = options.font;
+  let lines = wrapCanvasText(context, text, font, maxWidth, options.maxLines);
+  while (
+    fontSize > options.minFontSize &&
+    (lines.length > options.maxLines || lines.some((line) => getCanvasTextWidth(context, line, font) > maxWidth))
+  ) {
+    fontSize -= 1;
+    font = setCanvasFontPixelSize(options.font, fontSize);
+    lines = wrapCanvasText(context, text, font, maxWidth, options.maxLines);
+  }
+
+  const visibleLines = lines.slice(0, options.maxLines);
+  if (visibleLines.length && lines.length > options.maxLines) {
+    visibleLines[visibleLines.length - 1] = ellipsizeCanvasText(
+      context,
+      visibleLines[visibleLines.length - 1],
+      font,
+      maxWidth
+    );
+  }
+  context.font = font;
+  visibleLines.forEach((line, index) => {
+    const fittedLine = getCanvasTextWidth(context, line, font) <= maxWidth
+      ? line
+      : ellipsizeCanvasText(context, line, font, maxWidth);
+    context.fillText(fittedLine, centerX, firstLineY + index * options.lineHeight);
+  });
+  context.restore();
+}
+
+function getFittedCanvasText(
+  context: CanvasRenderingContext2D,
+  text: string,
+  font: string,
+  maxWidth: number,
+  minFontSize: number
+): { font: string; text: string } {
+  let fontSize = getBountyHuntingFontPixelSize(font);
+  let fittedFont = font;
+  while (fontSize > minFontSize && getCanvasTextWidth(context, text, fittedFont) > maxWidth) {
+    fontSize -= 1;
+    fittedFont = setCanvasFontPixelSize(font, fontSize);
+  }
+  return {
+    font: fittedFont,
+    text: getCanvasTextWidth(context, text, fittedFont) > maxWidth
+      ? ellipsizeCanvasText(context, text, fittedFont, maxWidth)
+      : text
+  };
+}
+
+function getCanvasTextWidth(context: CanvasRenderingContext2D, text: string, font: string): number {
+  context.save();
+  context.font = font;
+  const width = context.measureText(text).width;
+  context.restore();
+  return width;
+}
+
+function setCanvasFontPixelSize(font: string, fontSize: number): string {
+  return font.replace(/(\d+(?:\.\d+)?)px/, `${fontSize}px`);
+}
+
+function ellipsizeCanvasText(
+  context: CanvasRenderingContext2D,
+  text: string,
+  font: string,
+  maxWidth: number
+): string {
+  const ellipsis = '...';
+  if (getCanvasTextWidth(context, text, font) <= maxWidth) return text;
+  if (getCanvasTextWidth(context, ellipsis, font) > maxWidth) return '';
+
+  let nextText = text;
+  while (nextText.length > 1) {
+    nextText = nextText.slice(0, -1).trimEnd();
+    const candidate = `${nextText}${ellipsis}`;
+    if (getCanvasTextWidth(context, candidate, font) <= maxWidth) return candidate;
+  }
+  return ellipsis;
+}
+
+function wrapCanvasText(
+  context: CanvasRenderingContext2D,
+  text: string,
+  font: string,
+  maxWidth: number,
+  maxLines: number
+): string[] {
+  const words = text.trim().split(/\s+/u).filter(Boolean);
+  if (words.length <= 1) return words.length ? words : [''];
+
+  const lines: string[] = [];
+  let currentLine = '';
+  for (const word of words) {
+    const candidate = currentLine ? `${currentLine} ${word}` : word;
+    if (getCanvasTextWidth(context, candidate, font) <= maxWidth || !currentLine) {
+      currentLine = candidate;
+    } else {
+      lines.push(currentLine);
+      currentLine = word;
+      if (lines.length >= maxLines) break;
+    }
+  }
+  if (currentLine && lines.length < maxLines + 1) lines.push(currentLine);
+  return lines;
 }
 
 function drawRoundedRect(
@@ -1711,7 +1956,8 @@ function drawRoundedRect(
 
 function getBountyHuntingLedgerRows(runtime: BountyHuntingPanelRuntime): Array<{
   claims: number;
-  label: 'THEM' | 'YOU';
+  isCurrentUser: boolean;
+  label: string;
   money: number;
   role: BountyHuntingPlayerRole;
 }> {
@@ -1720,22 +1966,49 @@ function getBountyHuntingLedgerRows(runtime: BountyHuntingPanelRuntime): Array<{
   return [
     {
       claims: getBountyHuntingRoleClaimCount(runtime.game, currentRole),
-      label: 'YOU' as const,
+      isCurrentUser: true,
+      label: getBountyHuntingEmphasisText(t('gamesBountyHuntingYou')),
       money: runtime.game.scores[currentRole] || 0,
       role: currentRole
     },
     {
       claims: getBountyHuntingRoleClaimCount(runtime.game, opponentRole),
-      label: 'THEM' as const,
+      isCurrentUser: false,
+      label: getBountyHuntingEmphasisText(t('gamesBountyHuntingThem')),
       money: runtime.game.scores[opponentRole] || 0,
       role: opponentRole
     }
-  ].sort((a, b) => b.money - a.money || b.claims - a.claims || (a.label === 'YOU' ? -1 : 1));
+  ].sort((a, b) => b.money - a.money || b.claims - a.claims || (a.isCurrentUser ? -1 : 1));
 }
 
 function getBountyHuntingWinnerLabel(runtime: BountyHuntingPanelRuntime): string {
-  if (!runtime.game.winnerUserId) return 'TIE';
-  return runtime.game.winnerUserId === runtime.currentUserId ? 'YOU' : 'THEM';
+  let label = t('gamesBountyHuntingTie');
+  if (runtime.game.winnerUserId) {
+    label = runtime.game.winnerUserId === runtime.currentUserId
+      ? t('gamesBountyHuntingYou')
+      : t('gamesBountyHuntingThem');
+  }
+  return getBountyHuntingEmphasisText(label);
+}
+
+function getBountyHuntingWinnerText(runtime: BountyHuntingPanelRuntime): string {
+  return t('gamesBountyHuntingWinner', {
+    winner: getBountyHuntingWinnerLabel(runtime)
+  });
+}
+
+function getBountyHuntingBountyDescription(bounty: PublicBountyHuntingBounty): string {
+  if (
+    bounty.descriptionKey &&
+    BOUNTY_HUNTING_DESCRIPTION_KEYS.has(bounty.descriptionKey)
+  ) {
+    return t(bounty.descriptionKey as BountyHuntingBountyDescriptionKey & MessageKey);
+  }
+  return bounty.description;
+}
+
+function getBountyHuntingEmphasisText(text: string): string {
+  return text.toLocaleUpperCase();
 }
 
 function getBountyHuntingTimerText(game: PublicBountyHuntingGame): string {
@@ -1766,7 +2039,7 @@ function getBountyHuntingCurrentRole(
 function getBountyHuntingOpponentLabel(game: PublicBountyHuntingGame, currentUserId: string): string {
   const role = getBountyHuntingCurrentRole(game, currentUserId);
   const opponentRole = role === 'host' ? 'guest' : 'host';
-  return game.players[opponentRole]?.displayName || 'Player';
+  return game.players[opponentRole]?.displayName || t('gamesBountyHuntingPlayer');
 }
 
 function configureBountyHuntingCanvas(canvas: HTMLCanvasElement, compactMode = false): number {
