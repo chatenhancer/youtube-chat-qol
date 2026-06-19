@@ -731,7 +731,7 @@ describe('popup', () => {
     expect(playgroundProfile.hidden).toBe(false);
     expect(playgroundProfileDetails.hidden).toBe(true);
     expect(playgroundProfileAvatar.textContent).toBe('T');
-    expect(playgroundProfileAvatar.style.getPropertyValue('--playground-profile-avatar-bg')).toBe('hsl(11 62% 28%)');
+    expect(playgroundProfileAvatar.style.getPropertyValue('--playground-profile-avatar-bg')).toBe('hsl(255 45% 37%)');
     expect(playgroundProfileName.textContent).toBe('Player TEST');
     expect(playgroundProfileWins.title).toBe('playgroundWins: 7');
     expect(playgroundProfileWins.getAttribute('aria-label')).toBe('playgroundWins: 7');

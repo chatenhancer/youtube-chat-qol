@@ -30,6 +30,41 @@ export interface PlaygroundAvatarPresentation {
   initial: string;
 }
 
+const PLAYGROUND_AVATAR_COLORS = [
+  'hsl(188 64% 30%)',
+  'hsl(28 68% 34%)',
+  'hsl(262 46% 38%)',
+  'hsl(115 40% 30%)',
+  'hsl(340 58% 34%)',
+  'hsl(210 62% 34%)',
+  'hsl(55 65% 28%)',
+  'hsl(300 42% 35%)',
+  'hsl(150 48% 29%)',
+  'hsl(12 63% 35%)',
+  'hsl(235 45% 38%)',
+  'hsl(85 45% 30%)',
+  'hsl(175 55% 29%)',
+  'hsl(45 70% 30%)',
+  'hsl(2 57% 36%)',
+  'hsl(270 45% 36%)',
+  'hsl(146 48% 30%)',
+  'hsl(205 62% 34%)',
+  'hsl(24 64% 35%)',
+  'hsl(324 52% 34%)',
+  'hsl(255 45% 37%)',
+  'hsl(286 46% 36%)',
+  'hsl(192 61% 31%)',
+  'hsl(350 57% 35%)',
+  'hsl(224 51% 36%)',
+  'hsl(72 48% 29%)',
+  'hsl(312 47% 35%)',
+  'hsl(132 45% 30%)',
+  'hsl(242 43% 37%)',
+  'hsl(18 66% 34%)',
+  'hsl(276 45% 35%)',
+  'hsl(104 43% 30%)'
+] as const;
+
 export interface PlaygroundProfileMessage {
   type: typeof PLAYGROUND_PROFILE_MESSAGE_TYPE;
 }
@@ -68,11 +103,16 @@ export function getPlaygroundAvatarInitial(displayName: string, userId = ''): st
       getFirstAsciiLetter(userId) ||
       getStableAsciiLetter(userId || generatedPlayerCode);
   }
+  const computerProfileLabel = getComputerProfileLabel(normalized, userId);
+  if (computerProfileLabel) {
+    return getFirstAsciiLetter(computerProfileLabel) ||
+      getStableAsciiLetter(computerProfileLabel);
+  }
   return (normalized[0] || '?').toUpperCase();
 }
 
 export function getPlaygroundAvatarPresentation(identity: PlaygroundAvatarIdentity): PlaygroundAvatarPresentation {
-  const seed = identity.userId || identity.displayName;
+  const seed = getPlaygroundAvatarColorSeed(identity);
   return {
     backgroundColor: getPlaygroundAvatarColor(seed),
     foregroundColor: '#fff',
@@ -81,7 +121,7 @@ export function getPlaygroundAvatarPresentation(identity: PlaygroundAvatarIdenti
 }
 
 export function getPlaygroundAvatarColor(seed: string): string {
-  return `hsl(${getStableHash(seed) % 360} 62% 28%)`;
+  return PLAYGROUND_AVATAR_COLORS[getStablePaletteIndex(seed)];
 }
 
 export function isPlaygroundProfileMessage(value: unknown): value is PlaygroundProfileMessage {
@@ -132,6 +172,32 @@ function getFirstAsciiLetter(value: string): string {
 
 function getStableAsciiLetter(seed: string): string {
   return String.fromCharCode(65 + (getStableHash(seed) % 26));
+}
+
+function getPlaygroundAvatarColorSeed(identity: PlaygroundAvatarIdentity): string {
+  const computerProfileLabel = getComputerProfileLabel(identity.displayName, identity.userId || '');
+  if (computerProfileLabel) return `computer:${computerProfileLabel.toLowerCase()}`;
+  return identity.userId || identity.displayName;
+}
+
+function getComputerProfileLabel(displayName: string, userId = ''): string {
+  if (!userId.startsWith('server:computer:')) return '';
+  const normalized = displayName.replace(/^@/, '').trim();
+  return /^Computer\s+\(([^()]+)\)$/i.exec(normalized)?.[1]?.trim() || '';
+}
+
+function getStablePaletteIndex(seed: string): number {
+  return getAvatarColorHash(seed) % PLAYGROUND_AVATAR_COLORS.length;
+}
+
+function getAvatarColorHash(seed: string): number {
+  let hash = getStableHash(seed);
+  hash ^= hash >>> 16;
+  hash = Math.imul(hash, 0x7feb352d);
+  hash ^= hash >>> 15;
+  hash = Math.imul(hash, 0x846ca68b);
+  hash ^= hash >>> 16;
+  return hash >>> 0;
 }
 
 function getStableHash(value: string): number {

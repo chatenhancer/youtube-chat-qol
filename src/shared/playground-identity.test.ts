@@ -17,9 +17,34 @@ describe('playground identity helpers', () => {
       displayName: 'Player TEST',
       userId: 'test-user'
     })).toEqual({
-      backgroundColor: 'hsl(11 62% 28%)',
+      backgroundColor: 'hsl(255 45% 37%)',
       foregroundColor: '#fff',
       initial: 'T'
     });
+  });
+
+  it('uses built-in Computer profile labels for avatar initials and colors', () => {
+    const avatars = [
+      getPlaygroundAvatarPresentation({
+        displayName: 'Computer (Beginner)',
+        userId: 'server:computer:beginner'
+      }),
+      getPlaygroundAvatarPresentation({
+        displayName: 'Computer (Club)',
+        userId: 'server:computer:club'
+      }),
+      getPlaygroundAvatarPresentation({
+        displayName: 'Computer (Master)',
+        userId: 'server:computer:master'
+      })
+    ];
+
+    expect(avatars.map((avatar) => avatar.initial)).toEqual(['B', 'C', 'M']);
+    expect(avatars.map((avatar) => avatar.backgroundColor)).toEqual([
+      'hsl(205 62% 34%)',
+      'hsl(45 70% 30%)',
+      'hsl(286 46% 36%)'
+    ]);
+    expect(new Set(avatars.map((avatar) => avatar.backgroundColor)).size).toBe(3);
   });
 });

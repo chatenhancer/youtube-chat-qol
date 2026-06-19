@@ -292,8 +292,8 @@ describe('playground games header button', () => {
     expect(document.querySelector('.ytcq-profile-card-title')?.textContent).toBe('HELP-A-FRIEND! Trivia');
     expect(document.querySelectorAll('.ytcq-games-player-row')).toHaveLength(2);
     expect(getPlayerAvatarBackgrounds()).toEqual([
-      'hsl(89 62% 28%)',
-      'hsl(195 62% 28%)'
+      'hsl(188 64% 30%)',
+      'hsl(146 48% 30%)'
     ]);
     getActionButton('Invite').click();
     expect(lastMockPort()?.messages.at(-1)).toMatchObject({
