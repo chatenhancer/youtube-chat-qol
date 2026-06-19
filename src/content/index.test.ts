@@ -226,6 +226,10 @@ describe('content script entrypoint wiring', () => {
     });
 
     const messageListener = vi.mocked(chrome.runtime.onMessage.addListener).mock.calls.at(-1)?.[0];
+    const sendResponse = vi.fn();
+    messageListener?.({ type: 'ytcq:chat-attached-ping' }, {} as chrome.runtime.MessageSender, sendResponse);
+    expect(sendResponse).toHaveBeenCalledWith({ attached: true });
+
     messageListener?.({ type: 'ytcq:reset-page' }, {} as chrome.runtime.MessageSender, vi.fn());
 
     expect(lifecycleMocks.resetFeatures).toHaveBeenCalledOnce();
