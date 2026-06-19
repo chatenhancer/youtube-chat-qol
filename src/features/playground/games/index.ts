@@ -8,7 +8,7 @@
  */
 import { registerFeatureLifecycle, type FeatureMutationBatch } from '../../../content/lifecycle';
 import type { Options } from '../../../shared/options';
-import type { GameId, PresenceUser, PublicGame, PublicInvite } from '../../../shared/playground-protocol';
+import type { GameId, PresenceUser, PublicGame, PublicInvite } from '../../../shared/playground/protocol';
 import { getOptions } from '../../../shared/state';
 import {
   closeActiveGamePanel,

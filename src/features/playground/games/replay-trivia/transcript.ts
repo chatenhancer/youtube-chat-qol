@@ -1,4 +1,4 @@
-import type { ReplayTriviaTranscriptSegment } from '../../../../shared/playground-trivia';
+import type { ReplayTriviaTranscriptSegment } from '../../../../shared/playground/trivia';
 import { getCurrentYouTubeChatStreamKey } from '../../../../youtube/source-url';
 
 const DEFAULT_LANGUAGE_CODES = ['en'] as const;

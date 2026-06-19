@@ -5,7 +5,7 @@ import {
   BOUNTY_HUNTING_BOUNTY_COUNT,
   type BountyHuntingBounty,
   type BountyHuntingBountyMatcher
-} from '../../../../shared/playground-bounty-hunting';
+} from '../../../../shared/playground/bounty-hunting';
 import { cleanText } from '../../../../shared/text';
 import {
   getAuthorName,

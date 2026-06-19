@@ -4,7 +4,7 @@ import {
   doesBountyHuntingBountyMatch,
   isBountyHuntingAllCapsMessage,
   type BountyHuntingBounty
-} from './playground-bounty-hunting';
+} from './bounty-hunting';
 
 describe('Bounty Hunting bounty matching', () => {
   it('matches fact-based bounty rules without raw chat text', () => {

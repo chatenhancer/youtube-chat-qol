@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { getPlaygroundAvatarInitial, getPlaygroundAvatarPresentation } from './playground-identity';
+import { getPlaygroundAvatarInitial, getPlaygroundAvatarPresentation } from './identity';
 
 describe('playground identity helpers', () => {
   it('uses the generated player code for anonymous avatar initials', () => {
@@ -27,15 +27,15 @@ describe('playground identity helpers', () => {
     const avatars = [
       getPlaygroundAvatarPresentation({
         displayName: 'Computer (Beginner)',
-        userId: 'server:computer:beginner'
+        userId: 'server:computer:chess:beginner'
       }),
       getPlaygroundAvatarPresentation({
         displayName: 'Computer (Club)',
-        userId: 'server:computer:club'
+        userId: 'server:computer:chess:club'
       }),
       getPlaygroundAvatarPresentation({
         displayName: 'Computer (Master)',
-        userId: 'server:computer:master'
+        userId: 'server:computer:chess:master'
       })
     ];
 

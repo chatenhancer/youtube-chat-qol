@@ -44,16 +44,16 @@ describe('computer player', () => {
     expect(CHESS_COMPUTER_PLAYER_BEGINNER_PROFILE).toMatchObject({
       chessElo: 750,
       displayName: 'Computer (Beginner)',
-      userId: 'server:computer:beginner'
+      userId: 'server:computer:chess:beginner'
     });
   });
 
   it('uses one Bounty Hunting computer profile', () => {
     expect(BOUNTY_HUNTING_COMPUTER_PLAYER_PROFILE).toEqual({
       availableGames: ['bounty-hunting'],
-      connectionId: 'server:computer:bounty-hunter',
+      connectionId: 'server:computer:bounty-hunting',
       displayName: 'Computer (Bounty Hunter)',
-      userId: 'server:computer:bounty-hunter'
+      userId: 'server:computer:bounty-hunting'
     });
   });
 

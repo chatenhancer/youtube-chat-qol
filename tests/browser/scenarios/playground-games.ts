@@ -5,7 +5,7 @@
  * Playground bridge, and game panels against a deterministic WebSocket backend.
  */
 import { expect, test, type Locator } from '@playwright/test';
-import type { PublicGame } from '../../../src/shared/playground-protocol';
+import type { PublicGame } from '../../../src/shared/playground/protocol';
 import {
   createMockPlaygroundSnapshot,
   installMockPlaygroundBackend

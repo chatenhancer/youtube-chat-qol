@@ -1,4 +1,4 @@
-import type { PublicGame, PublicUserIdentity } from '../../../../shared/playground-protocol';
+import type { PublicGame, PublicUserIdentity } from '../../../../shared/playground/protocol';
 
 export type ChessPieceColor = 'black' | 'white';
 export type ChessPromotionPiece = 'b' | 'n' | 'q' | 'r';

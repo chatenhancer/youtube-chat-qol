@@ -1,15 +1,15 @@
 import type { GameSoundController } from '../sound';
 import type { GamePanelStatusOverlay } from '../panel-feedback';
-import type { PublicGame, PublicUserIdentity } from '../../../../shared/playground-protocol';
+import type { PublicGame, PublicUserIdentity } from '../../../../shared/playground/protocol';
 import type {
   ReplayTriviaGenerationToken,
   ReplayTriviaGameStatus,
   ReplayTriviaPublicAnswer,
   ReplayTriviaPublicQuestion,
   ReplayTriviaPlayerRole
-} from '../../../../shared/playground-trivia';
+} from '../../../../shared/playground/trivia';
 
-export type { ReplayTriviaGameStatus, ReplayTriviaPlayerRole } from '../../../../shared/playground-trivia';
+export type { ReplayTriviaGameStatus, ReplayTriviaPlayerRole } from '../../../../shared/playground/trivia';
 
 export interface ReplayTriviaAssets {
   bestie: HTMLImageElement | null;

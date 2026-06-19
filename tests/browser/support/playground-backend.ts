@@ -12,7 +12,7 @@ import type {
   LobbySnapshot,
   PresenceUser,
   ServerMessage
-} from '../../../src/shared/playground-protocol';
+} from '../../../src/shared/playground/protocol';
 import { getExtensionServiceWorker } from './extension';
 
 export interface MockPlaygroundBackend {
@@ -82,8 +82,8 @@ export function createMockPlaygroundUsers(): PresenceUser[] {
     createMockPresenceUser('browser-user', 'Browser Viewer', ['chess', 'bounty-hunting', 'replay-trivia']),
     createMockPresenceUser('luna-user', 'Luna Chat', ['chess', 'bounty-hunting', 'replay-trivia']),
     createMockPresenceUser('marco-user', 'Marco Vibes', ['chess', 'bounty-hunting', 'replay-trivia']),
-    createMockPresenceUser('server:computer:beginner', 'Computer (Beginner)', ['chess']),
-    createMockPresenceUser('server:computer:bounty-hunter', 'Computer (Bounty Hunter)', ['bounty-hunting'])
+    createMockPresenceUser('server:computer:chess:beginner', 'Computer (Beginner)', ['chess']),
+    createMockPresenceUser('server:computer:bounty-hunting', 'Computer (Bounty Hunter)', ['bounty-hunting'])
   ];
 }
 

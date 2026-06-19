@@ -1,1 +1,1 @@
-export * from '../../../../src/shared/playground-protocol';
+export * from '../../../../src/shared/playground/protocol';

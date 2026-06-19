@@ -1,5 +1,5 @@
-import type { ServerMessage } from '../../../../shared/playground-protocol';
-import type { ReplayTriviaGenerationToken } from '../../../../shared/playground-trivia';
+import type { ServerMessage } from '../../../../shared/playground/protocol';
+import type { ReplayTriviaGenerationToken } from '../../../../shared/playground/trivia';
 
 let generationTokens: Record<string, ReplayTriviaGenerationToken> = {};
 

@@ -15,7 +15,7 @@ import {
   type PublicGame,
   type PublicInvite,
   type ServerMessage
-} from '../../../shared/playground-protocol';
+} from '../../../shared/playground/protocol';
 import { getUiLocale } from '../../../shared/i18n';
 import { getCurrentYouTubeChatStreamKey } from '../../../youtube/source-url';
 import {

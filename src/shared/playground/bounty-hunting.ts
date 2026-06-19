@@ -1,4 +1,4 @@
-import { cleanText } from './text';
+import { cleanText } from '../text';
 
 export const BOUNTY_HUNTING_BOUNTY_COUNT = 6;
 export const BOUNTY_HUNTING_COUNTDOWN_MS = 3_000;

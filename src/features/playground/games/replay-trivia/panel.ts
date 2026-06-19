@@ -5,7 +5,7 @@
  * answer/phase intents back to the Playground room state machine.
  */
 import { ytcqCreateElement } from '../../../../shared/managed-dom';
-import type { ReplayTriviaGenerationToken, ReplayTriviaQuestion } from '../../../../shared/playground-trivia';
+import type { ReplayTriviaGenerationToken, ReplayTriviaQuestion } from '../../../../shared/playground/trivia';
 import { getUiLocale, t } from '../../../../shared/i18n';
 import type { GamePanelShell } from '../panel-shell';
 import { createGameSoundController } from '../sound';

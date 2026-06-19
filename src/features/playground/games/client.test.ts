@@ -5,7 +5,7 @@ import type {
   PlaygroundContentMessage,
   PublicGame,
   PublicInvite
-} from '../../../shared/playground-protocol';
+} from '../../../shared/playground/protocol';
 import {
   getPlaygroundAvailability,
   getPlaygroundClientState,

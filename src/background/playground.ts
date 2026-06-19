@@ -15,7 +15,7 @@ import {
   type PlaygroundContentMessage,
   type ServerMessage,
   type SignedClientIdentity
-} from '../shared/playground-protocol';
+} from '../shared/playground/protocol';
 import {
   PLAYGROUND_IDENTITY_STORAGE_KEY,
   PLAYGROUND_PROFILE_STATS_ROUTE,
@@ -27,14 +27,14 @@ import {
   type PlaygroundProfile,
   type PlaygroundProfileResponse,
   type StoredPlaygroundIdentity
-} from '../shared/playground-identity';
+} from '../shared/playground/identity';
 import {
   REPLAY_TRIVIA_QUESTIONS_BACKGROUND_MESSAGE,
   REPLAY_TRIVIA_QUESTIONS_ROUTE,
   type ReplayTriviaQuestionsBackgroundMessage,
   type ReplayTriviaQuestionsBackgroundResponse,
   type ReplayTriviaQuestionsResponse
-} from '../shared/playground-trivia';
+} from '../shared/playground/trivia';
 
 const SIGNATURE_PREFIX = 'chat-enhancer-playground:';
 const MAX_QUEUED_CLIENT_MESSAGES = 20;

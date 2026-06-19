@@ -7,7 +7,7 @@
 import type {
   ReplayTriviaQuestionsRequest,
   ReplayTriviaTranscriptSegment
-} from '../../../../../src/shared/playground-trivia';
+} from '../../../../../src/shared/playground/trivia';
 import { ReplayTriviaError } from './errors';
 
 const DEFAULT_QUESTION_COUNT = 10;

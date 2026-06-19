@@ -8,8 +8,8 @@
 import { createChevronBackwardIcon } from '../../../shared/icons';
 import { t } from '../../../shared/i18n';
 import { ytcqCreateElement } from '../../../shared/managed-dom';
-import { getPlaygroundAvatarPresentation } from '../../../shared/playground-identity';
-import type { GameId, PresenceUser, PublicGame, PublicInvite } from '../../../shared/playground-protocol';
+import { getPlaygroundAvatarPresentation } from '../../../shared/playground/identity';
+import type { GameId, PresenceUser, PublicGame, PublicInvite } from '../../../shared/playground/protocol';
 import {
   getActiveGamePanelId,
   getGamePickerCards,
@@ -67,10 +67,7 @@ export function updateGamesCardHeader(card: HTMLElement, state: GamesPanelState)
 export function renderGamesPanelBody(body: HTMLElement, state: GamesPanelState, actions: GamesViewActions): void {
   body.replaceChildren();
   if (shouldShowTransportNotice(state)) {
-    body.append(
-      createTransportNotice(state, actions),
-      createGamesGrid(actions, { includeRealtime: false })
-    );
+    body.append(createTransportNotice(state, actions));
     return;
   }
 

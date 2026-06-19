@@ -3,7 +3,7 @@ import {
   REPLAY_TRIVIA_CAPTCHA_POST_MESSAGE_SOURCE,
   REPLAY_TRIVIA_CAPTCHA_POST_MESSAGE_TYPE,
   REPLAY_TRIVIA_CAPTCHA_ROUTE
-} from '../../../../../src/shared/playground-trivia';
+} from '../../../../../src/shared/playground/trivia';
 import { createErrorResponse, createJsonResponse } from '../../http';
 import { getLogErrorMessage, getLogErrorType, hashLogValue, logPlaygroundEvent } from '../../logging';
 import { createRouteResult, type RouteContext, type RouteModule, type RouteResult } from '../../routes/types';

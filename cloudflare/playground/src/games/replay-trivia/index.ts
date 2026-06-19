@@ -12,7 +12,7 @@ import type {
   ReplayTriviaPublicAnswer,
   ReplayTriviaPublicQuestion,
   ReplayTriviaQuestion
-} from '../../../../../src/shared/playground-trivia';
+} from '../../../../../src/shared/playground/trivia';
 import type { GameActionInput, GameModule, GameRecord, PublicGameContext } from '../types';
 
 type ChoiceIndex = 0 | 1 | 2 | 3;

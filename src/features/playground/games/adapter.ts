@@ -6,7 +6,7 @@
  * content into the shared panel shell and translate game actions.
  */
 import type { MessageKey } from '../../../shared/i18n';
-import type { GameId, PublicGame, ServerMessage } from '../../../shared/playground-protocol';
+import type { GameId, PublicGame, ServerMessage } from '../../../shared/playground/protocol';
 import type { PlaygroundClientState } from './client';
 import type { GamePanelShell } from './panel-shell';
 

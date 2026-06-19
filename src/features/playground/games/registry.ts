@@ -7,7 +7,7 @@
  */
 import { createGamesIcon } from '../../../shared/icons';
 import { t } from '../../../shared/i18n';
-import type { GameId, PublicGame, ServerMessage } from '../../../shared/playground-protocol';
+import type { GameId, PublicGame, ServerMessage } from '../../../shared/playground/protocol';
 import type { PlaygroundClientState } from './client';
 import { ENABLED_GAMES } from './enabled-games';
 import type { AnyEnabledGame, AnyGamePanelAdapter, GameDefinition, GamePanelMount, SendGameAction } from './adapter';
