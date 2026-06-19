@@ -54,7 +54,7 @@ Not affiliated with YouTube or Google.
 
 - See whether the extension is active in this tab or other open live chat tabs.
 - Manage extension settings and clear local extension data from the popup.
-- Opt in to Playground experiments. The current beta can connect users in the same stream for chess games.
+- Opt in to Playground experiments for stream-scoped games with other available users.
 
 ### <img src="assets/readme/icons/privacy.svg" alt="" width="20" height="20" align="absmiddle"> &nbsp;Privacy
 
