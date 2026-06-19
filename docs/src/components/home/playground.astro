@@ -2,11 +2,33 @@
 import Icon from '../common/icon.astro';
 import type { Messages } from '../../data/site';
 
-const { messages: m, playgroundPostPath, rootPrefix } = Astro.props as {
+interface GamePostPaths {
+  chess: string;
+  trivia: string;
+  wild: string;
+}
+
+const { messages: m, playgroundPostPath, gamePostPaths, rootPrefix } = Astro.props as {
   messages: Messages;
   playgroundPostPath: string;
+  gamePostPaths: GamePostPaths;
   rootPrefix: string;
 };
+
+const playgroundGames = [
+  {
+    alt: 'The Wild Wild Chat',
+    className: 'playground-game-logo-wild',
+    href: gamePostPaths.wild,
+    src: 'assets/playground/wild-wild-chat-logo.webp'
+  },
+  {
+    alt: 'HELP-A-FRIEND! Trivia',
+    className: 'playground-game-logo-trivia',
+    href: gamePostPaths.trivia,
+    src: 'assets/playground/replay-trivia-logo.png'
+  }
+];
 ---
 
 <section class="playground-section" id="playground" aria-labelledby="playground-title">
@@ -36,6 +58,18 @@ const { messages: m, playgroundPostPath, rootPrefix } = Astro.props as {
         </a>
       </div>
       <p class="playground-note">{m.playground.note}</p>
+      <div class="playground-game-logos" aria-label="Playground games">
+        <a class="playground-game-logo-link" href={gamePostPaths.chess} aria-label="Read about Chess">
+          <span class="playground-game-logo playground-game-logo-chess" aria-hidden="true">
+            <span class="playground-game-logo-chess-piece" aria-hidden="true" style={`background-image: url('${rootPrefix}assets/playground/chess-white-pieces.png')`}></span>
+          </span>
+        </a>
+        {playgroundGames.map((game) => (
+          <a class="playground-game-logo-link" href={game.href} aria-label={`Read about ${game.alt}`}>
+            <img class={`playground-game-logo ${game.className}`} src={`${rootPrefix}${game.src}`} alt="" loading="lazy" decoding="async">
+          </a>
+        ))}
+      </div>
     </div>
     <figure class="playground-preview">
       <img class="playground-preview-card playground-preview-card-back playground-preview-card-back-right" src={`${rootPrefix}assets/playground/trivia-preview.png`} alt="" loading="lazy" decoding="async" aria-hidden="true">

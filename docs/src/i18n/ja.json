@@ -61,7 +61,7 @@
   "playground": {
     "eyebrow": "Playground",
     "title": "ライブチャットの合間に<br><span class=\"title-emphasis\">小さなゲーム</span>",
-    "copy": "Playground は、配信をもっとインタラクティブにする実験用の任意参加スペースです。最初はチェス。参加可能な視聴者*を招待し、ゲームを開始して、チャットも近くで追えます。",
+    "copy": "Playground は、配信をもっとインタラクティブにする実験用の任意参加スペースです。ゲームを選び、参加可能な視聴者*を招待してプレイを始め、チャットも近くで追えます。",
     "primaryCta": "拡張機能で試す",
     "secondaryCta": "詳しく見る",
     "imageAlt": "YouTube ライブチャット内に浮かぶチェスゲームパネル",

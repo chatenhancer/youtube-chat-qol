@@ -61,7 +61,7 @@
   "playground": {
     "eyebrow": "Playground",
     "title": "<span class=\"title-emphasis\">Tiny games</span> for<br>live chat breaks",
-    "copy": "Playground is an opt-in space for experiments that make streams more interactive. Chess is first: invite an available viewer*, start the game, and keep chat nearby.",
+    "copy": "Playground is an opt-in space for experiments that make streams more interactive. Pick a game: invite an available viewer*, start playing, and keep chat nearby.",
     "primaryCta": "Try it in the extension",
     "secondaryCta": "Learn more",
     "imageAlt": "Floating chess game panel inside YouTube live chat",

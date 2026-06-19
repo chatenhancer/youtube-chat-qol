@@ -61,7 +61,7 @@
   "playground": {
     "eyebrow": "Playground",
     "title": "<span class=\"title-emphasis\">Minijuegos</span> para<br>pausas del chat en vivo",
-    "copy": "Playground es un espacio opcional para experimentos que hacen los directos más interactivos. El ajedrez va primero: invita a un espectador disponible*, empieza la partida y mantén el chat cerca.",
+    "copy": "Playground es un espacio opcional para experimentos que hacen los directos más interactivos. Elige un juego: invita a un espectador disponible*, empieza a jugar y mantén el chat cerca.",
     "primaryCta": "Pruébalo en la extensión",
     "secondaryCta": "Más información",
     "imageAlt": "Panel flotante de ajedrez dentro del chat en vivo de YouTube",

@@ -61,7 +61,7 @@
   "playground": {
     "eyebrow": "Playground",
     "title": "<span class=\"title-emphasis\">Petits jeux</span> pour<br>les pauses du chat en direct",
-    "copy": "Playground est un espace optionnel pour des expériences qui rendent les streams plus interactifs. Les échecs arrivent en premier : invitez un spectateur disponible*, lancez la partie et suivez le chat à côté.",
+    "copy": "Playground est un espace optionnel pour des expériences qui rendent les streams plus interactifs. Choisissez un jeu : invitez un spectateur disponible*, lancez la partie et suivez le chat à côté.",
     "primaryCta": "Essayer dans l’extension",
     "secondaryCta": "En savoir plus",
     "imageAlt": "Panneau d’échecs flottant dans le chat en direct YouTube",
