@@ -31,7 +31,7 @@ const MAX_BOUNTY_WITNESS_IDS = BOUNTY_HUNTING_BOUNTY_COUNT;
 const MAX_MESSAGE_ID_LENGTH = 160;
 const MIN_BOUNTY_AMOUNT = 25;
 const MAX_BOUNTY_AMOUNT = 500;
-const PENDING_CLAIM_MS = 750;
+const PENDING_CLAIM_MS = 2_000;
 
 export interface PublicBountyHuntingGame extends PublicGame {
   bounties: PublicBountyHuntingBounty[];
