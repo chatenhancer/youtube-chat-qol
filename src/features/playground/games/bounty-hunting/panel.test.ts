@@ -208,6 +208,36 @@ describe('Bounty Hunting panel', () => {
     });
   });
 
+  it('orders wanted bounties from lower to higher money amounts', () => {
+    openBountyHuntingGamePanel({
+      ...createBountyHuntingGame(),
+      bounties: [
+        {
+          amount: 125,
+          description: 'high bounty',
+          id: 'high',
+          matcher: { kind: 'mention' }
+        },
+        {
+          amount: 50,
+          description: 'low bounty',
+          id: 'low',
+          matcher: { kind: 'allCaps' }
+        },
+        {
+          amount: 75,
+          description: 'mid bounty',
+          id: 'mid',
+          matcher: { kind: 'question' }
+        }
+      ]
+    }, 'host-user', vi.fn());
+
+    expect(context.fillText).toHaveBeenCalledWith('low bounty', 124, 166);
+    expect(context.fillText).toHaveBeenCalledWith('mid bounty', 124, 208);
+    expect(context.fillText).toHaveBeenCalledWith('high bounty', 124, 250);
+  });
+
   it('uses the title color for the timer until the active round starts', () => {
     const timerColors: string[] = [];
     context.fillText.mockImplementation((text: string, x: number, y: number) => {

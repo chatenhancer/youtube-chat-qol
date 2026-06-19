@@ -856,13 +856,23 @@ function drawBountyHuntingWanted(runtime: BountyHuntingPanelRuntime, now: number
     weight: 400
   });
   drawBountyHuntingLiveScore(runtime, now);
-  runtime.game.bounties.forEach((bounty, index) => drawBountyHuntingBounty(runtime, bounty, index));
-  runtime.game.bounties.forEach((bounty, index) => drawBountyHuntingBountyClaimAvatar(runtime, bounty, index));
+  const displayBounties = getBountyHuntingDisplayBounties(runtime.game.bounties);
+  displayBounties.forEach((bounty, index) => drawBountyHuntingBounty(runtime, bounty, index));
+  displayBounties.forEach((bounty, index) => drawBountyHuntingBountyClaimAvatar(runtime, bounty, index));
   drawBountyHuntingActionButton(runtime, 'READY', runtime.game.status === 'ready' ? 'ready' : null, {
     flashAmount: getBountyHuntingReadyButtonFlashAmount(runtime, now),
     readyStack: true
   });
   if (runtime.game.status === 'countdown') drawBountyHuntingCountdown(runtime);
+}
+
+function getBountyHuntingDisplayBounties(
+  bounties: readonly PublicBountyHuntingBounty[]
+): PublicBountyHuntingBounty[] {
+  return bounties
+    .map((bounty, index) => ({ bounty, index }))
+    .sort((left, right) => left.bounty.amount - right.bounty.amount || left.index - right.index)
+    .map(({ bounty }) => bounty);
 }
 
 function drawBountyHuntingCountdown(runtime: BountyHuntingPanelRuntime): void {
