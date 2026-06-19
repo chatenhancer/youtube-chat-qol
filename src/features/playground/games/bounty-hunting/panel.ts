@@ -32,9 +32,11 @@ import {
   getBountyHuntingAssets
 } from './assets';
 import {
+  collectBountyHuntingTopFanAuthorKeys,
   createBountyHuntingBountiesFromMessages,
   findBountyHuntingMatchingBounty,
-  getBountyHuntingObservedMessage
+  getBountyHuntingObservedMessage,
+  getBountyHuntingTopFanAuthorKeyFromParticipant
 } from './candidates';
 import type {
   PublicBountyHuntingGame,
@@ -96,6 +98,8 @@ const READY_BUTTON_FLASH_MS = 520;
 const ROUND_OVER_BUTTON_LABEL_COLOR = '#F4DAA5';
 const ROUND_OVER_BUTTON_Y = 382;
 const TIMER_START_PULSE_MS = 720;
+const WITNESS_FLUSH_MS = 500;
+const WITNESS_OBSERVATIONS_PER_FLUSH = 20;
 const READY_STACK_AVATAR_OFFSET_X = 12;
 const READY_STACK_AVATAR_OVERLAP = 12;
 const READY_STACK_AVATAR_RADIUS = 10;
@@ -133,7 +137,8 @@ registerFeatureLifecycle({
     collect({ changedMessages }) {
       changedMessages.forEach(handleBountyHuntingLifecycleMessage);
     }
-  }
+  },
+  participant: { enhance: handleBountyHuntingLifecycleParticipant }
 });
 
 export function openBountyHuntingGamePanel(
@@ -208,6 +213,7 @@ export function openBountyHuntingGamePanel(
     listeners,
     onAction,
     onVisibilityChanged: onVisibilityChanged || null,
+    pendingWitnesses: new Map(),
     pixelRatio: configureBountyHuntingCanvas(canvas),
     preparationMessages: new Map(),
     preparationStarted: false,
@@ -215,12 +221,15 @@ export function openBountyHuntingGamePanel(
     readyButtonFlashUntil: 0,
     roundOverStingPlayedForGameId: null,
     sentClaimKeys: new Set(),
+    sentWitnessKeys: new Set(),
     soundController,
     startRoundSent: false,
     statusOverlay,
     subtitleElement,
     timerStartPulseUntil: 0,
-    timeoutSent: false
+    timeoutSent: false,
+    topFanAuthorKeys: collectBountyHuntingTopFanAuthorKeys(),
+    witnessFlushTimer: null
   };
 
   canvas.addEventListener('click', handleBountyHuntingCanvasClick, { signal: listeners.signal });
@@ -233,6 +242,7 @@ export function openBountyHuntingGamePanel(
   });
 
   maybeStartBountyHuntingPreparation(activeBountyHuntingPanel);
+  maybeObserveVisibleBountyHuntingMessages(activeBountyHuntingPanel);
   renderBountyHuntingGame(getNow());
   maybePlayBountyHuntingRoundOverSting(activeBountyHuntingPanel);
   startBountyHuntingLoop();
@@ -259,6 +269,7 @@ export function closeBountyHuntingGamePanel({ notify = true }: { notify?: boolea
   if (!runtime) return;
   if (runtime.frameId !== null) cancelScheduledFrame(runtime.frameId);
   if (runtime.preparationTimer !== null) window.clearTimeout(runtime.preparationTimer);
+  clearBountyHuntingWitnessQueue(runtime);
   runtime.statusOverlay.clear();
   runtime.listeners.abort();
   runtime.canvas.remove();
@@ -303,6 +314,8 @@ export function updateBountyHuntingGamePanel(game: PublicBountyHuntingGame, curr
     if (game.status === 'active') {
       activeBountyHuntingPanel.timerStartPulseUntil = getNow() + TIMER_START_PULSE_MS;
       activeBountyHuntingPanel.soundController.play(BOUNTY_HUNTING_ROUND_START_SOUND_PATH);
+    } else {
+      clearBountyHuntingWitnessQueue(activeBountyHuntingPanel);
     }
   }
   if (getClaimedBountyCount(game) > previousClaimCount) {
@@ -314,13 +327,16 @@ export function updateBountyHuntingGamePanel(game: PublicBountyHuntingGame, curr
   maybePlayBountyHuntingRoundOverSting(activeBountyHuntingPanel);
 
   maybeStartBountyHuntingPreparation(activeBountyHuntingPanel);
+  maybeObserveVisibleBountyHuntingMessages(activeBountyHuntingPanel);
   renderBountyHuntingGame(getNow());
 }
 
 function handleBountyHuntingLifecycleMessage(message: HTMLElement): void {
   const runtime = activeBountyHuntingPanel;
   if (!runtime || !message.isConnected) return;
-  const observed = getBountyHuntingObservedMessage(message);
+  const observed = getBountyHuntingObservedMessage(message, {
+    topFanAuthorKeys: runtime.topFanAuthorKeys
+  });
   if (!observed) return;
 
   if (runtime.game.status === 'preparing' && runtime.currentUserId === runtime.game.bountyProviderUserId) {
@@ -328,8 +344,14 @@ function handleBountyHuntingLifecycleMessage(message: HTMLElement): void {
     return;
   }
 
-  // Active-round claims are intentionally click-driven. Newly observed messages
-  // are only used to prepare the bounty board before the round starts.
+  maybeSendBountyHuntingWitness(runtime, observed);
+}
+
+function handleBountyHuntingLifecycleParticipant(participant: HTMLElement): void {
+  const runtime = activeBountyHuntingPanel;
+  if (!runtime || !participant.isConnected) return;
+  const key = getBountyHuntingTopFanAuthorKeyFromParticipant(participant);
+  if (key) runtime.topFanAuthorKeys.add(key);
 }
 
 function maybeStartBountyHuntingPreparation(runtime: BountyHuntingPanelRuntime): void {
@@ -351,10 +373,97 @@ function maybeStartBountyHuntingPreparation(runtime: BountyHuntingPanelRuntime):
 }
 
 function collectVisibleBountyHuntingMessages(runtime: BountyHuntingPanelRuntime): void {
+  refreshBountyHuntingTopFanAuthorKeys(runtime);
   document.querySelectorAll<HTMLElement>(CHAT_MESSAGE_SELECTOR).forEach((message) => {
-    const observed = getBountyHuntingObservedMessage(message);
+    const observed = getBountyHuntingObservedMessage(message, {
+      topFanAuthorKeys: runtime.topFanAuthorKeys
+    });
     if (observed) runtime.preparationMessages.set(observed.messageId, observed);
   });
+}
+
+function maybeObserveVisibleBountyHuntingMessages(runtime: BountyHuntingPanelRuntime): void {
+  if (runtime.game.status !== 'active') return;
+  refreshBountyHuntingTopFanAuthorKeys(runtime);
+  document.querySelectorAll<HTMLElement>(CHAT_MESSAGE_SELECTOR).forEach((message) => {
+    const observed = getBountyHuntingObservedMessage(message, {
+      topFanAuthorKeys: runtime.topFanAuthorKeys
+    });
+    if (observed) maybeSendBountyHuntingWitness(runtime, observed);
+  });
+  flushBountyHuntingWitnesses(runtime);
+}
+
+function refreshBountyHuntingTopFanAuthorKeys(runtime: BountyHuntingPanelRuntime): void {
+  collectBountyHuntingTopFanAuthorKeys().forEach((key) => runtime.topFanAuthorKeys.add(key));
+}
+
+function maybeSendBountyHuntingWitness(
+  runtime: BountyHuntingPanelRuntime,
+  message: BountyHuntingObservedMessage
+): void {
+  if (runtime.game.status !== 'active') return;
+  if (Date.now() >= runtime.game.phaseStartedAt + BOUNTY_HUNTING_ROUND_MS) return;
+  if (message.messageId.startsWith('local:')) return;
+
+  const bountyIds = runtime.game.bounties
+    .filter((bounty) => !bounty.claim && findBountyHuntingMatchingBounty([bounty], message))
+    .map((bounty) => bounty.id)
+    .filter((bountyId) => !runtime.sentWitnessKeys.has(`${message.messageId}:${bountyId}`));
+  if (!bountyIds.length) return;
+
+  bountyIds.forEach((bountyId) => runtime.sentWitnessKeys.add(`${message.messageId}:${bountyId}`));
+  queueBountyHuntingWitness(runtime, message.messageId, bountyIds);
+}
+
+function queueBountyHuntingWitness(
+  runtime: BountyHuntingPanelRuntime,
+  messageId: string,
+  bountyIds: string[]
+): void {
+  const existing = runtime.pendingWitnesses.get(messageId) || new Set<string>();
+  bountyIds.forEach((bountyId) => existing.add(bountyId));
+  runtime.pendingWitnesses.set(messageId, existing);
+  scheduleBountyHuntingWitnessFlush(runtime);
+}
+
+function scheduleBountyHuntingWitnessFlush(runtime: BountyHuntingPanelRuntime): void {
+  if (runtime.witnessFlushTimer !== null) return;
+  runtime.witnessFlushTimer = window.setTimeout(() => {
+    runtime.witnessFlushTimer = null;
+    flushBountyHuntingWitnesses(runtime);
+  }, WITNESS_FLUSH_MS);
+}
+
+function flushBountyHuntingWitnesses(runtime: BountyHuntingPanelRuntime): void {
+  if (!runtime.pendingWitnesses.size) return;
+  if (runtime.game.status !== 'active') {
+    clearBountyHuntingWitnessQueue(runtime);
+    return;
+  }
+
+  const observations: Array<{ bountyIds: string[]; messageId: string }> = [];
+  for (const [messageId, bountyIds] of runtime.pendingWitnesses) {
+    observations.push({
+      bountyIds: [...bountyIds],
+      messageId
+    });
+    runtime.pendingWitnesses.delete(messageId);
+    if (observations.length >= WITNESS_OBSERVATIONS_PER_FLUSH) break;
+  }
+
+  if (!observations.length) return;
+  runtime.onAction(runtime.game.gameId, 'observeBountyMessage', {
+    observations
+  });
+  if (runtime.pendingWitnesses.size) scheduleBountyHuntingWitnessFlush(runtime);
+}
+
+function clearBountyHuntingWitnessQueue(runtime: BountyHuntingPanelRuntime): void {
+  runtime.pendingWitnesses.clear();
+  if (runtime.witnessFlushTimer === null) return;
+  window.clearTimeout(runtime.witnessFlushTimer);
+  runtime.witnessFlushTimer = null;
 }
 
 function maybeClaimBountyHuntingBounty(
@@ -363,6 +472,7 @@ function maybeClaimBountyHuntingBounty(
 ): void {
   if (runtime.game.status !== 'active') return;
   if (Date.now() >= runtime.game.phaseStartedAt + BOUNTY_HUNTING_ROUND_MS) return;
+  if (message.messageId.startsWith('local:')) return;
 
   const openBounties = runtime.game.bounties.filter((bounty) => !bounty.claim);
   const bounty = findBountyHuntingMatchingBounty(openBounties, message);
@@ -372,12 +482,8 @@ function maybeClaimBountyHuntingBounty(
   if (runtime.sentClaimKeys.has(claimKey)) return;
   runtime.sentClaimKeys.add(claimKey);
   runtime.onAction(runtime.game.gameId, 'claimBounty', {
-    authorName: message.authorName,
     bountyId: bounty.id,
-    emojiCount: message.emojiCount,
-    isVerifiedAuthor: message.isVerifiedAuthor,
-    messageId: message.messageId,
-    text: message.text
+    messageId: message.messageId
   });
 }
 
@@ -388,7 +494,9 @@ function handleBountyHuntingDocumentClick(event: MouseEvent): void {
 
   const message = event.target.closest<HTMLElement>(CHAT_MESSAGE_SELECTOR);
   if (!message) return;
-  const observed = getBountyHuntingObservedMessage(message);
+  const observed = getBountyHuntingObservedMessage(message, {
+    topFanAuthorKeys: runtime.topFanAuthorKeys
+  });
   if (observed) maybeClaimBountyHuntingBounty(runtime, observed);
 }
 

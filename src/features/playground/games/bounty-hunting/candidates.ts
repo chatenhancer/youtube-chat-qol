@@ -2,46 +2,19 @@ import {
   countBountyHuntingTextEmojis,
   doesBountyHuntingBountyMatch,
   isBountyHuntingAllCapsMessage,
-  normalizeBountyHuntingAuthorKey,
   BOUNTY_HUNTING_BOUNTY_COUNT,
   type BountyHuntingBounty,
   type BountyHuntingBountyMatcher
 } from '../../../../shared/playground-bounty-hunting';
-import { cleanText, normalizeComparableText } from '../../../../shared/text';
+import { cleanText } from '../../../../shared/text';
 import {
   getAuthorName,
   getMessageRuns,
   getMessageStableId,
   getMessageText
 } from '../../../../youtube/messages';
+import { getParticipantAuthorName } from '../../../../youtube/participants';
 import type { BountyHuntingObservedMessage } from './types';
-
-const MIN_KEYWORD_LENGTH = 4;
-const STOP_WORDS = new Set([
-  'about',
-  'after',
-  'again',
-  'also',
-  'because',
-  'been',
-  'chat',
-  'from',
-  'have',
-  'just',
-  'like',
-  'live',
-  'message',
-  'more',
-  'that',
-  'the',
-  'this',
-  'with',
-  'what',
-  'when',
-  'where',
-  'will',
-  'your'
-]);
 
 interface BountyCandidate extends BountyHuntingBounty {
   score: number;
@@ -49,49 +22,41 @@ interface BountyCandidate extends BountyHuntingBounty {
 
 interface MessageStats {
   allCaps: number;
-  authors: Map<string, { count: number; label: string }>;
   emojiHeavy: number;
-  keywords: Map<string, { count: number; label: string }>;
   mentions: number;
   numbers: number;
   questions: number;
-  urls: number;
+  topFanAuthors: number;
   verifiedAuthors: number;
 }
+
+interface BountyHuntingObservedMessageOptions {
+  topFanAuthorKeys?: ReadonlySet<string>;
+}
+
+const TOP_FAN_LABEL_PATTERN = /\btop\s+(?:fans?|chatters?)\b/i;
 
 export function createBountyHuntingBountiesFromMessages(
   messages: readonly BountyHuntingObservedMessage[]
 ): BountyHuntingBounty[] {
   const stats = collectBountyHuntingStats(messages);
-  const topAuthors = getTopBountyHuntingAuthors(stats);
-  const keyword = getTopBountyHuntingKeyword(stats);
   const candidates: BountyCandidate[] = [
     createCandidate('emoji-3', 50, 'a message that has 3+ emojis', { kind: 'emojiCount', min: 3 }, stats.emojiHeavy),
-    createCandidate('all-caps', 50, 'a message in all caps', { kind: 'allCaps', minLetters: 4 }, stats.allCaps),
+    createCandidate('all-caps', 50, 'a message in all caps', { kind: 'allCaps' }, stats.allCaps),
+    createCandidate('verified-author', 75, 'a message by a verified account', { kind: 'verifiedAuthor' }, stats.verifiedAuthors),
     createCandidate('question', 75, 'a message that asks a question', { kind: 'question' }, stats.questions),
     createCandidate('mention-user', 125, 'a message that mentions a user', { kind: 'mention' }, stats.mentions),
     createCandidate('has-number', 75, 'a message with a number', { kind: 'number' }, stats.numbers),
-    createCandidate('has-link', 100, 'a message with a link', { kind: 'url' }, stats.urls),
-    createCandidate('verified-author', 75, 'a message by a verified account', { kind: 'verifiedAuthor' }, stats.verifiedAuthors),
-    topAuthors.length
-      ? createCandidate(
+    ...(stats.topFanAuthors > 0
+      ? [createCandidate(
         'top-chatters',
         100,
         'a message by the top 3 chatters',
-        { authorNames: topAuthors.map((author) => author.label), kind: 'authorIn' },
-        topAuthors.reduce((total, author) => total + author.count, 0)
-      )
-      : null,
-    keyword
-      ? createCandidate(
-        `keyword-${keyword.label.toLowerCase().replace(/[^a-z0-9]+/gi, '-')}`,
-        75,
-        `a message that says "${keyword.label}"`,
-        { keyword: keyword.label, kind: 'keyword' },
-        keyword.count
-      )
-      : null
-  ].filter((candidate): candidate is BountyCandidate => Boolean(candidate));
+        { kind: 'topFanAuthor' },
+        stats.topFanAuthors
+      )]
+      : [])
+  ];
 
   const selected = dedupeBountyHuntingCandidates(candidates)
     .sort((a, b) => b.score - a.score || b.amount - a.amount || a.id.localeCompare(b.id))
@@ -105,17 +70,39 @@ export function createBountyHuntingBountiesFromMessages(
   return selected.map(({ score: _score, ...bounty }) => bounty);
 }
 
-export function getBountyHuntingObservedMessage(message: HTMLElement): BountyHuntingObservedMessage | null {
+export function getBountyHuntingObservedMessage(
+  message: HTMLElement,
+  options: BountyHuntingObservedMessageOptions = {}
+): BountyHuntingObservedMessage | null {
   const text = getMessageText(message);
   if (!text) return null;
+  const emojiCount = countBountyHuntingMessageEmojis(message);
+  const authorKey = getBountyHuntingAuthorKey(getAuthorName(message));
 
   return {
-    authorName: getAuthorName(message),
-    emojiCount: countBountyHuntingMessageEmojis(message),
+    emojiCount,
+    hasAllCaps: isBountyHuntingAllCapsMessage(text),
+    hasMention: /(^|\s)@[\p{L}\p{N}._-]{2,}/u.test(text),
+    hasNumber: /\p{N}/u.test(text),
+    hasQuestion: /[?？]/u.test(text),
+    isTopFanAuthor: Boolean(authorKey && options.topFanAuthorKeys?.has(authorKey)),
     isVerifiedAuthor: isBountyHuntingVerifiedAuthor(message),
-    messageId: getBountyHuntingMessageId(message, text),
-    text
+    messageId: getBountyHuntingMessageId(message)
   };
+}
+
+export function collectBountyHuntingTopFanAuthorKeys(root: ParentNode = document): Set<string> {
+  const authorKeys = new Set<string>();
+  root.querySelectorAll<HTMLElement>('yt-live-chat-participant-renderer').forEach((participant) => {
+    const key = getBountyHuntingTopFanAuthorKeyFromParticipant(participant);
+    if (key) authorKeys.add(key);
+  });
+  return authorKeys;
+}
+
+export function getBountyHuntingTopFanAuthorKeyFromParticipant(participant: HTMLElement): string {
+  if (!isBountyHuntingTopFanParticipant(participant)) return '';
+  return getBountyHuntingAuthorKey(getParticipantAuthorName(participant));
 }
 
 export function findBountyHuntingMatchingBounty(
@@ -130,26 +117,22 @@ export function findBountyHuntingMatchingBounty(
 function collectBountyHuntingStats(messages: readonly BountyHuntingObservedMessage[]): MessageStats {
   const stats: MessageStats = {
     allCaps: 0,
-    authors: new Map(),
     emojiHeavy: 0,
-    keywords: new Map(),
     mentions: 0,
     numbers: 0,
     questions: 0,
-    urls: 0,
+    topFanAuthors: 0,
     verifiedAuthors: 0
   };
 
   messages.forEach((message) => {
     if (message.emojiCount >= 3) stats.emojiHeavy += 1;
-    if (isBountyHuntingAllCapsMessage(message.text)) stats.allCaps += 1;
-    if (/[?？]/u.test(message.text)) stats.questions += 1;
-    if (/(^|\s)@[\p{L}\p{N}._-]{2,}/u.test(message.text)) stats.mentions += 1;
-    if (/\p{N}/u.test(message.text)) stats.numbers += 1;
-    if (/\b(?:https?:\/\/|www\.)\S+/i.test(message.text)) stats.urls += 1;
+    if (message.hasAllCaps) stats.allCaps += 1;
+    if (message.hasQuestion) stats.questions += 1;
+    if (message.hasMention) stats.mentions += 1;
+    if (message.hasNumber) stats.numbers += 1;
+    if (message.isTopFanAuthor) stats.topFanAuthors += 1;
     if (message.isVerifiedAuthor) stats.verifiedAuthors += 1;
-    recordBountyHuntingAuthor(stats, message.authorName);
-    recordBountyHuntingKeywords(stats, message.text);
   });
 
   return stats;
@@ -179,54 +162,86 @@ function dedupeBountyHuntingCandidates(candidates: BountyCandidate[]): BountyCan
   return [...result.values()];
 }
 
-function getTopBountyHuntingAuthors(stats: MessageStats): Array<{ count: number; label: string }> {
-  return [...stats.authors.values()]
-    .filter((author) => author.count >= 2)
-    .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label))
-    .slice(0, 3);
-}
-
-function getTopBountyHuntingKeyword(stats: MessageStats): { count: number; label: string } | null {
-  return [...stats.keywords.values()]
-    .filter((keyword) => keyword.count >= 2)
-    .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label))[0] || null;
-}
-
-function recordBountyHuntingAuthor(stats: MessageStats, authorName: string): void {
-  const label = cleanText(authorName);
-  const key = normalizeBountyHuntingAuthorKey(label);
-  if (!key) return;
-  const existing = stats.authors.get(key);
-  stats.authors.set(key, {
-    count: (existing?.count || 0) + 1,
-    label: existing?.label || label
-  });
-}
-
-function recordBountyHuntingKeywords(stats: MessageStats, text: string): void {
-  const words = normalizeComparableText(text)
-    .match(/[\p{L}\p{N}][\p{L}\p{N}'_-]{3,}/gu) || [];
-
-  new Set(words).forEach((word) => {
-    const label = word.replace(/^_+|_+$/g, '');
-    if (label.length < MIN_KEYWORD_LENGTH || STOP_WORDS.has(label)) return;
-    const existing = stats.keywords.get(label);
-    stats.keywords.set(label, {
-      count: (existing?.count || 0) + 1,
-      label: existing?.label || label
-    });
-  });
-}
-
 function getBountyHuntingFallbackBounties(): BountyCandidate[] {
   return [
     createCandidate('emoji-3', 50, 'a message that has 3+ emojis', { kind: 'emojiCount', min: 3 }, 0),
-    createCandidate('all-caps', 50, 'a message in all caps', { kind: 'allCaps', minLetters: 4 }, 0),
+    createCandidate('all-caps', 50, 'a message in all caps', { kind: 'allCaps' }, 0),
+    createCandidate('verified-author', 75, 'a message by a verified account', { kind: 'verifiedAuthor' }, 0),
     createCandidate('question', 75, 'a message that asks a question', { kind: 'question' }, 0),
     createCandidate('mention-user', 125, 'a message that mentions a user', { kind: 'mention' }, 0),
-    createCandidate('has-number', 75, 'a message with a number', { kind: 'number' }, 0),
-    createCandidate('has-link', 100, 'a message with a link', { kind: 'url' }, 0)
+    createCandidate('has-number', 75, 'a message with a number', { kind: 'number' }, 0)
   ];
+}
+
+function getBountyHuntingAuthorKey(value: unknown): string {
+  return cleanText(value)
+    .replace(/^@+/, '')
+    .toLocaleLowerCase();
+}
+
+function isBountyHuntingTopFanParticipant(participant: HTMLElement): boolean {
+  if (hasBountyHuntingTopFanDataSignal(participant)) return true;
+  if (hasBountyHuntingTopFanLabel(participant)) return true;
+  return hasBountyHuntingTopFanSectionSignal(participant);
+}
+
+function hasBountyHuntingTopFanLabel(element: Element): boolean {
+  const text = [
+    element.getAttribute('aria-label'),
+    element.getAttribute('title'),
+    ...Array.from(element.querySelectorAll('[aria-label], [title]')).flatMap((child) => [
+      child.getAttribute('aria-label'),
+      child.getAttribute('title')
+    ])
+  ].join(' ');
+  return TOP_FAN_LABEL_PATTERN.test(text);
+}
+
+function hasBountyHuntingTopFanSectionSignal(participant: HTMLElement): boolean {
+  let current: Element | null = participant;
+  for (let depth = 0; current?.parentElement && depth < 4; depth += 1) {
+    const signal = getBountyHuntingPreviousSectionLabel(current);
+    if (signal && TOP_FAN_LABEL_PATTERN.test(signal)) return true;
+    current = current.parentElement;
+  }
+  return false;
+}
+
+function getBountyHuntingPreviousSectionLabel(element: Element): string {
+  let sibling = element.previousElementSibling;
+  while (sibling) {
+    if (sibling.matches('yt-live-chat-participant-renderer')) return '';
+    const text = cleanText([
+      sibling.getAttribute('aria-label'),
+      sibling.getAttribute('title'),
+      sibling.textContent
+    ].join(' '));
+    if (text) return text;
+    sibling = sibling.previousElementSibling;
+  }
+  return '';
+}
+
+function hasBountyHuntingTopFanDataSignal(participant: HTMLElement): boolean {
+  const candidate = participant as HTMLElement & {
+    data?: unknown;
+    __data?: { data?: unknown };
+  };
+  return hasBountyHuntingTopFanValue(candidate.data || candidate.__data?.data);
+}
+
+function hasBountyHuntingTopFanValue(value: unknown, depth = 0): boolean {
+  if (!value || depth > 4) return false;
+  if (typeof value === 'string') return TOP_FAN_LABEL_PATTERN.test(value);
+  if (Array.isArray(value)) {
+    return value.some((child) => hasBountyHuntingTopFanValue(child, depth + 1));
+  }
+  if (typeof value !== 'object') return false;
+
+  return Object.entries(value as Record<string, unknown>).some(([key, child]) => {
+    if (/top\s*fan|top\s*chatter/i.test(key) && child !== false && child !== null && child !== undefined) return true;
+    return hasBountyHuntingTopFanValue(child, depth + 1);
+  });
 }
 
 function countBountyHuntingMessageEmojis(message: HTMLElement): number {
@@ -257,14 +272,17 @@ function isBountyHuntingVerifiedAuthor(message: HTMLElement): boolean {
   }
 }
 
-function getBountyHuntingMessageId(message: HTMLElement, text: string): string {
+function getBountyHuntingMessageId(message: HTMLElement): string {
   const stableId = getMessageStableId(message);
   if (stableId) return stableId;
 
   const existingId = message.dataset.ytcqBountyHuntingMessageId;
   if (existingId) return existingId;
 
-  const generatedId = `local:${Date.now().toString(36)}:${Math.random().toString(36).slice(2, 8)}:${normalizeComparableText(text).slice(0, 24)}`;
+  const randomId = typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+    ? crypto.randomUUID()
+    : Math.random().toString(36).slice(2, 12);
+  const generatedId = `local:${Date.now().toString(36)}:${randomId}`;
   message.dataset.ytcqBountyHuntingMessageId = generatedId;
   return generatedId;
 }
