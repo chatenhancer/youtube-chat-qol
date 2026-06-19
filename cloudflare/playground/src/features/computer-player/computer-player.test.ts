@@ -3,14 +3,13 @@ import { createComputerPlayer } from './computer-player';
 import {
   BOUNTY_HUNTING_COMPUTER_PLAYER_PROFILE,
   CHESS_COMPUTER_PLAYER_CLUB_PROFILE,
-  COMPUTER_PLAYER_AVAILABLE_GAMES,
-  COMPUTER_PLAYER_DISPLAY_NAME,
-  COMPUTER_PLAYER_PROFILE,
-  COMPUTER_PLAYER_USER_ID,
+  REPLAY_TRIVIA_COMPUTER_PLAYER_PROFILE,
+  getChessComputerPlayerStockfishElo,
   type ComputerPlayerProfile
-} from './actions';
+} from './profiles';
 import { applyChessMove, createChessGame, toPublicChessGame, type ChessGameRecord } from '../../games/chess';
 import {
+  claimBountyHuntingBounty,
   createBountyHuntingGame,
   observeBountyHuntingMessage,
   readyBountyHuntingPlayer,
@@ -50,13 +49,13 @@ describe('in-room computer player', () => {
     vi.restoreAllMocks();
   });
 
-  it('exposes a server-owned Computer session and accepts invites', () => {
-    const harness = createComputerPlayerHarness(COMPUTER_PLAYER_PROFILE);
+  it('exposes a server-owned Replay Trivia Computer session and accepts invites', () => {
+    const harness = createComputerPlayerHarness(REPLAY_TRIVIA_COMPUTER_PLAYER_PROFILE);
 
-    expect(harness.player.connectionId).toBe(COMPUTER_PLAYER_PROFILE.connectionId);
-    expect(harness.player.displayName).toBe(COMPUTER_PLAYER_DISPLAY_NAME);
-    expect(harness.player.userId).toBe(COMPUTER_PLAYER_USER_ID);
-    expect(harness.player.availableGames).toEqual(COMPUTER_PLAYER_AVAILABLE_GAMES);
+    expect(harness.player.connectionId).toBe(REPLAY_TRIVIA_COMPUTER_PLAYER_PROFILE.connectionId);
+    expect(harness.player.displayName).toBe(REPLAY_TRIVIA_COMPUTER_PLAYER_PROFILE.displayName);
+    expect(harness.player.userId).toBe(REPLAY_TRIVIA_COMPUTER_PLAYER_PROFILE.userId);
+    expect(harness.player.availableGames).toEqual(REPLAY_TRIVIA_COMPUTER_PLAYER_PROFILE.availableGames);
 
     sendServerMessage(harness, {
       invite: {
@@ -66,7 +65,7 @@ describe('in-room computer player', () => {
         gameId: 'replay-trivia',
         inviteId: 'inv_1',
         status: 'pending',
-        toUser: { displayName: 'Computer', userId: COMPUTER_PLAYER_USER_ID }
+        toUser: { displayName: 'Computer', userId: REPLAY_TRIVIA_COMPUTER_PLAYER_PROFILE.userId }
       },
       type: 'inviteReceived'
     });
@@ -79,7 +78,7 @@ describe('in-room computer player', () => {
   });
 
   it('ignores unrelated invites, logs socket errors, and stops receiving after close', () => {
-    const harness = createComputerPlayerHarness(COMPUTER_PLAYER_PROFILE);
+    const harness = createComputerPlayerHarness(REPLAY_TRIVIA_COMPUTER_PLAYER_PROFILE);
 
     harness.player.socket.accept();
     sendServerMessage(harness, {
@@ -127,7 +126,7 @@ describe('in-room computer player', () => {
         gameId: 'replay-trivia',
         inviteId: 'inv_after_close',
         status: 'pending',
-        toUser: { displayName: 'Computer', userId: COMPUTER_PLAYER_USER_ID }
+        toUser: { displayName: 'Computer', userId: REPLAY_TRIVIA_COMPUTER_PLAYER_PROFILE.userId }
       },
       type: 'inviteReceived'
     });
@@ -161,7 +160,7 @@ describe('in-room computer player', () => {
 
     expect(getStockfishBestMove).toHaveBeenCalledWith(game.fen);
     expect(createStockfishBestMoveProvider).toHaveBeenCalledWith(expect.any(Object), {
-      elo: CHESS_COMPUTER_PLAYER_CLUB_PROFILE.chessElo
+      elo: getChessComputerPlayerStockfishElo(CHESS_COMPUTER_PLAYER_CLUB_PROFILE.userId)
     });
     expect(harness.sentMessages.at(-1)).toEqual({
       action: 'move',
@@ -193,7 +192,7 @@ describe('in-room computer player', () => {
     );
   });
 
-  it('readies and claims Bounty Hunting bounties as normal game actions', async () => {
+  it('readies, witnesses, and claims Bounty Hunting bounties as normal game actions', async () => {
     vi.useFakeTimers();
     const harness = createComputerPlayerHarness(BOUNTY_HUNTING_COMPUTER_PLAYER_PROFILE);
     let game = submitBountyHunting(
@@ -224,14 +223,70 @@ describe('in-room computer player', () => {
     game = readyBountyHuntingPlayer(game, harness.player.userId, 2_000);
     game = readyBountyHuntingPlayer(game, 'human-user', 2_000);
     game = startBountyHuntingRound(game, 5_000);
-    game = observeBountyHuntingMessage(game, {
-      action: 'observeBountyMessage',
+    game = claimBountyHuntingBounty(game, {
+      action: 'claimBounty',
       payload: {
-        bountyIds: ['question'],
+        bountyId: 'question',
         messageId: 'msg-question-1'
       },
       userId: 'human-user'
-    }, 6_000);
+    }, 6_050);
+    expect(game.scores.host).toBe(0);
+    game = observeBountyHuntingMessage(game, {
+      action: 'observeBountyMessage',
+      payload: {
+        observations: [
+          {
+            bountyIds: ['question'],
+            messageId: 'msg-question-1'
+          },
+          {
+            bountyIds: ['verified'],
+            messageId: 'msg-verified-1'
+          }
+        ]
+      },
+      userId: 'human-user'
+    }, 6_100);
+    harness.games.set(game.gameId, game);
+    vi.setSystemTime(6_100);
+
+    sendServerMessage(harness, {
+      game: toPublicBountyHuntingGame(game, getPlayerInfo),
+      type: 'gameUpdated'
+    });
+
+    await vi.runAllTimersAsync();
+    await harness.flushWaitUntil();
+
+    expect(harness.sentMessages.at(-1)).toEqual({
+      action: 'observeBountyMessage',
+      gameId: 'game_bounty_1',
+      payload: {
+        observations: [
+          {
+            bountyIds: ['question'],
+            messageId: 'msg-question-1'
+          },
+          {
+            bountyIds: ['verified'],
+            messageId: 'msg-verified-1'
+          }
+        ]
+      },
+      type: 'gameAction'
+    });
+
+    const witnessAction = harness.sentMessages.at(-1);
+    expect(witnessAction?.type).toBe('gameAction');
+    if (witnessAction?.type !== 'gameAction') throw new Error('Expected bot witness game action.');
+
+    game = observeBountyHuntingMessage(game, {
+      action: 'observeBountyMessage',
+      payload: witnessAction.payload,
+      userId: harness.player.userId
+    }, 6_220);
+    expect(game.scores.host).toBe(50);
     harness.games.set(game.gameId, game);
     vi.setSystemTime(7_000);
 
@@ -247,8 +302,8 @@ describe('in-room computer player', () => {
       action: 'claimBounty',
       gameId: 'game_bounty_1',
       payload: {
-        bountyId: 'question',
-        messageId: 'msg-question-1'
+        bountyId: 'verified',
+        messageId: 'msg-verified-1'
       },
       type: 'gameAction'
     });
