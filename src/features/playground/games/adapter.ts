@@ -16,7 +16,6 @@ export interface GameDefinition {
   id: GameId;
   isPlayable?: () => boolean;
   labelKey: MessageKey;
-  panelTitleKey?: MessageKey;
   renderPreview: (container: HTMLElement) => void;
 }
 

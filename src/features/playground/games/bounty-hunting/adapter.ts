@@ -28,7 +28,6 @@ export const bountyHuntingGameDefinition: GameDefinition = {
   id: 'bounty-hunting',
   isPlayable: () => !isLiveChatReplayUrl(),
   labelKey: 'gamesBountyHunting',
-  panelTitleKey: 'gamesBountyHuntingPanelTitle',
   renderPreview: renderBountyHuntingPreview
 };
 
