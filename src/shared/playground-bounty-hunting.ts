@@ -1,4 +1,4 @@
-import { cleanText, normalizeComparableText } from './text';
+import { cleanText } from './text';
 
 export const BOUNTY_HUNTING_BOUNTY_COUNT = 6;
 export const BOUNTY_HUNTING_COUNTDOWN_MS = 3_000;
@@ -9,14 +9,12 @@ export type BountyHuntingGameStatus = 'active' | 'countdown' | 'finished' | 'pre
 export type BountyHuntingPlayerRole = 'guest' | 'host';
 
 export type BountyHuntingBountyMatcher =
-  | { kind: 'allCaps'; minLetters: number }
-  | { kind: 'authorIn'; authorNames: string[] }
+  | { kind: 'allCaps' }
   | { kind: 'emojiCount'; min: number }
-  | { kind: 'keyword'; keyword: string }
   | { kind: 'mention' }
   | { kind: 'number' }
   | { kind: 'question' }
-  | { kind: 'url' }
+  | { kind: 'topFanAuthor' }
   | { kind: 'verifiedAuthor' };
 
 export interface BountyHuntingBounty {
@@ -29,7 +27,6 @@ export interface BountyHuntingBounty {
 export interface BountyHuntingClaim {
   bountyId: string;
   claimedAt: number;
-  messageAuthorName: string;
   messageId: string;
   role: BountyHuntingPlayerRole;
   userId: string;
@@ -39,60 +36,38 @@ export interface PublicBountyHuntingBounty extends BountyHuntingBounty {
   claim?: BountyHuntingClaim;
 }
 
-export interface BountyHuntingMessageSignal {
-  authorName?: string;
-  emojiCount?: number;
-  isVerifiedAuthor?: boolean;
-  text: string;
-}
-
-interface BountyHuntingMessageFacts {
-  authorKey: string;
+export interface BountyHuntingMessageFacts {
   emojiCount: number;
+  hasAllCaps: boolean;
   hasMention: boolean;
   hasNumber: boolean;
   hasQuestion: boolean;
-  hasUrl: boolean;
+  isTopFanAuthor: boolean;
   isVerifiedAuthor: boolean;
-  text: string;
-  textKey: string;
 }
 
 export function doesBountyHuntingBountyMatch(
   bounty: Pick<BountyHuntingBounty, 'matcher'>,
-  message: BountyHuntingMessageSignal
+  message: BountyHuntingMessageFacts
 ): boolean {
-  const facts = getBountyHuntingMessageFacts(message);
   const { matcher } = bounty;
 
   switch (matcher.kind) {
     case 'allCaps':
-      return isBountyHuntingAllCapsMessage(facts.text, matcher.minLetters);
-    case 'authorIn':
-      return matcher.authorNames
-        .map(normalizeBountyHuntingAuthorKey)
-        .filter(Boolean)
-        .includes(facts.authorKey);
+      return message.hasAllCaps;
     case 'emojiCount':
-      return facts.emojiCount >= matcher.min;
-    case 'keyword':
-      return Boolean(normalizeComparableText(matcher.keyword)) &&
-        facts.textKey.includes(normalizeComparableText(matcher.keyword));
+      return message.emojiCount >= matcher.min;
     case 'mention':
-      return facts.hasMention;
+      return message.hasMention;
     case 'number':
-      return facts.hasNumber;
+      return message.hasNumber;
     case 'question':
-      return facts.hasQuestion;
-    case 'url':
-      return facts.hasUrl;
+      return message.hasQuestion;
+    case 'topFanAuthor':
+      return message.isTopFanAuthor;
     case 'verifiedAuthor':
-      return facts.isVerifiedAuthor;
+      return message.isVerifiedAuthor;
   }
-}
-
-export function normalizeBountyHuntingAuthorKey(value: unknown): string {
-  return normalizeComparableText(cleanText(value).replace(/^@+/, ''));
 }
 
 export function countBountyHuntingTextEmojis(value: unknown): number {
@@ -107,19 +82,4 @@ export function isBountyHuntingAllCapsMessage(value: unknown, minLetters = 4): b
   const uppercaseLetters = casedLetters.filter((letter) => letter === letter.toLocaleUpperCase()).length;
   const lowercaseLetters = casedLetters.filter((letter) => letter === letter.toLocaleLowerCase()).length;
   return uppercaseLetters >= minLetters && lowercaseLetters === 0;
-}
-
-function getBountyHuntingMessageFacts(message: BountyHuntingMessageSignal): BountyHuntingMessageFacts {
-  const text = cleanText(message.text);
-  return {
-    authorKey: normalizeBountyHuntingAuthorKey(message.authorName || ''),
-    emojiCount: Math.max(0, Math.round(Number(message.emojiCount) || 0), countBountyHuntingTextEmojis(text)),
-    hasMention: /(^|\s)@[\p{L}\p{N}._-]{2,}/u.test(text),
-    hasNumber: /\p{N}/u.test(text),
-    hasQuestion: /[?？]/u.test(text),
-    hasUrl: /\b(?:https?:\/\/|www\.)\S+/i.test(text),
-    isVerifiedAuthor: message.isVerifiedAuthor === true,
-    text,
-    textKey: normalizeComparableText(text)
-  };
 }

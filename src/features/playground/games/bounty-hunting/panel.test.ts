@@ -79,6 +79,12 @@ describe('Bounty Hunting panel', () => {
     handleFeatureMessage(message, { allowTranslate: true });
     updateBountyHuntingGamePanel(game, 'host-user');
 
+    expect(onAction).toHaveBeenCalledWith('game-bounty-hunting', 'observeBountyMessage', {
+      observations: [{
+        bountyIds: ['mention-user'],
+        messageId: 'msg-1'
+      }]
+    });
     expect(onAction).not.toHaveBeenCalledWith(
       'game-bounty-hunting',
       'claimBounty',
@@ -88,13 +94,46 @@ describe('Bounty Hunting panel', () => {
     message.dispatchEvent(new MouseEvent('click', { bubbles: true }));
 
     expect(onAction).toHaveBeenCalledWith('game-bounty-hunting', 'claimBounty', {
-      authorName: '@Luna',
       bountyId: 'mention-user',
-      emojiCount: 0,
-      isVerifiedAuthor: false,
-      messageId: 'msg-1',
-      text: 'look @Marco'
+      messageId: 'msg-1'
     });
+  });
+
+  it('sends all matching witness bounty IDs in one playground action', () => {
+    const onAction = vi.fn();
+    const baseGame = createBountyHuntingGame();
+    const game = {
+      ...baseGame,
+      bounties: [
+        ...baseGame.bounties,
+        {
+          amount: 75,
+          description: 'a message that asks a question',
+          id: 'question',
+          matcher: { kind: 'question' as const }
+        }
+      ]
+    };
+    openBountyHuntingGamePanel(game, 'host-user', onAction);
+    const message = appendChatMessage('msg-1', '@Luna', 'look @Marco?');
+
+    handleFeatureMessage(message, { allowTranslate: true });
+    updateBountyHuntingGamePanel(game, 'host-user');
+
+    const observeCalls = onAction.mock.calls.filter((call) => call[1] === 'observeBountyMessage');
+    expect(observeCalls).toHaveLength(1);
+    expect(observeCalls[0]).toEqual([
+      'game-bounty-hunting',
+      'observeBountyMessage',
+      {
+        observations: [
+          {
+            bountyIds: ['mention-user', 'question'],
+            messageId: 'msg-1'
+          }
+        ]
+      }
+    ]);
   });
 
   it('ignores clicked messages that do not match open bounties', () => {
@@ -560,7 +599,6 @@ function createClaimedBounty(id: string, role: 'guest' | 'host'): PublicBountyHu
     claim: {
       bountyId: id,
       claimedAt: 100_000,
-      messageAuthorName: '@Chatter',
       messageId: `message-${id}`,
       role,
       userId: `${role}-user`

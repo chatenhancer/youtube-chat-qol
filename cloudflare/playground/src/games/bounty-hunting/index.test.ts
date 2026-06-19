@@ -4,6 +4,7 @@ import {
   claimBountyHuntingBounty,
   createBountyHuntingGame,
   finishBountyHuntingGame,
+  observeBountyHuntingMessage,
   readyBountyHuntingPlayer,
   startBountyHuntingRound,
   submitBountyHunting,
@@ -38,9 +39,7 @@ describe('playground Bounty Hunting game rules', () => {
       action: 'claimBounty',
       payload: {
         bountyId: 'mention-user',
-        authorName: '@Chatter',
-        messageId: 'msg-early',
-        text: 'hello @Luna'
+        messageId: 'msg-early'
       },
       userId: 'guest-user'
     }, 5_000)).toThrowError(new ProtocolError(
@@ -56,13 +55,21 @@ describe('playground Bounty Hunting game rules', () => {
     expect(game.status).toBe('active');
     expect(game.phaseStartedAt).toBe(7_000);
 
+    game = observeBountyHuntingMessage(game, {
+      action: 'observeBountyMessage',
+      payload: {
+        observations: [{
+          bountyIds: ['mention-user'],
+          messageId: 'msg-1'
+        }]
+      },
+      userId: 'host-user'
+    }, 7_500);
     game = claimBountyHuntingBounty(game, {
       action: 'claimBounty',
       payload: {
         bountyId: 'mention-user',
-        authorName: '@Chatter',
-        messageId: 'msg-1',
-        text: 'hello @Luna'
+        messageId: 'msg-1'
       },
       userId: 'guest-user'
     }, 8_000);
@@ -110,7 +117,7 @@ describe('playground Bounty Hunting game rules', () => {
     expect(game.phaseStartedAt).toBe(5_000);
   });
 
-  it('rejects invalid providers, bad claims, duplicate messages, and early timeouts', () => {
+  it('requires an opposing witness, resolves pending claims, and rejects duplicate messages', () => {
     const preparingGame = createBountyHuntingGame('game-1', 'host-user', 'guest-user', 0);
     expect(() => submitBountyHunting(preparingGame, {
       action: 'submitBounties',
@@ -133,43 +140,126 @@ describe('playground Bounty Hunting game rules', () => {
       'time_remaining',
       'This bounty round still has time remaining.'
     ));
-    expect(() => claimBountyHuntingBounty(game, {
-      action: 'claimBounty',
-      payload: {
-        bountyId: 'question',
-        authorName: '@Chatter',
-        messageId: 'msg-1',
-        text: 'not a question'
-      },
-      userId: 'host-user'
-    }, 1_000)).toThrowError(new ProtocolError(
-      'bounty_mismatch',
-      'That chat message does not claim this bounty.'
-    ));
 
     game = claimBountyHuntingBounty(game, {
       action: 'claimBounty',
       payload: {
         bountyId: 'question',
-        authorName: '@Chatter',
-        messageId: 'msg-1',
-        text: 'is this a question?'
+        messageId: 'msg-1'
       },
       userId: 'host-user'
-    }, 2_000);
+    }, 3_100);
+    expect(game.scores.host).toBe(0);
+
+    game = observeBountyHuntingMessage(game, {
+      action: 'observeBountyMessage',
+      payload: {
+        bountyIds: ['question'],
+        messageId: 'msg-1'
+      },
+      userId: 'guest-user'
+    }, 3_500);
+    expect(game.scores.host).toBe(75);
+    expect(game.claims[0]).toMatchObject({
+      bountyId: 'question',
+      messageId: 'msg-1',
+      role: 'host'
+    });
+
+    game = observeBountyHuntingMessage(game, {
+      action: 'observeBountyMessage',
+      payload: {
+        bountyIds: ['has-number'],
+        messageId: 'msg-1'
+      },
+      userId: 'guest-user'
+    }, 3_600);
+    expect(game.scores.host).toBe(75);
     expect(() => claimBountyHuntingBounty(game, {
       action: 'claimBounty',
       payload: {
         bountyId: 'has-number',
-        authorName: '@Chatter',
-        messageId: 'msg-1',
-        text: '42'
+        messageId: 'msg-1'
       },
       userId: 'guest-user'
-    }, 2_100)).toThrowError(new ProtocolError(
+    }, 3_700)).toThrowError(new ProtocolError(
       'message_claimed',
       'This chat message already claimed a bounty.'
     ));
+  });
+
+  it('expires pending claims that are not witnessed quickly', () => {
+    let game = submitBountyHunting(createBountyHuntingGame('game-1', 'host-user', 'guest-user', 0), {
+      action: 'submitBounties',
+      payload: { bounties: createBounties() },
+      userId: 'host-user'
+    }, 0);
+    game = readyBountyHuntingPlayer(readyBountyHuntingPlayer(game, 'host-user', 0), 'guest-user', 0);
+    game = startBountyHuntingRound(game, 3_000);
+    game = claimBountyHuntingBounty(game, {
+      action: 'claimBounty',
+      payload: {
+        bountyId: 'question',
+        messageId: 'msg-1'
+      },
+      userId: 'host-user'
+    }, 3_100);
+    game = observeBountyHuntingMessage(game, {
+      action: 'observeBountyMessage',
+      payload: {
+        bountyIds: ['question'],
+        messageId: 'msg-1'
+      },
+      userId: 'guest-user'
+    }, 3_900);
+
+    expect(game.scores.host).toBe(0);
+    expect(game.claims).toHaveLength(0);
+  });
+
+  it('accepts multiple witness observations in one game action', () => {
+    let game = submitBountyHunting(createBountyHuntingGame('game-1', 'host-user', 'guest-user', 0), {
+      action: 'submitBounties',
+      payload: { bounties: createBounties() },
+      userId: 'host-user'
+    }, 0);
+    game = readyBountyHuntingPlayer(readyBountyHuntingPlayer(game, 'host-user', 0), 'guest-user', 0);
+    game = startBountyHuntingRound(game, 3_000);
+    game = observeBountyHuntingMessage(game, {
+      action: 'observeBountyMessage',
+      payload: {
+        observations: [
+          {
+            bountyIds: ['question'],
+            messageId: 'msg-question'
+          },
+          {
+            bountyIds: ['has-number'],
+            messageId: 'msg-number'
+          }
+        ]
+      },
+      userId: 'guest-user'
+    }, 3_100);
+    game = claimBountyHuntingBounty(game, {
+      action: 'claimBounty',
+      payload: {
+        bountyId: 'question',
+        messageId: 'msg-question'
+      },
+      userId: 'host-user'
+    }, 3_200);
+    game = claimBountyHuntingBounty(game, {
+      action: 'claimBounty',
+      payload: {
+        bountyId: 'has-number',
+        messageId: 'msg-number'
+      },
+      userId: 'host-user'
+    }, 3_300);
+
+    expect(game.scores.host).toBe(150);
+    expect(game.claims.map((claim) => claim.bountyId)).toEqual(['question', 'has-number']);
   });
 
   it('handles actions through the game module interface', () => {
@@ -203,7 +293,7 @@ function createBounties() {
       amount: 50,
       description: 'a message in all caps',
       id: 'all-caps',
-      matcher: { kind: 'allCaps', minLetters: 4 }
+      matcher: { kind: 'allCaps' }
     },
     {
       amount: 75,
@@ -225,9 +315,9 @@ function createBounties() {
     },
     {
       amount: 100,
-      description: 'a message with a link',
-      id: 'has-link',
-      matcher: { kind: 'url' }
+      description: 'a message by the top 3 chatters',
+      id: 'top-chatters',
+      matcher: { kind: 'topFanAuthor' }
     }
   ];
 }
