@@ -16,6 +16,13 @@ import {
 } from '../../games/replay-trivia';
 import type { GameActionInput, GameRecord } from '../../games/types';
 import type { GameId } from '../../protocol/messages';
+import {
+  BOUNTY_HUNTING_ROUND_MS,
+  type BountyHuntingBounty,
+  type BountyHuntingClaim,
+  type BountyHuntingGameStatus,
+  type BountyHuntingPlayerRole
+} from '../../../../../src/shared/playground-bounty-hunting';
 
 type ChoiceIndex = 0 | 1 | 2 | 3;
 type ChessBotMove = Pick<ChessMoveInput, 'from' | 'promotion' | 'to'>;
@@ -71,6 +78,11 @@ export const CHESS_COMPUTER_PLAYER_MASTER_PROFILE = createChessComputerPlayerPro
   'Computer (Master)',
   2500
 );
+export const BOUNTY_HUNTING_COMPUTER_PLAYER_PROFILE = createComputerPlayerProfile(
+  'bounty-hunter',
+  'Computer (Bounty Hunter)',
+  ['bounty-hunting']
+);
 export const CHESS_COMPUTER_PLAYER_PROFILES: readonly ComputerPlayerProfile[] = [
   CHESS_COMPUTER_PLAYER_BEGINNER_PROFILE,
   CHESS_COMPUTER_PLAYER_CLUB_PROFILE,
@@ -78,9 +90,13 @@ export const CHESS_COMPUTER_PLAYER_PROFILES: readonly ComputerPlayerProfile[] = 
 ];
 export const COMPUTER_PLAYER_PROFILES: readonly ComputerPlayerProfile[] = [
   COMPUTER_PLAYER_PROFILE,
-  ...CHESS_COMPUTER_PLAYER_PROFILES
+  ...CHESS_COMPUTER_PLAYER_PROFILES,
+  BOUNTY_HUNTING_COMPUTER_PLAYER_PROFILE
 ];
 
+const BOUNTY_HUNTING_RESPONSE_MIN_DELAY_MS = 1_200;
+const BOUNTY_HUNTING_RESPONSE_MAX_DELAY_MS = 3_600;
+const BOUNTY_HUNTING_TOP_CLAIM_RATE = 0.7;
 const CHESS_RESPONSE_MIN_DELAY_MS = 700;
 const CHESS_RESPONSE_MAX_DELAY_MS = 1_500;
 const TRIVIA_RESPONSE_MIN_DELAY_MS = 1_800;
@@ -91,6 +107,8 @@ export function shouldComputerPlayerAct(game: GameRecord, userId = COMPUTER_PLAY
   if (!hasPlayer(game, userId)) return false;
 
   switch (game.gameType) {
+    case 'bounty-hunting':
+      return isBountyHuntingActionNeeded(game, userId, now);
     case 'chess':
       return isChessTurnForPlayer(game, userId);
     case 'replay-trivia':
@@ -102,6 +120,8 @@ export function shouldComputerPlayerAct(game: GameRecord, userId = COMPUTER_PLAY
 
 export function getComputerPlayerActionDelayMs(game: GameRecord, random = Math.random): number {
   switch (game.gameType) {
+    case 'bounty-hunting':
+      return getRandomDelay(BOUNTY_HUNTING_RESPONSE_MIN_DELAY_MS, BOUNTY_HUNTING_RESPONSE_MAX_DELAY_MS, random);
     case 'chess':
       return getRandomDelay(CHESS_RESPONSE_MIN_DELAY_MS, CHESS_RESPONSE_MAX_DELAY_MS, random);
     case 'replay-trivia':
@@ -117,6 +137,13 @@ export function createComputerPlayerAction(
 ): Promise<GameActionInput | null> | GameActionInput | null {
   const userId = options.userId ?? COMPUTER_PLAYER_USER_ID;
   switch (game.gameType) {
+    case 'bounty-hunting':
+      return createBountyHuntingBotAction(
+        game,
+        userId,
+        options.random,
+        options.now
+      );
     case 'chess':
       return createStockfishChessBotAction(
         game,
@@ -142,10 +169,20 @@ export function isComputerPlayerUserId(userId: string): boolean {
 }
 
 function createChessComputerPlayerProfile(slug: string, displayName: string, chessElo: number): ComputerPlayerProfile {
+  return {
+    ...createComputerPlayerProfile(slug, displayName, ['chess']),
+    chessElo
+  };
+}
+
+function createComputerPlayerProfile(
+  slug: string,
+  displayName: string,
+  availableGames: readonly GameId[]
+): ComputerPlayerProfile {
   const id = `server:computer:${slug}`;
   return {
-    availableGames: ['chess'],
-    chessElo,
+    availableGames,
     connectionId: id,
     displayName,
     userId: id
@@ -214,6 +251,43 @@ export function createReplayTriviaBotAnswerAction(
   };
 }
 
+export function createBountyHuntingBotAction(
+  game: GameRecord,
+  userId: string,
+  random = Math.random,
+  now = Date.now()
+): GameActionInput | null {
+  const bountyGame = getBountyHuntingBotGame(game);
+  if (!bountyGame) return null;
+  const role = getBountyHuntingPlayerRole(bountyGame, userId);
+  if (!role) return null;
+
+  if (bountyGame.status === 'ready') {
+    return bountyGame.readyPlayers[role] ? null : {
+      action: 'ready',
+      userId
+    };
+  }
+
+  if (bountyGame.status !== 'active') return null;
+  if (isBountyHuntingDeadlinePassed(bountyGame, now)) return null;
+
+  const candidate = pickBountyHuntingClaimCandidate(
+    getBountyHuntingClaimCandidates(bountyGame, role),
+    random
+  );
+  if (!candidate) return null;
+
+  return {
+    action: 'claimBounty',
+    payload: {
+      bountyId: candidate.bountyId,
+      messageId: candidate.messageId
+    },
+    userId
+  };
+}
+
 function getRandomDelay(minMs: number, maxMs: number, random: () => number): number {
   return Math.round(minMs + random() * (maxMs - minMs));
 }
@@ -237,6 +311,18 @@ function isReplayTriviaAnswerNeeded(game: GameRecord, userId: string, now: numbe
       && triviaGame.answers[userId] === undefined
       && !isReplayTriviaQuestionDeadlinePassed(triviaGame, now)
   );
+}
+
+function isBountyHuntingActionNeeded(game: GameRecord, userId: string, now: number): boolean {
+  const bountyGame = getBountyHuntingBotGame(game);
+  if (!bountyGame) return false;
+  const role = getBountyHuntingPlayerRole(bountyGame, userId);
+  if (!role) return false;
+
+  if (bountyGame.status === 'ready') return !bountyGame.readyPlayers[role];
+  return bountyGame.status === 'active'
+    && !isBountyHuntingDeadlinePassed(bountyGame, now)
+    && getBountyHuntingClaimCandidates(bountyGame, role).length > 0;
 }
 
 function getGamePlayers(game: GameRecord): Record<string, string> {
@@ -282,4 +368,94 @@ function pickWrongChoiceIndex(correctChoiceIndex: ChoiceIndex, random: () => num
   const wrongChoices = ([0, 1, 2, 3] as ChoiceIndex[]).filter((choiceIndex) => choiceIndex !== correctChoiceIndex);
   const index = Math.min(Math.floor(random() * wrongChoices.length), wrongChoices.length - 1);
   return wrongChoices[index];
+}
+
+interface BountyHuntingBotGame extends GameRecord {
+  bounties: BountyHuntingBounty[];
+  claimedMessageIds: string[];
+  claimWitnesses: BountyHuntingBotClaimWitness[];
+  claims: BountyHuntingClaim[];
+  gameType: 'bounty-hunting';
+  phaseStartedAt: number;
+  players: Record<BountyHuntingPlayerRole, string>;
+  readyPlayers: Partial<Record<BountyHuntingPlayerRole, boolean>>;
+  status: BountyHuntingGameStatus;
+}
+
+interface BountyHuntingBotClaimWitness {
+  bountyId: string;
+  messageId: string;
+  observedAt: number;
+  role: BountyHuntingPlayerRole;
+  userId: string;
+}
+
+interface BountyHuntingBotClaimCandidate {
+  amount: number;
+  bountyId: string;
+  messageId: string;
+  observedAt: number;
+}
+
+function getBountyHuntingBotGame(game: GameRecord): BountyHuntingBotGame | null {
+  if (game.gameType !== 'bounty-hunting') return null;
+  return game as BountyHuntingBotGame;
+}
+
+function getBountyHuntingPlayerRole(
+  game: BountyHuntingBotGame,
+  userId: string
+): BountyHuntingPlayerRole | null {
+  if (game.players.host === userId) return 'host';
+  if (game.players.guest === userId) return 'guest';
+  return null;
+}
+
+function isBountyHuntingDeadlinePassed(game: BountyHuntingBotGame, now: number): boolean {
+  return now - game.phaseStartedAt >= BOUNTY_HUNTING_ROUND_MS;
+}
+
+function getBountyHuntingClaimCandidates(
+  game: BountyHuntingBotGame,
+  botRole: BountyHuntingPlayerRole
+): BountyHuntingBotClaimCandidate[] {
+  const bountiesById = new Map(game.bounties.map((bounty) => [bounty.id, bounty]));
+  const claimedBountyIds = new Set(game.claims.map((claim) => claim.bountyId));
+  const claimedMessageIds = new Set(game.claimedMessageIds);
+  const candidateKeys = new Set<string>();
+
+  return game.claimWitnesses
+    .flatMap((witness): BountyHuntingBotClaimCandidate[] => {
+      if (witness.role === botRole) return [];
+      if (claimedBountyIds.has(witness.bountyId)) return [];
+      if (claimedMessageIds.has(witness.messageId)) return [];
+      const bounty = bountiesById.get(witness.bountyId);
+      if (!bounty) return [];
+      const key = `${witness.messageId}:${witness.bountyId}`;
+      if (candidateKeys.has(key)) return [];
+      candidateKeys.add(key);
+      return [{
+        amount: bounty.amount,
+        bountyId: witness.bountyId,
+        messageId: witness.messageId,
+        observedAt: witness.observedAt
+      }];
+    })
+    .sort((a, b) =>
+      b.amount - a.amount ||
+      a.observedAt - b.observedAt ||
+      a.bountyId.localeCompare(b.bountyId) ||
+      a.messageId.localeCompare(b.messageId)
+    );
+}
+
+function pickBountyHuntingClaimCandidate(
+  candidates: BountyHuntingBotClaimCandidate[],
+  random: () => number
+): BountyHuntingBotClaimCandidate | null {
+  if (!candidates.length) return null;
+  if (candidates.length === 1 || random() < BOUNTY_HUNTING_TOP_CLAIM_RATE) return candidates[0];
+  const fallbackCount = candidates.length - 1;
+  const fallbackIndex = 1 + Math.min(Math.floor(random() * fallbackCount), fallbackCount - 1);
+  return candidates[fallbackIndex];
 }

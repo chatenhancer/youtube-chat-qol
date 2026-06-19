@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createComputerPlayer } from './computer-player';
 import {
+  BOUNTY_HUNTING_COMPUTER_PLAYER_PROFILE,
   CHESS_COMPUTER_PLAYER_CLUB_PROFILE,
   COMPUTER_PLAYER_AVAILABLE_GAMES,
   COMPUTER_PLAYER_DISPLAY_NAME,
@@ -9,6 +10,14 @@ import {
   type ComputerPlayerProfile
 } from './actions';
 import { applyChessMove, createChessGame, toPublicChessGame, type ChessGameRecord } from '../../games/chess';
+import {
+  createBountyHuntingGame,
+  observeBountyHuntingMessage,
+  readyBountyHuntingPlayer,
+  startBountyHuntingRound,
+  submitBountyHunting,
+  toPublicBountyHuntingGame
+} from '../../games/bounty-hunting';
 import {
   createStockfishBestMoveProvider,
   getStockfishBestMove
@@ -182,6 +191,67 @@ describe('in-room computer player', () => {
       }),
       'info'
     );
+  });
+
+  it('readies and claims Bounty Hunting bounties as normal game actions', async () => {
+    vi.useFakeTimers();
+    const harness = createComputerPlayerHarness(BOUNTY_HUNTING_COMPUTER_PLAYER_PROFILE);
+    let game = submitBountyHunting(
+      createBountyHuntingGame('game_bounty_1', 'human-user', harness.player.userId, 0),
+      {
+        action: 'submitBounties',
+        payload: { bounties: createBounties() },
+        userId: 'human-user'
+      },
+      1_000
+    );
+    harness.games.set(game.gameId, game);
+
+    sendServerMessage(harness, {
+      game: toPublicBountyHuntingGame(game, getPlayerInfo),
+      type: 'gameUpdated'
+    });
+
+    await vi.runAllTimersAsync();
+    await harness.flushWaitUntil();
+
+    expect(harness.sentMessages.at(-1)).toEqual({
+      action: 'ready',
+      gameId: 'game_bounty_1',
+      type: 'gameAction'
+    });
+
+    game = readyBountyHuntingPlayer(game, harness.player.userId, 2_000);
+    game = readyBountyHuntingPlayer(game, 'human-user', 2_000);
+    game = startBountyHuntingRound(game, 5_000);
+    game = observeBountyHuntingMessage(game, {
+      action: 'observeBountyMessage',
+      payload: {
+        bountyIds: ['question'],
+        messageId: 'msg-question-1'
+      },
+      userId: 'human-user'
+    }, 6_000);
+    harness.games.set(game.gameId, game);
+    vi.setSystemTime(7_000);
+
+    sendServerMessage(harness, {
+      game: toPublicBountyHuntingGame(game, getPlayerInfo),
+      type: 'gameUpdated'
+    });
+
+    await vi.runAllTimersAsync();
+    await harness.flushWaitUntil();
+
+    expect(harness.sentMessages.at(-1)).toEqual({
+      action: 'claimBounty',
+      gameId: 'game_bounty_1',
+      payload: {
+        bountyId: 'question',
+        messageId: 'msg-question-1'
+      },
+      type: 'gameAction'
+    });
   });
 
   it('schedules from hello snapshots and clears timers when a game disappears', async () => {
@@ -499,11 +569,56 @@ function sendServerMessage(
 
 function getPlayerInfo(userId: string): { displayName: string; userId: string } {
   return {
-    displayName: userId === CHESS_COMPUTER_PLAYER_CLUB_PROFILE.userId
-      ? CHESS_COMPUTER_PLAYER_CLUB_PROFILE.displayName
-      : 'Alice',
+    displayName: getTestDisplayName(userId),
     userId
   };
+}
+
+function getTestDisplayName(userId: string): string {
+  if (userId === CHESS_COMPUTER_PLAYER_CLUB_PROFILE.userId) return CHESS_COMPUTER_PLAYER_CLUB_PROFILE.displayName;
+  if (userId === BOUNTY_HUNTING_COMPUTER_PLAYER_PROFILE.userId) return BOUNTY_HUNTING_COMPUTER_PLAYER_PROFILE.displayName;
+  return 'Alice';
+}
+
+function createBounties() {
+  return [
+    {
+      amount: 50,
+      description: 'a message that asks a question',
+      id: 'question',
+      matcher: { kind: 'question' }
+    },
+    {
+      amount: 75,
+      description: 'a message by a verified account',
+      id: 'verified',
+      matcher: { kind: 'verifiedAuthor' }
+    },
+    {
+      amount: 100,
+      description: 'a message in all caps',
+      id: 'all-caps',
+      matcher: { kind: 'allCaps' }
+    },
+    {
+      amount: 125,
+      description: 'a message with 3+ emojis',
+      id: 'emoji',
+      matcher: { kind: 'emojiCount', min: 3 }
+    },
+    {
+      amount: 150,
+      description: 'a message that mentions a user',
+      id: 'mention',
+      matcher: { kind: 'mention' }
+    },
+    {
+      amount: 175,
+      description: 'a message from a top fan',
+      id: 'top-fan',
+      matcher: { kind: 'topFanAuthor' }
+    }
+  ];
 }
 
 function createStockfishResult(move: { from: string; to: string } | null) {
