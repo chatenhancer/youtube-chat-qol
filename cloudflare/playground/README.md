@@ -3,8 +3,8 @@
 This worker is the opt-in realtime backend for Playground features.
 
 Playground is separate from the normal extension features. Users must opt in
-before the extension connects to this backend. Chess is the only game module for
-now.
+before the extension connects to this backend. The current game roster is owned
+by the source game registry and exposed through the extension UI.
 
 ## Architecture
 
