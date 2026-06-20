@@ -103,6 +103,42 @@ describe('Bounty Hunting panel', () => {
     });
   });
 
+  it('temporarily marks the chat message when a bounty claim is confirmed', async () => {
+    vi.useFakeTimers();
+    vi.spyOn(Date, 'now').mockImplementation(() => 100_500);
+    const onAction = vi.fn();
+    const game = createBountyHuntingGame();
+    openBountyHuntingGamePanel(game, 'host-user', onAction);
+    const message = appendChatMessage('msg-1', '@Luna', 'look @Marco');
+    const claimedGame: PublicBountyHuntingGame = {
+      ...game,
+      bounties: [{
+        ...game.bounties[0],
+        claim: {
+          bountyId: 'mention-user',
+          claimedAt: 100_600,
+          messageId: 'msg-1',
+          role: 'host',
+          userId: 'host-user'
+        }
+      }],
+      scores: {
+        ...game.scores,
+        host: 125
+      }
+    };
+
+    updateBountyHuntingGamePanel(claimedGame, 'host-user');
+
+    expect(message.classList.contains('ytcq-bounty-hunting-message-claimed')).toBe(true);
+    expect(message.querySelector('.ytcq-bounty-hunting-message-claimed-badge')?.textContent).toBe('CLAIMED');
+
+    await vi.advanceTimersByTimeAsync(1_600);
+
+    expect(message.classList.contains('ytcq-bounty-hunting-message-claimed')).toBe(false);
+    expect(message.querySelector('.ytcq-bounty-hunting-message-claimed-badge')).toBeNull();
+  });
+
   it('does not claim bounties from the current user authored chat messages', () => {
     appendCurrentUserIdentity('@CurrentViewer');
     initMentionDetection();
