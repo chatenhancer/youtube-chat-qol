@@ -492,6 +492,56 @@ describe('computer player', () => {
     });
   });
 
+  it('witnesses newer Bounty Hunting messages before old chat backlog', () => {
+    let game = submitBountyHunting(
+      createBountyHuntingGame('bounty-1', 'host-user', BOUNTY_HUNTING_COMPUTER_PLAYER_PROFILE.userId, 0),
+      {
+        action: 'submitBounties',
+        payload: { bounties: createBounties() },
+        userId: 'host-user'
+      },
+      1_000
+    );
+    game = readyBountyHuntingPlayer(game, BOUNTY_HUNTING_COMPUTER_PLAYER_PROFILE.userId, 2_000);
+    game = readyBountyHuntingPlayer(game, 'host-user', 2_000);
+    game = startBountyHuntingRound(game, 5_000);
+    const oldObservations = Array.from({ length: 21 }, (_, index) => ({
+      bountyIds: ['question'],
+      messageId: `msg-old-${String(index + 1).padStart(2, '0')}`
+    }));
+    game = observeBountyHuntingMessage(game, {
+      action: 'observeBountyMessage',
+      payload: { observations: oldObservations },
+      userId: 'host-user'
+    }, 6_000);
+    game = observeBountyHuntingMessage(game, {
+      action: 'observeBountyMessage',
+      payload: {
+        observations: [{
+          bountyIds: ['question'],
+          messageId: 'msg-new-01'
+        }]
+      },
+      userId: 'host-user'
+    }, 8_000);
+
+    const action = createBountyHuntingBotAction(
+      game,
+      BOUNTY_HUNTING_COMPUTER_PLAYER_PROFILE.userId,
+      () => 0.1,
+      8_200
+    );
+    const observations = action?.payload?.observations as Array<{ bountyIds: string[]; messageId: string }> | undefined;
+
+    expect(action?.action).toBe('observeBountyMessage');
+    expect(observations).toHaveLength(20);
+    expect(observations?.[0]).toEqual({
+      bountyIds: ['question'],
+      messageId: 'msg-new-01'
+    });
+    expect(observations?.map((observation) => observation.messageId)).not.toContain('msg-old-21');
+  });
+
   it('prioritizes newer witnessed Bounty Hunting messages over older higher-value claims', () => {
     let game = submitBountyHunting(
       createBountyHuntingGame('bounty-1', 'host-user', BOUNTY_HUNTING_COMPUTER_PLAYER_PROFILE.userId, 0),
@@ -552,6 +602,56 @@ describe('computer player', () => {
       payload: {
         bountyId: 'question',
         messageId: 'msg-question-new'
+      },
+      userId: BOUNTY_HUNTING_COMPUTER_PLAYER_PROFILE.userId
+    });
+  });
+
+  it('keeps random Bounty Hunting claim fallback inside recent messages', () => {
+    let game = submitBountyHunting(
+      createBountyHuntingGame('bounty-1', 'host-user', BOUNTY_HUNTING_COMPUTER_PLAYER_PROFILE.userId, 0),
+      {
+        action: 'submitBounties',
+        payload: { bounties: createBounties() },
+        userId: 'host-user'
+      },
+      1_000
+    );
+    game = readyBountyHuntingPlayer(game, BOUNTY_HUNTING_COMPUTER_PLAYER_PROFILE.userId, 2_000);
+    game = readyBountyHuntingPlayer(game, 'host-user', 2_000);
+    game = startBountyHuntingRound(game, 5_000);
+    const observations = [
+      { bountyIds: ['top-fan'], messageId: 'msg-old-top-fan' },
+      { bountyIds: ['mention'], messageId: 'msg-recent-mention' },
+      { bountyIds: ['emoji'], messageId: 'msg-recent-emoji' },
+      { bountyIds: ['all-caps'], messageId: 'msg-recent-all-caps' },
+      { bountyIds: ['verified'], messageId: 'msg-recent-verified' },
+      { bountyIds: ['question'], messageId: 'msg-recent-question' }
+    ];
+    observations.forEach((observation, index) => {
+      game = observeBountyHuntingMessage(game, {
+        action: 'observeBountyMessage',
+        payload: { observations: [observation] },
+        userId: 'host-user'
+      }, 6_000 + index * 1_000);
+    });
+    game = observeBountyHuntingMessage(game, {
+      action: 'observeBountyMessage',
+      payload: { observations },
+      userId: BOUNTY_HUNTING_COMPUTER_PLAYER_PROFILE.userId
+    }, 12_000);
+
+    const randomValues = [0.9, 0.99];
+    expect(createBountyHuntingBotAction(
+      game,
+      BOUNTY_HUNTING_COMPUTER_PLAYER_PROFILE.userId,
+      () => randomValues.shift() ?? 0,
+      12_100
+    )).toEqual({
+      action: 'claimBounty',
+      payload: {
+        bountyId: 'mention',
+        messageId: 'msg-recent-mention'
       },
       userId: BOUNTY_HUNTING_COMPUTER_PLAYER_PROFILE.userId
     });
