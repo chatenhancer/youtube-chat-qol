@@ -525,7 +525,9 @@ describe('Bounty Hunting panel', () => {
 
     expect(context.fillText).toHaveBeenCalledWith('THE LEDGER', 224, 46);
     expect(context.fillText).toHaveBeenCalledWith('BOUNTIES', 304, 96);
-    expect(context.fillText).toHaveBeenCalledWith('CLAIMED', 304, 116);
+    expect(context.fillText).toHaveBeenCalledWith('CLAIMED', 304, 113);
+    expect(context.fillText).toHaveBeenCalledWith('MONEY', 382, 96);
+    expect(context.fillText).toHaveBeenCalledWith('EARNED', 382, 113);
     expect(context.fillText).toHaveBeenCalledWith('YOU', 136, 164);
     expect(context.fillText).toHaveBeenCalledWith('4', 304, 164);
     expect(context.fillText).toHaveBeenCalledWith('THEM', 136, 234);
@@ -549,7 +551,7 @@ describe('Bounty Hunting panel', () => {
     }, 'host-user', vi.fn());
     await Promise.resolve();
 
-    expect(context.drawImage).toHaveBeenCalledWith(roundOverTitle, 33, 64, 382, 296);
+    expect(context.drawImage).toHaveBeenCalledWith(roundOverTitle, 33, 28, 382, 296);
   });
 
   it('draws the round over loading button higher with cream text', () => {
@@ -564,6 +566,7 @@ describe('Bounty Hunting panel', () => {
       status: 'roundOver'
     }, 'host-user', vi.fn());
 
+    expect(context.fillText).toHaveBeenCalledWith('ROUND OVER', 224, 169);
     expect(loadingLabels.at(-1)).toEqual({
       color: '#F4DAA5',
       x: 224,
@@ -574,7 +577,9 @@ describe('Bounty Hunting panel', () => {
   it('draws a spinner on the logo loading screen', () => {
     openBountyHuntingGamePanel(createPreparingBountyHuntingGame(), 'host-user', vi.fn());
 
-    expect(context.arc).toHaveBeenCalledWith(224, 424, 9, 0, Math.PI * 2);
+    expect(context.fillText).toHaveBeenCalledWith('RELOADED', 224, 300);
+    expect(context.fillText).toHaveBeenCalledWith('Loading...', 224, 370);
+    expect(context.arc).toHaveBeenCalledWith(224, 396, 9, 0, Math.PI * 2);
     expect(context.stroke).toHaveBeenCalled();
   });
 

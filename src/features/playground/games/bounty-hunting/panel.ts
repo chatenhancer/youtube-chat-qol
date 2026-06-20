@@ -105,11 +105,13 @@ const LIVE_SCORE_MONEY_Y = 126;
 const LIVE_SCORE_NAME_Y = 106;
 const LIVE_SCORE_RIGHT_TEXT_X = 344;
 const LIVE_SCORE_Y_OFFSET = -8;
+const LOADING_SCREEN_OFFSET_Y = -28;
 const LEDGER_AVATAR_X = 92;
 const LEDGER_BOUNTIES_X = 304;
 const LEDGER_CLOSE_BUTTON_Y = 386;
 const LEDGER_DIVIDER_X = 92;
 const LEDGER_DIVIDER_WIDTH = 328;
+const LEDGER_HEADER_LINE_HEIGHT = 17;
 const LEDGER_HEADER_TOP_Y = 96;
 const LEDGER_HEADER_X = 304;
 const LEDGER_LABEL_X = 136;
@@ -128,8 +130,13 @@ const LEDGER_TITLE_FONT_SIZE = 56;
 const LEDGER_TITLE_Y = 18;
 const LEDGER_WINNER_Y = 318;
 const READY_BUTTON_FLASH_MS = 520;
+const ROUND_OVER_FALLBACK_TITLE_Y = 169;
 const ROUND_OVER_BUTTON_LABEL_COLOR = '#F4DAA5';
 const ROUND_OVER_BUTTON_Y = 382;
+const ROUND_OVER_TITLE_IMAGE_HEIGHT = 296;
+const ROUND_OVER_TITLE_IMAGE_WIDTH = 382;
+const ROUND_OVER_TITLE_IMAGE_X = 33;
+const ROUND_OVER_TITLE_IMAGE_Y = 28;
 const TIMER_START_PULSE_MS = 720;
 const WITNESS_FLUSH_MS = 500;
 const WITNESS_OBSERVATIONS_PER_FLUSH = 20;
@@ -1110,12 +1117,12 @@ function drawBountyHuntingLoading(runtime: BountyHuntingPanelRuntime, now: numbe
   context.fillRect(0, 0, LAYOUT_WIDTH, LAYOUT_HEIGHT);
 
   if (runtime.assets.logo) {
-    context.drawImage(runtime.assets.logo, 118, 50, 212, 318);
+    context.drawImage(runtime.assets.logo, 118, 50 + LOADING_SCREEN_OFFSET_Y, 212, 318);
   } else {
     drawBountyHuntingLoadingLogoFallback(context);
   }
 
-  drawCenteredFittedText(context, t('gamesBountyHuntingLoading'), 224, 398, 220, {
+  drawCenteredFittedText(context, t('gamesBountyHuntingLoading'), 224, 398 + LOADING_SCREEN_OFFSET_Y, 220, {
     color: '#444',
     font: '400 22px Roboto, Arial, sans-serif',
     minFontSize: 14,
@@ -1128,32 +1135,32 @@ function drawBountyHuntingLoading(runtime: BountyHuntingPanelRuntime, now: numbe
     radius: 9,
     trackColor: 'rgba(242, 13, 13, 0.14)',
     x: 224,
-    y: 424
+    y: 424 + LOADING_SCREEN_OFFSET_Y
   });
 }
 
 function drawBountyHuntingLoadingLogoFallback(context: CanvasRenderingContext2D): void {
-  drawCenteredText(context, 'THE', 224, 85, {
+  drawCenteredText(context, 'THE', 224, 85 + LOADING_SCREEN_OFFSET_Y, {
     color: '#f20d0d',
     font: `700 43px ${BARNUM_STACK}`,
     shadow: false
   });
-  drawCenteredText(context, 'Wild', 224, 132, {
+  drawCenteredText(context, 'Wild', 224, 132 + LOADING_SCREEN_OFFSET_Y, {
     color: '#f20d0d',
     font: `700 71px ${BARNUM_STACK}`,
     shadow: false
   });
-  drawCenteredText(context, 'WILD', 224, 190, {
+  drawCenteredText(context, 'WILD', 224, 190 + LOADING_SCREEN_OFFSET_Y, {
     color: '#f20d0d',
     font: `800 76px ${BARNUM_STACK}`,
     shadow: false
   });
-  drawCenteredText(context, 'CHAT', 224, 274, {
+  drawCenteredText(context, 'CHAT', 224, 274 + LOADING_SCREEN_OFFSET_Y, {
     color: '#f20d0d',
     font: `800 112px ${BARNUM_STACK}`,
     shadow: false
   });
-  drawCenteredText(context, 'RELOADED', 224, 328, {
+  drawCenteredText(context, 'RELOADED', 224, 328 + LOADING_SCREEN_OFFSET_Y, {
     color: '#050505',
     font: `800 33px ${TEX_MEX_STACK}`,
     shadow: false
@@ -1221,10 +1228,16 @@ function drawBountyHuntingRoundOver(runtime: BountyHuntingPanelRuntime): void {
   }
 
   if (assets.roundOverTitle) {
-    context.drawImage(assets.roundOverTitle, 33, 64, 382, 296);
+    context.drawImage(
+      assets.roundOverTitle,
+      ROUND_OVER_TITLE_IMAGE_X,
+      ROUND_OVER_TITLE_IMAGE_Y,
+      ROUND_OVER_TITLE_IMAGE_WIDTH,
+      ROUND_OVER_TITLE_IMAGE_HEIGHT
+    );
   } else {
     const title = tBountyHuntingBarnum('gamesBountyHuntingRoundOver');
-    drawCenteredFittedText(context, title, 224, 205, 330, {
+    drawCenteredFittedText(context, title, 224, ROUND_OVER_FALLBACK_TITLE_Y, 330, {
       color: '#f6deb2',
       font: `700 72px ${BARNUM_STACK}`,
       minFontSize: 36
@@ -1262,7 +1275,7 @@ function drawBountyHuntingLedger(runtime: BountyHuntingPanelRuntime): void {
     {
       color: RED_TEXT,
       font: `700 13px ${BARNUM_STACK}`,
-      lineHeight: 20,
+      lineHeight: LEDGER_HEADER_LINE_HEIGHT,
       maxLines: 2,
       minFontSize: 9
     }
@@ -1276,7 +1289,7 @@ function drawBountyHuntingLedger(runtime: BountyHuntingPanelRuntime): void {
     {
       color: RED_TEXT,
       font: `700 13px ${BARNUM_STACK}`,
-      lineHeight: 20,
+      lineHeight: LEDGER_HEADER_LINE_HEIGHT,
       maxLines: 2,
       minFontSize: 9
     }
