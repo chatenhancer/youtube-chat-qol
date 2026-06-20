@@ -151,6 +151,8 @@
     "gamesBountyHuntingClose": "閉じる",
     "gamesBountyHuntingOpen": "未獲得",
     "gamesBountyHuntingClaimed": "獲得済み",
+    "gamesBountyHuntingBountyLabel": "報酬",
+    "gamesBountyHuntingAmountLabel": "金額",
     "gamesBountyHuntingTimeRemaining": "残り時間",
     "gamesBountyHuntingYou": "あなた",
     "gamesBountyHuntingThem": "相手",

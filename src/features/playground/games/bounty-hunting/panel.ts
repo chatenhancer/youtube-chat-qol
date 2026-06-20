@@ -15,6 +15,7 @@ import {
 } from '../../../../shared/i18n';
 import { ytcqCreateElement } from '../../../../shared/managed-dom';
 import { drawPlaygroundCanvasAvatar } from '../../../../shared/playground/avatar';
+import { getPlaygroundAvatarPresentation } from '../../../../shared/playground/identity';
 import {
   BOUNTY_HUNTING_COUNTDOWN_MS,
   BOUNTY_HUNTING_BOUNTY_COUNT,
@@ -25,8 +26,13 @@ import {
   type BountyHuntingBountyDescriptionKey,
   type PublicBountyHuntingBounty
 } from '../../../../shared/playground/bounty-hunting';
-import { getAuthorName, getMessageStableId } from '../../../../youtube/messages';
-import { CHAT_MESSAGE_SELECTOR } from '../../../../youtube/selectors';
+import {
+  getAuthorName,
+  getMessageContentNodes,
+  getMessageStableId,
+  getMessageText
+} from '../../../../youtube/messages';
+import { CHAT_MESSAGE_SELECTOR, CHAT_SCROLLER_SELECTOR } from '../../../../youtube/selectors';
 import {
   cancelScheduledFrame,
   getNow,
@@ -131,7 +137,7 @@ const LEDGER_TITLE_FONT_SIZE = 56;
 const LEDGER_TITLE_Y = 18;
 const LEDGER_WINNER_Y = 318;
 const READY_BUTTON_FLASH_MS = 520;
-const CLAIMED_MESSAGE_FEEDBACK_MS = 1_600;
+const CLAIMED_MESSAGE_FEEDBACK_MS = 2_800;
 const ROUND_OVER_FALLBACK_TITLE_Y = 169;
 const ROUND_OVER_BUTTON_LABEL_COLOR = '#F4DAA5';
 const ROUND_OVER_BUTTON_Y = 382;
@@ -147,8 +153,16 @@ const READY_STACK_AVATAR_OVERLAP = 12;
 const READY_STACK_AVATAR_RADIUS = 10;
 const BOUNTY_HUNTING_PLAYER_ROLES: BountyHuntingPlayerRole[] = ['host', 'guest'];
 const BOUNTY_HUNTING_DESCRIPTION_KEYS = new Set<string>(BOUNTY_HUNTING_BOUNTY_DESCRIPTION_KEYS);
-const BOUNTY_HUNTING_CLAIMED_MESSAGE_CLASS = 'ytcq-bounty-hunting-message-claimed';
-const BOUNTY_HUNTING_CLAIMED_MESSAGE_BADGE_CLASS = 'ytcq-bounty-hunting-message-claimed-badge';
+const BOUNTY_HUNTING_CLAIMED_FEED_CLASS = 'ytcq-bounty-hunting-claimed-feed';
+const BOUNTY_HUNTING_CLAIMED_FEED_ITEM_CLASS = 'ytcq-bounty-hunting-claimed-feed-item';
+const BOUNTY_HUNTING_CLAIMED_FEED_AVATAR_CLASS = 'ytcq-bounty-hunting-claimed-feed-avatar';
+const BOUNTY_HUNTING_CLAIMED_FEED_BODY_CLASS = 'ytcq-bounty-hunting-claimed-feed-body';
+const BOUNTY_HUNTING_CLAIMED_FEED_META_CLASS = 'ytcq-bounty-hunting-claimed-feed-meta';
+const BOUNTY_HUNTING_CLAIMED_FEED_CLAIMER_CLASS = 'ytcq-bounty-hunting-claimed-feed-claimer';
+const BOUNTY_HUNTING_CLAIMED_FEED_DETAIL_CLASS = 'ytcq-bounty-hunting-claimed-feed-detail';
+const BOUNTY_HUNTING_CLAIMED_FEED_DETAIL_LABEL_CLASS = 'ytcq-bounty-hunting-claimed-feed-detail-label';
+const BOUNTY_HUNTING_CLAIMED_FEED_DETAIL_VALUE_CLASS = 'ytcq-bounty-hunting-claimed-feed-detail-value';
+const BOUNTY_HUNTING_CLAIMED_FEED_TEXT_CLASS = 'ytcq-bounty-hunting-claimed-feed-text';
 const BOUNTY_HUNTING_READY_SOUND_PATH = 'games/bounty-hunting/ready-gun-cock.mp3';
 const BOUNTY_HUNTING_ROUND_OVER_SOUND_PATH = 'games/bounty-hunting/sting.mp3';
 const BOUNTY_HUNTING_FINAL_TICK_SOUND_PATH = 'games/bounty-hunting/final-10-clock-tick.mp3';
@@ -389,7 +403,7 @@ export function updateBountyHuntingGamePanel(game: PublicBountyHuntingGame, curr
   if (newClaims.length > 0) {
     playBountyHuntingClaimFeedback(runtime);
     newClaims.forEach((claim) => {
-      showBountyHuntingClaimedMessageFeedback(runtime, claim.messageId);
+      showBountyHuntingClaimedMessageFeedback(runtime, claim);
     });
   }
   if (hasNewBountyHuntingReadyPlayer(previousGame, game)) {
@@ -653,23 +667,111 @@ function playBountyHuntingClaimFeedback(runtime: BountyHuntingPanelRuntime): voi
 
 function showBountyHuntingClaimedMessageFeedback(
   runtime: BountyHuntingPanelRuntime,
-  messageId: string
+  claim: BountyHuntingClaim
 ): void {
-  const message = findBountyHuntingChatMessageById(messageId);
+  const message = findBountyHuntingChatMessageById(claim.messageId);
   if (!message) return;
 
-  removeBountyHuntingClaimedMessageFeedback(runtime, message);
-  const badge = ytcqCreateElement('span');
-  badge.className = BOUNTY_HUNTING_CLAIMED_MESSAGE_BADGE_CLASS;
-  badge.setAttribute('role', 'status');
-  badge.textContent = t('gamesBountyHuntingClaimed');
+  const feed = getBountyHuntingClaimedMessageFeed(message);
+  const item = createBountyHuntingClaimedMessageFeedbackItem(runtime, claim, message);
+  feed.append(item);
 
-  message.classList.add(BOUNTY_HUNTING_CLAIMED_MESSAGE_CLASS);
-  message.append(badge);
   const timer = window.setTimeout(() => {
-    removeBountyHuntingClaimedMessageFeedback(runtime, message);
+    removeBountyHuntingClaimedMessageFeedback(runtime, item);
   }, CLAIMED_MESSAGE_FEEDBACK_MS);
-  runtime.claimedMessageFeedbackTimers.set(message, timer);
+  runtime.claimedMessageFeedbackTimers.set(item, timer);
+}
+
+function createBountyHuntingClaimedMessageFeedbackItem(
+  runtime: BountyHuntingPanelRuntime,
+  claim: BountyHuntingClaim,
+  message: HTMLElement
+): HTMLElement {
+  const player = runtime.game.players[claim.role];
+  const bounty = runtime.game.bounties.find((candidate) => candidate.id === claim.bountyId);
+  const bountyLabel = bounty ? getBountyHuntingCompactBountyLabel(bounty) : t('gamesBountyHuntingClaimed');
+  const bountyAmount = bounty ? `$${bounty.amount}` : '';
+  const presentation = getPlaygroundAvatarPresentation(player);
+  const item = ytcqCreateElement('div');
+  item.className = BOUNTY_HUNTING_CLAIMED_FEED_ITEM_CLASS;
+  item.setAttribute('role', 'status');
+
+  const text = ytcqCreateElement('span');
+  text.className = BOUNTY_HUNTING_CLAIMED_FEED_TEXT_CLASS;
+  const contentNodes = getMessageContentNodes(message);
+  if (contentNodes.length) {
+    text.replaceChildren(...contentNodes);
+  } else {
+    text.textContent = getMessageText(message) || t('gamesBountyHuntingClaimed');
+  }
+
+  const body = ytcqCreateElement('span');
+  body.className = BOUNTY_HUNTING_CLAIMED_FEED_BODY_CLASS;
+
+  const avatar = ytcqCreateElement('span');
+  avatar.className = BOUNTY_HUNTING_CLAIMED_FEED_AVATAR_CLASS;
+  avatar.style.backgroundColor = presentation.backgroundColor;
+  avatar.style.color = presentation.foregroundColor;
+  avatar.textContent = presentation.initial;
+  avatar.title = player.displayName;
+
+  const meta = ytcqCreateElement('span');
+  meta.className = BOUNTY_HUNTING_CLAIMED_FEED_META_CLASS;
+
+  const claimer = ytcqCreateElement('span');
+  claimer.className = BOUNTY_HUNTING_CLAIMED_FEED_CLAIMER_CLASS;
+  claimer.textContent = player.displayName;
+
+  meta.append(
+    claimer,
+    createBountyHuntingClaimedFeedDetail(t('gamesBountyHuntingBountyLabel'), bountyLabel),
+    createBountyHuntingClaimedFeedDetail(t('gamesBountyHuntingAmountLabel'), bountyAmount)
+  );
+
+  body.append(avatar, meta);
+  item.append(text, body);
+  return item;
+}
+
+function createBountyHuntingClaimedFeedDetail(labelText: string, valueText: string): HTMLElement {
+  const detail = ytcqCreateElement('span');
+  detail.className = BOUNTY_HUNTING_CLAIMED_FEED_DETAIL_CLASS;
+  detail.setAttribute('aria-label', `${labelText}: ${valueText}`);
+
+  const label = ytcqCreateElement('span');
+  label.className = BOUNTY_HUNTING_CLAIMED_FEED_DETAIL_LABEL_CLASS;
+  label.textContent = `${labelText}: `;
+
+  const value = ytcqCreateElement('span');
+  value.className = BOUNTY_HUNTING_CLAIMED_FEED_DETAIL_VALUE_CLASS;
+  value.textContent = valueText;
+
+  detail.append(label, value);
+  return detail;
+}
+
+function getBountyHuntingClaimedMessageFeed(message: HTMLElement): HTMLElement {
+  const scroller = message
+    .closest('yt-live-chat-item-list-renderer')
+    ?.querySelector<HTMLElement>('#item-scroller') ||
+    document.querySelector<HTMLElement>(CHAT_SCROLLER_SELECTOR);
+  let feed = document.querySelector<HTMLElement>(`.${BOUNTY_HUNTING_CLAIMED_FEED_CLASS}`);
+  if (!feed) {
+    feed = ytcqCreateElement('div');
+    feed.className = BOUNTY_HUNTING_CLAIMED_FEED_CLASS;
+    feed.setAttribute('aria-live', 'polite');
+    document.body.append(feed);
+  }
+  if (scroller) positionBountyHuntingClaimedMessageFeed(feed, scroller);
+  return feed;
+}
+
+function positionBountyHuntingClaimedMessageFeed(feed: HTMLElement, scroller: HTMLElement): void {
+  const rect = scroller.getBoundingClientRect();
+  const sideInset = 12;
+  feed.style.left = `${Math.max(0, Math.round(rect.left + sideInset))}px`;
+  feed.style.right = `${Math.max(sideInset, Math.round(window.innerWidth - rect.right + sideInset))}px`;
+  feed.style.bottom = `${Math.max(sideInset, Math.round(window.innerHeight - rect.bottom + sideInset))}px`;
 }
 
 function findBountyHuntingChatMessageById(messageId: string): HTMLElement | null {
@@ -683,18 +785,21 @@ function clearBountyHuntingClaimedMessageFeedback(runtime: BountyHuntingPanelRun
   [...runtime.claimedMessageFeedbackTimers.keys()].forEach((message) => {
     removeBountyHuntingClaimedMessageFeedback(runtime, message);
   });
+  document.querySelectorAll<HTMLElement>(`.${BOUNTY_HUNTING_CLAIMED_FEED_CLASS}`).forEach((feed) => feed.remove());
 }
 
 function removeBountyHuntingClaimedMessageFeedback(
   runtime: BountyHuntingPanelRuntime,
-  message: HTMLElement
+  item: HTMLElement
 ): void {
-  const timer = runtime.claimedMessageFeedbackTimers.get(message);
+  const timer = runtime.claimedMessageFeedbackTimers.get(item);
   if (timer !== undefined) window.clearTimeout(timer);
-  runtime.claimedMessageFeedbackTimers.delete(message);
-  message.classList.remove(BOUNTY_HUNTING_CLAIMED_MESSAGE_CLASS);
-  message.querySelectorAll<HTMLElement>(`:scope > .${BOUNTY_HUNTING_CLAIMED_MESSAGE_BADGE_CLASS}`)
-    .forEach((badge) => badge.remove());
+  runtime.claimedMessageFeedbackTimers.delete(item);
+  const feed = item.parentElement;
+  item.remove();
+  if (feed?.classList.contains(BOUNTY_HUNTING_CLAIMED_FEED_CLASS) && !feed.childElementCount) {
+    feed.remove();
+  }
 }
 
 function maybePlayBountyHuntingRoundOverSting(runtime: BountyHuntingPanelRuntime): void {

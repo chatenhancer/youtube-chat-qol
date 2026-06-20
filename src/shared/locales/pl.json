@@ -151,6 +151,8 @@
     "gamesBountyHuntingClose": "Zamknij",
     "gamesBountyHuntingOpen": "Otwarte",
     "gamesBountyHuntingClaimed": "Zdobyte",
+    "gamesBountyHuntingBountyLabel": "Nagroda",
+    "gamesBountyHuntingAmountLabel": "Kwota",
     "gamesBountyHuntingTimeRemaining": "Pozostaly czas",
     "gamesBountyHuntingYou": "Ty",
     "gamesBountyHuntingThem": "Oni",

@@ -151,6 +151,8 @@
     "gamesBountyHuntingClose": "關閉",
     "gamesBountyHuntingOpen": "開放",
     "gamesBountyHuntingClaimed": "已領取",
+    "gamesBountyHuntingBountyLabel": "懸賞",
+    "gamesBountyHuntingAmountLabel": "金額",
     "gamesBountyHuntingTimeRemaining": "剩餘時間",
     "gamesBountyHuntingYou": "你",
     "gamesBountyHuntingThem": "對手",

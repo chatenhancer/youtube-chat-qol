@@ -151,6 +151,8 @@
     "gamesBountyHuntingClose": "סגור",
     "gamesBountyHuntingOpen": "פתוח",
     "gamesBountyHuntingClaimed": "נתבע",
+    "gamesBountyHuntingBountyLabel": "פרס",
+    "gamesBountyHuntingAmountLabel": "סכום",
     "gamesBountyHuntingTimeRemaining": "זמן נותר",
     "gamesBountyHuntingYou": "אתה",
     "gamesBountyHuntingThem": "הם",

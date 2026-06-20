@@ -151,6 +151,8 @@
     "gamesBountyHuntingClose": "Fechar",
     "gamesBountyHuntingOpen": "Aberta",
     "gamesBountyHuntingClaimed": "Coletada",
+    "gamesBountyHuntingBountyLabel": "Recompensa",
+    "gamesBountyHuntingAmountLabel": "Valor",
     "gamesBountyHuntingTimeRemaining": "Tempo restante",
     "gamesBountyHuntingYou": "Eu",
     "gamesBountyHuntingThem": "Eles",

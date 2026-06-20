@@ -151,6 +151,8 @@
     "gamesBountyHuntingClose": "Sluiten",
     "gamesBountyHuntingOpen": "Open",
     "gamesBountyHuntingClaimed": "Geclaimd",
+    "gamesBountyHuntingBountyLabel": "Bounty",
+    "gamesBountyHuntingAmountLabel": "Bedrag",
     "gamesBountyHuntingTimeRemaining": "Resterende tijd",
     "gamesBountyHuntingYou": "Jij",
     "gamesBountyHuntingThem": "Zij",

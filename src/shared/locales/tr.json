@@ -151,6 +151,8 @@
     "gamesBountyHuntingClose": "Kapat",
     "gamesBountyHuntingOpen": "Acik",
     "gamesBountyHuntingClaimed": "Alindi",
+    "gamesBountyHuntingBountyLabel": "Ödül",
+    "gamesBountyHuntingAmountLabel": "Tutar",
     "gamesBountyHuntingTimeRemaining": "Kalan sure",
     "gamesBountyHuntingYou": "Sen",
     "gamesBountyHuntingThem": "Onlar",
