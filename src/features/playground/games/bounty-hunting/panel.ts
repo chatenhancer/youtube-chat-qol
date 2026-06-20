@@ -322,7 +322,7 @@ export function openBountyHuntingGamePanel(
 
   maybeStartBountyHuntingPreparation(activeBountyHuntingPanel);
   if (activeBountyHuntingPanel.game.status === 'active') {
-    insertBountyHuntingRoundStartDivider(activeBountyHuntingPanel);
+    syncBountyHuntingRoundStartDivider(activeBountyHuntingPanel);
   }
   maybeObserveVisibleBountyHuntingMessages(activeBountyHuntingPanel);
   renderBountyHuntingGame(getNow());
@@ -397,7 +397,7 @@ export function updateBountyHuntingGamePanel(game: PublicBountyHuntingGame, curr
     runtime.timeoutSent = false;
     runtime.finishSent = false;
     if (game.status === 'active') {
-      insertBountyHuntingRoundStartDivider(runtime);
+      syncBountyHuntingRoundStartDivider(runtime);
       moveBountyHuntingPanelToActiveRoundPosition(runtime);
       runtime.timerStartPulseUntil = getNow() + TIMER_START_PULSE_MS;
       runtime.soundController.play(BOUNTY_HUNTING_ROUND_START_SOUND_PATH);
@@ -446,6 +446,7 @@ function handleBountyHuntingLifecycleMessage(message: HTMLElement): void {
     return;
   }
 
+  syncBountyHuntingRoundStartDivider(runtime);
   maybeSendBountyHuntingWitness(runtime, observed);
 }
 
@@ -517,16 +518,31 @@ function maybeObserveVisibleBountyHuntingMessages(runtime: BountyHuntingPanelRun
   flushBountyHuntingWitnesses(runtime);
 }
 
-function insertBountyHuntingRoundStartDivider(runtime: BountyHuntingPanelRuntime): void {
-  if (runtime.roundStartDividerElement?.isConnected) return;
-  runtime.roundStartDividerElement?.remove();
-
+function syncBountyHuntingRoundStartDivider(runtime: BountyHuntingPanelRuntime): void {
+  if (runtime.game.status !== 'active') return;
   const container = getBountyHuntingChatItemsContainer();
   if (!container) {
+    runtime.roundStartDividerElement?.remove();
     runtime.roundStartDividerElement = null;
     return;
   }
 
+  const divider = runtime.roundStartDividerElement?.isConnected
+    ? runtime.roundStartDividerElement
+    : createBountyHuntingRoundStartDivider(runtime);
+  const firstEligibleMessage = findFirstBountyHuntingRoundMessage(runtime, container);
+  if (firstEligibleMessage) {
+    if (divider.nextElementSibling !== firstEligibleMessage) {
+      container.insertBefore(divider, firstEligibleMessage);
+    }
+  } else {
+    container.append(divider);
+  }
+  runtime.roundStartDividerElement = divider;
+}
+
+function createBountyHuntingRoundStartDivider(runtime: BountyHuntingPanelRuntime): HTMLElement {
+  runtime.roundStartDividerElement?.remove();
   const divider = ytcqCreateElement('div');
   divider.className = BOUNTY_HUNTING_START_DIVIDER_CLASS;
   divider.dataset.ytcqBountyHuntingGameId = runtime.game.gameId;
@@ -536,15 +552,8 @@ function insertBountyHuntingRoundStartDivider(runtime: BountyHuntingPanelRuntime
   const text = ytcqCreateElement('span');
   text.className = BOUNTY_HUNTING_START_DIVIDER_TEXT_CLASS;
   text.textContent = t('gamesBountyHuntingStartMarker');
-
   divider.append(text);
-  const firstEligibleMessage = findFirstBountyHuntingRoundMessage(runtime, container);
-  if (firstEligibleMessage) {
-    container.insertBefore(divider, firstEligibleMessage);
-  } else {
-    container.append(divider);
-  }
-  runtime.roundStartDividerElement = divider;
+  return divider;
 }
 
 function findFirstBountyHuntingRoundMessage(
@@ -566,6 +575,19 @@ function getBountyHuntingChatItemsContainer(): HTMLElement | null {
   const scroller = document.querySelector<HTMLElement>(CHAT_SCROLLER_SELECTOR);
   return scroller?.querySelector<HTMLElement>('#items') ||
     document.querySelector<HTMLElement>('yt-live-chat-item-list-renderer #items');
+}
+
+function getLatestVisibleBountyHuntingMessagePublishedAt(runtime: BountyHuntingPanelRuntime): number | null {
+  let latest: number | null = null;
+  refreshBountyHuntingTopFanAuthorKeys(runtime);
+  document.querySelectorAll<HTMLElement>(CHAT_MESSAGE_SELECTOR).forEach((message) => {
+    const observed = getBountyHuntingObservedMessage(message, {
+      topFanAuthorKeys: runtime.topFanAuthorKeys
+    });
+    if (observed?.messagePublishedAt === undefined) return;
+    latest = Math.max(latest ?? observed.messagePublishedAt, observed.messagePublishedAt);
+  });
+  return latest;
 }
 
 function removeBountyHuntingRoundStartDivider(runtime: BountyHuntingPanelRuntime): void {
@@ -590,9 +612,14 @@ function isBountyHuntingObservedMessageInRound(
   runtime: BountyHuntingPanelRuntime,
   message: BountyHuntingObservedMessage
 ): boolean {
+  const messageCutoffAt = getBountyHuntingMessageCutoffAt(runtime);
   return message.messagePublishedAt !== undefined &&
-    message.messagePublishedAt >= runtime.game.phaseStartedAt &&
-    message.messagePublishedAt < runtime.game.phaseStartedAt + BOUNTY_HUNTING_ROUND_MS;
+    message.messagePublishedAt > messageCutoffAt &&
+    message.messagePublishedAt < messageCutoffAt + BOUNTY_HUNTING_ROUND_MS;
+}
+
+function getBountyHuntingMessageCutoffAt(runtime: BountyHuntingPanelRuntime): number {
+  return runtime.game.messageCutoffAt ?? runtime.game.phaseStartedAt;
 }
 
 function maybeSendBountyHuntingWitness(
@@ -961,7 +988,12 @@ function maybeSendBountyHuntingTimerActions(runtime: BountyHuntingPanelRuntime):
   if (runtime.game.status === 'countdown' && !runtime.startRoundSent) {
     if (Date.now() - runtime.game.phaseStartedAt >= BOUNTY_HUNTING_COUNTDOWN_MS) {
       runtime.startRoundSent = true;
-      runtime.onAction(runtime.game.gameId, 'startRound');
+      const messageCutoffAt = getLatestVisibleBountyHuntingMessagePublishedAt(runtime);
+      if (messageCutoffAt !== null) {
+        runtime.onAction(runtime.game.gameId, 'startRound', { messageCutoffAt });
+      } else {
+        runtime.onAction(runtime.game.gameId, 'startRound');
+      }
     }
   }
 

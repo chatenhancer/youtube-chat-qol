@@ -202,6 +202,36 @@ describe('Bounty Hunting panel', () => {
     });
   });
 
+  it('moves the start divider before the first message after the shared chat cutoff', () => {
+    const onAction = vi.fn();
+    const game = {
+      ...createBountyHuntingGame(),
+      messageCutoffAt: 100_000
+    };
+    getChatItemsContainer();
+    openBountyHuntingGamePanel(game, 'host-user', onAction);
+    const divider = document.querySelector<HTMLElement>('.ytcq-bounty-hunting-start-divider');
+    expect(divider).toBeInstanceOf(HTMLElement);
+
+    const newMessage = appendChatMessage('msg-new', '@Luna', 'new @Marco', {
+      timestampUsec: '100001000'
+    });
+    getChatItemsContainer().insertBefore(newMessage, divider as HTMLElement);
+
+    handleFeatureMessage(newMessage, { allowTranslate: true });
+    updateBountyHuntingGamePanel(game, 'host-user');
+
+    const chatItems = [...getChatItemsContainer().children];
+    expect(chatItems.indexOf(divider as Element)).toBeLessThan(chatItems.indexOf(newMessage));
+    expect(onAction).toHaveBeenCalledWith('game-bounty-hunting', 'observeBountyMessage', {
+      observations: [{
+        bountyIds: ['mention-user'],
+        messageId: 'timestamp-usec:100001000:@Luna',
+        messagePublishedAt: 100_001
+      }]
+    });
+  });
+
   it('does not witness or claim messages without a YouTube publish timestamp', () => {
     const onAction = vi.fn();
     const game = createBountyHuntingGame();
@@ -956,6 +986,30 @@ describe('Bounty Hunting panel', () => {
     frameCallbacks[0]?.(103_000);
 
     expect(onAction).toHaveBeenCalledWith('game-bounty-hunting', 'startRound');
+  });
+
+  it('sends the latest visible YouTube chat timestamp when starting the round', () => {
+    const onAction = vi.fn();
+    appendChatMessage('msg-before-1', '@Luna', 'waiting', {
+      timestampUsec: '99500000'
+    });
+    appendChatMessage('msg-before-2', '@Marco', 'ready?', {
+      timestampUsec: '99900000'
+    });
+    const game = {
+      ...createBountyHuntingGame(),
+      phaseStartedAt: 100_000,
+      roundEndsAt: undefined,
+      status: 'countdown' as const
+    };
+
+    openBountyHuntingGamePanel(game, 'host-user', onAction);
+    vi.mocked(Date.now).mockReturnValue(103_000);
+    frameCallbacks[0]?.(103_000);
+
+    expect(onAction).toHaveBeenCalledWith('game-bounty-hunting', 'startRound', {
+      messageCutoffAt: 99_900
+    });
   });
 
   it('plays the final ten second clock tick once', () => {

@@ -234,7 +234,7 @@ describe('computer player', () => {
       payload: {
         bountyIds: ['question'],
         messageId: 'msg-question-1',
-        messagePublishedAt: 5_500
+        messagePublishedAt: 5_501
       },
       userId: 'host-user'
     }, 6_000);
@@ -278,7 +278,7 @@ describe('computer player', () => {
       payload: {
         bountyIds: ['question'],
         messageId: 'msg-question-1',
-        messagePublishedAt: 5_500
+        messagePublishedAt: 5_501
       },
       userId: 'host-user'
     }, 6_000);
