@@ -71,6 +71,7 @@ export interface BountyHuntingPanelRuntime {
   onAction: (gameId: string, action: string, payload?: Record<string, unknown>) => void;
   onVisibilityChanged: (() => void) | null;
   panelControls: GamePanelControls | null;
+  claimedMessageFeedbackTimers: Map<HTMLElement, number>;
   pendingWitnesses: Map<string, Set<string>>;
   pixelRatio: number;
   preparationMessages: Map<string, BountyHuntingObservedMessage>;

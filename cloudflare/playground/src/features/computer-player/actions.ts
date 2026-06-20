@@ -397,8 +397,8 @@ function getBountyHuntingClaimCandidates(
       }];
     })
     .sort((a, b) =>
+      b.observedAt - a.observedAt ||
       b.amount - a.amount ||
-      a.observedAt - b.observedAt ||
       a.bountyId.localeCompare(b.bountyId) ||
       a.messageId.localeCompare(b.messageId)
     );

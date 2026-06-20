@@ -492,6 +492,71 @@ describe('computer player', () => {
     });
   });
 
+  it('prioritizes newer witnessed Bounty Hunting messages over older higher-value claims', () => {
+    let game = submitBountyHunting(
+      createBountyHuntingGame('bounty-1', 'host-user', BOUNTY_HUNTING_COMPUTER_PLAYER_PROFILE.userId, 0),
+      {
+        action: 'submitBounties',
+        payload: { bounties: createBounties() },
+        userId: 'host-user'
+      },
+      1_000
+    );
+    game = readyBountyHuntingPlayer(game, BOUNTY_HUNTING_COMPUTER_PLAYER_PROFILE.userId, 2_000);
+    game = readyBountyHuntingPlayer(game, 'host-user', 2_000);
+    game = startBountyHuntingRound(game, 5_000);
+    game = observeBountyHuntingMessage(game, {
+      action: 'observeBountyMessage',
+      payload: {
+        observations: [{
+          bountyIds: ['verified'],
+          messageId: 'msg-verified-old'
+        }]
+      },
+      userId: 'host-user'
+    }, 6_000);
+    game = observeBountyHuntingMessage(game, {
+      action: 'observeBountyMessage',
+      payload: {
+        observations: [{
+          bountyIds: ['question'],
+          messageId: 'msg-question-new'
+        }]
+      },
+      userId: 'host-user'
+    }, 8_000);
+    game = observeBountyHuntingMessage(game, {
+      action: 'observeBountyMessage',
+      payload: {
+        observations: [
+          {
+            bountyIds: ['verified'],
+            messageId: 'msg-verified-old'
+          },
+          {
+            bountyIds: ['question'],
+            messageId: 'msg-question-new'
+          }
+        ]
+      },
+      userId: BOUNTY_HUNTING_COMPUTER_PLAYER_PROFILE.userId
+    }, 8_100);
+
+    expect(createBountyHuntingBotAction(
+      game,
+      BOUNTY_HUNTING_COMPUTER_PLAYER_PROFILE.userId,
+      () => 0.1,
+      8_200
+    )).toEqual({
+      action: 'claimBounty',
+      payload: {
+        bountyId: 'question',
+        messageId: 'msg-question-new'
+      },
+      userId: BOUNTY_HUNTING_COMPUTER_PLAYER_PROFILE.userId
+    });
+  });
+
   it('does not answer Replay Trivia when the bot is not eligible', () => {
     let game = submitReplayTriviaQuestions(createReplayTriviaGame('game-1', 'host-user', 'bot-user', 0), {
       action: 'submitQuestions',
