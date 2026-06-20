@@ -73,8 +73,8 @@ interface PendingStartedGameOpen {
 registerFeatureLifecycle({
   page: {
     boot: refreshGamesButton,
-    cleanupStale: cleanupStaleGamesButtons,
-    reset: cleanupStaleGamesButtons,
+    cleanupStale: cleanupStaleGamesUi,
+    reset: cleanupStaleGamesUi,
     optionsChanged: handlePlaygroundOptionsChanged
   },
   mutation: { enhance: handlePlaygroundMutations }
@@ -82,7 +82,7 @@ registerFeatureLifecycle({
 
 export function refreshGamesButton(): void {
   if (!getOptions().playgroundEnabled) {
-    cleanupStaleGamesButtons();
+    cleanupStaleGamesUi();
     return;
   }
 
@@ -103,7 +103,7 @@ export function scheduleGamesButtonWire(): void {
 
 export function wireGamesButton(): void {
   if (!getOptions().playgroundEnabled) {
-    cleanupStaleGamesButtons();
+    cleanupStaleGamesUi();
     return;
   }
 
@@ -122,7 +122,7 @@ export function wireGamesButton(): void {
   moveGamesButton(button, header, anchor);
 }
 
-export function cleanupStaleGamesButtons(): void {
+export function cleanupStaleGamesUi(): void {
   if (gamesWireTimer !== null) {
     window.clearTimeout(gamesWireTimer);
     gamesWireTimer = null;
@@ -130,6 +130,7 @@ export function cleanupStaleGamesButtons(): void {
   pendingStartedGameOpen = null;
   closeActiveGamePanel({ notify: false });
   closeGamesCard();
+  removeOrphanedGameSurfaces();
   lastGamesPointerPosition = null;
   activeGamesClientCleanup?.();
   activeGamesClientCleanup = null;
@@ -137,9 +138,13 @@ export function cleanupStaleGamesButtons(): void {
   document.querySelectorAll<HTMLButtonElement>('.ytcq-games-button').forEach((button) => button.remove());
 }
 
+function removeOrphanedGameSurfaces(): void {
+  document.querySelectorAll<HTMLElement>('.ytcq-games-card, .ytcq-game-panel').forEach((surface) => surface.remove());
+}
+
 function handlePlaygroundOptionsChanged(_previousOptions: Options, nextOptions: Options): void {
   if (!nextOptions.playgroundEnabled) {
-    cleanupStaleGamesButtons();
+    cleanupStaleGamesUi();
     return;
   }
 
