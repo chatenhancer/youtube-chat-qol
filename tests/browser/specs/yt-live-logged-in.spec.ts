@@ -31,7 +31,7 @@ import { settingsMenuScenario } from '../scenarios/menus';
 import { profileCardRecentMessagesScenario } from '../scenarios/profile';
 import { loggedInLiveTest as test } from '../support/scenario-fixtures';
 
-test('logged-in live: extension attaches and popup reports connected status', attachScenario);
+test('logged-in live: extension attaches and current tab action reports connected status', attachScenario);
 test('logged-in live: mark user from message menu persists and shows avatar ring', markedUserMessageMenuScenario);
 test('logged-in live: mention menu action writes a draft only', mentionMenuDraftScenario);
 test('logged-in live: quote menu action writes a draft only', quoteMenuDraftScenario);

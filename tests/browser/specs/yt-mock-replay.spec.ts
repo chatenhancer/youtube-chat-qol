@@ -19,7 +19,7 @@ import { playgroundReplayTriviaInviteScenario } from '../scenarios/playground-ga
 import { profileCardRecentMessagesScenario } from '../scenarios/profile';
 import { loggedInMockReplayTest as test } from '../support/scenario-fixtures';
 
-test('logged-in mock replay: extension attaches and popup reports connected status', attachScenario);
+test('logged-in mock replay: extension attaches and current tab action reports connected status', attachScenario);
 test('logged-in mock replay: chat settings menu receives extension controls', settingsMenuScenario);
 test('logged-in mock replay: message context menu receives mark, quote, and mention actions', messageMenuScenario);
 test('logged-in mock replay: mark user from message menu persists and shows avatar ring', markedUserMessageMenuScenario);

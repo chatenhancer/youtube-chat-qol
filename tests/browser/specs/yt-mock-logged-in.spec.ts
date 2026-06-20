@@ -56,7 +56,7 @@ import { playgroundChessInviteAndMoveScenario } from '../scenarios/playground-ga
 import { tabAlertScenario } from '../scenarios/tab-alert';
 import { loggedInMockTest as test } from '../support/scenario-fixtures';
 
-test('logged-in mock: extension attaches and popup reports connected status', attachScenario);
+test('logged-in mock: extension attaches and current tab action reports connected status', attachScenario);
 test('logged-in mock: message context menu receives mark, quote, and mention actions', messageMenuScenario);
 test('logged-in mock: mark user from message menu persists and shows avatar ring', markedUserMessageMenuScenario);
 test('logged-in mock: mention menu action writes a draft only', mentionMenuDraftScenario);

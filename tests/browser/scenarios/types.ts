@@ -4,7 +4,7 @@
  * A scenario is one feature-level browser check that can run against either
  * the deterministic YouTube fixture or a real YouTube live chat frame.
  */
-import type { BrowserContext } from '@playwright/test';
+import type { BrowserContext, Page } from '@playwright/test';
 import {
   NORMAL_CHAT_MESSAGE_SELECTOR,
   type ChatSurface
@@ -24,6 +24,10 @@ export interface BrowserScenarioSession {
    * The browser context that owns the loaded extension. 
    */
   context: BrowserContext;
+  /**
+   * The top-level YouTube tab that owns the chat surface.
+   */
+  page: Page;
 }
 
 /**
