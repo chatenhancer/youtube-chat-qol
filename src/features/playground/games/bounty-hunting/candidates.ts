@@ -10,7 +10,6 @@ import {
 import { cleanText } from '../../../../shared/text';
 import {
   getAuthorName,
-  getMessageRuns,
   getMessageStableId,
   getMessageText
 } from '../../../../youtube/messages';
@@ -43,7 +42,6 @@ interface BountyHuntingObservedMessageOptions {
 }
 
 const TOP_FAN_LABEL_PATTERN = /\btop\s+(?:fans?|chatters?)\b/i;
-const CUSTOM_EMOJI_SHORTCUT_PATTERN = /^:[^:\s]+:$/;
 const BOUNTY_HUNTING_ENGLISH_DESCRIPTIONS: Record<BountyHuntingBountyDescriptionKey, string> = {
   gamesBountyHuntingBountyAllCaps: 'a message in all caps',
   gamesBountyHuntingBountyChannelMember: 'a message from a channel member',
@@ -282,7 +280,6 @@ function getBountyHuntingAuthorKey(value: unknown): string {
 }
 
 function isBountyHuntingTopFanParticipant(participant: HTMLElement): boolean {
-  if (hasBountyHuntingTopFanDataSignal(participant)) return true;
   if (hasBountyHuntingTopFanLabel(participant)) return true;
   return hasBountyHuntingTopFanSectionSignal(participant);
 }
@@ -324,35 +321,7 @@ function getBountyHuntingPreviousSectionLabel(element: Element): string {
   return '';
 }
 
-function hasBountyHuntingTopFanDataSignal(participant: HTMLElement): boolean {
-  const candidate = participant as HTMLElement & {
-    data?: unknown;
-    __data?: { data?: unknown };
-  };
-  return hasBountyHuntingTopFanValue(candidate.data || candidate.__data?.data);
-}
-
-function hasBountyHuntingTopFanValue(value: unknown, depth = 0): boolean {
-  if (!value || depth > 4) return false;
-  if (typeof value === 'string') return TOP_FAN_LABEL_PATTERN.test(value);
-  if (Array.isArray(value)) {
-    return value.some((child) => hasBountyHuntingTopFanValue(child, depth + 1));
-  }
-  if (typeof value !== 'object') return false;
-
-  return Object.entries(value as Record<string, unknown>).some(([key, child]) => {
-    if (/top\s*fan|top\s*chatter/i.test(key) && child !== false && child !== null && child !== undefined) return true;
-    return hasBountyHuntingTopFanValue(child, depth + 1);
-  });
-}
-
 function countBountyHuntingMessageEmojis(message: HTMLElement): number {
-  const runs = getMessageRuns(message);
-  if (runs?.length) {
-    const runEmojiCount = runs.filter((run) => Boolean(run.emoji)).length;
-    if (runEmojiCount) return runEmojiCount;
-  }
-
   const visualEmojiCount = message.querySelectorAll(
     'img[alt], img[shared-tooltip-text], [data-emoji-id], [class*="emoji" i]'
   ).length;
@@ -360,14 +329,6 @@ function countBountyHuntingMessageEmojis(message: HTMLElement): number {
 }
 
 function hasBountyHuntingCustomEmoji(message: HTMLElement): boolean {
-  const runs = getMessageRuns(message);
-  if (runs?.some((run) => {
-    const shortcut = cleanText(run.emoji?.shortcuts?.[0] || '');
-    return Boolean(run.emoji?.emojiId || CUSTOM_EMOJI_SHORTCUT_PATTERN.test(shortcut));
-  })) {
-    return true;
-  }
-
   const selector = [
     'img[shared-tooltip-text^=":"]',
     'img[alt^=":"]',
@@ -382,11 +343,6 @@ function hasBountyHuntingCustomEmoji(message: HTMLElement): boolean {
 
 function isBountyHuntingOnlyEmojiMessage(message: HTMLElement, text: string, emojiCount: number): boolean {
   if (emojiCount <= 0) return false;
-
-  const runs = getMessageRuns(message);
-  if (runs?.length) {
-    return runs.every((run) => Boolean(run.emoji) || !cleanText(run.text || ''));
-  }
 
   const messageText = message.querySelector<HTMLElement>('#message');
   if (messageText) {

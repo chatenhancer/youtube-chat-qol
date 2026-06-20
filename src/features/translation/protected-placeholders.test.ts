@@ -101,24 +101,20 @@ describe('translation protected placeholders', () => {
     expect(restoredNodes.some((node) => node instanceof HTMLImageElement)).toBe(true);
   });
 
-  it('plans translation from YouTube renderer runs when DOM text is unavailable', () => {
-    const message = document.createElement('yt-live-chat-text-message-renderer') as HTMLElement & {
-      data?: unknown;
-    };
-    message.data = {
-      message: {
-        runs: [
-          { emoji: { shortcuts: [':wave:'] } },
-          { text: ' ' },
-          { emoji: { searchTerms: [':sparkles:'] } },
-          { text: ' hello @ExampleUser!' },
-          { emoji: { emojiId: 'custom-heart' } },
-          { text: ' ' },
-          { emoji: { shortcuts: [':second:'] } },
-          {}
-        ]
-      }
-    };
+  it('plans translation from visible DOM emoji nodes', () => {
+    const message = document.createElement('yt-live-chat-text-message-renderer');
+    const messageText = document.createElement('span');
+    messageText.id = 'message';
+    messageText.append(
+      createEmojiImage(':wave:'),
+      ' ',
+      createEmojiImage(':sparkles:'),
+      ' hello @ExampleUser!',
+      createEmojiImage('custom-heart'),
+      ' ',
+      createEmojiImage(':second:')
+    );
+    message.append(messageText);
 
     const plan = createTranslationPlan(message, ':wave: :sparkles: hello @ExampleUser!custom-heart :second:');
 
@@ -131,46 +127,27 @@ describe('translation protected placeholders', () => {
   });
 
   it('restores DOM emoji nodes when message text contains only emoji images', () => {
-    const message = document.createElement('yt-live-chat-text-message-renderer') as HTMLElement & {
-      data?: unknown;
-    };
+    const message = document.createElement('yt-live-chat-text-message-renderer');
     const messageText = document.createElement('span');
     messageText.id = 'message';
     const emoji = document.createElement('img');
     emoji.alt = ':wave:';
-    emoji.hidden = true;
     messageText.append(emoji);
+    messageText.append(' hello');
     message.append(messageText);
-    message.data = {
-      message: {
-        runs: [
-          { emoji: { shortcuts: [':wave:'] } },
-          { text: ' hello' }
-        ]
-      }
-    };
 
     const plan = createTranslationPlan(message, ':wave: hello');
     const restored = createNodesWithPlaceholders(plan.text, plan.protectedTokens);
 
-    expect(plan.text).toBe('§0§');
+    expect(plan.text).toBe('§0§ hello');
     expect(restored[0]).toBeInstanceOf(HTMLImageElement);
   });
 
   it('keeps pending whitespace as text when an emoji run ends before normal content', () => {
-    const message = document.createElement('yt-live-chat-text-message-renderer') as HTMLElement & {
-      data?: unknown;
-    };
-    message.data = {
-      message: {
-        runs: [
-          { emoji: { shortcuts: [':wave:'] } },
-          { text: '   ' },
-          {},
-          { text: 'hello' }
-        ]
-      }
-    };
+    const message = document.createElement('yt-live-chat-text-message-renderer');
+    message.innerHTML = `
+      <span id="message"><img alt=":wave:">   <span></span>hello</span>
+    `;
 
     const plan = createTranslationPlan(message, ':wave:   hello');
 
@@ -178,20 +155,11 @@ describe('translation protected placeholders', () => {
     expect(plan.protectedTokens[0].fallbackText).toBe(':wave:');
   });
 
-  it('keeps renderer whitespace outside emoji runs when the run is interrupted', () => {
-    const message = document.createElement('yt-live-chat-text-message-renderer') as HTMLElement & {
-      data?: unknown;
-    };
-    message.data = {
-      message: {
-        runs: [
-          { emoji: { shortcuts: [':wave:'] } },
-          { text: '   ' },
-          {},
-          { emoji: { shortcuts: [':sparkles:'] } }
-        ]
-      }
-    };
+  it('keeps DOM whitespace outside emoji runs when the run is interrupted', () => {
+    const message = document.createElement('yt-live-chat-text-message-renderer');
+    message.innerHTML = `
+      <span id="message"><img alt=":wave:">   <span></span><img alt=":sparkles:"></span>
+    `;
 
     const plan = createTranslationPlan(message, ':wave:   :sparkles:');
 
@@ -199,7 +167,7 @@ describe('translation protected placeholders', () => {
     expect(plan.protectedTokens.map((token) => token.fallbackText)).toEqual([':wave:', ':sparkles:']);
   });
 
-  it('falls back to original text when no DOM nodes or renderer runs are available', () => {
+  it('falls back to original text when no DOM nodes are available', () => {
     const message = document.createElement('yt-live-chat-text-message-renderer');
 
     const plan = createTranslationPlan(message, 'hello @ExampleUser 😀');
@@ -435,3 +403,9 @@ describe('translation protected placeholders', () => {
     expect(getPlainTextFromMessageNodes(restoredAfterElement)).toBe('Hola @NodeUser@SecondUser');
   });
 });
+
+function createEmojiImage(alt: string): HTMLImageElement {
+  const image = document.createElement('img');
+  image.alt = alt;
+  return image;
+}

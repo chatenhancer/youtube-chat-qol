@@ -8,8 +8,6 @@
  */
 import { cleanText } from '../../shared/text';
 import {
-  getEmojiTextFromRun,
-  getMessageRuns,
   getMessageTextElement,
   getStoredOriginalMessage
 } from '../../youtube/messages';
@@ -52,79 +50,6 @@ export function createTranslationPlan(message: HTMLElement, originalText: string
   if (domText) {
     return {
       text: cleanText(domText),
-      protectedTokens
-    };
-  }
-
-  const runs = getMessageRuns(message);
-
-  if (Array.isArray(runs) && runs.length) {
-    const emojiNodes = Array.from(getMessageTextElement(message)?.querySelectorAll('img') || []);
-    let emojiNodeIndex = 0;
-    const parts: string[] = [];
-    const emojiRunNodes: Node[] = [];
-    let emojiRunText = '';
-    const pendingWhitespaceNodes: Node[] = [];
-    let pendingWhitespaceText = '';
-
-    const hasEmojiRun = (): boolean => Boolean(emojiRunText || emojiRunNodes.length);
-
-    const movePendingWhitespaceToEmojiRun = (): void => {
-      if (!pendingWhitespaceText && !pendingWhitespaceNodes.length) return;
-      emojiRunText += pendingWhitespaceText;
-      emojiRunNodes.push(...pendingWhitespaceNodes);
-      pendingWhitespaceText = '';
-      pendingWhitespaceNodes.length = 0;
-    };
-
-    const flushPendingWhitespaceToParts = (): void => {
-      if (!pendingWhitespaceText) return;
-      parts.push(pendingWhitespaceText);
-      pendingWhitespaceText = '';
-      pendingWhitespaceNodes.length = 0;
-    };
-
-    const flushEmojiRun = (): void => {
-      if (!emojiRunText && !emojiRunNodes.length) return;
-      parts.push(createProtectedPlaceholderToken({
-        protectedTokens,
-        fallbackText: emojiRunText,
-        nodes: emojiRunNodes
-      }));
-      emojiRunText = '';
-      emojiRunNodes.length = 0;
-    };
-
-    runs.forEach((run) => {
-      if (run.text) {
-        if (hasEmojiRun() && isWhitespaceOnly(run.text)) {
-          pendingWhitespaceText += run.text;
-          pendingWhitespaceNodes.push(document.createTextNode(run.text));
-          return;
-        }
-
-        flushEmojiRun();
-        flushPendingWhitespaceToParts();
-        parts.push(replaceProtectedTextWithPlaceholders(run.text, protectedTokens));
-        return;
-      }
-      if (!run.emoji) {
-        flushEmojiRun();
-        flushPendingWhitespaceToParts();
-        return;
-      }
-
-      movePendingWhitespaceToEmojiRun();
-      emojiRunText += getEmojiTextFromRun(run);
-      const emojiNode = emojiNodes[emojiNodeIndex++] || null;
-      if (emojiNode) emojiRunNodes.push(emojiNode);
-    });
-    movePendingWhitespaceToEmojiRun();
-    flushEmojiRun();
-    flushPendingWhitespaceToParts();
-
-    return {
-      text: cleanText(parts.join('')),
       protectedTokens
     };
   }

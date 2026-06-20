@@ -1,16 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-interface TestRendererData {
-  authorExternalChannelId?: string;
-  authorName?: { simpleText: string };
-  id?: string;
-  message?: { runs: { text: string }[] };
-}
-
-type TestMessageElement = HTMLElement & {
-  data?: TestRendererData;
-};
-
 describe('user message history', () => {
   beforeEach(() => {
     vi.resetModules();
@@ -126,7 +115,6 @@ describe('user message history', () => {
 
     history.recordUserMessage(message);
     message.querySelector('#message')!.textContent = 'loaded text';
-    message.data!.message = { runs: [{ text: 'loaded text' }] };
     history.recordUserMessage(message);
 
     expect(history.getRecentMessagesForIdentity({ channelId: 'channel-3', authorName: '@LateText' }))
@@ -168,16 +156,11 @@ describe('user message history', () => {
     });
 
     history.recordUserMessage(message);
-    message.data = {
-      authorExternalChannelId: 'second-channel',
-      authorName: { simpleText: '@SecondAuthor' },
-      id: 'message-2',
-      message: { runs: [{ text: 'second message' }] }
-    };
+    message.setAttribute('data-message-id', 'message-2');
     message.innerHTML = `
       <span id="timestamp">12:00 PM</span>
       <span id="author-photo"></span>
-      <span id="author-name">@SecondAuthor</span>
+      <a href="/channel/second-channel"><span id="author-name">@SecondAuthor</span></a>
       <span id="message">second message</span>
     `;
     history.recordUserMessage(message);
@@ -699,18 +682,16 @@ function createMessage({
   messageId?: string;
   text: string;
   timestampText?: string;
-}): TestMessageElement {
-  const message = document.createElement('yt-live-chat-text-message-renderer') as TestMessageElement;
-  message.data = {
-    authorExternalChannelId: channelId,
-    authorName: { simpleText: authorName },
-    id: messageId,
-    message: { runs: [{ text }] }
-  };
+}): HTMLElement {
+  const message = document.createElement('yt-live-chat-text-message-renderer');
+  if (messageId) message.setAttribute('data-message-id', messageId);
+  const authorHtml = channelId
+    ? `<a href="/channel/${channelId}"><span id="author-name">${authorName}</span></a>`
+    : `<span id="author-name">${authorName}</span>`;
   message.innerHTML = `
     <span id="timestamp">${timestampText}</span>
     <span id="author-photo"></span>
-    <span id="author-name">${authorName}</span>
+    ${authorHtml}
     <span id="message">${text}</span>
   `;
   document.body.append(message);

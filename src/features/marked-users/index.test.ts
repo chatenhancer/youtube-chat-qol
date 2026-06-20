@@ -304,12 +304,7 @@ describe('marked users', () => {
     expect(markedUsers.getMessageAuthorMarkTitle(message)).toBe('Mark');
     await expect(markedUsers.toggleMessageAuthorMark(message)).resolves.toBe(false);
 
-    const authoredMessage = document.createElement('yt-live-chat-text-message-renderer') as HTMLElement & {
-      data?: unknown;
-    };
-    authoredMessage.data = {
-      authorName: { simpleText: '@ViewerOne' }
-    };
+    const authoredMessage = document.createElement('yt-live-chat-text-message-renderer');
     authoredMessage.innerHTML = `
       <span id="author-photo"><img src="https://example.test/avatar.png"></span>
       <span id="author-name">@ViewerOne</span>
@@ -332,16 +327,10 @@ describe('marked users', () => {
     markedUsers.initMarkedUsers();
     await Promise.resolve();
 
-    const message = document.createElement('yt-live-chat-text-message-renderer') as HTMLElement & {
-      data?: unknown;
-    };
-    message.data = {
-      authorExternalChannelId: 'viewer-channel',
-      authorName: { simpleText: '@ViewerOne' }
-    };
+    const message = document.createElement('yt-live-chat-text-message-renderer');
     message.innerHTML = `
       <span id="author-photo"></span>
-      <span id="author-name">@ViewerOne</span>
+      <a href="/channel/viewer-channel"><span id="author-name">@ViewerOne</span></a>
     `;
     document.body.append(message);
 
@@ -522,16 +511,10 @@ describe('marked users', () => {
     markedUsers.initMarkedUsers();
     await Promise.resolve();
 
-    const participant = document.createElement('yt-live-chat-participant-renderer') as HTMLElement & {
-      data?: unknown;
-    };
-    participant.data = {
-      authorChannelId: 'participant-channel',
-      authorName: { simpleText: '@ParticipantUser' }
-    };
+    const participant = document.createElement('yt-live-chat-participant-renderer');
     participant.innerHTML = `
       <yt-img-shadow><img src="https://example.test/participant.png"></yt-img-shadow>
-      <span id="author-name">@ParticipantUser</span>
+      <a href="/channel/participant-channel"><span id="author-name">@ParticipantUser</span></a>
     `;
     document.body.append(participant);
 

@@ -19,23 +19,14 @@ describe('focus mode source helpers', () => {
     });
   });
 
-  it('builds a focus source from renderer data and avatar DOM', () => {
-    const message = document.createElement('yt-live-chat-text-message-renderer') as HTMLElement & {
-      data?: {
-        authorExternalChannelId?: string;
-        authorName?: { simpleText: string };
-      };
-    };
-    message.data = {
-      authorExternalChannelId: 'channel-1',
-      authorName: { simpleText: '@ExampleCreator Verified' }
-    };
-    message.innerHTML = '<div id="author-photo"><img src="https://example.test/avatar.png"></div>';
+  it('builds a focus source from author and avatar DOM', () => {
+    const message = document.createElement('yt-live-chat-text-message-renderer');
+    message.innerHTML = '<a href="/channel/dom-channel-1"><span id="author-name">@ExampleCreator <span>Verified</span></span></a><div id="author-photo"><img src="https://example.test/avatar.png"></div>';
 
     expect(getFocusSourceFromMessage(message)).toEqual({
       authorName: '@ExampleCreator',
       avatarSrc: 'https://example.test/avatar.png',
-      channelId: 'channel-1'
+      channelId: 'dom-channel-1'
     });
   });
 

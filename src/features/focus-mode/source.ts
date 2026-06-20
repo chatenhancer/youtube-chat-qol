@@ -7,23 +7,22 @@
 import { cleanText, normalizeComparableText } from '../../shared/text';
 import { cleanAuthorNameText } from '../../youtube/authors';
 import {
+  getAuthorChannelId,
   getAuthorName,
-  getMessageAvatarSrc,
-  getRendererData
+  getMessageAvatarSrc
 } from '../../youtube/messages';
 import { CHAT_MESSAGE_SELECTOR } from '../../youtube/selectors';
 import { getAvatarSrcForIdentity } from '../user-message-history';
 import type { FocusSource } from './types';
 
 export function getFocusSourceFromMessage(message: HTMLElement): FocusSource | null {
-  const data = getRendererData(message);
   const authorName = getAuthorName(message);
   if (!authorName) return null;
 
   return normalizeFocusSource({
     authorName,
     avatarSrc: getMessageAvatarSrc(message),
-    channelId: data?.authorExternalChannelId || data?.authorChannelId
+    channelId: getAuthorChannelId(message)
   });
 }
 
@@ -49,8 +48,7 @@ export function isSameFocusSource(a: FocusSource, b: FocusSource): boolean {
 }
 
 export function isSelectedFocusAuthor(message: HTMLElement, source: FocusSource): boolean {
-  const data = getRendererData(message);
-  const channelId = data?.authorExternalChannelId || data?.authorChannelId;
+  const channelId = getAuthorChannelId(message);
   if (source.channelId && channelId) return source.channelId === channelId;
 
   return normalizeComparableText(getAuthorName(message)) === normalizeComparableText(source.authorName);

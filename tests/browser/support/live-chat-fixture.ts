@@ -71,12 +71,11 @@ export function createLiveChatFixtureHtml({
       }
 
       #author-photo {
-        border: 0;
         border-radius: 50%;
         cursor: pointer;
+        display: block;
         height: 32px;
         overflow: hidden;
-        padding: 0;
         width: 32px;
       }
 
@@ -94,6 +93,13 @@ export function createLiveChatFixtureHtml({
 
       #menu {
         margin-left: auto;
+      }
+
+      #menu button {
+        background: transparent;
+        border: 0;
+        color: inherit;
+        cursor: pointer;
       }
 
       yt-live-chat-message-input-renderer {
@@ -170,16 +176,27 @@ export function createLiveChatFixtureHtml({
         <yt-live-chat-item-list-renderer>
           <div id="item-scroller">
             <div id="items">
-              <yt-live-chat-text-message-renderer id="fixture-message-1" data-message-id="fixture-message-1">
-                <button id="author-photo" type="button">
-                  <img alt="" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Crect width='32' height='32' rx='16' fill='%233f8cff'/%3E%3Ctext x='16' y='21' text-anchor='middle' fill='white' font-size='16'%3EE%3C/text%3E%3C/svg%3E">
-                </button>
+              <yt-live-chat-text-message-renderer id="fixture-message-1">
+                <yt-img-shadow id="author-photo" height="24" width="24" loaded="">
+                  <img id="img" alt="" height="24" width="24" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Crect width='32' height='32' rx='16' fill='%233f8cff'/%3E%3Ctext x='16' y='21' text-anchor='middle' fill='white' font-size='16'%3EE%3C/text%3E%3C/svg%3E">
+                </yt-img-shadow>
                 <div id="content">
                   <span id="timestamp">${replay ? '0:05' : '10:05 PM'}</span>
-                  <span id="author-name">@ExampleCreator</span>
-                  <span id="message">Hola mundo</span>
+                  <yt-live-chat-author-chip>
+                    <span id="prepend-chat-badges"></span>
+                    <span id="author-name" dir="auto">@ExampleCreator<span id="chip-badges"></span></span>
+                    <span id="chat-badges"></span>
+                  </yt-live-chat-author-chip>
+                  <span id="message-container">
+                    <span id="message-prefix-icon-container"></span>
+                    <span id="message" dir="auto">Hola mundo</span>
+                  </span>
                 </div>
-                <button id="menu" type="button" aria-label="Message actions">⋮</button>
+                <div id="menu">
+                  <yt-icon-button id="menu-button">
+                    <button id="button" type="button" aria-label="Chat actions">⋮</button>
+                  </yt-icon-button>
+                </div>
               </yt-live-chat-text-message-renderer>
             </div>
           </div>
@@ -205,12 +222,12 @@ export function createLiveChatFixtureHtml({
       const items = document.querySelector('#items');
       let nextMessageNumber = 1;
       const fixtureMessages = [
-        { author: '@ExampleCreator', channel: 'fixture-channel-1', text: 'Hola mundo' },
-        { author: '@ChatFan', channel: 'fixture-channel-2', text: 'Gracias por el stream' },
-        { author: '@NightViewer', channel: 'fixture-channel-3', text: 'This mock chat is still moving' },
-        { author: '@StreamHelper', channel: 'fixture-channel-4', text: 'Bonjour le chat' },
-        { author: '@EmojiFan', channel: 'fixture-channel-5', text: 'Great moment 😄' },
-        { author: '@LateViewer', channel: 'fixture-channel-6', text: 'Llegué tarde pero aquí estoy' }
+        { author: '@ExampleCreator', text: 'Hola mundo' },
+        { author: '@ChatFan', text: 'Gracias por el stream' },
+        { author: '@NightViewer', text: 'This mock chat is still moving' },
+        { author: '@StreamHelper', text: 'Bonjour le chat' },
+        { author: '@EmojiFan', text: 'Great moment 😄' },
+        { author: '@LateViewer', text: 'Llegué tarde pero aquí estoy' }
       ];
 
       const getMessageId = (number) => \`fixture-message-\${number}\`;
@@ -220,39 +237,36 @@ export function createLiveChatFixtureHtml({
         return \`data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Crect width='32' height='32' rx='16' fill='%23\${colors[index % colors.length]}'/%3E%3Ctext x='16' y='21' text-anchor='middle' fill='white' font-size='16'%3E\${encodeURIComponent(label)}%3C/text%3E%3C/svg%3E\`;
       };
 
-      const attachMessageData = (message, fixtureMessage, number) => {
-        const id = getMessageId(number);
-        message.data = {
-          authorExternalChannelId: fixtureMessage.channel,
-          authorName: { simpleText: fixtureMessage.author },
-          id,
-          message: { runs: [{ text: fixtureMessage.text }] },
-          timestampUsec: String(1779396300000000 + (number * 1000000))
-        };
-      };
-
       const createMessage = (fixtureMessage, number) => {
         const id = getMessageId(number);
         const message = document.createElement('yt-live-chat-text-message-renderer');
         message.id = id;
-        message.dataset.messageId = id;
         message.innerHTML = \`
-          <button id="author-photo" type="button">
-            <img alt="" src="\${createAvatarSrc(fixtureMessage.author.replace(/^@/, '').slice(0, 1).toUpperCase(), number)}">
-          </button>
+          <yt-img-shadow id="author-photo" height="24" width="24" loaded="">
+            <img id="img" alt="" height="24" width="24" src="\${createAvatarSrc(fixtureMessage.author.replace(/^@/, '').slice(0, 1).toUpperCase(), number)}">
+          </yt-img-shadow>
           <div id="content">
             <span id="timestamp">${replay ? '${Math.min(number * 5, 59)}:00' : '10:0${Math.min(number + 4, 9)} PM'}</span>
-            <span id="author-name">\${fixtureMessage.author}</span>
-            <span id="message">\${fixtureMessage.text}</span>
+            <yt-live-chat-author-chip>
+              <span id="prepend-chat-badges"></span>
+              <span id="author-name" dir="auto">\${fixtureMessage.author}<span id="chip-badges"></span></span>
+              <span id="chat-badges"></span>
+            </yt-live-chat-author-chip>
+            <span id="message-container">
+              <span id="message-prefix-icon-container"></span>
+              <span id="message" dir="auto">\${fixtureMessage.text}</span>
+            </span>
           </div>
-          <button id="menu" type="button" aria-label="Message actions">⋮</button>
+          <div id="menu">
+            <yt-icon-button id="menu-button">
+              <button id="button" type="button" aria-label="Chat actions">⋮</button>
+            </yt-icon-button>
+          </div>
         \`;
-        attachMessageData(message, fixtureMessage, number);
         return message;
       };
 
       const initialMessage = document.querySelector('#fixture-message-1');
-      attachMessageData(initialMessage, fixtureMessages[0], 1);
       nextMessageNumber = 2;
 
       const appendFixtureMessage = () => {
@@ -274,7 +288,6 @@ export function createLiveChatFixtureHtml({
 
         const fixtureMessage = {
           author: String(overrides.author || '@BrowserTestViewer'),
-          channel: String(overrides.channel || \`fixture-channel-custom-\${nextMessageNumber}\`),
           text: String(overrides.text || 'Browser test message')
         };
         const message = createMessage(fixtureMessage, nextMessageNumber);

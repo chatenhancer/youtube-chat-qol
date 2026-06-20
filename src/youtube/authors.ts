@@ -48,7 +48,7 @@ export function getAuthorHandleForUrl(authorName: string): string {
 
 function getDirectTextFromElement(element: Element): string {
   return Array.from(element.childNodes)
-    .filter((node) => node.nodeType === Node.TEXT_NODE)
+    .filter((node) => node.nodeType === 3)
     .map((node) => node.textContent || '')
     .join('');
 }

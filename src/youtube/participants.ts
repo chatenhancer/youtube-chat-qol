@@ -1,36 +1,36 @@
 /**
  * YouTube participant-list adapter.
  *
- * Centralizes extraction of author, channel, and avatar data from
+ * Centralizes extraction of author, channel, and avatar details from
  * `yt-live-chat-participant-renderer` rows so features do not duplicate
  * participant-list DOM assumptions.
  */
 import { cleanText } from '../shared/text';
 import {
   cleanAuthorNameText,
-  getAuthorNameFromElement,
-  getAuthorNameFromRendererText
+  getAuthorNameFromElement
 } from './authors';
 
-interface ParticipantRendererData {
-  authorExternalChannelId?: string;
-  authorChannelId?: string;
-  authorName?: {
-    simpleText?: string;
-    runs?: { text?: string }[];
-  };
-}
-
 export function getParticipantAuthorName(participant: HTMLElement): string {
-  const data = getParticipantRendererData(participant);
-  return getAuthorNameFromRendererText(data?.authorName) ||
-    getAuthorNameFromElement(participant.querySelector('#author-name')) ||
+  return getAuthorNameFromElement(participant.querySelector('[id="author-name"], a[href*="/channel/"], a[href^="/@"]')) ||
     cleanAuthorNameText(participant.textContent);
 }
 
 export function getParticipantChannelId(participant: HTMLElement): string {
-  const data = getParticipantRendererData(participant);
-  return cleanText(data?.authorExternalChannelId || data?.authorChannelId);
+  const authorName = participant.querySelector<HTMLElement>('[id="author-name"], a[href*="/channel/"], a[href^="/@"]');
+  const authorLink = authorName?.closest<HTMLAnchorElement>('a[href]');
+  const candidateLinks = [
+    authorName instanceof HTMLAnchorElement ? authorName : null,
+    authorLink,
+    participant.querySelector<HTMLAnchorElement>('a[href*="/channel/"]')
+  ];
+
+  for (const link of candidateLinks) {
+    const channelId = getChannelIdFromHref(link?.getAttribute('href') || '');
+    if (channelId) return channelId;
+  }
+
+  return '';
 }
 
 export function getParticipantAvatarElement(participant: HTMLElement): HTMLElement | null {
@@ -41,10 +41,15 @@ export function getParticipantAvatarSrc(participant: HTMLElement): string {
   return participant.querySelector<HTMLImageElement>('yt-img-shadow img, img#img, img')?.src || '';
 }
 
-function getParticipantRendererData(participant: HTMLElement): ParticipantRendererData | null {
-  const candidate = participant as HTMLElement & {
-    data?: ParticipantRendererData;
-    __data?: { data?: ParticipantRendererData };
-  };
-  return candidate.data || candidate.__data?.data || null;
+function getChannelIdFromHref(href: string): string {
+  const cleanHref = cleanText(href);
+  if (!cleanHref) return '';
+
+  try {
+    const url = new URL(cleanHref, 'https://www.youtube.com');
+    const [kind, channelId] = url.pathname.split('/').filter(Boolean);
+    return kind === 'channel' ? cleanText(channelId) : '';
+  } catch {
+    return '';
+  }
 }

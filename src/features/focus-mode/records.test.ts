@@ -1,13 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { FocusRecord, FocusSource } from './types';
 
-interface TestRendererData {
-  authorExternalChannelId?: string;
-  authorName?: { simpleText: string };
-  id?: string;
-  message?: { runs: { text: string }[] };
-}
-
 describe('focus mode records', () => {
   beforeEach(() => {
     vi.resetModules();
@@ -120,18 +113,14 @@ function createMessage({
   text: string;
   timestampText?: string;
 }): HTMLElement {
-  const message = document.createElement('yt-live-chat-text-message-renderer') as HTMLElement & {
-    data?: TestRendererData;
-  };
-  message.data = {
-    authorExternalChannelId: channelId,
-    authorName: { simpleText: authorName },
-    id: messageId,
-    message: { runs: [{ text }] }
-  };
+  const message = document.createElement('yt-live-chat-text-message-renderer');
+  if (messageId) message.setAttribute('data-message-id', messageId);
+  const authorHtml = channelId
+    ? `<a href="/channel/${channelId}"><span id="author-name">${authorName}</span></a>`
+    : `<span id="author-name">${authorName}</span>`;
   message.innerHTML = `
     <span id="timestamp">${timestampText}</span>
-    <span id="author-name">${authorName}</span>
+    ${authorHtml}
     <span id="message">${text}</span>
   `;
   document.body.append(message);
