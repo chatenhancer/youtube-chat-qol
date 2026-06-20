@@ -258,6 +258,54 @@ describe('playground Bounty Hunting game rules', () => {
     ));
   });
 
+  it('uses the shared YouTube chat cutoff instead of server phase time for message validation', () => {
+    let game = submitBountyHunting(createBountyHuntingGame('game-1', 'host-user', 'guest-user', 0), {
+      action: 'submitBounties',
+      payload: { bounties: createBounties() },
+      userId: 'host-user'
+    }, 0);
+    game = readyBountyHuntingPlayer(readyBountyHuntingPlayer(game, 'host-user', 0), 'guest-user', 0);
+    game = startBountyHuntingRound(game, {
+      action: 'startRound',
+      payload: { messageCutoffAt: 80_000 },
+      userId: 'host-user'
+    }, 100_000);
+
+    expect(game.messageCutoffAt).toBe(80_000);
+    game = observeBountyHuntingMessage(game, {
+      action: 'observeBountyMessage',
+      payload: {
+        bountyIds: ['question'],
+        messageId: 'msg-after-cutoff',
+        messagePublishedAt: 80_500
+      },
+      userId: 'guest-user'
+    }, 100_100);
+    game = claimBountyHuntingBounty(game, {
+      action: 'claimBounty',
+      payload: {
+        bountyId: 'question',
+        messageId: 'msg-after-cutoff',
+        messagePublishedAt: 80_500
+      },
+      userId: 'host-user'
+    }, 100_200);
+
+    expect(game.scores.host).toBe(75);
+    expect(() => claimBountyHuntingBounty(game, {
+      action: 'claimBounty',
+      payload: {
+        bountyId: 'has-number',
+        messageId: 'msg-at-cutoff',
+        messagePublishedAt: 80_000
+      },
+      userId: 'host-user'
+    }, 100_300)).toThrowError(new ProtocolError(
+      'message_too_old',
+      'This chat message is from before the bounty round.'
+    ));
+  });
+
   it('rejects active-round messages without a published timestamp', () => {
     let game = submitBountyHunting(createBountyHuntingGame('game-1', 'host-user', 'guest-user', 0), {
       action: 'submitBounties',

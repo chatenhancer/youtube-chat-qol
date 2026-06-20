@@ -15,6 +15,7 @@ export interface PublicBountyHuntingGame extends PublicGame {
   bounties: PublicBountyHuntingBounty[];
   bountyProviderUserId: string;
   gameType: 'bounty-hunting';
+  messageCutoffAt?: number;
   phaseStartedAt: number;
   players: Record<BountyHuntingPlayerRole, PublicUserIdentity>;
   readyPlayers: Partial<Record<BountyHuntingPlayerRole, boolean>>;

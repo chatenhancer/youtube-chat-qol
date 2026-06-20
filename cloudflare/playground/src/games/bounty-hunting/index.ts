@@ -39,6 +39,7 @@ export interface PublicBountyHuntingGame extends PublicGame {
   bounties: PublicBountyHuntingBounty[];
   bountyProviderUserId: string;
   gameType: 'bounty-hunting';
+  messageCutoffAt?: number;
   phaseStartedAt: number;
   players: Record<PlayerRole, PublicUserIdentity>;
   readyPlayers: Partial<Record<PlayerRole, boolean>>;
@@ -55,6 +56,7 @@ interface BountyHuntingGameRecord extends GameRecord {
   claimWitnesses: BountyHuntingClaimWitness[];
   claims: BountyHuntingClaim[];
   gameType: 'bounty-hunting';
+  messageCutoffAt?: number;
   phaseStartedAt: number;
   pendingClaims: BountyHuntingPendingClaim[];
   players: Record<PlayerRole, string>;
@@ -96,7 +98,7 @@ export const bountyHuntingGameModule: GameModule = {
       case 'ready':
         return readyBountyHuntingPlayer(bountyGame, input.userId);
       case 'startRound':
-        return startBountyHuntingRound(bountyGame);
+        return startBountyHuntingRound(bountyGame, input);
       case 'claimBounty':
         return claimBountyHuntingBounty(bountyGame, input);
       case 'observeBountyMessage':
@@ -170,6 +172,7 @@ export function submitBountyHunting(
     claimedMessageIds: [],
     claimWitnesses: [],
     claims: [],
+    messageCutoffAt: undefined,
     phaseStartedAt: now,
     pendingClaims: [],
     readyPlayers: {},
@@ -197,6 +200,7 @@ export function readyBountyHuntingPlayer(
   if (nextReady && readyPlayers.host && readyPlayers.guest) {
     return {
       ...game,
+      messageCutoffAt: undefined,
       phaseStartedAt: now,
       readyPlayers,
       status: 'countdown'
@@ -211,15 +215,20 @@ export function readyBountyHuntingPlayer(
 
 export function startBountyHuntingRound(
   game: BountyHuntingGameRecord,
-  now = Date.now()
+  inputOrNow: GameActionInput | number = Date.now(),
+  maybeNow?: number
 ): BountyHuntingGameRecord {
+  const input = typeof inputOrNow === 'number' ? null : inputOrNow;
+  const now = typeof inputOrNow === 'number' ? inputOrNow : maybeNow ?? Date.now();
   if (game.status !== 'countdown') return game;
   if (now - game.phaseStartedAt < BOUNTY_HUNTING_COUNTDOWN_MS) {
     throw new ProtocolError('countdown_active', 'This bounty round countdown is still active.');
   }
+  const messageCutoffAt = getPayloadOptionalTimestamp(input?.payload?.messageCutoffAt, 'messageCutoffAt');
 
   return {
     ...game,
+    ...(messageCutoffAt !== undefined ? { messageCutoffAt } : {}),
     phaseStartedAt: now,
     status: 'active'
   };
@@ -454,6 +463,7 @@ export function toPublicBountyHuntingGame(
     bountyProviderUserId: game.bountyProviderUserId,
     gameId: game.gameId,
     gameType: 'bounty-hunting',
+    messageCutoffAt: game.messageCutoffAt,
     phaseStartedAt: game.phaseStartedAt,
     players: {
       guest: getUser(game.players.guest),
@@ -592,6 +602,11 @@ function getPayloadTimestamp(value: unknown, field: string): number {
   return Math.floor(timestamp);
 }
 
+function getPayloadOptionalTimestamp(value: unknown, field: string): number | undefined {
+  if (value === undefined) return undefined;
+  return getPayloadTimestamp(value, field);
+}
+
 function parseBountyHuntingWitnessObservations(payload: Record<string, unknown>): BountyHuntingWitnessObservation[] {
   if (Array.isArray(payload.observations)) {
     return payload.observations
@@ -625,8 +640,9 @@ function isBountyHuntingMessageInActiveRound(
   game: BountyHuntingGameRecord,
   messagePublishedAt: number
 ): boolean {
-  return messagePublishedAt >= game.phaseStartedAt &&
-    messagePublishedAt < game.phaseStartedAt + BOUNTY_HUNTING_ROUND_MS;
+  const messageCutoffAt = getBountyHuntingMessageCutoffAt(game);
+  return messagePublishedAt > messageCutoffAt &&
+    messagePublishedAt < messageCutoffAt + BOUNTY_HUNTING_ROUND_MS;
 }
 
 function assertBountyHuntingMessageIsInActiveRound(
@@ -635,6 +651,10 @@ function assertBountyHuntingMessageIsInActiveRound(
 ): void {
   if (isBountyHuntingMessageInActiveRound(game, messagePublishedAt)) return;
   throw new ProtocolError('message_too_old', 'This chat message is from before the bounty round.');
+}
+
+function getBountyHuntingMessageCutoffAt(game: BountyHuntingGameRecord): number {
+  return game.messageCutoffAt ?? game.phaseStartedAt;
 }
 
 function getRecord(value: unknown, field: string): Record<string, unknown> {
