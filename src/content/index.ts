@@ -85,8 +85,8 @@ function boot(): void {
 
   observer.observe(document.documentElement, {
     childList: true,
-    subtree: true,
-    characterData: true
+    characterData: true,
+    subtree: true
   });
 }
 

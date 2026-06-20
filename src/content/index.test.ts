@@ -76,8 +76,8 @@ describe('content script entrypoint wiring', () => {
     expect(lifecycleMocks.bootFeatures).toHaveBeenCalledOnce();
     expect(observe).toHaveBeenCalledWith(document.documentElement, {
       childList: true,
-      subtree: true,
-      characterData: true
+      characterData: true,
+      subtree: true
     });
     expect(chrome.runtime.sendMessage).not.toHaveBeenCalled();
   });
@@ -274,16 +274,18 @@ function createMessage(): HTMLElement {
 
 function mutation({
   addedNodes,
+  attributeName,
   target,
   type
 }: {
   addedNodes?: Node[];
+  attributeName?: string;
   target: Node;
   type: MutationRecordType;
 }): MutationRecord {
   return {
     addedNodes: (addedNodes || []) as unknown as NodeList,
-    attributeName: null,
+    attributeName: attributeName || null,
     attributeNamespace: null,
     nextSibling: null,
     oldValue: null,

@@ -60,8 +60,7 @@ describe('playground Bounty Hunting game rules', () => {
       payload: {
         observations: [{
           bountyIds: ['mention-user'],
-          messageId: 'msg-1',
-          messagePublishedAt: 7_250
+          messageId: 'msg-1'
         }]
       },
       userId: 'host-user'
@@ -70,8 +69,7 @@ describe('playground Bounty Hunting game rules', () => {
       action: 'claimBounty',
       payload: {
         bountyId: 'mention-user',
-        messageId: 'msg-1',
-        messagePublishedAt: 7_250
+        messageId: 'msg-1'
       },
       userId: 'guest-user'
     }, 8_000);
@@ -147,8 +145,7 @@ describe('playground Bounty Hunting game rules', () => {
       action: 'claimBounty',
       payload: {
         bountyId: 'question',
-        messageId: 'msg-1',
-        messagePublishedAt: 3_050
+        messageId: 'msg-1'
       },
       userId: 'host-user'
     }, 3_100);
@@ -158,8 +155,7 @@ describe('playground Bounty Hunting game rules', () => {
       action: 'observeBountyMessage',
       payload: {
         bountyIds: ['question'],
-        messageId: 'msg-1',
-        messagePublishedAt: 3_050
+        messageId: 'msg-1'
       },
       userId: 'guest-user'
     }, 3_500);
@@ -174,8 +170,7 @@ describe('playground Bounty Hunting game rules', () => {
       action: 'observeBountyMessage',
       payload: {
         bountyIds: ['has-number'],
-        messageId: 'msg-1',
-        messagePublishedAt: 3_050
+        messageId: 'msg-1'
       },
       userId: 'guest-user'
     }, 3_600);
@@ -184,8 +179,7 @@ describe('playground Bounty Hunting game rules', () => {
       action: 'claimBounty',
       payload: {
         bountyId: 'has-number',
-        messageId: 'msg-1',
-        messagePublishedAt: 3_050
+        messageId: 'msg-1'
       },
       userId: 'guest-user'
     }, 3_700)).toThrowError(new ProtocolError(
@@ -206,8 +200,7 @@ describe('playground Bounty Hunting game rules', () => {
       action: 'claimBounty',
       payload: {
         bountyId: 'question',
-        messageId: 'msg-1',
-        messagePublishedAt: 3_050
+        messageId: 'msg-1'
       },
       userId: 'host-user'
     }, 3_100);
@@ -215,8 +208,7 @@ describe('playground Bounty Hunting game rules', () => {
       action: 'observeBountyMessage',
       payload: {
         bountyIds: ['question'],
-        messageId: 'msg-1',
-        messagePublishedAt: 3_050
+        messageId: 'msg-1'
       },
       userId: 'guest-user'
     }, 5_200);
@@ -225,7 +217,7 @@ describe('playground Bounty Hunting game rules', () => {
     expect(game.claims).toHaveLength(0);
   });
 
-  it('ignores or rejects messages published before the active round', () => {
+  it('accepts witnessed message ids without publish timestamps or chat cutoffs', () => {
     let game = submitBountyHunting(createBountyHuntingGame('game-1', 'host-user', 'guest-user', 0), {
       action: 'submitBounties',
       payload: { bounties: createBounties() },
@@ -237,106 +229,21 @@ describe('playground Bounty Hunting game rules', () => {
       action: 'observeBountyMessage',
       payload: {
         bountyIds: ['question'],
-        messageId: 'msg-old',
-        messagePublishedAt: 2_999
+        messageId: 'msg-old'
       },
       userId: 'guest-user'
     }, 3_100);
 
-    expect(game.claimWitnesses).toHaveLength(0);
-    expect(() => claimBountyHuntingBounty(game, {
-      action: 'claimBounty',
-      payload: {
-        bountyId: 'question',
-        messageId: 'msg-old',
-        messagePublishedAt: 2_999
-      },
-      userId: 'host-user'
-    }, 3_200)).toThrowError(new ProtocolError(
-      'message_too_old',
-      'This chat message is from before the bounty round.'
-    ));
-  });
-
-  it('uses the shared YouTube chat cutoff instead of server phase time for message validation', () => {
-    let game = submitBountyHunting(createBountyHuntingGame('game-1', 'host-user', 'guest-user', 0), {
-      action: 'submitBounties',
-      payload: { bounties: createBounties() },
-      userId: 'host-user'
-    }, 0);
-    game = readyBountyHuntingPlayer(readyBountyHuntingPlayer(game, 'host-user', 0), 'guest-user', 0);
-    game = startBountyHuntingRound(game, {
-      action: 'startRound',
-      payload: { messageCutoffAt: 80_000 },
-      userId: 'host-user'
-    }, 100_000);
-
-    expect(game.messageCutoffAt).toBe(80_000);
-    game = observeBountyHuntingMessage(game, {
-      action: 'observeBountyMessage',
-      payload: {
-        bountyIds: ['question'],
-        messageId: 'msg-after-cutoff',
-        messagePublishedAt: 80_500
-      },
-      userId: 'guest-user'
-    }, 100_100);
     game = claimBountyHuntingBounty(game, {
       action: 'claimBounty',
       payload: {
         bountyId: 'question',
-        messageId: 'msg-after-cutoff',
-        messagePublishedAt: 80_500
+        messageId: 'msg-old'
       },
       userId: 'host-user'
-    }, 100_200);
+    }, 3_200);
 
     expect(game.scores.host).toBe(75);
-    expect(() => claimBountyHuntingBounty(game, {
-      action: 'claimBounty',
-      payload: {
-        bountyId: 'has-number',
-        messageId: 'msg-at-cutoff',
-        messagePublishedAt: 80_000
-      },
-      userId: 'host-user'
-    }, 100_300)).toThrowError(new ProtocolError(
-      'message_too_old',
-      'This chat message is from before the bounty round.'
-    ));
-  });
-
-  it('rejects active-round messages without a published timestamp', () => {
-    let game = submitBountyHunting(createBountyHuntingGame('game-1', 'host-user', 'guest-user', 0), {
-      action: 'submitBounties',
-      payload: { bounties: createBounties() },
-      userId: 'host-user'
-    }, 0);
-    game = readyBountyHuntingPlayer(readyBountyHuntingPlayer(game, 'host-user', 0), 'guest-user', 0);
-    game = startBountyHuntingRound(game, 3_000);
-
-    expect(() => observeBountyHuntingMessage(game, {
-      action: 'observeBountyMessage',
-      payload: {
-        bountyIds: ['question'],
-        messageId: 'msg-no-timestamp'
-      },
-      userId: 'guest-user'
-    }, 3_100)).toThrowError(new ProtocolError(
-      'invalid_bounty',
-      'messagePublishedAt must be a valid timestamp.'
-    ));
-    expect(() => claimBountyHuntingBounty(game, {
-      action: 'claimBounty',
-      payload: {
-        bountyId: 'question',
-        messageId: 'msg-no-timestamp'
-      },
-      userId: 'host-user'
-    }, 3_200)).toThrowError(new ProtocolError(
-      'invalid_bounty',
-      'messagePublishedAt must be a valid timestamp.'
-    ));
   });
 
   it('accepts multiple witness observations in one game action', () => {
@@ -353,13 +260,11 @@ describe('playground Bounty Hunting game rules', () => {
         observations: [
           {
             bountyIds: ['question'],
-            messageId: 'msg-question',
-            messagePublishedAt: 3_050
+            messageId: 'msg-question'
           },
           {
             bountyIds: ['has-number'],
-            messageId: 'msg-number',
-            messagePublishedAt: 3_060
+            messageId: 'msg-number'
           }
         ]
       },
@@ -369,8 +274,7 @@ describe('playground Bounty Hunting game rules', () => {
       action: 'claimBounty',
       payload: {
         bountyId: 'question',
-        messageId: 'msg-question',
-        messagePublishedAt: 3_050
+        messageId: 'msg-question'
       },
       userId: 'host-user'
     }, 3_200);
@@ -378,8 +282,7 @@ describe('playground Bounty Hunting game rules', () => {
       action: 'claimBounty',
       payload: {
         bountyId: 'has-number',
-        messageId: 'msg-number',
-        messagePublishedAt: 3_060
+        messageId: 'msg-number'
       },
       userId: 'host-user'
     }, 3_300);
