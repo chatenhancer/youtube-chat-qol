@@ -15,7 +15,6 @@ export interface PublicBountyHuntingGame extends PublicGame {
   bounties: PublicBountyHuntingBounty[];
   bountyProviderUserId: string;
   gameType: 'bounty-hunting';
-  messageCutoffAt?: number;
   phaseStartedAt: number;
   players: Record<BountyHuntingPlayerRole, PublicUserIdentity>;
   readyPlayers: Partial<Record<BountyHuntingPlayerRole, boolean>>;
@@ -73,7 +72,7 @@ export interface BountyHuntingPanelRuntime {
   onVisibilityChanged: (() => void) | null;
   panelControls: GamePanelControls | null;
   claimedMessageFeedbackTimers: Map<HTMLElement, number>;
-  pendingWitnesses: Map<string, { bountyIds: Set<string>; messagePublishedAt: number }>;
+  pendingWitnesses: Map<string, Set<string>>;
   pixelRatio: number;
   preparationMessages: Map<string, BountyHuntingObservedMessage>;
   preparationStarted: boolean;
@@ -81,7 +80,6 @@ export interface BountyHuntingPanelRuntime {
   claimSoundIndex: number;
   readyButtonFlashUntil: number;
   roundOverStingPlayedForGameId: string | null;
-  roundStartDividerElement: HTMLElement | null;
   sentClaimKeys: Set<string>;
   sentWitnessKeys: Set<string>;
   soundController: GameSoundController;
@@ -96,7 +94,6 @@ export interface BountyHuntingPanelRuntime {
 
 export interface BountyHuntingObservedMessage extends BountyHuntingMessageFacts {
   messageId: string;
-  messagePublishedAt?: number;
 }
 
 export interface BountyHuntingFallbackRuntime {

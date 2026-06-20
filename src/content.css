@@ -2239,35 +2239,6 @@ yt-live-chat-header-renderer .ytcq-inbox-badge[hidden] {
   pointer-events: none;
 }
 
-.ytcq-bounty-hunting-start-divider {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  box-sizing: border-box;
-  width: 100%;
-  padding: 8px 16px;
-  color: var(--yt-live-chat-secondary-text-color, var(--yt-spec-text-secondary, #aaa));
-  font: 700 11px/14px Roboto, Arial, sans-serif;
-  text-align: center;
-  text-transform: uppercase;
-  pointer-events: none;
-}
-
-.ytcq-bounty-hunting-start-divider::before,
-.ytcq-bounty-hunting-start-divider::after {
-  content: "";
-  min-width: 16px;
-  border-top: 1px solid var(--yt-live-chat-secondary-text-color, var(--yt-spec-text-secondary, #aaa));
-  flex: 1 1 auto;
-  opacity: 0.42;
-}
-
-.ytcq-bounty-hunting-start-divider-text {
-  flex: 0 1 auto;
-  min-width: 0;
-  overflow-wrap: anywhere;
-}
-
 .ytcq-bounty-hunting-claimed-feed-item {
   display: flex;
   flex-direction: column;

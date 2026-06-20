@@ -10,7 +10,6 @@ import {
 import { cleanText } from '../../../../shared/text';
 import {
   getAuthorName,
-  getMessagePublishedAt,
   getMessageRuns,
   getMessageStableId,
   getMessageText
@@ -150,8 +149,6 @@ export function getBountyHuntingObservedMessage(
   if (!text && !isSuperChat) return null;
   const emojiCount = countBountyHuntingMessageEmojis(message);
   const authorKey = getBountyHuntingAuthorKey(getAuthorName(message));
-  const messagePublishedAt = getMessagePublishedAt(message);
-
   return {
     emojiCount,
     hasAllCaps: isBountyHuntingAllCapsMessage(text),
@@ -166,8 +163,7 @@ export function getBountyHuntingObservedMessage(
     isSuperChat,
     isTopFanAuthor: Boolean(authorKey && options.topFanAuthorKeys?.has(authorKey)),
     isVerifiedAuthor: isBountyHuntingVerifiedAuthor(message),
-    messageId: getBountyHuntingMessageId(message),
-    messagePublishedAt: messagePublishedAt ?? undefined
+    messageId: getBountyHuntingMessageId(message)
   };
 }
 
