@@ -204,13 +204,19 @@ describe('playground games header button', () => {
     expect(document.querySelector('.ytcq-profile-card-subtitle')?.textContent).toBe('No players online');
     expect(document.querySelector('.ytcq-games-availability-toggle')?.getAttribute('aria-checked')).toBe('false');
     expect(document.querySelector('.ytcq-games-availability-toggle .ytcq-menu-toggle')).not.toBeNull();
-    expect(getGamesSectionTitles()).toEqual(['Invites', 'Start a game']);
-    expect(document.querySelector('.ytcq-games-section-empty')?.textContent).toBe('No invites received yet.');
+    expect(getGamesSectionTitles()).toEqual(['Start a game']);
+    expect(document.querySelector('.ytcq-games-invite-row')).toBeNull();
+    expect(document.querySelector('.ytcq-games-section-empty')).toBeNull();
     expect(getGameCards()).toHaveLength(3);
     expect(document.querySelector('.ytcq-games-preview-chess .ytcq-games-preview-canvas')).not.toBeNull();
     expect(document.querySelector('.ytcq-games-preview-bounty-hunting .ytcq-games-preview-canvas')).not.toBeNull();
     expect(document.querySelector('.ytcq-games-preview-replay-trivia .ytcq-games-preview-canvas')).not.toBeNull();
     expect(getGameLabels()).toEqual(['Chess', 'The Wild Wild Chat', 'HELP-A-FRIEND! Trivia']);
+    expect(getGameCardHelpers()).toEqual([
+      'Classic chess, three difficulty levels.',
+      'Time to take care of some bounties.',
+      'Do you have the knowledge?'
+    ]);
     expect(getGameCards()[0].getAttribute('aria-disabled')).toBe('false');
     expect(getGameCards()[1].getAttribute('aria-disabled')).toBe('false');
     expect(getGameCards()[2].getAttribute('aria-disabled')).toBe('true');
@@ -274,6 +280,11 @@ describe('playground games header button', () => {
     expect(getGameCards()[1].title).toBe('Can only be played during live chat.');
     expect(getGameCards()[2].getAttribute('aria-disabled')).toBe('false');
     expect(getGameCards()[2].title).toBe('');
+    expect(getGameCardHelpers()).toEqual([
+      'Classic chess, three difficulty levels.',
+      'Time to take care of some bounties.',
+      'Do you have the knowledge?'
+    ]);
   });
 
   it('offers replay trivia through the normal invite flow', () => {
@@ -454,11 +465,10 @@ describe('playground games header button', () => {
     expect(canvas?.getAttribute('aria-label')).toBe('Chess');
 
     gamesButton.click();
-    expect(getGamesSectionTitles()).toEqual(['Active games', 'Invites', 'Start a game']);
+    expect(getGamesSectionTitles()).toEqual(['Active games', 'Start a game']);
     expect(document.querySelector('.ytcq-games-active-row')?.textContent).toContain('Chess');
     expect(document.querySelector('.ytcq-games-active-row')?.textContent).toContain('Luna Chat');
     expect(document.querySelector('.ytcq-games-invite-row')).toBeNull();
-    expect(document.querySelector('.ytcq-games-section-empty')?.textContent).toBe('No invites received yet.');
     expect(getActionButtonLabels()).toEqual(['Hide', 'Leave']);
 
     getActionButton('Hide').click();
@@ -1363,6 +1373,11 @@ function getGameCards(): HTMLButtonElement[] {
 
 function getGameLabels(): string[] {
   return Array.from(document.querySelectorAll<HTMLElement>('.ytcq-games-game-label'))
+    .map((label) => label.textContent || '');
+}
+
+function getGameCardHelpers(): string[] {
+  return Array.from(document.querySelectorAll<HTMLElement>('.ytcq-games-game-helper'))
     .map((label) => label.textContent || '');
 }
 

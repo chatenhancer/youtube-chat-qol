@@ -1579,15 +1579,16 @@ yt-live-chat-header-renderer .ytcq-inbox-badge[hidden] {
 
 .ytcq-games-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 6px;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 5px;
 }
 
 .ytcq-games-game-card {
   display: grid;
-  gap: 7px;
-  justify-items: start;
-  min-height: 94px;
+  grid-template-columns: 92px minmax(0, 1fr);
+  gap: 9px;
+  align-items: center;
+  min-height: 66px;
   padding: 8px;
   border: 0;
   border-radius: 7px;
@@ -1619,9 +1620,27 @@ yt-live-chat-header-renderer .ytcq-inbox-badge[hidden] {
     var(--yt-spec-badge-chip-background, transparent);
 }
 
+.ytcq-games-game-copy {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+
 .ytcq-games-game-label {
   font: 500 12px/15px Roboto, Arial, sans-serif;
   overflow-wrap: anywhere;
+}
+
+.ytcq-games-game-helper {
+  display: -webkit-box;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  color: var(--yt-live-chat-secondary-text-color, var(--yt-spec-text-secondary, #aaa));
+  font: 400 10px/13px Roboto, Arial, sans-serif;
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
 .ytcq-games-preview {

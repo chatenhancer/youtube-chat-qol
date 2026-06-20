@@ -44,6 +44,7 @@ interface RealtimeGamePickerCard {
   id: GameId;
   label: string;
   renderPreview: (container: HTMLElement) => void;
+  tagline: string;
   type: 'realtime';
 }
 
@@ -65,6 +66,7 @@ export function getGamePickerCards({ includeRealtime = true }: { includeRealtime
       id: game.id,
       label: getGameLabel(game.id),
       renderPreview: game.renderPreview,
+      tagline: t(game.taglineKey),
       type: 'realtime' as const
     }))
     : [];

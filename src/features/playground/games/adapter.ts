@@ -17,6 +17,7 @@ export interface GameDefinition {
   isPlayable?: () => boolean;
   labelKey: MessageKey;
   renderPreview: (container: HTMLElement) => void;
+  taglineKey: MessageKey;
 }
 
 export type SendGameAction = (gameId: string, action: string, payload?: Record<string, unknown>) => void;
