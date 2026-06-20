@@ -6,17 +6,17 @@
  */
 import { expect, test } from '@playwright/test';
 import { CHAT_MESSAGE_SELECTOR } from '../../../src/youtube/selectors';
-import { expectPopupReportsConnectedStatus } from '../support/popup-status';
+import { expectCurrentTabActionReportsConnectedStatus } from '../support/popup-status';
 import type { BrowserScenario, ChatSurface } from './types';
 
 const EXTENSION_ATTACH_TIMEOUT_MS = 15_000;
 
-export const attachScenario: BrowserScenario = async ({ chat, context }) => {
+export const attachScenario: BrowserScenario = async ({ chat, context, page }) => {
   await expectExtensionUiAttached(chat);
   await expectReconnectPromptHidden(chat);
   await expectVisibleChatMessages(chat);
-  await test.step('Verify popup reports connected status', async () => {
-    await expectPopupReportsConnectedStatus(context);
+  await test.step('Verify current tab action reports connected status', async () => {
+    await expectCurrentTabActionReportsConnectedStatus(context, page);
   });
 };
 
