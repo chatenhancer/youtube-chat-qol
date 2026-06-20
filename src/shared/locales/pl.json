@@ -143,6 +143,7 @@
     "gamesBountyHuntingWanted": "POSZUKIWANY",
     "gamesBountyHuntingReady": "GOTOWE",
     "gamesBountyHuntingStarting": "Start",
+    "gamesBountyHuntingStartMarker": "Polowanie na nagrody zaczyna się tutaj",
     "gamesBountyHuntingRoundOver": "Koniec rundy",
     "gamesBountyHuntingLedger": "Rejestr",
     "gamesBountyHuntingBountiesClaimed": "Nagrody zdobyte",

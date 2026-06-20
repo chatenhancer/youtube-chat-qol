@@ -227,7 +227,8 @@ describe('in-room computer player', () => {
       action: 'claimBounty',
       payload: {
         bountyId: 'question',
-        messageId: 'msg-question-1'
+        messageId: 'msg-question-1',
+        messagePublishedAt: 5_500
       },
       userId: 'human-user'
     }, 6_050);
@@ -238,11 +239,13 @@ describe('in-room computer player', () => {
         observations: [
           {
             bountyIds: ['question'],
-            messageId: 'msg-question-1'
+            messageId: 'msg-question-1',
+            messagePublishedAt: 5_500
           },
           {
             bountyIds: ['verified'],
-            messageId: 'msg-verified-1'
+            messageId: 'msg-verified-1',
+            messagePublishedAt: 5_600
           }
         ]
       },
@@ -266,11 +269,13 @@ describe('in-room computer player', () => {
         observations: [
           {
             bountyIds: ['question'],
-            messageId: 'msg-question-1'
+            messageId: 'msg-question-1',
+            messagePublishedAt: 5_500
           },
           {
             bountyIds: ['verified'],
-            messageId: 'msg-verified-1'
+            messageId: 'msg-verified-1',
+            messagePublishedAt: 5_600
           }
         ]
       },
@@ -303,7 +308,8 @@ describe('in-room computer player', () => {
       gameId: 'game_bounty_1',
       payload: {
         bountyId: 'verified',
-        messageId: 'msg-verified-1'
+        messageId: 'msg-verified-1',
+        messagePublishedAt: 5_600
       },
       type: 'gameAction'
     });

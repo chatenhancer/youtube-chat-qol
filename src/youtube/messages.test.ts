@@ -4,6 +4,7 @@ import {
   getAuthorChannelId,
   getMessageAvatarSrc,
   getMessageContentNodes,
+  getMessagePublishedAt,
   getMessageRuns,
   getMessageStableId,
   getMessageText,
@@ -68,6 +69,7 @@ describe('YouTube message adapter fixtures', () => {
 
     expect(getAuthorName(message)).toBe('@NewMember');
     expect(getMessageText(message)).toBe('New member');
+    expect(getMessagePublishedAt(message)).toBe(123_456);
     expect(getMessageStableId(message)).toBe('timestamp-usec:123456789:@NewMember');
   });
 

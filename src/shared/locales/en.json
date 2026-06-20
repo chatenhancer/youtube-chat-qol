@@ -143,6 +143,7 @@
     "gamesBountyHuntingWanted": "WANTED",
     "gamesBountyHuntingReady": "READY",
     "gamesBountyHuntingStarting": "STARTING",
+    "gamesBountyHuntingStartMarker": "Bounty hunt starts here",
     "gamesBountyHuntingRoundOver": "ROUND OVER",
     "gamesBountyHuntingLedger": "THE LEDGER",
     "gamesBountyHuntingBountiesClaimed": "BOUNTIES CLAIMED",
