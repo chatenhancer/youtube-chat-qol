@@ -262,26 +262,8 @@
     "extensionActiveTitle": {
       "message": "Chat Enhancer for YouTube نشط في علامة التبويب هذه"
     },
-    "extensionStatusChecking": {
-      "message": "جارٍ فحص علامات التبويب المفتوحة..."
-    },
-    "extensionStatusCheckingHelper": {
-      "message": "يتم البحث عن علامات تبويب دردشة YouTube المباشرة."
-    },
     "extensionStatusActiveCurrent": {
       "message": "نشط في علامة التبويب هذه"
-    },
-    "extensionStatusActiveCurrentAndOne": {
-      "message": "نشط في علامة التبويب هذه وعلامة تبويب أخرى واحدة"
-    },
-    "extensionStatusActiveCurrentAndMany": {
-      "message": "نشط في علامة التبويب هذه و{count} علامات تبويب أخرى"
-    },
-    "extensionStatusActiveOneOther": {
-      "message": "نشط في علامة تبويب أخرى واحدة"
-    },
-    "extensionStatusActiveManyOther": {
-      "message": "نشط في {count} علامات تبويب أخرى"
     },
     "extensionStatusInactiveAll": {
       "message": "غير نشط"

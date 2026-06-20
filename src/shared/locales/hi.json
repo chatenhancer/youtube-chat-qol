@@ -262,26 +262,8 @@
     "extensionActiveTitle": {
       "message": "Chat Enhancer for YouTube इस टैब में सक्रिय है"
     },
-    "extensionStatusChecking": {
-      "message": "खुले टैब जाँचे जा रहे हैं..."
-    },
-    "extensionStatusCheckingHelper": {
-      "message": "YouTube लाइव चैट टैब खोजे जा रहे हैं."
-    },
     "extensionStatusActiveCurrent": {
       "message": "इस टैब में सक्रिय"
-    },
-    "extensionStatusActiveCurrentAndOne": {
-      "message": "इस टैब और 1 अन्य टैब में सक्रिय"
-    },
-    "extensionStatusActiveCurrentAndMany": {
-      "message": "इस टैब और {count} अन्य टैब में सक्रिय"
-    },
-    "extensionStatusActiveOneOther": {
-      "message": "1 अन्य टैब में सक्रिय"
-    },
-    "extensionStatusActiveManyOther": {
-      "message": "{count} अन्य टैब में सक्रिय"
     },
     "extensionStatusInactiveAll": {
       "message": "निष्क्रिय"

@@ -261,26 +261,8 @@
     "extensionActiveTitle": {
       "message": "Chat Enhancer for YouTube est actif dans cet onglet"
     },
-    "extensionStatusChecking": {
-      "message": "Vérification des onglets ouverts..."
-    },
-    "extensionStatusCheckingHelper": {
-      "message": "Recherche d’onglets de chat en direct YouTube."
-    },
     "extensionStatusActiveCurrent": {
       "message": "Actif dans cet onglet"
-    },
-    "extensionStatusActiveCurrentAndOne": {
-      "message": "Actif dans cet onglet et 1 autre onglet"
-    },
-    "extensionStatusActiveCurrentAndMany": {
-      "message": "Actif dans cet onglet et {count} autres onglets"
-    },
-    "extensionStatusActiveOneOther": {
-      "message": "Actif dans 1 autre onglet"
-    },
-    "extensionStatusActiveManyOther": {
-      "message": "Actif dans {count} autres onglets"
     },
     "extensionStatusInactiveAll": {
       "message": "Inactif"

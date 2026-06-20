@@ -261,26 +261,8 @@
     "extensionActiveTitle": {
       "message": "Chat Enhancer for YouTube ทำงานอยู่ในแท็บนี้"
     },
-    "extensionStatusChecking": {
-      "message": "กำลังตรวจสอบแท็บที่เปิดอยู่..."
-    },
-    "extensionStatusCheckingHelper": {
-      "message": "กำลังหาแท็บแชทสด YouTube"
-    },
     "extensionStatusActiveCurrent": {
       "message": "ทำงานในแท็บนี้"
-    },
-    "extensionStatusActiveCurrentAndOne": {
-      "message": "ทำงานในแท็บนี้และอีก 1 แท็บ"
-    },
-    "extensionStatusActiveCurrentAndMany": {
-      "message": "ทำงานในแท็บนี้และอีก {count} แท็บ"
-    },
-    "extensionStatusActiveOneOther": {
-      "message": "ทำงานในอีก 1 แท็บ"
-    },
-    "extensionStatusActiveManyOther": {
-      "message": "ทำงานในอีก {count} แท็บ"
     },
     "extensionStatusInactiveAll": {
       "message": "ไม่ทำงาน"

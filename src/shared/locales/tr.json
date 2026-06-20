@@ -262,26 +262,8 @@
     "extensionActiveTitle": {
       "message": "Chat Enhancer for YouTube bu sekmede etkin"
     },
-    "extensionStatusChecking": {
-      "message": "Açık sekmeler kontrol ediliyor..."
-    },
-    "extensionStatusCheckingHelper": {
-      "message": "YouTube canlı sohbet sekmeleri aranıyor."
-    },
     "extensionStatusActiveCurrent": {
       "message": "Bu sekmede etkin"
-    },
-    "extensionStatusActiveCurrentAndOne": {
-      "message": "Bu sekmede ve 1 başka sekmede etkin"
-    },
-    "extensionStatusActiveCurrentAndMany": {
-      "message": "Bu sekmede ve {count} başka sekmede etkin"
-    },
-    "extensionStatusActiveOneOther": {
-      "message": "1 başka sekmede etkin"
-    },
-    "extensionStatusActiveManyOther": {
-      "message": "{count} başka sekmede etkin"
     },
     "extensionStatusInactiveAll": {
       "message": "Etkin değil"

@@ -261,26 +261,8 @@
     "extensionActiveTitle": {
       "message": "Chat Enhancer for YouTube is actief in dit tabblad"
     },
-    "extensionStatusChecking": {
-      "message": "Open tabbladen controleren..."
-    },
-    "extensionStatusCheckingHelper": {
-      "message": "Zoeken naar YouTube-livechattabbladen."
-    },
     "extensionStatusActiveCurrent": {
       "message": "Actief in dit tabblad"
-    },
-    "extensionStatusActiveCurrentAndOne": {
-      "message": "Actief in dit tabblad en 1 ander tabblad"
-    },
-    "extensionStatusActiveCurrentAndMany": {
-      "message": "Actief in dit tabblad en {count} andere tabbladen"
-    },
-    "extensionStatusActiveOneOther": {
-      "message": "Actief in 1 ander tabblad"
-    },
-    "extensionStatusActiveManyOther": {
-      "message": "Actief in {count} andere tabbladen"
     },
     "extensionStatusInactiveAll": {
       "message": "Inactief"
