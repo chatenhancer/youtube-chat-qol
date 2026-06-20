@@ -49,6 +49,8 @@ const BOUNTY_HUNTING_RESPONSE_MIN_DELAY_MS = 1_200;
 const BOUNTY_HUNTING_RESPONSE_MAX_DELAY_MS = 3_600;
 const BOUNTY_HUNTING_WITNESS_DELAY_MS = 120;
 const BOUNTY_HUNTING_WITNESS_OBSERVATIONS_PER_ACTION = 20;
+const BOUNTY_HUNTING_RECENT_MESSAGE_WINDOW = 20;
+const BOUNTY_HUNTING_RECENT_CLAIM_POOL_SIZE = 5;
 const BOUNTY_HUNTING_TOP_CLAIM_RATE = 0.7;
 const CHESS_RESPONSE_MIN_DELAY_MS = 700;
 const CHESS_RESPONSE_MAX_DELAY_MS = 1_500;
@@ -375,15 +377,13 @@ function getBountyHuntingClaimCandidates(
   botRole: BountyHuntingPlayerRole
 ): BountyHuntingBotClaimCandidate[] {
   const bountiesById = new Map(game.bounties.map((bounty) => [bounty.id, bounty]));
-  const claimedBountyIds = new Set(game.claims.map((claim) => claim.bountyId));
-  const claimedMessageIds = new Set(game.claimedMessageIds);
+  const witnesses = getBountyHuntingEligibleOpponentWitnesses(game, botRole, bountiesById);
+  const recentMessageIds = getBountyHuntingRecentOpponentMessageIds(witnesses);
   const candidateKeys = new Set<string>();
 
-  return game.claimWitnesses
+  return witnesses
     .flatMap((witness): BountyHuntingBotClaimCandidate[] => {
-      if (witness.role === botRole) return [];
-      if (claimedBountyIds.has(witness.bountyId)) return [];
-      if (claimedMessageIds.has(witness.messageId)) return [];
+      if (!recentMessageIds.has(witness.messageId)) return [];
       const bounty = bountiesById.get(witness.bountyId);
       if (!bounty) return [];
       const key = `${witness.messageId}:${witness.bountyId}`;
@@ -414,8 +414,8 @@ function getBountyHuntingWitnessObservations(
   if (!botRole) return [];
 
   const bountiesById = new Map(bountyGame.bounties.map((bounty) => [bounty.id, bounty]));
-  const claimedBountyIds = new Set(bountyGame.claims.map((claim) => claim.bountyId));
-  const claimedMessageIds = new Set(bountyGame.claimedMessageIds);
+  const witnesses = getBountyHuntingEligibleOpponentWitnesses(bountyGame, botRole, bountiesById);
+  const recentMessageIds = getBountyHuntingRecentOpponentMessageIds(witnesses);
   const botWitnessKeys = new Set(
     bountyGame.claimWitnesses
       .filter((witness) => witness.role === botRole)
@@ -423,11 +423,8 @@ function getBountyHuntingWitnessObservations(
   );
   const observations = new Map<string, Set<string>>();
 
-  for (const witness of bountyGame.claimWitnesses) {
-    if (witness.role === botRole) continue;
-    if (claimedBountyIds.has(witness.bountyId)) continue;
-    if (claimedMessageIds.has(witness.messageId)) continue;
-    if (!bountiesById.has(witness.bountyId)) continue;
+  for (const witness of witnesses) {
+    if (!recentMessageIds.has(witness.messageId)) continue;
     if (botWitnessKeys.has(getBountyHuntingWitnessKey({
       ...witness,
       role: botRole
@@ -445,6 +442,41 @@ function getBountyHuntingWitnessObservations(
   }));
 }
 
+function getBountyHuntingEligibleOpponentWitnesses(
+  game: BountyHuntingBotGame,
+  botRole: BountyHuntingPlayerRole,
+  bountiesById: Map<string, BountyHuntingBounty>
+): BountyHuntingBotClaimWitness[] {
+  const claimedBountyIds = new Set(game.claims.map((claim) => claim.bountyId));
+  const claimedMessageIds = new Set(game.claimedMessageIds);
+  return game.claimWitnesses
+    .filter((witness) =>
+      witness.role !== botRole &&
+      !claimedBountyIds.has(witness.bountyId) &&
+      !claimedMessageIds.has(witness.messageId) &&
+      bountiesById.has(witness.bountyId)
+    )
+    .sort(compareBountyHuntingWitnessRecency);
+}
+
+function getBountyHuntingRecentOpponentMessageIds(
+  witnesses: BountyHuntingBotClaimWitness[]
+): Set<string> {
+  const messageIds = new Set<string>();
+  for (const witness of witnesses) {
+    messageIds.add(witness.messageId);
+    if (messageIds.size >= BOUNTY_HUNTING_RECENT_MESSAGE_WINDOW) break;
+  }
+  return messageIds;
+}
+
+function compareBountyHuntingWitnessRecency(
+  a: BountyHuntingBotClaimWitness,
+  b: BountyHuntingBotClaimWitness
+): number {
+  return b.observedAt - a.observedAt;
+}
+
 function getBountyHuntingWitnessKey(
   witness: Pick<BountyHuntingBotClaimWitness, 'bountyId' | 'messageId' | 'role'>
 ): string {
@@ -456,8 +488,9 @@ function pickBountyHuntingClaimCandidate(
   random: () => number
 ): BountyHuntingBotClaimCandidate | null {
   if (!candidates.length) return null;
-  if (candidates.length === 1 || random() < BOUNTY_HUNTING_TOP_CLAIM_RATE) return candidates[0];
-  const fallbackCount = candidates.length - 1;
+  const recentCandidates = candidates.slice(0, BOUNTY_HUNTING_RECENT_CLAIM_POOL_SIZE);
+  if (recentCandidates.length === 1 || random() < BOUNTY_HUNTING_TOP_CLAIM_RATE) return recentCandidates[0];
+  const fallbackCount = recentCandidates.length - 1;
   const fallbackIndex = 1 + Math.min(Math.floor(random() * fallbackCount), fallbackCount - 1);
-  return candidates[fallbackIndex];
+  return recentCandidates[fallbackIndex];
 }
