@@ -262,26 +262,8 @@
     "extensionActiveTitle": {
       "message": "Chat Enhancer for YouTube 已在此标签页中启用"
     },
-    "extensionStatusChecking": {
-      "message": "正在检查打开的标签页..."
-    },
-    "extensionStatusCheckingHelper": {
-      "message": "正在查找 YouTube 直播聊天标签页。"
-    },
     "extensionStatusActiveCurrent": {
       "message": "已在此标签页中启用"
-    },
-    "extensionStatusActiveCurrentAndOne": {
-      "message": "已在此标签页和另外 1 个标签页中启用"
-    },
-    "extensionStatusActiveCurrentAndMany": {
-      "message": "已在此标签页和另外 {count} 个标签页中启用"
-    },
-    "extensionStatusActiveOneOther": {
-      "message": "已在另外 1 个标签页中启用"
-    },
-    "extensionStatusActiveManyOther": {
-      "message": "已在另外 {count} 个标签页中启用"
     },
     "extensionStatusInactiveAll": {
       "message": "未启用"

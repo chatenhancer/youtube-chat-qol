@@ -1,5 +1,4 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { CHAT_STATUS_UPDATED_STORAGE_KEY } from '../shared/chat-status';
 import { MARKED_USERS_STORAGE_KEY } from '../shared/marked-users';
 
 describe('popup', () => {
@@ -89,9 +88,9 @@ describe('popup', () => {
       callback?.(tabs);
       return Promise.resolve(tabs);
     }) as never);
-    vi.mocked(chrome.runtime.sendMessage).mockImplementation(((_message: unknown, callback?: (response: unknown) => void) => {
-      callback?.({ status: { currentActive: true, otherActiveCount: 1 } });
-      return Promise.resolve({ status: { currentActive: true, otherActiveCount: 1 } });
+    vi.mocked(chrome.tabs.sendMessage).mockImplementation(((_tabId: number, _message: unknown, callback?: (response: unknown) => void) => {
+      callback?.({ attached: true });
+      return Promise.resolve();
     }) as never);
 
     await import('./index');
@@ -107,19 +106,14 @@ describe('popup', () => {
   });
 
   it('uses disconnected helper copy when no active content scripts respond', async () => {
-    await chrome.storage.local.set({
-      ytcqKnownChatTabs: {
-        10: Date.now()
-      }
-    });
     vi.mocked(chrome.tabs.query).mockImplementation(((queryInfo: chrome.tabs.QueryInfo, callback?: (tabs: chrome.tabs.Tab[]) => void) => {
       const tabs = queryInfo.active ? [{ id: 10 } as chrome.tabs.Tab] : [];
       callback?.(tabs);
       return Promise.resolve(tabs);
     }) as never);
-    vi.mocked(chrome.runtime.sendMessage).mockImplementation(((_message: unknown, callback?: (response: unknown) => void) => {
-      callback?.({ status: { currentActive: false, otherActiveCount: 0 } });
-      return Promise.resolve({ status: { currentActive: false, otherActiveCount: 0 } });
+    vi.mocked(chrome.tabs.sendMessage).mockImplementation(((_tabId: number, _message: unknown, callback?: (response: unknown) => void) => {
+      callback?.(undefined);
+      return Promise.resolve();
     }) as never);
 
     await import('./index');
@@ -134,27 +128,21 @@ describe('popup', () => {
     expect(document.querySelector('[data-extension-status-text]')?.textContent).toBe('extensionStatusInactiveAll');
   });
 
-  it('uses direct content-script liveness when background active state is empty', async () => {
+  it('only checks the current tab for liveness', async () => {
     vi.mocked(chrome.tabs.query).mockImplementation(((queryInfo: chrome.tabs.QueryInfo, callback?: (tabs: chrome.tabs.Tab[]) => void) => {
-      const tabs = queryInfo.active
-        ? [{ id: 99 } as chrome.tabs.Tab]
-        : [{ id: 10 } as chrome.tabs.Tab, { id: 99 } as chrome.tabs.Tab];
+      const tabs = queryInfo.active ? [{ id: 99 } as chrome.tabs.Tab] : [];
       callback?.(tabs);
       return Promise.resolve(tabs);
     }) as never);
-    vi.mocked(chrome.runtime.sendMessage).mockImplementation(((_message: unknown, callback?: (response: unknown) => void) => {
-      callback?.({ status: { currentActive: false, otherActiveCount: 0 } });
-      return Promise.resolve({ status: { currentActive: false, otherActiveCount: 0 } });
-    }) as never);
     vi.mocked(chrome.tabs.sendMessage).mockImplementation(((tabId: number, _message: unknown, callback?: (response: unknown) => void) => {
-      callback?.(tabId === 10 ? { attached: true } : undefined);
+      callback?.(tabId === 99 ? { attached: true } : undefined);
       return Promise.resolve();
     }) as never);
 
     await import('./index');
 
     expect(document.querySelector('[data-extension-status]')?.getAttribute('data-extension-status')).toBe('active');
-    expect(document.querySelector('[data-extension-status-text]')?.textContent).toBe('extensionStatusActiveOneOther');
+    expect(document.querySelector('[data-extension-status-text]')?.textContent).toBe('extensionStatusActiveCurrent');
   });
 
   it('renders the compact manifest version in the footer', async () => {
@@ -169,148 +157,20 @@ describe('popup', () => {
     expect(document.querySelector('#version')?.textContent).toBe('v1.2.3');
   });
 
-  it('refreshes active chat status while the popup remains open', async () => {
-    let activeStatus = { currentActive: false, otherActiveCount: 0 };
-    vi.mocked(chrome.tabs.query).mockImplementation(((queryInfo: chrome.tabs.QueryInfo, callback?: (tabs: chrome.tabs.Tab[]) => void) => {
-      const tabs = queryInfo.active ? [{ id: 10 } as chrome.tabs.Tab] : [];
-      callback?.(tabs);
-      return Promise.resolve(tabs);
-    }) as never);
-    vi.mocked(chrome.runtime.sendMessage).mockImplementation(((_message: unknown, callback?: (response: unknown) => void) => {
-      callback?.({ status: activeStatus });
-      return Promise.resolve({ status: activeStatus });
-    }) as never);
-
-    await import('./index');
-
-    expect(document.querySelector('[data-extension-status]')?.getAttribute('data-extension-status')).toBe('inactive');
-    expect(document.querySelector('[data-extension-status-text]')?.textContent).toBe('extensionStatusInactiveAll');
-
-    const statusStorageListener = vi.mocked(chrome.storage.onChanged.addListener).mock.calls[0]?.[0] as (
-      changes: Record<string, chrome.storage.StorageChange>,
-      areaName: string
-    ) => void;
-
-    activeStatus = { currentActive: true, otherActiveCount: 0 };
-    statusStorageListener({
-      [CHAT_STATUS_UPDATED_STORAGE_KEY]: {
-        newValue: Date.now()
-      } as chrome.storage.StorageChange
-    }, 'local');
-
-    expect(document.querySelector('[data-extension-status]')?.getAttribute('data-extension-status')).toBe('active');
-    expect(document.querySelector('[data-extension-status-text]')?.textContent).toBe('extensionStatusActiveCurrent');
-    expect(document.querySelector('[data-extension-status]')?.getAttribute('title')).toBe(
-      'extensionStatusConnected'
-    );
-  });
-
-  it('summarizes active chats in other tabs and handles no open tabs', async () => {
-    vi.mocked(chrome.tabs.query).mockImplementation(((queryInfo: chrome.tabs.QueryInfo, callback?: (tabs: chrome.tabs.Tab[]) => void) => {
-      const tabs = queryInfo.active ? [{ id: 10 } as chrome.tabs.Tab] : [];
-      callback?.(tabs);
-      return Promise.resolve(tabs);
-    }) as never);
-    vi.mocked(chrome.runtime.sendMessage).mockImplementation(((_message: unknown, callback?: (response: unknown) => void) => {
-      callback?.({ status: { currentActive: false, otherActiveCount: 2 } });
-      return Promise.resolve({ status: { currentActive: false, otherActiveCount: 2 } });
-    }) as never);
-
-    await import('./index');
-
-    expect(document.querySelector('[data-extension-status-text]')?.textContent).toBe('extensionStatusActiveManyOther:2');
-    expect(document.querySelector('[data-extension-status]')?.getAttribute('title')).toBe('extensionStatusConnected');
-
-    vi.resetModules();
-    vi.mocked(chrome.tabs.query).mockImplementation(((queryInfo: chrome.tabs.QueryInfo, callback?: (tabs: chrome.tabs.Tab[]) => void) => {
-      const tabs: chrome.tabs.Tab[] = [];
-      callback?.(tabs);
-      return Promise.resolve(tabs);
-    }) as never);
-    vi.mocked(chrome.runtime.sendMessage).mockImplementation(((_message: unknown, callback?: (response: unknown) => void) => {
-      callback?.({ status: { currentActive: false, otherActiveCount: 0 } });
-      return Promise.resolve({ status: { currentActive: false, otherActiveCount: 0 } });
-    }) as never);
-    await import('./index');
-
-    expect(document.querySelector('[data-extension-status-text]')?.textContent).toBe('extensionStatusInactiveAll');
-    expect(document.querySelector('[data-extension-status]')?.getAttribute('title')).toBe('extensionStatusDisconnected');
-  });
-
-  it('keeps current-tab active status focused even when other tabs are active', async () => {
-    vi.mocked(chrome.tabs.query).mockImplementation(((queryInfo: chrome.tabs.QueryInfo, callback?: (tabs: chrome.tabs.Tab[]) => void) => {
-      const tabs = queryInfo.active ? [{ id: 10 } as chrome.tabs.Tab] : [];
-      callback?.(tabs);
-      return Promise.resolve(tabs);
-    }) as never);
-    vi.mocked(chrome.runtime.sendMessage).mockImplementation(((_message: unknown, callback?: (response: unknown) => void) => {
-      callback?.({ status: { currentActive: true, otherActiveCount: 0 } });
-      return Promise.resolve({ status: { currentActive: true, otherActiveCount: 0 } });
-    }) as never);
-
-    await import('./index');
-    expect(document.querySelector('[data-extension-status-text]')?.textContent).toBe('extensionStatusActiveCurrent');
-    expect(document.querySelector('[data-extension-status]')?.getAttribute('title')).toBe('extensionStatusConnected');
-
-    vi.resetModules();
-    vi.mocked(chrome.runtime.sendMessage).mockImplementation(((_message: unknown, callback?: (response: unknown) => void) => {
-      callback?.({ status: { currentActive: true, otherActiveCount: 2 } });
-      return Promise.resolve({ status: { currentActive: true, otherActiveCount: 2 } });
-    }) as never);
-    await import('./index');
-
-    expect(document.querySelector('[data-extension-status-text]')?.textContent).toBe('extensionStatusActiveCurrent');
-    expect(document.querySelector('[data-extension-status]')?.getAttribute('title')).toBe('extensionStatusConnected');
-  });
-
-  it('summarizes a single active chat in another tab', async () => {
-    vi.mocked(chrome.tabs.query).mockImplementation(((queryInfo: chrome.tabs.QueryInfo, callback?: (tabs: chrome.tabs.Tab[]) => void) => {
-      const tabs = queryInfo.active ? [{ id: 10 } as chrome.tabs.Tab] : [];
-      callback?.(tabs);
-      return Promise.resolve(tabs);
-    }) as never);
-    vi.mocked(chrome.runtime.sendMessage).mockImplementation(((_message: unknown, callback?: (response: unknown) => void) => {
-      callback?.({ status: { currentActive: false, otherActiveCount: 1 } });
-      return Promise.resolve({ status: { currentActive: false, otherActiveCount: 1 } });
-    }) as never);
-
-    await import('./index');
-
-    expect(document.querySelector('[data-extension-status-text]')?.textContent).toBe('extensionStatusActiveOneOther');
-    expect(document.querySelector('[data-extension-status]')?.getAttribute('title')).toBe('extensionStatusConnected');
-  });
-
   it('ignores malformed active chat responses', async () => {
     vi.mocked(chrome.tabs.query).mockImplementation(((queryInfo: chrome.tabs.QueryInfo, callback?: (tabs: chrome.tabs.Tab[]) => void) => {
       const tabs = queryInfo.active ? [{ id: 10 } as chrome.tabs.Tab] : [];
       callback?.(tabs);
       return Promise.resolve(tabs);
     }) as never);
-    vi.mocked(chrome.runtime.sendMessage).mockImplementation(((_message: unknown, callback?: (response: unknown) => void) => {
-      callback?.({ status: { currentActive: 'yes', otherActiveCount: -1 } });
-      return Promise.resolve({ status: { currentActive: 'yes', otherActiveCount: -1 } });
+    vi.mocked(chrome.tabs.sendMessage).mockImplementation(((_tabId: number, _message: unknown, callback?: (response: unknown) => void) => {
+      callback?.({ attached: 'yes' });
+      return Promise.resolve();
     }) as never);
 
     await import('./index');
 
     expect(document.querySelector('[data-extension-status]')?.getAttribute('data-extension-status')).toBe('inactive');
-  });
-
-  it('summarizes active tabs when the current active tab has no usable id', async () => {
-    vi.mocked(chrome.tabs.query).mockImplementation(((queryInfo: chrome.tabs.QueryInfo, callback?: (tabs: chrome.tabs.Tab[]) => void) => {
-      const tabs = queryInfo.active ? [{ id: undefined } as chrome.tabs.Tab] : [];
-      callback?.(tabs);
-      return Promise.resolve(tabs);
-    }) as never);
-    vi.mocked(chrome.runtime.sendMessage).mockImplementation(((_message: unknown, callback?: (response: unknown) => void) => {
-      callback?.({ status: { currentActive: false, otherActiveCount: 1 } });
-      return Promise.resolve({ status: { currentActive: false, otherActiveCount: 1 } });
-    }) as never);
-
-    await import('./index');
-
-    expect(document.querySelector('[data-extension-status-text]')?.textContent).toBe('extensionStatusActiveOneOther');
-    expect(document.querySelector('[data-extension-status]')?.getAttribute('title')).toBe('extensionStatusConnected');
   });
 
   it('treats missing active tab responses as disconnected', async () => {
@@ -319,9 +179,9 @@ describe('popup', () => {
       callback?.(tabs);
       return Promise.resolve(tabs);
     }) as never);
-    vi.mocked(chrome.runtime.sendMessage).mockImplementation(((_message: unknown, callback?: (response: unknown) => void) => {
+    vi.mocked(chrome.tabs.sendMessage).mockImplementation(((_tabId: number, _message: unknown, callback?: (response: unknown) => void) => {
       callback?.(undefined);
-      return Promise.resolve(undefined);
+      return Promise.resolve();
     }) as never);
 
     await import('./index');
@@ -336,12 +196,12 @@ describe('popup', () => {
       callback?.(tabs);
       return Promise.resolve(tabs);
     }) as never);
-    vi.mocked(chrome.runtime.sendMessage).mockImplementation(((_message: unknown, callback?: (response: unknown) => void) => {
+    vi.mocked(chrome.tabs.sendMessage).mockImplementation(((_tabId: number, _message: unknown, callback?: (response: unknown) => void) => {
       Object.defineProperty(chrome.runtime, 'lastError', {
         configurable: true,
-        value: { message: 'background unavailable' }
+        value: { message: 'Could not establish connection.' }
       });
-      callback?.({ status: { currentActive: true, otherActiveCount: 0 } });
+      callback?.({ attached: true });
       Object.defineProperty(chrome.runtime, 'lastError', {
         configurable: true,
         value: undefined

@@ -261,26 +261,8 @@
     "extensionActiveTitle": {
       "message": "Chat Enhancer for YouTube активний на цій вкладці"
     },
-    "extensionStatusChecking": {
-      "message": "Перевірка відкритих вкладок..."
-    },
-    "extensionStatusCheckingHelper": {
-      "message": "Пошук вкладок із live-чатом YouTube."
-    },
     "extensionStatusActiveCurrent": {
       "message": "Активно на цій вкладці"
-    },
-    "extensionStatusActiveCurrentAndOne": {
-      "message": "Активно на цій вкладці й ще 1 вкладці"
-    },
-    "extensionStatusActiveCurrentAndMany": {
-      "message": "Активно на цій вкладці й ще {count} вкладках"
-    },
-    "extensionStatusActiveOneOther": {
-      "message": "Активно ще в 1 вкладці"
-    },
-    "extensionStatusActiveManyOther": {
-      "message": "Активно ще в {count} вкладках"
     },
     "extensionStatusInactiveAll": {
       "message": "Неактивно"

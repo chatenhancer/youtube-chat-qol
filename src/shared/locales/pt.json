@@ -262,26 +262,8 @@
     "extensionActiveTitle": {
       "message": "Chat Enhancer for YouTube está ativo nesta aba"
     },
-    "extensionStatusChecking": {
-      "message": "Verificando abas abertas..."
-    },
-    "extensionStatusCheckingHelper": {
-      "message": "Procurando abas com chat ao vivo do YouTube."
-    },
     "extensionStatusActiveCurrent": {
       "message": "Ativo nesta aba"
-    },
-    "extensionStatusActiveCurrentAndOne": {
-      "message": "Ativo nesta aba e em mais 1 aba"
-    },
-    "extensionStatusActiveCurrentAndMany": {
-      "message": "Ativo nesta aba e em mais {count} abas"
-    },
-    "extensionStatusActiveOneOther": {
-      "message": "Ativo em mais 1 aba"
-    },
-    "extensionStatusActiveManyOther": {
-      "message": "Ativo em mais {count} abas"
     },
     "extensionStatusInactiveAll": {
       "message": "Inativo"

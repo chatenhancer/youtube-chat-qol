@@ -262,26 +262,8 @@
     "extensionActiveTitle": {
       "message": "Chat Enhancer for YouTube はこのタブで有効です"
     },
-    "extensionStatusChecking": {
-      "message": "開いているタブを確認中..."
-    },
-    "extensionStatusCheckingHelper": {
-      "message": "YouTube ライブチャットのタブを探しています。"
-    },
     "extensionStatusActiveCurrent": {
       "message": "このタブで有効です"
-    },
-    "extensionStatusActiveCurrentAndOne": {
-      "message": "このタブと他 1 個のタブで有効です"
-    },
-    "extensionStatusActiveCurrentAndMany": {
-      "message": "このタブと他 {count} 個のタブで有効です"
-    },
-    "extensionStatusActiveOneOther": {
-      "message": "他 1 個のタブで有効です"
-    },
-    "extensionStatusActiveManyOther": {
-      "message": "他 {count} 個のタブで有効です"
     },
     "extensionStatusInactiveAll": {
       "message": "非アクティブ"

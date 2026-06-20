@@ -261,26 +261,8 @@
     "extensionActiveTitle": {
       "message": "Chat Enhancer for YouTube가 이 탭에서 활성화되어 있습니다"
     },
-    "extensionStatusChecking": {
-      "message": "열린 탭 확인 중..."
-    },
-    "extensionStatusCheckingHelper": {
-      "message": "YouTube 실시간 채팅 탭을 찾고 있습니다."
-    },
     "extensionStatusActiveCurrent": {
       "message": "이 탭에서 활성화됨"
-    },
-    "extensionStatusActiveCurrentAndOne": {
-      "message": "이 탭과 다른 탭 1개에서 활성화됨"
-    },
-    "extensionStatusActiveCurrentAndMany": {
-      "message": "이 탭과 다른 탭 {count}개에서 활성화됨"
-    },
-    "extensionStatusActiveOneOther": {
-      "message": "다른 탭 1개에서 활성화됨"
-    },
-    "extensionStatusActiveManyOther": {
-      "message": "다른 탭 {count}개에서 활성화됨"
     },
     "extensionStatusInactiveAll": {
       "message": "비활성"

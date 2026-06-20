@@ -261,26 +261,8 @@
     "extensionActiveTitle": {
       "message": "Chat Enhancer for YouTube đang hoạt động trong tab này"
     },
-    "extensionStatusChecking": {
-      "message": "Đang kiểm tra các tab đang mở..."
-    },
-    "extensionStatusCheckingHelper": {
-      "message": "Đang tìm tab live chat YouTube."
-    },
     "extensionStatusActiveCurrent": {
       "message": "Đang hoạt động trong tab này"
-    },
-    "extensionStatusActiveCurrentAndOne": {
-      "message": "Đang hoạt động trong tab này và 1 tab khác"
-    },
-    "extensionStatusActiveCurrentAndMany": {
-      "message": "Đang hoạt động trong tab này và {count} tab khác"
-    },
-    "extensionStatusActiveOneOther": {
-      "message": "Đang hoạt động trong 1 tab khác"
-    },
-    "extensionStatusActiveManyOther": {
-      "message": "Đang hoạt động trong {count} tab khác"
     },
     "extensionStatusInactiveAll": {
       "message": "Không hoạt động"

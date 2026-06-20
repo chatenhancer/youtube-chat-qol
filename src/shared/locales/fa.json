@@ -261,26 +261,8 @@
     "extensionActiveTitle": {
       "message": "Chat Enhancer for YouTube در این تب فعال است"
     },
-    "extensionStatusChecking": {
-      "message": "در حال بررسی تب‌های باز..."
-    },
-    "extensionStatusCheckingHelper": {
-      "message": "در حال جستجوی تب‌های چت زنده YouTube."
-    },
     "extensionStatusActiveCurrent": {
       "message": "در این تب فعال است"
-    },
-    "extensionStatusActiveCurrentAndOne": {
-      "message": "در این تب و ۱ تب دیگر فعال است"
-    },
-    "extensionStatusActiveCurrentAndMany": {
-      "message": "در این تب و {count} تب دیگر فعال است"
-    },
-    "extensionStatusActiveOneOther": {
-      "message": "در ۱ تب دیگر فعال است"
-    },
-    "extensionStatusActiveManyOther": {
-      "message": "در {count} تب دیگر فعال است"
     },
     "extensionStatusInactiveAll": {
       "message": "غیرفعال"

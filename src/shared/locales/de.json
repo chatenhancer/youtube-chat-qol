@@ -261,26 +261,8 @@
     "extensionActiveTitle": {
       "message": "Chat Enhancer for YouTube ist in diesem Tab aktiv"
     },
-    "extensionStatusChecking": {
-      "message": "Offene Tabs werden geprüft..."
-    },
-    "extensionStatusCheckingHelper": {
-      "message": "Suche nach YouTube-Livechat-Tabs."
-    },
     "extensionStatusActiveCurrent": {
       "message": "In diesem Tab aktiv"
-    },
-    "extensionStatusActiveCurrentAndOne": {
-      "message": "In diesem Tab und 1 weiterem Tab aktiv"
-    },
-    "extensionStatusActiveCurrentAndMany": {
-      "message": "In diesem Tab und {count} weiteren Tabs aktiv"
-    },
-    "extensionStatusActiveOneOther": {
-      "message": "In 1 weiterem Tab aktiv"
-    },
-    "extensionStatusActiveManyOther": {
-      "message": "In {count} weiteren Tabs aktiv"
     },
     "extensionStatusInactiveAll": {
       "message": "Inaktiv"

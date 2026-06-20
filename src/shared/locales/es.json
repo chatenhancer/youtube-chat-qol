@@ -261,26 +261,8 @@
     "extensionActiveTitle": {
       "message": "Chat Enhancer for YouTube está activo en esta pestaña"
     },
-    "extensionStatusChecking": {
-      "message": "Comprobando pestañas abiertas..."
-    },
-    "extensionStatusCheckingHelper": {
-      "message": "Buscando pestañas con chat en vivo de YouTube."
-    },
     "extensionStatusActiveCurrent": {
       "message": "Activo en esta pestaña"
-    },
-    "extensionStatusActiveCurrentAndOne": {
-      "message": "Activo en esta pestaña y 1 pestaña más"
-    },
-    "extensionStatusActiveCurrentAndMany": {
-      "message": "Activo en esta pestaña y {count} pestañas más"
-    },
-    "extensionStatusActiveOneOther": {
-      "message": "Activo en 1 pestaña más"
-    },
-    "extensionStatusActiveManyOther": {
-      "message": "Activo en {count} pestañas más"
     },
     "extensionStatusInactiveAll": {
       "message": "Inactivo"

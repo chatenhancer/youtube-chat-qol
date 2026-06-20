@@ -261,26 +261,8 @@
     "extensionActiveTitle": {
       "message": "Chat Enhancer for YouTube jest aktywny na tej karcie"
     },
-    "extensionStatusChecking": {
-      "message": "Sprawdzanie otwartych kart..."
-    },
-    "extensionStatusCheckingHelper": {
-      "message": "Szukanie kart z czatem na żywo YouTube."
-    },
     "extensionStatusActiveCurrent": {
       "message": "Aktywne na tej karcie"
-    },
-    "extensionStatusActiveCurrentAndOne": {
-      "message": "Aktywne na tej karcie i 1 innej karcie"
-    },
-    "extensionStatusActiveCurrentAndMany": {
-      "message": "Aktywne na tej karcie i {count} innych kartach"
-    },
-    "extensionStatusActiveOneOther": {
-      "message": "Aktywne w 1 innej karcie"
-    },
-    "extensionStatusActiveManyOther": {
-      "message": "Aktywne w {count} innych kartach"
     },
     "extensionStatusInactiveAll": {
       "message": "Nieaktywne"

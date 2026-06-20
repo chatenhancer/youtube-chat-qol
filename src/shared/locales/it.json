@@ -262,26 +262,8 @@
     "extensionActiveTitle": {
       "message": "Chat Enhancer for YouTube è attivo in questa scheda"
     },
-    "extensionStatusChecking": {
-      "message": "Controllo delle schede aperte..."
-    },
-    "extensionStatusCheckingHelper": {
-      "message": "Ricerca di schede con live chat YouTube."
-    },
     "extensionStatusActiveCurrent": {
       "message": "Attivo in questa scheda"
-    },
-    "extensionStatusActiveCurrentAndOne": {
-      "message": "Attivo in questa scheda e in 1 altra scheda"
-    },
-    "extensionStatusActiveCurrentAndMany": {
-      "message": "Attivo in questa scheda e in altre {count} schede"
-    },
-    "extensionStatusActiveOneOther": {
-      "message": "Attivo in 1 altra scheda"
-    },
-    "extensionStatusActiveManyOther": {
-      "message": "Attivo in altre {count} schede"
     },
     "extensionStatusInactiveAll": {
       "message": "Inattivo"
