@@ -72,10 +72,16 @@ async function readMessageSource(message: Locator): Promise<MessageSource | null
   if (!authorName || !text) return null;
 
   const channelId = await message.evaluate((element) => {
-    const data = (element as HTMLElement & {
-      data?: { authorExternalChannelId?: string };
-    }).data;
-    return data?.authorExternalChannelId || '';
+    const author = element.querySelector('#author-name');
+    const link = author?.closest('a[href]') || element.querySelector('a[href*="/channel/"]');
+    const href = link?.getAttribute('href') || '';
+    try {
+      const url = new URL(href, 'https://www.youtube.com');
+      const [kind, id] = url.pathname.split('/').filter(Boolean);
+      return kind === 'channel' ? id : '';
+    } catch {
+      return '';
+    }
   }).catch(() => '');
 
   return {

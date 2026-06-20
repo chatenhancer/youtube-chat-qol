@@ -174,16 +174,10 @@ describe('inbox records', () => {
 });
 
 function createMessage(): HTMLElement {
-  const message = document.createElement('yt-live-chat-text-message-renderer') as HTMLElement & {
-    data?: unknown;
-  };
-  message.data = {
-    id: 'message-1',
-    authorExternalChannelId: 'example-channel',
-    authorName: { simpleText: '@ExampleUser' }
-  };
+  const message = document.createElement('yt-live-chat-text-message-renderer');
+  message.setAttribute('data-message-id', 'message-1');
   message.innerHTML = `
-    <span id="author-name">@FallbackUser</span>
+    <a href="/channel/example-channel"><span id="author-name">@ExampleUser</span></a>
     <span id="author-photo"><img src="https://example.test/avatar.jpg"></span>
     <span id="timestamp">10:30 PM</span>
     <span id="message">hello @CurrentViewer <img class="emoji" alt="🚀" data-emoji-id="rocket" src="https://example.test/rocket.png"></span>

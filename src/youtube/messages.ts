@@ -1,38 +1,13 @@
 /**
  * YouTube chat message adapter.
  *
- * Centralizes extraction of author names, message text, renderer data, and
+ * Centralizes extraction of author names, message text, stable DOM IDs, and
  * original message snapshots. Feature modules use this instead of duplicating
  * fragile selectors across the codebase.
  */
 import { cleanText } from '../shared/text';
-import { getAuthorNameFromElement, getAuthorNameFromRendererText } from './authors';
+import { getAuthorNameFromElement } from './authors';
 import { cloneSafeMessageNode, getPlainTextFromMessageNodes } from './message-content';
-
-interface RendererRun {
-  text?: string;
-  emoji?: {
-    shortcuts?: string[];
-    searchTerms?: string[];
-    emojiId?: string;
-  };
-}
-
-interface RendererText {
-  simpleText?: string;
-  runs?: RendererRun[];
-}
-
-interface RendererData {
-  id?: string;
-  authorExternalChannelId?: string;
-  authorChannelId?: string;
-  authorName?: RendererText;
-  message?: RendererText;
-  messageText?: RendererText;
-  headerSubtext?: RendererText;
-  timestampUsec?: string;
-}
 
 interface OriginalMessageSnapshot {
   originalText: string;
@@ -54,18 +29,15 @@ export function getMessageDetails(message: HTMLElement): { authorName: string; t
 }
 
 export function getAuthorName(message: HTMLElement): string {
-  const data = getRendererData(message);
-  return getAuthorNameFromRendererText(data?.authorName) ||
-    getAuthorNameFromElement(getAuthorNameElement(message));
+  return getAuthorNameFromElement(getAuthorNameElement(message));
 }
 
 export function getAuthorNameElement(message: HTMLElement): HTMLElement | null {
-  return message.querySelector<HTMLElement>('#author-name');
+  return message.querySelector<HTMLElement>('[id="author-name"], a[href*="/channel/"], a[href^="/@"]');
 }
 
 export function getAuthorChannelId(message: HTMLElement): string {
-  const data = getRendererData(message);
-  return cleanText(data?.authorExternalChannelId || data?.authorChannelId);
+  return getChannelIdFromElementLinks(message);
 }
 
 export function getMessageAvatarSrc(message: HTMLElement): string {
@@ -77,17 +49,12 @@ export function getMessageText(message: HTMLElement): string {
   const replaced = replacedMessages.get(message);
   if (replaced?.originalText) return cleanText(replaced.originalText);
 
-  const data = getRendererData(message);
-  const fromRuns = getTextFromRuns(data?.message?.runs) ||
-    getTextFromRuns(data?.messageText?.runs) ||
-    getTextFromRuns(data?.headerSubtext?.runs);
-
   const messageText = getMessageTextElement(message);
-  return cleanText(fromRuns || (messageText ? getPlainTextFromMessageNodes(messageText.childNodes) : ''));
+  return cleanText(messageText ? getPlainTextFromMessageNodes(messageText.childNodes) : '');
 }
 
 export function getMessageTextElement(message: HTMLElement): HTMLElement | null {
-  return message.querySelector<HTMLElement>('#message');
+  return message.querySelector<HTMLElement>('[id="message"]');
 }
 
 export function getMessageContentNodes(message: HTMLElement): Node[] {
@@ -106,22 +73,6 @@ export function getMessageContentSourceNodes(message: HTMLElement): Node[] {
   return messageText ? Array.from(messageText.childNodes) : [];
 }
 
-export function getRendererData(message: HTMLElement): RendererData | null {
-  const candidate = message as HTMLElement & {
-    data?: RendererData;
-    __data?: { data?: RendererData };
-  };
-  return candidate.data || candidate.__data?.data || null;
-}
-
-export function getMessageRuns(message: HTMLElement): RendererRun[] | null {
-  const data = getRendererData(message);
-  return data?.message?.runs ||
-    data?.messageText?.runs ||
-    data?.headerSubtext?.runs ||
-    null;
-}
-
 export function getMessageTimestampText(message: HTMLElement, timestamp = Date.now()): string {
   const youtubeTimestamp = message.querySelector('#timestamp')?.textContent;
   if (youtubeTimestamp) {
@@ -135,47 +86,12 @@ export function getMessageTimestampText(message: HTMLElement, timestamp = Date.n
   }).format(timestamp);
 }
 
-export function getMessagePublishedAt(message: HTMLElement): number | null {
-  const timestampUsec = cleanText(getRendererData(message)?.timestampUsec);
-  if (!timestampUsec) return null;
-  const timestamp = Number(timestampUsec);
-  if (!Number.isFinite(timestamp) || timestamp < 0) return null;
-  return Math.floor(timestamp / 1_000);
-}
-
 export function getMessageStableId(message: HTMLElement): string {
-  const data = getRendererData(message);
-  const timestampUsec = cleanText(data?.timestampUsec);
-  if (timestampUsec) {
-    const authorKey = cleanText(
-      data?.authorExternalChannelId ||
-      data?.authorChannelId ||
-      getAuthorNameFromRendererText(data?.authorName) ||
-      ''
-    );
-    return ['timestamp-usec', timestampUsec, authorKey].filter(Boolean).join(':');
-  }
-
-  const rendererId = cleanText(data?.id);
-  if (rendererId) return rendererId;
-
   return cleanText(
     message.getAttribute('data-message-id') ||
     message.id ||
     ''
   );
-}
-
-function getTextFromRuns(runs: RendererRun[] | undefined): string {
-  if (!Array.isArray(runs)) return '';
-  return runs.map((run) => run.text || getEmojiTextFromRun(run) || '').join('');
-}
-
-export function getEmojiTextFromRun(run: RendererRun): string {
-  return run?.emoji?.shortcuts?.[0] ||
-    run?.emoji?.searchTerms?.[0] ||
-    run?.emoji?.emojiId ||
-    '';
 }
 
 export function rememberOriginalMessageText(message: HTMLElement, messageText: HTMLElement, originalText: string): void {
@@ -225,4 +141,34 @@ export function restoreReplacedTranslation(message: Element): void {
 
   message.classList.remove('ytcq-translation-replaced');
   delete message.dataset.ytcqReplacedTranslation;
+}
+
+function getChannelIdFromElementLinks(root: HTMLElement): string {
+  const authorName = getAuthorNameElement(root);
+  const authorLink = authorName?.closest<HTMLAnchorElement>('a[href]');
+  const candidateLinks = [
+    authorName instanceof HTMLAnchorElement ? authorName : null,
+    authorLink,
+    root.querySelector<HTMLAnchorElement>('a[href*="/channel/"]')
+  ];
+
+  for (const link of candidateLinks) {
+    const channelId = getChannelIdFromHref(link?.getAttribute('href') || '');
+    if (channelId) return channelId;
+  }
+
+  return '';
+}
+
+function getChannelIdFromHref(href: string): string {
+  const cleanHref = cleanText(href);
+  if (!cleanHref) return '';
+
+  try {
+    const url = new URL(cleanHref, 'https://www.youtube.com');
+    const [kind, channelId] = url.pathname.split('/').filter(Boolean);
+    return kind === 'channel' ? cleanText(channelId) : '';
+  } catch {
+    return '';
+  }
 }

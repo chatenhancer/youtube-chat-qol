@@ -7,23 +7,12 @@ import {
 } from './participants';
 
 describe('YouTube participant adapter', () => {
-  it('reads author, channel, and avatar data from renderer data and DOM', () => {
-    const participant = document.createElement('yt-live-chat-participant-renderer') as HTMLElement & {
-      data?: unknown;
-    };
-    participant.data = {
-      authorExternalChannelId: 'channel-1',
-      authorName: {
-        runs: [
-          { text: '@ParticipantUser' },
-          { text: ' Verified' }
-        ]
-      }
-    };
-    participant.innerHTML = '<span id="author-name">@FallbackUser <span>Verified</span></span><yt-img-shadow><img src="https://example.test/avatar.png"></yt-img-shadow>';
+  it('reads author, channel, and avatar details from visible DOM', () => {
+    const participant = document.createElement('yt-live-chat-participant-renderer');
+    participant.innerHTML = '<a href="/channel/dom-channel"><span id="author-name">@FallbackUser <span>Verified</span></span></a><yt-img-shadow><img src="https://example.test/avatar.png"></yt-img-shadow>';
 
-    expect(getParticipantAuthorName(participant)).toBe('@ParticipantUser');
-    expect(getParticipantChannelId(participant)).toBe('channel-1');
+    expect(getParticipantAuthorName(participant)).toBe('@FallbackUser');
+    expect(getParticipantChannelId(participant)).toBe('dom-channel');
     expect(getParticipantAvatarSrc(participant)).toBe('https://example.test/avatar.png');
     expect(getParticipantAvatarElement(participant)?.tagName.toLowerCase()).toBe('yt-img-shadow');
   });

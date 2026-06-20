@@ -374,22 +374,8 @@ function createIdentitySurface(authorName: string): HTMLElement {
   return surface;
 }
 
-function createMessage(authorName: string, text: string): HTMLElement & {
-  data?: {
-    authorName: { simpleText: string };
-    message: { runs: { text: string }[] };
-  };
-} {
-  const message = document.createElement('yt-live-chat-text-message-renderer') as HTMLElement & {
-    data?: {
-      authorName: { simpleText: string };
-      message: { runs: { text: string }[] };
-    };
-  };
-  message.data = {
-    authorName: { simpleText: authorName },
-    message: { runs: [{ text }] }
-  };
+function createMessage(authorName: string, text: string): HTMLElement {
+  const message = document.createElement('yt-live-chat-text-message-renderer');
   message.innerHTML = `
     <span id="author-name">${authorName}</span>
     <span id="message">${text}</span>

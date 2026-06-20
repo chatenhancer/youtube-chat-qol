@@ -554,17 +554,10 @@ describe('focus mode entrypoint', () => {
 });
 
 function createMessage(authorName: string, text: string, channelId: string): HTMLElement {
-  const message = document.createElement('yt-live-chat-text-message-renderer') as HTMLElement & {
-    data?: unknown;
-  };
-  message.data = {
-    authorExternalChannelId: channelId,
-    authorName: { simpleText: authorName },
-    id: `${channelId}-${text}`,
-    message: { runs: [{ text }] }
-  };
+  const message = document.createElement('yt-live-chat-text-message-renderer');
+  message.setAttribute('data-message-id', `${channelId}-${text}`);
   message.innerHTML = `
-    <span id="author-name">${authorName}</span>
+    <a href="/channel/${channelId}"><span id="author-name">${authorName}</span></a>
     <span id="message">${text}</span>
     <span id="timestamp">9:30 PM</span>
   `;

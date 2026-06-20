@@ -42,7 +42,6 @@ const BUDGETS = {
 
 interface SourceAuthor {
   author: string;
-  channel: string;
 }
 
 test('youtube-mock performance: open panels keep up with incoming messages', async ({
@@ -127,14 +126,8 @@ async function getSourceAuthor(page: Page): Promise<SourceAuthor> {
   const sourceMessage = page.locator('yt-live-chat-text-message-renderer').first();
   await expect(sourceMessage).toBeVisible({ timeout: 15_000 });
   const author = cleanVisibleText(await sourceMessage.locator('#author-name').innerText());
-  const channel = await sourceMessage.evaluate((element) => {
-    const data = (element as HTMLElement & {
-      data?: { authorExternalChannelId?: string };
-    }).data;
-    return data?.authorExternalChannelId || '';
-  });
-  if (!author || !channel) throw new Error('Mock source message did not expose author data.');
-  return { author, channel };
+  if (!author) throw new Error('Mock source message did not expose an author.');
+  return { author };
 }
 
 async function openProfileCard(page: Page): Promise<void> {
@@ -163,7 +156,6 @@ async function closeProfileCard(page: Page): Promise<void> {
 function createPanelMessages(source: SourceAuthor, count: number, label: string) {
   return Array.from({ length: count }, (_, index) => ({
     author: source.author,
-    channel: source.channel,
     text: `Panel performance ${PANEL_KEYWORD} ${label} message ${index} gracias por mirar`
   }));
 }

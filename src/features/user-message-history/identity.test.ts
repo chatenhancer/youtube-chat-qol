@@ -37,16 +37,11 @@ describe('user message identity helpers', () => {
   });
 });
 
-function createMessage(authorName: string, channelId = ''): HTMLElement & {
-  data?: { authorExternalChannelId?: string; authorName: { simpleText: string } };
-} {
-  const message = document.createElement('yt-live-chat-text-message-renderer') as HTMLElement & {
-    data?: { authorExternalChannelId?: string; authorName: { simpleText: string } };
-  };
-  message.data = {
-    authorExternalChannelId: channelId,
-    authorName: { simpleText: authorName }
-  };
-  message.innerHTML = `<span id="author-name">${authorName}</span>`;
+function createMessage(authorName: string, channelId = ''): HTMLElement {
+  const message = document.createElement('yt-live-chat-text-message-renderer');
+  const authorHtml = channelId
+    ? `<a href="/channel/${channelId}"><span id="author-name">${authorName}</span></a>`
+    : `<span id="author-name">${authorName}</span>`;
+  message.innerHTML = authorHtml;
   return message;
 }

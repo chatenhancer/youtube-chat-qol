@@ -524,14 +524,8 @@ describe('inbox coordinator', () => {
 });
 
 function createMessage(authorName: string, text: string): HTMLElement {
-  const message = document.createElement('yt-live-chat-text-message-renderer') as HTMLElement & {
-    data?: unknown;
-  };
-  message.data = {
-    authorName: { simpleText: authorName },
-    id: `${authorName}-${text}`,
-    message: { runs: [{ text }] }
-  };
+  const message = document.createElement('yt-live-chat-text-message-renderer');
+  message.setAttribute('data-message-id', `${authorName}-${text}`);
   message.innerHTML = `
     <span id="author-name">${authorName}</span>
     <span id="message">${text}</span>

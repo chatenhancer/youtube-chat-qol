@@ -72,14 +72,12 @@ describe('Bounty Hunting bounty candidates', () => {
     root.append(participant);
 
     const topFanAuthorKeys = collectBountyHuntingTopFanAuthorKeys(root);
-    const chatMessage = document.createElement('yt-live-chat-text-message-renderer') as HTMLElement & {
-      data?: unknown;
-    };
-    chatMessage.data = {
-      authorName: { simpleText: '@TopFan' },
-      id: 'message-1',
-      message: { runs: [{ text: 'hello chat' }] }
-    };
+    const chatMessage = document.createElement('yt-live-chat-text-message-renderer');
+    chatMessage.setAttribute('data-message-id', 'message-1');
+    chatMessage.innerHTML = `
+      <span id="author-name">@TopFan</span>
+      <span id="message">hello chat</span>
+    `;
 
     const observed = getBountyHuntingObservedMessage(chatMessage, { topFanAuthorKeys });
 
@@ -91,22 +89,16 @@ describe('Bounty Hunting bounty candidates', () => {
   });
 
   it('detects badges, Super Chats, custom emoji, and emoji-only messages locally', () => {
-    const message = document.createElement('yt-live-chat-paid-message-renderer') as HTMLElement & {
-      data?: unknown;
-    };
-    message.data = {
-      id: 'message-2',
-      message: {
-        runs: [
-          { emoji: { emojiId: 'custom-1', shortcuts: [':party_parrot:'] } },
-          { emoji: { shortcuts: ['🤠'] } }
-        ]
-      }
-    };
+    const message = document.createElement('yt-live-chat-paid-message-renderer');
+    message.setAttribute('data-message-id', 'message-2');
     message.innerHTML = `
       <yt-live-chat-author-badge-renderer type="member"></yt-live-chat-author-badge-renderer>
       <yt-live-chat-author-badge-renderer type="moderator"></yt-live-chat-author-badge-renderer>
       <yt-live-chat-author-badge-renderer aria-label="Channel owner"></yt-live-chat-author-badge-renderer>
+      <span id="message">
+        <img alt=":party_parrot:" data-emoji-id="custom-1">
+        <img alt="🤠">
+      </span>
     `;
 
     const observed = getBountyHuntingObservedMessage(message);

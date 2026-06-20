@@ -4,8 +4,6 @@ import {
   getAuthorChannelId,
   getMessageAvatarSrc,
   getMessageContentNodes,
-  getMessagePublishedAt,
-  getMessageRuns,
   getMessageStableId,
   getMessageText,
   getMessageTimestampText,
@@ -15,28 +13,13 @@ import {
 } from './messages';
 
 describe('YouTube message adapter fixtures', () => {
-  it('extracts clean authors and text from verified superchat-like renderers', () => {
-    const message = document.createElement('yt-live-chat-paid-message-renderer') as HTMLElement & {
-      data?: {
-        authorExternalChannelId?: string;
-        authorName?: { runs: { text: string }[] };
-        id?: string;
-        message?: { runs: { text?: string }[] };
-      };
-    };
-    message.data = {
-      authorExternalChannelId: 'channel-1',
-      authorName: {
-        runs: [
-          { text: '@ExampleCreator' },
-          { text: ' Verified' }
-        ]
-      },
-      id: 'message-1',
-      message: {
-        runs: [{ text: 'Saltamonte es el jefe' }]
-      }
-    };
+  it('extracts clean authors and text from visible DOM', () => {
+    const message = document.createElement('yt-live-chat-paid-message-renderer');
+    message.id = 'message-1';
+    message.innerHTML = `
+      <span id="author-name">@ExampleCreator <span>Verified</span></span>
+      <span id="message">Saltamonte es el jefe</span>
+    `;
 
     expect(getAuthorName(message)).toBe('@ExampleCreator');
     expect(getMessageText(message)).toBe('Saltamonte es el jefe');
@@ -53,24 +36,16 @@ describe('YouTube message adapter fixtures', () => {
     expect(getMessageText(message)).toBe(':face-orange-biting-nails:');
   });
 
-  it('falls back to header subtext runs for membership-style renderers', () => {
-    const message = document.createElement('yt-live-chat-membership-item-renderer') as HTMLElement & {
-      data?: {
-        authorName?: { simpleText: string };
-        headerSubtext?: { runs: { text?: string }[] };
-        timestampUsec?: string;
-      };
-    };
-    message.data = {
-      authorName: { simpleText: '@NewMember' },
-      headerSubtext: { runs: [{ text: 'New member' }] },
-      timestampUsec: '123456789'
-    };
+  it('uses visible membership DOM only', () => {
+    const message = document.createElement('yt-live-chat-membership-item-renderer');
+    message.innerHTML = `
+      <span id="author-name">@NewMember</span>
+      <span id="message">New member</span>
+    `;
 
     expect(getAuthorName(message)).toBe('@NewMember');
     expect(getMessageText(message)).toBe('New member');
-    expect(getMessagePublishedAt(message)).toBe(123_456);
-    expect(getMessageStableId(message)).toBe('timestamp-usec:123456789:@NewMember');
+    expect(getMessageStableId(message)).toBe('');
   });
 
   it('reads timestamp text from YouTube timestamp nodes', () => {
@@ -80,40 +55,19 @@ describe('YouTube message adapter fixtures', () => {
     expect(getMessageTimestampText(message)).toBe('10:05 PM');
   });
 
-  it('uses renderer fallbacks for message text, channel ids, avatars, runs, and stable ids', () => {
-    const message = document.createElement('yt-live-chat-text-message-renderer') as HTMLElement & {
-      __data?: {
-        data?: {
-          authorChannelId?: string;
-          authorName?: { simpleText: string };
-          messageText?: { runs: { emoji?: { emojiId?: string }; text?: string }[] };
-        };
-      };
-    };
-    message.__data = {
-      data: {
-        authorChannelId: 'fallback-channel',
-        authorName: { simpleText: '@FallbackUser' },
-        messageText: {
-          runs: [
-            { text: 'hello ' },
-            { emoji: { emojiId: ':wave:' } }
-          ]
-        }
-      }
-    };
+  it('uses DOM fallbacks for message text, channel ids, avatars, and stable ids', () => {
+    const message = document.createElement('yt-live-chat-text-message-renderer');
     message.id = 'dom-message-id';
     message.innerHTML = `
-      <span id="author-name">@WrongDomUser</span>
+      <a href="https://www.youtube.com/channel/dom-channel"><span id="author-name">@DomUser</span></a>
       <span id="author-photo"><img id="img" src="https://yt3.example/avatar.png"></span>
-      <span id="message">wrong dom text</span>
+      <span id="message">DOM text</span>
     `;
 
-    expect(getAuthorName(message)).toBe('@FallbackUser');
-    expect(getAuthorChannelId(message)).toBe('fallback-channel');
+    expect(getAuthorName(message)).toBe('@DomUser');
+    expect(getAuthorChannelId(message)).toBe('dom-channel');
     expect(getMessageAvatarSrc(message)).toBe('https://yt3.example/avatar.png');
-    expect(getMessageRuns(message)).toEqual(message.__data.data?.messageText?.runs);
-    expect(getMessageText(message)).toBe('hello :wave:');
+    expect(getMessageText(message)).toBe('DOM text');
     expect(getMessageStableId(message)).toBe('dom-message-id');
   });
 

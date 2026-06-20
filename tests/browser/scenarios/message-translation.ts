@@ -380,7 +380,6 @@ async function appendTranslatedToggleMessage(chat: ChatSurface): Promise<{
   return test.step('Append a deterministic translatable mock message', async () => {
     const messageId = await appendMockFixtureMessage(chat, {
       author: '@ToggleViewer',
-      channel: 'fixture-channel-toggle-viewer',
       text: 'Gracias por probar el cambio'
     });
     if (!messageId) throw new Error('Could not append mock translation toggle message.');
