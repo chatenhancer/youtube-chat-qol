@@ -33,7 +33,8 @@ export const replayTriviaGameDefinition: GameDefinition = {
   id: 'replay-trivia',
   isPlayable: isLiveChatReplayUrl,
   labelKey: 'gamesReplayTrivia',
-  renderPreview: renderReplayTriviaPreview
+  renderPreview: renderReplayTriviaPreview,
+  taglineKey: 'gamesReplayTriviaTagline'
 };
 
 export const replayTriviaGameAdapter: GamePanelAdapter<PublicReplayTriviaGame> = {

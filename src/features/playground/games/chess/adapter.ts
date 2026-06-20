@@ -24,7 +24,8 @@ export const chessGameDefinition: GameDefinition = {
   classNamePrefix: 'ytcq-chess-game',
   id: 'chess',
   labelKey: 'gamesChess',
-  renderPreview: renderChessPreview
+  renderPreview: renderChessPreview,
+  taglineKey: 'gamesChessTagline'
 };
 
 export const chessGameAdapter: GamePanelAdapter<PublicChessGame> = {

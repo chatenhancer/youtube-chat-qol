@@ -244,8 +244,7 @@ function createInvitesSection(state: GamesPanelState, actions: GamesViewActions)
   const section = createGamesSection(t('gamesInvites'));
   const invites = getPendingInvites(state);
   if (!invites.length) {
-    const empty = createGamesEmpty(t('gamesNoInvites'));
-    section.append(empty);
+    section.hidden = true;
     return section;
   }
 
@@ -296,11 +295,14 @@ function createGamesGrid(
     card.className = 'ytcq-games-game-card';
     card.classList.toggle('ytcq-games-game-card-disabled', game.disabled);
     card.setAttribute('aria-disabled', String(game.disabled));
+    card.setAttribute('aria-label', getGameCardAriaLabel(game));
     if (game.disabled && game.disabledReason) {
       card.title = game.disabledReason;
-      card.setAttribute('aria-label', `${game.label}. ${game.disabledReason}`);
     }
-    card.append(createGamePreview(game.id, game.renderPreview), createGameCardLabel(game.label));
+    card.append(
+      createGamePreview(game.id, game.renderPreview),
+      createGameCardCopy(game.label, game.tagline)
+    );
     if (!game.disabled) {
       card.addEventListener('click', () => actions.onSelectGame(game.id));
     }
@@ -309,6 +311,13 @@ function createGamesGrid(
 
   section.append(grid);
   return section;
+}
+
+function getGameCardAriaLabel(game: ReturnType<typeof getGamePickerCards>[number]): string {
+  if (game.disabled && game.disabledReason) {
+    return `${game.label}. ${game.tagline}. ${game.disabledReason}`;
+  }
+  return `${game.label}. ${game.tagline}`;
 }
 
 function renderPlayWithView(body: HTMLElement, state: GamesPanelState, actions: GamesViewActions): void {
@@ -424,11 +433,20 @@ function getWrappedIndex(index: number, length: number): number {
   return (index + length) % length;
 }
 
-function createGameCardLabel(label: string): HTMLElement {
+function createGameCardCopy(label: string, helperText: string): HTMLElement {
+  const copy = ytcqCreateElement('span');
+  copy.className = 'ytcq-games-game-copy';
   const text = ytcqCreateElement('span');
   text.className = 'ytcq-games-game-label';
   text.textContent = label;
-  return text;
+  copy.append(text);
+  if (helperText) {
+    const helper = ytcqCreateElement('span');
+    helper.className = 'ytcq-games-game-helper';
+    helper.textContent = helperText;
+    copy.append(helper);
+  }
+  return copy;
 }
 
 function createGamePreview(gameId: string, renderPreview: (container: HTMLElement) => void): HTMLElement {
