@@ -66,6 +66,7 @@ interface BountyHuntingGameRecord extends GameRecord {
 interface BountyHuntingClaimWitness {
   bountyId: string;
   messageId: string;
+  messagePublishedAt: number;
   observedAt: number;
   role: PlayerRole;
   userId: string;
@@ -74,6 +75,7 @@ interface BountyHuntingClaimWitness {
 interface BountyHuntingPendingClaim {
   bountyId: string;
   messageId: string;
+  messagePublishedAt: number;
   requestedAt: number;
   role: PlayerRole;
   userId: string;
@@ -82,6 +84,7 @@ interface BountyHuntingPendingClaim {
 interface BountyHuntingWitnessObservation {
   bountyIds: string[];
   messageId: string;
+  messagePublishedAt: number;
 }
 
 export const bountyHuntingGameModule: GameModule = {
@@ -243,10 +246,13 @@ export function claimBountyHuntingBounty(
   if (game.claimedMessageIds.includes(messageId)) {
     throw new ProtocolError('message_claimed', 'This chat message already claimed a bounty.');
   }
+  const messagePublishedAt = getPayloadTimestamp(payload.messagePublishedAt, 'messagePublishedAt');
+  assertBountyHuntingMessageIsInActiveRound(game, messagePublishedAt);
 
   const pendingClaim: BountyHuntingPendingClaim = {
     bountyId,
     messageId,
+    messagePublishedAt,
     requestedAt: now,
     role,
     userId: input.userId
@@ -272,8 +278,10 @@ export function observeBountyHuntingMessage(
       bountyIds: observation.bountyIds
         .filter((bountyId) => game.bounties.some((bounty) => bounty.id === bountyId))
         .filter((bountyId) => !game.claims.some((claim) => claim.bountyId === bountyId)),
-      messageId: observation.messageId
+      messageId: observation.messageId,
+      messagePublishedAt: observation.messagePublishedAt
     }))
+    .filter((observation) => isBountyHuntingMessageInActiveRound(game, observation.messagePublishedAt))
     .filter((observation) => observation.bountyIds.length > 0);
 
   if (!observations.length) return resolveBountyHuntingPendingClaims(game, now);
@@ -283,6 +291,7 @@ export function observeBountyHuntingMessage(
     .flatMap((observation) => observation.bountyIds.map((bountyId): BountyHuntingClaimWitness => ({
       bountyId,
       messageId: observation.messageId,
+      messagePublishedAt: observation.messagePublishedAt,
       observedAt: now,
       role,
       userId: input.userId
@@ -575,6 +584,14 @@ function getPayloadTextArray(value: unknown, field: string, itemMaxLength: numbe
   return [...new Set(texts)];
 }
 
+function getPayloadTimestamp(value: unknown, field: string): number {
+  const timestamp = typeof value === 'number' ? value : Number.NaN;
+  if (!Number.isFinite(timestamp) || timestamp < 0) {
+    throw new ProtocolError('invalid_bounty', `${field} must be a valid timestamp.`);
+  }
+  return Math.floor(timestamp);
+}
+
 function parseBountyHuntingWitnessObservations(payload: Record<string, unknown>): BountyHuntingWitnessObservation[] {
   if (Array.isArray(payload.observations)) {
     return payload.observations
@@ -588,15 +605,36 @@ function parseBountyHuntingWitnessObservations(payload: Record<string, unknown>)
             80,
             MAX_BOUNTY_WITNESS_IDS
           ),
-          messageId: getPayloadText(observation.messageId, `witness observation ${index + 1} messageId`, MAX_MESSAGE_ID_LENGTH)
+          messageId: getPayloadText(observation.messageId, `witness observation ${index + 1} messageId`, MAX_MESSAGE_ID_LENGTH),
+          messagePublishedAt: getPayloadTimestamp(
+            observation.messagePublishedAt,
+            `witness observation ${index + 1} messagePublishedAt`
+          )
         };
       });
   }
 
   return [{
     bountyIds: getPayloadTextArray(payload.bountyIds, 'bountyIds', 80, MAX_BOUNTY_WITNESS_IDS),
-    messageId: getPayloadText(payload.messageId, 'messageId', MAX_MESSAGE_ID_LENGTH)
+    messageId: getPayloadText(payload.messageId, 'messageId', MAX_MESSAGE_ID_LENGTH),
+    messagePublishedAt: getPayloadTimestamp(payload.messagePublishedAt, 'messagePublishedAt')
   }];
+}
+
+function isBountyHuntingMessageInActiveRound(
+  game: BountyHuntingGameRecord,
+  messagePublishedAt: number
+): boolean {
+  return messagePublishedAt >= game.phaseStartedAt &&
+    messagePublishedAt < game.phaseStartedAt + BOUNTY_HUNTING_ROUND_MS;
+}
+
+function assertBountyHuntingMessageIsInActiveRound(
+  game: BountyHuntingGameRecord,
+  messagePublishedAt: number
+): void {
+  if (isBountyHuntingMessageInActiveRound(game, messagePublishedAt)) return;
+  throw new ProtocolError('message_too_old', 'This chat message is from before the bounty round.');
 }
 
 function getRecord(value: unknown, field: string): Record<string, unknown> {

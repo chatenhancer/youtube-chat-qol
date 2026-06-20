@@ -27,6 +27,7 @@ import type { BountyHuntingAssets, PublicBountyHuntingGame } from './types';
 
 let shellControllers: AbortController[] = [];
 let shellCleanups: Array<() => void> = [];
+let chatMessageTimestampUsecOffset = 0;
 
 describe('Bounty Hunting panel', () => {
   let audioElements: FakeAudioElement[];
@@ -42,6 +43,7 @@ describe('Bounty Hunting panel', () => {
     shellControllers = [];
     shellCleanups = [];
     audioElements = [];
+    chatMessageTimestampUsecOffset = 0;
     context = createMockCanvasContext();
     vi.stubGlobal('Audio', createFakeAudioConstructor(audioElements));
     vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(context as unknown as CanvasRenderingContext2D);
@@ -86,7 +88,8 @@ describe('Bounty Hunting panel', () => {
     expect(onAction).toHaveBeenCalledWith('game-bounty-hunting', 'observeBountyMessage', {
       observations: [{
         bountyIds: ['mention-user'],
-        messageId: 'msg-1'
+        messageId: 'timestamp-usec:100500000:@Luna',
+        messagePublishedAt: 100_500
       }]
     });
     expect(onAction).not.toHaveBeenCalledWith(
@@ -99,8 +102,128 @@ describe('Bounty Hunting panel', () => {
 
     expect(onAction).toHaveBeenCalledWith('game-bounty-hunting', 'claimBounty', {
       bountyId: 'mention-user',
-      messageId: 'msg-1'
+      messageId: 'timestamp-usec:100500000:@Luna',
+      messagePublishedAt: 100_500
     });
+  });
+
+  it('does not witness or claim messages published before the shared round start', () => {
+    const onAction = vi.fn();
+    const message = appendChatMessage('msg-old', '@Luna', 'look @Marco', {
+      timestampUsec: '99999000'
+    });
+    const game = createBountyHuntingGame();
+
+    openBountyHuntingGamePanel(game, 'host-user', onAction);
+    const divider = document.querySelector<HTMLElement>('.ytcq-bounty-hunting-start-divider');
+    const chatItems = [...getChatItemsContainer().children];
+    expect(divider?.textContent).toBe('Bounty hunt starts here');
+    expect(chatItems.indexOf(message)).toBeLessThan(chatItems.indexOf(divider as Element));
+    handleFeatureMessage(message, { allowTranslate: true });
+    updateBountyHuntingGamePanel(game, 'host-user');
+    message.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+    expect(onAction).not.toHaveBeenCalledWith(
+      'game-bounty-hunting',
+      'observeBountyMessage',
+      expect.anything()
+    );
+    expect(onAction).not.toHaveBeenCalledWith(
+      'game-bounty-hunting',
+      'claimBounty',
+      expect.anything()
+    );
+
+    const newMessage = appendChatMessage('msg-new', '@Luna', 'hello @Marco');
+    handleFeatureMessage(newMessage, { allowTranslate: true });
+    updateBountyHuntingGamePanel(game, 'host-user');
+    newMessage.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+    expect(onAction).toHaveBeenCalledWith('game-bounty-hunting', 'observeBountyMessage', {
+      observations: [{
+        bountyIds: ['mention-user'],
+        messageId: 'timestamp-usec:100500000:@Luna',
+        messagePublishedAt: 100_500
+      }]
+    });
+    expect(onAction).toHaveBeenCalledWith('game-bounty-hunting', 'claimBounty', {
+      bountyId: 'mention-user',
+      messageId: 'timestamp-usec:100500000:@Luna',
+      messagePublishedAt: 100_500
+    });
+    expect(chatItems.indexOf(divider as Element)).toBeLessThan([...getChatItemsContainer().children].indexOf(newMessage));
+
+    closeBountyHuntingGamePanel({ notify: false });
+
+    expect(document.querySelector('.ytcq-bounty-hunting-start-divider')).toBeNull();
+  });
+
+  it('places the start divider before timestamped messages inside the shared round window', () => {
+    const onAction = vi.fn();
+    const oldMessage = appendChatMessage('msg-old', '@Luna', 'old @Marco', {
+      timestampUsec: '99999000'
+    });
+    const newMessage = appendChatMessage('msg-new', '@Luna', 'new @Marco', {
+      timestampUsec: '100001000'
+    });
+    const game = createBountyHuntingGame();
+
+    openBountyHuntingGamePanel(game, 'host-user', onAction);
+    const divider = document.querySelector<HTMLElement>('.ytcq-bounty-hunting-start-divider');
+    const chatItems = [...getChatItemsContainer().children];
+
+    expect(chatItems.indexOf(oldMessage)).toBeLessThan(chatItems.indexOf(divider as Element));
+    expect(chatItems.indexOf(divider as Element)).toBeLessThan(chatItems.indexOf(newMessage));
+
+    handleFeatureMessage(oldMessage, { allowTranslate: true });
+    handleFeatureMessage(newMessage, { allowTranslate: true });
+    updateBountyHuntingGamePanel(game, 'host-user');
+    oldMessage.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    newMessage.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+    expect(onAction).not.toHaveBeenCalledWith(
+      'game-bounty-hunting',
+      'observeBountyMessage',
+      {
+        observations: [expect.objectContaining({ messageId: 'timestamp-usec:99999000:@Luna' })]
+      }
+    );
+    expect(onAction).toHaveBeenCalledWith('game-bounty-hunting', 'observeBountyMessage', {
+      observations: [{
+        bountyIds: ['mention-user'],
+        messageId: 'timestamp-usec:100001000:@Luna',
+        messagePublishedAt: 100_001
+      }]
+    });
+    expect(onAction).toHaveBeenCalledWith('game-bounty-hunting', 'claimBounty', {
+      bountyId: 'mention-user',
+      messageId: 'timestamp-usec:100001000:@Luna',
+      messagePublishedAt: 100_001
+    });
+  });
+
+  it('does not witness or claim messages without a YouTube publish timestamp', () => {
+    const onAction = vi.fn();
+    const game = createBountyHuntingGame();
+    openBountyHuntingGamePanel(game, 'host-user', onAction);
+    const message = appendChatMessage('msg-no-timestamp', '@Luna', 'look @Marco', {
+      timestampUsec: null
+    });
+
+    handleFeatureMessage(message, { allowTranslate: true });
+    updateBountyHuntingGamePanel(game, 'host-user');
+    message.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+    expect(onAction).not.toHaveBeenCalledWith(
+      'game-bounty-hunting',
+      'observeBountyMessage',
+      expect.anything()
+    );
+    expect(onAction).not.toHaveBeenCalledWith(
+      'game-bounty-hunting',
+      'claimBounty',
+      expect.anything()
+    );
   });
 
   it('temporarily stacks claimed chat messages at the bottom of the feed', async () => {
@@ -142,7 +265,7 @@ describe('Bounty Hunting panel', () => {
           claim: {
             bountyId: 'mention-user',
             claimedAt: 100_600,
-            messageId: 'msg-1',
+            messageId: 'timestamp-usec:100500000:@Luna',
             role: 'guest',
             userId: 'server:computer:bounty-hunting'
           }
@@ -152,7 +275,7 @@ describe('Bounty Hunting panel', () => {
           claim: {
             bountyId: 'question',
             claimedAt: 100_650,
-            messageId: 'msg-2',
+            messageId: 'timestamp-usec:100500001:@Marco',
             role: 'guest',
             userId: 'server:computer:bounty-hunting'
           }
@@ -208,7 +331,8 @@ describe('Bounty Hunting panel', () => {
     expect(onAction).toHaveBeenCalledWith('game-bounty-hunting', 'observeBountyMessage', {
       observations: [{
         bountyIds: ['mention-user'],
-        messageId: 'msg-own'
+        messageId: 'timestamp-usec:100500000:@CurrentViewer',
+        messagePublishedAt: 100_500
       }]
     });
 
@@ -251,7 +375,8 @@ describe('Bounty Hunting panel', () => {
         observations: [
           {
             bountyIds: ['mention-user', 'question'],
-            messageId: 'msg-1'
+            messageId: 'timestamp-usec:100500000:@Luna',
+            messagePublishedAt: 100_500
           }
         ]
       }
@@ -765,6 +890,7 @@ describe('Bounty Hunting panel', () => {
       setCompactMode: vi.fn(),
       setPosition: vi.fn()
     };
+    const oldMessage = appendChatMessage('msg-old', '@Luna', 'look @Marco');
     const game = {
       ...createBountyHuntingGame(),
       phaseStartedAt: 100_000,
@@ -782,6 +908,10 @@ describe('Bounty Hunting panel', () => {
 
     expect(controls.setCompactMode).toHaveBeenCalledWith(true);
     expect(controls.setPosition).toHaveBeenCalledWith({ placement: 'top-center' });
+    const divider = document.querySelector<HTMLElement>('.ytcq-bounty-hunting-start-divider');
+    const chatItems = [...getChatItemsContainer().children];
+    expect(divider?.textContent).toBe('Bounty hunt starts here');
+    expect(chatItems.indexOf(oldMessage)).toBeLessThan(chatItems.indexOf(divider as Element));
   });
 
   it('expands back to the round over page when the active round ends', () => {
@@ -1069,19 +1199,29 @@ function createClaimedBounty(id: string, role: 'guest' | 'host'): PublicBountyHu
   };
 }
 
-function appendChatMessage(messageId: string, authorName: string, text: string): HTMLElement {
+function appendChatMessage(
+  messageId: string,
+  authorName: string,
+  text: string,
+  options: { timestampUsec?: string | null } = {}
+): HTMLElement {
   const message = document.createElement('yt-live-chat-text-message-renderer') as HTMLElement & {
     data?: {
       authorName: { simpleText: string };
       id: string;
       message: { runs: Array<{ text: string }> };
+      timestampUsec?: string;
     };
   };
   message.setAttribute('data-message-id', messageId);
+  const timestampUsec = options.timestampUsec === null
+    ? undefined
+    : options.timestampUsec ?? String(Date.now() * 1_000 + chatMessageTimestampUsecOffset++);
   message.data = {
     authorName: { simpleText: authorName },
     id: messageId,
-    message: { runs: [{ text }] }
+    message: { runs: [{ text }] },
+    timestampUsec
   };
 
   const author = document.createElement('span');

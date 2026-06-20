@@ -72,7 +72,7 @@ export interface BountyHuntingPanelRuntime {
   onVisibilityChanged: (() => void) | null;
   panelControls: GamePanelControls | null;
   claimedMessageFeedbackTimers: Map<HTMLElement, number>;
-  pendingWitnesses: Map<string, Set<string>>;
+  pendingWitnesses: Map<string, { bountyIds: Set<string>; messagePublishedAt: number }>;
   pixelRatio: number;
   preparationMessages: Map<string, BountyHuntingObservedMessage>;
   preparationStarted: boolean;
@@ -80,6 +80,7 @@ export interface BountyHuntingPanelRuntime {
   claimSoundIndex: number;
   readyButtonFlashUntil: number;
   roundOverStingPlayedForGameId: string | null;
+  roundStartDividerElement: HTMLElement | null;
   sentClaimKeys: Set<string>;
   sentWitnessKeys: Set<string>;
   soundController: GameSoundController;
@@ -94,6 +95,7 @@ export interface BountyHuntingPanelRuntime {
 
 export interface BountyHuntingObservedMessage extends BountyHuntingMessageFacts {
   messageId: string;
+  messagePublishedAt?: number;
 }
 
 export interface BountyHuntingFallbackRuntime {

@@ -143,6 +143,7 @@
     "gamesBountyHuntingWanted": "ARANIYOR",
     "gamesBountyHuntingReady": "HAZIR",
     "gamesBountyHuntingStarting": "Basliyor",
+    "gamesBountyHuntingStartMarker": "Ödül avı burada başlar",
     "gamesBountyHuntingRoundOver": "Tur bitti",
     "gamesBountyHuntingLedger": "Defter",
     "gamesBountyHuntingBountiesClaimed": "Alinan oduller",

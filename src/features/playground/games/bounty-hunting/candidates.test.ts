@@ -90,6 +90,21 @@ describe('Bounty Hunting bounty candidates', () => {
     expect(observed).not.toHaveProperty('authorName');
   });
 
+  it('carries the YouTube renderer timestamp for shared round cutoffs', () => {
+    const chatMessage = document.createElement('yt-live-chat-text-message-renderer') as HTMLElement & {
+      data?: unknown;
+    };
+    chatMessage.data = {
+      authorName: { simpleText: '@Luna' },
+      message: { runs: [{ text: 'hello @Marco' }] },
+      timestampUsec: '100500000'
+    };
+
+    expect(getBountyHuntingObservedMessage(chatMessage)).toMatchObject({
+      messagePublishedAt: 100_500
+    });
+  });
+
   it('detects badges, Super Chats, custom emoji, and emoji-only messages locally', () => {
     const message = document.createElement('yt-live-chat-paid-message-renderer') as HTMLElement & {
       data?: unknown;

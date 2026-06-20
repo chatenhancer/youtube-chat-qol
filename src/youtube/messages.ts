@@ -135,6 +135,14 @@ export function getMessageTimestampText(message: HTMLElement, timestamp = Date.n
   }).format(timestamp);
 }
 
+export function getMessagePublishedAt(message: HTMLElement): number | null {
+  const timestampUsec = cleanText(getRendererData(message)?.timestampUsec);
+  if (!timestampUsec) return null;
+  const timestamp = Number(timestampUsec);
+  if (!Number.isFinite(timestamp) || timestamp < 0) return null;
+  return Math.floor(timestamp / 1_000);
+}
+
 export function getMessageStableId(message: HTMLElement): string {
   const data = getRendererData(message);
   const timestampUsec = cleanText(data?.timestampUsec);
