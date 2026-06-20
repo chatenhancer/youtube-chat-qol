@@ -151,6 +151,8 @@
     "gamesBountyHuntingClose": "Dong",
     "gamesBountyHuntingOpen": "Mo",
     "gamesBountyHuntingClaimed": "Da lay",
+    "gamesBountyHuntingBountyLabel": "Tiền thưởng",
+    "gamesBountyHuntingAmountLabel": "Số tiền",
     "gamesBountyHuntingTimeRemaining": "Thoi gian con lai",
     "gamesBountyHuntingYou": "Ban",
     "gamesBountyHuntingThem": "Ho",

@@ -151,6 +151,8 @@
     "gamesBountyHuntingClose": "닫기",
     "gamesBountyHuntingOpen": "열림",
     "gamesBountyHuntingClaimed": "획득",
+    "gamesBountyHuntingBountyLabel": "현상금",
+    "gamesBountyHuntingAmountLabel": "금액",
     "gamesBountyHuntingTimeRemaining": "남은 시간",
     "gamesBountyHuntingYou": "나",
     "gamesBountyHuntingThem": "상대",

@@ -151,6 +151,8 @@
     "gamesBountyHuntingClose": "إغلاق",
     "gamesBountyHuntingOpen": "مفتوح",
     "gamesBountyHuntingClaimed": "تم التحصيل",
+    "gamesBountyHuntingBountyLabel": "المكافأة",
+    "gamesBountyHuntingAmountLabel": "القيمة",
     "gamesBountyHuntingTimeRemaining": "الوقت المتبقي",
     "gamesBountyHuntingYou": "أنت",
     "gamesBountyHuntingThem": "هم",

@@ -151,6 +151,8 @@
     "gamesBountyHuntingClose": "CLOSE",
     "gamesBountyHuntingOpen": "OPEN",
     "gamesBountyHuntingClaimed": "CLAIMED",
+    "gamesBountyHuntingBountyLabel": "Bounty",
+    "gamesBountyHuntingAmountLabel": "Amount",
     "gamesBountyHuntingTimeRemaining": "TIME REMAINING",
     "gamesBountyHuntingYou": "You",
     "gamesBountyHuntingThem": "Them",

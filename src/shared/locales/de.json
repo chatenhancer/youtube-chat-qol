@@ -151,6 +151,8 @@
     "gamesBountyHuntingClose": "Schliessen",
     "gamesBountyHuntingOpen": "Offen",
     "gamesBountyHuntingClaimed": "Geholt",
+    "gamesBountyHuntingBountyLabel": "Prämie",
+    "gamesBountyHuntingAmountLabel": "Betrag",
     "gamesBountyHuntingTimeRemaining": "Restzeit",
     "gamesBountyHuntingYou": "Du",
     "gamesBountyHuntingThem": "Sie",

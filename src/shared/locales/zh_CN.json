@@ -151,6 +151,8 @@
     "gamesBountyHuntingClose": "关闭",
     "gamesBountyHuntingOpen": "开放",
     "gamesBountyHuntingClaimed": "已领取",
+    "gamesBountyHuntingBountyLabel": "悬赏",
+    "gamesBountyHuntingAmountLabel": "金额",
     "gamesBountyHuntingTimeRemaining": "剩余时间",
     "gamesBountyHuntingYou": "你",
     "gamesBountyHuntingThem": "对手",

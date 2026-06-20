@@ -151,6 +151,8 @@
     "gamesBountyHuntingClose": "Закрыть",
     "gamesBountyHuntingOpen": "Открыто",
     "gamesBountyHuntingClaimed": "Взято",
+    "gamesBountyHuntingBountyLabel": "Награда",
+    "gamesBountyHuntingAmountLabel": "Сумма",
     "gamesBountyHuntingTimeRemaining": "Осталось",
     "gamesBountyHuntingYou": "Вы",
     "gamesBountyHuntingThem": "Они",

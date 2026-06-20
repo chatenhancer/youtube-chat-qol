@@ -151,6 +151,8 @@
     "gamesBountyHuntingClose": "बंद करें",
     "gamesBountyHuntingOpen": "खुला",
     "gamesBountyHuntingClaimed": "जीता गया",
+    "gamesBountyHuntingBountyLabel": "इनाम",
+    "gamesBountyHuntingAmountLabel": "राशि",
     "gamesBountyHuntingTimeRemaining": "समय बाकी",
     "gamesBountyHuntingYou": "आप",
     "gamesBountyHuntingThem": "वे",

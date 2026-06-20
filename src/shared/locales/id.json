@@ -151,6 +151,8 @@
     "gamesBountyHuntingClose": "Tutup",
     "gamesBountyHuntingOpen": "Terbuka",
     "gamesBountyHuntingClaimed": "Diklaim",
+    "gamesBountyHuntingBountyLabel": "Bounty",
+    "gamesBountyHuntingAmountLabel": "Jumlah",
     "gamesBountyHuntingTimeRemaining": "Sisa waktu",
     "gamesBountyHuntingYou": "Kamu",
     "gamesBountyHuntingThem": "Mereka",

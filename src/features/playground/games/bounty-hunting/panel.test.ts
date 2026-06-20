@@ -103,40 +103,95 @@ describe('Bounty Hunting panel', () => {
     });
   });
 
-  it('temporarily marks the chat message when a bounty claim is confirmed', async () => {
+  it('temporarily stacks claimed chat messages at the bottom of the feed', async () => {
     vi.useFakeTimers();
     vi.spyOn(Date, 'now').mockImplementation(() => 100_500);
     const onAction = vi.fn();
-    const game = createBountyHuntingGame();
+    const baseGame = createBountyHuntingGame();
+    const game: PublicBountyHuntingGame = {
+      ...baseGame,
+      bounties: [
+        ...baseGame.bounties,
+        {
+          amount: 75,
+          description: 'a message that asks a question',
+          id: 'question',
+          matcher: { kind: 'question' }
+        }
+      ],
+      players: {
+        ...baseGame.players,
+        guest: {
+          displayName: 'Computer (Bounty Hunter)',
+          userId: 'server:computer:bounty-hunting'
+        }
+      }
+    };
     openBountyHuntingGamePanel(game, 'host-user', onAction);
     const message = appendChatMessage('msg-1', '@Luna', 'look @Marco');
+    const customEmoji = document.createElement('img');
+    customEmoji.alt = ':party:';
+    customEmoji.src = 'https://example.test/party.png';
+    message.querySelector('#message')?.append(' ', customEmoji);
+    appendChatMessage('msg-2', '@Marco', 'anyone there?');
     const claimedGame: PublicBountyHuntingGame = {
       ...game,
-      bounties: [{
-        ...game.bounties[0],
-        claim: {
-          bountyId: 'mention-user',
-          claimedAt: 100_600,
-          messageId: 'msg-1',
-          role: 'host',
-          userId: 'host-user'
+      bounties: [
+        {
+          ...game.bounties[0],
+          claim: {
+            bountyId: 'mention-user',
+            claimedAt: 100_600,
+            messageId: 'msg-1',
+            role: 'guest',
+            userId: 'server:computer:bounty-hunting'
+          }
+        },
+        {
+          ...game.bounties[1],
+          claim: {
+            bountyId: 'question',
+            claimedAt: 100_650,
+            messageId: 'msg-2',
+            role: 'guest',
+            userId: 'server:computer:bounty-hunting'
+          }
         }
-      }],
+      ],
       scores: {
         ...game.scores,
-        host: 125
+        guest: 200
       }
     };
 
     updateBountyHuntingGamePanel(claimedGame, 'host-user');
 
-    expect(message.classList.contains('ytcq-bounty-hunting-message-claimed')).toBe(true);
-    expect(message.querySelector('.ytcq-bounty-hunting-message-claimed-badge')?.textContent).toBe('CLAIMED');
+    const feed = document.querySelector<HTMLElement>('.ytcq-bounty-hunting-claimed-feed');
+    const items = [...document.querySelectorAll<HTMLElement>('.ytcq-bounty-hunting-claimed-feed-item')];
+    expect(feed).toBeInstanceOf(HTMLElement);
+    expect(items).toHaveLength(2);
+    expect(items[0].firstElementChild?.className).toBe('ytcq-bounty-hunting-claimed-feed-text');
+    expect(items[0].firstElementChild?.textContent).toContain('look @Marco');
+    expect(items[0].querySelector('.ytcq-bounty-hunting-claimed-feed-avatar')?.textContent).toBe('B');
+    expect(items[0].querySelector('.ytcq-bounty-hunting-claimed-feed-claimer')?.textContent)
+      .toBe('Computer (Bounty Hunter)');
+    const detailBadges = [...items[0].querySelectorAll('.ytcq-bounty-hunting-claimed-feed-detail')];
+    expect(detailBadges.map((detail) => detail.textContent)).toEqual([
+      'Bounty: mention',
+      'Amount: $125'
+    ]);
+    expect(detailBadges.map((detail) => detail.getAttribute('aria-label'))).toEqual([
+      'Bounty: mention',
+      'Amount: $125'
+    ]);
+    expect(detailBadges[0].querySelector('.ytcq-bounty-hunting-claimed-feed-detail-value')?.textContent)
+      .toBe('mention');
+    expect(items[0].querySelector<HTMLImageElement>('.ytcq-bounty-hunting-claimed-feed-text img')?.alt).toBe(':party:');
+    expect(items[1].textContent).toContain('anyone there?');
 
-    await vi.advanceTimersByTimeAsync(1_600);
+    await vi.advanceTimersByTimeAsync(2_800);
 
-    expect(message.classList.contains('ytcq-bounty-hunting-message-claimed')).toBe(false);
-    expect(message.querySelector('.ytcq-bounty-hunting-message-claimed-badge')).toBeNull();
+    expect(document.querySelector('.ytcq-bounty-hunting-claimed-feed')).toBeNull();
   });
 
   it('does not claim bounties from the current user authored chat messages', () => {
@@ -1037,9 +1092,39 @@ function appendChatMessage(messageId: string, authorName: string, text: string):
   body.id = 'message';
   body.textContent = text;
 
-  message.append(author, body);
-  document.body.append(message);
+  const content = document.createElement('span');
+  content.id = 'content';
+  content.append(author, body);
+
+  message.append(content);
+  getChatItemsContainer().append(message);
   return message;
+}
+
+function getChatItemsContainer(): HTMLElement {
+  let items = document.querySelector<HTMLElement>('#item-scroller > #items');
+  if (items) return items;
+
+  const list = document.createElement('yt-live-chat-item-list-renderer');
+  const scroller = document.createElement('div');
+  scroller.id = 'item-scroller';
+  scroller.getBoundingClientRect = () => ({
+    bottom: 448,
+    height: 448,
+    left: 0,
+    right: 320,
+    top: 0,
+    width: 320,
+    x: 0,
+    y: 0,
+    toJSON: () => ({})
+  } as DOMRect);
+  items = document.createElement('div');
+  items.id = 'items';
+  scroller.append(items);
+  list.append(scroller);
+  document.body.append(list);
+  return items;
 }
 
 function appendCurrentUserIdentity(authorName: string): HTMLElement {

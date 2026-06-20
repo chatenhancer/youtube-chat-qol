@@ -151,6 +151,8 @@
     "gamesBountyHuntingClose": "ปิด",
     "gamesBountyHuntingOpen": "เปิด",
     "gamesBountyHuntingClaimed": "รับแล้ว",
+    "gamesBountyHuntingBountyLabel": "ค่าหัว",
+    "gamesBountyHuntingAmountLabel": "จำนวน",
     "gamesBountyHuntingTimeRemaining": "เวลาที่เหลือ",
     "gamesBountyHuntingYou": "คุณ",
     "gamesBountyHuntingThem": "อีกฝ่าย",
