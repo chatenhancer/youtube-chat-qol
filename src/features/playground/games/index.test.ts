@@ -7,7 +7,7 @@ import {
   handleFeatureOptionsChanged
 } from '../../../content/lifecycle';
 import {
-  cleanupStaleGamesButtons,
+  cleanupStaleGamesUi,
   refreshGamesButton,
   scheduleGamesButtonWire,
   wireGamesButton
@@ -37,7 +37,7 @@ describe('playground games header button', () => {
   });
 
   afterEach(() => {
-    cleanupStaleGamesButtons();
+    cleanupStaleGamesUi();
     vi.useRealTimers();
     delete (chrome.runtime as Partial<typeof chrome.runtime>).connect;
   });
@@ -832,9 +832,22 @@ describe('playground games header button', () => {
     expect(document.querySelector('.ytcq-games-card')).toBeNull();
 
     button.click();
-    cleanupStaleGamesButtons();
+    cleanupStaleGamesUi();
     expect(document.querySelector('.ytcq-games-card')).toBeNull();
     expect(document.querySelector('.ytcq-chess-game-panel')).toBeNull();
+  });
+
+  it('removes orphaned game surfaces from a previous content script instance', () => {
+    const staleCard = document.createElement('section');
+    staleCard.className = 'ytcq-games-card';
+    const stalePanel = document.createElement('section');
+    stalePanel.className = 'ytcq-game-panel ytcq-chess-game-panel';
+    document.body.append(staleCard, stalePanel);
+
+    cleanupStaleGamesUi();
+
+    expect(document.querySelector('.ytcq-games-card')).toBeNull();
+    expect(document.querySelector('.ytcq-game-panel')).toBeNull();
   });
 
   it('keeps the active games card positioned and closes it from an outside click listener', async () => {
@@ -900,7 +913,7 @@ describe('playground games header button', () => {
     setOptions({ ...DEFAULT_OPTIONS, playgroundEnabled: true });
 
     scheduleGamesButtonWire();
-    cleanupStaleGamesButtons();
+    cleanupStaleGamesUi();
     await vi.runOnlyPendingTimersAsync();
 
     expect(document.querySelector('.ytcq-games-button')).toBeNull();
