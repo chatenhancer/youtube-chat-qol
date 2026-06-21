@@ -6,7 +6,7 @@ description: "Como o Chat Enhancer for YouTube lida com armazenamento local, tra
 
 # Privacidade
 
-Última atualização: 17 de junho de 2026
+Última atualização: 21 de junho de 2026
 
 Chat Enhancer for YouTube é uma extensão de navegador para o chat ao vivo do YouTube. Ela foi criada para adicionar pequenos recursos de chat sem substituir o chat do YouTube nem coletar análises.
 
@@ -37,8 +37,6 @@ A extensão armazena alguns dados para que seus recursos funcionem entre recarre
 - **Os dados de usuários marcados são armazenados com `chrome.storage.local`:** isso inclui o handle do usuário marcado, ID do canal quando disponível e o horário em que a marcação foi criada. Usuários marcados são globais entre streams no perfil atual do navegador e são usados para mostrar anéis coloridos no avatar.
 
 - **Rascunhos de chat não enviados são armazenados com `chrome.storage.local` por stream:** eles são restaurados após uma atualização da página. Rascunhos são removidos quando a entrada de chat é limpa, a mensagem é enviada ou os dados da extensão são redefinidos.
-
-- **O status da aba de chat ao vivo é armazenado com `chrome.storage.local`:** isso se limita a IDs de abas do navegador e timestamps de última atividade para abas de chat ao vivo do YouTube recentemente ativas, e é usado para mostrar se a extensão está conectada ou desconectada no momento. Esses registros expiram após 12 horas.
 
 - **Os dados de identidade do Playground são armazenados com `chrome.storage.local` se o Playground for usado:** trata-se de um par de chaves pública/privada gerado para assinar desafios de conexão do Playground, para que a mesma instalação do navegador possa manter a mesma identidade pseudônima do Playground. Não é sua identidade do YouTube.
 

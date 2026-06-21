@@ -6,7 +6,7 @@ description: "Chat Enhancer for YouTube 如何处理本地存储、翻译、Play
 
 # 隐私
 
-最后更新：2026 年 6 月 17 日
+最后更新：2026 年 6 月 21 日
 
 Chat Enhancer for YouTube 是一款用于 YouTube 实时聊天的浏览器扩展。它旨在为聊天添加小功能，而不是取代 YouTube 聊天或收集分析数据。
 
@@ -37,8 +37,6 @@ Chat Enhancer for YouTube 是一款用于 YouTube 实时聊天的浏览器扩展
 - **已收藏用户数据通过 `chrome.storage.local` 存储：** 这包括已收藏用户的 handle、可用时的频道 ID，以及收藏创建时间。已收藏用户在当前浏览器配置文件中的各个直播之间全局适用，并用于显示彩色头像环。
 
 - **未发送的聊天草稿按直播通过 `chrome.storage.local` 存储：** 页面刷新后会恢复。草稿会在聊天输入被清空、消息已发送或扩展数据被重置时删除。
-
-- **实时聊天标签页状态通过 `chrome.storage.local` 存储：** 这仅限于最近活跃的 YouTube 实时聊天标签页的浏览器标签页 ID 和最后出现时间戳，并用于显示扩展当前是已连接还是已断开。这些记录会在 12 小时后过期。
 
 - **如果使用 Playground，Playground 身份数据会通过 `chrome.storage.local` 存储：** 这是一对生成的公钥/私钥，用于签署 Playground 连接挑战，使同一浏览器安装可以保留同一个化名 Playground 身份。它不是你的 YouTube 身份。
 

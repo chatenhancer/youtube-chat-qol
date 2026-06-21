@@ -6,7 +6,7 @@ description: "Chat Enhancer for YouTube가 로컬 저장소, 번역, Playground 
 
 # 개인정보 보호
 
-마지막 업데이트: 2026년 6월 17일
+마지막 업데이트: 2026년 6월 21일
 
 Chat Enhancer for YouTube는 YouTube 실시간 채팅용 브라우저 확장 프로그램입니다. YouTube 채팅을 대체하거나 분석 데이터를 수집하지 않고 작은 채팅 기능을 추가하도록 설계되었습니다.
 
@@ -37,8 +37,6 @@ Chat Enhancer for YouTube는 YouTube 실시간 채팅용 브라우저 확장 프
 - **북마크한 사용자 데이터는 `chrome.storage.local`에 저장됩니다:** 여기에는 북마크한 사용자의 핸들, 사용 가능한 경우 채널 ID, 북마크가 생성된 시간이 포함됩니다. 북마크한 사용자는 현재 브라우저 프로필에서 스트림 간 전역으로 적용되며 색상 아바타 링을 표시하는 데 사용됩니다.
 
 - **보내지 않은 채팅 초안은 스트림별로 `chrome.storage.local`에 저장됩니다:** 페이지 새로고침 후 복원됩니다. 초안은 채팅 입력이 지워지거나, 메시지가 전송되거나, 확장 프로그램 데이터가 재설정될 때 제거됩니다.
-
-- **실시간 채팅 탭 상태는 `chrome.storage.local`에 저장됩니다:** 이는 최근 활성 상태였던 YouTube 실시간 채팅 탭의 브라우저 탭 ID와 마지막 확인 타임스탬프로 제한되며, 확장 프로그램이 현재 연결되어 있는지 끊어져 있는지 표시하는 데 사용됩니다. 이 기록은 12시간 후 만료됩니다.
 
 - **Playground를 사용하는 경우 Playground 신원 데이터는 `chrome.storage.local`에 저장됩니다:** 이는 Playground 연결 challenge에 서명하는 데 사용되는 생성된 공개/개인 키 쌍으로, 같은 브라우저 설치가 동일한 익명 Playground 신원을 유지할 수 있게 합니다. 이는 YouTube 신원이 아닙니다.
 

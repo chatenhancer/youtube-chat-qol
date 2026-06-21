@@ -6,7 +6,7 @@ description: "Cara Chat Enhancer for YouTube menangani penyimpanan lokal, terjem
 
 # Privasi
 
-Terakhir diperbarui: 17 Juni 2026
+Terakhir diperbarui: 21 Juni 2026
 
 Chat Enhancer for YouTube adalah ekstensi browser untuk live chat YouTube. Ekstensi ini dirancang untuk menambahkan fitur chat kecil tanpa menggantikan chat YouTube atau mengumpulkan analitik.
 
@@ -37,8 +37,6 @@ Ekstensi menyimpan beberapa data agar fiturnya dapat bekerja di antara reload ha
 - **Data pengguna yang dibookmark disimpan dengan `chrome.storage.local`:** ini mencakup handle pengguna yang dibookmark, ID channel jika tersedia, dan waktu bookmark dibuat. Pengguna yang dibookmark bersifat global di seluruh stream dalam profil browser saat ini dan digunakan untuk menampilkan cincin avatar berwarna.
 
 - **Draft chat yang belum terkirim disimpan dengan `chrome.storage.local` per stream:** draft dipulihkan setelah refresh halaman. Draft dihapus saat input chat dikosongkan, pesan dikirim, atau data ekstensi direset.
-
-- **Status tab live chat disimpan dengan `chrome.storage.local`:** ini terbatas pada ID tab browser dan timestamp terakhir terlihat untuk tab live chat YouTube yang baru-baru ini aktif, dan digunakan untuk menunjukkan apakah ekstensi saat ini terhubung atau terputus. Catatan ini kedaluwarsa setelah 12 jam.
 
 - **Data identitas Playground disimpan dengan `chrome.storage.local` jika Playground digunakan:** ini adalah pasangan kunci publik/privat yang dibuat untuk menandatangani tantangan koneksi Playground, sehingga instalasi browser yang sama dapat mempertahankan identitas Playground pseudonim yang sama. Ini bukan identitas YouTube Anda.
 
