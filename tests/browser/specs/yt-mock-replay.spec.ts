@@ -15,7 +15,10 @@ import {
   replacedTranslationToggleSurfacesScenario
 } from '../scenarios/message-translation';
 import { messageMenuScenario, settingsMenuScenario } from '../scenarios/menus';
-import { playgroundReplayTriviaInviteScenario } from '../scenarios/playground-games';
+import {
+  playgroundReplayTriviaAnswerScenario,
+  playgroundReplayTriviaInviteScenario
+} from '../scenarios/playground-games';
 import { profileCardRecentMessagesScenario } from '../scenarios/profile';
 import { loggedInMockReplayTest as test } from '../support/scenario-fixtures';
 
@@ -29,3 +32,4 @@ test('logged-in mock replay: focus panel opens from an author and follows their 
 test('logged-in mock replay: inbox opens from the chat header', inboxOpensFromHeaderScenario);
 test('logged-in mock replay: profile card opens from a chat avatar', profileCardRecentMessagesScenario);
 test('logged-in mock replay: Playground Games invites a Replay Trivia opponent and opens the panel', playgroundReplayTriviaInviteScenario);
+test('logged-in mock replay: Replay Trivia submits one selected answer', playgroundReplayTriviaAnswerScenario);

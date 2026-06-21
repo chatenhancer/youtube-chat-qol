@@ -20,12 +20,14 @@
 import type { Options } from '../shared/options';
 import { isExtensionManagedElement } from '../shared/managed-dom';
 import { clearToast } from '../shared/toast';
+import type { YouTubeMessageData } from '../youtube/message-data-events';
 
 type LifecycleCallback = () => void;
 type InitCallback = (context: FeatureLifecycleContext) => void;
 type OptionsChangedCallback = (previousOptions: Options, nextOptions: Options) => void;
 type VisibilityChangedCallback = (visibilityState: Document['visibilityState']) => void;
 type MessageCallback = (message: HTMLElement, context: FeatureMessageContext) => void;
+type MessageDataCallback = (message: HTMLElement, context: FeatureMessageDataContext) => void;
 type MutationCallback = (batch: FeatureMutationBatch) => void;
 type ParticipantCallback = (participant: HTMLElement) => void;
 type PhasedCallbacks<T extends (...args: never[]) => void> = Record<FeatureLifecyclePhase, T[]>;
@@ -77,6 +79,16 @@ export interface FeatureMessageContext {
    * features should usually wire/highlight only and avoid duplicate live work.
    */
   allowTranslate: boolean;
+}
+
+export interface FeatureMessageDataContext {
+  /**
+   * Sanitized YouTube-owned renderer data for this message.
+   *
+   * This hook is separate from `message` because it runs only after page-world
+   * metadata has been observed and passed to the isolated extension world.
+   */
+  youtubeData: YouTubeMessageData;
 }
 
 export interface FeatureMutationBatch {
@@ -222,6 +234,15 @@ export interface FeatureLifecycle {
   message?: FeaturePhasedLifecycle<MessageCallback>;
 
   /**
+   * Phased work for sanitized YouTube message data.
+   *
+   * This is an opt-in data-ready surface. It does not run for ordinary DOM-only
+   * message discovery, and `youtubeData` is guaranteed to be present when the
+   * hook runs.
+   */
+  messageData?: FeaturePhasedLifecycle<MessageDataCallback>;
+
+  /**
    * Phased work for normalized MutationObserver batches.
    *
    * Use this for late-loaded text, newly opened YouTube menus, emoji pickers,
@@ -246,6 +267,7 @@ export interface FeatureLifecycle {
 const bootCallbacks: LifecycleCallback[] = [];
 const initCallbacks: InitCallback[] = [];
 const messageCallbacks = createPhasedCallbacks<MessageCallback>();
+const messageDataCallbacks = createPhasedCallbacks<MessageDataCallback>();
 const mutationCallbacks = createPhasedCallbacks<MutationCallback>();
 const staleCleanupCallbacks: LifecycleCallback[] = [clearToast];
 const resetCallbacks: LifecycleCallback[] = [clearToast];
@@ -283,7 +305,7 @@ let featuresSuspended = false;
  * ```
  */
 export function registerFeatureLifecycle(lifecycle: FeatureLifecycle): void {
-  const { page, message, mutation, participant, observerIgnore } = lifecycle;
+  const { page, message, messageData, mutation, participant, observerIgnore } = lifecycle;
   if (page?.boot) bootCallbacks.push(page.boot);
   if (page?.init) initCallbacks.push(page.init);
   if (page?.cleanupStale) staleCleanupCallbacks.push(page.cleanupStale);
@@ -292,6 +314,7 @@ export function registerFeatureLifecycle(lifecycle: FeatureLifecycle): void {
   if (page?.visibleRecovery) visibleRecoveryCallbacks.push(page.visibleRecovery);
   if (page?.visibilityChanged) visibilityChangedCallbacks.push(page.visibilityChanged);
   registerPhasedCallbacks(messageCallbacks, message);
+  registerPhasedCallbacks(messageDataCallbacks, messageData);
   registerPhasedCallbacks(mutationCallbacks, mutation);
   if (participant?.enhance) participantCallbacks.push(participant.enhance);
   if (observerIgnore?.addedNode) observerIgnoreAddedNodeCallbacks.push(observerIgnore.addedNode);
@@ -361,6 +384,17 @@ export function handleFeatureVisibilityChanged(visibilityState: Document['visibi
 export function handleFeatureMessage(message: HTMLElement, context: FeatureMessageContext): void {
   if (featuresSuspended) return;
   runPhasedCallbacks(messageCallbacks, (callback) => callback(message, context));
+}
+
+/**
+ * Dispatch a chat message renderer through data-ready feature hooks.
+ *
+ * @param message A YouTube chat message renderer with matching sanitized data.
+ * @param context Per-message YouTube data read by the page-world adapter.
+ */
+export function handleFeatureMessageData(message: HTMLElement, context: FeatureMessageDataContext): void {
+  if (featuresSuspended) return;
+  runPhasedCallbacks(messageDataCallbacks, (callback) => callback(message, context));
 }
 
 /**

@@ -233,7 +233,8 @@ describe('computer player', () => {
       action: 'observeBountyMessage',
       payload: {
         bountyIds: ['question'],
-        messageId: 'msg-question-1'
+        messageId: 'msg-question-1',
+        messageTimestampUsec: '5500001'
       },
       userId: 'host-user'
     }, 6_000);
@@ -276,7 +277,8 @@ describe('computer player', () => {
       action: 'observeBountyMessage',
       payload: {
         bountyIds: ['question'],
-        messageId: 'msg-question-1'
+        messageId: 'msg-question-1',
+        messageTimestampUsec: '5000001'
       },
       userId: 'host-user'
     }, 6_000);
@@ -365,11 +367,13 @@ describe('computer player', () => {
         observations: [
           {
             bountyIds: ['question'],
-            messageId: 'msg-question-1'
+            messageId: 'msg-question-1',
+            messageTimestampUsec: '5000001'
           },
           {
             bountyIds: ['verified'],
-            messageId: 'msg-verified-1'
+            messageId: 'msg-verified-1',
+            messageTimestampUsec: '5000002'
           }
         ]
       },
@@ -385,11 +389,13 @@ describe('computer player', () => {
         observations: [
           {
             bountyIds: ['question'],
-            messageId: 'msg-question-1'
+            messageId: 'msg-question-1',
+            messageTimestampUsec: '5000001'
           },
           {
             bountyIds: ['verified'],
-            messageId: 'msg-verified-1'
+            messageId: 'msg-verified-1',
+            messageTimestampUsec: '5000002'
           }
         ]
       },
@@ -401,11 +407,13 @@ describe('computer player', () => {
         observations: [
           {
             bountyIds: ['question'],
-            messageId: 'msg-question-1'
+            messageId: 'msg-question-1',
+            messageTimestampUsec: '5000001'
           },
           {
             bountyIds: ['verified'],
-            messageId: 'msg-verified-1'
+            messageId: 'msg-verified-1',
+            messageTimestampUsec: '5000002'
           }
         ]
       },
@@ -419,7 +427,8 @@ describe('computer player', () => {
       action: 'claimBounty',
       payload: {
         bountyId: 'verified',
-        messageId: 'msg-verified-1'
+        messageId: 'msg-verified-1',
+        messageTimestampUsec: '5000002'
       },
       userId: BOUNTY_HUNTING_COMPUTER_PLAYER_PROFILE.userId
     });
@@ -428,6 +437,77 @@ describe('computer player', () => {
       gameType: 'unknown-game',
       status: 'active'
     } as unknown as GameRecord)).toBeNull();
+  });
+
+  it('witnesses and claims Bounty Hunting messages by message id', () => {
+    let bountyGame = submitBountyHunting(
+      createBountyHuntingGame('bounty-1', 'host-user', BOUNTY_HUNTING_COMPUTER_PLAYER_PROFILE.userId, 0),
+      {
+        action: 'submitBounties',
+        payload: { bounties: createBounties() },
+        userId: 'host-user'
+      },
+      1_000
+    );
+    bountyGame = readyBountyHuntingPlayer(bountyGame, BOUNTY_HUNTING_COMPUTER_PLAYER_PROFILE.userId, 2_000);
+    bountyGame = readyBountyHuntingPlayer(bountyGame, 'host-user', 2_000);
+    bountyGame = startBountyHuntingRound(bountyGame, {
+      action: 'startRound',
+      userId: 'host-user'
+    }, 5_000);
+    bountyGame = observeBountyHuntingMessage(bountyGame, {
+      action: 'observeBountyMessage',
+      payload: {
+        observations: [{
+          bountyIds: ['question'],
+          messageId: 'msg-question-1',
+          messageTimestampUsec: '5000001'
+        }]
+      },
+      userId: 'host-user'
+    }, 6_000);
+
+    expect(createComputerPlayerAction(bountyGame, {
+      now: 7_000,
+      random: () => 0.1,
+      userId: BOUNTY_HUNTING_COMPUTER_PLAYER_PROFILE.userId
+    })).toEqual({
+      action: 'observeBountyMessage',
+      payload: {
+        observations: [{
+          bountyIds: ['question'],
+          messageId: 'msg-question-1',
+          messageTimestampUsec: '5000001'
+        }]
+      },
+      userId: BOUNTY_HUNTING_COMPUTER_PLAYER_PROFILE.userId
+    });
+
+    bountyGame = observeBountyHuntingMessage(bountyGame, {
+      action: 'observeBountyMessage',
+      payload: {
+        observations: [{
+          bountyIds: ['question'],
+          messageId: 'msg-question-1',
+          messageTimestampUsec: '5000001'
+        }]
+      },
+      userId: BOUNTY_HUNTING_COMPUTER_PLAYER_PROFILE.userId
+    }, 7_100);
+
+    expect(createComputerPlayerAction(bountyGame, {
+      now: 7_200,
+      random: () => 0.1,
+      userId: BOUNTY_HUNTING_COMPUTER_PLAYER_PROFILE.userId
+    })).toEqual({
+      action: 'claimBounty',
+      payload: {
+        bountyId: 'question',
+        messageId: 'msg-question-1',
+        messageTimestampUsec: '5000001'
+      },
+      userId: BOUNTY_HUNTING_COMPUTER_PLAYER_PROFILE.userId
+    });
   });
 
   it('sometimes chooses a lower-value witnessed Bounty Hunting claim', () => {
@@ -449,11 +529,13 @@ describe('computer player', () => {
         observations: [
           {
             bountyIds: ['question'],
-            messageId: 'msg-question-1'
+            messageId: 'msg-question-1',
+            messageTimestampUsec: '5000001'
           },
           {
             bountyIds: ['verified'],
-            messageId: 'msg-verified-1'
+            messageId: 'msg-verified-1',
+            messageTimestampUsec: '5000002'
           }
         ]
       },
@@ -465,11 +547,13 @@ describe('computer player', () => {
         observations: [
           {
             bountyIds: ['question'],
-            messageId: 'msg-question-1'
+            messageId: 'msg-question-1',
+            messageTimestampUsec: '5000001'
           },
           {
             bountyIds: ['verified'],
-            messageId: 'msg-verified-1'
+            messageId: 'msg-verified-1',
+            messageTimestampUsec: '5000002'
           }
         ]
       },
@@ -486,7 +570,8 @@ describe('computer player', () => {
       action: 'claimBounty',
       payload: {
         bountyId: 'question',
-        messageId: 'msg-question-1'
+        messageId: 'msg-question-1',
+        messageTimestampUsec: '5000001'
       },
       userId: BOUNTY_HUNTING_COMPUTER_PLAYER_PROFILE.userId
     });
@@ -507,7 +592,8 @@ describe('computer player', () => {
     game = startBountyHuntingRound(game, 5_000);
     const oldObservations = Array.from({ length: 21 }, (_, index) => ({
       bountyIds: ['question'],
-      messageId: `msg-old-${String(index + 1).padStart(2, '0')}`
+      messageId: `msg-old-${String(index + 1).padStart(2, '0')}`,
+      messageTimestampUsec: String(5_000_001 + index)
     }));
     game = observeBountyHuntingMessage(game, {
       action: 'observeBountyMessage',
@@ -519,7 +605,8 @@ describe('computer player', () => {
       payload: {
         observations: [{
           bountyIds: ['question'],
-          messageId: 'msg-new-01'
+          messageId: 'msg-new-01',
+          messageTimestampUsec: '8000001'
         }]
       },
       userId: 'host-user'
@@ -531,13 +618,18 @@ describe('computer player', () => {
       () => 0.1,
       8_200
     );
-    const observations = action?.payload?.observations as Array<{ bountyIds: string[]; messageId: string }> | undefined;
+    const observations = action?.payload?.observations as Array<{
+      bountyIds: string[];
+      messageId: string;
+      messageTimestampUsec?: string;
+    }> | undefined;
 
     expect(action?.action).toBe('observeBountyMessage');
     expect(observations).toHaveLength(20);
     expect(observations?.[0]).toEqual({
       bountyIds: ['question'],
-      messageId: 'msg-new-01'
+      messageId: 'msg-new-01',
+      messageTimestampUsec: '8000001'
     });
     expect(observations?.map((observation) => observation.messageId)).not.toContain('msg-old-21');
   });
@@ -560,7 +652,8 @@ describe('computer player', () => {
       payload: {
         observations: [{
           bountyIds: ['verified'],
-          messageId: 'msg-verified-old'
+          messageId: 'msg-verified-old',
+          messageTimestampUsec: '6000001'
         }]
       },
       userId: 'host-user'
@@ -570,7 +663,8 @@ describe('computer player', () => {
       payload: {
         observations: [{
           bountyIds: ['question'],
-          messageId: 'msg-question-new'
+          messageId: 'msg-question-new',
+          messageTimestampUsec: '8000001'
         }]
       },
       userId: 'host-user'
@@ -581,11 +675,13 @@ describe('computer player', () => {
         observations: [
           {
             bountyIds: ['verified'],
-            messageId: 'msg-verified-old'
+            messageId: 'msg-verified-old',
+            messageTimestampUsec: '6000001'
           },
           {
             bountyIds: ['question'],
-            messageId: 'msg-question-new'
+            messageId: 'msg-question-new',
+            messageTimestampUsec: '8000001'
           }
         ]
       },
@@ -601,7 +697,8 @@ describe('computer player', () => {
       action: 'claimBounty',
       payload: {
         bountyId: 'question',
-        messageId: 'msg-question-new'
+        messageId: 'msg-question-new',
+        messageTimestampUsec: '8000001'
       },
       userId: BOUNTY_HUNTING_COMPUTER_PLAYER_PROFILE.userId
     });
@@ -621,12 +718,12 @@ describe('computer player', () => {
     game = readyBountyHuntingPlayer(game, 'host-user', 2_000);
     game = startBountyHuntingRound(game, 5_000);
     const observations = [
-      { bountyIds: ['top-fan'], messageId: 'msg-old-top-fan' },
-      { bountyIds: ['mention'], messageId: 'msg-recent-mention' },
-      { bountyIds: ['emoji'], messageId: 'msg-recent-emoji' },
-      { bountyIds: ['all-caps'], messageId: 'msg-recent-all-caps' },
-      { bountyIds: ['verified'], messageId: 'msg-recent-verified' },
-      { bountyIds: ['question'], messageId: 'msg-recent-question' }
+      { bountyIds: ['top-fan'], messageId: 'msg-old-top-fan', messageTimestampUsec: '6000001' },
+      { bountyIds: ['mention'], messageId: 'msg-recent-mention', messageTimestampUsec: '7000001' },
+      { bountyIds: ['emoji'], messageId: 'msg-recent-emoji', messageTimestampUsec: '8000001' },
+      { bountyIds: ['all-caps'], messageId: 'msg-recent-all-caps', messageTimestampUsec: '9000001' },
+      { bountyIds: ['verified'], messageId: 'msg-recent-verified', messageTimestampUsec: '10000001' },
+      { bountyIds: ['question'], messageId: 'msg-recent-question', messageTimestampUsec: '11000001' }
     ];
     observations.forEach((observation, index) => {
       game = observeBountyHuntingMessage(game, {
@@ -651,7 +748,8 @@ describe('computer player', () => {
       action: 'claimBounty',
       payload: {
         bountyId: 'mention',
-        messageId: 'msg-recent-mention'
+        messageId: 'msg-recent-mention',
+        messageTimestampUsec: '7000001'
       },
       userId: BOUNTY_HUNTING_COMPUTER_PLAYER_PROFILE.userId
     });

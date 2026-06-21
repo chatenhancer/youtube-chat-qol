@@ -40,7 +40,11 @@ interface MessageSource {
   channelId: string;
   messageId: string;
   messageText: string;
+  targetId: string;
 }
+
+const PROFILE_TARGET_ATTRIBUTE = 'data-ytcq-browser-profile-target';
+let nextProfileTargetId = 0;
 
 async function findRecentMessageSource(chat: ChatSurface): Promise<MessageSource> {
   return test.step('Find a recent message with readable author and text', async () => {
@@ -69,17 +73,35 @@ async function findRecentMessageSource(chat: ChatSurface): Promise<MessageSource
         }
       }).catch(() => '');
       const messageId = await message.getAttribute('id').catch(() => '') || '';
+      const targetId = await freezeProfileMessageTarget(message).catch(() => '');
+      if (!targetId) continue;
 
       return {
         authorName,
         channelId,
         messageId,
-        messageText
+        messageText,
+        targetId
       };
     }
 
     throw new Error('Could not find a recent message with readable author and text.');
   });
+}
+
+async function freezeProfileMessageTarget(message: Locator): Promise<string> {
+  const targetId = `profile-card-${Date.now()}-${nextProfileTargetId++}`;
+  const didFreeze = await message.evaluate((element, { attribute, value }) => {
+    if (!(element instanceof HTMLElement) || !element.isConnected) return false;
+    element.setAttribute(attribute, value);
+    return true;
+  }, {
+    attribute: PROFILE_TARGET_ATTRIBUTE,
+    value: targetId
+  });
+
+  if (!didFreeze) throw new Error('Could not stabilize the live chat profile target before clicking it.');
+  return targetId;
 }
 
 async function openProfileCardFromAvatar(chat: ChatSurface, source: MessageSource): Promise<void> {
@@ -209,6 +231,10 @@ async function closeProfileCard(chat: ChatSurface): Promise<void> {
 }
 
 function getSourceMessage(chat: ChatSurface, source: MessageSource): ReturnType<ChatSurface['locator']> {
+  if (source.targetId) {
+    return chat.locator(`[${PROFILE_TARGET_ATTRIBUTE}="${escapeCssString(source.targetId)}"]`).first();
+  }
+
   if (source.messageId) {
     return chat.locator(`${NORMAL_CHAT_MESSAGE_SELECTOR}[id="${escapeCssString(source.messageId)}"]`).first();
   }

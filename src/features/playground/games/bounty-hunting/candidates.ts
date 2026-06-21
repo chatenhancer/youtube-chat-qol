@@ -8,12 +8,7 @@ import {
   type BountyHuntingBountyMatcher
 } from '../../../../shared/playground/bounty-hunting';
 import { cleanText } from '../../../../shared/text';
-import {
-  getAuthorName,
-  getMessageStableId,
-  getMessageText
-} from '../../../../youtube/messages';
-import { getParticipantAuthorName } from '../../../../youtube/participants';
+import { getMessageStableId, getMessageText } from '../../../../youtube/messages';
 import type { BountyHuntingObservedMessage } from './types';
 
 interface BountyCandidate extends BountyHuntingBounty {
@@ -37,11 +32,7 @@ interface MessageStats {
   verifiedAuthors: number;
 }
 
-interface BountyHuntingObservedMessageOptions {
-  topFanAuthorKeys?: ReadonlySet<string>;
-}
-
-const TOP_FAN_LABEL_PATTERN = /\btop\s+(?:fans?|chatters?)\b/i;
+const TOP_FAN_RANK_PATTERN = /^#\s*[1-3]$/;
 const BOUNTY_HUNTING_ENGLISH_DESCRIPTIONS: Record<BountyHuntingBountyDescriptionKey, string> = {
   gamesBountyHuntingBountyAllCaps: 'a message in all caps',
   gamesBountyHuntingBountyChannelMember: 'a message from a channel member',
@@ -54,7 +45,7 @@ const BOUNTY_HUNTING_ENGLISH_DESCRIPTIONS: Record<BountyHuntingBountyDescription
   gamesBountyHuntingBountyOnlyEmojis: 'a message with only emojis',
   gamesBountyHuntingBountyQuestion: 'a message that asks a question',
   gamesBountyHuntingBountySuperChat: 'a Super Chat',
-  gamesBountyHuntingBountyTopChatters: 'a message by the top 3 chatters',
+  gamesBountyHuntingBountyTopChatters: 'a message from a top fan',
   gamesBountyHuntingBountyVerifiedAuthor: 'a message by a verified account'
 };
 
@@ -138,15 +129,11 @@ function createBountyHuntingCandidatePool(messages: readonly BountyHuntingObserv
   ];
 }
 
-export function getBountyHuntingObservedMessage(
-  message: HTMLElement,
-  options: BountyHuntingObservedMessageOptions = {}
-): BountyHuntingObservedMessage | null {
+export function getBountyHuntingObservedMessage(message: HTMLElement): BountyHuntingObservedMessage | null {
   const text = getMessageText(message);
   const isSuperChat = isBountyHuntingSuperChatMessage(message);
   if (!text && !isSuperChat) return null;
   const emojiCount = countBountyHuntingMessageEmojis(message);
-  const authorKey = getBountyHuntingAuthorKey(getAuthorName(message));
   return {
     emojiCount,
     hasAllCaps: isBountyHuntingAllCapsMessage(text),
@@ -159,24 +146,10 @@ export function getBountyHuntingObservedMessage(
     isChannelOwnerAuthor: hasBountyHuntingAuthorBadge(message, 'owner'),
     isModeratorAuthor: hasBountyHuntingAuthorBadge(message, 'moderator'),
     isSuperChat,
-    isTopFanAuthor: Boolean(authorKey && options.topFanAuthorKeys?.has(authorKey)),
+    isTopFanAuthor: hasBountyHuntingTopFanRankBadge(message),
     isVerifiedAuthor: isBountyHuntingVerifiedAuthor(message),
     messageId: getBountyHuntingMessageId(message)
   };
-}
-
-export function collectBountyHuntingTopFanAuthorKeys(root: ParentNode = document): Set<string> {
-  const authorKeys = new Set<string>();
-  root.querySelectorAll<HTMLElement>('yt-live-chat-participant-renderer').forEach((participant) => {
-    const key = getBountyHuntingTopFanAuthorKeyFromParticipant(participant);
-    if (key) authorKeys.add(key);
-  });
-  return authorKeys;
-}
-
-export function getBountyHuntingTopFanAuthorKeyFromParticipant(participant: HTMLElement): string {
-  if (!isBountyHuntingTopFanParticipant(participant)) return '';
-  return getBountyHuntingAuthorKey(getParticipantAuthorName(participant));
 }
 
 export function findBountyHuntingMatchingBounty(
@@ -273,52 +246,18 @@ function getBountyHuntingFallbackBounties(): BountyCandidate[] {
   ];
 }
 
-function getBountyHuntingAuthorKey(value: unknown): string {
-  return cleanText(value)
-    .replace(/^@+/, '')
-    .toLocaleLowerCase();
-}
-
-function isBountyHuntingTopFanParticipant(participant: HTMLElement): boolean {
-  if (hasBountyHuntingTopFanLabel(participant)) return true;
-  return hasBountyHuntingTopFanSectionSignal(participant);
-}
-
-function hasBountyHuntingTopFanLabel(element: Element): boolean {
-  const text = [
-    element.getAttribute('aria-label'),
-    element.getAttribute('title'),
-    ...Array.from(element.querySelectorAll('[aria-label], [title]')).flatMap((child) => [
-      child.getAttribute('aria-label'),
-      child.getAttribute('title')
+function hasBountyHuntingTopFanRankBadge(message: HTMLElement): boolean {
+  const buttonHost = message.querySelector<HTMLElement>('#before-content-buttons');
+  if (!buttonHost) return false;
+  const rankText = [
+    ...Array.from(buttonHost.querySelectorAll<HTMLElement>('.ytSpecButtonShapeNextButtonTextContent'))
+      .map((element) => element.textContent),
+    ...Array.from(buttonHost.querySelectorAll<HTMLElement>('button[aria-label], [title]')).flatMap((element) => [
+      element.getAttribute('aria-label'),
+      element.getAttribute('title')
     ])
-  ].join(' ');
-  return TOP_FAN_LABEL_PATTERN.test(text);
-}
-
-function hasBountyHuntingTopFanSectionSignal(participant: HTMLElement): boolean {
-  let current: Element | null = participant;
-  for (let depth = 0; current?.parentElement && depth < 4; depth += 1) {
-    const signal = getBountyHuntingPreviousSectionLabel(current);
-    if (signal && TOP_FAN_LABEL_PATTERN.test(signal)) return true;
-    current = current.parentElement;
-  }
-  return false;
-}
-
-function getBountyHuntingPreviousSectionLabel(element: Element): string {
-  let sibling = element.previousElementSibling;
-  while (sibling) {
-    if (sibling.matches('yt-live-chat-participant-renderer')) return '';
-    const text = cleanText([
-      sibling.getAttribute('aria-label'),
-      sibling.getAttribute('title'),
-      sibling.textContent
-    ].join(' '));
-    if (text) return text;
-    sibling = sibling.previousElementSibling;
-  }
-  return '';
+  ];
+  return rankText.some((value) => TOP_FAN_RANK_PATTERN.test(cleanText(value)));
 }
 
 function countBountyHuntingMessageEmojis(message: HTMLElement): number {

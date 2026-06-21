@@ -21,7 +21,8 @@ import {
   BOUNTY_HUNTING_BOUNTY_DESCRIPTION_KEYS,
   BOUNTY_HUNTING_COUNTDOWN_MS,
   BOUNTY_HUNTING_ROUND_MS,
-  BOUNTY_HUNTING_ROUND_OVER_MS
+  BOUNTY_HUNTING_ROUND_OVER_MS,
+  getBountyHuntingRoundStartTimestampUsec
 } from '../../../../../src/shared/playground/bounty-hunting';
 import type { GameActionInput, GameModule, GameRecord } from '../types';
 
@@ -43,6 +44,7 @@ export interface PublicBountyHuntingGame extends PublicGame {
   players: Record<PlayerRole, PublicUserIdentity>;
   readyPlayers: Partial<Record<PlayerRole, boolean>>;
   roundEndsAt?: number;
+  roundStartTimestampUsec?: string;
   scores: Record<PlayerRole, number>;
   status: BountyHuntingGameStatus;
   winnerUserId?: string | null;
@@ -59,6 +61,7 @@ interface BountyHuntingGameRecord extends GameRecord {
   pendingClaims: BountyHuntingPendingClaim[];
   players: Record<PlayerRole, string>;
   readyPlayers: Partial<Record<PlayerRole, boolean>>;
+  roundStartTimestampUsec?: string;
   scores: Record<PlayerRole, number>;
   status: BountyHuntingGameStatus;
 }
@@ -66,6 +69,7 @@ interface BountyHuntingGameRecord extends GameRecord {
 interface BountyHuntingClaimWitness {
   bountyId: string;
   messageId: string;
+  messageTimestampUsec?: string;
   observedAt: number;
   role: PlayerRole;
   userId: string;
@@ -82,6 +86,7 @@ interface BountyHuntingPendingClaim {
 interface BountyHuntingWitnessObservation {
   bountyIds: string[];
   messageId: string;
+  messageTimestampUsec?: string;
 }
 
 export const bountyHuntingGameModule: GameModule = {
@@ -146,6 +151,7 @@ export function createBountyHuntingGame(
       host: hostUserId
     },
     readyPlayers: {},
+    roundStartTimestampUsec: undefined,
     scores: {
       guest: 0,
       host: 0
@@ -170,6 +176,7 @@ export function submitBountyHunting(
     phaseStartedAt: now,
     pendingClaims: [],
     readyPlayers: {},
+    roundStartTimestampUsec: undefined,
     scores: {
       guest: 0,
       host: 0
@@ -216,10 +223,12 @@ export function startBountyHuntingRound(
   if (now - game.phaseStartedAt < BOUNTY_HUNTING_COUNTDOWN_MS) {
     throw new ProtocolError('countdown_active', 'This bounty round countdown is still active.');
   }
+  const roundStartTimestampUsec = getBountyHuntingRoundStartTimestampUsec(game.phaseStartedAt);
 
   return {
     ...game,
     phaseStartedAt: now,
+    roundStartTimestampUsec,
     status: 'active'
   };
 }
@@ -242,8 +251,12 @@ export function claimBountyHuntingBounty(
   }
 
   const messageId = getPayloadText(payload.messageId, 'messageId', MAX_MESSAGE_ID_LENGTH);
+  const messageTimestampUsec = parseOptionalTimestampUsec(payload.messageTimestampUsec, 'messageTimestampUsec');
   if (game.claimedMessageIds.includes(messageId)) {
     throw new ProtocolError('message_claimed', 'This chat message already claimed a bounty.');
+  }
+  if (isBountyHuntingPreStartMessage(game, messageId, messageTimestampUsec)) {
+    throw new ProtocolError('message_before_round_start', 'This chat message was sent before the bounty hunt started.');
   }
 
   const pendingClaim: BountyHuntingPendingClaim = {
@@ -274,9 +287,13 @@ export function observeBountyHuntingMessage(
       bountyIds: observation.bountyIds
         .filter((bountyId) => game.bounties.some((bounty) => bounty.id === bountyId))
         .filter((bountyId) => !game.claims.some((claim) => claim.bountyId === bountyId)),
-      messageId: observation.messageId
+      messageId: observation.messageId,
+      messageTimestampUsec: observation.messageTimestampUsec
     }))
-    .filter((observation) => observation.bountyIds.length > 0);
+    .filter((observation) => observation.bountyIds.length > 0)
+    .filter((observation) =>
+      !isBountyHuntingPreStartMessage(game, observation.messageId, observation.messageTimestampUsec)
+    );
 
   if (!observations.length) return resolveBountyHuntingPendingClaims(game, now);
 
@@ -285,6 +302,7 @@ export function observeBountyHuntingMessage(
     .flatMap((observation) => observation.bountyIds.map((bountyId): BountyHuntingClaimWitness => ({
       bountyId,
       messageId: observation.messageId,
+      messageTimestampUsec: observation.messageTimestampUsec || undefined,
       observedAt: now,
       role,
       userId: input.userId
@@ -454,6 +472,7 @@ export function toPublicBountyHuntingGame(
     },
     readyPlayers: { ...game.readyPlayers },
     roundEndsAt: game.status === 'active' ? game.phaseStartedAt + BOUNTY_HUNTING_ROUND_MS : undefined,
+    roundStartTimestampUsec: game.roundStartTimestampUsec,
     scores: { ...game.scores },
     status: game.status,
     winnerUserId: game.status === 'finished' ? getBountyHuntingWinnerUserId(game) : undefined
@@ -590,15 +609,46 @@ function parseBountyHuntingWitnessObservations(payload: Record<string, unknown>)
             80,
             MAX_BOUNTY_WITNESS_IDS
           ),
-          messageId: getPayloadText(observation.messageId, `witness observation ${index + 1} messageId`, MAX_MESSAGE_ID_LENGTH)
+          messageId: getPayloadText(observation.messageId, `witness observation ${index + 1} messageId`, MAX_MESSAGE_ID_LENGTH),
+          messageTimestampUsec: parseOptionalTimestampUsec(
+            observation.messageTimestampUsec,
+            `witness observation ${index + 1} messageTimestampUsec`
+          )
         };
       });
   }
 
   return [{
     bountyIds: getPayloadTextArray(payload.bountyIds, 'bountyIds', 80, MAX_BOUNTY_WITNESS_IDS),
-    messageId: getPayloadText(payload.messageId, 'messageId', MAX_MESSAGE_ID_LENGTH)
+    messageId: getPayloadText(payload.messageId, 'messageId', MAX_MESSAGE_ID_LENGTH),
+    messageTimestampUsec: parseOptionalTimestampUsec(payload.messageTimestampUsec, 'messageTimestampUsec')
   }];
+}
+
+function parseOptionalTimestampUsec(value: unknown, field: string): string {
+  if (value === undefined || value === null || value === '') return '';
+  const text = typeof value === 'string' ? value.trim() : '';
+  if (!/^\d{1,24}$/.test(text)) {
+    throw new ProtocolError('invalid_bounty', `${field} must be an epoch microsecond string.`);
+  }
+  return text;
+}
+
+function isBountyHuntingPreStartMessage(
+  game: BountyHuntingGameRecord,
+  _messageId: string,
+  messageTimestampUsec = ''
+): boolean {
+  if (!game.roundStartTimestampUsec) return false;
+  if (!messageTimestampUsec) return true;
+  return compareTimestampUsec(messageTimestampUsec, game.roundStartTimestampUsec) <= 0;
+}
+
+function compareTimestampUsec(left: string, right: string): number {
+  const leftValue = BigInt(left);
+  const rightValue = BigInt(right);
+  if (leftValue === rightValue) return 0;
+  return leftValue > rightValue ? 1 : -1;
 }
 
 function getRecord(value: unknown, field: string): Record<string, unknown> {

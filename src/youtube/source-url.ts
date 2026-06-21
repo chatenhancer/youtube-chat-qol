@@ -11,6 +11,9 @@ export function getCurrentYouTubeChatSourceUrl(): string {
   return getCanonicalWatchSourceUrl(window.location.href) ||
     getCanonicalWatchSourceUrl(getAccessibleWindowHref(window.top)) ||
     getCanonicalWatchSourceUrl(getAccessibleWindowHref(window.parent)) ||
+    getAccessibleDocumentSourceUrl(window.top) ||
+    getAccessibleDocumentSourceUrl(window.parent) ||
+    getDocumentSourceUrl(document) ||
     getCanonicalWatchSourceUrl(document.referrer) ||
     getLiveChatSourceUrl(window.location.href) ||
     getStablePageUrl(window.location.href);
@@ -67,6 +70,16 @@ function getAccessibleDocumentTitle(context: Window | null): string {
   }
 }
 
+function getAccessibleDocumentSourceUrl(context: Window | null): string {
+  if (!context) return '';
+
+  try {
+    return context.document === document ? '' : getDocumentSourceUrl(context.document);
+  } catch {
+    return '';
+  }
+}
+
 function getAccessibleWindowHref(context: Window | null): string {
   if (!context || context === window) return '';
 
@@ -77,10 +90,20 @@ function getAccessibleWindowHref(context: Window | null): string {
   }
 }
 
+function getDocumentSourceUrl(sourceDocument: Document): string {
+  return getCanonicalWatchSourceUrl(getLinkHref(sourceDocument, 'link[rel="canonical"]')) ||
+    getCanonicalWatchSourceUrl(getMetaContent(sourceDocument, 'meta[property="og:url"]')) ||
+    getCanonicalWatchSourceUrl(getMetaContent(sourceDocument, 'meta[name="twitter:url"]'));
+}
+
 function getDocumentTitle(sourceDocument: Document): string {
   return cleanYouTubeTitle(sourceDocument.title) ||
     cleanYouTubeTitle(getMetaContent(sourceDocument, 'meta[property="og:title"]')) ||
     cleanYouTubeTitle(getMetaContent(sourceDocument, 'meta[name="title"]'));
+}
+
+function getLinkHref(sourceDocument: Document, selector: string): string {
+  return cleanText(sourceDocument.querySelector<HTMLLinkElement>(selector)?.href);
 }
 
 function getMetaContent(sourceDocument: Document, selector: string): string {

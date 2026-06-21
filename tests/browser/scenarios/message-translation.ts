@@ -506,6 +506,7 @@ async function expectToggleableReplacement({
   await expect(text).toHaveAttribute('lang', targetLanguage);
   await expect(text).toHaveAttribute('title', translatedTitle);
 
+  await centerLocatorInViewport(host);
   await text.locator('.ytcq-replaced-translation-icon').click();
 
   await expect(host).toHaveAttribute('data-ytcq-translation-view', 'original');
@@ -516,6 +517,7 @@ async function expectToggleableReplacement({
     timeout: 2_000
   }).toBe('none');
 
+  await centerLocatorInViewport(host);
   await text.locator('.ytcq-replaced-translation-icon').click();
 
   await expect(host).toHaveAttribute('data-ytcq-translation-view', 'translated');
@@ -547,6 +549,7 @@ async function expectToggleableRealReplacement({
   await expect(text).toHaveAttribute('title', translatedTitle);
   await expectVisibleTextToDifferFrom(text, sourceVisibleText);
 
+  await centerLocatorInViewport(host);
   await text.locator('.ytcq-replaced-translation-icon').click();
 
   await expect(host).toHaveAttribute('data-ytcq-translation-view', 'original');
@@ -557,6 +560,7 @@ async function expectToggleableRealReplacement({
     timeout: 2_000
   }).toBe('none');
 
+  await centerLocatorInViewport(host);
   await text.locator('.ytcq-replaced-translation-icon').click();
 
   await expect(host).toHaveAttribute('data-ytcq-translation-view', 'translated');
