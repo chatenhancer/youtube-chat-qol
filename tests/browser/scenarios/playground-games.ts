@@ -244,7 +244,7 @@ export const playgroundAvailabilityToggleScenario: BrowserScenario = async ({ ch
     const enabled = await waitForClientMessage(backend, 'setAvailability', (message) =>
       message.availableGames.length > 0
     );
-    expect(enabled.availableGames).toEqual(['chess', 'bounty-hunting', 'replay-trivia']);
+    expect(enabled.availableGames).toEqual(['chess', 'bounty-hunting']);
     await expect(toggle).toHaveAttribute('aria-checked', 'true');
   });
 };

@@ -1317,6 +1317,10 @@ yt-live-chat-header-renderer .ytcq-inbox-badge[hidden] {
   grid-template-columns: 36px minmax(0, 1fr) 28px;
 }
 
+.ytcq-games-card {
+  z-index: 2147483646;
+}
+
 .ytcq-games-card-icon {
   display: inline-flex;
   align-items: center;
