@@ -67,7 +67,7 @@ describe('YouTube message data receiver', () => {
     expect(requests[0].target).toBe(message);
   });
 
-  it('ignores malformed event details and resolves missing data requests to null', async () => {
+  it('ignores malformed event details and keeps the request pending until valid data arrives', async () => {
     vi.resetModules();
     vi.useFakeTimers();
     document.body.replaceChildren();
@@ -76,7 +76,11 @@ describe('YouTube message data receiver', () => {
     message.id = 'msg-1';
     document.body.append(message);
 
+    let resolved = false;
     const messageData = requestYouTubeMessageData(message);
+    messageData.then(() => {
+      resolved = true;
+    });
     message.dispatchEvent(new CustomEvent(YOUTUBE_MESSAGE_DATA_EVENT, {
       bubbles: true,
       composed: true,
@@ -90,8 +94,23 @@ describe('YouTube message data receiver', () => {
         timestampUsec: 'not-a-timestamp'
       })
     }));
-    await vi.advanceTimersByTimeAsync(700);
+    await vi.advanceTimersByTimeAsync(10_000);
+    await Promise.resolve();
 
-    await expect(messageData).resolves.toBeNull();
+    expect(resolved).toBe(false);
+
+    message.dispatchEvent(new CustomEvent(YOUTUBE_MESSAGE_DATA_EVENT, {
+      bubbles: true,
+      composed: true,
+      detail: JSON.stringify({
+        messageId: 'msg-1',
+        timestampUsec: '1782000000000000'
+      })
+    }));
+
+    await expect(messageData).resolves.toEqual({
+      messageId: 'msg-1',
+      timestampUsec: '1782000000000000'
+    });
   });
 });

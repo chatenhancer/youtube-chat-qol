@@ -53,12 +53,17 @@ import {
   settingsMenuBehaviorScenario
 } from '../scenarios/settings';
 import {
+  playgroundActiveGameControlsScenario,
+  playgroundAvailabilityToggleScenario,
   playgroundBountyHuntingCountdownStartScenario,
   playgroundBountyHuntingCutoffScenario,
   playgroundBountyHuntingRoundStartScenario,
   playgroundBountyHuntingWitnessScenario,
   playgroundChessInviteAndMoveScenario,
-  playgroundChessTurnGatingScenario
+  playgroundChessTurnGatingScenario,
+  playgroundIncomingInviteAcceptScenario,
+  playgroundIncomingInviteIgnoreScenario,
+  playgroundInviteCancelScenario
 } from '../scenarios/playground-games';
 import { tabAlertScenario } from '../scenarios/tab-alert';
 import { loggedInMockTest as test } from '../support/scenario-fixtures';
@@ -95,6 +100,11 @@ test('logged-in mock: author click writes a mention draft only', authorMentionDr
 test('logged-in mock: author Alt-click writes a quote draft only', authorQuoteDraftScenario);
 test('logged-in mock: Playground Games invites a chess opponent and sends a move', playgroundChessInviteAndMoveScenario);
 test('logged-in mock: Chess blocks moves off-turn and accepts them on-turn', playgroundChessTurnGatingScenario);
+test('logged-in mock: Playground Games accepts an incoming invite and opens the started game', playgroundIncomingInviteAcceptScenario);
+test('logged-in mock: Playground Games ignores an incoming invite and removes it from the lobby', playgroundIncomingInviteIgnoreScenario);
+test('logged-in mock: Playground Games resumes, hides, and leaves an active game', playgroundActiveGameControlsScenario);
+test('logged-in mock: Playground Games toggles lobby availability', playgroundAvailabilityToggleScenario);
+test('logged-in mock: Playground Games cancels a pending outgoing invite locally', playgroundInviteCancelScenario);
 test('logged-in mock: Bounty Hunting round start divider attaches to the boundary message', playgroundBountyHuntingRoundStartScenario);
 test('logged-in mock: Bounty Hunting rejects pre-start messages and claims post-start messages', playgroundBountyHuntingCutoffScenario);
 test('logged-in mock: Bounty Hunting reports post-start witness messages', playgroundBountyHuntingWitnessScenario);

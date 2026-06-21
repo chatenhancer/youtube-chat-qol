@@ -24,12 +24,12 @@ export function applyChatKeywordHighlights(
   const authorName = getAuthorNameElement(message);
   if (!messageText && !authorName) return;
 
+  const hasCurrentHighlights = Boolean(
+    message.querySelector(`:scope #message .${CHAT_KEYWORD_HIGHLIGHT_CLASS}, :scope #author-name .${CHAT_KEYWORD_HIGHLIGHT_CLASS}`)
+  );
   if (
     message.dataset.ytcqInboxKeywordHighlightKey === nextHighlightKey &&
-    (
-      matchedKeywords.length ||
-      !message.querySelector(`:scope #message .${CHAT_KEYWORD_HIGHLIGHT_CLASS}, :scope #author-name .${CHAT_KEYWORD_HIGHLIGHT_CLASS}`)
-    )
+    (matchedKeywords.length ? hasCurrentHighlights : !hasCurrentHighlights)
   ) {
     return;
   }

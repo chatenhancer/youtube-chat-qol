@@ -10,12 +10,10 @@ import { getMessageStableId } from './messages';
 import { CHAT_MESSAGE_SELECTOR } from './selectors';
 
 const DATA_CACHE_LIMIT = 800;
-const MESSAGE_DATA_REQUEST_TIMEOUT_MS = 700;
 
 interface PendingMessageDataRequest {
   promise: Promise<YouTubeMessageData | null>;
   resolve: (data: YouTubeMessageData | null) => void;
-  timer: number;
 }
 
 const messageDataById = new Map<string, YouTubeMessageData>();
@@ -136,13 +134,8 @@ function createPendingMessageDataRequest(messageId: string): PendingMessageDataR
   });
   const request: PendingMessageDataRequest = {
     promise,
-    resolve: resolveRequest,
-    timer: 0
+    resolve: resolveRequest
   };
-  request.timer = window.setTimeout(() => {
-    pendingMessageDataById.delete(messageId);
-    request.resolve(null);
-  }, MESSAGE_DATA_REQUEST_TIMEOUT_MS);
   pendingMessageDataById.set(messageId, request);
   return request;
 }
@@ -150,7 +143,6 @@ function createPendingMessageDataRequest(messageId: string): PendingMessageDataR
 function resolvePendingMessageDataRequest(data: YouTubeMessageData): void {
   const request = pendingMessageDataById.get(data.messageId);
   if (!request) return;
-  window.clearTimeout(request.timer);
   pendingMessageDataById.delete(data.messageId);
   request.resolve(data);
 }

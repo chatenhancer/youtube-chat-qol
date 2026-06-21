@@ -266,7 +266,7 @@ describe('inbox coordinator', () => {
     expect(stateMocks.upsertInboxRecord).not.toHaveBeenCalled();
   });
 
-  it('skips repeated keyword checks when the author and message text have not changed', () => {
+  it('refreshes repeated keyword highlights without recording duplicate matches', async () => {
     mentionMocks.processPotentialMentionForConsumer.mockImplementation(() => undefined);
     inboxTestState.keywords = ['alpha'];
     inboxTestState.matchingKeywords = ['alpha'];
@@ -274,10 +274,13 @@ describe('inbox coordinator', () => {
     document.body.append(message);
 
     handlePotentialInbox(message);
+    await Promise.resolve();
     handlePotentialInbox(message);
+    await Promise.resolve();
 
-    expect(stateMocks.getMatchingKeywords).toHaveBeenCalledTimes(1);
-    expect(highlightMocks.applyChatKeywordHighlights).toHaveBeenCalledTimes(1);
+    expect(stateMocks.getMatchingKeywords).toHaveBeenCalledTimes(2);
+    expect(highlightMocks.applyChatKeywordHighlights).toHaveBeenCalledTimes(2);
+    expect(stateMocks.upsertInboxRecord).toHaveBeenCalledTimes(1);
   });
 
   it('does not keyword-highlight current-user messages', () => {
