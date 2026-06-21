@@ -58,15 +58,16 @@ describe('translation feature lifecycle wiring', () => {
 
   it('queues live messages and late text mutations only when translation is enabled', () => {
     const message = document.createElement('yt-live-chat-text-message-renderer');
+    const messageData = Promise.resolve(null);
 
-    lifecycle.message?.render?.(message, { allowTranslate: true });
+    lifecycle.message?.render?.(message, { allowTranslate: true, messageData });
     expect(queueMocks.queueMessageTranslation).not.toHaveBeenCalled();
 
     setCurrentOptions({ ...DEFAULT_OPTIONS, targetLanguage: 'ko' });
-    lifecycle.message?.render?.(message, { allowTranslate: false });
+    lifecycle.message?.render?.(message, { allowTranslate: false, messageData });
     expect(queueMocks.queueMessageTranslation).not.toHaveBeenCalled();
 
-    lifecycle.message?.render?.(message, { allowTranslate: true });
+    lifecycle.message?.render?.(message, { allowTranslate: true, messageData });
     lifecycle.mutation?.render?.({ addedElements: [], changedMessages: [message], mutations: [] });
 
     expect(queueMocks.queueMessageTranslation).toHaveBeenCalledTimes(2);

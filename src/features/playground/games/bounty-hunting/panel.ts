@@ -5,7 +5,7 @@
  * candidates from live chat, and lets players claim open bounties by clicking
  * matching live chat messages.
  */
-import { registerFeatureLifecycle, type FeatureMessageDataContext } from '../../../../content/lifecycle';
+import { registerFeatureLifecycle, type FeatureMessageContext } from '../../../../content/lifecycle';
 import { isCurrentUserAuthorName } from '../../../mention-detection';
 import {
   t,
@@ -203,10 +203,9 @@ let activeBountyHuntingFallback: BountyHuntingFallbackRuntime | null = null;
 
 registerFeatureLifecycle({
   message: { collect: handleBountyHuntingLifecycleMessage },
-  messageData: { collect: handleBountyHuntingMessageData },
   mutation: {
     collect({ changedMessages }) {
-      changedMessages.forEach(handleBountyHuntingLifecycleMessage);
+      changedMessages.forEach((message) => handleBountyHuntingLifecycleMessage(message));
     }
   }
 });
@@ -283,6 +282,7 @@ export function openBountyHuntingGamePanel(
     hitboxes: [],
     hoveredAction: null,
     listeners,
+    messageDataPromisesById: new Map(),
     messageTimestampUsecById: new Map(),
     onAction,
     onVisibilityChanged: onVisibilityChanged || null,
@@ -428,10 +428,14 @@ function moveBountyHuntingPanelToRoundOverPosition(runtime: BountyHuntingPanelRu
   runtime.panelControls?.setCompactMode(false);
 }
 
-function handleBountyHuntingLifecycleMessage(message: HTMLElement): void {
+function handleBountyHuntingLifecycleMessage(
+  message: HTMLElement,
+  context?: Pick<FeatureMessageContext, 'messageData'>
+): void {
   const runtime = activeBountyHuntingPanel;
   if (!runtime || !message.isConnected) return;
   rememberBountyHuntingCachedMessageData(runtime, message);
+  rememberBountyHuntingMessageDataWhenReady(runtime, message, context?.messageData);
   showBountyHuntingClaimIndicatorsForMessage(runtime, message);
   if (runtime.game.status === 'active') scheduleBountyHuntingRoundStartDividerPlacement(runtime);
   const observed = getBountyHuntingObservedMessageForRuntime(runtime, message);
@@ -445,11 +449,11 @@ function handleBountyHuntingLifecycleMessage(message: HTMLElement): void {
   maybeSendBountyHuntingWitness(runtime, message, observed);
 }
 
-function handleBountyHuntingMessageData(
+function handleBountyHuntingResolvedMessageData(
+  runtime: BountyHuntingPanelRuntime,
   message: HTMLElement,
-  { youtubeData }: FeatureMessageDataContext
+  youtubeData: { messageId: string; timestampUsec?: string }
 ): void {
-  const runtime = activeBountyHuntingPanel;
   if (!runtime || !message.isConnected) return;
   rememberBountyHuntingMessageData(runtime, youtubeData);
   if (runtime.game.status === 'active') {
@@ -457,6 +461,26 @@ function handleBountyHuntingMessageData(
     const observed = getBountyHuntingObservedMessageForRuntime(runtime, message);
     if (observed) maybeSendBountyHuntingWitness(runtime, message, observed);
   }
+}
+
+function rememberBountyHuntingMessageDataWhenReady(
+  runtime: BountyHuntingPanelRuntime,
+  message: HTMLElement,
+  messageData: FeatureMessageContext['messageData'] | undefined
+): void {
+  if (!messageData) return;
+  const messageId = getMessageStableId(message);
+  if (!messageId) return;
+  if (runtime.messageDataPromisesById.get(messageId) === messageData) return;
+  runtime.messageDataPromisesById.set(messageId, messageData);
+  void messageData
+    .then((youtubeData) => {
+      if (!activeBountyHuntingPanel || activeBountyHuntingPanel.canvas !== runtime.canvas) return;
+      if (runtime.messageDataPromisesById.get(messageId) !== messageData) return;
+      if (!youtubeData) return;
+      handleBountyHuntingResolvedMessageData(runtime, message, youtubeData);
+    })
+    .catch(() => undefined);
 }
 
 function maybeStartBountyHuntingPreparation(runtime: BountyHuntingPanelRuntime): void {

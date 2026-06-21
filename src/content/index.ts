@@ -13,7 +13,6 @@ import {
   bootFeatures,
   cleanupStaleFeatures,
   handleFeatureMessage,
-  handleFeatureMessageData,
   handleFeatureMutations,
   handleFeatureOptionsChanged,
   handleFeatureParticipant,
@@ -28,7 +27,7 @@ import {
 import { DEFAULT_OPTIONS, getTargetLanguageUpdate, normalizeOptions, type Options } from '../shared/options';
 import { getOptions, setOptions } from '../shared/state';
 import { initUiLocaleFromDocument } from '../shared/i18n';
-import { initYouTubeMessageData, requestYouTubeMessageData } from '../youtube/message-data';
+import { requestYouTubeMessageData, type YouTubeMessageData } from '../youtube/message-data';
 import { CHAT_MESSAGE_SELECTOR, PARTICIPANT_SELECTOR } from '../youtube/selectors';
 
 let observer: MutationObserver | null = null;
@@ -40,9 +39,6 @@ async function init(): Promise<void> {
   cleanupStaleFeatures();
   await initUiLocaleFromDocument();
   initFeatures({ saveOptions });
-  initYouTubeMessageData((message, youtubeData) => {
-    handleFeatureMessageData(message, { youtubeData });
-  });
 
   chrome.storage.sync.get(DEFAULT_OPTIONS, (storedOptions) => {
     setOptions(normalizeOptions(storedOptions));
@@ -84,9 +80,16 @@ function boot(): void {
 
   observer = new MutationObserver((mutations) => {
     const batch = createFeatureMutationBatch(mutations);
-    batch.changedMessages.forEach(requestYouTubeMessageData);
+    const requestedDataMessages = new WeakMap<HTMLElement, Promise<YouTubeMessageData | null>>();
+    const handledMessages = new WeakSet<HTMLElement>();
     handleFeatureMutations(batch);
-    batch.addedElements.forEach(handleAddedElement);
+    batch.addedElements.forEach((element) => handleAddedElement(element, requestedDataMessages, handledMessages));
+    batch.changedMessages.forEach((message) => {
+      handleFeatureMessageOnce(message, {
+        allowTranslate: false,
+        messageData: requestYouTubeMessageDataOnce(message, requestedDataMessages)
+      }, handledMessages);
+    });
   });
 
   observer.observe(document.documentElement, {
@@ -99,8 +102,10 @@ function boot(): void {
 function processExistingMessages(): void {
   const messages = Array.from(document.querySelectorAll<HTMLElement>(CHAT_MESSAGE_SELECTOR));
   messages.forEach((message) => {
-    requestYouTubeMessageData(message);
-    handleFeatureMessage(message, { allowTranslate: false });
+    handleFeatureMessage(message, {
+      allowTranslate: false,
+      messageData: requestYouTubeMessageData(message)
+    });
   });
 }
 
@@ -151,10 +156,16 @@ function createFeatureMutationBatch(mutations: MutationRecord[]): FeatureMutatio
   };
 }
 
-function handleAddedElement(element: Element): void {
+function handleAddedElement(
+  element: Element,
+  requestedDataMessages: WeakMap<HTMLElement, Promise<YouTubeMessageData | null>>,
+  handledMessages: WeakSet<HTMLElement>
+): void {
   if (element.matches(CHAT_MESSAGE_SELECTOR) && element instanceof HTMLElement) {
-    requestYouTubeMessageData(element);
-    handleFeatureMessage(element, { allowTranslate: true });
+    handleFeatureMessageOnce(element, {
+      allowTranslate: true,
+      messageData: requestYouTubeMessageDataOnce(element, requestedDataMessages)
+    }, handledMessages);
   }
   if (element.matches(PARTICIPANT_SELECTOR) && element instanceof HTMLElement) {
     handleFeatureParticipant(element);
@@ -162,8 +173,10 @@ function handleAddedElement(element: Element): void {
 
   const containingMessage = element.closest<HTMLElement>(CHAT_MESSAGE_SELECTOR);
   if (containingMessage && !element.matches(CHAT_MESSAGE_SELECTOR)) {
-    requestYouTubeMessageData(containingMessage);
-    handleFeatureMessage(containingMessage, { allowTranslate: false });
+    handleFeatureMessageOnce(containingMessage, {
+      allowTranslate: false,
+      messageData: requestYouTubeMessageDataOnce(containingMessage, requestedDataMessages)
+    }, handledMessages);
   }
 
   const containingParticipant = element.closest<HTMLElement>(PARTICIPANT_SELECTOR);
@@ -172,10 +185,33 @@ function handleAddedElement(element: Element): void {
   }
 
   element.querySelectorAll<HTMLElement>(CHAT_MESSAGE_SELECTOR).forEach((message) => {
-    requestYouTubeMessageData(message);
-    handleFeatureMessage(message, { allowTranslate: true });
+    handleFeatureMessageOnce(message, {
+      allowTranslate: true,
+      messageData: requestYouTubeMessageDataOnce(message, requestedDataMessages)
+    }, handledMessages);
   });
   element.querySelectorAll<HTMLElement>(PARTICIPANT_SELECTOR).forEach(handleFeatureParticipant);
+}
+
+function handleFeatureMessageOnce(
+  message: HTMLElement,
+  context: { allowTranslate: boolean; messageData: Promise<YouTubeMessageData | null> },
+  handledMessages: WeakSet<HTMLElement>
+): void {
+  if (handledMessages.has(message)) return;
+  handledMessages.add(message);
+  handleFeatureMessage(message, context);
+}
+
+function requestYouTubeMessageDataOnce(
+  message: HTMLElement,
+  requestedDataMessages: WeakMap<HTMLElement, Promise<YouTubeMessageData | null>>
+): Promise<YouTubeMessageData | null> {
+  const existingRequest = requestedDataMessages.get(message);
+  if (existingRequest) return existingRequest;
+  const request = requestYouTubeMessageData(message);
+  requestedDataMessages.set(message, request);
+  return request;
 }
 
 function getChangedMessageForMutation(mutation: MutationRecord): HTMLElement | null {

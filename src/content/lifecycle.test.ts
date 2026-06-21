@@ -24,34 +24,34 @@ describe('content feature lifecycle', () => {
     expect(calls).toEqual(['second-collect', 'second-enhance', 'first-render']);
   });
 
-  it('runs message data hooks only through the data-ready lifecycle surface', async () => {
+  it('passes message data promises through the normal message lifecycle', async () => {
     vi.resetModules();
     const lifecycle = await import('./lifecycle');
     const calls: string[] = [];
     const message = document.createElement('yt-live-chat-text-message-renderer');
-    const youtubeData = {
+    const messageData = Promise.resolve({
       messageId: 'msg-1',
       timestampUsec: '1782000000000000'
-    };
+    });
+    let receivedMessageData: Promise<unknown> | null = null;
 
     lifecycle.registerFeatureLifecycle({
       message: {
-        collect: () => calls.push('message-collect')
-      },
-      messageData: {
-        collect: (_message, context) => calls.push(`data-collect:${context.youtubeData.timestampUsec}`),
-        render: () => calls.push('data-render')
+        collect: (_message, context) => {
+          calls.push('message-collect');
+          receivedMessageData = context.messageData;
+        },
+        render: () => calls.push('message-render')
       }
     });
 
-    lifecycle.handleFeatureMessage(message, { allowTranslate: true });
-    lifecycle.handleFeatureMessageData(message, { youtubeData });
+    lifecycle.handleFeatureMessage(message, { allowTranslate: true, messageData });
 
     expect(calls).toEqual([
       'message-collect',
-      'data-collect:1782000000000000',
-      'data-render'
+      'message-render'
     ]);
+    expect(receivedMessageData).toBe(messageData);
   });
 
   it('ignores extension-managed observer nodes automatically', async () => {
@@ -74,23 +74,18 @@ describe('content feature lifecycle', () => {
     const lifecycle = await import('./lifecycle');
     const cleanupStale = vi.fn();
     const message = vi.fn();
-    const messageData = vi.fn();
     const mutation = vi.fn();
     const participant = vi.fn();
 
     lifecycle.registerFeatureLifecycle({
       page: { cleanupStale },
       message: { enhance: message },
-      messageData: { enhance: messageData },
       mutation: { enhance: mutation },
       participant: { enhance: participant }
     });
 
     lifecycle.suspendFeatures();
     lifecycle.handleFeatureMessage(document.createElement('yt-live-chat-text-message-renderer'), { allowTranslate: true });
-    lifecycle.handleFeatureMessageData(document.createElement('yt-live-chat-text-message-renderer'), {
-      youtubeData: { messageId: 'msg-1', timestampUsec: '1782000000000000' }
-    });
     lifecycle.handleFeatureMutations({
       addedElements: [],
       changedMessages: [],
@@ -100,7 +95,6 @@ describe('content feature lifecycle', () => {
 
     expect(cleanupStale).toHaveBeenCalledOnce();
     expect(message).not.toHaveBeenCalled();
-    expect(messageData).not.toHaveBeenCalled();
     expect(mutation).not.toHaveBeenCalled();
     expect(participant).not.toHaveBeenCalled();
   });

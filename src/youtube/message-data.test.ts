@@ -1,21 +1,28 @@
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   YOUTUBE_MESSAGE_DATA_EVENT,
   YOUTUBE_MESSAGE_DATA_REQUEST_EVENT
 } from './message-data-events';
 
 describe('YouTube message data receiver', () => {
-  it('caches sanitized message data and notifies listeners with the matching DOM message', async () => {
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.restoreAllMocks();
+  });
+
+  it('caches sanitized message data and resolves the matching request promise', async () => {
     vi.resetModules();
     document.body.replaceChildren();
-    const { getYouTubeMessageData, initYouTubeMessageData } = await import('./message-data');
-    const listener = vi.fn();
+    const { getYouTubeMessageData, requestYouTubeMessageData } = await import('./message-data');
     const message = document.createElement('yt-live-chat-text-message-renderer');
     message.id = 'msg-1';
     document.body.append(message);
 
-    initYouTubeMessageData(listener);
-    window.dispatchEvent(new CustomEvent(YOUTUBE_MESSAGE_DATA_EVENT, {
+    const messageData = requestYouTubeMessageData(message);
+    const querySelectorAll = vi.spyOn(document, 'querySelectorAll');
+    message.dispatchEvent(new CustomEvent(YOUTUBE_MESSAGE_DATA_EVENT, {
+      bubbles: true,
+      composed: true,
       detail: JSON.stringify({
         authorExternalChannelId: 'UC123',
         authorName: '@Example',
@@ -26,7 +33,7 @@ describe('YouTube message data receiver', () => {
       })
     }));
 
-    expect(listener).toHaveBeenCalledWith(message, {
+    await expect(messageData).resolves.toEqual({
       authorExternalChannelId: 'UC123',
       authorName: '@Example',
       authorPhotoUrl: 'https://example.test/avatar.jpg',
@@ -34,6 +41,12 @@ describe('YouTube message data receiver', () => {
       timestampUsec: '1782000000000000'
     });
     expect(getYouTubeMessageData(message)).toMatchObject({
+      messageId: 'msg-1',
+      timestampUsec: '1782000000000000'
+    });
+    expect(querySelectorAll).not.toHaveBeenCalled();
+
+    await expect(requestYouTubeMessageData(message)).resolves.toMatchObject({
       messageId: 'msg-1',
       timestampUsec: '1782000000000000'
     });
@@ -48,32 +61,37 @@ describe('YouTube message data receiver', () => {
     document.body.append(message);
     document.addEventListener(YOUTUBE_MESSAGE_DATA_REQUEST_EVENT, (event) => requests.push(event));
 
-    requestYouTubeMessageData(message);
+    await expect(requestYouTubeMessageData(message)).resolves.toBeNull();
 
     expect(requests).toHaveLength(1);
     expect(requests[0].target).toBe(message);
   });
 
-  it('ignores malformed event details and timestamp values', async () => {
+  it('ignores malformed event details and resolves missing data requests to null', async () => {
     vi.resetModules();
+    vi.useFakeTimers();
     document.body.replaceChildren();
-    const { initYouTubeMessageData } = await import('./message-data');
-    const listener = vi.fn();
+    const { requestYouTubeMessageData } = await import('./message-data');
     const message = document.createElement('yt-live-chat-text-message-renderer');
     message.id = 'msg-1';
     document.body.append(message);
 
-    initYouTubeMessageData(listener);
-    window.dispatchEvent(new CustomEvent(YOUTUBE_MESSAGE_DATA_EVENT, {
+    const messageData = requestYouTubeMessageData(message);
+    message.dispatchEvent(new CustomEvent(YOUTUBE_MESSAGE_DATA_EVENT, {
+      bubbles: true,
+      composed: true,
       detail: { messageId: 'msg-1', timestampUsec: '1782000000000000' }
     }));
-    window.dispatchEvent(new CustomEvent(YOUTUBE_MESSAGE_DATA_EVENT, {
+    message.dispatchEvent(new CustomEvent(YOUTUBE_MESSAGE_DATA_EVENT, {
+      bubbles: true,
+      composed: true,
       detail: JSON.stringify({
         messageId: 'msg-1',
         timestampUsec: 'not-a-timestamp'
       })
     }));
+    await vi.advanceTimersByTimeAsync(700);
 
-    expect(listener).not.toHaveBeenCalled();
+    await expect(messageData).resolves.toBeNull();
   });
 });

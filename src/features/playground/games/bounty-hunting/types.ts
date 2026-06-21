@@ -73,6 +73,7 @@ export interface BountyHuntingPanelRuntime {
   onVisibilityChanged: (() => void) | null;
   panelControls: GamePanelControls | null;
   claimedMessageIndicators: Set<HTMLElement>;
+  messageDataPromisesById: Map<string, Promise<unknown>>;
   messageTimestampUsecById: Map<string, string>;
   pendingWitnesses: Map<string, { bountyIds: Set<string>; messageTimestampUsec?: string }>;
   pixelRatio: number;
