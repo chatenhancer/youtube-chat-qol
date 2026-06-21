@@ -15,42 +15,46 @@ Chat Enhancer for YouTube 是一款用于 YouTube 实时聊天的浏览器扩展
 - 大多数扩展功能都在你的浏览器本地运行。
 - 翻译默认关闭。
 - 启用翻译时，被翻译的文本会发送到 Google Translate。
-- Playground 游戏默认关闭。如果你启用并使用 Playground，游戏在线状态、邀请和游戏操作会以生成的玩家名称发送到 Chat Enhancer Playground 后端。
+- Playground 游戏默认关闭。如果你启用并使用 Playground，游戏在线状态、邀请和游戏操作会以生成的玩家名称发送到 Chat Enhancer Playground 游戏服务器。
 - 扩展不运行分析、不出售数据，也不收集浏览历史。
 
 ## 扩展在哪里运行
 
-扩展只在与扩展 manifest 匹配的 YouTube 实时聊天和实时聊天回放页面上运行。
+扩展只在扩展被允许访问的 YouTube 实时聊天和实时聊天回放页面上运行。
 
-扩展使用浏览器的 `storage` 权限，以及对 YouTube 实时聊天页面、Google 翻译端点和可选加入的 Playground 后端的主机访问权限。它不会请求通用的浏览历史、标签页读取、脚本执行或网页导航权限。
+扩展使用权限在你的浏览器中保存自己的设置和数据。它还会访问功能运行所需的特定网站：YouTube 实时聊天页面、Google Translate 的翻译服务，以及可选加入的 Chat Enhancer Playground 游戏服务器。
+
+扩展不会请求通用的浏览历史、标签页读取、脚本执行或网页导航权限。
 
 ## 存储在你浏览器中的数据
 
 扩展会存储一些数据，以便其功能在页面重新加载后继续工作。
 
-- **设置通过 `chrome.storage.sync` 存储：** 根据你的浏览器设置，浏览器可能会在你自己已登录的浏览器安装之间同步这些扩展设置。
+本节列出的数据由扩展存储在你自己的浏览器配置文件中。除非下方“发送到浏览器外的数据”一节也列出这些数据，否则它们不会发送给 Chat Enhancer。
 
-- **Inbox 数据通过 `chrome.storage.local` 存储：** 这包括监视的关键词，以及每个直播或回放最多 100 条 inbox 记录。Inbox 记录可能包括消息文本、作者名称、时间戳、YouTube 消息/来源元数据、匹配元数据，以及显示已保存消息所需的 emoji/图片显示数据。
+- **设置：** 使用浏览器的同步扩展存储 (`chrome.storage.sync`) 保存。根据你的浏览器设置，浏览器可能会在你自己已登录的浏览器安装之间同步这些扩展设置。
 
-- **常用 emoji 数据通过 `chrome.storage.local` 存储：** 这包括本地使用次数和用于构建常用 emoji 行的 emoji 显示元数据。
+- **Inbox 数据：** 使用本地扩展存储 (`chrome.storage.local`) 保存。这包括监视的关键词，以及每个直播或回放最多 100 条 inbox 记录。Inbox 记录可能包括消息文本、作者名称、时间戳、用于显示已保存消息来源的基本 YouTube 消息详情、匹配详情，以及正确显示已保存消息所需的 emoji 或图片信息。
 
-- **已收藏用户数据通过 `chrome.storage.local` 存储：** 这包括已收藏用户的 handle、可用时的频道 ID，以及收藏创建时间。已收藏用户在当前浏览器配置文件中的各个直播之间全局适用，并用于显示彩色头像环。
+- **常用 emoji 数据：** 使用本地扩展存储 (`chrome.storage.local`) 保存。这包括本地使用次数和用于构建常用 emoji 行的 emoji 显示信息。
 
-- **未发送的聊天草稿按直播通过 `chrome.storage.local` 存储：** 页面刷新后会恢复。草稿会在聊天输入被清空、消息已发送或扩展数据被重置时删除。
+- **已收藏用户数据：** 使用本地扩展存储 (`chrome.storage.local`) 保存。这包括已收藏用户的 handle、可用时的频道 ID，以及收藏创建时间。已收藏用户在当前浏览器配置文件中的各个直播之间全局适用，并用于显示彩色头像环。
 
-- **如果使用 Playground，Playground 身份数据会通过 `chrome.storage.local` 存储：** 这是一对生成的公钥/私钥，用于签署 Playground 连接挑战，使同一浏览器安装可以保留同一个化名 Playground 身份。它不是你的 YouTube 身份。
+- **未发送的聊天草稿：** 按直播使用本地扩展存储 (`chrome.storage.local`) 保存。页面刷新后会恢复。草稿会在聊天输入被清空、消息已发送或扩展数据被重置时删除。
 
-- **最近的个人资料消息、命令状态和翻译结果只会保存在当前实时聊天页面的内存中。页面卸载时会被清除。**
+- **Playground 身份数据：** 如果使用 Playground，会使用本地扩展存储 (`chrome.storage.local`) 保存。这是随机生成的本地 Playground 身份，用于在重新连接 Playground 时识别同一个浏览器安装。它不是你的 YouTube 身份。
+
+- **最近的个人资料消息、命令状态和翻译结果：** 只会保存在当前实时聊天页面的内存中。当你离开或刷新聊天页面时会被清除。
 
 ## 发送到浏览器外的数据
 
-聊天翻译和草稿翻译默认关闭。
+聊天翻译、草稿翻译和 Playground 游戏默认关闭。
 
-启用翻译或 Playground 功能时，数据可能会发送到以下服务：
+启用并使用翻译或 Playground 功能时，数据可能会发送到以下服务：
 
 - **位于 `https://translate.googleapis.com/translate_a/single` 的 Google Translate**
 
-  聊天翻译会发送符合条件的可见和传入聊天消息文本。草稿翻译会发送你从聊天框中选择翻译的草稿文本。
+  聊天翻译会在翻译启用期间发送实时聊天中可见且符合翻译条件的聊天消息文本。草稿翻译会发送你从聊天框中选择翻译的草稿文本。
 
   翻译请求包括要翻译的文本和目标语言。扩展不会随翻译请求发送你的 YouTube cookie 或 YouTube 凭据。
 
@@ -58,17 +62,17 @@ Chat Enhancer for YouTube 是一款用于 YouTube 实时聊天的浏览器扩展
 
 - **位于 `https://playground.chatenhancer.com` 的 Chat Enhancer Playground**
 
-  Playground 默认关闭。如果你启用 Playground 并使用游戏面板，扩展会连接到 Playground 后端，以便同一直播中选择加入的用户可以查看可用状态、交换邀请并玩游戏。
+  Playground 默认关闭。如果你启用 Playground 并使用游戏面板，扩展会连接到 Chat Enhancer Playground 游戏服务器，以便同一直播中选择加入的用户可以查看可用状态、交换邀请并玩游戏。
 
-  Playground 消息可能包括直播/视频键、你生成的 Playground 公钥和签名、你生成的玩家名称、你的可用游戏列表、邀请和邀请回应，以及棋步等游戏操作。
+  Playground 消息可能包括 YouTube 直播或视频标识符、你生成的 Playground 玩家身份、你生成的玩家名称、你的可用游戏列表、邀请和邀请回应，以及棋步等游戏操作。
 
-  HELP-A-FRIEND! Trivia 问题生成可能会将选定的 YouTube 回放 transcript 摘录和游戏标识符发送到 Playground 后端。后端使用 OpenAI 根据这些摘录生成 trivia 问题。
+  Playground 不会将实时聊天消息文本、你的 YouTube 显示名称、你的 YouTube 头像 URL、YouTube cookie 或 YouTube 凭据发送到 Playground 游戏服务器。
 
-  Replay Trivia 生成可能需要在 `https://playground.chatenhancer.com` 上进行 Cloudflare Turnstile 验证。Cloudflare 可能会接收正常的验证数据，例如 IP 地址、用户代理和挑战结果。
+  另外，HELP-A-FRIEND! Trivia 问题生成可能会将选定的公开 YouTube 视频转录摘录和游戏标识符发送到 Playground 游戏服务器。这些摘录来自视频转录，而不是实时聊天。服务器使用 OpenAI 根据这些摘录生成 trivia 问题。
 
-  Playground 不会将实时聊天消息文本、你的 YouTube 显示名称、你的 YouTube 头像 URL、YouTube cookie 或 YouTube 凭据发送到 Playground 后端。
+  Replay Trivia 生成可能需要在 `https://playground.chatenhancer.com` 上进行 Cloudflare Turnstile 验证。Cloudflare 可能会接收正常的验证数据，例如 IP 地址、浏览器和设备信息以及挑战结果。
 
-  像任何 Web 服务一样，Playground 后端可能会从浏览器或网络提供商接收正常的连接元数据，例如 IP 地址和用户代理。
+  像任何 Web 服务一样，Playground 游戏服务器可能会从浏览器或网络提供商接收正常的连接信息，例如 IP 地址和浏览器/设备信息。
 
 ## 数据控制
 
@@ -76,7 +80,7 @@ Chat Enhancer for YouTube 是一款用于 YouTube 实时聊天的浏览器扩展
 
 你也可以从浏览器中移除扩展。根据浏览器不同，移除扩展也可能会删除其本地扩展存储。
 
-## 不收集的内容
+## Chat Enhancer 不会做什么
 
 扩展不运行分析。
 
@@ -84,9 +88,9 @@ Chat Enhancer for YouTube 是一款用于 YouTube 实时聊天的浏览器扩展
 
 扩展不出售用户数据。
 
-除上述选择加入的 Playground 游戏外，扩展不会向扩展拥有的服务器发送数据。
+除上述选择加入的 Playground 功能外，扩展不会向 Chat Enhancer 服务器发送数据。
 
-扩展不会在实时聊天页面卸载后存储最近的个人资料消息或翻译结果。
+扩展不会在你离开或刷新实时聊天页面后存储最近的个人资料消息或翻译结果。
 
 Chat Enhancer for YouTube 与 YouTube 或 Google 没有关联。
 

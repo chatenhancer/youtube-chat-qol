@@ -15,42 +15,46 @@ De korte versie:
 - De meeste extensiefuncties draaien lokaal in je browser.
 - Vertaling staat standaard uit.
 - Wanneer vertaling is ingeschakeld, wordt de tekst die wordt vertaald naar Google Translate gestuurd.
-- Playground-games staan standaard uit. Als je Playground inschakelt en gebruikt, worden gameaanwezigheid, uitnodigingen en gameacties onder een gegenereerde spelersnaam naar de Chat Enhancer Playground-backend gestuurd.
+- Playground-games staan standaard uit. Als je Playground inschakelt en gebruikt, worden gameaanwezigheid, uitnodigingen en gameacties onder een gegenereerde spelersnaam naar de Chat Enhancer Playground-gameserver gestuurd.
 - De extensie voert geen analytics uit, verkoopt geen gegevens en verzamelt geen browsegeschiedenis.
 
 ## Waar de extensie draait
 
-De extensie draait alleen op YouTube-livechat- en livechatreplaypagina’s die overeenkomen met het manifest van de extensie.
+De extensie draait alleen op YouTube-livechat- en livechatreplaypagina’s waartoe de extensie toegang mag hebben.
 
-De extensie gebruikt de browsermachtiging `storage`, plus hosttoegang voor YouTube-livechatpagina’s, het vertaalendpoint van Google en de opt-in Playground-backend. De extensie vraagt geen algemene machtigingen voor browsegeschiedenis, tabbladen lezen, scripting of webnavigatie.
+De extensie gebruikt een machtiging om eigen instellingen en gegevens in je browser op te slaan. De extensie gebruikt ook toegang tot de specifieke websites die nodig zijn voor de functies: YouTube-livechatpagina’s, de vertaaldienst van Google Translate en de opt-in Chat Enhancer Playground-gameserver.
+
+De extensie vraagt geen algemene machtigingen voor browsegeschiedenis, tabbladen lezen, scripting of webnavigatie.
 
 ## Gegevens die in je browser worden opgeslagen
 
 De extensie slaat enkele gegevens op zodat de functies blijven werken tussen het opnieuw laden van pagina’s.
 
-- **Instellingen worden opgeslagen met `chrome.storage.sync`:** afhankelijk van je browserinstellingen kan de browser deze extensie-instellingen synchroniseren tussen je eigen aangemelde browserinstallaties.
+Gegevens in deze sectie worden door de extensie opgeslagen in je eigen browserprofiel. Ze worden niet naar Chat Enhancer gestuurd, tenzij ze ook worden genoemd in de sectie "Gegevens die buiten je browser worden verzonden" hieronder.
 
-- **Inbox-gegevens worden opgeslagen met `chrome.storage.local`:** dit omvat bewaakte trefwoorden en maximaal 100 inboxrecords per stream of replay. Inboxrecords kunnen berichttekst, auteursnaam, tijdstempel, YouTube-bericht-/bronmetadata, matchmetadata en emoji-/afbeeldingsweergavegegevens bevatten die nodig zijn om het opgeslagen bericht te tonen.
+- **Instellingen:** opgeslagen met de gesynchroniseerde extensieopslag van de browser (`chrome.storage.sync`). Afhankelijk van je browserinstellingen kan de browser deze extensie-instellingen synchroniseren tussen je eigen aangemelde browserinstallaties.
 
-- **Gegevens van veelgebruikte emoji worden opgeslagen met `chrome.storage.local`:** dit omvat lokale gebruikstellingen en emojiweergavemetadata die worden gebruikt om de rij met veelgebruikte emoji te maken.
+- **Inbox-gegevens:** opgeslagen met lokale extensieopslag (`chrome.storage.local`). Dit omvat bewaakte trefwoorden en maximaal 100 inboxrecords per stream of replay. Inboxrecords kunnen berichttekst, auteursnaam, tijdstempel, basisgegevens van YouTube-berichten die nodig zijn om te tonen waar het opgeslagen bericht vandaan kwam, matchdetails en emoji- of afbeeldingsinformatie bevatten die nodig is om het opgeslagen bericht correct te tonen.
 
-- **Gegevens van gemarkeerde gebruikers worden opgeslagen met `chrome.storage.local`:** dit omvat de handle van de gemarkeerde gebruiker, kanaal-ID indien beschikbaar, en het tijdstip waarop de markering is gemaakt. Gemarkeerde gebruikers zijn globaal over streams in het huidige browserprofiel en worden gebruikt om gekleurde avatarringen te tonen.
+- **Gegevens van veelgebruikte emoji:** opgeslagen met lokale extensieopslag (`chrome.storage.local`). Dit omvat lokale gebruikstellingen en emojiweergave-informatie die wordt gebruikt om de rij met veelgebruikte emoji te maken.
 
-- **Niet-verzonden chatconcepten worden per stream opgeslagen met `chrome.storage.local`:** ze worden hersteld na het vernieuwen van de pagina. Concepten worden verwijderd wanneer de chatinvoer wordt gewist, het bericht wordt verzonden of extensiegegevens worden gereset.
+- **Gegevens van gemarkeerde gebruikers:** opgeslagen met lokale extensieopslag (`chrome.storage.local`). Dit omvat de handle van de gemarkeerde gebruiker, kanaal-ID indien beschikbaar, en het tijdstip waarop de markering is gemaakt. Gemarkeerde gebruikers zijn globaal over streams in het huidige browserprofiel en worden gebruikt om gekleurde avatarringen te tonen.
 
-- **Playground-identiteitsgegevens worden opgeslagen met `chrome.storage.local` als Playground wordt gebruikt:** dit is een gegenereerd openbaar/privé-sleutelpaar dat wordt gebruikt om Playground-verbindingsuitdagingen te ondertekenen, zodat dezelfde browserinstallatie dezelfde pseudonieme Playground-identiteit kan behouden. Het is niet je YouTube-identiteit.
+- **Niet-verzonden chatconcepten:** per stream opgeslagen met lokale extensieopslag (`chrome.storage.local`). Ze worden hersteld na het vernieuwen van de pagina. Concepten worden verwijderd wanneer de chatinvoer wordt gewist, het bericht wordt verzonden of extensiegegevens worden gereset.
 
-- **Recente profielberichten, opdrachtstatus en vertaalresultaten worden alleen in het geheugen bewaard voor de huidige livechatpagina. Ze worden gewist wanneer de pagina wordt verlaten.**
+- **Playground-identiteitsgegevens:** opgeslagen met lokale extensieopslag (`chrome.storage.local`) als Playground wordt gebruikt. Dit is een willekeurig gegenereerde lokale Playground-identiteit die wordt gebruikt om dezelfde browserinstallatie te herkennen wanneer deze opnieuw verbinding maakt met Playground. Het is niet je YouTube-identiteit.
+
+- **Recente profielberichten, opdrachtstatus en vertaalresultaten:** worden alleen in het geheugen bewaard voor de huidige livechatpagina. Ze worden gewist wanneer je de chatpagina verlaat of vernieuwt.
 
 ## Gegevens die buiten je browser worden verzonden
 
-Chatvertaling en conceptvertaling staan standaard uit.
+Chatvertaling, conceptvertaling en Playground-games staan standaard uit.
 
-Wanneer vertaling of Playground-functies zijn ingeschakeld, kunnen gegevens naar deze diensten worden verzonden:
+Wanneer vertaling of Playground-functies zijn ingeschakeld en worden gebruikt, kunnen gegevens naar deze diensten worden verzonden:
 
 - **Google Translate op `https://translate.googleapis.com/translate_a/single`**
 
-  Chatvertaling verzendt in aanmerking komende zichtbare en binnenkomende chatberichttekst. Conceptvertaling verzendt de concepttekst die je vanuit het chatvak kiest om te vertalen.
+  Chatvertaling verzendt chatberichttekst die zichtbaar is in de livechat en in aanmerking komt voor vertaling terwijl vertaling is ingeschakeld. Conceptvertaling verzendt de concepttekst die je vanuit het chatvak kiest om te vertalen.
 
   Vertaalverzoeken bevatten de te vertalen tekst en de doeltaal. De extensie stuurt je YouTube-cookies of YouTube-inloggegevens niet mee met vertaalverzoeken.
 
@@ -58,17 +62,17 @@ Wanneer vertaling of Playground-functies zijn ingeschakeld, kunnen gegevens naar
 
 - **Chat Enhancer Playground op `https://playground.chatenhancer.com`**
 
-  Playground staat standaard uit. Als je Playground inschakelt en het gamespaneel gebruikt, maakt de extensie verbinding met de Playground-backend zodat opt-in gebruikers in dezelfde stream beschikbaarheid kunnen zien, uitnodigingen kunnen uitwisselen en games kunnen spelen.
+  Playground staat standaard uit. Als je Playground inschakelt en het gamespaneel gebruikt, maakt de extensie verbinding met de Chat Enhancer Playground-gameserver zodat opt-in gebruikers in dezelfde stream beschikbaarheid kunnen zien, uitnodigingen kunnen uitwisselen en games kunnen spelen.
 
-  Playground-berichten kunnen de stream-/videosleutel, je gegenereerde Playground-openbare sleutel en handtekening, je gegenereerde spelersnaam, je lijst met beschikbare games, uitnodigingen en uitnodigingsreacties, en gameacties zoals schaakzetten bevatten.
+  Playground-berichten kunnen de YouTube-stream- of video-ID, je gegenereerde Playground-spelersidentiteit, je gegenereerde spelersnaam, je lijst met beschikbare games, uitnodigingen en uitnodigingsreacties, en gameacties zoals schaakzetten bevatten.
 
-  HELP-A-FRIEND! Trivia-vraaggeneratie kan geselecteerde YouTube-replaytranscriptfragmenten en game-ID’s naar de Playground-backend sturen. De backend gebruikt OpenAI om trivia-vragen uit die fragmenten te genereren.
+  Playground stuurt geen livechatberichttekst, je YouTube-weergavenaam, je YouTube-avatar-URL, YouTube-cookies of YouTube-inloggegevens naar de Playground-gameserver.
 
-  Replay Trivia-generatie kan Cloudflare Turnstile-verificatie op `https://playground.chatenhancer.com` vereisen. Cloudflare kan normale verificatiegegevens ontvangen, zoals IP-adres, useragent en het resultaat van de challenge.
+  Afzonderlijk kan HELP-A-FRIEND! Trivia-vraaggeneratie geselecteerde openbare YouTube-videotranscriptfragmenten en game-ID’s naar de Playground-gameserver sturen. Deze fragmenten komen uit het transcript van de video, niet uit livechat. De server gebruikt OpenAI om trivia-vragen uit die fragmenten te genereren.
 
-  Playground stuurt geen livechatberichttekst, je YouTube-weergavenaam, je YouTube-avatar-URL, YouTube-cookies of YouTube-inloggegevens naar de Playground-backend.
+  Replay Trivia-generatie kan Cloudflare Turnstile-verificatie op `https://playground.chatenhancer.com` vereisen. Cloudflare kan normale verificatiegegevens ontvangen, zoals IP-adres, browser- en apparaatinformatie en het resultaat van de challenge.
 
-  Zoals elke webservice kan de Playground-backend normale verbindingsmetadata ontvangen, zoals IP-adres en useragent, van de browser of netwerkprovider.
+  Zoals elke webservice kan de Playground-gameserver normale verbindingsinformatie ontvangen, zoals IP-adres en browser-/apparaatinformatie, van de browser of netwerkprovider.
 
 ## Gegevensbeheer
 
@@ -76,7 +80,7 @@ Je kunt extensiegegevens wissen vanuit de extensiepopup met de resetknop. Dit wi
 
 Je kunt de extensie ook uit je browser verwijderen. Afhankelijk van de browser kan het verwijderen van de extensie ook de lokale opslag van de extensie verwijderen.
 
-## Wat niet wordt verzameld
+## Wat Chat Enhancer niet doet
 
 De extensie voert geen analytics uit.
 
@@ -84,9 +88,9 @@ De extensie verzamelt geen browsegeschiedenis.
 
 De extensie verkoopt geen gebruikersgegevens.
 
-Behalve de hierboven beschreven opt-in Playground-games stuurt de extensie geen gegevens naar een server die eigendom is van de extensie.
+Behalve de hierboven beschreven opt-in Playground-functies stuurt de extensie geen gegevens naar een Chat Enhancer-server.
 
-De extensie slaat geen recente profielberichten of vertaalresultaten op nadat de livechatpagina is verlaten.
+De extensie slaat geen recente profielberichten of vertaalresultaten op nadat je de livechatpagina verlaat of vernieuwt.
 
 Chat Enhancer for YouTube is niet gelieerd aan YouTube of Google.
 
