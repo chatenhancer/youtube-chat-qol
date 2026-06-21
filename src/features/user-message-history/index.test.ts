@@ -417,7 +417,7 @@ describe('user message history', () => {
     ]);
   });
 
-  it('records changed messages from the lifecycle mutation collector', async () => {
+  it('records changed messages from the message lifecycle', async () => {
     const history = await import('./index');
     const lifecycle = await import('../../content/lifecycle');
     const message = createMessage({
@@ -427,11 +427,7 @@ describe('user message history', () => {
       text: 'mutation message'
     });
 
-    lifecycle.handleFeatureMutations({
-      addedElements: [],
-      changedMessages: [message],
-      mutations: []
-    });
+    lifecycle.handleFeatureMessage(message, { allowTranslate: false, source: 'changed' });
 
     expect(history.getRecentMessagesForIdentity({
       authorName: '@MutationUser',

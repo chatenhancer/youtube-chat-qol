@@ -7,7 +7,7 @@
  */
 import type { Options } from '../../shared/options';
 import { getOptions } from '../../shared/state';
-import { registerFeatureLifecycle } from '../../content/lifecycle';
+import { registerFeatureLifecycle, type FeatureMessageContext } from '../../content/lifecycle';
 import { clearTranslations, queueMessageTranslation, queueRetroactiveTranslations } from './queue';
 
 registerFeatureLifecycle({
@@ -18,8 +18,7 @@ registerFeatureLifecycle({
     reset: clearTranslations,
     visibleRecovery: queueRetroactiveTranslations
   },
-  message: { render: handleTranslationMessage },
-  mutation: { render: handleTranslationMutations }
+  message: { render: handleTranslationMessage }
 });
 
 function handleTranslationOptionsChanged(previousOptions: Options, nextOptions: Options): void {
@@ -31,17 +30,13 @@ function handleTranslationOptionsChanged(previousOptions: Options, nextOptions: 
   if (nextOptions.targetLanguage) queueRetroactiveTranslations();
 }
 
-function handleTranslationMessage(message: HTMLElement, { allowTranslate }: { allowTranslate: boolean }): void {
-  if (allowTranslate && getOptions().targetLanguage) {
-    queueMessageTranslation(message);
-  }
-}
-
-function handleTranslationMutations({ changedMessages }: { changedMessages: HTMLElement[] }): void {
+function handleTranslationMessage(
+  message: HTMLElement,
+  { allowTranslate, source }: Pick<FeatureMessageContext, 'allowTranslate' | 'source'>
+): void {
   if (!getOptions().targetLanguage) return;
+  if (!allowTranslate && source !== 'changed') return;
+  if (source === 'changed' && message.dataset.ytcqTranslationKey) return;
 
-  changedMessages.forEach((message) => {
-    if (message.dataset.ytcqTranslationKey) return;
-    queueMessageTranslation(message);
-  });
+  queueMessageTranslation(message);
 }

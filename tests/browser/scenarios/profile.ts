@@ -19,8 +19,7 @@ import {
 } from './types';
 
 export const profileCardRecentMessagesScenario: BrowserScenario = async ({ chat, context }) => {
-  const source = await findRecentMessageSource(chat);
-  await openProfileCardFromAvatar(chat, source);
+  const source = await openStableProfileCardFromRecentMessage(chat);
   await expectProfileCardHasRecentMessages(chat, source);
   await expectProfileCardJumpToMessage(chat, source);
   await expectProfileChannelButtonOpensChannel(chat, context);
@@ -28,8 +27,7 @@ export const profileCardRecentMessagesScenario: BrowserScenario = async ({ chat,
 };
 
 export const profileCardReceivesNewMessagesScenario: BrowserScenario = async ({ chat }) => {
-  const source = await findRecentMessageSource(chat);
-  await openProfileCardFromAvatar(chat, source);
+  const source = await openStableProfileCardFromRecentMessage(chat);
   await expectProfileCardHasRecentMessages(chat, source);
   await appendAuthorMessageAndVerifyProfileCardUpdates(chat, source);
   await closeProfileCard(chat);
@@ -46,47 +44,74 @@ interface MessageSource {
 const PROFILE_TARGET_ATTRIBUTE = 'data-ytcq-browser-profile-target';
 let nextProfileTargetId = 0;
 
-async function findRecentMessageSource(chat: ChatSurface): Promise<MessageSource> {
-  return test.step('Find a recent message with readable author and text', async () => {
+async function openStableProfileCardFromRecentMessage(chat: ChatSurface): Promise<MessageSource> {
+  return test.step('Open recent-message profile card from a stable avatar', async () => {
     const messages = chat.locator(NORMAL_CHAT_MESSAGE_SELECTOR);
     await messages.last().waitFor({ state: 'visible', timeout: 45_000 });
 
     const count = await messages.count();
     const firstCandidate = Math.max(0, count - 20);
     for (let index = count - 1; index >= firstCandidate; index -= 1) {
-      const message = messages.nth(index);
-      const authorName = cleanVisibleText(await message.locator('#author-name').first().innerText().catch(() => ''));
-      const messageText = await getRichVisibleText(message.locator('#message').first()).catch(() => '');
-      if (!authorName || !messageText) continue;
-      if (!hasMeaningfulText(messageText)) continue;
-
-      const channelId = await message.evaluate((element) => {
-        const author = element.querySelector('#author-name');
-        const link = author?.closest('a[href]') || element.querySelector('a[href*="/channel/"]');
-        const href = link?.getAttribute('href') || '';
-        try {
-          const url = new URL(href, 'https://www.youtube.com');
-          const [kind, id] = url.pathname.split('/').filter(Boolean);
-          return kind === 'channel' ? id : '';
-        } catch {
-          return '';
-        }
-      }).catch(() => '');
-      const messageId = await message.getAttribute('id').catch(() => '') || '';
-      const targetId = await freezeProfileMessageTarget(message).catch(() => '');
+      const targetId = await freezeProfileMessageTarget(messages.nth(index)).catch(() => '');
       if (!targetId) continue;
+      const sourceMessage = chat.locator(`[${PROFILE_TARGET_ATTRIBUTE}="${escapeCssString(targetId)}"]`).first();
+      await centerLocatorInViewport(sourceMessage);
 
-      return {
-        authorName,
-        channelId,
-        messageId,
-        messageText,
-        targetId
-      };
+      const sourceBeforeClick = await readProfileMessageSource(sourceMessage, targetId);
+      if (!sourceBeforeClick) continue;
+
+      const avatar = sourceMessage.locator('#author-photo').first();
+      if (!await avatar.isVisible({ timeout: 500 }).catch(() => false)) continue;
+
+      await avatar.click({ timeout: 2_000 }).catch(() => undefined);
+      const profileCard = chat.locator('.ytcq-profile-card:not(.ytcq-inbox-card)');
+      if (!await profileCard.isVisible({ timeout: 5_000 }).catch(() => false)) continue;
+
+      const sourceAfterClick = await readProfileMessageSource(sourceMessage, targetId);
+      const cardAuthor = cleanVisibleText(
+        await profileCard.locator('.ytcq-profile-card-title').innerText().catch(() => '')
+      );
+      if (
+        sourceAfterClick &&
+        cardAuthor === sourceAfterClick.authorName &&
+        isSameProfileMessageSource(sourceBeforeClick, sourceAfterClick)
+      ) {
+        return sourceAfterClick;
+      }
+
+      await closeProfileCardIfPresent(chat);
     }
 
-    throw new Error('Could not find a recent message with readable author and text.');
+    throw new Error('Could not open a profile card from a stable recent message.');
   });
+}
+
+async function readProfileMessageSource(message: Locator, targetId: string): Promise<MessageSource | null> {
+  const authorName = cleanVisibleText(await message.locator('#author-name').first().innerText().catch(() => ''));
+  const messageText = await getRichVisibleText(message.locator('#message').first()).catch(() => '');
+  if (!authorName || !messageText || !hasMeaningfulText(messageText)) return null;
+
+  const channelId = await message.evaluate((element) => {
+    const author = element.querySelector('#author-name');
+    const link = author?.closest('a[href]') || element.querySelector('a[href*="/channel/"]');
+    const href = link?.getAttribute('href') || '';
+    try {
+      const url = new URL(href, 'https://www.youtube.com');
+      const [kind, id] = url.pathname.split('/').filter(Boolean);
+      return kind === 'channel' ? id : '';
+    } catch {
+      return '';
+    }
+  }).catch(() => '');
+  const messageId = await message.getAttribute('id').catch(() => '') || '';
+
+  return {
+    authorName,
+    channelId,
+    messageId,
+    messageText,
+    targetId
+  };
 }
 
 async function freezeProfileMessageTarget(message: Locator): Promise<string> {
@@ -104,20 +129,13 @@ async function freezeProfileMessageTarget(message: Locator): Promise<string> {
   return targetId;
 }
 
-async function openProfileCardFromAvatar(chat: ChatSurface, source: MessageSource): Promise<void> {
-  const sourceMessage = getSourceMessage(chat, source);
-  const avatar = sourceMessage.locator('#author-photo').first();
-  const profileCard = chat.locator('.ytcq-profile-card:not(.ytcq-inbox-card)');
-
-  await test.step('Wait for a chat avatar', async () => {
-    await avatar.waitFor({ state: 'visible', timeout: 45_000 });
-  });
-
-  await test.step('Open recent-message profile card', async () => {
-    await centerLocatorInViewport(sourceMessage);
-    await avatar.click({ timeout: 2_000 });
-    await expect(profileCard).toBeVisible();
-  });
+function isSameProfileMessageSource(first: MessageSource, second: MessageSource): boolean {
+  const messageIdMatches = !first.messageId || !second.messageId || first.messageId === second.messageId;
+  return messageIdMatches &&
+    first.authorName === second.authorName &&
+    first.channelId === second.channelId &&
+    first.messageText === second.messageText &&
+    first.targetId === second.targetId;
 }
 
 async function expectProfileCardHasRecentMessages(chat: ChatSurface, source: MessageSource): Promise<void> {
@@ -228,6 +246,14 @@ async function closeProfileCard(chat: ChatSurface): Promise<void> {
     await profileCard.locator('.ytcq-profile-card-close').click();
     await expect(profileCard).toHaveCount(0);
   });
+}
+
+async function closeProfileCardIfPresent(chat: ChatSurface): Promise<void> {
+  const profileCard = chat.locator('.ytcq-profile-card:not(.ytcq-inbox-card)');
+  if (!await profileCard.isVisible({ timeout: 500 }).catch(() => false)) return;
+
+  await profileCard.locator('.ytcq-profile-card-close').click().catch(() => undefined);
+  await expect(profileCard).toHaveCount(0, { timeout: 2_000 }).catch(() => undefined);
 }
 
 function getSourceMessage(chat: ChatSurface, source: MessageSource): ReturnType<ChatSurface['locator']> {

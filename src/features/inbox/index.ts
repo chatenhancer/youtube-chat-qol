@@ -20,7 +20,7 @@ import {
   processPotentialMentionForConsumer,
   registerMentionProcessor
 } from '../mention-detection';
-import { registerFeatureLifecycle } from '../../content/lifecycle';
+import { registerFeatureLifecycle, type FeatureMessageContext } from '../../content/lifecycle';
 import {
   cleanupInboxTabAlertListeners,
   clearInboxTabAlert,
@@ -145,17 +145,19 @@ export function handlePotentialInbox(message: HTMLElement): void {
   processPotentialKeywordInbox(message);
 }
 
-function handleInboxMessage(message: HTMLElement, { allowTranslate }: { allowTranslate: boolean }): void {
-  if (allowTranslate) {
+function handleInboxMessage(
+  message: HTMLElement,
+  { allowTranslate, source }: Pick<FeatureMessageContext, 'allowTranslate' | 'source'>
+): void {
+  if (allowTranslate || source === 'changed') {
     handlePotentialInbox(message);
   } else {
     highlightPotentialInboxKeywords(message);
   }
 }
 
-function handleInboxMutations({ addedElements, changedMessages, mutations }: {
+function handleInboxMutations({ addedElements, mutations }: {
   addedElements: Element[];
-  changedMessages: HTMLElement[];
   mutations: MutationRecord[];
 }): void {
   const shouldWireButton = mutations.some((mutation) => {
@@ -168,7 +170,6 @@ function handleInboxMutations({ addedElements, changedMessages, mutations }: {
   });
 
   if (shouldWireButton) scheduleInboxButtonWire();
-  changedMessages.forEach(handlePotentialInbox);
 }
 
 export function highlightPotentialInboxKeywords(message: HTMLElement): void {

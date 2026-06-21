@@ -60,25 +60,29 @@ describe('translation feature lifecycle wiring', () => {
     const message = document.createElement('yt-live-chat-text-message-renderer');
     const messageData = Promise.resolve(null);
 
-    lifecycle.message?.render?.(message, { allowTranslate: true, messageData });
+    lifecycle.message?.render?.(message, { allowTranslate: true, messageData, source: 'added' });
     expect(queueMocks.queueMessageTranslation).not.toHaveBeenCalled();
 
     setCurrentOptions({ ...DEFAULT_OPTIONS, targetLanguage: 'ko' });
-    lifecycle.message?.render?.(message, { allowTranslate: false, messageData });
+    lifecycle.message?.render?.(message, { allowTranslate: false, messageData, source: 'existing' });
     expect(queueMocks.queueMessageTranslation).not.toHaveBeenCalled();
 
-    lifecycle.message?.render?.(message, { allowTranslate: true, messageData });
-    lifecycle.mutation?.render?.({ addedElements: [], changedMessages: [message], mutations: [] });
+    lifecycle.message?.render?.(message, { allowTranslate: true, messageData, source: 'added' });
+    lifecycle.message?.render?.(message, { allowTranslate: false, messageData, source: 'changed' });
 
     expect(queueMocks.queueMessageTranslation).toHaveBeenCalledTimes(2);
   });
 
-  it('does not requeue mutation messages that already have a translation key', () => {
+  it('does not requeue changed messages that already have a translation key', () => {
     const message = document.createElement('yt-live-chat-text-message-renderer');
     message.dataset.ytcqTranslationKey = 'existing-key';
     setCurrentOptions({ ...DEFAULT_OPTIONS, targetLanguage: 'ko' });
 
-    lifecycle.mutation?.render?.({ addedElements: [], changedMessages: [message], mutations: [] });
+    lifecycle.message?.render?.(message, {
+      allowTranslate: false,
+      messageData: Promise.resolve(null),
+      source: 'changed'
+    });
 
     expect(queueMocks.queueMessageTranslation).not.toHaveBeenCalled();
   });

@@ -52,12 +52,7 @@ registerFeatureLifecycle({
     cleanupStale: cleanupStaleFocusMode,
     reset: resetFocusMode
   },
-  message: { collect: handlePotentialFocusMessage },
-  mutation: {
-    collect: ({ changedMessages }) => {
-      changedMessages.forEach(handlePotentialFocusMessage);
-    }
-  }
+  message: { collect: handlePotentialFocusMessage }
 });
 
 export function initFocusMode(): void {

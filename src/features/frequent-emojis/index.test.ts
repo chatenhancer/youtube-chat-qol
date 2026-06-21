@@ -191,7 +191,6 @@ describe('frequent emoji feature entry points', () => {
 
     handleFeatureMutations({
       addedElements: [picker, child, wrapper],
-      changedMessages: [],
       mutations: []
     });
 

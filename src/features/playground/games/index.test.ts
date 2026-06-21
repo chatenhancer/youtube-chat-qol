@@ -958,7 +958,6 @@ describe('playground games header button', () => {
 
     handleFeatureMutations({
       addedElements: [wrapper],
-      changedMessages: [],
       mutations: []
     });
     await vi.runOnlyPendingTimersAsync();
@@ -975,7 +974,6 @@ describe('playground games header button', () => {
     setOptions({ ...DEFAULT_OPTIONS, playgroundEnabled: false });
     handleFeatureMutations({
       addedElements: [wrapper],
-      changedMessages: [],
       mutations: []
     });
     await vi.runOnlyPendingTimersAsync();
@@ -984,7 +982,6 @@ describe('playground games header button', () => {
     setOptions({ ...DEFAULT_OPTIONS, playgroundEnabled: true });
     handleFeatureMutations({
       addedElements: [document.createElement('div')],
-      changedMessages: [],
       mutations: []
     });
     await vi.runOnlyPendingTimersAsync();

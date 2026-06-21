@@ -178,8 +178,8 @@ describe('inbox coordinator', () => {
     const touchedMessage = createMessage('@ViewerTouched', 'hello alpha');
     document.body.append(liveMessage, touchedMessage);
 
-    handleFeatureMessage(liveMessage, { allowTranslate: true });
-    handleFeatureMessage(touchedMessage, { allowTranslate: false });
+    handleFeatureMessage(liveMessage, { allowTranslate: true, source: 'added' });
+    handleFeatureMessage(touchedMessage, { allowTranslate: false, source: 'existing' });
     await Promise.resolve();
 
     expect(mentionMocks.processPotentialMentionForConsumer).toHaveBeenCalledWith(
@@ -195,7 +195,7 @@ describe('inbox coordinator', () => {
     expect(highlightMocks.applyChatKeywordHighlights).toHaveBeenCalledWith(touchedMessage, ['alpha'], '@ViewerTouched|hello alpha');
   });
 
-  it('wires the inbox button from header mutations and retries changed messages', () => {
+  it('wires the inbox button from header mutations and retries changed messages through message lifecycle', () => {
     const header = document.createElement('yt-live-chat-header-renderer');
     const wrapper = document.createElement('div');
     wrapper.append(header);
@@ -204,12 +204,11 @@ describe('inbox coordinator', () => {
 
     handleFeatureMutations({
       addedElements: [header],
-      changedMessages: [changedMessage],
       mutations: []
     });
+    handleFeatureMessage(changedMessage, { allowTranslate: false, source: 'changed' });
     handleFeatureMutations({
       addedElements: [],
-      changedMessages: [],
       mutations: [{
         addedNodes: [] as unknown as NodeList,
         attributeName: null,
@@ -238,7 +237,6 @@ describe('inbox coordinator', () => {
 
     handleFeatureMutations({
       addedElements: [wrapper],
-      changedMessages: [],
       mutations: []
     });
 
