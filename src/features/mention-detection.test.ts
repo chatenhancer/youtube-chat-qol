@@ -194,7 +194,6 @@ describe('current-user mention detection', () => {
     document.body.append(surface);
     handleFeatureMutations({
       addedElements: [surface],
-      changedMessages: [],
       mutations: [{
         addedNodes: [surface] as unknown as NodeList,
         attributeName: null,
@@ -221,7 +220,6 @@ describe('current-user mention detection', () => {
 
     handleFeatureMutations({
       addedElements: [],
-      changedMessages: [],
       mutations: [{
         addedNodes: [] as unknown as NodeList,
         attributeName: null,
@@ -249,8 +247,8 @@ describe('current-user mention detection', () => {
       target: surface,
       type: 'childList' as MutationRecordType
     };
-    handleFeatureMutations({ addedElements: [], changedMessages: [], mutations: [mutation] });
-    handleFeatureMutations({ addedElements: [], changedMessages: [], mutations: [mutation] });
+    handleFeatureMutations({ addedElements: [], mutations: [mutation] });
+    handleFeatureMutations({ addedElements: [], mutations: [mutation] });
     expect(setTimeoutSpy).toHaveBeenCalledTimes(1);
 
     await vi.runOnlyPendingTimersAsync();
@@ -268,7 +266,6 @@ describe('current-user mention detection', () => {
     author.textContent = '@AfterViewer';
     handleFeatureMutations({
       addedElements: [],
-      changedMessages: [],
       mutations: [{
         addedNodes: [] as unknown as NodeList,
         attributeName: null,
@@ -294,7 +291,6 @@ describe('current-user mention detection', () => {
 
     handleFeatureMutations({
       addedElements: [],
-      changedMessages: [],
       mutations: [{
         addedNodes: [] as unknown as NodeList,
         attributeName: null,
@@ -321,7 +317,6 @@ describe('current-user mention detection', () => {
 
     handleFeatureMutations({
       addedElements: [],
-      changedMessages: [],
       mutations: [{
         addedNodes: [wrapper] as unknown as NodeList,
         attributeName: null,
@@ -347,7 +342,6 @@ describe('current-user mention detection', () => {
 
     handleFeatureMutations({
       addedElements: [],
-      changedMessages: [],
       mutations: [{
         addedNodes: [] as unknown as NodeList,
         attributeName: null,

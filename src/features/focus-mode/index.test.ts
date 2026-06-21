@@ -237,18 +237,14 @@ describe('focus mode entrypoint', () => {
     expect(document.querySelector('.ytcq-focus-bubble')?.textContent).toBe('new focused message');
   });
 
-  it('records changed messages from the lifecycle mutation collector while expanded', async () => {
+  it('records changed messages from the message lifecycle while expanded', async () => {
     const lifecycle = await import('../../content/lifecycle');
     expect(openFocusModeForAuthor({ authorName: '@MutationFocused', channelId: 'viewer-channel' })).toBe(true);
     await vi.runAllTimersAsync();
 
     const nextMessage = createMessage('@MutationFocused', 'mutation message', 'viewer-channel');
     document.body.append(nextMessage);
-    lifecycle.handleFeatureMutations({
-      addedElements: [],
-      changedMessages: [nextMessage],
-      mutations: []
-    });
+    lifecycle.handleFeatureMessage(nextMessage, { allowTranslate: false, source: 'changed' });
 
     expect(document.querySelector('.ytcq-focus-bubble')?.textContent).toBe('mutation message');
   });

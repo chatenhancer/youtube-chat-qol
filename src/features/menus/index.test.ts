@@ -147,7 +147,6 @@ describe('menu router', () => {
 
     handleFeatureMutations({
       addedElements: [addedMenu, containingChild, wrapper],
-      changedMessages: [],
       mutations: [{
         target: targetChild,
         type: 'childList'
@@ -167,7 +166,6 @@ describe('menu router', () => {
 
     handleFeatureMutations({
       addedElements: [unrelated],
-      changedMessages: [],
       mutations: [{
         target: text,
         type: 'characterData'

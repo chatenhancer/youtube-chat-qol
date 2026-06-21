@@ -30,8 +30,9 @@ type MessageCallback = (message: HTMLElement, context: FeatureMessageContext) =>
 type MutationCallback = (batch: FeatureMutationBatch) => void;
 type ParticipantCallback = (participant: HTMLElement) => void;
 type PhasedCallbacks<T extends (...args: never[]) => void> = Record<FeatureLifecyclePhase, T[]>;
-type FeatureMessageDispatchContext = Omit<FeatureMessageContext, 'messageData'> & {
+type FeatureMessageDispatchContext = Omit<FeatureMessageContext, 'messageData' | 'source'> & {
   messageData?: Promise<YouTubeMessageData | null>;
+  source?: FeatureMessageSource;
 };
 
 /**
@@ -42,6 +43,7 @@ type FeatureMessageDispatchContext = Omit<FeatureMessageContext, 'messageData'> 
  * `render` applies DOM renderings that depend on collected state.
  */
 export type FeatureLifecyclePhase = 'collect' | 'enhance' | 'render';
+export type FeatureMessageSource = 'existing' | 'added' | 'changed';
 
 /**
  * Optional collect/enhance/render hooks for one repeated lifecycle surface.
@@ -73,6 +75,16 @@ export interface FeatureLifecycleContext {
 
 export interface FeatureMessageContext {
   /**
+   * Why this message renderer is being dispatched.
+   *
+   * `existing` is used for boot and visible-message recovery scans.
+   * `added` is used for newly inserted chat renderers.
+   * `changed` is used when an existing renderer's text or children changed,
+   * including YouTube filling message text after the renderer was first seen.
+   */
+  source: FeatureMessageSource;
+
+  /**
    * Whether this message is a newly added top-level chat renderer.
    *
    * `true` means the message came from a new renderer and live-only actions,
@@ -102,19 +114,12 @@ export interface FeatureMutationBatch {
   addedElements: Element[];
 
   /**
-   * Deduplicated YouTube chat message renderers whose text or children changed.
-   *
-   * Use this for late-loaded message text handling, such as retrying Inbox,
-   * focus, user history, or translation work after YouTube fills `#message`.
-   */
-  changedMessages: HTMLElement[];
-
-  /**
    * Raw mutation records from the shared observer.
    *
-   * Prefer `addedElements` and `changedMessages`. Use raw records only when a
-   * feature needs to inspect a non-message target, such as the chat header or a
-   * YouTube menu popup.
+   * Prefer `addedElements`. Use raw records only when a feature needs to
+   * inspect a non-message target, such as the chat header or a YouTube menu
+   * popup. Chat message renderer changes are dispatched separately through the
+   * normal message lifecycle with `source: 'changed'`.
    */
   mutations: MutationRecord[];
 }
@@ -375,7 +380,8 @@ export function handleFeatureMessage(message: HTMLElement, context: FeatureMessa
   if (featuresSuspended) return;
   const featureContext: FeatureMessageContext = {
     ...context,
-    messageData: context.messageData || Promise.resolve(null)
+    messageData: context.messageData || Promise.resolve(null),
+    source: context.source || (context.allowTranslate ? 'added' : 'existing')
   };
   runPhasedCallbacks(messageCallbacks, (callback) => callback(message, featureContext));
 }

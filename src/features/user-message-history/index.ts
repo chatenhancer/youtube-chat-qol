@@ -66,12 +66,7 @@ let translationListenersInitialized = false;
 
 registerFeatureLifecycle({
   page: { init: initUserMessageHistoryTranslationListeners },
-  message: { collect: recordUserMessage },
-  mutation: {
-    collect: ({ changedMessages }) => {
-      changedMessages.forEach(recordUserMessage);
-    }
-  }
+  message: { collect: recordUserMessage }
 });
 
 function initUserMessageHistoryTranslationListeners(): void {

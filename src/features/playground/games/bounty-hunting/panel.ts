@@ -202,12 +202,7 @@ let activeBountyHuntingPanel: BountyHuntingPanelRuntime | null = null;
 let activeBountyHuntingFallback: BountyHuntingFallbackRuntime | null = null;
 
 registerFeatureLifecycle({
-  message: { collect: handleBountyHuntingLifecycleMessage },
-  mutation: {
-    collect({ changedMessages }) {
-      changedMessages.forEach((message) => handleBountyHuntingLifecycleMessage(message));
-    }
-  }
+  message: { collect: handleBountyHuntingLifecycleMessage }
 });
 
 export function openBountyHuntingGamePanel(

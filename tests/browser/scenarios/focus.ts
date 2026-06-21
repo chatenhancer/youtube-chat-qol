@@ -36,7 +36,11 @@ interface MessageSource {
   authorName: string;
   channelId: string;
   text: string;
+  targetId: string;
 }
+
+const FOCUS_TARGET_ATTRIBUTE = 'data-ytcq-browser-focus-target';
+let nextFocusTargetId = 0;
 
 async function openCollapsedFocusPromptFromRecentMessage(chat: ChatSurface): Promise<MessageSource> {
   return test.step('Click a recent author handle to open collapsed focus prompt', async () => {
@@ -46,11 +50,12 @@ async function openCollapsedFocusPromptFromRecentMessage(chat: ChatSurface): Pro
     const count = await messages.count();
     const firstCandidate = Math.max(0, count - 20);
     for (let index = count - 1; index >= firstCandidate; index -= 1) {
-      const message = messages.nth(index);
-      const source = await readMessageSource(message);
-      if (!source) continue;
+      const message = await freezeFocusMessageTarget(chat, messages.nth(index));
+      if (!message) continue;
 
       await centerLocatorInViewport(message);
+      const sourceBeforeClick = await readMessageSource(message);
+      if (!sourceBeforeClick) continue;
       const clicked = await message.locator('#author-name').first()
         .click({ timeout: 2_000 })
         .then(() => true, () => false);
@@ -58,7 +63,11 @@ async function openCollapsedFocusPromptFromRecentMessage(chat: ChatSurface): Pro
 
       const focusPrompt = chat.locator('.ytcq-focus-card-collapsed');
       if (await focusPrompt.isVisible({ timeout: 5_000 }).catch(() => false)) {
-        return source;
+        const sourceAfterClick = await readMessageSource(message);
+        if (sourceAfterClick && isSameMessageSource(sourceBeforeClick, sourceAfterClick)) {
+          return sourceAfterClick;
+        }
+        await closeFocusPromptIfPresent(chat);
       }
     }
 
@@ -66,10 +75,25 @@ async function openCollapsedFocusPromptFromRecentMessage(chat: ChatSurface): Pro
   });
 }
 
+async function freezeFocusMessageTarget(chat: ChatSurface, message: Locator): Promise<Locator | null> {
+  const targetId = `focus-card-${Date.now()}-${nextFocusTargetId++}`;
+  const didFreeze = await message.evaluate((element, { attribute, value }) => {
+    if (!(element instanceof HTMLElement) || !element.isConnected) return false;
+    element.setAttribute(attribute, value);
+    return true;
+  }, {
+    attribute: FOCUS_TARGET_ATTRIBUTE,
+    value: targetId
+  }).catch(() => false);
+
+  return didFreeze ? chat.locator(`[${FOCUS_TARGET_ATTRIBUTE}="${escapeCssString(targetId)}"]`).first() : null;
+}
+
 async function readMessageSource(message: Locator): Promise<MessageSource | null> {
   const authorName = cleanVisibleText(await message.locator('#author-name').first().innerText().catch(() => ''));
   const text = cleanVisibleText(await message.locator('#message').first().innerText().catch(() => ''));
   if (!authorName || !text) return null;
+  const targetId = await message.getAttribute(FOCUS_TARGET_ATTRIBUTE).catch(() => '') || '';
 
   const channelId = await message.evaluate((element) => {
     const author = element.querySelector('#author-name');
@@ -87,8 +111,20 @@ async function readMessageSource(message: Locator): Promise<MessageSource | null
   return {
     authorName,
     channelId,
-    text
+    text,
+    targetId
   };
+}
+
+function isSameMessageSource(first: MessageSource, second: MessageSource): boolean {
+  return first.authorName === second.authorName &&
+    first.channelId === second.channelId &&
+    first.text === second.text &&
+    first.targetId === second.targetId;
+}
+
+function escapeCssString(value: string): string {
+  return value.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
 }
 
 async function expandFocusPanel(chat: ChatSurface): Promise<void> {

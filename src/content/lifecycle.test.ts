@@ -34,24 +34,27 @@ describe('content feature lifecycle', () => {
       timestampUsec: '1782000000000000'
     });
     let receivedMessageData: Promise<unknown> | null = null;
+    let receivedSource = '';
 
     lifecycle.registerFeatureLifecycle({
       message: {
         collect: (_message, context) => {
           calls.push('message-collect');
           receivedMessageData = context.messageData;
+          receivedSource = context.source;
         },
         render: () => calls.push('message-render')
       }
     });
 
-    lifecycle.handleFeatureMessage(message, { allowTranslate: true, messageData });
+    lifecycle.handleFeatureMessage(message, { allowTranslate: false, messageData, source: 'changed' });
 
     expect(calls).toEqual([
       'message-collect',
       'message-render'
     ]);
     expect(receivedMessageData).toBe(messageData);
+    expect(receivedSource).toBe('changed');
   });
 
   it('ignores extension-managed observer nodes automatically', async () => {
@@ -88,7 +91,6 @@ describe('content feature lifecycle', () => {
     lifecycle.handleFeatureMessage(document.createElement('yt-live-chat-text-message-renderer'), { allowTranslate: true });
     lifecycle.handleFeatureMutations({
       addedElements: [],
-      changedMessages: [],
       mutations: []
     });
     lifecycle.handleFeatureParticipant(document.createElement('yt-live-chat-participant-renderer'));
