@@ -100,12 +100,12 @@ describe('YouTube chat source url helpers', () => {
     expect(getCurrentYouTubeChatSourceUrl()).toBe('https://www.youtube.com/watch?v=stream-from-top');
   });
 
-  it('uses accessible parent watch metadata for live channel pages', () => {
+  it('ignores accessible watch metadata that can be stale on live channel pages', () => {
     window.history.replaceState({}, '', '/live_chat?continuation=first-volatile-token');
     const topDocument = document.implementation.createHTMLDocument('Top Stream - YouTube');
     const canonical = topDocument.createElement('link');
     canonical.rel = 'canonical';
-    canonical.href = 'https://www.youtube.com/watch?v=stable-live-id&feature=live';
+    canonical.href = 'https://www.youtube.com/watch?v=stale-live-id&feature=live';
     topDocument.head.append(canonical);
     Object.defineProperty(window, 'top', {
       configurable: true,
@@ -117,8 +117,8 @@ describe('YouTube chat source url helpers', () => {
       } as Window
     });
 
-    expect(getCurrentYouTubeChatSourceUrl()).toBe('https://www.youtube.com/watch?v=stable-live-id');
-    expect(getYouTubeChatSourceStorageKey(getCurrentYouTubeChatSourceUrl())).toBe('video:stable-live-id');
+    expect(getCurrentYouTubeChatSourceUrl()).toBe('http://localhost:3000/live_chat?continuation=first-volatile-token');
+    expect(getYouTubeChatSourceStorageKey(getCurrentYouTubeChatSourceUrl())).toMatch(/^source:[a-z0-9]+$/);
   });
 
   it('uses an accessible parent watch url when the top window is unavailable', () => {

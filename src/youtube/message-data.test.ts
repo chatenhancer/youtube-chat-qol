@@ -8,10 +8,6 @@ describe('YouTube message data receiver', () => {
   it('caches sanitized message data and notifies listeners with the matching DOM message', async () => {
     vi.resetModules();
     document.body.replaceChildren();
-    const requestEvents: string[] = [];
-    window.addEventListener(YOUTUBE_MESSAGE_DATA_REQUEST_EVENT, () => requestEvents.push('request'), {
-      once: true
-    });
     const { getYouTubeMessageData, initYouTubeMessageData } = await import('./message-data');
     const listener = vi.fn();
     const message = document.createElement('yt-live-chat-text-message-renderer');
@@ -30,7 +26,6 @@ describe('YouTube message data receiver', () => {
       })
     }));
 
-    expect(requestEvents).toEqual(['request']);
     expect(listener).toHaveBeenCalledWith(message, {
       authorExternalChannelId: 'UC123',
       authorName: '@Example',
@@ -42,6 +37,21 @@ describe('YouTube message data receiver', () => {
       messageId: 'msg-1',
       timestampUsec: '1782000000000000'
     });
+  });
+
+  it('requests YouTube message data on the specific message element', async () => {
+    vi.resetModules();
+    document.body.replaceChildren();
+    const { requestYouTubeMessageData } = await import('./message-data');
+    const message = document.createElement('yt-live-chat-text-message-renderer');
+    const requests: Event[] = [];
+    document.body.append(message);
+    document.addEventListener(YOUTUBE_MESSAGE_DATA_REQUEST_EVENT, (event) => requests.push(event));
+
+    requestYouTubeMessageData(message);
+
+    expect(requests).toHaveLength(1);
+    expect(requests[0].target).toBe(message);
   });
 
   it('ignores malformed event details and timestamp values', async () => {

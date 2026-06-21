@@ -19,7 +19,8 @@ const lifecycleMocks = vi.hoisted(() => ({
 }));
 
 const messageDataMocks = vi.hoisted(() => ({
-  initYouTubeMessageData: vi.fn()
+  initYouTubeMessageData: vi.fn(),
+  requestYouTubeMessageData: vi.fn()
 }));
 
 vi.mock('./enabled-features', () => ({}));
@@ -78,6 +79,7 @@ describe('content script entrypoint wiring', () => {
     expect(lifecycleMocks.cleanupStaleFeatures).toHaveBeenCalledOnce();
     expect(lifecycleMocks.initFeatures).toHaveBeenCalledOnce();
     expect(messageDataMocks.initYouTubeMessageData).toHaveBeenCalledOnce();
+    expect(messageDataMocks.requestYouTubeMessageData).toHaveBeenCalledWith(message);
     expect(lifecycleMocks.handleFeatureMessage).toHaveBeenCalledWith(message, { allowTranslate: false });
     expect(lifecycleMocks.handleFeatureParticipant.mock.calls[0][0]).toBe(participant);
     expect(lifecycleMocks.bootFeatures).toHaveBeenCalledOnce();
@@ -127,6 +129,8 @@ describe('content script entrypoint wiring', () => {
     const batch = lifecycleMocks.handleFeatureMutations.mock.calls[0][0] as FeatureMutationBatch;
     expect(batch.addedElements).toEqual([newMessage, child]);
     expect(batch.changedMessages).toEqual([containingMessage]);
+    expect(messageDataMocks.requestYouTubeMessageData).toHaveBeenCalledWith(containingMessage);
+    expect(messageDataMocks.requestYouTubeMessageData).toHaveBeenCalledWith(newMessage);
     expect(lifecycleMocks.handleFeatureMessage).toHaveBeenCalledWith(newMessage, { allowTranslate: true });
     expect(lifecycleMocks.handleFeatureMessage).toHaveBeenCalledWith(containingMessage, { allowTranslate: false });
   });

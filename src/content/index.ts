@@ -28,7 +28,7 @@ import {
 import { DEFAULT_OPTIONS, getTargetLanguageUpdate, normalizeOptions, type Options } from '../shared/options';
 import { getOptions, setOptions } from '../shared/state';
 import { initUiLocaleFromDocument } from '../shared/i18n';
-import { initYouTubeMessageData } from '../youtube/message-data';
+import { initYouTubeMessageData, requestYouTubeMessageData } from '../youtube/message-data';
 import { CHAT_MESSAGE_SELECTOR, PARTICIPANT_SELECTOR } from '../youtube/selectors';
 
 let observer: MutationObserver | null = null;
@@ -84,6 +84,7 @@ function boot(): void {
 
   observer = new MutationObserver((mutations) => {
     const batch = createFeatureMutationBatch(mutations);
+    batch.changedMessages.forEach(requestYouTubeMessageData);
     handleFeatureMutations(batch);
     batch.addedElements.forEach(handleAddedElement);
   });
@@ -98,6 +99,7 @@ function boot(): void {
 function processExistingMessages(): void {
   const messages = Array.from(document.querySelectorAll<HTMLElement>(CHAT_MESSAGE_SELECTOR));
   messages.forEach((message) => {
+    requestYouTubeMessageData(message);
     handleFeatureMessage(message, { allowTranslate: false });
   });
 }
@@ -151,6 +153,7 @@ function createFeatureMutationBatch(mutations: MutationRecord[]): FeatureMutatio
 
 function handleAddedElement(element: Element): void {
   if (element.matches(CHAT_MESSAGE_SELECTOR) && element instanceof HTMLElement) {
+    requestYouTubeMessageData(element);
     handleFeatureMessage(element, { allowTranslate: true });
   }
   if (element.matches(PARTICIPANT_SELECTOR) && element instanceof HTMLElement) {
@@ -159,6 +162,7 @@ function handleAddedElement(element: Element): void {
 
   const containingMessage = element.closest<HTMLElement>(CHAT_MESSAGE_SELECTOR);
   if (containingMessage && !element.matches(CHAT_MESSAGE_SELECTOR)) {
+    requestYouTubeMessageData(containingMessage);
     handleFeatureMessage(containingMessage, { allowTranslate: false });
   }
 
@@ -168,6 +172,7 @@ function handleAddedElement(element: Element): void {
   }
 
   element.querySelectorAll<HTMLElement>(CHAT_MESSAGE_SELECTOR).forEach((message) => {
+    requestYouTubeMessageData(message);
     handleFeatureMessage(message, { allowTranslate: true });
   });
   element.querySelectorAll<HTMLElement>(PARTICIPANT_SELECTOR).forEach(handleFeatureParticipant);

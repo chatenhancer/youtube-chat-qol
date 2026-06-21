@@ -2,8 +2,8 @@
  * Page-world YouTube message data adapter.
  *
  * This runs in the page's MAIN world so it can read YouTube's renderer-owned
- * `data` property. It emits only a small sanitized allowlist to the isolated
- * extension world.
+ * `data` property for message elements requested by the isolated extension
+ * world. It emits only a small sanitized allowlist back.
  */
 import {
   YOUTUBE_MESSAGE_DATA_EVENT,
@@ -27,53 +27,19 @@ const sentMessageIds: string[] = [];
 startYouTubeMessageDataAdapter();
 
 function startYouTubeMessageDataAdapter(): void {
-  window.addEventListener(YOUTUBE_MESSAGE_DATA_REQUEST_EVENT, () => {
-    scanYouTubeMessageData(document, { force: true, retry: true });
-  });
-
-  const startObserver = (): void => {
-    const root = document.documentElement || document.body;
-    if (!root) {
-      window.setTimeout(startObserver, 0);
-      return;
-    }
-
-    scanYouTubeMessageData(document, { force: false, retry: true });
-    new MutationObserver((mutations) => handleYouTubeMessageDataMutations(mutations)).observe(root, {
-      characterData: true,
-      childList: true,
-      subtree: true
-    });
-  };
-
-  startObserver();
+  document.addEventListener(YOUTUBE_MESSAGE_DATA_REQUEST_EVENT, handleYouTubeMessageDataRequest);
 }
 
-function handleYouTubeMessageDataMutations(mutations: MutationRecord[]): void {
-  mutations.forEach((mutation) => {
-    const target = mutation.target instanceof Element
-      ? mutation.target
-      : mutation.target.parentElement;
-    const containingMessage = target?.closest<HTMLElement>(CHAT_MESSAGE_SELECTOR);
-    if (containingMessage) processYouTubeMessageData(containingMessage, { force: false, retry: true });
-
-    mutation.addedNodes.forEach((node) => {
-      if (node instanceof Element) scanYouTubeMessageData(node, { force: false, retry: true });
-    });
-  });
+function handleYouTubeMessageDataRequest(event: Event): void {
+  const message = getRequestedYouTubeMessage(event.target);
+  if (!message) return;
+  processYouTubeMessageData(message, { force: false, retry: true });
 }
 
-function scanYouTubeMessageData(
-  root: ParentNode,
-  options: { force: boolean; retry: boolean }
-): void {
-  if (root instanceof Element && root.matches(CHAT_MESSAGE_SELECTOR)) {
-    processYouTubeMessageData(root as HTMLElement, options);
-  }
-
-  root.querySelectorAll?.(CHAT_MESSAGE_SELECTOR).forEach((message) => {
-    processYouTubeMessageData(message as HTMLElement, options);
-  });
+function getRequestedYouTubeMessage(target: EventTarget | null): HTMLElement | null {
+  if (!(target instanceof Element)) return null;
+  if (target.matches(CHAT_MESSAGE_SELECTOR) && target instanceof HTMLElement) return target;
+  return target.closest<HTMLElement>(CHAT_MESSAGE_SELECTOR);
 }
 
 function processYouTubeMessageData(

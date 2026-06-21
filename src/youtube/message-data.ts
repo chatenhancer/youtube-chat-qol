@@ -25,19 +25,22 @@ export type { YouTubeMessageData };
 
 export function initYouTubeMessageData(listener: YouTubeMessageDataListener): void {
   listeners.add(listener);
-  if (started) {
-    requestYouTubeMessageDataScan();
-    return;
-  }
+  if (started) return;
 
   started = true;
   window.addEventListener(YOUTUBE_MESSAGE_DATA_EVENT, handleYouTubeMessageDataEvent);
-  requestYouTubeMessageDataScan();
 }
 
 export function getYouTubeMessageData(message: HTMLElement): YouTubeMessageData | null {
   const messageId = getMessageStableId(message);
   return messageId ? messageDataById.get(messageId) || null : null;
+}
+
+export function requestYouTubeMessageData(message: HTMLElement): void {
+  message.dispatchEvent(new CustomEvent(YOUTUBE_MESSAGE_DATA_REQUEST_EVENT, {
+    bubbles: true,
+    composed: true
+  }));
 }
 
 function handleYouTubeMessageDataEvent(event: Event): void {
@@ -100,8 +103,4 @@ function findYouTubeMessageById(messageId: string): HTMLElement | null {
     if (getMessageStableId(message) === messageId) return message;
   }
   return null;
-}
-
-function requestYouTubeMessageDataScan(): void {
-  window.dispatchEvent(new CustomEvent(YOUTUBE_MESSAGE_DATA_REQUEST_EVENT));
 }
