@@ -38,6 +38,13 @@ npm run test
 Run Vitest tests.
 
 ```sh
+npm run test:all
+```
+
+Run every test layer once: Vitest, all mock and live browser behavior specs,
+and mock browser performance specs.
+
+```sh
 npm run test:coverage
 ```
 

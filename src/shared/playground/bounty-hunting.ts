@@ -24,6 +24,10 @@ export type BountyHuntingGameStatus = 'active' | 'countdown' | 'finished' | 'pre
 export type BountyHuntingPlayerRole = 'guest' | 'host';
 export type BountyHuntingBountyDescriptionKey = typeof BOUNTY_HUNTING_BOUNTY_DESCRIPTION_KEYS[number];
 
+export function getBountyHuntingRoundStartTimestampUsec(phaseStartedAt: number): string {
+  return String(BigInt(Math.trunc(phaseStartedAt + BOUNTY_HUNTING_COUNTDOWN_MS)) * 1000n);
+}
+
 export type BountyHuntingBountyMatcher =
   | { kind: 'allCaps' }
   | { kind: 'channelMemberAuthor' }

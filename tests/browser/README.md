@@ -84,6 +84,12 @@ Run all browser behavior specs:
 npm run test:browser
 ```
 
+Run every project test layer:
+
+```sh
+npm run test:all
+```
+
 Run browser behavior specs repeatedly to check flakiness:
 
 ```sh

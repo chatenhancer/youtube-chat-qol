@@ -52,7 +52,14 @@ import {
   popupSettingsBehaviorScenario,
   settingsMenuBehaviorScenario
 } from '../scenarios/settings';
-import { playgroundChessInviteAndMoveScenario } from '../scenarios/playground-games';
+import {
+  playgroundBountyHuntingCountdownStartScenario,
+  playgroundBountyHuntingCutoffScenario,
+  playgroundBountyHuntingRoundStartScenario,
+  playgroundBountyHuntingWitnessScenario,
+  playgroundChessInviteAndMoveScenario,
+  playgroundChessTurnGatingScenario
+} from '../scenarios/playground-games';
 import { tabAlertScenario } from '../scenarios/tab-alert';
 import { loggedInMockTest as test } from '../support/scenario-fixtures';
 
@@ -87,3 +94,8 @@ test('logged-in mock: chat command autocomplete suggests names and arguments', c
 test('logged-in mock: author click writes a mention draft only', authorMentionDraftScenario);
 test('logged-in mock: author Alt-click writes a quote draft only', authorQuoteDraftScenario);
 test('logged-in mock: Playground Games invites a chess opponent and sends a move', playgroundChessInviteAndMoveScenario);
+test('logged-in mock: Chess blocks moves off-turn and accepts them on-turn', playgroundChessTurnGatingScenario);
+test('logged-in mock: Bounty Hunting round start divider attaches to the boundary message', playgroundBountyHuntingRoundStartScenario);
+test('logged-in mock: Bounty Hunting rejects pre-start messages and claims post-start messages', playgroundBountyHuntingCutoffScenario);
+test('logged-in mock: Bounty Hunting reports post-start witness messages', playgroundBountyHuntingWitnessScenario);
+test('logged-in mock: Bounty Hunting countdown starts with server timestamp cutoff', playgroundBountyHuntingCountdownStartScenario);

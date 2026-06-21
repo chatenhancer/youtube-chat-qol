@@ -6,6 +6,7 @@ const lifecycleMocks = vi.hoisted(() => ({
   bootFeatures: vi.fn(),
   cleanupStaleFeatures: vi.fn(),
   handleFeatureMessage: vi.fn(),
+  handleFeatureMessageData: vi.fn(),
   handleFeatureMutations: vi.fn(),
   handleFeatureOptionsChanged: vi.fn(),
   handleFeatureParticipant: vi.fn(),
@@ -17,8 +18,13 @@ const lifecycleMocks = vi.hoisted(() => ({
   shouldIgnoreFeatureMutation: vi.fn(() => false)
 }));
 
+const messageDataMocks = vi.hoisted(() => ({
+  initYouTubeMessageData: vi.fn()
+}));
+
 vi.mock('./enabled-features', () => ({}));
 vi.mock('./lifecycle', () => lifecycleMocks);
+vi.mock('../youtube/message-data', () => messageDataMocks);
 
 describe('content script entrypoint wiring', () => {
   let observerCallback: MutationCallback | null = null;
@@ -71,6 +77,7 @@ describe('content script entrypoint wiring', () => {
 
     expect(lifecycleMocks.cleanupStaleFeatures).toHaveBeenCalledOnce();
     expect(lifecycleMocks.initFeatures).toHaveBeenCalledOnce();
+    expect(messageDataMocks.initYouTubeMessageData).toHaveBeenCalledOnce();
     expect(lifecycleMocks.handleFeatureMessage).toHaveBeenCalledWith(message, { allowTranslate: false });
     expect(lifecycleMocks.handleFeatureParticipant.mock.calls[0][0]).toBe(participant);
     expect(lifecycleMocks.bootFeatures).toHaveBeenCalledOnce();
@@ -80,6 +87,25 @@ describe('content script entrypoint wiring', () => {
       subtree: true
     });
     expect(chrome.runtime.sendMessage).not.toHaveBeenCalled();
+  });
+
+  it('forwards sanitized YouTube message data to feature lifecycle hooks', async () => {
+    const message = createMessage();
+    const youtubeData = {
+      messageId: 'msg-1',
+      timestampUsec: '1782000000000000'
+    };
+    await import('./index');
+
+    const onMessageData = messageDataMocks.initYouTubeMessageData.mock.calls[0][0] as (
+      message: HTMLElement,
+      data: { messageId: string; timestampUsec: string }
+    ) => void;
+    onMessageData(message, youtubeData);
+
+    expect(lifecycleMocks.handleFeatureMessageData).toHaveBeenCalledWith(message, {
+      youtubeData
+    });
   });
 
   it('normalizes observer mutations before dispatching feature hooks', async () => {

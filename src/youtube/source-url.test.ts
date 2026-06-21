@@ -100,6 +100,27 @@ describe('YouTube chat source url helpers', () => {
     expect(getCurrentYouTubeChatSourceUrl()).toBe('https://www.youtube.com/watch?v=stream-from-top');
   });
 
+  it('uses accessible parent watch metadata for live channel pages', () => {
+    window.history.replaceState({}, '', '/live_chat?continuation=first-volatile-token');
+    const topDocument = document.implementation.createHTMLDocument('Top Stream - YouTube');
+    const canonical = topDocument.createElement('link');
+    canonical.rel = 'canonical';
+    canonical.href = 'https://www.youtube.com/watch?v=stable-live-id&feature=live';
+    topDocument.head.append(canonical);
+    Object.defineProperty(window, 'top', {
+      configurable: true,
+      value: {
+        document: topDocument,
+        location: {
+          href: 'https://www.youtube.com/@ExampleChannel/live'
+        }
+      } as Window
+    });
+
+    expect(getCurrentYouTubeChatSourceUrl()).toBe('https://www.youtube.com/watch?v=stable-live-id');
+    expect(getYouTubeChatSourceStorageKey(getCurrentYouTubeChatSourceUrl())).toBe('video:stable-live-id');
+  });
+
   it('uses an accessible parent watch url when the top window is unavailable', () => {
     window.history.replaceState({}, '', '/live_chat?continuation=iframe-token');
     Object.defineProperty(window, 'top', {

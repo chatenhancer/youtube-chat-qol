@@ -227,7 +227,8 @@ describe('in-room computer player', () => {
       action: 'claimBounty',
       payload: {
         bountyId: 'question',
-        messageId: 'msg-question-1'
+        messageId: 'msg-question-1',
+        messageTimestampUsec: '5000001'
       },
       userId: 'human-user'
     }, 6_050);
@@ -238,11 +239,13 @@ describe('in-room computer player', () => {
         observations: [
           {
             bountyIds: ['question'],
-            messageId: 'msg-question-1'
+            messageId: 'msg-question-1',
+            messageTimestampUsec: '5000001'
           },
           {
             bountyIds: ['verified'],
-            messageId: 'msg-verified-1'
+            messageId: 'msg-verified-1',
+            messageTimestampUsec: '5000002'
           }
         ]
       },
@@ -266,11 +269,13 @@ describe('in-room computer player', () => {
         observations: [
           {
             bountyIds: ['question'],
-            messageId: 'msg-question-1'
+            messageId: 'msg-question-1',
+            messageTimestampUsec: '5000001'
           },
           {
             bountyIds: ['verified'],
-            messageId: 'msg-verified-1'
+            messageId: 'msg-verified-1',
+            messageTimestampUsec: '5000002'
           }
         ]
       },
@@ -303,7 +308,89 @@ describe('in-room computer player', () => {
       gameId: 'game_bounty_1',
       payload: {
         bountyId: 'verified',
-        messageId: 'msg-verified-1'
+        messageId: 'msg-verified-1',
+        messageTimestampUsec: '5000002'
+      },
+      type: 'gameAction'
+    });
+  });
+
+  it('claims DOM-gated Bounty Hunting messages', async () => {
+    vi.useFakeTimers();
+    const harness = createComputerPlayerHarness(BOUNTY_HUNTING_COMPUTER_PLAYER_PROFILE);
+    let game = submitBountyHunting(
+      createBountyHuntingGame('game_bounty_1', 'human-user', harness.player.userId, 0),
+      {
+        action: 'submitBounties',
+        payload: { bounties: createBounties() },
+        userId: 'human-user'
+      },
+      1_000
+    );
+    game = readyBountyHuntingPlayer(game, harness.player.userId, 2_000);
+    game = readyBountyHuntingPlayer(game, 'human-user', 2_000);
+    game = startBountyHuntingRound(game, {
+      action: 'startRound',
+      userId: 'human-user'
+    }, 5_000);
+    game = observeBountyHuntingMessage(game, {
+      action: 'observeBountyMessage',
+      payload: {
+        observations: [{
+          bountyIds: ['question'],
+          messageId: 'msg-question-1',
+          messageTimestampUsec: '5000001'
+        }]
+      },
+      userId: 'human-user'
+    }, 6_100);
+    harness.games.set(game.gameId, game);
+    vi.setSystemTime(6_100);
+
+    sendServerMessage(harness, {
+      game: toPublicBountyHuntingGame(game, getPlayerInfo),
+      type: 'gameUpdated'
+    });
+    await vi.runAllTimersAsync();
+    await harness.flushWaitUntil();
+
+    expect(harness.sentMessages.at(-1)).toEqual({
+      action: 'observeBountyMessage',
+      gameId: 'game_bounty_1',
+      payload: {
+        observations: [{
+          bountyIds: ['question'],
+          messageId: 'msg-question-1',
+          messageTimestampUsec: '5000001'
+        }]
+      },
+      type: 'gameAction'
+    });
+
+    const witnessAction = harness.sentMessages.at(-1);
+    if (witnessAction?.type !== 'gameAction') throw new Error('Expected bot witness game action.');
+    game = observeBountyHuntingMessage(game, {
+      action: 'observeBountyMessage',
+      payload: witnessAction.payload,
+      userId: harness.player.userId
+    }, 6_220);
+    harness.games.set(game.gameId, game);
+    vi.setSystemTime(7_000);
+
+    sendServerMessage(harness, {
+      game: toPublicBountyHuntingGame(game, getPlayerInfo),
+      type: 'gameUpdated'
+    });
+    await vi.runAllTimersAsync();
+    await harness.flushWaitUntil();
+
+    expect(harness.sentMessages.at(-1)).toEqual({
+      action: 'claimBounty',
+      gameId: 'game_bounty_1',
+      payload: {
+        bountyId: 'question',
+        messageId: 'msg-question-1',
+        messageTimestampUsec: '5000001'
       },
       type: 'gameAction'
     });

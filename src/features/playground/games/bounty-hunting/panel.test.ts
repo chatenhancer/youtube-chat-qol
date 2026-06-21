@@ -13,7 +13,7 @@ vi.mock('./assets', () => ({
   getBountyHuntingAssets: assetMock.getAssets
 }));
 
-import { handleFeatureMessage } from '../../../../content/lifecycle';
+import { handleFeatureMessage, handleFeatureMessageData } from '../../../../content/lifecycle';
 import { initMentionDetection } from '../../../mention-detection';
 import { createGamePanelShell } from '../panel-shell';
 import {
@@ -27,11 +27,11 @@ import type { BountyHuntingAssets, PublicBountyHuntingGame } from './types';
 
 let shellControllers: AbortController[] = [];
 let shellCleanups: Array<() => void> = [];
+let frameCallbacks: FrameRequestCallback[] = [];
 
 describe('Bounty Hunting panel', () => {
   let audioElements: FakeAudioElement[];
   let context: ReturnType<typeof createMockCanvasContext>;
-  let frameCallbacks: FrameRequestCallback[];
 
   beforeEach(() => {
     document.body.replaceChildren();
@@ -183,9 +183,140 @@ describe('Bounty Hunting panel', () => {
     });
   });
 
-  it('temporarily stacks claimed chat messages at the bottom of the feed', async () => {
+  it('does not claim active-round messages before timestamp data arrives', () => {
+    const onAction = vi.fn();
+    openBountyHuntingGamePanel({
+      ...createBountyHuntingGame(),
+      phaseStartedAt: 103_000,
+      roundStartTimestampUsec: '103000000'
+    }, 'host-user', onAction);
+    const message = appendChatMessage('msg-new', '@Luna', 'look @Marco');
+
+    message.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+    expect(onAction).not.toHaveBeenCalledWith(
+      'game-bounty-hunting',
+      'claimBounty',
+      expect.objectContaining({ messageId: 'msg-new' })
+    );
+  });
+
+  it('sends witnesses for messages after the timestamp start divider', async () => {
     vi.useFakeTimers();
-    vi.spyOn(Date, 'now').mockImplementation(() => 100_500);
+    const onAction = vi.fn();
+    const oldMessage = appendChatMessage('msg-old', '@Luna', 'old @Marco');
+
+    openBountyHuntingGamePanel({
+      ...createBountyHuntingGame(),
+      phaseStartedAt: 102_000,
+      roundStartTimestampUsec: '103000000'
+    }, 'host-user', onAction);
+    sendYouTubeMessageTimestamp(oldMessage, '102999999');
+    runLatestBountyHuntingFrame(103_000);
+    const divider = getBountyHuntingStartDivider();
+    expect(getChatItemsContainer().contains(oldMessage)).toBe(true);
+    expect([...getChatItemsContainer().children]).not.toContain(divider);
+    expect(divider.parentElement).toBe(oldMessage);
+
+    const newMessage = appendChatMessage('msg-new', '@Luna', 'new @Marco');
+    sendYouTubeMessageTimestamp(newMessage, '103000001');
+    handleFeatureMessage(newMessage, { allowTranslate: true });
+    runLatestBountyHuntingFrame(103_100);
+    await vi.advanceTimersByTimeAsync(500);
+
+    expect(onAction).toHaveBeenCalledWith('game-bounty-hunting', 'observeBountyMessage', {
+      observations: [{
+        bountyIds: ['mention-user'],
+        messageId: 'msg-new',
+        messageTimestampUsec: '103000001'
+      }]
+    });
+    expect(getChatItemsContainer().contains(newMessage)).toBe(true);
+    expect([...getChatItemsContainer().children]).not.toContain(divider);
+    expect(divider.parentElement).toBe(newMessage);
+  });
+
+  it('uses YouTube timestamp data to reject pre-start messages and send post-start timestamps', async () => {
+    vi.useFakeTimers();
+    const onAction = vi.fn();
+    const oldMessage = appendChatMessage('msg-old', '@Luna', 'old @Marco');
+    const newMessage = appendChatMessage('msg-new', '@Luna', 'new @Marco');
+
+    openBountyHuntingGamePanel({
+      ...createBountyHuntingGame(),
+      phaseStartedAt: 103_000,
+      roundStartTimestampUsec: '103000000',
+      status: 'active'
+    }, 'host-user', onAction);
+
+    handleFeatureMessageData(oldMessage, {
+      youtubeData: {
+        messageId: 'msg-old',
+        timestampUsec: '102999999'
+      }
+    });
+    handleFeatureMessageData(newMessage, {
+      youtubeData: {
+        messageId: 'msg-new',
+        timestampUsec: '103000001'
+      }
+    });
+    handleFeatureMessage(oldMessage, { allowTranslate: true });
+    handleFeatureMessage(newMessage, { allowTranslate: true });
+    oldMessage.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    newMessage.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    await vi.advanceTimersByTimeAsync(500);
+
+    expect(onAction).not.toHaveBeenCalledWith(
+      'game-bounty-hunting',
+      'claimBounty',
+      expect.objectContaining({ messageId: 'msg-old' })
+    );
+    expect(onAction).toHaveBeenCalledWith('game-bounty-hunting', 'claimBounty', {
+      bountyId: 'mention-user',
+      messageId: 'msg-new',
+      messageTimestampUsec: '103000001'
+    });
+    expect(onAction).toHaveBeenCalledWith('game-bounty-hunting', 'observeBountyMessage', {
+      observations: [{
+        bountyIds: ['mention-user'],
+        messageId: 'msg-new',
+        messageTimestampUsec: '103000001'
+      }]
+    });
+  });
+
+  it('adds late YouTube timestamp data to a pending witness before flushing', async () => {
+    vi.useFakeTimers();
+    const onAction = vi.fn();
+    const message = appendChatMessage('msg-new', '@Luna', 'new @Marco');
+
+    openBountyHuntingGamePanel({
+      ...createBountyHuntingGame(),
+      phaseStartedAt: 103_000,
+      roundStartTimestampUsec: '103000000',
+      status: 'active'
+    }, 'host-user', onAction);
+
+    handleFeatureMessage(message, { allowTranslate: true });
+    handleFeatureMessageData(message, {
+      youtubeData: {
+        messageId: 'msg-new',
+        timestampUsec: '103000001'
+      }
+    });
+    await vi.advanceTimersByTimeAsync(500);
+
+    expect(onAction).toHaveBeenCalledWith('game-bounty-hunting', 'observeBountyMessage', {
+      observations: [{
+        bountyIds: ['mention-user'],
+        messageId: 'msg-new',
+        messageTimestampUsec: '103000001'
+      }]
+    });
+  });
+
+  it('marks claimed chat messages inline without a bottom feed', () => {
     const onAction = vi.fn();
     const baseGame = createBountyHuntingGame();
     const game: PublicBountyHuntingGame = {
@@ -209,11 +340,7 @@ describe('Bounty Hunting panel', () => {
     };
     openBountyHuntingGamePanel(game, 'host-user', onAction);
     const message = appendChatMessage('msg-1', '@Luna', 'look @Marco');
-    const customEmoji = document.createElement('img');
-    customEmoji.alt = ':party:';
-    customEmoji.src = 'https://example.test/party.png';
-    message.querySelector('#message')?.append(' ', customEmoji);
-    appendChatMessage('msg-2', '@Marco', 'anyone there?');
+    const secondMessage = appendChatMessage('msg-2', '@Marco', 'anyone there?');
     const claimedGame: PublicBountyHuntingGame = {
       ...game,
       bounties: [
@@ -246,32 +373,19 @@ describe('Bounty Hunting panel', () => {
 
     updateBountyHuntingGamePanel(claimedGame, 'host-user');
 
-    const feed = document.querySelector<HTMLElement>('.ytcq-bounty-hunting-claimed-feed');
-    const items = [...document.querySelectorAll<HTMLElement>('.ytcq-bounty-hunting-claimed-feed-item')];
-    expect(feed).toBeInstanceOf(HTMLElement);
-    expect(items).toHaveLength(2);
-    expect(items[0].firstElementChild?.className).toBe('ytcq-bounty-hunting-claimed-feed-text');
-    expect(items[0].firstElementChild?.textContent).toContain('look @Marco');
-    expect(items[0].querySelector('.ytcq-bounty-hunting-claimed-feed-avatar')?.textContent).toBe('B');
-    expect(items[0].querySelector('.ytcq-bounty-hunting-claimed-feed-claimer')?.textContent)
-      .toBe('Computer (Bounty Hunter)');
-    const detailBadges = [...items[0].querySelectorAll('.ytcq-bounty-hunting-claimed-feed-detail')];
-    expect(detailBadges.map((detail) => detail.textContent)).toEqual([
-      'Bounty: mention',
-      'Amount: $125'
-    ]);
-    expect(detailBadges.map((detail) => detail.getAttribute('aria-label'))).toEqual([
-      'Bounty: mention',
-      'Amount: $125'
-    ]);
-    expect(detailBadges[0].querySelector('.ytcq-bounty-hunting-claimed-feed-detail-value')?.textContent)
-      .toBe('mention');
-    expect(items[0].querySelector<HTMLImageElement>('.ytcq-bounty-hunting-claimed-feed-text img')?.alt).toBe(':party:');
-    expect(items[1].textContent).toContain('anyone there?');
-
-    await vi.advanceTimersByTimeAsync(2_800);
-
     expect(document.querySelector('.ytcq-bounty-hunting-claimed-feed')).toBeNull();
+    const indicators = [...document.querySelectorAll<HTMLElement>('.ytcq-bounty-hunting-claim-indicator')];
+    expect(indicators).toHaveLength(2);
+    expect(message.querySelector('.ytcq-bounty-hunting-claim-indicator')?.textContent).toBe('B$125');
+    expect(secondMessage.querySelector('.ytcq-bounty-hunting-claim-indicator')?.textContent).toBe('B$75');
+    expect(indicators[0].getAttribute('aria-label')).toBe(
+      'CLAIMED · Computer (Bounty Hunter) · Bounty: mention · Amount: $125'
+    );
+    expect(indicators[0].getAttribute('role')).toBe('status');
+
+    closeBountyHuntingGamePanel({ notify: false });
+
+    expect(document.querySelector('.ytcq-bounty-hunting-claim-indicator')).toBeNull();
   });
 
   it('does not claim bounties from the current user authored chat messages', () => {
@@ -910,6 +1024,87 @@ describe('Bounty Hunting panel', () => {
     expect(onAction).toHaveBeenCalledWith('game-bounty-hunting', 'startRound');
   });
 
+  it('keeps the start divider at the timestamp boundary after countdown', () => {
+    const onAction = vi.fn();
+    const oldMessage = appendChatMessage('msg-old', '@Luna', 'old @Marco');
+    const game = {
+      ...createBountyHuntingGame(),
+      phaseStartedAt: 100_000,
+      roundEndsAt: undefined,
+      status: 'countdown' as const
+    };
+
+    openBountyHuntingGamePanel(game, 'host-user', onAction);
+    sendYouTubeMessageTimestamp(oldMessage, '102999999');
+    vi.mocked(Date.now).mockReturnValue(103_000);
+    expect(frameCallbacks.length).toBeGreaterThan(0);
+    frameCallbacks[frameCallbacks.length - 1]?.(103_000);
+    expect(onAction).toHaveBeenCalledWith('game-bounty-hunting', 'startRound');
+    expect(getBountyHuntingStartDivider().parentElement).toBe(oldMessage);
+
+    const newMessage = appendChatMessage('msg-new', '@Luna', 'new @Marco');
+    updateBountyHuntingGamePanel({
+      ...createBountyHuntingGame(),
+      phaseStartedAt: 103_000,
+      roundStartTimestampUsec: '103000000',
+      status: 'active'
+    }, 'host-user');
+    sendYouTubeMessageTimestamp(newMessage, '103000001');
+    runLatestBountyHuntingFrame(103_100);
+
+    const divider = getBountyHuntingStartDivider();
+
+    const children = [...getChatItemsContainer().children];
+    expect(children.indexOf(oldMessage)).toBeLessThan(children.indexOf(newMessage));
+    expect(children).not.toContain(divider);
+    expect(divider.parentElement).toBe(newMessage);
+  });
+
+  it('places the start divider before the first visible post-start timestamp', () => {
+    const firstMessage = appendChatMessage('msg-new-1', '@Luna', 'first after @Marco');
+    const secondMessage = appendChatMessage('msg-new-2', '@Luna', 'second after @Marco');
+
+    openBountyHuntingGamePanel({
+      ...createBountyHuntingGame(),
+      phaseStartedAt: 103_000,
+      roundStartTimestampUsec: '103000000',
+      status: 'active'
+    }, 'host-user', vi.fn());
+    sendYouTubeMessageTimestamp(firstMessage, '103000001');
+    sendYouTubeMessageTimestamp(secondMessage, '103000002');
+    runLatestBountyHuntingFrame(103_100);
+
+    const divider = getBountyHuntingStartDivider();
+    const children = [...getChatItemsContainer().children];
+    expect(children.indexOf(firstMessage)).toBeLessThan(children.indexOf(secondMessage));
+    expect(children).not.toContain(divider);
+    expect(divider.parentElement).toBe(firstMessage);
+  });
+
+  it('keeps the visual start divider outside YouTube message items as newer messages arrive', () => {
+    const oldMessage = appendChatMessage('msg-old', '@Luna', 'old @Marco');
+
+    openBountyHuntingGamePanel({
+      ...createBountyHuntingGame(),
+      phaseStartedAt: 102_000,
+      roundStartTimestampUsec: '103000000',
+      status: 'active'
+    }, 'host-user', vi.fn());
+    sendYouTubeMessageTimestamp(oldMessage, '102999999');
+    runLatestBountyHuntingFrame(103_000);
+    const divider = getBountyHuntingStartDivider();
+    const newMessage = appendChatMessage('msg-new', '@Luna', 'new @Marco');
+
+    sendYouTubeMessageTimestamp(newMessage, '103000001');
+    handleFeatureMessage(newMessage, { allowTranslate: true });
+    runLatestBountyHuntingFrame(104_000);
+
+    const children = [...getChatItemsContainer().children];
+    expect(children.indexOf(oldMessage)).toBeLessThan(children.indexOf(newMessage));
+    expect(children).not.toContain(divider);
+    expect(divider.parentElement).toBe(newMessage);
+  });
+
   it('plays the final ten second clock tick once', () => {
     const game = {
       ...createBountyHuntingGame(),
@@ -1176,6 +1371,28 @@ function appendChatMessage(
   return message;
 }
 
+function sendYouTubeMessageTimestamp(message: HTMLElement, timestampUsec: string): void {
+  handleFeatureMessageData(message, {
+    youtubeData: {
+      messageId: message.getAttribute('data-message-id') || message.id,
+      timestampUsec
+    }
+  });
+}
+
+function runLatestBountyHuntingFrame(now: number): void {
+  if (frameCallbacks.length > 0) {
+    frameCallbacks[frameCallbacks.length - 1]?.(now);
+    return;
+  }
+
+  try {
+    vi.advanceTimersByTime(16);
+  } catch {
+    expect(frameCallbacks.length).toBeGreaterThan(0);
+  }
+}
+
 function getChatItemsContainer(): HTMLElement {
   let items = document.querySelector<HTMLElement>('#item-scroller > #items');
   if (items) return items;
@@ -1200,6 +1417,12 @@ function getChatItemsContainer(): HTMLElement {
   list.append(scroller);
   document.body.append(list);
   return items;
+}
+
+function getBountyHuntingStartDivider(): HTMLElement {
+  const divider = document.querySelector<HTMLElement>('.ytcq-bounty-hunting-start-divider');
+  expect(divider).toBeInstanceOf(HTMLElement);
+  return divider as HTMLElement;
 }
 
 function appendCurrentUserIdentity(authorName: string): HTMLElement {

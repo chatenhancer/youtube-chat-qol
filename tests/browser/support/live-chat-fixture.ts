@@ -240,10 +240,11 @@ export function createLiveChatFixtureHtml({
       const createMessage = (fixtureMessage, number) => {
         const id = getMessageId(number);
         const message = document.createElement('yt-live-chat-text-message-renderer');
+        const avatarSrc = createAvatarSrc(fixtureMessage.author.replace(/^@/, '').slice(0, 1).toUpperCase(), number);
         message.id = id;
         message.innerHTML = \`
           <yt-img-shadow id="author-photo" height="24" width="24" loaded="">
-            <img id="img" alt="" height="24" width="24" src="\${createAvatarSrc(fixtureMessage.author.replace(/^@/, '').slice(0, 1).toUpperCase(), number)}">
+            <img id="img" alt="" height="24" width="24" src="\${avatarSrc}">
           </yt-img-shadow>
           <div id="content">
             <span id="timestamp">${replay ? '${Math.min(number * 5, 59)}:00' : '10:0${Math.min(number + 4, 9)} PM'}</span>
@@ -263,10 +264,15 @@ export function createLiveChatFixtureHtml({
             </yt-icon-button>
           </div>
         \`;
+        message.data = {
+          authorExternalChannelId: \`UCFixtureChannel\${number}\`,
+          authorName: { simpleText: fixtureMessage.author },
+          authorPhoto: { thumbnails: [{ url: avatarSrc }] },
+          timestampUsec: String(1780000000000000 + number)
+        };
         return message;
       };
 
-      const initialMessage = document.querySelector('#fixture-message-1');
       nextMessageNumber = 2;
 
       const appendFixtureMessage = () => {

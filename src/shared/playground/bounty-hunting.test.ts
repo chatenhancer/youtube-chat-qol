@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   countBountyHuntingTextEmojis,
   doesBountyHuntingBountyMatch,
+  getBountyHuntingRoundStartTimestampUsec,
   isBountyHuntingAllCapsMessage,
   type BountyHuntingBounty
 } from './bounty-hunting';
@@ -43,6 +44,10 @@ describe('Bounty Hunting bounty matching', () => {
     expect(isBountyHuntingAllCapsMessage('GG CHAT!!!', 4)).toBe(true);
     expect(isBountyHuntingAllCapsMessage('GG chat!!!', 4)).toBe(false);
     expect(countBountyHuntingTextEmojis('go 🤠🔥')).toBe(2);
+  });
+
+  it('computes the shared round start cutoff timestamp', () => {
+    expect(getBountyHuntingRoundStartTimestampUsec(1_234)).toBe('4234000');
   });
 });
 

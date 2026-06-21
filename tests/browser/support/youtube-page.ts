@@ -47,11 +47,43 @@ export function getReplayUrl(): string {
 }
 
 export async function openLiveChat(page: Page, liveUrl: string): Promise<FrameLocator> {
-  await page.goto(liveUrl, { waitUntil: 'domcontentloaded', timeout: LIVE_PAGE_TIMEOUT_MS });
+  await gotoLiveChatPage(page, liveUrl);
   await dismissYouTubeConsentIfPresent(page);
   await expect(page.locator(CHAT_FRAME_SELECTOR)).toBeVisible({ timeout: LIVE_PAGE_TIMEOUT_MS });
   await dismissYouTubeConsentIfPresent(page);
   return page.frameLocator(CHAT_FRAME_SELECTOR);
+}
+
+async function gotoLiveChatPage(page: Page, liveUrl: string): Promise<void> {
+  try {
+    await page.goto(liveUrl, { waitUntil: 'domcontentloaded', timeout: LIVE_PAGE_TIMEOUT_MS });
+  } catch (error) {
+    if (!isSameYouTubeReloadNavigation(error, liveUrl, page.url())) throw error;
+    await page.waitForLoadState('domcontentloaded', { timeout: LIVE_PAGE_TIMEOUT_MS }).catch(() => undefined);
+  }
+}
+
+function isSameYouTubeReloadNavigation(error: unknown, requestedUrl: string, currentUrl: string): boolean {
+  if (!(error instanceof Error) || !error.message.includes('is interrupted by another navigation')) {
+    return false;
+  }
+
+  const requested = normalizeReloadUrl(requestedUrl);
+  const current = normalizeReloadUrl(currentUrl);
+  return Boolean(requested && current && requested === current);
+}
+
+function normalizeReloadUrl(value: string): string {
+  try {
+    const url = new URL(value);
+    if (!url.hostname.endsWith('youtube.com')) return '';
+    url.searchParams.delete('reload');
+    url.hash = '';
+    url.searchParams.sort();
+    return url.toString();
+  } catch {
+    return '';
+  }
 }
 
 export async function startVideoPlaybackIfPaused(page: Page): Promise<void> {

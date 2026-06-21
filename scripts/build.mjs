@@ -62,6 +62,12 @@ async function buildTarget(target) {
     }),
     build({
       ...sharedBuildOptions,
+      entryPoints: [path.join(root, 'src', 'youtube', 'message-data-page.ts')],
+      outfile: path.join(extensionDir, 'message-data-page.js'),
+      format: 'iife'
+    }),
+    build({
+      ...sharedBuildOptions,
       entryPoints: [path.join(root, 'src', 'background', 'index.ts')],
       outfile: path.join(extensionDir, 'background.js'),
       format: 'iife'
@@ -109,7 +115,7 @@ function createManifest(target) {
   }
   for (const script of manifest.content_scripts) {
     script.js = script.js.map(stripBuildPrefix);
-    script.css = script.css.map(stripBuildPrefix);
+    if (script.css) script.css = script.css.map(stripBuildPrefix);
   }
 
   if (isLocalPlaygroundBackendOrigin(playgroundBackendOrigin)) {

@@ -39,6 +39,7 @@
     "publish:chrome:deferred": "node scripts/publish-deferred-chrome-webstore.mjs",
     "publish:firefox": "node scripts/submit-firefox-amo.mjs",
     "test": "node scripts/run-unit-tests.mjs",
+    "test:all": "npm run test && npm run test:browser && npm run test:browser:perf",
     "test:browser": "node scripts/run-browser-tests.mjs",
     "test:browser:flake": "node scripts/run-browser-flake-tests.mjs",
     "test:browser:install": "playwright install chromium",

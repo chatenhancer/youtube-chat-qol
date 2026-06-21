@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
 import {
-  collectBountyHuntingTopFanAuthorKeys,
   countBountyHuntingObservedCandidateTypes,
   createBountyHuntingBountiesFromMessages,
   findBountyHuntingMatchingBounty,
@@ -62,30 +61,45 @@ describe('Bounty Hunting bounty candidates', () => {
     expect(match?.amount).toBe(125);
   });
 
-  it('marks messages by locally discovered Top fans without exposing the author name', () => {
-    const root = document.createElement('div');
-    const participant = document.createElement('yt-live-chat-participant-renderer');
-    participant.innerHTML = `
-      <span id="author-name">@TopFan</span>
-      <span aria-label="Top fan"></span>
-    `;
-    root.append(participant);
-
-    const topFanAuthorKeys = collectBountyHuntingTopFanAuthorKeys(root);
+  it('detects YouTube Top fan rank badges on chat messages', () => {
     const chatMessage = document.createElement('yt-live-chat-text-message-renderer');
-    chatMessage.setAttribute('data-message-id', 'message-1');
+    chatMessage.setAttribute('data-message-id', 'message-ranked');
     chatMessage.innerHTML = `
-      <span id="author-name">@TopFan</span>
-      <span id="message">hello chat</span>
+      <span id="author-name">@RankedFan</span>
+      <div id="before-content-buttons">
+        <yt-button-view-model>
+          <button-view-model>
+            <button class="ytSpecButtonShapeNextHost" aria-label="#2">
+              <div class="ytSpecButtonShapeNextButtonTextContent">#2</div>
+            </button>
+          </button-view-model>
+        </yt-button-view-model>
+      </div>
+      <span id="message">thanks for the stream</span>
     `;
 
-    const observed = getBountyHuntingObservedMessage(chatMessage, { topFanAuthorKeys });
+    const observed = getBountyHuntingObservedMessage(chatMessage);
 
     expect(observed).toMatchObject({
       isTopFanAuthor: true,
-      messageId: 'message-1'
+      messageId: 'message-ranked'
     });
-    expect(observed).not.toHaveProperty('authorName');
+  });
+
+  it('does not treat typed rank text as a Top fan badge', () => {
+    const chatMessage = document.createElement('yt-live-chat-text-message-renderer');
+    chatMessage.setAttribute('data-message-id', 'message-rank-text');
+    chatMessage.innerHTML = `
+      <span id="author-name">@RegularFan</span>
+      <span id="message">I am #2 today</span>
+    `;
+
+    const observed = getBountyHuntingObservedMessage(chatMessage);
+
+    expect(observed).toMatchObject({
+      isTopFanAuthor: false,
+      messageId: 'message-rank-text'
+    });
   });
 
   it('detects badges, Super Chats, custom emoji, and emoji-only messages locally', () => {

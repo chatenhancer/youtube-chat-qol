@@ -13,6 +13,7 @@ import {
   bootFeatures,
   cleanupStaleFeatures,
   handleFeatureMessage,
+  handleFeatureMessageData,
   handleFeatureMutations,
   handleFeatureOptionsChanged,
   handleFeatureParticipant,
@@ -27,6 +28,7 @@ import {
 import { DEFAULT_OPTIONS, getTargetLanguageUpdate, normalizeOptions, type Options } from '../shared/options';
 import { getOptions, setOptions } from '../shared/state';
 import { initUiLocaleFromDocument } from '../shared/i18n';
+import { initYouTubeMessageData } from '../youtube/message-data';
 import { CHAT_MESSAGE_SELECTOR, PARTICIPANT_SELECTOR } from '../youtube/selectors';
 
 let observer: MutationObserver | null = null;
@@ -38,6 +40,9 @@ async function init(): Promise<void> {
   cleanupStaleFeatures();
   await initUiLocaleFromDocument();
   initFeatures({ saveOptions });
+  initYouTubeMessageData((message, youtubeData) => {
+    handleFeatureMessageData(message, { youtubeData });
+  });
 
   chrome.storage.sync.get(DEFAULT_OPTIONS, (storedOptions) => {
     setOptions(normalizeOptions(storedOptions));

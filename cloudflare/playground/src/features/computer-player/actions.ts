@@ -230,7 +230,8 @@ export function createBountyHuntingBotAction(
     action: 'claimBounty',
     payload: {
       bountyId: candidate.bountyId,
-      messageId: candidate.messageId
+      messageId: candidate.messageId,
+      ...(candidate.messageTimestampUsec ? { messageTimestampUsec: candidate.messageTimestampUsec } : {})
     },
     userId
   };
@@ -336,6 +337,7 @@ interface BountyHuntingBotGame extends GameRecord {
 interface BountyHuntingBotClaimWitness {
   bountyId: string;
   messageId: string;
+  messageTimestampUsec?: string;
   observedAt: number;
   role: BountyHuntingPlayerRole;
   userId: string;
@@ -345,12 +347,14 @@ interface BountyHuntingBotClaimCandidate {
   amount: number;
   bountyId: string;
   messageId: string;
+  messageTimestampUsec?: string;
   observedAt: number;
 }
 
 interface BountyHuntingBotWitnessObservation {
   bountyIds: string[];
   messageId: string;
+  messageTimestampUsec?: string;
 }
 
 function getBountyHuntingBotGame(game: GameRecord): BountyHuntingBotGame | null {
@@ -393,6 +397,7 @@ function getBountyHuntingClaimCandidates(
         amount: bounty.amount,
         bountyId: witness.bountyId,
         messageId: witness.messageId,
+        messageTimestampUsec: witness.messageTimestampUsec,
         observedAt: witness.observedAt
       }];
     })
@@ -421,24 +426,29 @@ function getBountyHuntingWitnessObservations(
       .filter((witness) => witness.role === botRole)
       .map((witness) => getBountyHuntingWitnessKey(witness))
   );
-  const observations = new Map<string, Set<string>>();
+  const observations = new Map<string, { bountyIds: Set<string>; messageTimestampUsec?: string }>();
 
   for (const witness of witnesses) {
     if (!recentMessageIds.has(witness.messageId)) continue;
+    if (!witness.messageTimestampUsec) continue;
     if (botWitnessKeys.has(getBountyHuntingWitnessKey({
       ...witness,
       role: botRole
     }))) continue;
 
-    const observation = observations.get(witness.messageId) || new Set<string>();
-    observation.add(witness.bountyId);
+    const observation = observations.get(witness.messageId) || {
+      bountyIds: new Set<string>(),
+      messageTimestampUsec: witness.messageTimestampUsec
+    };
+    observation.bountyIds.add(witness.bountyId);
     observations.set(witness.messageId, observation);
     if (observations.size >= BOUNTY_HUNTING_WITNESS_OBSERVATIONS_PER_ACTION) break;
   }
 
   return [...observations.entries()].map(([messageId, observation]) => ({
-    bountyIds: [...observation],
-    messageId
+    bountyIds: [...observation.bountyIds],
+    messageId,
+    messageTimestampUsec: observation.messageTimestampUsec
   }));
 }
 

@@ -19,6 +19,9 @@ import type { BrowserScenario, ChatSurface } from './types';
 
 const RECOVERED_DRAFT_TEXT = 'this draft should survive refresh :draft-emoji:';
 const RECOVERED_DRAFT_EMOJI_ALT = ':draft-emoji:';
+const CHAT_FRAME_SELECTOR = 'iframe#chatframe';
+const RELOAD_ATTEMPTS = 2;
+const RELOADED_CHAT_TIMEOUT_MS = 60_000;
 
 export const chatDraftRecoveryScenario: BrowserScenario = async ({ chat, context }) => {
   const page = getReloadableStreamPage(chat, context);
@@ -40,7 +43,7 @@ export const chatDraftRecoveryScenario: BrowserScenario = async ({ chat, context
     });
 
     await test.step('Reload the same stream page', async () => {
-      await page.reload({ timeout: 60_000, waitUntil: 'domcontentloaded' });
+      await reloadStreamPageAndWaitForChat(page, chat);
     });
 
     await test.step('Verify the unsent draft is restored', async () => {
@@ -57,6 +60,33 @@ export const chatDraftRecoveryScenario: BrowserScenario = async ({ chat, context
     });
   });
 };
+
+async function reloadStreamPageAndWaitForChat(page: Page, chat: ChatSurface): Promise<void> {
+  let lastError: unknown;
+
+  for (let attempt = 1; attempt <= RELOAD_ATTEMPTS; attempt += 1) {
+    await page.reload({ timeout: 60_000, waitUntil: 'domcontentloaded' });
+
+    try {
+      await waitForReloadedChatSurface(page, chat);
+      return;
+    } catch (error) {
+      lastError = error;
+    }
+  }
+
+  throw lastError instanceof Error
+    ? lastError
+    : new Error('Reloaded stream page did not expose a ready chat surface.');
+}
+
+async function waitForReloadedChatSurface(page: Page, chat: ChatSurface): Promise<void> {
+  if (!isPageSurface(chat)) {
+    await expect(page.locator(CHAT_FRAME_SELECTOR)).toBeVisible({ timeout: RELOADED_CHAT_TIMEOUT_MS });
+  }
+
+  await expect(chat.locator('yt-live-chat-renderer')).toBeVisible({ timeout: RELOADED_CHAT_TIMEOUT_MS });
+}
 
 async function setChatComposerRichDraft(chat: ChatSurface): Promise<void> {
   const input = getChatComposerInput(chat);
