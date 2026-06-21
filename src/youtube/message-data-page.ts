@@ -33,7 +33,7 @@ function startYouTubeMessageDataAdapter(): void {
 function handleYouTubeMessageDataRequest(event: Event): void {
   const message = getRequestedYouTubeMessage(event.target);
   if (!message) return;
-  processYouTubeMessageData(message, { force: false, retry: true });
+  processYouTubeMessageData(message);
 }
 
 function getRequestedYouTubeMessage(target: EventTarget | null): HTMLElement | null {
@@ -42,35 +42,48 @@ function getRequestedYouTubeMessage(target: EventTarget | null): HTMLElement | n
   return target.closest<HTMLElement>(CHAT_MESSAGE_SELECTOR);
 }
 
-function processYouTubeMessageData(
-  message: HTMLElement,
-  options: { force: boolean; retry: boolean }
-): void {
-  if (emitYouTubeMessageData(message, options.force)) return;
-  if (options.retry) scheduleYouTubeMessageDataRetry(message, options.force);
+function processYouTubeMessageData(message: HTMLElement): void {
+  if (emitYouTubeMessageData(message)) {
+    clearYouTubeMessageDataRetry(message);
+    retryCounts.delete(message);
+    return;
+  }
+
+  scheduleYouTubeMessageDataRetry(message);
 }
 
-function scheduleYouTubeMessageDataRetry(message: HTMLElement, force: boolean): void {
+function scheduleYouTubeMessageDataRetry(message: HTMLElement): void {
   const count = retryCounts.get(message) || 0;
   if (count >= MAX_DATA_RETRIES || retryTimers.has(message)) return;
 
   retryCounts.set(message, count + 1);
   const timer = window.setTimeout(() => {
     retryTimers.delete(message);
-    if (!message.isConnected) return;
-    processYouTubeMessageData(message, { force, retry: true });
+    if (!message.isConnected) {
+      retryCounts.delete(message);
+      return;
+    }
+    processYouTubeMessageData(message);
   }, count === 0 ? 0 : RETRY_MS);
   retryTimers.set(message, timer);
 }
 
-function emitYouTubeMessageData(message: HTMLElement, force: boolean): boolean {
+function clearYouTubeMessageDataRetry(message: HTMLElement): void {
+  const timer = retryTimers.get(message);
+  if (timer !== undefined) window.clearTimeout(timer);
+  retryTimers.delete(message);
+}
+
+function emitYouTubeMessageData(message: HTMLElement): boolean {
   const payload = getYouTubeMessageDataPayload(message);
   if (!payload) return false;
 
   const serialized = JSON.stringify(payload);
-  if (!force && sentPayloads.get(payload.messageId) === serialized) return true;
+  if (sentPayloads.get(payload.messageId) === serialized) return true;
   rememberSentPayload(payload.messageId, serialized);
-  window.dispatchEvent(new CustomEvent(YOUTUBE_MESSAGE_DATA_EVENT, {
+  message.dispatchEvent(new CustomEvent(YOUTUBE_MESSAGE_DATA_EVENT, {
+    bubbles: true,
+    composed: true,
     detail: serialized
   }));
   return true;

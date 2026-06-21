@@ -9,38 +9,51 @@ import {
 import { getMessageStableId } from './messages';
 import { CHAT_MESSAGE_SELECTOR } from './selectors';
 
-export type YouTubeMessageDataListener = (
-  message: HTMLElement,
-  data: YouTubeMessageData
-) => void;
-
 const DATA_CACHE_LIMIT = 800;
+const MESSAGE_DATA_REQUEST_TIMEOUT_MS = 700;
 
-const listeners = new Set<YouTubeMessageDataListener>();
+interface PendingMessageDataRequest {
+  promise: Promise<YouTubeMessageData | null>;
+  resolve: (data: YouTubeMessageData | null) => void;
+  timer: number;
+}
+
 const messageDataById = new Map<string, YouTubeMessageData>();
 const cachedMessageIds: string[] = [];
+const pendingMessageDataById = new Map<string, PendingMessageDataRequest>();
 let started = false;
 
 export type { YouTubeMessageData };
-
-export function initYouTubeMessageData(listener: YouTubeMessageDataListener): void {
-  listeners.add(listener);
-  if (started) return;
-
-  started = true;
-  window.addEventListener(YOUTUBE_MESSAGE_DATA_EVENT, handleYouTubeMessageDataEvent);
-}
 
 export function getYouTubeMessageData(message: HTMLElement): YouTubeMessageData | null {
   const messageId = getMessageStableId(message);
   return messageId ? messageDataById.get(messageId) || null : null;
 }
 
-export function requestYouTubeMessageData(message: HTMLElement): void {
-  message.dispatchEvent(new CustomEvent(YOUTUBE_MESSAGE_DATA_REQUEST_EVENT, {
-    bubbles: true,
-    composed: true
-  }));
+export function requestYouTubeMessageData(message: HTMLElement): Promise<YouTubeMessageData | null> {
+  ensureYouTubeMessageDataStarted();
+  const messageId = getMessageStableId(message);
+  const cachedData = messageId ? messageDataById.get(messageId) : null;
+  if (cachedData) return Promise.resolve(cachedData);
+
+  if (!messageId) {
+    dispatchYouTubeMessageDataRequest(message);
+    return Promise.resolve(null);
+  }
+
+  const existingRequest = pendingMessageDataById.get(messageId);
+  if (existingRequest) return existingRequest.promise;
+
+  const request = createPendingMessageDataRequest(messageId);
+  dispatchYouTubeMessageDataRequest(message);
+  return request.promise;
+}
+
+function ensureYouTubeMessageDataStarted(): void {
+  if (started) return;
+
+  started = true;
+  window.addEventListener(YOUTUBE_MESSAGE_DATA_EVENT, handleYouTubeMessageDataEvent);
 }
 
 function handleYouTubeMessageDataEvent(event: Event): void {
@@ -48,10 +61,10 @@ function handleYouTubeMessageDataEvent(event: Event): void {
   const data = parseYouTubeMessageData(event.detail);
   if (!data) return;
 
-  rememberYouTubeMessageData(data);
-  const message = findYouTubeMessageById(data.messageId);
+  const message = getYouTubeMessageFromDataEvent(event, data.messageId);
   if (!message) return;
-  listeners.forEach((listener) => listener(message, data));
+  rememberYouTubeMessageData(data);
+  resolvePendingMessageDataRequest(data);
 }
 
 function parseYouTubeMessageData(value: unknown): YouTubeMessageData | null {
@@ -98,9 +111,46 @@ function rememberYouTubeMessageData(data: YouTubeMessageData): void {
   }
 }
 
-function findYouTubeMessageById(messageId: string): HTMLElement | null {
-  for (const message of document.querySelectorAll<HTMLElement>(CHAT_MESSAGE_SELECTOR)) {
-    if (getMessageStableId(message) === messageId) return message;
-  }
-  return null;
+function getYouTubeMessageFromDataEvent(event: Event, messageId: string): HTMLElement | null {
+  const target = event.target;
+  if (!(target instanceof Element)) return null;
+
+  const message = target.matches(CHAT_MESSAGE_SELECTOR) && target instanceof HTMLElement
+    ? target
+    : target.closest<HTMLElement>(CHAT_MESSAGE_SELECTOR);
+  if (!message || getMessageStableId(message) !== messageId) return null;
+  return message;
+}
+
+function dispatchYouTubeMessageDataRequest(message: HTMLElement): void {
+  message.dispatchEvent(new CustomEvent(YOUTUBE_MESSAGE_DATA_REQUEST_EVENT, {
+    bubbles: true,
+    composed: true
+  }));
+}
+
+function createPendingMessageDataRequest(messageId: string): PendingMessageDataRequest {
+  let resolveRequest: (data: YouTubeMessageData | null) => void = () => undefined;
+  const promise = new Promise<YouTubeMessageData | null>((resolve) => {
+    resolveRequest = resolve;
+  });
+  const request: PendingMessageDataRequest = {
+    promise,
+    resolve: resolveRequest,
+    timer: 0
+  };
+  request.timer = window.setTimeout(() => {
+    pendingMessageDataById.delete(messageId);
+    request.resolve(null);
+  }, MESSAGE_DATA_REQUEST_TIMEOUT_MS);
+  pendingMessageDataById.set(messageId, request);
+  return request;
+}
+
+function resolvePendingMessageDataRequest(data: YouTubeMessageData): void {
+  const request = pendingMessageDataById.get(data.messageId);
+  if (!request) return;
+  window.clearTimeout(request.timer);
+  pendingMessageDataById.delete(data.messageId);
+  request.resolve(data);
 }

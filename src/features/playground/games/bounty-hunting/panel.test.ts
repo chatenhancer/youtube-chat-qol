@@ -13,7 +13,7 @@ vi.mock('./assets', () => ({
   getBountyHuntingAssets: assetMock.getAssets
 }));
 
-import { handleFeatureMessage, handleFeatureMessageData } from '../../../../content/lifecycle';
+import { handleFeatureMessage } from '../../../../content/lifecycle';
 import { initMentionDetection } from '../../../mention-detection';
 import { createGamePanelShell } from '../panel-shell';
 import {
@@ -211,7 +211,7 @@ describe('Bounty Hunting panel', () => {
       phaseStartedAt: 102_000,
       roundStartTimestampUsec: '103000000'
     }, 'host-user', onAction);
-    sendYouTubeMessageTimestamp(oldMessage, '102999999');
+    await sendYouTubeMessageTimestamp(oldMessage, '102999999');
     runLatestBountyHuntingFrame(103_000);
     const divider = getBountyHuntingStartDivider();
     expect(getChatItemsContainer().contains(oldMessage)).toBe(true);
@@ -219,7 +219,7 @@ describe('Bounty Hunting panel', () => {
     expect(divider.parentElement).toBe(oldMessage);
 
     const newMessage = appendChatMessage('msg-new', '@Luna', 'new @Marco');
-    sendYouTubeMessageTimestamp(newMessage, '103000001');
+    await sendYouTubeMessageTimestamp(newMessage, '103000001');
     handleFeatureMessage(newMessage, { allowTranslate: true });
     runLatestBountyHuntingFrame(103_100);
     await vi.advanceTimersByTimeAsync(500);
@@ -249,18 +249,8 @@ describe('Bounty Hunting panel', () => {
       status: 'active'
     }, 'host-user', onAction);
 
-    handleFeatureMessageData(oldMessage, {
-      youtubeData: {
-        messageId: 'msg-old',
-        timestampUsec: '102999999'
-      }
-    });
-    handleFeatureMessageData(newMessage, {
-      youtubeData: {
-        messageId: 'msg-new',
-        timestampUsec: '103000001'
-      }
-    });
+    await sendYouTubeMessageTimestamp(oldMessage, '102999999');
+    await sendYouTubeMessageTimestamp(newMessage, '103000001');
     handleFeatureMessage(oldMessage, { allowTranslate: true });
     handleFeatureMessage(newMessage, { allowTranslate: true });
     oldMessage.dispatchEvent(new MouseEvent('click', { bubbles: true }));
@@ -299,12 +289,7 @@ describe('Bounty Hunting panel', () => {
     }, 'host-user', onAction);
 
     handleFeatureMessage(message, { allowTranslate: true });
-    handleFeatureMessageData(message, {
-      youtubeData: {
-        messageId: 'msg-new',
-        timestampUsec: '103000001'
-      }
-    });
+    await sendYouTubeMessageTimestamp(message, '103000001');
     await vi.advanceTimersByTimeAsync(500);
 
     expect(onAction).toHaveBeenCalledWith('game-bounty-hunting', 'observeBountyMessage', {
@@ -1024,7 +1009,7 @@ describe('Bounty Hunting panel', () => {
     expect(onAction).toHaveBeenCalledWith('game-bounty-hunting', 'startRound');
   });
 
-  it('keeps the start divider at the timestamp boundary after countdown', () => {
+  it('keeps the start divider at the timestamp boundary after countdown', async () => {
     const onAction = vi.fn();
     const oldMessage = appendChatMessage('msg-old', '@Luna', 'old @Marco');
     const game = {
@@ -1035,7 +1020,7 @@ describe('Bounty Hunting panel', () => {
     };
 
     openBountyHuntingGamePanel(game, 'host-user', onAction);
-    sendYouTubeMessageTimestamp(oldMessage, '102999999');
+    await sendYouTubeMessageTimestamp(oldMessage, '102999999');
     vi.mocked(Date.now).mockReturnValue(103_000);
     expect(frameCallbacks.length).toBeGreaterThan(0);
     frameCallbacks[frameCallbacks.length - 1]?.(103_000);
@@ -1049,7 +1034,7 @@ describe('Bounty Hunting panel', () => {
       roundStartTimestampUsec: '103000000',
       status: 'active'
     }, 'host-user');
-    sendYouTubeMessageTimestamp(newMessage, '103000001');
+    await sendYouTubeMessageTimestamp(newMessage, '103000001');
     runLatestBountyHuntingFrame(103_100);
 
     const divider = getBountyHuntingStartDivider();
@@ -1060,7 +1045,7 @@ describe('Bounty Hunting panel', () => {
     expect(divider.parentElement).toBe(newMessage);
   });
 
-  it('places the start divider before the first visible post-start timestamp', () => {
+  it('places the start divider before the first visible post-start timestamp', async () => {
     const firstMessage = appendChatMessage('msg-new-1', '@Luna', 'first after @Marco');
     const secondMessage = appendChatMessage('msg-new-2', '@Luna', 'second after @Marco');
 
@@ -1070,8 +1055,8 @@ describe('Bounty Hunting panel', () => {
       roundStartTimestampUsec: '103000000',
       status: 'active'
     }, 'host-user', vi.fn());
-    sendYouTubeMessageTimestamp(firstMessage, '103000001');
-    sendYouTubeMessageTimestamp(secondMessage, '103000002');
+    await sendYouTubeMessageTimestamp(firstMessage, '103000001');
+    await sendYouTubeMessageTimestamp(secondMessage, '103000002');
     runLatestBountyHuntingFrame(103_100);
 
     const divider = getBountyHuntingStartDivider();
@@ -1081,7 +1066,7 @@ describe('Bounty Hunting panel', () => {
     expect(divider.parentElement).toBe(firstMessage);
   });
 
-  it('keeps the visual start divider outside YouTube message items as newer messages arrive', () => {
+  it('keeps the visual start divider outside YouTube message items as newer messages arrive', async () => {
     const oldMessage = appendChatMessage('msg-old', '@Luna', 'old @Marco');
 
     openBountyHuntingGamePanel({
@@ -1090,12 +1075,12 @@ describe('Bounty Hunting panel', () => {
       roundStartTimestampUsec: '103000000',
       status: 'active'
     }, 'host-user', vi.fn());
-    sendYouTubeMessageTimestamp(oldMessage, '102999999');
+    await sendYouTubeMessageTimestamp(oldMessage, '102999999');
     runLatestBountyHuntingFrame(103_000);
     const divider = getBountyHuntingStartDivider();
     const newMessage = appendChatMessage('msg-new', '@Luna', 'new @Marco');
 
-    sendYouTubeMessageTimestamp(newMessage, '103000001');
+    await sendYouTubeMessageTimestamp(newMessage, '103000001');
     handleFeatureMessage(newMessage, { allowTranslate: true });
     runLatestBountyHuntingFrame(104_000);
 
@@ -1371,13 +1356,15 @@ function appendChatMessage(
   return message;
 }
 
-function sendYouTubeMessageTimestamp(message: HTMLElement, timestampUsec: string): void {
-  handleFeatureMessageData(message, {
-    youtubeData: {
+async function sendYouTubeMessageTimestamp(message: HTMLElement, timestampUsec: string): Promise<void> {
+  handleFeatureMessage(message, {
+    allowTranslate: false,
+    messageData: Promise.resolve({
       messageId: message.getAttribute('data-message-id') || message.id,
       timestampUsec
-    }
+    })
   });
+  await Promise.resolve();
 }
 
 function runLatestBountyHuntingFrame(now: number): void {

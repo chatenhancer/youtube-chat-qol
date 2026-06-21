@@ -6,7 +6,6 @@ const lifecycleMocks = vi.hoisted(() => ({
   bootFeatures: vi.fn(),
   cleanupStaleFeatures: vi.fn(),
   handleFeatureMessage: vi.fn(),
-  handleFeatureMessageData: vi.fn(),
   handleFeatureMutations: vi.fn(),
   handleFeatureOptionsChanged: vi.fn(),
   handleFeatureParticipant: vi.fn(),
@@ -19,8 +18,7 @@ const lifecycleMocks = vi.hoisted(() => ({
 }));
 
 const messageDataMocks = vi.hoisted(() => ({
-  initYouTubeMessageData: vi.fn(),
-  requestYouTubeMessageData: vi.fn()
+  requestYouTubeMessageData: vi.fn((): Promise<unknown> => Promise.resolve(null))
 }));
 
 vi.mock('./enabled-features', () => ({}));
@@ -78,9 +76,11 @@ describe('content script entrypoint wiring', () => {
 
     expect(lifecycleMocks.cleanupStaleFeatures).toHaveBeenCalledOnce();
     expect(lifecycleMocks.initFeatures).toHaveBeenCalledOnce();
-    expect(messageDataMocks.initYouTubeMessageData).toHaveBeenCalledOnce();
     expect(messageDataMocks.requestYouTubeMessageData).toHaveBeenCalledWith(message);
-    expect(lifecycleMocks.handleFeatureMessage).toHaveBeenCalledWith(message, { allowTranslate: false });
+    expect(lifecycleMocks.handleFeatureMessage).toHaveBeenCalledWith(message, expect.objectContaining({
+      allowTranslate: false,
+      messageData: expect.any(Promise)
+    }));
     expect(lifecycleMocks.handleFeatureParticipant.mock.calls[0][0]).toBe(participant);
     expect(lifecycleMocks.bootFeatures).toHaveBeenCalledOnce();
     expect(observe).toHaveBeenCalledWith(document.documentElement, {
@@ -91,22 +91,20 @@ describe('content script entrypoint wiring', () => {
     expect(chrome.runtime.sendMessage).not.toHaveBeenCalled();
   });
 
-  it('forwards sanitized YouTube message data to feature lifecycle hooks', async () => {
+  it('passes the message data request promise through message lifecycle hooks', async () => {
     const message = createMessage();
-    const youtubeData = {
+    const messageData = Promise.resolve({
       messageId: 'msg-1',
       timestampUsec: '1782000000000000'
-    };
+    });
+    messageDataMocks.requestYouTubeMessageData.mockReturnValueOnce(messageData);
+    document.body.append(message);
+
     await import('./index');
 
-    const onMessageData = messageDataMocks.initYouTubeMessageData.mock.calls[0][0] as (
-      message: HTMLElement,
-      data: { messageId: string; timestampUsec: string }
-    ) => void;
-    onMessageData(message, youtubeData);
-
-    expect(lifecycleMocks.handleFeatureMessageData).toHaveBeenCalledWith(message, {
-      youtubeData
+    expect(lifecycleMocks.handleFeatureMessage).toHaveBeenCalledWith(message, {
+      allowTranslate: false,
+      messageData
     });
   });
 
@@ -131,8 +129,15 @@ describe('content script entrypoint wiring', () => {
     expect(batch.changedMessages).toEqual([containingMessage]);
     expect(messageDataMocks.requestYouTubeMessageData).toHaveBeenCalledWith(containingMessage);
     expect(messageDataMocks.requestYouTubeMessageData).toHaveBeenCalledWith(newMessage);
-    expect(lifecycleMocks.handleFeatureMessage).toHaveBeenCalledWith(newMessage, { allowTranslate: true });
-    expect(lifecycleMocks.handleFeatureMessage).toHaveBeenCalledWith(containingMessage, { allowTranslate: false });
+    expect(messageDataMocks.requestYouTubeMessageData).toHaveBeenCalledTimes(2);
+    expect(lifecycleMocks.handleFeatureMessage).toHaveBeenCalledWith(newMessage, expect.objectContaining({
+      allowTranslate: true,
+      messageData: expect.any(Promise)
+    }));
+    expect(lifecycleMocks.handleFeatureMessage).toHaveBeenCalledWith(containingMessage, expect.objectContaining({
+      allowTranslate: false,
+      messageData: expect.any(Promise)
+    }));
   });
 
   it('handles character-data mutations and nested added participants', async () => {
@@ -159,6 +164,11 @@ describe('content script entrypoint wiring', () => {
 
     const batch = lifecycleMocks.handleFeatureMutations.mock.calls[0][0] as FeatureMutationBatch;
     expect(batch.changedMessages).toEqual([message]);
+    expect(messageDataMocks.requestYouTubeMessageData).toHaveBeenCalledWith(message);
+    expect(lifecycleMocks.handleFeatureMessage).toHaveBeenCalledWith(message, expect.objectContaining({
+      allowTranslate: false,
+      messageData: expect.any(Promise)
+    }));
     expect(lifecycleMocks.handleFeatureParticipant.mock.calls[0][0]).toBe(participant);
   });
 
@@ -201,7 +211,10 @@ describe('content script entrypoint wiring', () => {
     await vi.advanceTimersByTimeAsync(300);
 
     expect(lifecycleMocks.handleFeatureVisibilityChanged).toHaveBeenCalledWith('visible');
-    expect(lifecycleMocks.handleFeatureMessage).toHaveBeenCalledWith(message, { allowTranslate: false });
+    expect(lifecycleMocks.handleFeatureMessage).toHaveBeenCalledWith(message, expect.objectContaining({
+      allowTranslate: false,
+      messageData: expect.any(Promise)
+    }));
     expect(lifecycleMocks.recoverVisibleFeatures).toHaveBeenCalledOnce();
   });
 
