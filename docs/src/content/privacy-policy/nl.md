@@ -6,7 +6,7 @@ description: "Hoe Chat Enhancer for YouTube lokale opslag, vertaling, Playground
 
 # Privacy
 
-Laatst bijgewerkt: 17 juni 2026
+Laatst bijgewerkt: 21 juni 2026
 
 Chat Enhancer for YouTube is een browserextensie voor YouTube-livechat. De extensie is ontworpen om kleine chatfuncties toe te voegen zonder YouTube-chat te vervangen of analytics te verzamelen.
 
@@ -37,8 +37,6 @@ De extensie slaat enkele gegevens op zodat de functies blijven werken tussen het
 - **Gegevens van gemarkeerde gebruikers worden opgeslagen met `chrome.storage.local`:** dit omvat de handle van de gemarkeerde gebruiker, kanaal-ID indien beschikbaar, en het tijdstip waarop de markering is gemaakt. Gemarkeerde gebruikers zijn globaal over streams in het huidige browserprofiel en worden gebruikt om gekleurde avatarringen te tonen.
 
 - **Niet-verzonden chatconcepten worden per stream opgeslagen met `chrome.storage.local`:** ze worden hersteld na het vernieuwen van de pagina. Concepten worden verwijderd wanneer de chatinvoer wordt gewist, het bericht wordt verzonden of extensiegegevens worden gereset.
-
-- **Livechat-tabstatus wordt opgeslagen met `chrome.storage.local`:** dit is beperkt tot browsertab-ID’s en laatst-gezien-tijdstempels voor recent actieve YouTube-livechattabs, en wordt gebruikt om te tonen of de extensie momenteel verbonden of losgekoppeld is. Deze records verlopen na 12 uur.
 
 - **Playground-identiteitsgegevens worden opgeslagen met `chrome.storage.local` als Playground wordt gebruikt:** dit is een gegenereerd openbaar/privé-sleutelpaar dat wordt gebruikt om Playground-verbindingsuitdagingen te ondertekenen, zodat dezelfde browserinstallatie dezelfde pseudonieme Playground-identiteit kan behouden. Het is niet je YouTube-identiteit.
 

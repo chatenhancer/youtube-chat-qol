@@ -6,7 +6,7 @@ description: "Chat Enhancer for YouTube yerel depolamayı, çeviriyi, Playground
 
 # Gizlilik
 
-Son güncelleme: 17 Haziran 2026
+Son güncelleme: 21 Haziran 2026
 
 Chat Enhancer for YouTube, YouTube canlı sohbeti için bir tarayıcı uzantısıdır. YouTube sohbetinin yerini almadan veya analitik toplamadan küçük sohbet özellikleri eklemek için tasarlanmıştır.
 
@@ -37,8 +37,6 @@ Uzantı, özelliklerinin sayfa yenilemeleri arasında çalışabilmesi için baz
 - **Yer işaretli kullanıcı verileri `chrome.storage.local` ile saklanır:** bu, yer işaretli kullanıcının handle’ını, varsa kanal ID’sini ve yer işaretinin oluşturulduğu zamanı içerir. Yer işaretli kullanıcılar mevcut tarayıcı profilindeki stream’ler arasında geneldir ve renkli avatar halkaları göstermek için kullanılır.
 
 - **Gönderilmemiş sohbet taslakları stream başına `chrome.storage.local` ile saklanır:** sayfa yenilemesinden sonra geri yüklenir. Taslaklar sohbet girişi temizlendiğinde, mesaj gönderildiğinde veya uzantı verileri sıfırlandığında kaldırılır.
-
-- **Canlı sohbet sekmesi durumu `chrome.storage.local` ile saklanır:** bu, yakın zamanda aktif olan YouTube canlı sohbet sekmeleri için tarayıcı sekme ID’leri ve son görülme zaman damgalarıyla sınırlıdır ve uzantının şu anda bağlı mı yoksa bağlantısının kesik mi olduğunu göstermek için kullanılır. Bu kayıtlar 12 saat sonra sona erer.
 
 - **Playground kullanılırsa Playground kimlik verileri `chrome.storage.local` ile saklanır:** bu, aynı tarayıcı kurulumunun aynı takma adlı Playground kimliğini koruyabilmesi için Playground bağlantı challenge’larını imzalamada kullanılan oluşturulmuş bir public/private key çiftidir. Bu sizin YouTube kimliğiniz değildir.
 

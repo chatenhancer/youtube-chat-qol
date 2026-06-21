@@ -1,6 +1,6 @@
 # Privacy
 
-Last updated: June 17, 2026
+Last updated: June 21, 2026
 
 Chat Enhancer for YouTube is a browser extension for YouTube live chat. It is designed to add small chat features without replacing YouTube chat or collecting analytics.
 
@@ -31,8 +31,6 @@ The extension stores some data so its features can work between page reloads.
 - **Bookmarked user data is stored with `chrome.storage.local`:** this includes the bookmarked user's handle, channel ID when available, and the time the bookmark was created. Bookmarked users are global across streams in the current browser profile and are used to show colored avatar rings.
 
 - **Unsent chat drafts are stored with `chrome.storage.local` per stream:** they are restored after a page refresh. Drafts are removed when the chat input is cleared, the message is sent, or extension data is reset.
-
-- **Live chat tab status is stored with `chrome.storage.local`:** this is limited to browser tab IDs and last-seen timestamps for recently active YouTube live chat tabs, and is used to show whether the extension is currently connected or disconnected. These records expire after 12 hours.
 
 - **Playground identity data is stored with `chrome.storage.local` if Playground is used:** this is a generated public/private key pair used to sign Playground connection challenges, so the same browser install can keep the same pseudonymous Playground identity. It is not your YouTube identity.
 

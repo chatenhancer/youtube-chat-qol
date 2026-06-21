@@ -6,7 +6,7 @@ description: "Comment Chat Enhancer for YouTube gère le stockage local, la trad
 
 # Politique de confidentialité
 
-Dernière mise à jour : 17 juin 2026
+Dernière mise à jour : 21 juin 2026
 
 Chat Enhancer for YouTube est une extension de navigateur pour le chat en direct YouTube. Elle est conçue pour ajouter de petites fonctions au chat sans remplacer le chat YouTube ni collecter d’analyses.
 
@@ -37,8 +37,6 @@ L’extension stocke certaines données afin que ses fonctions continuent de fon
 - **Les données d’utilisateurs favoris sont stockées avec `chrome.storage.local` :** cela inclut le handle de l’utilisateur favori, l’ID de chaîne lorsqu’il est disponible et l’heure de création du favori. Les utilisateurs favoris sont globaux entre les streams dans le profil de navigateur actuel et servent à afficher des anneaux d’avatar colorés.
 
 - **Les brouillons de chat non envoyés sont stockés avec `chrome.storage.local` par stream :** ils sont restaurés après l’actualisation d’une page. Les brouillons sont supprimés lorsque le champ de chat est vidé, que le message est envoyé ou que les données de l’extension sont réinitialisées.
-
-- **L’état des onglets de chat en direct est stocké avec `chrome.storage.local` :** il se limite aux IDs d’onglets du navigateur et aux horodatages de dernière activité des onglets de chat en direct YouTube récemment actifs, et sert à indiquer si l’extension est actuellement connectée ou déconnectée. Ces enregistrements expirent après 12 heures.
 
 - **Les données d’identité Playground sont stockées avec `chrome.storage.local` si Playground est utilisé :** il s’agit d’une paire de clés publique/privée générée pour signer les défis de connexion Playground, afin que la même installation du navigateur puisse conserver la même identité Playground pseudonyme. Ce n’est pas votre identité YouTube.
 

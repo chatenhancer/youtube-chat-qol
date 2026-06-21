@@ -6,7 +6,7 @@ description: "Jak Chat Enhancer for YouTube obsługuje lokalne przechowywanie, t
 
 # Prywatność
 
-Ostatnia aktualizacja: 17 czerwca 2026
+Ostatnia aktualizacja: 21 czerwca 2026
 
 Chat Enhancer for YouTube to rozszerzenie przeglądarki dla czatu na żywo YouTube. Zostało zaprojektowane, aby dodawać drobne funkcje czatu bez zastępowania czatu YouTube ani zbierania analityki.
 
@@ -37,8 +37,6 @@ Rozszerzenie przechowuje część danych, aby jego funkcje mogły działać mię
 - **Dane zapisanych użytkowników są przechowywane za pomocą `chrome.storage.local`:** obejmuje to handle zapisanego użytkownika, ID kanału, jeśli jest dostępne, oraz czas utworzenia zakładki. Zapisani użytkownicy są globalni między streamami w bieżącym profilu przeglądarki i służą do wyświetlania kolorowych pierścieni awatarów.
 
 - **Niewysłane szkice czatu są przechowywane za pomocą `chrome.storage.local` dla każdego streamu:** są przywracane po odświeżeniu strony. Szkice są usuwane, gdy pole czatu zostanie wyczyszczone, wiadomość zostanie wysłana lub dane rozszerzenia zostaną zresetowane.
-
-- **Status karty czatu na żywo jest przechowywany za pomocą `chrome.storage.local`:** ogranicza się do ID kart przeglądarki i znaczników czasu ostatniej aktywności dla niedawno aktywnych kart czatu na żywo YouTube, i służy do pokazywania, czy rozszerzenie jest obecnie połączone czy rozłączone. Te rekordy wygasają po 12 godzinach.
 
 - **Dane tożsamości Playground są przechowywane za pomocą `chrome.storage.local`, jeśli używany jest Playground:** jest to wygenerowana para kluczy publiczny/prywatny służąca do podpisywania wyzwań połączenia Playground, aby ta sama instalacja przeglądarki mogła zachować tę samą pseudonimową tożsamość Playground. To nie jest Twoja tożsamość YouTube.
 
