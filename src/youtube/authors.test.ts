@@ -5,6 +5,7 @@ import {
   getAuthorNameFromElement,
   getAuthorNameFromRendererText
 } from './authors';
+import { markExtensionManagedElement } from '../shared/managed-dom';
 
 describe('YouTube author helpers', () => {
   it('strips verified badge text from handles', () => {
@@ -29,5 +30,19 @@ describe('YouTube author helpers', () => {
     author.append(badge);
 
     expect(getAuthorNameFromElement(author)).toBe('@ExampleCreator');
+  });
+
+  it('keeps extension-managed highlight text inside author handles', () => {
+    const author = document.createElement('span');
+    author.append('@h');
+    const highlight = markExtensionManagedElement(document.createElement('span'));
+    highlight.className = 'ytcq-chat-keyword-highlight';
+    highlight.textContent = 'A';
+    author.append(highlight, 'ndle');
+    const badge = document.createElement('span');
+    badge.textContent = 'Verified';
+    author.append(badge);
+
+    expect(getAuthorNameFromElement(author)).toBe('@hAndle');
   });
 });

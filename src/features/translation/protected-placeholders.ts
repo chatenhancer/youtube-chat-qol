@@ -120,6 +120,7 @@ function getTranslationTextFromNodes(nodes: NodeListOf<ChildNode> | Node[] | und
   let emojiRunText = '';
   const pendingWhitespaceNodes: Node[] = [];
   let pendingWhitespaceText = '';
+  let textRun = '';
 
   const hasEmojiRun = (): boolean => Boolean(emojiRunText || emojiRunNodes.length);
 
@@ -131,9 +132,15 @@ function getTranslationTextFromNodes(nodes: NodeListOf<ChildNode> | Node[] | und
     pendingWhitespaceNodes.length = 0;
   };
 
-  const flushPendingWhitespaceToParts = (): void => {
+  const flushTextRun = (): void => {
+    if (!textRun) return;
+    parts.push(replaceProtectedTextWithPlaceholders(textRun, protectedTokens));
+    textRun = '';
+  };
+
+  const flushPendingWhitespaceToTextRun = (): void => {
     if (!pendingWhitespaceText) return;
-    parts.push(pendingWhitespaceText);
+    textRun += pendingWhitespaceText;
     pendingWhitespaceText = '';
     pendingWhitespaceNodes.length = 0;
   };
@@ -152,6 +159,7 @@ function getTranslationTextFromNodes(nodes: NodeListOf<ChildNode> | Node[] | und
   Array.from(nodes).forEach((node) => {
     const emoji = getEmojiRunItem(node);
     if (emoji) {
+      flushTextRun();
       movePendingWhitespaceToEmojiRun();
       emojiRunText += emoji.fallbackText;
       emojiRunNodes.push(emoji.node);
@@ -165,19 +173,20 @@ function getTranslationTextFromNodes(nodes: NodeListOf<ChildNode> | Node[] | und
     }
 
     flushEmojiRun();
-    flushPendingWhitespaceToParts();
-    parts.push(getTranslationTextFromNode(node, protectedTokens));
+    flushPendingWhitespaceToTextRun();
+    textRun += getTranslationTextFromNode(node, protectedTokens);
   });
   movePendingWhitespaceToEmojiRun();
   flushEmojiRun();
-  flushPendingWhitespaceToParts();
+  flushPendingWhitespaceToTextRun();
+  flushTextRun();
 
   return parts.join('');
 }
 
 function getTranslationTextFromNode(node: Node, protectedTokens: ProtectedToken[]): string {
   if (node.nodeType === Node.TEXT_NODE) {
-    return replaceProtectedTextWithPlaceholders(node.textContent || '', protectedTokens);
+    return node.textContent || '';
   }
 
   if (!(node instanceof Element)) return '';
@@ -194,7 +203,7 @@ function getTranslationTextFromNode(node: Node, protectedTokens: ProtectedToken[
 
   const childText = getTranslationTextFromNodes(node.childNodes, protectedTokens);
   if (childText || node.childNodes.length) return childText;
-  return replaceProtectedTextWithPlaceholders(node.textContent || '', protectedTokens);
+  return node.textContent || '';
 }
 
 function isIgnoredTranslationContentElement(element: Element): boolean {

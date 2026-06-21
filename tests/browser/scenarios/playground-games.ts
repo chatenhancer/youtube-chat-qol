@@ -5,7 +5,13 @@
  * Playground bridge, and game panels against a deterministic WebSocket backend.
  */
 import { expect, test, type Locator } from '@playwright/test';
-import type { GameActionClientMessage, PublicGame } from '../../../src/shared/playground/protocol';
+import type {
+  ClientMessage,
+  GameActionClientMessage,
+  GameId,
+  PublicGame,
+  PublicInvite
+} from '../../../src/shared/playground/protocol';
 import {
   createMockPlaygroundSnapshot,
   installMockPlaygroundBackend
@@ -111,6 +117,158 @@ export const playgroundChessTurnGatingScenario: BrowserScenario = async ({ chat,
         to: 'f3'
       }
     });
+  });
+};
+
+export const playgroundIncomingInviteAcceptScenario: BrowserScenario = async ({ chat, context }) => {
+  const incomingInvite = createBrowserInvite();
+  const backend = await installMockPlaygroundBackend(context, {
+    snapshot: createMockPlaygroundSnapshot({
+      invites: [incomingInvite]
+    })
+  });
+
+  await withExtensionStorageValues(context, 'sync', PLAYGROUND_ENABLED_OPTIONS, async () => {
+    const card = await openGamesCard(chat, backend);
+    const inviteRow = card.locator('.ytcq-games-invite-row').filter({ hasText: 'Luna Chat invited you to Chess' });
+    await expect(inviteRow).toBeVisible();
+
+    await inviteRow.getByRole('button', { name: 'Accept' }).click();
+    const response = await waitForClientMessage(backend, 'respondInvite', (message) =>
+      message.inviteId === incomingInvite.inviteId
+    );
+    expect(response).toMatchObject({
+      accept: true,
+      inviteId: incomingInvite.inviteId
+    });
+
+    await backend.sendServerMessage({
+      game: createBrowserChessGame({ gameId: 'incoming-chess-game' }),
+      type: 'gameStarted'
+    });
+
+    await expect(chat.locator('.ytcq-games-card')).toHaveCount(0);
+    await expect(chat.locator('.ytcq-chess-game-panel')).toBeVisible();
+  });
+};
+
+export const playgroundIncomingInviteIgnoreScenario: BrowserScenario = async ({ chat, context }) => {
+  const incomingInvite = createBrowserInvite({
+    inviteId: 'browser-invite-ignore'
+  });
+  const backend = await installMockPlaygroundBackend(context, {
+    snapshot: createMockPlaygroundSnapshot({
+      invites: [incomingInvite]
+    })
+  });
+
+  await withExtensionStorageValues(context, 'sync', PLAYGROUND_ENABLED_OPTIONS, async () => {
+    const card = await openGamesCard(chat, backend);
+    const inviteRow = card.locator('.ytcq-games-invite-row').filter({ hasText: 'Luna Chat invited you to Chess' });
+    await expect(inviteRow).toBeVisible();
+
+    await inviteRow.getByRole('button', { name: 'Ignore' }).click();
+    const response = await waitForClientMessage(backend, 'respondInvite', (message) =>
+      message.inviteId === incomingInvite.inviteId
+    );
+    expect(response).toMatchObject({
+      accept: false,
+      inviteId: incomingInvite.inviteId
+    });
+
+    await backend.sendServerMessage({
+      invite: {
+        ...incomingInvite,
+        status: 'ignored'
+      },
+      type: 'inviteUpdated'
+    });
+    await expect(card.locator('.ytcq-games-invite-row')).toHaveCount(0);
+  });
+};
+
+export const playgroundActiveGameControlsScenario: BrowserScenario = async ({ chat, context }) => {
+  const activeGame = createBrowserChessGame({ gameId: 'active-chess-game' });
+  const backend = await installMockPlaygroundBackend(context, {
+    snapshot: createMockPlaygroundSnapshot({
+      games: [activeGame]
+    })
+  });
+
+  await withExtensionStorageValues(context, 'sync', PLAYGROUND_ENABLED_OPTIONS, async () => {
+    const card = await openGamesCard(chat, backend);
+    const activeRow = card.locator('.ytcq-games-active-row').filter({ hasText: 'Chess' });
+    await expect(activeRow).toContainText('Luna Chat');
+
+    await activeRow.getByRole('button', { name: 'Resume' }).click();
+    await expect(chat.locator('.ytcq-chess-game-panel')).toBeVisible();
+    await expect(activeRow.getByRole('button', { name: 'Hide' })).toBeVisible();
+
+    await activeRow.getByRole('button', { name: 'Hide' }).click();
+    await expect(chat.locator('.ytcq-chess-game-panel')).toHaveCount(0);
+
+    await activeRow.getByRole('button', { name: 'Resume' }).click();
+    await expect(chat.locator('.ytcq-chess-game-panel')).toBeVisible();
+
+    await activeRow.getByRole('button', { name: 'Leave' }).click();
+    await expect(chat.locator('.ytcq-chess-game-panel')).toHaveCount(0);
+
+    const leave = await waitForGameAction(backend, 'leave', (message) =>
+      message.gameId === 'active-chess-game'
+    );
+    expect(leave).toMatchObject({
+      action: 'leave',
+      gameId: 'active-chess-game'
+    });
+  });
+};
+
+export const playgroundAvailabilityToggleScenario: BrowserScenario = async ({ chat, context }) => {
+  const backend = await installMockPlaygroundBackend(context, {
+    snapshot: createMockPlaygroundSnapshot()
+  });
+
+  await withExtensionStorageValues(context, 'sync', PLAYGROUND_ENABLED_OPTIONS, async () => {
+    const card = await openGamesCard(chat, backend);
+    const toggle = card.locator('.ytcq-games-availability-toggle');
+    await expect(toggle).toHaveAttribute('aria-checked', 'true');
+
+    await toggle.click();
+    const disabled = await waitForClientMessage(backend, 'setAvailability', (message) =>
+      message.availableGames.length === 0
+    );
+    expect(disabled.availableGames).toEqual([]);
+    await expect(toggle).toHaveAttribute('aria-checked', 'false');
+
+    await toggle.click();
+    const enabled = await waitForClientMessage(backend, 'setAvailability', (message) =>
+      message.availableGames.length > 0
+    );
+    expect(enabled.availableGames).toEqual(['chess', 'bounty-hunting', 'replay-trivia']);
+    await expect(toggle).toHaveAttribute('aria-checked', 'true');
+  });
+};
+
+export const playgroundInviteCancelScenario: BrowserScenario = async ({ chat, context }) => {
+  const backend = await installMockPlaygroundBackend(context, {
+    snapshot: createMockPlaygroundSnapshot()
+  });
+
+  await withExtensionStorageValues(context, 'sync', PLAYGROUND_ENABLED_OPTIONS, async () => {
+    const card = await openGamePlayerListFromChat(chat, backend, 'Chess');
+    await invitePlayer(card, 'Luna Chat');
+    const invite = await backend.waitForClientMessage('invite');
+    expect(invite).toMatchObject({
+      gameId: 'chess',
+      toUserId: 'luna-user'
+    });
+
+    const player = card.locator('.ytcq-games-player-row').filter({ hasText: 'Luna Chat' });
+    await player.getByRole('button', { name: 'Cancel' }).click();
+    await expect(player).toContainText('Available now');
+    await expect(player.getByRole('button', { name: 'Invite' })).toBeVisible();
+    await expectClientMessageCount(backend, 'invite', 1, 500);
+    await expectClientMessageCount(backend, 'respondInvite', 0);
   });
 };
 
@@ -509,6 +667,33 @@ async function invitePlayer(card: Locator, playerName: string): Promise<void> {
   });
 }
 
+interface BrowserInviteOptions {
+  gameId?: GameId;
+  inviteId?: string;
+}
+
+function createBrowserInvite({
+  gameId = 'chess',
+  inviteId = 'browser-invite-chess'
+}: BrowserInviteOptions = {}): PublicInvite {
+  const now = Date.now();
+  return {
+    createdAt: now,
+    expiresAt: now + 60_000,
+    fromUser: {
+      displayName: 'Luna Chat',
+      userId: 'luna-user'
+    },
+    gameId,
+    inviteId,
+    status: 'pending',
+    toUser: {
+      displayName: 'Browser Viewer',
+      userId: 'browser-user'
+    }
+  };
+}
+
 interface BrowserChessGameOptions {
   fen?: string;
   gameId?: string;
@@ -671,6 +856,31 @@ async function waitForGameAction(
   return match;
 }
 
+async function waitForClientMessage<Type extends ClientMessage['type']>(
+  backend: Awaited<ReturnType<typeof installMockPlaygroundBackend>>,
+  type: Type,
+  predicate: (message: Extract<ClientMessage, { type: Type }>) => boolean = () => true
+): Promise<Extract<ClientMessage, { type: Type }>> {
+  await expect.poll(async () => {
+    const messages = await backend.getClientMessages();
+    return messages.some((message) => {
+      if (message.type !== type) return false;
+      return predicate(message as Extract<ClientMessage, { type: Type }>);
+    });
+  }, {
+    message: `Expected Playground client message ${type}.`,
+    timeout: 10_000
+  }).toBe(true);
+
+  const messages = await backend.getClientMessages();
+  const match = messages.find((message) => {
+    if (message.type !== type) return false;
+    return predicate(message as Extract<ClientMessage, { type: Type }>);
+  });
+  if (!match || match.type !== type) throw new Error(`Missing Playground client message ${type}.`);
+  return match as Extract<ClientMessage, { type: Type }>;
+}
+
 async function expectNoGameAction(
   backend: Awaited<ReturnType<typeof installMockPlaygroundBackend>>,
   action: string,
@@ -697,6 +907,17 @@ async function expectGameActionCount(
     message.type === 'gameAction' && message.action === action && predicate(message)
   ).length;
   expect(count).toBe(expectedCount);
+}
+
+async function expectClientMessageCount<Type extends ClientMessage['type']>(
+  backend: Awaited<ReturnType<typeof installMockPlaygroundBackend>>,
+  type: Type,
+  expectedCount: number,
+  timeoutMs = 0
+): Promise<void> {
+  if (timeoutMs > 0) await new Promise((resolve) => setTimeout(resolve, timeoutMs));
+  const messages = await backend.getClientMessages();
+  expect(messages.filter((message) => message.type === type)).toHaveLength(expectedCount);
 }
 
 function getBountyObservationPayloads(message: GameActionClientMessage): Array<Record<string, unknown>> {

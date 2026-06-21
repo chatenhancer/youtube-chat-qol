@@ -272,19 +272,18 @@ function processPotentialKeywordInbox(message: HTMLElement): void {
 
   const keywordValues = [authorName, text];
   const keywordKey = getKeywordCheckKeyFromValues(keywordValues);
+  const matchedKeywords = getMatchingKeywords(...keywordValues);
+  applyChatKeywordHighlights(message, matchedKeywords, matchedKeywords.length ? keywordKey : '');
   if (message.dataset.ytcqInboxKeywordChecked === keywordKey) return;
   message.dataset.ytcqInboxKeywordChecked = keywordKey;
 
-  const matchedKeywords = getMatchingKeywords(...keywordValues);
   if (!matchedKeywords.length) {
-    applyChatKeywordHighlights(message, [], '');
     return;
   }
 
   recordInboxMatch(message, {
     keywords: matchedKeywords
   });
-  applyChatKeywordHighlights(message, matchedKeywords, keywordKey);
 }
 
 function recordInboxMatch(message: HTMLElement, match: InboxMatch): void {

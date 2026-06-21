@@ -69,6 +69,16 @@ describe('inbox highlight helpers', () => {
     expect(message.querySelector('.ytcq-chat-keyword-highlight')).toBe(existingHighlight);
   });
 
+  it('reapplies highlights when the key is current but YouTube replaced the highlighted nodes', () => {
+    const message = createMessage('@LaunchHost', 'ready for launch');
+    message.dataset.ytcqInboxKeywordHighlightKey = 'keyword-key';
+
+    applyChatKeywordHighlights(message, ['launch'], 'keyword-key');
+
+    expect(message.querySelector('#author-name .ytcq-chat-keyword-highlight')?.textContent).toBe('Launch');
+    expect(message.querySelector('#message .ytcq-chat-keyword-highlight')?.textContent).toBe('launch');
+  });
+
   it('skips empty matching work when the same key has no visible highlights', () => {
     const message = createMessage('@LaunchHost', 'ready for launch');
     message.dataset.ytcqInboxKeywordHighlightKey = 'empty-key';

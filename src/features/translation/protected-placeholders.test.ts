@@ -8,6 +8,7 @@ import {
   restorePlaceholdersToText
 } from './protected-placeholders';
 import { getPlainTextFromMessageNodes } from '../../youtube/message-content';
+import { markExtensionManagedElement } from '../../shared/managed-dom';
 
 describe('translation protected placeholders', () => {
   it('protects mentions and emoji while keeping translatable text', () => {
@@ -60,6 +61,20 @@ describe('translation protected placeholders', () => {
     expect(plan.text).toBe('Hello (§0§).');
     expect(plan.protectedTokens[0].fallbackText).toBe('@ExampleUser');
     expect(restorePlaceholdersToText('Hola (§0§).', plan.protectedTokens)).toBe('Hola (@ExampleUser).');
+  });
+
+  it('protects mentions split by extension-managed keyword highlights', () => {
+    const message = document.createElement('span');
+    message.append('Hello @h');
+    const highlight = markExtensionManagedElement(document.createElement('span'));
+    highlight.className = 'ytcq-chat-keyword-highlight';
+    highlight.textContent = 'A';
+    message.append(highlight, 'ndle');
+
+    const plan = createTranslationPlanFromNodes(Array.from(message.childNodes), message.textContent || '');
+
+    expect(plan.text).toBe('Hello §0§');
+    expect(plan.protectedTokens[0].fallbackText).toBe('@hAndle');
   });
 
   it('compresses adjacent unicode emoji with whitespace into one protected run', () => {

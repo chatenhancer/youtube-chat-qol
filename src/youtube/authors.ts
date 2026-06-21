@@ -6,6 +6,7 @@
  * before it reaches mentions, profile cards, or channel URLs.
  */
 import { cleanText } from '../shared/text';
+import { isExtensionManagedElement } from '../shared/managed-dom';
 
 interface RendererAuthorText {
   simpleText?: string;
@@ -25,7 +26,7 @@ export function getAuthorNameFromRendererText(text: RendererAuthorText | null | 
 export function getAuthorNameFromElement(element: Element | null): string {
   if (!element) return '';
 
-  return cleanAuthorNameText(getDirectTextFromElement(element)) ||
+  return cleanAuthorNameText(getDirectOrManagedTextFromElement(element)) ||
     cleanAuthorNameText(getVisibleTextFromElement(element)) ||
     cleanAuthorNameText(element.textContent);
 }
@@ -46,10 +47,13 @@ export function getAuthorHandleForUrl(authorName: string): string {
   return handleMatch?.[0] || '';
 }
 
-function getDirectTextFromElement(element: Element): string {
+function getDirectOrManagedTextFromElement(element: Element): string {
   return Array.from(element.childNodes)
-    .filter((node) => node.nodeType === 3)
-    .map((node) => node.textContent || '')
+    .map((node) => {
+      if (node.nodeType === Node.TEXT_NODE) return node.textContent || '';
+      if (node instanceof Element && isExtensionManagedElement(node)) return node.textContent || '';
+      return '';
+    })
     .join('');
 }
 
