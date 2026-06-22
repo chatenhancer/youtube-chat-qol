@@ -8,6 +8,7 @@
 import type { MessageKey } from '../../../shared/i18n';
 import type { GameId, PublicGame, ServerMessage } from '../../../shared/playground/protocol';
 import type { PlaygroundClientState } from './client';
+import type { GamePanelStatusOverlay } from './panel-feedback';
 import type { GamePanelShell, GamePanelShellPosition } from './panel-shell';
 
 export interface GameDefinition {
@@ -17,6 +18,7 @@ export interface GameDefinition {
   isPlayable?: () => boolean;
   labelKey: MessageKey;
   renderPreview: (container: HTMLElement) => void;
+  surface?: 'chat-overlay' | 'panel';
   taglineKey: MessageKey;
 }
 
@@ -38,10 +40,19 @@ export interface GamePanelMountContext {
   shell: GamePanelShell;
 }
 
+export interface GameOverlayMountContext {
+  closePanel: CloseGamePanel;
+  currentUserId: string;
+  onPanelChange: () => void;
+  sendGameAction: SendGameAction;
+}
+
 export interface GamePanelMount {
   close(options?: { notify?: boolean }): void;
   gameId: string;
+  isConnected?(): boolean;
   setCompactMode?(compact: boolean): void;
+  statusOverlay?: GamePanelStatusOverlay;
 }
 
 export interface GamePanelUpdateContext {
@@ -54,6 +65,10 @@ export interface GamePanelAdapter<TGame extends PublicGame = PublicGame> {
     game: TGame,
     context: GamePanelMountContext
   ): GamePanelMount;
+  mountOverlay?(
+    game: TGame,
+    context: GameOverlayMountContext
+  ): GamePanelMount | null;
   updatePanel(game: TGame, context: GamePanelUpdateContext): void;
 }
 

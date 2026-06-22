@@ -41,12 +41,13 @@ describe('Bounty Hunting preview', () => {
     expect(context.drawImage).not.toHaveBeenCalled();
   });
 
-  it('exposes WebP game assets to content scripts', () => {
+  it('exposes game assets to content scripts', () => {
     const manifest = JSON.parse(readFileSync(path.join(process.cwd(), 'manifest.json'), 'utf8'));
     const resources = manifest.web_accessible_resources.flatMap(
       (entry: { resources: string[] }) => entry.resources
     );
 
+    expect(resources).toContain('games/*/*.json');
     expect(resources).toContain('games/*/*.webp');
   });
 });

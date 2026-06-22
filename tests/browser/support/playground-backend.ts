@@ -79,11 +79,12 @@ export function createMockPlaygroundSnapshot({
 
 export function createMockPlaygroundUsers(): PresenceUser[] {
   return [
-    createMockPresenceUser('browser-user', 'Browser Viewer', ['chess', 'bounty-hunting', 'replay-trivia']),
-    createMockPresenceUser('luna-user', 'Luna Chat', ['chess', 'bounty-hunting', 'replay-trivia']),
-    createMockPresenceUser('marco-user', 'Marco Vibes', ['chess', 'bounty-hunting', 'replay-trivia']),
+    createMockPresenceUser('browser-user', 'Browser Viewer', ['chess', 'bounty-hunting', 'replay-trivia', 'stick-around']),
+    createMockPresenceUser('luna-user', 'Luna Chat', ['chess', 'bounty-hunting', 'replay-trivia', 'stick-around']),
+    createMockPresenceUser('marco-user', 'Marco Vibes', ['chess', 'bounty-hunting', 'replay-trivia', 'stick-around']),
     createMockPresenceUser('server:computer:chess:beginner', 'Computer (Beginner)', ['chess']),
-    createMockPresenceUser('server:computer:bounty-hunting', 'Computer (Bounty Hunter)', ['bounty-hunting'])
+    createMockPresenceUser('server:computer:bounty-hunting', 'Computer (Bounty Hunter)', ['bounty-hunting']),
+    createMockPresenceUser('server:computer:stick-around', 'Computer (Stick Around!)', ['stick-around'])
   ];
 }
 

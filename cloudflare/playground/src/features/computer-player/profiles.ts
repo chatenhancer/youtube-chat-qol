@@ -69,6 +69,10 @@ export const COMPUTER_PLAYER_PROFILE_BY_KEY = {
   replayTrivia: createComputerPlayerProfile({
     displayName: 'Computer',
     gameId: 'replay-trivia'
+  }),
+  stickAround: createComputerPlayerProfile({
+    displayName: 'Computer (Stick Around!)',
+    gameId: 'stick-around'
   })
 } as const;
 
@@ -77,6 +81,7 @@ export const CHESS_COMPUTER_PLAYER_BEGINNER_PROFILE = COMPUTER_PLAYER_PROFILE_BY
 export const CHESS_COMPUTER_PLAYER_CLUB_PROFILE = COMPUTER_PLAYER_PROFILE_BY_KEY.chessClub;
 export const CHESS_COMPUTER_PLAYER_MASTER_PROFILE = COMPUTER_PLAYER_PROFILE_BY_KEY.chessMaster;
 export const BOUNTY_HUNTING_COMPUTER_PLAYER_PROFILE = COMPUTER_PLAYER_PROFILE_BY_KEY.bountyHunting;
+export const STICK_AROUND_COMPUTER_PLAYER_PROFILE = COMPUTER_PLAYER_PROFILE_BY_KEY.stickAround;
 
 export const DEFAULT_COMPUTER_PLAYER_PROFILE = REPLAY_TRIVIA_COMPUTER_PLAYER_PROFILE;
 export const CHESS_COMPUTER_PLAYER_PROFILES = [
@@ -87,7 +92,8 @@ export const CHESS_COMPUTER_PLAYER_PROFILES = [
 export const COMPUTER_PLAYER_PROFILES = [
   REPLAY_TRIVIA_COMPUTER_PLAYER_PROFILE,
   ...CHESS_COMPUTER_PLAYER_PROFILES,
-  BOUNTY_HUNTING_COMPUTER_PLAYER_PROFILE
+  BOUNTY_HUNTING_COMPUTER_PLAYER_PROFILE,
+  STICK_AROUND_COMPUTER_PLAYER_PROFILE
 ] as const satisfies readonly ComputerPlayerProfile[];
 
 export function isComputerPlayerUserId(userId: string): boolean {

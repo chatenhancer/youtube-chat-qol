@@ -35,9 +35,10 @@ export const playgroundChessInviteAndMoveScenario: BrowserScenario = async ({ ch
     await expect(card.locator('.ytcq-profile-card-title')).toHaveText('Games');
     await expect(card.locator('.ytcq-profile-card-subtitle')).toHaveText('2 players online');
     await expect(card.locator('.ytcq-games-availability-toggle')).toHaveAttribute('aria-checked', 'true');
-    await expect(card.locator('.ytcq-games-game-label')).toHaveText(['Chess', 'The Wild Wild Chat', 'HELP-A-FRIEND! Trivia']);
+    await expect(card.locator('.ytcq-games-game-label')).toHaveText(['Chess', 'The Wild Wild Chat', 'HELP-A-FRIEND! Trivia', 'Stick Around!']);
     await expect(getGameCard(card, 'The Wild Wild Chat')).toHaveAttribute('aria-disabled', 'false');
     await expect(getGameCard(card, 'HELP-A-FRIEND! Trivia')).toHaveAttribute('aria-disabled', 'true');
+    await expect(getGameCard(card, 'Stick Around!')).toHaveAttribute('aria-disabled', 'false');
 
     await openGamePlayerList(card, 'Chess');
     await expect(card.locator('.ytcq-games-player-row')).toHaveCount(3);
@@ -244,8 +245,74 @@ export const playgroundAvailabilityToggleScenario: BrowserScenario = async ({ ch
     const enabled = await waitForClientMessage(backend, 'setAvailability', (message) =>
       message.availableGames.length > 0
     );
-    expect(enabled.availableGames).toEqual(['chess', 'bounty-hunting']);
+    expect(enabled.availableGames).toEqual(['chess', 'bounty-hunting', 'stick-around']);
     await expect(toggle).toHaveAttribute('aria-checked', 'true');
+  });
+};
+
+export const playgroundStickAroundComputerOverlayScenario: BrowserScenario = async ({ chat, context, page }) => {
+  const backend = await installMockPlaygroundBackend(context, {
+    snapshot: createMockPlaygroundSnapshot()
+  });
+
+  await withExtensionStorageValues(context, 'sync', PLAYGROUND_ENABLED_OPTIONS, async () => {
+    await page.evaluate(() => {
+      const style = document.createElement('style');
+      style.textContent = `
+        html,
+        body,
+        yt-live-chat-item-list-renderer {
+          --yt-live-chat-primary-text-color: #0f0f0f;
+          --yt-spec-text-primary: #0f0f0f;
+          background: #fff !important;
+          color: #0f0f0f !important;
+        }
+      `;
+      document.head.append(style);
+    });
+
+    const card = await openGamePlayerListFromChat(chat, backend, 'Stick Around!');
+    await invitePlayer(card, 'Computer (Stick Around!)');
+    const invite = await backend.waitForClientMessage('invite');
+    expect(invite).toMatchObject({
+      gameId: 'stick-around',
+      toUserId: 'server:computer:stick-around'
+    });
+
+    await chat.locator('#item-scroller').evaluate((scroller) => {
+      scroller.scrollTop = scroller.scrollHeight;
+    });
+    await backend.sendServerMessage({
+      game: createBrowserStickAroundGame(),
+      type: 'gameStarted'
+    });
+
+    await expect(chat.locator('.ytcq-games-card')).toHaveCount(0);
+    const overlay = chat.locator('yt-live-chat-item-list-renderer > .ytcq-stick-around-overlay');
+    await expect(overlay).toBeVisible();
+    await expect(overlay).toHaveClass(/ytcq-game-overlay-theme-light/);
+    await expect(overlay).toHaveCSS('background-color', 'rgba(255, 255, 255, 0.78)');
+    await expect(overlay.locator('.ytcq-game-overlay-header')).toBeVisible();
+    await expect(overlay.locator('.ytcq-game-overlay-icon')).toBeVisible();
+    await expect(overlay.locator('.ytcq-game-overlay-title')).toHaveText('Stick Around!');
+    await expect(overlay.locator('.ytcq-game-overlay-subtitle')).toHaveText('Computer (Stick Around!)');
+    await expect(overlay.getByRole('button', { name: 'Ready' })).toBeVisible();
+    await expect(overlay.locator('.ytcq-game-overlay-header').getByRole('button', { name: 'Ready' })).toHaveCount(0);
+    await expect(overlay.getByRole('button', { name: 'Mute game sounds' })).toBeVisible();
+    const hideButton = overlay.getByRole('button', { name: 'Hide' });
+    await expect(hideButton).toBeVisible();
+    await expect(hideButton).toHaveCSS('color', 'rgb(17, 17, 17)');
+    await expect(hideButton).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
+    await expect(chat.locator('.ytcq-stick-around-canvas')).toBeVisible();
+    await expect(chat.locator('#item-scroller > .ytcq-stick-around-overlay')).toHaveCount(0);
+    await expect(chat.locator('yt-live-chat-header-renderer .ytcq-stick-around-overlay')).toHaveCount(0);
+    await expect(chat.locator('#input-panel .ytcq-stick-around-overlay')).toHaveCount(0);
+
+    const messageMenuButton = chat.locator('yt-live-chat-text-message-renderer #menu button').first();
+    const box = await messageMenuButton.boundingBox();
+    if (!box) throw new Error('Expected a visible message menu button under the Stick Around overlay.');
+    await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+    await expect(chat.locator('ytd-menu-popup-renderer')).toHaveCount(0);
   });
 };
 
@@ -279,9 +346,10 @@ export const playgroundReplayTriviaInviteScenario: BrowserScenario = async ({ ch
 
   await withExtensionStorageValues(context, 'sync', PLAYGROUND_ENABLED_OPTIONS, async () => {
     const card = await openGamesCard(chat, backend);
-    await expect(card.locator('.ytcq-games-game-label')).toHaveText(['Chess', 'The Wild Wild Chat', 'HELP-A-FRIEND! Trivia']);
+    await expect(card.locator('.ytcq-games-game-label')).toHaveText(['Chess', 'The Wild Wild Chat', 'HELP-A-FRIEND! Trivia', 'Stick Around!']);
     await expect(getGameCard(card, 'The Wild Wild Chat')).toHaveAttribute('aria-disabled', 'true');
     await expect(getGameCard(card, 'HELP-A-FRIEND! Trivia')).toHaveAttribute('aria-disabled', 'false');
+    await expect(getGameCard(card, 'Stick Around!')).toHaveAttribute('aria-disabled', 'true');
 
     await openGamePlayerList(card, 'HELP-A-FRIEND! Trivia');
     await expect(card.locator('.ytcq-games-player-row')).toHaveCount(2);
@@ -824,6 +892,30 @@ function createBrowserBountyHuntingGame({
       host: claimedMessageId ? 125 : 0
     },
     status
+  } as PublicGame;
+}
+
+function createBrowserStickAroundGame(): PublicGame {
+  return {
+    finishReports: {},
+    gameId: 'browser-stick-around-game',
+    gameType: 'stick-around',
+    hazards: [],
+    inputs: {},
+    phaseStartedAt: Date.now(),
+    players: {
+      guest: {
+        displayName: 'Computer (Stick Around!)',
+        userId: 'server:computer:stick-around'
+      },
+      host: {
+        displayName: 'Browser Viewer',
+        userId: 'browser-user'
+      }
+    },
+    readyPlayers: {},
+    roundSeed: 12345,
+    status: 'ready'
   } as PublicGame;
 }
 
