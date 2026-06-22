@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { StreamRoom } from './stream-room';
+import { GAME_STATE_DEFERRED_PERSIST_MS } from './game-state';
 import type { PublicChessGame } from '../../games/chess';
 import {
   createChallenge,
@@ -531,6 +532,82 @@ describe('playground stream room', () => {
       to: 'e4'
     });
     expect(updatedChessGame.lastMoveSan).toBe('e4');
+  });
+
+  it('defers storage writes for active Stick Around realtime updates', async () => {
+    const storage = new FakeDurableObjectStorage();
+    const { room, state } = createRoomHarness(storage);
+    const alice = createSession('alice-connection');
+    const bob = createSession('bob-connection');
+    const aliceKeyPair = await createIdentityKeyPair();
+    const bobKeyPair = await createIdentityKeyPair();
+
+    await room.handleHello(alice, await createHello(alice.challenge, 'Alice', ['stick-around'], aliceKeyPair));
+    await room.handleHello(bob, await createHello(bob.challenge, 'Bob', ['stick-around'], bobKeyPair));
+    room.handleInvite(alice, 'stick-around', bob.userId);
+    room.handleInviteResponse(bob, lastMessage(bob, 'inviteReceived').invite.inviteId, true);
+    const gameId = lastMessage(alice, 'gameStarted').game.gameId;
+
+    const now = Date.now();
+    vi.useFakeTimers();
+    vi.setSystemTime(now);
+
+    try {
+      room.handleGameAction(alice, gameId, {
+        action: 'ready',
+        userId: alice.userId
+      });
+      room.handleGameAction(bob, gameId, {
+        action: 'ready',
+        userId: bob.userId
+      });
+      await state.flushWaitUntil();
+
+      await vi.advanceTimersByTimeAsync(3_000);
+      room.handleGameAction(alice, gameId, {
+        action: 'startRound',
+        userId: alice.userId
+      });
+      await state.flushWaitUntil();
+
+      const storedActiveGame = await getStoredGame(storage, gameId);
+      expect(storedActiveGame).toMatchObject({
+        gameId,
+        status: 'active'
+      });
+      const activeFrame = getStoredStickAroundFrame(storedActiveGame);
+
+      await vi.advanceTimersByTimeAsync(40);
+      room.handleGameAction(alice, gameId, {
+        action: 'input',
+        payload: {
+          frame: activeFrame,
+          jump: false,
+          right: true,
+          seq: 1
+        },
+        userId: alice.userId
+      });
+      room.handleGameAction(bob, gameId, {
+        action: 'input',
+        payload: {
+          frame: activeFrame,
+          left: true,
+          seq: 1
+        },
+        userId: bob.userId
+      });
+      await state.flushWaitUntil();
+
+      expect(getStoredStickAroundFrame(await getStoredGame(storage, gameId))).toBe(activeFrame);
+
+      await vi.advanceTimersByTimeAsync(GAME_STATE_DEFERRED_PERSIST_MS);
+      await state.flushWaitUntil();
+
+      expect(getStoredStickAroundFrame(await getStoredGame(storage, gameId))).toBeGreaterThan(activeFrame);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it('restores legacy Replay Trivia questions without localizations', async () => {
@@ -1229,6 +1306,23 @@ function createRoomHarness(
 
 function cloneStoredValue<T>(value: T): T {
   return value === undefined ? value : JSON.parse(JSON.stringify(value)) as T;
+}
+
+async function getStoredGame(storage: FakeDurableObjectStorage, gameId: string): Promise<Record<string, unknown>> {
+  const stored = await storage.get<{ games?: Array<Record<string, unknown>> }>('roomState:v1');
+  const game = stored?.games?.find((candidate) => candidate.gameId === gameId);
+  if (!game) throw new Error(`Expected stored game ${gameId}.`);
+  return game;
+}
+
+function getStoredStickAroundFrame(game: Record<string, unknown>): number {
+  const simulation = game.simulation;
+  if (!simulation || typeof simulation !== 'object' || Array.isArray(simulation)) {
+    throw new Error('Expected stored Stick Around simulation.');
+  }
+  const frame = (simulation as { frame?: unknown }).frame;
+  if (typeof frame !== 'number') throw new Error('Expected stored Stick Around frame.');
+  return frame;
 }
 
 function createSession(connectionId: string): TestSession {

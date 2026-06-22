@@ -25,7 +25,7 @@ import { parseClientMessage, ProtocolError, sanitizeStreamKey } from '../../prot
 import { TokenBucket, type TokenBucketOptions } from '../../rate-limit';
 import { attachComputerPlayerToRoom } from '../../features/computer-player/room-adapter';
 import { recordPlayerWin } from '../player-stats/client';
-import { GameState } from './game-state';
+import { GameState, type GameStatePersistence } from './game-state';
 import { GenerationTokens } from './generation-token';
 import { InviteManager } from './invite-manager';
 import { type ClientSession, sendMessage, SessionManager } from './session-manager';
@@ -359,7 +359,9 @@ export class StreamRoom {
     }
   ): void {
     const nextGame = getGameModuleForRecord(game).applyAction(game, action);
-    this.gameState.set(nextGame);
+    this.gameState.set(nextGame, {
+      persistence: getGameStatePersistence(game, nextGame, action.action)
+    });
     const recordedWin = this.recordTerminalGameWin(game, nextGame);
     if (game.status !== nextGame.status && isTerminalGameStatus(nextGame.status)) {
       this.logEvent('game_ended', {
@@ -708,6 +710,24 @@ function isTerminalGameStatus(status: string): boolean {
     status === 'draw' ||
     status === 'finished' ||
     status === 'resigned';
+}
+
+function getGameStatePersistence(
+  previousGame: GameRecord,
+  nextGame: GameRecord,
+  action: string
+): GameStatePersistence {
+  if (
+    previousGame.gameType === 'stick-around' &&
+    nextGame.gameType === 'stick-around' &&
+    previousGame.status === nextGame.status &&
+    nextGame.status === 'active' &&
+    (action === 'input' || action === 'observeChatTraffic')
+  ) {
+    return 'deferred';
+  }
+
+  return 'immediate';
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
