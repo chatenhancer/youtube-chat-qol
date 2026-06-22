@@ -20,9 +20,7 @@ Not the page. Not the video. Not the message box. Just the space where live chat
 
 ## It's raining bubbles
 
-In Stick Around!, the chat is not a command system. Viewers do not type special keywords, and comments do not trigger secret attacks.
-
-Comments are weather.
+In Stick Around!, comments are weather.
 
 When chat is quiet, the arena has room to breathe. When chat gets busy, more message bubbles begin dropping into the fight. Some drift, some spin, some fall harder than others, and the actual local chat text can appear on the bubbles as they tumble down.
 
