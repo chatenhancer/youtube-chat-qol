@@ -49,9 +49,11 @@ export interface ComputerActionOptions extends ComputerActionCallbacks {
   userId?: string;
 }
 
-const BOUNTY_HUNTING_RESPONSE_MIN_DELAY_MS = 1_200;
-const BOUNTY_HUNTING_RESPONSE_MAX_DELAY_MS = 3_600;
-const BOUNTY_HUNTING_WITNESS_DELAY_MS = 120;
+const BOUNTY_HUNTING_READY_DELAY_MS = 250;
+const BOUNTY_HUNTING_CLAIM_MIN_DELAY_MS = 450;
+const BOUNTY_HUNTING_CLAIM_MAX_DELAY_MS = 1_200;
+const BOUNTY_HUNTING_WITNESS_MIN_DELAY_MS = 80;
+const BOUNTY_HUNTING_WITNESS_MAX_DELAY_MS = 120;
 const BOUNTY_HUNTING_WITNESS_OBSERVATIONS_PER_ACTION = 20;
 const BOUNTY_HUNTING_RECENT_MESSAGE_WINDOW = 20;
 const BOUNTY_HUNTING_RECENT_CLAIM_POOL_SIZE = 5;
@@ -90,8 +92,11 @@ export function getComputerPlayerActionDelayMs(
 ): number {
   switch (game.gameType) {
     case 'bounty-hunting':
-      if (getBountyHuntingWitnessObservations(game, userId).length > 0) return BOUNTY_HUNTING_WITNESS_DELAY_MS;
-      return getRandomDelay(BOUNTY_HUNTING_RESPONSE_MIN_DELAY_MS, BOUNTY_HUNTING_RESPONSE_MAX_DELAY_MS, random);
+      if (getBountyHuntingBotGame(game)?.status === 'ready') return BOUNTY_HUNTING_READY_DELAY_MS;
+      if (getBountyHuntingWitnessObservations(game, userId).length > 0) {
+        return getRandomDelay(BOUNTY_HUNTING_WITNESS_MIN_DELAY_MS, BOUNTY_HUNTING_WITNESS_MAX_DELAY_MS, random);
+      }
+      return getRandomDelay(BOUNTY_HUNTING_CLAIM_MIN_DELAY_MS, BOUNTY_HUNTING_CLAIM_MAX_DELAY_MS, random);
     case 'chess':
       return getRandomDelay(CHESS_RESPONSE_MIN_DELAY_MS, CHESS_RESPONSE_MAX_DELAY_MS, random);
     case 'replay-trivia':

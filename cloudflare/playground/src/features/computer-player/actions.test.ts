@@ -325,12 +325,17 @@ describe('computer player', () => {
       gameId: 'bounty-1',
       gameType: 'bounty-hunting',
       status: 'active'
-    }, () => 0.5)).toBe(2_400);
+    }, () => 0.5)).toBe(825);
+    expect(getComputerPlayerActionDelayMs({
+      gameId: 'bounty-1',
+      gameType: 'bounty-hunting',
+      status: 'ready'
+    }, () => 0.5)).toBe(250);
     expect(getComputerPlayerActionDelayMs(
       bountyWitnessGame,
       () => 0.5,
       BOUNTY_HUNTING_COMPUTER_PLAYER_PROFILE.userId
-    )).toBe(120);
+    )).toBe(100);
     expect(getComputerPlayerActionDelayMs(
       createStickAroundGame('stick-1', 'host-user', STICK_AROUND_COMPUTER_PLAYER_PROFILE.userId, 1_000),
       () => 0.5,
