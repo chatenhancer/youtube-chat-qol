@@ -6,6 +6,9 @@ type LogDetails = Record<string, boolean | number | string | undefined>;
 type LogEvent = (event: string, details?: LogDetails, level?: 'error' | 'info' | 'warn') => void;
 
 const ROOM_STATE_STORAGE_KEY = 'roomState:v1';
+export const GAME_STATE_DEFERRED_PERSIST_MS = 1_000;
+
+export type GameStatePersistence = 'deferred' | 'immediate';
 
 interface StoredRoomState {
   games: unknown[];
@@ -13,6 +16,7 @@ interface StoredRoomState {
 
 export class GameState {
   private readonly games = new Map<string, GameRecord>();
+  private deferredWriteTimer: ReturnType<typeof setTimeout> | null = null;
   private storageWriteQueue: Promise<unknown> = Promise.resolve();
 
   constructor(
@@ -22,16 +26,20 @@ export class GameState {
 
   delete(gameId: string): void {
     this.games.delete(gameId);
-    this.queueWrite();
+    this.queueImmediateWrite();
   }
 
   get(gameId: string): GameRecord | undefined {
     return this.games.get(gameId);
   }
 
-  set(game: GameRecord): void {
+  set(game: GameRecord, { persistence = 'immediate' }: { persistence?: GameStatePersistence } = {}): void {
     this.games.set(game.gameId, game);
-    this.queueWrite();
+    if (persistence === 'deferred') {
+      this.queueDeferredWrite();
+      return;
+    }
+    this.queueImmediateWrite();
   }
 
   values(): GameRecord[] {
@@ -69,6 +77,22 @@ export class GameState {
         gameCount: this.games.size
       });
     }
+  }
+
+  private queueDeferredWrite(): void {
+    if (this.deferredWriteTimer !== null) return;
+    this.deferredWriteTimer = setTimeout(() => {
+      this.deferredWriteTimer = null;
+      this.queueWrite();
+    }, GAME_STATE_DEFERRED_PERSIST_MS);
+  }
+
+  private queueImmediateWrite(): void {
+    if (this.deferredWriteTimer !== null) {
+      clearTimeout(this.deferredWriteTimer);
+      this.deferredWriteTimer = null;
+    }
+    this.queueWrite();
   }
 
   private queueWrite(): void {

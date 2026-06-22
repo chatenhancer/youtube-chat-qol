@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { ProtocolError } from '../../protocol/validation';
 import type { GameRecord } from '../../games/types';
-import { GameState } from './game-state';
+import { GAME_STATE_DEFERRED_PERSIST_MS, GameState } from './game-state';
 import { GenerationTokens } from './generation-token';
 import { InviteManager } from './invite-manager';
 import {
@@ -14,6 +14,7 @@ import {
 describe('stream room state managers', () => {
   afterEach(() => {
     vi.restoreAllMocks();
+    vi.useRealTimers();
   });
 
   it('restores only supported stored games and logs ignored entries', async () => {
@@ -93,6 +94,45 @@ describe('stream room state managers', () => {
       errorMessage: 'write failed',
       errorType: 'Error'
     }, 'warn');
+  });
+
+  it('coalesces deferred game state writes and flushes immediately when needed', async () => {
+    vi.useFakeTimers();
+    const logEvent = vi.fn();
+    const state = createDurableObjectState(null);
+    const games = new GameState(state, logEvent);
+
+    games.set(createStoredGame('game-1', 'stick-around'), { persistence: 'deferred' });
+    games.set({
+      ...createStoredGame('game-1', 'stick-around'),
+      status: 'active'
+    }, { persistence: 'deferred' });
+    await Promise.all(state.pending);
+
+    expect(state.storage.put).not.toHaveBeenCalled();
+
+    await vi.advanceTimersByTimeAsync(GAME_STATE_DEFERRED_PERSIST_MS - 1);
+    await Promise.all(state.pending);
+    expect(state.storage.put).not.toHaveBeenCalled();
+
+    await vi.advanceTimersByTimeAsync(1);
+    await Promise.all(state.pending);
+    expect(state.storage.put).toHaveBeenCalledTimes(1);
+    expect(state.storage.put).toHaveBeenLastCalledWith('roomState:v1', {
+      games: [expect.objectContaining({
+        gameId: 'game-1',
+        status: 'active'
+      })]
+    });
+
+    games.set(createStoredGame('game-2', 'stick-around'), { persistence: 'deferred' });
+    games.delete('game-2');
+    await Promise.all(state.pending);
+
+    expect(state.storage.put).toHaveBeenCalledTimes(2);
+    await vi.advanceTimersByTimeAsync(GAME_STATE_DEFERRED_PERSIST_MS);
+    await Promise.all(state.pending);
+    expect(state.storage.put).toHaveBeenCalledTimes(2);
   });
 
   it('creates, consumes, expires, and rate limits generation tokens', () => {
