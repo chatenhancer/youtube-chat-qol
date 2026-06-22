@@ -8,6 +8,7 @@
 import { chessGameModule } from './chess';
 import { replayTriviaGameModule } from './replay-trivia';
 import { bountyHuntingGameModule } from './bounty-hunting';
+import { stickAroundGameModule } from './stick-around';
 
 export const ENABLED_GAME_MODULES = [
   {
@@ -21,5 +22,9 @@ export const ENABLED_GAME_MODULES = [
   {
     gameId: 'replay-trivia',
     module: replayTriviaGameModule
+  },
+  {
+    gameId: 'stick-around',
+    module: stickAroundGameModule
   }
 ] as const;

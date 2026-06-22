@@ -12,6 +12,7 @@ import {
   CHESS_COMPUTER_PLAYER_BEGINNER_PROFILE,
   CHESS_COMPUTER_PLAYER_CLUB_PROFILE,
   REPLAY_TRIVIA_COMPUTER_PLAYER_PROFILE,
+  STICK_AROUND_COMPUTER_PLAYER_PROFILE,
   getChessComputerPlayerStockfishElo,
   isComputerPlayerUserId
 } from './profiles';
@@ -29,6 +30,11 @@ import {
   startBountyHuntingRound,
   submitBountyHunting
 } from '../../games/bounty-hunting';
+import {
+  createStickAroundGame,
+  readyStickAroundPlayer,
+  startStickAroundRound
+} from '../../games/stick-around';
 import type { GameRecord } from '../../games/types';
 
 vi.mock('../../durable-objects/stockfish-container/client', () => ({
@@ -68,6 +74,15 @@ describe('computer player', () => {
       connectionId: 'server:computer:replay-trivia',
       displayName: 'Computer',
       userId: 'server:computer:replay-trivia'
+    });
+  });
+
+  it('uses one Stick Around computer profile', () => {
+    expect(STICK_AROUND_COMPUTER_PLAYER_PROFILE).toEqual({
+      availableGames: ['stick-around'],
+      connectionId: 'server:computer:stick-around',
+      displayName: 'Computer (Stick Around!)',
+      userId: 'server:computer:stick-around'
     });
   });
 
@@ -218,6 +233,7 @@ describe('computer player', () => {
       },
       1_000
     );
+    let stickGame = createStickAroundGame('stick-1', 'host-user', STICK_AROUND_COMPUTER_PLAYER_PROFILE.userId, 0);
 
     expect(shouldComputerPlayerAct(activeChess, CHESS_COMPUTER_PLAYER_CLUB_PROFILE.userId)).toBe(true);
     expect(shouldComputerPlayerAct(waitingChess, CHESS_COMPUTER_PLAYER_CLUB_PROFILE.userId)).toBe(false);
@@ -240,6 +256,13 @@ describe('computer player', () => {
     }, 6_000);
     expect(shouldComputerPlayerAct(bountyGame, BOUNTY_HUNTING_COMPUTER_PLAYER_PROFILE.userId, 7_000)).toBe(true);
     expect(shouldComputerPlayerAct(bountyGame, BOUNTY_HUNTING_COMPUTER_PLAYER_PROFILE.userId, 66_000)).toBe(false);
+    expect(shouldComputerPlayerAct(stickGame, STICK_AROUND_COMPUTER_PLAYER_PROFILE.userId, 1_000)).toBe(true);
+    stickGame = readyStickAroundPlayer(stickGame, STICK_AROUND_COMPUTER_PLAYER_PROFILE.userId, 1_100);
+    expect(shouldComputerPlayerAct(stickGame, STICK_AROUND_COMPUTER_PLAYER_PROFILE.userId, 1_200)).toBe(false);
+    stickGame = readyStickAroundPlayer(stickGame, 'host-user', 1_300);
+    expect(shouldComputerPlayerAct(stickGame, STICK_AROUND_COMPUTER_PLAYER_PROFILE.userId, 4_400)).toBe(true);
+    stickGame = startStickAroundRound(stickGame, 4_400);
+    expect(shouldComputerPlayerAct(stickGame, STICK_AROUND_COMPUTER_PLAYER_PROFILE.userId, 4_500)).toBe(false);
     expect(shouldComputerPlayerAct({
       gameId: 'unknown-1',
       gameType: 'unknown-game',
@@ -308,6 +331,11 @@ describe('computer player', () => {
       () => 0.5,
       BOUNTY_HUNTING_COMPUTER_PLAYER_PROFILE.userId
     )).toBe(120);
+    expect(getComputerPlayerActionDelayMs(
+      createStickAroundGame('stick-1', 'host-user', STICK_AROUND_COMPUTER_PLAYER_PROFILE.userId, 1_000),
+      () => 0.5,
+      STICK_AROUND_COMPUTER_PLAYER_PROFILE.userId
+    )).toBe(450);
     expect(getComputerPlayerActionDelayMs({
       gameId: 'unknown-1',
       gameType: 'unknown-game',
@@ -333,6 +361,7 @@ describe('computer player', () => {
       },
       1_000
     );
+    let stickGame = createStickAroundGame('stick-1', 'host-user', STICK_AROUND_COMPUTER_PLAYER_PROFILE.userId, 0);
 
     await expect(createComputerPlayerAction(chessGame, {
       getStockfishBestMove: stockfish,
@@ -358,6 +387,26 @@ describe('computer player', () => {
       action: 'ready',
       userId: BOUNTY_HUNTING_COMPUTER_PLAYER_PROFILE.userId
     });
+    expect(createComputerPlayerAction(stickGame, {
+      userId: STICK_AROUND_COMPUTER_PLAYER_PROFILE.userId
+    })).toEqual({
+      action: 'ready',
+      userId: STICK_AROUND_COMPUTER_PLAYER_PROFILE.userId
+    });
+    stickGame = readyStickAroundPlayer(stickGame, STICK_AROUND_COMPUTER_PLAYER_PROFILE.userId, 1_000);
+    stickGame = readyStickAroundPlayer(stickGame, 'host-user', 1_100);
+    expect(createComputerPlayerAction(stickGame, {
+      now: 4_300,
+      userId: STICK_AROUND_COMPUTER_PLAYER_PROFILE.userId
+    })).toEqual({
+      action: 'startRound',
+      userId: STICK_AROUND_COMPUTER_PLAYER_PROFILE.userId
+    });
+    stickGame = startStickAroundRound(stickGame, 4_100);
+    expect(createComputerPlayerAction(stickGame, {
+      now: 5_300,
+      userId: STICK_AROUND_COMPUTER_PLAYER_PROFILE.userId
+    })).toBeNull();
     bountyGame = readyBountyHuntingPlayer(bountyGame, BOUNTY_HUNTING_COMPUTER_PLAYER_PROFILE.userId, 2_000);
     bountyGame = readyBountyHuntingPlayer(bountyGame, 'host-user', 2_000);
     bountyGame = startBountyHuntingRound(bountyGame, 5_000);

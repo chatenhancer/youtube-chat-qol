@@ -207,20 +207,23 @@ describe('playground games header button', () => {
     expect(getGamesSectionTitles()).toEqual(['Start a game']);
     expect(document.querySelector('.ytcq-games-invite-row')).toBeNull();
     expect(document.querySelector('.ytcq-games-section-empty')).toBeNull();
-    expect(getGameCards()).toHaveLength(3);
+    expect(getGameCards()).toHaveLength(4);
     expect(document.querySelector('.ytcq-games-preview-chess .ytcq-games-preview-canvas')).not.toBeNull();
     expect(document.querySelector('.ytcq-games-preview-bounty-hunting .ytcq-games-preview-canvas')).not.toBeNull();
     expect(document.querySelector('.ytcq-games-preview-replay-trivia .ytcq-games-preview-canvas')).not.toBeNull();
-    expect(getGameLabels()).toEqual(['Chess', 'The Wild Wild Chat', 'HELP-A-FRIEND! Trivia']);
+    expect(document.querySelector('.ytcq-games-preview-stick-around .ytcq-games-preview-canvas')).not.toBeNull();
+    expect(getGameLabels()).toEqual(['Chess', 'The Wild Wild Chat', 'HELP-A-FRIEND! Trivia', 'Stick Around!']);
     expect(getGameCardHelpers()).toEqual([
       'Classic chess, three difficulty levels.',
       'Time to take care of some bounties.',
-      'Do you have the knowledge?'
+      'Do you have the knowledge?',
+      "It's raining bubbles."
     ]);
     expect(getGameCards()[0].getAttribute('aria-disabled')).toBe('false');
     expect(getGameCards()[1].getAttribute('aria-disabled')).toBe('false');
     expect(getGameCards()[2].getAttribute('aria-disabled')).toBe('true');
     expect(getGameCards()[2].title).toBe('Can only be played during a live replay (a stream that has already ended).');
+    expect(getGameCards()[3].getAttribute('aria-disabled')).toBe('false');
     getGameCards()[2].click();
     expect(document.querySelector('.ytcq-profile-card-title')?.textContent).toBe('Games');
 
@@ -251,7 +254,7 @@ describe('playground games header button', () => {
     header.querySelector<HTMLButtonElement>('.ytcq-games-button')!.click();
 
     expect(lastMockPort()?.messages.at(-1)).toEqual({
-      availableGames: ['chess', 'bounty-hunting'],
+      availableGames: ['chess', 'bounty-hunting', 'stick-around'],
       languageCode: 'en',
       locale: 'en',
       streamKey: 'stream-a',
@@ -280,10 +283,13 @@ describe('playground games header button', () => {
     expect(getGameCards()[1].title).toBe('Can only be played during live chat.');
     expect(getGameCards()[2].getAttribute('aria-disabled')).toBe('false');
     expect(getGameCards()[2].title).toBe('');
+    expect(getGameCards()[3].getAttribute('aria-disabled')).toBe('true');
+    expect(getGameCards()[3].title).toBe('Can only be played during live chat.');
     expect(getGameCardHelpers()).toEqual([
       'Classic chess, three difficulty levels.',
       'Time to take care of some bounties.',
-      'Do you have the knowledge?'
+      'Do you have the knowledge?',
+      "It's raining bubbles."
     ]);
   });
 
@@ -297,7 +303,7 @@ describe('playground games header button', () => {
     header.querySelector<HTMLButtonElement>('.ytcq-games-button')!.click();
     lastMockPort()?.emit(createSnapshotMessage(createLobbySnapshot()));
 
-    expect(getGameLabels()).toEqual(['Chess', 'The Wild Wild Chat', 'HELP-A-FRIEND! Trivia']);
+    expect(getGameLabels()).toEqual(['Chess', 'The Wild Wild Chat', 'HELP-A-FRIEND! Trivia', 'Stick Around!']);
     getGameCards()[2].click();
 
     expect(document.querySelector('.ytcq-profile-card-title')?.textContent).toBe('HELP-A-FRIEND! Trivia');
@@ -326,7 +332,7 @@ describe('playground games header button', () => {
       invites: [],
       users: [
         {
-          availableGames: ['chess', 'bounty-hunting'],
+          availableGames: ['chess', 'bounty-hunting', 'stick-around'],
           displayName: 'Me',
           joinedAt: Date.now(),
           userId: 'me-user'
@@ -615,7 +621,7 @@ describe('playground games header button', () => {
     gamesButton.click();
 
     expect(lastMockPort()?.messages.at(-1)).toEqual({
-      availableGames: ['chess', 'bounty-hunting'],
+      availableGames: ['chess', 'bounty-hunting', 'stick-around'],
       languageCode: 'en',
       locale: 'en',
       streamKey: 'stream-b',
@@ -736,6 +742,139 @@ describe('playground games header button', () => {
     }));
 
     expect(isChessGamePanelOpen()).toBe(false);
+  });
+
+  it('treats an externally removed Stick Around overlay as hidden', () => {
+    vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(createMockCanvasContext() as unknown as CanvasRenderingContext2D);
+    const header = createHeader();
+    const feed = document.createElement('yt-live-chat-item-list-renderer');
+    document.body.append(header, feed);
+    setOptions({ ...DEFAULT_OPTIONS, playgroundEnabled: true, playgroundGamesAvailable: true });
+
+    wireGamesButton();
+    const gamesButton = header.querySelector<HTMLButtonElement>('.ytcq-games-button')!;
+    gamesButton.click();
+    const snapshot = {
+      ...createLobbySnapshot(),
+      games: [createStickAroundGame()],
+      invites: []
+    };
+    lastMockPort()?.emit(createSnapshotMessage(snapshot));
+
+    getActionButton('Resume').click();
+    expect(document.querySelector('.ytcq-stick-around-overlay')).not.toBeNull();
+    expect(getActionButtonLabels()).toEqual(['Hide', 'Leave']);
+
+    document.querySelector('.ytcq-stick-around-overlay')?.remove();
+    lastMockPort()?.emit(createSnapshotMessage(snapshot));
+
+    expect(document.querySelector('.ytcq-stick-around-overlay')).toBeNull();
+    expect(getActionButtonLabels()).toEqual(['Resume', 'Leave']);
+  });
+
+  it('shows active Stick Around games as the backend connection state changes', () => {
+    vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(createMockCanvasContext() as unknown as CanvasRenderingContext2D);
+    const header = createHeader();
+    const feed = document.createElement('yt-live-chat-item-list-renderer');
+    document.body.append(header, feed);
+    setOptions({ ...DEFAULT_OPTIONS, playgroundEnabled: true, playgroundGamesAvailable: true });
+
+    wireGamesButton();
+    header.querySelector<HTMLButtonElement>('.ytcq-games-button')!.click();
+    const snapshot = {
+      ...createLobbySnapshot(),
+      games: [createStickAroundGame()],
+      invites: []
+    };
+    lastMockPort()?.emit(createSnapshotMessage(snapshot));
+    getActionButton('Resume').click();
+
+    const status = document.querySelector<HTMLElement>('.ytcq-stick-around-status');
+    expect(document.querySelector('.ytcq-stick-around-overlay')).not.toBeNull();
+    expect(status?.hidden).toBe(true);
+
+    lastMockPort()?.emit({
+      error: 'Playground connection failed.',
+      status: 'connecting',
+      type: 'ytcq:playground:status'
+    });
+
+    expect(status?.textContent).toBe('Connection lost. Trying to reconnect...');
+    expect(status?.hidden).toBe(false);
+
+    lastMockPort()?.emit({
+      error: 'Playground connection failed.',
+      status: 'disconnected',
+      type: 'ytcq:playground:status'
+    });
+
+    expect(status?.textContent).toBe('Could not reconnect. Open Games to try again.');
+    expect(status?.hidden).toBe(false);
+
+    lastMockPort()?.emit(createSnapshotMessage(snapshot));
+
+    expect(status?.hidden).toBe(true);
+    expect(status?.textContent).toBe('');
+  });
+
+  it('shows system status notices for ended and unavailable Stick Around overlays', () => {
+    vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(createMockCanvasContext() as unknown as CanvasRenderingContext2D);
+    const header = createHeader();
+    const feed = document.createElement('yt-live-chat-item-list-renderer');
+    document.body.append(header, feed);
+    setOptions({ ...DEFAULT_OPTIONS, playgroundEnabled: true, playgroundGamesAvailable: true });
+
+    wireGamesButton();
+    const gamesButton = header.querySelector<HTMLButtonElement>('.ytcq-games-button')!;
+    gamesButton.click();
+    const game = createStickAroundGame();
+    lastMockPort()?.emit(createSnapshotMessage({
+      ...createLobbySnapshot(),
+      games: [game],
+      invites: []
+    }));
+    getActionButton('Resume').click();
+
+    lastMockPort()?.emit({
+      message: {
+        gameId: game.gameId,
+        reason: 'playerLeft',
+        type: 'gameEnded',
+        userId: 'server:computer:stick-around'
+      },
+      type: 'ytcq:playground:server-message'
+    });
+
+    expect(document.querySelector('.ytcq-stick-around-overlay')).not.toBeNull();
+    expect(document.querySelector('.ytcq-stick-around-status')?.textContent).toBe('Opponent left the game.');
+
+    gamesButton.click();
+    expect(document.querySelector('.ytcq-games-active-row')).toBeNull();
+  });
+
+  it('shows when an active Stick Around game cannot be restored after reconnecting', () => {
+    vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(createMockCanvasContext() as unknown as CanvasRenderingContext2D);
+    const header = createHeader();
+    const feed = document.createElement('yt-live-chat-item-list-renderer');
+    document.body.append(header, feed);
+    setOptions({ ...DEFAULT_OPTIONS, playgroundEnabled: true, playgroundGamesAvailable: true });
+
+    wireGamesButton();
+    header.querySelector<HTMLButtonElement>('.ytcq-games-button')!.click();
+    lastMockPort()?.emit(createSnapshotMessage({
+      ...createLobbySnapshot(),
+      games: [createStickAroundGame()],
+      invites: []
+    }));
+    getActionButton('Resume').click();
+
+    lastMockPort()?.emit(createSnapshotMessage({
+      ...createLobbySnapshot(),
+      games: []
+    }));
+
+    expect(document.querySelector('.ytcq-stick-around-overlay')).not.toBeNull();
+    expect(document.querySelector('.ytcq-stick-around-status')?.textContent).toBe('This game could not be restored.');
   });
 
   it('shows when an active chess game cannot be restored after reconnecting', () => {
@@ -1001,7 +1140,7 @@ describe('playground games header button', () => {
 
     expect(header.querySelector('.ytcq-games-button')).not.toBeNull();
     expect(lastMockPort()?.messages.at(-1)).toEqual({
-      availableGames: ['chess', 'bounty-hunting'],
+      availableGames: ['chess', 'bounty-hunting', 'stick-around'],
       languageCode: 'en',
       locale: 'en',
       streamKey: 'stream-a',
@@ -1024,7 +1163,7 @@ describe('playground games header button', () => {
     );
 
     expect(lastMockPort()?.messages.at(-1)).toEqual({
-      availableGames: ['chess', 'bounty-hunting'],
+      availableGames: ['chess', 'bounty-hunting', 'stick-around'],
       languageCode: 'en',
       locale: 'en',
       streamKey: 'stream-a',
@@ -1175,19 +1314,19 @@ function createLobbySnapshot(): LobbySnapshot {
     ],
     users: [
       {
-        availableGames: ['chess', 'bounty-hunting', 'replay-trivia'],
+        availableGames: ['chess', 'bounty-hunting', 'replay-trivia', 'stick-around'],
         displayName: 'Me',
         joinedAt: Date.now(),
         userId: 'me-user'
       },
       {
-        availableGames: ['chess', 'bounty-hunting', 'replay-trivia'],
+        availableGames: ['chess', 'bounty-hunting', 'replay-trivia', 'stick-around'],
         displayName: 'Luna Chat',
         joinedAt: Date.now(),
         userId: 'luna-user'
       },
       {
-        availableGames: ['chess', 'bounty-hunting', 'replay-trivia'],
+        availableGames: ['chess', 'bounty-hunting', 'replay-trivia', 'stick-around'],
         displayName: 'Marco Vibes',
         joinedAt: Date.now(),
         userId: 'marco-user'
@@ -1233,6 +1372,12 @@ function createComputerUsers(): LobbySnapshot['users'] {
       displayName: 'Computer (Bounty Hunter)',
       joinedAt: Date.now(),
       userId: 'server:computer:bounty-hunting'
+    },
+    {
+      availableGames: ['stick-around'],
+      displayName: 'Computer (Stick Around!)',
+      joinedAt: Date.now(),
+      userId: 'server:computer:stick-around'
     }
   ];
 }
@@ -1328,6 +1473,34 @@ function createBountyHuntingGame(): PublicGame {
   } as PublicGame;
 }
 
+function createStickAroundGame(): PublicGame {
+  return {
+    finishReports: {},
+    gameId: 'game-stick-around',
+    gameType: 'stick-around',
+    hazards: [],
+    inputs: {},
+    phaseStartedAt: Date.now(),
+    players: {
+      guest: {
+        displayName: 'Computer (Stick Around!)',
+        userId: 'server:computer:stick-around'
+      },
+      host: {
+        displayName: 'Me',
+        userId: 'me-user'
+      }
+    },
+    readyPlayers: {
+      guest: true,
+      host: true
+    },
+    roundSeed: 123,
+    roundStartedAt: Date.now(),
+    status: 'active'
+  } as PublicGame;
+}
+
 function createMockCanvasContext(): Partial<CanvasRenderingContext2D> {
   return {
     arc: vi.fn(),
@@ -1338,12 +1511,14 @@ function createMockCanvasContext(): Partial<CanvasRenderingContext2D> {
     fill: vi.fn(),
     fillRect: vi.fn(),
     fillText: vi.fn(),
+    ellipse: vi.fn(),
     lineTo: vi.fn(),
     measureText: vi.fn((text: string) => ({ width: text.length * 8 }) as TextMetrics),
     moveTo: vi.fn(),
     quadraticCurveTo: vi.fn(),
     restore: vi.fn(),
     rotate: vi.fn(),
+    scale: vi.fn(),
     save: vi.fn(),
     setTransform: vi.fn(),
     stroke: vi.fn(),

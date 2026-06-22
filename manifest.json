@@ -63,6 +63,7 @@
     {
       "resources": [
         "games/*/*.mp3",
+        "games/*/*.json",
         "games/*/*.otf",
         "games/*/*.png",
         "games/*/*.ttf",

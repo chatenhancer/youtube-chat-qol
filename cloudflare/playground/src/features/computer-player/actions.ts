@@ -14,6 +14,10 @@ import {
   REPLAY_TRIVIA_ANSWER_TIME_MS,
   REPLAY_TRIVIA_QUESTION_READ_MS
 } from '../../games/replay-trivia';
+import {
+  STICK_AROUND_COUNTDOWN_MS,
+  type StickAroundGameStatus
+} from '../../../../../src/shared/playground/stick-around';
 import type { GameActionInput, GameRecord } from '../../games/types';
 import {
   BOUNTY_HUNTING_ROUND_MS,
@@ -72,6 +76,8 @@ export function shouldComputerPlayerAct(
       return isChessTurnForPlayer(game, userId);
     case 'replay-trivia':
       return isReplayTriviaAnswerNeeded(game, userId, now);
+    case 'stick-around':
+      return isStickAroundActionNeeded(game, userId, now);
     default:
       return false;
   }
@@ -90,6 +96,8 @@ export function getComputerPlayerActionDelayMs(
       return getRandomDelay(CHESS_RESPONSE_MIN_DELAY_MS, CHESS_RESPONSE_MAX_DELAY_MS, random);
     case 'replay-trivia':
       return getRandomDelay(TRIVIA_RESPONSE_MIN_DELAY_MS, TRIVIA_RESPONSE_MAX_DELAY_MS, random);
+    case 'stick-around':
+      return getStickAroundBotActionDelayMs(game);
     default:
       return 0;
   }
@@ -123,9 +131,40 @@ export function createComputerPlayerAction(
         options.random,
         options.now
       );
+    case 'stick-around':
+      return createStickAroundBotAction(
+        game,
+        userId,
+        options.now
+      );
     default:
       return null;
   }
+}
+
+export function createStickAroundBotAction(
+  game: GameRecord,
+  userId: string,
+  now = Date.now()
+): GameActionInput | null {
+  const stickGame = getStickAroundBotGame(game);
+  if (!stickGame) return null;
+  if (!Object.values(stickGame.players).includes(userId)) return null;
+
+  const role = getStickAroundPlayerRole(stickGame, userId);
+  if (!role) return null;
+  if (stickGame.status === 'ready') {
+    return stickGame.readyPlayers[role] ? null : {
+      action: 'ready',
+      userId
+    };
+  }
+  if (stickGame.status === 'countdown') {
+    return now - stickGame.phaseStartedAt >= STICK_AROUND_COUNTDOWN_MS
+      ? { action: 'startRound', userId }
+      : null;
+  }
+  return null;
 }
 
 export async function createStockfishChessBotAction(
@@ -277,6 +316,25 @@ function isBountyHuntingActionNeeded(game: GameRecord, userId: string, now: numb
     );
 }
 
+function isStickAroundActionNeeded(game: GameRecord, userId: string, now: number): boolean {
+  const stickGame = getStickAroundBotGame(game);
+  if (!stickGame) return false;
+  const role = getStickAroundPlayerRole(stickGame, userId);
+  if (!role) return false;
+  if (stickGame.status === 'ready') return !stickGame.readyPlayers[role];
+  if (stickGame.status === 'countdown') return now - stickGame.phaseStartedAt >= STICK_AROUND_COUNTDOWN_MS;
+  return false;
+}
+
+function getStickAroundBotActionDelayMs(game: GameRecord): number {
+  const stickGame = getStickAroundBotGame(game);
+  if (!stickGame) return 0;
+  if (stickGame.status === 'countdown') {
+    return Math.max(100, stickGame.phaseStartedAt + STICK_AROUND_COUNTDOWN_MS - Date.now());
+  }
+  return stickGame.status === 'ready' ? 450 : 0;
+}
+
 function getGamePlayers(game: GameRecord): Record<string, string> {
   const candidate = (game as GameRecord & { players?: unknown }).players;
   if (!candidate || typeof candidate !== 'object' || Array.isArray(candidate)) return {};
@@ -310,6 +368,25 @@ interface ReplayTriviaBotQuestion {
 function getReplayTriviaBotGame(game: GameRecord): ReplayTriviaBotGame | null {
   if (game.gameType !== 'replay-trivia') return null;
   return game as ReplayTriviaBotGame;
+}
+
+interface StickAroundBotGame extends GameRecord {
+  gameType: 'stick-around';
+  phaseStartedAt: number;
+  players: Record<'guest' | 'host', string>;
+  readyPlayers: Partial<Record<'guest' | 'host', boolean>>;
+  status: StickAroundGameStatus;
+}
+
+function getStickAroundBotGame(game: GameRecord): StickAroundBotGame | null {
+  if (game.gameType !== 'stick-around') return null;
+  return game as StickAroundBotGame;
+}
+
+function getStickAroundPlayerRole(game: StickAroundBotGame, userId: string): 'guest' | 'host' | null {
+  if (game.players.host === userId) return 'host';
+  if (game.players.guest === userId) return 'guest';
+  return null;
 }
 
 function isReplayTriviaQuestionDeadlinePassed(game: ReplayTriviaBotGame, now: number): boolean {

@@ -21,8 +21,8 @@ interface ActiveGamePanel {
   adapter: AnyGamePanelAdapter;
   gameType: GameId;
   mount: GamePanelMount;
-  shell: GamePanelShell;
-  shellController: AbortController;
+  shell?: GamePanelShell;
+  shellController?: AbortController;
 }
 
 interface GamePanelPreferences {
@@ -135,6 +135,26 @@ export function openSupportedGamePanel(
 
   closeActiveGamePanel({ notify: false });
   const { adapter, definition } = enabledGame;
+  if (definition.surface === 'chat-overlay') {
+    if (!adapter.mountOverlay) return;
+    const mount = adapter.mountOverlay(game, {
+      closePanel: closeActiveGamePanel,
+      currentUserId,
+      onPanelChange: () => {
+        closeDisconnectedActiveGamePanel();
+        onPanelChange();
+      },
+      sendGameAction
+    });
+    if (!mount) return;
+    activeGamePanel = {
+      adapter,
+      gameType: game.gameType,
+      mount
+    };
+    return;
+  }
+
   const shellController = new AbortController();
   const title = t(definition.labelKey);
   const shell = createGamePanelShell({
@@ -212,10 +232,17 @@ export function updateOpenGamePanel(nextState: PlaygroundClientState): void {
   if (!panel) return;
 
   const { adapter, gameType, mount, shell } = panel;
+  const overlay = mount.statusOverlay || shell?.statusOverlay;
+  if (!shell && !overlay) {
+    if (nextState.status === 'disconnected') {
+      closeActiveGamePanel({ notify: false });
+      return;
+    }
+    if (nextState.status === 'connecting') return;
+  }
   const activeGameId = mount.gameId;
-  const { statusOverlay: overlay } = shell;
   if (nextState.status === 'connecting') {
-    overlay.show({
+    overlay?.show({
       key: `connection:reconnecting:${activeGameId}`,
       message: t('gamesConnectionLost'),
       owner: 'system',
@@ -225,7 +252,7 @@ export function updateOpenGamePanel(nextState: PlaygroundClientState): void {
   }
 
   if (nextState.status === 'disconnected') {
-    overlay.show({
+    overlay?.show({
       key: `connection:failed:${activeGameId}`,
       message: t('gamesReconnectFailed'),
       owner: 'system',
@@ -243,7 +270,7 @@ export function updateOpenGamePanel(nextState: PlaygroundClientState): void {
       return;
     }
 
-    overlay.show({
+    overlay?.show({
       key: `game-ended:opponent-left:${activeGameId}`,
       message: t('gamesOpponentLeft'),
       owner: 'system',
@@ -254,9 +281,9 @@ export function updateOpenGamePanel(nextState: PlaygroundClientState): void {
 
   const game = nextState.games.find((candidate) => candidate.gameId === activeGameId);
   if (!game || game.gameType !== gameType) {
-    if (overlay.has({ keyPrefix: 'game-ended:', owner: 'system' })) return;
+    if (overlay?.has({ keyPrefix: 'game-ended:', owner: 'system' })) return;
 
-    overlay.show({
+    overlay?.show({
       key: `game-unavailable:${activeGameId}`,
       message: t('gamesGameCouldNotRestore'),
       owner: 'system',
@@ -265,7 +292,7 @@ export function updateOpenGamePanel(nextState: PlaygroundClientState): void {
     return;
   }
 
-  overlay.clear({ owner: 'system' });
+  overlay?.clear({ owner: 'system' });
   adapter.updatePanel(game, {
     clientState: nextState,
     currentUserId,
@@ -289,21 +316,28 @@ function getConnectedActiveGamePanel(): ActiveGamePanel | null {
 
 function closeDisconnectedActiveGamePanel(): void {
   const panel = activeGamePanel;
-  if (!panel || panel.shell.panel.isConnected) return;
+  if (!panel) return;
+  const shellDisconnected = Boolean(panel.shell && !panel.shell.panel.isConnected);
+  const mountDisconnected = panel.mount.isConnected?.() === false;
+  if (!shellDisconnected && !mountDisconnected) return;
 
   activeGamePanel = null;
   disposeGamePanel(panel, { notify: false });
 }
 
 function disposeGamePanel(panel: ActiveGamePanel, options?: { notify?: boolean }): void {
-  releaseGamePanelShell(panel);
+  if (panel.shell && panel.shellController) releaseGamePanelShell({ shell: panel.shell, shellController: panel.shellController });
+  if (!panel.shell) panel.mount.statusOverlay?.clear();
   panel.mount.close(options);
 }
 
 function releaseGamePanelShell({
   shell,
   shellController
-}: Pick<ActiveGamePanel, 'shell' | 'shellController'>): void {
+}: {
+  shell: GamePanelShell;
+  shellController: AbortController;
+}): void {
   shell.statusOverlay.clear();
   shellController.abort();
   shell.panel.remove();

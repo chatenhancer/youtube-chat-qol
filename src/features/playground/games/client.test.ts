@@ -87,7 +87,7 @@ describe('Playground games client', () => {
     expect(chrome.runtime.connect).toHaveBeenCalledTimes(1);
     expect(port.messages).toEqual([
       {
-        availableGames: ['chess', 'bounty-hunting'],
+        availableGames: ['chess', 'bounty-hunting', 'stick-around'],
         languageCode: 'en',
         locale: 'en',
         streamKey: 'stream-a',
@@ -119,7 +119,7 @@ describe('Playground games client', () => {
 
     startPlaygroundClient(false);
     expect(port.messages.at(-1)).toEqual({
-      availableGames: ['chess', 'bounty-hunting'],
+      availableGames: ['chess', 'bounty-hunting', 'stick-around'],
       type: 'ytcq:playground:set-availability'
     });
 
@@ -149,7 +149,7 @@ describe('Playground games client', () => {
 
     expect(port.messages.slice(1)).toEqual([
       {
-        availableGames: ['chess', 'bounty-hunting'],
+        availableGames: ['chess', 'bounty-hunting', 'stick-around'],
         type: 'ytcq:playground:set-availability'
       },
       {
