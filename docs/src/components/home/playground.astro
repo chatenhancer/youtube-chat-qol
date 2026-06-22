@@ -4,6 +4,7 @@ import type { Messages } from '../../data/site';
 
 interface GamePostPaths {
   chess: string;
+  stickAround: string;
   trivia: string;
   wild: string;
 }
@@ -21,6 +22,12 @@ const playgroundGames = [
     className: 'playground-game-logo-wild',
     href: gamePostPaths.wild,
     src: 'assets/playground/wild-wild-chat-logo.webp'
+  },
+  {
+    alt: "Stick Around!: It's Raining Bubbles",
+    className: 'playground-game-logo-stick-around',
+    href: gamePostPaths.stickAround,
+    src: 'assets/playground/stick-around-logo.webp'
   },
   {
     alt: 'HELP-A-FRIEND! Trivia',

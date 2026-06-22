@@ -1306,6 +1306,11 @@ h3 {
   max-width: 74px;
 }
 
+.playground-game-logo-stick-around {
+  height: 36px;
+  max-width: 74px;
+}
+
 .playground-preview {
   position: relative;
   justify-self: center;
