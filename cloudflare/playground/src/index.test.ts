@@ -727,7 +727,7 @@ function createEnv(
   const captchaNamespace = createNamespace('captcha-id', fetchCaptcha);
 
   return {
-    ALLOWED_ORIGIN_PATTERNS: 'https://playground.chatenhancer.com,https://chatenhancer.com,chrome-extension://',
+    ALLOWED_ORIGIN_PATTERNS: 'https://playground.chatenhancer.com,https://chatenhancer.com,chrome-extension://,safari-web-extension://',
     CAPTCHA_PASSES: captchaNamespace,
     STREAM_ROOMS: streamNamespace,
     ...overrides

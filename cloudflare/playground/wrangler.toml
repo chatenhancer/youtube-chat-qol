@@ -18,7 +18,7 @@ head_sampling_rate = 1
 invocation_logs = false
 
 [vars]
-ALLOWED_ORIGIN_PATTERNS = "https://playground.chatenhancer.com,https://chatenhancer.com,https://www.chatenhancer.com,chrome-extension://,moz-extension://,http://localhost:,http://127.0.0.1:"
+ALLOWED_ORIGIN_PATTERNS = "https://playground.chatenhancer.com,https://chatenhancer.com,https://www.chatenhancer.com,chrome-extension://,moz-extension://,safari-web-extension://,http://localhost:,http://127.0.0.1:"
 STOCKFISH_ELO = "1700"
 STOCKFISH_MOVE_TIME_MS = "500"
 TURNSTILE_EXPECTED_HOSTNAME = "playground.chatenhancer.com"
