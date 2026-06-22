@@ -1828,6 +1828,7 @@ yt-live-chat-header-renderer .ytcq-inbox-badge[hidden] {
 .ytcq-stick-around-canvas {
   position: absolute;
   inset: 0;
+  z-index: 0;
   display: block;
   width: 100%;
   height: 100%;
@@ -1841,7 +1842,7 @@ yt-live-chat-header-renderer .ytcq-inbox-badge[hidden] {
   top: 8px;
   left: 8px;
   right: 8px;
-  z-index: 1;
+  z-index: 4;
   display: grid;
   grid-template-columns: 32px minmax(0, 1fr) auto;
   max-width: calc(100% - 16px);
@@ -1951,11 +1952,11 @@ yt-live-chat-header-renderer .ytcq-inbox-badge[hidden] {
 
 .ytcq-game-overlay .ytcq-game-status {
   z-index: 3;
-  top: 54px;
-  right: 10px;
-  bottom: 10px;
-  left: 10px;
-  border-radius: 8px;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  border-radius: 0;
   color: #fff;
   background: rgba(0, 0, 0, 0.72);
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.11);
