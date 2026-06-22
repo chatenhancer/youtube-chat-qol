@@ -16,7 +16,7 @@ describe('Stick Around chat traffic observer', () => {
     vi.useRealTimers();
   });
 
-  it('refreshes late message text without counting the same row twice', async () => {
+  it('refreshes late message text without counting the same row twice', () => {
     const observations: Array<{ count: number; messageIds: string[] }> = [];
     observer = createStickAroundChatTrafficObserver((observation) => {
       observations.push({
@@ -27,7 +27,7 @@ describe('Stick Around chat traffic observer', () => {
     const message = createMessage('message-1', 'first text');
 
     document.body.append(message);
-    await Promise.resolve();
+    observer.recordMessage(message, true);
     vi.advanceTimersByTime(1_000);
 
     expect(observations).toEqual([{
@@ -42,6 +42,25 @@ describe('Stick Around chat traffic observer', () => {
 
     expect(observations).toHaveLength(1);
     expect(observer.getMessageTexts().get('message-1')).toBe('late text');
+  });
+
+  it('clears pending traffic when reset without clearing cached message text', () => {
+    const observations: Array<{ count: number; messageIds: string[] }> = [];
+    observer = createStickAroundChatTrafficObserver((observation) => {
+      observations.push({
+        count: observation.count,
+        messageIds: observation.messageIds
+      });
+    });
+    const message = createMessage('message-1', 'countdown text');
+    document.body.append(message);
+    observer.recordMessage(message, true);
+
+    observer.reset();
+    vi.advanceTimersByTime(1_000);
+
+    expect(observations).toEqual([]);
+    expect(observer.getMessageTexts().get('message-1')).toBe('countdown text');
   });
 });
 

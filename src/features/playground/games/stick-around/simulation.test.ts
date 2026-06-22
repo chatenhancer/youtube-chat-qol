@@ -48,7 +48,7 @@ describe('Stick Around simulation', () => {
     let landedWhilePressed = false;
     let jumpedAgainAfterLanding = false;
 
-    for (let now = 1_050; now <= 3_000; now += 50) {
+    for (let now = 1_016; now <= 3_000; now += 16) {
       const wasGrounded = fighter.grounded;
       stepStickAroundSimulation(simulation, game, {
         'host-user': controls
@@ -64,7 +64,7 @@ describe('Stick Around simulation', () => {
     expect(jumpedAgainAfterLanding).toBe(true);
   });
 
-  it('caps delayed frame movement to avoid visible teleports', () => {
+  it('substeps delayed frame movement to avoid one large teleport', () => {
     const game = createGame();
     const simulation = createStickAroundSimulation(game, 320, 260, 1_000);
     const fighter = simulation.fighters['host-user'];
@@ -78,9 +78,9 @@ describe('Stick Around simulation', () => {
       }
     }, new Map(), 1_200);
 
-    expect(simulation.frame).toBe(1);
-    expect(fighter.x).toBeGreaterThan(startX);
-    expect(fighter.x).toBeLessThan(startX + 3);
+    expect(simulation.frame).toBe(7);
+    expect(fighter.x).toBeGreaterThan(startX + 10);
+    expect(fighter.x).toBeLessThan(startX + 45);
   });
 
   it('ignores stale remote inputs', () => {
@@ -443,10 +443,12 @@ describe('Stick Around simulation', () => {
     expect(controls.jump).toBe(false);
   });
 
-  it('sizes chat bubbles from their local message text', () => {
+  it('uses server bubble dimensions while preserving local message text', () => {
     const game = createGame({
       hazards: [
         {
+          bubbleHeight: 30,
+          bubbleWidth: 82,
           id: 'short-hazard',
           messageId: 'short-message',
           seed: 123,
@@ -454,6 +456,8 @@ describe('Stick Around simulation', () => {
           weight: 1
         },
         {
+          bubbleHeight: 30,
+          bubbleWidth: 82,
           id: 'long-hazard',
           messageId: 'long-message',
           seed: 456,
@@ -473,8 +477,10 @@ describe('Stick Around simulation', () => {
     const longBubble = simulation.bubbles.find((bubble) => bubble.id === 'long-hazard');
     expect(shortBubble).toBeDefined();
     expect(longBubble).toBeDefined();
-    expect(longBubble!.width).toBeGreaterThan(shortBubble!.width);
-    expect(longBubble!.height).toBeGreaterThan(shortBubble!.height);
+    expect(shortBubble!.text).toBe('ok');
+    expect(longBubble!.text).toBe('this is a much longer chat bubble that should wrap onto more than one line');
+    expect(longBubble!.width).toBe(shortBubble!.width);
+    expect(longBubble!.height).toBe(shortBubble!.height);
   });
 
   it('declares the surviving player after a stock loss', () => {
@@ -501,6 +507,8 @@ describe('Stick Around simulation', () => {
     stepStickAroundSimulation(simulation, game, {}, new Map(), 1_016);
 
     expect(fighter.stocks).toBe(STICK_AROUND_STARTING_STOCKS - 1);
+    expect(simulation.particles.length).toBeGreaterThan(0);
+    expect(simulation.particles.every((particle) => particle.x === 0)).toBe(true);
     expect(fighter.x).toBeCloseTo(320 * 0.28 - 15);
     expect(fighter.y).toBe(36);
     expect(fighter.grounded).toBe(false);

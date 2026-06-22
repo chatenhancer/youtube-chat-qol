@@ -1,27 +1,40 @@
 /**
  * Stick Around! realtime game module.
  *
- * The server owns match lifecycle, input relay, hazard scheduling, and winner
- * agreement. Clients keep the full physics/render loop local and only send chat
- * traffic counts, never chat text.
+ * The server owns match lifecycle, input relay, hazard scheduling, physics, and
+ * winner resolution. Clients send controls and chat traffic counts, then render
+ * the authoritative world snapshot.
  */
 import type { PublicUserIdentity } from '../../protocol/messages';
-import { isPlaygroundComputerUserId } from '../../protocol/messages';
 import { ProtocolError } from '../../protocol/validation';
 import type {
+  StickAroundArenaDimensions,
   PublicStickAroundGame,
+  StickAroundControls,
   StickAroundFinishReport,
   StickAroundGameStatus,
   StickAroundHazardEvent,
   StickAroundInputSnapshot,
-  StickAroundPlayerRole
+  StickAroundPlayerRole,
+  StickAroundSimulationSnapshot
 } from '../../../../../src/shared/playground/stick-around';
 import {
+  STICK_AROUND_ARENA_HEIGHT,
+  STICK_AROUND_ARENA_WIDTH,
   STICK_AROUND_COUNTDOWN_MS,
   STICK_AROUND_MAX_HAZARDS_PER_OBSERVATION,
   STICK_AROUND_MAX_OBSERVED_MESSAGE_IDS,
   STICK_AROUND_MAX_STORED_HAZARDS
 } from '../../../../../src/shared/playground/stick-around';
+import {
+  createStickAroundServerSimulation,
+  getStickAroundComputerControls,
+  getStickAroundWinnerUserId,
+  hydrateStickAroundSimulationSnapshot,
+  serializeStickAroundSimulation,
+  stepStickAroundSimulation,
+  type StickAroundSimulation
+} from '../../../../../src/shared/playground/stick-around-simulation';
 import type { GameActionInput, GameModule, GameRecord } from '../types';
 
 type PlayerRole = StickAroundPlayerRole;
@@ -30,8 +43,14 @@ const MAX_MESSAGE_ID_LENGTH = 160;
 const MAX_TRAFFIC_COUNT = 30;
 const MIN_HAZARD_SPACING_MS = 220;
 const HAZARD_SPAWN_LEAD_MS = 650;
+const HAZARD_DIMENSIONS = [
+  { bubbleHeight: 30, bubbleWidth: 82 },
+  { bubbleHeight: 44, bubbleWidth: 126 },
+  { bubbleHeight: 58, bubbleWidth: 172 }
+] as const;
 
 export interface StickAroundGameRecord extends GameRecord {
+  arena: StickAroundArenaDimensions;
   finishReports: Record<string, StickAroundFinishReport>;
   gameType: 'stick-around';
   hazardSequence: number;
@@ -43,6 +62,7 @@ export interface StickAroundGameRecord extends GameRecord {
   readyPlayers: Partial<Record<PlayerRole, boolean>>;
   roundSeed: number;
   roundStartedAt?: number;
+  simulation?: StickAroundSimulationSnapshot;
   status: StickAroundGameStatus;
   winnerUserId?: string | null;
 }
@@ -96,6 +116,10 @@ export function createStickAroundGame(
     finishReports: {},
     gameId,
     gameType: 'stick-around',
+    arena: {
+      height: STICK_AROUND_ARENA_HEIGHT,
+      width: STICK_AROUND_ARENA_WIDTH
+    },
     hazardSequence: 0,
     hazards: [],
     inputs: {},
@@ -156,6 +180,21 @@ export function startStickAroundRound(
     observedMessageIds: [],
     phaseStartedAt: now,
     roundStartedAt: now,
+    simulation: serializeStickAroundSimulation(createStickAroundServerSimulation({
+      arena: game.arena,
+      finishReports: {},
+      gameId: game.gameId,
+      gameType: 'stick-around',
+      hazards: [],
+      inputs: {},
+      phaseStartedAt: now,
+      players: createSimulationPlayers(game),
+      readyPlayers: game.readyPlayers,
+      roundSeed: game.roundSeed,
+      roundStartedAt: now,
+      serverNow: now,
+      status: 'active'
+    }, now)),
     status: 'active',
     winnerUserId: undefined
   };
@@ -172,13 +211,13 @@ export function applyStickAroundInput(
   const previous = game.inputs[input.userId];
   if (previous && snapshot.seq <= previous.seq) return game;
 
-  return {
+  return advanceStickAroundGame({
     ...game,
     inputs: {
       ...game.inputs,
       [input.userId]: snapshot
     }
-  };
+  }, now);
 }
 
 export function observeStickAroundChatTraffic(
@@ -197,7 +236,7 @@ export function observeStickAroundChatTraffic(
   const anonymousCount = messageIds.length ? Math.max(0, reportedCount - messageIds.length) : reportedCount;
   const observedCount = Math.min(MAX_TRAFFIC_COUNT, newMessageIds.length + anonymousCount);
   const hazardCount = Math.min(STICK_AROUND_MAX_HAZARDS_PER_OBSERVATION, Math.ceil(observedCount / 2));
-  if (hazardCount <= 0) return game;
+  if (hazardCount <= 0) return advanceStickAroundGame(game, now);
 
   const hazards: StickAroundHazardEvent[] = [];
   let sequence = game.hazardSequence;
@@ -206,7 +245,10 @@ export function observeStickAroundChatTraffic(
     sequence += 1;
     const seed = createHazardSeed(game.roundSeed, sequence, observedCount);
     const messageId = newMessageIds[index % newMessageIds.length];
+    const dimensions = getHazardDimensions(observedCount);
     hazards.push({
+      bubbleHeight: dimensions.bubbleHeight,
+      bubbleWidth: dimensions.bubbleWidth,
       id: `hazard-${sequence}`,
       ...(messageId ? { messageId } : {}),
       seed,
@@ -215,12 +257,12 @@ export function observeStickAroundChatTraffic(
     });
   }
 
-  return {
+  return advanceStickAroundGame({
     ...game,
     hazardSequence: sequence,
     hazards: [...game.hazards, ...hazards].slice(-STICK_AROUND_MAX_STORED_HAZARDS),
     observedMessageIds: [...game.observedMessageIds, ...newMessageIds].slice(-400)
-  };
+  }, now);
 }
 
 export function finishStickAroundRound(
@@ -230,40 +272,7 @@ export function finishStickAroundRound(
 ): StickAroundGameRecord {
   if (game.status !== 'active') return game;
   getRequiredStickAroundPlayerRole(game, input.userId);
-  const report = parseFinishReport(game, input, now);
-  const finishReports = {
-    ...game.finishReports,
-    [input.userId]: report
-  };
-  const playerIds = [game.players.host, game.players.guest];
-  const humanPlayerIds = playerIds.filter((userId) => !isPlaygroundComputerUserId(userId));
-  const requiredReports = humanPlayerIds.length || playerIds.length;
-  const reports = Object.values(finishReports);
-
-  if (reports.length < requiredReports) {
-    return {
-      ...game,
-      finishReports
-    };
-  }
-
-  const firstWinner = reports[0]?.winnerUserId ?? null;
-  const agreed = reports.every((candidate) => candidate.winnerUserId === firstWinner);
-  return agreed
-    ? {
-        ...game,
-        finishReports,
-        phaseStartedAt: now,
-        status: 'finished',
-        winnerUserId: firstWinner
-      }
-    : {
-        ...game,
-        finishReports,
-        phaseStartedAt: now,
-        status: 'desynced',
-        winnerUserId: null
-      };
+  return advanceStickAroundGame(game, now);
 }
 
 export function timeoutStickAroundRound(
@@ -286,24 +295,135 @@ export function toPublicStickAroundGame(
   getUser: (userId: string) => PublicUserIdentity,
   now = Date.now()
 ): PublicStickAroundGame {
+  const players = {
+    guest: getUser(game.players.guest),
+    host: getUser(game.players.host)
+  };
   return {
+    arena: game.arena,
     finishReports: game.finishReports,
     gameId: game.gameId,
     gameType: 'stick-around',
     hazards: game.hazards,
     inputs: game.inputs,
     phaseStartedAt: game.phaseStartedAt,
-    players: {
-      guest: getUser(game.players.guest),
-      host: getUser(game.players.host)
-    },
+    players,
     readyPlayers: game.readyPlayers,
     roundSeed: game.roundSeed,
     roundStartedAt: game.roundStartedAt,
     serverNow: now,
+    simulation: game.simulation ? withPublicStickAroundFighterLabels(game.simulation, players) : undefined,
     status: game.status,
     winnerUserId: game.winnerUserId
   };
+}
+
+function withPublicStickAroundFighterLabels(
+  simulation: StickAroundSimulationSnapshot,
+  players: PublicStickAroundGame['players']
+): StickAroundSimulationSnapshot {
+  const labels = new Map(Object.values(players).map((player) => [
+    player.userId,
+    player.displayName
+  ]));
+  return {
+    ...simulation,
+    bubbles: simulation.bubbles.map((bubble) => ({ ...bubble })),
+    fighters: Object.fromEntries(Object.entries(simulation.fighters).map(([userId, fighter]) => [
+      userId,
+      {
+        ...fighter,
+        label: labels.get(userId) || fighter.label
+      }
+    ])),
+    particles: simulation.particles.map((particle) => ({ ...particle })),
+    platforms: simulation.platforms.map((platform) => ({ ...platform })),
+    spawnedHazardIds: [...simulation.spawnedHazardIds]
+  };
+}
+
+export function advanceStickAroundGame(
+  game: StickAroundGameRecord,
+  now = Date.now()
+): StickAroundGameRecord {
+  if (game.status !== 'active') return game;
+  const publicGame = toSimulationPublicGame(game, now);
+  const simulation = game.simulation
+    ? hydrateStickAroundSimulationSnapshot(game.simulation)
+    : createStickAroundServerSimulation(publicGame, now);
+
+  stepStickAroundSimulation(
+    simulation,
+    publicGame,
+    getAuthoritativeInputs(game, simulation, now),
+    new Map(),
+    now
+  );
+
+  const simulationSnapshot = serializeStickAroundSimulation(simulation);
+  const winnerUserId = getStickAroundWinnerUserId(simulation);
+  if (winnerUserId !== undefined) {
+    return {
+      ...game,
+      phaseStartedAt: now,
+      simulation: simulationSnapshot,
+      status: 'finished',
+      winnerUserId
+    };
+  }
+
+  return {
+    ...game,
+    simulation: simulationSnapshot
+  };
+}
+
+function toSimulationPublicGame(game: StickAroundGameRecord, now: number): PublicStickAroundGame {
+  return {
+    arena: game.arena,
+    finishReports: game.finishReports,
+    gameId: game.gameId,
+    gameType: 'stick-around',
+    hazards: game.hazards,
+    inputs: game.inputs,
+    phaseStartedAt: game.phaseStartedAt,
+    players: createSimulationPlayers(game),
+    readyPlayers: game.readyPlayers,
+    roundSeed: game.roundSeed,
+    roundStartedAt: game.roundStartedAt,
+    serverNow: now,
+    simulation: game.simulation,
+    status: game.status,
+    winnerUserId: game.winnerUserId
+  };
+}
+
+function createSimulationPlayers(game: StickAroundGameRecord): PublicStickAroundGame['players'] {
+  return {
+    guest: {
+      displayName: '',
+      userId: game.players.guest
+    },
+    host: {
+      displayName: '',
+      userId: game.players.host
+    }
+  };
+}
+
+function getAuthoritativeInputs(
+  game: StickAroundGameRecord,
+  simulation: StickAroundSimulation,
+  now: number
+): Record<string, StickAroundControls | StickAroundInputSnapshot | undefined> {
+  const inputs: Record<string, StickAroundControls | StickAroundInputSnapshot> = {
+    ...game.inputs
+  };
+  Object.values(game.players).forEach((userId) => {
+    if (!userId.startsWith('server:computer:')) return;
+    inputs[userId] = getStickAroundComputerControls(simulation, userId, now);
+  });
+  return inputs;
 }
 
 function parseStickAroundInput(input: GameActionInput, now: number): StickAroundInputSnapshot {
@@ -319,34 +439,9 @@ function parseStickAroundInput(input: GameActionInput, now: number): StickAround
   };
 }
 
-function parseFinishReport(
-  game: StickAroundGameRecord,
-  input: GameActionInput,
-  now: number
-): StickAroundFinishReport {
-  const payload = input.payload || {};
-  const winnerUserId = payload.winnerUserId === null
-    ? null
-    : getOptionalPlayerUserId(game, payload.winnerUserId);
-  return {
-    frame: getInteger(payload.frame, 'frame', 0, 1_000_000_000),
-    reportedAt: now,
-    userId: input.userId,
-    winnerUserId
-  };
-}
-
 function getInteger(value: unknown, key: string, min: number, max: number): number {
   if (!Number.isInteger(value)) throw new ProtocolError('invalid_payload', `${key} must be an integer.`);
   return Math.max(min, Math.min(max, Number(value)));
-}
-
-function getOptionalPlayerUserId(game: StickAroundGameRecord, value: unknown): string | null {
-  if (typeof value !== 'string') throw new ProtocolError('invalid_winner', 'winnerUserId must be a player or null.');
-  if (!Object.values(game.players).includes(value)) {
-    throw new ProtocolError('invalid_winner', 'winnerUserId must be a player or null.');
-  }
-  return value;
 }
 
 function parseMessageIds(value: unknown): string[] {
@@ -364,6 +459,11 @@ function parseMessageIds(value: unknown): string[] {
       messageIds.push(messageId);
     });
   return messageIds;
+}
+
+function getHazardDimensions(weight: number): { bubbleHeight: number; bubbleWidth: number } {
+  const index = Math.max(0, Math.min(HAZARD_DIMENSIONS.length - 1, Math.ceil(weight) - 1));
+  return HAZARD_DIMENSIONS[index];
 }
 
 function getStickAroundPlayerRole(game: StickAroundGameRecord, userId: string): PlayerRole | null {

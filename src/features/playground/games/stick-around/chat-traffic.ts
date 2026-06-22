@@ -2,10 +2,12 @@ import {
   STICK_AROUND_MAX_OBSERVED_MESSAGE_IDS,
   STICK_AROUND_TRAFFIC_WINDOW_MS
 } from '../../../../shared/playground/stick-around';
+import { registerFeatureLifecycle, type FeatureMessageContext } from '../../../../content/lifecycle';
 import { getMessageStableId, getMessageText } from '../../../../youtube/messages';
 import { CHAT_MESSAGE_SELECTOR } from '../../../../youtube/selectors';
 
 const MAX_STORED_MESSAGE_TEXTS = 400;
+const activeTrafficObservers = new Set<StickAroundChatTrafficObserverInternal>();
 
 export interface StickAroundTrafficObservation {
   count: number;
@@ -16,8 +18,18 @@ export interface StickAroundTrafficObservation {
 export interface StickAroundChatTrafficObserver {
   close(): void;
   getMessageTexts(): ReadonlyMap<string, string>;
+  recordMessage(message: HTMLElement, countTraffic: boolean): void;
   refresh(): void;
+  reset(): void;
 }
+
+interface StickAroundChatTrafficObserverInternal extends StickAroundChatTrafficObserver {
+  recordMessage(message: HTMLElement, countTraffic: boolean): void;
+}
+
+registerFeatureLifecycle({
+  message: { collect: handleStickAroundLifecycleMessage }
+});
 
 export function createStickAroundChatTrafficObserver(
   onObserve: (observation: StickAroundTrafficObservation) => void
@@ -28,47 +40,35 @@ export function createStickAroundChatTrafficObserver(
   let pendingCount = 0;
   let windowStartedAt = Date.now();
 
-  const observer = new MutationObserver((mutations) => {
-    mutations.forEach((mutation) => {
-      mutation.addedNodes.forEach((node) => {
-        collectMessages(node, true);
-      });
-    });
-  });
-  observer.observe(document.body, {
-    childList: true,
-    subtree: true
-  });
-
   collectExistingMessages();
   const intervalId = window.setInterval(flush, STICK_AROUND_TRAFFIC_WINDOW_MS);
 
-  return {
+  const observer: StickAroundChatTrafficObserverInternal = {
     close() {
-      observer.disconnect();
+      activeTrafficObservers.delete(observer);
       window.clearInterval(intervalId);
     },
     getMessageTexts() {
       return messageTexts;
     },
+    recordMessage(message: HTMLElement, countTraffic: boolean) {
+      rememberMessage(message, countTraffic);
+    },
     refresh() {
       collectExistingMessages();
+    },
+    reset() {
+      pendingCount = 0;
+      pendingMessageIds.clear();
+      windowStartedAt = Date.now();
     }
   };
+  activeTrafficObservers.add(observer);
+  return observer;
 
   function collectExistingMessages(): void {
     document.querySelectorAll<HTMLElement>(CHAT_MESSAGE_SELECTOR).forEach((message) => {
       rememberMessage(message, false);
-    });
-  }
-
-  function collectMessages(node: Node, countTraffic: boolean): void {
-    if (!(node instanceof Element)) return;
-    if (node instanceof HTMLElement && node.matches(CHAT_MESSAGE_SELECTOR)) {
-      rememberMessage(node, countTraffic);
-    }
-    node.querySelectorAll<HTMLElement>(CHAT_MESSAGE_SELECTOR).forEach((message) => {
-      rememberMessage(message, countTraffic);
     });
   }
 
@@ -108,4 +108,10 @@ export function createStickAroundChatTrafficObserver(
     pendingMessageIds.clear();
     windowStartedAt = Date.now();
   }
+}
+
+function handleStickAroundLifecycleMessage(message: HTMLElement, context: FeatureMessageContext): void {
+  if (!activeTrafficObservers.size) return;
+  const countTraffic = context.source === 'added' && context.allowTranslate;
+  activeTrafficObservers.forEach((observer) => observer.recordMessage(message, countTraffic));
 }

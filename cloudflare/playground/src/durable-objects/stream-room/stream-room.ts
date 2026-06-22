@@ -59,6 +59,7 @@ const MESSAGE_RATE_COSTS: { [Type in ClientMessage['type']]: number } = {
   setAvailability: 2,
   setDisplayName: 3
 };
+const STICK_AROUND_REALTIME_ACTION_RATE_COST = 0.2;
 
 export class StreamRoom {
   private readonly gameState: GameState;
@@ -540,7 +541,7 @@ export class StreamRoom {
   }
 
   private assertWithinRateLimit(session: ClientSession, message: ClientMessage): void {
-    const cost = MESSAGE_RATE_COSTS[message.type];
+    const cost = getMessageRateCost(message);
     if (!session.rateLimit.consume(cost)) {
       throw new ProtocolError('rate_limited', 'Slow down before sending more playground messages.');
     }
@@ -655,6 +656,16 @@ export class StreamRoom {
       ...details
     }, level);
   }
+}
+
+function getMessageRateCost(message: ClientMessage): number {
+  if (
+    message.type === 'gameAction' &&
+    (message.action === 'input' || message.action === 'observeChatTraffic')
+  ) {
+    return STICK_AROUND_REALTIME_ACTION_RATE_COST;
+  }
+  return MESSAGE_RATE_COSTS[message.type];
 }
 
 function normalizeError(error: unknown): ProtocolError {
