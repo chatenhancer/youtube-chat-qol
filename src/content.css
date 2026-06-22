@@ -2439,6 +2439,10 @@ yt-live-chat-header-renderer .ytcq-inbox-badge[hidden] {
 }
 
 .ytcq-bounty-hunting-claim-indicator {
+  --ytcq-bounty-hunting-claim-indicator-background: rgba(170, 124, 47, 0.22);
+  --ytcq-bounty-hunting-claim-indicator-border: rgba(220, 176, 88, 0.42);
+  --ytcq-bounty-hunting-claim-indicator-color: var(--yt-spec-text-primary, #f1f1f1);
+
   display: inline-flex;
   align-items: center;
   gap: 3px;
@@ -2446,12 +2450,18 @@ yt-live-chat-header-renderer .ytcq-inbox-badge[hidden] {
   margin-inline-start: 6px;
   padding: 1px 5px 1px 3px;
   border-radius: 999px;
-  color: var(--yt-spec-text-primary, #f1f1f1);
-  background: rgba(170, 124, 47, 0.22);
-  box-shadow: inset 0 0 0 1px rgba(220, 176, 88, 0.42);
+  color: var(--ytcq-bounty-hunting-claim-indicator-color);
+  background: var(--ytcq-bounty-hunting-claim-indicator-background);
+  box-shadow: inset 0 0 0 1px var(--ytcq-bounty-hunting-claim-indicator-border);
   font: 500 11px/14px Roboto, Arial, sans-serif;
   letter-spacing: 0;
   vertical-align: text-bottom;
+}
+
+html:not([dark]) .ytcq-bounty-hunting-claim-indicator {
+  --ytcq-bounty-hunting-claim-indicator-background: #f1d89d;
+  --ytcq-bounty-hunting-claim-indicator-border: rgba(114, 77, 14, 0.34);
+  --ytcq-bounty-hunting-claim-indicator-color: #473000;
 }
 
 .ytcq-bounty-hunting-claim-indicator-avatar {
