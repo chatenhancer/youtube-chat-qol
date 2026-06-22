@@ -8,9 +8,14 @@ import {
   startStickAroundRound,
   stickAroundGameModule,
   timeoutStickAroundRound,
-  toPublicStickAroundGame
+  toPublicStickAroundGame,
+  type StickAroundGameRecord
 } from './index';
 import { ProtocolError } from '../../protocol/validation';
+import {
+  STICK_AROUND_ARENA_HEIGHT,
+  STICK_AROUND_ARENA_WIDTH
+} from '../../../../../src/shared/playground/stick-around';
 
 describe('playground Stick Around game rules', () => {
   it('readies both players, starts after countdown, and relays newer inputs', () => {
@@ -30,6 +35,10 @@ describe('playground Stick Around game rules', () => {
     game = startStickAroundRound(game, 4_200);
     expect(game.status).toBe('active');
     expect(game.roundStartedAt).toBe(4_200);
+    expect(game.arena).toEqual({
+      height: STICK_AROUND_ARENA_HEIGHT,
+      width: STICK_AROUND_ARENA_WIDTH
+    });
 
     game = applyStickAroundInput(game, {
       action: 'input',
@@ -75,6 +84,8 @@ describe('playground Stick Around game rules', () => {
 
     expect(game.hazards).toHaveLength(2);
     expect(game.hazards[0]).toMatchObject({
+      bubbleHeight: 58,
+      bubbleWidth: 172,
       id: 'hazard-1',
       messageId: 'message-1',
       spawnAt: 5_750
@@ -94,7 +105,7 @@ describe('playground Stick Around game rules', () => {
     expect(game.hazards).toHaveLength(2);
   });
 
-  it('finishes only after human players agree and marks disagreements as desynced', () => {
+  it('ignores client finish reports and resolves the winner from server physics', () => {
     let game = startActiveGame();
 
     game = finishStickAroundRound(game, {
@@ -106,32 +117,40 @@ describe('playground Stick Around game rules', () => {
       userId: 'host-user'
     }, 8_000);
     expect(game.status).toBe('active');
-    expect(Object.keys(game.finishReports)).toEqual(['host-user']);
+    expect(Object.keys(game.finishReports)).toEqual([]);
 
-    game = finishStickAroundRound(game, {
-      action: 'finish',
+    game = placeFighterPastBlastZone(game, 'host-user');
+    game = applyStickAroundInput(game, {
+      action: 'input',
       payload: {
-        frame: 505,
-        winnerUserId: 'guest-user'
+        frame: 501,
+        jump: false,
+        left: false,
+        right: false,
+        seq: 1
       },
       userId: 'guest-user'
     }, 8_100);
 
-    expect(game.status).toBe('desynced');
-    expect(game.winnerUserId).toBeNull();
+    expect(game.status).toBe('finished');
+    expect(game.winnerUserId).toBe('guest-user');
   });
 
-  it('accepts one human finish report against the computer', () => {
+  it('runs server-side computer controls and resolves computer games on the server', () => {
     let game = createStickAroundGame('game-1', 'host-user', 'server:computer:stick-around', 1_000);
     game = readyStickAroundPlayer(game, 'host-user', 1_100);
     game = readyStickAroundPlayer(game, 'server:computer:stick-around', 1_200);
     game = startStickAroundRound(game, 4_200);
 
-    game = finishStickAroundRound(game, {
-      action: 'finish',
+    game = placeFighterPastBlastZone(game, 'server:computer:stick-around');
+    game = applyStickAroundInput(game, {
+      action: 'input',
       payload: {
         frame: 500,
-        winnerUserId: 'host-user'
+        jump: false,
+        left: false,
+        right: false,
+        seq: 1
       },
       userId: 'host-user'
     }, 8_000);
@@ -163,6 +182,18 @@ describe('playground Stick Around game rules', () => {
       readyPlayers: { host: true }
     });
   });
+
+  it('keeps public fighter labels in authoritative simulation snapshots', () => {
+    const game = startActiveGame();
+
+    const publicGame = toPublicStickAroundGame(game, (userId) => ({
+      displayName: userId === 'host-user' ? 'Host name' : 'Guest name',
+      userId
+    }), 4_300);
+
+    expect(publicGame.simulation?.fighters['host-user'].label).toBe('Host name');
+    expect(publicGame.simulation?.fighters['guest-user'].label).toBe('Guest name');
+  });
 });
 
 function startActiveGame() {
@@ -170,4 +201,14 @@ function startActiveGame() {
   game = readyStickAroundPlayer(game, 'host-user', 1_100);
   game = readyStickAroundPlayer(game, 'guest-user', 1_200);
   return startStickAroundRound(game, 4_200);
+}
+
+function placeFighterPastBlastZone(game: StickAroundGameRecord, userId: string): StickAroundGameRecord {
+  const fighter = game.simulation?.fighters[userId];
+  if (!fighter) throw new Error(`Expected fighter ${userId} in server simulation.`);
+  fighter.grounded = false;
+  fighter.stocks = 1;
+  fighter.x = -180;
+  fighter.y = 999;
+  return game;
 }

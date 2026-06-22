@@ -1,7 +1,6 @@
 import { createGamesIcon } from '../../../../shared/icons';
 import { t } from '../../../../shared/i18n';
 import { ytcqCreateElement } from '../../../../shared/managed-dom';
-import { isPlaygroundComputerUserId } from '../../../../shared/playground/protocol';
 import {
   STICK_AROUND_COUNTDOWN_MS,
   STICK_AROUND_INPUT_RATE_MS
@@ -17,14 +16,15 @@ import { createStickAroundChatTrafficObserver, type StickAroundChatTrafficObserv
 import { getStickAroundAssets, STICK_AROUND_FONT_BYTESIZED } from './assets';
 import {
   createStickAroundSimulation,
-  getStickAroundComputerControls,
   getStickAroundFighterAnimation,
-  getStickAroundWinnerUserId,
+  getStickAroundArenaDimensions,
+  hydrateStickAroundSimulationSnapshot,
   isStickAroundCurrentUserPlayer,
-  resizeStickAroundSimulation,
-  stepStickAroundSimulation,
+  replaceStickAroundSimulation,
   stepStickAroundVisualEffects,
+  STICK_AROUND_FIGHTER_WIDTH,
   STICK_AROUND_FIGHTER_HEIGHT,
+  STICK_AROUND_SIDE_POSITION_LIMIT,
   STICK_AROUND_STARTING_STOCKS,
   type StickAroundBubble,
   type StickAroundFighter,
@@ -45,7 +45,6 @@ const SPRITE_DRAW_SIZE = 58;
 const BUBBLE_RADIUS = 16;
 const BUBBLE_TEXT_HORIZONTAL_PADDING = 22;
 const BUBBLE_TEXT_LINE_HEIGHT = 14;
-const BUBBLE_TEXT_VERTICAL_PADDING = 10;
 const BUBBLE_TEXT_MAX_LINES = 4;
 const READY_BUTTON_HEIGHT = 32;
 const READY_BUTTON_WIDTH = 124;
@@ -63,6 +62,15 @@ const STICK_AROUND_SOUND_PATHS = [
 ] as const;
 const SERVER_CLOCK_CORRECTION_DEAD_ZONE_MS = 8;
 const SERVER_CLOCK_MAX_CORRECTION_MS = 3;
+const STICK_AROUND_DISPLAY_SMOOTHING = 0.5;
+const STICK_AROUND_LOCAL_DISPLAY_SMOOTHING = 0.84;
+const STICK_AROUND_LOCAL_INPUT_LEAD_X = 14;
+const STICK_AROUND_LOCAL_JUMP_LEAD_Y = 9;
+const STICK_AROUND_LOCAL_RUN_VELOCITY_LEAD = 96;
+const STICK_AROUND_MAX_VISUAL_EXTRAPOLATION_MS = 100;
+const STICK_AROUND_VISUAL_BUBBLE_GRAVITY = 160;
+const STICK_AROUND_SNAP_DISTANCE = 96;
+const STICK_AROUND_RENDER_SIDE_LIMIT = STICK_AROUND_SIDE_POSITION_LIMIT + STICK_AROUND_LOCAL_INPUT_LEAD_X;
 
 interface StickAroundOverlayRuntime {
   assets: StickAroundAssets;
@@ -71,13 +79,12 @@ interface StickAroundOverlayRuntime {
   controls: StickAroundControls;
   currentUserId: string;
   feedSurface: HTMLElement;
-  finishSent: boolean;
   game: PublicStickAroundGame;
+  inputDirty: boolean;
   inputSeq: number;
   lastInputSentAt: number;
   lastGameNow: number;
   listeners: AbortController;
-  localWinnerUserId: string | null | undefined;
   onPanelChange: () => void;
   readyButton: HTMLButtonElement;
   root: HTMLElement;
@@ -88,6 +95,7 @@ interface StickAroundOverlayRuntime {
   soundController: GameSoundController;
   startRoundSent: boolean;
   status: HTMLElement;
+  targetSimulation: StickAroundSimulation;
   traffic: StickAroundChatTrafficObserver;
 }
 
@@ -96,6 +104,12 @@ interface StickAroundSoundFighterSnapshot {
   grounded: boolean;
   stocks: number;
   vy: number;
+}
+
+interface StickAroundCanvasViewport {
+  offsetX: number;
+  offsetY: number;
+  scale: number;
 }
 
 let activeStickAroundOverlay: StickAroundOverlayRuntime | null = null;
@@ -107,7 +121,9 @@ const BLOCKED_POINTER_EVENTS = [
   'mousedown',
   'mouseup',
   'pointerdown',
-  'pointerup'
+  'pointerup',
+  'touchmove',
+  'wheel'
 ] as const;
 
 export function openStickAroundOverlay(
@@ -159,13 +175,14 @@ export function openStickAroundOverlay(
   const openedAt = Date.now();
   const serverClockOffsetMs = getStickAroundServerClockOffset(game, openedAt);
   const initialGameNow = openedAt + serverClockOffsetMs;
-  const size = resizeCanvasToSurface(canvas, feedSurface);
-  const simulation = createStickAroundSimulation(
-    game,
-    size.width,
-    size.height,
-    initialGameNow
-  );
+  resizeCanvasToSurface(canvas, feedSurface);
+  const arena = getStickAroundArenaDimensions(game);
+  const simulation = game.simulation
+    ? hydrateStickAroundSimulationSnapshot(game.simulation)
+    : createStickAroundSimulation(game, arena.width, arena.height, initialGameNow);
+  const targetSimulation = game.simulation
+    ? hydrateStickAroundSimulationSnapshot(game.simulation)
+    : createStickAroundSimulation(game, arena.width, arena.height, initialGameNow);
   const runtime: StickAroundOverlayRuntime = {
     assets: {
       animations: {},
@@ -182,13 +199,12 @@ export function openStickAroundOverlay(
     },
     currentUserId,
     feedSurface,
-    finishSent: false,
     game,
+    inputDirty: true,
     inputSeq: 0,
     lastInputSentAt: 0,
     lastGameNow: initialGameNow,
     listeners,
-    localWinnerUserId: undefined,
     onPanelChange,
     readyButton,
     root,
@@ -199,6 +215,7 @@ export function openStickAroundOverlay(
     soundController,
     startRoundSent: false,
     status: shell.subtitleElement,
+    targetSimulation,
     traffic: createStickAroundChatTrafficObserver((observation) => {
       if (activeStickAroundOverlay !== runtime || runtime.game.status !== 'active') return;
       sendGameAction(runtime.game.gameId, 'observeChatTraffic', {
@@ -251,12 +268,9 @@ export function updateStickAroundOverlay(game: PublicStickAroundGame, currentUse
   syncStickAroundServerClock(runtime, game, receivedAt);
   if (game.status !== 'countdown') runtime.startRoundSent = false;
   if (game.status === 'active' && previousStatus !== 'active') {
-    runtime.finishSent = false;
-    runtime.localWinnerUserId = undefined;
-  } else if (game.status !== 'active' && game.status !== 'finished') {
-    runtime.finishSent = false;
-    runtime.localWinnerUserId = undefined;
+    runtime.traffic.reset();
   }
+  syncStickAroundAuthoritativeSimulation(runtime, game);
   runtime.traffic.refresh();
   renderStickAroundOverlay(runtime, getStickAroundServerNow(runtime, receivedAt));
 }
@@ -304,26 +318,9 @@ function tickStickAroundOverlay(
   const serverNow = getStickAroundServerNow(runtime, localNow);
   resizeStickAroundOverlay(runtime);
   maybeStartRound(runtime, sendGameAction, serverNow);
-  if (runtime.game.status === 'active' && !runtime.finishSent) {
-    const soundSnapshot = snapshotStickAroundSoundState(runtime.simulation);
-    sendInputSnapshot(runtime, sendGameAction, localNow);
-    const inputs: Record<string, StickAroundControls | undefined> = {
-      ...runtime.game.inputs,
-      [runtime.currentUserId]: runtime.controls
-    };
-    const computerUserId = getStickAroundComputerOpponentUserId(runtime.game, runtime.currentUserId);
-    if (computerUserId) {
-      inputs[computerUserId] = getStickAroundComputerControls(runtime.simulation, computerUserId, serverNow);
-    }
-    stepStickAroundSimulation(
-      runtime.simulation,
-      runtime.game,
-      inputs,
-      runtime.traffic.getMessageTexts(),
-      serverNow
-    );
-    playStickAroundSimulationSounds(runtime, soundSnapshot);
-    maybeSendFinish(runtime, sendGameAction);
+  if (runtime.game.status === 'active') {
+    sendInputSnapshot(runtime, sendGameAction, localNow, runtime.inputDirty);
+    smoothStickAroundDisplay(runtime, serverNow);
   } else if (shouldAnimateStickAroundEffects(runtime)) {
     stepStickAroundVisualEffects(runtime.simulation, serverNow);
   }
@@ -363,16 +360,8 @@ function syncStickAroundServerClock(
 }
 
 function shouldAnimateStickAroundEffects(runtime: StickAroundOverlayRuntime): boolean {
-  return (runtime.finishSent || runtime.game.status === 'finished' || runtime.game.status === 'desynced') &&
+  return (runtime.game.status === 'finished' || runtime.game.status === 'desynced') &&
     (runtime.simulation.shake > 0 || runtime.simulation.particles.length > 0);
-}
-
-function getStickAroundComputerOpponentUserId(
-  game: PublicStickAroundGame,
-  currentUserId: string
-): string | null {
-  const playerIds = Object.values(game.players).map((player) => player.userId);
-  return playerIds.find((userId) => userId !== currentUserId && isPlaygroundComputerUserId(userId)) || null;
 }
 
 function maybeStartRound(
@@ -389,11 +378,13 @@ function maybeStartRound(
 function sendInputSnapshot(
   runtime: StickAroundOverlayRuntime,
   sendGameAction: SendGameAction,
-  now: number
+  now: number,
+  force = false
 ): void {
   if (!isStickAroundCurrentUserPlayer(runtime.game, runtime.currentUserId)) return;
-  if (now - runtime.lastInputSentAt < STICK_AROUND_INPUT_RATE_MS) return;
+  if (!force && now - runtime.lastInputSentAt < STICK_AROUND_INPUT_RATE_MS) return;
   runtime.lastInputSentAt = now;
+  runtime.inputDirty = false;
   runtime.inputSeq += 1;
   sendGameAction(runtime.game.gameId, 'input', {
     frame: runtime.simulation.frame,
@@ -404,16 +395,200 @@ function sendInputSnapshot(
   });
 }
 
-function maybeSendFinish(runtime: StickAroundOverlayRuntime, sendGameAction: SendGameAction): void {
-  if (runtime.finishSent) return;
-  const winnerUserId = getStickAroundWinnerUserId(runtime.simulation);
-  if (winnerUserId === undefined) return;
-  runtime.finishSent = true;
-  runtime.localWinnerUserId = winnerUserId;
-  sendGameAction(runtime.game.gameId, 'finish', {
-    frame: runtime.simulation.frame,
-    winnerUserId
+function syncStickAroundAuthoritativeSimulation(
+  runtime: StickAroundOverlayRuntime,
+  game: PublicStickAroundGame
+): void {
+  if (!game.simulation) return;
+  const before = snapshotStickAroundSoundState(runtime.targetSimulation);
+  const previousFrame = runtime.targetSimulation.frame;
+  replaceStickAroundSimulation(runtime.targetSimulation, game.simulation);
+  applyLocalBubbleTextToSimulation(runtime.targetSimulation, runtime);
+  if (runtime.game.status !== 'active' || runtime.simulation.frame === 0) {
+    replaceStickAroundSimulation(runtime.simulation, game.simulation);
+  }
+  applyLocalBubbleText(runtime);
+  if (runtime.targetSimulation.frame !== previousFrame) {
+    playStickAroundSimulationSounds(runtime, before, runtime.targetSimulation);
+  }
+}
+
+function smoothStickAroundDisplay(runtime: StickAroundOverlayRuntime, now: number): void {
+  smoothSimulationToward(runtime.simulation, runtime.targetSimulation, runtime, now);
+  applyLocalBubbleText(runtime);
+}
+
+function applyLocalBubbleText(runtime: StickAroundOverlayRuntime): void {
+  applyLocalBubbleTextToSimulation(runtime.simulation, runtime);
+}
+
+function applyLocalBubbleTextToSimulation(
+  simulation: StickAroundSimulation,
+  runtime: StickAroundOverlayRuntime
+): void {
+  const messageTexts = runtime.traffic.getMessageTexts();
+  simulation.bubbles.forEach((bubble) => {
+    const text = bubble.messageId ? messageTexts.get(bubble.messageId) : '';
+    if (text) bubble.text = text.slice(0, 80);
   });
+}
+
+function smoothSimulationToward(
+  display: StickAroundSimulation,
+  target: StickAroundSimulation,
+  runtime: StickAroundOverlayRuntime,
+  now: number
+): void {
+  if (display.width !== target.width || display.height !== target.height || display.roundSeed !== target.roundSeed) {
+    copySimulation(display, target);
+    return;
+  }
+
+  const extrapolationSeconds = getVisualExtrapolationSeconds(target, now);
+  display.frame = target.frame;
+  display.lastTime = now;
+  display.platforms = target.platforms.map((platform) => ({ ...platform }));
+  display.roundSeed = target.roundSeed;
+  display.spawnedHazardIds = new Set(target.spawnedHazardIds);
+  display.flash = Math.max(target.flash, display.flash * 0.86);
+  display.shake = Math.max(target.shake, display.shake * 0.82);
+
+  display.fighters = Object.fromEntries(Object.entries(target.fighters).map(([userId, targetFighter]) => {
+    const current = display.fighters[userId];
+    return [
+      userId,
+      current
+        ? smoothFighter(current, targetFighter, runtime, target.width, extrapolationSeconds)
+        : getExtrapolatedFighter(targetFighter, extrapolationSeconds)
+    ];
+  }));
+
+  const currentBubbles = new Map(display.bubbles.map((bubble) => [bubble.id, bubble]));
+  display.bubbles = target.bubbles.map((targetBubble) => {
+    const current = currentBubbles.get(targetBubble.id);
+    return current
+      ? smoothBubble(current, targetBubble, extrapolationSeconds)
+      : getExtrapolatedBubble(targetBubble, extrapolationSeconds);
+  });
+
+  display.particles = target.particles.map((particle) => ({ ...particle }));
+}
+
+function copySimulation(display: StickAroundSimulation, target: StickAroundSimulation): void {
+  display.bubbles = target.bubbles.map(cloneBubble);
+  display.flash = target.flash;
+  display.fighters = Object.fromEntries(Object.entries(target.fighters).map(([userId, fighter]) => [
+    userId,
+    { ...fighter }
+  ]));
+  display.frame = target.frame;
+  display.height = target.height;
+  display.lastTime = target.lastTime;
+  display.particles = target.particles.map((particle) => ({ ...particle }));
+  display.platforms = target.platforms.map((platform) => ({ ...platform }));
+  display.roundSeed = target.roundSeed;
+  display.shake = target.shake;
+  display.spawnedHazardIds = new Set(target.spawnedHazardIds);
+  display.width = target.width;
+}
+
+function smoothFighter(
+  current: StickAroundFighter,
+  target: StickAroundFighter,
+  runtime: StickAroundOverlayRuntime,
+  simulationWidth: number,
+  extrapolationSeconds: number
+): StickAroundFighter {
+  const distance = Math.hypot(target.x - current.x, target.y - current.y);
+  if (distance > STICK_AROUND_SNAP_DISTANCE || target.stocks !== current.stocks) return { ...target };
+  const localControls = target.userId === runtime.currentUserId ? runtime.controls : null;
+  const horizontalInput = localControls ? Number(localControls.right) - Number(localControls.left) : 0;
+  const alpha = localControls ? STICK_AROUND_LOCAL_DISPLAY_SMOOTHING : STICK_AROUND_DISPLAY_SMOOTHING;
+  const extrapolated = getExtrapolatedFighter(target, extrapolationSeconds);
+  const xTarget = localControls
+    ? clampNumber(
+      extrapolated.x + horizontalInput * STICK_AROUND_LOCAL_INPUT_LEAD_X,
+      -STICK_AROUND_RENDER_SIDE_LIMIT,
+      simulationWidth - STICK_AROUND_FIGHTER_WIDTH + STICK_AROUND_RENDER_SIDE_LIMIT
+    )
+    : extrapolated.x;
+  const yTarget = localControls?.jump && target.grounded
+    ? extrapolated.y - STICK_AROUND_LOCAL_JUMP_LEAD_Y
+    : extrapolated.y;
+  const facing = horizontalInput > 0 ? 1 : horizontalInput < 0 ? -1 : target.facing;
+  const vxTarget = target.vx + horizontalInput * STICK_AROUND_LOCAL_RUN_VELOCITY_LEAD;
+  return {
+    ...target,
+    facing,
+    vx: smoothNumber(current.vx, vxTarget, alpha),
+    vy: smoothNumber(current.vy, extrapolated.vy, alpha),
+    x: smoothNumber(current.x, xTarget, alpha),
+    y: smoothNumber(current.y, yTarget, alpha)
+  };
+}
+
+function smoothBubble(
+  current: StickAroundBubble,
+  target: StickAroundBubble,
+  extrapolationSeconds: number
+): StickAroundBubble {
+  const distance = Math.hypot(target.x - current.x, target.y - current.y);
+  if (distance > STICK_AROUND_SNAP_DISTANCE) return cloneBubble(target);
+  const extrapolated = getExtrapolatedBubble(target, extrapolationSeconds);
+  return {
+    ...target,
+    angle: smoothNumber(current.angle, extrapolated.angle, STICK_AROUND_DISPLAY_SMOOTHING),
+    hitUserIds: new Set(target.hitUserIds),
+    vx: smoothNumber(current.vx, extrapolated.vx, STICK_AROUND_DISPLAY_SMOOTHING),
+    vy: smoothNumber(current.vy, extrapolated.vy, STICK_AROUND_DISPLAY_SMOOTHING),
+    x: smoothNumber(current.x, extrapolated.x, STICK_AROUND_DISPLAY_SMOOTHING),
+    y: smoothNumber(current.y, extrapolated.y, STICK_AROUND_DISPLAY_SMOOTHING)
+  };
+}
+
+function getVisualExtrapolationSeconds(target: StickAroundSimulation, now: number): number {
+  return clampNumber(
+    now - target.lastTime,
+    0,
+    STICK_AROUND_MAX_VISUAL_EXTRAPOLATION_MS
+  ) / 1000;
+}
+
+function getExtrapolatedFighter(
+  fighter: StickAroundFighter,
+  extrapolationSeconds: number
+): StickAroundFighter {
+  if (extrapolationSeconds <= 0 || fighter.stocks <= 0) return { ...fighter };
+  return {
+    ...fighter,
+    x: fighter.x + fighter.vx * extrapolationSeconds,
+    y: fighter.y + fighter.vy * extrapolationSeconds
+  };
+}
+
+function getExtrapolatedBubble(
+  bubble: StickAroundBubble,
+  extrapolationSeconds: number
+): StickAroundBubble {
+  const clone = cloneBubble(bubble);
+  if (extrapolationSeconds <= 0) return clone;
+  clone.angle += bubble.spin * extrapolationSeconds;
+  clone.vy += STICK_AROUND_VISUAL_BUBBLE_GRAVITY * extrapolationSeconds;
+  clone.x += bubble.vx * extrapolationSeconds;
+  clone.y += bubble.vy * extrapolationSeconds +
+    (STICK_AROUND_VISUAL_BUBBLE_GRAVITY * extrapolationSeconds * extrapolationSeconds) / 2;
+  return clone;
+}
+
+function cloneBubble(bubble: StickAroundBubble): StickAroundBubble {
+  return {
+    ...bubble,
+    hitUserIds: new Set(bubble.hitUserIds)
+  };
+}
+
+function smoothNumber(current: number, target: number, alpha: number): number {
+  return current + (target - current) * alpha;
 }
 
 function snapshotStickAroundSoundState(
@@ -432,14 +607,15 @@ function snapshotStickAroundSoundState(
 
 function playStickAroundSimulationSounds(
   runtime: StickAroundOverlayRuntime,
-  before: ReadonlyMap<string, StickAroundSoundFighterSnapshot>
+  before: ReadonlyMap<string, StickAroundSoundFighterSnapshot>,
+  after: StickAroundSimulation = runtime.simulation
 ): void {
   let landed = false;
   let jumped = false;
   let softHit = false;
   let strongHit = false;
 
-  Object.entries(runtime.simulation.fighters).forEach(([userId, fighter]) => {
+  Object.entries(after.fighters).forEach(([userId, fighter]) => {
     const previous = before.get(userId);
     if (!previous) return;
     if (previous.stocks > fighter.stocks) {
@@ -471,13 +647,17 @@ function renderStickAroundOverlay(runtime: StickAroundOverlayRuntime, now = Date
   updateHud(runtime);
   context.clearRect(0, 0, canvas.width, canvas.height);
   context.save();
-  context.scale(getCanvasScale(canvas), getCanvasScale(canvas));
+  const canvasScale = getCanvasScale(canvas);
+  const viewport = getStickAroundCanvasViewport(canvas, simulation);
+  context.scale(canvasScale, canvasScale);
   context.imageSmoothingEnabled = false;
   const theme = getStickAroundOverlayTheme(runtime.feedSurface);
   runtime.root.classList.toggle('ytcq-game-overlay-theme-light', theme === 'light');
   runtime.root.classList.toggle('ytcq-game-overlay-theme-dark', theme === 'dark');
   const fighterColor = getStickAroundFighterColor(theme);
 
+  context.save();
+  applyCanvasViewportTransform(context, viewport);
   context.save();
   applyWorldShake(context, simulation);
   drawArena(context, simulation, fighterColor, theme);
@@ -487,9 +667,10 @@ function renderStickAroundOverlay(runtime: StickAroundOverlayRuntime, now = Date
       context,
       runtime.readyButton.textContent || t('gamesStickAroundReady'),
       logoBottomY,
-      fighterColor
+      fighterColor,
+      simulation
     );
-    positionReadyButtonHitTarget(runtime.readyButton, simulation, logoBottomY);
+    positionReadyButtonHitTarget(runtime.readyButton, simulation, logoBottomY, viewport);
   }
   simulation.bubbles.forEach((bubble) => drawBubble(context, bubble));
   Object.values(simulation.fighters).forEach((fighter) =>
@@ -503,6 +684,15 @@ function renderStickAroundOverlay(runtime: StickAroundOverlayRuntime, now = Date
   if (statusText) drawCanvasStatus(context, simulation, statusText, fighterColor);
   if (simulation.flash > 0) drawScreenFlash(context, simulation, theme);
   context.restore();
+  context.restore();
+}
+
+function applyCanvasViewportTransform(
+  context: CanvasRenderingContext2D,
+  viewport: StickAroundCanvasViewport
+): void {
+  context.translate(viewport.offsetX, viewport.offsetY);
+  context.scale(viewport.scale, viewport.scale);
 }
 
 function applyWorldShake(context: CanvasRenderingContext2D, simulation: StickAroundSimulation): void {
@@ -563,7 +753,7 @@ function drawScreenFlash(
 function drawBubble(context: CanvasRenderingContext2D, bubble: StickAroundBubble): void {
   context.save();
   context.font = `600 12px ${STICK_AROUND_FONT_STACK}`;
-  const layout = getBubbleCanvasLayout(context, bubble);
+  const lines = getBubbleCanvasLines(context, bubble);
   context.translate(bubble.x + bubble.width / 2, bubble.y + bubble.height / 2);
   context.rotate(bubble.angle);
   context.fillStyle = '#ff4044';
@@ -571,23 +761,23 @@ function drawBubble(context: CanvasRenderingContext2D, bubble: StickAroundBubble
   context.lineWidth = 2;
   drawRoundedRect(
     context,
-    -layout.width / 2,
-    -layout.height / 2,
-    layout.width,
-    layout.height,
-    Math.min(BUBBLE_RADIUS, layout.height / 2)
+    -bubble.width / 2,
+    -bubble.height / 2,
+    bubble.width,
+    bubble.height,
+    Math.min(BUBBLE_RADIUS, bubble.height / 2)
   );
 
   context.fillStyle = '#ffffff';
   context.textBaseline = 'middle';
   context.textAlign = 'center';
-  const startY = -((layout.lines.length - 1) * BUBBLE_TEXT_LINE_HEIGHT) / 2;
-  layout.lines.forEach((line, index) => {
+  const startY = -((lines.length - 1) * BUBBLE_TEXT_LINE_HEIGHT) / 2;
+  lines.forEach((line, index) => {
     context.fillText(
       line,
       0,
       startY + index * BUBBLE_TEXT_LINE_HEIGHT,
-      layout.width - BUBBLE_TEXT_HORIZONTAL_PADDING
+      bubble.width - BUBBLE_TEXT_HORIZONTAL_PADDING
     );
   });
   context.restore();
@@ -601,30 +791,16 @@ function drawParticle(context: CanvasRenderingContext2D, particle: StickAroundPa
   context.restore();
 }
 
-function getBubbleCanvasLayout(
+function getBubbleCanvasLines(
   context: CanvasRenderingContext2D,
   bubble: StickAroundBubble
-): { height: number; lines: string[]; width: number } {
-  const lines = wrapText(
+): string[] {
+  return wrapText(
     context,
     bubble.text,
     Math.max(1, bubble.width - BUBBLE_TEXT_HORIZONTAL_PADDING),
     BUBBLE_TEXT_MAX_LINES
   );
-  const widestLine = Math.max(...lines.map((line) => context.measureText(line).width), 1);
-  const width = Math.min(
-    bubble.width,
-    Math.max(48, Math.ceil(widestLine + BUBBLE_TEXT_HORIZONTAL_PADDING))
-  );
-  const height = Math.max(
-    BUBBLE_TEXT_LINE_HEIGHT + BUBBLE_TEXT_VERTICAL_PADDING,
-    lines.length * BUBBLE_TEXT_LINE_HEIGHT + BUBBLE_TEXT_VERTICAL_PADDING
-  );
-  return {
-    height,
-    lines,
-    width
-  };
 }
 
 function drawWaitingLogo(
@@ -669,12 +845,12 @@ function drawReadyButton(
   context: CanvasRenderingContext2D,
   label: string,
   logoBottomY: number,
-  fighterColor: string
+  fighterColor: string,
+  simulation: StickAroundSimulation
 ): void {
-  const canvasWidth = context.canvas.width / getCanvasScale(context.canvas);
   const text = label.toUpperCase();
   const y = getReadyButtonY(logoBottomY);
-  const centerX = Math.round(canvasWidth / 2);
+  const centerX = Math.round(simulation.width / 2);
   context.save();
   context.fillStyle = fighterColor;
   context.strokeStyle = fighterColor;
@@ -694,13 +870,14 @@ function drawReadyButton(
 function positionReadyButtonHitTarget(
   readyButton: HTMLButtonElement,
   simulation: StickAroundSimulation,
-  logoBottomY: number
+  logoBottomY: number,
+  viewport: StickAroundCanvasViewport
 ): void {
   const y = getReadyButtonY(logoBottomY);
-  readyButton.style.left = `${Math.round(simulation.width / 2)}px`;
-  readyButton.style.top = `${y}px`;
-  readyButton.style.width = `${READY_BUTTON_WIDTH}px`;
-  readyButton.style.height = `${READY_BUTTON_HEIGHT}px`;
+  readyButton.style.left = `${Math.round(viewport.offsetX + (simulation.width / 2) * viewport.scale)}px`;
+  readyButton.style.top = `${Math.round(viewport.offsetY + y * viewport.scale)}px`;
+  readyButton.style.width = `${Math.round(READY_BUTTON_WIDTH * viewport.scale)}px`;
+  readyButton.style.height = `${Math.round(READY_BUTTON_HEIGHT * viewport.scale)}px`;
 }
 
 function getReadyButtonY(logoBottomY: number): number {
@@ -860,8 +1037,7 @@ function getCanvasStatusText(runtime: StickAroundOverlayRuntime, now: number): s
   }
   if (game.status === 'finished') return getWinnerStatusText(game, game.winnerUserId);
   if (game.status === 'desynced') return t('gamesStickAroundDesynced');
-  const localWinnerUserId = runtime.localWinnerUserId;
-  return localWinnerUserId === undefined ? null : getWinnerStatusText(game, localWinnerUserId);
+  return null;
 }
 
 function getWinnerStatusText(game: PublicStickAroundGame, winnerUserId: string | null | undefined): string {
@@ -892,6 +1068,7 @@ function handleStickAroundKey(
     before.right !== runtime.controls.right ||
     before.jump !== runtime.controls.jump
   ) {
+    runtime.inputDirty = true;
     event.preventDefault();
     event.stopPropagation();
   }
@@ -899,7 +1076,8 @@ function handleStickAroundKey(
 
 function blockStickAroundFeedPointerEvent(event: Event): void {
   const target = event.target instanceof Element ? event.target : null;
-  if (target?.closest('.ytcq-game-overlay-header')) {
+  const isScrollEvent = event.type === 'wheel' || event.type === 'touchmove';
+  if (!isScrollEvent && target?.closest('.ytcq-game-overlay-header')) {
     event.stopPropagation();
     return;
   }
@@ -915,8 +1093,7 @@ function isTypingTarget(target: EventTarget | null): boolean {
 }
 
 function resizeStickAroundOverlay(runtime: StickAroundOverlayRuntime): void {
-  const size = resizeCanvasToSurface(runtime.canvas, runtime.feedSurface);
-  resizeStickAroundSimulation(runtime.simulation, size.width, size.height);
+  resizeCanvasToSurface(runtime.canvas, runtime.feedSurface);
 }
 
 function resizeCanvasToSurface(
@@ -936,6 +1113,21 @@ function resizeCanvasToSurface(
   return {
     height: cssHeight,
     width: cssWidth
+  };
+}
+
+function getStickAroundCanvasViewport(
+  canvas: HTMLCanvasElement,
+  simulation: StickAroundSimulation
+): StickAroundCanvasViewport {
+  const canvasScale = getCanvasScale(canvas);
+  const width = canvas.width / canvasScale;
+  const height = canvas.height / canvasScale;
+  const scale = Math.max(0.1, Math.min(1, width / simulation.width, height / simulation.height));
+  return {
+    offsetX: Math.round((width - simulation.width * scale) / 2),
+    offsetY: Math.round((height - simulation.height * scale) / 2),
+    scale
   };
 }
 

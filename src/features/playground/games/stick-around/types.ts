@@ -1,5 +1,6 @@
 import type {
   PublicStickAroundGame,
+  StickAroundControls,
   StickAroundHazardEvent,
   StickAroundInputSnapshot,
   StickAroundPlayerRole
@@ -7,6 +8,7 @@ import type {
 
 export type {
   PublicStickAroundGame,
+  StickAroundControls,
   StickAroundHazardEvent,
   StickAroundInputSnapshot,
   StickAroundPlayerRole
@@ -30,10 +32,4 @@ export interface StickAroundAssets {
   fontsReady: boolean;
   logo: HTMLImageElement | null;
   spritesheet: HTMLImageElement | null;
-}
-
-export interface StickAroundControls {
-  jump: boolean;
-  left: boolean;
-  right: boolean;
 }

@@ -1801,7 +1801,6 @@ yt-live-chat-header-renderer .ytcq-inbox-badge[hidden] {
 
 .ytcq-stick-around-feed-surface {
   position: relative;
-  display: block;
   min-height: 1px;
 }
 
