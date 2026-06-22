@@ -6,7 +6,7 @@
  * Game-specific rules are delegated through `games/registry.ts`.
  */
 import { getGameModule, getGameModuleForRecord } from '../../games/registry';
-import type { GameRecord } from '../../games/types';
+import type { GameActionInput, GameRecord } from '../../games/types';
 import { createErrorResponse, createJsonResponse } from '../../http';
 import { getLogErrorMessage, getLogErrorType, hashLogValue, logPlaygroundEvent, shortLogId } from '../../logging';
 import {
@@ -25,13 +25,14 @@ import { parseClientMessage, ProtocolError, sanitizeStreamKey } from '../../prot
 import { TokenBucket, type TokenBucketOptions } from '../../rate-limit';
 import { attachComputerPlayerToRoom } from '../../features/computer-player/room-adapter';
 import { recordPlayerWin } from '../player-stats/client';
-import { GameState, type GameStatePersistence } from './game-state';
+import { GameState } from './game-state';
 import { GenerationTokens } from './generation-token';
 import { InviteManager } from './invite-manager';
 import { type ClientSession, sendMessage, SessionManager } from './session-manager';
 import type { Env } from '../../types';
 
 const INVITE_TTL_MS = 2 * 60 * 1000;
+const GENERATION_TOKEN_CONSUME_PATH = '/internal/games/generation-token/consume';
 const MAX_MESSAGE_BYTES = 32_768;
 const CLOSE_POLICY_VIOLATION = 1008;
 const CONNECTION_RATE_LIMIT: TokenBucketOptions = {
@@ -59,7 +60,6 @@ const MESSAGE_RATE_COSTS: { [Type in ClientMessage['type']]: number } = {
   setAvailability: 2,
   setDisplayName: 3
 };
-const STICK_AROUND_REALTIME_ACTION_RATE_COST = 0.2;
 
 export class StreamRoom {
   private readonly gameState: GameState;
@@ -95,7 +95,7 @@ export class StreamRoom {
     const streamKey = request.headers.get('X-Chat-Enhancer-Stream-Key') || url.searchParams.get('streamKey') || '';
     this.streamKey = sanitizeStreamKey(streamKey);
 
-    if (url.pathname.endsWith('/internal/replay-trivia/generation-token/consume')) {
+    if (url.pathname.endsWith(GENERATION_TOKEN_CONSUME_PATH)) {
       return this.handleGenerationTokenConsume(request);
     }
 
@@ -319,11 +319,7 @@ export class StreamRoom {
   private handleGameAction(
     session: ClientSession,
     gameId: string,
-    action: {
-      action: string;
-      payload?: Record<string, unknown>;
-      userId: string;
-    }
+    action: GameActionInput
   ): void {
     const game = this.gameState.get(gameId);
     if (!game) throw new ProtocolError('game_not_found', 'Game not found.');
@@ -341,8 +337,9 @@ export class StreamRoom {
 
   private assertNoActiveGameBetweenUsers(gameId: GameId, userA: string, userB: string): void {
     const hasActiveGame = this.gameState.values().some((game) => {
-      if (game.gameType !== gameId || isTerminalGameStatus(game.status)) return false;
-      const recipientUserIds = getGameModuleForRecord(game).getRecipientUserIds(game);
+      const gameModule = getGameModuleForRecord(game);
+      if (game.gameType !== gameId || gameModule.isTerminal(game)) return false;
+      const recipientUserIds = gameModule.getRecipientUserIds(game);
       return recipientUserIds.includes(userA) && recipientUserIds.includes(userB);
     });
     if (hasActiveGame) {
@@ -352,18 +349,20 @@ export class StreamRoom {
 
   private applyGameAction(
     game: GameRecord,
-    action: {
-      action: string;
-      payload?: Record<string, unknown>;
-      userId: string;
-    }
+    action: GameActionInput
   ): void {
-    const nextGame = getGameModuleForRecord(game).applyAction(game, action);
+    const gameModule = getGameModuleForRecord(game);
+    const nextGame = gameModule.applyAction(game, action);
+    const nextGameModule = getGameModuleForRecord(nextGame);
     this.gameState.set(nextGame, {
-      persistence: getGameStatePersistence(game, nextGame, action.action)
+      persistence: gameModule.getStatePersistence?.({
+        action,
+        nextGame,
+        previousGame: game
+      }) ?? 'immediate'
     });
     const recordedWin = this.recordTerminalGameWin(game, nextGame);
-    if (game.status !== nextGame.status && isTerminalGameStatus(nextGame.status)) {
+    if (game.status !== nextGame.status && nextGameModule.isTerminal(nextGame)) {
       this.logEvent('game_ended', {
         game: shortLogId(nextGame.gameId),
         gameType: nextGame.gameType,
@@ -375,9 +374,10 @@ export class StreamRoom {
   }
 
   private recordTerminalGameWin(previousGame: GameRecord, nextGame: GameRecord): string {
-    if (previousGame.status === nextGame.status || !isTerminalGameStatus(nextGame.status)) return '';
+    const gameModule = getGameModuleForRecord(nextGame);
+    if (previousGame.status === nextGame.status || !gameModule.isTerminal(nextGame)) return '';
 
-    const winnerUserId = getGameModuleForRecord(nextGame).getWinnerUserId?.(nextGame);
+    const winnerUserId = gameModule.getWinnerUserId?.(nextGame);
     return winnerUserId || '';
   }
 
@@ -439,7 +439,7 @@ export class StreamRoom {
 
   private handleGenerationTokenRequest(session: ClientSession, game: GameRecord): void {
     const gameModule = getGameModuleForRecord(game);
-    if (!gameModule.createGenerationToken) {
+    if (!gameModule.createGenerationToken || !gameModule.createGenerationTokenMessage) {
       throw new ProtocolError('unsupported_action', 'This game does not support generated content.');
     }
 
@@ -450,7 +450,7 @@ export class StreamRoom {
       now,
       userId: session.userId
     });
-    const generationToken = createId('rtg');
+    const generationToken = createId(grant.tokenPrefix || 'gen');
     this.generationTokens.create({
       expiresAt: grant.expiresAt,
       generationToken,
@@ -464,12 +464,13 @@ export class StreamRoom {
       gameType: game.gameType,
       user: hashLogValue(session.userId)
     });
-    if (session.socket) sendMessage(session.socket, {
-      expiresAt: grant.expiresAt,
-      gameId: game.gameId,
-      generationToken,
-      type: 'replayTriviaGenerationToken'
-    });
+    if (session.socket) {
+      sendMessage(session.socket, gameModule.createGenerationTokenMessage({
+        expiresAt: grant.expiresAt,
+        gameId: game.gameId,
+        generationToken
+      }));
+    }
   }
 
   private async handleGenerationTokenConsume(request: Request): Promise<Response> {
@@ -490,7 +491,7 @@ export class StreamRoom {
     const gameId = typeof payload.gameId === 'string' ? payload.gameId.trim() : '';
     const generationToken = typeof payload.generationToken === 'string' ? payload.generationToken.trim() : '';
     if (!gameId || !generationToken) {
-      return createErrorResponse('invalid_generation_token', 'Replay Trivia generation token is invalid.', 403);
+      return createErrorResponse('invalid_generation_token', 'Generation token is invalid.', 403);
     }
 
     const now = Date.now();
@@ -499,7 +500,7 @@ export class StreamRoom {
       this.logEvent('generation_token_rejected', {
         game: gameId ? shortLogId(gameId) : undefined
       }, 'warn');
-      return createErrorResponse('invalid_generation_token', 'Replay Trivia generation token is invalid or expired.', 403);
+      return createErrorResponse('invalid_generation_token', 'Generation token is invalid or expired.', 403);
     }
 
     const game = this.gameState.get(token.gameId);
@@ -543,7 +544,7 @@ export class StreamRoom {
   }
 
   private assertWithinRateLimit(session: ClientSession, message: ClientMessage): void {
-    const cost = getMessageRateCost(message);
+    const cost = this.getMessageRateCost(message);
     if (!session.rateLimit.consume(cost)) {
       throw new ProtocolError('rate_limited', 'Slow down before sending more playground messages.');
     }
@@ -552,6 +553,24 @@ export class StreamRoom {
     if (!this.getUserRateLimit(session.userId).consume(cost)) {
       throw new ProtocolError('rate_limited', 'Slow down before sending more playground messages.');
     }
+  }
+
+  private getMessageRateCost(message: ClientMessage): number {
+    if (message.type === 'gameAction') {
+      const game = this.gameState.get(message.gameId);
+      const gameActionCost = game
+        ? getGameModuleForRecord(game).getActionRateCost?.({
+            action: message.action,
+            game,
+            payload: message.payload
+          })
+        : undefined;
+      if (typeof gameActionCost === 'number' && Number.isFinite(gameActionCost) && gameActionCost >= 0) {
+        return gameActionCost;
+      }
+    }
+
+    return MESSAGE_RATE_COSTS[message.type];
   }
 
   private getUserRateLimit(userId: string): TokenBucket {
@@ -660,16 +679,6 @@ export class StreamRoom {
   }
 }
 
-function getMessageRateCost(message: ClientMessage): number {
-  if (
-    message.type === 'gameAction' &&
-    (message.action === 'input' || message.action === 'observeChatTraffic')
-  ) {
-    return STICK_AROUND_REALTIME_ACTION_RATE_COST;
-  }
-  return MESSAGE_RATE_COSTS[message.type];
-}
-
 function normalizeError(error: unknown): ProtocolError {
   if (error instanceof ProtocolError) return error;
   return new ProtocolError('internal_error', 'Something went wrong.');
@@ -703,31 +712,6 @@ function createId(prefix: string): string {
   const bytes = new Uint8Array(12);
   crypto.getRandomValues(bytes);
   return `${prefix}_${Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0')).join('')}`;
-}
-
-function isTerminalGameStatus(status: string): boolean {
-  return status === 'checkmate' ||
-    status === 'draw' ||
-    status === 'finished' ||
-    status === 'resigned';
-}
-
-function getGameStatePersistence(
-  previousGame: GameRecord,
-  nextGame: GameRecord,
-  action: string
-): GameStatePersistence {
-  if (
-    previousGame.gameType === 'stick-around' &&
-    nextGame.gameType === 'stick-around' &&
-    previousGame.status === nextGame.status &&
-    nextGame.status === 'active' &&
-    (action === 'input' || action === 'observeChatTraffic')
-  ) {
-    return 'deferred';
-  }
-
-  return 'immediate';
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

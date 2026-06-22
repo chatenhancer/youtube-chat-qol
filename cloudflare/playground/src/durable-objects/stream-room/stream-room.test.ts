@@ -393,7 +393,7 @@ describe('playground stream room', () => {
     expect(await replayResponse.json()).toEqual({
       error: {
         code: 'invalid_generation_token',
-        message: 'Replay Trivia generation token is invalid or expired.'
+        message: 'Generation token is invalid or expired.'
       }
     });
   });
@@ -1134,24 +1134,24 @@ describe('playground stream room', () => {
       'This game does not support generated content.'
     ));
 
-    const getResponse = await room.fetch(new Request('https://playground.chatenhancer.com/internal/replay-trivia/generation-token/consume?streamKey=stream-a', {
+    const getResponse = await room.fetch(new Request('https://playground.chatenhancer.com/internal/games/generation-token/consume?streamKey=stream-a', {
       method: 'GET'
     }));
     expect(getResponse.status).toBe(405);
 
-    const invalidJsonResponse = await room.fetch(new Request('https://playground.chatenhancer.com/internal/replay-trivia/generation-token/consume?streamKey=stream-a', {
+    const invalidJsonResponse = await room.fetch(new Request('https://playground.chatenhancer.com/internal/games/generation-token/consume?streamKey=stream-a', {
       body: '{bad',
       method: 'POST'
     }));
     expect(invalidJsonResponse.status).toBe(400);
 
-    const invalidBodyResponse = await room.fetch(new Request('https://playground.chatenhancer.com/internal/replay-trivia/generation-token/consume?streamKey=stream-a', {
+    const invalidBodyResponse = await room.fetch(new Request('https://playground.chatenhancer.com/internal/games/generation-token/consume?streamKey=stream-a', {
       body: '[]',
       method: 'POST'
     }));
     expect(invalidBodyResponse.status).toBe(400);
 
-    const missingTokenResponse = await room.fetch(new Request('https://playground.chatenhancer.com/internal/replay-trivia/generation-token/consume?streamKey=stream-a', {
+    const missingTokenResponse = await room.fetch(new Request('https://playground.chatenhancer.com/internal/games/generation-token/consume?streamKey=stream-a', {
       body: JSON.stringify({ gameId: 'game-1', generationToken: '' }),
       method: 'POST'
     }));
@@ -1342,7 +1342,7 @@ function createSession(connectionId: string): TestSession {
 }
 
 function consumeGenerationToken(room: PrivateStreamRoom, gameId: string, generationToken: string): Promise<Response> {
-  return room.fetch(new Request('https://playground.chatenhancer.com/internal/replay-trivia/generation-token/consume', {
+  return room.fetch(new Request('https://playground.chatenhancer.com/internal/games/generation-token/consume', {
     body: JSON.stringify({
       gameId,
       generationToken

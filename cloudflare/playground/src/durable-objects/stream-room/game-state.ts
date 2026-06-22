@@ -1,5 +1,5 @@
 import { getGameModuleForRecord } from '../../games/registry';
-import type { GameRecord } from '../../games/types';
+import type { GameRecord, GameStatePersistence } from '../../games/types';
 import { getLogErrorMessage, getLogErrorType, shortLogId } from '../../logging';
 
 type LogDetails = Record<string, boolean | number | string | undefined>;
@@ -7,8 +7,6 @@ type LogEvent = (event: string, details?: LogDetails, level?: 'error' | 'info' |
 
 const ROOM_STATE_STORAGE_KEY = 'roomState:v1';
 export const GAME_STATE_DEFERRED_PERSIST_MS = 1_000;
-
-export type GameStatePersistence = 'deferred' | 'immediate';
 
 interface StoredRoomState {
   games: unknown[];

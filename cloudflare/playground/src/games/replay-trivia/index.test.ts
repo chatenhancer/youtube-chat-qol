@@ -68,7 +68,18 @@ describe('playground replay trivia game rules', () => {
       now: 2_000,
       userId: 'host-user'
     })).toEqual({
-      expiresAt: 122_000
+      expiresAt: 122_000,
+      tokenPrefix: 'rtg'
+    });
+    expect(replayTriviaGameModule.createGenerationTokenMessage?.({
+      expiresAt: 122_000,
+      gameId: preparingGame.gameId,
+      generationToken: 'rtg_1234567890abcdef'
+    })).toEqual({
+      expiresAt: 122_000,
+      gameId: preparingGame.gameId,
+      generationToken: 'rtg_1234567890abcdef',
+      type: 'replayTriviaGenerationToken'
     });
     expect(() => replayTriviaGameModule.createGenerationToken?.(preparingGame, {
       now: 2_000,

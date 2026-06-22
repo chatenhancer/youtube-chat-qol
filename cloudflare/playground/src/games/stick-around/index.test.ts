@@ -159,6 +159,47 @@ describe('playground Stick Around game rules', () => {
     expect(stickAroundGameModule.getWinnerUserId?.(game)).toBe('host-user');
   });
 
+  it('exposes realtime room policies through the game module', () => {
+    const game = startActiveGame();
+    const nextGame = applyStickAroundInput(game, {
+      action: 'input',
+      payload: {
+        frame: 40,
+        right: true,
+        seq: 1
+      },
+      userId: 'host-user'
+    }, 4_260);
+    const finishedGame = timeoutStickAroundRound(game, 'guest-user', 6_000);
+
+    expect(stickAroundGameModule.getActionRateCost?.({
+      action: 'input',
+      game
+    })).toBe(0.2);
+    expect(stickAroundGameModule.getActionRateCost?.({
+      action: 'ready',
+      game
+    })).toBeUndefined();
+    expect(stickAroundGameModule.getStatePersistence?.({
+      action: {
+        action: 'input',
+        userId: 'host-user'
+      },
+      nextGame,
+      previousGame: game
+    })).toBe('deferred');
+    expect(stickAroundGameModule.getStatePersistence?.({
+      action: {
+        action: 'timeout',
+        userId: 'guest-user'
+      },
+      nextGame: finishedGame,
+      previousGame: game
+    })).toBe('immediate');
+    expect(stickAroundGameModule.isTerminal(game)).toBe(false);
+    expect(stickAroundGameModule.isTerminal(finishedGame)).toBe(true);
+  });
+
   it('serializes public state and handles timeout through the module', () => {
     let game = startActiveGame();
     game = timeoutStickAroundRound(game, 'guest-user', 6_000);

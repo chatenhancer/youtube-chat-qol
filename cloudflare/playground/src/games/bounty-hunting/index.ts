@@ -125,6 +125,9 @@ export const bountyHuntingGameModule: GameModule = {
     const bountyGame = assertBountyHuntingGame(game);
     return bountyGame.status === 'finished' ? getBountyHuntingWinnerUserId(bountyGame) : null;
   },
+  isTerminal(game) {
+    return assertBountyHuntingGame(game).status === 'finished';
+  },
   toPublicGame(game, getUser) {
     return toPublicBountyHuntingGame(assertBountyHuntingGame(game), getUser);
   }

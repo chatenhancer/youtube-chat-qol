@@ -75,6 +75,9 @@ export const chessGameModule: GameModule = {
   getWinnerUserId(game) {
     return getChessWinnerUserId(assertChessGame(game));
   },
+  isTerminal(game) {
+    return assertChessGame(game).status !== 'active';
+  },
   toPublicGame(game, getUser) {
     return toPublicChessGame(assertChessGame(game), getUser);
   }

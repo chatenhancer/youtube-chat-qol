@@ -343,7 +343,7 @@ describe('playground worker routes', () => {
     }));
 
     expect(response.status).toBe(200);
-    expect(tokenConsumeRequest?.url).toBe('https://stream-room.internal/internal/replay-trivia/generation-token/consume');
+    expect(tokenConsumeRequest?.url).toBe('https://stream-room.internal/internal/games/generation-token/consume');
     expect(tokenConsumeRequest?.headers.get('X-Chat-Enhancer-Stream-Key')).toBe('SHt3FyE-VIQ');
     expect(await tokenConsumeRequest?.json()).toEqual({
       gameId: 'game-replay-trivia',

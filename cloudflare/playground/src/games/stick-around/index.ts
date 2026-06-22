@@ -43,6 +43,7 @@ const MAX_MESSAGE_ID_LENGTH = 160;
 const MAX_TRAFFIC_COUNT = 30;
 const MIN_HAZARD_SPACING_MS = 220;
 const HAZARD_SPAWN_LEAD_MS = 650;
+const STICK_AROUND_REALTIME_ACTION_RATE_COST = 0.2;
 const HAZARD_DIMENSIONS = [
   { bubbleHeight: 30, bubbleWidth: 82 },
   { bubbleHeight: 44, bubbleWidth: 126 },
@@ -93,18 +94,39 @@ export const stickAroundGameModule: GameModule = {
   createGame(gameId, playerUserIds) {
     return createStickAroundGame(gameId, playerUserIds[0], playerUserIds[1]);
   },
+  getActionRateCost(input) {
+    return isStickAroundRealtimeAction(input.action) ? STICK_AROUND_REALTIME_ACTION_RATE_COST : undefined;
+  },
   getRecipientUserIds(game) {
     const stickGame = assertStickAroundGame(game);
     return [stickGame.players.host, stickGame.players.guest];
+  },
+  getStatePersistence({ action, nextGame, previousGame }) {
+    if (
+      previousGame.status === nextGame.status &&
+      nextGame.status === 'active' &&
+      isStickAroundRealtimeAction(action.action)
+    ) {
+      return 'deferred';
+    }
+
+    return 'immediate';
   },
   getWinnerUserId(game) {
     const stickGame = assertStickAroundGame(game);
     return stickGame.status === 'finished' ? stickGame.winnerUserId || null : null;
   },
+  isTerminal(game) {
+    return assertStickAroundGame(game).status === 'finished';
+  },
   toPublicGame(game, getUser) {
     return toPublicStickAroundGame(assertStickAroundGame(game), getUser);
   }
 };
+
+function isStickAroundRealtimeAction(action: string): boolean {
+  return action === 'input' || action === 'observeChatTraffic';
+}
 
 export function createStickAroundGame(
   gameId: string,

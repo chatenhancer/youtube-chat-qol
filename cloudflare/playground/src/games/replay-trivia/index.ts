@@ -97,7 +97,14 @@ export const replayTriviaGameModule: GameModule = {
   createGenerationToken(game, input) {
     assertReplayTriviaQuestionProviderCanGenerate(assertReplayTriviaGame(game), input.userId);
     return {
-      expiresAt: input.now + GENERATION_TOKEN_TTL_MS
+      expiresAt: input.now + GENERATION_TOKEN_TTL_MS,
+      tokenPrefix: 'rtg'
+    };
+  },
+  createGenerationTokenMessage(input) {
+    return {
+      ...input,
+      type: 'replayTriviaGenerationToken'
     };
   },
   createGame(gameId, playerUserIds) {
@@ -110,6 +117,9 @@ export const replayTriviaGameModule: GameModule = {
   getWinnerUserId(game) {
     const triviaGame = assertReplayTriviaGame(game);
     return triviaGame.status === 'finished' ? getReplayTriviaWinnerUserId(triviaGame) : null;
+  },
+  isTerminal(game) {
+    return assertReplayTriviaGame(game).status === 'finished';
   },
   toPublicGame(game, getUser, context) {
     return toPublicReplayTriviaGame(assertReplayTriviaGame(game), getUser, context);

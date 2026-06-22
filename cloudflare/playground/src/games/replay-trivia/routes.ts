@@ -7,7 +7,7 @@
  */
 import { REPLAY_TRIVIA_QUESTIONS_ROUTE } from '../../../../../src/shared/playground/trivia';
 import { consumeReplayTriviaCaptchaPass } from '../../durable-objects/captcha-passes/client';
-import { consumeReplayTriviaGenerationToken as consumeStreamRoomReplayTriviaGenerationToken } from '../../durable-objects/stream-room/client';
+import { consumeStreamRoomGenerationToken } from '../../durable-objects/stream-room/client';
 import { createErrorResponse, createJsonResponse } from '../../http';
 import { getLogErrorMessage, getLogErrorType, hashLogValue, logPlaygroundEvent } from '../../logging';
 import { createRouteResult, type RouteModule, type RouteResult, type StreamRouteContext } from '../../routes/types';
@@ -124,7 +124,7 @@ async function consumeReplayTriviaGenerationToken(
   targetLanguages?: { languageCode: string; locale?: string }[];
   userId: string;
 }> {
-  const response = await consumeStreamRoomReplayTriviaGenerationToken(env, streamKey, requestBody);
+  const response = await consumeStreamRoomGenerationToken(env, streamKey, requestBody);
   if (response.ok) {
     try {
       const body = await response.json() as {
@@ -159,6 +159,9 @@ async function consumeReplayTriviaGenerationToken(
     message = body.error?.message || message;
   } catch {
     // Preserve the generic token failure for malformed internal responses.
+  }
+  if (code === 'invalid_generation_token') {
+    message = 'Replay Trivia generation token is invalid or expired.';
   }
 
   logPlaygroundEvent('replay_trivia_token_rejected', {
