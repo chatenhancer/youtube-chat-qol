@@ -1221,13 +1221,21 @@ function findChatFeedSurface(): HTMLElement | null {
   return message?.closest<HTMLElement>(CHAT_FEED_SURFACE_SELECTOR) || message?.parentElement || null;
 }
 
-function fitText(context: CanvasRenderingContext2D, text: string, maxWidth: number): string {
-  if (context.measureText(text).width <= maxWidth) return text;
+function fitText(
+  context: CanvasRenderingContext2D,
+  text: string,
+  maxWidth: number,
+  { forceEllipsis = false }: { forceEllipsis?: boolean } = {}
+): string {
+  if (!forceEllipsis && context.measureText(text).width <= maxWidth) return text;
+  const suffix = '...';
+  if (maxWidth <= 0) return '';
   let next = text;
-  while (next.length > 1 && context.measureText(`${next}...`).width > maxWidth) {
+  while (next.length > 0 && context.measureText(`${next}${suffix}`).width > maxWidth) {
     next = next.slice(0, -1);
   }
-  return `${next}...`;
+  if (!next && context.measureText(suffix).width > maxWidth) return '';
+  return `${next}${suffix}`;
 }
 
 function wrapText(
@@ -1240,8 +1248,10 @@ function wrapText(
   const lines: string[] = [];
   let current = '';
   const sourceWords = words.length ? words : ['chat'];
+  let truncated = false;
 
-  for (const word of sourceWords) {
+  for (let index = 0; index < sourceWords.length; index += 1) {
+    const word = sourceWords[index];
     const next = current ? `${current} ${word}` : word;
     if (context.measureText(next).width <= maxWidth || !current) {
       current = next;
@@ -1249,15 +1259,18 @@ function wrapText(
     }
     lines.push(current);
     current = word;
-    if (lines.length === maxLines) break;
+    if (lines.length === maxLines) {
+      truncated = true;
+      break;
+    }
   }
 
   if (lines.length < maxLines && current) lines.push(current);
+  if (lines.length === maxLines && sourceWords.join(' ') !== lines.join(' ')) truncated = true;
   if (!lines.length) return ['chat'];
-  if (lines.length === maxLines) {
-    lines[lines.length - 1] = fitText(context, lines[lines.length - 1], maxWidth);
-  }
-  return lines;
+  return lines.map((line, index) => fitText(context, line, maxWidth, {
+    forceEllipsis: truncated && index === lines.length - 1
+  }));
 }
 
 function drawRoundedRect(
