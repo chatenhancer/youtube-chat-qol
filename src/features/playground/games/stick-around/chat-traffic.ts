@@ -3,7 +3,12 @@ import {
   STICK_AROUND_TRAFFIC_WINDOW_MS
 } from '../../../../shared/playground/stick-around';
 import { registerFeatureLifecycle, type FeatureMessageContext } from '../../../../content/lifecycle';
-import { getMessageStableId, getMessageText } from '../../../../youtube/messages';
+import {
+  getMessageContentSourceNodes,
+  getMessageStableId,
+  getMessageText
+} from '../../../../youtube/messages';
+import { serializeRichMessageNodes, type RichTextSegment } from '../../../../youtube/rich-text';
 import { CHAT_MESSAGE_SELECTOR } from '../../../../youtube/selectors';
 
 const MAX_STORED_MESSAGE_TEXTS = 400;
@@ -17,6 +22,7 @@ export interface StickAroundTrafficObservation {
 
 export interface StickAroundChatTrafficObserver {
   close(): void;
+  getMessageRichTextSegments(): ReadonlyMap<string, readonly RichTextSegment[]>;
   getMessageTexts(): ReadonlyMap<string, string>;
   recordMessage(message: HTMLElement, countTraffic: boolean): void;
   refresh(): void;
@@ -34,6 +40,7 @@ registerFeatureLifecycle({
 export function createStickAroundChatTrafficObserver(
   onObserve: (observation: StickAroundTrafficObservation) => void
 ): StickAroundChatTrafficObserver {
+  const messageRichTextSegments = new Map<string, RichTextSegment[]>();
   const messageTexts = new Map<string, string>();
   const observedElements = new WeakSet<HTMLElement>();
   const pendingMessageIds = new Set<string>();
@@ -50,6 +57,9 @@ export function createStickAroundChatTrafficObserver(
     },
     getMessageTexts() {
       return messageTexts;
+    },
+    getMessageRichTextSegments() {
+      return messageRichTextSegments;
     },
     recordMessage(message: HTMLElement, countTraffic: boolean) {
       rememberMessage(message, countTraffic);
@@ -79,6 +89,12 @@ export function createStickAroundChatTrafficObserver(
     const text = getMessageText(message);
     if (messageId && text) {
       messageTexts.set(messageId, text);
+      const segments = serializeRichMessageNodes(getMessageContentSourceNodes(message));
+      if (segments.length) {
+        messageRichTextSegments.set(messageId, segments);
+      } else {
+        messageRichTextSegments.delete(messageId);
+      }
       trimStoredMessageTexts();
     }
     if (alreadyObserved || !countTraffic) return;
@@ -91,6 +107,7 @@ export function createStickAroundChatTrafficObserver(
       const oldestKey = messageTexts.keys().next().value;
       if (!oldestKey) return;
       messageTexts.delete(oldestKey);
+      messageRichTextSegments.delete(oldestKey);
     }
   }
 

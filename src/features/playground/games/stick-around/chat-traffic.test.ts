@@ -44,6 +44,38 @@ describe('Stick Around chat traffic observer', () => {
     expect(observer.getMessageTexts().get('message-1')).toBe('late text');
   });
 
+  it('caches rich message segments for custom emoji bubble rendering', () => {
+    observer = createStickAroundChatTrafficObserver(vi.fn());
+    const message = createMessage('message-emoji', 'hello ');
+    const emoji = document.createElement('img');
+    emoji.alt = ':party:';
+    emoji.src = 'https://example.test/party.png';
+    emoji.setAttribute('data-emoji-id', 'party-id');
+    message.querySelector<HTMLElement>('#message')!.append(emoji, document.createTextNode(' chat'));
+
+    observer.recordMessage(message, true);
+
+    expect(observer.getMessageTexts().get('message-emoji')).toBe('hello :party: chat');
+    expect(observer.getMessageRichTextSegments().get('message-emoji')).toEqual([
+      {
+        text: 'hello ',
+        type: 'text'
+      },
+      {
+        alt: ':party:',
+        className: '',
+        emojiId: 'party-id',
+        src: 'https://example.test/party.png',
+        tooltip: '',
+        type: 'emoji'
+      },
+      {
+        text: ' chat',
+        type: 'text'
+      }
+    ]);
+  });
+
   it('clears pending traffic when reset without clearing cached message text', () => {
     const observations: Array<{ count: number; messageIds: string[] }> = [];
     observer = createStickAroundChatTrafficObserver((observation) => {
