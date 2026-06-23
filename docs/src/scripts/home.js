@@ -1,8 +1,9 @@
 (() => {
   const docsConfig = readDocsConfig();
   const installActions = document.querySelector("[data-install-actions]");
-  const chromeButton = document.querySelector('[data-browser-install="chrome"]');
-  const firefoxButton = document.querySelector('[data-browser-install="firefox"]');
+  const chromeStoreLink = document.querySelector('[data-browser-store-link="chrome"]');
+  const firefoxStoreLink = document.querySelector('[data-browser-store-link="firefox"]');
+  const safariStoreLink = document.querySelector('[data-browser-store-link="safari"]');
   const languageSwitcher = document.querySelector("[data-language-switcher]");
   const walkthroughCtas = document.querySelectorAll("[data-walkthrough-cta]");
   const walkthroughOpenButtons = document.querySelectorAll("[data-walkthrough-open]");
@@ -24,6 +25,10 @@
     firefox: {
       image: "https://img.shields.io/amo/v/chat-enhancer-for-youtube?label=firefox%20add-ons",
       json: "https://img.shields.io/amo/v/chat-enhancer-for-youtube.json?label=firefox%20add-ons"
+    },
+    safari: {
+      image: "https://img.shields.io/itunes/v/6783276323?label=mac%20app%20store",
+      json: "https://img.shields.io/itunes/v/6783276323.json?label=mac%20app%20store"
     }
   };
   const versionBadgeColors = {
@@ -93,17 +98,29 @@
   setupStoreVersionAlertScrollFade();
   void checkStoreVersionStatus();
 
-  if (!installActions || !chromeButton || !firefoxButton) return;
+  if (!installActions || !chromeStoreLink || !firefoxStoreLink || !safariStoreLink) return;
 
-  const isFirefox = navigator.userAgent.toLowerCase().includes("firefox/");
-  const primaryButton = isFirefox ? firefoxButton : chromeButton;
-  const secondaryButton = isFirefox ? chromeButton : firefoxButton;
+  const userAgent = navigator.userAgent.toLowerCase();
+  const isFirefox = userAgent.includes("firefox/");
+  const isSafari = userAgent.includes("safari/")
+    && !userAgent.includes("chrome/")
+    && !userAgent.includes("chromium/")
+    && !userAgent.includes("crios/")
+    && !userAgent.includes("edg/");
+  const primaryStoreKey = isSafari ? "safari" : isFirefox ? "firefox" : "chrome";
+  const storeLinks = {
+    chrome: chromeStoreLink,
+    firefox: firefoxStoreLink,
+    safari: safariStoreLink
+  };
 
-  primaryButton.classList.add("button-primary");
-  primaryButton.classList.remove("button-secondary");
-  secondaryButton.classList.add("button-secondary");
-  secondaryButton.classList.remove("button-primary");
-  installActions.insertBefore(primaryButton, installActions.firstElementChild);
+  Object.entries(storeLinks).forEach(([key, link]) => {
+    if (key === primaryStoreKey) {
+      link.setAttribute("aria-current", "true");
+    } else {
+      link.removeAttribute("aria-current");
+    }
+  });
 
   async function checkStoreVersionStatus() {
     const alert = document.querySelector("[data-store-version-alert]");
@@ -117,7 +134,8 @@
 
     const pendingStores = [
       ["chrome", versions.chrome],
-      ["firefox", versions.firefox]
+      ["firefox", versions.firefox],
+      ["safari", versions.safari]
     ].filter(([, version]) => version && normalizeVersion(version) !== normalizeVersion(releaseVersion));
 
     if (!pendingStores.length) return;
@@ -691,7 +709,7 @@
     const releaseVersion = versions.release;
     setVersionBadgeColor("release", versionBadgeColors.current);
 
-    for (const key of ["chrome", "firefox"]) {
+    for (const key of ["chrome", "firefox", "safari"]) {
       const storeVersion = versions[key];
       const color = releaseVersion && storeVersion
         ? normalizeVersion(storeVersion) === normalizeVersion(releaseVersion)

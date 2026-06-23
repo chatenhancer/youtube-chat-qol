@@ -24,6 +24,8 @@
   --ytcq-popup-text: #0f0f0f;
   --ytcq-popup-secondary-text: #606060;
   --ytcq-popup-action: #065fd4;
+  --ytcq-popup-logo-red-start: #fe0031;
+  --ytcq-popup-logo-red-end: #fd0032;
   font-family: "Inter", Arial, sans-serif;
 }
 
@@ -259,7 +261,7 @@ main {
 
 .popup-reset-dialog-confirm {
   color: #fff;
-  background: #c43b3b;
+  background: linear-gradient(180deg, var(--ytcq-popup-logo-red-start), var(--ytcq-popup-logo-red-end));
 }
 
 .extension-status {

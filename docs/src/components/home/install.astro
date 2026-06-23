@@ -35,26 +35,37 @@ const { locale, messages: m, rootPrefix } = Astro.props as {
       </div>
     </div>
     <div class="install-actions" data-install-actions>
-      <a class="button button-primary" href={site.chromeUrl} data-browser-install="chrome">
-        <span class="button-icon" data-symbol="storefront" aria-hidden="true"><Icon name="storefront" /></span>
-        <span>{m.install.chromeStore}</span>
-      </a>
-      <a class="button button-secondary" href={site.firefoxUrl} data-browser-install="firefox">
-        <span class="button-icon" data-symbol="extension" aria-hidden="true"><Icon name="extension" /></span>
-        <span>{m.install.firefoxAddons}</span>
-      </a>
-      <a class="button button-link" href={site.sourceUrl}>
-        <span class="button-icon" data-symbol="code" aria-hidden="true"><Icon name="code" /></span>
-        <span>{m.install.sourceCode}</span>
-      </a>
-      <a class="button button-link" href={getSupportUrl(locale)}>
-        <span class="button-icon" data-symbol="bug_report" aria-hidden="true"><Icon name="bug_report" /></span>
-        <span>{m.install.supportFeedback}</span>
-      </a>
-      <p class="install-contact">
-        <span>{m.install.privateQuestions}</span>
-        <a data-contact-email-address></a>
-      </p>
+      <p class="install-store-heading" id="install-store-options-title">{m.install.stepStoreTitle}</p>
+      <div class="install-store-options" aria-labelledby="install-store-options-title">
+        <a class="install-store-option" href={site.chromeUrl} data-browser-store-link="chrome">
+          <img class="install-store-option-icon" src={`${rootPrefix}assets/browser-icons/chrome.svg`} alt="" aria-hidden="true">
+          <span class="install-store-option-label">Chrome</span>
+          <span class="install-store-option-meta">{m.install.chromeStore}</span>
+          <span class="install-store-option-arrow" aria-hidden="true"></span>
+        </a>
+        <a class="install-store-option" href={site.firefoxUrl} data-browser-store-link="firefox">
+          <img class="install-store-option-icon" src={`${rootPrefix}assets/browser-icons/firefox.svg`} alt="" aria-hidden="true">
+          <span class="install-store-option-label">Firefox</span>
+          <span class="install-store-option-meta">{m.install.firefoxAddons}</span>
+          <span class="install-store-option-arrow" aria-hidden="true"></span>
+        </a>
+        <a class="install-store-option" href={site.safariUrl} data-browser-store-link="safari">
+          <img class="install-store-option-icon install-store-option-icon-safari" src={`${rootPrefix}assets/browser-icons/safari.svg`} alt="" aria-hidden="true">
+          <span class="install-store-option-label">Safari</span>
+          <span class="install-store-option-meta">{m.install.safariAppStore}</span>
+          <span class="install-store-option-arrow" aria-hidden="true"></span>
+        </a>
+      </div>
+      <div class="install-utility-actions">
+        <a class="install-utility-chip" href={site.sourceUrl}>
+          <span class="install-utility-icon" data-symbol="code" aria-hidden="true"><Icon name="code" /></span>
+          <span>{m.install.sourceCode}</span>
+        </a>
+        <a class="install-utility-chip" href={getSupportUrl(locale)}>
+          <span class="install-utility-icon" data-symbol="bug_report" aria-hidden="true"><Icon name="bug_report" /></span>
+          <span>{m.install.supportFeedback}</span>
+        </a>
+      </div>
     </div>
     <div class="install-quickstart" aria-labelledby="install-quickstart-title">
       <div class="install-quickstart-heading">

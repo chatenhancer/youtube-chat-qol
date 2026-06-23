@@ -70,7 +70,7 @@ const defaultStructuredData = ogType === 'website' ? {
   url: canonicalUrl,
   image,
   applicationCategory: 'BrowserApplication',
-  operatingSystem: 'Chrome, Firefox',
+  operatingSystem: 'Chrome, Firefox, Safari',
   offers: {
     '@type': 'Offer',
     price: '0',
@@ -78,12 +78,14 @@ const defaultStructuredData = ogType === 'website' ? {
   },
   downloadUrl: [
     site.chromeUrl,
-    site.firefoxUrl
+    site.firefoxUrl,
+    site.safariUrl
   ],
   sameAs: [
     site.sourceUrl,
     site.chromeUrl,
-    site.firefoxUrl
+    site.firefoxUrl,
+    site.safariUrl
   ]
 } : null;
 const resolvedStructuredData = structuredData === undefined ? defaultStructuredData : structuredData;
