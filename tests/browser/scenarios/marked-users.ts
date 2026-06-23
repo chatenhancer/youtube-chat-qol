@@ -87,7 +87,17 @@ async function expectMarkedUserRingVisible(message: Locator): Promise<void> {
 async function expectMarkedUserRingRemoved(message: Locator): Promise<void> {
   await test.step('Verify marked user avatar ring is removed from chat', async () => {
     const avatar = message.locator('#author-photo').first();
-    await expect(avatar).not.toHaveClass(/ytcq-marked-user-avatar/, { timeout: 10_000 });
+    await expect.poll(async () => {
+      const count = await avatar.count();
+      if (count === 0) return true;
+
+      return !(await avatar.evaluate((element) => {
+        return element.classList.contains('ytcq-marked-user-avatar');
+      }).catch(() => false));
+    }, {
+      message: 'Marked user avatar ring should be removed or the live chat row should be recycled.',
+      timeout: 10_000
+    }).toBe(true);
   });
 }
 

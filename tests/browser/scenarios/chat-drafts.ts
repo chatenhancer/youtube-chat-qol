@@ -13,7 +13,7 @@ import {
 } from '../support/composer';
 import {
   getExtensionStorageValues,
-  withExtensionStorageSnapshot
+  withExtensionStorageValues
 } from '../support/extension-storage';
 import type { BrowserScenario, ChatSurface } from './types';
 
@@ -26,7 +26,9 @@ const RELOADED_CHAT_TIMEOUT_MS = 60_000;
 export const chatDraftRecoveryScenario: BrowserScenario = async ({ chat, context }) => {
   const page = getReloadableStreamPage(chat, context);
 
-  await withExtensionStorageSnapshot(context, 'local', async () => {
+  await withExtensionStorageValues(context, 'local', {
+    [CHAT_INPUT_DRAFTS_STORAGE_KEY]: {}
+  }, async () => {
     await test.step('Type an unsent chat draft', async () => {
       await clearChatComposer(chat);
       await setChatComposerRichDraft(chat);

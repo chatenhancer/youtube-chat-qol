@@ -11,6 +11,9 @@ export function getCurrentYouTubeChatSourceUrl(): string {
   return getCanonicalWatchSourceUrl(window.location.href) ||
     getCanonicalWatchSourceUrl(getAccessibleWindowHref(window.top)) ||
     getCanonicalWatchSourceUrl(getAccessibleWindowHref(window.parent)) ||
+    getWatchCommandSourceUrl(window) ||
+    getWatchCommandSourceUrl(window.top) ||
+    getWatchCommandSourceUrl(window.parent) ||
     getCanonicalWatchSourceUrl(document.referrer) ||
     getLiveChatSourceUrl(window.location.href) ||
     getStablePageUrl(window.location.href);
@@ -55,6 +58,40 @@ function getLiveChatSourceUrl(value: string): string {
   } catch {
     return '';
   }
+}
+
+function getWatchCommandSourceUrl(context: Window | null): string {
+  if (!context) return '';
+
+  try {
+    const command = (context as Window & { ytCommand?: unknown }).ytCommand;
+    const videoId = getWatchCommandVideoId(command) || getDocumentWatchCommandVideoId(context.document);
+    return videoId ? `https://www.youtube.com/watch?v=${encodeURIComponent(videoId)}` : '';
+  } catch {
+    return '';
+  }
+}
+
+function getWatchCommandVideoId(command: unknown): string {
+  if (!command || typeof command !== 'object') return '';
+
+  const watchEndpoint = (command as { watchEndpoint?: unknown }).watchEndpoint;
+  if (!watchEndpoint || typeof watchEndpoint !== 'object') return '';
+
+  return cleanText((watchEndpoint as { videoId?: unknown }).videoId);
+}
+
+function getDocumentWatchCommandVideoId(sourceDocument: Document): string {
+  for (const script of Array.from(sourceDocument.scripts)) {
+    const text = script.textContent || '';
+    if (!text.includes('ytCommand') || !text.includes('watchEndpoint') || !text.includes('videoId')) continue;
+
+    const match = text.match(/ytCommand[\s\S]{0,3000}?"watchEndpoint"\s*:\s*\{[\s\S]{0,1000}?"videoId"\s*:\s*"([^"]+)"/);
+    const videoId = cleanText(match?.[1]);
+    if (videoId) return videoId;
+  }
+
+  return '';
 }
 
 function getAccessibleDocumentTitle(context: Window | null): string {

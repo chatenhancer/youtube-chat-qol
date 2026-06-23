@@ -116,6 +116,34 @@ describe('chat input draft recovery', () => {
     expect(input.textContent).toBe('');
   });
 
+  it('keeps retrying when no stored draft is available yet', async () => {
+    window.history.replaceState({}, '', '/watch?v=stream-a');
+    const input = createContentEditable();
+    document.body.append(input);
+
+    await expect(restoreChatInputDraft()).resolves.toBe(false);
+    await saveChatInputDraft('https://www.youtube.com/watch?v=stream-a', textDraft('late draft'));
+    await vi.advanceTimersByTimeAsync(100);
+    await flushPromises();
+
+    expect(input.textContent).toBe('late draft');
+  });
+
+  it('reapplies a restored draft if YouTube clears the composer during setup', async () => {
+    const sourceUrl = 'https://www.youtube.com/watch?v=stream-a';
+    await saveChatInputDraft(sourceUrl, textDraft('saved draft'));
+    const input = createContentEditable();
+    document.body.append(input);
+
+    await expect(restoreChatInputDraft(sourceUrl)).resolves.toBe(true);
+    expect(input.textContent).toBe('saved draft');
+
+    input.replaceChildren();
+    await vi.advanceTimersByTimeAsync(500);
+
+    expect(input.textContent).toBe('saved draft');
+  });
+
   it('stops retrying restore after the configured delays are exhausted', async () => {
     window.history.replaceState({}, '', '/watch?v=stream-a');
     scheduleChatInputDraftRestore();

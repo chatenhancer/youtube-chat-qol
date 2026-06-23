@@ -27,6 +27,7 @@ describe('YouTube chat source url helpers', () => {
       configurable: true,
       value: originalParentWindow
     });
+    delete (window as Window & { ytCommand?: unknown }).ytCommand;
   });
 
   it('normalizes watch pages to the video id only', () => {
@@ -66,6 +67,34 @@ describe('YouTube chat source url helpers', () => {
     expect(getCurrentYouTubeChatSourceUrl()).toBe('https://www.youtube.com/watch?v=-OfA04BD4GA');
     expect(getCurrentYouTubeChatStreamKey()).toBe('-OfA04BD4GA');
     expect(getYouTubeChatSourceStorageKey(getCurrentYouTubeChatSourceUrl())).toBe('video:-OfA04BD4GA');
+  });
+
+  it('uses YouTube watch commands on live channel pages without watch urls', () => {
+    window.history.replaceState({}, '', '/@ExampleChannel/live');
+    Object.defineProperty(window, 'ytCommand', {
+      configurable: true,
+      value: {
+        watchEndpoint: {
+          videoId: 'live-video1'
+        }
+      }
+    });
+
+    expect(getCurrentYouTubeChatSourceUrl()).toBe('https://www.youtube.com/watch?v=live-video1');
+    expect(getCurrentYouTubeChatStreamKey()).toBe('live-video1');
+  });
+
+  it('uses YouTube watch commands in live chat frames when continuation parsing is not stable', () => {
+    window.history.replaceState(
+      {},
+      '',
+      '/live_chat?continuation=0ofMyAOYARp2Q2lrcUp3b1lWVU5UU2pSbmExWkROazV5ZGtsSk9IVnRlblJtTUU5M0VndFlORlppWkhkb2EwVXhNQm9sNnFqZHVRRWZDZ3RZTkZaaVpIZG9hMFV4TUVvUU1HZGpTa05SU1VKWlIyTnNSMTh4YXlBQk1BQSUzRDABggEICAQYAiAAKACIAQGgAcvNy6eSnpUDqAEAsgEA'
+    );
+    const script = document.createElement('script');
+    script.textContent = 'window["ytCommand"] = {"watchEndpoint":{"videoId":"X4VbdwhkE10"}};';
+    document.head.append(script);
+
+    expect(getCurrentYouTubeChatSourceUrl()).toBe('https://www.youtube.com/watch?v=X4VbdwhkE10');
   });
 
   it('chooses the most repeated video-id candidate from plain continuation text', () => {

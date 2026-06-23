@@ -17,6 +17,7 @@ import { getCurrentYouTubeChatSourceUrl } from '../../youtube/source-url';
 import { SEND_BUTTON_SELECTOR } from '../../youtube/selectors';
 import {
   createChatInputDraftContent,
+  type ChatInputDraftContent,
   loadChatInputDraft,
   saveChatInputDraft
 } from './storage';
@@ -26,9 +27,11 @@ const CHAT_INPUT_EMOJI_CLASS = 'emoji yt-formatted-string style-scope yt-live-ch
 const DRAFT_SAVE_DEBOUNCE_MS = 250;
 const POST_SEND_SAVE_DELAY_MS = 500;
 const DRAFT_RESTORE_DELAYS_MS = [100, 300, 800, 1500, 3000, 5000];
+const DRAFT_RESTORE_VERIFY_DELAYS_MS = [500, 1500, 3000];
 
 let saveTimer = 0;
 let restoreTimer = 0;
+let restoreVerificationTimer = 0;
 let restoreAttempt = 0;
 let restoreFinished = false;
 let replacingDraft = false;
@@ -61,6 +64,7 @@ export function initChatInputDrafts(): void {
 export function resetChatInputDrafts(): void {
   clearSaveTimer();
   clearRestoreTimer();
+  clearRestoreVerificationTimer();
   restoreAttempt = 0;
   restoreFinished = false;
   replacingDraft = false;
@@ -95,28 +99,23 @@ export async function restoreChatInputDraft(sourceUrl = getCurrentYouTubeChatSou
   }
 
   if (getChatInputText().trim()) {
-    restoreFinished = true;
+    if (!restoreVerificationTimer) restoreFinished = true;
     return false;
   }
 
   const draft = await loadChatInputDraft(sourceUrl);
-  restoreFinished = true;
-  if (!draft.text.trim()) return false;
-
-  replacingDraft = true;
-  try {
-    return replaceChatInputSnapshot({
-      childNodes: createRichTextSegmentNodes(draft.contentParts, {
-        emojiClassName: CHAT_INPUT_EMOJI_CLASS,
-        includeEmojiIdAsElementId: true
-      }),
-      text: draft.text
-    });
-  } finally {
-    window.setTimeout(() => {
-      replacingDraft = false;
-    }, 0);
+  if (!draft.text.trim()) {
+    scheduleChatInputDraftRestore();
+    return false;
   }
+
+  const restored = replaceStoredDraftContent(draft);
+  if (restored) {
+    scheduleRestoredDraftVerification(draft);
+  } else {
+    scheduleChatInputDraftRestore();
+  }
+  return restored;
 }
 
 export async function saveCurrentChatInputDraft(sourceUrl = getCurrentYouTubeChatSourceUrl()): Promise<void> {
@@ -170,6 +169,60 @@ function clearRestoreTimer(): void {
   if (!restoreTimer) return;
   window.clearTimeout(restoreTimer);
   restoreTimer = 0;
+}
+
+function clearRestoreVerificationTimer(): void {
+  if (!restoreVerificationTimer) return;
+  window.clearTimeout(restoreVerificationTimer);
+  restoreVerificationTimer = 0;
+}
+
+function replaceStoredDraftContent(draft: ChatInputDraftContent): boolean {
+  replacingDraft = true;
+  try {
+    return replaceChatInputSnapshot({
+      childNodes: createRichTextSegmentNodes(draft.contentParts, {
+        emojiClassName: CHAT_INPUT_EMOJI_CLASS,
+        includeEmojiIdAsElementId: true
+      }),
+      text: draft.text
+    });
+  } finally {
+    window.setTimeout(() => {
+      replacingDraft = false;
+    }, 0);
+  }
+}
+
+function scheduleRestoredDraftVerification(draft: ChatInputDraftContent, attempt = 0): void {
+  clearRestoreVerificationTimer();
+
+  const delay = DRAFT_RESTORE_VERIFY_DELAYS_MS[attempt];
+  if (delay === undefined) {
+    restoreFinished = true;
+    return;
+  }
+
+  restoreVerificationTimer = window.setTimeout(() => {
+    restoreVerificationTimer = 0;
+    if (restoreFinished) return;
+
+    const currentText = getChatInputText();
+    if (currentText === draft.text) {
+      scheduleRestoredDraftVerification(draft, attempt + 1);
+      return;
+    }
+    if (currentText.trim()) {
+      restoreFinished = true;
+      return;
+    }
+
+    if (replaceStoredDraftContent(draft)) {
+      scheduleRestoredDraftVerification(draft, attempt + 1);
+    } else {
+      scheduleChatInputDraftRestore();
+    }
+  }, delay);
 }
 
 function isFromChatInput(target: EventTarget | null): boolean {

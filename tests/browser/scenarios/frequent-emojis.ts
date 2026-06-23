@@ -4,7 +4,7 @@
  * Uses a stable built-in Unicode emoji and verifies storage, row rendering,
  * persistence after reload, and composer insertion.
  */
-import { expect, test, type BrowserContext, type Page } from '@playwright/test';
+import { expect, test, type BrowserContext, type FrameLocator, type Page } from '@playwright/test';
 import {
   clearChatComposer,
   getChatComposerText
@@ -16,9 +16,10 @@ import {
 import type { BrowserScenario, ChatSurface } from './types';
 
 const EMOJI_USAGE_STORAGE_KEY = 'ytcqEmojiUsage';
-const CHAT_FRAME_SELECTOR = 'iframe#chatframe';
 const EMOJI_PICKER_BUTTON_SELECTOR = '#emoji-picker-button yt-live-chat-icon-toggle-button-renderer#emoji button';
 const TEST_EMOJI = '✅';
+const CHAT_RELOAD_COMMIT_TIMEOUT_MS = 15_000;
+const CHAT_READY_TIMEOUT_MS = 60_000;
 
 export const frequentEmojiPersistenceScenario: BrowserScenario = async ({ chat, context }) => {
   await expectFrequentEmojiBehavior({ chat, context });
@@ -47,17 +48,33 @@ async function expectFrequentEmojiBehavior({
 
 async function reloadChatSurface(chat: ChatSurface): Promise<void> {
   await test.step('Reload chat surface', async () => {
-    const page = isPageSurface(chat) ? chat : chat.owner().page();
-    await page.reload({ waitUntil: 'domcontentloaded' });
-
-    if (!isPageSurface(chat)) {
-      await expect(page.locator(CHAT_FRAME_SELECTOR)).toBeVisible({ timeout: 60_000 });
+    if (isPageSurface(chat)) {
+      await chat.reload({ timeout: CHAT_RELOAD_COMMIT_TIMEOUT_MS, waitUntil: 'commit' });
+    } else {
+      await reloadChatFrame(chat);
+      await expect(chat.owner()).toBeVisible({ timeout: CHAT_READY_TIMEOUT_MS });
     }
 
-    await expect(chat.locator('yt-live-chat-renderer')).toBeVisible({ timeout: 60_000 });
-    await expect(chat.locator('.ytcq-inbox-button')).toBeVisible({ timeout: 60_000 });
-    await expect(getEmojiPickerButton(chat)).toBeVisible({ timeout: 60_000 });
+    await expect(chat.locator('yt-live-chat-renderer')).toBeVisible({ timeout: CHAT_READY_TIMEOUT_MS });
+    await expect(chat.locator('.ytcq-inbox-button')).toBeVisible({ timeout: CHAT_READY_TIMEOUT_MS });
+    await expect(getEmojiPickerButton(chat)).toBeVisible({ timeout: CHAT_READY_TIMEOUT_MS });
   });
+}
+
+async function reloadChatFrame(chat: FrameLocator): Promise<void> {
+  const frameOwner = chat.owner();
+  await frameOwner.waitFor({ state: 'attached', timeout: CHAT_READY_TIMEOUT_MS });
+
+  const frameElement = await frameOwner.elementHandle();
+  const frame = await frameElement?.contentFrame();
+  const frameUrl = frame?.url();
+
+  if (!frame || !frameUrl || frameUrl === 'about:blank') {
+    const pageUrl = frameOwner.page().url();
+    throw new Error(`Could not find a reloadable YouTube chat frame on ${pageUrl}.`);
+  }
+
+  await frame.goto(frameUrl, { timeout: CHAT_RELOAD_COMMIT_TIMEOUT_MS, waitUntil: 'commit' });
 }
 
 async function clickNativeEmojiOption(chat: ChatSurface): Promise<void> {
