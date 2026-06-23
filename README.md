@@ -14,21 +14,19 @@
   <a href="LICENSE"><img alt="license" src="https://img.shields.io/badge/license-GPL--3.0%2B-2da44e"></a>
 </p>
 
-Native-feeling quality-of-life tools for YouTube live chat.
+Designed to feel like part of YouTube, Chat Enhancer for YouTube keeps the native live chat experience while adding a lightweight layer of quality-of-life tools for busy streams.
+
+Main features include two-way translation, an inbox for @mentions and keyword matches, and chat profiles that help you quickly see someone’s recent messages or open their YouTube channel.
+
+You also get a row of your most-used emojis, chat commands, user bookmarks, quick mentions and quotes, focus mode, draft recovery, and more.
+
+NEW! Introducing Playground: play minigames with other extension users right in YouTube live chat.
+
+Chat Enhancer for YouTube is free, open-source, requires no account, and does not run analytics.
 
 Not affiliated with YouTube or Google.
 
 [Website](https://www.chatenhancer.com) · [Chrome Web Store](https://www.chatenhancer.com/chrome) · [Firefox Add-ons](https://www.chatenhancer.com/firefox)
-
-## Features
-
-- Translate live chat messages or the message you're typing before sending it.
-- Mention or quote from YouTube's message menu, author names, or Tab-expanded commands.
-- Use Focus mode, recent-message profile cards, colored bookmarks, and draft recovery to keep conversations easier to follow.
-- Keep a local Inbox for mentions and watched keywords, with highlights, jump-back links, optional sounds, and tab alerts.
-- Reuse frequent emojis and expand slash commands for mentions, quotes, time helpers, translations, inbox watches, and settings.
-- Check active-tab status and manage extension settings from the popup.
-- Opt in to stream-scoped Playground games with other available users.
 
 ## Privacy
 
@@ -37,9 +35,9 @@ Not affiliated with YouTube or Google.
 - Bookmarked users are stored locally so avatar rings can appear across streams.
 - When translation is enabled, message text or draft text you choose to translate is sent to Google Translate.
 
-## Screenshots
+## Preview
 
-![Chat Enhancer for YouTube screenshots](assets/readme/showcase.png)
+![Chat Enhancer for YouTube promo previews](assets/readme/promo-grid.png)
 
 ## Development
 
