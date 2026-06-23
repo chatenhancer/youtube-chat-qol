@@ -20,7 +20,7 @@ const appName = process.env.YTCQ_SAFARI_APP_NAME || 'Chat Enhancer for YouTube';
 const bundleIdentifier = process.env.YTCQ_SAFARI_BUNDLE_ID || 'com.chatenhancer.safari';
 const developmentTeam = process.env.YTCQ_SAFARI_DEVELOPMENT_TEAM || '2UJF2GNW75';
 const marketingVersion = process.env.YTCQ_SAFARI_MARKETING_VERSION || packageJson.version;
-const buildNumber = process.env.YTCQ_SAFARI_BUILD_NUMBER || getDefaultBuildNumber(packageJson.version);
+const buildNumber = process.env.YTCQ_SAFARI_BUILD_NUMBER || getDefaultBuildNumber();
 
 await unregisterLegacySafariExtensionBuilds();
 await assertSafariExtensionBuildExists();
@@ -130,13 +130,21 @@ function quotePbxValue(value) {
     : JSON.stringify(text);
 }
 
-function getDefaultBuildNumber(version) {
-  const match = /^(\d+)\.(\d+)\.(\d+)/.exec(String(version));
-  if (!match) return '1';
-  const major = Number(match[1]);
-  const minor = Number(match[2]);
-  const patch = Number(match[3]);
-  return String(Math.max(1, major * 10000 + minor * 100 + patch));
+function getDefaultBuildNumber() {
+  const now = new Date();
+  const parts = [
+    now.getUTCFullYear(),
+    now.getUTCMonth() + 1,
+    now.getUTCDate(),
+    now.getUTCHours(),
+    now.getUTCMinutes(),
+    now.getUTCSeconds()
+  ];
+
+  return [
+    parts[0],
+    ...parts.slice(1).map((part) => String(part).padStart(2, '0'))
+  ].join('');
 }
 
 function run(command, args, options = {}) {
