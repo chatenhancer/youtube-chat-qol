@@ -1,6 +1,9 @@
 (() => {
   const docsConfig = readDocsConfig();
   const installActions = document.querySelector("[data-install-actions]");
+  const primaryStoreLink = document.querySelector("[data-browser-primary-store-link]");
+  const storeToggle = document.querySelector("[data-browser-store-toggle]");
+  const storeOptions = document.querySelector("[data-browser-store-options]");
   const chromeStoreLink = document.querySelector('[data-browser-store-link="chrome"]');
   const firefoxStoreLink = document.querySelector('[data-browser-store-link="firefox"]');
   const safariStoreLink = document.querySelector('[data-browser-store-link="safari"]');
@@ -98,7 +101,15 @@
   setupStoreVersionAlertScrollFade();
   void checkStoreVersionStatus();
 
-  if (!installActions || !chromeStoreLink || !firefoxStoreLink || !safariStoreLink) return;
+  if (
+    !installActions ||
+    !primaryStoreLink ||
+    !storeToggle ||
+    !storeOptions ||
+    !chromeStoreLink ||
+    !firefoxStoreLink ||
+    !safariStoreLink
+  ) return;
 
   const userAgent = navigator.userAgent.toLowerCase();
   const isFirefox = userAgent.includes("firefox/");
@@ -120,6 +131,14 @@
     } else {
       link.removeAttribute("aria-current");
     }
+  });
+  const primaryStoreHref = storeLinks[primaryStoreKey]?.getAttribute("href");
+  if (primaryStoreHref) primaryStoreLink.setAttribute("href", primaryStoreHref);
+
+  storeToggle.addEventListener("click", () => {
+    const isExpanded = storeToggle.getAttribute("aria-expanded") === "true";
+    storeToggle.setAttribute("aria-expanded", String(!isExpanded));
+    storeOptions.hidden = isExpanded;
   });
 
   async function checkStoreVersionStatus() {

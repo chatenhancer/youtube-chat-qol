@@ -3250,23 +3250,44 @@ figcaption {
   margin-left: 0;
 }
 
+.install-store-picker {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
 .install-store-options {
+  position: absolute;
+  z-index: 3;
+  top: calc(100% + 8px);
+  right: 0;
+  left: 0;
   overflow: hidden;
   width: 100%;
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 8px;
-  box-shadow: 0 18px 48px rgba(15, 23, 42, 0.08);
 }
 
-.install-store-heading {
-  align-self: stretch;
-  margin: 0;
-  color: var(--muted);
-  font-size: 12.5px;
-  font-weight: 600;
-  line-height: 1.35;
-  text-align: center;
+.install-store-options[hidden] {
+  display: none;
+}
+
+.install-primary-button,
+.install-other-stores-toggle {
+  width: 100%;
+}
+
+.install-primary-button {
+  min-height: 46px;
+}
+
+.install-other-stores-toggle {
+  min-height: 38px;
+  font-size: 13.5px;
 }
 
 .install-store-option {

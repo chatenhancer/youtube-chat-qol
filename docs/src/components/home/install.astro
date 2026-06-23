@@ -35,26 +35,51 @@ const { locale, messages: m, rootPrefix } = Astro.props as {
       </div>
     </div>
     <div class="install-actions" data-install-actions>
-      <p class="install-store-heading" id="install-store-options-title">{m.install.stepStoreTitle}</p>
-      <div class="install-store-options" aria-labelledby="install-store-options-title">
-        <a class="install-store-option" href={site.chromeUrl} data-browser-store-link="chrome">
-          <img class="install-store-option-icon" src={`${rootPrefix}assets/browser-icons/chrome.svg`} alt="" aria-hidden="true">
-          <span class="install-store-option-label">Chrome</span>
-          <span class="install-store-option-meta">{m.install.chromeStore}</span>
-          <span class="install-store-option-arrow" aria-hidden="true"></span>
+      <div class="install-store-picker">
+        <a class="button button-primary install-primary-button" href={site.chromeUrl} data-browser-primary-store-link>
+          <span class="button-icon" data-symbol="install_desktop" aria-hidden="true">
+            <Icon name="install_desktop" />
+          </span>
+          <span>{m.install.installForThisBrowser}</span>
         </a>
-        <a class="install-store-option" href={site.firefoxUrl} data-browser-store-link="firefox">
-          <img class="install-store-option-icon" src={`${rootPrefix}assets/browser-icons/firefox.svg`} alt="" aria-hidden="true">
-          <span class="install-store-option-label">Firefox</span>
-          <span class="install-store-option-meta">{m.install.firefoxAddons}</span>
-          <span class="install-store-option-arrow" aria-hidden="true"></span>
-        </a>
-        <a class="install-store-option" href={site.safariUrl} data-browser-store-link="safari">
-          <img class="install-store-option-icon install-store-option-icon-safari" src={`${rootPrefix}assets/browser-icons/safari.svg`} alt="" aria-hidden="true">
-          <span class="install-store-option-label">Safari</span>
-          <span class="install-store-option-meta">{m.install.safariAppStore}</span>
-          <span class="install-store-option-arrow" aria-hidden="true"></span>
-        </a>
+        <button
+          class="button button-secondary install-other-stores-toggle"
+          type="button"
+          aria-controls="install-store-options"
+          aria-expanded="false"
+          data-browser-store-toggle
+        >
+          <span class="button-icon" data-symbol="storefront" aria-hidden="true">
+            <Icon name="storefront" />
+          </span>
+          <span>{m.install.otherStores}</span>
+        </button>
+        <div
+          class="install-store-options"
+          id="install-store-options"
+          aria-label={m.install.otherStores}
+          data-browser-store-options
+          hidden
+        >
+          <a class="install-store-option" href={site.chromeUrl} data-browser-store-link="chrome">
+            <img class="install-store-option-icon" src={`${rootPrefix}assets/browser-icons/chrome.svg`} alt="" aria-hidden="true">
+            <span class="install-store-option-label">Chrome</span>
+            <span class="install-store-option-meta">{m.install.chromeStore}</span>
+            <span class="install-store-option-arrow" aria-hidden="true"></span>
+          </a>
+          <a class="install-store-option" href={site.firefoxUrl} data-browser-store-link="firefox">
+            <img class="install-store-option-icon" src={`${rootPrefix}assets/browser-icons/firefox.svg`} alt="" aria-hidden="true">
+            <span class="install-store-option-label">Firefox</span>
+            <span class="install-store-option-meta">{m.install.firefoxAddons}</span>
+            <span class="install-store-option-arrow" aria-hidden="true"></span>
+          </a>
+          <a class="install-store-option" href={site.safariUrl} data-browser-store-link="safari">
+            <img class="install-store-option-icon install-store-option-icon-safari" src={`${rootPrefix}assets/browser-icons/safari.svg`} alt="" aria-hidden="true">
+            <span class="install-store-option-label">Safari</span>
+            <span class="install-store-option-meta">{m.install.safariAppStore}</span>
+            <span class="install-store-option-arrow" aria-hidden="true"></span>
+          </a>
+        </div>
       </div>
       <div class="install-utility-actions">
         <a class="install-utility-chip" href={site.sourceUrl}>
