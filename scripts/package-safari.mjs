@@ -9,9 +9,11 @@ import { access, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import sharp from 'sharp';
 import packageJson from '../package.json' with { type: 'json' };
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const safariAppIconSourcePath = path.join(root, 'src', 'assets', 'icons', 'safari-app-icon.svg');
 const extensionDir = path.join(root, 'dist', 'extension-safari');
 const projectLocation = path.join(root, 'dist', 'safari');
 const appName = process.env.YTCQ_SAFARI_APP_NAME || 'Chat Enhancer for YouTube';
@@ -42,6 +44,7 @@ run('xcrun', [
 });
 
 await updateXcodeProjectSettings();
+await updateSafariAppIcons();
 
 async function assertSafariExtensionBuildExists() {
   try {
@@ -66,6 +69,33 @@ async function updateXcodeProjectSettings() {
       '$1\t\t\t\tENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;\n'
     );
   if (next !== original) await writeFile(projectPath, next);
+}
+
+async function updateSafariAppIcons() {
+  const appRoot = path.join(projectLocation, appName);
+  const appIconDir = path.join(appRoot, 'Shared (App)', 'Assets.xcassets', 'AppIcon.appiconset');
+  const outputSpecs = [
+    ['universal-icon-1024@1x.png', 1024],
+    ['mac-icon-16@1x.png', 16],
+    ['mac-icon-16@2x.png', 32],
+    ['mac-icon-32@1x.png', 32],
+    ['mac-icon-32@2x.png', 64],
+    ['mac-icon-128@1x.png', 128],
+    ['mac-icon-128@2x.png', 256],
+    ['mac-icon-256@1x.png', 256],
+    ['mac-icon-256@2x.png', 512],
+    ['mac-icon-512@1x.png', 512],
+    ['mac-icon-512@2x.png', 1024],
+    [path.join('..', '..', 'Resources', 'Icon.png'), 512],
+    [path.join('..', 'LargeIcon.imageset', 'icon-128.png'), 128]
+  ];
+
+  await Promise.all(outputSpecs.map(([fileName, size]) =>
+    sharp(safariAppIconSourcePath)
+      .resize(size, size)
+      .png()
+      .toFile(path.join(appIconDir, fileName))
+  ));
 }
 
 async function unregisterLegacySafariExtensionBuilds() {

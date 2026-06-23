@@ -142,13 +142,6 @@ function createManifest(target) {
   }
 
   if (target === 'safari') {
-    manifest.permissions = [
-      ...new Set([
-        ...(manifest.permissions || []),
-        'activeTab',
-        'tabs'
-      ])
-    ];
     manifest.host_permissions = [
       ...new Set([
         ...(manifest.host_permissions || []),
