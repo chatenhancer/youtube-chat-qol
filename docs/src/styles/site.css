@@ -3321,12 +3321,12 @@ figcaption {
 }
 
 .install-store-option-arrow {
-  width: 8px;
-  height: 8px;
-  border-right: 2px solid currentColor;
-  border-bottom: 2px solid currentColor;
-  opacity: 0.42;
-  transform: rotate(-45deg);
+  width: 18px;
+  height: 18px;
+  background: currentColor;
+  opacity: 0.46;
+  -webkit-mask: url("/assets/icons/chevron-right.svg") center / contain no-repeat;
+  mask: url("/assets/icons/chevron-right.svg") center / contain no-repeat;
 }
 
 .install-utility-actions {

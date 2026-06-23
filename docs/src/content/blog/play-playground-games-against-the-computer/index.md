@@ -1,7 +1,7 @@
 ---
 title: "Play Playground games against the computer"
 date: 2026-06-14
-description: "Play Chess against three Computer opponents or play HELP-A-FRIEND! Trivia in Playground when another player is not around."
+description: "Computer opponents make Playground games easier to start when nobody else is around."
 slug: "play-playground-games-against-the-computer"
 image: "./cover.png"
 locale: "en"
@@ -13,13 +13,13 @@ tags:
   - "trivia"
 ---
 
-Playground is easier to jump into now: you can play against **Computer**.
+Playground is easier to jump into now. You can play against **Computer**.
 
-Sometimes chat is quiet. Sometimes your friends are watching a different stream. Sometimes you just want to play a quick round without waiting for someone else to accept. Computer gives you another option.
+Sometimes chat is quiet. Sometimes your friends are watching a different stream. Sometimes you just want to play a quick round without waiting for someone else to accept. Now there is another option.
 
 ## How it works
 
-Open Playground from the Games panel and look for a Computer player in the player list. Invite one the same way you would invite another player. The match starts automatically, and you can play without changing how you use Playground.
+Open Playground from the Games panel and look for a Computer player in the player list. Invite one the same way you would invite another viewer. The match starts automatically, and the rest of Playground works the same way.
 
 Computer opponents are available for:
 
@@ -28,21 +28,21 @@ Computer opponents are available for:
 
 ## Pick your Chess difficulty
 
-Chess now has three Computer opponents. Beginner is the easiest way to warm up, Club is a steadier mid-level opponent, and Master is the toughest option.
+Chess now has three Computer opponents. Beginner is the easiest way to warm up, Club plays a steadier mid-level game, and Master is the toughest option.
 
 No separate setting is needed: choose the Computer profile you want from the player list and send an invite.
 
 ## Still feels like Playground
 
-This is not a separate solo mode or a new screen. Computer players behave like normal Playground opponents, so the flow stays familiar: open the panel, pick a game, send an invite, and play.
+This is not a separate solo mode or a new screen. Computer players behave like regular Playground opponents: open the panel, pick a game, send an invite, and play.
 
-For Chess, Computer makes its moves after a short pause so the game does not feel instant or robotic.
+For Chess, Computer waits briefly before moving, so the game does not feel instant.
 
 For *HELP-A-FRIEND! Trivia*, Computer answers during the question round just like another player would. It is not perfect, so you still have a real chance to win.
 
 ## Why add it?
 
-Playground is most fun when there is someone nearby to play with, but live chat is unpredictable. Computer keeps the games usable during slower moments, late-night streams, replays, or tiny communities where there may not always be another Chat Enhancer user available.
+Playground is best when there is another person nearby to play with, but live chat is unpredictable. Computer keeps the games usable during slower moments, late-night streams, replays, or smaller communities where another Chat Enhancer user may not be available.
 
 :::media-left
 
