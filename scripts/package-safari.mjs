@@ -21,6 +21,7 @@ const bundleIdentifier = process.env.YTCQ_SAFARI_BUNDLE_ID || 'com.chatenhancer.
 const developmentTeam = process.env.YTCQ_SAFARI_DEVELOPMENT_TEAM || '2UJF2GNW75';
 const marketingVersion = process.env.YTCQ_SAFARI_MARKETING_VERSION || packageJson.version;
 const buildNumber = process.env.YTCQ_SAFARI_BUILD_NUMBER || getDefaultBuildNumber();
+const macAppCategory = process.env.YTCQ_SAFARI_APP_CATEGORY || 'public.app-category.entertainment';
 
 await unregisterLegacySafariExtensionBuilds();
 await assertSafariExtensionBuildExists();
@@ -44,6 +45,7 @@ run('xcrun', [
 });
 
 await updateXcodeProjectSettings();
+await updateMacAppInfoPlist();
 await updateSafariAppIcons();
 
 async function assertSafariExtensionBuildExists() {
@@ -69,6 +71,21 @@ async function updateXcodeProjectSettings() {
       '$1\t\t\t\tENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;\n'
     );
   if (next !== original) await writeFile(projectPath, next);
+}
+
+async function updateMacAppInfoPlist() {
+  const plistPath = path.join(projectLocation, appName, 'macOS (App)', 'Info.plist');
+  const original = await readFile(plistPath, 'utf8');
+  const next = original.includes('<key>LSApplicationCategoryType</key>')
+    ? original.replace(
+      /<key>LSApplicationCategoryType<\/key>\s*<string>[^<]*<\/string>/,
+      `<key>LSApplicationCategoryType</key>\n\t<string>${escapeXml(macAppCategory)}</string>`
+    )
+    : original.replace(
+      '</dict>',
+      `\t<key>LSApplicationCategoryType</key>\n\t<string>${escapeXml(macAppCategory)}</string>\n</dict>`
+    );
+  if (next !== original) await writeFile(plistPath, next);
 }
 
 async function updateSafariAppIcons() {
@@ -145,6 +162,15 @@ function getDefaultBuildNumber() {
     parts[0],
     ...parts.slice(1).map((part) => String(part).padStart(2, '0'))
   ].join('');
+}
+
+function escapeXml(value) {
+  return String(value)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&apos;');
 }
 
 function run(command, args, options = {}) {
