@@ -1,6 +1,7 @@
 (() => {
   const docsConfig = readDocsConfig();
   const installActions = document.querySelector("[data-install-actions]");
+  const storePicker = document.querySelector("[data-browser-store-picker]");
   const primaryStoreLink = document.querySelector("[data-browser-primary-store-link]");
   const storeToggle = document.querySelector("[data-browser-store-toggle]");
   const storeOptions = document.querySelector("[data-browser-store-options]");
@@ -103,6 +104,7 @@
 
   if (
     !installActions ||
+    !storePicker ||
     !primaryStoreLink ||
     !storeToggle ||
     !storeOptions ||
@@ -137,9 +139,18 @@
 
   storeToggle.addEventListener("click", () => {
     const isExpanded = storeToggle.getAttribute("aria-expanded") === "true";
-    storeToggle.setAttribute("aria-expanded", String(!isExpanded));
-    storeOptions.hidden = isExpanded;
+    setStoreOptionsExpanded(!isExpanded);
   });
+
+  document.addEventListener("click", (event) => {
+    if (storeOptions.hidden || !(event.target instanceof Node) || storePicker.contains(event.target)) return;
+    setStoreOptionsExpanded(false);
+  });
+
+  function setStoreOptionsExpanded(isExpanded) {
+    storeToggle.setAttribute("aria-expanded", String(isExpanded));
+    storeOptions.hidden = !isExpanded;
+  }
 
   async function checkStoreVersionStatus() {
     const alert = document.querySelector("[data-store-version-alert]");
