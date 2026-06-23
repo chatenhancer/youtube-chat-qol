@@ -15,8 +15,9 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const extensionDir = path.join(root, 'dist', 'extension-safari');
 const projectLocation = path.join(root, 'dist', 'safari');
 const appName = process.env.YTCQ_SAFARI_APP_NAME || 'Chat Enhancer for YouTube';
-const bundleIdentifier = process.env.YTCQ_SAFARI_BUNDLE_ID || 'com.chatenhancer.ChatEnhancerForYouTube';
+const bundleIdentifier = process.env.YTCQ_SAFARI_BUNDLE_ID || 'com.chatenhancer.safari';
 const developmentTeam = process.env.YTCQ_SAFARI_DEVELOPMENT_TEAM || '2UJF2GNW75';
+const marketingVersion = process.env.YTCQ_SAFARI_MARKETING_VERSION || packageJson.version;
 const buildNumber = process.env.YTCQ_SAFARI_BUILD_NUMBER || getDefaultBuildNumber(packageJson.version);
 
 await unregisterLegacySafariExtensionBuilds();
@@ -55,7 +56,7 @@ async function updateXcodeProjectSettings() {
   const original = await readFile(projectPath, 'utf8');
   const next = original
     .replace(/CURRENT_PROJECT_VERSION = [^;]+;/g, `CURRENT_PROJECT_VERSION = ${quotePbxValue(buildNumber)};`)
-    .replace(/MARKETING_VERSION = [^;]+;/g, `MARKETING_VERSION = ${quotePbxValue(packageJson.version)};`)
+    .replace(/MARKETING_VERSION = [^;]+;/g, `MARKETING_VERSION = ${quotePbxValue(marketingVersion)};`)
     .replace(
       /(CODE_SIGN_STYLE = Automatic;\n)(?!\s*DEVELOPMENT_TEAM = )/g,
       `$1\t\t\t\tDEVELOPMENT_TEAM = ${quotePbxValue(developmentTeam)};\n`
