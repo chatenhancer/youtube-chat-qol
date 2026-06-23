@@ -14,6 +14,8 @@
   <a href="LICENSE"><img alt="license" src="https://img.shields.io/badge/license-GPL--3.0%2B-2da44e"></a>
 </p>
 
+[Website](https://www.chatenhancer.com) · [Chrome Web Store](https://www.chatenhancer.com/chrome) · [Firefox Add-ons](https://www.chatenhancer.com/firefox) · [Safari (Mac App Store)](https://www.chatenhancer.com/safari)
+
 Designed to feel like part of YouTube, Chat Enhancer for YouTube keeps the native live chat experience while adding a lightweight layer of quality-of-life tools for busy streams.
 
 Main features include two-way translation, an inbox for @mentions and keyword matches, and chat profiles that help you quickly see someone’s recent messages or open their YouTube channel.
@@ -26,14 +28,17 @@ Chat Enhancer for YouTube is free, open-source, requires no account, and does no
 
 Not affiliated with YouTube or Google.
 
-[Website](https://www.chatenhancer.com) · [Chrome Web Store](https://www.chatenhancer.com/chrome) · [Firefox Add-ons](https://www.chatenhancer.com/firefox)
-
 ## Privacy
 
-- The extension does not replace YouTube chat or run analytics.
-- Except for opt-in Playground games, it does not send data to an extension-owned server.
-- Bookmarked users are stored locally so avatar rings can appear across streams.
-- When translation is enabled, message text or draft text you choose to translate is sent to Google Translate.
+- Most extension features run locally in your browser.
+
+- Translation is off by default.
+
+- When translation is enabled, the text being translated is sent to Google Translate.
+
+- Playground games are off by default. If you enable and use Playground, game presence, invites, and game actions are sent to the Chat Enhancer Playground game server under a generated player name.
+
+- The extension does not run analytics, sell data, or collect browsing history.
 
 ## Preview
 
