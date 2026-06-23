@@ -272,6 +272,9 @@
     "gamesUnavailableNoticeTitle": "Unable to connect"
   },
   "extension": {
+    "close": {
+      "message": "Close"
+    },
     "extensionName": {
       "message": "Chat Enhancer for YouTube",
       "description": "Public extension name."
@@ -378,7 +381,34 @@
       "message": "Off"
     },
     "popupResetConfirm": {
-      "message": "Reset Chat Enhancer settings and clear all local extension data?\n\nThis includes inbox messages, watched keywords, frequent emojis, unsent drafts, bookmarked users."
+      "message": "Reset Chat Enhancer settings and clear all local extension data?"
+    },
+    "popupResetConfirmIncludes": {
+      "message": "This includes:"
+    },
+    "popupResetItemSettings": {
+      "message": "Extension settings"
+    },
+    "popupResetItemInboxMessages": {
+      "message": "Inbox messages"
+    },
+    "popupResetItemWatchedKeywords": {
+      "message": "Watched keywords"
+    },
+    "popupResetItemFrequentEmojis": {
+      "message": "Frequent emojis"
+    },
+    "popupResetItemUnsentDrafts": {
+      "message": "Unsent drafts"
+    },
+    "popupResetItemBookmarkedUsers": {
+      "message": "Bookmarked users"
+    },
+    "popupResetItemPlaygroundIdentity": {
+      "message": "Playground identity and display name"
+    },
+    "popupResetItemGamePreferences": {
+      "message": "Game sound preference"
     },
     "popupResetComplete": {
       "message": "Chat Enhancer has been reset."

@@ -272,6 +272,9 @@
     "gamesUnavailableNoticeTitle": "Verbindung nicht möglich"
   },
   "extension": {
+    "close": {
+      "message": "Schließen"
+    },
     "extensionName": {
       "message": "Chat Enhancer for YouTube"
     },
@@ -375,7 +378,34 @@
       "message": "Aus"
     },
     "popupResetConfirm": {
-      "message": "Chat Enhancer-Einstellungen zurücksetzen und alle lokalen Erweiterungsdaten löschen?\n\nDazu gehören Inbox-Nachrichten, beobachtete Keywords, häufige Emojis, ungesendete Entwürfe, als Lesezeichen gespeicherte Nutzer."
+      "message": "Chat Enhancer-Einstellungen zurücksetzen und alle lokalen Erweiterungsdaten löschen?"
+    },
+    "popupResetConfirmIncludes": {
+      "message": "Dies umfasst:"
+    },
+    "popupResetItemSettings": {
+      "message": "Erweiterungseinstellungen"
+    },
+    "popupResetItemInboxMessages": {
+      "message": "Inbox-Nachrichten"
+    },
+    "popupResetItemWatchedKeywords": {
+      "message": "Überwachte Keywords"
+    },
+    "popupResetItemFrequentEmojis": {
+      "message": "Häufig verwendete Emojis"
+    },
+    "popupResetItemUnsentDrafts": {
+      "message": "Nicht gesendete Entwürfe"
+    },
+    "popupResetItemBookmarkedUsers": {
+      "message": "Gespeicherte Nutzer"
+    },
+    "popupResetItemPlaygroundIdentity": {
+      "message": "Playground-Identität und Anzeigename"
+    },
+    "popupResetItemGamePreferences": {
+      "message": "Spiel-Soundeinstellung"
     },
     "popupResetComplete": {
       "message": "Chat Enhancer wurde zurückgesetzt."

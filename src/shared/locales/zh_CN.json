@@ -272,6 +272,9 @@
     "gamesUnavailableNoticeTitle": "无法连接"
   },
   "extension": {
+    "close": {
+      "message": "关闭"
+    },
     "extensionName": {
       "message": "Chat Enhancer for YouTube",
       "description": "公开显示的扩展名称。"
@@ -378,7 +381,34 @@
       "message": "关闭"
     },
     "popupResetConfirm": {
-      "message": "要重置 Chat Enhancer 设置并清除所有本地扩展数据吗？\n\n这包括收件箱消息、关注的关键词、常用表情、未发送草稿、已加入书签的用户。"
+      "message": "要重置 Chat Enhancer 设置并清除所有本地扩展程序数据吗？"
+    },
+    "popupResetConfirmIncludes": {
+      "message": "包括："
+    },
+    "popupResetItemSettings": {
+      "message": "扩展程序设置"
+    },
+    "popupResetItemInboxMessages": {
+      "message": "收件箱消息"
+    },
+    "popupResetItemWatchedKeywords": {
+      "message": "监视的关键词"
+    },
+    "popupResetItemFrequentEmojis": {
+      "message": "常用表情符号"
+    },
+    "popupResetItemUnsentDrafts": {
+      "message": "未发送草稿"
+    },
+    "popupResetItemBookmarkedUsers": {
+      "message": "已加书签的用户"
+    },
+    "popupResetItemPlaygroundIdentity": {
+      "message": "Playground 身份和显示名称"
+    },
+    "popupResetItemGamePreferences": {
+      "message": "游戏声音偏好"
     },
     "popupResetComplete": {
       "message": "Chat Enhancer 已重置。"

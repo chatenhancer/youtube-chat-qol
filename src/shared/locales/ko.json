@@ -272,6 +272,9 @@
     "gamesUnavailableNoticeTitle": "연결할 수 없음"
   },
   "extension": {
+    "close": {
+      "message": "닫기"
+    },
     "extensionName": {
       "message": "Chat Enhancer for YouTube"
     },
@@ -375,7 +378,34 @@
       "message": "끄기"
     },
     "popupResetConfirm": {
-      "message": "Chat Enhancer 설정을 초기화하고 모든 로컬 확장 프로그램 데이터를 삭제할까요?\n\n받은 메시지, 감시 중인 키워드, 자주 쓰는 이모지, 보내지 않은 초안, 북마크한 사용자이 포함됩니다."
+      "message": "Chat Enhancer 설정을 재설정하고 모든 로컬 확장 프로그램 데이터를 삭제할까요?"
+    },
+    "popupResetConfirmIncludes": {
+      "message": "포함 항목:"
+    },
+    "popupResetItemSettings": {
+      "message": "확장 프로그램 설정"
+    },
+    "popupResetItemInboxMessages": {
+      "message": "받은편지함 메시지"
+    },
+    "popupResetItemWatchedKeywords": {
+      "message": "감시 중인 키워드"
+    },
+    "popupResetItemFrequentEmojis": {
+      "message": "자주 쓰는 이모지"
+    },
+    "popupResetItemUnsentDrafts": {
+      "message": "보내지 않은 초안"
+    },
+    "popupResetItemBookmarkedUsers": {
+      "message": "북마크한 사용자"
+    },
+    "popupResetItemPlaygroundIdentity": {
+      "message": "Playground ID 및 표시 이름"
+    },
+    "popupResetItemGamePreferences": {
+      "message": "게임 소리 설정"
     },
     "popupResetComplete": {
       "message": "Chat Enhancer가 재설정되었습니다."

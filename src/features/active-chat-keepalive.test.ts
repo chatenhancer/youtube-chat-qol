@@ -105,6 +105,20 @@ describe('active chat keepalive', () => {
     expect(document.querySelector('.ytcq-reconnect-anchor')).toBeNull();
   });
 
+  it('stops the active chat port during stale cleanup without reconnecting', async () => {
+    const port = createMockPort();
+    const connect = vi.fn(() => port as unknown as chrome.runtime.Port);
+    chrome.runtime.connect = connect;
+    const { cleanupActiveChatKeepAlive, startActiveChatKeepAlive } = await import('./active-chat-keepalive');
+
+    startActiveChatKeepAlive();
+    cleanupActiveChatKeepAlive();
+    await vi.advanceTimersByTimeAsync(250);
+
+    expect(connect).toHaveBeenCalledOnce();
+    expect(port.postMessage).toHaveBeenCalledOnce();
+  });
+
   it('does not start another reconnect timer while one is pending', async () => {
     const firstPort = createMockPort();
     const connect = vi.fn()

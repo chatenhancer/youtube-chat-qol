@@ -272,6 +272,9 @@
     "gamesUnavailableNoticeTitle": "تعذر الاتصال"
   },
   "extension": {
+    "close": {
+      "message": "إغلاق"
+    },
     "extensionName": {
       "message": "Chat Enhancer for YouTube",
       "description": "اسم الإضافة العام."
@@ -378,7 +381,34 @@
       "message": "متوقف"
     },
     "popupResetConfirm": {
-      "message": "هل تريد إعادة تعيين إعدادات Chat Enhancer ومسح كل بيانات الإضافة المحلية؟\n\nيشمل ذلك رسائل الوارد، والكلمات الرئيسية المتابعة، والرموز التعبيرية المتكررة، والمسودات غير المرسلة، والمستخدمين المحفوظين كإشارات مرجعية."
+      "message": "هل تريد إعادة تعيين إعدادات Chat Enhancer ومسح كل بيانات الإضافة المحلية؟"
+    },
+    "popupResetConfirmIncludes": {
+      "message": "يشمل ذلك:"
+    },
+    "popupResetItemSettings": {
+      "message": "إعدادات الإضافة"
+    },
+    "popupResetItemInboxMessages": {
+      "message": "رسائل البريد الوارد"
+    },
+    "popupResetItemWatchedKeywords": {
+      "message": "الكلمات المفتاحية المراقبة"
+    },
+    "popupResetItemFrequentEmojis": {
+      "message": "الرموز التعبيرية المتكررة"
+    },
+    "popupResetItemUnsentDrafts": {
+      "message": "المسودات غير المرسلة"
+    },
+    "popupResetItemBookmarkedUsers": {
+      "message": "المستخدمون المحفوظون في الإشارات المرجعية"
+    },
+    "popupResetItemPlaygroundIdentity": {
+      "message": "هوية Playground واسم العرض"
+    },
+    "popupResetItemGamePreferences": {
+      "message": "تفضيل صوت الألعاب"
     },
     "popupResetComplete": {
       "message": "تمت إعادة تعيين Chat Enhancer."

@@ -539,12 +539,12 @@ async function createSignedPlaygroundIdentity(
 }
 
 async function getStoredPlaygroundIdentity(): Promise<StoredPlaygroundIdentity> {
-  const stored = await chrome.storage.local.get(PLAYGROUND_IDENTITY_STORAGE_KEY);
+  const stored = await getLocalStorage(PLAYGROUND_IDENTITY_STORAGE_KEY);
   const candidate = stored[PLAYGROUND_IDENTITY_STORAGE_KEY];
   if (isStoredPlaygroundIdentity(candidate)) return candidate;
 
   const identity = await createStoredPlaygroundIdentity();
-  await chrome.storage.local.set({
+  await setLocalStorage({
     [PLAYGROUND_IDENTITY_STORAGE_KEY]: identity
   });
   return identity;
@@ -587,9 +587,9 @@ async function setStoredPlaygroundProfileDisplayName(value: string): Promise<Pla
   }
 
   if (customDisplayName) {
-    await chrome.storage.local.set({ [PLAYGROUND_DISPLAY_NAME_STORAGE_KEY]: customDisplayName });
+    await setLocalStorage({ [PLAYGROUND_DISPLAY_NAME_STORAGE_KEY]: customDisplayName });
   } else {
-    await chrome.storage.local.remove(PLAYGROUND_DISPLAY_NAME_STORAGE_KEY);
+    await removeLocalStorage(PLAYGROUND_DISPLAY_NAME_STORAGE_KEY);
   }
 
   return getStoredPlaygroundProfile();
@@ -601,8 +601,47 @@ async function getStoredPlaygroundSocketDisplayName(identity: StoredPlaygroundId
 }
 
 async function getStoredPlaygroundCustomDisplayName(): Promise<string> {
-  const stored = await chrome.storage.local.get(PLAYGROUND_DISPLAY_NAME_STORAGE_KEY);
+  const stored = await getLocalStorage(PLAYGROUND_DISPLAY_NAME_STORAGE_KEY);
   return normalizePlaygroundDisplayName(stored[PLAYGROUND_DISPLAY_NAME_STORAGE_KEY]);
+}
+
+function getLocalStorage(keys: string | string[] | Record<string, unknown> | null): Promise<Record<string, unknown>> {
+  return new Promise((resolve, reject) => {
+    chrome.storage.local.get(keys, (stored) => {
+      const error = chrome.runtime.lastError;
+      if (error) {
+        reject(new Error(error.message));
+        return;
+      }
+      resolve(stored || {});
+    });
+  });
+}
+
+function setLocalStorage(items: Record<string, unknown>): Promise<void> {
+  return new Promise((resolve, reject) => {
+    chrome.storage.local.set(items, () => {
+      const error = chrome.runtime.lastError;
+      if (error) {
+        reject(new Error(error.message));
+        return;
+      }
+      resolve();
+    });
+  });
+}
+
+function removeLocalStorage(keys: string | string[]): Promise<void> {
+  return new Promise((resolve, reject) => {
+    chrome.storage.local.remove(keys, () => {
+      const error = chrome.runtime.lastError;
+      if (error) {
+        reject(new Error(error.message));
+        return;
+      }
+      resolve();
+    });
+  });
 }
 
 async function getRemotePlaygroundProfileWins(userId: string): Promise<number> {

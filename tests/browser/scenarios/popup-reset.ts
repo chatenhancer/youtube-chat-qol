@@ -50,18 +50,19 @@ async function openInboxPanel(chat: ChatSurface): Promise<void> {
 async function resetExtensionFromPopup(context: BrowserContext): Promise<void> {
   await test.step('Confirm popup reset', async () => {
     const popup = await openExtensionPopup(context);
-    const dialogMessages: string[] = [];
-    popup.on('dialog', async (dialog) => {
-      dialogMessages.push(dialog.message());
-      await dialog.accept();
-    });
 
     try {
       await popup.locator('#resetExtension').click();
-      await expect.poll(() => dialogMessages.length, {
-        message: 'Reset should show confirmation and completion dialogs.',
-        timeout: 10_000
-      }).toBeGreaterThanOrEqual(2);
+      await expect(popup.locator('.popup-reset-dialog-message')).toBeVisible();
+      await expect(popup.locator('.popup-reset-dialog-list li')).toHaveCount(8);
+      await popup.locator('.popup-reset-dialog-backdrop').click({ position: { x: 2, y: 2 } });
+      await expect(popup.locator('.popup-reset-dialog-backdrop')).toHaveCount(0);
+
+      await popup.locator('#resetExtension').click();
+      await expect(popup.locator('.popup-reset-dialog-message')).toBeVisible();
+      await expect(popup.locator('.popup-reset-dialog-list li')).toHaveCount(8);
+      await popup.locator('.popup-reset-dialog-confirm').click();
+      await expect(popup.locator('.popup-reset-dialog-close')).toBeVisible();
     } finally {
       await popup.close();
     }

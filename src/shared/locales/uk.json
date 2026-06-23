@@ -272,6 +272,9 @@
     "gamesUnavailableNoticeTitle": "Не вдалося підключитися"
   },
   "extension": {
+    "close": {
+      "message": "Закрити"
+    },
     "extensionName": {
       "message": "Chat Enhancer for YouTube"
     },
@@ -375,7 +378,34 @@
       "message": "Вимкнено"
     },
     "popupResetConfirm": {
-      "message": "Скинути налаштування Chat Enhancer і очистити всі локальні дані розширення?\n\nЦе включає повідомлення у вхідних, відстежувані ключові слова, часті емодзі, ненадіслані чернетки, користувачів у закладках."
+      "message": "Скинути налаштування Chat Enhancer і очистити всі локальні дані розширення?"
+    },
+    "popupResetConfirmIncludes": {
+      "message": "Сюди входять:"
+    },
+    "popupResetItemSettings": {
+      "message": "Налаштування розширення"
+    },
+    "popupResetItemInboxMessages": {
+      "message": "Повідомлення у вхідних"
+    },
+    "popupResetItemWatchedKeywords": {
+      "message": "Відстежувані ключові слова"
+    },
+    "popupResetItemFrequentEmojis": {
+      "message": "Часто використовувані емодзі"
+    },
+    "popupResetItemUnsentDrafts": {
+      "message": "Ненадіслані чернетки"
+    },
+    "popupResetItemBookmarkedUsers": {
+      "message": "Користувачі в закладках"
+    },
+    "popupResetItemPlaygroundIdentity": {
+      "message": "Ідентичність і відображуване ім’я Playground"
+    },
+    "popupResetItemGamePreferences": {
+      "message": "Налаштування звуку ігор"
     },
     "popupResetComplete": {
       "message": "Chat Enhancer скинуто."

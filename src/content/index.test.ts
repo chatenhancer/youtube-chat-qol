@@ -14,7 +14,8 @@ const lifecycleMocks = vi.hoisted(() => ({
   recoverVisibleFeatures: vi.fn(),
   resetFeatures: vi.fn(),
   shouldIgnoreFeatureAddedNode: vi.fn(() => false),
-  shouldIgnoreFeatureMutation: vi.fn(() => false)
+  shouldIgnoreFeatureMutation: vi.fn(() => false),
+  suspendFeatures: vi.fn()
 }));
 
 const messageDataMocks = vi.hoisted(() => ({
@@ -27,6 +28,8 @@ vi.mock('../youtube/message-data', () => messageDataMocks);
 
 describe('content script entrypoint wiring', () => {
   let observerCallback: MutationCallback | null = null;
+  let observerCallbacks: MutationCallback[];
+  let observerDisconnects: ReturnType<typeof vi.fn>[];
   let observe: ReturnType<typeof vi.fn>;
   let visibilityListener: (() => void) | null = null;
 
@@ -38,6 +41,8 @@ describe('content script entrypoint wiring', () => {
     vi.clearAllMocks();
     observe = vi.fn();
     observerCallback = null;
+    observerCallbacks = [];
+    observerDisconnects = [];
     visibilityListener = null;
     const originalAddEventListener = document.addEventListener.bind(document);
     vi.spyOn(document, 'addEventListener').mockImplementation((type, listener, options) => {
@@ -50,10 +55,12 @@ describe('content script entrypoint wiring', () => {
     class MutationObserverMock {
       constructor(callback: MutationCallback) {
         observerCallback = callback;
+        observerCallbacks.push(callback);
+        observerDisconnects.push(this.disconnect);
       }
 
       observe = observe;
-      disconnect = vi.fn();
+      disconnect = vi.fn(() => undefined);
       takeRecords = vi.fn(() => []);
     }
     Object.defineProperty(globalThis, 'MutationObserver', {
@@ -197,7 +204,61 @@ describe('content script entrypoint wiring', () => {
 
     const batch = lifecycleMocks.handleFeatureMutations.mock.calls[0][0] as FeatureMutationBatch;
     expect(batch.addedElements).toEqual([]);
+    expect(batch.mutations).toEqual([]);
     expect('changedMessages' in batch).toBe(false);
+  });
+
+  it('filters extension-only childList mutations from the feature batch', async () => {
+    await import('./index');
+    const header = document.createElement('yt-live-chat-header-renderer');
+    const managedButton = document.createElement('button');
+    managedButton.setAttribute('data-ytcq-managed', 'true');
+    document.body.append(header);
+
+    observerCallback?.([
+      mutation({
+        addedNodes: [managedButton],
+        target: header,
+        type: 'childList'
+      })
+    ], {} as MutationObserver);
+
+    const batch = lifecycleMocks.handleFeatureMutations.mock.calls[0][0] as FeatureMutationBatch;
+    expect(batch.addedElements).toEqual([]);
+    expect(batch.mutations).toEqual([]);
+  });
+
+  it('suspends older content script instances when a newer one claims the document', async () => {
+    await import('./index');
+    const firstObserver = observerCallbacks[0];
+    const firstDisconnect = observerDisconnects[0];
+    lifecycleMocks.suspendFeatures.mockClear();
+
+    vi.resetModules();
+    await import('./index');
+
+    expect(firstDisconnect).toHaveBeenCalledOnce();
+    expect(lifecycleMocks.suspendFeatures).toHaveBeenCalledOnce();
+    expect(observerCallbacks).toHaveLength(2);
+
+    lifecycleMocks.handleFeatureMutations.mockClear();
+    firstObserver?.([
+      mutation({
+        addedNodes: [document.createElement('div')],
+        target: document.body,
+        type: 'childList'
+      })
+    ], {} as MutationObserver);
+    expect(lifecycleMocks.handleFeatureMutations).not.toHaveBeenCalled();
+
+    observerCallbacks[1]?.([
+      mutation({
+        addedNodes: [document.createElement('div')],
+        target: document.body,
+        type: 'childList'
+      })
+    ], {} as MutationObserver);
+    expect(lifecycleMocks.handleFeatureMutations).toHaveBeenCalledOnce();
   });
 
   it('recovers visible messages after the tab returns to the foreground', async () => {
@@ -324,11 +385,13 @@ function createMessage(): HTMLElement {
 function mutation({
   addedNodes,
   attributeName,
+  removedNodes,
   target,
   type
 }: {
   addedNodes?: Node[];
   attributeName?: string;
+  removedNodes?: Node[];
   target: Node;
   type: MutationRecordType;
 }): MutationRecord {
@@ -339,7 +402,7 @@ function mutation({
     nextSibling: null,
     oldValue: null,
     previousSibling: null,
-    removedNodes: [] as unknown as NodeList,
+    removedNodes: (removedNodes || []) as unknown as NodeList,
     target,
     type
   };

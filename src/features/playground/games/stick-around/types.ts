@@ -29,6 +29,8 @@ export interface StickAroundAnimationFrame {
 
 export interface StickAroundAssets {
   animations: Record<string, StickAroundAnimationFrame[]>;
+  darkLogo: HTMLImageElement | null;
+  darkSpritesheet: HTMLImageElement | null;
   fontsReady: boolean;
   logo: HTMLImageElement | null;
   spritesheet: HTMLImageElement | null;

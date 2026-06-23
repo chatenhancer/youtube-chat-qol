@@ -272,6 +272,9 @@
     "gamesUnavailableNoticeTitle": "接続できません"
   },
   "extension": {
+    "close": {
+      "message": "閉じる"
+    },
     "extensionName": {
       "message": "Chat Enhancer for YouTube",
       "description": "公開される拡張機能名。"
@@ -378,7 +381,34 @@
       "message": "オフ"
     },
     "popupResetConfirm": {
-      "message": "Chat Enhancer の設定をリセットし、ローカルの拡張機能データをすべて削除しますか？\n\nこれには、受信箱のメッセージ、監視中のキーワード、よく使う絵文字、未送信の下書き、ブックマークしたユーザーが含まれます。"
+      "message": "Chat Enhancer の設定をリセットし、ローカルの拡張機能データをすべて削除しますか？"
+    },
+    "popupResetConfirmIncludes": {
+      "message": "含まれるもの:"
+    },
+    "popupResetItemSettings": {
+      "message": "拡張機能の設定"
+    },
+    "popupResetItemInboxMessages": {
+      "message": "受信箱のメッセージ"
+    },
+    "popupResetItemWatchedKeywords": {
+      "message": "監視中のキーワード"
+    },
+    "popupResetItemFrequentEmojis": {
+      "message": "よく使う絵文字"
+    },
+    "popupResetItemUnsentDrafts": {
+      "message": "未送信の下書き"
+    },
+    "popupResetItemBookmarkedUsers": {
+      "message": "ブックマークしたユーザー"
+    },
+    "popupResetItemPlaygroundIdentity": {
+      "message": "Playground の ID と表示名"
+    },
+    "popupResetItemGamePreferences": {
+      "message": "ゲーム音の設定"
     },
     "popupResetComplete": {
       "message": "Chat Enhancer がリセットされました。"

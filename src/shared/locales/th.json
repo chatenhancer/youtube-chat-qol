@@ -272,6 +272,9 @@
     "gamesUnavailableNoticeTitle": "ไม่สามารถเชื่อมต่อได้"
   },
   "extension": {
+    "close": {
+      "message": "ปิด"
+    },
     "extensionName": {
       "message": "Chat Enhancer for YouTube"
     },
@@ -375,7 +378,34 @@
       "message": "ปิด"
     },
     "popupResetConfirm": {
-      "message": "รีเซ็ตการตั้งค่า Chat Enhancer และล้างข้อมูลส่วนขยายในเครื่องทั้งหมดหรือไม่?\n\nซึ่งรวมถึงข้อความในกล่องข้อความ คำสำคัญที่ติดตาม อีโมจิที่ใช้บ่อย แบบร่างที่ยังไม่ได้ส่ง ผู้ใช้ที่บุ๊กมาร์กไว้"
+      "message": "รีเซ็ตการตั้งค่า Chat Enhancer และล้างข้อมูลส่วนขยายในเครื่องทั้งหมดหรือไม่"
+    },
+    "popupResetConfirmIncludes": {
+      "message": "ซึ่งรวมถึง:"
+    },
+    "popupResetItemSettings": {
+      "message": "การตั้งค่าส่วนขยาย"
+    },
+    "popupResetItemInboxMessages": {
+      "message": "ข้อความในกล่องขาเข้า"
+    },
+    "popupResetItemWatchedKeywords": {
+      "message": "คีย์เวิร์ดที่เฝ้าดู"
+    },
+    "popupResetItemFrequentEmojis": {
+      "message": "อีโมจิที่ใช้บ่อย"
+    },
+    "popupResetItemUnsentDrafts": {
+      "message": "ฉบับร่างที่ยังไม่ได้ส่ง"
+    },
+    "popupResetItemBookmarkedUsers": {
+      "message": "ผู้ใช้ที่บุ๊กมาร์กไว้"
+    },
+    "popupResetItemPlaygroundIdentity": {
+      "message": "ตัวตนและชื่อที่แสดงของ Playground"
+    },
+    "popupResetItemGamePreferences": {
+      "message": "การตั้งค่าเสียงของเกม"
     },
     "popupResetComplete": {
       "message": "รีเซ็ต Chat Enhancer แล้ว"

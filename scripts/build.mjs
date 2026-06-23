@@ -19,7 +19,8 @@ const extensionAssetsDir = path.join(root, 'src', 'assets');
 const targetOutputDirs = {
   chrome: path.join(root, 'dist', 'extension-chrome'),
   edge: path.join(root, 'dist', 'extension-edge'),
-  firefox: path.join(root, 'dist', 'extension-firefox')
+  firefox: path.join(root, 'dist', 'extension-firefox'),
+  safari: path.join(root, 'dist', 'extension-safari')
 };
 const targets = getRequestedTargets();
 const playgroundBackendOrigin = getPlaygroundBackendOrigin();
@@ -36,11 +37,22 @@ const sharedBuildOptions = {
   legalComments: 'none',
   minify: true,
   logLevel: 'info',
-  sourcemap: false,
-  define: {
-    'globalThis.YTCQ_PLAYGROUND_BACKEND_ORIGIN': JSON.stringify(playgroundBackendOrigin)
-  }
+  sourcemap: false
 };
+
+const sharedDefines = {
+  'globalThis.YTCQ_PLAYGROUND_BACKEND_ORIGIN': JSON.stringify(playgroundBackendOrigin)
+};
+
+function getBuildOptions(target) {
+  return {
+    ...sharedBuildOptions,
+    define: {
+      ...sharedDefines,
+      'globalThis.YTCQ_INJECT_MESSAGE_DATA_PAGE': JSON.stringify(target === 'safari')
+    }
+  };
+}
 
 for (const target of targets) {
   await buildTarget(target);
@@ -55,25 +67,25 @@ async function buildTarget(target) {
 
   await Promise.all([
     build({
-      ...sharedBuildOptions,
+      ...getBuildOptions(target),
       entryPoints: [path.join(root, 'src', 'content', 'index.ts')],
       outfile: path.join(extensionDir, 'content.js'),
       format: 'iife'
     }),
     build({
-      ...sharedBuildOptions,
+      ...getBuildOptions(target),
       entryPoints: [path.join(root, 'src', 'youtube', 'message-data-page.ts')],
       outfile: path.join(extensionDir, 'message-data-page.js'),
       format: 'iife'
     }),
     build({
-      ...sharedBuildOptions,
+      ...getBuildOptions(target),
       entryPoints: [path.join(root, 'src', 'background', 'index.ts')],
       outfile: path.join(extensionDir, 'background.js'),
       format: 'iife'
     }),
     build({
-      ...sharedBuildOptions,
+      ...getBuildOptions(target),
       entryPoints: [path.join(root, 'src', 'popup', 'index.ts')],
       outfile: path.join(extensionDir, 'popup.js'),
       format: 'iife'
@@ -118,8 +130,8 @@ function createManifest(target) {
     if (script.css) script.css = script.css.map(stripBuildPrefix);
   }
 
-  if (isLocalPlaygroundBackendOrigin(playgroundBackendOrigin)) {
-    const localPlaygroundSocketOrigin = getSocketOrigin(playgroundBackendOrigin);
+  const usesLocalPlaygroundBackend = isLocalPlaygroundBackendOrigin(playgroundBackendOrigin);
+  if (usesLocalPlaygroundBackend) {
     manifest.host_permissions = [
       ...new Set([
         ...(manifest.host_permissions || []),
@@ -127,20 +139,40 @@ function createManifest(target) {
         'http://localhost/*'
       ])
     ];
-    manifest.content_security_policy = {
-      extension_pages: [
-        "script-src 'self'",
-        "object-src 'self'",
-        [
-          "connect-src 'self'",
-          'https://translate.googleapis.com',
-          'https://playground.chatenhancer.com',
-          'wss://playground.chatenhancer.com',
-          playgroundBackendOrigin,
-          localPlaygroundSocketOrigin
-        ].join(' ')
-      ].join('; ')
-    };
+  }
+
+  if (target === 'safari') {
+    manifest.permissions = [
+      ...new Set([
+        ...(manifest.permissions || []),
+        'activeTab',
+        'tabs'
+      ])
+    ];
+    manifest.host_permissions = [
+      ...new Set([
+        ...(manifest.host_permissions || []),
+        'https://www.youtube.com/*',
+        'https://studio.youtube.com/*',
+        'wss://playground.chatenhancer.com/*'
+      ])
+    ];
+    removeMainWorldContentScripts(manifest);
+    addSafariMessageDataPageResource(manifest);
+    useSafariPersistentBackground(manifest);
+  }
+
+  if (target === 'safari' || usesLocalPlaygroundBackend) {
+    const connectSources = [
+      "'self'",
+      'https://translate.googleapis.com',
+      'https://playground.chatenhancer.com',
+      'wss://playground.chatenhancer.com'
+    ];
+    if (usesLocalPlaygroundBackend) {
+      connectSources.push(playgroundBackendOrigin, getSocketOrigin(playgroundBackendOrigin));
+    }
+    setExtensionPageContentSecurityPolicy(manifest, connectSources);
   }
 
   if (target === 'firefox') {
@@ -163,6 +195,75 @@ function createManifest(target) {
 
 function stripBuildPrefix(value) {
   return String(value).replace(/^dist\/extension(?:-chrome)?\//, '');
+}
+
+function removeMainWorldContentScripts(manifest) {
+  manifest.content_scripts = (manifest.content_scripts || []).filter((script) => {
+    if (script.world !== 'MAIN') return true;
+    return false;
+  });
+}
+
+function addSafariMessageDataPageResource(manifest) {
+  const resources = manifest.web_accessible_resources || [];
+  const entry = resources.find((candidate) =>
+    Array.isArray(candidate.resources) &&
+    Array.isArray(candidate.matches) &&
+    candidate.matches.includes('https://www.youtube.com/*')
+  );
+  if (entry) {
+    entry.resources = [...new Set([...entry.resources, 'message-data-page.js'])];
+    return;
+  }
+  resources.push({
+    resources: ['message-data-page.js'],
+    matches: [
+      'https://www.youtube.com/*',
+      'https://studio.youtube.com/*'
+    ]
+  });
+  manifest.web_accessible_resources = resources;
+}
+
+function useSafariPersistentBackground(manifest) {
+  const hostPermissions = manifest.host_permissions || [];
+  manifest.manifest_version = 2;
+  manifest.background = {
+    persistent: true,
+    scripts: [manifest.background.service_worker]
+  };
+  manifest.browser_action = manifest.action;
+  delete manifest.action;
+  manifest.permissions = [
+    ...new Set([
+      ...(manifest.permissions || []),
+      ...hostPermissions
+    ])
+  ];
+  delete manifest.host_permissions;
+  if (Array.isArray(manifest.web_accessible_resources)) {
+    manifest.web_accessible_resources = [
+      ...new Set(manifest.web_accessible_resources.flatMap((entry) =>
+        Array.isArray(entry.resources) ? entry.resources : entry
+      ))
+    ];
+  }
+}
+
+function setExtensionPageContentSecurityPolicy(manifest, connectSources) {
+  const policy = [
+    "script-src 'self'",
+    "object-src 'self'",
+    `connect-src ${[...new Set(connectSources)].join(' ')}`
+  ].join('; ');
+  if (manifest.manifest_version === 2) {
+    manifest.content_security_policy = policy;
+    return;
+  }
+
+  manifest.content_security_policy = {
+    extension_pages: policy
+  };
 }
 
 function copyStaticDirectory(source, destination) {

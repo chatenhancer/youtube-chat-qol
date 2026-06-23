@@ -272,6 +272,9 @@
     "gamesUnavailableNoticeTitle": "Kan geen verbinding maken"
   },
   "extension": {
+    "close": {
+      "message": "Sluiten"
+    },
     "extensionName": {
       "message": "Chat Enhancer for YouTube"
     },
@@ -375,7 +378,34 @@
       "message": "Uit"
     },
     "popupResetConfirm": {
-      "message": "Chat Enhancer-instellingen resetten en alle lokale extensiegegevens wissen?\n\nDit omvat inboxberichten, gevolgde trefwoorden, veelgebruikte emoji’s, niet-verzonden concepten, gebruikers met bladwijzer."
+      "message": "Chat Enhancer-instellingen resetten en alle lokale extensiegegevens wissen?"
+    },
+    "popupResetConfirmIncludes": {
+      "message": "Dit omvat:"
+    },
+    "popupResetItemSettings": {
+      "message": "Extensie-instellingen"
+    },
+    "popupResetItemInboxMessages": {
+      "message": "Inboxberichten"
+    },
+    "popupResetItemWatchedKeywords": {
+      "message": "Gevolgde trefwoorden"
+    },
+    "popupResetItemFrequentEmojis": {
+      "message": "Veelgebruikte emoji"
+    },
+    "popupResetItemUnsentDrafts": {
+      "message": "Niet-verzonden concepten"
+    },
+    "popupResetItemBookmarkedUsers": {
+      "message": "Gebookmarkte gebruikers"
+    },
+    "popupResetItemPlaygroundIdentity": {
+      "message": "Playground-identiteit en weergavenaam"
+    },
+    "popupResetItemGamePreferences": {
+      "message": "Voorkeur voor gamegeluid"
     },
     "popupResetComplete": {
       "message": "Chat Enhancer is gereset."

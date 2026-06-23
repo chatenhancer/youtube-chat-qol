@@ -272,6 +272,9 @@
     "gamesUnavailableNoticeTitle": "無法連線"
   },
   "extension": {
+    "close": {
+      "message": "關閉"
+    },
     "extensionName": {
       "message": "Chat Enhancer for YouTube"
     },
@@ -375,7 +378,34 @@
       "message": "關閉"
     },
     "popupResetConfirm": {
-      "message": "要重設 Chat Enhancer 設定並清除所有本機擴充功能資料嗎？\n\n這包括收件匣訊息、追蹤的關鍵字、常用表情符號、未送出的草稿、已加入書籤的使用者。"
+      "message": "要重設 Chat Enhancer 設定並清除所有本機擴充功能資料嗎？"
+    },
+    "popupResetConfirmIncludes": {
+      "message": "包括："
+    },
+    "popupResetItemSettings": {
+      "message": "擴充功能設定"
+    },
+    "popupResetItemInboxMessages": {
+      "message": "收件匣訊息"
+    },
+    "popupResetItemWatchedKeywords": {
+      "message": "監看的關鍵字"
+    },
+    "popupResetItemFrequentEmojis": {
+      "message": "常用表情符號"
+    },
+    "popupResetItemUnsentDrafts": {
+      "message": "未送出的草稿"
+    },
+    "popupResetItemBookmarkedUsers": {
+      "message": "已加入書籤的使用者"
+    },
+    "popupResetItemPlaygroundIdentity": {
+      "message": "Playground 身分與顯示名稱"
+    },
+    "popupResetItemGamePreferences": {
+      "message": "遊戲音效偏好"
     },
     "popupResetComplete": {
       "message": "Chat Enhancer 已重設。"

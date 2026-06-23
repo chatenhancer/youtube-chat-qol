@@ -16,6 +16,9 @@ const syncStorageArea = createStorageArea();
 
 const chromeMock = {
   action: {
+    getTitle: vi.fn((_details: unknown, callback?: (title: string) => void) => {
+      callback?.('');
+    }),
     setIcon: vi.fn((_details: unknown, callback?: () => void) => {
       callback?.();
     }),
@@ -25,6 +28,7 @@ const chromeMock = {
   },
   i18n: {
     getMessage: vi.fn((key: string, substitutions?: string | string[]) => {
+      if (key === 'close') return 'Close';
       const suffix = Array.isArray(substitutions) ? substitutions.join(',') : substitutions || '';
       return suffix ? `${key}:${suffix}` : key;
     }),

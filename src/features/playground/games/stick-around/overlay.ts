@@ -218,6 +218,8 @@ export function openStickAroundOverlay(
   const runtime: StickAroundOverlayRuntime = {
     assets: {
       animations: {},
+      darkLogo: null,
+      darkSpritesheet: null,
       fontsReady: false,
       logo: null,
       spritesheet: null
@@ -900,7 +902,7 @@ function drawWaitingLogo(
   simulation: StickAroundSimulation,
   fighterColor: string
 ): number {
-  const logo = assets.logo;
+  const logo = getThemedStickAroundLogo(assets, fighterColor);
   if (!logo) {
     context.fillStyle = fighterColor;
     context.font = `700 24px ${STICK_AROUND_FONT_STACK}`;
@@ -918,9 +920,6 @@ function drawWaitingLogo(
   const height = Math.round(logo.naturalHeight * scale);
   context.save();
   context.globalAlpha = 0.92;
-  if (fighterColor === '#ffffff') {
-    context.filter = 'invert(1) hue-rotate(180deg) contrast(1.08) brightness(1.18)';
-  }
   context.drawImage(
     logo,
     Math.round((simulation.width - width) / 2),
@@ -930,6 +929,10 @@ function drawWaitingLogo(
   );
   context.restore();
   return Math.round((simulation.height - height) / 2) + height;
+}
+
+function getThemedStickAroundLogo(assets: StickAroundAssets, fighterColor: string): HTMLImageElement | null {
+  return fighterColor === '#ffffff' ? assets.darkLogo : assets.logo;
 }
 
 function drawReadyButton(
@@ -1009,40 +1012,56 @@ function drawFighter(
   const frame = selectAnimationFrame(assets.animations[animation] || assets.animations.idle, now);
   const drawX = Math.round(fighter.x + 15 - SPRITE_DRAW_SIZE / 2);
   const drawY = Math.round(fighter.y + STICK_AROUND_FIGHTER_HEIGHT - SPRITE_DRAW_SIZE);
-  if (assets.spritesheet && frame) {
+  const spritesheet = getThemedStickAroundSpritesheet(assets, color);
+  if (spritesheet && frame) {
     context.save();
-    context.filter = color === '#ffffff' ? 'brightness(0) invert(1)' : 'brightness(0)';
     if (fighter.facing < 0) {
       context.translate(drawX + SPRITE_DRAW_SIZE, drawY);
       context.scale(-1, 1);
-      context.drawImage(
-        assets.spritesheet,
-        frame.frame.x,
-        frame.frame.y,
-        frame.frame.w,
-        frame.frame.h,
-        0,
-        0,
-        SPRITE_DRAW_SIZE,
-        SPRITE_DRAW_SIZE
-      );
+      drawStickAroundSpriteFrame(context, spritesheet, frame, 0, 0);
     } else {
-      context.drawImage(
-        assets.spritesheet,
-        frame.frame.x,
-        frame.frame.y,
-        frame.frame.w,
-        frame.frame.h,
-        drawX,
-        drawY,
-        SPRITE_DRAW_SIZE,
-        SPRITE_DRAW_SIZE
-      );
+      drawStickAroundSpriteFrame(context, spritesheet, frame, drawX, drawY);
     }
     context.restore();
   } else {
     drawFallbackFighter(context, fighter, color);
   }
+}
+
+function getThemedStickAroundSpritesheet(assets: StickAroundAssets, color: string): HTMLImageElement | null {
+  return color === '#ffffff' ? assets.darkSpritesheet : assets.spritesheet;
+}
+
+function drawStickAroundSpriteFrame(
+  context: CanvasRenderingContext2D,
+  spritesheet: HTMLImageElement,
+  frame: StickAroundAnimationFrame,
+  x: number,
+  y: number
+): void {
+  const source = {
+    height: frame.frame.h,
+    width: frame.frame.w,
+    x: frame.frame.x,
+    y: frame.frame.y
+  };
+  const destination = {
+    height: SPRITE_DRAW_SIZE,
+    width: SPRITE_DRAW_SIZE,
+    x,
+    y
+  };
+  context.drawImage(
+    spritesheet,
+    source.x,
+    source.y,
+    source.width,
+    source.height,
+    destination.x,
+    destination.y,
+    destination.width,
+    destination.height
+  );
 }
 
 function drawFallbackFighter(
@@ -1237,6 +1256,9 @@ function getStickAroundFighterColor(theme: StickAroundOverlayTheme): '#111111' |
 }
 
 function getStickAroundOverlayTheme(surface: HTMLElement): StickAroundOverlayTheme {
+  if (document.documentElement.hasAttribute('dark')) return 'dark';
+  if (document.documentElement.hasAttribute('light')) return 'light';
+
   const surfaceStyle = getComputedStyle(surface);
   const bodyStyle = getComputedStyle(document.body);
   const textColor = surfaceStyle.getPropertyValue('--yt-spec-text-primary') ||

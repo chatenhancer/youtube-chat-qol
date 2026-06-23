@@ -272,6 +272,9 @@
     "gamesUnavailableNoticeTitle": "לא ניתן להתחבר"
   },
   "extension": {
+    "close": {
+      "message": "סגירה"
+    },
     "extensionName": {
       "message": "Chat Enhancer for YouTube"
     },
@@ -375,7 +378,34 @@
       "message": "כבוי"
     },
     "popupResetConfirm": {
-      "message": "לאפס את הגדרות Chat Enhancer ולמחוק את כל הנתונים המקומיים של התוסף?\n\nזה כולל הודעות בתיבה, מילות מפתח במעקב, אימוג׳ים נפוצים, טיוטות שלא נשלחו, משתמשים שנוספו לסימניות."
+      "message": "האם לאפס את הגדרות Chat Enhancer ולמחוק את כל נתוני התוסף המקומיים?"
+    },
+    "popupResetConfirmIncludes": {
+      "message": "זה כולל:"
+    },
+    "popupResetItemSettings": {
+      "message": "הגדרות התוסף"
+    },
+    "popupResetItemInboxMessages": {
+      "message": "הודעות בתיבת הדואר הנכנס"
+    },
+    "popupResetItemWatchedKeywords": {
+      "message": "מילות מפתח במעקב"
+    },
+    "popupResetItemFrequentEmojis": {
+      "message": "אמוג'ים בשימוש תכוף"
+    },
+    "popupResetItemUnsentDrafts": {
+      "message": "טיוטות שלא נשלחו"
+    },
+    "popupResetItemBookmarkedUsers": {
+      "message": "משתמשים שסומנו בסימנייה"
+    },
+    "popupResetItemPlaygroundIdentity": {
+      "message": "זהות ושם תצוגה של Playground"
+    },
+    "popupResetItemGamePreferences": {
+      "message": "העדפת צליל משחקים"
     },
     "popupResetComplete": {
       "message": "Chat Enhancer אופס."

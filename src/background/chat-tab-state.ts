@@ -4,6 +4,8 @@
  * An active tab record means a content script is currently connected to this
  * service worker.
  */
+import { getExtensionAction, isBrowserActionOnly } from '../shared/extension-action';
+
 const ACTIVE_ICON_PATHS: Record<string, string> = {
   '16': 'icons/icon-16.png',
   '32': 'icons/icon-32.png',
@@ -43,14 +45,21 @@ export function getActiveChatTabIds(): number[] {
 }
 
 function setActionStatus(tabId: number, active: boolean): void {
-  chrome.action.setIcon({
+  const action = getExtensionAction();
+  const path = active ? ACTIVE_ICON_PATHS : INACTIVE_ICON_PATHS;
+  const title = active ? ACTIVE_TITLE : DEFAULT_TITLE;
+  action.setIcon({
     tabId,
-    path: active ? ACTIVE_ICON_PATHS : INACTIVE_ICON_PATHS
+    path
   }, consumeRuntimeError);
-  chrome.action.setTitle({
+  action.setTitle({
     tabId,
-    title: active ? ACTIVE_TITLE : DEFAULT_TITLE
+    title
   }, consumeRuntimeError);
+  if (isBrowserActionOnly()) {
+    action.setIcon({ path }, consumeRuntimeError);
+    action.setTitle({ title }, consumeRuntimeError);
+  }
 }
 
 function consumeRuntimeError(): void {

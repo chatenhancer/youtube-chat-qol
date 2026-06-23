@@ -272,6 +272,9 @@
     "gamesUnavailableNoticeTitle": "Không thể kết nối"
   },
   "extension": {
+    "close": {
+      "message": "Đóng"
+    },
     "extensionName": {
       "message": "Chat Enhancer for YouTube"
     },
@@ -375,7 +378,34 @@
       "message": "Tắt"
     },
     "popupResetConfirm": {
-      "message": "Đặt lại cài đặt Chat Enhancer và xóa toàn bộ dữ liệu tiện ích cục bộ?\n\nBao gồm tin nhắn trong hộp thư, từ khóa đang theo dõi, emoji thường dùng, bản nháp chưa gửi, người dùng đã lưu dấu trang."
+      "message": "Đặt lại cài đặt Chat Enhancer và xóa toàn bộ dữ liệu tiện ích cục bộ?"
+    },
+    "popupResetConfirmIncludes": {
+      "message": "Bao gồm:"
+    },
+    "popupResetItemSettings": {
+      "message": "Cài đặt tiện ích"
+    },
+    "popupResetItemInboxMessages": {
+      "message": "Tin nhắn hộp thư"
+    },
+    "popupResetItemWatchedKeywords": {
+      "message": "Từ khóa đang theo dõi"
+    },
+    "popupResetItemFrequentEmojis": {
+      "message": "Emoji thường dùng"
+    },
+    "popupResetItemUnsentDrafts": {
+      "message": "Bản nháp chưa gửi"
+    },
+    "popupResetItemBookmarkedUsers": {
+      "message": "Người dùng đã đánh dấu"
+    },
+    "popupResetItemPlaygroundIdentity": {
+      "message": "Danh tính và tên hiển thị Playground"
+    },
+    "popupResetItemGamePreferences": {
+      "message": "Tùy chọn âm thanh trò chơi"
     },
     "popupResetComplete": {
       "message": "Chat Enhancer đã được đặt lại."

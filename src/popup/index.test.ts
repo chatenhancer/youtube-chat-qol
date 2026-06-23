@@ -66,6 +66,11 @@ describe('popup', () => {
     `;
     await chrome.storage.local.clear();
     await chrome.storage.sync.clear();
+    vi.mocked(chrome.action.getTitle).mockReset();
+    vi.mocked(chrome.action.getTitle).mockImplementation(((_details: chrome.action.TabDetails, callback?: (title: string) => void) => {
+      callback?.('');
+      return Promise.resolve('');
+    }) as never);
     vi.mocked(chrome.tabs.create).mockClear();
     vi.mocked(chrome.tabs.sendMessage).mockClear();
     vi.mocked(chrome.storage.local.clear).mockClear();
@@ -126,6 +131,52 @@ describe('popup', () => {
       'extensionStatusInactiveAll. extensionStatusDisconnected'
     );
     expect(document.querySelector('[data-extension-status-text]')?.textContent).toBe('extensionStatusInactiveAll');
+  });
+
+  it('uses the tab action title when Safari does not deliver popup messages to the live chat frame', async () => {
+    vi.mocked(chrome.tabs.query).mockImplementation(((queryInfo: chrome.tabs.QueryInfo, callback?: (tabs: chrome.tabs.Tab[]) => void) => {
+      const tabs = queryInfo.active ? [{ id: 10 } as chrome.tabs.Tab] : [];
+      callback?.(tabs);
+      return Promise.resolve(tabs);
+    }) as never);
+    vi.mocked(chrome.tabs.sendMessage).mockImplementation(((_tabId: number, _message: unknown, callback?: (response: unknown) => void) => {
+      callback?.(undefined);
+      return Promise.resolve();
+    }) as never);
+    vi.mocked(chrome.action.getTitle).mockImplementation(((_details: chrome.action.TabDetails, callback?: (title: string) => void) => {
+      callback?.('extensionActiveTitle');
+      return Promise.resolve('extensionActiveTitle');
+    }) as never);
+
+    await import('./index');
+
+    expect(chrome.action.getTitle).toHaveBeenCalledWith({ tabId: 10 }, expect.any(Function));
+    expect(document.querySelector('[data-extension-status]')?.getAttribute('data-extension-status')).toBe('active');
+    expect(document.querySelector('[data-extension-status-text]')?.textContent).toBe('extensionStatusActiveCurrent');
+  });
+
+  it('uses the global action title when Safari does not return a tab action title', async () => {
+    vi.mocked(chrome.tabs.query).mockImplementation(((queryInfo: chrome.tabs.QueryInfo, callback?: (tabs: chrome.tabs.Tab[]) => void) => {
+      const tabs = queryInfo.active ? [{ id: 10 } as chrome.tabs.Tab] : [];
+      callback?.(tabs);
+      return Promise.resolve(tabs);
+    }) as never);
+    vi.mocked(chrome.tabs.sendMessage).mockImplementation(((_tabId: number, _message: unknown, callback?: (response: unknown) => void) => {
+      callback?.(undefined);
+      return Promise.resolve();
+    }) as never);
+    vi.mocked(chrome.action.getTitle).mockImplementation(((details: chrome.action.TabDetails, callback?: (title: string) => void) => {
+      const title = typeof details.tabId === 'number' ? '' : 'extensionActiveTitle';
+      callback?.(title);
+      return Promise.resolve(title);
+    }) as never);
+
+    await import('./index');
+
+    expect(chrome.action.getTitle).toHaveBeenCalledWith({ tabId: 10 }, expect.any(Function));
+    expect(chrome.action.getTitle).toHaveBeenCalledWith({}, expect.any(Function));
+    expect(document.querySelector('[data-extension-status]')?.getAttribute('data-extension-status')).toBe('active');
+    expect(document.querySelector('[data-extension-status-text]')?.textContent).toBe('extensionStatusActiveCurrent');
   });
 
   it('only checks the current tab for liveness', async () => {
@@ -503,7 +554,7 @@ describe('popup', () => {
     expect(document.querySelector('[data-i18n="translation"]')?.textContent).toBe('translation');
     expect(document.querySelector('[data-i18n="playgroundProfileHelper"]')?.textContent).toBe('playgroundProfileHelper');
     expect(document.querySelector('[data-i18n-title="openChannel"]')?.getAttribute('title')).toBe('openChannel');
-    expect(document.querySelector('[data-i18n-aria-label="close"]')?.getAttribute('aria-label')).toBe('close');
+    expect(document.querySelector('[data-i18n-aria-label="close"]')?.getAttribute('aria-label')).toBe('Close');
     expect(document.querySelector('[data-i18n=""]')?.textContent).toBe('unchanged text');
     expect(document.querySelector('[data-i18n-title=""]')?.getAttribute('title')).toBe('unchanged title');
     expect(document.querySelector('[data-i18n-aria-label=""]')?.getAttribute('aria-label')).toBe('unchanged label');
@@ -872,7 +923,7 @@ describe('popup', () => {
     displayNamesSpy.mockRestore();
   });
 
-  it('resets extension storage, updates controls, broadcasts page reset, and alerts completion', async () => {
+  it('resets extension storage, updates controls, broadcasts page reset, and shows completion', async () => {
     vi.mocked(chrome.tabs.query).mockImplementation(((queryInfo: chrome.tabs.QueryInfo, callback?: (tabs: chrome.tabs.Tab[]) => void) => {
       const tabs = queryInfo.active
         ? [{ id: 10 } as chrome.tabs.Tab]
@@ -884,13 +935,27 @@ describe('popup', () => {
       callback?.({ activeTabIds: [] });
       return Promise.resolve({ activeTabIds: [] });
     }) as never);
-    vi.spyOn(window, 'confirm').mockReturnValue(true);
-    vi.spyOn(window, 'alert').mockImplementation(() => undefined);
-
     await import('./index');
     document.querySelector<HTMLSelectElement>('#targetLanguage')!.value = 'ja';
     document.querySelector<HTMLInputElement>('#sound')!.checked = false;
     document.querySelector<HTMLButtonElement>('#resetExtension')?.click();
+    expect(chrome.storage.local.clear).not.toHaveBeenCalled();
+    expect(document.querySelector('.popup-reset-dialog-message')?.textContent).toBe('popupResetConfirm');
+    expect(document.querySelector('.popup-reset-dialog-list-label')?.textContent).toBe('popupResetConfirmIncludes');
+    expect(Array.from(document.querySelectorAll('.popup-reset-dialog-list li')).map((item) => item.textContent)).toEqual([
+      'popupResetItemSettings',
+      'popupResetItemInboxMessages',
+      'popupResetItemWatchedKeywords',
+      'popupResetItemFrequentEmojis',
+      'popupResetItemUnsentDrafts',
+      'popupResetItemBookmarkedUsers',
+      'popupResetItemPlaygroundIdentity',
+      'popupResetItemGamePreferences'
+    ]);
+    expect(document.querySelector('.popup-reset-dialog-cancel')?.textContent).toBe('Close');
+    expect(document.querySelector('.popup-reset-dialog-confirm')?.textContent).toBe('resetExtension');
+
+    document.querySelector<HTMLButtonElement>('.popup-reset-dialog-confirm')?.click();
 
     expect(chrome.storage.local.clear).toHaveBeenCalled();
     expect(chrome.storage.sync.clear).toHaveBeenCalled();
@@ -899,9 +964,30 @@ describe('popup', () => {
       targetLanguage: ''
     }), expect.any(Function));
     expect(chrome.tabs.sendMessage).toHaveBeenCalledWith(10, { type: 'ytcq:reset-page' }, expect.any(Function));
-    expect(window.alert).toHaveBeenCalledWith('popupResetComplete');
+    expect(document.querySelector('.popup-reset-dialog-message')?.textContent).toBe('popupResetComplete');
+    expect(document.querySelector('.popup-reset-dialog-list')).toBeNull();
+    expect(document.querySelector('.popup-reset-dialog-close')?.textContent).toBe('Close');
     expect(document.querySelector<HTMLInputElement>('#sound')?.checked).toBe(true);
     expect(document.querySelector<HTMLSelectElement>('#targetLanguage')?.value).toBe('');
+  });
+
+  it('cancels the reset dialog when clicking outside it', async () => {
+    await import('./index');
+    document.querySelector<HTMLButtonElement>('#resetExtension')?.click();
+
+    const backdrop = document.querySelector<HTMLDivElement>('.popup-reset-dialog-backdrop');
+    const dialog = document.querySelector<HTMLElement>('.popup-reset-dialog');
+    expect(backdrop).not.toBeNull();
+    expect(dialog).not.toBeNull();
+
+    dialog?.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+    expect(document.querySelector('.popup-reset-dialog-backdrop')).not.toBeNull();
+
+    backdrop?.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+
+    expect(document.querySelector('.popup-reset-dialog-backdrop')).toBeNull();
+    expect(chrome.storage.local.clear).not.toHaveBeenCalled();
+    expect(chrome.storage.sync.clear).not.toHaveBeenCalled();
   });
 
   it('completes reset immediately when there are no tab ids to notify', async () => {
@@ -910,14 +996,12 @@ describe('popup', () => {
       callback?.(tabs);
       return Promise.resolve(tabs);
     }) as never);
-    vi.spyOn(window, 'confirm').mockReturnValue(true);
-    vi.spyOn(window, 'alert').mockImplementation(() => undefined);
-
     await import('./index');
     document.querySelector<HTMLButtonElement>('#resetExtension')?.click();
+    document.querySelector<HTMLButtonElement>('.popup-reset-dialog-confirm')?.click();
 
     expect(chrome.tabs.sendMessage).not.toHaveBeenCalled();
-    expect(window.alert).toHaveBeenCalledWith('popupResetComplete');
+    expect(document.querySelector('.popup-reset-dialog-message')?.textContent).toBe('popupResetComplete');
   });
 
   it('waits for every tab reset response before reporting completion', async () => {
@@ -941,20 +1025,18 @@ describe('popup', () => {
       }
       return Promise.resolve();
     }) as never);
-    vi.spyOn(window, 'confirm').mockReturnValue(true);
-    vi.spyOn(window, 'alert').mockImplementation(() => undefined);
-
     await import('./index');
     document.querySelector<HTMLButtonElement>('#resetExtension')?.click();
+    document.querySelector<HTMLButtonElement>('.popup-reset-dialog-confirm')?.click();
 
     expect(resetCallbacks).toHaveLength(2);
-    expect(window.alert).not.toHaveBeenCalled();
+    expect(document.querySelector('.popup-reset-dialog-message')?.textContent).toBe('popupResetConfirm');
 
     resetCallbacks[0]();
-    expect(window.alert).not.toHaveBeenCalled();
+    expect(document.querySelector('.popup-reset-dialog-message')?.textContent).toBe('popupResetConfirm');
 
     resetCallbacks[1]();
-    expect(window.alert).toHaveBeenCalledWith('popupResetComplete');
+    expect(document.querySelector('.popup-reset-dialog-message')?.textContent).toBe('popupResetComplete');
   });
 
   it('skips popup wiring when required controls are missing', async () => {

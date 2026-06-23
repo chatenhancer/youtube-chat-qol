@@ -526,7 +526,7 @@ yt-live-chat-header-renderer .ytcq-inbox-badge {
   border-radius: 8px;
   color: #fff;
   background: #c00;
-  font: 700 10px/16px Roboto, Arial, sans-serif;
+  font: 500 10px/16px Roboto, Arial, sans-serif;
   text-align: center;
   box-sizing: border-box;
 }
@@ -828,7 +828,7 @@ yt-live-chat-header-renderer .ytcq-inbox-badge[hidden] {
   border-radius: 999px;
   color: var(--yt-live-chat-secondary-text-color, var(--yt-spec-text-secondary, #aaa));
   background: var(--yt-spec-badge-chip-background, rgba(255, 255, 255, 0.1));
-  font: 600 9px/12px Roboto, Arial, sans-serif;
+  font: 500 9px/12px Roboto, Arial, sans-serif;
   pointer-events: none;
 }
 
@@ -1361,7 +1361,7 @@ yt-live-chat-header-renderer .ytcq-inbox-badge[hidden] {
   border-radius: 5px;
   color: var(--yt-spec-call-to-action, #3ea6ff);
   background: color-mix(in srgb, var(--yt-spec-call-to-action, #3ea6ff) 10%, transparent);
-  font: 600 9px/12px Roboto, Arial, sans-serif;
+  font: 500 9px/12px Roboto, Arial, sans-serif;
   text-transform: uppercase;
 }
 
@@ -1894,7 +1894,7 @@ yt-live-chat-header-renderer .ytcq-inbox-badge[hidden] {
   min-width: 0;
   overflow: hidden;
   color: #fff;
-  font: 600 12px/15px Roboto, Arial, sans-serif;
+  font: 500 12px/15px Roboto, Arial, sans-serif;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -1978,7 +1978,7 @@ yt-live-chat-header-renderer .ytcq-inbox-badge[hidden] {
   color: transparent;
   background: transparent;
   cursor: pointer;
-  font: 700 12px/1 Roboto, Arial, sans-serif;
+  font: 500 12px/1 Roboto, Arial, sans-serif;
   opacity: 0;
   transform: translateX(-50%);
   white-space: nowrap;

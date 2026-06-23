@@ -3,6 +3,8 @@ import type { StickAroundAnimationFrame, StickAroundAssets, StickAroundFrameRect
 export const STICK_AROUND_FONT_BYTESIZED = 'YtcqStickAroundBytesized';
 
 const ASSET_PATHS = {
+  darkLogo: 'games/stick-around/logo-dark.png',
+  darkSpritesheet: 'games/stick-around/stick_all_animations_spritesheet-dark.png',
   font: 'games/stick-around/bytesized-regular.ttf',
   logo: 'games/stick-around/logo.png',
   spritesheet: 'games/stick-around/stick_all_animations_spritesheet.png',
@@ -11,6 +13,8 @@ const ASSET_PATHS = {
 
 const EMPTY_ASSETS: StickAroundAssets = {
   animations: {},
+  darkLogo: null,
+  darkSpritesheet: null,
   fontsReady: false,
   logo: null,
   spritesheet: null
@@ -33,15 +37,19 @@ export function getStickAroundAssets(): Promise<StickAroundAssets> {
 }
 
 async function loadStickAroundAssets(): Promise<StickAroundAssets> {
-  const [fontsReady, logo, spritesheet, spritesheetData] = await Promise.allSettled([
+  const [fontsReady, logo, darkLogo, spritesheet, darkSpritesheet, spritesheetData] = await Promise.allSettled([
     loadStickAroundFonts(),
     loadStickAroundImage(chrome.runtime.getURL(ASSET_PATHS.logo)),
+    loadStickAroundImage(chrome.runtime.getURL(ASSET_PATHS.darkLogo)),
     loadStickAroundImage(chrome.runtime.getURL(ASSET_PATHS.spritesheet)),
+    loadStickAroundImage(chrome.runtime.getURL(ASSET_PATHS.darkSpritesheet)),
     loadStickAroundSpritesheetData(chrome.runtime.getURL(ASSET_PATHS.spritesheetData))
   ]);
 
   return {
     animations: getLoadedSpritesheetData(spritesheetData),
+    darkLogo: getLoadedImage(darkLogo),
+    darkSpritesheet: getLoadedImage(darkSpritesheet),
     fontsReady: fontsReady.status === 'fulfilled' ? fontsReady.value : false,
     logo: getLoadedImage(logo),
     spritesheet: getLoadedImage(spritesheet)

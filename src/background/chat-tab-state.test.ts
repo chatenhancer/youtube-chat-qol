@@ -33,6 +33,54 @@ describe('background chat tab state', () => {
     );
   });
 
+  it('mirrors action status to the global browser action for Safari MV2', async () => {
+    const runtimeChrome = chrome as unknown as {
+      action?: unknown;
+      browserAction?: unknown;
+    };
+    const originalAction = runtimeChrome.action;
+    const browserAction = {
+      getTitle: vi.fn(),
+      setIcon: vi.fn((_details: unknown, callback?: () => void) => {
+        callback?.();
+      }),
+      setTitle: vi.fn((_details: unknown, callback?: () => void) => {
+        callback?.();
+      })
+    };
+
+    runtimeChrome.action = undefined;
+    runtimeChrome.browserAction = browserAction;
+
+    try {
+      markChatTabActive(42);
+
+      expect(browserAction.setIcon).toHaveBeenCalledWith(
+        expect.objectContaining({
+          path: expect.objectContaining({ 16: 'icons/icon-16.png' }),
+          tabId: 42
+        }),
+        expect.any(Function)
+      );
+      expect(browserAction.setIcon).toHaveBeenCalledWith(
+        expect.objectContaining({
+          path: expect.objectContaining({ 16: 'icons/icon-16.png' })
+        }),
+        expect.any(Function)
+      );
+      expect(browserAction.setTitle).toHaveBeenCalledWith(
+        expect.objectContaining({
+          title: 'extensionActiveTitle'
+        }),
+        expect.any(Function)
+      );
+    } finally {
+      clearChatTab(42);
+      runtimeChrome.action = originalAction;
+      delete runtimeChrome.browserAction;
+    }
+  });
+
   it('marks chat tabs inactive and restores the gray tab action', async () => {
     markChatTabActive(42);
     markChatTabInactive(42);

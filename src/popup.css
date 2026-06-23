@@ -20,6 +20,7 @@
   --ytcq-popup-control-bg: #fff;
   --ytcq-popup-control-tint: rgba(0, 0, 0, 0.04);
   --ytcq-popup-control-border: rgba(0, 0, 0, 0.22);
+  --ytcq-popup-modal-backdrop: rgba(0, 0, 0, 0.48);
   --ytcq-popup-text: #0f0f0f;
   --ytcq-popup-secondary-text: #606060;
   --ytcq-popup-action: #065fd4;
@@ -34,6 +35,7 @@
     --ytcq-popup-control-bg: #282828;
     --ytcq-popup-control-tint: rgba(255, 255, 255, 0.06);
     --ytcq-popup-control-border: rgba(255, 255, 255, 0.24);
+    --ytcq-popup-modal-backdrop: rgba(0, 0, 0, 0.68);
     --ytcq-popup-text: #f1f1f1;
     --ytcq-popup-secondary-text: #aaa;
     --ytcq-popup-action: #3ea6ff;
@@ -179,6 +181,87 @@ main {
   box-shadow: inset 0 0 0 2px var(--ytcq-popup-action);
 }
 
+.popup-reset-dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  padding: 14px;
+  background: var(--ytcq-popup-modal-backdrop);
+}
+
+.popup-reset-dialog {
+  display: grid;
+  gap: 8px;
+  width: min(286px, 100%);
+  padding: 14px;
+  border: 1px solid var(--ytcq-popup-control-border);
+  border-radius: 8px;
+  color: var(--ytcq-popup-text);
+  background: var(--ytcq-popup-card-bg);
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.28);
+}
+
+.popup-reset-dialog-message,
+.popup-reset-dialog-list-label,
+.popup-reset-dialog-list {
+  margin: 0;
+  color: var(--ytcq-popup-secondary-text);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 17px;
+}
+
+.popup-reset-dialog-message {
+  white-space: pre-line;
+}
+
+.popup-reset-dialog-list-label {
+  margin-top: 2px;
+}
+
+.popup-reset-dialog-list {
+  margin: -2px 0 2px 18px;
+  padding: 0;
+}
+
+.popup-reset-dialog-list li {
+  margin: 1px 0;
+}
+
+.popup-reset-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.popup-reset-dialog-button {
+  appearance: none;
+  min-width: 70px;
+  min-height: 28px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 6px;
+  color: var(--ytcq-popup-text);
+  background: transparent;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.popup-reset-dialog-button:hover,
+.popup-reset-dialog-button:focus {
+  outline: none;
+}
+
+.popup-reset-dialog-confirm {
+  color: #fff;
+  background: #c43b3b;
+}
+
 .extension-status {
   display: grid;
   grid-template-columns: 6px minmax(0, auto);
@@ -249,7 +332,7 @@ main {
   color: var(--ytcq-popup-secondary-text);
   background: transparent;
   font-size: 11px;
-  font-weight: 550;
+  font-weight: 500;
   line-height: 14px;
   cursor: pointer;
 }
@@ -344,7 +427,7 @@ main {
   margin: 0 0 4px;
   color: var(--ytcq-popup-secondary-text);
   font-size: 11px;
-  font-weight: 550;
+  font-weight: 500;
   line-height: 14px;
   text-transform: uppercase;
 }
@@ -468,7 +551,7 @@ main {
   overflow: hidden;
   color: var(--ytcq-popup-text);
   font-size: 11px;
-  font-weight: 650;
+  font-weight: 500;
   line-height: 13px;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -487,7 +570,7 @@ main {
   color: color-mix(in srgb, #eab308 74%, var(--ytcq-popup-text));
   background: color-mix(in srgb, #eab308 12%, transparent);
   font-size: 10px;
-  font-weight: 650;
+  font-weight: 500;
   line-height: 1;
 }
 
@@ -575,7 +658,7 @@ main {
   margin: 0;
   color: var(--ytcq-popup-secondary-text);
   font-size: 11px;
-  font-weight: 550;
+  font-weight: 500;
   line-height: 14px;
   text-transform: uppercase;
 }
@@ -664,7 +747,7 @@ main {
     0 0 0 2px var(--ytcq-popup-card-bg),
     0 0 0 3px var(--bookmark-user-color);
   font-size: 11px;
-  font-weight: 650;
+  font-weight: 500;
   line-height: 1;
 }
 
@@ -730,7 +813,7 @@ main {
   overflow: hidden;
   color: var(--ytcq-popup-text);
   font-size: 12px;
-  font-weight: 550;
+  font-weight: 500;
   line-height: 16px;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -886,7 +969,7 @@ main {
   color: var(--ytcq-popup-action);
   background: color-mix(in srgb, var(--ytcq-popup-action) 10%, transparent);
   font-size: 9px;
-  font-weight: 600;
+  font-weight: 500;
   line-height: 12px;
   text-transform: uppercase;
 }

@@ -272,6 +272,9 @@
     "gamesUnavailableNoticeTitle": "Não foi possível conectar"
   },
   "extension": {
+    "close": {
+      "message": "Fechar"
+    },
     "extensionName": {
       "message": "Chat Enhancer for YouTube",
       "description": "Nome público da extensão."
@@ -378,7 +381,34 @@
       "message": "Desativado"
     },
     "popupResetConfirm": {
-      "message": "Redefinir as configurações do Chat Enhancer e limpar todos os dados locais da extensão?\n\nIsso inclui mensagens da caixa de entrada, palavras-chave monitoradas, emojis frequentes, rascunhos não enviados, usuários salvos como favoritos."
+      "message": "Redefinir as configurações do Chat Enhancer e limpar todos os dados locais da extensão?"
+    },
+    "popupResetConfirmIncludes": {
+      "message": "Isto inclui:"
+    },
+    "popupResetItemSettings": {
+      "message": "Configurações da extensão"
+    },
+    "popupResetItemInboxMessages": {
+      "message": "Mensagens da caixa de entrada"
+    },
+    "popupResetItemWatchedKeywords": {
+      "message": "Palavras-chave monitoradas"
+    },
+    "popupResetItemFrequentEmojis": {
+      "message": "Emojis frequentes"
+    },
+    "popupResetItemUnsentDrafts": {
+      "message": "Rascunhos não enviados"
+    },
+    "popupResetItemBookmarkedUsers": {
+      "message": "Usuários marcados como favoritos"
+    },
+    "popupResetItemPlaygroundIdentity": {
+      "message": "Identidade e nome de exibição do Playground"
+    },
+    "popupResetItemGamePreferences": {
+      "message": "Preferência de som dos jogos"
     },
     "popupResetComplete": {
       "message": "Chat Enhancer foi redefinido."

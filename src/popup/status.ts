@@ -1,4 +1,5 @@
 import { controls } from './controls';
+import { getExtensionAction } from '../shared/extension-action';
 import { getExtensionMessage } from './i18n';
 
 type ExtensionStatus = 'active' | 'inactive';
@@ -21,7 +22,24 @@ function refreshExtensionStatus(): void {
       return;
     }
     chrome.tabs.sendMessage(currentTabId, { type: CHAT_ATTACHED_PING_TYPE }, (response?: ChatAttachedPingResponse) => {
-      updateExtensionStatusSummary(!chrome.runtime.lastError && response?.attached === true);
+      if (!chrome.runtime.lastError && response?.attached === true) {
+        updateExtensionStatusSummary(true);
+        return;
+      }
+      updateExtensionStatusFromActionTitle(currentTabId);
+    });
+  });
+}
+
+function updateExtensionStatusFromActionTitle(tabId: number): void {
+  const action = getExtensionAction();
+  action.getTitle({ tabId }, (title) => {
+    if (!chrome.runtime.lastError && title === getExtensionMessage('extensionActiveTitle')) {
+      updateExtensionStatusSummary(true);
+      return;
+    }
+    action.getTitle({}, (globalTitle) => {
+      updateExtensionStatusSummary(!chrome.runtime.lastError && globalTitle === getExtensionMessage('extensionActiveTitle'));
     });
   });
 }

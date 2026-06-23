@@ -272,6 +272,9 @@
     "gamesUnavailableNoticeTitle": "Tidak dapat terhubung"
   },
   "extension": {
+    "close": {
+      "message": "Tutup"
+    },
     "extensionName": {
       "message": "Chat Enhancer for YouTube",
       "description": "Nama publik ekstensi."
@@ -378,7 +381,34 @@
       "message": "Mati"
     },
     "popupResetConfirm": {
-      "message": "Reset pengaturan Chat Enhancer dan hapus semua data ekstensi lokal?\n\nIni termasuk pesan inbox, kata kunci yang dipantau, emoji yang sering dipakai, draf yang belum dikirim, pengguna yang dibookmark."
+      "message": "Reset pengaturan Chat Enhancer dan hapus semua data ekstensi lokal?"
+    },
+    "popupResetConfirmIncludes": {
+      "message": "Ini mencakup:"
+    },
+    "popupResetItemSettings": {
+      "message": "Pengaturan ekstensi"
+    },
+    "popupResetItemInboxMessages": {
+      "message": "Pesan kotak masuk"
+    },
+    "popupResetItemWatchedKeywords": {
+      "message": "Kata kunci yang dipantau"
+    },
+    "popupResetItemFrequentEmojis": {
+      "message": "Emoji yang sering digunakan"
+    },
+    "popupResetItemUnsentDrafts": {
+      "message": "Draf yang belum dikirim"
+    },
+    "popupResetItemBookmarkedUsers": {
+      "message": "Pengguna yang dibookmark"
+    },
+    "popupResetItemPlaygroundIdentity": {
+      "message": "Identitas dan nama tampilan Playground"
+    },
+    "popupResetItemGamePreferences": {
+      "message": "Preferensi suara game"
     },
     "popupResetComplete": {
       "message": "Chat Enhancer telah direset."

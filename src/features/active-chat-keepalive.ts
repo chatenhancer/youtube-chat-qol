@@ -20,6 +20,7 @@ let keepAliveTimer = 0;
 let reconnectTimer = 0;
 let reconnectPending = false;
 let reloadPending = false;
+let keepAliveStopped = false;
 
 interface ReconnectDraft {
   text: string;
@@ -29,29 +30,33 @@ interface ReconnectDraft {
 registerFeatureLifecycle({
   page: {
     init: startActiveChatKeepAlive,
-    cleanupStale: cleanupStaleReconnectNotice,
+    cleanupStale: cleanupActiveChatKeepAlive,
     visibilityChanged: resumePendingReconnect
   }
 });
 
 export function startActiveChatKeepAlive(): void {
+  keepAliveStopped = false;
   restoreReconnectDraft();
   if (keepAlivePort) return;
   connectActiveChatPort();
 }
 
 function connectActiveChatPort(): boolean {
+  let port: chrome.runtime.Port;
   try {
-    keepAlivePort = chrome.runtime.connect({ name: ACTIVE_CHAT_PORT_NAME });
+    port = chrome.runtime.connect({ name: ACTIVE_CHAT_PORT_NAME });
   } catch {
     keepAlivePort = null;
     hideEnhancedEffect();
     return false;
   }
 
-  keepAlivePort.onDisconnect.addListener(() => {
-    keepAlivePort = null;
+  keepAlivePort = port;
+  port.onDisconnect.addListener(() => {
+    if (keepAlivePort === port) keepAlivePort = null;
     clearKeepAliveTimer();
+    if (keepAliveStopped) return;
     scheduleActiveChatReconnect();
   });
 
@@ -67,6 +72,22 @@ function connectActiveChatPort(): boolean {
 export function cleanupStaleReconnectNotice(): void {
   document.querySelectorAll<HTMLElement>(`.${RECONNECT_ANCHOR_CLASS}`).forEach((anchor) => anchor.remove());
   reconnectPending = false;
+  clearReconnectTimer();
+}
+
+export function cleanupActiveChatKeepAlive(): void {
+  keepAliveStopped = true;
+  cleanupStaleReconnectNotice();
+  const port = keepAlivePort;
+  keepAlivePort = null;
+  clearKeepAliveTimer();
+  try {
+    port?.disconnect();
+  } catch {
+    // The old extension context may already be gone during reload handoff.
+  }
+  reconnectPending = false;
+  reloadPending = false;
   clearReconnectTimer();
 }
 

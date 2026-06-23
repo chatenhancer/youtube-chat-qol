@@ -22,6 +22,7 @@ import {
   resetFeatures,
   shouldIgnoreFeatureAddedNode,
   shouldIgnoreFeatureMutation,
+  suspendFeatures,
   type FeatureMessageSource,
   type FeatureMutationBatch
 } from './lifecycle';
@@ -29,6 +30,7 @@ import { DEFAULT_OPTIONS, getTargetLanguageUpdate, normalizeOptions, type Option
 import { getOptions, setOptions } from '../shared/state';
 import { initUiLocaleFromDocument } from '../shared/i18n';
 import { requestYouTubeMessageData, type YouTubeMessageData } from '../youtube/message-data';
+import { injectYouTubeMessageDataPage } from '../youtube/message-data-page-injection';
 import { CHAT_MESSAGE_SELECTOR, PARTICIPANT_SELECTOR } from '../youtube/selectors';
 
 interface NormalizedMutationBatch {
@@ -36,22 +38,32 @@ interface NormalizedMutationBatch {
   featureBatch: FeatureMutationBatch;
 }
 
+const CONTENT_INSTANCE_ATTRIBUTE = 'data-ytcq-content-instance';
+const CONTENT_INSTANCE_CLAIM_EVENT = 'ytcq:content-instance-claim';
+const CONTENT_INSTANCE_ID = `${Date.now()}-${Math.random()}`;
+
 let observer: MutationObserver | null = null;
 let visibilityRecoveryTimer = 0;
+let contentSuspended = false;
 
+claimContentInstance();
+injectYouTubeMessageDataPage();
 void init();
 
 async function init(): Promise<void> {
   cleanupStaleFeatures();
   await initUiLocaleFromDocument();
+  if (!isCurrentContentInstance()) return;
   initFeatures({ saveOptions });
 
   chrome.storage.sync.get(DEFAULT_OPTIONS, (storedOptions) => {
+    if (!isCurrentContentInstance()) return;
     setOptions(normalizeOptions(storedOptions));
     boot();
   });
 
   chrome.storage.onChanged.addListener((changes, areaName) => {
+    if (!isCurrentContentInstance()) return;
     if (areaName !== 'sync') return;
 
     const previousOptions = getOptions();
@@ -67,6 +79,7 @@ async function init(): Promise<void> {
   });
 
   chrome.runtime.onMessage.addListener((message: { type?: string }, _sender, sendResponse) => {
+    if (!isCurrentContentInstance()) return false;
     if (message?.type === 'ytcq:chat-attached-ping') {
       sendResponse({ attached: true });
       return false;
@@ -79,12 +92,18 @@ async function init(): Promise<void> {
 }
 
 function boot(): void {
+  if (!isCurrentContentInstance()) return;
   processExistingMessages();
   processExistingParticipants();
   bootFeatures();
   document.addEventListener('visibilitychange', handleVisibilityChange);
 
   observer = new MutationObserver((mutations) => {
+    if (!isCurrentContentInstance()) {
+      suspendContentInstance();
+      return;
+    }
+
     const batch = createNormalizedMutationBatch(mutations);
     const requestedDataMessages = new WeakMap<HTMLElement, Promise<YouTubeMessageData | null>>();
     const handledMessages = new WeakSet<HTMLElement>();
@@ -107,6 +126,7 @@ function boot(): void {
 }
 
 function processExistingMessages(): void {
+  if (!isCurrentContentInstance()) return;
   const messages = Array.from(document.querySelectorAll<HTMLElement>(CHAT_MESSAGE_SELECTOR));
   messages.forEach((message) => {
     handleFeatureMessage(message, {
@@ -118,10 +138,12 @@ function processExistingMessages(): void {
 }
 
 function processExistingParticipants(): void {
+  if (!isCurrentContentInstance()) return;
   document.querySelectorAll<HTMLElement>(PARTICIPANT_SELECTOR).forEach(handleFeatureParticipant);
 }
 
 function scheduleVisibleMessageRecovery(): void {
+  if (!isCurrentContentInstance()) return;
   if (document.visibilityState === 'hidden') return;
   if (visibilityRecoveryTimer) window.clearTimeout(visibilityRecoveryTimer);
   visibilityRecoveryTimer = window.setTimeout(() => {
@@ -132,6 +154,7 @@ function scheduleVisibleMessageRecovery(): void {
 }
 
 function handleVisibilityChange(): void {
+  if (!isCurrentContentInstance()) return;
   handleFeatureVisibilityChanged(document.visibilityState);
   if (document.visibilityState === 'hidden') {
     return;
@@ -143,8 +166,13 @@ function handleVisibilityChange(): void {
 function createNormalizedMutationBatch(mutations: MutationRecord[]): NormalizedMutationBatch {
   const addedElements: Element[] = [];
   const changedMessages = new Set<HTMLElement>();
+  const featureMutations: MutationRecord[] = [];
 
   mutations.forEach((mutation) => {
+    if (shouldIgnoreObserverMutation(mutation)) return;
+
+    featureMutations.push(mutation);
+
     if (mutation.type === 'childList' || mutation.type === 'characterData') {
       const message = getChangedMessageForMutation(mutation);
       if (message) changedMessages.add(message);
@@ -161,7 +189,7 @@ function createNormalizedMutationBatch(mutations: MutationRecord[]): NormalizedM
     changedMessages: [...changedMessages],
     featureBatch: {
       addedElements,
-      mutations
+      mutations: featureMutations
     }
   };
 }
@@ -235,7 +263,26 @@ function getChangedMessageForMutation(mutation: MutationRecord): HTMLElement | n
   return targetElement.closest<HTMLElement>(CHAT_MESSAGE_SELECTOR);
 }
 
+function shouldIgnoreObserverMutation(mutation: MutationRecord): boolean {
+  const targetElement = mutation.target instanceof Element
+    ? mutation.target
+    : mutation.target.parentElement;
+  if (targetElement && shouldIgnoreFeatureMutation(targetElement)) return true;
+  if (mutation.type !== 'childList') return false;
+
+  const changedNodes = [
+    ...Array.from(mutation.addedNodes),
+    ...Array.from(mutation.removedNodes)
+  ];
+  return Boolean(changedNodes.length) && changedNodes.every(shouldIgnoreObserverNode);
+}
+
+function shouldIgnoreObserverNode(node: Node): boolean {
+  return node instanceof Element && shouldIgnoreFeatureAddedNode(node);
+}
+
 function saveOptions(values: Partial<Options>): void {
+  if (!isCurrentContentInstance()) return;
   const previousOptions = getOptions();
   const nextValues = values.targetLanguage !== undefined
     ? {
@@ -252,12 +299,50 @@ function saveOptions(values: Partial<Options>): void {
 }
 
 function notifyFeatureOptionsChanged(previousOptions: Options, nextOptions: Options): void {
+  if (!isCurrentContentInstance()) return;
   handleFeatureOptionsChanged(previousOptions, nextOptions);
 }
 
 function resetPageState(): void {
+  if (!isCurrentContentInstance()) return;
   const previousOptions = getOptions();
   setOptions(DEFAULT_OPTIONS);
   resetFeatures();
   notifyFeatureOptionsChanged(previousOptions, DEFAULT_OPTIONS);
+}
+
+function claimContentInstance(): void {
+  document.addEventListener(CONTENT_INSTANCE_CLAIM_EVENT, handleContentInstanceClaim);
+  document.documentElement.setAttribute(CONTENT_INSTANCE_ATTRIBUTE, CONTENT_INSTANCE_ID);
+  document.dispatchEvent(new CustomEvent(CONTENT_INSTANCE_CLAIM_EVENT, {
+    detail: { id: CONTENT_INSTANCE_ID }
+  }));
+}
+
+function handleContentInstanceClaim(event: Event): void {
+  const claimedId = event instanceof CustomEvent && typeof event.detail?.id === 'string'
+    ? event.detail.id
+    : document.documentElement.getAttribute(CONTENT_INSTANCE_ATTRIBUTE);
+  if (claimedId && claimedId !== CONTENT_INSTANCE_ID) {
+    suspendContentInstance();
+  }
+}
+
+function isCurrentContentInstance(): boolean {
+  return !contentSuspended &&
+    document.documentElement.getAttribute(CONTENT_INSTANCE_ATTRIBUTE) === CONTENT_INSTANCE_ID;
+}
+
+function suspendContentInstance(): void {
+  if (contentSuspended) return;
+  contentSuspended = true;
+  if (visibilityRecoveryTimer) {
+    window.clearTimeout(visibilityRecoveryTimer);
+    visibilityRecoveryTimer = 0;
+  }
+  observer?.disconnect();
+  observer = null;
+  document.removeEventListener('visibilitychange', handleVisibilityChange);
+  document.removeEventListener(CONTENT_INSTANCE_CLAIM_EVENT, handleContentInstanceClaim);
+  suspendFeatures();
 }

@@ -272,6 +272,9 @@
     "gamesUnavailableNoticeTitle": "Bağlanılamıyor"
   },
   "extension": {
+    "close": {
+      "message": "Kapat"
+    },
     "extensionName": {
       "message": "Chat Enhancer for YouTube",
       "description": "Herkese açık uzantı adı."
@@ -378,7 +381,34 @@
       "message": "Kapalı"
     },
     "popupResetConfirm": {
-      "message": "Chat Enhancer ayarları sıfırlansın ve tüm yerel uzantı verileri temizlensin mi?\n\nBuna gelen kutusu mesajları, izlenen anahtar kelimeler, sık kullanılan emojiler, gönderilmemiş taslaklar, yer işaretine eklenen kullanıcılar dahildir."
+      "message": "Chat Enhancer ayarları sıfırlansın ve tüm yerel uzantı verileri temizlensin mi?"
+    },
+    "popupResetConfirmIncludes": {
+      "message": "Buna şunlar dahildir:"
+    },
+    "popupResetItemSettings": {
+      "message": "Uzantı ayarları"
+    },
+    "popupResetItemInboxMessages": {
+      "message": "Gelen kutusu mesajları"
+    },
+    "popupResetItemWatchedKeywords": {
+      "message": "İzlenen anahtar kelimeler"
+    },
+    "popupResetItemFrequentEmojis": {
+      "message": "Sık kullanılan emojiler"
+    },
+    "popupResetItemUnsentDrafts": {
+      "message": "Gönderilmemiş taslaklar"
+    },
+    "popupResetItemBookmarkedUsers": {
+      "message": "Yer imi eklenen kullanıcılar"
+    },
+    "popupResetItemPlaygroundIdentity": {
+      "message": "Playground kimliği ve görünen adı"
+    },
+    "popupResetItemGamePreferences": {
+      "message": "Oyun sesi tercihi"
     },
     "popupResetComplete": {
       "message": "Chat Enhancer sıfırlandı."

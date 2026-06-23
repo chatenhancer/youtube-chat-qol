@@ -272,6 +272,9 @@
     "gamesUnavailableNoticeTitle": "कनेक्ट नहीं हो सका"
   },
   "extension": {
+    "close": {
+      "message": "बंद करें"
+    },
     "extensionName": {
       "message": "Chat Enhancer for YouTube",
       "description": "एक्सटेंशन का सार्वजनिक नाम."
@@ -378,7 +381,34 @@
       "message": "बंद"
     },
     "popupResetConfirm": {
-      "message": "Chat Enhancer सेटिंग रीसेट करके सभी स्थानीय एक्सटेंशन डेटा साफ़ करें?\n\nइसमें इनबॉक्स संदेश, देखे जा रहे कीवर्ड, अक्सर इस्तेमाल किए गए इमोजी, नहीं भेजे गए ड्राफ़्ट, बुकमार्क किए गए उपयोगकर्ता शामिल हैं।"
+      "message": "Chat Enhancer की सेटिंग रीसेट करें और सभी स्थानीय एक्सटेंशन डेटा साफ़ करें?"
+    },
+    "popupResetConfirmIncludes": {
+      "message": "इसमें शामिल है:"
+    },
+    "popupResetItemSettings": {
+      "message": "एक्सटेंशन सेटिंग"
+    },
+    "popupResetItemInboxMessages": {
+      "message": "इनबॉक्स संदेश"
+    },
+    "popupResetItemWatchedKeywords": {
+      "message": "देखे जा रहे कीवर्ड"
+    },
+    "popupResetItemFrequentEmojis": {
+      "message": "बार-बार इस्तेमाल किए गए इमोजी"
+    },
+    "popupResetItemUnsentDrafts": {
+      "message": "न भेजे गए ड्राफ़्ट"
+    },
+    "popupResetItemBookmarkedUsers": {
+      "message": "बुकमार्क किए गए उपयोगकर्ता"
+    },
+    "popupResetItemPlaygroundIdentity": {
+      "message": "Playground पहचान और प्रदर्शन नाम"
+    },
+    "popupResetItemGamePreferences": {
+      "message": "गेम ध्वनि प्राथमिकता"
     },
     "popupResetComplete": {
       "message": "Chat Enhancer रीसेट हो गया है."

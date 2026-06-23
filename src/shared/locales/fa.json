@@ -272,6 +272,9 @@
     "gamesUnavailableNoticeTitle": "امکان اتصال نیست"
   },
   "extension": {
+    "close": {
+      "message": "بستن"
+    },
     "extensionName": {
       "message": "Chat Enhancer for YouTube"
     },
@@ -375,7 +378,34 @@
       "message": "خاموش"
     },
     "popupResetConfirm": {
-      "message": "تنظیمات Chat Enhancer بازنشانی شود و همه داده‌های محلی افزونه پاک شود؟\n\nاین شامل پیام‌های صندوق، کلیدواژه‌های زیر نظر، ایموجی‌های پرتکرار، پیش‌نویس‌های ارسال‌نشده، کاربران نشانک‌شده است."
+      "message": "تنظیمات Chat Enhancer بازنشانی و همه داده‌های محلی افزونه پاک شود؟"
+    },
+    "popupResetConfirmIncludes": {
+      "message": "این موارد شامل می‌شود:"
+    },
+    "popupResetItemSettings": {
+      "message": "تنظیمات افزونه"
+    },
+    "popupResetItemInboxMessages": {
+      "message": "پیام‌های صندوق ورودی"
+    },
+    "popupResetItemWatchedKeywords": {
+      "message": "کلیدواژه‌های تحت نظر"
+    },
+    "popupResetItemFrequentEmojis": {
+      "message": "ایموجی‌های پرتکرار"
+    },
+    "popupResetItemUnsentDrafts": {
+      "message": "پیش‌نویس‌های ارسال‌نشده"
+    },
+    "popupResetItemBookmarkedUsers": {
+      "message": "کاربران نشانک‌شده"
+    },
+    "popupResetItemPlaygroundIdentity": {
+      "message": "هویت و نام نمایشی Playground"
+    },
+    "popupResetItemGamePreferences": {
+      "message": "ترجیح صدای بازی‌ها"
     },
     "popupResetComplete": {
       "message": "Chat Enhancer بازنشانی شد."

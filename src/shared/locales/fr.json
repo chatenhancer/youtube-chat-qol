@@ -272,6 +272,9 @@
     "gamesUnavailableNoticeTitle": "Connexion impossible"
   },
   "extension": {
+    "close": {
+      "message": "Fermer"
+    },
     "extensionName": {
       "message": "Chat Enhancer for YouTube"
     },
@@ -375,7 +378,34 @@
       "message": "Désactivé"
     },
     "popupResetConfirm": {
-      "message": "Réinitialiser les paramètres de Chat Enhancer et effacer toutes les données locales de l’extension ?\n\nCela inclut les messages de la boîte de réception, les mots-clés surveillés, les emojis fréquents, les brouillons non envoyés, les utilisateurs ajoutés aux favoris."
+      "message": "Réinitialiser les paramètres de Chat Enhancer et effacer toutes les données locales de l’extension ?"
+    },
+    "popupResetConfirmIncludes": {
+      "message": "Cela inclut :"
+    },
+    "popupResetItemSettings": {
+      "message": "Paramètres de l’extension"
+    },
+    "popupResetItemInboxMessages": {
+      "message": "Messages de la boîte de réception"
+    },
+    "popupResetItemWatchedKeywords": {
+      "message": "Mots-clés surveillés"
+    },
+    "popupResetItemFrequentEmojis": {
+      "message": "Emojis fréquents"
+    },
+    "popupResetItemUnsentDrafts": {
+      "message": "Brouillons non envoyés"
+    },
+    "popupResetItemBookmarkedUsers": {
+      "message": "Utilisateurs ajoutés aux favoris"
+    },
+    "popupResetItemPlaygroundIdentity": {
+      "message": "Identité et nom d’affichage Playground"
+    },
+    "popupResetItemGamePreferences": {
+      "message": "Préférence de son des jeux"
     },
     "popupResetComplete": {
       "message": "Chat Enhancer a été réinitialisé."
