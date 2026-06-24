@@ -186,6 +186,8 @@ describe('playground games header button', () => {
     expect(document.querySelector('.ytcq-profile-card-subtitle')?.textContent).toBe('Connecting...');
     expect(document.querySelector('.ytcq-games-connection-notice')?.textContent).toContain('Connecting to Playground');
     expect(document.querySelector('.ytcq-games-connection-notice')?.textContent).toContain('Setting up the games lobby, please wait.');
+    expect(getActionButton('Connecting').disabled).toBe(true);
+    expect(getActionButton('Connecting').querySelector('.ytcq-games-loading-spinner')).not.toBeNull();
     expect(document.querySelector('.ytcq-games-availability-toggle')).toBeNull();
     expect(lastMockPort()?.messages.at(-1)).toMatchObject({
       availableGames: [],
@@ -491,6 +493,8 @@ describe('playground games header button', () => {
     expect(document.querySelector('.ytcq-chess-game-panel')).not.toBeNull();
     expect(document.querySelector('.ytcq-games-card')).not.toBeNull();
     getActionButton('Leave').click();
+    expect(getActionButton('Leave').disabled).toBe(true);
+    expect(getActionButton('Leave').querySelector('.ytcq-games-loading-spinner')).not.toBeNull();
     expect(lastMockPort()?.messages.at(-1)).toEqual({
       action: 'leave',
       gameId: 'game-1',
@@ -516,6 +520,7 @@ describe('playground games header button', () => {
     getActionButton('Invite').click();
     expect(document.querySelector('.ytcq-games-player-row')?.textContent).toContain('Waiting for reply...');
     expect(getActionButton('Cancel')).not.toBeNull();
+    expect(getActionButton('Cancel').querySelector('.ytcq-games-loading-spinner')).not.toBeNull();
     expect(lastMockPort()?.messages.at(-1)).toEqual({
       gameId: 'chess',
       toUserId: 'luna-user',
@@ -938,6 +943,8 @@ describe('playground games header button', () => {
       type: 'ytcq:playground:init'
     });
     expect(document.querySelector('.ytcq-profile-card-subtitle')?.textContent).toBe('Connecting...');
+    expect(getActionButton('Connecting').disabled).toBe(true);
+    expect(getActionButton('Connecting').querySelector('.ytcq-games-loading-spinner')).not.toBeNull();
     reconnectButton.click();
     expect(lastMockPort()?.messages).toHaveLength(messagesBeforeReconnect + 1);
   });

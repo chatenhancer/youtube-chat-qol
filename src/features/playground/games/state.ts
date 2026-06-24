@@ -20,6 +20,7 @@ export interface GamesPanelState {
   activeGameIndex: number;
   available: boolean;
   invitedPlayer: string;
+  leavingGameId: string;
   mode: GamesPanelMode;
   selectedGameId: GameId | null;
   transport: PlaygroundClientState;
@@ -30,6 +31,7 @@ export function createInitialGamesPanelState(available: boolean, transport: Play
     activeGameIndex: 0,
     available,
     invitedPlayer: '',
+    leavingGameId: '',
     mode: 'lobby',
     selectedGameId: null,
     transport

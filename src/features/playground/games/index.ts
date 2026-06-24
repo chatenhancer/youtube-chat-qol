@@ -215,6 +215,7 @@ function handlePlaygroundClientStateChanged(nextState: PlaygroundClientState): v
 
   gamesPanelState.transport = nextState;
   gamesPanelState.available = nextState.available;
+  clearPendingLobbyActions(gamesPanelState, nextState);
   renderGamesPanel();
 }
 
@@ -302,8 +303,27 @@ function toggleActiveGamePanel(game: PublicGame): void {
 
 function leaveGame(game: PublicGame): void {
   if (!isSupportedPublicGame(game)) return;
+  if (gamesPanelState?.leavingGameId === game.gameId) return;
+
   closeActiveGamePanel({ notify: false });
+  if (gamesPanelState) {
+    gamesPanelState.leavingGameId = game.gameId;
+    renderGamesPanel();
+  }
   sendPlaygroundGameAction(game.gameId, 'leave');
+}
+
+function clearPendingLobbyActions(state: GamesPanelState, transport: PlaygroundClientState): void {
+  if (transport.status !== 'connected' || transport.error) {
+    state.invitedPlayer = '';
+    state.leavingGameId = '';
+    pendingStartedGameOpen = null;
+    return;
+  }
+
+  if (state.leavingGameId && !transport.games.some((game) => game.gameId === state.leavingGameId)) {
+    state.leavingGameId = '';
+  }
 }
 
 function openGamePanel(

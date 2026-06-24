@@ -106,12 +106,16 @@ function createTransportNotice(state: GamesPanelState, actions: GamesViewActions
     ? t('gamesConnectingHelper')
     : getUnavailableNoticeHelper(state);
 
+  if (state.transport.status === 'connecting') {
+    notice.append(title, helper, createSmallActionButton(t('gamesConnectingTitle'), {
+      busy: true,
+      disabled: true
+    }));
+    return notice;
+  }
+
   const refresh = createSmallActionButton(t('gamesReconnect'));
-  refresh.addEventListener('click', () => {
-    if (state.transport.status === 'connecting') return;
-    actions.onReconnect();
-  });
-  refresh.hidden = state.transport.status === 'connecting';
+  refresh.addEventListener('click', actions.onReconnect);
 
   notice.append(title, helper, refresh);
   return notice;
@@ -177,7 +181,7 @@ function createActiveGameSection(state: GamesPanelState, actions: GamesViewActio
   const game = games[gameIndex];
   section.append(
     createActiveGameHeader(games, gameIndex, state.transport.userId, actions),
-    createActiveGameRow(game, state.transport.userId, actions)
+    createActiveGameRow(game, state, actions)
   );
   return section;
 }
@@ -211,7 +215,7 @@ function createActiveGameHeader(
   return header;
 }
 
-function createActiveGameRow(game: PublicGame, currentUserId: string, actions: GamesViewActions): HTMLElement {
+function createActiveGameRow(game: PublicGame, state: GamesPanelState, actions: GamesViewActions): HTMLElement {
   const item = ytcqCreateElement('div');
   item.className = 'ytcq-games-active-row';
   const copy = ytcqCreateElement('span');
@@ -221,7 +225,7 @@ function createActiveGameRow(game: PublicGame, currentUserId: string, actions: G
   title.textContent = getGameLabel(game.gameType);
   const helper = ytcqCreateElement('span');
   helper.className = 'ytcq-games-row-helper';
-  helper.textContent = getGameOpponentLabel(game, currentUserId);
+  helper.textContent = getGameOpponentLabel(game, state.transport.userId);
   copy.append(title, helper);
 
   const actionsWrap = ytcqCreateElement('span');
@@ -229,7 +233,11 @@ function createActiveGameRow(game: PublicGame, currentUserId: string, actions: G
   const isPanelOpen = getActiveGamePanelId() === game.gameId;
   const togglePanel = createSmallActionButton(t(isPanelOpen ? 'gamesHide' : 'gamesResume'));
   togglePanel.addEventListener('click', () => actions.onToggleActiveGame(game));
-  const leave = createSmallActionButton(t('gamesLeave'));
+  const isLeaving = state.leavingGameId === game.gameId;
+  const leave = createSmallActionButton(t('gamesLeave'), {
+    busy: isLeaving,
+    disabled: isLeaving
+  });
   leave.addEventListener('click', () => actions.onLeaveGame(game));
   actionsWrap.append(togglePanel, leave);
   item.append(copy, actionsWrap);
@@ -366,7 +374,10 @@ function createPlayerRow(player: PresenceUser, state: GamesPanelState, actions: 
 
   const actionsWrap = ytcqCreateElement('span');
   actionsWrap.className = 'ytcq-games-row-actions';
-  const action = createSmallActionButton(state.invitedPlayer === player.userId ? t('gamesCancelInvite') : t('gamesInvite'));
+  const isInviting = state.invitedPlayer === player.userId;
+  const action = createSmallActionButton(isInviting ? t('gamesCancelInvite') : t('gamesInvite'), {
+    busy: isInviting
+  });
   action.addEventListener('click', () => {
     if (state.invitedPlayer === player.userId) {
       actions.onCancelInvite(player);
@@ -401,12 +412,42 @@ function createGamesEmpty(textContent: string): HTMLElement {
   return empty;
 }
 
-function createSmallActionButton(label: string): HTMLButtonElement {
+interface SmallActionButtonOptions {
+  busy?: boolean;
+  disabled?: boolean;
+}
+
+function createSmallActionButton(label: string, options: SmallActionButtonOptions = {}): HTMLButtonElement {
   const button = ytcqCreateElement('button');
   button.type = 'button';
   button.className = 'ytcq-games-small-action';
-  button.textContent = label;
+  if (options.busy) {
+    button.classList.add('ytcq-games-small-action-busy');
+    button.setAttribute('aria-busy', 'true');
+    button.append(createGamesLoadingSpinner('ytcq-games-action-spinner'));
+  }
+  if (options.disabled) button.disabled = true;
+  if (label) button.append(createTextSpan(options.busy ? getBusyActionLabel(label) : label));
   return button;
+}
+
+function getBusyActionLabel(label: string): string {
+  return label.replace(/[.\u2026]+$/u, '');
+}
+
+function createTextSpan(textContent: string): HTMLElement {
+  const text = ytcqCreateElement('span');
+  text.textContent = textContent;
+  return text;
+}
+
+function createGamesLoadingSpinner(extraClassName = ''): HTMLElement {
+  const spinner = ytcqCreateElement('span');
+  spinner.className = extraClassName
+    ? `ytcq-games-loading-spinner ${extraClassName}`
+    : 'ytcq-games-loading-spinner';
+  spinner.setAttribute('aria-hidden', 'true');
+  return spinner;
 }
 
 function createCycleButton(

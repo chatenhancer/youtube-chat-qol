@@ -1538,6 +1538,10 @@ yt-live-chat-header-renderer .ytcq-inbox-badge[hidden] {
 }
 
 .ytcq-games-small-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
   min-width: 0;
   height: 24px;
   padding: 0 8px;
@@ -1549,11 +1553,54 @@ yt-live-chat-header-renderer .ytcq-inbox-badge[hidden] {
   cursor: pointer;
 }
 
+.ytcq-games-small-action-busy {
+  color: var(--yt-spec-call-to-action, #3ea6ff);
+  background: rgba(62, 166, 255, 0.14);
+}
+
+.ytcq-games-small-action:disabled,
+.ytcq-games-small-action:disabled:hover,
+.ytcq-games-small-action:disabled:focus {
+  cursor: default;
+  outline: none;
+}
+
 .ytcq-games-small-action:hover,
 .ytcq-games-small-action:focus {
   color: var(--yt-spec-call-to-action, #3ea6ff);
   background: rgba(62, 166, 255, 0.18);
   outline: none;
+}
+
+.ytcq-games-small-action-busy:disabled,
+.ytcq-games-small-action-busy:disabled:hover,
+.ytcq-games-small-action-busy:disabled:focus {
+  color: var(--yt-spec-call-to-action, #3ea6ff);
+  background: rgba(62, 166, 255, 0.14);
+}
+
+.ytcq-games-loading-spinner {
+  display: inline-flex;
+  width: 11px;
+  height: 11px;
+  border: 2px solid color-mix(in srgb, currentColor 26%, transparent);
+  border-top-color: currentColor;
+  border-radius: 50%;
+  box-sizing: border-box;
+  flex: 0 0 auto;
+  animation: ytcq-games-spinner-spin 850ms linear infinite;
+}
+
+@keyframes ytcq-games-spinner-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ytcq-games-loading-spinner {
+    animation: none;
+  }
 }
 
 .ytcq-games-cycle-action {

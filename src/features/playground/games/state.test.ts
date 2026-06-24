@@ -20,6 +20,7 @@ describe('playground games panel state selectors', () => {
       activeGameIndex: 0,
       available: true,
       invitedPlayer: '',
+      leavingGameId: '',
       mode: 'lobby',
       selectedGameId: null,
       transport: connected
