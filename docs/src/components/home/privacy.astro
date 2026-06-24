@@ -1,6 +1,6 @@
 ---
 import Icon from '../common/icon.astro';
-import { getPrivacyPolicyUrl } from '../../data/privacy';
+import { getPrivacyPolicyPath } from '../../data/privacy';
 import type { Locale } from '../../data/locales';
 import type { Messages } from '../../data/site';
 
@@ -25,7 +25,7 @@ const items = [
       <h2 id="privacy-title">{m.privacy.title}</h2>
       <p>{m.privacy.copy}</p>
       <div class="privacy-actions">
-        <a class="button button-secondary" href={getPrivacyPolicyUrl(locale)}>{m.privacy.button}</a>
+        <a class="button button-secondary" href={getPrivacyPolicyPath(locale)}>{m.privacy.button}</a>
       </div>
     </div>
     <dl class="privacy-list" aria-label={m.privacy.summaryAria}>

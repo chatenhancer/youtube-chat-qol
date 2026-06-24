@@ -1,6 +1,6 @@
 ---
-import { getPrivacyPolicyUrl } from '../../data/privacy';
-import { getSupportUrl } from '../../data/support';
+import { getPrivacyPolicyPath } from '../../data/privacy';
+import { getSupportPath } from '../../data/support';
 import type { Locale } from '../../data/locales';
 import { site } from '../../data/site';
 import type { Messages } from '../../data/site';
@@ -13,8 +13,8 @@ const { locale, messages: m } = Astro.props as {
 
 <footer class="site-footer">
   <p>{m.footer.disclaimer}</p>
-  <a href={getPrivacyPolicyUrl(locale)}>{m.footer.privacy}</a>
-  <a href={getSupportUrl(locale)}>{m.footer.support}</a>
+  <a href={getPrivacyPolicyPath(locale)}>{m.footer.privacy}</a>
+  <a href={getSupportPath(locale)}>{m.footer.support}</a>
   <a data-contact-email-link>{m.footer.email}</a>
   <a href={site.licenseUrl}>{m.footer.license}</a>
 </footer>
