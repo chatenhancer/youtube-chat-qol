@@ -1698,6 +1698,7 @@ h3 {
 
 .back-link-icon {
   flex: 0 0 auto;
+  margin-inline-start: -3px;
   width: 18px;
   height: 18px;
   fill: currentColor;
