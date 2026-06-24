@@ -36,7 +36,7 @@ Translation uses Google Translate, so it will not be perfect. In practice, it is
 
 YouTube live chat does not notify you when someone mentions you.
 
-That is fine if you are staring at the chat every second. It is less fine if you leave the stream in the background, make coffee, or briefly pretend to have a life.
+That is fine if you are staring at the chat every second. It is less fine if you leave the stream in the background, make coffee, or step away for a minute.
 
 Chat Enhancer adds an inbox for mentions and watched keywords, so you can catch up on messages that matter to you without having to scroll through everything manually.
 
