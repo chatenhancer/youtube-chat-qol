@@ -37,6 +37,10 @@
     "mentionUser": "אזכור משתמש",
     "mentionUserTitle": "אזכור משתמש. Alt/Option-קליק כדי לצטט.",
     "mostUsed": "בשימוש נפוץ",
+    "emojiUsageCount": {
+      "one": "{count} שימוש",
+      "other": "{count} שימושים"
+    },
     "noInboxMessagesYet": "אין עדיין הודעות בתיבה.",
     "noInboxMessages": "אין הודעות בתיבה",
     "noKeywords": "אין מילות מפתח",

@@ -37,6 +37,10 @@
     "mentionUser": "사용자 멘션",
     "mentionUserTitle": "사용자 멘션. Alt/Option 클릭으로 인용.",
     "mostUsed": "가장 많이 사용",
+    "emojiUsageCount": {
+      "one": "{count}회 사용",
+      "other": "{count}회 사용"
+    },
     "noInboxMessagesYet": "아직 받은 편지함 메시지가 없습니다.",
     "noInboxMessages": "받은 편지함 메시지 없음",
     "noKeywords": "키워드 없음",

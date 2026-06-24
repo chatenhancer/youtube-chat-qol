@@ -37,6 +37,10 @@
     "mentionUser": "Mencionar usuario",
     "mentionUserTitle": "Mencionar usuario. Alt/Opción-clic para citar.",
     "mostUsed": "MÁS USADOS",
+    "emojiUsageCount": {
+      "one": "{count} uso",
+      "other": "{count} usos"
+    },
     "noInboxMessagesYet": "Todavía no hay mensajes en la bandeja.",
     "noInboxMessages": "No hay mensajes en la bandeja",
     "noKeywords": "Sin palabras clave",

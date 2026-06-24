@@ -37,6 +37,10 @@
     "mentionUser": "Gebruiker vermelden",
     "mentionUserTitle": "Gebruiker vermelden. Alt/Option-klik om te citeren.",
     "mostUsed": "MEEST GEBRUIKT",
+    "emojiUsageCount": {
+      "one": "{count} keer gebruikt",
+      "other": "{count} keer gebruikt"
+    },
     "noInboxMessagesYet": "Nog geen inboxberichten.",
     "noInboxMessages": "Geen inboxberichten",
     "noKeywords": "Geen trefwoorden",

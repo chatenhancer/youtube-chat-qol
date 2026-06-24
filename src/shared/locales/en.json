@@ -37,6 +37,10 @@
     "mentionUser": "Mention user",
     "mentionUserTitle": "Mention user. Alt/Option-click to quote.",
     "mostUsed": "MOST USED",
+    "emojiUsageCount": {
+      "one": "{count} use",
+      "other": "{count} uses"
+    },
     "noInboxMessagesYet": "No inbox messages yet.",
     "noInboxMessages": "No inbox messages",
     "noKeywords": "No keywords",

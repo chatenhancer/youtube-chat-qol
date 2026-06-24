@@ -37,6 +37,10 @@
     "mentionUser": "Упомянуть пользователя",
     "mentionUserTitle": "Упомянуть пользователя. Alt/Option-клик, чтобы процитировать.",
     "mostUsed": "ЧАСТО ИСПОЛЬЗУЕМЫЕ",
+    "emojiUsageCount": {
+      "one": "{count} использование",
+      "other": "{count} использований"
+    },
     "noInboxMessagesYet": "Во входящих пока нет сообщений.",
     "noInboxMessages": "Нет сообщений во входящих",
     "noKeywords": "Нет ключевых слов",

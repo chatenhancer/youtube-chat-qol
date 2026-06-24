@@ -37,6 +37,10 @@
     "mentionUser": "กล่าวถึงผู้ใช้",
     "mentionUserTitle": "กล่าวถึงผู้ใช้ กด Alt/Option-click เพื่ออ้างอิง",
     "mostUsed": "ใช้บ่อยที่สุด",
+    "emojiUsageCount": {
+      "one": "ใช้ {count} ครั้ง",
+      "other": "ใช้ {count} ครั้ง"
+    },
     "noInboxMessagesYet": "ยังไม่มีข้อความในกล่องข้อความ",
     "noInboxMessages": "ไม่มีข้อความในกล่องข้อความ",
     "noKeywords": "ไม่มีคำสำคัญ",

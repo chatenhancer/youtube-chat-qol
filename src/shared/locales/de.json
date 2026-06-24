@@ -37,6 +37,10 @@
     "mentionUser": "Nutzer erwähnen",
     "mentionUserTitle": "Nutzer erwähnen. Alt/Option-Klick zum Zitieren.",
     "mostUsed": "AM HÄUFIGSTEN VERWENDET",
+    "emojiUsageCount": {
+      "one": "{count} Verwendung",
+      "other": "{count} Verwendungen"
+    },
     "noInboxMessagesYet": "Noch keine Nachrichten im Posteingang.",
     "noInboxMessages": "Keine Nachrichten im Posteingang",
     "noKeywords": "Keine Schlüsselwörter",

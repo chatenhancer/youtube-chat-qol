@@ -37,6 +37,10 @@
     "mentionUser": "यूज़र को मेंशन करें",
     "mentionUserTitle": "यूज़र को मेंशन करें. कोट करने के लिए Alt/Option-क्लिक करें.",
     "mostUsed": "सबसे ज़्यादा इस्तेमाल किए गए",
+    "emojiUsageCount": {
+      "one": "{count} बार इस्तेमाल",
+      "other": "{count} बार इस्तेमाल"
+    },
     "noInboxMessagesYet": "इनबॉक्स में अभी कोई मैसेज नहीं है.",
     "noInboxMessages": "इनबॉक्स में कोई मैसेज नहीं है",
     "noKeywords": "कोई कीवर्ड नहीं",

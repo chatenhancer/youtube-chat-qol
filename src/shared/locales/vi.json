@@ -37,6 +37,10 @@
     "mentionUser": "Nhắc đến người dùng",
     "mentionUserTitle": "Nhắc đến người dùng. Alt/Option-click để trích dẫn.",
     "mostUsed": "DÙNG NHIỀU NHẤT",
+    "emojiUsageCount": {
+      "one": "{count} lần dùng",
+      "other": "{count} lần dùng"
+    },
     "noInboxMessagesYet": "Chưa có tin nhắn trong hộp thư.",
     "noInboxMessages": "Không có tin nhắn trong hộp thư",
     "noKeywords": "Không có từ khóa",

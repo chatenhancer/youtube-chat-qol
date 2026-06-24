@@ -62,7 +62,7 @@ function createFrequentEmojiButton(emoji: EmojiUsage, chooseEmoji: (emoji: Emoji
   const button = ytcqCreateElement('button');
   button.type = 'button';
   button.className = 'ytcq-frequent-emoji-button';
-  button.title = displayEmoji.label || displayEmoji.alt || displayEmoji.text || 'Emoji';
+  button.title = getFrequentEmojiButtonTitle(displayEmoji);
   button.setAttribute('aria-label', button.title);
 
   if (displayEmoji.src) {
@@ -105,6 +105,11 @@ function createFrequentEmojiButton(emoji: EmojiUsage, chooseEmoji: (emoji: Emoji
   });
 
   return button;
+}
+
+function getFrequentEmojiButtonTitle(emoji: EmojiUsage): string {
+  const label = emoji.label || emoji.alt || emoji.text || 'Emoji';
+  return `${label} (${t('emojiUsageCount', { count: emoji.count })})`;
 }
 
 function getFrequentEmojiRenderKey(topEmojis: EmojiUsage[]): string {

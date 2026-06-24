@@ -37,6 +37,10 @@
     "mentionUser": "Wspomnij użytkownika",
     "mentionUserTitle": "Wspomnij użytkownika. Alt/Option-klik, aby zacytować.",
     "mostUsed": "NAJCZĘŚCIEJ UŻYWANE",
+    "emojiUsageCount": {
+      "one": "użyto {count} raz",
+      "other": "użyto {count} razy"
+    },
     "noInboxMessagesYet": "Brak wiadomości w skrzynce.",
     "noInboxMessages": "Brak wiadomości w skrzynce",
     "noKeywords": "Brak słów kluczowych",

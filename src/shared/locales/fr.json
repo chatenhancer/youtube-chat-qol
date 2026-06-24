@@ -37,6 +37,10 @@
     "mentionUser": "Mentionner l'utilisateur",
     "mentionUserTitle": "Mentionner l'utilisateur. Alt/Option-clic pour citer.",
     "mostUsed": "LES PLUS UTILISÉS",
+    "emojiUsageCount": {
+      "one": "{count} utilisation",
+      "other": "{count} utilisations"
+    },
     "noInboxMessagesYet": "Aucun message dans la boîte de réception pour le moment.",
     "noInboxMessages": "Aucun message dans la boîte de réception",
     "noKeywords": "Aucun mot-clé",

@@ -37,6 +37,10 @@
     "mentionUser": "منشن کاربر",
     "mentionUserTitle": "منشن کاربر. برای نقل‌قول Alt/Option-click کنید.",
     "mostUsed": "بیشترین استفاده",
+    "emojiUsageCount": {
+      "one": "{count} بار استفاده",
+      "other": "{count} بار استفاده"
+    },
     "noInboxMessagesYet": "هنوز پیامی در صندوق ورودی نیست.",
     "noInboxMessages": "هیچ پیامی در صندوق ورودی نیست",
     "noKeywords": "کلیدواژه‌ای نیست",

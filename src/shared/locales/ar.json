@@ -37,6 +37,10 @@
     "mentionUser": "الإشارة إلى المستخدم",
     "mentionUserTitle": "الإشارة إلى المستخدم. انقر مع Alt/Option للاقتباس.",
     "mostUsed": "الأكثر استخداما",
+    "emojiUsageCount": {
+      "one": "{count} استخدام",
+      "other": "{count} استخدامات"
+    },
     "noInboxMessagesYet": "لا توجد رسائل في صندوق الوارد بعد.",
     "noInboxMessages": "لا توجد رسائل في صندوق الوارد",
     "noKeywords": "لا توجد كلمات مفتاحية",

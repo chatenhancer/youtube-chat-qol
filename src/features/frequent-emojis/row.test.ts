@@ -20,7 +20,23 @@ describe('frequent emoji row rendering', () => {
     expect(row).toBe(picker.querySelector('#categories')?.firstElementChild);
     expect(row?.querySelector('.ytcq-frequent-emoji-label')?.textContent).toBe('MOST USED');
     expect(row?.querySelectorAll('button')).toHaveLength(2);
+    expect(row?.querySelector<HTMLButtonElement>('button')?.title).toBe('👋 (1 use)');
     expect(row?.querySelector('img')?.alt).toBe(':custom-heart:');
+  });
+
+  it('shows usage counts in frequent emoji button tooltips', () => {
+    const picker = createPicker();
+
+    renderFrequentEmojiRow(picker, [
+      emoji({ key: 'single', label: 'single emoji', count: 1 }),
+      emoji({ key: 'multi', label: 'multi emoji', count: 3 })
+    ], vi.fn());
+
+    const buttons = picker.querySelectorAll<HTMLButtonElement>('.ytcq-frequent-emoji-button');
+    expect(buttons[0].title).toBe('single emoji (1 use)');
+    expect(buttons[0].getAttribute('aria-label')).toBe('single emoji (1 use)');
+    expect(buttons[1].title).toBe('multi emoji (3 uses)');
+    expect(buttons[1].getAttribute('aria-label')).toBe('multi emoji (3 uses)');
   });
 
   it('activates an emoji once for pointer and click pairs', () => {
@@ -109,7 +125,7 @@ describe('frequent emoji row rendering', () => {
 
     const buttons = picker.querySelectorAll<HTMLButtonElement>('.ytcq-frequent-emoji-button');
     const images = picker.querySelectorAll<HTMLImageElement>('img');
-    expect(buttons[0].title).toBe('Emoji');
+    expect(buttons[0].title).toBe('Emoji (1 use)');
     expect(images[0].alt).toBe('text fallback');
     expect(images[1].alt).toBe('label fallback');
   });

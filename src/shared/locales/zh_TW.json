@@ -37,6 +37,10 @@
     "mentionUser": "提及使用者",
     "mentionUserTitle": "提及使用者。Alt/Option 點擊可引用。",
     "mostUsed": "最常使用",
+    "emojiUsageCount": {
+      "one": "使用 {count} 次",
+      "other": "使用 {count} 次"
+    },
     "noInboxMessagesYet": "收件匣尚無訊息。",
     "noInboxMessages": "收件匣中沒有訊息",
     "noKeywords": "沒有關鍵字",

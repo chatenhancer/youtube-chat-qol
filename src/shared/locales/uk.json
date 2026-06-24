@@ -37,6 +37,10 @@
     "mentionUser": "Згадати користувача",
     "mentionUserTitle": "Згадати користувача. Alt/Option-клік, щоб процитувати.",
     "mostUsed": "НАЙЧАСТІШЕ",
+    "emojiUsageCount": {
+      "one": "{count} використання",
+      "other": "{count} використань"
+    },
     "noInboxMessagesYet": "Поки немає повідомлень у вхідних.",
     "noInboxMessages": "Немає повідомлень у вхідних",
     "noKeywords": "Немає ключових слів",

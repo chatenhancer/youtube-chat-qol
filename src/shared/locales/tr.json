@@ -37,6 +37,10 @@
     "mentionUser": "Kullanıcıdan bahset",
     "mentionUserTitle": "Kullanıcıdan bahset. Alıntı yapmak için Alt/Option-tıkla.",
     "mostUsed": "EN ÇOK KULLANILANLAR",
+    "emojiUsageCount": {
+      "one": "{count} kez kullanıldı",
+      "other": "{count} kez kullanıldı"
+    },
     "noInboxMessagesYet": "Gelen kutusunda henüz mesaj yok.",
     "noInboxMessages": "Gelen kutusunda mesaj yok",
     "noKeywords": "Anahtar kelime yok",

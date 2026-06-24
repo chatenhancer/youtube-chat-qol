@@ -37,6 +37,10 @@
     "mentionUser": "ユーザーをメンション",
     "mentionUserTitle": "ユーザーをメンション。Alt/Option クリックで引用。",
     "mostUsed": "よく使うもの",
+    "emojiUsageCount": {
+      "one": "{count} 回使用",
+      "other": "{count} 回使用"
+    },
     "noInboxMessagesYet": "受信トレイのメッセージはまだありません。",
     "noInboxMessages": "受信トレイにメッセージはありません",
     "noKeywords": "キーワードなし",

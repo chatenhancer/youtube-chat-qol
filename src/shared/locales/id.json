@@ -37,6 +37,10 @@
     "mentionUser": "Sebut pengguna",
     "mentionUserTitle": "Sebut pengguna. Alt/Option-klik untuk mengutip.",
     "mostUsed": "PALING SERING DIPAKAI",
+    "emojiUsageCount": {
+      "one": "{count} kali dipakai",
+      "other": "{count} kali dipakai"
+    },
     "noInboxMessagesYet": "Belum ada pesan di kotak masuk.",
     "noInboxMessages": "Tidak ada pesan kotak masuk",
     "noKeywords": "Tidak ada kata kunci",
