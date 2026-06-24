@@ -1687,6 +1687,15 @@ h3 {
   margin-bottom: 18px;
 }
 
+.blog-post-header > .blog-back-link {
+  margin-bottom: 8px;
+}
+
+.blog-forward-link {
+  align-items: center;
+  gap: 2px;
+}
+
 .back-link-icon {
   flex: 0 0 auto;
   width: 18px;
@@ -1697,6 +1706,26 @@ h3 {
 
 html[dir="rtl"] .back-link-icon {
   transform: translateX(3px) scaleX(-1);
+}
+
+.forward-link-icon {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+  transform: translateX(2px) scaleX(-1);
+}
+
+.back-link-icon path,
+.forward-link-icon path {
+  stroke: currentColor;
+  stroke-width: 34px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+html[dir="rtl"] .forward-link-icon {
+  transform: translateX(-2px);
 }
 
 .blog-empty {
@@ -1977,10 +2006,21 @@ html[dir="rtl"] .back-link-icon {
   border-top: 1px solid var(--line);
 }
 
+.blog-related-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 18px;
+}
+
 .blog-related h2 {
   margin: 0;
   font-size: 28px;
   line-height: 1.16;
+}
+
+.blog-related-heading .feature-link {
+  margin-top: 0;
 }
 
 .blog-brand-inline {
@@ -3784,7 +3824,8 @@ figcaption {
     padding: 60px 20px;
   }
 
-  .latest-updates-heading {
+  .latest-updates-heading,
+  .blog-related-heading {
     align-items: start;
     flex-direction: column;
   }

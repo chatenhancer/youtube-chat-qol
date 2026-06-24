@@ -1,8 +1,10 @@
 ---
 import { Image } from 'astro:assets';
 import type { BlogPost } from '../../data/blog';
+import Icon from '../common/icon.astro';
 import {
   getBlogEntryFolder,
+  getBlogIndexPath,
   getBlogPostPath,
   getRelatedBlogPosts
 } from '../../data/blog';
@@ -28,7 +30,13 @@ const BLOG_CARD_IMAGE_WIDTH = 960;
 
 {relatedPosts.length > 0 && (
   <section class="blog-related" aria-labelledby="blog-related-title">
-    <h2 id="blog-related-title">{blog.similarPosts}</h2>
+    <div class="blog-related-heading">
+      <h2 id="blog-related-title">{blog.similarPosts}</h2>
+      <a class="feature-link blog-forward-link" href={getBlogIndexPath(locale)}>
+        <span>{blog.viewAllUpdates}</span>
+        <Icon class="forward-link-icon" name="chevron_backward" />
+      </a>
+    </div>
     <div class="latest-updates-grid blog-related-grid">
       {relatedPosts.map((relatedPost) => {
         const coverVideoUrl = getBlogCoverVideoUrl(getBlogEntryFolder(relatedPost), relatedPost.data.video);

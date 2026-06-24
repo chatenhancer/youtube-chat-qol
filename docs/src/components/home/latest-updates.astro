@@ -33,7 +33,10 @@ const BLOG_CARD_IMAGE_WIDTH = 1280;
           <h2 id="latest-updates-title">{blog.latestNotes}</h2>
           <p class="latest-updates-copy">{blog.archiveCopy}</p>
         </div>
-        <a class="feature-link" href={getBlogIndexPath(locale)} data-blog-archive-link>{blog.viewAllUpdates}</a>
+        <a class="feature-link blog-forward-link" href={getBlogIndexPath(locale)} data-blog-archive-link>
+          <span>{blog.viewAllUpdates}</span>
+          <Icon class="forward-link-icon" name="chevron_backward" />
+        </a>
       </div>
       <div class="latest-updates-grid" data-blog-latest-list>
         {latestPosts.map((post) => {
