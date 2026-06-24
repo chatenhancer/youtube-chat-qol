@@ -3392,7 +3392,8 @@ figcaption {
 
 .install-store-option {
   display: grid;
-  grid-template-columns: auto auto minmax(0, 1fr) auto;
+  grid-template-areas: "browser store chevron";
+  grid-template-columns: minmax(0, 1fr) minmax(0, 8rem) 18px;
   align-items: center;
   gap: 10px;
   min-height: 46px;
@@ -3412,6 +3413,8 @@ figcaption {
 }
 
 .install-store-option-icon {
+  grid-area: browser;
+  justify-self: start;
   width: 22px;
   height: 22px;
   border-radius: 999px;
@@ -3424,24 +3427,36 @@ figcaption {
 }
 
 .install-store-option-label {
+  grid-area: browser;
+  min-width: 0;
+  max-width: calc(100% - 32px);
+  margin-left: 32px;
   overflow: hidden;
   font-size: 13px;
   font-weight: 700;
   line-height: 1.2;
+  text-align: left;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .install-store-option-meta {
+  grid-area: store;
+  justify-self: end;
+  min-width: 0;
+  max-width: 100%;
   overflow: hidden;
   color: var(--muted);
   font-size: 11.5px;
   line-height: 1.2;
+  text-align: right;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .install-store-option-arrow {
+  grid-area: chevron;
+  justify-self: end;
   width: 18px;
   height: 18px;
   background: currentColor;
