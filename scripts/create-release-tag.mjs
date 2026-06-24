@@ -1,6 +1,7 @@
 import { spawnSync } from 'node:child_process';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
+import * as readline from 'node:readline/promises';
 import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -48,10 +49,18 @@ if (existingRemoteTag.status !== 2) {
   throw new Error(`Could not check whether ${tagName} exists on ${args.remote}.`);
 }
 
+const releasePreview = getReleasePreview(tagName);
+printReleasePreview(tagName, releasePreview);
+
 if (args.dryRun) {
   console.log(`Would push ${branch} to ${args.remote}.`);
   console.log(`Would create annotated tag ${tagName}.`);
   console.log(`Would push ${tagName} to ${args.remote}.`);
+  process.exit(0);
+}
+
+if (!(await confirmRelease(tagName))) {
+  console.log(`Aborted ${tagName}.`);
   process.exit(0);
 }
 
@@ -99,8 +108,87 @@ function printUsage() {
     'Usage: npm run release:tag -- [--remote <name>] [--dry-run]',
     '',
     'Pushes the current branch, creates an annotated vX.Y.Z tag from package.json,',
-    'then pushes the tag. The worktree must be clean.'
+    'then pushes the tag. The worktree must be clean.',
+    '',
+    'Before tagging, prints the commits entering the release and asks for',
+    'confirmation. Press Enter or type Y to continue; type N to abort.'
   ].join('\n'));
+}
+
+function getReleasePreview(tagName) {
+  const previousTag = getPreviousReleaseTag(tagName);
+  const logRange = previousTag ? `${previousTag}..HEAD` : 'HEAD';
+  const commitOutput = gitOutput(['log', '--pretty=format:%h %s', '--reverse', logRange]);
+  const commits = commitOutput ? commitOutput.split('\n') : [];
+
+  return {
+    commits,
+    logRange,
+    previousTag
+  };
+}
+
+function getPreviousReleaseTag(tagName) {
+  const tagOutput = gitOutput(['tag', '--merged', 'HEAD', '--list', 'v[0-9]*', '--sort=-version:refname']);
+  const releaseTags = tagOutput
+    .split('\n')
+    .map((tag) => tag.trim())
+    .filter((tag) => /^v\d+\.\d+\.\d+$/.test(tag) && tag !== tagName);
+
+  return releaseTags[0] || '';
+}
+
+function printReleasePreview(tagName, preview) {
+  console.log(`Release ${tagName} commit preview:`);
+  if (preview.previousTag) {
+    console.log(`Previous release tag: ${preview.previousTag}`);
+  } else {
+    console.log('Previous release tag: none found');
+  }
+  console.log(`Commit range: ${preview.logRange}`);
+  console.log('');
+
+  if (preview.commits.length === 0) {
+    console.log('No commits found for this release range.');
+    console.log('');
+    return;
+  }
+
+  for (const commit of preview.commits) {
+    console.log(`- ${commit}`);
+  }
+  console.log('');
+}
+
+async function confirmRelease(tagName) {
+  if (!process.stdin.isTTY || !process.stdout.isTTY) {
+    throw new Error([
+      'Release confirmation requires an interactive terminal.',
+      'Run this command from a terminal so you can type Y or N.'
+    ].join('\n'));
+  }
+
+  const prompt = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+  });
+
+  try {
+    for (;;) {
+      const answer = (await prompt.question(`Create and push ${tagName}? [Y/n] `)).trim().toLowerCase();
+
+      if (answer === '' || answer === 'y' || answer === 'yes') {
+        return true;
+      }
+      if (answer === 'n' || answer === 'no') {
+        return false;
+      }
+
+      console.log('Please type Y or N.');
+    }
+  } finally {
+    prompt.close();
+  }
 }
 
 function git(args) {
