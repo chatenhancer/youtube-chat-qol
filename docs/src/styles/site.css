@@ -2102,26 +2102,34 @@ html[dir="rtl"] .back-link-icon {
 }
 
 .version-badges {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
+  display: grid;
   gap: 8px;
   margin-top: 18px;
 }
 
 .version-badges span {
-  flex: 0 0 100%;
   color: var(--muted);
   font-size: 13px;
   font-weight: 700;
 }
 
-.version-badges a {
+.version-badge-list {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 5px;
+  overflow-x: auto;
+  max-width: 100%;
+  padding-bottom: 2px;
+}
+
+.version-badge-list a {
+  flex: 0 0 auto;
   display: inline-flex;
 }
 
-.version-badges img {
-  height: 20px;
+.version-badge-list img {
+  height: 18px;
+  max-width: none;
 }
 
 .store-version-alert {

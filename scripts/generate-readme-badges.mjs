@@ -9,6 +9,7 @@ fs.mkdirSync(badgesDir, { recursive: true });
 
 const coverage = readCoverageSummary();
 writeBadge('unit-coverage.json', createCoverageBadge(coverage));
+writeBadge('unit-line-coverage.json', createLineCoverageBadge(coverage));
 writeBadge('unit-tests.json', {
   label: 'unit tests',
   message: String(countUnitTests()),
@@ -38,6 +39,23 @@ function createCoverageBadge(summary) {
     label: 'coverage',
     message: `${formatPercent(linePct)} lines / ${formatPercent(branchPct)} branches`,
     color: coverageColor(Math.min(linePct, branchPct))
+  };
+}
+
+function createLineCoverageBadge(summary) {
+  if (!summary?.lines) {
+    return {
+      label: 'coverage',
+      message: 'run tests',
+      color: 'lightgrey'
+    };
+  }
+
+  const linePct = Number(summary.lines.pct);
+  return {
+    label: 'coverage',
+    message: formatPercent(linePct),
+    color: coverageColor(linePct)
   };
 }
 

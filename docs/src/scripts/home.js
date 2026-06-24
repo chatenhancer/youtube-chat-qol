@@ -19,19 +19,19 @@
   const walkthroughHash = "#walkthrough";
   const versionBadgeSources = {
     release: {
-      image: "https://img.shields.io/github/v/release/chat-enhancer-yt/youtube-chat-qol?label=release",
+      image: "https://img.shields.io/github/v/release/chat-enhancer-yt/youtube-chat-qol?label=release&logo=github",
       json: "https://img.shields.io/github/v/release/chat-enhancer-yt/youtube-chat-qol.json?label=release"
     },
     chrome: {
-      image: "https://img.shields.io/chrome-web-store/v/pkhaaipeppfpakofgpdpcpkflangpghf?label=chrome%20web%20store",
+      image: "https://img.shields.io/chrome-web-store/v/pkhaaipeppfpakofgpdpcpkflangpghf?label=chrome%20web%20store&logo=googlechrome",
       json: "https://img.shields.io/chrome-web-store/v/pkhaaipeppfpakofgpdpcpkflangpghf.json?label=chrome%20web%20store"
     },
     firefox: {
-      image: "https://img.shields.io/amo/v/chat-enhancer-for-youtube?label=firefox%20add-ons",
+      image: "https://img.shields.io/amo/v/chat-enhancer-for-youtube?label=firefox%20add-ons&logo=firefoxbrowser",
       json: "https://img.shields.io/amo/v/chat-enhancer-for-youtube.json?label=firefox%20add-ons"
     },
     safari: {
-      image: "https://img.shields.io/itunes/v/6783276323?label=mac%20app%20store",
+      image: "https://img.shields.io/itunes/v/6783276323?label=mac%20app%20store&logo=apple",
       json: "https://img.shields.io/itunes/v/6783276323.json?label=mac%20app%20store"
     }
   };

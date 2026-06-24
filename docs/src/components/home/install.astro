@@ -23,15 +23,20 @@ const { locale, messages: m, rootPrefix } = Astro.props as {
       <p>{m.install.copy}</p>
       <div class="version-badges" aria-label={m.install.publishedVersions}>
         <span>{m.install.publishedVersions}</span>
-        <a href={site.sourceUrl}>
-          <img data-version-badge="release" src="https://img.shields.io/github/v/release/chat-enhancer-yt/youtube-chat-qol?label=release&color=2da44e" alt="release version">
-        </a>
-        <a href={site.chromeUrl}>
-          <img data-version-badge="chrome" src="https://img.shields.io/chrome-web-store/v/pkhaaipeppfpakofgpdpcpkflangpghf?label=chrome%20web%20store&color=6b7280" alt="chrome web store version">
-        </a>
-        <a href={site.firefoxUrl}>
-          <img data-version-badge="firefox" src="https://img.shields.io/amo/v/chat-enhancer-for-youtube?label=firefox%20add-ons&color=6b7280" alt="firefox add-ons version">
-        </a>
+        <div class="version-badge-list">
+          <a href={site.sourceUrl}>
+            <img data-version-badge="release" src="https://img.shields.io/github/v/release/chat-enhancer-yt/youtube-chat-qol?label=release&logo=github&color=2da44e" alt="release version">
+          </a>
+          <a href={site.chromeUrl}>
+            <img data-version-badge="chrome" src="https://img.shields.io/chrome-web-store/v/pkhaaipeppfpakofgpdpcpkflangpghf?label=chrome%20web%20store&logo=googlechrome&color=6b7280" alt="chrome web store version">
+          </a>
+          <a href={site.firefoxUrl}>
+            <img data-version-badge="firefox" src="https://img.shields.io/amo/v/chat-enhancer-for-youtube?label=firefox%20add-ons&logo=firefoxbrowser&color=6b7280" alt="firefox add-ons version">
+          </a>
+          <a href={site.safariUrl}>
+            <img data-version-badge="safari" src="https://img.shields.io/itunes/v/6783276323?label=mac%20app%20store&logo=apple&color=6b7280" alt="mac app store version">
+          </a>
+        </div>
       </div>
     </div>
     <div class="install-actions" data-install-actions>
