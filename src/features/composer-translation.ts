@@ -35,10 +35,11 @@ const ICON_CLASS = 'ytcq-composer-translate-icon';
 const PANEL_CLASS = 'ytcq-composer-translate-panel';
 const SELECT_CLASS = 'ytcq-composer-translate-select';
 const TRANSLATION_PULSE_CLASS = 'ytcq-translation-pulse';
+const TRANSLATION_PULSE_LOOP_CLASS = 'ytcq-translation-pulse-loop';
 const INPUT_RENDERER_SELECTOR = 'yt-live-chat-message-input-renderer';
 const EMOJI_BUTTON_SELECTOR = '#emoji-picker-button';
 const TRANSLATION_DEBOUNCE_MS = 850;
-const TRANSLATION_PULSE_MIN_MS = 900;
+const TRANSLATION_PULSE_MIN_MS = 620;
 
 let saveOptions: SaveOptions = () => {};
 let button: HTMLButtonElement | null = null;
@@ -57,6 +58,8 @@ let lastTranslatedText = '';
 const activeDraftTranslationRequests = new Set<number>();
 let draftTranslationAnimationStartedAt = 0;
 let draftTranslationAnimationClearTimer = 0;
+let draftTranslationAnimationLoopTimer = 0;
+let draftTranslationAnimationLooping = false;
 let composerTranslationListeners = new AbortController();
 
 registerFeatureLifecycle({
@@ -333,7 +336,16 @@ function startDraftTranslationAnimation(requestId: number): void {
     window.clearTimeout(draftTranslationAnimationClearTimer);
     draftTranslationAnimationClearTimer = 0;
   }
-  if (wasIdle) draftTranslationAnimationStartedAt = Date.now();
+  if (wasIdle) {
+    draftTranslationAnimationStartedAt = Date.now();
+    draftTranslationAnimationLooping = false;
+    draftTranslationAnimationLoopTimer = window.setTimeout(() => {
+      draftTranslationAnimationLoopTimer = 0;
+      if (!activeDraftTranslationRequests.size) return;
+      draftTranslationAnimationLooping = true;
+      updateDraftTranslationAnimation();
+    }, TRANSLATION_PULSE_MIN_MS);
+  }
   updateDraftTranslationAnimation();
 }
 
@@ -344,10 +356,15 @@ function stopDraftTranslationAnimation(requestId: number): void {
     return;
   }
 
+  if (draftTranslationAnimationLoopTimer) {
+    window.clearTimeout(draftTranslationAnimationLoopTimer);
+    draftTranslationAnimationLoopTimer = 0;
+  }
   const elapsed = Date.now() - draftTranslationAnimationStartedAt;
   const remaining = Math.max(0, TRANSLATION_PULSE_MIN_MS - elapsed);
   if (!remaining) {
     draftTranslationAnimationStartedAt = 0;
+    draftTranslationAnimationLooping = false;
     updateDraftTranslationAnimation();
     return;
   }
@@ -356,6 +373,7 @@ function stopDraftTranslationAnimation(requestId: number): void {
     draftTranslationAnimationClearTimer = 0;
     if (!activeDraftTranslationRequests.size) {
       draftTranslationAnimationStartedAt = 0;
+      draftTranslationAnimationLooping = false;
       updateDraftTranslationAnimation();
     }
   }, remaining);
@@ -364,11 +382,16 @@ function stopDraftTranslationAnimation(requestId: number): void {
 
 function clearDraftTranslationAnimation(): void {
   activeDraftTranslationRequests.clear();
+  if (draftTranslationAnimationLoopTimer) {
+    window.clearTimeout(draftTranslationAnimationLoopTimer);
+    draftTranslationAnimationLoopTimer = 0;
+  }
   if (draftTranslationAnimationClearTimer) {
     window.clearTimeout(draftTranslationAnimationClearTimer);
     draftTranslationAnimationClearTimer = 0;
   }
   draftTranslationAnimationStartedAt = 0;
+  draftTranslationAnimationLooping = false;
   updateDraftTranslationAnimation();
 }
 
@@ -378,6 +401,7 @@ function updateDraftTranslationAnimation(): void {
     TRANSLATION_PULSE_CLASS,
     activeDraftTranslationRequests.size > 0 || draftTranslationAnimationClearTimer > 0
   );
+  icon?.classList.toggle(TRANSLATION_PULSE_LOOP_CLASS, draftTranslationAnimationLooping);
 }
 
 function getDraftTranslationCandidate(): {

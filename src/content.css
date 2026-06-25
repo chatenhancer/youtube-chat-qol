@@ -388,6 +388,12 @@ ytd-menu-popup-renderer .ytcq-toggle-item[aria-checked="true"] .ytcq-menu-toggle
   animation: ytcq-translation-target-pop 560ms ease-out 60ms;
 }
 
+.ytcq-composer-translate-icon.ytcq-translation-pulse-loop,
+.ytcq-composer-translate-icon.ytcq-translation-pulse-loop .ytcq-translate-source-mark,
+.ytcq-composer-translate-icon.ytcq-translation-pulse-loop .ytcq-translate-target-mark {
+  animation-iteration-count: infinite;
+}
+
 .ytcq-composer-translate-button-active {
   color: var(--yt-spec-call-to-action, #3ea6ff);
 }

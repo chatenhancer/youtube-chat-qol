@@ -101,10 +101,57 @@ describe('composer translation', () => {
     await flushPromises();
 
     expect(icon.classList.contains('ytcq-translation-pulse')).toBe(true);
-    await vi.advanceTimersByTimeAsync(899);
+    expect(icon.classList.contains('ytcq-translation-pulse-loop')).toBe(false);
+    await vi.advanceTimersByTimeAsync(619);
     expect(icon.classList.contains('ytcq-translation-pulse')).toBe(true);
+    expect(icon.classList.contains('ytcq-translation-pulse-loop')).toBe(false);
     await vi.advanceTimersByTimeAsync(1);
     expect(icon.classList.contains('ytcq-translation-pulse')).toBe(false);
+  });
+
+  it('keeps the translate icon animating while draft translation remains pending', async () => {
+    vi.useFakeTimers();
+    document.body.replaceChildren();
+    setOptions({
+      ...DEFAULT_OPTIONS,
+      composerTranslateLanguage: 'ja'
+    });
+    let resolveTranslation: ((response: unknown) => void) | null = null;
+    vi.mocked(chrome.runtime.sendMessage).mockImplementation(((_message: unknown, callback?: (response: unknown) => void) => {
+      resolveTranslation = (response: unknown) => callback?.(response);
+      return Promise.resolve({});
+    }) as never);
+    const input = createVisibleChatInput();
+    document.body.append(createComposerHost(input));
+
+    initComposerTranslation(vi.fn());
+    scheduleComposerTranslationWire();
+    await vi.runOnlyPendingTimersAsync();
+    input.textContent = 'Hola';
+    input.dispatchEvent(new InputEvent('input', { bubbles: true }));
+    await vi.advanceTimersByTimeAsync(850);
+
+    const icon = document.querySelector<SVGSVGElement>('.ytcq-composer-translate-icon')!;
+    expect(icon.classList.contains('ytcq-translation-pulse')).toBe(true);
+    expect(icon.classList.contains('ytcq-translation-pulse-loop')).toBe(false);
+    await vi.advanceTimersByTimeAsync(620);
+    expect(icon.classList.contains('ytcq-translation-pulse')).toBe(true);
+    expect(icon.classList.contains('ytcq-translation-pulse-loop')).toBe(true);
+    await vi.advanceTimersByTimeAsync(1000);
+    expect(icon.classList.contains('ytcq-translation-pulse')).toBe(true);
+    expect(icon.classList.contains('ytcq-translation-pulse-loop')).toBe(true);
+
+    const finishTranslation = resolveTranslation as ((response: unknown) => void) | null;
+    if (!finishTranslation) throw new Error('Expected pending draft translation.');
+    finishTranslation({
+      ok: true,
+      sourceLanguage: 'es',
+      translatedText: 'こんにちは'
+    });
+    await flushPromises();
+
+    expect(icon.classList.contains('ytcq-translation-pulse')).toBe(false);
+    expect(icon.classList.contains('ytcq-translation-pulse-loop')).toBe(false);
   });
 
   it('does not translate disabled, empty, or slash-command drafts', async () => {
