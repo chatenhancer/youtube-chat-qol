@@ -7,11 +7,11 @@
 <p>
   <a href="https://www.chatenhancer.com/chrome"><img alt="chrome" src="https://img.shields.io/chrome-web-store/v/pkhaaipeppfpakofgpdpcpkflangpghf?label=chrome&logo=googlechrome&color=4285f4"></a>
   <a href="https://www.chatenhancer.com/firefox"><img alt="firefox" src="https://img.shields.io/amo/v/chat-enhancer-for-youtube?label=firefox&logo=firefoxbrowser&color=ff7139"></a>
-  <a href="https://www.chatenhancer.com/safari"><img alt="safari" src="https://img.shields.io/itunes/v/6783276323?label=safari&logo=apple&color=0a84ff"></a>
+  <a href="https://www.chatenhancer.com/safari"><img alt="safari" src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fitunes.apple.com%2Flookup%3Fid%3D6783276323%26country%3Dus&query=%24.results%5B0%5D.version&label=safari&logo=apple&color=6e6e73"></a>
   <img alt="release" src="https://img.shields.io/github/v/release/chat-enhancer-yt/youtube-chat-qol?label=release&logo=github&color=fd0032">
   <a href="https://github.com/chat-enhancer-yt/youtube-chat-qol/actions/workflows/ci.yml"><img alt="CI" src="https://img.shields.io/github/actions/workflow/status/chat-enhancer-yt/youtube-chat-qol/ci.yml?label=ci"></a>
   <img alt="coverage" src="https://img.shields.io/endpoint?url=https%3A%2F%2Fwww.chatenhancer.com%2Fbadges%2Funit-line-coverage.json">
-  <img alt="manifest v3" src="https://img.shields.io/badge/mv3-6b7280">
+  <img alt="manifest v3" src="https://img.shields.io/badge/mv3-7c3aed">
   <a href="LICENSE"><img alt="license" src="https://img.shields.io/badge/GPL--3.0%2B-2da44e"></a>
 </p>
 

@@ -31,8 +31,8 @@
       json: "https://img.shields.io/amo/v/chat-enhancer-for-youtube.json?label=firefox%20add-ons"
     },
     safari: {
-      image: "https://img.shields.io/itunes/v/6783276323?label=mac%20app%20store&logo=apple",
-      json: "https://img.shields.io/itunes/v/6783276323.json?label=mac%20app%20store"
+      image: "https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fitunes.apple.com%2Flookup%3Fid%3D6783276323%26country%3Dus&query=%24.results%5B0%5D.version&label=mac%20app%20store&logo=apple",
+      json: "https://img.shields.io/badge/dynamic/json.json?url=https%3A%2F%2Fitunes.apple.com%2Flookup%3Fid%3D6783276323%26country%3Dus&query=%24.results%5B0%5D.version&label=mac%20app%20store"
     }
   };
   const versionBadgeColors = {
