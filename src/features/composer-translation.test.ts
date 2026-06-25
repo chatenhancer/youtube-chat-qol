@@ -64,6 +64,49 @@ describe('composer translation', () => {
     expect(input.textContent).toBe('こんにちは @ExampleUser');
   });
 
+  it('animates the translate icon for at least one pulse when draft translation finishes quickly', async () => {
+    vi.useFakeTimers();
+    document.body.replaceChildren();
+    setOptions({
+      ...DEFAULT_OPTIONS,
+      composerTranslateLanguage: 'ja'
+    });
+    let resolveTranslation: ((response: unknown) => void) | null = null;
+    vi.mocked(chrome.runtime.sendMessage).mockImplementation(((_message: unknown, callback?: (response: unknown) => void) => {
+      resolveTranslation = (response: unknown) => callback?.(response);
+      return Promise.resolve({});
+    }) as never);
+    const input = createVisibleChatInput();
+    document.body.append(createComposerHost(input));
+
+    initComposerTranslation(vi.fn());
+    scheduleComposerTranslationWire();
+    await vi.runOnlyPendingTimersAsync();
+    input.textContent = 'Hola';
+    input.dispatchEvent(new InputEvent('input', { bubbles: true }));
+    await vi.advanceTimersByTimeAsync(850);
+
+    const icon = document.querySelector<SVGSVGElement>('.ytcq-composer-translate-icon')!;
+    expect(icon.classList.contains('ytcq-translation-pulse')).toBe(true);
+    expect(icon.querySelector('.ytcq-translate-source-mark')).not.toBeNull();
+    expect(icon.querySelector('.ytcq-translate-target-mark')).not.toBeNull();
+
+    const finishTranslation = resolveTranslation as ((response: unknown) => void) | null;
+    if (!finishTranslation) throw new Error('Expected pending draft translation.');
+    finishTranslation({
+      ok: true,
+      sourceLanguage: 'es',
+      translatedText: 'こんにちは'
+    });
+    await flushPromises();
+
+    expect(icon.classList.contains('ytcq-translation-pulse')).toBe(true);
+    await vi.advanceTimersByTimeAsync(899);
+    expect(icon.classList.contains('ytcq-translation-pulse')).toBe(true);
+    await vi.advanceTimersByTimeAsync(1);
+    expect(icon.classList.contains('ytcq-translation-pulse')).toBe(false);
+  });
+
   it('does not translate disabled, empty, or slash-command drafts', async () => {
     vi.useFakeTimers();
     document.body.replaceChildren();

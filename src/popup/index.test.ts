@@ -662,8 +662,11 @@ describe('popup', () => {
     const playgroundProfileWinsCount = document.querySelector<HTMLElement>('#playgroundProfileWinsCount')!;
     const playgroundGamesSection = document.querySelector<HTMLElement>('#playgroundGamesSection')!;
     const playgroundGamesAvailable = document.querySelector<HTMLInputElement>('#playgroundGamesAvailable')!;
+    const translationIcon = document.querySelector<SVGSVGElement>('.translation-target-icon')!;
 
     expect(targetLanguage.value).toBe('ja');
+    expect(translationIcon.querySelector('.translation-source-mark')).not.toBeNull();
+    expect(translationIcon.querySelector('.translation-target-mark')).not.toBeNull();
     expect(translationDisplay.value).toBe('below');
     expect(sound.checked).toBe(false);
     expect(startupEffect.checked).toBe(true);

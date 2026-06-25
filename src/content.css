@@ -265,7 +265,10 @@ ytd-menu-popup-renderer .ytcq-translate-menu-icon.ytcq-translation-pulse .ytcq-t
   ytd-menu-popup-renderer .ytcq-menu-icon.ytcq-bell-ringing svg,
   ytd-menu-popup-renderer .ytcq-translate-menu-icon.ytcq-translation-pulse,
   ytd-menu-popup-renderer .ytcq-translate-menu-icon.ytcq-translation-pulse .ytcq-translate-source-mark,
-  ytd-menu-popup-renderer .ytcq-translate-menu-icon.ytcq-translation-pulse .ytcq-translate-target-mark {
+  ytd-menu-popup-renderer .ytcq-translate-menu-icon.ytcq-translation-pulse .ytcq-translate-target-mark,
+  .ytcq-composer-translate-icon.ytcq-translation-pulse,
+  .ytcq-composer-translate-icon.ytcq-translation-pulse .ytcq-translate-source-mark,
+  .ytcq-composer-translate-icon.ytcq-translation-pulse .ytcq-translate-target-mark {
     animation: none;
   }
 }
@@ -361,6 +364,28 @@ ytd-menu-popup-renderer .ytcq-toggle-item[aria-checked="true"] .ytcq-menu-toggle
   height: 24px;
   fill: currentColor;
   pointer-events: none;
+}
+
+.ytcq-composer-translate-icon {
+  transform-origin: center;
+}
+
+.ytcq-composer-translate-icon .ytcq-translate-source-mark,
+.ytcq-composer-translate-icon .ytcq-translate-target-mark {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.ytcq-composer-translate-icon.ytcq-translation-pulse {
+  animation: ytcq-translation-icon-pop 560ms cubic-bezier(0.18, 0.89, 0.32, 1.28);
+}
+
+.ytcq-composer-translate-icon.ytcq-translation-pulse .ytcq-translate-source-mark {
+  animation: ytcq-translation-source-pop 560ms ease-out;
+}
+
+.ytcq-composer-translate-icon.ytcq-translation-pulse .ytcq-translate-target-mark {
+  animation: ytcq-translation-target-pop 560ms ease-out 60ms;
 }
 
 .ytcq-composer-translate-button-active {

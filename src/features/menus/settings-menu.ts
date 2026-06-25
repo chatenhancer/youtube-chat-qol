@@ -9,12 +9,10 @@ import { getTargetLanguageUpdate, getTranslationToggleTarget, type Options } fro
 import { getOptions } from '../../shared/state';
 import { t } from '../../shared/i18n';
 import {
-  ICON_VIEW_BOX,
   SOUND_BELL_ICON_PATH,
   SOUND_RINGING_BELL_ICON_PATH,
   TRANSLATE_ICON_PATH,
-  TRANSLATE_SOURCE_ICON_PATH,
-  TRANSLATE_TARGET_ICON_PATH
+  createSplitTranslateIcon
 } from '../../shared/icons';
 import { playSoftChime } from '../../shared/sounds/soft-chime';
 import { registerFeatureLifecycle } from '../../content/lifecycle';
@@ -26,7 +24,6 @@ let saveOptions: SaveOptions = () => {};
 
 const BELL_RING_CLASS = 'ytcq-bell-ringing';
 const TRANSLATION_PULSE_CLASS = 'ytcq-translation-pulse';
-const SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
 
 registerFeatureLifecycle({
   page: {
@@ -129,26 +126,10 @@ function prepareTranslateMenuIcon(item: HTMLElement): void {
   if (!icon) return;
 
   icon.classList.add('ytcq-translate-menu-icon');
-  icon.replaceChildren(createSplitTranslateIcon());
-}
-
-function createSplitTranslateIcon(): SVGSVGElement {
-  const svg = document.createElementNS(SVG_NAMESPACE, 'svg');
-  svg.setAttribute('viewBox', ICON_VIEW_BOX);
-  svg.setAttribute('focusable', 'false');
-  svg.setAttribute('aria-hidden', 'true');
-  svg.append(
-    createTranslateIconPath(TRANSLATE_SOURCE_ICON_PATH, 'ytcq-translate-source-mark'),
-    createTranslateIconPath(TRANSLATE_TARGET_ICON_PATH, 'ytcq-translate-target-mark')
-  );
-  return svg;
-}
-
-function createTranslateIconPath(pathData: string, className: string): SVGPathElement {
-  const path = document.createElementNS(SVG_NAMESPACE, 'path');
-  path.setAttribute('class', className);
-  path.setAttribute('d', pathData);
-  return path;
+  icon.replaceChildren(createSplitTranslateIcon({
+    sourceClassName: 'ytcq-translate-source-mark',
+    targetClassName: 'ytcq-translate-target-mark'
+  }));
 }
 
 function animateTranslateMenuIcon(item: HTMLElement): void {

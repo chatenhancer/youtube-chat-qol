@@ -9,6 +9,7 @@ import {
   createAddIcon,
   createChannelIcon,
   createInboxIcon,
+  createSplitTranslateIcon,
   createSvgIcon,
   createTranslateIcon
 } from './icons';
@@ -32,5 +33,17 @@ describe('shared SVG icon factories', () => {
     expect(createAddIcon().getAttribute('viewBox')).toBe(ICON_VIEW_BOX);
     expect(createTranslateIcon().querySelector('path')?.getAttribute('d')).toBe(TRANSLATE_ICON_PATH);
     expect(createChannelIcon().getAttribute('viewBox')).toBe(MATERIAL_ICON_VIEW_BOX);
+  });
+
+  it('creates split translate icons with configurable classes', () => {
+    const icon = createSplitTranslateIcon({
+      iconClassName: 'translate-icon',
+      sourceClassName: 'translate-source',
+      targetClassName: 'translate-target'
+    });
+    const paths = [...icon.querySelectorAll('path')];
+
+    expect(icon.getAttribute('class')).toBe('translate-icon');
+    expect(paths.map((path) => path.getAttribute('class'))).toEqual(['translate-source', 'translate-target']);
   });
 });

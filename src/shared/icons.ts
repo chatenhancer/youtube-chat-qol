@@ -34,11 +34,38 @@ export function createSvgIcon(viewBox: string, pathData: string): SVGSVGElement 
   icon.setAttribute('focusable', 'false');
   icon.setAttribute('aria-hidden', 'true');
 
-  const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-  path.setAttribute('d', pathData);
-  icon.append(path);
+  icon.append(createSvgPath(pathData));
 
   return icon;
+}
+
+export function createSplitTranslateIcon({
+  iconClassName = '',
+  sourceClassName = '',
+  targetClassName = ''
+}: {
+  iconClassName?: string;
+  sourceClassName?: string;
+  targetClassName?: string;
+} = {}): SVGSVGElement {
+  const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  icon.setAttribute('viewBox', ICON_VIEW_BOX);
+  icon.setAttribute('focusable', 'false');
+  icon.setAttribute('aria-hidden', 'true');
+  if (iconClassName) icon.setAttribute('class', iconClassName);
+  icon.append(
+    createSvgPath(TRANSLATE_SOURCE_ICON_PATH, sourceClassName),
+    createSvgPath(TRANSLATE_TARGET_ICON_PATH, targetClassName)
+  );
+
+  return icon;
+}
+
+function createSvgPath(pathData: string, className = ''): SVGPathElement {
+  const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  path.setAttribute('d', pathData);
+  if (className) path.setAttribute('class', className);
+  return path;
 }
 
 export function createCloseIcon(): SVGSVGElement {

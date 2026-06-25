@@ -8,7 +8,7 @@
  * original text instead of mixing translated and untranslated fragments.
  */
 import { getLocalizedLanguageLabel, t } from '../shared/i18n';
-import { createTranslateIcon } from '../shared/icons';
+import { createSplitTranslateIcon } from '../shared/icons';
 import { LANGUAGE_OPTIONS } from '../shared/languages';
 import { ytcqCreateElement } from '../shared/managed-dom';
 import type { Options } from '../shared/options';
@@ -31,11 +31,14 @@ type SaveOptions = (values: Partial<Options>) => void;
 
 const CONTROL_CLASS = 'ytcq-composer-translate-control';
 const BUTTON_CLASS = 'ytcq-composer-translate-button';
+const ICON_CLASS = 'ytcq-composer-translate-icon';
 const PANEL_CLASS = 'ytcq-composer-translate-panel';
 const SELECT_CLASS = 'ytcq-composer-translate-select';
+const TRANSLATION_PULSE_CLASS = 'ytcq-translation-pulse';
 const INPUT_RENDERER_SELECTOR = 'yt-live-chat-message-input-renderer';
 const EMOJI_BUTTON_SELECTOR = '#emoji-picker-button';
 const TRANSLATION_DEBOUNCE_MS = 850;
+const TRANSLATION_PULSE_MIN_MS = 900;
 
 let saveOptions: SaveOptions = () => {};
 let button: HTMLButtonElement | null = null;
@@ -51,6 +54,9 @@ let lastSourceText = '';
 let lastSourceNodes: Node[] = [];
 let lastSourcePlanText = '';
 let lastTranslatedText = '';
+const activeDraftTranslationRequests = new Set<number>();
+let draftTranslationAnimationStartedAt = 0;
+let draftTranslationAnimationClearTimer = 0;
 let composerTranslationListeners = new AbortController();
 
 registerFeatureLifecycle({
@@ -95,6 +101,7 @@ export function refreshComposerTranslation(): void {
     activeLanguage = nextLanguage;
     resetDraftMemory();
     requestSerial += 1;
+    clearDraftTranslationAnimation();
   }
 
   updateButtonState();
@@ -111,6 +118,7 @@ export function resetComposerTranslation(): void {
   window.clearTimeout(debounceTimer);
   debounceTimer = 0;
   requestSerial += 1;
+  clearDraftTranslationAnimation();
   resetDraftMemory();
   closePanel();
   refreshComposerTranslation();
@@ -127,6 +135,7 @@ export function cleanupStaleComposerTranslation(): void {
   debounceTimer = 0;
   requestSerial += 1;
   replacingDraft = false;
+  clearDraftTranslationAnimation();
   resetDraftMemory();
   document.querySelectorAll(`.${CONTROL_CLASS}, .${PANEL_CLASS}`).forEach((surface) => surface.remove());
   document.querySelectorAll('.ytcq-composer-translate-host').forEach((host) => {
@@ -166,12 +175,17 @@ function createButton(): HTMLButtonElement {
   button = ytcqCreateElement('button');
   button.type = 'button';
   button.className = BUTTON_CLASS;
-  button.append(createTranslateIcon());
+  button.append(createSplitTranslateIcon({
+    iconClassName: ICON_CLASS,
+    sourceClassName: 'ytcq-translate-source-mark',
+    targetClassName: 'ytcq-translate-target-mark'
+  }));
   button.addEventListener('click', (event) => {
     event.preventDefault();
     event.stopPropagation();
     togglePanel();
   });
+  updateDraftTranslationAnimation();
   return button;
 }
 
@@ -288,6 +302,7 @@ async function translateCurrentDraft(): Promise<void> {
   if (!targetLanguage || !candidate || candidate.sourceText.startsWith('/')) return;
 
   const requestId = ++requestSerial;
+  startDraftTranslationAnimation(requestId);
   try {
     const translated = await translateTranslationPlan(candidate.plan, candidate.sourceText, targetLanguage);
     if (requestId !== requestSerial) return;
@@ -304,10 +319,65 @@ async function translateCurrentDraft(): Promise<void> {
   } catch {
     showToast(t('couldNotTranslateText'));
   } finally {
+    stopDraftTranslationAnimation(requestId);
     window.setTimeout(() => {
       replacingDraft = false;
     }, 0);
   }
+}
+
+function startDraftTranslationAnimation(requestId: number): void {
+  const wasIdle = activeDraftTranslationRequests.size === 0;
+  activeDraftTranslationRequests.add(requestId);
+  if (draftTranslationAnimationClearTimer) {
+    window.clearTimeout(draftTranslationAnimationClearTimer);
+    draftTranslationAnimationClearTimer = 0;
+  }
+  if (wasIdle) draftTranslationAnimationStartedAt = Date.now();
+  updateDraftTranslationAnimation();
+}
+
+function stopDraftTranslationAnimation(requestId: number): void {
+  if (!activeDraftTranslationRequests.delete(requestId)) return;
+  if (activeDraftTranslationRequests.size) {
+    updateDraftTranslationAnimation();
+    return;
+  }
+
+  const elapsed = Date.now() - draftTranslationAnimationStartedAt;
+  const remaining = Math.max(0, TRANSLATION_PULSE_MIN_MS - elapsed);
+  if (!remaining) {
+    draftTranslationAnimationStartedAt = 0;
+    updateDraftTranslationAnimation();
+    return;
+  }
+
+  draftTranslationAnimationClearTimer = window.setTimeout(() => {
+    draftTranslationAnimationClearTimer = 0;
+    if (!activeDraftTranslationRequests.size) {
+      draftTranslationAnimationStartedAt = 0;
+      updateDraftTranslationAnimation();
+    }
+  }, remaining);
+  updateDraftTranslationAnimation();
+}
+
+function clearDraftTranslationAnimation(): void {
+  activeDraftTranslationRequests.clear();
+  if (draftTranslationAnimationClearTimer) {
+    window.clearTimeout(draftTranslationAnimationClearTimer);
+    draftTranslationAnimationClearTimer = 0;
+  }
+  draftTranslationAnimationStartedAt = 0;
+  updateDraftTranslationAnimation();
+}
+
+function updateDraftTranslationAnimation(): void {
+  const icon = button?.querySelector<SVGSVGElement>(`.${ICON_CLASS}`);
+  icon?.classList.toggle(
+    TRANSLATION_PULSE_CLASS,
+    activeDraftTranslationRequests.size > 0 || draftTranslationAnimationClearTimer > 0
+  );
 }
 
 function getDraftTranslationCandidate(): {

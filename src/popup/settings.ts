@@ -1,4 +1,5 @@
 import { LANGUAGE_OPTIONS } from '../shared/languages';
+import { createSplitTranslateIcon } from '../shared/icons';
 import {
   getPlaygroundAvatarPresentation,
   PLAYGROUND_PROFILE_MESSAGE_TYPE,
@@ -28,6 +29,7 @@ import { prefersReducedMotion } from './motion';
 
 const PLAYGROUND_GROUP_COLLAPSED_CLASS = 'playground-group-collapsed';
 const PLAYGROUND_GROUP_ANIMATION_MS = 180;
+const TRANSLATION_TARGET_ICON_CLASS = 'option-icon translation-target-icon';
 
 let lastKnownTranslationTarget = DEFAULT_OPTIONS.lastTranslationTarget;
 let playgroundGamesVisibilityToken = 0;
@@ -47,6 +49,8 @@ export function initSettingsControls(popupLocale: string): void {
     playgroundDisplayName,
     playgroundProfileToggle
   } = settingsControls;
+
+  preparePopupTranslationIcon();
 
   targetLanguage.appendChild(createLanguageOption('', getExtensionMessage('off')));
   for (const [value, label] of LANGUAGE_OPTIONS) {
@@ -144,6 +148,17 @@ export function applyOptionsToControls(options: Partial<Options>): void {
 
 function save(values: Partial<Options>): void {
   chrome.storage.sync.set(values);
+}
+
+function preparePopupTranslationIcon(): void {
+  const currentIcon = document.querySelector<HTMLElement>('.translation-target-icon');
+  if (!currentIcon) return;
+
+  currentIcon.replaceWith(createSplitTranslateIcon({
+    iconClassName: TRANSLATION_TARGET_ICON_CLASS,
+    sourceClassName: 'translation-source-mark',
+    targetClassName: 'translation-target-mark'
+  }));
 }
 
 function updatePlaygroundGamesVisibility(playgroundEnabled: boolean, animated = false): void {
