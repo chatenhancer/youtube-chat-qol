@@ -177,7 +177,7 @@ describe('active chat keepalive', () => {
     startActiveChatKeepAlive();
     firstPort.disconnect();
     await vi.advanceTimersByTimeAsync(250);
-    lifecycle.handleFeatureMessage(document.createElement('yt-live-chat-text-message-renderer'), { allowTranslate: true });
+    lifecycle.handleFeatureMessage(document.createElement('yt-live-chat-text-message-renderer'), { source: 'added' });
 
     expect(document.querySelector('.ytcq-stale-feature-ui')).toBeNull();
     expect(document.querySelector('.ytcq-reconnect-button')).toBeNull();

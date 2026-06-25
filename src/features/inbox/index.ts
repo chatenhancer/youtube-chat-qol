@@ -147,9 +147,9 @@ export function handlePotentialInbox(message: HTMLElement): void {
 
 function handleInboxMessage(
   message: HTMLElement,
-  { allowTranslate, source }: Pick<FeatureMessageContext, 'allowTranslate' | 'source'>
+  { source }: Pick<FeatureMessageContext, 'source'>
 ): void {
-  if (allowTranslate || source === 'changed') {
+  if (source === 'added' || source === 'changed') {
     handlePotentialInbox(message);
   } else {
     highlightPotentialInboxKeywords(message);

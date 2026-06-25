@@ -129,6 +129,6 @@ export function createStickAroundChatTrafficObserver(
 
 function handleStickAroundLifecycleMessage(message: HTMLElement, context: FeatureMessageContext): void {
   if (!activeTrafficObservers.size) return;
-  const countTraffic = context.source === 'added' && context.allowTranslate;
+  const countTraffic = context.source === 'added';
   activeTrafficObservers.forEach((observer) => observer.recordMessage(message, countTraffic));
 }

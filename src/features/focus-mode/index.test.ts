@@ -244,7 +244,7 @@ describe('focus mode entrypoint', () => {
 
     const nextMessage = createMessage('@MutationFocused', 'mutation message', 'viewer-channel');
     document.body.append(nextMessage);
-    lifecycle.handleFeatureMessage(nextMessage, { allowTranslate: false, source: 'changed' });
+    lifecycle.handleFeatureMessage(nextMessage, { source: 'changed' });
 
     expect(document.querySelector('.ytcq-focus-bubble')?.textContent).toBe('mutation message');
   });

@@ -19,7 +19,7 @@ describe('content feature lifecycle', () => {
       }
     });
 
-    lifecycle.handleFeatureMessage(message, { allowTranslate: true });
+    lifecycle.handleFeatureMessage(message, { source: 'added' });
 
     expect(calls).toEqual(['second-collect', 'second-enhance', 'first-render']);
   });
@@ -47,7 +47,7 @@ describe('content feature lifecycle', () => {
       }
     });
 
-    lifecycle.handleFeatureMessage(message, { allowTranslate: false, messageData, source: 'changed' });
+    lifecycle.handleFeatureMessage(message, { messageData, source: 'changed' });
 
     expect(calls).toEqual([
       'message-collect',
@@ -88,7 +88,7 @@ describe('content feature lifecycle', () => {
     });
 
     lifecycle.suspendFeatures();
-    lifecycle.handleFeatureMessage(document.createElement('yt-live-chat-text-message-renderer'), { allowTranslate: true });
+    lifecycle.handleFeatureMessage(document.createElement('yt-live-chat-text-message-renderer'), { source: 'added' });
     lifecycle.handleFeatureMutations({
       addedElements: [],
       mutations: []

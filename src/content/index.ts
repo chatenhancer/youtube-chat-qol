@@ -111,7 +111,6 @@ function boot(): void {
     batch.featureBatch.addedElements.forEach((element) => handleAddedElement(element, requestedDataMessages, handledMessages));
     batch.changedMessages.forEach((message) => {
       handleFeatureMessageOnce(message, {
-        allowTranslate: false,
         messageData: requestYouTubeMessageDataOnce(message, requestedDataMessages),
         source: 'changed'
       }, handledMessages);
@@ -130,7 +129,6 @@ function processExistingMessages(): void {
   const messages = Array.from(document.querySelectorAll<HTMLElement>(CHAT_MESSAGE_SELECTOR));
   messages.forEach((message) => {
     handleFeatureMessage(message, {
-      allowTranslate: false,
       messageData: requestYouTubeMessageData(message),
       source: 'existing'
     });
@@ -201,7 +199,6 @@ function handleAddedElement(
 ): void {
   if (element.matches(CHAT_MESSAGE_SELECTOR) && element instanceof HTMLElement) {
     handleFeatureMessageOnce(element, {
-      allowTranslate: true,
       messageData: requestYouTubeMessageDataOnce(element, requestedDataMessages),
       source: 'added'
     }, handledMessages);
@@ -213,7 +210,6 @@ function handleAddedElement(
   const containingMessage = element.closest<HTMLElement>(CHAT_MESSAGE_SELECTOR);
   if (containingMessage && !element.matches(CHAT_MESSAGE_SELECTOR)) {
     handleFeatureMessageOnce(containingMessage, {
-      allowTranslate: false,
       messageData: requestYouTubeMessageDataOnce(containingMessage, requestedDataMessages),
       source: 'changed'
     }, handledMessages);
@@ -226,7 +222,6 @@ function handleAddedElement(
 
   element.querySelectorAll<HTMLElement>(CHAT_MESSAGE_SELECTOR).forEach((message) => {
     handleFeatureMessageOnce(message, {
-      allowTranslate: true,
       messageData: requestYouTubeMessageDataOnce(message, requestedDataMessages),
       source: 'added'
     }, handledMessages);
@@ -236,7 +231,7 @@ function handleAddedElement(
 
 function handleFeatureMessageOnce(
   message: HTMLElement,
-  context: { allowTranslate: boolean; messageData: Promise<YouTubeMessageData | null>; source: FeatureMessageSource },
+  context: { messageData: Promise<YouTubeMessageData | null>; source: FeatureMessageSource },
   handledMessages: WeakSet<HTMLElement>
 ): void {
   if (handledMessages.has(message)) return;

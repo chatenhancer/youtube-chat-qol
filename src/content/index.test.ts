@@ -85,7 +85,6 @@ describe('content script entrypoint wiring', () => {
     expect(lifecycleMocks.initFeatures).toHaveBeenCalledOnce();
     expect(messageDataMocks.requestYouTubeMessageData).toHaveBeenCalledWith(message);
     expect(lifecycleMocks.handleFeatureMessage).toHaveBeenCalledWith(message, expect.objectContaining({
-      allowTranslate: false,
       messageData: expect.any(Promise),
       source: 'existing'
     }));
@@ -111,7 +110,6 @@ describe('content script entrypoint wiring', () => {
     await import('./index');
 
     expect(lifecycleMocks.handleFeatureMessage).toHaveBeenCalledWith(message, {
-      allowTranslate: false,
       messageData,
       source: 'existing'
     });
@@ -140,12 +138,10 @@ describe('content script entrypoint wiring', () => {
     expect(messageDataMocks.requestYouTubeMessageData).toHaveBeenCalledWith(newMessage);
     expect(messageDataMocks.requestYouTubeMessageData).toHaveBeenCalledTimes(2);
     expect(lifecycleMocks.handleFeatureMessage).toHaveBeenCalledWith(newMessage, expect.objectContaining({
-      allowTranslate: true,
       messageData: expect.any(Promise),
       source: 'added'
     }));
     expect(lifecycleMocks.handleFeatureMessage).toHaveBeenCalledWith(containingMessage, expect.objectContaining({
-      allowTranslate: false,
       messageData: expect.any(Promise),
       source: 'changed'
     }));
@@ -177,7 +173,6 @@ describe('content script entrypoint wiring', () => {
     expect('changedMessages' in batch).toBe(false);
     expect(messageDataMocks.requestYouTubeMessageData).toHaveBeenCalledWith(message);
     expect(lifecycleMocks.handleFeatureMessage).toHaveBeenCalledWith(message, expect.objectContaining({
-      allowTranslate: false,
       messageData: expect.any(Promise),
       source: 'changed'
     }));
@@ -278,7 +273,6 @@ describe('content script entrypoint wiring', () => {
 
     expect(lifecycleMocks.handleFeatureVisibilityChanged).toHaveBeenCalledWith('visible');
     expect(lifecycleMocks.handleFeatureMessage).toHaveBeenCalledWith(message, expect.objectContaining({
-      allowTranslate: false,
       messageData: expect.any(Promise),
       source: 'existing'
     }));

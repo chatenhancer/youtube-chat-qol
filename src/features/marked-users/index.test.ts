@@ -334,7 +334,7 @@ describe('marked users', () => {
     `;
     document.body.append(message);
 
-    lifecycle.handleFeatureMessage(message, { allowTranslate: false });
+    lifecycle.handleFeatureMessage(message, { source: 'existing' });
 
     const avatar = message.querySelector<HTMLElement>('#author-photo')!;
     expect(avatar.dataset.ytcqMarkedUserKey).toBe('channel:viewer-channel');
@@ -348,7 +348,7 @@ describe('marked users', () => {
 
     const messageWithoutAvatar = document.createElement('yt-live-chat-text-message-renderer');
     messageWithoutAvatar.innerHTML = '<span id="author-name">@ViewerTwo</span>';
-    lifecycle.handleFeatureMessage(messageWithoutAvatar, { allowTranslate: false });
+    lifecycle.handleFeatureMessage(messageWithoutAvatar, { source: 'existing' });
     expect(messageWithoutAvatar.querySelector('[data-ytcq-marked-user-key]')).toBeNull();
   });
 

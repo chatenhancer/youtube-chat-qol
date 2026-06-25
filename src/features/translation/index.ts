@@ -32,10 +32,10 @@ function handleTranslationOptionsChanged(previousOptions: Options, nextOptions: 
 
 function handleTranslationMessage(
   message: HTMLElement,
-  { allowTranslate, source }: Pick<FeatureMessageContext, 'allowTranslate' | 'source'>
+  { source }: Pick<FeatureMessageContext, 'source'>
 ): void {
   if (!getOptions().targetLanguage) return;
-  if (!allowTranslate && source !== 'changed') return;
+  if (source !== 'added' && source !== 'changed') return;
   if (source === 'changed' && message.dataset.ytcqTranslationKey) return;
 
   queueMessageTranslation(message);

@@ -427,7 +427,7 @@ describe('user message history', () => {
       text: 'mutation message'
     });
 
-    lifecycle.handleFeatureMessage(message, { allowTranslate: false, source: 'changed' });
+    lifecycle.handleFeatureMessage(message, { source: 'changed' });
 
     expect(history.getRecentMessagesForIdentity({
       authorName: '@MutationUser',

@@ -171,19 +171,19 @@ describe('inbox coordinator', () => {
     expect(tabAlertMocks.showInboxTabAlert).toHaveBeenCalledWith(1);
   });
 
-  it('runs through lifecycle message phases for live and non-live message passes', async () => {
+  it('runs through lifecycle message phases for added and existing message passes', async () => {
     inboxTestState.keywords = ['alpha'];
     inboxTestState.matchingKeywords = ['alpha'];
-    const liveMessage = createMessage('@ViewerLifecycle', 'hello alpha');
+    const addedMessage = createMessage('@ViewerLifecycle', 'hello alpha');
     const touchedMessage = createMessage('@ViewerTouched', 'hello alpha');
-    document.body.append(liveMessage, touchedMessage);
+    document.body.append(addedMessage, touchedMessage);
 
-    handleFeatureMessage(liveMessage, { allowTranslate: true, source: 'added' });
-    handleFeatureMessage(touchedMessage, { allowTranslate: false, source: 'existing' });
+    handleFeatureMessage(addedMessage, { source: 'added' });
+    handleFeatureMessage(touchedMessage, { source: 'existing' });
     await Promise.resolve();
 
     expect(mentionMocks.processPotentialMentionForConsumer).toHaveBeenCalledWith(
-      liveMessage,
+      addedMessage,
       'ytcqInboxMentionChecked',
       expect.any(Function)
     );
@@ -206,7 +206,7 @@ describe('inbox coordinator', () => {
       addedElements: [header],
       mutations: []
     });
-    handleFeatureMessage(changedMessage, { allowTranslate: false, source: 'changed' });
+    handleFeatureMessage(changedMessage, { source: 'changed' });
     handleFeatureMutations({
       addedElements: [],
       mutations: [{

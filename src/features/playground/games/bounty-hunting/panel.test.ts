@@ -80,7 +80,7 @@ describe('Bounty Hunting panel', () => {
     openBountyHuntingGamePanel(game, 'host-user', onAction);
     const message = appendChatMessage('msg-1', '@Luna', 'look @Marco');
 
-    handleFeatureMessage(message, { allowTranslate: true });
+    handleFeatureMessage(message, { source: 'added' });
     updateBountyHuntingGamePanel(game, 'host-user');
 
     expect(onAction).toHaveBeenCalledWith('game-bounty-hunting', 'observeBountyMessage', {
@@ -111,7 +111,7 @@ describe('Bounty Hunting panel', () => {
     openBountyHuntingGamePanel(game, 'host-user', onAction);
     const chatItems = [...getChatItemsContainer().children];
     expect(chatItems).toContain(message);
-    handleFeatureMessage(message, { allowTranslate: true });
+    handleFeatureMessage(message, { source: 'added' });
     updateBountyHuntingGamePanel(game, 'host-user');
     message.dispatchEvent(new MouseEvent('click', { bubbles: true }));
 
@@ -137,8 +137,8 @@ describe('Bounty Hunting panel', () => {
 
     openBountyHuntingGamePanel(game, 'host-user', onAction);
 
-    handleFeatureMessage(oldMessage, { allowTranslate: true });
-    handleFeatureMessage(newMessage, { allowTranslate: true });
+    handleFeatureMessage(oldMessage, { source: 'added' });
+    handleFeatureMessage(newMessage, { source: 'added' });
     updateBountyHuntingGamePanel(game, 'host-user');
     oldMessage.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     newMessage.dispatchEvent(new MouseEvent('click', { bubbles: true }));
@@ -167,7 +167,7 @@ describe('Bounty Hunting panel', () => {
     openBountyHuntingGamePanel(game, 'host-user', onAction);
     const message = appendChatMessage('msg-no-timestamp', '@Luna', 'look @Marco');
 
-    handleFeatureMessage(message, { allowTranslate: true });
+    handleFeatureMessage(message, { source: 'added' });
     updateBountyHuntingGamePanel(game, 'host-user');
     message.dispatchEvent(new MouseEvent('click', { bubbles: true }));
 
@@ -220,7 +220,7 @@ describe('Bounty Hunting panel', () => {
 
     const newMessage = appendChatMessage('msg-new', '@Luna', 'new @Marco');
     await sendYouTubeMessageTimestamp(newMessage, '103000001');
-    handleFeatureMessage(newMessage, { allowTranslate: true });
+    handleFeatureMessage(newMessage, { source: 'added' });
     runLatestBountyHuntingFrame(103_100);
     await vi.advanceTimersByTimeAsync(500);
 
@@ -251,8 +251,8 @@ describe('Bounty Hunting panel', () => {
 
     await sendYouTubeMessageTimestamp(oldMessage, '102999999');
     await sendYouTubeMessageTimestamp(newMessage, '103000001');
-    handleFeatureMessage(oldMessage, { allowTranslate: true });
-    handleFeatureMessage(newMessage, { allowTranslate: true });
+    handleFeatureMessage(oldMessage, { source: 'added' });
+    handleFeatureMessage(newMessage, { source: 'added' });
     oldMessage.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     newMessage.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     await vi.advanceTimersByTimeAsync(500);
@@ -288,7 +288,7 @@ describe('Bounty Hunting panel', () => {
       status: 'active'
     }, 'host-user', onAction);
 
-    handleFeatureMessage(message, { allowTranslate: true });
+    handleFeatureMessage(message, { source: 'added' });
     await sendYouTubeMessageTimestamp(message, '103000001');
     await vi.advanceTimersByTimeAsync(500);
 
@@ -381,7 +381,7 @@ describe('Bounty Hunting panel', () => {
     openBountyHuntingGamePanel(game, 'host-user', onAction);
     const message = appendChatMessage('msg-own', '@CurrentViewer', 'look @Marco');
 
-    handleFeatureMessage(message, { allowTranslate: true });
+    handleFeatureMessage(message, { source: 'added' });
     updateBountyHuntingGamePanel(game, 'host-user');
 
     expect(onAction).toHaveBeenCalledWith('game-bounty-hunting', 'observeBountyMessage', {
@@ -418,7 +418,7 @@ describe('Bounty Hunting panel', () => {
     openBountyHuntingGamePanel(game, 'host-user', onAction);
     const message = appendChatMessage('msg-1', '@Luna', 'look @Marco?');
 
-    handleFeatureMessage(message, { allowTranslate: true });
+    handleFeatureMessage(message, { source: 'added' });
     updateBountyHuntingGamePanel(game, 'host-user');
 
     const observeCalls = onAction.mock.calls.filter((call) => call[1] === 'observeBountyMessage');
@@ -1081,7 +1081,7 @@ describe('Bounty Hunting panel', () => {
     const newMessage = appendChatMessage('msg-new', '@Luna', 'new @Marco');
 
     await sendYouTubeMessageTimestamp(newMessage, '103000001');
-    handleFeatureMessage(newMessage, { allowTranslate: true });
+    handleFeatureMessage(newMessage, { source: 'added' });
     runLatestBountyHuntingFrame(104_000);
 
     const children = [...getChatItemsContainer().children];
@@ -1358,11 +1358,11 @@ function appendChatMessage(
 
 async function sendYouTubeMessageTimestamp(message: HTMLElement, timestampUsec: string): Promise<void> {
   handleFeatureMessage(message, {
-    allowTranslate: false,
     messageData: Promise.resolve({
       messageId: message.getAttribute('data-message-id') || message.id,
       timestampUsec
-    })
+    }),
+    source: 'existing'
   });
   await Promise.resolve();
 }

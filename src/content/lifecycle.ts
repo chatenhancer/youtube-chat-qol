@@ -33,9 +33,8 @@ type MessageCallback = (message: HTMLElement, context: FeatureMessageContext) =>
 type MutationCallback = (batch: FeatureMutationBatch) => void;
 type ParticipantCallback = (participant: HTMLElement) => void;
 type PhasedCallbacks<T extends (...args: never[]) => void> = Record<FeatureLifecyclePhase, T[]>;
-type FeatureMessageDispatchContext = Omit<FeatureMessageContext, 'messageData' | 'source'> & {
+type FeatureMessageDispatchContext = Omit<FeatureMessageContext, 'messageData'> & {
   messageData?: Promise<YouTubeMessageData | null>;
-  source?: FeatureMessageSource;
 };
 
 /**
@@ -87,16 +86,6 @@ export interface FeatureMessageContext {
    * common case where message text appears after the renderer shell.
    */
   source: FeatureMessageSource;
-
-  /**
-   * Whether live-only message work may run for this dispatch.
-   *
-   * The field name is translation-specific for historical reasons, but the
-   * meaning is broader: `true` means the renderer is new live chat work, while
-   * `false` means a boot, recovery, or mutation refresh pass. Features such as
-   * translation and Inbox use this to avoid replaying old messages as new ones.
-   */
-  allowTranslate: boolean;
 
   /**
    * Sanitized page-world metadata for this YouTube message renderer.
@@ -385,8 +374,8 @@ export function handleFeatureVisibilityChanged(visibilityState: Document['visibi
 /**
  * Dispatch a YouTube chat message renderer through all message phases.
  *
- * When `source` or `messageData` is omitted, this helper derives the source
- * from `allowTranslate` and supplies an empty metadata promise.
+ * When `messageData` is omitted, this helper supplies an empty metadata
+ * promise.
  *
  * @param message A renderer matching the extension's chat message selector.
  * @param context Per-message flags and optional page-world metadata request.
@@ -395,8 +384,7 @@ export function handleFeatureMessage(message: HTMLElement, context: FeatureMessa
   if (featuresSuspended) return;
   const featureContext: FeatureMessageContext = {
     ...context,
-    messageData: context.messageData || Promise.resolve(null),
-    source: context.source || (context.allowTranslate ? 'added' : 'existing')
+    messageData: context.messageData || Promise.resolve(null)
   };
   runPhasedCallbacks(messageCallbacks, (callback) => callback(message, featureContext));
 }

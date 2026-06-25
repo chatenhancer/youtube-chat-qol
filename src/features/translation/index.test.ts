@@ -56,19 +56,19 @@ describe('translation feature lifecycle wiring', () => {
     expect(queueMocks.queueRetroactiveTranslations).toHaveBeenCalledTimes(2);
   });
 
-  it('queues live messages and late text mutations only when translation is enabled', () => {
+  it('queues added messages and late text mutations only when translation is enabled', () => {
     const message = document.createElement('yt-live-chat-text-message-renderer');
     const messageData = Promise.resolve(null);
 
-    lifecycle.message?.render?.(message, { allowTranslate: true, messageData, source: 'added' });
+    lifecycle.message?.render?.(message, { messageData, source: 'added' });
     expect(queueMocks.queueMessageTranslation).not.toHaveBeenCalled();
 
     setCurrentOptions({ ...DEFAULT_OPTIONS, targetLanguage: 'ko' });
-    lifecycle.message?.render?.(message, { allowTranslate: false, messageData, source: 'existing' });
+    lifecycle.message?.render?.(message, { messageData, source: 'existing' });
     expect(queueMocks.queueMessageTranslation).not.toHaveBeenCalled();
 
-    lifecycle.message?.render?.(message, { allowTranslate: true, messageData, source: 'added' });
-    lifecycle.message?.render?.(message, { allowTranslate: false, messageData, source: 'changed' });
+    lifecycle.message?.render?.(message, { messageData, source: 'added' });
+    lifecycle.message?.render?.(message, { messageData, source: 'changed' });
 
     expect(queueMocks.queueMessageTranslation).toHaveBeenCalledTimes(2);
   });
@@ -79,7 +79,6 @@ describe('translation feature lifecycle wiring', () => {
     setCurrentOptions({ ...DEFAULT_OPTIONS, targetLanguage: 'ko' });
 
     lifecycle.message?.render?.(message, {
-      allowTranslate: false,
       messageData: Promise.resolve(null),
       source: 'changed'
     });
