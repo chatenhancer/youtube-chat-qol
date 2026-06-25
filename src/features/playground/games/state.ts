@@ -92,3 +92,58 @@ function hasActiveGameWithPlayer(
 export function getSupportedGames(games: PublicGame[]): PublicGame[] {
   return games.filter((game) => isSupportedGameId(game.gameType));
 }
+
+export function getGamesPanelViewKey(state: GamesPanelState, activeGamePanelId: string): string {
+  const { transport } = state;
+  return [
+    state.mode,
+    state.selectedGameId || '',
+    state.invitedPlayer,
+    state.leavingGameId,
+    String(state.activeGameIndex),
+    activeGamePanelId,
+    String(state.available),
+    transport.status,
+    transport.error,
+    transport.userId,
+    String(transport.available),
+    transport.users.map(getPresenceRenderKey).join('\n'),
+    transport.invites.map(getInviteRenderKey).join('\n'),
+    getSupportedGames(transport.games).map(getGameRenderKey).join('\n')
+  ].join('\u001f');
+}
+
+function getPresenceRenderKey(user: PresenceUser): string {
+  return [
+    user.userId,
+    user.displayName,
+    user.availableGames.join(',')
+  ].join('\u001e');
+}
+
+function getInviteRenderKey(invite: PublicInvite): string {
+  return [
+    invite.inviteId,
+    invite.gameId,
+    invite.status,
+    invite.fromUser.userId,
+    invite.fromUser.displayName,
+    invite.toUser.userId,
+    invite.toUser.displayName
+  ].join('\u001e');
+}
+
+function getGameRenderKey(game: PublicGame): string {
+  const players = Object.entries(game.players || {})
+    .map(([role, player]) => [
+      role,
+      player?.userId || '',
+      player?.displayName || ''
+    ].join(':'))
+    .join('|');
+  return [
+    game.gameId,
+    game.gameType,
+    players
+  ].join('\u001e');
+}

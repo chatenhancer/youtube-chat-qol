@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { DEFAULT_OPTIONS } from '../../../shared/options';
 import type { LobbySnapshot, PlaygroundBackgroundMessage, PublicGame } from '../../../shared/playground/protocol';
+import type { PublicStickAroundGame } from '../../../shared/playground/stick-around';
 import { setOptions } from '../../../shared/state';
 import {
   handleFeatureMutations,
@@ -777,6 +778,48 @@ describe('playground games header button', () => {
     expect(getActionButtonLabels()).toEqual(['Resume', 'Leave']);
   });
 
+  it('keeps lobby buttons stable during active Stick Around game updates', () => {
+    vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(createMockCanvasContext() as unknown as CanvasRenderingContext2D);
+    const header = createHeader();
+    const feed = document.createElement('yt-live-chat-item-list-renderer');
+    document.body.append(header, feed);
+    setOptions({ ...DEFAULT_OPTIONS, playgroundEnabled: true, playgroundGamesAvailable: true });
+
+    wireGamesButton();
+    header.querySelector<HTMLButtonElement>('.ytcq-games-button')!.click();
+    const game = createStickAroundGame();
+    lastMockPort()?.emit(createSnapshotMessage({
+      ...createLobbySnapshot(),
+      games: [game],
+      invites: []
+    }));
+    getActionButton('Resume').click();
+
+    const hideButton = getActionButton('Hide');
+    lastMockPort()?.emit({
+      message: {
+        game: {
+          ...game,
+          inputs: {
+            'me-user': {
+              jump: true,
+              left: false,
+              right: false,
+              frame: 1,
+              seq: 1,
+              sentAt: Date.now(),
+              userId: 'me-user'
+            }
+          }
+        } as PublicStickAroundGame,
+        type: 'gameUpdated'
+      },
+      type: 'ytcq:playground:server-message'
+    });
+
+    expect(getActionButton('Hide')).toBe(hideButton);
+  });
+
   it('shows active Stick Around games as the backend connection state changes', () => {
     vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(createMockCanvasContext() as unknown as CanvasRenderingContext2D);
     const header = createHeader();
@@ -1480,7 +1523,7 @@ function createBountyHuntingGame(): PublicGame {
   } as PublicGame;
 }
 
-function createStickAroundGame(): PublicGame {
+function createStickAroundGame(): PublicStickAroundGame {
   return {
     finishReports: {},
     gameId: 'game-stick-around',
@@ -1505,7 +1548,7 @@ function createStickAroundGame(): PublicGame {
     roundSeed: 123,
     roundStartedAt: Date.now(),
     status: 'active'
-  } as PublicGame;
+  };
 }
 
 function createMockCanvasContext(): Partial<CanvasRenderingContext2D> {

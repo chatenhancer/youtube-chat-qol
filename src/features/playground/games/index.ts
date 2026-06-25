@@ -31,6 +31,7 @@ import {
 import { createGamesCard, installGamesCardListeners } from './card';
 import {
   createInitialGamesPanelState,
+  getGamesPanelViewKey,
   getSupportedGames,
   type GamesPanelState
 } from './state';
@@ -57,6 +58,7 @@ let activeGamesCardCleanup: (() => void) | null = null;
 let activeGamesClientCleanup: (() => void) | null = null;
 let activeGamesPointerCleanup: (() => void) | null = null;
 let gamesPanelState: GamesPanelState | null = null;
+let lastGamesPanelRenderKey = '';
 let lastGamesPointerPosition: GamesPointerPosition | null = null;
 let pendingStartedGameOpen: PendingStartedGameOpen | null = null;
 
@@ -197,6 +199,7 @@ function closeGamesCard(): void {
   activeGamesCard?.remove();
   activeGamesCard = null;
   gamesPanelState = null;
+  lastGamesPanelRenderKey = '';
   setGamesButtonExpanded(activeGamesAnchor, false);
   activeGamesAnchor = null;
 }
@@ -216,7 +219,9 @@ function handlePlaygroundClientStateChanged(nextState: PlaygroundClientState): v
   gamesPanelState.transport = nextState;
   gamesPanelState.available = nextState.available;
   clearPendingLobbyActions(gamesPanelState, nextState);
-  renderGamesPanel();
+  if (getCurrentGamesPanelViewKey() !== lastGamesPanelRenderKey) {
+    renderGamesPanel();
+  }
 }
 
 function renderGamesPanel(): void {
@@ -227,6 +232,7 @@ function renderGamesPanel(): void {
   if (!body) return;
 
   renderGamesPanelBody(body, gamesPanelState, createGamesViewActions());
+  lastGamesPanelRenderKey = getCurrentGamesPanelViewKey();
 }
 
 function createGamesViewActions(): GamesViewActions {
@@ -324,6 +330,10 @@ function clearPendingLobbyActions(state: GamesPanelState, transport: PlaygroundC
   if (state.leavingGameId && !transport.games.some((game) => game.gameId === state.leavingGameId)) {
     state.leavingGameId = '';
   }
+}
+
+function getCurrentGamesPanelViewKey(): string {
+  return gamesPanelState ? getGamesPanelViewKey(gamesPanelState, getActiveGamePanelId()) : '';
 }
 
 function openGamePanel(

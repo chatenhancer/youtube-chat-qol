@@ -315,8 +315,10 @@ function mergeInvite(invites: PublicInvite[], invite: PublicInvite): PublicInvit
 }
 
 function mergeGame(games: PublicGame[], game: PublicGame): PublicGame[] {
-  return [
-    ...games.filter((candidate) => candidate.gameId !== game.gameId),
-    game
-  ];
+  const existingIndex = games.findIndex((candidate) => candidate.gameId === game.gameId);
+  if (existingIndex < 0) return [...games, game];
+
+  const nextGames = [...games];
+  nextGames[existingIndex] = game;
+  return nextGames;
 }

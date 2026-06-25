@@ -64,6 +64,7 @@ import {
   playgroundIncomingInviteAcceptScenario,
   playgroundIncomingInviteIgnoreScenario,
   playgroundInviteCancelScenario,
+  playgroundStickAroundActiveOverlayControlsScenario,
   playgroundStickAroundComputerOverlayScenario
 } from '../scenarios/playground-games';
 import { tabAlertScenario } from '../scenarios/tab-alert';
@@ -106,6 +107,7 @@ test('logged-in mock: Playground Games ignores an incoming invite and removes it
 test('logged-in mock: Playground Games resumes, hides, and leaves an active game', playgroundActiveGameControlsScenario);
 test('logged-in mock: Playground Games toggles lobby availability', playgroundAvailabilityToggleScenario);
 test('logged-in mock: Stick Around opens as a chat feed overlay after inviting the computer', playgroundStickAroundComputerOverlayScenario);
+test('logged-in mock: Stick Around lobby controls work over an active overlay', playgroundStickAroundActiveOverlayControlsScenario);
 test('logged-in mock: Playground Games cancels a pending outgoing invite locally', playgroundInviteCancelScenario);
 test('logged-in mock: Bounty Hunting round start divider attaches to the boundary message', playgroundBountyHuntingRoundStartScenario);
 test('logged-in mock: Bounty Hunting rejects pre-start messages and claims post-start messages', playgroundBountyHuntingCutoffScenario);

@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import type { GameId, PublicGame } from '../../../shared/playground/protocol';
+import type { PublicStickAroundGame } from '../../../shared/playground/stick-around';
 import type { PlaygroundClientState } from './client';
 import {
   createInitialGamesPanelState,
   getAvailablePlayers,
+  getGamesPanelViewKey,
   getOnlinePlayerCount,
   getPendingInvites,
   getSupportedGames,
@@ -79,6 +81,31 @@ describe('playground games panel state selectors', () => {
     expect(getAvailablePlayers(state, 'chess').map((user) => user.userId)).toEqual(['free-user']);
     expect(getAvailablePlayers(state, 'unknown' as GameId)).toEqual([]);
     expect(getSupportedGames(state.transport.games).map((game) => game.gameId)).toEqual(['game-1']);
+  });
+
+  it('ignores Stick Around active-round fields that are not visible in the lobby', () => {
+    const game = createStickAroundGame();
+    const updatedGame: PublicStickAroundGame = {
+      ...game,
+      inputs: {
+        'me-user': {
+          frame: 1,
+          jump: true,
+          left: false,
+          right: false,
+          sentAt: 10,
+          seq: 1,
+          userId: 'me-user'
+        }
+      },
+      serverNow: 20
+    };
+    const state = createInitialGamesPanelState(true, createTransport({ games: [game] }));
+    const nextState = createInitialGamesPanelState(true, createTransport({
+      games: [updatedGame]
+    }));
+
+    expect(getGamesPanelViewKey(nextState, 'game-1')).toBe(getGamesPanelViewKey(state, 'game-1'));
   });
 
   it('handles anonymous transport state and games without player maps', () => {
@@ -165,4 +192,32 @@ function createGame(gameId: string, gameType: GameId, userIds: string[]): Public
     ])),
     status: 'active'
   } as PublicGame;
+}
+
+function createStickAroundGame(): PublicStickAroundGame {
+  return {
+    finishReports: {},
+    gameId: 'game-1',
+    gameType: 'stick-around',
+    hazards: [],
+    inputs: {},
+    phaseStartedAt: 1,
+    players: {
+      guest: {
+        displayName: 'Computer',
+        userId: 'server:computer:stick-around'
+      },
+      host: {
+        displayName: 'Me',
+        userId: 'me-user'
+      }
+    },
+    readyPlayers: {
+      guest: true,
+      host: true
+    },
+    roundSeed: 123,
+    roundStartedAt: 2,
+    status: 'active'
+  };
 }

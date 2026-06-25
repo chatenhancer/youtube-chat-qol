@@ -12,6 +12,7 @@ import type {
   PublicGame,
   PublicInvite
 } from '../../../src/shared/playground/protocol';
+import type { PublicStickAroundGame } from '../../../src/shared/playground/stick-around';
 import {
   createMockPlaygroundSnapshot,
   installMockPlaygroundBackend
@@ -220,6 +221,68 @@ export const playgroundActiveGameControlsScenario: BrowserScenario = async ({ ch
     expect(leave).toMatchObject({
       action: 'leave',
       gameId: 'active-chess-game'
+    });
+  });
+};
+
+export const playgroundStickAroundActiveOverlayControlsScenario: BrowserScenario = async ({ chat, context, page }) => {
+  const activeGame = createBrowserStickAroundGame({
+    gameId: 'active-stick-around-game',
+    status: 'active'
+  });
+  const backend = await installMockPlaygroundBackend(context, {
+    snapshot: createMockPlaygroundSnapshot({
+      games: [activeGame]
+    })
+  });
+
+  await withExtensionStorageValues(context, 'sync', PLAYGROUND_ENABLED_OPTIONS, async () => {
+    const card = await openGamesCard(chat, backend);
+    const activeRow = card.locator('.ytcq-games-active-row').filter({ hasText: 'Stick Around!' });
+    await expect(activeRow).toContainText('Computer (Stick Around!)');
+
+    await activeRow.getByRole('button', { name: 'Resume' }).click();
+    await expect(chat.locator('.ytcq-stick-around-overlay')).toBeVisible();
+    const hideButton = activeRow.getByRole('button', { name: 'Hide' });
+    await expect(hideButton).toBeVisible();
+
+    const hideBox = await hideButton.boundingBox();
+    if (!hideBox) throw new Error('Expected the active Stick Around Hide button to be visible.');
+    await page.mouse.move(hideBox.x + hideBox.width / 2, hideBox.y + hideBox.height / 2);
+    await page.mouse.down();
+    await backend.sendServerMessage({
+      game: createBrowserStickAroundGame({
+        gameId: 'active-stick-around-game',
+        inputs: {
+          'browser-user': {
+            jump: true,
+            left: false,
+            right: false,
+            frame: 1,
+            seq: 1,
+            sentAt: Date.now(),
+            userId: 'browser-user'
+          }
+        },
+        status: 'active'
+      }),
+      type: 'gameUpdated'
+    });
+    await page.mouse.up();
+    await expect(chat.locator('.ytcq-stick-around-overlay')).toHaveCount(0);
+
+    await activeRow.getByRole('button', { name: 'Resume' }).click();
+    await expect(chat.locator('.ytcq-stick-around-overlay')).toBeVisible();
+
+    await activeRow.getByRole('button', { name: 'Leave' }).click();
+    await expect(chat.locator('.ytcq-stick-around-overlay')).toHaveCount(0);
+
+    const leave = await waitForGameAction(backend, 'leave', (message) =>
+      message.gameId === 'active-stick-around-game'
+    );
+    expect(leave).toMatchObject({
+      action: 'leave',
+      gameId: 'active-stick-around-game'
     });
   });
 };
@@ -897,14 +960,16 @@ function createBrowserBountyHuntingGame({
   } as PublicGame;
 }
 
-function createBrowserStickAroundGame(): PublicGame {
+function createBrowserStickAroundGame(overrides: Partial<PublicStickAroundGame> = {}): PublicStickAroundGame {
+  const now = Date.now();
+  const status = overrides.status || 'ready';
   return {
     finishReports: {},
     gameId: 'browser-stick-around-game',
     gameType: 'stick-around',
     hazards: [],
     inputs: {},
-    phaseStartedAt: Date.now(),
+    phaseStartedAt: now,
     players: {
       guest: {
         displayName: 'Computer (Stick Around!)',
@@ -915,10 +980,15 @@ function createBrowserStickAroundGame(): PublicGame {
         userId: 'browser-user'
       }
     },
-    readyPlayers: {},
+    readyPlayers: status === 'ready' ? {} : {
+      guest: true,
+      host: true
+    },
+    roundStartedAt: status === 'ready' ? undefined : now,
     roundSeed: 12345,
-    status: 'ready'
-  } as PublicGame;
+    status,
+    ...overrides
+  };
 }
 
 function getFixtureMessageTimestampUsec(messageId: string): string {
