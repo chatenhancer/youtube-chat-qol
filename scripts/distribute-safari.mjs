@@ -25,7 +25,7 @@ for (const arg of args) {
 
 await loadLocalEnv();
 
-const appName = requireEnv('YTCQ_SAFARI_APP_NAME');
+const appName = process.env.YTCQ_SAFARI_APP_NAME || 'Chat Enhancer for YouTube';
 const developmentTeam = requireEnv('YTCQ_SAFARI_DEVELOPMENT_TEAM');
 const configuration = process.env.YTCQ_SAFARI_CONFIGURATION || 'Release';
 const destination = process.env.YTCQ_SAFARI_DESTINATION || 'generic/platform=macOS';
