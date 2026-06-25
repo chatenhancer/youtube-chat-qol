@@ -47,6 +47,7 @@ export function parseTranslateTextCommand(value: string): {
 }
 
 export async function translateCommandText(text: string, targetLanguage: string): Promise<string> {
+  // ytcq-allow-raw-create-element: temporary text holder, never inserted into observed UI.
   const holder = document.createElement('span');
   holder.textContent = text;
   const plan = createTranslationPlanFromNodes(holder.childNodes, text);

@@ -177,6 +177,7 @@ function createInputEmojiNode(data: {
   const alt = cleanText(data.alt);
   if (!src || !alt) return null;
 
+  // ytcq-allow-raw-create-element: inserted into YouTube's chat input as quoted emoji content.
   const image = document.createElement('img');
   image.className = INPUT_EMOJI_CLASS;
   image.src = src;

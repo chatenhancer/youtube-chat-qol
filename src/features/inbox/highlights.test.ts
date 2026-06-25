@@ -5,6 +5,7 @@ import {
   highlightInboxAuthorMatches,
   highlightInboxMatches
 } from './highlights';
+import { isExtensionManagedElement } from '../../shared/managed-dom';
 import type { InboxRecord } from './types';
 
 describe('inbox highlight helpers', () => {
@@ -46,6 +47,9 @@ describe('inbox highlight helpers', () => {
 
     expect(message.querySelector('#author-name .ytcq-chat-keyword-highlight')?.textContent).toBe('Launch');
     expect(message.querySelector('#message .ytcq-chat-keyword-highlight')?.textContent).toBe('launch');
+    message.querySelectorAll('.ytcq-chat-keyword-highlight').forEach((highlight) => {
+      expect(isExtensionManagedElement(highlight)).toBe(true);
+    });
     expect(message.dataset.ytcqInboxKeywordHighlightKey).toBe('keyword-key');
     await vi.runAllTimersAsync();
     expect(message.dataset.ytcqInboxKeywordHighlighting).toBeUndefined();

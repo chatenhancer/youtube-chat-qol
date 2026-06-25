@@ -24,6 +24,7 @@ function insertEmojiImageIntoChat(emoji: EmojiUsage): boolean {
   const alt = cleanText(emoji.alt || getEmojiFallbackText(emoji) || emoji.label || emoji.shortcut);
   if (!alt) return false;
 
+  // ytcq-allow-raw-create-element: inserted into YouTube's chat input as message content.
   const image = document.createElement('img');
   image.className = 'emoji yt-formatted-string style-scope yt-live-chat-text-input-field-renderer';
   image.src = emoji.src;
