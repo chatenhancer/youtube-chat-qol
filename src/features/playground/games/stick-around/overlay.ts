@@ -236,7 +236,7 @@ export function openStickAroundOverlay(
     feedSurface,
     game,
     inputDirty: true,
-    inputSeq: 0,
+    inputSeq: getStickAroundInitialInputSeq(game, currentUserId),
     lastInputSentAt: 0,
     lastGameNow: initialGameNow,
     listeners,
@@ -428,6 +428,11 @@ function sendInputSnapshot(
     right: runtime.controls.right,
     seq: runtime.inputSeq
   });
+}
+
+function getStickAroundInitialInputSeq(game: PublicStickAroundGame, currentUserId: string): number {
+  const currentInputSeq = game.inputs[currentUserId]?.seq;
+  return Number.isInteger(currentInputSeq) ? Math.max(0, currentInputSeq) : 0;
 }
 
 function syncStickAroundAuthoritativeSimulation(
