@@ -368,6 +368,11 @@ describe('Bounty Hunting panel', () => {
     );
     expect(indicators[0].getAttribute('role')).toBe('status');
 
+    indicators[0].remove();
+    handleFeatureMessage(message, { source: 'changed' });
+
+    expect(message.querySelector('.ytcq-bounty-hunting-claim-indicator')?.textContent).toBe('B$125');
+
     closeBountyHuntingGamePanel({ notify: false });
 
     expect(document.querySelector('.ytcq-bounty-hunting-claim-indicator')).toBeNull();

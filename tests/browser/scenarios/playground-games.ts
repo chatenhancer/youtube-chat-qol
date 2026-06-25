@@ -519,6 +519,8 @@ export const playgroundBountyHuntingRoundStartScenario: BrowserScenario = async 
     });
     await expect(chat.locator('.ytcq-bounty-hunting-claimed-feed')).toHaveCount(0);
     await expect(message.locator('.ytcq-bounty-hunting-claim-indicator')).toHaveText('B$125');
+    await message.locator('.ytcq-bounty-hunting-claim-indicator').evaluate((indicator) => indicator.remove());
+    await expect(message.locator('.ytcq-bounty-hunting-claim-indicator')).toHaveText('B$125');
   });
 };
 

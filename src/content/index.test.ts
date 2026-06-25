@@ -13,8 +13,8 @@ const lifecycleMocks = vi.hoisted(() => ({
   initFeatures: vi.fn(),
   recoverVisibleFeatures: vi.fn(),
   resetFeatures: vi.fn(),
-  shouldIgnoreFeatureAddedNode: vi.fn(() => false),
-  shouldIgnoreFeatureMutation: vi.fn(() => false),
+  shouldIgnoreFeatureAddedNode: vi.fn((_element: Element) => false),
+  shouldIgnoreFeatureMutation: vi.fn((_element: Element) => false),
   suspendFeatures: vi.fn()
 }));
 
@@ -39,6 +39,12 @@ describe('content script entrypoint wiring', () => {
     document.body.replaceChildren();
     chrome.storage.sync.clear();
     vi.clearAllMocks();
+    lifecycleMocks.shouldIgnoreFeatureAddedNode.mockReset();
+    lifecycleMocks.shouldIgnoreFeatureAddedNode.mockReturnValue(false);
+    lifecycleMocks.shouldIgnoreFeatureMutation.mockReset();
+    lifecycleMocks.shouldIgnoreFeatureMutation.mockReturnValue(false);
+    messageDataMocks.requestYouTubeMessageData.mockReset();
+    messageDataMocks.requestYouTubeMessageData.mockResolvedValue(null);
     observe = vi.fn();
     observerCallback = null;
     observerCallbacks = [];
@@ -209,6 +215,9 @@ describe('content script entrypoint wiring', () => {
     const managedButton = document.createElement('button');
     managedButton.setAttribute('data-ytcq-managed', 'true');
     document.body.append(header);
+    lifecycleMocks.shouldIgnoreFeatureAddedNode.mockImplementation((element) =>
+      element.hasAttribute('data-ytcq-managed')
+    );
 
     observerCallback?.([
       mutation({
@@ -221,6 +230,38 @@ describe('content script entrypoint wiring', () => {
     const batch = lifecycleMocks.handleFeatureMutations.mock.calls[0][0] as FeatureMutationBatch;
     expect(batch.addedElements).toEqual([]);
     expect(batch.mutations).toEqual([]);
+  });
+
+  it('dispatches changed message work when managed nodes are removed from chat messages', async () => {
+    await import('./index');
+    const message = createMessage();
+    const messageText = message.querySelector('#message')!;
+    const managedPill = document.createElement('span');
+    managedPill.setAttribute('data-ytcq-managed', 'true');
+    messageText.append(managedPill);
+    document.body.append(message);
+    lifecycleMocks.handleFeatureMessage.mockClear();
+    lifecycleMocks.handleFeatureMutations.mockClear();
+    lifecycleMocks.shouldIgnoreFeatureAddedNode.mockImplementation((element) =>
+      element.hasAttribute('data-ytcq-managed')
+    );
+
+    observerCallback?.([
+      mutation({
+        removedNodes: [managedPill],
+        target: messageText,
+        type: 'childList'
+      })
+    ], {} as MutationObserver);
+
+    const batch = lifecycleMocks.handleFeatureMutations.mock.calls[0][0] as FeatureMutationBatch;
+    expect(batch.addedElements).toEqual([]);
+    expect(batch.mutations).toHaveLength(1);
+    expect(messageDataMocks.requestYouTubeMessageData).toHaveBeenCalledWith(message);
+    expect(lifecycleMocks.handleFeatureMessage).toHaveBeenCalledWith(message, expect.objectContaining({
+      messageData: expect.any(Promise),
+      source: 'changed'
+    }));
   });
 
   it('suspends older content script instances when a newer one claims the document', async () => {

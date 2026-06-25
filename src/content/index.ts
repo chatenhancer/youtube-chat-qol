@@ -269,11 +269,21 @@ function shouldIgnoreObserverMutation(mutation: MutationRecord): boolean {
     ...Array.from(mutation.addedNodes),
     ...Array.from(mutation.removedNodes)
   ];
-  return Boolean(changedNodes.length) && changedNodes.every(shouldIgnoreObserverNode);
+  if (!changedNodes.length) return false;
+  if (shouldDispatchManagedRemovalFromChatMessage(targetElement, mutation)) return false;
+  return changedNodes.every(shouldIgnoreObserverNode);
 }
 
 function shouldIgnoreObserverNode(node: Node): boolean {
   return node instanceof Element && shouldIgnoreFeatureAddedNode(node);
+}
+
+function shouldDispatchManagedRemovalFromChatMessage(
+  targetElement: Element | null,
+  mutation: MutationRecord
+): boolean {
+  if (!targetElement?.closest(CHAT_MESSAGE_SELECTOR)) return false;
+  return Array.from(mutation.removedNodes).some(shouldIgnoreObserverNode);
 }
 
 function saveOptions(values: Partial<Options>): void {
