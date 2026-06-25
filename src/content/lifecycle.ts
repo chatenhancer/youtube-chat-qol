@@ -1,21 +1,24 @@
 /**
- * Content feature lifecycle hooks.
+ * Lifecycle registry for extension features that run in YouTube's live-chat
+ * document.
  *
- * Feature modules register the work they own at module load, while the content
- * entrypoint owns the single MutationObserver and only runs lifecycle phases.
- * This is intentionally content-scoped rather than `shared`: it depends on the
- * live-chat DOM observer model and should not become an API for popup,
- * background, or docs code.
+ * Feature modules register hooks when `enabled-features.ts` imports them. The
+ * content entrypoint handles startup, options, the active content script
+ * instance, and the one shared `MutationObserver`; this module stores hooks and
+ * dispatches normalized events by lifecycle phase.
  *
- * The important convention is that feature import order should not carry
- * behavioral meaning. Message and mutation work is split into collect, enhance,
- * and render phases so ordering is expressed by intent instead of by the
- * enabled-feature import list.
+ * The hooks assume a real YouTube chat DOM: message renderers, participant
+ * renderers, YouTube menu popups, document visibility changes, and extension
+ * UI injected into that page.
  *
- * Extension-created UI should use `ytcqCreateElement()` from
- * `shared/managed-dom`. That marks the element as extension-owned, letting the
- * shared observer ignore our own DOM mutations without fragile per-feature
- * selector lists.
+ * Message and mutation hooks run in fixed `collect`, `enhance`, then `render`
+ * passes. When several features see the same message or mutation, state
+ * gathering happens before control wiring, and visible DOM rendering happens
+ * last.
+ *
+ * Elements created through `ytcqCreateElement()` from `shared/managed-dom` are
+ * marked as extension-managed. The shared observer ignores managed elements, so
+ * injected buttons, cards, and popups do not look like new YouTube DOM work.
  */
 import type { Options } from '../shared/options';
 import { isExtensionManagedElement } from '../shared/managed-dom';
@@ -36,227 +39,234 @@ type FeatureMessageDispatchContext = Omit<FeatureMessageContext, 'messageData' |
 };
 
 /**
- * Ordered phases for repeated message/mutation work.
+ * Ordered phases for repeated work on chat messages and observer batches.
  *
- * `collect` reads YouTube DOM and updates local state.
- * `enhance` wires controls/listeners or adds lightweight feature UI.
- * `render` applies DOM renderings that depend on collected state.
+ * `collect` reads YouTube DOM and updates extension state.
+ * `enhance` wires listeners, controls, or compact feature UI.
+ * `render` changes visible DOM after collection/enhancement state is ready.
  */
 export type FeatureLifecyclePhase = 'collect' | 'enhance' | 'render';
 export type FeatureMessageSource = 'existing' | 'added' | 'changed';
 
 /**
- * Optional collect/enhance/render hooks for one repeated lifecycle surface.
+ * Phase-specific hooks for one repeated lifecycle surface.
  *
- * Used by both `message` and `mutation` registrations. Most features only need
- * one phase, so call sites stay compact: `message: { enhance: wireMessage }`.
+ * `message` and `mutation` registrations both use this shape. A registration
+ * can include only the phase it needs, such as
+ * `message: { enhance: wireMessage }`.
  */
 export type FeaturePhasedLifecycle<T extends (...args: never[]) => void> = Partial<Record<FeatureLifecyclePhase, T>>;
 
 /**
- * Persist extension options from feature code.
+ * Save option updates requested by injected chat UI.
  *
- * Features receive this through `init` instead of importing storage helpers
- * directly, so option normalization and side effects stay centralized in the
- * content entrypoint.
+ * Features receive this in `page.init` so content-script option normalization,
+ * storage writes, and option-change fan-out stay in `content/index.ts`.
  */
 export type SaveOptions = (values: Partial<Options>) => void;
 
 export interface FeatureLifecycleContext {
   /**
-   * Save a partial option update.
+   * Save a partial option update from an injected control.
    *
-   * Use this for user actions in injected UI, such as settings menu toggles or
-   * composer translation changes. It updates in-memory options, runs side
-   * effects, and writes to `chrome.storage.sync`.
+   * Settings menu toggles, composer translation controls, and other
+   * YouTube-page UI call this when they change extension options. The content
+   * entrypoint updates in-memory options, notifies feature hooks, and persists
+   * the change to `chrome.storage.sync`.
    */
   saveOptions: SaveOptions;
 }
 
 export interface FeatureMessageContext {
   /**
-   * Why this message renderer is being dispatched.
+   * Why this chat message renderer is being dispatched.
    *
-   * `existing` is used for boot and visible-message recovery scans.
-   * `added` is used for newly inserted chat renderers.
-   * `changed` is used when an existing renderer's text or children changed,
-   * including YouTube filling message text after the renderer was first seen.
+   * `existing` is used during boot and visible-message recovery scans.
+   * `added` is used for renderer nodes newly inserted by YouTube.
+   * `changed` is used when YouTube mutates an existing renderer, including the
+   * common case where message text appears after the renderer shell.
    */
   source: FeatureMessageSource;
 
   /**
-   * Whether this message is a newly added top-level chat renderer.
+   * Whether live-only message work may run for this dispatch.
    *
-   * `true` means the message came from a new renderer and live-only actions,
-   * such as queueing translation, may run. `false` is used for existing
-   * messages on boot or containing renderers touched by child mutations, where
-   * features should usually wire/highlight only and avoid duplicate live work.
+   * The field name is translation-specific for historical reasons, but the
+   * meaning is broader: `true` means the renderer is new live chat work, while
+   * `false` means a boot, recovery, or mutation refresh pass. Features such as
+   * translation and Inbox use this to avoid replaying old messages as new ones.
    */
   allowTranslate: boolean;
 
   /**
-   * Sanitized YouTube-owned renderer data for this message when it is ready.
+   * Sanitized page-world metadata for this YouTube message renderer.
    *
-   * Features that need page-world message metadata can await this promise or
-   * attach a continuation. Promise work resumes after the synchronous
-   * collect/enhance/render lifecycle dispatch.
+   * Features can await the promise when they need data exposed by YouTube's
+   * page context, such as stable message IDs. The promise resolves outside the
+   * synchronous collect/enhance/render pass; immediate DOM wiring happens
+   * before this data is available.
    */
   messageData: Promise<YouTubeMessageData | null>;
 }
 
 export interface FeatureMutationBatch {
   /**
-   * Added DOM elements after extension-owned nodes have been filtered out.
+   * Added DOM elements from observer records after managed nodes are removed.
    *
-   * Use this for structural UI work such as finding newly opened YouTube menus
-   * or emoji pickers. Do not mutate this array.
+   * This is the primary input for structural UI work such as finding newly
+   * opened YouTube menus, emoji pickers, chat header changes, or composer
+   * controls. The lifecycle dispatcher does not mutate it after creation.
    */
   addedElements: Element[];
 
   /**
-   * Raw mutation records from the shared observer.
+   * Mutation records that were not fully ignored by the shared observer.
    *
-   * Prefer `addedElements`. Use raw records only when a feature needs to
-   * inspect a non-message target, such as the chat header or a YouTube menu
-   * popup. Chat message renderer changes are dispatched separately through the
-   * normal message lifecycle with `source: 'changed'`.
+   * `addedElements` covers most added-node work. These records preserve the
+   * original mutation target for cases such as YouTube menu popups or the chat
+   * header. Because the records are still the browser's original records, mixed
+   * node lists can include managed extension nodes. Chat message changes are
+   * dispatched separately through `message` hooks with `source: 'changed'`.
    */
   mutations: MutationRecord[];
 }
 
 export interface FeaturePageLifecycle {
   /**
-   * Runs after options are loaded and existing chat messages/participants have
-   * been processed.
+   * Runs after options load and the first chat message/participant scan ends.
    *
-   * Use for one-time scans of already-open YouTube surfaces, such as currently
-   * open menus. Most features should prefer `init`, message hooks, or mutation
-   * hooks instead.
+   * This covers one-time work that needs normalized options or already-open
+   * YouTube surfaces, such as enhancing a menu that existed before the observer
+   * started. Work that does not depend on the completed first pass usually fits
+   * in `init`, `message`, or `mutation`.
    */
   boot?: LifecycleCallback;
 
   /**
-   * Runs once during content-script initialization before options are loaded.
+   * Runs once after stale cleanup and locale setup, before options load.
    *
-   * Use for document-level event listeners, storage subscriptions, and feature
-   * setup that does not require current option values. The `saveOptions`
-   * callback is available through the context.
+   * This covers document listeners, storage subscriptions, local state loading,
+   * and feature setup that does not depend on current option values. The
+   * context provides `saveOptions` for injected controls that need to update
+   * extension settings.
    */
   init?: InitCallback;
 
   /**
-   * Runs before the new content script initializes feature state.
+   * Runs before a fresh content script instance initializes feature state.
    *
-   * Use for removing stale DOM or data attributes left behind when an extension
-   * update/reload leaves old injected UI in the page.
+   * This removes injected DOM, data attributes, timers, or small page state
+   * that can survive an extension reload/update inside the same YouTube tab.
+   * It runs before options or feature state are loaded.
    */
   cleanupStale?: LifecycleCallback;
 
   /**
-   * Runs when the background asks the page to reset extension UI/state.
+   * Runs when the extension asks this page to reset in-page feature state.
    *
-   * Use for closing panels, clearing in-page caches, and restoring mutated
-   * message DOM. Persistent browser storage cleanup belongs in the feature's
-   * storage path, not here.
+   * This closes panels, clears in-page caches, and undoes message DOM changes
+   * in the current YouTube page. Browser storage is unchanged by page reset
+   * hooks.
    */
   reset?: LifecycleCallback;
 
   /**
-   * Runs after normalized options change.
+   * Runs after content-script options have been normalized and changed.
    *
-   * Use for feature-specific reactions to settings changes. The content
-   * entrypoint owns reading/writing options; features own their own UI/cache
-   * refresh behavior.
+   * Feature UI refreshes, derived-state clears, and visible-chat reprocessing
+   * after a settings change happen here. Callbacks receive both the previous
+   * and next normalized option snapshots.
    */
   optionsChanged?: OptionsChangedCallback;
 
   /**
-   * Runs after the page returns to the foreground and visible messages have
-   * been scanned again.
+   * Runs after a foreground tab recovery scan has reprocessed visible messages.
    *
-   * Use for capped recovery work that should happen after background-tab live
-   * edge recovery, such as translation backfill. This is not a general
-   * visibility listener; features that need raw foreground/background events
-   * should use `visibilityChanged`.
+   * Bounded follow-up work that benefits from the fresh scan runs here, such as
+   * translation backfill. Immediate foreground/background transitions use
+   * `visibilityChanged`.
    */
   visibleRecovery?: LifecycleCallback;
 
   /**
-   * Runs when the document visibility changes.
+   * Runs immediately when the chat document visibility changes.
    *
-   * Use for feature behavior that specifically reacts to tab foreground or
-   * background transitions. Keep ordinary foreground recovery work in
-   * `visibleRecovery`, which runs after the content entrypoint has rescanned
-   * visible messages.
+   * Behavior tied to the transition itself runs here, such as keeping the
+   * native chat scroller at the live edge or cancelling timers. Foreground work
+   * that depends on visible messages being rescanned runs in `visibleRecovery`.
    */
   visibilityChanged?: VisibilityChangedCallback;
 }
 
 export interface FeatureParticipantLifecycle {
   /**
-   * Runs for participant-list renderers discovered by the content entrypoint.
+   * Runs for YouTube participant-list renderers discovered by the entrypoint.
    *
-   * Use this only for participant surfaces; chat messages should use the
-   * message phase hooks.
+   * This is for participant surfaces only. Chat messages, including author
+   * chips inside message renderers, go through the `message` hooks.
    */
   enhance?: ParticipantCallback;
 }
 
 export interface FeatureObserverIgnoreLifecycle {
   /**
-   * Optional custom added-node filter.
+   * Optional filter for added nodes that are feature-owned, not YouTube work.
    *
-   * Prefer `ytcqCreateElement()` for extension-created UI. This callback is an
-   * escape hatch for feature-owned mutations to YouTube DOM that would otherwise
-   * be observed as fresh YouTube work, such as live keyword highlighting.
+   * `ytcqCreateElement()` covers normal extension UI. This hook covers
+   * feature-owned edits to YouTube-rendered DOM, such as keyword highlight
+   * wrappers, where marking a new element as managed is not enough by itself.
    */
   addedNode?: (element: Element) => boolean;
 
   /**
-   * Optional custom mutation-target filter.
+   * Optional filter for feature-owned mutation targets.
    *
-   * Prefer `ytcqCreateElement()` for extension-created UI. This callback is an
-   * escape hatch for temporarily ignoring observer feedback while a feature is
-   * mutating YouTube-owned DOM.
+   * `ytcqCreateElement()` covers normal extension UI. This hook covers
+   * temporary observer feedback from feature-owned changes to YouTube DOM that
+   * cannot be represented as managed extension elements.
    */
   mutation?: (element: Element) => boolean;
 }
 
 export interface FeatureLifecycle {
   /**
-   * One-time page lifecycle hooks.
+   * Page-level hooks for setup, cleanup, options, and visibility.
    *
-   * Use this group for setup, stale UI cleanup, late boot work, and page reset
-   * cleanup. Repeated chat renderer work belongs in `message` or `mutation`.
+   * These hooks cover work tied to the content-script instance or whole chat
+   * document. Repeated chat renderer work is handled by `message`; repeated
+   * structural DOM work is handled by `mutation`.
    */
   page?: FeaturePageLifecycle;
 
   /**
    * Phased work for YouTube chat message renderers.
    *
-   * `collect` updates feature state, `enhance` wires behavior/UI controls, and
-   * `render` changes visible message content after state is ready.
+   * These hooks cover message text, author data, per-message controls,
+   * mention/inbox logic, translation rendering, and other behavior attached to
+   * `yt-live-chat-*-message-renderer` nodes.
    */
   message?: FeaturePhasedLifecycle<MessageCallback>;
 
   /**
-   * Phased work for normalized MutationObserver batches.
+   * Phased work for non-message DOM changes from the shared observer.
    *
-   * Use this for late-loaded text, newly opened YouTube menus, emoji pickers,
-   * composer controls, or other DOM changes found by the shared observer.
+   * These hooks cover newly opened YouTube menus, emoji pickers, composer
+   * controls, chat header changes, and other structural surfaces. Chat message
+   * renderer changes are dispatched through `message`.
    */
   mutation?: FeaturePhasedLifecycle<MutationCallback>;
 
   /**
-   * Participant-list hooks.
+   * Hooks for YouTube's participant list surface.
    */
   participant?: FeatureParticipantLifecycle;
 
   /**
-   * Custom observer suppression hooks for feature-owned YouTube DOM mutations.
+   * Custom observer suppression for feature-owned edits to YouTube DOM.
    *
-   * Most features should not need this. Prefer creating UI with
-   * `ytcqCreateElement()`, which marks extension-owned DOM automatically.
+   * Managed extension elements cover normal injected UI. These filters cover
+   * feature-owned mutations to YouTube nodes that would otherwise feed back into
+   * the shared observer.
    */
   observerIgnore?: FeatureObserverIgnoreLifecycle;
 }
@@ -276,20 +286,19 @@ const observerIgnoreMutationCallbacks: ((element: Element) => boolean)[] = [];
 let featuresSuspended = false;
 
 /**
- * Register lifecycle hooks for one enabled content feature.
+ * Register hooks for one enabled content feature or focused sub-feature.
  *
- * Call this at module top level from a module imported by
- * `enabled-features.ts`. Do not create a separate `MutationObserver` in a
- * feature module; instead, register message/mutation hooks here and let
- * `content/index.ts` fan out the shared observer events.
+ * Feature modules call this at module top level from files imported by
+ * `enabled-features.ts`.
+ * `content/index.ts` owns the broad `MutationObserver`, current-instance
+ * checks, and dispatch. Registered hooks receive the resulting message,
+ * mutation, participant, option, and visibility events.
  *
- * Hooks are optional. Register only the phases the feature owns, and prefer the
- * earliest phase that matches the work:
- * collect for state, enhance for wiring/UI controls, render for visible message
- * rendering.
+ * Hook sets can cover one lifecycle surface or several. `collect` is the state
+ * phase, `enhance` is the listener/control phase, and `render` is the visible
+ * DOM phase that runs after collected state is ready.
  *
- * @param lifecycle The hooks owned by a feature or focused sub-feature. Each
- * hook is called by the content entrypoint at the matching lifecycle point.
+ * @param lifecycle The hook set owned by the registering feature.
  *
  * @example
  * ```ts
@@ -317,23 +326,22 @@ export function registerFeatureLifecycle(lifecycle: FeatureLifecycle): void {
 }
 
 /**
- * Run all feature initialization hooks.
+ * Run feature `page.init` hooks.
  *
- * Called once by the content entrypoint after stale UI cleanup and locale setup.
- *
- * @param context Shared services passed from the content entrypoint to feature
- * init hooks. Keep cross-feature services here instead of importing content
- * internals from feature modules.
+ * The content entrypoint calls this once after stale UI cleanup and locale setup
+ * but before stored options are loaded. The context contains the small set of
+ * services that injected chat UI needs from the entrypoint.
  */
 export function initFeatures(context: FeatureLifecycleContext): void {
   initCallbacks.forEach((callback) => callback(context));
 }
 
 /**
- * Run boot hooks after options and existing messages have been loaded.
+ * Run feature `page.boot` hooks after the initial chat scan.
  *
- * Boot is later than `init`: use it only for work that needs normalized options
- * and the first pass over existing YouTube renderers to be complete.
+ * At this point options are normalized, existing message renderers have gone
+ * through `message` hooks, and existing participant renderers have gone through
+ * participant hooks.
  */
 export function bootFeatures(): void {
   if (featuresSuspended) return;
@@ -341,10 +349,10 @@ export function bootFeatures(): void {
 }
 
 /**
- * Run feature option-change hooks after normalized options have changed.
+ * Run feature `page.optionsChanged` hooks after options are normalized.
  *
- * @param previousOptions Options before the update.
- * @param nextOptions Current normalized options.
+ * @param previousOptions Normalized option values before the update.
+ * @param nextOptions Current normalized option values.
  */
 export function handleFeatureOptionsChanged(previousOptions: Options, nextOptions: Options): void {
   if (featuresSuspended) return;
@@ -352,7 +360,10 @@ export function handleFeatureOptionsChanged(previousOptions: Options, nextOption
 }
 
 /**
- * Run feature hooks after foreground live-edge recovery rescans messages.
+ * Run feature `page.visibleRecovery` hooks after foreground message recovery.
+ *
+ * The content entrypoint calls this after it has rescanned currently visible
+ * message renderers on a foreground transition.
  */
 export function recoverVisibleFeatures(): void {
   if (featuresSuspended) return;
@@ -360,21 +371,25 @@ export function recoverVisibleFeatures(): void {
 }
 
 /**
- * Run feature hooks for a document visibility state change.
+ * Run feature `page.visibilityChanged` hooks for a document visibility change.
  *
- * @param visibilityState Current `document.visibilityState` value.
+ * These hooks are not gated by feature suspension so cleanup paths can still
+ * notify timer-owning features if needed.
+ *
+ * @param visibilityState The current `document.visibilityState` value.
  */
 export function handleFeatureVisibilityChanged(visibilityState: Document['visibilityState']): void {
   visibilityChangedCallbacks.forEach((callback) => callback(visibilityState));
 }
 
 /**
- * Dispatch a chat message renderer through collect, enhance, then render.
+ * Dispatch a YouTube chat message renderer through all message phases.
  *
- * @param message A YouTube chat message renderer, normally matching
- * `CHAT_MESSAGE_SELECTOR`.
- * @param context Per-message dispatch flags, most importantly whether live-only
- * work such as initial translation queueing is allowed for this pass.
+ * When `source` or `messageData` is omitted, this helper derives the source
+ * from `allowTranslate` and supplies an empty metadata promise.
+ *
+ * @param message A renderer matching the extension's chat message selector.
+ * @param context Per-message flags and optional page-world metadata request.
  */
 export function handleFeatureMessage(message: HTMLElement, context: FeatureMessageDispatchContext): void {
   if (featuresSuspended) return;
@@ -387,12 +402,12 @@ export function handleFeatureMessage(message: HTMLElement, context: FeatureMessa
 }
 
 /**
- * Dispatch one normalized observer batch through collect, enhance, then render.
+ * Dispatch one normalized observer batch through all mutation phases.
  *
- * @param batch A shared observer batch created by the content entrypoint. The
- * batch already filters extension-managed DOM and deduplicates changed message
- * renderers, so feature hooks should use it instead of scanning raw mutations
- * from scratch.
+ * The batch is for non-message structural work. Changed chat messages are
+ * dispatched separately through `handleFeatureMessage`.
+ *
+ * @param batch Observer data prepared by the content entrypoint.
  */
 export function handleFeatureMutations(batch: FeatureMutationBatch): void {
   if (featuresSuspended) return;
@@ -400,10 +415,9 @@ export function handleFeatureMutations(batch: FeatureMutationBatch): void {
 }
 
 /**
- * Dispatch a participant renderer to participant-specific feature hooks.
+ * Dispatch a YouTube participant-list renderer to participant hooks.
  *
- * @param participant A YouTube participant renderer from the participants list,
- * not a normal chat message renderer.
+ * @param participant A renderer from the participants list, not a chat message.
  */
 export function handleFeatureParticipant(participant: HTMLElement): void {
   if (featuresSuspended) return;
@@ -411,44 +425,46 @@ export function handleFeatureParticipant(participant: HTMLElement): void {
 }
 
 /**
- * Whether an added node should be ignored by the shared observer.
+ * Return whether an added node is extension-owned DOM work.
  *
- * Extension UI created through `ytcqCreateElement()` is automatically ignored.
+ * Managed elements are ignored automatically before feature-specific filters
+ * run.
  *
- * @param element Added DOM element from the shared MutationObserver.
+ * @param element Added element from the shared observer.
  */
 export function shouldIgnoreFeatureAddedNode(element: Element): boolean {
   return shouldIgnoreFeatureObserverElement(element, observerIgnoreAddedNodeCallbacks);
 }
 
 /**
- * Whether a mutation target should be ignored by the shared observer.
+ * Return whether a mutation target is extension-owned DOM work.
  *
- * Extension UI created through `ytcqCreateElement()` is automatically ignored.
+ * Managed elements are ignored automatically before feature-specific filters
+ * run.
  *
- * @param element Mutation target element from the shared MutationObserver.
+ * @param element Mutation target element from the shared observer.
  */
 export function shouldIgnoreFeatureMutation(element: Element): boolean {
   return shouldIgnoreFeatureObserverElement(element, observerIgnoreMutationCallbacks);
 }
 
 /**
- * Remove stale extension UI/markers from prior content script instances.
+ * Remove stale extension UI and markers before normal feature startup.
  *
- * This is mainly for extension reload/update recovery, where old injected DOM
- * can remain in the page while a fresh content script instance starts.
+ * This handles extension reload/update cases where a YouTube tab keeps old
+ * injected DOM even though a fresh content script is starting.
  */
 export function cleanupStaleFeatures(): void {
   runLifecycleCallbacks(staleCleanupCallbacks);
 }
 
 /**
- * Remove injected UI and stop normal feature dispatch for this page instance.
+ * Stop normal feature dispatch and clean up injected UI for this instance.
  *
- * This is used when the old content script can still run JavaScript but can no
- * longer talk to the extension context. In that state feature controls would be
- * misleading because their actions cannot reliably reach storage/background.
- * The reconnect/refresh notice is created after this cleanup.
+ * This is used when another content script instance claims the page or the old
+ * script can no longer reliably talk to the extension context. Visible feature
+ * controls are removed so they do not race the new instance or fail when users
+ * interact with them.
  */
 export function suspendFeatures(): void {
   if (featuresSuspended) return;
@@ -457,10 +473,11 @@ export function suspendFeatures(): void {
 }
 
 /**
- * Reset in-page feature state after a full extension reset.
+ * Reset feature-owned state in the current YouTube page.
  *
- * This does not clear browser storage. It only asks features to remove visible
- * page state, close panels, and undo DOM mutations in the current YouTube page.
+ * This does not clear browser storage. It asks features to close panels, clear
+ * in-page caches, and undo visible DOM mutations. Reset hooks still run after
+ * suspension so teardown can finish cleanly.
  */
 export function resetFeatures(): void {
   runLifecycleCallbacks(resetCallbacks);
