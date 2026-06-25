@@ -7,19 +7,10 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { loadLocalEnv, requireEnv } from './lib/local-env.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const args = new Set(process.argv.slice(2));
-const appName = process.env.YTCQ_SAFARI_APP_NAME || 'Chat Enhancer for YouTube';
-const developmentTeam = process.env.YTCQ_SAFARI_DEVELOPMENT_TEAM || '2UJF2GNW75';
-const configuration = process.env.YTCQ_SAFARI_CONFIGURATION || 'Release';
-const destination = process.env.YTCQ_SAFARI_DESTINATION || 'generic/platform=macOS';
-const projectLocation = path.join(root, 'dist', 'safari');
-const projectPath = path.join(projectLocation, appName, `${appName}.xcodeproj`);
-const pbxProjectPath = path.join(projectPath, 'project.pbxproj');
-const scheme = process.env.YTCQ_SAFARI_SCHEME || `${appName} (macOS)`;
-const archiveRoot = path.join(root, 'dist', 'safari-archives');
-const exportRoot = path.join(root, 'dist', 'safari-upload');
 
 if (args.has('--help')) {
   printUsage();
@@ -31,6 +22,19 @@ for (const arg of args) {
     throw new Error(`Unknown argument: ${arg}`);
   }
 }
+
+await loadLocalEnv();
+
+const appName = requireEnv('YTCQ_SAFARI_APP_NAME');
+const developmentTeam = requireEnv('YTCQ_SAFARI_DEVELOPMENT_TEAM');
+const configuration = process.env.YTCQ_SAFARI_CONFIGURATION || 'Release';
+const destination = process.env.YTCQ_SAFARI_DESTINATION || 'generic/platform=macOS';
+const projectLocation = path.join(root, 'dist', 'safari');
+const projectPath = path.join(projectLocation, appName, `${appName}.xcodeproj`);
+const pbxProjectPath = path.join(projectPath, 'project.pbxproj');
+const scheme = process.env.YTCQ_SAFARI_SCHEME || `${appName} (macOS)`;
+const archiveRoot = path.join(root, 'dist', 'safari-archives');
+const exportRoot = path.join(root, 'dist', 'safari-upload');
 
 const shouldUpload = args.has('--upload');
 const versions = await readProjectVersions();
@@ -200,6 +204,7 @@ Usage:
 
 Environment:
   YTCQ_SAFARI_DEVELOPMENT_TEAM           Apple Developer team ID.
+  YTCQ_SAFARI_APP_NAME                   Generated Safari wrapper app name.
   YTCQ_SAFARI_ARCHIVE_PATH               Optional .xcarchive output path.
   YTCQ_SAFARI_EXPORT_PATH                Optional upload export working directory.
   YTCQ_SAFARI_ALLOW_PROVISIONING_UPDATES Set to 0 to disable Xcode provisioning updates.

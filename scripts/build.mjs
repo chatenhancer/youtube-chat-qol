@@ -11,8 +11,11 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import packageJson from '../package.json' with { type: 'json' };
 import { generateIcons } from './generate-icons.mjs';
+import { loadLocalEnv } from './lib/local-env.mjs';
 import { syncExtensionLocales } from './sync-extension-locales.mjs';
 import { validateExtensionLocales } from './validate-extension-locales.mjs';
+
+await loadLocalEnv();
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const extensionAssetsDir = path.join(root, 'src', 'assets');

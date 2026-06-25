@@ -22,6 +22,9 @@ import {
   getGitHubConfig,
   queueDeferredChromeRelease
 } from './lib/deferred-chrome-release.mjs';
+import { loadLocalEnv } from './lib/local-env.mjs';
+
+await loadLocalEnv();
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const releaseDir = path.join(root, 'dist', 'release');

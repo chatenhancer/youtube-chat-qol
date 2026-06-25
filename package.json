@@ -19,7 +19,7 @@
     "build:firefox:playground-local": "node scripts/build.mjs --target=firefox --playground-backend=http://127.0.0.1:8787",
     "build:safari": "node scripts/build.mjs --target=safari",
     "build:safari:xcode": "npm run build:safari && node scripts/package-safari.mjs",
-    "build:safari:app": "npm run build:safari:xcode && xcodebuild -project \"dist/safari/Chat Enhancer for YouTube/Chat Enhancer for YouTube.xcodeproj\" -scheme \"Chat Enhancer for YouTube (macOS)\" -configuration Debug DEVELOPMENT_TEAM=${YTCQ_SAFARI_DEVELOPMENT_TEAM:-2UJF2GNW75} build",
+    "build:safari:app": "npm run build:safari:xcode && node scripts/build-safari-app.mjs",
     "build:safari:archive": "npm run build:safari:xcode && node scripts/distribute-safari.mjs --archive",
     "build:playground-local": "npm run build:chrome:playground-local && npm run build:firefox:playground-local",
     "docs:screenshots": "npm run docs:build && node scripts/generate-dom-screenshots.mjs",
