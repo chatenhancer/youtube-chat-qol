@@ -30,6 +30,7 @@ interface PendingTranslationEntry {
 }
 
 interface TranslationJob {
+  backfill: boolean;
   key: string;
   text: string;
   targetLanguage: string;
@@ -57,6 +58,7 @@ export interface TranslationPriorityScope {
 
 const MAX_RETROACTIVE_TRANSLATIONS = 150;
 
+const MAX_TRANSLATION_BATCH_SIZE = 50;
 const MAX_TRANSLATION_CACHE_SIZE = 500;
 const MAX_TRANSLATION_CONCURRENCY = 2;
 const MAX_PENDING_TRANSLATION_ENTRIES = 300;
@@ -67,6 +69,7 @@ let liveTranslationQueue: TranslationJob[] = [];
 let backfillTranslationQueue: TranslationJob[] = [];
 let activeTranslations = 0;
 let translationDelayTimer = 0;
+let translationPumpScheduled = false;
 let pendingTranslationSequence = 0;
 
 const translationCache = new Map<string, TranslationResult>();
@@ -120,13 +123,14 @@ export function queueMessageTranslation(message: HTMLElement, { backfill = false
 
   pendingTranslations.set(request.key, new Set([entry]));
   const job = {
+    backfill,
     key: request.key,
     text: request.sourceText,
     targetLanguage: request.targetLanguage
   };
   enqueueTranslationJob(job, { backfill });
   enforcePendingTranslationLimit();
-  pumpTranslationQueue();
+  scheduleTranslationPump();
 }
 
 export function createTranslationPriorityScope(): TranslationPriorityScope {
@@ -173,6 +177,7 @@ export function clearTranslations(): void {
     window.clearTimeout(translationDelayTimer);
     translationDelayTimer = 0;
   }
+  translationPumpScheduled = false;
   clearTranslationRenderings();
   emitMessageTranslationsCleared();
 }
@@ -249,12 +254,13 @@ function enqueueTranslationJob(job: TranslationJob, { backfill }: { backfill: bo
 function promoteBackfillTranslation(key: string): void {
   const index = backfillTranslationQueue.findIndex((job) => job.key === key);
   if (index < 0) return;
-  liveTranslationQueue.unshift(backfillTranslationQueue.splice(index, 1)[0]);
+  const [job] = backfillTranslationQueue.splice(index, 1);
+  liveTranslationQueue.unshift({ ...job, backfill: false });
   if (translationDelayTimer) {
     window.clearTimeout(translationDelayTimer);
     translationDelayTimer = 0;
   }
-  pumpTranslationQueue();
+  scheduleTranslationPump();
 }
 
 function retainPriorityTranslationKey(scope: ActiveTranslationPriorityScope, key: string): void {
@@ -394,42 +400,49 @@ function pumpTranslationQueue(): void {
   if (activeTranslations >= MAX_TRANSLATION_CONCURRENCY) return;
   if (translationDelayTimer) return;
 
-  const job = takeNextTranslationJob();
-  if (!job) return;
+  const batch = takeNextTranslationBatch();
+  if (!batch.length) return;
 
   activeTranslations += 1;
-  translate(job.text, job.targetLanguage)
-    .then((result) => {
-      let renderedAny = false;
-      for (const entry of pendingTranslations.get(job.key) || []) {
-        const message = entry.messageRef.deref();
-        if (!message) continue;
+  translateBatch(batch)
+    .then((results) => {
+      batch.forEach((job, index) => {
+        const result = results[index];
+        if (!result) return;
 
-        const rendered = renderTranslation(message, result, entry.originalText, entry.protectedTokens, entry.sourceText);
-        if (rendered) {
-          emitMessageTranslationRendered({
-            message,
-            result,
-            originalText: entry.originalText,
-            protectedTokens: entry.protectedTokens,
-            sourceText: entry.sourceText,
-          });
-          renderedAny = true;
-        } else {
-          delete message.dataset.ytcqTranslationKey;
-          emitMessageTranslationCleared(message);
+        let renderedAny = false;
+        for (const entry of pendingTranslations.get(job.key) || []) {
+          const message = entry.messageRef.deref();
+          if (!message) continue;
+
+          const rendered = renderTranslation(message, result, entry.originalText, entry.protectedTokens, entry.sourceText);
+          if (rendered) {
+            emitMessageTranslationRendered({
+              message,
+              result,
+              originalText: entry.originalText,
+              protectedTokens: entry.protectedTokens,
+              sourceText: entry.sourceText,
+            });
+            renderedAny = true;
+          } else {
+            delete message.dataset.ytcqTranslationKey;
+            emitMessageTranslationCleared(message);
+          }
         }
-      }
-      if (renderedAny) rememberTranslation(job.key, result);
+        if (renderedAny) rememberTranslation(job.key, result);
+      });
     })
     .catch(() => {
-      for (const entry of pendingTranslations.get(job.key) || []) {
-        const message = entry.messageRef.deref();
-        if (message) delete message.dataset.ytcqTranslationKey;
+      for (const job of batch) {
+        for (const entry of pendingTranslations.get(job.key) || []) {
+          const message = entry.messageRef.deref();
+          if (message) delete message.dataset.ytcqTranslationKey;
+        }
       }
     })
     .finally(() => {
-      pendingTranslations.delete(job.key);
+      batch.forEach((job) => pendingTranslations.delete(job.key));
       activeTranslations -= 1;
       if (liveTranslationQueue.length) {
         pumpTranslationQueue();
@@ -442,26 +455,72 @@ function pumpTranslationQueue(): void {
       }, backfillTranslationQueue.length ? TRANSLATION_DELAY_MS : LIVE_TRANSLATION_DELAY_MS);
       pumpTranslationQueue();
     });
+
+  pumpTranslationQueue();
 }
 
-function takeNextTranslationJob(): TranslationJob | undefined {
-  return takePriorityTranslationJob(liveTranslationQueue) ||
-    takePriorityTranslationJob(backfillTranslationQueue) ||
-    liveTranslationQueue.shift() ||
-    backfillTranslationQueue.shift();
+function scheduleTranslationPump(): void {
+  if (translationPumpScheduled) return;
+  translationPumpScheduled = true;
+  queueMicrotask(() => {
+    translationPumpScheduled = false;
+    pumpTranslationQueue();
+  });
 }
 
-function takePriorityTranslationJob(queue: TranslationJob[]): TranslationJob | undefined {
-  const index = queue.findIndex((job) => priorityTranslationKeys.has(job.key));
+function takeNextTranslationBatch(): TranslationJob[] {
+  const first = takeNextTranslationJob();
+  if (!first) return [];
+
+  const batch = [first];
+  while (batch.length < MAX_TRANSLATION_BATCH_SIZE) {
+    const next = takeNextTranslationJob(first.targetLanguage, first.backfill);
+    if (!next) break;
+    batch.push(next);
+  }
+  return batch;
+}
+
+function takeNextTranslationJob(targetLanguage?: string, backfill?: boolean): TranslationJob | undefined {
+  return takePriorityTranslationJob(liveTranslationQueue, targetLanguage, backfill) ||
+    takePriorityTranslationJob(backfillTranslationQueue, targetLanguage, backfill) ||
+    takeQueuedTranslationJob(liveTranslationQueue, targetLanguage, backfill) ||
+    takeQueuedTranslationJob(backfillTranslationQueue, targetLanguage, backfill);
+}
+
+function takePriorityTranslationJob(
+  queue: TranslationJob[],
+  targetLanguage?: string,
+  backfill?: boolean
+): TranslationJob | undefined {
+  const index = queue.findIndex((job) =>
+    priorityTranslationKeys.has(job.key) &&
+    (!targetLanguage || job.targetLanguage === targetLanguage) &&
+    (backfill === undefined || job.backfill === backfill)
+  );
   if (index < 0) return undefined;
   return queue.splice(index, 1)[0];
 }
 
-function translate(text: string, targetLanguage: string): Promise<TranslationResult> {
+function takeQueuedTranslationJob(
+  queue: TranslationJob[],
+  targetLanguage?: string,
+  backfill?: boolean
+): TranslationJob | undefined {
+  if (!targetLanguage) return queue.shift();
+  const index = queue.findIndex((job) =>
+    job.targetLanguage === targetLanguage && (backfill === undefined || job.backfill === backfill)
+  );
+  if (index < 0) return undefined;
+  return queue.splice(index, 1)[0];
+}
+
+function translateBatch(jobs: TranslationJob[]): Promise<TranslationResult[]> {
+  const targetLanguage = jobs[0]?.targetLanguage || '';
   return new Promise((resolve, reject) => {
     chrome.runtime.sendMessage({
-      type: 'ytcq:translate',
-      text,
+      type: 'ytcq:translateBatch',
+      texts: jobs.map((job) => job.text),
       targetLanguage
     }, (response) => {
       if (chrome.runtime.lastError) {
@@ -474,11 +533,17 @@ function translate(text: string, targetLanguage: string): Promise<TranslationRes
         return;
       }
 
-      resolve({
-        text: response.translatedText || text,
-        sourceLanguage: response.sourceLanguage || '',
+      const results = Array.isArray(response.results) ? response.results : [];
+      if (results.length !== jobs.length) {
+        reject(new Error('Translate batch response did not match the request.'));
+        return;
+      }
+
+      resolve(results.map((result: { translatedText?: string; sourceLanguage?: string }, index: number) => ({
+        text: result.translatedText || jobs[index].text,
+        sourceLanguage: result.sourceLanguage || '',
         targetLanguage
-      });
+      })));
     });
   });
 }

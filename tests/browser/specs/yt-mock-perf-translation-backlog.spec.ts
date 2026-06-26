@@ -72,9 +72,10 @@ test('youtube-mock performance: slow failing translation backlog remains bounded
           { label: 'Messages appended', value: MESSAGE_COUNT },
           { label: 'Append burst', value: formatMs(appendBurstMs), budget: formatMs(BUDGETS.appendBurstMs) },
           { label: 'Queue quiet', value: formatMs(queueQuietMs), budget: formatMs(BUDGETS.queueQuietMs) },
-          { label: 'Translation requests', value: translationStats.requestCount, budget: `>= ${REQUEST_FLOOR}` },
-          { label: 'Translation successes', value: translationStats.successCount },
-          { label: 'Translation failures', value: translationStats.failureCount },
+          { label: 'Translation requests', value: translationStats.requestCount },
+          { label: 'Translation items', value: translationStats.translatedItemCount, budget: `>= ${REQUEST_FLOOR}` },
+          { label: 'Translation request successes', value: translationStats.successCount },
+          { label: 'Translation request failures', value: translationStats.failureCount },
           { label: 'Rendered translations', value: visibleTranslationCount },
           { label: 'Messages with translation keys', value: queuedMessageCount },
           { label: 'Long tasks', value: probe.longTaskCount },
@@ -91,7 +92,7 @@ test('youtube-mock performance: slow failing translation backlog remains bounded
         heapGrowthMb,
         probe,
         queueQuietMs,
-        translationRequestCount: translationStats.requestCount
+        translatedItemCount: translationStats.translatedItemCount
       });
     });
   });
@@ -105,9 +106,9 @@ function createBacklogMessages() {
   }));
 }
 
-async function waitForTranslationQueueToQuiet(stats: { requestCount: number }): Promise<number> {
+async function waitForTranslationQueueToQuiet(stats: { requestCount: number; translatedItemCount: number }): Promise<number> {
   const startedAt = performance.now();
-  await expect.poll(() => stats.requestCount, {
+  await expect.poll(() => stats.translatedItemCount, {
     message: 'Slow translation backlog should keep making request progress.',
     timeout: BUDGETS.queueQuietMs
   }).toBeGreaterThanOrEqual(REQUEST_FLOOR);
@@ -131,19 +132,19 @@ function assertPerformanceBudgets({
   heapGrowthMb,
   probe,
   queueQuietMs,
-  translationRequestCount
+  translatedItemCount
 }: {
   appendBurstMs: number;
   heapGrowthMb: number | null;
   probe: BrowserPerfProbeSnapshot;
   queueQuietMs: number;
-  translationRequestCount: number;
+  translatedItemCount: number;
 }): void {
   expect.soft(appendBurstMs, 'Appending messages during a slow endpoint should not block too long.')
     .toBeLessThanOrEqual(BUDGETS.appendBurstMs);
   expect.soft(queueQuietMs, 'The slow/failing translation queue should settle within the broad budget.')
     .toBeLessThanOrEqual(BUDGETS.queueQuietMs);
-  expect.soft(translationRequestCount, 'The queue should keep processing even when some translations fail.')
+  expect.soft(translatedItemCount, 'The queue should keep processing even when some translations fail.')
     .toBeGreaterThanOrEqual(REQUEST_FLOOR);
   expect.soft(probe.maxLongTaskMs, 'Slow translation responses should not create a catastrophic long task.')
     .toBeLessThanOrEqual(BUDGETS.maxLongTaskMs);

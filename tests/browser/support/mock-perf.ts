@@ -9,7 +9,7 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
 const REPORT_DIR = path.join(process.cwd(), 'test-results', 'performance');
-const TRANSLATE_ENDPOINT_PATTERN = 'https://translate.googleapis.com/translate_a/single*';
+const TRANSLATE_ENDPOINT_PATTERN = 'https://translate.googleapis.com/translate_a/*';
 
 export interface BrowserPerfProbeSnapshot {
   durationMs: number;
@@ -45,6 +45,7 @@ export interface MockTranslationStats {
   failureCount: number;
   requestCount: number;
   successCount: number;
+  translatedItemCount: number;
 }
 
 export async function reloadMockChatPageForStoredSettings(page: Page): Promise<void> {
@@ -219,10 +220,14 @@ export async function withMockedPerformanceTranslationEndpoint<T>(
   const stats = {
     failureCount: 0,
     requestCount: 0,
-    successCount: 0
+    successCount: 0,
+    translatedItemCount: 0
   };
 
   const handler = async (route: Route) => {
+    const url = new URL(route.request().url());
+    const isBatchRequest = url.pathname.endsWith('/t');
+    const itemCount = isBatchRequest ? Math.max(1, url.searchParams.getAll('q').length) : 1;
     stats.requestCount += 1;
     if (delayMs) await delay(delayMs);
 
@@ -237,9 +242,18 @@ export async function withMockedPerformanceTranslationEndpoint<T>(
     }
 
     stats.successCount += 1;
+    stats.translatedItemCount += itemCount;
     const text = typeof translatedText === 'function'
       ? translatedText(stats.requestCount)
       : translatedText;
+    if (isBatchRequest) {
+      await route.fulfill({
+        body: JSON.stringify(Array.from({ length: itemCount }, () => [text, sourceLanguage])),
+        contentType: 'application/json'
+      });
+      return;
+    }
+
     await route.fulfill({
       body: JSON.stringify({
         sentences: [{ trans: text }],

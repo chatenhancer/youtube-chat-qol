@@ -13,6 +13,7 @@ describe('background translation bridge', () => {
 
     expect(listener({ type: 'other' }, {}, vi.fn())).toBe(false);
     expect(listener({ type: 'ytcq:translate', text: 'hola', targetLanguage: 'en' }, {}, vi.fn())).toBe(true);
+    expect(listener({ type: 'ytcq:translateBatch', texts: ['hola'], targetLanguage: 'en' }, {}, vi.fn())).toBe(true);
   });
 
   it('calls Google Translate without credentials and returns translated text', async () => {
@@ -85,6 +86,81 @@ describe('background translation bridge', () => {
       });
     });
     expect(fetch).not.toHaveBeenCalled();
+  });
+
+  it('calls the batch endpoint with repeated query values and returns per-text results', async () => {
+    vi.mocked(fetch).mockResolvedValue({
+      json: () => Promise.resolve([['hello', 'es'], ['bye', 'es']]),
+      ok: true
+    } as Response);
+    await import('./translate');
+    const listener = getMessageListener();
+    const sendResponse = vi.fn();
+
+    listener({ type: 'ytcq:translateBatch', texts: ['hola', 'adios'], targetLanguage: 'en' }, {}, sendResponse);
+
+    await vi.waitFor(() => {
+      expect(sendResponse).toHaveBeenCalledWith({
+        ok: true,
+        results: [
+          { sourceLanguage: 'es', translatedText: 'hello' },
+          { sourceLanguage: 'es', translatedText: 'bye' }
+        ]
+      });
+    });
+    expect(fetch).toHaveBeenCalledWith(
+      expect.stringContaining('https://translate.googleapis.com/translate_a/t'),
+      expect.objectContaining({
+        credentials: 'omit',
+        signal: expect.any(AbortSignal)
+      })
+    );
+    const url = String(vi.mocked(fetch).mock.calls[0][0]);
+    expect(url).toContain('sl=auto');
+    expect(url).toContain('tl=en');
+    expect(url).toContain('q=hola');
+    expect(url).toContain('q=adios');
+  });
+
+  it('falls back to single requests when a batch response cannot be mapped', async () => {
+    vi.mocked(fetch)
+      .mockResolvedValueOnce({
+        json: () => Promise.resolve([['hello', 'es']]),
+        ok: true
+      } as Response)
+      .mockResolvedValueOnce({
+        json: () => Promise.resolve({
+          sentences: [{ trans: 'hello' }],
+          src: 'es'
+        }),
+        ok: true
+      } as Response)
+      .mockResolvedValueOnce({
+        json: () => Promise.resolve({
+          sentences: [{ trans: 'bye' }],
+          src: 'es'
+        }),
+        ok: true
+      } as Response);
+    await import('./translate');
+    const listener = getMessageListener();
+    const sendResponse = vi.fn();
+
+    listener({ type: 'ytcq:translateBatch', texts: ['hola', 'adios'], targetLanguage: 'en' }, {}, sendResponse);
+
+    await vi.waitFor(() => {
+      expect(sendResponse).toHaveBeenCalledWith({
+        ok: true,
+        results: [
+          { sourceLanguage: 'es', translatedText: 'hello' },
+          { sourceLanguage: 'es', translatedText: 'bye' }
+        ]
+      });
+    });
+    expect(fetch).toHaveBeenCalledTimes(3);
+    expect(String(vi.mocked(fetch).mock.calls[0][0])).toContain('/translate_a/t');
+    expect(String(vi.mocked(fetch).mock.calls[1][0])).toContain('/translate_a/single');
+    expect(String(vi.mocked(fetch).mock.calls[2][0])).toContain('/translate_a/single');
   });
 
   it('returns request errors from failed translation responses', async () => {

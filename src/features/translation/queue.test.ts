@@ -53,8 +53,8 @@ describe('translation queue', () => {
     expect(chrome.runtime.sendMessage).toHaveBeenCalledWith(
       expect.objectContaining({
         targetLanguage: 'en',
-        text: 'Adios mundo',
-        type: 'ytcq:translate'
+        texts: ['Adios mundo'],
+        type: 'ytcq:translateBatch'
       }),
       expect.any(Function)
     );
@@ -292,12 +292,9 @@ describe('translation queue', () => {
     const scope = createTranslationPriorityScope();
     scope.prioritize([panelMessage]);
 
-    requests[0].resolve();
-    await waitForRuntimeRequestCount(requests, 3);
+    await waitForRuntimeRequestCount(requests, 2);
 
-    expect(requests[2]?.message).toEqual(expect.objectContaining({
-      text: 'Mensaje del panel'
-    }));
+    expect(getRequestTexts(requests[0])).toEqual(['Mensaje del panel']);
 
     scope.close();
     await resolveAllRuntimeRequests(requests);
@@ -319,12 +316,9 @@ describe('translation queue', () => {
     scope.prioritize([panelMessage]);
     scope.close();
 
-    requests[0].resolve();
-    await waitForRuntimeRequestCount(requests, 3);
+    await waitForRuntimeRequestCount(requests, 2);
 
-    expect(requests[2]?.message).toEqual(expect.objectContaining({
-      text: 'Otro mensaje vivo tres'
-    }));
+    expect(getRequestTexts(requests[0])).toEqual(['Otro mensaje del panel']);
 
     await resolveAllRuntimeRequests(requests);
   });
@@ -357,12 +351,11 @@ describe('translation queue', () => {
     scope.close();
     await waitForRuntimeRequestCount(requests, 2);
 
-    expect(requests[0].message).toEqual(expect.objectContaining({
-      text: 'Mensaje prioritario aislado'
-    }));
-    expect(requests[1].message).toEqual(expect.objectContaining({
-      text: 'Mensaje vivo sin prioridad activa'
-    }));
+    expect(getRequestTexts(requests[0])).toEqual(['Mensaje prioritario aislado']);
+    expect(getRequestTexts(requests[1])).toEqual([
+      'Mensaje vivo posterior sin prioridad',
+      'Mensaje vivo sin prioridad activa'
+    ]);
 
     await resolveAllRuntimeRequests(requests);
   });
@@ -380,9 +373,7 @@ describe('translation queue', () => {
     await flushPromises();
 
     expect(requests).toHaveLength(1);
-    expect(requests[0].message).toEqual(expect.objectContaining({
-      text: 'Mensaje prioritario nuevo'
-    }));
+    expect(getRequestTexts(requests[0])).toEqual(['Mensaje prioritario nuevo']);
 
     await resolveAllRuntimeRequests(requests);
   });
@@ -405,12 +396,9 @@ describe('translation queue', () => {
     secondScope.prioritize([priorityMessage]);
     firstScope.close();
 
-    requests[0].resolve();
-    await waitForRuntimeRequestCount(requests, 3);
+    await waitForRuntimeRequestCount(requests, 2);
 
-    expect(requests[2].message).toEqual(expect.objectContaining({
-      text: 'Mensaje con prioridad compartida panel'
-    }));
+    expect(getRequestTexts(requests[0])).toEqual(['Mensaje con prioridad compartida panel']);
 
     secondScope.close();
     await resolveAllRuntimeRequests(requests);
@@ -429,12 +417,8 @@ describe('translation queue', () => {
     queueMessageTranslation(liveDuplicate);
 
     await waitForRuntimeRequestCount(requests, 2);
-    requests[0].resolve();
-    await waitForRuntimeRequestCount(requests, 3);
 
-    expect(requests[2].message).toEqual(expect.objectContaining({
-      text: 'Mensaje de historial promocion tres'
-    }));
+    expect(getRequestTexts(requests[0])).toEqual(['Mensaje de historial promocion tres']);
 
     await resolveAllRuntimeRequests(requests);
   });
@@ -443,8 +427,9 @@ describe('translation queue', () => {
     const requests = mockDeferredRuntimeSendMessages();
     const delayedBackfill = createTextMessage('Mensaje de historial con retardo');
 
-    queueMessageTranslation(createTextMessage('Mensaje de historial inicial'), { backfill: true });
-    queueMessageTranslation(createTextMessage('Mensaje de historial segundo'), { backfill: true });
+    Array.from({ length: 100 }, (_value, index) => {
+      queueMessageTranslation(createTextMessage(`Mensaje de historial inicial ${index}`), { backfill: true });
+    });
     queueMessageTranslation(delayedBackfill, { backfill: true });
     await waitForRuntimeRequestCount(requests, 2);
     requests[0].resolve();
@@ -453,9 +438,7 @@ describe('translation queue', () => {
     queueMessageTranslation(createTextMessage('Mensaje de historial con retardo'));
     await waitForRuntimeRequestCount(requests, 3);
 
-    expect(requests[2].message).toEqual(expect.objectContaining({
-      text: 'Mensaje de historial con retardo'
-    }));
+    expect(getRequestTexts(requests[2])).toEqual(['Mensaje de historial con retardo']);
 
     await resolveAllRuntimeRequests(requests);
   });
@@ -469,9 +452,9 @@ describe('translation queue', () => {
     });
     await waitForRuntimeRequestCount(requests, 2);
 
-    expect(messages[0].dataset.ytcqTranslationKey).toBeDefined();
-    expect(messages[1].dataset.ytcqTranslationKey).toBeDefined();
-    expect(messages[2].dataset.ytcqTranslationKey).toBeUndefined();
+    expect(messages[0].dataset.ytcqTranslationKey).toBeUndefined();
+    expect(messages[4].dataset.ytcqTranslationKey).toBeUndefined();
+    expect(messages[5].dataset.ytcqTranslationKey).toBeDefined();
     expect(messages[304].dataset.ytcqTranslationKey).toBeDefined();
 
     await resolveAllRuntimeRequests(requests);
@@ -486,9 +469,9 @@ describe('translation queue', () => {
     });
     await waitForRuntimeRequestCount(requests, 2);
 
-    expect(messages[0].dataset.ytcqTranslationKey).toBeDefined();
-    expect(messages[1].dataset.ytcqTranslationKey).toBeDefined();
-    expect(messages[2].dataset.ytcqTranslationKey).toBeUndefined();
+    expect(messages[0].dataset.ytcqTranslationKey).toBeUndefined();
+    expect(messages[4].dataset.ytcqTranslationKey).toBeUndefined();
+    expect(messages[5].dataset.ytcqTranslationKey).toBeDefined();
     expect(messages[304].dataset.ytcqTranslationKey).toBeDefined();
 
     await resolveAllRuntimeRequests(requests);
@@ -620,14 +603,12 @@ describe('translation queue', () => {
     mockMessageRect(upperVisible, { top: 100, bottom: 140 });
 
     queueRetroactiveTranslations();
-    await waitForRuntimeRequestCount(requests, 2);
+    await waitForRuntimeRequestCount(requests, 1);
 
-    expect(requests[0].message).toEqual(expect.objectContaining({
-      text: 'Mensaje visible bajo'
-    }));
-    expect(requests[1].message).toEqual(expect.objectContaining({
-      text: 'Mensaje visible alto'
-    }));
+    expect(getRequestTexts(requests[0]).slice(0, 2)).toEqual([
+      'Mensaje visible bajo',
+      'Mensaje visible alto'
+    ]);
 
     await resolveAllRuntimeRequests(requests);
   });
@@ -676,10 +657,10 @@ async function flushPromises(): Promise<void> {
 
 function mockRuntimeSendMessage(response: unknown): void {
   vi.mocked(chrome.runtime.sendMessage).mockImplementation(((
-    _message: unknown,
+    message: unknown,
     callback?: (response: unknown) => void
   ) => {
-    callback?.(response);
+    callback?.(createRuntimeResponse(message, response));
     return Promise.resolve(response);
   }) as never);
 }
@@ -706,7 +687,7 @@ function mockDeferredRuntimeSendMessages(): DeferredRuntimeRequest[] {
       }) => {
         if (request.resolved) return;
         request.resolved = true;
-        callback?.(response);
+        callback?.(createRuntimeResponse(message, response));
       }
     };
     requests.push(request);
@@ -731,4 +712,32 @@ async function waitForRuntimeRequestCount(
     await flushPromises();
   }
   throw new Error(`Expected ${count} runtime requests, received ${requests.length}: ${JSON.stringify(requests.map((request) => request.message))}`);
+}
+
+function getRequestTexts(request: DeferredRuntimeRequest): string[] {
+  const message = request.message as { text?: string; texts?: string[] };
+  if (Array.isArray(message.texts)) return message.texts;
+  return message.text ? [message.text] : [];
+}
+
+function createRuntimeResponse(message: unknown, response: unknown): unknown {
+  const request = message as { type?: string; texts?: string[] };
+  const value = response as {
+    ok?: boolean;
+    results?: unknown[];
+    sourceLanguage?: string;
+    translatedText?: string;
+  };
+
+  if (request.type !== 'ytcq:translateBatch' || !Array.isArray(request.texts) || value?.ok === false || Array.isArray(value?.results)) {
+    return response;
+  }
+
+  return {
+    ...value,
+    results: request.texts.map(() => ({
+      sourceLanguage: value?.sourceLanguage || '',
+      translatedText: value?.translatedText
+    }))
+  };
 }
