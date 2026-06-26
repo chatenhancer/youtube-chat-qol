@@ -466,6 +466,7 @@ async function prepareLoggedInWorkingProfile(sourceProfileDir: string, profileNa
     filter: (source) => !isRootChromeRuntimePath(source, sourceProfileDir)
   });
   await removeChromeRuntimeFiles(profileDir);
+  await removeCopiedExtensionServiceWorkerState(profileDir);
 
   return profileDir;
 }
@@ -486,6 +487,12 @@ async function removeChromeRuntimeFiles(profileDir: string): Promise<void> {
   await Promise.all(runtimeFiles.map((fileName) => {
     return removeProfilePath(path.join(profileDir, fileName));
   }));
+}
+
+async function removeCopiedExtensionServiceWorkerState(profileDir: string): Promise<void> {
+  // Copied normal Chrome profiles can carry stale MV3 service-worker scripts for
+  // unpacked extensions; Chrome rebuilds this state from dist on next launch.
+  await removeProfilePath(path.join(profileDir, 'Default', 'Service Worker'));
 }
 
 async function removeProfilePath(profilePath: string): Promise<void> {
