@@ -335,18 +335,29 @@ async function findRealReplacedTranslationCandidate(
 } | null> {
   const count = await messages.count();
 
-  for (let index = 0; index < count; index += 1) {
+  for (let index = count - 1; index >= 0; index -= 1) {
     const message = messages.nth(index);
     const snapshot = await message.evaluate((element) => {
       const text = element.querySelector<HTMLElement>('#message');
+      const icon = text?.querySelector<HTMLElement>('.ytcq-replaced-translation-icon');
+      const iconRect = icon?.getBoundingClientRect();
+      const iconInViewport = iconRect
+        ? iconRect.width > 0 &&
+          iconRect.height > 0 &&
+          iconRect.top >= 0 &&
+          iconRect.left >= 0 &&
+          iconRect.bottom <= window.innerHeight &&
+          iconRect.right <= window.innerWidth
+        : false;
       return {
+        iconInViewport,
         language: text?.getAttribute('lang') || '',
         messageId: element.id || '',
         translatedText: text?.innerText || text?.textContent || '',
         translatedTitle: text?.getAttribute('title') || ''
       };
     }).catch(() => null);
-    if (!snapshot?.messageId || snapshot.language !== targetLanguage) continue;
+    if (!snapshot?.messageId || !snapshot.iconInViewport || snapshot.language !== targetLanguage) continue;
 
     const { messageId, translatedTitle } = snapshot;
     const sourceText = getOriginalTextFromReplacementTitle(translatedTitle);
@@ -506,8 +517,7 @@ async function expectToggleableReplacement({
   await expect(text).toHaveAttribute('lang', targetLanguage);
   await expect(text).toHaveAttribute('title', translatedTitle);
 
-  await centerLocatorInViewport(host);
-  await text.locator('.ytcq-replaced-translation-icon').click();
+  await clickReplacedTranslationIcon({ host, text });
 
   await expect(host).toHaveAttribute('data-ytcq-translation-view', 'original');
   await expectVisibleTextToContain(text, sourceVisibleText);
@@ -517,8 +527,7 @@ async function expectToggleableReplacement({
     timeout: 2_000
   }).toBe('none');
 
-  await centerLocatorInViewport(host);
-  await text.locator('.ytcq-replaced-translation-icon').click();
+  await clickReplacedTranslationIcon({ host, text });
 
   await expect(host).toHaveAttribute('data-ytcq-translation-view', 'translated');
   await expectVisibleTextToContain(text, expectedTranslatedVisibleText);
@@ -549,8 +558,7 @@ async function expectToggleableRealReplacement({
   await expect(text).toHaveAttribute('title', translatedTitle);
   await expectVisibleTextToDifferFrom(text, sourceVisibleText);
 
-  await centerLocatorInViewport(host);
-  await text.locator('.ytcq-replaced-translation-icon').click();
+  await clickReplacedTranslationIcon({ host, text });
 
   await expect(host).toHaveAttribute('data-ytcq-translation-view', 'original');
   await expectVisibleTextToMatchStoredOriginal(text, sourceVisibleText);
@@ -560,8 +568,7 @@ async function expectToggleableRealReplacement({
     timeout: 2_000
   }).toBe('none');
 
-  await centerLocatorInViewport(host);
-  await text.locator('.ytcq-replaced-translation-icon').click();
+  await clickReplacedTranslationIcon({ host, text });
 
   await expect(host).toHaveAttribute('data-ytcq-translation-view', 'translated');
   await expect(text).toHaveAttribute('title', translatedTitle);
@@ -573,6 +580,19 @@ async function expectVisibleTextToContain(locator: Locator, expectedText: string
     message: `Expected visible text to include ${expectedText}.`,
     timeout: 15_000
   }).toContain(getComparableVisibleText(expectedText));
+}
+
+async function clickReplacedTranslationIcon({
+  host,
+  text
+}: {
+  host: Locator;
+  text: Locator;
+}): Promise<void> {
+  const icon = text.locator('.ytcq-replaced-translation-icon').first();
+  await centerLocatorInViewport(host);
+  await centerLocatorInViewport(icon);
+  await icon.click();
 }
 
 async function expectVisibleTextToMatchStoredOriginal(locator: Locator, expectedText: string): Promise<void> {
