@@ -23,7 +23,7 @@ const platform = process.env.YTCQ_APP_STORE_PLATFORM || 'MAC_OS';
 const releaseType = process.env.YTCQ_APP_STORE_RELEASE_TYPE || 'AFTER_APPROVAL';
 const whatsNew = process.env.YTCQ_APP_STORE_WHATS_NEW
   || 'Thanks for using Chat Enhancer for YouTube. This update includes new features, along with refinements and fixes to make the extension feel smoother and more reliable.';
-const waitAttempts = readPositiveInteger('YTCQ_APP_STORE_BUILD_WAIT_ATTEMPTS', 60);
+const waitAttempts = readPositiveInteger('YTCQ_APP_STORE_BUILD_WAIT_ATTEMPTS', 20);
 const waitSeconds = readPositiveInteger('YTCQ_APP_STORE_BUILD_WAIT_SECONDS', 30);
 const projectPath = path.join(
   root,
@@ -34,15 +34,21 @@ const projectPath = path.join(
   'project.pbxproj'
 );
 const projectVersions = await readProjectVersions();
-const marketingVersion = projectVersions.marketingVersion
-  || process.env.YTCQ_SAFARI_MARKETING_VERSION
-  || packageJson.version;
-const buildNumber = projectVersions.buildNumber
-  || process.env.YTCQ_SAFARI_BUILD_NUMBER;
+const marketingVersion = String(process.env.YTCQ_SAFARI_MARKETING_VERSION
+  || projectVersions.marketingVersion
+  || packageJson.version).trim();
+const buildNumber = String(process.env.YTCQ_SAFARI_BUILD_NUMBER
+  || projectVersions.buildNumber
+  || '').trim();
 
 if (!buildNumber) {
-  throw new Error('Could not determine the Safari app build number from the generated Xcode project.');
+  throw new Error(
+    'Could not determine the Safari app build number. Set YTCQ_SAFARI_BUILD_NUMBER '
+    + 'or run after generating the Safari Xcode project.'
+  );
 }
+
+console.log(`Preparing Mac App Store submission for ${marketingVersion} build ${buildNumber}.`);
 
 const config = await getAppStoreConnectConfig();
 const app = await findApp(config);
@@ -211,6 +217,10 @@ async function waitForProcessedBuild(config, appId) {
         `Waiting for Mac App Store build ${buildNumber} to appear `
         + `(attempt ${attempt}/${waitAttempts}).`
       );
+
+      if (shouldLogVisibleBuilds(attempt)) {
+        await logVisibleBuilds(config, appId);
+      }
     }
 
     if (attempt < waitAttempts) await delay(waitSeconds * 1000);
@@ -231,11 +241,58 @@ async function findUploadedBuild(config, appId) {
     sort: '-uploadedDate'
   });
   const builds = payload.data || [];
-  const matchingMarketingVersion = builds.find((build) =>
-    getBuildMarketingVersion(payload, build) === marketingVersion
+  const matchingBuild = builds.find((build) =>
+    isMatchingBuild(payload, build)
   );
 
-  return matchingMarketingVersion || builds[0] || null;
+  if (matchingBuild) return matchingBuild;
+
+  const recentPayload = await listVisibleBuilds(config, appId, 20);
+  return (recentPayload.data || []).find((build) =>
+    isMatchingBuild(recentPayload, build)
+  ) || null;
+}
+
+async function listVisibleBuilds(config, appId, limit) {
+  return ascGet(config, '/v1/builds', {
+    'filter[app]': appId,
+    include: 'preReleaseVersion',
+    limit,
+    sort: '-uploadedDate'
+  });
+}
+
+async function logVisibleBuilds(config, appId) {
+  const payload = await listVisibleBuilds(config, appId, 5);
+  const builds = payload.data || [];
+
+  if (builds.length === 0) {
+    console.log('No recent Mac App Store builds are visible for this app yet.');
+    return;
+  }
+
+  const summary = builds.map((build) => {
+    const version = build.attributes?.version || 'unknown-build';
+    const state = build.attributes?.processingState || 'unknown-state';
+    const uploadedDate = build.attributes?.uploadedDate || 'unknown-upload-date';
+    const preReleaseVersion = getBuildMarketingVersion(payload, build) || 'unknown-version';
+
+    return `${preReleaseVersion} (${version}, ${state}, ${uploadedDate})`;
+  }).join('; ');
+
+  console.log(`Recent visible Mac App Store builds: ${summary}.`);
+}
+
+function shouldLogVisibleBuilds(attempt) {
+  return attempt === 1 || attempt % 5 === 0 || attempt === waitAttempts;
+}
+
+function isMatchingBuild(payload, build) {
+  const version = String(build.attributes?.version || '').trim();
+  const preReleaseVersion = getBuildMarketingVersion(payload, build);
+
+  return version === buildNumber
+    && (!preReleaseVersion || preReleaseVersion === marketingVersion);
 }
 
 async function attachBuild(config, appStoreVersionId, buildId) {
@@ -297,7 +354,17 @@ async function ascGet(config, resourcePath, query = {}) {
 }
 
 async function readProjectVersions() {
-  const project = await readFile(projectPath, 'utf8');
+  let project;
+  try {
+    project = await readFile(projectPath, 'utf8');
+  } catch (error) {
+    if (error?.code !== 'ENOENT') throw error;
+    return {
+      buildNumber: '',
+      marketingVersion: ''
+    };
+  }
+
   return {
     buildNumber: parsePbxSetting(project, 'CURRENT_PROJECT_VERSION'),
     marketingVersion: parsePbxSetting(project, 'MARKETING_VERSION')

@@ -7,6 +7,18 @@ on:
         description: 'Exact package.json version to publish, such as 0.16.7'
         required: true
         type: string
+      mode:
+        description: 'Upload a new build, or submit an already uploaded build'
+        required: true
+        default: upload-and-submit
+        type: choice
+        options:
+          - upload-and-submit
+          - submit-existing
+      build_number:
+        description: 'Existing uploaded build number, required for submit-existing'
+        required: false
+        type: string
 
 jobs:
   publish-safari:
@@ -26,6 +38,11 @@ jobs:
 
           if [ "${actual_version}" != "${requested_version}" ]; then
             printf 'Requested Safari publish version %s, but package.json is %s.\n' "${requested_version}" "${actual_version}" >&2
+            exit 1
+          fi
+
+          if [ "${{ inputs.mode }}" = "submit-existing" ] && [ -z "${{ inputs.build_number }}" ]; then
+            echo "submit-existing mode requires build_number." >&2
             exit 1
           fi
       - name: Install dependencies
@@ -51,6 +68,7 @@ jobs:
           chmod 600 "${key_path}"
           echo "YTCQ_APP_STORE_CONNECT_KEY_PATH=${key_path}" >> "${GITHUB_ENV}"
       - name: Configure Safari signing assets
+        if: inputs.mode == 'upload-and-submit'
         run: node scripts/configure-safari-signing-assets.mjs
         env:
           YTCQ_SAFARI_DISTRIBUTION_CERTIFICATE_P12_BASE64: ${{ secrets.YTCQ_SAFARI_DISTRIBUTION_CERTIFICATE_P12_BASE64 }}
@@ -67,7 +85,8 @@ jobs:
           YTCQ_SAFARI_EXTENSION_PROVISIONING_PROFILE_BUNDLE_ID: ${{ vars.YTCQ_SAFARI_EXTENSION_PROVISIONING_PROFILE_BUNDLE_ID }}
           YTCQ_SAFARI_EXPORT_SIGNING_CERTIFICATE: ${{ vars.YTCQ_SAFARI_EXPORT_SIGNING_CERTIFICATE }}
           YTCQ_SAFARI_EXPORT_INSTALLER_SIGNING_CERTIFICATE: ${{ vars.YTCQ_SAFARI_EXPORT_INSTALLER_SIGNING_CERTIFICATE }}
-      - name: Submit to Mac App Store
+      - name: Upload and submit to Mac App Store
+        if: inputs.mode == 'upload-and-submit'
         run: npm run publish:safari
         env:
           YTCQ_SAFARI_APP_NAME: ${{ vars.YTCQ_SAFARI_APP_NAME }}
@@ -78,3 +97,17 @@ jobs:
           YTCQ_APP_STORE_CONNECT_ISSUER_ID: ${{ vars.YTCQ_APP_STORE_CONNECT_ISSUER_ID }}
           YTCQ_APP_STORE_APPLE_ID: ${{ vars.YTCQ_APP_STORE_APPLE_ID }}
           YTCQ_APP_STORE_WHATS_NEW: ${{ vars.YTCQ_APP_STORE_WHATS_NEW }}
+          YTCQ_APP_STORE_BUILD_WAIT_ATTEMPTS: 20
+      - name: Submit existing Mac App Store build
+        if: inputs.mode == 'submit-existing'
+        run: node scripts/submit-safari-app-store.mjs
+        env:
+          YTCQ_SAFARI_APP_NAME: ${{ vars.YTCQ_SAFARI_APP_NAME }}
+          YTCQ_SAFARI_BUNDLE_ID: ${{ vars.YTCQ_SAFARI_BUNDLE_ID }}
+          YTCQ_SAFARI_MARKETING_VERSION: ${{ inputs.version }}
+          YTCQ_SAFARI_BUILD_NUMBER: ${{ inputs.build_number }}
+          YTCQ_APP_STORE_CONNECT_KEY_ID: ${{ vars.YTCQ_APP_STORE_CONNECT_KEY_ID }}
+          YTCQ_APP_STORE_CONNECT_ISSUER_ID: ${{ vars.YTCQ_APP_STORE_CONNECT_ISSUER_ID }}
+          YTCQ_APP_STORE_APPLE_ID: ${{ vars.YTCQ_APP_STORE_APPLE_ID }}
+          YTCQ_APP_STORE_WHATS_NEW: ${{ vars.YTCQ_APP_STORE_WHATS_NEW }}
+          YTCQ_APP_STORE_BUILD_WAIT_ATTEMPTS: 20
