@@ -334,14 +334,7 @@ async function submitAppStoreVersion(config, appStoreVersionId) {
       throw error;
     }
 
-    const appVersion = await getAppStoreVersion(config, appStoreVersionId);
-    const state = normalizeState(appVersion.attributes?.appStoreState);
-    if (!isAlreadySubmittedState(state) && !(await hasAppStoreVersionSubmission(
-      config,
-      appStoreVersionId
-    ))) {
-      throw error;
-    }
+    const state = await readAppStoreVersionState(config, appStoreVersionId);
 
     console.log(
       `Mac App Store version ${marketingVersion} already has an App Store submission`
@@ -351,8 +344,7 @@ async function submitAppStoreVersion(config, appStoreVersionId) {
 }
 
 async function skipIfAlreadySubmitted(config, appStoreVersionId) {
-  const appVersion = await getAppStoreVersion(config, appStoreVersionId);
-  const state = normalizeState(appVersion.attributes?.appStoreState);
+  const state = await readAppStoreVersionState(config, appStoreVersionId);
   if (!isAlreadySubmittedState(state)) return;
 
   console.log(
@@ -361,16 +353,12 @@ async function skipIfAlreadySubmitted(config, appStoreVersionId) {
   process.exit(0);
 }
 
-async function hasAppStoreVersionSubmission(config, appStoreVersionId) {
+async function readAppStoreVersionState(config, appStoreVersionId) {
   try {
-    const payload = await appStoreConnectFetch(
-      config,
-      `/v1/appStoreVersions/${appStoreVersionId}/appStoreVersionSubmission`
-    );
-
-    return Boolean(payload?.data?.id);
+    const appVersion = await getAppStoreVersion(config, appStoreVersionId);
+    return normalizeState(appVersion.attributes?.appStoreState);
   } catch (error) {
-    if (error instanceof AppStoreConnectError && error.status === 404) return false;
+    if (error instanceof AppStoreConnectError) return '';
     throw error;
   }
 }
