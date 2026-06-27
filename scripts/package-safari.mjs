@@ -12,6 +12,10 @@ import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
 import packageJson from '../package.json' with { type: 'json' };
 import { loadLocalEnv, requireEnv } from './lib/local-env.mjs';
+import {
+  readSafariProductBundleIdentifiers,
+  rewriteSafariProductBundleIdentifiers
+} from './lib/safari-xcode-project.mjs';
 
 await loadLocalEnv();
 
@@ -49,6 +53,7 @@ run('xcrun', [
 
 await updateXcodeProjectSettings();
 await updateMacAppInfoPlist();
+await updateSafariAppViewController();
 await updateSafariAppIcons();
 
 async function assertSafariExtensionBuildExists() {
@@ -74,6 +79,14 @@ async function updateXcodeProjectSettings() {
       '$1\t\t\t\tENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;\n'
     );
   if (next !== original) await writeFile(projectPath, next);
+
+  const normalized = rewriteSafariProductBundleIdentifiers(next, bundleIdentifier);
+  const productBundleIdentifiers = readSafariProductBundleIdentifiers(normalized);
+  if (normalized !== next) await writeFile(projectPath, normalized);
+
+  console.log(
+    `Configured Safari Xcode bundle identifiers: ${productBundleIdentifiers.join(', ')}.`
+  );
 }
 
 async function updateMacAppInfoPlist() {
@@ -89,6 +102,23 @@ async function updateMacAppInfoPlist() {
       `\t<key>LSApplicationCategoryType</key>\n\t<string>${escapeXml(macAppCategory)}</string>\n</dict>`
     );
   if (next !== original) await writeFile(plistPath, next);
+}
+
+async function updateSafariAppViewController() {
+  const viewControllerPath = path.join(
+    projectLocation,
+    appName,
+    'Shared (App)',
+    'ViewController.swift'
+  );
+  const original = await readFile(viewControllerPath, 'utf8');
+  const extensionBundleIdentifier = `${bundleIdentifier}.Extension`;
+  const next = original.replace(
+    /let extensionBundleIdentifier = "[^"]*"/,
+    `let extensionBundleIdentifier = "${extensionBundleIdentifier}"`
+  );
+
+  if (next !== original) await writeFile(viewControllerPath, next);
 }
 
 async function updateSafariAppIcons() {

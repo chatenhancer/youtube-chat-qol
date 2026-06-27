@@ -78,6 +78,7 @@ async function archiveApp(nextArchivePath) {
   ]);
 
   console.log(`Safari archive: ${nextArchivePath}`);
+  await assertArchiveBundleIdentifiers(nextArchivePath);
 }
 
 async function uploadArchive(nextArchivePath, archiveVersions) {
@@ -181,6 +182,47 @@ function getAuthenticationConfig() {
       keyId,
       keyPath
     };
+}
+
+async function assertArchiveBundleIdentifiers(nextArchivePath) {
+  const appInfoPlist = path.join(
+    nextArchivePath,
+    'Products',
+    'Applications',
+    `${appName}.app`,
+    'Contents',
+    'Info.plist'
+  );
+  const extensionInfoPlist = path.join(
+    nextArchivePath,
+    'Products',
+    'Applications',
+    `${appName}.app`,
+    'Contents',
+    'PlugIns',
+    `${appName} Extension.appex`,
+    'Contents',
+    'Info.plist'
+  );
+  const appBundleId = readPlistValue(appInfoPlist, ':CFBundleIdentifier');
+  const extensionBundleId = readPlistValue(extensionInfoPlist, ':CFBundleIdentifier');
+  const expectedExtensionBundleId = `${bundleIdentifier}.Extension`;
+
+  if (appBundleId !== bundleIdentifier || extensionBundleId !== expectedExtensionBundleId) {
+    throw new Error(
+      'Safari archive bundle identifiers do not match the App Store Connect app: '
+      + `expected ${bundleIdentifier} and ${expectedExtensionBundleId}, `
+      + `got ${appBundleId} and ${extensionBundleId}.`
+    );
+  }
+
+  console.log(
+    `Verified Safari archive bundle identifiers: ${appBundleId}, ${extensionBundleId}.`
+  );
+}
+
+function readPlistValue(plistPath, key) {
+  return runCapture('/usr/libexec/PlistBuddy', ['-c', `Print ${key}`, plistPath]);
 }
 
 async function uploadExportedPackage(exportPath) {
@@ -396,4 +438,18 @@ function run(command, commandArgs, options = {}) {
   if (result.status !== 0) {
     throw new Error(`${command} exited with ${result.status ?? 'unknown status'}`);
   }
+}
+
+function runCapture(command, commandArgs, options = {}) {
+  const result = spawnSync(command, commandArgs, {
+    cwd: root,
+    encoding: 'utf8',
+    ...options
+  });
+
+  if (result.status !== 0) {
+    throw new Error(`${command} exited with ${result.status ?? 'unknown status'}`);
+  }
+
+  return result.stdout.trim();
 }
