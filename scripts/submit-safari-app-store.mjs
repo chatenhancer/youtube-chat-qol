@@ -13,22 +13,12 @@ import {
   appStoreConnectFetch,
   getAppStoreConnectConfig
 } from './lib/app-store-connect.mjs';
-import { maskGithubActionsValues } from './lib/github-actions-log.mjs';
 import { loadLocalEnv, requireEnv, root } from './lib/local-env.mjs';
 
 await loadLocalEnv();
 
 const appName = 'Chat Enhancer for YouTube';
 const bundleId = requireEnv('YTCQ_SAFARI_BUNDLE_ID');
-maskGithubActionsValues([
-  bundleId,
-  `${bundleId}.Extension`,
-  process.env.YTCQ_APP_STORE_CONNECT_KEY_ID,
-  process.env.APP_STORE_CONNECT_API_KEY_ID,
-  process.env.YTCQ_APP_STORE_CONNECT_ISSUER_ID,
-  process.env.APP_STORE_CONNECT_ISSUER_ID,
-  process.env.YTCQ_APP_STORE_APPLE_ID
-]);
 const platform = process.env.YTCQ_APP_STORE_PLATFORM || 'MAC_OS';
 const releaseType = process.env.YTCQ_APP_STORE_RELEASE_TYPE || 'AFTER_APPROVAL';
 const whatsNew = process.env.YTCQ_APP_STORE_WHATS_NEW

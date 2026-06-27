@@ -8,7 +8,6 @@ import { spawnSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { maskGithubActionsValues } from './lib/github-actions-log.mjs';
 import { loadLocalEnv, requireEnv } from './lib/local-env.mjs';
 import {
   createSafariExportOptionsPlist,
@@ -46,19 +45,6 @@ const exportRoot = path.join(root, 'dist', 'safari-upload');
 const shouldUpload = args.has('--upload');
 const versions = await readProjectVersions();
 const bundleIdentifier = requireEnv('YTCQ_SAFARI_BUNDLE_ID');
-maskGithubActionsValues([
-  developmentTeam,
-  bundleIdentifier,
-  `${bundleIdentifier}.Extension`,
-  process.env.YTCQ_APP_STORE_CONNECT_KEY_ID,
-  process.env.APP_STORE_CONNECT_API_KEY_ID,
-  process.env.YTCQ_APP_STORE_CONNECT_ISSUER_ID,
-  process.env.APP_STORE_CONNECT_ISSUER_ID,
-  process.env.YTCQ_APP_STORE_APPLE_ID,
-  process.env.YTCQ_SAFARI_EXPORT_SIGNING_CERTIFICATE,
-  process.env.YTCQ_SAFARI_EXPORT_INSTALLER_SIGNING_CERTIFICATE,
-  process.env.YTCQ_SAFARI_EXPORT_PROVISIONING_PROFILES
-]);
 const archivePath = process.env.YTCQ_SAFARI_ARCHIVE_PATH
   || path.join(
     archiveRoot,

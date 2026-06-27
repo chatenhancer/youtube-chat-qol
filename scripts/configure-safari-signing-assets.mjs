@@ -11,7 +11,6 @@ import { spawnSync } from 'node:child_process';
 import { homedir, tmpdir } from 'node:os';
 import crypto from 'node:crypto';
 import path from 'node:path';
-import { maskGithubActionsValues } from './lib/github-actions-log.mjs';
 
 const env = process.env;
 const runnerTemp = env.RUNNER_TEMP || tmpdir();
@@ -23,13 +22,6 @@ const installerCertificate = env.YTCQ_SAFARI_INSTALLER_DISTRIBUTION_CERTIFICATE_
   || combinedCertificate;
 const appProfile = env.YTCQ_SAFARI_APP_PROVISIONING_PROFILE_BASE64;
 const extensionProfile = env.YTCQ_SAFARI_EXTENSION_PROVISIONING_PROFILE_BASE64;
-
-maskGithubActionsValues([
-  env.YTCQ_SAFARI_APP_PROVISIONING_PROFILE_BUNDLE_ID,
-  env.YTCQ_SAFARI_EXTENSION_PROVISIONING_PROFILE_BUNDLE_ID,
-  env.YTCQ_SAFARI_EXPORT_SIGNING_CERTIFICATE,
-  env.YTCQ_SAFARI_EXPORT_INSTALLER_SIGNING_CERTIFICATE
-]);
 
 if (![appCertificate, installerCertificate, appProfile, extensionProfile].some(Boolean)) {
   console.log('No explicit Safari signing assets configured; using Xcode automatic signing.');
@@ -96,14 +88,6 @@ const safariSigningExportEnv = {
     || installerSigningCertificate.fingerprint,
   YTCQ_SAFARI_EXPORT_PROVISIONING_PROFILES: JSON.stringify(provisioningProfiles)
 };
-
-maskGithubActionsValues([
-  safariSigningExportEnv.YTCQ_SAFARI_EXPORT_SIGNING_CERTIFICATE,
-  safariSigningExportEnv.YTCQ_SAFARI_EXPORT_INSTALLER_SIGNING_CERTIFICATE,
-  safariSigningExportEnv.YTCQ_SAFARI_EXPORT_PROVISIONING_PROFILES,
-  ...Object.keys(provisioningProfiles),
-  ...Object.values(provisioningProfiles)
-]);
 
 await appendGithubEnv(safariSigningExportEnv);
 
