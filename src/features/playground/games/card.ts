@@ -45,6 +45,7 @@ export function createGamesCard(onClose: () => void): GamesCardElements {
 
   const betaBadge = ytcqCreateElement('span');
   betaBadge.className = 'ytcq-games-beta-badge';
+  // ytcq-allow-visible-ui-literal: Beta is a standard product-stage badge.
   betaBadge.textContent = 'Beta';
 
   const subtitle = ytcqCreateElement('div');

@@ -7,21 +7,20 @@
 import { createGamesIcon } from '../../../shared/icons';
 import { t } from '../../../shared/i18n';
 import { ytcqCreateElement } from '../../../shared/managed-dom';
+import { CHAT_HEADER_SELECTOR } from '../../../youtube/selectors';
 import { INBOX_BUTTON_CLASS, INBOX_BUTTON_SELECTOR } from '../../inbox/selectors';
 
-const HEADER_SELECTOR = 'yt-live-chat-header-renderer';
-
 export function findGamesHeader(): HTMLElement | null {
-  return document.querySelector<HTMLElement>(HEADER_SELECTOR);
+  return document.querySelector<HTMLElement>(CHAT_HEADER_SELECTOR);
 }
 
 export function shouldWireGamesButton(addedElements: Element[], mutations: MutationRecord[]): boolean {
   return mutations.some((mutation) => {
     return mutation.type === 'childList' &&
       mutation.target instanceof Element &&
-      mutation.target.closest(HEADER_SELECTOR);
+      mutation.target.closest(CHAT_HEADER_SELECTOR);
   }) || addedElements.some((element) => {
-    return element.matches(HEADER_SELECTOR) || Boolean(element.querySelector(HEADER_SELECTOR));
+    return element.matches(CHAT_HEADER_SELECTOR) || Boolean(element.querySelector(CHAT_HEADER_SELECTOR));
   });
 }
 

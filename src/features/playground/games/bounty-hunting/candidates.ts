@@ -9,6 +9,7 @@ import {
 } from '../../../../shared/playground/bounty-hunting';
 import { cleanText } from '../../../../shared/text';
 import { getMessageStableId, getMessageText } from '../../../../youtube/messages';
+import { PAID_CHAT_MESSAGE_SELECTOR } from '../../../../youtube/selectors';
 import type { BountyHuntingObservedMessage } from './types';
 
 interface BountyCandidate extends BountyHuntingBounty {
@@ -364,7 +365,7 @@ function getBountyHuntingAuthorBadgeTypeValues(type: 'member' | 'moderator' | 'o
 }
 
 function isBountyHuntingSuperChatMessage(message: HTMLElement): boolean {
-  return message.matches('yt-live-chat-paid-message-renderer, yt-live-chat-paid-sticker-renderer');
+  return message.matches(PAID_CHAT_MESSAGE_SELECTOR);
 }
 
 function getBountyHuntingMessageId(message: HTMLElement): string {

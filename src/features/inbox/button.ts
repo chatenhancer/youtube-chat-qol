@@ -6,10 +6,10 @@
  */
 import { t } from '../../shared/i18n';
 import { ytcqCreateElement } from '../../shared/managed-dom';
+import { CHAT_HEADER_SELECTOR } from '../../youtube/selectors';
 import { createInboxIcon, formatBadgeCount, setInboxIcon } from './icons';
 import { INBOX_BUTTON_CLASS, INBOX_BUTTON_HAS_UNREAD_CLASS, INBOX_BUTTON_SELECTOR } from './selectors';
 
-const HEADER_SELECTOR = 'yt-live-chat-header-renderer';
 const INBOX_BUTTON_OWNER_ID = `${Date.now()}-${Math.random()}`;
 
 export interface InboxButtonOptions {
@@ -29,7 +29,7 @@ export function scheduleInboxButtonWire(options: InboxButtonOptions): void {
 }
 
 export function wireInboxButton(options: InboxButtonOptions): void {
-  const header = document.querySelector<HTMLElement>(HEADER_SELECTOR);
+  const header = document.querySelector<HTMLElement>(CHAT_HEADER_SELECTOR);
   if (!header) return;
 
   const anchor = getInboxHeaderAnchor(header);

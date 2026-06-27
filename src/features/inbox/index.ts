@@ -10,7 +10,7 @@ import {
   getAuthorName,
   getMessageText
 } from '../../youtube/messages';
-import { CHAT_MESSAGE_SELECTOR } from '../../youtube/selectors';
+import { CHAT_HEADER_SELECTOR, CHAT_MESSAGE_SELECTOR } from '../../youtube/selectors';
 import {
   applyChatKeywordHighlights,
   clearChatKeywordHighlights
@@ -163,10 +163,10 @@ function handleInboxMutations({ addedElements, mutations }: {
   const shouldWireButton = mutations.some((mutation) => {
     return mutation.type === 'childList' &&
       mutation.target instanceof Element &&
-      mutation.target.closest('yt-live-chat-header-renderer');
+      mutation.target.closest(CHAT_HEADER_SELECTOR);
   }) || addedElements.some((element) => {
-    return element.matches('yt-live-chat-header-renderer') ||
-      Boolean(element.querySelector('yt-live-chat-header-renderer'));
+    return element.matches(CHAT_HEADER_SELECTOR) ||
+      Boolean(element.querySelector(CHAT_HEADER_SELECTOR));
   });
 
   if (shouldWireButton) scheduleInboxButtonWire();

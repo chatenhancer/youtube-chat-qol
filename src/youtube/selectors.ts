@@ -11,6 +11,11 @@ export const CHAT_MESSAGE_SELECTOR = [
   'yt-live-chat-membership-item-renderer'
 ].join(',');
 
+export const PAID_CHAT_MESSAGE_SELECTOR = [
+  'yt-live-chat-paid-message-renderer',
+  'yt-live-chat-paid-sticker-renderer'
+].join(',');
+
 export const CHAT_TOOLTIP_SELECTOR = [
   '[role="tooltip"]',
   'tp-yt-paper-tooltip',
@@ -18,6 +23,8 @@ export const CHAT_TOOLTIP_SELECTOR = [
 ].join(',');
 
 export const PARTICIPANT_SELECTOR = 'yt-live-chat-participant-renderer';
+
+export const CHAT_HEADER_SELECTOR = 'yt-live-chat-header-renderer';
 
 export const CHAT_SCROLLER_SELECTOR = [
   'yt-live-chat-item-list-renderer #item-scroller',

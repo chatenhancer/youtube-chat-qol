@@ -88,12 +88,13 @@ export function requestReplayTriviaCaptchaPass(input: {
     let pollId = 0;
     let timeoutId = 0;
     let handleMessage: (event: MessageEvent) => void = () => undefined;
+    const listenerController = new AbortController();
     const finish = (error: Error | null, captchaPass = '') => {
       if (settled) return;
       settled = true;
       window.clearTimeout(timeoutId);
       window.clearInterval(pollId);
-      window.removeEventListener('message', handleMessage);
+      listenerController.abort();
       try {
         popup.close();
       } catch {
@@ -123,7 +124,7 @@ export function requestReplayTriviaCaptchaPass(input: {
     pollId = window.setInterval(() => {
       if (popup.closed) finish(new Error('Replay Trivia verification was closed before it finished.'));
     }, CAPTCHA_WINDOW_POLL_MS);
-    window.addEventListener('message', handleMessage);
+    window.addEventListener('message', handleMessage, { signal: listenerController.signal });
   });
 }
 
