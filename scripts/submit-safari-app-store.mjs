@@ -337,6 +337,9 @@ async function getOrCreateReviewSubmission(config, appId) {
       method: 'POST',
       body: jsonApiResource({
         type: 'reviewSubmissions',
+        attributes: {
+          platform
+        },
         relationships: {
           app: relationship('apps', appId)
         }
