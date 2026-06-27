@@ -22,9 +22,14 @@ import {
   getGitHubConfig,
   queueDeferredChromeRelease
 } from './lib/deferred-chrome-release.mjs';
+import { maskGithubActionsValues } from './lib/github-actions-log.mjs';
 import { loadLocalEnv } from './lib/local-env.mjs';
 
 await loadLocalEnv();
+maskGithubActionsValues([
+  process.env.CHROME_WEBSTORE_EXTENSION_ID,
+  process.env.CHROME_WEBSTORE_PUBLISHER_ID
+]);
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const releaseDir = path.join(root, 'dist', 'release');
@@ -38,6 +43,11 @@ if (missingEnv.length) {
 }
 
 const chromeConfig = getChromeWebStoreConfig();
+maskGithubActionsValues([
+  chromeConfig.extensionId,
+  chromeConfig.publisherId,
+  chromeConfig.serviceAccount?.client_email
+]);
 const token = await getAccessToken(chromeConfig.serviceAccount);
 
 if (shouldDeferBlockedSubmission()) {

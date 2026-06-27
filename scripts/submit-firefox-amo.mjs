@@ -11,6 +11,7 @@ import crypto from 'node:crypto';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import packageJson from '../package.json' with { type: 'json' };
+import { maskGithubActionsValues } from './lib/github-actions-log.mjs';
 import { loadLocalEnv } from './lib/local-env.mjs';
 
 await loadLocalEnv();
@@ -22,6 +23,10 @@ const sourceZipPath = path.join(releaseDir, `youtube-chat-qol-${packageJson.vers
 const apiBaseUrl = process.env.FIREFOX_AMO_API_BASE_URL || 'https://addons.mozilla.org/api/v5';
 const apiOrigin = new URL(apiBaseUrl).origin;
 const addonId = process.env.FIREFOX_AMO_ADDON_ID || 'chat-enhancer-for-youtube@chat-enhancer-yt.github.io';
+maskGithubActionsValues([
+  addonId,
+  process.env.FIREFOX_AMO_API_KEY
+]);
 const channel = process.env.FIREFOX_AMO_CHANNEL || 'listed';
 const requiredEnv = [
   'FIREFOX_AMO_API_KEY',
