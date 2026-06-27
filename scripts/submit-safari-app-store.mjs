@@ -326,12 +326,36 @@ async function skipIfAlreadySubmitted(config, appStoreVersionId) {
 }
 
 async function submitReviewSubmission(config, appId, appStoreVersionId) {
-  const reviewSubmission = await getOrCreateReviewSubmission(config, appId);
-  await ensureReviewSubmissionItem(config, reviewSubmission.id, appStoreVersionId);
+  let reviewSubmission = await getOrCreateReviewSubmission(config, appId, appStoreVersionId);
+  reviewSubmission = await ensureReviewSubmissionItem(
+    config,
+    appId,
+    reviewSubmission,
+    appStoreVersionId
+  );
   await submitReviewSubmissionForReview(config, reviewSubmission.id);
 }
 
-async function getOrCreateReviewSubmission(config, appId) {
+async function getOrCreateReviewSubmission(config, appId, appStoreVersionId) {
+  const existingForVersion = await findReviewSubmissionForVersion(
+    config,
+    appId,
+    appStoreVersionId
+  );
+  if (existingForVersion) {
+    console.log(
+      `Using existing Mac App Store review submission ${existingForVersion.id} `
+      + `for version ${marketingVersion}.`
+    );
+    return existingForVersion;
+  }
+
+  const readySubmission = await findReadyReviewSubmission(config, appId);
+  if (readySubmission) {
+    console.log(`Using existing Mac App Store review submission ${readySubmission.id}.`);
+    return readySubmission;
+  }
+
   try {
     const payload = await appStoreConnectFetch(config, '/v1/reviewSubmissions', {
       method: 'POST',
@@ -362,45 +386,96 @@ async function getOrCreateReviewSubmission(config, appId) {
 }
 
 async function findReadyReviewSubmission(config, appId) {
+  const submissions = await listReadyReviewSubmissions(config, appId);
+  return submissions[0] || null;
+}
+
+async function findReviewSubmissionForVersion(config, appId, appStoreVersionId) {
+  const submissions = await listReadyReviewSubmissions(config, appId);
+  for (const submission of submissions) {
+    if (await reviewSubmissionHasVersion(config, submission, appStoreVersionId)) {
+      return submission;
+    }
+  }
+
+  return null;
+}
+
+async function listReadyReviewSubmissions(config, appId) {
   const payload = await ascGet(config, '/v1/reviewSubmissions', {
     'filter[app]': appId,
     'filter[platform]': platform,
     'filter[state]': 'READY_FOR_REVIEW',
+    include: 'items,appStoreVersionForReview',
+    'limit[items]': 50,
     limit: 20
   });
 
-  return payload.data?.[0] || null;
+  return payload.data || [];
 }
 
-async function ensureReviewSubmissionItem(config, reviewSubmissionId, appStoreVersionId) {
-  const existingItem = await findReviewSubmissionItem(config, reviewSubmissionId, appStoreVersionId);
-  if (existingItem) {
+async function ensureReviewSubmissionItem(config, appId, reviewSubmission, appStoreVersionId) {
+  if (await reviewSubmissionHasVersion(config, reviewSubmission, appStoreVersionId)) {
     console.log(`Review submission already includes Mac App Store version ${marketingVersion}.`);
-    return existingItem;
+    return reviewSubmission;
   }
 
   try {
-    const payload = await appStoreConnectFetch(config, '/v1/reviewSubmissionItems', {
+    await appStoreConnectFetch(config, '/v1/reviewSubmissionItems', {
       method: 'POST',
       body: jsonApiResource({
         type: 'reviewSubmissionItems',
         relationships: {
           appStoreVersion: relationship('appStoreVersions', appStoreVersionId),
-          reviewSubmission: relationship('reviewSubmissions', reviewSubmissionId)
+          reviewSubmission: relationship('reviewSubmissions', reviewSubmission.id)
         }
       })
     });
 
     console.log(`Added Mac App Store version ${marketingVersion} to the review submission.`);
-    return payload.data;
   } catch (error) {
     if (!(error instanceof AppStoreConnectError) || error.status !== 409) {
       throw error;
     }
 
-    console.log(`Review submission already includes Mac App Store version ${marketingVersion}.`);
-    return null;
+    const existingForVersion = await findReviewSubmissionForVersion(
+      config,
+      appId,
+      appStoreVersionId
+    );
+    if (!existingForVersion) throw error;
+
+    console.log(
+      `Using existing Mac App Store review submission ${existingForVersion.id} `
+      + `for version ${marketingVersion}.`
+    );
+    return existingForVersion;
   }
+
+  await confirmReviewSubmissionHasVersion(config, reviewSubmission, appStoreVersionId);
+  return reviewSubmission;
+}
+
+async function confirmReviewSubmissionHasVersion(config, reviewSubmission, appStoreVersionId) {
+  for (let attempt = 1; attempt <= 6; attempt += 1) {
+    if (await reviewSubmissionHasVersion(config, reviewSubmission, appStoreVersionId)) return;
+    if (attempt < 6) await delay(5 * 1000);
+  }
+
+  throw new Error(
+    `Review submission ${reviewSubmission.id} still has no item for Mac App Store `
+    + `version ${marketingVersion} after adding it.`
+  );
+}
+
+async function reviewSubmissionHasVersion(config, reviewSubmission, appStoreVersionId) {
+  const appStoreVersionForReview = reviewSubmission
+    .relationships?.appStoreVersionForReview?.data?.id;
+  if (appStoreVersionForReview === appStoreVersionId) return true;
+
+  return Boolean(
+    await findReviewSubmissionItem(config, reviewSubmission.id, appStoreVersionId)
+  );
 }
 
 async function findReviewSubmissionItem(config, reviewSubmissionId, appStoreVersionId) {
