@@ -1,0 +1,80 @@
+name: publish safari
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Exact package.json version to publish, such as 0.16.7'
+        required: true
+        type: string
+
+jobs:
+  publish-safari:
+    runs-on: macos-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
+        with:
+          node-version: 22.21.1
+          cache: npm
+      - name: Validate requested version
+        run: |
+          actual_version="$(node -p "require('./package.json').version")"
+          requested_version="${{ inputs.version }}"
+
+          if [ "${actual_version}" != "${requested_version}" ]; then
+            printf 'Requested Safari publish version %s, but package.json is %s.\n' "${requested_version}" "${actual_version}" >&2
+            exit 1
+          fi
+      - name: Install dependencies
+        run: npm ci
+      - name: Configure App Store Connect API key
+        env:
+          YTCQ_APP_STORE_CONNECT_PRIVATE_KEY: ${{ secrets.YTCQ_APP_STORE_CONNECT_PRIVATE_KEY }}
+          YTCQ_APP_STORE_CONNECT_KEY_ID: ${{ vars.YTCQ_APP_STORE_CONNECT_KEY_ID }}
+        run: |
+          if [ -z "${YTCQ_APP_STORE_CONNECT_PRIVATE_KEY}" ]; then
+            echo "Missing YTCQ_APP_STORE_CONNECT_PRIVATE_KEY." >&2
+            exit 1
+          fi
+
+          if [ -z "${YTCQ_APP_STORE_CONNECT_KEY_ID}" ]; then
+            echo "Missing YTCQ_APP_STORE_CONNECT_KEY_ID." >&2
+            exit 1
+          fi
+
+          key_path="${RUNNER_TEMP}/AuthKey_${YTCQ_APP_STORE_CONNECT_KEY_ID}.p8"
+          umask 077
+          printf '%s\n' "${YTCQ_APP_STORE_CONNECT_PRIVATE_KEY}" > "${key_path}"
+          chmod 600 "${key_path}"
+          echo "YTCQ_APP_STORE_CONNECT_KEY_PATH=${key_path}" >> "${GITHUB_ENV}"
+      - name: Configure Safari signing assets
+        run: node scripts/configure-safari-signing-assets.mjs
+        env:
+          YTCQ_SAFARI_DISTRIBUTION_CERTIFICATE_P12_BASE64: ${{ secrets.YTCQ_SAFARI_DISTRIBUTION_CERTIFICATE_P12_BASE64 }}
+          YTCQ_SAFARI_DISTRIBUTION_CERTIFICATES_P12_BASE64: ${{ secrets.YTCQ_SAFARI_DISTRIBUTION_CERTIFICATES_P12_BASE64 }}
+          YTCQ_SAFARI_APP_DISTRIBUTION_CERTIFICATE_P12_BASE64: ${{ secrets.YTCQ_SAFARI_APP_DISTRIBUTION_CERTIFICATE_P12_BASE64 }}
+          YTCQ_SAFARI_INSTALLER_DISTRIBUTION_CERTIFICATE_P12_BASE64: ${{ secrets.YTCQ_SAFARI_INSTALLER_DISTRIBUTION_CERTIFICATE_P12_BASE64 }}
+          YTCQ_SAFARI_CERTIFICATE_PASSWORD: ${{ secrets.YTCQ_SAFARI_CERTIFICATE_PASSWORD }}
+          YTCQ_SAFARI_APP_DISTRIBUTION_CERTIFICATE_PASSWORD: ${{ secrets.YTCQ_SAFARI_APP_DISTRIBUTION_CERTIFICATE_PASSWORD }}
+          YTCQ_SAFARI_INSTALLER_DISTRIBUTION_CERTIFICATE_PASSWORD: ${{ secrets.YTCQ_SAFARI_INSTALLER_DISTRIBUTION_CERTIFICATE_PASSWORD }}
+          YTCQ_SAFARI_SIGNING_KEYCHAIN_PASSWORD: ${{ secrets.YTCQ_SAFARI_SIGNING_KEYCHAIN_PASSWORD }}
+          YTCQ_SAFARI_APP_PROVISIONING_PROFILE_BASE64: ${{ secrets.YTCQ_SAFARI_APP_PROVISIONING_PROFILE_BASE64 }}
+          YTCQ_SAFARI_EXTENSION_PROVISIONING_PROFILE_BASE64: ${{ secrets.YTCQ_SAFARI_EXTENSION_PROVISIONING_PROFILE_BASE64 }}
+          YTCQ_SAFARI_APP_PROVISIONING_PROFILE_BUNDLE_ID: ${{ vars.YTCQ_SAFARI_APP_PROVISIONING_PROFILE_BUNDLE_ID }}
+          YTCQ_SAFARI_EXTENSION_PROVISIONING_PROFILE_BUNDLE_ID: ${{ vars.YTCQ_SAFARI_EXTENSION_PROVISIONING_PROFILE_BUNDLE_ID }}
+          YTCQ_SAFARI_EXPORT_SIGNING_CERTIFICATE: ${{ vars.YTCQ_SAFARI_EXPORT_SIGNING_CERTIFICATE }}
+          YTCQ_SAFARI_EXPORT_INSTALLER_SIGNING_CERTIFICATE: ${{ vars.YTCQ_SAFARI_EXPORT_INSTALLER_SIGNING_CERTIFICATE }}
+      - name: Submit to Mac App Store
+        run: npm run publish:safari
+        env:
+          YTCQ_SAFARI_APP_NAME: ${{ vars.YTCQ_SAFARI_APP_NAME }}
+          YTCQ_SAFARI_BUNDLE_ID: ${{ vars.YTCQ_SAFARI_BUNDLE_ID }}
+          YTCQ_SAFARI_DEVELOPMENT_TEAM: ${{ vars.YTCQ_SAFARI_DEVELOPMENT_TEAM }}
+          YTCQ_SAFARI_APP_CATEGORY: ${{ vars.YTCQ_SAFARI_APP_CATEGORY }}
+          YTCQ_APP_STORE_CONNECT_KEY_ID: ${{ vars.YTCQ_APP_STORE_CONNECT_KEY_ID }}
+          YTCQ_APP_STORE_CONNECT_ISSUER_ID: ${{ vars.YTCQ_APP_STORE_CONNECT_ISSUER_ID }}
+          YTCQ_APP_STORE_APPLE_ID: ${{ vars.YTCQ_APP_STORE_APPLE_ID }}
+          YTCQ_APP_STORE_WHATS_NEW: ${{ vars.YTCQ_APP_STORE_WHATS_NEW }}
