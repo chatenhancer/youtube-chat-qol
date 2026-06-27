@@ -30,7 +30,7 @@ for (const arg of args) {
 await loadLocalEnv();
 
 const appName = process.env.YTCQ_SAFARI_APP_NAME || 'Chat Enhancer for YouTube';
-const bundleIdentifier = requireEnv('YTCQ_SAFARI_BUNDLE_ID');
+requireEnv('YTCQ_SAFARI_BUNDLE_ID');
 const developmentTeam = requireEnv('YTCQ_SAFARI_DEVELOPMENT_TEAM');
 const configuration = process.env.YTCQ_SAFARI_CONFIGURATION || 'Release';
 const destination = process.env.YTCQ_SAFARI_DESTINATION || 'generic/platform=macOS';
@@ -107,7 +107,7 @@ async function uploadArchive(nextArchivePath, archiveVersions) {
     ...getAuthenticationArgs()
   ]);
 
-  await uploadExportedPackage(exportPath, archiveVersions);
+  await uploadExportedPackage(exportPath);
 }
 
 async function readProjectVersions() {
@@ -181,10 +181,10 @@ function getAuthenticationConfig() {
     };
 }
 
-async function uploadExportedPackage(exportPath, archiveVersions) {
+async function uploadExportedPackage(exportPath) {
   const packagePath = await findExportedPackage(exportPath);
   const authentication = getAuthenticationConfig();
-  const appleId = requireEnv('YTCQ_APP_STORE_APPLE_ID');
+  requireEnv('YTCQ_APP_STORE_APPLE_ID');
 
   if (!authentication) {
     throw new Error(
@@ -194,23 +194,15 @@ async function uploadExportedPackage(exportPath, archiveVersions) {
 
   run('xcrun', [
     'altool',
-    '--upload-package',
+    '--upload-app',
+    '--file',
     packagePath,
     '--type',
     'macos',
-    '--apple-id',
-    appleId,
-    '--bundle-id',
-    bundleIdentifier,
-    '--bundle-version',
-    archiveVersions.buildNumber,
-    '--bundle-short-version-string',
-    archiveVersions.marketingVersion,
     '--apiKey',
     authentication.keyId,
     '--apiIssuer',
-    authentication.issuerId,
-    '--wait'
+    authentication.issuerId
   ], {
     env: {
       ...process.env,
