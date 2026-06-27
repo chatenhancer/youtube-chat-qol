@@ -3,7 +3,7 @@
  *
  * Run after scripts/package-safari.mjs has generated dist/safari.
  */
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, readdir, writeFile } from 'node:fs/promises';
 import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -30,6 +30,7 @@ for (const arg of args) {
 await loadLocalEnv();
 
 const appName = process.env.YTCQ_SAFARI_APP_NAME || 'Chat Enhancer for YouTube';
+const bundleIdentifier = requireEnv('YTCQ_SAFARI_BUNDLE_ID');
 const developmentTeam = requireEnv('YTCQ_SAFARI_DEVELOPMENT_TEAM');
 const configuration = process.env.YTCQ_SAFARI_CONFIGURATION || 'Release';
 const destination = process.env.YTCQ_SAFARI_DESTINATION || 'generic/platform=macOS';
@@ -86,7 +87,13 @@ async function uploadArchive(nextArchivePath, archiveVersions) {
   const exportOptionsPath = path.join(exportPath, 'ExportOptions.plist');
 
   await mkdir(exportPath, { recursive: true });
-  await writeFile(exportOptionsPath, createSafariExportOptionsPlist({ developmentTeam }), 'utf8');
+  await writeFile(exportOptionsPath, createSafariExportOptionsPlist({
+    developmentTeam,
+    env: {
+      ...process.env,
+      YTCQ_SAFARI_EXPORT_DESTINATION: 'export'
+    }
+  }), 'utf8');
 
   run('xcodebuild', [
     '-exportArchive',
@@ -99,6 +106,8 @@ async function uploadArchive(nextArchivePath, archiveVersions) {
     ...getSafariExportProvisioningArgs(),
     ...getAuthenticationArgs()
   ]);
+
+  await uploadExportedPackage(exportPath, archiveVersions);
 }
 
 async function readProjectVersions() {
@@ -133,6 +142,20 @@ function getProvisioningArgs() {
 }
 
 function getAuthenticationArgs() {
+  const config = getAuthenticationConfig();
+  if (!config) return [];
+
+  return [
+    '-authenticationKeyPath',
+    config.keyPath,
+    '-authenticationKeyID',
+    config.keyId,
+    '-authenticationKeyIssuerID',
+    config.issuerId
+  ];
+}
+
+function getAuthenticationConfig() {
   const keyPath = process.env.YTCQ_APP_STORE_CONNECT_KEY_PATH
     || process.env.APP_STORE_CONNECT_API_KEY_PATH;
   const keyId = process.env.YTCQ_APP_STORE_CONNECT_KEY_ID
@@ -150,15 +173,83 @@ function getAuthenticationArgs() {
   }
 
   return presentValues.length === 0
-    ? []
-    : [
-      '-authenticationKeyPath',
-      keyPath,
-      '-authenticationKeyID',
+    ? null
+    : {
+      issuerId,
       keyId,
-      '-authenticationKeyIssuerID',
-      issuerId
-    ];
+      keyPath
+    };
+}
+
+async function uploadExportedPackage(exportPath, archiveVersions) {
+  const packagePath = await findExportedPackage(exportPath);
+  const authentication = getAuthenticationConfig();
+  const appleId = requireEnv('YTCQ_APP_STORE_APPLE_ID');
+
+  if (!authentication) {
+    throw new Error(
+      'Uploading the Safari package requires App Store Connect API key env vars.'
+    );
+  }
+
+  run('xcrun', [
+    'altool',
+    '--upload-package',
+    packagePath,
+    '--platform',
+    'macos',
+    '--apple-id',
+    appleId,
+    '--bundle-id',
+    bundleIdentifier,
+    '--bundle-version',
+    archiveVersions.buildNumber,
+    '--bundle-short-version-string',
+    archiveVersions.marketingVersion,
+    '--api-key',
+    authentication.keyId,
+    '--api-issuer',
+    authentication.issuerId,
+    '--wait'
+  ], {
+    env: {
+      ...process.env,
+      API_PRIVATE_KEYS_DIR: path.dirname(authentication.keyPath)
+    }
+  });
+}
+
+async function findExportedPackage(exportPath) {
+  const packagePaths = await findFilesByExtension(exportPath, '.pkg');
+
+  if (packagePaths.length === 1) return packagePaths[0];
+  if (packagePaths.length > 1) {
+    throw new Error(
+      `Expected one exported Safari package in ${exportPath}, found ${packagePaths.length}.`
+    );
+  }
+
+  throw new Error(`No exported Safari .pkg found in ${exportPath}.`);
+}
+
+async function findFilesByExtension(directory, extension) {
+  const entries = await readdir(directory, { withFileTypes: true });
+  const matches = [];
+
+  for (const entry of entries) {
+    const entryPath = path.join(directory, entry.name);
+
+    if (entry.isDirectory()) {
+      matches.push(...await findFilesByExtension(entryPath, extension));
+      continue;
+    }
+
+    if (entry.isFile() && entry.name.endsWith(extension)) {
+      matches.push(entryPath);
+    }
+  }
+
+  return matches;
 }
 
 function sanitizePathPart(value) {
@@ -173,6 +264,7 @@ Usage:
 
 Environment:
   YTCQ_SAFARI_DEVELOPMENT_TEAM           Apple Developer team ID.
+  YTCQ_SAFARI_BUNDLE_ID                  Mac App Store app bundle ID.
   YTCQ_SAFARI_APP_NAME                   Generated Safari wrapper app name.
   YTCQ_SAFARI_ARCHIVE_PATH               Optional .xcarchive output path.
   YTCQ_SAFARI_EXPORT_PATH                Optional upload export working directory.
@@ -186,6 +278,7 @@ Environment:
   YTCQ_APP_STORE_CONNECT_KEY_PATH        Optional App Store Connect API key .p8 path.
   YTCQ_APP_STORE_CONNECT_KEY_ID          Optional App Store Connect API key ID.
   YTCQ_APP_STORE_CONNECT_ISSUER_ID       Optional App Store Connect issuer ID.
+  YTCQ_APP_STORE_APPLE_ID                Mac App Store numeric app ID.
 `.trim());
 }
 

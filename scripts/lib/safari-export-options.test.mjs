@@ -46,6 +46,18 @@ describe('Safari export options', () => {
     expect(getSafariExportProvisioningArgs({ env })).toEqual([]);
   });
 
+  it('can request local export instead of Xcode upload', () => {
+    const plist = createSafariExportOptionsPlist({
+      developmentTeam: 'TEAM123',
+      env: {
+        YTCQ_SAFARI_EXPORT_DESTINATION: 'export'
+      }
+    });
+
+    expect(plist).toContain('<key>destination</key>\n\t<string>export</string>');
+    expect(plist).toContain('<key>method</key>\n\t<string>app-store-connect</string>');
+  });
+
   it('rejects manual signing without provisioning profiles', () => {
     expect(() => createSafariExportOptionsPlist({
       developmentTeam: 'TEAM123',
