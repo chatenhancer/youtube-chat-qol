@@ -67,7 +67,8 @@ await setWhatsNew(config, appVersion.id);
 const build = await waitForProcessedBuild(config, app.id);
 await attachBuild(config, appVersion.id, build.id);
 await skipIfAlreadySubmitted(config, appVersion.id);
-await submitAppStoreVersion(config, appVersion.id);
+await submitReviewSubmission(config, app.id, appVersion.id);
+await confirmSubmittedAppStoreVersion(config, appVersion.id);
 
 console.log(`Submitted Mac App Store release ${marketingVersion} build ${buildNumber}.`);
 
@@ -314,35 +315,6 @@ async function attachBuild(config, appStoreVersionId, buildId) {
   console.log(`Attached build ${buildNumber} to Mac App Store version ${marketingVersion}.`);
 }
 
-async function submitAppStoreVersion(config, appStoreVersionId) {
-  try {
-    await appStoreConnectFetch(config, '/v1/appStoreVersionSubmissions', {
-      method: 'POST',
-      body: jsonApiResource({
-        type: 'appStoreVersionSubmissions',
-        relationships: {
-          appStoreVersion: relationship('appStoreVersions', appStoreVersionId)
-        }
-      })
-    });
-    return;
-  } catch (error) {
-    if (
-      !(error instanceof AppStoreConnectError)
-      || !isAlreadyHasSubmissionError(error)
-    ) {
-      throw error;
-    }
-
-    const state = await readAppStoreVersionState(config, appStoreVersionId);
-
-    console.log(
-      `Mac App Store version ${marketingVersion} already has an App Store submission`
-      + `${state ? ` (${state})` : ''}.`
-    );
-  }
-}
-
 async function skipIfAlreadySubmitted(config, appStoreVersionId) {
   const state = await readAppStoreVersionState(config, appStoreVersionId);
   if (!isAlreadySubmittedState(state)) return;
@@ -351,6 +323,125 @@ async function skipIfAlreadySubmitted(config, appStoreVersionId) {
     `Mac App Store version ${marketingVersion} is already ${state}; skipping submission.`
   );
   process.exit(0);
+}
+
+async function submitReviewSubmission(config, appId, appStoreVersionId) {
+  const reviewSubmission = await getOrCreateReviewSubmission(config, appId);
+  await ensureReviewSubmissionItem(config, reviewSubmission.id, appStoreVersionId);
+  await submitReviewSubmissionForReview(config, reviewSubmission.id);
+}
+
+async function getOrCreateReviewSubmission(config, appId) {
+  try {
+    const payload = await appStoreConnectFetch(config, '/v1/reviewSubmissions', {
+      method: 'POST',
+      body: jsonApiResource({
+        type: 'reviewSubmissions',
+        relationships: {
+          app: relationship('apps', appId)
+        }
+      })
+    });
+
+    console.log(`Created Mac App Store review submission ${payload.data.id}.`);
+    return payload.data;
+  } catch (error) {
+    if (!(error instanceof AppStoreConnectError) || error.status !== 409) {
+      throw error;
+    }
+
+    const reviewSubmission = await findReadyReviewSubmission(config, appId);
+    if (!reviewSubmission) throw error;
+
+    console.log(`Using existing Mac App Store review submission ${reviewSubmission.id}.`);
+    return reviewSubmission;
+  }
+}
+
+async function findReadyReviewSubmission(config, appId) {
+  const payload = await ascGet(config, '/v1/reviewSubmissions', {
+    'filter[app]': appId,
+    'filter[platform]': platform,
+    'filter[state]': 'READY_FOR_REVIEW',
+    limit: 20
+  });
+
+  return payload.data?.[0] || null;
+}
+
+async function ensureReviewSubmissionItem(config, reviewSubmissionId, appStoreVersionId) {
+  const existingItem = await findReviewSubmissionItem(config, reviewSubmissionId, appStoreVersionId);
+  if (existingItem) {
+    console.log(`Review submission already includes Mac App Store version ${marketingVersion}.`);
+    return existingItem;
+  }
+
+  try {
+    const payload = await appStoreConnectFetch(config, '/v1/reviewSubmissionItems', {
+      method: 'POST',
+      body: jsonApiResource({
+        type: 'reviewSubmissionItems',
+        relationships: {
+          appStoreVersion: relationship('appStoreVersions', appStoreVersionId),
+          reviewSubmission: relationship('reviewSubmissions', reviewSubmissionId)
+        }
+      })
+    });
+
+    console.log(`Added Mac App Store version ${marketingVersion} to the review submission.`);
+    return payload.data;
+  } catch (error) {
+    if (!(error instanceof AppStoreConnectError) || error.status !== 409) {
+      throw error;
+    }
+
+    console.log(`Review submission already includes Mac App Store version ${marketingVersion}.`);
+    return null;
+  }
+}
+
+async function findReviewSubmissionItem(config, reviewSubmissionId, appStoreVersionId) {
+  const payload = await ascGet(config, `/v1/reviewSubmissions/${reviewSubmissionId}/items`, {
+    limit: 200
+  });
+
+  return (payload.data || []).find((item) =>
+    item.relationships?.appStoreVersion?.data?.id === appStoreVersionId
+  ) || null;
+}
+
+async function submitReviewSubmissionForReview(config, reviewSubmissionId) {
+  await appStoreConnectFetch(config, `/v1/reviewSubmissions/${reviewSubmissionId}`, {
+    method: 'PATCH',
+    body: jsonApiResource({
+      id: reviewSubmissionId,
+      type: 'reviewSubmissions',
+      attributes: {
+        platform,
+        submitted: true
+      }
+    })
+  });
+
+  console.log(`Sent Mac App Store review submission ${reviewSubmissionId} for review.`);
+}
+
+async function confirmSubmittedAppStoreVersion(config, appStoreVersionId) {
+  for (let attempt = 1; attempt <= 6; attempt += 1) {
+    const state = await readAppStoreVersionState(config, appStoreVersionId);
+    if (isAlreadySubmittedState(state)) {
+      console.log(`Mac App Store version ${marketingVersion} is now ${state}.`);
+      return;
+    }
+
+    if (attempt < 6) await delay(10 * 1000);
+  }
+
+  const state = await readAppStoreVersionState(config, appStoreVersionId);
+  throw new Error(
+    `Mac App Store review submission was sent, but version ${marketingVersion} `
+    + `is still ${state || 'in an unknown state'}.`
+  );
 }
 
 async function readAppStoreVersionState(config, appStoreVersionId) {
@@ -461,19 +552,6 @@ function isAlreadySubmittedState(state) {
     'WAITING_FOR_EXPORT_COMPLIANCE',
     'WAITING_FOR_REVIEW'
   ].includes(state);
-}
-
-function isAlreadyHasSubmissionError(error) {
-  if (error.status === 409) return true;
-
-  const details = (error.payload?.errors || [])
-    .map((entry) => entry?.detail || '')
-    .join(' ');
-
-  return error.status === 403
-    && details.includes("appStoreVersionSubmissions")
-    && details.includes("does not allow 'CREATE'")
-    && details.includes('Allowed operation is: DELETE');
 }
 
 function normalizeState(state) {
