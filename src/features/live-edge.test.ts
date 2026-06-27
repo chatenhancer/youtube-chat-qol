@@ -24,6 +24,27 @@ describe('live edge recovery', () => {
     expect(jumpToBottom.button.click).toHaveBeenCalledOnce();
   });
 
+  it('scrolls chat to the live edge when the chat frame window blurs', async () => {
+    const lifecycle = await import('../content/lifecycle');
+    await import('./live-edge');
+    const scroller = createScroller();
+    const jumpToBottom = createJumpToBottomButton();
+    document.body.append(scroller, jumpToBottom.wrapper);
+
+    lifecycle.initFeatures({ saveOptions: vi.fn() });
+    window.dispatchEvent(new Event('blur'));
+
+    expect(scroller.scrollTop).toBe(800);
+    expect(jumpToBottom.button.click).toHaveBeenCalledOnce();
+
+    scroller.scrollTop = 0;
+    lifecycle.suspendFeatures();
+    window.dispatchEvent(new Event('blur'));
+
+    expect(scroller.scrollTop).toBe(0);
+    expect(jumpToBottom.button.click).toHaveBeenCalledOnce();
+  });
+
   it('retries live-edge recovery after the tab becomes visible again', async () => {
     const lifecycle = await import('../content/lifecycle');
     await import('./live-edge');

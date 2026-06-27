@@ -18,10 +18,25 @@ const JUMP_TO_BOTTOM_SELECTOR = [
 const LIVE_EDGE_RETRY_DELAYS = [120, 500, 1200];
 
 let liveEdgeTimer = 0;
+let liveEdgeListeners = new AbortController();
 
 registerFeatureLifecycle({
-  page: { visibilityChanged: handleVisibilityChanged }
+  page: {
+    init: initLiveEdgeRecovery,
+    cleanupStale: cleanupStaleLiveEdgeRecovery,
+    visibilityChanged: handleVisibilityChanged
+  }
 });
+
+function initLiveEdgeRecovery(): void {
+  window.addEventListener('blur', keepChatAtLiveEdge, { signal: liveEdgeListeners.signal });
+}
+
+function cleanupStaleLiveEdgeRecovery(): void {
+  liveEdgeListeners.abort();
+  liveEdgeListeners = new AbortController();
+  clearLiveEdgeTimer();
+}
 
 function handleVisibilityChanged(visibilityState: Document['visibilityState']): void {
   if (visibilityState === 'hidden') {
@@ -39,7 +54,7 @@ function keepChatAtLiveEdge(): void {
 
 function scheduleKeepChatAtLiveEdge(): void {
   keepChatAtLiveEdge();
-  if (liveEdgeTimer) window.clearTimeout(liveEdgeTimer);
+  clearLiveEdgeTimer();
 
   let attempt = 0;
   const tick = (): void => {
@@ -71,6 +86,12 @@ function clickJumpToBottomButton(): void {
   const button = Array.from(document.querySelectorAll<HTMLElement>(JUMP_TO_BOTTOM_SELECTOR))
     .find(isVisibleElement);
   button?.click();
+}
+
+function clearLiveEdgeTimer(): void {
+  if (!liveEdgeTimer) return;
+  window.clearTimeout(liveEdgeTimer);
+  liveEdgeTimer = 0;
 }
 
 function isVisibleElement(element: HTMLElement): boolean {
