@@ -58,6 +58,19 @@ describe('Safari export options', () => {
     expect(plist).toContain('<key>method</key>\n\t<string>app-store-connect</string>');
   });
 
+  it('can focus export on the configured Safari app bundle identifier', () => {
+    const plist = createSafariExportOptionsPlist({
+      developmentTeam: 'TEAM123',
+      env: {
+        YTCQ_SAFARI_BUNDLE_ID: 'com.chatenhancer.safari'
+      }
+    });
+
+    expect(plist).toContain(
+      '<key>distributionBundleIdentifier</key>\n\t<string>com.chatenhancer.safari</string>'
+    );
+  });
+
   it('rejects manual signing without provisioning profiles', () => {
     expect(() => createSafariExportOptionsPlist({
       developmentTeam: 'TEAM123',

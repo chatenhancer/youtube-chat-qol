@@ -13,6 +13,10 @@ export function createSafariExportOptionsPlist({
     uploadSymbols: true
   };
 
+  if (env.YTCQ_SAFARI_BUNDLE_ID) {
+    values.distributionBundleIdentifier = env.YTCQ_SAFARI_BUNDLE_ID;
+  }
+
   if (signingStyle === 'manual') {
     values.signingCertificate = env.YTCQ_SAFARI_EXPORT_SIGNING_CERTIFICATE
       || 'Mac App Distribution';

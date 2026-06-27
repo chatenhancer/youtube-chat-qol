@@ -3,8 +3,9 @@
  *
  * Run after scripts/package-safari.mjs has generated dist/safari.
  */
-import { mkdir, readFile, readdir, writeFile } from 'node:fs/promises';
+import { access, mkdir, mkdtemp, readFile, readdir, rename, rm, writeFile } from 'node:fs/promises';
 import { spawnSync } from 'node:child_process';
+import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { loadLocalEnv, requireEnv } from './lib/local-env.mjs';
@@ -43,6 +44,7 @@ const exportRoot = path.join(root, 'dist', 'safari-upload');
 
 const shouldUpload = args.has('--upload');
 const versions = await readProjectVersions();
+const bundleIdentifier = requireEnv('YTCQ_SAFARI_BUNDLE_ID');
 const archivePath = process.env.YTCQ_SAFARI_ARCHIVE_PATH
   || path.join(
     archiveRoot,
@@ -183,8 +185,9 @@ function getAuthenticationConfig() {
 
 async function uploadExportedPackage(exportPath) {
   const packagePath = await findExportedPackage(exportPath);
+  const normalizedPackagePath = await normalizePackageIdentifier(packagePath);
   const authentication = getAuthenticationConfig();
-  requireEnv('YTCQ_APP_STORE_APPLE_ID');
+  const appleId = requireEnv('YTCQ_APP_STORE_APPLE_ID');
 
   if (!authentication) {
     throw new Error(
@@ -194,11 +197,18 @@ async function uploadExportedPackage(exportPath) {
 
   run('xcrun', [
     'altool',
-    '--upload-app',
-    '--file',
-    packagePath,
+    '--upload-package',
+    normalizedPackagePath,
     '--type',
     'macos',
+    '--apple-id',
+    appleId,
+    '--bundle-id',
+    bundleIdentifier,
+    '--bundle-version',
+    versions.buildNumber,
+    '--bundle-short-version-string',
+    versions.marketingVersion,
     '--apiKey',
     authentication.keyId,
     '--apiIssuer',
@@ -211,8 +221,81 @@ async function uploadExportedPackage(exportPath) {
   });
 }
 
+async function normalizePackageIdentifier(packagePath) {
+  const workRoot = await mkdtemp(path.join(tmpdir(), 'ytcq-safari-pkg-'));
+  const expandedPath = path.join(workRoot, 'expanded');
+  const unsignedPackagePath = path.join(workRoot, 'unsigned.pkg');
+  const normalizedPackagePath = packagePath.replace(/[.]pkg$/i, '.appstore.pkg');
+
+  try {
+    run('pkgutil', ['--expand', packagePath, expandedPath]);
+
+    const currentIdentifier = await readProductPackageIdentifier(expandedPath);
+    if (currentIdentifier === bundleIdentifier) return packagePath;
+
+    await rewriteProductPackageIdentifier(expandedPath, currentIdentifier);
+    run('pkgutil', ['--flatten', expandedPath, unsignedPackagePath]);
+    run('productsign', [
+      '--sign',
+      getInstallerSigningCertificate(),
+      unsignedPackagePath,
+      normalizedPackagePath
+    ]);
+
+    console.log(
+      `Normalized Safari package identifier from ${currentIdentifier} to ${bundleIdentifier}.`
+    );
+    return normalizedPackagePath;
+  } finally {
+    await rm(workRoot, { force: true, recursive: true });
+  }
+}
+
+async function readProductPackageIdentifier(expandedPath) {
+  const distributionPath = path.join(expandedPath, 'Distribution');
+  const distribution = await readFile(distributionPath, 'utf8');
+  const productMatch = /<product\b[^>]*\bid="([^"]+)"/.exec(distribution);
+  if (productMatch?.[1]) return productMatch[1];
+
+  const packageInfoPaths = await findFilesByName(expandedPath, 'PackageInfo');
+  for (const packageInfoPath of packageInfoPaths) {
+    const packageInfo = await readFile(packageInfoPath, 'utf8');
+    const packageMatch = /<pkg-info\b[^>]*\bidentifier="([^"]+)"/.exec(packageInfo);
+    if (packageMatch?.[1]) return packageMatch[1];
+  }
+
+  throw new Error(`Could not read the product package identifier from ${expandedPath}.`);
+}
+
+async function rewriteProductPackageIdentifier(expandedPath, currentIdentifier) {
+  const replacementFiles = [
+    path.join(expandedPath, 'Distribution'),
+    ...await findFilesByName(expandedPath, 'PackageInfo')
+  ];
+
+  await Promise.all(replacementFiles.map(async (filePath) => {
+    const original = await readFile(filePath, 'utf8');
+    const next = original.replaceAll(currentIdentifier, bundleIdentifier);
+    if (next !== original) await writeFile(filePath, next, 'utf8');
+  }));
+
+  const currentComponentPath = path.join(expandedPath, `${currentIdentifier}.pkg`);
+  const nextComponentPath = path.join(expandedPath, `${bundleIdentifier}.pkg`);
+  if (currentComponentPath !== nextComponentPath && await pathExists(currentComponentPath)) {
+    await rm(nextComponentPath, { force: true, recursive: true });
+    await rename(currentComponentPath, nextComponentPath);
+  }
+}
+
+function getInstallerSigningCertificate() {
+  return process.env.YTCQ_SAFARI_EXPORT_INSTALLER_SIGNING_CERTIFICATE
+    || 'Mac Installer Distribution';
+}
+
 async function findExportedPackage(exportPath) {
-  const packagePaths = await findFilesByExtension(exportPath, '.pkg');
+  const packagePaths = (await findFilesByExtension(exportPath, '.pkg')).filter(
+    (packagePath) => !/[.]appstore[.]pkg$/i.test(packagePath)
+  );
 
   if (packagePaths.length === 1) return packagePaths[0];
   if (packagePaths.length > 1) {
@@ -242,6 +325,35 @@ async function findFilesByExtension(directory, extension) {
   }
 
   return matches;
+}
+
+async function findFilesByName(directory, fileName) {
+  const entries = await readdir(directory, { withFileTypes: true });
+  const matches = [];
+
+  for (const entry of entries) {
+    const entryPath = path.join(directory, entry.name);
+
+    if (entry.isDirectory()) {
+      matches.push(...await findFilesByName(entryPath, fileName));
+      continue;
+    }
+
+    if (entry.isFile() && entry.name === fileName) {
+      matches.push(entryPath);
+    }
+  }
+
+  return matches;
+}
+
+async function pathExists(filePath) {
+  try {
+    await access(filePath);
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 function sanitizePathPart(value) {
