@@ -18,7 +18,7 @@ import { loadLocalEnv, requireEnv, root } from './lib/local-env.mjs';
 
 await loadLocalEnv();
 
-const appName = process.env.YTCQ_SAFARI_APP_NAME || 'Chat Enhancer for YouTube';
+const appName = 'Chat Enhancer for YouTube';
 const bundleId = requireEnv('YTCQ_SAFARI_BUNDLE_ID');
 maskGithubActionsValues([
   bundleId,

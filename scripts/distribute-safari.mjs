@@ -31,7 +31,7 @@ for (const arg of args) {
 
 await loadLocalEnv();
 
-const appName = process.env.YTCQ_SAFARI_APP_NAME || 'Chat Enhancer for YouTube';
+const appName = 'Chat Enhancer for YouTube';
 requireEnv('YTCQ_SAFARI_BUNDLE_ID');
 const developmentTeam = requireEnv('YTCQ_SAFARI_DEVELOPMENT_TEAM');
 const configuration = process.env.YTCQ_SAFARI_CONFIGURATION || 'Release';
@@ -421,7 +421,6 @@ Usage:
 Environment:
   YTCQ_SAFARI_DEVELOPMENT_TEAM           Apple Developer team ID.
   YTCQ_SAFARI_BUNDLE_ID                  Mac App Store app bundle ID.
-  YTCQ_SAFARI_APP_NAME                   Generated Safari wrapper app name.
   YTCQ_SAFARI_ARCHIVE_PATH               Optional .xcarchive output path.
   YTCQ_SAFARI_EXPORT_PATH                Optional upload export working directory.
   YTCQ_SAFARI_ALLOW_PROVISIONING_UPDATES Set to 0 to disable Xcode provisioning updates.

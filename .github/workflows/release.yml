@@ -294,8 +294,6 @@ jobs:
           FIREFOX_AMO_ADDON_ID: ${{ secrets.FIREFOX_AMO_ADDON_ID }}
           FIREFOX_AMO_API_KEY: ${{ secrets.FIREFOX_AMO_API_KEY }}
           FIREFOX_AMO_API_SECRET: ${{ secrets.FIREFOX_AMO_API_SECRET }}
-          FIREFOX_AMO_APPROVAL_NOTES: ${{ vars.FIREFOX_AMO_APPROVAL_NOTES }}
-          FIREFOX_AMO_RELEASE_NOTES: ${{ vars.FIREFOX_AMO_RELEASE_NOTES }}
 
   publish-safari:
     needs: package
@@ -352,12 +350,9 @@ jobs:
       - name: Submit to Mac App Store
         run: npm run publish:safari
         env:
-          YTCQ_SAFARI_APP_NAME: ${{ vars.YTCQ_SAFARI_APP_NAME }}
           YTCQ_SAFARI_BUNDLE_ID: ${{ secrets.YTCQ_SAFARI_BUNDLE_ID }}
           YTCQ_SAFARI_DEVELOPMENT_TEAM: ${{ secrets.YTCQ_SAFARI_DEVELOPMENT_TEAM }}
-          YTCQ_SAFARI_APP_CATEGORY: ${{ vars.YTCQ_SAFARI_APP_CATEGORY }}
           YTCQ_APP_STORE_CONNECT_KEY_ID: ${{ secrets.YTCQ_APP_STORE_CONNECT_KEY_ID }}
           YTCQ_APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.YTCQ_APP_STORE_CONNECT_ISSUER_ID }}
           YTCQ_APP_STORE_APPLE_ID: ${{ secrets.YTCQ_APP_STORE_APPLE_ID }}
-          YTCQ_APP_STORE_WHATS_NEW: ${{ vars.YTCQ_APP_STORE_WHATS_NEW }}
           YTCQ_APP_STORE_BUILD_WAIT_ATTEMPTS: 20

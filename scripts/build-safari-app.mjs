@@ -9,7 +9,7 @@ import { loadLocalEnv, requireEnv, root } from './lib/local-env.mjs';
 
 await loadLocalEnv();
 
-const appName = process.env.YTCQ_SAFARI_APP_NAME || 'Chat Enhancer for YouTube';
+const appName = 'Chat Enhancer for YouTube';
 const developmentTeam = requireEnv('YTCQ_SAFARI_DEVELOPMENT_TEAM');
 const configuration = process.env.YTCQ_SAFARI_APP_CONFIGURATION || 'Debug';
 const projectPath = path.join(root, 'dist', 'safari', appName, `${appName}.xcodeproj`);

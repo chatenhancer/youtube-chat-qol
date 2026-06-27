@@ -23,12 +23,12 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const safariAppIconSourcePath = path.join(root, 'src', 'assets', 'icons', 'safari-app-icon.svg');
 const extensionDir = path.join(root, 'dist', 'extension-safari');
 const projectLocation = path.join(root, 'dist', 'safari');
-const appName = process.env.YTCQ_SAFARI_APP_NAME || 'Chat Enhancer for YouTube';
+const appName = 'Chat Enhancer for YouTube';
 const bundleIdentifier = requireEnv('YTCQ_SAFARI_BUNDLE_ID');
 const developmentTeam = requireEnv('YTCQ_SAFARI_DEVELOPMENT_TEAM');
 const marketingVersion = process.env.YTCQ_SAFARI_MARKETING_VERSION || packageJson.version;
 const buildNumber = process.env.YTCQ_SAFARI_BUILD_NUMBER || getDefaultBuildNumber();
-const macAppCategory = process.env.YTCQ_SAFARI_APP_CATEGORY || 'public.app-category.entertainment';
+const macAppCategory = 'public.app-category.entertainment';
 
 await unregisterLegacySafariExtensionBuilds();
 await assertSafariExtensionBuildExists();
