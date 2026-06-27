@@ -442,7 +442,7 @@ async function ensureReviewSubmissionItem(config, appId, reviewSubmission, appSt
   }
 
   try {
-    await appStoreConnectFetch(config, '/v1/reviewSubmissionItems', {
+    const payload = await appStoreConnectFetch(config, '/v1/reviewSubmissionItems', {
       method: 'POST',
       body: jsonApiResource({
         type: 'reviewSubmissionItems',
@@ -454,6 +454,9 @@ async function ensureReviewSubmissionItem(config, appId, reviewSubmission, appSt
     });
 
     console.log(`Added Mac App Store version ${marketingVersion} to the review submission.`);
+    if (isReviewSubmissionItemForVersion(payload.data, appStoreVersionId)) {
+      return reviewSubmission;
+    }
   } catch (error) {
     if (!(error instanceof AppStoreConnectError) || error.status !== 409) {
       throw error;
@@ -501,12 +504,18 @@ async function reviewSubmissionHasVersion(config, reviewSubmission, appStoreVers
 
 async function findReviewSubmissionItem(config, reviewSubmissionId, appStoreVersionId) {
   const payload = await ascGet(config, `/v1/reviewSubmissions/${reviewSubmissionId}/items`, {
+    'fields[reviewSubmissionItems]': 'appStoreVersion,state',
+    include: 'appStoreVersion',
     limit: 200
   });
 
   return (payload.data || []).find((item) =>
-    item.relationships?.appStoreVersion?.data?.id === appStoreVersionId
+    isReviewSubmissionItemForVersion(item, appStoreVersionId)
   ) || null;
+}
+
+function isReviewSubmissionItemForVersion(item, appStoreVersionId) {
+  return item?.relationships?.appStoreVersion?.data?.id === appStoreVersionId;
 }
 
 async function submitReviewSubmissionForReview(config, reviewSubmissionId) {
