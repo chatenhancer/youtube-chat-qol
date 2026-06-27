@@ -142,11 +142,7 @@ async function importCertificate({
 }) {
   const certificatePath = path.join(runnerTemp, `${label}.p12`);
   await writeFile(certificatePath, decodeBase64(contents));
-  const fingerprint = readPkcs12CertificateFingerprint({
-    certificatePath,
-    label,
-    password
-  });
+  const fingerprintsBeforeImport = new Set(readKeychainCertificateFingerprints(nextKeychainPath));
 
   run('security', [
     'import',
@@ -163,9 +159,20 @@ async function importCertificate({
     '/usr/bin/productsign'
   ]);
 
+  const fingerprintsAfterImport = readKeychainCertificateFingerprints(nextKeychainPath);
+  const importedFingerprints = fingerprintsAfterImport.filter(
+    (fingerprint) => !fingerprintsBeforeImport.has(fingerprint)
+  );
+
+  if (importedFingerprints.length !== 1) {
+    throw new Error(
+      `Could not identify the SHA-1 fingerprint for the imported ${label} certificate.`
+    );
+  }
+
   return {
     certificatePath,
-    fingerprint
+    fingerprint: importedFingerprints[0]
   };
 }
 
@@ -246,40 +253,18 @@ function decodeBase64(value) {
   return Buffer.from(String(value).replace(/\s+/g, ''), 'base64');
 }
 
-function readPkcs12CertificateFingerprint({
-  certificatePath,
-  label,
-  password
-}) {
-  const pem = runCapture('openssl', [
-    'pkcs12',
-    '-in',
-    certificatePath,
-    '-nokeys',
-    '-clcerts',
-    '-passin',
-    'env:YTCQ_P12_PASSWORD'
-  ], {
-    env: {
-      ...process.env,
-      YTCQ_P12_PASSWORD: password
-    }
+function readKeychainCertificateFingerprints(keychainPath) {
+  const result = spawnSync('security', ['find-certificate', '-a', '-Z', keychainPath], {
+    encoding: 'utf8'
   });
-  const certificate = runCapture('openssl', [
-    'x509',
-    '-noout',
-    '-fingerprint',
-    '-sha1'
-  ], {
-    input: pem
-  });
-  const match = /Fingerprint=([A-Fa-f0-9:]+)/.exec(certificate);
+  const output = `${result.stdout || ''}\n${result.stderr || ''}`;
 
-  if (!match) {
-    throw new Error(`Could not read SHA-1 fingerprint from the ${label} certificate.`);
+  if (result.status !== 0 && !/could not be found|could not find/i.test(output)) {
+    throw new Error(`security exited with ${result.status ?? 'unknown status'}`);
   }
 
-  return match[1].replaceAll(':', '').toUpperCase();
+  return [...output.matchAll(/SHA-1 hash:\s*([A-Fa-f0-9]+)/g)]
+    .map((match) => match[1].toUpperCase());
 }
 
 async function appendGithubEnv(values) {
