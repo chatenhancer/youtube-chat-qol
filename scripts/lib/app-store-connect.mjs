@@ -130,15 +130,29 @@ function formatAppStoreConnectError(response, payload, url) {
   if (!Array.isArray(payload.errors)) return `${prefix}: ${JSON.stringify(payload)}`;
 
   const details = payload.errors
-    .map((error) => [
-      error.code,
-      error.title,
-      error.detail
-    ].filter(Boolean).join(': '))
+    .map((error) => formatAppStoreConnectErrorEntry(error))
     .filter(Boolean)
     .join('; ');
 
   return details ? `${prefix}: ${details}` : prefix;
+}
+
+function formatAppStoreConnectErrorEntry(error) {
+  const details = [
+    error.code,
+    error.title,
+    error.detail
+  ];
+
+  if (error.source) {
+    details.push(`source=${JSON.stringify(error.source)}`);
+  }
+
+  if (error.meta) {
+    details.push(`meta=${JSON.stringify(error.meta)}`);
+  }
+
+  return details.filter(Boolean).join(': ');
 }
 
 function resolveApiUrl(apiOrigin, pathOrUrl) {
