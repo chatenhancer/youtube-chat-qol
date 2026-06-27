@@ -40,13 +40,13 @@ const installerCertificatePassword = env.YTCQ_SAFARI_INSTALLER_DISTRIBUTION_CERT
   || sharedCertificatePassword;
 
 await createTemporaryKeychain(keychainPath, keychainPassword);
-await importCertificate({
+const appSigningCertificate = await importCertificate({
   contents: appCertificate,
   keychainPath,
   label: 'app-distribution',
   password: appCertificatePassword
 });
-await importCertificate({
+const installerSigningCertificate = await importCertificate({
   contents: installerCertificate,
   keychainPath,
   label: 'installer-distribution',
@@ -82,10 +82,10 @@ const provisioningProfiles = Object.fromEntries(installedProfiles.map((profile) 
 await appendGithubEnv({
   YTCQ_SAFARI_EXPORT_SIGNING_STYLE: 'manual',
   YTCQ_SAFARI_EXPORT_SIGNING_CERTIFICATE: env.YTCQ_SAFARI_EXPORT_SIGNING_CERTIFICATE
-    || 'Mac App Distribution',
+    || appSigningCertificate.fingerprint,
   YTCQ_SAFARI_EXPORT_INSTALLER_SIGNING_CERTIFICATE:
     env.YTCQ_SAFARI_EXPORT_INSTALLER_SIGNING_CERTIFICATE
-    || 'Mac Installer Distribution',
+    || installerSigningCertificate.fingerprint,
   YTCQ_SAFARI_EXPORT_PROVISIONING_PROFILES: JSON.stringify(provisioningProfiles)
 });
 
@@ -142,6 +142,12 @@ async function importCertificate({
 }) {
   const certificatePath = path.join(runnerTemp, `${label}.p12`);
   await writeFile(certificatePath, decodeBase64(contents));
+  const fingerprint = readPkcs12CertificateFingerprint({
+    certificatePath,
+    label,
+    password
+  });
+
   run('security', [
     'import',
     certificatePath,
@@ -156,6 +162,11 @@ async function importCertificate({
     '-T',
     '/usr/bin/productsign'
   ]);
+
+  return {
+    certificatePath,
+    fingerprint
+  };
 }
 
 async function installProvisioningProfile({
@@ -235,6 +246,42 @@ function decodeBase64(value) {
   return Buffer.from(String(value).replace(/\s+/g, ''), 'base64');
 }
 
+function readPkcs12CertificateFingerprint({
+  certificatePath,
+  label,
+  password
+}) {
+  const pem = runCapture('openssl', [
+    'pkcs12',
+    '-in',
+    certificatePath,
+    '-nokeys',
+    '-clcerts',
+    '-passin',
+    'env:YTCQ_P12_PASSWORD'
+  ], {
+    env: {
+      ...process.env,
+      YTCQ_P12_PASSWORD: password
+    }
+  });
+  const certificate = runCapture('openssl', [
+    'x509',
+    '-noout',
+    '-fingerprint',
+    '-sha1'
+  ], {
+    input: pem
+  });
+  const match = /Fingerprint=([A-Fa-f0-9:]+)/.exec(certificate);
+
+  if (!match) {
+    throw new Error(`Could not read SHA-1 fingerprint from the ${label} certificate.`);
+  }
+
+  return match[1].replaceAll(':', '').toUpperCase();
+}
+
 async function appendGithubEnv(values) {
   if (!env.GITHUB_ENV) {
     Object.assign(env, values);
@@ -252,8 +299,11 @@ function run(command, args) {
   }
 }
 
-function runCapture(command, args) {
-  const result = spawnSync(command, args, { encoding: 'utf8' });
+function runCapture(command, args, options = {}) {
+  const result = spawnSync(command, args, {
+    encoding: 'utf8',
+    ...options
+  });
   if (result.status !== 0) {
     throw new Error(`${command} exited with ${result.status ?? 'unknown status'}`);
   }
