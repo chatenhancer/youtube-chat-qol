@@ -74,6 +74,13 @@ const chromeMock = {
     sendMessage: vi.fn((_tabId: number, _message: unknown, callback?: () => void) => {
       callback?.();
     })
+  },
+  windows: {
+    WINDOW_ID_NONE: -1,
+    onFocusChanged: {
+      addListener: vi.fn(),
+      removeListener: vi.fn()
+    }
   }
 } as unknown as typeof chrome;
 

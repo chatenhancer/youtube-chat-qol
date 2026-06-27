@@ -6,6 +6,7 @@
  * bottom gives DOM-driven features fresh messages to observe after tab switches.
  */
 import { registerFeatureLifecycle } from '../content/lifecycle';
+import { LIVE_EDGE_WINDOW_BLURRED_MESSAGE_TYPE } from '../shared/live-edge';
 import { CHAT_SCROLLER_SELECTOR } from '../youtube/selectors';
 
 const JUMP_TO_BOTTOM_SELECTOR = [
@@ -18,7 +19,6 @@ const JUMP_TO_BOTTOM_SELECTOR = [
 const LIVE_EDGE_RETRY_DELAYS = [120, 500, 1200];
 
 let liveEdgeTimer = 0;
-let liveEdgeListeners = new AbortController();
 
 registerFeatureLifecycle({
   page: {
@@ -29,13 +29,19 @@ registerFeatureLifecycle({
 });
 
 function initLiveEdgeRecovery(): void {
-  window.addEventListener('blur', keepChatAtLiveEdge, { signal: liveEdgeListeners.signal });
+  chrome.runtime.onMessage.addListener(handleLiveEdgeMessage);
 }
 
 function cleanupStaleLiveEdgeRecovery(): void {
-  liveEdgeListeners.abort();
-  liveEdgeListeners = new AbortController();
+  chrome.runtime.onMessage.removeListener(handleLiveEdgeMessage);
   clearLiveEdgeTimer();
+}
+
+function handleLiveEdgeMessage(message: { type?: string }): false {
+  if (message?.type === LIVE_EDGE_WINDOW_BLURRED_MESSAGE_TYPE) {
+    keepChatAtLiveEdge();
+  }
+  return false;
 }
 
 function handleVisibilityChanged(visibilityState: Document['visibilityState']): void {

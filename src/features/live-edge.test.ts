@@ -1,8 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { LIVE_EDGE_WINDOW_BLURRED_MESSAGE_TYPE } from '../shared/live-edge';
 
 describe('live edge recovery', () => {
   beforeEach(() => {
     vi.resetModules();
+    vi.clearAllMocks();
     vi.useFakeTimers();
     document.body.replaceChildren();
   });
@@ -24,7 +26,7 @@ describe('live edge recovery', () => {
     expect(jumpToBottom.button.click).toHaveBeenCalledOnce();
   });
 
-  it('scrolls chat to the live edge when the chat frame window blurs', async () => {
+  it('scrolls chat to the live edge when the background reports browser window blur', async () => {
     const lifecycle = await import('../content/lifecycle');
     await import('./live-edge');
     const scroller = createScroller();
@@ -32,17 +34,20 @@ describe('live edge recovery', () => {
     document.body.append(scroller, jumpToBottom.wrapper);
 
     lifecycle.initFeatures({ saveOptions: vi.fn() });
-    window.dispatchEvent(new Event('blur'));
+    const listener = getLiveEdgeMessageListener();
+
+    listener({ type: 'other-message' });
+    expect(scroller.scrollTop).toBe(0);
+    expect(jumpToBottom.button.click).not.toHaveBeenCalled();
+
+    listener({ type: LIVE_EDGE_WINDOW_BLURRED_MESSAGE_TYPE });
 
     expect(scroller.scrollTop).toBe(800);
     expect(jumpToBottom.button.click).toHaveBeenCalledOnce();
 
-    scroller.scrollTop = 0;
     lifecycle.suspendFeatures();
-    window.dispatchEvent(new Event('blur'));
 
-    expect(scroller.scrollTop).toBe(0);
-    expect(jumpToBottom.button.click).toHaveBeenCalledOnce();
+    expect(chrome.runtime.onMessage.removeListener).toHaveBeenCalledWith(listener);
   });
 
   it('retries live-edge recovery after the tab becomes visible again', async () => {
@@ -98,6 +103,12 @@ describe('live edge recovery', () => {
     expect(scroller.scrollTop).toBe(0);
   });
 });
+
+function getLiveEdgeMessageListener(): (message: { type?: string }) => false {
+  const listener = vi.mocked(chrome.runtime.onMessage.addListener).mock.calls.at(-1)?.[0];
+  if (!listener) throw new Error('No runtime message listener registered');
+  return listener as (message: { type?: string }) => false;
+}
 
 function createScroller(): HTMLElement {
   const scroller = document.createElement('div');
