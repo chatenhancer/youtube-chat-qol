@@ -23,6 +23,10 @@ const platform = process.env.YTCQ_APP_STORE_PLATFORM || 'MAC_OS';
 const releaseType = process.env.YTCQ_APP_STORE_RELEASE_TYPE || 'AFTER_APPROVAL';
 const whatsNew = process.env.YTCQ_APP_STORE_WHATS_NEW
   || 'Thanks for using Chat Enhancer for YouTube. This update includes new features, along with refinements and fixes to make the extension feel smoother and more reliable.';
+const usesNonExemptEncryption = readBoolean(
+  'YTCQ_APP_STORE_USES_NON_EXEMPT_ENCRYPTION',
+  false
+);
 const waitAttempts = readPositiveInteger('YTCQ_APP_STORE_BUILD_WAIT_ATTEMPTS', 20);
 const waitSeconds = readPositiveInteger('YTCQ_APP_STORE_BUILD_WAIT_SECONDS', 30);
 const projectPath = path.join(
@@ -65,6 +69,7 @@ if (isAlreadySubmittedState(currentState)) {
 await setReleaseType(config, appVersion);
 await setWhatsNew(config, appVersion.id);
 const build = await waitForProcessedBuild(config, app.id);
+await setBuildEncryptionCompliance(config, build.id);
 await attachBuild(config, appVersion.id, build.id);
 await skipIfAlreadySubmitted(config, appVersion.id);
 await submitReviewSubmission(config, app.id, appVersion.id);
@@ -313,6 +318,23 @@ async function attachBuild(config, appStoreVersionId, buildId) {
   );
 
   console.log(`Attached build ${buildNumber} to Mac App Store version ${marketingVersion}.`);
+}
+
+async function setBuildEncryptionCompliance(config, buildId) {
+  await appStoreConnectFetch(config, `/v1/builds/${buildId}`, {
+    method: 'PATCH',
+    body: jsonApiResource({
+      id: buildId,
+      type: 'builds',
+      attributes: {
+        usesNonExemptEncryption
+      }
+    })
+  });
+
+  console.log(
+    `Set Mac App Store build usesNonExemptEncryption to ${usesNonExemptEncryption}.`
+  );
 }
 
 async function skipIfAlreadySubmitted(config, appStoreVersionId) {
@@ -643,6 +665,17 @@ function readPositiveInteger(name, defaultValue) {
   if (Number.isInteger(value) && value > 0) return value;
 
   throw new Error(`${name} must be a positive integer.`);
+}
+
+function readBoolean(name, defaultValue) {
+  const rawValue = process.env[name];
+  if (!rawValue) return defaultValue;
+
+  const value = rawValue.trim().toLowerCase();
+  if (['1', 'true', 'yes'].includes(value)) return true;
+  if (['0', 'false', 'no'].includes(value)) return false;
+
+  throw new Error(`${name} must be true or false.`);
 }
 
 function delay(ms) {
