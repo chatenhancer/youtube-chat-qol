@@ -11,7 +11,7 @@ export async function expectCurrentTabActionReportsConnectedStatus(
   await sourcePage.bringToFront();
 
   await expect.poll(async () => {
-    const status = await getCurrentTabActionStatus(context);
+    const status = await getCurrentTabActionStatus(context, sourcePage.url());
     return status.attached && /^Chat Enhancer for YouTube is active/i.test(status.title);
   }, {
     message: 'Expected the current YouTube tab to have an active extension action status.',
@@ -19,14 +19,35 @@ export async function expectCurrentTabActionReportsConnectedStatus(
   }).toBe(true);
 }
 
-async function getCurrentTabActionStatus(context: BrowserContext): Promise<{
+async function getCurrentTabActionStatus(
+  context: BrowserContext,
+  sourcePageUrl: string
+): Promise<{
   attached: boolean;
   title: string;
 }> {
   const serviceWorker = await getExtensionServiceWorker(context);
-  return serviceWorker.evaluate(() => new Promise((resolve) => {
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      const tabId = tabs[0]?.id;
+  return serviceWorker.evaluate((targetUrl) => new Promise((resolve) => {
+    const normalizeTabUrl = (value: string | undefined): string => {
+      if (!value) return '';
+      try {
+        const url = new URL(value);
+        url.hash = '';
+        url.searchParams.delete('reload');
+        url.searchParams.sort();
+        return url.toString();
+      } catch {
+        return '';
+      }
+    };
+
+    chrome.tabs.query({}, (tabs) => {
+      const normalizedTargetUrl = normalizeTabUrl(targetUrl);
+      const matchingTab = tabs.find((tab) => {
+        return typeof tab.id === 'number' &&
+          normalizeTabUrl(tab.url || tab.pendingUrl) === normalizedTargetUrl;
+      }) || tabs.find((tab) => tab.active);
+      const tabId = matchingTab?.id;
       if (typeof tabId !== 'number') {
         resolve({ attached: false, title: '' });
         return;
@@ -41,5 +62,5 @@ async function getCurrentTabActionStatus(context: BrowserContext): Promise<{
         });
       });
     });
-  }));
+  }), sourcePageUrl);
 }

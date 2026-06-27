@@ -10,7 +10,10 @@ import {
   getChatComposerText
 } from '../support/composer';
 import { closeFocusPromptIfPresent } from '../support/focus-panel';
-import { centerLocatorInViewport } from '../support/locator';
+import {
+  centerLocatorInViewport,
+  clickLocatorAtCurrentCenter
+} from '../support/locator';
 import { cleanVisibleText } from '../support/text';
 import {
   NORMAL_CHAT_MESSAGE_SELECTOR,
@@ -87,8 +90,7 @@ async function expectMentionMenuActionInsertsDraft(chat: ChatSurface): Promise<v
   const { menu, authorName } = await openMessageMenu(chat);
   const mentionAction = menu.locator('.ytcq-context-split-button[data-ytcq-action="mention"]').first();
   await test.step('Click injected Mention action', async () => {
-    await expect(mentionAction).toBeVisible({ timeout: 10_000 });
-    await mentionAction.click();
+    await clickVisibleActionAtCurrentCenter(mentionAction);
   });
 
   await test.step('Verify composer contains mention draft', async () => {
@@ -109,8 +111,7 @@ async function expectQuoteMenuActionInsertsDraft(chat: ChatSurface): Promise<voi
 
   await test.step('Click injected Quote action', async () => {
     const quoteAction = menu.locator('.ytcq-context-split-button[data-ytcq-action="quote"]').first();
-    await expect(quoteAction).toBeVisible({ timeout: 10_000 });
-    await quoteAction.click();
+    await clickVisibleActionAtCurrentCenter(quoteAction);
   });
 
   await test.step('Verify composer contains quote draft', async () => {
@@ -129,6 +130,12 @@ async function clearComposerForAction(chat: ChatSurface, stepName: string): Prom
   await test.step(stepName, async () => {
     await clearChatComposer(chat);
   });
+}
+
+async function clickVisibleActionAtCurrentCenter(action: Locator): Promise<void> {
+  await expect(action).toBeVisible({ timeout: 10_000 });
+  if (await clickLocatorAtCurrentCenter(action)) return;
+  await action.click({ timeout: 2_000 });
 }
 
 async function getLatestClickableAuthor(chat: ChatSurface): Promise<{

@@ -32,6 +32,15 @@ const TOGGLE_TRANSLATED_TEXT = 'Browser translated toggle result';
 
 type TranslationDisplayMode = 'below' | 'replace';
 
+interface RealReplacedTranslationCandidate {
+  messageId: string;
+  sourceText: string;
+  sourceVisibleText: string;
+  translatedText: string;
+  translatedVisibleText: string;
+  translatedTitle: string;
+}
+
 export const mockedMessageTranslationScenario: BrowserScenario = async ({ chat, context }) => {
   await waitForSourceChatMessage(chat);
   await expectMockedIncomingTranslation({ chat, context });
@@ -291,15 +300,7 @@ async function findRealReplacedTranslation(
 }> {
   return test.step('Find a real replaced translation with original-text metadata', async () => {
     const messages = chat.locator(`${NORMAL_CHAT_MESSAGE_SELECTOR}.ytcq-translation-replaced`);
-    await expect.poll(async () => findRealReplacedTranslationCandidate(messages, targetLanguage), {
-      message: 'Real Google Translate should replace at least one visible chat message.',
-      timeout: 30_000
-    }).not.toBeNull();
-
-    const candidate = await findRealReplacedTranslationCandidate(messages, targetLanguage);
-    if (!candidate) {
-      throw new Error('Could not refind the selected real replaced translation.');
-    }
+    const candidate = await waitForRealReplacedTranslationCandidate(messages, targetLanguage);
 
     const host = chat.locator(
       `${NORMAL_CHAT_MESSAGE_SELECTOR}[id="${escapeCssAttributeValue(candidate.messageId)}"]`
@@ -322,17 +323,25 @@ async function findRealReplacedTranslation(
   });
 }
 
+async function waitForRealReplacedTranslationCandidate(
+  messages: Locator,
+  targetLanguage: string
+): Promise<RealReplacedTranslationCandidate> {
+  const deadline = Date.now() + 30_000;
+
+  while (Date.now() < deadline) {
+    const candidate = await findRealReplacedTranslationCandidate(messages, targetLanguage);
+    if (candidate) return candidate;
+    await messages.page().waitForTimeout(250);
+  }
+
+  throw new Error('Real Google Translate should replace at least one visible chat message.');
+}
+
 async function findRealReplacedTranslationCandidate(
   messages: Locator,
   targetLanguage: string
-): Promise<{
-  messageId: string;
-  sourceText: string;
-  sourceVisibleText: string;
-  translatedText: string;
-  translatedVisibleText: string;
-  translatedTitle: string;
-} | null> {
+): Promise<RealReplacedTranslationCandidate | null> {
   const count = await messages.count();
 
   for (let index = count - 1; index >= 0; index -= 1) {

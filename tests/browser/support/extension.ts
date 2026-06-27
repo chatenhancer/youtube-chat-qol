@@ -22,17 +22,54 @@ export async function getExtensionId(context: BrowserContext): Promise<string> {
 }
 
 export async function getExtensionServiceWorker(context: BrowserContext): Promise<Worker> {
-  const serviceWorker = context.serviceWorkers().find(isExtensionServiceWorker);
+  const serviceWorker = await findChatEnhancerServiceWorker(context.serviceWorkers());
   if (serviceWorker) return serviceWorker;
 
-  return context.waitForEvent('serviceworker', {
-    predicate: isExtensionServiceWorker,
-    timeout: 15_000
-  });
+  const startedAt = Date.now();
+  let remainingMs = 15_000;
+
+  while (remainingMs > 0) {
+    const candidate = await context.waitForEvent('serviceworker', {
+      predicate: isPossibleExtensionServiceWorker,
+      timeout: remainingMs
+    });
+    if (await isChatEnhancerServiceWorker(candidate)) return candidate;
+    remainingMs = 15_000 - (Date.now() - startedAt);
+  }
+
+  throw new Error('Could not find the Chat Enhancer extension service worker.');
 }
 
-function isExtensionServiceWorker(serviceWorker: Worker): boolean {
-  return serviceWorker.url().startsWith('chrome-extension://');
+async function findChatEnhancerServiceWorker(serviceWorkers: Worker[]): Promise<Worker | null> {
+  for (const serviceWorker of serviceWorkers) {
+    if (await isChatEnhancerServiceWorker(serviceWorker)) return serviceWorker;
+  }
+  return null;
+}
+
+function isPossibleExtensionServiceWorker(serviceWorker: Worker): boolean {
+  return /^chrome-extension:\/\/[^/]+\/background\.js$/u.test(serviceWorker.url());
+}
+
+async function isChatEnhancerServiceWorker(serviceWorker: Worker): Promise<boolean> {
+  if (!isPossibleExtensionServiceWorker(serviceWorker)) return false;
+
+  return serviceWorker.evaluate(() => {
+    const manifest = chrome.runtime.getManifest();
+    const background = manifest.background;
+    const backgroundServiceWorker = background && 'service_worker' in background
+      ? background.service_worker
+      : '';
+    const hasLiveChatContentScript = Boolean(manifest.content_scripts?.some((contentScript) => {
+      return contentScript.matches?.some((matchPattern) => matchPattern.includes('youtube.com/live_chat'));
+    }));
+
+    return manifest.default_locale === 'en' &&
+      manifest.action?.default_popup === 'popup.html' &&
+      backgroundServiceWorker === 'background.js' &&
+      hasLiveChatContentScript &&
+      Boolean(chrome.storage?.local && chrome.storage?.sync);
+  }).catch(() => false);
 }
 
 export async function getInstalledProfileExtensionId(profileDir: string): Promise<string | null> {

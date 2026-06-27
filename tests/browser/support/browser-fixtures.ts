@@ -322,7 +322,6 @@ async function createLoggedInYouTubeSession({
 
   const chrome = await launchNormalChromeExtensionContext({
     headless: shouldRunLiveHeadlessBrowserTest(),
-    initialUrl: url,
     profileDir,
     userAgent: getLiveBrowserUserAgent(shouldRunLiveHeadlessBrowserTest())
   });
