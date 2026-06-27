@@ -66,6 +66,7 @@ await setReleaseType(config, appVersion);
 await setWhatsNew(config, appVersion.id);
 const build = await waitForProcessedBuild(config, app.id);
 await attachBuild(config, appVersion.id, build.id);
+await skipIfAlreadySubmitted(config, appVersion.id);
 await submitAppStoreVersion(config, appVersion.id);
 
 console.log(`Submitted Mac App Store release ${marketingVersion} build ${buildNumber}.`);
@@ -326,13 +327,51 @@ async function submitAppStoreVersion(config, appStoreVersionId) {
     });
     return;
   } catch (error) {
-    if (!(error instanceof AppStoreConnectError) || error.status !== 409) throw error;
+    if (
+      !(error instanceof AppStoreConnectError)
+      || !isAlreadyHasSubmissionError(error)
+    ) {
+      throw error;
+    }
 
     const appVersion = await getAppStoreVersion(config, appStoreVersionId);
     const state = normalizeState(appVersion.attributes?.appStoreState);
-    if (!isAlreadySubmittedState(state)) throw error;
+    if (!isAlreadySubmittedState(state) && !(await hasAppStoreVersionSubmission(
+      config,
+      appStoreVersionId
+    ))) {
+      throw error;
+    }
 
-    console.log(`Mac App Store version ${marketingVersion} is already ${state}.`);
+    console.log(
+      `Mac App Store version ${marketingVersion} already has an App Store submission`
+      + `${state ? ` (${state})` : ''}.`
+    );
+  }
+}
+
+async function skipIfAlreadySubmitted(config, appStoreVersionId) {
+  const appVersion = await getAppStoreVersion(config, appStoreVersionId);
+  const state = normalizeState(appVersion.attributes?.appStoreState);
+  if (!isAlreadySubmittedState(state)) return;
+
+  console.log(
+    `Mac App Store version ${marketingVersion} is already ${state}; skipping submission.`
+  );
+  process.exit(0);
+}
+
+async function hasAppStoreVersionSubmission(config, appStoreVersionId) {
+  try {
+    const payload = await appStoreConnectFetch(
+      config,
+      `/v1/appStoreVersions/${appStoreVersionId}/appStoreVersionSubmission`
+    );
+
+    return Boolean(payload?.data?.id);
+  } catch (error) {
+    if (error instanceof AppStoreConnectError && error.status === 404) return false;
+    throw error;
   }
 }
 
@@ -434,6 +473,19 @@ function isAlreadySubmittedState(state) {
     'WAITING_FOR_EXPORT_COMPLIANCE',
     'WAITING_FOR_REVIEW'
   ].includes(state);
+}
+
+function isAlreadyHasSubmissionError(error) {
+  if (error.status === 409) return true;
+
+  const details = (error.payload?.errors || [])
+    .map((entry) => entry?.detail || '')
+    .join(' ');
+
+  return error.status === 403
+    && details.includes("appStoreVersionSubmissions")
+    && details.includes("does not allow 'CREATE'")
+    && details.includes('Allowed operation is: DELETE');
 }
 
 function normalizeState(state) {
