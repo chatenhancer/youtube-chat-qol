@@ -417,7 +417,6 @@ async function submitReviewSubmissionForReview(config, reviewSubmissionId) {
       id: reviewSubmissionId,
       type: 'reviewSubmissions',
       attributes: {
-        platform,
         submitted: true
       }
     })
