@@ -196,7 +196,7 @@ async function uploadExportedPackage(exportPath, archiveVersions) {
     'altool',
     '--upload-package',
     packagePath,
-    '--platform',
+    '--type',
     'macos',
     '--apple-id',
     appleId,
@@ -206,9 +206,9 @@ async function uploadExportedPackage(exportPath, archiveVersions) {
     archiveVersions.buildNumber,
     '--bundle-short-version-string',
     archiveVersions.marketingVersion,
-    '--api-key',
+    '--apiKey',
     authentication.keyId,
-    '--api-issuer',
+    '--apiIssuer',
     authentication.issuerId,
     '--wait'
   ], {
