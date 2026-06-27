@@ -428,8 +428,7 @@ async function listReadyReviewSubmissions(config, appId) {
     'filter[app]': appId,
     'filter[platform]': platform,
     'filter[state]': 'READY_FOR_REVIEW',
-    include: 'items,appStoreVersionForReview',
-    'limit[items]': 50,
+    include: 'appStoreVersionForReview',
     limit: 20
   });
 
