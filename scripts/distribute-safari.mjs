@@ -8,6 +8,10 @@ import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { loadLocalEnv, requireEnv } from './lib/local-env.mjs';
+import {
+  createSafariExportOptionsPlist,
+  getSafariExportProvisioningArgs
+} from './lib/safari-export-options.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const args = new Set(process.argv.slice(2));
@@ -82,7 +86,7 @@ async function uploadArchive(nextArchivePath, archiveVersions) {
   const exportOptionsPath = path.join(exportPath, 'ExportOptions.plist');
 
   await mkdir(exportPath, { recursive: true });
-  await writeFile(exportOptionsPath, getExportOptionsPlist(), 'utf8');
+  await writeFile(exportOptionsPath, createSafariExportOptionsPlist({ developmentTeam }), 'utf8');
 
   run('xcodebuild', [
     '-exportArchive',
@@ -92,7 +96,7 @@ async function uploadArchive(nextArchivePath, archiveVersions) {
     exportPath,
     '-exportOptionsPlist',
     exportOptionsPath,
-    ...getProvisioningArgs(),
+    ...getSafariExportProvisioningArgs(),
     ...getAuthenticationArgs()
   ]);
 }
@@ -120,32 +124,6 @@ function unquotePbxValue(value) {
   } catch {
     return trimmed.slice(1, -1);
   }
-}
-
-function getExportOptionsPlist() {
-  const values = {
-    destination: 'upload',
-    manageAppVersionAndBuildNumber: false,
-    method: 'app-store-connect',
-    signingStyle: 'automatic',
-    stripSwiftSymbols: true,
-    teamID: developmentTeam,
-    uploadSymbols: true
-  };
-
-  return `<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-${Object.entries(values).map(([key, value]) => `\t<key>${escapeXml(key)}</key>\n${plistValue(value)}`).join('\n')}
-</dict>
-</plist>
-`;
-}
-
-function plistValue(value) {
-  if (typeof value === 'boolean') return `\t<${value ? 'true' : 'false'}/>`;
-  return `\t<string>${escapeXml(value)}</string>`;
 }
 
 function getProvisioningArgs() {
@@ -187,15 +165,6 @@ function sanitizePathPart(value) {
   return String(value).replace(/[^A-Za-z0-9_.-]+/g, '-').replace(/^-|-$/g, '') || 'safari-app';
 }
 
-function escapeXml(value) {
-  return String(value)
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&apos;');
-}
-
 function printUsage() {
   console.log(`
 Usage:
@@ -208,6 +177,12 @@ Environment:
   YTCQ_SAFARI_ARCHIVE_PATH               Optional .xcarchive output path.
   YTCQ_SAFARI_EXPORT_PATH                Optional upload export working directory.
   YTCQ_SAFARI_ALLOW_PROVISIONING_UPDATES Set to 0 to disable Xcode provisioning updates.
+  YTCQ_SAFARI_EXPORT_SIGNING_STYLE       automatic or manual. Defaults to automatic.
+  YTCQ_SAFARI_EXPORT_PROVISIONING_PROFILES
+                                            JSON bundle ID to profile name map for manual export signing.
+  YTCQ_SAFARI_EXPORT_SIGNING_CERTIFICATE Optional manual app signing certificate name.
+  YTCQ_SAFARI_EXPORT_INSTALLER_SIGNING_CERTIFICATE
+                                            Optional manual installer signing certificate name.
   YTCQ_APP_STORE_CONNECT_KEY_PATH        Optional App Store Connect API key .p8 path.
   YTCQ_APP_STORE_CONNECT_KEY_ID          Optional App Store Connect API key ID.
   YTCQ_APP_STORE_CONNECT_ISSUER_ID       Optional App Store Connect issuer ID.
