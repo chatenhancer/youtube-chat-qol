@@ -29,20 +29,22 @@ const walkthroughKeyPoints = [
     </div>
     <div class="walkthrough-video-frame">
       <video class="walkthrough-video" data-walkthrough-video playsinline loop preload="auto" tabindex="0"></video>
-      <aside class="walkthrough-key-points" aria-label={m.features.walkthroughKeyPointsAria}>
+      <aside class="walkthrough-key-points" data-walkthrough-key-points aria-label={m.features.walkthroughKeyPointsAria}>
         <strong>{m.features.walkthroughKeyPointsTitle}</strong>
-        <div class="walkthrough-key-point-list">
-          {walkthroughKeyPoints.map((point) => (
-            <button
-              class="walkthrough-key-point"
-              type="button"
-              data-walkthrough-seek={String(point.seconds)}
-              aria-label={`${point.time} ${point.label}`}
-            >
-              <span class="walkthrough-key-point-time">{point.time}</span>
-              <span class="walkthrough-key-point-label">{point.label}</span>
-            </button>
-          ))}
+        <div class="walkthrough-key-point-list" data-walkthrough-key-point-list>
+          <div class="walkthrough-key-point-track" data-walkthrough-key-point-track>
+            {walkthroughKeyPoints.map((point) => (
+              <button
+                class="walkthrough-key-point"
+                type="button"
+                data-walkthrough-seek={String(point.seconds)}
+                aria-label={`${point.time} ${point.label}`}
+              >
+                <span class="walkthrough-key-point-time">{point.time}</span>
+                <span class="walkthrough-key-point-label">{point.label}</span>
+              </button>
+            ))}
+          </div>
         </div>
       </aside>
       <span class="walkthrough-video-feedback" data-walkthrough-feedback aria-hidden="true">

@@ -857,8 +857,10 @@ h3 {
 }
 
 .walkthrough-key-points strong {
+  position: relative;
   display: block;
   margin: 0 0 5px;
+  padding: 0 13px;
   color: var(--muted);
   font-size: 11px;
   font-weight: 520;
@@ -866,9 +868,55 @@ h3 {
   text-align: center;
 }
 
+.walkthrough-key-points strong::after {
+  --walkthrough-toggle-mark-size: 6px;
+  --walkthrough-toggle-mark-stroke: 0.9px;
+
+  position: absolute;
+  top: 50%;
+  right: 3px;
+  width: var(--walkthrough-toggle-mark-size);
+  height: var(--walkthrough-toggle-mark-size);
+  background:
+    linear-gradient(currentColor 0 0) center / var(--walkthrough-toggle-mark-size) var(--walkthrough-toggle-mark-stroke) no-repeat,
+    linear-gradient(currentColor 0 0) center / var(--walkthrough-toggle-mark-stroke) var(--walkthrough-toggle-mark-size) no-repeat;
+  content: "";
+  opacity: 0.72;
+  transform: translateY(-50%);
+  transition:
+    background-size 180ms ease,
+    opacity 160ms ease;
+}
+
+.walkthrough-key-points:hover strong::after,
+.walkthrough-key-points:focus-within strong::after {
+  background-size:
+    var(--walkthrough-toggle-mark-size) var(--walkthrough-toggle-mark-stroke),
+    var(--walkthrough-toggle-mark-stroke) 0;
+  opacity: 0.9;
+}
+
 .walkthrough-key-point-list {
+  height: var(--walkthrough-visible-list-height, 65px);
+  overflow: hidden;
+  transition: height 180ms ease;
+}
+
+.walkthrough-key-points:hover .walkthrough-key-point-list,
+.walkthrough-key-points:focus-within .walkthrough-key-point-list {
+  height: var(--walkthrough-expanded-list-height, auto);
+}
+
+.walkthrough-key-point-track {
   display: grid;
   gap: 1px;
+  transform: translateY(var(--walkthrough-window-offset, 0));
+  transition: transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.walkthrough-key-points:hover .walkthrough-key-point-track,
+.walkthrough-key-points:focus-within .walkthrough-key-point-track {
+  transform: translateY(0);
 }
 
 .walkthrough-key-point {
@@ -886,6 +934,12 @@ h3 {
   border: 1px solid transparent;
   border-radius: var(--compact-icon-surface-corner-radius);
   font: inherit;
+  opacity: 1;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    opacity 180ms ease;
 }
 
 .walkthrough-key-point:hover,
@@ -893,6 +947,10 @@ h3 {
   color: var(--text);
   background: rgba(246, 247, 249, 0.72);
   border-color: rgba(226, 230, 238, 0.68);
+}
+
+.walkthrough-key-points:not(:hover):not(:focus-within) .walkthrough-key-point:not(.is-active) {
+  opacity: 0.52;
 }
 
 .walkthrough-key-point.is-active {

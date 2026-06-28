@@ -16,6 +16,8 @@
   const walkthroughTime = document.querySelector("[data-walkthrough-time]");
   const walkthroughVideo = document.querySelector("[data-walkthrough-video]");
   const walkthroughVideoFeedback = document.querySelector("[data-walkthrough-feedback]");
+  const walkthroughKeyPointList = document.querySelector("[data-walkthrough-key-point-list]");
+  const walkthroughKeyPointTrack = document.querySelector("[data-walkthrough-key-point-track]");
   const walkthroughSeekButtons = Array.from(document.querySelectorAll("[data-walkthrough-seek]"));
   const walkthroughHash = "#walkthrough";
   const versionBadgeSources = {
@@ -105,6 +107,11 @@
       seekWalkthroughToKeyPoint(button);
     });
   });
+
+  if (walkthroughSeekButtons.length) {
+    window.addEventListener("resize", updateWalkthroughKeyPointViewport);
+    document.fonts?.ready.then(updateWalkthroughKeyPointViewport).catch(() => undefined);
+  }
 
   setupStoreVersionAlertScrollFade();
   void checkStoreVersionStatus();
@@ -768,6 +775,30 @@
         button.removeAttribute("aria-current");
       }
     });
+    updateWalkthroughKeyPointViewport(activeButton);
+  }
+
+  function updateWalkthroughKeyPointViewport(activeButton = document.querySelector(".walkthrough-key-point.is-active")) {
+    if (!(walkthroughKeyPointList instanceof HTMLElement)) return;
+    if (!(walkthroughKeyPointTrack instanceof HTMLElement)) return;
+    if (!(activeButton instanceof HTMLElement)) return;
+
+    const activeIndex = Math.max(0, walkthroughSeekButtons.indexOf(activeButton));
+    const lastIndex = Math.max(0, walkthroughSeekButtons.length - 1);
+    const windowStartIndex = Math.min(Math.max(activeIndex - 1, 0), Math.max(walkthroughSeekButtons.length - 3, 0));
+    const windowEndIndex = Math.min(windowStartIndex + 2, lastIndex);
+    const firstVisibleButton = walkthroughSeekButtons[windowStartIndex];
+    const lastVisibleButton = walkthroughSeekButtons[windowEndIndex];
+
+    if (!(firstVisibleButton instanceof HTMLElement)) return;
+    if (!(lastVisibleButton instanceof HTMLElement)) return;
+
+    const windowOffset = firstVisibleButton.offsetTop;
+    const windowHeight = lastVisibleButton.offsetTop + lastVisibleButton.offsetHeight - windowOffset;
+
+    walkthroughKeyPointList.style.setProperty("--walkthrough-window-offset", `${-windowOffset}px`);
+    walkthroughKeyPointList.style.setProperty("--walkthrough-visible-list-height", `${windowHeight}px`);
+    walkthroughKeyPointList.style.setProperty("--walkthrough-expanded-list-height", `${walkthroughKeyPointTrack.scrollHeight}px`);
   }
 
   function formatWalkthroughTime(value) {
