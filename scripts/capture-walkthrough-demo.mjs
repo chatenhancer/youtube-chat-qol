@@ -27,6 +27,10 @@ const demoCursorDir = path.join(repoRoot, 'assets', 'demo', 'cursors');
 const demoAudioDir = path.join(repoRoot, 'assets', 'demo', 'audio');
 const logoPath = path.join(repoRoot, 'src', 'assets', 'icons', 'icon.svg');
 const avatarLogoPath = path.join(repoRoot, 'src', 'assets', 'icons', 'icon-128.png');
+const docsFontDir = path.join(repoRoot, 'docs', 'public', 'assets', 'fonts');
+const interFontPath = path.join(docsFontDir, 'InterVariable.woff2');
+const interDisplayBoldFontPath = path.join(docsFontDir, 'InterDisplay-Bold.woff2');
+const interDisplayExtraBoldFontPath = path.join(docsFontDir, 'InterDisplay-ExtraBold.woff2');
 const pointerCursorPath = path.join(demoCursorDir, 'pointer.svg');
 const handCursorPath = path.join(demoCursorDir, 'hand.svg');
 const cameraSwooshPath = path.join(demoAudioDir, 'swoosh.mp3');
@@ -62,6 +66,7 @@ const viewport = { width: 1280, height: 720 };
 const cursorHotspot = { x: 16, y: 12 };
 const defaultDemoCursorPosition = { x: 28, y: 36 };
 let demoCursorPosition = { ...defaultDemoCursorPosition };
+let demoDocsFontFaceCssPromise = null;
 const normalChatMessageSelector = 'yt-live-chat-text-message-renderer';
 const demoChatMessageSelector = `${normalChatMessageSelector}.ytcq-demo-message`;
 const menuPopupSelector = 'ytd-menu-popup-renderer';
@@ -290,7 +295,9 @@ async function sectionTranslateChat(page, chat, context, recorder) {
   await closeNativeMenus(chat);
   await recorder.refreshCaptureSource();
 
-  await waitForDemoMessageTranslation(chat, 'translate-2');
+  await waitForDemoMessageTranslation(chat, 'translate-2', {
+    timeout: 900
+  });
   await recorder.refreshCaptureSource();
   await recorder.hold(500);
   await showDemoCaptionFor(
@@ -302,6 +309,10 @@ async function sectionTranslateChat(page, chat, context, recorder) {
   );
 
   await setExtensionStorage(context, 'sync', { translationDisplay: 'replace' });
+  await waitForDemoMessageTranslation(chat, 'translate-2', {
+    display: 'replace',
+    timeout: 900
+  });
   await recorder.refreshCaptureSource();
   await recorder.hold(800);
   await showDemoCaptionFor(
@@ -334,26 +345,66 @@ async function openChatSettingsMenu(page, chat, recorder, settingsButton, firstC
       await keepMenuWithinFrameViewport(menu);
       return menu;
     }
+
+    await clickChatSettingsButtonDirectly(settingsButton);
+    const fallbackMenu = await findVisibleMenu(chat, markerSelector).catch(() => null);
+    if (fallbackMenu) {
+      await keepMenuWithinFrameViewport(fallbackMenu);
+      return fallbackMenu;
+    }
   }
 
   throw new Error('Timed out waiting for chat settings menu.');
 }
 
+async function clickChatSettingsButtonDirectly(settingsButton) {
+  await settingsButton.evaluate((element) => {
+    if (!(element instanceof HTMLElement)) return;
+    const target = element.matches('button, yt-icon-button')
+      ? element
+      : element.querySelector('button, yt-icon-button') || element;
+    if (!(target instanceof HTMLElement)) return;
+    const eventOptions = {
+      bubbles: true,
+      button: 0,
+      buttons: 1,
+      cancelable: true,
+      composed: true,
+      pointerId: 1,
+      pointerType: 'mouse'
+    };
+    target.dispatchEvent(new PointerEvent('pointerdown', eventOptions));
+    target.dispatchEvent(new MouseEvent('mousedown', eventOptions));
+    target.dispatchEvent(new PointerEvent('pointerup', { ...eventOptions, buttons: 0 }));
+    target.dispatchEvent(new MouseEvent('mouseup', { ...eventOptions, buttons: 0 }));
+    target.click();
+  }).catch(() => undefined);
+}
+
 async function sectionComposerTranslation(page, chat, recorder) {
   const button = chat.locator('.ytcq-composer-translate-button').first();
+  const composer = chat.locator('yt-live-chat-message-input-renderer').first();
   await button.waitFor({ state: 'visible', timeout: 20_000 });
   await focusComposerArea(page, chat, recorder, { showFocus: false });
+  const composerBox = await getLocatorBox(composer, 'chat composer');
   await openComposerTranslationPanel(page, chat, recorder, button, {
     afterFocusHoldMs: 240,
     beforeFocusHoldMs: 560,
     caption: {
       title: 'Translate what you type',
-      body: 'Pick a language, write normally, and the draft is translated before sending.'
+      body: 'Pick a language, write normally, and the draft is translated before sending.',
+      anchorBox: composerBox,
+      options: {
+        placement: 'above',
+        verticalGap: 28
+      }
     }
   });
 
   await selectComposerLanguage(chat, 'ja');
-  await recorder.hold(800);
+  await recorder.hold(520);
+  await hideDemoCaption(page);
+  await recorder.hold(280);
   await clearChatComposer(chat);
   await typeIntoComposerHuman(chat, recorder, 'Thanks for the stream @ChatDemo ✅');
   await waitForComposerTextToChange(chat, 'Thanks for the stream @ChatDemo ✅');
@@ -362,7 +413,7 @@ async function sectionComposerTranslation(page, chat, recorder) {
     recorder,
     'Mentions and emojis stay intact',
     'The draft translator protects the pieces YouTube chat needs to keep untouched.',
-    { anchorLocator: chat.locator('yt-live-chat-message-input-renderer').first() }
+    { anchorLocator: composer }
   );
   await selectComposerLanguage(chat, '', { allowHidden: true });
   await recorder.hold(300);
@@ -574,10 +625,10 @@ async function sectionMarkedUsers(page, chat, context, recorder) {
 
 async function sectionEmojiAndCommands(page, chat, recorder) {
   await focusComposerArea(page, chat, recorder, { showFocus: false });
-  const emojiButtonIcon = chat.locator('#emoji-picker-button yt-live-chat-icon-toggle-button-renderer#emoji button svg').first();
-  await emojiButtonIcon.waitFor({ state: 'visible', timeout: 10_000 });
+  const emojiButton = chat.locator('#emoji-picker-button yt-live-chat-icon-toggle-button-renderer#emoji button').first();
+  await emojiButton.waitFor({ state: 'visible', timeout: 10_000 });
   await prepareDemoEmojiPicker(chat);
-  await clickWithCursor(page, emojiButtonIcon, recorder, 'emoji picker button', {
+  await clickWithCursor(page, emojiButton, recorder, 'emoji picker button', {
     afterFocusHoldMs: 240,
     beforeFocusHoldMs: 360,
     caption: {
@@ -588,7 +639,7 @@ async function sectionEmojiAndCommands(page, chat, recorder) {
   const picker = chat.locator('yt-emoji-picker-renderer').first();
   await picker.waitFor({ state: 'attached', timeout: 10_000 });
   await scrubDemoEmojiPicker(chat);
-  await picker.waitFor({ state: 'visible', timeout: 10_000 });
+  await ensureDemoEmojiPickerVisible(chat, emojiButton);
   await showDemoCaptionFor(
     page,
     recorder,
@@ -631,6 +682,7 @@ async function sectionEmojiAndCommands(page, chat, recorder) {
     { anchorLocator: chat.locator('yt-live-chat-message-input-renderer').first() }
   );
   await clearChatComposer(chat);
+  await closeEmojiPickerIfPresent(chat, recorder);
 }
 
 async function sectionPopupStatus(page, context, recorder) {
@@ -1070,11 +1122,23 @@ async function showComposerDraftResult(page, chat, recorder, durationMs, options
   await recorder.hold(160);
 }
 
-async function waitForDemoMessageTranslation(chat, messageKey) {
-  await getFirstVisibleLocator(
-    chat.locator(`${demoChatMessageSelector}[data-ytcq-demo-key="${messageKey}"] .ytcq-translation`),
-    40_000
-  );
+async function waitForDemoMessageTranslation(chat, messageKey, { display = 'below', timeout = 8_000 } = {}) {
+  const selector = display === 'replace'
+    ? `${demoChatMessageSelector}[data-ytcq-demo-key="${messageKey}"].ytcq-translation-replaced[data-ytcq-translation-view="translated"] #message`
+    : `${demoChatMessageSelector}[data-ytcq-demo-key="${messageKey}"] .ytcq-translation`;
+  const locator = chat.locator(selector);
+  try {
+    await getFirstVisibleLocator(locator, timeout);
+    return;
+  } catch (error) {
+    const rendered = await chat.locator('body').evaluate((body, [key, nextDisplay]) => {
+      void body;
+      return Boolean(window.__ytcqDemoRenderTranslation?.(key, nextDisplay));
+    }, [messageKey, display]).catch(() => false);
+    if (!rendered) throw error;
+  }
+
+  await getFirstVisibleLocator(locator, 5_000);
 }
 
 async function stabilizeDemoChatFeed(chat) {
@@ -1185,19 +1249,64 @@ async function clearChatComposer(chat) {
 
 async function closeEmojiPickerIfPresent(chat, recorder) {
   const picker = chat.locator('yt-emoji-picker-renderer').first();
-  if (!await picker.isVisible({ timeout: 500 }).catch(() => false)) return;
-  await chat.locator('body').press('Escape').catch(() => undefined);
-  await recorder.hold(180);
-  if (await picker.isVisible({ timeout: 500 }).catch(() => false)) {
-    await chat.locator('#emoji-picker-button yt-live-chat-icon-toggle-button-renderer#emoji button').first()
-      .click({ timeout: 2_000 })
-      .catch(() => undefined);
-    await recorder.hold(240);
+  const hadPicker = await picker.count() > 0;
+  if (hadPicker && await picker.isVisible({ timeout: 500 }).catch(() => false)) {
+    await chat.locator('body').press('Escape').catch(() => undefined);
+    await recorder.hold(180);
+    if (await picker.isVisible({ timeout: 500 }).catch(() => false)) {
+      await chat.locator('#emoji-picker-button yt-live-chat-icon-toggle-button-renderer#emoji button').first()
+        .click({ timeout: 2_000 })
+        .catch(() => undefined);
+      await recorder.hold(240);
+    }
   }
-  if (await picker.isVisible({ timeout: 500 }).catch(() => false)) {
-    await picker.evaluate((element) => element.remove()).catch(() => undefined);
-    await recorder.hold(120);
-  }
+  const removedCount = await removeDemoEmojiOverlays(chat);
+  if (hadPicker || removedCount) await recorder.hold(120);
+}
+
+async function removeDemoEmojiOverlays(chat) {
+  return chat.locator('body').evaluate(() => {
+    let removedCount = 0;
+    const persistentChatControlSelector = [
+      'yt-live-chat-message-input-renderer',
+      'yt-live-chat-viewer-engagement-message-input-renderer',
+      'yt-reaction-control-panel-view-model',
+      'yt-reaction-control-panel-renderer',
+      'yt-live-chat-reaction-control-panel-renderer',
+      'yt-live-chat-reaction-button-renderer',
+      '#emoji-picker-button',
+      '#input-buttons',
+      '#button-panel'
+    ].join(',');
+    const removeElement = (element) => {
+      if (!(element instanceof HTMLElement) || !element.isConnected) return;
+      element.remove();
+      removedCount += 1;
+    };
+
+    document.querySelectorAll('yt-emoji-picker-renderer').forEach(removeElement);
+    document.querySelectorAll('*').forEach((element) => {
+      if (!(element instanceof HTMLElement) || !element.isConnected) return;
+      if (element.matches(persistentChatControlSelector) || element.closest(persistentChatControlSelector)) return;
+      const identity = [
+        element.localName,
+        element.id,
+        typeof element.className === 'string' ? element.className : ''
+      ].join(' ');
+      const text = (element.textContent || '').trim();
+      const isFloatingReaction = /^(❤️|💙|😂|😁|🎉|😮|💯)+$/u.test(text);
+      if (!/(emoji|reaction)/i.test(identity) && !isFloatingReaction) return;
+      const style = getComputedStyle(element);
+      if (!['absolute', 'fixed'].includes(style.position)) return;
+      const rect = element.getBoundingClientRect();
+      const isFloatingPanel = rect.width > 0 &&
+        rect.height > 0 &&
+        rect.right > window.innerWidth * 0.75 &&
+        rect.bottom > window.innerHeight * 0.45;
+      if (isFloatingPanel) removeElement(element);
+    });
+    return removedCount;
+  }).catch(() => 0);
 }
 
 async function waitForExtensionToastToClear(chat, recorder) {
@@ -1221,6 +1330,34 @@ async function prepareDemoEmojiPicker(chat) {
     `;
     document.head.append(style);
   });
+}
+
+async function ensureDemoEmojiPickerVisible(chat, emojiButton) {
+  const picker = chat.locator('yt-emoji-picker-renderer').first();
+  if (await picker.isVisible({ timeout: 1_500 }).catch(() => false)) return;
+
+  await emojiButton.evaluate((element) => {
+    if (!(element instanceof HTMLElement)) return;
+    element.click();
+  }).catch(() => undefined);
+  if (await picker.isVisible({ timeout: 1_500 }).catch(() => false)) return;
+
+  await picker.evaluate((element) => {
+    if (!(element instanceof HTMLElement)) return;
+    let current = element;
+    for (let depth = 0; current instanceof HTMLElement && depth < 4; depth += 1) {
+      current.hidden = false;
+      current.removeAttribute('hidden');
+      current.style.opacity = '1';
+      current.style.pointerEvents = 'auto';
+      current.style.visibility = 'visible';
+      if (current === element || getComputedStyle(current).display === 'none') {
+        current.style.display = 'block';
+      }
+      current = current.parentElement;
+    }
+  });
+  await picker.waitFor({ state: 'visible', timeout: 2_000 });
 }
 
 async function scrubDemoEmojiPicker(chat) {
@@ -1974,11 +2111,49 @@ async function setDemoViewport(page, size) {
 async function installWatchPageBranding(page) {
   const logoSrc = await readFileDataUrl(logoPath, 'image/svg+xml');
   const avatarLogoSrc = await readFileDataUrl(avatarLogoPath, 'image/png');
+  const docsFontFaceCss = await getDemoDocsFontFaceCss();
   await page.addStyleTag({
     content: `
+      ${docsFontFaceCss}
+
       html,
       body {
+        --ytcq-demo-chat-column-width: 400px;
         overflow-x: clip !important;
+      }
+
+      ytd-watch-flexy,
+      ytd-watch-flexy[flexy] {
+        --ytd-watch-flexy-sidebar-min-width: var(--ytcq-demo-chat-column-width) !important;
+        --ytd-watch-flexy-sidebar-width: var(--ytcq-demo-chat-column-width) !important;
+      }
+
+      ytd-watch-flexy[flexy] #columns.ytd-watch-flexy {
+        column-gap: 20px !important;
+        gap: 20px !important;
+      }
+
+      ytd-watch-flexy[flexy] #primary.ytd-watch-flexy {
+        flex: 1 1 auto !important;
+        max-width: calc(100% - var(--ytcq-demo-chat-column-width) - 20px) !important;
+        min-width: 0 !important;
+      }
+
+      ytd-watch-flexy[flexy] #secondary.ytd-watch-flexy {
+        flex: 0 0 var(--ytcq-demo-chat-column-width) !important;
+        max-width: var(--ytcq-demo-chat-column-width) !important;
+        min-width: var(--ytcq-demo-chat-column-width) !important;
+        width: var(--ytcq-demo-chat-column-width) !important;
+      }
+
+      ytd-watch-flexy[flexy] #secondary-inner.ytd-watch-flexy,
+      ytd-watch-flexy[flexy] #chat-container.ytd-watch-flexy,
+      ytd-watch-flexy[flexy] ytd-live-chat-frame#chat,
+      ytd-watch-flexy[flexy] iframe#chatframe {
+        flex: 0 0 auto !important;
+        max-width: none !important;
+        min-width: 0 !important;
+        width: 100% !important;
       }
 
       .ytcq-demo-video-cover {
@@ -1986,15 +2161,21 @@ async function installWatchPageBranding(page) {
         background: #fff;
         border-radius: inherit;
         box-sizing: border-box;
-        color: #0f0f0f;
+        color: #17191f;
         display: flex;
         flex-direction: column;
-        font-family: Roboto, "YouTube Sans", Arial, sans-serif;
+        font-family: "Inter", sans-serif;
+        font-kerning: normal;
+        font-synthesis-weight: none;
         inset: 0;
         justify-content: center;
+        letter-spacing: 0;
         overflow: hidden;
+        padding: 48px;
         pointer-events: none;
         position: absolute;
+        text-align: center;
+        text-rendering: optimizeLegibility;
         z-index: 2000;
       }
 
@@ -2010,21 +2191,24 @@ async function installWatchPageBranding(page) {
 
       .ytcq-demo-video-cover img {
         height: 88px;
-        margin-bottom: 22px;
+        margin-bottom: 24px;
         object-fit: contain;
         width: 88px;
       }
 
       .ytcq-demo-video-cover strong {
-        font-size: 38px;
-        font-weight: 700;
-        letter-spacing: 0;
-        line-height: 1.1;
+        font-family: "Inter Display", "Inter", sans-serif;
+        font-size: 42px;
+        font-weight: 750;
+        letter-spacing: -1px;
+        line-height: 0.98;
       }
 
       .ytcq-demo-video-cover span {
-        color: #606060;
+        color: #626b7a;
         font-size: 18px;
+        letter-spacing: 0;
+        line-height: 1.55;
         margin-top: 12px;
       }
 
@@ -2191,6 +2375,7 @@ async function installLiveChatMask(chat) {
     const authorMap = new Map();
 
     const cleanText = (value) => String(value || '').replace(/\s+/g, ' ').trim();
+    const translateIconPath = 'M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0014.07 6H17V4h-7V2H8v2H1v2h11.17a15.7 15.7 0 01-2.86 4.63A15.07 15.07 0 017.22 7H5.2a17.2 17.2 0 002.77 5.03l-5.09 5.02L4.3 18.47l5.01-5.01 3.11 3.11.45-1.5ZM18.5 10h-2L12 22h2l1.13-3h4.74L21 22h2l-4.5-12Zm-2.62 7l1.62-4.33L19.12 17h-3.24Z';
 
     const hashString = (value) => {
       let hash = 0;
@@ -2656,6 +2841,7 @@ async function installLiveChatMask(chat) {
       const author = document.createElement('span');
       const body = document.createElement('span');
       content.className = 'ytcq-demo-message-content';
+      content.id = 'content';
       timestamp.id = 'timestamp';
       timestamp.textContent = entry.timestamp || '';
       author.id = 'author-name';
@@ -2769,6 +2955,94 @@ async function installLiveChatMask(chat) {
         shell.style.opacity = '1';
       }, 80);
       return true;
+    };
+
+    const createDemoTranslationIcon = () => {
+      const icon = document.createElement('span');
+      const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      icon.className = 'ytcq-replaced-translation-icon';
+      icon.dataset.ytcqTranslationView = 'translated';
+      icon.title = 'Original message';
+      icon.setAttribute('aria-hidden', 'true');
+      svg.setAttribute('viewBox', '0 0 24 24');
+      svg.setAttribute('focusable', 'false');
+      svg.setAttribute('aria-hidden', 'true');
+      path.setAttribute('d', translateIconPath);
+      path.setAttribute('fill', 'currentColor');
+      svg.append(path);
+      icon.append(svg);
+      return icon;
+    };
+
+    const getDemoTranslationText = (message, messageKey) => {
+      const entry = demoMessages.find((candidate) => candidate.key === messageKey);
+      if (entry?.translation) return entry.translation;
+      const handle = message.dataset.ytcqDemoAuthor || message.querySelector('#author-name')?.textContent || '';
+      return getProfile(handle).translation;
+    };
+
+    const restoreDemoReplacement = (message) => {
+      const body = message.querySelector('#message');
+      if (body instanceof HTMLElement && message.dataset.ytcqDemoOriginalText) {
+        body.textContent = message.dataset.ytcqDemoOriginalText;
+      }
+      body?.classList.remove('ytcq-translation-replaced-text');
+      body?.removeAttribute('lang');
+      body?.removeAttribute('title');
+      message.classList.remove('ytcq-translation-replaced');
+      delete message.dataset.ytcqReplacedTranslation;
+      delete message.dataset.ytcqTranslationView;
+      delete message.dataset.ytcqDemoForcedTranslation;
+    };
+
+    const renderDemoInlineTranslation = (message, translationText, messageKey) => {
+      restoreDemoReplacement(message);
+      const content = message.querySelector('#content') || message.querySelector('.ytcq-demo-message-content') || message;
+      if (!(content instanceof HTMLElement)) return false;
+      message.querySelector(':scope .ytcq-translation')?.remove();
+      const translation = document.createElement('div');
+      const prefix = document.createElement('span');
+      const body = document.createElement('span');
+      translation.className = 'ytcq-translation';
+      translation.lang = 'en';
+      translation.title = 'Translated message';
+      prefix.className = 'ytcq-translation-prefix';
+      prefix.textContent = 'Translated:';
+      body.textContent = translationText;
+      translation.append(prefix, body);
+      content.append(translation);
+      message.dataset.ytcqDemoForcedTranslation = 'below';
+      message.dataset.ytcqTranslationKey = `ytcq-demo:${messageKey}:en`;
+      return true;
+    };
+
+    const renderDemoReplacementTranslation = (message, translationText, messageKey) => {
+      const body = message.querySelector('#message');
+      if (!(body instanceof HTMLElement)) return false;
+      message.querySelector(':scope .ytcq-translation')?.remove();
+      if (!message.dataset.ytcqDemoOriginalText) {
+        message.dataset.ytcqDemoOriginalText = body.textContent || '';
+      }
+      body.replaceChildren(document.createTextNode(translationText), createDemoTranslationIcon());
+      body.classList.add('ytcq-translation-replaced-text');
+      body.lang = 'en';
+      body.title = 'Translated message';
+      message.classList.add('ytcq-translation-replaced');
+      message.dataset.ytcqReplacedTranslation = 'true';
+      message.dataset.ytcqTranslationView = 'translated';
+      message.dataset.ytcqDemoForcedTranslation = 'replace';
+      message.dataset.ytcqTranslationKey = `ytcq-demo:${messageKey}:en`;
+      return true;
+    };
+
+    const renderDemoTranslation = (messageKey, display = 'below') => {
+      const message = document.querySelector(`.ytcq-demo-message[data-ytcq-demo-key="${CSS.escape(messageKey)}"]`);
+      if (!(message instanceof HTMLElement)) return false;
+      const translationText = getDemoTranslationText(message, messageKey);
+      return display === 'replace'
+        ? renderDemoReplacementTranslation(message, translationText, messageKey)
+        : renderDemoInlineTranslation(message, translationText, messageKey);
     };
 
     const installDemoMessages = () => {
@@ -2974,6 +3248,7 @@ async function installLiveChatMask(chat) {
     }, true);
     window.__ytcqDemoOpenMessageMenu = openDemoMessageMenu;
     window.__ytcqDemoCloseMenus = removeDemoMenus;
+    window.__ytcqDemoRenderTranslation = renderDemoTranslation;
     window.__ytcqDemoSetChatScrollTop = setChatScrollTop;
     window.__ytcqDemoStabilizeChat = stabilizeChatFeed;
     maskAll();
@@ -2981,23 +3256,32 @@ async function installLiveChatMask(chat) {
 }
 
 async function installDemoPresentationLayer(page) {
+  const docsFontFaceCss = await getDemoDocsFontFaceCss();
   await page.addStyleTag({
     content: `
+      ${docsFontFaceCss}
+
       .ytcq-demo-caption,
       .ytcq-demo-focus {
-        font-family: Roboto, "YouTube Sans", Arial, sans-serif;
+        font-family: "Inter", sans-serif;
+        font-kerning: normal;
+        font-synthesis-weight: none;
+        letter-spacing: 0;
         pointer-events: none;
         position: fixed;
+        text-rendering: optimizeLegibility;
       }
 
       .ytcq-demo-caption {
-        background: rgba(255, 255, 255, 0.96);
-        border: 1px solid rgba(37, 99, 235, 0.16);
-        border-radius: 16px;
-        box-shadow: 0 18px 48px rgba(15, 23, 42, 0.18);
-        color: #0f172a;
+        background: #fff;
+        border: 1px solid #e2e6ee;
+        border-radius: 8px;
+        box-sizing: border-box;
+        box-shadow: 0 18px 48px rgba(23, 25, 31, 0.14);
+        color: #17191f;
+        line-height: 1.55;
         left: 48px;
-        max-width: 300px;
+        max-width: 320px;
         opacity: 0;
         padding: 16px 18px;
         top: 150px;
@@ -3006,24 +3290,41 @@ async function installDemoPresentationLayer(page) {
         z-index: 2147483620;
       }
 
+      @supports (corner-shape: superellipse(2)) {
+        .ytcq-demo-caption {
+          border-radius: 24px;
+          corner-shape: superellipse(2);
+        }
+      }
+
+      @supports ((corner-shape: squircle) and (not (corner-shape: superellipse(2)))) {
+        .ytcq-demo-caption {
+          border-radius: 24px;
+          corner-shape: squircle;
+        }
+      }
+
       .ytcq-demo-caption.is-visible {
         opacity: 1;
         transform: translateY(0);
       }
 
       .ytcq-demo-caption strong {
+        color: #17191f;
         display: block;
+        font-family: "Inter Display", "Inter", sans-serif;
         font-size: 18px;
         font-weight: 700;
         letter-spacing: 0;
-        line-height: 1.2;
-        margin-bottom: 6px;
+        line-height: 1.25;
+        margin-bottom: 7px;
       }
 
       .ytcq-demo-caption span {
-        color: #526173;
+        color: #626b7a;
         display: block;
         font-size: 14px;
+        letter-spacing: 0;
         line-height: 1.45;
       }
 
@@ -3106,6 +3407,7 @@ async function fadeDemoPopupIn(page, recorder) {
 }
 
 async function fadeDemoPopupOut(page, recorder) {
+  await hideDemoCaption(page);
   await animateDemoPopupOpacity(page, recorder, 1, 0, 420);
 }
 
@@ -3630,7 +3932,13 @@ async function clickWithCursor(page, locator, recorder, label, options = {}) {
     await recorder.hold(options.afterFocusHoldMs);
   }
   if (options.caption) {
-    await setDemoCaption(page, options.caption.title, options.caption.body, box);
+    await setDemoCaption(
+      page,
+      options.caption.title,
+      options.caption.body,
+      options.caption.anchorBox || box,
+      options.caption.options || {}
+    );
     await recorder.hold(260);
     await recorder.holdStill(640);
   }
@@ -3669,7 +3977,7 @@ async function highlightLocator(page, locator, padding = 8) {
 async function showDemoCaptionFor(page, recorder, title, body, options = {}) {
   const box = options.anchorBox ||
     (options.anchorLocator ? await getLocatorBox(options.anchorLocator, title) : null);
-  await setDemoCaption(page, title, body, box);
+  await setDemoCaption(page, title, body, box, options.captionOptions || {});
   if (options.anchorLocator) {
     await setDemoFocusOnLocator(page, options.anchorLocator, options.padding ?? 8);
   } else if (box) {
@@ -3696,18 +4004,20 @@ async function setDemoCaption(page, title, body, anchorBox = null, options = {})
     if (bodyElement) bodyElement.textContent = nextBody;
 
     if (targetBox) {
-      const viewportPadding = 18;
-      const gap = captionOptions?.gap ?? 72;
-      const verticalGap = 22;
+      const viewportPadding = captionOptions?.viewportPadding ?? 18;
+      const gap = captionOptions?.gap ?? 36;
+      const verticalGap = captionOptions?.verticalGap ?? 22;
+      const maxCaptionWidth = captionOptions?.maxWidth ?? 320;
       const captionBox = caption.getBoundingClientRect();
-      const captionWidth = Math.min(captionBox.width || 300, 300);
+      const captionWidth = Math.min(captionBox.width || maxCaptionWidth, maxCaptionWidth);
       const captionHeight = captionBox.height || 104;
       const targetIsLow = targetBox.y + targetBox.height > window.innerHeight * 0.72;
+      const shouldPlaceAbove = placement === 'above' || (placement !== 'side' && targetIsLow);
       const fitsLeft = targetBox.x - captionWidth - gap >= viewportPadding;
       const fitsRight = targetBox.x + targetBox.width + captionWidth + gap <= window.innerWidth - viewportPadding;
       let left;
       let top;
-      if (placement !== 'side' && targetIsLow && targetBox.y - captionHeight - verticalGap >= viewportPadding) {
+      if (shouldPlaceAbove && targetBox.y - captionHeight - verticalGap >= viewportPadding) {
         left = Math.max(
           viewportPadding,
           Math.min(
@@ -3734,8 +4044,9 @@ async function setDemoCaption(page, title, body, anchorBox = null, options = {})
       caption.style.left = `${left}px`;
       caption.style.top = `${top}px`;
     } else {
+      const maxCaptionWidth = captionOptions?.maxWidth ?? 320;
       const captionBox = caption.getBoundingClientRect();
-      const captionWidth = Math.min(captionBox.width || 300, 300);
+      const captionWidth = Math.min(captionBox.width || maxCaptionWidth, maxCaptionWidth);
       const player = document.querySelector('#movie_player');
       const playerBox = player instanceof HTMLElement ? player.getBoundingClientRect() : null;
       const left = playerBox
@@ -4144,6 +4455,48 @@ function shouldRunHeadlessDemo() {
   if (override === '0') return false;
   if (override === '1') return true;
   return true;
+}
+
+async function getDemoDocsFontFaceCss() {
+  demoDocsFontFaceCssPromise ??= (async () => {
+    const [
+      interFontSrc,
+      interDisplayBoldFontSrc,
+      interDisplayExtraBoldFontSrc
+    ] = await Promise.all([
+      readFileDataUrl(interFontPath, 'font/woff2'),
+      readFileDataUrl(interDisplayBoldFontPath, 'font/woff2'),
+      readFileDataUrl(interDisplayExtraBoldFontPath, 'font/woff2')
+    ]);
+
+    return `
+      @font-face {
+        font-family: "Inter";
+        font-style: normal;
+        font-weight: 100 900;
+        font-display: swap;
+        src: url("${interFontSrc}") format("woff2");
+      }
+
+      @font-face {
+        font-family: "Inter Display";
+        font-style: normal;
+        font-weight: 700;
+        font-display: swap;
+        src: url("${interDisplayBoldFontSrc}") format("woff2");
+      }
+
+      @font-face {
+        font-family: "Inter Display";
+        font-style: normal;
+        font-weight: 750 900;
+        font-display: swap;
+        src: url("${interDisplayExtraBoldFontSrc}") format("woff2");
+      }
+    `;
+  })();
+
+  return demoDocsFontFaceCssPromise;
 }
 
 async function readSvgDataUrl(filePath) {
