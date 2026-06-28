@@ -68,6 +68,8 @@
 .button,
 .walkthrough-modal,
 .walkthrough-video-frame,
+.walkthrough-key-points,
+.walkthrough-key-point,
 .section-icon,
 .privacy-icon,
 .feature-grid,
@@ -826,6 +828,101 @@ h3 {
   height: calc(100% + 2px);
   object-fit: cover;
   cursor: pointer;
+}
+
+.walkthrough-key-points {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 2;
+  width: min(190px, calc(100% - 24px));
+  padding: 7px;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.74);
+  border: 1px solid rgba(226, 230, 238, 0.64);
+  border-radius: var(--callout-surface-corner-radius);
+  box-shadow: 0 10px 30px rgba(23, 25, 31, 0.1);
+  backdrop-filter: blur(10px);
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.walkthrough-key-points:hover,
+.walkthrough-key-points:focus-within {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(226, 230, 238, 0.82);
+  box-shadow: 0 14px 34px rgba(23, 25, 31, 0.14);
+}
+
+.walkthrough-key-points strong {
+  display: block;
+  margin: 0 0 5px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 520;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.walkthrough-key-point-list {
+  display: grid;
+  gap: 1px;
+}
+
+.walkthrough-key-point {
+  display: grid;
+  grid-template-columns: 31px minmax(0, 1fr);
+  align-items: center;
+  gap: 5px;
+  width: 100%;
+  min-height: 21px;
+  padding: 2px 4px;
+  color: var(--muted);
+  cursor: pointer;
+  text-align: left;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--compact-icon-surface-corner-radius);
+  font: inherit;
+}
+
+.walkthrough-key-point:hover,
+.walkthrough-key-point:focus {
+  color: var(--text);
+  background: rgba(246, 247, 249, 0.72);
+  border-color: rgba(226, 230, 238, 0.68);
+}
+
+.walkthrough-key-point.is-active {
+  color: var(--text);
+  background: rgba(var(--blue-rgb), 0.055);
+  border-color: rgba(var(--blue-rgb), 0.11);
+}
+
+.walkthrough-key-point-time {
+  color: var(--muted);
+  font-size: 9.5px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 400;
+  line-height: 1;
+}
+
+.walkthrough-key-point.is-active .walkthrough-key-point-time {
+  color: var(--blue);
+}
+
+.walkthrough-key-point.is-active .walkthrough-key-point-label {
+  color: var(--blue);
+}
+
+.walkthrough-key-point-label {
+  min-width: 0;
+  font-size: 10.75px;
+  font-weight: 400;
+  line-height: 1.2;
+  overflow-wrap: break-word;
 }
 
 .walkthrough-video-feedback {
@@ -4065,6 +4162,33 @@ figcaption {
 
   .walkthrough-modal-panel {
     padding: 10px;
+  }
+
+  .walkthrough-key-points {
+    top: 7px;
+    left: 7px;
+    width: min(176px, calc(100% - 14px));
+    padding: 6px;
+  }
+
+  .walkthrough-key-points strong {
+    margin-bottom: 4px;
+    font-size: 10.5px;
+  }
+
+  .walkthrough-key-point {
+    grid-template-columns: 29px minmax(0, 1fr);
+    gap: 4px;
+    min-height: 20px;
+    padding: 2px 4px;
+  }
+
+  .walkthrough-key-point-time {
+    font-size: 9px;
+  }
+
+  .walkthrough-key-point-label {
+    font-size: 10px;
   }
 
   .install-actions {

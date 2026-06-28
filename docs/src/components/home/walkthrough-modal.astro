@@ -2,6 +2,18 @@
 import type { Messages } from '../../data/site';
 
 const { messages: m } = Astro.props as { messages: Messages };
+const walkthroughKeyPoints = [
+  { label: m.features.walkthroughKeyPointTranslation, seconds: 6, time: '0:06' },
+  { label: m.features.walkthroughKeyPointDrafts, seconds: 24, time: '0:24' },
+  { label: m.features.walkthroughKeyPointMentions, seconds: 37, time: '0:37' },
+  { label: m.features.walkthroughKeyPointUserCards, seconds: 59, time: '0:59' },
+  { label: m.features.walkthroughKeyPointFocus, seconds: 67, time: '1:07' },
+  { label: m.features.walkthroughKeyPointInbox, seconds: 75, time: '1:15' },
+  { label: m.features.walkthroughKeyPointBookmarks, seconds: 89, time: '1:29' },
+  { label: m.features.walkthroughKeyPointEmojis, seconds: 102, time: '1:42' },
+  { label: m.features.walkthroughKeyPointCommands, seconds: 115, time: '1:55' },
+  { label: m.features.walkthroughKeyPointPopup, seconds: 124, time: '2:04' }
+];
 ---
 
 <dialog class="walkthrough-modal" data-walkthrough-modal aria-labelledby="walkthrough-modal-title">
@@ -17,6 +29,22 @@ const { messages: m } = Astro.props as { messages: Messages };
     </div>
     <div class="walkthrough-video-frame">
       <video class="walkthrough-video" data-walkthrough-video playsinline loop preload="auto" tabindex="0"></video>
+      <aside class="walkthrough-key-points" aria-label={m.features.walkthroughKeyPointsAria}>
+        <strong>{m.features.walkthroughKeyPointsTitle}</strong>
+        <div class="walkthrough-key-point-list">
+          {walkthroughKeyPoints.map((point) => (
+            <button
+              class="walkthrough-key-point"
+              type="button"
+              data-walkthrough-seek={String(point.seconds)}
+              aria-label={`${point.time} ${point.label}`}
+            >
+              <span class="walkthrough-key-point-time">{point.time}</span>
+              <span class="walkthrough-key-point-label">{point.label}</span>
+            </button>
+          ))}
+        </div>
+      </aside>
       <span class="walkthrough-video-feedback" data-walkthrough-feedback aria-hidden="true">
         <svg class="walkthrough-video-feedback-icon walkthrough-video-feedback-play" viewBox="0 -960 960 960" focusable="false">
           <path d="M320-273v-414q0-17 12-28.5t28-11.5q5 0 10.5 1.5T381-721l326 207q9 6 13.5 15t4.5 19q0 10-4.5 19T707-446L381-239q-5 3-10.5 4.5T360-233q-16 0-28-11.5T320-273Z"></path>

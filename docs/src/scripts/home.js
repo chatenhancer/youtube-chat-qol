@@ -16,6 +16,7 @@
   const walkthroughTime = document.querySelector("[data-walkthrough-time]");
   const walkthroughVideo = document.querySelector("[data-walkthrough-video]");
   const walkthroughVideoFeedback = document.querySelector("[data-walkthrough-feedback]");
+  const walkthroughSeekButtons = Array.from(document.querySelectorAll("[data-walkthrough-seek]"));
   const walkthroughHash = "#walkthrough";
   const versionBadgeSources = {
     release: {
@@ -98,6 +99,12 @@
     walkthroughVideo.addEventListener("loadedmetadata", updateWalkthroughTimeBadge);
     walkthroughVideo.addEventListener("timeupdate", updateWalkthroughTimeBadge);
   }
+
+  walkthroughSeekButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      seekWalkthroughToKeyPoint(button);
+    });
+  });
 
   setupStoreVersionAlertScrollFade();
   void checkStoreVersionStatus();
@@ -595,6 +602,7 @@
 
     walkthroughVideo.currentTime = 0;
     updateWalkthroughTimeBadge();
+    updateWalkthroughKeyPointState();
     hideWalkthroughPlaybackFeedback();
     if (walkthroughModal && typeof walkthroughModal.showModal === "function") {
       if (walkthroughModal.open) {
@@ -670,6 +678,22 @@
     updateWalkthroughTimeBadge();
   }
 
+  function seekWalkthroughToKeyPoint(button) {
+    if (!(button instanceof HTMLElement)) return;
+    if (!(walkthroughVideo instanceof HTMLVideoElement)) return;
+
+    const nextTime = Number(button.dataset.walkthroughSeek);
+    if (!Number.isFinite(nextTime) || nextTime < 0) return;
+
+    const duration = Number.isFinite(walkthroughVideo.duration) ? walkthroughVideo.duration : 0;
+    walkthroughVideo.currentTime = duration
+      ? Math.min(duration, nextTime)
+      : nextTime;
+    updateWalkthroughTimeBadge();
+    startWalkthroughPlayback({ allowMutedFallback: true });
+    walkthroughVideo.focus({ preventScroll: true });
+  }
+
   function toggleWalkthroughPlayback() {
     if (!(walkthroughVideo instanceof HTMLVideoElement)) return;
 
@@ -713,10 +737,37 @@
     if (!(walkthroughTime instanceof HTMLElement)) return;
     if (!(walkthroughVideo instanceof HTMLVideoElement)) {
       walkthroughTime.textContent = "0:00 / 0:00";
+      updateWalkthroughKeyPointState();
       return;
     }
 
     walkthroughTime.textContent = `${formatWalkthroughTime(walkthroughVideo.currentTime)} / ${formatWalkthroughTime(walkthroughVideo.duration)}`;
+    updateWalkthroughKeyPointState();
+  }
+
+  function updateWalkthroughKeyPointState() {
+    if (!walkthroughSeekButtons.length) return;
+
+    const currentTime = walkthroughVideo instanceof HTMLVideoElement && Number.isFinite(walkthroughVideo.currentTime)
+      ? walkthroughVideo.currentTime
+      : 0;
+    const activeButton = walkthroughSeekButtons.reduce((active, button) => {
+      if (!(button instanceof HTMLElement)) return active;
+      const pointTime = Number(button.dataset.walkthroughSeek);
+      if (!Number.isFinite(pointTime)) return active;
+      if (pointTime <= currentTime + 0.75) return button;
+      return active;
+    }, walkthroughSeekButtons[0]);
+
+    walkthroughSeekButtons.forEach((button) => {
+      const isActive = button === activeButton;
+      button.classList.toggle("is-active", isActive);
+      if (isActive) {
+        button.setAttribute("aria-current", "true");
+      } else {
+        button.removeAttribute("aria-current");
+      }
+    });
   }
 
   function formatWalkthroughTime(value) {
