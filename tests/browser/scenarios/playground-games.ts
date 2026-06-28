@@ -334,6 +334,13 @@ export const playgroundStickAroundComputerOverlayScenario: BrowserScenario = asy
       document.head.append(style);
     });
 
+    for (let index = 0; index < 12; index += 1) {
+      await appendMockFixtureMessage(chat, {
+        author: `@StickSetup${index}`,
+        text: `setup stick around message ${index}`
+      });
+    }
+
     const card = await openGamePlayerListFromChat(chat, backend, 'Stick Around!');
     await invitePlayer(card, 'Computer (Stick Around!)');
     const invite = await backend.waitForClientMessage('invite');
@@ -343,7 +350,8 @@ export const playgroundStickAroundComputerOverlayScenario: BrowserScenario = asy
     });
 
     await chat.locator('#item-scroller').evaluate((scroller) => {
-      scroller.scrollTop = scroller.scrollHeight;
+      scroller.scrollTop = 0;
+      scroller.dispatchEvent(new Event('scroll', { bubbles: true }));
     });
     await backend.sendServerMessage({
       game: createBrowserStickAroundGame(),
@@ -353,6 +361,7 @@ export const playgroundStickAroundComputerOverlayScenario: BrowserScenario = asy
     await expect(chat.locator('.ytcq-games-card')).toHaveCount(0);
     const overlay = chat.locator('yt-live-chat-item-list-renderer > .ytcq-stick-around-overlay');
     await expect(overlay).toBeVisible();
+    await expect.poll(() => isChatScrolledToBottom(chat)).toBe(true);
     await expect(overlay).toHaveClass(/ytcq-game-overlay-theme-light/);
     await expect(overlay).toHaveCSS('background-color', 'rgba(255, 255, 255, 0.78)');
     await expect(overlay.locator('.ytcq-game-overlay-header')).toBeVisible();
@@ -370,6 +379,11 @@ export const playgroundStickAroundComputerOverlayScenario: BrowserScenario = asy
     await expect(chat.locator('#item-scroller > .ytcq-stick-around-overlay')).toHaveCount(0);
     await expect(chat.locator('yt-live-chat-header-renderer .ytcq-stick-around-overlay')).toHaveCount(0);
     await expect(chat.locator('#input-panel .ytcq-stick-around-overlay')).toHaveCount(0);
+    await chat.locator('#item-scroller').evaluate((scroller) => {
+      scroller.scrollTop = 0;
+      scroller.dispatchEvent(new Event('scroll', { bubbles: true }));
+    });
+    await expect.poll(() => isChatScrolledToBottom(chat)).toBe(true);
 
     const messageMenuButton = chat.locator('yt-live-chat-text-message-renderer #menu button').first();
     const box = await messageMenuButton.boundingBox();
@@ -989,6 +1003,12 @@ function createBrowserStickAroundGame(overrides: Partial<PublicStickAroundGame> 
     status,
     ...overrides
   };
+}
+
+async function isChatScrolledToBottom(chat: ChatSurface): Promise<boolean> {
+  return chat.locator('#item-scroller').evaluate((scroller) =>
+    scroller.scrollTop + scroller.clientHeight >= scroller.scrollHeight - 2
+  );
 }
 
 function getFixtureMessageTimestampUsec(messageId: string): string {

@@ -7,14 +7,7 @@
  */
 import { registerFeatureLifecycle } from '../content/lifecycle';
 import { LIVE_EDGE_WINDOW_BLURRED_MESSAGE_TYPE } from '../shared/live-edge';
-import { CHAT_SCROLLER_SELECTOR } from '../youtube/selectors';
-
-const JUMP_TO_BOTTOM_SELECTOR = [
-  'yt-live-chat-item-list-renderer #jump-to-bottom-button button',
-  'yt-live-chat-item-list-renderer #jump-to-bottom-button',
-  '#jump-to-bottom-button button',
-  '#jump-to-bottom-button'
-].join(',');
+import { keepChatAtLiveEdge } from '../youtube/chat-scroll';
 
 const LIVE_EDGE_RETRY_DELAYS = [120, 500, 1200];
 
@@ -53,11 +46,6 @@ function handleVisibilityChanged(visibilityState: Document['visibilityState']): 
   scheduleKeepChatAtLiveEdge();
 }
 
-function keepChatAtLiveEdge(): void {
-  clickJumpToBottomButton();
-  scrollChatToBottom();
-}
-
 function scheduleKeepChatAtLiveEdge(): void {
   keepChatAtLiveEdge();
   clearLiveEdgeTimer();
@@ -80,27 +68,8 @@ function scheduleKeepChatAtLiveEdge(): void {
   tick();
 }
 
-function scrollChatToBottom(): void {
-  const scroller = document.querySelector<HTMLElement>(CHAT_SCROLLER_SELECTOR);
-  if (!scroller) return;
-
-  scroller.scrollTop = scroller.scrollHeight;
-  scroller.dispatchEvent(new Event('scroll', { bubbles: true }));
-}
-
-function clickJumpToBottomButton(): void {
-  const button = Array.from(document.querySelectorAll<HTMLElement>(JUMP_TO_BOTTOM_SELECTOR))
-    .find(isVisibleElement);
-  button?.click();
-}
-
 function clearLiveEdgeTimer(): void {
   if (!liveEdgeTimer) return;
   window.clearTimeout(liveEdgeTimer);
   liveEdgeTimer = 0;
-}
-
-function isVisibleElement(element: HTMLElement): boolean {
-  const rect = element.getBoundingClientRect();
-  return rect.width > 0 && rect.height > 0;
 }

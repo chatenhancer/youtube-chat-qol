@@ -78,10 +78,90 @@ describe('Stick Around overlay', () => {
       seq: 121
     }));
   });
+
+  it('keeps the chat scroller pinned to the bottom while open', () => {
+    const frameCallbacks: FrameRequestCallback[] = [];
+    vi.spyOn(window, 'requestAnimationFrame').mockImplementation((callback) => {
+      frameCallbacks.push(callback);
+      return frameCallbacks.length;
+    });
+    vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockImplementation((contextId) => {
+      return contextId === '2d'
+        ? createMockCanvasContext() as CanvasRenderingContext2D
+        : null;
+    });
+
+    const { feed, scroller } = createScrollableChatFeedSurface();
+    const jumpToBottom = createJumpToBottomButton();
+    feed.append(jumpToBottom.wrapper);
+    const scrollEvents: number[] = [];
+    scroller.addEventListener('scroll', () => scrollEvents.push(scroller.scrollTop));
+    document.body.append(feed);
+
+    const opened = openStickAroundOverlay(createStickAroundGame(), 'me-user', vi.fn(), vi.fn(), vi.fn());
+
+    expect(opened).toBe(true);
+    expect(scroller.scrollTop).toBe(800);
+    expect(jumpToBottom.button.click).toHaveBeenCalledOnce();
+    expect(scrollEvents).toEqual([800]);
+
+    scroller.scrollTop = 0;
+    frameCallbacks[0](1_016);
+
+    expect(scroller.scrollTop).toBe(800);
+    expect(jumpToBottom.button.click).toHaveBeenCalledTimes(2);
+    expect(scrollEvents).toEqual([800, 800]);
+  });
 });
 
 function createChatFeedSurface(): HTMLElement {
   return document.createElement('yt-live-chat-item-list-renderer');
+}
+
+function createScrollableChatFeedSurface(): { feed: HTMLElement; scroller: HTMLElement } {
+  const feed = createChatFeedSurface();
+  const scroller = document.createElement('div');
+  scroller.id = 'item-scroller';
+  setElementScrollMetrics(scroller, {
+    clientHeight: 240,
+    scrollHeight: 800
+  });
+  feed.append(scroller);
+  return { feed, scroller };
+}
+
+function createJumpToBottomButton(): { button: HTMLButtonElement; wrapper: HTMLElement } {
+  const wrapper = document.createElement('div');
+  const button = document.createElement('button');
+  wrapper.id = 'jump-to-bottom-button';
+  button.click = vi.fn();
+  button.getBoundingClientRect = () => ({
+    bottom: 20,
+    height: 20,
+    left: 0,
+    right: 20,
+    top: 0,
+    width: 20,
+    x: 0,
+    y: 0,
+    toJSON: () => ({})
+  });
+  wrapper.append(button);
+  return { button, wrapper };
+}
+
+function setElementScrollMetrics(
+  element: HTMLElement,
+  { clientHeight, scrollHeight }: { clientHeight: number; scrollHeight: number }
+): void {
+  Object.defineProperty(element, 'clientHeight', {
+    configurable: true,
+    value: clientHeight
+  });
+  Object.defineProperty(element, 'scrollHeight', {
+    configurable: true,
+    value: scrollHeight
+  });
 }
 
 function createStickAroundGame(overrides: Partial<PublicStickAroundGame> = {}): PublicStickAroundGame {

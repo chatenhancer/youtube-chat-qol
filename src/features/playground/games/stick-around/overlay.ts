@@ -6,9 +6,12 @@ import {
   STICK_AROUND_INPUT_RATE_MS
 } from '../../../../shared/playground/stick-around';
 import {
-  CHAT_MESSAGE_SELECTOR,
-  CHAT_SCROLLER_SELECTOR
+  CHAT_MESSAGE_SELECTOR
 } from '../../../../youtube/selectors';
+import {
+  findChatScroller,
+  keepChatAtLiveEdge
+} from '../../../../youtube/chat-scroll';
 import type { RichTextSegment } from '../../../../youtube/rich-text';
 import type { CloseGamePanel, SendGameAction } from '../adapter';
 import { createGameOverlayShell, type GameOverlayShell } from '../overlay-shell';
@@ -261,6 +264,7 @@ export function openStickAroundOverlay(
     })
   };
   activeStickAroundOverlay = runtime;
+  keepChatAtLiveEdge();
 
   BLOCKED_POINTER_EVENTS.forEach((type) => {
     root.addEventListener(type, blockStickAroundFeedPointerEvent, {
@@ -307,6 +311,7 @@ export function updateStickAroundOverlay(game: PublicStickAroundGame, currentUse
   }
   syncStickAroundAuthoritativeSimulation(runtime, game);
   runtime.traffic.refresh();
+  keepChatAtLiveEdge();
   renderStickAroundOverlay(runtime, getStickAroundServerNow(runtime, receivedAt));
 }
 
@@ -351,6 +356,7 @@ function tickStickAroundOverlay(
   localNow: number
 ): void {
   const serverNow = getStickAroundServerNow(runtime, localNow);
+  keepChatAtLiveEdge();
   resizeStickAroundOverlay(runtime);
   maybeStartRound(runtime, sendGameAction, serverNow);
   if (runtime.game.status === 'active') {
@@ -1333,7 +1339,7 @@ function selectAnimationFrame(
 function findChatFeedSurface(): HTMLElement | null {
   const feedSurface = document.querySelector<HTMLElement>(CHAT_FEED_SURFACE_SELECTOR);
   if (feedSurface) return feedSurface;
-  const scroller = document.querySelector<HTMLElement>(CHAT_SCROLLER_SELECTOR);
+  const scroller = findChatScroller();
   if (scroller) return scroller;
   const message = document.querySelector<HTMLElement>(CHAT_MESSAGE_SELECTOR);
   return message?.closest<HTMLElement>(CHAT_FEED_SURFACE_SELECTOR) || message?.parentElement || null;
