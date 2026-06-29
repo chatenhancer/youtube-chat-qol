@@ -139,6 +139,7 @@ function unquotePbxValue(value) {
 }
 
 function getProvisioningArgs() {
+  if (process.env.YTCQ_SAFARI_EXPORT_SIGNING_STYLE === 'manual') return [];
   return process.env.YTCQ_SAFARI_ALLOW_PROVISIONING_UPDATES === '0'
     ? []
     : ['-allowProvisioningUpdates'];

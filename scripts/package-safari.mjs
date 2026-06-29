@@ -14,6 +14,7 @@ import packageJson from '../package.json' with { type: 'json' };
 import { loadLocalEnv, requireEnv } from './lib/local-env.mjs';
 import {
   readSafariProductBundleIdentifiers,
+  rewriteSafariManualCodeSigningSettings,
   rewriteSafariProductBundleIdentifiers
 } from './lib/safari-xcode-project.mjs';
 
@@ -78,15 +79,47 @@ async function updateXcodeProjectSettings() {
       /(ENABLE_HARDENED_RUNTIME = YES;\n)(?!\s*ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;\n)(?=[\s\S]*?INFOPLIST_FILE = "macOS \(Extension\)\/Info\.plist";)/g,
       '$1\t\t\t\tENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;\n'
     );
-  if (next !== original) await writeFile(projectPath, next);
 
-  const normalized = rewriteSafariProductBundleIdentifiers(next, bundleIdentifier);
+  let normalized = rewriteSafariProductBundleIdentifiers(next, bundleIdentifier);
+  normalized = applyManualCodeSigningSettings(normalized);
   const productBundleIdentifiers = readSafariProductBundleIdentifiers(normalized);
-  if (normalized !== next) await writeFile(projectPath, normalized);
+  if (normalized !== original) await writeFile(projectPath, normalized);
 
   console.log(
     `Configured Safari Xcode bundle identifiers: ${productBundleIdentifiers.join(', ')}.`
   );
+}
+
+function applyManualCodeSigningSettings(project) {
+  const signingStyle = process.env.YTCQ_SAFARI_EXPORT_SIGNING_STYLE;
+  if (signingStyle !== 'manual') return project;
+
+  const signedProject = rewriteSafariManualCodeSigningSettings(project, {
+    bundleIdentifier,
+    developmentTeam,
+    provisioningProfiles: readManualProvisioningProfiles(),
+    signingCertificate: process.env.YTCQ_SAFARI_EXPORT_SIGNING_CERTIFICATE
+      || 'Mac App Distribution'
+  });
+
+  console.log('Configured Safari Xcode manual archive signing.');
+  return signedProject;
+}
+
+function readManualProvisioningProfiles() {
+  const rawProfiles = process.env.YTCQ_SAFARI_EXPORT_PROVISIONING_PROFILES;
+  if (!rawProfiles) {
+    throw new Error(
+      'YTCQ_SAFARI_EXPORT_SIGNING_STYLE=manual requires '
+      + 'YTCQ_SAFARI_EXPORT_PROVISIONING_PROFILES.'
+    );
+  }
+
+  try {
+    return JSON.parse(rawProfiles);
+  } catch {
+    throw new Error('YTCQ_SAFARI_EXPORT_PROVISIONING_PROFILES must be valid JSON.');
+  }
 }
 
 async function updateMacAppInfoPlist() {

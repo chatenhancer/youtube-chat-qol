@@ -3,7 +3,7 @@
  *
  * When the Safari release workflow has distribution certificates and
  * provisioning profiles in secrets, this script imports them into a temporary
- * keychain and configures xcodebuild exportArchive for manual signing. If no
+ * keychain and configures the archive/export steps for manual signing. If no
  * assets are configured, the workflow keeps using Xcode automatic signing.
  */
 import { appendFile, copyFile, mkdir, writeFile } from 'node:fs/promises';
