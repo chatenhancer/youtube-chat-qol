@@ -112,6 +112,38 @@ describe('Stick Around overlay', () => {
     expect(jumpToBottom.button.click).toHaveBeenCalledTimes(2);
     expect(scrollEvents).toEqual([800, 800]);
   });
+
+  it('keeps the ready button hit target clickable through the overlay pointer blocker', () => {
+    vi.spyOn(window, 'requestAnimationFrame').mockImplementation(() => 1);
+    vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockImplementation((contextId) => {
+      return contextId === '2d'
+        ? createMockCanvasContext() as CanvasRenderingContext2D
+        : null;
+    });
+
+    document.body.append(createChatFeedSurface());
+    const sendGameAction = vi.fn();
+    const opened = openStickAroundOverlay(createStickAroundGame({
+      readyPlayers: {
+        guest: true,
+        host: false
+      },
+      status: 'ready'
+    }), 'me-user', sendGameAction, vi.fn(), vi.fn());
+    expect(opened).toBe(true);
+
+    const readyButton = document.querySelector<HTMLButtonElement>('.ytcq-stick-around-ready');
+    expect(readyButton).not.toBeNull();
+
+    const mousedown = new MouseEvent('mousedown', { bubbles: true, cancelable: true });
+    expect(readyButton!.dispatchEvent(mousedown)).toBe(true);
+    expect(mousedown.defaultPrevented).toBe(false);
+
+    const click = new MouseEvent('click', { bubbles: true, cancelable: true });
+    expect(readyButton!.dispatchEvent(click)).toBe(true);
+    expect(click.defaultPrevented).toBe(false);
+    expect(sendGameAction).toHaveBeenCalledWith('game-stick-around', 'ready');
+  });
 });
 
 function createChatFeedSurface(): HTMLElement {

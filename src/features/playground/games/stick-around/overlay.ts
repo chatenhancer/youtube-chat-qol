@@ -52,8 +52,11 @@ const BUBBLE_TEXT_LINE_HEIGHT = 14;
 const BUBBLE_TEXT_MAX_LINES = 4;
 const BUBBLE_EMOJI_SIZE = 13;
 const READY_BUTTON_HEIGHT = 32;
+const READY_BUTTON_HIT_TARGET_PADDING_X = 12;
+const READY_BUTTON_HIT_TARGET_PADDING_Y = 8;
 const READY_BUTTON_WIDTH = 124;
 const CHAT_FEED_SURFACE_SELECTOR = 'yt-live-chat-item-list-renderer';
+const STICK_AROUND_INTERACTIVE_POINTER_TARGET_SELECTOR = '.ytcq-game-overlay-header, .ytcq-stick-around-ready';
 const STICK_AROUND_FONT_STACK = `"${STICK_AROUND_FONT_BYTESIZED}", Arial, sans-serif`;
 const STICK_AROUND_JUMP_SOUND_PATH = 'games/stick-around/jump.mp3';
 const STICK_AROUND_LAND_SOUND_PATH = 'games/stick-around/land.mp3';
@@ -979,10 +982,12 @@ function positionReadyButtonHitTarget(
   viewport: StickAroundCanvasViewport
 ): void {
   const y = getReadyButtonY(logoBottomY);
+  const width = READY_BUTTON_WIDTH + READY_BUTTON_HIT_TARGET_PADDING_X * 2;
+  const height = READY_BUTTON_HEIGHT + READY_BUTTON_HIT_TARGET_PADDING_Y * 2;
   readyButton.style.left = `${Math.round(viewport.offsetX + (simulation.width / 2) * viewport.scale)}px`;
-  readyButton.style.top = `${Math.round(viewport.offsetY + y * viewport.scale)}px`;
-  readyButton.style.width = `${Math.round(READY_BUTTON_WIDTH * viewport.scale)}px`;
-  readyButton.style.height = `${Math.round(READY_BUTTON_HEIGHT * viewport.scale)}px`;
+  readyButton.style.top = `${Math.round(viewport.offsetY + (y - READY_BUTTON_HIT_TARGET_PADDING_Y) * viewport.scale)}px`;
+  readyButton.style.width = `${Math.round(width * viewport.scale)}px`;
+  readyButton.style.height = `${Math.round(height * viewport.scale)}px`;
 }
 
 function getReadyButtonY(logoBottomY: number): number {
@@ -1198,7 +1203,7 @@ function handleStickAroundKey(
 function blockStickAroundFeedPointerEvent(event: Event): void {
   const target = event.target instanceof Element ? event.target : null;
   const isScrollEvent = event.type === 'wheel' || event.type === 'touchmove';
-  if (!isScrollEvent && target?.closest('.ytcq-game-overlay-header')) {
+  if (!isScrollEvent && target?.closest(STICK_AROUND_INTERACTIVE_POINTER_TARGET_SELECTOR)) {
     event.stopPropagation();
     return;
   }

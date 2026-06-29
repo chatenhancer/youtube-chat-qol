@@ -11,6 +11,16 @@
   --ytcq-control-border: rgba(128, 128, 128, 0.42);
 }
 
+:where(button[class^="ytcq-"], button[class*=" ytcq-"]) {
+  -webkit-appearance: none;
+  appearance: none;
+  box-sizing: border-box;
+  margin: 0;
+  font: inherit;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
 ytd-menu-popup-renderer.ytcq-settings-expanded-menu {
   max-height: min(80vh, 360px) !important;
   transform: translateY(var(--ytcq-context-shift-y, 0px));
@@ -551,13 +561,16 @@ yt-live-chat-header-renderer .ytcq-inbox-badge {
   position: absolute;
   top: 4px;
   right: 3px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   min-width: 16px;
   height: 16px;
   padding: 0 4px;
   border-radius: 8px;
   color: #fff;
   background: #c00;
-  font: 500 10px/16px Roboto, Arial, sans-serif;
+  font: 500 10px/12px Roboto, Arial, sans-serif;
   text-align: center;
   box-sizing: border-box;
 }
@@ -1134,17 +1147,20 @@ yt-live-chat-header-renderer .ytcq-inbox-badge[hidden] {
 .ytcq-focus-avatar-fallback {
   color: var(--yt-spec-text-primary, #fff);
   background: var(--yt-spec-call-to-action, #3ea6ff);
-  font: 500 12px/24px Roboto, Arial, sans-serif;
+  font: 500 12px/12px Roboto, Arial, sans-serif;
 }
 
 .ytcq-focus-open {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   min-height: 24px;
   padding: 0 8px;
   border: 0;
   border-radius: 12px;
   color: var(--yt-spec-call-to-action, #3ea6ff);
   background: transparent;
-  font: 500 13px/18px Roboto, Arial, sans-serif;
+  font: 500 13px/16px Roboto, Arial, sans-serif;
   cursor: pointer;
 }
 
@@ -1300,13 +1316,16 @@ yt-live-chat-header-renderer .ytcq-inbox-badge[hidden] {
 }
 
 .ytcq-profile-card-open {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   min-height: 32px;
   padding: 0 12px;
   border: 0;
   border-radius: 16px;
   color: var(--yt-spec-call-to-action, #3ea6ff);
   background: transparent;
-  font: 500 13px/18px Roboto, Arial, sans-serif;
+  font: 500 13px/16px Roboto, Arial, sans-serif;
   cursor: pointer;
 }
 
@@ -1385,6 +1404,7 @@ yt-live-chat-header-renderer .ytcq-inbox-badge[hidden] {
 .ytcq-games-beta-badge {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   flex: 0 0 auto;
   min-height: 13px;
   padding: 0 5px;
@@ -1580,7 +1600,7 @@ yt-live-chat-header-renderer .ytcq-inbox-badge[hidden] {
   border-radius: 12px;
   color: var(--yt-spec-text-primary, var(--yt-live-chat-primary-text-color, #f1f1f1));
   background: rgba(128, 128, 128, 0.18);
-  font: 500 11px/24px Roboto, Arial, sans-serif;
+  font: 500 11px/14px Roboto, Arial, sans-serif;
   cursor: pointer;
 }
 
@@ -1819,11 +1839,10 @@ yt-live-chat-header-renderer .ytcq-inbox-badge[hidden] {
   width: 24px;
   height: 24px;
   box-sizing: border-box;
-  padding-top: 1px;
   border-radius: 50%;
   color: var(--ytcq-games-player-avatar-fg, #fff);
   background: var(--ytcq-games-player-avatar-bg, var(--yt-spec-call-to-action, #3ea6ff));
-  font: 500 12px/1 Roboto, Arial, sans-serif;
+  font: 500 12px/12px Roboto, Arial, sans-serif;
 }
 
 .ytcq-chess-game-panel {
@@ -2048,17 +2067,23 @@ yt-live-chat-header-renderer .ytcq-inbox-badge[hidden] {
 
 .ytcq-stick-around-ready {
   position: absolute;
-  z-index: 2;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   box-sizing: border-box;
   padding: 0;
   border: 0;
   border-radius: 8px;
   color: transparent;
-  background: transparent;
+  background: rgba(0, 0, 0, 0.001);
   cursor: pointer;
-  font: 500 12px/1 Roboto, Arial, sans-serif;
-  opacity: 0;
+  font: 500 12px/12px Roboto, Arial, sans-serif;
+  overflow: hidden;
+  pointer-events: auto;
+  touch-action: manipulation;
   transform: translateX(-50%);
+  -webkit-tap-highlight-color: transparent;
   white-space: nowrap;
 }
 
@@ -2550,7 +2575,7 @@ html:not([dark]) .ytcq-bounty-hunting-claim-indicator {
   height: 12px;
   border-radius: 50%;
   flex: 0 0 auto;
-  font: 500 7px/1 Roboto, Arial, sans-serif;
+  font: 500 7px/7px Roboto, Arial, sans-serif;
 }
 
 .ytcq-bounty-hunting-claim-indicator-amount {
@@ -2683,13 +2708,16 @@ html:not([dark]) .ytcq-bounty-hunting-claim-indicator {
 }
 
 .ytcq-inbox-keyword-add {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   min-height: 32px;
   padding: 0 12px;
   border: 0;
   border-radius: 16px;
   color: var(--yt-spec-call-to-action, #3ea6ff);
   background: transparent;
-  font: 500 13px/18px Roboto, Arial, sans-serif;
+  font: 500 13px/16px Roboto, Arial, sans-serif;
   cursor: pointer;
 }
 
