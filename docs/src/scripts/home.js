@@ -34,8 +34,11 @@
       json: "https://img.shields.io/amo/v/chat-enhancer-for-youtube.json?label=firefox%20add-ons"
     },
     safari: {
-      image: "https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fitunes.apple.com%2Flookup%3Fid%3D6783276323%26country%3Dus&query=%24.results%5B0%5D.version&label=mac%20app%20store&logo=apple",
-      json: "https://img.shields.io/badge/dynamic/json.json?url=https%3A%2F%2Fitunes.apple.com%2Flookup%3Fid%3D6783276323%26country%3Dus&query=%24.results%5B0%5D.version&label=mac%20app%20store"
+      image: "https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fitunes.apple.com%2Flookup%3Fid%3D6783276323%26country%3Dus&query=%24.results%5B0%5D.version&label=mac%20app%20store&logo=apple&cacheSeconds=300",
+      json: "https://img.shields.io/badge/dynamic/json.json?url=https%3A%2F%2Fitunes.apple.com%2Flookup%3Fid%3D6783276323%26country%3Dus&query=%24.results%5B0%5D.version&label=mac%20app%20store&cacheSeconds=300",
+      // Apple's public lookup can lag behind App Store Connect after approval.
+      // Keep the badge informational instead of treating a stale result as pending.
+      showPendingState: false
     }
   };
   const versionBadgeColors = {
@@ -180,7 +183,7 @@
       ["chrome", versions.chrome],
       ["firefox", versions.firefox],
       ["safari", versions.safari]
-    ].filter(([, version]) => version && normalizeVersion(version) !== normalizeVersion(releaseVersion));
+    ].filter(([key, version]) => isPendingStoreVersion(key, releaseVersion, version));
 
     if (!pendingStores.length) return;
 
@@ -823,14 +826,28 @@
 
     for (const key of ["chrome", "firefox", "safari"]) {
       const storeVersion = versions[key];
-      const color = releaseVersion && storeVersion
-        ? normalizeVersion(storeVersion) === normalizeVersion(releaseVersion)
-          ? versionBadgeColors.current
-          : versionBadgeColors.pending
-        : versionBadgeColors.unknown;
+      const color = getStoreVersionBadgeColor(key, releaseVersion, storeVersion);
 
       setVersionBadgeColor(key, color);
     }
+  }
+
+  function getStoreVersionBadgeColor(key, releaseVersion, storeVersion) {
+    if (!releaseVersion || !storeVersion) return versionBadgeColors.unknown;
+    if (normalizeVersion(storeVersion) === normalizeVersion(releaseVersion)) {
+      return versionBadgeColors.current;
+    }
+    return shouldShowPendingState(key) ? versionBadgeColors.pending : versionBadgeColors.unknown;
+  }
+
+  function isPendingStoreVersion(key, releaseVersion, storeVersion) {
+    return shouldShowPendingState(key)
+      && Boolean(storeVersion)
+      && normalizeVersion(storeVersion) !== normalizeVersion(releaseVersion);
+  }
+
+  function shouldShowPendingState(key) {
+    return versionBadgeSources[key]?.showPendingState !== false;
   }
 
   function setVersionBadgeColor(key, color) {
