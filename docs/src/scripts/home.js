@@ -711,7 +711,6 @@
       : nextTime;
     updateWalkthroughTimeBadge();
     startWalkthroughPlayback({ allowMutedFallback: true });
-    setWalkthroughKeyPointPanelOpen(false);
     walkthroughVideo.focus({ preventScroll: true });
   }
 
@@ -828,6 +827,7 @@
 
     walkthroughKeyPointList.style.setProperty("--walkthrough-window-offset", `${-windowOffset}px`);
     walkthroughKeyPointList.style.setProperty("--walkthrough-visible-list-height", `${windowHeight}px`);
+    walkthroughKeyPointList.style.setProperty("--walkthrough-expanded-list-height", `${walkthroughKeyPointTrack.scrollHeight}px`);
   }
 
   function formatWalkthroughTime(value) {
