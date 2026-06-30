@@ -335,7 +335,7 @@ export default [
     ignores: ['coverage/**', 'dist/**', 'node_modules/**']
   },
   {
-    files: ['cloudflare/language-redirect/src/**/*.ts', 'cloudflare/playground/src/**/*.ts', 'src/**/*.ts', 'tests/**/*.ts'],
+    files: ['cloudflare/**/*.ts', 'src/**/*.ts', 'tests/**/*.ts'],
     languageOptions: {
       parser: tseslint.parser,
       parserOptions: {
