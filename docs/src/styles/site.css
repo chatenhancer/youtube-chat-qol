@@ -165,11 +165,20 @@ html {
 }
 
 body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh;
   margin: 0;
   background: var(--background);
   color: var(--text);
   font-family: var(--font-body);
   line-height: 1.55;
+}
+
+body > main {
+  flex: 1 0 auto;
+  min-width: 0;
 }
 
 a {
@@ -2026,17 +2035,27 @@ html[dir="rtl"] .forward-link-icon {
   max-width: 860px;
 }
 
+.privacy-policy-body {
+  min-width: 0;
+  overflow-wrap: break-word;
+}
+
 .privacy-policy-body h1 {
   margin: 0 0 14px;
   font-size: clamp(42px, 6vw, 68px);
   line-height: 1.11;
   letter-spacing: 0;
+  overflow-wrap: anywhere;
 }
 
 .privacy-policy-body > p:first-of-type {
   color: var(--muted);
   font-size: 15px;
   font-weight: 650;
+}
+
+.privacy-policy-body :where(a, code) {
+  overflow-wrap: anywhere;
 }
 
 .support-page {
@@ -4216,14 +4235,21 @@ figcaption {
   }
 
   .feature-walkthrough {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr) auto;
     gap: 12px;
     text-align: left;
   }
 
   .feature-walkthrough-action {
     grid-column: auto;
-    justify-self: start;
+    justify-self: end;
+    width: 56px;
+    height: 42px;
+  }
+
+  .feature-walkthrough-play {
+    width: 52px;
+    height: 39px;
   }
 
   .walkthrough-modal {
