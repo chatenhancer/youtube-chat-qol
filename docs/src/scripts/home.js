@@ -22,7 +22,6 @@
   const walkthroughKeyPointTrack = document.querySelector("[data-walkthrough-key-point-track]");
   const walkthroughSeekButtons = Array.from(document.querySelectorAll("[data-walkthrough-seek]"));
   const walkthroughHash = "#walkthrough";
-  const walkthroughCompactKeyPoints = window.matchMedia("(max-width: 640px)");
   const versionBadgeSources = {
     release: {
       image: "https://img.shields.io/github/v/release/chat-enhancer-yt/youtube-chat-qol?label=release&logo=github",
@@ -87,13 +86,8 @@
   });
 
   walkthroughTimeToggle?.addEventListener("click", (event) => {
-    if (!walkthroughCompactKeyPoints.matches) return;
     event.preventDefault();
     toggleWalkthroughKeyPointPanel();
-  });
-
-  walkthroughCompactKeyPoints.addEventListener("change", () => {
-    setWalkthroughKeyPointPanelOpen(false);
   });
 
   setWalkthroughKeyPointPanelOpen(false);
@@ -728,14 +722,12 @@
   }
 
   function setWalkthroughKeyPointPanelOpen(isOpen) {
-    const isCompact = walkthroughCompactKeyPoints.matches;
-
     if (walkthroughKeyPoints instanceof HTMLElement) {
-      walkthroughKeyPoints.classList.toggle("is-key-points-open", isCompact && isOpen);
+      walkthroughKeyPoints.classList.toggle("is-key-points-open", isOpen);
     }
 
     if (walkthroughTimeToggle instanceof HTMLElement) {
-      walkthroughTimeToggle.setAttribute("aria-expanded", String(!isCompact || isOpen));
+      walkthroughTimeToggle.setAttribute("aria-expanded", String(isOpen));
     }
   }
 
@@ -836,7 +828,6 @@
 
     walkthroughKeyPointList.style.setProperty("--walkthrough-window-offset", `${-windowOffset}px`);
     walkthroughKeyPointList.style.setProperty("--walkthrough-visible-list-height", `${windowHeight}px`);
-    walkthroughKeyPointList.style.setProperty("--walkthrough-expanded-list-height", `${walkthroughKeyPointTrack.scrollHeight}px`);
   }
 
   function formatWalkthroughTime(value) {

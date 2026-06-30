@@ -765,6 +765,11 @@ h3 {
 .walkthrough-modal-panel {
   display: grid;
   position: relative;
+  --walkthrough-control-bg: #fff;
+  --walkthrough-control-border: #dfe6f0;
+  --walkthrough-control-bg-hover: #fff;
+  --walkthrough-control-border-hover: #d7e0ec;
+  --walkthrough-control-color: var(--muted);
 }
 
 .walkthrough-modal-heading {
@@ -783,7 +788,7 @@ h3 {
   max-width: 100%;
   margin: 0;
   padding: 4px 8px;
-  color: var(--muted);
+  color: var(--walkthrough-control-color);
   appearance: none;
   cursor: pointer;
   font: inherit;
@@ -792,21 +797,10 @@ h3 {
   line-height: 1.2;
   background: var(--walkthrough-key-point-bg);
   border: 1px solid var(--walkthrough-key-point-border);
-  border-bottom: 0;
-  border-radius: 6px 6px 0 0;
+  border-radius: 999px;
   box-shadow: none;
   text-align: left;
   white-space: nowrap;
-}
-
-.walkthrough-modal-time::after {
-  position: absolute;
-  right: 1px;
-  bottom: -2px;
-  left: 1px;
-  height: 4px;
-  background: var(--walkthrough-key-point-bg);
-  content: "";
 }
 
 .walkthrough-modal h2 {
@@ -864,10 +858,10 @@ h3 {
 }
 
 .walkthrough-key-points {
-  --walkthrough-key-point-bg: #fff;
-  --walkthrough-key-point-border: #dfe6f0;
-  --walkthrough-key-point-bg-hover: #fff;
-  --walkthrough-key-point-border-hover: #d7e0ec;
+  --walkthrough-key-point-bg: var(--walkthrough-control-bg);
+  --walkthrough-key-point-border: var(--walkthrough-control-border);
+  --walkthrough-key-point-bg-hover: var(--walkthrough-control-bg-hover);
+  --walkthrough-key-point-border-hover: var(--walkthrough-control-border-hover);
 
   position: absolute;
   top: 16px;
@@ -887,21 +881,72 @@ h3 {
 
 .walkthrough-key-point-panel {
   position: relative;
+  visibility: hidden;
   width: 100%;
-  margin-top: -1px;
+  margin-top: 8px;
   padding: 7px;
   background: var(--walkthrough-key-point-bg);
   border: 1px solid var(--walkthrough-key-point-border);
-  border-radius: 0 6px 6px 6px;
+  border-radius: 6px;
   box-shadow: none;
-  overflow: hidden;
+  opacity: 0;
+  overflow: visible;
+  pointer-events: none;
+  transform: translateY(-3px);
+  transition:
+    visibility 0s linear 120ms,
+    opacity 120ms ease,
+    transform 120ms ease,
+    background-color 160ms ease,
+    border-color 160ms ease;
+}
+
+.walkthrough-key-point-panel::before {
+  content: "";
+  position: absolute;
+  top: -5px;
+  left: 38px;
+  width: 9px;
+  height: 9px;
+  background: var(--walkthrough-key-point-bg);
+  border-top: 1px solid var(--walkthrough-key-point-border);
+  border-left: 1px solid var(--walkthrough-key-point-border);
+  transform: translateX(-50%) rotate(45deg);
   transition:
     background-color 160ms ease,
     border-color 160ms ease;
 }
 
+.walkthrough-key-points:not(.is-key-points-open) {
+  width: fit-content;
+}
+
+.walkthrough-key-points:not(.is-key-points-open) .walkthrough-modal-time {
+  border-bottom: 1px solid var(--walkthrough-key-point-border);
+  border-radius: 999px;
+}
+
+.walkthrough-key-points.is-key-points-open .walkthrough-modal-time {
+  border-bottom: 1px solid var(--walkthrough-key-point-border);
+  border-radius: 999px;
+}
+
+.walkthrough-key-points.is-key-points-open .walkthrough-key-point-panel {
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+  transition-delay: 0s;
+}
+
 .walkthrough-key-points:hover .walkthrough-key-point-panel,
 .walkthrough-key-points:focus-within .walkthrough-key-point-panel {
+  background: var(--walkthrough-key-point-bg-hover);
+  border-color: var(--walkthrough-key-point-border-hover);
+}
+
+.walkthrough-key-points:hover .walkthrough-key-point-panel::before,
+.walkthrough-key-points:focus-within .walkthrough-key-point-panel::before {
   background: var(--walkthrough-key-point-bg-hover);
   border-color: var(--walkthrough-key-point-border-hover);
 }
@@ -912,20 +957,12 @@ h3 {
   border-color: var(--walkthrough-key-point-border-hover);
 }
 
-.walkthrough-key-points:hover .walkthrough-modal-time::after,
-.walkthrough-key-points:focus-within .walkthrough-modal-time::after {
-  background: var(--walkthrough-key-point-bg-hover);
-}
-
 .walkthrough-key-point-list {
+  position: relative;
+  z-index: 1;
   height: var(--walkthrough-visible-list-height, 65px);
   overflow: hidden;
   transition: height 180ms ease;
-}
-
-.walkthrough-key-points:hover .walkthrough-key-point-list,
-.walkthrough-key-points:focus-within .walkthrough-key-point-list {
-  height: var(--walkthrough-expanded-list-height, auto);
 }
 
 .walkthrough-key-point-track {
@@ -933,11 +970,6 @@ h3 {
   gap: 1px;
   transform: translateY(var(--walkthrough-window-offset, 0));
   transition: transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-
-.walkthrough-key-points:hover .walkthrough-key-point-track,
-.walkthrough-key-points:focus-within .walkthrough-key-point-track {
-  transform: translateY(0);
 }
 
 .walkthrough-key-point {
@@ -1022,11 +1054,14 @@ h3 {
   position: absolute;
   width: 78px;
   height: 78px;
-  background: rgba(15, 23, 42, 0.66);
-  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.58);
+  border: 1px solid rgba(255, 255, 255, 0.68);
   border-radius: 999px;
-  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.24);
-  backdrop-filter: blur(10px);
+  box-shadow:
+    0 16px 40px rgba(23, 25, 31, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.72);
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
+  backdrop-filter: blur(12px) saturate(150%);
 }
 
 .walkthrough-video-feedback-icon {
@@ -1034,7 +1069,7 @@ h3 {
   display: none;
   width: 42px;
   height: 42px;
-  fill: #fff;
+  fill: #111827;
 }
 
 .walkthrough-video-feedback[data-state="play"] .walkthrough-video-feedback-play,
@@ -4264,6 +4299,11 @@ figcaption {
   .walkthrough-modal-panel {
     position: relative;
     padding: 0;
+    --walkthrough-control-bg: #68707d;
+    --walkthrough-control-border: #8b93a0;
+    --walkthrough-control-bg-hover: #68707d;
+    --walkthrough-control-border-hover: #a1a8b3;
+    --walkthrough-control-color: rgba(255, 255, 255, 0.86);
   }
 
   .walkthrough-modal-heading {
@@ -4289,9 +4329,6 @@ figcaption {
     position: relative;
     margin: 0;
     padding: 6px 8px 4px;
-    color: rgba(255, 255, 255, 0.86);
-    border-bottom: 0;
-    border-radius: 6px 6px 0 0;
     box-shadow: none;
     pointer-events: auto;
   }
@@ -4313,11 +4350,6 @@ figcaption {
   }
 
   .walkthrough-key-points {
-    --walkthrough-key-point-bg: #68707d;
-    --walkthrough-key-point-border: #8b93a0;
-    --walkthrough-key-point-bg-hover: #68707d;
-    --walkthrough-key-point-border-hover: #a1a8b3;
-
     top: 8px;
     right: auto;
     bottom: auto;
@@ -4333,49 +4365,10 @@ figcaption {
   }
 
   .walkthrough-key-point-panel {
-    visibility: hidden;
-    opacity: 0;
-    transform: translateY(-3px);
-    margin-top: -1px;
+    margin-top: 8px;
     padding: 6px;
-    border-radius: 0 6px 6px 6px;
-    box-shadow: none;
-    pointer-events: none;
-    transition:
-      visibility 0s linear 120ms,
-      opacity 120ms ease,
-      transform 120ms ease;
-  }
-
-  .walkthrough-key-points:not(.is-key-points-open) {
-    width: fit-content;
-  }
-
-  .walkthrough-key-points:not(.is-key-points-open) .walkthrough-modal-time {
-    border-bottom: 1px solid var(--walkthrough-key-point-border);
     border-radius: 6px;
-  }
-
-  .walkthrough-key-points:not(.is-key-points-open) .walkthrough-modal-time::after {
-    content: none;
-  }
-
-  .walkthrough-key-points.is-key-points-open .walkthrough-key-point-panel {
-    visibility: visible;
-    opacity: 1;
-    transform: translateY(0);
-    pointer-events: auto;
-    transition-delay: 0s;
-  }
-
-  .walkthrough-key-points:hover .walkthrough-key-point-list,
-  .walkthrough-key-points:focus-within .walkthrough-key-point-list {
-    height: var(--walkthrough-visible-list-height, 65px);
-  }
-
-  .walkthrough-key-points:hover .walkthrough-key-point-track,
-  .walkthrough-key-points:focus-within .walkthrough-key-point-track {
-    transform: translateY(var(--walkthrough-window-offset, 0));
+    box-shadow: none;
   }
 
   .walkthrough-key-point {
