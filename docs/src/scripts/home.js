@@ -630,6 +630,7 @@
         return;
       }
       walkthroughModal.showModal();
+      window.requestAnimationFrame(() => updateWalkthroughKeyPointViewport());
       walkthroughVideo.focus();
       startWalkthroughPlayback({ allowMutedFallback: options.allowMutedFallback === true });
       return;
@@ -728,6 +729,8 @@
     if (walkthroughTimeToggle instanceof HTMLElement) {
       walkthroughTimeToggle.setAttribute("aria-expanded", String(isOpen));
     }
+
+    window.requestAnimationFrame(() => updateWalkthroughKeyPointViewport());
   }
 
   function toggleWalkthroughPlayback() {
@@ -828,6 +831,39 @@
     walkthroughKeyPointList.style.setProperty("--walkthrough-window-offset", `${-windowOffset}px`);
     walkthroughKeyPointList.style.setProperty("--walkthrough-visible-list-height", `${windowHeight}px`);
     walkthroughKeyPointList.style.setProperty("--walkthrough-expanded-list-height", `${walkthroughKeyPointTrack.scrollHeight}px`);
+    walkthroughKeyPointList.style.setProperty("--walkthrough-scroll-list-max-height", `${getWalkthroughKeyPointListMaxHeight()}px`);
+  }
+
+  function getWalkthroughKeyPointListMaxHeight() {
+    if (!(walkthroughKeyPoints instanceof HTMLElement)) return 65;
+    if (!(walkthroughTimeToggle instanceof HTMLElement)) return 65;
+    if (!(walkthroughKeyPointList instanceof HTMLElement)) return 65;
+    if (!(walkthroughVideo instanceof HTMLElement)) return 65;
+
+    const videoFrame = walkthroughVideo.closest(".walkthrough-video-frame");
+    const keyPointPanel = walkthroughKeyPointList.closest(".walkthrough-key-point-panel");
+    if (!(videoFrame instanceof HTMLElement)) return 65;
+    if (!(keyPointPanel instanceof HTMLElement)) return 65;
+
+    const videoFrameRect = videoFrame.getBoundingClientRect();
+    const keyPointsRect = walkthroughKeyPoints.getBoundingClientRect();
+    const timeToggleRect = walkthroughTimeToggle.getBoundingClientRect();
+    const panelStyles = window.getComputedStyle(keyPointPanel);
+    const panelChrome =
+      getCssPixelValue(panelStyles.marginTop) +
+      getCssPixelValue(panelStyles.paddingTop) +
+      getCssPixelValue(panelStyles.paddingBottom) +
+      getCssPixelValue(panelStyles.borderTopWidth) +
+      getCssPixelValue(panelStyles.borderBottomWidth);
+    const bottomInset = 8;
+    const availableHeight = videoFrameRect.bottom - keyPointsRect.top - timeToggleRect.height - panelChrome - bottomInset;
+
+    return Math.max(48, Math.floor(availableHeight));
+  }
+
+  function getCssPixelValue(value) {
+    const pixels = Number.parseFloat(value);
+    return Number.isFinite(pixels) ? pixels : 0;
   }
 
   function formatWalkthroughTime(value) {

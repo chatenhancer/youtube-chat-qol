@@ -4309,11 +4309,6 @@ figcaption {
   .walkthrough-modal-panel {
     position: relative;
     padding: 0;
-    --walkthrough-control-bg: #68707d;
-    --walkthrough-control-border: #8b93a0;
-    --walkthrough-control-bg-hover: #68707d;
-    --walkthrough-control-border-hover: #a1a8b3;
-    --walkthrough-control-color: rgba(255, 255, 255, 0.86);
   }
 
   .walkthrough-modal-heading {
@@ -4344,14 +4339,7 @@ figcaption {
   }
 
   .walkthrough-modal-close {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    color: #111827;
-    background: rgba(255, 255, 255, 0.86);
-    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.16);
-    backdrop-filter: blur(10px);
-    pointer-events: auto;
+    display: none;
   }
 
   .walkthrough-video-frame {
@@ -4366,7 +4354,6 @@ figcaption {
     left: 8px;
     width: min(198px, calc(100% - 16px));
     padding: 0;
-    color: #fff;
     background: transparent;
     border: 0;
     border-radius: 0;
@@ -4381,35 +4368,28 @@ figcaption {
     box-shadow: none;
   }
 
+  .walkthrough-key-points.is-key-points-open .walkthrough-key-point-list {
+    height: var(--walkthrough-expanded-list-height, var(--walkthrough-visible-list-height, 65px));
+    max-height: var(--walkthrough-scroll-list-max-height, max(48px, calc((100vw * 9 / 16) - 64px)));
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .walkthrough-key-points.is-key-points-open .walkthrough-key-point-track {
+    transform: translateY(0);
+  }
+
   .walkthrough-key-point {
     grid-template-columns: 34px minmax(0, 1fr);
     gap: 5px;
     min-height: 23px;
     padding: 2px 4px;
-    color: rgba(255, 255, 255, 0.72);
-  }
-
-  .walkthrough-key-point:hover,
-  .walkthrough-key-point:focus {
-    color: #fff;
-    background: rgba(255, 255, 255, 0.12);
-    border-color: rgba(255, 255, 255, 0.18);
-  }
-
-  .walkthrough-key-point.is-active {
-    color: #fff;
-    background: rgba(255, 255, 255, 0.16);
-    border-color: rgba(255, 255, 255, 0.24);
   }
 
   .walkthrough-key-point-time {
-    color: rgba(255, 255, 255, 0.68);
     font-size: 11px;
-  }
-
-  .walkthrough-key-point.is-active .walkthrough-key-point-time,
-  .walkthrough-key-point.is-active .walkthrough-key-point-label {
-    color: #fff;
   }
 
   .walkthrough-key-point-label {
