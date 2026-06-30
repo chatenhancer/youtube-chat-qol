@@ -19,7 +19,6 @@ const walkthroughKeyPoints = [
 <dialog class="walkthrough-modal" data-walkthrough-modal aria-labelledby="walkthrough-modal-title">
   <div class="walkthrough-modal-panel">
     <div class="walkthrough-modal-heading">
-      <span class="walkthrough-modal-time" data-walkthrough-time>0:00 / 0:00</span>
       <h2 id="walkthrough-modal-title">{m.features.walkthroughModalTitle}</h2>
       <button class="walkthrough-modal-close" type="button" data-walkthrough-close aria-label={m.features.walkthroughClose}>
         <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
@@ -27,10 +26,18 @@ const walkthroughKeyPoints = [
         </svg>
       </button>
     </div>
-    <div class="walkthrough-video-frame">
-      <video class="walkthrough-video" data-walkthrough-video playsinline loop preload="auto" tabindex="0"></video>
-      <aside class="walkthrough-key-points" data-walkthrough-key-points aria-label={m.features.walkthroughKeyPointsAria}>
-        <strong>{m.features.walkthroughKeyPointsTitle}</strong>
+    <aside class="walkthrough-key-points" data-walkthrough-key-points aria-label={m.features.walkthroughKeyPointsAria}>
+      <button
+        class="walkthrough-modal-time"
+        type="button"
+        data-walkthrough-time
+        data-walkthrough-time-toggle
+        aria-controls="walkthrough-key-point-panel"
+        aria-expanded="false"
+      >
+        0:00 / 0:00
+      </button>
+      <div class="walkthrough-key-point-panel" id="walkthrough-key-point-panel">
         <div class="walkthrough-key-point-list" data-walkthrough-key-point-list>
           <div class="walkthrough-key-point-track" data-walkthrough-key-point-track>
             {walkthroughKeyPoints.map((point) => (
@@ -46,7 +53,10 @@ const walkthroughKeyPoints = [
             ))}
           </div>
         </div>
-      </aside>
+      </div>
+    </aside>
+    <div class="walkthrough-video-frame">
+      <video class="walkthrough-video" data-walkthrough-video playsinline loop preload="auto" tabindex="0"></video>
       <span class="walkthrough-video-feedback" data-walkthrough-feedback aria-hidden="true">
         <svg class="walkthrough-video-feedback-icon walkthrough-video-feedback-play" viewBox="0 -960 960 960" focusable="false">
           <path d="M320-273v-414q0-17 12-28.5t28-11.5q5 0 10.5 1.5T381-721l326 207q9 6 13.5 15t4.5 19q0 10-4.5 19T707-446L381-239q-5 3-10.5 4.5T360-233q-16 0-28-11.5T320-273Z"></path>

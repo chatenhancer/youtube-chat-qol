@@ -755,30 +755,53 @@ h3 {
 
 .walkthrough-modal-panel {
   display: grid;
+  position: relative;
 }
 
 .walkthrough-modal-heading {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  grid-template-columns: minmax(34px, 1fr) auto minmax(34px, 1fr);
   align-items: center;
   gap: 16px;
   padding: 16px;
 }
 
 .walkthrough-modal-time {
-  justify-self: start;
+  display: inline-flex;
+  position: relative;
+  z-index: 1;
+  width: fit-content;
+  max-width: 100%;
+  margin: 0;
   padding: 4px 8px;
   color: var(--muted);
-  font-size: 12px;
+  appearance: none;
+  cursor: pointer;
+  font: inherit;
+  font-size: 11px;
   font-variant-numeric: tabular-nums;
   line-height: 1.2;
-  background: var(--soft);
-  border: 1px solid var(--line);
-  border-radius: 999px;
+  background: var(--walkthrough-key-point-bg);
+  border: 1px solid var(--walkthrough-key-point-border);
+  border-bottom: 0;
+  border-radius: 6px 6px 0 0;
+  box-shadow: none;
+  text-align: left;
   white-space: nowrap;
 }
 
+.walkthrough-modal-time::after {
+  position: absolute;
+  right: 1px;
+  bottom: -2px;
+  left: 1px;
+  height: 4px;
+  background: var(--walkthrough-key-point-bg);
+  content: "";
+}
+
 .walkthrough-modal h2 {
+  grid-column: 2;
   justify-self: center;
   margin: 0;
   font-size: 18px;
@@ -788,6 +811,7 @@ h3 {
 
 .walkthrough-modal-close {
   display: inline-grid;
+  grid-column: 3;
   justify-self: end;
   place-items: center;
   width: 34px;
@@ -831,69 +855,57 @@ h3 {
 }
 
 .walkthrough-key-points {
+  --walkthrough-key-point-bg: #fff;
+  --walkthrough-key-point-border: #dfe6f0;
+  --walkthrough-key-point-bg-hover: #fff;
+  --walkthrough-key-point-border-hover: #d7e0ec;
+
   position: absolute;
-  top: 12px;
-  left: 12px;
-  z-index: 2;
-  width: min(190px, calc(100% - 24px));
-  padding: 7px;
+  top: 16px;
+  left: 16px;
+  z-index: 4;
+  width: min(198px, calc(100% - 24px));
+  padding: 0;
   color: var(--text);
-  background: rgba(255, 255, 255, 0.74);
-  border: 1px solid rgba(226, 230, 238, 0.64);
-  border-radius: var(--callout-surface-corner-radius);
-  box-shadow: 0 10px 30px rgba(23, 25, 31, 0.1);
-  backdrop-filter: blur(10px);
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  backdrop-filter: none;
+  filter: drop-shadow(0 10px 26px rgba(23, 25, 31, 0.1));
+  overflow: visible;
+}
+
+.walkthrough-key-point-panel {
+  position: relative;
+  width: 100%;
+  margin-top: -1px;
+  padding: 7px;
+  background: var(--walkthrough-key-point-bg);
+  border: 1px solid var(--walkthrough-key-point-border);
+  border-radius: 0 6px 6px 6px;
+  box-shadow: none;
+  overflow: hidden;
   transition:
     background-color 160ms ease,
-    border-color 160ms ease,
-    box-shadow 160ms ease;
+    border-color 160ms ease;
 }
 
-.walkthrough-key-points:hover,
-.walkthrough-key-points:focus-within {
-  background: rgba(255, 255, 255, 0.9);
-  border-color: rgba(226, 230, 238, 0.82);
-  box-shadow: 0 14px 34px rgba(23, 25, 31, 0.14);
+.walkthrough-key-points:hover .walkthrough-key-point-panel,
+.walkthrough-key-points:focus-within .walkthrough-key-point-panel {
+  background: var(--walkthrough-key-point-bg-hover);
+  border-color: var(--walkthrough-key-point-border-hover);
 }
 
-.walkthrough-key-points strong {
-  position: relative;
-  display: block;
-  margin: 0 0 5px;
-  padding: 0 13px;
-  color: var(--muted);
-  font-size: 11px;
-  font-weight: 520;
-  line-height: 1.2;
-  text-align: center;
+.walkthrough-key-points:hover .walkthrough-modal-time,
+.walkthrough-key-points:focus-within .walkthrough-modal-time {
+  background: var(--walkthrough-key-point-bg-hover);
+  border-color: var(--walkthrough-key-point-border-hover);
 }
 
-.walkthrough-key-points strong::after {
-  --walkthrough-toggle-mark-size: 6px;
-  --walkthrough-toggle-mark-stroke: 0.9px;
-
-  position: absolute;
-  top: 50%;
-  right: 3px;
-  width: var(--walkthrough-toggle-mark-size);
-  height: var(--walkthrough-toggle-mark-size);
-  background:
-    linear-gradient(currentColor 0 0) center / var(--walkthrough-toggle-mark-size) var(--walkthrough-toggle-mark-stroke) no-repeat,
-    linear-gradient(currentColor 0 0) center / var(--walkthrough-toggle-mark-stroke) var(--walkthrough-toggle-mark-size) no-repeat;
-  content: "";
-  opacity: 0.72;
-  transform: translateY(-50%);
-  transition:
-    background-size 180ms ease,
-    opacity 160ms ease;
-}
-
-.walkthrough-key-points:hover strong::after,
-.walkthrough-key-points:focus-within strong::after {
-  background-size:
-    var(--walkthrough-toggle-mark-size) var(--walkthrough-toggle-mark-stroke),
-    var(--walkthrough-toggle-mark-stroke) 0;
-  opacity: 0.9;
+.walkthrough-key-points:hover .walkthrough-modal-time::after,
+.walkthrough-key-points:focus-within .walkthrough-modal-time::after {
+  background: var(--walkthrough-key-point-bg-hover);
 }
 
 .walkthrough-key-point-list {
@@ -921,11 +933,11 @@ h3 {
 
 .walkthrough-key-point {
   display: grid;
-  grid-template-columns: 31px minmax(0, 1fr);
+  grid-template-columns: 34px minmax(0, 1fr);
   align-items: center;
   gap: 5px;
   width: 100%;
-  min-height: 21px;
+  min-height: 23px;
   padding: 2px 4px;
   color: var(--muted);
   cursor: pointer;
@@ -961,10 +973,10 @@ h3 {
 
 .walkthrough-key-point-time {
   color: var(--muted);
-  font-size: 9.5px;
+  font-size: 11px;
   font-variant-numeric: tabular-nums;
   font-weight: 400;
-  line-height: 1;
+  line-height: 1.2;
 }
 
 .walkthrough-key-point.is-active .walkthrough-key-point-time {
@@ -977,7 +989,7 @@ h3 {
 
 .walkthrough-key-point-label {
   min-width: 0;
-  font-size: 10.75px;
+  font-size: 11px;
   font-weight: 400;
   line-height: 1.2;
   overflow-wrap: break-word;
@@ -4215,38 +4227,164 @@ figcaption {
   }
 
   .walkthrough-modal {
-    width: calc(100% - 20px);
+    width: 100vw;
+    max-width: none;
+    max-height: 100dvh;
+    border-right: 0;
+    border-left: 0;
+    border-radius: 0;
   }
 
   .walkthrough-modal-panel {
-    padding: 10px;
+    position: relative;
+    padding: 0;
+  }
+
+  .walkthrough-modal-heading {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    display: block;
+    padding: 0;
+    pointer-events: none;
+  }
+
+  .walkthrough-modal h2 {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  .walkthrough-modal-time {
+    position: relative;
+    margin: 0;
+    padding: 6px 8px 4px;
+    color: rgba(255, 255, 255, 0.86);
+    border-bottom: 0;
+    border-radius: 6px 6px 0 0;
+    box-shadow: none;
+    pointer-events: auto;
+  }
+
+  .walkthrough-modal-close {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    color: #111827;
+    background: rgba(255, 255, 255, 0.86);
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.16);
+    backdrop-filter: blur(10px);
+    pointer-events: auto;
+  }
+
+  .walkthrough-video-frame {
+    border-radius: 0;
+    clip-path: none;
   }
 
   .walkthrough-key-points {
-    top: 7px;
-    left: 7px;
-    width: min(176px, calc(100% - 14px));
-    padding: 6px;
+    --walkthrough-key-point-bg: #68707d;
+    --walkthrough-key-point-border: #8b93a0;
+    --walkthrough-key-point-bg-hover: #68707d;
+    --walkthrough-key-point-border-hover: #a1a8b3;
+
+    top: 8px;
+    right: auto;
+    bottom: auto;
+    left: 8px;
+    width: min(198px, calc(100% - 16px));
+    padding: 0;
+    color: #fff;
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    filter: drop-shadow(0 12px 28px rgba(15, 23, 42, 0.18));
   }
 
-  .walkthrough-key-points strong {
-    margin-bottom: 4px;
-    font-size: 10.5px;
+  .walkthrough-key-point-panel {
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(-3px);
+    margin-top: -1px;
+    padding: 6px;
+    border-radius: 0 6px 6px 6px;
+    box-shadow: none;
+    pointer-events: none;
+    transition:
+      visibility 0s linear 120ms,
+      opacity 120ms ease,
+      transform 120ms ease;
+  }
+
+  .walkthrough-key-points:not(.is-key-points-open) {
+    width: fit-content;
+  }
+
+  .walkthrough-key-points:not(.is-key-points-open) .walkthrough-modal-time {
+    border-bottom: 1px solid var(--walkthrough-key-point-border);
+    border-radius: 6px;
+  }
+
+  .walkthrough-key-points:not(.is-key-points-open) .walkthrough-modal-time::after {
+    content: none;
+  }
+
+  .walkthrough-key-points.is-key-points-open .walkthrough-key-point-panel {
+    visibility: visible;
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+    transition-delay: 0s;
+  }
+
+  .walkthrough-key-points:hover .walkthrough-key-point-list,
+  .walkthrough-key-points:focus-within .walkthrough-key-point-list {
+    height: var(--walkthrough-visible-list-height, 65px);
+  }
+
+  .walkthrough-key-points:hover .walkthrough-key-point-track,
+  .walkthrough-key-points:focus-within .walkthrough-key-point-track {
+    transform: translateY(var(--walkthrough-window-offset, 0));
   }
 
   .walkthrough-key-point {
-    grid-template-columns: 29px minmax(0, 1fr);
-    gap: 4px;
-    min-height: 20px;
+    grid-template-columns: 34px minmax(0, 1fr);
+    gap: 5px;
+    min-height: 23px;
     padding: 2px 4px;
+    color: rgba(255, 255, 255, 0.72);
+  }
+
+  .walkthrough-key-point:hover,
+  .walkthrough-key-point:focus {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.18);
+  }
+
+  .walkthrough-key-point.is-active {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.16);
+    border-color: rgba(255, 255, 255, 0.24);
   }
 
   .walkthrough-key-point-time {
-    font-size: 9px;
+    color: rgba(255, 255, 255, 0.68);
+    font-size: 11px;
+  }
+
+  .walkthrough-key-point.is-active .walkthrough-key-point-time,
+  .walkthrough-key-point.is-active .walkthrough-key-point-label {
+    color: #fff;
   }
 
   .walkthrough-key-point-label {
-    font-size: 10px;
+    font-size: 11px;
   }
 
   .install-actions {

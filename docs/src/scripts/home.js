@@ -14,12 +14,15 @@
   const walkthroughModal = document.querySelector("[data-walkthrough-modal]");
   const walkthroughClose = document.querySelector("[data-walkthrough-close]");
   const walkthroughTime = document.querySelector("[data-walkthrough-time]");
+  const walkthroughTimeToggle = document.querySelector("[data-walkthrough-time-toggle]");
   const walkthroughVideo = document.querySelector("[data-walkthrough-video]");
   const walkthroughVideoFeedback = document.querySelector("[data-walkthrough-feedback]");
+  const walkthroughKeyPoints = document.querySelector("[data-walkthrough-key-points]");
   const walkthroughKeyPointList = document.querySelector("[data-walkthrough-key-point-list]");
   const walkthroughKeyPointTrack = document.querySelector("[data-walkthrough-key-point-track]");
   const walkthroughSeekButtons = Array.from(document.querySelectorAll("[data-walkthrough-seek]"));
   const walkthroughHash = "#walkthrough";
+  const walkthroughCompactKeyPoints = window.matchMedia("(max-width: 640px)");
   const versionBadgeSources = {
     release: {
       image: "https://img.shields.io/github/v/release/chat-enhancer-yt/youtube-chat-qol?label=release&logo=github",
@@ -82,6 +85,18 @@
   walkthroughClose?.addEventListener("click", () => {
     closeWalkthroughModal();
   });
+
+  walkthroughTimeToggle?.addEventListener("click", (event) => {
+    if (!walkthroughCompactKeyPoints.matches) return;
+    event.preventDefault();
+    toggleWalkthroughKeyPointPanel();
+  });
+
+  walkthroughCompactKeyPoints.addEventListener("change", () => {
+    setWalkthroughKeyPointPanelOpen(false);
+  });
+
+  setWalkthroughKeyPointPanelOpen(false);
 
   walkthroughModal?.addEventListener("click", (event) => {
     if (event.target === walkthroughModal) closeWalkthroughModal();
@@ -613,6 +628,7 @@
     walkthroughVideo.currentTime = 0;
     updateWalkthroughTimeBadge();
     updateWalkthroughKeyPointState();
+    setWalkthroughKeyPointPanelOpen(false);
     hideWalkthroughPlaybackFeedback();
     if (walkthroughModal && typeof walkthroughModal.showModal === "function") {
       if (walkthroughModal.open) {
@@ -701,7 +717,26 @@
       : nextTime;
     updateWalkthroughTimeBadge();
     startWalkthroughPlayback({ allowMutedFallback: true });
+    setWalkthroughKeyPointPanelOpen(false);
     walkthroughVideo.focus({ preventScroll: true });
+  }
+
+  function toggleWalkthroughKeyPointPanel() {
+    if (!(walkthroughKeyPoints instanceof HTMLElement)) return;
+
+    setWalkthroughKeyPointPanelOpen(!walkthroughKeyPoints.classList.contains("is-key-points-open"));
+  }
+
+  function setWalkthroughKeyPointPanelOpen(isOpen) {
+    const isCompact = walkthroughCompactKeyPoints.matches;
+
+    if (walkthroughKeyPoints instanceof HTMLElement) {
+      walkthroughKeyPoints.classList.toggle("is-key-points-open", isCompact && isOpen);
+    }
+
+    if (walkthroughTimeToggle instanceof HTMLElement) {
+      walkthroughTimeToggle.setAttribute("aria-expanded", String(!isCompact || isOpen));
+    }
   }
 
   function toggleWalkthroughPlayback() {
