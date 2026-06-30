@@ -66,6 +66,8 @@
 .title-emphasis,
 .hero-walkthrough-button,
 .button,
+.mobile-header-menu-toggle,
+.mobile-header-menu-panel,
 .walkthrough-modal,
 .walkthrough-video-frame,
 .walkthrough-key-points,
@@ -238,6 +240,18 @@ img {
   gap: 16px;
 }
 
+.mobile-header-menu {
+  display: none;
+}
+
+.mobile-header-menu-toggle::-webkit-details-marker {
+  display: none;
+}
+
+.mobile-header-menu-toggle {
+  list-style: none;
+}
+
 .brand {
   grid-column: 1;
   justify-self: start;
@@ -330,8 +344,10 @@ img {
 
 @media (prefers-reduced-motion: reduce) {
   .brand-logo-bg,
-  .brand-logo-mark {
+  .brand-logo-mark,
+  .site-nav::before {
     animation: none;
+    transition: none;
   }
 }
 
@@ -343,16 +359,40 @@ img {
 .site-nav {
   grid-column: 2;
   justify-self: center;
+  position: relative;
   display: flex;
   align-items: center;
   gap: 18px;
   color: var(--muted);
   font-size: 14px;
   font-weight: 500;
+  isolation: isolate;
+}
+
+.site-nav::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  top: 50%;
+  left: 0;
+  width: var(--site-nav-highlight-width, 0);
+  height: var(--site-nav-highlight-height, 32px);
+  background: var(--soft);
+  border-radius: var(--compact-icon-surface-corner-radius);
+  opacity: var(--site-nav-highlight-opacity, 0);
+  pointer-events: none;
+  transform: translate3d(var(--site-nav-highlight-x, 0), -50%, 0);
+  transition: transform 190ms ease, width 190ms ease, height 190ms ease, opacity 130ms ease;
 }
 
 .site-nav a {
   position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 5px 8px;
+  border-radius: var(--compact-icon-surface-corner-radius);
   transition: color 150ms ease;
 }
 
@@ -4030,7 +4070,118 @@ figcaption {
   }
 
   .site-header {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 12px;
     padding: 12px 18px;
+  }
+
+  .site-header-actions {
+    display: none;
+  }
+
+  .mobile-header-menu {
+    position: relative;
+    grid-column: 2;
+    justify-self: end;
+    display: block;
+  }
+
+  .mobile-header-menu-toggle {
+    display: inline-grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    color: var(--text);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--button-corner-radius);
+    cursor: pointer;
+  }
+
+  .mobile-header-menu[open] .mobile-header-menu-toggle,
+  .mobile-header-menu-toggle:hover,
+  .mobile-header-menu-toggle:focus {
+    background: var(--soft);
+    border-color: #c7d0dd;
+    outline: none;
+  }
+
+  .mobile-header-menu-icon,
+  .mobile-header-menu-icon svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .mobile-header-menu-icon svg {
+    fill: currentColor;
+  }
+
+  .mobile-header-menu-panel {
+    position: absolute;
+    z-index: 30;
+    top: calc(100% + 10px);
+    right: 0;
+    display: grid;
+    gap: 10px;
+    width: min(260px, calc(100vw - 36px));
+    padding: 12px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--large-surface-corner-radius);
+    box-shadow: 0 18px 44px rgba(35, 74, 120, 0.18);
+  }
+
+  .mobile-header-menu:not([open]) .mobile-header-menu-panel {
+    display: none;
+  }
+
+  .mobile-header-menu-nav {
+    display: grid;
+    gap: 2px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .mobile-header-menu-nav a {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 36px;
+    padding: 7px 8px;
+    color: var(--muted);
+    border-radius: var(--compact-icon-surface-corner-radius);
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .mobile-header-menu-nav a:hover,
+  .mobile-header-menu-nav a:focus,
+  .mobile-header-menu-nav a.site-nav-active {
+    color: var(--text);
+    background: var(--soft);
+    outline: none;
+  }
+
+  .mobile-header-menu-nav a.site-nav-active {
+    color: var(--blue);
+  }
+
+  .mobile-header-menu-github svg {
+    width: 17px;
+    height: 17px;
+    fill: currentColor;
+  }
+
+  .mobile-header-menu .language-switcher,
+  .mobile-header-menu .language-switcher select,
+  .mobile-header-menu .header-install {
+    width: 100%;
+  }
+
+  .mobile-header-menu .language-switcher select {
+    max-width: none;
+    height: 38px;
   }
 
   .store-version-alert-top {

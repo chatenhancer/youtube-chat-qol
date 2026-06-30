@@ -8,7 +8,8 @@
   const chromeStoreLink = document.querySelector('[data-browser-store-link="chrome"]');
   const firefoxStoreLink = document.querySelector('[data-browser-store-link="firefox"]');
   const safariStoreLink = document.querySelector('[data-browser-store-link="safari"]');
-  const languageSwitcher = document.querySelector("[data-language-switcher]");
+  const languageSwitchers = document.querySelectorAll("[data-language-switcher]");
+  const mobileHeaderMenu = document.querySelector("[data-mobile-header-menu]");
   const walkthroughCtas = document.querySelectorAll("[data-walkthrough-cta]");
   const walkthroughOpenButtons = document.querySelectorAll("[data-walkthrough-open]");
   const walkthroughModal = document.querySelector("[data-walkthrough-modal]");
@@ -52,17 +53,45 @@
 
   setupTopHeaderState();
   setupActiveNavigation();
+  setupLanguageSwitchers();
+  setupMobileHeaderMenu();
   setupContactEmailLinks();
   setupCommandDemo();
   setupWalkthroughVideoModal();
 
-  if (languageSwitcher) {
-    languageSwitcher.value = getCurrentLocalePath(languageSwitcher);
-    languageSwitcher.addEventListener("change", () => {
-      const nextPath = getLocalePath(languageSwitcher);
-      const locale = languageSwitcher.selectedOptions[0]?.dataset.locale || (nextPath === "/" ? "en" : nextPath.split("/").filter(Boolean)[0]);
-      document.cookie = `ce_lang=${encodeURIComponent(locale)}; Max-Age=31536000; Path=/; SameSite=Lax; Secure`;
-      window.location.assign(nextPath);
+  function setupLanguageSwitchers() {
+    languageSwitchers.forEach((languageSwitcher) => {
+      if (!(languageSwitcher instanceof HTMLSelectElement)) return;
+
+      languageSwitcher.value = getCurrentLocalePath(languageSwitcher);
+      languageSwitcher.addEventListener("change", () => {
+        const nextPath = getLocalePath(languageSwitcher);
+        const locale = languageSwitcher.selectedOptions[0]?.dataset.locale || (nextPath === "/" ? "en" : nextPath.split("/").filter(Boolean)[0]);
+        document.cookie = `ce_lang=${encodeURIComponent(locale)}; Max-Age=31536000; Path=/; SameSite=Lax; Secure`;
+        window.location.assign(nextPath);
+      });
+    });
+  }
+
+  function setupMobileHeaderMenu() {
+    if (!(mobileHeaderMenu instanceof HTMLDetailsElement)) return;
+
+    mobileHeaderMenu.addEventListener("click", (event) => {
+      if (!(event.target instanceof Element)) return;
+      if (event.target.closest("a")) mobileHeaderMenu.open = false;
+    });
+
+    mobileHeaderMenu.addEventListener("keydown", (event) => {
+      if (event.key !== "Escape" || !mobileHeaderMenu.open) return;
+
+      event.preventDefault();
+      mobileHeaderMenu.open = false;
+      mobileHeaderMenu.querySelector("summary")?.focus();
+    });
+
+    document.addEventListener("click", (event) => {
+      if (!mobileHeaderMenu.open || !(event.target instanceof Node) || mobileHeaderMenu.contains(event.target)) return;
+      mobileHeaderMenu.open = false;
     });
   }
 
@@ -271,12 +300,76 @@
   }
 
   function setupActiveNavigation() {
-    const navLinks = Array.from(document.querySelectorAll(".site-nav a[data-nav-section], .site-nav a[data-nav-page]"));
+    const navLinks = Array.from(document.querySelectorAll(
+      ".site-nav a[data-nav-section], .site-nav a[data-nav-page], .mobile-header-menu-nav a[data-nav-section], .mobile-header-menu-nav a[data-nav-page]"
+    ));
     if (!navLinks.length) return;
 
+    const desktopNav = document.querySelector(".site-nav");
+    const desktopNavLinks = desktopNav instanceof HTMLElement
+      ? Array.from(desktopNav.querySelectorAll("a")).filter((link) => link instanceof HTMLElement)
+      : [];
+    let hoveredDesktopNavLink = null;
+
+    const getActiveDesktopNavLink = () => desktopNavLinks.find((link) => link.classList.contains("site-nav-active")) || null;
+
+    const setDesktopNavHighlight = (link) => {
+      if (!(desktopNav instanceof HTMLElement)) return;
+
+      if (!(link instanceof HTMLElement) || !desktopNav.offsetParent) {
+        desktopNav.style.setProperty("--site-nav-highlight-opacity", "0");
+        return;
+      }
+
+      const navRect = desktopNav.getBoundingClientRect();
+      const linkRect = link.getBoundingClientRect();
+      desktopNav.style.setProperty("--site-nav-highlight-x", `${Math.round(linkRect.left - navRect.left)}px`);
+      desktopNav.style.setProperty("--site-nav-highlight-width", `${Math.round(linkRect.width)}px`);
+      desktopNav.style.setProperty("--site-nav-highlight-height", `${Math.round(linkRect.height)}px`);
+      desktopNav.style.setProperty("--site-nav-highlight-opacity", "1");
+    };
+
+    const syncDesktopNavHighlight = () => {
+      setDesktopNavHighlight(hoveredDesktopNavLink || getActiveDesktopNavLink());
+    };
+
+    if (desktopNav instanceof HTMLElement && desktopNavLinks.length) {
+      desktopNavLinks.forEach((link) => {
+        link.addEventListener("pointerenter", () => {
+          hoveredDesktopNavLink = link;
+          syncDesktopNavHighlight();
+        });
+
+        link.addEventListener("focus", () => {
+          hoveredDesktopNavLink = link;
+          syncDesktopNavHighlight();
+        });
+      });
+
+      desktopNav.addEventListener("pointerleave", () => {
+        hoveredDesktopNavLink = null;
+        syncDesktopNavHighlight();
+      });
+
+      desktopNav.addEventListener("focusout", (event) => {
+        if (event.relatedTarget instanceof Node && desktopNav.contains(event.relatedTarget)) return;
+
+        hoveredDesktopNavLink = null;
+        syncDesktopNavHighlight();
+      });
+
+      window.addEventListener("resize", syncDesktopNavHighlight);
+      document.fonts?.ready.then(syncDesktopNavHighlight).catch(() => undefined);
+    }
+
     const setActiveLink = (activeLink, currentValue = "location") => {
+      const activeSection = activeLink?.dataset.navSection;
+      const activePage = activeLink?.dataset.navPage;
       navLinks.forEach((link) => {
-        const isActive = link === activeLink;
+        const isActive = Boolean(
+          (activeSection && link.dataset.navSection === activeSection) ||
+          (activePage && link.dataset.navPage === activePage)
+        );
         link.classList.toggle("site-nav-active", isActive);
         if (isActive) {
           link.setAttribute("aria-current", currentValue);
@@ -284,6 +377,7 @@
           link.removeAttribute("aria-current");
         }
       });
+      syncDesktopNavHighlight();
     };
 
     const blogLink = navLinks.find((link) => link.dataset.navPage === "blog");
@@ -292,20 +386,26 @@
       return;
     }
 
-    const sectionLinks = navLinks.filter((link) => link.dataset.navSection);
-    const sectionEntries = sectionLinks
-      .map((link) => ({ link, section: document.getElementById(link.dataset.navSection || "") }))
-      .filter((entry) => entry.section);
+    const seenSectionIds = new Set();
+    const sectionEntries = navLinks
+      .map((link) => {
+        const sectionId = link.dataset.navSection;
+        if (!sectionId || seenSectionIds.has(sectionId)) return null;
+
+        seenSectionIds.add(sectionId);
+        return { link, section: document.getElementById(sectionId) };
+      })
+      .filter((entry) => entry?.section);
     if (!sectionEntries.length) return;
 
     let frame = 0;
     const update = () => {
       frame = 0;
       const probeLine = window.innerHeight * 0.42;
-      const activeEntry = sectionEntries.find((entry) => {
+      const activeEntry = sectionEntries.reduce((currentEntry, entry) => {
         const rect = entry.section.getBoundingClientRect();
-        return rect.top <= probeLine && rect.bottom > probeLine;
-      });
+        return rect.top <= probeLine ? entry : currentEntry;
+      }, null);
       setActiveLink(activeEntry?.link || null);
     };
     const schedule = () => {
