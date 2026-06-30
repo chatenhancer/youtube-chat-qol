@@ -15,6 +15,7 @@
   const walkthroughModal = document.querySelector("[data-walkthrough-modal]");
   const walkthroughClose = document.querySelector("[data-walkthrough-close]");
   const walkthroughTime = document.querySelector("[data-walkthrough-time]");
+  const walkthroughTimeLabel = document.querySelector("[data-walkthrough-time-label]");
   const walkthroughTimeToggle = document.querySelector("[data-walkthrough-time-toggle]");
   const walkthroughVideo = document.querySelector("[data-walkthrough-video]");
   const walkthroughVideoFeedback = document.querySelector("[data-walkthrough-feedback]");
@@ -873,14 +874,23 @@
   }
 
   function updateWalkthroughTimeBadge() {
+    const updateTimeText = (text) => {
+      if (walkthroughTimeLabel instanceof HTMLElement) {
+        walkthroughTimeLabel.textContent = text;
+        return;
+      }
+
+      if (walkthroughTime instanceof HTMLElement) walkthroughTime.textContent = text;
+    };
+
     if (!(walkthroughTime instanceof HTMLElement)) return;
     if (!(walkthroughVideo instanceof HTMLVideoElement)) {
-      walkthroughTime.textContent = "0:00 / 0:00";
+      updateTimeText("0:00 / 0:00");
       updateWalkthroughKeyPointState();
       return;
     }
 
-    walkthroughTime.textContent = `${formatWalkthroughTime(walkthroughVideo.currentTime)} / ${formatWalkthroughTime(walkthroughVideo.duration)}`;
+    updateTimeText(`${formatWalkthroughTime(walkthroughVideo.currentTime)} / ${formatWalkthroughTime(walkthroughVideo.duration)}`);
     updateWalkthroughKeyPointState();
   }
 

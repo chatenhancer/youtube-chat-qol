@@ -824,10 +824,12 @@ h3 {
   display: inline-flex;
   position: relative;
   z-index: 1;
+  align-items: center;
+  gap: 4px;
   width: fit-content;
   max-width: 100%;
   margin: 0;
-  padding: 4px 8px;
+  padding: 4px 6px 4px 8px;
   color: var(--walkthrough-control-color);
   appearance: none;
   cursor: pointer;
@@ -841,6 +843,22 @@ h3 {
   box-shadow: none;
   text-align: left;
   white-space: nowrap;
+}
+
+.walkthrough-modal-time-label {
+  min-width: 0;
+}
+
+.walkthrough-modal-time-chevron {
+  width: 15px;
+  height: 15px;
+  flex: 0 0 auto;
+  background: currentColor;
+  opacity: 0.46;
+  -webkit-mask: url("/assets/icons/chevron-right.svg") center / contain no-repeat;
+  mask: url("/assets/icons/chevron-right.svg") center / contain no-repeat;
+  transform: rotate(90deg);
+  transition: opacity 160ms ease, transform 160ms ease;
 }
 
 .walkthrough-modal h2 {
@@ -941,22 +959,6 @@ h3 {
     border-color 160ms ease;
 }
 
-.walkthrough-key-point-panel::before {
-  content: "";
-  position: absolute;
-  top: -5px;
-  left: 38px;
-  width: 9px;
-  height: 9px;
-  background: var(--walkthrough-key-point-bg);
-  border-top: 1px solid var(--walkthrough-key-point-border);
-  border-left: 1px solid var(--walkthrough-key-point-border);
-  transform: translateX(-50%) rotate(45deg);
-  transition:
-    background-color 160ms ease,
-    border-color 160ms ease;
-}
-
 .walkthrough-key-points:not(.is-key-points-open) {
   width: fit-content;
 }
@@ -985,16 +987,20 @@ h3 {
   border-color: var(--walkthrough-key-point-border-hover);
 }
 
-.walkthrough-key-points:hover .walkthrough-key-point-panel::before,
-.walkthrough-key-points:focus-within .walkthrough-key-point-panel::before {
-  background: var(--walkthrough-key-point-bg-hover);
-  border-color: var(--walkthrough-key-point-border-hover);
-}
-
 .walkthrough-key-points:hover .walkthrough-modal-time,
 .walkthrough-key-points:focus-within .walkthrough-modal-time {
   background: var(--walkthrough-key-point-bg-hover);
   border-color: var(--walkthrough-key-point-border-hover);
+}
+
+.walkthrough-key-points:hover .walkthrough-modal-time-chevron,
+.walkthrough-key-points:focus-within .walkthrough-modal-time-chevron {
+  opacity: 0.62;
+}
+
+.walkthrough-key-points.is-key-points-open .walkthrough-modal-time-chevron {
+  opacity: 0.62;
+  transform: rotate(-90deg);
 }
 
 .walkthrough-key-point-list {
@@ -4485,7 +4491,7 @@ figcaption {
   .walkthrough-modal-time {
     position: relative;
     margin: 0;
-    padding: 6px 8px 4px;
+    padding: 6px 6px 4px 8px;
     box-shadow: none;
     pointer-events: auto;
   }
