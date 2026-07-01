@@ -9,19 +9,11 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import packageJson from '../package.json' with { type: 'json' };
 import {
-  describeChromeWebStoreStatus,
-  fetchChromeWebStoreStatus,
   getAccessToken,
   getChromeWebStoreConfig,
   getMissingChromeWebStoreEnv,
-  isChromeWebStoreSubmissionBlocked,
   submitChromeWebStorePackage
 } from './lib/chrome-webstore.mjs';
-import {
-  createDeferredChromeRelease,
-  getGitHubConfig,
-  queueDeferredChromeRelease
-} from './lib/deferred-chrome-release.mjs';
 import { loadLocalEnv } from './lib/local-env.mjs';
 
 await loadLocalEnv();
@@ -40,17 +32,6 @@ if (missingEnv.length) {
 const chromeConfig = getChromeWebStoreConfig();
 const token = await getAccessToken(chromeConfig.serviceAccount);
 
-if (shouldDeferBlockedSubmission()) {
-  const status = await fetchChromeWebStoreStatus(token, chromeConfig.publisherId, chromeConfig.extensionId);
-  if (isChromeWebStoreSubmissionBlocked(status)) {
-    await queueBlockedRelease(status);
-    console.log(
-      `Deferred Chrome Web Store release ${releaseVersion}; current submitted revision is ${describeChromeWebStoreStatus(status)}.`
-    );
-    process.exit(0);
-  }
-}
-
 await submitChromeWebStorePackage({
   token,
   publisherId: chromeConfig.publisherId,
@@ -60,22 +41,6 @@ await submitChromeWebStorePackage({
 });
 
 console.log(`Submitted Chrome Web Store release ${releaseVersion}.`);
-
-async function queueBlockedRelease(status) {
-  const release = createDeferredChromeRelease({
-    version: releaseVersion,
-    statusDescription: describeChromeWebStoreStatus(status)
-  });
-  await queueDeferredChromeRelease({
-    config: getGitHubConfig(),
-    release
-  });
-}
-
-function shouldDeferBlockedSubmission() {
-  return process.env.CHROME_WEBSTORE_DEFER_ON_BLOCKED === '1' ||
-    process.env.CHROME_WEBSTORE_DEFER_ON_BLOCKED === 'true';
-}
 
 function normalizeVersion(version) {
   return String(version).replace(/^v/, '');

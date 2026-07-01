@@ -59,7 +59,7 @@ export async function getAccessToken(serviceAccount) {
   return payload.access_token;
 }
 
-export async function fetchChromeWebStoreStatus(token, publisherId, extensionId) {
+async function fetchChromeWebStoreStatus(token, publisherId, extensionId) {
   const response = await chromeWebStoreFetch(
     token,
     `/v2/publishers/${encodeURIComponent(publisherId)}/items/${encodeURIComponent(extensionId)}:fetchStatus`
@@ -67,27 +67,6 @@ export async function fetchChromeWebStoreStatus(token, publisherId, extensionId)
   const payload = await parseJson(response);
   await assertOk(response, 'Chrome status check failed', payload);
   return payload;
-}
-
-export function getSubmittedRevisionState(status) {
-  return status?.submittedItemRevisionStatus?.state || null;
-}
-
-export function getSubmittedRevisionVersion(status) {
-  const channels = status?.submittedItemRevisionStatus?.distributionChannels;
-  if (!Array.isArray(channels)) return null;
-  return channels.find((channel) => channel?.crxVersion)?.crxVersion || null;
-}
-
-export function isChromeWebStoreSubmissionBlocked(status) {
-  const state = getSubmittedRevisionState(status);
-  return state === 'PENDING_REVIEW' || state === 'STAGED';
-}
-
-export function describeChromeWebStoreStatus(status) {
-  const state = getSubmittedRevisionState(status) || 'none';
-  const version = getSubmittedRevisionVersion(status);
-  return version ? `${state} (${version})` : state;
 }
 
 export async function submitChromeWebStorePackage({
