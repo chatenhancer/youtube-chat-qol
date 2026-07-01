@@ -1,7 +1,7 @@
 ---
 title: "The Wild Wild Chat قادم إلى Chat Enhancer 0.15.0"
 date: 2026-06-18
-description: "لعبة صيد جوائز جديدة في Playground يتسابق فيها اللاعبون لاكتشاف جوائز الدردشة المباشرة قبل انتهاء الوقت."
+description: "تحوّل The Wild Wild Chat الدردشة المباشرة إلى مطاردة جوائز سريعة يتسابق فيها اللاعبون للمطالبة بالرسائل المطابقة."
 locale: "ar"
 slug: "the-wild-wild-chat-coming-to-chat-enhancer-0-15-0"
 image: "./05346f6306b006ff.png"
@@ -56,7 +56,7 @@ tags:
 
 ## جزء من Playground
 
-مثل Chess وHELP-A-FRIEND! Trivia، تعيش The Wild Wild Chat داخل Playground. تستخدم لوحة الألعاب نفسها، وتدفق الدعوات نفسه، ونافذة اللعبة العائمة نفسها، لذلك تبقى قريبة من دردشة YouTube بدلا من أن تصبح تطبيقا منفصلا.
+مثل Chess وHELP-A-FRIEND! Trivia، تعيش The Wild Wild Chat داخل Playground. تستخدم لوحة الألعاب نفسها، وتدفق الدعوات نفسه، ونافذة اللعبة العائمة نفسها، لذلك تبقى قريبة من دردشة YouTube.
 
 لكن الأسلوب جديد: ملصقات مطلوبين، وجوائز مختومة، وورق مغبر، ولمسة غرب أمريكي مرحة.
 

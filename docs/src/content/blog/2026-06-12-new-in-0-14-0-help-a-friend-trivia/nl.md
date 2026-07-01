@@ -18,7 +18,7 @@ Het tweede Playground-spel is er: **HELP-A-FRIEND! Trivia**
 
 ![Logo van HELP-A-FRIEND! Trivia](./2026-06-12-new-in-0-14-0-help-a-friend-trivia-assets/6ef6d6f2584f127f.png){shadow=smooth;rotate=-8deg}
 
-In plaats van een quizbord speelt *HELP-A-FRIEND! Trivia* zich af als een kleine groepschat. Een van je vrienden zat duidelijk niet op te letten tijdens de stream en heeft nu hulp nodig... heb jij de kennis?
+In plaats van een quizbord speelt *HELP-A-FRIEND! Trivia* zich af als een kleine groepschat. Een van je vrienden zat duidelijk niet op te letten tijdens de stream en heeft nu hulp nodig. Weet je nog wat er gebeurde?
 
 Goede antwoorden krijgen de 🏆-reactie.
 
@@ -28,7 +28,7 @@ Foute antwoorden worden *beleefd* beoordeeld.
 
 ## Hoe het werkt
 
-Start een Playground-match vanuit een YouTube-replay (een livestream die is afgelopen), nodig een andere speler uit en wacht een paar seconden terwijl de vragen worden voorbereid.
+Start een Playground-match vanuit een YouTube-replay, nodig een andere speler uit en wacht een paar seconden terwijl de vragen worden voorbereid.
 
 Zodra het spel begint, stelt je "vriend" vragen over de replay, verschijnen er vier mogelijke antwoorden en kiezen beide spelers voordat de tijd om is. Antwoord snel. Je maatje heeft weinig geduld.
 

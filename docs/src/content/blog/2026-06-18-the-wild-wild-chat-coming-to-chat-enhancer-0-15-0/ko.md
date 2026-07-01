@@ -1,7 +1,7 @@
 ---
 title: "The Wild Wild Chat이 Chat Enhancer 0.15.0에 옵니다"
 date: 2026-06-18
-description: "시간이 끝나기 전에 라이브 채팅 속 바운티를 찾아내는 새로운 Playground 스캐빈저 헌트 게임입니다."
+description: "The Wild Wild Chat은 라이브 채팅을 플레이어가 일치하는 메시지를 차지하려고 경쟁하는 빠른 현상금 사냥으로 바꿉니다."
 locale: "ko"
 slug: "the-wild-wild-chat-coming-to-chat-enhancer-0-15-0"
 image: "./05346f6306b006ff.png"
@@ -56,7 +56,7 @@ The Wild Wild Chat은 라이브 채팅 중에만 사용할 수 있습니다. 이
 
 ## Playground의 일부
 
-Chess와 HELP-A-FRIEND! Trivia처럼 The Wild Wild Chat은 Playground 안에 있습니다. 같은 Games 패널, 같은 초대 흐름, 같은 플로팅 게임 창을 사용하므로 별도 앱이 되지 않고 YouTube 채팅 가까이에 머뭅니다.
+Chess와 HELP-A-FRIEND! Trivia처럼 The Wild Wild Chat은 Playground 안에 있습니다. 같은 Games 패널, 같은 초대 흐름, 같은 플로팅 게임 창을 사용하므로 YouTube 채팅 가까이에 머뭅니다.
 
 다만 스타일은 새롭습니다. 현상수배 포스터, 스탬프가 찍힌 클레임, 먼지 낀 종이, 그리고 약간의 서부극 분위기가 있습니다.
 

@@ -1,7 +1,7 @@
 ---
 title: "Apresentando o Playground: pequenos jogos para pausas do chat ao vivo"
 date: 2026-06-10
-description: "Playground é um novo recurso da extensão Chat Enhancer que permite jogar jogos compactos, como xadrez, com outras pessoas durante chats ao vivo."
+description: "Playground adiciona jogos compactos ao chat ao vivo do YouTube para os momentos mais calmos de uma live."
 locale: "pt"
 slug: "introducing-playground-tiny-games-for-live-chat-breaks"
 translationKey: "introducing-playground-tiny-games-for-live-chat-breaks"
@@ -16,32 +16,55 @@ tags:
 
 ## Playground chegou!
 
-Playground é uma central de jogos dentro da extensão, onde você pode jogar com outros usuários que também têm a extensão instalada.
+Playground é um pequeno hub de jogos dentro do Chat Enhancer. Ele permite jogar com outros espectadores que têm a extensão instalada e estão na mesma live.
 
-Seu streamer saiu para uma pausa? Abra o Playground até ele voltar.
+O streamer se afastou por um minuto? Abra o Playground, jogue uma partida rápida e mantenha o chat por perto.
 
 :::media-right
 
 ![Painel compacto de xadrez flutuando sobre o chat ao vivo do YouTube](./f779ebcc57f8280d.png){shadow=smooth rotation=-2}
 
-Os jogos são compactos e não ficam muito maiores que isso. O painel pode ser arrastado, então você pode colocá-lo em qualquer lugar do chat.
+Os jogos ficam compactos. O painel é arrastável, então você pode tirá-lo do caminho quando o chat voltar a acelerar.
 
-O primeiro jogo disponível é o bom e velho xadrez. Quão rápido você consegue dar xeque-mate no seu novo colega de stream?
+O xadrez foi o primeiro jogo do Playground e ainda explica melhor a ideia: uma atividade rápida ao lado do chat, sem tomar conta da página.
 
 :::
 
-Procure as opções do Playground nesta seção das configurações da extensão.
+## Como o Xadrez funciona
+
+Abra o painel Jogos, escolha **Xadrez** e convide alguém disponível na mesma live. Quando a pessoa aceitar, o tabuleiro abre em um pequeno painel flutuante sobre o chat ao vivo.
+
+O jogo usa as regras normais do xadrez. As jogadas são verificadas antes de serem enviadas, os turnos ficam sincronizados entre os dois jogadores e a partida pode terminar em xeque-mate, empate ou desistência. Se a live voltar a ficar movimentada, arraste o painel para o lado e continue assistindo.
+
+Se não houver mais ninguém por perto, o Xadrez também aceita oponentes **Computer**. Escolha **Computer (Beginner)**, **Computer (Club)** ou **Computer (Master)** na lista de jogadores e comece uma partida do mesmo jeito que faria com outro espectador.
+
+## Por que isso combina com o chat ao vivo
+
+Playground não é uma sala de jogos completa grudada no YouTube. Ele existe para as partes mais lentas de uma live, quando o chat continua aberto, mas não há muita coisa acontecendo.
+
+Isso significa que o Xadrez é intencionalmente pequeno:
+
+- Ele roda a partir do painel Jogos dentro da extensão.
+- Usa um tabuleiro compacto e móvel.
+- Mostra apenas jogadores disponíveis que também estão usando o Chat Enhancer na live atual.
+- Mantém o restante do YouTube visível, para você voltar ao chat imediatamente.
+
+As configurações do Playground ficam no popup da extensão.
 
 :::media-left
 
 ![Configurações do Playground no popup do Chat Enhancer](./c99cee6a87fb4253.png)
 
-Ative a configuração “Entrar no Playground” para o ícone de Jogos aparecer no chat.
+Ative **Entrar no Playground** para que o ícone de Jogos apareça no chat.
 
-Quando abrir o painel de Jogos, você terá que ativar “Disponível para jogos” para que outros jogadores possam ver você, ou ativar “Disponível por padrão” nas configurações da extensão para deixar isso sempre ligado. Você decide.
+Dentro do painel Jogos, ative **Disponível para jogar** quando quiser que outros jogadores vejam você. Se normalmente quiser ficar disponível, ative **Disponível por padrão** nas configurações da extensão.
 
 :::
 
-Mais jogos em breve!
+## Agora é mais que Xadrez
+
+O Playground cresceu desde esta primeira prévia do Xadrez. Você também pode jogar [HELP-A-FRIEND! Trivia](/pt/blog/new-in-0-14-0-help-a-friend-trivia/), e [The Wild Wild Chat](/pt/blog/the-wild-wild-chat-coming-to-chat-enhancer-0-15-0/) transforma o chat ao vivo em uma caça rápida por recompensas.
+
+O fluxo continua igual: abra o painel Jogos, convide um espectador ou um oponente Computer quando houver suporte, jogue uma partida compacta e mantenha a live por perto.
 
 Se tiver sugestões, envie um e-mail para [hello@chatenhancer.com](mailto:hello@chatenhancer.com).

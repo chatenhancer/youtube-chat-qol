@@ -1,7 +1,7 @@
 ---
 title: "Chat Enhancer for YouTube ile tanışın"
 date: 2026-06-01
-description: "Chat Enhancer for YouTube, YouTube canlı sohbet deneyimini iyileştirmeyi amaçlayan ücretsiz ve açık kaynaklı bir uzantıdır."
+description: "Chat Enhancer for YouTube, yoğun YouTube canlı sohbetlerini takip etmeyi kolaylaştıran küçük ve yerel hissettiren araçlar ekler."
 locale: "tr"
 slug: "introducing-chat-enhancer-for-youtube"
 translationKey: "introducing-chat-enhancer-for-youtube"
@@ -20,33 +20,33 @@ Chat Enhancer’ı uzun süredir devam eden bir canlı yayında gereğinden fazl
 
 Bu yüzden YouTube canlı sohbetinde sürekli olmasını dilediğim şeyler için bir uzantı yaptım.
 
-Chat Enhancer, YouTube’un yerine geçen bir şey değil, YouTube’un parçası gibi hissettirmek için tasarlandı. Yerel canlı sohbet deneyimini korur, üzerine küçük bir kullanım kolaylığı katmanı ekler.
+Chat Enhancer, YouTube’un yerini almak için değil, YouTube’un içinde sessizce durmak için tasarlandı. Sohbet hâlâ YouTube sohbeti gibi hissettirir; yalnızca işe yaradığı yerlerde birkaç araç daha vardır.
 
 ## Canlı çeviri
 
-İlk karşılaştığım sorunlardan biri dildi. Bulunduğum sohbette çok fazla Korece ve Çince mesaj vardı. Tüm sayfayı Google Translate ile çevirmek teknik olarak çalışıyordu, ama sohbeti garip ve takip etmesi daha zor hale getiriyordu.
+Sürekli karşıma çıkan ilk sorun dildi. Sohbette çok fazla Korece ve Çince mesaj vardı. Tüm sayfayı çevirmek teknik olarak çalışıyordu, ama sohbeti garip ve takip etmesi daha zor hale getiriyordu.
 
 Chat Enhancer, emojileri ve bahsetmeleri bozmadan canlı sohbet mesajlarını doğrudan çevirmenizi sağlar. Çevrilmiş bir mesajın üzerine gelerek orijinal metni ve algılanan dili görebilirsiniz.
 
 Ayrıca göndermeden önce yazdığınız metni çevirebilirsiniz. Bu, çok dilli bir sohbette kenardan izlemek yerine gerçekten katılmayı çok daha kolay hale getirir.
 
-Çeviri Google Translate üzerinden yapılır, bu yüzden mükemmel değildir; ama gerçek bir fark yaratacak kadar kullanışlıdır.
+Çeviri Google Translate kullanır, bu yüzden mükemmel olmayacaktır. Pratikte yine de yoğun ve çok dilli bir sohbeti takip etmeyi kolaylaştıracak kadar iyidir.
 
 ## Inbox
 
 YouTube canlı sohbeti, biri sizden bahsettiğinde sizi bilgilendirmez.
 
-Her saniye sohbete bakıyorsanız sorun değil. Yayını arka planda bırakıp kahve almaya gidiyorsanız ya da kısa süreliğine bir hayatınız varmış gibi davranıyorsanız daha az iyi.
+Her saniye sohbete bakıyorsanız sorun değil. Yayını arka planda bırakıp kahve yapıyorsanız ya da bir dakikalığına uzaklaşıyorsanız daha az iyi.
 
 Chat Enhancer, bahsetmeler ve izlenen anahtar kelimeler için bir inbox ekler. Böylece önemli mesajları her şeyi elle kaydırmadan yakalayabilirsiniz.
 
 ## Daha iyi kullanıcı bağlamı
 
-Canlı sohbetler hızlı akar ve birinin kim olduğunu ya da ne söylediğini anlamak her zaman kolay değildir.
+Canlı sohbetler hızlı akar. Biri size yanıt verdiğinde, kim olduğu ya da birkaç dakika önce neden bahsettiği her zaman açık değildir.
 
 Chat Enhancer ile bir kullanıcının avatarına tıklamak, o kişinin son mesajlarını gösteren bir profil paneli açar. Ayrıca YouTube kanalını yan pencerede açabilir ve daha sonra tanımak istediğiniz kullanıcıları yer imlerine ekleyebilirsiniz.
 
-Küçük bir şey, ama düzenli sohbet edenleri çok daha az anonim hissettirir.
+Küçük bir şey, ama düzenli sohbet edenlerin ekrandan uçup giden rastgele isimler gibi hissettirmesini azaltır.
 
 ## En çok kullanılan emojiler
 
@@ -58,7 +58,7 @@ Chat Enhancer, en çok kullandığınız emojiler için bir sıra ekler; gerçek
 
 Hızlı bahsetme ve alıntılar, kullanıcı yer imleri, sohbet komutları, taslak kurtarma ve canlı sohbeti biraz daha az çıplak hissettiren başka küçük dokunuşlar da var.
 
-Bunların hiçbiri YouTube canlı sohbetini baştan icat etmeye çalışmıyor. Sadece onu daha kullanılabilir yapmayı amaçlıyor.
+Bunların hiçbiri YouTube canlı sohbetini farklı bir uygulamaya dönüştürmeye çalışmıyor. Sadece mevcut sohbeti kullanmayı kolaylaştırıyor.
 
 Chat Enhancer for YouTube ücretsizdir, açık kaynaklıdır, hesap gerektirmez ve analytics çalıştırmaz.
 

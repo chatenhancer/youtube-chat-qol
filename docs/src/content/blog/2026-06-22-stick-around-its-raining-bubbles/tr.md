@@ -1,7 +1,7 @@
 ---
 title: "Stick Around!: Baloncuk Yağmuru"
 date: 2026-06-22
-description: "Stick Around! canlı sohbet akışını, yukarıdan sohbet baloncuklarının düştüğü ve ayakta kalan son çöp adamın kazandığı küçük bir dövüş arenasına çevirir."
+description: "Stick Around! canlı sohbet akışını düşen sohbet baloncukları olan küçük bir dövüş arenasına çevirir."
 slug: "stick-around-its-raining-bubbles"
 image: "./cover.png"
 locale: "tr"
@@ -19,8 +19,6 @@ Sohbet akışının kendisini ele geçirir.
 Sayfayı değil. Videoyu değil. Mesaj kutusunu değil. Sadece canlı sohbetin aktığı alanı küçük bir arenaya dönüştürür; iki çöp adam, yukarıdan düşen mesajların arasında hayatta kalmaya çalışır.
 
 ## Baloncuk yağmuru
-
-Stick Around! içinde sohbet bir komut sistemi değildir. İzleyiciler özel anahtar kelimeler yazmaz ve yorumlar gizli saldırılar tetiklemez.
 
 Yorumlar hava durumudur.
 
@@ -42,7 +40,7 @@ Chess, HELP-A-FRIEND! Trivia ve The Wild Wild Chat kompakt oyun panelleri kullan
 
 Bu yüzden YouTube sohbetinin yanında olan bir şeyden çok, sohbetin *içinde* olan bir şey gibi hissettirir. Başlıkta hâlâ diğer oyun panellerindeki basit kontroller bulunur; gizleme ve ses dahil. Ama maçın kendisi doğrudan akışın üzerine çizilir.
 
-Daha koyu veya daha açık katman oyunu okunur tutarken sohbet altta görünmeye devam eder. Böylece ayrı bir ekrana dönüşmek yerine yayına bağlı kalır.
+Katman oyunu okunur tutarken sohbet altta görünmeye devam eder. Böylece ayrı bir ekrana dönüşmek yerine yayına bağlı kalır.
 
 ## Başka bir izleyiciye veya Computer'a karşı oyna
 
@@ -60,7 +58,7 @@ Her oyuncunun üç stock'u vardır. Darbe almak hasarını artırır; hasar yük
 
 Stick Around! basit bir fikirle başladı: Sohbet akışı oyunun sadece arkasında değil de oyunun bir parçası olsaydı ne olurdu?
 
-Bu yüzden düşen baloncuklar sohbet hacminden gelir. Yavaş bir yayın hafif bir maça dönüşür. Hızlı bir yayın fırtınaya dönüşür. Yorumlar hâlâ yorum gibi davranır, ama konuşma yükseldikçe oda daha tehlikeli olur.
+Bu yüzden düşen baloncuklar sohbet hacminden gelir. Yavaş bir yayın hafif bir maça dönüşür. Hızlı bir yayın fırtınaya dönüşür. Yorumlar hâlâ yorum gibi davranır, ama konuşma yükseldikçe arena daha tehlikeli olur.
 
 Saçma, hızlı ve canlı sohbetin olabildiği şekilde biraz adaletsiz.
 

@@ -1,7 +1,7 @@
 ---
 title: "The Wild Wild Chat komt naar Chat Enhancer 0.15.0"
 date: 2026-06-18
-description: "Een nieuwe Playground-speurtocht waarin spelers livechat-bounties proberen te vinden voordat de tijd om is."
+description: "The Wild Wild Chat verandert livechat in een snelle premiejacht waarin spelers passende berichten proberen te claimen."
 locale: "nl"
 slug: "the-wild-wild-chat-coming-to-chat-enhancer-0-15-0"
 image: "./05346f6306b006ff.png"
@@ -56,7 +56,7 @@ Er is ook een compacte modus voor deze game. Als de volledige wanted-poster te v
 
 ## Onderdeel van Playground
 
-Net als Chess en HELP-A-FRIEND! Trivia leeft The Wild Wild Chat binnen Playground. Het gebruikt hetzelfde Games-paneel, dezelfde uitnodigingsflow en hetzelfde zwevende gamevenster, zodat het dicht bij YouTube-chat blijft in plaats van een aparte app te worden.
+Net als Chess en HELP-A-FRIEND! Trivia leeft The Wild Wild Chat binnen Playground. Het gebruikt hetzelfde Games-paneel, dezelfde uitnodigingsflow en hetzelfde zwevende gamevenster, zodat het dicht bij YouTube-chat blijft.
 
 De stijl is wel nieuw: wanted-posters, gestempelde claims, stoffig papier en een beetje westerngevoel.
 

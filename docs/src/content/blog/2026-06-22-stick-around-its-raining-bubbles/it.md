@@ -1,7 +1,7 @@
 ---
 title: "Stick Around!: Piovono bolle"
 date: 2026-06-22
-description: "Stick Around! trasforma il feed della live chat in una piccola arena di combattimento, dove le bolle della chat cadono dall'alto e vince l'ultimo omino stilizzato rimasto in piedi."
+description: "Stick Around! trasforma il feed della live chat in una piccola arena di combattimento con bolle della chat che cadono."
 slug: "stick-around-its-raining-bubbles"
 image: "./cover.png"
 locale: "it"
@@ -19,8 +19,6 @@ Prende il controllo del feed della chat.
 Non della pagina. Non del video. Non della casella dei messaggi. Solo dello spazio in cui scorre la live chat, trasformandolo in una piccola arena dove due omini stilizzati cercano di restare vivi mentre i messaggi cadono dall’alto.
 
 ## Piovono bolle
-
-In Stick Around!, la chat non è un sistema di comandi. Gli spettatori non digitano parole chiave speciali, e i commenti non attivano attacchi segreti.
 
 I commenti sono meteo.
 
@@ -42,7 +40,7 @@ Chess, HELP-A-FRIEND! Trivia e The Wild Wild Chat usano tutti pannelli di gioco 
 
 Questo lo fa sembrare più vicino a qualcosa che succede *dentro* la chat di YouTube invece che accanto. L’intestazione ha ancora gli stessi controlli semplici degli altri pannelli di gioco, inclusi nascondi e audio, ma la partita viene disegnata direttamente sopra il feed.
 
-L’overlay più scuro o più chiaro mantiene il gioco leggibile mentre la chat resta visibile sotto, quindi continua a sembrare connesso allo stream invece di diventare una schermata separata.
+L’overlay mantiene il gioco leggibile mentre la chat resta visibile sotto, quindi continua a sembrare connesso allo stream invece di diventare una schermata separata.
 
 ## Gioca contro un altro spettatore o Computer
 
@@ -60,7 +58,7 @@ Ogni giocatore ha tre stock. Essere colpiti aumenta il danno, e più danno hai, 
 
 Stick Around! è nato da un’idea semplice: e se il feed della chat non fosse solo dietro il gioco, ma parte del gioco?
 
-Per questo le bolle che cadono dipendono dal volume della chat. Uno stream lento diventa una partita leggera. Uno stream veloce diventa una tempesta. I commenti continuano a comportarsi come commenti, ma la stanza diventa più pericolosa man mano che la conversazione si fa più rumorosa.
+Per questo le bolle che cadono dipendono dal volume della chat. Uno stream lento diventa una partita leggera. Uno stream veloce diventa una tempesta. I commenti continuano a comportarsi come commenti, ma l’arena diventa più pericolosa man mano che la conversazione si fa più rumorosa.
 
 È sciocco, rapido e un po’ ingiusto esattamente come può esserlo la live chat.
 

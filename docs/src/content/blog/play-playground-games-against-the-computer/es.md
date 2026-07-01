@@ -1,7 +1,7 @@
 ---
 title: "Juega a los juegos de Playground contra el ordenador"
 date: 2026-06-14
-description: "Juega a Chess contra tres rivales Computer o a HELP-A-FRIEND! Trivia en Playground cuando no haya otro jugador disponible."
+description: "Los rivales Computer hacen que sea más fácil iniciar juegos de Playground cuando no hay nadie más cerca."
 locale: "es"
 slug: "play-playground-games-against-the-computer"
 image: "./cover.png"
@@ -36,7 +36,7 @@ No necesitas ningún ajuste separado: elige el perfil de Computer que quieras en
 
 No es un modo en solitario separado ni una pantalla nueva. Los jugadores Computer se comportan como rivales normales de Playground, así que el flujo sigue siendo familiar: abre el panel, elige un juego, envía una invitación y juega.
 
-En Chess, Computer hace sus jugadas después de una breve pausa para que la partida no se sienta instantánea ni demasiado robótica.
+En Chess, Computer hace sus jugadas después de una breve pausa para que la partida no se sienta instantánea.
 
 En *HELP-A-FRIEND! Trivia*, Computer responde durante la ronda de preguntas igual que otro jugador. No es perfecto, así que sigues teniendo una oportunidad real de ganar.
 

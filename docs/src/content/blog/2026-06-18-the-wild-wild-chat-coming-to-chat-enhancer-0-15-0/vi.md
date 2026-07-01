@@ -1,7 +1,7 @@
 ---
 title: "The Wild Wild Chat sắp có trong Chat Enhancer 0.15.0"
 date: 2026-06-18
-description: "Một trò săn bounty mới trong Playground, nơi người chơi chạy đua để tìm mục tiêu trong live chat trước khi hết giờ."
+description: "The Wild Wild Chat biến live chat thành một cuộc săn bounty tốc độ cao, nơi người chơi chạy đua để claim các tin nhắn khớp."
 locale: "vi"
 slug: "the-wild-wild-chat-coming-to-chat-enhancer-0-15-0"
 image: "./05346f6306b006ff.png"
@@ -56,7 +56,7 @@ Trò chơi này cũng có chế độ thu gọn. Nếu poster truy nã đầy đ
 
 ## Một phần của Playground
 
-Giống như Chess và HELP-A-FRIEND! Trivia, The Wild Wild Chat nằm trong Playground. Nó dùng cùng bảng Games, cùng luồng mời và cùng cửa sổ trò chơi nổi, nên vẫn ở gần chat YouTube thay vì trở thành một ứng dụng riêng.
+Giống như Chess và HELP-A-FRIEND! Trivia, The Wild Wild Chat nằm trong Playground. Nó dùng cùng bảng Games, cùng luồng mời và cùng cửa sổ trò chơi nổi, nên vẫn ở gần chat YouTube.
 
 Phong cách thì mới: poster truy nã, dấu đóng trên các lượt nhận, giấy phủ bụi và một chút chất viễn Tây.
 

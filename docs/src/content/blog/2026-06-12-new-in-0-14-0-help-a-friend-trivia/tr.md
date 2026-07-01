@@ -18,7 +18,7 @@ tags:
 
 ![HELP-A-FRIEND! Trivia logosu](./2026-06-12-new-in-0-14-0-help-a-friend-trivia-assets/6ef6d6f2584f127f.png){shadow=smooth;rotate=-8deg}
 
-*HELP-A-FRIEND! Trivia*, bir quiz tahtası yerine küçük bir grup sohbeti gibi oynanır. Arkadaşlarından biri belli ki yayına dikkat etmemiş ve şimdi yardıma ihtiyacı var... cevapları biliyor musun?
+*HELP-A-FRIEND! Trivia*, bir quiz tahtası yerine küçük bir grup sohbeti gibi oynanır. Arkadaşlarından biri belli ki yayına dikkat etmemiş ve şimdi yardıma ihtiyacı var. Ne olduğunu hatırlıyor musun?
 
 Doğru cevaplar 🏆 tepkisi alır.
 
@@ -28,7 +28,7 @@ Yanlış cevaplar *kibarca* değerlendirilir.
 
 ## Nasıl çalışır
 
-Bir YouTube tekrarından (sona ermiş bir canlı yayın) Playground maçı başlat, başka bir oyuncu davet et ve sorular hazırlanırken birkaç saniye bekle.
+Bir YouTube tekrarından Playground maçı başlat, başka bir oyuncu davet et ve sorular hazırlanırken birkaç saniye bekle.
 
 Oyun başladığında “arkadaşın” tekrar hakkında soru sorar, dört olası cevap görünür ve süre dolmadan iki oyuncu da seçim yapar. Hızlı cevap ver. Dostun pek sabırlı değil.
 

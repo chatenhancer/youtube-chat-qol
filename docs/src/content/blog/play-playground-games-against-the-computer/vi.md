@@ -1,7 +1,7 @@
 ---
 title: "Chơi game Playground với máy tính"
 date: 2026-06-14
-description: "Chơi Chess với ba đối thủ Computer hoặc HELP-A-FRIEND! Trivia trong Playground khi không có người chơi khác."
+description: "Đối thủ Computer giúp trò chơi Playground dễ bắt đầu hơn khi không có ai khác ở quanh."
 locale: "vi"
 slug: "play-playground-games-against-the-computer"
 image: "./cover.png"
@@ -36,7 +36,7 @@ Không cần cài đặt riêng: chọn hồ sơ Computer bạn muốn trong dan
 
 Đây không phải là chế độ solo riêng hay một màn hình mới. Các người chơi Computer hoạt động như đối thủ Playground bình thường, nên quy trình vẫn quen thuộc: mở bảng, chọn game, gửi lời mời và chơi.
 
-Trong Chess, Computer đi nước cờ sau một khoảng dừng ngắn để ván đấu không có cảm giác diễn ra tức thì hoặc quá máy móc.
+Trong Chess, Computer đi nước cờ sau một khoảng dừng ngắn để ván đấu không có cảm giác diễn ra tức thì.
 
 Trong *HELP-A-FRIEND! Trivia*, Computer trả lời trong vòng câu hỏi như một người chơi khác. Nó không hoàn hảo, nên bạn vẫn có cơ hội thật sự để thắng.
 

@@ -1,7 +1,7 @@
 ---
 title: "العب ألعاب Playground ضد الكمبيوتر"
 date: 2026-06-14
-description: "العب Chess ضد ثلاثة خصوم Computer أو HELP-A-FRIEND! Trivia في Playground عندما لا يكون لاعب آخر متاحًا."
+description: "يجعل خصوم Computer بدء ألعاب Playground أسهل عندما لا يكون هناك أحد آخر."
 locale: "ar"
 slug: "play-playground-games-against-the-computer"
 image: "./cover.png"
@@ -36,7 +36,7 @@ tags:
 
 هذا ليس وضعًا منفردًا منفصلًا ولا شاشة جديدة. يتصرف لاعبو Computer مثل خصوم عاديين في Playground، لذلك يبقى المسار مألوفًا: افتح اللوحة، اختر لعبة، أرسل دعوة، والعب.
 
-في Chess، يلعب Computer نقلاته بعد توقف قصير حتى لا تبدو اللعبة فورية أو آلية أكثر من اللازم.
+في Chess، يلعب Computer نقلاته بعد توقف قصير حتى لا تبدو اللعبة فورية.
 
 في *HELP-A-FRIEND! Trivia*، يجيب Computer أثناء جولة السؤال مثل أي لاعب آخر. ليس مثاليًا، لذلك ما زالت لديك فرصة حقيقية للفوز.
 

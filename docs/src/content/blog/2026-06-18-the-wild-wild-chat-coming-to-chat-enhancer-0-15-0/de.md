@@ -1,7 +1,7 @@
 ---
 title: "The Wild Wild Chat kommt zu Chat Enhancer 0.15.0"
 date: 2026-06-18
-description: "Eine neue Playground-Schnitzeljagd, bei der Spieler Livechat-Kopfgelder finden müssen, bevor die Zeit abläuft."
+description: "The Wild Wild Chat macht Livechat zu einer schnellen Kopfgeldjagd, bei der Spieler passende Nachrichten beanspruchen."
 locale: "de"
 slug: "the-wild-wild-chat-coming-to-chat-enhancer-0-15-0"
 image: "./05346f6306b006ff.png"
@@ -56,7 +56,7 @@ Es gibt außerdem einen Kompaktmodus für dieses Spiel. Wenn der volle Steckbrie
 
 ## Teil von Playground
 
-Wie Chess und HELP-A-FRIEND! Trivia lebt The Wild Wild Chat in Playground. Es verwendet dasselbe Spiele-Panel, denselben Einladungsablauf und dasselbe schwebende Spielfenster. So bleibt es nah am YouTube-Chat, statt zu einer separaten App zu werden.
+Wie Chess und HELP-A-FRIEND! Trivia lebt The Wild Wild Chat in Playground. Es verwendet dasselbe Spiele-Panel, denselben Einladungsablauf und dasselbe schwebende Spielfenster. So bleibt es nah am YouTube-Chat.
 
 Der Stil ist aber neu: Steckbriefe, abgestempelte Ansprüche, staubiges Papier und ein wenig Western-Flair.
 

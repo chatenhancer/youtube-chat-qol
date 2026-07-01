@@ -1,7 +1,7 @@
 ---
 title: "The Wild Wild Chat arrive dans Chat Enhancer 0.15.0"
 date: 2026-06-18
-description: "Une nouvelle chasse aux primes Playground où les joueurs font la course pour repérer des primes dans le chat en direct avant la fin du chrono."
+description: "The Wild Wild Chat transforme le chat en direct en chasse aux primes rapide où les joueurs se dépêchent de réclamer les messages correspondants."
 locale: "fr"
 slug: "the-wild-wild-chat-coming-to-chat-enhancer-0-15-0"
 image: "./05346f6306b006ff.png"
@@ -56,7 +56,7 @@ Il existe aussi un mode compact pour ce jeu. Si l’affiche complète prend trop
 
 ## Dans Playground
 
-Comme Chess et HELP-A-FRIEND! Trivia, The Wild Wild Chat vit dans Playground. Il utilise le même panneau Jeux, le même parcours d’invitation et la même fenêtre de jeu flottante, afin de rester proche du chat YouTube plutôt que de devenir une application séparée.
+Comme Chess et HELP-A-FRIEND! Trivia, The Wild Wild Chat vit dans Playground. Il utilise le même panneau Jeux, le même parcours d’invitation et la même fenêtre de jeu flottante, afin de rester proche du chat YouTube.
 
 Le style, lui, est nouveau : avis de recherche, tampons de réclamation, papier poussiéreux et une petite touche western.
 

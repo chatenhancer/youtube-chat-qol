@@ -18,7 +18,7 @@ Game Playground kedua sudah hadir: **HELP-A-FRIEND! Trivia**
 
 ![Logo HELP-A-FRIEND! Trivia](./2026-06-12-new-in-0-14-0-help-a-friend-trivia-assets/6ef6d6f2584f127f.png){shadow=smooth;rotate=-8deg}
 
-Alih-alih papan kuis, *HELP-A-FRIEND! Trivia* berjalan seperti chat grup kecil. Salah satu temanmu jelas tidak memperhatikan stream dan sekarang butuh bantuan... apakah kamu tahu jawabannya?
+Alih-alih papan kuis, *HELP-A-FRIEND! Trivia* berjalan seperti chat grup kecil. Salah satu temanmu jelas tidak memperhatikan stream dan sekarang butuh bantuan. Apakah kamu ingat apa yang terjadi?
 
 Jawaban benar mendapat reaksi 🏆.
 
@@ -28,7 +28,7 @@ Jawaban salah akan dinilai *dengan sopan*.
 
 ## Cara kerjanya
 
-Mulai pertandingan Playground dari replay YouTube (live stream yang sudah berakhir), undang pemain lain, lalu tunggu beberapa detik sementara pertanyaan disiapkan.
+Mulai pertandingan Playground dari replay YouTube, undang pemain lain, lalu tunggu beberapa detik sementara pertanyaan disiapkan.
 
 Setelah game dimulai, “teman” kamu bertanya tentang replay, empat kemungkinan jawaban muncul, dan kedua pemain memilih sebelum waktu habis. Jawab cepat. Temanmu tidak sabaran.
 

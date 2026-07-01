@@ -1,7 +1,7 @@
 ---
 title: "The Wild Wild Chat, Chat Enhancer 0.15.0’a geliyor"
 date: 2026-06-18
-description: "Oyuncuların süre bitmeden canlı sohbet ödüllerini bulmak için yarıştığı yeni bir Playground hazine avı."
+description: "The Wild Wild Chat, canlı sohbeti oyuncuların eşleşen mesajları kapmak için yarıştığı hızlı bir ödül avına dönüştürür."
 locale: "tr"
 slug: "the-wild-wild-chat-coming-to-chat-enhancer-0-15-0"
 image: "./05346f6306b006ff.png"
@@ -56,7 +56,7 @@ Bu oyun için kompakt mod da var. Tam arananlar posteri sohbetin çok fazla kıs
 
 ## Playground’un parçası
 
-Chess ve HELP-A-FRIEND! Trivia gibi The Wild Wild Chat de Playground içinde yaşar. Aynı Games panelini, aynı davet akışını ve aynı yüzen oyun penceresini kullanır; böylece ayrı bir uygulama olmak yerine YouTube sohbetine yakın kalır.
+Chess ve HELP-A-FRIEND! Trivia gibi The Wild Wild Chat de Playground içinde yaşar. Aynı Games panelini, aynı davet akışını ve aynı yüzen oyun penceresini kullanır; böylece YouTube sohbetine yakın kalır.
 
 Ama tarzı yeni: arananlar posterleri, damgalı alımlar, tozlu kağıt ve biraz western havası.
 

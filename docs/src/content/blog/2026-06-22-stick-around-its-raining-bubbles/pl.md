@@ -1,7 +1,7 @@
 ---
 title: "Stick Around!: Pada deszcz z bąbelków"
 date: 2026-06-22
-description: "Stick Around! zmienia kanał czatu na żywo w małą arenę walki, na której z góry spadają bąbelki czatu, a wygrywa ostatnia stojąca postać z patyczków."
+description: "Stick Around! zmienia kanał czatu na żywo w małą arenę walki ze spadającymi bąbelkami czatu."
 slug: "stick-around-its-raining-bubbles"
 image: "./cover.png"
 locale: "pl"
@@ -19,8 +19,6 @@ Przejmuje sam kanał czatu.
 Nie stronę. Nie film. Nie pole wiadomości. Tylko przestrzeń, w której przewija się czat na żywo, zmieniając ją w małą arenę, gdzie dwie postacie z patyczków próbują przetrwać, gdy wiadomości spadają z góry.
 
 ## Pada deszcz z bąbelków
-
-W Stick Around! czat nie jest systemem komend. Widzowie nie wpisują specjalnych słów kluczowych, a komentarze nie uruchamiają sekretnych ataków.
 
 Komentarze są pogodą.
 
@@ -42,7 +40,7 @@ Chess, HELP-A-FRIEND! Trivia i The Wild Wild Chat używają kompaktowych paneli 
 
 Dzięki temu bardziej przypomina coś, co dzieje się *w* czacie YouTube, a nie obok niego. Nagłówek nadal ma te same proste elementy sterowania co inne panele gier, w tym ukrywanie i dźwięk, ale sama rozgrywka jest rysowana bezpośrednio nad kanałem.
 
-Ciemniejszy lub jaśniejszy overlay utrzymuje czytelność gry, podczas gdy czat pozostaje widoczny pod spodem, więc całość nadal czuje się połączona ze streamem, zamiast stawać się osobnym ekranem.
+Nakładka utrzymuje czytelność gry, podczas gdy czat pozostaje widoczny pod spodem, więc całość nadal czuje się połączona ze streamem, zamiast stawać się osobnym ekranem.
 
 ## Graj z innym widzem albo z Computer
 
@@ -60,7 +58,7 @@ Każdy gracz ma trzy stocki. Trafienia zwiększają twoje obrażenia, a im więk
 
 Stick Around! zaczęło się od prostego pomysłu: co jeśli kanał czatu nie byłby tylko za grą, ale byłby częścią gry?
 
-Dlatego spadające bąbelki wynikają z natężenia czatu. Wolny stream staje się lekkim meczem. Szybki stream staje się burzą. Komentarze nadal zachowują się jak komentarze, ale pokój robi się bardziej niebezpieczny, im głośniejsza jest rozmowa.
+Dlatego spadające bąbelki wynikają z natężenia czatu. Wolny stream staje się lekkim meczem. Szybki stream staje się burzą. Komentarze nadal zachowują się jak komentarze, ale arena robi się bardziej niebezpieczna, im głośniejsza jest rozmowa.
 
 To głupie, szybkie i trochę niesprawiedliwe dokładnie tak, jak potrafi być czat na żywo.
 

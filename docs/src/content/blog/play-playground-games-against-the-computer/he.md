@@ -1,7 +1,7 @@
 ---
 title: "שחקו במשחקי Playground נגד המחשב"
 date: 2026-06-14
-description: "שחקו Chess מול שלושה יריבי Computer או HELP-A-FRIEND! Trivia ב-Playground כשאין שחקן אחר זמין."
+description: "יריבי Computer מקלים להתחיל משחקי Playground כשאין אף אחד אחר בסביבה."
 locale: "he"
 slug: "play-playground-games-against-the-computer"
 image: "./cover.png"
@@ -36,7 +36,7 @@ tags:
 
 זה לא מצב סולו נפרד ולא מסך חדש. שחקני Computer מתנהגים כמו יריבי Playground רגילים, כך שהזרימה נשארת מוכרת: פותחים את הלוח, בוחרים משחק, שולחים הזמנה ומשחקים.
 
-ב-Chess, Computer עושה את המהלכים שלו אחרי השהיה קצרה כדי שהמשחק לא ירגיש מיידי או רובוטי מדי.
+ב-Chess, Computer עושה את המהלכים שלו אחרי השהיה קצרה כדי שהמשחק לא ירגיש מיידי.
 
 ב-*HELP-A-FRIEND! Trivia*, Computer עונה בסיבוב השאלה בדיוק כמו שחקן אחר. הוא לא מושלם, כך שעדיין יש לכם סיכוי אמיתי לנצח.
 

@@ -1,7 +1,7 @@
 ---
 title: "The Wild Wild Chat появится в Chat Enhancer 0.15.0"
 date: 2026-06-18
-description: "Новая охота за наградами в Playground, где игроки соревнуются, кто быстрее найдет цели в live-чате до окончания времени."
+description: "The Wild Wild Chat превращает live-чат в быструю охоту за наградами, где игроки спешат забрать подходящие сообщения."
 locale: "ru"
 slug: "the-wild-wild-chat-coming-to-chat-enhancer-0-15-0"
 image: "./05346f6306b006ff.png"
@@ -56,7 +56,7 @@ The Wild Wild Chat доступна только во время live-чата, 
 
 ## Часть Playground
 
-Как Chess и HELP-A-FRIEND! Trivia, The Wild Wild Chat живет внутри Playground. Она использует ту же панель Games, тот же поток приглашений и то же плавающее игровое окно, поэтому остается рядом с чатом YouTube, а не превращается в отдельное приложение.
+Как Chess и HELP-A-FRIEND! Trivia, The Wild Wild Chat живет внутри Playground. Она использует ту же панель Games, тот же поток приглашений и то же плавающее игровое окно, поэтому остается рядом с чатом YouTube.
 
 Стиль при этом новый: плакаты розыска, штампы на заявках, пыльная бумага и немного вестерн-настроения.
 

@@ -1,7 +1,7 @@
 ---
 title: "The Wild Wild Chat hadir di Chat Enhancer 0.15.0"
 date: 2026-06-18
-description: "Game perburuan bounty baru di Playground, tempat pemain berlomba menemukan target live chat sebelum waktu habis."
+description: "The Wild Wild Chat mengubah live chat menjadi perburuan bounty cepat, tempat pemain berlomba mengklaim pesan yang cocok."
 locale: "id"
 slug: "the-wild-wild-chat-coming-to-chat-enhancer-0-15-0"
 image: "./05346f6306b006ff.png"
@@ -56,7 +56,7 @@ Ada juga mode ringkas untuk game ini. Jika poster wanted penuh menutupi terlalu 
 
 ## Bagian dari Playground
 
-Seperti Chess dan HELP-A-FRIEND! Trivia, The Wild Wild Chat berada di dalam Playground. Game ini memakai panel Games yang sama, alur undangan yang sama, dan jendela game mengambang yang sama, sehingga tetap dekat dengan chat YouTube dan tidak menjadi aplikasi terpisah.
+Seperti Chess dan HELP-A-FRIEND! Trivia, The Wild Wild Chat berada di dalam Playground. Game ini memakai panel Games yang sama, alur undangan yang sama, dan jendela game mengambang yang sama, sehingga tetap dekat dengan chat YouTube.
 
 Namun gayanya baru: poster wanted, klaim yang distempel, kertas berdebu, dan sedikit nuansa western.
 

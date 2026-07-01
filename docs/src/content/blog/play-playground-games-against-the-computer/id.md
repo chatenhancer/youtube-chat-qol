@@ -1,7 +1,7 @@
 ---
 title: "Main game Playground melawan komputer"
 date: 2026-06-14
-description: "Main Chess melawan tiga lawan Computer atau HELP-A-FRIEND! Trivia di Playground saat tidak ada pemain lain yang tersedia."
+description: "Lawan Computer membuat game Playground lebih mudah dimulai saat tidak ada orang lain di sekitar."
 locale: "id"
 slug: "play-playground-games-against-the-computer"
 image: "./cover.png"
@@ -36,7 +36,7 @@ Tidak perlu pengaturan terpisah: pilih profil Computer yang Anda inginkan dari d
 
 Ini bukan mode solo terpisah atau layar baru. Pemain Computer berperilaku seperti lawan Playground biasa, jadi alurnya tetap familier: buka panel, pilih game, kirim undangan, lalu main.
 
-Di Chess, Computer menjalankan langkahnya setelah jeda singkat agar game tidak terasa instan atau terlalu seperti robot.
+Di Chess, Computer menjalankan langkahnya setelah jeda singkat agar game tidak terasa instan.
 
 Di *HELP-A-FRIEND! Trivia*, Computer menjawab selama ronde pertanyaan seperti pemain lain. Jawabannya tidak sempurna, jadi Anda tetap punya peluang nyata untuk menang.
 

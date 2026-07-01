@@ -1,7 +1,7 @@
 ---
 title: "Playground games को कंप्यूटर के खिलाफ खेलें"
 date: 2026-06-14
-description: "जब कोई दूसरा खिलाड़ी उपलब्ध न हो, तब Playground में तीन Computer opponents के खिलाफ Chess या HELP-A-FRIEND! Trivia खेलें."
+description: "जब आसपास कोई और नहीं होता, Computer opponents Playground games शुरू करना आसान बनाते हैं."
 locale: "hi"
 slug: "play-playground-games-against-the-computer"
 image: "./cover.png"
@@ -36,7 +36,7 @@ Chess में अब तीन Computer opponents हैं। Beginner warm u
 
 यह कोई अलग solo mode या नई screen नहीं है। Computer players normal Playground opponents की तरह व्यवहार करते हैं, इसलिए flow वही रहता है: panel खोलें, game चुनें, invite भेजें और खेलें।
 
-Chess में, Computer थोड़े pause के बाद अपनी moves करता है ताकि game instant या बहुत robotic न लगे।
+Chess में, Computer थोड़े pause के बाद अपनी moves करता है ताकि game instant न लगे।
 
 *HELP-A-FRIEND! Trivia* में, Computer question round के दौरान दूसरे player की तरह answer देता है। यह perfect नहीं है, इसलिए आपके पास जीतने का वास्तविक chance रहता है।
 

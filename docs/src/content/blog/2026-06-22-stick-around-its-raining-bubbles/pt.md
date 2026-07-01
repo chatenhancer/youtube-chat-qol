@@ -1,7 +1,7 @@
 ---
 title: "Stick Around!: Está chovendo bolhas"
 date: 2026-06-22
-description: "Stick Around! transforma o feed do chat ao vivo em uma pequena arena de luta, onde bolhas de chat caem de cima e vence o último boneco de palito em pé."
+description: "Stick Around! transforma o feed do chat ao vivo em uma pequena arena de luta com bolhas de chat caindo."
 slug: "stick-around-its-raining-bubbles"
 image: "./cover.png"
 locale: "pt"
@@ -19,8 +19,6 @@ Ele toma conta do próprio feed do chat.
 Não da página. Não do vídeo. Não da caixa de mensagens. Só do espaço por onde o chat ao vivo passa, transformando-o em uma pequena arena onde dois bonecos de palito tentam sobreviver enquanto mensagens caem de cima.
 
 ## Está chovendo bolhas
-
-Em Stick Around!, o chat não é um sistema de comandos. Os espectadores não digitam palavras-chave especiais, e comentários não disparam ataques secretos.
 
 Comentários são o clima.
 
@@ -42,7 +40,7 @@ Chess, HELP-A-FRIEND! Trivia e The Wild Wild Chat usam painéis de jogo compacto
 
 Isso faz com que pareça mais algo acontecendo *dentro* do chat do YouTube do que ao lado dele. O cabeçalho ainda tem os mesmos controles simples dos outros painéis de jogo, incluindo ocultar e som, mas a partida em si é desenhada diretamente sobre o feed.
 
-A sobreposição mais escura ou mais clara mantém o jogo legível enquanto o chat continua visível por baixo, então ele ainda parece conectado à transmissão em vez de virar uma tela separada.
+A sobreposição mantém o jogo legível enquanto o chat continua visível por baixo, então ele ainda parece conectado à transmissão em vez de virar uma tela separada.
 
 ## Jogue contra outro espectador ou Computer
 
@@ -60,7 +58,7 @@ Cada jogador tem três stocks. Levar golpes aumenta seu dano, e quanto maior o d
 
 Stick Around! começou com uma ideia simples: e se o feed do chat não estivesse apenas atrás do jogo, mas fosse parte do jogo?
 
-É por isso que as bolhas que caem vêm do volume do chat. Uma transmissão lenta vira uma partida leve. Uma transmissão rápida vira uma tempestade. Os comentários continuam se comportando como comentários, mas a sala fica mais perigosa conforme a conversa fica mais alta.
+É por isso que as bolhas que caem vêm do volume do chat. Uma transmissão lenta vira uma partida leve. Uma transmissão rápida vira uma tempestade. Os comentários continuam se comportando como comentários, mas a arena fica mais perigosa conforme a conversa fica mais alta.
 
 É bobo, rápido e um pouco injusto exatamente do jeito que um chat ao vivo pode ser.
 

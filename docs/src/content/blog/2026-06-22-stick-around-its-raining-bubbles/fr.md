@@ -1,7 +1,7 @@
 ---
 title: "Stick Around! : Il pleut des bulles"
 date: 2026-06-22
-description: "Stick Around! transforme le flux du chat en direct en petite arène de combat où des bulles de chat tombent du haut et où le dernier bonhomme bâton debout gagne."
+description: "Stick Around! transforme le flux du chat en direct en petite arène de combat avec des bulles de chat qui tombent."
 slug: "stick-around-its-raining-bubbles"
 image: "./cover.png"
 locale: "fr"
@@ -19,8 +19,6 @@ Il prend possession du flux du chat lui-même.
 Pas la page. Pas la vidéo. Pas la zone de message. Seulement l’espace où défile le chat en direct, transformé en petite arène où deux bonshommes bâtons essaient de survivre pendant que des messages tombent d’en haut.
 
 ## Il pleut des bulles
-
-Dans Stick Around!, le chat n’est pas un système de commandes. Les spectateurs ne tapent pas de mots-clés spéciaux, et les commentaires ne déclenchent pas d’attaques secrètes.
 
 Les commentaires sont la météo.
 
@@ -42,7 +40,7 @@ Chess, HELP-A-FRIEND! Trivia et The Wild Wild Chat utilisent tous des panneaux d
 
 Cela le rapproche de quelque chose qui se passe *dans* le chat YouTube plutôt qu’à côté. L’en-tête garde les mêmes commandes simples que les autres panneaux de jeu, dont masquer et son, mais la partie elle-même est dessinée directement au-dessus du flux.
 
-La superposition plus sombre ou plus claire garde le jeu lisible tandis que le chat reste visible dessous, ce qui le maintient lié au stream au lieu d’en faire un écran séparé.
+La superposition garde le jeu lisible tandis que le chat reste visible dessous, ce qui le maintient lié au stream au lieu d’en faire un écran séparé.
 
 ## Jouer contre un autre spectateur ou Computer
 
@@ -60,7 +58,7 @@ Chaque joueur a trois stocks. Se faire toucher augmente tes dégâts, et plus te
 
 Stick Around! est parti d’une idée simple : et si le flux du chat n’était pas seulement derrière le jeu, mais faisait partie du jeu ?
 
-C’est pour cela que les bulles qui tombent viennent du volume du chat. Un stream calme devient une partie légère. Un stream rapide devient une tempête. Les commentaires restent des commentaires, mais la pièce devient plus dangereuse à mesure que la conversation monte.
+C’est pour cela que les bulles qui tombent viennent du volume du chat. Un stream calme devient une partie légère. Un stream rapide devient une tempête. Les commentaires restent des commentaires, mais l’arène devient plus dangereuse à mesure que la conversation monte.
 
 C’est idiot, rapide et un peu injuste, exactement comme le chat en direct peut l’être.
 

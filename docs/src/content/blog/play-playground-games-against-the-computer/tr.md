@@ -1,7 +1,7 @@
 ---
 title: "Playground oyunlarını bilgisayara karşı oynayın"
 date: 2026-06-14
-description: "Başka bir oyuncu yokken Playground’da üç Computer rakibine karşı Chess veya HELP-A-FRIEND! Trivia oynayın."
+description: "Computer rakipleri, etrafta başka kimse yokken Playground oyunlarını başlatmayı kolaylaştırır."
 locale: "tr"
 slug: "play-playground-games-against-the-computer"
 image: "./cover.png"
@@ -36,7 +36,7 @@ Ayrı bir ayara gerek yok: oyuncu listesinden istediğiniz Computer profilini se
 
 Bu ayrı bir solo mod ya da yeni bir ekran değil. Computer oyuncuları normal Playground rakipleri gibi davranır, bu yüzden akış tanıdık kalır: paneli açın, oyun seçin, davet gönderin ve oynayın.
 
-Chess’te Computer hamlelerini kısa bir duraklamadan sonra yapar, böylece oyun anında gerçekleşiyor ya da fazla robotik hissettirmez.
+Chess’te Computer hamlelerini kısa bir duraklamadan sonra yapar, böylece oyun anında gerçekleşiyor gibi hissettirmez.
 
 *HELP-A-FRIEND! Trivia* içinde Computer, soru turunda başka bir oyuncu gibi cevap verir. Kusursuz değildir, bu yüzden kazanmak için hâlâ gerçek bir şansınız vardır.
 

@@ -1,7 +1,7 @@
 ---
 title: "Stick Around!: Llueven burbujas"
 date: 2026-06-22
-description: "Stick Around! convierte el feed del chat en directo en una pequeña arena de combate donde caen burbujas de chat desde arriba y gana el último muñeco de palitos en pie."
+description: "Stick Around! convierte el feed del chat en directo en una pequeña arena de combate con burbujas de chat cayendo."
 slug: "stick-around-its-raining-bubbles"
 image: "./cover.png"
 locale: "es"
@@ -19,8 +19,6 @@ Se apodera del propio feed del chat.
 No de la página. No del vídeo. No del cuadro de mensajes. Solo del espacio por el que se desplaza el chat en directo, convirtiéndolo en una pequeña arena donde dos muñecos de palitos intentan sobrevivir mientras caen mensajes desde arriba.
 
 ## Llueven burbujas
-
-En Stick Around!, el chat no es un sistema de comandos. Los espectadores no escriben palabras clave especiales y los comentarios no activan ataques secretos.
 
 Los comentarios son el clima.
 
@@ -42,7 +40,7 @@ Chess, HELP-A-FRIEND! Trivia y The Wild Wild Chat usan paneles de juego compacto
 
 Eso hace que se sienta más como algo que ocurre *dentro* del chat de YouTube en vez de a su lado. El encabezado sigue teniendo los mismos controles sencillos que los otros paneles de juego, incluidos ocultar y sonido, pero la partida se dibuja directamente sobre el feed.
 
-La superposición más oscura o más clara mantiene el juego legible mientras el chat sigue visible debajo, así que todavía se siente conectado al stream en lugar de convertirse en una pantalla aparte.
+La superposición mantiene el juego legible mientras el chat sigue visible debajo, así que todavía se siente conectado al stream en lugar de convertirse en una pantalla aparte.
 
 ## Juega contra otro espectador o contra Computer
 
@@ -60,7 +58,7 @@ Cada jugador tiene tres stocks. Recibir golpes sube tu daño, y cuanto más dañ
 
 Stick Around! nació de una idea simple: ¿y si el feed del chat no estuviera solo detrás del juego, sino que fuera parte del juego?
 
-Por eso las burbujas que caen vienen del volumen del chat. Un stream lento se convierte en una partida ligera. Un stream rápido se convierte en una tormenta. Los comentarios siguen comportándose como comentarios, pero la sala se vuelve más peligrosa cuanto más fuerte se pone la conversación.
+Por eso las burbujas que caen vienen del volumen del chat. Un stream lento se convierte en una partida ligera. Un stream rápido se convierte en una tormenta. Los comentarios siguen comportándose como comentarios, pero la arena se vuelve más peligrosa cuanto más fuerte se pone la conversación.
 
 Es tonto, rápido y un poco injusto justo de la forma en que puede serlo el chat en directo.
 

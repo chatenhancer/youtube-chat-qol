@@ -1,7 +1,7 @@
 ---
 title: "Stick Around!: Hujan Gelembung"
 date: 2026-06-22
-description: "Stick Around! mengubah feed live chat menjadi arena bertarung kecil, tempat gelembung chat jatuh dari atas dan stick figure terakhir yang bertahan menang."
+description: "Stick Around! mengubah feed live chat menjadi arena bertarung kecil dengan gelembung chat yang jatuh."
 slug: "stick-around-its-raining-bubbles"
 image: "./cover.png"
 locale: "id"
@@ -19,8 +19,6 @@ Game ini mengambil alih feed chat itu sendiri.
 Bukan halaman. Bukan video. Bukan kotak pesan. Hanya ruang tempat live chat bergulir, lalu mengubahnya menjadi arena kecil tempat dua stick figure mencoba bertahan hidup sementara pesan jatuh dari atas.
 
 ## Hujan gelembung
-
-Di Stick Around!, chat bukan sistem perintah. Penonton tidak mengetik kata kunci khusus, dan komentar tidak memicu serangan rahasia.
 
 Komentar adalah cuaca.
 
@@ -42,7 +40,7 @@ Chess, HELP-A-FRIEND! Trivia, dan The Wild Wild Chat semuanya memakai panel game
 
 Itu membuatnya terasa lebih seperti sesuatu yang terjadi *di dalam* chat YouTube, bukan di sebelahnya. Header tetap memiliki kontrol sederhana yang sama seperti panel game lain, termasuk hide dan sound, tetapi match-nya sendiri digambar langsung di atas feed.
 
-Overlay yang lebih gelap atau lebih terang menjaga game tetap mudah dibaca sementara chat tetap terlihat di bawahnya, sehingga masih terasa terhubung dengan stream, bukan menjadi layar terpisah.
+Overlay menjaga game tetap mudah dibaca sementara chat tetap terlihat di bawahnya, sehingga masih terasa terhubung dengan stream, bukan menjadi layar terpisah.
 
 ## Main melawan penonton lain atau Computer
 
@@ -60,7 +58,7 @@ Setiap pemain punya tiga stock. Terkena hit menaikkan damage, dan damage yang le
 
 Stick Around! dimulai dari ide sederhana: bagaimana jika feed chat bukan hanya berada di belakang game, tetapi menjadi bagian dari game?
 
-Itulah kenapa gelembung yang jatuh berasal dari volume chat. Stream yang lambat menjadi match ringan. Stream yang cepat menjadi badai. Komentar tetap berperilaku seperti komentar, tetapi ruangan makin berbahaya saat percakapan makin ramai.
+Itulah kenapa gelembung yang jatuh berasal dari volume chat. Stream yang lambat menjadi match ringan. Stream yang cepat menjadi badai. Komentar tetap berperilaku seperti komentar, tetapi arena makin berbahaya saat percakapan makin ramai.
 
 Ini konyol, cepat, dan sedikit tidak adil dengan cara yang sangat mirip live chat.
 

@@ -18,7 +18,7 @@ Trò chơi Playground thứ hai đã có mặt: **HELP-A-FRIEND! Trivia**
 
 ![Logo HELP-A-FRIEND! Trivia](./2026-06-12-new-in-0-14-0-help-a-friend-trivia-assets/6ef6d6f2584f127f.png){shadow=smooth;rotate=-8deg}
 
-Thay vì một bảng câu hỏi, *HELP-A-FRIEND! Trivia* diễn ra như một cuộc trò chuyện nhóm nhỏ. Một người bạn của bạn rõ ràng đã không chú ý đến stream và giờ cần được giúp... bạn có biết câu trả lời không?
+Thay vì một bảng câu hỏi, *HELP-A-FRIEND! Trivia* diễn ra như một cuộc trò chuyện nhóm nhỏ. Một người bạn của bạn rõ ràng đã không chú ý đến stream và giờ cần được giúp. Bạn có nhớ chuyện gì đã xảy ra không?
 
 Câu trả lời đúng nhận phản ứng 🏆.
 
@@ -28,7 +28,7 @@ Câu trả lời sai sẽ bị đánh giá *một cách lịch sự*.
 
 ## Cách hoạt động
 
-Bắt đầu một trận Playground từ bản phát lại YouTube (một livestream đã kết thúc), mời người chơi khác, rồi chờ vài giây trong khi các câu hỏi được chuẩn bị.
+Bắt đầu một trận Playground từ bản phát lại YouTube, mời người chơi khác, rồi chờ vài giây trong khi các câu hỏi được chuẩn bị.
 
 Khi trò chơi bắt đầu, “người bạn” của bạn hỏi về bản phát lại, bốn đáp án có thể xuất hiện, và cả hai người chơi chọn trước khi hết thời gian. Trả lời nhanh nhé. Bạn của bạn không kiên nhẫn đâu.
 

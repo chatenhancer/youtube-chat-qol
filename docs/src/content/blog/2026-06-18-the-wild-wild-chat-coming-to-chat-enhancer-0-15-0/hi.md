@@ -1,7 +1,7 @@
 ---
 title: "The Wild Wild Chat, Chat Enhancer 0.15.0 में आ रहा है"
 date: 2026-06-18
-description: "Playground का एक नया इनाम-शिकार गेम, जिसमें खिलाड़ी समय खत्म होने से पहले लाइव चैट के लक्ष्य पहचानने की दौड़ लगाते हैं."
+description: "The Wild Wild Chat live chat को तेज़ bounty hunt में बदल देता है, जहाँ players matching messages claim करने की race लगाते हैं."
 locale: "hi"
 slug: "the-wild-wild-chat-coming-to-chat-enhancer-0-15-0"
 image: "./05346f6306b006ff.png"
@@ -56,7 +56,7 @@ The Wild Wild Chat सिर्फ लाइव चैट के दौरान
 
 ## Playground का हिस्सा
 
-Chess और HELP-A-FRIEND! Trivia की तरह, The Wild Wild Chat भी Playground के अंदर रहता है. यह वही Games panel, वही invite flow, और वही floating game window इस्तेमाल करता है, इसलिए यह अलग ऐप बनने के बजाय YouTube चैट के पास रहता है.
+Chess और HELP-A-FRIEND! Trivia की तरह, The Wild Wild Chat भी Playground के अंदर रहता है. यह वही Games panel, वही invite flow, और वही floating game window इस्तेमाल करता है, इसलिए यह YouTube चैट के पास रहता है.
 
 स्टाइल नया है: wanted posters, stamped claims, धूल भरा कागज़, और थोड़ा western अंदाज़.
 

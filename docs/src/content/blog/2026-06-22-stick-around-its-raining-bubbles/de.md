@@ -1,7 +1,7 @@
 ---
 title: "Stick Around!: Es regnet Blasen"
 date: 2026-06-22
-description: "Stick Around! macht den Livechat-Feed zu einer kleinen Kampfarena, in der Chatblasen von oben fallen und die letzte Strichfigur gewinnt."
+description: "Stick Around! macht den Livechat-Feed zu einer kleinen Kampfarena mit fallenden Chatblasen."
 slug: "stick-around-its-raining-bubbles"
 image: "./cover.png"
 locale: "de"
@@ -19,8 +19,6 @@ Es übernimmt den Chat-Feed selbst.
 Nicht die Seite. Nicht das Video. Nicht das Nachrichtenfeld. Nur den Bereich, in dem der Livechat scrollt, und macht daraus eine kleine Arena, in der zwei Strichfiguren versuchen zu überleben, während Nachrichten von oben fallen.
 
 ## Es regnet Blasen
-
-In Stick Around! ist der Chat kein Befehlssystem. Zuschauer tippen keine speziellen Schlüsselwörter, und Kommentare lösen keine geheimen Angriffe aus.
 
 Kommentare sind Wetter.
 
@@ -42,7 +40,7 @@ Chess, HELP-A-FRIEND! Trivia und The Wild Wild Chat nutzen alle kompakte Spielpa
 
 Dadurch fühlt es sich eher wie etwas an, das *in* YouTube-Chat passiert, statt daneben. Der Header hat weiterhin dieselben einfachen Steuerelemente wie die anderen Spielpanels, einschließlich Ausblenden und Sound, aber das Match selbst wird direkt über dem Feed gezeichnet.
 
-Das dunklere oder hellere Overlay hält das Spiel lesbar, während der Chat darunter sichtbar bleibt. So fühlt es sich weiter mit dem Stream verbunden an, statt zu einem separaten Bildschirm zu werden.
+Das Overlay hält das Spiel lesbar, während der Chat darunter sichtbar bleibt. So fühlt es sich weiter mit dem Stream verbunden an, statt zu einem separaten Bildschirm zu werden.
 
 ## Spiele gegen einen anderen Zuschauer oder Computer
 
@@ -60,7 +58,7 @@ Jeder Spieler hat drei Stocks. Treffer erhöhen deinen Schaden, und mehr Schaden
 
 Stick Around! begann mit einer einfachen Idee: Was wäre, wenn der Chat-Feed nicht nur hinter dem Spiel läge, sondern Teil des Spiels wäre?
 
-Deshalb kommen die fallenden Blasen aus dem Chatvolumen. Ein langsamer Stream wird zu einem leichten Match. Ein schneller Stream wird zu einem Sturm. Die Kommentare bleiben Kommentare, aber der Raum wird gefährlicher, je lauter das Gespräch wird.
+Deshalb kommen die fallenden Blasen aus dem Chatvolumen. Ein langsamer Stream wird zu einem leichten Match. Ein schneller Stream wird zu einem Sturm. Die Kommentare bleiben Kommentare, aber die Arena wird gefährlicher, je lauter das Gespräch wird.
 
 Es ist albern, schnell und ein bisschen unfair, genau so, wie Livechat manchmal sein kann.
 

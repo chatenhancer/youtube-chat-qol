@@ -1,7 +1,7 @@
 ---
 title: "The Wild Wild Chat arriva in Chat Enhancer 0.15.0"
 date: 2026-06-18
-description: "Una nuova caccia alle taglie di Playground in cui i giocatori corrono per individuare obiettivi nella live chat prima che scada il tempo."
+description: "The Wild Wild Chat trasforma la live chat in una rapida caccia alle taglie in cui i giocatori corrono a reclamare messaggi corrispondenti."
 locale: "it"
 slug: "the-wild-wild-chat-coming-to-chat-enhancer-0-15-0"
 image: "./05346f6306b006ff.png"
@@ -56,7 +56,7 @@ C’è anche una modalità compatta per questo gioco. Se il poster completo dei 
 
 ## Parte di Playground
 
-Come Chess e HELP-A-FRIEND! Trivia, The Wild Wild Chat vive dentro Playground. Usa lo stesso pannello Games, lo stesso flusso di inviti e la stessa finestra di gioco flottante, così resta vicino alla chat di YouTube invece di diventare un’app separata.
+Come Chess e HELP-A-FRIEND! Trivia, The Wild Wild Chat vive dentro Playground. Usa lo stesso pannello Games, lo stesso flusso di inviti e la stessa finestra di gioco flottante, così resta vicino alla chat di YouTube.
 
 Lo stile però è nuovo: poster dei ricercati, rivendicazioni timbrate, carta polverosa e un po’ di gusto western.
 

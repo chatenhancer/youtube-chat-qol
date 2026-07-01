@@ -1,7 +1,7 @@
 ---
 title: "Speel Playground-games tegen de computer"
 date: 2026-06-14
-description: "Speel Chess tegen drie Computer-tegenstanders of speel HELP-A-FRIEND! Trivia in Playground wanneer er geen andere speler beschikbaar is."
+description: "Computer-tegenstanders maken Playground-games makkelijker te starten wanneer er niemand anders in de buurt is."
 locale: "nl"
 slug: "play-playground-games-against-the-computer"
 image: "./cover.png"
@@ -36,7 +36,7 @@ Er is geen aparte instelling nodig: kies het Computer-profiel dat je wilt in de 
 
 Dit is geen aparte solomodus en geen nieuw scherm. Computer-spelers gedragen zich als gewone Playground-tegenstanders, dus de flow blijft vertrouwd: open het paneel, kies een game, stuur een uitnodiging en speel.
 
-Bij Chess doet Computer zijn zetten na een korte pauze, zodat de game niet direct of te robotachtig aanvoelt.
+Bij Chess doet Computer zijn zetten na een korte pauze, zodat de game niet direct aanvoelt.
 
 Bij *HELP-A-FRIEND! Trivia* antwoordt Computer tijdens de vragenronde net als een andere speler. Hij is niet perfect, dus je hebt nog steeds een echte kans om te winnen.
 

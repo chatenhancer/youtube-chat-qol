@@ -1,7 +1,7 @@
 ---
 title: "Stick Around!: Het regent bubbels"
 date: 2026-06-22
-description: "Stick Around! verandert de livechatfeed in een kleine vechtarena waar chatbubbels van boven vallen en het laatste stokfiguurtje dat blijft staan wint."
+description: "Stick Around! verandert de livechatfeed in een kleine vechtarena met vallende chatbubbels."
 slug: "stick-around-its-raining-bubbles"
 image: "./cover.png"
 locale: "nl"
@@ -19,8 +19,6 @@ Het neemt de chatfeed zelf over.
 Niet de pagina. Niet de video. Niet het berichtvak. Alleen de ruimte waar de livechat voorbijschuift, verandert in een kleine arena waar twee stokfiguren proberen te overleven terwijl berichten van boven vallen.
 
 ## Het regent bubbels
-
-In Stick Around! is de chat geen commandosysteem. Kijkers typen geen speciale trefwoorden, en reacties activeren geen geheime aanvallen.
 
 Reacties zijn weer.
 
@@ -42,7 +40,7 @@ Chess, HELP-A-FRIEND! Trivia en The Wild Wild Chat gebruiken allemaal compacte g
 
 Daardoor voelt het meer als iets dat *in* YouTube-chat gebeurt dan ernaast. De kop heeft nog steeds dezelfde eenvoudige bediening als de andere gamepanelen, inclusief verbergen en geluid, maar de match zelf wordt direct over de feed getekend.
 
-De donkerdere of lichtere overlay houdt het spel leesbaar terwijl de chat eronder zichtbaar blijft, waardoor het verbonden blijft met de stream in plaats van een apart scherm te worden.
+De overlay houdt het spel leesbaar terwijl de chat eronder zichtbaar blijft, waardoor het verbonden blijft met de stream in plaats van een apart scherm te worden.
 
 ## Speel tegen een andere kijker of Computer
 
@@ -60,7 +58,7 @@ Elke speler heeft drie stocks. Geraakt worden verhoogt je schade, en hoe hoger j
 
 Stick Around! begon met een simpel idee: wat als de chatfeed niet alleen achter het spel stond, maar onderdeel van het spel was?
 
-Daarom komen de vallende bubbels voort uit het chatvolume. Een langzame stream wordt een lichte match. Een snelle stream wordt een storm. Reacties blijven reacties, maar de ruimte wordt gevaarlijker naarmate het gesprek luider wordt.
+Daarom komen de vallende bubbels voort uit het chatvolume. Een langzame stream wordt een lichte match. Een snelle stream wordt een storm. Reacties blijven reacties, maar de arena wordt gevaarlijker naarmate het gesprek luider wordt.
 
 Het is gek, snel en een beetje oneerlijk op precies de manier waarop livechat dat kan zijn.
 

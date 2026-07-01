@@ -1,7 +1,7 @@
 ---
 title: "Memperkenalkan Playground: game kecil untuk jeda live chat"
 date: 2026-06-10
-description: "Playground adalah fitur baru di ekstensi Chat Enhancer yang memungkinkan pengguna memainkan game ringkas seperti catur bersama selama live chat."
+description: "Playground menambahkan game ringkas ke live chat YouTube untuk bagian stream yang lebih tenang."
 locale: "id"
 slug: "introducing-playground-tiny-games-for-live-chat-breaks"
 translationKey: "introducing-playground-tiny-games-for-live-chat-breaks"
@@ -16,32 +16,55 @@ tags:
 
 ## Playground sudah hadir!
 
-Playground adalah hub game di dalam ekstensi, tempat Anda bisa bermain dengan pengguna lain yang juga memasang ekstensi.
+Playground adalah hub game kecil di Chat Enhancer. Anda bisa bermain dengan penonton lain yang memasang ekstensi dan berada di stream yang sama.
 
-Streamer Anda sedang istirahat? Buka Playground sampai mereka kembali.
+Streamer sedang menjauh sebentar? Buka Playground, mainkan pertandingan cepat, dan tetap dekat dengan chat.
 
 :::media-right
 
 ![Panel catur ringkas melayang di atas live chat YouTube](./f779ebcc57f8280d.png){shadow=smooth rotation=-2}
 
-Game dibuat ringkas dan tidak akan jauh lebih besar dari ini. Panel bisa diseret, jadi Anda dapat menaruhnya di mana saja di chat.
+Game tetap ringkas. Panel bisa diseret, jadi Anda dapat memindahkannya saat chat kembali ramai.
 
-Game pertama yang tersedia adalah catur klasik. Seberapa cepat Anda bisa skakmat teman stream baru Anda?
+Catur adalah game Playground pertama, dan masih paling jelas menjelaskan idenya: aktivitas sampingan cepat yang tetap dekat dengan chat tanpa mengambil alih halaman.
 
 :::
 
-Cari opsi Playground di bagian pengaturan ekstensi ini.
+## Cara kerja Catur
+
+Buka panel Game, pilih **Catur**, lalu undang seseorang yang tersedia di stream yang sama. Saat mereka menerima, papan akan terbuka dalam panel kecil yang melayang di atas live chat.
+
+Game ini memakai aturan catur biasa. Langkah diperiksa sebelum dikirim, giliran tetap sinkron antara kedua pemain, dan pertandingan bisa berakhir dengan skakmat, seri, atau menyerah. Jika stream kembali ramai, seret panel ke samping dan lanjutkan menonton.
+
+Jika tidak ada orang lain di sekitar, Catur juga mendukung lawan **Computer**. Pilih **Computer (Beginner)**, **Computer (Club)**, atau **Computer (Master)** dari daftar pemain dan mulai pertandingan seperti saat bermain dengan penonton lain.
+
+## Kenapa cocok di live chat
+
+Playground bukan ruang game penuh yang ditempelkan ke YouTube. Fitur ini dibuat untuk bagian stream yang lebih tenang, saat chat masih terbuka tetapi tidak banyak yang terjadi.
+
+Itu sebabnya Catur sengaja dibuat kecil:
+
+- Berjalan dari panel Game di dalam ekstensi.
+- Menggunakan papan yang ringkas dan bisa dipindahkan.
+- Hanya menampilkan pemain tersedia yang juga memakai Chat Enhancer di stream saat ini.
+- Menjaga bagian YouTube lainnya tetap terlihat, sehingga Anda bisa langsung kembali ke chat.
+
+Pengaturan Playground ada di popup ekstensi.
 
 :::media-left
 
 ![Pengaturan Playground di popup Chat Enhancer](./c99cee6a87fb4253.png)
 
-Aktifkan pengaturan “Gabung Playground” agar ikon Game muncul di chat.
+Aktifkan **Gabung Playground** agar ikon Game muncul di chat.
 
-Saat membuka panel Game, Anda perlu mengaktifkan “Tersedia untuk game” agar pemain lain bisa melihat Anda, atau mengaktifkan “Tersedia secara default” di pengaturan ekstensi agar selalu aktif. Terserah Anda.
+Di dalam panel Game, aktifkan **Tersedia untuk bermain** saat Anda ingin pemain lain melihat Anda. Jika biasanya ingin selalu tersedia, aktifkan **Tersedia secara default** di pengaturan ekstensi.
 
 :::
 
-Game lainnya akan hadir segera!
+## Sekarang lebih dari Catur
+
+Playground sudah berkembang sejak pratinjau Catur pertama ini. Anda juga bisa memainkan [HELP-A-FRIEND! Trivia](/id/blog/new-in-0-14-0-help-a-friend-trivia/), dan [The Wild Wild Chat](/id/blog/the-wild-wild-chat-coming-to-chat-enhancer-0-15-0/) mengubah live chat menjadi perburuan bounty yang cepat.
+
+Alurnya tetap sama: buka panel Game, undang penonton atau lawan Computer jika didukung, mainkan pertandingan ringkas, dan tetap dekat dengan stream.
 
 Jika punya saran, Anda bisa mengirim email ke [hello@chatenhancer.com](mailto:hello@chatenhancer.com).

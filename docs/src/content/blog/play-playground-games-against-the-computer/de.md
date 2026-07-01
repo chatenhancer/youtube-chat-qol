@@ -1,7 +1,7 @@
 ---
 title: "Playground-Spiele gegen den Computer spielen"
 date: 2026-06-14
-description: "Spiele Chess gegen drei Computer-Gegner oder HELP-A-FRIEND! Trivia in Playground, wenn gerade niemand anderes verfügbar ist."
+description: "Computer-Gegner machen es einfacher, Playground-Spiele zu starten, wenn niemand anderes da ist."
 locale: "de"
 slug: "play-playground-games-against-the-computer"
 image: "./cover.png"
@@ -36,7 +36,7 @@ Du brauchst keine separate Einstellung: Wähle das gewünschte Computer-Profil i
 
 Das ist kein separater Solo-Modus und kein neuer Bildschirm. Computer-Spieler verhalten sich wie normale Playground-Gegner. Der Ablauf bleibt also vertraut: Panel öffnen, Spiel auswählen, Einladung senden und spielen.
 
-Bei Chess macht Computer seine Züge nach einer kurzen Pause, damit sich die Partie nicht sofort oder zu roboterhaft anfühlt.
+Bei Chess macht Computer seine Züge nach einer kurzen Pause, damit sich die Partie nicht augenblicklich anfühlt.
 
 Bei *HELP-A-FRIEND! Trivia* antwortet Computer während der Fragerunde genau wie ein anderer Spieler. Er ist nicht perfekt, du hast also weiterhin eine echte Chance zu gewinnen.
 

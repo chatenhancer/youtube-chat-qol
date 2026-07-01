@@ -1,7 +1,7 @@
 ---
 title: "Graj w gry Playground przeciwko komputerowi"
 date: 2026-06-14
-description: "Graj w Chess przeciwko trzem przeciwnikom Computer albo w HELP-A-FRIEND! Trivia w Playground, gdy nie ma innego gracza."
+description: "Przeciwnicy Computer ułatwiają rozpoczynanie gier Playground, gdy nikogo innego nie ma w pobliżu."
 locale: "pl"
 slug: "play-playground-games-against-the-computer"
 image: "./cover.png"
@@ -36,7 +36,7 @@ Nie trzeba osobnego ustawienia: wybierz profil Computer z listy graczy i wyślij
 
 To nie jest osobny tryb solo ani nowy ekran. Gracze Computer zachowują się jak zwykli przeciwnicy w Playground, więc cały przepływ pozostaje znajomy: otwierasz panel, wybierasz grę, wysyłasz zaproszenie i grasz.
 
-W Chess Computer wykonuje ruchy po krótkiej przerwie, żeby gra nie wydawała się natychmiastowa ani zbyt mechaniczna.
+W Chess Computer wykonuje ruchy po krótkiej przerwie, żeby gra nie wydawała się natychmiastowa.
 
 W *HELP-A-FRIEND! Trivia* Computer odpowiada w rundzie pytań tak jak inny gracz. Nie jest idealny, więc nadal masz realną szansę wygrać.
 
