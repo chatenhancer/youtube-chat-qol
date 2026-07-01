@@ -29,16 +29,22 @@
   --squircle-radius-11: 11px;
   --squircle-radius-12: 12px;
   --squircle-radius-18: 18px;
-  --button-corner-radius: var(--squircle-radius-8);
-  --feature-button-corner-radius: var(--squircle-radius-8);
+  --button-corner-radius: var(--squircle-radius-10);
+  --feature-button-corner-radius: var(--squircle-radius-10);
   --badge-corner-radius: var(--squircle-radius-5);
   --command-chip-corner-radius: var(--squircle-radius-5);
   --icon-surface-corner-radius: var(--squircle-radius-8);
   --compact-icon-surface-corner-radius: var(--squircle-radius-5);
-  --large-surface-corner-radius: var(--squircle-radius-8);
+  --large-surface-corner-radius: 14px;
   --modal-corner-radius: var(--squircle-radius-12);
   --walkthrough-video-corner-radius: var(--squircle-radius-11);
   --callout-surface-corner-radius: var(--squircle-radius-18);
+  --site-nav-highlight-corner-radius: 8px;
+  --menu-item-background-corner-radius: 8px;
+  --mobile-menu-item-corner-radius: 8px;
+  --command-menu-corner-radius: var(--large-surface-corner-radius);
+  --install-store-options-corner-radius: 12px;
+  --install-store-option-corner-radius: 8px;
 }
 
 @supports (corner-shape: superellipse(2)) {
@@ -59,15 +65,23 @@
     --modal-corner-radius: 24px;
     --walkthrough-video-corner-radius: 24px;
     --callout-surface-corner-radius: 24px;
+    --site-nav-highlight-corner-radius: var(--compact-icon-surface-corner-radius);
+    --menu-item-background-corner-radius: var(--compact-icon-surface-corner-radius);
+    --mobile-menu-item-corner-radius: var(--compact-icon-surface-corner-radius);
+    --command-menu-corner-radius: var(--large-surface-corner-radius);
+    --install-store-options-corner-radius: var(--large-surface-corner-radius);
+    --install-store-option-corner-radius: var(--compact-icon-surface-corner-radius);
   }
 }
 
 .language-switcher select,
 .title-emphasis,
+.site-nav::before,
 .hero-walkthrough-button,
 .button,
 .mobile-header-menu-toggle,
 .mobile-header-menu-panel,
+.mobile-header-menu-nav a,
 .walkthrough-modal,
 .walkthrough-video-frame,
 .walkthrough-key-points,
@@ -102,11 +116,13 @@
 .inline-app-icon,
 .commands code,
 .command-menu,
+.command-menu-item::before,
 code,
 kbd,
 .showcase-inline-icon,
 .showcase-command-list code,
-.install-store-options {
+.install-store-options,
+.install-store-option::before {
   corner-shape: var(--squircle-corner-shape);
 }
 
@@ -379,7 +395,7 @@ img {
   width: var(--site-nav-highlight-width, 0);
   height: var(--site-nav-highlight-height, 32px);
   background: var(--soft);
-  border-radius: var(--compact-icon-surface-corner-radius);
+  border-radius: var(--site-nav-highlight-corner-radius);
   opacity: var(--site-nav-highlight-opacity, 0);
   pointer-events: none;
   transform: translate3d(var(--site-nav-highlight-x, 0), -50%, 0);
@@ -2964,7 +2980,7 @@ html[dir="rtl"] .forward-link-icon {
     linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(249, 251, 254, 0.94)),
     #fff;
   border: 1px solid #dfe6f0;
-  border-radius: var(--large-surface-corner-radius);
+  border-radius: var(--command-menu-corner-radius);
   box-shadow:
     0 22px 58px rgba(35, 74, 120, 0.12),
     0 1px 0 rgba(255, 255, 255, 0.9) inset;
@@ -2975,6 +2991,8 @@ html[dir="rtl"] .forward-link-icon {
 }
 
 .command-menu-item {
+  position: relative;
+  isolation: isolate;
   display: grid;
   grid-template-columns: minmax(104px, 0.34fr) minmax(0, 1fr);
   gap: 12px;
@@ -2984,23 +3002,64 @@ html[dir="rtl"] .forward-link-icon {
   color: var(--text);
   background: transparent;
   border: 0;
-  border-bottom: 1px solid #edf0f5;
   font: inherit;
   text-align: left;
   cursor: pointer;
 }
 
-.command-menu-item:last-child {
-  border-bottom: 0;
+.command-menu-item::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  border-radius: 0;
+  pointer-events: none;
+}
+
+.command-menu-item:first-child::before {
+  border-radius: var(--menu-item-background-corner-radius) var(--menu-item-background-corner-radius) 0 0;
+}
+
+.command-menu-item:last-child::before {
+  border-radius: 0 0 var(--menu-item-background-corner-radius) var(--menu-item-background-corner-radius);
+}
+
+.command-menu-item:first-child:last-child::before {
+  border-radius: var(--menu-item-background-corner-radius);
+}
+
+.command-menu-item::after {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  border-bottom: 1px solid #edf0f5;
+  pointer-events: none;
+}
+
+.command-menu-item:last-child::after {
+  display: none;
+}
+
+.command-menu-item:hover::before,
+.command-menu-item:focus::before,
+.command-menu-item.is-active::before {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.68), rgba(255, 255, 255, 0.2)),
+    rgba(var(--blue-rgb), 0.08);
 }
 
 .command-menu-item:hover,
 .command-menu-item:focus,
 .command-menu-item.is-active {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.68), rgba(255, 255, 255, 0.2)),
-    rgba(var(--blue-rgb), 0.08);
   outline: 0;
+}
+
+.command-menu-item > * {
+  position: relative;
+  z-index: 2;
 }
 
 .command-menu-copy {
@@ -3720,7 +3779,7 @@ figcaption {
   width: 100%;
   background: var(--surface);
   border: 1px solid var(--line);
-  border-radius: var(--large-surface-corner-radius);
+  border-radius: var(--install-store-options-corner-radius);
 }
 
 .install-store-options[hidden] {
@@ -3742,6 +3801,8 @@ figcaption {
 }
 
 .install-store-option {
+  position: relative;
+  isolation: isolate;
   display: grid;
   grid-template-areas: "browser store chevron";
   grid-template-columns: minmax(0, 1fr) minmax(0, 8rem) 18px;
@@ -3750,17 +3811,53 @@ figcaption {
   min-height: 46px;
   padding: 7px 12px;
   color: var(--text);
-  border-bottom: 1px solid var(--line);
   text-decoration: none;
 }
 
-.install-store-option:last-child {
-  border-bottom: 0;
+.install-store-option::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  border-radius: 0;
+  pointer-events: none;
 }
 
-.install-store-option:hover,
-.install-store-option:focus {
+.install-store-option:first-child::before {
+  border-radius: var(--install-store-option-corner-radius) var(--install-store-option-corner-radius) 0 0;
+}
+
+.install-store-option:last-child::before {
+  border-radius: 0 0 var(--install-store-option-corner-radius) var(--install-store-option-corner-radius);
+}
+
+.install-store-option:first-child:last-child::before {
+  border-radius: var(--install-store-option-corner-radius);
+}
+
+.install-store-option::after {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  border-bottom: 1px solid var(--line);
+  pointer-events: none;
+}
+
+.install-store-option:last-child::after {
+  display: none;
+}
+
+.install-store-option:hover::before,
+.install-store-option:focus::before {
   background: rgba(62, 166, 255, 0.06);
+}
+
+.install-store-option > * {
+  position: relative;
+  z-index: 2;
 }
 
 .install-store-option-icon {
@@ -4157,7 +4254,7 @@ figcaption {
     min-height: 36px;
     padding: 7px 8px;
     color: var(--muted);
-    border-radius: var(--compact-icon-surface-corner-radius);
+    border-radius: var(--mobile-menu-item-corner-radius);
     font-size: 14px;
     font-weight: 500;
   }
