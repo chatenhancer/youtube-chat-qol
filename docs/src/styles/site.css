@@ -71,6 +71,7 @@
 .walkthrough-modal,
 .walkthrough-video-frame,
 .walkthrough-key-points,
+.walkthrough-key-point-panel,
 .walkthrough-key-point,
 .section-icon,
 .privacy-icon,
@@ -945,7 +946,7 @@ h3 {
   padding: 7px;
   background: var(--walkthrough-key-point-bg);
   border: 1px solid var(--walkthrough-key-point-border);
-  border-radius: 6px;
+  border-radius: var(--modal-corner-radius);
   box-shadow: none;
   opacity: 0;
   overflow: visible;
@@ -4522,7 +4523,7 @@ figcaption {
   .walkthrough-key-point-panel {
     margin-top: 8px;
     padding: 6px;
-    border-radius: 6px;
+    border-radius: var(--modal-corner-radius);
     box-shadow: none;
   }
 
