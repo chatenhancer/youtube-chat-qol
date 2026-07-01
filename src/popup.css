@@ -26,7 +26,51 @@
   --ytcq-popup-action: #065fd4;
   --ytcq-popup-logo-red-start: #fe0031;
   --ytcq-popup-logo-red-end: #fd0032;
+  --ytcq-popup-squircle-corner-shape: squircle;
+  --ytcq-popup-squircle-radius-small: 4px;
+  --ytcq-popup-squircle-radius-badge: 5px;
+  --ytcq-popup-squircle-radius-control: 6px;
+  --ytcq-popup-squircle-radius-compact: 7px;
+  --ytcq-popup-squircle-radius-surface: 8px;
+  --ytcq-popup-squircle-radius-tab: 4px 4px 0 0;
+  --ytcq-popup-squircle-radius-tab-mark: 2px 2px 0 0;
   font-family: "Inter", Arial, sans-serif;
+}
+
+@supports (corner-shape: superellipse(2)) {
+  :root {
+    --ytcq-popup-squircle-corner-shape: superellipse(2);
+  }
+}
+
+@supports ((corner-shape: squircle) or (corner-shape: superellipse(2))) {
+  :root {
+    --ytcq-popup-squircle-radius-small: 8px;
+    --ytcq-popup-squircle-radius-badge: 10px;
+    --ytcq-popup-squircle-radius-control: 12px;
+    --ytcq-popup-squircle-radius-compact: 14px;
+    --ytcq-popup-squircle-radius-surface: 18px;
+    --ytcq-popup-squircle-radius-tab: 12px 12px 0 0;
+    --ytcq-popup-squircle-radius-tab-mark: 5px 5px 0 0;
+  }
+}
+
+.brand-link,
+.header-actions,
+.popup-reset-dialog,
+.popup-reset-dialog-button,
+.popup-tab,
+.popup-tab-active::after,
+.settings-section,
+.playground-profile,
+.playground-display-name-field input,
+.bookmarks-section,
+.bookmark-row,
+.option:hover,
+.option-beta-badge,
+select,
+input[type="number"] {
+  corner-shape: var(--ytcq-popup-squircle-corner-shape);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -1316,4 +1360,42 @@ input[type="checkbox"] {
   align-self: center;
   margin: 0;
   accent-color: var(--ytcq-popup-action);
+}
+
+@supports ((corner-shape: squircle) or (corner-shape: superellipse(2))) {
+  .brand-link {
+    border-radius: var(--ytcq-popup-squircle-radius-small);
+  }
+
+  .header-actions,
+  .popup-reset-dialog-button,
+  .playground-display-name-field input,
+  .option:hover,
+  select,
+  input[type="number"] {
+    border-radius: var(--ytcq-popup-squircle-radius-control);
+  }
+
+  .popup-reset-dialog,
+  .settings-section,
+  .playground-profile,
+  .bookmarks-section {
+    border-radius: var(--ytcq-popup-squircle-radius-surface);
+  }
+
+  .bookmark-row {
+    border-radius: var(--ytcq-popup-squircle-radius-compact);
+  }
+
+  .option-beta-badge {
+    border-radius: var(--ytcq-popup-squircle-radius-badge);
+  }
+
+  .popup-tab {
+    border-radius: var(--ytcq-popup-squircle-radius-tab);
+  }
+
+  .popup-tab-active::after {
+    border-radius: var(--ytcq-popup-squircle-radius-tab-mark);
+  }
 }

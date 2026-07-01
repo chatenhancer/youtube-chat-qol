@@ -15,7 +15,10 @@ describe('Replay Trivia preview', () => {
 
     renderReplayTriviaPreview(container);
 
-    expect(container.querySelector('canvas')?.className).toBe('ytcq-games-preview-canvas');
+    const canvas = container.querySelector<HTMLCanvasElement>('canvas');
+    expect(canvas?.className).toBe('ytcq-games-preview-canvas');
+    expect(canvas?.style.width).toBe('');
+    expect(canvas?.style.height).toBe('');
   });
 
   it('handles context creation errors', async () => {

@@ -14,8 +14,6 @@ export function renderBountyHuntingPreview(container: HTMLElement): void {
   const backingScale = pixelRatio * PREVIEW_SUPERSAMPLE;
   canvas.width = Math.round(PREVIEW_WIDTH * backingScale);
   canvas.height = Math.round(PREVIEW_HEIGHT * backingScale);
-  canvas.style.width = `${PREVIEW_WIDTH}px`;
-  canvas.style.height = `${PREVIEW_HEIGHT}px`;
   canvas.setAttribute('aria-hidden', 'true');
   container.append(canvas);
 

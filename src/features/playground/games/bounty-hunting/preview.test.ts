@@ -22,6 +22,9 @@ describe('Bounty Hunting preview', () => {
     renderBountyHuntingPreview(container);
     await flushPromises();
 
+    const canvas = container.querySelector<HTMLCanvasElement>('canvas');
+    expect(canvas?.style.width).toBe('');
+    expect(canvas?.style.height).toBe('');
     expect(chrome.runtime.getURL).toHaveBeenCalledWith('games/bounty-hunting/logo.webp');
     expect(context.drawImage).toHaveBeenCalledWith(images[0], 30, 0, 32, 48);
   });

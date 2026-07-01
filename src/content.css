@@ -9,6 +9,34 @@
   --ytcq-hover-background: var(--yt-spec-touch-response, var(--yt-spec-10-percent-layer, rgba(128, 128, 128, 0.16)));
   --ytcq-hover-background-strong: var(--yt-spec-10-percent-layer, rgba(128, 128, 128, 0.22));
   --ytcq-control-border: rgba(128, 128, 128, 0.42);
+  --ytcq-squircle-corner-shape: squircle;
+  --ytcq-squircle-radius-tiny: 2px;
+  --ytcq-squircle-radius-small: 4px;
+  --ytcq-squircle-radius-badge: 5px;
+  --ytcq-squircle-radius-control: 6px;
+  --ytcq-squircle-radius-compact: 7px;
+  --ytcq-squircle-radius-surface: 8px;
+  --ytcq-squircle-radius-bubble: 10px;
+  --ytcq-squircle-radius-effect: 18px;
+}
+
+@supports (corner-shape: superellipse(2)) {
+  :root {
+    --ytcq-squircle-corner-shape: superellipse(2);
+  }
+}
+
+@supports ((corner-shape: squircle) or (corner-shape: superellipse(2))) {
+  :root {
+    --ytcq-squircle-radius-tiny: 5px;
+    --ytcq-squircle-radius-small: 8px;
+    --ytcq-squircle-radius-badge: 10px;
+    --ytcq-squircle-radius-control: 12px;
+    --ytcq-squircle-radius-compact: 14px;
+    --ytcq-squircle-radius-surface: 18px;
+    --ytcq-squircle-radius-bubble: 18px;
+    --ytcq-squircle-radius-effect: 28px;
+  }
 }
 
 :where(button[class^="ytcq-"], button[class*=" ytcq-"]) {
@@ -19,6 +47,54 @@
   font: inherit;
   letter-spacing: 0;
   text-transform: none;
+}
+
+.ytcq-enhanced-effect::before,
+ytd-menu-popup-renderer .ytcq-context-split-button,
+.ytcq-composer-translate-panel,
+.ytcq-composer-translate-select,
+.ytcq-profile-card,
+.ytcq-profile-card-message,
+.ytcq-focus-card,
+.ytcq-focus-author-button,
+.ytcq-focus-bubble,
+.ytcq-games-beta-badge,
+.ytcq-games-connection-notice,
+.ytcq-games-availability,
+.ytcq-games-active-row,
+.ytcq-games-invite-row,
+.ytcq-games-player-row,
+.ytcq-games-game-card,
+.ytcq-games-preview,
+.ytcq-chess-game-panel,
+.ytcq-replay-trivia-game-panel,
+.ytcq-bounty-hunting-game-panel,
+.ytcq-game-overlay-header,
+.ytcq-game-overlay-icon,
+.ytcq-stick-around-ready,
+.ytcq-chess-game-icon,
+.ytcq-replay-trivia-game-icon,
+.ytcq-bounty-hunting-game-icon,
+.ytcq-chess-board-canvas,
+.ytcq-replay-trivia-canvas,
+.ytcq-bounty-hunting-canvas,
+.ytcq-replay-trivia-game-fallback,
+.ytcq-bounty-hunting-game-fallback,
+.ytcq-game-status,
+.ytcq-chess-game-status,
+.ytcq-inbox-keyword-input,
+.ytcq-inbox-inline-highlight,
+.ytcq-chat-keyword-highlight,
+.ytcq-command-autocomplete-card,
+.ytcq-command-autocomplete-option,
+.ytcq-command-help-card,
+yt-live-chat-text-message-renderer .ytcq-replaced-translation-icon,
+yt-live-chat-paid-message-renderer .ytcq-replaced-translation-icon,
+yt-live-chat-membership-item-renderer .ytcq-replaced-translation-icon,
+.ytcq-profile-card-message .ytcq-replaced-translation-icon,
+.ytcq-focus-message .ytcq-replaced-translation-icon,
+.ytcq-toast {
+  corner-shape: var(--ytcq-squircle-corner-shape);
 }
 
 ytd-menu-popup-renderer.ytcq-settings-expanded-menu {
@@ -1682,16 +1758,16 @@ yt-live-chat-header-renderer .ytcq-inbox-badge[hidden] {
 .ytcq-games-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: 5px;
+  gap: 4px;
 }
 
 .ytcq-games-game-card {
   display: grid;
-  grid-template-columns: 92px minmax(0, 1fr);
-  gap: 9px;
+  grid-template-columns: 80px minmax(0, 1fr);
+  gap: 7px;
   align-items: center;
-  min-height: 66px;
-  padding: 8px;
+  min-height: 54px;
+  padding: 6px;
   border: 0;
   border-radius: 7px;
   color: var(--yt-spec-text-primary, var(--yt-live-chat-primary-text-color, #f1f1f1));
@@ -1748,8 +1824,8 @@ yt-live-chat-header-renderer .ytcq-inbox-badge[hidden] {
 .ytcq-games-preview {
   position: relative;
   display: inline-flex;
-  width: 92px;
-  height: 48px;
+  width: 80px;
+  height: 42px;
   align-items: center;
   justify-content: center;
   overflow: hidden;
@@ -3089,4 +3165,75 @@ yt-live-chat-membership-item-renderer .ytcq-replaced-translation-icon svg,
   font: 400 12px/16px Roboto, Arial, sans-serif;
   z-index: 9999;
   pointer-events: none;
+}
+
+@supports ((corner-shape: squircle) or (corner-shape: superellipse(2))) {
+  .ytcq-enhanced-effect::before {
+    border-radius: var(--ytcq-squircle-radius-effect);
+  }
+
+  .ytcq-composer-translate-panel,
+  .ytcq-profile-card,
+  .ytcq-focus-card:not(.ytcq-focus-card-expanded),
+  .ytcq-chess-game-panel,
+  .ytcq-replay-trivia-game-panel,
+  .ytcq-bounty-hunting-game-panel,
+  .ytcq-command-autocomplete-card,
+  .ytcq-command-help-card {
+    border-radius: var(--ytcq-squircle-radius-surface);
+  }
+
+  ytd-menu-popup-renderer .ytcq-context-split-button,
+  .ytcq-composer-translate-select,
+  .ytcq-inbox-keyword-input,
+  .ytcq-command-autocomplete-option {
+    border-radius: var(--ytcq-squircle-radius-control);
+  }
+
+  .ytcq-profile-card-message,
+  .ytcq-games-connection-notice,
+  .ytcq-games-availability,
+  .ytcq-games-active-row,
+  .ytcq-games-invite-row,
+  .ytcq-games-player-row,
+  .ytcq-games-game-card,
+  .ytcq-games-preview,
+  .ytcq-game-overlay-header,
+  .ytcq-game-overlay-icon,
+  .ytcq-stick-around-ready,
+  .ytcq-chess-game-icon,
+  .ytcq-replay-trivia-game-icon,
+  .ytcq-bounty-hunting-game-icon,
+  .ytcq-chess-board-canvas,
+  .ytcq-replay-trivia-canvas,
+  .ytcq-bounty-hunting-canvas,
+  .ytcq-replay-trivia-game-fallback,
+  .ytcq-bounty-hunting-game-fallback,
+  .ytcq-game-status,
+  .ytcq-chess-game-status {
+    border-radius: var(--ytcq-squircle-radius-compact);
+  }
+
+  .ytcq-focus-bubble {
+    border-radius: var(--ytcq-squircle-radius-bubble);
+  }
+
+  .ytcq-games-beta-badge {
+    border-radius: var(--ytcq-squircle-radius-badge);
+  }
+
+  .ytcq-focus-author-button,
+  .ytcq-inbox-inline-highlight,
+  .ytcq-chat-keyword-highlight,
+  yt-live-chat-text-message-renderer .ytcq-replaced-translation-icon,
+  yt-live-chat-paid-message-renderer .ytcq-replaced-translation-icon,
+  yt-live-chat-membership-item-renderer .ytcq-replaced-translation-icon,
+  .ytcq-profile-card-message .ytcq-replaced-translation-icon,
+  .ytcq-focus-message .ytcq-replaced-translation-icon {
+    border-radius: var(--ytcq-squircle-radius-tiny);
+  }
+
+  .ytcq-toast {
+    border-radius: var(--ytcq-squircle-radius-small);
+  }
 }
