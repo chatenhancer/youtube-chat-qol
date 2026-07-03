@@ -56,12 +56,14 @@ export function createMenuToggleItem({
   label,
   checked,
   iconPath,
+  iconViewBox,
   onClick
 }: {
   setting: string;
   label: string;
   checked: boolean;
   iconPath: string;
+  iconViewBox?: string;
   onClick: () => void;
 }): HTMLElement {
   const item = createMenuActionItem({
@@ -69,6 +71,7 @@ export function createMenuToggleItem({
     setting,
     label,
     iconPath,
+    iconViewBox,
     onClick
   });
   item.setAttribute('aria-checked', String(Boolean(checked)));

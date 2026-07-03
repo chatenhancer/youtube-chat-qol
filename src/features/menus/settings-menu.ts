@@ -9,6 +9,7 @@ import { getTargetLanguageUpdate, getTranslationToggleTarget, type Options } fro
 import { getOptions } from '../../shared/state';
 import { t } from '../../shared/i18n';
 import {
+  MATERIAL_ICON_VIEW_BOX,
   SOUND_BELL_ICON_PATH,
   SOUND_RINGING_BELL_ICON_PATH,
   TRANSLATE_ICON_PATH,
@@ -48,6 +49,7 @@ export function enhanceSettingsMenu(menu: HTMLElement): void {
     label: t('translateChat'),
     checked: Boolean(options.targetLanguage),
     iconPath: TRANSLATE_ICON_PATH,
+    iconViewBox: MATERIAL_ICON_VIEW_BOX,
     onClick: () => {
       const currentOptions = getOptions();
       const nextTargetLanguage = currentOptions.targetLanguage

@@ -31,6 +31,7 @@ describe('shared SVG icon factories', () => {
 
   it('uses the expected view boxes for material and non-material icons', () => {
     expect(createAddIcon().getAttribute('viewBox')).toBe(ICON_VIEW_BOX);
+    expect(createTranslateIcon().getAttribute('viewBox')).toBe(MATERIAL_ICON_VIEW_BOX);
     expect(createTranslateIcon().querySelector('path')?.getAttribute('d')).toBe(TRANSLATE_ICON_PATH);
     expect(createChannelIcon().getAttribute('viewBox')).toBe(MATERIAL_ICON_VIEW_BOX);
   });
@@ -44,6 +45,7 @@ describe('shared SVG icon factories', () => {
     const paths = [...icon.querySelectorAll('path')];
 
     expect(icon.getAttribute('class')).toBe('translate-icon');
+    expect(icon.getAttribute('viewBox')).toBe(MATERIAL_ICON_VIEW_BOX);
     expect(paths.map((path) => path.getAttribute('class'))).toEqual(['translate-source', 'translate-target']);
   });
 });

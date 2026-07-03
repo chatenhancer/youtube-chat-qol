@@ -12,8 +12,10 @@ const {
   name: IconName;
   viewBox?: string;
 };
+const iconPaths = materialIcons[name];
+const paths = Array.isArray(iconPaths) ? iconPaths : [iconPaths];
 ---
 
 <svg class={className} viewBox={viewBox} focusable="false" aria-hidden="true">
-  <path d={materialIcons[name]}></path>
+  {paths.map((path) => <path d={path}></path>)}
 </svg>
