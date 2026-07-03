@@ -205,7 +205,7 @@ describe('playground games header button', () => {
     expect(document.querySelector('.ytcq-games-connection-notice')).toBeNull();
     expect(document.querySelector('.ytcq-profile-card-title')?.textContent).toBe('Games');
     expect(document.querySelector('.ytcq-profile-card-subtitle')?.textContent).toBe('No players online');
-    expect(document.querySelector('.ytcq-games-availability-toggle')?.getAttribute('aria-checked')).toBe('false');
+    expect(document.querySelector('.ytcq-games-availability')?.getAttribute('aria-checked')).toBe('false');
     expect(document.querySelector('.ytcq-games-availability-toggle .ytcq-menu-toggle')).not.toBeNull();
     expect(getGamesSectionTitles()).toEqual(['Start a game']);
     expect(document.querySelector('.ytcq-games-invite-row')).toBeNull();
@@ -430,12 +430,12 @@ describe('playground games header button', () => {
     gamesButton.click();
     lastMockPort()?.emit(createSnapshotMessage(createLobbySnapshot()));
 
-    expect(document.querySelector('.ytcq-games-availability-toggle')?.getAttribute('aria-checked')).toBe('true');
+    expect(document.querySelector('.ytcq-games-availability')?.getAttribute('aria-checked')).toBe('true');
     expect(document.querySelector('.ytcq-profile-card-subtitle')?.textContent).toBe('2 players online');
     expect(getActionButton('Accept')).not.toBeNull();
 
-    document.querySelector<HTMLButtonElement>('.ytcq-games-availability-toggle')!.click();
-    expect(document.querySelector('.ytcq-games-availability-toggle')?.getAttribute('aria-checked')).toBe('false');
+    document.querySelector<HTMLButtonElement>('.ytcq-games-availability')!.click();
+    expect(document.querySelector('.ytcq-games-availability')?.getAttribute('aria-checked')).toBe('false');
     expect(lastMockPort()?.messages.at(-1)).toEqual({
       availableGames: [],
       type: 'ytcq:playground:set-availability'
@@ -608,10 +608,10 @@ describe('playground games header button', () => {
     gamesButton.click();
     lastMockPort()?.emit(createSnapshotMessage(createLobbySnapshot()));
 
-    expect(document.querySelector('.ytcq-games-availability-toggle')?.getAttribute('aria-checked')).toBe('true');
+    expect(document.querySelector('.ytcq-games-availability')?.getAttribute('aria-checked')).toBe('true');
 
-    document.querySelector<HTMLButtonElement>('.ytcq-games-availability-toggle')!.click();
-    expect(document.querySelector('.ytcq-games-availability-toggle')?.getAttribute('aria-checked')).toBe('false');
+    document.querySelector<HTMLButtonElement>('.ytcq-games-availability')!.click();
+    expect(document.querySelector('.ytcq-games-availability')?.getAttribute('aria-checked')).toBe('false');
     expect(lastMockPort()?.messages.at(-1)).toEqual({
       availableGames: [],
       type: 'ytcq:playground:set-availability'
@@ -620,7 +620,7 @@ describe('playground games header button', () => {
     gamesButton.click();
     gamesButton.click();
 
-    expect(document.querySelector('.ytcq-games-availability-toggle')?.getAttribute('aria-checked')).toBe('false');
+    expect(document.querySelector('.ytcq-games-availability')?.getAttribute('aria-checked')).toBe('false');
 
     gamesButton.click();
     window.history.replaceState({}, '', '/watch?v=stream-b');
@@ -635,7 +635,7 @@ describe('playground games header button', () => {
     });
 
     lastMockPort()?.emit(createSnapshotMessage(createLobbySnapshot()));
-    expect(document.querySelector('.ytcq-games-availability-toggle')?.getAttribute('aria-checked')).toBe('true');
+    expect(document.querySelector('.ytcq-games-availability')?.getAttribute('aria-checked')).toBe('true');
   });
 
   it('removes ended games and tells the remaining player when the opponent leaves', () => {
@@ -1219,7 +1219,7 @@ describe('playground games header button', () => {
       streamKey: 'stream-a',
       type: 'ytcq:playground:init'
     });
-    expect(document.querySelector('.ytcq-games-availability-toggle')?.getAttribute('aria-checked')).toBe('true');
+    expect(document.querySelector('.ytcq-games-availability')?.getAttribute('aria-checked')).toBe('true');
 
     setOptions({ ...DEFAULT_OPTIONS, playgroundEnabled: false, playgroundGamesAvailable: false });
     handleFeatureOptionsChanged(

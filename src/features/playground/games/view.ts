@@ -129,8 +129,18 @@ function getUnavailableNoticeHelper(state: GamesPanelState): string {
 
 function createAvailabilitySection(state: GamesPanelState, actions: GamesViewActions): HTMLElement {
   const section = createGamesSection();
-  const item = ytcqCreateElement('div');
+  const item = ytcqCreateElement('button');
+  item.type = 'button';
   item.className = 'ytcq-games-availability';
+  item.setAttribute('role', 'switch');
+  item.setAttribute('aria-label', `${t('gamesAvailableToPlay')}. ${t('gamesAvailableHelper')}`);
+  item.setAttribute('aria-checked', String(state.available));
+  item.addEventListener('click', () => {
+    const nextAvailable = !state.available;
+    state.available = nextAvailable;
+    actions.onSetAvailability(nextAvailable);
+    item.setAttribute('aria-checked', String(nextAvailable));
+  });
 
   const copy = ytcqCreateElement('span');
   copy.className = 'ytcq-games-section-copy';
@@ -142,30 +152,21 @@ function createAvailabilitySection(state: GamesPanelState, actions: GamesViewAct
   helper.textContent = t('gamesAvailableHelper');
   copy.append(title, helper);
 
-  const toggle = createGamesAvailabilityToggle(state, actions);
+  const toggle = createGamesAvailabilityToggle();
   item.append(copy, toggle);
   section.append(item);
   return section;
 }
 
-function createGamesAvailabilityToggle(state: GamesPanelState, actions: GamesViewActions): HTMLButtonElement {
-  const toggle = ytcqCreateElement('button');
-  toggle.type = 'button';
+function createGamesAvailabilityToggle(): HTMLElement {
+  const toggle = ytcqCreateElement('span');
   toggle.className = 'ytcq-games-availability-toggle';
-  toggle.setAttribute('role', 'switch');
-  toggle.setAttribute('aria-label', t('gamesAvailableToPlay'));
-  toggle.setAttribute('aria-checked', String(state.available));
+  toggle.setAttribute('aria-hidden', 'true');
 
   const track = ytcqCreateElement('span');
   track.className = 'ytcq-menu-toggle';
   track.setAttribute('aria-hidden', 'true');
   toggle.append(track);
-  toggle.addEventListener('click', () => {
-    const nextAvailable = !state.available;
-    state.available = nextAvailable;
-    actions.onSetAvailability(nextAvailable);
-    toggle.setAttribute('aria-checked', String(nextAvailable));
-  });
   return toggle;
 }
 

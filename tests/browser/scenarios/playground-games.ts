@@ -35,7 +35,8 @@ export const playgroundChessInviteAndMoveScenario: BrowserScenario = async ({ ch
     const card = await openGamesCard(chat, backend);
     await expect(card.locator('.ytcq-profile-card-title')).toHaveText('Games');
     await expect(card.locator('.ytcq-profile-card-subtitle')).toHaveText('2 players online');
-    await expect(card.locator('.ytcq-games-availability-toggle')).toHaveAttribute('aria-checked', 'true');
+    await expect(card.locator('.ytcq-games-availability')).toHaveAttribute('aria-checked', 'true');
+    await expect(card.locator('.ytcq-games-availability-toggle')).toBeVisible();
     await expect(card.locator('.ytcq-games-game-label')).toHaveText(['Chess', 'The Wild Wild Chat', 'HELP-A-FRIEND! Trivia', 'Stick Around!']);
     await expect(getGameCard(card, 'The Wild Wild Chat')).toHaveAttribute('aria-disabled', 'false');
     await expect(getGameCard(card, 'HELP-A-FRIEND! Trivia')).toHaveAttribute('aria-disabled', 'true');
@@ -294,22 +295,22 @@ export const playgroundAvailabilityToggleScenario: BrowserScenario = async ({ ch
 
   await withExtensionStorageValues(context, 'sync', PLAYGROUND_ENABLED_OPTIONS, async () => {
     const card = await openGamesCard(chat, backend);
-    const toggle = card.locator('.ytcq-games-availability-toggle');
-    await expect(toggle).toHaveAttribute('aria-checked', 'true');
+    const availability = card.locator('.ytcq-games-availability');
+    await expect(availability).toHaveAttribute('aria-checked', 'true');
 
-    await toggle.click();
+    await availability.getByText('Receive game invites for this stream.').click();
     const disabled = await waitForClientMessage(backend, 'setAvailability', (message) =>
       message.availableGames.length === 0
     );
     expect(disabled.availableGames).toEqual([]);
-    await expect(toggle).toHaveAttribute('aria-checked', 'false');
+    await expect(availability).toHaveAttribute('aria-checked', 'false');
 
-    await toggle.click();
+    await availability.getByText('Available to play').click();
     const enabled = await waitForClientMessage(backend, 'setAvailability', (message) =>
       message.availableGames.length > 0
     );
     expect(enabled.availableGames).toEqual(['chess', 'bounty-hunting', 'stick-around']);
-    await expect(toggle).toHaveAttribute('aria-checked', 'true');
+    await expect(availability).toHaveAttribute('aria-checked', 'true');
   });
 };
 
