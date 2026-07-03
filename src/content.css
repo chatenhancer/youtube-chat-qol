@@ -71,7 +71,6 @@ ytd-menu-popup-renderer .ytcq-context-split-button,
 .ytcq-bounty-hunting-game-panel,
 .ytcq-game-overlay-header,
 .ytcq-game-overlay-icon,
-.ytcq-stick-around-ready,
 .ytcq-chess-game-icon,
 .ytcq-replay-trivia-game-icon,
 .ytcq-bounty-hunting-game-icon,
@@ -2154,33 +2153,6 @@ yt-live-chat-header-renderer .ytcq-inbox-badge[hidden] {
   box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.12);
 }
 
-.ytcq-stick-around-ready {
-  position: absolute;
-  z-index: 3;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
-  padding: 0;
-  border: 0;
-  border-radius: 8px;
-  color: transparent;
-  background: rgba(0, 0, 0, 0.001);
-  cursor: pointer;
-  font: 500 12px/12px Roboto, Arial, sans-serif;
-  overflow: hidden;
-  pointer-events: auto;
-  touch-action: manipulation;
-  transform: translateX(-50%);
-  -webkit-tap-highlight-color: transparent;
-  white-space: nowrap;
-}
-
-.ytcq-stick-around-ready:hover,
-.ytcq-stick-around-ready:focus {
-  outline: none;
-}
-
 .ytcq-chess-game-header {
   position: relative;
   display: grid;
@@ -3213,7 +3185,6 @@ yt-live-chat-membership-item-renderer .ytcq-replaced-translation-icon svg,
   .ytcq-games-preview,
   .ytcq-game-overlay-header,
   .ytcq-game-overlay-icon,
-  .ytcq-stick-around-ready,
   .ytcq-chess-game-icon,
   .ytcq-replay-trivia-game-icon,
   .ytcq-bounty-hunting-game-icon,

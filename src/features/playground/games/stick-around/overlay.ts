@@ -56,7 +56,7 @@ const READY_BUTTON_HIT_TARGET_PADDING_X = 12;
 const READY_BUTTON_HIT_TARGET_PADDING_Y = 8;
 const READY_BUTTON_WIDTH = 124;
 const CHAT_FEED_SURFACE_SELECTOR = 'yt-live-chat-item-list-renderer';
-const STICK_AROUND_INTERACTIVE_POINTER_TARGET_SELECTOR = '.ytcq-game-overlay-header, .ytcq-stick-around-ready';
+const STICK_AROUND_INTERACTIVE_POINTER_TARGET_SELECTOR = '.ytcq-game-overlay-header';
 const STICK_AROUND_FONT_STACK = `"${STICK_AROUND_FONT_BYTESIZED}", Arial, sans-serif`;
 const STICK_AROUND_JUMP_SOUND_PATH = 'games/stick-around/jump.mp3';
 const STICK_AROUND_LAND_SOUND_PATH = 'games/stick-around/land.mp3';
@@ -95,7 +95,7 @@ interface StickAroundOverlayRuntime {
   lastGameNow: number;
   listeners: AbortController;
   onPanelChange: () => void;
-  readyButton: HTMLButtonElement;
+  readyHitbox: StickAroundRect | null;
   root: HTMLElement;
   shell: GameOverlayShell;
   serverClockOffsetMs: number;
@@ -119,6 +119,13 @@ interface StickAroundCanvasViewport {
   offsetX: number;
   offsetY: number;
   scale: number;
+}
+
+interface StickAroundRect {
+  height: number;
+  width: number;
+  x: number;
+  y: number;
 }
 
 type StickAroundBubbleLineItem =
@@ -192,14 +199,13 @@ export function openStickAroundOverlay(
   canvas.className = 'ytcq-stick-around-canvas';
   canvas.setAttribute('aria-label', t('gamesStickAround'));
 
-  const readyButton = createStickAroundReadyButton();
   const soundController = createGameSoundController({
     className: 'ytcq-stick-around-sound-toggle',
     preloadPaths: STICK_AROUND_SOUND_PATHS,
     signal: listeners.signal
   });
   shell.closeButton.before(soundController.button);
-  shell.body.append(canvas, readyButton);
+  shell.body.append(canvas);
 
   const context = canvas.getContext('2d');
   if (!context) {
@@ -247,7 +253,7 @@ export function openStickAroundOverlay(
     lastGameNow: initialGameNow,
     listeners,
     onPanelChange,
-    readyButton,
+    readyHitbox: null,
     root,
     shell,
     serverClockOffsetMs,
@@ -274,9 +280,13 @@ export function openStickAroundOverlay(
       signal: runtime.listeners.signal
     });
   });
-  readyButton.addEventListener('click', () => {
-    if (runtime.game.status === 'ready') sendGameAction(runtime.game.gameId, 'ready');
-  }, { signal: runtime.listeners.signal });
+  addStickAroundReadyHitboxListeners(root, runtime, sendGameAction);
+  root.addEventListener('mousemove', (event) => updateStickAroundReadyCursor(event, runtime), {
+    signal: runtime.listeners.signal
+  });
+  root.addEventListener('mouseleave', () => resetStickAroundReadyCursor(runtime), {
+    signal: runtime.listeners.signal
+  });
   document.addEventListener('keydown', (event) => handleStickAroundKey(event, runtime, true), {
     capture: true,
     signal: runtime.listeners.signal
@@ -335,14 +345,6 @@ export function isStickAroundOverlayConnected(): boolean {
 
 export function getStickAroundOverlayStatusOverlay(): GameOverlayShell['statusOverlay'] | undefined {
   return activeStickAroundOverlay?.shell.statusOverlay;
-}
-
-function createStickAroundReadyButton(): HTMLButtonElement {
-  const readyButton = ytcqCreateElement('button');
-  readyButton.className = 'ytcq-stick-around-ready';
-  readyButton.type = 'button';
-  readyButton.textContent = t('gamesStickAroundReady');
-  return readyButton;
 }
 
 function scheduleNextFrame(runtime: StickAroundOverlayRuntime, sendGameAction: SendGameAction): void {
@@ -710,16 +712,19 @@ function renderStickAroundOverlay(runtime: StickAroundOverlayRuntime, now = Date
   context.save();
   applyWorldShake(context, simulation);
   drawArena(context, simulation, fighterColor, theme);
+  runtime.readyHitbox = null;
   if (runtime.game.status === 'ready') {
     const logoBottomY = drawWaitingLogo(context, runtime.assets, simulation, fighterColor);
     drawReadyButton(
       context,
-      runtime.readyButton.textContent || t('gamesStickAroundReady'),
+      getStickAroundReadyLabel(runtime),
       logoBottomY,
       fighterColor,
       simulation
     );
-    positionReadyButtonHitTarget(runtime.readyButton, simulation, logoBottomY, viewport);
+    runtime.readyHitbox = getReadyButtonHitbox(simulation, logoBottomY, viewport);
+  } else {
+    resetStickAroundReadyCursor(runtime);
   }
   simulation.bubbles.forEach((bubble) => drawBubble(context, bubble, runtime));
   Object.values(simulation.fighters).forEach((fighter) =>
@@ -975,19 +980,20 @@ function drawReadyButton(
   context.restore();
 }
 
-function positionReadyButtonHitTarget(
-  readyButton: HTMLButtonElement,
+function getReadyButtonHitbox(
   simulation: StickAroundSimulation,
   logoBottomY: number,
   viewport: StickAroundCanvasViewport
-): void {
+): StickAroundRect {
   const y = getReadyButtonY(logoBottomY);
   const width = READY_BUTTON_WIDTH + READY_BUTTON_HIT_TARGET_PADDING_X * 2;
   const height = READY_BUTTON_HEIGHT + READY_BUTTON_HIT_TARGET_PADDING_Y * 2;
-  readyButton.style.left = `${Math.round(viewport.offsetX + (simulation.width / 2) * viewport.scale)}px`;
-  readyButton.style.top = `${Math.round(viewport.offsetY + (y - READY_BUTTON_HIT_TARGET_PADDING_Y) * viewport.scale)}px`;
-  readyButton.style.width = `${Math.round(width * viewport.scale)}px`;
-  readyButton.style.height = `${Math.round(height * viewport.scale)}px`;
+  return {
+    height: Math.round(height * viewport.scale),
+    width: Math.round(width * viewport.scale),
+    x: Math.round(viewport.offsetX + (simulation.width / 2) * viewport.scale - (width * viewport.scale) / 2),
+    y: Math.round(viewport.offsetY + (y - READY_BUTTON_HIT_TARGET_PADDING_Y) * viewport.scale)
+  };
 }
 
 function getReadyButtonY(logoBottomY: number): number {
@@ -1145,13 +1151,12 @@ function drawStockBars(
 }
 
 function updateHud(runtime: StickAroundOverlayRuntime): void {
-  const { game, readyButton, status } = runtime;
-  status.textContent = getStickAroundOverlayOpponentLabel(game, runtime.currentUserId);
-  readyButton.hidden = game.status !== 'ready';
-  if (game.status === 'ready') {
-    const role = game.players.host.userId === runtime.currentUserId ? 'host' : 'guest';
-    readyButton.textContent = game.readyPlayers[role] ? t('gamesStickAroundWaiting') : t('gamesStickAroundReady');
-  }
+  runtime.status.textContent = getStickAroundOverlayOpponentLabel(runtime.game, runtime.currentUserId);
+}
+
+function getStickAroundReadyLabel(runtime: StickAroundOverlayRuntime): string {
+  const role = runtime.game.players.host.userId === runtime.currentUserId ? 'host' : 'guest';
+  return runtime.game.readyPlayers[role] ? t('gamesStickAroundWaiting') : t('gamesStickAroundReady');
 }
 
 function getCanvasStatusText(runtime: StickAroundOverlayRuntime, now: number): string | null {
@@ -1198,6 +1203,82 @@ function handleStickAroundKey(
     event.preventDefault();
     event.stopPropagation();
   }
+}
+
+function addStickAroundReadyHitboxListeners(
+  root: HTMLElement,
+  runtime: StickAroundOverlayRuntime,
+  sendGameAction: SendGameAction
+): void {
+  const options = {
+    capture: true,
+    signal: runtime.listeners.signal
+  };
+  const handleRelease = (event: Event): void => {
+    if (!isStickAroundReadyHitboxEvent(event, runtime)) return;
+    sendGameAction(runtime.game.gameId, 'ready');
+    event.preventDefault();
+    event.stopImmediatePropagation();
+  };
+
+  if (typeof window.PointerEvent === 'function') {
+    root.addEventListener('pointerup', handleRelease, options);
+    return;
+  }
+
+  root.addEventListener('mouseup', handleRelease, options);
+  root.addEventListener('touchend', handleRelease, options);
+}
+
+function updateStickAroundReadyCursor(event: MouseEvent, runtime: StickAroundOverlayRuntime): void {
+  runtime.root.style.cursor = isStickAroundReadyHitboxEvent(event, runtime) ? 'pointer' : 'default';
+}
+
+function resetStickAroundReadyCursor(runtime: StickAroundOverlayRuntime): void {
+  runtime.root.style.cursor = 'default';
+}
+
+function isStickAroundReadyHitboxEvent(event: Event, runtime: StickAroundOverlayRuntime): boolean {
+  if (runtime.game.status !== 'ready' || !runtime.readyHitbox || runtime.shell.statusOverlay.isBlocking()) return false;
+
+  const target = event.target instanceof Element ? event.target : null;
+  if (target?.closest(STICK_AROUND_INTERACTIVE_POINTER_TARGET_SELECTOR)) return false;
+
+  const point = getStickAroundOverlayPointerPoint(event, runtime.root);
+  if (!point) return false;
+
+  return isPointInStickAroundRect(point, runtime.readyHitbox);
+}
+
+function getStickAroundOverlayPointerPoint(
+  event: Event,
+  root: HTMLElement
+): { x: number; y: number } | null {
+  const rect = root.getBoundingClientRect();
+  if (event instanceof MouseEvent) {
+    if (event.button !== 0) return null;
+    return {
+      x: event.clientX - rect.left,
+      y: event.clientY - rect.top
+    };
+  }
+  if (typeof TouchEvent !== 'undefined' && event instanceof TouchEvent) {
+    const touch = event.changedTouches[0];
+    return touch
+      ? {
+          x: touch.clientX - rect.left,
+          y: touch.clientY - rect.top
+        }
+      : null;
+  }
+  return null;
+}
+
+function isPointInStickAroundRect(point: { x: number; y: number }, rect: StickAroundRect): boolean {
+  return point.x >= rect.x &&
+    point.x <= rect.x + rect.width &&
+    point.y >= rect.y &&
+    point.y <= rect.y + rect.height;
 }
 
 function blockStickAroundFeedPointerEvent(event: Event): void {

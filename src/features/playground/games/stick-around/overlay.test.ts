@@ -113,7 +113,7 @@ describe('Stick Around overlay', () => {
     expect(scrollEvents).toEqual([800, 800]);
   });
 
-  it('keeps the ready button hit target clickable through the overlay pointer blocker', () => {
+  it('activates ready from the canvas hitbox without a DOM ready button', () => {
     vi.spyOn(window, 'requestAnimationFrame').mockImplementation(() => 1);
     vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockImplementation((contextId) => {
       return contextId === '2d'
@@ -121,7 +121,14 @@ describe('Stick Around overlay', () => {
         : null;
     });
 
-    document.body.append(createChatFeedSurface());
+    const feed = createChatFeedSurface();
+    mockElementRect(feed, {
+      height: 560,
+      left: 0,
+      top: 0,
+      width: 360
+    });
+    document.body.append(feed);
     const sendGameAction = vi.fn();
     const opened = openStickAroundOverlay(createStickAroundGame({
       readyPlayers: {
@@ -132,17 +139,40 @@ describe('Stick Around overlay', () => {
     }), 'me-user', sendGameAction, vi.fn(), vi.fn());
     expect(opened).toBe(true);
 
-    const readyButton = document.querySelector<HTMLButtonElement>('.ytcq-stick-around-ready');
-    expect(readyButton).not.toBeNull();
+    const canvas = document.querySelector<HTMLCanvasElement>('.ytcq-stick-around-canvas');
+    const overlay = document.querySelector<HTMLElement>('.ytcq-stick-around-overlay');
+    expect(canvas).not.toBeNull();
+    expect(overlay).not.toBeNull();
+    expect(document.querySelector('.ytcq-stick-around-ready')).toBeNull();
 
-    const mousedown = new MouseEvent('mousedown', { bubbles: true, cancelable: true });
-    expect(readyButton!.dispatchEvent(mousedown)).toBe(true);
-    expect(mousedown.defaultPrevented).toBe(false);
+    canvas!.dispatchEvent(new MouseEvent('mousemove', {
+      bubbles: true,
+      clientX: 180,
+      clientY: 300
+    }));
+    expect(overlay!.style.cursor).toBe('pointer');
 
-    const click = new MouseEvent('click', { bubbles: true, cancelable: true });
-    expect(readyButton!.dispatchEvent(click)).toBe(true);
-    expect(click.defaultPrevented).toBe(false);
+    canvas!.dispatchEvent(new MouseEvent('mousemove', {
+      bubbles: true,
+      clientX: 20,
+      clientY: 20
+    }));
+    expect(overlay!.style.cursor).toBe('default');
+
+    canvas!.dispatchEvent(new MouseEvent('mousedown', {
+      bubbles: true,
+      button: 0,
+      cancelable: true,
+      clientX: 180,
+      clientY: 300
+    }));
+    canvas!.dispatchEvent(createPointerReleaseEvent({ x: 180, y: 300 }));
+
+    expect(sendGameAction).toHaveBeenCalledOnce();
     expect(sendGameAction).toHaveBeenCalledWith('game-stick-around', 'ready');
+
+    overlay!.dispatchEvent(new MouseEvent('mouseleave', { bubbles: true }));
+    expect(overlay!.style.cursor).toBe('default');
   });
 });
 
@@ -194,6 +224,36 @@ function setElementScrollMetrics(
     configurable: true,
     value: scrollHeight
   });
+}
+
+function mockElementRect(
+  element: Element,
+  { height, left, top, width }: { height: number; left: number; top: number; width: number }
+): void {
+  element.getBoundingClientRect = () => ({
+    bottom: top + height,
+    height,
+    left,
+    right: left + width,
+    top,
+    width,
+    x: left,
+    y: top,
+    toJSON: () => ({})
+  });
+}
+
+function createPointerReleaseEvent({ x, y }: { x: number; y: number }): Event {
+  const init = {
+    bubbles: true,
+    button: 0,
+    cancelable: true,
+    clientX: x,
+    clientY: y
+  };
+  return typeof window.PointerEvent === 'function'
+    ? new window.PointerEvent('pointerup', init)
+    : new MouseEvent('mouseup', init);
 }
 
 function createStickAroundGame(overrides: Partial<PublicStickAroundGame> = {}): PublicStickAroundGame {
