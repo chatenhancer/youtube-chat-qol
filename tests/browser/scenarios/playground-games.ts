@@ -4,7 +4,7 @@
  * These checks exercise the real content script, popup card, background
  * Playground bridge, and game panels against a deterministic WebSocket backend.
  */
-import { expect, test, type Locator } from '@playwright/test';
+import { expect, test, type Locator, type Page } from '@playwright/test';
 import type {
   ClientMessage,
   GameActionClientMessage,
@@ -12,7 +12,11 @@ import type {
   PublicGame,
   PublicInvite
 } from '../../../src/shared/playground/protocol';
-import type { PublicStickAroundGame } from '../../../src/shared/playground/stick-around';
+import {
+  STICK_AROUND_ARENA_HEIGHT,
+  STICK_AROUND_ARENA_WIDTH,
+  type PublicStickAroundGame
+} from '../../../src/shared/playground/stick-around';
 import {
   createMockPlaygroundSnapshot,
   installMockPlaygroundBackend
@@ -369,14 +373,23 @@ export const playgroundStickAroundComputerOverlayScenario: BrowserScenario = asy
     await expect(overlay.locator('.ytcq-game-overlay-icon')).toBeVisible();
     await expect(overlay.locator('.ytcq-game-overlay-title')).toHaveText('Stick Around!');
     await expect(overlay.locator('.ytcq-game-overlay-subtitle')).toHaveText('Computer (Stick Around!)');
-    await expect(overlay.getByRole('button', { name: 'Ready' })).toBeVisible();
-    await expect(overlay.locator('.ytcq-game-overlay-header').getByRole('button', { name: 'Ready' })).toHaveCount(0);
     await expect(overlay.getByRole('button', { name: 'Mute game sounds' })).toBeVisible();
     const hideButton = overlay.getByRole('button', { name: 'Hide' });
     await expect(hideButton).toBeVisible();
     await expect(hideButton).toHaveCSS('color', 'rgb(17, 17, 17)');
     await expect(hideButton).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
-    await expect(chat.locator('.ytcq-stick-around-canvas')).toBeVisible();
+    const canvas = chat.locator('.ytcq-stick-around-canvas');
+    await expect(canvas).toBeVisible();
+    await expect(overlay.getByRole('button', { name: 'Ready' })).toHaveCount(0);
+    const readyPoint = await findStickAroundReadyHitboxPoint(page, overlay, canvas);
+    await page.mouse.click(readyPoint.x, readyPoint.y);
+    const ready = await waitForGameAction(backend, 'ready', (message) =>
+      message.gameId === 'browser-stick-around-game'
+    );
+    expect(ready).toMatchObject({
+      action: 'ready',
+      gameId: 'browser-stick-around-game'
+    });
     await expect(chat.locator('#item-scroller > .ytcq-stick-around-overlay')).toHaveCount(0);
     await expect(chat.locator('yt-live-chat-header-renderer .ytcq-stick-around-overlay')).toHaveCount(0);
     await expect(chat.locator('#input-panel .ytcq-stick-around-overlay')).toHaveCount(0);
@@ -1010,6 +1023,45 @@ async function isChatScrolledToBottom(chat: ChatSurface): Promise<boolean> {
   return chat.locator('#item-scroller').evaluate((scroller) =>
     scroller.scrollTop + scroller.clientHeight >= scroller.scrollHeight - 2
   );
+}
+
+async function findStickAroundReadyHitboxPoint(
+  page: Page,
+  overlay: Locator,
+  canvas: Locator
+): Promise<{ x: number; y: number }> {
+  const point = { x: 0, y: 0 };
+  const candidateArenaY = [
+    400,
+    300
+  ];
+
+  await expect.poll(async () => {
+    const box = await canvas.boundingBox();
+    if (!box) return false;
+    const viewportScale = Math.max(0.1, Math.min(
+      1,
+      box.width / STICK_AROUND_ARENA_WIDTH,
+      box.height / STICK_AROUND_ARENA_HEIGHT
+    ));
+    const offsetX = (box.width - STICK_AROUND_ARENA_WIDTH * viewportScale) / 2;
+    const offsetY = (box.height - STICK_AROUND_ARENA_HEIGHT * viewportScale) / 2;
+
+    for (const arenaY of candidateArenaY) {
+      point.x = box.x + offsetX + (STICK_AROUND_ARENA_WIDTH / 2) * viewportScale;
+      point.y = box.y + offsetY + arenaY * viewportScale;
+      await page.mouse.move(point.x, point.y);
+      const cursor = await overlay.evaluate((element) => (element as HTMLElement).style.cursor);
+      if (cursor === 'pointer') return true;
+    }
+
+    return false;
+  }, {
+    message: 'Expected Stick Around canvas Ready hitbox to respond to hover.',
+    timeout: 10_000
+  }).toBe(true);
+
+  return point;
 }
 
 function getFixtureMessageTimestampUsec(messageId: string): string {
