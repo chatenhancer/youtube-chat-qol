@@ -39,7 +39,7 @@
   --modal-corner-radius: var(--squircle-radius-12);
   --walkthrough-video-corner-radius: var(--squircle-radius-11);
   --callout-surface-corner-radius: var(--squircle-radius-18);
-  --site-nav-highlight-corner-radius: 8px;
+  --site-nav-highlight-corner-radius: var(--mobile-menu-item-corner-radius);
   --menu-item-background-corner-radius: 8px;
   --mobile-menu-item-corner-radius: 8px;
   --command-menu-corner-radius: var(--large-surface-corner-radius);
@@ -65,9 +65,9 @@
     --modal-corner-radius: 24px;
     --walkthrough-video-corner-radius: 24px;
     --callout-surface-corner-radius: 24px;
-    --site-nav-highlight-corner-radius: var(--compact-icon-surface-corner-radius);
+    --site-nav-highlight-corner-radius: 999px;
     --menu-item-background-corner-radius: var(--compact-icon-surface-corner-radius);
-    --mobile-menu-item-corner-radius: var(--compact-icon-surface-corner-radius);
+    --mobile-menu-item-corner-radius: 999px;
     --command-menu-corner-radius: var(--large-surface-corner-radius);
     --install-store-options-corner-radius: var(--large-surface-corner-radius);
     --install-store-option-corner-radius: var(--compact-icon-surface-corner-radius);

@@ -399,20 +399,64 @@
       .filter((entry) => entry?.section);
     if (!sectionEntries.length) return;
 
+    const sectionEntriesById = new Map(sectionEntries.map((entry) => [entry.section.id, entry]));
+    let pendingSectionId = null;
+    let pendingSectionTimer = 0;
     let frame = 0;
-    const update = () => {
-      frame = 0;
+    const clearPendingSection = () => {
+      pendingSectionId = null;
+      if (pendingSectionTimer) {
+        window.clearTimeout(pendingSectionTimer);
+        pendingSectionTimer = 0;
+      }
+    };
+    const getScrollActiveEntry = () => {
       const probeLine = window.innerHeight * 0.42;
-      const activeEntry = sectionEntries.reduce((currentEntry, entry) => {
+      return sectionEntries.reduce((currentEntry, entry) => {
         const rect = entry.section.getBoundingClientRect();
         return rect.top <= probeLine ? entry : currentEntry;
       }, null);
+    };
+    const update = () => {
+      frame = 0;
+      const activeEntry = getScrollActiveEntry();
+      if (pendingSectionId) {
+        const pendingEntry = sectionEntriesById.get(pendingSectionId);
+        if (pendingEntry) {
+          setActiveLink(pendingEntry.link);
+          if (activeEntry?.section.id === pendingSectionId) {
+            clearPendingSection();
+          }
+          return;
+        }
+        clearPendingSection();
+      }
       setActiveLink(activeEntry?.link || null);
     };
     const schedule = () => {
       if (frame) return;
       frame = window.requestAnimationFrame(update);
     };
+    const setPendingSection = (sectionId) => {
+      clearPendingSection();
+      pendingSectionId = sectionId;
+      pendingSectionTimer = window.setTimeout(() => {
+        clearPendingSection();
+        schedule();
+      }, 2400);
+    };
+
+    navLinks.forEach((link) => {
+      link.addEventListener("click", (event) => {
+        if (event.defaultPrevented || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+
+        const sectionId = link.dataset.navSection;
+        if (!sectionId || !sectionEntriesById.has(sectionId)) return;
+
+        setPendingSection(sectionId);
+        setActiveLink(link);
+      });
+    });
 
     window.addEventListener("scroll", schedule, { passive: true });
     window.addEventListener("resize", schedule);
