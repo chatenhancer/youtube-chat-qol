@@ -236,7 +236,7 @@
     "gamesLeave": "Verlassen",
     "gamesInvites": "Einladungen",
     "gamesNoInvites": "Noch keine Einladungen erhalten.",
-    "gamesInviteFrom": "{user} hat dich zu {game} eingeladen.",
+    "gamesInviteFrom": "{user} hat dich zu {game} eingeladen",
     "gamesInviteHelper": "Annehmen, um das Spielfeld zu öffnen.",
     "gamesAccept": "Annehmen",
     "gamesPlayWith": "Spieler einladen",

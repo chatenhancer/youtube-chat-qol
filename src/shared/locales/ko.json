@@ -236,7 +236,7 @@
     "gamesLeave": "나가기",
     "gamesInvites": "초대",
     "gamesNoInvites": "아직 받은 초대가 없습니다.",
-    "gamesInviteFrom": "{user}님이 {game}에 초대했습니다.",
+    "gamesInviteFrom": "{user}님이 {game}에 초대했습니다",
     "gamesInviteHelper": "수락하면 게임 패널이 열립니다.",
     "gamesAccept": "수락",
     "gamesPlayWith": "플레이어 초대",

@@ -236,7 +236,7 @@
     "gamesLeave": "Keluar",
     "gamesInvites": "Undangan",
     "gamesNoInvites": "Belum ada undangan diterima.",
-    "gamesInviteFrom": "{user} mengundang Anda ke {game}.",
+    "gamesInviteFrom": "{user} mengundang Anda ke {game}",
     "gamesInviteHelper": "Terima untuk membuka panel game.",
     "gamesAccept": "Terima",
     "gamesPlayWith": "Undang pemain",

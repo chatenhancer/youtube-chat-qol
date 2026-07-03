@@ -236,7 +236,7 @@
     "gamesLeave": "छोड़ें",
     "gamesInvites": "निमंत्रण",
     "gamesNoInvites": "अभी तक कोई निमंत्रण नहीं मिला.",
-    "gamesInviteFrom": "{user} ने आपको {game} के लिए बुलाया.",
+    "gamesInviteFrom": "{user} ने आपको {game} के लिए बुलाया",
     "gamesInviteHelper": "गेम पैनल खोलने के लिए स्वीकार करें.",
     "gamesAccept": "स्वीकार करें",
     "gamesPlayWith": "खिलाड़ी को आमंत्रित करें",

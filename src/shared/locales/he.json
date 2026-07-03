@@ -236,7 +236,7 @@
     "gamesLeave": "עזוב",
     "gamesInvites": "הזמנות",
     "gamesNoInvites": "עדיין לא התקבלו הזמנות.",
-    "gamesInviteFrom": "{user} הזמין אותך ל-{game}.",
+    "gamesInviteFrom": "{user} הזמין אותך ל-{game}",
     "gamesInviteHelper": "אשר כדי לפתוח את חלונית המשחק.",
     "gamesAccept": "אישור",
     "gamesPlayWith": "הזמנת שחקן",

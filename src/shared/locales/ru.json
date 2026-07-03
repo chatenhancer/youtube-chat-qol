@@ -236,7 +236,7 @@
     "gamesLeave": "Выйти",
     "gamesInvites": "Приглашения",
     "gamesNoInvites": "Приглашений пока нет.",
-    "gamesInviteFrom": "{user} приглашает вас в {game}.",
+    "gamesInviteFrom": "{user} приглашает вас в {game}",
     "gamesInviteHelper": "Примите, чтобы открыть игровую панель.",
     "gamesAccept": "Принять",
     "gamesPlayWith": "Пригласить игрока",

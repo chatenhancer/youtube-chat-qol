@@ -236,7 +236,7 @@
     "gamesLeave": "Sair",
     "gamesInvites": "Convites",
     "gamesNoInvites": "Nenhum convite recebido ainda.",
-    "gamesInviteFrom": "{user} convidou você para {game}.",
+    "gamesInviteFrom": "{user} convidou você para {game}",
     "gamesInviteHelper": "Aceite para abrir o painel do jogo.",
     "gamesAccept": "Aceitar",
     "gamesPlayWith": "Convidar jogador",

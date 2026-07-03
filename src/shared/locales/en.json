@@ -236,7 +236,7 @@
     "gamesLeave": "Leave",
     "gamesInvites": "Invites",
     "gamesNoInvites": "No invites received yet.",
-    "gamesInviteFrom": "{user} invited you to {game}.",
+    "gamesInviteFrom": "{user} invited you to {game}",
     "gamesInviteHelper": "Accept to open the game panel.",
     "gamesAccept": "Accept",
     "gamesPlayWith": "Invite a player",

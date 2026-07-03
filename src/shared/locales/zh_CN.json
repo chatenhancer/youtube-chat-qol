@@ -236,7 +236,7 @@
     "gamesLeave": "离开",
     "gamesInvites": "邀请",
     "gamesNoInvites": "还没有收到邀请。",
-    "gamesInviteFrom": "{user} 邀请你玩 {game}。",
+    "gamesInviteFrom": "{user} 邀请你玩 {game}",
     "gamesInviteHelper": "接受后会打开游戏面板。",
     "gamesAccept": "接受",
     "gamesPlayWith": "邀请玩家",

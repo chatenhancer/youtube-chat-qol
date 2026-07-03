@@ -236,7 +236,7 @@
     "gamesLeave": "مغادرة",
     "gamesInvites": "دعوات",
     "gamesNoInvites": "لم تصلك أي دعوات بعد.",
-    "gamesInviteFrom": "دعاك {user} إلى {game}.",
+    "gamesInviteFrom": "دعاك {user} إلى {game}",
     "gamesInviteHelper": "اقبل لفتح لوحة اللعبة.",
     "gamesAccept": "قبول",
     "gamesPlayWith": "ادعُ لاعبًا",

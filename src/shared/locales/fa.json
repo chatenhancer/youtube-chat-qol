@@ -236,7 +236,7 @@
     "gamesLeave": "ترک کردن",
     "gamesInvites": "دعوت‌ها",
     "gamesNoInvites": "هنوز دعوتی دریافت نشده است.",
-    "gamesInviteFrom": "{user} شما را به {game} دعوت کرد.",
+    "gamesInviteFrom": "{user} شما را به {game} دعوت کرد",
     "gamesInviteHelper": "برای باز کردن پنل بازی بپذیرید.",
     "gamesAccept": "پذیرفتن",
     "gamesPlayWith": "دعوت از بازیکن",

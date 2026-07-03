@@ -236,7 +236,7 @@
     "gamesLeave": "退出",
     "gamesInvites": "招待",
     "gamesNoInvites": "まだ招待は届いていません。",
-    "gamesInviteFrom": "{user} が {game} に招待しました。",
+    "gamesInviteFrom": "{user} が {game} に招待しました",
     "gamesInviteHelper": "承諾するとゲームパネルが開きます。",
     "gamesAccept": "承諾",
     "gamesPlayWith": "プレイヤーを招待",

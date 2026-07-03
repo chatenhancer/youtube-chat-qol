@@ -236,7 +236,7 @@
     "gamesLeave": "Verlaten",
     "gamesInvites": "Uitnodigingen",
     "gamesNoInvites": "Nog geen uitnodigingen ontvangen.",
-    "gamesInviteFrom": "{user} heeft je uitgenodigd voor {game}.",
+    "gamesInviteFrom": "{user} heeft je uitgenodigd voor {game}",
     "gamesInviteHelper": "Accepteer om het spelpaneel te openen.",
     "gamesAccept": "Accepteren",
     "gamesPlayWith": "Speler uitnodigen",

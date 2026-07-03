@@ -236,7 +236,7 @@
     "gamesLeave": "Ayrıl",
     "gamesInvites": "Davetler",
     "gamesNoInvites": "Henüz davet alınmadı.",
-    "gamesInviteFrom": "{user} seni {game} oyununa davet etti.",
+    "gamesInviteFrom": "{user} seni {game} oyununa davet etti",
     "gamesInviteHelper": "Oyun panelini açmak için kabul et.",
     "gamesAccept": "Kabul et",
     "gamesPlayWith": "Oyuncu davet et",

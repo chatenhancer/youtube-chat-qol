@@ -236,7 +236,7 @@
     "gamesLeave": "Quitter",
     "gamesInvites": "Invitations",
     "gamesNoInvites": "Aucune invitation reçue pour le moment.",
-    "gamesInviteFrom": "{user} vous invite à {game}.",
+    "gamesInviteFrom": "{user} vous invite à {game}",
     "gamesInviteHelper": "Acceptez pour ouvrir le panneau du jeu.",
     "gamesAccept": "Accepter",
     "gamesPlayWith": "Inviter un joueur",
