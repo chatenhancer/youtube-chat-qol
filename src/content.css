@@ -1460,8 +1460,8 @@ yt-live-chat-header-renderer .ytcq-inbox-badge[hidden] {
 
 .ytcq-games-card-icon svg {
   display: block;
-  width: 23px;
-  height: 23px;
+  width: 24px;
+  height: 24px;
 }
 
 .ytcq-games-title-row {
@@ -3150,6 +3150,16 @@ yt-live-chat-membership-item-renderer .ytcq-replaced-translation-icon svg,
   font: 400 12px/16px Roboto, Arial, sans-serif;
   z-index: 9999;
   pointer-events: none;
+}
+
+@supports (font: -apple-system-body) and (text-box-trim: trim-both) and (text-box-edge: cap alphabetic) {
+  /* Safari centers compact text from the full font box; trim it to the visible text box. */
+  :where(button[class^="ytcq-"], button[class*=" ytcq-"]),
+  :where(button[class^="ytcq-"], button[class*=" ytcq-"]) > :where(span),
+  :where([class^="ytcq-"][class*="avatar"], [class*=" ytcq-"][class*="avatar"]) {
+    text-box-trim: trim-both;
+    text-box-edge: cap alphabetic;
+  }
 }
 
 @supports ((corner-shape: squircle) or (corner-shape: superellipse(2))) {
