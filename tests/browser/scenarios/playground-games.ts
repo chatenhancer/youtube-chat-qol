@@ -302,14 +302,14 @@ export const playgroundAvailabilityToggleScenario: BrowserScenario = async ({ ch
     const availability = card.locator('.ytcq-games-availability');
     await expect(availability).toHaveAttribute('aria-checked', 'true');
 
-    await availability.getByText('Receive game invites for this stream.').click();
+    await availability.click();
     const disabled = await waitForClientMessage(backend, 'setAvailability', (message) =>
       message.availableGames.length === 0
     );
     expect(disabled.availableGames).toEqual([]);
     await expect(availability).toHaveAttribute('aria-checked', 'false');
 
-    await availability.getByText('Available to play').click();
+    await availability.click();
     const enabled = await waitForClientMessage(backend, 'setAvailability', (message) =>
       message.availableGames.length > 0
     );
