@@ -4,7 +4,7 @@ date: 2026-06-18
 description: "The Wild Wild Chat چت زنده را به یک شکار جایزه سریع تبدیل می‌کند که بازیکنان در آن برای گرفتن پیام‌های مطابق رقابت می‌کنند."
 locale: "fa"
 slug: "the-wild-wild-chat-coming-to-chat-enhancer-0-15-0"
-image: "./05346f6306b006ff.png"
+image: "./cover.png"
 translationKey: "the-wild-wild-chat-coming-to-chat-enhancer-0-15-0"
 tags:
   - "playground"

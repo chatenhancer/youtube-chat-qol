@@ -4,7 +4,7 @@ date: 2026-06-18
 description: "The Wild Wild Chat trasforma la live chat in una rapida caccia alle taglie in cui i giocatori corrono a reclamare messaggi corrispondenti."
 locale: "it"
 slug: "the-wild-wild-chat-coming-to-chat-enhancer-0-15-0"
-image: "./05346f6306b006ff.png"
+image: "./cover.png"
 translationKey: "the-wild-wild-chat-coming-to-chat-enhancer-0-15-0"
 tags:
   - "playground"

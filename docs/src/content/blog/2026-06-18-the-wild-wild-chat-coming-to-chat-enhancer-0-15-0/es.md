@@ -4,7 +4,7 @@ date: 2026-06-18
 description: "The Wild Wild Chat convierte el chat en directo en una rápida caza de recompensas donde los jugadores compiten por reclamar mensajes coincidentes."
 locale: "es"
 slug: "the-wild-wild-chat-coming-to-chat-enhancer-0-15-0"
-image: "./05346f6306b006ff.png"
+image: "./cover.png"
 translationKey: "the-wild-wild-chat-coming-to-chat-enhancer-0-15-0"
 tags:
   - "playground"

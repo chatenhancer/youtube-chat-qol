@@ -4,7 +4,7 @@ date: 2026-06-18
 description: "The Wild Wild Chat เปลี่ยนแชทสดให้เป็นเกมล่าค่าหัวเร็ว ๆ ที่ผู้เล่นแข่งกัน claim ข้อความที่ตรงกัน"
 locale: "th"
 slug: "the-wild-wild-chat-coming-to-chat-enhancer-0-15-0"
-image: "./05346f6306b006ff.png"
+image: "./cover.png"
 translationKey: "the-wild-wild-chat-coming-to-chat-enhancer-0-15-0"
 tags:
   - "playground"

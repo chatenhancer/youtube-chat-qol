@@ -4,7 +4,7 @@ date: 2026-06-18
 description: "The Wild Wild Chat 會把直播聊天變成一場快速賞金狩獵，玩家競相搶下符合條件的訊息。"
 locale: "zh_TW"
 slug: "the-wild-wild-chat-coming-to-chat-enhancer-0-15-0"
-image: "./05346f6306b006ff.png"
+image: "./cover.png"
 translationKey: "the-wild-wild-chat-coming-to-chat-enhancer-0-15-0"
 tags:
   - "playground"

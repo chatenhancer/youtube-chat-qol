@@ -4,7 +4,7 @@ date: 2026-06-18
 description: "The Wild Wild Chat은 라이브 채팅을 플레이어가 일치하는 메시지를 차지하려고 경쟁하는 빠른 현상금 사냥으로 바꿉니다."
 locale: "ko"
 slug: "the-wild-wild-chat-coming-to-chat-enhancer-0-15-0"
-image: "./05346f6306b006ff.png"
+image: "./cover.png"
 translationKey: "the-wild-wild-chat-coming-to-chat-enhancer-0-15-0"
 tags:
   - "playground"

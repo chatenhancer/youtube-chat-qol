@@ -3,7 +3,7 @@ title: "The Wild Wild Chat is coming to Chat Enhancer 0.15.0"
 date: 2026-06-18
 description: "The Wild Wild Chat turns live chat into a fast bounty hunt where players race to claim matching messages."
 slug: "the-wild-wild-chat-coming-to-chat-enhancer-0-15-0"
-image: "./05346f6306b006ff.png"
+image: "./cover.png"
 locale: "en"
 translationKey: "the-wild-wild-chat-coming-to-chat-enhancer-0-15-0"
 tags:
