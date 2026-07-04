@@ -51,7 +51,7 @@ describe('Stick Around overlay', () => {
     });
     vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockImplementation((contextId) => {
       return contextId === '2d'
-        ? createMockCanvasContext() as CanvasRenderingContext2D
+        ? createMockCanvasContext() as unknown as CanvasRenderingContext2D
         : null;
     });
 
@@ -87,7 +87,7 @@ describe('Stick Around overlay', () => {
     });
     vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockImplementation((contextId) => {
       return contextId === '2d'
-        ? createMockCanvasContext() as CanvasRenderingContext2D
+        ? createMockCanvasContext() as unknown as CanvasRenderingContext2D
         : null;
     });
 
@@ -117,7 +117,7 @@ describe('Stick Around overlay', () => {
     vi.spyOn(window, 'requestAnimationFrame').mockImplementation(() => 1);
     vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockImplementation((contextId) => {
       return contextId === '2d'
-        ? createMockCanvasContext() as CanvasRenderingContext2D
+        ? createMockCanvasContext() as unknown as CanvasRenderingContext2D
         : null;
     });
 
@@ -174,7 +174,113 @@ describe('Stick Around overlay', () => {
     overlay!.dispatchEvent(new MouseEvent('mouseleave', { bubbles: true }));
     expect(overlay!.style.cursor).toBe('default');
   });
+
+  it('keeps wrapped text inside small falling bubbles', () => {
+    vi.spyOn(window, 'requestAnimationFrame').mockImplementation(() => 1);
+    const context = createMockCanvasContext();
+    context.measureText.mockImplementation((text: string) => ({ width: text.length * 6 }) as TextMetrics);
+    vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockImplementation((contextId) => {
+      return contextId === '2d'
+        ? context as unknown as CanvasRenderingContext2D
+        : null;
+    });
+
+    document.body.append(createChatFeedSurface());
+    const opened = openStickAroundOverlay(createStickAroundGame({
+      simulation: createStickAroundSimulationSnapshot({
+        bubbles: [
+          createStickAroundBubbleSnapshot({
+            height: 30,
+            text: 'I thought he was dead for sure today',
+            width: 82
+          })
+        ]
+      })
+    }), 'me-user', vi.fn(), vi.fn(), vi.fn());
+    expect(opened).toBe(true);
+
+    const bubbleTextCalls = context.fillText.mock.calls.filter(([text]) =>
+      ['I', 'thought', 'he', 'was', 'dead', 'for', 'sure', 'today', '...'].includes(String(text))
+    );
+    const lineYs = [...new Set(bubbleTextCalls.map(([, , y]) => Number(y)))];
+
+    expect(lineYs).toEqual([-8, 0, 8]);
+    expect(bubbleTextCalls.some(([text]) => text === '...')).toBe(true);
+  });
+
+  it('ellipsizes unbroken words after wrapping to a new bubble line', () => {
+    vi.spyOn(window, 'requestAnimationFrame').mockImplementation(() => 1);
+    const context = createMockCanvasContext();
+    const textWidth = (text: string): number => text.length * 6;
+    context.measureText.mockImplementation((text: string) => ({ width: textWidth(text) }) as TextMetrics);
+    vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockImplementation((contextId) => {
+      return contextId === '2d'
+        ? context as unknown as CanvasRenderingContext2D
+        : null;
+    });
+
+    document.body.append(createChatFeedSurface());
+    const opened = openStickAroundOverlay(createStickAroundGame({
+      simulation: createStickAroundSimulationSnapshot({
+        bubbles: [
+          createStickAroundBubbleSnapshot({
+            height: 44,
+            text: `DIRTY DIANA ${'NO'.repeat(90)}`,
+            width: 126
+          })
+        ]
+      })
+    }), 'me-user', vi.fn(), vi.fn(), vi.fn());
+    expect(opened).toBe(true);
+
+    const maxTextWidth = 126 - 22;
+    const bubbleTextCalls = context.fillText.mock.calls.filter(([text]) =>
+      ['DIRTY', 'DIANA'].includes(String(text)) || String(text).startsWith('NO')
+    );
+
+    expect(bubbleTextCalls.every(([text]) => textWidth(String(text)) <= maxTextWidth)).toBe(true);
+    expect(bubbleTextCalls.some(([text]) => String(text).startsWith('NO') && String(text).endsWith('...')))
+      .toBe(true);
+  });
+
+  it('scales short text up inside large falling bubbles', () => {
+    vi.spyOn(window, 'requestAnimationFrame').mockImplementation(() => 1);
+    const context = createMockCanvasContext();
+    const drawnText: Array<{ font: string; text: string }> = [];
+    context.fillText.mockImplementation((text: string) => {
+      drawnText.push({
+        font: context.font,
+        text
+      });
+    });
+    vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockImplementation((contextId) => {
+      return contextId === '2d'
+        ? context as unknown as CanvasRenderingContext2D
+        : null;
+    });
+
+    document.body.append(createChatFeedSurface());
+    const opened = openStickAroundOverlay(createStickAroundGame({
+      simulation: createStickAroundSimulationSnapshot({
+        bubbles: [
+          createStickAroundBubbleSnapshot({
+            height: 58,
+            text: 'chat',
+            width: 172
+          })
+        ]
+      })
+    }), 'me-user', vi.fn(), vi.fn(), vi.fn());
+    expect(opened).toBe(true);
+
+    const bubbleText = drawnText.find(({ text }) => text === 'chat');
+
+    expect(bubbleText?.font).toContain('22px');
+  });
 });
+
+type StickAroundSimulationSnapshotForTest = NonNullable<PublicStickAroundGame['simulation']>;
+type StickAroundBubbleSnapshotForTest = StickAroundSimulationSnapshotForTest['bubbles'][number];
 
 function createChatFeedSurface(): HTMLElement {
   return document.createElement('yt-live-chat-item-list-renderer');
@@ -285,7 +391,47 @@ function createStickAroundGame(overrides: Partial<PublicStickAroundGame> = {}): 
   };
 }
 
-function createMockCanvasContext(): Partial<CanvasRenderingContext2D> {
+function createStickAroundSimulationSnapshot(
+  overrides: Partial<StickAroundSimulationSnapshotForTest> = {}
+): StickAroundSimulationSnapshotForTest {
+  return {
+    bubbles: [],
+    fighters: {},
+    flash: 0,
+    frame: 1,
+    height: 560,
+    lastTime: Date.now(),
+    particles: [],
+    platforms: [],
+    roundSeed: 123,
+    shake: 0,
+    spawnedHazardIds: [],
+    width: 360,
+    ...overrides
+  };
+}
+
+function createStickAroundBubbleSnapshot(
+  overrides: Partial<StickAroundBubbleSnapshotForTest> = {}
+): StickAroundBubbleSnapshotForTest {
+  return {
+    angle: 0,
+    height: 30,
+    hitUserIds: [],
+    id: 'bubble-1',
+    seed: 1,
+    spin: 0,
+    text: 'chat',
+    vx: 0,
+    vy: 0,
+    width: 82,
+    x: 20,
+    y: 20,
+    ...overrides
+  };
+}
+
+function createMockCanvasContext() {
   return {
     arc: vi.fn(),
     beginPath: vi.fn(),
@@ -295,6 +441,7 @@ function createMockCanvasContext(): Partial<CanvasRenderingContext2D> {
     fill: vi.fn(),
     fillRect: vi.fn(),
     fillText: vi.fn(),
+    font: '',
     lineTo: vi.fn(),
     measureText: vi.fn((text: string) => ({ width: text.length * 8 }) as TextMetrics),
     moveTo: vi.fn(),

@@ -48,9 +48,12 @@ const CANVAS_MIN_HEIGHT = 220;
 const SPRITE_DRAW_SIZE = 58;
 const BUBBLE_RADIUS = 16;
 const BUBBLE_TEXT_HORIZONTAL_PADDING = 22;
-const BUBBLE_TEXT_LINE_HEIGHT = 14;
+const BUBBLE_TEXT_LINE_HEIGHT_RATIO = 0.78;
+const BUBBLE_TEXT_MAX_FONT_SIZE = 22;
 const BUBBLE_TEXT_MAX_LINES = 4;
-const BUBBLE_EMOJI_SIZE = 13;
+const BUBBLE_TEXT_MIN_FONT_SIZE = 10;
+const BUBBLE_TEXT_VERTICAL_PADDING = 3;
+const BUBBLE_EMOJI_SIZE_RATIO = 0.9;
 const READY_BUTTON_HEIGHT = 32;
 const READY_BUTTON_HIT_TARGET_PADDING_X = 12;
 const READY_BUTTON_HIT_TARGET_PADDING_Y = 8;
@@ -145,6 +148,12 @@ type StickAroundBubbleLineItem =
 interface StickAroundBubbleLine {
   items: StickAroundBubbleLineItem[];
   width: number;
+}
+
+interface StickAroundBubbleTextLayout {
+  fontSize: number;
+  lineHeight: number;
+  lines: StickAroundBubbleLine[];
 }
 
 type StickAroundBubbleToken =
@@ -810,8 +819,7 @@ function drawBubble(
   runtime: StickAroundOverlayRuntime
 ): void {
   context.save();
-  context.font = `600 12px ${STICK_AROUND_FONT_STACK}`;
-  const lines = getBubbleCanvasLines(context, bubble, runtime);
+  const layout = getBubbleTextLayout(context, bubble, runtime);
   context.translate(bubble.x + bubble.width / 2, bubble.y + bubble.height / 2);
   context.rotate(bubble.angle);
   context.fillStyle = '#ff4044';
@@ -826,11 +834,12 @@ function drawBubble(
     Math.min(BUBBLE_RADIUS, bubble.height / 2)
   );
 
+  context.font = getBubbleTextFont(layout.fontSize);
   context.fillStyle = '#ffffff';
   context.textBaseline = 'middle';
-  const startY = -((lines.length - 1) * BUBBLE_TEXT_LINE_HEIGHT) / 2;
-  lines.forEach((line, index) => {
-    drawBubbleLine(context, line, startY + index * BUBBLE_TEXT_LINE_HEIGHT);
+  const startY = -((layout.lines.length - 1) * layout.lineHeight) / 2;
+  layout.lines.forEach((line, index) => {
+    drawBubbleLine(context, line, startY + index * layout.lineHeight);
   });
   context.restore();
 }
@@ -843,18 +852,78 @@ function drawParticle(context: CanvasRenderingContext2D, particle: StickAroundPa
   context.restore();
 }
 
-function getBubbleCanvasLines(
+function getBubbleTextLayout(
   context: CanvasRenderingContext2D,
   bubble: StickAroundBubble,
   runtime: StickAroundOverlayRuntime
-): StickAroundBubbleLine[] {
-  return wrapBubbleTokens(
+): StickAroundBubbleTextLayout {
+  const tokens = getBubbleCanvasTokens(bubble, runtime);
+  const maxWidth = Math.max(1, bubble.width - BUBBLE_TEXT_HORIZONTAL_PADDING);
+  let fallback: StickAroundBubbleTextLayout | null = null;
+  for (
+    let fontSize = getBubbleTextMaxFontSize(bubble);
+    fontSize >= BUBBLE_TEXT_MIN_FONT_SIZE;
+    fontSize -= 1
+  ) {
+    const layout = createBubbleTextLayout(context, bubble, tokens, maxWidth, fontSize, runtime);
+    fallback = layout;
+    if (getBubbleLineText(layout.lines).trim() === getBubbleTokenText(tokens).trim()) return layout;
+  }
+
+  return fallback || createBubbleTextLayout(
     context,
-    getBubbleCanvasTokens(bubble, runtime),
-    Math.max(1, bubble.width - BUBBLE_TEXT_HORIZONTAL_PADDING),
-    BUBBLE_TEXT_MAX_LINES,
+    bubble,
+    tokens,
+    maxWidth,
+    BUBBLE_TEXT_MIN_FONT_SIZE,
     runtime
   );
+}
+
+function createBubbleTextLayout(
+  context: CanvasRenderingContext2D,
+  bubble: StickAroundBubble,
+  tokens: StickAroundBubbleToken[],
+  maxWidth: number,
+  fontSize: number,
+  runtime: StickAroundOverlayRuntime
+): StickAroundBubbleTextLayout {
+  context.font = getBubbleTextFont(fontSize);
+  const lineHeight = getBubbleTextLineHeight(fontSize);
+  return {
+    fontSize,
+    lineHeight,
+    lines: wrapBubbleTokens(
+      context,
+      tokens,
+      maxWidth,
+      getBubbleTextMaxLines(bubble, lineHeight),
+      runtime,
+      getBubbleEmojiSize(fontSize)
+    )
+  };
+}
+
+function getBubbleTextMaxLines(bubble: StickAroundBubble, lineHeight: number): number {
+  const availableHeight = Math.max(lineHeight, bubble.height - BUBBLE_TEXT_VERTICAL_PADDING);
+  return clampNumber(Math.floor(availableHeight / lineHeight), 1, BUBBLE_TEXT_MAX_LINES);
+}
+
+function getBubbleTextMaxFontSize(bubble: StickAroundBubble): number {
+  const heightBound = Math.floor((bubble.height - BUBBLE_TEXT_VERTICAL_PADDING * 2) * 0.5);
+  return clampNumber(heightBound, BUBBLE_TEXT_MIN_FONT_SIZE, BUBBLE_TEXT_MAX_FONT_SIZE);
+}
+
+function getBubbleTextLineHeight(fontSize: number): number {
+  return Math.max(8, Math.round(fontSize * BUBBLE_TEXT_LINE_HEIGHT_RATIO));
+}
+
+function getBubbleEmojiSize(fontSize: number): number {
+  return Math.max(9, Math.round(fontSize * BUBBLE_EMOJI_SIZE_RATIO));
+}
+
+function getBubbleTextFont(fontSize: number): string {
+  return `600 ${fontSize}px ${STICK_AROUND_FONT_STACK}`;
 }
 
 function drawBubbleLine(
@@ -1453,7 +1522,8 @@ function wrapBubbleTokens(
   tokens: StickAroundBubbleToken[],
   maxWidth: number,
   maxLines: number,
-  runtime: StickAroundOverlayRuntime
+  runtime: StickAroundOverlayRuntime,
+  emojiSize: number
 ): StickAroundBubbleLine[] {
   const lines: StickAroundBubbleLine[] = [];
   let current: StickAroundBubbleLine = createEmptyBubbleLine();
@@ -1463,7 +1533,7 @@ function wrapBubbleTokens(
     const token = tokens[index];
     if (isBubbleSpaceToken(token) && !current.items.length) continue;
 
-    let item = createBubbleLineItem(context, token, runtime);
+    let item = createBubbleLineItem(context, token, runtime, emojiSize);
     if (!item) continue;
 
     if (!current.items.length && item.type === 'text' && item.width > maxWidth) {
@@ -1485,8 +1555,15 @@ function wrapBubbleTokens(
     }
     current = createEmptyBubbleLine();
     if (isBubbleSpaceToken(token)) continue;
-    item = createBubbleLineItem(context, token, runtime);
-    if (item) appendBubbleLineItem(current, item);
+    item = createBubbleLineItem(context, token, runtime, emojiSize);
+    if (!item) continue;
+    if (item.type === 'text' && item.width > maxWidth) {
+      item = createBubbleTextItem(context, fitText(context, item.text, maxWidth, { forceEllipsis: true }));
+      truncated = true;
+      appendBubbleLineItem(current, item);
+      break;
+    }
+    appendBubbleLineItem(current, item);
   }
 
   if (lines.length < maxLines) pushBubbleLine(lines, current);
@@ -1499,7 +1576,9 @@ function wrapBubbleTokens(
       width: context.measureText('chat').width
     }];
   }
-  if (truncated) lines[lines.length - 1] = ellipsizeBubbleLine(context, lines[lines.length - 1], maxWidth);
+  if (truncated && !doesBubbleLineEndWithEllipsis(lines[lines.length - 1])) {
+    lines[lines.length - 1] = ellipsizeBubbleLine(context, lines[lines.length - 1], maxWidth);
+  }
   return lines;
 }
 
@@ -1513,16 +1592,17 @@ function createEmptyBubbleLine(): StickAroundBubbleLine {
 function createBubbleLineItem(
   context: CanvasRenderingContext2D,
   token: StickAroundBubbleToken,
-  runtime: StickAroundOverlayRuntime
+  runtime: StickAroundOverlayRuntime,
+  emojiSize: number
 ): StickAroundBubbleLineItem | null {
   if (token.type === 'text') return createBubbleTextItem(context, token.text);
   const image = getBubbleEmojiImage(runtime, token.segment);
   return {
     alt: token.segment.alt,
     image,
-    size: BUBBLE_EMOJI_SIZE,
+    size: emojiSize,
     type: 'emoji',
-    width: BUBBLE_EMOJI_SIZE
+    width: emojiSize
   };
 }
 
@@ -1591,6 +1671,11 @@ function ellipsizeBubbleLine(
     items: [createBubbleTextItem(context, fitText(context, '...', maxWidth, { forceEllipsis: true }))],
     width: Math.min(context.measureText('...').width, maxWidth)
   };
+}
+
+function doesBubbleLineEndWithEllipsis(line: StickAroundBubbleLine | undefined): boolean {
+  const item = line?.items.at(-1);
+  return item?.type === 'text' && item.text.endsWith('...');
 }
 
 function isBubbleSpaceToken(token: StickAroundBubbleToken): boolean {
