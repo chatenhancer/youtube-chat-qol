@@ -502,7 +502,7 @@
       "message": "Standardmäßig für Einladungen verfügbar"
     },
     "playgroundGamesAvailableHelper": {
-      "message": "Wenn aktiviert, erscheinst du in der Liste verfügbarer Spieler und kannst standardmäßig Einladungen erhalten, wenn du einem Stream beitrittst."
+      "message": "Wenn du einem Stream beitrittst, erscheinst du in der Spielerliste und kannst Spieleinladungen erhalten."
     },
     "learnMore": {
       "message": "Mehr erfahren"

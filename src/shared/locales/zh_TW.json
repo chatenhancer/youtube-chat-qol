@@ -502,7 +502,7 @@
       "message": "預設可接收邀請"
     },
     "playgroundGamesAvailableHelper": {
-      "message": "啟用後，進入直播時你會顯示在可邀請玩家清單中，並預設可以接收邀請。"
+      "message": "進入直播時，你會顯示在玩家清單中並可以接收遊戲邀請。"
     },
     "learnMore": {
       "message": "了解更多"

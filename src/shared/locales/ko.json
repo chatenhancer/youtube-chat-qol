@@ -502,7 +502,7 @@
       "message": "기본적으로 초대 가능"
     },
     "playgroundGamesAvailableHelper": {
-      "message": "켜면 스트림에 들어갈 때 사용 가능한 플레이어 목록에 표시되고 기본적으로 초대를 받을 수 있습니다."
+      "message": "스트림에 들어가면 플레이어 목록에 표시되고 게임 초대를 받을 수 있습니다."
     },
     "learnMore": {
       "message": "자세히 알아보기"

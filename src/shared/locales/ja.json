@@ -505,7 +505,7 @@
       "message": "デフォルトで招待を受け付ける"
     },
     "playgroundGamesAvailableHelper": {
-      "message": "有効にすると、配信に入ったときに参加可能なプレイヤーリストに表示され、デフォルトで招待を受け取れます。"
+      "message": "配信に入るとプレイヤーリストに表示され、ゲーム招待を受け取れます。"
     },
     "learnMore": {
       "message": "詳細を見る"

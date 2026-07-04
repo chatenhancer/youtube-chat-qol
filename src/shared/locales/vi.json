@@ -502,7 +502,7 @@
       "message": "Sẵn sàng nhận lời mời theo mặc định"
     },
     "playgroundGamesAvailableHelper": {
-      "message": "Nếu bật, bạn sẽ xuất hiện trong danh sách người chơi sẵn sàng và có thể nhận lời mời theo mặc định khi vào một livestream."
+      "message": "Khi vào một livestream, bạn sẽ xuất hiện trong danh sách người chơi và có thể nhận lời mời chơi game."
     },
     "learnMore": {
       "message": "Tìm hiểu thêm"

@@ -505,7 +505,7 @@
       "message": "默认可接收邀请"
     },
     "playgroundGamesAvailableHelper": {
-      "message": "启用后，进入直播时你会显示在可邀请玩家列表中，并默认可以接收邀请。"
+      "message": "进入直播时，你会显示在玩家列表中并可以接收游戏邀请。"
     },
     "learnMore": {
       "message": "了解更多"

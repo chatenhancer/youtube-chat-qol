@@ -502,7 +502,7 @@
       "message": "Disponible pour les invitations par défaut"
     },
     "playgroundGamesAvailableHelper": {
-      "message": "Si cette option est activée, vous apparaissez dans la liste des joueurs disponibles et pouvez recevoir des invitations par défaut lorsque vous rejoignez un live."
+      "message": "Lorsque vous rejoignez un live, vous apparaissez dans la liste des joueurs et pouvez recevoir des invitations de jeu."
     },
     "learnMore": {
       "message": "En savoir plus"

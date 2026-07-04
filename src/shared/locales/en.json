@@ -505,7 +505,7 @@
       "message": "Available for invites by default"
     },
     "playgroundGamesAvailableHelper": {
-      "message": "If enabled, you'll appear in the available player list and can receive invites by default when you enter a stream."
+      "message": "When you enter a stream, you’ll appear in the player list and can receive game invites."
     },
     "learnMore": {
       "message": "Learn more"
