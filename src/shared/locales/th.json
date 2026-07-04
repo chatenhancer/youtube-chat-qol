@@ -227,7 +227,7 @@
     "gamesReplayTriviaStampBestie": "เพื่อนซี้",
     "gamesReplayTriviaStampBlocked": "บล็อกแล้ว",
     "gamesAvailableToPlay": "พร้อมรับคำเชิญ",
-    "gamesAvailableHelper": "แสดงฉันในรายชื่อผู้เล่นของสตรีมนี้",
+    "gamesAvailableHelper": "รับคำเชิญเล่นเกมสำหรับสตรีมนี้",
     "gamesActiveGame": "เกมที่กำลังเล่น",
     "gamesResume": "เล่นต่อ",
     "gamesMinimize": "ย่อ",
@@ -499,10 +499,10 @@
       "message": "เกม"
     },
     "playgroundGamesAvailable": {
-      "message": "พร้อมโดยอัตโนมัติ"
+      "message": "พร้อมรับคำเชิญเป็นค่าเริ่มต้น"
     },
     "playgroundGamesAvailableHelper": {
-      "message": "เมื่อเปิด Playground ให้แสดงฉันว่าพร้อมรับคำเชิญเล่นเกมเมื่อเปิดแต่ละสตรีม"
+      "message": "เมื่อเปิดใช้ คุณจะปรากฏในรายชื่อผู้เล่นที่พร้อมและรับคำเชิญได้เป็นค่าเริ่มต้นเมื่อเข้าสู่สตรีม"
     },
     "learnMore": {
       "message": "เรียนรู้เพิ่มเติม"

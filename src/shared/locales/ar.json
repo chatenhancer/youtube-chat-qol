@@ -227,7 +227,7 @@
     "gamesReplayTriviaStampBestie": "صديق مقرّب",
     "gamesReplayTriviaStampBlocked": "محظور",
     "gamesAvailableToPlay": "متاح للدعوات",
-    "gamesAvailableHelper": "إظهاري في قائمة لاعبي هذا البث.",
+    "gamesAvailableHelper": "تلقي دعوات الألعاب لهذا البث.",
     "gamesActiveGame": "ألعاب نشطة",
     "gamesResume": "استئناف",
     "gamesMinimize": "تصغير",
@@ -502,10 +502,10 @@
       "message": "الألعاب"
     },
     "playgroundGamesAvailable": {
-      "message": "كن متاحًا تلقائيًا"
+      "message": "متاح للدعوات افتراضيًا"
     },
     "playgroundGamesAvailableHelper": {
-      "message": "عند تشغيل Playground، أظهرني كمتاح لدعوات الألعاب عند فتح كل بث."
+      "message": "إذا كان مفعّلًا، ستظهر في قائمة اللاعبين المتاحين ويمكنك تلقي الدعوات افتراضيًا عند دخول بث."
     },
     "learnMore": {
       "message": "تعرّف على المزيد"

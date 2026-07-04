@@ -227,7 +227,7 @@
     "gamesReplayTriviaStampBestie": "ЛУЧШИЙ ДРУГ",
     "gamesReplayTriviaStampBlocked": "ЗАБЛОКИРОВАНО",
     "gamesAvailableToPlay": "Доступен для приглашений",
-    "gamesAvailableHelper": "Показывать меня в списке игроков этого стрима.",
+    "gamesAvailableHelper": "Получать игровые приглашения для этого стрима.",
     "gamesActiveGame": "Активные игры",
     "gamesResume": "Продолжить",
     "gamesMinimize": "Свернуть",
@@ -502,10 +502,10 @@
       "message": "Игры"
     },
     "playgroundGamesAvailable": {
-      "message": "Быть доступным автоматически"
+      "message": "Доступен для приглашений по умолчанию"
     },
     "playgroundGamesAvailableHelper": {
-      "message": "Когда Playground включен, показывать меня доступным для игровых приглашений при открытии каждого стрима."
+      "message": "Если включено, вы будете появляться в списке доступных игроков и сможете получать приглашения по умолчанию при входе на стрим."
     },
     "learnMore": {
       "message": "Подробнее"

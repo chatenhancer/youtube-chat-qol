@@ -227,7 +227,7 @@
     "gamesReplayTriviaStampBestie": "SAHABAT",
     "gamesReplayTriviaStampBlocked": "DIBLOKIR",
     "gamesAvailableToPlay": "Tersedia untuk undangan",
-    "gamesAvailableHelper": "Tampilkan saya di daftar pemain live ini.",
+    "gamesAvailableHelper": "Terima undangan game untuk live ini.",
     "gamesActiveGame": "Game aktif",
     "gamesResume": "Lanjutkan",
     "gamesMinimize": "Minimalkan",
@@ -502,10 +502,10 @@
       "message": "Game"
     },
     "playgroundGamesAvailable": {
-      "message": "Tersedia otomatis"
+      "message": "Tersedia untuk undangan secara default"
     },
     "playgroundGamesAvailableHelper": {
-      "message": "Saat Playground aktif, tampilkan saya sebagai tersedia untuk undangan game saat setiap live dibuka."
+      "message": "Jika aktif, Anda akan muncul di daftar pemain yang tersedia dan dapat menerima undangan secara default saat masuk ke live."
     },
     "learnMore": {
       "message": "Pelajari selengkapnya"

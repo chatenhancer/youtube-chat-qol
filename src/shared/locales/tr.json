@@ -227,7 +227,7 @@
     "gamesReplayTriviaStampBestie": "KANKA",
     "gamesReplayTriviaStampBlocked": "ENGELLENDİ",
     "gamesAvailableToPlay": "Davetler için uygun",
-    "gamesAvailableHelper": "Beni bu yayının oyuncu listesinde göster.",
+    "gamesAvailableHelper": "Bu yayın için oyun davetleri al.",
     "gamesActiveGame": "Aktif oyunlar",
     "gamesResume": "Sürdür",
     "gamesMinimize": "Küçült",
@@ -502,10 +502,10 @@
       "message": "Oyunlar"
     },
     "playgroundGamesAvailable": {
-      "message": "Otomatik olarak uygun ol"
+      "message": "Varsayılan olarak davetlere uygun"
     },
     "playgroundGamesAvailableHelper": {
-      "message": "Playground açıkken, her yayın açıldığında beni oyun davetleri için uygun göster."
+      "message": "Etkinse, bir yayına girdiğinizde uygun oyuncular listesinde görünür ve varsayılan olarak davet alabilirsiniz."
     },
     "learnMore": {
       "message": "Daha fazla bilgi"

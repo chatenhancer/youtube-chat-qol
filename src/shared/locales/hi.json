@@ -227,7 +227,7 @@
     "gamesReplayTriviaStampBestie": "बेस्ट फ्रेंड",
     "gamesReplayTriviaStampBlocked": "ब्लॉक",
     "gamesAvailableToPlay": "आमंत्रणों के लिए उपलब्ध",
-    "gamesAvailableHelper": "मुझे इस स्ट्रीम की खिलाड़ी सूची में दिखाएं.",
+    "gamesAvailableHelper": "इस स्ट्रीम के लिए गेम आमंत्रण पाएं.",
     "gamesActiveGame": "सक्रिय गेम",
     "gamesResume": "फिर शुरू करें",
     "gamesMinimize": "छोटा करें",
@@ -502,10 +502,10 @@
       "message": "गेम"
     },
     "playgroundGamesAvailable": {
-      "message": "अपने-आप उपलब्ध रहें"
+      "message": "डिफ़ॉल्ट रूप से आमंत्रणों के लिए उपलब्ध"
     },
     "playgroundGamesAvailableHelper": {
-      "message": "Playground चालू होने पर, हर स्ट्रीम खुलते ही मुझे गेम आमंत्रणों के लिए उपलब्ध दिखाएं."
+      "message": "चालू होने पर, स्ट्रीम में प्रवेश करते समय आप उपलब्ध खिलाड़ियों की सूची में दिखेंगे और डिफ़ॉल्ट रूप से आमंत्रण पा सकेंगे."
     },
     "learnMore": {
       "message": "और जानें"

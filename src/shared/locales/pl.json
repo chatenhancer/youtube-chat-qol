@@ -227,7 +227,7 @@
     "gamesReplayTriviaStampBestie": "BESTIE",
     "gamesReplayTriviaStampBlocked": "ZABLOKOWANO",
     "gamesAvailableToPlay": "Dostępny dla zaproszeń",
-    "gamesAvailableHelper": "Pokaż mnie na liście graczy tej transmisji.",
+    "gamesAvailableHelper": "Otrzymuj zaproszenia do gry dla tej transmisji.",
     "gamesActiveGame": "Aktywne gry",
     "gamesResume": "Wznów",
     "gamesMinimize": "Zminimalizuj",
@@ -499,10 +499,10 @@
       "message": "Gry"
     },
     "playgroundGamesAvailable": {
-      "message": "Bądź dostępny automatycznie"
+      "message": "Domyślnie dostępny dla zaproszeń"
     },
     "playgroundGamesAvailableHelper": {
-      "message": "Gdy Playground jest włączony, pokazuj mnie jako dostępnego dla zaproszeń do gry po otwarciu każdej transmisji."
+      "message": "Po włączeniu pojawisz się na liście dostępnych graczy i możesz domyślnie otrzymywać zaproszenia po wejściu na transmisję."
     },
     "learnMore": {
       "message": "Dowiedz się więcej"

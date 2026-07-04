@@ -227,7 +227,7 @@
     "gamesReplayTriviaStampBestie": "MELHOR AMIGO",
     "gamesReplayTriviaStampBlocked": "BLOQUEADO",
     "gamesAvailableToPlay": "Disponível para convites",
-    "gamesAvailableHelper": "Mostrar-me na lista de jogadores desta live.",
+    "gamesAvailableHelper": "Receber convites de jogo para esta live.",
     "gamesActiveGame": "Jogos ativos",
     "gamesResume": "Continuar",
     "gamesMinimize": "Minimizar",
@@ -502,10 +502,10 @@
       "message": "Jogos"
     },
     "playgroundGamesAvailable": {
-      "message": "Ficar disponível automaticamente"
+      "message": "Disponível para convites por padrão"
     },
     "playgroundGamesAvailableHelper": {
-      "message": "Quando o Playground estiver ativado, mostre-me como disponível para convites de jogo ao abrir cada live."
+      "message": "Quando ativado, você aparece na lista de jogadores disponíveis e pode receber convites por padrão ao entrar em uma live."
     },
     "learnMore": {
       "message": "Saiba mais"

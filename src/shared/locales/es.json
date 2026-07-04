@@ -227,7 +227,7 @@
     "gamesReplayTriviaStampBestie": "MEJOR AMIGO",
     "gamesReplayTriviaStampBlocked": "BLOQUEADO",
     "gamesAvailableToPlay": "Disponible para invitaciones",
-    "gamesAvailableHelper": "Mostrarme en la lista de jugadores de este directo.",
+    "gamesAvailableHelper": "Recibir invitaciones de juego para este directo.",
     "gamesActiveGame": "Partidas activas",
     "gamesResume": "Continuar",
     "gamesMinimize": "Minimizar",
@@ -499,10 +499,10 @@
       "message": "Juegos"
     },
     "playgroundGamesAvailable": {
-      "message": "Estar disponible automáticamente"
+      "message": "Disponible para invitaciones por defecto"
     },
     "playgroundGamesAvailableHelper": {
-      "message": "Cuando Playground esté activado, muéstrame como disponible para invitaciones de juego al abrir cada directo."
+      "message": "Si está activado, aparecerás en la lista de jugadores disponibles y podrás recibir invitaciones por defecto al entrar en un directo."
     },
     "learnMore": {
       "message": "Más información"

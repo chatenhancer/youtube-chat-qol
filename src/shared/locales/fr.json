@@ -227,7 +227,7 @@
     "gamesReplayTriviaStampBestie": "BFF",
     "gamesReplayTriviaStampBlocked": "BLOQUÉ",
     "gamesAvailableToPlay": "Disponible pour les invitations",
-    "gamesAvailableHelper": "M'afficher dans la liste des joueurs de ce live.",
+    "gamesAvailableHelper": "Recevoir des invitations de jeu pour ce live.",
     "gamesActiveGame": "Parties actives",
     "gamesResume": "Reprendre",
     "gamesMinimize": "Réduire",
@@ -499,10 +499,10 @@
       "message": "Jeux"
     },
     "playgroundGamesAvailable": {
-      "message": "Être disponible automatiquement"
+      "message": "Disponible pour les invitations par défaut"
     },
     "playgroundGamesAvailableHelper": {
-      "message": "Quand Playground est activé, m'afficher comme disponible pour les invitations de jeu à l'ouverture de chaque live."
+      "message": "Si cette option est activée, vous apparaissez dans la liste des joueurs disponibles et pouvez recevoir des invitations par défaut lorsque vous rejoignez un live."
     },
     "learnMore": {
       "message": "En savoir plus"

@@ -227,7 +227,7 @@
     "gamesReplayTriviaStampBestie": "摯友",
     "gamesReplayTriviaStampBlocked": "已封鎖",
     "gamesAvailableToPlay": "可接收邀請",
-    "gamesAvailableHelper": "在此直播的玩家列表中顯示我。",
+    "gamesAvailableHelper": "接收此直播的遊戲邀請。",
     "gamesActiveGame": "進行中的遊戲",
     "gamesResume": "繼續",
     "gamesMinimize": "最小化",
@@ -499,10 +499,10 @@
       "message": "遊戲"
     },
     "playgroundGamesAvailable": {
-      "message": "自動設為可邀請"
+      "message": "預設可接收邀請"
     },
     "playgroundGamesAvailableHelper": {
-      "message": "Playground 開啟時，每次開啟直播都會將我顯示為可接收遊戲邀請。"
+      "message": "啟用後，進入直播時你會顯示在可邀請玩家清單中，並預設可以接收邀請。"
     },
     "learnMore": {
       "message": "了解更多"

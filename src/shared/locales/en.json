@@ -227,7 +227,7 @@
     "gamesReplayTriviaStampBestie": "BESTIE",
     "gamesReplayTriviaStampBlocked": "BLOCKED",
     "gamesAvailableToPlay": "Available for invites",
-    "gamesAvailableHelper": "Show me in this stream's player list.",
+    "gamesAvailableHelper": "Receive game invites for this stream.",
     "gamesActiveGame": "Active games",
     "gamesResume": "Resume",
     "gamesMinimize": "Minimize",
@@ -502,10 +502,10 @@
       "message": "Games"
     },
     "playgroundGamesAvailable": {
-      "message": "Be available automatically"
+      "message": "Available for invites by default"
     },
     "playgroundGamesAvailableHelper": {
-      "message": "When Playground is on, show me as available for game invites when each stream opens."
+      "message": "If enabled, you'll appear in the available player list and can receive invites by default when you enter a stream."
     },
     "learnMore": {
       "message": "Learn more"

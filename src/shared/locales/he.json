@@ -227,7 +227,7 @@
     "gamesReplayTriviaStampBestie": "הכי טוב/ה",
     "gamesReplayTriviaStampBlocked": "חסום",
     "gamesAvailableToPlay": "זמין להזמנות",
-    "gamesAvailableHelper": "הצג אותי ברשימת השחקנים של השידור הזה.",
+    "gamesAvailableHelper": "קבל הזמנות למשחק עבור השידור הזה.",
     "gamesActiveGame": "משחקים פעילים",
     "gamesResume": "המשך",
     "gamesMinimize": "מזער",
@@ -499,10 +499,10 @@
       "message": "משחקים"
     },
     "playgroundGamesAvailable": {
-      "message": "להיות זמין אוטומטית"
+      "message": "זמין להזמנות כברירת מחדל"
     },
     "playgroundGamesAvailableHelper": {
-      "message": "כאשר Playground מופעל, הצג אותי כזמין להזמנות משחק בכל פתיחה של שידור."
+      "message": "אם מופעל, תופיע ברשימת השחקנים הזמינים ותוכל לקבל הזמנות כברירת מחדל כשאתה נכנס לשידור."
     },
     "learnMore": {
       "message": "מידע נוסף"
