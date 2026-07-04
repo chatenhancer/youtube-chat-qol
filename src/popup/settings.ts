@@ -3,13 +3,15 @@ import { createSplitTranslateIcon } from '../shared/icons';
 import {
   getPlaygroundAvatarPresentation,
   PLAYGROUND_PROFILE_MESSAGE_TYPE,
+  PLAYGROUND_PROFILE_STATS_MESSAGE_TYPE,
   PLAYGROUND_PROFILE_UPDATE_MESSAGE_TYPE,
   isValidPlaygroundDisplayName,
   normalizePlaygroundDisplayName,
   type PlaygroundProfile,
-  type PlaygroundProfileResponse
+  type PlaygroundProfileResponse,
+  type PlaygroundProfileStatsResponse
 } from '../shared/playground/identity';
-import { playSoftChime } from '../shared/sounds/soft-chime';
+import { playAlertSoundPreview } from '../shared/sounds/alert-sounds';
 import {
   DEFAULT_OPTIONS,
   getPlaygroundDisabledUpdate,
@@ -17,6 +19,7 @@ import {
   normalizeOptions,
   type Options
 } from '../shared/options';
+import { createLoadingSpinner } from '../shared/loading-spinner';
 import { getSettingsControls } from './controls';
 import {
   animatePopupDisplayIcon,
@@ -34,6 +37,7 @@ const TRANSLATION_TARGET_ICON_CLASS = 'option-icon translation-target-icon';
 let lastKnownTranslationTarget = DEFAULT_OPTIONS.lastTranslationTarget;
 let playgroundGamesVisibilityToken = 0;
 let playgroundProfileRequestToken = 0;
+let playgroundProfileStatsRequestToken = 0;
 
 export function initSettingsControls(popupLocale: string): void {
   const settingsControls = getSettingsControls();
@@ -79,7 +83,7 @@ export function initSettingsControls(popupLocale: string): void {
     const enabled = sound.checked;
     if (enabled) {
       animatePopupSoundIcon();
-      playSoftChime();
+      playAlertSoundPreview();
     }
     save({ sound: enabled });
   });
@@ -216,6 +220,7 @@ function updatePlaygroundProfile(playgroundEnabled: boolean): void {
     playgroundProfileWinsCount
   } = settingsControls;
   const token = ++playgroundProfileRequestToken;
+  ++playgroundProfileStatsRequestToken;
   setPlaygroundProfileDetailsExpanded(false);
   playgroundProfile.hidden = true;
   playgroundProfileAvatar.textContent = '';
@@ -237,7 +242,8 @@ function updatePlaygroundProfile(playgroundEnabled: boolean): void {
       : '';
     if (!displayName) return;
 
-    renderPlaygroundProfile(response.profile);
+    renderPlaygroundProfile(response.profile, { winsLoading: true });
+    requestPlaygroundProfileStats(response.profile.userId);
   });
 }
 
@@ -270,11 +276,16 @@ function savePlaygroundDisplayName(): void {
       return;
     }
 
-    renderPlaygroundProfile(response.profile);
+    renderPlaygroundProfile(response.profile, { preserveWins: true });
   });
 }
 
-function renderPlaygroundProfile(profile: PlaygroundProfile): void {
+interface RenderPlaygroundProfileOptions {
+  preserveWins?: boolean;
+  winsLoading?: boolean;
+}
+
+function renderPlaygroundProfile(profile: PlaygroundProfile, options: RenderPlaygroundProfileOptions = {}): void {
   const settingsControls = getSettingsControls();
   if (!settingsControls) return;
 
@@ -297,12 +308,45 @@ function renderPlaygroundProfile(profile: PlaygroundProfile): void {
   settingsControls.playgroundDisplayName.placeholder = generatedDisplayName;
   settingsControls.playgroundProfileAvatar.textContent = avatar.initial;
   settingsControls.playgroundProfileAvatar.style.setProperty('--playground-profile-avatar-bg', avatar.backgroundColor);
-  updatePlaygroundProfileWins(
-    settingsControls.playgroundProfileWins,
-    settingsControls.playgroundProfileWinsCount,
-    profile.wins
-  );
+  if (options.winsLoading) {
+    updatePlaygroundProfileWinsLoading(settingsControls.playgroundProfileWins, settingsControls.playgroundProfileWinsCount);
+  } else if (!options.preserveWins) {
+    updatePlaygroundProfileWins(
+      settingsControls.playgroundProfileWins,
+      settingsControls.playgroundProfileWinsCount,
+      profile.wins
+    );
+  }
   settingsControls.playgroundProfile.hidden = false;
+}
+
+function requestPlaygroundProfileStats(userId: string): void {
+  const settingsControls = getSettingsControls();
+  if (!settingsControls || !settingsControls.playgroundEnabled.checked) return;
+
+  const requestedUserId = typeof userId === 'string' ? userId.trim() : '';
+  if (!requestedUserId) {
+    updatePlaygroundProfileWins(settingsControls.playgroundProfileWins, settingsControls.playgroundProfileWinsCount, 0);
+    return;
+  }
+
+  const token = ++playgroundProfileStatsRequestToken;
+  updatePlaygroundProfileWinsLoading(settingsControls.playgroundProfileWins, settingsControls.playgroundProfileWinsCount);
+  chrome.runtime.sendMessage({
+    type: PLAYGROUND_PROFILE_STATS_MESSAGE_TYPE,
+    userId: requestedUserId
+  }, (response?: PlaygroundProfileStatsResponse) => {
+    if (token !== playgroundProfileStatsRequestToken) return;
+    const latestControls = getSettingsControls();
+    if (!latestControls || !latestControls.playgroundEnabled.checked) return;
+
+    if (chrome.runtime.lastError || !response?.ok || response.userId !== requestedUserId) {
+      updatePlaygroundProfileWins(latestControls.playgroundProfileWins, latestControls.playgroundProfileWinsCount, 0);
+      return;
+    }
+
+    updatePlaygroundProfileWins(latestControls.playgroundProfileWins, latestControls.playgroundProfileWinsCount, response.wins);
+  });
 }
 
 function setPlaygroundProfileDetailsExpanded(expanded: boolean): void {
@@ -324,7 +368,31 @@ function updatePlaygroundProfileWins(container: HTMLElement, countElement: HTMLE
   const numericValue = typeof value === 'number' ? value : 0;
   const wins = Number.isFinite(numericValue) && numericValue > 0 ? Math.floor(numericValue) : 0;
   const label = `${getExtensionMessage('playgroundWins')}: ${wins}`;
+  const spinner = getPlaygroundWinsSpinner(container);
+  spinner.hidden = true;
+  container.removeAttribute('aria-busy');
+  countElement.hidden = false;
   countElement.textContent = String(wins);
   container.title = label;
   container.setAttribute('aria-label', label);
+}
+
+function updatePlaygroundProfileWinsLoading(container: HTMLElement, countElement: HTMLElement): void {
+  const spinner = getPlaygroundWinsSpinner(container);
+  spinner.hidden = false;
+  countElement.hidden = true;
+  countElement.textContent = '';
+  container.title = getExtensionMessage('playgroundWins');
+  container.setAttribute('aria-label', getExtensionMessage('playgroundWins'));
+  container.setAttribute('aria-busy', 'true');
+}
+
+function getPlaygroundWinsSpinner(container: HTMLElement): HTMLElement {
+  const existing = container.querySelector<HTMLElement>('.playground-profile-wins-spinner');
+  if (existing) return existing;
+
+  const spinner = createLoadingSpinner('playground-profile-wins-spinner');
+  spinner.hidden = true;
+  container.append(spinner);
+  return spinner;
 }

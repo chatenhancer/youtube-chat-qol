@@ -19,6 +19,7 @@ export type GamesPanelMode = 'lobby' | 'players';
 export interface GamesPanelState {
   activeGameIndex: number;
   available: boolean;
+  invitedGameId: GameId | null;
   invitedPlayer: string;
   leavingGameId: string;
   mode: GamesPanelMode;
@@ -30,6 +31,7 @@ export function createInitialGamesPanelState(available: boolean, transport: Play
   return {
     activeGameIndex: 0,
     available,
+    invitedGameId: null,
     invitedPlayer: '',
     leavingGameId: '',
     mode: 'lobby',
@@ -57,10 +59,46 @@ export function isCurrentUserAvailable(state: PlaygroundClientState, fallbackAva
 }
 
 export function getPendingInvites(state: GamesPanelState): PublicInvite[] {
-  const currentUserId = state.transport.userId || '';
-  return state.transport.invites
+  return getPendingInvitesForCurrentUser(state.transport);
+}
+
+export function getPendingInviteCount(state: PlaygroundClientState): number {
+  return getPendingInvitesForCurrentUser(state).length;
+}
+
+export function isPlayerInvitePending(state: GamesPanelState, gameId: GameId, toUserId: string): boolean {
+  return (
+    (state.invitedGameId === gameId && state.invitedPlayer === toUserId) ||
+    Boolean(getPendingOutgoingInvite(state, gameId, toUserId))
+  );
+}
+
+export function getActiveGameCount(state: PlaygroundClientState): number {
+  const currentUserId = state.userId || '';
+  if (!currentUserId) return 0;
+
+  return getSupportedGames(state.games)
+    .filter((game) => isCurrentUserGame(game, currentUserId))
+    .length;
+}
+
+function getPendingInvitesForCurrentUser(state: PlaygroundClientState): PublicInvite[] {
+  const currentUserId = state.userId || '';
+  return state.invites
     .filter((invite) => invite.status === 'pending' && invite.toUser.userId === currentUserId)
     .filter((invite) => isPlayableGameId(invite.gameId));
+}
+
+function getPendingOutgoingInvite(state: GamesPanelState, gameId: GameId, toUserId: string): PublicInvite | null {
+  const currentUserId = state.transport.userId || '';
+  if (!currentUserId) return null;
+
+  return state.transport.invites.find((invite) =>
+    invite.status === 'pending' &&
+    invite.fromUser.userId === currentUserId &&
+    invite.toUser.userId === toUserId &&
+    invite.gameId === gameId
+  ) || null;
 }
 
 export function getAvailablePlayers(state: GamesPanelState, gameId: GameId): PresenceUser[] {
@@ -93,11 +131,17 @@ export function getSupportedGames(games: PublicGame[]): PublicGame[] {
   return games.filter((game) => isSupportedGameId(game.gameType));
 }
 
+function isCurrentUserGame(game: PublicGame, currentUserId: string): boolean {
+  const players = Object.values(game.players || {});
+  return !players.length || players.some((player) => player?.userId === currentUserId);
+}
+
 export function getGamesPanelViewKey(state: GamesPanelState, activeGamePanelId: string): string {
   const { transport } = state;
   return [
     state.mode,
     state.selectedGameId || '',
+    state.invitedGameId || '',
     state.invitedPlayer,
     state.leavingGameId,
     String(state.activeGameIndex),

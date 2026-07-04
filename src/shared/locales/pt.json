@@ -18,14 +18,14 @@
     "commandHelpOpenHelp": "Mostra esta lista.",
     "commandHelpSetTranslateTo": "Define o idioma da tradução.",
     "commandHelpSetTranslationDisplay": "Define como as traduções são exibidas.",
-    "commandHelpSetSound": "Define o som da caixa de entrada.",
+    "commandHelpSetSound": "Configura os sons de alerta.",
     "couldNotFindChatInput": "Não foi possível encontrar o campo do chat.",
     "couldNotReadTime": "Não foi possível ler esse horário.",
     "couldNotReadUserName": "Não foi possível ler esse nome de usuário.",
     "inbox": "Caixa de entrada",
     "inboxAriaUnread": "Caixa de entrada, {count} não lidas",
     "inboxEmpty": "Caixa de entrada vazia",
-    "inboxSound": "Som da caixa de entrada",
+    "alertSounds": "Sons de alerta",
     "jumpToMessage": "Ir para a mensagem",
     "keywordOrPhrase": "Palavra-chave ou frase",
     "lessThanOneMinute": "menos de 1 min",
@@ -226,8 +226,8 @@
     "gamesReplayTriviaStampOkay": "OK! :)",
     "gamesReplayTriviaStampBestie": "MELHOR AMIGO",
     "gamesReplayTriviaStampBlocked": "BLOQUEADO",
-    "gamesAvailableToPlay": "Disponível para jogar",
-    "gamesAvailableHelper": "Receba convites de jogo para esta live.",
+    "gamesAvailableToPlay": "Disponível para convites",
+    "gamesAvailableHelper": "Mostrar-me na lista de jogadores desta live.",
     "gamesActiveGame": "Jogos ativos",
     "gamesResume": "Continuar",
     "gamesMinimize": "Minimizar",
@@ -237,7 +237,7 @@
     "gamesInvites": "Convites",
     "gamesNoInvites": "Nenhum convite recebido ainda.",
     "gamesInviteFrom": "{user} convidou você para {game}",
-    "gamesInviteHelper": "Aceite para abrir o painel do jogo.",
+    "gamesInviteHelper": "Aceite para iniciar o jogo.",
     "gamesAccept": "Aceitar",
     "gamesPlayWith": "Convidar jogador",
     "gamesBack": "Voltar",
@@ -357,14 +357,14 @@
     "effects": {
       "message": "Efeitos"
     },
-    "playInboxSound": {
-      "message": "Tocar som da caixa de entrada"
+    "playAlertSounds": {
+      "message": "Reproduzir sons de alerta"
     },
-    "playInboxSoundTitle": {
-      "message": "Toca um som curto quando uma mensagem do chat é salva na sua caixa de entrada."
+    "playAlertSoundsTitle": {
+      "message": "Reproduz sons curtos para alertas do chat."
     },
-    "playInboxSoundHelper": {
-      "message": "Reproduz um som de notificação curto para novas mensagens da caixa de entrada."
+    "playAlertSoundsHelper": {
+      "message": "Reproduz sons curtos para menções, correspondências de palavras-chave e convites de jogos."
     },
     "appearance": {
       "message": "Aparência"
@@ -502,10 +502,10 @@
       "message": "Jogos"
     },
     "playgroundGamesAvailable": {
-      "message": "Disponível por padrão"
+      "message": "Ficar disponível automaticamente"
     },
     "playgroundGamesAvailableHelper": {
-      "message": "Ao entrar numa live, você aparecerá automaticamente na lista de jogadores disponíveis para receber convites de jogo."
+      "message": "Quando o Playground estiver ativado, mostre-me como disponível para convites de jogo ao abrir cada live."
     },
     "learnMore": {
       "message": "Saiba mais"

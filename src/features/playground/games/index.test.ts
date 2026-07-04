@@ -7,6 +7,13 @@ import {
   handleFeatureMutations,
   handleFeatureOptionsChanged
 } from '../../../content/lifecycle';
+
+const alertSoundMocks = vi.hoisted(() => ({
+  playAlertSound: vi.fn()
+}));
+
+vi.mock('../../../shared/sounds/alert-sounds', () => alertSoundMocks);
+
 import {
   cleanupStaleGamesUi,
   refreshGamesButton,
@@ -33,6 +40,7 @@ describe('playground games header button', () => {
     window.history.replaceState({}, '', '/watch?v=stream-a');
     setOptions({ ...DEFAULT_OPTIONS });
     mockPorts.length = 0;
+    alertSoundMocks.playAlertSound.mockClear();
     chrome.runtime.connect = vi.fn(() => createMockPort() as unknown as chrome.runtime.Port);
     vi.useFakeTimers();
   });
@@ -182,8 +190,7 @@ describe('playground games header button', () => {
     expect(document.querySelector('.ytcq-games-card')).not.toBeNull();
     expect(document.querySelector('.ytcq-games-card-icon svg')).not.toBeNull();
     expect(document.querySelector('.ytcq-profile-card-title')?.textContent).toBe('Games');
-    expect(document.querySelector<HTMLElement>('.ytcq-games-beta-badge')?.hidden).toBe(false);
-    expect(document.querySelector('.ytcq-games-beta-badge')?.textContent).toBe('Beta');
+    expect(document.querySelector('.ytcq-games-beta-badge')).toBeNull();
     expect(document.querySelector('.ytcq-profile-card-subtitle')?.textContent).toBe('Connecting...');
     expect(document.querySelector('.ytcq-games-connection-notice')?.textContent).toContain('Connecting to Playground');
     expect(document.querySelector('.ytcq-games-connection-notice')?.textContent).toContain('Setting up the games lobby, please wait.');
@@ -232,7 +239,7 @@ describe('playground games header button', () => {
 
     getGameCards()[0].click();
     expect(document.querySelector('.ytcq-profile-card-title')?.textContent).toBe('Chess');
-    expect(document.querySelector<HTMLElement>('.ytcq-games-beta-badge')?.hidden).toBe(true);
+    expect(document.querySelector('.ytcq-games-beta-badge')).toBeNull();
     expect(document.querySelector('.ytcq-profile-card-subtitle')?.textContent).toBe('Invite a player');
     expect(document.querySelector('.ytcq-games-section-empty')?.textContent).toBe('There are no players available.');
     expect(document.querySelector('.ytcq-games-player-row')).toBeNull();
@@ -242,6 +249,78 @@ describe('playground games header button', () => {
 
     expect(button.getAttribute('aria-expanded')).toBe('false');
     expect(document.querySelector('.ytcq-games-card')).toBeNull();
+  });
+
+  it('shows pending invite and active game counts on the header button', async () => {
+    const header = createHeader();
+    document.body.append(header);
+    setOptions({ ...DEFAULT_OPTIONS, playgroundEnabled: true, playgroundGamesAvailable: true });
+
+    refreshGamesButton();
+    await vi.runOnlyPendingTimersAsync();
+
+    const button = header.querySelector<HTMLButtonElement>('.ytcq-games-button')!;
+    const badge = button.querySelector<HTMLElement>('.ytcq-games-badge')!;
+    expect(badge.hidden).toBe(true);
+    expect(button.getAttribute('aria-label')).toBe('Games');
+
+    lastMockPort()?.emit(createSnapshotMessage({
+      ...createLobbySnapshot(),
+      games: [createChessGame()]
+    }));
+
+    expect(badge.hidden).toBe(false);
+    expect(badge.textContent).toBe('1');
+    expect(badge.classList.contains('ytcq-games-badge-invites')).toBe(true);
+    expect(badge.classList.contains('ytcq-games-badge-active')).toBe(false);
+    expect(button.getAttribute('aria-label')).toBe('Games: Invites 1');
+    expect(alertSoundMocks.playAlertSound).not.toHaveBeenCalled();
+
+    lastMockPort()?.emit(createSnapshotMessage({
+      ...createLobbySnapshot(),
+      games: [createChessGame(), createReplayTriviaGame()],
+      invites: []
+    }));
+
+    expect(badge.hidden).toBe(false);
+    expect(badge.textContent).toBe('2');
+    expect(badge.classList.contains('ytcq-games-badge-invites')).toBe(false);
+    expect(badge.classList.contains('ytcq-games-badge-active')).toBe(true);
+    expect(button.getAttribute('aria-label')).toBe('Games: Active games 2');
+
+    lastMockPort()?.emit(createSnapshotMessage({
+      ...createLobbySnapshot(),
+      games: [],
+      invites: []
+    }));
+
+    expect(badge.hidden).toBe(true);
+    expect(badge.textContent).toBe('');
+    expect(button.getAttribute('aria-label')).toBe('Games');
+  });
+
+  it('plays the game invite alert sound for new incoming invites', async () => {
+    const header = createHeader();
+    document.body.append(header);
+    setOptions({ ...DEFAULT_OPTIONS, playgroundEnabled: true, playgroundGamesAvailable: true });
+
+    refreshGamesButton();
+    await vi.runOnlyPendingTimersAsync();
+    lastMockPort()?.emit(createSnapshotMessage({
+      ...createLobbySnapshot(),
+      invites: []
+    }));
+
+    lastMockPort()?.emit({
+      message: {
+        invite: createLobbySnapshot().invites[0],
+        type: 'inviteReceived'
+      },
+      type: 'ytcq:playground:server-message'
+    });
+
+    expect(alertSoundMocks.playAlertSound).toHaveBeenCalledOnce();
+    expect(alertSoundMocks.playAlertSound).toHaveBeenCalledWith('gameInvite');
   });
 
   it('does not send the visible YouTube profile to Playground', () => {
@@ -530,8 +609,15 @@ describe('playground games header button', () => {
 
     getActionButton('Back').click();
     expect(document.querySelector('.ytcq-profile-card-title')?.textContent).toBe('Games');
-    expect(document.querySelector<HTMLElement>('.ytcq-games-beta-badge')?.hidden).toBe(false);
+    expect(document.querySelector('.ytcq-games-beta-badge')).toBeNull();
     expect(document.querySelector('.ytcq-profile-card-subtitle')?.textContent).toBe('2 players online');
+
+    getGameCards()[0].click();
+    expect(document.querySelector('.ytcq-games-player-row')?.textContent).toContain('Waiting for reply...');
+    expect(getActionButton('Cancel')).not.toBeNull();
+    expect(lastMockPort()?.messages.filter((message) =>
+      (message as { type?: string }).type === 'ytcq:playground:invite'
+    )).toHaveLength(1);
   });
 
   it('remembers compact mode only when resuming an active Bounty Hunting game', () => {
@@ -1251,6 +1337,49 @@ describe('playground games header button', () => {
     expect(document.querySelector('.ytcq-games-player-row')?.textContent).toContain('Waiting for reply...');
     getActionButton('Cancel').click();
 
+    expect(lastMockPort()?.messages.at(-1)).toEqual({
+      gameId: 'chess',
+      toUserId: 'luna-user',
+      type: 'ytcq:playground:cancel-invite'
+    });
+    expect(document.querySelector('.ytcq-games-player-row')?.textContent).toContain('Available now');
+    expect(getActionButton('Invite')).not.toBeNull();
+  });
+
+  it('shows and cancels server-backed outgoing invites in the player list', () => {
+    const header = createHeader();
+    document.body.append(header);
+    setOptions({ ...DEFAULT_OPTIONS, playgroundEnabled: true, playgroundGamesAvailable: true });
+    wireGamesButton();
+    header.querySelector<HTMLButtonElement>('.ytcq-games-button')!.click();
+    const incomingInvite = createLobbySnapshot().invites[0];
+    lastMockPort()?.emit(createSnapshotMessage({
+      ...createLobbySnapshot(),
+      invites: [
+        {
+          ...incomingInvite,
+          fromUser: {
+            displayName: 'Me',
+            userId: 'me-user'
+          },
+          inviteId: 'invite-out-1',
+          toUser: {
+            displayName: 'Luna Chat',
+            userId: 'luna-user'
+          }
+        }
+      ]
+    }));
+
+    getGameCards()[0].click();
+    expect(document.querySelector('.ytcq-games-player-row')?.textContent).toContain('Waiting for reply...');
+    getActionButton('Cancel').click();
+
+    expect(lastMockPort()?.messages.at(-1)).toEqual({
+      gameId: 'chess',
+      toUserId: 'luna-user',
+      type: 'ytcq:playground:cancel-invite'
+    });
     expect(document.querySelector('.ytcq-games-player-row')?.textContent).toContain('Available now');
     expect(getActionButton('Invite')).not.toBeNull();
   });

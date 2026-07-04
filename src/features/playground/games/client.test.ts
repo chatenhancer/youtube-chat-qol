@@ -7,6 +7,7 @@ import type {
   PublicInvite
 } from '../../../shared/playground/protocol';
 import {
+  cancelPlaygroundInvite,
   getPlaygroundAvailability,
   getPlaygroundClientState,
   respondToPlaygroundInvite,
@@ -143,6 +144,7 @@ describe('Playground games client', () => {
 
     setPlaygroundAvailability(true);
     sendPlaygroundInvite('chess', 'luna-user');
+    cancelPlaygroundInvite('chess', 'luna-user');
     respondToPlaygroundInvite('invite-1', false);
     sendPlaygroundGameAction('game-1', 'move', { from: 'e2', to: 'e4' });
     sendPlaygroundGameAction('game-1', 'leave');
@@ -156,6 +158,11 @@ describe('Playground games client', () => {
         gameId: 'chess',
         toUserId: 'luna-user',
         type: 'ytcq:playground:invite'
+      },
+      {
+        gameId: 'chess',
+        toUserId: 'luna-user',
+        type: 'ytcq:playground:cancel-invite'
       },
       {
         accept: false,
@@ -175,6 +182,35 @@ describe('Playground games client', () => {
         type: 'ytcq:playground:game-action'
       }
     ]);
+  });
+
+  it('optimistically marks outgoing invites cancelled', () => {
+    startPlaygroundClient(true);
+    const port = lastMockPort()!;
+    const outgoingInvite = {
+      ...createInvite('invite-out-1', 'pending'),
+      fromUser: createUser('me-user', 'Me'),
+      toUser: createUser('luna-user', 'Luna Chat')
+    };
+    port.emit(createSnapshotMessage({
+      games: [],
+      invites: [outgoingInvite],
+      users: [createUser('me-user', 'Me'), createUser('luna-user', 'Luna Chat')]
+    }));
+
+    cancelPlaygroundInvite('chess', 'luna-user');
+
+    expect(getPlaygroundClientState().invites).toEqual([
+      {
+        ...outgoingInvite,
+        status: 'cancelled'
+      }
+    ]);
+    expect(port.messages.at(-1)).toEqual({
+      gameId: 'chess',
+      toUserId: 'luna-user',
+      type: 'ytcq:playground:cancel-invite'
+    });
   });
 
   it('updates local state from background status, snapshots, and server messages', () => {

@@ -122,7 +122,7 @@ function executeSetSoundCommand(
 ): void {
   saveOptions({ sound: value });
   runtime.clearInput();
-  showToast(t('settingState', { label: t('inboxSound'), state: value ? t('stateOn') : t('stateOff') }));
+  showToast(t('settingState', { label: t('alertSounds'), state: value ? t('stateOn') : t('stateOff') }));
 }
 
 function getTranslateCommandTarget(value: string): string | null {

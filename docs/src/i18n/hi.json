@@ -193,7 +193,7 @@
     "helpDescription": "यह सूची दिखाता है।",
     "setTranslateDescription": "अनुवाद भाषा सेट करता है। अनुवाद बंद करने के लिए off इस्तेमाल करें। मौजूदा लक्ष्य देखने के लिए बिना भाषा के /lang इस्तेमाल करें।",
     "setDisplayDescription": "अनुवाद कैसे दिखें, यह सेट करता है।",
-    "setSoundDescription": "इनबॉक्स ध्वनि सेट करता है।",
+    "setSoundDescription": "अलर्ट ध्वनियां सेट करता है।",
     "aliasesLabel": "उपनाम:",
     "exampleLabel": "उदाहरण:",
     "timeZoneAliases": "समर्थित स्थान/समय क्षेत्र:"

@@ -8,7 +8,13 @@ import { createGamesIcon } from '../../../shared/icons';
 import { t } from '../../../shared/i18n';
 import { ytcqCreateElement } from '../../../shared/managed-dom';
 import { CHAT_HEADER_SELECTOR } from '../../../youtube/selectors';
+import { formatBadgeCount } from '../../inbox/icons';
 import { INBOX_BUTTON_CLASS, INBOX_BUTTON_SELECTOR } from '../../inbox/selectors';
+
+export interface GamesButtonBadgeState {
+  activeGames: number;
+  invites: number;
+}
 
 export function findGamesHeader(): HTMLElement | null {
   return document.querySelector<HTMLElement>(CHAT_HEADER_SELECTOR);
@@ -33,13 +39,35 @@ export function createGamesButton(ownerId: string, onClick: (anchor: HTMLElement
   button.setAttribute('aria-haspopup', 'dialog');
   button.setAttribute('aria-expanded', 'false');
   button.setAttribute('aria-label', t('games'));
-  button.append(createGamesIcon());
+  button.append(createGamesIcon(), createGamesBadge());
   button.addEventListener('click', (event) => {
     event.preventDefault();
     event.stopPropagation();
     onClick(button);
   }, true);
   return button;
+}
+
+export function updateGamesButtonStatus(button: HTMLButtonElement, state: GamesButtonBadgeState): void {
+  const invites = getPositiveCount(state.invites);
+  const activeGames = getPositiveCount(state.activeGames);
+  const displayCount = invites || activeGames;
+  const hasInvites = invites > 0;
+  const hasActiveGames = !hasInvites && activeGames > 0;
+  const ariaLabel = getGamesAriaLabel({ activeGames, invites });
+  const badge = button.querySelector<HTMLElement>('.ytcq-games-badge');
+
+  if (button.getAttribute('aria-label') !== ariaLabel) {
+    button.setAttribute('aria-label', ariaLabel);
+  }
+  button.classList.toggle('ytcq-games-button-has-invites', hasInvites);
+  button.classList.toggle('ytcq-games-button-has-active-games', hasActiveGames);
+
+  if (!badge) return;
+  badge.classList.toggle('ytcq-games-badge-invites', hasInvites);
+  badge.classList.toggle('ytcq-games-badge-active', hasActiveGames);
+  badge.hidden = displayCount === 0;
+  badge.textContent = displayCount ? formatBadgeCount(displayCount) : '';
 }
 
 export function getGamesHeaderAnchor(header: HTMLElement): HTMLElement | null {
@@ -67,6 +95,23 @@ export function setGamesButtonExpanded(anchor: HTMLElement | null | undefined, e
   if (anchor instanceof HTMLButtonElement && anchor.classList.contains('ytcq-games-button')) {
     anchor.setAttribute('aria-expanded', String(expanded));
   }
+}
+
+function createGamesBadge(): HTMLSpanElement {
+  const badge = ytcqCreateElement('span');
+  badge.className = 'ytcq-games-badge';
+  badge.hidden = true;
+  return badge;
+}
+
+function getPositiveCount(value: number): number {
+  return Number.isFinite(value) && value > 0 ? Math.floor(value) : 0;
+}
+
+function getGamesAriaLabel(state: GamesButtonBadgeState): string {
+  if (state.invites > 0) return `${t('games')}: ${t('gamesInvites')} ${formatBadgeCount(state.invites)}`;
+  if (state.activeGames > 0) return `${t('games')}: ${t('gamesActiveGame')} ${formatBadgeCount(state.activeGames)}`;
+  return t('games');
 }
 
 export function positionGamesCard(card: HTMLElement, anchor?: HTMLElement): void {

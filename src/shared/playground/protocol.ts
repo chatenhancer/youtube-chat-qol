@@ -14,7 +14,7 @@ export function isPlaygroundComputerUserId(userId: string): boolean {
 
 export type GameId = typeof SUPPORTED_GAMES[number];
 export type GameEndReason = 'playerLeft';
-export type InviteStatus = 'accepted' | 'ignored' | 'pending';
+export type InviteStatus = 'accepted' | 'cancelled' | 'ignored' | 'pending';
 
 export interface PublicUserIdentity {
   displayName: string;
@@ -59,6 +59,7 @@ export type ClientMessage =
   | SetAvailabilityClientMessage
   | SetDisplayNameClientMessage
   | InviteClientMessage
+  | CancelInviteClientMessage
   | RespondInviteClientMessage
   | GameActionClientMessage
   | PingClientMessage;
@@ -92,6 +93,12 @@ export interface InviteClientMessage {
   gameId: GameId;
   toUserId: string;
   type: 'invite';
+}
+
+export interface CancelInviteClientMessage {
+  gameId: GameId;
+  toUserId: string;
+  type: 'cancelInvite';
 }
 
 export interface RespondInviteClientMessage {
@@ -198,6 +205,7 @@ export type PlaygroundContentMessage =
   | PlaygroundInitMessage
   | PlaygroundSetAvailabilityMessage
   | PlaygroundInviteMessage
+  | PlaygroundCancelInviteMessage
   | PlaygroundRespondInviteMessage
   | PlaygroundGameActionMessage
   | PlaygroundDisconnectMessage;
@@ -219,6 +227,12 @@ export interface PlaygroundInviteMessage {
   gameId: GameId;
   toUserId: string;
   type: 'ytcq:playground:invite';
+}
+
+export interface PlaygroundCancelInviteMessage {
+  gameId: GameId;
+  toUserId: string;
+  type: 'ytcq:playground:cancel-invite';
 }
 
 export interface PlaygroundRespondInviteMessage {

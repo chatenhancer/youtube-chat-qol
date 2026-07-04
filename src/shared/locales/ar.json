@@ -18,14 +18,14 @@
     "commandHelpOpenHelp": "يعرض هذه القائمة.",
     "commandHelpSetTranslateTo": "يضبط لغة الترجمة.",
     "commandHelpSetTranslationDisplay": "يضبط طريقة عرض الترجمات.",
-    "commandHelpSetSound": "يضبط صوت البريد الوارد.",
+    "commandHelpSetSound": "اضبط أصوات التنبيه.",
     "couldNotFindChatInput": "تعذر العثور على حقل إدخال الدردشة.",
     "couldNotReadTime": "تعذرت قراءة هذا الوقت.",
     "couldNotReadUserName": "تعذرت قراءة اسم المستخدم هذا.",
     "inbox": "صندوق الوارد",
     "inboxAriaUnread": "صندوق الوارد، {count} غير مقروءة",
     "inboxEmpty": "صندوق الوارد فارغ",
-    "inboxSound": "صوت صندوق الوارد",
+    "alertSounds": "أصوات التنبيه",
     "jumpToMessage": "الانتقال إلى الرسالة",
     "keywordOrPhrase": "كلمة مفتاحية أو عبارة",
     "lessThanOneMinute": "أقل من دقيقة واحدة",
@@ -226,8 +226,8 @@
     "gamesReplayTriviaStampOkay": "تمام! :)",
     "gamesReplayTriviaStampBestie": "صديق مقرّب",
     "gamesReplayTriviaStampBlocked": "محظور",
-    "gamesAvailableToPlay": "متاح للعب",
-    "gamesAvailableHelper": "تلقي دعوات الألعاب لهذا البث.",
+    "gamesAvailableToPlay": "متاح للدعوات",
+    "gamesAvailableHelper": "إظهاري في قائمة لاعبي هذا البث.",
     "gamesActiveGame": "ألعاب نشطة",
     "gamesResume": "استئناف",
     "gamesMinimize": "تصغير",
@@ -237,7 +237,7 @@
     "gamesInvites": "دعوات",
     "gamesNoInvites": "لم تصلك أي دعوات بعد.",
     "gamesInviteFrom": "دعاك {user} إلى {game}",
-    "gamesInviteHelper": "اقبل لفتح لوحة اللعبة.",
+    "gamesInviteHelper": "اقبل لبدء اللعبة.",
     "gamesAccept": "قبول",
     "gamesPlayWith": "ادعُ لاعبًا",
     "gamesBack": "رجوع",
@@ -357,14 +357,14 @@
     "effects": {
       "message": "التأثيرات"
     },
-    "playInboxSound": {
-      "message": "تشغيل صوت صندوق الوارد"
+    "playAlertSounds": {
+      "message": "تشغيل أصوات التنبيه"
     },
-    "playInboxSoundTitle": {
-      "message": "تشغيل صوت قصير عند حفظ رسالة دردشة في صندوق الوارد."
+    "playAlertSoundsTitle": {
+      "message": "تشغيل أصوات قصيرة لتنبيهات الدردشة."
     },
-    "playInboxSoundHelper": {
-      "message": "شغّل صوت إشعار قصيرًا لرسائل البريد الوارد الجديدة."
+    "playAlertSoundsHelper": {
+      "message": "تشغيل أصوات قصيرة للإشارات وتطابقات الكلمات المفتاحية ودعوات الألعاب."
     },
     "appearance": {
       "message": "المظهر"
@@ -502,10 +502,10 @@
       "message": "الألعاب"
     },
     "playgroundGamesAvailable": {
-      "message": "متاح افتراضيًا"
+      "message": "كن متاحًا تلقائيًا"
     },
     "playgroundGamesAvailableHelper": {
-      "message": "عند الانضمام إلى بث، ستظهر تلقائيًا في قائمة اللاعبين المتاحين لتلقي دعوات الألعاب."
+      "message": "عند تشغيل Playground، أظهرني كمتاح لدعوات الألعاب عند فتح كل بث."
     },
     "learnMore": {
       "message": "تعرّف على المزيد"

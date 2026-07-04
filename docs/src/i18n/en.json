@@ -193,7 +193,7 @@
     "helpDescription": "Show this list.",
     "setTranslateDescription": "Set the translation language. Use off to disable translation. Use /lang without a language to show the current target.",
     "setDisplayDescription": "Set how translations are shown.",
-    "setSoundDescription": "Set inbox sound.",
+    "setSoundDescription": "Set alert sounds.",
     "aliasesLabel": "Aliases:",
     "exampleLabel": "Example:",
     "timeZoneAliases": "Supported places/timezones:"

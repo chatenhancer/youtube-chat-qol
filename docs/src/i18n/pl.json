@@ -193,7 +193,7 @@
     "helpDescription": "Pokaż tę listę.",
     "setTranslateDescription": "Ustawia język tłumaczenia. Użyj off, aby wyłączyć tłumaczenie. Użyj /lang bez języka, aby pokazać bieżący cel.",
     "setDisplayDescription": "Ustaw sposób wyświetlania tłumaczeń.",
-    "setSoundDescription": "Ustaw dźwięk skrzynki.",
+    "setSoundDescription": "Ustaw dźwięki alertów.",
     "aliasesLabel": "Aliasy:",
     "exampleLabel": "Przykład:",
     "timeZoneAliases": "Obsługiwane miejsca/strefy czasowe:"

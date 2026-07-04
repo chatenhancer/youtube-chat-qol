@@ -193,7 +193,7 @@
     "helpDescription": "Показати цей список.",
     "setTranslateDescription": "Встановлює мову перекладу. Використовуйте off, щоб вимкнути переклад. Використовуйте /lang без мови, щоб показати поточну ціль.",
     "setDisplayDescription": "Установити спосіб показу перекладів.",
-    "setSoundDescription": "Установити звук вхідних.",
+    "setSoundDescription": "Налаштувати звуки сповіщень.",
     "aliasesLabel": "Псевдоніми:",
     "exampleLabel": "Приклад:",
     "timeZoneAliases": "Підтримувані місця/часові пояси:"

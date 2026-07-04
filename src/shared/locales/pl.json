@@ -18,14 +18,14 @@
     "commandHelpOpenHelp": "Pokaż tę listę.",
     "commandHelpSetTranslateTo": "Ustaw język tłumaczenia.",
     "commandHelpSetTranslationDisplay": "Ustaw sposób wyświetlania tłumaczeń.",
-    "commandHelpSetSound": "Ustaw dźwięk skrzynki.",
+    "commandHelpSetSound": "Ustaw dźwięki alertów.",
     "couldNotFindChatInput": "Nie znaleziono pola czatu.",
     "couldNotReadTime": "Nie można odczytać tej godziny.",
     "couldNotReadUserName": "Nie można odczytać tej nazwy użytkownika.",
     "inbox": "Skrzynka",
     "inboxAriaUnread": "Skrzynka, {count} nieprzeczytanych",
     "inboxEmpty": "Skrzynka pusta",
-    "inboxSound": "Dźwięk skrzynki",
+    "alertSounds": "Dźwięki alertów",
     "jumpToMessage": "Przejdź do wiadomości",
     "keywordOrPhrase": "Słowo kluczowe lub fraza",
     "lessThanOneMinute": "mniej niż 1 min",
@@ -226,8 +226,8 @@
     "gamesReplayTriviaStampOkay": "OK! :)",
     "gamesReplayTriviaStampBestie": "BESTIE",
     "gamesReplayTriviaStampBlocked": "ZABLOKOWANO",
-    "gamesAvailableToPlay": "Dostępny do gry",
-    "gamesAvailableHelper": "Otrzymuj zaproszenia do gry w tej transmisji.",
+    "gamesAvailableToPlay": "Dostępny dla zaproszeń",
+    "gamesAvailableHelper": "Pokaż mnie na liście graczy tej transmisji.",
     "gamesActiveGame": "Aktywne gry",
     "gamesResume": "Wznów",
     "gamesMinimize": "Zminimalizuj",
@@ -237,7 +237,7 @@
     "gamesInvites": "Zaproszenia",
     "gamesNoInvites": "Nie otrzymano jeszcze zaproszeń.",
     "gamesInviteFrom": "{user} zaprasza cię do {game}",
-    "gamesInviteHelper": "Zaakceptuj, aby otworzyć panel gry.",
+    "gamesInviteHelper": "Zaakceptuj, aby rozpocząć grę.",
     "gamesAccept": "Akceptuj",
     "gamesPlayWith": "Zaproś gracza",
     "gamesBack": "Wstecz",
@@ -354,14 +354,14 @@
     "effects": {
       "message": "Efekty"
     },
-    "playInboxSound": {
-      "message": "Odtwarzaj dźwięk skrzynki"
+    "playAlertSounds": {
+      "message": "Odtwarzaj dźwięki alertów"
     },
-    "playInboxSoundTitle": {
-      "message": "Odtwórz krótki dźwięk, gdy wiadomość czatu zostanie zapisana w skrzynce."
+    "playAlertSoundsTitle": {
+      "message": "Odtwarzaj krótkie dźwięki dla alertów czatu."
     },
-    "playInboxSoundHelper": {
-      "message": "Odtwarzaj krótki dźwięk powiadomienia dla nowych wiadomości w Inboxie."
+    "playAlertSoundsHelper": {
+      "message": "Odtwarzaj krótkie dźwięki dla wzmianek, dopasowań słów kluczowych i zaproszeń do gier."
     },
     "appearance": {
       "message": "Wygląd"
@@ -499,10 +499,10 @@
       "message": "Gry"
     },
     "playgroundGamesAvailable": {
-      "message": "Dostępny domyślnie"
+      "message": "Bądź dostępny automatycznie"
     },
     "playgroundGamesAvailableHelper": {
-      "message": "Gdy dołączysz do transmisji, automatycznie pojawisz się na liście dostępnych graczy i będziesz otrzymywać zaproszenia do gry."
+      "message": "Gdy Playground jest włączony, pokazuj mnie jako dostępnego dla zaproszeń do gry po otwarciu każdej transmisji."
     },
     "learnMore": {
       "message": "Dowiedz się więcej"

@@ -193,7 +193,7 @@
     "helpDescription": "Bu listeyi göster.",
     "setTranslateDescription": "Çeviri dilini ayarlar. Çeviriyi kapatmak için off kullan. Geçerli hedefi görmek için dil olmadan /lang kullan.",
     "setDisplayDescription": "Çevirilerin nasıl gösterileceğini ayarla.",
-    "setSoundDescription": "Gelen kutusu sesini ayarla.",
+    "setSoundDescription": "Uyarı seslerini ayarla.",
     "aliasesLabel": "Kısayollar:",
     "exampleLabel": "Örnek:",
     "timeZoneAliases": "Desteklenen yerler/saat dilimleri:"

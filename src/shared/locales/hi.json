@@ -18,14 +18,14 @@
     "commandHelpOpenHelp": "यह सूची दिखाता है।",
     "commandHelpSetTranslateTo": "अनुवाद भाषा सेट करता है।",
     "commandHelpSetTranslationDisplay": "अनुवाद कैसे दिखें, यह सेट करता है।",
-    "commandHelpSetSound": "इनबॉक्स ध्वनि सेट करता है।",
+    "commandHelpSetSound": "अलर्ट ध्वनियां सेट करें.",
     "couldNotFindChatInput": "चैट इनपुट नहीं मिला.",
     "couldNotReadTime": "यह समय पढ़ा नहीं जा सका.",
     "couldNotReadUserName": "यह यूज़र नाम पढ़ा नहीं जा सका.",
     "inbox": "इनबॉक्स",
     "inboxAriaUnread": "इनबॉक्स, {count} अपठित",
     "inboxEmpty": "इनबॉक्स खाली है",
-    "inboxSound": "इनबॉक्स साउंड",
+    "alertSounds": "अलर्ट ध्वनियां",
     "jumpToMessage": "मैसेज पर जाएं",
     "keywordOrPhrase": "कीवर्ड या वाक्यांश",
     "lessThanOneMinute": "1 मिनट से कम",
@@ -226,8 +226,8 @@
     "gamesReplayTriviaStampOkay": "ठीक है! :)",
     "gamesReplayTriviaStampBestie": "बेस्ट फ्रेंड",
     "gamesReplayTriviaStampBlocked": "ब्लॉक",
-    "gamesAvailableToPlay": "खेलने के लिए उपलब्ध",
-    "gamesAvailableHelper": "इस स्ट्रीम के लिए गेम आमंत्रण पाएं.",
+    "gamesAvailableToPlay": "आमंत्रणों के लिए उपलब्ध",
+    "gamesAvailableHelper": "मुझे इस स्ट्रीम की खिलाड़ी सूची में दिखाएं.",
     "gamesActiveGame": "सक्रिय गेम",
     "gamesResume": "फिर शुरू करें",
     "gamesMinimize": "छोटा करें",
@@ -237,7 +237,7 @@
     "gamesInvites": "निमंत्रण",
     "gamesNoInvites": "अभी तक कोई निमंत्रण नहीं मिला.",
     "gamesInviteFrom": "{user} ने आपको {game} के लिए बुलाया",
-    "gamesInviteHelper": "गेम पैनल खोलने के लिए स्वीकार करें.",
+    "gamesInviteHelper": "गेम शुरू करने के लिए स्वीकार करें.",
     "gamesAccept": "स्वीकार करें",
     "gamesPlayWith": "खिलाड़ी को आमंत्रित करें",
     "gamesBack": "वापस",
@@ -357,14 +357,14 @@
     "effects": {
       "message": "प्रभाव"
     },
-    "playInboxSound": {
-      "message": "इनबॉक्स साउंड चलाएं"
+    "playAlertSounds": {
+      "message": "अलर्ट ध्वनियां चलाएं"
     },
-    "playInboxSoundTitle": {
-      "message": "जब कोई चैट मैसेज आपके इनबॉक्स में सेव हो, तो छोटा साउंड चलाएं."
+    "playAlertSoundsTitle": {
+      "message": "चैट अलर्ट के लिए छोटी ध्वनियां चलाएं."
     },
-    "playInboxSoundHelper": {
-      "message": "नए इनबॉक्स संदेशों के लिए छोटी सूचना ध्वनि चलाएं।"
+    "playAlertSoundsHelper": {
+      "message": "उल्लेखों, कीवर्ड मिलानों और गेम आमंत्रणों के लिए छोटी ध्वनियां चलाएं."
     },
     "appearance": {
       "message": "रूप"
@@ -502,10 +502,10 @@
       "message": "गेम"
     },
     "playgroundGamesAvailable": {
-      "message": "डिफ़ॉल्ट रूप से उपलब्ध"
+      "message": "अपने-आप उपलब्ध रहें"
     },
     "playgroundGamesAvailableHelper": {
-      "message": "जब आप किसी स्ट्रीम में शामिल होंगे, तो गेम आमंत्रण पाने के लिए आप अपने-आप उपलब्ध खिलाड़ियों की सूची में दिखेंगे."
+      "message": "Playground चालू होने पर, हर स्ट्रीम खुलते ही मुझे गेम आमंत्रणों के लिए उपलब्ध दिखाएं."
     },
     "learnMore": {
       "message": "और जानें"

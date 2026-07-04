@@ -202,6 +202,11 @@ describe('stream room state managers', () => {
     });
 
     expect(invites.getPendingInvite('invite-1')).toBe(invite);
+    expect(invites.getPendingInviteFromUser({
+      fromUserId: 'alice',
+      gameId: 'chess',
+      toUserId: 'bob'
+    })).toBe(invite);
     expect(invites.getPublicInvites('alice', getPublicUser)).toEqual([
       expect.objectContaining({
         fromUser: { displayName: 'Alice', userId: 'alice' },
@@ -213,6 +218,11 @@ describe('stream room state managers', () => {
     expect(invites.getPublicInvites('carol', getPublicUser)).toEqual([]);
 
     invites.setInviteStatus(invite, 'ignored');
+    expect(invites.getPendingInviteFromUser({
+      fromUserId: 'alice',
+      gameId: 'chess',
+      toUserId: 'bob'
+    })).toBeNull();
     expect(() => invites.getPendingInvite('invite-1')).toThrowError(new ProtocolError(
       'invite_not_found',
       'Invite not found.'

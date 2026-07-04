@@ -193,7 +193,7 @@
     "helpDescription": "แสดงรายการนี้",
     "setTranslateDescription": "ตั้งค่าภาษาแปล ใช้ off เพื่อปิดการแปล ใช้ /lang โดยไม่ใส่ภาษาเพื่อแสดงเป้าหมายปัจจุบัน",
     "setDisplayDescription": "ตั้งค่าวิธีแสดงคำแปล",
-    "setSoundDescription": "ตั้งค่าเสียงกล่องข้อความ",
+    "setSoundDescription": "ตั้งค่าเสียงแจ้งเตือน",
     "aliasesLabel": "ชื่อย่อ:",
     "exampleLabel": "ตัวอย่าง:",
     "timeZoneAliases": "สถานที่/เขตเวลาที่รองรับ:"

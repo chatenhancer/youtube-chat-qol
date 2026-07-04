@@ -515,7 +515,7 @@ function createCommands(): ChatCommandDefinition[] {
       run: vi.fn()
     },
     {
-      helpDescription: 'Mute inbox sound.',
+      helpDescription: 'Mute alert sounds.',
       helpLabel: '/mute',
       kind: 'setting',
       names: ['mute'],

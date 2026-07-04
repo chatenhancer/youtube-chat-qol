@@ -193,7 +193,7 @@
     "helpDescription": "이 목록을 표시합니다.",
     "setTranslateDescription": "번역 언어를 설정합니다. off를 사용하면 번역을 끕니다. 언어 없이 /lang을 사용하면 현재 대상을 보여줍니다.",
     "setDisplayDescription": "번역 표시 방식을 설정합니다.",
-    "setSoundDescription": "받은함 소리를 설정합니다.",
+    "setSoundDescription": "알림음을 설정합니다.",
     "aliasesLabel": "별칭:",
     "exampleLabel": "예:",
     "timeZoneAliases": "지원되는 장소/시간대:"

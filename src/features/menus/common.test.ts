@@ -56,7 +56,7 @@ describe('shared menu DOM helpers', () => {
     const item = createMenuToggleItem({
       checked: true,
       iconPath: 'M0 0h24v24H0z',
-      label: 'Inbox sound',
+      label: 'Alert sounds',
       onClick: vi.fn(),
       setting: 'sound'
     });

@@ -193,7 +193,7 @@
     "helpDescription": "Affiche cette liste.",
     "setTranslateDescription": "Définit la langue de traduction. Utilisez off pour désactiver la traduction. Utilisez /lang sans langue pour afficher la cible actuelle.",
     "setDisplayDescription": "Définit l'affichage des traductions.",
-    "setSoundDescription": "Définit le son de la boîte de réception.",
+    "setSoundDescription": "Définit les sons d’alerte.",
     "aliasesLabel": "Alias :",
     "exampleLabel": "Exemple :",
     "timeZoneAliases": "Lieux/fuseaux horaires pris en charge :"

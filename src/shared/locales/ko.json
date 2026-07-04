@@ -18,14 +18,14 @@
     "commandHelpOpenHelp": "이 목록을 표시합니다.",
     "commandHelpSetTranslateTo": "번역 언어를 설정합니다.",
     "commandHelpSetTranslationDisplay": "번역 표시 방식을 설정합니다.",
-    "commandHelpSetSound": "받은함 소리를 설정합니다.",
+    "commandHelpSetSound": "알림음을 설정합니다.",
     "couldNotFindChatInput": "채팅 입력창을 찾을 수 없습니다.",
     "couldNotReadTime": "해당 시간을 읽을 수 없습니다.",
     "couldNotReadUserName": "해당 사용자 이름을 읽을 수 없습니다.",
     "inbox": "받은 편지함",
     "inboxAriaUnread": "받은 편지함, 읽지 않은 메시지 {count}개",
     "inboxEmpty": "받은 편지함 비어 있음",
-    "inboxSound": "받은 편지함 소리",
+    "alertSounds": "알림음",
     "jumpToMessage": "메시지로 이동",
     "keywordOrPhrase": "키워드 또는 문구",
     "lessThanOneMinute": "1분 미만",
@@ -226,8 +226,8 @@
     "gamesReplayTriviaStampOkay": "좋아요! :)",
     "gamesReplayTriviaStampBestie": "절친",
     "gamesReplayTriviaStampBlocked": "차단됨",
-    "gamesAvailableToPlay": "게임 가능",
-    "gamesAvailableHelper": "이 스트림의 게임 초대를 받습니다.",
+    "gamesAvailableToPlay": "초대 받을 수 있음",
+    "gamesAvailableHelper": "이 스트림의 플레이어 목록에 나를 표시합니다.",
     "gamesActiveGame": "진행 중인 게임",
     "gamesResume": "계속",
     "gamesMinimize": "최소화",
@@ -237,7 +237,7 @@
     "gamesInvites": "초대",
     "gamesNoInvites": "아직 받은 초대가 없습니다.",
     "gamesInviteFrom": "{user}님이 {game}에 초대했습니다",
-    "gamesInviteHelper": "수락하면 게임 패널이 열립니다.",
+    "gamesInviteHelper": "수락하면 게임이 시작됩니다.",
     "gamesAccept": "수락",
     "gamesPlayWith": "플레이어 초대",
     "gamesBack": "뒤로",
@@ -354,14 +354,14 @@
     "effects": {
       "message": "효과"
     },
-    "playInboxSound": {
-      "message": "받은 편지함 소리 재생"
+    "playAlertSounds": {
+      "message": "알림음 재생"
     },
-    "playInboxSoundTitle": {
-      "message": "채팅 메시지가 받은 편지함에 저장될 때 짧은 소리를 재생합니다."
+    "playAlertSoundsTitle": {
+      "message": "채팅 알림에 짧은 소리를 재생합니다."
     },
-    "playInboxSoundHelper": {
-      "message": "새 받은 편지함 메시지에 짧은 알림음을 재생합니다."
+    "playAlertSoundsHelper": {
+      "message": "멘션, 키워드 일치, 게임 초대에 짧은 소리를 재생합니다."
     },
     "appearance": {
       "message": "모양"
@@ -499,10 +499,10 @@
       "message": "게임"
     },
     "playgroundGamesAvailable": {
-      "message": "기본적으로 가능"
+      "message": "자동으로 초대 받기"
     },
     "playgroundGamesAvailableHelper": {
-      "message": "스트림에 참여하면 게임 초대를 받을 수 있도록 사용 가능한 플레이어 목록에 자동으로 표시됩니다."
+      "message": "Playground가 켜져 있으면 각 스트림을 열 때 게임 초대를 받을 수 있는 상태로 표시됩니다."
     },
     "learnMore": {
       "message": "자세히 알아보기"

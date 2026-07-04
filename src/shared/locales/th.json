@@ -18,14 +18,14 @@
     "commandHelpOpenHelp": "แสดงรายการนี้",
     "commandHelpSetTranslateTo": "ตั้งค่าภาษาที่จะแปล",
     "commandHelpSetTranslationDisplay": "ตั้งค่าวิธีแสดงคำแปล",
-    "commandHelpSetSound": "ตั้งค่าเสียงกล่องข้อความ",
+    "commandHelpSetSound": "ตั้งค่าเสียงแจ้งเตือน",
     "couldNotFindChatInput": "ไม่พบช่องพิมพ์แชท",
     "couldNotReadTime": "อ่านเวลานั้นไม่ได้",
     "couldNotReadUserName": "อ่านชื่อผู้ใช้นั้นไม่ได้",
     "inbox": "กล่องข้อความ",
     "inboxAriaUnread": "กล่องข้อความ มี {count} รายการที่ยังไม่ได้อ่าน",
     "inboxEmpty": "กล่องข้อความว่าง",
-    "inboxSound": "เสียงกล่องข้อความ",
+    "alertSounds": "เสียงแจ้งเตือน",
     "jumpToMessage": "ข้ามไปยังข้อความ",
     "keywordOrPhrase": "คำสำคัญหรือวลี",
     "lessThanOneMinute": "น้อยกว่า 1 นาที",
@@ -226,8 +226,8 @@
     "gamesReplayTriviaStampOkay": "โอเค! :)",
     "gamesReplayTriviaStampBestie": "เพื่อนซี้",
     "gamesReplayTriviaStampBlocked": "บล็อกแล้ว",
-    "gamesAvailableToPlay": "พร้อมเล่น",
-    "gamesAvailableHelper": "รับคำเชิญเล่นเกมสำหรับสตรีมนี้",
+    "gamesAvailableToPlay": "พร้อมรับคำเชิญ",
+    "gamesAvailableHelper": "แสดงฉันในรายชื่อผู้เล่นของสตรีมนี้",
     "gamesActiveGame": "เกมที่กำลังเล่น",
     "gamesResume": "เล่นต่อ",
     "gamesMinimize": "ย่อ",
@@ -237,7 +237,7 @@
     "gamesInvites": "คำเชิญ",
     "gamesNoInvites": "ยังไม่มีคำเชิญ",
     "gamesInviteFrom": "{user} เชิญคุณเล่น {game}",
-    "gamesInviteHelper": "ยอมรับเพื่อเปิดแผงเกม",
+    "gamesInviteHelper": "ยอมรับเพื่อเริ่มเกม",
     "gamesAccept": "ยอมรับ",
     "gamesPlayWith": "เชิญผู้เล่น",
     "gamesBack": "กลับ",
@@ -354,14 +354,14 @@
     "effects": {
       "message": "เอฟเฟกต์"
     },
-    "playInboxSound": {
-      "message": "เล่นเสียงกล่องข้อความ"
+    "playAlertSounds": {
+      "message": "เล่นเสียงแจ้งเตือน"
     },
-    "playInboxSoundTitle": {
-      "message": "เล่นเสียงสั้นเมื่อข้อความแชทถูกบันทึกลงกล่องข้อความ"
+    "playAlertSoundsTitle": {
+      "message": "เล่นเสียงสั้น ๆ สำหรับการแจ้งเตือนในแชท"
     },
-    "playInboxSoundHelper": {
-      "message": "เล่นเสียงแจ้งเตือนสั้น ๆ สำหรับข้อความใหม่ในกล่องข้อความ"
+    "playAlertSoundsHelper": {
+      "message": "เล่นเสียงสั้น ๆ สำหรับการกล่าวถึง การตรงกับคีย์เวิร์ด และคำเชิญเล่นเกม"
     },
     "appearance": {
       "message": "รูปลักษณ์"
@@ -499,10 +499,10 @@
       "message": "เกม"
     },
     "playgroundGamesAvailable": {
-      "message": "พร้อมเล่นเป็นค่าเริ่มต้น"
+      "message": "พร้อมโดยอัตโนมัติ"
     },
     "playgroundGamesAvailableHelper": {
-      "message": "เมื่อคุณเข้าร่วมสตรีม คุณจะแสดงในรายชื่อผู้เล่นที่พร้อมรับคำเชิญเล่นเกมโดยอัตโนมัติ"
+      "message": "เมื่อเปิด Playground ให้แสดงฉันว่าพร้อมรับคำเชิญเล่นเกมเมื่อเปิดแต่ละสตรีม"
     },
     "learnMore": {
       "message": "เรียนรู้เพิ่มเติม"

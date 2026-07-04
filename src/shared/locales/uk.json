@@ -18,14 +18,14 @@
     "commandHelpOpenHelp": "Показати цей список.",
     "commandHelpSetTranslateTo": "Установити мову перекладу.",
     "commandHelpSetTranslationDisplay": "Установити спосіб показу перекладів.",
-    "commandHelpSetSound": "Установити звук вхідних.",
+    "commandHelpSetSound": "Налаштувати звуки сповіщень.",
     "couldNotFindChatInput": "Не вдалося знайти поле чату.",
     "couldNotReadTime": "Не вдалося прочитати цей час.",
     "couldNotReadUserName": "Не вдалося прочитати це ім’я користувача.",
     "inbox": "Вхідні",
     "inboxAriaUnread": "Вхідні, {count} непрочитаних",
     "inboxEmpty": "Вхідні порожні",
-    "inboxSound": "Звук вхідних",
+    "alertSounds": "Звуки сповіщень",
     "jumpToMessage": "Перейти до повідомлення",
     "keywordOrPhrase": "Ключове слово або фраза",
     "lessThanOneMinute": "менше ніж 1 хв",
@@ -226,8 +226,8 @@
     "gamesReplayTriviaStampOkay": "ОК! :)",
     "gamesReplayTriviaStampBestie": "НАЙКРАЩИЙ ДРУГ",
     "gamesReplayTriviaStampBlocked": "ЗАБЛОКОВАНО",
-    "gamesAvailableToPlay": "Готовий грати",
-    "gamesAvailableHelper": "Отримуйте ігрові запрошення в цій трансляції.",
+    "gamesAvailableToPlay": "Доступний для запрошень",
+    "gamesAvailableHelper": "Показувати мене у списку гравців цієї трансляції.",
     "gamesActiveGame": "Активні ігри",
     "gamesResume": "Продовжити",
     "gamesMinimize": "Згорнути",
@@ -237,7 +237,7 @@
     "gamesInvites": "Запрошення",
     "gamesNoInvites": "Запрошень поки немає.",
     "gamesInviteFrom": "{user} запрошує вас у {game}",
-    "gamesInviteHelper": "Прийміть, щоб відкрити ігрову панель.",
+    "gamesInviteHelper": "Прийміть, щоб почати гру.",
     "gamesAccept": "Прийняти",
     "gamesPlayWith": "Запросити гравця",
     "gamesBack": "Назад",
@@ -354,14 +354,14 @@
     "effects": {
       "message": "Ефекти"
     },
-    "playInboxSound": {
-      "message": "Відтворювати звук вхідних"
+    "playAlertSounds": {
+      "message": "Відтворювати звуки сповіщень"
     },
-    "playInboxSoundTitle": {
-      "message": "Відтворювати короткий звук, коли повідомлення чату зберігається у вхідних."
+    "playAlertSoundsTitle": {
+      "message": "Відтворює короткі звуки для сповіщень чату."
     },
-    "playInboxSoundHelper": {
-      "message": "Відтворює короткий звук сповіщення для нових повідомлень у вхідних."
+    "playAlertSoundsHelper": {
+      "message": "Відтворює короткі звуки для згадок, збігів ключових слів і запрошень до ігор."
     },
     "appearance": {
       "message": "Вигляд"
@@ -499,10 +499,10 @@
       "message": "Ігри"
     },
     "playgroundGamesAvailable": {
-      "message": "Доступний за замовчуванням"
+      "message": "Бути доступним автоматично"
     },
     "playgroundGamesAvailableHelper": {
-      "message": "Коли ви приєднуєтеся до трансляції, ви автоматично з'являтиметеся у списку доступних гравців і зможете отримувати запрошення до гри."
+      "message": "Коли Playground увімкнено, показувати мене доступним для ігрових запрошень під час відкриття кожної трансляції."
     },
     "learnMore": {
       "message": "Докладніше"

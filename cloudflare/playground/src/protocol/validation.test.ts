@@ -179,10 +179,24 @@ describe('playground protocol validation', () => {
       toUserId: 'target-user',
       type: 'invite'
     });
+    expect(parseClientMessage(JSON.stringify({
+      gameId: 'chess',
+      toUserId: 'target-user',
+      type: 'cancelInvite'
+    }))).toEqual({
+      gameId: 'chess',
+      toUserId: 'target-user',
+      type: 'cancelInvite'
+    });
     expect(() => parseClientMessage(JSON.stringify({
       gameId: 'chess',
       toUserId: '   ',
       type: 'invite'
+    }))).toThrowError(new ProtocolError('invalid_field', 'toUserId must be a non-empty string.'));
+    expect(() => parseClientMessage(JSON.stringify({
+      gameId: 'chess',
+      toUserId: '   ',
+      type: 'cancelInvite'
     }))).toThrowError(new ProtocolError('invalid_field', 'toUserId must be a non-empty string.'));
     expect(parseClientMessage(JSON.stringify({
       accept: false,

@@ -18,14 +18,14 @@
     "commandHelpOpenHelp": "Zeigt diese Liste an.",
     "commandHelpSetTranslateTo": "Legt die Übersetzungssprache fest.",
     "commandHelpSetTranslationDisplay": "Legt fest, wie Übersetzungen angezeigt werden.",
-    "commandHelpSetSound": "Legt den Inbox-Ton fest.",
+    "commandHelpSetSound": "Legt Alarmtöne fest.",
     "couldNotFindChatInput": "Chat-Eingabe nicht gefunden.",
     "couldNotReadTime": "Diese Zeit konnte nicht gelesen werden.",
     "couldNotReadUserName": "Dieser Nutzername konnte nicht gelesen werden.",
     "inbox": "Posteingang",
     "inboxAriaUnread": "Posteingang, {count} ungelesen",
     "inboxEmpty": "Posteingang leer",
-    "inboxSound": "Posteingangston",
+    "alertSounds": "Alarmtöne",
     "jumpToMessage": "Zur Nachricht springen",
     "keywordOrPhrase": "Schlüsselwort oder Phrase",
     "lessThanOneMinute": "weniger als 1 Min.",
@@ -226,8 +226,8 @@
     "gamesReplayTriviaStampOkay": "OK! :)",
     "gamesReplayTriviaStampBestie": "BESTIE",
     "gamesReplayTriviaStampBlocked": "BLOCKIERT",
-    "gamesAvailableToPlay": "Zum Spielen verfügbar",
-    "gamesAvailableHelper": "Spieleinladungen für diesen Stream erhalten.",
+    "gamesAvailableToPlay": "Für Einladungen verfügbar",
+    "gamesAvailableHelper": "Mich in der Spielerliste dieses Streams anzeigen.",
     "gamesActiveGame": "Aktive Spiele",
     "gamesResume": "Fortsetzen",
     "gamesMinimize": "Minimieren",
@@ -237,7 +237,7 @@
     "gamesInvites": "Einladungen",
     "gamesNoInvites": "Noch keine Einladungen erhalten.",
     "gamesInviteFrom": "{user} hat dich zu {game} eingeladen",
-    "gamesInviteHelper": "Annehmen, um das Spielfeld zu öffnen.",
+    "gamesInviteHelper": "Annehmen, um das Spiel zu starten.",
     "gamesAccept": "Annehmen",
     "gamesPlayWith": "Spieler einladen",
     "gamesBack": "Zurück",
@@ -354,14 +354,14 @@
     "effects": {
       "message": "Effekte"
     },
-    "playInboxSound": {
-      "message": "Posteingangston abspielen"
+    "playAlertSounds": {
+      "message": "Alarmtöne abspielen"
     },
-    "playInboxSoundTitle": {
-      "message": "Spielt einen kurzen Ton ab, wenn eine Chatnachricht im Posteingang gespeichert wird."
+    "playAlertSoundsTitle": {
+      "message": "Spielt kurze Töne für Chat-Benachrichtigungen ab."
     },
-    "playInboxSoundHelper": {
-      "message": "Spielt einen kurzen Benachrichtigungston für neue Inbox-Nachrichten."
+    "playAlertSoundsHelper": {
+      "message": "Spielt kurze Töne für Erwähnungen, Schlüsselworttreffer und Spieleinladungen ab."
     },
     "appearance": {
       "message": "Darstellung"
@@ -499,10 +499,10 @@
       "message": "Spiele"
     },
     "playgroundGamesAvailable": {
-      "message": "Standardmäßig verfügbar"
+      "message": "Automatisch verfügbar sein"
     },
     "playgroundGamesAvailableHelper": {
-      "message": "Wenn du einem Stream beitrittst, erscheinst du automatisch in der Liste verfügbarer Spieler und kannst Spieleinladungen erhalten."
+      "message": "Wenn Playground aktiviert ist, werde ich beim Öffnen jedes Streams als für Spieleinladungen verfügbar angezeigt."
     },
     "learnMore": {
       "message": "Mehr erfahren"

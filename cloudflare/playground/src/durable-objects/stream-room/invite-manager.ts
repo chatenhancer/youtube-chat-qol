@@ -7,7 +7,7 @@ export interface PendingInvite {
   fromUserId: string;
   gameId: GameId;
   inviteId: string;
-  status: 'accepted' | 'ignored' | 'pending';
+  status: 'accepted' | 'cancelled' | 'ignored' | 'pending';
   toUserId: string;
 }
 
@@ -44,6 +44,21 @@ export class InviteManager {
       throw new ProtocolError('invite_not_found', 'Invite not found.');
     }
     return invite;
+  }
+
+  getPendingInviteFromUser(input: {
+    fromUserId: string;
+    gameId: GameId;
+    toUserId: string;
+  }): PendingInvite | null {
+    this.pruneExpiredInvites();
+    return [...this.invites.values()]
+      .find((invite) =>
+        invite.status === 'pending' &&
+        invite.fromUserId === input.fromUserId &&
+        invite.toUserId === input.toUserId &&
+        invite.gameId === input.gameId
+      ) || null;
   }
 
   getPublicInvites(

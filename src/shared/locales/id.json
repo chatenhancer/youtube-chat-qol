@@ -18,14 +18,14 @@
     "commandHelpOpenHelp": "Tampilkan daftar ini.",
     "commandHelpSetTranslateTo": "Atur bahasa terjemahan.",
     "commandHelpSetTranslationDisplay": "Atur cara terjemahan ditampilkan.",
-    "commandHelpSetSound": "Atur suara inbox.",
+    "commandHelpSetSound": "Atur suara peringatan.",
     "couldNotFindChatInput": "Tidak dapat menemukan input chat.",
     "couldNotReadTime": "Tidak dapat membaca waktu itu.",
     "couldNotReadUserName": "Tidak dapat membaca nama pengguna itu.",
     "inbox": "Kotak masuk",
     "inboxAriaUnread": "Kotak masuk, {count} belum dibaca",
     "inboxEmpty": "Kotak masuk kosong",
-    "inboxSound": "Suara kotak masuk",
+    "alertSounds": "Suara peringatan",
     "jumpToMessage": "Lompat ke pesan",
     "keywordOrPhrase": "Kata kunci atau frasa",
     "lessThanOneMinute": "kurang dari 1 menit",
@@ -226,8 +226,8 @@
     "gamesReplayTriviaStampOkay": "OKE! :)",
     "gamesReplayTriviaStampBestie": "SAHABAT",
     "gamesReplayTriviaStampBlocked": "DIBLOKIR",
-    "gamesAvailableToPlay": "Tersedia untuk bermain",
-    "gamesAvailableHelper": "Terima undangan game untuk live ini.",
+    "gamesAvailableToPlay": "Tersedia untuk undangan",
+    "gamesAvailableHelper": "Tampilkan saya di daftar pemain live ini.",
     "gamesActiveGame": "Game aktif",
     "gamesResume": "Lanjutkan",
     "gamesMinimize": "Minimalkan",
@@ -237,7 +237,7 @@
     "gamesInvites": "Undangan",
     "gamesNoInvites": "Belum ada undangan diterima.",
     "gamesInviteFrom": "{user} mengundang Anda ke {game}",
-    "gamesInviteHelper": "Terima untuk membuka panel game.",
+    "gamesInviteHelper": "Terima untuk memulai game.",
     "gamesAccept": "Terima",
     "gamesPlayWith": "Undang pemain",
     "gamesBack": "Kembali",
@@ -357,14 +357,14 @@
     "effects": {
       "message": "Efek"
     },
-    "playInboxSound": {
-      "message": "Putar suara kotak masuk"
+    "playAlertSounds": {
+      "message": "Putar suara peringatan"
     },
-    "playInboxSoundTitle": {
-      "message": "Putar suara singkat saat pesan chat disimpan ke kotak masuk Anda."
+    "playAlertSoundsTitle": {
+      "message": "Putar suara singkat untuk peringatan chat."
     },
-    "playInboxSoundHelper": {
-      "message": "Putar suara notifikasi singkat untuk pesan inbox baru."
+    "playAlertSoundsHelper": {
+      "message": "Putar suara singkat untuk sebutan, kecocokan kata kunci, dan undangan game."
     },
     "appearance": {
       "message": "Tampilan"
@@ -502,10 +502,10 @@
       "message": "Game"
     },
     "playgroundGamesAvailable": {
-      "message": "Tersedia secara default"
+      "message": "Tersedia otomatis"
     },
     "playgroundGamesAvailableHelper": {
-      "message": "Saat kamu bergabung ke live, kamu otomatis muncul di daftar pemain yang tersedia untuk menerima undangan game."
+      "message": "Saat Playground aktif, tampilkan saya sebagai tersedia untuk undangan game saat setiap live dibuka."
     },
     "learnMore": {
       "message": "Pelajari selengkapnya"

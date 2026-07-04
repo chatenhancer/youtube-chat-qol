@@ -193,7 +193,7 @@
     "helpDescription": "Показывает этот список.",
     "setTranslateDescription": "Задает язык перевода. Используйте off, чтобы отключить перевод. Используйте /lang без языка, чтобы показать текущую цель.",
     "setDisplayDescription": "Задает способ отображения переводов.",
-    "setSoundDescription": "Задает звук входящих.",
+    "setSoundDescription": "Настраивает звуки оповещений.",
     "aliasesLabel": "Алиасы:",
     "exampleLabel": "Пример:",
     "timeZoneAliases": "Поддерживаемые места/часовые пояса:"

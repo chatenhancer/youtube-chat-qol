@@ -193,7 +193,7 @@
     "helpDescription": "Muestra esta lista.",
     "setTranslateDescription": "Define el idioma de traducción. Usa off para desactivar la traducción. Usa /lang sin idioma para ver el destino actual.",
     "setDisplayDescription": "Configura cómo se muestran las traducciones.",
-    "setSoundDescription": "Configura el sonido de la bandeja.",
+    "setSoundDescription": "Configura los sonidos de alerta.",
     "aliasesLabel": "Alias:",
     "exampleLabel": "Ejemplo:",
     "timeZoneAliases": "Lugares/zonas horarias compatibles:"

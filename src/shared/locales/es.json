@@ -18,14 +18,14 @@
     "commandHelpOpenHelp": "Muestra esta lista.",
     "commandHelpSetTranslateTo": "Configura el idioma de traducción.",
     "commandHelpSetTranslationDisplay": "Configura cómo se muestran las traducciones.",
-    "commandHelpSetSound": "Configura el sonido del inbox.",
+    "commandHelpSetSound": "Configura los sonidos de alerta.",
     "couldNotFindChatInput": "No se encontró el campo del chat.",
     "couldNotReadTime": "No se pudo leer esa hora.",
     "couldNotReadUserName": "No se pudo leer ese nombre de usuario.",
     "inbox": "Bandeja",
     "inboxAriaUnread": "Bandeja, {count} sin leer",
     "inboxEmpty": "Bandeja vacía",
-    "inboxSound": "Sonido de la bandeja",
+    "alertSounds": "Sonidos de alerta",
     "jumpToMessage": "Ir al mensaje",
     "keywordOrPhrase": "Palabra clave o frase",
     "lessThanOneMinute": "menos de 1 min",
@@ -226,8 +226,8 @@
     "gamesReplayTriviaStampOkay": "¡OK! :)",
     "gamesReplayTriviaStampBestie": "MEJOR AMIGO",
     "gamesReplayTriviaStampBlocked": "BLOQUEADO",
-    "gamesAvailableToPlay": "Disponible para jugar",
-    "gamesAvailableHelper": "Recibe invitaciones de juego para este directo.",
+    "gamesAvailableToPlay": "Disponible para invitaciones",
+    "gamesAvailableHelper": "Mostrarme en la lista de jugadores de este directo.",
     "gamesActiveGame": "Partidas activas",
     "gamesResume": "Continuar",
     "gamesMinimize": "Minimizar",
@@ -237,7 +237,7 @@
     "gamesInvites": "Invitaciones",
     "gamesNoInvites": "Aún no has recibido invitaciones.",
     "gamesInviteFrom": "{user} te invitó a {game}",
-    "gamesInviteHelper": "Acepta para abrir el panel del juego.",
+    "gamesInviteHelper": "Acepta para iniciar el juego.",
     "gamesAccept": "Aceptar",
     "gamesPlayWith": "Invitar a un jugador",
     "gamesBack": "Volver",
@@ -354,14 +354,14 @@
     "effects": {
       "message": "Efectos"
     },
-    "playInboxSound": {
-      "message": "Reproducir sonido de la bandeja"
+    "playAlertSounds": {
+      "message": "Reproducir sonidos de alerta"
     },
-    "playInboxSoundTitle": {
-      "message": "Reproduce un sonido corto cuando un mensaje del chat se guarda en tu bandeja."
+    "playAlertSoundsTitle": {
+      "message": "Reproduce sonidos cortos para alertas del chat."
     },
-    "playInboxSoundHelper": {
-      "message": "Reproduce un sonido de notificación breve para nuevos mensajes de la bandeja."
+    "playAlertSoundsHelper": {
+      "message": "Reproduce sonidos cortos para menciones, coincidencias de palabras clave e invitaciones de juegos."
     },
     "appearance": {
       "message": "Apariencia"
@@ -499,10 +499,10 @@
       "message": "Juegos"
     },
     "playgroundGamesAvailable": {
-      "message": "Disponible de forma predeterminada"
+      "message": "Estar disponible automáticamente"
     },
     "playgroundGamesAvailableHelper": {
-      "message": "Al unirte a un directo, aparecerás automáticamente en la lista de jugadores disponibles para recibir invitaciones de juego."
+      "message": "Cuando Playground esté activado, muéstrame como disponible para invitaciones de juego al abrir cada directo."
     },
     "learnMore": {
       "message": "Más información"

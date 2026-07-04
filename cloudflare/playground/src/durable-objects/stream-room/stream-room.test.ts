@@ -42,6 +42,7 @@ interface PrivateStreamRoom {
     gameId: string,
     action: { action: string; payload?: Record<string, unknown>; userId: string }
   ): void;
+  handleCancelInvite(session: TestSession, gameId: GameId, toUserId: string): void;
   handleHello(session: TestSession, message: Extract<ClientMessage, { type: 'hello' }>): Promise<void>;
   handleInvite(session: TestSession, gameId: GameId, toUserId: string): void;
   handleInviteResponse(session: TestSession, inviteId: string, accept: boolean): void;
@@ -413,6 +414,29 @@ describe('playground stream room', () => {
     expect(bob.socket.messages.some((message) => message.type === 'gameStarted')).toBe(false);
     expect(room.createSnapshot(bob.userId).games).toHaveLength(0);
     expect(lastMessage(alice, 'inviteUpdated').invite.status).toBe('ignored');
+  });
+
+  it('keeps cancelled outgoing invites from starting a game', async () => {
+    const room = createRoom();
+    const alice = createSession('alice-connection');
+    const bob = createSession('bob-connection');
+
+    await room.handleHello(alice, await createHello(alice.challenge, 'Alice', ['chess']));
+    await room.handleHello(bob, await createHello(bob.challenge, 'Bob', ['chess']));
+    room.handleInvite(alice, 'chess', bob.userId);
+
+    const inviteReceived = lastMessage(bob, 'inviteReceived');
+    room.handleCancelInvite(alice, 'chess', bob.userId);
+
+    expect(lastMessage(alice, 'inviteUpdated').invite.status).toBe('cancelled');
+    expect(lastMessage(bob, 'inviteUpdated').invite.status).toBe('cancelled');
+    expect(room.createSnapshot(bob.userId).invites).toEqual([]);
+    expect(() => room.handleInviteResponse(bob, inviteReceived.invite.inviteId, true)).toThrowError(new ProtocolError(
+      'invite_not_found',
+      'Invite not found.'
+    ));
+    expect(bob.socket.messages.some((message) => message.type === 'gameStarted')).toBe(false);
+    expect(room.createSnapshot(bob.userId).games).toHaveLength(0);
   });
 
   it('keeps active games resumable when a player disconnects', async () => {

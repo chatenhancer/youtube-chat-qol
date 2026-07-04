@@ -1,5 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { MARKED_USERS_STORAGE_KEY } from '../shared/marked-users';
+import {
+  PLAYGROUND_PROFILE_MESSAGE_TYPE,
+  PLAYGROUND_PROFILE_STATS_MESSAGE_TYPE,
+  PLAYGROUND_PROFILE_UPDATE_MESSAGE_TYPE
+} from '../shared/playground/identity';
 
 describe('popup', () => {
   beforeEach(async () => {
@@ -619,7 +624,7 @@ describe('popup', () => {
       const type = typeof message === 'object' && message !== null
         ? (message as { type?: string }).type
         : '';
-      const response = type === 'ytcq:playground:get-profile'
+      const response = type === PLAYGROUND_PROFILE_MESSAGE_TYPE
         ? {
             ok: true,
             profile: {
@@ -627,10 +632,16 @@ describe('popup', () => {
               displayName: 'Player TEST',
               generatedDisplayName: 'Player TEST',
               userId: 'test-user',
-              wins: 7
+              wins: null
             }
           }
-        : type === 'ytcq:playground:update-profile'
+        : type === PLAYGROUND_PROFILE_STATS_MESSAGE_TYPE
+          ? {
+              ok: true,
+              userId: 'test-user',
+              wins: 7
+            }
+        : type === PLAYGROUND_PROFILE_UPDATE_MESSAGE_TYPE
           ? {
               ok: true,
               profile: {
@@ -638,7 +649,7 @@ describe('popup', () => {
                 displayName: 'Luna Chat',
                 generatedDisplayName: 'Player TEST',
                 userId: 'test-user',
-                wins: 7
+                wins: null
               }
             }
           : { activeTabIds: [] };
@@ -696,7 +707,7 @@ describe('popup', () => {
     playgroundDisplayName.dispatchEvent(new Event('change', { bubbles: true }));
     expect(chrome.runtime.sendMessage).toHaveBeenCalledWith({
       displayName: 'Luna Chat',
-      type: 'ytcq:playground:update-profile'
+      type: PLAYGROUND_PROFILE_UPDATE_MESSAGE_TYPE
     }, expect.any(Function));
     expect(playgroundProfileAvatar.textContent).toBe('L');
     expect(playgroundProfileName.textContent).toBe('Luna Chat');
@@ -754,6 +765,70 @@ describe('popup', () => {
     expect(document.querySelector('.startup-effect-icon')?.classList.contains('ytcq-sparkle-burst')).toBe(false);
   });
 
+  it('shows the Playground identity while remote wins are loading', async () => {
+    type RuntimeCallback = (response: unknown) => void;
+    const statsCallbacks: RuntimeCallback[] = [];
+    await chrome.storage.sync.set({
+      playgroundEnabled: true
+    });
+    vi.mocked(chrome.tabs.query).mockImplementation(((_queryInfo: chrome.tabs.QueryInfo, callback?: (tabs: chrome.tabs.Tab[]) => void) => {
+      callback?.([]);
+      return Promise.resolve([]);
+    }) as never);
+    vi.mocked(chrome.runtime.sendMessage).mockImplementation(((message: unknown, callback?: RuntimeCallback) => {
+      const type = typeof message === 'object' && message !== null
+        ? (message as { type?: string }).type
+        : '';
+      if (type === PLAYGROUND_PROFILE_MESSAGE_TYPE) {
+        callback?.({
+          ok: true,
+          profile: {
+            customDisplayName: '',
+            displayName: 'Player SLOW',
+            generatedDisplayName: 'Player SLOW',
+            userId: 'slow-user',
+            wins: null
+          }
+        });
+        return Promise.resolve(undefined);
+      }
+      if (type === PLAYGROUND_PROFILE_STATS_MESSAGE_TYPE) {
+        if (callback) statsCallbacks.push(callback);
+        return Promise.resolve(undefined);
+      }
+
+      callback?.({ activeTabIds: [] });
+      return Promise.resolve({ activeTabIds: [] });
+    }) as never);
+
+    await import('./index');
+    const playgroundProfile = document.querySelector<HTMLElement>('#playgroundProfile')!;
+    const playgroundProfileName = document.querySelector<HTMLElement>('#playgroundProfileName')!;
+    const playgroundProfileWins = document.querySelector<HTMLElement>('#playgroundProfileWins')!;
+    const playgroundProfileWinsCount = document.querySelector<HTMLElement>('#playgroundProfileWinsCount')!;
+    const spinner = playgroundProfileWins.querySelector<HTMLElement>('.playground-profile-wins-spinner')!;
+
+    expect(playgroundProfile.hidden).toBe(false);
+    expect(playgroundProfileName.textContent).toBe('Player SLOW');
+    expect(playgroundProfileWins.getAttribute('aria-busy')).toBe('true');
+    expect(playgroundProfileWins.getAttribute('aria-label')).toBe('playgroundWins');
+    expect(spinner.hidden).toBe(false);
+    expect(playgroundProfileWinsCount.hidden).toBe(true);
+    expect(playgroundProfileWinsCount.textContent).toBe('');
+
+    statsCallbacks[0]?.({
+      ok: true,
+      userId: 'slow-user',
+      wins: 12
+    });
+
+    expect(playgroundProfileWins.getAttribute('aria-busy')).toBeNull();
+    expect(playgroundProfileWins.getAttribute('aria-label')).toBe('playgroundWins: 12');
+    expect(spinner.hidden).toBe(true);
+    expect(playgroundProfileWinsCount.hidden).toBe(false);
+    expect(playgroundProfileWinsCount.textContent).toBe('12');
+  });
+
   it('ignores stale, failed, and blank Playground profile responses', async () => {
     type RuntimeCallback = (response: unknown) => void;
     const profileCallbacks: RuntimeCallback[] = [];
@@ -767,7 +842,7 @@ describe('popup', () => {
     vi.mocked(chrome.runtime.sendMessage).mockImplementation(((message: unknown, callback?: RuntimeCallback) => {
       if (typeof message === 'object' &&
         message !== null &&
-        (message as { type?: string }).type === 'ytcq:playground:get-profile') {
+        (message as { type?: string }).type === PLAYGROUND_PROFILE_MESSAGE_TYPE) {
         if (callback) profileCallbacks.push(callback);
         return Promise.resolve(undefined);
       }
@@ -817,7 +892,7 @@ describe('popup', () => {
     vi.mocked(chrome.runtime.sendMessage).mockImplementation(((message: unknown, callback?: (response: unknown) => void) => {
       const response = typeof message === 'object' &&
         message !== null &&
-        (message as { type?: string }).type === 'ytcq:playground:get-profile'
+        (message as { type?: string }).type === PLAYGROUND_PROFILE_MESSAGE_TYPE
         ? {
             ok: true,
             profile: {
@@ -825,9 +900,17 @@ describe('popup', () => {
               displayName: 'Player TEST',
               generatedDisplayName: 'Player TEST',
               userId: 'test-user',
-              wins: 0
+              wins: null
             }
           }
+        : typeof message === 'object' &&
+          message !== null &&
+          (message as { type?: string }).type === PLAYGROUND_PROFILE_STATS_MESSAGE_TYPE
+          ? {
+              ok: true,
+              userId: 'test-user',
+              wins: 0
+            }
         : { activeTabIds: [] };
       callback?.(response);
       return Promise.resolve(response);
@@ -844,7 +927,7 @@ describe('popup', () => {
     expect(reportValidity).toHaveBeenCalled();
     expect(displayName.validationMessage).toBe('playgroundDisplayNameInvalid');
     expect(chrome.runtime.sendMessage).not.toHaveBeenCalledWith(expect.objectContaining({
-      type: 'ytcq:playground:update-profile'
+      type: PLAYGROUND_PROFILE_UPDATE_MESSAGE_TYPE
     }), expect.any(Function));
   });
 

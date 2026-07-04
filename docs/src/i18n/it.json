@@ -193,7 +193,7 @@
     "helpDescription": "Mostra questo elenco.",
     "setTranslateDescription": "Imposta la lingua di traduzione. Usa off per disattivare la traduzione. Usa /lang senza lingua per mostrare la destinazione attuale.",
     "setDisplayDescription": "Imposta come vengono mostrate le traduzioni.",
-    "setSoundDescription": "Imposta il suono della posta in arrivo.",
+    "setSoundDescription": "Imposta i suoni di avviso.",
     "aliasesLabel": "Alias:",
     "exampleLabel": "Esempio:",
     "timeZoneAliases": "Luoghi/fusi orari supportati:"

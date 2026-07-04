@@ -193,7 +193,7 @@
     "helpDescription": "הצג את הרשימה הזו.",
     "setTranslateDescription": "מגדיר את שפת התרגום. השתמשו ב-off כדי לכבות תרגום. השתמשו ב-/lang בלי שפה כדי להציג את היעד הנוכחי.",
     "setDisplayDescription": "הגדר איך תרגומים מוצגים.",
-    "setSoundDescription": "הגדר צליל תיבה.",
+    "setSoundDescription": "הגדר צלילי התראה.",
     "aliasesLabel": "כינויים:",
     "exampleLabel": "דוגמה:",
     "timeZoneAliases": "מקומות/אזורי זמן נתמכים:"

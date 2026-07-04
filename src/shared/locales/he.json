@@ -18,14 +18,14 @@
     "commandHelpOpenHelp": "הצג את הרשימה הזו.",
     "commandHelpSetTranslateTo": "הגדר את שפת התרגום.",
     "commandHelpSetTranslationDisplay": "הגדר איך תרגומים מוצגים.",
-    "commandHelpSetSound": "הגדר צליל תיבה.",
+    "commandHelpSetSound": "הגדר צלילי התראה.",
     "couldNotFindChatInput": "לא נמצא שדה הקלט של הצ׳אט.",
     "couldNotReadTime": "לא ניתן לקרוא את השעה הזו.",
     "couldNotReadUserName": "לא ניתן לקרוא את שם המשתמש הזה.",
     "inbox": "תיבה",
     "inboxAriaUnread": "תיבה, {count} לא נקראו",
     "inboxEmpty": "התיבה ריקה",
-    "inboxSound": "צליל תיבה",
+    "alertSounds": "צלילי התראה",
     "jumpToMessage": "קפיצה להודעה",
     "keywordOrPhrase": "מילת מפתח או ביטוי",
     "lessThanOneMinute": "פחות מדקה",
@@ -226,8 +226,8 @@
     "gamesReplayTriviaStampOkay": "בסדר! :)",
     "gamesReplayTriviaStampBestie": "הכי טוב/ה",
     "gamesReplayTriviaStampBlocked": "חסום",
-    "gamesAvailableToPlay": "זמין למשחק",
-    "gamesAvailableHelper": "קבלת הזמנות למשחק בשידור הזה.",
+    "gamesAvailableToPlay": "זמין להזמנות",
+    "gamesAvailableHelper": "הצג אותי ברשימת השחקנים של השידור הזה.",
     "gamesActiveGame": "משחקים פעילים",
     "gamesResume": "המשך",
     "gamesMinimize": "מזער",
@@ -237,7 +237,7 @@
     "gamesInvites": "הזמנות",
     "gamesNoInvites": "עדיין לא התקבלו הזמנות.",
     "gamesInviteFrom": "{user} הזמין אותך ל-{game}",
-    "gamesInviteHelper": "אשר כדי לפתוח את חלונית המשחק.",
+    "gamesInviteHelper": "אשר כדי להתחיל את המשחק.",
     "gamesAccept": "אישור",
     "gamesPlayWith": "הזמנת שחקן",
     "gamesBack": "חזרה",
@@ -354,14 +354,14 @@
     "effects": {
       "message": "אפקטים"
     },
-    "playInboxSound": {
-      "message": "השמעת צליל תיבה"
+    "playAlertSounds": {
+      "message": "השמע צלילי התראה"
     },
-    "playInboxSoundTitle": {
-      "message": "השמע צליל קצר כאשר הודעת צ׳אט נשמרת בתיבה."
+    "playAlertSoundsTitle": {
+      "message": "השמע צלילים קצרים להתראות בצ׳אט."
     },
-    "playInboxSoundHelper": {
-      "message": "השמע צליל התראה קצר להודעות חדשות בתיבת הדואר."
+    "playAlertSoundsHelper": {
+      "message": "השמע צלילים קצרים לאזכורים, התאמות מילות מפתח והזמנות למשחק."
     },
     "appearance": {
       "message": "מראה"
@@ -499,10 +499,10 @@
       "message": "משחקים"
     },
     "playgroundGamesAvailable": {
-      "message": "זמין כברירת מחדל"
+      "message": "להיות זמין אוטומטית"
     },
     "playgroundGamesAvailableHelper": {
-      "message": "כשמצטרפים לשידור, תופיעו אוטומטית ברשימת השחקנים הזמינים לקבלת הזמנות למשחק."
+      "message": "כאשר Playground מופעל, הצג אותי כזמין להזמנות משחק בכל פתיחה של שידור."
     },
     "learnMore": {
       "message": "מידע נוסף"

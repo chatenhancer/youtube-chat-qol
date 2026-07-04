@@ -18,14 +18,14 @@
     "commandHelpOpenHelp": "Show this list.",
     "commandHelpSetTranslateTo": "Set the translation language.",
     "commandHelpSetTranslationDisplay": "Set how translations are shown.",
-    "commandHelpSetSound": "Set inbox sound.",
+    "commandHelpSetSound": "Set alert sounds.",
     "couldNotFindChatInput": "Could not find the chat input.",
     "couldNotReadTime": "Could not read that time.",
     "couldNotReadUserName": "Could not read that user name.",
     "inbox": "Inbox",
     "inboxAriaUnread": "Inbox, {count} unread",
     "inboxEmpty": "Inbox empty",
-    "inboxSound": "Inbox sound",
+    "alertSounds": "Alert sounds",
     "jumpToMessage": "Jump to message",
     "keywordOrPhrase": "Keyword or phrase",
     "lessThanOneMinute": "less than 1 min",
@@ -226,8 +226,8 @@
     "gamesReplayTriviaStampOkay": "OKAY! :)",
     "gamesReplayTriviaStampBestie": "BESTIE",
     "gamesReplayTriviaStampBlocked": "BLOCKED",
-    "gamesAvailableToPlay": "Available to play",
-    "gamesAvailableHelper": "Receive game invites for this stream.",
+    "gamesAvailableToPlay": "Available for invites",
+    "gamesAvailableHelper": "Show me in this stream's player list.",
     "gamesActiveGame": "Active games",
     "gamesResume": "Resume",
     "gamesMinimize": "Minimize",
@@ -237,7 +237,7 @@
     "gamesInvites": "Invites",
     "gamesNoInvites": "No invites received yet.",
     "gamesInviteFrom": "{user} invited you to {game}",
-    "gamesInviteHelper": "Accept to open the game panel.",
+    "gamesInviteHelper": "Accept to start the game.",
     "gamesAccept": "Accept",
     "gamesPlayWith": "Invite a player",
     "gamesBack": "Back",
@@ -357,14 +357,14 @@
     "effects": {
       "message": "Effects"
     },
-    "playInboxSound": {
-      "message": "Play inbox sound"
+    "playAlertSounds": {
+      "message": "Play alert sounds"
     },
-    "playInboxSoundTitle": {
-      "message": "Play a short sound when a chat message is saved to your inbox."
+    "playAlertSoundsTitle": {
+      "message": "Play short sounds for chat alerts."
     },
-    "playInboxSoundHelper": {
-      "message": "Play a short notification sound for new inbox messages."
+    "playAlertSoundsHelper": {
+      "message": "Play short sounds for mentions, keyword matches, and game invites."
     },
     "appearance": {
       "message": "Appearance"
@@ -502,10 +502,10 @@
       "message": "Games"
     },
     "playgroundGamesAvailable": {
-      "message": "Available by default"
+      "message": "Be available automatically"
     },
     "playgroundGamesAvailableHelper": {
-      "message": "When you join a stream you'll automatically appear in the available players list to receive game invites."
+      "message": "When Playground is on, show me as available for game invites when each stream opens."
     },
     "learnMore": {
       "message": "Learn more"

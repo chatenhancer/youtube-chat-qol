@@ -193,7 +193,7 @@
     "helpDescription": "この一覧を表示します。",
     "setTranslateDescription": "翻訳言語を設定します。off で翻訳を無効にします。言語なしで /lang を使うと現在の対象を表示します。",
     "setDisplayDescription": "翻訳の表示方法を設定します。",
-    "setSoundDescription": "受信箱サウンドを設定します。",
+    "setSoundDescription": "アラート音を設定します。",
     "aliasesLabel": "エイリアス:",
     "exampleLabel": "例:",
     "timeZoneAliases": "対応する場所/タイムゾーン:"

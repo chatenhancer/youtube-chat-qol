@@ -18,14 +18,14 @@
     "commandHelpOpenHelp": "显示此列表。",
     "commandHelpSetTranslateTo": "设置翻译语言。",
     "commandHelpSetTranslationDisplay": "设置翻译的显示方式。",
-    "commandHelpSetSound": "设置收件箱声音。",
+    "commandHelpSetSound": "设置提醒声音。",
     "couldNotFindChatInput": "找不到聊天输入框。",
     "couldNotReadTime": "无法读取该时间。",
     "couldNotReadUserName": "无法读取该用户名。",
     "inbox": "收件箱",
     "inboxAriaUnread": "收件箱，{count} 条未读",
     "inboxEmpty": "收件箱为空",
-    "inboxSound": "收件箱提示音",
+    "alertSounds": "提醒声音",
     "jumpToMessage": "跳到消息",
     "keywordOrPhrase": "关键词或短语",
     "lessThanOneMinute": "少于 1 分钟",
@@ -226,8 +226,8 @@
     "gamesReplayTriviaStampOkay": "好的！:)",
     "gamesReplayTriviaStampBestie": "挚友",
     "gamesReplayTriviaStampBlocked": "已拉黑",
-    "gamesAvailableToPlay": "可以一起玩",
-    "gamesAvailableHelper": "接收此直播的游戏邀请。",
+    "gamesAvailableToPlay": "可接收邀请",
+    "gamesAvailableHelper": "在此直播的玩家列表中显示我。",
     "gamesActiveGame": "进行中的游戏",
     "gamesResume": "继续",
     "gamesMinimize": "最小化",
@@ -237,7 +237,7 @@
     "gamesInvites": "邀请",
     "gamesNoInvites": "还没有收到邀请。",
     "gamesInviteFrom": "{user} 邀请你玩 {game}",
-    "gamesInviteHelper": "接受后会打开游戏面板。",
+    "gamesInviteHelper": "接受后会开始游戏。",
     "gamesAccept": "接受",
     "gamesPlayWith": "邀请玩家",
     "gamesBack": "返回",
@@ -357,14 +357,14 @@
     "effects": {
       "message": "效果"
     },
-    "playInboxSound": {
-      "message": "播放收件箱提示音"
+    "playAlertSounds": {
+      "message": "播放提醒声音"
     },
-    "playInboxSoundTitle": {
-      "message": "当聊天消息保存到收件箱时播放短提示音。"
+    "playAlertSoundsTitle": {
+      "message": "为聊天提醒播放短音效。"
     },
-    "playInboxSoundHelper": {
-      "message": "为新的收件箱消息播放短提示音。"
+    "playAlertSoundsHelper": {
+      "message": "为提及、关键词匹配和游戏邀请播放短音效。"
     },
     "appearance": {
       "message": "外观"
@@ -502,10 +502,10 @@
       "message": "游戏"
     },
     "playgroundGamesAvailable": {
-      "message": "默认显示为可玩"
+      "message": "自动设为可邀请"
     },
     "playgroundGamesAvailableHelper": {
-      "message": "加入直播时，你会自动出现在可邀请玩家列表中，以接收游戏邀请。"
+      "message": "Playground 开启时，每次打开直播都会将我显示为可接收游戏邀请。"
     },
     "learnMore": {
       "message": "了解更多"

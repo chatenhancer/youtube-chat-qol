@@ -7,6 +7,7 @@
  */
 import { createChevronBackwardIcon } from '../../../shared/icons';
 import { t } from '../../../shared/i18n';
+import { createLoadingSpinner } from '../../../shared/loading-spinner';
 import { ytcqCreateElement } from '../../../shared/managed-dom';
 import { getPlaygroundAvatarPresentation } from '../../../shared/playground/identity';
 import type { GameId, PresenceUser, PublicGame, PublicInvite } from '../../../shared/playground/protocol';
@@ -21,6 +22,7 @@ import {
   getOnlinePlayerCount,
   getPendingInvites,
   getSupportedGames,
+  isPlayerInvitePending,
   shouldShowTransportNotice,
   type GamesPanelState
 } from './state';
@@ -42,18 +44,15 @@ export interface GamesViewActions {
 export function updateGamesCardHeader(card: HTMLElement, state: GamesPanelState): void {
   const title = card.querySelector<HTMLElement>('.ytcq-profile-card-title');
   const subtitle = card.querySelector<HTMLElement>('.ytcq-profile-card-subtitle');
-  const betaBadge = card.querySelector<HTMLElement>('.ytcq-games-beta-badge');
   if (!title || !subtitle) return;
 
   if (state.mode === 'players' && state.selectedGameId) {
     title.textContent = getGameLabel(state.selectedGameId);
     subtitle.textContent = t('gamesPlayWith');
-    if (betaBadge) betaBadge.hidden = true;
     return;
   }
 
   title.textContent = t('games');
-  if (betaBadge) betaBadge.hidden = false;
   if (shouldShowTransportNotice(state)) {
     subtitle.textContent = state.transport.status === 'connecting'
       ? t('gamesConnectingTitle')
@@ -368,19 +367,19 @@ function createPlayerRow(player: PresenceUser, state: GamesPanelState, actions: 
   title.textContent = player.displayName;
   const helper = ytcqCreateElement('span');
   helper.className = 'ytcq-games-row-helper';
-  helper.textContent = state.invitedPlayer === player.userId
-    ? t('gamesWaitingForReply')
-    : t('gamesAvailableNow');
+  const isInviting = state.selectedGameId
+    ? isPlayerInvitePending(state, state.selectedGameId, player.userId)
+    : false;
+  helper.textContent = isInviting ? t('gamesWaitingForReply') : t('gamesAvailableNow');
   copy.append(title, helper);
 
   const actionsWrap = ytcqCreateElement('span');
   actionsWrap.className = 'ytcq-games-row-actions';
-  const isInviting = state.invitedPlayer === player.userId;
   const action = createSmallActionButton(isInviting ? t('gamesCancelInvite') : t('gamesInvite'), {
     busy: isInviting
   });
   action.addEventListener('click', () => {
-    if (state.invitedPlayer === player.userId) {
+    if (isInviting) {
       actions.onCancelInvite(player);
       return;
     }
@@ -425,7 +424,7 @@ function createSmallActionButton(label: string, options: SmallActionButtonOption
   if (options.busy) {
     button.classList.add('ytcq-games-small-action-busy');
     button.setAttribute('aria-busy', 'true');
-    button.append(createGamesLoadingSpinner('ytcq-games-action-spinner'));
+    button.append(createLoadingSpinner('ytcq-games-loading-spinner ytcq-games-action-spinner'));
   }
   if (options.disabled) button.disabled = true;
   if (label) button.append(createTextSpan(options.busy ? getBusyActionLabel(label) : label));
@@ -440,15 +439,6 @@ function createTextSpan(textContent: string): HTMLElement {
   const text = ytcqCreateElement('span');
   text.textContent = textContent;
   return text;
-}
-
-function createGamesLoadingSpinner(extraClassName = ''): HTMLElement {
-  const spinner = ytcqCreateElement('span');
-  spinner.className = extraClassName
-    ? `ytcq-games-loading-spinner ${extraClassName}`
-    : 'ytcq-games-loading-spinner';
-  spinner.setAttribute('aria-hidden', 'true');
-  return spinner;
 }
 
 function createCycleButton(

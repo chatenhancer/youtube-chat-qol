@@ -18,14 +18,14 @@
     "commandHelpOpenHelp": "Hiển thị danh sách này.",
     "commandHelpSetTranslateTo": "Đặt ngôn ngữ dịch.",
     "commandHelpSetTranslationDisplay": "Đặt cách hiển thị bản dịch.",
-    "commandHelpSetSound": "Đặt âm thanh hộp thư.",
+    "commandHelpSetSound": "Đặt âm thanh cảnh báo.",
     "couldNotFindChatInput": "Không tìm thấy ô nhập chat.",
     "couldNotReadTime": "Không đọc được thời gian đó.",
     "couldNotReadUserName": "Không đọc được tên người dùng đó.",
     "inbox": "Hộp thư",
     "inboxAriaUnread": "Hộp thư, {count} chưa đọc",
     "inboxEmpty": "Hộp thư trống",
-    "inboxSound": "Âm thanh hộp thư",
+    "alertSounds": "Âm thanh cảnh báo",
     "jumpToMessage": "Nhảy đến tin nhắn",
     "keywordOrPhrase": "Từ khóa hoặc cụm từ",
     "lessThanOneMinute": "dưới 1 phút",
@@ -226,8 +226,8 @@
     "gamesReplayTriviaStampOkay": "OK! :)",
     "gamesReplayTriviaStampBestie": "BẠN THÂN",
     "gamesReplayTriviaStampBlocked": "ĐÃ CHẶN",
-    "gamesAvailableToPlay": "Sẵn sàng chơi",
-    "gamesAvailableHelper": "Nhận lời mời chơi game trong livestream này.",
+    "gamesAvailableToPlay": "Sẵn sàng nhận lời mời",
+    "gamesAvailableHelper": "Hiển thị tôi trong danh sách người chơi của livestream này.",
     "gamesActiveGame": "Trò chơi đang mở",
     "gamesResume": "Tiếp tục",
     "gamesMinimize": "Thu nhỏ",
@@ -237,7 +237,7 @@
     "gamesInvites": "Lời mời",
     "gamesNoInvites": "Chưa nhận được lời mời nào.",
     "gamesInviteFrom": "{user} mời bạn chơi {game}",
-    "gamesInviteHelper": "Chấp nhận để mở bảng trò chơi.",
+    "gamesInviteHelper": "Chấp nhận để bắt đầu trò chơi.",
     "gamesAccept": "Chấp nhận",
     "gamesPlayWith": "Mời người chơi",
     "gamesBack": "Quay lại",
@@ -354,14 +354,14 @@
     "effects": {
       "message": "Hiệu ứng"
     },
-    "playInboxSound": {
-      "message": "Phát âm thanh hộp thư"
+    "playAlertSounds": {
+      "message": "Phát âm thanh cảnh báo"
     },
-    "playInboxSoundTitle": {
-      "message": "Phát âm thanh ngắn khi tin nhắn chat được lưu vào hộp thư."
+    "playAlertSoundsTitle": {
+      "message": "Phát âm thanh ngắn cho cảnh báo trong chat."
     },
-    "playInboxSoundHelper": {
-      "message": "Phát âm thanh thông báo ngắn cho tin nhắn hộp thư mới."
+    "playAlertSoundsHelper": {
+      "message": "Phát âm thanh ngắn cho lượt nhắc, khớp từ khóa và lời mời chơi game."
     },
     "appearance": {
       "message": "Giao diện"
@@ -499,10 +499,10 @@
       "message": "Trò chơi"
     },
     "playgroundGamesAvailable": {
-      "message": "Sẵn sàng theo mặc định"
+      "message": "Tự động sẵn sàng"
     },
     "playgroundGamesAvailableHelper": {
-      "message": "Khi tham gia một livestream, bạn sẽ tự động xuất hiện trong danh sách người chơi sẵn sàng để nhận lời mời chơi game."
+      "message": "Khi Playground bật, hiển thị tôi là sẵn sàng nhận lời mời chơi game mỗi khi mở một livestream."
     },
     "learnMore": {
       "message": "Tìm hiểu thêm"

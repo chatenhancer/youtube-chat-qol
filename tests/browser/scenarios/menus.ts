@@ -28,8 +28,8 @@ async function expectSettingsMenuControlsInjected(menu: Locator): Promise<void> 
     await expect(menu.locator('.ytcq-settings-item').filter({ hasText: 'Translate' })).toBeVisible();
   });
 
-  await test.step('Verify Inbox sound setting is injected', async () => {
-    await expect(menu.locator('.ytcq-settings-item').filter({ hasText: 'Inbox sound' })).toBeVisible();
+  await test.step('Verify alert sounds setting is injected', async () => {
+    await expect(menu.locator('.ytcq-settings-item').filter({ hasText: 'Alert sounds' })).toBeVisible();
   });
 
   await test.step('Verify extension settings are inside the visible menu area', async () => {

@@ -18,14 +18,14 @@
     "commandHelpOpenHelp": "Bu listeyi göster.",
     "commandHelpSetTranslateTo": "Çeviri dilini ayarla.",
     "commandHelpSetTranslationDisplay": "Çevirilerin nasıl gösterileceğini ayarla.",
-    "commandHelpSetSound": "Gelen kutusu sesini ayarla.",
+    "commandHelpSetSound": "Uyarı seslerini ayarla.",
     "couldNotFindChatInput": "Sohbet girişi bulunamadı.",
     "couldNotReadTime": "Bu saat okunamadı.",
     "couldNotReadUserName": "Bu kullanıcı adı okunamadı.",
     "inbox": "Gelen kutusu",
     "inboxAriaUnread": "Gelen kutusu, {count} okunmamış",
     "inboxEmpty": "Gelen kutusu boş",
-    "inboxSound": "Gelen kutusu sesi",
+    "alertSounds": "Uyarı sesleri",
     "jumpToMessage": "Mesaja git",
     "keywordOrPhrase": "Anahtar kelime veya ifade",
     "lessThanOneMinute": "1 dakikadan az",
@@ -226,8 +226,8 @@
     "gamesReplayTriviaStampOkay": "TAMAM! :)",
     "gamesReplayTriviaStampBestie": "KANKA",
     "gamesReplayTriviaStampBlocked": "ENGELLENDİ",
-    "gamesAvailableToPlay": "Oynamaya uygun",
-    "gamesAvailableHelper": "Bu yayın için oyun davetleri al.",
+    "gamesAvailableToPlay": "Davetler için uygun",
+    "gamesAvailableHelper": "Beni bu yayının oyuncu listesinde göster.",
     "gamesActiveGame": "Aktif oyunlar",
     "gamesResume": "Sürdür",
     "gamesMinimize": "Küçült",
@@ -237,7 +237,7 @@
     "gamesInvites": "Davetler",
     "gamesNoInvites": "Henüz davet alınmadı.",
     "gamesInviteFrom": "{user} seni {game} oyununa davet etti",
-    "gamesInviteHelper": "Oyun panelini açmak için kabul et.",
+    "gamesInviteHelper": "Oyunu başlatmak için kabul et.",
     "gamesAccept": "Kabul et",
     "gamesPlayWith": "Oyuncu davet et",
     "gamesBack": "Geri",
@@ -357,14 +357,14 @@
     "effects": {
       "message": "Efektler"
     },
-    "playInboxSound": {
-      "message": "Gelen kutusu sesi çal"
+    "playAlertSounds": {
+      "message": "Uyarı seslerini çal"
     },
-    "playInboxSoundTitle": {
-      "message": "Bir sohbet mesajı gelen kutunuza kaydedildiğinde kısa bir ses çalar."
+    "playAlertSoundsTitle": {
+      "message": "Sohbet uyarıları için kısa sesler çal."
     },
-    "playInboxSoundHelper": {
-      "message": "Yeni gelen kutusu mesajları için kısa bir bildirim sesi çal."
+    "playAlertSoundsHelper": {
+      "message": "Bahsetmeler, anahtar kelime eşleşmeleri ve oyun davetleri için kısa sesler çal."
     },
     "appearance": {
       "message": "Görünüm"
@@ -502,10 +502,10 @@
       "message": "Oyunlar"
     },
     "playgroundGamesAvailable": {
-      "message": "Varsayılan olarak uygun"
+      "message": "Otomatik olarak uygun ol"
     },
     "playgroundGamesAvailableHelper": {
-      "message": "Bir yayına katıldığında, oyun davetleri almak için otomatik olarak uygun oyuncular listesinde görünürsün."
+      "message": "Playground açıkken, her yayın açıldığında beni oyun davetleri için uygun göster."
     },
     "learnMore": {
       "message": "Daha fazla bilgi"

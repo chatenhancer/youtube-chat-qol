@@ -18,14 +18,14 @@
     "commandHelpOpenHelp": "この一覧を表示します。",
     "commandHelpSetTranslateTo": "翻訳言語を設定します。",
     "commandHelpSetTranslationDisplay": "翻訳の表示方法を設定します。",
-    "commandHelpSetSound": "受信箱サウンドを設定します。",
+    "commandHelpSetSound": "アラート音を設定します。",
     "couldNotFindChatInput": "チャット入力欄が見つかりません。",
     "couldNotReadTime": "その時刻を読み取れませんでした。",
     "couldNotReadUserName": "そのユーザー名を読み取れませんでした。",
     "inbox": "受信トレイ",
     "inboxAriaUnread": "受信トレイ、未読 {count} 件",
     "inboxEmpty": "受信トレイは空です",
-    "inboxSound": "受信トレイの音",
+    "alertSounds": "アラート音",
     "jumpToMessage": "メッセージへ移動",
     "keywordOrPhrase": "キーワードまたはフレーズ",
     "lessThanOneMinute": "1分未満",
@@ -226,8 +226,8 @@
     "gamesReplayTriviaStampOkay": "OK! :)",
     "gamesReplayTriviaStampBestie": "親友",
     "gamesReplayTriviaStampBlocked": "ブロック",
-    "gamesAvailableToPlay": "プレイ可能",
-    "gamesAvailableHelper": "この配信のゲーム招待を受け取ります。",
+    "gamesAvailableToPlay": "招待を受け付ける",
+    "gamesAvailableHelper": "この配信のプレイヤー一覧に表示します。",
     "gamesActiveGame": "進行中のゲーム",
     "gamesResume": "再開",
     "gamesMinimize": "最小化",
@@ -237,7 +237,7 @@
     "gamesInvites": "招待",
     "gamesNoInvites": "まだ招待は届いていません。",
     "gamesInviteFrom": "{user} が {game} に招待しました",
-    "gamesInviteHelper": "承諾するとゲームパネルが開きます。",
+    "gamesInviteHelper": "承諾するとゲームが始まります。",
     "gamesAccept": "承諾",
     "gamesPlayWith": "プレイヤーを招待",
     "gamesBack": "戻る",
@@ -357,14 +357,14 @@
     "effects": {
       "message": "エフェクト"
     },
-    "playInboxSound": {
-      "message": "受信トレイの音を鳴らす"
+    "playAlertSounds": {
+      "message": "アラート音を鳴らす"
     },
-    "playInboxSoundTitle": {
-      "message": "チャットメッセージが受信トレイに保存されたときに短い音を鳴らします。"
+    "playAlertSoundsTitle": {
+      "message": "チャットのアラートに短い音を鳴らします。"
     },
-    "playInboxSoundHelper": {
-      "message": "新しい受信箱メッセージに短い通知音を鳴らします。"
+    "playAlertSoundsHelper": {
+      "message": "メンション、キーワード一致、ゲーム招待に短い音を鳴らします。"
     },
     "appearance": {
       "message": "表示"
@@ -502,10 +502,10 @@
       "message": "ゲーム"
     },
     "playgroundGamesAvailable": {
-      "message": "デフォルトでプレイ可能"
+      "message": "自動的に招待を受け付ける"
     },
     "playgroundGamesAvailableHelper": {
-      "message": "配信に参加すると、ゲーム招待を受け取れるプレイヤーとして自動的に一覧に表示されます。"
+      "message": "Playground がオンのとき、各配信を開くとゲーム招待を受け付けるユーザーとして表示します。"
     },
     "learnMore": {
       "message": "詳細を見る"

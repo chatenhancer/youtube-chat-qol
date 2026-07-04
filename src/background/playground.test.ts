@@ -10,6 +10,7 @@ import {
 import {
   PLAYGROUND_DISPLAY_NAME_STORAGE_KEY,
   PLAYGROUND_PROFILE_MESSAGE_TYPE,
+  PLAYGROUND_PROFILE_STATS_MESSAGE_TYPE,
   PLAYGROUND_PROFILE_UPDATE_MESSAGE_TYPE
 } from '../shared/playground/identity';
 import { REPLAY_TRIVIA_QUESTIONS_BACKGROUND_MESSAGE } from '../shared/playground/trivia';
@@ -195,14 +196,6 @@ describe('background playground bridge', () => {
   });
 
   it('returns the stable local playground profile without opening a socket', async () => {
-    vi.stubGlobal('fetch', vi.fn(async () => new Response(JSON.stringify({
-      ok: true,
-      stats: {
-        games: {},
-        userId: 'ignored',
-        wins: 0
-      }
-    }))));
     await import('./playground');
 
     const sendResponse = vi.fn();
@@ -219,7 +212,7 @@ describe('background playground bridge', () => {
           displayName: expect.stringMatching(/^Player [A-Z0-9]{4}$/),
           generatedDisplayName: expect.stringMatching(/^Player [A-Z0-9]{4}$/),
           userId: expect.stringMatching(/^[A-Za-z0-9_-]{32}$/),
-          wins: 0
+          wins: null
         }
       });
     });
@@ -400,18 +393,32 @@ describe('background playground bridge', () => {
     vi.stubGlobal('fetch', fetchMock);
     await import('./playground');
 
+    const profileResponse = vi.fn();
+    getMessageListener()({
+      type: PLAYGROUND_PROFILE_MESSAGE_TYPE
+    }, {} as chrome.runtime.MessageSender, profileResponse);
+    await vi.waitFor(() => {
+      expect(profileResponse).toHaveBeenCalledWith({
+        ok: true,
+        profile: expect.objectContaining({
+          userId: expect.stringMatching(/^[A-Za-z0-9_-]{32}$/)
+        })
+      });
+    });
+    const userId = profileResponse.mock.calls[0]?.[0]?.profile.userId as string;
+
     const sendResponse = vi.fn();
     const keepAlive = getMessageListener()({
-      type: PLAYGROUND_PROFILE_MESSAGE_TYPE
+      type: PLAYGROUND_PROFILE_STATS_MESSAGE_TYPE,
+      userId
     }, {} as chrome.runtime.MessageSender, sendResponse);
 
     expect(keepAlive).toBe(true);
     await vi.waitFor(() => {
       expect(sendResponse).toHaveBeenCalledWith({
         ok: true,
-        profile: expect.objectContaining({
-          wins: 5
-        })
+        userId,
+        wins: 5
       });
     });
     const fetchCalls = fetchMock.mock.calls as unknown as Array<[string, RequestInit?]>;
@@ -429,27 +436,59 @@ describe('background playground bridge', () => {
     vi.stubGlobal('fetch', fetchMock);
     await import('./playground');
 
-    const sendResponse = vi.fn();
+    const profileResponse = vi.fn();
     getMessageListener()({
       type: PLAYGROUND_PROFILE_MESSAGE_TYPE
+    }, {} as chrome.runtime.MessageSender, profileResponse);
+    await vi.waitFor(() => {
+      expect(profileResponse).toHaveBeenCalledWith({
+        ok: true,
+        profile: expect.objectContaining({
+          userId: expect.stringMatching(/^[A-Za-z0-9_-]{32}$/)
+        })
+      });
+    });
+    const firstUserId = profileResponse.mock.calls[0]?.[0]?.profile.userId as string;
+
+    const sendResponse = vi.fn();
+    getMessageListener()({
+      type: PLAYGROUND_PROFILE_STATS_MESSAGE_TYPE,
+      userId: firstUserId
     }, {} as chrome.runtime.MessageSender, sendResponse);
     await vi.waitFor(() => {
       expect(sendResponse).toHaveBeenCalledWith({
         ok: true,
-        profile: expect.objectContaining({ wins: 0 })
+        userId: firstUserId,
+        wins: 0
       });
     });
 
     await chrome.storage.local.clear();
-    sendResponse.mockClear();
+    const nextProfileResponse = vi.fn();
     getMessageListener()({
       type: PLAYGROUND_PROFILE_MESSAGE_TYPE
+    }, {} as chrome.runtime.MessageSender, nextProfileResponse);
+    await vi.waitFor(() => {
+      expect(nextProfileResponse).toHaveBeenCalledWith({
+        ok: true,
+        profile: expect.objectContaining({
+          userId: expect.stringMatching(/^[A-Za-z0-9_-]{32}$/)
+        })
+      });
+    });
+    const secondUserId = nextProfileResponse.mock.calls[0]?.[0]?.profile.userId as string;
+
+    sendResponse.mockClear();
+    getMessageListener()({
+      type: PLAYGROUND_PROFILE_STATS_MESSAGE_TYPE,
+      userId: secondUserId
     }, {} as chrome.runtime.MessageSender, sendResponse);
 
     await vi.waitFor(() => {
       expect(sendResponse).toHaveBeenCalledWith({
         ok: true,
-        profile: expect.objectContaining({ wins: 0 })
+        userId: secondUserId,
+        wins: 0
       });
     });
   });
@@ -627,6 +666,11 @@ describe('background playground bridge', () => {
       type: 'ytcq:playground:invite'
     });
     port.emit({
+      gameId: 'chess',
+      toUserId: 'user-2',
+      type: 'ytcq:playground:cancel-invite'
+    });
+    port.emit({
       action: 'move',
       gameId: 'game-1',
       payload: {
@@ -673,6 +717,11 @@ describe('background playground bridge', () => {
         gameId: 'chess',
         toUserId: 'user-2',
         type: 'invite'
+      },
+      {
+        gameId: 'chess',
+        toUserId: 'user-2',
+        type: 'cancelInvite'
       },
       {
         action: 'move',

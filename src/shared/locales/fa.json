@@ -18,14 +18,14 @@
     "commandHelpOpenHelp": "این فهرست را نشان بده.",
     "commandHelpSetTranslateTo": "زبان ترجمه را تنظیم کن.",
     "commandHelpSetTranslationDisplay": "نحوه نمایش ترجمه‌ها را تنظیم کن.",
-    "commandHelpSetSound": "صدای صندوق ورودی را تنظیم کن.",
+    "commandHelpSetSound": "صدای هشدارها را تنظیم کنید.",
     "couldNotFindChatInput": "کادر ورود چت پیدا نشد.",
     "couldNotReadTime": "این زمان خوانده نشد.",
     "couldNotReadUserName": "این نام کاربری خوانده نشد.",
     "inbox": "صندوق ورودی",
     "inboxAriaUnread": "صندوق ورودی، {count} خوانده‌نشده",
     "inboxEmpty": "صندوق ورودی خالی است",
-    "inboxSound": "صدای صندوق ورودی",
+    "alertSounds": "صداهای هشدار",
     "jumpToMessage": "پرش به پیام",
     "keywordOrPhrase": "کلیدواژه یا عبارت",
     "lessThanOneMinute": "کمتر از ۱ دقیقه",
@@ -226,8 +226,8 @@
     "gamesReplayTriviaStampOkay": "باشه! :)",
     "gamesReplayTriviaStampBestie": "بهترین دوست",
     "gamesReplayTriviaStampBlocked": "مسدود",
-    "gamesAvailableToPlay": "آماده بازی",
-    "gamesAvailableHelper": "دعوت‌های بازی را برای این پخش دریافت کنید.",
+    "gamesAvailableToPlay": "آماده دریافت دعوت",
+    "gamesAvailableHelper": "من را در فهرست بازیکنان این پخش نشان بده.",
     "gamesActiveGame": "بازی‌های فعال",
     "gamesResume": "ادامه",
     "gamesMinimize": "کوچک کردن",
@@ -237,7 +237,7 @@
     "gamesInvites": "دعوت‌ها",
     "gamesNoInvites": "هنوز دعوتی دریافت نشده است.",
     "gamesInviteFrom": "{user} شما را به {game} دعوت کرد",
-    "gamesInviteHelper": "برای باز کردن پنل بازی بپذیرید.",
+    "gamesInviteHelper": "برای شروع بازی بپذیرید.",
     "gamesAccept": "پذیرفتن",
     "gamesPlayWith": "دعوت از بازیکن",
     "gamesBack": "بازگشت",
@@ -354,14 +354,14 @@
     "effects": {
       "message": "جلوه‌ها"
     },
-    "playInboxSound": {
-      "message": "پخش صدای صندوق ورودی"
+    "playAlertSounds": {
+      "message": "پخش صداهای هشدار"
     },
-    "playInboxSoundTitle": {
-      "message": "وقتی پیام چت در صندوق ورودی ذخیره می‌شود، صدای کوتاهی پخش کن."
+    "playAlertSoundsTitle": {
+      "message": "پخش صداهای کوتاه برای هشدارهای چت."
     },
-    "playInboxSoundHelper": {
-      "message": "برای پیام‌های تازه صندوق ورودی، یک صدای اعلان کوتاه پخش کن."
+    "playAlertSoundsHelper": {
+      "message": "پخش صداهای کوتاه برای اشاره‌ها، تطبیق‌های کلیدواژه و دعوت‌های بازی."
     },
     "appearance": {
       "message": "ظاهر"
@@ -499,10 +499,10 @@
       "message": "بازی‌ها"
     },
     "playgroundGamesAvailable": {
-      "message": "به‌طور پیش‌فرض آماده"
+      "message": "به‌طور خودکار آماده باش"
     },
     "playgroundGamesAvailableHelper": {
-      "message": "وقتی وارد یک پخش می‌شوید، به‌طور خودکار در فهرست بازیکنان آماده برای دریافت دعوت بازی نمایش داده می‌شوید."
+      "message": "وقتی Playground روشن است، هنگام باز شدن هر پخش من را آماده دریافت دعوت بازی نشان بده."
     },
     "learnMore": {
       "message": "بیشتر بدانید"

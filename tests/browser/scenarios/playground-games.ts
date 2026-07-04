@@ -421,11 +421,21 @@ export const playgroundInviteCancelScenario: BrowserScenario = async ({ chat, co
       toUserId: 'luna-user'
     });
 
+    await card.getByRole('button', { name: 'Back' }).click();
+    await expect(card.locator('.ytcq-profile-card-title')).toHaveText('Games');
+    await openGamePlayerList(card, 'Chess');
     const player = card.locator('.ytcq-games-player-row').filter({ hasText: 'Luna Chat' });
+    await expect(player).toContainText('Waiting for reply...');
     await player.getByRole('button', { name: 'Cancel' }).click();
+    const cancel = await backend.waitForClientMessage('cancelInvite');
+    expect(cancel).toMatchObject({
+      gameId: 'chess',
+      toUserId: 'luna-user'
+    });
     await expect(player).toContainText('Available now');
     await expect(player.getByRole('button', { name: 'Invite' })).toBeVisible();
     await expectClientMessageCount(backend, 'invite', 1, 500);
+    await expectClientMessageCount(backend, 'cancelInvite', 1);
     await expectClientMessageCount(backend, 'respondInvite', 0);
   });
 };

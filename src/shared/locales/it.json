@@ -18,14 +18,14 @@
     "commandHelpOpenHelp": "Mostra questo elenco.",
     "commandHelpSetTranslateTo": "Imposta la lingua di traduzione.",
     "commandHelpSetTranslationDisplay": "Imposta come vengono mostrate le traduzioni.",
-    "commandHelpSetSound": "Imposta il suono dell'inbox.",
+    "commandHelpSetSound": "Imposta i suoni di avviso.",
     "couldNotFindChatInput": "Impossibile trovare il campo della chat.",
     "couldNotReadTime": "Impossibile leggere quell'orario.",
     "couldNotReadUserName": "Impossibile leggere quel nome utente.",
     "inbox": "Posta in arrivo",
     "inboxAriaUnread": "Posta in arrivo, {count} non letti",
     "inboxEmpty": "Posta in arrivo vuota",
-    "inboxSound": "Suono posta in arrivo",
+    "alertSounds": "Suoni di avviso",
     "jumpToMessage": "Vai al messaggio",
     "keywordOrPhrase": "Parola chiave o frase",
     "lessThanOneMinute": "meno di 1 min",
@@ -226,8 +226,8 @@
     "gamesReplayTriviaStampOkay": "OK! :)",
     "gamesReplayTriviaStampBestie": "BESTIE",
     "gamesReplayTriviaStampBlocked": "BLOCCATO",
-    "gamesAvailableToPlay": "Disponibile a giocare",
-    "gamesAvailableHelper": "Ricevi inviti di gioco per questa live.",
+    "gamesAvailableToPlay": "Disponibile agli inviti",
+    "gamesAvailableHelper": "Mostrami nell'elenco giocatori di questa live.",
     "gamesActiveGame": "Partite attive",
     "gamesResume": "Riprendi",
     "gamesMinimize": "Riduci",
@@ -237,7 +237,7 @@
     "gamesInvites": "Inviti",
     "gamesNoInvites": "Nessun invito ricevuto per ora.",
     "gamesInviteFrom": "{user} ti ha invitato a {game}",
-    "gamesInviteHelper": "Accetta per aprire il pannello di gioco.",
+    "gamesInviteHelper": "Accetta per iniziare il gioco.",
     "gamesAccept": "Accetta",
     "gamesPlayWith": "Invita un giocatore",
     "gamesBack": "Indietro",
@@ -357,14 +357,14 @@
     "effects": {
       "message": "Effetti"
     },
-    "playInboxSound": {
-      "message": "Riproduci suono posta in arrivo"
+    "playAlertSounds": {
+      "message": "Riproduci suoni di avviso"
     },
-    "playInboxSoundTitle": {
-      "message": "Riproduce un breve suono quando un messaggio della chat viene salvato nella posta in arrivo."
+    "playAlertSoundsTitle": {
+      "message": "Riproduce suoni brevi per gli avvisi della chat."
     },
-    "playInboxSoundHelper": {
-      "message": "Riproduci un breve suono di notifica per i nuovi messaggi nella posta in arrivo."
+    "playAlertSoundsHelper": {
+      "message": "Riproduce suoni brevi per menzioni, corrispondenze di parole chiave e inviti di gioco."
     },
     "appearance": {
       "message": "Aspetto"
@@ -502,10 +502,10 @@
       "message": "Giochi"
     },
     "playgroundGamesAvailable": {
-      "message": "Disponibile per impostazione predefinita"
+      "message": "Disponibile automaticamente"
     },
     "playgroundGamesAvailableHelper": {
-      "message": "Quando entri in una live, comparirai automaticamente nella lista dei giocatori disponibili per ricevere inviti di gioco."
+      "message": "Quando Playground è attivo, mostrami come disponibile agli inviti di gioco all'apertura di ogni live."
     },
     "learnMore": {
       "message": "Scopri di più"

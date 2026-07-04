@@ -7,6 +7,7 @@
 export const PLAYGROUND_DISPLAY_NAME_STORAGE_KEY = 'ytcqPlaygroundDisplayName:v1';
 export const PLAYGROUND_IDENTITY_STORAGE_KEY = 'ytcqPlaygroundIdentity:v1';
 export const PLAYGROUND_PROFILE_MESSAGE_TYPE = 'ytcq:playground:get-profile';
+export const PLAYGROUND_PROFILE_STATS_MESSAGE_TYPE = 'ytcq:playground:get-profile-stats';
 export const PLAYGROUND_PROFILE_UPDATE_MESSAGE_TYPE = 'ytcq:playground:update-profile';
 export const PLAYGROUND_PROFILE_STATS_ROUTE = '/v1/player-stats';
 export const PLAYGROUND_DISPLAY_NAME_MAX_LENGTH = 24;
@@ -21,7 +22,7 @@ export interface PlaygroundProfile {
   displayName: string;
   generatedDisplayName: string;
   userId: string;
-  wins: number;
+  wins: number | null;
 }
 
 export interface PlaygroundAvatarIdentity {
@@ -79,6 +80,11 @@ export interface PlaygroundProfileUpdateMessage {
   type: typeof PLAYGROUND_PROFILE_UPDATE_MESSAGE_TYPE;
 }
 
+export interface PlaygroundProfileStatsMessage {
+  type: typeof PLAYGROUND_PROFILE_STATS_MESSAGE_TYPE;
+  userId: string;
+}
+
 export type PlaygroundProfileResponse =
   | {
     ok: true;
@@ -90,6 +96,18 @@ export type PlaygroundProfileResponse =
   };
 
 export type PlaygroundProfileUpdateResponse = PlaygroundProfileResponse;
+
+export type PlaygroundProfileStatsResponse =
+  | {
+    ok: true;
+    userId: string;
+    wins: number;
+  }
+  | {
+    error: string;
+    ok: false;
+    userId?: string;
+  };
 
 export async function getPlaygroundUserId(publicKeyJwk: JsonWebKey): Promise<string> {
   const canonicalKey = JSON.stringify({
@@ -152,6 +170,12 @@ export function getPlaygroundAvatarColor(seed: string): string {
 
 export function isPlaygroundProfileMessage(value: unknown): value is PlaygroundProfileMessage {
   return isRecord(value) && value.type === PLAYGROUND_PROFILE_MESSAGE_TYPE;
+}
+
+export function isPlaygroundProfileStatsMessage(value: unknown): value is PlaygroundProfileStatsMessage {
+  return isRecord(value) &&
+    value.type === PLAYGROUND_PROFILE_STATS_MESSAGE_TYPE &&
+    typeof value.userId === 'string';
 }
 
 export function isPlaygroundProfileUpdateMessage(value: unknown): value is PlaygroundProfileUpdateMessage {

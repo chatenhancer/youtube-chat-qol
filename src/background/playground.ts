@@ -25,11 +25,13 @@ import {
   getPlaygroundDisplayName,
   getPlaygroundUserId,
   isPlaygroundProfileMessage,
+  isPlaygroundProfileStatsMessage,
   isPlaygroundProfileUpdateMessage,
   isStoredPlaygroundIdentity,
   normalizePlaygroundDisplayName,
   type PlaygroundProfile,
   type PlaygroundProfileResponse,
+  type PlaygroundProfileStatsResponse,
   type PlaygroundProfileUpdateResponse,
   type StoredPlaygroundIdentity
 } from '../shared/playground/identity';
@@ -66,6 +68,22 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
           error: error instanceof Error ? error.message : 'Playground profile unavailable.',
           ok: false
         } satisfies PlaygroundProfileResponse);
+      });
+    return true;
+  }
+
+  if (isPlaygroundProfileStatsMessage(message)) {
+    void getStoredPlaygroundProfileStats(message.userId)
+      .then((stats) => sendResponse({
+        ok: true,
+        ...stats
+      } satisfies PlaygroundProfileStatsResponse))
+      .catch((error: unknown) => {
+        sendResponse({
+          error: error instanceof Error ? error.message : 'Playground stats unavailable.',
+          ok: false,
+          userId: message.userId
+        } satisfies PlaygroundProfileStatsResponse);
       });
     return true;
   }
@@ -152,6 +170,13 @@ class PlaygroundBackgroundSession {
           gameId: message.gameId,
           toUserId: message.toUserId,
           type: 'invite'
+        });
+        return;
+      case 'ytcq:playground:cancel-invite':
+        this.sendClientMessage({
+          gameId: message.gameId,
+          toUserId: message.toUserId,
+          type: 'cancelInvite'
         });
         return;
       case 'ytcq:playground:respond-invite':
@@ -574,6 +599,19 @@ async function getStoredPlaygroundProfile(): Promise<PlaygroundProfile> {
     customDisplayName,
     displayName: getPlaygroundDisplayName(userId, customDisplayName),
     generatedDisplayName,
+    userId,
+    wins: null
+  };
+}
+
+async function getStoredPlaygroundProfileStats(requestedUserId: string): Promise<{ userId: string; wins: number }> {
+  const identity = await getStoredPlaygroundIdentity();
+  const userId = await getPlaygroundUserId(identity.publicKeyJwk);
+  if (requestedUserId && requestedUserId !== userId) {
+    throw new Error('Playground stats unavailable.');
+  }
+
+  return {
     userId,
     wins: await getRemotePlaygroundProfileWins(userId).catch(() => 0)
   };

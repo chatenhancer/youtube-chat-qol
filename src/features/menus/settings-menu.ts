@@ -15,7 +15,7 @@ import {
   TRANSLATE_ICON_PATH,
   createSplitTranslateIcon
 } from '../../shared/icons';
-import { playSoftChime } from '../../shared/sounds/soft-chime';
+import { playAlertSoundPreview } from '../../shared/sounds/alert-sounds';
 import { registerFeatureLifecycle } from '../../content/lifecycle';
 import { clampMenuToViewport, createMenuToggleItem } from './common';
 
@@ -65,14 +65,14 @@ export function enhanceSettingsMenu(menu: HTMLElement): void {
   let soundItem: HTMLElement | null = null;
   soundItem = createMenuToggleItem({
     setting: 'sound',
-    label: t('inboxSound'),
+    label: t('alertSounds'),
     checked: options.sound,
     iconPath: getSoundIconPath(options.sound),
     onClick: () => {
       const enabled = !getOptions().sound;
       if (enabled && soundItem) {
         animateSoundMenuIcon(soundItem);
-        playSoftChime();
+        playAlertSoundPreview();
       }
       saveOptions({ sound: enabled });
     }
@@ -93,7 +93,7 @@ export function refreshSettingsMenus(): void {
       label.textContent = t('translateChat');
       item.setAttribute('aria-checked', String(Boolean(options.targetLanguage)));
     } else if (setting === 'sound') {
-      label.textContent = t('inboxSound');
+      label.textContent = t('alertSounds');
       item.setAttribute('aria-checked', String(options.sound));
       item.querySelector<SVGPathElement>('.ytcq-menu-icon path')?.setAttribute('d', getSoundIconPath(options.sound));
     }

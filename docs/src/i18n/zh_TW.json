@@ -193,7 +193,7 @@
     "helpDescription": "顯示此清單。",
     "setTranslateDescription": "設定翻譯語言。使用 off 可關閉翻譯。不帶語言使用 /lang 可顯示目前目標語言。",
     "setDisplayDescription": "設定翻譯顯示方式。",
-    "setSoundDescription": "設定收件匣音效。",
+    "setSoundDescription": "設定提醒聲音。",
     "aliasesLabel": "別名：",
     "exampleLabel": "範例：",
     "timeZoneAliases": "支援的地點/時區："

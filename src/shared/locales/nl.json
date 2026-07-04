@@ -18,14 +18,14 @@
     "commandHelpOpenHelp": "Toon deze lijst.",
     "commandHelpSetTranslateTo": "Stel de vertaaltaal in.",
     "commandHelpSetTranslationDisplay": "Stel in hoe vertalingen worden getoond.",
-    "commandHelpSetSound": "Stel inboxgeluid in.",
+    "commandHelpSetSound": "Stel waarschuwingsgeluiden in.",
     "couldNotFindChatInput": "Kan de chatinvoer niet vinden.",
     "couldNotReadTime": "Kan die tijd niet lezen.",
     "couldNotReadUserName": "Kan die gebruikersnaam niet lezen.",
     "inbox": "Inbox",
     "inboxAriaUnread": "Inbox, {count} ongelezen",
     "inboxEmpty": "Inbox leeg",
-    "inboxSound": "Inboxgeluid",
+    "alertSounds": "Waarschuwingsgeluiden",
     "jumpToMessage": "Naar bericht springen",
     "keywordOrPhrase": "Trefwoord of zin",
     "lessThanOneMinute": "minder dan 1 min",
@@ -226,8 +226,8 @@
     "gamesReplayTriviaStampOkay": "OK! :)",
     "gamesReplayTriviaStampBestie": "BESTIE",
     "gamesReplayTriviaStampBlocked": "GEBLOKKEERD",
-    "gamesAvailableToPlay": "Beschikbaar om te spelen",
-    "gamesAvailableHelper": "Ontvang game-uitnodigingen voor deze stream.",
+    "gamesAvailableToPlay": "Beschikbaar voor uitnodigingen",
+    "gamesAvailableHelper": "Toon mij in de spelerslijst van deze stream.",
     "gamesActiveGame": "Actieve spellen",
     "gamesResume": "Hervatten",
     "gamesMinimize": "Minimaliseren",
@@ -237,7 +237,7 @@
     "gamesInvites": "Uitnodigingen",
     "gamesNoInvites": "Nog geen uitnodigingen ontvangen.",
     "gamesInviteFrom": "{user} heeft je uitgenodigd voor {game}",
-    "gamesInviteHelper": "Accepteer om het spelpaneel te openen.",
+    "gamesInviteHelper": "Accepteer om het spel te starten.",
     "gamesAccept": "Accepteren",
     "gamesPlayWith": "Speler uitnodigen",
     "gamesBack": "Terug",
@@ -354,14 +354,14 @@
     "effects": {
       "message": "Effecten"
     },
-    "playInboxSound": {
-      "message": "Inboxgeluid afspelen"
+    "playAlertSounds": {
+      "message": "Waarschuwingsgeluiden afspelen"
     },
-    "playInboxSoundTitle": {
-      "message": "Speel een kort geluid af wanneer een chatbericht in je inbox wordt opgeslagen."
+    "playAlertSoundsTitle": {
+      "message": "Speel korte geluiden af voor chatwaarschuwingen."
     },
-    "playInboxSoundHelper": {
-      "message": "Speel een kort meldingsgeluid af voor nieuwe inboxberichten."
+    "playAlertSoundsHelper": {
+      "message": "Speel korte geluiden af voor vermeldingen, trefwoordmatches en game-uitnodigingen."
     },
     "appearance": {
       "message": "Weergave"
@@ -499,10 +499,10 @@
       "message": "Games"
     },
     "playgroundGamesAvailable": {
-      "message": "Standaard beschikbaar"
+      "message": "Automatisch beschikbaar zijn"
     },
     "playgroundGamesAvailableHelper": {
-      "message": "Wanneer je een stream opent, verschijn je automatisch in de lijst met beschikbare spelers om game-uitnodigingen te ontvangen."
+      "message": "Als Playground aan staat, toon mij als beschikbaar voor game-uitnodigingen wanneer elke stream opent."
     },
     "learnMore": {
       "message": "Meer informatie"

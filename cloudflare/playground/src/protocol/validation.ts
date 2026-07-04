@@ -49,6 +49,12 @@ export function parseClientMessage(text: string): ClientMessage {
         toUserId: getString(value, 'toUserId'),
         type
       };
+    case 'cancelInvite':
+      return {
+        gameId: parseGameId(value.gameId),
+        toUserId: getString(value, 'toUserId'),
+        type
+      };
     case 'respondInvite':
       return {
         accept: getBoolean(value, 'accept'),

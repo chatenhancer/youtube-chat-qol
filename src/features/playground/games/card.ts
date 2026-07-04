@@ -43,16 +43,11 @@ export function createGamesCard(onClose: () => void): GamesCardElements {
   title.className = 'ytcq-profile-card-title';
   title.textContent = t('games');
 
-  const betaBadge = ytcqCreateElement('span');
-  betaBadge.className = 'ytcq-games-beta-badge';
-  // ytcq-allow-visible-ui-literal: Beta is a standard product-stage badge.
-  betaBadge.textContent = 'Beta';
-
   const subtitle = ytcqCreateElement('div');
   subtitle.className = 'ytcq-profile-card-subtitle';
   subtitle.textContent = t('playground');
 
-  titleRow.append(title, betaBadge);
+  titleRow.append(title);
   titleWrap.append(titleRow, subtitle);
   header.append(icon, titleWrap, createGamesCardCloseButton(onClose));
 

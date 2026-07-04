@@ -18,14 +18,14 @@
     "commandHelpOpenHelp": "Affiche cette liste.",
     "commandHelpSetTranslateTo": "Définit la langue de traduction.",
     "commandHelpSetTranslationDisplay": "Définit l'affichage des traductions.",
-    "commandHelpSetSound": "Définit le son de la boîte de réception.",
+    "commandHelpSetSound": "Définit les sons d’alerte.",
     "couldNotFindChatInput": "Impossible de trouver le champ du chat.",
     "couldNotReadTime": "Impossible de lire cette heure.",
     "couldNotReadUserName": "Impossible de lire ce nom d'utilisateur.",
     "inbox": "Boîte de réception",
     "inboxAriaUnread": "Boîte de réception, {count} non lu(s)",
     "inboxEmpty": "Boîte de réception vide",
-    "inboxSound": "Son de la boîte de réception",
+    "alertSounds": "Sons d’alerte",
     "jumpToMessage": "Aller au message",
     "keywordOrPhrase": "Mot-clé ou expression",
     "lessThanOneMinute": "moins de 1 min",
@@ -226,8 +226,8 @@
     "gamesReplayTriviaStampOkay": "OK ! :)",
     "gamesReplayTriviaStampBestie": "BFF",
     "gamesReplayTriviaStampBlocked": "BLOQUÉ",
-    "gamesAvailableToPlay": "Disponible pour jouer",
-    "gamesAvailableHelper": "Recevoir des invitations de jeu pour ce live.",
+    "gamesAvailableToPlay": "Disponible pour les invitations",
+    "gamesAvailableHelper": "M'afficher dans la liste des joueurs de ce live.",
     "gamesActiveGame": "Parties actives",
     "gamesResume": "Reprendre",
     "gamesMinimize": "Réduire",
@@ -237,7 +237,7 @@
     "gamesInvites": "Invitations",
     "gamesNoInvites": "Aucune invitation reçue pour le moment.",
     "gamesInviteFrom": "{user} vous invite à {game}",
-    "gamesInviteHelper": "Acceptez pour ouvrir le panneau du jeu.",
+    "gamesInviteHelper": "Acceptez pour démarrer la partie.",
     "gamesAccept": "Accepter",
     "gamesPlayWith": "Inviter un joueur",
     "gamesBack": "Retour",
@@ -354,14 +354,14 @@
     "effects": {
       "message": "Effets"
     },
-    "playInboxSound": {
-      "message": "Jouer un son de boîte de réception"
+    "playAlertSounds": {
+      "message": "Jouer les sons d’alerte"
     },
-    "playInboxSoundTitle": {
-      "message": "Joue un court son quand un message du chat est enregistré dans votre boîte de réception."
+    "playAlertSoundsTitle": {
+      "message": "Joue des sons courts pour les alertes du chat."
     },
-    "playInboxSoundHelper": {
-      "message": "Joue un court son de notification pour les nouveaux messages de la boîte de réception."
+    "playAlertSoundsHelper": {
+      "message": "Joue des sons courts pour les mentions, les correspondances de mots-clés et les invitations de jeu."
     },
     "appearance": {
       "message": "Apparence"
@@ -499,10 +499,10 @@
       "message": "Jeux"
     },
     "playgroundGamesAvailable": {
-      "message": "Disponible par défaut"
+      "message": "Être disponible automatiquement"
     },
     "playgroundGamesAvailableHelper": {
-      "message": "Quand vous rejoignez un live, vous apparaissez automatiquement dans la liste des joueurs disponibles pour recevoir des invitations de jeu."
+      "message": "Quand Playground est activé, m'afficher comme disponible pour les invitations de jeu à l'ouverture de chaque live."
     },
     "learnMore": {
       "message": "En savoir plus"

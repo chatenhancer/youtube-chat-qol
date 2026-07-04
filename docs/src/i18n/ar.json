@@ -193,7 +193,7 @@
     "helpDescription": "يعرض هذه القائمة.",
     "setTranslateDescription": "اضبط لغة الترجمة. استخدم off لتعطيل الترجمة. استخدم /lang بدون لغة لعرض الهدف الحالي.",
     "setDisplayDescription": "يضبط طريقة عرض الترجمات.",
-    "setSoundDescription": "يضبط صوت البريد الوارد.",
+    "setSoundDescription": "يضبط أصوات التنبيه.",
     "aliasesLabel": "الأسماء البديلة:",
     "exampleLabel": "مثال:",
     "timeZoneAliases": "الأماكن/المناطق الزمنية المدعومة:"

@@ -193,7 +193,7 @@
     "helpDescription": "Tampilkan daftar ini.",
     "setTranslateDescription": "Mengatur bahasa terjemahan. Gunakan off untuk menonaktifkan terjemahan. Gunakan /lang tanpa bahasa untuk menampilkan target saat ini.",
     "setDisplayDescription": "Atur cara terjemahan ditampilkan.",
-    "setSoundDescription": "Atur suara kotak masuk.",
+    "setSoundDescription": "Atur suara peringatan.",
     "aliasesLabel": "Alias:",
     "exampleLabel": "Contoh:",
     "timeZoneAliases": "Tempat/zona waktu yang didukung:"

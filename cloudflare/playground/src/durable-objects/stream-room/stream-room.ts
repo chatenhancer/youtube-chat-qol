@@ -52,6 +52,7 @@ const GENERATION_TOKEN_USER_RATE_LIMIT: TokenBucketOptions = {
   refillPerSecond: 1 / 60
 };
 const MESSAGE_RATE_COSTS: { [Type in ClientMessage['type']]: number } = {
+  cancelInvite: 4,
   gameAction: 3,
   hello: 5,
   invite: 12,
@@ -212,6 +213,9 @@ export class StreamRoom {
       case 'invite':
         this.handleInvite(session, message.gameId, message.toUserId);
         return;
+      case 'cancelInvite':
+        this.handleCancelInvite(session, message.gameId, message.toUserId);
+        return;
       case 'respondInvite':
         this.handleInviteResponse(session, message.inviteId, message.accept);
         return;
@@ -279,6 +283,26 @@ export class StreamRoom {
     });
     this.sendToUser(session.userId, { invite: publicInvite, type: 'inviteCreated' });
     this.sendToUser(toUserId, { invite: publicInvite, type: 'inviteReceived' });
+  }
+
+  private handleCancelInvite(session: ClientSession, gameId: GameId, toUserId: string): void {
+    const invite = this.invites.getPendingInviteFromUser({
+      fromUserId: session.userId,
+      gameId,
+      toUserId
+    });
+    if (!invite) return;
+
+    this.invites.setInviteStatus(invite, 'cancelled');
+    this.logEvent('invite_cancelled', {
+      fromUser: hashLogValue(invite.fromUserId),
+      gameType: invite.gameId,
+      invite: shortLogId(invite.inviteId),
+      toUser: hashLogValue(invite.toUserId)
+    });
+    const publicInvite = this.invites.toPublicInvite(invite, (publicUserId) => this.sessions.getPublicUser(publicUserId));
+    this.sendToUser(invite.fromUserId, { invite: publicInvite, type: 'inviteUpdated' });
+    this.sendToUser(invite.toUserId, { invite: publicInvite, type: 'inviteUpdated' });
   }
 
   private handleInviteResponse(session: ClientSession, inviteId: string, accept: boolean): void {

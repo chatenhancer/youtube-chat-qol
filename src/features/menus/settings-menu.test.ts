@@ -3,10 +3,10 @@ import { DEFAULT_OPTIONS } from '../../shared/options';
 import { setOptions } from '../../shared/state';
 
 const soundMocks = vi.hoisted(() => ({
-  playSoftChime: vi.fn()
+  playAlertSoundPreview: vi.fn()
 }));
 
-vi.mock('../../shared/sounds/soft-chime', () => soundMocks);
+vi.mock('../../shared/sounds/alert-sounds', () => soundMocks);
 
 import {
   cleanupStaleSettingsMenuSurfaces,
@@ -18,7 +18,7 @@ import {
 describe('chat settings menu integration', () => {
   beforeEach(() => {
     document.body.replaceChildren();
-    soundMocks.playSoftChime.mockClear();
+    soundMocks.playAlertSoundPreview.mockClear();
     setOptions({ ...DEFAULT_OPTIONS });
     vi.useRealTimers();
   });
@@ -28,7 +28,7 @@ describe('chat settings menu integration', () => {
     vi.restoreAllMocks();
   });
 
-  it('adds translation and inbox sound toggles to the native chat settings menu', () => {
+  it('adds translation and alert sound toggles to the native chat settings menu', () => {
     const saveOptions = vi.fn();
     const menu = createSettingsMenu();
     document.body.append(menu);
@@ -42,7 +42,7 @@ describe('chat settings menu integration', () => {
     expect(items[0].querySelector('.ytcq-menu-label')?.textContent).toBe('Translate');
     expect(items[0].getAttribute('aria-checked')).toBe('false');
     expect(items[1].getAttribute('data-ytcq-setting')).toBe('sound');
-    expect(items[1].querySelector('.ytcq-menu-label')?.textContent).toBe('Inbox sound');
+    expect(items[1].querySelector('.ytcq-menu-label')?.textContent).toBe('Alert sounds');
     expect(items[1].getAttribute('aria-checked')).toBe('true');
   });
 
@@ -68,7 +68,7 @@ describe('chat settings menu integration', () => {
       lastTranslationTarget: 'ja'
     });
     expect(saveOptions).toHaveBeenNthCalledWith(2, { sound: true });
-    expect(soundMocks.playSoftChime).toHaveBeenCalledOnce();
+    expect(soundMocks.playAlertSoundPreview).toHaveBeenCalledOnce();
   });
 
   it('saves sound being disabled without starting the enable animation', () => {
@@ -87,7 +87,7 @@ describe('chat settings menu integration', () => {
     menu.querySelector<HTMLElement>('[data-ytcq-setting="sound"]')!.click();
 
     expect(saveOptions).toHaveBeenCalledWith({ sound: false });
-    expect(soundMocks.playSoftChime).not.toHaveBeenCalled();
+    expect(soundMocks.playAlertSoundPreview).not.toHaveBeenCalled();
     expect(readLayout).not.toHaveBeenCalled();
   });
 

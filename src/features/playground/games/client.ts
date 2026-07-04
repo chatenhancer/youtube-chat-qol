@@ -172,6 +172,15 @@ export function sendPlaygroundInvite(gameId: GameId, toUserId: string): void {
   });
 }
 
+export function cancelPlaygroundInvite(gameId: GameId, toUserId: string): void {
+  markOutgoingInviteCancelled(gameId, toUserId);
+  postPlaygroundMessage({
+    gameId,
+    toUserId,
+    type: 'ytcq:playground:cancel-invite'
+  });
+}
+
 export function respondToPlaygroundInvite(inviteId: string, accept: boolean): void {
   postPlaygroundMessage({
     accept,
@@ -223,6 +232,35 @@ function handleBackgroundMessage(message: PlaygroundBackgroundMessage): void {
       handleServerMessage(message.message);
       return;
   }
+}
+
+function markOutgoingInviteCancelled(gameId: GameId, toUserId: string): void {
+  const currentUserId = state.userId;
+  if (!currentUserId) return;
+
+  let changed = false;
+  const invites = state.invites.map((invite) => {
+    if (
+      invite.status !== 'pending' ||
+      invite.gameId !== gameId ||
+      invite.fromUser.userId !== currentUserId ||
+      invite.toUser.userId !== toUserId
+    ) {
+      return invite;
+    }
+
+    changed = true;
+    return {
+      ...invite,
+      status: 'cancelled' as const
+    };
+  });
+  if (!changed) return;
+
+  setState({
+    ...state,
+    invites
+  });
 }
 
 function handleServerMessage(message: ServerMessage): void {

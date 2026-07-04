@@ -193,7 +193,7 @@
     "helpDescription": "Mostra esta lista.",
     "setTranslateDescription": "Define o idioma de tradução. Use off para desativar a tradução. Use /lang sem idioma para mostrar o destino atual.",
     "setDisplayDescription": "Define como as traduções são exibidas.",
-    "setSoundDescription": "Define o som da caixa de entrada.",
+    "setSoundDescription": "Configura os sons de alerta.",
     "aliasesLabel": "Aliases:",
     "exampleLabel": "Exemplo:",
     "timeZoneAliases": "Lugares/fusos horários compatíveis:"

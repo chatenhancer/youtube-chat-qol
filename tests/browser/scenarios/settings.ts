@@ -26,7 +26,7 @@ export const settingsMenuBehaviorScenario: BrowserScenario = async ({ chat, cont
   await withExtensionStorageValues(context, 'sync', SETTINGS_INITIAL_VALUES, async () => {
     const menu = await openSettingsMenu(chat);
     await toggleTranslationFromChatSettings({ context, menu });
-    await toggleInboxSoundFromChatSettings({ context, menu });
+    await toggleAlertSoundsFromChatSettings({ context, menu });
     await closeNativeMenu(chat);
   });
 };
@@ -38,7 +38,7 @@ export const popupSettingsBehaviorScenario: BrowserScenario = async ({ context }
     try {
       await changePopupTranslationTarget({ context, popup });
       await changePopupTranslationDisplay({ context, popup });
-      await changePopupInboxSound({ context, popup });
+      await changePopupAlertSounds({ context, popup });
       await changePopupStartupEffect({ context, popup });
     } finally {
       await popup.close();
@@ -73,7 +73,7 @@ async function toggleTranslationFromChatSettings({
   });
 }
 
-async function toggleInboxSoundFromChatSettings({
+async function toggleAlertSoundsFromChatSettings({
   context,
   menu
 }: {
@@ -82,17 +82,17 @@ async function toggleInboxSoundFromChatSettings({
 }): Promise<void> {
   const item = menu.locator('.ytcq-settings-item[data-ytcq-setting="sound"]').first();
 
-  await test.step('Verify Inbox sound starts off in chat settings', async () => {
+  await test.step('Verify alert sounds start off in chat settings', async () => {
     await expect(item).toHaveAttribute('aria-checked', 'false');
   });
 
-  await test.step('Enable Inbox sound from chat settings', async () => {
+  await test.step('Enable alert sounds from chat settings', async () => {
     await item.click();
     await expectStorageValue(context, 'sound', true);
     await expect(item).toHaveAttribute('aria-checked', 'true');
   });
 
-  await test.step('Disable Inbox sound from chat settings', async () => {
+  await test.step('Disable alert sounds from chat settings', async () => {
     await item.click();
     await expectStorageValue(context, 'sound', false);
     await expect(item).toHaveAttribute('aria-checked', 'false');
@@ -126,14 +126,14 @@ async function changePopupTranslationDisplay({
   });
 }
 
-async function changePopupInboxSound({
+async function changePopupAlertSounds({
   context,
   popup
 }: {
   context: BrowserContext;
   popup: Page;
 }): Promise<void> {
-  await test.step('Set popup Inbox sound option', async () => {
+  await test.step('Set popup alert sounds option', async () => {
     await popup.locator('#sound').setChecked(true);
     await expectStorageValue(context, 'sound', true);
   });

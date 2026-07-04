@@ -9,6 +9,7 @@
 import { registerFeatureLifecycle, type FeatureMutationBatch } from '../../../content/lifecycle';
 import type { Options } from '../../../shared/options';
 import type { GameId, PresenceUser, PublicGame, PublicInvite } from '../../../shared/playground/protocol';
+import { playAlertSound } from '../../../shared/sounds/alert-sounds';
 import { getOptions } from '../../../shared/state';
 import {
   closeActiveGamePanel,
@@ -26,17 +27,22 @@ import {
   moveGamesButton,
   positionGamesCard,
   setGamesButtonExpanded,
-  shouldWireGamesButton
+  shouldWireGamesButton,
+  updateGamesButtonStatus
 } from './button';
 import { createGamesCard, installGamesCardListeners } from './card';
 import {
   createInitialGamesPanelState,
+  getActiveGameCount,
   getGamesPanelViewKey,
+  getPendingInviteCount,
   getSupportedGames,
+  isPlayerInvitePending,
   type GamesPanelState
 } from './state';
 import { renderGamesPanelBody, updateGamesCardHeader, type GamesViewActions } from './view';
 import {
+  cancelPlaygroundInvite,
   getPlaygroundClientState,
   getPlaygroundAvailability,
   respondToPlaygroundInvite,
@@ -60,6 +66,8 @@ let activeGamesPointerCleanup: (() => void) | null = null;
 let gamesPanelState: GamesPanelState | null = null;
 let lastGamesPanelRenderKey = '';
 let lastGamesPointerPosition: GamesPointerPosition | null = null;
+let knownIncomingInviteIds: Set<string> | null = null;
+let incomingInviteAlertsPrimed = false;
 let pendingStartedGameOpen: PendingStartedGameOpen | null = null;
 
 interface GamesPointerPosition {
@@ -89,6 +97,7 @@ export function refreshGamesButton(): void {
   }
 
   if (getOptions().playgroundGamesAvailable) {
+    ensureGamesClientSubscription();
     startPlaygroundClient(true);
   }
   scheduleGamesButtonWire();
@@ -116,12 +125,14 @@ export function wireGamesButton(): void {
   const existing = header.querySelector<HTMLButtonElement>('.ytcq-games-button');
   if (existing?.dataset.ytcqGamesOwner === GAMES_BUTTON_OWNER_ID) {
     moveGamesButton(existing, header, anchor);
+    refreshGamesButtonStatus(existing);
     return;
   }
 
   existing?.remove();
   const button = createGamesButton(GAMES_BUTTON_OWNER_ID, toggleGamesCard);
   moveGamesButton(button, header, anchor);
+  refreshGamesButtonStatus(button);
 }
 
 export function cleanupStaleGamesUi(): void {
@@ -134,6 +145,8 @@ export function cleanupStaleGamesUi(): void {
   closeGamesCard();
   removeOrphanedGameSurfaces();
   lastGamesPointerPosition = null;
+  knownIncomingInviteIds = null;
+  incomingInviteAlertsPrimed = false;
   activeGamesClientCleanup?.();
   activeGamesClientCleanup = null;
   stopPlaygroundClient();
@@ -209,6 +222,8 @@ function ensureGamesClientSubscription(): void {
 }
 
 function handlePlaygroundClientStateChanged(nextState: PlaygroundClientState): void {
+  maybePlayIncomingInviteAlert(nextState);
+  refreshGamesButtonStatuses(nextState);
   updateOpenGamePanel(nextState);
   openPendingStartedGame(nextState);
 
@@ -256,6 +271,40 @@ function reconnectGamesClient(): void {
   startPlaygroundClient(gamesPanelState.available);
 }
 
+function refreshGamesButtonStatuses(state = getPlaygroundClientState()): void {
+  document.querySelectorAll<HTMLButtonElement>('.ytcq-games-button')
+    .forEach((button) => refreshGamesButtonStatus(button, state));
+}
+
+function refreshGamesButtonStatus(button: HTMLButtonElement, state = getPlaygroundClientState()): void {
+  updateGamesButtonStatus(button, {
+    activeGames: getActiveGameCount(state),
+    invites: getPendingInviteCount(state)
+  });
+}
+
+function maybePlayIncomingInviteAlert(state: PlaygroundClientState): void {
+  if (state.status !== 'connected' || !state.userId) return;
+
+  const nextInviteIds = getIncomingPendingInviteIds(state);
+  if (!incomingInviteAlertsPrimed || !knownIncomingInviteIds) {
+    knownIncomingInviteIds = nextInviteIds;
+    incomingInviteAlertsPrimed = true;
+    return;
+  }
+
+  const hasNewInvite = [...nextInviteIds].some((inviteId) => !knownIncomingInviteIds?.has(inviteId));
+  knownIncomingInviteIds = nextInviteIds;
+  if (hasNewInvite) playAlertSound('gameInvite');
+}
+
+function getIncomingPendingInviteIds(state: PlaygroundClientState): Set<string> {
+  const currentUserId = state.userId || '';
+  return new Set(state.invites
+    .filter((invite) => invite.status === 'pending' && invite.toUser.userId === currentUserId)
+    .map((invite) => invite.inviteId));
+}
+
 function acceptInvite(invite: PublicInvite): void {
   queueStartedGameOpen(invite.gameId);
   respondToPlaygroundInvite(invite.inviteId, true);
@@ -269,7 +318,6 @@ function showPlayersView(gameId: GameId): void {
   if (!gamesPanelState) return;
   gamesPanelState.mode = 'players';
   gamesPanelState.selectedGameId = gameId;
-  gamesPanelState.invitedPlayer = '';
   renderGamesPanel();
 }
 
@@ -277,12 +325,12 @@ function showLobbyView(): void {
   if (!gamesPanelState) return;
   gamesPanelState.mode = 'lobby';
   gamesPanelState.selectedGameId = null;
-  gamesPanelState.invitedPlayer = '';
   renderGamesPanel();
 }
 
 function invitePlayer(player: PresenceUser): void {
   if (!gamesPanelState?.selectedGameId) return;
+  gamesPanelState.invitedGameId = gamesPanelState.selectedGameId;
   gamesPanelState.invitedPlayer = player.userId;
   queueStartedGameOpen(gamesPanelState.selectedGameId);
   sendPlaygroundInvite(gamesPanelState.selectedGameId, player.userId);
@@ -290,8 +338,13 @@ function invitePlayer(player: PresenceUser): void {
 }
 
 function cancelPlayerInvite(player: PresenceUser): void {
-  if (!gamesPanelState || gamesPanelState.invitedPlayer !== player.userId) return;
-  gamesPanelState.invitedPlayer = '';
+  const gameId = gamesPanelState?.selectedGameId;
+  if (!gamesPanelState || !gameId || !isPlayerInvitePending(gamesPanelState, gameId, player.userId)) return;
+  cancelPlaygroundInvite(gameId, player.userId);
+  if (gamesPanelState.invitedGameId === gameId && gamesPanelState.invitedPlayer === player.userId) {
+    gamesPanelState.invitedGameId = null;
+    gamesPanelState.invitedPlayer = '';
+  }
   pendingStartedGameOpen = null;
   renderGamesPanel();
 }
@@ -321,6 +374,7 @@ function leaveGame(game: PublicGame): void {
 
 function clearPendingLobbyActions(state: GamesPanelState, transport: PlaygroundClientState): void {
   if (transport.status !== 'connected' || transport.error) {
+    state.invitedGameId = null;
     state.invitedPlayer = '';
     state.leavingGameId = '';
     pendingStartedGameOpen = null;

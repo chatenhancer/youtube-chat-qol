@@ -18,14 +18,14 @@
     "commandHelpOpenHelp": "Показывает этот список.",
     "commandHelpSetTranslateTo": "Задает язык перевода.",
     "commandHelpSetTranslationDisplay": "Задает способ отображения переводов.",
-    "commandHelpSetSound": "Задает звук входящих.",
+    "commandHelpSetSound": "Настроить звуки оповещений.",
     "couldNotFindChatInput": "Не удалось найти поле ввода чата.",
     "couldNotReadTime": "Не удалось прочитать это время.",
     "couldNotReadUserName": "Не удалось прочитать это имя пользователя.",
     "inbox": "Входящие",
     "inboxAriaUnread": "Входящие, непрочитано: {count}",
     "inboxEmpty": "Входящие пусты",
-    "inboxSound": "Звук входящих",
+    "alertSounds": "Звуки оповещений",
     "jumpToMessage": "Перейти к сообщению",
     "keywordOrPhrase": "Ключевое слово или фраза",
     "lessThanOneMinute": "меньше 1 мин",
@@ -226,8 +226,8 @@
     "gamesReplayTriviaStampOkay": "ОК! :)",
     "gamesReplayTriviaStampBestie": "ЛУЧШИЙ ДРУГ",
     "gamesReplayTriviaStampBlocked": "ЗАБЛОКИРОВАНО",
-    "gamesAvailableToPlay": "Готов играть",
-    "gamesAvailableHelper": "Получайте игровые приглашения в этом стриме.",
+    "gamesAvailableToPlay": "Доступен для приглашений",
+    "gamesAvailableHelper": "Показывать меня в списке игроков этого стрима.",
     "gamesActiveGame": "Активные игры",
     "gamesResume": "Продолжить",
     "gamesMinimize": "Свернуть",
@@ -237,7 +237,7 @@
     "gamesInvites": "Приглашения",
     "gamesNoInvites": "Приглашений пока нет.",
     "gamesInviteFrom": "{user} приглашает вас в {game}",
-    "gamesInviteHelper": "Примите, чтобы открыть игровую панель.",
+    "gamesInviteHelper": "Примите, чтобы начать игру.",
     "gamesAccept": "Принять",
     "gamesPlayWith": "Пригласить игрока",
     "gamesBack": "Назад",
@@ -357,14 +357,14 @@
     "effects": {
       "message": "Эффекты"
     },
-    "playInboxSound": {
-      "message": "Воспроизводить звук входящих"
+    "playAlertSounds": {
+      "message": "Воспроизводить звуки оповещений"
     },
-    "playInboxSoundTitle": {
-      "message": "Воспроизводит короткий звук, когда сообщение чата сохраняется во входящие."
+    "playAlertSoundsTitle": {
+      "message": "Воспроизводит короткие звуки для оповещений чата."
     },
-    "playInboxSoundHelper": {
-      "message": "Воспроизводит короткий звук уведомления для новых сообщений в папке входящих."
+    "playAlertSoundsHelper": {
+      "message": "Воспроизводит короткие звуки для упоминаний, совпадений ключевых слов и приглашений в игры."
     },
     "appearance": {
       "message": "Внешний вид"
@@ -502,10 +502,10 @@
       "message": "Игры"
     },
     "playgroundGamesAvailable": {
-      "message": "Доступен по умолчанию"
+      "message": "Быть доступным автоматически"
     },
     "playgroundGamesAvailableHelper": {
-      "message": "Когда вы присоединяетесь к трансляции, вы автоматически появляетесь в списке доступных игроков и можете получать приглашения в игру."
+      "message": "Когда Playground включен, показывать меня доступным для игровых приглашений при открытии каждого стрима."
     },
     "learnMore": {
       "message": "Подробнее"

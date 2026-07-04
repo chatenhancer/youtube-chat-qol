@@ -193,7 +193,7 @@
     "helpDescription": "Hiển thị danh sách này.",
     "setTranslateDescription": "Đặt ngôn ngữ dịch. Dùng off để tắt dịch. Dùng /lang không kèm ngôn ngữ để hiển thị đích hiện tại.",
     "setDisplayDescription": "Đặt cách hiển thị bản dịch.",
-    "setSoundDescription": "Đặt âm thanh hộp thư.",
+    "setSoundDescription": "Đặt âm thanh cảnh báo.",
     "aliasesLabel": "Bí danh:",
     "exampleLabel": "Ví dụ:",
     "timeZoneAliases": "Địa điểm/múi giờ được hỗ trợ:"

@@ -193,7 +193,7 @@
     "helpDescription": "Toon deze lijst.",
     "setTranslateDescription": "Stelt de vertaaltaal in. Gebruik off om vertaling uit te schakelen. Gebruik /lang zonder taal om het huidige doel te tonen.",
     "setDisplayDescription": "Stel in hoe vertalingen worden getoond.",
-    "setSoundDescription": "Stel inboxgeluid in.",
+    "setSoundDescription": "Stel waarschuwingsgeluiden in.",
     "aliasesLabel": "Aliassen:",
     "exampleLabel": "Voorbeeld:",
     "timeZoneAliases": "Ondersteunde plaatsen/tijdzones:"

@@ -193,7 +193,7 @@
     "helpDescription": "این فهرست را نشان بده.",
     "setTranslateDescription": "زبان ترجمه را تنظیم می‌کند. برای غیرفعال کردن ترجمه از off استفاده کنید. /lang بدون زبان، مقصد فعلی را نشان می‌دهد.",
     "setDisplayDescription": "نحوه نمایش ترجمه‌ها را تنظیم کن.",
-    "setSoundDescription": "صدای صندوق ورودی را تنظیم کن.",
+    "setSoundDescription": "صدای هشدارها را تنظیم می‌کند.",
     "aliasesLabel": "نام‌های جایگزین:",
     "exampleLabel": "مثال:",
     "timeZoneAliases": "مکان‌ها/منطقه‌های زمانی پشتیبانی‌شده:"

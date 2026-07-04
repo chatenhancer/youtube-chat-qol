@@ -193,7 +193,7 @@
     "helpDescription": "Zeigt diese Liste an.",
     "setTranslateDescription": "Legt die Übersetzungssprache fest. Mit off wird Übersetzung deaktiviert. /lang ohne Sprache zeigt das aktuelle Ziel.",
     "setDisplayDescription": "Legt fest, wie Übersetzungen angezeigt werden.",
-    "setSoundDescription": "Legt den Posteingangston fest.",
+    "setSoundDescription": "Legt Alarmtöne fest.",
     "aliasesLabel": "Aliasse:",
     "exampleLabel": "Beispiel:",
     "timeZoneAliases": "Unterstützte Orte/Zeitzonen:"
