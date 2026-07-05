@@ -11,6 +11,17 @@ const { locale, messages: m, rootPrefix } = Astro.props as {
   rootPrefix: string;
 };
 
+const browserLabels = {
+  chrome: 'Google Chrome',
+  firefox: 'Mozilla Firefox',
+  safari: 'Safari'
+} as const;
+const storeOptionLabels = {
+  ...browserLabels,
+  safari: 'Safari for Mac'
+} as const;
+const defaultInstallLabel = m.install.installForBrowser.replace('{browser}', browserLabels.chrome);
+
 ---
 
 <section class="section install" id="install" aria-labelledby="install-title">
@@ -42,10 +53,10 @@ const { locale, messages: m, rootPrefix } = Astro.props as {
     <div class="install-actions" data-install-actions>
       <div class="install-store-picker" data-browser-store-picker>
         <a class="button button-primary install-primary-button" href={site.chromeUrl} data-browser-primary-store-link>
-          <span class="button-icon" data-symbol="install_desktop" aria-hidden="true">
-            <Icon name="install_desktop" />
+          <span class="button-icon" aria-hidden="true">
+            <img class="install-primary-browser-icon" src={`${rootPrefix}assets/browser-icons/chrome-white.svg`} alt="" data-browser-primary-store-icon>
           </span>
-          <span>{m.install.installForThisBrowser}</span>
+          <span data-browser-primary-store-label data-install-label-template={m.install.installForBrowser}>{defaultInstallLabel}</span>
         </a>
         <button
           class="button button-secondary install-other-stores-toggle"
@@ -66,21 +77,21 @@ const { locale, messages: m, rootPrefix } = Astro.props as {
           data-browser-store-options
           hidden
         >
-          <a class="install-store-option" href={site.chromeUrl} data-browser-store-link="chrome">
+          <a class="install-store-option" href={site.chromeUrl} data-browser-store-link="chrome" data-browser-store-label={browserLabels.chrome} data-browser-store-primary-icon={`${rootPrefix}assets/browser-icons/chrome-white.svg`}>
             <img class="install-store-option-icon" src={`${rootPrefix}assets/browser-icons/chrome.svg`} alt="" aria-hidden="true">
-            <span class="install-store-option-label">Google Chrome</span>
+            <span class="install-store-option-label">{browserLabels.chrome}</span>
             <span class="install-store-option-meta">{m.install.chromeStore}</span>
             <span class="install-store-option-arrow" aria-hidden="true"></span>
           </a>
-          <a class="install-store-option" href={site.firefoxUrl} data-browser-store-link="firefox">
+          <a class="install-store-option" href={site.firefoxUrl} data-browser-store-link="firefox" data-browser-store-label={browserLabels.firefox} data-browser-store-primary-icon={`${rootPrefix}assets/browser-icons/firefox-white.svg`}>
             <img class="install-store-option-icon" src={`${rootPrefix}assets/browser-icons/firefox.svg`} alt="" aria-hidden="true">
-            <span class="install-store-option-label">Mozilla Firefox</span>
+            <span class="install-store-option-label">{browserLabels.firefox}</span>
             <span class="install-store-option-meta">{m.install.firefoxAddons}</span>
             <span class="install-store-option-arrow" aria-hidden="true"></span>
           </a>
-          <a class="install-store-option" href={site.safariUrl} data-browser-store-link="safari">
+          <a class="install-store-option" href={site.safariUrl} data-browser-store-link="safari" data-browser-store-label={browserLabels.safari} data-browser-store-primary-icon={`${rootPrefix}assets/browser-icons/safari-white.svg`}>
             <img class="install-store-option-icon install-store-option-icon-safari" src={`${rootPrefix}assets/browser-icons/safari.svg`} alt="" aria-hidden="true">
-            <span class="install-store-option-label">Safari for Mac</span>
+            <span class="install-store-option-label">{storeOptionLabels.safari}</span>
             <span class="install-store-option-meta">{m.install.safariAppStore}</span>
             <span class="install-store-option-arrow" aria-hidden="true"></span>
           </a>

@@ -129,7 +129,7 @@
     "chromeStore": "Chrome Web Store",
     "firefoxAddons": "Firefox Add-ons",
     "safariAppStore": "Mac App Store",
-    "installForThisBrowser": "ติดตั้งสำหรับเบราว์เซอร์นี้",
+    "installForBrowser": "ติดตั้งสำหรับ {browser}",
     "otherStores": "สโตร์อื่น",
     "sourceCode": "ซอร์สโค้ด",
     "supportFeedback": "ช่วยเหลือ",

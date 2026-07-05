@@ -129,7 +129,7 @@
     "chromeStore": "Chrome Web Store",
     "firefoxAddons": "Firefox Add-ons",
     "safariAppStore": "Mac App Store",
-    "installForThisBrowser": "इस ब्राउज़र के लिए इंस्टॉल करें",
+    "installForBrowser": "{browser} के लिए इंस्टॉल करें",
     "otherStores": "अन्य स्टोर",
     "sourceCode": "सोर्स कोड",
     "supportFeedback": "सहायता",

@@ -3,6 +3,8 @@
   const installActions = document.querySelector("[data-install-actions]");
   const storePicker = document.querySelector("[data-browser-store-picker]");
   const primaryStoreLink = document.querySelector("[data-browser-primary-store-link]");
+  const primaryStoreIcon = document.querySelector("[data-browser-primary-store-icon]");
+  const primaryStoreLabel = document.querySelector("[data-browser-primary-store-label]");
   const storeToggle = document.querySelector("[data-browser-store-toggle]");
   const storeOptions = document.querySelector("[data-browser-store-options]");
   const chromeStoreLink = document.querySelector('[data-browser-store-link="chrome"]');
@@ -162,6 +164,8 @@
     !installActions ||
     !storePicker ||
     !primaryStoreLink ||
+    !primaryStoreIcon ||
+    !primaryStoreLabel ||
     !storeToggle ||
     !storeOptions ||
     !chromeStoreLink ||
@@ -192,6 +196,14 @@
   });
   const primaryStoreHref = storeLinks[primaryStoreKey]?.getAttribute("href");
   if (primaryStoreHref) primaryStoreLink.setAttribute("href", primaryStoreHref);
+  const primaryStoreIconSrc = storeLinks[primaryStoreKey]?.dataset.browserStorePrimaryIcon;
+  if (primaryStoreIconSrc) primaryStoreIcon.setAttribute("src", primaryStoreIconSrc);
+  primaryStoreIcon.classList.toggle("install-primary-browser-icon-safari", primaryStoreKey === "safari");
+  const primaryStoreBrowser = storeLinks[primaryStoreKey]?.dataset.browserStoreLabel;
+  const installLabelTemplate = primaryStoreLabel.dataset.installLabelTemplate;
+  if (primaryStoreBrowser && installLabelTemplate) {
+    primaryStoreLabel.textContent = installLabelTemplate.replace("{browser}", primaryStoreBrowser);
+  }
 
   storeToggle.addEventListener("click", () => {
     const isExpanded = storeToggle.getAttribute("aria-expanded") === "true";

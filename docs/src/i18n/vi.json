@@ -129,7 +129,7 @@
     "chromeStore": "Chrome Web Store",
     "firefoxAddons": "Firefox Add-ons",
     "safariAppStore": "Mac App Store",
-    "installForThisBrowser": "Cài đặt cho trình duyệt này",
+    "installForBrowser": "Cài đặt cho {browser}",
     "otherStores": "Cửa hàng khác",
     "sourceCode": "Mã nguồn",
     "supportFeedback": "Hỗ trợ",

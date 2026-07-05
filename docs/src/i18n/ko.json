@@ -129,7 +129,7 @@
     "chromeStore": "Chrome Web Store",
     "firefoxAddons": "Firefox Add-ons",
     "safariAppStore": "Mac App Store",
-    "installForThisBrowser": "이 브라우저에 설치",
+    "installForBrowser": "{browser}에 설치",
     "otherStores": "다른 스토어",
     "sourceCode": "소스 코드",
     "supportFeedback": "지원",

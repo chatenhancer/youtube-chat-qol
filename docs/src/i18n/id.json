@@ -129,7 +129,7 @@
     "chromeStore": "Chrome Web Store",
     "firefoxAddons": "Firefox Add-ons",
     "safariAppStore": "Mac App Store",
-    "installForThisBrowser": "Instal untuk browser ini",
+    "installForBrowser": "Instal untuk {browser}",
     "otherStores": "Toko lain",
     "sourceCode": "Kode sumber",
     "supportFeedback": "Dukungan",

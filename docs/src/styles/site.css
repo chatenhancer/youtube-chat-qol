@@ -765,6 +765,13 @@ h3 {
   fill: currentColor;
 }
 
+.button-icon img {
+  display: block;
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+}
+
 .button-primary {
   color: #fff;
   background: linear-gradient(180deg, var(--logo-red-start), var(--logo-red-end));
@@ -3793,6 +3800,11 @@ figcaption {
 
 .install-primary-button {
   min-height: 46px;
+}
+
+.install-primary-browser-icon-safari {
+  transform: scale(1.08);
+  transform-origin: center;
 }
 
 .install-other-stores-toggle {

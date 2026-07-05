@@ -129,7 +129,7 @@
     "chromeStore": "Chrome Web Store",
     "firefoxAddons": "Firefox Add-ons",
     "safariAppStore": "Mac App Store",
-    "installForThisBrowser": "התקנה לדפדפן הזה",
+    "installForBrowser": "התקנה עבור {browser}",
     "otherStores": "חנויות אחרות",
     "sourceCode": "קוד מקור",
     "supportFeedback": "תמיכה",

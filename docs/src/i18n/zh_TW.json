@@ -129,7 +129,7 @@
     "chromeStore": "Chrome Web Store",
     "firefoxAddons": "Firefox Add-ons",
     "safariAppStore": "Mac App Store",
-    "installForThisBrowser": "為此瀏覽器安裝",
+    "installForBrowser": "為 {browser} 安裝",
     "otherStores": "其他商店",
     "sourceCode": "原始碼",
     "supportFeedback": "支援",

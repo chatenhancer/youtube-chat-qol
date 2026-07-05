@@ -129,7 +129,7 @@
     "chromeStore": "Chrome Web Store",
     "firefoxAddons": "Firefox Add-ons",
     "safariAppStore": "Mac App Store",
-    "installForThisBrowser": "Bu tarayıcı için yükle",
+    "installForBrowser": "{browser} için yükle",
     "otherStores": "Diğer mağazalar",
     "sourceCode": "Kaynak kod",
     "supportFeedback": "Destek",
