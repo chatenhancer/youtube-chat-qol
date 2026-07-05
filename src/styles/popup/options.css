@@ -1,0 +1,176 @@
+/*
+ * Popup settings option rows, helpers, icons, and state animation hooks.
+ */
+.option {
+  display: flex;
+  gap: 7px;
+  padding: 6px 8px;
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.option-control,
+.option-toggle {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 120px;
+  column-gap: 10px;
+  align-items: center;
+}
+
+.option-toggle {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.option:hover {
+  border-radius: 6px;
+  border-top-color: transparent;
+  background: var(--ytcq-popup-row-hover-bg);
+}
+
+.option:hover + .option {
+  border-top-color: transparent;
+}
+
+.option-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  font-weight: 400;
+}
+
+.option-beta-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 13px;
+  padding: 0 5px;
+  border: 1px solid color-mix(in srgb, var(--ytcq-popup-action) 36%, transparent);
+  border-radius: 5px;
+  color: var(--ytcq-popup-action);
+  background: color-mix(in srgb, var(--ytcq-popup-action) 10%, transparent);
+  font-size: 9px;
+  font-weight: 500;
+  line-height: 12px;
+  text-transform: uppercase;
+}
+
+.option-control .option-title {
+  align-self: end;
+}
+
+.option-copy {
+  display: contents;
+}
+
+.option-helper {
+  grid-column: 1;
+  margin-left: 23px;
+  color: var(--ytcq-popup-secondary-text);
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 14px;
+}
+
+.option-helper-link {
+  color: var(--ytcq-popup-action);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.option-helper-link:hover,
+.option-helper-link:focus {
+  text-decoration: underline;
+}
+
+.option-control .option-helper {
+  align-self: start;
+}
+
+.option-control select,
+.option-control input[type="number"],
+.option-toggle input[type="checkbox"] {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+}
+
+.option-icon {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  fill: currentColor;
+  opacity: 0.78;
+}
+
+.sound-ring {
+  display: none;
+}
+
+.option-toggle:has(#sound:checked) .sound-ring {
+  display: block;
+}
+
+.sound-icon.ytcq-bell-ringing {
+  transform-origin: 50% 16%;
+  animation: ytcq-bell-ring 620ms ease-in-out;
+}
+
+.sound-icon.ytcq-bell-ringing .sound-ring {
+  animation: ytcq-bell-ring-lines 620ms ease-in-out;
+}
+
+.translation-target-icon .translation-source-mark,
+.translation-target-icon .translation-target-mark,
+.translation-display-icon .translation-display-frame,
+.translation-display-icon .translation-display-line {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.translation-target-icon {
+  transform-origin: center;
+}
+
+.translation-target-icon.ytcq-translation-pulse {
+  animation: ytcq-translation-icon-pop 560ms cubic-bezier(0.18, 0.89, 0.32, 1.28);
+}
+
+.translation-target-icon.ytcq-translation-pulse .translation-source-mark {
+  animation: ytcq-translation-source-pop 560ms ease-out;
+}
+
+.translation-target-icon.ytcq-translation-pulse .translation-target-mark {
+  animation: ytcq-translation-target-pop 560ms ease-out 60ms;
+}
+
+.translation-display-icon.ytcq-display-reflow .translation-display-frame {
+  animation: ytcq-display-frame-reflow 680ms ease-out;
+}
+
+.translation-display-icon.ytcq-display-reflow .translation-display-line-top {
+  animation: ytcq-display-line-top-reflow 680ms ease-out;
+}
+
+.translation-display-icon.ytcq-display-reflow .translation-display-line-left {
+  animation: ytcq-display-line-bottom-reflow 680ms ease-out 70ms;
+}
+
+.translation-display-icon.ytcq-display-reflow .translation-display-line-right {
+  animation: ytcq-display-line-bottom-reflow 680ms ease-out 120ms;
+}
+
+.startup-effect-icon .startup-sparkle {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.startup-effect-icon.ytcq-sparkle-burst .startup-sparkle-large {
+  animation: ytcq-sparkle-large-burst 760ms ease-out;
+}
+
+.startup-effect-icon.ytcq-sparkle-burst .startup-sparkle-small-start {
+  animation: ytcq-sparkle-small-burst 760ms ease-out 80ms;
+}
+
+.startup-effect-icon.ytcq-sparkle-burst .startup-sparkle-small-end {
+  animation: ytcq-sparkle-small-burst 760ms ease-out 150ms;
+}

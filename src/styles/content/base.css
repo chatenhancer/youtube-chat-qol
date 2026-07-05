@@ -1,0 +1,59 @@
+/*
+ * Shared content-script base styles for extension-owned controls and rounded
+ * surface defaults inside YouTube live chat.
+ */
+:where(button[class^="ytcq-"], button[class*=" ytcq-"]) {
+  -webkit-appearance: none;
+  appearance: none;
+  box-sizing: border-box;
+  margin: 0;
+  font: inherit;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.ytcq-enhanced-effect::before,
+ytd-menu-popup-renderer .ytcq-context-split-button,
+.ytcq-composer-translate-panel,
+.ytcq-composer-translate-select,
+.ytcq-profile-card,
+.ytcq-profile-card-message,
+.ytcq-focus-card,
+.ytcq-focus-author-button,
+.ytcq-focus-bubble,
+.ytcq-games-connection-notice,
+.ytcq-games-availability,
+.ytcq-games-active-row,
+.ytcq-games-invite-row,
+.ytcq-games-player-row,
+.ytcq-games-game-card,
+.ytcq-games-preview,
+.ytcq-chess-game-panel,
+.ytcq-replay-trivia-game-panel,
+.ytcq-bounty-hunting-game-panel,
+.ytcq-game-overlay-header,
+.ytcq-game-overlay-icon,
+.ytcq-chess-game-icon,
+.ytcq-replay-trivia-game-icon,
+.ytcq-bounty-hunting-game-icon,
+.ytcq-chess-board-canvas,
+.ytcq-replay-trivia-canvas,
+.ytcq-bounty-hunting-canvas,
+.ytcq-replay-trivia-game-fallback,
+.ytcq-bounty-hunting-game-fallback,
+.ytcq-game-status,
+.ytcq-chess-game-status,
+.ytcq-inbox-keyword-input,
+.ytcq-inbox-inline-highlight,
+.ytcq-chat-keyword-highlight,
+.ytcq-command-autocomplete-card,
+.ytcq-command-autocomplete-option,
+.ytcq-command-help-card,
+yt-live-chat-text-message-renderer .ytcq-replaced-translation-icon,
+yt-live-chat-paid-message-renderer .ytcq-replaced-translation-icon,
+yt-live-chat-membership-item-renderer .ytcq-replaced-translation-icon,
+.ytcq-profile-card-message .ytcq-replaced-translation-icon,
+.ytcq-focus-message .ytcq-replaced-translation-icon,
+.ytcq-toast {
+  corner-shape: var(--ytcq-squircle-corner-shape);
+}

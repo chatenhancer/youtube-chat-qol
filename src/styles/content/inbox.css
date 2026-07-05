@@ -1,0 +1,190 @@
+/*
+ * Mention and keyword Inbox card, keyword management panel, and chat highlights.
+ */
+.ytcq-inbox-card-header {
+  grid-template-columns: 36px minmax(0, 1fr) 28px 28px;
+}
+
+.ytcq-inbox-card-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  color: var(--yt-spec-call-to-action, #3ea6ff);
+  fill: currentColor;
+  background: var(--yt-spec-badge-chip-background, rgba(62, 166, 255, 0.12));
+}
+
+.ytcq-inbox-card-icon svg {
+  display: block;
+  width: 22px;
+  height: 22px;
+}
+
+.ytcq-inbox-messages {
+  flex: 1 1 auto;
+  max-height: 300px;
+}
+
+.ytcq-inbox-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 84px;
+  padding: 12px 0;
+  text-align: center;
+}
+
+.ytcq-inbox-author {
+  display: inline;
+  padding: 0;
+  border: 0;
+  color: inherit;
+  background: transparent;
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.ytcq-inbox-author:hover,
+.ytcq-inbox-author:focus {
+  color: var(--yt-spec-call-to-action, #3ea6ff);
+  text-decoration: underline;
+  outline: none;
+}
+
+.ytcq-inbox-keyword-panel {
+  flex: 0 0 auto;
+  margin-top: 10px;
+  overflow: hidden;
+}
+
+.ytcq-inbox-keyword-panel[hidden] {
+  display: none;
+}
+
+.ytcq-inbox-keyword-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+}
+
+.ytcq-inbox-keyword-input {
+  min-width: 0;
+  height: 32px;
+  box-sizing: border-box;
+  padding: 0 10px;
+  border: 1px solid var(--ytcq-control-border);
+  border-radius: 6px;
+  color: var(--yt-spec-text-primary, var(--yt-live-chat-primary-text-color, #f1f1f1));
+  background: var(--yt-spec-menu-background, var(--yt-live-chat-background-color, #0f0f0f));
+  font: 400 13px/18px Roboto, Arial, sans-serif;
+}
+
+.ytcq-inbox-keyword-input:focus {
+  border-color: var(--yt-spec-call-to-action, #3ea6ff);
+  outline: none;
+}
+
+.ytcq-inbox-keyword-add {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 16px;
+  color: var(--yt-spec-call-to-action, #3ea6ff);
+  background: transparent;
+  font: 500 13px/16px Roboto, Arial, sans-serif;
+  cursor: pointer;
+}
+
+.ytcq-inbox-keyword-add:hover,
+.ytcq-inbox-keyword-add:focus {
+  background: var(--ytcq-hover-background);
+  outline: none;
+}
+
+.ytcq-inbox-keyword-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.ytcq-inbox-keyword-chip {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  min-height: 24px;
+  box-sizing: border-box;
+  padding: 0 4px 0 8px;
+  border-radius: 12px;
+  color: var(--yt-spec-text-primary, var(--yt-live-chat-primary-text-color, #f1f1f1));
+  background: rgba(255, 183, 77, 0.2);
+  font: 500 12px/16px Roboto, Arial, sans-serif;
+}
+
+.ytcq-inbox-keyword-chip > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ytcq-inbox-keyword-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  margin-left: 2px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  color: inherit;
+  background: transparent;
+  cursor: pointer;
+}
+
+.ytcq-inbox-keyword-remove svg {
+  display: block;
+  width: 12px;
+  height: 12px;
+  fill: currentColor;
+}
+
+.ytcq-inbox-keyword-remove:hover,
+.ytcq-inbox-keyword-remove:focus {
+  background: rgba(255, 183, 77, 0.24);
+  outline: none;
+}
+
+.ytcq-inbox-keyword-empty {
+  color: var(--yt-live-chat-secondary-text-color, var(--yt-spec-text-secondary, #aaa));
+  font: 400 12px/16px Roboto, Arial, sans-serif;
+}
+
+.ytcq-inbox-inline-highlight {
+  padding: 2px 4px;
+  border-radius: 2px;
+}
+
+.ytcq-inbox-mention-highlight {
+  color: var(--yt-live-chat-mention-text-color, var(--yt-spec-text-primary, #f1f1f1));
+  background: var(--yt-live-chat-mention-background-color, rgba(62, 166, 255, 0.24));
+}
+
+.ytcq-inbox-keyword-highlight {
+  color: var(--yt-spec-text-primary, var(--yt-live-chat-primary-text-color, #f1f1f1));
+  background: rgba(255, 183, 77, 0.24);
+}
+
+.ytcq-chat-keyword-highlight {
+  padding: 2px 4px;
+  border-radius: 2px;
+  color: var(--yt-spec-text-primary, var(--yt-live-chat-primary-text-color, #f1f1f1));
+  background: rgba(255, 183, 77, 0.24);
+}

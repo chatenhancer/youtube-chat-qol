@@ -1,0 +1,78 @@
+/*
+ * Popup theme tokens for light/dark surfaces, controls, text, and radius values.
+ */
+:root {
+  color-scheme: light dark;
+  --ytcq-popup-card-bg: #fff;
+  --ytcq-popup-row-bg: rgba(0, 0, 0, 0.04);
+  --ytcq-popup-row-hover-bg: rgba(0, 0, 0, 0.07);
+  --ytcq-popup-control-bg: #fff;
+  --ytcq-popup-control-tint: rgba(0, 0, 0, 0.04);
+  --ytcq-popup-control-border: rgba(0, 0, 0, 0.22);
+  --ytcq-popup-modal-backdrop: rgba(0, 0, 0, 0.48);
+  --ytcq-popup-text: #0f0f0f;
+  --ytcq-popup-secondary-text: #606060;
+  --ytcq-popup-action: #065fd4;
+  --ytcq-popup-logo-red-start: #fe0031;
+  --ytcq-popup-logo-red-end: #fd0032;
+  --ytcq-popup-squircle-corner-shape: squircle;
+  --ytcq-popup-squircle-radius-small: 4px;
+  --ytcq-popup-squircle-radius-badge: 5px;
+  --ytcq-popup-squircle-radius-control: 6px;
+  --ytcq-popup-squircle-radius-compact: 7px;
+  --ytcq-popup-squircle-radius-surface: 8px;
+  --ytcq-popup-squircle-radius-tab: 4px 4px 0 0;
+  --ytcq-popup-squircle-radius-tab-mark: 2px 2px 0 0;
+  font-family: "Inter", Arial, sans-serif;
+}
+
+@supports (corner-shape: superellipse(2)) {
+  :root {
+    --ytcq-popup-squircle-corner-shape: superellipse(2);
+  }
+}
+
+@supports ((corner-shape: squircle) or (corner-shape: superellipse(2))) {
+  :root {
+    --ytcq-popup-squircle-radius-small: 8px;
+    --ytcq-popup-squircle-radius-badge: 10px;
+    --ytcq-popup-squircle-radius-control: 12px;
+    --ytcq-popup-squircle-radius-compact: 14px;
+    --ytcq-popup-squircle-radius-surface: 18px;
+    --ytcq-popup-squircle-radius-tab: 12px 12px 0 0;
+    --ytcq-popup-squircle-radius-tab-mark: 5px 5px 0 0;
+  }
+}
+
+.brand-link,
+.header-actions,
+.popup-reset-dialog,
+.popup-reset-dialog-button,
+.popup-tab,
+.popup-tab-active::after,
+.settings-section,
+.playground-profile,
+.playground-display-name-field input,
+.bookmarks-section,
+.bookmark-row,
+.option:hover,
+.option-beta-badge,
+select,
+input[type="number"] {
+  corner-shape: var(--ytcq-popup-squircle-corner-shape);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ytcq-popup-card-bg: #282828;
+    --ytcq-popup-row-bg: rgba(255, 255, 255, 0.08);
+    --ytcq-popup-row-hover-bg: rgba(255, 255, 255, 0.12);
+    --ytcq-popup-control-bg: #282828;
+    --ytcq-popup-control-tint: rgba(255, 255, 255, 0.06);
+    --ytcq-popup-control-border: rgba(255, 255, 255, 0.24);
+    --ytcq-popup-modal-backdrop: rgba(0, 0, 0, 0.68);
+    --ytcq-popup-text: #f1f1f1;
+    --ytcq-popup-secondary-text: #aaa;
+    --ytcq-popup-action: #3ea6ff;
+  }
+}

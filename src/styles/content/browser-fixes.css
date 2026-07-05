@@ -1,0 +1,78 @@
+/*
+ * Browser-specific content-script fixes and capability-gated refinements.
+ */
+@supports (font: -apple-system-body) and (text-box-trim: trim-both) and (text-box-edge: cap alphabetic) {
+  /* Safari centers compact text from the full font box; trim it to the visible text box. */
+  :where(button[class^="ytcq-"], button[class*=" ytcq-"]),
+  :where(button[class^="ytcq-"], button[class*=" ytcq-"]) > :where(span),
+  :where([class^="ytcq-"][class*="avatar"], [class*=" ytcq-"][class*="avatar"]) {
+    text-box-trim: trim-both;
+    text-box-edge: cap alphabetic;
+  }
+}
+
+@supports ((corner-shape: squircle) or (corner-shape: superellipse(2))) {
+  .ytcq-enhanced-effect::before {
+    border-radius: var(--ytcq-squircle-radius-effect);
+  }
+
+  .ytcq-composer-translate-panel,
+  .ytcq-profile-card,
+  .ytcq-focus-card:not(.ytcq-focus-card-expanded),
+  .ytcq-chess-game-panel,
+  .ytcq-replay-trivia-game-panel,
+  .ytcq-bounty-hunting-game-panel,
+  .ytcq-command-autocomplete-card,
+  .ytcq-command-help-card {
+    border-radius: var(--ytcq-squircle-radius-surface);
+  }
+
+  ytd-menu-popup-renderer .ytcq-context-split-button,
+  .ytcq-composer-translate-select,
+  .ytcq-inbox-keyword-input,
+  .ytcq-command-autocomplete-option {
+    border-radius: var(--ytcq-squircle-radius-control);
+  }
+
+  .ytcq-profile-card-message,
+  .ytcq-games-connection-notice,
+  .ytcq-games-availability,
+  .ytcq-games-active-row,
+  .ytcq-games-invite-row,
+  .ytcq-games-player-row,
+  .ytcq-games-game-card,
+  .ytcq-games-preview,
+  .ytcq-game-overlay-header,
+  .ytcq-game-overlay-icon,
+  .ytcq-chess-game-icon,
+  .ytcq-replay-trivia-game-icon,
+  .ytcq-bounty-hunting-game-icon,
+  .ytcq-chess-board-canvas,
+  .ytcq-replay-trivia-canvas,
+  .ytcq-bounty-hunting-canvas,
+  .ytcq-replay-trivia-game-fallback,
+  .ytcq-bounty-hunting-game-fallback,
+  .ytcq-game-status,
+  .ytcq-chess-game-status {
+    border-radius: var(--ytcq-squircle-radius-compact);
+  }
+
+  .ytcq-focus-bubble {
+    border-radius: var(--ytcq-squircle-radius-bubble);
+  }
+
+  .ytcq-focus-author-button,
+  .ytcq-inbox-inline-highlight,
+  .ytcq-chat-keyword-highlight,
+  yt-live-chat-text-message-renderer .ytcq-replaced-translation-icon,
+  yt-live-chat-paid-message-renderer .ytcq-replaced-translation-icon,
+  yt-live-chat-membership-item-renderer .ytcq-replaced-translation-icon,
+  .ytcq-profile-card-message .ytcq-replaced-translation-icon,
+  .ytcq-focus-message .ytcq-replaced-translation-icon {
+    border-radius: var(--ytcq-squircle-radius-tiny);
+  }
+
+  .ytcq-toast {
+    border-radius: var(--ytcq-squircle-radius-small);
+  }
+}

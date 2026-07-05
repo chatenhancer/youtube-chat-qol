@@ -1,0 +1,291 @@
+/*
+ * Focus mode collapsed chip, expanded panel, focused messages, and controls.
+ */
+.ytcq-focus-anchor {
+  position: relative;
+  z-index: 10001;
+  height: 0;
+  pointer-events: none;
+}
+
+.ytcq-focus-card {
+  position: absolute;
+  z-index: 10001;
+  bottom: 8px;
+  left: 12px;
+  right: 12px;
+  box-sizing: border-box;
+  border: 1px solid var(--ytcq-control-border);
+  border-radius: 8px;
+  color: var(--yt-spec-text-primary, var(--yt-live-chat-primary-text-color, #f1f1f1));
+  background: var(--yt-spec-raised-background, var(--yt-live-chat-background-color, #282828));
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.32);
+  font: 400 13px/18px Roboto, Arial, sans-serif;
+  pointer-events: auto;
+  animation: ytcq-focus-slide-in 160ms ease-out;
+}
+
+.ytcq-focus-card-collapsed {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto 24px;
+  gap: 6px;
+  align-items: center;
+  min-height: 42px;
+  padding: 6px 8px;
+  cursor: pointer;
+}
+
+.ytcq-focus-card-collapsed:focus {
+  outline: none;
+}
+
+.ytcq-focus-card-expanded {
+  display: flex;
+  flex-direction: column;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  max-height: min(46vh, 360px);
+  border-top: 1px solid rgba(128, 128, 128, 0.28);
+  border-right: 0;
+  border-bottom: 0;
+  border-left: 0;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 10px 12px;
+}
+
+.ytcq-focus-summary,
+.ytcq-focus-title,
+.ytcq-focus-author {
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+}
+
+.ytcq-focus-summary,
+.ytcq-focus-title {
+  gap: 8px;
+}
+
+.ytcq-focus-title {
+  flex-wrap: wrap;
+}
+
+.ytcq-focus-label {
+  color: var(--yt-live-chat-secondary-text-color, var(--yt-spec-text-secondary, #aaa));
+  font: 400 12px/16px Roboto, Arial, sans-serif;
+  white-space: nowrap;
+}
+
+.ytcq-focus-author {
+  gap: 6px;
+  color: var(--yt-spec-text-primary, var(--yt-live-chat-primary-text-color, #f1f1f1));
+  font: 500 13px/18px Roboto, Arial, sans-serif;
+  overflow: visible;
+  white-space: nowrap;
+}
+
+.ytcq-focus-author-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ytcq-focus-author-button {
+  padding: 2px 4px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.ytcq-focus-author-button:hover,
+.ytcq-focus-author-button:focus {
+  background: var(--ytcq-hover-background);
+  outline: none;
+}
+
+.ytcq-focus-avatar {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.ytcq-focus-avatar img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  object-fit: cover;
+}
+
+.ytcq-focus-avatar-fallback {
+  color: var(--yt-spec-text-primary, #fff);
+  background: var(--yt-spec-call-to-action, #3ea6ff);
+  font: 500 12px/12px Roboto, Arial, sans-serif;
+}
+
+.ytcq-focus-open {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 24px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 12px;
+  color: var(--yt-spec-call-to-action, #3ea6ff);
+  background: transparent;
+  font: 500 13px/16px Roboto, Arial, sans-serif;
+  cursor: pointer;
+}
+
+.ytcq-focus-open:hover,
+.ytcq-focus-open:focus {
+  background: var(--ytcq-hover-background);
+  outline: none;
+}
+
+.ytcq-focus-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  fill: currentColor;
+  color: var(--yt-spec-text-secondary, var(--yt-live-chat-secondary-text-color, #aaa));
+  background: transparent;
+  cursor: pointer;
+}
+
+.ytcq-focus-close svg {
+  display: block;
+  width: 16px;
+  height: 16px;
+  pointer-events: none;
+}
+
+.ytcq-focus-close:hover,
+.ytcq-focus-close:focus {
+  color: var(--yt-spec-text-primary, var(--yt-live-chat-primary-text-color, #f1f1f1));
+  background: var(--ytcq-hover-background);
+  outline: none;
+}
+
+.ytcq-focus-header {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.ytcq-focus-messages {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;
+  margin-top: 10px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.ytcq-focus-message {
+  display: flex;
+  flex-direction: column;
+  max-width: 86%;
+  gap: 2px;
+}
+
+.ytcq-focus-message-quotable {
+  cursor: pointer;
+}
+
+.ytcq-focus-message-them {
+  align-self: flex-start;
+}
+
+.ytcq-focus-message-us {
+  align-self: flex-end;
+  align-items: flex-end;
+}
+
+.ytcq-focus-message-meta {
+  color: var(--yt-live-chat-secondary-text-color, var(--yt-spec-text-secondary, #aaa));
+  font: 400 11px/14px Roboto, Arial, sans-serif;
+}
+
+.ytcq-focus-bubble {
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 7px 9px;
+  border-radius: 10px;
+  overflow-wrap: anywhere;
+  color: var(--yt-spec-text-primary, var(--yt-live-chat-primary-text-color, #f1f1f1));
+  background:
+    linear-gradient(rgba(128, 128, 128, 0.1), rgba(128, 128, 128, 0.1)),
+    var(--yt-spec-badge-chip-background, transparent);
+}
+
+.ytcq-focus-message-us .ytcq-focus-bubble {
+  background:
+    linear-gradient(rgba(62, 166, 255, 0.14), rgba(62, 166, 255, 0.14)),
+    var(--yt-live-chat-background-color, var(--yt-spec-base-background, transparent));
+}
+
+.ytcq-focus-message-quotable:hover .ytcq-focus-bubble,
+.ytcq-focus-message-quotable:focus .ytcq-focus-bubble {
+  background:
+    linear-gradient(rgba(128, 128, 128, 0.18), rgba(128, 128, 128, 0.18)),
+    var(--yt-spec-badge-chip-background, transparent);
+}
+
+.ytcq-focus-message-quotable:focus {
+  outline: none;
+}
+
+.ytcq-focus-bubble img {
+  width: 16px;
+  height: 16px;
+  max-width: 16px;
+  max-height: 16px;
+  object-fit: contain;
+  vertical-align: -3px;
+}
+
+.ytcq-focus-empty {
+  display: flex;
+  min-height: 96px;
+  align-items: center;
+  justify-content: center;
+  color: var(--yt-live-chat-secondary-text-color, var(--yt-spec-text-secondary, #aaa));
+  text-align: center;
+}
+
+@keyframes ytcq-focus-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ytcq-focus-card {
+    animation: none;
+  }
+}

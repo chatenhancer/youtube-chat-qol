@@ -1,0 +1,37 @@
+/*
+ * Shared content-script tokens that mirror YouTube live chat colors, density,
+ * and rounded surface defaults.
+ */
+:root {
+  --ytcq-hover-background: var(--yt-spec-touch-response, var(--yt-spec-10-percent-layer, rgba(128, 128, 128, 0.16)));
+  --ytcq-hover-background-strong: var(--yt-spec-10-percent-layer, rgba(128, 128, 128, 0.22));
+  --ytcq-control-border: rgba(128, 128, 128, 0.42);
+  --ytcq-squircle-corner-shape: squircle;
+  --ytcq-squircle-radius-tiny: 2px;
+  --ytcq-squircle-radius-small: 4px;
+  --ytcq-squircle-radius-badge: 5px;
+  --ytcq-squircle-radius-control: 6px;
+  --ytcq-squircle-radius-compact: 7px;
+  --ytcq-squircle-radius-surface: 8px;
+  --ytcq-squircle-radius-bubble: 10px;
+  --ytcq-squircle-radius-effect: 18px;
+}
+
+@supports (corner-shape: superellipse(2)) {
+  :root {
+    --ytcq-squircle-corner-shape: superellipse(2);
+  }
+}
+
+@supports ((corner-shape: squircle) or (corner-shape: superellipse(2))) {
+  :root {
+    --ytcq-squircle-radius-tiny: 5px;
+    --ytcq-squircle-radius-small: 8px;
+    --ytcq-squircle-radius-badge: 10px;
+    --ytcq-squircle-radius-control: 12px;
+    --ytcq-squircle-radius-compact: 14px;
+    --ytcq-squircle-radius-surface: 18px;
+    --ytcq-squircle-radius-bubble: 18px;
+    --ytcq-squircle-radius-effect: 28px;
+  }
+}

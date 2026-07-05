@@ -1,0 +1,40 @@
+/*
+ * Popup browser capability refinements, including squircle radius upgrades.
+ */
+@supports ((corner-shape: squircle) or (corner-shape: superellipse(2))) {
+  .brand-link {
+    border-radius: var(--ytcq-popup-squircle-radius-small);
+  }
+
+  .header-actions,
+  .popup-reset-dialog-button,
+  .playground-display-name-field input,
+  .option:hover,
+  select,
+  input[type="number"] {
+    border-radius: var(--ytcq-popup-squircle-radius-control);
+  }
+
+  .popup-reset-dialog,
+  .settings-section,
+  .playground-profile,
+  .bookmarks-section {
+    border-radius: var(--ytcq-popup-squircle-radius-surface);
+  }
+
+  .bookmark-row {
+    border-radius: var(--ytcq-popup-squircle-radius-compact);
+  }
+
+  .option-beta-badge {
+    border-radius: var(--ytcq-popup-squircle-radius-badge);
+  }
+
+  .popup-tab {
+    border-radius: var(--ytcq-popup-squircle-radius-tab);
+  }
+
+  .popup-tab-active::after {
+    border-radius: var(--ytcq-popup-squircle-radius-tab-mark);
+  }
+}

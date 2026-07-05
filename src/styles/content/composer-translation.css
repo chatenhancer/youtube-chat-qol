@@ -1,0 +1,130 @@
+/*
+ * Composer draft translation button, status icon, and language picker panel.
+ */
+.ytcq-composer-translate-host {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.ytcq-composer-translate-control {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  margin-right: -6px;
+}
+
+.ytcq-composer-translate-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 8px;
+  border: 0;
+  border-radius: 50%;
+  color: var(--yt-live-chat-secondary-text-color, var(--yt-spec-text-secondary, #aaa));
+  background: transparent;
+  cursor: pointer;
+}
+
+.ytcq-composer-translate-button:hover,
+.ytcq-composer-translate-button:focus {
+  color: var(--yt-live-chat-primary-text-color, var(--yt-spec-text-primary, #fff));
+  background: transparent;
+  outline: none;
+}
+
+.ytcq-composer-translate-button:focus-visible {
+  outline: 2px solid var(--yt-spec-call-to-action, #3ea6ff);
+  outline-offset: -2px;
+}
+
+.ytcq-composer-translate-button svg {
+  width: 24px;
+  height: 24px;
+  fill: currentColor;
+  pointer-events: none;
+}
+
+.ytcq-composer-translate-icon {
+  transform-origin: center;
+}
+
+.ytcq-composer-translate-icon .ytcq-translate-source-mark,
+.ytcq-composer-translate-icon .ytcq-translate-target-mark {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.ytcq-composer-translate-icon.ytcq-translation-pulse {
+  animation: ytcq-translation-icon-pop 560ms cubic-bezier(0.18, 0.89, 0.32, 1.28);
+}
+
+.ytcq-composer-translate-icon.ytcq-translation-pulse .ytcq-translate-source-mark {
+  animation: ytcq-translation-source-pop 560ms ease-out;
+}
+
+.ytcq-composer-translate-icon.ytcq-translation-pulse .ytcq-translate-target-mark {
+  animation: ytcq-translation-target-pop 560ms ease-out 60ms;
+}
+
+.ytcq-composer-translate-icon.ytcq-translation-pulse-loop,
+.ytcq-composer-translate-icon.ytcq-translation-pulse-loop .ytcq-translate-source-mark,
+.ytcq-composer-translate-icon.ytcq-translation-pulse-loop .ytcq-translate-target-mark {
+  animation-iteration-count: infinite;
+}
+
+.ytcq-composer-translate-button-active {
+  color: var(--yt-spec-call-to-action, #3ea6ff);
+}
+
+.ytcq-composer-translate-panel {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 10060;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: max-content;
+  max-width: min(280px, 84vw);
+  min-height: 42px;
+  padding: 6px 8px;
+  border: 1px solid var(--ytcq-control-border);
+  border-radius: 8px;
+  color: var(--yt-live-chat-primary-text-color, var(--yt-spec-text-primary, #fff));
+  background: var(--yt-spec-raised-background, var(--yt-live-chat-background-color, #282828));
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.32);
+  box-sizing: border-box;
+  font: 400 13px/18px Roboto, Arial, sans-serif;
+}
+
+.ytcq-composer-translate-panel[hidden] {
+  display: none;
+}
+
+.ytcq-composer-translate-label {
+  display: block;
+  flex: 0 0 auto;
+  margin: 0;
+  font: 500 12px/16px Roboto, Arial, sans-serif;
+  color: var(--yt-live-chat-secondary-text-color, var(--yt-spec-text-secondary, #aaa));
+  white-space: nowrap;
+}
+
+.ytcq-composer-translate-select {
+  flex: 0 1 auto;
+  width: auto;
+  min-width: 112px;
+  max-width: 160px;
+  min-height: 28px;
+  padding: 3px 6px;
+  border: 1px solid var(--ytcq-control-border);
+  border-radius: 6px;
+  color: var(--yt-live-chat-primary-text-color, var(--yt-spec-text-primary, #fff));
+  background: var(--yt-live-chat-action-panel-background-color, var(--yt-spec-raised-background, #181818));
+  font: inherit;
+}

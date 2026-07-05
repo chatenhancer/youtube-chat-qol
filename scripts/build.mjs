@@ -5,7 +5,8 @@
  * flattened browser-specific manifests into dist folders that can be loaded
  * directly by extension browsers or zipped for stores.
  */
-import { build } from 'esbuild';
+import { build, transform } from 'esbuild';
+import { minify as minifyHtml } from 'html-minifier-terser';
 import { copyFile, cp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -19,6 +20,45 @@ await loadLocalEnv();
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const extensionAssetsDir = path.join(root, 'src', 'assets');
+const cssLayerOrder = ['tokens', 'base', 'features', 'skins', 'browser-fixes'];
+const htmlMinifyOptions = {
+  collapseWhitespace: true,
+  conservativeCollapse: false,
+  minifyCSS: false,
+  minifyJS: false,
+  removeAttributeQuotes: false,
+  removeComments: true,
+  removeOptionalTags: false,
+  removeRedundantAttributes: false
+};
+const contentCssSources = [
+  ['tokens', 'src/styles/content/tokens.css'],
+  ['base', 'src/styles/content/base.css'],
+  ['features', 'src/styles/content/menus.css'],
+  ['features', 'src/styles/content/enhanced-effect.css'],
+  ['features', 'src/styles/content/composer-translation.css'],
+  ['features', 'src/styles/content/frequent-emojis.css'],
+  ['features', 'src/styles/content/chat-header.css'],
+  ['features', 'src/styles/content/profile-popup.css'],
+  ['features', 'src/styles/content/focus-mode.css'],
+  ['features', 'src/styles/content/inbox.css'],
+  ['features', 'src/styles/content/playground.css'],
+  ['features', 'src/styles/content/chat-commands.css'],
+  ['features', 'src/styles/content/translation.css'],
+  ['features', 'src/styles/content/toast.css'],
+  ['browser-fixes', 'src/styles/content/browser-fixes.css']
+];
+const popupCssSources = [
+  [null, 'src/styles/popup/fonts.css'],
+  ['tokens', 'src/styles/popup/tokens.css'],
+  ['base', 'src/styles/popup/layout.css'],
+  ['features', 'src/styles/popup/playground.css'],
+  ['features', 'src/styles/popup/bookmarks.css'],
+  ['features', 'src/styles/popup/options.css'],
+  ['features', 'src/styles/popup/animations.css'],
+  ['features', 'src/styles/popup/controls.css'],
+  ['browser-fixes', 'src/styles/popup/browser-fixes.css']
+];
 const targetOutputDirs = {
   chrome: path.join(root, 'dist', 'extension-chrome'),
   edge: path.join(root, 'dist', 'extension-edge'),
@@ -96,9 +136,14 @@ async function buildTarget(target) {
   ]);
 
   await Promise.all([
-    copyFile(path.join(root, 'src', 'content.css'), path.join(extensionDir, 'content.css')),
-    copyFile(path.join(root, 'src', 'popup.css'), path.join(extensionDir, 'popup.css')),
-    copyFile(path.join(root, 'src', 'popup.html'), path.join(extensionDir, 'popup.html')),
+    // Content-script CSS must stay unlayered so YouTube's unlayered author
+    // styles do not outrank extension rules that target injected UI.
+    writeCssBundle(contentCssSources, path.join(extensionDir, 'content.css')),
+    writeMinifiedHtml(
+      path.join(root, 'src', 'popup.html'),
+      path.join(extensionDir, 'popup.html'),
+      { inlineCss: buildCssBundle(popupCssSources, { layered: true }) }
+    ),
     copyFile(path.join(root, 'LICENSE'), path.join(extensionDir, 'LICENSE')),
     copyFile(path.join(root, 'THIRD_PARTY_NOTICES.md'), path.join(extensionDir, 'THIRD_PARTY_NOTICES.md')),
     copyFile(path.join(extensionAssetsDir, 'logos', 'logo.png'), path.join(extensionDir, 'logo.png')),
@@ -115,6 +160,69 @@ async function buildTarget(target) {
     path.join(extensionDir, 'manifest.json'),
     `${JSON.stringify(createManifest(target), null, 2)}\n`
   );
+}
+
+async function writeCssBundle(sources, outfile, { layered = false } = {}) {
+  await writeFile(outfile, ensureTrailingNewline(await buildCssBundle(sources, { layered })));
+}
+
+async function buildCssBundle(sources, { layered = false } = {}) {
+  const chunks = [
+    [
+      '/*',
+      ' * Generated extension stylesheet.',
+      ' *',
+      ' * Edit the ordered source files under src/styles instead of this built file.',
+      ' */'
+    ].join('\n')
+  ];
+  if (layered) chunks.push(`@layer ${cssLayerOrder.join(', ')};`);
+
+  for (const [layer, sourceFile] of sources) {
+    const sourcePath = path.join(root, sourceFile);
+    const css = (await readFile(sourcePath, 'utf8')).trim();
+    if (!css) continue;
+
+    chunks.push(
+      `/* ${sourceFile} */`,
+      layered && layer
+        ? `@layer ${layer} {\n${indentCss(css)}\n}`
+        : css
+    );
+  }
+
+  const result = await transform(`${chunks.join('\n\n')}\n`, {
+    loader: 'css',
+    minify: true,
+    legalComments: 'none'
+  });
+
+  return result.code;
+}
+
+function indentCss(css) {
+  return css
+    .split('\n')
+    .map((line) => line ? `  ${line}` : '')
+    .join('\n');
+}
+
+async function writeMinifiedHtml(infile, outfile, { inlineCss } = {}) {
+  const html = await readFile(infile, 'utf8');
+  const nextHtml = inlineCss
+    ? inlinePopupCss(html, await inlineCss)
+    : html;
+  await writeFile(outfile, ensureTrailingNewline(await minifyHtml(nextHtml, htmlMinifyOptions)));
+}
+
+function inlinePopupCss(html, css) {
+  const linkPattern = /<link\b(?=[^>]*\brel="stylesheet")(?=[^>]*\bhref="popup\.css")[^>]*>/i;
+  if (!linkPattern.test(html)) throw new Error('Could not find popup.css stylesheet link.');
+  return html.replace(linkPattern, `<style>${css.trim()}</style>`);
+}
+
+function ensureTrailingNewline(value) {
+  return value.endsWith('\n') ? value : `${value}\n`;
 }
 
 function createManifest(target) {

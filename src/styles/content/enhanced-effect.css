@@ -1,0 +1,47 @@
+/*
+ * Startup edge shimmer and ambient enhanced-chat effect.
+ */
+.ytcq-enhanced-effect {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483647;
+  pointer-events: none;
+  overflow: visible;
+  contain: layout paint style;
+}
+
+.ytcq-enhanced-effect::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  pointer-events: none;
+  border-radius: 18px;
+  box-sizing: border-box;
+  opacity: 0.95;
+  box-shadow:
+    inset 0 0 8px rgba(62, 166, 255, 0.07),
+    inset 0 0 16px rgba(126, 87, 255, 0.04),
+    0 0 10px rgba(62, 166, 255, 0.12),
+    0 0 22px rgba(126, 87, 255, 0.06);
+}
+
+.ytcq-enhanced-effect canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  filter: blur(5px) saturate(1.18) brightness(1.04);
+  transition: opacity 120ms ease-out;
+}
+
+.ytcq-enhanced-effect.ytcq-enhanced-effect-active canvas {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ytcq-enhanced-effect canvas {
+    display: none;
+  }
+}

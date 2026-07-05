@@ -1,0 +1,33 @@
+/*
+ * Native popup form control normalization for buttons, selects, and checkboxes.
+ */
+button,
+input,
+select {
+  font: inherit;
+}
+
+select,
+input[type="number"] {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 28px;
+  padding: 3px 8px;
+  border: 1px solid var(--ytcq-popup-control-border);
+  border-radius: 4px;
+  color: var(--ytcq-popup-text);
+  background:
+    linear-gradient(var(--ytcq-popup-control-tint), var(--ytcq-popup-control-tint)),
+    var(--ytcq-popup-control-bg);
+}
+
+select {
+  padding-right: 24px;
+}
+
+input[type="checkbox"] {
+  justify-self: center;
+  align-self: center;
+  margin: 0;
+  accent-color: var(--ytcq-popup-action);
+}

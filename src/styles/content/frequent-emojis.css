@@ -1,0 +1,57 @@
+/*
+ * Frequent emoji row injected into YouTube's native emoji picker.
+ */
+yt-emoji-picker-renderer .ytcq-frequent-emoji-row {
+  box-sizing: border-box;
+  grid-column: 1 / -1;
+  flex: 0 0 auto;
+  width: 100%;
+  padding: 8px 12px 6px;
+  border-bottom: 1px solid var(--yt-spec-10-percent-layer, rgba(255, 255, 255, 0.12));
+}
+
+yt-emoji-picker-renderer .ytcq-frequent-emoji-label {
+  margin: 0 0 6px;
+  color: var(--yt-live-chat-secondary-text-color, var(--yt-spec-text-secondary, currentColor));
+  font: 500 12px/16px Roboto, Arial, sans-serif;
+}
+
+yt-emoji-picker-renderer .ytcq-frequent-emoji-list {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  overflow: hidden;
+}
+
+yt-emoji-picker-renderer .ytcq-frequent-emoji-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 1 32px;
+  min-width: 24px;
+  width: 32px;
+  max-width: 32px;
+  aspect-ratio: 1;
+  padding: 4px;
+  border: 0;
+  border-radius: 50%;
+  color: var(--yt-spec-text-primary, var(--yt-live-chat-primary-text-color, currentColor));
+  background: transparent;
+  font: 400 20px/1 Roboto, Arial, sans-serif;
+  cursor: pointer;
+}
+
+yt-emoji-picker-renderer .ytcq-frequent-emoji-button:hover,
+yt-emoji-picker-renderer .ytcq-frequent-emoji-button:focus {
+  background: var(--ytcq-hover-background);
+  outline: none;
+}
+
+yt-emoji-picker-renderer .ytcq-frequent-emoji-button img {
+  display: block;
+  width: 100%;
+  max-width: 24px;
+  height: auto;
+  aspect-ratio: 1;
+  object-fit: contain;
+}
