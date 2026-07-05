@@ -11,7 +11,11 @@ const profileTestState = vi.hoisted(() => ({
 const historyMocks = vi.hoisted(() => ({
   getLiveMessageForRecord: vi.fn(() => null),
   getRecentMessagesForIdentity: vi.fn(() => profileTestState.recentMessages),
-  getUserKeyFromIdentity: vi.fn(() => 'channel:viewer-channel'),
+  getUserKeyFromIdentity: vi.fn((identity: { authorName?: string; channelId?: string }) => {
+    if (identity.channelId) return `channel:${identity.channelId}`;
+    const authorName = (identity.authorName || '').trim().toLowerCase();
+    return authorName ? `author:${authorName}` : '';
+  }),
   onUserMessagesChanged: vi.fn((listener: (key: string) => void) => {
     profileTestState.userMessagesChanged = listener;
     return vi.fn();
@@ -200,6 +204,27 @@ describe('profile popup coordinator', () => {
     expect(sourceMocks.getParticipantProfileSource).toHaveBeenCalledWith(participant);
   });
 
+  it('reuses the open profile card when opening the same user again', () => {
+    const message = createMessage();
+    document.body.append(message);
+    wireProfileClick(message);
+    const avatar = message.querySelector<HTMLElement>('#author-photo')!;
+
+    avatar.click();
+    const card = document.querySelector<HTMLElement>('.ytcq-profile-card')!;
+    const initialZIndex = Number(card.style.zIndex);
+    avatar.click();
+
+    expect(document.querySelectorAll('.ytcq-profile-card:not(.ytcq-inbox-card)')).toHaveLength(1);
+    expect(document.querySelector('.ytcq-profile-card')).toBe(card);
+    expect(Number(card.style.zIndex)).toBeGreaterThan(initialZIndex);
+    expect(positioningMocks.positionProfileCard).toHaveBeenCalledOnce();
+
+    expect(openProfileCardForIdentity({ authorName: '@ViewerOne', channelId: 'viewer-channel' })).toBe(true);
+    expect(document.querySelectorAll('.ytcq-profile-card:not(.ytcq-inbox-card)')).toHaveLength(1);
+    expect(document.querySelector('.ytcq-profile-card')).toBe(card);
+  });
+
   it('allows multiple profile cards to stay open while opening another profile target', async () => {
     vi.useFakeTimers();
     const firstMessage = createMessage({ includeAuthorName: false });
@@ -349,7 +374,7 @@ describe('profile popup coordinator', () => {
     expect(avatar.hasAttribute('title')).toBe(false);
   });
 
-  it('closes from the header button, outside click, and Escape', async () => {
+  it('closes from the header button and Escape while ignoring outside clicks', async () => {
     vi.useFakeTimers();
     const message = createMessage();
     document.body.append(message);
@@ -362,10 +387,8 @@ describe('profile popup coordinator', () => {
     message.querySelector<HTMLElement>('#author-photo')!.click();
     await vi.runOnlyPendingTimersAsync();
     document.body.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-    expect(document.querySelector('.ytcq-profile-card')).toBeNull();
+    expect(document.querySelector('.ytcq-profile-card')).not.toBeNull();
 
-    message.querySelector<HTMLElement>('#author-photo')!.click();
-    await vi.runOnlyPendingTimersAsync();
     document.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Escape' }));
     expect(document.querySelector('.ytcq-profile-card')).toBeNull();
   });

@@ -35,7 +35,9 @@ import { getMessageProfileSource, getParticipantProfileSource } from './source';
 import type { ProfileSource } from './types';
 
 const profileCards = new Set<HTMLElement>();
+const profileCardsByKey = new Map<string, HTMLElement>();
 const profileCardCleanups = new WeakMap<HTMLElement, () => void>();
+const profileCardKeys = new WeakMap<HTMLElement, string>();
 let nextProfileCardZIndex = 10_000;
 let profileWiringListeners = new AbortController();
 
@@ -140,6 +142,14 @@ export function openProfileCardForIdentity(identity: UserIdentity, anchor?: HTML
 
 function showProfileCard(source: ProfileSource, anchor: HTMLElement): void {
   recordVisibleUserMessages();
+  const profileKey = getUserKeyFromIdentity(source.identity);
+  const existingCard = profileKey ? profileCardsByKey.get(profileKey) : null;
+  if (existingCard && isProfileCardOpen(existingCard)) {
+    bringProfileCardToFront(existingCard);
+    return;
+  }
+  if (profileKey) profileCardsByKey.delete(profileKey);
+
   const cardListeners = new AbortController();
 
   const card = ytcqCreateElement('section');
@@ -226,7 +236,6 @@ function showProfileCard(source: ProfileSource, anchor: HTMLElement): void {
   const list = ytcqCreateElement('div');
   list.className = 'ytcq-profile-card-messages';
 
-  const profileKey = getUserKeyFromIdentity(source.identity);
   const translationPriorityScope = createTranslationPriorityScope();
   const renderMessages = (): void => {
     const recentMessages = getRecentMessagesForIdentity(source.identity);
@@ -238,6 +247,10 @@ function showProfileCard(source: ProfileSource, anchor: HTMLElement): void {
   card.append(header, list);
   document.body.append(card);
   profileCards.add(card);
+  if (profileKey) {
+    profileCardsByKey.set(profileKey, card);
+    profileCardKeys.set(card, profileKey);
+  }
   bringProfileCardToFront(card);
   positionProfileCard(card, anchor);
   scrollElementToBottom(list);
@@ -278,15 +291,6 @@ function showProfileCard(source: ProfileSource, anchor: HTMLElement): void {
   resizeObserver.observe(card);
   schedulePosition('viewport');
 
-  const handleOutsideClick = (event: MouseEvent): void => {
-    const target = event.target as Element | null;
-    if (card.contains(event.target as Node)) {
-      bringProfileCardToFront(card);
-      return;
-    }
-    if (target?.closest?.('.ytcq-profile-card:not(.ytcq-inbox-card), .ytcq-profile-enabled')) return;
-    closeProfileCard(card);
-  };
   const handleKeydown = (event: KeyboardEvent): void => {
     if (event.key === 'Escape') closeProfileCard(card);
   };
@@ -318,7 +322,6 @@ function showProfileCard(source: ProfileSource, anchor: HTMLElement): void {
   window.setTimeout(() => {
     if (!isProfileCardOpen(card)) return;
     const options = { capture: true, signal: cardListeners.signal };
-    document.addEventListener('click', handleOutsideClick, options);
     document.addEventListener('keydown', handleKeydown, options);
     window.addEventListener('resize', handleResize, options);
   }, 0);
@@ -342,6 +345,11 @@ function prioritizeProfileMessageTranslations(
 function closeSingleProfileCard(card: HTMLElement): void {
   profileCardCleanups.get(card)?.();
   profileCardCleanups.delete(card);
+  const profileKey = profileCardKeys.get(card);
+  if (profileKey && profileCardsByKey.get(profileKey) === card) {
+    profileCardsByKey.delete(profileKey);
+  }
+  profileCardKeys.delete(card);
   profileCards.delete(card);
   card.remove();
 }

@@ -627,8 +627,7 @@
   #emoji-picker-button button,
   yt-live-chat-icon-toggle-button-renderer button,
   #send-button button,
-  yt-live-chat-message-input-renderer yt-reaction-control-panel-button-view-model button,
-  .ytcq-composer-translate-button
+  yt-live-chat-message-input-renderer yt-reaction-control-panel-button-view-model button
 ) {
   color: var(--ytcq-2007-accent-strong) !important;
   background: transparent !important;
@@ -639,8 +638,7 @@
   #emoji-picker-button button,
   yt-live-chat-icon-toggle-button-renderer button,
   #send-button button,
-  yt-live-chat-message-input-renderer yt-reaction-control-panel-button-view-model button,
-  .ytcq-composer-translate-button
+  yt-live-chat-message-input-renderer yt-reaction-control-panel-button-view-model button
 ):where(:hover, :focus) {
   background: rgba(255, 255, 255, 0.32) !important;
   outline: none !important;
@@ -658,8 +656,13 @@
 
 :root[data-ytcq-chat-skin="2007"] .ytcq-composer-translate-button:is(.ytcq-composer-translate-button-active, [aria-pressed="true"]) {
   color: var(--ytcq-2007-accent-strong) !important;
-  background: color-mix(in srgb, var(--ytcq-2007-accent) 12%, transparent) !important;
+  background: transparent !important;
   opacity: 1;
+}
+
+:root[data-ytcq-chat-skin="2007"] .ytcq-composer-translate-button:where(:hover, :focus) {
+  background: transparent !important;
+  outline: none !important;
 }
 
 :root[data-ytcq-chat-skin="2007"] yt-live-chat-message-input-renderer :where(
@@ -1489,8 +1492,7 @@
   #emoji-picker-button button,
   yt-live-chat-icon-toggle-button-renderer button,
   #send-button button,
-  yt-live-chat-message-input-renderer yt-reaction-control-panel-button-view-model button,
-  .ytcq-composer-translate-button
+  yt-live-chat-message-input-renderer yt-reaction-control-panel-button-view-model button
 ):where(:hover, :focus) {
   background: rgba(103, 200, 230, 0.16) !important;
 }
