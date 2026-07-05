@@ -17,6 +17,7 @@ describe('popup', () => {
       <button id="settingsTab" data-popup-tab-target="settingsPanel" aria-selected="true"></button>
       <button id="bookmarksTab" data-popup-tab-target="bookmarksPanel" aria-selected="false"></button>
       <button id="playgroundTab" data-popup-tab-target="playgroundPanel" aria-selected="false"></button>
+      <div class="popup-tab-panels">
       <div id="settingsPanel" data-popup-tab-panel>
       <select id="targetLanguage"></select>
       <select id="translationDisplay">
@@ -61,6 +62,10 @@ describe('popup', () => {
         <section id="playgroundGamesSection" hidden>
           <input id="playgroundGamesAvailable" type="checkbox">
         </section>
+        <section>
+          <select id="chatSkin"></select>
+        </section>
+      </div>
       </div>
       <footer>
         <span id="version"></span>
@@ -386,6 +391,45 @@ describe('popup', () => {
     expect(document.querySelector('.bookmark-row')?.classList.contains('bookmark-row-unmarked')).toBe(false);
   });
 
+  it('shows popup scroll fades only when the active panel has hidden content beyond that edge', async () => {
+    vi.mocked(chrome.tabs.query).mockImplementation(((_queryInfo: chrome.tabs.QueryInfo, callback?: (tabs: chrome.tabs.Tab[]) => void) => {
+      callback?.([]);
+      return Promise.resolve([]);
+    }) as never);
+    const settingsPanel = document.querySelector<HTMLElement>('#settingsPanel')!;
+    const bookmarksPanel = document.querySelector<HTMLElement>('#bookmarksPanel')!;
+    Object.defineProperties(settingsPanel, {
+      clientHeight: { configurable: true, value: 100 },
+      scrollHeight: { configurable: true, value: 300 },
+      scrollTop: { configurable: true, value: 0, writable: true }
+    });
+    Object.defineProperties(bookmarksPanel, {
+      clientHeight: { configurable: true, value: 100 },
+      scrollHeight: { configurable: true, value: 100 },
+      scrollTop: { configurable: true, value: 0, writable: true }
+    });
+
+    await import('./index');
+
+    const scrollRegion = document.querySelector<HTMLElement>('.popup-tab-panels')!;
+    expect(scrollRegion.classList.contains('popup-scroll-fade-top')).toBe(false);
+    expect(scrollRegion.classList.contains('popup-scroll-fade-bottom')).toBe(true);
+
+    settingsPanel.scrollTop = 80;
+    settingsPanel.dispatchEvent(new Event('scroll'));
+    expect(scrollRegion.classList.contains('popup-scroll-fade-top')).toBe(true);
+    expect(scrollRegion.classList.contains('popup-scroll-fade-bottom')).toBe(true);
+
+    settingsPanel.scrollTop = 200;
+    settingsPanel.dispatchEvent(new Event('scroll'));
+    expect(scrollRegion.classList.contains('popup-scroll-fade-top')).toBe(true);
+    expect(scrollRegion.classList.contains('popup-scroll-fade-bottom')).toBe(false);
+
+    document.querySelector<HTMLButtonElement>('#bookmarksTab')?.click();
+    expect(scrollRegion.classList.contains('popup-scroll-fade-top')).toBe(false);
+    expect(scrollRegion.classList.contains('popup-scroll-fade-bottom')).toBe(false);
+  });
+
   it('renders bookmark fallback rows, profile handles, and storage-change refreshes', async () => {
     await chrome.storage.local.set({
       [MARKED_USERS_STORAGE_KEY]: {
@@ -608,6 +652,7 @@ describe('popup', () => {
       <svg class="startup-effect-icon"></svg>
     `;
     await chrome.storage.sync.set({
+      chatSkin: '2007',
       lastTranslationTarget: 'ko',
       playgroundEnabled: true,
       playgroundGamesAvailable: true,
@@ -673,8 +718,15 @@ describe('popup', () => {
     const playgroundProfileWinsCount = document.querySelector<HTMLElement>('#playgroundProfileWinsCount')!;
     const playgroundGamesSection = document.querySelector<HTMLElement>('#playgroundGamesSection')!;
     const playgroundGamesAvailable = document.querySelector<HTMLInputElement>('#playgroundGamesAvailable')!;
+    const chatSkin = document.querySelector<HTMLSelectElement>('#chatSkin')!;
     const translationIcon = document.querySelector<SVGSVGElement>('.translation-target-icon')!;
+    const skinOptions = Array.from(chatSkin.options).map((option) => [option.value, option.textContent]);
 
+    expect(skinOptions).toEqual([
+      ['system', 'chatSkinDefault'],
+      ['2007', 'chatSkin2007']
+    ]);
+    expect(chatSkin.value).toBe('2007');
     expect(targetLanguage.value).toBe('ja');
     expect(translationIcon.querySelector('.translation-source-mark')).not.toBeNull();
     expect(translationIcon.querySelector('.translation-target-mark')).not.toBeNull();
@@ -725,6 +777,8 @@ describe('popup', () => {
     targetLanguage.dispatchEvent(new Event('change', { bubbles: true }));
     translationDisplay.value = 'replace';
     translationDisplay.dispatchEvent(new Event('change', { bubbles: true }));
+    chatSkin.value = 'system';
+    chatSkin.dispatchEvent(new Event('change', { bubbles: true }));
     sound.checked = true;
     sound.dispatchEvent(new Event('change', { bubbles: true }));
     startupEffect.checked = true;
@@ -736,6 +790,7 @@ describe('popup', () => {
     expect(document.querySelector('.translation-display-icon')?.classList.contains('ytcq-display-reflow')).toBe(true);
     expect(document.querySelector('.sound-icon')?.classList.contains('ytcq-bell-ringing')).toBe(true);
     expect(document.querySelector('.startup-effect-icon')?.classList.contains('ytcq-sparkle-burst')).toBe(true);
+    expect(chrome.storage.sync.set).toHaveBeenCalledWith({ chatSkin: 'system' });
     expect(playgroundGamesSection.hidden).toBe(false);
     expect(playgroundGamesSection.classList.contains('playground-group-collapsed')).toBe(true);
     expect(playgroundProfile.hidden).toBe(true);
@@ -1022,6 +1077,7 @@ describe('popup', () => {
       return Promise.resolve({ activeTabIds: [] });
     }) as never);
     await import('./index');
+    document.querySelector<HTMLSelectElement>('#chatSkin')!.value = '2007';
     document.querySelector<HTMLSelectElement>('#targetLanguage')!.value = 'ja';
     document.querySelector<HTMLInputElement>('#sound')!.checked = false;
     document.querySelector<HTMLButtonElement>('#resetExtension')?.click();
@@ -1054,6 +1110,7 @@ describe('popup', () => {
     expect(document.querySelector('.popup-reset-dialog-list')).toBeNull();
     expect(document.querySelector('.popup-reset-dialog-close')?.textContent).toBe('Close');
     expect(document.querySelector<HTMLInputElement>('#sound')?.checked).toBe(true);
+    expect(document.querySelector<HTMLSelectElement>('#chatSkin')?.value).toBe('system');
     expect(document.querySelector<HTMLSelectElement>('#targetLanguage')?.value).toBe('');
   });
 

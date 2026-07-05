@@ -6,6 +6,7 @@
  * it only exists while the current chat page is open.
  */
 import { t } from '../../shared/i18n';
+import { wireFloatingPanelDrag } from '../../shared/floating-panel-drag';
 import { createChannelIcon, createCloseIcon } from '../../shared/icons';
 import { ytcqCreateElement } from '../../shared/managed-dom';
 import { captureScrollPosition, restoreScrollPositionAfterRender, scrollElementToBottom } from '../../shared/scroll';
@@ -33,8 +34,9 @@ import { keepProfileCardInViewport, positionProfileCard } from './positioning';
 import { getMessageProfileSource, getParticipantProfileSource } from './source';
 import type { ProfileSource } from './types';
 
-let activeProfileCard: HTMLElement | null = null;
-let activeProfileCardCleanup: (() => void) | null = null;
+const profileCards = new Set<HTMLElement>();
+const profileCardCleanups = new WeakMap<HTMLElement, () => void>();
+let nextProfileCardZIndex = 10_000;
 let profileWiringListeners = new AbortController();
 
 registerFeatureLifecycle({
@@ -137,13 +139,16 @@ export function openProfileCardForIdentity(identity: UserIdentity, anchor?: HTML
 }
 
 function showProfileCard(source: ProfileSource, anchor: HTMLElement): void {
-  closeProfileCard();
   recordVisibleUserMessages();
+  const cardListeners = new AbortController();
 
   const card = ytcqCreateElement('section');
   card.className = 'ytcq-profile-card';
   card.setAttribute('role', 'dialog');
   card.setAttribute('aria-label', t('recentMessagesFromThisUser'));
+  card.addEventListener('pointerdown', () => bringProfileCardToFront(card), {
+    signal: cardListeners.signal
+  });
 
   const header = ytcqCreateElement('div');
   header.className = source.profileUrl
@@ -176,7 +181,7 @@ function showProfileCard(source: ProfileSource, anchor: HTMLElement): void {
         channelId: source.identity.channelId
       }
     });
-    closeProfileCard();
+    closeProfileCard(card);
   });
 
   const subtitle = ytcqCreateElement('div');
@@ -211,7 +216,11 @@ function showProfileCard(source: ProfileSource, anchor: HTMLElement): void {
   closeButton.className = 'ytcq-profile-card-header-button ytcq-profile-card-close';
   closeButton.setAttribute('aria-label', t('close'));
   closeButton.append(createCloseIcon());
-  closeButton.addEventListener('click', closeProfileCard);
+  closeButton.addEventListener('click', (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    closeProfileCard(card);
+  });
   header.append(closeButton);
 
   const list = ytcqCreateElement('div');
@@ -221,16 +230,24 @@ function showProfileCard(source: ProfileSource, anchor: HTMLElement): void {
   const translationPriorityScope = createTranslationPriorityScope();
   const renderMessages = (): void => {
     const recentMessages = getRecentMessagesForIdentity(source.identity);
-    renderProfileMessages(list, recentMessages, source, closeProfileCard);
+    renderProfileMessages(list, recentMessages, source, () => closeProfileCard(card));
     prioritizeProfileMessageTranslations(translationPriorityScope, recentMessages);
   };
   renderMessages();
 
   card.append(header, list);
   document.body.append(card);
-  activeProfileCard = card;
+  profileCards.add(card);
+  bringProfileCardToFront(card);
   positionProfileCard(card, anchor);
   scrollElementToBottom(list);
+  wireFloatingPanelDrag({
+    draggingClassName: 'ytcq-profile-card-dragging',
+    handle: header,
+    onDragStart: () => bringProfileCardToFront(card),
+    panel: card,
+    signal: cardListeners.signal
+  });
 
   let positionFrame = 0;
   let positionMode: 'anchor' | 'viewport' = 'viewport';
@@ -244,9 +261,9 @@ function showProfileCard(source: ProfileSource, anchor: HTMLElement): void {
       positionFrame = 0;
       const modeToApply = positionMode;
       positionMode = 'viewport';
-      if (activeProfileCard !== card) return;
+      if (!isProfileCardOpen(card)) return;
       if (!anchor.isConnected) {
-        closeProfileCard();
+        closeProfileCard(card);
         return;
       }
 
@@ -262,39 +279,44 @@ function showProfileCard(source: ProfileSource, anchor: HTMLElement): void {
   schedulePosition('viewport');
 
   const handleOutsideClick = (event: MouseEvent): void => {
-    if (activeProfileCard?.contains(event.target as Node)) return;
-    closeProfileCard();
+    const target = event.target as Element | null;
+    if (card.contains(event.target as Node)) {
+      bringProfileCardToFront(card);
+      return;
+    }
+    if (target?.closest?.('.ytcq-profile-card:not(.ytcq-inbox-card), .ytcq-profile-enabled')) return;
+    closeProfileCard(card);
   };
   const handleKeydown = (event: KeyboardEvent): void => {
-    if (event.key === 'Escape') closeProfileCard();
+    if (event.key === 'Escape') closeProfileCard(card);
   };
   const handleResize = (): void => {
-    if (!activeProfileCard) return;
+    if (!isProfileCardOpen(card)) return;
     if (!anchor.isConnected) {
-      closeProfileCard();
+      closeProfileCard(card);
       return;
     }
 
     schedulePosition('anchor');
   };
   const unsubscribeMessages = onUserMessagesChanged((key) => {
-    if (!activeProfileCard || !shouldRefreshProfileMessages(key, source, profileKey)) return;
+    if (!isProfileCardOpen(card) || !shouldRefreshProfileMessages(key, source, profileKey)) return;
     const scrollPosition = captureScrollPosition(list);
     renderMessages();
     schedulePosition('viewport');
     restoreScrollPositionAfterRender(list, scrollPosition);
   });
-  const cardListeners = new AbortController();
 
-  activeProfileCardCleanup = () => {
+  profileCardCleanups.set(card, () => {
     cardListeners.abort();
     if (positionFrame) window.cancelAnimationFrame(positionFrame);
     resizeObserver.disconnect();
     translationPriorityScope.close();
     unsubscribeMessages();
-  };
+  });
 
   window.setTimeout(() => {
+    if (!isProfileCardOpen(card)) return;
     const options = { capture: true, signal: cardListeners.signal };
     document.addEventListener('click', handleOutsideClick, options);
     document.addEventListener('keydown', handleKeydown, options);
@@ -302,11 +324,12 @@ function showProfileCard(source: ProfileSource, anchor: HTMLElement): void {
   }, 0);
 }
 
-export function closeProfileCard(): void {
-  activeProfileCardCleanup?.();
-  activeProfileCardCleanup = null;
-  activeProfileCard?.remove();
-  activeProfileCard = null;
+export function closeProfileCard(card?: HTMLElement): void {
+  if (card) {
+    closeSingleProfileCard(card);
+    return;
+  }
+  Array.from(profileCards).forEach(closeSingleProfileCard);
 }
 
 function prioritizeProfileMessageTranslations(
@@ -314,4 +337,19 @@ function prioritizeProfileMessageTranslations(
   recentMessages: MessageRecord[]
 ): void {
   scope.prioritize(recentMessages.map(getLiveMessageForRecord));
+}
+
+function closeSingleProfileCard(card: HTMLElement): void {
+  profileCardCleanups.get(card)?.();
+  profileCardCleanups.delete(card);
+  profileCards.delete(card);
+  card.remove();
+}
+
+function isProfileCardOpen(card: HTMLElement): boolean {
+  return profileCards.has(card) && card.isConnected;
+}
+
+function bringProfileCardToFront(card: HTMLElement): void {
+  card.style.zIndex = String(++nextProfileCardZIndex);
 }

@@ -354,9 +354,6 @@
     "popupAlerts": {
       "message": "Avvisi"
     },
-    "effects": {
-      "message": "Effetti"
-    },
     "playAlertSounds": {
       "message": "Riproduci suoni di avviso"
     },
@@ -509,6 +506,21 @@
     },
     "learnMore": {
       "message": "Scopri di più"
+    },
+    "chatSkin": {
+      "message": "Theme"
+    },
+    "chatSkinTitle": {
+      "message": "Choose a custom theme for YouTube chat."
+    },
+    "chatSkinHelper": {
+      "message": "Apply a custom theme to YouTube chat."
+    },
+    "chatSkinDefault": {
+      "message": "Default"
+    },
+    "chatSkin2007": {
+      "message": "2007"
     }
   }
 }

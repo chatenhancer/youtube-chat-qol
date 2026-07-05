@@ -5,9 +5,16 @@
  * against missing or malformed stored values so storage state cannot break
  * content-script startup.
  */
+import {
+  DEFAULT_CHAT_SKIN,
+  isChatSkin,
+  type ChatSkin
+} from './chat-skins';
+
 export type TranslationDisplay = 'replace' | 'below';
 
 export interface Options {
+  chatSkin: ChatSkin;
   composerTranslateLanguage: string;
   targetLanguage: string;
   lastTranslationTarget: string;
@@ -27,6 +34,7 @@ const DISABLED_PLAYGROUND_OPTIONS: Pick<Options, PlaygroundOptionKey> = {
 };
 
 export const DEFAULT_OPTIONS: Options = {
+  chatSkin: DEFAULT_CHAT_SKIN,
   composerTranslateLanguage: '',
   targetLanguage: '',
   lastTranslationTarget: DEFAULT_TRANSLATION_TARGET,
@@ -44,6 +52,9 @@ const TRANSLATION_DISPLAY_OPTIONS: readonly (readonly [TranslationDisplay, strin
 
 export function normalizeOptions(value: Partial<Options> | Record<string, unknown>): Options {
   const candidate = value as Record<string, unknown>;
+  const chatSkin = isChatSkin(candidate.chatSkin)
+    ? candidate.chatSkin
+    : DEFAULT_OPTIONS.chatSkin;
   const composerTranslateLanguage = getStringOption(candidate.composerTranslateLanguage);
   const targetLanguage = getStringOption(candidate.targetLanguage);
   const lastTranslationTarget = getStringOption(candidate.lastTranslationTarget) || targetLanguage || DEFAULT_TRANSLATION_TARGET;
@@ -52,6 +63,7 @@ export function normalizeOptions(value: Partial<Options> | Record<string, unknow
     : DEFAULT_OPTIONS.translationDisplay;
 
   return {
+    chatSkin,
     composerTranslateLanguage,
     targetLanguage,
     lastTranslationTarget,

@@ -9,6 +9,7 @@ export const controls = {
   extensionStatusText: document.querySelector<HTMLElement>('[data-extension-status-text]'),
   bookmarksCount: document.querySelector<HTMLElement>('#bookmarksCount'),
   bookmarksList: document.querySelector<HTMLElement>('#bookmarksList'),
+  chatSkin: document.querySelector<HTMLSelectElement>('#chatSkin'),
   targetLanguage: document.querySelector<HTMLSelectElement>('#targetLanguage'),
   translationDisplay: document.querySelector<HTMLSelectElement>('#translationDisplay'),
   sound: document.querySelector<HTMLInputElement>('#sound'),
@@ -28,6 +29,7 @@ export const controls = {
 };
 
 export interface PopupSettingsControls {
+  chatSkin: HTMLSelectElement;
   playgroundEnabled: HTMLInputElement;
   playgroundDisplayName: HTMLInputElement;
   playgroundGamesAvailable: HTMLInputElement;
@@ -48,6 +50,7 @@ export interface PopupSettingsControls {
 export function getSettingsControls(): PopupSettingsControls | null {
   const {
     targetLanguage,
+    chatSkin,
     translationDisplay,
     sound,
     startupEffect,
@@ -66,6 +69,7 @@ export function getSettingsControls(): PopupSettingsControls | null {
 
   if (
     !targetLanguage ||
+    !chatSkin ||
     !translationDisplay ||
     !sound ||
     !startupEffect ||
@@ -85,6 +89,7 @@ export function getSettingsControls(): PopupSettingsControls | null {
   }
 
   return {
+    chatSkin,
     playgroundEnabled,
     playgroundDisplayName,
     playgroundGamesAvailable,

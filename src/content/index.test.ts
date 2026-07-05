@@ -266,19 +266,19 @@ describe('content script entrypoint wiring', () => {
 
   it('suspends older content script instances when a newer one claims the document', async () => {
     await import('./index');
-    const firstObserver = observerCallbacks[0];
-    const firstDisconnect = observerDisconnects[0];
+    const firstDomObserver = observerCallbacks[0];
+    const firstDomDisconnect = observerDisconnects[0];
     lifecycleMocks.suspendFeatures.mockClear();
 
     vi.resetModules();
     await import('./index');
 
-    expect(firstDisconnect).toHaveBeenCalledOnce();
+    expect(firstDomDisconnect).toHaveBeenCalledOnce();
     expect(lifecycleMocks.suspendFeatures).toHaveBeenCalledOnce();
     expect(observerCallbacks).toHaveLength(2);
 
     lifecycleMocks.handleFeatureMutations.mockClear();
-    firstObserver?.([
+    firstDomObserver?.([
       mutation({
         addedNodes: [document.createElement('div')],
         target: document.body,
@@ -387,14 +387,25 @@ describe('content script entrypoint wiring', () => {
     const storageListener = vi.mocked(chrome.storage.onChanged.addListener).mock.calls.at(-1)?.[0];
 
     storageListener?.({
+      chatSkin: {
+        newValue: '2007',
+        oldValue: 'system'
+      },
       targetLanguage: {
         newValue: 'fr',
         oldValue: ''
       }
     }, 'local');
     expect(getOptions().targetLanguage).toBe('');
+    expect(document.documentElement.getAttribute('data-ytcq-chat-skin')).toBeNull();
+    expect(document.documentElement.getAttribute('data-ytcq-chat-skin-theme')).toBeNull();
 
+    document.documentElement.setAttribute('dark', '');
     storageListener?.({
+      chatSkin: {
+        newValue: '2007',
+        oldValue: 'system'
+      },
       targetLanguage: {
         newValue: 'fr',
         oldValue: ''
@@ -402,10 +413,25 @@ describe('content script entrypoint wiring', () => {
     }, 'sync');
 
     expect(getOptions().targetLanguage).toBe('fr');
+    expect(getOptions().chatSkin).toBe('2007');
+    expect(document.documentElement.getAttribute('data-ytcq-chat-skin')).toBe('2007');
+    expect(document.documentElement.getAttribute('data-ytcq-chat-skin-theme')).toBe('dark');
     expect(lifecycleMocks.handleFeatureOptionsChanged).toHaveBeenCalledWith(expect.any(Object), expect.objectContaining({
+      chatSkin: '2007',
       targetLanguage: 'fr'
     }));
+
+    storageListener?.({
+      chatSkin: {
+        newValue: 'system',
+        oldValue: '2007'
+      }
+    }, 'sync');
+    expect(document.documentElement.getAttribute('data-ytcq-chat-skin')).toBeNull();
+    expect(document.documentElement.getAttribute('data-ytcq-chat-skin-theme')).toBeNull();
+    expect(document.documentElement.hasAttribute('dark')).toBe(true);
   });
+
 });
 
 function createMessage(): HTMLElement {

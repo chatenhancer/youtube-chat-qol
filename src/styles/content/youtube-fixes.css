@@ -1,0 +1,88 @@
+/*
+ * Small compatibility tweaks for YouTube-owned live chat UI.
+ */
+ytd-menu-popup-renderer :where(
+  ytd-menu-service-item-renderer,
+  ytd-menu-navigation-item-renderer
+) tp-yt-paper-item {
+  box-sizing: border-box !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: 16px;
+  align-items: center !important;
+}
+
+ytd-menu-popup-renderer :where(
+  ytd-menu-service-item-renderer,
+  ytd-menu-navigation-item-renderer
+) tp-yt-paper-item:has(> :where(yt-icon, yt-img-shadow)) {
+  grid-template-columns: 24px minmax(0, 1fr) auto;
+}
+
+ytd-menu-popup-renderer :where(
+  ytd-menu-service-item-renderer,
+  ytd-menu-navigation-item-renderer
+) tp-yt-paper-item > :where(.text-wrapper, #text-wrapper) {
+  grid-column: 1;
+  align-self: center !important;
+  justify-self: start;
+  min-width: 0;
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 20px !important;
+}
+
+ytd-menu-popup-renderer :where(
+  ytd-menu-service-item-renderer,
+  ytd-menu-navigation-item-renderer
+) tp-yt-paper-item:has(> :where(yt-icon, yt-img-shadow)) > :where(.text-wrapper, #text-wrapper) {
+  grid-column: 2;
+}
+
+ytd-menu-popup-renderer :where(
+  ytd-menu-service-item-renderer,
+  ytd-menu-navigation-item-renderer
+) :where(.title, #title, #label, #primary-text, .text-wrapper > yt-formatted-string) {
+  display: block !important;
+  font-family: Roboto, Arial, sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 400 !important;
+  line-height: 20px !important;
+}
+
+ytd-menu-popup-renderer :where(
+  ytd-menu-service-item-renderer,
+  ytd-menu-navigation-item-renderer
+) tp-yt-paper-item > :where(yt-icon, yt-img-shadow) {
+  grid-column: 1;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex: 0 0 24px !important;
+  width: 24px !important;
+  height: 24px !important;
+  align-self: center !important;
+  justify-self: center;
+  margin: 0 !important;
+}
+
+ytd-menu-popup-renderer :where(
+  ytd-menu-service-item-renderer,
+  ytd-menu-navigation-item-renderer
+) tp-yt-paper-item > :where(yt-icon, yt-img-shadow),
+ytd-menu-popup-renderer :where(
+  ytd-menu-service-item-renderer,
+  ytd-menu-navigation-item-renderer
+) tp-yt-paper-item > :where(yt-icon, yt-img-shadow) :where(svg, img) {
+  width: 24px !important;
+  height: 24px !important;
+}
+
+ytd-menu-popup-renderer :where(
+  ytd-menu-service-item-renderer,
+  ytd-menu-navigation-item-renderer
+) tp-yt-paper-item > :where(tp-yt-paper-toggle-button, ytd-toggle-button-renderer) {
+  align-self: center !important;
+  justify-self: end;
+  margin-left: 0 !important;
+}

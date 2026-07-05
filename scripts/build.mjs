@@ -31,9 +31,13 @@ const htmlMinifyOptions = {
   removeOptionalTags: false,
   removeRedundantAttributes: false
 };
+const contentSkinCssSources = [
+  ['skins', 'src/styles/content/skins/2007.css']
+];
 const contentCssSources = [
   ['tokens', 'src/styles/content/tokens.css'],
   ['base', 'src/styles/content/base.css'],
+  ['features', 'src/styles/content/youtube-fixes.css'],
   ['features', 'src/styles/content/menus.css'],
   ['features', 'src/styles/content/enhanced-effect.css'],
   ['features', 'src/styles/content/composer-translation.css'],
@@ -46,17 +50,18 @@ const contentCssSources = [
   ['features', 'src/styles/content/chat-commands.css'],
   ['features', 'src/styles/content/translation.css'],
   ['features', 'src/styles/content/toast.css'],
+  ...contentSkinCssSources,
   ['browser-fixes', 'src/styles/content/browser-fixes.css']
 ];
 const popupCssSources = [
   [null, 'src/styles/popup/fonts.css'],
   ['tokens', 'src/styles/popup/tokens.css'],
+  ['base', 'src/styles/popup/controls.css'],
   ['base', 'src/styles/popup/layout.css'],
   ['features', 'src/styles/popup/playground.css'],
   ['features', 'src/styles/popup/bookmarks.css'],
   ['features', 'src/styles/popup/options.css'],
   ['features', 'src/styles/popup/animations.css'],
-  ['features', 'src/styles/popup/controls.css'],
   ['browser-fixes', 'src/styles/popup/browser-fixes.css']
 ];
 const targetOutputDirs = {

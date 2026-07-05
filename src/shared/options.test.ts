@@ -11,6 +11,7 @@ import {
 describe('shared option helpers', () => {
   it('normalizes malformed stored values to safe defaults', () => {
     expect(normalizeOptions({
+      chatSkin: 'classic',
       composerTranslateLanguage: 123,
       lastTranslationTarget: '',
       playgroundEnabled: 'yes',
@@ -26,6 +27,7 @@ describe('shared option helpers', () => {
 
   it('preserves explicit false booleans and valid display modes', () => {
     expect(normalizeOptions({
+      chatSkin: '2007',
       sound: false,
       startupEffect: false,
       playgroundEnabled: true,
@@ -34,6 +36,7 @@ describe('shared option helpers', () => {
     })).toMatchObject({
       sound: false,
       startupEffect: false,
+      chatSkin: '2007',
       playgroundEnabled: true,
       playgroundGamesAvailable: true,
       translationDisplay: 'below'

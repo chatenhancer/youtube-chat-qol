@@ -354,9 +354,6 @@
     "popupAlerts": {
       "message": "通知"
     },
-    "effects": {
-      "message": "エフェクト"
-    },
     "playAlertSounds": {
       "message": "アラート音を鳴らす"
     },
@@ -509,6 +506,21 @@
     },
     "learnMore": {
       "message": "詳細を見る"
+    },
+    "chatSkin": {
+      "message": "Theme"
+    },
+    "chatSkinTitle": {
+      "message": "Choose a custom theme for YouTube chat."
+    },
+    "chatSkinHelper": {
+      "message": "Apply a custom theme to YouTube chat."
+    },
+    "chatSkinDefault": {
+      "message": "Default"
+    },
+    "chatSkin2007": {
+      "message": "2007"
     }
   }
 }

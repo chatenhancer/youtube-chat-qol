@@ -200,6 +200,110 @@ describe('profile popup coordinator', () => {
     expect(sourceMocks.getParticipantProfileSource).toHaveBeenCalledWith(participant);
   });
 
+  it('allows multiple profile cards to stay open while opening another profile target', async () => {
+    vi.useFakeTimers();
+    const firstMessage = createMessage({ includeAuthorName: false });
+    const participant = document.createElement('yt-live-chat-participant-renderer');
+    participant.innerHTML = `
+      <img id="img">
+      <span id="author-name">@Participant</span>
+    `;
+    document.body.append(firstMessage, participant);
+    wireProfileClick(firstMessage);
+    wireParticipantProfileClick(participant);
+    const firstAvatar = firstMessage.querySelector<HTMLElement>('#author-photo')!;
+    const participantName = participant.querySelector<HTMLElement>('#author-name')!;
+
+    firstAvatar.click();
+    await vi.runOnlyPendingTimersAsync();
+    profileTestState.participantSource = source({
+      authorName: '@ViewerTwo',
+      identity: {
+        authorName: '@ViewerTwo',
+        channelId: 'viewer-two-channel'
+      },
+      profileUrl: 'https://www.youtube.com/@ViewerTwo'
+    });
+    participantName.click();
+
+    const cards = document.querySelectorAll('.ytcq-profile-card:not(.ytcq-inbox-card)');
+    expect(cards).toHaveLength(2);
+    expect(Array.from(cards).map((card) => card.textContent)).toEqual([
+      expect.stringContaining('@ViewerOne'),
+      expect.stringContaining('@ViewerTwo')
+    ]);
+  });
+
+  it('drags profile cards by the header and ignores header buttons', () => {
+    Object.defineProperty(window, 'innerHeight', {
+      configurable: true,
+      value: 400
+    });
+    Object.defineProperty(window, 'innerWidth', {
+      configurable: true,
+      value: 600
+    });
+    const message = createMessage();
+    document.body.append(message);
+    wireProfileClick(message);
+    message.querySelector<HTMLElement>('#author-photo')!.click();
+
+    const card = document.querySelector<HTMLElement>('.ytcq-profile-card')!;
+    const header = card.querySelector<HTMLElement>('.ytcq-profile-card-header')!;
+    vi.spyOn(card, 'getBoundingClientRect').mockReturnValue(createRect({
+      bottom: 200,
+      height: 180,
+      left: 100,
+      right: 400,
+      top: 20,
+      width: 300
+    }));
+    card.setPointerCapture = vi.fn();
+    card.releasePointerCapture = vi.fn();
+    card.style.transform = 'translateX(-50%)';
+
+    const ignoredDown = createPointerEvent('pointerdown', {
+      clientX: 120,
+      clientY: 40,
+      pointerId: 1
+    });
+    card.querySelector<HTMLButtonElement>('.ytcq-profile-card-close')!.dispatchEvent(ignoredDown);
+    expect(card.classList.contains('ytcq-profile-card-dragging')).toBe(false);
+
+    const down = createPointerEvent('pointerdown', {
+      clientX: 150,
+      clientY: 70,
+      pointerId: 7
+    });
+    const preventDefault = vi.spyOn(down, 'preventDefault');
+    header.dispatchEvent(down);
+
+    expect(preventDefault).toHaveBeenCalledOnce();
+    expect(card.classList.contains('ytcq-profile-card-dragging')).toBe(true);
+    expect(card.style.left).toBe('100px');
+    expect(card.style.top).toBe('20px');
+    expect(card.style.right).toBe('auto');
+    expect(card.style.bottom).toBe('auto');
+    expect(card.style.transform).toBe('');
+    expect(card.setPointerCapture).toHaveBeenCalledWith(7);
+
+    document.dispatchEvent(createPointerEvent('pointermove', {
+      clientX: 2_000,
+      clientY: -100,
+      pointerId: 7
+    }));
+    expect(card.style.left).toBe('292px');
+    expect(card.style.top).toBe('8px');
+
+    document.dispatchEvent(createPointerEvent('pointerup', {
+      clientX: 2_000,
+      clientY: -100,
+      pointerId: 7
+    }));
+    expect(card.classList.contains('ytcq-profile-card-dragging')).toBe(false);
+    expect(card.releasePointerCapture).toHaveBeenCalledWith(7);
+  });
+
   it('tolerates participants without clickable avatar or author targets', () => {
     const participant = document.createElement('yt-live-chat-participant-renderer');
 
@@ -390,12 +494,46 @@ function record(overrides: Partial<MessageRecord> = {}): MessageRecord {
   };
 }
 
-function createMessage(): HTMLElement {
+function createMessage({ includeAuthorName = true }: {
+  includeAuthorName?: boolean;
+} = {}): HTMLElement {
   const message = document.createElement('yt-live-chat-text-message-renderer');
   message.innerHTML = `
     <button id="author-photo"></button>
-    <span id="author-name">@ViewerOne</span>
+    ${includeAuthorName ? '<span id="author-name">@ViewerOne</span>' : ''}
     <span id="message">hello</span>
   `;
   return message;
+}
+
+function createRect(overrides: Partial<DOMRect>): DOMRect {
+  return {
+    bottom: 0,
+    height: 0,
+    left: 0,
+    right: 0,
+    top: 0,
+    width: 0,
+    x: overrides.left ?? 0,
+    y: overrides.top ?? 0,
+    toJSON: () => ({}),
+    ...overrides
+  } as DOMRect;
+}
+
+function createPointerEvent(type: string, options: {
+  clientX: number;
+  clientY: number;
+  pointerId: number;
+}): Event {
+  const event = new Event(type, {
+    bubbles: true,
+    cancelable: true
+  });
+  Object.defineProperties(event, {
+    clientX: { value: options.clientX },
+    clientY: { value: options.clientY },
+    pointerId: { value: options.pointerId }
+  });
+  return event;
 }

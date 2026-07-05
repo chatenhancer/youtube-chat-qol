@@ -6,6 +6,12 @@
  * close behavior, shared status overlay, and drag positioning.
  */
 import { createCloseIcon, createExpandIcon, createMinimizeIcon } from '../../../shared/icons';
+import {
+  anchorFloatingPanelAtPoint,
+  anchorFloatingPanelAtRect,
+  clampFloatingPanelToViewport,
+  wireFloatingPanelDrag
+} from '../../../shared/floating-panel-drag';
 import { ytcqCreateElement } from '../../../shared/managed-dom';
 import { createGamePanelStatusOverlay, type GamePanelStatusOverlay } from './panel-feedback';
 
@@ -130,10 +136,12 @@ export function createGamePanelShell({
   wireGamePanelShellDrag({
     draggingClassName: `${classNamePrefix}-panel-dragging`,
     header,
-    onClose,
     panel,
     signal
   });
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') onClose();
+  }, { capture: true, signal });
 
   function setCompactModeEnabled(options: GamePanelShellCompactOptions | null): void {
     compactOptions = options;
@@ -320,73 +328,32 @@ function cancelGamePanelSizeAnimation(panel: HTMLElement): void {
 
 function anchorGamePanelAtRect(panel: HTMLElement, rect: DOMRect): void {
   cancelGamePanelPositionAnimation(panel);
-  panel.style.left = `${Math.round(rect.left)}px`;
-  panel.style.top = `${Math.round(rect.top)}px`;
-  panel.style.right = 'auto';
-  panel.style.bottom = 'auto';
-  panel.style.transform = '';
+  anchorFloatingPanelAtRect(panel, rect);
 }
 
 function anchorGamePanelAtPoint(panel: HTMLElement, left: number, top: number): void {
   cancelGamePanelPositionAnimation(panel);
-  panel.style.left = `${Math.round(left)}px`;
-  panel.style.top = `${Math.round(top)}px`;
-  panel.style.right = 'auto';
-  panel.style.bottom = 'auto';
-  panel.style.transform = '';
+  anchorFloatingPanelAtPoint(panel, left, top);
 }
 
 function wireGamePanelShellDrag({
   draggingClassName,
   header,
-  onClose,
   panel,
   signal
 }: {
   draggingClassName: string;
   header: HTMLElement;
-  onClose: () => void;
   panel: HTMLElement;
   signal: AbortSignal;
 }): void {
-  let dragOffset: { x: number; y: number } | null = null;
-
-  header.addEventListener('pointerdown', (event) => {
-    if ((event.target as Element | null)?.closest('button')) return;
-
-    const rect = panel.getBoundingClientRect();
-    dragOffset = {
-      x: event.clientX - rect.left,
-      y: event.clientY - rect.top
-    };
-    panel.classList.add(draggingClassName);
-    anchorGamePanelAtRect(panel, rect);
-    panel.setPointerCapture?.(event.pointerId);
-    event.preventDefault();
-  }, { signal });
-
-  document.addEventListener('pointermove', (event) => {
-    if (!dragOffset) return;
-
-    const rect = panel.getBoundingClientRect();
-    const maxLeft = Math.max(8, window.innerWidth - rect.width - 8);
-    const maxTop = Math.max(8, window.innerHeight - rect.height - 8);
-    const left = Math.min(maxLeft, Math.max(8, event.clientX - dragOffset.x));
-    const top = Math.min(maxTop, Math.max(8, event.clientY - dragOffset.y));
-    anchorGamePanelAtPoint(panel, left, top);
-  }, { signal });
-
-  document.addEventListener('pointerup', (event) => {
-    if (!dragOffset) return;
-
-    dragOffset = null;
-    panel.classList.remove(draggingClassName);
-    panel.releasePointerCapture?.(event.pointerId);
-  }, { signal });
-
-  document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape') onClose();
-  }, { capture: true, signal });
+  wireFloatingPanelDrag({
+    draggingClassName,
+    handle: header,
+    onDragStart: () => cancelGamePanelPositionAnimation(panel),
+    panel,
+    signal
+  });
 }
 
 function anchorGamePanelPosition(panel: HTMLElement): void {
@@ -394,10 +361,6 @@ function anchorGamePanelPosition(panel: HTMLElement): void {
 }
 
 function clampGamePanelPosition(panel: HTMLElement): void {
-  const rect = panel.getBoundingClientRect();
-  const maxLeft = Math.max(8, window.innerWidth - rect.width - 8);
-  const maxTop = Math.max(8, window.innerHeight - rect.height - 8);
-  const left = Math.min(maxLeft, Math.max(8, rect.left));
-  const top = Math.min(maxTop, Math.max(8, rect.top));
-  anchorGamePanelAtPoint(panel, left, top);
+  cancelGamePanelPositionAnimation(panel);
+  clampFloatingPanelToViewport(panel);
 }

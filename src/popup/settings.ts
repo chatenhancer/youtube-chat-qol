@@ -1,4 +1,5 @@
 import { LANGUAGE_OPTIONS } from '../shared/languages';
+import { CHAT_SKIN_OPTIONS } from '../shared/chat-skins';
 import { createSplitTranslateIcon } from '../shared/icons';
 import {
   getPlaygroundAvatarPresentation,
@@ -44,6 +45,7 @@ export function initSettingsControls(popupLocale: string): void {
   if (!settingsControls) return;
 
   const {
+    chatSkin,
     targetLanguage,
     translationDisplay,
     sound,
@@ -55,10 +57,11 @@ export function initSettingsControls(popupLocale: string): void {
   } = settingsControls;
 
   preparePopupTranslationIcon();
+  populateChatSkinOptions(chatSkin);
 
-  targetLanguage.appendChild(createLanguageOption('', getExtensionMessage('off')));
+  targetLanguage.appendChild(createSelectOption('', getExtensionMessage('off')));
   for (const [value, label] of LANGUAGE_OPTIONS) {
-    targetLanguage.appendChild(createLanguageOption(value, getLocalizedLanguageLabel(value, popupLocale) || label));
+    targetLanguage.appendChild(createSelectOption(value, getLocalizedLanguageLabel(value, popupLocale) || label));
   }
 
   chrome.storage.sync.get(DEFAULT_OPTIONS, (storedOptions: Partial<Options>) => {
@@ -77,6 +80,11 @@ export function initSettingsControls(popupLocale: string): void {
   translationDisplay.addEventListener('change', () => {
     animatePopupDisplayIcon();
     save({ translationDisplay: translationDisplay.value as Options['translationDisplay'] });
+  });
+
+  chatSkin.addEventListener('change', () => {
+    const nextSkin = chatSkin.value as Options['chatSkin'];
+    save({ chatSkin: nextSkin });
   });
 
   sound.addEventListener('change', () => {
@@ -129,6 +137,7 @@ export function applyOptionsToControls(options: Partial<Options>): void {
   if (!settingsControls) return;
 
   const {
+    chatSkin,
     targetLanguage,
     translationDisplay,
     sound,
@@ -138,6 +147,7 @@ export function applyOptionsToControls(options: Partial<Options>): void {
   } = settingsControls;
 
   const normalized = normalizeOptions(options);
+  chatSkin.value = normalized.chatSkin;
   lastKnownTranslationTarget = normalized.lastTranslationTarget;
   targetLanguage.value = normalized.targetLanguage;
   translationDisplay.value = normalized.translationDisplay;
@@ -163,6 +173,12 @@ function preparePopupTranslationIcon(): void {
     sourceClassName: 'translation-source-mark',
     targetClassName: 'translation-target-mark'
   }));
+}
+
+function populateChatSkinOptions(chatSkin: HTMLSelectElement): void {
+  chatSkin.replaceChildren(...CHAT_SKIN_OPTIONS.map(({ id, labelMessage }) =>
+    createSelectOption(id, getExtensionMessage(labelMessage))
+  ));
 }
 
 function updatePlaygroundGamesVisibility(playgroundEnabled: boolean, animated = false): void {
@@ -357,7 +373,7 @@ function setPlaygroundProfileDetailsExpanded(expanded: boolean): void {
   settingsControls.playgroundProfileDetails.hidden = !expanded;
 }
 
-function createLanguageOption(value: string, label: string): HTMLOptionElement {
+function createSelectOption(value: string, label: string): HTMLOptionElement {
   const option = document.createElement('option');
   option.value = value;
   option.textContent = label;

@@ -3,7 +3,9 @@
  */
 body {
   width: 350px;
+  height: 465px;
   margin: 0;
+  overflow: hidden;
   color: var(--ytcq-popup-text);
   font-family: "Inter", Arial, sans-serif;
   background: var(--ytcq-popup-card-bg);
@@ -12,7 +14,8 @@ body {
 main {
   box-sizing: border-box;
   display: grid;
-  grid-template-rows: auto auto auto auto;
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  height: 100%;
   padding: 10px 12px 8px;
   background: var(--ytcq-popup-card-bg);
 }
@@ -329,6 +332,34 @@ main {
   min-height: 0;
 }
 
+.popup-tab-panels::before,
+.popup-tab-panels::after {
+  position: absolute;
+  right: 0;
+  left: 0;
+  z-index: 2;
+  height: 16px;
+  content: "";
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 120ms ease;
+}
+
+.popup-tab-panels::before {
+  top: 0;
+  background: linear-gradient(180deg, var(--ytcq-popup-card-bg) 0%, transparent 100%);
+}
+
+.popup-tab-panels::after {
+  bottom: 0;
+  background: linear-gradient(0deg, var(--ytcq-popup-card-bg) 0%, transparent 100%);
+}
+
+.popup-scroll-fade-top::before,
+.popup-scroll-fade-bottom::after {
+  opacity: 1;
+}
+
 .popup-tab-panel {
   grid-area: 1 / 1;
   display: flex;
@@ -337,10 +368,22 @@ main {
   overflow: hidden;
 }
 
+.popup-tab-panel > .settings-section {
+  flex: 0 0 auto;
+}
+
 #settingsPanel[hidden] {
   display: flex;
   visibility: hidden;
+  overflow: hidden;
   pointer-events: none;
+}
+
+#settingsPanel:not([hidden]) {
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
 }
 
 #bookmarksPanel[hidden],

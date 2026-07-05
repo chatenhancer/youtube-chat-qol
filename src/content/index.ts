@@ -27,6 +27,10 @@ import {
   type FeatureMutationBatch
 } from './lifecycle';
 import { DEFAULT_OPTIONS, getTargetLanguageUpdate, normalizeOptions, type Options } from '../shared/options';
+import {
+  DEFAULT_CHAT_SKIN,
+  type ChatSkinTheme
+} from '../shared/chat-skins';
 import { getOptions, setOptions } from '../shared/state';
 import { initUiLocaleFromDocument } from '../shared/i18n';
 import { requestYouTubeMessageData, type YouTubeMessageData } from '../youtube/message-data';
@@ -41,6 +45,9 @@ interface NormalizedMutationBatch {
 const CONTENT_INSTANCE_ATTRIBUTE = 'data-ytcq-content-instance';
 const CONTENT_INSTANCE_CLAIM_EVENT = 'ytcq:content-instance-claim';
 const CONTENT_INSTANCE_ID = `${Date.now()}-${Math.random()}`;
+const CHAT_SKIN_ATTRIBUTE = 'data-ytcq-chat-skin';
+const CHAT_SKIN_THEME_ATTRIBUTE = 'data-ytcq-chat-skin-theme';
+const YOUTUBE_DARK_ATTRIBUTE = 'dark';
 
 let observer: MutationObserver | null = null;
 let visibilityRecoveryTimer = 0;
@@ -59,6 +66,7 @@ async function init(): Promise<void> {
   chrome.storage.sync.get(DEFAULT_OPTIONS, (storedOptions) => {
     if (!isCurrentContentInstance()) return;
     setOptions(normalizeOptions(storedOptions));
+    applyChatSkin(getOptions());
     boot();
   });
 
@@ -75,6 +83,7 @@ async function init(): Promise<void> {
     }
 
     setOptions(normalizeOptions(nextOptions));
+    applyChatSkin(getOptions());
     notifyFeatureOptionsChanged(previousOptions, getOptions());
   });
 
@@ -299,8 +308,34 @@ function saveOptions(values: Partial<Options>): void {
       }
     : values;
   setOptions(normalizeOptions({ ...previousOptions, ...nextValues }));
+  applyChatSkin(getOptions());
   notifyFeatureOptionsChanged(previousOptions, getOptions());
   chrome.storage.sync.set(nextValues);
+}
+
+function applyChatSkin(options: Pick<Options, 'chatSkin'>): void {
+  const previousSkin = document.documentElement.getAttribute(CHAT_SKIN_ATTRIBUTE) || DEFAULT_CHAT_SKIN;
+  const previousTheme = document.documentElement.getAttribute(CHAT_SKIN_THEME_ATTRIBUTE);
+  const resolvedTheme = options.chatSkin === DEFAULT_CHAT_SKIN
+    ? null
+    : resolveChatSkinTheme();
+
+  if (previousSkin === options.chatSkin && previousTheme === resolvedTheme) {
+    return;
+  }
+
+  if (options.chatSkin === DEFAULT_CHAT_SKIN) {
+    document.documentElement.removeAttribute(CHAT_SKIN_ATTRIBUTE);
+    document.documentElement.removeAttribute(CHAT_SKIN_THEME_ATTRIBUTE);
+    return;
+  }
+
+  document.documentElement.setAttribute(CHAT_SKIN_ATTRIBUTE, options.chatSkin);
+  document.documentElement.setAttribute(CHAT_SKIN_THEME_ATTRIBUTE, resolvedTheme ?? resolveChatSkinTheme());
+}
+
+function resolveChatSkinTheme(): ChatSkinTheme {
+  return document.documentElement.hasAttribute(YOUTUBE_DARK_ATTRIBUTE) ? 'dark' : 'light';
 }
 
 function notifyFeatureOptionsChanged(previousOptions: Options, nextOptions: Options): void {
@@ -312,6 +347,7 @@ function resetPageState(): void {
   if (!isCurrentContentInstance()) return;
   const previousOptions = getOptions();
   setOptions(DEFAULT_OPTIONS);
+  applyChatSkin(DEFAULT_OPTIONS);
   resetFeatures();
   notifyFeatureOptionsChanged(previousOptions, DEFAULT_OPTIONS);
 }

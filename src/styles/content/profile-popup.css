@@ -2,6 +2,8 @@
  * Recent-message profile card, bookmark affordances, and profile card actions.
  */
 .ytcq-profile-card {
+  --ytcq-profile-card-padding: 12px;
+
   position: fixed;
   z-index: 10000;
   display: flex;
@@ -9,7 +11,7 @@
   width: min(340px, calc(100vw - 16px));
   max-height: min(420px, calc(100vh - 16px));
   box-sizing: border-box;
-  padding: 12px;
+  padding: var(--ytcq-profile-card-padding);
   border: 1px solid var(--ytcq-control-border);
   border-radius: 8px;
   color: var(--yt-spec-text-primary, var(--yt-live-chat-primary-text-color, #f1f1f1));
@@ -23,6 +25,48 @@
   grid-template-columns: 36px minmax(0, 1fr) 28px 28px;
   column-gap: 10px;
   align-items: center;
+}
+
+.ytcq-profile-card:not(.ytcq-inbox-card):not(.ytcq-games-card) .ytcq-profile-card-header {
+  position: relative;
+  margin: calc(-1 * var(--ytcq-profile-card-padding)) calc(-1 * var(--ytcq-profile-card-padding)) 0;
+  padding: calc(var(--ytcq-profile-card-padding) + 16px) var(--ytcq-profile-card-padding) 0;
+  cursor: grab;
+  user-select: none;
+}
+
+.ytcq-profile-card:not(.ytcq-inbox-card):not(.ytcq-games-card) .ytcq-profile-card-header::before {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 42px;
+  height: 11px;
+  border-bottom-right-radius: 9px;
+  border-bottom-left-radius: 9px;
+  background: rgba(128, 128, 128, 0.16);
+  background: color-mix(in srgb, var(--ytcq-control-border) 40%, transparent);
+  content: "";
+  pointer-events: none;
+  transform: translateX(-50%);
+}
+
+.ytcq-profile-card:not(.ytcq-inbox-card):not(.ytcq-games-card) .ytcq-profile-card-header::after {
+  position: absolute;
+  top: 4px;
+  left: 50%;
+  width: 25px;
+  height: 4px;
+  background:
+    radial-gradient(circle, var(--yt-live-chat-secondary-text-color, var(--yt-spec-text-secondary, #aaa)) 1px, transparent 1.4px)
+    0 0 / 6px 4px repeat-x;
+  content: "";
+  opacity: 0.52;
+  pointer-events: none;
+  transform: translateX(-50%);
+}
+
+.ytcq-profile-card-dragging .ytcq-profile-card-header {
+  cursor: grabbing;
 }
 
 .ytcq-profile-card-header-has-channel {

@@ -25,6 +25,7 @@ ytd-menu-popup-renderer.ytcq-context-expanded-menu #items {
 
 ytd-menu-popup-renderer .ytcq-settings-item .ytcq-paper-item,
 ytd-menu-popup-renderer .ytcq-context-item .ytcq-paper-item {
+  --ytcq-menu-hover-background: var(--yt-spec-touch-response, var(--yt-spec-10-percent-layer, rgba(128, 128, 128, 0.16)));
   cursor: pointer;
   min-height: 40px;
   padding: 0 16px 0 16px;
@@ -43,7 +44,7 @@ ytd-menu-popup-renderer .ytcq-context-item .ytcq-paper-item {
 
 ytd-menu-popup-renderer .ytcq-settings-item .ytcq-paper-item:hover,
 ytd-menu-popup-renderer .ytcq-context-item .ytcq-paper-item:hover {
-  background: var(--ytcq-hover-background);
+  background: var(--ytcq-menu-hover-background);
 }
 
 ytd-menu-popup-renderer .ytcq-context-split-item .ytcq-paper-item {
@@ -80,7 +81,7 @@ ytd-menu-popup-renderer .ytcq-context-split-button {
 
 ytd-menu-popup-renderer .ytcq-context-split-button:hover,
 ytd-menu-popup-renderer .ytcq-context-split-button:focus {
-  background: var(--ytcq-hover-background);
+  background: var(--ytcq-menu-hover-background);
   outline: none;
 }
 
