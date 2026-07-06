@@ -102,6 +102,13 @@ Run mock browser performance specs:
 npm run test:browser:perf
 ```
 
+Run the manual hybrid real-DOM performance benchmark against a real YouTube
+chat iframe:
+
+```sh
+npm run test:browser:perf:live
+```
+
 Run only a subset with Playwright's grep:
 
 ```sh
@@ -202,6 +209,30 @@ Use `tests/browser/support/mock-perf.ts` for common instrumentation:
 - record long tasks and frame gaps
 - collect optional heap snapshots
 - write JSON and Markdown summaries to `test-results/performance/`
+
+The sustained busy-stream spec can be scaled with:
+
+```sh
+YTCQ_PERF_BUSY_STREAM_WAVES=16 \
+YTCQ_PERF_BUSY_STREAM_WAVE_SIZE=80 \
+YTCQ_PERF_BUSY_STREAM_WAVE_INTERVAL_MS=100 \
+npm run test:browser:perf -- --grep "busy stream"
+```
+
+The live hybrid real-DOM benchmark can be scaled with:
+
+```sh
+YTCQ_PERF_LIVE_HYBRID_WAVES=10 \
+YTCQ_PERF_LIVE_HYBRID_WAVE_SIZE=60 \
+YTCQ_PERF_LIVE_HYBRID_WAVE_INTERVAL_MS=120 \
+npm run test:browser:perf:live
+```
+
+That live benchmark opens `YTCQ_LIVE_URL` or the default live URL, clones
+existing YouTube chat renderer DOM inside the iframe, and appends local
+synthetic messages. It does not send YouTube chat messages. Its numbers are
+closer to real YouTube DOM cost than mock fixture tests, but they are less
+stable because page load, live chat composition, and YouTube experiments vary.
 
 Keep performance tests mock-only unless there is a specific reason to involve
 real YouTube. Real YouTube performance numbers are harder to compare because

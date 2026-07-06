@@ -22,8 +22,7 @@ import {
   stopBrowserPerfProbe,
   withMockedPerformanceTranslationEndpoint,
   writePerformanceReport,
-  type BrowserPerfProbeSnapshot,
-  type HeapSnapshot
+  type BrowserPerfProbeSnapshot
 } from '../support/mock-perf';
 
 const MESSAGE_COUNT = getPositiveIntegerEnv('YTCQ_PERF_MESSAGE_COUNT', 180);
@@ -75,6 +74,7 @@ test('youtube-mock performance: fast chat stays responsive with translation and 
             { label: 'Append burst', value: formatMs(appendBurstMs), budget: formatMs(BUDGETS.appendBurstMs) },
             { label: 'Translation drain', value: formatMs(translationDrainMs), budget: formatMs(BUDGETS.translationDrainMs) },
             { label: 'Translation requests', value: translationStats.requestCount },
+            { label: 'Translation items', value: translationStats.translatedItemCount, budget: `>= ${MESSAGE_COUNT}` },
             { label: 'Rendered translations', value: visibleTranslationCount, budget: `>= ${MESSAGE_COUNT}` },
             { label: 'Keyword highlights', value: visibleKeywordHighlightCount, budget: `>= ${MESSAGE_COUNT}` },
             { label: 'Long tasks', value: probe.longTaskCount },
@@ -88,12 +88,10 @@ test('youtube-mock performance: fast chat stays responsive with translation and 
         await writePerformanceReport(testInfo, 'youtube-mock-fast-chat', report);
         assertPerformanceBudgets({
           appendBurstMs,
-          heapAfter,
-          heapBefore,
           heapGrowthMb,
           probe,
+          translatedItemCount: translationStats.translatedItemCount,
           translationDrainMs,
-          translationRequestCount: translationStats.requestCount,
           visibleKeywordHighlightCount,
           visibleTranslationCount
         });
@@ -123,18 +121,16 @@ function assertPerformanceBudgets({
   appendBurstMs,
   heapGrowthMb,
   probe,
+  translatedItemCount,
   translationDrainMs,
-  translationRequestCount,
   visibleKeywordHighlightCount,
   visibleTranslationCount
 }: {
   appendBurstMs: number;
-  heapAfter: HeapSnapshot | null;
-  heapBefore: HeapSnapshot | null;
   heapGrowthMb: number | null;
   probe: BrowserPerfProbeSnapshot;
+  translatedItemCount: number;
   translationDrainMs: number;
-  translationRequestCount: number;
   visibleKeywordHighlightCount: number;
   visibleTranslationCount: number;
 }): void {
@@ -146,7 +142,7 @@ function assertPerformanceBudgets({
     .toBeGreaterThanOrEqual(MESSAGE_COUNT);
   expect.soft(visibleKeywordHighlightCount, 'Keyword matching should keep up with the appended chat burst.')
     .toBeGreaterThanOrEqual(MESSAGE_COUNT);
-  expect.soft(translationRequestCount, 'The mocked translation endpoint should receive the burst.')
+  expect.soft(translatedItemCount, 'The mocked translation endpoint should process the burst.')
     .toBeGreaterThanOrEqual(MESSAGE_COUNT);
   expect.soft(probe.maxLongTaskMs, 'No single observed long task should be catastrophic.')
     .toBeLessThanOrEqual(BUDGETS.maxLongTaskMs);

@@ -25,9 +25,13 @@ popup status, composer behavior, and real YouTube DOM compatibility.
 **Browser performance tests**
 
 `npm run test:browser:perf` runs deterministic mock YouTube stress checks for
-fast chat, translation backlog, keyword matching, panels, and composer
-translation debounce. These are separate from `verify` so performance budgets
-can be checked intentionally.
+fast chat, sustained busy streams, translation backlog, keyword matching,
+panels, and composer translation debounce. These are separate from `verify` so
+performance budgets can be checked intentionally.
+
+`npm run test:browser:perf:live` runs the manual hybrid real-DOM benchmark
+against a real YouTube chat iframe. It clones existing renderer DOM locally and
+does not send YouTube chat messages.
 
 ## Commands
 

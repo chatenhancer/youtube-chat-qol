@@ -10,6 +10,7 @@ import { defineConfig } from '@playwright/test';
 
 const reportOutputFolder = process.env.YTCQ_PLAYWRIGHT_REPORT_DIR ?? 'playwright-report/performance';
 const jsonReportPath = process.env.YTCQ_PLAYWRIGHT_JSON_REPORT ?? 'test-results/performance/playwright-report.json';
+const includeLivePerformanceTests = process.env.YTCQ_PERF_INCLUDE_LIVE === '1';
 
 export default defineConfig({
   expect: {
@@ -18,15 +19,10 @@ export default defineConfig({
   fullyParallel: false,
   outputDir: 'test-results/performance/browser',
   projects: [
-    {
-      name: 'youtube-mock-perf',
-      testMatch: /specs\/yt-mock-perf-.*\.spec\.ts/,
-      use: {
-        screenshot: 'only-on-failure',
-        trace: 'retain-on-failure',
-        video: 'off'
-      }
-    }
+    createPerformanceProject('youtube-mock-perf', /specs\/yt-mock-perf-.*\.spec\.ts/),
+    ...(includeLivePerformanceTests
+      ? [createPerformanceProject('youtube-live-perf', /specs\/yt-live-perf-.*\.spec\.ts/)]
+      : [])
   ],
   reporter: [
     ['list'],
@@ -41,3 +37,15 @@ export default defineConfig({
   },
   workers: 1
 });
+
+function createPerformanceProject(name: string, testMatch: RegExp) {
+  return {
+    name,
+    testMatch,
+    use: {
+      screenshot: 'only-on-failure' as const,
+      trace: 'retain-on-failure' as const,
+      video: 'off' as const
+    }
+  };
+}

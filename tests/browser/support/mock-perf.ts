@@ -38,6 +38,7 @@ export interface PerformanceReport {
 
 export interface MockChatMessage {
   author: string;
+  channel?: string;
   text: string;
 }
 
@@ -63,6 +64,7 @@ export async function appendMockChatBurst(page: Page, messages: MockChatMessage[
     const appendMessage = (window as typeof window & {
       ytcqAppendFixtureMessage?: (_message: {
         author: string;
+        channel?: string;
         text: string;
       }) => string | null;
     }).ytcqAppendFixtureMessage;

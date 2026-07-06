@@ -241,6 +241,7 @@ export function createLiveChatFixtureHtml({
         const id = getMessageId(number);
         const message = document.createElement('yt-live-chat-text-message-renderer');
         const avatarSrc = createAvatarSrc(fixtureMessage.author.replace(/^@/, '').slice(0, 1).toUpperCase(), number);
+        const channelId = fixtureMessage.channel || \`UCFixtureChannel\${number}\`;
         message.id = id;
         message.innerHTML = \`
           <yt-img-shadow id="author-photo" height="24" width="24" loaded="">
@@ -265,7 +266,7 @@ export function createLiveChatFixtureHtml({
           </div>
         \`;
         message.data = {
-          authorExternalChannelId: \`UCFixtureChannel\${number}\`,
+          authorExternalChannelId: channelId,
           authorName: { simpleText: fixtureMessage.author },
           authorPhoto: { thumbnails: [{ url: avatarSrc }] },
           timestampUsec: String(1780000000000000 + number)
@@ -294,6 +295,7 @@ export function createLiveChatFixtureHtml({
 
         const fixtureMessage = {
           author: String(overrides.author || '@BrowserTestViewer'),
+          channel: typeof overrides.channel === 'string' ? overrides.channel : '',
           text: String(overrides.text || 'Browser test message')
         };
         const message = createMessage(fixtureMessage, nextMessageNumber);
