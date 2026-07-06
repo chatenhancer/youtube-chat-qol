@@ -562,14 +562,17 @@ describe('playground games header button', () => {
     expect(getActionButtonLabels()).toEqual(['Resume', 'Leave']);
     getActionButton('Resume').click();
     expect(document.querySelector('.ytcq-chess-game-panel')).not.toBeNull();
-    expect(document.querySelector('.ytcq-games-card')).not.toBeNull();
+    expect(document.querySelector('.ytcq-games-card')).toBeNull();
+    expect(gamesButton.getAttribute('aria-expanded')).toBe('false');
+    gamesButton.click();
     expect(getActionButtonLabels()).toEqual(['Hide', 'Leave']);
     document.querySelector<HTMLButtonElement>('.ytcq-chess-game-close')!.click();
     expect(document.querySelector('.ytcq-chess-game-panel')).toBeNull();
     expect(getActionButtonLabels()).toEqual(['Resume', 'Leave']);
     getActionButton('Resume').click();
     expect(document.querySelector('.ytcq-chess-game-panel')).not.toBeNull();
-    expect(document.querySelector('.ytcq-games-card')).not.toBeNull();
+    expect(document.querySelector('.ytcq-games-card')).toBeNull();
+    gamesButton.click();
     getActionButton('Leave').click();
     expect(getActionButton('Leave').disabled).toBe(true);
     expect(getActionButton('Leave').querySelector('.ytcq-games-loading-spinner')).not.toBeNull();
@@ -624,7 +627,8 @@ describe('playground games header button', () => {
     setOptions({ ...DEFAULT_OPTIONS, playgroundEnabled: true, playgroundGamesAvailable: true });
 
     wireGamesButton();
-    header.querySelector<HTMLButtonElement>('.ytcq-games-button')!.click();
+    const gamesButton = header.querySelector<HTMLButtonElement>('.ytcq-games-button')!;
+    gamesButton.click();
     lastMockPort()?.emit(createSnapshotMessage({
       ...createLobbySnapshot(),
       games: [createBountyHuntingGame()],
@@ -633,18 +637,22 @@ describe('playground games header button', () => {
 
     getActionButton('Resume').click();
     expect(document.querySelector('.ytcq-bounty-hunting-game-panel')).not.toBeNull();
+    expect(document.querySelector('.ytcq-games-card')).toBeNull();
     expect(document.querySelector('.ytcq-bounty-hunting-game-title')?.textContent).toBe('The Wild Wild Chat');
 
     document.querySelector<HTMLButtonElement>('.ytcq-bounty-hunting-game-compact-toggle')!.click();
     expect(document.querySelector('.ytcq-bounty-hunting-game-panel')?.classList.contains('ytcq-game-panel-compact')).toBe(true);
 
+    gamesButton.click();
     getActionButton('Hide').click();
     expect(document.querySelector('.ytcq-bounty-hunting-game-panel')).toBeNull();
 
     getActionButton('Resume').click();
     expect(document.querySelector('.ytcq-bounty-hunting-game-panel')?.classList.contains('ytcq-game-panel-compact')).toBe(true);
+    expect(document.querySelector('.ytcq-games-card')).toBeNull();
     expect(document.querySelector('.ytcq-bounty-hunting-canvas')?.classList.contains('ytcq-bounty-hunting-canvas-compact')).toBe(true);
 
+    gamesButton.click();
     getActionButton('Hide').click();
     const bountyInvite = {
       ...createLobbySnapshot().invites[0],
@@ -852,12 +860,14 @@ describe('playground games header button', () => {
 
     getActionButton('Resume').click();
     expect(document.querySelector('.ytcq-stick-around-overlay')).not.toBeNull();
-    expect(getActionButtonLabels()).toEqual(['Hide', 'Leave']);
+    expect(document.querySelector('.ytcq-games-card')).toBeNull();
+    expect(gamesButton.getAttribute('aria-expanded')).toBe('false');
 
     document.querySelector('.ytcq-stick-around-overlay')?.remove();
     lastMockPort()?.emit(createSnapshotMessage(snapshot));
 
     expect(document.querySelector('.ytcq-stick-around-overlay')).toBeNull();
+    gamesButton.click();
     expect(getActionButtonLabels()).toEqual(['Resume', 'Leave']);
   });
 
@@ -869,7 +879,8 @@ describe('playground games header button', () => {
     setOptions({ ...DEFAULT_OPTIONS, playgroundEnabled: true, playgroundGamesAvailable: true });
 
     wireGamesButton();
-    header.querySelector<HTMLButtonElement>('.ytcq-games-button')!.click();
+    const gamesButton = header.querySelector<HTMLButtonElement>('.ytcq-games-button')!;
+    gamesButton.click();
     const game = createStickAroundGame();
     lastMockPort()?.emit(createSnapshotMessage({
       ...createLobbySnapshot(),
@@ -877,6 +888,8 @@ describe('playground games header button', () => {
       invites: []
     }));
     getActionButton('Resume').click();
+    expect(document.querySelector('.ytcq-games-card')).toBeNull();
+    gamesButton.click();
 
     const hideButton = getActionButton('Hide');
     lastMockPort()?.emit({

@@ -209,15 +209,26 @@ export const playgroundActiveGameControlsScenario: BrowserScenario = async ({ ch
 
     await activeRow.getByRole('button', { name: 'Resume' }).click();
     await expect(chat.locator('.ytcq-chess-game-panel')).toBeVisible();
-    await expect(activeRow.getByRole('button', { name: 'Hide' })).toBeVisible();
+    await expect(chat.locator('.ytcq-games-card')).toHaveCount(0);
 
-    await activeRow.getByRole('button', { name: 'Hide' }).click();
+    await chat.locator('.ytcq-games-button').click();
+    const resumedCard = chat.locator('.ytcq-games-card');
+    await expect(resumedCard).toBeVisible();
+    const resumedActiveRow = resumedCard.locator('.ytcq-games-active-row').filter({ hasText: 'Chess' });
+    await expect(resumedActiveRow.getByRole('button', { name: 'Hide' })).toBeVisible();
+
+    await resumedActiveRow.getByRole('button', { name: 'Hide' }).click();
     await expect(chat.locator('.ytcq-chess-game-panel')).toHaveCount(0);
 
-    await activeRow.getByRole('button', { name: 'Resume' }).click();
+    await resumedActiveRow.getByRole('button', { name: 'Resume' }).click();
     await expect(chat.locator('.ytcq-chess-game-panel')).toBeVisible();
+    await expect(chat.locator('.ytcq-games-card')).toHaveCount(0);
 
-    await activeRow.getByRole('button', { name: 'Leave' }).click();
+    await chat.locator('.ytcq-games-button').click();
+    const leaveCard = chat.locator('.ytcq-games-card');
+    await expect(leaveCard).toBeVisible();
+    const leaveActiveRow = leaveCard.locator('.ytcq-games-active-row').filter({ hasText: 'Chess' });
+    await leaveActiveRow.getByRole('button', { name: 'Leave' }).click();
     await expect(chat.locator('.ytcq-chess-game-panel')).toHaveCount(0);
 
     const leave = await waitForGameAction(backend, 'leave', (message) =>
@@ -248,7 +259,13 @@ export const playgroundStickAroundActiveOverlayControlsScenario: BrowserScenario
 
     await activeRow.getByRole('button', { name: 'Resume' }).click();
     await expect(chat.locator('.ytcq-stick-around-overlay')).toBeVisible();
-    const hideButton = activeRow.getByRole('button', { name: 'Hide' });
+    await expect(chat.locator('.ytcq-games-card')).toHaveCount(0);
+
+    await chat.locator('.ytcq-games-button').click();
+    const resumedCard = chat.locator('.ytcq-games-card');
+    await expect(resumedCard).toBeVisible();
+    const resumedActiveRow = resumedCard.locator('.ytcq-games-active-row').filter({ hasText: 'Stick Around!' });
+    const hideButton = resumedActiveRow.getByRole('button', { name: 'Hide' });
     await expect(hideButton).toBeVisible();
 
     const hideBox = await hideButton.boundingBox();
@@ -276,10 +293,15 @@ export const playgroundStickAroundActiveOverlayControlsScenario: BrowserScenario
     await page.mouse.up();
     await expect(chat.locator('.ytcq-stick-around-overlay')).toHaveCount(0);
 
-    await activeRow.getByRole('button', { name: 'Resume' }).click();
+    await resumedActiveRow.getByRole('button', { name: 'Resume' }).click();
     await expect(chat.locator('.ytcq-stick-around-overlay')).toBeVisible();
+    await expect(chat.locator('.ytcq-games-card')).toHaveCount(0);
 
-    await activeRow.getByRole('button', { name: 'Leave' }).click();
+    await chat.locator('.ytcq-games-button').click();
+    const leaveCard = chat.locator('.ytcq-games-card');
+    await expect(leaveCard).toBeVisible();
+    const leaveActiveRow = leaveCard.locator('.ytcq-games-active-row').filter({ hasText: 'Stick Around!' });
+    await leaveActiveRow.getByRole('button', { name: 'Leave' }).click();
     await expect(chat.locator('.ytcq-stick-around-overlay')).toHaveCount(0);
 
     const leave = await waitForGameAction(backend, 'leave', (message) =>

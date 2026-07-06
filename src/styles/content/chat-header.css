@@ -73,7 +73,7 @@ yt-live-chat-header-renderer .ytcq-games-badge-invites {
 
 yt-live-chat-header-renderer .ytcq-games-badge-active {
   color: #fff;
-  background: #606060;
+  background: var(--yt-spec-call-to-action, #3ea6ff);
 }
 
 yt-live-chat-header-renderer .ytcq-inbox-badge[hidden],

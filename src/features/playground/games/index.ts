@@ -358,6 +358,7 @@ function toggleActiveGamePanel(game: PublicGame): void {
 
   openGamePanel(game, gamesPanelState.transport.userId);
   renderGamesPanel();
+  if (isActiveGamePanelOpen() && getActiveGamePanelId() === game.gameId) closeGamesCard();
 }
 
 function leaveGame(game: PublicGame): void {
