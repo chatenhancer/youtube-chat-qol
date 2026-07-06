@@ -89,6 +89,87 @@ describe('menu router', () => {
     expect(menuMocks.enhanceSettingsMenu).not.toHaveBeenCalled();
   });
 
+  it('clears stale native width caps from live chat menus even when no enhancer is routed', async () => {
+    const menu = createMenu(`
+      <div id="items">
+        <ytd-menu-service-item-renderer></ytd-menu-service-item-renderer>
+        <ytd-menu-navigation-item-renderer></ytd-menu-navigation-item-renderer>
+      </div>
+    `);
+    menu.className = 'style-scope yt-live-chat-app';
+    menu.style.width = '65.5625px';
+    menu.style.minWidth = '65.5625px';
+    menu.style.maxWidth = '65.5625px';
+    menuMocks.isRecentActiveContextMessage.mockReturnValue(false);
+
+    enhanceMenu(menu);
+    await vi.runAllTimersAsync();
+
+    expect(menu.classList.contains('ytcq-live-chat-menu-size-repaired')).toBe(true);
+    expect(menu.style.width).toBe('');
+    expect(menu.style.minWidth).toBe('');
+    expect(menu.style.maxWidth).toBe('');
+    expect(menuMocks.enhanceMessageContextMenu).not.toHaveBeenCalled();
+    expect(menuMocks.enhanceSettingsMenu).not.toHaveBeenCalled();
+  });
+
+  it('shifts repaired live chat menus left when YouTube anchors them past the chat edge', async () => {
+    const app = document.createElement('yt-live-chat-app');
+    const dropdown = document.createElement('tp-yt-iron-dropdown');
+    const menu = createMenu(`
+      <div id="items">
+        <ytd-menu-service-item-renderer></ytd-menu-service-item-renderer>
+        <ytd-menu-navigation-item-renderer></ytd-menu-navigation-item-renderer>
+      </div>
+    `);
+    dropdown.style.position = 'fixed';
+    dropdown.style.left = '320px';
+    dropdown.append(menu);
+    app.append(dropdown);
+    document.body.append(app);
+    app.getBoundingClientRect = () => rect({ left: 0, right: 400, width: 400 });
+    dropdown.getBoundingClientRect = () => rect({
+      height: 168,
+      left: 320,
+      right: 452,
+      width: 132
+    });
+    menu.getBoundingClientRect = () => rect({
+      height: 168,
+      left: 320,
+      right: 452,
+      width: 132
+    });
+    menuMocks.isRecentActiveContextMessage.mockReturnValue(false);
+
+    enhanceMenu(menu);
+    await vi.runAllTimersAsync();
+
+    expect(menu.classList.contains('ytcq-live-chat-menu-size-repaired')).toBe(true);
+    expect(dropdown.style.left).toBe('260px');
+    expect(dropdown.style.right).toBe('auto');
+    expect(menuMocks.enhanceMessageContextMenu).not.toHaveBeenCalled();
+    expect(menuMocks.enhanceSettingsMenu).not.toHaveBeenCalled();
+  });
+
+  it('leaves unrelated menu popup width caps alone', async () => {
+    const menu = createMenu(`
+      <div id="items">
+        <ytd-menu-service-item-renderer></ytd-menu-service-item-renderer>
+      </div>
+    `);
+    menu.style.maxWidth = '65.5625px';
+    menuMocks.isRecentActiveContextMessage.mockReturnValue(false);
+
+    enhanceMenu(menu);
+    await vi.runAllTimersAsync();
+
+    expect(menu.classList.contains('ytcq-live-chat-menu-size-repaired')).toBe(false);
+    expect(menu.style.maxWidth).toBe('65.5625px');
+    expect(menuMocks.enhanceMessageContextMenu).not.toHaveBeenCalled();
+    expect(menuMocks.enhanceSettingsMenu).not.toHaveBeenCalled();
+  });
+
   it('cleans all routed menu surfaces', () => {
     cleanupStaleMenuSurfaces();
 
@@ -182,4 +263,19 @@ function createMenu(html: string): HTMLElement {
   const menu = document.createElement('ytd-menu-popup-renderer');
   menu.innerHTML = html;
   return menu;
+}
+
+function rect(overrides: Partial<DOMRect> = {}): DOMRect {
+  return {
+    bottom: 0,
+    height: 0,
+    left: 0,
+    right: 0,
+    top: 0,
+    width: 0,
+    x: 0,
+    y: 0,
+    toJSON: () => ({}),
+    ...overrides
+  } as DOMRect;
 }

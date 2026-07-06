@@ -1,6 +1,11 @@
 /*
  * Extension controls inserted into YouTube chat settings and message menus.
  */
+ytd-menu-popup-renderer.ytcq-live-chat-menu-size-repaired {
+  width: max-content !important;
+  max-width: min(360px, calc(100vw - 16px)) !important;
+}
+
 ytd-menu-popup-renderer.ytcq-settings-expanded-menu {
   max-height: min(80vh, 360px) !important;
   transform: translateY(var(--ytcq-context-shift-y, 0px));

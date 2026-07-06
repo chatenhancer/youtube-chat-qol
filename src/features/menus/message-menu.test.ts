@@ -213,7 +213,6 @@ describe('message context menu integration', () => {
     vi.useFakeTimers();
     const app = document.createElement('yt-live-chat-app');
     const menu = createContextMenu();
-    menu.classList.add('ytcq-expanded-menu');
     menu.style.width = '300px';
     menu.style.minWidth = '300px';
     menu.style.maxWidth = '300px';
@@ -232,9 +231,25 @@ describe('message context menu integration', () => {
     await vi.runAllTimersAsync();
 
     expect(menu.classList.contains('ytcq-context-expanded-menu')).toBe(true);
-    expect(menu.classList.contains('ytcq-expanded-menu')).toBe(false);
     expect(menu.style.width).toBe('');
+    expect(menu.style.minWidth).toBe('');
+    expect(menu.style.maxWidth).toBe('');
     expect(menu.style.getPropertyValue('--ytcq-context-shift-y')).toBe('-78px');
+  });
+
+  it('clears native inline width caps that crop message context menu labels', () => {
+    const menu = createContextMenu();
+    menu.style.width = '129.562px';
+    menu.style.minWidth = '129.562px';
+    menu.style.maxWidth = '129.562px';
+    document.body.append(menu);
+
+    enhanceMessageContextMenu(menu);
+
+    expect(menu.classList.contains('ytcq-context-expanded-menu')).toBe(true);
+    expect(menu.style.width).toBe('');
+    expect(menu.style.minWidth).toBe('');
+    expect(menu.style.maxWidth).toBe('');
   });
 
   it('shifts context menus down when they overflow the top boundary', async () => {

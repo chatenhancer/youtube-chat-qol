@@ -218,16 +218,12 @@ function handleReplyAction(quote: boolean): void {
 }
 
 function prepareContextMenu(menu: HTMLElement): void {
-  const hadLegacyExpandedClass = menu.classList.contains('ytcq-expanded-menu');
   menu.classList.add('ytcq-context-expanded-menu');
-  menu.classList.remove('ytcq-settings-expanded-menu', 'ytcq-expanded-menu');
+  menu.classList.remove('ytcq-settings-expanded-menu');
   menu.style.setProperty('--ytcq-context-shift-y', '0px');
-
-  if (hadLegacyExpandedClass) {
-    menu.style.removeProperty('width');
-    menu.style.removeProperty('min-width');
-    menu.style.removeProperty('max-width');
-  }
+  menu.style.removeProperty('width');
+  menu.style.removeProperty('min-width');
+  menu.style.removeProperty('max-width');
 }
 
 function clampContextMenuVertically(menu: HTMLElement): void {

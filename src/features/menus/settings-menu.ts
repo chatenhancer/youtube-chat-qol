@@ -148,7 +148,7 @@ function animateTranslateMenuIcon(item: HTMLElement): void {
 
 function prepareSettingsMenu(menu: HTMLElement): void {
   menu.classList.add('ytcq-settings-expanded-menu');
-  menu.classList.remove('ytcq-context-expanded-menu', 'ytcq-expanded-menu');
+  menu.classList.remove('ytcq-context-expanded-menu');
   menu.style.setProperty('--ytcq-context-shift-y', '0px');
   menu.style.removeProperty('width');
   menu.style.removeProperty('min-width');
