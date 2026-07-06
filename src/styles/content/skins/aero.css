@@ -453,6 +453,17 @@
 }
 
 :root[data-ytcq-chat-skin="aero"] :where(
+  #author-photo,
+  yt-img-shadow#author-photo,
+  yt-live-chat-message-input-renderer yt-img-shadow#avatar
+).ytcq-marked-user-avatar::after {
+  background: var(--ytcq-aero-marked-avatar-frame);
+  filter: drop-shadow(0 0 4px var(--ytcq-aero-marked-avatar-glow));
+  mask: var(--ytcq-aero-avatar-frame-image) center / 100% 100% no-repeat;
+  -webkit-mask: var(--ytcq-aero-avatar-frame-image) center / 100% 100% no-repeat;
+}
+
+:root[data-ytcq-chat-skin="aero"] :where(
   yt-live-chat-text-message-renderer,
   yt-live-chat-membership-item-renderer,
   yt-live-chat-viewer-engagement-message-renderer,
@@ -1223,6 +1234,19 @@
   .ytcq-inbox-avatar,
   .ytcq-games-player-avatar,
   .ytcq-bounty-hunting-claim-indicator-avatar
+).ytcq-marked-user-avatar::before {
+  background: var(--ytcq-aero-marked-avatar-frame);
+  filter: drop-shadow(0 0 4px var(--ytcq-aero-marked-avatar-glow));
+  mask: var(--ytcq-aero-avatar-frame-image) center / 100% 100% no-repeat;
+  -webkit-mask: var(--ytcq-aero-avatar-frame-image) center / 100% 100% no-repeat;
+}
+
+:root[data-ytcq-chat-skin="aero"] :where(
+  .ytcq-profile-card-avatar-button,
+  .ytcq-focus-avatar,
+  .ytcq-inbox-avatar,
+  .ytcq-games-player-avatar,
+  .ytcq-bounty-hunting-claim-indicator-avatar
 ).ytcq-marked-user-avatar {
   box-shadow: none !important;
   animation: none !important;
@@ -1292,7 +1316,21 @@
   .ytcq-marked-user-avatar,
   .ytcq-marked-user-ring-animation
 ) {
-  color: #67bd3b;
+  --ytcq-aero-marked-avatar-frame:
+    radial-gradient(circle at 34% 20%, color-mix(in srgb, var(--ytcq-marked-user-color, #67bd3b) 42%, white 58%) 0 18%, transparent 42%),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--ytcq-marked-user-color, #67bd3b) 70%, white 30%) 0%,
+      color-mix(in srgb, var(--ytcq-marked-user-color, #67bd3b) 88%, black 12%) 100%
+    );
+  --ytcq-aero-marked-avatar-glow: color-mix(in srgb, var(--ytcq-marked-user-color, #67bd3b) 42%, transparent);
+
+  color: var(--ytcq-marked-user-color, #67bd3b);
+}
+
+:root[data-ytcq-chat-skin="aero"] .ytcq-marked-user-ring-animation {
+  display: none !important;
+  animation: none !important;
 }
 
 :root[data-ytcq-chat-skin="aero"][data-ytcq-chat-skin-theme="dark"],
@@ -1677,5 +1715,14 @@
   .ytcq-marked-user-avatar,
   .ytcq-marked-user-ring-animation
 ) {
-  color: #8ad96a;
+  --ytcq-aero-marked-avatar-frame:
+    radial-gradient(circle at 34% 20%, color-mix(in srgb, var(--ytcq-marked-user-color, #8ad96a) 40%, white 60%) 0 18%, transparent 42%),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--ytcq-marked-user-color, #8ad96a) 72%, white 28%) 0%,
+      color-mix(in srgb, var(--ytcq-marked-user-color, #8ad96a) 84%, black 16%) 100%
+    );
+  --ytcq-aero-marked-avatar-glow: color-mix(in srgb, var(--ytcq-marked-user-color, #8ad96a) 48%, transparent);
+
+  color: var(--ytcq-marked-user-color, #8ad96a);
 }
