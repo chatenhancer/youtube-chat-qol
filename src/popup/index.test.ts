@@ -653,7 +653,7 @@ describe('popup', () => {
       <svg class="startup-effect-icon"></svg>
     `;
     await chrome.storage.sync.set({
-      chatSkin: '2007',
+      chatSkin: 'aero',
       lastTranslationTarget: 'ko',
       playgroundEnabled: true,
       playgroundGamesAvailable: true,
@@ -725,9 +725,9 @@ describe('popup', () => {
 
     expect(skinOptions).toEqual([
       ['system', 'chatSkinDefault'],
-      ['2007', 'chatSkin2007']
+      ['aero', 'chatSkinAero']
     ]);
-    expect(chatSkin.value).toBe('2007');
+    expect(chatSkin.value).toBe('aero');
     expect(targetLanguage.value).toBe('ja');
     expect(translationIcon.querySelector('.translation-source-mark')).not.toBeNull();
     expect(translationIcon.querySelector('.translation-target-mark')).not.toBeNull();
@@ -1029,7 +1029,7 @@ describe('popup', () => {
     const chatSkin = document.querySelector<HTMLSelectElement>('#chatSkin')!;
     targetLanguage.value = 'ja';
     targetLanguage.dispatchEvent(new Event('change', { bubbles: true }));
-    chatSkin.value = '2007';
+    chatSkin.value = 'aero';
     chatSkin.dispatchEvent(new Event('change', { bubbles: true }));
 
     expect(document.querySelector<HTMLInputElement>('#startupEffect')?.disabled).toBe(true);
@@ -1087,7 +1087,7 @@ describe('popup', () => {
       return Promise.resolve({ activeTabIds: [] });
     }) as never);
     await import('./index');
-    document.querySelector<HTMLSelectElement>('#chatSkin')!.value = '2007';
+    document.querySelector<HTMLSelectElement>('#chatSkin')!.value = 'aero';
     document.querySelector<HTMLSelectElement>('#targetLanguage')!.value = 'ja';
     document.querySelector<HTMLInputElement>('#sound')!.checked = false;
     document.querySelector<HTMLButtonElement>('#resetExtension')?.click();

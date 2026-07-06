@@ -32,7 +32,7 @@ const htmlMinifyOptions = {
   removeRedundantAttributes: false
 };
 const contentSkinCssSources = [
-  ['skins', 'src/styles/content/skins/2007.css']
+  ['skins', 'src/styles/content/skins/aero.css']
 ];
 const contentCssSources = [
   ['tokens', 'src/styles/content/tokens.css'],

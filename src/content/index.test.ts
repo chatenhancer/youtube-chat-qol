@@ -388,7 +388,7 @@ describe('content script entrypoint wiring', () => {
 
     storageListener?.({
       chatSkin: {
-        newValue: '2007',
+        newValue: 'aero',
         oldValue: 'system'
       },
       targetLanguage: {
@@ -403,7 +403,7 @@ describe('content script entrypoint wiring', () => {
     document.documentElement.setAttribute('dark', '');
     storageListener?.({
       chatSkin: {
-        newValue: '2007',
+        newValue: 'aero',
         oldValue: 'system'
       },
       targetLanguage: {
@@ -413,18 +413,18 @@ describe('content script entrypoint wiring', () => {
     }, 'sync');
 
     expect(getOptions().targetLanguage).toBe('fr');
-    expect(getOptions().chatSkin).toBe('2007');
-    expect(document.documentElement.getAttribute('data-ytcq-chat-skin')).toBe('2007');
+    expect(getOptions().chatSkin).toBe('aero');
+    expect(document.documentElement.getAttribute('data-ytcq-chat-skin')).toBe('aero');
     expect(document.documentElement.getAttribute('data-ytcq-chat-skin-theme')).toBe('dark');
     expect(lifecycleMocks.handleFeatureOptionsChanged).toHaveBeenCalledWith(expect.any(Object), expect.objectContaining({
-      chatSkin: '2007',
+      chatSkin: 'aero',
       targetLanguage: 'fr'
     }));
 
     storageListener?.({
       chatSkin: {
         newValue: 'system',
-        oldValue: '2007'
+        oldValue: 'aero'
       }
     }, 'sync');
     expect(document.documentElement.getAttribute('data-ytcq-chat-skin')).toBeNull();

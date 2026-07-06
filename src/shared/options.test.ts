@@ -27,7 +27,7 @@ describe('shared option helpers', () => {
 
   it('preserves explicit false booleans and valid display modes', () => {
     expect(normalizeOptions({
-      chatSkin: '2007',
+      chatSkin: 'aero',
       sound: false,
       startupEffect: false,
       playgroundEnabled: true,
@@ -36,7 +36,7 @@ describe('shared option helpers', () => {
     })).toMatchObject({
       sound: false,
       startupEffect: false,
-      chatSkin: '2007',
+      chatSkin: 'aero',
       playgroundEnabled: true,
       playgroundGamesAvailable: true,
       translationDisplay: 'below'

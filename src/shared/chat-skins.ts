@@ -12,8 +12,8 @@ export const CHAT_SKIN_OPTIONS = [
     labelMessage: 'chatSkinDefault'
   },
   {
-    id: '2007',
-    labelMessage: 'chatSkin2007'
+    id: 'aero',
+    labelMessage: 'chatSkinAero'
   }
 ] as const;
 
