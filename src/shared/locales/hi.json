@@ -468,8 +468,8 @@
     "joinPlayground": {
       "message": "Playground से जुड़ें"
     },
-    "playgroundBetaHelper": {
-      "message": "शुरुआती प्रयोग आज़माएँ। कुछ काम करने के लिए chatenhancer.com से कनेक्ट हो सकते हैं।"
+    "playgroundHelper": {
+      "message": "अन्य एक्सटेंशन उपयोगकर्ताओं के साथ गेम खेलें। चालू होने पर chatenhancer.com से कनेक्ट होता है."
     },
     "playgroundProfile": {
       "message": "Your Playground identity"

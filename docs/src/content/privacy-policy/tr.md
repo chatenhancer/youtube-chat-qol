@@ -60,7 +60,7 @@ Sohbet çevirisi, taslak çevirisi ve Playground oyunları varsayılan olarak ka
 
   `translate.googleapis.com` üzerinden Google Translate erişimi resmi değildir ve rate limit’e tabi olabilir, değişebilir veya kullanılamayabilir.
 
-- **`https://playground.chatenhancer.com` adresindeki Chat Enhancer Playground**
+- <span id="playground"></span>**`https://playground.chatenhancer.com` adresindeki Chat Enhancer Playground**
 
   Playground varsayılan olarak kapalıdır. Playground’u etkinleştirir ve oyun panelini kullanırsanız uzantı, aynı stream’de opt-in kullanıcıların uygunluğu görmesi, davet alışverişi yapması ve oyun oynaması için Chat Enhancer Playground oyun sunucusuna bağlanır.
 

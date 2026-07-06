@@ -1,7 +1,7 @@
 ---
-title: "Chơi game Playground với máy tính"
+title: "Chơi game Playground với Computer"
 date: 2026-06-14
-description: "Đối thủ Computer giúp trò chơi Playground dễ bắt đầu hơn khi không có ai khác ở quanh."
+description: "Đối thủ Computer giúp game Playground dễ bắt đầu hơn khi không có người chơi khác ở gần."
 locale: "vi"
 slug: "play-playground-games-against-the-computer"
 image: "./cover.png"
@@ -13,41 +13,41 @@ tags:
   - "trivia"
 ---
 
-Giờ đây bạn có thể vào Playground dễ hơn: bạn có thể chơi với **Computer**.
+Giờ đây Playground dễ bắt đầu hơn: bạn có thể chơi với **Computer**.
 
-Đôi khi chat khá yên ắng. Đôi khi bạn bè đang xem stream khác. Đôi khi bạn chỉ muốn chơi nhanh một ván mà không phải chờ người khác chấp nhận lời mời. Computer cho bạn thêm một lựa chọn.
+Đôi khi chat khá yên ắng. Đôi khi bạn bè đang xem stream khác. Đôi khi bạn chỉ muốn chơi nhanh một ván mà không phải chờ người khác nhận lời mời. Computer cho bạn thêm một lựa chọn trong những lúc như vậy.
 
 ## Cách hoạt động
 
-Mở Playground từ bảng Games và tìm một người chơi Computer trong danh sách người chơi. Mời một trong số đó giống như cách bạn mời một người chơi khác. Trận đấu sẽ tự động bắt đầu, và bạn có thể chơi mà không cần thay đổi cách dùng Playground.
+Mở Playground từ bảng Trò chơi và tìm một người chơi Computer trong danh sách người chơi. Mời một trong số đó giống như cách bạn mời một người xem khác. Trận đấu sẽ tự động bắt đầu, và phần còn lại của Playground vẫn hoạt động như thường lệ.
 
 Các đối thủ Computer có mặt trong:
 
-- **Chess**, với **Computer (Beginner)**, **Computer (Club)** và **Computer (Master)** để bạn chọn trận nhẹ hơn, trung bình hoặc khó hơn.
+- **Cờ vua**, với **Computer (Beginner)**, **Computer (Club)** và **Computer (Master)** để bạn chọn trận nhẹ, trung bình hoặc thử thách hơn.
 - **HELP-A-FRIEND! Trivia**, để replay trivia vẫn chơi được khi không ai rảnh.
 
-## Chọn độ khó Chess
+## Chọn độ khó Cờ vua
 
-Chess hiện có ba đối thủ Computer. Beginner là lựa chọn dễ nhất để khởi động, Club là đối thủ tầm trung ổn định hơn, còn Master là lựa chọn khó nhất.
+Cờ vua hiện có ba đối thủ Computer. Beginner phù hợp để khởi động, Club chơi ổn định hơn ở mức trung bình, còn Master là lựa chọn khó nhất.
 
 Không cần cài đặt riêng: chọn hồ sơ Computer bạn muốn trong danh sách người chơi và gửi lời mời.
 
 ## Vẫn đúng cảm giác Playground
 
-Đây không phải là chế độ solo riêng hay một màn hình mới. Các người chơi Computer hoạt động như đối thủ Playground bình thường, nên quy trình vẫn quen thuộc: mở bảng, chọn game, gửi lời mời và chơi.
+Đây không phải là chế độ solo riêng hay một màn hình mới. Các người chơi Computer hoạt động như đối thủ Playground bình thường, nên quy trình vẫn quen thuộc: mở panel, chọn game, gửi lời mời và chơi.
 
-Trong Chess, Computer đi nước cờ sau một khoảng dừng ngắn để ván đấu không có cảm giác diễn ra tức thì.
+Trong Cờ vua, Computer đi sau một khoảng dừng ngắn để ván đấu không có cảm giác diễn ra quá tức thì.
 
 Trong *HELP-A-FRIEND! Trivia*, Computer trả lời trong vòng câu hỏi như một người chơi khác. Nó không hoàn hảo, nên bạn vẫn có cơ hội thật sự để thắng.
 
 ## Vì sao thêm tính năng này?
 
-Playground vui nhất khi có ai đó để chơi cùng, nhưng live chat không phải lúc nào cũng đoán trước được. Computer giúp các game vẫn dùng được trong những lúc yên tĩnh hơn, stream đêm muộn, replay hoặc cộng đồng nhỏ nơi không phải lúc nào cũng có người dùng Chat Enhancer khác sẵn sàng.
+Playground vui nhất khi có ai đó để chơi cùng, nhưng live chat không phải lúc nào cũng đoán trước được. Computer giúp các game vẫn chơi được trong những lúc yên tĩnh hơn, stream đêm muộn, replay hoặc cộng đồng nhỏ nơi không phải lúc nào cũng có người dùng Chat Enhancer khác sẵn sàng.
 
 :::media-left
 
 ![Cài đặt Playground trong popup Chat Enhancer](./extension-settings.png)
 
-Playground vẫn là tính năng opt-in. Bật **Tham gia Playground** trong cài đặt tiện ích, mở bảng Games trong chat và mời một đối thủ Computer khi bạn muốn chơi một trận.
+Playground vẫn là tính năng opt-in. Bật **Tham gia Playground** trong cài đặt tiện ích, mở bảng Trò chơi trong chat và mời một đối thủ Computer khi bạn muốn chơi một trận.
 
 :::

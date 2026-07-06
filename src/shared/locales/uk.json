@@ -465,8 +465,8 @@
     "joinPlayground": {
       "message": "Приєднатися до Playground"
     },
-    "playgroundBetaHelper": {
-      "message": "Спробуйте ранні експерименти. Деякі можуть підключатися до chatenhancer.com, щоб працювати."
+    "playgroundHelper": {
+      "message": "Грайте з іншими користувачами розширення. Підключається до chatenhancer.com, доки увімкнено."
     },
     "playgroundProfile": {
       "message": "Your Playground identity"

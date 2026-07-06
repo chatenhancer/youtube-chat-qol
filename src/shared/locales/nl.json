@@ -465,8 +465,8 @@
     "joinPlayground": {
       "message": "Deelnemen aan Playground"
     },
-    "playgroundBetaHelper": {
-      "message": "Probeer vroege experimenten. Sommige kunnen verbinding maken met chatenhancer.com om te werken."
+    "playgroundHelper": {
+      "message": "Speel games met andere extensiegebruikers. Maakt verbinding met chatenhancer.com zolang het is ingeschakeld."
     },
     "playgroundProfile": {
       "message": "Your Playground identity"

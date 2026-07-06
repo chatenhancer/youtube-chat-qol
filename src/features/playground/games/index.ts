@@ -1,5 +1,5 @@
 /**
- * Playground Games experiment.
+ * Playground Games.
  *
  * Owns the chat header Games entry point and coordinates the lobby surface.
  * Rendering, state selectors, and game-specific panel adapters live in nearby

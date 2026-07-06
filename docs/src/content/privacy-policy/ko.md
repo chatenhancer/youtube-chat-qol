@@ -60,7 +60,7 @@ Chat Enhancer for YouTube는 YouTube 실시간 채팅용 브라우저 확장 프
 
   `translate.googleapis.com`을 통한 Google Translate 접근은 비공식이며, 속도 제한을 받거나 변경되거나 사용할 수 없게 될 수 있습니다.
 
-- **`https://playground.chatenhancer.com`의 Chat Enhancer Playground**
+- <span id="playground"></span>**`https://playground.chatenhancer.com`의 Chat Enhancer Playground**
 
   Playground는 기본적으로 꺼져 있습니다. Playground를 켜고 게임 패널을 사용하면 확장 프로그램이 Chat Enhancer Playground 게임 서버에 연결되어 같은 스트림의 참여 사용자가 이용 가능 상태를 보고, 초대를 교환하고, 게임을 할 수 있습니다.
 

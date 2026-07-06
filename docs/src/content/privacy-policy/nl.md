@@ -60,7 +60,7 @@ Wanneer vertaling of Playground-functies zijn ingeschakeld en worden gebruikt, k
 
   Toegang tot Google Translate via `translate.googleapis.com` is onofficieel en kan worden beperkt, gewijzigd of onbeschikbaar worden.
 
-- **Chat Enhancer Playground op `https://playground.chatenhancer.com`**
+- <span id="playground"></span>**Chat Enhancer Playground op `https://playground.chatenhancer.com`**
 
   Playground staat standaard uit. Als je Playground inschakelt en het gamespaneel gebruikt, maakt de extensie verbinding met de Chat Enhancer Playground-gameserver zodat opt-in gebruikers in dezelfde stream beschikbaarheid kunnen zien, uitnodigingen kunnen uitwisselen en games kunnen spelen.
 

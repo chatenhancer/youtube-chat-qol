@@ -60,7 +60,7 @@ Cuando las funciones de traducción o Playground están activadas y se usan, pue
 
   El acceso a Google Translate mediante `translate.googleapis.com` no es oficial y puede estar sujeto a límites de uso, cambiar o dejar de estar disponible.
 
-- **Chat Enhancer Playground en `https://playground.chatenhancer.com`**
+- <span id="playground"></span>**Chat Enhancer Playground en `https://playground.chatenhancer.com`**
 
   Playground está desactivado por defecto. Si activas Playground y usas el panel de juegos, la extensión se conecta al servidor de juegos de Chat Enhancer Playground para que los usuarios que hayan optado por participar en el mismo stream puedan ver disponibilidad, intercambiar invitaciones y jugar.
 

@@ -468,8 +468,8 @@
     "joinPlayground": {
       "message": "Playground’a katıl"
     },
-    "playgroundBetaHelper": {
-      "message": "Erken deneyleri dene. Bazıları çalışmak için chatenhancer.com'a bağlanabilir."
+    "playgroundHelper": {
+      "message": "Diğer uzantı kullanıcılarıyla oyun oynayın. Etkinken chatenhancer.com'a bağlanır."
     },
     "playgroundProfile": {
       "message": "Your Playground identity"

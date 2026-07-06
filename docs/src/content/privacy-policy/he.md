@@ -60,7 +60,7 @@ Chat Enhancer for YouTube הוא תוסף דפדפן לצ׳אט חי ב-YouTube.
 
   הגישה ל-Google Translate דרך `translate.googleapis.com` אינה רשמית ועלולה להיות מוגבלת בקצב, להשתנות או לא להיות זמינה.
 
-- **Chat Enhancer Playground ב-`https://playground.chatenhancer.com`**
+- <span id="playground"></span>**Chat Enhancer Playground ב-`https://playground.chatenhancer.com`**
 
   Playground כבוי כברירת מחדל. אם מפעילים את Playground ומשתמשים בלוח המשחקים, התוסף מתחבר לשרת המשחקים של Chat Enhancer Playground כדי שמשתמשים שבחרו להצטרף באותו שידור יוכלו לראות זמינות, להחליף הזמנות ולשחק.
 

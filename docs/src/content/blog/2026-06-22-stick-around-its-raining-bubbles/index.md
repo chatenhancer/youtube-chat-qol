@@ -12,7 +12,7 @@ tags:
   - "stick-around"
 ---
 
-The next Playground experiment is **Stick Around!**, a tiny fighting game that does not sit in a compact panel.
+The next Playground game is **Stick Around!**, a tiny fighting game that does not sit in a compact panel.
 
 It takes over the chat feed itself.
 

@@ -468,8 +468,8 @@
     "joinPlayground": {
       "message": "الانضمام إلى ساحة التجارب"
     },
-    "playgroundBetaHelper": {
-      "message": "جرّب تجارب مبكرة. قد يتصل بعضها بـ chatenhancer.com ليعمل."
+    "playgroundHelper": {
+      "message": "العب ألعابًا مع مستخدمي الإضافة الآخرين. يتصل بـ chatenhancer.com أثناء تفعيله."
     },
     "playgroundProfile": {
       "message": "Your Playground identity"

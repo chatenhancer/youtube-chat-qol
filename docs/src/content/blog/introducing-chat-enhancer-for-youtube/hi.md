@@ -1,7 +1,7 @@
 ---
-title: "Chat Enhancer for YouTube का परिचय"
+title: "पेश है Chat Enhancer for YouTube"
 date: 2026-06-01
-description: "Chat Enhancer for YouTube छोटे, native-feeling tools जोड़ता है जो busy YouTube live chats को follow करना आसान बनाते हैं."
+description: "Chat Enhancer for YouTube छोटे-छोटे ऐसे टूल जोड़ता है जो YouTube का हिस्सा लगते हैं और व्यस्त live chat को समझना आसान बनाते हैं."
 locale: "hi"
 slug: "introducing-chat-enhancer-for-youtube"
 translationKey: "introducing-chat-enhancer-for-youtube"
@@ -12,54 +12,54 @@ tags:
   - "extension"
 ---
 
-## Chat Enhancer क्यों?
+## Chat Enhancer क्यों बनाया गया?
 
-YouTube live chat तेज़ होने में बहुत अच्छा है. लेकिन बातचीत को सच में ट्रैक करने की जगह बनने में उतना अच्छा नहीं है.
+YouTube live chat तेज़ चलने में शानदार है. लेकिन जब आप सच में किसी बातचीत को पकड़कर चलना चाहते हैं, तब यह उतनी मदद नहीं करता.
 
-मैंने Chat Enhancer तब बनाया जब मैं एक लंबे समय से चल रहे livestream में बहुत ज़्यादा समय बिता चुका था. वहाँ दुनिया भर के लोग बात कर रहे थे, संदेश तेज़ी से आगे बढ़ रहे थे, और धीरे-धीरे वह एक छोटी अस्थायी कम्युनिटी जैसा लगने लगा. इससे कुछ बातें साफ़ दिखीं: mentions आसानी से छूट जाते हैं, बातचीत तुरंत गायब हो जाती है, भाषा की बाधाएँ रास्ते में आती हैं, और chat में दूसरे लोगों के बारे में बुनियादी संदर्भ पाना जितना आसान होना चाहिए उतना नहीं है.
+Chat Enhancer बनाने की शुरुआत तब हुई जब मैं एक लंबे समय तक चलने वाली livestream में ज़रूरत से ज़्यादा समय बिताने लगा. दुनिया भर से लोग बात कर रहे थे, संदेश तेज़ी से बह रहे थे, और कुछ देर बाद वह जगह एक छोटी-सी अस्थायी कम्युनिटी जैसी लगने लगी. उसी दौरान कमजोरियाँ भी साफ़ दिखीं: मेंशन आसानी से छूट जाते थे, बातचीत कुछ ही पलों में गायब हो जाती थी, भाषा बीच में आ जाती थी, और यह समझना भी मुश्किल हो जाता था कि बोलने वाला व्यक्ति कौन है या पहले क्या कह रहा था.
 
-इसलिए मैंने उन चीज़ों के लिए एक एक्सटेंशन बनाया जिन्हें मैं बार-बार YouTube live chat में चाहता था.
+इसलिए मैंने वही एक्सटेंशन बनाया जिसकी कमी मुझे YouTube live chat में बार-बार महसूस होती थी.
 
-Chat Enhancer को YouTube के अंदर चुपचाप बैठने के लिए बनाया गया है, उसे replace करने के लिए नहीं. Chat अभी भी YouTube chat जैसा ही लगता है; बस जहाँ ज़रूरत हो वहाँ कुछ और tools मिल जाते हैं.
+Chat Enhancer YouTube को बदलने के लिए नहीं है. यह उसके अंदर चुपचाप काम करता है. Chat अब भी YouTube chat जैसा ही लगता है; बस जहाँ ज़रूरत हो, वहाँ कुछ उपयोगी टूल मिल जाते हैं.
 
-## Live translation
+## लाइव अनुवाद
 
-Language पहली समस्या थी जिससे मैं बार-बार टकरा रहा था. Chat में बहुत सारे Korean और Chinese messages थे. पूरी page translate करना तकनीकी रूप से काम करता था, लेकिन chat को अजीब और follow करने में कठिन बना देता था.
+भाषा पहली समस्या थी जो बार-बार सामने आई. Chat में बहुत सारे कोरियाई और चीनी संदेश आते थे. पूरी page translate करने से काम तो चल जाता था, लेकिन chat अजीब लगने लगता था और उसे पढ़ना और कठिन हो जाता था.
 
-Chat Enhancer live chat messages को सीधे translate करने देता है, जबकि emojis और mentions को intact रखता है. आप translated message पर hover करके original text और detected language देख सकते हैं.
+Chat Enhancer live chat के संदेशों का सीधे अनुवाद कर सकता है, और साथ में emoji और मेंशन को जस का तस रखता है. अनुवादित संदेश पर hover करने पर मूल पाठ और पहचानी गई भाषा दिख जाती है.
 
-आप भेजने से पहले वह text भी translate कर सकते हैं जो आप type कर रहे हैं. इससे multilingual chat में सच में participate करना बहुत आसान हो जाता है, सिर्फ़ किनारे से देखने के बजाय.
+आप भेजने से पहले अपने लिखे हुए संदेश का भी अनुवाद कर सकते हैं. इससे बहुभाषी chat में सिर्फ़ दर्शक बने रहने के बजाय सच में हिस्सा लेना आसान हो जाता है.
 
-Translation Google Translate इस्तेमाल करती है, इसलिए यह perfect नहीं होगी. व्यवहार में यह busy multilingual chat को follow करना आसान बनाने के लिए फिर भी काफ़ी अच्छी है.
+अनुवाद के लिए Google Translate इस्तेमाल होता है, इसलिए नतीजा हमेशा परफ़ेक्ट नहीं होगा. फिर भी, व्यस्त बहुभाषी chat को समझने के लिए यह व्यवहार में काफ़ी मददगार है.
 
 ## Inbox
 
-YouTube live chat आपको notify नहीं करता जब कोई आपको mention करता है.
+YouTube live chat में कोई आपको मेंशन करे, तो YouTube आपको अलग से नहीं बताता.
 
-अगर आप हर second chat को देख रहे हैं तो यह ठीक है. लेकिन अगर आपने stream background में छोड़ा है, coffee बना रहे हैं, या एक minute के लिए दूर चले गए हैं, तो यह कम ठीक है.
+अगर आप हर सेकंड chat देख रहे हैं, तो कोई दिक्कत नहीं. लेकिन अगर stream background में चल रही है, आप कॉफ़ी बना रहे हैं, या बस एक मिनट के लिए दूर गए हैं, तो ज़रूरी संदेश छूट सकते हैं.
 
-Chat Enhancer mentions और watched keywords के लिए inbox जोड़ता है, ताकि आप manually सब कुछ scroll किए बिना अपने लिए ज़रूरी messages पकड़ सकें.
+Chat Enhancer में मेंशन और चुने हुए keywords के लिए Inbox मिलता है, ताकि आपको हर संदेश manually scroll किए बिना अपने काम की बातें मिल जाएँ.
 
-## बेहतर user context
+## लोगों के बारे में बेहतर संदर्भ
 
-Live chats तेज़ी से आगे बढ़ते हैं. जब कोई आपको reply करता है, तो हमेशा साफ़ नहीं होता कि वह कौन है या कुछ minutes पहले किस बारे में बात कर रहा था.
+Live chat तेज़ी से आगे बढ़ता है. जब कोई आपको reply करता है, तो हमेशा साफ़ नहीं होता कि वह कौन है या कुछ मिनट पहले किस बारे में बात कर रहा था.
 
-Chat Enhancer में user के avatar पर click करने से उस user के recent messages वाला profile panel खुलता है. आप उनका YouTube channel side popup में खोल सकते हैं और उन users को bookmark कर सकते हैं जिन्हें आप बाद में पहचानना चाहते हैं.
+Chat Enhancer में किसी user के avatar पर click करने से उसका profile panel खुलता है, जिसमें उसके हाल के संदेश दिखते हैं. आप उसका YouTube channel side popup में खोल सकते हैं और जिन लोगों को बाद में पहचानना चाहते हैं उन्हें bookmark भी कर सकते हैं.
 
-यह छोटी चीज़ है, लेकिन regular chatters को random names की तरह उड़ते हुए गुजरने से कम महसूस कराती है.
+यह छोटी-सी सुविधा है, लेकिन इससे नियमित chatters बस उड़ते हुए random नाम नहीं लगते.
 
-## Most-used emojis
+## सबसे ज़्यादा इस्तेमाल होने वाले emoji
 
-मैं लगातार वही emojis इस्तेमाल करता हूँ. हर बार पूरे emoji picker में scroll करना जल्दी ही परेशान करने लगा.
+मैं बार-बार वही emoji इस्तेमाल करता हूँ. हर बार पूरे emoji picker में ढूँढ़ना जल्दी ही परेशान करने लगा.
 
-Chat Enhancer आपके most-used emojis के लिए एक row जोड़ता है, ताकि जो emojis आप सच में इस्तेमाल करते हैं वे आसानी से मिलें.
+Chat Enhancer आपके सबसे ज़्यादा इस्तेमाल किए गए emoji की एक row जोड़ता है, ताकि जो emoji आप सच में इस्तेमाल करते हैं वे तुरंत मिल जाएँ.
 
 ## अन्य छोटे सुधार
 
-इसमें कुछ और quality-of-life features भी हैं, जैसे quick mentions और quotes, user bookmarks, chat commands, draft recovery, और ऐसे छोटे touches जो live chat को थोड़ा कम barebones बनाते हैं.
+इसमें कुछ और छोटे-छोटे सुधार भी हैं: quick mentions और quotes, user bookmarks, chat commands, draft recovery, और ऐसी बारीकियाँ जो live chat को कम अधूरा महसूस कराती हैं.
 
-इनमें से कुछ भी YouTube live chat को अलग app में बदलने की कोशिश नहीं करता. यह सिर्फ़ मौजूदा chat को use करना आसान बनाता है.
+इनमें से कोई भी चीज़ YouTube live chat को किसी अलग app में बदलने की कोशिश नहीं करती. यह बस मौजूदा chat को इस्तेमाल करने में आसान बनाती है.
 
-Chat Enhancer for YouTube मुफ़्त है, open-source है, account नहीं माँगता और analytics नहीं चलाता.
+Chat Enhancer for YouTube मुफ़्त है, open-source है, account नहीं माँगता, और analytics नहीं चलाता.
 
-आप [chatenhancer.com](https://www.chatenhancer.com/#features) पर और जान सकते हैं
+आप [chatenhancer.com](https://www.chatenhancer.com/#features) पर और जान सकते हैं.

@@ -1,7 +1,7 @@
 ---
 title: "Chat Enhancer 0.14.0 में नया: HELP-A-FRIEND! Trivia"
 date: 2026-06-12
-description: "एक नया Playground गेम, जहां YouTube रीप्ले के पल चैट-स्टाइल ट्रिविया सवाल बन जाते हैं।"
+description: "HELP-A-FRIEND! Trivia में YouTube replay के पल छोटे chat-style quiz में बदल जाते हैं।"
 locale: "hi"
 slug: "new-in-0-14-0-help-a-friend-trivia"
 image: "./0e5e4f69e6fa7b45.png"
@@ -12,38 +12,38 @@ tags:
   - "trivia"
 ---
 
-दूसरा Playground गेम आ गया है: **HELP-A-FRIEND! Trivia**
+दूसरा Playground game आ गया है: **HELP-A-FRIEND! Trivia**।
 
 :::media-right
 
-![HELP-A-FRIEND! Trivia लोगो](./2026-06-12-new-in-0-14-0-help-a-friend-trivia-assets/6ef6d6f2584f127f.png){shadow=smooth;rotate=-8deg}
+![HELP-A-FRIEND! Trivia logo](./2026-06-12-new-in-0-14-0-help-a-friend-trivia-assets/6ef6d6f2584f127f.png){shadow=smooth;rotate=-8deg}
 
-क्विज बोर्ड के बजाय, *HELP-A-FRIEND! Trivia* एक छोटे ग्रुप चैट जैसा चलता है। तुम्हारा एक दोस्त साफ तौर पर स्ट्रीम पर ध्यान नहीं दे रहा था और अब उसे मदद चाहिए. क्या तुम्हें याद है क्या हुआ था?
+Quiz board के बजाय, *HELP-A-FRIEND! Trivia* एक छोटे group chat जैसा चलता है। आपका एक दोस्त साफ़ तौर पर stream पर ध्यान नहीं दे रहा था और अब उसे मदद चाहिए। क्या आपको याद है कि क्या हुआ था?
 
-सही जवाबों को 🏆 प्रतिक्रिया मिलती है।
+सही जवाबों पर 🏆 reaction मिलता है।
 
-गलत जवाबों को *विनम्रता से* जज किया जाता है।
+गलत जवाबों को *पूरी विनम्रता से* judge किया जाता है।
 
 :::
 
 ## यह कैसे काम करता है
 
-YouTube रीप्ले से Playground मैच शुरू करो, दूसरे खिलाड़ी को आमंत्रित करो, और सवाल तैयार होने तक कुछ सेकंड इंतज़ार करो।
+YouTube replay से Playground match शुरू करें, दूसरे player को invite करें, और सवाल तैयार होने तक कुछ सेकंड इंतज़ार करें।
 
-गेम शुरू होते ही तुम्हारा “दोस्त” रीप्ले के बारे में पूछता है, चार संभावित जवाब दिखते हैं, और समय खत्म होने से पहले दोनों खिलाड़ी चुनते हैं। जल्दी जवाब दो। तुम्हारा दोस्त धैर्यवान नहीं है।
+Game शुरू होते ही आपका “दोस्त” replay के बारे में सवाल पूछता है। चार जवाब दिखते हैं, और समय खत्म होने से पहले दोनों players अपना जवाब चुनते हैं। जल्दी जवाब दें। आपका दोस्त ज़्यादा धैर्यवान नहीं है।
 
-## रीप्ले के लिए बनाया गया
+## Replays के लिए बनाया गया
 
-हर मैच उस रीप्ले की ट्रांसक्रिप्ट से बनाया जाता है जिसे तुम देख रहे हो, इसलिए गेम उस स्ट्रीम में सचमुच हुए पलों के बारे में पूछ सकता है: खुलासे, पुरस्कार, मज़ाक, भटकती बातें, और वीडियो में आई बाकी हर चीज़।
+हर match उस replay की transcript से बनाया जाता है जिसे आप देख रहे हैं, इसलिए game stream में सचमुच हुई बातों पर सवाल पूछ सकता है: reveals, awards, jokes, tangents, और video में आई बाकी यादगार चीज़ें।
 
 :::media-left
 
-![HELP-A-FRIEND! Trivia स्क्रीनशॉट](./f6e02e23a9bb8118.png)
+![HELP-A-FRIEND! Trivia screenshot](./f6e02e23a9bb8118.png)
 
-## इसे आज़माएँ!
+## इसे आज़माएँ
 
-*HELP-A-FRIEND! Trivia* Playground का हिस्सा है, जो अभी भी वैकल्पिक है। एक्सटेंशन सेटिंग्स से Playground चालू करें, लाइव चैट वाला रीप्ले खोलें, और Games पैनल से मैच शुरू करें। चैट में कंट्रोलर आइकन देखें।
+*HELP-A-FRIEND! Trivia* Playground का हिस्सा है, जो अभी भी opt-in है। Extension settings से Playground enable करें, live chat वाला replay खोलें, और गेम पैनल से match शुरू करें। Chat में controller icon देखें।
 
-अभी के लिए अंग्रेज़ी में उपलब्ध है।
+अभी के लिए यह English में उपलब्ध है।
 
 :::

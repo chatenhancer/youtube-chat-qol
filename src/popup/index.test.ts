@@ -34,8 +34,8 @@ describe('popup', () => {
       <div id="playgroundPanel" data-popup-tab-panel hidden>
         <label id="playgroundOption" class="option option-toggle">
           <span class="option-helper">
-            <span id="playgroundHelper">Try early experiments.</span>
-            <a class="option-helper-link" href="https://www.chatenhancer.com/privacy" target="_blank" rel="noreferrer">Learn more</a>
+            <span id="playgroundHelper">Play games with other extension users.</span>
+            <a class="option-helper-link" href="https://www.chatenhancer.com/privacy#playground" target="_blank" rel="noreferrer">Learn more</a>
           </span>
           <input id="playgroundEnabled" type="checkbox">
         </label>

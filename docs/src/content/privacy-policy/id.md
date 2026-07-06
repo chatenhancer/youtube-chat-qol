@@ -60,7 +60,7 @@ Saat fitur terjemahan atau Playground diaktifkan dan digunakan, data dapat dikir
 
   Akses Google Translate melalui `translate.googleapis.com` tidak resmi dan dapat dibatasi, berubah, atau tidak tersedia.
 
-- **Chat Enhancer Playground di `https://playground.chatenhancer.com`**
+- <span id="playground"></span>**Chat Enhancer Playground di `https://playground.chatenhancer.com`**
 
   Playground nonaktif secara default. Jika Anda mengaktifkan Playground dan menggunakan panel game, ekstensi terhubung ke server game Chat Enhancer Playground agar pengguna opt-in di stream yang sama dapat melihat ketersediaan, bertukar undangan, dan bermain game.
 

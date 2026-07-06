@@ -60,7 +60,7 @@ Chat translation, draft translation, और Playground games डिफ़ॉल�
 
   `translate.googleapis.com` के माध्यम से Google Translate access unofficial है और rate-limited, changed या unavailable हो सकता है।
 
-- **Chat Enhancer Playground at `https://playground.chatenhancer.com`**
+- <span id="playground"></span>**Chat Enhancer Playground at `https://playground.chatenhancer.com`**
 
   Playground डिफ़ॉल्ट रूप से बंद है। यदि आप Playground चालू करते हैं और games panel का उपयोग करते हैं, तो extension Chat Enhancer Playground game server से connect होता है ताकि उसी stream में opted-in users availability देख सकें, invites exchange कर सकें और games खेल सकें।
 

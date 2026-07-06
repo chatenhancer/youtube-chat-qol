@@ -30,7 +30,7 @@
   "hero": {
     "eyebrow": "Extension for YouTube live chat",
     "title": "Chat Enhancer for YouTube",
-    "copy": "Keep up with fast-moving YouTube live chats, understand more of what people are saying, find the messages that matter, and reply naturally without losing your place.",
+    "copy": "Suite of enhancements that make YouTube live chat easier to follow and participate in.",
     "primaryCta": "Install",
     "secondaryCta": "View features",
     "disclaimer": "Not affiliated with YouTube or Google.",
@@ -77,7 +77,7 @@
   "playground": {
     "eyebrow": "Playground",
     "title": "<span class=\"title-emphasis\">Tiny games</span> for<br>live chat breaks",
-    "copy": "Playground is an opt-in space for experiments that make streams more interactive. Pick a game: invite an available viewer*, start playing, and keep chat nearby.",
+    "copy": "Playground is an opt-in games space that makes streams more interactive. Pick a game: invite an available viewer*, start playing, and keep chat nearby.",
     "primaryCta": "Try it in the extension",
     "secondaryCta": "Learn more",
     "imageAlt": "Floating chess game panel inside YouTube live chat",

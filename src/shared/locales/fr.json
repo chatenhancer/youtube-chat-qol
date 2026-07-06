@@ -465,8 +465,8 @@
     "joinPlayground": {
       "message": "Rejoindre Playground"
     },
-    "playgroundBetaHelper": {
-      "message": "Essayez des expériences en avance. Certaines peuvent se connecter à chatenhancer.com pour fonctionner."
+    "playgroundHelper": {
+      "message": "Jouez avec d’autres utilisateurs de l’extension. Se connecte à chatenhancer.com tant que c’est activé."
     },
     "playgroundProfile": {
       "message": "Your Playground identity"

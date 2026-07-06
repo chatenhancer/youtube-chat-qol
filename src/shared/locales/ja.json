@@ -468,8 +468,8 @@
     "joinPlayground": {
       "message": "Playground に参加"
     },
-    "playgroundBetaHelper": {
-      "message": "実験的な機能を早めに試せます。一部は動作のために chatenhancer.com に接続する場合があります。"
+    "playgroundHelper": {
+      "message": "他の拡張機能ユーザーとゲームをプレイします。有効な間は chatenhancer.com に接続します。"
     },
     "playgroundProfile": {
       "message": "Your Playground identity"

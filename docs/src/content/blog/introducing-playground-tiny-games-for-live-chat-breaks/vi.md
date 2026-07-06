@@ -1,7 +1,7 @@
 ---
-title: "Giới thiệu Playground: trò chơi nhỏ cho những lúc live chat tạm nghỉ"
+title: "Giới thiệu Playground: trò chơi nhỏ cho lúc live chat chậm lại"
 date: 2026-06-10
-description: "Playground thêm các trò chơi gọn nhẹ vào live chat YouTube cho những đoạn livestream chậm hơn."
+description: "Playground thêm các trò chơi gọn nhẹ vào live chat YouTube cho những đoạn livestream đang chậm lại."
 locale: "vi"
 slug: "introducing-playground-tiny-games-for-live-chat-breaks"
 translationKey: "introducing-playground-tiny-games-for-live-chat-breaks"
@@ -14,19 +14,19 @@ tags:
   - "chess"
 ---
 
-## Playground đã có mặt!
+## Playground đã có mặt
 
-Playground là một trung tâm trò chơi nhỏ trong Chat Enhancer. Nó cho phép bạn chơi với những người xem khác đã cài tiện ích và đang ở cùng livestream.
+Playground là một khu trò chơi nhỏ trong Chat Enhancer. Bạn có thể chơi với những người xem khác đã cài tiện ích và đang ở cùng livestream.
 
-Streamer rời đi một phút? Mở Playground, chơi một ván nhanh và giữ chat ở gần.
+Streamer rời đi một lát? Mở Playground, chơi một ván nhanh và vẫn giữ chat ở gần.
 
 :::media-right
 
-![Bảng cờ vua nhỏ gọn nổi trên live chat YouTube](./f779ebcc57f8280d.png){shadow=smooth rotation=-2}
+![Bảng Cờ vua nhỏ gọn nổi trên live chat YouTube](./f779ebcc57f8280d.png){shadow=smooth rotation=-2}
 
 Các trò chơi vẫn gọn nhẹ. Bảng có thể kéo thả, nên bạn có thể đẩy nó sang một bên khi chat sôi động trở lại.
 
-Cờ vua là trò chơi Playground đầu tiên, và nó vẫn giải thích ý tưởng rõ nhất: một hoạt động nhanh bên cạnh chat thay vì chiếm cả trang.
+Cờ vua là trò chơi Playground đầu tiên, và đến giờ vẫn giải thích ý tưởng rõ nhất: một hoạt động nhanh bên cạnh chat, thay vì chiếm cả trang.
 
 :::
 
@@ -34,7 +34,7 @@ Cờ vua là trò chơi Playground đầu tiên, và nó vẫn giải thích ý 
 
 Mở bảng Trò chơi, chọn **Cờ vua** và mời một người đang sẵn sàng trong cùng livestream. Khi họ chấp nhận, bàn cờ sẽ mở trong một bảng nổi nhỏ phía trên live chat.
 
-Trò chơi dùng luật cờ vua bình thường. Nước đi được kiểm tra trước khi gửi, lượt chơi luôn đồng bộ giữa hai người, và ván có thể kết thúc bằng chiếu hết, hòa hoặc đầu hàng. Nếu livestream trở lại đông đúc, kéo bảng sang một bên và tiếp tục xem.
+Trò chơi dùng luật chess bình thường. Nước đi được kiểm tra trước khi gửi, lượt chơi luôn đồng bộ giữa hai người, và ván có thể kết thúc bằng checkmate, draw hoặc resign. Nếu livestream lại đông đúc, kéo bảng sang một bên và tiếp tục xem.
 
 Nếu không có ai khác, Cờ vua cũng hỗ trợ đối thủ **Computer**. Chọn **Computer (Beginner)**, **Computer (Club)** hoặc **Computer (Master)** trong danh sách người chơi và bắt đầu ván như khi chơi với một người xem khác.
 
@@ -57,7 +57,7 @@ Cài đặt Playground nằm trong popup tiện ích.
 
 Bật **Tham gia Playground** để biểu tượng Trò chơi xuất hiện trong chat.
 
-Trong bảng Trò chơi, bật **Sẵn sàng chơi** khi bạn muốn người chơi khác thấy mình. Nếu bạn thường muốn sẵn sàng, bật **Sẵn sàng theo mặc định** trong cài đặt tiện ích.
+Trong bảng Trò chơi, bật **Sẵn sàng nhận lời mời** khi bạn muốn người chơi khác thấy mình. Nếu bạn thường muốn sẵn sàng, bật **Sẵn sàng nhận lời mời theo mặc định** trong cài đặt tiện ích.
 
 :::
 

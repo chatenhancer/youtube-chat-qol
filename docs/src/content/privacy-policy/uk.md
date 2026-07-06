@@ -60,7 +60,7 @@ Chat Enhancer for YouTube — це розширення браузера для 
 
   Доступ до Google Translate через `translate.googleapis.com` є неофіційним і може бути обмежений, змінений або недоступний.
 
-- **Chat Enhancer Playground за адресою `https://playground.chatenhancer.com`**
+- <span id="playground"></span>**Chat Enhancer Playground за адресою `https://playground.chatenhancer.com`**
 
   Playground вимкнено за замовчуванням. Якщо ви ввімкнете Playground і використовуватимете панель ігор, розширення підключиться до ігрового сервера Chat Enhancer Playground, щоб користувачі opt-in у тому самому стримі могли бачити доступність, обмінюватися запрошеннями та грати.
 

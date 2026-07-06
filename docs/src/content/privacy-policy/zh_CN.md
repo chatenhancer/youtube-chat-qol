@@ -60,7 +60,7 @@ Chat Enhancer for YouTube 是一款用于 YouTube 实时聊天的浏览器扩展
 
   通过 `translate.googleapis.com` 访问 Google Translate 是非官方的，可能会受到速率限制、发生变化或不可用。
 
-- **位于 `https://playground.chatenhancer.com` 的 Chat Enhancer Playground**
+- <span id="playground"></span>**位于 `https://playground.chatenhancer.com` 的 Chat Enhancer Playground**
 
   Playground 默认关闭。如果你启用 Playground 并使用游戏面板，扩展会连接到 Chat Enhancer Playground 游戏服务器，以便同一直播中选择加入的用户可以查看可用状态、交换邀请并玩游戏。
 

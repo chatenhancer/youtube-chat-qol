@@ -5,7 +5,7 @@ export const site = {
   chromeUrl: 'https://www.chatenhancer.com/chrome',
   firefoxUrl: 'https://www.chatenhancer.com/firefox',
   safariUrl: 'https://www.chatenhancer.com/safari',
-  issuesUrl: 'https://github.com/chatenhancer/youtube-chat-qol/issues',
+  issuesUrl: 'https://chatenhancer.com/issues',
   licenseUrl: 'https://www.chatenhancer.com/license',
   privacyUrl: 'https://www.chatenhancer.com/privacy',
   sourceUrl: 'https://www.chatenhancer.com/source',

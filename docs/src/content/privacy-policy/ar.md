@@ -60,7 +60,7 @@ Chat Enhancer for YouTube هو إضافة متصفح لدردشة YouTube الم
 
   الوصول إلى Google Translate عبر `translate.googleapis.com` غير رسمي وقد يخضع لقيود معدل الاستخدام أو يتغير أو يصبح غير متاح.
 
-- **Chat Enhancer Playground على `https://playground.chatenhancer.com`**
+- <span id="playground"></span>**Chat Enhancer Playground على `https://playground.chatenhancer.com`**
 
   Playground متوقف افتراضيًا. إذا فعّلته واستخدمت لوحة الألعاب، تتصل الإضافة بخادم ألعاب Chat Enhancer Playground حتى يتمكن المستخدمون المشتركون اختياريًا في البث نفسه من رؤية التوفر وتبادل الدعوات ولعب الألعاب.
 

@@ -468,8 +468,8 @@
     "joinPlayground": {
       "message": "Присоединиться к Playground"
     },
-    "playgroundBetaHelper": {
-      "message": "Пробуйте ранние эксперименты. Некоторые могут подключаться к chatenhancer.com для работы."
+    "playgroundHelper": {
+      "message": "Играйте с другими пользователями расширения. Подключается к chatenhancer.com, пока включено."
     },
     "playgroundProfile": {
       "message": "Your Playground identity"

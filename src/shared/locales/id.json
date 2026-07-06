@@ -468,8 +468,8 @@
     "joinPlayground": {
       "message": "Gabung Playground"
     },
-    "playgroundBetaHelper": {
-      "message": "Coba eksperimen lebih awal. Sebagian mungkin tersambung ke chatenhancer.com agar berfungsi."
+    "playgroundHelper": {
+      "message": "Main game dengan pengguna ekstensi lain. Terhubung ke chatenhancer.com saat diaktifkan."
     },
     "playgroundProfile": {
       "message": "Your Playground identity"

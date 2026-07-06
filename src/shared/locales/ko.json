@@ -465,8 +465,8 @@
     "joinPlayground": {
       "message": "Playground 참여"
     },
-    "playgroundBetaHelper": {
-      "message": "실험 기능을 미리 사용해 보세요. 일부는 작동을 위해 chatenhancer.com에 연결될 수 있습니다."
+    "playgroundHelper": {
+      "message": "다른 확장 프로그램 사용자와 게임을 플레이하세요. 활성화된 동안 chatenhancer.com에 연결됩니다."
     },
     "playgroundProfile": {
       "message": "Your Playground identity"

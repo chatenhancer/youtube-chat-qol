@@ -1,7 +1,7 @@
 ---
-title: "Introductie van Chat Enhancer for YouTube"
+title: "Maak kennis met Chat Enhancer for YouTube"
 date: 2026-06-01
-description: "Chat Enhancer for YouTube voegt kleine, native aanvoelende tools toe waardoor drukke YouTube-livechats makkelijker te volgen zijn."
+description: "Chat Enhancer for YouTube voegt kleine, vertrouwd aanvoelende tools toe waardoor drukke YouTube-livechats makkelijker te volgen zijn."
 locale: "nl"
 slug: "introducing-chat-enhancer-for-youtube"
 translationKey: "introducing-chat-enhancer-for-youtube"
@@ -14,52 +14,52 @@ tags:
 
 ## Waarom Chat Enhancer?
 
-YouTube-livechat is erg goed in snel zijn. Het is minder goed als plek waar je gesprekken echt kunt blijven volgen.
+YouTube-livechat is uitstekend in snelheid. Het is een stuk minder goed in gesprekken overzichtelijk houden.
 
-Ik heb Chat Enhancer gebouwd nadat ik veel te veel tijd had doorgebracht in een langlopende livestream. Er praatten mensen van over de hele wereld mee, berichten gingen snel voorbij en na een tijdje voelde het als een kleine tijdelijke gemeenschap. Het maakte ook een paar dingen pijnlijk duidelijk: vermeldingen mis je makkelijk, gesprekken verdwijnen meteen, taalbarrières zitten in de weg en basiscontext over andere mensen in de chat is moeilijker te krijgen dan zou moeten.
+Ik ben Chat Enhancer gaan bouwen nadat ik veel te veel tijd had doorgebracht in een livestream die maar bleef doorgaan. Mensen van over de hele wereld praatten mee, berichten vlogen voorbij en na een tijdje voelde het als een kleine tijdelijke gemeenschap. Tegelijk werden de zwakke plekken duidelijk: vermeldingen mis je snel, gesprekken zijn bijna meteen weer weg, taal zit in de weg en zelfs simpele context over de mensen in de chat is lastiger te vinden dan je zou verwachten.
 
-Daarom maakte ik een extensie voor de dingen waarvan ik bleef wensen dat YouTube-livechat ze al had.
+Daarom heb ik de extensie gemaakt die ik steeds miste in YouTube-livechat.
 
-Chat Enhancer is bedoeld om stilletjes in YouTube te zitten, niet om het te vervangen. De chat voelt nog steeds als YouTube-chat; er zitten alleen een paar extra hulpmiddelen waar ze nuttig zijn.
+Chat Enhancer hoort onopvallend in YouTube te passen, niet YouTube te vervangen. De chat blijft voelen als YouTube-chat; hij krijgt alleen een paar extra hulpmiddelen op de plekken waar ze nuttig zijn.
 
-## Live vertaling
+## Live vertalen
 
-Taal was het eerste probleem waar ik steeds tegenaan liep. De chat had veel Koreaanse en Chinese berichten. De hele pagina vertalen werkte technisch gezien, maar het maakte de chat ook vreemd en moeilijker te volgen.
+Taal was het eerste probleem waar ik steeds tegenaan liep. In die chat stonden veel Koreaanse en Chinese berichten. De hele pagina vertalen werkte technisch gezien wel, maar het liet de chat vreemd aanvoelen en maakte hem juist moeilijker te volgen.
 
-Met Chat Enhancer kun je livechatberichten direct vertalen, terwijl emoji’s en vermeldingen intact blijven. Je kunt met de muis over een vertaald bericht gaan om de oorspronkelijke tekst en de gedetecteerde taal te zien.
+Met Chat Enhancer vertaal je livechatberichten direct, terwijl emoji’s en vermeldingen intact blijven. Ga met je muis over een vertaald bericht om de oorspronkelijke tekst en de herkende taal te zien.
 
-Je kunt ook vertalen wat je typt voordat je het verstuurt. Daardoor wordt het veel makkelijker om echt mee te doen in een meertalige chat in plaats van alleen vanaf de zijlijn mee te kijken.
+Je kunt ook vertalen wat je zelf typt voordat je het verstuurt. Daardoor wordt het veel makkelijker om echt mee te doen in een meertalige chat, in plaats van alleen vanaf de zijlijn mee te kijken.
 
-De vertaling gebruikt Google Translate, dus die zal niet perfect zijn. In de praktijk is hij nog steeds goed genoeg om een drukke meertalige chat makkelijker te volgen.
+De vertaling gebruikt Google Translate, dus perfect wordt het niet. In de praktijk is het wel goed genoeg om een drukke, meertalige chat veel beter te kunnen volgen.
 
 ## Inbox
 
-YouTube-livechat waarschuwt je niet wanneer iemand je noemt.
+YouTube-livechat geeft geen melding wanneer iemand je noemt.
 
-Dat is prima als je elke seconde naar de chat kijkt. Het is minder prima als je de stream op de achtergrond laat staan, koffie gaat zetten of even wegloopt.
+Dat is prima als je elke seconde naar de chat kijkt. Het is minder handig als de stream op de achtergrond draait, je koffie gaat zetten of even wegloopt.
 
-Chat Enhancer voegt een inbox toe voor vermeldingen en gevolgde trefwoorden, zodat je belangrijke berichten kunt terugvinden zonder alles handmatig door te scrollen.
+Chat Enhancer voegt een Inbox toe voor vermeldingen en gevolgde trefwoorden. Zo vind je de berichten die voor jou belangrijk zijn terug zonder de hele chat handmatig door te scrollen.
 
 ## Betere gebruikerscontext
 
-Livechats bewegen snel. Wanneer iemand op je reageert, is het niet altijd duidelijk wie diegene is of waar diegene het een paar minuten geleden over had.
+Livechats gaan snel. Wanneer iemand op je reageert, is niet altijd meteen duidelijk wie diegene is of waar diegene een paar minuten geleden over praatte.
 
-Met Chat Enhancer opent een klik op iemands avatar een profielpaneel met recente berichten van die gebruiker. Je kunt ook hun YouTube-kanaal openen in een zijvenster en gebruikers bookmarken die je later wilt herkennen.
+Met Chat Enhancer opent een klik op iemands avatar een profielpaneel met recente berichten van die gebruiker. Je kunt ook het YouTube-kanaal openen in een zijvenster en gebruikers bookmarken die je later wilt herkennen.
 
-Het is iets kleins, maar vaste chatters voelen daardoor minder als willekeurige namen die voorbijvliegen.
+Het is klein, maar vaste chatters voelen daardoor minder als willekeurige namen die voorbijschieten.
 
 ## Meestgebruikte emoji’s
 
-Ik gebruik constant dezelfde emoji’s. Elke keer door de volledige emoji-kiezer scrollen werd al snel vervelend.
+Ik gebruik constant dezelfde emoji’s. Elke keer door de volledige emoji-kiezer scrollen begon al snel te vervelen.
 
-Chat Enhancer voegt een rij toe voor je meestgebruikte emoji’s, zodat de emoji’s die je echt gebruikt makkelijker bereikbaar zijn.
+Chat Enhancer voegt een rij met je meestgebruikte emoji’s toe, zodat de emoji’s die je echt gebruikt sneller binnen handbereik zijn.
 
 ## Andere kleine verbeteringen
 
-Er zitten nog wat meer verbeteringen in, zoals snelle vermeldingen en citaten, gebruikersbookmarks, chatcommando’s, conceptherstel en andere kleine details die livechat iets minder kaal maken.
+Er zijn nog meer kleine verbeteringen: snelle vermeldingen en citaten, gebruikersbookmarks, chatcommando’s, conceptherstel en andere details waardoor livechat minder kaal aanvoelt.
 
-Niets hiervan probeert YouTube-livechat in een andere app te veranderen. Het maakt de bestaande chat alleen makkelijker te gebruiken.
+Niets hiervan probeert van YouTube-livechat een andere app te maken. Het maakt de bestaande chat gewoon makkelijker in gebruik.
 
 Chat Enhancer for YouTube is gratis, open-source, vereist geen account en gebruikt geen analytics.
 
-Lees meer op [chatenhancer.com](https://www.chatenhancer.com/#features)
+Lees meer op [chatenhancer.com](https://www.chatenhancer.com/#features).

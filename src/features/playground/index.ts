@@ -1,7 +1,7 @@
 /**
- * Playground beta entry point.
+ * Playground entry point.
  *
- * Playground is the opt-in surface for experiments. Concrete experiments live
+ * Playground is the opt-in games surface. Concrete games live
  * in submodules so this entry point stays as feature wiring only.
  */
 import './games';

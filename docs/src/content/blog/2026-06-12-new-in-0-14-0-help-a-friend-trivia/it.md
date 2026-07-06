@@ -1,7 +1,7 @@
 ---
 title: "Novità in Chat Enhancer 0.14.0: HELP-A-FRIEND! Trivia"
 date: 2026-06-12
-description: "Un nuovo gioco Playground in cui i momenti dei replay di YouTube diventano domande trivia in stile chat."
+description: "HELP-A-FRIEND! Trivia trasforma i momenti dei replay di YouTube in un quiz rapido in stile chat."
 locale: "it"
 slug: "new-in-0-14-0-help-a-friend-trivia"
 image: "./0e5e4f69e6fa7b45.png"
@@ -12,17 +12,17 @@ tags:
   - "trivia"
 ---
 
-Il secondo gioco Playground è arrivato: **HELP-A-FRIEND! Trivia**
+Il secondo gioco Playground è arrivato: **HELP-A-FRIEND! Trivia**.
 
 :::media-right
 
 ![Logo di HELP-A-FRIEND! Trivia](./2026-06-12-new-in-0-14-0-help-a-friend-trivia-assets/6ef6d6f2584f127f.png){shadow=smooth;rotate=-8deg}
 
-Invece di una plancia da quiz, *HELP-A-FRIEND! Trivia* si svolge come una piccola chat di gruppo. Uno dei tuoi amici chiaramente non stava seguendo lo stream e ora ha bisogno di aiuto. Ti ricordi cosa è successo?
+Invece di una plancia da quiz, *HELP-A-FRIEND! Trivia* si svolge come una piccola chat di gruppo. Uno dei tuoi amici chiaramente non stava seguendo lo stream e ora ha bisogno di aiuto. Ti ricordi che cosa è successo?
 
 Le risposte corrette ricevono la reazione 🏆.
 
-Le risposte sbagliate vengono giudicate *con gentilezza*.
+Le risposte sbagliate vengono giudicate *con garbo*.
 
 :::
 
@@ -30,7 +30,7 @@ Le risposte sbagliate vengono giudicate *con gentilezza*.
 
 Avvia una partita Playground da un replay di YouTube, invita un altro giocatore e attendi qualche secondo mentre vengono preparate le domande.
 
-Quando il gioco inizia, il tuo “amico” fa una domanda sul replay, compaiono quattro possibili risposte, ed entrambi i giocatori scelgono prima che il tempo scada. Rispondi in fretta. Il tuo compagno non è paziente.
+Quando il gioco inizia, il tuo “amico” fa una domanda sul replay. Compaiono quattro possibili risposte, ed entrambi i giocatori scelgono prima che il tempo scada. Rispondi in fretta. Il tuo compagno non è paziente.
 
 ## Creato per i replay
 

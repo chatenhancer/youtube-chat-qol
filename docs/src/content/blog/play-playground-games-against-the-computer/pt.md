@@ -1,7 +1,7 @@
 ---
-title: "Jogue os jogos do Playground contra o computador"
+title: "Jogue os jogos do Playground contra Computer"
 date: 2026-06-14
-description: "Oponentes Computer facilitam começar jogos do Playground quando não há mais ninguém por perto."
+description: "Oponentes Computer facilitam começar partidas do Playground quando não há mais ninguém por perto."
 locale: "pt"
 slug: "play-playground-games-against-the-computer"
 image: "./cover.png"
@@ -19,35 +19,35 @@ Agora ficou mais fácil entrar no Playground: você pode jogar contra **Computer
 
 ## Como funciona
 
-Abra o Playground pelo painel Games e procure um jogador Computer na lista de jogadores. Convide um deles da mesma forma que convidaria outro jogador. A partida começa automaticamente, e você pode jogar sem mudar a forma como usa o Playground.
+Abra o Playground pelo painel Jogos e procure um jogador Computer na lista de jogadores. Convide-o da mesma forma que convidaria outro espectador. A partida começa automaticamente, e o restante do Playground funciona como sempre.
 
 Os oponentes Computer estão disponíveis para:
 
-- **Chess**, com **Computer (Beginner)**, **Computer (Club)** e **Computer (Master)**, para escolher uma partida mais leve, intermediária ou mais difícil.
-- **HELP-A-FRIEND! Trivia**, para que a trivia de replays continue jogável quando ninguém estiver livre.
+- **Xadrez**, com **Computer (Beginner)**, **Computer (Club)** e **Computer (Master)**, para escolher uma partida mais leve, intermediária ou mais difícil.
+- **HELP-A-FRIEND! Trivia**, para que a trivia de replays continue jogável quando ninguém estiver disponível.
 
-## Escolha sua dificuldade de Chess
+## Escolha a dificuldade de Xadrez
 
-Chess agora tem três oponentes Computer. Beginner é a opção mais fácil para aquecer, Club é um oponente intermediário mais estável e Master é a opção mais difícil.
+Xadrez agora tem três oponentes Computer. Beginner é a opção mais fácil para aquecer, Club joga em um nível intermediário mais estável e Master é a escolha mais difícil.
 
 Não é preciso mudar nenhuma configuração: escolha o perfil Computer que quiser na lista de jogadores e envie um convite.
 
 ## Ainda parece Playground
 
-Não é um modo solo separado nem uma nova tela. Os jogadores Computer se comportam como oponentes normais do Playground, então o fluxo continua familiar: abra o painel, escolha um jogo, envie um convite e jogue.
+Não é um modo solo separado nem uma nova tela. Os jogadores Computer se comportam como oponentes normais do Playground: abra o painel, escolha um jogo, envie um convite e jogue.
 
-No Chess, Computer faz as jogadas depois de uma pequena pausa para que a partida não pareça instantânea.
+No Xadrez, Computer espera um pouco antes de jogar, para que a partida não pareça instantânea.
 
 Em *HELP-A-FRIEND! Trivia*, Computer responde durante a rodada da pergunta como outro jogador faria. Ele não é perfeito, então você ainda tem uma chance real de vencer.
 
 ## Por que adicionar isso?
 
-O Playground é mais divertido quando há alguém por perto para jogar, mas o chat ao vivo é imprevisível. Computer mantém os jogos úteis em momentos mais calmos, streams tarde da noite, replays ou comunidades pequenas em que nem sempre há outro usuário do Chat Enhancer disponível.
+O Playground é mais divertido quando há alguém por perto para jogar, mas o chat ao vivo é imprevisível. Computer mantém os jogos disponíveis em momentos mais calmos, streams tarde da noite, replays ou comunidades pequenas em que nem sempre há outro usuário do Chat Enhancer disponível.
 
 :::media-left
 
 ![Configurações do Playground no popup do Chat Enhancer](./extension-settings.png)
 
-O Playground continua sendo opcional. Ative **Entrar no Playground** nas configurações da extensão, abra o painel Games no chat e convide um oponente Computer quando quiser uma partida.
+O Playground continua sendo opcional. Ative **Entrar no Playground** nas configurações da extensão, abra o painel Jogos no chat e convide um oponente Computer quando quiser uma partida.
 
 :::

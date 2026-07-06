@@ -54,7 +54,7 @@ When translation or Playground features are enabled and used, data may be sent t
 
   Google Translate access through `translate.googleapis.com` is unofficial and may be rate-limited, changed, or unavailable.
 
-- **Chat Enhancer Playground at `https://playground.chatenhancer.com`**
+- <span id="playground"></span>**Chat Enhancer Playground at `https://playground.chatenhancer.com`**
 
   Playground is off by default. If you enable Playground and use the games panel, the extension connects to the Chat Enhancer Playground game server so opted-in users in the same stream can see availability, exchange invites, and play games.
 

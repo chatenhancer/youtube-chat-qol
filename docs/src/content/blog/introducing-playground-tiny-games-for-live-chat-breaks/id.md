@@ -1,7 +1,7 @@
 ---
 title: "Memperkenalkan Playground: game kecil untuk jeda live chat"
 date: 2026-06-10
-description: "Playground menambahkan game ringkas ke live chat YouTube untuk bagian stream yang lebih tenang."
+description: "Playground menghadirkan game kecil di live chat YouTube untuk momen-momen stream yang sedang lebih tenang."
 locale: "id"
 slug: "introducing-playground-tiny-games-for-live-chat-breaks"
 translationKey: "introducing-playground-tiny-games-for-live-chat-breaks"
@@ -14,19 +14,19 @@ tags:
   - "chess"
 ---
 
-## Playground sudah hadir!
+## Playground sudah hadir
 
-Playground adalah hub game kecil di Chat Enhancer. Anda bisa bermain dengan penonton lain yang memasang ekstensi dan berada di stream yang sama.
+Playground adalah hub game kecil di dalam Chat Enhancer. Anda bisa bermain dengan penonton lain yang memasang ekstensi dan sedang berada di stream yang sama.
 
-Streamer sedang menjauh sebentar? Buka Playground, mainkan pertandingan cepat, dan tetap dekat dengan chat.
+Streamer sedang pergi sebentar? Buka Playground, mainkan pertandingan singkat, dan tetap dekat dengan chat.
 
 :::media-right
 
-![Panel catur ringkas melayang di atas live chat YouTube](./f779ebcc57f8280d.png){shadow=smooth rotation=-2}
+![Panel Catur ringkas melayang di atas live chat YouTube](./f779ebcc57f8280d.png){shadow=smooth rotation=-2}
 
-Game tetap ringkas. Panel bisa diseret, jadi Anda dapat memindahkannya saat chat kembali ramai.
+Game tetap ringkas. Panelnya bisa diseret, jadi Anda dapat memindahkannya saat chat kembali ramai.
 
-Catur adalah game Playground pertama, dan masih paling jelas menjelaskan idenya: aktivitas sampingan cepat yang tetap dekat dengan chat tanpa mengambil alih halaman.
+Catur adalah game Playground pertama, dan sampai sekarang masih paling jelas menggambarkan idenya: aktivitas sampingan singkat yang tetap dekat dengan chat tanpa mengambil alih halaman.
 
 :::
 
@@ -34,7 +34,7 @@ Catur adalah game Playground pertama, dan masih paling jelas menjelaskan idenya:
 
 Buka panel Game, pilih **Catur**, lalu undang seseorang yang tersedia di stream yang sama. Saat mereka menerima, papan akan terbuka dalam panel kecil yang melayang di atas live chat.
 
-Game ini memakai aturan catur biasa. Langkah diperiksa sebelum dikirim, giliran tetap sinkron antara kedua pemain, dan pertandingan bisa berakhir dengan skakmat, seri, atau menyerah. Jika stream kembali ramai, seret panel ke samping dan lanjutkan menonton.
+Game ini memakai aturan chess biasa. Langkah diperiksa sebelum dikirim, giliran tetap sinkron antara kedua pemain, dan pertandingan bisa berakhir dengan checkmate, draw, atau resign. Jika stream kembali ramai, seret panel ke samping dan lanjutkan menonton.
 
 Jika tidak ada orang lain di sekitar, Catur juga mendukung lawan **Computer**. Pilih **Computer (Beginner)**, **Computer (Club)**, atau **Computer (Master)** dari daftar pemain dan mulai pertandingan seperti saat bermain dengan penonton lain.
 
@@ -57,11 +57,11 @@ Pengaturan Playground ada di popup ekstensi.
 
 Aktifkan **Gabung Playground** agar ikon Game muncul di chat.
 
-Di dalam panel Game, aktifkan **Tersedia untuk bermain** saat Anda ingin pemain lain melihat Anda. Jika biasanya ingin selalu tersedia, aktifkan **Tersedia secara default** di pengaturan ekstensi.
+Di dalam panel Game, aktifkan **Tersedia untuk undangan** saat Anda ingin pemain lain melihat Anda. Jika biasanya ingin selalu tersedia, aktifkan **Tersedia untuk undangan secara default** di pengaturan ekstensi.
 
 :::
 
-## Sekarang lebih dari Catur
+## Sekarang bukan cuma Catur
 
 Playground sudah berkembang sejak pratinjau Catur pertama ini. Anda juga bisa memainkan [HELP-A-FRIEND! Trivia](/id/blog/new-in-0-14-0-help-a-friend-trivia/), dan [The Wild Wild Chat](/id/blog/the-wild-wild-chat-coming-to-chat-enhancer-0-15-0/) mengubah live chat menjadi perburuan bounty yang cepat.
 

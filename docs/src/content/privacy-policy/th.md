@@ -60,7 +60,7 @@ Chat Enhancer for YouTube เป็นส่วนขยายเบราว์
 
   การเข้าถึง Google Translate ผ่าน `translate.googleapis.com` เป็นแบบไม่เป็นทางการ และอาจถูกจำกัด เปลี่ยนแปลง หรือไม่พร้อมใช้งาน
 
-- **Chat Enhancer Playground ที่ `https://playground.chatenhancer.com`**
+- <span id="playground"></span>**Chat Enhancer Playground ที่ `https://playground.chatenhancer.com`**
 
   Playground ปิดอยู่ตามค่าเริ่มต้น หากคุณเปิดใช้ Playground และใช้แผงเกม ส่วนขยายจะเชื่อมต่อกับเซิร์ฟเวอร์เกม Chat Enhancer Playground เพื่อให้ผู้ใช้ที่เลือกเข้าร่วมใน stream เดียวกันเห็นสถานะพร้อมเล่น แลกเปลี่ยนคำเชิญ และเล่นเกมได้
 

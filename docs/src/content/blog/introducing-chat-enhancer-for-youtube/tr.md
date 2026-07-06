@@ -1,7 +1,7 @@
 ---
 title: "Chat Enhancer for YouTube ile tanışın"
 date: 2026-06-01
-description: "Chat Enhancer for YouTube, yoğun YouTube canlı sohbetlerini takip etmeyi kolaylaştıran küçük ve yerel hissettiren araçlar ekler."
+description: "Chat Enhancer for YouTube, yoğun YouTube canlı sohbetlerini takip etmeyi kolaylaştıran küçük ve YouTube’a aitmiş gibi duran araçlar ekler."
 locale: "tr"
 slug: "introducing-chat-enhancer-for-youtube"
 translationKey: "introducing-chat-enhancer-for-youtube"
@@ -14,52 +14,52 @@ tags:
 
 ## Neden Chat Enhancer?
 
-YouTube canlı sohbeti hızlı olmakta çok iyi. Ama konuşmaları gerçekten takip edebileceğiniz bir yer olmakta o kadar iyi değil.
+YouTube canlı sohbeti hız konusunda çok iyi. Ama gerçekten bir konuşmayı takip etmek istediğinizde aynı derecede yardımcı olmuyor.
 
-Chat Enhancer’ı uzun süredir devam eden bir canlı yayında gereğinden fazla zaman geçirdikten sonra yaptım. Dünyanın her yerinden insanlar yazıyordu, mesajlar çok hızlı akıyordu ve zamanla orası küçük, geçici bir topluluk gibi hissettirmeye başladı. Aynı zamanda birkaç şeyi acı şekilde belli etti: bahsetmeleri kaçırmak kolay, konuşmalar anında kayboluyor, dil engelleri araya giriyor ve sohbetteki diğer insanlar hakkında temel bağlam almak olması gerekenden zor.
+Chat Enhancer’ı, uzun süren bir canlı yayında gereğinden fazla vakit geçirdikten sonra yapmaya başladım. Dünyanın her yerinden insanlar yazıyordu, mesajlar hızla akıyordu ve bir süre sonra orası küçük, geçici bir topluluk gibi hissettirmeye başladı. Aynı zamanda zayıf noktalar da çok belirginleşti: bahsetmeleri kaçırmak kolaydı, konuşmalar neredeyse anında kayboluyordu, dil araya giriyordu ve sohbetteki insanlar hakkında temel bağlam edinmek şaşırtıcı derecede zordu.
 
-Bu yüzden YouTube canlı sohbetinde sürekli olmasını dilediğim şeyler için bir uzantı yaptım.
+Bu yüzden YouTube canlı sohbetinde sürekli olmasını istediğim şeyleri ekleyen bir uzantı yaptım.
 
-Chat Enhancer, YouTube’un yerini almak için değil, YouTube’un içinde sessizce durmak için tasarlandı. Sohbet hâlâ YouTube sohbeti gibi hissettirir; yalnızca işe yaradığı yerlerde birkaç araç daha vardır.
+Chat Enhancer, YouTube’un yerini almak için değil, YouTube’un içinde sessizce durmak için tasarlandı. Sohbet hâlâ YouTube sohbeti gibi hissettirir; sadece işe yaradığı yerlerde birkaç ek araç belirir.
 
 ## Canlı çeviri
 
-Sürekli karşıma çıkan ilk sorun dildi. Sohbette çok fazla Korece ve Çince mesaj vardı. Tüm sayfayı çevirmek teknik olarak çalışıyordu, ama sohbeti garip ve takip etmesi daha zor hale getiriyordu.
+Sürekli karşıma çıkan ilk sorun dildi. Sohbette çok fazla Korece ve Çince mesaj vardı. Tüm sayfayı çevirmek teknik olarak işe yarıyordu, ama sohbeti tuhaf gösteriyor ve takip etmeyi zorlaştırıyordu.
 
 Chat Enhancer, emojileri ve bahsetmeleri bozmadan canlı sohbet mesajlarını doğrudan çevirmenizi sağlar. Çevrilmiş bir mesajın üzerine gelerek orijinal metni ve algılanan dili görebilirsiniz.
 
-Ayrıca göndermeden önce yazdığınız metni çevirebilirsiniz. Bu, çok dilli bir sohbette kenardan izlemek yerine gerçekten katılmayı çok daha kolay hale getirir.
+Ayrıca göndermeden önce yazdığınız metni de çevirebilirsiniz. Böylece çok dilli bir sohbeti kenardan izlemek yerine gerçekten katılmak çok daha kolay olur.
 
-Çeviri Google Translate kullanır, bu yüzden mükemmel olmayacaktır. Pratikte yine de yoğun ve çok dilli bir sohbeti takip etmeyi kolaylaştıracak kadar iyidir.
+Çeviri Google Translate kullanır, bu yüzden mükemmel değildir. Yine de pratikte yoğun ve çok dilli bir sohbeti takip etmeyi kolaylaştıracak kadar işe yarar.
 
 ## Inbox
 
-YouTube canlı sohbeti, biri sizden bahsettiğinde sizi bilgilendirmez.
+YouTube canlı sohbeti, biri sizden bahsettiğinde size bildirim göndermez.
 
-Her saniye sohbete bakıyorsanız sorun değil. Yayını arka planda bırakıp kahve yapıyorsanız ya da bir dakikalığına uzaklaşıyorsanız daha az iyi.
+Her saniye sohbete bakıyorsanız sorun değil. Ama yayını arka planda bırakıp kahve yapıyorsanız ya da bir dakikalığına uzaklaşıyorsanız önemli bir mesaj kolayca kaybolabilir.
 
-Chat Enhancer, bahsetmeler ve izlenen anahtar kelimeler için bir inbox ekler. Böylece önemli mesajları her şeyi elle kaydırmadan yakalayabilirsiniz.
+Chat Enhancer, bahsetmeler ve izlenen anahtar kelimeler için Inbox ekler. Böylece önemli mesajlara tüm sohbeti elle kaydırmadan dönebilirsiniz.
 
 ## Daha iyi kullanıcı bağlamı
 
-Canlı sohbetler hızlı akar. Biri size yanıt verdiğinde, kim olduğu ya da birkaç dakika önce neden bahsettiği her zaman açık değildir.
+Canlı sohbetler hızlı akar. Biri size yanıt verdiğinde, kim olduğu ya da birkaç dakika önce ne hakkında konuştuğu her zaman açık değildir.
 
-Chat Enhancer ile bir kullanıcının avatarına tıklamak, o kişinin son mesajlarını gösteren bir profil paneli açar. Ayrıca YouTube kanalını yan pencerede açabilir ve daha sonra tanımak istediğiniz kullanıcıları yer imlerine ekleyebilirsiniz.
+Chat Enhancer’da bir kullanıcının avatarına tıkladığınızda, o kişinin son mesajlarını gösteren bir profil paneli açılır. YouTube kanalını yan pencerede açabilir ve daha sonra tanımak istediğiniz kullanıcıları yer imlerine ekleyebilirsiniz.
 
-Küçük bir şey, ama düzenli sohbet edenlerin ekrandan uçup giden rastgele isimler gibi hissettirmesini azaltır.
+Küçük bir şey, ama düzenli sohbet edenleri ekrandan uçup giden rastgele isimler gibi hissettirmez.
 
 ## En çok kullanılan emojiler
 
-Sürekli aynı emojileri kullanıyorum. Her seferinde tüm emoji seçicisini kaydırmak kısa sürede can sıkıcı hale geldi.
+Sürekli aynı emojileri kullanıyorum. Her seferinde tüm emoji seçicisini açıp aramak kısa sürede can sıkıcı hale geldi.
 
-Chat Enhancer, en çok kullandığınız emojiler için bir sıra ekler; gerçekten kullandıklarınıza ulaşmak daha kolay olur.
+Chat Enhancer, en çok kullandığınız emojiler için bir sıra ekler; gerçekten kullandıklarınıza ulaşmak kolaylaşır.
 
 ## Diğer küçük iyileştirmeler
 
-Hızlı bahsetme ve alıntılar, kullanıcı yer imleri, sohbet komutları, taslak kurtarma ve canlı sohbeti biraz daha az çıplak hissettiren başka küçük dokunuşlar da var.
+Hızlı bahsetme ve alıntılar, kullanıcı yer imleri, sohbet komutları, taslak kurtarma ve canlı sohbeti daha az boş hissettiren başka küçük dokunuşlar da var.
 
 Bunların hiçbiri YouTube canlı sohbetini farklı bir uygulamaya dönüştürmeye çalışmıyor. Sadece mevcut sohbeti kullanmayı kolaylaştırıyor.
 
-Chat Enhancer for YouTube ücretsizdir, açık kaynaklıdır, hesap gerektirmez ve analytics çalıştırmaz.
+Chat Enhancer for YouTube ücretsizdir, açık kaynaklıdır, hesap gerektirmez ve analiz toplamaz.
 
-Daha fazla bilgi için [chatenhancer.com](https://www.chatenhancer.com/#features)
+Daha fazla bilgi için [chatenhancer.com](https://www.chatenhancer.com/#features).

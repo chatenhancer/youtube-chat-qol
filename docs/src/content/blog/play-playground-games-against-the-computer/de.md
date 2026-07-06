@@ -1,7 +1,7 @@
 ---
-title: "Playground-Spiele gegen den Computer spielen"
+title: "Playground-Spiele gegen Computer spielen"
 date: 2026-06-14
-description: "Computer-Gegner machen es einfacher, Playground-Spiele zu starten, wenn niemand anderes da ist."
+description: "Computer-Gegner machen Playground-Spiele leichter zugänglich, wenn gerade niemand anderes verfügbar ist."
 locale: "de"
 slug: "play-playground-games-against-the-computer"
 image: "./cover.png"
@@ -13,36 +13,36 @@ tags:
   - "trivia"
 ---
 
-Playground ist jetzt leichter nutzbar: Du kannst gegen **Computer** spielen.
+Der Einstieg in Playground ist jetzt einfacher: Du kannst gegen **Computer** spielen.
 
-Manchmal ist der Chat ruhig. Manchmal schauen deine Freunde einen anderen Stream. Manchmal willst du einfach eine schnelle Runde spielen, ohne darauf zu warten, dass jemand anderes annimmt. Computer gibt dir eine weitere Option.
+Manchmal ist der Chat ruhig. Manchmal schauen deine Freunde gerade einen anderen Stream. Und manchmal willst du einfach eine schnelle Runde spielen, ohne darauf zu warten, dass jemand eine Einladung annimmt. Mit Computer hast du dafür jetzt eine weitere Option.
 
 ## So funktioniert es
 
-Öffne Playground über das Spiele-Panel und suche in der Spielerliste nach einem Computer-Spieler. Lade einen davon genauso ein wie einen anderen Spieler. Die Partie startet automatisch, und du kannst spielen, ohne deine gewohnte Playground-Nutzung zu ändern.
+Öffne Playground über das Spiele-Panel und suche in der Spielerliste nach einem Computer-Spieler. Lade ihn genauso ein wie einen anderen Zuschauer. Die Partie startet automatisch, und der Rest von Playground funktioniert wie gewohnt.
 
 Computer-Gegner sind verfügbar für:
 
-- **Chess**, mit **Computer (Beginner)**, **Computer (Club)** und **Computer (Master)**, damit du eine leichtere, mittlere oder härtere Partie wählen kannst.
-- **HELP-A-FRIEND! Trivia**, damit Replay-Trivia auch spielbar bleibt, wenn niemand frei ist.
+- **Schach**, mit **Computer (Beginner)**, **Computer (Club)** und **Computer (Master)**, damit du eine leichtere, mittlere oder schwierigere Partie wählen kannst.
+- **HELP-A-FRIEND! Trivia**, damit Replay-Trivia auch spielbar bleibt, wenn sonst niemand Zeit hat.
 
-## Wähle deinen Chess-Schwierigkeitsgrad
+## Wähle deinen Schach-Schwierigkeitsgrad
 
-Chess hat jetzt drei Computer-Gegner. Beginner ist der einfachste Einstieg, Club ist ein stabilerer Gegner auf mittlerem Niveau, und Master ist die härteste Option.
+Schach hat jetzt drei Computer-Gegner. Beginner ist die einfachste Wahl zum Aufwärmen, Club spielt solider auf mittlerem Niveau, und Master ist die härteste Option.
 
-Du brauchst keine separate Einstellung: Wähle das gewünschte Computer-Profil in der Spielerliste aus und sende eine Einladung.
+Du brauchst keine separate Einstellung. Wähle einfach das gewünschte Computer-Profil in der Spielerliste aus und sende eine Einladung.
 
 ## Es fühlt sich weiter wie Playground an
 
-Das ist kein separater Solo-Modus und kein neuer Bildschirm. Computer-Spieler verhalten sich wie normale Playground-Gegner. Der Ablauf bleibt also vertraut: Panel öffnen, Spiel auswählen, Einladung senden und spielen.
+Das ist kein separater Solo-Modus und kein neuer Bildschirm. Computer-Spieler verhalten sich wie normale Playground-Gegner: Panel öffnen, Spiel auswählen, Einladung senden und spielen.
 
-Bei Chess macht Computer seine Züge nach einer kurzen Pause, damit sich die Partie nicht augenblicklich anfühlt.
+Bei Schach wartet Computer kurz, bevor er zieht. So fühlt sich die Partie nicht wie eine sofortige Antwortmaschine an.
 
-Bei *HELP-A-FRIEND! Trivia* antwortet Computer während der Fragerunde genau wie ein anderer Spieler. Er ist nicht perfekt, du hast also weiterhin eine echte Chance zu gewinnen.
+Bei *HELP-A-FRIEND! Trivia* antwortet Computer während der Fragerunde wie ein anderer Spieler. Er ist nicht perfekt, du hast also weiterhin eine echte Chance zu gewinnen.
 
 ## Warum diese Ergänzung?
 
-Playground macht am meisten Spaß, wenn jemand zum Mitspielen da ist, aber Live-Chats sind unberechenbar. Computer hält die Spiele in ruhigeren Momenten, bei späten Streams, Replays oder kleinen Communities nutzbar, wenn nicht immer ein anderer Chat Enhancer-Nutzer verfügbar ist.
+Playground macht am meisten Spaß, wenn jemand zum Mitspielen da ist, aber Livechats sind unberechenbar. Computer hält die Spiele auch in ruhigeren Momenten, späten Streams, Replays oder kleinen Communities nutzbar, in denen gerade kein anderer Chat Enhancer-Nutzer verfügbar ist.
 
 :::media-left
 

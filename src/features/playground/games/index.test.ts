@@ -51,7 +51,7 @@ describe('playground games header button', () => {
     delete (chrome.runtime as Partial<typeof chrome.runtime>).connect;
   });
 
-  it('does not insert the games button until the beta is enabled', async () => {
+  it('does not insert the games button until Playground is enabled', async () => {
     document.body.append(createHeader());
 
     refreshGamesButton();
@@ -190,7 +190,6 @@ describe('playground games header button', () => {
     expect(document.querySelector('.ytcq-games-card')).not.toBeNull();
     expect(document.querySelector('.ytcq-games-card-icon svg')).not.toBeNull();
     expect(document.querySelector('.ytcq-profile-card-title')?.textContent).toBe('Games');
-    expect(document.querySelector('.ytcq-games-beta-badge')).toBeNull();
     expect(document.querySelector('.ytcq-profile-card-subtitle')?.textContent).toBe('Connecting...');
     expect(document.querySelector('.ytcq-games-connection-notice')?.textContent).toContain('Connecting to Playground');
     expect(document.querySelector('.ytcq-games-connection-notice')?.textContent).toContain('Setting up the games lobby, please wait.');
@@ -239,7 +238,6 @@ describe('playground games header button', () => {
 
     getGameCards()[0].click();
     expect(document.querySelector('.ytcq-profile-card-title')?.textContent).toBe('Chess');
-    expect(document.querySelector('.ytcq-games-beta-badge')).toBeNull();
     expect(document.querySelector('.ytcq-profile-card-subtitle')?.textContent).toBe('Invite a player');
     expect(document.querySelector('.ytcq-games-section-empty')?.textContent).toBe('There are no players available.');
     expect(document.querySelector('.ytcq-games-player-row')).toBeNull();
@@ -609,7 +607,6 @@ describe('playground games header button', () => {
 
     getActionButton('Back').click();
     expect(document.querySelector('.ytcq-profile-card-title')?.textContent).toBe('Games');
-    expect(document.querySelector('.ytcq-games-beta-badge')).toBeNull();
     expect(document.querySelector('.ytcq-profile-card-subtitle')?.textContent).toBe('2 players online');
 
     getGameCards()[0].click();

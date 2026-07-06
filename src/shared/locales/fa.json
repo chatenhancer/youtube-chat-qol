@@ -465,8 +465,8 @@
     "joinPlayground": {
       "message": "پیوستن به محیط آزمایشی"
     },
-    "playgroundBetaHelper": {
-      "message": "قابلیت‌های آزمایشی را زودتر امتحان کنید. برخی ممکن است برای کارکردن به chatenhancer.com وصل شوند."
+    "playgroundHelper": {
+      "message": "با دیگر کاربران افزونه بازی کنید. هنگام فعال بودن به chatenhancer.com وصل می‌شود."
     },
     "playgroundProfile": {
       "message": "Your Playground identity"
