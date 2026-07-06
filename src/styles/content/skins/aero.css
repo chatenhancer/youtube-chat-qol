@@ -9,7 +9,9 @@
   --ytcq-aero-border: #73b9db;
   --ytcq-aero-surface: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(238, 253, 255, 0.94) 36%, rgba(203, 236, 249, 0.94) 100%);
   --ytcq-aero-surface-deep: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(225, 248, 255, 0.96) 50%, rgba(181, 226, 245, 0.94) 100%);
-  --ytcq-aero-row: linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(220, 246, 255, 0.74) 100%);
+  --ytcq-aero-list-row-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(226, 247, 254, 0.52));
+  --ytcq-aero-list-row-hover-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(207, 240, 252, 0.72));
+  --ytcq-aero-list-row-border: rgba(100, 183, 219, 0.5);
   --ytcq-aero-hover: linear-gradient(180deg, #fff 0%, #dff6ff 45%, #bdefff 100%);
   --ytcq-aero-control-border: #8e8f8f;
   --ytcq-aero-control-border-hover: #3c7fb1;
@@ -52,7 +54,9 @@
   --ytcq-aero-border: #267a9e;
   --ytcq-aero-surface: linear-gradient(180deg, rgba(34, 71, 86, 0.98) 0%, rgba(22, 55, 71, 0.96) 42%, rgba(11, 35, 50, 0.97) 100%);
   --ytcq-aero-surface-deep: linear-gradient(180deg, rgba(46, 87, 101, 0.98) 0%, rgba(24, 57, 73, 0.97) 48%, rgba(8, 28, 42, 0.98) 100%);
-  --ytcq-aero-row: linear-gradient(180deg, rgba(37, 78, 94, 0.8) 0%, rgba(12, 42, 58, 0.74) 100%);
+  --ytcq-aero-list-row-bg: linear-gradient(180deg, rgba(38, 79, 94, 0.68), rgba(13, 43, 58, 0.56));
+  --ytcq-aero-list-row-hover-bg: linear-gradient(180deg, rgba(55, 111, 132, 0.74), rgba(20, 65, 86, 0.66));
+  --ytcq-aero-list-row-border: rgba(88, 188, 220, 0.36);
   --ytcq-aero-hover: linear-gradient(180deg, rgba(67, 130, 151, 0.68) 0%, rgba(22, 81, 107, 0.76) 48%, rgba(6, 52, 78, 0.8) 100%);
   --ytcq-aero-control-border: #0d1d28 #425b66 #587581 #152b38;
   --ytcq-aero-control-border-hover: #66d9ff;
@@ -247,10 +251,10 @@
   yt-live-chat-mode-change-message-renderer,
   yt-live-chat-placeholder-item-renderer
 ):where(:hover, :focus-within) {
-  background: rgba(255, 255, 255, 0.72) !important;
-  box-shadow:
-    inset 0 0 0 1px rgba(107, 185, 218, 0.34),
-    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  background: var(--ytcq-aero-list-row-hover-bg) !important;
+  outline: 1px solid var(--ytcq-aero-list-row-border);
+  outline-offset: -1px;
+  box-shadow: none !important;
 }
 
 :root[data-ytcq-chat-skin="aero"] yt-live-chat-viewer-engagement-message-renderer {
@@ -264,13 +268,8 @@
   border: 1px solid var(--ytcq-aero-border) !important;
   border-radius: 4px !important;
   color: var(--ytcq-aero-text) !important;
-  background:
-    radial-gradient(circle at 50% -16px, rgba(255, 255, 255, 0.98), transparent 54px),
-    var(--ytcq-aero-row) !important;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.94),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.42),
-    0 1px 3px rgba(28, 112, 152, 0.16) !important;
+  background: var(--ytcq-aero-list-row-bg) !important;
+  box-shadow: 0 1px 3px rgba(28, 112, 152, 0.14) !important;
   padding: 8px 10px !important;
 }
 
@@ -382,7 +381,7 @@
   #right-arrow-container
 ) {
   color: var(--ytcq-aero-accent-strong) !important;
-  background: var(--ytcq-aero-row) !important;
+  background: var(--ytcq-aero-list-row-bg) !important;
 }
 
 :root[data-ytcq-chat-skin="aero"] :where(
@@ -1007,11 +1006,11 @@
   .ytcq-chess-game-status,
   .ytcq-focus-bubble
 ) {
+  box-sizing: border-box;
+  border: 1px solid var(--ytcq-aero-list-row-border);
   color: var(--ytcq-aero-text);
-  background: var(--ytcq-aero-row);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.92),
-    inset 0 0 0 1px rgba(104, 185, 220, 0.28);
+  background: var(--ytcq-aero-list-row-bg);
+  box-shadow: none;
 }
 
 :root[data-ytcq-chat-skin="aero"] :where(
@@ -1386,20 +1385,13 @@
   yt-live-chat-mode-change-message-renderer,
   yt-live-chat-placeholder-item-renderer
 ):where(:hover, :focus-within) {
-  background: rgba(33, 81, 99, 0.58) !important;
-  box-shadow:
-    inset 0 0 0 1px rgba(79, 168, 201, 0.34),
-    inset 0 1px 0 rgba(255, 255, 255, 0.16);
+  background: var(--ytcq-aero-list-row-hover-bg) !important;
+  box-shadow: none !important;
 }
 
 :root[data-ytcq-chat-skin="aero"][data-ytcq-chat-skin-theme="dark"] yt-live-chat-viewer-engagement-message-renderer #card {
-  background:
-    radial-gradient(circle at 50% -16px, rgba(129, 214, 239, 0.22), transparent 54px),
-    var(--ytcq-aero-row) !important;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.22),
-    inset 0 0 0 1px rgba(116, 198, 223, 0.16),
-    0 1px 4px rgba(0, 0, 0, 0.36) !important;
+  background: var(--ytcq-aero-list-row-bg) !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.28) !important;
 }
 
 :root[data-ytcq-chat-skin="aero"][data-ytcq-chat-skin-theme="dark"] yt-live-chat-ticker-renderer {
@@ -1595,9 +1587,8 @@
   .ytcq-chess-game-status,
   .ytcq-focus-bubble
 ) {
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.15),
-    inset 0 0 0 1px rgba(89, 186, 218, 0.24);
+  background: var(--ytcq-aero-list-row-bg);
+  box-shadow: none;
 }
 
 :root[data-ytcq-chat-skin="aero"][data-ytcq-chat-skin-theme="dark"] :where(
