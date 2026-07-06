@@ -225,7 +225,37 @@ describe('profile popup coordinator', () => {
     expect(document.querySelector('.ytcq-profile-card')).toBe(card);
   });
 
-  it('allows multiple profile cards to stay open while opening another profile target', async () => {
+  it('closes an unmoved profile card while opening another profile target', () => {
+    const firstMessage = createMessage({ includeAuthorName: false });
+    const participant = document.createElement('yt-live-chat-participant-renderer');
+    participant.innerHTML = `
+      <img id="img">
+      <span id="author-name">@Participant</span>
+    `;
+    document.body.append(firstMessage, participant);
+    wireProfileClick(firstMessage);
+    wireParticipantProfileClick(participant);
+    const firstAvatar = firstMessage.querySelector<HTMLElement>('#author-photo')!;
+    const participantName = participant.querySelector<HTMLElement>('#author-name')!;
+
+    firstAvatar.click();
+    profileTestState.participantSource = source({
+      authorName: '@ViewerTwo',
+      identity: {
+        authorName: '@ViewerTwo',
+        channelId: 'viewer-two-channel'
+      },
+      profileUrl: 'https://www.youtube.com/@ViewerTwo'
+    });
+    participantName.click();
+
+    const cards = document.querySelectorAll('.ytcq-profile-card:not(.ytcq-inbox-card)');
+    expect(cards).toHaveLength(1);
+    expect(cards[0]?.textContent).toContain('@ViewerTwo');
+    expect(cards[0]?.textContent).not.toContain('@ViewerOne');
+  });
+
+  it('keeps dragged profile cards open while opening another profile target', async () => {
     vi.useFakeTimers();
     const firstMessage = createMessage({ includeAuthorName: false });
     const participant = document.createElement('yt-live-chat-participant-renderer');
@@ -241,6 +271,23 @@ describe('profile popup coordinator', () => {
 
     firstAvatar.click();
     await vi.runOnlyPendingTimersAsync();
+    const firstCard = document.querySelector<HTMLElement>('.ytcq-profile-card:not(.ytcq-inbox-card)')!;
+    const firstHeader = firstCard.querySelector<HTMLElement>('.ytcq-profile-card-header')!;
+    firstHeader.dispatchEvent(createPointerEvent('pointerdown', {
+      clientX: 120,
+      clientY: 40,
+      pointerId: 3
+    }));
+    document.dispatchEvent(createPointerEvent('pointermove', {
+      clientX: 180,
+      clientY: 80,
+      pointerId: 3
+    }));
+    document.dispatchEvent(createPointerEvent('pointerup', {
+      clientX: 180,
+      clientY: 80,
+      pointerId: 3
+    }));
     profileTestState.participantSource = source({
       authorName: '@ViewerTwo',
       identity: {

@@ -38,6 +38,7 @@ const profileCards = new Set<HTMLElement>();
 const profileCardsByKey = new Map<string, HTMLElement>();
 const profileCardCleanups = new WeakMap<HTMLElement, () => void>();
 const profileCardKeys = new WeakMap<HTMLElement, string>();
+const stickyProfileCards = new WeakSet<HTMLElement>();
 let nextProfileCardZIndex = 10_000;
 let profileWiringListeners = new AbortController();
 
@@ -150,6 +151,8 @@ function showProfileCard(source: ProfileSource, anchor: HTMLElement): void {
   }
   if (profileKey) profileCardsByKey.delete(profileKey);
 
+  closeTransientProfileCards();
+
   const cardListeners = new AbortController();
 
   const card = ytcqCreateElement('section');
@@ -257,6 +260,7 @@ function showProfileCard(source: ProfileSource, anchor: HTMLElement): void {
   wireFloatingPanelDrag({
     draggingClassName: 'ytcq-profile-card-dragging',
     handle: header,
+    onDragMove: () => stickyProfileCards.add(card),
     onDragStart: () => bringProfileCardToFront(card),
     panel: card,
     signal: cardListeners.signal
@@ -352,6 +356,12 @@ function closeSingleProfileCard(card: HTMLElement): void {
   profileCardKeys.delete(card);
   profileCards.delete(card);
   card.remove();
+}
+
+function closeTransientProfileCards(): void {
+  Array.from(profileCards).forEach((card) => {
+    if (!stickyProfileCards.has(card)) closeSingleProfileCard(card);
+  });
 }
 
 function isProfileCardOpen(card: HTMLElement): boolean {

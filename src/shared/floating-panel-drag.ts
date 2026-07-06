@@ -6,6 +6,7 @@ interface FloatingPanelDragOptions {
   handle: HTMLElement;
   ignoredSelector?: string;
   margin?: number;
+  onDragMove?: () => void;
   onDragStart?: () => void;
   panel: HTMLElement;
   signal: AbortSignal;
@@ -19,6 +20,7 @@ export function wireFloatingPanelDrag({
   handle,
   ignoredSelector = DEFAULT_IGNORED_SELECTOR,
   margin = DEFAULT_MARGIN,
+  onDragMove,
   onDragStart,
   panel,
   signal
@@ -51,6 +53,7 @@ export function wireFloatingPanelDrag({
     const left = Math.min(maxLeft, Math.max(margin, event.clientX - dragOffset.x));
     const top = Math.min(maxTop, Math.max(margin, event.clientY - dragOffset.y));
     anchorFloatingPanelAtPoint(panel, left, top);
+    onDragMove?.();
   }, { signal });
 
   const stopDrag = (event: PointerEvent): void => {
