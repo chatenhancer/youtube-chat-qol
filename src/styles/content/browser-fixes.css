@@ -3,8 +3,8 @@
  */
 @supports (font: -apple-system-body) and (text-box-trim: trim-both) and (text-box-edge: cap alphabetic) {
   /* Safari centers compact text from the full font box; trim it to the visible text box. */
-  :where(button[class^="ytcq-"], button[class*=" ytcq-"]),
-  :where(button[class^="ytcq-"], button[class*=" ytcq-"]) > :where(span),
+  :where(button[class^="ytcq-"], button[class*=" ytcq-"]):not(.ytcq-profile-card-author),
+  :where(button[class^="ytcq-"], button[class*=" ytcq-"]):not(.ytcq-profile-card-author) > :where(span),
   :where([class^="ytcq-"][class*="avatar"], [class*=" ytcq-"][class*="avatar"]) {
     text-box-trim: trim-both;
     text-box-edge: cap alphabetic;
