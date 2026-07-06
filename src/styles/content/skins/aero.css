@@ -936,6 +936,170 @@
   line-height: 14px !important;
 }
 
+:root[data-ytcq-chat-skin="aero"] ytd-menu-popup-renderer.ytcq-live-chat-menu-size-repaired {
+  --ytcq-menu-hover-background: var(--ytcq-aero-menu-highlight);
+
+  border: 1px solid rgba(0, 0, 0, 0.38) !important;
+  border-radius: 2px !important;
+  color: var(--ytcq-aero-text) !important;
+  background: var(--ytcq-aero-menu-surface) !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.72),
+    4px 4px 3px -2px rgba(0, 0, 0, 0.5) !important;
+  font-family: Tahoma, "Segoe UI", Arial, sans-serif !important;
+  font-size: 12px !important;
+  padding: 2px !important;
+  text-shadow: none !important;
+}
+
+:root[data-ytcq-chat-skin="aero"] ytd-menu-popup-renderer.ytcq-live-chat-menu-size-repaired #items {
+  color: inherit !important;
+  background: transparent !important;
+  font: inherit !important;
+  padding: 0 !important;
+  text-shadow: none !important;
+}
+
+:root[data-ytcq-chat-skin="aero"] ytd-menu-popup-renderer.ytcq-live-chat-menu-size-repaired :where(
+  ytd-menu-service-item-renderer,
+  ytd-menu-navigation-item-renderer,
+  yt-live-chat-toggle-renderer,
+  .ytcq-settings-item,
+  .ytcq-context-item
+) {
+  color: inherit !important;
+  font-family: Tahoma, "Segoe UI", Arial, sans-serif !important;
+  font-size: 12px !important;
+  text-shadow: none !important;
+}
+
+:root[data-ytcq-chat-skin="aero"] ytd-menu-popup-renderer.ytcq-live-chat-menu-size-repaired :where(
+  ytd-menu-service-item-renderer,
+  ytd-menu-navigation-item-renderer
+) a.yt-simple-endpoint {
+  color: inherit !important;
+  font: inherit !important;
+  text-shadow: none !important;
+}
+
+:root[data-ytcq-chat-skin="aero"] ytd-menu-popup-renderer.ytcq-live-chat-menu-size-repaired :where(
+  ytd-menu-service-item-renderer tp-yt-paper-item,
+  ytd-menu-navigation-item-renderer tp-yt-paper-item,
+  yt-live-chat-toggle-renderer tp-yt-paper-item,
+  .ytcq-settings-item .ytcq-paper-item,
+  .ytcq-context-item:not(.ytcq-context-split-item) .ytcq-paper-item
+) {
+  box-sizing: border-box !important;
+  min-height: 40px !important;
+  border: 1px solid transparent !important;
+  border-radius: 3px !important;
+  color: inherit !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  font-family: Tahoma, "Segoe UI", Arial, sans-serif !important;
+  font-size: 12px !important;
+  font-weight: 400 !important;
+  line-height: 18px !important;
+  text-shadow: none !important;
+}
+
+:root[data-ytcq-chat-skin="aero"] ytd-menu-popup-renderer.ytcq-live-chat-menu-size-repaired .ytcq-context-split-item .ytcq-paper-item {
+  box-sizing: border-box !important;
+  min-height: 40px !important;
+  padding: 0 8px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  color: inherit !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+
+:root[data-ytcq-chat-skin="aero"] ytd-menu-popup-renderer.ytcq-live-chat-menu-size-repaired .ytcq-context-split-button {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  box-sizing: border-box !important;
+  height: 40px !important;
+  border: 1px solid transparent !important;
+  border-radius: 3px !important;
+  color: inherit !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  font-family: Tahoma, "Segoe UI", Arial, sans-serif !important;
+  font-size: 12px !important;
+  font-weight: 400 !important;
+  line-height: 18px !important;
+  text-shadow: none !important;
+}
+
+:root[data-ytcq-chat-skin="aero"] ytd-menu-popup-renderer.ytcq-live-chat-menu-size-repaired .ytcq-context-split-divider {
+  background: color-mix(in srgb, var(--ytcq-aero-text) 28%, transparent) !important;
+}
+
+:root[data-ytcq-chat-skin="aero"] ytd-menu-popup-renderer.ytcq-live-chat-menu-size-repaired :where(
+  ytd-menu-service-item-renderer tp-yt-paper-item:hover,
+  ytd-menu-service-item-renderer tp-yt-paper-item:focus,
+  ytd-menu-navigation-item-renderer tp-yt-paper-item:hover,
+  ytd-menu-navigation-item-renderer tp-yt-paper-item:focus,
+  yt-live-chat-toggle-renderer tp-yt-paper-item:hover,
+  yt-live-chat-toggle-renderer tp-yt-paper-item:focus,
+  .ytcq-settings-item .ytcq-paper-item:hover,
+  .ytcq-settings-item .ytcq-paper-item:focus,
+  .ytcq-context-item:not(.ytcq-context-split-item) .ytcq-paper-item:hover,
+  .ytcq-context-item:not(.ytcq-context-split-item) .ytcq-paper-item:focus,
+  .ytcq-context-split-button:hover,
+  .ytcq-context-split-button:focus
+) {
+  border-color: var(--ytcq-aero-menu-highlight-border) !important;
+  background: var(--ytcq-aero-menu-highlight) !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+:root[data-ytcq-chat-skin="aero"] ytd-menu-popup-renderer.ytcq-live-chat-menu-size-repaired .ytcq-context-split-button:where(:hover, :focus) {
+  border: 1px solid var(--ytcq-aero-menu-highlight-border) !important;
+  background: var(--ytcq-aero-menu-highlight) !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+:root[data-ytcq-chat-skin="aero"] ytd-menu-popup-renderer.ytcq-live-chat-menu-size-repaired :where(
+  .title,
+  #title,
+  #label,
+  #primary-text,
+  .text-wrapper > yt-formatted-string,
+  ytd-menu-service-item-renderer tp-yt-paper-item > yt-formatted-string,
+  ytd-menu-navigation-item-renderer tp-yt-paper-item > yt-formatted-string,
+  yt-live-chat-toggle-renderer tp-yt-paper-item > span,
+  .ytcq-menu-label
+) {
+  color: inherit !important;
+  font-family: Tahoma, "Segoe UI", Arial, sans-serif !important;
+  font-size: 12px !important;
+  font-weight: 400 !important;
+  line-height: 18px !important;
+  text-shadow: none !important;
+}
+
+:root[data-ytcq-chat-skin="aero"] ytd-menu-popup-renderer.ytcq-live-chat-menu-size-repaired :where(
+  yt-icon,
+  yt-icon *,
+  .ytcq-menu-icon,
+  .ytcq-menu-icon *
+) {
+  color: var(--ytcq-aero-text) !important;
+  fill: currentColor !important;
+  text-shadow: none !important;
+}
+
+:root[data-ytcq-chat-skin="aero"] ytd-menu-popup-renderer.ytcq-live-chat-menu-size-repaired :where(
+  yt-icon,
+  .ytcq-menu-icon
+) {
+  opacity: 1 !important;
+}
+
 :root[data-ytcq-chat-skin="aero"] :where(
   .ytcq-profile-card,
   .ytcq-focus-card,
@@ -1153,6 +1317,16 @@
   box-shadow:
     inset 0 0 0 1px rgba(255, 255, 255, 0.34),
     inset 0 1px 0 rgba(255, 255, 255, 0.42);
+}
+
+:root[data-ytcq-chat-skin="aero"] .ytcq-profile-card:not(.ytcq-inbox-card):not(.ytcq-games-card) .ytcq-profile-card-header::after,
+:root[data-ytcq-chat-skin="aero"] .ytcq-chess-game-header::after,
+:root[data-ytcq-chat-skin="aero"] .ytcq-replay-trivia-game-header::after,
+:root[data-ytcq-chat-skin="aero"] .ytcq-bounty-hunting-game-header::after {
+  background:
+    radial-gradient(circle, color-mix(in srgb, var(--ytcq-aero-accent-strong) 72%, white 28%) 1px, transparent 1.4px)
+    0 0 / 6px 4px repeat-x;
+  opacity: 0.72;
 }
 
 :root[data-ytcq-chat-skin="aero"] :where(
@@ -1591,6 +1765,13 @@
     4px 4px 5px -2px rgba(0, 0, 0, 0.72) !important;
 }
 
+:root[data-ytcq-chat-skin="aero"][data-ytcq-chat-skin-theme="dark"] ytd-menu-popup-renderer.ytcq-live-chat-menu-size-repaired {
+  border-color: rgba(113, 198, 225, 0.44) !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.14),
+    4px 4px 5px -2px rgba(0, 0, 0, 0.72) !important;
+}
+
 :root[data-ytcq-chat-skin="aero"][data-ytcq-chat-skin-theme="dark"] :where(
   .ytcq-profile-card,
   .ytcq-focus-card,
@@ -1670,6 +1851,16 @@
   box-shadow:
     inset 0 0 0 1px rgba(126, 219, 246, 0.32),
     inset 0 1px 0 rgba(255, 255, 255, 0.24);
+}
+
+:root[data-ytcq-chat-skin="aero"][data-ytcq-chat-skin-theme="dark"] .ytcq-profile-card:not(.ytcq-inbox-card):not(.ytcq-games-card) .ytcq-profile-card-header::after,
+:root[data-ytcq-chat-skin="aero"][data-ytcq-chat-skin-theme="dark"] .ytcq-chess-game-header::after,
+:root[data-ytcq-chat-skin="aero"][data-ytcq-chat-skin-theme="dark"] .ytcq-replay-trivia-game-header::after,
+:root[data-ytcq-chat-skin="aero"][data-ytcq-chat-skin-theme="dark"] .ytcq-bounty-hunting-game-header::after {
+  background:
+    radial-gradient(circle, color-mix(in srgb, var(--ytcq-aero-accent-strong) 78%, #08293c 22%) 1px, transparent 1.4px)
+    0 0 / 6px 4px repeat-x;
+  opacity: 0.76;
 }
 
 :root[data-ytcq-chat-skin="aero"][data-ytcq-chat-skin-theme="dark"] :where(
