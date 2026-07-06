@@ -144,13 +144,14 @@
 }
 
 .ytcq-profile-card-author {
-  display: block;
-  width: 100%;
+  display: inline-block;
+  max-width: 100%;
   padding: 0;
   border: 0;
   background: transparent;
   cursor: pointer;
   text-align: left;
+  vertical-align: top;
 }
 
 .ytcq-profile-card-author:hover,
