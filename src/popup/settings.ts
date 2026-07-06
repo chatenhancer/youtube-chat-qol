@@ -23,6 +23,7 @@ import {
 import { createLoadingSpinner } from '../shared/loading-spinner';
 import { getSettingsControls } from './controls';
 import {
+  animatePopupChatSkinIcon,
   animatePopupDisplayIcon,
   animatePopupSoundIcon,
   animatePopupStartupEffectIcon,
@@ -84,6 +85,7 @@ export function initSettingsControls(popupLocale: string): void {
 
   chatSkin.addEventListener('change', () => {
     const nextSkin = chatSkin.value as Options['chatSkin'];
+    animatePopupChatSkinIcon();
     save({ chatSkin: nextSkin });
   });
 

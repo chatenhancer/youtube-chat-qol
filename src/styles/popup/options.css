@@ -130,6 +130,53 @@
   transform-origin: center;
 }
 
+.chat-skin-icon,
+.chat-skin-icon .chat-skin-palette-body,
+.chat-skin-icon .chat-skin-palette-spot {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.chat-skin-palette-spot-left {
+  --ytcq-palette-pop-x: -10px;
+  --ytcq-palette-pop-y: 3px;
+}
+
+.chat-skin-palette-spot-top-left {
+  --ytcq-palette-pop-x: -6px;
+  --ytcq-palette-pop-y: -9px;
+}
+
+.chat-skin-palette-spot-top-right {
+  --ytcq-palette-pop-x: 6px;
+  --ytcq-palette-pop-y: -9px;
+}
+
+.chat-skin-palette-spot-right {
+  --ytcq-palette-pop-x: 10px;
+  --ytcq-palette-pop-y: 3px;
+}
+
+.chat-skin-icon.ytcq-palette-pop .chat-skin-palette-body {
+  animation: ytcq-palette-body-pop 620ms ease-out;
+}
+
+.chat-skin-icon.ytcq-palette-pop .chat-skin-palette-spot {
+  animation: ytcq-palette-spot-pop 620ms cubic-bezier(0.18, 0.89, 0.32, 1.28);
+}
+
+.chat-skin-icon.ytcq-palette-pop .chat-skin-palette-spot-top-left {
+  animation-delay: 50ms;
+}
+
+.chat-skin-icon.ytcq-palette-pop .chat-skin-palette-spot-top-right {
+  animation-delay: 100ms;
+}
+
+.chat-skin-icon.ytcq-palette-pop .chat-skin-palette-spot-right {
+  animation-delay: 150ms;
+}
+
 .translation-target-icon.ytcq-translation-pulse {
   animation: ytcq-translation-icon-pop 560ms cubic-bezier(0.18, 0.89, 0.32, 1.28);
 }

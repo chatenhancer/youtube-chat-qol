@@ -69,6 +69,44 @@
   }
 }
 
+@keyframes ytcq-palette-body-pop {
+  0%,
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+
+  36% {
+    transform: scale(0.94) rotate(-2deg);
+  }
+
+  68% {
+    transform: scale(1.04) rotate(1deg);
+  }
+}
+
+@keyframes ytcq-palette-spot-pop {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+
+  24% {
+    transform: translate(var(--ytcq-palette-pop-x), var(--ytcq-palette-pop-y)) scale(1.42);
+    opacity: 1;
+  }
+
+  52% {
+    transform: translate(0, 0) scale(0.84);
+    opacity: 0.72;
+  }
+
+  76% {
+    transform: translate(0, 0) scale(1.08);
+    opacity: 1;
+  }
+}
+
 @keyframes ytcq-display-frame-reflow {
   0%,
   100% {
@@ -191,6 +229,8 @@
   .translation-target-icon.ytcq-translation-pulse,
   .translation-target-icon.ytcq-translation-pulse .translation-source-mark,
   .translation-target-icon.ytcq-translation-pulse .translation-target-mark,
+  .chat-skin-icon.ytcq-palette-pop .chat-skin-palette-body,
+  .chat-skin-icon.ytcq-palette-pop .chat-skin-palette-spot,
   .translation-display-icon.ytcq-display-reflow .translation-display-frame,
   .translation-display-icon.ytcq-display-reflow .translation-display-line,
   .startup-effect-icon.ytcq-sparkle-burst .startup-sparkle {

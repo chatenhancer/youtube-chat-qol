@@ -30,7 +30,7 @@
 .ytcq-profile-card:not(.ytcq-inbox-card):not(.ytcq-games-card) .ytcq-profile-card-header {
   position: relative;
   margin: calc(-1 * var(--ytcq-profile-card-padding)) calc(-1 * var(--ytcq-profile-card-padding)) 0;
-  padding: calc(var(--ytcq-profile-card-padding) + 16px) var(--ytcq-profile-card-padding) 0;
+  padding: calc(var(--ytcq-profile-card-padding) + 4px) var(--ytcq-profile-card-padding) 0;
   cursor: grab;
   user-select: none;
 }

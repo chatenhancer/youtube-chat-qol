@@ -646,6 +646,7 @@ describe('popup', () => {
   it('updates option controls and animates enabled option icons', async () => {
     vi.useFakeTimers();
     document.body.innerHTML += `
+      <svg class="chat-skin-icon"></svg>
       <svg class="translation-target-icon"></svg>
       <svg class="translation-display-icon"></svg>
       <svg class="sound-icon"></svg>
@@ -788,6 +789,7 @@ describe('popup', () => {
 
     expect(document.querySelector('.translation-target-icon')?.classList.contains('ytcq-translation-pulse')).toBe(true);
     expect(document.querySelector('.translation-display-icon')?.classList.contains('ytcq-display-reflow')).toBe(true);
+    expect(document.querySelector('.chat-skin-icon')?.classList.contains('ytcq-palette-pop')).toBe(true);
     expect(document.querySelector('.sound-icon')?.classList.contains('ytcq-bell-ringing')).toBe(true);
     expect(document.querySelector('.startup-effect-icon')?.classList.contains('ytcq-sparkle-burst')).toBe(true);
     expect(chrome.storage.sync.set).toHaveBeenCalledWith({ chatSkin: 'system' });
@@ -817,6 +819,7 @@ describe('popup', () => {
     await vi.advanceTimersByTimeAsync(180);
     expect(playgroundGamesSection.hidden).toBe(true);
     await vi.advanceTimersByTimeAsync(1000);
+    expect(document.querySelector('.chat-skin-icon')?.classList.contains('ytcq-palette-pop')).toBe(false);
     expect(document.querySelector('.startup-effect-icon')?.classList.contains('ytcq-sparkle-burst')).toBe(false);
   });
 
@@ -1009,7 +1012,10 @@ describe('popup', () => {
 
   it('does not animate icons and disables startup effect when reduced motion is preferred', async () => {
     installMatchMedia(true);
-    document.body.innerHTML += '<svg class="translation-target-icon"></svg>';
+    document.body.innerHTML += `
+      <svg class="chat-skin-icon"></svg>
+      <svg class="translation-target-icon"></svg>
+    `;
     await chrome.storage.sync.set({
       startupEffect: true
     });
@@ -1020,12 +1026,16 @@ describe('popup', () => {
 
     await import('./index');
     const targetLanguage = document.querySelector<HTMLSelectElement>('#targetLanguage')!;
+    const chatSkin = document.querySelector<HTMLSelectElement>('#chatSkin')!;
     targetLanguage.value = 'ja';
     targetLanguage.dispatchEvent(new Event('change', { bubbles: true }));
+    chatSkin.value = '2007';
+    chatSkin.dispatchEvent(new Event('change', { bubbles: true }));
 
     expect(document.querySelector<HTMLInputElement>('#startupEffect')?.disabled).toBe(true);
     expect(document.querySelector<HTMLInputElement>('#startupEffect')?.checked).toBe(false);
     expect(document.querySelector('.translation-target-icon')?.classList.contains('ytcq-translation-pulse')).toBe(false);
+    expect(document.querySelector('.chat-skin-icon')?.classList.contains('ytcq-palette-pop')).toBe(false);
   });
 
   it('falls back to static language labels and skips missing animation icons', async () => {
