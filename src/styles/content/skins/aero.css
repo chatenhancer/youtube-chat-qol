@@ -449,6 +449,14 @@
   #author-photo,
   yt-img-shadow#author-photo,
   yt-live-chat-message-input-renderer yt-img-shadow#avatar
+):has(> img[width="40"], > img[height="40"], > #img[width="40"], > #img[height="40"]) {
+  --ytcq-aero-avatar-frame-size: 57px;
+}
+
+:root[data-ytcq-chat-skin="aero"] :where(
+  #author-photo,
+  yt-img-shadow#author-photo,
+  yt-live-chat-message-input-renderer yt-img-shadow#avatar
 )::after {
   position: absolute;
   top: 50%;
