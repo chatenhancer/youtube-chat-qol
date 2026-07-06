@@ -1,5 +1,5 @@
 /*
- * Small compatibility tweaks for YouTube-owned live chat UI.
+ * Layout fixes for YouTube-owned live chat UI.
  */
 ytd-menu-popup-renderer :where(
   ytd-menu-service-item-renderer,
