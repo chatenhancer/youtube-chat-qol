@@ -201,14 +201,6 @@
 }
 
 :root[data-ytcq-chat-skin="aero"] yt-live-chat-header-renderer :where(
-  #chat-title,
-  #label-text,
-  #live-chat-header-context-menu button
-):not(ytd-menu-popup-renderer *) {
-  text-shadow: 0 1px 1px rgba(0, 78, 126, 0.7);
-}
-
-:root[data-ytcq-chat-skin="aero"] yt-live-chat-header-renderer :where(
   #live-chat-header-context-menu button,
   yt-icon-button button,
   tp-yt-paper-icon-button,
@@ -529,7 +521,6 @@
 ) {
   color: var(--ytcq-aero-accent-strong) !important;
   font-weight: 700 !important;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.72);
 }
 
 :root[data-ytcq-chat-skin="aero"] yt-live-chat-text-message-renderer #message-container::before {
@@ -833,6 +824,18 @@
   padding: 1px 6px !important;
   font-size: 12px !important;
   line-height: 19px !important;
+}
+
+:root[data-ytcq-chat-skin="aero"] yt-emoji-picker-renderer :where(
+  #search input,
+  #search-input input
+)::placeholder,
+:root[data-ytcq-chat-skin="aero"] yt-emoji-picker-renderer :where(
+  #search #label,
+  #search-input #label
+) {
+  color: color-mix(in srgb, var(--ytcq-aero-muted-text) 70%, var(--ytcq-aero-input-bg) 30%) !important;
+  opacity: 1 !important;
 }
 
 :root[data-ytcq-chat-skin="aero"] yt-emoji-picker-renderer :where(
@@ -1261,7 +1264,6 @@
   .ytcq-games-cycle-action
 ) {
   color: var(--ytcq-aero-accent-strong);
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);
 }
 
 :root[data-ytcq-chat-skin="aero"] :where(
@@ -1357,6 +1359,14 @@
   outline: none;
 }
 
+:root[data-ytcq-chat-skin="aero"] .ytcq-inbox-keyword-count {
+  border: 0;
+  color: #fff;
+  background: var(--ytcq-aero-accent-strong);
+  box-shadow: none;
+  text-shadow: none;
+}
+
 :root[data-ytcq-chat-skin="aero"] yt-live-chat-header-renderer :where(
   .ytcq-inbox-button,
   .ytcq-games-button
@@ -1364,7 +1374,6 @@
   color: #fff !important;
   fill: currentColor !important;
   border-radius: 4px;
-  text-shadow: 0 1px 1px rgba(0, 72, 112, 0.46);
 }
 
 :root[data-ytcq-chat-skin="aero"] yt-live-chat-header-renderer :where(
@@ -1396,11 +1405,12 @@
 :root[data-ytcq-chat-skin="aero"] .ytcq-replay-trivia-game-header::before,
 :root[data-ytcq-chat-skin="aero"] .ytcq-bounty-hunting-game-header::before {
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(181, 226, 245, 0.72));
+    var(--ytcq-aero-navbar-image) center / 100% 100% repeat-x,
+    linear-gradient(180deg, rgba(255, 255, 255, 0.42), transparent 42%),
+    linear-gradient(180deg, #56c8ec 0%, #1794cc 48%, #0875b0 100%);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.96),
-    inset 0 -1px 0 rgba(57, 143, 180, 0.36),
-    0 1px 2px rgba(23, 105, 146, 0.12);
+    inset 0 -1px 0 rgba(0, 90, 147, 0.5),
+    0 1px 2px rgba(23, 105, 146, 0.24);
 }
 
 :root[data-ytcq-chat-skin="aero"] .ytcq-profile-card:not(.ytcq-inbox-card):not(.ytcq-games-card) .ytcq-profile-card-header::after,
@@ -1408,10 +1418,10 @@
 :root[data-ytcq-chat-skin="aero"] .ytcq-replay-trivia-game-header::after,
 :root[data-ytcq-chat-skin="aero"] .ytcq-bounty-hunting-game-header::after {
   background:
-    radial-gradient(circle, color-mix(in srgb, var(--ytcq-aero-accent-strong) 84%, #0f91c7 16%) 1px, transparent 1.4px)
+    radial-gradient(circle, #e9fbff 1px, transparent 1.4px)
     0 0 / 6px 4px repeat-x;
-  opacity: 0.84;
-  filter: drop-shadow(0 1px 0 rgba(255, 255, 255, 0.86));
+  opacity: 0.94;
+  filter: drop-shadow(0 1px 0 rgba(0, 72, 112, 0.38));
 }
 
 :root[data-ytcq-chat-skin="aero"] :where(
@@ -1552,6 +1562,25 @@
     inset 0 1px 3px rgba(20, 82, 108, 0.12);
 }
 
+:root[data-ytcq-chat-skin="aero"] .ytcq-inbox-keyword-input {
+  border-radius: var(--ytcq-aero-input-radius);
+  corner-shape: var(--ytcq-squircle-corner-shape);
+  background-clip: padding-box;
+  font-family: Tahoma, "Segoe UI", Arial, sans-serif;
+  overflow: hidden;
+}
+
+:root[data-ytcq-chat-skin="aero"] .ytcq-inbox-keyword-input:focus {
+  box-shadow:
+    inset 0 0 0 1px rgba(109, 195, 231, 0.36),
+    inset 0 1px 3px rgba(20, 82, 108, 0.12);
+}
+
+:root[data-ytcq-chat-skin="aero"] .ytcq-inbox-keyword-input::placeholder {
+  color: color-mix(in srgb, var(--ytcq-aero-muted-text) 70%, var(--ytcq-aero-input-bg) 30%);
+  opacity: 1;
+}
+
 :root[data-ytcq-chat-skin="aero"] :where(
   .ytcq-inbox-keyword-chip,
   .ytcq-inbox-inline-highlight,
@@ -1652,14 +1681,6 @@
 }
 
 :root[data-ytcq-chat-skin="aero"][data-ytcq-chat-skin-theme="dark"] yt-live-chat-header-renderer :where(
-  #chat-title,
-  #label-text,
-  #live-chat-header-context-menu button
-):not(ytd-menu-popup-renderer *) {
-  text-shadow: 0 1px 1px rgba(0, 20, 30, 0.9);
-}
-
-:root[data-ytcq-chat-skin="aero"][data-ytcq-chat-skin-theme="dark"] yt-live-chat-header-renderer :where(
   #live-chat-header-context-menu button,
   yt-icon-button button,
   tp-yt-paper-icon-button,
@@ -1741,15 +1762,6 @@
   background:
     linear-gradient(180deg, rgba(207, 176, 69, 0.72) 0%, rgba(139, 104, 28, 0.74) 100%) !important;
   box-shadow: none !important;
-}
-
-:root[data-ytcq-chat-skin="aero"][data-ytcq-chat-skin-theme="dark"] :where(
-  yt-live-chat-text-message-renderer
-) yt-live-chat-author-chip :where(
-  #author-name:not(.owner):not([type="owner"]),
-  #author-name[is-highlighted]:not(.owner):not([type="owner"])
-) {
-  text-shadow: 0 1px 0 rgba(0, 9, 14, 0.86);
 }
 
 :root[data-ytcq-chat-skin="aero"][data-ytcq-chat-skin-theme="dark"] :where(
@@ -1845,6 +1857,17 @@
 }
 
 :root[data-ytcq-chat-skin="aero"][data-ytcq-chat-skin-theme="dark"] yt-emoji-picker-renderer :where(
+  #search input,
+  #search-input input
+)::placeholder,
+:root[data-ytcq-chat-skin="aero"][data-ytcq-chat-skin-theme="dark"] yt-emoji-picker-renderer :where(
+  #search #label,
+  #search-input #label
+) {
+  color: color-mix(in srgb, var(--ytcq-aero-muted-text) 86%, #fff 14%) !important;
+}
+
+:root[data-ytcq-chat-skin="aero"][data-ytcq-chat-skin-theme="dark"] yt-emoji-picker-renderer :where(
   #search,
   #search-input
 ) {
@@ -1927,23 +1950,6 @@
 }
 
 :root[data-ytcq-chat-skin="aero"][data-ytcq-chat-skin-theme="dark"] :where(
-  .ytcq-profile-card-header-button,
-  .ytcq-profile-card-author,
-  .ytcq-focus-author-button,
-  .ytcq-focus-open,
-  .ytcq-focus-close,
-  .ytcq-inbox-author,
-  .ytcq-inbox-keyword-add,
-  .ytcq-inbox-keyword-remove,
-  .ytcq-command-help-close,
-  .ytcq-command-autocomplete-option,
-  .ytcq-games-small-action,
-  .ytcq-games-cycle-action
-) {
-  text-shadow: 0 1px 0 rgba(0, 8, 12, 0.86);
-}
-
-:root[data-ytcq-chat-skin="aero"][data-ytcq-chat-skin-theme="dark"] :where(
   .ytcq-profile-card-open,
   .ytcq-focus-open,
   .ytcq-focus-close,
@@ -1951,6 +1957,15 @@
   .ytcq-games-small-action
 ) {
   text-shadow: none;
+}
+
+:root[data-ytcq-chat-skin="aero"][data-ytcq-chat-skin-theme="dark"] .ytcq-inbox-author {
+  text-shadow: none;
+}
+
+:root[data-ytcq-chat-skin="aero"][data-ytcq-chat-skin-theme="dark"] .ytcq-inbox-keyword-count {
+  color: #062337;
+  background: var(--ytcq-aero-accent-strong);
 }
 
 :root[data-ytcq-chat-skin="aero"][data-ytcq-chat-skin-theme="dark"] :where(
@@ -2030,6 +2045,21 @@
     0 1px 0 rgba(255, 255, 255, 0.18);
 }
 
+:root[data-ytcq-chat-skin="aero"][data-ytcq-chat-skin-theme="dark"] .ytcq-inbox-keyword-input {
+  background:
+    linear-gradient(180deg, rgba(56, 101, 118, 0.98) 0%, rgba(19, 55, 73, 0.98) 45%, rgba(8, 31, 45, 0.99) 100%);
+}
+
+:root[data-ytcq-chat-skin="aero"][data-ytcq-chat-skin-theme="dark"] .ytcq-inbox-keyword-input:focus {
+  box-shadow:
+    inset 0 0 0 1px rgba(139, 224, 251, 0.42),
+    inset 0 1px 3px rgba(0, 0, 0, 0.34);
+}
+
+:root[data-ytcq-chat-skin="aero"][data-ytcq-chat-skin-theme="dark"] .ytcq-inbox-keyword-input::placeholder {
+  color: color-mix(in srgb, var(--ytcq-aero-muted-text) 86%, #fff 14%);
+}
+
 :root[data-ytcq-chat-skin="aero"][data-ytcq-chat-skin-theme="dark"] :where(
   .ytcq-inbox-keyword-chip,
   .ytcq-inbox-inline-highlight,
@@ -2038,6 +2068,17 @@
   color: #172719;
   background: linear-gradient(180deg, rgba(248, 255, 204, 0.94) 0%, rgba(187, 216, 77, 0.86) 100%);
   box-shadow: inset 0 0 0 1px rgba(230, 245, 122, 0.48);
+}
+
+:root[data-ytcq-chat-skin="aero"][data-ytcq-chat-skin-theme="dark"] .ytcq-inbox-keyword-chip .ytcq-inbox-keyword-remove {
+  color: inherit;
+  text-shadow: none;
+}
+
+:root[data-ytcq-chat-skin="aero"][data-ytcq-chat-skin-theme="dark"] .ytcq-inbox-keyword-chip .ytcq-inbox-keyword-remove:where(:hover, :focus) {
+  color: inherit;
+  background: rgba(23, 39, 25, 0.14);
+  box-shadow: inset 0 0 0 1px rgba(23, 39, 25, 0.16);
 }
 
 :root[data-ytcq-chat-skin="aero"][data-ytcq-chat-skin-theme="dark"] :where(

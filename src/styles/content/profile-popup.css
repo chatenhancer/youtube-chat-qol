@@ -37,7 +37,7 @@
 
 .ytcq-profile-card:not(.ytcq-inbox-card):not(.ytcq-games-card) .ytcq-profile-card-header::before {
   position: absolute;
-  top: 0;
+  top: -1px;
   left: 50%;
   width: 42px;
   height: 11px;
@@ -52,7 +52,7 @@
 
 .ytcq-profile-card:not(.ytcq-inbox-card):not(.ytcq-games-card) .ytcq-profile-card-header::after {
   position: absolute;
-  top: 4px;
+  top: 3px;
   left: 50%;
   width: 25px;
   height: 4px;
@@ -350,7 +350,7 @@
 
 .ytcq-profile-card-messages {
   display: grid;
-  gap: 8px;
+  gap: 6px;
   min-height: 0;
   max-height: 252px;
   margin-top: 12px;
@@ -364,7 +364,7 @@
   column-gap: 8px;
   align-items: start;
   position: relative;
-  padding: 7px 36px 7px 9px;
+  padding: 6px 36px 6px 9px;
   border-radius: 6px;
   color: var(--yt-spec-text-primary, var(--yt-live-chat-primary-text-color, #f1f1f1));
   background:
@@ -375,15 +375,15 @@
 }
 
 .ytcq-inbox-message-has-avatar {
-  grid-template-columns: 20px auto minmax(0, 1fr);
+  grid-template-columns: 24px auto minmax(0, 1fr);
 }
 
 .ytcq-inbox-avatar {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
 }
 
@@ -398,7 +398,7 @@
 .ytcq-inbox-message-has-avatar .ytcq-profile-card-message-time {
   display: inline-flex;
   align-items: center;
-  min-height: 20px;
+  min-height: 24px;
   line-height: 20px;
 }
 
@@ -462,6 +462,7 @@
 
 .ytcq-profile-card-message-text {
   min-width: 0;
+  font: 400 12px/16px Roboto, Arial, sans-serif;
 }
 
 .ytcq-profile-card-message-text img {
@@ -476,6 +477,7 @@
 .ytcq-profile-card-empty {
   padding: 8px 0;
   color: var(--yt-live-chat-secondary-text-color, var(--yt-spec-text-secondary, #aaa));
+  font: 400 12px/16px Roboto, Arial, sans-serif;
 }
 
 .ytcq-profile-card-empty-centered {
@@ -497,13 +499,13 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 32px;
-  padding: 0 12px;
+  height: 24px;
+  padding: 0 8px;
   border: 0;
-  border-radius: 16px;
+  border-radius: 12px;
   color: var(--yt-spec-call-to-action, #3ea6ff);
   background: transparent;
-  font: 500 13px/16px Roboto, Arial, sans-serif;
+  font: 500 11px/14px Roboto, Arial, sans-serif;
   cursor: pointer;
 }
 

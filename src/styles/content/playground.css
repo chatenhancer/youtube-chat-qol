@@ -746,7 +746,7 @@
 
 .ytcq-chess-game-header::before {
   position: absolute;
-  top: 0;
+  top: -1px;
   left: 50%;
   width: 42px;
   height: 11px;
@@ -761,7 +761,7 @@
 
 .ytcq-replay-trivia-game-header::before {
   position: absolute;
-  top: 0;
+  top: -1px;
   left: 50%;
   width: 42px;
   height: 11px;
@@ -776,7 +776,7 @@
 
 .ytcq-bounty-hunting-game-header::before {
   position: absolute;
-  top: 0;
+  top: -1px;
   left: 50%;
   width: 42px;
   height: 11px;
@@ -791,7 +791,7 @@
 
 .ytcq-chess-game-header::after {
   position: absolute;
-  top: 4px;
+  top: 3px;
   left: 50%;
   width: 25px;
   height: 4px;
@@ -806,7 +806,7 @@
 
 .ytcq-replay-trivia-game-header::after {
   position: absolute;
-  top: 4px;
+  top: 3px;
   left: 50%;
   width: 25px;
   height: 4px;
@@ -821,7 +821,7 @@
 
 .ytcq-bounty-hunting-game-header::after {
   position: absolute;
-  top: 4px;
+  top: 3px;
   left: 50%;
   width: 25px;
   height: 4px;

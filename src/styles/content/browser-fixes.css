@@ -42,6 +42,7 @@
   .ytcq-games-player-row,
   .ytcq-games-game-card,
   .ytcq-games-preview,
+  .ytcq-focus-author-button,
   .ytcq-game-overlay-header,
   .ytcq-game-overlay-icon,
   .ytcq-chess-game-icon,
@@ -61,7 +62,6 @@
     border-radius: var(--ytcq-squircle-radius-bubble);
   }
 
-  .ytcq-focus-author-button,
   .ytcq-inbox-inline-highlight,
   .ytcq-chat-keyword-highlight,
   yt-live-chat-text-message-renderer .ytcq-replaced-translation-icon,
