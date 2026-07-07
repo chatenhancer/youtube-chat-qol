@@ -63,6 +63,7 @@ const frameQuality = readBoundedInteger(process.env.YTCQ_DEMO_FRAME_QUALITY, pre
 const shouldLogFrameSize = process.env.YTCQ_DEMO_LOG_FRAME_SIZE === '1';
 const pipedVideoPath = path.join(demoResultsDir, `${finalVideoBaseName}-${process.pid}-silent.mp4`);
 const viewport = { width: 1280, height: 720 };
+const extensionPopupSize = { width: 350, height: 465 };
 const cursorHotspot = { x: 16, y: 12 };
 const defaultDemoCursorPosition = { x: 28, y: 36 };
 let demoCursorPosition = { ...defaultDemoCursorPosition };
@@ -3381,12 +3382,19 @@ async function installPopupPresentationLayer(page) {
   await installDemoCursor(page);
   await page.addStyleTag({
     content: `
-      body {
+      html {
         align-items: center;
         background: #f6f7f8 !important;
         display: flex !important;
         justify-content: center;
-        width: 100% !important;
+      }
+
+      body {
+        background: transparent !important;
+        height: ${extensionPopupSize.height}px !important;
+        margin: 0 !important;
+        overflow: visible !important;
+        width: ${extensionPopupSize.width}px !important;
       }
 
       main,
@@ -3394,9 +3402,10 @@ async function installPopupPresentationLayer(page) {
         border-radius: 18px !important;
         box-shadow: 0 18px 48px rgba(15, 23, 42, 0.18);
         box-sizing: border-box !important;
+        height: ${extensionPopupSize.height}px !important;
         opacity: 0 !important;
         transition: none !important;
-        width: 350px !important;
+        width: ${extensionPopupSize.width}px !important;
       }
     `
   });
