@@ -379,7 +379,7 @@
   max-width: 100%;
   overflow: hidden;
   color: var(--yt-live-chat-secondary-text-color, var(--yt-spec-text-secondary, #aaa));
-  font: 400 10px/13px Roboto, Arial, sans-serif;
+  font: 400 11px/14px Roboto, Arial, sans-serif;
   overflow-wrap: anywhere;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
