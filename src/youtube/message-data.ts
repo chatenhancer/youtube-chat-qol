@@ -10,10 +10,13 @@ import { getMessageStableId } from './messages';
 import { CHAT_MESSAGE_SELECTOR } from './selectors';
 
 const DATA_CACHE_LIMIT = 800;
+const PENDING_DATA_LIMIT = 800;
+const PENDING_DATA_TIMEOUT_MS = 1500;
 
 interface PendingMessageDataRequest {
   promise: Promise<YouTubeMessageData | null>;
   resolve: (data: YouTubeMessageData | null) => void;
+  timeoutId: number;
 }
 
 const messageDataById = new Map<string, YouTubeMessageData>();
@@ -62,7 +65,7 @@ function handleYouTubeMessageDataEvent(event: Event): void {
   const message = getYouTubeMessageFromDataEvent(event, data.messageId);
   if (!message) return;
   rememberYouTubeMessageData(data);
-  resolvePendingMessageDataRequest(data);
+  resolvePendingMessageDataRequest(data.messageId, data);
 }
 
 function parseYouTubeMessageData(value: unknown): YouTubeMessageData | null {
@@ -132,17 +135,31 @@ function createPendingMessageDataRequest(messageId: string): PendingMessageDataR
   const promise = new Promise<YouTubeMessageData | null>((resolve) => {
     resolveRequest = resolve;
   });
+  const timeoutId = window.setTimeout(() => {
+    resolvePendingMessageDataRequest(messageId, null);
+  }, PENDING_DATA_TIMEOUT_MS);
   const request: PendingMessageDataRequest = {
     promise,
-    resolve: resolveRequest
+    resolve: resolveRequest,
+    timeoutId
   };
   pendingMessageDataById.set(messageId, request);
+  enforcePendingMessageDataLimit();
   return request;
 }
 
-function resolvePendingMessageDataRequest(data: YouTubeMessageData): void {
-  const request = pendingMessageDataById.get(data.messageId);
+function resolvePendingMessageDataRequest(messageId: string, data: YouTubeMessageData | null): void {
+  const request = pendingMessageDataById.get(messageId);
   if (!request) return;
-  pendingMessageDataById.delete(data.messageId);
+  pendingMessageDataById.delete(messageId);
+  window.clearTimeout(request.timeoutId);
   request.resolve(data);
+}
+
+function enforcePendingMessageDataLimit(): void {
+  while (pendingMessageDataById.size > PENDING_DATA_LIMIT) {
+    const oldestMessageId = pendingMessageDataById.keys().next().value;
+    if (!oldestMessageId) return;
+    resolvePendingMessageDataRequest(oldestMessageId, null);
+  }
 }

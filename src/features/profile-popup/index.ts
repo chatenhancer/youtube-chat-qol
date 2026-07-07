@@ -280,7 +280,7 @@ function showProfileCard(source: ProfileSource, anchor: HTMLElement): void {
       positionMode = 'viewport';
       if (!isProfileCardOpen(card)) return;
       if (!anchor.isConnected) {
-        closeProfileCard(card);
+        keepProfileCardInViewport(card);
         return;
       }
 
@@ -300,11 +300,6 @@ function showProfileCard(source: ProfileSource, anchor: HTMLElement): void {
   };
   const handleResize = (): void => {
     if (!isProfileCardOpen(card)) return;
-    if (!anchor.isConnected) {
-      closeProfileCard(card);
-      return;
-    }
-
     schedulePosition('anchor');
   };
   const unsubscribeMessages = onUserMessagesChanged((key) => {

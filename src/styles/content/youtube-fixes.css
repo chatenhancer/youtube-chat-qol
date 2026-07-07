@@ -1,6 +1,19 @@
 /*
  * Layout fixes for YouTube-owned live chat UI.
  */
+@supports (content-visibility: auto) {
+  yt-live-chat-text-message-renderer {
+    contain: layout style paint;
+    content-visibility: auto;
+    contain-intrinsic-size: 26px;
+  }
+
+  yt-live-chat-paid-message-renderer,
+  yt-live-chat-membership-item-renderer {
+    contain: layout style;
+  }
+}
+
 ytd-menu-popup-renderer :where(
   ytd-menu-service-item-renderer,
   ytd-menu-navigation-item-renderer

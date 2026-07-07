@@ -67,7 +67,7 @@ describe('YouTube message data receiver', () => {
     expect(requests[0].target).toBe(message);
   });
 
-  it('ignores malformed event details and keeps the request pending until valid data arrives', async () => {
+  it('ignores malformed event details and resolves pending requests after a bounded wait', async () => {
     vi.resetModules();
     vi.useFakeTimers();
     document.body.replaceChildren();
@@ -94,10 +94,26 @@ describe('YouTube message data receiver', () => {
         timestampUsec: 'not-a-timestamp'
       })
     }));
-    await vi.advanceTimersByTimeAsync(10_000);
+    await vi.advanceTimersByTimeAsync(1499);
     await Promise.resolve();
 
     expect(resolved).toBe(false);
+
+    await vi.advanceTimersByTimeAsync(1);
+    await expect(messageData).resolves.toBeNull();
+  });
+
+  it('keeps pending requests open long enough for valid late data', async () => {
+    vi.resetModules();
+    vi.useFakeTimers();
+    document.body.replaceChildren();
+    const { requestYouTubeMessageData } = await import('./message-data');
+    const message = document.createElement('yt-live-chat-text-message-renderer');
+    message.id = 'msg-1';
+    document.body.append(message);
+
+    const messageData = requestYouTubeMessageData(message);
+    await vi.advanceTimersByTimeAsync(200);
 
     message.dispatchEvent(new CustomEvent(YOUTUBE_MESSAGE_DATA_EVENT, {
       bubbles: true,

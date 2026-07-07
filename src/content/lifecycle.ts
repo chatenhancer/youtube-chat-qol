@@ -322,7 +322,7 @@ export function registerFeatureLifecycle(lifecycle: FeatureLifecycle): void {
  * services that injected chat UI needs from the entrypoint.
  */
 export function initFeatures(context: FeatureLifecycleContext): void {
-  initCallbacks.forEach((callback) => callback(context));
+  initCallbacks.forEach((callback) => runFeatureCallback(() => callback(context)));
 }
 
 /**
@@ -345,7 +345,9 @@ export function bootFeatures(): void {
  */
 export function handleFeatureOptionsChanged(previousOptions: Options, nextOptions: Options): void {
   if (featuresSuspended) return;
-  optionsChangedCallbacks.forEach((callback) => callback(previousOptions, nextOptions));
+  optionsChangedCallbacks.forEach((callback) =>
+    runFeatureCallback(() => callback(previousOptions, nextOptions))
+  );
 }
 
 /**
@@ -368,7 +370,9 @@ export function recoverVisibleFeatures(): void {
  * @param visibilityState The current `document.visibilityState` value.
  */
 export function handleFeatureVisibilityChanged(visibilityState: Document['visibilityState']): void {
-  visibilityChangedCallbacks.forEach((callback) => callback(visibilityState));
+  visibilityChangedCallbacks.forEach((callback) =>
+    runFeatureCallback(() => callback(visibilityState))
+  );
 }
 
 /**
@@ -409,7 +413,7 @@ export function handleFeatureMutations(batch: FeatureMutationBatch): void {
  */
 export function handleFeatureParticipant(participant: HTMLElement): void {
   if (featuresSuspended) return;
-  participantCallbacks.forEach((callback) => callback(participant));
+  participantCallbacks.forEach((callback) => runFeatureCallback(() => callback(participant)));
 }
 
 /**
@@ -472,7 +476,7 @@ export function resetFeatures(): void {
 }
 
 function runLifecycleCallbacks(callbacks: LifecycleCallback[]): void {
-  callbacks.forEach((callback) => callback());
+  callbacks.forEach((callback) => runFeatureCallback(callback));
 }
 
 function createPhasedCallbacks<T extends (...args: never[]) => void>(): PhasedCallbacks<T> {
@@ -496,9 +500,9 @@ function runPhasedCallbacks<T extends (...args: never[]) => void>(
   callbacks: PhasedCallbacks<T>,
   run: (callback: T) => void
 ): void {
-  callbacks.collect.forEach(run);
-  callbacks.enhance.forEach(run);
-  callbacks.render.forEach(run);
+  callbacks.collect.forEach((callback) => runFeatureCallback(() => run(callback)));
+  callbacks.enhance.forEach((callback) => runFeatureCallback(() => run(callback)));
+  callbacks.render.forEach((callback) => runFeatureCallback(() => run(callback)));
 }
 
 function shouldIgnoreFeatureObserverElement(
@@ -506,5 +510,25 @@ function shouldIgnoreFeatureObserverElement(
   callbacks: ((element: Element) => boolean)[]
 ): boolean {
   if (isExtensionManagedElement(element)) return true;
-  return callbacks.some((callback) => callback(element));
+  return callbacks.some((callback) => runFeatureCallback(() => callback(element)) === true);
+}
+
+function runFeatureCallback<T>(run: () => T): T | undefined {
+  try {
+    return run();
+  } catch (error) {
+    reportFeatureLifecycleError(error);
+    return undefined;
+  }
+}
+
+function reportFeatureLifecycleError(error: unknown): void {
+  const reportError = (globalThis as { reportError?: (error: unknown) => void }).reportError;
+  if (typeof reportError !== 'function') return;
+
+  try {
+    reportError(error);
+  } catch {
+    // Keep feature dispatch isolated even if the browser reporter is unavailable.
+  }
 }

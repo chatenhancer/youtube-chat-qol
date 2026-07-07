@@ -455,7 +455,7 @@ describe('profile popup coordinator', () => {
     expect(document.querySelector('.ytcq-profile-card')).toBe(card);
   });
 
-  it('repositions on resize and closes when the anchor disconnects', async () => {
+  it('repositions on resize and stays open when the anchor disconnects', async () => {
     vi.useFakeTimers();
     const message = createMessage();
     document.body.append(message);
@@ -463,18 +463,20 @@ describe('profile popup coordinator', () => {
     wireProfileClick(message);
     avatar.click();
     await vi.runOnlyPendingTimersAsync();
+    const card = document.querySelector<HTMLElement>('.ytcq-profile-card')!;
 
     window.dispatchEvent(new Event('resize'));
     await vi.runOnlyPendingTimersAsync();
-    expect(positioningMocks.positionProfileCard).toHaveBeenCalledWith(expect.any(HTMLElement), avatar);
+    expect(positioningMocks.positionProfileCard).toHaveBeenCalledWith(card, avatar);
 
     avatar.remove();
     window.dispatchEvent(new Event('resize'));
     await vi.runOnlyPendingTimersAsync();
-    expect(document.querySelector('.ytcq-profile-card')).toBeNull();
+    expect(document.querySelector('.ytcq-profile-card')).toBe(card);
+    expect(positioningMocks.keepProfileCardInViewport).toHaveBeenCalledWith(card);
   });
 
-  it('keeps the card in view after resize observer updates and closes if the anchor disappears', async () => {
+  it('keeps the card in view after resize observer updates even if the anchor disappears', async () => {
     vi.useFakeTimers();
     const message = createMessage();
     document.body.append(message);
@@ -489,7 +491,8 @@ describe('profile popup coordinator', () => {
     avatar.remove();
     resizeObserverCallbacks.at(-1)?.([], {} as ResizeObserver);
     await vi.runOnlyPendingTimersAsync();
-    expect(document.querySelector('.ytcq-profile-card')).toBeNull();
+    expect(document.querySelector('.ytcq-profile-card')).not.toBeNull();
+    expect(positioningMocks.keepProfileCardInViewport).toHaveBeenCalledTimes(2);
   });
 
   it('ignores history updates after the active card closes', () => {

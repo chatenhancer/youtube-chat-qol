@@ -57,6 +57,55 @@ describe('content feature lifecycle', () => {
     expect(receivedSource).toBe('changed');
   });
 
+  it('continues lifecycle dispatch after feature hook failures', async () => {
+    vi.resetModules();
+    const lifecycle = await import('./lifecycle');
+    const error = new Error('feature failed');
+    const originalReportError = (globalThis as { reportError?: (error: unknown) => void }).reportError;
+    const reportError = vi.fn();
+    (globalThis as { reportError?: (error: unknown) => void }).reportError = reportError;
+    const calls: string[] = [];
+
+    try {
+      lifecycle.registerFeatureLifecycle({
+        message: {
+          collect: () => {
+            calls.push('collect-before');
+            throw error;
+          },
+          render: () => calls.push('render-after')
+        }
+      });
+      lifecycle.registerFeatureLifecycle({
+        message: {
+          collect: () => calls.push('collect-after')
+        },
+        page: {
+          boot: () => {
+            calls.push('boot-before');
+            throw error;
+          },
+          visibleRecovery: () => calls.push('visible-recovery-after')
+        }
+      });
+
+      lifecycle.handleFeatureMessage(document.createElement('yt-live-chat-text-message-renderer'), { source: 'added' });
+      lifecycle.bootFeatures();
+      lifecycle.recoverVisibleFeatures();
+
+      expect(calls).toEqual([
+        'collect-before',
+        'collect-after',
+        'render-after',
+        'boot-before',
+        'visible-recovery-after'
+      ]);
+      expect(reportError).toHaveBeenCalledWith(error);
+    } finally {
+      (globalThis as { reportError?: (error: unknown) => void }).reportError = originalReportError;
+    }
+  });
+
   it('ignores extension-managed observer nodes automatically', async () => {
     vi.resetModules();
     const [{ ytcqCreateElement }, lifecycle] = await Promise.all([
@@ -199,5 +248,25 @@ describe('content feature lifecycle', () => {
     expect(lifecycle.shouldIgnoreFeatureMutation(ordinary)).toBe(false);
     expect(ignoreAdded).toHaveBeenCalledWith(ordinary);
     expect(ignoreMutation).toHaveBeenCalledWith(ordinary);
+  });
+
+  it('treats throwing observer ignore hooks as non-matches', async () => {
+    vi.resetModules();
+    const lifecycle = await import('./lifecycle');
+    const element = document.createElement('div');
+
+    lifecycle.registerFeatureLifecycle({
+      observerIgnore: {
+        addedNode: () => {
+          throw new Error('ignore failed');
+        },
+        mutation: () => {
+          throw new Error('ignore failed');
+        }
+      }
+    });
+
+    expect(lifecycle.shouldIgnoreFeatureAddedNode(element)).toBe(false);
+    expect(lifecycle.shouldIgnoreFeatureMutation(element)).toBe(false);
   });
 });
