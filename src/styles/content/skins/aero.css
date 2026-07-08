@@ -1472,6 +1472,8 @@
   .ytcq-games-player-avatar,
   .ytcq-bounty-hunting-claim-indicator-avatar
 ) {
+  --ytcq-aero-extension-avatar-frame-size: 37px;
+
   position: relative;
   overflow: visible;
   border-radius: 2px;
@@ -1489,12 +1491,19 @@
   top: 50%;
   left: 50%;
   z-index: 2;
-  width: 37px;
-  height: 37px;
-  background: var(--ytcq-aero-avatar-frame-image) center / 37px 37px no-repeat;
+  width: var(--ytcq-aero-extension-avatar-frame-size);
+  height: var(--ytcq-aero-extension-avatar-frame-size);
+  background:
+    var(--ytcq-aero-avatar-frame-image) center /
+    var(--ytcq-aero-extension-avatar-frame-size) var(--ytcq-aero-extension-avatar-frame-size)
+    no-repeat;
   content: "";
   pointer-events: none;
   transform: translate(-50%, -50%);
+}
+
+:root[data-ytcq-chat-skin="aero"] .ytcq-inbox-avatar {
+  --ytcq-aero-extension-avatar-frame-size: 34px;
 }
 
 :root[data-ytcq-chat-skin="aero"] :where(

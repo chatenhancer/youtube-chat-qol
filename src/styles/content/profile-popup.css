@@ -421,25 +421,34 @@
 
 .ytcq-profile-card-jump {
   position: absolute;
-  top: 5px;
-  right: 6px;
+  top: 1px;
+  right: 2px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
   padding: 0;
   border: 0;
   border-radius: 50%;
   color: var(--yt-live-chat-secondary-text-color, var(--yt-spec-text-secondary, #aaa));
-  background: rgba(128, 128, 128, 0.16);
+  background: transparent;
   cursor: pointer;
   opacity: 0;
   pointer-events: none;
   transition:
-    background-color 120ms ease,
     color 120ms ease,
     opacity 120ms ease;
+}
+
+.ytcq-profile-card-jump::before {
+  position: absolute;
+  inset: 4px;
+  border-radius: inherit;
+  background: rgba(128, 128, 128, 0.16);
+  content: "";
+  pointer-events: none;
+  transition: background-color 120ms ease;
 }
 
 .ytcq-profile-card-message:hover .ytcq-profile-card-jump,
@@ -451,14 +460,20 @@
 .ytcq-profile-card-jump:hover,
 .ytcq-profile-card-jump:focus {
   color: var(--yt-spec-call-to-action, #3ea6ff);
-  background: rgba(62, 166, 255, 0.18);
   outline: none;
 }
 
+.ytcq-profile-card-jump:hover::before,
+.ytcq-profile-card-jump:focus::before {
+  background: rgba(62, 166, 255, 0.18);
+}
+
 .ytcq-profile-card-jump svg {
+  position: relative;
+  z-index: 1;
   display: block;
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   fill: currentColor;
   pointer-events: none;
 }

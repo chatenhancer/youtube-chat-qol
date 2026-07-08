@@ -32,6 +32,28 @@
   max-height: 220px;
 }
 
+.ytcq-inbox-message-has-avatar {
+  grid-template-columns: 22px auto minmax(0, 1fr);
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+.ytcq-inbox-message-has-avatar .ytcq-inbox-avatar {
+  width: 22px;
+  height: 22px;
+}
+
+.ytcq-inbox-message-has-avatar .ytcq-inbox-message-body {
+  align-self: start;
+  min-height: 22px;
+  box-sizing: border-box;
+  padding-top: 3px;
+}
+
+.ytcq-inbox-message-has-avatar .ytcq-profile-card-message-time {
+  min-height: 22px;
+}
+
 .ytcq-inbox-empty {
   display: flex;
   align-items: center;
