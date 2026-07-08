@@ -363,7 +363,8 @@
 }
 
 .ytcq-profile-card:not(.ytcq-inbox-card):not(.ytcq-games-card) .ytcq-profile-card-messages {
-  max-height: 220px;
+  /* Five compact single-line messages plus row gaps. */
+  max-height: 182px;
 }
 
 .ytcq-profile-card-message {
