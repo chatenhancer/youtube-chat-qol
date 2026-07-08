@@ -1434,10 +1434,13 @@
   .ytcq-focus-avatar-fallback
 ) {
   color: #fff;
-  background:
-    var(--ytcq-aero-navbar-image) center / 100% 100% repeat-x,
+  background-image:
+    var(--ytcq-aero-navbar-image),
     linear-gradient(180deg, rgba(255, 255, 255, 0.48) 0%, rgba(255, 255, 255, 0.16) 46%, rgba(0, 93, 142, 0.22) 47%, rgba(0, 75, 122, 0.32) 100%),
     linear-gradient(180deg, #64d3f1 0%, #2eb2df 49%, #087dbc 50%, #04649a 100%);
+  background-position: center, center, center;
+  background-size: 100% 100%, 100% 100%, 100% 100%;
+  background-repeat: repeat-x, no-repeat, no-repeat;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.76),
     0 1px 3px rgba(0, 86, 132, 0.32);
@@ -2034,8 +2037,8 @@
   .ytcq-bounty-hunting-game-icon,
   .ytcq-focus-avatar-fallback
 ) {
-  background:
-    var(--ytcq-aero-navbar-image) center / 100% 100% repeat-x,
+  background-image:
+    var(--ytcq-aero-navbar-image),
     linear-gradient(180deg, rgba(255, 255, 255, 0.36) 0%, rgba(255, 255, 255, 0.14) 46%, rgba(0, 63, 92, 0.24) 47%, rgba(0, 38, 65, 0.34) 100%),
     linear-gradient(180deg, #78d4ed 0%, #3299c0 49%, #0d5b83 50%, #084260 100%);
   box-shadow:
