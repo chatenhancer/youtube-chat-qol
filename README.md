@@ -17,27 +17,21 @@
 
 [Website](https://www.chatenhancer.com) · [Chrome Web Store](https://www.chatenhancer.com/chrome) · [Firefox Add-ons](https://www.chatenhancer.com/firefox) · [Safari (Mac App Store)](https://www.chatenhancer.com/safari)
 
-Designed to feel like part of YouTube, Chat Enhancer for YouTube keeps the native live chat experience while adding a lightweight layer of quality-of-life tools for busy streams.
+Suite of enhancements that make YouTube live chat easier to follow and participate in.
 
-Main features include two-way translation, an inbox for @mentions and keyword matches, and chat profiles that help you quickly see someone’s recent messages or open their YouTube channel.
-
-You also get a row of your most-used emojis, chat commands, user bookmarks, quick mentions and quotes, focus mode, draft recovery, and more.
-
-NEW! Introducing Playground: play minigames with other extension users right in YouTube live chat.
-
-Chat Enhancer for YouTube is free, open-source, requires no account, and does not run analytics.
+The extension is free, open-source, requires no account, and does not run analytics.
 
 Not affiliated with YouTube or Google.
 
 ## Privacy
 
-- Most extension features run locally in your browser.
+- Most extension features run locally in the browser profile.
 
 - Translation is off by default.
 
-- When translation is enabled, the text being translated is sent to Google Translate.
+- When translation is enabled, message or draft text being translated is sent to Google Translate.
 
-- Playground games are off by default. If you enable and use Playground, game presence, invites, and game actions are sent to the Chat Enhancer Playground game server under a generated player name.
+- The extension includes optional multiplayer games for users in the same live chat. Games are off by default. If enabled, game presence, invites, and game actions are sent to the Playground backend under a generated player name; YouTube display names, avatars, cookies, credentials, and chat text are not sent.
 
 - The extension does not run analytics, sell data, or collect browsing history.
 

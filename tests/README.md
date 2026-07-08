@@ -8,85 +8,29 @@ tests/browser/scenarios/   reusable Playwright browser behavior checks
 tests/browser/specs/       flattened Playwright spec matrix
 ```
 
-## Test layers
+## Layers
 
-**Unit tests**
-
-`npm run test` runs Vitest against colocated `src/**/*.test.ts` files. These
-cover parser, formatter, matching, storage, command, placeholder, and small
-DOM/module behavior close to the implementation.
-
-**Browser behavior tests**
-
-`npm run test:browser` runs Playwright against the built extension. These cover
-content-script attachment, YouTube chat frame wiring, injected menus, cards,
-popup status, composer behavior, and real YouTube DOM compatibility.
-
-**Browser performance tests**
-
-`npm run test:browser:perf` runs deterministic mock YouTube stress checks for
-fast chat, sustained busy streams, translation backlog, keyword matching,
-panels, and composer translation debounce. These are separate from `verify` so
-performance budgets can be checked intentionally.
-
-`npm run test:browser:perf:live` runs the manual hybrid real-DOM benchmark
-against a real YouTube chat iframe. It clones existing renderer DOM locally and
-does not send YouTube chat messages.
+- `npm run test` runs Vitest for parsing, formatting, matching, storage,
+  commands, placeholders, and DOM-light feature behavior.
+- `npm run test:browser` runs Playwright against the built extension for
+  content-script wiring, injected UI, composer behavior, popup status, and
+  YouTube DOM compatibility.
+- `npm run test:browser:perf` runs intentional mock YouTube performance checks.
 
 ## Commands
 
-```sh
-npm run test
-```
+- `npm run test`: run Vitest.
+- `npm run test:coverage`: run Vitest coverage, refresh badges, and print the
+  coverage notice.
+- `npm run test:browser:mock`: run deterministic mock YouTube browser specs.
+- `npm run test:browser:live`: run real YouTube browser specs. Logged-in specs
+  require the dedicated profile described in `tests/browser/README.md`.
+- `npm run test:browser`: run all mock and live browser behavior specs.
+- `npm run test:browser:perf`: run mock browser performance specs.
+- `npm run test:all`: run Vitest, browser behavior specs, and mock performance
+  specs once.
+- `npm run verify`: run the CI-style gate. Signed-in live and performance specs
+  remain local/manual.
 
-Run Vitest tests.
-
-```sh
-npm run test:all
-```
-
-Run every test layer once: Vitest, all mock and live browser behavior specs,
-and mock browser performance specs.
-
-```sh
-npm run test:coverage
-```
-
-Run Vitest with coverage, write `coverage/unit/index.html`, refresh README
-coverage badges, and print a notice when coverage is below the target.
-
-```sh
-npm run test:browser:mock
-```
-
-Run deterministic mock YouTube browser behavior tests.
-
-```sh
-npm run test:browser:live
-```
-
-Run real YouTube browser behavior tests. Logged-in tests require the dedicated
-test profile described in `tests/browser/README.md`.
-
-```sh
-npm run test:browser
-```
-
-Run all mock and live browser behavior specs.
-
-```sh
-npm run test:browser:perf
-```
-
-Run mock browser performance specs.
-
-```sh
-npm run verify
-```
-
-Run the CI-style correctness gate: typecheck, lint, Vitest, build, docs build,
-mock browser behavior specs, and logged-out live behavior specs. Signed-in live
-and performance browser specs stay local/manual.
-
-See `tests/browser/README.md` for browser profile setup, browser report paths,
-failure artifacts, and how to add browser scenarios.
+Browser-specific setup, reports, and artifact notes live in
+`tests/browser/README.md`.
