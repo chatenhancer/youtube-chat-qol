@@ -16,6 +16,13 @@
   --ytcq-scroll-fade-size: 16px;
   --ytcq-scroll-fade-top-size: 0px;
   --ytcq-scroll-fade-bottom-size: 0px;
+
+  scrollbar-width: thin;
+}
+
+.ytcq-scroll-fade::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
 }
 
 .ytcq-scroll-fade-top {
