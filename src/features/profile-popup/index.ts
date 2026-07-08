@@ -9,7 +9,12 @@ import { t } from '../../shared/i18n';
 import { wireFloatingPanelDrag } from '../../shared/floating-panel-drag';
 import { createChannelIcon, createCloseIcon } from '../../shared/icons';
 import { ytcqCreateElement } from '../../shared/managed-dom';
-import { captureScrollPosition, restoreScrollPositionAfterRender, scrollElementToBottom } from '../../shared/scroll';
+import {
+  captureScrollPosition,
+  restoreScrollPositionAfterRender,
+  scrollElementToBottom,
+  wireScrollEdgeFades
+} from '../../shared/scroll';
 import { findChatInput } from '../../youtube/chat-input';
 import {
   getLiveMessageForRecord,
@@ -238,6 +243,7 @@ function showProfileCard(source: ProfileSource, anchor: HTMLElement): void {
 
   const list = ytcqCreateElement('div');
   list.className = 'ytcq-profile-card-messages';
+  const scrollFadeCleanup = wireScrollEdgeFades(list);
 
   const translationPriorityScope = createTranslationPriorityScope();
   const renderMessages = (): void => {
@@ -314,6 +320,7 @@ function showProfileCard(source: ProfileSource, anchor: HTMLElement): void {
     cardListeners.abort();
     if (positionFrame) window.cancelAnimationFrame(positionFrame);
     resizeObserver.disconnect();
+    scrollFadeCleanup();
     translationPriorityScope.close();
     unsubscribeMessages();
   });

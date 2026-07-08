@@ -7,7 +7,12 @@
 import { t } from '../../shared/i18n';
 import { createCloseIcon } from '../../shared/icons';
 import { ytcqCreateElement } from '../../shared/managed-dom';
-import { captureScrollPosition, restoreScrollPositionAfterRender, scrollElementToBottom } from '../../shared/scroll';
+import {
+  captureScrollPosition,
+  restoreScrollPositionAfterRender,
+  scrollElementToBottom,
+  wireScrollEdgeFades
+} from '../../shared/scroll';
 import { appendRichMessageText } from '../../youtube/rich-text';
 import { applyMarkedUserRing } from '../marked-users';
 import { createJumpToMessageIcon, jumpToChatMessage } from '../message-jump';
@@ -93,6 +98,7 @@ export function openInboxCardView(anchor: HTMLElement | undefined, callbacks: In
 
   const list = ytcqCreateElement('div');
   list.className = 'ytcq-profile-card-messages ytcq-inbox-messages';
+  const scrollFadeCleanup = wireScrollEdgeFades(list);
   renderInboxList(list);
 
   const actions = ytcqCreateElement('div');
@@ -129,6 +135,7 @@ export function openInboxCardView(anchor: HTMLElement | undefined, callbacks: In
 
   activeInboxCardCleanup = () => {
     cardListeners.abort();
+    scrollFadeCleanup();
   };
 
   window.setTimeout(() => {

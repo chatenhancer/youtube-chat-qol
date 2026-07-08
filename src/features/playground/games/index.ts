@@ -11,6 +11,7 @@ import type { Options } from '../../../shared/options';
 import type { GameId, PresenceUser, PublicGame, PublicInvite } from '../../../shared/playground/protocol';
 import { playAlertSound } from '../../../shared/sounds/alert-sounds';
 import { getOptions } from '../../../shared/state';
+import { updateScrollEdgeFades, wireScrollEdgeFades } from '../../../shared/scroll';
 import {
   closeActiveGamePanel,
   getActiveGamePanelId,
@@ -183,7 +184,8 @@ function toggleGamesCard(anchor: HTMLElement): void {
 function openGamesCard(anchor: HTMLElement): void {
   closeGamesCard();
 
-  const { card } = createGamesCard(closeGamesCard);
+  const { body, card } = createGamesCard(closeGamesCard);
+  const scrollFadeCleanup = wireScrollEdgeFades(body);
   document.body.append(card);
   activeGamesCard = card;
   activeGamesAnchor = anchor;
@@ -196,11 +198,15 @@ function openGamesCard(anchor: HTMLElement): void {
   renderGamesPanel();
   setGamesButtonExpanded(anchor, true);
   positionGamesCard(card, anchor);
-  activeGamesCardCleanup = installGamesCardListeners({
+  const cardListenersCleanup = installGamesCardListeners({
     getAnchor: () => activeGamesAnchor,
     getCard: () => activeGamesCard,
     onClose: closeGamesCard
   });
+  activeGamesCardCleanup = () => {
+    cardListenersCleanup();
+    scrollFadeCleanup();
+  };
   activeGamesPointerCleanup = installGamesPointerTracking();
 }
 
@@ -247,6 +253,7 @@ function renderGamesPanel(): void {
   if (!body) return;
 
   renderGamesPanelBody(body, gamesPanelState, createGamesViewActions());
+  updateScrollEdgeFades(body);
   lastGamesPanelRenderKey = getCurrentGamesPanelViewKey();
 }
 

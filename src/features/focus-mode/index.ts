@@ -7,7 +7,12 @@
 import { t } from '../../shared/i18n';
 import { createCloseIcon } from '../../shared/icons';
 import { ytcqCreateElement } from '../../shared/managed-dom';
-import { captureScrollPosition, restoreScrollPositionAfterRender, scrollElementToBottom } from '../../shared/scroll';
+import {
+  captureScrollPosition,
+  restoreScrollPositionAfterRender,
+  scrollElementToBottom,
+  wireScrollEdgeFades
+} from '../../shared/scroll';
 import { findChatInput, getChatInputText, replaceChatInput } from '../../youtube/chat-input';
 import { CHAT_MESSAGE_SELECTOR, PANEL_PAGES_SELECTOR, SEND_BUTTON_SELECTOR } from '../../youtube/selectors';
 import { getChannelUrl, openChannelWindow } from '../channel-popup';
@@ -39,6 +44,7 @@ const FOCUS_ANCHOR_CLASS = 'ytcq-focus-anchor';
 let activeSource: FocusSource | null = null;
 let activeCard: HTMLElement | null = null;
 let activeList: HTMLElement | null = null;
+let activeScrollFadeCleanup: (() => void) | null = null;
 let activeTranslationPriorityScope: TranslationPriorityScope | null = null;
 let activeExpanded = false;
 let mentionRestoreTimer = 0;
@@ -163,6 +169,7 @@ function renderCollapsedFocusPrompt(): void {
   if (!activeSource) return;
 
   activeExpanded = false;
+  cleanupActiveScrollFade();
   activeCard?.remove();
 
   const card = ytcqCreateElement('section');
@@ -211,6 +218,7 @@ function openFocusPanel(): void {
   if (!activeSource) return;
 
   activeExpanded = true;
+  cleanupActiveScrollFade();
   activeCard?.remove();
   clearFocusRecords();
   stopFocusTranslationPriority();
@@ -236,6 +244,7 @@ function openFocusPanel(): void {
 
   const list = ytcqCreateElement('div');
   list.className = 'ytcq-focus-messages';
+  activeScrollFadeCleanup = wireScrollEdgeFades(list);
 
   card.append(header, list);
   mountFocusCard(card);
@@ -319,6 +328,7 @@ async function quoteFocusRecord(record: FocusRecord): Promise<void> {
 }
 
 function closeFocusMode(): void {
+  cleanupActiveScrollFade();
   activeCard?.remove();
   activeCard = null;
   activeList = null;
@@ -328,6 +338,11 @@ function closeFocusMode(): void {
   clearFocusRecords();
   window.clearTimeout(mentionRestoreTimer);
   mentionRestoreTimer = 0;
+}
+
+function cleanupActiveScrollFade(): void {
+  activeScrollFadeCleanup?.();
+  activeScrollFadeCleanup = null;
 }
 
 function clearFocusRecords(): void {

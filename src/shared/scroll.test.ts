@@ -2,7 +2,9 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   captureScrollPosition,
   restoreScrollPositionAfterRender,
-  scrollElementToBottom
+  scrollElementToBottom,
+  updateScrollEdgeFades,
+  wireScrollEdgeFades
 } from './scroll';
 
 describe('scroll helpers', () => {
@@ -54,6 +56,39 @@ describe('scroll helpers', () => {
     await vi.runAllTimersAsync();
 
     expect(element.scrollTop).toBe(320);
+  });
+
+  it('marks only the scroll edges with hidden content', () => {
+    const element = scrollElement({ clientHeight: 100, scrollHeight: 300, scrollTop: 0 });
+
+    updateScrollEdgeFades(element);
+    expect(element.classList.contains('ytcq-scroll-fade-top')).toBe(false);
+    expect(element.classList.contains('ytcq-scroll-fade-bottom')).toBe(true);
+
+    element.scrollTop = 80;
+    updateScrollEdgeFades(element);
+    expect(element.classList.contains('ytcq-scroll-fade-top')).toBe(true);
+    expect(element.classList.contains('ytcq-scroll-fade-bottom')).toBe(true);
+
+    element.scrollTop = 200;
+    updateScrollEdgeFades(element);
+    expect(element.classList.contains('ytcq-scroll-fade-top')).toBe(true);
+    expect(element.classList.contains('ytcq-scroll-fade-bottom')).toBe(false);
+  });
+
+  it('wires and cleans up scroll edge fades', async () => {
+    vi.useFakeTimers();
+    const element = scrollElement({ clientHeight: 100, scrollHeight: 300, scrollTop: 0 });
+
+    const cleanup = wireScrollEdgeFades(element);
+    await vi.runAllTimersAsync();
+
+    expect(element.classList.contains('ytcq-scroll-fade')).toBe(true);
+    expect(element.classList.contains('ytcq-scroll-fade-bottom')).toBe(true);
+
+    cleanup();
+    expect(element.classList.contains('ytcq-scroll-fade')).toBe(false);
+    expect(element.classList.contains('ytcq-scroll-fade-bottom')).toBe(false);
   });
 });
 

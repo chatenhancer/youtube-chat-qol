@@ -12,6 +12,40 @@
   text-transform: none;
 }
 
+.ytcq-scroll-fade {
+  --ytcq-scroll-fade-size: 16px;
+  --ytcq-scroll-fade-top-size: 0px;
+  --ytcq-scroll-fade-bottom-size: 0px;
+}
+
+.ytcq-scroll-fade-top {
+  --ytcq-scroll-fade-top-size: var(--ytcq-scroll-fade-size);
+}
+
+.ytcq-scroll-fade-bottom {
+  --ytcq-scroll-fade-bottom-size: var(--ytcq-scroll-fade-size);
+}
+
+.ytcq-scroll-fade-top,
+.ytcq-scroll-fade-bottom {
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    #000 var(--ytcq-scroll-fade-top-size),
+    #000 calc(100% - var(--ytcq-scroll-fade-bottom-size)),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    #000 var(--ytcq-scroll-fade-top-size),
+    #000 calc(100% - var(--ytcq-scroll-fade-bottom-size)),
+    transparent 100%
+  );
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
+
 .ytcq-enhanced-effect::before,
 ytd-menu-popup-renderer .ytcq-context-split-button,
 .ytcq-composer-translate-panel,
