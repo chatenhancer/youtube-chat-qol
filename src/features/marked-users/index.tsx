@@ -381,11 +381,11 @@ function animateMarkedUserRing(target: HTMLElement, marked: boolean, onDone?: ()
     return;
   }
 
-  const overlay = el<HTMLDivElement>(
-    <div
-      class={`ytcq-marked-user-ring-animation ${marked ? 'ytcq-marked-user-ring-animation-enter' : 'ytcq-marked-user-ring-animation-exit'}`}
-    />
-  );
+  const overlayBaseClass = 'ytcq-marked-user-ring-animation';
+  const overlayStateClass = marked
+    ? 'ytcq-marked-user-ring-animation-enter'
+    : 'ytcq-marked-user-ring-animation-exit';
+  const overlay = el<HTMLDivElement>(<div class={`${overlayBaseClass} ${overlayStateClass}`} />);
   overlay.style.setProperty(
     '--ytcq-marked-user-color',
     target.style.getPropertyValue('--ytcq-marked-user-color') || '#3ea6ff'
