@@ -388,12 +388,48 @@
 }
 
 .ytcq-inbox-avatar {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 24px;
   height: 24px;
+  padding: 0;
+  border: 0;
   border-radius: 50%;
+  overflow: hidden;
+  background: transparent;
+}
+
+button.ytcq-inbox-avatar {
+  cursor: pointer;
+}
+
+button.ytcq-inbox-avatar::after {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: rgba(0, 0, 0, 0.42);
+  opacity: 0;
+  content: "";
+  transition: opacity 120ms ease;
+}
+
+button.ytcq-inbox-avatar:hover,
+button.ytcq-inbox-avatar:focus {
+  outline: none;
+}
+
+button.ytcq-inbox-avatar:hover::after,
+button.ytcq-inbox-avatar:focus::after,
+button.ytcq-inbox-avatar:hover .ytcq-inbox-avatar-open-icon,
+button.ytcq-inbox-avatar:focus .ytcq-inbox-avatar-open-icon {
+  opacity: 1;
+}
+
+.ytcq-inbox-avatar .ytcq-inbox-avatar-open-icon {
+  width: 12px;
+  height: 12px;
 }
 
 .ytcq-inbox-avatar img {

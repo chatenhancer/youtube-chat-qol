@@ -47,11 +47,21 @@ const markedUserMocks = vi.hoisted(() => ({
   applyMarkedUserRing: vi.fn()
 }));
 
+const channelPopupMocks = vi.hoisted(() => ({
+  getChannelUrl: vi.fn((channelId: string | undefined, authorName: string) => {
+    if (channelId) return `https://www.youtube.com/channel/${encodeURIComponent(channelId)}`;
+    if (authorName.startsWith('@')) return `https://www.youtube.com/${authorName}`;
+    return '';
+  }),
+  openChannelWindow: vi.fn()
+}));
+
 vi.mock('./state', () => stateMocks);
 vi.mock('./keyword-panel', () => keywordPanelMocks);
 vi.mock('../reply', () => replyMocks);
 vi.mock('../message-jump', () => jumpMocks);
 vi.mock('../marked-users', () => markedUserMocks);
+vi.mock('../channel-popup', () => channelPopupMocks);
 
 import {
   cleanupStaleInboxCards,
@@ -155,6 +165,26 @@ describe('inbox card view', () => {
       avatarUrl: 'https://example.com/avatar.jpg',
       channelId: 'viewer-channel'
     });
+  });
+
+  it('opens the channel popup from stored inbox avatars without quoting the row', () => {
+    records = [record({
+      authorName: '@ViewerOne',
+      avatarSrc: 'https://example.com/avatar.jpg',
+      channelId: 'viewer-channel'
+    })];
+
+    openInboxCardView(undefined, callbacksForCard());
+
+    const avatar = document.querySelector<HTMLButtonElement>('.ytcq-inbox-avatar')!;
+    avatar.click();
+
+    expect(avatar.querySelector('.ytcq-inbox-avatar-open-icon')).not.toBeNull();
+    expect(channelPopupMocks.openChannelWindow).toHaveBeenCalledWith(
+      'https://www.youtube.com/channel/viewer-channel'
+    );
+    expect(replyMocks.quoteAuthorRichText).not.toHaveBeenCalled();
+    expect(isInboxCardOpen()).toBe(true);
   });
 
   it('quotes inbox rows from keyboard activation and ignores button targets', () => {

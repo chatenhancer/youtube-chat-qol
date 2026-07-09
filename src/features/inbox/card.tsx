@@ -5,7 +5,7 @@
  * jump-to-message buttons while state changes stay in the coordinator.
  */
 import { t } from '../../shared/i18n';
-import { createCloseIcon } from '../../shared/icons';
+import { createCloseIcon, createOpenInNewIcon } from '../../shared/icons';
 import { jsx, el } from '../../shared/jsx-dom';
 import {
   captureScrollPosition,
@@ -17,6 +17,7 @@ import { appendRichMessageText } from '../../youtube/rich-text';
 import { applyMarkedUserRing } from '../marked-users';
 import { createJumpToMessageIcon, jumpToChatMessage } from '../message-jump';
 import { mentionAuthorName, quoteAuthorRichText } from '../reply';
+import { getChannelUrl, openChannelWindow } from '../channel-popup';
 import { highlightInboxAuthorMatches, highlightInboxMatches } from './highlights';
 import { createInboxIcon, setInboxIcon } from './icons';
 import {
@@ -246,17 +247,42 @@ function renderInboxList(list: HTMLElement): void {
 function createInboxAvatar(record: InboxRecord): HTMLElement | null {
   if (!record.avatarSrc) return null;
 
-  const surface = el<HTMLSpanElement>(
-    <span class="ytcq-inbox-avatar">
-      <img src={record.avatarSrc} alt="" referrerPolicy="no-referrer" />
-    </span>
+  const avatar = el<HTMLImageElement>(
+    <img src={record.avatarSrc} alt="" referrerPolicy="no-referrer" />
   );
+  const channelUrl = getChannelUrl(record.channelId, record.authorName);
+  const surface = channelUrl
+    ? el<HTMLButtonElement>(
+        <button
+          type="button"
+          class="ytcq-inbox-avatar"
+          title={t('openChannel')}
+          aria-label={t('openChannel')}
+        >
+          {avatar}
+          {createInboxAvatarOpenIcon()}
+        </button>
+      )
+    : el<HTMLSpanElement>(<span class="ytcq-inbox-avatar">{avatar}</span>);
+  if (channelUrl) {
+    surface.addEventListener('click', (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      openChannelWindow(channelUrl);
+    });
+  }
   applyMarkedUserRing(surface, {
     authorName: record.authorName,
     avatarUrl: record.avatarSrc,
     channelId: record.channelId
   });
   return surface;
+}
+
+function createInboxAvatarOpenIcon(): SVGSVGElement {
+  const icon = createOpenInNewIcon();
+  icon.classList.add('ytcq-profile-card-avatar-open-icon', 'ytcq-inbox-avatar-open-icon');
+  return icon;
 }
 
 function createCardCloseButton(): HTMLButtonElement {
