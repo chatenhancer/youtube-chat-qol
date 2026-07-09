@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { Fragment, jsx, el, toSVGElement } from './jsx-dom';
+import { Fragment, jsx, el, UNMANAGED } from './jsx-dom';
 import { isExtensionManagedElement } from './managed-dom';
 
 describe('jsx-dom', () => {
@@ -44,7 +44,7 @@ describe('jsx-dom', () => {
   });
 
   it('creates managed SVG elements', () => {
-    const icon = toSVGElement<SVGSVGElement>(
+    const icon = el<SVGSVGElement>(
       <svg viewBox="0 0 24 24" aria-hidden="true">
         <path d="M0 0h1v1H0z" />
       </svg>
@@ -54,5 +54,33 @@ describe('jsx-dom', () => {
     expect(icon.firstElementChild?.namespaceURI).toBe('http://www.w3.org/2000/svg');
     expect(icon.getAttribute('viewBox')).toBe('0 0 24 24');
     expect(isExtensionManagedElement(icon)).toBe(true);
+  });
+
+  it('creates unmanaged elements for content nodes', () => {
+    const image = el<HTMLImageElement>(
+      <img
+        class="emoji"
+        src="https://example.test/emoji.png"
+        alt=":wave:"
+        data-emoji-id="emoji-1"
+      />,
+      UNMANAGED
+    );
+
+    expect(image.className).toBe('emoji');
+    expect(image.dataset.emojiId).toBe('emoji-1');
+    expect(isExtensionManagedElement(image)).toBe(false);
+  });
+
+  it('removes managed markers from unmanaged descendants', () => {
+    const wrapper = el<HTMLSpanElement>(
+      <span>
+        <span>child</span>
+      </span>,
+      UNMANAGED
+    );
+
+    expect(isExtensionManagedElement(wrapper)).toBe(false);
+    expect(isExtensionManagedElement(wrapper.firstElementChild!)).toBe(false);
   });
 });

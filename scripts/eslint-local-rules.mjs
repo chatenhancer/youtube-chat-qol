@@ -43,7 +43,7 @@ export default {
       meta: {
         type: 'problem',
         docs: {
-          description: 'Require managed JSX/DOM creation for feature-owned HTML UI.'
+          description: 'Require managed JSX/DOM creation for extension-owned HTML UI.'
         },
         messages: {
           useManagedDom:
@@ -265,13 +265,13 @@ export default {
 
 function isDocumentCreateElementCall(node) {
   const callee = node.callee;
+  const methodName = callee?.property?.type === 'Identifier' ? callee.property.name : '';
   return (
     callee?.type === 'MemberExpression' &&
     !callee.computed &&
     callee.object?.type === 'Identifier' &&
     callee.object.name === 'document' &&
-    callee.property?.type === 'Identifier' &&
-    callee.property.name === 'createElement'
+    (methodName === 'createElement' || methodName === 'createElementNS')
   );
 }
 

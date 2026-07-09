@@ -21,6 +21,7 @@ import {
   type Options
 } from '../shared/options';
 import { createLoadingSpinner } from '../shared/loading-spinner';
+import { jsx, el } from '../shared/jsx-dom';
 import { getSettingsControls } from './controls';
 import {
   animatePopupChatSkinIcon,
@@ -62,7 +63,9 @@ export function initSettingsControls(popupLocale: string): void {
 
   targetLanguage.appendChild(createSelectOption('', getExtensionMessage('off')));
   for (const [value, label] of LANGUAGE_OPTIONS) {
-    targetLanguage.appendChild(createSelectOption(value, getLocalizedLanguageLabel(value, popupLocale) || label));
+    targetLanguage.appendChild(
+      createSelectOption(value, getLocalizedLanguageLabel(value, popupLocale) || label)
+    );
   }
 
   chrome.storage.sync.get(DEFAULT_OPTIONS, (storedOptions: Partial<Options>) => {
@@ -157,7 +160,8 @@ export function applyOptionsToControls(options: Partial<Options>): void {
   startupEffect.disabled = prefersReducedMotion();
   startupEffect.checked = normalized.startupEffect && !startupEffect.disabled;
   playgroundEnabled.checked = normalized.playgroundEnabled;
-  playgroundGamesAvailable.checked = normalized.playgroundEnabled && normalized.playgroundGamesAvailable;
+  playgroundGamesAvailable.checked =
+    normalized.playgroundEnabled && normalized.playgroundGamesAvailable;
   updatePlaygroundProfile(normalized.playgroundEnabled);
   updatePlaygroundGamesVisibility(normalized.playgroundEnabled);
 }
@@ -170,17 +174,21 @@ function preparePopupTranslationIcon(): void {
   const currentIcon = document.querySelector<HTMLElement>('.translation-target-icon');
   if (!currentIcon) return;
 
-  currentIcon.replaceWith(createSplitTranslateIcon({
-    iconClassName: TRANSLATION_TARGET_ICON_CLASS,
-    sourceClassName: 'translation-source-mark',
-    targetClassName: 'translation-target-mark'
-  }));
+  currentIcon.replaceWith(
+    createSplitTranslateIcon({
+      iconClassName: TRANSLATION_TARGET_ICON_CLASS,
+      sourceClassName: 'translation-source-mark',
+      targetClassName: 'translation-target-mark'
+    })
+  );
 }
 
 function populateChatSkinOptions(chatSkin: HTMLSelectElement): void {
-  chatSkin.replaceChildren(...CHAT_SKIN_OPTIONS.map(({ id, labelMessage }) =>
-    createSelectOption(id, getExtensionMessage(labelMessage))
-  ));
+  chatSkin.replaceChildren(
+    ...CHAT_SKIN_OPTIONS.map(({ id, labelMessage }) =>
+      createSelectOption(id, getExtensionMessage(labelMessage))
+    )
+  );
 }
 
 function updatePlaygroundGamesVisibility(playgroundEnabled: boolean, animated = false): void {
@@ -251,18 +259,22 @@ function updatePlaygroundProfile(playgroundEnabled: boolean): void {
 
   if (!playgroundEnabled) return;
 
-  chrome.runtime.sendMessage({ type: PLAYGROUND_PROFILE_MESSAGE_TYPE }, (response?: PlaygroundProfileResponse) => {
-    if (token !== playgroundProfileRequestToken) return;
-    if (chrome.runtime.lastError || !response?.ok) return;
+  chrome.runtime.sendMessage(
+    { type: PLAYGROUND_PROFILE_MESSAGE_TYPE },
+    (response?: PlaygroundProfileResponse) => {
+      if (token !== playgroundProfileRequestToken) return;
+      if (chrome.runtime.lastError || !response?.ok) return;
 
-    const displayName = typeof response.profile?.displayName === 'string'
-      ? response.profile.displayName.trim()
-      : '';
-    if (!displayName) return;
+      const displayName =
+        typeof response.profile?.displayName === 'string'
+          ? response.profile.displayName.trim()
+          : '';
+      if (!displayName) return;
 
-    renderPlaygroundProfile(response.profile, { winsLoading: true });
-    requestPlaygroundProfileStats(response.profile.userId);
-  });
+      renderPlaygroundProfile(response.profile, { winsLoading: true });
+      requestPlaygroundProfileStats(response.profile.userId);
+    }
+  );
 }
 
 function savePlaygroundDisplayName(): void {
@@ -281,21 +293,26 @@ function savePlaygroundDisplayName(): void {
   input.value = displayName;
   input.setCustomValidity('');
   const token = ++playgroundProfileRequestToken;
-  chrome.runtime.sendMessage({
-    displayName,
-    type: PLAYGROUND_PROFILE_UPDATE_MESSAGE_TYPE
-  }, (response?: PlaygroundProfileResponse) => {
-    if (token !== playgroundProfileRequestToken) return;
-    if (chrome.runtime.lastError || !response?.ok) {
-      input.setCustomValidity(response?.ok === false
-        ? response.error
-        : getExtensionMessage('playgroundDisplayNameSaveFailed'));
-      input.reportValidity();
-      return;
-    }
+  chrome.runtime.sendMessage(
+    {
+      displayName,
+      type: PLAYGROUND_PROFILE_UPDATE_MESSAGE_TYPE
+    },
+    (response?: PlaygroundProfileResponse) => {
+      if (token !== playgroundProfileRequestToken) return;
+      if (chrome.runtime.lastError || !response?.ok) {
+        input.setCustomValidity(
+          response?.ok === false
+            ? response.error
+            : getExtensionMessage('playgroundDisplayNameSaveFailed')
+        );
+        input.reportValidity();
+        return;
+      }
 
-    renderPlaygroundProfile(response.profile, { preserveWins: true });
-  });
+      renderPlaygroundProfile(response.profile, { preserveWins: true });
+    }
+  );
 }
 
 interface RenderPlaygroundProfileOptions {
@@ -303,19 +320,22 @@ interface RenderPlaygroundProfileOptions {
   winsLoading?: boolean;
 }
 
-function renderPlaygroundProfile(profile: PlaygroundProfile, options: RenderPlaygroundProfileOptions = {}): void {
+function renderPlaygroundProfile(
+  profile: PlaygroundProfile,
+  options: RenderPlaygroundProfileOptions = {}
+): void {
   const settingsControls = getSettingsControls();
   if (!settingsControls) return;
 
   const displayName = typeof profile.displayName === 'string' ? profile.displayName.trim() : '';
   if (!displayName) return;
 
-  const customDisplayName = typeof profile.customDisplayName === 'string'
-    ? profile.customDisplayName.trim()
-    : '';
-  const generatedDisplayName = typeof profile.generatedDisplayName === 'string'
-    ? profile.generatedDisplayName.trim()
-    : displayName;
+  const customDisplayName =
+    typeof profile.customDisplayName === 'string' ? profile.customDisplayName.trim() : '';
+  const generatedDisplayName =
+    typeof profile.generatedDisplayName === 'string'
+      ? profile.generatedDisplayName.trim()
+      : displayName;
   const avatar = getPlaygroundAvatarPresentation({
     displayName,
     userId: profile.userId || ''
@@ -325,9 +345,15 @@ function renderPlaygroundProfile(profile: PlaygroundProfile, options: RenderPlay
   settingsControls.playgroundDisplayName.value = customDisplayName;
   settingsControls.playgroundDisplayName.placeholder = generatedDisplayName;
   settingsControls.playgroundProfileAvatar.textContent = avatar.initial;
-  settingsControls.playgroundProfileAvatar.style.setProperty('--playground-profile-avatar-bg', avatar.backgroundColor);
+  settingsControls.playgroundProfileAvatar.style.setProperty(
+    '--playground-profile-avatar-bg',
+    avatar.backgroundColor
+  );
   if (options.winsLoading) {
-    updatePlaygroundProfileWinsLoading(settingsControls.playgroundProfileWins, settingsControls.playgroundProfileWinsCount);
+    updatePlaygroundProfileWinsLoading(
+      settingsControls.playgroundProfileWins,
+      settingsControls.playgroundProfileWinsCount
+    );
   } else if (!options.preserveWins) {
     updatePlaygroundProfileWins(
       settingsControls.playgroundProfileWins,
@@ -344,27 +370,45 @@ function requestPlaygroundProfileStats(userId: string): void {
 
   const requestedUserId = typeof userId === 'string' ? userId.trim() : '';
   if (!requestedUserId) {
-    updatePlaygroundProfileWins(settingsControls.playgroundProfileWins, settingsControls.playgroundProfileWinsCount, 0);
+    updatePlaygroundProfileWins(
+      settingsControls.playgroundProfileWins,
+      settingsControls.playgroundProfileWinsCount,
+      0
+    );
     return;
   }
 
   const token = ++playgroundProfileStatsRequestToken;
-  updatePlaygroundProfileWinsLoading(settingsControls.playgroundProfileWins, settingsControls.playgroundProfileWinsCount);
-  chrome.runtime.sendMessage({
-    type: PLAYGROUND_PROFILE_STATS_MESSAGE_TYPE,
-    userId: requestedUserId
-  }, (response?: PlaygroundProfileStatsResponse) => {
-    if (token !== playgroundProfileStatsRequestToken) return;
-    const latestControls = getSettingsControls();
-    if (!latestControls || !latestControls.playgroundEnabled.checked) return;
+  updatePlaygroundProfileWinsLoading(
+    settingsControls.playgroundProfileWins,
+    settingsControls.playgroundProfileWinsCount
+  );
+  chrome.runtime.sendMessage(
+    {
+      type: PLAYGROUND_PROFILE_STATS_MESSAGE_TYPE,
+      userId: requestedUserId
+    },
+    (response?: PlaygroundProfileStatsResponse) => {
+      if (token !== playgroundProfileStatsRequestToken) return;
+      const latestControls = getSettingsControls();
+      if (!latestControls || !latestControls.playgroundEnabled.checked) return;
 
-    if (chrome.runtime.lastError || !response?.ok || response.userId !== requestedUserId) {
-      updatePlaygroundProfileWins(latestControls.playgroundProfileWins, latestControls.playgroundProfileWinsCount, 0);
-      return;
+      if (chrome.runtime.lastError || !response?.ok || response.userId !== requestedUserId) {
+        updatePlaygroundProfileWins(
+          latestControls.playgroundProfileWins,
+          latestControls.playgroundProfileWinsCount,
+          0
+        );
+        return;
+      }
+
+      updatePlaygroundProfileWins(
+        latestControls.playgroundProfileWins,
+        latestControls.playgroundProfileWinsCount,
+        response.wins
+      );
     }
-
-    updatePlaygroundProfileWins(latestControls.playgroundProfileWins, latestControls.playgroundProfileWinsCount, response.wins);
-  });
+  );
 }
 
 function setPlaygroundProfileDetailsExpanded(expanded: boolean): void {
@@ -376,13 +420,14 @@ function setPlaygroundProfileDetailsExpanded(expanded: boolean): void {
 }
 
 function createSelectOption(value: string, label: string): HTMLOptionElement {
-  const option = document.createElement('option');
-  option.value = value;
-  option.textContent = label;
-  return option;
+  return el<HTMLOptionElement>(<option value={value}>{label}</option>);
 }
 
-function updatePlaygroundProfileWins(container: HTMLElement, countElement: HTMLElement, value: unknown): void {
+function updatePlaygroundProfileWins(
+  container: HTMLElement,
+  countElement: HTMLElement,
+  value: unknown
+): void {
   const numericValue = typeof value === 'number' ? value : 0;
   const wins = Number.isFinite(numericValue) && numericValue > 0 ? Math.floor(numericValue) : 0;
   const label = `${getExtensionMessage('playgroundWins')}: ${wins}`;
@@ -395,7 +440,10 @@ function updatePlaygroundProfileWins(container: HTMLElement, countElement: HTMLE
   container.setAttribute('aria-label', label);
 }
 
-function updatePlaygroundProfileWinsLoading(container: HTMLElement, countElement: HTMLElement): void {
+function updatePlaygroundProfileWinsLoading(
+  container: HTMLElement,
+  countElement: HTMLElement
+): void {
   const spinner = getPlaygroundWinsSpinner(container);
   spinner.hidden = false;
   countElement.hidden = true;

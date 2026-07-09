@@ -4,6 +4,7 @@
  * Converts cloned chat message content into safe input nodes, preserving emoji
  * images while enforcing the quote character budget.
  */
+import { jsx, el, UNMANAGED } from '../../shared/jsx-dom';
 import { cleanText } from '../../shared/text';
 import {
   getCleanAttribute,
@@ -17,7 +18,8 @@ import type { RichTextSegment } from '../../youtube/rich-text';
 import { QUOTE_MAX_LENGTH, truncateForQuote } from './format';
 import type { RichQuoteContent } from './types';
 
-const INPUT_EMOJI_CLASS = 'emoji yt-formatted-string style-scope yt-live-chat-text-input-field-renderer';
+const INPUT_EMOJI_CLASS =
+  'emoji yt-formatted-string style-scope yt-live-chat-text-input-field-renderer';
 const INVISIBLE_QUOTE_TEXT_PATTERN = /[\u200B\u2060\uFEFF]/g;
 
 interface QuoteContentBuild {
@@ -25,7 +27,10 @@ interface QuoteContentBuild {
   truncated: boolean;
 }
 
-export function createQuoteContentNodes(content: RichQuoteContent, fallbackText: string): QuoteContentBuild {
+export function createQuoteContentNodes(
+  content: RichQuoteContent,
+  fallbackText: string
+): QuoteContentBuild {
   const state = {
     remaining: QUOTE_MAX_LENGTH,
     truncated: false
@@ -100,12 +105,14 @@ function appendQuoteSegment(
   const fallbackText = cleanText(segment.alt || segment.tooltip || segment.emojiId);
   if (!consumeQuoteBudget(fallbackText, state)) return;
 
-  nodes.push(createInputEmojiNode({
-    src: segment.src,
-    alt: fallbackText,
-    emojiId: segment.emojiId,
-    tooltip: segment.tooltip
-  }) || document.createTextNode(fallbackText));
+  nodes.push(
+    createInputEmojiNode({
+      src: segment.src,
+      alt: fallbackText,
+      emojiId: segment.emojiId,
+      tooltip: segment.tooltip
+    }) || document.createTextNode(fallbackText)
+  );
 }
 
 function appendQuoteText(
@@ -137,7 +144,9 @@ function appendQuoteEmoji(
   const fallbackText = getElementTextFallback(element);
   if (!fallbackText || !consumeQuoteBudget(fallbackText, state)) return;
 
-  nodes.push(createInputEmojiNodeFromElement(element, fallbackText) || document.createTextNode(fallbackText));
+  nodes.push(
+    createInputEmojiNodeFromElement(element, fallbackText) || document.createTextNode(fallbackText)
+  );
 }
 
 function consumeQuoteBudget(
@@ -156,12 +165,16 @@ function consumeQuoteBudget(
   return true;
 }
 
-function createInputEmojiNodeFromElement(element: Element, fallbackText: string): HTMLImageElement | null {
+function createInputEmojiNodeFromElement(
+  element: Element,
+  fallbackText: string
+): HTMLImageElement | null {
   return createInputEmojiNode({
     src: getElementImageSource(element),
     alt: fallbackText,
     emojiId: getCleanAttribute(element, 'data-emoji-id'),
-    tooltip: getCleanAttribute(element, 'shared-tooltip-text') ||
+    tooltip:
+      getCleanAttribute(element, 'shared-tooltip-text') ||
       getCleanAttribute(element, 'title') ||
       getCleanAttribute(element, 'aria-label')
   });
@@ -177,22 +190,19 @@ function createInputEmojiNode(data: {
   const alt = cleanText(data.alt);
   if (!src || !alt) return null;
 
-  // ytcq-allow-raw-create-element: inserted into YouTube's chat input as quoted emoji content.
-  const image = document.createElement('img');
-  image.className = INPUT_EMOJI_CLASS;
-  image.src = src;
-  image.alt = alt;
-
   const emojiId = cleanText(data.emojiId);
-  if (emojiId) {
-    image.id = emojiId;
-    image.setAttribute('data-emoji-id', emojiId);
-  }
-
   const tooltip = cleanText(data.tooltip);
-  if (tooltip) image.setAttribute('shared-tooltip-text', tooltip);
-
-  return image;
+  return el<HTMLImageElement>(
+    <img
+      class={INPUT_EMOJI_CLASS}
+      src={src}
+      alt={alt}
+      id={emojiId || undefined}
+      data-emoji-id={emojiId || undefined}
+      shared-tooltip-text={tooltip || undefined}
+    />,
+    UNMANAGED
+  );
 }
 
 function getSafeImageSource(value: string): string {

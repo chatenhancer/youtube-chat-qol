@@ -4,6 +4,7 @@
  * Cards can reuse cloned YouTube message nodes for custom emoji while falling
  * back to plain text for records restored from extension storage.
  */
+import { jsx, el, UNMANAGED } from '../shared/jsx-dom';
 import {
   cloneSafeMessageNode,
   getCleanAttribute,
@@ -108,7 +109,8 @@ function getEmojiSegment(element: Element): RichTextSegment | null {
   if (!isEmojiLikeElement(element)) return null;
 
   const src = getElementImageSource(element);
-  const alt = getCleanAttribute(element, 'alt') ||
+  const alt =
+    getCleanAttribute(element, 'alt') ||
     getCleanAttribute(element, 'aria-label') ||
     getCleanAttribute(element, 'title') ||
     element.textContent?.trim() ||
@@ -120,7 +122,8 @@ function getEmojiSegment(element: Element): RichTextSegment | null {
     src,
     alt,
     emojiId: getCleanAttribute(element, 'data-emoji-id') || getCleanAttribute(element, 'id'),
-    tooltip: getCleanAttribute(element, 'shared-tooltip-text') || getCleanAttribute(element, 'title'),
+    tooltip:
+      getCleanAttribute(element, 'shared-tooltip-text') || getCleanAttribute(element, 'title'),
     className: element.getAttribute('class') || ''
   };
 }
@@ -134,24 +137,29 @@ export function createRichTextSegmentNodes(
     .filter((node): node is Node => Boolean(node));
 }
 
-function createRichTextSegmentNode(segment: RichTextSegment, options: RichTextRenderOptions): Node | null {
+function createRichTextSegmentNode(
+  segment: RichTextSegment,
+  options: RichTextRenderOptions
+): Node | null {
   if (segment.type === 'text') return document.createTextNode(segment.text);
-  if (!segment.src || !segment.alt) return segment.alt ? document.createTextNode(segment.alt) : null;
+  if (!segment.src || !segment.alt)
+    return segment.alt ? document.createTextNode(segment.alt) : null;
 
-  const image = document.createElement('img');
-  image.className = segment.className ||
-    options.emojiClassName ||
-    'emoji yt-formatted-string style-scope yt-live-chat-text-message-renderer';
-  image.src = segment.src;
-  image.alt = segment.alt;
-  image.loading = 'lazy';
-
-  if (segment.emojiId) {
-    image.setAttribute('data-emoji-id', segment.emojiId);
-    if (options.includeEmojiIdAsElementId) image.id = segment.emojiId;
-  }
-
-  return image;
+  return el<HTMLImageElement>(
+    <img
+      class={
+        segment.className ||
+        options.emojiClassName ||
+        'emoji yt-formatted-string style-scope yt-live-chat-text-message-renderer'
+      }
+      src={segment.src}
+      alt={segment.alt}
+      loading="lazy"
+      id={options.includeEmojiIdAsElementId ? segment.emojiId || undefined : undefined}
+      data-emoji-id={segment.emojiId || undefined}
+    />,
+    UNMANAGED
+  );
 }
 
 function normalizeRichTextSegment(value: unknown): RichTextSegment | null {

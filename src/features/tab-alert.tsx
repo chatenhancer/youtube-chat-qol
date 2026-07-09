@@ -5,6 +5,8 @@
  * the watch page. When possible, update the top document's title/favicon so a
  * background tab can signal unread inbox messages without adding more controls.
  */
+import { jsx, el, UNMANAGED } from '../shared/jsx-dom';
+
 const ALERT_FAVICON_CLASS = 'ytcq-tab-alert-favicon';
 const ALERT_STATE_DATASET_KEY = 'ytcqTabAlertActive';
 const TITLE_PREFIX_PATTERN = /^\((?:\d+|99\+)\)\s+/;
@@ -45,7 +47,11 @@ export function clearInboxTabAlert(): void {
   if (!topDocument) return;
 
   const alertFavicons = getAlertFaviconLinks(topDocument);
-  if (alertActive || alertFavicons.length || topDocument.documentElement.dataset[ALERT_STATE_DATASET_KEY] === 'true') {
+  if (
+    alertActive ||
+    alertFavicons.length ||
+    topDocument.documentElement.dataset[ALERT_STATE_DATASET_KEY] === 'true'
+  ) {
     topDocument.title = stripAlertPrefix(topDocument.title);
     removeAlertFavicons(topDocument);
     restoreOriginalFavicon(topDocument);
@@ -105,7 +111,9 @@ function setAlertFavicon(topDocument: Document): void {
   if (!head) return;
 
   if (!originalFaviconLinks.length) {
-    originalFaviconLinks = getPageFaviconLinks(topDocument).map((link) => link.cloneNode(true) as HTMLLinkElement);
+    originalFaviconLinks = getPageFaviconLinks(topDocument).map(
+      (link) => link.cloneNode(true) as HTMLLinkElement
+    );
   }
 
   getPageFaviconLinks(topDocument).forEach((link) => link.remove());
@@ -113,12 +121,18 @@ function setAlertFavicon(topDocument: Document): void {
 
   const href = createAlertFaviconHref();
   ALERT_FAVICON_SIZES.forEach((size) => {
-    const link = topDocument.createElement('link');
-    link.className = ALERT_FAVICON_CLASS;
-    link.rel = 'icon';
-    link.type = 'image/svg+xml';
-    link.setAttribute('sizes', size);
-    link.href = href;
+    const link = topDocument.adoptNode(
+      el<HTMLLinkElement>(
+        <link
+          class={ALERT_FAVICON_CLASS}
+          rel="icon"
+          type="image/svg+xml"
+          sizes={size}
+          href={href}
+        />,
+        UNMANAGED
+      )
+    );
     head.append(link);
   });
 }
@@ -137,8 +151,9 @@ function restoreOriginalFavicon(topDocument: Document): void {
 }
 
 function getPageFaviconLinks(topDocument: Document): HTMLLinkElement[] {
-  return Array.from(topDocument.querySelectorAll<HTMLLinkElement>(FAVICON_SELECTOR))
-    .filter((link) => !link.classList.contains(ALERT_FAVICON_CLASS));
+  return Array.from(topDocument.querySelectorAll<HTMLLinkElement>(FAVICON_SELECTOR)).filter(
+    (link) => !link.classList.contains(ALERT_FAVICON_CLASS)
+  );
 }
 
 function getAlertFaviconLinks(topDocument: Document): HTMLLinkElement[] {

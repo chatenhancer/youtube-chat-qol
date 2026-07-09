@@ -5,6 +5,7 @@ import {
   createSvgIcon,
   MATERIAL_ICON_VIEW_BOX
 } from '../shared/icons';
+import { jsx, el } from '../shared/jsx-dom';
 import {
   getMarkedUserColor,
   MARKED_USERS_STORAGE_KEY,
@@ -52,18 +53,17 @@ function renderBookmarkedUsers(records: Map<string, MarkedUserRecord>): void {
   controls.bookmarksList.classList.toggle('bookmarks-list-empty', entries.length === 0);
 
   if (!entries.length) {
-    const empty = document.createElement('p');
-    empty.className = 'bookmarks-empty';
-    empty.textContent = getExtensionMessage('bookmarkedUsersEmpty');
-    controls.bookmarksList.append(empty);
+    controls.bookmarksList.append(
+      el<HTMLParagraphElement>(
+        <p class="bookmarks-empty">{getExtensionMessage('bookmarkedUsersEmpty')}</p>
+      )
+    );
     return;
   }
 
-  const fragment = document.createDocumentFragment();
-  entries.forEach(({ key, record, active }) => {
-    fragment.append(createBookmarkedUserRow(key, record, active));
-  });
-  controls.bookmarksList.append(fragment);
+  controls.bookmarksList.append(
+    ...entries.map(({ key, record, active }) => createBookmarkedUserRow(key, record, active))
+  );
 }
 
 function getVisibleBookmarkedUserEntries(records: Map<string, MarkedUserRecord>): Array<{
@@ -83,36 +83,29 @@ function getVisibleBookmarkedUserEntries(records: Map<string, MarkedUserRecord>)
   return entries;
 }
 
-function createBookmarkedUserRow(key: string, record: MarkedUserRecord, active: boolean): HTMLElement {
-  const row = document.createElement('article');
-  row.className = 'bookmark-row';
-  row.classList.toggle('bookmark-row-unmarked', !active);
-
+function createBookmarkedUserRow(
+  key: string,
+  record: MarkedUserRecord,
+  active: boolean
+): HTMLElement {
   const channelUrl = getBookmarkedUserChannelUrl(record);
   const avatar = createBookmarkedUserAvatar(record, channelUrl);
-
-  const copy = document.createElement('span');
-  copy.className = 'bookmark-copy';
-
   const name = createBookmarkedUserName(record);
-
-  const date = document.createElement('span');
-  date.className = 'bookmark-date';
-  date.textContent = formatBookmarkedUserDate(record.markedAt);
-
   const source = createBookmarkedUserSource(record);
-
-  copy.append(name, date, source);
-
-  const actions = document.createElement('span');
-  actions.className = 'bookmark-actions';
-
-  const unmarkButton = document.createElement('button');
-  unmarkButton.type = 'button';
-  unmarkButton.className = 'bookmark-action-button';
-  unmarkButton.title = getExtensionMessage(active ? 'removeBookmark' : 'bookmarkUser');
-  unmarkButton.setAttribute('aria-label', getExtensionMessage(active ? 'removeBookmark' : 'bookmarkUser'));
-  unmarkButton.append(createSvgIcon(MATERIAL_ICON_VIEW_BOX, active ? BOOKMARK_FILLED_ICON_PATH : BOOKMARK_ICON_PATH));
+  const actionLabel = getExtensionMessage(active ? 'removeBookmark' : 'bookmarkUser');
+  const unmarkButton = el<HTMLButtonElement>(
+    <button
+      type="button"
+      class="bookmark-action-button"
+      title={actionLabel}
+      aria-label={actionLabel}
+    >
+      {createSvgIcon(
+        MATERIAL_ICON_VIEW_BOX,
+        active ? BOOKMARK_FILLED_ICON_PATH : BOOKMARK_ICON_PATH
+      )}
+    </button>
+  );
   unmarkButton.addEventListener('click', () => {
     if (active) {
       unmarkBookmarkedUser(key);
@@ -120,31 +113,43 @@ function createBookmarkedUserRow(key: string, record: MarkedUserRecord, active: 
       markBookmarkedUser(key, record);
     }
   });
-  actions.append(unmarkButton);
 
-  row.append(avatar, copy, actions);
-  return row;
+  return el<HTMLElement>(
+    <article class={`bookmark-row${active ? '' : ' bookmark-row-unmarked'}`}>
+      {avatar}
+      <span class="bookmark-copy">
+        {name}
+        <span class="bookmark-date">{formatBookmarkedUserDate(record.markedAt)}</span>
+        {source}
+      </span>
+      <span class="bookmark-actions">{unmarkButton}</span>
+    </article>
+  );
 }
 
 function createBookmarkedUserAvatar(record: MarkedUserRecord, channelUrl: string): HTMLElement {
-  const element = channelUrl ? document.createElement('button') : document.createElement('span');
-  element.className = channelUrl ? 'bookmark-avatar bookmark-avatar-button' : 'bookmark-avatar';
+  const content = record.avatarUrl ? (
+    <img src={record.avatarUrl} alt="" referrerPolicy="no-referrer" />
+  ) : (
+    getBookmarkedUserInitial(record.authorName)
+  );
+
+  const element = channelUrl
+    ? el<HTMLButtonElement>(
+        <button
+          type="button"
+          class="bookmark-avatar bookmark-avatar-button"
+          title={getExtensionMessage('openChannel')}
+          aria-label={getExtensionMessage('openChannel')}
+        >
+          {content}
+          {createBookmarkedUserAvatarOpenIcon()}
+        </button>
+      )
+    : el<HTMLSpanElement>(<span class="bookmark-avatar">{content}</span>);
   element.style.setProperty('--bookmark-user-color', getMarkedUserColor(record));
-  if (record.avatarUrl) {
-    const image = document.createElement('img');
-    image.src = record.avatarUrl;
-    image.alt = '';
-    image.referrerPolicy = 'no-referrer';
-    element.append(image);
-  } else {
-    element.textContent = getBookmarkedUserInitial(record.authorName);
-  }
 
   if (channelUrl && element instanceof HTMLButtonElement) {
-    element.type = 'button';
-    element.title = getExtensionMessage('openChannel');
-    element.setAttribute('aria-label', getExtensionMessage('openChannel'));
-    element.append(createBookmarkedUserAvatarOpenIcon());
     element.addEventListener('click', () => {
       chrome.tabs.create({ url: channelUrl });
     });
@@ -160,36 +165,36 @@ function createBookmarkedUserAvatarOpenIcon(): SVGSVGElement {
 }
 
 function createBookmarkedUserName(record: MarkedUserRecord): HTMLElement {
-  const element = document.createElement('strong');
-  element.className = 'bookmark-name';
-  element.textContent = record.authorName || getExtensionMessage('unknownUser');
-  return element;
+  return el<HTMLElement>(
+    <strong class="bookmark-name">{record.authorName || getExtensionMessage('unknownUser')}</strong>
+  );
 }
 
 function createBookmarkedUserSource(record: MarkedUserRecord): HTMLElement {
-  const sourceText = record.markedSourceTitle || record.markedSourceUrl || getExtensionMessage('unknownStream');
+  const sourceText =
+    record.markedSourceTitle || record.markedSourceUrl || getExtensionMessage('unknownStream');
   const sourceUrl = getBookmarkedUserSourceUrl(record);
-  const element = sourceUrl ? document.createElement('button') : document.createElement('span');
-  element.className = sourceUrl ? 'bookmark-source bookmark-source-button' : 'bookmark-source';
 
-  if (sourceUrl && element instanceof HTMLButtonElement) {
-    const label = document.createElement('span');
-    label.className = 'bookmark-source-label';
-    label.textContent = sourceText;
-
+  if (sourceUrl) {
     const tooltip = getExtensionMessage('openStreamInNewWindow', sourceText);
-    element.type = 'button';
-    element.title = tooltip;
-    element.setAttribute('aria-label', tooltip);
-    element.append(label, createOpenInNewIcon());
+    const element = el<HTMLButtonElement>(
+      <button
+        type="button"
+        class="bookmark-source bookmark-source-button"
+        title={tooltip}
+        aria-label={tooltip}
+      >
+        <span class="bookmark-source-label">{sourceText}</span>
+        {createOpenInNewIcon()}
+      </button>
+    );
     element.addEventListener('click', () => {
       chrome.tabs.create({ url: sourceUrl });
     });
-  } else {
-    element.textContent = sourceText;
+    return element;
   }
 
-  return element;
+  return el<HTMLSpanElement>(<span class="bookmark-source">{sourceText}</span>);
 }
 
 function unmarkBookmarkedUser(key: string): void {
@@ -223,7 +228,8 @@ function getBookmarkedUserInitial(authorName: string): string {
 }
 
 function formatBookmarkedUserDate(timestamp: number): string {
-  if (!Number.isFinite(timestamp) || timestamp <= 0) return getExtensionMessage('markedDateUnknown');
+  if (!Number.isFinite(timestamp) || timestamp <= 0)
+    return getExtensionMessage('markedDateUnknown');
 
   const formatted = new Intl.DateTimeFormat(undefined, {
     dateStyle: 'medium',

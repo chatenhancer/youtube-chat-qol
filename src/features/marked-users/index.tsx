@@ -393,18 +393,11 @@ function animateMarkedUserRing(target: HTMLElement, marked: boolean, onDone?: ()
   overlay.dataset.ytcqRingAnimationId = String(++ringAnimationId);
   overlay.dataset.ytcqMarkedUserRingTargetId = getMarkedUserRingTargetId(target);
 
-  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-  svg.setAttribute('viewBox', '0 0 100 100');
-  svg.setAttribute('focusable', 'false');
-  svg.setAttribute('aria-hidden', 'true');
-
-  const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-  circle.setAttribute('cx', '50');
-  circle.setAttribute('cy', '50');
-  circle.setAttribute('r', '44');
-  circle.setAttribute('pathLength', '100');
-
-  svg.append(circle);
+  const svg = el<SVGSVGElement>(
+    <svg viewBox="0 0 100 100" focusable="false" aria-hidden="true">
+      <circle cx="50" cy="50" r="44" pathLength="100" />
+    </svg>
+  );
   overlay.append(svg);
   target.classList.add('ytcq-marked-user-ring-host');
 

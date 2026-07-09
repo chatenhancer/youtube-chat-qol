@@ -5,7 +5,11 @@
  * and each call immediately returns DOM nodes created with the extension's
  * managed DOM helpers.
  */
-import { markExtensionManagedElement, ytcqCreateElement } from './managed-dom';
+import {
+  markExtensionManagedElement,
+  unmarkExtensionManagedElement,
+  ytcqCreateElement
+} from './managed-dom';
 
 type JsxComponent = (props: Record<string, unknown>) => JsxChild;
 type JsxTag = string | JsxComponent;
@@ -13,6 +17,7 @@ type JsxProps = Record<string, unknown> | null;
 type JsxChild = Node | string | number | boolean | null | undefined | JsxChild[];
 
 const SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
+export const UNMANAGED = Symbol('ytcq.unmanaged');
 const SVG_TAG_NAMES = new Set([
   'circle',
   'clipPath',
@@ -33,6 +38,9 @@ const SVG_TAG_NAMES = new Set([
 ]);
 const HTML_PROPERTY_NAMES = new Set([
   'referrerPolicy'
+]);
+const HTML_ATTRIBUTE_NAMES = new Set([
+  'sizes'
 ]);
 
 export function jsx(tag: JsxTag, props: JsxProps, ...children: JsxChild[]): Node {
@@ -63,16 +71,12 @@ export function Fragment({ children }: { children?: JsxChild }): DocumentFragmen
   return fragment;
 }
 
-export function el<T extends HTMLElement>(node: Node): T {
-  if (node instanceof HTMLElement) return node as T;
+export function el<T extends Element = HTMLElement>(node: Node, mode?: typeof UNMANAGED): T {
+  if (node instanceof Element) {
+    return (mode === UNMANAGED ? unmarkExtensionManagedElement(node) : node) as T;
+  }
 
-  throw new Error('Expected JSX to create an HTMLElement');
-}
-
-export function toSVGElement<T extends SVGElement>(node: Node): T {
-  if (node instanceof SVGElement) return node as T;
-
-  throw new Error('Expected JSX to create an SVGElement');
+  throw new Error('Expected JSX to create an Element');
 }
 
 function createManagedJsxElement(tagName: string): HTMLElement | SVGElement {
@@ -99,6 +103,10 @@ function applyJsxProp(element: Element, name: string, value: unknown): void {
     return;
   }
   if (name.startsWith('aria-') || name.startsWith('data-')) {
+    element.setAttribute(name, String(value));
+    return;
+  }
+  if (HTML_ATTRIBUTE_NAMES.has(name)) {
     element.setAttribute(name, String(value));
     return;
   }

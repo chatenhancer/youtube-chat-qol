@@ -5,9 +5,8 @@
  * marks nodes with a stable attribute so the shared MutationObserver can ignore
  * extension-owned DOM without each feature maintaining fragile selector lists.
  *
- * Use raw `document.createElement()` only for nodes that intentionally become
- * user/chat content, such as rich quote content, input emoji nodes, or temporary
- * text-processing holders.
+ * Use unmanaged JSX only for nodes that intentionally become user/chat content
+ * or browser metadata rather than extension UI.
  */
 const EXTENSION_MANAGED_ATTRIBUTE = 'data-ytcq-managed';
 const EXTENSION_MANAGED_SELECTOR = `[${EXTENSION_MANAGED_ATTRIBUTE}="true"]`;
@@ -24,6 +23,20 @@ const EXTENSION_MANAGED_SELECTOR = `[${EXTENSION_MANAGED_ATTRIBUTE}="true"]`;
  */
 export function markExtensionManagedElement<T extends Element>(element: T): T {
   element.setAttribute(EXTENSION_MANAGED_ATTRIBUTE, 'true');
+  return element;
+}
+
+/**
+ * Remove extension-owned markers from a JSX-created subtree.
+ *
+ * This is intentionally narrow: use it only when JSX is convenient but the node
+ * must behave as YouTube/browser content rather than extension UI.
+ */
+export function unmarkExtensionManagedElement<T extends Element>(element: T): T {
+  element.removeAttribute(EXTENSION_MANAGED_ATTRIBUTE);
+  element.querySelectorAll(EXTENSION_MANAGED_SELECTOR).forEach((child) => {
+    child.removeAttribute(EXTENSION_MANAGED_ATTRIBUTE);
+  });
   return element;
 }
 

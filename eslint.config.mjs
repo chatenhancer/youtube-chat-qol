@@ -70,7 +70,8 @@ export default [
       ytcq: ytcqPlugin
     },
     rules: {
-      'ytcq/no-hardcoded-visible-ui-literals': 'warn'
+      'ytcq/no-hardcoded-visible-ui-literals': 'warn',
+      'ytcq/require-managed-create-element': 'error'
     }
   },
   {

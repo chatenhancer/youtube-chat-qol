@@ -1,4 +1,5 @@
 import { DEFAULT_OPTIONS } from '../shared/options';
+import { jsx, el } from '../shared/jsx-dom';
 import { controls } from './controls';
 import { getExtensionMessage } from './i18n';
 import { applyOptionsToControls } from './settings';
@@ -20,15 +21,18 @@ export function initResetControl(): void {
 
 function resetExtensionState(): void {
   showResetDialog({
-    actions: [{
-      className: 'popup-reset-dialog-cancel',
-      label: getExtensionMessage('close'),
-      onClick: closeResetDialog
-    }, {
-      className: 'popup-reset-dialog-confirm',
-      label: getExtensionMessage('resetExtension'),
-      onClick: runResetExtensionState
-    }],
+    actions: [
+      {
+        className: 'popup-reset-dialog-cancel',
+        label: getExtensionMessage('close'),
+        onClick: closeResetDialog
+      },
+      {
+        className: 'popup-reset-dialog-confirm',
+        label: getExtensionMessage('resetExtension'),
+        onClick: runResetExtensionState
+      }
+    ],
     items: RESET_CONFIRM_ITEM_KEYS.map((key) => getExtensionMessage(key)),
     listLabel: getExtensionMessage('popupResetConfirmIncludes'),
     message: getExtensionMessage('popupResetConfirm')
@@ -42,11 +46,13 @@ function runResetExtensionState(): void {
         applyOptionsToControls(DEFAULT_OPTIONS);
         broadcastPageReset(() => {
           showResetDialog({
-            actions: [{
-              className: 'popup-reset-dialog-close',
-              label: getExtensionMessage('close'),
-              onClick: closeResetDialog
-            }],
+            actions: [
+              {
+                className: 'popup-reset-dialog-close',
+                label: getExtensionMessage('close'),
+                onClick: closeResetDialog
+              }
+            ],
             message: getExtensionMessage('popupResetComplete')
           });
         });
@@ -87,53 +93,40 @@ function showResetDialog({
 }): void {
   closeResetDialog();
 
-  const overlay = document.createElement('div');
-  overlay.className = 'popup-reset-dialog-backdrop';
-  overlay.addEventListener('click', (event) => {
-    if (event.target === overlay) closeResetDialog();
-  });
+  const overlay = el<HTMLDivElement>(
+    <div
+      class="popup-reset-dialog-backdrop"
+      onClick={(event: MouseEvent) => {
+        if (event.target === event.currentTarget) closeResetDialog();
+      }}
+    >
+      <section class="popup-reset-dialog" aria-modal="true" role="dialog">
+        <p class="popup-reset-dialog-message">{message}</p>
+        {items.length && listLabel ? (
+          <p class="popup-reset-dialog-list-label">{listLabel}</p>
+        ) : null}
+        {items.length ? (
+          <ul class="popup-reset-dialog-list">
+            {items.map((item) => (
+              <li>{item}</li>
+            ))}
+          </ul>
+        ) : null}
+        <div class="popup-reset-dialog-actions">
+          {actions.map((action) => (
+            <button
+              type="button"
+              class={`popup-reset-dialog-button ${action.className}`}
+              onClick={action.onClick}
+            >
+              {action.label}
+            </button>
+          ))}
+        </div>
+      </section>
+    </div>
+  );
 
-  const dialog = document.createElement('section');
-  dialog.className = 'popup-reset-dialog';
-  dialog.setAttribute('aria-modal', 'true');
-  dialog.setAttribute('role', 'dialog');
-
-  const copy = document.createElement('p');
-  copy.className = 'popup-reset-dialog-message';
-  copy.textContent = message;
-
-  const fragments: HTMLElement[] = [copy];
-  if (items.length) {
-    if (listLabel) {
-      const includes = document.createElement('p');
-      includes.className = 'popup-reset-dialog-list-label';
-      includes.textContent = listLabel;
-      fragments.push(includes);
-    }
-
-    const list = document.createElement('ul');
-    list.className = 'popup-reset-dialog-list';
-    items.forEach((item) => {
-      const listItem = document.createElement('li');
-      listItem.textContent = item;
-      list.append(listItem);
-    });
-    fragments.push(list);
-  }
-
-  const actionRow = document.createElement('div');
-  actionRow.className = 'popup-reset-dialog-actions';
-  actions.forEach((action) => {
-    const button = document.createElement('button');
-    button.className = `popup-reset-dialog-button ${action.className}`;
-    button.type = 'button';
-    button.textContent = action.label;
-    button.addEventListener('click', action.onClick);
-    actionRow.append(button);
-  });
-
-  dialog.append(...fragments, actionRow);
-  overlay.append(dialog);
   document.body.append(overlay);
 }
 

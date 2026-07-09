@@ -5,6 +5,7 @@
  * placeholder planner, and returns translated text for the chat input.
  */
 import { t } from '../../shared/i18n';
+import { jsx, el } from '../../shared/jsx-dom';
 import { cleanText } from '../../shared/text';
 import { showToast } from '../../shared/toast';
 import {
@@ -47,9 +48,7 @@ export function parseTranslateTextCommand(value: string): {
 }
 
 export async function translateCommandText(text: string, targetLanguage: string): Promise<string> {
-  // ytcq-allow-raw-create-element: temporary text holder, never inserted into observed UI.
-  const holder = document.createElement('span');
-  holder.textContent = text;
+  const holder = el<HTMLSpanElement>(<span>{text}</span>);
   const plan = createTranslationPlanFromNodes(holder.childNodes, text);
   return (await translateTranslationPlan(plan, text, targetLanguage)).text;
 }
@@ -60,7 +59,9 @@ export async function translateTranslationPlan(
   targetLanguage: string
 ): Promise<{ nodes: Node[]; text: string }> {
   const result = await sendCommandTranslationRequest(plan.text || fallbackText, targetLanguage);
-  const text = cleanText(restorePlaceholdersToText(result.text, plan.protectedTokens) || result.text || fallbackText);
+  const text = cleanText(
+    restorePlaceholdersToText(result.text, plan.protectedTokens) || result.text || fallbackText
+  );
 
   return {
     nodes: createNodesWithPlaceholders(result.text || fallbackText, plan.protectedTokens),
@@ -73,28 +74,34 @@ function getLanguageCodeCommandTarget(value: string): string {
   return LANGUAGE_OPTIONS.find(([code]) => normalizeCommandToken(code) === normalized)?.[0] || '';
 }
 
-function sendCommandTranslationRequest(text: string, targetLanguage: string): Promise<TranslationResult> {
+function sendCommandTranslationRequest(
+  text: string,
+  targetLanguage: string
+): Promise<TranslationResult> {
   return new Promise((resolve, reject) => {
-    chrome.runtime.sendMessage({
-      type: 'ytcq:translate',
-      text,
-      targetLanguage
-    }, (response) => {
-      if (chrome.runtime.lastError) {
-        reject(new Error(chrome.runtime.lastError.message));
-        return;
-      }
-
-      if (!response?.ok) {
-        reject(new Error(response?.error || 'Translate request failed.'));
-        return;
-      }
-
-      resolve({
-        text: response.translatedText || text,
-        sourceLanguage: response.sourceLanguage || '',
+    chrome.runtime.sendMessage(
+      {
+        type: 'ytcq:translate',
+        text,
         targetLanguage
-      });
-    });
+      },
+      (response) => {
+        if (chrome.runtime.lastError) {
+          reject(new Error(chrome.runtime.lastError.message));
+          return;
+        }
+
+        if (!response?.ok) {
+          reject(new Error(response?.error || 'Translate request failed.'));
+          return;
+        }
+
+        resolve({
+          text: response.translatedText || text,
+          sourceLanguage: response.sourceLanguage || '',
+          targetLanguage
+        });
+      }
+    );
   });
 }

@@ -4,13 +4,10 @@
  * Inserts a saved frequent emoji into YouTube's chat input, preserving custom
  * YouTube emoji image metadata when available.
  */
+import { jsx, el, UNMANAGED } from '../../shared/jsx-dom';
 import { cleanText } from '../../shared/text';
 import { insertIntoChatInput, insertNodeIntoChatInput } from '../../youtube/chat-input';
-import {
-  getEmojiFallbackText,
-  getEmojiInsertText,
-  isCustomEmojiUsage
-} from './data';
+import { getEmojiFallbackText, getEmojiInsertText, isCustomEmojiUsage } from './data';
 import type { EmojiUsage } from './types';
 
 export function insertEmojiIntoChat(emoji: EmojiUsage): boolean {
@@ -24,21 +21,22 @@ function insertEmojiImageIntoChat(emoji: EmojiUsage): boolean {
   const alt = cleanText(emoji.alt || getEmojiFallbackText(emoji) || emoji.label || emoji.shortcut);
   if (!alt) return false;
 
-  // ytcq-allow-raw-create-element: inserted into YouTube's chat input as message content.
-  const image = document.createElement('img');
-  image.className = 'emoji yt-formatted-string style-scope yt-live-chat-text-input-field-renderer';
-  image.src = emoji.src;
-  image.alt = alt;
-
+  const emojiId = isCustomEmojiUsage(emoji) ? cleanText(emoji.emojiId) : '';
   if (isCustomEmojiUsage(emoji)) {
-    const emojiId = cleanText(emoji.emojiId);
     if (!emojiId) return false;
-    image.id = emojiId;
-    image.setAttribute('data-emoji-id', emojiId);
   }
-
   const tooltipText = cleanText(emoji.shortcut || emoji.label);
-  if (tooltipText) image.setAttribute('shared-tooltip-text', tooltipText);
+  const image = el<HTMLImageElement>(
+    <img
+      class="emoji yt-formatted-string style-scope yt-live-chat-text-input-field-renderer"
+      src={emoji.src}
+      alt={alt}
+      id={emojiId || undefined}
+      data-emoji-id={emojiId || undefined}
+      shared-tooltip-text={tooltipText || undefined}
+    />,
+    UNMANAGED
+  );
 
   return insertNodeIntoChatInput(image, alt);
 }
