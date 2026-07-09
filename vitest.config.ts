@@ -18,10 +18,12 @@ export default defineConfig({
     coverage: {
       exclude: [
         'src/**/*.test.ts',
+        'src/**/*.test.tsx',
         'src/shared/locales/**'
       ],
       include: [
-        'src/**/*.ts'
+        'src/**/*.ts',
+        'src/**/*.tsx'
       ],
       provider: 'v8',
       reporter: ['text', 'html', 'json-summary'],
@@ -33,6 +35,7 @@ export default defineConfig({
       'cloudflare/language-redirect/src/**/*.test.ts',
       'cloudflare/playground/src/**/*.test.ts',
       'src/**/*.test.ts',
+      'src/**/*.test.tsx',
       'scripts/**/*.test.mjs'
     ],
     restoreMocks: true,

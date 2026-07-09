@@ -76,6 +76,7 @@ function isChatScrollerAtLiveEdge(scroller: HTMLElement): boolean {
 
 function findChatScroller(target: HTMLElement): HTMLElement | null {
   const listRenderer = target.closest('yt-live-chat-item-list-renderer');
+  // ytcq-allow-local-youtube-selector: scoped lookup inside the containing chat list.
   const scopedScroller = listRenderer?.querySelector<HTMLElement>('#item-scroller');
   if (scopedScroller?.contains(target)) return scopedScroller;
 

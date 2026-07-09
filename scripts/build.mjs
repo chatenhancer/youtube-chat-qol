@@ -81,6 +81,9 @@ const manifestSource = await readFile(path.join(root, 'manifest.json'), 'utf8');
 
 const sharedBuildOptions = {
   bundle: true,
+  jsx: 'transform',
+  jsxFactory: 'jsx',
+  jsxFragment: 'Fragment',
   target: 'es2022',
   legalComments: 'none',
   minify: true,

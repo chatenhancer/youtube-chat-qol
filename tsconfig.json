@@ -6,12 +6,16 @@
     "lib": ["DOM", "DOM.Iterable", "ES2022"],
     "resolveJsonModule": true,
     "types": ["chrome", "node"],
+    "jsx": "react",
+    "jsxFactory": "jsx",
+    "jsxFragmentFactory": "Fragment",
     "strict": true,
     "skipLibCheck": true,
     "noEmit": true
   },
   "include": [
     "src/**/*.ts",
+    "src/**/*.tsx",
     "tests/**/*.ts",
     "vitest.config.ts",
     "playwright.config.ts",

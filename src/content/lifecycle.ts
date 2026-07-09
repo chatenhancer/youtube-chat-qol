@@ -16,9 +16,9 @@
  * gathering happens before control wiring, and visible DOM rendering happens
  * last.
  *
- * Elements created through `ytcqCreateElement()` from `shared/managed-dom` are
- * marked as extension-managed. The shared observer ignores managed elements, so
- * injected buttons, cards, and popups do not look like new YouTube DOM work.
+ * Elements created through JSX from `shared/jsx-dom` are marked as
+ * extension-managed. The shared observer ignores managed elements, so injected
+ * buttons, cards, and popups do not look like new YouTube DOM work.
  */
 import type { Options } from '../shared/options';
 import { isExtensionManagedElement } from '../shared/managed-dom';
@@ -201,7 +201,7 @@ export interface FeatureObserverIgnoreLifecycle {
   /**
    * Optional filter for added nodes that are feature-owned, not YouTube work.
    *
-   * `ytcqCreateElement()` covers normal extension UI. This hook covers
+   * Managed JSX covers normal extension UI. This hook covers
    * feature-owned edits to YouTube-rendered DOM, such as keyword highlight
    * wrappers, where marking a new element as managed is not enough by itself.
    */
@@ -210,7 +210,7 @@ export interface FeatureObserverIgnoreLifecycle {
   /**
    * Optional filter for feature-owned mutation targets.
    *
-   * `ytcqCreateElement()` covers normal extension UI. This hook covers
+   * Managed JSX covers normal extension UI. This hook covers
    * temporary observer feedback from feature-owned changes to YouTube DOM that
    * cannot be represented as managed extension elements.
    */
