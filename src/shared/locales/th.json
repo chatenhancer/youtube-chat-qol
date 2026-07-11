@@ -25,6 +25,16 @@
     "inbox": "กล่องข้อความ",
     "inboxAriaUnread": "กล่องข้อความ มี {count} รายการที่ยังไม่ได้อ่าน",
     "inboxEmpty": "กล่องข้อความว่าง",
+    "liteMode": "โหมดเบา",
+    "enableLiteMode": "เปิดโหมดเบา",
+    "disableLiteMode": "ปิดโหมดเบา",
+    "liteModeLoadingChat": "กำลังโหลดแชท",
+    "liteModeNewMessages": {
+      "one": "{count} ข้อความใหม่",
+      "other": "{count} ข้อความใหม่"
+    },
+    "liteModeJumpToLive": "ไปยังแชทสด",
+    "liteModeFallback": "โหมดเบาไม่สามารถอ่านแชทนี้ได้ จึงกลับไปใช้แชท YouTube",
     "alertSounds": "เสียงแจ้งเตือน",
     "jumpToMessage": "ข้ามไปยังข้อความ",
     "keywordOrPhrase": "คำสำคัญหรือวลี",
@@ -362,6 +372,15 @@
     },
     "appearance": {
       "message": "รูปลักษณ์"
+    },
+    "liteMode": {
+      "message": "โหมดเบา"
+    },
+    "liteModeTitle": {
+      "message": "ใช้ฟีดแชทแบบเบาเพื่อเพิ่มประสิทธิภาพในแชทที่มีข้อความจำนวนมาก"
+    },
+    "liteModeHelper": {
+      "message": "ใช้ฟีดแชทที่เร็วและเบากว่า โดยจะกลับไปใช้แชท YouTube โดยอัตโนมัติเมื่อจำเป็น"
     },
     "startupShimmer": {
       "message": "แอนิเมชันเริ่มต้น"

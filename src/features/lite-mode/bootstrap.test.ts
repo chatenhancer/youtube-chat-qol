@@ -1,0 +1,94 @@
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import {
+  beginLiteModeDocumentSession,
+  consumeLiteModeFallbackNotice,
+  hasLiteModeSessionCooldown,
+  isSupportedLiteModePage,
+  LITE_MODE_NATIVE_RESTORE_KEY,
+  LITE_MODE_REPLAY_START_KEY,
+  LITE_MODE_SESSION_COOLDOWN_KEY,
+  requestNativeChatRestore,
+  requestReplayLiteModeReload
+} from './bootstrap';
+
+afterEach(async () => {
+  window.sessionStorage.clear();
+  await chrome.storage.sync.remove('liteModeEnabled');
+  document.documentElement.removeAttribute('data-ytcq-lite-fallback-notice');
+  document.documentElement.removeAttribute('data-ytcq-lite-mode-intent');
+  vi.useRealTimers();
+});
+
+describe('Lite mode document-start bootstrap', () => {
+  it('allows regular YouTube live/replay chat but never YouTube Studio', () => {
+    expect(isSupportedLiteModePage(createLocation('www.youtube.com', '/live_chat'))).toBe(true);
+    expect(isSupportedLiteModePage(createLocation('www.youtube.com', '/live_chat_replay'))).toBe(true);
+    expect(isSupportedLiteModePage(createLocation('studio.youtube.com', '/live_chat'))).toBe(false);
+    expect(isSupportedLiteModePage(createLocation('www.youtube.com', '/watch'))).toBe(false);
+  });
+
+  it('does not carry an automatic fallback cooldown across a document reload', () => {
+    window.sessionStorage.setItem(LITE_MODE_SESSION_COOLDOWN_KEY, 'true');
+    expect(hasLiteModeSessionCooldown()).toBe(true);
+
+    beginLiteModeDocumentSession();
+
+    expect(hasLiteModeSessionCooldown()).toBe(false);
+  });
+
+  it('preserves the cooldown only for an extension-initiated recovery reload', () => {
+    beginLiteModeDocumentSession(true);
+    expect(hasLiteModeSessionCooldown()).toBe(true);
+
+    beginLiteModeDocumentSession();
+    expect(hasLiteModeSessionCooldown()).toBe(false);
+  });
+
+  it('stores a bounded restore request before scheduling the chat-frame reload', () => {
+    vi.useFakeTimers();
+    requestNativeChatRestore({
+      automaticFailure: true,
+      message: 'Loading chat'
+    });
+
+    const stored = JSON.parse(window.sessionStorage.getItem(LITE_MODE_NATIVE_RESTORE_KEY) || '{}');
+    expect(stored).toMatchObject({
+      automaticFailure: true,
+      message: 'Loading chat'
+    });
+    expect(stored.requestedAt).toEqual(expect.any(Number));
+  });
+
+  it('marks replay Lite intent before scheduling its fresh chat document', async () => {
+    vi.useFakeTimers();
+    const controls: string[] = [];
+    const listener: EventListener = (event) => {
+      if (event instanceof CustomEvent && typeof event.detail === 'string') {
+        controls.push(event.detail);
+      }
+    };
+    window.addEventListener('ytcq:lite-chat-control', listener);
+
+    requestReplayLiteModeReload();
+
+    expect(Number(window.sessionStorage.getItem(LITE_MODE_REPLAY_START_KEY))).toBeGreaterThan(0);
+    await expect(chrome.storage.sync.get('liteModeEnabled')).resolves.toEqual({
+      liteModeEnabled: true
+    });
+    expect(controls.map((detail) => JSON.parse(detail))).toContainEqual({
+      enabled: true,
+      version: 1
+    });
+    window.removeEventListener('ytcq:lite-chat-control', listener);
+  });
+
+  it('consumes a post-reload fallback notice once', () => {
+    document.documentElement.setAttribute('data-ytcq-lite-fallback-notice', 'true');
+    expect(consumeLiteModeFallbackNotice()).toBe(true);
+    expect(consumeLiteModeFallbackNotice()).toBe(false);
+  });
+});
+
+function createLocation(hostname: string, pathname: string): Location {
+  return { hostname, pathname } as Location;
+}

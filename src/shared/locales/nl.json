@@ -25,6 +25,16 @@
     "inbox": "Inbox",
     "inboxAriaUnread": "Inbox, {count} ongelezen",
     "inboxEmpty": "Inbox leeg",
+    "liteMode": "Lite-modus",
+    "enableLiteMode": "Lite-modus inschakelen",
+    "disableLiteMode": "Lite-modus uitschakelen",
+    "liteModeLoadingChat": "Chat laden",
+    "liteModeNewMessages": {
+      "one": "{count} nieuw bericht",
+      "other": "{count} nieuwe berichten"
+    },
+    "liteModeJumpToLive": "Naar livechat springen",
+    "liteModeFallback": "De Lite-modus kon deze chat niet lezen, daarom is de YouTube-chat hersteld.",
     "alertSounds": "Waarschuwingsgeluiden",
     "jumpToMessage": "Naar bericht springen",
     "keywordOrPhrase": "Trefwoord of zin",
@@ -362,6 +372,15 @@
     },
     "appearance": {
       "message": "Weergave"
+    },
+    "liteMode": {
+      "message": "Lite-modus"
+    },
+    "liteModeTitle": {
+      "message": "Gebruik een lichte chatfeed voor betere prestaties in drukke chats."
+    },
+    "liteModeHelper": {
+      "message": "Gebruik een snellere, lichte chatfeed. Schakelt indien nodig automatisch terug naar YouTube-chat."
     },
     "startupShimmer": {
       "message": "Startanimatie"

@@ -25,6 +25,16 @@
     "inbox": "Входящие",
     "inboxAriaUnread": "Входящие, непрочитано: {count}",
     "inboxEmpty": "Входящие пусты",
+    "liteMode": "Облегчённый режим",
+    "enableLiteMode": "Включить облегчённый режим",
+    "disableLiteMode": "Выключить облегчённый режим",
+    "liteModeLoadingChat": "Загрузка чата",
+    "liteModeNewMessages": {
+      "one": "{count} новое сообщение",
+      "other": "{count} новых сообщений"
+    },
+    "liteModeJumpToLive": "Перейти к чату в реальном времени",
+    "liteModeFallback": "Облегчённый режим не смог прочитать этот чат, поэтому был восстановлен чат YouTube.",
     "alertSounds": "Звуки оповещений",
     "jumpToMessage": "Перейти к сообщению",
     "keywordOrPhrase": "Ключевое слово или фраза",
@@ -365,6 +375,15 @@
     },
     "appearance": {
       "message": "Внешний вид"
+    },
+    "liteMode": {
+      "message": "Облегчённый режим"
+    },
+    "liteModeTitle": {
+      "message": "Используйте облегчённую ленту чата для повышения производительности в активных чатах."
+    },
+    "liteModeHelper": {
+      "message": "Быстрая и лёгкая лента чата. При необходимости автоматически возвращается к чату YouTube."
     },
     "startupShimmer": {
       "message": "Анимация запуска"

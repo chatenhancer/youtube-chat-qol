@@ -25,6 +25,16 @@
     "inbox": "Kotak masuk",
     "inboxAriaUnread": "Kotak masuk, {count} belum dibaca",
     "inboxEmpty": "Kotak masuk kosong",
+    "liteMode": "Mode ringan",
+    "enableLiteMode": "Aktifkan mode ringan",
+    "disableLiteMode": "Nonaktifkan mode ringan",
+    "liteModeLoadingChat": "Memuat chat",
+    "liteModeNewMessages": {
+      "one": "{count} pesan baru",
+      "other": "{count} pesan baru"
+    },
+    "liteModeJumpToLive": "Lompat ke chat live",
+    "liteModeFallback": "Mode ringan tidak dapat membaca chat ini, jadi chat YouTube dipulihkan.",
     "alertSounds": "Suara peringatan",
     "jumpToMessage": "Lompat ke pesan",
     "keywordOrPhrase": "Kata kunci atau frasa",
@@ -365,6 +375,15 @@
     },
     "appearance": {
       "message": "Tampilan"
+    },
+    "liteMode": {
+      "message": "Mode ringan"
+    },
+    "liteModeTitle": {
+      "message": "Gunakan feed chat ringan untuk meningkatkan performa di chat yang ramai."
+    },
+    "liteModeHelper": {
+      "message": "Gunakan feed chat yang lebih cepat dan ringan. Otomatis kembali ke chat YouTube jika diperlukan."
     },
     "startupShimmer": {
       "message": "Animasi awal"

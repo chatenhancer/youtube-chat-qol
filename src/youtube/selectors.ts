@@ -8,12 +8,15 @@
 export const CHAT_MESSAGE_SELECTOR = [
   'yt-live-chat-text-message-renderer',
   'yt-live-chat-paid-message-renderer',
-  'yt-live-chat-membership-item-renderer'
+  'yt-live-chat-membership-item-renderer',
+  '.ytcq-lite-message'
 ].join(',');
 
 export const PAID_CHAT_MESSAGE_SELECTOR = [
   'yt-live-chat-paid-message-renderer',
-  'yt-live-chat-paid-sticker-renderer'
+  'yt-live-chat-paid-sticker-renderer',
+  '.ytcq-lite-message[data-ytcq-lite-kind="paid"]',
+  '.ytcq-lite-message[data-ytcq-lite-kind="sticker"]'
 ].join(',');
 
 export const CHAT_TOOLTIP_SELECTOR = [

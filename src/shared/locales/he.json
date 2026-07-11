@@ -25,6 +25,16 @@
     "inbox": "תיבה",
     "inboxAriaUnread": "תיבה, {count} לא נקראו",
     "inboxEmpty": "התיבה ריקה",
+    "liteMode": "מצב קל",
+    "enableLiteMode": "הפעלת מצב קל",
+    "disableLiteMode": "כיבוי מצב קל",
+    "liteModeLoadingChat": "הצ'אט נטען",
+    "liteModeNewMessages": {
+      "one": "{count} הודעה חדשה",
+      "other": "{count} הודעות חדשות"
+    },
+    "liteModeJumpToLive": "מעבר לצ'אט החי",
+    "liteModeFallback": "מצב קל לא הצליח לקרוא את הצ'אט הזה, ולכן הצ'אט של YouTube שוחזר.",
     "alertSounds": "צלילי התראה",
     "jumpToMessage": "קפיצה להודעה",
     "keywordOrPhrase": "מילת מפתח או ביטוי",
@@ -362,6 +372,15 @@
     },
     "appearance": {
       "message": "מראה"
+    },
+    "liteMode": {
+      "message": "מצב קל"
+    },
+    "liteModeTitle": {
+      "message": "השתמשו בעדכון צ'אט קל כדי לשפר את הביצועים בצ'אטים עמוסים."
+    },
+    "liteModeHelper": {
+      "message": "השתמשו בעדכון צ'אט מהיר וקל יותר. חוזר אוטומטית לצ'אט של YouTube בעת הצורך."
     },
     "startupShimmer": {
       "message": "אנימציית הפעלה"

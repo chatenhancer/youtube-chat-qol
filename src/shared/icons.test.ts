@@ -1,12 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import {
   ADD_ICON_PATH,
+  BOLT_ICON_PATH,
   ICON_VIEW_BOX,
   INBOX_ICON_PATH,
   INBOX_TEXT_ICON_PATH,
   MATERIAL_ICON_VIEW_BOX,
   TRANSLATE_ICON_PATH,
   createAddIcon,
+  createBoltIcon,
   createChannelIcon,
   createInboxIcon,
   createSplitTranslateIcon,
@@ -34,6 +36,9 @@ describe('shared SVG icon factories', () => {
     expect(createTranslateIcon().getAttribute('viewBox')).toBe(MATERIAL_ICON_VIEW_BOX);
     expect(createTranslateIcon().querySelector('path')?.getAttribute('d')).toBe(TRANSLATE_ICON_PATH);
     expect(createChannelIcon().getAttribute('viewBox')).toBe(MATERIAL_ICON_VIEW_BOX);
+    expect(createBoltIcon().getAttribute('viewBox')).toBe(MATERIAL_ICON_VIEW_BOX);
+    expect(createBoltIcon().querySelector('path')?.getAttribute('d')).toBe(BOLT_ICON_PATH);
+    expect(createBoltIcon().getAttribute('fill')).toBeNull();
   });
 
   it('creates split translate icons with configurable classes', () => {

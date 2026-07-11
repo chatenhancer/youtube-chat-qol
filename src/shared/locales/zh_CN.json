@@ -25,6 +25,16 @@
     "inbox": "收件箱",
     "inboxAriaUnread": "收件箱，{count} 条未读",
     "inboxEmpty": "收件箱为空",
+    "liteMode": "轻量模式",
+    "enableLiteMode": "开启轻量模式",
+    "disableLiteMode": "关闭轻量模式",
+    "liteModeLoadingChat": "正在加载聊天",
+    "liteModeNewMessages": {
+      "one": "{count} 条新消息",
+      "other": "{count} 条新消息"
+    },
+    "liteModeJumpToLive": "跳到实时聊天",
+    "liteModeFallback": "轻量模式无法读取此聊天，因此已恢复 YouTube 聊天。",
     "alertSounds": "提醒声音",
     "jumpToMessage": "跳到消息",
     "keywordOrPhrase": "关键词或短语",
@@ -365,6 +375,15 @@
     },
     "appearance": {
       "message": "外观"
+    },
+    "liteMode": {
+      "message": "轻量模式"
+    },
+    "liteModeTitle": {
+      "message": "在消息繁忙的聊天中使用轻量聊天信息流以提升性能。"
+    },
+    "liteModeHelper": {
+      "message": "使用更快、更轻量的聊天信息流。必要时会自动返回 YouTube 聊天。"
     },
     "startupShimmer": {
       "message": "启动动画"

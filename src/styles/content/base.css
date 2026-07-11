@@ -93,6 +93,7 @@ ytd-menu-popup-renderer .ytcq-context-split-button,
 yt-live-chat-text-message-renderer .ytcq-replaced-translation-icon,
 yt-live-chat-paid-message-renderer .ytcq-replaced-translation-icon,
 yt-live-chat-membership-item-renderer .ytcq-replaced-translation-icon,
+.ytcq-lite-message .ytcq-replaced-translation-icon,
 .ytcq-profile-card-message .ytcq-replaced-translation-icon,
 .ytcq-focus-message .ytcq-replaced-translation-icon,
 .ytcq-toast {

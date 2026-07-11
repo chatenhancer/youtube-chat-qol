@@ -35,6 +35,13 @@ function handleTranslationMessage(
   { source }: Pick<FeatureMessageContext, 'source'>
 ): void {
   if (!getOptions().targetLanguage) return;
+  if (source === 'existing' && message.classList.contains('ytcq-lite-message')) {
+    // Lite mode replaces the native history with fresh elements. Backfill only
+    // those rows so cached native translations carry across immediately while
+    // untranslated history continues through the normal bounded queue.
+    queueMessageTranslation(message, { backfill: true });
+    return;
+  }
   if (source !== 'added' && source !== 'changed') return;
   if (source === 'changed' && message.dataset.ytcqTranslationKey) return;
 

@@ -25,6 +25,16 @@
     "inbox": "Gelen kutusu",
     "inboxAriaUnread": "Gelen kutusu, {count} okunmamış",
     "inboxEmpty": "Gelen kutusu boş",
+    "liteMode": "Lite mod",
+    "enableLiteMode": "Lite modu aç",
+    "disableLiteMode": "Lite modu kapat",
+    "liteModeLoadingChat": "Sohbet yükleniyor",
+    "liteModeNewMessages": {
+      "one": "{count} yeni mesaj",
+      "other": "{count} yeni mesaj"
+    },
+    "liteModeJumpToLive": "Canlı sohbete git",
+    "liteModeFallback": "Lite mod bu sohbeti okuyamadığı için YouTube sohbeti geri yüklendi.",
     "alertSounds": "Uyarı sesleri",
     "jumpToMessage": "Mesaja git",
     "keywordOrPhrase": "Anahtar kelime veya ifade",
@@ -365,6 +375,15 @@
     },
     "appearance": {
       "message": "Görünüm"
+    },
+    "liteMode": {
+      "message": "Lite mod"
+    },
+    "liteModeTitle": {
+      "message": "Yoğun sohbetlerde performansı artırmak için hafif sohbet akışını kullanın."
+    },
+    "liteModeHelper": {
+      "message": "Daha hızlı ve hafif bir sohbet akışı kullanın. Gerektiğinde otomatik olarak YouTube sohbetine döner."
     },
     "startupShimmer": {
       "message": "Başlangıç animasyonu"

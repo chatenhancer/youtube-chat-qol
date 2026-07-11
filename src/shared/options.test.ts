@@ -14,6 +14,7 @@ describe('shared option helpers', () => {
       chatSkin: 'classic',
       composerTranslateLanguage: 123,
       lastTranslationTarget: '',
+      liteModeEnabled: 'yes',
       playgroundEnabled: 'yes',
       playgroundGamesAvailable: 'yes',
       sound: 'yes',
@@ -28,6 +29,7 @@ describe('shared option helpers', () => {
   it('preserves explicit false booleans and valid display modes', () => {
     expect(normalizeOptions({
       chatSkin: 'aero',
+      liteModeEnabled: true,
       sound: false,
       startupEffect: false,
       playgroundEnabled: true,
@@ -37,6 +39,7 @@ describe('shared option helpers', () => {
       sound: false,
       startupEffect: false,
       chatSkin: 'aero',
+      liteModeEnabled: true,
       playgroundEnabled: true,
       playgroundGamesAvailable: true,
       translationDisplay: 'below'

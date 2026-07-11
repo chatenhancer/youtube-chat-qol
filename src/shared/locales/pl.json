@@ -25,6 +25,16 @@
     "inbox": "Skrzynka",
     "inboxAriaUnread": "Skrzynka, {count} nieprzeczytanych",
     "inboxEmpty": "Skrzynka pusta",
+    "liteMode": "Tryb lekki",
+    "enableLiteMode": "Włącz tryb lekki",
+    "disableLiteMode": "Wyłącz tryb lekki",
+    "liteModeLoadingChat": "Wczytywanie czatu",
+    "liteModeNewMessages": {
+      "one": "{count} nowa wiadomość",
+      "other": "{count} nowych wiadomości"
+    },
+    "liteModeJumpToLive": "Przejdź do czatu na żywo",
+    "liteModeFallback": "Tryb lekki nie mógł odczytać tego czatu, więc przywrócono czat YouTube.",
     "alertSounds": "Dźwięki alertów",
     "jumpToMessage": "Przejdź do wiadomości",
     "keywordOrPhrase": "Słowo kluczowe lub fraza",
@@ -362,6 +372,15 @@
     },
     "appearance": {
       "message": "Wygląd"
+    },
+    "liteMode": {
+      "message": "Tryb lekki"
+    },
+    "liteModeTitle": {
+      "message": "Użyj lekkiego kanału czatu, aby poprawić wydajność w aktywnych czatach."
+    },
+    "liteModeHelper": {
+      "message": "Użyj szybszego, lekkiego kanału czatu. W razie potrzeby automatycznie wraca do czatu YouTube."
     },
     "startupShimmer": {
       "message": "Animacja startowa"

@@ -19,7 +19,7 @@ export function createLiveChatFixtureHtml({
   replay = false
 }: LiveChatFixtureOptions = {}): string {
   return `<!doctype html>
-<html lang="en">
+<html lang="en" data-ytcq-fixture-timestamps="false">
   <head>
     <meta charset="utf-8">
     <title>Mock YouTube Live Chat</title>
@@ -59,30 +59,43 @@ export function createLiveChatFixtureHtml({
         flex: 1 1 auto;
         min-height: 360px;
         overflow: auto;
-        padding: 8px 12px;
+        padding: 8px 0;
       }
 
       yt-live-chat-text-message-renderer {
         align-items: flex-start;
+        box-sizing: border-box;
         display: flex;
-        gap: 10px;
-        min-height: 44px;
-        padding: 6px 0;
+        min-height: 32px;
+        padding: 4px 24px;
       }
 
       #author-photo {
         border-radius: 50%;
         cursor: pointer;
         display: block;
-        height: 32px;
+        flex: 0 0 24px;
+        height: 24px;
+        margin-right: 16px;
         overflow: hidden;
-        width: 32px;
+        width: 24px;
       }
 
       #author-photo img {
         display: block;
-        height: 32px;
-        width: 32px;
+        height: 24px;
+        width: 24px;
+      }
+
+      yt-live-chat-text-message-renderer > #content {
+        flex: 1 1 auto;
+        min-width: 0;
+        font-size: 13px;
+        line-height: 16px;
+      }
+
+      html[data-ytcq-fixture-timestamps="false"] yt-live-chat-text-message-renderer #timestamp {
+        display: none;
       }
 
       #author-name {
@@ -161,11 +174,69 @@ export function createLiveChatFixtureHtml({
         top: 64px;
         z-index: 1000;
       }
+
+      yt-live-chat-toggle-renderer {
+        display: block;
+      }
+
+      yt-live-chat-toggle-renderer tp-yt-paper-item {
+        align-items: center;
+        box-sizing: border-box;
+        cursor: pointer;
+        display: flex;
+        gap: 12px;
+        min-height: 40px;
+        padding: 0 12px;
+      }
+
+      yt-live-chat-toggle-renderer .native-setting-label {
+        flex: 1 1 auto;
+      }
+
+      yt-live-chat-toggle-renderer tp-yt-paper-toggle-button {
+        display: inline-flex;
+        flex: 0 0 auto;
+        height: 20px;
+        width: 36px;
+      }
+
+      yt-live-chat-toggle-renderer .toggle-container {
+        align-items: center;
+        display: flex;
+        height: 20px;
+        position: relative;
+        width: 36px;
+      }
+
+      yt-live-chat-toggle-renderer .toggle-bar {
+        background: #717171;
+        border-radius: 7px;
+        height: 14px;
+        width: 32px;
+      }
+
+      yt-live-chat-toggle-renderer .toggle-button {
+        background: #fff;
+        border-radius: 50%;
+        height: 20px;
+        left: 0;
+        position: absolute;
+        transition: left 80ms linear;
+        width: 20px;
+      }
+
+      yt-live-chat-toggle-renderer tp-yt-paper-toggle-button[checked] .toggle-bar {
+        background: #3ea6ff;
+      }
+
+      yt-live-chat-toggle-renderer tp-yt-paper-toggle-button[checked] .toggle-button {
+        left: 16px;
+      }
     </style>
   </head>
   <body>
     <yt-live-chat-app>
-      <yt-live-chat-renderer>
+      <yt-live-chat-renderer hide-timestamps>
         <yt-live-chat-header-renderer>
           <strong>Top chat</strong>
           <div id="live-chat-header-context-menu">
@@ -221,6 +292,7 @@ export function createLiveChatFixtureHtml({
       const scroller = document.querySelector('#item-scroller');
       const items = document.querySelector('#items');
       let nextMessageNumber = 1;
+      let timestampsEnabled = false;
       const fixtureMessages = [
         { author: '@ExampleCreator', text: 'Hola mundo' },
         { author: '@ChatFan', text: 'Gracias por el stream' },
@@ -266,13 +338,29 @@ export function createLiveChatFixtureHtml({
           </div>
         \`;
         message.data = {
+          id,
           authorExternalChannelId: channelId,
           authorName: { simpleText: fixtureMessage.author },
           authorPhoto: { thumbnails: [{ url: avatarSrc }] },
+          message: { simpleText: fixtureMessage.text },
           timestampUsec: String(1780000000000000 + number)
         };
         return message;
       };
+
+      const initialMessage = document.querySelector('#fixture-message-1');
+      if (initialMessage) {
+        initialMessage.data = {
+          id: 'fixture-message-1',
+          authorExternalChannelId: 'UCFixtureChannel1',
+          authorName: { simpleText: fixtureMessages[0].author },
+          authorPhoto: {
+            thumbnails: [{ url: initialMessage.querySelector('#author-photo img')?.src || '' }]
+          },
+          message: { simpleText: fixtureMessages[0].text },
+          timestampUsec: '1780000000000001'
+        };
+      }
 
       nextMessageNumber = 2;
 
@@ -332,11 +420,39 @@ export function createLiveChatFixtureHtml({
         }
       };
 
+      const updateTimestampToggle = (root = document) => {
+        const renderer = root.querySelector(
+          'yt-live-chat-toggle-renderer[data-ytcq-native-setting="timestamps"]'
+        );
+        const toggle = renderer?.querySelector('tp-yt-paper-toggle-button');
+        renderer?.setAttribute('aria-selected', String(timestampsEnabled));
+        toggle?.setAttribute('aria-pressed', String(timestampsEnabled));
+        toggle?.toggleAttribute('checked', timestampsEnabled);
+        toggle?.toggleAttribute('active', timestampsEnabled);
+      };
+
+      const setTimestampsEnabled = (enabled) => {
+        timestampsEnabled = Boolean(enabled);
+        document.querySelector('yt-live-chat-renderer')?.toggleAttribute(
+          'hide-timestamps',
+          !timestampsEnabled
+        );
+        document.documentElement.setAttribute(
+          'data-ytcq-fixture-timestamps',
+          String(timestampsEnabled)
+        );
+        updateTimestampToggle();
+      };
+
       const addSettingsMenu = () => {
         removeOpenMenus();
         const menu = document.createElement('ytd-menu-popup-renderer');
-        menu.innerHTML = '<div id="items"><yt-live-chat-toggle-renderer></yt-live-chat-toggle-renderer></div>';
+        menu.innerHTML = '<div id="items"><yt-live-chat-toggle-renderer data-ytcq-native-setting="timestamps" tabindex="-1" aria-selected="false"><tp-yt-paper-item role="option" tabindex="0"><yt-icon aria-hidden="true">◷</yt-icon><span class="native-setting-label">Timestamps</span><tp-yt-paper-toggle-button role="button" aria-pressed="false" tabindex="0" toggles aria-label="Timestamps"><div class="toggle-container"><div id="toggleBar" class="toggle-bar"></div><div id="toggleButton" class="toggle-button"></div></div></tp-yt-paper-toggle-button></tp-yt-paper-item></yt-live-chat-toggle-renderer></div>';
         document.body.append(menu);
+        updateTimestampToggle(menu);
+        menu
+          .querySelector('yt-live-chat-toggle-renderer[data-ytcq-native-setting="timestamps"] tp-yt-paper-item')
+          ?.addEventListener('click', () => setTimestampsEnabled(!timestampsEnabled));
       };
 
       const addMessageMenu = () => {

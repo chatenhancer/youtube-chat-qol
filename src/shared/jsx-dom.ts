@@ -71,12 +71,19 @@ export function Fragment({ children }: { children?: JsxChild }): DocumentFragmen
   return fragment;
 }
 
-export function el<T extends Element = HTMLElement>(node: Node, mode?: typeof UNMANAGED): T {
+/** Create a typed JSX element or a comment placeholder from text. */
+export function el<T extends Element | Comment = HTMLElement>(
+  node: T extends Comment ? string : Node,
+  mode?: T extends Comment ? never : typeof UNMANAGED
+): T {
+  if (typeof node === 'string') return document.createComment(node) as unknown as T;
   if (node instanceof Element) {
-    return (mode === UNMANAGED ? unmarkExtensionManagedElement(node) : node) as T;
+    return (mode === UNMANAGED
+      ? unmarkExtensionManagedElement(node)
+      : node) as unknown as T;
   }
 
-  throw new Error('Expected JSX to create an Element');
+  throw new Error('Expected JSX to create an Element or comment text');
 }
 
 function createManagedJsxElement(tagName: string): HTMLElement | SVGElement {

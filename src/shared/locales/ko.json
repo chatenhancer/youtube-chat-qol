@@ -25,6 +25,16 @@
     "inbox": "받은 편지함",
     "inboxAriaUnread": "받은 편지함, 읽지 않은 메시지 {count}개",
     "inboxEmpty": "받은 편지함 비어 있음",
+    "liteMode": "라이트 모드",
+    "enableLiteMode": "라이트 모드 켜기",
+    "disableLiteMode": "라이트 모드 끄기",
+    "liteModeLoadingChat": "채팅을 불러오는 중",
+    "liteModeNewMessages": {
+      "one": "새 메시지 {count}개",
+      "other": "새 메시지 {count}개"
+    },
+    "liteModeJumpToLive": "실시간 채팅으로 이동",
+    "liteModeFallback": "라이트 모드에서 이 채팅을 읽지 못해 YouTube 채팅으로 복원했습니다.",
     "alertSounds": "알림음",
     "jumpToMessage": "메시지로 이동",
     "keywordOrPhrase": "키워드 또는 문구",
@@ -362,6 +372,15 @@
     },
     "appearance": {
       "message": "모양"
+    },
+    "liteMode": {
+      "message": "라이트 모드"
+    },
+    "liteModeTitle": {
+      "message": "활발한 채팅에서 성능을 높이기 위해 가벼운 채팅 피드를 사용합니다."
+    },
+    "liteModeHelper": {
+      "message": "더 빠르고 가벼운 채팅 피드를 사용합니다. 필요한 경우 YouTube 채팅으로 자동 전환됩니다."
     },
     "startupShimmer": {
       "message": "시작 애니메이션"

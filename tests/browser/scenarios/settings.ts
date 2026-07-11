@@ -18,6 +18,7 @@ const SETTINGS_INITIAL_VALUES = {
   targetLanguage: '',
   lastTranslationTarget: 'ja',
   translationDisplay: 'replace',
+  liteModeEnabled: false,
   sound: false,
   startupEffect: true
 };
@@ -38,6 +39,7 @@ export const popupSettingsBehaviorScenario: BrowserScenario = async ({ context }
     try {
       await changePopupTranslationTarget({ context, popup });
       await changePopupTranslationDisplay({ context, popup });
+      await changePopupLiteMode({ context, popup });
       await changePopupAlertSounds({ context, popup });
       await changePopupStartupEffect({ context, popup });
     } finally {
@@ -123,6 +125,22 @@ async function changePopupTranslationDisplay({
   await test.step('Set popup translation display mode', async () => {
     await popup.locator('#translationDisplay').selectOption('below');
     await expectStorageValue(context, 'translationDisplay', 'below');
+  });
+}
+
+async function changePopupLiteMode({
+  context,
+  popup
+}: {
+  context: BrowserContext;
+  popup: Page;
+}): Promise<void> {
+  await test.step('Enable Lite mode from the popup', async () => {
+    await expect(
+      popup.locator('label:has(#liteModeEnabled) .option-beta-badge')
+    ).toHaveText('Beta');
+    await popup.locator('#liteModeEnabled').setChecked(true);
+    await expectStorageValue(context, 'liteModeEnabled', true);
   });
 }
 

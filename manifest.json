@@ -37,6 +37,15 @@
     {
       "matches": [
         "https://www.youtube.com/live_chat*",
+        "https://www.youtube.com/live_chat_replay*"
+      ],
+      "js": ["dist/extension-chrome/lite-mode-bootstrap.js"],
+      "run_at": "document_start",
+      "all_frames": true
+    },
+    {
+      "matches": [
+        "https://www.youtube.com/live_chat*",
         "https://www.youtube.com/live_chat_replay*",
         "https://studio.youtube.com/live_chat*",
         "https://studio.youtube.com/live_chat_replay*"

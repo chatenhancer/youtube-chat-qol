@@ -10,6 +10,8 @@
  */
 const EXTENSION_MANAGED_ATTRIBUTE = 'data-ytcq-managed';
 const EXTENSION_MANAGED_SELECTOR = `[${EXTENSION_MANAGED_ATTRIBUTE}="true"]`;
+/** Let the shared observer report removal of a managed lifecycle root. */
+export const OBSERVED_MANAGED_REMOVAL_ATTRIBUTE = 'data-ytcq-observe-removal';
 
 /**
  * Mark an existing element as extension-owned.

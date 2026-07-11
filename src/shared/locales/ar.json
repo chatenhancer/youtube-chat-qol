@@ -25,6 +25,16 @@
     "inbox": "صندوق الوارد",
     "inboxAriaUnread": "صندوق الوارد، {count} غير مقروءة",
     "inboxEmpty": "صندوق الوارد فارغ",
+    "liteMode": "الوضع الخفيف",
+    "enableLiteMode": "تشغيل الوضع الخفيف",
+    "disableLiteMode": "إيقاف الوضع الخفيف",
+    "liteModeLoadingChat": "جارٍ تحميل الدردشة",
+    "liteModeNewMessages": {
+      "one": "{count} رسالة جديدة",
+      "other": "{count} رسائل جديدة"
+    },
+    "liteModeJumpToLive": "الانتقال إلى الدردشة المباشرة",
+    "liteModeFallback": "تعذّر على الوضع الخفيف قراءة هذه الدردشة، لذا تمت استعادة دردشة YouTube.",
     "alertSounds": "أصوات التنبيه",
     "jumpToMessage": "الانتقال إلى الرسالة",
     "keywordOrPhrase": "كلمة مفتاحية أو عبارة",
@@ -365,6 +375,15 @@
     },
     "appearance": {
       "message": "المظهر"
+    },
+    "liteMode": {
+      "message": "الوضع الخفيف"
+    },
+    "liteModeTitle": {
+      "message": "استخدم موجز دردشة خفيفًا لتحسين الأداء في الدردشات المزدحمة."
+    },
+    "liteModeHelper": {
+      "message": "استخدم موجز دردشة أسرع وأخف. يعود تلقائيًا إلى دردشة YouTube عند الحاجة."
     },
     "startupShimmer": {
       "message": "رسوم بدء التشغيل المتحركة"

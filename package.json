@@ -22,7 +22,6 @@
     "build:safari:app": "npm run build:safari:xcode && node scripts/build-safari-app.mjs",
     "build:safari:archive": "npm run build:safari:xcode && node scripts/distribute-safari.mjs --archive",
     "build:playground-local": "npm run build:chrome:playground-local && npm run build:firefox:playground-local",
-    "docs:screenshots": "npm run docs:build && node scripts/generate-dom-screenshots.mjs",
     "docs:dev": "astro dev --config astro.docs.config.mjs --force",
     "docs:check": "astro check --config astro.docs.config.mjs --tsconfig docs/tsconfig.json",
     "docs:build": "node scripts/validate-docs-locales.mjs && astro build --config astro.docs.config.mjs --force",

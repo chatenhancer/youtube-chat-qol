@@ -25,6 +25,16 @@
     "inbox": "Posteingang",
     "inboxAriaUnread": "Posteingang, {count} ungelesen",
     "inboxEmpty": "Posteingang leer",
+    "liteMode": "Lite-Modus",
+    "enableLiteMode": "Lite-Modus einschalten",
+    "disableLiteMode": "Lite-Modus ausschalten",
+    "liteModeLoadingChat": "Chat wird geladen",
+    "liteModeNewMessages": {
+      "one": "{count} neue Nachricht",
+      "other": "{count} neue Nachrichten"
+    },
+    "liteModeJumpToLive": "Zum Livechat springen",
+    "liteModeFallback": "Der Lite-Modus konnte diesen Chat nicht lesen. Daher wurde der YouTube-Chat wiederhergestellt.",
     "alertSounds": "Alarmtöne",
     "jumpToMessage": "Zur Nachricht springen",
     "keywordOrPhrase": "Schlüsselwort oder Phrase",
@@ -362,6 +372,15 @@
     },
     "appearance": {
       "message": "Darstellung"
+    },
+    "liteMode": {
+      "message": "Lite-Modus"
+    },
+    "liteModeTitle": {
+      "message": "Nutze einen ressourcenschonenden Chat-Feed für bessere Leistung in schnellen Chats."
+    },
+    "liteModeHelper": {
+      "message": "Nutze einen schnelleren, schlanken Chat-Feed. Wechselt bei Bedarf automatisch zum YouTube-Chat zurück."
     },
     "startupShimmer": {
       "message": "Startanimation"

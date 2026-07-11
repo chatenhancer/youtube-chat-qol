@@ -16,6 +16,7 @@ export type TranslationDisplay = 'replace' | 'below';
 export interface Options {
   chatSkin: ChatSkin;
   composerTranslateLanguage: string;
+  liteModeEnabled: boolean;
   targetLanguage: string;
   lastTranslationTarget: string;
   translationDisplay: TranslationDisplay;
@@ -36,6 +37,7 @@ const DISABLED_PLAYGROUND_OPTIONS: Pick<Options, PlaygroundOptionKey> = {
 export const DEFAULT_OPTIONS: Options = {
   chatSkin: DEFAULT_CHAT_SKIN,
   composerTranslateLanguage: '',
+  liteModeEnabled: false,
   targetLanguage: '',
   lastTranslationTarget: DEFAULT_TRANSLATION_TARGET,
   translationDisplay: 'replace',
@@ -65,6 +67,7 @@ export function normalizeOptions(value: Partial<Options> | Record<string, unknow
   return {
     chatSkin,
     composerTranslateLanguage,
+    liteModeEnabled: candidate.liteModeEnabled === true,
     targetLanguage,
     lastTranslationTarget,
     translationDisplay,

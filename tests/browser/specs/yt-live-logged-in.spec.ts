@@ -20,6 +20,12 @@ import { focusPanelOpensFromAuthorScenario } from '../scenarios/focus';
 import { frequentEmojiPersistenceScenario } from '../scenarios/frequent-emojis';
 import { inboxOpensFromHeaderScenario } from '../scenarios/inbox';
 import {
+  liteModeLiveSustainedScenario,
+  liteModeStoredPreferenceReloadScenario,
+  liteModeTranslationContinuityScenario
+} from '../scenarios/lite-mode';
+import { liteModeLiveNativeSurfacesScenario } from '../scenarios/lite-mode-native-surfaces';
+import {
   authorQuoteDraftScenario,
   authorMentionDraftScenario,
   mentionMenuDraftScenario,
@@ -39,6 +45,10 @@ test('logged-in live: chat settings menu receives extension controls', settingsM
 test('logged-in live: replaced translations toggle from the inline icon', realReplacedTranslationToggleScenario);
 test('logged-in live: focus panel opens from an author and follows their messages', focusPanelOpensFromAuthorScenario);
 test('logged-in live: inbox opens from the chat header', inboxOpensFromHeaderScenario);
+test('logged-in live: Lite mode keeps receiving after the native feed is discarded', liteModeLiveSustainedScenario);
+test('logged-in live: stored Lite mode preserves history across a tab reload', liteModeStoredPreferenceReloadScenario);
+test('logged-in live: Lite mode preserves Participants and mirrors native Timestamps', liteModeLiveNativeSurfacesScenario);
+test('logged-in live: enabled translations carry from native history into Lite mode', liteModeTranslationContinuityScenario);
 test('logged-in live: profile card opens from a chat avatar', profileCardRecentMessagesScenario);
 test('logged-in live: composer translation controls open', composerTranslationControlsOpenScenario);
 test('logged-in live: composer translation translates draft text with real Google Translate', realComposerTranslationScenario);

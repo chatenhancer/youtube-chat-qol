@@ -25,6 +25,16 @@
     "inbox": "इनबॉक्स",
     "inboxAriaUnread": "इनबॉक्स, {count} अपठित",
     "inboxEmpty": "इनबॉक्स खाली है",
+    "liteMode": "लाइट मोड",
+    "enableLiteMode": "लाइट मोड चालू करें",
+    "disableLiteMode": "लाइट मोड बंद करें",
+    "liteModeLoadingChat": "चैट लोड हो रही है",
+    "liteModeNewMessages": {
+      "one": "{count} नया मैसेज",
+      "other": "{count} नए मैसेज"
+    },
+    "liteModeJumpToLive": "लाइव चैट पर जाएं",
+    "liteModeFallback": "लाइट मोड इस चैट को पढ़ नहीं सका, इसलिए YouTube चैट बहाल कर दी गई।",
     "alertSounds": "अलर्ट ध्वनियां",
     "jumpToMessage": "मैसेज पर जाएं",
     "keywordOrPhrase": "कीवर्ड या वाक्यांश",
@@ -365,6 +375,15 @@
     },
     "appearance": {
       "message": "रूप"
+    },
+    "liteMode": {
+      "message": "लाइट मोड"
+    },
+    "liteModeTitle": {
+      "message": "व्यस्त चैट में बेहतर परफ़ॉर्मेंस के लिए हल्की चैट फ़ीड का उपयोग करें।"
+    },
+    "liteModeHelper": {
+      "message": "तेज़, हल्की चैट फ़ीड का उपयोग करें। ज़रूरत पड़ने पर अपने-आप YouTube चैट पर लौटता है।"
     },
     "startupShimmer": {
       "message": "स्टार्टअप एनिमेशन"

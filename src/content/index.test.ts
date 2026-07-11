@@ -232,6 +232,32 @@ describe('content script entrypoint wiring', () => {
     expect(batch.mutations).toEqual([]);
   });
 
+  it('dispatches removal of a managed root that explicitly needs lifecycle recovery', async () => {
+    await import('./index');
+    const host = document.createElement('yt-live-chat-renderer');
+    const managedRoot = document.createElement('section');
+    managedRoot.setAttribute('data-ytcq-managed', 'true');
+    managedRoot.setAttribute('data-ytcq-observe-removal', '');
+    host.append(managedRoot);
+    document.body.append(host);
+    lifecycleMocks.shouldIgnoreFeatureAddedNode.mockImplementation((element) =>
+      element.hasAttribute('data-ytcq-managed')
+    );
+    managedRoot.remove();
+
+    observerCallback?.([
+      mutation({
+        removedNodes: [managedRoot],
+        target: host,
+        type: 'childList'
+      })
+    ], {} as MutationObserver);
+
+    const batch = lifecycleMocks.handleFeatureMutations.mock.calls[0][0] as FeatureMutationBatch;
+    expect(batch.addedElements).toEqual([]);
+    expect(batch.mutations).toHaveLength(1);
+  });
+
   it('dispatches changed message work when managed nodes are removed from chat messages', async () => {
     await import('./index');
     const message = createMessage();

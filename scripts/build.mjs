@@ -43,6 +43,7 @@ const contentCssSources = [
   ['features', 'src/styles/content/composer-translation.css'],
   ['features', 'src/styles/content/frequent-emojis.css'],
   ['features', 'src/styles/content/chat-header.css'],
+  ['features', 'src/styles/content/lite-mode.css'],
   ['features', 'src/styles/content/profile-popup.css'],
   ['features', 'src/styles/content/focus-mode.css'],
   ['features', 'src/styles/content/inbox.css'],
@@ -127,6 +128,12 @@ async function buildTarget(target) {
       ...getBuildOptions(target),
       entryPoints: [path.join(root, 'src', 'youtube', 'message-data-page.ts')],
       outfile: path.join(extensionDir, 'message-data-page.js'),
+      format: 'iife'
+    }),
+    build({
+      ...getBuildOptions(target),
+      entryPoints: [path.join(root, 'src', 'features', 'lite-mode', 'bootstrap-entry.ts')],
+      outfile: path.join(extensionDir, 'lite-mode-bootstrap.js'),
       format: 'iife'
     }),
     build({

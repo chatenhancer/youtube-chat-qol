@@ -28,6 +28,11 @@ import {
 } from '../scenarios/inbox';
 import { markedUserMessageMenuScenario } from '../scenarios/marked-users';
 import {
+  liteModeMockBehaviorScenario,
+  liteModeStoredPreferenceReloadScenario,
+  liteModeTranslationContinuityScenario
+} from '../scenarios/lite-mode';
+import {
   mockedMessageTranslationScenario,
   replacedTranslationToggleSurfacesScenario,
   translationDisplayScenario,
@@ -65,7 +70,8 @@ import {
   playgroundIncomingInviteIgnoreScenario,
   playgroundInviteCancelScenario,
   playgroundStickAroundActiveOverlayControlsScenario,
-  playgroundStickAroundComputerOverlayScenario
+  playgroundStickAroundComputerOverlayScenario,
+  playgroundStickAroundLiteOverlayScenario
 } from '../scenarios/playground-games';
 import { tabAlertScenario } from '../scenarios/tab-alert';
 import { loggedInMockTest as test } from '../support/scenario-fixtures';
@@ -79,6 +85,9 @@ test('logged-in mock: chat settings menu receives extension controls', settingsM
 test('logged-in mock: chat settings menu toggles persist options', settingsMenuBehaviorScenario);
 test('logged-in mock: extension popup settings persist options', popupSettingsBehaviorScenario);
 test('logged-in mock: popup reset restores defaults and clears local data', popupResetScenario);
+test('logged-in mock: Lite mode renders, keeps author actions, and restores native chat', liteModeMockBehaviorScenario);
+test('logged-in mock: stored Lite mode preserves history across a reload', liteModeStoredPreferenceReloadScenario);
+test('logged-in mock: translations carry from native history into Lite mode', liteModeTranslationContinuityScenario);
 test('logged-in mock: incoming chat messages are translated', mockedMessageTranslationScenario);
 test('logged-in mock: translation display modes render correctly', translationDisplayScenario);
 test('logged-in mock: replaced translations toggle across chat surfaces', replacedTranslationToggleSurfacesScenario);
@@ -108,6 +117,7 @@ test('logged-in mock: Playground Games resumes, hides, and leaves an active game
 test('logged-in mock: Playground Games toggles lobby availability', playgroundAvailabilityToggleScenario);
 test('logged-in mock: Stick Around opens as a chat feed overlay after inviting the computer', playgroundStickAroundComputerOverlayScenario);
 test('logged-in mock: Stick Around lobby controls work over an active overlay', playgroundStickAroundActiveOverlayControlsScenario);
+test('logged-in mock: Stick Around mounts its playable overlay on Lite chat', playgroundStickAroundLiteOverlayScenario);
 test('logged-in mock: Playground Games cancels a pending outgoing invite', playgroundInviteCancelScenario);
 test('logged-in mock: Bounty Hunting round start divider attaches to the boundary message', playgroundBountyHuntingRoundStartScenario);
 test('logged-in mock: Bounty Hunting rejects pre-start messages and claims post-start messages', playgroundBountyHuntingCutoffScenario);

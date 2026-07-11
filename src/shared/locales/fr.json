@@ -25,6 +25,16 @@
     "inbox": "Boîte de réception",
     "inboxAriaUnread": "Boîte de réception, {count} non lu(s)",
     "inboxEmpty": "Boîte de réception vide",
+    "liteMode": "Mode léger",
+    "enableLiteMode": "Activer le mode léger",
+    "disableLiteMode": "Désactiver le mode léger",
+    "liteModeLoadingChat": "Chargement du chat",
+    "liteModeNewMessages": {
+      "one": "{count} nouveau message",
+      "other": "{count} nouveaux messages"
+    },
+    "liteModeJumpToLive": "Aller au chat en direct",
+    "liteModeFallback": "Le mode léger n’a pas pu lire ce chat, le chat YouTube a donc été restauré.",
     "alertSounds": "Sons d’alerte",
     "jumpToMessage": "Aller au message",
     "keywordOrPhrase": "Mot-clé ou expression",
@@ -362,6 +372,15 @@
     },
     "appearance": {
       "message": "Apparence"
+    },
+    "liteMode": {
+      "message": "Mode léger"
+    },
+    "liteModeTitle": {
+      "message": "Utilisez un flux de chat léger pour améliorer les performances dans les chats très actifs."
+    },
+    "liteModeHelper": {
+      "message": "Utilisez un flux de chat plus rapide et léger. Retourne automatiquement au chat YouTube si nécessaire."
     },
     "startupShimmer": {
       "message": "Animation de démarrage"

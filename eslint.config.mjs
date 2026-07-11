@@ -45,6 +45,7 @@ export default [
       ytcq: ytcqPlugin
     },
     rules: {
+      'ytcq/no-direct-jsx-factory': 'error',
       'ytcq/no-direct-ytcq-create-element': 'error',
       'ytcq/require-jsx-dom-el-type': 'error'
     }

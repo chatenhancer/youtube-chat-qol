@@ -12,6 +12,7 @@ export const controls = {
   chatSkin: document.querySelector<HTMLSelectElement>('#chatSkin'),
   targetLanguage: document.querySelector<HTMLSelectElement>('#targetLanguage'),
   translationDisplay: document.querySelector<HTMLSelectElement>('#translationDisplay'),
+  liteModeEnabled: document.querySelector<HTMLInputElement>('#liteModeEnabled'),
   sound: document.querySelector<HTMLInputElement>('#sound'),
   startupEffect: document.querySelector<HTMLInputElement>('#startupEffect'),
   playgroundEnabled: document.querySelector<HTMLInputElement>('#playgroundEnabled'),
@@ -30,6 +31,7 @@ export const controls = {
 
 export interface PopupSettingsControls {
   chatSkin: HTMLSelectElement;
+  liteModeEnabled: HTMLInputElement;
   playgroundEnabled: HTMLInputElement;
   playgroundDisplayName: HTMLInputElement;
   playgroundGamesAvailable: HTMLInputElement;
@@ -52,6 +54,7 @@ export function getSettingsControls(): PopupSettingsControls | null {
     targetLanguage,
     chatSkin,
     translationDisplay,
+    liteModeEnabled,
     sound,
     startupEffect,
     playgroundEnabled,
@@ -71,6 +74,7 @@ export function getSettingsControls(): PopupSettingsControls | null {
     !targetLanguage ||
     !chatSkin ||
     !translationDisplay ||
+    !liteModeEnabled ||
     !sound ||
     !startupEffect ||
     !playgroundEnabled ||
@@ -90,6 +94,7 @@ export function getSettingsControls(): PopupSettingsControls | null {
 
   return {
     chatSkin,
+    liteModeEnabled,
     playgroundEnabled,
     playgroundDisplayName,
     playgroundGamesAvailable,

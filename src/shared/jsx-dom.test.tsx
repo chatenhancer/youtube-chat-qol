@@ -83,4 +83,11 @@ describe('jsx-dom', () => {
     expect(isExtensionManagedElement(wrapper)).toBe(false);
     expect(isExtensionManagedElement(wrapper.firstElementChild!)).toBe(false);
   });
+
+  it('creates typed comment placeholders from text', () => {
+    const placeholder = el<Comment>('ytcq-placeholder');
+
+    expect(placeholder).toBeInstanceOf(Comment);
+    expect(placeholder.data).toBe('ytcq-placeholder');
+  });
 });

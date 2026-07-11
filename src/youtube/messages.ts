@@ -33,7 +33,8 @@ export function getAuthorName(message: HTMLElement): string {
 }
 
 export function getAuthorNameElement(message: HTMLElement): HTMLElement | null {
-  return message.querySelector<HTMLElement>('[id="author-name"], a[href*="/channel/"], a[href^="/@"]');
+  return message.querySelector<HTMLElement>('[id="author-name"]') ||
+    message.querySelector<HTMLElement>('a[href*="/channel/"], a[href^="/@"]');
 }
 
 export function getAuthorChannelId(message: HTMLElement): string {
@@ -80,10 +81,24 @@ export function getMessageTimestampText(message: HTMLElement, timestamp = Date.n
     if (cleanTimestamp) return cleanTimestamp;
   }
 
-  return new Intl.DateTimeFormat(undefined, {
+  return formatMessageTimestamp(timestamp);
+}
+
+export function formatMessageTimestamp(timestamp: number, locale?: string): string {
+  if (!Number.isFinite(timestamp)) return '';
+  const date = new Date(timestamp);
+  if (Number.isNaN(date.getTime())) return '';
+
+  return new Intl.DateTimeFormat(locale, {
     hour: 'numeric',
     minute: '2-digit'
-  }).format(timestamp);
+  }).format(date);
+}
+
+export function formatMessageTimestampUsec(timestampUsec: string | undefined): string {
+  if (!timestampUsec || !/^\d{1,24}$/.test(timestampUsec)) return '';
+  const milliseconds = Number(timestampUsec) / 1_000;
+  return formatMessageTimestamp(milliseconds);
 }
 
 export function getMessageStableId(message: HTMLElement): string {

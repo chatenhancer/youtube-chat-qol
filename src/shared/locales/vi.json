@@ -25,6 +25,16 @@
     "inbox": "Hộp thư",
     "inboxAriaUnread": "Hộp thư, {count} chưa đọc",
     "inboxEmpty": "Hộp thư trống",
+    "liteMode": "Chế độ nhẹ",
+    "enableLiteMode": "Bật chế độ nhẹ",
+    "disableLiteMode": "Tắt chế độ nhẹ",
+    "liteModeLoadingChat": "Đang tải cuộc trò chuyện",
+    "liteModeNewMessages": {
+      "one": "{count} tin nhắn mới",
+      "other": "{count} tin nhắn mới"
+    },
+    "liteModeJumpToLive": "Chuyển đến trò chuyện trực tiếp",
+    "liteModeFallback": "Chế độ nhẹ không thể đọc cuộc trò chuyện này nên trò chuyện YouTube đã được khôi phục.",
     "alertSounds": "Âm thanh cảnh báo",
     "jumpToMessage": "Nhảy đến tin nhắn",
     "keywordOrPhrase": "Từ khóa hoặc cụm từ",
@@ -362,6 +372,15 @@
     },
     "appearance": {
       "message": "Giao diện"
+    },
+    "liteMode": {
+      "message": "Chế độ nhẹ"
+    },
+    "liteModeTitle": {
+      "message": "Sử dụng bảng tin trò chuyện gọn nhẹ để cải thiện hiệu suất trong các cuộc trò chuyện đông người."
+    },
+    "liteModeHelper": {
+      "message": "Sử dụng bảng tin trò chuyện nhanh và nhẹ hơn. Tự động quay lại trò chuyện YouTube khi cần."
     },
     "startupShimmer": {
       "message": "Hoạt ảnh khởi động"

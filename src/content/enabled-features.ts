@@ -25,3 +25,4 @@ import '../features/playground';
 import '../features/frequent-emojis';
 import '../features/enhanced-effect';
 import '../features/translation';
+import '../features/lite-mode';

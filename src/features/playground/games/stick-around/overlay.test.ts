@@ -41,6 +41,31 @@ describe('Stick Around overlay', () => {
     expect(getStickAroundThemeFighterColor(surface)).toBe('#ffffff');
   });
 
+  it('mounts on the connected Lite chat surface when native chat is retained', () => {
+    vi.spyOn(window, 'requestAnimationFrame').mockImplementation(() => 1);
+    vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockImplementation((contextId) => {
+      return contextId === '2d'
+        ? createMockCanvasContext() as unknown as CanvasRenderingContext2D
+        : null;
+    });
+    const liteFeed = document.createElement('section');
+    liteFeed.className = 'ytcq-lite-root';
+    const nativeFeed = createChatFeedSurface();
+    document.body.append(liteFeed, nativeFeed);
+
+    const opened = openStickAroundOverlay(
+      createStickAroundGame(),
+      'me-user',
+      vi.fn(),
+      vi.fn(),
+      vi.fn()
+    );
+
+    expect(opened).toBe(true);
+    expect(liteFeed.querySelector('.ytcq-stick-around-overlay')).not.toBeNull();
+    expect(nativeFeed.querySelector('.ytcq-stick-around-overlay')).toBeNull();
+  });
+
   it('continues the previous input sequence when resuming an active game', () => {
     vi.useFakeTimers();
     vi.setSystemTime(1_000);

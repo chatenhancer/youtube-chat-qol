@@ -48,6 +48,7 @@ export function initSettingsControls(popupLocale: string): void {
 
   const {
     chatSkin,
+    liteModeEnabled,
     targetLanguage,
     translationDisplay,
     sound,
@@ -90,6 +91,10 @@ export function initSettingsControls(popupLocale: string): void {
     const nextSkin = chatSkin.value as Options['chatSkin'];
     animatePopupChatSkinIcon();
     save({ chatSkin: nextSkin });
+  });
+
+  liteModeEnabled.addEventListener('change', () => {
+    save({ liteModeEnabled: liteModeEnabled.checked });
   });
 
   sound.addEventListener('change', () => {
@@ -143,6 +148,7 @@ export function applyOptionsToControls(options: Partial<Options>): void {
 
   const {
     chatSkin,
+    liteModeEnabled,
     targetLanguage,
     translationDisplay,
     sound,
@@ -153,6 +159,7 @@ export function applyOptionsToControls(options: Partial<Options>): void {
 
   const normalized = normalizeOptions(options);
   chatSkin.value = normalized.chatSkin;
+  liteModeEnabled.checked = normalized.liteModeEnabled;
   lastKnownTranslationTarget = normalized.lastTranslationTarget;
   targetLanguage.value = normalized.targetLanguage;
   translationDisplay.value = normalized.translationDisplay;

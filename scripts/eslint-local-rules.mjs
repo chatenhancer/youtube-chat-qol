@@ -114,10 +114,10 @@ export default {
       meta: {
         type: 'problem',
         docs: {
-          description: 'Require explicit element subtypes for shared jsx-dom el() calls.'
+          description: 'Require explicit result subtypes for shared jsx-dom el() calls.'
         },
         messages: {
-          missingType: 'Pass an explicit element type to el(), for example el<HTMLDivElement>(...).'
+          missingType: 'Pass an explicit result type to el(), for example el<HTMLDivElement>(...) or el<Comment>(...).'
         },
         schema: []
       },
@@ -144,6 +144,58 @@ export default {
 
             context.report({
               messageId: 'missingType',
+              node: callee
+            });
+          }
+        };
+      }
+    },
+    'no-direct-jsx-factory': {
+      meta: {
+        type: 'problem',
+        docs: {
+          description: 'Require JSX syntax instead of direct jsx() factory calls.'
+        },
+        messages: {
+          useJsxSyntax: 'Use JSX syntax instead of calling jsx() directly.'
+        },
+        schema: []
+      },
+      create(context) {
+        const jsxFactoryNames = new Set();
+        const jsxDomNamespaceNames = new Set();
+
+        return {
+          ImportDeclaration(node) {
+            if (!isJsxDomImportSource(node.source?.value)) return;
+
+            node.specifiers.forEach((specifier) => {
+              if (specifier.type === 'ImportNamespaceSpecifier') {
+                jsxDomNamespaceNames.add(specifier.local.name);
+                return;
+              }
+              if (
+                specifier.type === 'ImportSpecifier' &&
+                getImportedName(specifier.imported) === 'jsx'
+              ) {
+                jsxFactoryNames.add(specifier.local.name);
+              }
+            });
+          },
+          CallExpression(node) {
+            const callee = node.callee;
+            const callsNamedFactory = callee?.type === 'Identifier' &&
+              jsxFactoryNames.has(callee.name);
+            const callsNamespaceFactory = callee?.type === 'MemberExpression' &&
+              !callee.computed &&
+              callee.object?.type === 'Identifier' &&
+              jsxDomNamespaceNames.has(callee.object.name) &&
+              callee.property?.type === 'Identifier' &&
+              callee.property.name === 'jsx';
+            if (!callsNamedFactory && !callsNamespaceFactory) return;
+
+            context.report({
+              messageId: 'useJsxSyntax',
               node: callee
             });
           }

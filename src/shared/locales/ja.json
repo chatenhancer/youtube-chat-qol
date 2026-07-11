@@ -25,6 +25,16 @@
     "inbox": "受信トレイ",
     "inboxAriaUnread": "受信トレイ、未読 {count} 件",
     "inboxEmpty": "受信トレイは空です",
+    "liteMode": "軽量モード",
+    "enableLiteMode": "軽量モードをオンにする",
+    "disableLiteMode": "軽量モードをオフにする",
+    "liteModeLoadingChat": "チャットを読み込んでいます",
+    "liteModeNewMessages": {
+      "one": "新着メッセージ {count} 件",
+      "other": "新着メッセージ {count} 件"
+    },
+    "liteModeJumpToLive": "ライブチャットに移動",
+    "liteModeFallback": "軽量モードでこのチャットを読み込めなかったため、YouTube チャットに戻しました。",
     "alertSounds": "アラート音",
     "jumpToMessage": "メッセージへ移動",
     "keywordOrPhrase": "キーワードまたはフレーズ",
@@ -365,6 +375,15 @@
     },
     "appearance": {
       "message": "表示"
+    },
+    "liteMode": {
+      "message": "軽量モード"
+    },
+    "liteModeTitle": {
+      "message": "活発なチャットでのパフォーマンスを向上させる軽量チャットフィードを使用します。"
+    },
+    "liteModeHelper": {
+      "message": "より高速で軽量なチャットフィードを使用します。必要に応じて自動的に YouTube チャットに戻ります。"
     },
     "startupShimmer": {
       "message": "起動時のアニメーション"

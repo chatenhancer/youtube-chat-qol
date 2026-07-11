@@ -314,6 +314,33 @@ export const playgroundStickAroundActiveOverlayControlsScenario: BrowserScenario
   });
 };
 
+export const playgroundStickAroundLiteOverlayScenario: BrowserScenario = async ({ chat, context }) => {
+  const backend = await installMockPlaygroundBackend(context, {
+    snapshot: createMockPlaygroundSnapshot({
+      games: [createBrowserStickAroundGame({
+        gameId: 'lite-stick-around-game',
+        status: 'active'
+      })]
+    })
+  });
+
+  await withExtensionStorageValues(context, 'sync', {
+    ...PLAYGROUND_ENABLED_OPTIONS,
+    liteModeEnabled: true
+  }, async () => {
+    const liteRoot = chat.locator('.ytcq-lite-root');
+    await expect(liteRoot).toBeVisible();
+    const card = await openGamesCard(chat, backend);
+    const activeRow = card.locator('.ytcq-games-active-row').filter({ hasText: 'Stick Around!' });
+    await activeRow.getByRole('button', { name: 'Resume' }).click();
+
+    await expect(liteRoot.locator(':scope > .ytcq-stick-around-overlay')).toBeVisible();
+    await expect(liteRoot.locator('.ytcq-stick-around-canvas')).toBeVisible();
+    await expect(chat.locator('yt-live-chat-item-list-renderer > .ytcq-stick-around-overlay'))
+      .toHaveCount(0);
+  });
+};
+
 export const playgroundAvailabilityToggleScenario: BrowserScenario = async ({ chat, context }) => {
   const backend = await installMockPlaygroundBackend(context, {
     snapshot: createMockPlaygroundSnapshot()
@@ -611,6 +638,12 @@ export const playgroundBountyHuntingRoundStartScenario: BrowserScenario = async 
     expect(Math.round(dividerAfterScroll.rectTop - dividerBeforeScroll.rectTop))
       .toBe(Math.round(dividerAfterScroll.parentTop - dividerBeforeScroll.parentTop));
 
+    // The game panel intentionally floats above chat. Compact it before the
+    // message-click assertion, just as a player must do to use the feed below.
+    await chat.locator('.ytcq-bounty-hunting-game-compact-toggle').click();
+    await expect(chat.locator('.ytcq-bounty-hunting-game-panel'))
+      .toHaveClass(/ytcq-game-panel-compact/);
+
     const messageId = await appendMockFixtureMessage(chat, {
       author: '@BountyFan',
       text: 'claim this @Marco'
@@ -620,6 +653,7 @@ export const playgroundBountyHuntingRoundStartScenario: BrowserScenario = async 
 
     const message = chat.locator(`yt-live-chat-text-message-renderer[id="${messageId}"]`);
     await expect(message).toBeVisible();
+    await message.evaluate((element) => element.scrollIntoView({ block: 'start' }));
     await message.click();
 
     const claim = await waitForGameAction(backend, 'claimBounty');

@@ -91,7 +91,7 @@ async function readEntireExtensionStorage(
   ));
 }
 
-async function setExtensionStorageValues(
+export async function setExtensionStorageValues(
   context: BrowserContext,
   area: StorageArea,
   values: StorageValues
@@ -111,8 +111,20 @@ async function replaceExtensionStorageValues(
 ): Promise<void> {
   await withExtensionServiceWorker(context, (serviceWorker) => serviceWorker.evaluate(
     ({ storageArea, storageValues }) => new Promise<void>((resolve) => {
-      chrome.storage[storageArea].clear(() => {
-        chrome.storage[storageArea].set(storageValues, () => resolve());
+      chrome.storage[storageArea].get(null, (stored) => {
+        const hasStoredValues = Object.keys(stored).length > 0;
+        const hasNextValues = Object.keys(storageValues).length > 0;
+        if (!hasStoredValues && !hasNextValues) {
+          resolve();
+          return;
+        }
+        chrome.storage[storageArea].clear(() => {
+          if (!hasNextValues) {
+            resolve();
+            return;
+          }
+          chrome.storage[storageArea].set(storageValues, () => resolve());
+        });
       });
     }),
     { storageArea: area, storageValues: values }
@@ -133,9 +145,18 @@ async function restoreExtensionStorageValues(
 
   await withExtensionServiceWorker(context, (serviceWorker) => serviceWorker.evaluate(
     ({ storageArea, storageKeys, storageValues }) => new Promise<void>((resolve) => {
-      chrome.storage[storageArea].remove(storageKeys, () => {
+      const restoreValues = () => {
+        if (!Object.keys(storageValues).length) {
+          resolve();
+          return;
+        }
         chrome.storage[storageArea].set(storageValues, () => resolve());
-      });
+      };
+      if (!storageKeys.length) {
+        restoreValues();
+        return;
+      }
+      chrome.storage[storageArea].remove(storageKeys, restoreValues);
     }),
     {
       storageArea: area,

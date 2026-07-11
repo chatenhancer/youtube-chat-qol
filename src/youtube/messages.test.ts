@@ -4,6 +4,7 @@ import {
   getAuthorChannelId,
   getMessageAvatarSrc,
   getMessageContentNodes,
+  formatMessageTimestampUsec,
   getMessageStableId,
   getMessageText,
   getMessageTimestampText,
@@ -55,6 +56,12 @@ describe('YouTube message adapter fixtures', () => {
     expect(getMessageTimestampText(message)).toBe('10:05 PM');
   });
 
+  it('formats microsecond transport timestamps and rejects invalid values', () => {
+    expect(formatMessageTimestampUsec('1782000000000000')).toMatch(/\d/);
+    expect(formatMessageTimestampUsec('not-a-timestamp')).toBe('');
+    expect(formatMessageTimestampUsec(undefined)).toBe('');
+  });
+
   it('uses DOM fallbacks for message text, channel ids, avatars, and stable ids', () => {
     const message = document.createElement('yt-live-chat-text-message-renderer');
     message.id = 'dom-message-id';
@@ -69,6 +76,18 @@ describe('YouTube message adapter fixtures', () => {
     expect(getMessageAvatarSrc(message)).toBe('https://yt3.example/avatar.png');
     expect(getMessageText(message)).toBe('DOM text');
     expect(getMessageStableId(message)).toBe('dom-message-id');
+  });
+
+  it('prefers the author-name slot when an earlier avatar also links to the channel', () => {
+    const message = document.createElement('article');
+    message.innerHTML = `
+      <a id="author-photo" href="https://www.youtube.com/channel/dom-channel">L</a>
+      <a id="author-name" href="https://www.youtube.com/channel/dom-channel">@LiteViewer</a>
+      <span id="message">Hello</span>
+    `;
+
+    expect(getAuthorName(message)).toBe('@LiteViewer');
+    expect(getAuthorChannelId(message)).toBe('dom-channel');
   });
 
   it('falls back to data-message-id and formatted local time when renderer values are missing', () => {

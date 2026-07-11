@@ -25,6 +25,16 @@
     "inbox": "Posta in arrivo",
     "inboxAriaUnread": "Posta in arrivo, {count} non letti",
     "inboxEmpty": "Posta in arrivo vuota",
+    "liteMode": "Modalità leggera",
+    "enableLiteMode": "Attiva la modalità leggera",
+    "disableLiteMode": "Disattiva la modalità leggera",
+    "liteModeLoadingChat": "Caricamento della chat",
+    "liteModeNewMessages": {
+      "one": "{count} nuovo messaggio",
+      "other": "{count} nuovi messaggi"
+    },
+    "liteModeJumpToLive": "Vai alla chat dal vivo",
+    "liteModeFallback": "La modalità leggera non è riuscita a leggere questa chat, quindi è stata ripristinata la chat di YouTube.",
     "alertSounds": "Suoni di avviso",
     "jumpToMessage": "Vai al messaggio",
     "keywordOrPhrase": "Parola chiave o frase",
@@ -365,6 +375,15 @@
     },
     "appearance": {
       "message": "Aspetto"
+    },
+    "liteMode": {
+      "message": "Modalità leggera"
+    },
+    "liteModeTitle": {
+      "message": "Usa un feed della chat leggero per migliorare le prestazioni nelle chat molto attive."
+    },
+    "liteModeHelper": {
+      "message": "Usa un feed della chat più veloce e leggero. Se necessario, torna automaticamente alla chat di YouTube."
     },
     "startupShimmer": {
       "message": "Animazione iniziale"

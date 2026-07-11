@@ -33,6 +33,7 @@ import {
 } from '../shared/chat-skins';
 import { getOptions, setOptions } from '../shared/state';
 import { initUiLocaleFromDocument } from '../shared/i18n';
+import { OBSERVED_MANAGED_REMOVAL_ATTRIBUTE } from '../shared/managed-dom';
 import { requestYouTubeMessageData, type YouTubeMessageData } from '../youtube/message-data';
 import { injectYouTubeMessageDataPage } from '../youtube/message-data-page-injection';
 import { CHAT_MESSAGE_SELECTOR, PARTICIPANT_SELECTOR } from '../youtube/selectors';
@@ -284,7 +285,14 @@ function shouldIgnoreObserverMutation(mutation: MutationRecord): boolean {
 }
 
 function shouldIgnoreObserverNode(node: Node): boolean {
-  return node instanceof Element && shouldIgnoreFeatureAddedNode(node);
+  if (!(node instanceof Element)) return false;
+  if (
+    !node.isConnected &&
+    node.hasAttribute(OBSERVED_MANAGED_REMOVAL_ATTRIBUTE)
+  ) {
+    return false;
+  }
+  return shouldIgnoreFeatureAddedNode(node);
 }
 
 function shouldDispatchManagedRemovalFromChatMessage(

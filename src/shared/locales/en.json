@@ -25,6 +25,16 @@
     "inbox": "Inbox",
     "inboxAriaUnread": "Inbox, {count} unread",
     "inboxEmpty": "Inbox empty",
+    "liteMode": "Lite mode",
+    "enableLiteMode": "Turn on Lite mode",
+    "disableLiteMode": "Turn off Lite mode",
+    "liteModeLoadingChat": "Loading chat",
+    "liteModeNewMessages": {
+      "one": "{count} new message",
+      "other": "{count} new messages"
+    },
+    "liteModeJumpToLive": "Jump to live chat",
+    "liteModeFallback": "Lite mode couldn't read this chat, so YouTube chat was restored.",
     "alertSounds": "Alert sounds",
     "jumpToMessage": "Jump to message",
     "keywordOrPhrase": "Keyword or phrase",
@@ -365,6 +375,15 @@
     },
     "appearance": {
       "message": "Appearance"
+    },
+    "liteMode": {
+      "message": "Lite mode"
+    },
+    "liteModeTitle": {
+      "message": "Use a lightweight chat feed to improve performance in busy chats."
+    },
+    "liteModeHelper": {
+      "message": "Use a faster, lightweight chat feed. Returns to YouTube chat automatically if needed."
     },
     "startupShimmer": {
       "message": "Startup animation"

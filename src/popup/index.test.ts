@@ -26,6 +26,7 @@ describe('popup', () => {
       </select>
       <input id="sound" type="checkbox">
       <input id="startupEffect" type="checkbox">
+      <input id="liteModeEnabled" type="checkbox">
       </div>
       <div id="bookmarksPanel" data-popup-tab-panel hidden>
         <span id="bookmarksCount"></span>
@@ -655,6 +656,7 @@ describe('popup', () => {
     await chrome.storage.sync.set({
       chatSkin: 'aero',
       lastTranslationTarget: 'ko',
+      liteModeEnabled: true,
       playgroundEnabled: true,
       playgroundGamesAvailable: true,
       sound: false,
@@ -708,6 +710,7 @@ describe('popup', () => {
     const translationDisplay = document.querySelector<HTMLSelectElement>('#translationDisplay')!;
     const sound = document.querySelector<HTMLInputElement>('#sound')!;
     const startupEffect = document.querySelector<HTMLInputElement>('#startupEffect')!;
+    const liteModeEnabled = document.querySelector<HTMLInputElement>('#liteModeEnabled')!;
     const playgroundEnabled = document.querySelector<HTMLInputElement>('#playgroundEnabled')!;
     const playgroundProfile = document.querySelector<HTMLElement>('#playgroundProfile')!;
     const playgroundProfileAvatar = document.querySelector<HTMLElement>('#playgroundProfileAvatar')!;
@@ -734,6 +737,7 @@ describe('popup', () => {
     expect(translationDisplay.value).toBe('below');
     expect(sound.checked).toBe(false);
     expect(startupEffect.checked).toBe(true);
+    expect(liteModeEnabled.checked).toBe(true);
     expect(playgroundEnabled.checked).toBe(true);
     expect(playgroundProfile.hidden).toBe(false);
     expect(playgroundProfileDetails.hidden).toBe(true);
@@ -784,6 +788,8 @@ describe('popup', () => {
     sound.dispatchEvent(new Event('change', { bubbles: true }));
     startupEffect.checked = true;
     startupEffect.dispatchEvent(new Event('change', { bubbles: true }));
+    liteModeEnabled.checked = false;
+    liteModeEnabled.dispatchEvent(new Event('change', { bubbles: true }));
     playgroundEnabled.checked = false;
     playgroundEnabled.dispatchEvent(new Event('change', { bubbles: true }));
 
@@ -793,6 +799,7 @@ describe('popup', () => {
     expect(document.querySelector('.sound-icon')?.classList.contains('ytcq-bell-ringing')).toBe(true);
     expect(document.querySelector('.startup-effect-icon')?.classList.contains('ytcq-sparkle-burst')).toBe(true);
     expect(chrome.storage.sync.set).toHaveBeenCalledWith({ chatSkin: 'system' });
+    expect(chrome.storage.sync.set).toHaveBeenCalledWith({ liteModeEnabled: false });
     expect(playgroundGamesSection.hidden).toBe(false);
     expect(playgroundGamesSection.classList.contains('playground-group-collapsed')).toBe(true);
     expect(playgroundProfile.hidden).toBe(true);

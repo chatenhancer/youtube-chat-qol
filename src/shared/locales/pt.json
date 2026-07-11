@@ -25,6 +25,16 @@
     "inbox": "Caixa de entrada",
     "inboxAriaUnread": "Caixa de entrada, {count} não lidas",
     "inboxEmpty": "Caixa de entrada vazia",
+    "liteMode": "Modo leve",
+    "enableLiteMode": "Ativar o modo leve",
+    "disableLiteMode": "Desativar o modo leve",
+    "liteModeLoadingChat": "Carregando chat",
+    "liteModeNewMessages": {
+      "one": "{count} nova mensagem",
+      "other": "{count} novas mensagens"
+    },
+    "liteModeJumpToLive": "Ir para o chat ao vivo",
+    "liteModeFallback": "O modo leve não conseguiu ler este chat, por isso o chat do YouTube foi restaurado.",
     "alertSounds": "Sons de alerta",
     "jumpToMessage": "Ir para a mensagem",
     "keywordOrPhrase": "Palavra-chave ou frase",
@@ -365,6 +375,15 @@
     },
     "appearance": {
       "message": "Aparência"
+    },
+    "liteMode": {
+      "message": "Modo leve"
+    },
+    "liteModeTitle": {
+      "message": "Use um feed de chat leve para melhorar o desempenho em chats movimentados."
+    },
+    "liteModeHelper": {
+      "message": "Use um feed de chat mais rápido e leve. Volta automaticamente ao chat do YouTube se necessário."
     },
     "startupShimmer": {
       "message": "Animação inicial"

@@ -25,6 +25,16 @@
     "inbox": "صندوق ورودی",
     "inboxAriaUnread": "صندوق ورودی، {count} خوانده‌نشده",
     "inboxEmpty": "صندوق ورودی خالی است",
+    "liteMode": "حالت سبک",
+    "enableLiteMode": "روشن کردن حالت سبک",
+    "disableLiteMode": "خاموش کردن حالت سبک",
+    "liteModeLoadingChat": "در حال بارگیری گفت‌وگو",
+    "liteModeNewMessages": {
+      "one": "{count} پیام جدید",
+      "other": "{count} پیام جدید"
+    },
+    "liteModeJumpToLive": "رفتن به گفتگوی زنده",
+    "liteModeFallback": "حالت سبک نتوانست این گفتگو را بخواند، بنابراین گفتگوی YouTube بازیابی شد.",
     "alertSounds": "صداهای هشدار",
     "jumpToMessage": "پرش به پیام",
     "keywordOrPhrase": "کلیدواژه یا عبارت",
@@ -362,6 +372,15 @@
     },
     "appearance": {
       "message": "ظاهر"
+    },
+    "liteMode": {
+      "message": "حالت سبک"
+    },
+    "liteModeTitle": {
+      "message": "برای بهبود عملکرد در گفتگوهای شلوغ از خوراک گفتگوی سبک استفاده کنید."
+    },
+    "liteModeHelper": {
+      "message": "از خوراک گفتگوی سریع‌تر و سبک‌تر استفاده کنید. در صورت نیاز به‌طور خودکار به گفتگوی YouTube بازمی‌گردد."
     },
     "startupShimmer": {
       "message": "پویانمایی شروع"

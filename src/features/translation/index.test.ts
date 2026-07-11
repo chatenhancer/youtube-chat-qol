@@ -73,6 +73,25 @@ describe('translation feature lifecycle wiring', () => {
     expect(queueMocks.queueMessageTranslation).toHaveBeenCalledTimes(2);
   });
 
+  it('backfills initial Lite rows without reprocessing native history', () => {
+    const nativeMessage = document.createElement('yt-live-chat-text-message-renderer');
+    const liteMessage = document.createElement('article');
+    liteMessage.classList.add('ytcq-lite-message');
+    const context = {
+      messageData: Promise.resolve(null),
+      source: 'existing' as const
+    };
+    setCurrentOptions({ ...DEFAULT_OPTIONS, targetLanguage: 'ja' });
+
+    lifecycle.message?.render?.(nativeMessage, context);
+    lifecycle.message?.render?.(liteMessage, context);
+
+    expect(queueMocks.queueMessageTranslation).toHaveBeenCalledTimes(1);
+    expect(queueMocks.queueMessageTranslation).toHaveBeenCalledWith(liteMessage, {
+      backfill: true
+    });
+  });
+
   it('does not requeue changed messages that already have a translation key', () => {
     const message = document.createElement('yt-live-chat-text-message-renderer');
     message.dataset.ytcqTranslationKey = 'existing-key';
