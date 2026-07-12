@@ -125,12 +125,12 @@ export function createLiteChatRenderer(
       : null;
   resizeObserver?.observe(items);
 
-  const unsubscribe = store.subscribe((change, records) => {
+  const unsubscribe = store.subscribe((change) => {
     if (destroyed) return;
-    handleStoreChange(change, records);
+    handleStoreChange(change);
   });
 
-  renderRecords(store.getRecords(), null);
+  renderRecords(null);
   setConnectionState('connecting');
   setTimestampsVisible(options.timestampsVisible === true);
 
@@ -138,7 +138,7 @@ export function createLiteChatRenderer(
     destroy,
     getMessageElement: (id) => rowsById.get(id) || null,
     rememberActionSources,
-    render: () => renderRecords(store.getRecords(), null),
+    render: () => renderRecords(null),
     root,
     scrollToLiveEdge,
     setConnectionState,
@@ -160,10 +160,7 @@ export function createLiteChatRenderer(
     }
   }
 
-  function handleStoreChange(
-    change: LiteChatStoreChange,
-    records: readonly LiteChatMessageRecord[]
-  ): void {
+  function handleStoreChange(change: LiteChatStoreChange): void {
     const wasFollowingLiveEdge = followingLiveEdge;
     const previousFrozenEndId = frozenEndId;
     rememberChangedRowSources(change);
@@ -175,7 +172,7 @@ export function createLiteChatRenderer(
       } else {
         setFollowingLiveEdge(false);
         frozenEndId = previousFrozenEndId;
-        pendingMessageCount = getResetPendingMessageCount(records, previousFrozenEndId);
+        pendingMessageCount = getResetPendingMessageCount(store.getRecords(), previousFrozenEndId);
       }
     } else if (!followingLiveEdge && change.addedIds.length) {
       pendingMessageCount = Math.min(
@@ -184,11 +181,19 @@ export function createLiteChatRenderer(
       );
     }
 
-    renderRecords(records, change);
+    if (followingLiveEdge || doesStoreChangeAffectFrozenWindow(change)) {
+      renderRecords(change);
+    }
     refreshNewMessagesButton();
     if (followingLiveEdge) {
       pinScrollToBottom();
     }
+  }
+
+  function doesStoreChangeAffectFrozenWindow(change: LiteChatStoreChange): boolean {
+    if (change.reset) return true;
+    if (change.removedIds.some((id) => id === frozenEndId || rowsById.has(id))) return true;
+    return change.updatedIds.some((id) => rowsById.has(id));
   }
 
   function getResetPendingMessageCount(
@@ -231,11 +236,8 @@ export function createLiteChatRenderer(
     }
   }
 
-  function renderRecords(
-    records: readonly LiteChatMessageRecord[],
-    change: LiteChatStoreChange | null
-  ): void {
-    const desired = getDesiredRecords(records);
+  function renderRecords(change: LiteChatStoreChange | null): void {
+    const desired = getDesiredRecords();
     const desiredIds = new Set(desired.map((record) => record.id));
     emptyState.hidden = desired.length > 0;
 
@@ -284,15 +286,14 @@ export function createLiteChatRenderer(
     }
   }
 
-  function getDesiredRecords(
-    records: readonly LiteChatMessageRecord[]
-  ): readonly LiteChatMessageRecord[] {
+  function getDesiredRecords(): readonly LiteChatMessageRecord[] {
     if (followingLiveEdge || !frozenEndId) {
-      const latest = records.slice(-renderLimit);
+      const latest = store.getLatest(renderLimit);
       frozenEndId = latest[latest.length - 1]?.id || '';
       return latest;
     }
 
+    const records = store.getRecords();
     let endIndex = records.findIndex((record) => record.id === frozenEndId);
     if (endIndex < 0) {
       const renderedIds = new Set(rowsById.keys());
@@ -320,7 +321,7 @@ export function createLiteChatRenderer(
       if (atLiveEdge && !followingLiveEdge) {
         setFollowingLiveEdge(true);
         pendingMessageCount = 0;
-        renderRecords(store.getRecords(), null);
+        renderRecords(null);
         refreshNewMessagesButton();
         pinScrollToBottom();
       } else if (atLiveEdge) {
@@ -346,7 +347,7 @@ export function createLiteChatRenderer(
     const pageSize = Math.max(1, Math.floor(renderLimit / 2));
     const nextEndIndex = endIndex - Math.min(pageSize, firstIndex);
     frozenEndId = records[nextEndIndex]?.id || frozenEndId;
-    renderRecords(records, null);
+    renderRecords(null);
 
     const nextAnchor = rowsById.get(firstId);
     if (nextAnchor) {
@@ -364,7 +365,7 @@ export function createLiteChatRenderer(
     setFollowingLiveEdge(true);
     frozenEndId = '';
     pendingMessageCount = 0;
-    renderRecords(store.getRecords(), null);
+    renderRecords(null);
     refreshNewMessagesButton();
     pinScrollToBottom();
   }

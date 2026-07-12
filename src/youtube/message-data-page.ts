@@ -39,6 +39,7 @@ const LITE_CHAT_TRANSPORT_STATE_KEY = Symbol.for('ytcq:lite-chat-transport:v1');
 const MAX_LITE_CHAT_RESPONSE_BYTES = 5 * 1024 * 1024;
 const MAX_LITE_CHAT_SEED_ACTIONS = 499;
 const MAX_UNRESOLVED_LITE_CHAT_RESPONSES = 2;
+const MAX_QUEUED_LITE_CHAT_RESPONSE_PARSES = 2;
 
 interface PendingLiteChatResponse {
   receivedAt: number;
@@ -54,8 +55,10 @@ interface LiteChatTransportState {
   handleControl: (event: Event) => void;
   initialActions: LiteChatAction[];
   originalFetch: typeof window.fetch;
+  parseBacklogFailureQueued: boolean;
   parseChain: Promise<void>;
   pendingStartupResponses: PendingLiteChatResponse[];
+  queuedResponseParses: number;
   preReadyActions: LiteChatAction[];
   preReadyCompatibilityWarnings: string[];
   preReadyContinuationTimeoutMs?: number;
@@ -141,6 +144,25 @@ function startLiteChatTransport(): void {
       ) {
         return;
       }
+      if (
+        state.enabled &&
+        state.queuedResponseParses >= MAX_QUEUED_LITE_CHAT_RESPONSE_PARSES
+      ) {
+        if (!state.parseBacklogFailureQueued) {
+          state.parseBacklogFailureQueued = true;
+          queueLiteChatFailure(
+            state,
+            source,
+            state.generation,
+            'response:parse-backlog',
+            source === 'replay' ? replayRequest : undefined,
+            () => {
+              state.parseBacklogFailureQueued = false;
+            }
+          );
+        }
+        return;
+      }
       let clone: Response;
       try {
         clone = response.clone();
@@ -191,8 +213,10 @@ function startLiteChatTransport(): void {
     handleControl: (event: Event) => handleLiteChatControl(event, state),
     initialActions: [],
     originalFetch,
+    parseBacklogFailureQueued: false,
     parseChain: Promise.resolve(),
     pendingStartupResponses: [],
+    queuedResponseParses: 0,
     preReadyActions: [],
     preReadyCompatibilityWarnings: [],
     preReadyFatalErrors: [],
@@ -450,7 +474,14 @@ function queueLiteChatResponse(
   receivedAt: number,
   replayRequest?: LiteChatReplayRequest
 ): void {
-  enqueueLiteChatParse(state, generation, async () => {
+  state.queuedResponseParses += 1;
+  let released = false;
+  const releaseQueuedResponse = (): void => {
+    if (released) return;
+    released = true;
+    state.queuedResponseParses = Math.max(0, state.queuedResponseParses - 1);
+  };
+  const task = async (): Promise<void> => {
     const resolvedReplayRequest = await replayRequest;
     if (state.replayRequests.isObsolete(resolvedReplayRequest)) return;
     const replayMetadata = resolvedReplayRequest?.playerOffsetMs !== undefined
@@ -537,7 +568,13 @@ function queueLiteChatResponse(
       source,
       unreadableFeed: source === 'send' ? false : parsed.unreadableFeed
     }, generation);
-  });
+  };
+  enqueueLiteChatParse(
+    state,
+    generation,
+    () => task().finally(releaseQueuedResponse),
+    releaseQueuedResponse
+  );
 }
 
 function queueLiteChatFailure(
@@ -545,9 +582,16 @@ function queueLiteChatFailure(
   source: LiteChatBatchSource,
   generation: number,
   reason: string,
-  replayRequest?: LiteChatReplayRequest
+  replayRequest?: LiteChatReplayRequest,
+  onSettled?: () => void
 ): void {
-  enqueueLiteChatParse(state, generation, async () => {
+  let settled = false;
+  const settle = (): void => {
+    if (settled) return;
+    settled = true;
+    onSettled?.();
+  };
+  const task = async (): Promise<void> => {
     const resolvedReplayRequest = await replayRequest;
     if (state.replayRequests.isObsolete(resolvedReplayRequest)) return;
     emitAndRememberLiteChatBatch(state, {
@@ -559,7 +603,8 @@ function queueLiteChatFailure(
         : {}),
       source
     }, generation);
-  });
+  };
+  enqueueLiteChatParse(state, generation, () => task().finally(settle), settle);
 }
 
 function getFeedDiagnostics(
@@ -634,12 +679,16 @@ function rememberLiteChatStartupMetadata(
 function enqueueLiteChatParse(
   state: LiteChatTransportState,
   generation: number,
-  task: () => void | Promise<void>
+  task: () => void | Promise<void>,
+  onSkipped?: () => void
 ): void {
   state.parseChain = state.parseChain
     .catch(() => undefined)
     .then(async () => {
-      if (!state.enabled || generation !== state.generation) return;
+      if (!state.enabled || generation !== state.generation) {
+        onSkipped?.();
+        return;
+      }
       await task();
     });
 }

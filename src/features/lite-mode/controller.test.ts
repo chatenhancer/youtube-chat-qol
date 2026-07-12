@@ -254,6 +254,27 @@ describe('Lite mode controller', () => {
     expect(document.querySelector('[data-message-id="two"]')).not.toBeNull();
   });
 
+  it('falls back before a rich live-action backlog exceeds its byte budget', () => {
+    startLiteMode({ clearCooldown: true });
+    const richText = 'x'.repeat(9_000);
+    for (let sequence = 1; sequence <= 5; sequence += 1) {
+      dispatchBatch({
+        ...createBatch(sequence, Array.from({ length: 100 }, (_value, index) => ({
+          type: 'upsert' as const,
+          record: createRecord(`rich-${sequence}-${index}`, richText)
+        }))),
+        continuationTimeoutMs: 5_000
+      });
+      if (!isLiteModeActive()) break;
+    }
+
+    expect(isLiteModeActive()).toBe(false);
+    expect(requestNativeChatRestoreMock).toHaveBeenCalledWith({
+      automaticFailure: true,
+      message: 'Loading chat'
+    });
+  });
+
   it('releases replay rows at their YouTube player offsets instead of by response batch', () => {
     window.history.replaceState({}, '', '/live_chat_replay');
     startLiteMode({ clearCooldown: true });
@@ -417,6 +438,32 @@ describe('Lite mode controller', () => {
     expect(replacement.isConnected).toBe(false);
     expect(document.querySelector('template[data-ytcq-lite-native-retainer]')).toBeNull();
     expect(requestNativeChatRestoreMock).not.toHaveBeenCalled();
+  });
+
+  it('reclaims a detached native list only when YouTube repopulates it', () => {
+    const nativeList = document.querySelector<HTMLElement>('yt-live-chat-item-list-renderer')!;
+    const ticker = document.createElement('yt-live-chat-ticker-renderer');
+    ticker.append(document.createElement('span'));
+    document.querySelector('yt-live-chat-renderer')!.append(ticker);
+    startLiteMode({ clearCooldown: true });
+    const root = document.querySelector<HTMLElement>('.ytcq-lite-root')!;
+
+    const repopulated = document.createElement('div');
+    repopulated.append(document.createElement('span'));
+    nativeList.append(repopulated);
+    expect(nativeList.querySelectorAll('*')).toHaveLength(2);
+
+    dispatchBatch(createBatch(1, [{
+      type: 'upsert',
+      record: createRecord('one', 'One')
+    }]));
+
+    expect(nativeList.querySelectorAll('*')).toHaveLength(0);
+    expect(root.dataset.ytcqLiteDetachedNativeRepopulations).toBe('1');
+    expect(root.dataset.ytcqLiteDetachedNativeReclaimedDescendants).toBe('2');
+    expect(root.dataset.ytcqLiteNativeTickerElements).toBe('2');
+    expect(Number(root.dataset.ytcqLiteStoreSize)).toBe(1);
+    expect(Number(root.dataset.ytcqLiteStoreBytes)).toBeGreaterThan(0);
   });
 
   it('does not classify document teardown during a tab reload as a Lite failure', async () => {

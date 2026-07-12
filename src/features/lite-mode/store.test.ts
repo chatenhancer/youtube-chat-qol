@@ -26,11 +26,13 @@ describe('Lite chat store', () => {
     store.apply([upsert(record)]);
     store.subscribe(listener);
 
-    const unchanged = store.apply([upsert({
-      ...record,
-      author: record.author ? { ...record.author, badges: [...record.author.badges] } : undefined,
-      runs: record.runs.map((run) => ({ ...run }))
-    })]);
+    const unchanged = store.apply([
+      upsert({
+        ...record,
+        author: record.author ? { ...record.author, badges: [...record.author.badges] } : undefined,
+        runs: record.runs.map((run) => ({ ...run }))
+      })
+    ]);
     expect(unchanged).toEqual({
       addedIds: [],
       removedIds: [],
@@ -69,9 +71,11 @@ describe('Lite chat store', () => {
 
   it('keeps bounded history and exposes a smaller latest render window', () => {
     const store = createLiteChatStore({ renderLimit: 3, storeLimit: 5 });
-    store.apply(Array.from({ length: 7 }, (_value, index) => (
-      upsert(createRecord(`message-${index}`, `Message ${index}`))
-    )));
+    store.apply(
+      Array.from({ length: 7 }, (_value, index) =>
+        upsert(createRecord(`message-${index}`, `Message ${index}`))
+      )
+    );
 
     expect(store.getRecords().map((record) => record.id)).toEqual([
       'message-2',
@@ -87,6 +91,45 @@ describe('Lite chat store', () => {
     ]);
   });
 
+  it('keeps the default steady-state history at 500 records through repeated compaction', () => {
+    const store = createLiteChatStore();
+    store.apply(
+      Array.from({ length: 2_000 }, (_value, index) =>
+        upsert(createRecord(`message-${index}`, `Message ${index}`))
+      )
+    );
+
+    expect(store.getSize()).toBe(500);
+    expect(store.getRecords().map((record) => record.id)).toEqual(
+      Array.from({ length: 500 }, (_value, index) => `message-${index + 1_500}`)
+    );
+    expect(store.getLatest(3).map((record) => record.id)).toEqual([
+      'message-1997',
+      'message-1998',
+      'message-1999'
+    ]);
+  });
+
+  it('trims rich records by retained weight before the count limit', () => {
+    const sampleRecord = createRecord('sample', 'x'.repeat(300));
+    const probe = createLiteChatStore({ storeLimit: 10 });
+    probe.apply([upsert(sampleRecord)]);
+    const recordBytes = probe.getRetainedBytes();
+    const store = createLiteChatStore({
+      storeByteLimit: recordBytes * 2 + 1,
+      storeLimit: 10
+    });
+
+    store.apply([
+      upsert(createRecord('one', 'x'.repeat(300))),
+      upsert(createRecord('two', 'x'.repeat(300))),
+      upsert(createRecord('three', 'x'.repeat(300)))
+    ]);
+
+    expect(store.getRecords().map((record) => record.id)).toEqual(['two', 'three']);
+    expect(store.getRetainedBytes()).toBeLessThanOrEqual(recordBytes * 2 + 1);
+  });
+
   it('notifies subscribers once per changed action batch', () => {
     const store = createLiteChatStore();
     const listener = vi.fn();
@@ -94,6 +137,7 @@ describe('Lite chat store', () => {
 
     store.apply([upsert(createRecord('one', 'One')), upsert(createRecord('two', 'Two'))]);
     expect(listener).toHaveBeenCalledTimes(1);
+    expect(listener.mock.calls[0]).toHaveLength(1);
     expect(listener.mock.calls[0][0].addedIds).toEqual(['one', 'two']);
 
     unsubscribe();

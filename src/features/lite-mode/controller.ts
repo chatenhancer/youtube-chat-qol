@@ -20,10 +20,12 @@ import {
   cleanupStaleLiteModeDom,
   discardNativeList,
   findNativeList,
+  inspectDetachedNativeLists,
   isNativeFeedDiscarded,
   NATIVE_HIDDEN_CLASS,
   NATIVE_LIST_SELECTOR,
   NATIVE_RETAINER_ATTRIBUTE,
+  resetDetachedNativeListDiagnostics,
   revealConnectedNativeLists
 } from './native-list';
 import {
@@ -54,6 +56,7 @@ const NATIVE_HIDE_TIMESTAMPS_ATTRIBUTE = 'hide-timestamps';
 const NATIVE_TIMESTAMP_TOGGLE_SELECTOR =
   'yt-live-chat-toggle-renderer tp-yt-paper-toggle-button';
 const PARTICIPANT_LIST_SELECTOR = 'yt-live-chat-participant-list-renderer';
+const NATIVE_TICKER_SELECTOR = 'yt-live-chat-ticker-renderer, #ticker';
 const STARTUP_TIMEOUT_MS = 20_000;
 const REPLAY_STARTUP_TIMEOUT_MS = 45_000;
 const DEFAULT_SOURCE_TIMEOUT_MS = 35_000;
@@ -65,6 +68,8 @@ const MAX_LIVE_ACTION_INTERVAL_MS = 2_500;
 const MAX_LIVE_ACTIONS_PER_TICK = 16;
 const MAX_PENDING_LIVE_ACTIONS = 2_000;
 const MAX_PENDING_REPLAY_ACTIONS = 2_000;
+const MAX_PENDING_LIVE_ACTION_BYTES = 16 * 1024 * 1024;
+const MAX_PENDING_REPLAY_ACTION_BYTES = 16 * 1024 * 1024;
 // One-off YouTube message types are skipped without disrupting Lite mode. Three
 // independent unreadable feed batches without a supported message indicate
 // that the main feed schema, rather than one special row, is no longer usable.
@@ -120,6 +125,8 @@ let liveActionIntervalMs = MAX_LIVE_ACTION_INTERVAL_MS;
 let liveActionsPerTick = 1;
 let pendingLiveActions: LiteChatAction[] = [];
 let pendingReplayActions: LiteChatAction[] = [];
+let pendingLiveActionBytes = 0;
+let pendingReplayActionBytes = 0;
 let replayProgressMs: number | null = null;
 let replayRequestsIdentifySeeks = false;
 let receivedSourceBatch = false;
@@ -347,6 +354,7 @@ function handleLiteChatBatchEvent(event: Event): void {
     renderer?.setConnectionState('connected');
   }
   applyBatchActions(batch);
+  refreshLiteMemoryDiagnostics(true);
   if (!active) return;
   if (isSourceHeartbeat(batch.source)) {
     scheduleSourceWatchdog(batch.continuationTimeoutMs);
@@ -396,7 +404,11 @@ function applyBatchActions(batch: LiteChatBatch): void {
     applyStoreActions(batch.actions, batch.source);
     return;
   }
-  if (pendingLiveActions.length + batch.actions.length > MAX_PENDING_LIVE_ACTIONS) {
+  const batchActionBytes = getLiteChatActionsBytes(batch.actions);
+  if (
+    pendingLiveActions.length + batch.actions.length > MAX_PENDING_LIVE_ACTIONS ||
+    pendingLiveActionBytes + batchActionBytes > MAX_PENDING_LIVE_ACTION_BYTES
+  ) {
     failLiteMode('action-backlog');
     return;
   }
@@ -404,6 +416,7 @@ function applyBatchActions(batch: LiteChatBatch): void {
   // Keep every live action in transport order. A later delete/reset must not
   // leapfrog a queued upsert, and a later single-message batch must not either.
   pendingLiveActions.push(...batch.actions);
+  pendingLiveActionBytes += batchActionBytes;
   // YouTube can hold a continuation for several seconds. Pace the whole batch
   // across that expected response window so the queue does not drain into a
   // visible pause before the next continuation arrives. Busy batches still use
@@ -449,10 +462,16 @@ function drainPendingLiveActions(): void {
     pendingLiveActions.length,
     Math.max(liveActionsPerTick, Math.ceil(pendingLiveActions.length / 100))
   );
-  applyStoreActions(pendingLiveActions.splice(0, actionCount), 'live');
+  const drainedActions = pendingLiveActions.splice(0, actionCount);
+  pendingLiveActionBytes = Math.max(
+    0,
+    pendingLiveActionBytes - getLiteChatActionsBytes(drainedActions)
+  );
+  applyStoreActions(drainedActions, 'live');
   if (!pendingLiveActions.length) {
     liveActionIntervalMs = MAX_LIVE_ACTION_INTERVAL_MS;
     liveActionsPerTick = 1;
+    refreshLiteMemoryDiagnostics();
     return;
   }
   liveActionTimer = window.setTimeout(drainPendingLiveActions, liveActionIntervalMs);
@@ -460,11 +479,16 @@ function drainPendingLiveActions(): void {
 
 function enqueueReplayActions(actions: readonly LiteChatAction[]): void {
   if (!actions.length) return;
-  if (pendingReplayActions.length + actions.length > MAX_PENDING_REPLAY_ACTIONS) {
+  const actionBytes = getLiteChatActionsBytes(actions);
+  if (
+    pendingReplayActions.length + actions.length > MAX_PENDING_REPLAY_ACTIONS ||
+    pendingReplayActionBytes + actionBytes > MAX_PENDING_REPLAY_ACTION_BYTES
+  ) {
     failLiteMode('action-backlog');
     return;
   }
   pendingReplayActions.push(...actions);
+  pendingReplayActionBytes += actionBytes;
   drainPendingReplayActions();
 }
 
@@ -479,7 +503,13 @@ function drainPendingReplayActions(): void {
     dueCount += 1;
   }
   if (!dueCount) return;
-  applyStoreActions(pendingReplayActions.splice(0, dueCount), 'replay');
+  const drainedActions = pendingReplayActions.splice(0, dueCount);
+  pendingReplayActionBytes = Math.max(
+    0,
+    pendingReplayActionBytes - getLiteChatActionsBytes(drainedActions)
+  );
+  applyStoreActions(drainedActions, 'replay');
+  if (!pendingReplayActions.length) refreshLiteMemoryDiagnostics();
 }
 
 function handleYouTubePlayerProgress(event: MessageEvent): void {
@@ -518,6 +548,7 @@ function discardNativeListIfPresent(): void {
   currentNativeList.classList.add(NATIVE_HIDDEN_CLASS);
   currentNativeList.setAttribute('aria-hidden', 'true');
   discardNativeList(currentNativeList);
+  refreshLiteMemoryDiagnostics(true);
 }
 
 export function handleLiteModeDomMutations(mutations: readonly MutationRecord[]): void {
@@ -835,6 +866,7 @@ function teardownLiteMode(clearIntent: boolean): void {
   renderer?.destroy();
   renderer = null;
   store = null;
+  resetDetachedNativeListDiagnostics();
   lastSequence = -1;
   receivedSourceBatch = false;
   unreadableFeedBatchesWithoutProgress = 0;
@@ -868,10 +900,12 @@ function clearLiveActionQueue(): void {
   liveActionIntervalMs = MAX_LIVE_ACTION_INTERVAL_MS;
   liveActionsPerTick = 1;
   pendingLiveActions = [];
+  pendingLiveActionBytes = 0;
 }
 
 function clearReplayActionQueue(): void {
   pendingReplayActions = [];
+  pendingReplayActionBytes = 0;
 }
 
 function clearPacedActionQueues(): void {
@@ -897,6 +931,34 @@ function isFeedCompatibilityHealthy(batch: LiteChatBatch): boolean {
   if (!batch.unreadableFeed) return true;
   unreadableFeedBatchesWithoutProgress += 1;
   return unreadableFeedBatchesWithoutProgress < MAX_UNREADABLE_FEED_BATCHES_WITHOUT_PROGRESS;
+}
+
+function refreshLiteMemoryDiagnostics(sampleNative = false): void {
+  const root = renderer?.root;
+  if (!root) return;
+  root.dataset.ytcqLiteStoreSize = String(store?.getSize() || 0);
+  root.dataset.ytcqLiteStoreBytes = String(store?.getRetainedBytes() || 0);
+  root.dataset.ytcqLitePendingLiveActions = String(pendingLiveActions.length);
+  root.dataset.ytcqLitePendingLiveActionBytes = String(pendingLiveActionBytes);
+  root.dataset.ytcqLitePendingReplayActions = String(pendingReplayActions.length);
+  root.dataset.ytcqLitePendingReplayActionBytes = String(pendingReplayActionBytes);
+  if (!sampleNative) return;
+
+  const detached = inspectDetachedNativeLists();
+  root.dataset.ytcqLiteDetachedNativeAlive = String(detached.aliveCount);
+  root.dataset.ytcqLiteDetachedNativeTracked = String(detached.trackedCount);
+  root.dataset.ytcqLiteDetachedNativeRepopulations = String(detached.repopulationCount);
+  root.dataset.ytcqLiteDetachedNativeReclaimedDescendants = String(
+    detached.reclaimedDescendantCount
+  );
+  root.dataset.ytcqLiteNativeTickerElements = String(
+    Array.from(document.querySelectorAll<HTMLElement>(NATIVE_TICKER_SELECTOR))
+      .reduce((count, ticker) => count + 1 + ticker.querySelectorAll('*').length, 0)
+  );
+}
+
+function getLiteChatActionsBytes(actions: readonly LiteChatAction[]): number {
+  return actions.reduce((total, action) => total + JSON.stringify(action).length * 2, 0);
 }
 
 function reportLiteModeError(error: unknown): void {

@@ -218,7 +218,9 @@ describe('Lite chat renderer', () => {
     ]);
     expect(renderer.root.dataset.ytcqFollowingLiveEdge).toBe('false');
 
+    const getRecords = vi.spyOn(store, 'getRecords');
     store.apply([{ type: 'upsert', record: createRecord('message-10', 'Message 10') }]);
+    expect(getRecords).not.toHaveBeenCalled();
     expect(getRenderedMessageIds(renderer.root)).toEqual([
       'message-4',
       'message-5',

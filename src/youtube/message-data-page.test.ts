@@ -853,6 +853,69 @@ describe('YouTube message data page adapter', () => {
     expect(batches).toHaveLength(1);
     window.removeEventListener(LITE_CHAT_BATCH_EVENT, listener);
   });
+
+  it('does not clone more than two live responses while parsing is backlogged', async () => {
+    vi.resetModules();
+    const batches: LiteChatBatch[] = [];
+    const listener = collectLiteChatBatches(batches);
+    window.addEventListener(LITE_CHAT_BATCH_EVENT, listener);
+    const resolvers: Array<(value: string) => void> = [];
+    const bodies = Array.from({ length: 2 }, () => new Promise<string>((resolve) => {
+      resolvers.push(resolve);
+    }));
+    const clones = bodies.map((body) => ({
+      headers: new Headers(),
+      ok: true,
+      status: 200,
+      text: () => body,
+      url: ''
+    }) as Response);
+    const cloneSpies = [
+      vi.fn(() => clones[0]),
+      vi.fn(() => clones[1]),
+      vi.fn(() => jsonResponse({ actions: [] })),
+      vi.fn(() => jsonResponse({ actions: [] })),
+      vi.fn(() => jsonResponse({ actions: [] }))
+    ];
+    window.fetch = vi.fn()
+      .mockResolvedValueOnce({ clone: cloneSpies[0], url: '' } as unknown as Response)
+      .mockResolvedValueOnce({ clone: cloneSpies[1], url: '' } as unknown as Response)
+      .mockResolvedValueOnce({ clone: cloneSpies[2], url: '' } as unknown as Response)
+      .mockResolvedValueOnce({ clone: cloneSpies[3], url: '' } as unknown as Response)
+      .mockResolvedValueOnce({ clone: cloneSpies[4], url: '' } as unknown as Response) as typeof window.fetch;
+    await import('./message-data-page');
+    dispatchLiteChatControl(true);
+
+    await Promise.all(Array.from({ length: 5 }, () => (
+      window.fetch('https://www.youtube.com/youtubei/v1/live_chat/get_live_chat')
+    )));
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(cloneSpies[0]).toHaveBeenCalledOnce();
+    expect(cloneSpies[1]).toHaveBeenCalledOnce();
+    cloneSpies.slice(2).forEach((clone) => expect(clone).not.toHaveBeenCalled());
+
+    resolvers[0](JSON.stringify({
+      continuationContents: {
+        liveChatContinuation: { actions: [textAction('one', 'One')] }
+      }
+    }));
+    await flushAsyncWork();
+    resolvers[1](JSON.stringify({
+      continuationContents: {
+        liveChatContinuation: { actions: [textAction('two', 'Two')] }
+      }
+    }));
+    await flushAsyncWork();
+
+    expect(batches.map((batch) => batch.fatalErrors)).toEqual([
+      undefined,
+      undefined,
+      ['response:parse-backlog']
+    ]);
+    window.removeEventListener(LITE_CHAT_BATCH_EVENT, listener);
+  });
 });
 
 function jsonResponse(value: unknown): Response {
