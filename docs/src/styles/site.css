@@ -760,7 +760,7 @@ h3 {
   color: var(--muted);
   background: transparent;
   border: 0;
-  border-radius: var(--compact-icon-surface-corner-radius);
+  border-radius: 999px;
   cursor: pointer;
 }
 
