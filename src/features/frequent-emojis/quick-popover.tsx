@@ -141,7 +141,9 @@ export function renderQuickEmojiPopover(
 
   nextPopover.dataset.ytcqEmojiRenderKey = renderKey;
   nextPopover.replaceChildren(
-    ...displayEmojis.map((emoji) => createFrequentEmojiButton(emoji, onChooseEmoji))
+    ...displayEmojis.map((emoji) =>
+      createFrequentEmojiButton(emoji, onChooseEmoji, { showTooltip: false })
+    )
   );
   return nextPopover;
 }

@@ -56,7 +56,8 @@ function getFrequentEmojiRowHost(picker: HTMLElement): HTMLElement {
 
 export function createFrequentEmojiButton(
   emoji: EmojiUsage,
-  chooseEmoji: (emoji: EmojiUsage) => void
+  chooseEmoji: (emoji: EmojiUsage) => void,
+  options: { showTooltip?: boolean } = {}
 ): HTMLButtonElement {
   const displayEmoji = emoji;
   const title = getFrequentEmojiButtonTitle(displayEmoji);
@@ -71,7 +72,7 @@ export function createFrequentEmojiButton(
     <button
       type="button"
       class="ytcq-frequent-emoji-button"
-      title={title}
+      title={options.showTooltip === false ? undefined : title}
       aria-label={title}
       onPointerDown={activate}
       onMouseDown={(event: MouseEvent) => {

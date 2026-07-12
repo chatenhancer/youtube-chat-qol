@@ -23,6 +23,9 @@ describe('quick emoji popover rendering', () => {
     expect(popover.getAttribute('aria-label')).toBe('MOST USED');
     expect(popover.style.getPropertyValue('--ytcq-quick-emoji-columns')).toBe('2');
     expect(popover.querySelectorAll('button')).toHaveLength(2);
+    expect(Array.from(popover.querySelectorAll('button')).every((button) => !button.title)).toBe(
+      true
+    );
     expect(popover.querySelector('img')?.alt).toBe(':custom-heart:');
     expect(popover.querySelector<HTMLButtonElement>('button:last-child')?.textContent).toBe('👋');
 
@@ -41,7 +44,8 @@ describe('quick emoji popover rendering', () => {
 
     renderQuickEmojiPopover(popover, [emoji({ ...wave, count: 2 })], chooseEmoji);
     expect(popover.querySelector('button')).not.toBe(firstButton);
-    expect(popover.querySelector('button')?.title).toBe('👋 (2 uses)');
+    expect(popover.querySelector('button')?.title).toBe('');
+    expect(popover.querySelector('button')?.getAttribute('aria-label')).toBe('👋 (2 uses)');
 
     document.body.append(popover);
     expect(renderQuickEmojiPopover(popover, [], chooseEmoji)).toBeNull();
