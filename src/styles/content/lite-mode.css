@@ -143,6 +143,7 @@
 }
 
 .ytcq-lite-content {
+  align-self: center;
   min-width: 0;
   line-height: 16px;
   overflow-wrap: anywhere;

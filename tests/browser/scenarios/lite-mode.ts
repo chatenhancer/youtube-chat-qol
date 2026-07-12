@@ -268,6 +268,7 @@ export const liteModeMockRenderingAndFallbackScenario: BrowserScenario = async (
           'wave-emoji'
         );
         await expect(liteRow.locator('#author-photo')).toBeVisible();
+        await expect(liteRow.locator('.ytcq-lite-content')).toHaveCSS('align-self', 'center');
         await expect(liteRow.locator('#author-name')).toContainText('@LiteViewer');
         const longModerator = chat.locator(
           '[data-message-id="lite-browser-message-long-moderator"]'
