@@ -9,9 +9,9 @@ interface GamePostPaths {
   wild: string;
 }
 
-const { messages: m, playgroundPostPath, gamePostPaths, rootPrefix } = Astro.props as {
+const { messages: m, playgroundLearnMorePath, gamePostPaths, rootPrefix } = Astro.props as {
   messages: Messages;
-  playgroundPostPath: string;
+  playgroundLearnMorePath: string;
   gamePostPaths: GamePostPaths;
   rootPrefix: string;
 };
@@ -57,7 +57,7 @@ const playgroundGames = [
           </span>
           {m.playground.primaryCta}
         </a>
-        <a class="button playground-link" href={playgroundPostPath}>
+        <a class="button playground-link" href={playgroundLearnMorePath}>
           <span class="button-icon" data-symbol="ads_click" aria-hidden="true">
             <Icon name="ads_click" />
           </span>

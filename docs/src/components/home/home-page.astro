@@ -23,6 +23,7 @@ if (!playgroundPost) {
   throw new Error('Missing required Playground blog post.');
 }
 const playgroundPostPath = getBlogPostPath(playgroundPost);
+const playgroundLearnMorePath = locale === 'en' ? '/playground/' : playgroundPostPath;
 const gamePostPaths = {
   chess: playgroundPostPath,
   stickAround: getRequiredBlogPostPath('stick-around-its-raining-bubbles'),
@@ -42,7 +43,7 @@ function getRequiredBlogPostPath(translationKey: string): string {
 
 <Hero messages={messages} posts={posts} rootPrefix={rootPrefix} />
 <Features messages={messages} />
-<Playground messages={messages} playgroundPostPath={playgroundPostPath} gamePostPaths={gamePostPaths} rootPrefix={rootPrefix} />
+<Playground messages={messages} playgroundLearnMorePath={playgroundLearnMorePath} gamePostPaths={gamePostPaths} rootPrefix={rootPrefix} />
 <Screenshots messages={messages} rootPrefix={rootPrefix} />
 <Install locale={locale} messages={messages} rootPrefix={rootPrefix} />
 <Privacy locale={locale} messages={messages} />

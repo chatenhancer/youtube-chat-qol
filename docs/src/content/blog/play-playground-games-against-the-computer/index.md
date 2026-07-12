@@ -19,16 +19,16 @@ You can now play Playground games against **Computer** when another viewer is no
 
 Open the Games panel, choose a game, and invite a Computer player from the player list.
 
-Computer opponents are available for:
+Computer opponents are available in every Playground game:
 
 - **Chess**, with **Computer (Beginner)**, **Computer (Club)**, and **Computer (Master)** for three difficulty levels.
-- **HELP-A-FRIEND! Trivia**, so replay trivia can still be played when nobody else is free.
+- **HELP-A-FRIEND! Trivia, The Wild Wild Chat, and Stick Around!**, so every game can still be played when nobody else is free.
 
 ## How Computer plays
 
 In Chess, Computer waits briefly before moving. Beginner is the easiest opponent, Club offers a mid-level game, and Master is the toughest.
 
-In *HELP-A-FRIEND! Trivia*, Computer answers during each question round and does not always get it right.
+In *HELP-A-FRIEND! Trivia*, Computer answers during each question round and does not always get it right. In *The Wild Wild Chat*, it watches for messages that match an open bounty and tries to claim them before you do. In *Stick Around!*, it moves around the arena, dodges falling chat bubbles, and fights to be the last player standing.
 
 ## Why add it?
 

@@ -1,0 +1,82 @@
+---
+import { getCollection } from 'astro:content';
+import Footer from '../../components/home/footer.astro';
+import Header from '../../components/home/header.astro';
+import PlaygroundPage from '../../components/playground/playground-page.astro';
+import { getBlogPostPath, getLocalizedBlogPosts } from '../../data/blog';
+import { getMessages } from '../../data/locales';
+import { site } from '../../data/site';
+import BaseLayout from '../../layouts/base-layout.astro';
+
+const locale = 'en';
+const messages = getMessages(locale);
+const posts = getLocalizedBlogPosts(await getCollection('blog'), locale);
+
+function getRequiredPostPath(translationKey: string): string {
+  const post = posts.find((candidate) => candidate.data.translationKey === translationKey);
+  if (!post) throw new Error(`Missing required Playground post: ${translationKey}`);
+  return getBlogPostPath(post);
+}
+
+const games = [
+  {
+    alt: 'Chess board in a floating Playground panel beside YouTube live chat',
+    body: 'Keep a familiar chessboard beside chat. Invite another viewer or choose a Beginner, Club, or Master Computer opponent without leaving the stream.',
+    href: getRequiredPostPath('introducing-playground-tiny-games-for-live-chat-breaks'),
+    image: '/assets/playground/page/chess.webp',
+    imageHeight: 1586,
+    imageWidth: 1400,
+    title: "Good Ol' Chess"
+  },
+  {
+    alt: 'HELP-A-FRIEND! Trivia asking viewers to pick an answer',
+    body: 'YouTube replay moments turn into a quick chat-style quiz. Do you remember what happened during the stream? Invite a friend and find out.',
+    href: getRequiredPostPath('new-in-0-14-0-help-a-friend-trivia'),
+    image: '/assets/playground/page/replay-trivia.webp',
+    imageHeight: 1570,
+    imageWidth: 1400,
+    title: 'HELP-A-FRIEND! Trivia'
+  },
+  {
+    alt: 'The Wild Wild Chat bounty board inside a Playground panel',
+    body: 'Chat becomes a fast bounty hunt where players race to claim matching messages. Who is taking home all the loot?',
+    href: getRequiredPostPath('the-wild-wild-chat-coming-to-chat-enhancer-0-15-0'),
+    image: '/assets/playground/page/wild-wild-chat.webp',
+    imageHeight: 1538,
+    imageWidth: 1400,
+    title: 'The Wild Wild Chat'
+  },
+  {
+    alt: 'Stick Around! turning the YouTube live chat feed into a fighting arena',
+    body: 'Stick Around! turns the live chat feed into a tiny fighting arena with falling chat bubbles. Push your opponent out of the ring before they do.',
+    href: getRequiredPostPath('stick-around-its-raining-bubbles'),
+    image: '/assets/playground/page/stick-around.webp',
+    imageHeight: 1787,
+    imageWidth: 1400,
+    title: 'Stick Around!'
+  }
+];
+
+const title = `Playground - Tiny games for YouTube live chat | ${site.title}`;
+const description = 'Explore Playground, an opt-in collection of tiny games that stays close to YouTube live chat.';
+const canonicalUrl = `${site.url}/playground/`;
+const computerHref = getRequiredPostPath('play-playground-games-against-the-computer');
+---
+
+<BaseLayout
+  alternateLinks={[{ href: canonicalUrl, hreflang: 'en' }]}
+  canonicalUrl={canonicalUrl}
+  description={description}
+  imageAlt="Playground games inside Chat Enhancer for YouTube live chat"
+  locale={locale}
+  messages={messages}
+  rootPrefix="../"
+  title={title}
+  xDefaultUrl={canonicalUrl}
+>
+  <Header languageUrls={{ en: '/playground/' }} locale={locale} messages={messages} />
+  <main id="top">
+    <PlaygroundPage computerHref={computerHref} games={games} />
+  </main>
+  <Footer locale={locale} messages={messages} />
+</BaseLayout>
