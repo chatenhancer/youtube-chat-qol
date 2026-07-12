@@ -43,9 +43,12 @@ async function expectFrequentEmojiBehavior({
       await expectEmojiUsageCount(context, 1);
       await expectFrequentEmojiRow(chat);
       await reloadChatSurface(chat);
+      await hoverQuickEmojiAndExpectComposerInsertion(chat);
+      await expectEmojiUsageCount(context, 2);
+      await expectQuickPopoverClosesForNativePicker(chat);
       await expectFrequentEmojiRow(chat);
       await clickFrequentEmojiAndExpectComposerInsertion(chat);
-      await expectEmojiUsageCount(context, 2);
+      await expectEmojiUsageCount(context, 3);
     }
   );
 }
@@ -119,6 +122,70 @@ async function clickFrequentEmojiAndExpectComposerInsertion(chat: ChatSurface): 
   });
 }
 
+async function hoverQuickEmojiAndExpectComposerInsertion(chat: ChatSurface): Promise<void> {
+  await test.step('Hover the emoji button and use the quick emoji popover', async () => {
+    await clearChatComposer(chat);
+    await getEmojiPickerButton(chat).hover();
+    const popover = chat.locator('.ytcq-quick-emoji-popover');
+    await expect(popover).toBeVisible({ timeout: 5_000 });
+    const button = getQuickEmojiButton(chat);
+    await expect(button).toBeVisible();
+    if (!(await clickLocatorAtCurrentCenter(button))) {
+      throw new Error('Quick emoji button has no clickable point in the current viewport.');
+    }
+    await expect
+      .poll(async () => getChatComposerText(chat), {
+        message: 'Quick emoji button should insert the emoji into the composer.',
+        timeout: 5_000
+      })
+      .toContain(TEST_EMOJI);
+  });
+}
+
+async function expectQuickPopoverClosesForNativePicker(chat: ChatSurface): Promise<void> {
+  await test.step('Open the native picker without leaving the quick popover behind', async () => {
+    await getEmojiPickerButton(chat).hover();
+    const popover = chat.locator('.ytcq-quick-emoji-popover');
+    await expect(popover).toBeVisible({ timeout: 5_000 });
+    const body = chat.locator('body');
+    await body.evaluate((element) => {
+      const root = element as HTMLElement & { ytcqQuickEmojiObserver?: MutationObserver };
+      root.dataset.ytcqQuickEmojiReopens = '0';
+      root.ytcqQuickEmojiObserver = new MutationObserver((mutations) => {
+        const additions = mutations.reduce((count, mutation) => {
+          return (
+            count +
+            Array.from(mutation.addedNodes).filter((node) => {
+              return (
+                node instanceof Element &&
+                (node.matches('.ytcq-quick-emoji-popover') ||
+                  Boolean(node.querySelector('.ytcq-quick-emoji-popover')))
+              );
+            }).length
+          );
+        }, 0);
+        root.dataset.ytcqQuickEmojiReopens = String(
+          Number(root.dataset.ytcqQuickEmojiReopens || 0) + additions
+        );
+      });
+      root.ytcqQuickEmojiObserver.observe(root, { childList: true, subtree: true });
+    });
+
+    await getEmojiPickerButton(chat).click();
+
+    await expect(popover).toHaveCount(0);
+    await expect(chat.locator('yt-emoji-picker-renderer').first()).toBeVisible({ timeout: 5_000 });
+    await body.evaluate(() => new Promise((resolve) => window.setTimeout(resolve, 700)));
+    const reopenCount = await body.evaluate((element) => {
+      const root = element as HTMLElement & { ytcqQuickEmojiObserver?: MutationObserver };
+      root.ytcqQuickEmojiObserver?.disconnect();
+      delete root.ytcqQuickEmojiObserver;
+      return Number(root.dataset.ytcqQuickEmojiReopens || 0);
+    });
+    expect(reopenCount).toBe(0);
+  });
+}
+
 async function expectEmojiUsageCount(
   context: BrowserContext,
   expectedCount: number
@@ -184,6 +251,20 @@ function getFrequentEmojiButton(chat: ChatSurface) {
       has: chat.locator(`img[alt="${TEST_EMOJI}"]`)
     })
     .or(chat.locator('.ytcq-frequent-emoji-button').filter({ hasText: TEST_EMOJI }))
+    .first();
+}
+
+function getQuickEmojiButton(chat: ChatSurface) {
+  return chat
+    .locator('.ytcq-quick-emoji-popover .ytcq-frequent-emoji-button')
+    .filter({
+      has: chat.locator(`img[alt="${TEST_EMOJI}"]`)
+    })
+    .or(
+      chat
+        .locator('.ytcq-quick-emoji-popover .ytcq-frequent-emoji-button')
+        .filter({ hasText: TEST_EMOJI })
+    )
     .first();
 }
 

@@ -839,8 +839,12 @@
   box-shadow: none !important;
 }
 
-:root[data-ytcq-chat-skin="aero"] yt-emoji-picker-renderer .ytcq-frequent-emoji-button {
-  border-radius: 4px;
+:root[data-ytcq-chat-skin="aero"] :where(
+  yt-emoji-picker-renderer,
+  .ytcq-quick-emoji-popover
+) .ytcq-frequent-emoji-button {
+  border-radius: var(--ytcq-squircle-radius-control);
+  corner-shape: var(--ytcq-squircle-corner-shape);
   color: var(--ytcq-aero-text);
   background: transparent;
 }
@@ -1262,6 +1266,7 @@
   .ytcq-profile-card,
   .ytcq-focus-card,
   .ytcq-composer-translate-panel,
+  .ytcq-quick-emoji-popover,
   .ytcq-command-autocomplete-card,
   .ytcq-command-help-card,
   .ytcq-games-card,
@@ -2066,6 +2071,7 @@
   .ytcq-profile-card,
   .ytcq-focus-card,
   .ytcq-composer-translate-panel,
+  .ytcq-quick-emoji-popover,
   .ytcq-command-autocomplete-card,
   .ytcq-command-help-card,
   .ytcq-games-card,

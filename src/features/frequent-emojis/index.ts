@@ -1,13 +1,21 @@
 /**
- * Most-used emoji row.
+ * Most-used emoji surfaces.
  *
  * Tracks emoji selections locally, renders a compact row at the top of
- * YouTube's emoji picker, and inserts selected frequent emojis directly into
- * the chat input. The row is capped so it does not crowd the native emoji list.
+ * YouTube's emoji picker, and exposes the same emojis from a composer-adjacent
+ * quick popover. Both surfaces insert directly into the native chat input.
  */
+import { registerFeatureLifecycle } from '../../content/lifecycle';
 import { getEmojiUsageData, isVariantParentEmoji } from './data';
 import { insertEmojiIntoChat } from './insert';
-import { registerFeatureLifecycle } from '../../content/lifecycle';
+import {
+  cleanupDisconnectedQuickEmojiPopover,
+  cleanupQuickEmojiPopover,
+  initQuickEmojiPopover,
+  refreshQuickEmojiPopover,
+  resetQuickEmojiPopover,
+  suppressQuickEmojiPopoverForNativePicker
+} from './quick-popover';
 import { renderFrequentEmojiRow as renderFrequentEmojiRowView } from './row';
 import type { EmojiUsage } from './types';
 import { getTopEmojiUsage, normalizeEmojiUsage, upsertEmojiUsage } from './usage';
@@ -29,13 +37,17 @@ registerFeatureLifecycle({
 });
 
 export function initFrequentEmojis(): void {
+  frequentEmojiListeners.abort();
+  frequentEmojiListeners = new AbortController();
   document.addEventListener('click', handleEmojiPickerClick, {
     capture: true,
     signal: frequentEmojiListeners.signal
   });
+  initQuickEmojiPopover(() => getTopEmojiUsage(emojiUsage), chooseFrequentEmoji);
   chrome.storage.local.get({ [EMOJI_USAGE_STORAGE_KEY]: [] }, (stored) => {
     emojiUsage = normalizeEmojiUsage((stored || {})[EMOJI_USAGE_STORAGE_KEY]);
     refreshEmojiPickers();
+    refreshQuickEmojiPopover();
   });
 }
 
@@ -45,21 +57,17 @@ export function enhanceEmojiPicker(picker: Element): void {
 }
 
 export function resetFrequentEmojis(): void {
-  window.clearTimeout(emojiUsageSaveTimer);
-  window.clearTimeout(emojiPickerRefreshTimer);
-  emojiUsageSaveTimer = 0;
-  emojiPickerRefreshTimer = 0;
+  clearFrequentEmojiTimers();
   emojiUsage = [];
+  resetQuickEmojiPopover();
   document.querySelectorAll('.ytcq-frequent-emoji-row').forEach((row) => row.remove());
 }
 
 export function cleanupStaleFrequentEmojis(): void {
   frequentEmojiListeners.abort();
   frequentEmojiListeners = new AbortController();
-  window.clearTimeout(emojiUsageSaveTimer);
-  window.clearTimeout(emojiPickerRefreshTimer);
-  emojiUsageSaveTimer = 0;
-  emojiPickerRefreshTimer = 0;
+  clearFrequentEmojiTimers();
+  cleanupQuickEmojiPopover();
   document.querySelectorAll('.ytcq-frequent-emoji-row').forEach((row) => row.remove());
 }
 
@@ -76,39 +84,44 @@ function scheduleEmojiPickerRefresh(): void {
 }
 
 function isEmojiPickerToggle(target: Element): boolean {
-  return !target.closest('yt-emoji-picker-renderer') &&
-    Boolean(target.closest('#emoji.style-scope.yt-live-chat-message-input-renderer'));
+  return (
+    !target.closest('yt-emoji-picker-renderer') &&
+    Boolean(target.closest('#emoji.style-scope.yt-live-chat-message-input-renderer'))
+  );
 }
 
 export function handleEmojiPickerClick(event: Event): void {
   const target = event.target instanceof Element ? event.target : null;
-  if (target && isEmojiPickerToggle(target)) {
-    scheduleEmojiPickerRefresh();
-  }
+  if (target && isEmojiPickerToggle(target)) scheduleEmojiPickerRefresh();
 
   const option = target?.closest('yt-emoji-picker-renderer [role="option"]');
   if (!option || option.closest('.ytcq-frequent-emoji-row')) return;
 
   const emoji = getEmojiUsageData(option);
-  if (!emoji) return;
-  if (isVariantParentEmoji(emoji)) return;
-
+  if (!emoji || isVariantParentEmoji(emoji)) return;
   recordEmojiUsage(emoji);
 }
 
 function handleFrequentEmojiMutations({ addedElements }: { addedElements: Element[] }): void {
+  cleanupDisconnectedQuickEmojiPopover();
+  if (addedElements.some(containsNativeEmojiPicker)) {
+    suppressQuickEmojiPopoverForNativePicker();
+  }
   addedElements.forEach((element) => {
-    if (element.matches('yt-emoji-picker-renderer')) {
-      enhanceEmojiPicker(element);
-    }
+    if (element.matches('yt-emoji-picker-renderer')) enhanceEmojiPicker(element);
 
     const containingEmojiPicker = element.closest('yt-emoji-picker-renderer');
-    if (containingEmojiPicker) {
-      enhanceEmojiPicker(containingEmojiPicker);
-    }
+    if (containingEmojiPicker) enhanceEmojiPicker(containingEmojiPicker);
 
     element.querySelectorAll('yt-emoji-picker-renderer').forEach(enhanceEmojiPicker);
   });
+}
+
+function containsNativeEmojiPicker(element: Element): boolean {
+  return (
+    element.matches('yt-emoji-picker-renderer') ||
+    Boolean(element.querySelector('yt-emoji-picker-renderer'))
+  );
 }
 
 function renderFrequentEmojiRow(picker: HTMLElement): void {
@@ -124,6 +137,7 @@ function recordEmojiUsage(emoji: EmojiUsage, options: { refreshPickers?: boolean
   emojiUsage = upsertEmojiUsage(emojiUsage, emoji);
   scheduleEmojiUsageSave();
   if (options.refreshPickers !== false) refreshEmojiPickers();
+  refreshQuickEmojiPopover();
 }
 
 function scheduleEmojiUsageSave(): void {
@@ -131,4 +145,11 @@ function scheduleEmojiUsageSave(): void {
   emojiUsageSaveTimer = window.setTimeout(() => {
     chrome.storage.local.set({ [EMOJI_USAGE_STORAGE_KEY]: emojiUsage });
   }, 150);
+}
+
+function clearFrequentEmojiTimers(): void {
+  window.clearTimeout(emojiUsageSaveTimer);
+  window.clearTimeout(emojiPickerRefreshTimer);
+  emojiUsageSaveTimer = 0;
+  emojiPickerRefreshTimer = 0;
 }

@@ -54,7 +54,7 @@ function getFrequentEmojiRowHost(picker: HTMLElement): HTMLElement {
   );
 }
 
-function createFrequentEmojiButton(
+export function createFrequentEmojiButton(
   emoji: EmojiUsage,
   chooseEmoji: (emoji: EmojiUsage) => void
 ): HTMLButtonElement {
@@ -113,7 +113,7 @@ function getFrequentEmojiButtonTitle(emoji: EmojiUsage): string {
   return `${label} (${t('emojiUsageCount', { count: emoji.count })})`;
 }
 
-function getFrequentEmojiRenderKey(topEmojis: EmojiUsage[]): string {
+export function getFrequentEmojiRenderKey(topEmojis: EmojiUsage[]): string {
   return topEmojis
     .map((emoji) =>
       [

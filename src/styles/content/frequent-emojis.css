@@ -34,7 +34,8 @@ yt-emoji-picker-renderer .ytcq-frequent-emoji-list {
   overflow: hidden;
 }
 
-yt-emoji-picker-renderer .ytcq-frequent-emoji-button {
+yt-emoji-picker-renderer .ytcq-frequent-emoji-button,
+.ytcq-quick-emoji-popover .ytcq-frequent-emoji-button {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -51,16 +52,131 @@ yt-emoji-picker-renderer .ytcq-frequent-emoji-button {
 }
 
 yt-emoji-picker-renderer .ytcq-frequent-emoji-button:hover,
-yt-emoji-picker-renderer .ytcq-frequent-emoji-button:focus {
+yt-emoji-picker-renderer .ytcq-frequent-emoji-button:focus,
+.ytcq-quick-emoji-popover .ytcq-frequent-emoji-button:hover,
+.ytcq-quick-emoji-popover .ytcq-frequent-emoji-button:focus {
   background: var(--ytcq-hover-background);
   outline: none;
 }
 
-yt-emoji-picker-renderer .ytcq-frequent-emoji-button img {
+yt-emoji-picker-renderer .ytcq-frequent-emoji-button img,
+.ytcq-quick-emoji-popover .ytcq-frequent-emoji-button img {
   display: block;
   width: 100%;
   max-width: 24px;
   height: auto;
   aspect-ratio: 1;
   object-fit: contain;
+}
+
+.ytcq-quick-emoji-popover {
+  position: fixed;
+  z-index: 10002;
+  display: grid;
+  grid-template-columns: repeat(var(--ytcq-quick-emoji-columns, 10), 28px);
+  direction: ltr;
+  gap: 4px;
+  width: max-content;
+  max-width: calc(100vw - 16px);
+  box-sizing: border-box;
+  padding: 6px;
+  border: 1px solid var(--ytcq-control-border);
+  border-radius: 999px;
+  corner-shape: round;
+  color: var(--yt-spec-text-primary, var(--yt-live-chat-primary-text-color, #f1f1f1));
+  background: var(--yt-spec-raised-background, var(--yt-live-chat-background-color, #282828));
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.32);
+  transform-origin: right bottom;
+  animation: ytcq-quick-emoji-popover-in 120ms ease-out both;
+  will-change: opacity, transform;
+}
+
+.ytcq-quick-emoji-popover::after {
+  position: absolute;
+  right: 0;
+  bottom: -7px;
+  width: 48px;
+  height: 7px;
+  content: "";
+}
+
+.ytcq-quick-emoji-popover-below {
+  transform-origin: right top;
+}
+
+.ytcq-quick-emoji-popover-below::after {
+  top: -7px;
+  bottom: auto;
+}
+
+.ytcq-quick-emoji-popover-closing {
+  pointer-events: none;
+  animation: ytcq-quick-emoji-popover-out 100ms ease-in both;
+}
+
+.ytcq-quick-emoji-popover .ytcq-frequent-emoji-button {
+  position: relative;
+  z-index: 0;
+  width: 28px;
+  padding: 3px;
+  transition:
+    transform 140ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    filter 140ms ease;
+  transform-origin: center;
+}
+
+.ytcq-quick-emoji-popover .ytcq-frequent-emoji-button:hover,
+.ytcq-quick-emoji-popover .ytcq-frequent-emoji-button:focus {
+  background: transparent;
+}
+
+.ytcq-quick-emoji-popover .ytcq-frequent-emoji-button:where(:hover, :focus-visible) {
+  z-index: 1;
+  transform: scale(1.46);
+  filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.26));
+}
+
+.ytcq-quick-emoji-popover .ytcq-frequent-emoji-button img {
+  max-width: 22px;
+}
+
+@media (max-width: 343px) {
+  .ytcq-quick-emoji-popover {
+    grid-template-columns: repeat(var(--ytcq-quick-emoji-compact-columns, 5), 28px);
+  }
+}
+
+@keyframes ytcq-quick-emoji-popover-in {
+  from {
+    opacity: 0;
+    transform: translateY(3px) scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes ytcq-quick-emoji-popover-out {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(2px) scale(0.97);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ytcq-quick-emoji-popover,
+  .ytcq-quick-emoji-popover-closing {
+    animation-duration: 1ms;
+  }
+
+  .ytcq-quick-emoji-popover .ytcq-frequent-emoji-button {
+    transition-duration: 1ms;
+  }
 }
