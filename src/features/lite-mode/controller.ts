@@ -59,9 +59,9 @@ const REPLAY_STARTUP_TIMEOUT_MS = 45_000;
 const DEFAULT_SOURCE_TIMEOUT_MS = 35_000;
 const MAX_SOURCE_WATCHDOG_MS = MAX_LITE_CHAT_CONTINUATION_TIMEOUT_MS * 2 + 5_000;
 const DEFAULT_LIVE_ACTION_WINDOW_MS = 1_000;
-const MAX_LIVE_ACTION_WINDOW_MS = 3_000;
+const MAX_LIVE_ACTION_WINDOW_MS = 5_000;
 const MIN_LIVE_ACTION_INTERVAL_MS = 25;
-const MAX_LIVE_ACTION_INTERVAL_MS = 1_000;
+const MAX_LIVE_ACTION_INTERVAL_MS = 2_500;
 const MAX_LIVE_ACTIONS_PER_TICK = 16;
 const MAX_PENDING_LIVE_ACTIONS = 2_000;
 const MAX_PENDING_REPLAY_ACTIONS = 2_000;
@@ -404,10 +404,10 @@ function applyBatchActions(batch: LiteChatBatch): void {
   // Keep every live action in transport order. A later delete/reset must not
   // leapfrog a queued upsert, and a later single-message batch must not either.
   pendingLiveActions.push(...batch.actions);
-  // YouTube can hold a lightly busy continuation for several seconds. Spread
-  // that small batch far enough to preserve chat velocity, but cap each new
-  // smoothing window at three seconds. Busy batches automatically use shorter
-  // intervals and multiple actions per tick to avoid a backlog.
+  // YouTube can hold a continuation for several seconds. Pace the whole batch
+  // across that expected response window so the queue does not drain into a
+  // visible pause before the next continuation arrives. Busy batches still use
+  // shorter intervals and multiple actions per tick to avoid a backlog.
   const actionWindowMs = batch.continuationTimeoutMs && batch.continuationTimeoutMs > 0
     ? Math.min(batch.continuationTimeoutMs, MAX_LIVE_ACTION_WINDOW_MS)
     : DEFAULT_LIVE_ACTION_WINDOW_MS;
@@ -428,7 +428,9 @@ function applyBatchActions(batch: LiteChatBatch): void {
   liveActionsPerTick = liveActionTimer
     ? Math.max(liveActionsPerTick, nextActionsPerTick)
     : nextActionsPerTick;
-  if (!liveActionTimer) drainPendingLiveActions();
+  if (!liveActionTimer) {
+    liveActionTimer = window.setTimeout(drainPendingLiveActions, liveActionIntervalMs);
+  }
 }
 
 function applyStoreActions(

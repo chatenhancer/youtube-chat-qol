@@ -24,9 +24,8 @@ import {
   type LiteChatStoreChange
 } from './store';
 
-const LIVE_EDGE_TOLERANCE_PX = 32;
+const LIVE_EDGE_TOLERANCE_PX = 2;
 const MAX_PENDING_MESSAGE_COUNT = 999;
-const USER_SCROLL_INTENT_MS = 1_000;
 const SCROLLBACK_LOAD_THRESHOLD_PX = 48;
 
 export type LiteChatRowSource = 'added' | 'changed' | 'existing';
@@ -69,11 +68,6 @@ export function createLiteChatRenderer(
   let pendingMessageCount = 0;
   let destroyed = false;
   let scrollFrame = 0;
-  let scrollBottomFrame = 0;
-  let lastScrollTop = 0;
-  let upwardScrollIntentUntil = 0;
-  let directScrollIntentUntil = 0;
-  const globalListeners = new AbortController();
 
   const loadingSpinner = createLoadingSpinner('ytcq-lite-loading-spinner');
   const emptyStateLabel = el<HTMLSpanElement>(
@@ -90,9 +84,13 @@ export function createLiteChatRenderer(
       {emptyState}
     </div>
   );
+  const scrollAnchor = el<HTMLDivElement>(
+    <div class="ytcq-lite-scroll-anchor" aria-hidden="true" />
+  );
   const scroller = el<HTMLDivElement>(
     <div id="item-scroller" class="ytcq-lite-scroller" tabIndex={0}>
       {items}
+      {scrollAnchor}
     </div>
   );
   const newMessagesButton = el<HTMLButtonElement>(
@@ -114,49 +112,15 @@ export function createLiteChatRenderer(
   );
 
   newMessagesButton.addEventListener('click', () => scrollToLiveEdge());
-  scroller.addEventListener('scroll', scheduleScrollStateUpdate, { passive: true });
-  scroller.addEventListener('wheel', handleWheel, { passive: true });
-  scroller.addEventListener('pointerdown', handlePointerDown, { passive: true });
-  scroller.addEventListener('touchstart', markDirectScrollIntent, { passive: true });
-  window.addEventListener('pointerup', finishDirectScrollIntent, {
-    passive: true,
-    signal: globalListeners.signal
-  });
-  window.addEventListener('pointercancel', clearScrollIntent, {
-    passive: true,
-    signal: globalListeners.signal
-  });
-  window.addEventListener('touchend', finishDirectScrollIntent, {
-    passive: true,
-    signal: globalListeners.signal
-  });
-  window.addEventListener('touchcancel', clearScrollIntent, {
-    passive: true,
-    signal: globalListeners.signal
-  });
-  scroller.addEventListener('keydown', (event) => {
-    if (
-      ['ArrowUp', 'Home', 'PageUp'].includes(event.key) ||
-      (event.key === ' ' && event.shiftKey)
-    ) {
-      markUpwardScrollIntent();
-    } else if (
-      ['ArrowDown', 'End', 'PageDown'].includes(event.key) ||
-      (event.key === ' ' && !event.shiftKey)
-    ) {
-      clearScrollIntent();
-    }
-  });
+  scroller.addEventListener('scroll', handleScroll, { passive: true });
   const resizeObserver =
     typeof ResizeObserver === 'function'
       ? new ResizeObserver(() => {
           if (!followingLiveEdge) return;
-          if (hasActiveScrollIntent()) return;
-          // ResizeObserver runs before paint. Pin here as well as in the queued
-          // frame so translated text, fonts, and decoded media cannot expose a
-          // one-frame gap at the live edge.
+          // ResizeObserver runs before paint. Pin here alongside the browser
+          // anchor so translated text, fonts, and decoded media keep
+          // the live edge stable even where CSS scroll anchoring is unavailable.
           pinScrollToBottom();
-          scheduleScrollToBottom();
         })
       : null;
   resizeObserver?.observe(items);
@@ -224,7 +188,6 @@ export function createLiteChatRenderer(
     refreshNewMessagesButton();
     if (followingLiveEdge) {
       pinScrollToBottom();
-      scheduleScrollToBottom();
     }
   }
 
@@ -344,36 +307,26 @@ export function createLiteChatRenderer(
     return records.slice(Math.max(0, endIndex - renderLimit + 1), endIndex + 1);
   }
 
+  function handleScroll(): void {
+    if (followingLiveEdge && !isAtLiveEdge(scroller)) leaveLiveEdge();
+    scheduleScrollStateUpdate();
+  }
+
   function scheduleScrollStateUpdate(): void {
     if (scrollFrame) return;
     scrollFrame = window.requestAnimationFrame(() => {
       scrollFrame = 0;
       const atLiveEdge = isAtLiveEdge(scroller);
-      const movedUp = scroller.scrollTop < lastScrollTop - 1;
-      lastScrollTop = scroller.scrollTop;
       if (atLiveEdge && !followingLiveEdge) {
-        clearScrollIntent();
         setFollowingLiveEdge(true);
         pendingMessageCount = 0;
         renderRecords(store.getRecords(), null);
         refreshNewMessagesButton();
         pinScrollToBottom();
-        scheduleScrollToBottom();
       } else if (atLiveEdge) {
         setFollowingLiveEdge(true);
       } else if (!atLiveEdge && followingLiveEdge) {
-        const now = performance.now();
-        const hasUpwardIntent = now <= upwardScrollIntentUntil;
-        const hasDirectIntent = now <= directScrollIntentUntil;
-        if (movedUp && (hasUpwardIntent || hasDirectIntent)) {
-          setFollowingLiveEdge(false);
-          const rendered = Array.from(rowsById.keys());
-          frozenEndId = rendered[rendered.length - 1] || '';
-        } else {
-          // Image/layout growth can increase scrollHeight without any user
-          // input. Preserve the live edge unless scrollTop actually moved up.
-          scheduleScrollToBottom();
-        }
+        leaveLiveEdge();
       }
       if (!followingLiveEdge && scroller.scrollTop <= SCROLLBACK_LOAD_THRESHOLD_PX) {
         loadEarlierRecords();
@@ -382,7 +335,6 @@ export function createLiteChatRenderer(
   }
 
   function loadEarlierRecords(): void {
-    if (!hasActiveScrollIntent()) return;
     const records = store.getRecords();
     const firstRow = items.querySelector<HTMLElement>('.ytcq-lite-message');
     const firstId = firstRow?.dataset.messageId || '';
@@ -399,64 +351,22 @@ export function createLiteChatRenderer(
     const nextAnchor = rowsById.get(firstId);
     if (nextAnchor) {
       scroller.scrollTop += nextAnchor.getBoundingClientRect().top - anchorTop;
-      lastScrollTop = scroller.scrollTop;
     }
   }
 
-  function handleWheel(event: WheelEvent): void {
-    if (event.deltaY < 0) {
-      markUpwardScrollIntent();
-    }
-  }
-
-  function handlePointerDown(event: PointerEvent): void {
-    if (event.pointerType === 'touch' || event.target === scroller) {
-      markDirectScrollIntent();
-    }
-  }
-
-  function markUpwardScrollIntent(): void {
-    upwardScrollIntentUntil = performance.now() + USER_SCROLL_INTENT_MS;
-    cancelScheduledScrollToBottom();
-  }
-
-  function markDirectScrollIntent(): void {
-    // Pointer/touch drags have an explicit end event and may legitimately last
-    // longer than the wheel/keyboard intent window.
-    directScrollIntentUntil = Number.POSITIVE_INFINITY;
-    cancelScheduledScrollToBottom();
-  }
-
-  function finishDirectScrollIntent(): void {
-    if (directScrollIntentUntil === 0) return;
-    directScrollIntentUntil = performance.now() + USER_SCROLL_INTENT_MS;
-  }
-
-  function clearScrollIntent(): void {
-    upwardScrollIntentUntil = 0;
-    directScrollIntentUntil = 0;
-    if (followingLiveEdge) scheduleScrollToBottom();
-  }
-
-  function hasActiveScrollIntent(): boolean {
-    const now = performance.now();
-    return now <= upwardScrollIntentUntil || now <= directScrollIntentUntil;
-  }
-
-  function cancelScheduledScrollToBottom(): void {
-    if (scrollBottomFrame) window.cancelAnimationFrame(scrollBottomFrame);
-    scrollBottomFrame = 0;
+  function leaveLiveEdge(): void {
+    setFollowingLiveEdge(false);
+    const rendered = Array.from(rowsById.keys());
+    frozenEndId = rendered[rendered.length - 1] || '';
   }
 
   function scrollToLiveEdge(): void {
-    clearScrollIntent();
     setFollowingLiveEdge(true);
     frozenEndId = '';
     pendingMessageCount = 0;
     renderRecords(store.getRecords(), null);
     refreshNewMessagesButton();
     pinScrollToBottom();
-    scheduleScrollToBottom();
   }
 
   function setFollowingLiveEdge(following: boolean): void {
@@ -466,18 +376,8 @@ export function createLiteChatRenderer(
   }
 
   function pinScrollToBottom(): void {
-    if (destroyed || !followingLiveEdge || hasActiveScrollIntent()) return;
+    if (destroyed || !followingLiveEdge) return;
     scroller.scrollTop = Math.max(0, scroller.scrollHeight - scroller.clientHeight);
-    lastScrollTop = scroller.scrollTop;
-  }
-
-  function scheduleScrollToBottom(): void {
-    if (scrollBottomFrame) return;
-    scrollBottomFrame = window.requestAnimationFrame(() => {
-      scrollBottomFrame = 0;
-      if (destroyed || !followingLiveEdge) return;
-      pinScrollToBottom();
-    });
   }
 
   function setConnectionState(state: LiteChatConnectionState): void {
@@ -512,15 +412,12 @@ export function createLiteChatRenderer(
     unsubscribe();
     resizeObserver?.disconnect();
     if (scrollFrame) window.cancelAnimationFrame(scrollFrame);
-    if (scrollBottomFrame) window.cancelAnimationFrame(scrollBottomFrame);
     scrollFrame = 0;
-    scrollBottomFrame = 0;
     rowsById.clear();
     renderedRecords.clear();
     dispatchedRecordIds.clear();
     pendingRowSources.clear();
     stagedActionSources.clear();
-    globalListeners.abort();
     root.remove();
   }
 }

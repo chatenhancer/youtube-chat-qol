@@ -199,16 +199,16 @@ describe('Lite mode controller', () => {
       continuationTimeoutMs: 1_000
     });
 
-    expect(document.querySelectorAll('.ytcq-lite-message')).toHaveLength(1);
+    expect(document.querySelectorAll('.ytcq-lite-message')).toHaveLength(0);
     await vi.advanceTimersByTimeAsync(249);
-    expect(document.querySelectorAll('.ytcq-lite-message')).toHaveLength(1);
+    expect(document.querySelectorAll('.ytcq-lite-message')).toHaveLength(0);
     await vi.advanceTimersByTimeAsync(1);
-    expect(document.querySelectorAll('.ytcq-lite-message')).toHaveLength(2);
-    await vi.advanceTimersByTimeAsync(500);
+    expect(document.querySelectorAll('.ytcq-lite-message')).toHaveLength(1);
+    await vi.advanceTimersByTimeAsync(750);
     expect(document.querySelectorAll('.ytcq-lite-message')).toHaveLength(4);
   });
 
-  it('smooths a light continuation batch instead of collapsing it into one burst', async () => {
+  it('paces a light continuation batch through the next expected response', async () => {
     startLiteMode({ clearCooldown: true });
     dispatchBatch({
       ...createBatch(1, [
@@ -219,12 +219,14 @@ describe('Lite mode controller', () => {
       continuationTimeoutMs: 5_000
     });
 
-    expect(document.querySelectorAll('.ytcq-lite-message')).toHaveLength(1);
-    await vi.advanceTimersByTimeAsync(999);
-    expect(document.querySelectorAll('.ytcq-lite-message')).toHaveLength(1);
+    expect(document.querySelectorAll('.ytcq-lite-message')).toHaveLength(0);
+    await vi.advanceTimersByTimeAsync(1_665);
+    expect(document.querySelectorAll('.ytcq-lite-message')).toHaveLength(0);
     await vi.advanceTimersByTimeAsync(1);
+    expect(document.querySelectorAll('.ytcq-lite-message')).toHaveLength(1);
+    await vi.advanceTimersByTimeAsync(1_666);
     expect(document.querySelectorAll('.ytcq-lite-message')).toHaveLength(2);
-    await vi.advanceTimersByTimeAsync(1_000);
+    await vi.advanceTimersByTimeAsync(1_666);
     expect(document.querySelectorAll('.ytcq-lite-message')).toHaveLength(3);
   });
 
@@ -239,6 +241,9 @@ describe('Lite mode controller', () => {
     });
     dispatchBatch(createBatch(2, [{ type: 'remove', id: 'one' }]));
 
+    expect(document.querySelector('[data-message-id="one"]')).toBeNull();
+    expect(document.querySelector('[data-message-id="two"]')).toBeNull();
+    await vi.advanceTimersByTimeAsync(250);
     expect(document.querySelector('[data-message-id="one"]')).not.toBeNull();
     expect(document.querySelector('[data-message-id="two"]')).toBeNull();
     await vi.advanceTimersByTimeAsync(250);
@@ -651,7 +656,7 @@ describe('Lite mode controller', () => {
       ]),
       continuationTimeoutMs: 1_000
     });
-    await vi.advanceTimersByTimeAsync(500);
+    await vi.advanceTimersByTimeAsync(1_000);
 
     expect(onRow.mock.calls.map(([, record, source]) => [record.id, source])).toEqual([
       ['initial', 'existing'],

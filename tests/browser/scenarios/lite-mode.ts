@@ -175,7 +175,8 @@ export const liteModeToggleAndRestoreScenario: BrowserScenario = async ({ chat, 
 
 export const liteModeMockRenderingAndFallbackScenario: BrowserScenario = async ({
   chat,
-  context
+  context,
+  page
 }) => {
   await withExtensionStorageValues(context, 'sync', { liteModeEnabled: false }, async () => {
     await installLiteDiagnostics(chat);
@@ -308,6 +309,60 @@ export const liteModeMockRenderingAndFallbackScenario: BrowserScenario = async (
         await liteRow.locator('#author-name').click();
         await expect.poll(() => getChatComposerText(chat)).toContain('@LiteViewer');
         await clearChatComposerIfVisible(chat);
+      });
+
+      await test.step('Release the live edge on a small upward wheel step', async () => {
+        const nextSequence = await getNextLiteBatchSequence(chat);
+        await dispatchLiteBatch(
+          chat,
+          createBatch(
+            nextSequence,
+            Array.from({ length: 40 }, (_value, index) => ({
+              type: 'upsert',
+              record: createRecord(
+                `lite-browser-scroll-${index}`,
+                `Scrollable Lite message ${index}`
+              )
+            }))
+          )
+        );
+        await expect(chat.locator('[data-message-id="lite-browser-scroll-39"]')).toBeVisible();
+        const scroller = chat.locator(`${LITE_ROOT_SELECTOR} .ytcq-lite-scroller`);
+        await expect.poll(() => scroller.evaluate((element) =>
+          element.scrollHeight > element.clientHeight
+        )).toBe(true);
+        await scroller.evaluate((element) => {
+          element.scrollTop = element.scrollHeight;
+          element.dispatchEvent(new Event('scroll', { bubbles: true }));
+        });
+        await expect(chat.locator(LITE_ROOT_SELECTOR)).toHaveAttribute(
+          'data-ytcq-following-live-edge',
+          'true'
+        );
+
+        await scroller.hover();
+        await page.mouse.wheel(0, -20);
+
+        await expect(chat.locator(LITE_ROOT_SELECTOR)).toHaveAttribute(
+          'data-ytcq-following-live-edge',
+          'false'
+        );
+        await expect.poll(() => scroller.evaluate((element) =>
+          element.scrollHeight - element.clientHeight - element.scrollTop
+        )).toBeGreaterThan(2);
+        await page.waitForTimeout(100);
+
+        await scroller.evaluate((element) => {
+          element.scrollTop = element.scrollHeight;
+          element.dispatchEvent(new Event('scroll', { bubbles: true }));
+        });
+        await expect(chat.locator(LITE_ROOT_SELECTOR)).toHaveAttribute(
+          'data-ytcq-following-live-edge',
+          'true'
+        );
+        await expect.poll(() => scroller.evaluate((element) =>
+          element.scrollHeight - element.clientHeight - element.scrollTop
+        )).toBeLessThanOrEqual(2);
       });
 
       await test.step('Keep Lite mode after one unsupported feed row', async () => {

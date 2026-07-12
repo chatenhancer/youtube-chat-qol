@@ -29,12 +29,15 @@
   min-height: 0;
   overflow-x: hidden;
   overflow-y: auto;
-  overflow-anchor: none;
+  overflow-anchor: auto;
   overscroll-behavior: contain;
 }
 
-.ytcq-lite-root[data-ytcq-following-live-edge="false"] .ytcq-lite-scroller {
+.ytcq-lite-scroll-anchor {
+  width: 1px;
+  height: 1px;
   overflow-anchor: auto;
+  pointer-events: none;
 }
 
 .ytcq-lite-items {
@@ -44,6 +47,7 @@
   min-height: 100%;
   justify-content: flex-end;
   padding: 8px 0;
+  overflow-anchor: none;
 }
 
 .ytcq-lite-empty-state {
