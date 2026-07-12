@@ -18,15 +18,11 @@ tags:
 
 Playground é um pequeno espaço de jogos dentro do Chat Enhancer. Ele permite jogar com outros espectadores que têm a extensão instalada e estão na mesma live.
 
-O streamer se afastou por um minuto? Abra o Playground, jogue uma partida rápida e mantenha o chat por perto.
-
 :::media-right
 
 ![Painel compacto de uma partida de Xadrez flutuando sobre o chat ao vivo do YouTube](./f779ebcc57f8280d.png){shadow=smooth rotation=-2}
 
 Os jogos continuam compactos. O painel é arrastável, então você pode tirá-lo do caminho quando o chat voltar a acelerar.
-
-Xadrez foi o primeiro jogo do Playground e ainda explica melhor a ideia: uma atividade rápida ao lado do chat, sem tomar conta da página.
 
 :::
 
@@ -36,20 +32,15 @@ Abra o painel Jogos, escolha **Xadrez** e convide alguém disponível na mesma l
 
 O jogo usa as regras normais do xadrez. As jogadas são verificadas antes de serem enviadas, os turnos ficam sincronizados entre os dois jogadores e a partida pode terminar em xeque-mate, empate ou desistência. Se a live voltar a ficar movimentada, arraste o painel para o lado e continue assistindo.
 
-Se não houver mais ninguém por perto, Xadrez também aceita oponentes **Computer**. Escolha **Computer (Beginner)**, **Computer (Club)** ou **Computer (Master)** na lista de jogadores e comece uma partida do mesmo jeito que faria com outro espectador.
+Se não houver mais ninguém por perto, Xadrez também aceita oponentes Computer. Escolha **Computer (Beginner)**, **Computer (Club)** ou **Computer (Master)** na lista de jogadores e comece uma partida do mesmo jeito que faria com outro espectador.
 
 ## Por que isso combina com o chat ao vivo
 
-Playground não é uma sala de jogos completa grudada no YouTube. Ele existe para as partes mais lentas de uma live, quando o chat continua aberto, mas não há muita coisa acontecendo.
+Playground não é uma sala de jogos completa grudada no YouTube. Ele existe para as partes mais lentas de uma live, quando o chat continua aberto, mas não há muita coisa acontecendo. Isso significa que Xadrez é pequeno de propósito:
 
-Isso significa que Xadrez é pequeno de propósito:
-
-- Ele roda a partir do painel Jogos dentro da extensão.
 - Usa um tabuleiro compacto e móvel.
 - Mostra apenas jogadores disponíveis que também estão usando o Chat Enhancer na live atual.
 - Mantém o restante do YouTube visível, para você voltar ao chat imediatamente.
-
-As configurações do Playground ficam no popup da extensão.
 
 :::media-left
 
@@ -64,7 +55,5 @@ Dentro do painel Jogos, ative **Disponível para convites** quando quiser que ou
 ## Agora é mais que Xadrez
 
 O Playground cresceu desde esta primeira prévia de Xadrez. Você também pode jogar [HELP-A-FRIEND! Trivia](/pt/blog/new-in-0-14-0-help-a-friend-trivia/), e [The Wild Wild Chat](/pt/blog/the-wild-wild-chat-coming-to-chat-enhancer-0-15-0/) transforma o chat ao vivo em uma caça rápida por recompensas.
-
-O fluxo continua igual: abra o painel Jogos, convide um espectador ou um oponente Computer quando houver suporte, jogue uma partida compacta e mantenha a live por perto.
 
 Se tiver sugestões, envie um e-mail para [hello@chatenhancer.com](mailto:hello@chatenhancer.com).

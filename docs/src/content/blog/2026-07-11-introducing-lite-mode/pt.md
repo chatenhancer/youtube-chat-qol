@@ -20,8 +20,6 @@ Um chat ao vivo movimentado pode ser uma das melhores partes de uma transmissão
 
 O modo Lite oferece outra opção: um feed de mensagens menor e leve, criado para continuar responsivo quando o chat fica cheio.
 
-Ele é totalmente opcional e pode ser ativado ou desativado quando você quiser.
-
 ## O que o modo Lite muda
 
 O modo Lite substitui apenas o feed rolável de mensagens. O vídeo, o cabeçalho do chat, a caixa de mensagens, o seletor de emojis, a seleção de chat, as configurações e a visualização de Participantes continuam pertencendo ao YouTube.
@@ -35,8 +33,6 @@ A maior melhoria deve ser perceptível em chats rápidos ou sessões longas de v
 As mensagens mantêm o layout familiar do YouTube, incluindo avatares, nomes de usuário, selos de moderador e de verificação, horários, emojis personalizados, assinaturas, presentes e mensagens pagas.
 
 Os recursos do Chat Enhancer também continuam funcionando nas linhas leves. Isso inclui tradução, destaques do Inbox, perfis de usuário e mensagens recentes, modo Focus, favoritos, ações de mensagem, temas e superfícies compatíveis do Playground.
-
-
 
 Alguns recursos do YouTube talvez ainda não sejam compatíveis com o modo Lite, por exemplo, a possibilidade de denunciar ou bloquear alguém no chat. Esses recursos passarão a ser compatíveis em futuras atualizações da extensão. Continuaremos atualizando o modo Lite à medida que o YouTube introduzir novos recursos.
 
@@ -59,8 +55,6 @@ O modo Lite não adiciona outra conta de chat nem envia mensagens por um serviç
 
 ## Por que o rótulo beta?
 
-O feed leve já cobre a experiência cotidiana do chat, mas os detalhes importam. Pretendemos continuar ajustando o ritmo das mensagens, a rolagem, as transições de replay, o estilo, os limites de desempenho e a compatibilidade com novos formatos de mensagem do YouTube conforme aprendemos como o modo Lite se comporta em mais transmissões e dispositivos.
-
-É por isso que o botão tem um selo **Beta**. Ele está pronto para ser testado, mas ainda continuará mudando.
+O feed leve já cobre a experiência cotidiana do chat, mas os detalhes importam. Pretendemos continuar ajustando o ritmo das mensagens, a rolagem, as transições de replay, o estilo, os limites de desempenho e a compatibilidade com novos formatos de mensagem do YouTube conforme aprendemos como o modo Lite se comporta em mais transmissões e dispositivos. É por isso que o botão tem um selo **Beta**. Ele está pronto para ser testado, mas ainda continuará mudando.
 
 Se algo parecer estranho, conte o que você percebeu pelo e-mail [hello@chatenhancer.com](mailto:hello@chatenhancer.com). Um link da transmissão, a informação de que era ao vivo ou um replay e o que aconteceu antes do problema são especialmente úteis.

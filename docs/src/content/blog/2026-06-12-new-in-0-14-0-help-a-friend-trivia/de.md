@@ -12,8 +12,6 @@ tags:
   - "trivia"
 ---
 
-Das zweite Playground-Spiel ist da: **HELP-A-FRIEND! Trivia**.
-
 :::media-right
 
 ![HELP-A-FRIEND! Trivia-Logo](./2026-06-12-new-in-0-14-0-help-a-friend-trivia-assets/6ef6d6f2584f127f.png){shadow=smooth;rotate=-8deg}

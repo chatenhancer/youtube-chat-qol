@@ -15,8 +15,6 @@ tags:
 
 Ora è più facile entrare in Playground: puoi giocare contro **Computer**.
 
-A volte la chat è tranquilla. A volte i tuoi amici stanno guardando un altro stream. A volte vuoi solo fare una partita veloce senza aspettare che qualcun altro accetti. Computer ti dà un’altra opzione.
-
 ## Come funziona
 
 Apri Playground dal pannello Giochi e cerca un giocatore Computer nell’elenco dei giocatori. Invitalo come inviteresti un altro spettatore. La partita parte automaticamente e il resto di Playground funziona come sempre.
@@ -26,17 +24,9 @@ Gli avversari Computer sono disponibili per:
 - **Scacchi**, con **Computer (Beginner)**, **Computer (Club)** e **Computer (Master)**, così puoi scegliere una partita più leggera, intermedia o più impegnativa.
 - **HELP-A-FRIEND! Trivia**, così la trivia sui replay resta giocabile anche quando nessun altro è disponibile.
 
-## Scegli la difficoltà di Scacchi
+## Come gioca Computer
 
-Scacchi ora ha tre avversari Computer. Beginner è l’opzione più facile per scaldarsi, Club gioca una partita intermedia più solida e Master è la scelta più impegnativa.
-
-Non serve un’impostazione separata: scegli il profilo Computer che vuoi dall’elenco dei giocatori e manda un invito.
-
-## Sembra ancora Playground
-
-Non è una modalità in solitaria separata né una nuova schermata. I giocatori Computer si comportano come normali avversari di Playground: apri il pannello, scegli un gioco, manda un invito e gioca.
-
-In Scacchi, Computer aspetta un attimo prima di muovere, così la partita non sembra istantanea.
+In Scacchi, Computer aspetta un attimo prima di muovere, così la partita non sembra istantanea. Scacchi ora ha tre avversari Computer. Beginner è l’opzione più facile per scaldarsi, Club gioca una partita intermedia più solida e Master è la scelta più impegnativa.
 
 In *HELP-A-FRIEND! Trivia*, Computer risponde durante il round della domanda proprio come farebbe un altro giocatore. Non è perfetto, quindi hai ancora una vera possibilità di vincere.
 

@@ -12,17 +12,17 @@ tags: []
 
 *Chat themes are now available in version 0.17!*
 
-Themes are meant to make chat more personal to you. For now, we will be releasing a pre-made set of themes (starting with **Aero**), with customizable themes coming in the future.
+Themes make chat more personal. We are starting with a set of ready-made themes, beginning with **Aero**, and plan to add customization later.
 
 :::media-left
 
 ![screenshot yoiapjpu 2x](./2026-07-07-themes-are-here-assets/055231c0965487a1.png){width=77%;rotate=3.5deg}
 
-To enable a theme, go to the **Appearance** section in the extension settings. Pick one of the available themes to spice up the chat interface!
+To enable a theme, open **Appearance** in the extension settings and choose one from the list.
 
 :::
 
 ## About the Aero theme
-Aero is a theme that mimics the aesthetics of late-2007 chat interfaces. It’s nostalgic, watery, and refreshing! 💧
+Aero draws on the glossy, translucent look of late-2000s chat interfaces. 💧
 
-As always, you can send us suggestions for themes, or anything else, at [hello@chatenhancer.com](mailto:hello@chatenhancer.com).
+Send theme suggestions to [hello@chatenhancer.com](mailto:hello@chatenhancer.com).

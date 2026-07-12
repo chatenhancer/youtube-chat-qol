@@ -18,15 +18,11 @@ tags:
 
 Playground ist ein kleiner Spielebereich in Chat Enhancer. Dort kannst du mit anderen Zuschauern spielen, die die Erweiterung installiert haben und gerade im selben Stream sind.
 
-Der Streamer ist kurz weg? Öffne Playground, spiele eine schnelle Runde und behalte den Chat trotzdem direkt im Blick.
-
 :::media-right
 
 ![Kompaktes Schachpanel über dem YouTube-Livechat](./f779ebcc57f8280d.png){shadow=smooth rotation=-2}
 
 Die Spiele bleiben kompakt. Das Panel lässt sich verschieben, damit du es aus dem Weg ziehen kannst, sobald der Chat wieder anzieht.
-
-Schach war das erste Playground-Spiel und erklärt die Idee immer noch am besten: eine schnelle Nebenbeschäftigung, die nah am Chat bleibt, statt die ganze Seite zu übernehmen.
 
 :::
 
@@ -36,20 +32,15 @@ Schach war das erste Playground-Spiel und erklärt die Idee immer noch am besten
 
 Gespielt wird nach normalen Schachregeln. Züge werden geprüft, bevor sie gesendet werden, die Runden bleiben bei beiden Spielern synchron, und die Partie kann mit Schachmatt, Remis oder Aufgabe enden. Wenn der Stream wieder spannender wird, ziehst du das Panel einfach zur Seite und schaust weiter.
 
-Wenn gerade niemand anderes da ist, unterstützt Schach auch **Computer**-Gegner. Wähle **Computer (Beginner)**, **Computer (Club)** oder **Computer (Master)** aus der Spielerliste und starte die Partie genauso wie mit einem anderen Zuschauer.
+Wenn gerade niemand anderes da ist, unterstützt Schach auch Computer-Gegner. Wähle **Computer (Beginner)**, **Computer (Club)** oder **Computer (Master)** aus der Spielerliste und starte die Partie genauso wie mit einem anderen Zuschauer.
 
 ## Warum es in den Livechat gehört
 
-Playground ist kein vollständiger Spielraum, der nachträglich an YouTube angeklebt wurde. Es ist für die ruhigen Phasen eines Streams gedacht, wenn der Chat noch offen ist, aber gerade nicht viel passiert.
+Playground ist kein vollständiger Spielraum, der nachträglich an YouTube angeklebt wurde. Es ist für die ruhigen Phasen eines Streams gedacht, wenn der Chat noch offen ist, aber gerade nicht viel passiert. Deshalb bleibt Schach bewusst klein:
 
-Deshalb bleibt Schach bewusst klein:
-
-- Es läuft über das Spiele-Panel der Erweiterung.
 - Es nutzt ein kompaktes, verschiebbares Brett.
 - Es zeigt nur verfügbare Spieler, die Chat Enhancer ebenfalls im aktuellen Stream verwenden.
 - Der Rest von YouTube bleibt sichtbar, damit du sofort wieder zurück in den Chat kannst.
-
-Die Playground-Einstellungen befinden sich im Erweiterungs-Popup.
 
 :::media-left
 
@@ -64,7 +55,5 @@ Aktiviere im Spiele-Panel **Für Einladungen verfügbar**, wenn andere Spieler d
 ## Inzwischen mehr als Schach
 
 Seit dieser ersten Schach-Vorschau ist Playground gewachsen. Du kannst auch [HELP-A-FRIEND! Trivia](/de/blog/new-in-0-14-0-help-a-friend-trivia/) spielen, und [The Wild Wild Chat](/de/blog/the-wild-wild-chat-coming-to-chat-enhancer-0-15-0/) macht aus dem Livechat eine schnelle Kopfgeldjagd.
-
-Der Ablauf bleibt gleich: Öffne das Spiele-Panel, lade einen Zuschauer oder, wenn unterstützt, einen Computer-Gegner ein, spiele eine kompakte Partie und behalte den Stream im Blick.
 
 Wenn du Vorschläge hast, kannst du uns unter [hello@chatenhancer.com](mailto:hello@chatenhancer.com) schreiben.

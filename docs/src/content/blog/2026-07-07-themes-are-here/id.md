@@ -25,4 +25,4 @@ Untuk mengaktifkan tema, buka bagian **Tampilan** di pengaturan ekstensi. Pilih 
 ## Tentang tema Aero
 Aero adalah tema yang meniru estetika antarmuka chat akhir 2007. Rasanya nostalgia, seperti air, dan menyegarkan! 💧
 
-Seperti biasa, kamu bisa mengirim saran tema, atau hal lainnya, ke [hello@chatenhancer.com](mailto:hello@chatenhancer.com).
+Kirim saran tema ke [hello@chatenhancer.com](mailto:hello@chatenhancer.com).

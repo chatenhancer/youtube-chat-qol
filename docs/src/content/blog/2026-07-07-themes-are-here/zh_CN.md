@@ -25,4 +25,4 @@ tags: []
 ## 关于 Aero 主题
 Aero 是一个模仿 2007 年末聊天界面美学的主题。它怀旧、清透，并且很清爽！💧
 
-一如既往，你可以将主题建议或任何其他想法发送到 [hello@chatenhancer.com](mailto:hello@chatenhancer.com)。
+欢迎将主题建议发送至 [hello@chatenhancer.com](mailto:hello@chatenhancer.com)。

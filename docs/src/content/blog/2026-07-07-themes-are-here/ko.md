@@ -25,4 +25,4 @@ tags: []
 ## Aero 테마 소개
 Aero는 2007년 말의 채팅 인터페이스 미학을 따라 만든 테마입니다. 향수를 불러일으키고, 물빛 느낌이 나며, 산뜻합니다! 💧
 
-늘 그렇듯이 테마나 그 밖의 어떤 제안이든 [hello@chatenhancer.com](mailto:hello@chatenhancer.com)으로 보내 주세요.
+테마 아이디어는 [hello@chatenhancer.com](mailto:hello@chatenhancer.com)으로 보내 주세요.

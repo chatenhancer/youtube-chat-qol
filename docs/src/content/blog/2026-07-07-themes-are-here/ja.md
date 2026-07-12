@@ -25,4 +25,4 @@ tags: []
 ## Aero テーマについて
 Aero は、2007 年末ごろのチャット画面の雰囲気を再現したテーマです。懐かしく、水のようで、さわやかです！ 💧
 
-いつものように、テーマの提案やその他のご意見は [hello@chatenhancer.com](mailto:hello@chatenhancer.com) までお送りください。
+テーマのアイデアは [hello@chatenhancer.com](mailto:hello@chatenhancer.com) までお寄せください。

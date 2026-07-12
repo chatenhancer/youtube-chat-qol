@@ -25,4 +25,4 @@ tags: []
 ## Aero थीम के बारे में
 Aero एक ऐसी थीम है जो 2007 के आखिर की चैट इंटरफेस वाली सुंदरता की नकल करती है. यह पुरानी यादों वाली, पानी जैसी और ताज़गी भरी है! 💧
 
-हमेशा की तरह, आप थीम या किसी भी और चीज़ के सुझाव हमें [hello@chatenhancer.com](mailto:hello@chatenhancer.com) पर भेज सकते हैं.
+थीम के सुझाव [hello@chatenhancer.com](mailto:hello@chatenhancer.com) पर भेजें।

@@ -30,15 +30,13 @@ Entrambi i giocatori premono **PRONTO**, poi un breve conto alla rovescia 3, 2, 
 
 :::
 
-
 ## Rivendicare le taglie
 
-La bacheca dei ricercati mostra **Loro vs Tu**, il timer live e le sei taglie aperte. Ogni taglia ha un valore in denaro, una descrizione e un timbro **Aperta** o **Riscossa**.
+La bacheca dei ricercati mostra Loro vs Tu, il timer live e le sei taglie aperte. Ogni taglia ha un valore in denaro, una descrizione e un timbro **Aperta** o **Riscossa**.
 
 Per rivendicarne una, fai clic su un messaggio della live chat. Se il messaggio corrisponde a una taglia aperta, il gioco la timbra come rivendicata, aggiunge il denaro al tuo punteggio e mette il tuo avatar sulla riga.
 
 La prima rivendicazione valida vince quella taglia. Una volta rivendicata, viene chiusa per entrambi i giocatori, quindi continua a scandagliare la chat in cerca della prossima occasione.
-
 
 ## Fine del round
 
@@ -46,19 +44,15 @@ Il round termina quando il timer arriva a zero o quando tutte e sei le taglie so
 
 Dopo una breve schermata di fine round, **The Ledger** mostra il risultato finale. Il vincitore appare per primo, seguito dall’altro giocatore, con avatar, rango, taglie rivendicate e denaro guadagnato da ciascuno. Vince chi ha più denaro.
 
-
 ## Creato per la live chat
 
 The Wild Wild Chat è disponibile solo durante la live chat, perché il gioco consiste nel reagire alla chat dello stream mentre accade.
 
 C’è anche una modalità compatta. Se il poster completo dei ricercati copre troppa chat, riduci il pannello a una piccola riga che mantiene visibili timer e punteggio e lascia la chat più facile da leggere.
 
-
 ## Parte di Playground
 
 Come Scacchi e HELP-A-FRIEND! Trivia, The Wild Wild Chat vive dentro Playground. Usa lo stesso pannello Giochi, lo stesso flusso di inviti e la stessa finestra di gioco flottante, così resta vicino alla chat di YouTube.
-
-Lo stile però è nuovo: poster dei ricercati, rivendicazioni timbrate, carta polverosa e un po’ di atmosfera western.
 
 :::media-left
 

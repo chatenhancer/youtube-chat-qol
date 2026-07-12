@@ -25,4 +25,4 @@ Para ativar um tema, vá até a seção **Aparência** nas configurações da ex
 ## Sobre o tema Aero
 Aero é um tema que imita a estética das interfaces de chat do fim de 2007. Ele é nostálgico, aquático e refrescante! 💧
 
-Como sempre, você pode nos enviar sugestões de temas, ou qualquer outra coisa, em [hello@chatenhancer.com](mailto:hello@chatenhancer.com).
+Envie sugestões de temas para [hello@chatenhancer.com](mailto:hello@chatenhancer.com).

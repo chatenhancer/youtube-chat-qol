@@ -16,17 +16,13 @@ tags:
 
 ## Playground is here
 
-Playground is a small games hub inside Chat Enhancer. It lets you play with other viewers who have the extension installed and are in the same stream.
-
-Streamer stepped away for a minute? Open Playground, play a quick match, and keep chat close.
+Playground is a small games hub inside Chat Enhancer for quick matches with other viewers in the same stream.
 
 :::media-right
 
 ![Compact chess game panel floating over YouTube live chat](./f779ebcc57f8280d.png){shadow=smooth rotation=-2}
 
-Games stay compact. The panel is draggable, so you can move it out of the way when chat picks up again.
-
-Chess was the first Playground game, and it still explains the idea best: a quick side activity that stays near chat instead of taking over the page.
+Games use a compact, draggable panel that stays near chat without taking over the page.
 
 :::
 
@@ -34,22 +30,17 @@ Chess was the first Playground game, and it still explains the idea best: a quic
 
 Open the Games panel, pick **Chess**, and invite someone available in the same stream. When they accept, the board opens in a small floating panel over live chat.
 
-The game uses normal chess rules. Moves are checked before they are sent, turns stay synced between both players, and the match can end by checkmate, draw, or resignation. If the stream gets busy again, drag the panel aside and keep watching.
+Moves follow normal chess rules, turns stay synced, and the match can end by checkmate, draw, or resignation.
 
-If nobody else is around, Chess also supports **Computer** opponents. Choose **Computer (Beginner)**, **Computer (Club)**, or **Computer (Master)** from the player list and start a match the same way you would with another viewer.
+If nobody else is available, choose **Computer (Beginner)**, **Computer (Club)**, or **Computer (Master)** from the player list.
 
 ## Why it belongs in live chat
 
-Playground is not a full game room bolted onto YouTube. It is there for the slow parts of a stream, when chat is still open but not much is happening.
+Playground is designed for quiet moments in a stream, so it keeps YouTube visible:
 
-That means Chess is intentionally small:
-
-- It runs from the Games panel inside the extension.
 - It uses a compact, movable board.
 - It only shows available players who are also using Chat Enhancer in the current stream.
-- It keeps the rest of YouTube visible, so you can drop back into chat immediately.
-
-The Playground settings live in the extension popup.
+- You can return to chat immediately.
 
 :::media-left
 
@@ -63,8 +54,6 @@ Inside the Games panel, turn on **Available for games** when you want other play
 
 ## More than Chess now
 
-Playground has grown since this first Chess preview. You can also play [HELP-A-FRIEND! Trivia](/blog/new-in-0-14-0-help-a-friend-trivia/), and [The Wild Wild Chat](/blog/the-wild-wild-chat-coming-to-chat-enhancer-0-15-0/) turns live chat into a fast bounty hunt.
-
-The flow stays the same: open the Games panel, invite a viewer or Computer opponent when supported, play a compact match, and keep the stream nearby.
+Playground has grown since this first Chess preview. You can also play [HELP-A-FRIEND! Trivia](/blog/new-in-0-14-0-help-a-friend-trivia/), while [The Wild Wild Chat](/blog/the-wild-wild-chat-coming-to-chat-enhancer-0-15-0/) turns live chat into a fast bounty hunt.
 
 If you have any suggestions, you can email us at [hello@chatenhancer.com](mailto:hello@chatenhancer.com).

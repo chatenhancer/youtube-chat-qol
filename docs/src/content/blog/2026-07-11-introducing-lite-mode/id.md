@@ -20,8 +20,6 @@ Live chat yang ramai bisa menjadi salah satu bagian terbaik dari sebuah streamin
 
 Mode Lite memberi Anda pilihan lain: feed pesan yang lebih kecil dan ringan, yang dirancang agar tetap responsif saat chat semakin ramai.
 
-Fitur ini sepenuhnya opsional, dan Anda dapat mengaktifkan atau menonaktifkannya kapan saja.
-
 ## Perubahan yang dibuat mode Lite
 
 Mode Lite hanya mengganti feed pesan yang dapat digulir. Video, header chat, kotak pesan, pemilih emoji, pilihan chat, pengaturan, dan tampilan Peserta tetap merupakan bagian dari YouTube.
@@ -35,8 +33,6 @@ Peningkatan terbesar seharusnya terasa dalam chat yang bergerak cepat atau sesi 
 Pesan tetap menggunakan tata letak bergaya YouTube yang familiar, termasuk avatar, nama pengguna, lencana moderator dan terverifikasi, stempel waktu, emoji khusus, langganan keanggotaan, hadiah, dan pesan berbayar.
 
 Fitur Chat Enhancer juga tetap berfungsi pada baris-baris ringan tersebut. Ini mencakup terjemahan, sorotan Inbox, profil pengguna dan pesan terbaru, mode Focus, bookmark, tindakan pesan, tema, serta permukaan Playground yang didukung.
-
-
 
 Ada fitur YouTube yang mungkin belum didukung dalam mode Lite, misalnya kemampuan untuk melaporkan atau memblokir seseorang di chat. Fitur tersebut akan didukung oleh mode Lite dalam pembaruan ekstensi mendatang. Kami akan terus memperbarui mode Lite seiring YouTube memperkenalkan lebih banyak fitur.
 
@@ -59,8 +55,6 @@ Mode Lite sendiri tidak menambahkan akun chat lain atau mengirim pesan melalui l
 
 ## Mengapa ada label beta?
 
-Feed ringan sudah mencakup pengalaman chat sehari-hari, tetapi detail tetap penting. Kami akan terus menyempurnakan tempo pesan, pengguliran, transisi replay, gaya, batas kinerja, dan dukungan untuk format pesan YouTube baru sambil mempelajari bagaimana mode Lite bekerja di lebih banyak streaming dan perangkat.
-
-Itulah sebabnya tombol pengalih memiliki lencana **Beta**. Fitur ini siap dicoba, tetapi perubahannya belum selesai.
+Feed ringan sudah mencakup pengalaman chat sehari-hari, tetapi detail tetap penting. Kami akan terus menyempurnakan tempo pesan, pengguliran, transisi replay, gaya, batas kinerja, dan dukungan untuk format pesan YouTube baru sambil mempelajari bagaimana mode Lite bekerja di lebih banyak streaming dan perangkat. Itulah sebabnya tombol pengalih memiliki lencana **Beta**. Fitur ini siap dicoba, tetapi perubahannya belum selesai.
 
 Jika ada yang terasa tidak semestinya, beri tahu kami apa yang Anda lihat melalui [hello@chatenhancer.com](mailto:hello@chatenhancer.com). Tautan streaming, keterangan apakah itu siaran langsung atau replay, dan apa yang terjadi sebelum masalah muncul akan sangat membantu.

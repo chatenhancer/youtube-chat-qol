@@ -20,8 +20,6 @@ Un chat en direct très actif peut être l’un des meilleurs aspects d’un str
 
 Le mode Lite vous offre une autre possibilité : un fil de messages plus petit et allégé, conçu pour rester réactif lorsque le chat devient très fréquenté.
 
-Il est entièrement facultatif et vous pouvez l’activer ou le désactiver à tout moment.
-
 ## Ce que change le mode Lite
 
 Le mode Lite remplace uniquement le fil de messages déroulant. La vidéo, l’en-tête du chat, la zone de saisie, le sélecteur d’émojis, la sélection du chat, les paramètres et la vue Participants restent gérés par YouTube.
@@ -35,8 +33,6 @@ L’amélioration devrait être particulièrement perceptible dans les chats rap
 Les messages conservent la présentation familière de YouTube, notamment les avatars, les identifiants, les badges de modération et de vérification, les horodatages, les émojis personnalisés, les abonnements, les cadeaux et les messages payants.
 
 Les fonctionnalités de Chat Enhancer continuent également de fonctionner dans les lignes allégées. Cela comprend la traduction, les mises en évidence d’Inbox, les profils utilisateur et messages récents, le mode Focus, les favoris, les actions sur les messages, les thèmes et les surfaces Playground prises en charge.
-
-
 
 Certaines fonctionnalités de YouTube ne sont peut-être pas encore prises en charge dans le mode Lite, par exemple la possibilité de signaler ou de bloquer une personne dans le chat. Elles seront ajoutées au mode Lite lors de futures mises à jour de l’extension. Nous continuerons à mettre à jour le mode Lite à mesure que YouTube introduira de nouvelles fonctionnalités.
 
@@ -59,8 +55,6 @@ Le mode Lite n’ajoute pas de compte de chat supplémentaire et n’envoie pas 
 
 ## Pourquoi la mention bêta ?
 
-Le fil allégé couvre déjà l’expérience quotidienne du chat, mais les détails comptent. Nous prévoyons de continuer à ajuster le rythme des messages, le défilement, les transitions des rediffusions, le style, les limites de performance et la prise en charge des nouveaux formats de messages YouTube, à mesure que nous observons le comportement du mode Lite sur davantage de streams et d’appareils.
-
-C’est pourquoi le bouton comporte un badge **Bêta**. La fonctionnalité est prête à être testée, mais elle continuera d’évoluer.
+Le fil allégé couvre déjà l’expérience quotidienne du chat, mais les détails comptent. Nous prévoyons de continuer à ajuster le rythme des messages, le défilement, les transitions des rediffusions, le style, les limites de performance et la prise en charge des nouveaux formats de messages YouTube, à mesure que nous observons le comportement du mode Lite sur davantage de streams et d’appareils. C’est pourquoi le bouton comporte un badge **Bêta**. La fonctionnalité est prête à être testée, mais elle continuera d’évoluer.
 
 Si quelque chose vous semble anormal, décrivez-nous ce que vous avez constaté à l’adresse [hello@chatenhancer.com](mailto:hello@chatenhancer.com). Un lien vers le stream, l’indication qu’il s’agissait d’un direct ou d’une rediffusion, ainsi que les événements ayant précédé le problème nous seront particulièrement utiles.

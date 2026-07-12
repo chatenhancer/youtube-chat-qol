@@ -25,4 +25,4 @@ tags: []
 ## درباره تم Aero
 Aero تمی است که زیبایی‌شناسی رابط‌های چت اواخر سال 2007 را بازآفرینی می‌کند. نوستالژیک، آب‌گونه و طراوت‌بخش است! 💧
 
-مثل همیشه، می‌توانی پیشنهادهای خودت برای تم‌ها یا هر چیز دیگر را به [hello@chatenhancer.com](mailto:hello@chatenhancer.com) بفرستی.
+پیشنهادهای خود برای تم‌ها را به [hello@chatenhancer.com](mailto:hello@chatenhancer.com) بفرستید.

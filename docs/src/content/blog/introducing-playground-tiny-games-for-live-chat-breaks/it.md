@@ -18,15 +18,11 @@ tags:
 
 Playground è un piccolo spazio giochi dentro Chat Enhancer. Ti permette di giocare con altri spettatori che hanno l’estensione installata e stanno guardando lo stesso stream.
 
-Lo streamer si è allontanato per un minuto? Apri Playground, fai una partita veloce e tieni la chat a portata di mano.
-
 :::media-right
 
 ![Pannello compatto per Scacchi sopra la live chat di YouTube](./f779ebcc57f8280d.png){shadow=smooth rotation=-2}
 
 I giochi restano compatti. Il pannello si può trascinare, così puoi spostarlo quando la chat riprende ritmo.
-
-Scacchi è stato il primo gioco di Playground e spiega ancora bene l’idea: una rapida attività laterale che resta vicino alla chat invece di prendersi tutta la pagina.
 
 :::
 
@@ -36,20 +32,15 @@ Apri il pannello Giochi, scegli **Scacchi** e invita qualcuno disponibile nello 
 
 Il gioco usa le regole normali degli scacchi. Le mosse vengono controllate prima dell’invio, i turni restano sincronizzati tra i due giocatori e la partita può finire per scacco matto, patta o resa. Se lo stream torna movimentato, trascina il pannello di lato e continua a guardare.
 
-Se non c’è nessun altro, Scacchi supporta anche avversari **Computer**. Scegli **Computer (Beginner)**, **Computer (Club)** o **Computer (Master)** dall’elenco dei giocatori e avvia la partita come faresti con un altro spettatore.
+Se non c’è nessun altro, Scacchi supporta anche avversari Computer. Scegli **Computer (Beginner)**, **Computer (Club)** o **Computer (Master)** dall’elenco dei giocatori e avvia la partita come faresti con un altro spettatore.
 
 ## Perché appartiene alla live chat
 
-Playground non è una sala giochi completa agganciata a YouTube. Esiste per i momenti lenti di uno stream, quando la chat è ancora aperta ma non succede molto.
+Playground non è una sala giochi completa agganciata a YouTube. Esiste per i momenti lenti di uno stream, quando la chat è ancora aperta ma non succede molto. Per questo Scacchi è volutamente piccolo:
 
-Per questo Scacchi è volutamente piccolo:
-
-- Si avvia dal pannello Giochi dentro l’estensione.
 - Usa una scacchiera compatta e spostabile.
 - Mostra solo giocatori disponibili che stanno usando Chat Enhancer nello stream attuale.
 - Mantiene visibile il resto di YouTube, così puoi tornare subito alla chat.
-
-Le impostazioni di Playground si trovano nel popup dell’estensione.
 
 :::media-left
 
@@ -64,7 +55,5 @@ Nel pannello Giochi, attiva **Disponibile agli inviti** quando vuoi che gli altr
 ## Ora è più di Scacchi
 
 Playground è cresciuto da questa prima anteprima di Scacchi. Ora puoi giocare anche a [HELP-A-FRIEND! Trivia](/it/blog/new-in-0-14-0-help-a-friend-trivia/), e [The Wild Wild Chat](/it/blog/the-wild-wild-chat-coming-to-chat-enhancer-0-15-0/) trasforma la live chat in una veloce caccia alle taglie.
-
-Il flusso resta lo stesso: apri il pannello Giochi, invita uno spettatore o un avversario Computer quando supportato, gioca una partita compatta e tieni lo stream vicino.
 
 Se hai suggerimenti, puoi scriverci a [hello@chatenhancer.com](mailto:hello@chatenhancer.com).

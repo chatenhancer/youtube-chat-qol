@@ -30,15 +30,13 @@ Beide Spieler drücken **Bereit**, dann startet ein kurzer 3-2-1-Countdown die e
 
 :::
 
-
 ## Kopfgelder sichern
 
-Die Steckbriefwand zeigt **Sie gegen dich**, den Live-Timer und die sechs offenen Kopfgelder. Jedes Kopfgeld hat einen Geldwert, eine Beschreibung und einen Stempel für **Offen** oder **Geholt**.
+Die Steckbriefwand zeigt Sie gegen dich, den Live-Timer und die sechs offenen Kopfgelder. Jedes Kopfgeld hat einen Geldwert, eine Beschreibung und einen Stempel für **Offen** oder **Geholt**.
 
 Um ein Kopfgeld zu holen, klickst du auf eine Livechat-Nachricht. Wenn die Nachricht zu einem offenen Kopfgeld passt, stempelt das Spiel es als geholt ab, addiert das Geld zu deinem Punktestand und setzt deinen Avatar in die Zeile.
 
 Der erste gültige Treffer gewinnt dieses Kopfgeld. Sobald es geholt wurde, ist es für beide Spieler geschlossen. Also scanne weiter den Chat nach der nächsten Gelegenheit.
-
 
 ## Rundenende
 
@@ -46,19 +44,15 @@ Die Runde endet, wenn der Timer null erreicht oder alle sechs Kopfgelder geholt 
 
 Nach einem kurzen Bildschirm zum Rundenende zeigt **Das Register** das Endergebnis. Der Gewinner erscheint zuerst, danach der andere Spieler, jeweils mit Avatar, Rang, geholten Kopfgeldern und verdientem Geld. Wer am meisten Geld hat, gewinnt.
 
-
 ## Für Livechat gebaut
 
 The Wild Wild Chat ist nur während eines Livechats verfügbar, weil das Spiel davon lebt, auf den Stream-Chat zu reagieren, während er passiert.
 
 Es gibt außerdem einen Kompaktmodus. Wenn der große Steckbrief zu viel vom Chat verdeckt, verkleinere das Panel zu einer schmalen Zeile, die Timer und Punktestand sichtbar hält und den Feed leichter lesbar macht.
 
-
 ## Teil von Playground
 
 Wie Schach und HELP-A-FRIEND! Trivia läuft The Wild Wild Chat in Playground. Es nutzt dasselbe Spiele-Panel, denselben Einladungsablauf und dasselbe schwebende Spielfenster. So bleibt es nah am YouTube-Chat.
-
-Der Stil ist aber neu: Steckbriefe, abgestempelte Treffer, staubiges Papier und ein bisschen Western-Flair.
 
 :::media-left
 

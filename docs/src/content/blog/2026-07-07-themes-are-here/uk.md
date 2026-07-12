@@ -25,4 +25,4 @@ tags: []
 ## Про тему Aero
 Aero — це тема, яка імітує естетику інтерфейсів чату кінця 2007 року. Вона ностальгійна, водяниста й освіжаюча! 💧
 
-Як завжди, ви можете надсилати нам пропозиції щодо тем або будь-чого іншого на [hello@chatenhancer.com](mailto:hello@chatenhancer.com).
+Надсилайте пропозиції щодо тем на [hello@chatenhancer.com](mailto:hello@chatenhancer.com).

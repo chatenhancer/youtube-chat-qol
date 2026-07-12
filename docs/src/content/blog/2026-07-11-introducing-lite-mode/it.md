@@ -20,8 +20,6 @@ Una chat live molto attiva può essere una delle parti migliori di uno streaming
 
 La modalità Lite offre un’altra opzione: un feed dei messaggi più piccolo e leggero, progettato per rimanere reattivo quando la chat si affolla.
 
-È completamente facoltativa e può essere attivata o disattivata in qualsiasi momento.
-
 ## Cosa cambia la modalità Lite
 
 La modalità Lite sostituisce soltanto il feed scorrevole dei messaggi. Il video, l’intestazione della chat, la casella dei messaggi, il selettore di emoji, la selezione della chat, le impostazioni e la vista Partecipanti restano gestiti da YouTube.
@@ -35,8 +33,6 @@ Il miglioramento più evidente dovrebbe notarsi nelle chat veloci o durante sess
 I messaggi mantengono il familiare layout in stile YouTube, inclusi avatar, handle, badge di moderatore e di verifica, timestamp, emoji personalizzate, abbonamenti, regali e messaggi a pagamento.
 
 Anche le funzionalità di Chat Enhancer continuano a funzionare nelle righe leggere. Sono incluse la traduzione, le evidenziazioni di Inbox, i profili utente e i messaggi recenti, la modalità Focus, i segnalibri, le azioni sui messaggi, i temi e le superfici Playground supportate.
-
-
 
 Alcune funzionalità di YouTube potrebbero non essere ancora supportate nella modalità Lite, per esempio la possibilità di segnalare o bloccare una persona in chat. Il supporto verrà aggiunto in futuri aggiornamenti dell’estensione. Continueremo ad aggiornare la modalità Lite man mano che YouTube introdurrà nuove funzionalità.
 
@@ -59,8 +55,6 @@ La modalità Lite non aggiunge un altro account di chat e non invia messaggi tra
 
 ## Perché l’etichetta beta?
 
-Il feed leggero copre già l’esperienza quotidiana della chat, ma i dettagli sono importanti. Prevediamo di continuare a perfezionare il ritmo dei messaggi, lo scorrimento, le transizioni dei replay, lo stile, i limiti delle prestazioni e il supporto dei nuovi formati di messaggio di YouTube, man mano che impariamo come si comporta la modalità Lite su più streaming e dispositivi.
-
-Per questo l’interruttore presenta un badge **Beta**. È pronta per essere provata, ma continuerà ancora a cambiare.
+Il feed leggero copre già l’esperienza quotidiana della chat, ma i dettagli sono importanti. Prevediamo di continuare a perfezionare il ritmo dei messaggi, lo scorrimento, le transizioni dei replay, lo stile, i limiti delle prestazioni e il supporto dei nuovi formati di messaggio di YouTube, man mano che impariamo come si comporta la modalità Lite su più streaming e dispositivi. Per questo l’interruttore presenta un badge **Beta**. È pronta per essere provata, ma continuerà ancora a cambiare.
 
 Se qualcosa non funziona come previsto, scrivici cosa hai notato a [hello@chatenhancer.com](mailto:hello@chatenhancer.com). Sono particolarmente utili un link allo streaming, l’indicazione che fosse una diretta o un replay e una descrizione di ciò che è accaduto prima del problema.

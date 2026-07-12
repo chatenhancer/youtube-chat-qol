@@ -20,8 +20,6 @@ Intensywny czat na żywo może być jedną z najlepszych części transmisji. Mo
 
 Tryb Lite daje dodatkową możliwość: mniejszy, lekki strumień wiadomości zaprojektowany tak, aby zachować szybkość reakcji, gdy na czacie robi się tłoczno.
 
-Jest całkowicie opcjonalny i można go włączyć lub wyłączyć w dowolnej chwili.
-
 ## Co zmienia tryb Lite
 
 Tryb Lite zastępuje wyłącznie przewijany strumień wiadomości. Film, nagłówek czatu, pole wiadomości, selektor emoji, wybór czatu, ustawienia oraz widok Uczestnicy nadal należą do YouTube.
@@ -35,8 +33,6 @@ Największa poprawa powinna być odczuwalna na szybkich czatach lub podczas dłu
 Wiadomości zachowują znajomy układ w stylu YouTube, w tym awatary, nazwy użytkowników, odznaki moderatora i zweryfikowanego konta, znaczniki czasu, niestandardowe emoji, członkostwa, prezenty oraz płatne wiadomości.
 
 Funkcje Chat Enhancer również nadal działają w lekkich wierszach. Obejmuje to tłumaczenie, wyróżnienia Inbox, profile użytkowników i ostatnie wiadomości, tryb Focus, zakładki, działania na wiadomościach, motywy i obsługiwane powierzchnie Playground.
-
-
 
 Niektóre funkcje YouTube mogą nie być jeszcze obsługiwane w trybie Lite, na przykład zgłaszanie lub blokowanie osoby na czacie. Obsługa tych funkcji pojawi się w przyszłych aktualizacjach rozszerzenia. Będziemy nadal aktualizować tryb Lite wraz z wprowadzaniem kolejnych funkcji przez YouTube.
 
@@ -59,8 +55,6 @@ Tryb Lite sam nie dodaje kolejnego konta czatu ani nie wysyła wiadomości przez
 
 ## Skąd etykieta beta?
 
-Lekki strumień obsługuje już codzienne korzystanie z czatu, ale szczegóły mają znaczenie. Zamierzamy nadal dopracowywać tempo wiadomości, przewijanie, przejścia w powtórkach, styl, limity wydajności i obsługę nowych formatów wiadomości YouTube, w miarę poznawania działania trybu Lite w kolejnych transmisjach i na kolejnych urządzeniach.
-
-Dlatego przełącznik ma odznakę **Beta**. Funkcja jest gotowa do wypróbowania, ale nadal będzie się zmieniać.
+Lekki strumień obsługuje już codzienne korzystanie z czatu, ale szczegóły mają znaczenie. Zamierzamy nadal dopracowywać tempo wiadomości, przewijanie, przejścia w powtórkach, styl, limity wydajności i obsługę nowych formatów wiadomości YouTube, w miarę poznawania działania trybu Lite w kolejnych transmisjach i na kolejnych urządzeniach. Dlatego przełącznik ma odznakę **Beta**. Funkcja jest gotowa do wypróbowania, ale nadal będzie się zmieniać.
 
 Jeśli coś wydaje się nieprawidłowe, napisz na [hello@chatenhancer.com](mailto:hello@chatenhancer.com), co udało Ci się zauważyć. Szczególnie pomocne będą link do transmisji, informacja, czy była to transmisja na żywo czy powtórka, oraz opis tego, co wydarzyło się tuż przed problemem.

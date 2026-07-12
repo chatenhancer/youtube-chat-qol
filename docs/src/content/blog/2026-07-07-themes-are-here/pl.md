@@ -25,4 +25,4 @@ Aby włączyć motyw, przejdź do sekcji **Wygląd** w ustawieniach rozszerzenia
 ## O motywie Aero
 Aero to motyw, który naśladuje estetykę interfejsów czatu z końca 2007 roku. Jest nostalgiczny, wodny i odświeżający! 💧
 
-Jak zawsze, sugestie dotyczące motywów lub czegokolwiek innego możesz wysłać na [hello@chatenhancer.com](mailto:hello@chatenhancer.com).
+Pomysły na motywy wyślij na [hello@chatenhancer.com](mailto:hello@chatenhancer.com).

@@ -15,8 +15,6 @@ tags:
 
 Je kunt nu nog makkelijker in Playground springen: je kunt tegen **Computer** spelen.
 
-Soms is de chat rustig. Soms kijken je vrienden naar een andere stream. En soms wil je gewoon snel een ronde spelen zonder te wachten tot iemand anders je uitnodiging accepteert. Computer geeft je dan een extra optie.
-
 ## Zo werkt het
 
 Open Playground via het Games-paneel en zoek een Computer-speler in de spelerslijst. Nodig er een uit zoals je een andere kijker zou uitnodigen. De match start automatisch en de rest van Playground werkt zoals je gewend bent.
@@ -26,17 +24,9 @@ Computer-tegenstanders zijn beschikbaar voor:
 - **Schaken**, met **Computer (Beginner)**, **Computer (Club)** en **Computer (Master)**, zodat je een lichte, gemiddelde of moeilijkere match kunt kiezen.
 - **HELP-A-FRIEND! Trivia**, zodat replaytrivia speelbaar blijft wanneer niemand anders vrij is.
 
-## Kies je schaakniveau
+## Zo speelt Computer
 
-Schaken heeft nu drie Computer-tegenstanders. Beginner is de makkelijkste manier om op te warmen, Club speelt steviger op middenniveau en Master is de zwaarste optie.
-
-Je hoeft niets apart in te stellen: kies het gewenste Computer-profiel in de spelerslijst en stuur een uitnodiging.
-
-## Het blijft aanvoelen als Playground
-
-Dit is geen aparte solomodus en geen nieuw scherm. Computer-spelers gedragen zich als gewone Playground-tegenstanders, dus de flow blijft vertrouwd: open het paneel, kies een game, stuur een uitnodiging en speel.
-
-Bij Schaken wacht Computer kort voordat hij zet, zodat de game niet als een instant antwoordmachine voelt.
+Bij Schaken wacht Computer kort voordat hij zet, zodat de game niet als een instant antwoordmachine voelt. Schaken heeft nu drie Computer-tegenstanders. Beginner is de makkelijkste manier om op te warmen, Club speelt steviger op middenniveau en Master is de zwaarste optie.
 
 Bij *HELP-A-FRIEND! Trivia* antwoordt Computer tijdens de vragenronde net als een andere speler. Hij is niet perfect, dus je hebt nog steeds een echte kans om te winnen.
 

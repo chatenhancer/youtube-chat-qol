@@ -20,8 +20,6 @@ Yoğun bir canlı sohbet, bir yayının en güzel bölümlerinden biri olabilir.
 
 Lite modu size başka bir seçenek sunar: sohbet kalabalıklaştığında da hızlı yanıt vermek üzere tasarlanmış, daha küçük ve hafif bir mesaj akışı.
 
-Tamamen isteğe bağlıdır ve istediğiniz zaman açıp kapatabilirsiniz.
-
 ## Lite modu neleri değiştirir?
 
 Lite modu yalnızca kaydırılabilir mesaj akışını değiştirir. Video, sohbet başlığı, mesaj kutusu, emoji seçici, sohbet seçimi, ayarlar ve Katılımcılar görünümü YouTube’a ait olmaya devam eder.
@@ -35,8 +33,6 @@ En büyük iyileşme hızlı sohbetlerde veya uzun izleme oturumlarında fark ed
 Mesajlar; avatarlar, kullanıcı adları, moderatör ve doğrulanmış rozetleri, zaman damgaları, özel emojiler, üyelikler, hediyeler ve ücretli mesajlar dâhil olmak üzere tanıdık YouTube tarzı düzeni korur.
 
 Chat Enhancer özellikleri de hafif satırlarda çalışmaya devam eder. Bunlara çeviri, Inbox vurguları, kullanıcı profilleri ve son mesajlar, Focus modu, yer imleri, mesaj işlemleri, temalar ve desteklenen Playground yüzeyleri dahildir.
-
-
 
 Bir sohbet kullanıcısını bildirme veya engelleme gibi bazı YouTube özellikleri henüz Lite modunda desteklenmeyebilir. Bu özellikler, uzantının gelecekteki güncellemelerinde Lite modu tarafından desteklenecektir. YouTube daha fazla özellik sundukça Lite modunu güncellemeye devam edeceğiz.
 
@@ -59,8 +55,6 @@ Lite modu kendi başına başka bir sohbet hesabı eklemez veya ayrı bir sohbet
 
 ## Neden beta etiketi var?
 
-Hafif akış günlük sohbet deneyimini zaten karşılıyor, ancak ayrıntılar önemlidir. Lite modunun daha fazla yayın ve cihazda nasıl davrandığını öğrendikçe mesaj hızını, kaydırmayı, tekrar geçişlerini, stilleri, performans sınırlarını ve yeni YouTube mesaj biçimlerine yönelik desteği ayarlamayı sürdüreceğiz.
-
-Bu nedenle anahtarda **Beta** rozeti bulunur. Denemeye hazırdır, ancak değişimi henüz tamamlanmış değildir.
+Hafif akış günlük sohbet deneyimini zaten karşılıyor, ancak ayrıntılar önemlidir. Lite modunun daha fazla yayın ve cihazda nasıl davrandığını öğrendikçe mesaj hızını, kaydırmayı, tekrar geçişlerini, stilleri, performans sınırlarını ve yeni YouTube mesaj biçimlerine yönelik desteği ayarlamayı sürdüreceğiz. Bu nedenle anahtarda **Beta** rozeti bulunur. Denemeye hazırdır, ancak değişimi henüz tamamlanmış değildir.
 
 Bir şey doğru görünmüyorsa [hello@chatenhancer.com](mailto:hello@chatenhancer.com) adresinden ne fark ettiğinizi bize bildirin. Yayın bağlantısı, yayının canlı mı yoksa tekrar mı olduğu ve sorun öncesinde neler yaşandığı özellikle yararlıdır.

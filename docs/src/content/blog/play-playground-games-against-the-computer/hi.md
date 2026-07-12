@@ -15,8 +15,6 @@ tags:
 
 अब Playground में खेल शुरू करना और आसान है: आप **Computer** के खिलाफ खेल सकते हैं।
 
-कभी chat शांत होता है। कभी दोस्त कोई दूसरा stream देख रहे होते हैं। और कभी आप बस किसी और के accept करने का इंतज़ार किए बिना एक quick round खेलना चाहते हैं। ऐसे में Computer एक और option दे देता है।
-
 ## यह कैसे काम करता है
 
 गेम पैनल से Playground खोलें और player list में Computer player ढूँढ़ें। उसे वैसे ही invite करें जैसे आप किसी दूसरे viewer को invite करते हैं। Match अपने-आप शुरू हो जाता है, और Playground का बाकी अनुभव वैसा ही रहता है।
@@ -26,17 +24,9 @@ Computer opponents इन games में उपलब्ध हैं:
 - **शतरंज**, जिसमें **Computer (Beginner)**, **Computer (Club)** और **Computer (Master)** मिलते हैं, ताकि आप हल्का, बीच का या ज़्यादा मुश्किल match चुन सकें।
 - **HELP-A-FRIEND! Trivia**, ताकि replay trivia तब भी खेली जा सके जब कोई और free न हो।
 
-## अपनी शतरंज difficulty चुनें
+## Computer कैसे खेलता है
 
-शतरंज में अब तीन Computer opponents हैं। Beginner warm up करने के लिए सबसे आसान है, Club ज्यादा steady middle-level game खेलता है, और Master सबसे मुश्किल option है।
-
-इसके लिए अलग setting की ज़रूरत नहीं है: player list से अपना Computer profile चुनें और invite भेजें।
-
-## यह अभी भी Playground जैसा ही लगता है
-
-यह कोई अलग solo mode या नई screen नहीं है। Computer players सामान्य Playground opponents की तरह काम करते हैं: panel खोलें, game चुनें, invite भेजें, और खेलें।
-
-शतरंज में Computer थोड़े pause के बाद move करता है, ताकि game बहुत instant न लगे।
+शतरंज में Computer थोड़े pause के बाद move करता है, ताकि game बहुत instant न लगे। शतरंज में अब तीन Computer opponents हैं। Beginner warm up करने के लिए सबसे आसान है, Club ज्यादा steady middle-level game खेलता है, और Master सबसे मुश्किल option है।
 
 *HELP-A-FRIEND! Trivia* में Computer question round के दौरान दूसरे player की तरह answer देता है। वह perfect नहीं है, इसलिए आपके पास जीतने का असली मौका रहता है।
 

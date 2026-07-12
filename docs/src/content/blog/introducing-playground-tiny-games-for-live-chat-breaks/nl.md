@@ -18,15 +18,11 @@ tags:
 
 Playground is een kleine gamehub in Chat Enhancer. Je kunt er spelen met andere kijkers die de extensie hebben geïnstalleerd en in dezelfde stream zitten.
 
-Is de streamer even weg? Open Playground, speel een snelle match en houd de chat dichtbij.
-
 :::media-right
 
 ![Compact schaakpaneel boven YouTube-livechat](./f779ebcc57f8280d.png){shadow=smooth rotation=-2}
 
 Games blijven compact. Het paneel is versleepbaar, zodat je het aan de kant kunt zetten zodra de chat weer drukker wordt.
-
-Schaken was de eerste Playground-game en laat het idee nog steeds het best zien: een snelle activiteit voor erbij, dicht bij de chat, zonder de hele pagina over te nemen.
 
 :::
 
@@ -36,20 +32,15 @@ Open het Games-paneel, kies **Schaken** en nodig iemand uit die beschikbaar is i
 
 De game gebruikt normale schaakregels. Zetten worden gecontroleerd voordat ze worden verstuurd, beurten blijven bij beide spelers synchroon en de match kan eindigen met schaakmat, remise of opgave. Wordt de stream weer druk, dan sleep je het paneel opzij en kijk je verder.
 
-Als er niemand anders in de buurt is, ondersteunt Schaken ook **Computer**-tegenstanders. Kies **Computer (Beginner)**, **Computer (Club)** of **Computer (Master)** uit de spelerslijst en start een match zoals je dat met een andere kijker zou doen.
+Als er niemand anders in de buurt is, ondersteunt Schaken ook Computer-tegenstanders. Kies **Computer (Beginner)**, **Computer (Club)** of **Computer (Master)** uit de spelerslijst en start een match zoals je dat met een andere kijker zou doen.
 
 ## Waarom dit in livechat past
 
-Playground is geen volledige gameroom die op YouTube is geplakt. Het is bedoeld voor de rustige stukken van een stream, wanneer de chat nog open is maar er niet veel gebeurt.
+Playground is geen volledige gameroom die op YouTube is geplakt. Het is bedoeld voor de rustige stukken van een stream, wanneer de chat nog open is maar er niet veel gebeurt. Daarom blijft Schaken bewust klein:
 
-Daarom blijft Schaken bewust klein:
-
-- Het draait vanuit het Games-paneel in de extensie.
 - Het gebruikt een compact, verplaatsbaar bord.
 - Het toont alleen beschikbare spelers die ook Chat Enhancer gebruiken in de huidige stream.
 - De rest van YouTube blijft zichtbaar, zodat je meteen terug kunt naar de chat.
-
-De Playground-instellingen staan in de extensie-popup.
 
 :::media-left
 
@@ -64,7 +55,5 @@ Zet in het Games-paneel **Beschikbaar voor uitnodigingen** aan wanneer je wilt d
 ## Inmiddels meer dan Schaken
 
 Playground is gegroeid sinds deze eerste schaakpreview. Je kunt ook [HELP-A-FRIEND! Trivia](/nl/blog/new-in-0-14-0-help-a-friend-trivia/) spelen, en [The Wild Wild Chat](/nl/blog/the-wild-wild-chat-coming-to-chat-enhancer-0-15-0/) verandert livechat in een snelle bountyjacht.
-
-De flow blijft hetzelfde: open het Games-paneel, nodig een kijker of, wanneer ondersteund, een Computer-tegenstander uit, speel een compacte match en houd de stream dichtbij.
 
 Als je suggesties hebt, kun je mailen naar [hello@chatenhancer.com](mailto:hello@chatenhancer.com).

@@ -20,8 +20,6 @@ Một cuộc trò chuyện trực tiếp sôi động có thể là một trong 
 
 Chế độ Lite mang đến một lựa chọn khác: bảng tin nhắn nhỏ và nhẹ hơn, được thiết kế để vẫn phản hồi nhanh khi cuộc trò chuyện trở nên đông đúc.
 
-Tính năng này hoàn toàn không bắt buộc và bạn có thể bật hoặc tắt bất cứ lúc nào.
-
 ## Chế độ Lite thay đổi những gì
 
 Chế độ Lite chỉ thay thế bảng tin nhắn có thể cuộn. Video, tiêu đề trò chuyện, hộp tin nhắn, bộ chọn biểu tượng cảm xúc, lựa chọn cuộc trò chuyện, phần cài đặt và chế độ xem Người tham gia vẫn thuộc về YouTube.
@@ -35,8 +33,6 @@ Mức cải thiện lớn nhất sẽ dễ nhận thấy trong các cuộc trò 
 Tin nhắn vẫn giữ bố cục quen thuộc theo phong cách YouTube, bao gồm ảnh đại diện, tên người dùng, huy hiệu người kiểm duyệt và huy hiệu đã xác minh, dấu thời gian, biểu tượng cảm xúc tùy chỉnh, tư cách thành viên, quà tặng và tin nhắn trả phí.
 
 Các tính năng của Chat Enhancer cũng tiếp tục hoạt động trên những hàng nhẹ. Các tính năng đó gồm bản dịch, phần đánh dấu Inbox, hồ sơ người dùng và tin nhắn gần đây, chế độ Focus, dấu trang, thao tác với tin nhắn, chủ đề và các bề mặt Playground được hỗ trợ.
-
-
 
 Một số tính năng của YouTube có thể chưa được hỗ trợ trong chế độ Lite, chẳng hạn như khả năng báo cáo hoặc chặn một người trong cuộc trò chuyện. Các tính năng này sẽ được chế độ Lite hỗ trợ trong những bản cập nhật tiện ích mở rộng sau này. Chúng tôi sẽ tiếp tục cập nhật chế độ Lite khi YouTube giới thiệu thêm tính năng.
 
@@ -59,8 +55,6 @@ Bản thân chế độ Lite không thêm một tài khoản trò chuyện khác
 
 ## Tại sao có nhãn beta?
 
-Bảng tin nhẹ đã đáp ứng trải nghiệm trò chuyện hằng ngày, nhưng các chi tiết vẫn rất quan trọng. Chúng tôi dự kiến tiếp tục điều chỉnh nhịp hiển thị tin nhắn, thao tác cuộn, chuyển cảnh khi phát lại, kiểu trình bày, giới hạn hiệu suất và khả năng hỗ trợ các định dạng tin nhắn YouTube mới khi tìm hiểu cách chế độ Lite hoạt động trên nhiều buổi phát và thiết bị hơn.
-
-Đó là lý do nút chuyển có huy hiệu **Beta**. Tính năng đã sẵn sàng để dùng thử, nhưng vẫn sẽ tiếp tục thay đổi.
+Bảng tin nhẹ đã đáp ứng trải nghiệm trò chuyện hằng ngày, nhưng các chi tiết vẫn rất quan trọng. Chúng tôi dự kiến tiếp tục điều chỉnh nhịp hiển thị tin nhắn, thao tác cuộn, chuyển cảnh khi phát lại, kiểu trình bày, giới hạn hiệu suất và khả năng hỗ trợ các định dạng tin nhắn YouTube mới khi tìm hiểu cách chế độ Lite hoạt động trên nhiều buổi phát và thiết bị hơn. Đó là lý do nút chuyển có huy hiệu **Beta**. Tính năng đã sẵn sàng để dùng thử, nhưng vẫn sẽ tiếp tục thay đổi.
 
 Nếu có điều gì không ổn, hãy cho chúng tôi biết bạn đã quan sát thấy gì tại [hello@chatenhancer.com](mailto:hello@chatenhancer.com). Liên kết buổi phát, thông tin đó là phát trực tiếp hay bản phát lại và những gì xảy ra trước sự cố sẽ đặc biệt hữu ích.

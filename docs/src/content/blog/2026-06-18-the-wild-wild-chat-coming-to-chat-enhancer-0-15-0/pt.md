@@ -30,15 +30,13 @@ Os dois jogadores pressionam **PRONTO**, então uma contagem curta de 3, 2, 1 in
 
 :::
 
-
 ## Resgatando recompensas
 
-O quadro de procurados mostra **Eles vs Eu**, o cronômetro ao vivo e as seis recompensas abertas. Cada recompensa tem um valor em dinheiro, uma descrição e um carimbo **Aberta** ou **Coletada**.
+O quadro de procurados mostra Eles vs Eu, o cronômetro ao vivo e as seis recompensas abertas. Cada recompensa tem um valor em dinheiro, uma descrição e um carimbo **Aberta** ou **Coletada**.
 
 Para reivindicar uma, clique em uma mensagem do chat ao vivo. Se a mensagem corresponder a uma recompensa aberta, o jogo marca essa recompensa como reivindicada, adiciona o dinheiro à sua pontuação e coloca seu avatar na linha.
 
 A primeira reivindicação válida ganha essa recompensa. Depois que ela é reivindicada, fica fechada para os dois jogadores, então continue olhando o chat em busca da próxima oportunidade.
-
 
 ## Fim da rodada
 
@@ -46,19 +44,15 @@ A rodada termina quando o cronômetro chega a zero ou quando as seis recompensas
 
 Depois de uma breve tela de fim de rodada, **The Ledger** mostra o resultado final. O vencedor aparece primeiro, seguido pelo outro jogador, com o avatar, a classificação, as recompensas reivindicadas e o dinheiro ganho por cada um. Quem tiver mais dinheiro vence.
 
-
 ## Feito para o chat ao vivo
 
 The Wild Wild Chat está disponível apenas durante o chat ao vivo, porque o jogo é sobre reagir ao chat da transmissão conforme ele acontece.
 
 Também existe um modo compacto. Se o cartaz completo de procurados estiver cobrindo chat demais, reduza o painel para uma pequena linha que mantém o cronômetro e a pontuação visíveis enquanto deixa o chat mais fácil de ler.
 
-
 ## Parte do Playground
 
 Assim como Xadrez e HELP-A-FRIEND! Trivia, The Wild Wild Chat fica dentro do Playground. Ele usa o mesmo painel Jogos, o mesmo fluxo de convite e a mesma janela flutuante de jogo, então continua perto do chat do YouTube.
-
-O estilo é novo: cartazes de procurados, reivindicações carimbadas, papel empoeirado e um pouco de clima western.
 
 :::media-left
 

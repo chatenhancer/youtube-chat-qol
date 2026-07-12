@@ -25,4 +25,4 @@ Ga naar het onderdeel **Uiterlijk** in de instellingen van de extensie om een th
 ## Over het Aero-thema
 Aero is een thema dat de esthetiek van chatinterfaces uit eind 2007 nabootst. Het is nostalgisch, waterachtig en verfrissend! 💧
 
-Zoals altijd kun je suggesties voor thema's, of iets anders, sturen naar [hello@chatenhancer.com](mailto:hello@chatenhancer.com).
+Stuur ideeën voor thema’s naar [hello@chatenhancer.com](mailto:hello@chatenhancer.com).

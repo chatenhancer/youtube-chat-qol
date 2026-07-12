@@ -25,4 +25,4 @@ Pour activer un thème, allez dans la section **Apparence** des paramètres de l
 ## À propos du thème Aero
 Aero est un thème qui imite l’esthétique des interfaces de chat de fin 2007. Il est nostalgique, aquatique et rafraîchissant ! 💧
 
-Comme toujours, vous pouvez nous envoyer des suggestions de thèmes, ou toute autre idée, à [hello@chatenhancer.com](mailto:hello@chatenhancer.com).
+Envoyez vos idées de thèmes à [hello@chatenhancer.com](mailto:hello@chatenhancer.com).

@@ -25,4 +25,4 @@ Chủ đề được tạo ra để khiến chat trở nên cá nhân hơn với
 ## Về chủ đề Aero
 Aero là một chủ đề mô phỏng thẩm mỹ của các giao diện chat cuối năm 2007. Nó hoài niệm, trong veo như nước và đầy tươi mới! 💧
 
-Như mọi khi, bạn có thể gửi đề xuất về chủ đề hoặc bất kỳ điều gì khác cho chúng tôi tại [hello@chatenhancer.com](mailto:hello@chatenhancer.com).
+Gửi đề xuất về chủ đề đến [hello@chatenhancer.com](mailto:hello@chatenhancer.com).

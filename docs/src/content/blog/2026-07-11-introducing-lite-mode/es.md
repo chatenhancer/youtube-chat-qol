@@ -1,7 +1,7 @@
 ---
 title: "Presentamos el modo Lite"
 date: 2026-07-11
-description: "El modo Lite es un feed de chat opcional y ligero, diseñado para que los chats en directo de YouTube con mucha actividad funcionen con mayor fluidez y exijan menos a tu navegador."
+description: "El modo Lite es una lista de mensajes opcional y ligera, diseñada para que los chats en directo más activos funcionen con mayor fluidez."
 slug: "introducing-lite-mode"
 image: "./a267721fcd28b8ba.png"
 cover_width: 88
@@ -16,29 +16,25 @@ tags:
 
 *El modo Lite ya está disponible en beta en la versión 0.18.*
 
-Un chat en directo con mucha actividad puede ser una de las mejores partes de una emisión. También puede exigir bastante a tu navegador cuando llevan un tiempo acumulándose mensajes, avatares, insignias, animaciones y otros elementos del chat.
+Un chat muy activo puede ser una de las mejores partes de un directo, pero los mensajes, avatares, insignias y animaciones pueden exigir cada vez más al navegador.
 
-El modo Lite te ofrece otra opción: un feed de mensajes más pequeño y ligero, diseñado para mantener una buena respuesta cuando el chat se llena.
-
-Es completamente opcional y puedes activarlo o desactivarlo cuando quieras.
+El modo Lite es un feed de mensajes opcional y ligero, diseñado para mantener la fluidez cuando el chat se llena.
 
 ## Qué cambia el modo Lite
 
 El modo Lite sustituye únicamente el feed desplazable de mensajes. El vídeo, el encabezado del chat, el cuadro de mensajes, el selector de emojis, la selección de chat, los ajustes y la vista de participantes siguen perteneciendo a YouTube.
 
-Mientras el modo Lite está activado, Chat Enhancer sustituye el feed original por su propia versión ligera. De este modo, hay menos elementos del chat, imágenes y efectos que deban permanecer activos al mismo tiempo, lo que mejora el rendimiento.
+Mantiene activos menos elementos, imágenes y efectos a la vez, lo que reduce el trabajo necesario para mostrar el chat.
 
-La mejora más notable debería apreciarse en chats rápidos o durante sesiones de visualización largas. La diferencia exacta seguirá dependiendo de la emisión, tu dispositivo, tus otras extensiones y las funciones que tengas activadas. El modo Lite se centra en el feed del chat; no cambia el trabajo necesario para reproducir el vídeo en sí.
+La mejora debería notarse sobre todo en chats rápidos o sesiones largas, aunque el resultado depende del directo, el dispositivo, las demás extensiones y las funciones activas. El modo Lite no cambia la reproducción del vídeo.
 
 ## Un chat familiar, más ligero por dentro
 
 Los mensajes conservan el diseño familiar de YouTube, incluidos los avatares, nombres de usuario, insignias de moderador y verificación, marcas de tiempo, emojis personalizados, membresías, regalos y mensajes de pago.
 
-Las funciones de Chat Enhancer también siguen funcionando en las filas ligeras. Esto incluye la traducción, los destacados de Inbox, los perfiles de usuario y mensajes recientes, el modo Focus, los marcadores, las acciones de mensajes, los temas y las superficies compatibles de Playground.
+Las funciones de Chat Enhancer, como la traducción, los destacados de Inbox, los perfiles, el modo Focus, los marcadores, las acciones de mensajes, los temas y las secciones compatibles de Playground, siguen funcionando.
 
-
-
-Hay funciones de YouTube que quizá todavía no estén disponibles en el modo Lite, como la posibilidad de denunciar o bloquear a una persona del chat. Estas funciones se incorporarán al modo Lite en futuras actualizaciones de la extensión. Seguiremos actualizando el modo Lite a medida que YouTube añada más funciones.
+Algunas acciones de YouTube, como denunciar o bloquear a una persona, todavía no están disponibles en el modo Lite. Ampliaremos la compatibilidad en futuras actualizaciones.
 
 :::media-right
 
@@ -51,16 +47,14 @@ Activa el **modo Lite** desde la sección **Apariencia** de la ventana emergente
 
 ## Una forma segura de volver al chat de YouTube
 
-YouTube cambia sus formatos de chat con el tiempo, y las emisiones en directo pueden incluir tipos de mensajes o estados de conexión poco habituales. Si el modo Lite no puede seguir leyendo el feed principal del chat, deja de recibir actualizaciones o pierde la parte de la página que necesita, Chat Enhancer vuelve a cargar el panel del chat y restaura automáticamente el chat de YouTube.
+Si el modo Lite pierde el acceso al feed o deja de recibir mensajes, Chat Enhancer vuelve a cargar el panel y restaura automáticamente el chat de YouTube.
 
-Verás un breve aviso indicando que se ha restaurado el chat de YouTube. El vídeo y el resto de la página de visualización no se vuelven a cargar.
+Verás un breve aviso, pero el vídeo y el resto de la página no se volverán a cargar.
 
-El modo Lite no añade otra cuenta de chat ni envía mensajes mediante un servicio de chat independiente. La lectura y el envío de mensajes siguen utilizando YouTube. Si tienes activada la traducción o Playground, esas funciones mantienen el mismo comportamiento de red descrito en nuestra [política de privacidad](/privacy/).
+Los mensajes se siguen leyendo y enviando a través de YouTube; el modo Lite no añade otra cuenta ni un servicio de chat independiente. La traducción y Playground mantienen el comportamiento de red descrito en nuestra [política de privacidad](/privacy/).
 
 ## ¿Por qué la etiqueta beta?
 
-El feed ligero ya cubre la experiencia cotidiana del chat, pero los detalles importan. Esperamos seguir ajustando el ritmo de los mensajes, el desplazamiento, las transiciones de las repeticiones, el estilo, los límites de rendimiento y la compatibilidad con nuevos formatos de mensajes de YouTube a medida que aprendamos cómo se comporta el modo Lite en más emisiones y dispositivos.
-
-Por eso el interruptor lleva una insignia **Beta**. Ya está listo para probarlo, pero todavía seguirá cambiando.
+El feed ligero ya cubre el uso habitual, pero seguimos ajustando el desplazamiento, las transiciones en repeticiones, el diseño, el rendimiento y la compatibilidad con nuevos formatos de mensajes. Por eso el interruptor lleva la insignia **Beta**.
 
 Si algo no funciona como esperabas, cuéntanos qué observaste en [hello@chatenhancer.com](mailto:hello@chatenhancer.com). Resulta especialmente útil incluir un enlace a la emisión, indicar si era en directo o una repetición y explicar qué ocurrió justo antes del problema.

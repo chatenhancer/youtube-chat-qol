@@ -25,4 +25,4 @@ tags: []
 ## حول سمة Aero
 Aero هي سمة تحاكي جماليات واجهات الدردشة في أواخر عام 2007. إنها حنينية، مائية، ومنعشة! 💧
 
-وكالعادة، يمكنك إرسال اقتراحاتك للسمات أو لأي شيء آخر إلى [hello@chatenhancer.com](mailto:hello@chatenhancer.com).
+أرسل اقتراحاتك للسمات إلى [hello@chatenhancer.com](mailto:hello@chatenhancer.com).

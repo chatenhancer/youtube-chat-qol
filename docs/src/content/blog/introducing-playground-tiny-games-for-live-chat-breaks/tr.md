@@ -18,15 +18,11 @@ tags:
 
 Playground, Chat Enhancer içinde küçük bir oyun alanıdır. Uzantıyı kurmuş ve aynı yayında bulunan diğer izleyicilerle oynamanızı sağlar.
 
-Yayıncı bir dakikalığına uzaklaştı mı? Playground’u açın, hızlı bir maç yapın ve sohbetten kopmayın.
-
 :::media-right
 
 ![YouTube canlı sohbet üzerinde yüzen kompakt satranç paneli](./f779ebcc57f8280d.png){shadow=smooth rotation=-2}
 
 Oyunlar kompakt kalır. Panel sürüklenebilir, böylece sohbet yeniden hızlandığında onu kenara alabilirsiniz.
-
-Satranç ilk Playground oyunuydu ve fikri hâlâ en iyi o anlatıyor: sayfayı ele geçirmek yerine sohbetin yanında duran kısa bir yan etkinlik.
 
 :::
 
@@ -36,20 +32,15 @@ Oyunlar paneli açın, **Satranç** seçin ve aynı yayında uygun olan birini d
 
 Oyun normal satranç kurallarını kullanır. Hamleler gönderilmeden önce kontrol edilir, sıralar iki oyuncu arasında senkron kalır ve maç mat, beraberlik ya da terk ile bitebilir. Yayın yeniden yoğunlaşırsa paneli kenara sürükleyip izlemeye devam edin.
 
-Yakında başka kimse yoksa Satranç **Computer** rakiplerini de destekler. Oyuncu listesinden **Computer (Beginner)**, **Computer (Club)** veya **Computer (Master)** seçin ve başka bir izleyiciyle oynar gibi maça başlayın.
+Yakında başka kimse yoksa Satranç Computer rakiplerini de destekler. Oyuncu listesinden **Computer (Beginner)**, **Computer (Club)** veya **Computer (Master)** seçin ve başka bir izleyiciyle oynar gibi maça başlayın.
 
 ## Neden canlı sohbete ait
 
-Playground, YouTube’a sonradan yapıştırılmış tam bir oyun odası değildir. Sohbetin açık olduğu ama pek bir şeyin yaşanmadığı sakin yayın anları içindir.
+Playground, YouTube’a sonradan yapıştırılmış tam bir oyun odası değildir. Sohbetin açık olduğu ama pek bir şeyin yaşanmadığı sakin yayın anları içindir. Bu yüzden Satranç özellikle küçük tutulur:
 
-Bu yüzden Satranç özellikle küçük tutulur:
-
-- Uzantının içindeki Oyunlar panelinden çalışır.
 - Kompakt, taşınabilir bir tahta kullanır.
 - Yalnızca mevcut yayında Chat Enhancer kullanan uygun oyuncuları gösterir.
 - YouTube’un geri kalanını görünür tutar, böylece hemen sohbete dönebilirsiniz.
-
-Playground ayarları uzantı popup’ındadır.
 
 :::media-left
 
@@ -64,7 +55,5 @@ Oyunlar panelinde, diğer oyuncuların sizi görmesini istediğinizde **Davetler
 ## Artık Satranç’ten fazlası
 
 Playground bu ilk Satranç önizlemesinden beri büyüdü. Ayrıca [HELP-A-FRIEND! Trivia](/tr/blog/new-in-0-14-0-help-a-friend-trivia/) oynayabilir, [The Wild Wild Chat](/tr/blog/the-wild-wild-chat-coming-to-chat-enhancer-0-15-0/) ile canlı sohbeti hızlı bir ödül avına dönüştürebilirsiniz.
-
-Akış aynı kalır: Oyunlar paneli açın, desteklendiğinde bir izleyici veya Computer rakibi davet edin, kompakt bir maç oynayın ve yayını yakınınızda tutun.
 
 Önerileriniz varsa bize [hello@chatenhancer.com](mailto:hello@chatenhancer.com) adresinden yazabilirsiniz.

@@ -18,15 +18,11 @@ tags:
 
 Playground est un petit espace de jeux dans Chat Enhancer. Il vous permet de jouer avec d’autres spectateurs qui ont installé l’extension et regardent le même live.
 
-Le streamer s’absente une minute ? Ouvrez Playground, lancez une partie rapide et gardez le chat sous les yeux.
-
 :::media-right
 
 ![Panneau compact de Échecs flottant au-dessus du chat en direct de YouTube](./f779ebcc57f8280d.png){shadow=smooth rotation=-2}
 
 Les jeux restent compacts. Le panneau se déplace facilement, vous pouvez donc le mettre de côté quand le chat reprend.
-
-Échecs a été le premier jeu de Playground, et c’est toujours celui qui résume le mieux l’idée : une petite activité rapide qui reste près du chat au lieu de prendre toute la page.
 
 :::
 
@@ -36,20 +32,15 @@ Ouvrez le panneau Jeux, choisissez **Échecs** et invitez une personne disponibl
 
 Le jeu utilise les règles normales des échecs. Les coups sont vérifiés avant d’être envoyés, les tours restent synchronisés entre les deux joueurs, et la partie peut se terminer par échec et mat, nulle ou abandon. Si le live s’anime à nouveau, faites glisser le panneau de côté et continuez à regarder.
 
-Si personne d’autre n’est là, Échecs prend aussi en charge les adversaires **Computer**. Choisissez **Computer (Beginner)**, **Computer (Club)** ou **Computer (Master)** dans la liste des joueurs et lancez une partie comme avec un autre spectateur.
+Si personne d’autre n’est là, Échecs prend aussi en charge les adversaires Computer. Choisissez **Computer (Beginner)**, **Computer (Club)** ou **Computer (Master)** dans la liste des joueurs et lancez une partie comme avec un autre spectateur.
 
 ## Pourquoi cela a sa place dans le chat en direct
 
-Playground n’est pas une salle de jeux complète ajoutée à YouTube. Il existe pour les moments calmes d’un live, quand le chat reste ouvert mais qu’il ne se passe pas grand-chose.
+Playground n’est pas une salle de jeux complète ajoutée à YouTube. Il existe pour les moments calmes d’un live, quand le chat reste ouvert mais qu’il ne se passe pas grand-chose. C’est pourquoi Échecs reste volontairement petit :
 
-C’est pourquoi Échecs reste volontairement petit :
-
-- Il se lance depuis le panneau Jeux de l’extension.
 - Il utilise un échiquier compact et déplaçable.
 - Il n’affiche que les joueurs disponibles qui utilisent aussi Chat Enhancer dans le live actuel.
 - Il garde le reste de YouTube visible, pour revenir immédiatement au chat.
-
-Les paramètres de Playground se trouvent dans le popup de l’extension.
 
 :::media-left
 
@@ -64,7 +55,5 @@ Dans le panneau Jeux, activez **Disponible pour les invitations** quand vous vou
 ## Plus seulement Échecs
 
 Playground a grandi depuis cette première présentation de Échecs. Vous pouvez aussi jouer à [HELP-A-FRIEND! Trivia](/fr/blog/new-in-0-14-0-help-a-friend-trivia/), et [The Wild Wild Chat](/fr/blog/the-wild-wild-chat-coming-to-chat-enhancer-0-15-0/) transforme le chat en direct en une chasse aux primes rapide.
-
-Le déroulement reste le même : ouvrez le panneau Jeux, invitez un spectateur ou un adversaire Computer quand c’est pris en charge, jouez une partie compacte et gardez le live à proximité.
 
 Si vous avez des suggestions, vous pouvez nous écrire à [hello@chatenhancer.com](mailto:hello@chatenhancer.com).

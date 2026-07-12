@@ -25,4 +25,4 @@ Um ein Theme zu aktivieren, gehe in den Erweiterungseinstellungen zum Abschnitt 
 ## Über das Aero-Theme
 Aero ist ein Theme, das die Ästhetik von Chat-Oberflächen aus Ende 2007 nachahmt. Es ist nostalgisch, glasig-wässrig und erfrischend! 💧
 
-Wie immer kannst du uns Vorschläge für Themes oder alles andere an [hello@chatenhancer.com](mailto:hello@chatenhancer.com) senden.
+Sende Theme-Vorschläge an [hello@chatenhancer.com](mailto:hello@chatenhancer.com).

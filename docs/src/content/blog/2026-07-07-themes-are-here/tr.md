@@ -25,4 +25,4 @@ Bir temayı etkinleştirmek için uzantı ayarlarında **Görünüm** bölümün
 ## Aero teması hakkında
 Aero, 2007 sonlarındaki sohbet arayüzlerinin estetiğini taklit eden bir tema. Nostaljik, sulu ve ferahlatıcı! 💧
 
-Her zamanki gibi tema önerilerini veya başka herhangi bir fikrini [hello@chatenhancer.com](mailto:hello@chatenhancer.com) adresine gönderebilirsin.
+Tema önerilerinizi [hello@chatenhancer.com](mailto:hello@chatenhancer.com) adresine gönderin.

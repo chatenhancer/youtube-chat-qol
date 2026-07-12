@@ -1,7 +1,7 @@
 ---
 title: "The Wild Wild Chat llega a Chat Enhancer 0.15.0"
 date: 2026-06-18
-description: "The Wild Wild Chat convierte el chat en directo en una caza de recompensas rápida donde los jugadores compiten por reclamar mensajes que coincidan."
+description: "The Wild Wild Chat convierte el chat en directo en una rápida caza de recompensas donde los jugadores compiten por encontrar mensajes que cumplan cada objetivo."
 locale: "es"
 slug: "the-wild-wild-chat-coming-to-chat-enhancer-0-15-0"
 image: "./cover.png"
@@ -14,7 +14,7 @@ tags:
 
 El próximo juego de Playground va directo al chat en directo: **The Wild Wild Chat**.
 
-Empieza con **Bounty Hunting**, una búsqueda rápida en la que dos jugadores miran el mismo chat del stream y compiten por encontrar los mensajes correctos antes de que se acabe el tiempo.
+Su primer modo es **Bounty Hunting**, una búsqueda rápida en la que dos jugadores compiten por encontrar mensajes que cumplan determinados requisitos en el mismo chat.
 
 :::media-right
 
@@ -22,43 +22,37 @@ Empieza con **Bounty Hunting**, una búsqueda rápida en la que dos jugadores mi
 
 ### Cómo funciona
 
-Inicia una partida de Playground desde el chat en directo, invita a otro jugador y espera un momento mientras se prepara la ronda.
+Inicia una partida desde el chat en directo e invita a otro jugador.
 
-Cada ronda incluye seis recompensas basadas en cosas que ocurren de forma natural en el chat. Puede que tengas que encontrar un mensaje con 3+ emojis, un mensaje en mayúsculas, una pregunta, una mención de usuario, un participante verificado, un enlace, un número, una frase repetida o una de las personas más activas del chat.
+Cada ronda incluye seis recompensas basadas en mensajes habituales, como uno con 3+ emojis, una pregunta, una mención, un enlace o una frase en mayúsculas.
 
-Ambos jugadores pulsan **LISTO**, y una breve cuenta atrás de 3, 2, 1 da inicio a la caza de verdad. A partir de ahí, tienes 60 segundos.
+Ambos jugadores pulsan **LISTO** y, tras una breve cuenta atrás, comienza la caza de 60 segundos.
 
 :::
 
-
 ## Reclamar recompensas
 
-El tablón de búsqueda muestra **Rival vs Yo**, el temporizador en directo y las seis recompensas abiertas. Cada recompensa tiene un valor en dinero, una descripción y un sello de **Abierta** o **Cobrada**.
+El tablón de búsqueda muestra Rival vs Yo, el temporizador en directo y las seis recompensas abiertas. Cada recompensa tiene un valor en dinero, una descripción y un sello de **Abierta** o **Cobrada**.
 
 Para reclamar una, haz clic en un mensaje del chat en directo. Si el mensaje coincide con una recompensa abierta, el juego la marca como reclamada, suma el dinero a tu puntuación y coloca tu avatar en la fila.
 
-La primera reclamación válida gana esa recompensa. Cuando ya está reclamada, queda cerrada para ambos jugadores, así que sigue revisando el chat en busca de la siguiente oportunidad.
-
+La primera coincidencia válida gana la recompensa y la cierra para ambos jugadores.
 
 ## Fin de la ronda
 
 La ronda termina cuando el temporizador llega a cero o cuando se han reclamado las seis recompensas.
 
-Después de una breve pantalla de fin de ronda, **The Ledger** muestra el resultado final. La persona ganadora aparece primero, seguida de la otra, con el avatar, el rango, las recompensas reclamadas y el dinero conseguido por cada jugador. Gana quien tenga más dinero.
-
+Al terminar, **The Ledger** muestra el puesto, las recompensas y las ganancias de cada jugador. Gana quien consiga más dinero.
 
 ## Hecho para el chat en directo
 
-The Wild Wild Chat solo está disponible durante el chat en directo, porque el juego consiste en reaccionar al chat del stream mientras está ocurriendo.
+The Wild Wild Chat solo está disponible durante los directos porque depende de los mensajes a medida que aparecen.
 
-También hay un modo compacto. Si el cartel completo de buscados tapa demasiado chat, reduce el panel a una pequeña fila que mantiene visibles el temporizador y la puntuación, y deja el chat más fácil de leer.
-
+Si el cartel tapa demasiado chat, el modo compacto lo reduce a una fila con el tiempo y la puntuación.
 
 ## Parte de Playground
 
-Como Ajedrez y HELP-A-FRIEND! Trivia, The Wild Wild Chat vive dentro de Playground. Usa el mismo panel de Juegos, el mismo flujo de invitaciones y la misma ventana flotante de juego, así que se mantiene cerca del chat de YouTube.
-
-El estilo, eso sí, es nuevo: carteles de buscados, reclamos sellados, papel polvoriento y un pequeño toque western.
+The Wild Wild Chat usa el panel de Juegos, las invitaciones y la ventana flotante de Playground, con una estética de carteles de buscados y papel polvoriento.
 
 :::media-left
 

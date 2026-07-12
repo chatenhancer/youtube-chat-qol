@@ -15,8 +15,6 @@ tags:
 
 Teraz jeszcze łatwiej wskoczyć do Playground: możesz grać z przeciwnikiem **Computer**.
 
-Czasem czat jest spokojny. Czasem znajomi oglądają inny stream. A czasem po prostu chcesz zagrać szybką rundę bez czekania, aż ktoś zaakceptuje zaproszenie. Computer daje wtedy jeszcze jedną opcję.
-
 ## Jak to działa
 
 Otwórz Playground z panelu Gry i znajdź gracza Computer na liście graczy. Zaproś go tak samo, jak zapraszasz innego widza. Mecz rozpocznie się automatycznie, a reszta Playground działa tak jak zwykle.
@@ -26,17 +24,9 @@ Przeciwnicy Computer są dostępni dla:
 - **Szachy**, z **Computer (Beginner)**, **Computer (Club)** i **Computer (Master)**, żeby wybrać łatwiejszy, średni albo trudniejszy mecz.
 - **HELP-A-FRIEND! Trivia**, żeby quiz z powtórek nadal działał, gdy nikt inny nie jest wolny.
 
-## Wybierz poziom trudności Szachów
+## Jak gra Computer
 
-Szachy mają teraz trzech przeciwników Computer. Beginner to najłatwiejsza opcja na rozgrzewkę, Club gra stabilniej na średnim poziomie, a Master jest najtrudniejszy.
-
-Nie trzeba osobnego ustawienia: wybierz profil Computer z listy graczy i wyślij zaproszenie.
-
-## Nadal czuć tu Playground
-
-To nie jest osobny tryb solo ani nowy ekran. Gracze Computer zachowują się jak zwykli przeciwnicy w Playground, więc cały przebieg pozostaje znajomy: otwierasz panel, wybierasz grę, wysyłasz zaproszenie i grasz.
-
-W Szachach Computer wykonuje ruch po krótkiej pauzie, żeby gra nie sprawiała wrażenia natychmiastowej odpowiedzi.
+W Szachach Computer wykonuje ruch po krótkiej pauzie, żeby gra nie sprawiała wrażenia natychmiastowej odpowiedzi. Szachy mają teraz trzech przeciwników Computer. Beginner to najłatwiejsza opcja na rozgrzewkę, Club gra stabilniej na średnim poziomie, a Master jest najtrudniejszy.
 
 W *HELP-A-FRIEND! Trivia* Computer odpowiada w rundzie pytań tak jak inny gracz. Nie jest idealny, więc nadal masz realną szansę wygrać.
 

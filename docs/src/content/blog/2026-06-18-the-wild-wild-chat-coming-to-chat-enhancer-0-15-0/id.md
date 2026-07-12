@@ -30,15 +30,13 @@ Kedua pemain menekan **SIAP**, lalu hitungan pendek 3, 2, 1 memulai perburuan ya
 
 :::
 
-
 ## Mengklaim bounty
 
-Papan wanted menampilkan **Mereka vs Kamu**, timer live, dan enam bounty yang masih terbuka. Setiap bounty punya nilai uang, deskripsi, dan stempel **Terbuka** atau **Diklaim**.
+Papan wanted menampilkan Mereka vs Kamu, timer live, dan enam bounty yang masih terbuka. Setiap bounty punya nilai uang, deskripsi, dan stempel **Terbuka** atau **Diklaim**.
 
 Untuk mengklaim satu bounty, klik pesan live chat. Jika pesan cocok dengan bounty yang masih terbuka, game menandai bounty itu sebagai claimed, menambahkan uang ke skor Anda, dan menaruh avatar Anda di baris tersebut.
 
 Claim valid pertama memenangkan bounty itu. Setelah diklaim, bounty tertutup untuk kedua pemain, jadi terus pantau chat untuk peluang berikutnya.
-
 
 ## Ronde selesai
 
@@ -46,23 +44,15 @@ Ronde berakhir ketika timer mencapai nol atau ketika keenam bounty sudah diklaim
 
 Setelah layar akhir ronde yang singkat, **The Ledger** menampilkan hasil akhir. Pemenang muncul lebih dulu, lalu pemain lain, lengkap dengan avatar, peringkat, bounty yang diklaim, dan uang yang didapat masing-masing pemain. Pemain dengan uang terbanyak menang.
 
-
 ## Dibuat untuk live chat
 
 The Wild Wild Chat hanya tersedia selama live chat, karena game ini tentang bereaksi pada chat stream tepat saat chat itu terjadi.
 
 Game ini juga punya mode ringkas. Jika wanted poster penuh menutupi terlalu banyak chat, kecilkan panel menjadi baris kecil yang tetap menampilkan timer dan skor sambil membuat feed lebih mudah dibaca.
 
-
 ## Bagian dari Playground
 
 Seperti Catur dan HELP-A-FRIEND! Trivia, The Wild Wild Chat berada di dalam Playground. Game ini memakai panel Game yang sama, alur undangan yang sama, dan jendela game mengambang yang sama, sehingga tetap dekat dengan chat YouTube.
-
-Namun gayanya baru: wanted posters, stamped claims, kertas berdebu, dan sedikit nuansa western.
-
-
-
-
 
 :::media-left
 

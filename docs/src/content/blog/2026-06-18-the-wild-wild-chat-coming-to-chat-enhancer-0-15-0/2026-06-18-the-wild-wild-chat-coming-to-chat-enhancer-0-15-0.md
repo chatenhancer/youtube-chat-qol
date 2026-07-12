@@ -14,7 +14,7 @@ tags:
 
 The next Playground game is headed into live chat: **The Wild Wild Chat**.
 
-It starts with **Bounty Hunting**, a quick scavenger hunt where two players watch the same stream chat and race to spot the right messages before time runs out.
+Its first mode is **Bounty Hunting**, a quick scavenger hunt where two players race to spot matching messages in the same live chat.
 
 :::media-right
 
@@ -22,42 +22,37 @@ It starts with **Bounty Hunting**, a quick scavenger hunt where two players watc
 
 ### How it works
 
-Start a Playground match from live chat, invite another player, and wait a moment while the round is prepared.
+Start a match from live chat and invite another player.
 
-Each round gets six bounties based on things that naturally happen in chat. You might need to find a message with 3+ emojis, an all-caps message, a question, a user mention, a verified chatter, a link, a number, a repeated phrase, or one of the busier chatters.
+Each round has six bounties based on common chat activity, such as a message with 3+ emojis, a question, a mention, a link, or an all-caps phrase.
 
-Both players press **Ready**, then a short 3, 2, 1 countdown starts the real hunt. After that, you have 60 seconds.
+Both players press **Ready**, then a short countdown starts the 60-second hunt.
 
 :::
 
-
 ## Claiming bounties
 
-The wanted board shows **Them vs You**, the live timer, and the six open bounties. Each bounty has a money value, a description, and an **Open** or **Claimed** stamp.
+The wanted board shows the timer, scores, and six bounties, each with a description, value, and **Open** or **Claimed** stamp.
 
 To claim one, click a live chat message. If the message matches an open bounty, the game stamps that bounty as claimed, adds the money to your score, and places your avatar on the row.
 
-The first valid claim wins that bounty. Once it is claimed, it closes for both players, so keep scanning chat for the next opening.
-
+The first valid claim wins that bounty and closes it for both players.
 
 ## Round over
 
 The round ends when the timer hits zero or when all six bounties have been claimed.
 
-After a short round-over screen, **The Ledger** shows the final result. The winner appears first, followed by the other player, with each player's avatar, rank, bounties claimed, and money earned. Most money wins.
-
+After the round, **The Ledger** shows each player’s rank, claimed bounties, and earnings. Most money wins.
 
 ## Built for live chat
 
-The Wild Wild Chat is only available during live chat, because the game is about reacting to the stream chat as it happens.
+The Wild Wild Chat is only available during live chat because it depends on messages as they appear.
 
-There is also a compact mode. If the full wanted poster covers too much chat, shrink the panel down to a small row that keeps the timer and score visible while leaving the feed easier to read.
+If the wanted poster covers too much chat, compact mode reduces it to a small row with the timer and score.
 
 ## Part of Playground
 
-Like Chess and HELP-A-FRIEND! Trivia, The Wild Wild Chat lives inside Playground. It uses the same Games panel, the same invite flow, and the same floating game window, so it stays close to YouTube chat.
-
-The style is new, though: wanted posters, stamped claims, dusty paper, and a little western dust.
+The Wild Wild Chat uses Playground’s Games panel, invite flow, and floating window, wrapped in wanted posters, stamped claims, and a dusty western style.
 
 :::media-left
 

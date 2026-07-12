@@ -12,11 +12,7 @@ tags:
   - "stick-around"
 ---
 
-Il prossimo gioco di Playground è **Stick Around!**, un piccolo gioco di combattimento che non resta dentro un pannello compatto.
-
-Prende il controllo del feed della chat.
-
-Non della pagina. Non del video. Non della casella dei messaggi. Solo dello spazio in cui scorre la live chat, trasformato in una piccola arena dove due omini stilizzati cercano di restare vivi mentre i messaggi cadono dall’alto.
+Il prossimo gioco di Playground è **Stick Around!**, un piccolo gioco di combattimento che non resta dentro un pannello compatto. Non della pagina. Non del video. Non della casella dei messaggi. Solo dello spazio in cui scorre la live chat, trasformato in una piccola arena dove due omini stilizzati cercano di restare vivi mentre i messaggi cadono dall’alto.
 
 ## Piovono bolle
 
@@ -36,30 +32,18 @@ Stick Around! usa tutto il feed della chat come spazio di gioco. L’intestazion
 
 ## Un tipo diverso di gioco Playground
 
-Scacchi, HELP-A-FRIEND! Trivia e The Wild Wild Chat usano pannelli di gioco compatti. Stick Around! è diverso perché l’arena ha bisogno dell’intero feed della chat.
-
 Questo lo fa sembrare più vicino a qualcosa che succede *dentro* la chat di YouTube invece che accanto. L’intestazione ha ancora gli stessi controlli semplici degli altri pannelli di gioco, inclusi nascondi e audio, ma la partita viene disegnata direttamente sopra il feed.
-
-L’overlay mantiene il gioco leggibile mentre la chat resta visibile sotto, quindi continua a sembrare connesso allo stream invece di diventare una schermata separata.
 
 ## Gioca contro un altro spettatore o Computer
 
-Stick Around! usa il normale flusso di invito di Playground. Apri il pannello Giochi, scegli Stick Around! e invita qualcuno nello stesso stream.
-
-Puoi anche invitare **Computer** se non c’è un altro giocatore nei dintorni. Così il gioco resta utilizzabile nelle chat piccole, negli stream a tarda notte o nei momenti in cui vuoi solo provare il caos senza aspettare un altro spettatore.
+Stick Around! usa il normale flusso di invito di Playground. Apri il pannello Giochi, scegli Stick Around! e invita qualcuno nello stesso stream. Puoi anche invitare **Computer** se non c’è un altro giocatore nei dintorni. Così il gioco resta utilizzabile nelle chat piccole, negli stream a tarda notte o nei momenti in cui vuoi solo provare il caos senza aspettare un altro spettatore.
 
 Entrambi i giocatori premono **PRONTO**, parte il conto alla rovescia e poi inizia la partita.
 
-## Cosa fa vincere o perdere
+## Come vincere
 
 Ogni giocatore ha tre stock. Essere colpiti aumenta il danno, e più danno hai, più lontano ti mandano i colpi. Cadi dal fondo o dai lati dell’arena e perdi uno stock. Quando finisci gli stock, vince l’altro giocatore.
 
 ## Perché appartiene alla chat
 
-Stick Around! è nato da un’idea semplice: e se il feed della chat non fosse solo dietro il gioco, ma parte del gioco?
-
-Per questo le bolle che cadono dipendono dal volume della chat. Uno stream lento diventa una partita leggera. Uno stream veloce diventa una tempesta. I commenti continuano a comportarsi come commenti, ma l’arena diventa più pericolosa man mano che la conversazione si fa più rumorosa.
-
-È sciocco, rapido e un po’ ingiusto esattamente come può esserlo la live chat.
-
-Sembra proprio Playground.
+Stick Around! è nato da un’idea semplice: e se il feed della chat non fosse solo dietro il gioco, ma parte del gioco? Per questo le bolle che cadono dipendono dal volume della chat. Uno stream lento diventa una partita leggera. Uno stream veloce diventa una tempesta. I commenti continuano a comportarsi come commenti, ma l’arena diventa più pericolosa man mano che la conversazione si fa più rumorosa.

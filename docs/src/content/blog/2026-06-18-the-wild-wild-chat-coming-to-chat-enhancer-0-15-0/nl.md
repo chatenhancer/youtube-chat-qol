@@ -30,15 +30,13 @@ Beide spelers drukken op **Klaar**, waarna een korte 3-2-1-aftelling de echte ja
 
 :::
 
-
 ## Bounties claimen
 
-Het wanted-bord toont **Zij tegen jou**, de live timer en de zes open bounties. Elke bounty heeft een geldwaarde, een beschrijving en een stempel **Open** of **Geclaimd**.
+Het wanted-bord toont Zij tegen jou, de live timer en de zes open bounties. Elke bounty heeft een geldwaarde, een beschrijving en een stempel **Open** of **Geclaimd**.
 
 Om er een te claimen, klik je op een livechatbericht. Als het bericht bij een open bounty past, stempelt de game die bounty als geclaimd, telt het geld op bij je score en zet je avatar in die rij.
 
 De eerste geldige claim wint die bounty. Zodra hij is geclaimd, is hij voor beide spelers gesloten, dus blijf de chat scannen voor de volgende kans.
-
 
 ## Ronde voorbij
 
@@ -46,19 +44,15 @@ De ronde eindigt wanneer de timer nul bereikt of wanneer alle zes bounties zijn 
 
 Na een kort scherm aan het einde van de ronde toont **Het kasboek** het eindresultaat. De winnaar staat bovenaan, gevolgd door de andere speler, met ieders avatar, rang, geclaimde bounties en verdiend geld. Wie het meeste geld heeft, wint.
 
-
 ## Gebouwd voor livechat
 
 The Wild Wild Chat is alleen beschikbaar tijdens livechat, omdat de game draait om reageren op de streamchat terwijl die gebeurt.
 
 Er is ook een compacte modus. Als de volledige wanted-poster te veel chat bedekt, verklein je het paneel tot een smalle rij die de timer en score zichtbaar houdt en de chat makkelijker leesbaar maakt.
 
-
 ## Onderdeel van Playground
 
 Net als Schaken en HELP-A-FRIEND! Trivia leeft The Wild Wild Chat binnen Playground. Het gebruikt hetzelfde Games-paneel, dezelfde uitnodigingsflow en hetzelfde zwevende gamevenster, zodat het dicht bij YouTube-chat blijft.
-
-De stijl is wel nieuw: wanted-posters, gestempelde claims, stoffig papier en een beetje westernsfeer.
 
 :::media-left
 

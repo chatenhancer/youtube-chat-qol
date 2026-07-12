@@ -20,8 +20,6 @@ Ein gut besuchter Livechat kann zu den besten Teilen eines Streams gehören. Er 
 
 Der Lite-Modus bietet dir eine weitere Möglichkeit: einen kleineren, ressourcenschonenden Nachrichten-Feed, der auch bei großem Andrang reaktionsschnell bleiben soll.
 
-Er ist vollständig optional und kann jederzeit ein- oder ausgeschaltet werden.
-
 ## Was der Lite-Modus verändert
 
 Der Lite-Modus ersetzt ausschließlich den scrollenden Nachrichten-Feed. Video, Chat-Kopfzeile, Nachrichtenfeld, Emoji-Auswahl, Chatauswahl, Einstellungen und die Teilnehmeransicht bleiben weiterhin Bestandteile von YouTube.
@@ -35,8 +33,6 @@ Die deutlichste Verbesserung sollte bei schnellen Chats oder langen Wiedergabesi
 Nachrichten behalten das vertraute YouTube-Layout bei, einschließlich Avataren, Handles, Moderator- und Verifizierungsabzeichen, Zeitstempeln, benutzerdefinierten Emojis, Mitgliedschaften, Geschenken und bezahlten Nachrichten.
 
 Auch die Funktionen von Chat Enhancer bleiben in den schlanken Zeilen verfügbar. Dazu gehören Übersetzungen, Inbox-Hervorhebungen, Benutzerprofile und letzte Nachrichten, Fokusmodus, Lesezeichen, Nachrichtenaktionen, Designs und unterstützte Playground-Oberflächen.
-
-
 
 Einige YouTube-Funktionen werden im Lite-Modus möglicherweise noch nicht unterstützt, beispielsweise das Melden oder Blockieren einer Person im Chat. Diese Funktionen werden in zukünftigen Updates der Erweiterung ergänzt. Wir werden den Lite-Modus auch weiterhin aktualisieren, wenn YouTube neue Funktionen einführt.
 
@@ -59,8 +55,6 @@ Der Lite-Modus selbst fügt kein weiteres Chatkonto hinzu und sendet Nachrichten
 
 ## Warum die Beta-Kennzeichnung?
 
-Der schlanke Feed deckt den alltäglichen Chat bereits ab, doch die Details sind wichtig. Wir werden voraussichtlich weiterhin Nachrichtentaktung, Scrollverhalten, Übergänge bei Wiederholungen, Darstellung, Leistungsgrenzen und die Unterstützung neuer YouTube-Nachrichtenformate optimieren, während wir beobachten, wie sich der Lite-Modus bei mehr Streams und Geräten verhält.
-
-Deshalb trägt der Schalter ein **Beta**-Abzeichen. Die Funktion kann ausprobiert werden, wird sich aber noch weiterentwickeln.
+Der schlanke Feed deckt den alltäglichen Chat bereits ab, doch die Details sind wichtig. Wir werden voraussichtlich weiterhin Nachrichtentaktung, Scrollverhalten, Übergänge bei Wiederholungen, Darstellung, Leistungsgrenzen und die Unterstützung neuer YouTube-Nachrichtenformate optimieren, während wir beobachten, wie sich der Lite-Modus bei mehr Streams und Geräten verhält. Deshalb trägt der Schalter ein **Beta**-Abzeichen. Die Funktion kann ausprobiert werden, wird sich aber noch weiterentwickeln.
 
 Falls sich etwas nicht richtig anfühlt, beschreibe uns bitte unter [hello@chatenhancer.com](mailto:hello@chatenhancer.com), was dir aufgefallen ist. Besonders hilfreich sind ein Link zum Stream, die Angabe, ob es sich um eine Liveübertragung oder Wiederholung handelte, und eine Beschreibung dessen, was unmittelbar vor dem Problem passiert ist.

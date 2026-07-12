@@ -25,4 +25,4 @@ tags: []
 ## เกี่ยวกับธีม Aero
 Aero เป็นธีมที่เลียนแบบสุนทรียะของอินเทอร์เฟซแชทช่วงปลายปี 2007 ให้ความรู้สึกย้อนยุค ใสเหมือนน้ำ และสดชื่น! 💧
 
-เช่นเคย คุณสามารถส่งข้อเสนอแนะเกี่ยวกับธีมหรือเรื่องอื่น ๆ มาให้เราได้ที่ [hello@chatenhancer.com](mailto:hello@chatenhancer.com)
+ส่งไอเดียธีมมาได้ที่ [hello@chatenhancer.com](mailto:hello@chatenhancer.com)

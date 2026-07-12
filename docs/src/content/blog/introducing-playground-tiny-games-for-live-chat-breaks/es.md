@@ -16,17 +16,13 @@ tags:
 
 ## Playground ya está aquí
 
-Playground es un pequeño centro de juegos dentro de Chat Enhancer. Te permite jugar con otros espectadores que tengan la extensión instalada y estén en el mismo stream.
-
-¿El streamer se ha ausentado un minuto? Abre Playground, juega una partida rápida y mantén el chat a mano.
+Playground es una pequeña zona de juegos dentro de Chat Enhancer para disputar partidas rápidas con otros espectadores del mismo directo.
 
 :::media-right
 
 ![Panel compacto de una partida de Ajedrez flotando sobre el chat en directo de YouTube](./f779ebcc57f8280d.png){shadow=smooth rotation=-2}
 
-Los juegos se mantienen compactos. El panel se puede arrastrar, así que puedes apartarlo cuando el chat vuelva a animarse.
-
-Ajedrez fue el primer juego de Playground y sigue siendo la mejor forma de explicar la idea: una actividad rápida junto al chat, sin ocupar toda la página.
+Los juegos aparecen en un panel compacto que puedes mover para mantener el chat a la vista.
 
 :::
 
@@ -34,22 +30,17 @@ Ajedrez fue el primer juego de Playground y sigue siendo la mejor forma de expli
 
 Abre el panel de Juegos, elige **Ajedrez** e invita a alguien disponible en el mismo stream. Cuando acepte, el tablero se abrirá en un pequeño panel flotante sobre el chat en directo.
 
-El juego usa las reglas normales del ajedrez. Los movimientos se validan antes de enviarse, los turnos se mantienen sincronizados entre ambos jugadores y la partida puede terminar por jaque mate, tablas o rendición. Si el stream vuelve a ponerse intenso, arrastra el panel a un lado y sigue mirando.
+Los movimientos siguen las reglas habituales del ajedrez, los turnos se sincronizan entre ambos jugadores y la partida puede terminar en jaque mate, tablas o rendición.
 
-Si no hay nadie más por ahí, Ajedrez también admite rivales **Computer**. Elige **Computer (Beginner)**, **Computer (Club)** o **Computer (Master)** en la lista de jugadores y empieza una partida igual que lo harías con otro espectador.
+Si no hay nadie disponible, elige **Computer (Beginner)**, **Computer (Club)** o **Computer (Master)** en la lista de jugadores.
 
 ## Por qué encaja en el chat en directo
 
-Playground no es una sala de juegos completa pegada a YouTube. Está pensado para los momentos tranquilos de un stream, cuando el chat sigue abierto pero no está pasando gran cosa.
+Playground está pensado para los momentos tranquilos de un directo y mantiene YouTube a la vista:
 
-Por eso Ajedrez es pequeño a propósito:
-
-- Se ejecuta desde el panel de Juegos dentro de la extensión.
 - Usa un tablero compacto y fácil de mover.
-- Solo muestra jugadores disponibles que también usan Chat Enhancer en el stream actual.
+- Solo muestra jugadores disponibles que también usan Chat Enhancer en el directo actual.
 - Mantiene visible el resto de YouTube, para que puedas volver al chat de inmediato.
-
-Los ajustes de Playground viven en el popup de la extensión.
 
 :::media-left
 
@@ -63,8 +54,6 @@ Dentro del panel de Juegos, activa **Disponible para invitaciones** cuando quier
 
 ## Ahora es más que Ajedrez
 
-Playground ha crecido desde esta primera vista previa de Ajedrez. También puedes jugar a [HELP-A-FRIEND! Trivia](/es/blog/new-in-0-14-0-help-a-friend-trivia/), y [The Wild Wild Chat](/es/blog/the-wild-wild-chat-coming-to-chat-enhancer-0-15-0/) convierte el chat en directo en una rápida caza de recompensas.
-
-El flujo sigue siendo el mismo: abre el panel de Juegos, invita a un espectador o a un rival Computer cuando esté disponible, juega una partida compacta y mantén el stream cerca.
+Playground ha crecido desde esta primera versión con Ajedrez. También puedes jugar a [HELP-A-FRIEND! Trivia](/es/blog/new-in-0-14-0-help-a-friend-trivia/), mientras que [The Wild Wild Chat](/es/blog/the-wild-wild-chat-coming-to-chat-enhancer-0-15-0/) convierte el chat en una rápida caza de recompensas.
 
 Si tienes sugerencias, puedes escribirnos a [hello@chatenhancer.com](mailto:hello@chatenhancer.com).

@@ -15,8 +15,6 @@ tags:
 
 Playground’a girmek artık daha kolay: **Computer**’a karşı oynayabilirsiniz.
 
-Bazen sohbet sessiz olur. Bazen arkadaşlarınız başka bir yayın izliyordur. Bazen de başka birinin kabul etmesini beklemeden hızlıca bir tur oynamak istersiniz. Computer size başka bir seçenek sunar.
-
 ## Nasıl çalışır?
 
 Oyunlar panelinden Playground’u açın ve oyuncu listesinde Computer’ı bulun. Başka bir izleyiciyi davet eder gibi davet edin. Maç otomatik olarak başlar; Playground’un geri kalanı aynı şekilde çalışır.
@@ -26,17 +24,9 @@ Computer rakipleri şu oyunlarda kullanılabilir:
 - **Satranç**, daha kolay, orta veya daha zor bir maç seçebilmeniz için **Computer (Beginner)**, **Computer (Club)** ve **Computer (Master)** ile.
 - **HELP-A-FRIEND! Trivia**, kimse uygun değilken tekrar tabanlı trivia hâlâ oynanabilsin diye.
 
-## Satranç zorluğunu seçin
+## Computer nasıl oynar?
 
-Satranç artık üç Computer rakibine sahip. Beginner ısınmak için en kolay seçenek, Club daha dengeli orta seviye rakip, Master ise en zor profildir.
-
-Ayrı bir ayara gerek yok: oyuncu listesinden istediğiniz Computer profilini seçin ve davet gönderin.
-
-## Hâlâ Playground gibi hissettirir
-
-Bu ayrı bir solo mod ya da yeni bir ekran değil. Computer normal Playground rakipleri gibi davranır, bu yüzden akış tanıdık kalır: paneli açın, oyun seçin, davet gönderin ve oynayın.
-
-Satranç’te Computer hamlelerini kısa bir duraklamadan sonra yapar, böylece oyun anında gerçekleşiyor gibi hissettirmez.
+Satranç’te Computer hamlelerini kısa bir duraklamadan sonra yapar, böylece oyun anında gerçekleşiyor gibi hissettirmez. Satranç artık üç Computer rakibine sahip. Beginner ısınmak için en kolay seçenek, Club daha dengeli orta seviye rakip, Master ise en zor profildir.
 
 *HELP-A-FRIEND! Trivia* içinde Computer, soru turunda başka bir oyuncu gibi cevap verir. Kusursuz değildir, bu yüzden kazanmak için hâlâ gerçek bir şansınız vardır.
 

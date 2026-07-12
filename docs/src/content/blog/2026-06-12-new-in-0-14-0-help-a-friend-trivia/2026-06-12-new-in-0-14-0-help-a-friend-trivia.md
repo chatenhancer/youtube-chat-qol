@@ -12,8 +12,6 @@ tags:
   - "trivia"
 ---
 
-The second Playground game is here: **HELP-A-FRIEND! Trivia**.
-
 :::media-right
 
 ![HELP-A-FRIEND! Trivia logo](./2026-06-12-new-in-0-14-0-help-a-friend-trivia-assets/6ef6d6f2584f127f.png){shadow=smooth;rotate=-8deg}
@@ -35,7 +33,6 @@ Once the game begins, your friend asks about the replay. Four possible answers a
 ## Built for replays
 
 Each match is generated from the transcript of the replay you are watching, so the game can ask about things that actually happened in that stream: reveals, awards, jokes, tangents, and whatever else made it into the video.
-
 
 :::media-left
 

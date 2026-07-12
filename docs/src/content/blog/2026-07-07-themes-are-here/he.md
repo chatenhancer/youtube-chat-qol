@@ -25,4 +25,4 @@ tags: []
 ## על ערכת העיצוב Aero
 Aero היא ערכת עיצוב שמחקה את האסתטיקה של ממשקי צ'אט מסוף 2007. היא נוסטלגית, מימית ומרעננת! 💧
 
-כמו תמיד, אפשר לשלוח לנו הצעות לערכות עיצוב, או לכל דבר אחר, אל [hello@chatenhancer.com](mailto:hello@chatenhancer.com).
+שלחו הצעות לערכות עיצוב אל [hello@chatenhancer.com](mailto:hello@chatenhancer.com).

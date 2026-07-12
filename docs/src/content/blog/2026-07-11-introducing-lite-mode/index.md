@@ -16,29 +16,25 @@ tags:
 
 *Lite mode is now available in beta in version 0.18.*
 
-A busy live chat can be one of the best parts of a stream. It can also ask a lot from your browser once messages, avatars, badges, animations, and other chat elements have been piling up for a while.
+A busy live chat can be one of the best parts of a stream, but messages, avatars, badges, and animations can put extra pressure on your browser over time.
 
-Lite mode gives you another option: a smaller, lightweight message feed designed to stay responsive when chat gets crowded.
-
-It is completely optional, and you can switch it on or off whenever you want.
+Lite mode is an optional, lightweight message feed designed to stay responsive when chat gets crowded.
 
 ## What Lite mode changes
 
 Lite mode replaces only the scrolling message feed. The video, chat header, message box, emoji picker, chat selection, settings, and Participants view still belong to YouTube.
 
-While Lite mode is enabled, Chat Enhancer replaces the original feed with its own lightweight version. That means fewer chat elements, images, and effects need to stay active at once, improving performance.
+It keeps fewer chat elements, images, and effects active at once, reducing the work required to display the feed.
 
-The biggest improvement should be noticeable in fast chats or long viewing sessions. The exact difference will still depend on the stream, your device, your other extensions, and the features you have enabled. Lite mode is focused on the chat feed; it does not change the work required to play the video itself.
+The biggest improvement should appear in fast chats or long viewing sessions, although results depend on the stream, device, other extensions, and enabled features. Lite mode does not change video playback.
 
 ## Familiar chat, lighter underneath
 
 Messages keep the familiar YouTube-style layout, including avatars, handles, moderator and verified badges, timestamps, custom emoji, memberships, gifts, and paid messages.
 
-Chat Enhancer features continue to work across the lightweight rows too. That includes translation, Inbox highlights, user profiles and recent messages, Focus mode, bookmarks, message actions, themes, and supported Playground surfaces.
+Chat Enhancer features such as translation, Inbox highlights, profiles, Focus mode, bookmarks, message actions, themes, and supported Playground surfaces continue to work.
 
-
-
-There are YouTube features that may not be supported in Lite mode yet, for example: the ability to report or block a chatter. These features will become supported by Lite mode in future updates to the extension. We will continue updating Lite mode as YouTube introduces more features.
+Some YouTube actions, including reporting or blocking a chatter, are not yet available in Lite mode. Support will expand in future updates.
 
 :::media-right
 
@@ -51,16 +47,14 @@ Turn on **Lite mode** from the **Appearance** section of the extension popup. Yo
 
 ## A safe way back to YouTube chat
 
-YouTube changes its chat formats over time, and live streams can include unusual message types or connection states. If Lite mode cannot keep reading the core chat feed, stops receiving updates, or loses the part of the page it needs, Chat Enhancer reloads the chat panel and restores YouTube chat automatically.
+If Lite mode loses access to the chat feed or stops receiving updates, Chat Enhancer reloads the chat panel and restores YouTube chat automatically.
 
-You will see a short notice explaining that YouTube chat was restored. The video and the rest of the watch page are not reloaded.
+You will see a short notice, and the video and watch page will not reload.
 
-Lite mode itself does not add another chat account or send messages through a separate chat service. Reading and sending chat still use YouTube. If you have translation or Playground enabled, those features keep the same network behavior described in our [privacy policy](/privacy/).
+Reading and sending messages still use YouTube; Lite mode does not add another account or chat service. Translation and Playground keep the network behavior described in our [privacy policy](/privacy/).
 
 ## Why the beta label?
 
-The lightweight feed already covers the everyday chat experience, but the details matter. We expect to keep tuning message pacing, scrolling, replay transitions, styling, performance limits, and support for new YouTube message formats as we learn how Lite mode behaves across more streams and devices.
-
-That is why the toggle has a **Beta** badge. It is ready to try, but it is not finished changing.
+The lightweight feed covers everyday chat, but we are still tuning scrolling, replay transitions, styling, performance, and support for new YouTube message formats. That is why the toggle has a **Beta** badge.
 
 If something feels off, tell us what you noticed at [hello@chatenhancer.com](mailto:hello@chatenhancer.com). A stream link, whether it was live or a replay, and what happened before the problem are especially helpful.

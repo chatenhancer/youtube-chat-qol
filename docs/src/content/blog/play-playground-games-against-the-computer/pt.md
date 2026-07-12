@@ -15,8 +15,6 @@ tags:
 
 Agora ficou mais fácil entrar no Playground: você pode jogar contra **Computer**.
 
-Às vezes o chat está quieto. Às vezes seus amigos estão assistindo a outro stream. Às vezes você só quer jogar uma partida rápida sem esperar outra pessoa aceitar. Computer oferece mais uma opção.
-
 ## Como funciona
 
 Abra o Playground pelo painel Jogos e procure um jogador Computer na lista de jogadores. Convide-o da mesma forma que convidaria outro espectador. A partida começa automaticamente, e o restante do Playground funciona como sempre.
@@ -26,17 +24,9 @@ Os oponentes Computer estão disponíveis para:
 - **Xadrez**, com **Computer (Beginner)**, **Computer (Club)** e **Computer (Master)**, para escolher uma partida mais leve, intermediária ou mais difícil.
 - **HELP-A-FRIEND! Trivia**, para que a trivia de replays continue jogável quando ninguém estiver disponível.
 
-## Escolha a dificuldade de Xadrez
+## Como o Computer joga
 
-Xadrez agora tem três oponentes Computer. Beginner é a opção mais fácil para aquecer, Club joga em um nível intermediário mais estável e Master é a escolha mais difícil.
-
-Não é preciso mudar nenhuma configuração: escolha o perfil Computer que quiser na lista de jogadores e envie um convite.
-
-## Ainda parece Playground
-
-Não é um modo solo separado nem uma nova tela. Os jogadores Computer se comportam como oponentes normais do Playground: abra o painel, escolha um jogo, envie um convite e jogue.
-
-No Xadrez, Computer espera um pouco antes de jogar, para que a partida não pareça instantânea.
+No Xadrez, Computer espera um pouco antes de jogar, para que a partida não pareça instantânea. Xadrez agora tem três oponentes Computer. Beginner é a opção mais fácil para aquecer, Club joga em um nível intermediário mais estável e Master é a escolha mais difícil.
 
 Em *HELP-A-FRIEND! Trivia*, Computer responde durante a rodada da pergunta como outro jogador faria. Ele não é perfeito, então você ainda tem uma chance real de vencer.
 

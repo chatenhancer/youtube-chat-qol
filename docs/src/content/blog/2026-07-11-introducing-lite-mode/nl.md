@@ -20,8 +20,6 @@ Een drukke livechat kan een van de leukste onderdelen van een stream zijn. Tegel
 
 De Lite-modus biedt een andere optie: een kleinere, lichte berichtenfeed die responsief blijft wanneer het druk wordt in de chat.
 
-De functie is volledig optioneel en je kunt haar op elk moment in- of uitschakelen.
-
 ## Wat de Lite-modus verandert
 
 De Lite-modus vervangt alleen de scrollende berichtenfeed. De video, chatkop, het berichtenvak, de emojikiezer, chatselectie, instellingen en deelnemersweergave blijven onderdeel van YouTube.
@@ -35,8 +33,6 @@ De grootste verbetering zal waarschijnlijk merkbaar zijn in snelle chats of tijd
 Berichten behouden de vertrouwde YouTube-achtige indeling, met onder meer avatars, gebruikersnamen, moderator- en verificatiebadges, tijdstempels, aangepaste emoji, lidmaatschappen, cadeaus en betaalde berichten.
 
 Ook de functies van Chat Enhancer blijven in de lichte rijen werken. Daaronder vallen vertaling, Inbox-markeringen, gebruikersprofielen en recente berichten, Focus-modus, bladwijzers, berichtacties, thema’s en ondersteunde Playground-oppervlakken.
-
-
 
 Sommige YouTube-functies worden mogelijk nog niet ondersteund in de Lite-modus, zoals het rapporteren of blokkeren van iemand in de chat. Ondersteuning voor deze functies wordt toegevoegd in toekomstige updates van de extensie. We blijven de Lite-modus bijwerken wanneer YouTube nieuwe functies introduceert.
 
@@ -59,8 +55,6 @@ De Lite-modus voegt zelf geen extra chataccount toe en verstuurt geen berichten 
 
 ## Waarom het bètalabel?
 
-De lichte feed dekt de alledaagse chatervaring al, maar de details zijn belangrijk. We verwachten de berichtsnelheid, het scrollen, overgangen bij herhalingen, de vormgeving, prestatielimieten en ondersteuning voor nieuwe YouTube-berichtformaten verder te verfijnen terwijl we leren hoe de Lite-modus zich gedraagt bij meer streams en apparaten.
-
-Daarom heeft de schakelaar een **Bèta**-badge. De functie is klaar om te proberen, maar zal nog blijven veranderen.
+De lichte feed dekt de alledaagse chatervaring al, maar de details zijn belangrijk. We verwachten de berichtsnelheid, het scrollen, overgangen bij herhalingen, de vormgeving, prestatielimieten en ondersteuning voor nieuwe YouTube-berichtformaten verder te verfijnen terwijl we leren hoe de Lite-modus zich gedraagt bij meer streams en apparaten. Daarom heeft de schakelaar een **Bèta**-badge. De functie is klaar om te proberen, maar zal nog blijven veranderen.
 
 Voelt iets niet goed, laat ons dan via [hello@chatenhancer.com](mailto:hello@chatenhancer.com) weten wat je hebt gezien. Vooral een link naar de stream, of het live was of een herhaling, en wat er vlak vóór het probleem gebeurde, zijn nuttig.

@@ -12,8 +12,6 @@ tags:
   - "trivia"
 ---
 
-두 번째 Playground 게임인 **HELP-A-FRIEND! Trivia**가 나왔습니다.
-
 :::media-right
 
 ![HELP-A-FRIEND! Trivia 로고](./2026-06-12-new-in-0-14-0-help-a-friend-trivia-assets/6ef6d6f2584f127f.png){shadow=smooth;rotate=-8deg}
