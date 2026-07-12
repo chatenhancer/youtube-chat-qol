@@ -55,7 +55,6 @@ const NATIVE_CHAT_RENDERER_SELECTOR = 'yt-live-chat-renderer';
 const NATIVE_HIDE_TIMESTAMPS_ATTRIBUTE = 'hide-timestamps';
 const NATIVE_TIMESTAMP_TOGGLE_SELECTOR =
   'yt-live-chat-toggle-renderer tp-yt-paper-toggle-button';
-const PARTICIPANT_LIST_SELECTOR = 'yt-live-chat-participant-list-renderer';
 const NATIVE_TICKER_SELECTOR = 'yt-live-chat-ticker-renderer, #ticker';
 const STARTUP_TIMEOUT_MS = 20_000;
 const REPLAY_STARTUP_TIMEOUT_MS = 45_000;
@@ -131,8 +130,6 @@ let replayProgressMs: number | null = null;
 let replayRequestsIdentifySeeks = false;
 let receivedSourceBatch = false;
 let unreadableFeedBatchesWithoutProgress = 0;
-let lastContinuationTimeoutMs: number | undefined;
-let participantsPanelSelected = false;
 let rowRenderedCallback: LiteChatRowRenderedCallback | null = null;
 let batchListeners = new AbortController();
 let documentUnloading = false;
@@ -163,8 +160,6 @@ export function startLiteMode(options: StartLiteModeOptions = {}): void {
   lastSequence = -1;
   receivedSourceBatch = false;
   unreadableFeedBatchesWithoutProgress = 0;
-  lastContinuationTimeoutMs = undefined;
-  participantsPanelSelected = false;
   setLiteModeBootstrapIntent(true);
   store = createLiteChatStore();
   renderer = createLiteChatRenderer(store, {
@@ -210,7 +205,6 @@ export function startLiteMode(options: StartLiteModeOptions = {}): void {
   refreshNativeUiObserverTargets();
   scheduleStartupTimeout();
   syncNativeTimestampToggle();
-  syncParticipantsPanelState();
 }
 
 export function stopLiteMode(reason: LiteModeStopReason = 'explicit'): void {
@@ -561,7 +555,6 @@ export function handleLiteModeDomMutations(mutations: readonly MutationRecord[])
   if (mutations.some(mutationTouchesNativeUi)) {
     refreshNativeUiObserverTargets();
     syncNativeTimestampToggle();
-    syncParticipantsPanelState();
   }
   const root = renderer?.root;
   if (!root?.isConnected) {
@@ -598,19 +591,12 @@ function handleNativeUiMutations(mutations: MutationRecord[]): void {
   )) {
     syncNativeTimestampToggle();
   }
-  if (mutations.some((mutation) =>
-    mutation.target instanceof Element &&
-    mutation.target.matches(PARTICIPANT_LIST_SELECTOR)
-  )) {
-    syncParticipantsPanelState();
-  }
 }
 
 function refreshNativeUiObserverTargets(): void {
   const targets = [
     ...document.querySelectorAll<HTMLElement>(NATIVE_CHAT_RENDERER_SELECTOR),
-    ...getNativeTimestampToggles(),
-    ...document.querySelectorAll<HTMLElement>(PARTICIPANT_LIST_SELECTOR)
+    ...getNativeTimestampToggles()
   ];
   if (
     targets.length === observedNativeUiTargets.length &&
@@ -651,7 +637,7 @@ function mutationTouchesNativeUi(mutation: MutationRecord): boolean {
   }
   if (
     mutation.target instanceof Element &&
-    mutation.target.closest(`${NATIVE_LIST_SELECTOR}, .ytcq-lite-root, ${PARTICIPANT_LIST_SELECTOR}`)
+    mutation.target.closest(`${NATIVE_LIST_SELECTOR}, .ytcq-lite-root`)
   ) {
     return false;
   }
@@ -660,10 +646,8 @@ function mutationTouchesNativeUi(mutation: MutationRecord): boolean {
     return node.matches('yt-live-chat-toggle-renderer') ||
       node.matches(NATIVE_CHAT_RENDERER_SELECTOR) ||
       node.matches(NATIVE_TIMESTAMP_TOGGLE_SELECTOR) ||
-      node.matches(PARTICIPANT_LIST_SELECTOR) ||
       Boolean(node.querySelector(NATIVE_TIMESTAMP_TOGGLE_SELECTOR)) ||
-      Boolean(node.querySelector(NATIVE_CHAT_RENDERER_SELECTOR)) ||
-      Boolean(node.querySelector(PARTICIPANT_LIST_SELECTOR));
+      Boolean(node.querySelector(NATIVE_CHAT_RENDERER_SELECTOR));
   });
 }
 
@@ -769,57 +753,16 @@ function isNativeTimestampToggleEnabled(toggle: Element): boolean {
     toggle.hasAttribute('active');
 }
 
-function syncParticipantsPanelState(): void {
-  const selected = isNativeParticipantsPanelSelected();
-  const root = renderer?.root;
-  if (root) {
-    root.hidden = selected;
-    if (selected) root.setAttribute('aria-hidden', 'true');
-    else root.removeAttribute('aria-hidden');
-  }
-  if (selected === participantsPanelSelected) return;
-
-  participantsPanelSelected = selected;
-  if (selected) {
-    clearStartupTimer();
-    clearSourceTimer();
-  } else if (active && receivedSourceBatch) {
-    scheduleSourceWatchdog(lastContinuationTimeoutMs);
-  } else if (active) {
-    scheduleStartupTimeout();
-  }
-}
-
-function isNativeParticipantsPanelSelected(): boolean {
-  return Array.from(document.querySelectorAll<HTMLElement>(PARTICIPANT_LIST_SELECTOR))
-    .some((participantList) => {
-      const selected = participantList.classList.contains('iron-selected') ||
-        participantList.hasAttribute('selected') ||
-        participantList.getAttribute('aria-selected') === 'true';
-      return selected &&
-        !participantList.hidden &&
-        participantList.getAttribute('aria-hidden') !== 'true';
-    });
-}
-
 function scheduleSourceWatchdog(continuationTimeoutMs: number | undefined): void {
-  lastContinuationTimeoutMs = continuationTimeoutMs;
   clearSourceTimer();
-  if (
-    window.location.pathname === '/live_chat_replay' ||
-    participantsPanelSelected
-  ) {
-    return;
-  }
+  if (window.location.pathname === '/live_chat_replay') return;
   const providerTimeout = continuationTimeoutMs || 0;
   const timeout = providerTimeout
     ? Math.min(MAX_SOURCE_WATCHDOG_MS, Math.max(12_000, providerTimeout * 2 + 5_000))
     : DEFAULT_SOURCE_TIMEOUT_MS;
   sourceTimer = window.setTimeout(() => {
     sourceTimer = 0;
-    if (document.visibilityState === 'hidden' || isNativeParticipantsPanelSelected()) {
-      syncParticipantsPanelState();
-      if (participantsPanelSelected) return;
+    if (document.visibilityState === 'hidden') {
       scheduleSourceWatchdog(continuationTimeoutMs);
       return;
     }
@@ -829,15 +772,14 @@ function scheduleSourceWatchdog(continuationTimeoutMs: number | undefined): void
 
 function scheduleStartupTimeout(): void {
   clearStartupTimer();
-  if (!active || receivedSourceBatch || participantsPanelSelected) return;
+  if (!active || receivedSourceBatch) return;
   const timeout = window.location.pathname === '/live_chat_replay'
     ? REPLAY_STARTUP_TIMEOUT_MS
     : STARTUP_TIMEOUT_MS;
   startupTimer = window.setTimeout(() => {
     startupTimer = 0;
-    if (document.visibilityState === 'hidden' || isNativeParticipantsPanelSelected()) {
-      syncParticipantsPanelState();
-      if (!participantsPanelSelected) scheduleStartupTimeout();
+    if (document.visibilityState === 'hidden') {
+      scheduleStartupTimeout();
       return;
     }
     failLiteMode('startup-timeout');
@@ -870,8 +812,6 @@ function teardownLiteMode(clearIntent: boolean): void {
   lastSequence = -1;
   receivedSourceBatch = false;
   unreadableFeedBatchesWithoutProgress = 0;
-  lastContinuationTimeoutMs = undefined;
-  participantsPanelSelected = false;
   documentUnloading = false;
   if (clearIntent) clearLiteModeBootstrapIntent();
 }

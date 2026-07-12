@@ -856,7 +856,7 @@ describe('Lite mode controller', () => {
     expect(root.dataset.ytcqShowTimestamps).toBe('false');
   });
 
-  it('keeps Lite transport active and pauses its watchdog while Participants is selected', async () => {
+  it('leaves Participants visibility to YouTube without pausing the source watchdog', async () => {
     startLiteMode({ clearCooldown: true });
     dispatchBatch({
       ...createBatch(1, [{ type: 'upsert', record: createRecord('before', 'Before') }]),
@@ -870,22 +870,14 @@ describe('Lite mode controller', () => {
     notifyLiteElementAdded(participants, chatRenderer);
     await flushMutations();
 
-    expect(root.hidden).toBe(true);
-    expect(root.getAttribute('aria-hidden')).toBe('true');
+    expect(root.hidden).toBe(false);
+    expect(root.hasAttribute('aria-hidden')).toBe(false);
 
     dispatchBatch({
       ...createBatch(2, [{ type: 'upsert', record: createRecord('during', 'During') }]),
       continuationTimeoutMs: 1_000
     });
     expect(document.querySelector('[data-message-id="during"]')).not.toBeNull();
-    await vi.advanceTimersByTimeAsync(20_000);
-    expect(isLiteModeActive()).toBe(true);
-
-    participants.classList.remove('iron-selected');
-    await flushMutations();
-    expect(root.hidden).toBe(false);
-    expect(root.hasAttribute('aria-hidden')).toBe(false);
-
     await vi.advanceTimersByTimeAsync(11_999);
     expect(isLiteModeActive()).toBe(true);
     await vi.advanceTimersByTimeAsync(1);
@@ -893,7 +885,7 @@ describe('Lite mode controller', () => {
     expect(requestNativeChatRestoreMock).toHaveBeenCalledOnce();
   });
 
-  it('pauses and rearms the startup timeout around Participants before a heartbeat', async () => {
+  it('does not pause the startup timeout for Participants', async () => {
     startLiteMode({ clearCooldown: true });
     const participants = document.createElement('yt-live-chat-participant-list-renderer');
     participants.classList.add('iron-selected');
@@ -902,11 +894,6 @@ describe('Lite mode controller', () => {
     notifyLiteElementAdded(participants, chatRenderer);
     await flushMutations();
 
-    await vi.advanceTimersByTimeAsync(20_000);
-    expect(isLiteModeActive()).toBe(true);
-
-    participants.classList.remove('iron-selected');
-    await flushMutations();
     await vi.advanceTimersByTimeAsync(19_999);
     expect(isLiteModeActive()).toBe(true);
     await vi.advanceTimersByTimeAsync(1);

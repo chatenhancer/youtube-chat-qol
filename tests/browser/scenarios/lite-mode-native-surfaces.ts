@@ -181,7 +181,7 @@ export const liteModeLiveParticipantsScenario: BrowserScenario = async ({ chat, 
         .first();
       await expect(participants).toBeVisible({ timeout: 15_000 });
       await expect(root).toBeHidden();
-      await expect(root).toHaveAttribute('aria-hidden', 'true');
+      await expect(root).not.toHaveAttribute('aria-hidden', 'true');
 
       await expect
         .poll(async () => getParticipantRowCount(participants), {
@@ -203,7 +203,6 @@ export const liteModeLiveParticipantsScenario: BrowserScenario = async ({ chat, 
 
       await closeParticipantsPanel(chat, participants);
       await expect(root).toBeVisible({ timeout: 15_000 });
-      await expect(root).not.toHaveAttribute('aria-hidden', 'true');
       await expect(root.locator('.ytcq-lite-message').first()).toBeVisible();
       expect((await getLiveSurfaceAudit(chat)).fallbackReason).toBe('');
     });
