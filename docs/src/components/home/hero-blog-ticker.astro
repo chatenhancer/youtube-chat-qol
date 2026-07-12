@@ -4,7 +4,8 @@ import type { CollectionEntry } from 'astro:content';
 import { getBlogPostPath } from '../../data/blog';
 import Icon from '../common/icon.astro';
 
-const { nextLabel, posts, previousLabel } = Astro.props as {
+const { newLabel, nextLabel, posts, previousLabel } = Astro.props as {
+  newLabel: string;
   nextLabel: string;
   posts: CollectionEntry<'blog'>[];
   previousLabel: string;
@@ -34,6 +35,20 @@ const BLOG_TICKER_IMAGE_WIDTH = 480;
                 decoding="async"
               />
             )}
+          </span>
+          <span
+            class="hero-blog-ticker-new"
+            data-hero-blog-new
+            data-hero-blog-post-date={post.data.date.toISOString().slice(0, 10)}
+            hidden
+          >
+            <span class="hero-blog-ticker-new-decor hero-blog-ticker-new-decor-start" aria-hidden="true">
+              <span></span><span></span><span></span>
+            </span>
+            <span class="hero-blog-ticker-new-label">{newLabel}</span>
+            <span class="hero-blog-ticker-new-decor hero-blog-ticker-new-decor-end" aria-hidden="true">
+              <span></span><span></span><span></span>
+            </span>
           </span>
           <span class="hero-blog-ticker-copy">
             <strong>{post.data.title}</strong>

@@ -69,6 +69,18 @@
 
     const slides = Array.from(heroBlogTicker.querySelectorAll("[data-hero-blog-slide]"))
       .filter((slide) => slide instanceof HTMLAnchorElement);
+    const newPostBadges = Array.from(heroBlogTicker.querySelectorAll("[data-hero-blog-new]"))
+      .filter((badge) => badge instanceof HTMLElement);
+    let newBadgeTimer = 0;
+
+    updateNewPostBadges();
+    scheduleNewPostBadgeRefresh();
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) return;
+      updateNewPostBadges();
+      scheduleNewPostBadgeRefresh();
+    });
+
     if (slides.length < 2) return;
 
     const previousButton = heroBlogTicker.querySelector("[data-hero-blog-previous]");
@@ -140,6 +152,30 @@
       if (!timer) return;
       window.clearTimeout(timer);
       timer = 0;
+    }
+
+    function updateNewPostBadges() {
+      const now = new Date();
+      const today = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+      const dayInMilliseconds = 24 * 60 * 60 * 1000;
+
+      newPostBadges.forEach((badge) => {
+        const [year, month, day] = String(badge.dataset.heroBlogPostDate || "").split("-").map(Number);
+        const postDate = Date.UTC(year, month - 1, day);
+        const ageInDays = (today - postDate) / dayInMilliseconds;
+        badge.hidden = !Number.isInteger(ageInDays) || ageInDays < 0 || ageInDays >= 3;
+      });
+    }
+
+    function scheduleNewPostBadgeRefresh() {
+      if (newBadgeTimer) window.clearTimeout(newBadgeTimer);
+
+      const now = new Date();
+      const nextDay = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+      newBadgeTimer = window.setTimeout(() => {
+        updateNewPostBadges();
+        scheduleNewPostBadgeRefresh();
+      }, nextDay.getTime() - now.getTime() + 1000);
     }
   }
 
