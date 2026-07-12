@@ -50,6 +50,11 @@
   overflow-anchor: none;
 }
 
+.ytcq-lite-items-flowing {
+  animation: ytcq-lite-items-flow var(--ytcq-lite-flow-duration, 240ms) linear both;
+  will-change: transform;
+}
+
 .ytcq-lite-empty-state {
   display: flex;
   align-items: center;
@@ -424,6 +429,16 @@
   }
 }
 
+@keyframes ytcq-lite-items-flow {
+  from {
+    transform: translateY(var(--ytcq-lite-flow-offset, 0));
+  }
+
+  to {
+    transform: translateY(0);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .ytcq-lite-root *,
   .ytcq-lite-root *::before,
@@ -438,5 +453,10 @@
 
   .ytcq-lite-message-enter {
     animation: none;
+  }
+
+  .ytcq-lite-items-flowing {
+    animation: none;
+    will-change: auto;
   }
 }

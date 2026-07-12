@@ -293,6 +293,42 @@ describe('Lite chat renderer', () => {
     renderer.destroy();
   });
 
+  it('flows a busy live batch through the viewport without delaying its rows', () => {
+    const rowRect = vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect')
+      .mockImplementation(function getBoundingClientRectMock(this: HTMLElement) {
+        const height = this.classList.contains('ytcq-lite-message') ? 32 : 0;
+        return {
+          bottom: height,
+          height,
+          left: 0,
+          right: 0,
+          toJSON: () => ({}),
+          top: 0,
+          width: 0,
+          x: 0,
+          y: 0
+        };
+      });
+    const store = createLiteChatStore();
+    const renderer = createLiteChatRenderer(store);
+    document.body.append(renderer.root);
+    const actions = Array.from({ length: 22 }, (_value, index) => ({
+      type: 'upsert' as const,
+      record: createRecord(`busy-${index}`, `Busy ${index}`)
+    }));
+
+    renderer.rememberActionSources(actions, 'live');
+    store.apply(actions);
+
+    const items = renderer.root.querySelector<HTMLElement>('.ytcq-lite-items')!;
+    expect(renderer.root.querySelectorAll('.ytcq-lite-message')).toHaveLength(22);
+    expect(items.classList).toContain('ytcq-lite-items-flowing');
+    expect(items.style.getPropertyValue('--ytcq-lite-flow-offset')).toBe('704px');
+    expect(items.style.getPropertyValue('--ytcq-lite-flow-duration')).toBe('1200ms');
+    rowRect.mockRestore();
+    renderer.destroy();
+  });
+
   it('preserves live row origin while frozen and reports later revisions as changed', async () => {
     const store = createLiteChatStore({ renderLimit: 2, storeLimit: 10 });
     store.apply([
