@@ -25,54 +25,83 @@ interface StoredMarkedUserRecord {
 }
 
 export const markedUserMessageMenuScenario: BrowserScenario = async ({ chat, context }) => {
-  await withExtensionStorageValues(context, 'local', {
-    [MARKED_USERS_STORAGE_KEY]: {}
-  }, async () => {
-    await expectMarkedUserStorageCount(context, 0);
+  await withExtensionStorageValues(
+    context,
+    'local',
+    {
+      [MARKED_USERS_STORAGE_KEY]: {}
+    },
+    async () => {
+      await expectMarkedUserStorageCount(context, 0);
 
-    const source = await markUserFromMessageMenu(chat);
-    await expectBookmarkedUserStored(context, source.authorName);
-    await expectMarkedUserRingVisible(source.message);
-    await expectMarkedUserListedInPopupAndUnmark(context, source.authorName);
-    await expectMarkedUserStorageCount(context, 0);
-    await expectMarkedUserRingRemoved(source.message);
-  });
+      const source = await markUserFromMessageMenu(chat);
+      await expectBookmarkedUserStored(context, source.authorName);
+      await expectMarkedUserRingVisible(source.message);
+      await expectMarkedUserMenuClosed(source.menu);
+      await expectMarkedUserListedInPopupAndUnmark(context, source.authorName);
+      await expectMarkedUserStorageCount(context, 0);
+      await expectMarkedUserRingRemoved(source.message);
+    }
+  );
 };
 
-async function markUserFromMessageMenu(chat: Parameters<BrowserScenario>[0]['chat']): Promise<OpenedMessageMenu> {
+async function markUserFromMessageMenu(
+  chat: Parameters<BrowserScenario>[0]['chat']
+): Promise<OpenedMessageMenu> {
   const source = await openMessageMenu(chat);
 
   await test.step('Click Mark in the message context menu', async () => {
-    const markAction = source.menu.locator('.ytcq-context-item[data-ytcq-action="mark-user"]').first();
-    await expect(markAction.locator('.ytcq-menu-label')).toHaveText('Mark');
-    await markAction.click();
-    await expect(source.menu).toBeHidden({ timeout: 5_000 });
+    const markAction = source.menu
+      .locator('.ytcq-context-item[data-ytcq-action="mark-user"]')
+      .first();
+    const markItem = markAction.locator('.ytcq-paper-item');
+    await expect(markItem.locator('.ytcq-menu-label')).toHaveText('Mark');
+    await expect(markAction).toBeVisible();
+    await markItem.press('Enter');
   });
 
   return source;
 }
 
-async function expectBookmarkedUserStored(context: BrowserContext, authorName: string): Promise<void> {
+async function expectMarkedUserMenuClosed(menu: Locator): Promise<void> {
+  await test.step('Verify the message context menu closes after marking', async () => {
+    await expect(menu).toBeHidden({ timeout: 5_000 });
+  });
+}
+
+async function expectBookmarkedUserStored(
+  context: BrowserContext,
+  authorName: string
+): Promise<void> {
   await test.step('Verify bookmarked user is saved in extension storage', async () => {
-    await expect.poll(async () => {
-      const records = await getStoredMarkedUserRecords(context);
-      return records.some((record) => {
-        return record.authorName === authorName &&
-          Number.isFinite(record.markedAt) &&
-          Boolean(record.markedSourceTitle || record.markedSourceUrl);
-      });
-    }, {
-      message: 'Bookmarked user should be stored with author and stream context.',
-      timeout: 10_000
-    }).toBe(true);
+    await expect
+      .poll(
+        async () => {
+          const records = await getStoredMarkedUserRecords(context);
+          return records.some((record) => {
+            return (
+              record.authorName === authorName &&
+              Number.isFinite(record.markedAt) &&
+              Boolean(record.markedSourceTitle || record.markedSourceUrl)
+            );
+          });
+        },
+        {
+          message: 'Bookmarked user should be stored with author and stream context.',
+          timeout: 10_000
+        }
+      )
+      .toBe(true);
   });
 }
 
 async function expectMarkedUserStorageCount(context: BrowserContext, count: number): Promise<void> {
   await test.step(`Verify marked user storage contains ${count} record${count === 1 ? '' : 's'}`, async () => {
-    await expect.poll(async () => (await getStoredMarkedUserRecords(context)).length, {
-      timeout: 10_000
-    }).toBe(count);
+    await expect
+      .poll(async () => (await getStoredMarkedUserRecords(context)).length, {
+        timeout: 10_000
+      })
+      .toBe(count);
   });
 }
 
@@ -87,21 +116,32 @@ async function expectMarkedUserRingVisible(message: Locator): Promise<void> {
 async function expectMarkedUserRingRemoved(message: Locator): Promise<void> {
   await test.step('Verify marked user avatar ring is removed from chat', async () => {
     const avatar = message.locator('#author-photo').first();
-    await expect.poll(async () => {
-      const count = await avatar.count();
-      if (count === 0) return true;
+    await expect
+      .poll(
+        async () => {
+          const count = await avatar.count();
+          if (count === 0) return true;
 
-      return !(await avatar.evaluate((element) => {
-        return element.classList.contains('ytcq-marked-user-avatar');
-      }).catch(() => false));
-    }, {
-      message: 'Marked user avatar ring should be removed or the live chat row should be recycled.',
-      timeout: 10_000
-    }).toBe(true);
+          return !(await avatar
+            .evaluate((element) => {
+              return element.classList.contains('ytcq-marked-user-avatar');
+            })
+            .catch(() => false));
+        },
+        {
+          message:
+            'Marked user avatar ring should be removed or the live chat row should be recycled.',
+          timeout: 10_000
+        }
+      )
+      .toBe(true);
   });
 }
 
-async function expectMarkedUserListedInPopupAndUnmark(context: BrowserContext, authorName: string): Promise<void> {
+async function expectMarkedUserListedInPopupAndUnmark(
+  context: BrowserContext,
+  authorName: string
+): Promise<void> {
   await test.step('Open popup Bookmarks tab and remove the bookmark', async () => {
     const popup = await openExtensionPopup(context);
 
@@ -131,13 +171,14 @@ async function openExtensionPopup(context: BrowserContext): Promise<Page> {
   return popup;
 }
 
-async function getStoredMarkedUserRecords(context: BrowserContext): Promise<StoredMarkedUserRecord[]> {
+async function getStoredMarkedUserRecords(
+  context: BrowserContext
+): Promise<StoredMarkedUserRecord[]> {
   const values = await getExtensionStorageValues(context, 'local', [MARKED_USERS_STORAGE_KEY]);
   const stored = values[MARKED_USERS_STORAGE_KEY];
   if (!stored || typeof stored !== 'object' || Array.isArray(stored)) return [];
 
-  return Object.values(stored)
-    .filter((record): record is StoredMarkedUserRecord => {
-      return Boolean(record && typeof record === 'object');
-    });
+  return Object.values(stored).filter((record): record is StoredMarkedUserRecord => {
+    return Boolean(record && typeof record === 'object');
+  });
 }

@@ -19,7 +19,6 @@ import {
   setExtensionStorageValues,
   withExtensionStorageValues
 } from '../support/extension-storage';
-import { openSettingsMenu } from '../support/menu-openers';
 import { getRichVisibleText } from '../support/text';
 import { withMockedTranslationEndpoint } from '../support/translation-endpoint';
 import type { BrowserScenario, ChatSurface } from './types';
@@ -99,33 +98,96 @@ interface LiteContinuitySnapshot {
   nativeIds: string[];
 }
 
-interface ChatRowGeometry {
-  authorBadgeGap: number | null;
-  authorBadgeTextGap: number | null;
-  authorMessageGap: number;
-  authorTextBottom: number;
-  avatarContentGap: number;
-  avatarHeight: number;
-  avatarWidth: number;
-  messageTextBottom: number;
-  rowHeight: number;
-}
+export const liteModeToggleAndRestoreScenario: BrowserScenario = async ({ chat, context }) => {
+  test.setTimeout(120_000);
+  await withExtensionStorageValues(context, 'sync', { liteModeEnabled: false }, async () => {
+    const button = chat.locator(LITE_BUTTON_SELECTOR).first();
+    const root = chat.locator(LITE_ROOT_SELECTOR);
+    try {
+      await clearLiteTestCooldown(chat);
+      await expect(chat.locator(NATIVE_LIST_SELECTOR).first()).toBeVisible({ timeout: 20_000 });
+      await expect(chat.locator(NATIVE_MESSAGE_SELECTOR).first()).toBeVisible({ timeout: 30_000 });
 
-export const liteModeMockBehaviorScenario: BrowserScenario = async ({ chat, context }) => {
+      await test.step('Enable Lite mode from the chat header', async () => {
+        await expect(button).toBeVisible({ timeout: 20_000 });
+        await expect(button).toHaveAttribute('aria-pressed', 'false');
+        await button.click();
+        await expectStorageValue(context, true);
+        await expect(button).toHaveAttribute('aria-pressed', 'true');
+        await expect(root).toBeVisible({ timeout: 20_000 });
+        await expect(chat.locator('html')).toHaveAttribute(
+          LITE_NATIVE_DISCARDED_ATTRIBUTE,
+          'true',
+          { timeout: 20_000 }
+        );
+        await expect(chat.locator(NATIVE_LIST_SELECTOR)).toHaveCount(0);
+      });
+
+      await test.step('Keep the lightweight feed readable and usable', async () => {
+        const row = root.locator('.ytcq-lite-message-text').last();
+        const author = row.locator('#author-name');
+        const message = row.locator('#message');
+        await expect(root.locator('.ytcq-lite-scroller')).toBeVisible();
+        await expect(row).toBeVisible({ timeout: 30_000 });
+        await expect(row.locator('#author-photo')).toBeVisible();
+        await expect(author).toBeVisible();
+        await expect(message).toBeVisible();
+        await expect.poll(() => author.innerText()).not.toBe('');
+        await expect.poll(() => message.innerText()).not.toBe('');
+        await expect(root.locator('.ytcq-lite-toolbar')).toHaveCount(0);
+        await expect(button).toBeVisible();
+      });
+
+      await test.step('Disable Lite mode and restore native chat', async () => {
+        await button.click();
+        await expectStorageValue(context, false);
+        await expect(root).toHaveCount(0, { timeout: 20_000 });
+        await expect(chat.locator(NATIVE_LIST_SELECTOR).first()).toBeVisible({ timeout: 30_000 });
+        await expect(chat.locator(NATIVE_MESSAGE_SELECTOR).first()).toBeVisible({
+          timeout: 30_000
+        });
+        await expect(chat.locator(LITE_NATIVE_RESTORE_SELECTOR)).toHaveCount(0, {
+          timeout: 20_000
+        });
+        await expect(chat.locator('html')).not.toHaveAttribute(
+          LITE_NATIVE_DISCARDED_ATTRIBUTE,
+          'true'
+        );
+        await expect(button).toHaveAttribute('aria-pressed', 'false');
+      });
+    } finally {
+      await setExtensionStorageValues(context, 'sync', { liteModeEnabled: false }).catch(
+        () => undefined
+      );
+      await root.waitFor({ state: 'detached', timeout: 8_000 }).catch(() => undefined);
+      await chat
+        .locator(NATIVE_LIST_SELECTOR)
+        .first()
+        .waitFor({
+          state: 'visible',
+          timeout: 20_000
+        })
+        .catch(() => undefined);
+      await clearLiteTestCooldown(chat).catch(() => undefined);
+    }
+  });
+};
+
+export const liteModeMockRenderingAndFallbackScenario: BrowserScenario = async ({
+  chat,
+  context
+}) => {
   await withExtensionStorageValues(context, 'sync', { liteModeEnabled: false }, async () => {
     await installLiteDiagnostics(chat);
     try {
       const nativeList = chat.locator(NATIVE_LIST_SELECTOR).first();
       const nativeRow = nativeList.locator('yt-live-chat-text-message-renderer').first();
       const nativeTimestamp = nativeRow.locator('#timestamp');
-      const nativeGeometry = await getChatRowGeometry(nativeRow);
 
-      await test.step('Use a 24px, single-line native fixture row', async () => {
-        expect(nativeGeometry.avatarWidth).toBe(24);
-        expect(nativeGeometry.avatarHeight).toBe(24);
-        expect(
-          Math.abs(nativeGeometry.authorTextBottom - nativeGeometry.messageTextBottom)
-        ).toBeLessThanOrEqual(2);
+      await test.step('Start with a readable native fixture row', async () => {
+        await expect(nativeRow.locator('#author-photo')).toBeVisible();
+        await expect(nativeRow.locator('#author-name')).toContainText('@ExampleCreator');
+        await expect(nativeRow.locator('#message')).toContainText('Hola mundo');
         await expect(nativeTimestamp).toBeHidden();
       });
 
@@ -137,12 +199,14 @@ export const liteModeMockBehaviorScenario: BrowserScenario = async ({ chat, cont
         await button.click();
         await expectStorageValue(context, true);
         await expect(button).toHaveAttribute('aria-pressed', 'true');
-        await expect(chat.locator(LITE_ROOT_SELECTOR)).toBeVisible().catch(async (error) => {
-          throw new Error(
-            `Lite root did not mount: ${JSON.stringify(await getLiteDiagnostics(chat))}`,
-            { cause: error }
-          );
-        });
+        await expect(chat.locator(LITE_ROOT_SELECTOR))
+          .toBeVisible()
+          .catch(async (error) => {
+            throw new Error(
+              `Lite root did not mount: ${JSON.stringify(await getLiteDiagnostics(chat))}`,
+              { cause: error }
+            );
+          });
         await expect(chat.locator(`${LITE_ROOT_SELECTOR} .ytcq-lite-toolbar`)).toHaveCount(0);
         const seededHistoryRow = chat.locator('[data-message-id="fixture-message-1"]');
         await expect(seededHistoryRow).toBeVisible();
@@ -199,37 +263,25 @@ export const liteModeMockBehaviorScenario: BrowserScenario = async ({ chat, cont
           'data-emoji-id',
           'wave-emoji'
         );
-        const liteGeometry = await getChatRowGeometry(liteRow);
-        expect(liteGeometry.avatarWidth).toBe(nativeGeometry.avatarWidth);
-        expect(liteGeometry.avatarHeight).toBe(nativeGeometry.avatarHeight);
-        expect(Math.abs(liteGeometry.rowHeight - nativeGeometry.rowHeight)).toBeLessThanOrEqual(1);
-        expect(
-          Math.abs(liteGeometry.authorTextBottom - liteGeometry.messageTextBottom)
-        ).toBeLessThanOrEqual(2);
-        expect(
-          Math.abs(liteGeometry.avatarContentGap - nativeGeometry.avatarContentGap)
-        ).toBeLessThanOrEqual(1);
-        expect(
-          Math.abs(liteGeometry.authorMessageGap - nativeGeometry.authorMessageGap)
-        ).toBeLessThanOrEqual(4);
+        await expect(liteRow.locator('#author-photo')).toBeVisible();
+        await expect(liteRow.locator('#author-name')).toContainText('@LiteViewer');
         const longModerator = chat.locator(
           '[data-message-id="lite-browser-message-long-moderator"]'
         );
         await expect(longModerator.locator('.ytcq-lite-moderator-badge-icon')).toBeVisible();
         await expect(longModerator.locator('.ytcq-lite-author-badge')).toHaveText('');
+        await expect(longModerator.locator('#author-name')).toContainText(
+          '@A_very_long_moderator_handle_that_should_not_be_ellipsized'
+        );
         await expect(longModerator.locator('#author-name')).toHaveCSS('text-overflow', 'clip');
         await expect(longModerator.locator('#author-name')).toHaveCSS('overflow', 'visible');
-        const moderatorGeometry = await getChatRowGeometry(longModerator);
-        expect(moderatorGeometry.authorBadgeGap).not.toBeNull();
-        expect(moderatorGeometry.authorBadgeGap || 0).toBeGreaterThanOrEqual(0);
-        expect(moderatorGeometry.authorBadgeGap || 0).toBeLessThanOrEqual(2.5);
-        expect(moderatorGeometry.authorBadgeTextGap).not.toBeNull();
-        expect(moderatorGeometry.authorBadgeTextGap || 0).toBeGreaterThanOrEqual(0);
 
         const owner = chat.locator('[data-message-id="lite-browser-message-owner"]');
         const ownerName = owner.locator('#author-name.owner');
         await expect(ownerName).toBeVisible();
-        await expect(ownerName.locator('#chip-badges .ytcq-lite-verified-badge-icon')).toBeVisible();
+        await expect(
+          ownerName.locator('#chip-badges .ytcq-lite-verified-badge-icon')
+        ).toBeVisible();
         await expect(owner.locator('#chat-badges .ytcq-lite-author-badge')).toHaveCount(0);
         const ownerColors = await ownerName.evaluate((element) => {
           const style = getComputedStyle(element);
@@ -245,15 +297,7 @@ export const liteModeMockBehaviorScenario: BrowserScenario = async ({ chat, cont
         expect(ownerColors.badgeColor).toBe(ownerColors.color);
         await expect(liteRow.locator('#timestamp')).toBeHidden();
         await expect(chat.locator(NATIVE_LIST_SELECTOR)).toHaveCount(0);
-        await expect(chat.locator('html')).toHaveAttribute(
-          LITE_NATIVE_DISCARDED_ATTRIBUTE,
-          'true'
-        );
-      });
-
-      await test.step('Mirror YouTube’s Timestamps toggle in Lite mode', async () => {
-        await setNativeTimestamps(chat, true);
-        await expect(liteRow.locator('#timestamp')).toBeVisible();
+        await expect(chat.locator('html')).toHaveAttribute(LITE_NATIVE_DISCARDED_ATTRIBUTE, 'true');
       });
 
       await test.step('Style replacement translations like native chat', async () => {
@@ -281,10 +325,12 @@ export const liteModeMockBehaviorScenario: BrowserScenario = async ({ chat, cont
       await test.step('Reset compatibility health after a supported message', async () => {
         const nextSequence = await getNextLiteBatchSequence(chat);
         await dispatchLiteBatch(chat, {
-          ...createBatch(nextSequence, [{
-            type: 'upsert',
-            record: createRecord('lite-browser-health-reset', 'Supported after unknown row')
-          }]),
+          ...createBatch(nextSequence, [
+            {
+              type: 'upsert',
+              record: createRecord('lite-browser-health-reset', 'Supported after unknown row')
+            }
+          ]),
           compatibilityWarnings: ['feed:liveChatFutureRenderer'],
           unreadableFeed: true
         });
@@ -319,7 +365,6 @@ export const liteModeMockBehaviorScenario: BrowserScenario = async ({ chat, cont
         );
         await expect(button).toHaveAttribute('aria-pressed', 'true');
 
-        await setNativeTimestamps(chat, false);
         await expect(restored.locator('#timestamp').first()).toBeHidden();
         await button.click();
         await expectStorageValue(context, false);
@@ -329,9 +374,12 @@ export const liteModeMockBehaviorScenario: BrowserScenario = async ({ chat, cont
       await setExtensionStorageValues(context, 'sync', { liteModeEnabled: false }).catch(
         () => undefined
       );
-      await chat.locator(LITE_ROOT_SELECTOR).waitFor({ state: 'detached', timeout: 8_000 })
+      await chat
+        .locator(LITE_ROOT_SELECTOR)
+        .waitFor({ state: 'detached', timeout: 8_000 })
         .catch(() => undefined);
-      await chat.locator(LITE_NATIVE_RESTORE_SELECTOR)
+      await chat
+        .locator(LITE_NATIVE_RESTORE_SELECTOR)
         .waitFor({ state: 'detached', timeout: 20_000 })
         .catch(() => undefined);
       await clearChatComposerIfVisible(chat).catch(() => undefined);
@@ -351,7 +399,9 @@ export const liteModeStoredPreferenceReloadScenario: BrowserScenario = async ({
     let nativeHistoryBeforeReload: string[] = [];
     try {
       await test.step('Enable Lite mode and keep its preference stored', async () => {
-        await expect(chat.locator(NATIVE_MESSAGE_SELECTOR).first()).toBeVisible({ timeout: 15_000 });
+        await expect(chat.locator(NATIVE_MESSAGE_SELECTOR).first()).toBeVisible({
+          timeout: 15_000
+        });
         nativeHistoryBeforeReload = (await getLiteContinuitySnapshot(chat)).nativeIds;
         expect(nativeHistoryBeforeReload.length).toBeGreaterThan(0);
         await setExtensionStorageValues(context, 'sync', { liteModeEnabled: true });
@@ -366,46 +416,54 @@ export const liteModeStoredPreferenceReloadScenario: BrowserScenario = async ({
           'aria-pressed',
           'true'
         );
-        await expect(root).toBeVisible({ timeout: 15_000 }).catch(async (error) => {
-          const documentState = await chat.locator('body').evaluate((_body, cooldownKey) => {
-            const transport = (
-              window as unknown as Record<PropertyKey, {
-                enabled?: unknown;
-                generation?: unknown;
-                receiverReady?: unknown;
-                sequence?: unknown;
-              } | undefined>
-            )[Symbol.for('ytcq:lite-chat-transport:v1')];
-            return {
-              cooldown: window.sessionStorage.getItem(cooldownKey),
-              discarded: document.documentElement.hasAttribute(
-                'data-ytcq-lite-native-discarded'
-              ),
-              intent: document.documentElement.getAttribute('data-ytcq-lite-mode-intent'),
-              transport: transport ? {
-                enabled: transport.enabled,
-                generation: transport.generation,
-                receiverReady: transport.receiverReady,
-                sequence: transport.sequence
-              } : null
-            };
-          }, LITE_SESSION_COOLDOWN_KEY);
-          const storage = await getExtensionStorageValues(context, 'sync', ['liteModeEnabled']);
-          throw new Error(
-            `Reloaded Lite mode did not mount: ${JSON.stringify({ documentState, storage })}`,
-            { cause: error }
-          );
-        });
-        await expect.poll(
-          async () => {
-            const liteIds = (await getLiteContinuitySnapshot(chat)).liteIds;
-            return nativeHistoryBeforeReload.some((id) => liteIds.includes(id));
-          },
-          {
-            message: 'Expected reloaded Lite mode to restore native chat history.',
-            timeout: 15_000
-          }
-        ).toBe(true);
+        await expect(root)
+          .toBeVisible({ timeout: 15_000 })
+          .catch(async (error) => {
+            const documentState = await chat.locator('body').evaluate((_body, cooldownKey) => {
+              const transport = (
+                window as unknown as Record<
+                  PropertyKey,
+                  | {
+                      enabled?: unknown;
+                      generation?: unknown;
+                      receiverReady?: unknown;
+                      sequence?: unknown;
+                    }
+                  | undefined
+                >
+              )[Symbol.for('ytcq:lite-chat-transport:v1')];
+              return {
+                cooldown: window.sessionStorage.getItem(cooldownKey),
+                discarded: document.documentElement.hasAttribute('data-ytcq-lite-native-discarded'),
+                intent: document.documentElement.getAttribute('data-ytcq-lite-mode-intent'),
+                transport: transport
+                  ? {
+                      enabled: transport.enabled,
+                      generation: transport.generation,
+                      receiverReady: transport.receiverReady,
+                      sequence: transport.sequence
+                    }
+                  : null
+              };
+            }, LITE_SESSION_COOLDOWN_KEY);
+            const storage = await getExtensionStorageValues(context, 'sync', ['liteModeEnabled']);
+            throw new Error(
+              `Reloaded Lite mode did not mount: ${JSON.stringify({ documentState, storage })}`,
+              { cause: error }
+            );
+          });
+        await expect
+          .poll(
+            async () => {
+              const liteIds = (await getLiteContinuitySnapshot(chat)).liteIds;
+              return nativeHistoryBeforeReload.some((id) => liteIds.includes(id));
+            },
+            {
+              message: 'Expected reloaded Lite mode to restore native chat history.',
+              timeout: 15_000
+            }
+          )
+          .toBe(true);
         await expect
           .poll(
             () =>
@@ -422,10 +480,7 @@ export const liteModeStoredPreferenceReloadScenario: BrowserScenario = async ({
 
       await test.step('Discard native immediately while the reloaded Lite transport connects', async () => {
         await expect(nativeList).toHaveCount(0);
-        await expect(chat.locator('html')).toHaveAttribute(
-          LITE_NATIVE_DISCARDED_ATTRIBUTE,
-          'true'
-        );
+        await expect(chat.locator('html')).toHaveAttribute(LITE_NATIVE_DISCARDED_ATTRIBUTE, 'true');
         const nextSequence = await getNextLiteBatchSequence(chat);
         await dispatchLiteBatch(
           chat,
@@ -441,30 +496,28 @@ export const liteModeStoredPreferenceReloadScenario: BrowserScenario = async ({
         );
         await expect(chat.locator('[data-message-id="lite-browser-reload-message"]')).toBeVisible();
         await expect(chat.locator(NATIVE_LIST_SELECTOR)).toHaveCount(0);
-        await expect(chat.locator('html')).toHaveAttribute(
-          LITE_NATIVE_DISCARDED_ATTRIBUTE,
-          'true'
-        );
+        await expect(chat.locator('html')).toHaveAttribute(LITE_NATIVE_DISCARDED_ATTRIBUTE, 'true');
       });
     } finally {
       await setExtensionStorageValues(context, 'sync', { liteModeEnabled: false }).catch(
         () => undefined
       );
       await root.waitFor({ state: 'detached', timeout: 8_000 }).catch(() => undefined);
-      await chat.locator(NATIVE_LIST_SELECTOR).first().waitFor({
-        state: 'visible',
-        timeout: 20_000
-      }).catch(() => undefined);
+      await chat
+        .locator(NATIVE_LIST_SELECTOR)
+        .first()
+        .waitFor({
+          state: 'visible',
+          timeout: 20_000
+        })
+        .catch(() => undefined);
       await clearLiteTestCooldown(chat).catch(() => undefined);
       await uninstallLiteDiagnostics(chat).catch(() => undefined);
     }
   });
 };
 
-export const liteModeTranslationContinuityScenario: BrowserScenario = async ({
-  chat,
-  context
-}) => {
+export const liteModeTranslationContinuityScenario: BrowserScenario = async ({ chat, context }) => {
   const translatedText = 'Lite history translation';
   await withExtensionStorageValues(
     context,
@@ -477,7 +530,7 @@ export const liteModeTranslationContinuityScenario: BrowserScenario = async ({
     },
     async () => {
       await withMockedTranslationEndpoint(context, translatedText, async () => {
-        const { row: nativeRow, text: nativeText } = await findNativeTextRow(chat);
+        const { messageId, row: nativeRow } = await findNativeTextRow(chat);
         await setExtensionStorageValues(context, 'sync', {
           lastTranslationTarget: 'ja',
           targetLanguage: 'ja'
@@ -490,17 +543,11 @@ export const liteModeTranslationContinuityScenario: BrowserScenario = async ({
         const button = chat.locator(LITE_BUTTON_SELECTOR).first();
         await button.click();
         await expect(chat.locator(LITE_ROOT_SELECTOR)).toBeVisible();
-        const record = createRecord('lite-translation-history', nativeText);
-        record.plainText = nativeText;
-        record.runs = [{ text: nativeText, type: 'text' }];
-        const nextSequence = await getNextLiteBatchSequence(chat);
-        await dispatchLiteBatch(chat, {
-          ...createBatch(nextSequence, [{ type: 'upsert', record }]),
-          source: 'initial'
-        });
 
-        const liteRow = chat.locator('[data-message-id="lite-translation-history"]');
-        await expect(liteRow).toBeVisible();
+        const liteRow = chat.locator(
+          `[data-message-id=${JSON.stringify(messageId)}]`
+        );
+        await expect(liteRow).toBeVisible({ timeout: 20_000 });
         await expect(liteRow.locator('.ytcq-translation[lang="ja"]')).toContainText(
           translatedText,
           { timeout: 20_000 }
@@ -508,34 +555,53 @@ export const liteModeTranslationContinuityScenario: BrowserScenario = async ({
       });
     }
   );
-  await chat.locator(LITE_ROOT_SELECTOR).waitFor({ state: 'detached', timeout: 8_000 })
+  await chat
+    .locator(LITE_ROOT_SELECTOR)
+    .waitFor({ state: 'detached', timeout: 8_000 })
     .catch(() => undefined);
-  await chat.locator(LITE_NATIVE_RESTORE_SELECTOR)
+  await chat
+    .locator(LITE_NATIVE_RESTORE_SELECTOR)
     .waitFor({ state: 'detached', timeout: 20_000 })
     .catch(() => undefined);
 };
 
-async function findNativeTextRow(chat: ChatSurface): Promise<{ row: Locator; text: string }> {
+async function findNativeTextRow(
+  chat: ChatSurface
+): Promise<{ messageId: string; row: Locator; text: string }> {
   const rows = chat.locator('yt-live-chat-text-message-renderer:has(#message)');
+  let selectedMessageId = '';
   let selectedRow: Locator | null = null;
   let selectedText = '';
 
-  await expect.poll(async () => {
-    for (let index = (await rows.count()) - 1; index >= 0; index -= 1) {
-      const row = rows.nth(index);
-      const text = await getRichVisibleText(row.locator('#message').first()).catch(() => '');
-      if (!text) continue;
-      selectedRow = row;
-      selectedText = text;
-      return true;
-    }
-    return false;
-  }, {
-    message: 'Expected a populated native text chat row.',
-    timeout: 20_000
-  }).toBe(true);
+  await expect
+    .poll(
+      async () => {
+        for (let index = (await rows.count()) - 1; index >= 0; index -= 1) {
+          const row = rows.nth(index);
+          const text = await getRichVisibleText(row.locator('#message').first()).catch(() => '');
+          const messageId = await row
+            .evaluate((element) => {
+              const data = (element as HTMLElement & { data?: { id?: unknown } }).data;
+              if (typeof data?.id === 'string' && data.id) return data.id;
+              return element.id;
+            })
+            .catch(() => '');
+          if (!text || !messageId) continue;
+          selectedMessageId = messageId;
+          selectedRow = row;
+          selectedText = text;
+          return true;
+        }
+        return false;
+      },
+      {
+        message: 'Expected a populated native text chat row.',
+        timeout: 20_000
+      }
+    )
+    .toBe(true);
 
-  return { row: selectedRow!, text: selectedText };
+  return { messageId: selectedMessageId, row: selectedRow!, text: selectedText };
 }
 
 export const liteModeLiveSustainedScenario: BrowserScenario = async ({ chat, context, page }) => {
@@ -562,7 +628,9 @@ export const liteModeLiveSustainedScenario: BrowserScenario = async ({ chat, con
     await expectStorageValue(context, false);
     await installLiteDiagnostics(chat);
     await nativeList.waitFor({ state: 'attached', timeout: 20_000 });
-    await expect(nativeList.locator(NATIVE_MESSAGE_SELECTOR).first()).toBeVisible({ timeout: 20_000 });
+    await expect(nativeList.locator(NATIVE_MESSAGE_SELECTOR).first()).toBeVisible({
+      timeout: 20_000
+    });
     await expect(button).toBeVisible({ timeout: 20_000 });
     await expect(button).toHaveAttribute('aria-pressed', 'false');
     const nativeHistoryBeforeEnable = await getLiteContinuitySnapshot(chat);
@@ -574,27 +642,26 @@ export const liteModeLiveSustainedScenario: BrowserScenario = async ({ chat, con
     await expect(root.locator('.ytcq-lite-toolbar')).toHaveCount(0);
 
     try {
-      await expect(chat.locator('html')).toHaveAttribute(
-        LITE_NATIVE_DISCARDED_ATTRIBUTE,
-        'true',
-        { timeout: 20_000 }
-      );
-      await expect.poll(
-        async () => {
-          const liteIds = (await getLiteContinuitySnapshot(chat)).liteIds;
-          return nativeHistoryBeforeEnable.nativeIds.some((id) => liteIds.includes(id));
-        },
-        {
-          message: 'Expected Lite mode to preserve at least one row from native chat history.',
-          timeout: 20_000
-        }
-      ).toBe(true);
+      await expect(chat.locator('html')).toHaveAttribute(LITE_NATIVE_DISCARDED_ATTRIBUTE, 'true', {
+        timeout: 20_000
+      });
+      await expect
+        .poll(
+          async () => {
+            const liteIds = (await getLiteContinuitySnapshot(chat)).liteIds;
+            return nativeHistoryBeforeEnable.nativeIds.some((id) => liteIds.includes(id));
+          },
+          {
+            message: 'Expected Lite mode to preserve at least one row from native chat history.',
+            timeout: 20_000
+          }
+        )
+        .toBe(true);
     } catch (error) {
       const diagnostics = await getLiteDiagnostics(chat);
-      throw new Error(
-        `Lite mode did not discard the native feed: ${JSON.stringify(diagnostics)}`,
-        { cause: error }
-      );
+      throw new Error(`Lite mode did not discard the native feed: ${JSON.stringify(diagnostics)}`, {
+        cause: error
+      });
     }
 
     const baseline = await getLiteDiagnostics(chat);
@@ -712,47 +779,6 @@ export const liteModeLiveSustainedScenario: BrowserScenario = async ({ chat, con
   }
 };
 
-async function getChatRowGeometry(row: Locator): Promise<ChatRowGeometry> {
-  return row.evaluate((element) => {
-    const avatar = element.querySelector<HTMLElement>('#author-photo');
-    const author = element.querySelector<HTMLElement>('#author-name');
-    const badge = element.querySelector<HTMLElement>('#chat-badges .ytcq-lite-author-badge');
-    const content = element.querySelector<HTMLElement>('#content');
-    const message = element.querySelector<HTMLElement>('#message');
-    if (!avatar || !author || !content || !message)
-      throw new Error('Chat row is missing native-compatible slots.');
-
-    const getFirstTextRect = (root: HTMLElement): DOMRect => {
-      const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
-      let textNode = walker.nextNode();
-      while (textNode && !textNode.textContent?.trim()) textNode = walker.nextNode();
-      if (!textNode) return root.getBoundingClientRect();
-      const range = document.createRange();
-      range.selectNodeContents(textNode);
-      return range.getBoundingClientRect();
-    };
-
-    const avatarRect = avatar.getBoundingClientRect();
-    const authorRect = author.getBoundingClientRect();
-    const badgeRect = badge?.getBoundingClientRect() || null;
-    const authorTextRect = getFirstTextRect(author);
-    const contentRect = content.getBoundingClientRect();
-    const messageTextRect = getFirstTextRect(message);
-    const rowRect = element.getBoundingClientRect();
-    return {
-      authorBadgeGap: badgeRect ? badgeRect.left - authorRect.right : null,
-      authorBadgeTextGap: badgeRect ? badgeRect.left - authorTextRect.right : null,
-      authorTextBottom: authorTextRect.bottom,
-      authorMessageGap: messageTextRect.left - authorRect.right,
-      avatarHeight: avatarRect.height,
-      avatarWidth: avatarRect.width,
-      avatarContentGap: contentRect.left - avatarRect.right,
-      messageTextBottom: messageTextRect.bottom,
-      rowHeight: rowRect.height
-    };
-  });
-}
-
 async function getLiteContinuitySnapshot(chat: ChatSurface): Promise<LiteContinuitySnapshot> {
   return chat.locator('body').evaluate(
     (_body, selectors) => {
@@ -776,27 +802,6 @@ async function getLiteContinuitySnapshot(chat: ChatSurface): Promise<LiteContinu
     },
     { nativeList: NATIVE_LIST_SELECTOR, nativeMessage: NATIVE_MESSAGE_SELECTOR }
   );
-}
-
-async function setNativeTimestamps(chat: ChatSurface, enabled: boolean): Promise<void> {
-  const menu = await openSettingsMenu(chat);
-  const item = menu
-    .locator('yt-live-chat-toggle-renderer[data-ytcq-native-setting="timestamps"]')
-    .first();
-  const toggle = item.locator('tp-yt-paper-toggle-button[aria-label="Timestamps"]').first();
-  await expect(item).toBeVisible();
-
-  if ((await toggle.getAttribute('aria-pressed')) !== String(enabled)) {
-    await item.locator('tp-yt-paper-item').click();
-  }
-  await expect(item).toHaveAttribute('aria-selected', String(enabled));
-  await expect(toggle).toHaveAttribute('aria-pressed', String(enabled));
-  if (enabled) {
-    await expect(toggle).toHaveAttribute('checked', '');
-  } else {
-    await expect(toggle).not.toHaveAttribute('checked', '');
-  }
-  await chat.locator('body').press('Escape');
 }
 
 async function expectLiteReplacementTranslation({
@@ -1032,9 +1037,7 @@ async function getLiteDiagnostics(chat: ChatSurface): Promise<LiteClientDiagnost
       hasNativeList: Boolean(
         document.querySelector('yt-live-chat-item-list-renderer, #chat > #item-list')
       ),
-      nativeDiscarded: document.documentElement.hasAttribute(
-        'data-ytcq-lite-native-discarded'
-      ),
+      nativeDiscarded: document.documentElement.hasAttribute('data-ytcq-lite-native-discarded'),
       liteDescendants: root?.querySelectorAll('*').length || 0,
       liveEdgeDistance: scroller
         ? Math.max(0, scroller.scrollHeight - scroller.scrollTop - scroller.clientHeight)

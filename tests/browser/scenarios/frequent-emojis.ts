@@ -5,18 +5,17 @@
  * persistence after reload, and composer insertion.
  */
 import { expect, test, type BrowserContext, type FrameLocator, type Page } from '@playwright/test';
-import {
-  clearChatComposer,
-  getChatComposerText
-} from '../support/composer';
+import { clearChatComposer, getChatComposerText } from '../support/composer';
 import {
   getExtensionStorageValues,
   withExtensionStorageValues
 } from '../support/extension-storage';
+import { clickLocatorAtCurrentCenter } from '../support/locator';
 import type { BrowserScenario, ChatSurface } from './types';
 
 const EMOJI_USAGE_STORAGE_KEY = 'ytcqEmojiUsage';
-const EMOJI_PICKER_BUTTON_SELECTOR = '#emoji-picker-button yt-live-chat-icon-toggle-button-renderer#emoji button';
+const EMOJI_PICKER_BUTTON_SELECTOR =
+  '#emoji-picker-button yt-live-chat-icon-toggle-button-renderer#emoji button';
 const TEST_EMOJI = '✅';
 const CHAT_RELOAD_COMMIT_TIMEOUT_MS = 15_000;
 const CHAT_READY_TIMEOUT_MS = 60_000;
@@ -32,18 +31,23 @@ async function expectFrequentEmojiBehavior({
   chat: ChatSurface;
   context: BrowserContext;
 }): Promise<void> {
-  await withExtensionStorageValues(context, 'local', {
-    [EMOJI_USAGE_STORAGE_KEY]: []
-  }, async () => {
-    await reloadChatSurface(chat);
-    await clickNativeEmojiOption(chat);
-    await expectEmojiUsageCount(context, 1);
-    await expectFrequentEmojiRow(chat);
-    await reloadChatSurface(chat);
-    await expectFrequentEmojiRow(chat);
-    await clickFrequentEmojiAndExpectComposerInsertion(chat);
-    await expectEmojiUsageCount(context, 2);
-  });
+  await withExtensionStorageValues(
+    context,
+    'local',
+    {
+      [EMOJI_USAGE_STORAGE_KEY]: []
+    },
+    async () => {
+      await reloadChatSurface(chat);
+      await clickNativeEmojiOption(chat);
+      await expectEmojiUsageCount(context, 1);
+      await expectFrequentEmojiRow(chat);
+      await reloadChatSurface(chat);
+      await expectFrequentEmojiRow(chat);
+      await clickFrequentEmojiAndExpectComposerInsertion(chat);
+      await expectEmojiUsageCount(context, 2);
+    }
+  );
 }
 
 async function reloadChatSurface(chat: ChatSurface): Promise<void> {
@@ -55,8 +59,12 @@ async function reloadChatSurface(chat: ChatSurface): Promise<void> {
       await expect(chat.owner()).toBeVisible({ timeout: CHAT_READY_TIMEOUT_MS });
     }
 
-    await expect(chat.locator('yt-live-chat-renderer')).toBeVisible({ timeout: CHAT_READY_TIMEOUT_MS });
-    await expect(chat.locator('.ytcq-inbox-button')).toBeVisible({ timeout: CHAT_READY_TIMEOUT_MS });
+    await expect(chat.locator('yt-live-chat-renderer')).toBeVisible({
+      timeout: CHAT_READY_TIMEOUT_MS
+    });
+    await expect(chat.locator('.ytcq-inbox-button')).toBeVisible({
+      timeout: CHAT_READY_TIMEOUT_MS
+    });
     await expect(getEmojiPickerButton(chat)).toBeVisible({ timeout: CHAT_READY_TIMEOUT_MS });
   });
 }
@@ -97,33 +105,49 @@ async function clickFrequentEmojiAndExpectComposerInsertion(chat: ChatSurface): 
   await test.step('Click frequent emoji and verify composer insertion', async () => {
     await clearChatComposer(chat);
     await openEmojiPicker(chat);
-    await getFrequentEmojiButton(chat).click();
-    await expect.poll(async () => getChatComposerText(chat), {
-      message: 'Frequent emoji button should insert the emoji into the composer.',
-      timeout: 5_000
-    }).toContain(TEST_EMOJI);
+    const button = getFrequentEmojiButton(chat);
+    await expect(button).toBeVisible();
+    if (!(await clickLocatorAtCurrentCenter(button))) {
+      throw new Error('Frequent emoji button has no clickable point in the current viewport.');
+    }
+    await expect
+      .poll(async () => getChatComposerText(chat), {
+        message: 'Frequent emoji button should insert the emoji into the composer.',
+        timeout: 5_000
+      })
+      .toContain(TEST_EMOJI);
   });
 }
 
-async function expectEmojiUsageCount(context: BrowserContext, expectedCount: number): Promise<void> {
+async function expectEmojiUsageCount(
+  context: BrowserContext,
+  expectedCount: number
+): Promise<void> {
   await test.step(`Verify persisted emoji usage count is ${expectedCount}`, async () => {
-    await expect.poll(async () => {
-      const values = await getExtensionStorageValues(context, 'local', [EMOJI_USAGE_STORAGE_KEY]);
-      const usage = values[EMOJI_USAGE_STORAGE_KEY];
-      if (!Array.isArray(usage)) return 0;
-      const record = usage.find((item) => {
-        return item &&
-          typeof item === 'object' &&
-          (
-            ('text' in item && item.text === TEST_EMOJI) ||
-            ('alt' in item && item.alt === TEST_EMOJI) ||
-            ('label' in item && item.label === TEST_EMOJI)
-          );
-      }) as { count?: unknown } | undefined;
-      return Number(record?.count || 0);
-    }, {
-      timeout: 5_000
-    }).toBe(expectedCount);
+    await expect
+      .poll(
+        async () => {
+          const values = await getExtensionStorageValues(context, 'local', [
+            EMOJI_USAGE_STORAGE_KEY
+          ]);
+          const usage = values[EMOJI_USAGE_STORAGE_KEY];
+          if (!Array.isArray(usage)) return 0;
+          const record = usage.find((item) => {
+            return (
+              item &&
+              typeof item === 'object' &&
+              (('text' in item && item.text === TEST_EMOJI) ||
+                ('alt' in item && item.alt === TEST_EMOJI) ||
+                ('label' in item && item.label === TEST_EMOJI))
+            );
+          }) as { count?: unknown } | undefined;
+          return Number(record?.count || 0);
+        },
+        {
+          timeout: 5_000
+        }
+      )
+      .toBe(expectedCount);
   });
 }
 
@@ -140,21 +164,27 @@ function getEmojiPickerButton(chat: ChatSurface) {
 }
 
 function getNativeEmojiOption(chat: ChatSurface) {
-  return chat.locator(`yt-emoji-picker-renderer [role="option"][alt="${TEST_EMOJI}"], yt-emoji-picker-renderer [role="option"][id="${TEST_EMOJI}"]`).or(
-    chat.locator('yt-emoji-picker-renderer [role="option"]').filter({
-      has: chat.locator(`img[alt="${TEST_EMOJI}"]`)
-    })
-  ).or(
-    chat.locator('yt-emoji-picker-renderer [role="option"]').filter({ hasText: TEST_EMOJI })
-  ).first();
+  return chat
+    .locator(
+      `yt-emoji-picker-renderer [role="option"][alt="${TEST_EMOJI}"], yt-emoji-picker-renderer [role="option"][id="${TEST_EMOJI}"]`
+    )
+    .or(
+      chat.locator('yt-emoji-picker-renderer [role="option"]').filter({
+        has: chat.locator(`img[alt="${TEST_EMOJI}"]`)
+      })
+    )
+    .or(chat.locator('yt-emoji-picker-renderer [role="option"]').filter({ hasText: TEST_EMOJI }))
+    .first();
 }
 
 function getFrequentEmojiButton(chat: ChatSurface) {
-  return chat.locator('.ytcq-frequent-emoji-button').filter({
-    has: chat.locator(`img[alt="${TEST_EMOJI}"]`)
-  }).or(
-    chat.locator('.ytcq-frequent-emoji-button').filter({ hasText: TEST_EMOJI })
-  ).first();
+  return chat
+    .locator('.ytcq-frequent-emoji-button')
+    .filter({
+      has: chat.locator(`img[alt="${TEST_EMOJI}"]`)
+    })
+    .or(chat.locator('.ytcq-frequent-emoji-button').filter({ hasText: TEST_EMOJI }))
+    .first();
 }
 
 function isPageSurface(chat: ChatSurface): chat is Page {

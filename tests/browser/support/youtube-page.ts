@@ -49,9 +49,32 @@ export function getReplayUrl(): string {
 export async function openLiveChat(page: Page, liveUrl: string): Promise<FrameLocator> {
   await gotoLiveChatPage(page, liveUrl);
   await dismissYouTubeConsentIfPresent(page);
-  await expect(page.locator(CHAT_FRAME_SELECTOR)).toBeVisible({ timeout: LIVE_PAGE_TIMEOUT_MS });
+  await ensureLiveChatFrameVisible(page);
   await dismissYouTubeConsentIfPresent(page);
   return page.frameLocator(CHAT_FRAME_SELECTOR);
+}
+
+async function ensureLiveChatFrameVisible(page: Page): Promise<void> {
+  const chatFrame = page.locator(CHAT_FRAME_SELECTOR);
+  if (await chatFrame.isVisible({ timeout: 1_500 }).catch(() => false)) return;
+
+  const openPanelButtons = [
+    page.getByRole('button', { name: /^Open panel$/i }).first(),
+    page.getByRole('button', { name: /^Live chat$/i }).first(),
+    page.locator('button[aria-label*="live chat" i]').first()
+  ];
+
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    for (const button of openPanelButtons) {
+      if (!(await button.isVisible({ timeout: 500 }).catch(() => false))) continue;
+      if (!(await button.isEnabled().catch(() => false))) continue;
+      await button.click({ timeout: 3_000 }).catch(() => undefined);
+      if (await chatFrame.isVisible({ timeout: 10_000 }).catch(() => false)) return;
+    }
+    await page.waitForTimeout(500);
+  }
+
+  await expect(chatFrame).toBeVisible({ timeout: LIVE_PAGE_TIMEOUT_MS });
 }
 
 async function gotoLiveChatPage(page: Page, liveUrl: string): Promise<void> {
@@ -59,12 +82,21 @@ async function gotoLiveChatPage(page: Page, liveUrl: string): Promise<void> {
     await page.goto(liveUrl, { waitUntil: 'domcontentloaded', timeout: LIVE_PAGE_TIMEOUT_MS });
   } catch (error) {
     if (!isSameYouTubeReloadNavigation(error, liveUrl, page.url())) throw error;
-    await page.waitForLoadState('domcontentloaded', { timeout: LIVE_PAGE_TIMEOUT_MS }).catch(() => undefined);
+    await page
+      .waitForLoadState('domcontentloaded', { timeout: LIVE_PAGE_TIMEOUT_MS })
+      .catch(() => undefined);
   }
 }
 
-function isSameYouTubeReloadNavigation(error: unknown, requestedUrl: string, currentUrl: string): boolean {
-  if (!(error instanceof Error) || !error.message.includes('is interrupted by another navigation')) {
+function isSameYouTubeReloadNavigation(
+  error: unknown,
+  requestedUrl: string,
+  currentUrl: string
+): boolean {
+  if (
+    !(error instanceof Error) ||
+    !error.message.includes('is interrupted by another navigation')
+  ) {
     return false;
   }
 
@@ -89,42 +121,85 @@ function normalizeReloadUrl(value: string): string {
 export async function startVideoPlaybackIfPaused(page: Page): Promise<void> {
   const video = page.locator('video').first();
   await video.waitFor({ state: 'attached', timeout: 15_000 });
+  await resumeVideoIfPaused(page, video);
+  await waitForYouTubeContentVideo(page);
+  await resumeVideoIfPaused(page, video);
 
-  if (!await isVideoPaused(video)) return;
+  await expect
+    .poll(async () => !(await isVideoPaused(video)), {
+      message: 'Expected replay video playback to start so chat replay messages can render.',
+      timeout: 10_000
+    })
+    .toBe(true);
+}
+
+export async function waitForYouTubeContentVideo(page: Page): Promise<void> {
+  const player = page.locator('#movie_player').first();
+  const skipAd = player.locator('.ytp-skip-ad-button, .ytp-ad-skip-button-modern').first();
+  await expect(player).toBeVisible({ timeout: 20_000 });
+  await expect
+    .poll(
+      async () => {
+        const adShowing = await player.evaluate((element) =>
+          element.classList.contains('ad-showing')
+        );
+        if (adShowing && (await skipAd.isVisible().catch(() => false))) {
+          await skipAd.click({ timeout: 1_000 }).catch(() => undefined);
+        }
+        return adShowing;
+      },
+      {
+        intervals: [250, 500, 1_000],
+        message: 'Expected YouTube to finish any pre-roll or seek-triggered ad.',
+        timeout: 60_000
+      }
+    )
+    .toBe(false);
+}
+
+async function resumeVideoIfPaused(page: Page, video: ReturnType<Page['locator']>): Promise<void> {
+  if (!(await isVideoPaused(video))) return;
 
   for (const playButton of [
     page.locator('.ytp-large-play-button').first(),
     page.locator('.ytp-play-button').first(),
     page.getByRole('button', { name: /^Play\b/i }).first()
   ]) {
-    if (!await playButton.isVisible({ timeout: 500 }).catch(() => false)) continue;
+    if (!(await playButton.isVisible({ timeout: 500 }).catch(() => false))) continue;
     await playButton.click({ timeout: 2_000 }).catch(() => undefined);
-    if (!await isVideoPaused(video)) return;
+    if (!(await isVideoPaused(video))) return;
   }
 
-  await video.evaluate((element) => {
-    if (!(element instanceof HTMLVideoElement)) return;
-    void element.play().catch(() => undefined);
-  }).catch(() => undefined);
-
-  await expect.poll(async () => !await isVideoPaused(video), {
-    message: 'Expected replay video playback to start so chat replay messages can render.',
-    timeout: 10_000
-  }).toBe(true);
+  await video
+    .evaluate((element) => {
+      if (!(element instanceof HTMLVideoElement)) return;
+      void element.play().catch(() => undefined);
+    })
+    .catch(() => undefined);
 }
 
 export async function isChatComposerVisible(chat: FrameLocator): Promise<boolean> {
-  return chat.locator('yt-live-chat-message-input-renderer')
+  return chat
+    .locator('yt-live-chat-message-input-renderer')
     .first()
     .waitFor({ state: 'visible', timeout: COMPOSER_TIMEOUT_MS })
-    .then(() => true, () => false);
+    .then(
+      () => true,
+      () => false
+    );
 }
 
-export async function getUnavailableComposerReason(page: Page, chat: FrameLocator): Promise<string> {
+export async function getUnavailableComposerReason(
+  page: Page,
+  chat: FrameLocator
+): Promise<string> {
   const unavailableSignedInReason = await getUnavailableSignedInReason(page);
   if (unavailableSignedInReason) return unavailableSignedInReason;
 
-  const chatText = await chat.locator('body').innerText({ timeout: 1_000 }).catch(() => '');
+  const chatText = await chat
+    .locator('body')
+    .innerText({ timeout: 1_000 })
+    .catch(() => '');
   const compactChatText = chatText.replace(/\s+/g, ' ').trim();
   if (compactChatText) {
     return `Skipping logged-in live smoke because YouTube did not expose the chat composer. Chat text: ${compactChatText.slice(0, 240)}`;
@@ -134,7 +209,13 @@ export async function getUnavailableComposerReason(page: Page, chat: FrameLocato
 }
 
 export async function getUnavailableSignedInReason(page: Page): Promise<string> {
-  if (await page.getByRole('button', { name: /sign in/i }).first().isVisible({ timeout: 500 }).catch(() => false)) {
+  if (
+    await page
+      .getByRole('button', { name: /sign in/i })
+      .first()
+      .isVisible({ timeout: 500 })
+      .catch(() => false)
+  ) {
     return [
       'Skipping logged-in YouTube smoke because YouTube still shows Sign in.',
       'Run `npm run test:youtube-login` in a normal Chrome window first.',
@@ -142,7 +223,13 @@ export async function getUnavailableSignedInReason(page: Page): Promise<string> 
     ].join(' ');
   }
 
-  if (await page.getByText(/Verify it.?s you/i).first().isVisible({ timeout: 500 }).catch(() => false)) {
+  if (
+    await page
+      .getByText(/Verify it.?s you/i)
+      .first()
+      .isVisible({ timeout: 500 })
+      .catch(() => false)
+  ) {
     return [
       'Skipping logged-in YouTube smoke because Google requires account verification.',
       'Complete Chrome account verification through `npm run test:youtube-login` or use a real Chrome tab manual smoke instead.',
@@ -165,11 +252,13 @@ async function dismissYouTubeConsentIfPresent(page: Page): Promise<void> {
       for (const button of [roleButton, textButton]) {
         if (!(await button.isVisible({ timeout: 250 }).catch(() => false))) continue;
 
-        await page.locator('ytd-consent-bump-v2-lightbox .loading-overlay')
+        await page
+          .locator('ytd-consent-bump-v2-lightbox .loading-overlay')
           .waitFor({ state: 'hidden', timeout: 5_000 })
           .catch(() => undefined);
 
-        const clicked = await button.click({ timeout: 2_000 })
+        const clicked = await button
+          .click({ timeout: 2_000 })
           .then(() => true)
           .catch(() => false);
         if (!clicked) continue;
@@ -185,11 +274,23 @@ async function dismissYouTubeConsentIfPresent(page: Page): Promise<void> {
 }
 
 async function hasYouTubeConsentPrompt(page: Page): Promise<boolean> {
-  if (await page.locator('ytd-consent-bump-v2-lightbox').first().isVisible({ timeout: 750 }).catch(() => false)) {
+  if (
+    await page
+      .locator('ytd-consent-bump-v2-lightbox')
+      .first()
+      .isVisible({ timeout: 750 })
+      .catch(() => false)
+  ) {
     return true;
   }
 
-  if (await page.getByText(/Before you continue to YouTube/i).first().isVisible({ timeout: 250 }).catch(() => false)) {
+  if (
+    await page
+      .getByText(/Before you continue to YouTube/i)
+      .first()
+      .isVisible({ timeout: 250 })
+      .catch(() => false)
+  ) {
     return true;
   }
 
@@ -204,7 +305,9 @@ async function hasYouTubeConsentPrompt(page: Page): Promise<boolean> {
 }
 
 async function isVideoPaused(video: ReturnType<Page['locator']>): Promise<boolean> {
-  return video.evaluate((element) => {
-    return element instanceof HTMLVideoElement ? element.paused : true;
-  }).catch(() => true);
+  return video
+    .evaluate((element) => {
+      return element instanceof HTMLVideoElement ? element.paused : true;
+    })
+    .catch(() => true);
 }

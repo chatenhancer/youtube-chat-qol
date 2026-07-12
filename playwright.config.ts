@@ -38,7 +38,7 @@ export default defineConfig({
     },
     {
       name: 'youtube-live',
-      testMatch: /specs\/yt-live-.*\.spec\.ts/,
+      testMatch: /specs\/yt-live-(?!perf-).*\.spec\.ts/,
       use: shouldCaptureBrowserFailureArtifacts('youtube-live') ? failureArtifactUse : disabledArtifactUse
     }
   ],

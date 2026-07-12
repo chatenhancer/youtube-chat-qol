@@ -8,14 +8,16 @@
 import type { Locator } from '@playwright/test';
 
 export async function centerLocatorInViewport(locator: Locator): Promise<void> {
-  await locator.evaluate((element) => {
-    element.scrollIntoView({
-      block: 'center',
-      inline: 'nearest'
+  await locator
+    .evaluate((element) => {
+      element.scrollIntoView({
+        block: 'center',
+        inline: 'nearest'
+      });
+    })
+    .catch(async () => {
+      await locator.scrollIntoViewIfNeeded({ timeout: 2_000 }).catch(() => undefined);
     });
-  }).catch(async () => {
-    await locator.scrollIntoViewIfNeeded({ timeout: 2_000 }).catch(() => undefined);
-  });
 }
 
 export async function clickLocatorAtCurrentCenter(locator: Locator): Promise<boolean> {
@@ -32,9 +34,17 @@ export async function clickLocatorAtCurrentCenter(locator: Locator): Promise<boo
   return true;
 }
 
-async function getLocatorCenterInViewport(locator: Locator): Promise<{ x: number; y: number } | null> {
+async function getLocatorCenterInViewport(
+  locator: Locator
+): Promise<{ x: number; y: number } | null> {
   const box = await locator.boundingBox().catch(() => null);
-  const viewport = locator.page().viewportSize();
+  const page = locator.page();
+  const viewport =
+    page.viewportSize() ||
+    (await page.evaluate(() => ({
+      height: window.innerHeight,
+      width: window.innerWidth
+    })));
   if (!box || !viewport || box.width <= 0 || box.height <= 0) return null;
 
   const x = box.x + box.width / 2;

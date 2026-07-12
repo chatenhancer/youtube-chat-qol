@@ -28,10 +28,12 @@ import {
 } from '../scenarios/inbox';
 import { markedUserMessageMenuScenario } from '../scenarios/marked-users';
 import {
-  liteModeMockBehaviorScenario,
+  liteModeMockRenderingAndFallbackScenario,
   liteModeStoredPreferenceReloadScenario,
+  liteModeToggleAndRestoreScenario,
   liteModeTranslationContinuityScenario
 } from '../scenarios/lite-mode';
+import { liteModeTimestampsScenario } from '../scenarios/lite-mode-native-surfaces';
 import {
   mockedMessageTranslationScenario,
   replacedTranslationToggleSurfacesScenario,
@@ -44,19 +46,13 @@ import {
   mentionMenuDraftScenario,
   quoteMenuDraftScenario
 } from '../scenarios/message-actions';
-import {
-  messageMenuScenario,
-  settingsMenuScenario
-} from '../scenarios/menus';
+import { messageMenuScenario, settingsMenuScenario } from '../scenarios/menus';
 import { popupResetScenario } from '../scenarios/popup-reset';
 import {
   profileCardReceivesNewMessagesScenario,
   profileCardRecentMessagesScenario
 } from '../scenarios/profile';
-import {
-  popupSettingsBehaviorScenario,
-  settingsMenuBehaviorScenario
-} from '../scenarios/settings';
+import { popupSettingsBehaviorScenario, settingsMenuBehaviorScenario } from '../scenarios/settings';
 import {
   playgroundActiveGameControlsScenario,
   playgroundAvailabilityToggleScenario,
@@ -76,50 +72,145 @@ import {
 import { tabAlertScenario } from '../scenarios/tab-alert';
 import { loggedInMockTest as test } from '../support/scenario-fixtures';
 
-test('logged-in mock: extension attaches and current tab action reports connected status', attachScenario);
-test('logged-in mock: message context menu receives mark, quote, and mention actions', messageMenuScenario);
-test('logged-in mock: mark user from message menu persists and shows avatar ring', markedUserMessageMenuScenario);
+test(
+  'logged-in mock: extension attaches and current tab action reports connected status',
+  attachScenario
+);
+test(
+  'logged-in mock: message context menu receives mark, quote, and mention actions',
+  messageMenuScenario
+);
+test(
+  'logged-in mock: mark user from message menu persists and shows avatar ring',
+  markedUserMessageMenuScenario
+);
 test('logged-in mock: mention menu action writes a draft only', mentionMenuDraftScenario);
 test('logged-in mock: quote menu action writes a draft only', quoteMenuDraftScenario);
 test('logged-in mock: chat settings menu receives extension controls', settingsMenuScenario);
 test('logged-in mock: chat settings menu toggles persist options', settingsMenuBehaviorScenario);
 test('logged-in mock: extension popup settings persist options', popupSettingsBehaviorScenario);
 test('logged-in mock: popup reset restores defaults and clears local data', popupResetScenario);
-test('logged-in mock: Lite mode renders, keeps author actions, and restores native chat', liteModeMockBehaviorScenario);
-test('logged-in mock: stored Lite mode preserves history across a reload', liteModeStoredPreferenceReloadScenario);
-test('logged-in mock: translations carry from native history into Lite mode', liteModeTranslationContinuityScenario);
+test(
+  'logged-in mock: Lite mode toggles on, renders readable messages, and restores native chat',
+  liteModeToggleAndRestoreScenario
+);
+test(
+  'logged-in mock: Lite renderer handles sanitized rows and compatibility fallback',
+  liteModeMockRenderingAndFallbackScenario
+);
+test(
+  'logged-in mock: stored Lite mode preserves history across a reload',
+  liteModeStoredPreferenceReloadScenario
+);
+test('logged-in mock: Lite mode mirrors the native Timestamps setting', liteModeTimestampsScenario);
+test(
+  'logged-in mock: translations carry from native history into Lite mode',
+  liteModeTranslationContinuityScenario
+);
 test('logged-in mock: incoming chat messages are translated', mockedMessageTranslationScenario);
 test('logged-in mock: translation display modes render correctly', translationDisplayScenario);
-test('logged-in mock: replaced translations toggle across chat surfaces', replacedTranslationToggleSurfacesScenario);
+test(
+  'logged-in mock: replaced translations toggle across chat surfaces',
+  replacedTranslationToggleSurfacesScenario
+);
 test('logged-in mock: translate chat setting reacts live', translationSettingsReactScenario);
 test('logged-in mock: background tab alert updates title and favicon', tabAlertScenario);
-test('logged-in mock: focus panel opens from an author and follows their messages', focusPanelOpensFromAuthorScenario);
-test('logged-in mock: focus panel receives new messages from the focused author', focusPanelReceivesNewMessagesScenario);
+test(
+  'logged-in mock: focus panel opens from an author and follows their messages',
+  focusPanelOpensFromAuthorScenario
+);
+test(
+  'logged-in mock: focus panel receives new messages from the focused author',
+  focusPanelReceivesNewMessagesScenario
+);
 test('logged-in mock: inbox opens from the chat header', inboxOpensFromHeaderScenario);
-test('logged-in mock: inbox saves keyword matches, highlights them, and jumps back to chat', inboxRecordCreationAndJumpScenario);
+test(
+  'logged-in mock: inbox saves keyword matches, highlights them, and jumps back to chat',
+  inboxRecordCreationAndJumpScenario
+);
 test('logged-in mock: inbox saves direct mentions and highlights them', inboxDirectMentionScenario);
 test('logged-in mock: profile card opens from a chat avatar', profileCardRecentMessagesScenario);
-test('logged-in mock: profile card receives new messages from the selected author', profileCardReceivesNewMessagesScenario);
+test(
+  'logged-in mock: profile card receives new messages from the selected author',
+  profileCardReceivesNewMessagesScenario
+);
 test('logged-in mock: composer translation controls open', composerTranslationControlsOpenScenario);
-test('logged-in mock: composer translation translates draft text with mocked Google Translate', mockedComposerTranslationScenario);
-test('logged-in mock: composer translation preserves mentions and emoji placeholders', mockedComposerTranslationProtectedDraftScenario);
+test(
+  'logged-in mock: composer translation translates draft text with mocked Google Translate',
+  mockedComposerTranslationScenario
+);
+test(
+  'logged-in mock: composer translation preserves mentions and emoji placeholders',
+  mockedComposerTranslationProtectedDraftScenario
+);
 test('logged-in mock: unsent chat draft is restored after refresh', chatDraftRecoveryScenario);
-test('logged-in mock: frequent emojis are tracked, rendered, and persisted', frequentEmojiPersistenceScenario);
-test('logged-in mock: chat commands expand and apply settings', chatCommandsExpandAndApplySettingsScenario);
-test('logged-in mock: chat command autocomplete suggests names and arguments', chatCommandAutocompleteScenario);
+test(
+  'logged-in mock: frequent emojis are tracked, rendered, and persisted',
+  frequentEmojiPersistenceScenario
+);
+test(
+  'logged-in mock: chat commands expand and apply settings',
+  chatCommandsExpandAndApplySettingsScenario
+);
+test(
+  'logged-in mock: chat command autocomplete suggests names and arguments',
+  chatCommandAutocompleteScenario
+);
 test('logged-in mock: author click writes a mention draft only', authorMentionDraftScenario);
 test('logged-in mock: author Alt-click writes a quote draft only', authorQuoteDraftScenario);
-test('logged-in mock: Playground Games invites a chess opponent and sends a move', playgroundChessInviteAndMoveScenario);
-test('logged-in mock: Chess blocks moves off-turn and accepts them on-turn', playgroundChessTurnGatingScenario);
-test('logged-in mock: Playground Games accepts an incoming invite and opens the started game', playgroundIncomingInviteAcceptScenario);
-test('logged-in mock: Playground Games ignores an incoming invite and removes it from the lobby', playgroundIncomingInviteIgnoreScenario);
-test('logged-in mock: Playground Games resumes, hides, and leaves an active game', playgroundActiveGameControlsScenario);
-test('logged-in mock: Playground Games toggles lobby availability', playgroundAvailabilityToggleScenario);
-test('logged-in mock: Stick Around opens as a chat feed overlay after inviting the computer', playgroundStickAroundComputerOverlayScenario);
-test('logged-in mock: Stick Around lobby controls work over an active overlay', playgroundStickAroundActiveOverlayControlsScenario);
-test('logged-in mock: Stick Around mounts its playable overlay on Lite chat', playgroundStickAroundLiteOverlayScenario);
-test('logged-in mock: Playground Games cancels a pending outgoing invite', playgroundInviteCancelScenario);
-test('logged-in mock: Bounty Hunting round start divider attaches to the boundary message', playgroundBountyHuntingRoundStartScenario);
-test('logged-in mock: Bounty Hunting rejects pre-start messages and claims post-start messages', playgroundBountyHuntingCutoffScenario);
-test('logged-in mock: Bounty Hunting reports post-start witness messages', playgroundBountyHuntingWitnessScenario);
-test('logged-in mock: Bounty Hunting countdown starts with server timestamp cutoff', playgroundBountyHuntingCountdownStartScenario);
+test(
+  'logged-in mock: Playground Games invites a chess opponent and sends a move',
+  playgroundChessInviteAndMoveScenario
+);
+test(
+  'logged-in mock: Chess blocks moves off-turn and accepts them on-turn',
+  playgroundChessTurnGatingScenario
+);
+test(
+  'logged-in mock: Playground Games accepts an incoming invite and opens the started game',
+  playgroundIncomingInviteAcceptScenario
+);
+test(
+  'logged-in mock: Playground Games ignores an incoming invite and removes it from the lobby',
+  playgroundIncomingInviteIgnoreScenario
+);
+test(
+  'logged-in mock: Playground Games resumes, hides, and leaves an active game',
+  playgroundActiveGameControlsScenario
+);
+test(
+  'logged-in mock: Playground Games toggles lobby availability',
+  playgroundAvailabilityToggleScenario
+);
+test(
+  'logged-in mock: Stick Around opens as a chat feed overlay after inviting the computer',
+  playgroundStickAroundComputerOverlayScenario
+);
+test(
+  'logged-in mock: Stick Around lobby controls work over an active overlay',
+  playgroundStickAroundActiveOverlayControlsScenario
+);
+test(
+  'logged-in mock: Stick Around mounts its playable overlay on Lite chat',
+  playgroundStickAroundLiteOverlayScenario
+);
+test(
+  'logged-in mock: Playground Games cancels a pending outgoing invite',
+  playgroundInviteCancelScenario
+);
+test(
+  'logged-in mock: Bounty Hunting round start divider attaches to the boundary message',
+  playgroundBountyHuntingRoundStartScenario
+);
+test(
+  'logged-in mock: Bounty Hunting rejects pre-start messages and claims post-start messages',
+  playgroundBountyHuntingCutoffScenario
+);
+test(
+  'logged-in mock: Bounty Hunting reports post-start witness messages',
+  playgroundBountyHuntingWitnessScenario
+);
+test(
+  'logged-in mock: Bounty Hunting countdown starts with server timestamp cutoff',
+  playgroundBountyHuntingCountdownStartScenario
+);

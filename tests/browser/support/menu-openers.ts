@@ -11,8 +11,7 @@ import {
   type ChatSurface
 } from './chat-surface';
 import {
-  centerLocatorInViewport,
-  clickLocatorAtCurrentCenter
+  centerLocatorInViewport
 } from './locator';
 import { cleanVisibleText } from './text';
 
@@ -63,7 +62,7 @@ export async function openMessageMenu(chat: ChatSurface): Promise<OpenedMessageM
     await messages.last().waitFor({ state: 'visible', timeout: 45_000 });
   });
 
-  return test.step('Click a message menu button', async () => {
+  return test.step('Activate a message menu button', async () => {
     const messages = chat.locator(NORMAL_CHAT_MESSAGE_SELECTOR).filter({
       has: chat.locator('#menu')
     });
@@ -84,29 +83,21 @@ export async function openMessageMenu(chat: ChatSurface): Promise<OpenedMessageM
       }
 
       await message.hover({ timeout: 2_000 }).catch(() => undefined);
-      const menuTargets = [
-        message.locator('#menu button').first(),
-        message.locator('#menu yt-icon-button').first(),
-        message.locator('#menu').first()
-      ];
-
-      for (const menuTarget of menuTargets) {
-        if (!await menuTarget.isVisible({ timeout: 500 }).catch(() => false)) continue;
-        for (const activate of [
-          () => clickLocatorAtCurrentCenter(menuTarget),
-          () => menuTarget.press('Enter', { timeout: 1_000 }).then(() => true)
-        ]) {
-          await activate().catch(() => false);
-          const openedMenu = await waitForVisibleMenu(
-            chat,
-            MESSAGE_MENU_MARKER_SELECTOR,
-            'message context menu popup',
-            1_000
-          ).catch(() => null);
-          if (openedMenu) return { menu: openedMenu, message, authorName };
-          await closeOpenMenus(chat);
-        }
+      const menuButton = message.locator('#menu button').first();
+      if (!await menuButton.isVisible({ timeout: 500 }).catch(() => false)) {
+        await releaseMessageTarget(message);
+        continue;
       }
+
+      await menuButton.press('Enter', { timeout: 2_000 }).catch(() => undefined);
+      const openedMenu = await waitForVisibleMenu(
+        chat,
+        MESSAGE_MENU_MARKER_SELECTOR,
+        'message context menu popup',
+        3_000
+      ).catch(() => null);
+      if (openedMenu) return { menu: openedMenu, message, authorName };
+      await closeOpenMenus(chat);
 
       await releaseMessageTarget(message);
     }

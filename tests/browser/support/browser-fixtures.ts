@@ -5,14 +5,16 @@
  * behavior without reopening Chrome for every test. Test-scoped fixtures reset
  * the mock page or close transient extension surfaces before each assertion.
  */
-import { expect, test as base, type BrowserContext, type FrameLocator, type Locator, type Page } from '@playwright/test';
-import { existsSync } from 'node:fs';
 import {
-  cp,
-  lstat,
-  mkdir,
-  rm
-} from 'node:fs/promises';
+  expect,
+  test as base,
+  type BrowserContext,
+  type FrameLocator,
+  type Locator,
+  type Page
+} from '@playwright/test';
+import { existsSync } from 'node:fs';
+import { cp, lstat, mkdir, rm } from 'node:fs/promises';
 import path from 'node:path';
 import {
   closeExtensionContext,
@@ -101,31 +103,37 @@ interface LiveWorkerFixtures {
 export { expect };
 
 export const mockTest = base.extend<MockTestFixtures, MockWorkerFixtures>({
-  mockWorkerSession: [async ({ browserName }, use, workerInfo) => {
-    void browserName;
-    const context = await launchExtensionContext({
-      headless: shouldRunHeadlessBrowserTest(),
-      profileDir: getDisposableWorkerProfileDir('mock', workerInfo)
-    });
-
-    await context.route(/^https:\/\/www\.youtube\.com\/live_chat(?:_replay)?(?:\?|$)/, (route) => {
-      const url = new URL(route.request().url());
-      const loggedIn = url.searchParams.get('ytcq-auth') !== 'logged-out';
-      const replay = url.pathname.includes('live_chat_replay');
-      route.fulfill({
-        body: createLiveChatFixtureHtml({ loggedIn, replay }),
-        contentType: 'text/html'
+  mockWorkerSession: [
+    async ({ browserName }, use, workerInfo) => {
+      void browserName;
+      const context = await launchExtensionContext({
+        headless: shouldRunHeadlessBrowserTest(),
+        profileDir: getDisposableWorkerProfileDir('mock', workerInfo)
       });
-    });
 
-    const page = await context.newPage();
+      await context.route(
+        /^https:\/\/www\.youtube\.com\/live_chat(?:_replay)?(?:\?|$)/,
+        (route) => {
+          const url = new URL(route.request().url());
+          const loggedIn = url.searchParams.get('ytcq-auth') !== 'logged-out';
+          const replay = url.pathname.includes('live_chat_replay');
+          route.fulfill({
+            body: createLiveChatFixtureHtml({ loggedIn, replay }),
+            contentType: 'text/html'
+          });
+        }
+      );
 
-    try {
-      await use({ context, page });
-    } finally {
-      await closeExtensionContext(context);
-    }
-  }, { scope: 'worker' }],
+      const page = await context.newPage();
+
+      try {
+        await use({ context, page });
+      } finally {
+        await closeExtensionContext(context);
+      }
+    },
+    { scope: 'worker' }
+  ],
 
   mockLoggedOutSession: async ({ mockWorkerSession }, use, testInfo) => {
     await openMockChatPage(mockWorkerSession.page, fixtureLoggedOutLiveChatUrl);
@@ -156,46 +164,55 @@ export const mockTest = base.extend<MockTestFixtures, MockWorkerFixtures>({
 });
 
 export const liveTest = base.extend<LiveTestFixtures, LiveWorkerFixtures>({
-  liveLoggedOutWorkerSession: [async ({ browserName }, use, workerInfo) => {
-    void browserName;
-    const headless = shouldRunLiveHeadlessBrowserTest();
-    const context = await launchExtensionContext({
-      headless,
-      profileDir: getDisposableWorkerProfileDir('live-logged-out', workerInfo),
-      userAgent: getLiveBrowserUserAgent(headless)
-    });
+  liveLoggedOutWorkerSession: [
+    async ({ browserName }, use, workerInfo) => {
+      void browserName;
+      const headless = shouldRunLiveHeadlessBrowserTest();
+      const context = await launchExtensionContext({
+        headless,
+        profileDir: getDisposableWorkerProfileDir('live-logged-out', workerInfo),
+        userAgent: getLiveBrowserUserAgent(headless)
+      });
 
-    const page = await context.newPage();
-    const chat = await openLiveChat(page, getLiveUrl());
+      const page = await context.newPage();
+      const chat = await openLiveChat(page, getLiveUrl());
 
-    try {
-      await use({ context, page, chat });
-    } finally {
-      await closeExtensionContext(context);
-    }
-  }, { scope: 'worker' }],
+      try {
+        await use({ context, page, chat });
+      } finally {
+        await closeExtensionContext(context);
+      }
+    },
+    { scope: 'worker' }
+  ],
 
-  liveLoggedInWorkerSession: [async ({ browserName }, use) => {
-    void browserName;
-    const session = await createLoggedInLiveSession();
+  liveLoggedInWorkerSession: [
+    async ({ browserName }, use) => {
+      void browserName;
+      const session = await createLoggedInLiveSession();
 
-    try {
-      await use(session?.session || null);
-    } finally {
-      await session?.close();
-    }
-  }, { scope: 'worker' }],
+      try {
+        await use(session?.session || null);
+      } finally {
+        await session?.close();
+      }
+    },
+    { scope: 'worker' }
+  ],
 
-  liveLoggedInReplayWorkerSession: [async ({ browserName }, use) => {
-    void browserName;
-    const session = await createLoggedInReplaySession();
+  liveLoggedInReplayWorkerSession: [
+    async ({ browserName }, use) => {
+      void browserName;
+      const session = await createLoggedInReplaySession();
 
-    try {
-      await use(session?.session || null);
-    } finally {
-      await session?.close();
-    }
-  }, { scope: 'worker' }],
+      try {
+        await use(session?.session || null);
+      } finally {
+        await session?.close();
+      }
+    },
+    { scope: 'worker' }
+  ],
 
   liveLoggedOutSession: async ({ liveLoggedOutWorkerSession }, use, testInfo) => {
     await resetLiveScenarioState(liveLoggedOutWorkerSession);
@@ -242,11 +259,33 @@ export function skipIfLoggedInYouTubeUnavailable(
 }
 
 async function openMockChatPage(page: Page, url: string): Promise<void> {
-  await page.goto('about:blank', { timeout: 15_000, waitUntil: 'commit' });
+  await isolateMockChatPage(page);
   await clearMockScenarioStorage(page.context());
   await page.goto(url, { timeout: 15_000, waitUntil: 'commit' });
   await expect(page.locator('yt-live-chat-renderer')).toBeVisible({ timeout: 15_000 });
   await expect(page.locator('.ytcq-inbox-button')).toBeVisible({ timeout: 15_000 });
+}
+
+async function isolateMockChatPage(page: Page): Promise<void> {
+  let lastError: unknown;
+  for (let attempt = 0; attempt < 4; attempt += 1) {
+    try {
+      await page.goto('about:blank', { timeout: 15_000, waitUntil: 'commit' });
+      if (page.url() === 'about:blank') return;
+    } catch (error) {
+      lastError = error;
+      if (
+        !(error instanceof Error) ||
+        !error.message.includes('is interrupted by another navigation')
+      ) {
+        throw error;
+      }
+    }
+    await page.waitForTimeout(250);
+  }
+  throw lastError instanceof Error
+    ? lastError
+    : new Error(`Could not isolate mock page from ${page.url()}.`);
 }
 
 async function clearMockScenarioStorage(context: BrowserContext): Promise<void> {
@@ -254,11 +293,14 @@ async function clearMockScenarioStorage(context: BrowserContext): Promise<void> 
   await clearExtensionStorageArea(context, 'sync');
 }
 
-function getDisposableWorkerProfileDir(prefix: string, workerInfo: {
-  parallelIndex: number;
-  project: { outputDir: string };
-  workerIndex: number;
-}): string {
+function getDisposableWorkerProfileDir(
+  prefix: string,
+  workerInfo: {
+    parallelIndex: number;
+    project: { outputDir: string };
+    workerIndex: number;
+  }
+): string {
   return path.join(
     workerInfo.project.outputDir,
     'profiles',
@@ -326,7 +368,7 @@ async function createLoggedInYouTubeSession({
     userAgent: getLiveBrowserUserAgent(shouldRunLiveHeadlessBrowserTest())
   });
   const { context } = chrome;
-  const page = context.pages()[0] || await context.newPage();
+  const page = context.pages()[0] || (await context.newPage());
   const chat = await openLiveChat(page, url);
   if (!requireComposer) {
     await startVideoPlaybackIfPaused(page);
@@ -349,15 +391,15 @@ async function createLoggedInYouTubeSession({
 }
 
 async function getComposerUnavailableReason(page: Page, chat: FrameLocator): Promise<string> {
-  return await isChatComposerVisible(chat)
-    ? ''
-    : await getUnavailableComposerReason(page, chat);
+  return (await isChatComposerVisible(chat)) ? '' : await getUnavailableComposerReason(page, chat);
 }
 
 async function resetLiveScenarioState(session: LiveSession): Promise<void> {
-  await session.page.evaluate(() => {
-    window.scrollTo(0, 0);
-  }).catch(() => undefined);
+  await session.page
+    .evaluate(() => {
+      window.scrollTo(0, 0);
+    })
+    .catch(() => undefined);
   await closeChatNativeMenus(session.chat);
   await closeTransientSurfaces(session.chat);
   await clearComposerIfVisible(session.chat);
@@ -369,7 +411,10 @@ async function closeChatNativeMenus(chat: FrameLocator): Promise<void> {
     const menu = await findOpenChatNativeMenu(chat);
     if (!menu) return;
     await menu.press('Escape').catch(() => undefined);
-    await chat.locator('body').press('Escape').catch(() => undefined);
+    await chat
+      .locator('body')
+      .press('Escape')
+      .catch(() => undefined);
     await menu.waitFor({ state: 'hidden', timeout: 500 }).catch(() => undefined);
   }
 }
@@ -381,12 +426,7 @@ async function findOpenChatNativeMenu(chat: FrameLocator): Promise<Locator | nul
   for (let index = count - 1; index >= 0; index -= 1) {
     const menu = menus.nth(index);
     const box = await menu.boundingBox().catch(() => null);
-    if (
-      box &&
-      box.width > 0 &&
-      box.height > 0 &&
-      await menu.isVisible().catch(() => false)
-    ) {
+    if (box && box.width > 0 && box.height > 0 && (await menu.isVisible().catch(() => false))) {
       return menu;
     }
   }
@@ -395,17 +435,19 @@ async function findOpenChatNativeMenu(chat: FrameLocator): Promise<Locator | nul
 }
 
 async function closeTransientSurfaces(chat: FrameLocator): Promise<void> {
-  await chat.locator([
-    '.ytcq-focus-card',
-    '.ytcq-inbox-card',
-    '.ytcq-profile-card:not(.ytcq-inbox-card)'
-  ].join(',')).evaluateAll((elements) => {
-    for (const element of elements) {
-      element.remove();
-    }
-  }).catch(() => undefined);
+  await chat
+    .locator(
+      ['.ytcq-focus-card', '.ytcq-inbox-card', '.ytcq-profile-card:not(.ytcq-inbox-card)'].join(',')
+    )
+    .evaluateAll((elements) => {
+      for (const element of elements) {
+        element.remove();
+      }
+    })
+    .catch(() => undefined);
 
-  await chat.locator('.ytcq-composer-translate-panel')
+  await chat
+    .locator('.ytcq-composer-translate-panel')
     .evaluateAll((panels) => {
       for (const panel of panels) {
         if (panel instanceof HTMLElement) panel.hidden = true;
@@ -443,18 +485,26 @@ function shouldRunLiveHeadlessBrowserTest(): boolean {
 }
 
 function getLiveBrowserUserAgent(headless: boolean): string | undefined {
-  return headless ? (process.env.YTCQ_TEST_LIVE_USER_AGENT || LIVE_HEADLESS_USER_AGENT) : undefined;
+  return headless ? process.env.YTCQ_TEST_LIVE_USER_AGENT || LIVE_HEADLESS_USER_AGENT : undefined;
 }
 
-async function prepareLoggedInWorkingProfile(sourceProfileDir: string, profileName: string): Promise<string> {
+async function prepareLoggedInWorkingProfile(
+  sourceProfileDir: string,
+  profileName: string
+): Promise<string> {
   const workingProfilesDir = getLiveWorkingProfilesDir();
   const profileDir = path.join(workingProfilesDir, profileName);
 
-  if (isSameOrNestedPath(sourceProfileDir, profileDir) || isSameOrNestedPath(profileDir, sourceProfileDir)) {
-    throw new Error([
-      `Logged-in source profile and working profile overlap: ${sourceProfileDir} -> ${profileDir}`,
-      'Use a separate YTCQ_CHROME_PROFILE or YTCQ_CHROME_WORKING_PROFILES value.'
-    ].join('\n'));
+  if (
+    isSameOrNestedPath(sourceProfileDir, profileDir) ||
+    isSameOrNestedPath(profileDir, sourceProfileDir)
+  ) {
+    throw new Error(
+      [
+        `Logged-in source profile and working profile overlap: ${sourceProfileDir} -> ${profileDir}`,
+        'Use a separate YTCQ_CHROME_PROFILE or YTCQ_CHROME_WORKING_PROFILES value.'
+      ].join('\n')
+    );
   }
 
   await assertSourceProfileClosed(sourceProfileDir);
@@ -471,21 +521,31 @@ async function prepareLoggedInWorkingProfile(sourceProfileDir: string, profileNa
 }
 
 async function assertSourceProfileClosed(profileDir: string): Promise<void> {
-  const activeFiles = await getExistingRootProfileFiles(profileDir, ACTIVE_CHROME_PROFILE_FILE_NAMES);
+  const activeFiles = await getExistingRootProfileFiles(
+    profileDir,
+    ACTIVE_CHROME_PROFILE_FILE_NAMES
+  );
   if (activeFiles.length === 0) return;
 
-  throw new Error([
-    `The logged-in source Chrome profile appears to be open: ${profileDir}`,
-    'Close the Chrome window opened by `npm run test:youtube-login`, then rerun the browser tests.',
-    `Open-profile marker files: ${activeFiles.join(', ')}`
-  ].join('\n'));
+  throw new Error(
+    [
+      `The logged-in source Chrome profile appears to be open: ${profileDir}`,
+      'Close the Chrome window opened by `npm run test:youtube-login`, then rerun the browser tests.',
+      `Open-profile marker files: ${activeFiles.join(', ')}`
+    ].join('\n')
+  );
 }
 
 async function removeChromeRuntimeFiles(profileDir: string): Promise<void> {
-  const runtimeFiles = await getExistingRootProfileFiles(profileDir, RUNTIME_CHROME_PROFILE_FILE_NAMES);
-  await Promise.all(runtimeFiles.map((fileName) => {
-    return removeProfilePath(path.join(profileDir, fileName));
-  }));
+  const runtimeFiles = await getExistingRootProfileFiles(
+    profileDir,
+    RUNTIME_CHROME_PROFILE_FILE_NAMES
+  );
+  await Promise.all(
+    runtimeFiles.map((fileName) => {
+      return removeProfilePath(path.join(profileDir, fileName));
+    })
+  );
 }
 
 async function removeCopiedExtensionServiceWorkerState(profileDir: string): Promise<void> {
@@ -503,11 +563,17 @@ async function removeProfilePath(profilePath: string): Promise<void> {
   });
 }
 
-async function getExistingRootProfileFiles(profileDir: string, fileNames: Set<string>): Promise<string[]> {
+async function getExistingRootProfileFiles(
+  profileDir: string,
+  fileNames: Set<string>
+): Promise<string[]> {
   const existingFiles: string[] = [];
   for (const fileName of fileNames) {
     const filePath = path.join(profileDir, fileName);
-    const exists = await lstat(filePath).then(() => true, () => false);
+    const exists = await lstat(filePath).then(
+      () => true,
+      () => false
+    );
     if (exists) existingFiles.push(fileName);
   }
   return existingFiles;

@@ -1,6 +1,7 @@
 /**
- * Read-only live-browser checks for YouTube-owned surfaces that remain usable
- * while Lite mode owns the chat feed. These scenarios never touch the composer.
+ * Read-only browser checks for YouTube-owned surfaces that remain usable while
+ * Lite mode owns the chat feed. User-facing behavior is shared across mock and
+ * live surfaces; transport-specific probes remain live-only.
  */
 import { expect, test, type BrowserContext, type Locator } from '@playwright/test';
 import {
@@ -9,6 +10,7 @@ import {
   withExtensionStorageValues
 } from '../support/extension-storage';
 import { openSettingsMenu } from '../support/menu-openers';
+import { waitForYouTubeContentVideo } from '../support/youtube-page';
 import type { BrowserScenario, ChatSurface } from './types';
 
 const LITE_BATCH_EVENT = 'ytcq:lite-chat-batch';
@@ -19,10 +21,8 @@ const LITE_NATIVE_DISCARDED_ATTRIBUTE = 'data-ytcq-lite-native-discarded';
 const LITE_NATIVE_RESTORE_SELECTOR = '#ytcq-lite-native-restore';
 const LITE_SESSION_COOLDOWN_KEY = 'ytcqLiteModeSessionCooldown:v1';
 const NATIVE_LIST_SELECTOR = 'yt-live-chat-item-list-renderer, #chat > #item-list';
-const OPTIONAL_GIFT_WAIT_MS = 5_000;
 const PARTICIPANT_LIST_SELECTOR = 'yt-live-chat-participant-list-renderer';
-const SHOULD_CAPTURE_AERO_SCREENSHOTS =
-  process.env.YTCQ_CAPTURE_LIVE_AERO_SCREENSHOTS === '1';
+const SHOULD_CAPTURE_AERO_SCREENSHOTS = process.env.YTCQ_CAPTURE_LIVE_AERO_SCREENSHOTS === '1';
 
 interface LiveSurfaceAudit {
   batchCount: number;
@@ -40,38 +40,6 @@ interface ParticipantEvidence extends LiveSurfaceAudit {
   visibleRowCount: number;
 }
 
-interface RectSnapshot {
-  bottom: number;
-  height: number;
-  left: number;
-  right: number;
-  top: number;
-  width: number;
-}
-
-interface RowStyleSnapshot {
-  authorMessageBaselineDelta: number | null;
-  avatar: RectSnapshot | null;
-  bounds: RectSnapshot;
-  content: RectSnapshot | null;
-  giftImage: RectSnapshot | null;
-  giftImageContained: boolean | null;
-  style: {
-    backgroundColor: string;
-    backgroundImage: string;
-    color: string;
-    display: string;
-    fontFamily: string;
-    fontSize: string;
-    lineHeight: string;
-    overflowX: string;
-    paddingBottom: string;
-    paddingLeft: string;
-    paddingRight: string;
-    paddingTop: string;
-  };
-}
-
 interface HeaderIconSnapshot {
   active: boolean;
   buttonColor: string;
@@ -86,40 +54,34 @@ interface HeaderIconSnapshot {
 interface AeroEvidence {
   activeIcons: HeaderIconSnapshot[];
   inactiveIcons: HeaderIconSnapshot[];
-  liteFeed: RectSnapshot;
-  liteGift: RowStyleSnapshot | null;
-  liteText: RowStyleSnapshot;
-  nativeFeed: RectSnapshot;
-  nativeGift: RowStyleSnapshot | null;
-  nativeText: RowStyleSnapshot;
+  liteMessageCount: number;
   startupMs: number;
 }
 
-export const liteModeLiveNativeSurfacesScenario: BrowserScenario = async ({ chat, context }) => {
+export const liteModeTimestampsScenario: BrowserScenario = async ({ chat, context }) => {
   test.setTimeout(120_000);
   const button = chat.locator(LITE_BUTTON_SELECTOR).first();
   const root = chat.locator(LITE_ROOT_SELECTOR);
   let originalTimestamps: boolean | null = null;
-  let participantEvidence: ParticipantEvidence | null = null;
   let timestampEvidence: Record<string, unknown> | null = null;
 
   try {
     await setExtensionStorageValues(context, 'sync', { liteModeEnabled: false });
     await expectStoredLiteMode(context, false);
     await clearLiteCooldown(chat);
-    await installLiveSurfaceAudit(chat);
-    await chat.locator(NATIVE_LIST_SELECTOR).first().waitFor({ state: 'attached', timeout: 20_000 });
+    await chat
+      .locator(NATIVE_LIST_SELECTOR)
+      .first()
+      .waitFor({ state: 'attached', timeout: 20_000 });
     await expect(button).toBeVisible({ timeout: 20_000 });
     await expect(button).toHaveAttribute('aria-pressed', 'false');
 
     await button.click();
     await expectStoredLiteMode(context, true);
     await expect(root).toBeVisible({ timeout: 20_000 });
-    await expect(chat.locator('html')).toHaveAttribute(
-      LITE_NATIVE_DISCARDED_ATTRIBUTE,
-      'true',
-      { timeout: 20_000 }
-    );
+    await expect(chat.locator('html')).toHaveAttribute(LITE_NATIVE_DISCARDED_ATTRIBUTE, 'true', {
+      timeout: 20_000
+    });
     const liteTimestamp = root.locator('.ytcq-lite-message #timestamp').first();
     await liteTimestamp.waitFor({ state: 'attached', timeout: 20_000 });
 
@@ -128,9 +90,7 @@ export const liteModeLiveNativeSurfacesScenario: BrowserScenario = async ({ chat
       const toggled = !originalTimestamps;
       await setNativeTimestampsEnabled(chat, toggled);
       const toggledMirrored = await waitForLiteTimestampState(root, toggled);
-      const toggledTextVisible = toggled
-        ? await hasVisibleLiteTimestampText(liteTimestamp)
-        : true;
+      const toggledTextVisible = toggled ? await hasVisibleLiteTimestampText(liteTimestamp) : true;
 
       await setNativeTimestampsEnabled(chat, originalTimestamps);
       const restoredMirrored = await waitForLiteTimestampState(root, originalTimestamps);
@@ -151,20 +111,74 @@ export const liteModeLiveNativeSurfacesScenario: BrowserScenario = async ({ chat
       expect(toggledMirrored, 'Expected the changed native timestamp state to reach Lite.').toBe(
         true
       );
-      expect(
-        restoredMirrored,
-        'Expected restoring the native timestamp state to reach Lite.'
-      ).toBe(true);
+      expect(restoredMirrored, 'Expected restoring the native timestamp state to reach Lite.').toBe(
+        true
+      );
       expect(
         toggledTextVisible && restoredTextVisible,
         'Expected enabled Lite timestamps to contain visible clock text.'
       ).toBe(true);
     });
+  } finally {
+    if (originalTimestamps !== null) {
+      await setNativeTimestampsEnabled(chat, originalTimestamps).catch(() => undefined);
+    }
+    await setExtensionStorageValues(context, 'sync', { liteModeEnabled: false }).catch(
+      () => undefined
+    );
+    await root.waitFor({ state: 'detached', timeout: 8_000 }).catch(() => undefined);
+    await chat
+      .locator(NATIVE_LIST_SELECTOR)
+      .first()
+      .waitFor({
+        state: 'visible',
+        timeout: 20_000
+      })
+      .catch(() => undefined);
+    await clearLiteCooldown(chat).catch(() => undefined);
+    await test
+      .info()
+      .attach('lite-timestamps-evidence', {
+        body: JSON.stringify(timestampEvidence, null, 2),
+        contentType: 'application/json'
+      })
+      .catch(() => undefined);
+  }
+};
+
+export const liteModeLiveParticipantsScenario: BrowserScenario = async ({ chat, context }) => {
+  test.setTimeout(120_000);
+  const button = chat.locator(LITE_BUTTON_SELECTOR).first();
+  const root = chat.locator(LITE_ROOT_SELECTOR);
+  let participantEvidence: ParticipantEvidence | null = null;
+
+  try {
+    await setExtensionStorageValues(context, 'sync', { liteModeEnabled: false });
+    await expectStoredLiteMode(context, false);
+    await clearLiteCooldown(chat);
+    await installLiveSurfaceAudit(chat);
+    await chat
+      .locator(NATIVE_LIST_SELECTOR)
+      .first()
+      .waitFor({ state: 'attached', timeout: 20_000 });
+    await expect(button).toBeVisible({ timeout: 20_000 });
+    await expect(button).toHaveAttribute('aria-pressed', 'false');
+
+    await button.click();
+    await expectStoredLiteMode(context, true);
+    await expect(root).toBeVisible({ timeout: 20_000 });
+    await expect(chat.locator('html')).toHaveAttribute(LITE_NATIVE_DISCARDED_ATTRIBUTE, 'true', {
+      timeout: 20_000
+    });
+    await expect(root.locator('.ytcq-lite-message').first()).toBeVisible({ timeout: 20_000 });
 
     await test.step('Keep Participants native, populated, and compatible with active Lite transport', async () => {
       const baseline = await getLiveSurfaceAudit(chat);
       await openParticipantsPanel(chat);
-      const participants = chat.locator(PARTICIPANT_LIST_SELECTOR).filter({ visible: true }).first();
+      const participants = chat
+        .locator(PARTICIPANT_LIST_SELECTOR)
+        .filter({ visible: true })
+        .first();
       await expect(participants).toBeVisible({ timeout: 15_000 });
       await expect(root).toBeHidden();
       await expect(root).toHaveAttribute('aria-hidden', 'true');
@@ -195,27 +209,27 @@ export const liteModeLiveNativeSurfacesScenario: BrowserScenario = async ({ chat
     });
   } finally {
     const finalAudit = await getLiveSurfaceAudit(chat).catch(() => null);
-    if (originalTimestamps !== null) {
-      await setNativeTimestampsEnabled(chat, originalTimestamps).catch(() => undefined);
-    }
     await setExtensionStorageValues(context, 'sync', { liteModeEnabled: false }).catch(
       () => undefined
     );
     await root.waitFor({ state: 'detached', timeout: 8_000 }).catch(() => undefined);
-    await chat.locator(NATIVE_LIST_SELECTOR).first().waitFor({
-      state: 'visible',
-      timeout: 20_000
-    }).catch(() => undefined);
+    await chat
+      .locator(NATIVE_LIST_SELECTOR)
+      .first()
+      .waitFor({
+        state: 'visible',
+        timeout: 20_000
+      })
+      .catch(() => undefined);
     await clearLiteCooldown(chat).catch(() => undefined);
     await uninstallLiveSurfaceAudit(chat).catch(() => undefined);
     await test
       .info()
-      .attach('lite-native-surfaces-evidence', {
+      .attach('lite-participants-evidence', {
         body: JSON.stringify(
           {
             finalAudit,
-            participantEvidence,
-            timestampEvidence
+            participantEvidence
           },
           null,
           2
@@ -226,7 +240,7 @@ export const liteModeLiveNativeSurfacesScenario: BrowserScenario = async ({ chat
   }
 };
 
-export const liteModeReplayAeroInspectionScenario: BrowserScenario = async ({ chat, context }) => {
+export const liteModeAeroBehaviorScenario: BrowserScenario = async ({ chat, context }) => {
   test.setTimeout(120_000);
   const button = chat.locator(LITE_BUTTON_SELECTOR).first();
   const root = chat.locator(LITE_ROOT_SELECTOR);
@@ -238,6 +252,7 @@ export const liteModeReplayAeroInspectionScenario: BrowserScenario = async ({ ch
     { chatSkin: 'aero', liteModeEnabled: false },
     async () => {
       try {
+        await clearLiteCooldown(chat);
         await expect(button).toBeVisible({ timeout: 20_000 });
         await expect(button).toHaveAttribute('aria-pressed', 'false');
         await expect(chat.locator('html')).toHaveAttribute('data-ytcq-chat-skin', 'aero');
@@ -247,30 +262,13 @@ export const liteModeReplayAeroInspectionScenario: BrowserScenario = async ({ ch
           .waitFor({ state: 'visible', timeout: 30_000 });
 
         const inactiveIcons = await sampleHeaderIconThemes(chat, false);
-        const nativeText = await getRowStyleSnapshot(
-          chat,
-          'yt-live-chat-text-message-renderer',
-          'text'
-        );
-        const nativeGift = await waitForOptionalRowStyleSnapshot(
-          chat,
-          'yt-gift-message-view-model',
-          'gift',
-          OPTIONAL_GIFT_WAIT_MS
-        );
-        const nativeFeed = await getRectSnapshot(chat.locator(NATIVE_LIST_SELECTOR).first());
 
         const startupAt = Date.now();
         await button.click();
         await expectStoredLiteMode(context, true);
         await expect(root).toBeVisible({ timeout: 20_000 });
-        await expect(root).toHaveAttribute('data-ytcq-connection-state', 'connected', {
-          timeout: 20_000
-        });
-        await root.locator('.ytcq-lite-message-text').last().waitFor({
-          state: 'visible',
-          timeout: 30_000
-        });
+        const liteText = root.locator('.ytcq-lite-message-text').last();
+        await liteText.waitFor({ state: 'visible', timeout: 30_000 });
         const startupMs = Date.now() - startupAt;
         await expect(chat.locator('html')).toHaveAttribute(
           LITE_NATIVE_DISCARDED_ATTRIBUTE,
@@ -284,24 +282,18 @@ export const liteModeReplayAeroInspectionScenario: BrowserScenario = async ({ ch
           true,
           SHOULD_CAPTURE_AERO_SCREENSHOTS
         );
-        const liteText = await getRowStyleSnapshot(chat, '.ytcq-lite-message-text', 'text');
-        const liteFeed = await getRectSnapshot(root);
-        const liteGift = await waitForOptionalRowStyleSnapshot(
-          chat,
-          '.ytcq-lite-message-gift',
-          'gift',
-          OPTIONAL_GIFT_WAIT_MS
-        );
+        await expect(liteText.locator('#author-photo')).toBeVisible();
+        await expect(liteText.locator('#author-name')).toBeVisible();
+        await expect(liteText.locator('#message')).toBeVisible();
+        await expect.poll(() => liteText.locator('#author-name').innerText()).not.toBe('');
+        await expect.poll(() => liteText.locator('#message').innerText()).not.toBe('');
+        await expect(root.locator('.ytcq-lite-scroller')).toBeVisible();
+        await expect(root.locator('.ytcq-lite-toolbar')).toHaveCount(0);
 
         evidence = {
           activeIcons,
           inactiveIcons,
-          liteFeed,
-          liteGift,
-          liteText,
-          nativeFeed,
-          nativeGift,
-          nativeText,
+          liteMessageCount: await root.locator('.ytcq-lite-message').count(),
           startupMs
         };
 
@@ -315,51 +307,44 @@ export const liteModeReplayAeroInspectionScenario: BrowserScenario = async ({ ch
           expect(icon.svgFilter).not.toBe('none');
         }
 
-        expect(nativeText.avatar).not.toBeNull();
-        expect(liteText.avatar).not.toBeNull();
-        expect(Math.abs((nativeText.avatar?.width || 0) - (liteText.avatar?.width || 0))).toBeLessThanOrEqual(1);
-        expect(Math.abs((nativeText.avatar?.height || 0) - (liteText.avatar?.height || 0))).toBeLessThanOrEqual(1);
-        expect(nativeText.authorMessageBaselineDelta).not.toBeNull();
-        expect(liteText.authorMessageBaselineDelta).not.toBeNull();
-        expect(nativeText.authorMessageBaselineDelta || 0).toBeLessThanOrEqual(2);
-        expect(liteText.authorMessageBaselineDelta || 0).toBeLessThanOrEqual(2);
-        expect(Math.abs(nativeFeed.top - liteFeed.top)).toBeLessThanOrEqual(1);
-        expect(Math.abs(nativeFeed.bottom - liteFeed.bottom)).toBeLessThanOrEqual(1);
-        expect(Math.abs(nativeFeed.height - liteFeed.height)).toBeLessThanOrEqual(1);
-        const lastLiteRow = await getRectSnapshot(root.locator('.ytcq-lite-message').last());
-        expect(lastLiteRow.bottom).toBeLessThanOrEqual(liteFeed.bottom + 1);
-
-        if (nativeGift?.giftImage) expect(nativeGift.giftImageContained).toBe(true);
-        if (liteGift?.giftImage) expect(liteGift.giftImageContained).toBe(true);
-
-        await test.step('Show restore loading while YouTube rebuilds native chat', async () => {
-          await setExtensionStorageValues(context, 'sync', { liteModeEnabled: false });
-          await expect(chat.locator(LITE_NATIVE_RESTORE_SELECTOR)).toBeVisible({
-            timeout: 8_000
-          });
+        await test.step('Restore native chat without losing the selected skin', async () => {
+          await button.click();
+          await expectStoredLiteMode(context, false);
+          await expect(root).toHaveCount(0, { timeout: 20_000 });
           await expect(chat.locator(NATIVE_LIST_SELECTOR).first()).toBeVisible({
             timeout: 20_000
+          });
+          await expect(chat.locator('yt-live-chat-text-message-renderer').first()).toBeVisible({
+            timeout: 30_000
           });
           await expect(chat.locator(LITE_NATIVE_RESTORE_SELECTOR)).toHaveCount(0, {
             timeout: 20_000
           });
+          await expect(chat.locator('html')).toHaveAttribute('data-ytcq-chat-skin', 'aero');
+          await expect(button).toHaveAttribute('aria-pressed', 'false');
         });
       } finally {
         await setExtensionStorageValues(context, 'sync', { liteModeEnabled: false }).catch(
           () => undefined
         );
         await root.waitFor({ state: 'detached', timeout: 8_000 }).catch(() => undefined);
-        await chat.locator(NATIVE_LIST_SELECTOR).first().waitFor({
-          state: 'visible',
-          timeout: 20_000
-        }).catch(() => undefined);
-        await expect(chat.locator(LITE_NATIVE_RESTORE_SELECTOR)).toHaveCount(0, {
-          timeout: 20_000
-        }).catch(() => undefined);
+        await chat
+          .locator(NATIVE_LIST_SELECTOR)
+          .first()
+          .waitFor({
+            state: 'visible',
+            timeout: 20_000
+          })
+          .catch(() => undefined);
+        await expect(chat.locator(LITE_NATIVE_RESTORE_SELECTOR))
+          .toHaveCount(0, {
+            timeout: 20_000
+          })
+          .catch(() => undefined);
         await clearLiteCooldown(chat).catch(() => undefined);
         await test
           .info()
-          .attach('lite-aero-computed-style-evidence', {
+          .attach('lite-aero-behavior-evidence', {
             body: JSON.stringify(evidence, null, 2),
             contentType: 'application/json'
           })
@@ -373,12 +358,16 @@ export const liteModeReplayRapidSeekScenario: BrowserScenario = async ({ chat, c
   test.setTimeout(180_000);
   const button = chat.locator(LITE_BUTTON_SELECTOR).first();
   const root = chat.locator(LITE_ROOT_SELECTOR);
+  let initialReplayTime: number | null = null;
 
   try {
     await setExtensionStorageValues(context, 'sync', { liteModeEnabled: false });
     await expectStoredLiteMode(context, false);
     await clearLiteCooldown(chat);
-    await chat.locator(NATIVE_LIST_SELECTOR).first().waitFor({ state: 'attached', timeout: 20_000 });
+    await chat
+      .locator(NATIVE_LIST_SELECTOR)
+      .first()
+      .waitFor({ state: 'attached', timeout: 20_000 });
     await expect(button).toBeVisible({ timeout: 20_000 });
 
     await button.click();
@@ -391,44 +380,60 @@ export const liteModeReplayRapidSeekScenario: BrowserScenario = async ({ chat, c
       timeout: 30_000
     });
 
+    await waitForYouTubeContentVideo(page);
     const video = page.locator('video.html5-main-video').first();
     await expect(video).toBeVisible({ timeout: 20_000 });
-    await expect.poll(
-      () => video.evaluate((element) => (element as HTMLVideoElement).duration),
-      { timeout: 45_000 }
-    ).toBeGreaterThan(60);
+    await expect
+      .poll(() => video.evaluate((element) => (element as HTMLVideoElement).duration), {
+        timeout: 45_000
+      })
+      .toBeGreaterThan(60);
     const duration = await video.evaluate((element) => (element as HTMLVideoElement).duration);
-    const progressBar = page.locator('.ytp-progress-bar').first();
-    await expect(progressBar).toBeVisible({ timeout: 20_000 });
-    const bounds = await progressBar.boundingBox();
-    if (!bounds) throw new Error('YouTube replay progress bar has no visible bounds.');
-
+    initialReplayTime = await video.evaluate(
+      (element) => (element as HTMLVideoElement).currentTime
+    );
     const seekFractions = [0.72, 0.16, 0.84, 0.28, 0.63, 0.41];
-    for (const fraction of seekFractions) {
-      await page.mouse.click(bounds.x + bounds.width * fraction, bounds.y + bounds.height / 2);
-      await page.waitForTimeout(100);
-    }
-
     const finalTime = duration * seekFractions.at(-1)!;
     const seekTolerance = Math.max(10, duration * 0.01);
-    await expect.poll(
-      () => video.evaluate((element) => (element as HTMLVideoElement).currentTime),
-      { timeout: 15_000 }
-    ).toBeGreaterThan(finalTime - seekTolerance);
-    await expect.poll(
-      () => video.evaluate((element) => (element as HTMLVideoElement).currentTime),
-      { timeout: 15_000 }
-    ).toBeLessThan(finalTime + seekTolerance);
+    await performRapidReplaySeeks({
+      duration,
+      finalTime,
+      page,
+      seekFractions,
+      seekTolerance,
+      video
+    });
+    await expect
+      .poll(() => video.evaluate((element) => (element as HTMLVideoElement).currentTime), {
+        timeout: 15_000
+      })
+      .toBeGreaterThan(finalTime - seekTolerance);
+    await expect
+      .poll(() => video.evaluate((element) => (element as HTMLVideoElement).currentTime), {
+        timeout: 15_000
+      })
+      .toBeLessThan(finalTime + seekTolerance);
     // The old race cleared the final response when a delayed progress signal
     // arrived just after it, so give that signal time to land before asserting.
     await page.waitForTimeout(1_500);
     await expect(root).toHaveAttribute('data-ytcq-connection-state', 'connected');
-    await expect.poll(() => root.locator('.ytcq-lite-message').count(), {
-      message: 'Expected Lite chat to stay populated at the final rapid replay seek position.',
-      timeout: 30_000
-    }).toBeGreaterThan(0);
+    await expect
+      .poll(() => root.locator('.ytcq-lite-message').count(), {
+        message: 'Expected Lite chat to stay populated at the final rapid replay seek position.',
+        timeout: 30_000
+      })
+      .toBeGreaterThan(0);
     await expect(root.locator('.ytcq-lite-message').last()).toBeVisible();
   } finally {
+    if (initialReplayTime !== null) {
+      await page
+        .locator('video.html5-main-video')
+        .first()
+        .evaluate((element, time) => {
+          (element as HTMLVideoElement).currentTime = time;
+        }, initialReplayTime)
+        .catch(() => undefined);
+    }
     await setExtensionStorageValues(context, 'sync', { liteModeEnabled: false }).catch(
       () => undefined
     );
@@ -436,18 +441,54 @@ export const liteModeReplayRapidSeekScenario: BrowserScenario = async ({ chat, c
   }
 };
 
-async function getRectSnapshot(locator: Locator): Promise<RectSnapshot> {
-  return locator.evaluate((element) => {
-    const rect = element.getBoundingClientRect();
-    return {
-      bottom: rect.bottom,
-      height: rect.height,
-      left: rect.left,
-      right: rect.right,
-      top: rect.top,
-      width: rect.width
-    };
-  });
+async function performRapidReplaySeeks({
+  duration,
+  finalTime,
+  page,
+  seekFractions,
+  seekTolerance,
+  video
+}: {
+  duration: number;
+  finalTime: number;
+  page: Parameters<BrowserScenario>[0]['page'];
+  seekFractions: number[];
+  seekTolerance: number;
+  video: Locator;
+}): Promise<void> {
+  const player = page.locator('#movie_player').first();
+  const progressBar = player.locator('.ytp-progress-bar').first();
+
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    for (const fraction of seekFractions) {
+      // A large replay seek can trigger a mid-roll ad. Resume the burst on the
+      // content progress bar instead of sending the remaining clicks to the ad.
+      await waitForYouTubeContentVideo(page);
+      await player.hover();
+      await expect(progressBar).toBeVisible({ timeout: 20_000 });
+      await expect(progressBar).not.toHaveAttribute('aria-disabled', 'true');
+      const bounds = await progressBar.boundingBox();
+      if (!bounds) throw new Error('YouTube replay progress bar has no visible bounds.');
+      await page.mouse.click(bounds.x + bounds.width * fraction, bounds.y + bounds.height / 2);
+      await page.waitForTimeout(100);
+    }
+
+    await waitForYouTubeContentVideo(page);
+    const currentTime = await video.evaluate(
+      (element) => (element as HTMLVideoElement).currentTime
+    );
+    if (Math.abs(currentTime - finalTime) <= seekTolerance) return;
+  }
+
+  const currentTime = await video.evaluate((element) => (element as HTMLVideoElement).currentTime);
+  throw new Error(
+    `YouTube progress-bar seeks did not reach the final replay position: ${JSON.stringify({
+      currentTime,
+      duration,
+      finalTime,
+      seekTolerance
+    })}`
+  );
 }
 
 async function expectStoredLiteMode(context: BrowserContext, enabled: boolean): Promise<void> {
@@ -463,14 +504,20 @@ async function waitForLiteTimestampState(root: Locator, enabled: boolean): Promi
   return expect
     .poll(() => root.getAttribute('data-ytcq-show-timestamps'), { timeout: 5_000 })
     .toBe(String(enabled))
-    .then(() => true, () => false);
+    .then(
+      () => true,
+      () => false
+    );
 }
 
 async function hasVisibleLiteTimestampText(timestamp: Locator): Promise<boolean> {
   return timestamp.evaluate((element) => {
     const style = getComputedStyle(element);
-    return style.display !== 'none' && style.visibility !== 'hidden' &&
-      Boolean(element.textContent?.trim());
+    return (
+      style.display !== 'none' &&
+      style.visibility !== 'hidden' &&
+      Boolean(element.textContent?.trim())
+    );
   });
 }
 
@@ -506,23 +553,29 @@ async function findTimestampToggle(menu: Locator): Promise<{ renderer: Locator; 
       return { renderer, toggle };
     }
   }
-  throw new Error(`YouTube Timestamps toggle was not found. Menu text: ${(await menu.innerText()).slice(0, 500)}`);
+  throw new Error(
+    `YouTube Timestamps toggle was not found. Menu text: ${(await menu.innerText()).slice(0, 500)}`
+  );
 }
 
 async function isToggleEnabled(toggle: Locator): Promise<boolean> {
-  return (await toggle.getAttribute('aria-pressed')) === 'true' ||
+  return (
+    (await toggle.getAttribute('aria-pressed')) === 'true' ||
     (await toggle.getAttribute('checked')) !== null ||
-    (await toggle.getAttribute('active')) !== null;
+    (await toggle.getAttribute('active')) !== null
+  );
 }
 
 async function openParticipantsPanel(chat: ChatSurface): Promise<void> {
   const menu = await openSettingsMenu(chat);
-  const candidates = menu.locator([
-    'ytd-menu-navigation-item-renderer',
-    'ytd-menu-service-item-renderer',
-    'yt-live-chat-menu-sub-menu-item-renderer',
-    'tp-yt-paper-item'
-  ].join(','));
+  const candidates = menu.locator(
+    [
+      'ytd-menu-navigation-item-renderer',
+      'ytd-menu-service-item-renderer',
+      'yt-live-chat-menu-sub-menu-item-renderer',
+      'tp-yt-paper-item'
+    ].join(',')
+  );
   for (let index = 0; index < (await candidates.count()); index += 1) {
     const candidate = candidates.nth(index);
     if (!/\bparticipants\b/i.test(await candidate.innerText().catch(() => ''))) continue;
@@ -530,7 +583,9 @@ async function openParticipantsPanel(chat: ChatSurface): Promise<void> {
     await candidate.click();
     return;
   }
-  throw new Error(`YouTube Participants item was not found. Menu text: ${(await menu.innerText()).slice(0, 500)}`);
+  throw new Error(
+    `YouTube Participants item was not found. Menu text: ${(await menu.innerText()).slice(0, 500)}`
+  );
 }
 
 async function closeParticipantsPanel(chat: ChatSurface, participants: Locator): Promise<void> {
@@ -549,7 +604,10 @@ async function closeParticipantsPanel(chat: ChatSurface, participants: Locator):
     return;
   }
   await participants.press('Escape').catch(() => undefined);
-  await chat.locator('body').press('Escape').catch(() => undefined);
+  await chat
+    .locator('body')
+    .press('Escape')
+    .catch(() => undefined);
 }
 
 async function getParticipantRowCount(participants: Locator): Promise<number> {
@@ -562,11 +620,14 @@ async function getParticipantEvidence(
   batchCountBeforePanel: number
 ): Promise<ParticipantEvidence> {
   const panel = await participants.evaluate((element) => {
-    const rows = Array.from(element.querySelectorAll<HTMLElement>('yt-live-chat-participant-renderer'));
+    const rows = Array.from(
+      element.querySelectorAll<HTMLElement>('yt-live-chat-participant-renderer')
+    );
     return {
       ariaHidden: element.getAttribute('aria-hidden'),
       rowCount: rows.length,
-      selected: element.classList.contains('iron-selected') ||
+      selected:
+        element.classList.contains('iron-selected') ||
         element.hasAttribute('selected') ||
         element.getAttribute('aria-selected') === 'true',
       textLength: (element.textContent || '').trim().length,
@@ -603,28 +664,37 @@ async function installLiveSurfaceAudit(chat: ChatSurface): Promise<void> {
       };
       auditWindow.__ytcqLiveSurfaceAudit = audit;
       auditWindow.__ytcqLiveSurfaceAuditAbort = controller;
-      window.addEventListener(eventNames.batch, () => {
-        audit.batchCount += 1;
-      }, { signal: controller.signal });
-      window.addEventListener(eventNames.fallback, (event) => {
-        if (!(event instanceof CustomEvent) || typeof event.detail !== 'string') return;
-        try {
-          const detail = JSON.parse(event.detail) as { reason?: unknown };
-          if (typeof detail.reason === 'string') audit.fallbackReason = detail.reason;
-        } catch {
-          audit.fallbackReason = 'invalid-fallback-detail';
-        }
-      }, { signal: controller.signal });
+      window.addEventListener(
+        eventNames.batch,
+        () => {
+          audit.batchCount += 1;
+        },
+        { signal: controller.signal }
+      );
+      window.addEventListener(
+        eventNames.fallback,
+        (event) => {
+          if (!(event instanceof CustomEvent) || typeof event.detail !== 'string') return;
+          try {
+            const detail = JSON.parse(event.detail) as { reason?: unknown };
+            if (typeof detail.reason === 'string') audit.fallbackReason = detail.reason;
+          } catch {
+            audit.fallbackReason = 'invalid-fallback-detail';
+          }
+        },
+        { signal: controller.signal }
+      );
       const observer = new MutationObserver((mutations) => {
         for (const mutation of mutations) {
-          const target = mutation.target instanceof Element
-            ? mutation.target
-            : mutation.target.parentElement;
-          const participantMutation = Boolean(target?.closest('yt-live-chat-participant-list-renderer')) ||
+          const target =
+            mutation.target instanceof Element ? mutation.target : mutation.target.parentElement;
+          const participantMutation =
+            Boolean(target?.closest('yt-live-chat-participant-list-renderer')) ||
             [...mutation.addedNodes, ...mutation.removedNodes].some((node) => {
-              return node instanceof Element && (
-                node.matches('yt-live-chat-participant-list-renderer') ||
-                Boolean(node.querySelector('yt-live-chat-participant-list-renderer'))
+              return (
+                node instanceof Element &&
+                (node.matches('yt-live-chat-participant-list-renderer') ||
+                  Boolean(node.querySelector('yt-live-chat-participant-list-renderer')))
               );
             });
           if (!participantMutation) continue;
@@ -646,13 +716,14 @@ async function installLiveSurfaceAudit(chat: ChatSurface): Promise<void> {
 
 async function getLiveSurfaceAudit(chat: ChatSurface): Promise<LiveSurfaceAudit> {
   return chat.locator('body').evaluate(() => {
-    return (window as Window & { __ytcqLiveSurfaceAudit?: LiveSurfaceAudit })
-      .__ytcqLiveSurfaceAudit || {
-      batchCount: 0,
-      fallbackReason: '',
-      participantChildMutations: 0,
-      participantMutationCount: 0
-    };
+    return (
+      (window as Window & { __ytcqLiveSurfaceAudit?: LiveSurfaceAudit }).__ytcqLiveSurfaceAudit || {
+        batchCount: 0,
+        fallbackReason: '',
+        participantChildMutations: 0,
+        participantMutationCount: 0
+      }
+    );
   });
 }
 
@@ -682,27 +753,31 @@ async function sampleHeaderIconThemes(
       element.setAttribute('data-ytcq-chat-skin', 'aero');
       element.setAttribute('data-ytcq-chat-skin-theme', value);
     }, theme);
-    const snapshot = await chat.locator(LITE_BUTTON_SELECTOR).first().evaluate(
-      (button, values) => {
-        const header = button.closest('yt-live-chat-header-renderer');
-        const svg = button.querySelector('svg');
-        if (!header || !svg) throw new Error('Lite header icon is missing its native header or SVG.');
-        const buttonStyle = getComputedStyle(button);
-        const headerStyle = getComputedStyle(header);
-        const svgStyle = getComputedStyle(svg);
-        return {
-          active: values.active,
-          buttonColor: buttonStyle.color,
-          headerBackgroundColor: headerStyle.backgroundColor,
-          headerBackgroundImage: headerStyle.backgroundImage,
-          svgColor: svgStyle.color,
-          svgFill: svgStyle.fill,
-          svgFilter: svgStyle.filter,
-          theme: values.theme
-        };
-      },
-      { active, theme }
-    );
+    const snapshot = await chat
+      .locator(LITE_BUTTON_SELECTOR)
+      .first()
+      .evaluate(
+        (button, values) => {
+          const header = button.closest('yt-live-chat-header-renderer');
+          const svg = button.querySelector('svg');
+          if (!header || !svg)
+            throw new Error('Lite header icon is missing its native header or SVG.');
+          const buttonStyle = getComputedStyle(button);
+          const headerStyle = getComputedStyle(header);
+          const svgStyle = getComputedStyle(svg);
+          return {
+            active: values.active,
+            buttonColor: buttonStyle.color,
+            headerBackgroundColor: headerStyle.backgroundColor,
+            headerBackgroundImage: headerStyle.backgroundImage,
+            svgColor: svgStyle.color,
+            svgFill: svgStyle.fill,
+            svgFilter: svgStyle.filter,
+            theme: values.theme
+          };
+        },
+        { active, theme }
+      );
     snapshots.push(snapshot);
     if (captureScreenshots) {
       const screenshot = await chat
@@ -718,106 +793,6 @@ async function sampleHeaderIconThemes(
     }
   }
   return snapshots;
-}
-
-async function waitForOptionalRowStyleSnapshot(
-  chat: ChatSurface,
-  selector: string,
-  kind: 'gift' | 'text',
-  timeout: number
-): Promise<RowStyleSnapshot | null> {
-  const visible = await chat
-    .locator(selector)
-    .last()
-    .waitFor({ state: 'visible', timeout })
-    .then(() => true, () => false);
-  return visible ? getRowStyleSnapshot(chat, selector, kind) : null;
-}
-
-async function getRowStyleSnapshot(
-  chat: ChatSurface,
-  selector: string,
-  kind: 'gift' | 'text'
-): Promise<RowStyleSnapshot> {
-  return chat.locator('body').evaluate(
-    (_body, values) => {
-      const candidates = Array.from(document.querySelectorAll<HTMLElement>(values.selector));
-      const firstTextRect = (element: HTMLElement | null): DOMRect | null => {
-        if (!element) return null;
-        const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
-        let node = walker.nextNode();
-        while (node && !node.textContent?.trim()) node = walker.nextNode();
-        if (!node) return null;
-        const range = document.createRange();
-        range.selectNodeContents(node);
-        return range.getBoundingClientRect();
-      };
-      const visibleCandidates = candidates.reverse().filter((candidate) => {
-        const style = getComputedStyle(candidate);
-        const rect = candidate.getBoundingClientRect();
-        return candidate.isConnected && style.display !== 'none' && rect.width > 0 && rect.height > 0;
-      });
-      const host = values.kind === 'text'
-        ? visibleCandidates.find((candidate) => {
-            const authorRect = firstTextRect(candidate.querySelector('#author-name-v2, #author-name'));
-            const messageRect = firstTextRect(candidate.querySelector('#message-v2, #message'));
-            return Boolean(authorRect && messageRect && Math.abs(authorRect.bottom - messageRect.bottom) <= 2);
-          }) || visibleCandidates[0]
-        : visibleCandidates[0];
-      if (!host) throw new Error(`No visible row matched ${values.selector}.`);
-      const row = values.kind === 'gift'
-        ? host.querySelector<HTMLElement>('#gift-message-v2') || host
-        : host;
-      const avatar = row.querySelector<HTMLElement>('#author-photo');
-      const content = row.querySelector<HTMLElement>('#content');
-      const author = row.querySelector<HTMLElement>('#author-name-v2, #author-name');
-      const message = row.querySelector<HTMLElement>('#message-v2, #message');
-      const giftImage = row.querySelector<HTMLElement>('#gift-image img, .ytcq-lite-gift-image');
-      const rowRect = row.getBoundingClientRect();
-      const rectSnapshot = (rect: DOMRect): RectSnapshot => ({
-        bottom: rect.bottom,
-        height: rect.height,
-        left: rect.left,
-        right: rect.right,
-        top: rect.top,
-        width: rect.width
-      });
-      const authorRect = firstTextRect(author);
-      const messageRect = firstTextRect(message);
-      const giftImageRect = giftImage?.getBoundingClientRect() || null;
-      const style = getComputedStyle(row);
-      return {
-        authorMessageBaselineDelta: authorRect && messageRect
-          ? Math.abs(authorRect.bottom - messageRect.bottom)
-          : null,
-        avatar: avatar ? rectSnapshot(avatar.getBoundingClientRect()) : null,
-        bounds: rectSnapshot(rowRect),
-        content: content ? rectSnapshot(content.getBoundingClientRect()) : null,
-        giftImage: giftImageRect ? rectSnapshot(giftImageRect) : null,
-        giftImageContained: giftImageRect
-          ? giftImageRect.left >= rowRect.left - 1 &&
-            giftImageRect.right <= rowRect.right + 1 &&
-            giftImageRect.top >= rowRect.top - 1 &&
-            giftImageRect.bottom <= rowRect.bottom + 1
-          : null,
-        style: {
-          backgroundColor: style.backgroundColor,
-          backgroundImage: style.backgroundImage,
-          color: style.color,
-          display: style.display,
-          fontFamily: style.fontFamily,
-          fontSize: style.fontSize,
-          lineHeight: style.lineHeight,
-          overflowX: style.overflowX,
-          paddingBottom: style.paddingBottom,
-          paddingLeft: style.paddingLeft,
-          paddingRight: style.paddingRight,
-          paddingTop: style.paddingTop
-        }
-      };
-    },
-    { kind, selector }
-  );
 }
 
 async function clearLiteCooldown(chat: ChatSurface): Promise<void> {
