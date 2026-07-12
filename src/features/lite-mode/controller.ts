@@ -45,6 +45,10 @@ import {
   type LiteChatRowRenderedCallback
 } from './renderer';
 import { createLiteChatStore, type LiteChatStore } from './store';
+import {
+  getLiteModeFallbackCode,
+  type LiteModeAutomaticFailureReason
+} from './fallback';
 import { t } from '../../shared/i18n';
 
 export { parseLiteChatBatchDetail } from './batch';
@@ -79,15 +83,7 @@ const YOUTUBE_PLAYER_PROGRESS_KEY = 'yt-player-video-progress';
 export type LiteModeStopReason =
   | 'explicit'
   | 'cleanup'
-  | 'startup-timeout'
-  | 'source-timeout'
-  | 'invalid-batch'
-  | 'non-monotonic-sequence'
-  | 'sequence-gap'
-  | 'unreadable-response'
-  | 'unreadable-feed'
-  | 'action-backlog'
-  | 'root-replaced';
+  | LiteModeAutomaticFailureReason;
 
 export interface StartLiteModeOptions {
   /** Explicit off-to-on retries can bypass a previous automatic session cooldown. */
@@ -216,7 +212,7 @@ export function stopLiteMode(reason: LiteModeStopReason = 'explicit'): void {
   }
 
   if (reason !== 'cleanup' && isNativeFeedDiscarded()) {
-    beginNativeRestore(automaticFailure);
+    beginNativeRestore(reason, automaticFailure);
     return;
   }
 
@@ -230,14 +226,15 @@ function completeLiteModeStop(
 ): void {
   teardownLiteMode(true);
 
-  if (automaticFailure && notifyFallback) {
+  if (automaticFailure && notifyFallback && isAutomaticFailureReason(reason)) {
+    const code = getLiteModeFallbackCode(reason);
     window.dispatchEvent(new CustomEvent(LITE_MODE_FALLBACK_EVENT, {
-      detail: JSON.stringify({ reason })
+      detail: JSON.stringify({ code, reason })
     }));
   }
 }
 
-function beginNativeRestore(automaticFailure: boolean): void {
+function beginNativeRestore(reason: LiteModeStopReason, automaticFailure: boolean): void {
   nativeRestorePending = true;
   active = false;
   clearStartupTimer();
@@ -253,6 +250,9 @@ function beginNativeRestore(automaticFailure: boolean): void {
   clearLiteModeBootstrapIntent();
   requestNativeChatRestore({
     automaticFailure,
+    ...(automaticFailure && isAutomaticFailureReason(reason)
+      ? { fallbackCode: getLiteModeFallbackCode(reason) }
+      : {}),
     message: t('liteModeLoadingChat')
   });
 }
@@ -855,7 +855,9 @@ function clearPacedActionQueues(): void {
   replayRequestsIdentifySeeks = false;
 }
 
-function isAutomaticFailureReason(reason: LiteModeStopReason): boolean {
+function isAutomaticFailureReason(
+  reason: LiteModeStopReason
+): reason is LiteModeAutomaticFailureReason {
   return !['explicit', 'cleanup'].includes(reason);
 }
 

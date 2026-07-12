@@ -459,7 +459,7 @@ describe('Lite chat InnerTube parser', () => {
     expect(result.unreadableFeed).toBe(true);
   });
 
-  it('caps action parsing and does not treat unrelated nested action arrays as chat', () => {
+  it('accepts complete official action arrays and ignores unrelated nested actions', () => {
     const result = parseLiteChatPayload({
       actions: Array.from({ length: 550 }, (_, index) => (
         addItem('liveChatTextMessageRenderer', {
@@ -477,8 +477,8 @@ describe('Lite chat InnerTube parser', () => {
       }
     });
 
-    expect(result.actions).toHaveLength(500);
-    expect(result.fatalErrors).toEqual(['parser:input-action-limit']);
+    expect(result.actions).toHaveLength(550);
+    expect(result.fatalErrors).toEqual([]);
   });
 
   it('reserves room for reset while keeping the latest bounded initial backlog', () => {

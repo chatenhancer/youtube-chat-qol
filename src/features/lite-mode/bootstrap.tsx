@@ -16,6 +16,7 @@ import {
 import { jsx, el } from '../../shared/jsx-dom';
 import { CHAT_SCROLLER_SELECTOR } from '../../youtube/selectors';
 import { NATIVE_LIST_SELECTOR } from './native-list';
+import { parseLiteModeFallbackCode, type LiteModeFallbackCode } from './fallback';
 
 export const LITE_MODE_SESSION_COOLDOWN_KEY = 'ytcqLiteModeSessionCooldown:v1';
 export const LITE_MODE_NATIVE_RESTORE_KEY = 'ytcqLiteModeNativeRestore:v1';
@@ -32,12 +33,14 @@ const NATIVE_RESTORE_OVERLAY_TIMEOUT_MS = 20_000;
 
 interface NativeRestoreRequest {
   automaticFailure: boolean;
+  fallbackCode?: LiteModeFallbackCode;
   message: string;
   requestedAt: number;
 }
 
 export interface RequestNativeChatRestoreOptions {
   automaticFailure: boolean;
+  fallbackCode?: LiteModeFallbackCode;
   message: string;
 }
 
@@ -57,7 +60,10 @@ export function initLiteModeBootstrap(): void {
   ensureLiteModeBootstrapStyle();
   if (nativeRestore) {
     if (nativeRestore.automaticFailure) {
-      document.documentElement.setAttribute(NATIVE_RESTORE_FALLBACK_ATTRIBUTE, 'true');
+      document.documentElement.setAttribute(
+        NATIVE_RESTORE_FALLBACK_ATTRIBUTE,
+        nativeRestore.fallbackCode || 'LM00'
+      );
     }
     showNativeRestoreOverlay(nativeRestore.message);
   } else if (replayStartRequested) {
@@ -142,10 +148,12 @@ export function beginLiteModeDocumentSession(preserveCooldown = false): void {
 
 export function requestNativeChatRestore({
   automaticFailure,
+  fallbackCode,
   message
 }: RequestNativeChatRestoreOptions): void {
   const request: NativeRestoreRequest = {
     automaticFailure,
+    ...(automaticFailure && fallbackCode ? { fallbackCode } : {}),
     message: message.trim().slice(0, 240),
     requestedAt: Date.now()
   };
@@ -189,10 +197,11 @@ export function requestReplayLiteModeReload(): void {
   }
 }
 
-export function consumeLiteModeFallbackNotice(): boolean {
-  const pending = document.documentElement.hasAttribute(NATIVE_RESTORE_FALLBACK_ATTRIBUTE);
+export function consumeLiteModeFallbackNotice(): LiteModeFallbackCode | null {
+  const value = document.documentElement.getAttribute(NATIVE_RESTORE_FALLBACK_ATTRIBUTE);
   document.documentElement.removeAttribute(NATIVE_RESTORE_FALLBACK_ATTRIBUTE);
-  return pending;
+  if (value === 'true') return 'LM00';
+  return parseLiteModeFallbackCode(value);
 }
 
 export function isSupportedLiteModePage(locationValue: Location = window.location): boolean {
@@ -299,8 +308,10 @@ function consumeNativeRestoreRequest(): NativeRestoreRequest | null {
     ) {
       return null;
     }
+    const fallbackCode = parseLiteModeFallbackCode(value.fallbackCode);
     return {
       automaticFailure: value.automaticFailure,
+      ...(fallbackCode ? { fallbackCode } : {}),
       message: value.message.slice(0, 240),
       requestedAt: value.requestedAt
     };

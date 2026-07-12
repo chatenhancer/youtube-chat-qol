@@ -48,12 +48,14 @@ describe('Lite mode document-start bootstrap', () => {
     vi.useFakeTimers();
     requestNativeChatRestore({
       automaticFailure: true,
+      fallbackCode: 'LM06',
       message: 'Loading chat'
     });
 
     const stored = JSON.parse(window.sessionStorage.getItem(LITE_MODE_NATIVE_RESTORE_KEY) || '{}');
     expect(stored).toMatchObject({
       automaticFailure: true,
+      fallbackCode: 'LM06',
       message: 'Loading chat'
     });
     expect(stored.requestedAt).toEqual(expect.any(Number));
@@ -83,9 +85,9 @@ describe('Lite mode document-start bootstrap', () => {
   });
 
   it('consumes a post-reload fallback notice once', () => {
-    document.documentElement.setAttribute('data-ytcq-lite-fallback-notice', 'true');
-    expect(consumeLiteModeFallbackNotice()).toBe(true);
-    expect(consumeLiteModeFallbackNotice()).toBe(false);
+    document.documentElement.setAttribute('data-ytcq-lite-fallback-notice', 'LM06');
+    expect(consumeLiteModeFallbackNotice()).toBe('LM06');
+    expect(consumeLiteModeFallbackNotice()).toBeNull();
   });
 });
 

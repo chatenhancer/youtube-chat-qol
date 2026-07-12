@@ -14,8 +14,8 @@ import {
   type LiteChatStickerMetadata
 } from './protocol';
 
-const MAX_BATCH_DETAIL_LENGTH = 2_000_000;
-const MAX_BATCH_ACTIONS = 500;
+export const MAX_LITE_CHAT_BATCH_DETAIL_LENGTH = 2_000_000;
+export const MAX_LITE_CHAT_BATCH_ACTIONS = 500;
 const MAX_DIAGNOSTIC_VALUES = 50;
 const MAX_MESSAGE_ID_LENGTH = 240;
 const MAX_CHANNEL_ID_LENGTH = 240;
@@ -27,7 +27,11 @@ const MAX_SHORTCUTS = 24;
 export const MAX_LITE_CHAT_CONTINUATION_TIMEOUT_MS = 600_000;
 
 export function parseLiteChatBatchDetail(detail: unknown): LiteChatBatch | null {
-  if (typeof detail !== 'string' || !detail || detail.length > MAX_BATCH_DETAIL_LENGTH) return null;
+  if (
+    typeof detail !== 'string' ||
+    !detail ||
+    detail.length > MAX_LITE_CHAT_BATCH_DETAIL_LENGTH
+  ) return null;
 
   let parsed: unknown;
   try {
@@ -40,7 +44,10 @@ export function parseLiteChatBatchDetail(detail: unknown): LiteChatBatch | null 
   if (!Number.isSafeInteger(parsed.sequence) || Number(parsed.sequence) <= 0) return null;
   if (!Number.isFinite(parsed.receivedAt) || Number(parsed.receivedAt) < 0) return null;
   if (!isBatchSource(parsed.source)) return null;
-  if (!Array.isArray(parsed.actions) || parsed.actions.length > MAX_BATCH_ACTIONS) return null;
+  if (
+    !Array.isArray(parsed.actions) ||
+    parsed.actions.length > MAX_LITE_CHAT_BATCH_ACTIONS
+  ) return null;
   if (!parsed.actions.every(isLiteChatAction)) return null;
   if (
     parsed.continuationTimeoutMs !== undefined &&

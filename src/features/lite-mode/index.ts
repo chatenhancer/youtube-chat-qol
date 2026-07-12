@@ -38,6 +38,11 @@ import {
 } from './controller';
 import type { LiteChatMessageRecord } from './protocol';
 import type { LiteChatRowSource } from './renderer';
+import {
+  formatLiteModeFallbackMessage,
+  parseLiteModeFallbackCode,
+  type LiteModeFallbackCode
+} from './fallback';
 
 let saveOptions: SaveOptions = () => {};
 let pageListenersInitialized = false;
@@ -61,7 +66,8 @@ function initLiteMode(context: FeatureLifecycleContext): void {
   saveOptions = context.saveOptions;
   initLiteModeButton(saveOptions);
   setLiteModeRowRenderedCallback(handleLiteModeRowRendered);
-  if (consumeLiteModeFallbackNotice()) showToast(t('liteModeFallback'));
+  const fallbackCode = consumeLiteModeFallbackNotice();
+  if (fallbackCode) showLiteModeFallback(fallbackCode);
   if (pageListenersInitialized) return;
   pageListenersInitialized = true;
   if (pageListeners.signal.aborted) pageListeners = new AbortController();
@@ -117,8 +123,20 @@ function createYouTubeMessageData(record: LiteChatMessageRecord): YouTubeMessage
   return messageData;
 }
 
-function handleLiteModeFallback(): void {
-  showToast(t('liteModeFallback'));
+function handleLiteModeFallback(event: Event): void {
+  let code: LiteModeFallbackCode = 'LM00';
+  if (event instanceof CustomEvent && typeof event.detail === 'string') {
+    try {
+      code = parseLiteModeFallbackCode(JSON.parse(event.detail)?.code) || code;
+    } catch {
+      // The fallback still remains understandable if an older event has no code.
+    }
+  }
+  showLiteModeFallback(code);
+}
+
+function showLiteModeFallback(code: LiteModeFallbackCode): void {
+  showToast(formatLiteModeFallbackMessage(t('liteModeFallback'), code));
 }
 
 function resetLiteMode(): void {

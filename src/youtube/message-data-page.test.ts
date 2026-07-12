@@ -112,7 +112,7 @@ describe('YouTube message data page adapter', () => {
     expect(events).toHaveLength(2);
   });
 
-  it('installs one passive fetch tap, emits initial and live sanitized batches, and returns the original promise', async () => {
+  it('installs one serialized fetch tap and emits initial and live sanitized batches', async () => {
     vi.resetModules();
     document.body.replaceChildren();
     const batches: LiteChatBatch[] = [];
@@ -196,7 +196,7 @@ describe('YouTube message data page adapter', () => {
     });
 
     const returnedPromise = window.fetch('https://www.youtube.com/youtubei/v1/live_chat/get_live_chat?prettyPrint=false');
-    expect(returnedPromise).toBe(originalPromise);
+    expect(returnedPromise).not.toBe(originalPromise);
     await returnedPromise;
     await flushAsyncWork();
 
@@ -441,7 +441,7 @@ describe('YouTube message data page adapter', () => {
     await window.fetch(replayRequestInput('initial', 1_000));
     await waitForLiteChatBatchCount(batches, 1);
 
-    await window.fetch(replayRequestInput('seek-1', 100_000));
+    const slowFetch = window.fetch(replayRequestInput('seek-1', 100_000));
     await slowReadStarted;
     await window.fetch(replayRequestInput('seek-1', 200_000));
     await waitForLiteChatBatchCount(batches, 2);
@@ -451,6 +451,7 @@ describe('YouTube message data page adapter', () => {
       { record: { id: 'current-seek' } }
     ]);
     resolveSlowBody(JSON.stringify(replayPayload('obsolete-seek', 100_000, 'old', 'old-seek')));
+    await slowFetch;
     await flushAsyncWork();
     expect(batches).toHaveLength(2);
     window.removeEventListener(LITE_CHAT_BATCH_EVENT, listener);
@@ -679,7 +680,7 @@ describe('YouTube message data page adapter', () => {
     window.removeEventListener(LITE_CHAT_BATCH_EVENT, listener);
   });
 
-  it('bounds feed response bodies without treating send failures as feed failures', async () => {
+  it('accepts large official feed responses without treating send failures as feed failures', async () => {
     vi.resetModules();
     const batches: LiteChatBatch[] = [];
     const listener = (event: Event) => {
@@ -688,10 +689,17 @@ describe('YouTube message data page adapter', () => {
       }
     };
     window.addEventListener(LITE_CHAT_BATCH_EVENT, listener);
-    const oversizedBody = 'x'.repeat(5 * 1024 * 1024 + 1);
+    const largeOfficialBody = JSON.stringify({
+      continuationContents: {
+        liveChatContinuation: {
+          actions: [textAction('large-official', 'Large official response')]
+        }
+      },
+      padding: 'x'.repeat(5 * 1024 * 1024 + 1)
+    });
     window.fetch = vi.fn()
       .mockResolvedValueOnce(new Response('{broken'))
-      .mockResolvedValueOnce(new Response(oversizedBody))
+      .mockResolvedValueOnce(new Response(largeOfficialBody))
       .mockResolvedValueOnce(new Response('{broken')) as typeof window.fetch;
     await import('./message-data-page');
     dispatchLiteChatControl(true);
@@ -703,9 +711,68 @@ describe('YouTube message data page adapter', () => {
 
     expect(batches.map((batch) => batch.fatalErrors)).toEqual([
       ['response:invalid-json'],
-      ['response:body-too-large'],
+      undefined,
       undefined
     ]);
+    expect(batches[1].actions).toEqual([
+      expect.objectContaining({
+        record: expect.objectContaining({ id: 'large-official' }),
+        type: 'upsert'
+      })
+    ]);
+    window.removeEventListener(LITE_CHAT_BATCH_EVENT, listener);
+  });
+
+  it('splits large official action sets across valid isolated-world batches', async () => {
+    vi.resetModules();
+    vi.useFakeTimers();
+    const batches: LiteChatBatch[] = [];
+    const detailLengths: number[] = [];
+    const listener = (event: Event) => {
+      if (!(event instanceof CustomEvent) || typeof event.detail !== 'string') return;
+      detailLengths.push(event.detail.length);
+      batches.push(JSON.parse(event.detail) as LiteChatBatch);
+    };
+    window.addEventListener(LITE_CHAT_BATCH_EVENT, listener);
+    const longText = 'x'.repeat(4_000);
+    window.fetch = vi.fn(() => Promise.resolve(jsonResponse({
+      continuationContents: {
+        liveChatContinuation: {
+          actions: Array.from({ length: 550 }, (_value, index) => (
+            textAction(`large-${index}`, longText)
+          ))
+        }
+      }
+    }))) as typeof window.fetch;
+    await import('./message-data-page');
+    window.dispatchEvent(new CustomEvent(LITE_CHAT_CONTROL_EVENT, {
+      detail: JSON.stringify({ enabled: true, requestInitial: true, version: 1 })
+    }));
+    await vi.advanceTimersByTimeAsync(0);
+    batches.length = 0;
+    detailLengths.length = 0;
+
+    let fetchSettled = false;
+    const fetchPromise = window.fetch('https://www.youtube.com/youtubei/v1/live_chat/get_live_chat')
+      .then(() => {
+        fetchSettled = true;
+      });
+    await vi.advanceTimersByTimeAsync(0);
+
+    expect(batches).toHaveLength(1);
+    expect(fetchSettled).toBe(false);
+
+    await vi.runAllTimersAsync();
+    await fetchPromise;
+
+    expect(batches.length).toBeGreaterThan(1);
+    expect(batches.flatMap((batch) => batch.actions)).toHaveLength(550);
+    expect(batches.map((batch) => batch.sequence)).toEqual(
+      batches.map((_batch, index) => index + 2)
+    );
+    expect(batches.every((batch) => batch.actions.length <= 500)).toBe(true);
+    expect(detailLengths.every((length) => length <= 2_000_000)).toBe(true);
+    expect(batches.every((batch) => batch.fatalErrors === undefined)).toBe(true);
     window.removeEventListener(LITE_CHAT_BATCH_EVENT, listener);
   });
 
@@ -753,12 +820,11 @@ describe('YouTube message data page adapter', () => {
         throw new Error('URL unavailable');
       }
     }) as unknown as Request;
-    expect(window.fetch(unusualInput)).toBe(originalPromise);
+    await expect(window.fetch(unusualInput)).resolves.toBe(response);
     expect(getterObservedOriginalCall).toBe(true);
 
     const matchedPromise = window.fetch('https://www.youtube.com/youtubei/v1/live_chat/get_live_chat');
-    expect(matchedPromise).toBe(originalPromise);
-    await matchedPromise;
+    expect(matchedPromise).not.toBe(originalPromise);
     await Promise.resolve();
     await Promise.resolve();
 
@@ -771,6 +837,7 @@ describe('YouTube message data page adapter', () => {
     resolvePayload(JSON.stringify({
       actions: [textAction('obsolete-message', 'Must not render')]
     }));
+    await matchedPromise;
     await flushAsyncWork();
 
     expect(batches).toEqual([]);
@@ -824,7 +891,9 @@ describe('YouTube message data page adapter', () => {
     await import('./message-data-page');
     dispatchLiteChatControl(true);
 
-    await window.fetch('https://www.youtube.com/youtubei/v1/live_chat/get_live_chat');
+    const obsoleteFetch = window.fetch(
+      'https://www.youtube.com/youtubei/v1/live_chat/get_live_chat'
+    );
     await obsoleteParseStarted;
 
     dispatchLiteChatControl(false);
@@ -848,13 +917,14 @@ describe('YouTube message data page adapter', () => {
         }
       }
     }));
+    await obsoleteFetch;
     await flushAsyncWork();
 
     expect(batches).toHaveLength(1);
     window.removeEventListener(LITE_CHAT_BATCH_EVENT, listener);
   });
 
-  it('does not clone more than two live responses while parsing is backlogged', async () => {
+  it('serializes concurrent official responses without dropping any clones', async () => {
     vi.resetModules();
     const batches: LiteChatBatch[] = [];
     const listener = collectLiteChatBatches(batches);
@@ -870,12 +940,17 @@ describe('YouTube message data page adapter', () => {
       text: () => body,
       url: ''
     }) as Response);
+    const queuedResponses = ['three', 'four', 'five'].map((id) => jsonResponse({
+      continuationContents: {
+        liveChatContinuation: { actions: [textAction(id, id)] }
+      }
+    }));
     const cloneSpies = [
       vi.fn(() => clones[0]),
       vi.fn(() => clones[1]),
-      vi.fn(() => jsonResponse({ actions: [] })),
-      vi.fn(() => jsonResponse({ actions: [] })),
-      vi.fn(() => jsonResponse({ actions: [] }))
+      vi.fn(() => queuedResponses[0]),
+      vi.fn(() => queuedResponses[1]),
+      vi.fn(() => queuedResponses[2])
     ];
     window.fetch = vi.fn()
       .mockResolvedValueOnce({ clone: cloneSpies[0], url: '' } as unknown as Response)
@@ -886,34 +961,32 @@ describe('YouTube message data page adapter', () => {
     await import('./message-data-page');
     dispatchLiteChatControl(true);
 
-    await Promise.all(Array.from({ length: 5 }, () => (
+    const fetches = Array.from({ length: 5 }, () => (
       window.fetch('https://www.youtube.com/youtubei/v1/live_chat/get_live_chat')
-    )));
+    ));
     await Promise.resolve();
     await Promise.resolve();
 
-    expect(cloneSpies[0]).toHaveBeenCalledOnce();
-    expect(cloneSpies[1]).toHaveBeenCalledOnce();
-    cloneSpies.slice(2).forEach((clone) => expect(clone).not.toHaveBeenCalled());
+    cloneSpies.forEach((clone) => expect(clone).toHaveBeenCalledOnce());
 
     resolvers[0](JSON.stringify({
       continuationContents: {
         liveChatContinuation: { actions: [textAction('one', 'One')] }
       }
     }));
-    await flushAsyncWork();
     resolvers[1](JSON.stringify({
       continuationContents: {
         liveChatContinuation: { actions: [textAction('two', 'Two')] }
       }
     }));
+    await Promise.all(fetches);
     await flushAsyncWork();
 
-    expect(batches.map((batch) => batch.fatalErrors)).toEqual([
-      undefined,
-      undefined,
-      ['response:parse-backlog']
-    ]);
+    expect(batches).toHaveLength(5);
+    expect(batches.flatMap((batch) => batch.actions).map((action) => (
+      action.type === 'upsert' ? action.record.id : action.type
+    ))).toEqual(['one', 'two', 'three', 'four', 'five']);
+    expect(batches.every((batch) => batch.fatalErrors === undefined)).toBe(true);
     window.removeEventListener(LITE_CHAT_BATCH_EVENT, listener);
   });
 });

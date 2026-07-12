@@ -28,7 +28,8 @@ export interface LiteChatParseResult {
   unreadableFeed: boolean;
 }
 
-const MAX_ACTIONS = 500;
+const MAX_INITIAL_ACTIONS = 500;
+const MAX_WALK_ARRAY_ITEMS = 500;
 const MAX_BADGES = 16;
 const MAX_PARSE_DIAGNOSTICS = 32;
 const MAX_GIFT_COUNT = 10_000;
@@ -126,7 +127,7 @@ export function parseLiteChatPayload(
   walkForChatContainers(value, state, 0, options.initial !== true);
 
   if (options.initial && state.foundChat) {
-    const latestActions = state.actions.slice(-(MAX_ACTIONS - 1));
+    const latestActions = state.actions.slice(-(MAX_INITIAL_ACTIONS - 1));
     state.actions.length = 0;
     state.actions.push({ type: 'reset' }, ...latestActions);
   }
@@ -150,7 +151,8 @@ function walkForChatContainers(
   if (depth > MAX_WALK_DEPTH || state.walkedNodes >= MAX_WALK_NODES) return;
   if (Array.isArray(value)) {
     state.walkedNodes += 1;
-    value.slice(0, MAX_ACTIONS).forEach((item) => walkForChatContainers(item, state, depth + 1));
+    value.slice(0, MAX_WALK_ARRAY_ITEMS)
+      .forEach((item) => walkForChatContainers(item, state, depth + 1));
     return;
   }
 
@@ -204,7 +206,8 @@ function findInitialItemLists(value: unknown, state: ParserState, depth: number)
   if (depth > MAX_WALK_DEPTH || state.walkedNodes >= MAX_WALK_NODES) return;
   if (Array.isArray(value)) {
     state.walkedNodes += 1;
-    value.slice(0, MAX_ACTIONS).forEach((item) => findInitialItemLists(item, state, depth + 1));
+    value.slice(0, MAX_WALK_ARRAY_ITEMS)
+      .forEach((item) => findInitialItemLists(item, state, depth + 1));
     return;
   }
 
@@ -217,7 +220,7 @@ function findInitialItemLists(value: unknown, state: ParserState, depth: number)
     if (key === 'liveChatItemListRenderer') {
       const itemList = asRecord(child);
       if (itemList && Array.isArray(itemList.contents)) {
-        itemList.contents.slice(0, MAX_ACTIONS).forEach((item) => parseFeedItem(item, state));
+        itemList.contents.forEach((item) => parseFeedItem(item, state));
       }
       if (itemList) {
         parseActionArray(itemList.actions, state);
@@ -235,8 +238,7 @@ function parseActionArray(
   replayOffsetMs?: number
 ): void {
   if (!Array.isArray(value)) return;
-  value.slice(0, MAX_ACTIONS).forEach((action) => parseAction(action, state, replayOffsetMs));
-  if (value.length > MAX_ACTIONS) rememberFatalError(state, 'parser:input-action-limit');
+  value.forEach((action) => parseAction(action, state, replayOffsetMs));
 }
 
 function parseAction(value: unknown, state: ParserState, replayOffsetMs?: number): void {
@@ -733,10 +735,6 @@ function pushAction(
   action: LiteChatAction,
   replayOffsetMs?: number
 ): void {
-  if (state.actions.length >= MAX_ACTIONS) {
-    rememberFatalError(state, 'parser:output-action-limit');
-    return;
-  }
   state.actions.push(replayOffsetMs === undefined ? action : { ...action, replayOffsetMs });
 }
 
@@ -757,11 +755,6 @@ function rememberCompatibilityWarning(
   if (unreadableFeed) state.unreadableFeed = true;
   if (!key || state.compatibilityWarnings.size >= MAX_PARSE_DIAGNOSTICS) return;
   state.compatibilityWarnings.add(key);
-}
-
-function rememberFatalError(state: ParserState, key: string): void {
-  if (!key || state.fatalErrors.size >= MAX_PARSE_DIAGNOSTICS) return;
-  state.fatalErrors.add(key);
 }
 
 function cleanInlineText(value: unknown, maxLength: number): string {

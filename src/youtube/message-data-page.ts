@@ -28,6 +28,10 @@ import {
   type LiteChatReplayRequestTracker
 } from './lite-chat-replay-requests';
 import { CHAT_MESSAGE_SELECTOR } from './selectors';
+import {
+  MAX_LITE_CHAT_BATCH_ACTIONS,
+  MAX_LITE_CHAT_BATCH_DETAIL_LENGTH
+} from '../features/lite-mode/batch';
 
 type DataRecord = Record<string, unknown>;
 type MessageRenderer = HTMLElement & { data?: unknown };
@@ -36,10 +40,15 @@ const MAX_DATA_RETRIES = 10;
 const RETRY_MS = 50;
 const SENT_CACHE_LIMIT = 800;
 const LITE_CHAT_TRANSPORT_STATE_KEY = Symbol.for('ytcq:lite-chat-transport:v1');
-const MAX_LITE_CHAT_RESPONSE_BYTES = 5 * 1024 * 1024;
 const MAX_LITE_CHAT_SEED_ACTIONS = 499;
 const MAX_UNRESOLVED_LITE_CHAT_RESPONSES = 2;
-const MAX_QUEUED_LITE_CHAT_RESPONSE_PARSES = 2;
+// Keep multi-batch official responses below the isolated-world queue ceiling.
+// These values mirror the receiver's fastest live drain rate; the provider
+// window remains the preferred delay so normal continuation pacing is kept.
+const DEFAULT_LITE_CHAT_ACTION_WINDOW_MS = 1_000;
+const MAX_LITE_CHAT_ACTION_WINDOW_MS = 5_000;
+const MIN_LITE_CHAT_ACTION_INTERVAL_MS = 25;
+const MAX_LITE_CHAT_ACTIONS_PER_TICK = 16;
 
 interface PendingLiteChatResponse {
   receivedAt: number;
@@ -55,10 +64,8 @@ interface LiteChatTransportState {
   handleControl: (event: Event) => void;
   initialActions: LiteChatAction[];
   originalFetch: typeof window.fetch;
-  parseBacklogFailureQueued: boolean;
   parseChain: Promise<void>;
   pendingStartupResponses: PendingLiteChatResponse[];
-  queuedResponseParses: number;
   preReadyActions: LiteChatAction[];
   preReadyCompatibilityWarnings: string[];
   preReadyContinuationTimeoutMs?: number;
@@ -133,35 +140,16 @@ function startLiteChatTransport(): void {
       ? state.replayRequests.capture(replayRequestClone, init)
       : undefined;
     const requestGeneration = state.enabled ? state.generation : null;
-    void responsePromise.then((response) => {
-      if (!state.enabled && state.controlResolved) return;
+    return responsePromise.then(async (response) => {
+      if (!state.enabled && state.controlResolved) return response;
       const source = getLiteChatResponseSource(response.url || requestedUrl);
-      if (!source) return;
+      if (!source) return response;
       if (
         state.enabled &&
         requestGeneration !== null &&
         requestGeneration !== state.generation
       ) {
-        return;
-      }
-      if (
-        state.enabled &&
-        state.queuedResponseParses >= MAX_QUEUED_LITE_CHAT_RESPONSE_PARSES
-      ) {
-        if (!state.parseBacklogFailureQueued) {
-          state.parseBacklogFailureQueued = true;
-          queueLiteChatFailure(
-            state,
-            source,
-            state.generation,
-            'response:parse-backlog',
-            source === 'replay' ? replayRequest : undefined,
-            () => {
-              state.parseBacklogFailureQueued = false;
-            }
-          );
-        }
-        return;
+        return response;
       }
       let clone: Response;
       try {
@@ -176,7 +164,7 @@ function startLiteChatTransport(): void {
             source === 'replay' ? replayRequest : undefined
           );
         }
-        return;
+        return response;
       }
       const receivedAt = Date.now();
       const replayRequestContext = source === 'replay' ? replayRequest : undefined;
@@ -190,11 +178,11 @@ function startLiteChatTransport(): void {
         state.pendingStartupResponses = state.pendingStartupResponses.slice(
           -MAX_UNRESOLVED_LITE_CHAT_RESPONSES
         );
-        return;
+        return response;
       }
       const generation = requestGeneration ?? state.generation;
-      if (generation !== state.generation) return;
-      queueLiteChatResponse(
+      if (generation !== state.generation) return response;
+      await queueLiteChatResponse(
         state,
         clone,
         source,
@@ -202,8 +190,8 @@ function startLiteChatTransport(): void {
         receivedAt,
         replayRequestContext
       );
-    }).catch(() => undefined);
-    return responsePromise;
+      return response;
+    });
   } as typeof window.fetch;
 
   Object.assign(state, {
@@ -213,10 +201,8 @@ function startLiteChatTransport(): void {
     handleControl: (event: Event) => handleLiteChatControl(event, state),
     initialActions: [],
     originalFetch,
-    parseBacklogFailureQueued: false,
     parseChain: Promise.resolve(),
     pendingStartupResponses: [],
-    queuedResponseParses: 0,
     preReadyActions: [],
     preReadyCompatibilityWarnings: [],
     preReadyFatalErrors: [],
@@ -377,7 +363,7 @@ function flushLiteChatStartupBuffer(
   state.preReadyReplayPlayerOffsetMs = undefined;
   state.preReadySource = undefined;
   state.preReadyUnreadableFeed = false;
-  emitLiteChatBatch(state, {
+  void emitLiteChatBatch(state, {
     actions: [{ type: 'reset' }, ...actions],
     compatibilityWarnings,
     continuationTimeoutMs,
@@ -387,7 +373,7 @@ function flushLiteChatStartupBuffer(
     unreadableFeed
   }, generation);
   if (source) {
-    emitLiteChatBatch(state, {
+    void emitLiteChatBatch(state, {
       actions: [],
       continuationTimeoutMs,
       receivedAt,
@@ -473,14 +459,7 @@ function queueLiteChatResponse(
   generation: number,
   receivedAt: number,
   replayRequest?: LiteChatReplayRequest
-): void {
-  state.queuedResponseParses += 1;
-  let released = false;
-  const releaseQueuedResponse = (): void => {
-    if (released) return;
-    released = true;
-    state.queuedResponseParses = Math.max(0, state.queuedResponseParses - 1);
-  };
+): Promise<void> {
   const task = async (): Promise<void> => {
     const resolvedReplayRequest = await replayRequest;
     if (state.replayRequests.isObsolete(resolvedReplayRequest)) return;
@@ -488,21 +467,9 @@ function queueLiteChatResponse(
       ? { replayPlayerOffsetMs: resolvedReplayRequest.playerOffsetMs }
       : {};
     if (!response.ok) {
-      emitAndRememberLiteChatBatch(state, {
+      await emitAndRememberLiteChatBatch(state, {
         actions: [],
         fatalErrors: getFeedDiagnostics(source, `response:http-${response.status}`),
-        receivedAt,
-        ...replayMetadata,
-        source
-      }, generation);
-      return;
-    }
-
-    const contentLength = Number(response.headers.get('content-length'));
-    if (Number.isFinite(contentLength) && contentLength > MAX_LITE_CHAT_RESPONSE_BYTES) {
-      emitAndRememberLiteChatBatch(state, {
-        actions: [],
-        fatalErrors: getFeedDiagnostics(source, 'response:body-too-large'),
         receivedAt,
         ...replayMetadata,
         source
@@ -515,7 +482,7 @@ function queueLiteChatResponse(
       body = await response.text();
     } catch {
       if (state.replayRequests.isObsolete(resolvedReplayRequest)) return;
-      emitAndRememberLiteChatBatch(state, {
+      await emitAndRememberLiteChatBatch(state, {
         actions: [],
         fatalErrors: getFeedDiagnostics(source, 'response:body-read-failed'),
         receivedAt,
@@ -525,22 +492,12 @@ function queueLiteChatResponse(
       return;
     }
     if (state.replayRequests.isObsolete(resolvedReplayRequest)) return;
-    if (body.length > MAX_LITE_CHAT_RESPONSE_BYTES) {
-      emitAndRememberLiteChatBatch(state, {
-        actions: [],
-        fatalErrors: getFeedDiagnostics(source, 'response:body-too-large'),
-        receivedAt,
-        ...replayMetadata,
-        source
-      }, generation);
-      return;
-    }
 
     let payload: unknown;
     try {
       payload = JSON.parse(body);
     } catch {
-      emitAndRememberLiteChatBatch(state, {
+      await emitAndRememberLiteChatBatch(state, {
         actions: [],
         fatalErrors: getFeedDiagnostics(source, 'response:invalid-json'),
         receivedAt,
@@ -556,7 +513,7 @@ function queueLiteChatResponse(
     if (source !== 'send' && !parsed.foundChat) {
       parsed.fatalErrors.push('response:unrecognized-chat-payload');
     }
-    emitAndRememberLiteChatBatch(state, {
+    await emitAndRememberLiteChatBatch(state, {
       actions: resolvedReplayRequest?.reset && !parsed.actions.some((action) => action.type === 'reset')
         ? [{ type: 'reset' }, ...parsed.actions.slice(-MAX_LITE_CHAT_SEED_ACTIONS)]
         : parsed.actions,
@@ -569,11 +526,10 @@ function queueLiteChatResponse(
       unreadableFeed: source === 'send' ? false : parsed.unreadableFeed
     }, generation);
   };
-  enqueueLiteChatParse(
+  return enqueueLiteChatParse(
     state,
     generation,
-    () => task().finally(releaseQueuedResponse),
-    releaseQueuedResponse
+    task
   );
 }
 
@@ -584,7 +540,7 @@ function queueLiteChatFailure(
   reason: string,
   replayRequest?: LiteChatReplayRequest,
   onSettled?: () => void
-): void {
+): Promise<void> {
   let settled = false;
   const settle = (): void => {
     if (settled) return;
@@ -594,7 +550,7 @@ function queueLiteChatFailure(
   const task = async (): Promise<void> => {
     const resolvedReplayRequest = await replayRequest;
     if (state.replayRequests.isObsolete(resolvedReplayRequest)) return;
-    emitAndRememberLiteChatBatch(state, {
+    await emitAndRememberLiteChatBatch(state, {
       actions: [],
       fatalErrors: getFeedDiagnostics(source, reason),
       receivedAt: Date.now(),
@@ -604,7 +560,7 @@ function queueLiteChatFailure(
       source
     }, generation);
   };
-  enqueueLiteChatParse(state, generation, () => task().finally(settle), settle);
+  return enqueueLiteChatParse(state, generation, () => task().finally(settle), settle);
 }
 
 function getFeedDiagnostics(
@@ -618,9 +574,9 @@ function emitAndRememberLiteChatBatch(
   state: LiteChatTransportState,
   values: Omit<LiteChatBatch, 'sequence' | 'version'>,
   generation: number
-): void {
+): Promise<void> {
   rememberLiteChatStartupBatch(state, values);
-  emitLiteChatBatch(state, values, generation);
+  return emitLiteChatBatch(state, values, generation);
 }
 
 function rememberLiteChatStartupBatch(
@@ -681,7 +637,7 @@ function enqueueLiteChatParse(
   generation: number,
   task: () => void | Promise<void>,
   onSkipped?: () => void
-): void {
+): Promise<void> {
   state.parseChain = state.parseChain
     .catch(() => undefined)
     .then(async () => {
@@ -691,17 +647,94 @@ function enqueueLiteChatParse(
       }
       await task();
     });
+  return state.parseChain.catch(() => undefined);
 }
 
-function emitLiteChatBatch(
+async function emitLiteChatBatch(
   state: LiteChatTransportState,
   values: Omit<LiteChatBatch, 'sequence' | 'version'>,
   generation: number
-): void {
+): Promise<void> {
   if (!state.enabled || generation !== state.generation) return;
-  state.sequence += 1;
-  const batch: LiteChatBatch = {
-    actions: values.actions,
+  const actionChunks = splitLiteChatBatchActions(values, state.sequence);
+  for (let index = 0; index < actionChunks.length; index += 1) {
+    const actions = actionChunks[index];
+    state.sequence += 1;
+    const batch = createLiteChatBatch(values, actions, state.sequence);
+    window.dispatchEvent(new CustomEvent(LITE_CHAT_BATCH_EVENT, {
+      detail: JSON.stringify(batch)
+    }));
+    if (
+      values.source === 'live' &&
+      state.receiverReady &&
+      index < actionChunks.length - 1
+    ) {
+      await waitForLiteChatChunkDrain(actions.length, values.continuationTimeoutMs);
+      if (!state.enabled || generation !== state.generation) return;
+    }
+  }
+}
+
+function waitForLiteChatChunkDrain(
+  actionCount: number,
+  continuationTimeoutMs?: number
+): Promise<void> {
+  const providerWindowMs = continuationTimeoutMs && continuationTimeoutMs > 0
+    ? Math.min(continuationTimeoutMs, MAX_LITE_CHAT_ACTION_WINDOW_MS)
+    : DEFAULT_LITE_CHAT_ACTION_WINDOW_MS;
+  const minimumDrainMs = Math.ceil(actionCount / MAX_LITE_CHAT_ACTIONS_PER_TICK) *
+    MIN_LITE_CHAT_ACTION_INTERVAL_MS;
+  return new Promise((resolve) => {
+    window.setTimeout(resolve, Math.max(providerWindowMs, minimumDrainMs));
+  });
+}
+
+function splitLiteChatBatchActions(
+  values: Omit<LiteChatBatch, 'sequence' | 'version'>,
+  startingSequence: number
+): LiteChatAction[][] {
+  if (!values.actions.length) return [[]];
+  const chunks: LiteChatAction[][] = [];
+  let chunk: LiteChatAction[] = [];
+  let chunkLength = getLiteChatBatchLength(values, chunk, startingSequence + 1);
+
+  for (const action of values.actions) {
+    const serializedAction = JSON.stringify(action);
+    const separatorLength = chunk.length ? 1 : 0;
+    const exceedsCount = chunk.length >= MAX_LITE_CHAT_BATCH_ACTIONS;
+    const exceedsLength =
+      chunkLength + separatorLength + serializedAction.length > MAX_LITE_CHAT_BATCH_DETAIL_LENGTH;
+    if (chunk.length && (exceedsCount || exceedsLength)) {
+      chunks.push(chunk);
+      chunk = [];
+      chunkLength = getLiteChatBatchLength(
+        values,
+        chunk,
+        startingSequence + chunks.length + 1
+      );
+    }
+    chunk.push(action);
+    chunkLength += (chunk.length > 1 ? 1 : 0) + serializedAction.length;
+  }
+  chunks.push(chunk);
+  return chunks;
+}
+
+function getLiteChatBatchLength(
+  values: Omit<LiteChatBatch, 'sequence' | 'version'>,
+  actions: LiteChatAction[],
+  sequence: number
+): number {
+  return JSON.stringify(createLiteChatBatch(values, actions, sequence)).length;
+}
+
+function createLiteChatBatch(
+  values: Omit<LiteChatBatch, 'sequence' | 'version'>,
+  actions: LiteChatAction[],
+  sequence: number
+): LiteChatBatch {
+  return {
+    actions,
     ...(values.compatibilityWarnings?.length
       ? { compatibilityWarnings: values.compatibilityWarnings }
       : {}),
@@ -715,14 +748,11 @@ function emitLiteChatBatch(
     ...(values.replayPlayerOffsetMs !== undefined
       ? { replayPlayerOffsetMs: values.replayPlayerOffsetMs }
       : {}),
-    sequence: state.sequence,
+    sequence,
     source: values.source,
     ...(values.unreadableFeed ? { unreadableFeed: true } : {}),
     version: LITE_CHAT_PROTOCOL_VERSION
   };
-  window.dispatchEvent(new CustomEvent(LITE_CHAT_BATCH_EVENT, {
-    detail: JSON.stringify(batch)
-  }));
 }
 
 function getFetchInputUrl(input: RequestInfo | URL): string {

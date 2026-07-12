@@ -271,6 +271,7 @@ describe('Lite mode controller', () => {
     expect(isLiteModeActive()).toBe(false);
     expect(requestNativeChatRestoreMock).toHaveBeenCalledWith({
       automaticFailure: true,
+      fallbackCode: 'LM08',
       message: 'Loading chat'
     });
   });
@@ -355,6 +356,7 @@ describe('Lite mode controller', () => {
     expect(hasLiteModeSessionCooldown()).toBe(true);
     expect(requestNativeChatRestoreMock).toHaveBeenCalledWith({
       automaticFailure: true,
+      fallbackCode: 'LM03',
       message: 'Loading chat'
     });
   });
@@ -369,6 +371,7 @@ describe('Lite mode controller', () => {
     expect(hasLiteModeSessionCooldown()).toBe(true);
     expect(requestNativeChatRestoreMock).toHaveBeenCalledWith({
       automaticFailure: true,
+      fallbackCode: 'LM01',
       message: 'Loading chat'
     });
   });
@@ -385,6 +388,7 @@ describe('Lite mode controller', () => {
     expect(isLiteModeActive()).toBe(false);
     expect(requestNativeChatRestoreMock).toHaveBeenCalledWith({
       automaticFailure: true,
+      fallbackCode: 'LM01',
       message: 'Loading chat'
     });
   });
@@ -410,6 +414,7 @@ describe('Lite mode controller', () => {
     expect(hasLiteModeSessionCooldown()).toBe(true);
     expect(requestNativeChatRestoreMock).toHaveBeenCalledWith({
       automaticFailure: true,
+      fallbackCode: 'LM09',
       message: 'Loading chat'
     });
   });
@@ -527,6 +532,7 @@ describe('Lite mode controller', () => {
     expect(isLiteModeActive()).toBe(false);
     expect(requestNativeChatRestoreMock).toHaveBeenCalledWith({
       automaticFailure: true,
+      fallbackCode: 'LM04',
       message: 'Loading chat'
     });
   });
@@ -539,6 +545,7 @@ describe('Lite mode controller', () => {
     expect(nativeList.isConnected).toBe(false);
     expect(requestNativeChatRestoreMock).toHaveBeenCalledWith({
       automaticFailure: true,
+      fallbackCode: 'LM06',
       message: 'Loading chat'
     });
   });
@@ -606,6 +613,7 @@ describe('Lite mode controller', () => {
     expect(isLiteModeActive()).toBe(false);
     expect(requestNativeChatRestoreMock).toHaveBeenCalledWith({
       automaticFailure: true,
+      fallbackCode: 'LM07',
       message: 'Loading chat'
     });
   });
@@ -640,6 +648,7 @@ describe('Lite mode controller', () => {
     expect(isLiteModeActive()).toBe(false);
     expect(requestNativeChatRestoreMock).toHaveBeenCalledWith({
       automaticFailure: true,
+      fallbackCode: 'LM02',
       message: 'Loading chat'
     });
   });
