@@ -269,13 +269,19 @@ export function createLiteChatRenderer(
         row = replacement;
       }
 
+      let rowSource: LiteChatRowSource | null = null;
+      if (created || changed) {
+        rowSource = created ? pendingRowSources.get(record.id) || 'existing' : 'changed';
+        if (created && change && rowSource === 'added') {
+          row.classList.add('ytcq-lite-message-enter');
+        }
+      }
       renderedRecords.set(record.id, record);
       const expectedRow = previousRow.nextSibling;
       if (row !== expectedRow) items.insertBefore(row, expectedRow);
       previousRow = row;
-      if (created || changed) {
-        const source = created ? pendingRowSources.get(record.id) || 'existing' : 'changed';
-        options.onRowRendered?.(row, record, source);
+      if (rowSource) {
+        options.onRowRendered?.(row, record, rowSource);
         dispatchedRecordIds.add(record.id);
         pendingRowSources.delete(record.id);
       }

@@ -267,6 +267,32 @@ describe('Lite chat renderer', () => {
     initialRenderer.destroy();
   });
 
+  it('marks only newly received rows for entrance motion', () => {
+    const store = createLiteChatStore();
+    store.apply([{ type: 'upsert', record: createRecord('existing', 'Existing') }]);
+    const renderer = createLiteChatRenderer(store);
+
+    expect(renderer.getMessageElement('existing')?.classList.contains('ytcq-lite-message-enter'))
+      .toBe(false);
+
+    const addedActions = [
+      { type: 'upsert' as const, record: createRecord('added', 'Added') }
+    ];
+    renderer.rememberActionSources(addedActions, 'live');
+    store.apply(addedActions);
+    expect(renderer.getMessageElement('added')?.classList.contains('ytcq-lite-message-enter'))
+      .toBe(true);
+
+    const changedActions = [
+      { type: 'upsert' as const, record: createRecord('added', 'Changed') }
+    ];
+    renderer.rememberActionSources(changedActions, 'live');
+    store.apply(changedActions);
+    expect(renderer.getMessageElement('added')?.classList.contains('ytcq-lite-message-enter'))
+      .toBe(false);
+    renderer.destroy();
+  });
+
   it('preserves live row origin while frozen and reports later revisions as changed', async () => {
     const store = createLiteChatStore({ renderLimit: 2, storeLimit: 10 });
     store.apply([
