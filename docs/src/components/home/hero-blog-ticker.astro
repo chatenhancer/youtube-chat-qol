@@ -1,0 +1,56 @@
+---
+import { Image } from 'astro:assets';
+import type { CollectionEntry } from 'astro:content';
+import { getBlogPostPath } from '../../data/blog';
+import Icon from '../common/icon.astro';
+
+const { nextLabel, posts, previousLabel } = Astro.props as {
+  nextLabel: string;
+  posts: CollectionEntry<'blog'>[];
+  previousLabel: string;
+};
+const spotlightPosts = posts;
+const BLOG_TICKER_IMAGE_WIDTH = 480;
+---
+
+{spotlightPosts.length > 0 && (
+  <div class="hero-blog-ticker" data-hero-blog-ticker data-hero-blog-ticker-interval="6000">
+    <div class="hero-blog-ticker-track">
+      {spotlightPosts.map((post, index) => (
+        <a
+          class:list={["hero-blog-ticker-slide", { "is-active": index === 0 }]}
+          href={getBlogPostPath(post)}
+          data-hero-blog-slide
+          aria-hidden={index === 0 ? undefined : "true"}
+          tabindex={index === 0 ? undefined : -1}
+        >
+          <span class="hero-blog-ticker-media">
+            {post.data.image && (
+              <Image
+                src={post.data.image}
+                alt=""
+                width={BLOG_TICKER_IMAGE_WIDTH}
+                loading={index === 0 ? "eager" : "lazy"}
+                decoding="async"
+              />
+            )}
+          </span>
+          <span class="hero-blog-ticker-copy">
+            <strong>{post.data.title}</strong>
+            <span>{post.data.description}</span>
+          </span>
+        </a>
+      ))}
+    </div>
+    {spotlightPosts.length > 1 && (
+      <div class="hero-blog-ticker-controls">
+        <button class="hero-blog-ticker-control hero-blog-ticker-previous" type="button" aria-label={previousLabel} data-hero-blog-previous>
+          <Icon name="chevron_backward" />
+        </button>
+        <button class="hero-blog-ticker-control hero-blog-ticker-next" type="button" aria-label={nextLabel} data-hero-blog-next>
+          <Icon name="chevron_backward" />
+        </button>
+      </div>
+    )}
+  </div>
+)}

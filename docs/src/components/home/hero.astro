@@ -1,9 +1,12 @@
 ---
 import Icon from '../common/icon.astro';
+import type { CollectionEntry } from 'astro:content';
 import type { Messages } from '../../data/site';
+import HeroBlogTicker from './hero-blog-ticker.astro';
 
-const { messages: m, rootPrefix } = Astro.props as {
+const { messages: m, posts, rootPrefix } = Astro.props as {
   messages: Messages;
+  posts: CollectionEntry<'blog'>[];
   rootPrefix: string;
 };
 ---
@@ -30,6 +33,7 @@ const { messages: m, rootPrefix } = Astro.props as {
       <a class="button button-secondary" href="#features">{m.hero.secondaryCta}</a>
     </div>
     <p class="hero-disclaimer">{m.hero.disclaimer}</p>
+    <HeroBlogTicker nextLabel={m.blog.nextUpdate} posts={posts} previousLabel={m.blog.previousUpdate} />
   </div>
   <div class="hero-media-column">
     <div class="hero-media" aria-hidden="true">

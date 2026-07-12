@@ -25,6 +25,7 @@
   const walkthroughKeyPointList = document.querySelector("[data-walkthrough-key-point-list]");
   const walkthroughKeyPointTrack = document.querySelector("[data-walkthrough-key-point-track]");
   const walkthroughSeekButtons = Array.from(document.querySelectorAll("[data-walkthrough-seek]"));
+  const heroBlogTicker = document.querySelector("[data-hero-blog-ticker]");
   const walkthroughHash = "#walkthrough";
   const versionBadgeSources = {
     release: {
@@ -60,7 +61,87 @@
   setupMobileHeaderMenu();
   setupContactEmailLinks();
   setupCommandDemo();
+  setupHeroBlogTicker();
   setupWalkthroughVideoModal();
+
+  function setupHeroBlogTicker() {
+    if (!(heroBlogTicker instanceof HTMLElement)) return;
+
+    const slides = Array.from(heroBlogTicker.querySelectorAll("[data-hero-blog-slide]"))
+      .filter((slide) => slide instanceof HTMLAnchorElement);
+    if (slides.length < 2) return;
+
+    const previousButton = heroBlogTicker.querySelector("[data-hero-blog-previous]");
+    const nextButton = heroBlogTicker.querySelector("[data-hero-blog-next]");
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const configuredInterval = Number(heroBlogTicker.dataset.heroBlogTickerInterval);
+    const interval = Number.isFinite(configuredInterval) && configuredInterval >= 3000 ? configuredInterval : 6000;
+    let activeIndex = Math.max(0, slides.findIndex((slide) => slide.classList.contains("is-active")));
+    let timer = 0;
+    let isPaused = false;
+
+    setActiveSlide(activeIndex);
+    scheduleNextSlide();
+
+    previousButton?.addEventListener("click", () => showAdjacentSlide(-1));
+    nextButton?.addEventListener("click", () => showAdjacentSlide(1));
+    heroBlogTicker.addEventListener("pointerenter", pauseTicker);
+    heroBlogTicker.addEventListener("pointerleave", resumeTicker);
+    heroBlogTicker.addEventListener("focusin", pauseTicker);
+    heroBlogTicker.addEventListener("focusout", (event) => {
+      if (event.relatedTarget instanceof Node && heroBlogTicker.contains(event.relatedTarget)) return;
+      resumeTicker();
+    });
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) {
+        clearTickerTimer();
+      } else {
+        scheduleNextSlide();
+      }
+    });
+    reducedMotion.addEventListener("change", scheduleNextSlide);
+
+    function setActiveSlide(nextIndex) {
+      activeIndex = nextIndex;
+      slides.forEach((slide, index) => {
+        const isActive = index === activeIndex;
+        slide.classList.toggle("is-active", isActive);
+        slide.setAttribute("aria-hidden", String(!isActive));
+        slide.tabIndex = isActive ? 0 : -1;
+      });
+    }
+
+    function scheduleNextSlide() {
+      clearTickerTimer();
+      if (isPaused || document.hidden || reducedMotion.matches) return;
+
+      timer = window.setTimeout(() => {
+        setActiveSlide((activeIndex + 1) % slides.length);
+        scheduleNextSlide();
+      }, interval);
+    }
+
+    function showAdjacentSlide(direction) {
+      setActiveSlide((activeIndex + direction + slides.length) % slides.length);
+      scheduleNextSlide();
+    }
+
+    function pauseTicker() {
+      isPaused = true;
+      clearTickerTimer();
+    }
+
+    function resumeTicker() {
+      isPaused = false;
+      scheduleNextSlide();
+    }
+
+    function clearTickerTimer() {
+      if (!timer) return;
+      window.clearTimeout(timer);
+      timer = 0;
+    }
+  }
 
   function setupLanguageSwitchers() {
     languageSwitchers.forEach((languageSwitcher) => {
