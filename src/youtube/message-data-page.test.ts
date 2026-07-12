@@ -725,7 +725,6 @@ describe('YouTube message data page adapter', () => {
 
   it('splits large official action sets across valid isolated-world batches', async () => {
     vi.resetModules();
-    vi.useFakeTimers();
     const batches: LiteChatBatch[] = [];
     const detailLengths: number[] = [];
     const listener = (event: Event) => {
@@ -748,7 +747,7 @@ describe('YouTube message data page adapter', () => {
     window.dispatchEvent(new CustomEvent(LITE_CHAT_CONTROL_EVENT, {
       detail: JSON.stringify({ enabled: true, requestInitial: true, version: 1 })
     }));
-    await vi.advanceTimersByTimeAsync(0);
+    await flushAsyncWork();
     batches.length = 0;
     detailLengths.length = 0;
 
@@ -757,14 +756,10 @@ describe('YouTube message data page adapter', () => {
       .then(() => {
         fetchSettled = true;
       });
-    await vi.advanceTimersByTimeAsync(0);
-
-    expect(batches).toHaveLength(1);
-    expect(fetchSettled).toBe(false);
-
-    await vi.runAllTimersAsync();
     await fetchPromise;
+    await flushAsyncWork();
 
+    expect(fetchSettled).toBe(true);
     expect(batches.length).toBeGreaterThan(1);
     expect(batches.flatMap((batch) => batch.actions)).toHaveLength(550);
     expect(batches.map((batch) => batch.sequence)).toEqual(

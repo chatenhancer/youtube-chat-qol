@@ -187,7 +187,7 @@ describe('Lite mode controller', () => {
     expect(requestNativeChatRestoreMock).toHaveBeenCalledOnce();
   });
 
-  it('paces busy live upserts across the provider window', async () => {
+  it('applies busy live upserts immediately', () => {
     startLiteMode({ clearCooldown: true });
     dispatchBatch({
       ...createBatch(1, [
@@ -199,38 +199,30 @@ describe('Lite mode controller', () => {
       continuationTimeoutMs: 1_000
     });
 
-    expect(document.querySelectorAll('.ytcq-lite-message')).toHaveLength(0);
-    await vi.advanceTimersByTimeAsync(249);
-    expect(document.querySelectorAll('.ytcq-lite-message')).toHaveLength(0);
-    await vi.advanceTimersByTimeAsync(1);
-    expect(document.querySelectorAll('.ytcq-lite-message')).toHaveLength(1);
-    await vi.advanceTimersByTimeAsync(750);
     expect(document.querySelectorAll('.ytcq-lite-message')).toHaveLength(4);
   });
 
-  it('paces a light continuation batch through the next expected response', async () => {
+  it('does not delay a paid message through the continuation window', () => {
     startLiteMode({ clearCooldown: true });
+    const paidRecord = {
+      ...createRecord('paid', 'Thank you'),
+      kind: 'paid' as const,
+      paid: { amountText: '$10.00' }
+    };
     dispatchBatch({
       ...createBatch(1, [
         { type: 'upsert', record: createRecord('one', 'One') },
         { type: 'upsert', record: createRecord('two', 'Two') },
-        { type: 'upsert', record: createRecord('three', 'Three') }
+        { type: 'upsert', record: paidRecord }
       ]),
       continuationTimeoutMs: 5_000
     });
 
-    expect(document.querySelectorAll('.ytcq-lite-message')).toHaveLength(0);
-    await vi.advanceTimersByTimeAsync(1_665);
-    expect(document.querySelectorAll('.ytcq-lite-message')).toHaveLength(0);
-    await vi.advanceTimersByTimeAsync(1);
-    expect(document.querySelectorAll('.ytcq-lite-message')).toHaveLength(1);
-    await vi.advanceTimersByTimeAsync(1_666);
-    expect(document.querySelectorAll('.ytcq-lite-message')).toHaveLength(2);
-    await vi.advanceTimersByTimeAsync(1_666);
     expect(document.querySelectorAll('.ytcq-lite-message')).toHaveLength(3);
+    expect(document.querySelector('[data-message-id="paid"]')).not.toBeNull();
   });
 
-  it('keeps later single-message and moderation actions behind the paced queue', async () => {
+  it('applies later single-message and moderation actions in transport order', () => {
     startLiteMode({ clearCooldown: true });
     dispatchBatch({
       ...createBatch(1, [
@@ -242,19 +234,10 @@ describe('Lite mode controller', () => {
     dispatchBatch(createBatch(2, [{ type: 'remove', id: 'one' }]));
 
     expect(document.querySelector('[data-message-id="one"]')).toBeNull();
-    expect(document.querySelector('[data-message-id="two"]')).toBeNull();
-    await vi.advanceTimersByTimeAsync(250);
-    expect(document.querySelector('[data-message-id="one"]')).not.toBeNull();
-    expect(document.querySelector('[data-message-id="two"]')).toBeNull();
-    await vi.advanceTimersByTimeAsync(250);
-    expect(document.querySelector('[data-message-id="one"]')).not.toBeNull();
-    expect(document.querySelector('[data-message-id="two"]')).not.toBeNull();
-    await vi.advanceTimersByTimeAsync(250);
-    expect(document.querySelector('[data-message-id="one"]')).toBeNull();
     expect(document.querySelector('[data-message-id="two"]')).not.toBeNull();
   });
 
-  it('falls back before a rich live-action backlog exceeds its byte budget', () => {
+  it('applies rich live batches without building a pending display backlog', () => {
     startLiteMode({ clearCooldown: true });
     const richText = 'x'.repeat(9_000);
     for (let sequence = 1; sequence <= 5; sequence += 1) {
@@ -265,15 +248,14 @@ describe('Lite mode controller', () => {
         }))),
         continuationTimeoutMs: 5_000
       });
-      if (!isLiteModeActive()) break;
     }
 
-    expect(isLiteModeActive()).toBe(false);
-    expect(requestNativeChatRestoreMock).toHaveBeenCalledWith({
-      automaticFailure: true,
-      fallbackCode: 'LM08',
-      message: 'Loading chat'
-    });
+    const root = document.querySelector<HTMLElement>('.ytcq-lite-root')!;
+    expect(isLiteModeActive()).toBe(true);
+    expect(root.dataset.ytcqLitePendingLiveActions).toBe('0');
+    expect(root.dataset.ytcqLitePendingLiveActionBytes).toBe('0');
+    expect(document.querySelectorAll('.ytcq-lite-message')).toHaveLength(150);
+    expect(requestNativeChatRestoreMock).not.toHaveBeenCalled();
   });
 
   it('releases replay rows at their YouTube player offsets instead of by response batch', () => {
@@ -688,7 +670,7 @@ describe('Lite mode controller', () => {
     expect(isLiteModeActive()).toBe(true);
   });
 
-  it('preserves initial and live row origins through direct and paced store updates', async () => {
+  it('preserves initial and live row origins through immediate store updates', () => {
     const onRow = vi.fn();
     setLiteModeRowRenderedCallback(onRow);
     startLiteMode({ clearCooldown: true });
@@ -712,8 +694,6 @@ describe('Lite mode controller', () => {
       ]),
       continuationTimeoutMs: 1_000
     });
-    await vi.advanceTimersByTimeAsync(1_000);
-
     expect(onRow.mock.calls.map(([, record, source]) => [record.id, source])).toEqual([
       ['initial', 'existing'],
       ['replay', 'added'],

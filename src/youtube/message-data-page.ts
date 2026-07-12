@@ -42,13 +42,6 @@ const SENT_CACHE_LIMIT = 800;
 const LITE_CHAT_TRANSPORT_STATE_KEY = Symbol.for('ytcq:lite-chat-transport:v1');
 const MAX_LITE_CHAT_SEED_ACTIONS = 499;
 const MAX_UNRESOLVED_LITE_CHAT_RESPONSES = 2;
-// Keep multi-batch official responses below the isolated-world queue ceiling.
-// These values mirror the receiver's fastest live drain rate; the provider
-// window remains the preferred delay so normal continuation pacing is kept.
-const DEFAULT_LITE_CHAT_ACTION_WINDOW_MS = 1_000;
-const MAX_LITE_CHAT_ACTION_WINDOW_MS = 5_000;
-const MIN_LITE_CHAT_ACTION_INTERVAL_MS = 25;
-const MAX_LITE_CHAT_ACTIONS_PER_TICK = 16;
 
 interface PendingLiteChatResponse {
   receivedAt: number;
@@ -650,43 +643,22 @@ function enqueueLiteChatParse(
   return state.parseChain.catch(() => undefined);
 }
 
-async function emitLiteChatBatch(
+function emitLiteChatBatch(
   state: LiteChatTransportState,
   values: Omit<LiteChatBatch, 'sequence' | 'version'>,
   generation: number
 ): Promise<void> {
-  if (!state.enabled || generation !== state.generation) return;
+  if (!state.enabled || generation !== state.generation) return Promise.resolve();
   const actionChunks = splitLiteChatBatchActions(values, state.sequence);
-  for (let index = 0; index < actionChunks.length; index += 1) {
-    const actions = actionChunks[index];
+  for (const actions of actionChunks) {
     state.sequence += 1;
     const batch = createLiteChatBatch(values, actions, state.sequence);
     window.dispatchEvent(new CustomEvent(LITE_CHAT_BATCH_EVENT, {
       detail: JSON.stringify(batch)
     }));
-    if (
-      values.source === 'live' &&
-      state.receiverReady &&
-      index < actionChunks.length - 1
-    ) {
-      await waitForLiteChatChunkDrain(actions.length, values.continuationTimeoutMs);
-      if (!state.enabled || generation !== state.generation) return;
-    }
+    if (!state.enabled || generation !== state.generation) return Promise.resolve();
   }
-}
-
-function waitForLiteChatChunkDrain(
-  actionCount: number,
-  continuationTimeoutMs?: number
-): Promise<void> {
-  const providerWindowMs = continuationTimeoutMs && continuationTimeoutMs > 0
-    ? Math.min(continuationTimeoutMs, MAX_LITE_CHAT_ACTION_WINDOW_MS)
-    : DEFAULT_LITE_CHAT_ACTION_WINDOW_MS;
-  const minimumDrainMs = Math.ceil(actionCount / MAX_LITE_CHAT_ACTIONS_PER_TICK) *
-    MIN_LITE_CHAT_ACTION_INTERVAL_MS;
-  return new Promise((resolve) => {
-    window.setTimeout(resolve, Math.max(providerWindowMs, minimumDrainMs));
-  });
+  return Promise.resolve();
 }
 
 function splitLiteChatBatchActions(

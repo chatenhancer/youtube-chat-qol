@@ -64,14 +64,7 @@ const STARTUP_TIMEOUT_MS = 20_000;
 const REPLAY_STARTUP_TIMEOUT_MS = 45_000;
 const DEFAULT_SOURCE_TIMEOUT_MS = 35_000;
 const MAX_SOURCE_WATCHDOG_MS = MAX_LITE_CHAT_CONTINUATION_TIMEOUT_MS * 2 + 5_000;
-const DEFAULT_LIVE_ACTION_WINDOW_MS = 1_000;
-const MAX_LIVE_ACTION_WINDOW_MS = 5_000;
-const MIN_LIVE_ACTION_INTERVAL_MS = 25;
-const MAX_LIVE_ACTION_INTERVAL_MS = 2_500;
-const MAX_LIVE_ACTIONS_PER_TICK = 16;
-const MAX_PENDING_LIVE_ACTIONS = 2_000;
 const MAX_PENDING_REPLAY_ACTIONS = 2_000;
-const MAX_PENDING_LIVE_ACTION_BYTES = 16 * 1024 * 1024;
 const MAX_PENDING_REPLAY_ACTION_BYTES = 16 * 1024 * 1024;
 // One-off YouTube message types are skipped without disrupting Lite mode. Three
 // independent unreadable feed batches without a supported message indicate
@@ -115,12 +108,7 @@ let observedNativeUiTargets: Element[] = [];
 let startupTimer = 0;
 let sourceTimer = 0;
 let timestampSyncTimer = 0;
-let liveActionTimer = 0;
-let liveActionIntervalMs = MAX_LIVE_ACTION_INTERVAL_MS;
-let liveActionsPerTick = 1;
-let pendingLiveActions: LiteChatAction[] = [];
 let pendingReplayActions: LiteChatAction[] = [];
-let pendingLiveActionBytes = 0;
 let pendingReplayActionBytes = 0;
 let replayProgressMs: number | null = null;
 let replayRequestsIdentifySeeks = false;
@@ -240,7 +228,7 @@ function beginNativeRestore(reason: LiteModeStopReason, automaticFailure: boolea
   clearStartupTimer();
   clearSourceTimer();
   clearTimestampSyncTimer();
-  clearPacedActionQueues();
+  clearReplayState();
   batchListeners.abort();
   batchListeners = new AbortController();
   nativeUiObserver?.disconnect();
@@ -378,7 +366,6 @@ function applyBatchActions(batch: LiteChatBatch): void {
   // velocity. Apply its snapshot immediately, but keep replay-wrapped actions
   // synchronized to the video even when they were buffered into the seed.
   if (batch.actions.some((action) => action.type === 'reset')) {
-    clearLiveActionQueue();
     clearReplayActionQueue();
     const timedReplayActions = batch.actions.filter(hasReplayOffset);
     const immediateActions = batch.actions.filter((action) => !hasReplayOffset(action));
@@ -390,54 +377,13 @@ function applyBatchActions(batch: LiteChatBatch): void {
     enqueueReplayActions(batch.actions);
     return;
   }
-  if (batch.source !== 'live' || batch.actions.length === 0) {
-    applyStoreActions(batch.actions, batch.source);
-    return;
-  }
-  if (!liveActionTimer && !pendingLiveActions.length && batch.actions.length === 1) {
-    applyStoreActions(batch.actions, batch.source);
-    return;
-  }
-  const batchActionBytes = getLiteChatActionsBytes(batch.actions);
-  if (
-    pendingLiveActions.length + batch.actions.length > MAX_PENDING_LIVE_ACTIONS ||
-    pendingLiveActionBytes + batchActionBytes > MAX_PENDING_LIVE_ACTION_BYTES
-  ) {
-    failLiteMode('action-backlog');
-    return;
-  }
 
-  // Keep every live action in transport order. A later delete/reset must not
-  // leapfrog a queued upsert, and a later single-message batch must not either.
-  pendingLiveActions.push(...batch.actions);
-  pendingLiveActionBytes += batchActionBytes;
-  // YouTube can hold a continuation for several seconds. Pace the whole batch
-  // across that expected response window so the queue does not drain into a
-  // visible pause before the next continuation arrives. Busy batches still use
-  // shorter intervals and multiple actions per tick to avoid a backlog.
-  const actionWindowMs = batch.continuationTimeoutMs && batch.continuationTimeoutMs > 0
-    ? Math.min(batch.continuationTimeoutMs, MAX_LIVE_ACTION_WINDOW_MS)
-    : DEFAULT_LIVE_ACTION_WINDOW_MS;
-  const nextInterval = Math.max(
-    MIN_LIVE_ACTION_INTERVAL_MS,
-    Math.min(MAX_LIVE_ACTION_INTERVAL_MS, Math.floor(actionWindowMs / batch.actions.length))
-  );
-  const nextActionsPerTick = Math.max(
-    1,
-    Math.min(
-      MAX_LIVE_ACTIONS_PER_TICK,
-      Math.ceil((batch.actions.length * nextInterval) / actionWindowMs)
-    )
-  );
-  liveActionIntervalMs = liveActionTimer
-    ? Math.min(liveActionIntervalMs, nextInterval)
-    : nextInterval;
-  liveActionsPerTick = liveActionTimer
-    ? Math.max(liveActionsPerTick, nextActionsPerTick)
-    : nextActionsPerTick;
-  if (!liveActionTimer) {
-    liveActionTimer = window.setTimeout(drainPendingLiveActions, liveActionIntervalMs);
-  }
+  // Keep every feed action in transport order. A later delete/reset must not
+  // leapfrog an earlier upsert. Apply each response atomically as soon as it
+  // arrives; the continuation timeout describes YouTube's next request, not a
+  // display window. Delaying through that window can create an ever-growing
+  // queue on active streams and make paid messages trail the native ticker.
+  applyStoreActions(batch.actions, batch.source);
 }
 
 function applyStoreActions(
@@ -446,29 +392,6 @@ function applyStoreActions(
 ): void {
   renderer?.rememberActionSources(actions, source);
   store?.apply(actions);
-}
-
-function drainPendingLiveActions(): void {
-  liveActionTimer = 0;
-  if (!active || !pendingLiveActions.length) return;
-  const actionCount = Math.min(
-    MAX_LIVE_ACTIONS_PER_TICK,
-    pendingLiveActions.length,
-    Math.max(liveActionsPerTick, Math.ceil(pendingLiveActions.length / 100))
-  );
-  const drainedActions = pendingLiveActions.splice(0, actionCount);
-  pendingLiveActionBytes = Math.max(
-    0,
-    pendingLiveActionBytes - getLiteChatActionsBytes(drainedActions)
-  );
-  applyStoreActions(drainedActions, 'live');
-  if (!pendingLiveActions.length) {
-    liveActionIntervalMs = MAX_LIVE_ACTION_INTERVAL_MS;
-    liveActionsPerTick = 1;
-    refreshLiteMemoryDiagnostics();
-    return;
-  }
-  liveActionTimer = window.setTimeout(drainPendingLiveActions, liveActionIntervalMs);
 }
 
 function enqueueReplayActions(actions: readonly LiteChatAction[]): void {
@@ -797,7 +720,7 @@ function teardownLiteMode(clearIntent: boolean): void {
   clearStartupTimer();
   clearSourceTimer();
   clearTimestampSyncTimer();
-  clearPacedActionQueues();
+  clearReplayState();
   batchListeners.abort();
   batchListeners = new AbortController();
   nativeUiObserver?.disconnect();
@@ -834,22 +757,12 @@ function clearTimestampSyncTimer(): void {
   timestampSyncTimer = 0;
 }
 
-function clearLiveActionQueue(): void {
-  if (liveActionTimer) window.clearTimeout(liveActionTimer);
-  liveActionTimer = 0;
-  liveActionIntervalMs = MAX_LIVE_ACTION_INTERVAL_MS;
-  liveActionsPerTick = 1;
-  pendingLiveActions = [];
-  pendingLiveActionBytes = 0;
-}
-
 function clearReplayActionQueue(): void {
   pendingReplayActions = [];
   pendingReplayActionBytes = 0;
 }
 
-function clearPacedActionQueues(): void {
-  clearLiveActionQueue();
+function clearReplayState(): void {
   clearReplayActionQueue();
   replayProgressMs = null;
   replayRequestsIdentifySeeks = false;
@@ -880,8 +793,8 @@ function refreshLiteMemoryDiagnostics(sampleNative = false): void {
   if (!root) return;
   root.dataset.ytcqLiteStoreSize = String(store?.getSize() || 0);
   root.dataset.ytcqLiteStoreBytes = String(store?.getRetainedBytes() || 0);
-  root.dataset.ytcqLitePendingLiveActions = String(pendingLiveActions.length);
-  root.dataset.ytcqLitePendingLiveActionBytes = String(pendingLiveActionBytes);
+  root.dataset.ytcqLitePendingLiveActions = '0';
+  root.dataset.ytcqLitePendingLiveActionBytes = '0';
   root.dataset.ytcqLitePendingReplayActions = String(pendingReplayActions.length);
   root.dataset.ytcqLitePendingReplayActionBytes = String(pendingReplayActionBytes);
   if (!sampleNative) return;

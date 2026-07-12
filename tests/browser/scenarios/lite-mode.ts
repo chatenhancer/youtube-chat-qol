@@ -77,6 +77,7 @@ interface LiteClientDiagnostics {
   liteRows: number;
   nativeDescendants: number;
   newMessagesVisible: boolean;
+  pendingLiveActions: number;
   rowAdds: Array<{ at: number; count: number }>;
   visibilityState: string;
 }
@@ -697,7 +698,6 @@ export const liteModeLiveSustainedScenario: BrowserScenario = async ({ chat, con
   const root = chat.locator(LITE_ROOT_SELECTOR);
   let continuationEvidence: { batches: number; requests: number } | null = null;
   let continuityEvidence: LiteContinuityEvidence | null = null;
-  let pacingEvidence: { events: number; spanMs: number; totalRows: number } | null = null;
   let sustainedEvidence: LiteClientDiagnostics | null = null;
   let baselineContinuity: LiteContinuitySnapshot | null = null;
 
@@ -744,7 +744,7 @@ export const liteModeLiveSustainedScenario: BrowserScenario = async ({ chat, con
 
     const baseline = await getLiteDiagnostics(chat);
     baselineContinuity = await getLiteContinuitySnapshot(chat);
-    const pacingBaselineAt = Date.now();
+    const observationBaselineAt = Date.now();
     const baselineSequence = getLatestLiveSequence(baseline);
     const networkBaseline = networkRequests.length;
     const continuationTimeoutMs = getContinuationEvidenceTimeout(baseline, target);
@@ -759,17 +759,7 @@ export const liteModeLiveSustainedScenario: BrowserScenario = async ({ chat, con
       timeoutMs: continuationTimeoutMs
     });
 
-    let sustained = await getLiteDiagnostics(chat);
-    const postDiscardUpserts = sustained.batches
-      .filter((batch) => batch.source === 'live' && (batch.sequence || 0) > baselineSequence)
-      .reduce((total, batch) => total + batch.upserts, 0);
-    if (process.env.YTCQ_LITE_EXPECT_BUSY_PACING === '1' || postDiscardUpserts >= 6) {
-      const paced = await waitForPacingEvidence(chat, page, pacingBaselineAt, 8_000);
-      pacingEvidence = paced.evidence;
-      sustained = paced.diagnostics;
-    } else {
-      pacingEvidence = getPacingEvidence(sustained, pacingBaselineAt);
-    }
+    const sustained = await getLiteDiagnostics(chat);
     sustainedEvidence = sustained;
     const beforeRestoreContinuity = await getLiteContinuitySnapshot(chat);
     const baselineLiteIds = new Set(baselineContinuity.liteIds);
@@ -782,22 +772,20 @@ export const liteModeLiveSustainedScenario: BrowserScenario = async ({ chat, con
       postDiscardLiteIds,
       restoredOverlapIds: []
     };
-    const edgeSamples = sustained.liveEdgeSamples.filter((sample) => sample.at >= pacingBaselineAt);
+    const edgeSamples = sustained.liveEdgeSamples.filter(
+      (sample) => sample.at >= observationBaselineAt
+    );
     expect(sustained.fallbackReason).toBe('');
     expect(sustained.followingLiveEdge).toBe(true);
     expect(sustained.liveEdgeDistance).toBeLessThanOrEqual(32);
     expect(sustained.liteRows).toBeGreaterThan(0);
     expect(sustained.liteRows).toBeLessThanOrEqual(150);
     expect(sustained.newMessagesVisible).toBe(false);
+    expect(sustained.pendingLiveActions).toBe(0);
     expect(edgeSamples.length).toBeGreaterThan(0);
     expect(edgeSamples.every((sample) => sample.following && !sample.newMessagesVisible)).toBe(
       true
     );
-    if (process.env.YTCQ_LITE_EXPECT_BUSY_PACING === '1') {
-      expect(pacingEvidence.events).toBeGreaterThanOrEqual(4);
-      expect(pacingEvidence.spanMs).toBeGreaterThanOrEqual(500);
-      expect(pacingEvidence.totalRows).toBeGreaterThanOrEqual(6);
-    }
     console.log(
       'Lite mode sustained evidence:',
       JSON.stringify({
@@ -805,7 +793,6 @@ export const liteModeLiveSustainedScenario: BrowserScenario = async ({ chat, con
         liteDescendants: sustained.liteDescendants,
         liteRows: sustained.liteRows,
         nativeDescendants: sustained.nativeDescendants,
-        pacingEvidence,
         continuityEvidence
       })
     );
@@ -845,7 +832,6 @@ export const liteModeLiveSustainedScenario: BrowserScenario = async ({ chat, con
             continuationEvidence,
             continuityEvidence,
             networkRequests,
-            pacingEvidence,
             sustained: sustainedEvidence
           },
           null,
@@ -1127,6 +1113,7 @@ async function getLiteDiagnostics(chat: ChatSurface): Promise<LiteClientDiagnost
           .querySelector('yt-live-chat-item-list-renderer, #chat > #item-list')
           ?.querySelectorAll('*').length || 0,
       newMessagesVisible: Boolean(newMessagesButton && !newMessagesButton.hidden),
+      pendingLiveActions: Number(root?.getAttribute('data-ytcq-lite-pending-live-actions') || 0),
       rowAdds: testWindow.__ytcqLiteRowAdds || [],
       visibilityState: document.visibilityState
     };
@@ -1232,49 +1219,6 @@ async function waitForContinuationEvidence({
       postDiscardRequests: networkRequests.length - networkBaseline
     })
   );
-}
-
-async function waitForPacingEvidence(
-  chat: ChatSurface,
-  page: Parameters<BrowserScenario>[0]['page'],
-  baselineAt: number,
-  timeoutMs: number
-): Promise<{
-  diagnostics: LiteClientDiagnostics;
-  evidence: { events: number; spanMs: number; totalRows: number };
-}> {
-  const deadline = Date.now() + timeoutMs;
-  let diagnostics = await getLiteDiagnostics(chat);
-  let evidence = getPacingEvidence(diagnostics, baselineAt);
-
-  while (Date.now() < deadline) {
-    diagnostics = await getLiteDiagnostics(chat);
-    if (diagnostics.fallbackReason || !diagnostics.hasLiteRoot) break;
-    evidence = getPacingEvidence(diagnostics, baselineAt);
-    if (evidence.events >= 4 && evidence.spanMs >= 500 && evidence.totalRows >= 6) {
-      return { diagnostics, evidence };
-    }
-    await page.waitForTimeout(100);
-  }
-
-  throw new Error(
-    `Lite mode did not pace the busy batch: ${JSON.stringify({
-      diagnostics,
-      evidence
-    })}`
-  );
-}
-
-function getPacingEvidence(
-  diagnostics: LiteClientDiagnostics,
-  baselineAt: number
-): { events: number; spanMs: number; totalRows: number } {
-  const pacedAdds = diagnostics.rowAdds.filter((entry) => entry.at >= baselineAt);
-  return {
-    events: pacedAdds.length,
-    spanMs: pacedAdds.length > 1 ? pacedAdds.at(-1)!.at - pacedAdds[0].at : 0,
-    totalRows: pacedAdds.reduce((total, entry) => total + entry.count, 0)
-  };
 }
 
 function getLatestLiveSequence(diagnostics: LiteClientDiagnostics): number {
