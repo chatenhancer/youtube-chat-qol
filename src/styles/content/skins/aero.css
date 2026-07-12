@@ -1306,6 +1306,7 @@
   .ytcq-focus-author,
   .ytcq-inbox-author
 ) {
+  font-family: Tahoma, "Segoe UI", Arial, sans-serif;
   font-weight: 700;
 }
 
