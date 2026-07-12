@@ -4,7 +4,7 @@
  * Stores a browser-local list of globally marked chat users and applies a
  * stable username-derived avatar ring wherever those users appear.
  */
-import { registerFeatureLifecycle } from '../../content/lifecycle';
+import { registerFeatureLifecycle, type FeatureMessageContext } from '../../content/lifecycle';
 import {
   BOOKMARK_FILLED_ICON_PATH,
   BOOKMARK_ICON_PATH,
@@ -44,6 +44,7 @@ const markedUsers = new Map<string, MarkedUserRecord>();
 let loadPromise: Promise<void> | null = null;
 let ringAnimationId = 0;
 let ringTargetId = 0;
+let markedUsersActive = false;
 
 registerFeatureLifecycle({
   page: {
@@ -55,13 +56,13 @@ registerFeatureLifecycle({
 });
 
 export function initMarkedUsers(): void {
+  markedUsersActive = true;
   void ensureMarkedUsersLoaded().then(refreshMarkedUserRings);
   chrome.storage.onChanged.addListener(handleMarkedUsersStorageChange);
 }
 
 export function isMarkedUser(identity: MarkedUserIdentity): boolean {
-  const key = getMarkedUserKey(identity);
-  return Boolean(key && markedUsers.has(key));
+  return Boolean(findMarkedUser(identity));
 }
 
 export async function toggleMarkedUser(identity: MarkedUserIdentity): Promise<boolean> {
@@ -73,8 +74,9 @@ export async function toggleMarkedUser(identity: MarkedUserIdentity): Promise<bo
   const key = getMarkedUserKey(normalized);
   if (!key) return false;
 
-  if (markedUsers.has(key)) {
-    markedUsers.delete(key);
+  const matches = findMarkedUsers(normalized);
+  if (matches.length) {
+    matches.forEach(([matchedKey]) => markedUsers.delete(matchedKey));
     await saveMarkedUsers();
     refreshMarkedUserRings();
     return false;
@@ -165,7 +167,8 @@ export function applyMarkedUserRing(
     return;
   }
 
-  const key = getMarkedUserKey(normalized);
+  const match = findMarkedUser(normalized);
+  const key = match?.[0] || getMarkedUserKey(normalized);
   if (!key) {
     clearMarkedUserRing(target);
     return;
@@ -174,28 +177,32 @@ export function applyMarkedUserRing(
   const hadSameKey = target.dataset.ytcqMarkedUserKey === key;
   target.dataset.ytcqMarkedUserKey = key;
   target.dataset.ytcqMarkedUserName = normalized.authorName || key;
+  target.dataset.ytcqMarkedUserChannelId = normalized.channelId || '';
   target.style.setProperty('--ytcq-marked-user-color', getMarkedUserColor(normalized));
   target.classList.add('ytcq-markable-user-avatar');
   maybeRefreshMarkedUserAvatar(normalized);
-  setMarkedUserRingState(target, markedUsers.has(key), hadSameKey);
+  setMarkedUserRingState(target, Boolean(match), hadSameKey);
 }
 
 export function refreshMarkedUserRings(): void {
   document.querySelectorAll<HTMLElement>('[data-ytcq-marked-user-key]').forEach((target) => {
-    const key = target.dataset.ytcqMarkedUserKey || '';
+    const identity = getMarkedUserTargetIdentity(target);
+    const match = findMarkedUser(identity);
+    const key = match?.[0] || getMarkedUserKey(identity);
     if (!key) {
       clearMarkedUserRing(target);
       return;
     }
 
-    const record = markedUsers.get(key);
+    const record = match?.[1];
+    target.dataset.ytcqMarkedUserKey = key;
     target.style.setProperty(
       '--ytcq-marked-user-color',
       getMarkedUserColor(
         record || { authorName: target.dataset.ytcqMarkedUserName || key, markedAt: 0 }
       )
     );
-    setMarkedUserRingState(target, Boolean(record), true);
+    setMarkedUserRingState(target, Boolean(match), true);
   });
 
   document.querySelectorAll<HTMLButtonElement>('.ytcq-marked-user-toggle').forEach((button) => {
@@ -208,6 +215,7 @@ export function refreshMarkedUserRings(): void {
 }
 
 export function cleanupStaleMarkedUsers(): void {
+  markedUsersActive = false;
   chrome.storage.onChanged.removeListener(handleMarkedUsersStorageChange);
   document
     .querySelectorAll<HTMLElement>('.ytcq-marked-user-ring-animation')
@@ -224,12 +232,20 @@ export function cleanupStaleMarkedUsers(): void {
     });
 }
 
-function renderMarkedUserMessageRing(message: HTMLElement): void {
+function renderMarkedUserMessageRing(message: HTMLElement, context: FeatureMessageContext): void {
   const identity = getMarkedUserIdentityFromMessage(message);
   const avatar = message.querySelector<HTMLElement>('#author-photo');
   if (!identity || !avatar) return;
 
   applyMarkedUserRing(avatar, identity);
+  void context.messageData.then((data) => {
+    if (!markedUsersActive || !message.isConnected || !avatar.isConnected || !data) return;
+    applyMarkedUserRing(avatar, {
+      authorName: data.authorName || identity.authorName,
+      avatarUrl: data.authorPhotoUrl || identity.avatarUrl,
+      channelId: data.authorExternalChannelId || identity.channelId
+    });
+  });
 }
 
 function renderMarkedUserParticipantRing(participant: HTMLElement): void {
@@ -286,10 +302,9 @@ function saveMarkedUsers(): Promise<void> {
 }
 
 function maybeRefreshMarkedUserAvatar(identity: MarkedUserRecord): void {
-  const key = getMarkedUserKey(identity);
-  if (!key) return;
-
-  const record = markedUsers.get(key);
+  const match = findMarkedUser(identity);
+  if (!match) return;
+  const [, record] = match;
   if (!record || !isBetterMarkedUserAvatarUrl(identity.avatarUrl || '', record.avatarUrl)) return;
 
   record.avatarUrl = identity.avatarUrl;
@@ -311,6 +326,46 @@ function replaceMarkedUsers(records: Map<string, MarkedUserRecord>): void {
   records.forEach((record, key) => markedUsers.set(key, record));
 }
 
+function findMarkedUser(identity: MarkedUserIdentity): [string, MarkedUserRecord] | null {
+  return findMarkedUsers(identity)[0] || null;
+}
+
+function findMarkedUsers(identity: MarkedUserIdentity): [string, MarkedUserRecord][] {
+  const normalized = normalizeMarkedIdentity(identity);
+  if (!normalized) return [];
+
+  const matches: [string, MarkedUserRecord][] = [];
+  const matchedKeys = new Set<string>();
+  const remember = (key: string): void => {
+    if (!key || matchedKeys.has(key)) return;
+    const record = markedUsers.get(key);
+    if (!record) return;
+    matchedKeys.add(key);
+    matches.push([key, record]);
+  };
+
+  remember(getMarkedUserKey(normalized));
+  const authorKey = getMarkedUserKey({ authorName: normalized.authorName });
+  remember(authorKey);
+  if (!normalized.channelId && authorKey) {
+    markedUsers.forEach((record, key) => {
+      if (getMarkedUserKey({ authorName: record.authorName }) === authorKey) remember(key);
+    });
+  }
+  return matches;
+}
+
+function getMarkedUserTargetIdentity(target: HTMLElement): MarkedUserIdentity {
+  const key = target.dataset.ytcqMarkedUserKey || '';
+  const channelId =
+    target.dataset.ytcqMarkedUserChannelId ||
+    (key.startsWith('channel:') ? key.slice('channel:'.length) : '');
+  return {
+    authorName: target.dataset.ytcqMarkedUserName || '',
+    channelId
+  };
+}
+
 function getMarkedUserActionTitle(
   identity: MarkedUserIdentity,
   label = isMarkedUser(identity) ? t('removeBookmark') : t('bookmarkUser')
@@ -328,8 +383,7 @@ function getMarkedUserActionTitle(
 }
 
 function getMarkedUserRecord(identity: MarkedUserIdentity): MarkedUserRecord | null {
-  const key = getMarkedUserKey(identity);
-  return key ? markedUsers.get(key) || null : null;
+  return findMarkedUser(identity)?.[1] || null;
 }
 
 function formatMarkedAt(timestamp: number): string {
@@ -351,6 +405,7 @@ function clearMarkedUserRing(target: HTMLElement): void {
   );
   target.style.removeProperty('--ytcq-marked-user-color');
   delete target.dataset.ytcqMarkedUserRingTargetId;
+  delete target.dataset.ytcqMarkedUserChannelId;
   delete target.dataset.ytcqMarkedUserKey;
   delete target.dataset.ytcqMarkedUserName;
 }

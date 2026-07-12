@@ -48,6 +48,94 @@ describe('marked users', () => {
     });
   });
 
+  it('treats native handle and Lite channel identities as the same bookmark', async () => {
+    const markedUsers = await import('./index');
+    markedUsers.initMarkedUsers();
+    await Promise.resolve();
+
+    const nativeAvatar = document.createElement('span');
+    const liteAvatar = document.createElement('span');
+    document.body.append(nativeAvatar, liteAvatar);
+    markedUsers.applyMarkedUserRing(nativeAvatar, { authorName: '@ViewerOne' });
+    markedUsers.applyMarkedUserRing(liteAvatar, {
+      authorName: '@ViewerOne',
+      channelId: 'viewer-channel'
+    });
+
+    await markedUsers.toggleMarkedUser({ authorName: '@ViewerOne' });
+
+    expect(markedUsers.isMarkedUser({
+      authorName: '@ViewerOne',
+      channelId: 'viewer-channel'
+    })).toBe(true);
+    expect(nativeAvatar.classList.contains('ytcq-marked-user-avatar')).toBe(true);
+    expect(liteAvatar.classList.contains('ytcq-marked-user-avatar')).toBe(true);
+    await expect(chrome.storage.local.get(markedUsers.MARKED_USERS_STORAGE_KEY)).resolves.toMatchObject({
+      [markedUsers.MARKED_USERS_STORAGE_KEY]: {
+        'author:@viewerone': { authorName: '@ViewerOne' }
+      }
+    });
+
+    await markedUsers.toggleMarkedUser({
+      authorName: '@ViewerOne',
+      channelId: 'viewer-channel'
+    });
+    expect(nativeAvatar.classList.contains('ytcq-marked-user-avatar')).toBe(false);
+    expect(liteAvatar.classList.contains('ytcq-marked-user-avatar')).toBe(false);
+
+    await markedUsers.toggleMarkedUser({
+      authorName: '@ViewerOne',
+      channelId: 'viewer-channel'
+    });
+
+    expect(markedUsers.isMarkedUser({ authorName: '@ViewerOne' })).toBe(true);
+    expect(nativeAvatar.classList.contains('ytcq-marked-user-avatar')).toBe(true);
+    expect(liteAvatar.classList.contains('ytcq-marked-user-avatar')).toBe(true);
+    await expect(chrome.storage.local.get(markedUsers.MARKED_USERS_STORAGE_KEY)).resolves.toMatchObject({
+      [markedUsers.MARKED_USERS_STORAGE_KEY]: {
+        'channel:viewer-channel': {
+          authorName: '@ViewerOne',
+          channelId: 'viewer-channel'
+        }
+      }
+    });
+
+    await markedUsers.toggleMarkedUser({ authorName: '@ViewerOne' });
+    expect(markedUsers.isMarkedUser({ authorName: '@ViewerOne' })).toBe(false);
+    expect(markedUsers.isMarkedUser({
+      authorName: '@ViewerOne',
+      channelId: 'viewer-channel'
+    })).toBe(false);
+  });
+
+  it('removes duplicate handle and channel bookmarks together', async () => {
+    await chrome.storage.local.set({
+      ytcqMarkedUsers: {
+        'author:@viewerone': {
+          authorName: '@ViewerOne',
+          markedAt: 1
+        },
+        'channel:viewer-channel': {
+          authorName: '@ViewerOne',
+          channelId: 'viewer-channel',
+          markedAt: 2
+        }
+      }
+    });
+    const markedUsers = await import('./index');
+    markedUsers.initMarkedUsers();
+    await Promise.resolve();
+
+    await markedUsers.toggleMarkedUser({
+      authorName: '@ViewerOne',
+      channelId: 'viewer-channel'
+    });
+
+    await expect(chrome.storage.local.get(markedUsers.MARKED_USERS_STORAGE_KEY)).resolves.toEqual({
+      [markedUsers.MARKED_USERS_STORAGE_KEY]: {}
+    });
+  });
+
   it('stores bookmark time and stream context for marked-user tooltips', async () => {
     vi.spyOn(Date, 'now').mockReturnValue(1_700_000_000_000);
     window.history.replaceState({}, '', '/watch?v=stream-a');
@@ -350,6 +438,76 @@ describe('marked users', () => {
     messageWithoutAvatar.innerHTML = '<span id="author-name">@ViewerTwo</span>';
     lifecycle.handleFeatureMessage(messageWithoutAvatar, { source: 'existing' });
     expect(messageWithoutAvatar.querySelector('[data-ytcq-marked-user-key]')).toBeNull();
+  });
+
+  it('upgrades native message rings with stable channel metadata', async () => {
+    const markedUsers = await import('./index');
+    const lifecycle = await import('../../content/lifecycle');
+    markedUsers.initMarkedUsers();
+    await Promise.resolve();
+    await markedUsers.toggleMarkedUser({
+      authorName: '@ViewerOne',
+      channelId: 'viewer-channel'
+    });
+
+    const message = document.createElement('yt-live-chat-text-message-renderer');
+    message.id = 'native-message';
+    message.innerHTML = `
+      <span id="author-photo"></span>
+      <span id="author-name">@ViewerOne</span>
+    `;
+    document.body.append(message);
+    lifecycle.handleFeatureMessage(message, {
+      messageData: Promise.resolve({
+        authorExternalChannelId: 'viewer-channel',
+        authorName: '@ViewerOne',
+        messageId: 'native-message'
+      }),
+      source: 'existing'
+    });
+    await Promise.resolve();
+
+    const avatar = message.querySelector<HTMLElement>('#author-photo')!;
+    expect(avatar.dataset.ytcqMarkedUserKey).toBe('channel:viewer-channel');
+    expect(avatar.classList.contains('ytcq-marked-user-avatar')).toBe(true);
+  });
+
+  it('does not reapply delayed message metadata after cleanup', async () => {
+    const markedUsers = await import('./index');
+    const lifecycle = await import('../../content/lifecycle');
+    markedUsers.initMarkedUsers();
+    await Promise.resolve();
+    let resolveMessageData: (value: {
+      authorExternalChannelId: string;
+      authorName: string;
+      messageId: string;
+    }) => void = () => undefined;
+    const messageData = new Promise<{
+      authorExternalChannelId: string;
+      authorName: string;
+      messageId: string;
+    }>((resolve) => {
+      resolveMessageData = resolve;
+    });
+    const message = document.createElement('yt-live-chat-text-message-renderer');
+    message.id = 'native-message';
+    message.innerHTML = `
+      <span id="author-photo"></span>
+      <span id="author-name">@ViewerOne</span>
+    `;
+    document.body.append(message);
+    lifecycle.handleFeatureMessage(message, { messageData, source: 'existing' });
+
+    markedUsers.cleanupStaleMarkedUsers();
+    resolveMessageData({
+      authorExternalChannelId: 'viewer-channel',
+      authorName: '@ViewerOne',
+      messageId: 'native-message'
+    });
+    await Promise.resolve();
+
+    const avatar = message.querySelector<HTMLElement>('#author-photo')!;
+    expect(avatar.hasAttribute('data-ytcq-marked-user-key')).toBe(false);
   });
 
   it('animates marked-user rings when an existing avatar is marked or unmarked', async () => {
