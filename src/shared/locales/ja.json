@@ -29,6 +29,7 @@
     "enableLiteMode": "軽量モードをオンにする",
     "disableLiteMode": "軽量モードをオフにする",
     "liteModeLoadingChat": "チャットを読み込んでいます",
+    "liteModeWaitingForChat": "チャットを待っています",
     "liteModeNewMessages": {
       "one": "新着メッセージ {count} 件",
       "other": "新着メッセージ {count} 件"

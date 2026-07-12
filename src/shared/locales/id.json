@@ -29,6 +29,7 @@
     "enableLiteMode": "Aktifkan mode ringan",
     "disableLiteMode": "Nonaktifkan mode ringan",
     "liteModeLoadingChat": "Memuat chat",
+    "liteModeWaitingForChat": "Menunggu chat",
     "liteModeNewMessages": {
       "one": "{count} pesan baru",
       "other": "{count} pesan baru"

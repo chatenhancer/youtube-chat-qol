@@ -29,6 +29,7 @@
     "enableLiteMode": "Lite-Modus einschalten",
     "disableLiteMode": "Lite-Modus ausschalten",
     "liteModeLoadingChat": "Chat wird geladen",
+    "liteModeWaitingForChat": "Warten auf den Chat",
     "liteModeNewMessages": {
       "one": "{count} neue Nachricht",
       "other": "{count} neue Nachrichten"

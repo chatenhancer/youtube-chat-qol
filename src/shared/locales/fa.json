@@ -29,6 +29,7 @@
     "enableLiteMode": "روشن کردن حالت سبک",
     "disableLiteMode": "خاموش کردن حالت سبک",
     "liteModeLoadingChat": "در حال بارگیری گفت‌وگو",
+    "liteModeWaitingForChat": "در انتظار گفت‌وگو",
     "liteModeNewMessages": {
       "one": "{count} پیام جدید",
       "other": "{count} پیام جدید"

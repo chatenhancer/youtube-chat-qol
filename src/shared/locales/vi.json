@@ -29,6 +29,7 @@
     "enableLiteMode": "Bật chế độ nhẹ",
     "disableLiteMode": "Tắt chế độ nhẹ",
     "liteModeLoadingChat": "Đang tải cuộc trò chuyện",
+    "liteModeWaitingForChat": "Đang chờ cuộc trò chuyện",
     "liteModeNewMessages": {
       "one": "{count} tin nhắn mới",
       "other": "{count} tin nhắn mới"

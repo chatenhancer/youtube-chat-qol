@@ -29,6 +29,7 @@
     "enableLiteMode": "开启轻量模式",
     "disableLiteMode": "关闭轻量模式",
     "liteModeLoadingChat": "正在加载聊天",
+    "liteModeWaitingForChat": "正在等待聊天",
     "liteModeNewMessages": {
       "one": "{count} 条新消息",
       "other": "{count} 条新消息"

@@ -29,6 +29,7 @@
     "enableLiteMode": "הפעלת מצב קל",
     "disableLiteMode": "כיבוי מצב קל",
     "liteModeLoadingChat": "הצ'אט נטען",
+    "liteModeWaitingForChat": "בהמתנה לצ'אט",
     "liteModeNewMessages": {
       "one": "{count} הודעה חדשה",
       "other": "{count} הודעות חדשות"

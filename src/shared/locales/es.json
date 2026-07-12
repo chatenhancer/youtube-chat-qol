@@ -29,6 +29,7 @@
     "enableLiteMode": "Activar el modo ligero",
     "disableLiteMode": "Desactivar el modo ligero",
     "liteModeLoadingChat": "Cargando chat",
+    "liteModeWaitingForChat": "Esperando el chat",
     "liteModeNewMessages": {
       "one": "{count} mensaje nuevo",
       "other": "{count} mensajes nuevos"

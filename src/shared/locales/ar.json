@@ -29,6 +29,7 @@
     "enableLiteMode": "تشغيل الوضع الخفيف",
     "disableLiteMode": "إيقاف الوضع الخفيف",
     "liteModeLoadingChat": "جارٍ تحميل الدردشة",
+    "liteModeWaitingForChat": "في انتظار الدردشة",
     "liteModeNewMessages": {
       "one": "{count} رسالة جديدة",
       "other": "{count} رسائل جديدة"

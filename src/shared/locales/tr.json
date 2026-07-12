@@ -29,6 +29,7 @@
     "enableLiteMode": "Lite modu aç",
     "disableLiteMode": "Lite modu kapat",
     "liteModeLoadingChat": "Sohbet yükleniyor",
+    "liteModeWaitingForChat": "Sohbet bekleniyor",
     "liteModeNewMessages": {
       "one": "{count} yeni mesaj",
       "other": "{count} yeni mesaj"

@@ -29,6 +29,7 @@
     "enableLiteMode": "Включить облегчённый режим",
     "disableLiteMode": "Выключить облегчённый режим",
     "liteModeLoadingChat": "Загрузка чата",
+    "liteModeWaitingForChat": "Ожидание чата",
     "liteModeNewMessages": {
       "one": "{count} новое сообщение",
       "other": "{count} новых сообщений"

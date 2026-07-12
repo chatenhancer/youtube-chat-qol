@@ -29,6 +29,7 @@
     "enableLiteMode": "Włącz tryb lekki",
     "disableLiteMode": "Wyłącz tryb lekki",
     "liteModeLoadingChat": "Wczytywanie czatu",
+    "liteModeWaitingForChat": "Oczekiwanie na czat",
     "liteModeNewMessages": {
       "one": "{count} nowa wiadomość",
       "other": "{count} nowych wiadomości"

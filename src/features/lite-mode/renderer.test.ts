@@ -391,7 +391,7 @@ describe('Lite chat renderer', () => {
     expect(renderer.root.dataset.ytcqConnectionState).toBe('connecting');
     expect(renderer.root.getAttribute('aria-busy')).toBe('true');
     expect(spinner.hidden).toBe(false);
-    expect(emptyState.textContent).toContain('Loading chat');
+    expect(emptyState.textContent).toContain('Waiting for chat');
     expect(emptyState.textContent).not.toContain('…');
     expect(renderer.root.dataset.ytcqShowTimestamps).toBe('false');
 

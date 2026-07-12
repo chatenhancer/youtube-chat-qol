@@ -29,6 +29,7 @@
     "enableLiteMode": "เปิดโหมดเบา",
     "disableLiteMode": "ปิดโหมดเบา",
     "liteModeLoadingChat": "กำลังโหลดแชท",
+    "liteModeWaitingForChat": "กำลังรอแชท",
     "liteModeNewMessages": {
       "one": "{count} ข้อความใหม่",
       "other": "{count} ข้อความใหม่"

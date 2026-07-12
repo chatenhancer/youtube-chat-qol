@@ -71,7 +71,7 @@ export function createLiteChatRenderer(
 
   const loadingSpinner = createLoadingSpinner('ytcq-lite-loading-spinner');
   const emptyStateLabel = el<HTMLSpanElement>(
-    <span class="ytcq-lite-empty-state-label">{t('liteModeLoadingChat')}</span>
+    <span class="ytcq-lite-empty-state-label">{t('liteModeWaitingForChat')}</span>
   );
   const emptyState = el<HTMLDivElement>(
     <div class="ytcq-lite-empty-state" role="status">
@@ -386,7 +386,7 @@ export function createLiteChatRenderer(
     root.dataset.ytcqConnectionState = state;
     root.setAttribute('aria-busy', String(connecting));
     loadingSpinner.hidden = !connecting;
-    emptyStateLabel.textContent = connecting ? t('liteModeLoadingChat') : t('noMessagesYet');
+    emptyStateLabel.textContent = connecting ? t('liteModeWaitingForChat') : t('noMessagesYet');
   }
 
   function setTimestampsVisible(visible: boolean): void {

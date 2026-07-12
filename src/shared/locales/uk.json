@@ -29,6 +29,7 @@
     "enableLiteMode": "Увімкнути полегшений режим",
     "disableLiteMode": "Вимкнути полегшений режим",
     "liteModeLoadingChat": "Завантаження чату",
+    "liteModeWaitingForChat": "Очікування чату",
     "liteModeNewMessages": {
       "one": "{count} нове повідомлення",
       "other": "{count} нових повідомлень"

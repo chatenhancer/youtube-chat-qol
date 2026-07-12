@@ -29,6 +29,7 @@
     "enableLiteMode": "लाइट मोड चालू करें",
     "disableLiteMode": "लाइट मोड बंद करें",
     "liteModeLoadingChat": "चैट लोड हो रही है",
+    "liteModeWaitingForChat": "चैट की प्रतीक्षा हो रही है",
     "liteModeNewMessages": {
       "one": "{count} नया मैसेज",
       "other": "{count} नए मैसेज"

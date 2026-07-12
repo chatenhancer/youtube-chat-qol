@@ -29,6 +29,7 @@
     "enableLiteMode": "라이트 모드 켜기",
     "disableLiteMode": "라이트 모드 끄기",
     "liteModeLoadingChat": "채팅을 불러오는 중",
+    "liteModeWaitingForChat": "채팅을 기다리는 중",
     "liteModeNewMessages": {
       "one": "새 메시지 {count}개",
       "other": "새 메시지 {count}개"
