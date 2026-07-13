@@ -716,11 +716,10 @@ const marqueeGameLogos = Array.from({ length: 3 }, () => gameLogoPattern).flat()
     min-height: 58px;
     margin-top: 10px;
     padding: 14px 25px;
-    overflow: hidden;
     color: var(--logo-red-end);
     background: #fff;
     border: 2px solid var(--logo-red-end);
-    border-radius: 22px;
+    border-radius: 15px;
     corner-shape: superellipse(2.4);
     font-size: 16px;
     transition:
@@ -728,12 +727,20 @@ const marqueeGameLogos = Array.from({ length: 3 }, () => gameLogoPattern).flat()
       transform 260ms ease;
   }
 
+  @supports ((corner-shape: squircle) or (corner-shape: superellipse(2))) {
+    .pg-ready-button {
+      border-radius: 24px;
+    }
+  }
+
   .pg-ready-button::before {
     content: "";
     position: absolute;
     z-index: -1;
-    inset: -2px;
+    inset: -1px;
     background: var(--logo-red-end);
+    border-radius: inherit;
+    corner-shape: inherit;
     clip-path: circle(0% at 50% 120%);
     transition: clip-path 540ms cubic-bezier(0.22, 1, 0.36, 1);
   }
