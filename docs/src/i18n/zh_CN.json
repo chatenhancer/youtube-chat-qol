@@ -174,6 +174,7 @@
     "firefoxAddons": "Firefox Add-ons",
     "safariAppStore": "Mac App Store",
     "installForBrowser": "为 {browser} 安装",
+    "yourBrowser": "你的浏览器",
     "otherStores": "其他商店",
     "sourceCode": "源代码",
     "supportFeedback": "支持 / 反馈",

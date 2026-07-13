@@ -4103,6 +4103,18 @@ figcaption {
   transform-origin: center;
 }
 
+.install-primary-browser-icon[hidden] {
+  display: none;
+}
+
+.install-primary-generic-icon {
+  display: inline-flex;
+}
+
+.install-primary-generic-icon[hidden] {
+  display: none;
+}
+
 .install-other-stores-toggle {
   min-height: 38px;
   font-size: 13.5px;

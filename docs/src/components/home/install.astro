@@ -55,8 +55,15 @@ const defaultInstallLabel = m.install.installForBrowser.replace('{browser}', bro
         <a class="button button-primary install-primary-button" href={site.chromeUrl} data-browser-primary-store-link>
           <span class="button-icon" aria-hidden="true">
             <img class="install-primary-browser-icon" src={`${rootPrefix}assets/browser-icons/chrome-white.svg`} alt="" data-browser-primary-store-icon>
+            <span class="install-primary-generic-icon" data-browser-primary-generic-icon hidden>
+              <Icon name="install_desktop" />
+            </span>
           </span>
-          <span data-browser-primary-store-label data-install-label-template={m.install.installForBrowser}>{defaultInstallLabel}</span>
+          <span
+            data-browser-primary-store-label
+            data-install-label-template={m.install.installForBrowser}
+            data-install-generic-browser={m.install.yourBrowser}
+          >{defaultInstallLabel}</span>
         </a>
         <button
           class="button button-secondary install-other-stores-toggle"

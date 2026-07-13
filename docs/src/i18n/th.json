@@ -174,6 +174,7 @@
     "firefoxAddons": "Firefox Add-ons",
     "safariAppStore": "Mac App Store",
     "installForBrowser": "ติดตั้งสำหรับ {browser}",
+    "yourBrowser": "เบราว์เซอร์ของคุณ",
     "otherStores": "สโตร์อื่น",
     "sourceCode": "ซอร์สโค้ด",
     "supportFeedback": "ความช่วยเหลือ / ความคิดเห็น",

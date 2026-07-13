@@ -4,6 +4,7 @@
   const storePicker = document.querySelector("[data-browser-store-picker]");
   const primaryStoreLink = document.querySelector("[data-browser-primary-store-link]");
   const primaryStoreIcon = document.querySelector("[data-browser-primary-store-icon]");
+  const primaryGenericIcon = document.querySelector("[data-browser-primary-generic-icon]");
   const primaryStoreLabel = document.querySelector("[data-browser-primary-store-label]");
   const storeToggle = document.querySelector("[data-browser-store-toggle]");
   const storeOptions = document.querySelector("[data-browser-store-options]");
@@ -303,6 +304,7 @@
     !storePicker ||
     !primaryStoreLink ||
     !primaryStoreIcon ||
+    !primaryGenericIcon ||
     !primaryStoreLabel ||
     !storeToggle ||
     !storeOptions ||
@@ -319,6 +321,24 @@
     && !userAgent.includes("crios/")
     && !userAgent.includes("edg/");
   const primaryStoreKey = isSafari ? "safari" : isFirefox ? "firefox" : "chrome";
+  const browserBrands = Array.from(navigator.userAgentData?.brands || [])
+    .map(({ brand }) => brand.toLowerCase());
+  const isKnownAlternativeChromium = "brave" in navigator || [
+    "edg/",
+    "opr/",
+    "opera/",
+    "vivaldi/",
+    "samsungbrowser/"
+  ].some((token) => userAgent.includes(token));
+  const isChromium = browserBrands.includes("chromium") || [
+    "chrome/",
+    "chromium/",
+    "crios/"
+  ].some((token) => userAgent.includes(token));
+  const isGoogleChrome = browserBrands.length
+    ? browserBrands.includes("google chrome") && !isKnownAlternativeChromium
+    : userAgent.includes("chrome/") && !isKnownAlternativeChromium;
+  const useGenericChromiumInstall = primaryStoreKey === "chrome" && isChromium && !isGoogleChrome;
   const storeLinks = {
     chrome: chromeStoreLink,
     firefox: firefoxStoreLink,
@@ -336,8 +356,12 @@
   if (primaryStoreHref) primaryStoreLink.setAttribute("href", primaryStoreHref);
   const primaryStoreIconSrc = storeLinks[primaryStoreKey]?.dataset.browserStorePrimaryIcon;
   if (primaryStoreIconSrc) primaryStoreIcon.setAttribute("src", primaryStoreIconSrc);
+  primaryStoreIcon.hidden = useGenericChromiumInstall;
+  primaryGenericIcon.hidden = !useGenericChromiumInstall;
   primaryStoreIcon.classList.toggle("install-primary-browser-icon-safari", primaryStoreKey === "safari");
-  const primaryStoreBrowser = storeLinks[primaryStoreKey]?.dataset.browserStoreLabel;
+  const primaryStoreBrowser = useGenericChromiumInstall
+    ? primaryStoreLabel.dataset.installGenericBrowser
+    : storeLinks[primaryStoreKey]?.dataset.browserStoreLabel;
   const installLabelTemplate = primaryStoreLabel.dataset.installLabelTemplate;
   if (primaryStoreBrowser && installLabelTemplate) {
     primaryStoreLabel.textContent = installLabelTemplate.replace("{browser}", primaryStoreBrowser);
