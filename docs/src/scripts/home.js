@@ -90,6 +90,7 @@
     const interval = Number.isFinite(configuredInterval) && configuredInterval >= 3000 ? configuredInterval : 6000;
     let activeIndex = Math.max(0, slides.findIndex((slide) => slide.classList.contains("is-active")));
     let timer = 0;
+    let slideAnimationTimer = 0;
     let isPaused = false;
 
     setActiveSlide(activeIndex);
@@ -113,7 +114,10 @@
     });
     reducedMotion.addEventListener("change", scheduleNextSlide);
 
-    function setActiveSlide(nextIndex) {
+    function setActiveSlide(nextIndex, direction = 0) {
+      const previousIndex = activeIndex;
+      const shouldAnimate = direction !== 0 && previousIndex !== nextIndex && !reducedMotion.matches;
+      clearSlideAnimation();
       activeIndex = nextIndex;
       slides.forEach((slide, index) => {
         const isActive = index === activeIndex;
@@ -121,6 +125,16 @@
         slide.setAttribute("aria-hidden", String(!isActive));
         slide.tabIndex = isActive ? 0 : -1;
       });
+
+      if (!shouldAnimate) return;
+
+      const previousSlide = slides[previousIndex];
+      const nextSlide = slides[activeIndex];
+      heroBlogTicker.classList.toggle("is-moving-next", direction > 0);
+      heroBlogTicker.classList.toggle("is-moving-previous", direction < 0);
+      previousSlide?.classList.add("is-leaving");
+      nextSlide?.classList.add("is-entering");
+      slideAnimationTimer = window.setTimeout(clearSlideAnimation, 520);
     }
 
     function scheduleNextSlide() {
@@ -128,14 +142,21 @@
       if (isPaused || document.hidden || reducedMotion.matches) return;
 
       timer = window.setTimeout(() => {
-        setActiveSlide((activeIndex + 1) % slides.length);
+        setActiveSlide((activeIndex + 1) % slides.length, 1);
         scheduleNextSlide();
       }, interval);
     }
 
     function showAdjacentSlide(direction) {
-      setActiveSlide((activeIndex + direction + slides.length) % slides.length);
+      setActiveSlide((activeIndex + direction + slides.length) % slides.length, direction);
       scheduleNextSlide();
+    }
+
+    function clearSlideAnimation() {
+      if (slideAnimationTimer) window.clearTimeout(slideAnimationTimer);
+      slideAnimationTimer = 0;
+      heroBlogTicker.classList.remove("is-moving-next", "is-moving-previous");
+      slides.forEach((slide) => slide.classList.remove("is-entering", "is-leaving"));
     }
 
     function pauseTicker() {
@@ -513,6 +534,12 @@
     const blogLink = navLinks.find((link) => link.dataset.navPage === "blog");
     if (/\/blog(?:\/|$)/.test(window.location.pathname)) {
       setActiveLink(blogLink, "page");
+      return;
+    }
+
+    const playgroundLink = navLinks.find((link) => link.dataset.navPage === "playground");
+    if (/\/playground(?:\/|$)/.test(window.location.pathname)) {
+      setActiveLink(playgroundLink, "page");
       return;
     }
 

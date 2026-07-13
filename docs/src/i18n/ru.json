@@ -86,6 +86,47 @@
     "imageAlt": "Плавающая шахматная панель в живом чате YouTube",
     "note": "* Чтобы играть вместе, расширение должно быть у обоих игроков"
   },
+  "playgroundPage": {
+    "metaTitle": "Playground — Мини-игры для чата YouTube",
+    "metaDescription": "Познакомьтесь с Playground — необязательной коллекцией мини-игр рядом с чатом трансляции YouTube.",
+    "metaImageAlt": "Игры Playground в Chat Enhancer для чата YouTube",
+    "taglineLead": "Мини-игры",
+    "taglineTail": "для перерывов в чате",
+    "introFirst": "Playground — это необязательное игровое пространство, которое делает трансляции интерактивнее.",
+    "introSecond": "Выберите игру, пригласите кого-нибудь, начните играть и не теряйте чат из виду.",
+    "exploreCta": "Посмотреть игры",
+    "gamesHeadingFirst": "Четыре игры,",
+    "gamesHeadingSecond": "четыре разных настроения",
+    "seeHow": "Посмотреть, как играть",
+    "computerTitle": "Играйте против Computer",
+    "computerBody": "В каждой игре Playground есть соперник Computer, поэтому матч можно начать, не дожидаясь другого зрителя. Выберите игру и Computer и оставайтесь рядом с трансляцией.",
+    "readyTitle": "Готовы играть?",
+    "settingsAlt": "Настройки Playground во всплывающем окне расширения Chat Enhancer",
+    "logoAlt": "Chat Enhancer Playground",
+    "primaryCta": "Попробовать в расширении",
+    "games": {
+      "chess": {
+        "title": "Старые добрые шахматы",
+        "body": "Держите знакомую шахматную доску рядом с чатом. Пригласите другого зрителя или выберите соперника Computer уровня Beginner, Club или Master, не покидая трансляцию.",
+        "alt": "Шахматная доска в плавающей панели Playground рядом с чатом YouTube"
+      },
+      "trivia": {
+        "title": "HELP-A-FRIEND! Trivia",
+        "body": "Моменты из повтора YouTube превращаются в быструю викторину в стиле чата. Помните, что происходило во время трансляции? Пригласите друга и проверьте.",
+        "alt": "HELP-A-FRIEND! Trivia предлагает зрителям выбрать ответ"
+      },
+      "wild": {
+        "title": "The Wild Wild Chat",
+        "body": "Чат превращается в быструю охоту за наградами, где игроки соревнуются за подходящие сообщения. Кто заберёт всю добычу?",
+        "alt": "Доска наград The Wild Wild Chat в панели Playground"
+      },
+      "stickAround": {
+        "title": "Stick Around!",
+        "body": "Stick Around! превращает чат трансляции в маленькую боевую арену с падающими пузырями. Вытолкните соперника за пределы ринга раньше него.",
+        "alt": "Stick Around! превращает чат YouTube в боевую арену"
+      }
+    }
+  },
   "screenshots": {
     "eyebrow": "Скриншоты",
     "title": "Естественные<br>улучшения <span class=\"title-emphasis\">чата</span>",

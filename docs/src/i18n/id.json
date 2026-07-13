@@ -86,6 +86,47 @@
     "imageAlt": "Panel game catur mengambang di dalam live chat YouTube",
     "note": "* Kedua pemain perlu memiliki ekstensi untuk bermain bersama"
   },
+  "playgroundPage": {
+    "metaTitle": "Playground - Game kecil untuk live chat YouTube",
+    "metaDescription": "Jelajahi Playground, koleksi game kecil opsional yang tetap dekat dengan live chat YouTube.",
+    "metaImageAlt": "Game Playground di Chat Enhancer untuk live chat YouTube",
+    "taglineLead": "Game kecil",
+    "taglineTail": "untuk jeda live chat",
+    "introFirst": "Playground adalah ruang game opsional yang membuat streaming lebih interaktif.",
+    "introSecond": "Pilih game, undang seseorang, mulai bermain, dan tetap dekat dengan chat.",
+    "exploreCta": "Jelajahi game",
+    "gamesHeadingFirst": "Empat game,",
+    "gamesHeadingSecond": "empat suasana berbeda",
+    "seeHow": "Lihat cara bermain",
+    "computerTitle": "Bermain melawan Computer",
+    "computerBody": "Setiap game Playground memiliki lawan Computer, jadi kamu dapat memulai pertandingan tanpa menunggu penonton lain. Pilih game, pilih Computer, dan tetap dekat dengan streaming.",
+    "readyTitle": "Siap bermain?",
+    "settingsAlt": "Pengaturan Playground di popup ekstensi Chat Enhancer",
+    "logoAlt": "Chat Enhancer Playground",
+    "primaryCta": "Coba di ekstensi",
+    "games": {
+      "chess": {
+        "title": "Catur klasik",
+        "body": "Pertahankan papan catur yang familier di samping chat. Undang penonton lain atau pilih lawan Computer Beginner, Club, atau Master tanpa meninggalkan streaming.",
+        "alt": "Papan catur dalam panel Playground mengambang di samping live chat YouTube"
+      },
+      "trivia": {
+        "title": "HELP-A-FRIEND! Trivia",
+        "body": "Momen tayangan ulang YouTube berubah menjadi kuis singkat bergaya chat. Ingat apa yang terjadi selama streaming? Undang teman dan cari tahu.",
+        "alt": "HELP-A-FRIEND! Trivia meminta penonton memilih jawaban"
+      },
+      "wild": {
+        "title": "The Wild Wild Chat",
+        "body": "Chat berubah menjadi perburuan hadiah cepat saat pemain berlomba mengklaim pesan yang cocok. Siapa yang membawa pulang semua jarahan?",
+        "alt": "Papan hadiah The Wild Wild Chat di dalam panel Playground"
+      },
+      "stickAround": {
+        "title": "Stick Around!",
+        "body": "Stick Around! mengubah live chat menjadi arena tarung kecil dengan gelembung chat berjatuhan. Dorong lawan keluar ring sebelum mereka melakukannya.",
+        "alt": "Stick Around! mengubah live chat YouTube menjadi arena tarung"
+      }
+    }
+  },
   "screenshots": {
     "eyebrow": "Tangkapan layar",
     "title": "Peningkatan<br><span class=\"title-emphasis\">chat</span> yang terasa menyatu",

@@ -86,6 +86,47 @@
     "imageAlt": "แผงเกมหมากรุกแบบลอยอยู่ในแชทสด YouTube",
     "note": "* ผู้เล่นทั้งสองคนต้องมีส่วนขยายจึงจะเล่นด้วยกันได้"
   },
+  "playgroundPage": {
+    "metaTitle": "Playground - เกมเล็ก ๆ สำหรับแชทสด YouTube",
+    "metaDescription": "สำรวจ Playground คอลเลกชันเกมเล็ก ๆ แบบเลือกใช้ที่อยู่ใกล้แชทสด YouTube",
+    "metaImageAlt": "เกม Playground ใน Chat Enhancer สำหรับแชทสด YouTube",
+    "taglineLead": "เกมเล็ก ๆ",
+    "taglineTail": "สำหรับช่วงพักจากแชทสด",
+    "introFirst": "Playground คือพื้นที่เกมแบบเลือกใช้ที่ทำให้สตรีมโต้ตอบกันได้มากขึ้น",
+    "introSecond": "เลือกเกม ชวนใครสักคน เริ่มเล่น และให้แชทอยู่ใกล้มือ",
+    "exploreCta": "สำรวจเกม",
+    "gamesHeadingFirst": "สี่เกม",
+    "gamesHeadingSecond": "สี่อารมณ์ที่แตกต่าง",
+    "seeHow": "ดูวิธีเล่น",
+    "computerTitle": "เล่นกับ Computer",
+    "computerBody": "ทุกเกมใน Playground มีคู่แข่ง Computer คุณจึงเริ่มแมตช์ได้โดยไม่ต้องรอผู้ชมคนอื่น เลือกเกม เลือก Computer และอยู่ใกล้สตรีมไว้",
+    "readyTitle": "พร้อมเล่นหรือยัง?",
+    "settingsAlt": "การตั้งค่า Playground ในป๊อปอัปส่วนขยาย Chat Enhancer",
+    "logoAlt": "Chat Enhancer Playground",
+    "primaryCta": "ลองใช้ในส่วนขยาย",
+    "games": {
+      "chess": {
+        "title": "หมากรุกแบบคุ้นเคย",
+        "body": "วางกระดานหมากรุกที่คุ้นเคยไว้ข้างแชท ชวนผู้ชมคนอื่นหรือเลือกคู่แข่ง Computer ระดับ Beginner, Club หรือ Master โดยไม่ต้องออกจากสตรีม",
+        "alt": "กระดานหมากรุกในแผง Playground แบบลอยข้างแชทสด YouTube"
+      },
+      "trivia": {
+        "title": "HELP-A-FRIEND! Trivia",
+        "body": "ช่วงเวลาจากวิดีโอย้อนหลัง YouTube กลายเป็นควิซสั้น ๆ แบบแชท คุณจำได้ไหมว่าเกิดอะไรขึ้นระหว่างสตรีม? ชวนเพื่อนแล้วมาหาคำตอบกัน",
+        "alt": "HELP-A-FRIEND! Trivia ขอให้ผู้ชมเลือกคำตอบ"
+      },
+      "wild": {
+        "title": "The Wild Wild Chat",
+        "body": "แชทกลายเป็นการล่ารางวัลสุดรวดเร็วที่ผู้เล่นแข่งกันยึดข้อความที่ตรงเงื่อนไข ใครจะได้ของรางวัลทั้งหมดไป?",
+        "alt": "กระดานรางวัล The Wild Wild Chat ในแผง Playground"
+      },
+      "stickAround": {
+        "title": "Stick Around!",
+        "body": "Stick Around! เปลี่ยนแชทสดเป็นสนามต่อสู้ขนาดเล็กที่มีฟองแชทตกลงมา ผลักคู่แข่งออกจากสนามก่อนที่อีกฝ่ายจะทำได้",
+        "alt": "Stick Around! เปลี่ยนแชทสด YouTube เป็นสนามต่อสู้"
+      }
+    }
+  },
   "screenshots": {
     "eyebrow": "ภาพหน้าจอ",
     "title": "การปรับปรุง<br><span class=\"title-emphasis\">แชท</span>ที่ดูเป็นธรรมชาติ",

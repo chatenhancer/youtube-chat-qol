@@ -78,6 +78,7 @@
 .title-emphasis,
 .site-nav::before,
 .hero-walkthrough-button,
+.hero-blog-ticker-track,
 .hero-blog-ticker-slide,
 .hero-blog-ticker-controls,
 .hero-blog-ticker-control,
@@ -656,6 +657,18 @@ h3 {
 .hero-blog-ticker-track {
   display: grid;
   min-height: 104px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid var(--line);
+  border-radius: var(--large-surface-corner-radius);
+  box-shadow: 0 14px 42px rgba(35, 74, 120, 0.08);
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.hero-blog-ticker-track:hover,
+.hero-blog-ticker-track:focus-within {
+  border-color: #c7d8f1;
+  box-shadow: 0 16px 44px rgba(var(--blue-rgb), 0.12);
 }
 
 .hero-blog-ticker-slide {
@@ -667,31 +680,78 @@ h3 {
   min-height: 104px;
   overflow: hidden;
   color: inherit;
-  background: rgba(255, 255, 255, 0.94);
-  border: 1px solid var(--line);
-  border-radius: var(--large-surface-corner-radius);
-  box-shadow: 0 14px 42px rgba(35, 74, 120, 0.08);
+  background: transparent;
+  border-radius: inherit;
   opacity: 0;
   pointer-events: none;
-  transform: translateY(10px) scale(0.99);
-  transition:
-    opacity 420ms ease,
-    transform 520ms cubic-bezier(0.22, 1, 0.36, 1),
-    border-color 160ms ease,
-    box-shadow 160ms ease;
 }
 
 .hero-blog-ticker-slide.is-active {
   z-index: 1;
   opacity: 1;
   pointer-events: auto;
-  transform: translateY(0) scale(1);
 }
 
-.hero-blog-ticker-slide.is-active:hover,
-.hero-blog-ticker-slide.is-active:focus {
-  border-color: #c7d8f1;
-  box-shadow: 0 16px 44px rgba(var(--blue-rgb), 0.12);
+.hero-blog-ticker-slide:focus-visible {
+  outline: 2px solid rgba(var(--blue-rgb), 0.55);
+  outline-offset: -3px;
+}
+
+.hero-blog-ticker-slide.is-leaving {
+  z-index: 2;
+  opacity: 1;
+}
+
+.hero-blog-ticker.is-moving-next .hero-blog-ticker-slide.is-entering {
+  animation: hero-blog-content-enter-next 500ms cubic-bezier(0.65, 0, 0.35, 1) both;
+}
+
+.hero-blog-ticker.is-moving-next .hero-blog-ticker-slide.is-leaving {
+  animation: hero-blog-content-leave-next 500ms cubic-bezier(0.65, 0, 0.35, 1) both;
+}
+
+.hero-blog-ticker.is-moving-previous .hero-blog-ticker-slide.is-entering {
+  animation: hero-blog-content-enter-previous 500ms cubic-bezier(0.65, 0, 0.35, 1) both;
+}
+
+.hero-blog-ticker.is-moving-previous .hero-blog-ticker-slide.is-leaving {
+  animation: hero-blog-content-leave-previous 500ms cubic-bezier(0.65, 0, 0.35, 1) both;
+}
+
+html[dir="rtl"] .hero-blog-ticker.is-moving-next .hero-blog-ticker-slide.is-entering {
+  animation-name: hero-blog-content-enter-previous;
+}
+
+html[dir="rtl"] .hero-blog-ticker.is-moving-next .hero-blog-ticker-slide.is-leaving {
+  animation-name: hero-blog-content-leave-previous;
+}
+
+html[dir="rtl"] .hero-blog-ticker.is-moving-previous .hero-blog-ticker-slide.is-entering {
+  animation-name: hero-blog-content-enter-next;
+}
+
+html[dir="rtl"] .hero-blog-ticker.is-moving-previous .hero-blog-ticker-slide.is-leaving {
+  animation-name: hero-blog-content-leave-next;
+}
+
+@keyframes hero-blog-content-enter-next {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes hero-blog-content-leave-next {
+  from { transform: translateX(0); }
+  to { transform: translateX(-100%); }
+}
+
+@keyframes hero-blog-content-enter-previous {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes hero-blog-content-leave-previous {
+  from { transform: translateX(0); }
+  to { transform: translateX(100%); }
 }
 
 .hero-blog-ticker-media {
@@ -878,7 +938,7 @@ html[dir="rtl"] .hero-blog-ticker-next svg {
 
 @media (prefers-reduced-motion: reduce) {
   .hero-blog-ticker-slide {
-    transition: border-color 160ms ease, box-shadow 160ms ease;
+    animation: none !important;
   }
 }
 
@@ -4288,6 +4348,34 @@ figcaption {
 .site-footer a {
   color: var(--text);
   font-weight: 700;
+}
+
+@media (max-width: 1380px) {
+  .site-header {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 12px;
+    padding-right: 20px;
+    padding-left: 20px;
+  }
+
+  .brand span {
+    max-width: 0;
+    opacity: 0;
+  }
+
+  .site-nav {
+    gap: 10px;
+    font-size: 13px;
+  }
+
+  .site-nav a {
+    padding-right: 6px;
+    padding-left: 6px;
+  }
+
+  .site-header-actions {
+    gap: 10px;
+  }
 }
 
 @media (max-width: 1100px) {

@@ -86,6 +86,47 @@
     "imageAlt": "Floating chess game panel inside YouTube live chat",
     "note": "* Players both need the extension to play together"
   },
+  "playgroundPage": {
+    "metaTitle": "Playground - Tiny games for YouTube live chat",
+    "metaDescription": "Explore Playground, an opt-in collection of tiny games that stays close to YouTube live chat.",
+    "metaImageAlt": "Playground games inside Chat Enhancer for YouTube live chat",
+    "logoAlt": "Chat Enhancer Playground",
+    "taglineLead": "Tiny games",
+    "taglineTail": "for live chat breaks",
+    "introFirst": "Playground is an opt-in games space that makes streams more interactive.",
+    "introSecond": "Pick a game, invite someone, start playing, and keep chat nearby.",
+    "primaryCta": "Try it in the extension",
+    "exploreCta": "Explore the games",
+    "gamesHeadingFirst": "Four games,",
+    "gamesHeadingSecond": "four different moods",
+    "seeHow": "See how it plays",
+    "computerTitle": "Play against the Computer",
+    "computerBody": "Every Playground game includes a Computer opponent, so you can start a match without waiting for another viewer. Pick a game, choose Computer, and keep the stream close.",
+    "readyTitle": "Ready to play?",
+    "settingsAlt": "Playground settings in the Chat Enhancer extension popup",
+    "games": {
+      "chess": {
+        "title": "Good Ol' Chess",
+        "body": "Keep a familiar chessboard beside chat. Invite another viewer or choose a Beginner, Club, or Master Computer opponent without leaving the stream.",
+        "alt": "Chess board in a floating Playground panel beside YouTube live chat"
+      },
+      "trivia": {
+        "title": "HELP-A-FRIEND! Trivia",
+        "body": "YouTube replay moments turn into a quick chat-style quiz. Do you remember what happened during the stream? Invite a friend and find out.",
+        "alt": "HELP-A-FRIEND! Trivia asking viewers to pick an answer"
+      },
+      "wild": {
+        "title": "The Wild Wild Chat",
+        "body": "Chat becomes a fast bounty hunt where players race to claim matching messages. Who is taking home all the loot?",
+        "alt": "The Wild Wild Chat bounty board inside a Playground panel"
+      },
+      "stickAround": {
+        "title": "Stick Around!",
+        "body": "Stick Around! turns the live chat feed into a tiny fighting arena with falling chat bubbles. Push your opponent out of the ring before they do.",
+        "alt": "Stick Around! turning the YouTube live chat feed into a fighting arena"
+      }
+    }
+  },
   "screenshots": {
     "eyebrow": "Screenshots",
     "title": "Native-feeling<br><span class=\"title-emphasis\">chat</span> improvements",

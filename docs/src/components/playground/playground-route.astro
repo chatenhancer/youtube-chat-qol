@@ -1,0 +1,93 @@
+---
+import { getCollection } from 'astro:content';
+import Footer from '../home/footer.astro';
+import Header from '../home/header.astro';
+import PlaygroundPage from './playground-page.astro';
+import { getBlogPostPath, getLocalizedBlogPosts } from '../../data/blog';
+import { getLocaleUrl, getMessages, htmlLangFor, locales } from '../../data/locales';
+import type { Locale } from '../../data/locales';
+import { site } from '../../data/site';
+import BaseLayout from '../../layouts/base-layout.astro';
+
+const { locale, rootPrefix } = Astro.props as { locale: Locale; rootPrefix: string };
+const messages = getMessages(locale);
+const page = messages.playgroundPage;
+const posts = getLocalizedBlogPosts(await getCollection('blog'), locale);
+
+function getRequiredPostPath(translationKey: string): string {
+  const post = posts.find((candidate) => candidate.data.translationKey === translationKey);
+  if (!post) throw new Error(`Missing required Playground post: ${translationKey}`);
+  return getBlogPostPath(post);
+}
+
+function getPlaygroundPath(targetLocale: Locale): string {
+  return `${getLocaleUrl(targetLocale)}playground/`;
+}
+
+function getPlaygroundUrl(targetLocale: Locale): string {
+  return `${site.url}${getPlaygroundPath(targetLocale)}`;
+}
+
+const games = [
+  {
+    ...page.games.chess,
+    href: getRequiredPostPath('introducing-playground-tiny-games-for-live-chat-breaks'),
+    image: '/assets/playground/page/chess.webp',
+    imageHeight: 1586,
+    imageWidth: 1400
+  },
+  {
+    ...page.games.trivia,
+    href: getRequiredPostPath('new-in-0-14-0-help-a-friend-trivia'),
+    image: '/assets/playground/page/replay-trivia.webp',
+    imageHeight: 1570,
+    imageWidth: 1400
+  },
+  {
+    ...page.games.wild,
+    href: getRequiredPostPath('the-wild-wild-chat-coming-to-chat-enhancer-0-15-0'),
+    image: '/assets/playground/page/wild-wild-chat.webp',
+    imageHeight: 1538,
+    imageWidth: 1400
+  },
+  {
+    ...page.games.stickAround,
+    href: getRequiredPostPath('stick-around-its-raining-bubbles'),
+    image: '/assets/playground/page/stick-around.webp',
+    imageHeight: 1787,
+    imageWidth: 1400
+  }
+];
+
+const canonicalUrl = getPlaygroundUrl(locale);
+const languageUrls = Object.fromEntries(
+  locales.map((targetLocale) => [targetLocale, getPlaygroundPath(targetLocale)])
+);
+const alternateLinks = locales.map((targetLocale) => ({
+  href: getPlaygroundUrl(targetLocale),
+  hreflang: htmlLangFor(targetLocale)
+}));
+---
+
+<BaseLayout
+  alternateLinks={alternateLinks}
+  canonicalUrl={canonicalUrl}
+  description={page.metaDescription}
+  imageAlt={page.metaImageAlt}
+  locale={locale}
+  messages={messages}
+  rootPrefix={rootPrefix}
+  title={`${page.metaTitle} | ${site.title}`}
+  xDefaultUrl={getPlaygroundUrl('en')}
+>
+  <Header languageUrls={languageUrls} locale={locale} messages={messages} />
+  <main id="top">
+    <PlaygroundPage
+      computerHref={getRequiredPostPath('play-playground-games-against-the-computer')}
+      copy={page}
+      games={games}
+      installHref={`${getLocaleUrl(locale)}#install`}
+    />
+  </main>
+  <Footer locale={locale} messages={messages} />
+</BaseLayout>

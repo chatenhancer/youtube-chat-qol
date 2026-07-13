@@ -86,6 +86,47 @@
     "imageAlt": "Pływający panel szachów w czacie na żywo YouTube",
     "note": "* Aby grać razem, obie osoby potrzebują rozszerzenia"
   },
+  "playgroundPage": {
+    "metaTitle": "Playground - Małe gry do czatu na żywo YouTube",
+    "metaDescription": "Poznaj Playground, opcjonalną kolekcję małych gier działających tuż obok czatu na żywo YouTube.",
+    "metaImageAlt": "Gry Playground w Chat Enhancer do czatu na żywo YouTube",
+    "taglineLead": "Małe gry",
+    "taglineTail": "na przerwy w czacie",
+    "introFirst": "Playground to opcjonalna przestrzeń z grami, która zwiększa interaktywność transmisji.",
+    "introSecond": "Wybierz grę, zaproś kogoś, zacznij grać i miej czat pod ręką.",
+    "exploreCta": "Poznaj gry",
+    "gamesHeadingFirst": "Cztery gry,",
+    "gamesHeadingSecond": "cztery różne nastroje",
+    "seeHow": "Zobacz, jak to działa",
+    "computerTitle": "Zagraj przeciwko Computer",
+    "computerBody": "Każda gra Playground zawiera przeciwnika Computer, więc możesz rozpocząć rozgrywkę bez czekania na innego widza. Wybierz grę i Computer i pozostań blisko transmisji.",
+    "readyTitle": "Gotowi do gry?",
+    "settingsAlt": "Ustawienia Playground w wyskakującym oknie rozszerzenia Chat Enhancer",
+    "logoAlt": "Chat Enhancer Playground",
+    "primaryCta": "Wypróbuj w rozszerzeniu",
+    "games": {
+      "chess": {
+        "title": "Stare dobre szachy",
+        "body": "Trzymaj znajomą szachownicę obok czatu. Zaproś innego widza albo wybierz przeciwnika Computer na poziomie Beginner, Club lub Master bez opuszczania transmisji.",
+        "alt": "Szachownica w pływającym panelu Playground obok czatu na żywo YouTube"
+      },
+      "trivia": {
+        "title": "HELP-A-FRIEND! Trivia",
+        "body": "Chwile z powtórki YouTube zmieniają się w szybki quiz w stylu czatu. Pamiętasz, co wydarzyło się podczas transmisji? Zaproś znajomego i sprawdź.",
+        "alt": "HELP-A-FRIEND! Trivia prosi widzów o wybranie odpowiedzi"
+      },
+      "wild": {
+        "title": "The Wild Wild Chat",
+        "body": "Czat zmienia się w szybką pogoń za nagrodami, a gracze ścigają się o pasujące wiadomości. Kto zgarnie cały łup?",
+        "alt": "Tablica nagród The Wild Wild Chat w panelu Playground"
+      },
+      "stickAround": {
+        "title": "Stick Around!",
+        "body": "Stick Around! zmienia czat na żywo w małą arenę walki ze spadającymi dymkami. Wypchnij przeciwnika z ringu, zanim zrobi to on.",
+        "alt": "Stick Around! zmienia czat na żywo YouTube w arenę walki"
+      }
+    }
+  },
   "screenshots": {
     "eyebrow": "Zrzuty ekranu",
     "title": "Ulepszenia<br><span class=\"title-emphasis\">czatu</span>, które wyglądają naturalnie",

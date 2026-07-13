@@ -86,6 +86,47 @@
     "imageAlt": "YouTube 直播聊天室中的浮動西洋棋遊戲面板",
     "note": "* 兩位玩家都需要安裝擴充功能才能一起玩"
   },
+  "playgroundPage": {
+    "metaTitle": "Playground - YouTube 即時聊天室小遊戲",
+    "metaDescription": "探索 Playground：一組可選的小遊戲，讓你在 YouTube 即時聊天室旁輕鬆遊玩。",
+    "metaImageAlt": "Chat Enhancer 中適用於 YouTube 即時聊天室的 Playground 遊戲",
+    "taglineLead": "小遊戲",
+    "taglineTail": "陪你度過聊天室空檔",
+    "introFirst": "Playground 是一個可選的遊戲空間，讓直播更有互動性。",
+    "introSecond": "選擇遊戲、邀請他人、開始遊玩，同時讓聊天室留在身旁。",
+    "exploreCta": "探索遊戲",
+    "gamesHeadingFirst": "四款遊戲，",
+    "gamesHeadingSecond": "四種不同氛圍",
+    "seeHow": "查看玩法",
+    "computerTitle": "與 Computer 對戰",
+    "computerBody": "每款 Playground 遊戲都有 Computer 對手，因此不必等待其他觀眾也能開始比賽。選擇遊戲和 Computer，繼續留在直播旁。",
+    "readyTitle": "準備好開始了嗎？",
+    "settingsAlt": "Chat Enhancer 擴充功能彈出視窗中的 Playground 設定",
+    "logoAlt": "Chat Enhancer Playground",
+    "primaryCta": "在擴充功能中試用",
+    "games": {
+      "chess": {
+        "title": "經典西洋棋",
+        "body": "把熟悉的棋盤放在聊天室旁。不必離開直播，即可邀請其他觀眾，或選擇 Beginner、Club、Master 難度的 Computer 對手。",
+        "alt": "YouTube 即時聊天室旁浮動 Playground 面板中的西洋棋棋盤"
+      },
+      "trivia": {
+        "title": "HELP-A-FRIEND! Trivia",
+        "body": "YouTube 重播片段會變成快速的聊天室風格問答。還記得直播中發生了什麼嗎？邀請朋友一起找出答案。",
+        "alt": "HELP-A-FRIEND! Trivia 請觀眾選擇答案"
+      },
+      "wild": {
+        "title": "The Wild Wild Chat",
+        "body": "聊天室會變成快節奏的賞金追逐，玩家競相認領符合條件的訊息。誰能帶走全部戰利品？",
+        "alt": "Playground 面板中的 The Wild Wild Chat 賞金榜"
+      },
+      "stickAround": {
+        "title": "Stick Around!",
+        "body": "Stick Around! 會把即時聊天室變成一個不斷落下聊天室泡泡的小型格鬥場。搶在對手之前把他們推出擂台。",
+        "alt": "Stick Around! 將 YouTube 即時聊天室變成格鬥場"
+      }
+    }
+  },
   "screenshots": {
     "eyebrow": "截圖",
     "title": "像原生一樣自然的<br><span class=\"title-emphasis\">聊天室</span>增強",

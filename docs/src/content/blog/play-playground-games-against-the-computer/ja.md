@@ -12,23 +12,22 @@ tags:
   - "chess"
   - "trivia"
 ---
-
 Playground は、前より気軽に始められるようになりました。**Computer** と対戦できます。
 
 ## 仕組み
 
 ゲームパネルから Playground を開き、プレイヤーリストで Computer プレイヤーを探します。ほかの視聴者を招待するときと同じように、相手を選んで招待してください。マッチは自動で始まり、Playground の使い方はそのままです。
 
-Computer の相手は次のゲームで利用できます。
+Computer 対戦相手はすべての Playground ゲームで利用できます：
 
 - **チェス** では、**Computer (Beginner)**、**Computer (Club)**、**Computer (Master)** から、軽め・中級・手ごわい対戦を選べます。
-- **HELP-A-FRIEND! Trivia** では、ほかに空いている人がいないときでもリプレイのトリビアを遊べます。
+- **HELP-A-FRIEND! Trivia、The Wild Wild Chat、Stick Around!**。ほかに誰もいないときでも、すべてのゲームをプレイできます。
 
 ## Computer のプレイ方法
 
 チェスでは、Computer は少し間を置いてから手を指します。すぐに返ってきすぎる感じを避けるためです。 チェスには 3 種類の Computer の相手があります。Beginner はウォームアップに向いた一番やさしい相手、Club は安定した中級レベル、Master は一番手ごわい相手です。
 
-*HELP-A-FRIEND! Trivia* では、Computer は質問ラウンド中にほかのプレイヤーと同じように回答します。完璧ではないので、こちらにも十分勝つチャンスがあります。
+*HELP-A-FRIEND! Trivia* では、Computer が各問題ラウンドで回答しますが、いつも正解するとは限りません。*The Wild Wild Chat* では、公開中の賞金条件に合うメッセージを監視し、あなたより先に獲得しようとします。*Stick Around!* では、アリーナを動き回り、降ってくるチャットバブルをかわし、最後の一人になるまで戦います。
 
 ## 追加した理由
 

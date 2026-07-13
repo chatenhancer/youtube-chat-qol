@@ -24,6 +24,7 @@ const { languageUrls = {}, locale: currentLocale, messages: m } = Astro.props as
     <a href={`${getLocaleUrl(currentLocale)}#screenshots`} data-nav-section="screenshots">{m.nav.screenshots}</a>
     <a href={`${getLocaleUrl(currentLocale)}#privacy`} data-nav-section="privacy">{m.nav.privacy}</a>
     <a href={`${getLocaleUrl(currentLocale)}#commands`} data-nav-section="commands">{m.nav.commands}</a>
+    <a href={`${getLocaleUrl(currentLocale)}playground/`} data-nav-page="playground">{m.playground.eyebrow}</a>
     <a href={getBlogIndexPath(currentLocale)} data-nav-page="blog">{m.blog.updates}</a>
     <a class="site-nav-github" href={site.sourceUrl}>
       <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
@@ -61,6 +62,7 @@ const { languageUrls = {}, locale: currentLocale, messages: m } = Astro.props as
         <a href={`${getLocaleUrl(currentLocale)}#screenshots`} data-nav-section="screenshots">{m.nav.screenshots}</a>
         <a href={`${getLocaleUrl(currentLocale)}#privacy`} data-nav-section="privacy">{m.nav.privacy}</a>
         <a href={`${getLocaleUrl(currentLocale)}#commands`} data-nav-section="commands">{m.nav.commands}</a>
+        <a href={`${getLocaleUrl(currentLocale)}playground/`} data-nav-page="playground">{m.playground.eyebrow}</a>
         <a href={getBlogIndexPath(currentLocale)} data-nav-page="blog">{m.blog.updates}</a>
         <a class="mobile-header-menu-github" href={site.sourceUrl}>
           <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">

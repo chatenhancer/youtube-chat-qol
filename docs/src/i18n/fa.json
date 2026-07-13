@@ -86,6 +86,47 @@
     "imageAlt": "پنل شناور بازی شطرنج در چت زنده YouTube",
     "note": "* هر دو بازیکن برای بازی با هم به افزونه نیاز دارند"
   },
+  "playgroundPage": {
+    "metaTitle": "Playground - بازی‌های کوچک برای گفت‌وگوی زنده YouTube",
+    "metaDescription": "Playground را کاوش کنید؛ مجموعه‌ای اختیاری از بازی‌های کوچک که کنار گفت‌وگوی زنده YouTube می‌ماند.",
+    "metaImageAlt": "بازی‌های Playground در Chat Enhancer برای گفت‌وگوی زنده YouTube",
+    "taglineLead": "بازی‌های کوچک",
+    "taglineTail": "برای استراحت‌های گفت‌وگوی زنده",
+    "introFirst": "Playground فضای بازی اختیاری‌ای است که پخش‌ها را تعاملی‌تر می‌کند.",
+    "introSecond": "یک بازی انتخاب کنید، کسی را دعوت کنید، بازی را شروع کنید و گفت‌وگو را نزدیک نگه دارید.",
+    "exploreCta": "کاوش بازی‌ها",
+    "gamesHeadingFirst": "چهار بازی،",
+    "gamesHeadingSecond": "چهار حال‌وهوای متفاوت",
+    "seeHow": "نحوه بازی را ببینید",
+    "computerTitle": "با Computer بازی کنید",
+    "computerBody": "هر بازی Playground یک حریف Computer دارد؛ بنابراین بدون منتظر ماندن برای بیننده‌ای دیگر می‌توانید مسابقه را شروع کنید. بازی را انتخاب کنید، Computer را برگزینید و نزدیک پخش بمانید.",
+    "readyTitle": "آماده بازی هستید؟",
+    "settingsAlt": "تنظیمات Playground در پنجره افزونه Chat Enhancer",
+    "logoAlt": "Chat Enhancer Playground",
+    "primaryCta": "در افزونه امتحانش کنید",
+    "games": {
+      "chess": {
+        "title": "شطرنج کلاسیک",
+        "body": "صفحه شطرنج آشنا را کنار گفت‌وگو نگه دارید. بیننده‌ای دیگر را دعوت کنید یا بدون ترک پخش، حریف Computer با سطح Beginner، Club یا Master را انتخاب کنید.",
+        "alt": "صفحه شطرنج در پنل شناور Playground کنار گفت‌وگوی زنده YouTube"
+      },
+      "trivia": {
+        "title": "HELP-A-FRIEND! Trivia",
+        "body": "لحظه‌های بازپخش YouTube به مسابقه‌ای سریع به سبک گفت‌وگو تبدیل می‌شوند. یادتان هست هنگام پخش چه اتفاقی افتاد؟ دوستی را دعوت کنید و بفهمید.",
+        "alt": "HELP-A-FRIEND! Trivia از بینندگان می‌خواهد پاسخی را انتخاب کنند"
+      },
+      "wild": {
+        "title": "The Wild Wild Chat",
+        "body": "گفت‌وگو به شکار سریع جایزه تبدیل می‌شود و بازیکنان برای تصاحب پیام‌های منطبق رقابت می‌کنند. چه کسی همه غنیمت را می‌برد؟",
+        "alt": "تابلوی جایزه The Wild Wild Chat در پنل Playground"
+      },
+      "stickAround": {
+        "title": "Stick Around!",
+        "body": "Stick Around! گفت‌وگوی زنده را به میدان نبرد کوچکی با حباب‌های در حال سقوط تبدیل می‌کند. پیش از حریفتان او را از میدان بیرون بیندازید.",
+        "alt": "Stick Around! گفت‌وگوی زنده YouTube را به میدان نبرد تبدیل می‌کند"
+      }
+    }
+  },
   "screenshots": {
     "eyebrow": "تصاویر",
     "title": "بهبودهای<br><span class=\"title-emphasis\">چت</span> با حس طبیعی",

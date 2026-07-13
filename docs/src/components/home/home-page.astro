@@ -1,6 +1,7 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import { getBlogPostPath } from '../../data/blog';
+import { getLocaleUrl } from '../../data/locales';
 import type { Locale } from '../../data/locales';
 import type { Messages } from '../../data/site';
 import Commands from './commands.astro';
@@ -23,7 +24,7 @@ if (!playgroundPost) {
   throw new Error('Missing required Playground blog post.');
 }
 const playgroundPostPath = getBlogPostPath(playgroundPost);
-const playgroundLearnMorePath = locale === 'en' ? '/playground/' : playgroundPostPath;
+const playgroundLearnMorePath = `${getLocaleUrl(locale)}playground/`;
 const gamePostPaths = {
   chess: playgroundPostPath,
   stickAround: getRequiredBlogPostPath('stick-around-its-raining-bubbles'),

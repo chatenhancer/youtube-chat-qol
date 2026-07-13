@@ -86,6 +86,47 @@
     "imageAlt": "Pannello fluttuante di scacchi dentro la chat live di YouTube",
     "note": "* Entrambi i giocatori devono avere l’estensione per giocare insieme"
   },
+  "playgroundPage": {
+    "metaTitle": "Playground - Piccoli giochi per la chat dal vivo di YouTube",
+    "metaDescription": "Scopri Playground, una raccolta facoltativa di piccoli giochi che resta accanto alla chat dal vivo di YouTube.",
+    "metaImageAlt": "Giochi Playground in Chat Enhancer per la chat dal vivo di YouTube",
+    "taglineLead": "Piccoli giochi",
+    "taglineTail": "per le pause dalla chat",
+    "introFirst": "Playground è uno spazio di gioco facoltativo che rende le dirette più interattive.",
+    "introSecond": "Scegli un gioco, invita qualcuno, inizia a giocare e tieni la chat a portata di mano.",
+    "exploreCta": "Esplora i giochi",
+    "gamesHeadingFirst": "Quattro giochi,",
+    "gamesHeadingSecond": "quattro atmosfere diverse",
+    "seeHow": "Guarda come si gioca",
+    "computerTitle": "Gioca contro Computer",
+    "computerBody": "Ogni gioco Playground include un avversario Computer, quindi puoi iniziare una partita senza aspettare un altro spettatore. Scegli un gioco, seleziona Computer e resta vicino alla diretta.",
+    "readyTitle": "Pronto a giocare?",
+    "settingsAlt": "Impostazioni di Playground nel popup dell’estensione Chat Enhancer",
+    "logoAlt": "Chat Enhancer Playground",
+    "primaryCta": "Provalo nell’estensione",
+    "games": {
+      "chess": {
+        "title": "Il buon vecchio scacchi",
+        "body": "Tieni una scacchiera familiare accanto alla chat. Invita un altro spettatore o scegli un avversario Computer Beginner, Club o Master senza lasciare la diretta.",
+        "alt": "Scacchiera in un pannello Playground sospeso accanto alla chat dal vivo di YouTube"
+      },
+      "trivia": {
+        "title": "HELP-A-FRIEND! Trivia",
+        "body": "I momenti di un replay di YouTube diventano un rapido quiz in stile chat. Ricordi cosa è successo durante la diretta? Invita un amico e scoprilo.",
+        "alt": "HELP-A-FRIEND! Trivia chiede agli spettatori di scegliere una risposta"
+      },
+      "wild": {
+        "title": "The Wild Wild Chat",
+        "body": "La chat diventa una rapida caccia alle taglie in cui i giocatori si contendono i messaggi corrispondenti. Chi porterà a casa tutto il bottino?",
+        "alt": "Bacheca delle taglie di The Wild Wild Chat in un pannello Playground"
+      },
+      "stickAround": {
+        "title": "Stick Around!",
+        "body": "Stick Around! trasforma la chat dal vivo in una piccola arena con bolle di chat che cadono. Spingi l’avversario fuori dal ring prima che lo faccia lui.",
+        "alt": "Stick Around! trasforma la chat dal vivo di YouTube in un’arena di combattimento"
+      }
+    }
+  },
   "screenshots": {
     "eyebrow": "Screenshot",
     "title": "Miglioramenti della<br><span class=\"title-emphasis\">chat</span> dal feeling nativo",

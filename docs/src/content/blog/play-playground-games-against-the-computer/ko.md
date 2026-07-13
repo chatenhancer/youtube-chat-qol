@@ -12,23 +12,22 @@ tags:
   - "chess"
   - "trivia"
 ---
-
 이제 Playground에 더 쉽게 뛰어들 수 있습니다. **Computer**와 플레이할 수 있습니다.
 
 ## 작동 방식
 
 게임 패널에서 Playground를 열고 플레이어 목록에서 Computer 플레이어를 찾으세요. 다른 시청자를 초대하듯이 상대를 골라 초대하면 됩니다. 매치는 자동으로 시작되고, Playground를 사용하는 방식은 그대로입니다.
 
-Computer 상대는 다음 게임에서 사용할 수 있습니다.
+Computer 상대는 모든 Playground 게임에서 이용할 수 있습니다:
 
 - **체스**에서는 **Computer (Beginner)**, **Computer (Club)**, **Computer (Master)** 중에서 가벼운 매치, 중간 난이도 매치, 더 어려운 매치를 선택할 수 있습니다.
-- **HELP-A-FRIEND! Trivia**에서는 아무도 시간이 없을 때도 다시보기 트리비아를 계속 플레이할 수 있습니다.
+- **HELP-A-FRIEND! Trivia, The Wild Wild Chat, Stick Around!** — 다른 사람이 없을 때도 모든 게임을 플레이할 수 있습니다.
 
 ## Computer의 플레이 방식
 
 체스에서는 Computer가 잠깐 기다렸다가 수를 둡니다. 너무 즉시 진행되는 느낌을 피하기 위해서입니다. 체스에는 세 가지 Computer 상대가 있습니다. Beginner는 몸풀기에 좋은 가장 쉬운 상대이고, Club은 안정적인 중간 난이도이며, Master는 가장 어려운 선택지입니다.
 
-*HELP-A-FRIEND! Trivia*에서는 Computer가 질문 라운드 중 다른 플레이어처럼 답합니다. 완벽하지는 않아서, 여전히 이길 기회가 충분히 있습니다.
+*HELP-A-FRIEND! Trivia*에서 Computer는 각 문제 라운드에 답하지만 항상 정답을 맞히지는 않습니다. *The Wild Wild Chat*에서는 열린 현상금 조건에 맞는 메시지를 지켜보다가 먼저 차지하려고 합니다. *Stick Around!*에서는 경기장을 움직이고, 떨어지는 채팅 버블을 피하며, 마지막 플레이어가 되기 위해 싸웁니다.
 
 ## 왜 추가했나요?
 

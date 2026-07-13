@@ -86,6 +86,47 @@
     "imageAlt": "חלונית משחק שחמט צפה בתוך צ׳אט חי של YouTube",
     "note": "* שני השחקנים צריכים את התוסף כדי לשחק יחד"
   },
+  "playgroundPage": {
+    "metaTitle": "Playground - משחקים קטנים לצ׳אט החי של YouTube",
+    "metaDescription": "גלו את Playground, אוסף אופציונלי של משחקים קטנים שנשאר לצד הצ׳אט החי של YouTube.",
+    "metaImageAlt": "משחקי Playground בתוך Chat Enhancer לצ׳אט החי של YouTube",
+    "taglineLead": "משחקים קטנים",
+    "taglineTail": "להפסקות בצ׳אט החי",
+    "introFirst": "Playground הוא מרחב משחקים אופציונלי שהופך שידורים לאינטראקטיביים יותר.",
+    "introSecond": "בחרו משחק, הזמינו מישהו, התחילו לשחק והשאירו את הצ׳אט קרוב.",
+    "exploreCta": "גלו את המשחקים",
+    "gamesHeadingFirst": "ארבעה משחקים,",
+    "gamesHeadingSecond": "ארבעה מצבי רוח שונים",
+    "seeHow": "ראו איך משחקים",
+    "computerTitle": "שחקו נגד Computer",
+    "computerBody": "בכל משחק של Playground יש יריב Computer, כך שאפשר להתחיל משחק בלי לחכות לצופה אחר. בחרו משחק, בחרו Computer והשאירו את השידור קרוב.",
+    "readyTitle": "מוכנים לשחק?",
+    "settingsAlt": "הגדרות Playground בחלון התוסף Chat Enhancer",
+    "logoAlt": "Chat Enhancer Playground",
+    "primaryCta": "לנסות בתוסף",
+    "games": {
+      "chess": {
+        "title": "שחמט קלאסי",
+        "body": "השאירו לוח שחמט מוכר לצד הצ׳אט. הזמינו צופה אחר או בחרו יריב Computer ברמת Beginner, Club או Master בלי לעזוב את השידור.",
+        "alt": "לוח שחמט בחלונית Playground צפה לצד הצ׳אט החי של YouTube"
+      },
+      "trivia": {
+        "title": "HELP-A-FRIEND! Trivia",
+        "body": "רגעים משידור חוזר ב-YouTube הופכים לחידון מהיר בסגנון הצ׳אט. זוכרים מה קרה בשידור? הזמינו חבר וגלו.",
+        "alt": "HELP-A-FRIEND! Trivia מבקש מהצופים לבחור תשובה"
+      },
+      "wild": {
+        "title": "The Wild Wild Chat",
+        "body": "הצ׳אט הופך למרדף מהיר אחר פרסים שבו השחקנים מתחרים על הודעות תואמות. מי ייקח את כל השלל?",
+        "alt": "לוח הפרסים של The Wild Wild Chat בתוך חלונית Playground"
+      },
+      "stickAround": {
+        "title": "Stick Around!",
+        "body": "Stick Around! הופך את הצ׳אט החי לזירת קרב קטנה עם בועות צ׳אט נופלות. דחפו את היריב מחוץ לזירה לפני שהוא יעשה זאת.",
+        "alt": "Stick Around! הופך את הצ׳אט החי של YouTube לזירת קרב"
+      }
+    }
+  },
   "screenshots": {
     "eyebrow": "צילומי מסך",
     "title": "שיפורי<br><span class=\"title-emphasis\">צ׳אט</span> שמרגישים טבעיים",

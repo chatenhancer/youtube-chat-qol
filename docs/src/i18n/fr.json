@@ -86,6 +86,47 @@
     "imageAlt": "Panneau d’échecs flottant dans le chat en direct YouTube",
     "note": "* Les deux joueurs doivent avoir l’extension pour jouer ensemble"
   },
+  "playgroundPage": {
+    "metaTitle": "Playground - Des mini-jeux pour le chat en direct YouTube",
+    "metaDescription": "Découvrez Playground, une collection facultative de mini-jeux qui reste près du chat en direct YouTube.",
+    "metaImageAlt": "Jeux Playground dans Chat Enhancer pour le chat en direct YouTube",
+    "taglineLead": "Des mini-jeux",
+    "taglineTail": "pour les pauses du chat",
+    "introFirst": "Playground est un espace de jeux facultatif qui rend les streams plus interactifs.",
+    "introSecond": "Choisissez un jeu, invitez quelqu’un, commencez à jouer et gardez le chat à proximité.",
+    "exploreCta": "Découvrir les jeux",
+    "gamesHeadingFirst": "Quatre jeux,",
+    "gamesHeadingSecond": "quatre ambiances différentes",
+    "seeHow": "Voir comment ça se joue",
+    "computerTitle": "Jouez contre Computer",
+    "computerBody": "Chaque jeu Playground comprend un adversaire Computer : vous pouvez donc lancer une partie sans attendre un autre spectateur. Choisissez un jeu, sélectionnez Computer et gardez le stream à proximité.",
+    "readyTitle": "Prêt à jouer ?",
+    "settingsAlt": "Réglages de Playground dans le popup de l’extension Chat Enhancer",
+    "logoAlt": "Chat Enhancer Playground",
+    "primaryCta": "L’essayer dans l’extension",
+    "games": {
+      "chess": {
+        "title": "Le bon vieux jeu d’échecs",
+        "body": "Gardez un échiquier familier près du chat. Invitez un autre spectateur ou choisissez un adversaire Computer Beginner, Club ou Master sans quitter le stream.",
+        "alt": "Échiquier dans un panneau Playground flottant près du chat en direct YouTube"
+      },
+      "trivia": {
+        "title": "HELP-A-FRIEND! Trivia",
+        "body": "Les moments d’une rediffusion YouTube deviennent un quiz rapide façon chat. Vous souvenez-vous de ce qui s’est passé pendant le stream ? Invitez un ami et découvrez-le.",
+        "alt": "HELP-A-FRIEND! Trivia demande aux spectateurs de choisir une réponse"
+      },
+      "wild": {
+        "title": "The Wild Wild Chat",
+        "body": "Le chat devient une chasse aux primes effrénée où les joueurs se disputent les messages correspondants. Qui repartira avec tout le butin ?",
+        "alt": "Tableau des primes de The Wild Wild Chat dans un panneau Playground"
+      },
+      "stickAround": {
+        "title": "Stick Around!",
+        "body": "Stick Around! transforme le chat en direct en petite arène de combat sous une pluie de bulles. Éjectez votre adversaire du ring avant qu’il ne le fasse.",
+        "alt": "Stick Around! transforme le chat en direct YouTube en arène de combat"
+      }
+    }
+  },
   "screenshots": {
     "eyebrow": "Captures",
     "title": "Des améliorations du<br><span class=\"title-emphasis\">chat</span> au rendu natif",

@@ -1,0 +1,17 @@
+---
+import PlaygroundRoute from '../../../components/playground/playground-route.astro';
+import { getLocaleFromPath, localeMeta, locales } from '../../../data/locales';
+
+export function getStaticPaths() {
+  return locales
+    .filter((locale) => locale !== 'en')
+    .map((locale) => ({
+      params: { locale: localeMeta[locale].path },
+      props: { resolvedLocale: locale }
+    }));
+}
+
+const locale = Astro.props.resolvedLocale ?? getLocaleFromPath(Astro.params.locale || '');
+---
+
+<PlaygroundRoute locale={locale} rootPrefix="../../" />

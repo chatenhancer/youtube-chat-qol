@@ -11,9 +11,28 @@ interface PlaygroundGame {
   title: string;
 }
 
-const { computerHref, games } = Astro.props as {
+interface PlaygroundPageCopy {
+  computerBody: string;
+  computerTitle: string;
+  exploreCta: string;
+  gamesHeadingFirst: string;
+  gamesHeadingSecond: string;
+  introFirst: string;
+  introSecond: string;
+  logoAlt: string;
+  primaryCta: string;
+  readyTitle: string;
+  seeHow: string;
+  settingsAlt: string;
+  taglineLead: string;
+  taglineTail: string;
+}
+
+const { computerHref, copy, games, installHref } = Astro.props as {
   computerHref: string;
+  copy: PlaygroundPageCopy;
   games: PlaygroundGame[];
+  installHref: string;
 };
 
 const gameLogoPattern = [
@@ -32,7 +51,7 @@ const marqueeGameLogos = Array.from({ length: 3 }, () => gameLogoPattern).flat()
         <img
           class="pg-title-logo"
           src="/assets/playground/playground-logo.svg"
-          alt="Chat Enhancer Playground"
+          alt={copy.logoAlt}
           width="1746"
           height="457"
           decoding="async"
@@ -55,7 +74,7 @@ const marqueeGameLogos = Array.from({ length: 3 }, () => gameLogoPattern).flat()
             ))}
           </div>
         </div>
-        <p class="pg-tagline"><strong>Tiny games</strong><span>for live chat breaks</span></p>
+        <p class="pg-tagline"><strong>{copy.taglineLead}</strong><span>{copy.taglineTail}</span></p>
         <div class="pg-logo-window pg-logo-window-right" aria-hidden="true">
           <div class="pg-logo-track">
             {[0, 1].map(() => (
@@ -74,22 +93,22 @@ const marqueeGameLogos = Array.from({ length: 3 }, () => gameLogoPattern).flat()
       </div>
 
       <p class="pg-intro">
-        <span>Playground is an opt-in games space that makes streams more interactive.</span>
-        <span>Pick a game, invite someone, start playing, and keep chat nearby.</span>
+        <span>{copy.introFirst}</span>
+        <span>{copy.introSecond}</span>
       </p>
       <div class="pg-hero-actions">
-        <a class="button button-primary" href="/#install">
+        <a class="button button-primary" href={installHref}>
           <span class="button-icon" aria-hidden="true"><Icon name="extension" /></span>
-          Try it in the extension
+          {copy.primaryCta}
         </a>
-        <a class="button pg-button-secondary" href="#pg-games-title">Explore the games</a>
+        <a class="button pg-button-secondary" href="#pg-games-title">{copy.exploreCta}</a>
       </div>
     </div>
   </section>
 
   <section class="pg-games" id="games" aria-labelledby="pg-games-title">
     <div class="pg-games-inner">
-      <h2 id="pg-games-title">Four games,<br>four different moods</h2>
+      <h2 id="pg-games-title">{copy.gamesHeadingFirst}<br>{copy.gamesHeadingSecond}</h2>
 
       <div class="pg-game-list">
         {games.map((game, index) => (
@@ -98,7 +117,7 @@ const marqueeGameLogos = Array.from({ length: 3 }, () => gameLogoPattern).flat()
               <h3>{game.title}</h3>
               <p>{game.body}</p>
               <a href={game.href}>
-                See how it plays
+                {copy.seeHow}
                 <span class="pg-link-arrow" aria-hidden="true"><span>→</span></span>
               </a>
             </div>
@@ -124,17 +143,17 @@ const marqueeGameLogos = Array.from({ length: 3 }, () => gameLogoPattern).flat()
       <img
         class="pg-settings-image"
         src="/assets/playground/page/settings.png"
-        alt="Playground settings in the Chat Enhancer extension popup"
+        alt={copy.settingsAlt}
         width="686"
         height="654"
         loading="lazy"
         decoding="async"
       >
       <div class="pg-computer-copy">
-        <h2 id="pg-computer-title">Play against the Computer</h2>
-        <p>Every Playground game includes a Computer opponent, so you can start a match without waiting for another viewer. Pick a game, choose Computer, and keep the stream close.</p>
+        <h2 id="pg-computer-title">{copy.computerTitle}</h2>
+        <p>{copy.computerBody}</p>
         <a href={computerHref}>
-          See how it plays
+          {copy.seeHow}
           <span class="pg-link-arrow" aria-hidden="true"><span>→</span></span>
         </a>
       </div>
@@ -150,10 +169,10 @@ const marqueeGameLogos = Array.from({ length: 3 }, () => gameLogoPattern).flat()
           )
         ))}
       </div>
-      <h2>Ready to play?</h2>
-      <a class="button pg-ready-button" href="/#install">
+      <h2>{copy.readyTitle}</h2>
+      <a class="button pg-ready-button" href={installHref}>
         <span class="button-icon" aria-hidden="true"><Icon name="extension" /></span>
-        <span class="pg-ready-button-label">Try it in the extension</span>
+        <span class="pg-ready-button-label">{copy.primaryCta}</span>
       </a>
     </div>
   </section>
@@ -241,6 +260,7 @@ const marqueeGameLogos = Array.from({ length: 3 }, () => gameLogoPattern).flat()
     min-width: 0;
     height: 48px;
     overflow: hidden;
+    direction: ltr;
     -webkit-mask-image: linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent);
     mask-image: linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent);
     opacity: 0.34;
@@ -495,6 +515,9 @@ const marqueeGameLogos = Array.from({ length: 3 }, () => gameLogoPattern).flat()
     font-weight: 800;
     line-height: 1;
     letter-spacing: -0.045em;
+    text-shadow:
+      0 5.45px 73.88px rgba(255, 255, 255, 0.44),
+      0 0 20px rgba(255, 255, 255, 0.28);
   }
 
   .pg-game-copy p {

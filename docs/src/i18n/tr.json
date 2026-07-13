@@ -86,6 +86,47 @@
     "imageAlt": "YouTube canlı sohbetinde yüzen satranç oyun paneli",
     "note": "* Birlikte oynayabilmek için iki oyuncuda da uzantı olmalıdır"
   },
+  "playgroundPage": {
+    "metaTitle": "Playground - YouTube canlı sohbeti için küçük oyunlar",
+    "metaDescription": "YouTube canlı sohbetinin yanında kalan isteğe bağlı küçük oyun koleksiyonu Playground’u keşfedin.",
+    "metaImageAlt": "YouTube canlı sohbeti için Chat Enhancer içindeki Playground oyunları",
+    "taglineLead": "Küçük oyunlar",
+    "taglineTail": "canlı sohbet molaları için",
+    "introFirst": "Playground, yayınları daha etkileşimli yapan isteğe bağlı bir oyun alanıdır.",
+    "introSecond": "Bir oyun seçin, birini davet edin, oynamaya başlayın ve sohbeti yakında tutun.",
+    "exploreCta": "Oyunları keşfet",
+    "gamesHeadingFirst": "Dört oyun,",
+    "gamesHeadingSecond": "dört farklı ruh hâli",
+    "seeHow": "Nasıl oynandığını gör",
+    "computerTitle": "Computer’a karşı oyna",
+    "computerBody": "Her Playground oyununda bir Computer rakibi vardır; böylece başka bir izleyiciyi beklemeden maça başlayabilirsiniz. Bir oyun seçin, Computer’ı seçin ve yayına yakın kalın.",
+    "readyTitle": "Oynamaya hazır mısın?",
+    "settingsAlt": "Chat Enhancer uzantısı açılır penceresindeki Playground ayarları",
+    "logoAlt": "Chat Enhancer Playground",
+    "primaryCta": "Uzantıda dene",
+    "games": {
+      "chess": {
+        "title": "Eski usul satranç",
+        "body": "Tanıdık bir satranç tahtasını sohbetin yanında tutun. Yayından ayrılmadan başka bir izleyiciyi davet edin veya Beginner, Club ya da Master Computer rakibi seçin.",
+        "alt": "YouTube canlı sohbetinin yanında yüzen Playground panelindeki satranç tahtası"
+      },
+      "trivia": {
+        "title": "HELP-A-FRIEND! Trivia",
+        "body": "YouTube tekrarındaki anlar sohbet tarzı hızlı bir teste dönüşür. Yayın sırasında ne olduğunu hatırlıyor musunuz? Bir arkadaşınızı davet edip öğrenin.",
+        "alt": "HELP-A-FRIEND! Trivia izleyicilerden bir cevap seçmelerini istiyor"
+      },
+      "wild": {
+        "title": "The Wild Wild Chat",
+        "body": "Sohbet, oyuncuların eşleşen mesajları almak için yarıştığı hızlı bir ödül avına dönüşür. Tüm ganimeti kim götürecek?",
+        "alt": "Playground panelindeki The Wild Wild Chat ödül panosu"
+      },
+      "stickAround": {
+        "title": "Stick Around!",
+        "body": "Stick Around! canlı sohbeti düşen sohbet baloncuklarıyla küçük bir dövüş arenasına dönüştürür. Rakibiniz sizi itmeden önce onu ringin dışına itin.",
+        "alt": "Stick Around! YouTube canlı sohbetini bir dövüş arenasına dönüştürüyor"
+      }
+    }
+  },
   "screenshots": {
     "eyebrow": "Ekran görüntüleri",
     "title": "Doğal hissettiren<br><span class=\"title-emphasis\">sohbet</span> iyileştirmeleri",

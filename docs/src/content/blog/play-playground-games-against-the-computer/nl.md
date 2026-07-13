@@ -12,23 +12,22 @@ tags:
   - "chess"
   - "trivia"
 ---
-
 Je kunt nu nog makkelijker in Playground springen: je kunt tegen **Computer** spelen.
 
 ## Zo werkt het
 
 Open Playground via het Games-paneel en zoek een Computer-speler in de spelerslijst. Nodig er een uit zoals je een andere kijker zou uitnodigen. De match start automatisch en de rest van Playground werkt zoals je gewend bent.
 
-Computer-tegenstanders zijn beschikbaar voor:
+Computer-tegenstanders zijn beschikbaar in elke Playground-game:
 
 - **Schaken**, met **Computer (Beginner)**, **Computer (Club)** en **Computer (Master)**, zodat je een lichte, gemiddelde of moeilijkere match kunt kiezen.
-- **HELP-A-FRIEND! Trivia**, zodat replaytrivia speelbaar blijft wanneer niemand anders vrij is.
+- **HELP-A-FRIEND! Trivia, The Wild Wild Chat en Stick Around!**, zodat elke game speelbaar blijft als niemand anders beschikbaar is.
 
 ## Zo speelt Computer
 
 Bij Schaken wacht Computer kort voordat hij zet, zodat de game niet als een instant antwoordmachine voelt. Schaken heeft nu drie Computer-tegenstanders. Beginner is de makkelijkste manier om op te warmen, Club speelt steviger op middenniveau en Master is de zwaarste optie.
 
-Bij *HELP-A-FRIEND! Trivia* antwoordt Computer tijdens de vragenronde net als een andere speler. Hij is niet perfect, dus je hebt nog steeds een echte kans om te winnen.
+In *HELP-A-FRIEND! Trivia* antwoordt Computer tijdens elke vragenronde en heeft hij het niet altijd goed. In *The Wild Wild Chat* let hij op berichten die bij een open premie passen en probeert hij ze eerder dan jij te claimen. In *Stick Around!* beweegt hij door de arena, ontwijkt hij vallende chatbubbels en vecht hij om als laatste over te blijven.
 
 ## Waarom dit toevoegen?
 

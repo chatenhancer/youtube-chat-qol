@@ -86,6 +86,47 @@
     "imageAlt": "Bảng chơi cờ vua nổi bên trong live chat YouTube",
     "note": "* Cả hai người chơi đều cần có tiện ích để chơi cùng nhau"
   },
+  "playgroundPage": {
+    "metaTitle": "Playground - Trò chơi nhỏ cho YouTube live chat",
+    "metaDescription": "Khám phá Playground, bộ sưu tập trò chơi nhỏ tùy chọn luôn ở cạnh YouTube live chat.",
+    "metaImageAlt": "Trò chơi Playground trong Chat Enhancer dành cho YouTube live chat",
+    "taglineLead": "Trò chơi nhỏ",
+    "taglineTail": "cho giờ nghỉ live chat",
+    "introFirst": "Playground là không gian trò chơi tùy chọn giúp buổi phát trực tiếp tương tác hơn.",
+    "introSecond": "Chọn trò chơi, mời ai đó, bắt đầu chơi và giữ chat ở gần.",
+    "exploreCta": "Khám phá trò chơi",
+    "gamesHeadingFirst": "Bốn trò chơi,",
+    "gamesHeadingSecond": "bốn tâm trạng khác nhau",
+    "seeHow": "Xem cách chơi",
+    "computerTitle": "Chơi với Computer",
+    "computerBody": "Mỗi trò chơi Playground đều có đối thủ Computer, nên bạn có thể bắt đầu trận đấu mà không cần chờ người xem khác. Chọn trò chơi, chọn Computer và ở gần buổi phát.",
+    "readyTitle": "Sẵn sàng chơi chưa?",
+    "settingsAlt": "Cài đặt Playground trong cửa sổ bật lên của tiện ích Chat Enhancer",
+    "logoAlt": "Chat Enhancer Playground",
+    "primaryCta": "Thử trong tiện ích",
+    "games": {
+      "chess": {
+        "title": "Cờ vua quen thuộc",
+        "body": "Giữ bàn cờ quen thuộc bên cạnh chat. Mời người xem khác hoặc chọn đối thủ Computer Beginner, Club hay Master mà không rời buổi phát.",
+        "alt": "Bàn cờ trong bảng Playground nổi cạnh YouTube live chat"
+      },
+      "trivia": {
+        "title": "HELP-A-FRIEND! Trivia",
+        "body": "Các khoảnh khắc trong video phát lại YouTube trở thành câu đố nhanh theo phong cách chat. Bạn có nhớ điều gì đã xảy ra trong buổi phát không? Mời một người bạn và cùng tìm hiểu.",
+        "alt": "HELP-A-FRIEND! Trivia yêu cầu người xem chọn câu trả lời"
+      },
+      "wild": {
+        "title": "The Wild Wild Chat",
+        "body": "Chat biến thành cuộc săn tiền thưởng tốc độ cao, nơi người chơi tranh nhau nhận các tin nhắn phù hợp. Ai sẽ mang toàn bộ chiến lợi phẩm về?",
+        "alt": "Bảng tiền thưởng The Wild Wild Chat trong bảng Playground"
+      },
+      "stickAround": {
+        "title": "Stick Around!",
+        "body": "Stick Around! biến live chat thành đấu trường nhỏ với các bong bóng chat rơi xuống. Đẩy đối thủ ra khỏi võ đài trước khi họ làm điều đó.",
+        "alt": "Stick Around! biến YouTube live chat thành đấu trường chiến đấu"
+      }
+    }
+  },
   "screenshots": {
     "eyebrow": "Ảnh chụp màn hình",
     "title": "Cải tiến<br><span class=\"title-emphasis\">chat</span> tự nhiên như giao diện gốc",

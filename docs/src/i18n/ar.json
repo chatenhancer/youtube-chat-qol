@@ -86,6 +86,47 @@
     "imageAlt": "لوحة شطرنج عائمة داخل دردشة YouTube المباشرة",
     "note": "* يحتاج اللاعبان إلى الإضافة للعب معًا"
   },
+  "playgroundPage": {
+    "metaTitle": "Playground - ألعاب صغيرة لدردشة YouTube المباشرة",
+    "metaDescription": "استكشف Playground، وهي مجموعة اختيارية من الألعاب الصغيرة التي تبقى بجوار دردشة YouTube المباشرة.",
+    "metaImageAlt": "ألعاب Playground داخل Chat Enhancer لدردشة YouTube المباشرة",
+    "taglineLead": "ألعاب صغيرة",
+    "taglineTail": "لاستراحات الدردشة المباشرة",
+    "introFirst": "Playground مساحة ألعاب اختيارية تجعل البث أكثر تفاعلاً.",
+    "introSecond": "اختر لعبة، وادعُ شخصاً، وابدأ اللعب مع إبقاء الدردشة قريبة.",
+    "exploreCta": "استكشف الألعاب",
+    "gamesHeadingFirst": "أربع ألعاب،",
+    "gamesHeadingSecond": "وأربعة أجواء مختلفة",
+    "seeHow": "شاهد طريقة اللعب",
+    "computerTitle": "العب ضد Computer",
+    "computerBody": "تتضمن كل لعبة في Playground منافساً من نوع Computer، لذا يمكنك بدء مباراة من دون انتظار مشاهد آخر. اختر لعبة، واختر Computer، وأبقِ البث قريباً.",
+    "readyTitle": "هل أنت مستعد للعب؟",
+    "settingsAlt": "إعدادات Playground في نافذة إضافة Chat Enhancer",
+    "logoAlt": "Chat Enhancer Playground",
+    "primaryCta": "جرّبه داخل الإضافة",
+    "games": {
+      "chess": {
+        "title": "الشطرنج الكلاسيكي",
+        "body": "أبقِ رقعة شطرنج مألوفة بجوار الدردشة. ادعُ مشاهداً آخر أو اختر منافس Computer بمستوى Beginner أو Club أو Master من دون مغادرة البث.",
+        "alt": "رقعة شطرنج في لوحة Playground عائمة بجوار دردشة YouTube المباشرة"
+      },
+      "trivia": {
+        "title": "HELP-A-FRIEND! Trivia",
+        "body": "تتحول لحظات إعادة بث YouTube إلى مسابقة سريعة بأسلوب الدردشة. هل تتذكر ما حدث أثناء البث؟ ادعُ صديقاً واكتشفا الإجابة.",
+        "alt": "لعبة HELP-A-FRIEND! Trivia تطلب من المشاهدين اختيار إجابة"
+      },
+      "wild": {
+        "title": "The Wild Wild Chat",
+        "body": "تتحول الدردشة إلى مطاردة مكافآت سريعة يتسابق فيها اللاعبون للمطالبة بالرسائل المطابقة. من سيحصل على كل الغنائم؟",
+        "alt": "لوحة مكافآت The Wild Wild Chat داخل لوحة Playground"
+      },
+      "stickAround": {
+        "title": "Stick Around!",
+        "body": "تحول Stick Around! الدردشة المباشرة إلى حلبة قتال صغيرة تتساقط فيها فقاعات الدردشة. ادفع خصمك خارج الحلبة قبل أن يفعل ذلك.",
+        "alt": "لعبة Stick Around! تحول دردشة YouTube المباشرة إلى حلبة قتال"
+      }
+    }
+  },
   "screenshots": {
     "eyebrow": "لقطات الشاشة",
     "title": "تحسينات <span class=\"title-emphasis\">للدردشة</span><br>تبدو طبيعية",

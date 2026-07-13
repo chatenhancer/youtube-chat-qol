@@ -12,23 +12,22 @@ tags:
   - "chess"
   - "trivia"
 ---
-
 Teraz jeszcze łatwiej wskoczyć do Playground: możesz grać z przeciwnikiem **Computer**.
 
 ## Jak to działa
 
 Otwórz Playground z panelu Gry i znajdź gracza Computer na liście graczy. Zaproś go tak samo, jak zapraszasz innego widza. Mecz rozpocznie się automatycznie, a reszta Playground działa tak jak zwykle.
 
-Przeciwnicy Computer są dostępni dla:
+Przeciwnicy Computer są dostępni w każdej grze Playground:
 
 - **Szachy**, z **Computer (Beginner)**, **Computer (Club)** i **Computer (Master)**, żeby wybrać łatwiejszy, średni albo trudniejszy mecz.
-- **HELP-A-FRIEND! Trivia**, żeby quiz z powtórek nadal działał, gdy nikt inny nie jest wolny.
+- **HELP-A-FRIEND! Trivia, The Wild Wild Chat i Stick Around!**, dzięki czemu w każdą grę można zagrać, nawet gdy nikt inny nie jest dostępny.
 
 ## Jak gra Computer
 
 W Szachach Computer wykonuje ruch po krótkiej pauzie, żeby gra nie sprawiała wrażenia natychmiastowej odpowiedzi. Szachy mają teraz trzech przeciwników Computer. Beginner to najłatwiejsza opcja na rozgrzewkę, Club gra stabilniej na średnim poziomie, a Master jest najtrudniejszy.
 
-W *HELP-A-FRIEND! Trivia* Computer odpowiada w rundzie pytań tak jak inny gracz. Nie jest idealny, więc nadal masz realną szansę wygrać.
+W *HELP-A-FRIEND! Trivia* Computer odpowiada w każdej rundzie pytań i nie zawsze ma rację. W *The Wild Wild Chat* obserwuje wiadomości pasujące do otwartej nagrody i próbuje przejąć je przed tobą. W *Stick Around!* porusza się po arenie, unika spadających dymków czatu i walczy o pozostanie ostatnim graczem.
 
 ## Dlaczego to dodaliśmy?
 

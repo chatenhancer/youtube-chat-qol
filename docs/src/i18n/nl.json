@@ -86,6 +86,47 @@
     "imageAlt": "Zwevend schaakpaneel in YouTube-livechat",
     "note": "* Beide spelers hebben de extensie nodig om samen te spelen"
   },
+  "playgroundPage": {
+    "metaTitle": "Playground - Kleine games voor YouTube-livechat",
+    "metaDescription": "Ontdek Playground, een optionele verzameling kleine games die dicht bij de YouTube-livechat blijft.",
+    "metaImageAlt": "Playground-games in Chat Enhancer voor YouTube-livechat",
+    "taglineLead": "Kleine games",
+    "taglineTail": "voor pauzes in de livechat",
+    "introFirst": "Playground is een optionele gameruimte die streams interactiever maakt.",
+    "introSecond": "Kies een game, nodig iemand uit, begin te spelen en houd de chat dichtbij.",
+    "exploreCta": "Ontdek de games",
+    "gamesHeadingFirst": "Vier games,",
+    "gamesHeadingSecond": "vier verschillende sferen",
+    "seeHow": "Bekijk hoe het speelt",
+    "computerTitle": "Speel tegen Computer",
+    "computerBody": "Elke Playground-game bevat een Computer-tegenstander, zodat je een wedstrijd kunt starten zonder op een andere kijker te wachten. Kies een game en Computer en houd de stream dichtbij.",
+    "readyTitle": "Klaar om te spelen?",
+    "settingsAlt": "Playground-instellingen in de popup van de Chat Enhancer-extensie",
+    "logoAlt": "Chat Enhancer Playground",
+    "primaryCta": "Probeer het in de extensie",
+    "games": {
+      "chess": {
+        "title": "Goed oud schaken",
+        "body": "Houd een vertrouwd schaakbord naast de chat. Nodig een andere kijker uit of kies een Computer-tegenstander op Beginner-, Club- of Master-niveau zonder de stream te verlaten.",
+        "alt": "Schaakbord in een zwevend Playground-paneel naast de YouTube-livechat"
+      },
+      "trivia": {
+        "title": "HELP-A-FRIEND! Trivia",
+        "body": "Momenten uit een YouTube-herhaling worden een snelle quiz in chatstijl. Weet je nog wat er tijdens de stream gebeurde? Nodig een vriend uit en ontdek het.",
+        "alt": "HELP-A-FRIEND! Trivia vraagt kijkers een antwoord te kiezen"
+      },
+      "wild": {
+        "title": "The Wild Wild Chat",
+        "body": "De chat wordt een snelle premiejacht waarin spelers passende berichten proberen te claimen. Wie neemt alle buit mee naar huis?",
+        "alt": "Premiebord van The Wild Wild Chat in een Playground-paneel"
+      },
+      "stickAround": {
+        "title": "Stick Around!",
+        "body": "Stick Around! verandert de livechat in een kleine vechtarena met vallende chatbubbels. Duw je tegenstander uit de ring voordat die dat doet.",
+        "alt": "Stick Around! verandert de YouTube-livechat in een vechtarena"
+      }
+    }
+  },
   "screenshots": {
     "eyebrow": "Screenshots",
     "title": "Verbeteringen voor<br><span class=\"title-emphasis\">chat</span> die vanzelfsprekend aanvoelen",

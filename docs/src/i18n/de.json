@@ -86,6 +86,47 @@
     "imageAlt": "Schwebendes Schachfenster im YouTube-Livechat",
     "note": "* Beide Personen brauchen die Erweiterung, um zusammen zu spielen"
   },
+  "playgroundPage": {
+    "metaTitle": "Playground – Kleine Spiele für den YouTube-Livechat",
+    "metaDescription": "Entdecke Playground, eine optionale Sammlung kleiner Spiele direkt neben dem YouTube-Livechat.",
+    "metaImageAlt": "Playground-Spiele in Chat Enhancer für den YouTube-Livechat",
+    "taglineLead": "Kleine Spiele",
+    "taglineTail": "für Livechat-Pausen",
+    "introFirst": "Playground ist ein optionaler Spielbereich, der Streams interaktiver macht.",
+    "introSecond": "Wähle ein Spiel, lade jemanden ein, leg los und behalte den Chat in der Nähe.",
+    "exploreCta": "Spiele entdecken",
+    "gamesHeadingFirst": "Vier Spiele,",
+    "gamesHeadingSecond": "vier verschiedene Stimmungen",
+    "seeHow": "So wird gespielt",
+    "computerTitle": "Gegen Computer spielen",
+    "computerBody": "Jedes Playground-Spiel bietet einen Computer-Gegner, sodass du eine Partie starten kannst, ohne auf einen anderen Zuschauer zu warten. Wähle ein Spiel und Computer aus und bleib nah am Stream.",
+    "readyTitle": "Bereit zu spielen?",
+    "settingsAlt": "Playground-Einstellungen im Popup der Chat-Enhancer-Erweiterung",
+    "logoAlt": "Chat Enhancer Playground",
+    "primaryCta": "In der Erweiterung ausprobieren",
+    "games": {
+      "chess": {
+        "title": "Gutes altes Schach",
+        "body": "Behalte ein vertrautes Schachbrett neben dem Chat. Lade einen anderen Zuschauer ein oder wähle Computer auf Beginner-, Club- oder Master-Niveau, ohne den Stream zu verlassen.",
+        "alt": "Schachbrett in einem schwebenden Playground-Fenster neben dem YouTube-Livechat"
+      },
+      "trivia": {
+        "title": "HELP-A-FRIEND! Trivia",
+        "body": "Momente aus einer YouTube-Wiederholung werden zu einem schnellen Quiz im Chatstil. Erinnerst du dich, was im Stream passiert ist? Lade einen Freund ein und finde es heraus.",
+        "alt": "HELP-A-FRIEND! Trivia fordert Zuschauer auf, eine Antwort auszuwählen"
+      },
+      "wild": {
+        "title": "The Wild Wild Chat",
+        "body": "Der Chat wird zur rasanten Kopfgeldjagd, bei der Spieler passende Nachrichten beanspruchen. Wer nimmt die ganze Beute mit?",
+        "alt": "Kopfgeldtafel von The Wild Wild Chat in einem Playground-Fenster"
+      },
+      "stickAround": {
+        "title": "Stick Around!",
+        "body": "Stick Around! verwandelt den Livechat in eine kleine Kampfarena mit fallenden Chatblasen. Stoße deinen Gegner aus dem Ring, bevor er es tut.",
+        "alt": "Stick Around! verwandelt den YouTube-Livechat in eine Kampfarena"
+      }
+    }
+  },
   "screenshots": {
     "eyebrow": "Screenshots",
     "title": "Verbesserungen für den<br><span class=\"title-emphasis\">Chat</span>, die sich nativ anfühlen",

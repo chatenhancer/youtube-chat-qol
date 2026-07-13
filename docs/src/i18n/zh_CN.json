@@ -86,6 +86,47 @@
     "imageAlt": "YouTube 直播聊天中的悬浮国际象棋游戏面板",
     "note": "* 两名玩家都需要安装扩展才能一起玩"
   },
+  "playgroundPage": {
+    "metaTitle": "Playground - YouTube 实时聊天小游戏",
+    "metaDescription": "探索 Playground：一组可选的小游戏，让你在 YouTube 实时聊天旁轻松游玩。",
+    "metaImageAlt": "Chat Enhancer 中面向 YouTube 实时聊天的 Playground 游戏",
+    "taglineLead": "小游戏",
+    "taglineTail": "陪你度过聊天间歇",
+    "introFirst": "Playground 是一个可选的游戏空间，让直播更有互动性。",
+    "introSecond": "选择游戏、邀请他人、开始游玩，同时让聊天始终在旁。",
+    "exploreCta": "探索游戏",
+    "gamesHeadingFirst": "四款游戏，",
+    "gamesHeadingSecond": "四种不同氛围",
+    "seeHow": "查看玩法",
+    "computerTitle": "与 Computer 对战",
+    "computerBody": "每款 Playground 游戏都有 Computer 对手，因此无需等待其他观众也能开始比赛。选择一款游戏和 Computer，继续留在直播旁。",
+    "readyTitle": "准备好开始了吗？",
+    "settingsAlt": "Chat Enhancer 扩展程序弹出窗口中的 Playground 设置",
+    "logoAlt": "Chat Enhancer Playground",
+    "primaryCta": "在扩展中试用",
+    "games": {
+      "chess": {
+        "title": "经典国际象棋",
+        "body": "把熟悉的棋盘放在聊天旁。无需离开直播，即可邀请其他观众，或选择 Beginner、Club、Master 难度的 Computer 对手。",
+        "alt": "YouTube 实时聊天旁悬浮 Playground 面板中的国际象棋棋盘"
+      },
+      "trivia": {
+        "title": "HELP-A-FRIEND! Trivia",
+        "body": "YouTube 回放片段会变成快速的聊天式问答。还记得直播中发生了什么吗？邀请朋友一起找出答案。",
+        "alt": "HELP-A-FRIEND! Trivia 请观众选择答案"
+      },
+      "wild": {
+        "title": "The Wild Wild Chat",
+        "body": "聊天会变成快节奏的赏金追逐，玩家竞相认领符合条件的消息。谁能带走全部战利品？",
+        "alt": "Playground 面板中的 The Wild Wild Chat 赏金榜"
+      },
+      "stickAround": {
+        "title": "Stick Around!",
+        "body": "Stick Around! 会把实时聊天变成一个不断落下聊天气泡的小型格斗场。抢在对手之前把他们推出擂台。",
+        "alt": "Stick Around! 将 YouTube 实时聊天变成格斗场"
+      }
+    }
+  },
   "screenshots": {
     "eyebrow": "截图",
     "title": "像原生一样自然的<br><span class=\"title-emphasis\">聊天</span>增强",

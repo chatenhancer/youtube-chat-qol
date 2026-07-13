@@ -86,6 +86,47 @@
     "imageAlt": "YouTube ライブチャット内に浮かぶチェスゲームパネル",
     "note": "* 一緒に遊ぶには、両方のプレイヤーが拡張機能を入れている必要があります"
   },
+  "playgroundPage": {
+    "metaTitle": "Playground - YouTube ライブチャットのミニゲーム",
+    "metaDescription": "YouTube ライブチャットのそばで遊べる、オプトイン式ミニゲーム集 Playground を紹介します。",
+    "metaImageAlt": "YouTube ライブチャット向け Chat Enhancer 内の Playground ゲーム",
+    "taglineLead": "小さなゲーム",
+    "taglineTail": "ライブチャットのひと休みに",
+    "introFirst": "Playground は配信をもっとインタラクティブにする、オプトイン式のゲームスペースです。",
+    "introSecond": "ゲームを選び、誰かを招待して、チャットをそばに置いたまま遊び始めましょう。",
+    "exploreCta": "ゲームを見る",
+    "gamesHeadingFirst": "4 つのゲーム、",
+    "gamesHeadingSecond": "4 つの異なる気分",
+    "seeHow": "遊び方を見る",
+    "computerTitle": "Computer と対戦",
+    "computerBody": "すべての Playground ゲームに Computer 対戦相手がいるため、ほかの視聴者を待たずに試合を始められます。ゲームと Computer を選び、配信のそばで遊びましょう。",
+    "readyTitle": "遊ぶ準備はできましたか？",
+    "settingsAlt": "Chat Enhancer 拡張機能ポップアップの Playground 設定",
+    "logoAlt": "Chat Enhancer Playground",
+    "primaryCta": "拡張機能で試す",
+    "games": {
+      "chess": {
+        "title": "いつものチェス",
+        "body": "おなじみのチェス盤をチャットの横に置けます。配信を離れずに別の視聴者を招待するか、Beginner、Club、Master の Computer 対戦相手を選べます。",
+        "alt": "YouTube ライブチャットの横に浮かぶ Playground パネル内のチェス盤"
+      },
+      "trivia": {
+        "title": "HELP-A-FRIEND! Trivia",
+        "body": "YouTube のリプレイ場面が、チャット形式の手軽なクイズになります。配信中に何が起きたか覚えていますか？友だちを招待して確かめましょう。",
+        "alt": "視聴者に答えを選んでもらう HELP-A-FRIEND! Trivia"
+      },
+      "wild": {
+        "title": "The Wild Wild Chat",
+        "body": "チャットがスピード感のある賞金稼ぎに変わり、プレイヤーは条件に合うメッセージの獲得を競います。戦利品を総取りするのは誰でしょう？",
+        "alt": "Playground パネル内の The Wild Wild Chat 賞金ボード"
+      },
+      "stickAround": {
+        "title": "Stick Around!",
+        "body": "Stick Around! はライブチャットを、チャットバブルが降る小さな格闘アリーナに変えます。相手より先にリングの外へ押し出しましょう。",
+        "alt": "YouTube ライブチャットを格闘アリーナに変える Stick Around!"
+      }
+    }
+  },
   "screenshots": {
     "eyebrow": "スクリーンショット",
     "title": "自然になじむ<br><span class=\"title-emphasis\">チャット</span>改善",

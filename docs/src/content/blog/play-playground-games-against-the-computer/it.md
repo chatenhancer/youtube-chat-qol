@@ -12,23 +12,22 @@ tags:
   - "chess"
   - "trivia"
 ---
-
 Ora è più facile entrare in Playground: puoi giocare contro **Computer**.
 
 ## Come funziona
 
 Apri Playground dal pannello Giochi e cerca un giocatore Computer nell’elenco dei giocatori. Invitalo come inviteresti un altro spettatore. La partita parte automaticamente e il resto di Playground funziona come sempre.
 
-Gli avversari Computer sono disponibili per:
+Gli avversari Computer sono disponibili in ogni gioco Playground:
 
 - **Scacchi**, con **Computer (Beginner)**, **Computer (Club)** e **Computer (Master)**, così puoi scegliere una partita più leggera, intermedia o più impegnativa.
-- **HELP-A-FRIEND! Trivia**, così la trivia sui replay resta giocabile anche quando nessun altro è disponibile.
+- **HELP-A-FRIEND! Trivia, The Wild Wild Chat e Stick Around!**, così ogni gioco resta disponibile anche quando non c’è nessun altro.
 
 ## Come gioca Computer
 
 In Scacchi, Computer aspetta un attimo prima di muovere, così la partita non sembra istantanea. Scacchi ora ha tre avversari Computer. Beginner è l’opzione più facile per scaldarsi, Club gioca una partita intermedia più solida e Master è la scelta più impegnativa.
 
-In *HELP-A-FRIEND! Trivia*, Computer risponde durante il round della domanda proprio come farebbe un altro giocatore. Non è perfetto, quindi hai ancora una vera possibilità di vincere.
+In *HELP-A-FRIEND! Trivia*, Computer risponde durante ogni turno e non sempre indovina. In *The Wild Wild Chat*, controlla i messaggi che corrispondono a una taglia aperta e prova a reclamarli prima di te. In *Stick Around!*, si muove nell’arena, schiva le bolle di chat che cadono e combatte per restare l’ultimo giocatore.
 
 ## Perché aggiungerlo?
 
