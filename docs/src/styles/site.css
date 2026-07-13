@@ -3348,15 +3348,12 @@ html[dir="rtl"] .forward-link-icon {
   display: none;
 }
 
-.command-menu-item:hover::before,
-.command-menu-item:focus::before,
 .command-menu-item.is-active::before {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.68), rgba(255, 255, 255, 0.2)),
     rgba(var(--blue-rgb), 0.08);
 }
 
-.command-menu-item:hover,
 .command-menu-item:focus,
 .command-menu-item.is-active {
   outline: 0;
@@ -3443,6 +3440,7 @@ html[dir="rtl"] .forward-link-icon {
   border: 0;
   outline: 0;
   font: 500 15px/1.4 var(--font-body);
+  pointer-events: none;
 }
 
 .command-input-wrap.is-cycling input {

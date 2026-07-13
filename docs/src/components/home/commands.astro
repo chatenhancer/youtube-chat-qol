@@ -45,7 +45,7 @@ const commandSections = [
   }
 ];
 const demoCommands = commandSections.flatMap((section) => section.commands.map((command) => ({ ...command, section: section.title })));
-const defaultCommand = demoCommands.find(({ command }) => command === '/translate') || demoCommands[0];
+const defaultCommand = demoCommands[0];
 const defaultCommandIndex = Math.max(0, demoCommands.findIndex(({ command }) => command === defaultCommand.command));
 const nextCommand = demoCommands[(defaultCommandIndex + 1) % demoCommands.length] || defaultCommand;
 const commandCopyParagraphs = [m.commands.copy, m.commands.actionCopy].filter(Boolean);
@@ -76,8 +76,6 @@ const commandCopyParagraphs = [m.commands.copy, m.commands.actionCopy].filter(Bo
                 data-command-option
                 data-command-value={item.command}
                 data-command-template={item.template}
-                data-command-description={item.description}
-                data-command-search={`${item.command} ${item.aliases.join(' ')} ${item.template} ${item.description} ${item.detail || ''}`.toLowerCase()}
                 tabindex={item.command === defaultCommand.command ? '0' : '-1'}
               >
                 <span class="command-menu-command">
@@ -103,8 +101,8 @@ const commandCopyParagraphs = [m.commands.copy, m.commands.actionCopy].filter(Bo
                     autocomplete="off"
                     spellcheck="false"
                     aria-label={m.commands.title}
-                    aria-controls="command-demo-menu"
-                    aria-autocomplete="list"
+                    readonly
+                    tabindex="-1"
                   >
                   <span class="command-input-cycle" data-command-cycle aria-hidden="true">
                     <span class="command-cycle-row" data-command-cycle-current>

@@ -653,12 +653,15 @@
     const initialOption = options.find((option) => option.classList.contains("is-active")) || options[0];
     const cycleDelayMs = 3200;
     const cycleAnimationMs = 460;
+    const interactionIdleMs = 5000;
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-    let isAutoCycling = inputWrap instanceof HTMLElement && cycleCurrent instanceof HTMLElement && cycleCurrentText instanceof HTMLElement && cycleNext instanceof HTMLElement && cycleNextText instanceof HTMLElement;
+    const canAutoCycle = inputWrap instanceof HTMLElement && cycleCurrent instanceof HTMLElement && cycleCurrentText instanceof HTMLElement && cycleNext instanceof HTMLElement && cycleNextText instanceof HTMLElement;
+    let isAutoCycling = canAutoCycle;
+    let isManuallyScrollingMenu = false;
     let cycleTimer = 0;
     let cycleAnimationTimer = 0;
+    let interactionTimer = 0;
     let cycleIndex = Math.max(0, options.indexOf(initialOption));
-    let activeIndex = -1;
     const optionTemplate = (option) => option?.dataset.commandTemplate || option?.dataset.commandValue || "";
     const optionAfter = (index) => options[(index + 1) % options.length] || options[0];
     const setInputTemplateWidth = (template) => {
@@ -666,7 +669,6 @@
       const width = Math.min(Math.max(template.length + 1, 9), 34);
       inputWrap.style.setProperty("--command-input-text-width", `${width}ch`);
     };
-    const visibleOptions = () => options.filter((option) => !option.hidden);
     const setActiveOption = (nextOption) => {
       if (!nextOption) return;
       options.forEach((option) => {
@@ -675,7 +677,6 @@
         option.setAttribute("aria-selected", isActive ? "true" : "false");
         option.setAttribute("tabindex", isActive ? "0" : "-1");
       });
-      activeIndex = visibleOptions().indexOf(nextOption);
     };
     const updateCycleText = (currentOption) => {
       if (!(cycleCurrentText instanceof HTMLElement) || !(cycleNextText instanceof HTMLElement)) return;
@@ -691,31 +692,31 @@
       if (!enabled) inputWrap.classList.remove("is-sliding");
     };
     const keepOptionVisible = (option) => {
-      const optionTop = option.offsetTop;
-      const optionBottom = optionTop + option.offsetHeight;
-      const menuBottom = menu.scrollTop + menu.clientHeight;
+      if (isManuallyScrollingMenu) return;
 
-      if (optionTop < menu.scrollTop) {
-        menu.scrollTop = optionTop;
-      } else if (optionBottom > menuBottom) {
-        menu.scrollTop = optionBottom - menu.clientHeight;
+      const optionRect = option.getBoundingClientRect();
+      const menuRect = menu.getBoundingClientRect();
+      const menuTop = menuRect.top + menu.clientTop + 1;
+      const menuBottom = menuRect.top + menu.clientTop + menu.clientHeight - 1;
+      let nextScrollTop = menu.scrollTop;
+
+      if (optionRect.top < menuTop) {
+        nextScrollTop -= menuTop - optionRect.top;
+      } else if (optionRect.bottom > menuBottom) {
+        nextScrollTop += optionRect.bottom - menuBottom;
+      } else {
+        return;
       }
-    };
-    const showOptions = (matches) => {
-      const visible = matches.length ? matches : options;
-      options.forEach((option) => {
-        option.hidden = !visible.includes(option);
+
+      menu.scrollTo({
+        top: nextScrollTop,
+        behavior: reducedMotion.matches ? "auto" : "smooth"
       });
-      menu.hidden = false;
-      setActiveOption(visible.includes(initialOption) ? initialOption : visible[0]);
     };
     const selectCycleOption = (option) => {
       if (!option) return;
-      options.forEach((candidate) => {
-        candidate.hidden = false;
-      });
-      menu.hidden = false;
       setActiveOption(option);
+      keepOptionVisible(option);
       cycleIndex = Math.max(0, options.indexOf(option));
       input.value = optionTemplate(option);
       updateCycleText(option);
@@ -730,26 +731,51 @@
       if (!isAutoCycling) return;
       isAutoCycling = false;
       stopCycleTimers();
-      setCycleState(false);
-      const activeOption = visibleOptions()[activeIndex] || options[cycleIndex] || initialOption;
+      if (inputWrap instanceof HTMLElement) inputWrap.classList.remove("is-sliding");
+      setCycleState(canAutoCycle);
+      const activeOption = options.find((option) => option.classList.contains("is-active")) || options[cycleIndex] || initialOption;
       cycleIndex = Math.max(0, options.indexOf(activeOption));
       input.value = optionTemplate(activeOption);
       updateCycleText(activeOption);
+    };
+    const resumeAutoCycle = () => {
+      if (!canAutoCycle || isAutoCycling) return;
+      isManuallyScrollingMenu = false;
+      isAutoCycling = true;
+      selectCycleOption(options[cycleIndex] || initialOption);
+      setCycleState(true);
+      if (!document.hidden) cycleToNextOption();
+    };
+    const scheduleAutoCycleResume = () => {
+      window.clearTimeout(interactionTimer);
+      interactionTimer = window.setTimeout(() => {
+        interactionTimer = 0;
+        resumeAutoCycle();
+      }, interactionIdleMs);
+    };
+    const noteManualMenuScroll = () => {
+      isManuallyScrollingMenu = true;
+      pauseAutoCycle();
+      scheduleAutoCycleResume();
     };
     const scheduleCycle = () => {
       if (!isAutoCycling || document.hidden) return;
       window.clearTimeout(cycleTimer);
       cycleTimer = window.setTimeout(cycleToNextOption, cycleDelayMs);
     };
-    const cycleToOption = (nextOption) => {
-      if (!isAutoCycling || !nextOption) return;
+    const cycleToOption = (nextOption, { automatic = true } = {}) => {
+      if (!nextOption || (automatic && !isAutoCycling)) return;
       const nextIndex = Math.max(0, options.indexOf(nextOption));
       const completeCycle = () => {
-        if (!isAutoCycling) return;
+        if (automatic && !isAutoCycling) return;
         cycleIndex = nextIndex;
         selectCycleOption(nextOption);
         if (inputWrap instanceof HTMLElement) inputWrap.classList.remove("is-sliding");
-        scheduleCycle();
+        if (automatic) {
+          scheduleCycle();
+        } else {
+          setCycleState(canAutoCycle);
+        }
       };
 
       if (reducedMotion.matches || !(inputWrap instanceof HTMLElement) || !(cycleCurrent instanceof HTMLElement) || !(cycleCurrentText instanceof HTMLElement) || !(cycleNext instanceof HTMLElement) || !(cycleNextText instanceof HTMLElement)) {
@@ -759,10 +785,12 @@
 
       const currentTemplate = optionTemplate(options[cycleIndex] || initialOption);
       const nextTemplate = optionTemplate(nextOption);
+      if (!automatic) setCycleState(true);
       cycleCurrentText.textContent = currentTemplate;
       cycleNextText.textContent = nextTemplate;
       setInputTemplateWidth(currentTemplate.length > nextTemplate.length ? currentTemplate : nextTemplate);
       setActiveOption(nextOption);
+      keepOptionVisible(nextOption);
       inputWrap.classList.remove("is-sliding");
       void inputWrap.offsetWidth;
       inputWrap.classList.add("is-sliding");
@@ -772,82 +800,22 @@
     function cycleToNextOption() {
       cycleToOption(optionAfter(cycleIndex));
     }
-    const filterMenu = () => {
-      const rawQuery = input.value.trim().toLowerCase();
-      const query = rawQuery.replace(/^\/+/, "");
-      if (!rawQuery) {
-        showOptions(options);
-        return;
-      }
-
-      const matches = options.filter((option) => {
-        const search = option.dataset.commandSearch || "";
-        const command = option.dataset.commandValue || "";
-        const normalizedCommand = command.replace(/^\/+/, "");
-        const isCommandMatch = command.startsWith(rawQuery) || normalizedCommand.startsWith(query);
-        const isTextMatch = query.length > 1 && (search.includes(rawQuery) || search.includes(query));
-        return isCommandMatch || isTextMatch;
-      });
-      showOptions(matches);
-    };
-    const applyOption = (option) => {
-      if (!option) return;
-      const template = option.dataset.commandTemplate || option.dataset.commandValue || "";
-      if (template) input.value = template;
-      setInputTemplateWidth(template || input.value);
-      cycleIndex = Math.max(0, options.indexOf(option));
-      updateCycleText(option);
-      filterMenu();
-      input.focus();
-    };
-    const moveActiveOption = (direction) => {
-      const visible = visibleOptions();
-      if (!visible.length) return;
-      const currentIndex = activeIndex >= 0 ? activeIndex : 0;
-      const nextIndex = (currentIndex + direction + visible.length) % visible.length;
-      const nextOption = visible[nextIndex];
-      setActiveOption(nextOption);
-      keepOptionVisible(nextOption);
-    };
-
-    input.addEventListener("input", () => {
-      pauseAutoCycle();
-      setInputTemplateWidth(input.value);
-      filterMenu();
-    });
-    input.addEventListener("focus", () => {
-      pauseAutoCycle();
-      filterMenu();
-    });
-    input.addEventListener("keydown", (event) => {
-      if (event.key === "ArrowDown") {
-        event.preventDefault();
-        pauseAutoCycle();
-        filterMenu();
-        moveActiveOption(1);
-        return;
-      }
-      if (event.key === "ArrowUp") {
-        event.preventDefault();
-        pauseAutoCycle();
-        filterMenu();
-        moveActiveOption(-1);
-        return;
-      }
-      if (event.key === "Tab" || event.key === "Enter") {
-        const activeOption = visibleOptions()[activeIndex];
-        if (activeOption) {
-          event.preventDefault();
-          applyOption(activeOption);
-        }
-      }
-    });
-
     options.forEach((option) => {
       option.addEventListener("click", () => {
         pauseAutoCycle();
-        applyOption(option);
+        cycleToOption(option, { automatic: false });
+        scheduleAutoCycleResume();
       });
+    });
+    menu.addEventListener("wheel", noteManualMenuScroll, { passive: true });
+    menu.addEventListener("touchmove", noteManualMenuScroll, { passive: true });
+    menu.addEventListener("pointerdown", (event) => {
+      if (event.target === menu) noteManualMenuScroll();
+    });
+    menu.addEventListener("keydown", (event) => {
+      if (["ArrowDown", "ArrowUp", "PageDown", "PageUp", "Home", "End", " "].includes(event.key)) {
+        noteManualMenuScroll();
+      }
     });
     selectCycleOption(initialOption);
     setCycleState(isAutoCycling);
