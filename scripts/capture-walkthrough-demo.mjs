@@ -485,6 +485,7 @@ async function sectionReplyFaster(page, chat, recorder) {
   await showComposerDraftResult(page, chat, recorder, 1_700, { moveCamera: false });
   await clearChatComposer(chat);
   await closeFocusPromptIfPresent(chat);
+  await fadeOutDemoCaption(page, recorder, 240);
 }
 
 async function sectionRecentMessages(page, chat, recorder) {
