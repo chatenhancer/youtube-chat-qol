@@ -19,6 +19,11 @@ export class StockfishContainer extends Container<Env> {
     });
   }
 
+  override async onActivityExpired(): Promise<void> {
+    logPlaygroundEvent('stockfish_container_activity_expired');
+    await this.destroy();
+  }
+
   override onError(error: unknown): never {
     logPlaygroundEvent('stockfish_container_error', {
       errorMessage: getLogErrorMessage(error),

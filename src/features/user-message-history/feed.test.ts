@@ -255,6 +255,10 @@ describe('feed-backed user message history', () => {
     expect(recent).toHaveLength(12);
     expect(recent[0].text).toBe('message 1');
     expect(recent.at(-1)?.text).toBe('message 12');
+    expect(history.getUserMessagesForIdentity({
+      authorName: '@BusyViewer',
+      channelId: 'feed-channel'
+    })).toHaveLength(13);
     expect(history.getUserMessageHistorySnapshot()).toHaveLength(13);
   });
 

@@ -35,9 +35,12 @@ vi.mock('../../youtube/chat-feed/records', () => ({
 
 import {
   cleanupLiteMode,
+  getLiteModeMessageElement,
   handleLiteModeDomMutations,
+  hasRetainedLiteModeMessage,
   isLiteModeActive,
   refreshLiteMode,
+  revealRetainedLiteModeMessage,
   setLiteModeRowRenderedCallback,
   startLiteMode,
   stopLiteMode
@@ -129,6 +132,29 @@ describe('Lite mode controller', () => {
       automaticFailure: false,
       message: 'Loading chat'
     });
+  });
+
+  it('reveals retained messages that are outside the mounted Lite window', () => {
+    getYouTubeChatFeedRecordStateMock.mockReturnValue({
+      ready: true,
+      records: Array.from({ length: 180 }, (_value, index) =>
+        createRecord(`message-${index}`, `Message ${index}`)
+      )
+    });
+
+    startLiteMode({ clearCooldown: true });
+
+    expect(getLiteModeMessageElement('message-0')).toBeNull();
+    expect(hasRetainedLiteModeMessage('message-0')).toBe(true);
+    const target = revealRetainedLiteModeMessage('message-0');
+    expect(target?.isConnected).toBe(true);
+    expect(target?.dataset.messageId).toBe('message-0');
+    expect(getLiteModeMessageElement('message-0')).toBe(target);
+    expect(document.querySelector('.ytcq-lite-root')?.getAttribute(
+      'data-ytcq-following-live-edge'
+    )).toBe('false');
+    expect(hasRetainedLiteModeMessage('missing')).toBe(false);
+    expect(revealRetainedLiteModeMessage('missing')).toBeNull();
   });
 
   it('requests a final initial snapshot before discarding an uncached native history', () => {

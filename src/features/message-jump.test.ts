@@ -1,10 +1,16 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { returnToChatInputPanel } from '../youtube/chat-input';
-import { jumpToChatMessage } from './message-jump';
+import { canJumpToChatMessage, jumpToChatMessage } from './message-jump';
+
+const liteModeMocks = vi.hoisted(() => ({
+  hasRetainedLiteModeMessage: vi.fn(() => false),
+  revealRetainedLiteModeMessage: vi.fn(() => null as HTMLElement | null)
+}));
 
 vi.mock('../youtube/chat-input', () => ({
   returnToChatInputPanel: vi.fn(() => false)
 }));
+vi.mock('./lite-mode/controller', () => liteModeMocks);
 
 describe('message jump helpers', () => {
   afterEach(() => {
@@ -12,6 +18,8 @@ describe('message jump helpers', () => {
     vi.restoreAllMocks();
     vi.useRealTimers();
     vi.mocked(returnToChatInputPanel).mockReturnValue(false);
+    liteModeMocks.hasRetainedLiteModeMessage.mockReset().mockReturnValue(false);
+    liteModeMocks.revealRetainedLiteModeMessage.mockReset().mockReturnValue(null);
   });
 
   it('scrolls YouTube chat scroller to center the target without moving the page', () => {
@@ -41,6 +49,23 @@ describe('message jump helpers', () => {
 
     expect(scrollTo).not.toHaveBeenCalled();
     await vi.advanceTimersByTimeAsync(120);
+    expect(scrollTo).toHaveBeenCalled();
+  });
+
+  it('returns from Participants before revealing a retained Lite message by ID', async () => {
+    vi.useFakeTimers();
+    vi.mocked(returnToChatInputPanel).mockReturnValue(true);
+    const { scrollTo, target } = createScrollableChat();
+    liteModeMocks.hasRetainedLiteModeMessage.mockReturnValue(true);
+    liteModeMocks.revealRetainedLiteModeMessage.mockReturnValue(target);
+
+    expect(canJumpToChatMessage(null, 'retained-message')).toBe(true);
+    jumpToChatMessage(null, 'retained-message');
+
+    expect(liteModeMocks.revealRetainedLiteModeMessage).not.toHaveBeenCalled();
+    expect(scrollTo).not.toHaveBeenCalled();
+    await vi.advanceTimersByTimeAsync(120);
+    expect(liteModeMocks.revealRetainedLiteModeMessage).toHaveBeenCalledWith('retained-message');
     expect(scrollTo).toHaveBeenCalled();
   });
 

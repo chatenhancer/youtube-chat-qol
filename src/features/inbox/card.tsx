@@ -15,7 +15,7 @@ import {
 } from '../../shared/scroll';
 import { appendRichMessageText } from '../../youtube/rich-text';
 import { applyMarkedUserRing } from '../marked-users';
-import { createJumpToMessageIcon, jumpToChatMessage } from '../message-jump';
+import { canJumpToChatMessage, createJumpToMessageIcon, jumpToChatMessage } from '../message-jump';
 import { mentionAuthorName, quoteAuthorRichText } from '../reply';
 import { getChannelUrl, openChannelWindow } from '../channel-popup';
 import { highlightInboxAuthorMatches, highlightInboxMatches } from './highlights';
@@ -322,7 +322,7 @@ function wireQuoteCardItem(item: HTMLElement, record: InboxRecord): void {
 }
 
 function createInboxJumpButton(record: InboxRecord): HTMLButtonElement | null {
-  if (!getLiveInboxMessage(record)) return null;
+  if (!canJumpToChatMessage(getLiveInboxMessage(record), record.messageId)) return null;
 
   const button = el<HTMLButtonElement>(
     <button
@@ -345,9 +345,9 @@ function createInboxJumpButton(record: InboxRecord): HTMLButtonElement | null {
 
 function jumpToInboxMessage(record: InboxRecord): void {
   const target = getLiveInboxMessage(record);
-  if (!target) return;
+  if (!canJumpToChatMessage(target, record.messageId)) return;
 
-  jumpToChatMessage(target);
+  jumpToChatMessage(target, record.messageId);
   closeInboxCard();
 }
 

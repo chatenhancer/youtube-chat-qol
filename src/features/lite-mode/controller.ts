@@ -304,6 +304,17 @@ export function getLiteModeMessageElement(messageId: string): HTMLElement | null
   return renderer?.getMessageElement(messageId) || null;
 }
 
+export function hasRetainedLiteModeMessage(messageId: string): boolean {
+  const id = messageId.trim();
+  return active && Boolean(id && store?.get(id));
+}
+
+export function revealRetainedLiteModeMessage(messageId: string): HTMLElement | null {
+  const id = messageId.trim();
+  if (!active || !id || !store?.get(id)) return null;
+  return renderer?.revealMessage(id) || null;
+}
+
 function handleLiteChatBatch(batch: YouTubeChatFeedBatch): void {
   if (!active) return;
   const isTransportDelivery = batch.delivery === 'transport';

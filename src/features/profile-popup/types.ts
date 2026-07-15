@@ -10,5 +10,6 @@ export interface ProfileSource {
   authorName: string;
   avatarSrc: string;
   identity: UserIdentity;
+  originMessageId?: string;
   profileUrl: string;
 }

@@ -7,21 +7,37 @@
 import { returnToChatInputPanel } from '../youtube/chat-input';
 import { signalChatLiveEdgeRelease } from '../youtube/chat-scroll';
 import { CHAT_SCROLLER_SELECTOR } from '../youtube/selectors';
+import {
+  hasRetainedLiteModeMessage,
+  revealRetainedLiteModeMessage
+} from './lite-mode/controller';
 export { createJumpToMessageIcon } from '../shared/icons';
 
 const JUMP_AFTER_PANEL_RETURN_DELAY_MS = 120;
 const JUMP_LIVE_EDGE_RELEASE_OFFSET = 48;
 const JUMP_TARGET_CLASS = 'ytcq-message-jump-target';
 
-export function jumpToChatMessage(target: HTMLElement): void {
+export function canJumpToChatMessage(
+  target: HTMLElement | null,
+  messageId = ''
+): boolean {
+  return Boolean(target?.isConnected || hasRetainedLiteModeMessage(messageId));
+}
+
+export function jumpToChatMessage(target: HTMLElement | null, messageId = ''): void {
+  const jump = (): void => {
+    const resolvedTarget = target?.isConnected
+      ? target
+      : revealRetainedLiteModeMessage(messageId);
+    if (resolvedTarget) scrollToChatMessage(resolvedTarget);
+  };
+
   if (returnToChatInputPanel()) {
-    window.setTimeout(() => {
-      scrollToChatMessage(target);
-    }, JUMP_AFTER_PANEL_RETURN_DELAY_MS);
+    window.setTimeout(jump, JUMP_AFTER_PANEL_RETURN_DELAY_MS);
     return;
   }
 
-  scrollToChatMessage(target);
+  jump();
 }
 
 function scrollToChatMessage(target: HTMLElement): void {

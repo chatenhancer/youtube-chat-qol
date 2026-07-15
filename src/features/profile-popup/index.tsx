@@ -9,16 +9,11 @@ import { t } from '../../shared/i18n';
 import { wireFloatingPanelDrag } from '../../shared/floating-panel-drag';
 import { createChannelIcon, createCloseIcon } from '../../shared/icons';
 import { jsx, el } from '../../shared/jsx-dom';
-import {
-  captureScrollPosition,
-  restoreScrollPositionAfterRender,
-  scrollElementToBottom,
-  wireScrollEdgeFades
-} from '../../shared/scroll';
+import { updateScrollEdgeFades, wireScrollEdgeFades } from '../../shared/scroll';
 import { findChatInput } from '../../youtube/chat-input';
 import {
   getLiveMessageForRecord,
-  getRecentMessagesForIdentity,
+  getUserMessagesForIdentity,
   getUserKeyFromIdentity,
   onUserMessagesChanged,
   recordVisibleUserMessages,
@@ -34,6 +29,7 @@ import {
 } from '../translation/queue';
 import { getChannelUrl, openChannelWindow } from '../channel-popup';
 import { createAvatarElement, createProfileAvatarButton } from './elements';
+import { createProfileMessagePager } from './history-pager';
 import { renderProfileMessages, shouldRefreshProfileMessages } from './messages';
 import { keepProfileCardInViewport, positionProfileCard } from './positioning';
 import { getMessageProfileSource, getParticipantProfileSource } from './source';
@@ -43,7 +39,9 @@ const profileCards = new Set<HTMLElement>();
 const profileCardsByKey = new Map<string, HTMLElement>();
 const profileCardCleanups = new WeakMap<HTMLElement, () => void>();
 const profileCardKeys = new WeakMap<HTMLElement, string>();
+const profileCardOriginMessageIds = new WeakMap<HTMLElement, string>();
 const stickyProfileCards = new WeakSet<HTMLElement>();
+const PROFILE_HISTORY_EDGE_TOLERANCE_PX = 12;
 let nextProfileCardZIndex = 10_000;
 let profileWiringListeners = new AbortController();
 
@@ -129,8 +127,8 @@ export function openProfileCardForIdentity(
   anchor?: HTMLElement | null
 ): boolean {
   recordVisibleUserMessages();
-  const recentMessages = getRecentMessagesForIdentity(identity);
-  const latestMessage = recentMessages[recentMessages.length - 1];
+  const userMessages = getUserMessagesForIdentity(identity);
+  const latestMessage = userMessages[userMessages.length - 1];
   if (!latestMessage) return false;
 
   const authorName = latestMessage.authorName || identity.authorName || '';
@@ -156,8 +154,12 @@ function showProfileCard(source: ProfileSource, anchor: HTMLElement): void {
   const profileKey = getUserKeyFromIdentity(source.identity);
   const existingCard = profileKey ? profileCardsByKey.get(profileKey) : null;
   if (existingCard && isProfileCardOpen(existingCard)) {
-    bringProfileCardToFront(existingCard);
-    return;
+    const existingOriginMessageId = profileCardOriginMessageIds.get(existingCard) || '';
+    if (existingOriginMessageId === (source.originMessageId || '')) {
+      bringProfileCardToFront(existingCard);
+      return;
+    }
+    closeSingleProfileCard(existingCard);
   }
   if (profileKey) profileCardsByKey.delete(profileKey);
 
@@ -242,21 +244,31 @@ function showProfileCard(source: ProfileSource, anchor: HTMLElement): void {
   const scrollFadeCleanup = wireScrollEdgeFades(list);
 
   const translationPriorityScope = createTranslationPriorityScope();
-  const renderMessages = (): void => {
-    const recentMessages = getRecentMessagesForIdentity(source.identity);
-    renderProfileMessages(list, recentMessages, source, () => closeProfileCard(card));
-    prioritizeProfileMessageTranslations(translationPriorityScope, recentMessages);
+  const messagePager = createProfileMessagePager(source.originMessageId);
+  const renderVisibleMessages = (): void => {
+    const visibleMessages = [...messagePager.getVisibleMessages()];
+    renderProfileMessages(
+      list,
+      visibleMessages,
+      source,
+      () => closeProfileCard(card),
+      messagePager.getOriginRecordId()
+    );
+    prioritizeProfileMessageTranslations(translationPriorityScope, visibleMessages);
   };
-  renderMessages();
+  messagePager.updateMessages(getUserMessagesForIdentity(source.identity), {
+    followLatest: !source.originMessageId
+  });
+  renderVisibleMessages();
   document.body.append(card);
   profileCards.add(card);
   if (profileKey) {
     profileCardsByKey.set(profileKey, card);
     profileCardKeys.set(card, profileKey);
   }
+  profileCardOriginMessageIds.set(card, source.originMessageId || '');
   bringProfileCardToFront(card);
   positionProfileCard(card, anchor);
-  scrollElementToBottom(list);
   wireFloatingPanelDrag({
     draggingClassName: 'ytcq-profile-card-dragging',
     handle: header,
@@ -268,6 +280,20 @@ function showProfileCard(source: ProfileSource, anchor: HTMLElement): void {
 
   let positionFrame = 0;
   let positionMode: 'anchor' | 'viewport' = 'viewport';
+  let scrollFrame = 0;
+  let pendingScrollIntent: ProfileScrollIntent | null = null;
+  const scheduleScroll = (intent: ProfileScrollIntent): void => {
+    pendingScrollIntent = intent;
+    if (scrollFrame) window.cancelAnimationFrame(scrollFrame);
+    scrollFrame = window.requestAnimationFrame(() => {
+      scrollFrame = 0;
+      const nextIntent = pendingScrollIntent;
+      pendingScrollIntent = null;
+      if (!nextIntent || !isProfileCardOpen(card)) return;
+      applyProfileScrollIntent(list, nextIntent);
+      updateScrollEdgeFades(list);
+    });
+  };
   const schedulePosition = (mode: 'anchor' | 'viewport'): void => {
     if (mode === 'anchor') positionMode = mode;
     if (positionFrame) return;
@@ -294,6 +320,10 @@ function showProfileCard(source: ProfileSource, anchor: HTMLElement): void {
   const resizeObserver = new ResizeObserver(() => schedulePosition('viewport'));
   resizeObserver.observe(card);
   schedulePosition('viewport');
+  const originRecordId = messagePager.getOriginRecordId();
+  scheduleScroll(
+    originRecordId === null ? { type: 'bottom' } : { recordId: originRecordId, type: 'record' }
+  );
 
   const handleKeydown = (event: KeyboardEvent): void => {
     if (event.key === 'Escape') closeProfileCard(card);
@@ -302,17 +332,63 @@ function showProfileCard(source: ProfileSource, anchor: HTMLElement): void {
     if (!isProfileCardOpen(card)) return;
     schedulePosition('anchor');
   };
+  const handleMessageScroll = (): void => {
+    if (scrollFrame) return;
+
+    if (list.scrollTop <= PROFILE_HISTORY_EDGE_TOLERANCE_PX && messagePager.hasEarlier()) {
+      const intent: ProfileScrollIntent = {
+        scrollHeight: list.scrollHeight,
+        scrollTop: list.scrollTop,
+        type: 'prepend'
+      };
+      if (!messagePager.loadEarlier()) return;
+      renderVisibleMessages();
+      scheduleScroll(intent);
+      schedulePosition('viewport');
+      return;
+    }
+
+    if (isProfileMessageListAtBottom(list) && messagePager.hasLater()) {
+      const intent: ProfileScrollIntent = {
+        scrollTop: list.scrollTop,
+        type: 'exact'
+      };
+      if (!messagePager.loadLater()) return;
+      renderVisibleMessages();
+      scheduleScroll(intent);
+      schedulePosition('viewport');
+    }
+  };
+  list.addEventListener('scroll', handleMessageScroll, {
+    passive: true,
+    signal: cardListeners.signal
+  });
   const unsubscribeMessages = onUserMessagesChanged((key) => {
     if (!isProfileCardOpen(card) || !shouldRefreshProfileMessages(key, source, profileKey)) return;
-    const scrollPosition = captureScrollPosition(list);
-    renderMessages();
+    const preservedIntent = pendingScrollIntent;
+    const previousOriginRecordId = messagePager.getOriginRecordId();
+    const followLatest =
+      preservedIntent?.type === 'bottom' ||
+      (!preservedIntent && isProfileMessageListAtBottom(list));
+    messagePager.updateMessages(getUserMessagesForIdentity(source.identity), { followLatest });
+    const resolvedOriginRecordId = messagePager.getOriginRecordId();
+    const scrollIntent =
+      previousOriginRecordId === null && resolvedOriginRecordId !== null
+        ? { recordId: resolvedOriginRecordId, type: 'record' as const }
+        : preservedIntent ||
+          (followLatest
+            ? { type: 'bottom' as const }
+            : { scrollTop: list.scrollTop, type: 'exact' as const });
+    renderVisibleMessages();
     schedulePosition('viewport');
-    restoreScrollPositionAfterRender(list, scrollPosition);
+    scheduleScroll(scrollIntent);
   });
 
   profileCardCleanups.set(card, () => {
     cardListeners.abort();
     if (positionFrame) window.cancelAnimationFrame(positionFrame);
+    if (scrollFrame) window.cancelAnimationFrame(scrollFrame);
+    pendingScrollIntent = null;
     resizeObserver.disconnect();
     scrollFadeCleanup();
     translationPriorityScope.close();
@@ -356,7 +432,7 @@ export function closeProfileCard(card?: HTMLElement): void {
 
 function prioritizeProfileMessageTranslations(
   scope: TranslationPriorityScope,
-  recentMessages: MessageRecord[]
+  recentMessages: readonly MessageRecord[]
 ): void {
   scope.prioritize(recentMessages.map(getLiveMessageForRecord));
 }
@@ -369,6 +445,7 @@ function closeSingleProfileCard(card: HTMLElement): void {
     profileCardsByKey.delete(profileKey);
   }
   profileCardKeys.delete(card);
+  profileCardOriginMessageIds.delete(card);
   profileCards.delete(card);
   card.remove();
 }
@@ -385,4 +462,52 @@ function isProfileCardOpen(card: HTMLElement): boolean {
 
 function bringProfileCardToFront(card: HTMLElement): void {
   card.style.zIndex = String(++nextProfileCardZIndex);
+}
+
+type ProfileScrollIntent =
+  | { type: 'bottom' }
+  | { recordId: number; type: 'record' }
+  | { scrollHeight: number; scrollTop: number; type: 'prepend' }
+  | { scrollTop: number; type: 'exact' };
+
+function applyProfileScrollIntent(list: HTMLElement, intent: ProfileScrollIntent): void {
+  if (intent.type === 'bottom') {
+    list.scrollTop = list.scrollHeight;
+    return;
+  }
+
+  if (intent.type === 'prepend') {
+    const addedHeight = Math.max(0, list.scrollHeight - intent.scrollHeight);
+    setProfileMessageScrollTop(list, intent.scrollTop + addedHeight);
+    return;
+  }
+
+  if (intent.type === 'exact') {
+    setProfileMessageScrollTop(list, intent.scrollTop);
+    return;
+  }
+
+  const message = Array.from(list.querySelectorAll<HTMLElement>('.ytcq-profile-card-message')).find(
+    (candidate) => candidate.dataset.ytcqMessageRecordId === String(intent.recordId)
+  );
+  if (!message) return;
+
+  const listRect = list.getBoundingClientRect();
+  const messageRect = message.getBoundingClientRect();
+  const messageTop = list.scrollTop + messageRect.top - listRect.top;
+  setProfileMessageScrollTop(
+    list,
+    messageTop - Math.max(0, (list.clientHeight - messageRect.height) / 2)
+  );
+}
+
+function setProfileMessageScrollTop(list: HTMLElement, scrollTop: number): void {
+  const maxScrollTop = Math.max(0, list.scrollHeight - list.clientHeight);
+  list.scrollTop = Math.max(0, Math.min(scrollTop, maxScrollTop));
+}
+
+function isProfileMessageListAtBottom(list: HTMLElement): boolean {
+  return (
+    list.scrollTop + list.clientHeight >= list.scrollHeight - PROFILE_HISTORY_EDGE_TOLERANCE_PX
+  );
 }

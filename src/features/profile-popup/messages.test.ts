@@ -10,6 +10,7 @@ const userHistoryMocks = vi.hoisted(() => ({
 }));
 
 const jumpMocks = vi.hoisted(() => ({
+  canJumpToChatMessage: vi.fn(),
   createJumpToMessageIcon: vi.fn(() => document.createElement('svg')),
   jumpToChatMessage: vi.fn()
 }));
@@ -28,6 +29,9 @@ describe('profile card message renderer', () => {
   beforeEach(() => {
     document.body.replaceChildren();
     vi.clearAllMocks();
+    jumpMocks.canJumpToChatMessage.mockImplementation(
+      (target: HTMLElement | null) => Boolean(target?.isConnected)
+    );
     setOptions({
       ...DEFAULT_OPTIONS,
       targetLanguage: 'en',
@@ -75,6 +79,17 @@ describe('profile card message renderer', () => {
     list.querySelector<HTMLElement>('.ytcq-profile-card-message')!
       .dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Enter' }));
     expect(nextClose).toHaveBeenCalledOnce();
+  });
+
+  it('marks the feed-origin message within a rendered history batch', () => {
+    const list = document.createElement('div');
+    const messages = [record(), record({ id: 2, messageId: 'message-2' })];
+
+    renderProfileMessages(list, messages, source(), vi.fn(), 2);
+
+    const items = list.querySelectorAll<HTMLElement>('.ytcq-profile-card-message');
+    expect(items[0]?.classList.contains('ytcq-profile-card-message-origin')).toBe(false);
+    expect(items[1]?.classList.contains('ytcq-profile-card-message-origin')).toBe(true);
   });
 
   it('ignores profile message keyboard events from children or unrelated keys', () => {
@@ -211,7 +226,22 @@ describe('profile card message renderer', () => {
     expect(item.dataset.ytcqMessageId).toBe('message-1');
     expect(item.dataset.ytcqLiveMessageId).toBe('live-message-1');
     expect(jumpButton.title).toBe('Jump to message');
-    expect(jumpMocks.jumpToChatMessage).toHaveBeenCalledWith(liveMessage);
+    expect(jumpMocks.jumpToChatMessage).toHaveBeenCalledWith(liveMessage, 'message-1');
+  });
+
+  it('keeps a jump button for a retained Lite message without a mounted row', () => {
+    const list = document.createElement('div');
+    userHistoryMocks.getLiveMessageForRecord.mockReturnValue(null);
+    jumpMocks.canJumpToChatMessage.mockReturnValue(true);
+
+    renderProfileMessages(list, [record()], source(), vi.fn());
+    const item = list.querySelector<HTMLElement>('.ytcq-profile-card-message')!;
+    const jumpButton = item.querySelector<HTMLButtonElement>('.ytcq-profile-card-jump')!;
+    jumpButton.click();
+
+    expect(jumpMocks.canJumpToChatMessage).toHaveBeenCalledWith(null, 'message-1');
+    expect(item.dataset.ytcqLiveMessageId).toBeUndefined();
+    expect(jumpMocks.jumpToChatMessage).toHaveBeenCalledWith(null, 'message-1');
   });
 
   it('preserves jump-button focus when refreshed records replace the list', () => {

@@ -39,6 +39,7 @@ const replyMocks = vi.hoisted(() => ({
 }));
 
 const jumpMocks = vi.hoisted(() => ({
+  canJumpToChatMessage: vi.fn(),
   createJumpToMessageIcon: vi.fn(() => document.createElement('svg')),
   jumpToChatMessage: vi.fn()
 }));
@@ -79,6 +80,9 @@ describe('inbox card view', () => {
     unreadCount = 0;
     liveMessage = null;
     vi.clearAllMocks();
+    jumpMocks.canJumpToChatMessage.mockImplementation(
+      (target: HTMLElement | null) => Boolean(target?.isConnected)
+    );
   });
 
   afterEach(() => {
@@ -219,12 +223,12 @@ describe('inbox card view', () => {
     const target = document.createElement('yt-live-chat-text-message-renderer');
     document.body.append(target);
     liveMessage = target;
-    records = [record({ id: 'record-1', read: true })];
+    records = [record({ id: 'record-1', messageId: 'message-1', read: true })];
     openInboxCardView(undefined, callbacksForCard());
 
     records = [
-      record({ id: 'record-1', read: true }),
-      record({ id: 'record-2', text: 'second saved message' })
+      record({ id: 'record-1', messageId: 'message-1', read: true }),
+      record({ id: 'record-2', messageId: 'message-1', text: 'second saved message' })
     ];
     unreadCount = 0;
     refreshOpenInboxCard();
@@ -234,7 +238,19 @@ describe('inbox card view', () => {
     expect(card.querySelectorAll('.ytcq-inbox-message')).toHaveLength(2);
 
     card.querySelector<HTMLButtonElement>('.ytcq-profile-card-jump')!.click();
-    expect(jumpMocks.jumpToChatMessage).toHaveBeenCalledWith(target);
+    expect(jumpMocks.jumpToChatMessage).toHaveBeenCalledWith(target, 'message-1');
+    expect(isInboxCardOpen()).toBe(false);
+  });
+
+  it('jumps to retained Lite messages without a mounted row', () => {
+    records = [record({ messageId: 'message-1' })];
+    liveMessage = null;
+    jumpMocks.canJumpToChatMessage.mockReturnValue(true);
+
+    openInboxCardView(undefined, callbacksForCard());
+    document.querySelector<HTMLButtonElement>('.ytcq-profile-card-jump')!.click();
+
+    expect(jumpMocks.jumpToChatMessage).toHaveBeenCalledWith(null, 'message-1');
     expect(isInboxCardOpen()).toBe(false);
   });
 

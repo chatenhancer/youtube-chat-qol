@@ -10,7 +10,7 @@ const profileTestState = vi.hoisted(() => ({
 
 const historyMocks = vi.hoisted(() => ({
   getLiveMessageForRecord: vi.fn(() => null),
-  getRecentMessagesForIdentity: vi.fn(() => profileTestState.recentMessages),
+  getUserMessagesForIdentity: vi.fn(() => profileTestState.recentMessages),
   getUserKeyFromIdentity: vi.fn((identity: { authorName?: string; channelId?: string }) => {
     if (identity.channelId) return `channel:${identity.channelId}`;
     const authorName = (identity.authorName || '').trim().toLowerCase();
@@ -29,8 +29,22 @@ const sourceMocks = vi.hoisted(() => ({
 }));
 
 const messageMocks = vi.hoisted(() => ({
-  renderProfileMessages: vi.fn((list: HTMLElement, messages: MessageRecord[]) => {
-    list.textContent = messages.map((message) => message.text).join('\n');
+  renderProfileMessages: vi.fn((
+    list: HTMLElement,
+    messages: MessageRecord[],
+    _source: unknown,
+    _onClose: () => void,
+    originRecordId: number | null
+  ) => {
+    list.replaceChildren(...messages.map((message) => {
+      const item = document.createElement('div');
+      item.className = message.id === originRecordId
+        ? 'ytcq-profile-card-message ytcq-profile-card-message-origin'
+        : 'ytcq-profile-card-message';
+      item.dataset.ytcqMessageRecordId = String(message.id);
+      item.textContent = message.text;
+      return item;
+    }));
   }),
   shouldRefreshProfileMessages: vi.fn(() => true)
 }));
@@ -202,6 +216,85 @@ describe('profile popup coordinator', () => {
 
     expect(document.querySelector('.ytcq-profile-card')).not.toBeNull();
     expect(sourceMocks.getParticipantProfileSource).toHaveBeenCalledWith(participant);
+  });
+
+  it('opens Participants at the latest batch and loads older messages at the top', async () => {
+    vi.useFakeTimers();
+    profileTestState.recentMessages = records(30);
+    const participant = document.createElement('yt-live-chat-participant-renderer');
+    participant.innerHTML = `
+      <img id="img">
+      <span id="author-name">@Participant</span>
+    `;
+    document.body.append(participant);
+
+    wireParticipantProfileClick(participant);
+    participant.querySelector<HTMLElement>('#author-name')!.click();
+
+    expect(renderedMessageIds()).toEqual(range(18, 30));
+    await vi.runOnlyPendingTimersAsync();
+
+    const list = document.querySelector<HTMLElement>('.ytcq-profile-card-messages')!;
+    setScrollMetrics(list, { clientHeight: 100, scrollHeight: 400 });
+    list.scrollTop = 0;
+    list.dispatchEvent(new Event('scroll'));
+
+    expect(renderedMessageIds()).toEqual(range(6, 30));
+  });
+
+  it('opens a feed profile at the clicked message and loads newer messages at the bottom', async () => {
+    vi.useFakeTimers();
+    profileTestState.recentMessages = records(40);
+    profileTestState.messageSource = source({ originMessageId: 'message-15' });
+    const message = createMessage();
+    document.body.append(message);
+
+    wireProfileClick(message);
+    message.querySelector<HTMLElement>('#author-photo')!.click();
+
+    expect(renderedMessageIds()).toEqual(range(9, 21));
+    expect(document.querySelector('.ytcq-profile-card-message-origin')?.textContent)
+      .toBe('message 15');
+    await vi.runOnlyPendingTimersAsync();
+
+    const list = document.querySelector<HTMLElement>('.ytcq-profile-card-messages')!;
+    setScrollMetrics(list, { clientHeight: 100, scrollHeight: 300 });
+    list.scrollTop = 200;
+    list.dispatchEvent(new Event('scroll'));
+
+    expect(renderedMessageIds()).toEqual(range(9, 33));
+  });
+
+  it('centers a feed-origin message that reaches history after the card opens', async () => {
+    vi.useFakeTimers();
+    profileTestState.recentMessages = records(10);
+    profileTestState.messageSource = source({ originMessageId: 'message-15' });
+    const message = createMessage();
+    document.body.append(message);
+
+    wireProfileClick(message);
+    message.querySelector<HTMLElement>('#author-photo')!.click();
+    expect(document.querySelector('.ytcq-profile-card-message-origin')).toBeNull();
+
+    profileTestState.recentMessages = records(30);
+    profileTestState.userMessagesChanged?.('channel:viewer-channel');
+
+    const list = document.querySelector<HTMLElement>('.ytcq-profile-card-messages')!;
+    const origin = list.querySelector<HTMLElement>('.ytcq-profile-card-message-origin')!;
+    setScrollMetrics(list, { clientHeight: 100, scrollHeight: 900 });
+    vi.spyOn(list, 'getBoundingClientRect').mockReturnValue(createRect({
+      height: 100,
+      top: 100
+    }));
+    vi.spyOn(origin, 'getBoundingClientRect').mockReturnValue(createRect({
+      height: 20,
+      top: 400
+    }));
+
+    await vi.runOnlyPendingTimersAsync();
+
+    expect(origin.textContent).toBe('message 15');
+    expect(list.scrollTop).toBe(260);
   });
 
   it('reuses the open profile card when opening the same user again', () => {
@@ -394,7 +487,13 @@ describe('profile popup coordinator', () => {
     profileTestState.recentMessages = [record({ text: 'updated history' })];
     profileTestState.userMessagesChanged?.('channel:viewer-channel');
 
-    expect(messageMocks.renderProfileMessages).toHaveBeenCalledWith(expect.any(HTMLElement), profileTestState.recentMessages, expect.any(Object), expect.any(Function));
+    expect(messageMocks.renderProfileMessages).toHaveBeenCalledWith(
+      expect.any(HTMLElement),
+      profileTestState.recentMessages,
+      expect.any(Object),
+      expect.any(Function),
+      null
+    );
 
     messageMocks.renderProfileMessages.mockClear();
     messageMocks.shouldRefreshProfileMessages.mockReturnValueOnce(false);
@@ -560,11 +659,45 @@ function record(overrides: Partial<MessageRecord> = {}): MessageRecord {
     avatarSrc: 'https://example.com/avatar.jpg',
     contentParts: [],
     id: 1,
+    messageId: 'message-1',
     text: 'hello from history',
     timestamp: 1,
     timestampText: '9:30 PM',
     ...overrides
   };
+}
+
+function records(count: number): MessageRecord[] {
+  return Array.from({ length: count }, (_, index) => record({
+    id: index + 1,
+    messageId: `message-${index}`,
+    text: `message ${index}`,
+    timestamp: index
+  }));
+}
+
+function renderedMessageIds(): number[] {
+  const call = messageMocks.renderProfileMessages.mock.calls.at(-1);
+  const messages = (call?.[1] || []) as MessageRecord[];
+  return messages.map((message) => Number(message.messageId?.replace('message-', '')));
+}
+
+function range(start: number, end: number): number[] {
+  return Array.from({ length: end - start }, (_, index) => start + index);
+}
+
+function setScrollMetrics(
+  element: HTMLElement,
+  { clientHeight, scrollHeight }: { clientHeight: number; scrollHeight: number }
+): void {
+  Object.defineProperty(element, 'clientHeight', {
+    configurable: true,
+    value: clientHeight
+  });
+  Object.defineProperty(element, 'scrollHeight', {
+    configurable: true,
+    value: scrollHeight
+  });
 }
 
 function createMessage({ includeAuthorName = true }: {

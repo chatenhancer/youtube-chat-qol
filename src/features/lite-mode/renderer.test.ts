@@ -189,6 +189,33 @@ describe('Lite chat renderer', () => {
     renderer.destroy();
   });
 
+  it('reveals a retained message outside the mounted window', () => {
+    const store = createLiteChatStore({ renderLimit: 4, storeLimit: 20 });
+    store.apply(Array.from({ length: 10 }, (_value, index) => ({
+      type: 'upsert' as const,
+      record: createRecord(`message-${index}`, `Message ${index}`)
+    })));
+    const renderer = createLiteChatRenderer(store, { renderLimit: 4 });
+    document.body.append(renderer.root);
+
+    expect(renderer.getMessageElement('message-2')).toBeNull();
+    const target = renderer.revealMessage('message-2');
+
+    expect(target?.dataset.messageId).toBe('message-2');
+    expect(getRenderedMessageIds(renderer.root)).toEqual([
+      'message-0',
+      'message-1',
+      'message-2',
+      'message-3'
+    ]);
+    expect(renderer.root.dataset.ytcqFollowingLiveEdge).toBe('false');
+    expect(renderer.root.querySelector<HTMLButtonElement>('.ytcq-lite-new-messages')?.hidden).toBe(
+      false
+    );
+    expect(renderer.revealMessage('missing')).toBeNull();
+    renderer.destroy();
+  });
+
   it('pages backward through retained records while keeping the mounted window bounded', async () => {
     const store = createLiteChatStore({ renderLimit: 4, storeLimit: 20 });
     store.apply(Array.from({ length: 10 }, (_value, index) => ({
@@ -292,22 +319,7 @@ describe('Lite chat renderer', () => {
     renderer.destroy();
   });
 
-  it('flows a busy live batch through the viewport without delaying its rows', () => {
-    const rowRect = vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect')
-      .mockImplementation(function getBoundingClientRectMock(this: HTMLElement) {
-        const height = this.classList.contains('ytcq-lite-message') ? 32 : 0;
-        return {
-          bottom: height,
-          height,
-          left: 0,
-          right: 0,
-          toJSON: () => ({}),
-          top: 0,
-          width: 0,
-          x: 0,
-          y: 0
-        };
-      });
+  it('renders a busy live batch without translating the whole feed', () => {
     const store = createLiteChatStore();
     const renderer = createLiteChatRenderer(store);
     document.body.append(renderer.root);
@@ -320,11 +332,12 @@ describe('Lite chat renderer', () => {
     store.apply(actions);
 
     const items = renderer.root.querySelector<HTMLElement>('.ytcq-lite-items')!;
-    expect(renderer.root.querySelectorAll('.ytcq-lite-message')).toHaveLength(22);
-    expect(items.classList).toContain('ytcq-lite-items-flowing');
-    expect(items.style.getPropertyValue('--ytcq-lite-flow-offset')).toBe('704px');
-    expect(items.style.getPropertyValue('--ytcq-lite-flow-duration')).toBe('1200ms');
-    rowRect.mockRestore();
+    const rows = renderer.root.querySelectorAll('.ytcq-lite-message');
+    expect(rows).toHaveLength(22);
+    expect(Array.from(rows).every((row) => row.classList.contains('ytcq-lite-message-enter')))
+      .toBe(true);
+    expect(items.classList).not.toContain('ytcq-lite-items-flowing');
+    expect(items.style.transform).toBe('');
     renderer.destroy();
   });
 

@@ -383,6 +383,12 @@
   cursor: pointer;
 }
 
+.ytcq-profile-card-message-origin {
+  box-shadow:
+    inset 0 0 8px color-mix(in srgb, var(--yt-spec-call-to-action, #3ea6ff) 42%, transparent),
+    inset 0 0 18px color-mix(in srgb, var(--yt-spec-call-to-action, #3ea6ff) 20%, transparent);
+}
+
 .ytcq-inbox-message-has-avatar {
   grid-template-columns: 24px auto minmax(0, 1fr);
 }

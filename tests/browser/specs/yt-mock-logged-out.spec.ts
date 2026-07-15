@@ -23,6 +23,7 @@ import {
 import { settingsMenuScenario } from '../scenarios/menus';
 import { popupResetScenario } from '../scenarios/popup-reset';
 import {
+  profileCardHistoryPagingScenario,
   profileCardReceivesNewMessagesScenario,
   profileCardRecentMessagesScenario
 } from '../scenarios/profile';
@@ -49,3 +50,4 @@ test('logged-out mock: inbox opens from the chat header', inboxOpensFromHeaderSc
 test('logged-out mock: inbox saves keyword matches, highlights them, and jumps back to chat', inboxRecordCreationAndJumpScenario);
 test('logged-out mock: profile card opens from a chat avatar', profileCardRecentMessagesScenario);
 test('logged-out mock: profile card receives new messages from the selected author', profileCardReceivesNewMessagesScenario);
+test('logged-out mock: profile card pages through retained author history', profileCardHistoryPagingScenario);

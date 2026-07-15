@@ -241,6 +241,10 @@ export function getUserMessageHistorySnapshot(): MessageRecord[] {
 }
 
 export function getRecentMessagesForIdentity(identity: UserIdentity, limit = RECENT_MESSAGE_LIMIT): MessageRecord[] {
+  return getUserMessagesForIdentity(identity).slice(-limit);
+}
+
+export function getUserMessagesForIdentity(identity: UserIdentity): MessageRecord[] {
   const key = getUserKeyFromIdentity(identity);
   const authorKey = getAuthorKey(identity.authorName);
   const records = createUniqueRecordCollector();
@@ -252,8 +256,7 @@ export function getRecentMessagesForIdentity(identity: UserIdentity, limit = REC
     records.add(getRecordsByAuthorName(identity.authorName));
   }
 
-  return sortRecentRecords(records.values())
-    .slice(-limit);
+  return sortRecentRecords(records.values());
 }
 
 export function getLatestMessageForIdentity(identity: UserIdentity): MessageRecord | null {

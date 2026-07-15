@@ -29,11 +29,6 @@ import {
 } from './store';
 
 const LIVE_EDGE_TOLERANCE_PX = 2;
-const LIVE_BATCH_MOTION_CLASS = 'ytcq-lite-items-flowing';
-const LIVE_BATCH_MOTION_MAX_MS = 1_200;
-const LIVE_BATCH_MOTION_MIN_MS = 180;
-const LIVE_BATCH_MOTION_MS_PER_ROW = 55;
-const LIVE_BATCH_MOTION_MAX_VIEWPORTS = 2;
 const MAX_PENDING_MESSAGE_COUNT = 999;
 const SCROLLBACK_LOAD_THRESHOLD_PX = 48;
 const LIVE_EDGE_SCROLL_INTENT_MS = 500;
@@ -68,6 +63,7 @@ export interface LiteChatRenderer {
     origin: YouTubeChatFeedBatchSource
   ): void;
   render(): void;
+  revealMessage(id: string): HTMLElement | null;
   root: HTMLElement;
   scrollToLiveEdge(): void;
   setConnectionState(state: LiteChatConnectionState): void;
@@ -137,7 +133,6 @@ export function createLiteChatRenderer(
   );
 
   newMessagesButton.addEventListener('click', () => scrollToLiveEdge());
-  items.addEventListener('animationend', handleItemsAnimationEnd);
   scroller.addEventListener('scroll', handleScroll, {
     passive: true,
     signal: scrollListeners.signal
@@ -198,6 +193,7 @@ export function createLiteChatRenderer(
     getMessageElement: (id) => rowsById.get(id) || null,
     rememberActionSources,
     render: () => renderRecords(null),
+    revealMessage,
     root,
     scrollToLiveEdge,
     setConnectionState,
@@ -240,12 +236,12 @@ export function createLiteChatRenderer(
       );
     }
 
-    const enteringRows =
-      followingLiveEdge || doesStoreChangeAffectFrozenWindow(change) ? renderRecords(change) : [];
+    if (followingLiveEdge || doesStoreChangeAffectFrozenWindow(change)) {
+      renderRecords(change);
+    }
     refreshNewMessagesButton();
     if (followingLiveEdge) {
       pinScrollToBottom();
-      if (!change.reset) animateLiveBatch(enteringRows);
     }
   }
 
@@ -295,10 +291,9 @@ export function createLiteChatRenderer(
     }
   }
 
-  function renderRecords(change: LiteChatStoreChange | null): HTMLElement[] {
+  function renderRecords(change: LiteChatStoreChange | null): void {
     const desired = getDesiredRecords();
     const desiredIds = new Set(desired.map((record) => record.id));
-    const enteringRows: HTMLElement[] = [];
     emptyState.hidden = desired.length > 0;
 
     for (const [id, row] of rowsById) {
@@ -334,7 +329,6 @@ export function createLiteChatRenderer(
         rowSource = created ? pendingRowSources.get(record.id) || 'existing' : 'changed';
         if (created && change && rowSource === 'added') {
           row.classList.add('ytcq-lite-message-enter');
-          enteringRows.push(row);
         }
       }
       renderedRecords.set(record.id, record);
@@ -351,44 +345,6 @@ export function createLiteChatRenderer(
     if (!frozenEndId && desired.length) {
       frozenEndId = desired[desired.length - 1].id;
     }
-    return enteringRows;
-  }
-
-  function animateLiveBatch(enteringRows: readonly HTMLElement[]): void {
-    if (!enteringRows.length) return;
-    const addedHeight = enteringRows.reduce(
-      (height, row) => height + row.getBoundingClientRect().height,
-      0
-    );
-    if (addedHeight <= 0) return;
-
-    const maxOffset =
-      scroller.clientHeight > 0
-        ? scroller.clientHeight * LIVE_BATCH_MOTION_MAX_VIEWPORTS
-        : addedHeight;
-    const offset = Math.min(addedHeight, maxOffset);
-    const duration = Math.min(
-      LIVE_BATCH_MOTION_MAX_MS,
-      Math.max(LIVE_BATCH_MOTION_MIN_MS, enteringRows.length * LIVE_BATCH_MOTION_MS_PER_ROW)
-    );
-
-    clearLiveBatchMotion();
-    items.style.setProperty('--ytcq-lite-flow-offset', `${Math.round(offset)}px`);
-    items.style.setProperty('--ytcq-lite-flow-duration', `${duration}ms`);
-    // Reading layout between class removal and addition restarts the bounded
-    // animation if a second response arrives while the previous motion ends.
-    void items.offsetWidth;
-    items.classList.add(LIVE_BATCH_MOTION_CLASS);
-  }
-
-  function clearLiveBatchMotion(): void {
-    items.classList.remove(LIVE_BATCH_MOTION_CLASS);
-    items.style.removeProperty('--ytcq-lite-flow-offset');
-    items.style.removeProperty('--ytcq-lite-flow-duration');
-  }
-
-  function handleItemsAnimationEnd(event: AnimationEvent): void {
-    if (event.animationName === 'ytcq-lite-items-flow') clearLiveBatchMotion();
   }
 
   function getDesiredRecords(): readonly YouTubeChatMessageRecord[] {
@@ -564,8 +520,31 @@ export function createLiteChatRenderer(
     }
   }
 
+  function revealMessage(id: string): HTMLElement | null {
+    const records = store.getRecords();
+    const targetIndex = records.findIndex((record) => record.id === id);
+    if (targetIndex < 0) return null;
+
+    const maxStartIndex = Math.max(0, records.length - renderLimit);
+    const startIndex = Math.min(
+      maxStartIndex,
+      Math.max(0, targetIndex - Math.floor(renderLimit / 2))
+    );
+    const endIndex = Math.min(records.length - 1, startIndex + renderLimit - 1);
+
+    clearReturnIntent();
+    setFollowingLiveEdge(false);
+    frozenEndId = records[endIndex]?.id || id;
+    pendingMessageCount = Math.min(
+      MAX_PENDING_MESSAGE_COUNT,
+      Math.max(0, records.length - endIndex - 1)
+    );
+    renderRecords(null);
+    refreshNewMessagesButton();
+    return rowsById.get(id) || null;
+  }
+
   function leaveLiveEdge(): void {
-    clearLiveBatchMotion();
     setFollowingLiveEdge(false);
     const rendered = Array.from(rowsById.keys());
     frozenEndId = rendered[rendered.length - 1] || '';
@@ -627,8 +606,6 @@ export function createLiteChatRenderer(
     if (scrollFrame) window.cancelAnimationFrame(scrollFrame);
     clearReturnIntent();
     scrollFrame = 0;
-    items.removeEventListener('animationend', handleItemsAnimationEnd);
-    clearLiveBatchMotion();
     rowsById.clear();
     renderedRecords.clear();
     dispatchedRecordIds.clear();

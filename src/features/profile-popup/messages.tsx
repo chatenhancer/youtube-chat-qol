@@ -19,7 +19,7 @@ import {
   getRecentMessagesForKey,
   type MessageRecord
 } from '../user-message-history';
-import { createJumpToMessageIcon, jumpToChatMessage } from '../message-jump';
+import { canJumpToChatMessage, createJumpToMessageIcon, jumpToChatMessage } from '../message-jump';
 import { quoteAuthorRichText } from '../reply';
 import type { ProfileSource } from './types';
 
@@ -27,7 +27,8 @@ export function renderProfileMessages(
   list: HTMLElement,
   recentMessages: MessageRecord[],
   source: ProfileSource,
-  onClose: () => void
+  onClose: () => void,
+  originRecordId: number | null = null
 ): void {
   const focusedControl = captureFocusedMessageControl(list);
   list.replaceChildren();
@@ -37,7 +38,11 @@ export function renderProfileMessages(
       const liveMessage = getLiveMessageForRecord(recentMessage);
       const item = el<HTMLDivElement>(
         <div
-          class="ytcq-profile-card-message"
+          class={
+            recentMessage.id === originRecordId
+              ? 'ytcq-profile-card-message ytcq-profile-card-message-origin'
+              : 'ytcq-profile-card-message'
+          }
           title={t('quoteMessage')}
           role="button"
           tabIndex={0}
@@ -61,7 +66,9 @@ export function renderProfileMessages(
       renderProfileMessageText(item, text, recentMessage);
 
       item.append(timestamp, text);
-      const jumpButton = liveMessage ? createJumpToMessageButton(liveMessage) : null;
+      const jumpButton = canJumpToChatMessage(liveMessage, recentMessage.messageId)
+        ? createJumpToMessageButton(liveMessage, recentMessage.messageId || '')
+        : null;
       if (jumpButton) item.append(jumpButton);
       list.append(item);
     });
@@ -207,7 +214,10 @@ function wireQuoteCardItem(
   });
 }
 
-function createJumpToMessageButton(liveMessage: HTMLElement): HTMLButtonElement {
+function createJumpToMessageButton(
+  liveMessage: HTMLElement | null,
+  messageId: string
+): HTMLButtonElement {
   const button = el<HTMLButtonElement>(
     <button
       type="button"
@@ -221,7 +231,7 @@ function createJumpToMessageButton(liveMessage: HTMLElement): HTMLButtonElement 
   button.addEventListener('click', (event) => {
     event.preventDefault();
     event.stopPropagation();
-    jumpToChatMessage(liveMessage);
+    jumpToChatMessage(liveMessage, messageId);
   });
 
   return button;

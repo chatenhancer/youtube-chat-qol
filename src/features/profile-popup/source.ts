@@ -4,7 +4,12 @@
  * Reads author, avatar, channel, and profile URL details from chat messages and
  * participant-list renderers for the shared profile card.
  */
-import { getAuthorChannelId, getAuthorName, getMessageAvatarSrc } from '../../youtube/messages';
+import {
+  getAuthorChannelId,
+  getAuthorName,
+  getMessageAvatarSrc,
+  getMessageStableId
+} from '../../youtube/messages';
 import { getParticipantAuthorName, getParticipantAvatarSrc, getParticipantChannelId } from '../../youtube/participants';
 import { getChannelUrl } from '../channel-popup';
 import type { ProfileSource } from './types';
@@ -22,6 +27,7 @@ export function getMessageProfileSource(message: HTMLElement): ProfileSource | n
       authorName,
       channelId
     },
+    originMessageId: getMessageStableId(message) || undefined,
     profileUrl: getChannelUrl(channelId, authorName)
   };
 }

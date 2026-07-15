@@ -1,6 +1,7 @@
 import json
 import os
 import queue
+import signal
 import shutil
 import subprocess
 import threading
@@ -13,6 +14,7 @@ DEFAULT_MOVE_TIME_MS = 500
 MAX_BODY_BYTES = 4096
 MAX_MOVE_TIME_MS = 2000
 REQUEST_TIMEOUT_SECONDS = 4.0
+SHUTDOWN_TIMEOUT_SECONDS = 1.0
 STOCKFISH_PATH = os.environ.get("STOCKFISH_PATH") or shutil.which("stockfish") or "/usr/games/stockfish"
 
 
@@ -105,6 +107,23 @@ class StockfishEngine:
     self.process = None
     self.current_elo = None
     self.lines = queue.Queue()
+
+  def close(self):
+    with self.lock:
+      process = self.process
+      if process and process.poll() is None:
+        try:
+          self._send("quit")
+          process.wait(timeout=SHUTDOWN_TIMEOUT_SECONDS)
+        except (BrokenPipeError, OSError, RuntimeError, subprocess.TimeoutExpired):
+          if process.poll() is None:
+            process.kill()
+          process.wait(timeout=SHUTDOWN_TIMEOUT_SECONDS)
+
+      self.process = None
+      self.current_elo = None
+      self.lines = queue.Queue()
+      self.reader = None
 
 
 ENGINE = StockfishEngine(STOCKFISH_PATH)
@@ -204,12 +223,31 @@ def parse_bestmove(line):
   return result
 
 
+def install_shutdown_handlers(server):
+  shutdown_started = threading.Event()
+
+  def handle_shutdown(_signal_number, _frame):
+    if shutdown_started.is_set():
+      return
+    shutdown_started.set()
+    threading.Thread(target=server.shutdown, daemon=True).start()
+
+  signal.signal(signal.SIGTERM, handle_shutdown)
+  signal.signal(signal.SIGINT, handle_shutdown)
+  return handle_shutdown
+
+
 def main():
   port = int(os.environ.get("PORT", "8080"))
   ENGINE._ensure_ready()
   ENGINE._configure_strength(DEFAULT_ELO)
   server = ThreadingHTTPServer(("0.0.0.0", port), Handler)
-  server.serve_forever()
+  install_shutdown_handlers(server)
+  try:
+    server.serve_forever()
+  finally:
+    server.server_close()
+    ENGINE.close()
 
 
 if __name__ == "__main__":

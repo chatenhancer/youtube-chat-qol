@@ -7,6 +7,7 @@ import {
 describe('profile source extraction', () => {
   it('extracts profile source data from chat message renderers', () => {
     const message = document.createElement('yt-live-chat-text-message-renderer');
+    message.dataset.messageId = 'message-origin';
     message.innerHTML = '<a href="/channel/dom-channel-1"><span id="author-name">@ExampleCreator</span></a><div id="author-photo"><img src="https://example.test/avatar.png"></div>';
 
     expect(getMessageProfileSource(message)).toEqual({
@@ -16,6 +17,7 @@ describe('profile source extraction', () => {
         authorName: '@ExampleCreator',
         channelId: 'dom-channel-1'
       },
+      originMessageId: 'message-origin',
       profileUrl: 'https://www.youtube.com/channel/dom-channel-1'
     });
   });

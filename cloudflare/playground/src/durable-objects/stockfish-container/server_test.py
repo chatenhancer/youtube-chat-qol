@@ -1,4 +1,8 @@
+import io
+import signal
+import threading
 import unittest
+from unittest import mock
 
 import server
 
@@ -45,6 +49,38 @@ class StockfishServerTest(unittest.TestCase):
   def test_clamp_int_allows_beginner_elo_floor(self):
     self.assertEqual(server.clamp_int(750, server.DEFAULT_ELO, 750, 3190), 750)
     self.assertEqual(server.clamp_int(100, server.DEFAULT_ELO, 750, 3190), 750)
+
+  def test_close_quits_the_stockfish_process(self):
+    engine = server.StockfishEngine("stockfish")
+    process = mock.Mock()
+    process.poll.return_value = None
+    process.stdin = io.StringIO()
+    engine.process = process
+    engine.current_elo = 1700
+
+    engine.close()
+
+    self.assertEqual(process.stdin.getvalue(), "quit\n")
+    process.wait.assert_called_once_with(timeout=server.SHUTDOWN_TIMEOUT_SECONDS)
+    self.assertIsNone(engine.process)
+    self.assertIsNone(engine.current_elo)
+
+  def test_shutdown_handler_stops_the_http_server_once(self):
+    stopped = threading.Event()
+    http_server = mock.Mock()
+    http_server.shutdown.side_effect = stopped.set
+
+    with mock.patch.object(server.signal, "signal") as register_signal:
+      handler = server.install_shutdown_handlers(http_server)
+
+    register_signal.assert_any_call(signal.SIGTERM, handler)
+    register_signal.assert_any_call(signal.SIGINT, handler)
+
+    handler(signal.SIGTERM, None)
+    handler(signal.SIGTERM, None)
+
+    self.assertTrue(stopped.wait(timeout=1))
+    http_server.shutdown.assert_called_once_with()
 
 
 if __name__ == "__main__":
