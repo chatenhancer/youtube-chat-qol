@@ -16,7 +16,7 @@ import {
   createSplitTranslateIcon
 } from '../../shared/icons';
 import { playAlertSoundPreview } from '../../shared/sounds/alert-sounds';
-import { registerFeatureLifecycle } from '../../content/lifecycle';
+import { registerFeature } from '../../content/feature-runtime';
 import { clampMenuToViewport, createMenuToggleItem } from './common';
 
 type SaveOptions = (values: Partial<Options>) => void;
@@ -26,7 +26,7 @@ let saveOptions: SaveOptions = () => {};
 const BELL_RING_CLASS = 'ytcq-bell-ringing';
 const TRANSLATION_PULSE_CLASS = 'ytcq-translation-pulse';
 
-registerFeatureLifecycle({
+registerFeature({
   page: {
     init: ({ saveOptions }) => configureSettingsMenu(saveOptions),
     optionsChanged: refreshSettingsMenus

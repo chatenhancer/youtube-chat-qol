@@ -14,7 +14,7 @@ import {
   initFrequentEmojis,
   resetFrequentEmojis
 } from './index';
-import { handleFeatureMutations } from '../../content/lifecycle';
+import { handleFeatureMutations } from '../../content/feature-runtime';
 
 describe('frequent emoji feature entry points', () => {
   beforeEach(() => {

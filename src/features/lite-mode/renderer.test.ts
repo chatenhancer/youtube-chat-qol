@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { jumpToChatMessage } from '../message-jump';
-import type { LiteChatMessageRecord } from './protocol';
+import type { YouTubeChatMessageRecord } from '../../youtube/chat-feed/protocol';
 import { argbToCss, createLiteChatRenderer, createLiteChatMessageRow } from './renderer';
 import { createLiteChatStore } from './store';
 
@@ -206,8 +206,7 @@ describe('Lite chat renderer', () => {
 
     scroller.dispatchEvent(new Event('scroll'));
     await waitForAnimationFrame();
-    scroller.scrollTop = 0;
-    scroller.dispatchEvent(new Event('scroll'));
+    scrollReaderTo(scroller, 0);
     await waitForAnimationFrame();
 
     expect(getRenderedMessageIds(renderer.root)).toEqual([
@@ -347,8 +346,7 @@ describe('Lite chat renderer', () => {
 
     scroller.dispatchEvent(new Event('scroll'));
     await waitForAnimationFrame();
-    scroller.scrollTop = 200;
-    scroller.dispatchEvent(new Event('scroll'));
+    scrollReaderTo(scroller, 200);
     await waitForAnimationFrame();
 
     const liveActions = [{ type: 'upsert' as const, record: createRecord('third', 'Third') }];
@@ -393,8 +391,7 @@ describe('Lite chat renderer', () => {
     });
     scroller.dispatchEvent(new Event('scroll'));
     await waitForAnimationFrame();
-    scroller.scrollTop = 200;
-    scroller.dispatchEvent(new Event('scroll'));
+    scrollReaderTo(scroller, 200);
     await waitForAnimationFrame();
 
     const resetActions = [
@@ -481,8 +478,7 @@ describe('Lite chat renderer', () => {
 
     scroller.dispatchEvent(new Event('scroll'));
     await waitForAnimationFrame();
-    scroller.scrollTop = 200;
-    scroller.dispatchEvent(new Event('scroll'));
+    scrollReaderTo(scroller, 200);
     await waitForAnimationFrame();
     expect(renderer.root.getAttribute('aria-live')).toBe('off');
 
@@ -490,6 +486,7 @@ describe('Lite chat renderer', () => {
     const jump = renderer.root.querySelector<HTMLButtonElement>('.ytcq-lite-new-messages')!;
     expect(jump.hidden).toBe(false);
 
+    scroller.dispatchEvent(new WheelEvent('wheel', { deltaY: 20 }));
     scroller.scrollTop = 400;
     scroller.dispatchEvent(new Event('scroll'));
     await waitForAnimationFrame();
@@ -498,7 +495,7 @@ describe('Lite chat renderer', () => {
     renderer.destroy();
   });
 
-  it('does not let a queued live-edge correction overwrite a user scroll', async () => {
+  it('uses upward wheel intent to cancel a queued live-edge correction', async () => {
     const store = createLiteChatStore();
     store.apply([{ type: 'upsert', record: createRecord('first', 'First') }]);
     const renderer = createLiteChatRenderer(store);
@@ -513,6 +510,11 @@ describe('Lite chat renderer', () => {
     await waitForAnimationFrame();
 
     store.apply([{ type: 'upsert', record: createRecord('second', 'Second') }]);
+    scroller.dispatchEvent(new Event('scroll'));
+    scroller.dispatchEvent(new WheelEvent('wheel', { deltaY: -20 }));
+    await waitForAnimationFrame();
+    expect(renderer.root.getAttribute('aria-live')).toBe('off');
+
     scroller.scrollTop = 200;
     scroller.dispatchEvent(new Event('scroll'));
     await waitForAnimationFrame();
@@ -522,7 +524,7 @@ describe('Lite chat renderer', () => {
     renderer.destroy();
   });
 
-  it('releases the live edge for an upward programmatic scroll', async () => {
+  it('does not treat a scripted scroll as reader intent', async () => {
     const store = createLiteChatStore();
     store.apply([{ type: 'upsert', record: createRecord('first', 'First') }]);
     const renderer = createLiteChatRenderer(store);
@@ -541,9 +543,9 @@ describe('Lite chat renderer', () => {
     scroller.dispatchEvent(new Event('scroll'));
     await waitForAnimationFrame();
 
-    expect(scroller.scrollTop).toBe(200);
-    expect(renderer.root.dataset.ytcqFollowingLiveEdge).toBe('false');
-    expect(renderer.root.getAttribute('aria-live')).toBe('off');
+    expect(scroller.scrollTop).toBe(400);
+    expect(renderer.root.dataset.ytcqFollowingLiveEdge).toBe('true');
+    expect(renderer.root.getAttribute('aria-live')).toBe('polite');
     renderer.destroy();
   });
 
@@ -607,8 +609,7 @@ describe('Lite chat renderer', () => {
 
     scroller.dispatchEvent(new Event('scroll'));
     await waitForAnimationFrame();
-    scroller.scrollTop = 390;
-    scroller.dispatchEvent(new Event('scroll'));
+    scrollReaderTo(scroller, 390);
     await waitForAnimationFrame();
     scroller.scrollTop = 300;
     scroller.dispatchEvent(new Event('scroll'));
@@ -662,6 +663,46 @@ describe('Lite chat renderer', () => {
     renderer.destroy();
   });
 
+  it('waits for a layout correction before leaving the live edge', async () => {
+    let onResize: ResizeObserverCallback = () => undefined;
+    vi.stubGlobal('ResizeObserver', class ResizeObserverMock {
+      constructor(callback: ResizeObserverCallback) {
+        onResize = callback;
+      }
+
+      disconnect(): void {}
+
+      observe(): void {}
+
+      unobserve(): void {}
+    });
+    const store = createLiteChatStore();
+    store.apply([{ type: 'upsert', record: createRecord('first', 'First') }]);
+    const renderer = createLiteChatRenderer(store);
+    document.body.append(renderer.root);
+    const scroller = renderer.root.querySelector<HTMLElement>('.ytcq-lite-scroller')!;
+    Object.defineProperties(scroller, {
+      clientHeight: { configurable: true, value: 100 },
+      scrollHeight: { configurable: true, value: 500, writable: true },
+      scrollTop: { configurable: true, value: 400, writable: true }
+    });
+
+    scroller.dispatchEvent(new Event('scroll'));
+    await waitForAnimationFrame();
+    Object.defineProperties(scroller, {
+      scrollHeight: { configurable: true, value: 600, writable: true },
+      scrollTop: { configurable: true, value: 300, writable: true }
+    });
+    scroller.dispatchEvent(new Event('scroll'));
+    onResize([], {} as ResizeObserver);
+    await waitForAnimationFrame();
+
+    expect(renderer.root.getAttribute('aria-live')).toBe('polite');
+    expect(renderer.root.dataset.ytcqFollowingLiveEdge).toBe('true');
+    expect(scroller.scrollTop).toBe(500);
+    renderer.destroy();
+  });
+
   it('does not swallow a small upward wheel step at the live edge', async () => {
     const store = createLiteChatStore();
     store.apply([{ type: 'upsert', record: createRecord('first', 'First') }]);
@@ -687,6 +728,71 @@ describe('Lite chat renderer', () => {
     renderer.destroy();
   });
 
+  it('does not treat an ordinary pointer press plus a layout shift as reader scrolling', async () => {
+    const { renderer, scroller } = createScrollableRenderer();
+
+    scroller.dispatchEvent(new Event('scroll'));
+    await waitForAnimationFrame();
+    scroller.dispatchEvent(new PointerEvent('pointerdown', {
+      bubbles: true,
+      clientY: 100,
+      pointerId: 1
+    }));
+    scroller.scrollTop = 300;
+    scroller.dispatchEvent(new Event('scroll'));
+    await waitForAnimationFrame();
+
+    expect(renderer.root.dataset.ytcqFollowingLiveEdge).toBe('true');
+    expect(scroller.scrollTop).toBe(400);
+    window.dispatchEvent(new PointerEvent('pointerup', { pointerId: 1 }));
+    renderer.destroy();
+  });
+
+  it('clears pointer drag tracking when the pointer is released outside the scroller', async () => {
+    const { renderer, scroller } = createScrollableRenderer();
+
+    scroller.dispatchEvent(new Event('scroll'));
+    await waitForAnimationFrame();
+    scroller.dispatchEvent(new PointerEvent('pointerdown', {
+      bubbles: true,
+      clientY: 100,
+      pointerId: 2
+    }));
+    window.dispatchEvent(new PointerEvent('pointermove', { clientY: 80, pointerId: 2 }));
+    document.body.dispatchEvent(new PointerEvent('pointerup', {
+      bubbles: true,
+      pointerId: 2
+    }));
+    scroller.scrollTop = 300;
+    scroller.dispatchEvent(new Event('scroll'));
+    await waitForAnimationFrame();
+
+    expect(renderer.root.dataset.ytcqFollowingLiveEdge).toBe('true');
+    expect(scroller.scrollTop).toBe(400);
+    renderer.destroy();
+  });
+
+  it('releases the live edge after a pointer drag actually scrolls upward', async () => {
+    const { renderer, scroller } = createScrollableRenderer();
+
+    scroller.dispatchEvent(new Event('scroll'));
+    await waitForAnimationFrame();
+    scroller.dispatchEvent(new PointerEvent('pointerdown', {
+      bubbles: true,
+      clientY: 100,
+      pointerId: 3
+    }));
+    window.dispatchEvent(new PointerEvent('pointermove', { clientY: 80, pointerId: 3 }));
+    scroller.scrollTop = 300;
+    scroller.dispatchEvent(new Event('scroll'));
+    await waitForAnimationFrame();
+
+    expect(renderer.root.dataset.ytcqFollowingLiveEdge).toBe('false');
+    expect(scroller.scrollTop).toBe(300);
+    window.dispatchEvent(new PointerEvent('pointerup', { pointerId: 3 }));
+    renderer.destroy();
+  });
+
   it('converts bounded ARGB values to CSS without accepting arbitrary values', () => {
     expect(argbToCss(0xff336699)).toBe('rgba(51, 102, 153, 1)');
     expect(argbToCss(-1)).toBe('');
@@ -694,7 +800,7 @@ describe('Lite chat renderer', () => {
   });
 });
 
-function createRecord(id: string, plainText: string): LiteChatMessageRecord {
+function createRecord(id: string, plainText: string): YouTubeChatMessageRecord {
   return {
     id,
     kind: 'text',
@@ -710,6 +816,29 @@ function createRecord(id: string, plainText: string): LiteChatMessageRecord {
 
 function waitForAnimationFrame(): Promise<void> {
   return new Promise((resolve) => window.requestAnimationFrame(() => resolve()));
+}
+
+function createScrollableRenderer(): {
+  renderer: ReturnType<typeof createLiteChatRenderer>;
+  scroller: HTMLElement;
+} {
+  const store = createLiteChatStore();
+  store.apply([{ type: 'upsert', record: createRecord('first', 'First') }]);
+  const renderer = createLiteChatRenderer(store);
+  document.body.append(renderer.root);
+  const scroller = renderer.root.querySelector<HTMLElement>('.ytcq-lite-scroller')!;
+  Object.defineProperties(scroller, {
+    clientHeight: { configurable: true, value: 100 },
+    scrollHeight: { configurable: true, value: 500 },
+    scrollTop: { configurable: true, value: 400, writable: true }
+  });
+  return { renderer, scroller };
+}
+
+function scrollReaderTo(scroller: HTMLElement, scrollTop: number): void {
+  scroller.dispatchEvent(new WheelEvent('wheel', { deltaY: -20 }));
+  scroller.scrollTop = scrollTop;
+  scroller.dispatchEvent(new Event('scroll'));
 }
 
 function getRenderedMessageIds(root: HTMLElement): string[] {

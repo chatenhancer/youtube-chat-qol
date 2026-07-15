@@ -1,26 +1,26 @@
 /**
- * Pure, bounded parser for the small InnerTube live-chat subset used by Lite
- * mode. It deliberately discards continuations, tracking parameters, service
+ * Pure, bounded parser for the InnerTube live-chat subset used by feed-backed
+ * features. It deliberately discards continuations, tracking parameters, service
  * endpoints, request metadata, and every other value outside the shared
  * sanitized protocol.
  */
 import type {
-  LiteChatAction,
-  LiteChatAuthor,
-  LiteChatAuthorBadge,
-  LiteChatMessageColors,
-  LiteChatMessageRecord,
-  LiteChatRichRun
-} from '../features/lite-mode/protocol';
+  YouTubeChatAuthor,
+  YouTubeChatAuthorBadge,
+  YouTubeChatFeedAction,
+  YouTubeChatMessageColors,
+  YouTubeChatMessageRecord,
+  YouTubeChatRichRun
+} from './protocol';
 
 type DataRecord = Record<string, unknown>;
 
-export interface LiteChatParseOptions {
+export interface YouTubeChatFeedParseOptions {
   initial?: boolean;
 }
 
-export interface LiteChatParseResult {
-  actions: LiteChatAction[];
+export interface YouTubeChatFeedParseResult {
+  actions: YouTubeChatFeedAction[];
   compatibilityWarnings: string[];
   continuationTimeoutMs?: number;
   fatalErrors: string[];
@@ -38,6 +38,8 @@ const MAX_PLAIN_TEXT_LENGTH = 8_000;
 const MAX_RUNS = 120;
 const MAX_SHORTCUTS = 16;
 const MAX_TEXT_LENGTH = 4_000;
+const MAX_TOP_FAN_SCAN_DEPTH = 6;
+const MAX_TOP_FAN_SCAN_NODES = 100;
 const MAX_URL_LENGTH = 2_048;
 const MAX_WALK_DEPTH = 12;
 const MAX_WALK_NODES = 2_500;
@@ -88,7 +90,7 @@ const KNOWN_NON_FEED_ACTIONS = new Set([
 ]);
 
 interface ParserState {
-  actions: LiteChatAction[];
+  actions: YouTubeChatFeedAction[];
   compatibilityWarnings: Set<string>;
   continuationTimeoutMs?: number;
   fatalErrors: Set<string>;
@@ -101,18 +103,18 @@ interface ParserState {
 
 interface ParsedFormattedText {
   plainText: string;
-  runs: LiteChatRichRun[];
+  runs: YouTubeChatRichRun[];
 }
 
 interface ParsedAuthorBadges {
-  badges: LiteChatAuthorBadge[];
+  badges: YouTubeChatAuthorBadge[];
   isOwner: boolean;
 }
 
-export function parseLiteChatPayload(
+export function parseYouTubeChatFeedPayload(
   value: unknown,
-  options: LiteChatParseOptions = {}
-): LiteChatParseResult {
+  options: YouTubeChatFeedParseOptions = {}
+): YouTubeChatFeedParseResult {
   const state: ParserState = {
     actions: [],
     compatibilityWarnings: new Set<string>(),
@@ -301,7 +303,7 @@ function parseAction(value: unknown, state: ParserState, replayOffsetMs?: number
 
     // Unknown auxiliary commands are left to YouTube. Feed-looking commands
     // are recorded for diagnostics, and add-like commands contribute to feed
-    // health because they may contain rows Lite could not read.
+    // health because they may contain rows the shared parser could not read.
     if (KNOWN_NON_FEED_ACTIONS.has(key)) continue;
     if (/ChatItems?.*Action$/.test(key)) {
       rememberCompatibilityWarning(
@@ -340,7 +342,10 @@ function parseFeedItem(value: unknown, state: ParserState, replayOffsetMs?: numb
   pushAction(state, { record, type: 'upsert' }, replayOffsetMs);
 }
 
-function parseMessageRenderer(rendererKey: string, value: unknown): LiteChatMessageRecord | null {
+function parseMessageRenderer(
+  rendererKey: string,
+  value: unknown
+): YouTubeChatMessageRecord | null {
   const renderer = asRecord(value);
   if (!renderer) return null;
   const id = cleanInlineText(renderer.id, MAX_ID_LENGTH);
@@ -465,7 +470,7 @@ function parseMessageRenderer(rendererKey: string, value: unknown): LiteChatMess
   });
 }
 
-function compactRecord(record: LiteChatMessageRecord): LiteChatMessageRecord {
+function compactRecord(record: YouTubeChatMessageRecord): YouTubeChatMessageRecord {
   if (!record.author) delete record.author;
   if (!record.colors || Object.keys(record.colors).length === 0) delete record.colors;
   if (!record.timestampText) delete record.timestampText;
@@ -473,7 +478,7 @@ function compactRecord(record: LiteChatMessageRecord): LiteChatMessageRecord {
   return record;
 }
 
-function parseAuthor(primary: DataRecord, fallback?: DataRecord): LiteChatAuthor | undefined {
+function parseAuthor(primary: DataRecord, fallback?: DataRecord): YouTubeChatAuthor | undefined {
   const name = getFormattedPlainText(primary.authorName) || getFormattedPlainText(fallback?.authorName);
   if (!name) return undefined;
 
@@ -486,12 +491,15 @@ function parseAuthor(primary: DataRecord, fallback?: DataRecord): LiteChatAuthor
     getThumbnailUrl(fallback?.authorPhoto) ||
     getThumbnailUrl(fallback?.authorAvatar);
   const { badges, isOwner } = parseBadges(primary.authorBadges || fallback?.authorBadges);
+  const topFanRank = parseTopFanRank(primary.beforeContentButtons) ??
+    parseTopFanRank(fallback?.beforeContentButtons);
   return {
     ...(avatarUrl ? { avatarUrl } : {}),
     badges,
     ...(channelId ? { channelId } : {}),
     ...(isOwner ? { isOwner: true } : {}),
-    name
+    name,
+    ...(topFanRank ? { topFanRank } : {})
   };
 }
 
@@ -499,7 +507,7 @@ function parseBadges(value: unknown): ParsedAuthorBadges {
   if (!Array.isArray(value)) return { badges: [], isOwner: false };
   let isOwner = false;
   const badges = value.slice(0, MAX_BADGES)
-    .map((badge): LiteChatAuthorBadge | null => {
+    .map((badge): YouTubeChatAuthorBadge | null => {
       const renderer = asRecord(asRecord(badge)?.liveChatAuthorBadgeRenderer);
       if (!renderer) return null;
       const icon = asRecord(renderer.icon);
@@ -518,19 +526,50 @@ function parseBadges(value: unknown): ParsedAuthorBadges {
         ? 'moderator' as const
         : iconType === 'VERIFIED'
           ? 'verified' as const
-          : undefined;
+          : iconType === 'SPONSOR' || iconType === 'MEMBER' || iconUrl
+            ? 'member' as const
+            : undefined;
       return {
         ...(iconUrl ? { iconUrl } : {}),
         ...(kind ? { kind } : {}),
         label
       };
     })
-    .filter((badge): badge is LiteChatAuthorBadge => Boolean(badge));
+    .filter((badge): badge is YouTubeChatAuthorBadge => Boolean(badge));
   return { badges, isOwner };
 }
 
-function parseColors(renderer: DataRecord): LiteChatMessageColors | undefined {
-  const colors: LiteChatMessageColors = {};
+function parseTopFanRank(value: unknown): 1 | 2 | 3 | undefined {
+  const visited = new WeakSet<object>();
+  let scannedNodes = 0;
+
+  const scan = (candidate: unknown, depth: number): 1 | 2 | 3 | undefined => {
+    if (depth > MAX_TOP_FAN_SCAN_DEPTH || scannedNodes >= MAX_TOP_FAN_SCAN_NODES) {
+      return undefined;
+    }
+    if (typeof candidate === 'string') {
+      const match = cleanInlineText(candidate, 120).match(/^#\s*([1-3])$/);
+      return match ? Number(match[1]) as 1 | 2 | 3 : undefined;
+    }
+    if (!candidate || typeof candidate !== 'object' || visited.has(candidate)) return undefined;
+
+    visited.add(candidate);
+    scannedNodes += 1;
+    const children = Array.isArray(candidate)
+      ? candidate.slice(0, 20)
+      : Object.values(candidate).slice(0, 30);
+    for (const child of children) {
+      const rank = scan(child, depth + 1);
+      if (rank) return rank;
+    }
+    return undefined;
+  };
+
+  return scan(value, 0);
+}
+
+function parseColors(renderer: DataRecord): YouTubeChatMessageColors | undefined {
+  const colors: YouTubeChatMessageColors = {};
   assignColor(colors, 'authorName', renderer.authorNameTextColor);
   assignColor(colors, 'background', renderer.backgroundColor);
   assignColor(colors, 'bodyBackground', firstDefined(renderer.bodyBackgroundColor, renderer.moneyChipBackgroundColor));
@@ -542,8 +581,8 @@ function parseColors(renderer: DataRecord): LiteChatMessageColors | undefined {
 }
 
 function assignColor(
-  colors: LiteChatMessageColors,
-  key: keyof LiteChatMessageColors,
+  colors: YouTubeChatMessageColors,
+  key: keyof YouTubeChatMessageColors,
   value: unknown
 ): void {
   if (typeof value !== 'number' || !Number.isFinite(value)) return;
@@ -577,7 +616,7 @@ function parseFormattedText(value: unknown): ParsedFormattedText {
   }
 
   if (!Array.isArray(formatted.runs)) return emptyFormattedText();
-  const runs: LiteChatRichRun[] = [];
+  const runs: YouTubeChatRichRun[] = [];
   for (const rawRun of formatted.runs.slice(0, MAX_RUNS)) {
     const run = asRecord(rawRun);
     if (!run) continue;
@@ -732,7 +771,7 @@ function getRendererEntry(item: DataRecord): [string, unknown] | null {
 
 function pushAction(
   state: ParserState,
-  action: LiteChatAction,
+  action: YouTubeChatFeedAction,
   replayOffsetMs?: number
 ): void {
   state.actions.push(replayOffsetMs === undefined ? action : { ...action, replayOffsetMs });

@@ -6,7 +6,11 @@
  */
 import { attachScenario } from '../scenarios/attach';
 import { focusPanelOpensFromAuthorScenario } from '../scenarios/focus';
-import { inboxOpensFromHeaderScenario } from '../scenarios/inbox';
+import {
+  inboxOpensFromHeaderScenario,
+  inboxReplayPrefetchTimingScenario,
+  inboxRecordCreationAndJumpScenario
+} from '../scenarios/inbox';
 import { liteModeToggleAndRestoreScenario } from '../scenarios/lite-mode';
 import { liteModeAeroBehaviorScenario } from '../scenarios/lite-mode-native-surfaces';
 import { markedUserMessageMenuScenario } from '../scenarios/marked-users';
@@ -48,6 +52,14 @@ test(
   focusPanelOpensFromAuthorScenario
 );
 test('logged-in mock replay: inbox opens from the chat header', inboxOpensFromHeaderScenario);
+test(
+  'logged-in mock replay: inbox saves feed matches and jumps back to chat',
+  inboxRecordCreationAndJumpScenario
+);
+test(
+  'logged-in mock replay: inbox waits until prefetched messages reach their video time',
+  inboxReplayPrefetchTimingScenario
+);
 test(
   'logged-in mock replay: Lite mode toggles on, renders readable messages, and restores native chat',
   liteModeToggleAndRestoreScenario

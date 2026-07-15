@@ -10,7 +10,17 @@ interface ScrollPosition {
   wasAtBottom: boolean;
 }
 
+interface PendingScrollRestore {
+  animationFrame: number;
+  position: ScrollPosition;
+}
+
+const pendingScrollRestores = new WeakMap<HTMLElement, PendingScrollRestore>();
+
 export function captureScrollPosition(element: HTMLElement): ScrollPosition {
+  const pending = pendingScrollRestores.get(element);
+  if (pending) return { ...pending.position };
+
   return {
     scrollTop: element.scrollTop,
     wasAtBottom: isScrolledToBottom(element)
@@ -18,23 +28,13 @@ export function captureScrollPosition(element: HTMLElement): ScrollPosition {
 }
 
 export function restoreScrollPositionAfterRender(element: HTMLElement, position: ScrollPosition): void {
-  window.requestAnimationFrame(() => {
-    if (position.wasAtBottom) {
-      element.scrollTop = element.scrollHeight;
-      updateScrollEdgeFades(element);
-      return;
-    }
-
-    const maxScrollTop = Math.max(0, element.scrollHeight - element.clientHeight);
-    element.scrollTop = Math.min(position.scrollTop, maxScrollTop);
-    updateScrollEdgeFades(element);
-  });
+  scheduleScrollRestore(element, position);
 }
 
 export function scrollElementToBottom(element: HTMLElement): void {
-  window.requestAnimationFrame(() => {
-    element.scrollTop = element.scrollHeight;
-    updateScrollEdgeFades(element);
+  scheduleScrollRestore(element, {
+    scrollTop: element.scrollTop,
+    wasAtBottom: true
   });
 }
 
@@ -77,4 +77,27 @@ export function updateScrollEdgeFades(element: HTMLElement): void {
 
 function isScrolledToBottom(element: HTMLElement): boolean {
   return element.scrollTop + element.clientHeight >= element.scrollHeight - BOTTOM_TOLERANCE_PX;
+}
+
+function scheduleScrollRestore(element: HTMLElement, position: ScrollPosition): void {
+  const previous = pendingScrollRestores.get(element);
+  if (previous) window.cancelAnimationFrame(previous.animationFrame);
+
+  const pending: PendingScrollRestore = {
+    animationFrame: 0,
+    position: { ...position }
+  };
+  pendingScrollRestores.set(element, pending);
+  pending.animationFrame = window.requestAnimationFrame(() => {
+    if (pendingScrollRestores.get(element) !== pending) return;
+    pendingScrollRestores.delete(element);
+
+    if (pending.position.wasAtBottom) {
+      element.scrollTop = element.scrollHeight;
+    } else {
+      const maxScrollTop = Math.max(0, element.scrollHeight - element.clientHeight);
+      element.scrollTop = Math.min(pending.position.scrollTop, maxScrollTop);
+    }
+    updateScrollEdgeFades(element);
+  });
 }

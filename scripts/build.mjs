@@ -101,7 +101,7 @@ function getBuildOptions(target) {
     ...sharedBuildOptions,
     define: {
       ...sharedDefines,
-      'globalThis.YTCQ_INJECT_MESSAGE_DATA_PAGE': JSON.stringify(target === 'safari')
+      'globalThis.YTCQ_INJECT_CHAT_FEED_PAGE': JSON.stringify(target === 'safari')
     }
   };
 }
@@ -126,8 +126,8 @@ async function buildTarget(target) {
     }),
     build({
       ...getBuildOptions(target),
-      entryPoints: [path.join(root, 'src', 'youtube', 'message-data-page.ts')],
-      outfile: path.join(extensionDir, 'message-data-page.js'),
+      entryPoints: [path.join(root, 'src', 'youtube', 'chat-feed', 'page.ts')],
+      outfile: path.join(extensionDir, 'chat-feed-page.js'),
       format: 'iife'
     }),
     build({
@@ -277,7 +277,7 @@ function createManifest(target) {
       ])
     ];
     removeMainWorldContentScripts(manifest);
-    addSafariMessageDataPageResource(manifest);
+    addSafariChatFeedPageResource(manifest);
     useSafariPersistentBackground(manifest);
   }
 
@@ -323,7 +323,7 @@ function removeMainWorldContentScripts(manifest) {
   });
 }
 
-function addSafariMessageDataPageResource(manifest) {
+function addSafariChatFeedPageResource(manifest) {
   const resources = manifest.web_accessible_resources || [];
   const entry = resources.find((candidate) =>
     Array.isArray(candidate.resources) &&
@@ -331,11 +331,11 @@ function addSafariMessageDataPageResource(manifest) {
     candidate.matches.includes('https://www.youtube.com/*')
   );
   if (entry) {
-    entry.resources = [...new Set([...entry.resources, 'message-data-page.js'])];
+    entry.resources = [...new Set([...entry.resources, 'chat-feed-page.js'])];
     return;
   }
   resources.push({
-    resources: ['message-data-page.js'],
+    resources: ['chat-feed-page.js'],
     matches: [
       'https://www.youtube.com/*',
       'https://studio.youtube.com/*'

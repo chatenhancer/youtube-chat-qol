@@ -1,54 +1,49 @@
 /**
  * Inbox record creation and merging.
  *
- * Converts live YouTube messages into stored Inbox records and merges mention
- * plus keyword matches for the same live message.
+ * Converts normalized feed messages into stored Inbox records and merges
+ * mention plus keyword matches for the same message.
  */
-import {
-  getAuthorName,
-  getAuthorChannelId,
-  getMessageAvatarSrc,
-  getMessageContentSourceNodes,
-  getMessageStableId,
-  getMessageText,
-  getMessageTimestampText
-} from '../../youtube/messages';
-import { serializeRichMessageNodes } from '../../youtube/rich-text';
+import { formatMessageTimestamp } from '../../youtube/messages';
+import { getChatTimestampValue } from '../../youtube/timestamps';
+import type { YouTubeChatMessageRecord } from '../../youtube/chat-feed/protocol';
+import { getYouTubeChatFeedRichTextSegments } from '../../youtube/chat-feed/rich-text';
 import { mergeStrings } from './matching';
-import { getInboxTimestamp } from './storage';
 import type { InboxMatch, InboxRecord } from './types';
 
-export function createInboxRecord(
-  message: HTMLElement,
-  match: InboxMatch,
-  options: {
-    getMentionHandles: (text: string) => string[];
-    sourceUrl: string;
-  }
-): InboxRecord | null {
-  const authorName = getAuthorName(message);
-  const text = getMessageText(message);
-  if (!authorName || !text) return null;
+export interface InboxChatFeedRecordOptions {
+  receivedAt: number;
+  replayOffsetMs?: number;
+  source: 'live' | 'replay';
+  sourceUrl: string;
+}
 
-  const now = Date.now();
-  const timestampText = getMessageTimestampText(message, now);
-  const timestamp = getInboxTimestamp(message, timestampText, now);
+export function createInboxRecordFromChatFeed(
+  sourceRecord: YouTubeChatMessageRecord,
+  match: InboxMatch,
+  options: InboxChatFeedRecordOptions
+): InboxRecord | null {
+  const authorName = sourceRecord.author?.name?.trim() || '';
+  const text = sourceRecord.plainText.trim();
+  if (!sourceRecord.id || !authorName || !text) return null;
+
+  const timestampText = sourceRecord.timestampText || getChatFeedTimestampText(options);
+  const timestamp = getChatFeedTimestamp(sourceRecord, timestampText, options);
   const matchedKeywords = mergeStrings([], match.keywords || []);
   const mentionHandles = match.mention
-    ? mergeStrings([], match.mentionHandles?.length ? match.mentionHandles : options.getMentionHandles(text))
+    ? mergeStrings([], match.mentionHandles || [])
     : [];
 
   return {
-    id: `${timestamp}-${Math.random().toString(36).slice(2, 8)}`,
+    id: `feed:${sourceRecord.id}`,
     authorName,
-    avatarSrc: getMessageAvatarSrc(message) || undefined,
-    channelId: getAuthorChannelId(message) || undefined,
-    contentParts: serializeRichMessageNodes(getMessageContentSourceNodes(message)),
+    avatarSrc: sourceRecord.author?.avatarUrl || undefined,
+    channelId: sourceRecord.author?.channelId || undefined,
+    contentParts: getYouTubeChatFeedRichTextSegments(sourceRecord),
     matchedKeywords,
-    messageRef: new WeakRef(message),
     mention: match.mention === true,
     mentionHandles,
-    messageId: getMessageStableId(message),
+    messageId: sourceRecord.id,
     read: false,
     sourceUrl: options.sourceUrl,
     text,
@@ -102,4 +97,32 @@ export function hasTransientRecordUpdate(
   getLiveMessage: (record: InboxRecord) => HTMLElement | null
 ): boolean {
   return getLiveMessage(existing) !== getLiveMessage(merged);
+}
+
+function getChatFeedTimestamp(
+  record: YouTubeChatMessageRecord,
+  timestampText: string,
+  options: InboxChatFeedRecordOptions
+): number {
+  if (options.source === 'live' && /^\d{1,24}$/.test(record.timestampUsec || '')) {
+    const timestamp = Number(record.timestampUsec) / 1_000;
+    if (Number.isFinite(timestamp) && timestamp > 0) return timestamp;
+  }
+
+  return getChatTimestampValue(timestampText, options.receivedAt, {
+    preferElapsed: options.source === 'replay'
+  }) ?? options.receivedAt;
+}
+
+function getChatFeedTimestampText(options: InboxChatFeedRecordOptions): string {
+  if (options.source === 'replay' && options.replayOffsetMs !== undefined) {
+    const totalSeconds = Math.max(0, Math.floor(options.replayOffsetMs / 1_000));
+    const hours = Math.floor(totalSeconds / 3_600);
+    const minutes = Math.floor((totalSeconds % 3_600) / 60);
+    const seconds = totalSeconds % 60;
+    return hours
+      ? `${hours}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
+      : `${minutes}:${String(seconds).padStart(2, '0')}`;
+  }
+  return formatMessageTimestamp(options.receivedAt);
 }

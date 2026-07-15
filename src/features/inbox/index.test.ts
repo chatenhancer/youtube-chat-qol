@@ -1,18 +1,22 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type { InboxRecord } from './types';
+import type { InboxMatch, InboxRecord } from './types';
+import type { YouTubeChatFeedBatch } from '../../youtube/chat-feed/source';
 
 const inboxTestState = vi.hoisted(() => ({
   currentTabActive: false,
+  feedOnBatch: null as ((batch: YouTubeChatFeedBatch) => void) | null,
   inboxOpen: false,
   keywords: [] as string[],
   loaded: true,
   matchingKeywords: [] as string[],
-  mentionProcessor: null as ((message: HTMLElement) => void) | null,
+  mentionCandidateListener: null as ((candidates: readonly string[]) => void) | null,
+  mentionCandidates: ['@currentuser'] as string[],
   upsertResult: { changed: true, transientChanged: false }
 }));
 
 const stateMocks = vi.hoisted(() => ({
   addInboxKeywordsToState: vi.fn((values: string[]) => ({ added: values, duplicates: [] as string[] })),
+  attachLiveInboxMessage: vi.fn(() => false),
   clearInboxRecords: vi.fn(),
   getInboxKeywords: vi.fn(() => inboxTestState.keywords),
   getInboxKeywordsSnapshot: vi.fn(() => inboxTestState.keywords),
@@ -20,7 +24,9 @@ const stateMocks = vi.hoisted(() => ({
   getLatestInboxRecord: vi.fn(),
   getLatestMentionInboxRecord: vi.fn(),
   getLoadedInboxKeywords: vi.fn(() => inboxTestState.keywords),
-  getMatchedMentionHandles: vi.fn(() => ['@CurrentUser']),
+  getMatchedMentionHandles: vi.fn(() => (
+    inboxTestState.mentionCandidates.length ? ['@CurrentUser'] : []
+  )),
   getMatchingKeywords: vi.fn(() => inboxTestState.matchingKeywords),
   getUnreadInboxCount: vi.fn(() => 1),
   isInboxStateLoaded: vi.fn(() => inboxTestState.loaded),
@@ -32,14 +38,19 @@ const stateMocks = vi.hoisted(() => ({
   resetInboxStore: vi.fn(),
   saveInboxKeywords: vi.fn(),
   saveInboxRecords: vi.fn(),
-  upsertInboxRecord: vi.fn(() => inboxTestState.upsertResult)
+  upsertInboxRecord: vi.fn((_record: InboxRecord, _isReadNow: boolean) => inboxTestState.upsertResult)
 }));
 
 const mentionMocks = vi.hoisted(() => ({
+  getCurrentMentionCandidates: vi.fn(() => inboxTestState.mentionCandidates),
   isCurrentUserAuthorName: vi.fn((authorName: string) => authorName === '@CurrentUser'),
-  processPotentialMentionForConsumer: vi.fn((_message: HTMLElement, _key: string, callback: () => void) => callback()),
-  registerMentionProcessor: vi.fn((processor: (message: HTMLElement) => void) => {
-    inboxTestState.mentionProcessor = processor;
+  onMentionCandidatesChanged: vi.fn((listener: (candidates: readonly string[]) => void) => {
+    inboxTestState.mentionCandidateListener = listener;
+    return () => {
+      if (inboxTestState.mentionCandidateListener === listener) {
+        inboxTestState.mentionCandidateListener = null;
+      }
+    };
   })
 }));
 
@@ -78,6 +89,16 @@ const soundMocks = vi.hoisted(() => ({
   playAlertSound: vi.fn()
 }));
 
+const chatFeedMocks = vi.hoisted(() => ({
+  isYouTubeChatFeedPage: vi.fn(() => true),
+  subscribeYouTubeChatFeed: vi.fn((subscription: { onBatch: (batch: YouTubeChatFeedBatch) => void }) => {
+    inboxTestState.feedOnBatch = subscription.onBatch;
+    return () => {
+      if (inboxTestState.feedOnBatch === subscription.onBatch) inboxTestState.feedOnBatch = null;
+    };
+  })
+}));
+
 vi.mock('./state', () => stateMocks);
 vi.mock('../mention-detection', () => mentionMocks);
 vi.mock('./card', () => cardMocks);
@@ -85,19 +106,26 @@ vi.mock('./button', () => buttonMocks);
 vi.mock('./highlights', () => highlightMocks);
 vi.mock('../tab-alert', () => tabAlertMocks);
 vi.mock('./sound', () => soundMocks);
+vi.mock('../../youtube/chat-feed/source', () => chatFeedMocks);
 vi.mock('./records', () => ({
-  createInboxRecord: vi.fn((message: HTMLElement, match: unknown) => ({
-    authorName: message.querySelector('#author-name')?.textContent || '@Viewer',
-    id: 'record-1',
-    matchedKeywords: [],
-    mention: false,
-    mentionHandles: [],
+  createInboxRecordFromChatFeed: vi.fn((record: {
+    author?: { channelId?: string; name?: string };
+    id: string;
+    plainText: string;
+  }, match: InboxMatch) => ({
+    authorName: record.author?.name || '@Viewer',
+    channelId: record.author?.channelId,
+    contentParts: [],
+    id: record.id,
+    matchedKeywords: match.keywords || [],
+    mention: match.mention === true,
+    mentionHandles: match.mentionHandles || [],
+    messageId: record.id,
     read: false,
     sourceUrl: 'https://www.youtube.com/watch?v=video',
-    text: message.querySelector('#message')?.textContent || '',
+    text: record.plainText,
     timestamp: 1,
-    timestampText: '9:30 PM',
-    ...(match as Partial<InboxRecord>)
+    timestampText: '0:01'
   }))
 }));
 vi.mock('../../youtube/source-url', () => ({
@@ -109,13 +137,11 @@ import {
   handleFeatureMutations,
   shouldIgnoreFeatureAddedNode,
   shouldIgnoreFeatureMutation
-} from '../../content/lifecycle';
-import { createInboxRecord } from './records';
+} from '../../content/feature-runtime';
+import { createInboxRecordFromChatFeed } from './records';
 import {
   addInboxKeywords,
   cleanupStaleInboxSurfaces,
-  handlePotentialInbox,
-  highlightPotentialInboxKeywords,
   initInbox,
   openInboxCard,
   removeInboxKeywords,
@@ -125,21 +151,24 @@ import {
 
 describe('inbox coordinator', () => {
   beforeEach(() => {
+    cleanupStaleInboxSurfaces();
     document.body.replaceChildren();
+    inboxTestState.feedOnBatch = null;
     inboxTestState.loaded = true;
     inboxTestState.keywords = [];
     inboxTestState.matchingKeywords = [];
+    inboxTestState.mentionCandidateListener = null;
+    inboxTestState.mentionCandidates = ['@currentuser'];
     inboxTestState.inboxOpen = false;
     inboxTestState.currentTabActive = false;
     inboxTestState.upsertResult = { changed: true, transientChanged: false };
-    inboxTestState.mentionProcessor = null;
     vi.clearAllMocks();
     stateMocks.loadInboxState.mockImplementation(async () => {
       inboxTestState.loaded = true;
     });
   });
 
-  it('initializes storage, tab alerts, mention processing, and header button wiring', async () => {
+  it('initializes storage, tab alerts, feed matching, and header button wiring', async () => {
     const message = createMessage('@ViewerOne', 'hello alpha');
     document.body.append(message);
     inboxTestState.keywords = ['alpha'];
@@ -149,20 +178,58 @@ describe('inbox coordinator', () => {
     await Promise.resolve();
 
     expect(tabAlertMocks.initInboxTabAlert).toHaveBeenCalledOnce();
-    expect(mentionMocks.registerMentionProcessor).toHaveBeenCalledOnce();
+    expect(chatFeedMocks.subscribeYouTubeChatFeed).toHaveBeenCalledOnce();
     expect(buttonMocks.scheduleInboxButtonWire).toHaveBeenCalledOnce();
     expect(buttonMocks.refreshInboxSurfaces).toHaveBeenCalled();
     expect(highlightMocks.applyChatKeywordHighlights).toHaveBeenCalledWith(message, ['alpha'], '@ViewerOne|hello alpha');
-    expect(inboxTestState.mentionProcessor).toBeTypeOf('function');
   });
 
-  it('records mention and keyword matches, then alerts when the inbox is not open', async () => {
+  it('ignores startup feed rows and retries a future replay mention after identity loads', async () => {
+    inboxTestState.mentionCandidates = [];
+    initInbox();
+
+    const backlogRecord = createFeedRecord('backlog-message', 'hello @CurrentUser');
+    inboxTestState.feedOnBatch?.({
+      actions: [{ record: backlogRecord, type: 'upsert' }],
+      activity: 'existing',
+      delivery: 'transport',
+      receivedAt: 1,
+      sequence: 1,
+      source: 'replay',
+      version: 1
+    });
+    expect(stateMocks.upsertInboxRecord).not.toHaveBeenCalled();
+
+    const futureRecord = createFeedRecord('future-message', 'hello @CurrentUser');
+    inboxTestState.feedOnBatch?.({
+      actions: [{ record: futureRecord, replayOffsetMs: 2_000, type: 'upsert' }],
+      activity: 'new',
+      delivery: 'replay-timeline',
+      receivedAt: 1,
+      sequence: 1,
+      source: 'initial',
+      version: 1
+    });
+    expect(stateMocks.upsertInboxRecord).not.toHaveBeenCalled();
+
+    inboxTestState.mentionCandidates = ['@currentuser'];
+    inboxTestState.mentionCandidateListener?.(inboxTestState.mentionCandidates);
+
+    expect(stateMocks.upsertInboxRecord).toHaveBeenCalledWith(
+      expect.objectContaining({
+        mention: true,
+        messageId: 'future-message'
+      }),
+      false
+    );
+    expect(soundMocks.playAlertSound).toHaveBeenCalledOnce();
+  });
+
+  it('records feed mention and keyword matches, then alerts when the inbox is not open', async () => {
     inboxTestState.keywords = ['alpha'];
     inboxTestState.matchingKeywords = ['alpha'];
-    const message = createMessage('@ViewerTwo', 'hello alpha');
-    document.body.append(message);
-
-    handlePotentialInbox(message);
+    initInbox();
+    dispatchNewFeedRecord('matched-message', 'hello @CurrentUser alpha');
     await Promise.resolve();
 
     expect(stateMocks.upsertInboxRecord).toHaveBeenCalled();
@@ -171,7 +238,7 @@ describe('inbox coordinator', () => {
     expect(tabAlertMocks.showInboxTabAlert).toHaveBeenCalledWith(1);
   });
 
-  it('runs through lifecycle message phases for added and existing message passes', async () => {
+  it('handles added and existing rows through the feature runtime', async () => {
     inboxTestState.keywords = ['alpha'];
     inboxTestState.matchingKeywords = ['alpha'];
     const addedMessage = createMessage('@ViewerLifecycle', 'hello alpha');
@@ -182,20 +249,12 @@ describe('inbox coordinator', () => {
     handleFeatureMessage(touchedMessage, { source: 'existing' });
     await Promise.resolve();
 
-    expect(mentionMocks.processPotentialMentionForConsumer).toHaveBeenCalledWith(
-      addedMessage,
-      'ytcqInboxMentionChecked',
-      expect.any(Function)
-    );
-    expect(mentionMocks.processPotentialMentionForConsumer).not.toHaveBeenCalledWith(
-      touchedMessage,
-      'ytcqInboxMentionChecked',
-      expect.any(Function)
-    );
+    expect(stateMocks.attachLiveInboxMessage).toHaveBeenCalledWith(addedMessage);
+    expect(stateMocks.attachLiveInboxMessage).not.toHaveBeenCalledWith(touchedMessage);
     expect(highlightMocks.applyChatKeywordHighlights).toHaveBeenCalledWith(touchedMessage, ['alpha'], '@ViewerTouched|hello alpha');
   });
 
-  it('wires the inbox button from header mutations and retries changed messages through message lifecycle', () => {
+  it('wires the inbox button and binds changed message rows through the lifecycle', () => {
     const header = document.createElement('yt-live-chat-header-renderer');
     const wrapper = document.createElement('div');
     wrapper.append(header);
@@ -223,11 +282,7 @@ describe('inbox coordinator', () => {
     });
 
     expect(buttonMocks.scheduleInboxButtonWire).toHaveBeenCalled();
-    expect(mentionMocks.processPotentialMentionForConsumer).toHaveBeenCalledWith(
-      changedMessage,
-      'ytcqInboxMentionChecked',
-      expect.any(Function)
-    );
+    expect(stateMocks.attachLiveInboxMessage).toHaveBeenCalledWith(changedMessage);
   });
 
   it('wires the inbox button when a newly added wrapper contains the chat header', () => {
@@ -248,39 +303,37 @@ describe('inbox coordinator', () => {
     const empty = createMessage('@ViewerTwo', '');
     document.body.append(empty);
 
-    handlePotentialInbox(disconnected);
-    handlePotentialInbox(empty);
+    handleFeatureMessage(disconnected, { source: 'added' });
+    handleFeatureMessage(empty, { source: 'added' });
 
-    expect(mentionMocks.processPotentialMentionForConsumer).not.toHaveBeenCalled();
+    expect(stateMocks.attachLiveInboxMessage).not.toHaveBeenCalled();
     expect(stateMocks.upsertInboxRecord).not.toHaveBeenCalled();
   });
 
-  it('clears keyword highlights when no keywords are configured', () => {
-    mentionMocks.processPotentialMentionForConsumer.mockImplementationOnce(() => undefined);
+  it('clears rendered keyword highlights when no keywords are configured', () => {
     const message = createMessage('@ViewerTwo', 'hello alpha');
     document.body.append(message);
 
-    handlePotentialInbox(message);
+    handleFeatureMessage(message, { source: 'added' });
 
-    expect(highlightMocks.clearChatKeywordHighlights).toHaveBeenCalledWith(message);
+    expect(highlightMocks.applyChatKeywordHighlights).toHaveBeenCalledWith(message, [], '');
     expect(stateMocks.upsertInboxRecord).not.toHaveBeenCalled();
   });
 
-  it('refreshes repeated keyword highlights without recording duplicate matches', async () => {
-    mentionMocks.processPotentialMentionForConsumer.mockImplementation(() => undefined);
+  it('refreshes repeated DOM keyword highlights without collecting message data', async () => {
     inboxTestState.keywords = ['alpha'];
     inboxTestState.matchingKeywords = ['alpha'];
     const message = createMessage('@ViewerTwo', 'hello alpha');
     document.body.append(message);
 
-    handlePotentialInbox(message);
+    handleFeatureMessage(message, { source: 'added' });
     await Promise.resolve();
-    handlePotentialInbox(message);
+    handleFeatureMessage(message, { source: 'added' });
     await Promise.resolve();
 
     expect(stateMocks.getMatchingKeywords).toHaveBeenCalledTimes(2);
     expect(highlightMocks.applyChatKeywordHighlights).toHaveBeenCalledTimes(2);
-    expect(stateMocks.upsertInboxRecord).toHaveBeenCalledTimes(1);
+    expect(stateMocks.upsertInboxRecord).not.toHaveBeenCalled();
   });
 
   it('does not keyword-highlight current-user messages', () => {
@@ -289,19 +342,18 @@ describe('inbox coordinator', () => {
     const message = createMessage('@CurrentUser', 'hello alpha');
     document.body.append(message);
 
-    highlightPotentialInboxKeywords(message);
+    handleFeatureMessage(message, { source: 'existing' });
 
     expect(highlightMocks.applyChatKeywordHighlights).toHaveBeenCalledWith(message, [], '');
   });
 
   it('applies empty keyword highlights when no keyword matches are found', () => {
-    mentionMocks.processPotentialMentionForConsumer.mockImplementationOnce(() => undefined);
     inboxTestState.keywords = ['alpha'];
     inboxTestState.matchingKeywords = [];
     const message = createMessage('@ViewerTwo', 'hello beta');
     document.body.append(message);
 
-    handlePotentialInbox(message);
+    handleFeatureMessage(message, { source: 'added' });
 
     expect(highlightMocks.applyChatKeywordHighlights).toHaveBeenCalledWith(message, [], '');
     expect(stateMocks.upsertInboxRecord).not.toHaveBeenCalled();
@@ -312,10 +364,8 @@ describe('inbox coordinator', () => {
     inboxTestState.currentTabActive = true;
     inboxTestState.keywords = ['alpha'];
     inboxTestState.matchingKeywords = ['alpha'];
-    const message = createMessage('@ViewerThree', 'hello alpha');
-    document.body.append(message);
-
-    handlePotentialInbox(message);
+    initInbox();
+    dispatchNewFeedRecord('read-message', 'hello alpha');
     await Promise.resolve();
 
     expect(soundMocks.playAlertSound).not.toHaveBeenCalled();
@@ -327,10 +377,8 @@ describe('inbox coordinator', () => {
     inboxTestState.upsertResult = { changed: false, transientChanged: true };
     inboxTestState.keywords = ['alpha'];
     inboxTestState.matchingKeywords = ['alpha'];
-    const message = createMessage('@ViewerThree', 'hello alpha');
-    document.body.append(message);
-
-    handlePotentialInbox(message);
+    initInbox();
+    dispatchNewFeedRecord('transient-message', 'hello alpha');
     await Promise.resolve();
 
     expect(cardMocks.refreshOpenInboxCard).toHaveBeenCalled();
@@ -339,14 +387,12 @@ describe('inbox coordinator', () => {
     expect(tabAlertMocks.showInboxTabAlert).not.toHaveBeenCalled();
   });
 
-  it('does not persist anything when a matched message cannot create an inbox record', async () => {
-    vi.mocked(createInboxRecord).mockReturnValueOnce(null as never);
+  it('does not persist anything when a matched feed message cannot create an inbox record', async () => {
+    vi.mocked(createInboxRecordFromChatFeed).mockReturnValueOnce(null as never);
     inboxTestState.keywords = ['alpha'];
     inboxTestState.matchingKeywords = ['alpha'];
-    const message = createMessage('@ViewerNoRecord', 'hello alpha');
-    document.body.append(message);
-
-    handlePotentialInbox(message);
+    initInbox();
+    dispatchNewFeedRecord('unreadable-message', 'hello alpha');
     await Promise.resolve();
 
     expect(stateMocks.upsertInboxRecord).not.toHaveBeenCalled();
@@ -358,10 +404,8 @@ describe('inbox coordinator', () => {
     inboxTestState.upsertResult = { changed: false, transientChanged: false };
     inboxTestState.keywords = ['alpha'];
     inboxTestState.matchingKeywords = ['alpha'];
-    const message = createMessage('@ViewerThree', 'hello alpha');
-    document.body.append(message);
-
-    handlePotentialInbox(message);
+    initInbox();
+    dispatchNewFeedRecord('unchanged-message', 'hello alpha');
     await Promise.resolve();
 
     expect(cardMocks.refreshOpenInboxCard).not.toHaveBeenCalled();
@@ -369,41 +413,47 @@ describe('inbox coordinator', () => {
     expect(soundMocks.playAlertSound).not.toHaveBeenCalled();
   });
 
-  it('loads state before handling pending messages and keyword highlighting', async () => {
+  it('loads state before keyword-highlighting a DOM row', async () => {
     inboxTestState.loaded = false;
     inboxTestState.keywords = ['alpha'];
     inboxTestState.matchingKeywords = ['alpha'];
     const message = createMessage('@ViewerFour', 'hello alpha');
     document.body.append(message);
 
-    handlePotentialInbox(message);
-    highlightPotentialInboxKeywords(message);
+    handleFeatureMessage(message, { source: 'existing' });
     await Promise.resolve();
 
     expect(stateMocks.loadInboxState).toHaveBeenCalled();
     expect(highlightMocks.applyChatKeywordHighlights).toHaveBeenCalledWith(message, ['alpha'], '@ViewerFour|hello alpha');
   });
 
-  it('caps pending inbox messages while state is loading', async () => {
+  it('bounds feed messages while Inbox state is loading', async () => {
     inboxTestState.loaded = false;
-    inboxTestState.keywords = ['alpha'];
     inboxTestState.matchingKeywords = ['alpha'];
-    stateMocks.loadInboxState.mockImplementation(() => Promise.resolve().then(() => {
-      inboxTestState.loaded = true;
-    }));
+    let resolveLoad = () => undefined;
+    const loadPromise = new Promise<void>((resolve) => {
+      resolveLoad = () => {
+        inboxTestState.loaded = true;
+        resolve();
+      };
+    });
+    stateMocks.loadInboxState.mockReturnValue(loadPromise);
+    initInbox();
+
     for (let index = 0; index < 65; index += 1) {
-      const message = createMessage(`@Viewer${index}`, `hello alpha ${index}`);
-      document.body.append(message);
-      handlePotentialInbox(message);
+      dispatchNewFeedRecord(`pending-${index}`, `hello alpha ${index}`);
     }
+    expect(stateMocks.upsertInboxRecord).not.toHaveBeenCalled();
 
-    await Promise.resolve();
+    resolveLoad();
+    await loadPromise;
     await Promise.resolve();
 
-    expect(mentionMocks.processPotentialMentionForConsumer).toHaveBeenCalledTimes(60);
-    const processedMessages = mentionMocks.processPotentialMentionForConsumer.mock.calls
-      .map(([message]) => (message as HTMLElement).textContent || '');
-    expect(processedMessages.some((text) => text.includes('hello alpha 0'))).toBe(false);
+    expect(stateMocks.upsertInboxRecord).toHaveBeenCalledTimes(60);
+    const messageIds = stateMocks.upsertInboxRecord.mock.calls
+      .map(([record]) => record.messageId);
+    expect(messageIds).not.toContain('pending-0');
+    expect(messageIds).toContain('pending-64');
   });
 
   it('updates keyword storage and visible highlights through public keyword helpers', async () => {
@@ -496,7 +546,6 @@ describe('inbox coordinator', () => {
 
   it('cleans visible inbox highlights and tab alert state from stale pages', () => {
     const message = createMessage('@ViewerOne', 'hello alpha');
-    message.dataset.ytcqInboxKeywordChecked = 'true';
     message.dataset.ytcqInboxKeywordHighlightKey = 'alpha';
     document.body.append(message);
 
@@ -507,7 +556,6 @@ describe('inbox coordinator', () => {
     expect(tabAlertMocks.clearInboxTabAlert).toHaveBeenCalled();
     expect(tabAlertMocks.cleanupInboxTabAlertListeners).toHaveBeenCalled();
     expect(highlightMocks.clearChatKeywordHighlights).toHaveBeenCalledWith(message);
-    expect(message.dataset.ytcqInboxKeywordChecked).toBeUndefined();
     expect(message.dataset.ytcqInboxKeywordHighlightKey).toBeUndefined();
   });
 
@@ -532,4 +580,30 @@ function createMessage(authorName: string, text: string): HTMLElement {
     <span id="message">${text}</span>
   `;
   return message;
+}
+
+function createFeedRecord(id: string, plainText: string) {
+  return {
+    author: {
+      badges: [],
+      channelId: `channel-${id}`,
+      name: '@OtherViewer'
+    },
+    id,
+    kind: 'text' as const,
+    plainText,
+    runs: [{ text: plainText, type: 'text' as const }]
+  };
+}
+
+function dispatchNewFeedRecord(id: string, plainText: string): void {
+  inboxTestState.feedOnBatch?.({
+    actions: [{ record: createFeedRecord(id, plainText), type: 'upsert' }],
+    activity: 'new',
+    delivery: 'transport',
+    receivedAt: 1,
+    sequence: 1,
+    source: 'live',
+    version: 1
+  });
 }

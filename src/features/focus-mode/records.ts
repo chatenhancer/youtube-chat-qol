@@ -1,67 +1,35 @@
-/**
- * Focus mode record builder.
- *
- * Converts visible YouTube chat messages into local focus-panel records and
- * dedupes them against stable message IDs or live renderer references.
- */
+/** Builds Focus mode rows from the canonical current-page message history. */
 import { cleanText } from '../../shared/text';
-import { findMatchingLiveMessageRecordIndex } from '../../youtube/message-dedupe';
-import {
-  getAuthorName,
-  getMessageContentSourceNodes,
-  getMessageStableId,
-  getMessageText,
-  getMessageTimestampText
-} from '../../youtube/messages';
-import { serializeRichMessageNodes } from '../../youtube/rich-text';
 import { isCurrentUserAuthorName } from '../mention-detection';
-import { getUserMessageRecordForMessage } from '../user-message-history';
 import {
-  isSelectedFocusAuthor,
+  getUserKeyFromIdentity,
+  type MessageRecord
+} from '../user-message-history';
+import {
+  isSelectedFocusIdentity,
   textMentionsFocusSource
 } from './source';
 import type { FocusRecord, FocusSource } from './types';
 
-export function createFocusRecord(
-  message: HTMLElement,
-  source: FocusSource,
-  records: FocusRecord[],
-  nextId: () => number
+export function createFocusRecordFromHistory(
+  record: MessageRecord,
+  source: FocusSource
 ): FocusRecord | null {
-  const authorName = getAuthorName(message);
-  const text = getMessageText(message);
-  if (!authorName || !text) return null;
-
-  const selectedAuthor = isSelectedFocusAuthor(message, source);
-  const currentAuthor = isCurrentUserAuthorName(authorName);
+  const selectedAuthor = isSelectedFocusIdentity(record, source);
+  const currentAuthor = isCurrentUserAuthorName(record.authorName);
   if (!selectedAuthor && !currentAuthor) return null;
-
-  const side = currentAuthor ? 'us' : 'them';
-  if (currentAuthor && !textMentionsFocusSource(text, source)) return null;
-
-  const timestampText = getMessageTimestampText(message);
-  const messageId = cleanText(getMessageStableId(message));
-  const messageRef = new WeakRef(message);
-  if (findMatchingLiveMessageRecordIndex(records, { messageId, messageRef }) >= 0) {
-    return null;
-  }
+  if (currentAuthor && !textMentionsFocusSource(record.text, source)) return null;
 
   return {
-    authorName,
-    contentParts: serializeRichMessageNodes(getMessageContentSourceNodes(message)),
-    id: nextId(),
-    messageId: messageId || undefined,
-    messageRef,
-    side,
-    text,
-    timestampText,
-    translation: getUserMessageRecordForMessage(message)?.translation
+    authorName: record.authorName,
+    contentParts: record.contentParts,
+    historyKey: getUserKeyFromIdentity(record),
+    id: record.id,
+    messageId: cleanText(record.messageId) || undefined,
+    messageRef: record.messageRef,
+    side: currentAuthor ? 'us' : 'them',
+    text: record.text,
+    timestampText: record.timestampText,
+    translation: record.translation
   };
-}
-
-export function findFocusRecordForMessage(records: FocusRecord[], message: HTMLElement): FocusRecord | null {
-  const messageId = cleanText(getMessageStableId(message));
-  const messageRef = new WeakRef(message);
-  const index = findMatchingLiveMessageRecordIndex(records, { messageId, messageRef });
-  return index >= 0 ? records[index] : null;
 }

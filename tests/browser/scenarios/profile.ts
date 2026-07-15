@@ -202,10 +202,10 @@ async function expectProfileCardJumpToMessage(chat: ChatSurface, source: Message
     const record = await getProfileCardRecord(chat, source);
 
     await centerLocatorInViewport(record);
-    await record.hover();
     const jumpButton = record.locator('.ytcq-profile-card-jump');
+    await jumpButton.focus();
     await expect(jumpButton).toHaveCSS('opacity', '1');
-    await jumpButton.click();
+    await jumpButton.press('Enter');
     await expect(sourceMessage).toHaveClass(/ytcq-message-jump-target/, { timeout: 2_000 });
   });
 }

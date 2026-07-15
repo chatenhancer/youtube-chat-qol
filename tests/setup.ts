@@ -60,6 +60,10 @@ const chromeMock = {
   },
   tabs: {
     create: vi.fn(),
+    onActivated: {
+      addListener: vi.fn(),
+      removeListener: vi.fn()
+    },
     query: vi.fn((_queryInfo: chrome.tabs.QueryInfo, callback: (tabs: chrome.tabs.Tab[]) => void) => {
       callback([]);
     }),

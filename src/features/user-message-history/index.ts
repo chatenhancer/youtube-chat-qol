@@ -1,24 +1,15 @@
 /**
  * In-memory recent user message history.
  *
- * Stores a small rolling list of recent messages per author for the current
- * chat page. Nothing is persisted to extension storage; this only powers the
- * avatar profile card while the livestream page is open.
+ * Stores bounded message history for the current chat page. Nothing is
+ * persisted to extension storage; recent-message consumers choose their own
+ * smaller display limits while Focus can use the complete retained history.
  */
 import { cleanText, normalizeComparableText } from '../../shared/text';
-import { findMatchingLiveMessageRecordIndex } from '../../youtube/message-dedupe';
-import {
-  getAuthorName,
-  getMessageContentSourceNodes,
-  getMessageAvatarSrc,
-  getMessageStableId,
-  getMessageText,
-  getMessageTimestampText
-} from '../../youtube/messages';
-import { serializeRichMessageNodes } from '../../youtube/rich-text';
+import { getMessageStableId } from '../../youtube/messages';
 import { CHAT_MESSAGE_SELECTOR } from '../../youtube/selectors';
-import { getChatTimestampValue, isLiveChatReplayUrl } from '../../youtube/timestamps';
-import { registerFeatureLifecycle } from '../../content/lifecycle';
+import { requestRenderedYouTubeChatFeedRecord } from '../../youtube/chat-feed/records';
+import { registerFeature } from '../../content/feature-runtime';
 import {
   onMessageTranslationCleared,
   onMessageTranslationRendered,
@@ -27,10 +18,14 @@ import {
 } from '../translation/events';
 import { cloneProtectedTokens } from '../translation/protected-placeholders';
 import {
+  startUserMessageFeed,
+  type UserMessageFeedRecord,
+  type UserMessageFeedUpdate
+} from './feed';
+import {
   getAuthorKey,
   getIdentityFromUserKey,
   getNormalizedHandle,
-  getUserKey,
   getUserKeyFromIdentity
 } from './identity';
 import type {
@@ -44,120 +39,208 @@ export type {
   RecentUserMatch,
   UserIdentity
 } from './types';
-export { getUserKey, getUserKeyFromIdentity } from './identity';
+export { getUserKeyFromIdentity } from './identity';
 
-const MAX_USERS = 160;
-const MAX_MESSAGES_PER_USER = 12;
+const RECENT_MESSAGE_LIMIT = 12;
+const RECENT_USER_LIMIT = 160;
+const MAX_HISTORY_RECORDS = RECENT_MESSAGE_LIMIT * RECENT_USER_LIMIT;
 
 interface ElementRecord {
   key: string;
   id: number;
-  elementStateKey: string;
+}
+
+interface FeedMessageLocation {
+  key: string;
+  record: MessageRecord;
 }
 
 type UserMessageListener = (key: string) => void;
 
 const recordsByUser = new Map<string, MessageRecord[]>();
-const latestByUser = new Map<string, number>();
-const recordsByElement = new WeakMap<HTMLElement, ElementRecord>();
+const feedMessagesById = new Map<string, FeedMessageLocation>();
+let recordsByElement = new WeakMap<HTMLElement, ElementRecord>();
 const userMessageListeners = new Set<UserMessageListener>();
+const pendingUserMessageNotificationKeys = new Set<string>();
 let nextRecordId = 1;
-let translationListenersInitialized = false;
+let userMessageNotificationBatchDepth = 0;
+let storedRecordCount = 0;
+let unsubscribeChatFeed: (() => void) | null = null;
+let translationListenerCleanups: Array<() => void> = [];
+let pendingTranslationEvents = new WeakMap<HTMLElement, MessageTranslationRenderedEvent>();
 
-registerFeatureLifecycle({
-  page: { init: initUserMessageHistoryTranslationListeners },
-  message: { collect: recordUserMessage }
+registerFeature({
+  page: {
+    init: initUserMessageHistory,
+    cleanup: cleanupUserMessageHistory
+  },
+  message: recordUserMessage
 });
 
-function initUserMessageHistoryTranslationListeners(): void {
-  if (translationListenersInitialized) return;
-  translationListenersInitialized = true;
-  onMessageTranslationRendered(recordUserMessageTranslation);
-  onMessageTranslationCleared(({ message }) => clearUserMessageTranslation(message));
-  onMessageTranslationsCleared(clearUserMessageTranslations);
+function initUserMessageHistory(): void {
+  if (!translationListenerCleanups.length) {
+    translationListenerCleanups = [
+      onMessageTranslationRendered(recordUserMessageTranslation),
+      onMessageTranslationCleared(({ message }) => clearUserMessageTranslation(message)),
+      onMessageTranslationsCleared(clearUserMessageTranslations)
+    ];
+  }
+  startUserMessageHistoryFeed();
 }
 
 export function recordUserMessage(message: HTMLElement): void {
-  const key = getUserKey(message);
+  bindFeedMessageElement(message);
+}
+
+function startUserMessageHistoryFeed(): void {
+  if (unsubscribeChatFeed) return;
+  unsubscribeChatFeed = startUserMessageFeed(applyUserMessageFeedUpdates);
+}
+
+function applyUserMessageFeedUpdates(updates: readonly UserMessageFeedUpdate[]): void {
+  runUserMessageNotificationBatch(() => {
+    updates.forEach((update) => {
+      if (update.type === 'reset') {
+        clearUserMessageHistory();
+      } else if (update.type === 'remove') {
+        removeFeedMessage(update.messageId);
+      } else if (update.type === 'remove-author') {
+        removeFeedMessagesByAuthor(update.channelId);
+      } else {
+        upsertFeedMessage(update.record);
+      }
+    });
+  });
+}
+
+function stopUserMessageHistoryFeed(): void {
+  unsubscribeChatFeed?.();
+  unsubscribeChatFeed = null;
+}
+
+function cleanupUserMessageHistory(): void {
+  stopUserMessageHistoryFeed();
+  translationListenerCleanups.forEach((cleanup) => cleanup());
+  translationListenerCleanups = [];
+  clearUserMessageHistory();
+}
+
+function upsertFeedMessage(source: UserMessageFeedRecord): void {
+  const key = getUserKeyFromIdentity(source);
   if (!key) return;
 
-  const authorName = getAuthorName(message);
-  const text = getMessageText(message);
-  if (!authorName || !text) return;
+  const existingLocation = feedMessagesById.get(source.messageId);
+  const existingRecord = existingLocation?.record;
 
-  const avatarSrc = getMessageAvatarSrc(message);
-  const messageId = getMessageStableId(message);
-  const recordedAt = Date.now();
-  const timestampText = getMessageTimestampText(message, recordedAt);
-  const timestamp = getMessageHistoryTimestamp(timestampText, recordedAt);
-  const elementStateKey = `${messageId || 'message-content'}\n${authorName}\n${text}`;
-  const previousRecord = recordsByElement.get(message);
-  if (previousRecord?.elementStateKey === elementStateKey) return;
-
-  const currentRecords = recordsByUser.get(key) || [];
-  const existingRecordIndex = findMatchingLiveMessageRecordIndex(currentRecords, {
-    messageId,
-    messageRef: new WeakRef(message)
-  });
-  const existingRecord = existingRecordIndex >= 0 ? currentRecords[existingRecordIndex] : null;
-  if (previousRecord && previousRecord.id !== existingRecord?.id) {
-    removeRecord(previousRecord.key, previousRecord.id);
+  if (existingLocation && existingRecord && existingLocation.key !== key) {
+    removeRecord(existingLocation.key, existingRecord.id);
   }
 
-  if (existingRecord) {
-    const nextTimestampText = getMessageTimestampText(message, existingRecord.timestamp);
-    existingRecord.authorName = authorName;
-    existingRecord.avatarSrc = avatarSrc || existingRecord.avatarSrc;
-    existingRecord.contentParts = serializeRichMessageNodes(getMessageContentSourceNodes(message));
-    existingRecord.messageId = existingRecord.messageId || messageId;
-    existingRecord.messageRef = new WeakRef(message);
-    existingRecord.text = text;
-    existingRecord.timestamp = getMessageHistoryTimestamp(nextTimestampText, existingRecord.timestamp);
-    existingRecord.timestampText = nextTimestampText;
-    recordsByElement.set(message, {
-      key,
-      id: existingRecord.id,
-      elementStateKey
-    });
+  const record: MessageRecord = existingRecord || {
+    id: nextRecordId++,
+    ...source
+  };
+  Object.assign(record, source, {
+    avatarSrc: source.avatarSrc || record.avatarSrc
+  });
+
+  if (!existingLocation || existingLocation.key !== key) {
+    setUserRecords(key, [...(recordsByUser.get(key) || []), record]);
+  } else {
     setUserRecords(key, recordsByUser.get(key) || []);
-    notifyUserMessageListeners(key);
+  }
+  if (!recordsByUser.get(key)?.includes(record)) return;
+  feedMessagesById.set(source.messageId, { key, record });
+
+  notifyPrunedUserMessageKeys(pruneOldMessages(), key);
+  notifyUserMessageListeners(key);
+}
+
+function removeFeedMessagesByAuthor(channelId: string): void {
+  [...feedMessagesById.entries()].forEach(([messageId, location]) => {
+    if (location.record.channelId === channelId) removeFeedMessage(messageId);
+  });
+}
+
+function bindFeedMessageElement(message: HTMLElement): void {
+  const messageId = cleanText(getMessageStableId(message));
+  if (!messageId) return;
+
+  const location = feedMessagesById.get(messageId);
+  if (location) {
+    bindKnownFeedMessageElement(message, location);
     return;
   }
 
-  const record: MessageRecord = {
-    id: previousRecord?.id || nextRecordId++,
-    authorName,
-    avatarSrc: avatarSrc || undefined,
-    contentParts: serializeRichMessageNodes(getMessageContentSourceNodes(message)),
-    messageId: messageId || undefined,
-    messageRef: new WeakRef(message),
-    text,
-    timestamp,
-    timestampText
-  };
+  void requestRenderedYouTubeChatFeedRecord(message).then((record) => {
+    if (!record || record.id !== messageId) return;
+    if (!message.isConnected || cleanText(getMessageStableId(message)) !== messageId) return;
 
-  const records = recordsByUser.get(key) || [];
-  records.push(record);
-  setUserRecords(key, records);
+    const pendingLocation = feedMessagesById.get(messageId);
+    if (pendingLocation) bindKnownFeedMessageElement(message, pendingLocation);
+  });
+}
+
+function bindKnownFeedMessageElement(
+  message: HTMLElement,
+  location: FeedMessageLocation
+): void {
+  const { key, record } = location;
+  const previousRecord = recordsByElement.get(message);
+  if (previousRecord?.id === record.id && record.messageRef?.deref() === message) {
+    return;
+  }
+  if (previousRecord && previousRecord.id !== record.id) {
+    detachRecycledFeedMessageElement(message, previousRecord);
+  }
+
+  record.messageRef = new WeakRef(message);
   recordsByElement.set(message, {
     key,
-    id: record.id,
-    elementStateKey
+    id: record.id
   });
-
-  pruneOldUsers();
   notifyUserMessageListeners(key);
+}
+
+function detachRecycledFeedMessageElement(
+  message: HTMLElement,
+  elementRecord: ElementRecord
+): void {
+  const previous = recordsByUser.get(elementRecord.key)
+    ?.find((record) => record.id === elementRecord.id);
+  if (previous?.messageRef?.deref() === message) delete previous.messageRef;
+}
+
+function removeFeedMessage(messageId: string): void {
+  const location = feedMessagesById.get(messageId);
+  if (!location) return;
+  feedMessagesById.delete(messageId);
+  removeRecord(location.key, location.record.id);
+  notifyUserMessageListeners(location.key);
 }
 
 export function recordVisibleUserMessages(): void {
   document.querySelectorAll<HTMLElement>(CHAT_MESSAGE_SELECTOR).forEach(recordUserMessage);
 }
 
-export function getRecentMessagesForKey(key: string, limit = MAX_MESSAGES_PER_USER): MessageRecord[] {
+export function getRecentMessagesForKey(key: string, limit = RECENT_MESSAGE_LIMIT): MessageRecord[] {
   return sortRecentRecords(recordsByUser.get(key) || []).slice(-limit);
 }
 
-export function getRecentMessagesForIdentity(identity: UserIdentity, limit = MAX_MESSAGES_PER_USER): MessageRecord[] {
+export function getUserMessageHistorySnapshot(): MessageRecord[] {
+  const seenRecords = new Set<MessageRecord>();
+  const records: MessageRecord[] = [];
+  recordsByUser.forEach((userRecords) => {
+    userRecords.forEach((record) => {
+      if (seenRecords.has(record)) return;
+      seenRecords.add(record);
+      records.push(record);
+    });
+  });
+  return sortRecentRecords(records);
+}
+
+export function getRecentMessagesForIdentity(identity: UserIdentity, limit = RECENT_MESSAGE_LIMIT): MessageRecord[] {
   const key = getUserKeyFromIdentity(identity);
   const authorKey = getAuthorKey(identity.authorName);
   const records = createUniqueRecordCollector();
@@ -189,7 +272,7 @@ export function findRecentUsersByHandle(query: string): RecentUserMatch[] {
 }
 
 export function getAvatarSrcForIdentity(identity: UserIdentity): string {
-  const records = getRecentMessagesForIdentity(identity, MAX_MESSAGES_PER_USER);
+  const records = getRecentMessagesForIdentity(identity, RECENT_MESSAGE_LIMIT);
   return [...records].reverse().find((record) => record.avatarSrc)?.avatarSrc || '';
 }
 
@@ -198,15 +281,33 @@ export function getLiveMessageForRecord(record: MessageRecord): HTMLElement | nu
   return message?.isConnected ? message : null;
 }
 
-function recordUserMessageTranslation({
-  message,
-  result,
-  originalText,
-  protectedTokens,
-  sourceText
-}: MessageTranslationRenderedEvent): void {
+function recordUserMessageTranslation(event: MessageTranslationRenderedEvent): void {
+  const { message } = event;
   const record = getRecordForMessage(message);
-  if (!record) return;
+  if (record) {
+    pendingTranslationEvents.delete(message);
+    applyUserMessageTranslation(message, record, event);
+    return;
+  }
+
+  const messageId = cleanText(getMessageStableId(message));
+  if (!messageId) return;
+  pendingTranslationEvents.set(message, event);
+  void requestRenderedYouTubeChatFeedRecord(message).then((feedRecord) => {
+    if (pendingTranslationEvents.get(message) !== event) return;
+    pendingTranslationEvents.delete(message);
+    if (!feedRecord) return;
+
+    const pendingRecord = getRecordForMessage(message);
+    if (pendingRecord) applyUserMessageTranslation(message, pendingRecord, event);
+  });
+}
+
+function applyUserMessageTranslation(
+  message: HTMLElement,
+  record: MessageRecord,
+  { result, originalText, protectedTokens, sourceText }: MessageTranslationRenderedEvent
+): void {
 
   record.translation = {
     result,
@@ -220,6 +321,7 @@ function recordUserMessageTranslation({
 }
 
 function clearUserMessageTranslation(message: HTMLElement): void {
+  pendingTranslationEvents.delete(message);
   const record = getRecordForMessage(message);
   if (!record?.translation) return;
 
@@ -229,6 +331,7 @@ function clearUserMessageTranslation(message: HTMLElement): void {
 }
 
 function clearUserMessageTranslations(): void {
+  pendingTranslationEvents = new WeakMap();
   const changedKeys: string[] = [];
   recordsByUser.forEach((records, key) => {
     let changed = false;
@@ -241,10 +344,6 @@ function clearUserMessageTranslations(): void {
   });
 
   changedKeys.forEach(notifyUserMessageListeners);
-}
-
-export function getUserMessageRecordForMessage(message: HTMLElement): MessageRecord | null {
-  return getRecordForMessage(message);
 }
 
 export function onUserMessagesChanged(listener: UserMessageListener): () => void {
@@ -277,35 +376,85 @@ function getRecordsByAuthorName(authorName: string | undefined): MessageRecord[]
   return records;
 }
 
-function pruneOldUsers(): void {
-  if (recordsByUser.size <= MAX_USERS) return;
+function pruneOldMessages(): Set<string> {
+  const changedKeys = new Set<string>();
+  while (storedRecordCount > MAX_HISTORY_RECORDS) {
+    let oldestKey = '';
+    let oldestRecord: MessageRecord | null = null;
+    for (const [key, records] of recordsByUser) {
+      const candidate = records[0];
+      if (
+        candidate &&
+        (!oldestRecord ||
+          candidate.timestamp < oldestRecord.timestamp ||
+          (candidate.timestamp === oldestRecord.timestamp && candidate.id < oldestRecord.id))
+      ) {
+        oldestKey = key;
+        oldestRecord = candidate;
+      }
+    }
+    if (!oldestKey || !oldestRecord) break;
+    removeRecord(oldestKey, oldestRecord.id);
+    changedKeys.add(oldestKey);
+  }
+  return changedKeys;
+}
 
-  const oldestUsers = Array.from(latestByUser.entries())
-    .sort((a, b) => a[1] - b[1])
-    .slice(0, recordsByUser.size - MAX_USERS);
-
-  oldestUsers.forEach(([key]) => {
-    recordsByUser.delete(key);
-    latestByUser.delete(key);
+function notifyPrunedUserMessageKeys(changedKeys: Set<string>, currentKey: string): void {
+  changedKeys.forEach((key) => {
+    if (key !== currentKey) notifyUserMessageListeners(key);
   });
 }
 
 function notifyUserMessageListeners(key: string): void {
+  if (userMessageNotificationBatchDepth > 0) {
+    pendingUserMessageNotificationKeys.add(key);
+    return;
+  }
+  notifyUserMessageListenersNow(key);
+}
+
+function notifyUserMessageListenersNow(key: string): void {
   userMessageListeners.forEach((listener) => {
     listener(key);
   });
 }
 
+function runUserMessageNotificationBatch(callback: () => void): void {
+  userMessageNotificationBatchDepth += 1;
+  try {
+    callback();
+  } finally {
+    userMessageNotificationBatchDepth -= 1;
+    if (userMessageNotificationBatchDepth === 0) {
+      const changedKeys = [...pendingUserMessageNotificationKeys];
+      pendingUserMessageNotificationKeys.clear();
+      changedKeys.forEach(notifyUserMessageListenersNow);
+    }
+  }
+}
+
 function setUserRecords(key: string, records: MessageRecord[]): void {
-  const nextRecords = sortRecentRecords(records).slice(-MAX_MESSAGES_PER_USER);
+  const previousRecords = recordsByUser.get(key) || [];
+  const nextRecords = sortRecentRecords(records);
+  const retainedRecords = new Set(nextRecords);
+  [...previousRecords, ...records].forEach((record) => {
+    if (!retainedRecords.has(record)) unindexFeedMessageRecord(record);
+  });
+  storedRecordCount += nextRecords.length - previousRecords.length;
   if (!nextRecords.length) {
     recordsByUser.delete(key);
-    latestByUser.delete(key);
     return;
   }
 
   recordsByUser.set(key, nextRecords);
-  latestByUser.set(key, nextRecords[nextRecords.length - 1].timestamp);
+}
+
+function unindexFeedMessageRecord(record: MessageRecord): void {
+  const messageId = cleanText(record.messageId);
+  if (!messageId) return;
+  const location = feedMessagesById.get(messageId);
+  if (location?.record === record) feedMessagesById.delete(messageId);
 }
 
 function sortRecentRecords(records: MessageRecord[]): MessageRecord[] {
@@ -335,6 +484,7 @@ function collectRecentUsers(): RecentUserMatch[] {
   const seenHandles = new Set<string>();
   return Array.from(users.values())
     .sort((a, b) => b.latestMessage.timestamp - a.latestMessage.timestamp)
+    .slice(0, RECENT_USER_LIMIT)
     .filter((user) => {
       const handle = getNormalizedHandle(user.authorName);
       if (!handle) return true;
@@ -376,10 +526,15 @@ function createUniqueRecordCollector(): {
   };
 }
 
-function getMessageHistoryTimestamp(timestampText: string, fallbackTimestamp: number): number {
-  return getChatTimestampValue(timestampText, fallbackTimestamp, {
-    preferElapsed: isLiveChatReplayUrl()
-  }) ?? fallbackTimestamp;
+function clearUserMessageHistory(): void {
+  const changedKeys = [...recordsByUser.keys()];
+  recordsByUser.clear();
+  storedRecordCount = 0;
+  feedMessagesById.clear();
+  recordsByElement = new WeakMap();
+  pendingTranslationEvents = new WeakMap();
+  nextRecordId = 1;
+  changedKeys.forEach(notifyUserMessageListeners);
 }
 
 function getRecordForMessage(message: HTMLElement): MessageRecord | null {

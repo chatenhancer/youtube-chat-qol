@@ -1,1 +1,1 @@
-export const LIVE_EDGE_WINDOW_BLURRED_MESSAGE_TYPE = 'ytcq:live-edge-window-blurred';
+export const LIVE_EDGE_LEAVE_MESSAGE_TYPE = 'ytcq:live-edge-leave';

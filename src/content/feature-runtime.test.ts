@@ -1,65 +1,45 @@
 import { describe, expect, it, vi } from 'vitest';
 
-describe('content feature lifecycle', () => {
-  it('runs message hooks by lifecycle phase, not registration order', async () => {
+describe('content feature runtime', () => {
+  it('runs every independent message hook once', async () => {
     vi.resetModules();
-    const lifecycle = await import('./lifecycle');
+    const lifecycle = await import('./feature-runtime');
     const calls: string[] = [];
     const message = document.createElement('yt-live-chat-text-message-renderer');
 
-    lifecycle.registerFeatureLifecycle({
-      message: {
-        render: () => calls.push('first-render')
-      }
+    lifecycle.registerFeature({
+      message: () => calls.push('first')
     });
-    lifecycle.registerFeatureLifecycle({
-      message: {
-        collect: () => calls.push('second-collect'),
-        enhance: () => calls.push('second-enhance')
-      }
+    lifecycle.registerFeature({
+      message: () => calls.push('second')
     });
 
     lifecycle.handleFeatureMessage(message, { source: 'added' });
 
-    expect(calls).toEqual(['second-collect', 'second-enhance', 'first-render']);
+    expect(calls).toHaveLength(2);
+    expect(calls).toEqual(expect.arrayContaining(['first', 'second']));
   });
 
-  it('passes message data promises through the normal message lifecycle', async () => {
+  it('passes the source context to a message hook', async () => {
     vi.resetModules();
-    const lifecycle = await import('./lifecycle');
-    const calls: string[] = [];
+    const lifecycle = await import('./feature-runtime');
     const message = document.createElement('yt-live-chat-text-message-renderer');
-    const messageData = Promise.resolve({
-      messageId: 'msg-1',
-      timestampUsec: '1782000000000000'
-    });
-    let receivedMessageData: Promise<unknown> | null = null;
     let receivedSource = '';
 
-    lifecycle.registerFeatureLifecycle({
-      message: {
-        collect: (_message, context) => {
-          calls.push('message-collect');
-          receivedMessageData = context.messageData;
-          receivedSource = context.source;
-        },
-        render: () => calls.push('message-render')
+    lifecycle.registerFeature({
+      message: (_message, context) => {
+        receivedSource = context.source;
       }
     });
 
-    lifecycle.handleFeatureMessage(message, { messageData, source: 'changed' });
+    lifecycle.handleFeatureMessage(message, { source: 'changed' });
 
-    expect(calls).toEqual([
-      'message-collect',
-      'message-render'
-    ]);
-    expect(receivedMessageData).toBe(messageData);
     expect(receivedSource).toBe('changed');
   });
 
-  it('continues lifecycle dispatch after feature hook failures', async () => {
+  it('continues runtime dispatch after feature hook failures', async () => {
     vi.resetModules();
-    const lifecycle = await import('./lifecycle');
+    const lifecycle = await import('./feature-runtime');
     const error = new Error('feature failed');
     const originalReportError = (globalThis as { reportError?: (error: unknown) => void }).reportError;
     const reportError = vi.fn();
@@ -67,19 +47,14 @@ describe('content feature lifecycle', () => {
     const calls: string[] = [];
 
     try {
-      lifecycle.registerFeatureLifecycle({
-        message: {
-          collect: () => {
-            calls.push('collect-before');
-            throw error;
-          },
-          render: () => calls.push('render-after')
+      lifecycle.registerFeature({
+        message: () => {
+          calls.push('message-before');
+          throw error;
         }
       });
-      lifecycle.registerFeatureLifecycle({
-        message: {
-          collect: () => calls.push('collect-after')
-        },
+      lifecycle.registerFeature({
+        message: () => calls.push('message-after'),
         page: {
           boot: () => {
             calls.push('boot-before');
@@ -94,9 +69,8 @@ describe('content feature lifecycle', () => {
       lifecycle.recoverVisibleFeatures();
 
       expect(calls).toEqual([
-        'collect-before',
-        'collect-after',
-        'render-after',
+        'message-before',
+        'message-after',
         'boot-before',
         'visible-recovery-after'
       ]);
@@ -106,11 +80,29 @@ describe('content feature lifecycle', () => {
     }
   });
 
+  it('runs structural mutation hooks once in registration order', async () => {
+    vi.resetModules();
+    const lifecycle = await import('./feature-runtime');
+    const calls: string[] = [];
+    const batch = { addedElements: [], mutations: [] };
+
+    lifecycle.registerFeature({
+      mutation: () => calls.push('first')
+    });
+    lifecycle.registerFeature({
+      mutation: () => calls.push('second')
+    });
+
+    lifecycle.handleFeatureMutations(batch);
+
+    expect(calls).toEqual(['first', 'second']);
+  });
+
   it('ignores extension-managed observer nodes automatically', async () => {
     vi.resetModules();
     const [{ ytcqCreateElement }, lifecycle] = await Promise.all([
       import('../shared/managed-dom'),
-      import('./lifecycle')
+      import('./feature-runtime')
     ]);
     const managed = ytcqCreateElement('div');
     const child = document.createElement('span');
@@ -123,17 +115,17 @@ describe('content feature lifecycle', () => {
 
   it('cleans stale UI and stops normal feature dispatch when suspended', async () => {
     vi.resetModules();
-    const lifecycle = await import('./lifecycle');
-    const cleanupStale = vi.fn();
+    const lifecycle = await import('./feature-runtime');
+    const cleanup = vi.fn();
     const message = vi.fn();
     const mutation = vi.fn();
     const participant = vi.fn();
 
-    lifecycle.registerFeatureLifecycle({
-      page: { cleanupStale },
-      message: { enhance: message },
-      mutation: { enhance: mutation },
-      participant: { enhance: participant }
+    lifecycle.registerFeature({
+      page: { cleanup },
+      message,
+      mutation,
+      participant
     });
 
     lifecycle.suspendFeatures();
@@ -144,7 +136,7 @@ describe('content feature lifecycle', () => {
     });
     lifecycle.handleFeatureParticipant(document.createElement('yt-live-chat-participant-renderer'));
 
-    expect(cleanupStale).toHaveBeenCalledOnce();
+    expect(cleanup).toHaveBeenCalledOnce();
     expect(message).not.toHaveBeenCalled();
     expect(mutation).not.toHaveBeenCalled();
     expect(participant).not.toHaveBeenCalled();
@@ -152,7 +144,7 @@ describe('content feature lifecycle', () => {
 
   it('runs page lifecycle hooks with their expected arguments', async () => {
     vi.resetModules();
-    const lifecycle = await import('./lifecycle');
+    const lifecycle = await import('./feature-runtime');
     const init = vi.fn();
     const boot = vi.fn();
     const reset = vi.fn();
@@ -163,7 +155,7 @@ describe('content feature lifecycle', () => {
     const previousOptions = { targetLanguage: '' } as never;
     const nextOptions = { targetLanguage: 'ja' } as never;
 
-    lifecycle.registerFeatureLifecycle({
+    lifecycle.registerFeature({
       page: {
         init,
         boot,
@@ -189,19 +181,19 @@ describe('content feature lifecycle', () => {
     expect(reset).toHaveBeenCalledOnce();
   });
 
-  it('keeps suspension idempotent and leaves reset and visibility hooks callable', async () => {
+  it('keeps suspension idempotent and blocks every later feature hook', async () => {
     vi.resetModules();
-    const lifecycle = await import('./lifecycle');
-    const cleanupStale = vi.fn();
+    const lifecycle = await import('./feature-runtime');
+    const cleanup = vi.fn();
     const boot = vi.fn();
     const reset = vi.fn();
     const optionsChanged = vi.fn();
     const visibleRecovery = vi.fn();
     const visibilityChanged = vi.fn();
 
-    lifecycle.registerFeatureLifecycle({
+    lifecycle.registerFeature({
       page: {
-        cleanupStale,
+        cleanup,
         boot,
         reset,
         optionsChanged,
@@ -218,24 +210,24 @@ describe('content feature lifecycle', () => {
     lifecycle.handleFeatureVisibilityChanged('visible');
     lifecycle.resetFeatures();
 
-    expect(cleanupStale).toHaveBeenCalledOnce();
+    expect(cleanup).toHaveBeenCalledOnce();
     expect(boot).not.toHaveBeenCalled();
     expect(optionsChanged).not.toHaveBeenCalled();
     expect(visibleRecovery).not.toHaveBeenCalled();
-    expect(visibilityChanged).toHaveBeenCalledWith('visible');
-    expect(reset).toHaveBeenCalledOnce();
+    expect(visibilityChanged).not.toHaveBeenCalled();
+    expect(reset).not.toHaveBeenCalled();
   });
 
   it('uses custom observer ignore hooks only after managed-element checks fail', async () => {
     vi.resetModules();
-    const lifecycle = await import('./lifecycle');
+    const lifecycle = await import('./feature-runtime');
     const added = document.createElement('div');
     const mutation = document.createElement('span');
     const ordinary = document.createElement('button');
     const ignoreAdded = vi.fn((element: Element) => element === added);
     const ignoreMutation = vi.fn((element: Element) => element === mutation);
 
-    lifecycle.registerFeatureLifecycle({
+    lifecycle.registerFeature({
       observerIgnore: {
         addedNode: ignoreAdded,
         mutation: ignoreMutation
@@ -252,10 +244,10 @@ describe('content feature lifecycle', () => {
 
   it('treats throwing observer ignore hooks as non-matches', async () => {
     vi.resetModules();
-    const lifecycle = await import('./lifecycle');
+    const lifecycle = await import('./feature-runtime');
     const element = document.createElement('div');
 
-    lifecycle.registerFeatureLifecycle({
+    lifecycle.registerFeature({
       observerIgnore: {
         addedNode: () => {
           throw new Error('ignore failed');

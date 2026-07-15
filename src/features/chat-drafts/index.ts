@@ -5,7 +5,7 @@
  * page refresh. Drafts are scoped per YouTube stream so text from one live chat
  * does not appear in another.
  */
-import { registerFeatureLifecycle } from '../../content/lifecycle';
+import { registerFeature } from '../../content/feature-runtime';
 import {
   findChatInput,
   getChatInputSnapshot,
@@ -37,18 +37,16 @@ let restoreFinished = false;
 let replacingDraft = false;
 let chatInputDraftListeners = new AbortController();
 
-registerFeatureLifecycle({
+registerFeature({
   page: {
     init: initChatInputDrafts,
     boot: scheduleChatInputDraftRestore,
-    cleanupStale: cleanupStaleChatInputDrafts,
+    cleanup: cleanupStaleChatInputDrafts,
     reset: resetChatInputDrafts
   },
-  mutation: {
-    enhance: ({ addedElements }) => {
-      if (addedElements.some(shouldWatchForChatInput)) {
-        scheduleChatInputDraftRestore(true);
-      }
+  mutation: ({ addedElements }) => {
+    if (addedElements.some(shouldWatchForChatInput)) {
+      scheduleChatInputDraftRestore(true);
     }
   }
 });

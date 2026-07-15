@@ -11,13 +11,16 @@ import {
 } from '../support/extension-storage';
 import {
   appendMockFixtureMessage,
-  isMockPageSurface
+  isMockPageSurface,
+  prefetchMockReplayFixtureMessage,
+  setMockReplayPlayerProgress
 } from '../support/mock-page';
 import type { BrowserScenario, ChatSurface } from './types';
 
 const INBOX_KEYWORD = 'browser-inbox-keyword';
 const CURRENT_VIEWER_MENTION = '@CurrentViewer';
 const DIRECT_MENTION_TEXT = `Direct browser mention for ${CURRENT_VIEWER_MENTION}`;
+const REPLAY_PREFETCH_KEYWORD = 'browser-replay-prefetch-keyword';
 
 export const inboxOpensFromHeaderScenario: BrowserScenario = async ({ chat }) => {
   await expectInboxButtonAttached(chat);
@@ -58,6 +61,36 @@ export const inboxDirectMentionScenario: BrowserScenario = async ({ chat, contex
       await appendMockDirectMention(chat);
       await openInboxPanel(chat);
       await expectDirectMentionInboxRecord(chat);
+      await closeInboxPanel(chat);
+    });
+  });
+};
+
+export const inboxReplayPrefetchTimingScenario: BrowserScenario = async ({ chat, context }) => {
+  if (!isMockPageSurface(chat)) {
+    throw new Error('inboxReplayPrefetchTimingScenario requires the deterministic mock replay page.');
+  }
+
+  await withExtensionStorageSnapshot(context, 'local', async () => {
+    await withExtensionStorageValues(context, 'local', {
+      ytcqInboxKeywords: [REPLAY_PREFETCH_KEYWORD]
+    }, async () => {
+      await reloadMockChat(chat, 'Reload mock replay with watched keyword storage');
+      await setMockReplayPlayerProgress(chat, 5);
+      const messageId = await prefetchMockReplayFixtureMessage(chat, {
+        author: '@ReplayPrefetchBrowserTest',
+        text: `Future ${REPLAY_PREFETCH_KEYWORD} message`
+      }, 10_000);
+      if (!messageId) throw new Error('Mock replay did not return a prefetched message id.');
+
+      await openInboxPanel(chat);
+      const record = chat.locator('.ytcq-inbox-card .ytcq-inbox-message').filter({
+        hasText: REPLAY_PREFETCH_KEYWORD
+      }).first();
+      await expect(record).toHaveCount(0);
+
+      await setMockReplayPlayerProgress(chat, 10);
+      await expect(record).toBeVisible({ timeout: 10_000 });
       await closeInboxPanel(chat);
     });
   });
@@ -154,10 +187,10 @@ async function jumpToInboxRecord(
     const record = chat.locator('.ytcq-inbox-card .ytcq-inbox-message').filter({
       hasText: INBOX_KEYWORD
     }).first();
-    await record.hover();
     const jumpButton = record.locator('.ytcq-profile-card-jump');
+    await jumpButton.focus();
     await expect(jumpButton).toHaveCSS('opacity', '1');
-    await jumpButton.click();
+    await jumpButton.press('Enter');
     await expect(chat.locator('.ytcq-inbox-card')).toHaveCount(0);
     await expect(sourceMessage).toHaveClass(/ytcq-message-jump-target/, { timeout: 2_000 });
   });

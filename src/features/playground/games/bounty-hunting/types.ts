@@ -11,6 +11,17 @@ import type {
 
 export type { BountyHuntingMessageFacts, BountyHuntingPlayerRole };
 
+export interface BountyHuntingChatFeedMessage extends BountyHuntingObservedMessage {
+  authorName: string;
+  channelId: string;
+}
+
+export interface BountyHuntingChatFeedObserver {
+  close(): void;
+  getMessage(messageId: string): BountyHuntingChatFeedMessage | null;
+  getMessages(): BountyHuntingChatFeedMessage[];
+}
+
 export interface PublicBountyHuntingGame extends PublicGame {
   bounties: PublicBountyHuntingBounty[];
   bountyProviderUserId: string;
@@ -73,8 +84,7 @@ export interface BountyHuntingPanelRuntime {
   onVisibilityChanged: (() => void) | null;
   panelControls: GamePanelControls | null;
   claimedMessageIndicators: Set<HTMLElement>;
-  messageDataPromisesById: Map<string, Promise<unknown>>;
-  messageTimestampUsecById: Map<string, string>;
+  chatFeed: BountyHuntingChatFeedObserver | null;
   pendingWitnesses: Map<string, { bountyIds: Set<string>; messageTimestampUsec?: string }>;
   pixelRatio: number;
   preparationMessages: Map<string, BountyHuntingObservedMessage>;

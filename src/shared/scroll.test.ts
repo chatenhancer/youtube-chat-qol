@@ -36,6 +36,22 @@ describe('scroll helpers', () => {
     expect(element.scrollTop).toBe(450);
   });
 
+  it('keeps pending bottom intent across consecutive renders', async () => {
+    vi.useFakeTimers();
+    const element = scrollElement({ clientHeight: 100, scrollHeight: 300, scrollTop: 200 });
+
+    const firstPosition = captureScrollPosition(element);
+    setScrollMetrics(element, { clientHeight: 100, scrollHeight: 350 });
+    restoreScrollPositionAfterRender(element, firstPosition);
+
+    const secondPosition = captureScrollPosition(element);
+    setScrollMetrics(element, { clientHeight: 100, scrollHeight: 420 });
+    restoreScrollPositionAfterRender(element, secondPosition);
+    await vi.runAllTimersAsync();
+
+    expect(element.scrollTop).toBe(420);
+  });
+
   it('clamps preserved positions when content becomes shorter', async () => {
     vi.useFakeTimers();
     const element = scrollElement({ clientHeight: 100, scrollHeight: 500, scrollTop: 300 });

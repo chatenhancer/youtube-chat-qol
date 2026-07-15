@@ -65,35 +65,24 @@ async function translateText(text: unknown, targetLanguage: unknown): Promise<{
   url.searchParams.set('dj', '1');
   url.searchParams.set('q', cleanText);
 
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
-
-  try {
-    const response = await fetch(url.toString(), {
-      signal: controller.signal,
-      credentials: 'omit'
-    });
-
-    if (!response.ok) {
-      throw new Error(`Translate request failed with ${response.status}`);
-    }
-
-    const payload = await response.json() as {
-      sentences?: { trans?: string }[];
-      src?: string;
-    };
-    const translatedText = Array.isArray(payload.sentences)
-      ? payload.sentences.map((sentence) => sentence.trans || '').join('')
-      : '';
-
-    return {
-      ok: true,
-      translatedText: translatedText || cleanText,
-      sourceLanguage: payload.src || ''
-    };
-  } finally {
-    clearTimeout(timeoutId);
+  const response = await fetchWithTimeout(url.toString());
+  if (!response.ok) {
+    throw new Error(`Translate request failed with ${response.status}`);
   }
+
+  const payload = await response.json() as {
+    sentences?: { trans?: string }[];
+    src?: string;
+  };
+  const translatedText = Array.isArray(payload.sentences)
+    ? payload.sentences.map((sentence) => sentence.trans || '').join('')
+    : '';
+
+  return {
+    ok: true,
+    translatedText: translatedText || cleanText,
+    sourceLanguage: payload.src || ''
+  };
 }
 
 async function translateTexts(texts: unknown, targetLanguage: unknown): Promise<{

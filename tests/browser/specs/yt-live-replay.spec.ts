@@ -13,7 +13,7 @@ import {
   liteModeReplayRapidSeekScenario
 } from '../scenarios/lite-mode-native-surfaces';
 import { markedUserMessageMenuScenario } from '../scenarios/marked-users';
-import { realMessageTranslationScenario } from '../scenarios/message-translation';
+import { mockedMessageTranslationScenario } from '../scenarios/message-translation';
 import { messageMenuScenario, settingsMenuScenario } from '../scenarios/menus';
 import { profileCardRecentMessagesScenario } from '../scenarios/profile';
 import { loggedInLiveReplayTest as test } from '../support/scenario-fixtures';
@@ -31,10 +31,7 @@ test(
   'logged-in live replay: mark user from message menu persists and shows avatar ring',
   markedUserMessageMenuScenario
 );
-test(
-  'logged-in live replay: incoming chat messages translate through real Google Translate',
-  realMessageTranslationScenario
-);
+test('logged-in live replay: incoming chat messages are translated', mockedMessageTranslationScenario);
 test(
   'logged-in live replay: focus panel opens from an author and follows their messages',
   focusPanelOpensFromAuthorScenario

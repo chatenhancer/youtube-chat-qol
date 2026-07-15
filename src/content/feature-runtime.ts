@@ -1,20 +1,21 @@
 /**
- * Lifecycle registry for extension features that run in YouTube's live-chat
+ * Runtime registry for extension features that run in YouTube's live-chat
  * document.
  *
  * Feature modules register hooks when `enabled-features.ts` imports them. The
  * content entrypoint handles startup, options, the active content script
  * instance, and the one shared `MutationObserver`; this module stores hooks and
- * dispatches normalized events by lifecycle phase.
+ * dispatches normalized page and DOM events.
  *
  * The hooks assume a real YouTube chat DOM: message renderers, participant
  * renderers, YouTube menu popups, document visibility changes, and extension
  * UI injected into that page.
  *
- * Message and mutation hooks run in fixed `collect`, `enhance`, then `render`
- * passes. When several features see the same message or mutation, state
- * gathering happens before control wiring, and visible DOM rendering happens
- * last.
+ * Message hooks are independent and run once per dispatched renderer.
+ * Cross-feature data dependencies belong in explicit shared-feed subscriptions
+ * or stable-ID lookups; registration order is not a feature contract.
+ * Structural mutation hooks run once per normalized observer batch before
+ * added or changed message renderers are dispatched.
  *
  * Elements created through JSX from `shared/jsx-dom` are marked as
  * extension-managed. The shared observer ignores managed elements, so injected
@@ -23,38 +24,15 @@
 import type { Options } from '../shared/options';
 import { isExtensionManagedElement } from '../shared/managed-dom';
 import { clearToast } from '../shared/toast';
-import type { YouTubeMessageData } from '../youtube/message-data-events';
 
 type LifecycleCallback = () => void;
-type InitCallback = (context: FeatureLifecycleContext) => void;
+type InitCallback = (context: FeatureRuntimeContext) => void;
 type OptionsChangedCallback = (previousOptions: Options, nextOptions: Options) => void;
 type VisibilityChangedCallback = (visibilityState: Document['visibilityState']) => void;
 type MessageCallback = (message: HTMLElement, context: FeatureMessageContext) => void;
 type MutationCallback = (batch: FeatureMutationBatch) => void;
 type ParticipantCallback = (participant: HTMLElement) => void;
-type PhasedCallbacks<T extends (...args: never[]) => void> = Record<FeatureLifecyclePhase, T[]>;
-type FeatureMessageDispatchContext = Omit<FeatureMessageContext, 'messageData'> & {
-  messageData?: Promise<YouTubeMessageData | null>;
-};
-
-/**
- * Ordered phases for repeated work on chat messages and observer batches.
- *
- * `collect` reads YouTube DOM and updates extension state.
- * `enhance` wires listeners, controls, or compact feature UI.
- * `render` changes visible DOM after collection/enhancement state is ready.
- */
-export type FeatureLifecyclePhase = 'collect' | 'enhance' | 'render';
 export type FeatureMessageSource = 'existing' | 'added' | 'changed';
-
-/**
- * Phase-specific hooks for one repeated lifecycle surface.
- *
- * `message` and `mutation` registrations both use this shape. A registration
- * can include only the phase it needs, such as
- * `message: { enhance: wireMessage }`.
- */
-export type FeaturePhasedLifecycle<T extends (...args: never[]) => void> = Partial<Record<FeatureLifecyclePhase, T>>;
 
 /**
  * Save option updates requested by injected chat UI.
@@ -64,7 +42,7 @@ export type FeaturePhasedLifecycle<T extends (...args: never[]) => void> = Parti
  */
 export type SaveOptions = (values: Partial<Options>) => void;
 
-export interface FeatureLifecycleContext {
+export interface FeatureRuntimeContext {
   /**
    * Save a partial option update from an injected control.
    *
@@ -86,16 +64,6 @@ export interface FeatureMessageContext {
    * common case where message text appears after the renderer shell.
    */
   source: FeatureMessageSource;
-
-  /**
-   * Sanitized page-world metadata for this YouTube message renderer.
-   *
-   * Features can await the promise when they need data exposed by YouTube's
-   * page context, such as stable message IDs. The promise resolves outside the
-   * synchronous collect/enhance/render pass; immediate DOM wiring happens
-   * before this data is available.
-   */
-  messageData: Promise<YouTubeMessageData | null>;
 }
 
 export interface FeatureMutationBatch {
@@ -104,7 +72,7 @@ export interface FeatureMutationBatch {
    *
    * This is the primary input for structural UI work such as finding newly
    * opened YouTube menus, emoji pickers, chat header changes, or composer
-   * controls. The lifecycle dispatcher does not mutate it after creation.
+   * controls. The feature runtime does not mutate it after creation.
    */
   addedElements: Element[];
 
@@ -142,13 +110,13 @@ export interface FeaturePageLifecycle {
   init?: InitCallback;
 
   /**
-   * Runs before a fresh content script instance initializes feature state.
+   * Runs both before initialization and when this content instance stops.
    *
-   * This removes injected DOM, data attributes, timers, or small page state
-   * that can survive an extension reload/update inside the same YouTube tab.
-   * It runs before options or feature state are loaded.
+   * The callback must be idempotent and safe before `init`. It removes stale
+   * injected DOM for a fresh instance and releases the active instance's
+   * listeners, timers, subscriptions, and UI during suspension.
    */
-  cleanupStale?: LifecycleCallback;
+  cleanup?: LifecycleCallback;
 
   /**
    * Runs when the extension asks this page to reset in-page feature state.
@@ -187,17 +155,7 @@ export interface FeaturePageLifecycle {
   visibilityChanged?: VisibilityChangedCallback;
 }
 
-export interface FeatureParticipantLifecycle {
-  /**
-   * Runs for YouTube participant-list renderers discovered by the entrypoint.
-   *
-   * This is for participant surfaces only. Chat messages, including author
-   * chips inside message renderers, go through the `message` hooks.
-   */
-  enhance?: ParticipantCallback;
-}
-
-export interface FeatureObserverIgnoreLifecycle {
+export interface FeatureObserverIgnore {
   /**
    * Optional filter for added nodes that are feature-owned, not YouTube work.
    *
@@ -217,7 +175,7 @@ export interface FeatureObserverIgnoreLifecycle {
   mutation?: (element: Element) => boolean;
 }
 
-export interface FeatureLifecycle {
+export interface ContentFeature {
   /**
    * Page-level hooks for setup, cleanup, options, and visibility.
    *
@@ -228,27 +186,30 @@ export interface FeatureLifecycle {
   page?: FeaturePageLifecycle;
 
   /**
-   * Phased work for YouTube chat message renderers.
+   * Work for YouTube chat message renderers.
    *
    * These hooks cover message text, author data, per-message controls,
    * mention/inbox logic, translation rendering, and other behavior attached to
    * `yt-live-chat-*-message-renderer` nodes.
    */
-  message?: FeaturePhasedLifecycle<MessageCallback>;
+  message?: MessageCallback;
 
   /**
-   * Phased work for non-message DOM changes from the shared observer.
+   * Work for non-message DOM changes from the shared observer.
    *
    * These hooks cover newly opened YouTube menus, emoji pickers, composer
    * controls, chat header changes, and other structural surfaces. Chat message
    * renderer changes are dispatched through `message`.
    */
-  mutation?: FeaturePhasedLifecycle<MutationCallback>;
+  mutation?: MutationCallback;
 
   /**
-   * Hooks for YouTube's participant list surface.
+   * Work for YouTube participant-list renderers discovered by the entrypoint.
+   *
+   * This is for participant surfaces only. Chat messages, including author
+   * chips inside message renderers, go through `message`.
    */
-  participant?: FeatureParticipantLifecycle;
+  participant?: ParticipantCallback;
 
   /**
    * Custom observer suppression for feature-owned edits to YouTube DOM.
@@ -257,14 +218,14 @@ export interface FeatureLifecycle {
    * feature-owned mutations to YouTube nodes that would otherwise feed back into
    * the shared observer.
    */
-  observerIgnore?: FeatureObserverIgnoreLifecycle;
+  observerIgnore?: FeatureObserverIgnore;
 }
 
 const bootCallbacks: LifecycleCallback[] = [];
 const initCallbacks: InitCallback[] = [];
-const messageCallbacks = createPhasedCallbacks<MessageCallback>();
-const mutationCallbacks = createPhasedCallbacks<MutationCallback>();
-const staleCleanupCallbacks: LifecycleCallback[] = [clearToast];
+const messageCallbacks: MessageCallback[] = [];
+const mutationCallbacks: MutationCallback[] = [];
+const cleanupCallbacks: LifecycleCallback[] = [clearToast];
 const resetCallbacks: LifecycleCallback[] = [clearToast];
 const optionsChangedCallbacks: OptionsChangedCallback[] = [];
 const visibleRecoveryCallbacks: LifecycleCallback[] = [];
@@ -283,33 +244,33 @@ let featuresSuspended = false;
  * checks, and dispatch. Registered hooks receive the resulting message,
  * mutation, participant, option, and visibility events.
  *
- * Hook sets can cover one lifecycle surface or several. `collect` is the state
- * phase, `enhance` is the listener/control phase, and `render` is the visible
- * DOM phase that runs after collected state is ready.
+ * Message hooks are independent callbacks for one renderer. Mutation hooks
+ * receive the full structural batch once before message renderers from that
+ * observer turn are dispatched.
  *
- * @param lifecycle The hook set owned by the registering feature.
+ * @param feature The hooks owned by the registering feature.
  *
  * @example
  * ```ts
- * registerFeatureLifecycle({
+ * registerFeature({
  *   page: { init: initFeature, reset: resetFeature },
- *   message: { collect: recordMessage, enhance: wireMessageControls },
- *   mutation: { enhance: refreshOpenPanels }
+ *   message: handleMessage,
+ *   mutation: refreshOpenPanels
  * });
  * ```
  */
-export function registerFeatureLifecycle(lifecycle: FeatureLifecycle): void {
-  const { page, message, mutation, participant, observerIgnore } = lifecycle;
+export function registerFeature(feature: ContentFeature): void {
+  const { page, message, mutation, participant, observerIgnore } = feature;
   if (page?.boot) bootCallbacks.push(page.boot);
   if (page?.init) initCallbacks.push(page.init);
-  if (page?.cleanupStale) staleCleanupCallbacks.push(page.cleanupStale);
+  if (page?.cleanup) cleanupCallbacks.push(page.cleanup);
   if (page?.reset) resetCallbacks.push(page.reset);
   if (page?.optionsChanged) optionsChangedCallbacks.push(page.optionsChanged);
   if (page?.visibleRecovery) visibleRecoveryCallbacks.push(page.visibleRecovery);
   if (page?.visibilityChanged) visibilityChangedCallbacks.push(page.visibilityChanged);
-  registerPhasedCallbacks(messageCallbacks, message);
-  registerPhasedCallbacks(mutationCallbacks, mutation);
-  if (participant?.enhance) participantCallbacks.push(participant.enhance);
+  if (message) messageCallbacks.push(message);
+  if (mutation) mutationCallbacks.push(mutation);
+  if (participant) participantCallbacks.push(participant);
   if (observerIgnore?.addedNode) observerIgnoreAddedNodeCallbacks.push(observerIgnore.addedNode);
   if (observerIgnore?.mutation) observerIgnoreMutationCallbacks.push(observerIgnore.mutation);
 }
@@ -321,7 +282,7 @@ export function registerFeatureLifecycle(lifecycle: FeatureLifecycle): void {
  * but before stored options are loaded. The context contains the small set of
  * services that injected chat UI needs from the entrypoint.
  */
-export function initFeatures(context: FeatureLifecycleContext): void {
+export function initFeatures(context: FeatureRuntimeContext): void {
   initCallbacks.forEach((callback) => runFeatureCallback(() => callback(context)));
 }
 
@@ -364,37 +325,30 @@ export function recoverVisibleFeatures(): void {
 /**
  * Run feature `page.visibilityChanged` hooks for a document visibility change.
  *
- * These hooks are not gated by feature suspension so cleanup paths can still
- * notify timer-owning features if needed.
- *
  * @param visibilityState The current `document.visibilityState` value.
  */
 export function handleFeatureVisibilityChanged(visibilityState: Document['visibilityState']): void {
+  if (featuresSuspended) return;
   visibilityChangedCallbacks.forEach((callback) =>
     runFeatureCallback(() => callback(visibilityState))
   );
 }
 
 /**
- * Dispatch a YouTube chat message renderer through all message phases.
- *
- * When `messageData` is omitted, this helper supplies an empty metadata
- * promise.
+ * Dispatch a YouTube chat message renderer to every registered feature.
  *
  * @param message A renderer matching the extension's chat message selector.
- * @param context Per-message flags and optional page-world metadata request.
+ * @param context The reason this renderer is being dispatched.
  */
-export function handleFeatureMessage(message: HTMLElement, context: FeatureMessageDispatchContext): void {
+export function handleFeatureMessage(message: HTMLElement, context: FeatureMessageContext): void {
   if (featuresSuspended) return;
-  const featureContext: FeatureMessageContext = {
-    ...context,
-    messageData: context.messageData || Promise.resolve(null)
-  };
-  runPhasedCallbacks(messageCallbacks, (callback) => callback(message, featureContext));
+  messageCallbacks.forEach((callback) =>
+    runFeatureCallback(() => callback(message, context))
+  );
 }
 
 /**
- * Dispatch one normalized observer batch through all mutation phases.
+ * Dispatch one normalized observer batch to structural mutation hooks.
  *
  * The batch is for non-message structural work. Changed chat messages are
  * dispatched separately through `handleFeatureMessage`.
@@ -403,7 +357,7 @@ export function handleFeatureMessage(message: HTMLElement, context: FeatureMessa
  */
 export function handleFeatureMutations(batch: FeatureMutationBatch): void {
   if (featuresSuspended) return;
-  runPhasedCallbacks(mutationCallbacks, (callback) => callback(batch));
+  mutationCallbacks.forEach((callback) => runFeatureCallback(() => callback(batch)));
 }
 
 /**
@@ -441,13 +395,15 @@ export function shouldIgnoreFeatureMutation(element: Element): boolean {
 }
 
 /**
- * Remove stale extension UI and markers before normal feature startup.
+ * Clean up feature-owned resources and DOM.
  *
- * This handles extension reload/update cases where a YouTube tab keeps old
- * injected DOM even though a fresh content script is starting.
+ * Cleanup hooks are idempotent and run both before feature initialization and
+ * when the active content-script instance is suspended. This lets a fresh
+ * instance scrub stale DOM while the outgoing instance releases its own
+ * listeners, timers, subscriptions, and UI through the same small contract.
  */
-export function cleanupStaleFeatures(): void {
-  runLifecycleCallbacks(staleCleanupCallbacks);
+export function cleanupFeatures(): void {
+  runLifecycleCallbacks(cleanupCallbacks);
 }
 
 /**
@@ -461,48 +417,22 @@ export function cleanupStaleFeatures(): void {
 export function suspendFeatures(): void {
   if (featuresSuspended) return;
   featuresSuspended = true;
-  cleanupStaleFeatures();
+  cleanupFeatures();
 }
 
 /**
  * Reset feature-owned state in the current YouTube page.
  *
  * This does not clear browser storage. It asks features to close panels, clear
- * in-page caches, and undo visible DOM mutations. Reset hooks still run after
- * suspension so teardown can finish cleanly.
+ * in-page caches, and undo visible DOM mutations.
  */
 export function resetFeatures(): void {
+  if (featuresSuspended) return;
   runLifecycleCallbacks(resetCallbacks);
 }
 
 function runLifecycleCallbacks(callbacks: LifecycleCallback[]): void {
   callbacks.forEach((callback) => runFeatureCallback(callback));
-}
-
-function createPhasedCallbacks<T extends (...args: never[]) => void>(): PhasedCallbacks<T> {
-  return {
-    collect: [],
-    enhance: [],
-    render: []
-  };
-}
-
-function registerPhasedCallbacks<T extends (...args: never[]) => void>(
-  target: PhasedCallbacks<T>,
-  source: FeaturePhasedLifecycle<T> | undefined
-): void {
-  if (source?.collect) target.collect.push(source.collect);
-  if (source?.enhance) target.enhance.push(source.enhance);
-  if (source?.render) target.render.push(source.render);
-}
-
-function runPhasedCallbacks<T extends (...args: never[]) => void>(
-  callbacks: PhasedCallbacks<T>,
-  run: (callback: T) => void
-): void {
-  callbacks.collect.forEach((callback) => runFeatureCallback(() => run(callback)));
-  callbacks.enhance.forEach((callback) => runFeatureCallback(() => run(callback)));
-  callbacks.render.forEach((callback) => runFeatureCallback(() => run(callback)));
 }
 
 function shouldIgnoreFeatureObserverElement(
@@ -517,12 +447,12 @@ function runFeatureCallback<T>(run: () => T): T | undefined {
   try {
     return run();
   } catch (error) {
-    reportFeatureLifecycleError(error);
+    reportFeatureRuntimeError(error);
     return undefined;
   }
 }
 
-function reportFeatureLifecycleError(error: unknown): void {
+function reportFeatureRuntimeError(error: unknown): void {
   const reportError = (globalThis as { reportError?: (error: unknown) => void }).reportError;
   if (typeof reportError !== 'function') return;
 

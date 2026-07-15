@@ -22,7 +22,7 @@ import {
   toggleMessageAuthorMark
 } from '../marked-users';
 import { replyToMessage } from '../reply';
-import { registerFeatureLifecycle } from '../../content/lifecycle';
+import { registerFeature } from '../../content/feature-runtime';
 import { closeMenu, createMenuActionItem } from './common';
 
 let activeContextMessage: HTMLElement | null = null;
@@ -30,9 +30,9 @@ let activeContextMessageAt = 0;
 let messageMenuActivationListeners = new AbortController();
 let contextMenuWiringListeners = new AbortController();
 
-registerFeatureLifecycle({
+registerFeature({
   page: { init: initMessageMenuActivation },
-  message: { enhance: wireMessageContext }
+  message: wireMessageContext
 });
 
 function initMessageMenuActivation(): void {

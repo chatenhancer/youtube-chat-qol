@@ -29,7 +29,8 @@ import {
   createLiveChatFixtureHtml,
   fixtureLoggedOutLiveChatUrl,
   fixtureLoggedInLiveChatUrl,
-  fixtureLoggedInReplayChatUrl
+  fixtureLoggedInReplayChatUrl,
+  fixtureStudioLoggedInLiveChatUrl
 } from './live-chat-fixture';
 import {
   defaultLiveUrl,
@@ -44,7 +45,8 @@ import {
   getUnavailableComposerReason,
   isChatComposerVisible,
   openLiveChat,
-  startVideoPlaybackIfPaused
+  startVideoPlaybackIfPaused,
+  waitForYouTubeContentVideo
 } from './youtube-page';
 
 const DEFAULT_MOCK_HEADLESS = true;
@@ -82,6 +84,7 @@ interface MockTestFixtures {
   mockLoggedOutSession: MockSession;
   mockLoggedInSession: MockSession;
   mockLoggedInReplaySession: MockSession;
+  mockStudioLoggedInSession: MockSession;
 }
 
 interface MockWorkerFixtures {
@@ -112,7 +115,7 @@ export const mockTest = base.extend<MockTestFixtures, MockWorkerFixtures>({
       });
 
       await context.route(
-        /^https:\/\/www\.youtube\.com\/live_chat(?:_replay)?(?:\?|$)/,
+        /^https:\/\/(?:studio|www)\.youtube\.com\/live_chat(?:_replay)?(?:\?|$)/,
         (route) => {
           const url = new URL(route.request().url());
           const loggedIn = url.searchParams.get('ytcq-auth') !== 'logged-out';
@@ -120,6 +123,15 @@ export const mockTest = base.extend<MockTestFixtures, MockWorkerFixtures>({
           route.fulfill({
             body: createLiveChatFixtureHtml({ loggedIn, replay }),
             contentType: 'text/html'
+          });
+        }
+      );
+      await context.route(
+        /^https:\/\/(?:studio|www)\.youtube\.com\/youtubei\/v1\/live_chat\/get_live_chat(?:_replay)?\?ytcq-fixture=1$/,
+        (route) => {
+          route.fulfill({
+            body: route.request().postData() || '{}',
+            contentType: 'application/json'
           });
         }
       );
@@ -155,6 +167,15 @@ export const mockTest = base.extend<MockTestFixtures, MockWorkerFixtures>({
 
   mockLoggedInReplaySession: async ({ mockWorkerSession }, use, testInfo) => {
     await openMockChatPage(mockWorkerSession.page, fixtureLoggedInReplayChatUrl);
+    try {
+      await use(mockWorkerSession);
+    } finally {
+      await dumpDomOnFailure(mockWorkerSession.context, testInfo);
+    }
+  },
+
+  mockStudioLoggedInSession: async ({ mockWorkerSession }, use, testInfo) => {
+    await openMockChatPage(mockWorkerSession.page, fixtureStudioLoggedInLiveChatUrl);
     try {
       await use(mockWorkerSession);
     } finally {
@@ -395,6 +416,9 @@ async function getComposerUnavailableReason(page: Page, chat: FrameLocator): Pro
 }
 
 async function resetLiveScenarioState(session: LiveSession): Promise<void> {
+  // Reused live workers can encounter a pre-roll or mid-roll between tests,
+  // temporarily replacing the chat frame with the ad player.
+  await waitForYouTubeContentVideo(session.page);
   await session.page
     .evaluate(() => {
       window.scrollTo(0, 0);

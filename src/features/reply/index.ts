@@ -11,7 +11,7 @@ import { cleanText } from '../../shared/text';
 import { showToast } from '../../shared/toast';
 import { getMessageContentNodes, getMessageDetails } from '../../youtube/messages';
 import { showFocusPromptForAuthor, showFocusPromptForMessage } from '../focus-mode';
-import { registerFeatureLifecycle } from '../../content/lifecycle';
+import { registerFeature } from '../../content/feature-runtime';
 import { formatMentionText, formatQuoteText } from './format';
 import { insertMentionText, replaceInputWithQuoteNodes, replaceInputWithQuoteText } from './input';
 import { createQuoteContentNodes } from './quote-content';
@@ -19,9 +19,9 @@ import type { ReplyInsertOptions, RichQuoteContent } from './types';
 
 let replyWiringListeners = new AbortController();
 
-registerFeatureLifecycle({
-  page: { cleanupStale: cleanupStaleReplyWiring },
-  message: { enhance: wireAuthorNameMention }
+registerFeature({
+  page: { cleanup: cleanupStaleReplyWiring },
+  message: wireAuthorNameMention
 });
 
 export function wireAuthorNameMention(message: HTMLElement): void {

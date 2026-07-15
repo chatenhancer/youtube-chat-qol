@@ -16,11 +16,11 @@ import {
   clearChatKeywordHighlights
 } from './highlights';
 import {
+  getCurrentMentionCandidates,
   isCurrentUserAuthorName,
-  processPotentialMentionForConsumer,
-  registerMentionProcessor
+  onMentionCandidatesChanged
 } from '../mention-detection';
-import { registerFeatureLifecycle, type FeatureMessageContext } from '../../content/lifecycle';
+import { registerFeature, type FeatureMessageContext } from '../../content/feature-runtime';
 import {
   cleanupInboxTabAlertListeners,
   clearInboxTabAlert,
@@ -41,10 +41,11 @@ import {
   refreshInboxSurfaces,
   scheduleInboxButtonWire as scheduleInboxButtonWireInternal
 } from './button';
-import { createInboxRecord } from './records';
+import { createInboxRecordFromChatFeed } from './records';
 import { getCurrentYouTubeChatSourceUrl } from '../../youtube/source-url';
 import {
   addInboxKeywordsToState,
+  attachLiveInboxMessage,
   clearInboxRecords,
   getInboxKeywords,
   getInboxKeywordsSnapshot,
@@ -64,7 +65,13 @@ import {
   saveInboxRecords,
   upsertInboxRecord
 } from './state';
-import type { InboxMatch, LatestInboxRecord } from './types';
+import type { InboxRecord, LatestInboxRecord } from './types';
+import {
+  isYouTubeChatFeedPage,
+  subscribeYouTubeChatFeed,
+  type YouTubeChatFeedBatch
+} from '../../youtube/chat-feed/source';
+import type { YouTubeChatMessageRecord } from '../../youtube/chat-feed/protocol';
 
 export type { LatestInboxRecord };
 export {
@@ -74,10 +81,19 @@ export {
   getLoadedInboxKeywords
 };
 
-const MAX_PENDING_INBOX_MESSAGES = 60;
-const pendingInboxMessages = new Set<HTMLElement>();
+const MAX_PENDING_CHAT_FEED_RECORDS = 60;
+const pendingChatFeedRecords = new Map<string, PendingChatFeedRecord>();
+const pendingMentionChatFeedRecords = new Map<string, PendingChatFeedRecord>();
 
-let registeredInbox = false;
+interface PendingChatFeedRecord {
+  receivedAt: number;
+  record: YouTubeChatMessageRecord;
+  replayOffsetMs?: number;
+  source: 'live' | 'replay';
+}
+
+let unsubscribeChatFeed: (() => void) | null = null;
+let unsubscribeMentionCandidatesChanged: (() => void) | null = null;
 
 const inboxButtonOptions = {
   getUnreadCount: getUnreadInboxCount,
@@ -97,52 +113,32 @@ const inboxCardCallbacks = {
   onMarkRead: markInboxRead
 };
 
-registerFeatureLifecycle({
+registerFeature({
   page: {
     init: initInbox,
-    cleanupStale: cleanupStaleInboxSurfaces,
+    cleanup: cleanupStaleInboxSurfaces,
     reset: resetInboxFeature
   },
   observerIgnore: {
     addedNode: shouldIgnoreInboxHighlightMutation,
     mutation: shouldIgnoreInboxHighlightMutation
   },
-  message: { collect: handleInboxMessage },
-  mutation: { collect: handleInboxMutations }
+  message: handleInboxMessage,
+  mutation: handleInboxMutations
 });
 
 export function initInbox(): void {
   initInboxTabAlert();
-  if (!registeredInbox) {
-    registeredInbox = true;
-    registerMentionProcessor(handlePotentialInbox);
-  }
+  unsubscribeMentionCandidatesChanged ||= onMentionCandidatesChanged(
+    handleInboxMentionCandidatesChanged
+  );
+  startInboxChatFeed();
 
   void loadInboxState().then(() => {
     scheduleInboxButtonWire();
     refreshInboxSurfaces(getUnreadInboxCount);
     refreshVisibleChatKeywordHighlights();
-    flushPendingInboxMessages();
   });
-}
-
-export function handlePotentialInbox(message: HTMLElement): void {
-  if (!message.isConnected || !getMessageText(message)) return;
-  if (!isInboxStateLoaded()) {
-    trackPendingInboxMessage(message);
-    void loadInboxState().then(flushPendingInboxMessages);
-    return;
-  }
-
-  processPotentialMentionForConsumer(message, 'ytcqInboxMentionChecked', () => {
-    const text = getMessageText(message);
-    recordInboxMatch(message, {
-      mention: true,
-      mentionHandles: getMatchedMentionHandles(text)
-    });
-  });
-
-  processPotentialKeywordInbox(message);
 }
 
 function handleInboxMessage(
@@ -150,10 +146,10 @@ function handleInboxMessage(
   { source }: Pick<FeatureMessageContext, 'source'>
 ): void {
   if (source === 'added' || source === 'changed') {
-    handlePotentialInbox(message);
-  } else {
-    highlightPotentialInboxKeywords(message);
+    if (!message.isConnected || !getMessageText(message)) return;
+    if (attachLiveInboxMessage(message)) refreshOpenInboxCard();
   }
+  highlightPotentialInboxKeywords(message);
 }
 
 function handleInboxMutations({ addedElements, mutations }: {
@@ -172,7 +168,7 @@ function handleInboxMutations({ addedElements, mutations }: {
   if (shouldWireButton) scheduleInboxButtonWire();
 }
 
-export function highlightPotentialInboxKeywords(message: HTMLElement): void {
+function highlightPotentialInboxKeywords(message: HTMLElement): void {
   if (!message.isConnected) return;
   if (!isInboxStateLoaded()) {
     void loadInboxState().then(() => highlightPotentialInboxKeywords(message));
@@ -191,26 +187,28 @@ function shouldIgnoreInboxHighlightMutation(element: Element): boolean {
 }
 
 export function resetInboxState(): void {
-  pendingInboxMessages.clear();
+  pendingChatFeedRecords.clear();
+  pendingMentionChatFeedRecords.clear();
   resetInboxStore();
   closeInboxCard();
   clearInboxTabAlert();
   document.querySelectorAll<HTMLElement>(CHAT_MESSAGE_SELECTOR).forEach((message) => {
     clearChatKeywordHighlights(message);
-    delete message.dataset.ytcqInboxKeywordChecked;
     delete message.dataset.ytcqInboxKeywordHighlightKey;
   });
   refreshInboxSurfaces(getUnreadInboxCount);
 }
 
 export function cleanupStaleInboxSurfaces(): void {
+  stopInboxChatFeed();
+  unsubscribeMentionCandidatesChanged?.();
+  unsubscribeMentionCandidatesChanged = null;
   cleanupStaleInboxButtons();
   cleanupStaleInboxCards();
   clearInboxTabAlert();
   cleanupInboxTabAlertListeners();
   document.querySelectorAll<HTMLElement>(CHAT_MESSAGE_SELECTOR).forEach((message) => {
     clearChatKeywordHighlights(message);
-    delete message.dataset.ytcqInboxKeywordChecked;
     delete message.dataset.ytcqInboxKeywordHighlightKey;
   });
 }
@@ -256,67 +254,127 @@ export async function removeInboxKeywords(values: string[]): Promise<{
   return result;
 }
 
-function processPotentialKeywordInbox(message: HTMLElement): void {
-  if (!getInboxKeywordsSnapshot().length) {
-    clearChatKeywordHighlights(message);
+function commitInboxRecord(record: InboxRecord): void {
+  const isReadNow = Boolean(isInboxCardOpen() && isCurrentTabActive());
+  const result = upsertInboxRecord({
+    ...record,
+    read: isReadNow
+  }, isReadNow);
+
+  if (!result.changed && result.transientChanged) {
+    refreshOpenInboxCard();
     return;
   }
+  if (!result.changed) return;
 
-  const text = getMessageText(message);
-  const authorName = getAuthorName(message);
-  if (!text && !authorName) return;
-  if (isCurrentUserAuthorName(authorName)) {
-    applyChatKeywordHighlights(message, [], '');
-    return;
+  void saveInboxRecords();
+  refreshOpenInboxCard();
+
+  if (isReadNow) {
+    markInboxRead();
+  } else {
+    playAlertSound();
+    refreshInboxSurfaces(getUnreadInboxCount);
+    showInboxTabAlert(getUnreadInboxCount());
   }
+}
 
-  const keywordValues = [authorName, text];
-  const keywordKey = getKeywordCheckKeyFromValues(keywordValues);
-  const matchedKeywords = getMatchingKeywords(...keywordValues);
-  applyChatKeywordHighlights(message, matchedKeywords, matchedKeywords.length ? keywordKey : '');
-  if (message.dataset.ytcqInboxKeywordChecked === keywordKey) return;
-  message.dataset.ytcqInboxKeywordChecked = keywordKey;
-
-  if (!matchedKeywords.length) {
-    return;
-  }
-
-  recordInboxMatch(message, {
-    keywords: matchedKeywords
+function startInboxChatFeed(): void {
+  if (unsubscribeChatFeed || !isYouTubeChatFeedPage()) return;
+  unsubscribeChatFeed = subscribeYouTubeChatFeed({
+    consumer: 'inbox',
+    onBatch: handleInboxChatFeedBatch
   });
 }
 
-function recordInboxMatch(message: HTMLElement, match: InboxMatch): void {
-  const record = createInboxRecord(message, match, {
-    getMentionHandles: getMatchedMentionHandles,
+function stopInboxChatFeed(): void {
+  unsubscribeChatFeed?.();
+  unsubscribeChatFeed = null;
+  pendingChatFeedRecords.clear();
+  pendingMentionChatFeedRecords.clear();
+}
+
+function handleInboxChatFeedBatch(batch: YouTubeChatFeedBatch): void {
+  if (batch.activity !== 'new') return;
+  const replayTimeline = batch.delivery === 'replay-timeline';
+  if (!replayTimeline && batch.source !== 'live' && batch.source !== 'replay') return;
+  const source = replayTimeline || batch.source === 'replay' ? 'replay' : 'live';
+
+  batch.actions.forEach((action) => {
+    if (action.type !== 'upsert') return;
+    enqueueInboxChatFeedRecord({
+      receivedAt: batch.receivedAt,
+      record: action.record,
+      ...(action.replayOffsetMs !== undefined
+        ? { replayOffsetMs: action.replayOffsetMs }
+        : {}),
+      source
+    });
+  });
+}
+
+function enqueueInboxChatFeedRecord(pending: PendingChatFeedRecord): void {
+  if (isInboxStateLoaded()) {
+    processInboxChatFeedRecord(pending);
+    return;
+  }
+
+  pendingChatFeedRecords.delete(pending.record.id);
+  pendingChatFeedRecords.set(pending.record.id, pending);
+  while (pendingChatFeedRecords.size > MAX_PENDING_CHAT_FEED_RECORDS) {
+    const oldestId = pendingChatFeedRecords.keys().next().value;
+    if (!oldestId) break;
+    pendingChatFeedRecords.delete(oldestId);
+  }
+  void loadInboxState().then(flushPendingInboxChatFeedRecords);
+}
+
+function flushPendingInboxChatFeedRecords(): void {
+  const pending = [...pendingChatFeedRecords.values()];
+  pendingChatFeedRecords.clear();
+  pending.forEach(processInboxChatFeedRecord);
+}
+
+function processInboxChatFeedRecord(pending: PendingChatFeedRecord): void {
+  const authorName = pending.record.author?.name || '';
+  const text = pending.record.plainText;
+  if (!authorName || !text || isCurrentUserAuthorName(authorName)) return;
+
+  const mentionCandidatesAvailable = getCurrentMentionCandidates().length > 0;
+  const mentionHandles = mentionCandidatesAvailable ? getMatchedMentionHandles(text) : [];
+  const matchedKeywords = getMatchingKeywords(authorName, text);
+  if (!mentionCandidatesAvailable) rememberPendingMentionChatFeedRecord(pending);
+  if (!mentionHandles.length && !matchedKeywords.length) return;
+
+  const record = createInboxRecordFromChatFeed(pending.record, {
+    ...(matchedKeywords.length ? { keywords: matchedKeywords } : {}),
+    ...(mentionHandles.length ? { mention: true, mentionHandles } : {})
+  }, {
+    receivedAt: pending.receivedAt,
+    ...(pending.replayOffsetMs !== undefined
+      ? { replayOffsetMs: pending.replayOffsetMs }
+      : {}),
+    source: pending.source,
     sourceUrl: getCurrentYouTubeChatSourceUrl()
   });
-  if (!record) return;
+  if (record) commitInboxRecord(record);
+}
 
-  void loadInboxState().then(() => {
-    const isReadNow = Boolean(isInboxCardOpen() && isCurrentTabActive());
-    const result = upsertInboxRecord({
-      ...record,
-      read: isReadNow
-    }, isReadNow);
+function rememberPendingMentionChatFeedRecord(pending: PendingChatFeedRecord): void {
+  pendingMentionChatFeedRecords.delete(pending.record.id);
+  pendingMentionChatFeedRecords.set(pending.record.id, pending);
+  while (pendingMentionChatFeedRecords.size > MAX_PENDING_CHAT_FEED_RECORDS) {
+    const oldestId = pendingMentionChatFeedRecords.keys().next().value;
+    if (!oldestId) break;
+    pendingMentionChatFeedRecords.delete(oldestId);
+  }
+}
 
-    if (!result.changed && result.transientChanged) {
-      refreshOpenInboxCard();
-      return;
-    }
-    if (!result.changed) return;
-
-    void saveInboxRecords();
-    refreshOpenInboxCard();
-
-    if (isReadNow) {
-      markInboxRead();
-    } else {
-      playAlertSound();
-      refreshInboxSurfaces(getUnreadInboxCount);
-      showInboxTabAlert(getUnreadInboxCount());
-    }
-  });
+function handleInboxMentionCandidatesChanged(candidates: readonly string[]): void {
+  if (!candidates.length || !pendingMentionChatFeedRecords.size) return;
+  const pending = [...pendingMentionChatFeedRecords.values()];
+  pendingMentionChatFeedRecords.clear();
+  pending.forEach(processInboxChatFeedRecord);
 }
 
 function refreshVisibleChatKeywordHighlights(): void {
@@ -357,22 +415,4 @@ function handleInboxKeywordsChanged(): void {
   void saveInboxKeywords();
   refreshVisibleChatKeywordHighlights();
   refreshOpenInboxCard();
-}
-
-function trackPendingInboxMessage(message: HTMLElement): void {
-  pendingInboxMessages.add(message);
-  if (pendingInboxMessages.size <= MAX_PENDING_INBOX_MESSAGES) return;
-
-  const oldestMessage = pendingInboxMessages.values().next().value;
-  if (oldestMessage) {
-    pendingInboxMessages.delete(oldestMessage);
-  }
-}
-
-function flushPendingInboxMessages(): void {
-  const messages = Array.from(pendingInboxMessages);
-  pendingInboxMessages.clear();
-  messages.forEach((message) => {
-    if (message.isConnected) handlePotentialInbox(message);
-  });
 }

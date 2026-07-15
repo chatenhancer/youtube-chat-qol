@@ -22,7 +22,7 @@ import { SEND_BUTTON_SELECTOR } from '../../youtube/selectors';
 import { createCommandAutocomplete } from './autocomplete';
 import { createCommandCards } from './cards';
 import { createChatCommands } from './commands';
-import { registerFeatureLifecycle } from '../../content/lifecycle';
+import { registerFeature } from '../../content/feature-runtime';
 import { parseCommand, parseInlineTextCommand } from './parser';
 import type {
   ChatCommandDefinition,
@@ -59,10 +59,10 @@ const commandAutocomplete = createCommandAutocomplete({
   preventCommandEvent
 });
 
-registerFeatureLifecycle({
+registerFeature({
   page: {
     init: ({ saveOptions }) => initChatCommands(saveOptions),
-    cleanupStale: cleanupStaleChatCommandSurfaces,
+    cleanup: cleanupStaleChatCommandSurfaces,
     reset: resetChatCommandsState
   }
 });

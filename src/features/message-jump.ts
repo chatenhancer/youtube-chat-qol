@@ -5,6 +5,7 @@
  * move the outer YouTube watch page.
  */
 import { returnToChatInputPanel } from '../youtube/chat-input';
+import { signalChatLiveEdgeRelease } from '../youtube/chat-scroll';
 import { CHAT_SCROLLER_SELECTOR } from '../youtube/selectors';
 export { createJumpToMessageIcon } from '../shared/icons';
 
@@ -63,6 +64,7 @@ function getMessageScrollTop(scroller: HTMLElement, target: HTMLElement): number
 }
 
 function releaseChatLiveEdge(scroller: HTMLElement): void {
+  signalChatLiveEdgeRelease(scroller);
   scroller.scrollTo({
     top: Math.max(0, scroller.scrollTop - JUMP_LIVE_EDGE_RELEASE_OFFSET),
     behavior: 'auto'

@@ -7,15 +7,8 @@
  * chat reloads only the chat document while a loading surface remains visible.
  * Automatic failures retain a one-document cooldown across that reload.
  */
-import {
-  LITE_CHAT_BATCH_EVENT,
-  type LiteChatAction,
-  type LiteChatBatch
-} from './protocol';
-import {
-  MAX_LITE_CHAT_CONTINUATION_TIMEOUT_MS,
-  parseLiteChatBatchDetail
-} from './batch';
+import type { YouTubeChatFeedAction, YouTubeChatFeedTransportBatch } from '../../youtube/chat-feed/protocol';
+import { MAX_YOUTUBE_CHAT_FEED_CONTINUATION_TIMEOUT_MS } from '../../youtube/chat-feed/batch';
 import {
   cleanupStaleLiteModeDom,
   discardNativeList,
@@ -50,8 +43,13 @@ import {
   type LiteModeAutomaticFailureReason
 } from './fallback';
 import { t } from '../../shared/i18n';
-
-export { parseLiteChatBatchDetail } from './batch';
+import {
+  getYouTubeChatFeedReplayDiagnostics,
+  subscribeYouTubeChatFeed,
+  type YouTubeChatFeedBatch,
+  type YouTubeChatFeedError
+} from '../../youtube/chat-feed/source';
+import { getYouTubeChatFeedRecordState } from '../../youtube/chat-feed/records';
 
 export const LITE_MODE_FALLBACK_EVENT = 'ytcq:lite-mode-fallback';
 
@@ -63,15 +61,11 @@ const NATIVE_TICKER_SELECTOR = 'yt-live-chat-ticker-renderer, #ticker';
 const STARTUP_TIMEOUT_MS = 20_000;
 const REPLAY_STARTUP_TIMEOUT_MS = 45_000;
 const DEFAULT_SOURCE_TIMEOUT_MS = 35_000;
-const MAX_SOURCE_WATCHDOG_MS = MAX_LITE_CHAT_CONTINUATION_TIMEOUT_MS * 2 + 5_000;
-const MAX_PENDING_REPLAY_ACTIONS = 2_000;
-const MAX_PENDING_REPLAY_ACTION_BYTES = 16 * 1024 * 1024;
+const MAX_SOURCE_WATCHDOG_MS = MAX_YOUTUBE_CHAT_FEED_CONTINUATION_TIMEOUT_MS * 2 + 5_000;
 // One-off YouTube message types are skipped without disrupting Lite mode. Three
 // independent unreadable feed batches without a supported message indicate
 // that the main feed schema, rather than one special row, is no longer usable.
 const MAX_UNREADABLE_FEED_BATCHES_WITHOUT_PROGRESS = 3;
-const REPLAY_BACKWARD_SEEK_THRESHOLD_MS = 1_000;
-const YOUTUBE_PLAYER_PROGRESS_KEY = 'yt-player-video-progress';
 
 export type LiteModeStopReason =
   | 'explicit'
@@ -99,7 +93,6 @@ export interface CleanupLiteModeOptions {
 let active = false;
 let sessionDisabled = false;
 let lastRefreshEnabled: boolean | undefined;
-let lastSequence = -1;
 let renderer: LiteChatRenderer | null = null;
 let store: LiteChatStore | null = null;
 let nativeRestorePending = false;
@@ -108,14 +101,11 @@ let observedNativeUiTargets: Element[] = [];
 let startupTimer = 0;
 let sourceTimer = 0;
 let timestampSyncTimer = 0;
-let pendingReplayActions: LiteChatAction[] = [];
-let pendingReplayActionBytes = 0;
-let replayProgressMs: number | null = null;
-let replayRequestsIdentifySeeks = false;
-let receivedSourceBatch = false;
+let feedReady = false;
 let unreadableFeedBatchesWithoutProgress = 0;
 let rowRenderedCallback: LiteChatRowRenderedCallback | null = null;
 let batchListeners = new AbortController();
+let unsubscribeChatFeed: (() => void) | null = null;
 let documentUnloading = false;
 
 export function startLiteMode(options: StartLiteModeOptions = {}): void {
@@ -124,10 +114,7 @@ export function startLiteMode(options: StartLiteModeOptions = {}): void {
     return;
   }
   if (nativeRestorePending) return;
-  if (active) {
-    dispatchLiteChatControl(true);
-    return;
-  }
+  if (active) return;
 
   if (options.clearCooldown) {
     clearLiteModeSessionCooldown();
@@ -141,8 +128,7 @@ export function startLiteMode(options: StartLiteModeOptions = {}): void {
 
   active = true;
   documentUnloading = false;
-  lastSequence = -1;
-  receivedSourceBatch = false;
+  feedReady = false;
   unreadableFeedBatchesWithoutProgress = 0;
   setLiteModeBootstrapIntent(true);
   store = createLiteChatStore();
@@ -156,11 +142,31 @@ export function startLiteMode(options: StartLiteModeOptions = {}): void {
     }
   });
   mountLiteRoot();
+  const initialFeedState = getYouTubeChatFeedRecordState();
+  const initialRecords = initialFeedState.records;
+  if (initialRecords.length) {
+    applyStoreActions(
+      initialRecords.map((record) => ({ record, type: 'upsert' })),
+      'initial'
+    );
+  }
+  if (initialFeedState.ready) {
+    // The record store has already observed the shared feed, including the
+    // valid empty-feed case, so Lite does not need another initial request.
+    markLiteModeFeedReady();
+  }
 
   batchListeners.abort();
   batchListeners = new AbortController();
-  window.addEventListener(LITE_CHAT_BATCH_EVENT, handleLiteChatBatchEvent, {
-    signal: batchListeners.signal
+  unsubscribeChatFeed?.();
+  unsubscribeChatFeed = subscribeYouTubeChatFeed({
+    consumer: 'lite',
+    onBatch: handleLiteChatBatch,
+    onError: handleLiteChatFeedError,
+    // The record store can become ready before YouTube mounts its native
+    // startup rows. If it is still empty, capture those rows synchronously
+    // while the native list is connected, immediately before discarding it.
+    requestInitial: initialRecords.length === 0
   });
   document.addEventListener('click', handleNativeTimestampToggleClick, {
     capture: true,
@@ -178,13 +184,13 @@ export function startLiteMode(options: StartLiteModeOptions = {}): void {
     capture: true,
     signal: batchListeners.signal
   });
-  window.addEventListener('message', handleYouTubePlayerProgress, {
-    signal: batchListeners.signal
-  });
-  // Attach the receiver before draining the buffered startup snapshot, while
-  // the page-world handler can still merge data from the connected native list.
-  dispatchLiteChatControl(true, true);
+  // Reuse records already captured before feature boot. The always-on record
+  // store owns initial capture, and Lite receives the same batch if it is still
+  // in flight.
   discardNativeListIfPresent();
+  // The root changes size when the native list disappears. Pin once against
+  // that final layout so restored history starts at the live edge.
+  renderer?.scrollToLiveEdge();
   nativeUiObserver = new MutationObserver(handleNativeUiMutations);
   refreshNativeUiObserverTargets();
   scheduleStartupTimeout();
@@ -228,13 +234,12 @@ function beginNativeRestore(reason: LiteModeStopReason, automaticFailure: boolea
   clearStartupTimer();
   clearSourceTimer();
   clearTimestampSyncTimer();
-  clearReplayState();
+  unsubscribeLiteChatFeed();
   batchListeners.abort();
   batchListeners = new AbortController();
   nativeUiObserver?.disconnect();
   nativeUiObserver = null;
   observedNativeUiTargets = [];
-  dispatchLiteChatControl(false);
   clearLiteModeBootstrapIntent();
   requestNativeChatRestore({
     automaticFailure,
@@ -299,48 +304,34 @@ export function getLiteModeMessageElement(messageId: string): HTMLElement | null
   return renderer?.getMessageElement(messageId) || null;
 }
 
-function handleLiteChatBatchEvent(event: Event): void {
+function handleLiteChatBatch(batch: YouTubeChatFeedBatch): void {
   if (!active) return;
-  if (!(event instanceof CustomEvent)) {
-    failLiteMode('invalid-batch');
-    return;
+  const isTransportDelivery = batch.delivery === 'transport';
+  if (isTransportDelivery) {
+    if (batch.fatalErrors?.length) {
+      if (isTransientYouTubeFeedFailure(batch.fatalErrors)) {
+        waitForLiteModeFeedRecovery();
+        return;
+      }
+      failLiteMode('unreadable-response');
+      return;
+    }
+    if (!isFeedCompatibilityHealthy(batch)) {
+      failLiteMode('unreadable-feed');
+      return;
+    }
+    if (isSourceHeartbeat(batch.source)) markLiteModeFeedReady();
   }
-
-  const batch = parseLiteChatBatchDetail(event.detail);
-  if (!batch) {
-    failLiteMode('invalid-batch');
-    return;
-  }
-  if (lastSequence >= 0 && batch.sequence !== lastSequence + 1) {
-    const reason = batch.sequence <= lastSequence ? 'non-monotonic-sequence' : 'sequence-gap';
-    failLiteMode(reason);
-    return;
-  }
-  if (batch.fatalErrors?.length) {
-    failLiteMode('unreadable-response');
-    return;
-  }
-
-  lastSequence = batch.sequence;
-  if (batch.source === 'replay' && batch.replayPlayerOffsetMs !== undefined) {
-    replayRequestsIdentifySeeks = true;
-    replayProgressMs = batch.replayPlayerOffsetMs;
-  }
-  if (!isFeedCompatibilityHealthy(batch)) {
-    failLiteMode('unreadable-feed');
-    return;
-  }
-  if (isSourceHeartbeat(batch.source) && !receivedSourceBatch) {
-    receivedSourceBatch = true;
-    clearStartupTimer();
-    renderer?.setConnectionState('connected');
-  }
-  applyBatchActions(batch);
-  refreshLiteMemoryDiagnostics(true);
+  applyStoreActions(batch.actions, batch.source);
+  refreshLiteMemoryDiagnostics(isTransportDelivery);
   if (!active) return;
-  if (isSourceHeartbeat(batch.source)) {
+  if (isTransportDelivery && isSourceHeartbeat(batch.source)) {
     scheduleSourceWatchdog(batch.continuationTimeoutMs);
   }
+}
+
+function handleLiteChatFeedError(error: YouTubeChatFeedError): void {
+  failLiteMode(error);
 }
 
 function mountLiteRoot(): void {
@@ -361,98 +352,12 @@ function mountLiteRoot(): void {
   (document.body || document.documentElement).append(root);
 }
 
-function applyBatchActions(batch: LiteChatBatch): void {
-  // A clientMessages refresh is one state replacement, not a burst of live
-  // velocity. Apply its snapshot immediately, but keep replay-wrapped actions
-  // synchronized to the video even when they were buffered into the seed.
-  if (batch.actions.some((action) => action.type === 'reset')) {
-    clearReplayActionQueue();
-    const timedReplayActions = batch.actions.filter(hasReplayOffset);
-    const immediateActions = batch.actions.filter((action) => !hasReplayOffset(action));
-    applyStoreActions(immediateActions, batch.source);
-    enqueueReplayActions(timedReplayActions);
-    return;
-  }
-  if (batch.source === 'replay') {
-    enqueueReplayActions(batch.actions);
-    return;
-  }
-
-  // Keep every feed action in transport order. A later delete/reset must not
-  // leapfrog an earlier upsert. Apply each response atomically as soon as it
-  // arrives; the continuation timeout describes YouTube's next request, not a
-  // display window. Delaying through that window can create an ever-growing
-  // queue on active streams and make paid messages trail the native ticker.
-  applyStoreActions(batch.actions, batch.source);
-}
-
 function applyStoreActions(
-  actions: readonly LiteChatAction[],
-  source: LiteChatBatch['source']
+  actions: readonly YouTubeChatFeedAction[],
+  source: YouTubeChatFeedTransportBatch['source']
 ): void {
   renderer?.rememberActionSources(actions, source);
   store?.apply(actions);
-}
-
-function enqueueReplayActions(actions: readonly LiteChatAction[]): void {
-  if (!actions.length) return;
-  const actionBytes = getLiteChatActionsBytes(actions);
-  if (
-    pendingReplayActions.length + actions.length > MAX_PENDING_REPLAY_ACTIONS ||
-    pendingReplayActionBytes + actionBytes > MAX_PENDING_REPLAY_ACTION_BYTES
-  ) {
-    failLiteMode('action-backlog');
-    return;
-  }
-  pendingReplayActions.push(...actions);
-  pendingReplayActionBytes += actionBytes;
-  drainPendingReplayActions();
-}
-
-function drainPendingReplayActions(): void {
-  if (!active || !pendingReplayActions.length) return;
-  let dueCount = 0;
-  for (const action of pendingReplayActions) {
-    const offset = action.replayOffsetMs;
-    if (offset !== undefined && offset > 0 && (replayProgressMs === null || offset > replayProgressMs)) {
-      break;
-    }
-    dueCount += 1;
-  }
-  if (!dueCount) return;
-  const drainedActions = pendingReplayActions.splice(0, dueCount);
-  pendingReplayActionBytes = Math.max(
-    0,
-    pendingReplayActionBytes - getLiteChatActionsBytes(drainedActions)
-  );
-  applyStoreActions(drainedActions, 'replay');
-  if (!pendingReplayActions.length) refreshLiteMemoryDiagnostics();
-}
-
-function handleYouTubePlayerProgress(event: MessageEvent): void {
-  if (!active || window.location.pathname !== '/live_chat_replay') return;
-  // The signal can originate from a nested player window rather than this
-  // frame's direct parent. Treat only the bounded numeric payload as trusted.
-  if (!event.data || typeof event.data !== 'object' || Array.isArray(event.data)) return;
-  const seconds = (event.data as Record<string, unknown>)[YOUTUBE_PLAYER_PROGRESS_KEY];
-  if (typeof seconds !== 'number' || !Number.isFinite(seconds) || seconds < 0) return;
-  const nextProgressMs = Math.round(seconds * 1_000);
-  if (!Number.isSafeInteger(nextProgressMs)) return;
-
-  if (
-    !replayRequestsIdentifySeeks &&
-    replayProgressMs !== null &&
-    nextProgressMs < replayProgressMs - REPLAY_BACKWARD_SEEK_THRESHOLD_MS
-  ) {
-    clearReplayActionQueue();
-    applyStoreActions([{ type: 'reset' }], 'replay');
-  }
-  replayProgressMs = nextProgressMs;
-  drainPendingReplayActions();
-}
-
-function hasReplayOffset(action: LiteChatAction): boolean {
-  return action.type !== 'reset' && action.replayOffsetMs !== undefined;
 }
 
 function discardNativeListIfPresent(): void {
@@ -695,7 +600,7 @@ function scheduleSourceWatchdog(continuationTimeoutMs: number | undefined): void
 
 function scheduleStartupTimeout(): void {
   clearStartupTimer();
-  if (!active || receivedSourceBatch) return;
+  if (!active || feedReady) return;
   const timeout = window.location.pathname === '/live_chat_replay'
     ? REPLAY_STARTUP_TIMEOUT_MS
     : STARTUP_TIMEOUT_MS;
@@ -720,23 +625,26 @@ function teardownLiteMode(clearIntent: boolean): void {
   clearStartupTimer();
   clearSourceTimer();
   clearTimestampSyncTimer();
-  clearReplayState();
+  unsubscribeLiteChatFeed();
   batchListeners.abort();
   batchListeners = new AbortController();
   nativeUiObserver?.disconnect();
   nativeUiObserver = null;
   observedNativeUiTargets = [];
-  dispatchLiteChatControl(false);
   revealConnectedNativeLists();
   renderer?.destroy();
   renderer = null;
   store = null;
   resetDetachedNativeListDiagnostics();
-  lastSequence = -1;
-  receivedSourceBatch = false;
+  feedReady = false;
   unreadableFeedBatchesWithoutProgress = 0;
   documentUnloading = false;
   if (clearIntent) clearLiteModeBootstrapIntent();
+}
+
+function unsubscribeLiteChatFeed(): void {
+  unsubscribeChatFeed?.();
+  unsubscribeChatFeed = null;
 }
 
 function clearStartupTimer(): void {
@@ -757,15 +665,24 @@ function clearTimestampSyncTimer(): void {
   timestampSyncTimer = 0;
 }
 
-function clearReplayActionQueue(): void {
-  pendingReplayActions = [];
-  pendingReplayActionBytes = 0;
+function markLiteModeFeedReady(): void {
+  if (feedReady) return;
+  feedReady = true;
+  clearStartupTimer();
+  renderer?.setConnectionState('connected');
 }
 
-function clearReplayState(): void {
-  clearReplayActionQueue();
-  replayProgressMs = null;
-  replayRequestsIdentifySeeks = false;
+function waitForLiteModeFeedRecovery(): void {
+  feedReady = false;
+  clearSourceTimer();
+  renderer?.setConnectionState('connecting');
+  // YouTube retries temporary server failures itself. Keep the original
+  // recovery deadline when several failed responses arrive in succession.
+  if (!startupTimer) scheduleStartupTimeout();
+}
+
+function isTransientYouTubeFeedFailure(errors: readonly string[]): boolean {
+  return errors.every((error) => /^response:http-(?:429|5\d\d)$/.test(error));
 }
 
 function isAutomaticFailureReason(
@@ -774,12 +691,12 @@ function isAutomaticFailureReason(
   return !['explicit', 'cleanup'].includes(reason);
 }
 
-function isSourceHeartbeat(source: LiteChatBatch['source']): boolean {
+function isSourceHeartbeat(source: YouTubeChatFeedTransportBatch['source']): boolean {
   return source === 'live' || source === 'replay';
 }
 
-function isFeedCompatibilityHealthy(batch: LiteChatBatch): boolean {
-  if (batch.actions.some((action) => action.type === 'upsert')) {
+function isFeedCompatibilityHealthy(batch: YouTubeChatFeedBatch): boolean {
+  if (batch.transportHadUpsert || batch.actions.some((action) => action.type === 'upsert')) {
     unreadableFeedBatchesWithoutProgress = 0;
     return true;
   }
@@ -791,12 +708,13 @@ function isFeedCompatibilityHealthy(batch: LiteChatBatch): boolean {
 function refreshLiteMemoryDiagnostics(sampleNative = false): void {
   const root = renderer?.root;
   if (!root) return;
+  const replayDiagnostics = getYouTubeChatFeedReplayDiagnostics();
   root.dataset.ytcqLiteStoreSize = String(store?.getSize() || 0);
   root.dataset.ytcqLiteStoreBytes = String(store?.getRetainedBytes() || 0);
   root.dataset.ytcqLitePendingLiveActions = '0';
   root.dataset.ytcqLitePendingLiveActionBytes = '0';
-  root.dataset.ytcqLitePendingReplayActions = String(pendingReplayActions.length);
-  root.dataset.ytcqLitePendingReplayActionBytes = String(pendingReplayActionBytes);
+  root.dataset.ytcqLitePendingReplayActions = String(replayDiagnostics.pendingActions);
+  root.dataset.ytcqLitePendingReplayActionBytes = String(replayDiagnostics.pendingActionBytes);
   if (!sampleNative) return;
 
   const detached = inspectDetachedNativeLists();
@@ -810,10 +728,6 @@ function refreshLiteMemoryDiagnostics(sampleNative = false): void {
     Array.from(document.querySelectorAll<HTMLElement>(NATIVE_TICKER_SELECTOR))
       .reduce((count, ticker) => count + 1 + ticker.querySelectorAll('*').length, 0)
   );
-}
-
-function getLiteChatActionsBytes(actions: readonly LiteChatAction[]): number {
-  return actions.reduce((total, action) => total + JSON.stringify(action).length * 2, 0);
 }
 
 function reportLiteModeError(error: unknown): void {

@@ -4,7 +4,7 @@
  * Shows a short edge shimmer when the extension attaches, then leaves a quiet
  * ambient glow so the chat feels enhanced without competing with messages.
  */
-import { registerFeatureLifecycle } from '../content/lifecycle';
+import { registerFeature } from '../content/feature-runtime';
 import { jsx, el } from '../shared/jsx-dom';
 import { getOptions } from '../shared/state';
 import type { Options } from '../shared/options';
@@ -25,10 +25,10 @@ interface EnhancedEffectOptions {
   animate?: boolean;
 }
 
-registerFeatureLifecycle({
+registerFeature({
   page: {
     boot: showConfiguredEnhancedEffect,
-    cleanupStale: cleanupStaleEnhancedEffect,
+    cleanup: cleanupStaleEnhancedEffect,
     optionsChanged: handleEnhancedEffectOptionsChanged
   }
 });

@@ -8,6 +8,7 @@
 export const fixtureLoggedInLiveChatUrl = 'https://www.youtube.com/live_chat?continuation=ytcq-fixture&ytcq-auth=logged-in';
 export const fixtureLoggedOutLiveChatUrl = 'https://www.youtube.com/live_chat?continuation=ytcq-fixture&ytcq-auth=logged-out';
 export const fixtureLoggedInReplayChatUrl = 'https://www.youtube.com/live_chat_replay?continuation=ytcq-fixture-replay&ytcq-auth=logged-in';
+export const fixtureStudioLoggedInLiveChatUrl = 'https://studio.youtube.com/live_chat?continuation=ytcq-fixture-studio&ytcq-auth=logged-in';
 
 interface LiveChatFixtureOptions {
   loggedIn?: boolean;
@@ -348,6 +349,36 @@ export function createLiveChatFixtureHtml({
         return message;
       };
 
+      const emitFixtureFeedMessage = async (message, replayOffsetMs) => {
+        const addAction = {
+          addChatItemAction: {
+            item: {
+              liveChatTextMessageRenderer: message.data
+            }
+          }
+        };
+        const actions = ${replay ? `Number.isFinite(replayOffsetMs)
+          ? [{
+              replayChatItemAction: {
+                actions: [addAction],
+                videoOffsetTimeMsec: String(Math.max(0, Math.round(replayOffsetMs)))
+              }
+            }]
+          : [addAction]` : '[addAction]'};
+        const endpoint = ${replay
+          ? "'/youtubei/v1/live_chat/get_live_chat_replay?ytcq-fixture=1'"
+          : "'/youtubei/v1/live_chat/get_live_chat?ytcq-fixture=1'"};
+        await fetch(endpoint, {
+          body: JSON.stringify({
+            continuationContents: {
+              liveChatContinuation: { actions }
+            }
+          }),
+          headers: { 'content-type': 'application/json' },
+          method: 'POST'
+        });
+      };
+
       const initialMessage = document.querySelector('#fixture-message-1');
       if (initialMessage) {
         initialMessage.data = {
@@ -364,13 +395,16 @@ export function createLiveChatFixtureHtml({
 
       nextMessageNumber = 2;
 
-      const appendFixtureMessage = () => {
+      const appendFixtureMessage = async () => {
         if (!items || !scroller || nextMessageNumber > fixtureMessages.length) return;
 
         const wasAtBottom = scroller.scrollTop + scroller.clientHeight >= scroller.scrollHeight - 4;
-        const fixtureMessage = fixtureMessages[nextMessageNumber - 1];
-        items.append(createMessage(fixtureMessage, nextMessageNumber));
+        const number = nextMessageNumber;
+        const fixtureMessage = fixtureMessages[number - 1];
         nextMessageNumber += 1;
+        const message = createMessage(fixtureMessage, number);
+        await emitFixtureFeedMessage(message);
+        items.append(message);
 
         if (wasAtBottom) {
           scroller.scrollTop = scroller.scrollHeight;
@@ -378,20 +412,56 @@ export function createLiveChatFixtureHtml({
         }
       };
 
-      window.ytcqAppendFixtureMessage = (overrides = {}) => {
+      window.ytcqAppendFixtureMessage = async (overrides = {}) => {
         if (!items || !scroller) return null;
 
+        const number = nextMessageNumber;
+        nextMessageNumber += 1;
         const fixtureMessage = {
           author: String(overrides.author || '@BrowserTestViewer'),
           channel: typeof overrides.channel === 'string' ? overrides.channel : '',
           text: String(overrides.text || 'Browser test message')
         };
-        const message = createMessage(fixtureMessage, nextMessageNumber);
+        const message = createMessage(fixtureMessage, number);
+        await emitFixtureFeedMessage(message);
         items.append(message);
-        nextMessageNumber += 1;
         scroller.scrollTop = scroller.scrollHeight;
         scroller.dispatchEvent(new Event('scroll', { bubbles: true }));
         return message.id;
+      };
+
+      window.ytcqEmitFixtureFeedMessage = async (overrides = {}) => {
+        const number = nextMessageNumber;
+        nextMessageNumber += 1;
+        const fixtureMessage = {
+          author: String(overrides.author || '@BrowserTestViewer'),
+          channel: typeof overrides.channel === 'string' ? overrides.channel : '',
+          text: String(overrides.text || 'Browser test message')
+        };
+        const message = createMessage(fixtureMessage, number);
+        await emitFixtureFeedMessage(message);
+        return message.id;
+      };
+
+      window.ytcqPrefetchFixtureReplayMessage = async (overrides = {}, replayOffsetMs = 0) => {
+        if (!items || !scroller) return null;
+
+        const number = nextMessageNumber;
+        nextMessageNumber += 1;
+        const fixtureMessage = {
+          author: String(overrides.author || '@BrowserTestViewer'),
+          channel: typeof overrides.channel === 'string' ? overrides.channel : '',
+          text: String(overrides.text || 'Browser test replay message')
+        };
+        const message = createMessage(fixtureMessage, number);
+        await emitFixtureFeedMessage(message, Number(replayOffsetMs));
+        return message.id;
+      };
+
+      window.ytcqSetFixturePlayerProgress = (seconds) => {
+        window.dispatchEvent(new MessageEvent('message', {
+          data: { 'yt-player-video-progress': Number(seconds) }
+        }));
       };
 
       const removeEmojiPicker = () => {
@@ -472,8 +542,21 @@ export function createLiveChatFixtureHtml({
       document.addEventListener('keydown', (event) => {
         if (event.key === 'Escape') removeOpenMenus();
       });
-      window.setTimeout(appendFixtureMessage, 300);
-      window.setInterval(appendFixtureMessage, 1200);
+      let fixtureMessagesPaused = false;
+      const appendScheduledFixtureMessage = () => {
+        if (fixtureMessagesPaused) return;
+        void appendFixtureMessage();
+      };
+      const fixtureMessageTimeout = window.setTimeout(appendScheduledFixtureMessage, 300);
+      const fixtureMessageInterval = window.setInterval(
+        appendScheduledFixtureMessage,
+        1200
+      );
+      window.ytcqPauseFixtureMessages = () => {
+        fixtureMessagesPaused = true;
+        window.clearTimeout(fixtureMessageTimeout);
+        window.clearInterval(fixtureMessageInterval);
+      };
     </script>
   </body>
 </html>`;

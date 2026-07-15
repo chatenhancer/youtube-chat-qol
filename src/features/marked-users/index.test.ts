@@ -5,6 +5,14 @@ import {
   MATERIAL_ICON_VIEW_BOX
 } from '../../shared/icons';
 
+const chatFeedRecordMocks = vi.hoisted(() => ({
+  requestRenderedYouTubeChatFeedRecord: vi.fn(
+    (_message: HTMLElement): Promise<unknown> => Promise.resolve(null)
+  )
+}));
+
+vi.mock('../../youtube/chat-feed/records', () => chatFeedRecordMocks);
+
 describe('marked users', () => {
   beforeEach(async () => {
     document.body.replaceChildren();
@@ -12,6 +20,8 @@ describe('marked users', () => {
     window.history.replaceState({}, '', '/');
     await chrome.storage.local.clear();
     vi.clearAllMocks();
+    chatFeedRecordMocks.requestRenderedYouTubeChatFeedRecord.mockReset();
+    chatFeedRecordMocks.requestRenderedYouTubeChatFeedRecord.mockResolvedValue(null);
     vi.resetModules();
   });
 
@@ -411,7 +421,7 @@ describe('marked users', () => {
 
   it('renders message rings through the feature lifecycle', async () => {
     const markedUsers = await import('./index');
-    const lifecycle = await import('../../content/lifecycle');
+    const lifecycle = await import('../../content/feature-runtime');
     markedUsers.initMarkedUsers();
     await Promise.resolve();
 
@@ -442,7 +452,7 @@ describe('marked users', () => {
 
   it('upgrades native message rings with stable channel metadata', async () => {
     const markedUsers = await import('./index');
-    const lifecycle = await import('../../content/lifecycle');
+    const lifecycle = await import('../../content/feature-runtime');
     markedUsers.initMarkedUsers();
     await Promise.resolve();
     await markedUsers.toggleMarkedUser({
@@ -457,14 +467,10 @@ describe('marked users', () => {
       <span id="author-name">@ViewerOne</span>
     `;
     document.body.append(message);
-    lifecycle.handleFeatureMessage(message, {
-      messageData: Promise.resolve({
-        authorExternalChannelId: 'viewer-channel',
-        authorName: '@ViewerOne',
-        messageId: 'native-message'
-      }),
-      source: 'existing'
-    });
+    chatFeedRecordMocks.requestRenderedYouTubeChatFeedRecord.mockResolvedValueOnce(
+      createFeedRecord('native-message')
+    );
+    lifecycle.handleFeatureMessage(message, { source: 'existing' });
     await Promise.resolve();
 
     const avatar = message.querySelector<HTMLElement>('#author-photo')!;
@@ -474,21 +480,14 @@ describe('marked users', () => {
 
   it('does not reapply delayed message metadata after cleanup', async () => {
     const markedUsers = await import('./index');
-    const lifecycle = await import('../../content/lifecycle');
+    const lifecycle = await import('../../content/feature-runtime');
     markedUsers.initMarkedUsers();
     await Promise.resolve();
-    let resolveMessageData: (value: {
-      authorExternalChannelId: string;
-      authorName: string;
-      messageId: string;
-    }) => void = () => undefined;
-    const messageData = new Promise<{
-      authorExternalChannelId: string;
-      authorName: string;
-      messageId: string;
-    }>((resolve) => {
-      resolveMessageData = resolve;
+    let resolveChatRecord: (value: ReturnType<typeof createFeedRecord>) => void = () => undefined;
+    const feedRecordRequest = new Promise<ReturnType<typeof createFeedRecord>>((resolve) => {
+      resolveChatRecord = resolve;
     });
+    chatFeedRecordMocks.requestRenderedYouTubeChatFeedRecord.mockReturnValueOnce(feedRecordRequest);
     const message = document.createElement('yt-live-chat-text-message-renderer');
     message.id = 'native-message';
     message.innerHTML = `
@@ -496,18 +495,41 @@ describe('marked users', () => {
       <span id="author-name">@ViewerOne</span>
     `;
     document.body.append(message);
-    lifecycle.handleFeatureMessage(message, { messageData, source: 'existing' });
+    lifecycle.handleFeatureMessage(message, { source: 'existing' });
 
     markedUsers.cleanupStaleMarkedUsers();
-    resolveMessageData({
-      authorExternalChannelId: 'viewer-channel',
-      authorName: '@ViewerOne',
-      messageId: 'native-message'
-    });
+    resolveChatRecord(createFeedRecord('native-message'));
     await Promise.resolve();
 
     const avatar = message.querySelector<HTMLElement>('#author-photo')!;
     expect(avatar.hasAttribute('data-ytcq-marked-user-key')).toBe(false);
+  });
+
+  it('ignores delayed feed metadata after YouTube reuses a message row', async () => {
+    const markedUsers = await import('./index');
+    const lifecycle = await import('../../content/feature-runtime');
+    markedUsers.initMarkedUsers();
+    await Promise.resolve();
+    let resolveChatRecord: (value: ReturnType<typeof createFeedRecord>) => void = () => undefined;
+    const feedRecordRequest = new Promise<ReturnType<typeof createFeedRecord>>((resolve) => {
+      resolveChatRecord = resolve;
+    });
+    chatFeedRecordMocks.requestRenderedYouTubeChatFeedRecord.mockReturnValueOnce(feedRecordRequest);
+    const message = document.createElement('yt-live-chat-text-message-renderer');
+    message.id = 'first-message';
+    message.innerHTML = `
+      <span id="author-photo"></span>
+      <span id="author-name">@ViewerOne</span>
+    `;
+    document.body.append(message);
+
+    lifecycle.handleFeatureMessage(message, { source: 'existing' });
+    message.id = 'reused-message';
+    resolveChatRecord(createFeedRecord('first-message'));
+    await Promise.resolve();
+
+    const avatar = message.querySelector<HTMLElement>('#author-photo')!;
+    expect(avatar.dataset.ytcqMarkedUserKey).toBe('author:@viewerone');
   });
 
   it('animates marked-user rings when an existing avatar is marked or unmarked', async () => {
@@ -665,7 +687,7 @@ describe('marked users', () => {
 
   it('applies marked-user rings to participant list avatars', async () => {
     const markedUsers = await import('./index');
-    const lifecycle = await import('../../content/lifecycle');
+    const lifecycle = await import('../../content/feature-runtime');
     markedUsers.initMarkedUsers();
     await Promise.resolve();
 
@@ -714,4 +736,18 @@ function rect(overrides: Partial<DOMRect> = {}): DOMRect {
     toJSON: () => ({}),
     ...overrides
   } as DOMRect;
+}
+
+function createFeedRecord(id: string) {
+  return {
+    author: {
+      badges: [],
+      channelId: 'viewer-channel',
+      name: '@ViewerOne'
+    },
+    id,
+    kind: 'text' as const,
+    plainText: 'hello',
+    runs: []
+  };
 }

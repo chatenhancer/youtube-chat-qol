@@ -25,7 +25,7 @@ import {
   type MessageRecord,
   type UserIdentity
 } from '../user-message-history';
-import { registerFeatureLifecycle } from '../../content/lifecycle';
+import { registerFeature } from '../../content/feature-runtime';
 import { mentionAuthorName } from '../reply';
 import { applyMarkedUserRing, createMarkedUserToggleButton } from '../marked-users';
 import {
@@ -47,13 +47,13 @@ const stickyProfileCards = new WeakSet<HTMLElement>();
 let nextProfileCardZIndex = 10_000;
 let profileWiringListeners = new AbortController();
 
-registerFeatureLifecycle({
+registerFeature({
   page: {
-    cleanupStale: cleanupStaleProfilePopupSurfaces,
+    cleanup: cleanupStaleProfilePopupSurfaces,
     reset: closeProfileCard
   },
-  message: { enhance: wireProfileClick },
-  participant: { enhance: wireParticipantProfileClick }
+  message: wireProfileClick,
+  participant: wireParticipantProfileClick
 });
 
 export function wireProfileClick(message: HTMLElement): void {

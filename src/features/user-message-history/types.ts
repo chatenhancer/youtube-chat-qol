@@ -12,6 +12,7 @@ export interface MessageRecord {
   id: number;
   authorName: string;
   avatarSrc?: string;
+  channelId?: string;
   contentParts: RichTextSegment[];
   messageId?: string;
   messageRef?: WeakRef<HTMLElement>;

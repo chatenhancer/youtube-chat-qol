@@ -23,6 +23,7 @@ const MESSAGE_MENU_MARKER_SELECTOR = [
   'ytd-menu-navigation-item-renderer',
   '.ytcq-context-item[data-ytcq-action]'
 ].join(',');
+const LIVE_MESSAGE_WAIT_TIMEOUT_MS = 60_000;
 let nextMessageTargetId = 1;
 
 export interface OpenedMessageMenu {
@@ -59,7 +60,10 @@ export async function openMessageMenu(chat: ChatSurface): Promise<OpenedMessageM
     const messages = chat.locator(NORMAL_CHAT_MESSAGE_SELECTOR).filter({
       has: chat.locator('#menu')
     });
-    await messages.last().waitFor({ state: 'visible', timeout: 45_000 });
+    await messages.last().waitFor({
+      state: 'visible',
+      timeout: LIVE_MESSAGE_WAIT_TIMEOUT_MS
+    });
   });
 
   return test.step('Activate a message menu button', async () => {

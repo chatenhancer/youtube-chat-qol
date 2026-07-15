@@ -6,7 +6,7 @@
  * modules so future games can be added without growing this file into a second
  * application entry point.
  */
-import { registerFeatureLifecycle, type FeatureMutationBatch } from '../../../content/lifecycle';
+import { registerFeature, type FeatureMutationBatch } from '../../../content/feature-runtime';
 import type { Options } from '../../../shared/options';
 import type { GameId, PresenceUser, PublicGame, PublicInvite } from '../../../shared/playground/protocol';
 import { playAlertSound } from '../../../shared/sounds/alert-sounds';
@@ -81,14 +81,14 @@ interface PendingStartedGameOpen {
   knownGameIds: Set<string>;
 }
 
-registerFeatureLifecycle({
+registerFeature({
   page: {
     boot: refreshGamesButton,
-    cleanupStale: cleanupStaleGamesUi,
+    cleanup: cleanupStaleGamesUi,
     reset: cleanupStaleGamesUi,
     optionsChanged: handlePlaygroundOptionsChanged
   },
-  mutation: { enhance: handlePlaygroundMutations }
+  mutation: handlePlaygroundMutations
 });
 
 export function refreshGamesButton(): void {

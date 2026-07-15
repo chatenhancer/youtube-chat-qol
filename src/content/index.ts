@@ -4,14 +4,14 @@
  * This file is the wiring layer: it loads options, watches YouTube's live chat
  * iframe for new renderers, and delegates each behavior to feature modules.
  *
- * `enabled-features` is imported for lifecycle registration side effects. This
+ * `enabled-features` is imported for feature registration side effects. This
  * entrypoint owns the single MutationObserver; features should register
- * lifecycle hooks rather than creating their own observers.
+ * runtime hooks rather than creating their own observers.
  */
 import './enabled-features';
 import {
   bootFeatures,
-  cleanupStaleFeatures,
+  cleanupFeatures,
   handleFeatureMessage,
   handleFeatureMutations,
   handleFeatureOptionsChanged,
@@ -25,7 +25,7 @@ import {
   suspendFeatures,
   type FeatureMessageSource,
   type FeatureMutationBatch
-} from './lifecycle';
+} from './feature-runtime';
 import { DEFAULT_OPTIONS, getTargetLanguageUpdate, normalizeOptions, type Options } from '../shared/options';
 import {
   DEFAULT_CHAT_SKIN,
@@ -34,8 +34,11 @@ import {
 import { getOptions, setOptions } from '../shared/state';
 import { initUiLocaleFromDocument } from '../shared/i18n';
 import { OBSERVED_MANAGED_REMOVAL_ATTRIBUTE } from '../shared/managed-dom';
-import { requestYouTubeMessageData, type YouTubeMessageData } from '../youtube/message-data';
-import { injectYouTubeMessageDataPage } from '../youtube/message-data-page-injection';
+import {
+  startYouTubeChatFeedRecordStore,
+  stopYouTubeChatFeedRecordStore
+} from '../youtube/chat-feed/records';
+import { injectYouTubeChatFeedPage } from '../youtube/chat-feed/page-injection';
 import { CHAT_MESSAGE_SELECTOR, PARTICIPANT_SELECTOR } from '../youtube/selectors';
 
 interface NormalizedMutationBatch {
@@ -55,13 +58,14 @@ let visibilityRecoveryTimer = 0;
 let contentSuspended = false;
 
 claimContentInstance();
-injectYouTubeMessageDataPage();
+injectYouTubeChatFeedPage();
 void init();
 
 async function init(): Promise<void> {
-  cleanupStaleFeatures();
+  cleanupFeatures();
   await initUiLocaleFromDocument();
   if (!isCurrentContentInstance()) return;
+  startYouTubeChatFeedRecordStore();
   initFeatures({ saveOptions });
 
   chrome.storage.sync.get(DEFAULT_OPTIONS, (storedOptions) => {
@@ -71,34 +75,44 @@ async function init(): Promise<void> {
     boot();
   });
 
-  chrome.storage.onChanged.addListener((changes, areaName) => {
-    if (!isCurrentContentInstance()) return;
-    if (areaName !== 'sync') return;
+  chrome.storage.onChanged.addListener(handleStorageChanged);
+  chrome.runtime.onMessage.addListener(handleRuntimeMessage);
+}
 
-    const previousOptions = getOptions();
-    const nextOptions = { ...previousOptions };
-    for (const key of Object.keys(DEFAULT_OPTIONS) as (keyof Options)[]) {
-      if (changes[key]) {
-        nextOptions[key] = changes[key].newValue as never;
-      }
+function handleStorageChanged(
+  changes: Record<string, chrome.storage.StorageChange>,
+  areaName: string
+): void {
+  if (!isCurrentContentInstance()) return;
+  if (areaName !== 'sync') return;
+
+  const previousOptions = getOptions();
+  const nextOptions = { ...previousOptions };
+  for (const key of Object.keys(DEFAULT_OPTIONS) as (keyof Options)[]) {
+    if (changes[key]) {
+      nextOptions[key] = changes[key].newValue as never;
     }
+  }
 
-    setOptions(normalizeOptions(nextOptions));
-    applyChatSkin(getOptions());
-    notifyFeatureOptionsChanged(previousOptions, getOptions());
-  });
+  setOptions(normalizeOptions(nextOptions));
+  applyChatSkin(getOptions());
+  notifyFeatureOptionsChanged(previousOptions, getOptions());
+}
 
-  chrome.runtime.onMessage.addListener((message: { type?: string }, _sender, sendResponse) => {
-    if (!isCurrentContentInstance()) return false;
-    if (message?.type === 'ytcq:chat-attached-ping') {
-      sendResponse({ attached: true });
-      return false;
-    }
-
-    if (message?.type !== 'ytcq:reset-page') return false;
-    resetPageState();
+function handleRuntimeMessage(
+  message: { type?: string },
+  _sender: chrome.runtime.MessageSender,
+  sendResponse: (response?: unknown) => void
+): false {
+  if (!isCurrentContentInstance()) return false;
+  if (message?.type === 'ytcq:chat-attached-ping') {
+    sendResponse({ attached: true });
     return false;
-  });
+  }
+
+  if (message?.type !== 'ytcq:reset-page') return false;
+  resetPageState();
+  return false;
 }
 
 function boot(): void {
@@ -115,15 +129,11 @@ function boot(): void {
     }
 
     const batch = createNormalizedMutationBatch(mutations);
-    const requestedDataMessages = new WeakMap<HTMLElement, Promise<YouTubeMessageData | null>>();
     const handledMessages = new WeakSet<HTMLElement>();
     handleFeatureMutations(batch.featureBatch);
-    batch.featureBatch.addedElements.forEach((element) => handleAddedElement(element, requestedDataMessages, handledMessages));
+    batch.featureBatch.addedElements.forEach((element) => handleAddedElement(element, handledMessages));
     batch.changedMessages.forEach((message) => {
-      handleFeatureMessageOnce(message, {
-        messageData: requestYouTubeMessageDataOnce(message, requestedDataMessages),
-        source: 'changed'
-      }, handledMessages);
+      handleFeatureMessageOnce(message, 'changed', handledMessages);
     });
   });
 
@@ -138,10 +148,7 @@ function processExistingMessages(): void {
   if (!isCurrentContentInstance()) return;
   const messages = Array.from(document.querySelectorAll<HTMLElement>(CHAT_MESSAGE_SELECTOR));
   messages.forEach((message) => {
-    handleFeatureMessage(message, {
-      messageData: requestYouTubeMessageData(message),
-      source: 'existing'
-    });
+    handleFeatureMessage(message, { source: 'existing' });
   });
 }
 
@@ -204,14 +211,10 @@ function createNormalizedMutationBatch(mutations: MutationRecord[]): NormalizedM
 
 function handleAddedElement(
   element: Element,
-  requestedDataMessages: WeakMap<HTMLElement, Promise<YouTubeMessageData | null>>,
   handledMessages: WeakSet<HTMLElement>
 ): void {
   if (element.matches(CHAT_MESSAGE_SELECTOR) && element instanceof HTMLElement) {
-    handleFeatureMessageOnce(element, {
-      messageData: requestYouTubeMessageDataOnce(element, requestedDataMessages),
-      source: 'added'
-    }, handledMessages);
+    handleFeatureMessageOnce(element, 'added', handledMessages);
   }
   if (element.matches(PARTICIPANT_SELECTOR) && element instanceof HTMLElement) {
     handleFeatureParticipant(element);
@@ -219,10 +222,7 @@ function handleAddedElement(
 
   const containingMessage = element.closest<HTMLElement>(CHAT_MESSAGE_SELECTOR);
   if (containingMessage && !element.matches(CHAT_MESSAGE_SELECTOR)) {
-    handleFeatureMessageOnce(containingMessage, {
-      messageData: requestYouTubeMessageDataOnce(containingMessage, requestedDataMessages),
-      source: 'changed'
-    }, handledMessages);
+    handleFeatureMessageOnce(containingMessage, 'changed', handledMessages);
   }
 
   const containingParticipant = element.closest<HTMLElement>(PARTICIPANT_SELECTOR);
@@ -231,33 +231,19 @@ function handleAddedElement(
   }
 
   element.querySelectorAll<HTMLElement>(CHAT_MESSAGE_SELECTOR).forEach((message) => {
-    handleFeatureMessageOnce(message, {
-      messageData: requestYouTubeMessageDataOnce(message, requestedDataMessages),
-      source: 'added'
-    }, handledMessages);
+    handleFeatureMessageOnce(message, 'added', handledMessages);
   });
   element.querySelectorAll<HTMLElement>(PARTICIPANT_SELECTOR).forEach(handleFeatureParticipant);
 }
 
 function handleFeatureMessageOnce(
   message: HTMLElement,
-  context: { messageData: Promise<YouTubeMessageData | null>; source: FeatureMessageSource },
+  source: FeatureMessageSource,
   handledMessages: WeakSet<HTMLElement>
 ): void {
   if (handledMessages.has(message)) return;
   handledMessages.add(message);
-  handleFeatureMessage(message, context);
-}
-
-function requestYouTubeMessageDataOnce(
-  message: HTMLElement,
-  requestedDataMessages: WeakMap<HTMLElement, Promise<YouTubeMessageData | null>>
-): Promise<YouTubeMessageData | null> {
-  const existingRequest = requestedDataMessages.get(message);
-  if (existingRequest) return existingRequest;
-  const request = requestYouTubeMessageData(message);
-  requestedDataMessages.set(message, request);
-  return request;
+  handleFeatureMessage(message, { source });
 }
 
 function getChangedMessageForMutation(mutation: MutationRecord): HTMLElement | null {
@@ -393,5 +379,8 @@ function suspendContentInstance(): void {
   observer = null;
   document.removeEventListener('visibilitychange', handleVisibilityChange);
   document.removeEventListener(CONTENT_INSTANCE_CLAIM_EVENT, handleContentInstanceClaim);
+  chrome.storage.onChanged.removeListener(handleStorageChanged);
+  chrome.runtime.onMessage.removeListener(handleRuntimeMessage);
+  stopYouTubeChatFeedRecordStore();
   suspendFeatures();
 }

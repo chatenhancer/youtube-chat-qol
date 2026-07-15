@@ -36,7 +36,7 @@ import {
   quoteMenuDraftScenario
 } from '../scenarios/message-actions';
 import { markedUserMessageMenuScenario } from '../scenarios/marked-users';
-import { realReplacedTranslationToggleScenario } from '../scenarios/message-translation';
+import { mockedReplacedTranslationToggleScenario } from '../scenarios/message-translation';
 import { messageMenuScenario, settingsMenuScenario } from '../scenarios/menus';
 import { profileCardRecentMessagesScenario } from '../scenarios/profile';
 import { loggedInLiveTest as test } from '../support/scenario-fixtures';
@@ -58,7 +58,7 @@ test('logged-in live: quote menu action writes a draft only', quoteMenuDraftScen
 test('logged-in live: chat settings menu receives extension controls', settingsMenuScenario);
 test(
   'logged-in live: replaced translations toggle from the inline icon',
-  realReplacedTranslationToggleScenario
+  mockedReplacedTranslationToggleScenario
 );
 test(
   'logged-in live: focus panel opens from an author and follows their messages',

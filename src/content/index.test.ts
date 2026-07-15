@@ -1,10 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { DEFAULT_OPTIONS } from '../shared/options';
-import type { FeatureMutationBatch } from './lifecycle';
+import type { FeatureMutationBatch } from './feature-runtime';
 
 const lifecycleMocks = vi.hoisted(() => ({
   bootFeatures: vi.fn(),
-  cleanupStaleFeatures: vi.fn(),
+  cleanupFeatures: vi.fn(),
   handleFeatureMessage: vi.fn(),
   handleFeatureMutations: vi.fn(),
   handleFeatureOptionsChanged: vi.fn(),
@@ -18,13 +18,14 @@ const lifecycleMocks = vi.hoisted(() => ({
   suspendFeatures: vi.fn()
 }));
 
-const messageDataMocks = vi.hoisted(() => ({
-  requestYouTubeMessageData: vi.fn((): Promise<unknown> => Promise.resolve(null))
+const chatFeedRecordStoreMocks = vi.hoisted(() => ({
+  startYouTubeChatFeedRecordStore: vi.fn(),
+  stopYouTubeChatFeedRecordStore: vi.fn()
 }));
 
 vi.mock('./enabled-features', () => ({}));
-vi.mock('./lifecycle', () => lifecycleMocks);
-vi.mock('../youtube/message-data', () => messageDataMocks);
+vi.mock('./feature-runtime', () => lifecycleMocks);
+vi.mock('../youtube/chat-feed/records', () => chatFeedRecordStoreMocks);
 
 describe('content script entrypoint wiring', () => {
   let observerCallback: MutationCallback | null = null;
@@ -43,8 +44,6 @@ describe('content script entrypoint wiring', () => {
     lifecycleMocks.shouldIgnoreFeatureAddedNode.mockReturnValue(false);
     lifecycleMocks.shouldIgnoreFeatureMutation.mockReset();
     lifecycleMocks.shouldIgnoreFeatureMutation.mockReturnValue(false);
-    messageDataMocks.requestYouTubeMessageData.mockReset();
-    messageDataMocks.requestYouTubeMessageData.mockResolvedValue(null);
     observe = vi.fn();
     observerCallback = null;
     observerCallbacks = [];
@@ -87,13 +86,12 @@ describe('content script entrypoint wiring', () => {
 
     await import('./index');
 
-    expect(lifecycleMocks.cleanupStaleFeatures).toHaveBeenCalledOnce();
+    expect(lifecycleMocks.cleanupFeatures).toHaveBeenCalledOnce();
+    expect(chatFeedRecordStoreMocks.startYouTubeChatFeedRecordStore).toHaveBeenCalledOnce();
     expect(lifecycleMocks.initFeatures).toHaveBeenCalledOnce();
-    expect(messageDataMocks.requestYouTubeMessageData).toHaveBeenCalledWith(message);
-    expect(lifecycleMocks.handleFeatureMessage).toHaveBeenCalledWith(message, expect.objectContaining({
-      messageData: expect.any(Promise),
+    expect(lifecycleMocks.handleFeatureMessage).toHaveBeenCalledWith(message, {
       source: 'existing'
-    }));
+    });
     expect(lifecycleMocks.handleFeatureParticipant.mock.calls[0][0]).toBe(participant);
     expect(lifecycleMocks.bootFeatures).toHaveBeenCalledOnce();
     expect(observe).toHaveBeenCalledWith(document.documentElement, {
@@ -102,23 +100,6 @@ describe('content script entrypoint wiring', () => {
       subtree: true
     });
     expect(chrome.runtime.sendMessage).not.toHaveBeenCalled();
-  });
-
-  it('passes the message data request promise through message lifecycle hooks', async () => {
-    const message = createMessage();
-    const messageData = Promise.resolve({
-      messageId: 'msg-1',
-      timestampUsec: '1782000000000000'
-    });
-    messageDataMocks.requestYouTubeMessageData.mockReturnValueOnce(messageData);
-    document.body.append(message);
-
-    await import('./index');
-
-    expect(lifecycleMocks.handleFeatureMessage).toHaveBeenCalledWith(message, {
-      messageData,
-      source: 'existing'
-    });
   });
 
   it('normalizes observer mutations before dispatching feature hooks', async () => {
@@ -140,17 +121,12 @@ describe('content script entrypoint wiring', () => {
     const batch = lifecycleMocks.handleFeatureMutations.mock.calls[0][0] as FeatureMutationBatch;
     expect(batch.addedElements).toEqual([newMessage, child]);
     expect('changedMessages' in batch).toBe(false);
-    expect(messageDataMocks.requestYouTubeMessageData).toHaveBeenCalledWith(containingMessage);
-    expect(messageDataMocks.requestYouTubeMessageData).toHaveBeenCalledWith(newMessage);
-    expect(messageDataMocks.requestYouTubeMessageData).toHaveBeenCalledTimes(2);
-    expect(lifecycleMocks.handleFeatureMessage).toHaveBeenCalledWith(newMessage, expect.objectContaining({
-      messageData: expect.any(Promise),
+    expect(lifecycleMocks.handleFeatureMessage).toHaveBeenCalledWith(newMessage, {
       source: 'added'
-    }));
-    expect(lifecycleMocks.handleFeatureMessage).toHaveBeenCalledWith(containingMessage, expect.objectContaining({
-      messageData: expect.any(Promise),
+    });
+    expect(lifecycleMocks.handleFeatureMessage).toHaveBeenCalledWith(containingMessage, {
       source: 'changed'
-    }));
+    });
   });
 
   it('handles character-data mutations and nested added participants', async () => {
@@ -177,11 +153,9 @@ describe('content script entrypoint wiring', () => {
 
     const batch = lifecycleMocks.handleFeatureMutations.mock.calls[0][0] as FeatureMutationBatch;
     expect('changedMessages' in batch).toBe(false);
-    expect(messageDataMocks.requestYouTubeMessageData).toHaveBeenCalledWith(message);
-    expect(lifecycleMocks.handleFeatureMessage).toHaveBeenCalledWith(message, expect.objectContaining({
-      messageData: expect.any(Promise),
+    expect(lifecycleMocks.handleFeatureMessage).toHaveBeenCalledWith(message, {
       source: 'changed'
-    }));
+    });
     expect(lifecycleMocks.handleFeatureParticipant.mock.calls[0][0]).toBe(participant);
   });
 
@@ -283,23 +257,29 @@ describe('content script entrypoint wiring', () => {
     const batch = lifecycleMocks.handleFeatureMutations.mock.calls[0][0] as FeatureMutationBatch;
     expect(batch.addedElements).toEqual([]);
     expect(batch.mutations).toHaveLength(1);
-    expect(messageDataMocks.requestYouTubeMessageData).toHaveBeenCalledWith(message);
-    expect(lifecycleMocks.handleFeatureMessage).toHaveBeenCalledWith(message, expect.objectContaining({
-      messageData: expect.any(Promise),
+    expect(lifecycleMocks.handleFeatureMessage).toHaveBeenCalledWith(message, {
       source: 'changed'
-    }));
+    });
   });
 
   it('suspends older content script instances when a newer one claims the document', async () => {
     await import('./index');
     const firstDomObserver = observerCallbacks[0];
     const firstDomDisconnect = observerDisconnects[0];
+    const firstStorageListener = vi.mocked(chrome.storage.onChanged.addListener).mock.calls.at(-1)?.[0];
+    const firstRuntimeListener = vi.mocked(chrome.runtime.onMessage.addListener).mock.calls.at(-1)?.[0];
     lifecycleMocks.suspendFeatures.mockClear();
+    chatFeedRecordStoreMocks.stopYouTubeChatFeedRecordStore.mockClear();
+    vi.mocked(chrome.storage.onChanged.removeListener).mockClear();
+    vi.mocked(chrome.runtime.onMessage.removeListener).mockClear();
 
     vi.resetModules();
     await import('./index');
 
     expect(firstDomDisconnect).toHaveBeenCalledOnce();
+    expect(chrome.storage.onChanged.removeListener).toHaveBeenCalledWith(firstStorageListener);
+    expect(chrome.runtime.onMessage.removeListener).toHaveBeenCalledWith(firstRuntimeListener);
+    expect(chatFeedRecordStoreMocks.stopYouTubeChatFeedRecordStore).toHaveBeenCalledOnce();
     expect(lifecycleMocks.suspendFeatures).toHaveBeenCalledOnce();
     expect(observerCallbacks).toHaveLength(2);
 
@@ -339,10 +319,9 @@ describe('content script entrypoint wiring', () => {
     await vi.advanceTimersByTimeAsync(300);
 
     expect(lifecycleMocks.handleFeatureVisibilityChanged).toHaveBeenCalledWith('visible');
-    expect(lifecycleMocks.handleFeatureMessage).toHaveBeenCalledWith(message, expect.objectContaining({
-      messageData: expect.any(Promise),
+    expect(lifecycleMocks.handleFeatureMessage).toHaveBeenCalledWith(message, {
       source: 'existing'
-    }));
+    });
     expect(lifecycleMocks.recoverVisibleFeatures).toHaveBeenCalledOnce();
   });
 

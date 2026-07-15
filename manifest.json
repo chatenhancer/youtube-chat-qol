@@ -50,7 +50,7 @@
         "https://studio.youtube.com/live_chat*",
         "https://studio.youtube.com/live_chat_replay*"
       ],
-      "js": ["dist/extension-chrome/message-data-page.js"],
+      "js": ["dist/extension-chrome/chat-feed-page.js"],
       "run_at": "document_start",
       "all_frames": true,
       "world": "MAIN"

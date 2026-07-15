@@ -8,15 +8,14 @@
  */
 import {
   handleFeatureMessage,
-  registerFeatureLifecycle,
-  type FeatureLifecycleContext,
+  registerFeature,
+  type FeatureRuntimeContext,
   type FeatureMutationBatch,
   type SaveOptions
-} from '../../content/lifecycle';
+} from '../../content/feature-runtime';
 import { t } from '../../shared/i18n';
 import { getOptions } from '../../shared/state';
 import { showToast } from '../../shared/toast';
-import type { YouTubeMessageData } from '../../youtube/message-data-events';
 import {
   consumeLiteModeFallbackNotice,
   isSupportedLiteModePage
@@ -36,7 +35,7 @@ import {
   setLiteModeRowRenderedCallback,
   stopLiteMode
 } from './controller';
-import type { LiteChatMessageRecord } from './protocol';
+import type { YouTubeChatMessageRecord } from '../../youtube/chat-feed/protocol';
 import type { LiteChatRowSource } from './renderer';
 import {
   formatLiteModeFallbackMessage,
@@ -48,20 +47,18 @@ let saveOptions: SaveOptions = () => {};
 let pageListenersInitialized = false;
 let pageListeners = new AbortController();
 
-registerFeatureLifecycle({
+registerFeature({
   page: {
     boot: bootLiteMode,
-    cleanupStale: cleanupStaleLiteMode,
+    cleanup: cleanupStaleLiteMode,
     init: initLiteMode,
     optionsChanged: handleLiteModeOptionsChanged,
     reset: resetLiteMode
   },
-  mutation: {
-    enhance: handleLiteModeMutations
-  }
+  mutation: handleLiteModeMutations
 });
 
-function initLiteMode(context: FeatureLifecycleContext): void {
+function initLiteMode(context: FeatureRuntimeContext): void {
   if (!isSupportedLiteModePage()) return;
   saveOptions = context.saveOptions;
   initLiteModeButton(saveOptions);
@@ -102,25 +99,11 @@ function handleLiteModeMutations(batch: FeatureMutationBatch): void {
 
 function handleLiteModeRowRendered(
   row: HTMLElement,
-  record: LiteChatMessageRecord,
+  _record: YouTubeChatMessageRecord,
   source: LiteChatRowSource
 ): void {
   if (!row.isConnected) return;
-  handleFeatureMessage(row, {
-    messageData: Promise.resolve(createYouTubeMessageData(record)),
-    source
-  });
-}
-
-function createYouTubeMessageData(record: LiteChatMessageRecord): YouTubeMessageData {
-  const messageData: YouTubeMessageData = { messageId: record.id };
-  if (record.timestampUsec) messageData.timestampUsec = record.timestampUsec;
-  if (record.author?.channelId) {
-    messageData.authorExternalChannelId = record.author.channelId;
-  }
-  if (record.author?.name) messageData.authorName = record.author.name;
-  if (record.author?.avatarUrl) messageData.authorPhotoUrl = record.author.avatarUrl;
-  return messageData;
+  handleFeatureMessage(row, { source });
 }
 
 function handleLiteModeFallback(event: Event): void {

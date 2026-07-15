@@ -333,7 +333,6 @@ export function updateStickAroundOverlay(game: PublicStickAroundGame, currentUse
     runtime.traffic.reset();
   }
   syncStickAroundAuthoritativeSimulation(runtime, game);
-  runtime.traffic.refresh();
   keepChatAtLiveEdge();
   renderStickAroundOverlay(runtime, getStickAroundServerNow(runtime, receivedAt));
 }

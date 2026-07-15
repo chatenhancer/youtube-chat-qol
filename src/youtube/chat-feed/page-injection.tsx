@@ -1,18 +1,17 @@
-import { jsx, el, UNMANAGED } from '../shared/jsx-dom';
+import { jsx, el, UNMANAGED } from '../../shared/jsx-dom';
 
-const MESSAGE_DATA_PAGE_SCRIPT_ID = 'ytcq-message-data-page-adapter';
-let messageDataPageInjectionStarted = false;
+const CHAT_FEED_PAGE_SCRIPT_ID = 'ytcq-chat-feed-page-transport';
+let chatFeedPageInjectionStarted = false;
 
-export function injectYouTubeMessageDataPage(): void {
+export function injectYouTubeChatFeedPage(): void {
   const shouldInject =
-    (globalThis as { YTCQ_INJECT_MESSAGE_DATA_PAGE?: boolean }).YTCQ_INJECT_MESSAGE_DATA_PAGE ===
-    true;
+    (globalThis as { YTCQ_INJECT_CHAT_FEED_PAGE?: boolean }).YTCQ_INJECT_CHAT_FEED_PAGE === true;
   if (!shouldInject) return;
-  if (messageDataPageInjectionStarted) return;
-  if (document.getElementById(MESSAGE_DATA_PAGE_SCRIPT_ID)) return;
+  if (chatFeedPageInjectionStarted) return;
+  if (document.getElementById(CHAT_FEED_PAGE_SCRIPT_ID)) return;
 
-  messageDataPageInjectionStarted = true;
-  const scriptUrl = chrome.runtime.getURL('message-data-page.js');
+  chatFeedPageInjectionStarted = true;
+  const scriptUrl = chrome.runtime.getURL('chat-feed-page.js');
   void fetch(scriptUrl)
     .then((response) =>
       response.ok ? response.text() : Promise.reject(new Error(`Failed to load ${scriptUrl}`))
@@ -26,9 +25,9 @@ export function injectYouTubeMessageDataPage(): void {
 }
 
 function injectInlineScript(source: string): void {
-  if (document.getElementById(MESSAGE_DATA_PAGE_SCRIPT_ID)) return;
+  if (document.getElementById(CHAT_FEED_PAGE_SCRIPT_ID)) return;
 
-  const script = el<HTMLScriptElement>(<script id={MESSAGE_DATA_PAGE_SCRIPT_ID} />, UNMANAGED);
+  const script = el<HTMLScriptElement>(<script id={CHAT_FEED_PAGE_SCRIPT_ID} />, UNMANAGED);
   const nonce = getDocumentScriptNonce();
   if (nonce) script.nonce = nonce;
   script.text = getTrustedScript(source) as string;
@@ -36,10 +35,10 @@ function injectInlineScript(source: string): void {
 }
 
 function injectExternalScript(scriptUrl: string): void {
-  if (document.getElementById(MESSAGE_DATA_PAGE_SCRIPT_ID)) return;
+  if (document.getElementById(CHAT_FEED_PAGE_SCRIPT_ID)) return;
 
   const script = el<HTMLScriptElement>(
-    <script id={MESSAGE_DATA_PAGE_SCRIPT_ID} async={false} />,
+    <script id={CHAT_FEED_PAGE_SCRIPT_ID} async={false} />,
     UNMANAGED
   );
   const nonce = getDocumentScriptNonce();
@@ -48,7 +47,7 @@ function injectExternalScript(scriptUrl: string): void {
   script.addEventListener(
     'error',
     () => {
-      messageDataPageInjectionStarted = false;
+      chatFeedPageInjectionStarted = false;
       script.remove();
     },
     { once: true }
@@ -76,7 +75,7 @@ function getTrustedScript(code: string): string | unknown {
   if (!trustedTypes) return code;
 
   try {
-    const policy = trustedTypes.createPolicy(`ytcqMessageDataInline${Date.now()}`, {
+    const policy = trustedTypes.createPolicy(`ytcqChatFeedInline${Date.now()}`, {
       createScript: (value) => value
     });
     return policy.createScript(code);
@@ -100,7 +99,7 @@ function getTrustedScriptUrl(url: string): string | unknown {
   if (!trustedTypes) return url;
 
   try {
-    const policy = trustedTypes.createPolicy(`ytcqMessageDataPage${Date.now()}`, {
+    const policy = trustedTypes.createPolicy(`ytcqChatFeedPage${Date.now()}`, {
       createScriptURL: (value) => value
     });
     return policy.createScriptURL(url);

@@ -5,7 +5,7 @@
  * YouTube's emoji picker, and exposes the same emojis from a composer-adjacent
  * quick popover. Both surfaces insert directly into the native chat input.
  */
-import { registerFeatureLifecycle } from '../../content/lifecycle';
+import { registerFeature } from '../../content/feature-runtime';
 import { getEmojiUsageData, isVariantParentEmoji } from './data';
 import { insertEmojiIntoChat } from './insert';
 import {
@@ -27,13 +27,13 @@ let emojiUsageSaveTimer = 0;
 let emojiPickerRefreshTimer = 0;
 let frequentEmojiListeners = new AbortController();
 
-registerFeatureLifecycle({
+registerFeature({
   page: {
     init: initFrequentEmojis,
-    cleanupStale: cleanupStaleFrequentEmojis,
+    cleanup: cleanupStaleFrequentEmojis,
     reset: resetFrequentEmojis
   },
-  mutation: { enhance: handleFrequentEmojiMutations }
+  mutation: handleFrequentEmojiMutations
 });
 
 export function initFrequentEmojis(): void {

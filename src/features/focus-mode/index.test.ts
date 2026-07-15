@@ -2,6 +2,13 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { DEFAULT_OPTIONS } from '../../shared/options';
 import { setOptions } from '../../shared/state';
 import { replaceChatInput } from '../../youtube/chat-input';
+import { cleanupFeatures, initFeatures } from '../../content/feature-runtime';
+import {
+  emitMessageTranslationCleared,
+  emitMessageTranslationRendered,
+  emitMessageTranslationsCleared
+} from '../translation/events';
+import { recordUserMessage } from '../user-message-history';
 
 const chatState = vi.hoisted(() => ({
   input: null as HTMLElement | null,
@@ -13,9 +20,9 @@ const mentionMocks = vi.hoisted(() => ({
 }));
 
 const channelMocks = vi.hoisted(() => ({
-  getChannelUrl: vi.fn((channelId?: string, authorName?: string) => (
+  getChannelUrl: vi.fn((channelId?: string, authorName?: string) =>
     channelId || authorName ? `https://www.youtube.com/${authorName || channelId}` : ''
-  )),
+  ),
   openChannelWindow: vi.fn()
 }));
 
@@ -36,21 +43,20 @@ const replyMocks = vi.hoisted(() => ({
   quoteAuthorRichText: vi.fn()
 }));
 
-const userHistoryMocks = vi.hoisted(() => ({
-  getAvatarSrcForIdentity: vi.fn(() => ''),
-  getUserMessageRecordForMessage: vi.fn(() => null)
-}));
-
-const translationCallbacks = vi.hoisted(() => ({
-  cleared: null as ((event: { message: HTMLElement }) => void) | null,
-  rendered: null as ((event: {
-    message: HTMLElement;
-    originalText: string;
-    protectedTokens: [];
-    result: { sourceLanguage: string; targetLanguage: string; text: string };
-    sourceText: string;
-  }) => void) | null,
-  translationsCleared: null as (() => void) | null
+const historyFeedMocks = vi.hoisted(() => ({
+  nextTimestamp: 0,
+  onBatch: null as ((updates: Array<{
+    record: {
+      authorName: string;
+      channelId: string;
+      contentParts: Array<{ text: string; type: 'text' }>;
+      messageId: string;
+      text: string;
+      timestamp: number;
+      timestampText: string;
+    };
+    type: 'upsert';
+  }>) => void) | null
 }));
 
 vi.mock('../../youtube/chat-input', () => ({
@@ -64,28 +70,20 @@ vi.mock('../../youtube/chat-input', () => ({
 }));
 vi.mock('../mention-detection', () => mentionMocks);
 vi.mock('../channel-popup', () => channelMocks);
-vi.mock('../translation/events', () => ({
-  onMessageTranslationCleared: vi.fn((callback) => {
-    translationCallbacks.cleared = callback;
-  }),
-  onMessageTranslationRendered: vi.fn((callback) => {
-    translationCallbacks.rendered = callback;
-  }),
-  onMessageTranslationsCleared: vi.fn((callback) => {
-    translationCallbacks.translationsCleared = callback;
-  })
-}));
 vi.mock('../translation/queue', () => queueMocks);
 vi.mock('../reply', () => replyMocks);
 vi.mock('../reply/index', () => replyMocks);
-vi.mock('../user-message-history', () => ({
-  getAvatarSrcForIdentity: userHistoryMocks.getAvatarSrcForIdentity,
-  getUserMessageRecordForMessage: userHistoryMocks.getUserMessageRecordForMessage
+vi.mock('../user-message-history/feed', () => ({
+  startUserMessageFeed: vi.fn((onBatch: NonNullable<typeof historyFeedMocks.onBatch>) => {
+    historyFeedMocks.onBatch = onBatch;
+    return () => {
+      if (historyFeedMocks.onBatch === onBatch) historyFeedMocks.onBatch = null;
+    };
+  })
 }));
 
 import {
   cleanupStaleFocusMode,
-  handlePotentialFocusMessage,
   initFocusMode,
   openFocusModeForAuthor,
   resetFocusMode,
@@ -95,21 +93,23 @@ import {
 
 describe('focus mode entrypoint', () => {
   beforeEach(() => {
+    cleanupFeatures();
     document.body.replaceChildren();
     vi.clearAllMocks();
     vi.useFakeTimers();
     setOptions({ ...DEFAULT_OPTIONS });
-    userHistoryMocks.getAvatarSrcForIdentity.mockReturnValue('');
-    userHistoryMocks.getUserMessageRecordForMessage.mockReturnValue(null);
+    window.history.replaceState({}, '', '/');
     chatState.input = document.createElement('div');
     chatState.input.id = 'input';
     chatState.text = '';
     document.body.append(chatState.input, document.createElement('tp-yt-iron-pages'));
     document.querySelector('tp-yt-iron-pages')!.id = 'panel-pages';
+    historyFeedMocks.nextTimestamp = 0;
+    initFeatures({ saveOptions: vi.fn() });
   });
 
   afterEach(() => {
-    cleanupStaleFocusMode();
+    cleanupFeatures();
     vi.useRealTimers();
   });
 
@@ -135,7 +135,9 @@ describe('focus mode entrypoint', () => {
 
     showFocusPromptForMessage(message);
 
-    expect(document.querySelector('.ytcq-focus-card-collapsed')?.textContent).toContain('@MessagePromptViewer');
+    expect(document.querySelector('.ytcq-focus-card-collapsed')?.textContent).toContain(
+      '@MessagePromptViewer'
+    );
   });
 
   it('opens the collapsed prompt from keyboard activation and ignores child key events', async () => {
@@ -167,7 +169,9 @@ describe('focus mode entrypoint', () => {
   });
 
   it('does not replace an already expanded panel with a collapsed prompt for the same author', async () => {
-    expect(openFocusModeForAuthor({ authorName: '@StableViewer', channelId: 'viewer-channel' })).toBe(true);
+    expect(
+      openFocusModeForAuthor({ authorName: '@StableViewer', channelId: 'viewer-channel' })
+    ).toBe(true);
     await vi.runAllTimersAsync();
 
     showFocusPromptForAuthor({ authorName: '@StableViewer', channelId: 'viewer-channel' });
@@ -178,10 +182,18 @@ describe('focus mode entrypoint', () => {
 
   it('opens with visible conversation messages and quotes focused-user rows', async () => {
     const focusedMessage = createMessage('@ViewerTwo', 'focused message', 'viewer-channel');
-    const currentUserMessage = createMessage('@CurrentUser', '@ViewerTwo response', 'current-channel');
+    const currentUserMessage = createMessage(
+      '@CurrentUser',
+      '@ViewerTwo response',
+      'current-channel'
+    );
     document.body.append(focusedMessage, currentUserMessage);
+    recordFeedMessage(focusedMessage);
+    recordFeedMessage(currentUserMessage);
 
-    expect(openFocusModeForAuthor({ authorName: '@ViewerTwo', channelId: 'viewer-channel' })).toBe(true);
+    expect(openFocusModeForAuthor({ authorName: '@ViewerTwo', channelId: 'viewer-channel' })).toBe(
+      true
+    );
     await vi.runAllTimersAsync();
 
     const rows = document.querySelectorAll<HTMLElement>('.ytcq-focus-message');
@@ -192,21 +204,55 @@ describe('focus mode entrypoint', () => {
     rows[0].click();
     await vi.runAllTimersAsync();
 
-    expect(replyMocks.quoteAuthorRichText).toHaveBeenCalledWith('@ViewerTwo', 'focused message', {
-      segments: [
-        {
-          text: 'focused message',
-          type: 'text'
-        }
-      ]
-    }, { skipFocusPrompt: true });
+    expect(replyMocks.quoteAuthorRichText).toHaveBeenCalledWith(
+      '@ViewerTwo',
+      'focused message',
+      {
+        segments: [
+          {
+            text: 'focused message',
+            type: 'text'
+          }
+        ]
+      },
+      { skipFocusPrompt: true }
+    );
+  });
+
+  it('shows more than the recent-message card limit for one focused user', async () => {
+    Array.from({ length: 13 }, (_, index) => {
+      const message = createMessage(
+        '@LongConversation',
+        `focused message ${index}`,
+        'viewer-channel'
+      );
+      document.body.append(message);
+      recordFeedMessage(message);
+    });
+
+    expect(
+      openFocusModeForAuthor({ authorName: '@LongConversation', channelId: 'viewer-channel' })
+    ).toBe(true);
+    await vi.runAllTimersAsync();
+
+    const rows = [...document.querySelectorAll<HTMLElement>('.ytcq-focus-bubble')];
+    expect(rows).toHaveLength(13);
+    expect(rows[0].textContent).toBe('focused message 0');
+    expect(rows.at(-1)?.textContent).toBe('focused message 12');
   });
 
   it('quotes focused-user rows from keyboard activation only on the row itself', async () => {
-    const focusedMessage = createMessage('@KeyboardQuoteViewer', 'focused message', 'viewer-channel');
+    const focusedMessage = createMessage(
+      '@KeyboardQuoteViewer',
+      'focused message',
+      'viewer-channel'
+    );
     document.body.append(focusedMessage);
+    recordFeedMessage(focusedMessage);
 
-    expect(openFocusModeForAuthor({ authorName: '@KeyboardQuoteViewer', channelId: 'viewer-channel' })).toBe(true);
+    expect(
+      openFocusModeForAuthor({ authorName: '@KeyboardQuoteViewer', channelId: 'viewer-channel' })
+    ).toBe(true);
     await vi.runAllTimersAsync();
 
     const row = document.querySelector<HTMLElement>('.ytcq-focus-message-quotable')!;
@@ -227,39 +273,42 @@ describe('focus mode entrypoint', () => {
   });
 
   it('adds new focused-user messages while the expanded panel is open', async () => {
-    expect(openFocusModeForAuthor({ authorName: '@ViewerThree', channelId: 'viewer-channel' })).toBe(true);
+    expect(
+      openFocusModeForAuthor({ authorName: '@ViewerThree', channelId: 'viewer-channel' })
+    ).toBe(true);
     await vi.runAllTimersAsync();
 
     const nextMessage = createMessage('@ViewerThree', 'new focused message', 'viewer-channel');
     document.body.append(nextMessage);
-    handlePotentialFocusMessage(nextMessage);
+    recordFeedMessage(nextMessage);
 
     expect(document.querySelector('.ytcq-focus-bubble')?.textContent).toBe('new focused message');
   });
 
-  it('records changed messages from the message lifecycle while expanded', async () => {
-    const lifecycle = await import('../../content/lifecycle');
-    expect(openFocusModeForAuthor({ authorName: '@MutationFocused', channelId: 'viewer-channel' })).toBe(true);
+  it('updates from recent-message history while expanded', async () => {
+    initFocusMode();
+    expect(
+      openFocusModeForAuthor({ authorName: '@MutationFocused', channelId: 'viewer-channel' })
+    ).toBe(true);
     await vi.runAllTimersAsync();
 
     const nextMessage = createMessage('@MutationFocused', 'mutation message', 'viewer-channel');
     document.body.append(nextMessage);
-    lifecycle.handleFeatureMessage(nextMessage, { source: 'changed' });
+    recordFeedMessage(nextMessage);
 
     expect(document.querySelector('.ytcq-focus-bubble')?.textContent).toBe('mutation message');
   });
 
-  it('ignores disconnected and unrelated messages while expanded', async () => {
-    expect(openFocusModeForAuthor({ authorName: '@ViewerThree', channelId: 'viewer-channel' })).toBe(true);
+  it('ignores unrelated message history while expanded', async () => {
+    expect(
+      openFocusModeForAuthor({ authorName: '@ViewerThree', channelId: 'viewer-channel' })
+    ).toBe(true);
     await vi.runAllTimersAsync();
     queueMocks.prioritize.mockClear();
 
-    const disconnected = createMessage('@ViewerThree', 'gone', 'viewer-channel');
-    disconnected.remove();
-    handlePotentialFocusMessage(disconnected);
     const unrelated = createMessage('@OtherViewer', 'other', 'other-channel');
     document.body.append(unrelated);
-    handlePotentialFocusMessage(unrelated);
+    recordFeedMessage(unrelated);
 
     expect(document.querySelector('.ytcq-focus-bubble')).toBeNull();
     expect(queueMocks.prioritize).not.toHaveBeenCalled();
@@ -270,25 +319,29 @@ describe('focus mode entrypoint', () => {
 
     const nextMessage = createMessage('@ViewerThree', 'collapsed message', 'viewer-channel');
     document.body.append(nextMessage);
-    handlePotentialFocusMessage(nextMessage);
+    recordFeedMessage(nextMessage);
 
     expect(document.querySelector('.ytcq-focus-bubble')).toBeNull();
     expect(queueMocks.prioritize).not.toHaveBeenCalled();
   });
 
   it('opens the focused user channel from the expanded header and closes from the header button', async () => {
-    expect(openFocusModeForAuthor({
-      authorName: '@ViewerFive',
-      avatarSrc: 'avatar.png',
-      channelId: 'viewer-channel'
-    })).toBe(true);
+    expect(
+      openFocusModeForAuthor({
+        authorName: '@ViewerFive',
+        avatarSrc: 'avatar.png',
+        channelId: 'viewer-channel'
+      })
+    ).toBe(true);
     await vi.runAllTimersAsync();
 
     const authorButton = document.querySelector<HTMLButtonElement>('.ytcq-focus-author-button')!;
     expect(document.querySelector('.ytcq-focus-avatar-fallback')).toBeNull();
     authorButton.click();
 
-    expect(channelMocks.openChannelWindow).toHaveBeenCalledWith('https://www.youtube.com/@ViewerFive');
+    expect(channelMocks.openChannelWindow).toHaveBeenCalledWith(
+      'https://www.youtube.com/@ViewerFive'
+    );
 
     document.querySelector<HTMLButtonElement>('.ytcq-focus-close')?.click();
     expect(document.querySelector('.ytcq-focus-card')).toBeNull();
@@ -310,7 +363,9 @@ describe('focus mode entrypoint', () => {
     initFocusMode();
     setOptions({ ...DEFAULT_OPTIONS, targetLanguage: 'en' });
     document.body.append(createSendButton());
-    expect(openFocusModeForAuthor({ authorName: '@FocusedViewer', channelId: 'viewer-channel' })).toBe(true);
+    expect(
+      openFocusModeForAuthor({ authorName: '@FocusedViewer', channelId: 'viewer-channel' })
+    ).toBe(true);
     await vi.runAllTimersAsync();
 
     chatState.text = 'already typed';
@@ -328,7 +383,9 @@ describe('focus mode entrypoint', () => {
 
   it('closes expanded focus mode on Escape', async () => {
     initFocusMode();
-    expect(openFocusModeForAuthor({ authorName: '@EscapeViewer', channelId: 'viewer-channel' })).toBe(true);
+    expect(
+      openFocusModeForAuthor({ authorName: '@EscapeViewer', channelId: 'viewer-channel' })
+    ).toBe(true);
     await vi.runAllTimersAsync();
 
     document.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Escape' }));
@@ -339,7 +396,9 @@ describe('focus mode entrypoint', () => {
   it('prefixes existing draft text when focus mode first opens', async () => {
     chatState.text = 'draft text';
 
-    expect(openFocusModeForAuthor({ authorName: '@DraftViewer', channelId: 'viewer-channel' })).toBe(true);
+    expect(
+      openFocusModeForAuthor({ authorName: '@DraftViewer', channelId: 'viewer-channel' })
+    ).toBe(true);
     await vi.runAllTimersAsync();
 
     expect(chatState.text).toBe('@DraftViewer draft text');
@@ -348,8 +407,12 @@ describe('focus mode entrypoint', () => {
   it('replaces a pending focus mention restore timer when focus changes quickly', async () => {
     const clearTimeoutSpy = vi.spyOn(window, 'clearTimeout');
 
-    expect(openFocusModeForAuthor({ authorName: '@FirstTimerViewer', channelId: 'first-channel' })).toBe(true);
-    expect(openFocusModeForAuthor({ authorName: '@SecondTimerViewer', channelId: 'second-channel' })).toBe(true);
+    expect(
+      openFocusModeForAuthor({ authorName: '@FirstTimerViewer', channelId: 'first-channel' })
+    ).toBe(true);
+    expect(
+      openFocusModeForAuthor({ authorName: '@SecondTimerViewer', channelId: 'second-channel' })
+    ).toBe(true);
     await vi.runAllTimersAsync();
 
     expect(clearTimeoutSpy).toHaveBeenCalled();
@@ -358,11 +421,15 @@ describe('focus mode entrypoint', () => {
 
   it('does not restore the fixed focus mention for Shift+Enter or non-input Enter', async () => {
     initFocusMode();
-    expect(openFocusModeForAuthor({ authorName: '@FocusedViewer', channelId: 'viewer-channel' })).toBe(true);
+    expect(
+      openFocusModeForAuthor({ authorName: '@FocusedViewer', channelId: 'viewer-channel' })
+    ).toBe(true);
     await vi.runAllTimersAsync();
 
     chatState.text = 'line break';
-    chatState.input?.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Enter', shiftKey: true }));
+    chatState.input?.dispatchEvent(
+      new KeyboardEvent('keydown', { bubbles: true, key: 'Enter', shiftKey: true })
+    );
     document.body.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Enter' }));
     await vi.runAllTimersAsync();
 
@@ -371,7 +438,9 @@ describe('focus mode entrypoint', () => {
 
   it('keeps focus at the end when the fixed focus mention is already present', async () => {
     initFocusMode();
-    expect(openFocusModeForAuthor({ authorName: '@FocusedViewer', channelId: 'viewer-channel' })).toBe(true);
+    expect(
+      openFocusModeForAuthor({ authorName: '@FocusedViewer', channelId: 'viewer-channel' })
+    ).toBe(true);
     await vi.runAllTimersAsync();
 
     chatState.text = '@FocusedViewer ready';
@@ -391,7 +460,9 @@ describe('focus mode entrypoint', () => {
     chatState.text = '@TextareaViewer ready';
     document.body.append(input);
 
-    expect(openFocusModeForAuthor({ authorName: '@TextareaViewer', channelId: 'viewer-channel' })).toBe(true);
+    expect(
+      openFocusModeForAuthor({ authorName: '@TextareaViewer', channelId: 'viewer-channel' })
+    ).toBe(true);
     await vi.runAllTimersAsync();
 
     expect(input.selectionStart).toBe(input.value.length);
@@ -402,7 +473,9 @@ describe('focus mode entrypoint', () => {
     chatState.input = null;
     chatState.text = '@MissingInputViewer ready';
 
-    expect(openFocusModeForAuthor({ authorName: '@MissingInputViewer', channelId: 'viewer-channel' })).toBe(true);
+    expect(
+      openFocusModeForAuthor({ authorName: '@MissingInputViewer', channelId: 'viewer-channel' })
+    ).toBe(true);
     await vi.runAllTimersAsync();
 
     expect(replaceChatInput).not.toHaveBeenCalled();
@@ -411,7 +484,9 @@ describe('focus mode entrypoint', () => {
 
   it('ignores document clicks that are not send-button element clicks', async () => {
     initFocusMode();
-    expect(openFocusModeForAuthor({ authorName: '@ClickViewer', channelId: 'viewer-channel' })).toBe(true);
+    expect(
+      openFocusModeForAuthor({ authorName: '@ClickViewer', channelId: 'viewer-channel' })
+    ).toBe(true);
     await vi.runAllTimersAsync();
     chatState.text = 'draft before click';
 
@@ -426,94 +501,77 @@ describe('focus mode entrypoint', () => {
     setOptions({ ...DEFAULT_OPTIONS, targetLanguage: 'en' });
     const focusedMessage = createMessage('@TranslatedFocus', 'hola', 'translated-channel');
     document.body.append(focusedMessage);
-    userHistoryMocks.getUserMessageRecordForMessage.mockReturnValue({
-      translation: {
-        originalText: 'hola',
-        protectedTokens: [],
-        result: { sourceLanguage: 'es', targetLanguage: 'en', text: 'hello' },
-        sourceText: 'hola'
-      }
-    } as never);
+    recordFeedMessage(focusedMessage);
+    emitTranslation(focusedMessage, 'hello');
 
-    expect(openFocusModeForAuthor({ authorName: '@TranslatedFocus', channelId: 'translated-channel' })).toBe(true);
+    expect(
+      openFocusModeForAuthor({ authorName: '@TranslatedFocus', channelId: 'translated-channel' })
+    ).toBe(true);
     await vi.runAllTimersAsync();
 
     expect(document.querySelector('.ytcq-focus-bubble')?.textContent).toContain('hello');
   });
 
-  it('updates and clears focus rows from translation events while expanded', async () => {
+  it('updates and clears translated rows through recent-message history', async () => {
     initFocusMode();
     setOptions({ ...DEFAULT_OPTIONS, targetLanguage: 'en' });
     const focusedMessage = createMessage('@LiveTranslatedFocus', 'hola', 'translated-channel');
     document.body.append(focusedMessage);
+    recordFeedMessage(focusedMessage);
 
-    expect(openFocusModeForAuthor({ authorName: '@LiveTranslatedFocus', channelId: 'translated-channel' })).toBe(true);
+    expect(
+      openFocusModeForAuthor({
+        authorName: '@LiveTranslatedFocus',
+        channelId: 'translated-channel'
+      })
+    ).toBe(true);
     await vi.runAllTimersAsync();
 
-    translationCallbacks.rendered?.({
-      message: focusedMessage,
-      originalText: 'hola',
-      protectedTokens: [],
-      result: { sourceLanguage: 'es', targetLanguage: 'en', text: 'hello' },
-      sourceText: 'hola'
-    });
+    emitTranslation(focusedMessage, 'hello');
     expect(document.querySelector('.ytcq-focus-bubble')?.textContent).toContain('hello');
     expect(queueMocks.prioritize).toHaveBeenCalled();
 
-    translationCallbacks.cleared?.({ message: focusedMessage });
+    emitMessageTranslationCleared(focusedMessage);
     expect(document.querySelector('.ytcq-focus-bubble')?.textContent).not.toContain('hello');
 
-    translationCallbacks.rendered?.({
-      message: focusedMessage,
-      originalText: 'hola',
-      protectedTokens: [],
-      result: { sourceLanguage: 'es', targetLanguage: 'en', text: 'hello again' },
-      sourceText: 'hola'
-    });
-    translationCallbacks.translationsCleared?.();
+    emitTranslation(focusedMessage, 'hello again');
+    emitMessageTranslationsCleared();
     expect(document.querySelector('.ytcq-focus-bubble')?.textContent).not.toContain('hello again');
   });
 
-  it('ignores translation clears for untranslated records and prioritizes detached live refs', async () => {
+  it('ignores missing translations and prioritizes detached history refs', async () => {
     initFocusMode();
     setOptions({ ...DEFAULT_OPTIONS, targetLanguage: 'en' });
     const focusedMessage = createMessage('@DetachedTranslatedFocus', 'hola', 'translated-channel');
     document.body.append(focusedMessage);
+    recordFeedMessage(focusedMessage);
 
-    expect(openFocusModeForAuthor({ authorName: '@DetachedTranslatedFocus', channelId: 'translated-channel' })).toBe(true);
+    expect(
+      openFocusModeForAuthor({
+        authorName: '@DetachedTranslatedFocus',
+        channelId: 'translated-channel'
+      })
+    ).toBe(true);
     await vi.runAllTimersAsync();
 
-    translationCallbacks.cleared?.({ message: focusedMessage });
+    emitMessageTranslationCleared(focusedMessage);
     expect(document.querySelector('.ytcq-focus-bubble')?.textContent).toContain('hola');
 
-    translationCallbacks.rendered?.({
-      message: focusedMessage,
-      originalText: 'hola',
-      protectedTokens: [],
-      result: { sourceLanguage: 'es', targetLanguage: 'en', text: 'hello' },
-      sourceText: 'hola'
-    });
+    emitTranslation(focusedMessage, 'hello');
     focusedMessage.remove();
     queueMocks.prioritize.mockClear();
 
-    translationCallbacks.translationsCleared?.();
+    emitMessageTranslationsCleared();
 
     expect(queueMocks.prioritize).toHaveBeenCalledWith([null]);
   });
 
-  it('ignores translation events when no focus record matches', async () => {
+  it('ignores history changes when no focus panel is open', () => {
     initFocusMode();
     const unknown = createMessage('@UnknownTranslatedFocus', 'hola', 'unknown-channel');
-
-    translationCallbacks.rendered?.({
-      message: unknown,
-      originalText: 'hola',
-      protectedTokens: [],
-      result: { sourceLanguage: 'es', targetLanguage: 'en', text: 'hello' },
-      sourceText: 'hola'
-    });
-    translationCallbacks.cleared?.({ message: unknown });
-    translationCallbacks.translationsCleared?.();
+    recordFeedMessage(unknown);
+    emitTranslation(unknown, 'hello');
+    emitMessageTranslationsCleared();
 
     expect(document.querySelector('.ytcq-focus-card')).toBeNull();
   });
@@ -549,6 +607,17 @@ describe('focus mode entrypoint', () => {
   });
 });
 
+function emitTranslation(message: HTMLElement, text: string): void {
+  const originalText = message.querySelector('[id="message"]')?.textContent?.trim() || '';
+  emitMessageTranslationRendered({
+    message,
+    originalText,
+    protectedTokens: [],
+    result: { sourceLanguage: 'es', targetLanguage: 'en', text },
+    sourceText: originalText
+  });
+}
+
 function createMessage(authorName: string, text: string, channelId: string): HTMLElement {
   const message = document.createElement('yt-live-chat-text-message-renderer');
   message.setAttribute('data-message-id', `${channelId}-${text}`);
@@ -558,6 +627,26 @@ function createMessage(authorName: string, text: string, channelId: string): HTM
     <span id="timestamp">9:30 PM</span>
   `;
   return message;
+}
+
+function recordFeedMessage(message: HTMLElement): void {
+  const authorName = message.querySelector('[id="author-name"]')?.textContent || '';
+  const text = message.querySelector('[id="message"]')?.textContent || '';
+  const messageId = message.getAttribute('data-message-id') || '';
+  const channelId = message.querySelector('a')?.getAttribute('href')?.split('/').pop() || '';
+  historyFeedMocks.onBatch?.([{
+    record: {
+      authorName,
+      channelId,
+      contentParts: [{ text, type: 'text' }],
+      messageId,
+      text,
+      timestamp: Date.now() + historyFeedMocks.nextTimestamp++,
+      timestampText: '9:30 PM'
+    },
+    type: 'upsert'
+  }]);
+  recordUserMessage(message);
 }
 
 function createSendButton(): HTMLElement {

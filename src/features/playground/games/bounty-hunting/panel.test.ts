@@ -1,8 +1,24 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import type { YouTubeChatFeedBatch } from '../../../../youtube/chat-feed/source';
+import type {
+  YouTubeChatAuthor,
+  YouTubeChatFeedAction,
+  YouTubeChatMessageRecord
+} from '../../../../youtube/chat-feed/protocol';
 
 const assetMock = vi.hoisted(() => ({
   emptyAssets: createEmptyBountyHuntingAssetsForMock(),
   getAssets: vi.fn()
+}));
+
+const chatFeedMock = vi.hoisted(() => ({
+  onBatch: null as ((batch: YouTubeChatFeedBatch) => void) | null,
+  recordsById: new Map<string, YouTubeChatMessageRecord>(),
+  subscribe: vi.fn((subscription: { onBatch: (batch: YouTubeChatFeedBatch) => void }) => {
+    chatFeedMock.onBatch = subscription.onBatch;
+    return chatFeedMock.unsubscribe;
+  }),
+  unsubscribe: vi.fn()
 }));
 
 vi.mock('./assets', () => ({
@@ -13,7 +29,18 @@ vi.mock('./assets', () => ({
   getBountyHuntingAssets: assetMock.getAssets
 }));
 
-import { handleFeatureMessage } from '../../../../content/lifecycle';
+vi.mock('../../../../youtube/chat-feed/records', () => ({
+  getYouTubeChatFeedRecordState: vi.fn(() => ({
+    ready: true,
+    records: [...chatFeedMock.recordsById.values()]
+  }))
+}));
+vi.mock('../../../../youtube/chat-feed/source', () => ({
+  isYouTubeChatFeedPage: vi.fn(() => true),
+  subscribeYouTubeChatFeed: chatFeedMock.subscribe
+}));
+
+import { handleFeatureMessage } from '../../../../content/feature-runtime';
 import { initMentionDetection } from '../../../mention-detection';
 import { createGamePanelShell } from '../panel-shell';
 import {
@@ -35,6 +62,10 @@ describe('Bounty Hunting panel', () => {
 
   beforeEach(() => {
     document.body.replaceChildren();
+    chatFeedMock.onBatch = null;
+    chatFeedMock.recordsById.clear();
+    chatFeedMock.subscribe.mockClear();
+    chatFeedMock.unsubscribe.mockClear();
     initMentionDetection();
     assetMock.getAssets.mockReset();
     assetMock.getAssets.mockResolvedValue(assetMock.emptyAssets);
@@ -100,6 +131,33 @@ describe('Bounty Hunting panel', () => {
     expect(onAction).toHaveBeenCalledWith('game-bounty-hunting', 'claimBounty', {
       bountyId: 'mention-user',
       messageId: 'msg-1'
+    });
+  });
+
+  it('witnesses feed messages that have no rendered DOM row', () => {
+    const onAction = vi.fn();
+    const game = createBountyHuntingGame();
+    openBountyHuntingGamePanel(game, 'host-user', onAction);
+
+    rememberTestChatFeedRecord({
+      author: {
+        badges: [],
+        channelId: 'background-channel',
+        name: '@BackgroundViewer'
+      },
+      id: 'background-message',
+      kind: 'text',
+      plainText: 'background @Marco',
+      runs: [{ text: 'background @Marco', type: 'text' }]
+    });
+    updateBountyHuntingGamePanel(game, 'host-user');
+
+    expect(document.querySelector('[data-message-id="background-message"]')).toBeNull();
+    expect(onAction).toHaveBeenCalledWith('game-bounty-hunting', 'observeBountyMessage', {
+      observations: [{
+        bountyIds: ['mention-user'],
+        messageId: 'background-message'
+      }]
     });
   });
 
@@ -301,6 +359,25 @@ describe('Bounty Hunting panel', () => {
     });
   });
 
+  it('does not attach feed timestamps to a DOM row YouTube has recycled', () => {
+    const message = appendChatMessage('original-row', '@Luna', 'old @Marco');
+    openBountyHuntingGamePanel({
+      ...createBountyHuntingGame(),
+      phaseStartedAt: 103_000,
+      roundStartTimestampUsec: '103000000',
+      status: 'active'
+    }, 'host-user', vi.fn());
+
+    handleFeatureMessage(message, { source: 'added' });
+    message.setAttribute('data-message-id', 'reused-row');
+    const originalRecord = chatFeedMock.recordsById.get('original-row');
+    if (!originalRecord) throw new Error('Missing original test feed record.');
+    rememberTestChatFeedRecord({ ...originalRecord, timestampUsec: '103000001' });
+    [...frameCallbacks].forEach((callback) => callback(103_100));
+
+    expect(document.querySelector('.ytcq-bounty-hunting-start-divider')).toBeNull();
+  });
+
   it('marks claimed chat messages inline without a bottom feed', () => {
     const onAction = vi.fn();
     const baseGame = createBountyHuntingGame();
@@ -451,18 +528,15 @@ describe('Bounty Hunting panel', () => {
     appendChatMessage('msg-mention', '@Luna', 'hello @Marco');
     appendChatMessage('msg-number', '@Luna', 'number 123');
     appendChatMessage('msg-emoji', '@Luna', '🤠🤠🤠');
-    const verifiedMessage = appendChatMessage('msg-verified', '@Luna', 'verified message');
-    const verifiedBadge = document.createElement('yt-live-chat-author-badge-renderer');
-    verifiedBadge.setAttribute('type', 'verified');
-    verifiedMessage.append(verifiedBadge);
-    const memberMessage = appendChatMessage('msg-member', '@Luna', 'member message');
-    const memberBadge = document.createElement('yt-live-chat-author-badge-renderer');
-    memberBadge.setAttribute('type', 'member');
-    memberMessage.append(memberBadge);
-    const moderatorMessage = appendChatMessage('msg-moderator', '@Luna', 'moderator message');
-    const moderatorBadge = document.createElement('yt-live-chat-author-badge-renderer');
-    moderatorBadge.setAttribute('type', 'moderator');
-    moderatorMessage.append(moderatorBadge);
+    appendChatMessage('msg-verified', '@Luna', 'verified message', {
+      author: { badges: [{ kind: 'verified', label: 'Verified' }] }
+    });
+    appendChatMessage('msg-member', '@Luna', 'member message', {
+      author: { badges: [{ kind: 'member', label: 'Member' }] }
+    });
+    appendChatMessage('msg-moderator', '@Luna', 'moderator message', {
+      author: { badges: [{ kind: 'moderator', label: 'Moderator' }] }
+    });
     const onAction = vi.fn();
 
     openBountyHuntingGamePanel(createPreparingBountyHuntingGame(), 'host-user', onAction);
@@ -514,6 +588,58 @@ describe('Bounty Hunting panel', () => {
         expect.objectContaining({ id: 'emoji-3' }),
         expect.objectContaining({ id: 'all-caps' }),
         expect.objectContaining({ id: 'question' })
+      ])
+    });
+  });
+
+  it('does not include off-DOM feed history in the preparation sample', async () => {
+    vi.useFakeTimers();
+    let now = 100_000;
+    vi.spyOn(Date, 'now').mockImplementation(() => now);
+    rememberTestChatFeedRecord({
+      author: {
+        badges: [{ kind: 'member', label: 'Member' }],
+        channelId: 'background-member-channel',
+        name: '@BackgroundMember'
+      },
+      id: 'background-member-message',
+      kind: 'text',
+      plainText: 'background member message',
+      runs: [{ text: 'background member message', type: 'text' }]
+    });
+    const onAction = vi.fn();
+
+    openBountyHuntingGamePanel(createPreparingBountyHuntingGame(), 'host-user', onAction);
+    now = 107_000;
+    await vi.advanceTimersByTimeAsync(7_000);
+
+    const submitCall = onAction.mock.calls.find((call) => call[1] === 'submitBounties');
+    expect(submitCall).toBeDefined();
+    expect(submitCall?.[2]).toMatchObject({
+      bounties: expect.not.arrayContaining([
+        expect.objectContaining({ id: 'channel-member' })
+      ])
+    });
+  });
+
+  it('retains rendered messages sampled earlier in preparation', async () => {
+    vi.useFakeTimers();
+    let now = 100_000;
+    vi.spyOn(Date, 'now').mockImplementation(() => now);
+    appendChatMessage('sampled-member-message', '@SampledMember', 'member message', {
+      author: { badges: [{ kind: 'member', label: 'Member' }] }
+    });
+    const onAction = vi.fn();
+
+    openBountyHuntingGamePanel(createPreparingBountyHuntingGame(), 'host-user', onAction);
+    dispatchChatFeedActions([{ id: 'sampled-member-message', type: 'remove' }]);
+    now = 107_000;
+    await vi.advanceTimersByTimeAsync(7_000);
+
+    const submitCall = onAction.mock.calls.find((call) => call[1] === 'submitBounties');
+    expect(submitCall?.[2]).toMatchObject({
+      bounties: expect.arrayContaining([
+        expect.objectContaining({ id: 'channel-member' })
       ])
     });
   });
@@ -1062,7 +1188,7 @@ describe('Bounty Hunting panel', () => {
     }, 'host-user', vi.fn());
     await sendYouTubeMessageTimestamp(firstMessage, '103000001');
     await sendYouTubeMessageTimestamp(secondMessage, '103000002');
-    runLatestBountyHuntingFrame(103_100);
+    runPendingBountyHuntingFrames(103_100);
 
     const divider = getBountyHuntingStartDivider();
     const children = [...getChatItemsContainer().children];
@@ -1081,13 +1207,13 @@ describe('Bounty Hunting panel', () => {
       status: 'active'
     }, 'host-user', vi.fn());
     await sendYouTubeMessageTimestamp(oldMessage, '102999999');
-    runLatestBountyHuntingFrame(103_000);
+    runPendingBountyHuntingFrames(103_000);
     const divider = getBountyHuntingStartDivider();
     const newMessage = appendChatMessage('msg-new', '@Luna', 'new @Marco');
 
     await sendYouTubeMessageTimestamp(newMessage, '103000001');
     handleFeatureMessage(newMessage, { source: 'added' });
-    runLatestBountyHuntingFrame(104_000);
+    runPendingBountyHuntingFrames(104_000);
 
     const children = [...getChatItemsContainer().children];
     expect(children.indexOf(oldMessage)).toBeLessThan(children.indexOf(newMessage));
@@ -1339,7 +1465,13 @@ function createClaimedBounty(id: string, role: 'guest' | 'host'): PublicBountyHu
 function appendChatMessage(
   messageId: string,
   authorName: string,
-  text: string
+  text: string,
+  options: {
+    author?: Partial<YouTubeChatAuthor>;
+    kind?: 'paid' | 'text';
+    runs?: YouTubeChatMessageRecord['runs'];
+    timestampUsec?: string;
+  } = {}
 ): HTMLElement {
   const message = document.createElement('yt-live-chat-text-message-renderer');
   message.setAttribute('data-message-id', messageId);
@@ -1358,18 +1490,47 @@ function appendChatMessage(
 
   message.append(content);
   getChatItemsContainer().append(message);
+  rememberTestChatFeedRecord({
+    author: {
+      badges: [],
+      channelId: `channel-${messageId}`,
+      name: authorName,
+      ...options.author
+    },
+    id: messageId,
+    kind: options.kind || 'text',
+    ...(options.kind === 'paid' ? { paid: { amountText: '$5.00' } } : {}),
+    plainText: text,
+    runs: options.runs || [{ text, type: 'text' }],
+    ...(options.timestampUsec ? { timestampUsec: options.timestampUsec } : {})
+  });
   return message;
 }
 
 async function sendYouTubeMessageTimestamp(message: HTMLElement, timestampUsec: string): Promise<void> {
-  handleFeatureMessage(message, {
-    messageData: Promise.resolve({
-      messageId: message.getAttribute('data-message-id') || message.id,
-      timestampUsec
-    }),
-    source: 'existing'
-  });
+  const id = message.getAttribute('data-message-id') || message.id;
+  const existing = chatFeedMock.recordsById.get(id);
+  if (!existing) throw new Error(`Missing test feed record for ${id}`);
+  rememberTestChatFeedRecord({ ...existing, timestampUsec });
   await Promise.resolve();
+}
+
+function rememberTestChatFeedRecord(record: YouTubeChatMessageRecord): void {
+  chatFeedMock.recordsById.delete(record.id);
+  chatFeedMock.recordsById.set(record.id, record);
+  if (chatFeedMock.onBatch) dispatchChatFeedActions([{ record, type: 'upsert' }]);
+}
+
+function dispatchChatFeedActions(actions: YouTubeChatFeedAction[]): void {
+  chatFeedMock.onBatch?.({
+    activity: 'new',
+    actions,
+    delivery: 'transport',
+    receivedAt: Date.now(),
+    sequence: 1,
+    source: 'live',
+    version: 1
+  });
 }
 
 function runLatestBountyHuntingFrame(now: number): void {
@@ -1383,6 +1544,11 @@ function runLatestBountyHuntingFrame(now: number): void {
   } catch {
     expect(frameCallbacks.length).toBeGreaterThan(0);
   }
+}
+
+function runPendingBountyHuntingFrames(now: number): void {
+  const callbacks = frameCallbacks.splice(0);
+  callbacks.forEach((callback) => callback(now));
 }
 
 function getChatItemsContainer(): HTMLElement {

@@ -105,6 +105,7 @@ function record(overrides: Partial<FocusRecord> = {}): FocusRecord {
   return {
     authorName: '@ExampleUser',
     contentParts: [],
+    historyKey: 'channel:example-user',
     id: 1,
     side: 'them',
     text: 'hello',

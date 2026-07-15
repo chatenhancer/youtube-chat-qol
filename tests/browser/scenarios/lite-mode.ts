@@ -7,12 +7,12 @@
  */
 import { expect, test, type BrowserContext, type Locator, type Request } from '@playwright/test';
 import {
-  LITE_CHAT_BATCH_EVENT,
-  LITE_CHAT_CONTROL_EVENT,
-  LITE_CHAT_PROTOCOL_VERSION,
-  type LiteChatBatch,
-  type LiteChatMessageRecord
-} from '../../../src/features/lite-mode/protocol';
+  YOUTUBE_CHAT_FEED_BATCH_EVENT,
+  YOUTUBE_CHAT_FEED_CONTROL_EVENT,
+  YOUTUBE_CHAT_FEED_PROTOCOL_VERSION,
+  type YouTubeChatFeedTransportBatch,
+  type YouTubeChatMessageRecord
+} from '../../../src/youtube/chat-feed/protocol';
 import { MARKED_USERS_STORAGE_KEY } from '../../../src/shared/marked-users';
 import { clearChatComposerIfVisible, getChatComposerText } from '../support/composer';
 import {
@@ -88,6 +88,8 @@ interface LiteNetworkRequestDiagnostic {
   requestPath: string;
 }
 
+type SyntheticLiteBatch = Omit<YouTubeChatFeedTransportBatch, 'sequence'>;
+
 interface LiteContinuityEvidence {
   nativeDescendantDelta: number;
   postDiscardLiteIds: string[];
@@ -138,6 +140,7 @@ export const liteModeToggleAndRestoreScenario: BrowserScenario = async ({ chat, 
         await expect.poll(() => message.innerText()).not.toBe('');
         await expect(root.locator('.ytcq-lite-toolbar')).toHaveCount(0);
         await expect(button).toBeVisible();
+        await expectLiteAtLiveEdge(root);
       });
 
       await test.step('Disable Lite mode and restore native chat', async () => {
@@ -214,10 +217,10 @@ export const liteModeMockRenderingAndFallbackScenario: BrowserScenario = async (
         const seededHistoryRow = chat.locator('[data-message-id="fixture-message-1"]');
         await expect(seededHistoryRow).toBeVisible();
         await expect(seededHistoryRow.locator('#message')).toContainText('Hola mundo');
+        await waitForRequestedLiteInitialSnapshot(chat);
       });
 
       await test.step('Render a sanitized batch and discard the native list', async () => {
-        const nextSequence = await getNextLiteBatchSequence(chat);
         const primaryRecord = createRecord(
           'lite-browser-message-1',
           'Hello from the lightweight feed'
@@ -245,7 +248,7 @@ export const liteModeMockRenderingAndFallbackScenario: BrowserScenario = async (
         };
         await dispatchLiteBatch(
           chat,
-          createBatch(nextSequence, [
+          createBatch([
             {
               type: 'upsert',
               record: primaryRecord
@@ -337,11 +340,9 @@ export const liteModeMockRenderingAndFallbackScenario: BrowserScenario = async (
       });
 
       await test.step('Release the live edge on a small upward wheel step', async () => {
-        const nextSequence = await getNextLiteBatchSequence(chat);
         await dispatchLiteBatch(
           chat,
           createBatch(
-            nextSequence,
             Array.from({ length: 40 }, (_value, index) => ({
               type: 'upsert',
               record: createRecord(
@@ -372,28 +373,34 @@ export const liteModeMockRenderingAndFallbackScenario: BrowserScenario = async (
           'data-ytcq-following-live-edge',
           'false'
         );
-        await expect.poll(() => scroller.evaluate((element) =>
-          element.scrollHeight - element.clientHeight - element.scrollTop
-        )).toBeGreaterThan(2);
-        await page.waitForTimeout(100);
+        const afterReleaseId = 'lite-browser-scroll-after-release';
+        await dispatchLiteBatch(
+          chat,
+          createBatch([
+            {
+              type: 'upsert',
+              record: createRecord(afterReleaseId, 'Message received while reading older chat')
+            }
+          ])
+        );
+        await expect(chat.locator('.ytcq-lite-new-messages')).toBeVisible();
+        await expect(chat.locator(`[data-message-id="${afterReleaseId}"]`)).toHaveCount(0);
 
-        await scroller.evaluate((element) => {
-          element.scrollTop = element.scrollHeight;
-          element.dispatchEvent(new Event('scroll', { bubbles: true }));
-        });
+        await scroller.hover();
+        await page.mouse.wheel(0, 20);
         await expect(chat.locator(LITE_ROOT_SELECTOR)).toHaveAttribute(
           'data-ytcq-following-live-edge',
           'true'
         );
+        await expect(chat.locator(`[data-message-id="${afterReleaseId}"]`)).toBeVisible();
         await expect.poll(() => scroller.evaluate((element) =>
           element.scrollHeight - element.clientHeight - element.scrollTop
         )).toBeLessThanOrEqual(2);
       });
 
       await test.step('Keep Lite mode after one unsupported feed row', async () => {
-        const nextSequence = await getNextLiteBatchSequence(chat);
         await dispatchLiteBatch(chat, {
-          ...createBatch(nextSequence, []),
+          ...createBatch([]),
           compatibilityWarnings: ['feed:liveChatFutureRenderer'],
           unreadableFeed: true
         });
@@ -403,9 +410,8 @@ export const liteModeMockRenderingAndFallbackScenario: BrowserScenario = async (
       });
 
       await test.step('Reset compatibility health after a supported message', async () => {
-        const nextSequence = await getNextLiteBatchSequence(chat);
         await dispatchLiteBatch(chat, {
-          ...createBatch(nextSequence, [
+          ...createBatch([
             {
               type: 'upsert',
               record: createRecord('lite-browser-health-reset', 'Supported after unknown row')
@@ -418,18 +424,14 @@ export const liteModeMockRenderingAndFallbackScenario: BrowserScenario = async (
       });
 
       await test.step('Reload after three unreadable feed batches without progress', async () => {
-        for (let batchIndex = 0; batchIndex < 3; batchIndex += 1) {
-          const nextSequence = await getNextLiteBatchSequence(chat);
-          await dispatchLiteBatch(chat, {
-            ...createBatch(nextSequence, []),
+        await dispatchLiteBatches(
+          chat,
+          Array.from({ length: 3 }, () => ({
+            ...createBatch([]),
             compatibilityWarnings: ['feed:liveChatFutureRenderer'],
             unreadableFeed: true
-          });
-          if (batchIndex < 2) {
-            await expect(chat.locator(LITE_ROOT_SELECTOR)).toBeVisible();
-            await expect(chat.locator(LITE_NATIVE_RESTORE_SELECTOR)).toHaveCount(0);
-          }
-        }
+          }))
+        );
 
         await expect(chat.locator(LITE_NATIVE_RESTORE_SELECTOR)).toBeVisible({ timeout: 8_000 });
         await expect(chat.locator('.ytcq-lite-handoff-overlay')).toHaveCount(0);
@@ -544,6 +546,7 @@ export const liteModeStoredPreferenceReloadScenario: BrowserScenario = async ({
             }
           )
           .toBe(true);
+        await expectLiteAtLiveEdge(root);
         await expect
           .poll(
             () =>
@@ -561,10 +564,9 @@ export const liteModeStoredPreferenceReloadScenario: BrowserScenario = async ({
       await test.step('Discard native immediately while the reloaded Lite transport connects', async () => {
         await expect(nativeList).toHaveCount(0);
         await expect(chat.locator('html')).toHaveAttribute(LITE_NATIVE_DISCARDED_ATTRIBUTE, 'true');
-        const nextSequence = await getNextLiteBatchSequence(chat);
         await dispatchLiteBatch(
           chat,
-          createBatch(nextSequence, [
+          createBatch([
             {
               type: 'upsert',
               record: createRecord(
@@ -900,18 +902,43 @@ async function expectLiteReplacementTranslation({
   });
 }
 
-async function dispatchLiteBatch(chat: ChatSurface, batch: LiteChatBatch): Promise<void> {
+async function dispatchLiteBatch(chat: ChatSurface, batch: SyntheticLiteBatch): Promise<void> {
+  await dispatchLiteBatches(chat, [batch]);
+}
+
+async function dispatchLiteBatches(
+  chat: ChatSurface,
+  batches: SyntheticLiteBatch[]
+): Promise<void> {
   await chat.locator('body').evaluate(
     (_body, payload) => {
-      window.dispatchEvent(
-        new CustomEvent(payload.eventName, {
-          detail: JSON.stringify(payload.batch)
-        })
-      );
+      const diagnosticSequence =
+        (
+          window as Window & {
+            __ytcqLiteLastBatchSequence?: number;
+          }
+        ).__ytcqLiteLastBatchSequence || 0;
+      const transport = (
+        window as unknown as Record<PropertyKey, { sequence?: unknown } | undefined>
+      )[Symbol.for('ytcq:lite-chat-transport:v1')];
+      const transportSequence = typeof transport?.sequence === 'number' ? transport.sequence : 0;
+      let sequence = Math.max(diagnosticSequence, transportSequence);
+      for (const batch of payload.batches) {
+        sequence += 1;
+        if (transport) transport.sequence = sequence;
+        window.dispatchEvent(
+          new CustomEvent(payload.eventName, {
+            detail: JSON.stringify({
+              ...batch,
+              sequence
+            })
+          })
+        );
+      }
     },
     {
-      batch,
-      eventName: LITE_CHAT_BATCH_EVENT
+      batches,
+      eventName: YOUTUBE_CHAT_FEED_BATCH_EVENT
     }
   );
 }
@@ -1074,8 +1101,8 @@ async function installLiteDiagnostics(chat: ChatSurface): Promise<void> {
       );
     },
     {
-      batch: LITE_CHAT_BATCH_EVENT,
-      control: LITE_CHAT_CONTROL_EVENT,
+      batch: YOUTUBE_CHAT_FEED_BATCH_EVENT,
+      control: YOUTUBE_CHAT_FEED_CONTROL_EVENT,
       fallback: LITE_MODE_FALLBACK_EVENT
     }
   );
@@ -1121,6 +1148,35 @@ async function getLiteDiagnostics(chat: ChatSurface): Promise<LiteClientDiagnost
   });
 }
 
+async function expectLiteAtLiveEdge(root: Locator): Promise<void> {
+  await expect(root).toHaveAttribute('data-ytcq-following-live-edge', 'true');
+  const scroller = root.locator('.ytcq-lite-scroller');
+  await expect.poll(
+    () => scroller.evaluate((element) =>
+      Math.max(0, element.scrollHeight - element.scrollTop - element.clientHeight)
+    ),
+    { message: 'Expected Lite mode to start at the live edge.' }
+  ).toBeLessThanOrEqual(2);
+}
+
+async function waitForRequestedLiteInitialSnapshot(chat: ChatSurface): Promise<void> {
+  await expect.poll(
+    () => chat.locator('body').evaluate(() => {
+      const testWindow = window as Window & {
+        __ytcqLiteBatches?: LiteBatchDiagnostic[];
+        __ytcqLiteControls?: LiteClientDiagnostics['controls'];
+      };
+      const requested = testWindow.__ytcqLiteControls?.some(
+        (control) => control.requestInitial === true
+      );
+      return !requested || testWindow.__ytcqLiteBatches?.some(
+        (batch) => batch.source === 'initial'
+      ) === true;
+    }),
+    { message: 'Expected the requested Lite history snapshot before fault injection.' }
+  ).toBe(true);
+}
+
 async function uninstallLiteDiagnostics(chat: ChatSurface): Promise<void> {
   await chat.locator('body').evaluate(() => {
     const testWindow = window as Window & {
@@ -1153,22 +1209,6 @@ async function clearLiteTestCooldown(chat: ChatSurface): Promise<void> {
   await chat.locator('body').evaluate((_body, key) => {
     window.sessionStorage.removeItem(key);
   }, LITE_SESSION_COOLDOWN_KEY);
-}
-
-async function getNextLiteBatchSequence(chat: ChatSurface): Promise<number> {
-  return chat.locator('body').evaluate(() => {
-    const diagnosticSequence =
-      (
-        window as Window & {
-          __ytcqLiteLastBatchSequence?: number;
-        }
-      ).__ytcqLiteLastBatchSequence || 0;
-    const transport = (
-      window as unknown as Record<PropertyKey, { sequence?: unknown } | undefined>
-    )[Symbol.for('ytcq:lite-chat-transport:v1')];
-    const transportSequence = typeof transport?.sequence === 'number' ? transport.sequence : 0;
-    return Math.max(diagnosticSequence, transportSequence) + 1;
-  });
 }
 
 async function waitForContinuationEvidence({
@@ -1293,17 +1333,16 @@ async function expectStorageValue(
     .toBe(expected);
 }
 
-function createBatch(sequence: number, actions: LiteChatBatch['actions']): LiteChatBatch {
+function createBatch(actions: YouTubeChatFeedTransportBatch['actions']): SyntheticLiteBatch {
   return {
     actions,
     receivedAt: Date.now(),
-    sequence,
     source: 'live',
-    version: LITE_CHAT_PROTOCOL_VERSION
+    version: YOUTUBE_CHAT_FEED_PROTOCOL_VERSION
   };
 }
 
-function createRecord(id: string, text: string): LiteChatMessageRecord {
+function createRecord(id: string, text: string): YouTubeChatMessageRecord {
   return {
     author: {
       badges: [{ label: 'Member' }],

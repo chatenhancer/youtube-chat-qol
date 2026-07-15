@@ -22,7 +22,10 @@ import {
   installMockPlaygroundBackend
 } from '../support/playground-backend';
 import { withExtensionStorageValues } from '../support/extension-storage';
-import { appendMockFixtureMessage } from '../support/mock-page';
+import {
+  appendMockFixtureMessage,
+  emitMockFixtureFeedMessage
+} from '../support/mock-page';
 import type { BrowserScenario, ChatSurface } from './types';
 
 const PLAYGROUND_ENABLED_OPTIONS = {
@@ -753,10 +756,12 @@ export const playgroundBountyHuntingWitnessScenario: BrowserScenario = async ({ 
     });
     await expect(chat.locator('.ytcq-bounty-hunting-game-panel')).toBeVisible();
 
-    const messageId = await appendRequiredMockFixtureMessage(chat, {
+    const messageId = await emitMockFixtureFeedMessage(chat, {
       author: '@WitnessFan',
       text: 'automatic witness for @Marco'
     });
+    if (!messageId) throw new Error('Could not emit Bounty Hunting feed message.');
+    await expect(chat.locator(`[data-message-id="${messageId}"], #${messageId}`)).toHaveCount(0);
 
     const witness = await waitForGameAction(backend, 'observeBountyMessage', (message) =>
       getBountyObservationPayloads(message).some((observation) => observation.messageId === messageId)

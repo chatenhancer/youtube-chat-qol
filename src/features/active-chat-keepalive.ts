@@ -5,7 +5,7 @@
  */
 import { findChatInput, getChatInputText, replaceChatInput } from '../youtube/chat-input';
 import { hideEnhancedEffect } from './enhanced-effect';
-import { registerFeatureLifecycle, suspendFeatures } from '../content/lifecycle';
+import { registerFeature, suspendFeatures } from '../content/feature-runtime';
 
 const ACTIVE_CHAT_PORT_NAME = 'ytcq:active-chat';
 const ACTIVE_CHAT_PING_TYPE = 'ytcq:active-chat-ping';
@@ -27,10 +27,10 @@ interface ReconnectDraft {
   url: string;
 }
 
-registerFeatureLifecycle({
+registerFeature({
   page: {
     init: startActiveChatKeepAlive,
-    cleanupStale: cleanupActiveChatKeepAlive,
+    cleanup: cleanupActiveChatKeepAlive,
     visibilityChanged: resumePendingReconnect
   }
 });

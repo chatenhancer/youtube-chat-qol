@@ -1,12 +1,20 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
-  LITE_CHAT_BATCH_EVENT,
-  LITE_CHAT_CONTROL_EVENT,
-  type LiteChatBatch,
-  type LiteChatMessageRecord
-} from './protocol';
+  YOUTUBE_CHAT_FEED_BATCH_EVENT,
+  YOUTUBE_CHAT_FEED_CONTROL_EVENT,
+  type YouTubeChatFeedTransportBatch,
+  type YouTubeChatMessageRecord
+} from '../../youtube/chat-feed/protocol';
 
-const { requestNativeChatRestoreMock, requestReplayLiteModeReloadMock } = vi.hoisted(() => ({
+const {
+  getYouTubeChatFeedRecordStateMock,
+  requestNativeChatRestoreMock,
+  requestReplayLiteModeReloadMock
+} = vi.hoisted(() => ({
+  getYouTubeChatFeedRecordStateMock: vi.fn<() => {
+    ready: boolean;
+    records: YouTubeChatMessageRecord[];
+  }>(() => ({ ready: false, records: [] })),
   requestNativeChatRestoreMock: vi.fn(),
   requestReplayLiteModeReloadMock: vi.fn()
 }));
@@ -21,16 +29,20 @@ vi.mock('./bootstrap', async (importOriginal) => {
   };
 });
 
+vi.mock('../../youtube/chat-feed/records', () => ({
+  getYouTubeChatFeedRecordState: getYouTubeChatFeedRecordStateMock
+}));
+
 import {
   cleanupLiteMode,
   handleLiteModeDomMutations,
   isLiteModeActive,
-  parseLiteChatBatchDetail,
   refreshLiteMode,
   setLiteModeRowRenderedCallback,
   startLiteMode,
   stopLiteMode
 } from './controller';
+import { parseYouTubeChatFeedBatchDetail } from '../../youtube/chat-feed/batch';
 import {
   clearLiteModeSessionCooldown,
   hasLiteModeSessionCooldown
@@ -48,6 +60,8 @@ describe('Lite mode controller', () => {
     document.body.replaceChildren(createChatPage());
     requestNativeChatRestoreMock.mockReset();
     requestReplayLiteModeReloadMock.mockReset();
+    getYouTubeChatFeedRecordStateMock.mockReset();
+    getYouTubeChatFeedRecordStateMock.mockReturnValue({ ready: false, records: [] });
     clearLiteModeSessionCooldown();
     cleanupLiteMode({ preserveBootstrapIntent: false });
   });
@@ -62,16 +76,18 @@ describe('Lite mode controller', () => {
   it('discards the native renderer immediately and renders the first healthy batch', () => {
     const nativeList = document.querySelector<HTMLElement>('yt-live-chat-item-list-renderer')!;
     appendNativeMessage(nativeList, 'native-before-lite');
+    const initialRecord = createRecord('native-before-lite', 'Native history');
+    getYouTubeChatFeedRecordStateMock.mockReturnValue({
+      ready: true,
+      records: [initialRecord]
+    });
+    const onRow = vi.fn();
+    setLiteModeRowRenderedCallback(onRow);
     const controlDetails: string[] = [];
-    let nativeHistoryAvailableWhenRequested = false;
     const onControl = ((event: CustomEvent<string>) => {
       controlDetails.push(event.detail);
-      const detail = JSON.parse(event.detail) as { requestInitial?: boolean };
-      if (detail.requestInitial) {
-        nativeHistoryAvailableWhenRequested = nativeList.isConnected && nativeList.childElementCount > 0;
-      }
     }) as EventListener;
-    window.addEventListener(LITE_CHAT_CONTROL_EVENT, onControl);
+    window.addEventListener(YOUTUBE_CHAT_FEED_CONTROL_EVENT, onControl, { once: true });
 
     startLiteMode({ clearCooldown: true });
     expect(isLiteModeActive()).toBe(true);
@@ -82,6 +98,12 @@ describe('Lite mode controller', () => {
     expect(document.querySelector('yt-live-chat-item-list-renderer')).toBeNull();
     expect(document.querySelector('template[data-ytcq-lite-native-retainer]')).toBeNull();
     expect(document.documentElement.getAttribute('data-ytcq-lite-native-discarded')).toBe('true');
+    expect(document.querySelector('[data-message-id="native-before-lite"]')).not.toBeNull();
+    expect(onRow).toHaveBeenCalledWith(
+      expect.objectContaining({ isConnected: true }),
+      initialRecord,
+      'existing'
+    );
 
     dispatchBatch(createBatch(1, [{
       type: 'upsert',
@@ -91,13 +113,13 @@ describe('Lite mode controller', () => {
     expect(nativeList.isConnected).toBe(false);
     expect(document.querySelector('[data-message-id="first"]')).not.toBeNull();
     expect(controlDetails.map((detail) => JSON.parse(detail))).toContainEqual({
+      consumer: 'lite',
       enabled: true,
-      requestInitial: true,
       version: 1
     });
-    expect(nativeHistoryAvailableWhenRequested).toBe(true);
-    window.removeEventListener(LITE_CHAT_CONTROL_EVENT, onControl);
-
+    expect(controlDetails.map((detail) => JSON.parse(detail))).not.toContainEqual(
+      expect.objectContaining({ requestInitial: true })
+    );
     stopLiteMode();
     expect(isLiteModeActive()).toBe(false);
     expect(nativeList.isConnected).toBe(false);
@@ -107,6 +129,50 @@ describe('Lite mode controller', () => {
       automaticFailure: false,
       message: 'Loading chat'
     });
+  });
+
+  it('requests a final initial snapshot before discarding an uncached native history', () => {
+    const nativeList = document.querySelector<HTMLElement>('yt-live-chat-item-list-renderer')!;
+    appendNativeMessage(nativeList, 'native-uncached');
+    const controlDetails: string[] = [];
+    let nativeHistoryConnectedOnRequest = false;
+    const onControl = ((event: CustomEvent<string>) => {
+      controlDetails.push(event.detail);
+      const control = JSON.parse(event.detail) as { requestInitial?: boolean };
+      if (control.requestInitial === true) {
+        nativeHistoryConnectedOnRequest =
+          nativeList.isConnected && nativeList.childElementCount > 0;
+      }
+    }) as EventListener;
+    window.addEventListener(YOUTUBE_CHAT_FEED_CONTROL_EVENT, onControl, { once: true });
+
+    startLiteMode({ clearCooldown: true });
+
+    expect(controlDetails.map((detail) => JSON.parse(detail))).toContainEqual({
+      consumer: 'lite',
+      enabled: true,
+      requestInitial: true,
+      version: 1
+    });
+    expect(nativeHistoryConnectedOnRequest).toBe(true);
+    expect(nativeList.isConnected).toBe(false);
+  });
+
+  it('treats an initialized empty shared feed as completed replay startup', async () => {
+    window.history.replaceState({}, '', '/live_chat_replay');
+    getYouTubeChatFeedRecordStateMock.mockReturnValue({ ready: true, records: [] });
+
+    startLiteMode({ clearCooldown: true });
+    const root = document.querySelector<HTMLElement>('.ytcq-lite-root')!;
+
+    expect(root.dataset.ytcqConnectionState).toBe('connected');
+    expect(root.getAttribute('aria-busy')).toBe('false');
+    expect(document.querySelector('.ytcq-lite-empty-state')).not.toBeNull();
+
+    await vi.advanceTimersByTimeAsync(45_000);
+
+    expect(isLiteModeActive()).toBe(true);
+    expect(requestNativeChatRestoreMock).not.toHaveBeenCalled();
   });
 
   it('uses the reload handoff when disabled while Lite is still connecting', () => {
@@ -331,7 +397,7 @@ describe('Lite mode controller', () => {
   it('reloads native chat and sets a session cooldown for malformed batches', () => {
     const nativeList = document.querySelector<HTMLElement>('yt-live-chat-item-list-renderer')!;
     startLiteMode({ clearCooldown: true });
-    window.dispatchEvent(new CustomEvent(LITE_CHAT_BATCH_EVENT, { detail: '{broken' }));
+    window.dispatchEvent(new CustomEvent(YOUTUBE_CHAT_FEED_BATCH_EVENT, { detail: '{broken' }));
 
     expect(isLiteModeActive()).toBe(false);
     expect(nativeList.isConnected).toBe(false);
@@ -528,6 +594,63 @@ describe('Lite mode controller', () => {
     expect(requestNativeChatRestoreMock).toHaveBeenCalledWith({
       automaticFailure: true,
       fallbackCode: 'LM06',
+      message: 'Loading chat'
+    });
+  });
+
+  it('waits for YouTube to recover from a transient replay response', async () => {
+    window.history.replaceState({}, '', '/live_chat_replay');
+    getYouTubeChatFeedRecordStateMock.mockReturnValue({ ready: true, records: [] });
+    startLiteMode({ clearCooldown: true });
+    const root = document.querySelector<HTMLElement>('.ytcq-lite-root')!;
+
+    dispatchBatch({
+      ...createBatch(1, []),
+      fatalErrors: ['response:http-503'],
+      source: 'replay'
+    });
+
+    expect(isLiteModeActive()).toBe(true);
+    expect(root.dataset.ytcqConnectionState).toBe('connecting');
+    expect(requestNativeChatRestoreMock).not.toHaveBeenCalled();
+
+    await vi.advanceTimersByTimeAsync(44_999);
+    dispatchBatch({
+      ...createBatch(2, [{ type: 'upsert', record: createRecord('recovered', 'Recovered') }]),
+      source: 'replay'
+    });
+    await vi.advanceTimersByTimeAsync(1);
+
+    expect(isLiteModeActive()).toBe(true);
+    expect(root.dataset.ytcqConnectionState).toBe('connected');
+    expect(document.querySelector('[data-message-id="recovered"]')).not.toBeNull();
+    expect(requestNativeChatRestoreMock).not.toHaveBeenCalled();
+  });
+
+  it('does not extend Lite recovery forever across repeated transient failures', async () => {
+    window.history.replaceState({}, '', '/live_chat_replay');
+    getYouTubeChatFeedRecordStateMock.mockReturnValue({ ready: true, records: [] });
+    startLiteMode({ clearCooldown: true });
+
+    dispatchBatch({
+      ...createBatch(1, []),
+      fatalErrors: ['response:http-503'],
+      source: 'replay'
+    });
+    await vi.advanceTimersByTimeAsync(30_000);
+    dispatchBatch({
+      ...createBatch(2, []),
+      fatalErrors: ['response:http-429'],
+      source: 'replay'
+    });
+    await vi.advanceTimersByTimeAsync(14_999);
+    expect(isLiteModeActive()).toBe(true);
+
+    await vi.advanceTimersByTimeAsync(1);
+    expect(isLiteModeActive()).toBe(false);
+    expect(requestNativeChatRestoreMock).toHaveBeenCalledWith({
+      automaticFailure: true,
+      fallbackCode: 'LM01',
       message: 'Loading chat'
     });
   });
@@ -891,29 +1014,29 @@ describe('Lite mode controller', () => {
 
   it('validates bounded batches independently of the page-world transport', () => {
     const valid = createBatch(1, [{ type: 'upsert', record: createRecord('one', 'One') }]);
-    expect(parseLiteChatBatchDetail(JSON.stringify(valid))).toEqual(valid);
-    const diagnosticBatch: LiteChatBatch = {
+    expect(parseYouTubeChatFeedBatchDetail(JSON.stringify(valid))).toEqual(valid);
+    const diagnosticBatch: YouTubeChatFeedTransportBatch = {
       ...valid,
       compatibilityWarnings: ['feed:liveChatFutureRenderer'],
       fatalErrors: ['response:invalid-json'],
       unreadableFeed: true
     };
-    expect(parseLiteChatBatchDetail(JSON.stringify(diagnosticBatch))).toEqual(diagnosticBatch);
-    expect(parseLiteChatBatchDetail(valid)).toBeNull();
-    expect(parseLiteChatBatchDetail(JSON.stringify({ ...valid, version: 2 }))).toBeNull();
-    expect(parseLiteChatBatchDetail(JSON.stringify({
+    expect(parseYouTubeChatFeedBatchDetail(JSON.stringify(diagnosticBatch))).toEqual(diagnosticBatch);
+    expect(parseYouTubeChatFeedBatchDetail(valid)).toBeNull();
+    expect(parseYouTubeChatFeedBatchDetail(JSON.stringify({ ...valid, version: 2 }))).toBeNull();
+    expect(parseYouTubeChatFeedBatchDetail(JSON.stringify({
       ...valid,
       compatibilityWarnings: [false]
     }))).toBeNull();
-    expect(parseLiteChatBatchDetail(JSON.stringify({
+    expect(parseYouTubeChatFeedBatchDetail(JSON.stringify({
       ...valid,
       unreadableFeed: 'yes'
     }))).toBeNull();
-    expect(parseLiteChatBatchDetail(JSON.stringify({
+    expect(parseYouTubeChatFeedBatchDetail(JSON.stringify({
       ...valid,
       actions: [{ type: 'remove', id: '' }]
     }))).toBeNull();
-    expect(parseLiteChatBatchDetail(JSON.stringify({
+    expect(parseYouTubeChatFeedBatchDetail(JSON.stringify({
       ...valid,
       actions: [{
         type: 'upsert',
@@ -923,7 +1046,7 @@ describe('Lite mode controller', () => {
         }
       }]
     }))).toBeNull();
-    expect(parseLiteChatBatchDetail(JSON.stringify({
+    expect(parseYouTubeChatFeedBatchDetail(JSON.stringify({
       ...valid,
       actions: [{
         type: 'upsert',
@@ -939,7 +1062,7 @@ describe('Lite mode controller', () => {
     }))).toBeNull();
     const moderatorRecord = createRecord('moderator', 'Safe');
     moderatorRecord.author!.badges = [{ kind: 'moderator', label: 'Moderator' }];
-    expect(parseLiteChatBatchDetail(JSON.stringify(
+    expect(parseYouTubeChatFeedBatchDetail(JSON.stringify(
       createBatch(2, [{ type: 'upsert', record: moderatorRecord }])
     ))).not.toBeNull();
     const ownerRecord = createRecord('owner', 'Safe owner');
@@ -948,10 +1071,10 @@ describe('Lite mode controller', () => {
       isOwner: true,
       name: '@Owner'
     };
-    expect(parseLiteChatBatchDetail(JSON.stringify(
+    expect(parseYouTubeChatFeedBatchDetail(JSON.stringify(
       createBatch(3, [{ type: 'upsert', record: ownerRecord }])
     ))).not.toBeNull();
-    expect(parseLiteChatBatchDetail(JSON.stringify({
+    expect(parseYouTubeChatFeedBatchDetail(JSON.stringify({
       ...valid,
       actions: [{
         type: 'upsert',
@@ -964,22 +1087,22 @@ describe('Lite mode controller', () => {
         }
       }]
     }))).toBeNull();
-    expect(parseLiteChatBatchDetail(JSON.stringify(createBatch(3, [{
+    expect(parseYouTubeChatFeedBatchDetail(JSON.stringify(createBatch(3, [{
       replayOffsetMs: 5_000,
       type: 'upsert',
       record: createRecord('timed', 'Timed')
     }])))).not.toBeNull();
-    expect(parseLiteChatBatchDetail(JSON.stringify(createBatch(4, [{
+    expect(parseYouTubeChatFeedBatchDetail(JSON.stringify(createBatch(4, [{
       replayOffsetMs: -1,
       type: 'upsert',
       record: createRecord('invalid-timing', 'Invalid timing')
     }])))).toBeNull();
-    expect(parseLiteChatBatchDetail(JSON.stringify({
+    expect(parseYouTubeChatFeedBatchDetail(JSON.stringify({
       ...createBatch(5, []),
       replayPlayerOffsetMs: 5_000,
       source: 'replay'
     }))).not.toBeNull();
-    expect(parseLiteChatBatchDetail(JSON.stringify({
+    expect(parseYouTubeChatFeedBatchDetail(JSON.stringify({
       ...createBatch(6, []),
       replayPlayerOffsetMs: -1,
       source: 'replay'
@@ -999,7 +1122,7 @@ function createChatPage(): HTMLElement {
   return app;
 }
 
-function createBatch(sequence: number, actions: LiteChatBatch['actions']): LiteChatBatch {
+function createBatch(sequence: number, actions: YouTubeChatFeedTransportBatch['actions']): YouTubeChatFeedTransportBatch {
   return {
     actions,
     receivedAt: Date.now(),
@@ -1009,7 +1132,7 @@ function createBatch(sequence: number, actions: LiteChatBatch['actions']): LiteC
   };
 }
 
-function createRecord(id: string, text: string): LiteChatMessageRecord {
+function createRecord(id: string, text: string): YouTubeChatMessageRecord {
   return {
     author: { badges: [], channelId: 'UCExample', name: '@Example' },
     id,
@@ -1019,8 +1142,8 @@ function createRecord(id: string, text: string): LiteChatMessageRecord {
   };
 }
 
-function dispatchBatch(batch: LiteChatBatch): void {
-  window.dispatchEvent(new CustomEvent(LITE_CHAT_BATCH_EVENT, {
+function dispatchBatch(batch: YouTubeChatFeedTransportBatch): void {
+  window.dispatchEvent(new CustomEvent(YOUTUBE_CHAT_FEED_BATCH_EVENT, {
     detail: JSON.stringify(batch)
   }));
 }

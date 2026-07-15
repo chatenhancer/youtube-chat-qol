@@ -17,6 +17,7 @@ export interface FocusRecord {
   authorName: string;
   contentParts: RichTextSegment[];
   id: number;
+  historyKey: string;
   messageId?: string;
   messageRef?: WeakRef<HTMLElement>;
   side: 'them' | 'us';

@@ -22,86 +22,22 @@ describe('current-user mention detection', () => {
     expect(mentionDetection.isCurrentUserAuthorName('@OtherViewer')).toBe(false);
   });
 
-  it('detects messages that mention the current user without matching self-authored messages', async () => {
-    document.body.append(createIdentitySurface('@CurrentViewer'));
+  it('notifies feed consumers when mention candidates become available', async () => {
     const mentionDetection = await import('./mention-detection');
-    const onMention = vi.fn();
+    const listener = vi.fn();
+    const unsubscribe = mentionDetection.onMentionCandidatesChanged(listener);
 
-    mentionDetection.processPotentialMentionForConsumer(
-      createMessage('@OtherViewer', 'hello @CurrentViewer'),
-      'ytcqMentionChecked',
-      onMention
-    );
-    mentionDetection.processPotentialMentionForConsumer(
-      createMessage('@CurrentViewer', 'hello @CurrentViewer'),
-      'ytcqMentionChecked',
-      onMention
-    );
-
-    expect(onMention).toHaveBeenCalledOnce();
-  });
-
-  it('waits for identity discovery before flushing pending mention messages', async () => {
-    const mentionDetection = await import('./mention-detection');
-    const processor = vi.fn();
-    const message = createMessage('@OtherViewer', 'hello @CurrentViewer');
-
-    mentionDetection.registerMentionProcessor(processor);
-    mentionDetection.processPotentialMentionForConsumer(message, 'ytcqMentionChecked', vi.fn());
-
-    expect(processor).not.toHaveBeenCalled();
+    mentionDetection.initMentionDetection();
+    expect(listener).not.toHaveBeenCalled();
 
     document.body.append(createIdentitySurface('@CurrentViewer'));
     mentionDetection.initMentionDetection();
+    expect(listener).toHaveBeenCalledWith(['@currentviewer']);
 
-    expect(processor).toHaveBeenCalledWith(message);
-  });
-
-  it('does not match handles embedded inside longer handle text', async () => {
-    document.body.append(createIdentitySurface('@CurrentViewer'));
-    const mentionDetection = await import('./mention-detection');
-    const onMention = vi.fn();
-
-    mentionDetection.processPotentialMentionForConsumer(
-      createMessage('@OtherViewer', 'hello @CurrentViewerExtra'),
-      'ytcqMentionChecked',
-      onMention
-    );
-
-    expect(onMention).not.toHaveBeenCalled();
-  });
-
-  it('continues searching when the first handle occurrence is embedded but a later one is valid', async () => {
-    document.body.append(createIdentitySurface('@CurrentViewer'));
-    const mentionDetection = await import('./mention-detection');
-    const onMention = vi.fn();
-
-    mentionDetection.processPotentialMentionForConsumer(
-      createMessage('@OtherViewer', 'hello @CurrentViewer_name and @CurrentViewer'),
-      'ytcqMentionChecked',
-      onMention
-    );
-
-    expect(onMention).toHaveBeenCalledOnce();
-  });
-
-  it('matches handles with punctuation boundaries and ignores messages with no text', async () => {
-    document.body.append(createIdentitySurface('@CurrentViewer'));
-    const mentionDetection = await import('./mention-detection');
-    const onMention = vi.fn();
-
-    mentionDetection.processPotentialMentionForConsumer(
-      createMessage('@OtherViewer', 'hello, @CurrentViewer!'),
-      'ytcqMentionChecked',
-      onMention
-    );
-    mentionDetection.processPotentialMentionForConsumer(
-      createMessage('@OtherViewer', ''),
-      'ytcqMentionChecked',
-      onMention
-    );
-
-    expect(onMention).toHaveBeenCalledOnce();
+    unsubscribe();
+    document.body.querySelector('#author-name')!.textContent = '@NextViewer';
+    mentionDetection.initMentionDetection();
+    expect(listener).toHaveBeenCalledOnce();
   });
 
   it('derives candidates from plain handles and channel URL handles', async () => {
@@ -135,58 +71,9 @@ describe('current-user mention detection', () => {
     expect(mentionDetection.getCurrentMentionDisplayHandle()).toBe('@CurrentViewerAlt');
   });
 
-  it('ignores already-checked and disconnected messages', async () => {
-    document.body.append(createIdentitySurface('@CurrentViewer'));
-    const mentionDetection = await import('./mention-detection');
-    const onMention = vi.fn();
-    const checked = createMessage('@OtherViewer', 'hello @CurrentViewer');
-    checked.dataset.ytcqMentionChecked = 'true';
-    const disconnected = createMessage('@OtherViewer', 'hello @CurrentViewer');
-    disconnected.remove();
-
-    mentionDetection.processPotentialMentionForConsumer(checked, 'ytcqMentionChecked', onMention);
-    mentionDetection.processPotentialMentionForConsumer(disconnected, 'ytcqMentionChecked', onMention);
-
-    expect(onMention).not.toHaveBeenCalled();
-  });
-
-  it('does not flush disconnected pending mention messages after identity discovery', async () => {
-    const mentionDetection = await import('./mention-detection');
-    const processor = vi.fn();
-    const message = createMessage('@OtherViewer', 'hello @CurrentViewer');
-
-    mentionDetection.registerMentionProcessor(processor);
-    mentionDetection.processPotentialMentionForConsumer(message, 'ytcqMentionChecked', vi.fn());
-    message.remove();
-    document.body.append(createIdentitySurface('@CurrentViewer'));
-    mentionDetection.initMentionDetection();
-
-    expect(processor).not.toHaveBeenCalled();
-  });
-
-  it('caps pending mention messages while waiting for identity discovery', async () => {
-    const mentionDetection = await import('./mention-detection');
-    const processor = vi.fn();
-    mentionDetection.registerMentionProcessor(processor);
-    for (let index = 0; index < 45; index += 1) {
-      mentionDetection.processPotentialMentionForConsumer(
-        createMessage('@OtherViewer', `hello @CurrentViewer ${index}`),
-        'ytcqMentionChecked',
-        vi.fn()
-      );
-    }
-
-    document.body.append(createIdentitySurface('@CurrentViewer'));
-    mentionDetection.initMentionDetection();
-
-    expect(processor).toHaveBeenCalledTimes(40);
-    const processedTexts = processor.mock.calls.map(([message]) => (message as HTMLElement).textContent || '');
-    expect(processedTexts.some((text) => text.includes('hello @CurrentViewer 0'))).toBe(false);
-  });
-
   it('refreshes candidates from lifecycle mutation batches', async () => {
     const mentionDetection = await import('./mention-detection');
-    const { handleFeatureMutations } = await import('../content/lifecycle');
+    const { handleFeatureMutations } = await import('../content/feature-runtime');
     mentionDetection.initMentionDetection();
     expect(mentionDetection.getCurrentMentionCandidates()).toEqual([]);
 
@@ -214,7 +101,7 @@ describe('current-user mention detection', () => {
   it('ignores unrelated mutations and coalesces pending identity refreshes', async () => {
     const setTimeoutSpy = vi.spyOn(window, 'setTimeout');
     const mentionDetection = await import('./mention-detection');
-    const { handleFeatureMutations } = await import('../content/lifecycle');
+    const { handleFeatureMutations } = await import('../content/feature-runtime');
     const unrelated = document.createElement('div');
     document.body.append(unrelated);
 
@@ -260,7 +147,7 @@ describe('current-user mention detection', () => {
     const author = surface.querySelector('#author-name')!;
     document.body.append(surface);
     const mentionDetection = await import('./mention-detection');
-    const { handleFeatureMutations } = await import('../content/lifecycle');
+    const { handleFeatureMutations } = await import('../content/feature-runtime');
     mentionDetection.initMentionDetection();
 
     author.textContent = '@AfterViewer';
@@ -285,7 +172,7 @@ describe('current-user mention detection', () => {
 
   it('refreshes identity when the identity container itself is the mutation target', async () => {
     const mentionDetection = await import('./mention-detection');
-    const { handleFeatureMutations } = await import('../content/lifecycle');
+    const { handleFeatureMutations } = await import('../content/feature-runtime');
     const surface = createIdentitySurface('@TargetViewer');
     document.body.append(surface);
 
@@ -310,7 +197,7 @@ describe('current-user mention detection', () => {
 
   it('refreshes identity when an added wrapper contains an identity surface', async () => {
     const mentionDetection = await import('./mention-detection');
-    const { handleFeatureMutations } = await import('../content/lifecycle');
+    const { handleFeatureMutations } = await import('../content/feature-runtime');
     const wrapper = document.createElement('div');
     wrapper.append(createIdentitySurface('@WrappedViewer'));
     document.body.append(wrapper);
@@ -336,7 +223,7 @@ describe('current-user mention detection', () => {
 
   it('cancels a pending mention identity refresh during stale cleanup', async () => {
     const mentionDetection = await import('./mention-detection');
-    const { cleanupStaleFeatures, handleFeatureMutations } = await import('../content/lifecycle');
+    const { cleanupFeatures, handleFeatureMutations } = await import('../content/feature-runtime');
     const surface = createIdentitySurface('@CanceledViewer');
     document.body.append(surface);
 
@@ -354,7 +241,7 @@ describe('current-user mention detection', () => {
         type: 'childList'
       }]
     });
-    cleanupStaleFeatures();
+    cleanupFeatures();
     surface.remove();
     await vi.runOnlyPendingTimersAsync();
 
@@ -366,14 +253,4 @@ function createIdentitySurface(authorName: string): HTMLElement {
   const surface = document.createElement('yt-live-chat-message-input-renderer');
   surface.innerHTML = `<span id="author-name">${authorName}</span>`;
   return surface;
-}
-
-function createMessage(authorName: string, text: string): HTMLElement {
-  const message = document.createElement('yt-live-chat-text-message-renderer');
-  message.innerHTML = `
-    <span id="author-name">${authorName}</span>
-    <span id="message">${text}</span>
-  `;
-  document.body.append(message);
-  return message;
 }

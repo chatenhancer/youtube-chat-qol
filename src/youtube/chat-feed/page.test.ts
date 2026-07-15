@@ -1,19 +1,15 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
-  YOUTUBE_MESSAGE_DATA_EVENT,
-  YOUTUBE_MESSAGE_DATA_REQUEST_EVENT
-} from './message-data-events';
-import {
-  LITE_CHAT_BATCH_EVENT,
-  LITE_CHAT_CONTROL_EVENT,
-  LITE_MODE_BOOTSTRAP_INTENT_ATTRIBUTE,
-  type LiteChatBatch
-} from '../features/lite-mode/protocol';
+  YOUTUBE_CHAT_FEED_BATCH_EVENT,
+  YOUTUBE_CHAT_FEED_CONTROL_EVENT,
+  YOUTUBE_CHAT_FEED_BOOTSTRAP_INTENT_ATTRIBUTE,
+  type YouTubeChatFeedTransportBatch
+} from './protocol';
 
 const LITE_CHAT_TRANSPORT_STATE_KEY = Symbol.for('ytcq:lite-chat-transport:v1');
 const originalWindowFetch = window.fetch;
 
-describe('YouTube message data page adapter', () => {
+describe('YouTube chat feed page transport', () => {
   beforeEach(() => {
     window.history.replaceState({}, '', '/live_chat');
   });
@@ -21,106 +17,20 @@ describe('YouTube message data page adapter', () => {
   afterEach(() => {
     vi.useRealTimers();
     cleanupLiteChatTransport();
-    document.documentElement.removeAttribute(LITE_MODE_BOOTSTRAP_INTENT_ATTRIBUTE);
+    document.documentElement.removeAttribute(YOUTUBE_CHAT_FEED_BOOTSTRAP_INTENT_ATTRIBUTE);
     Reflect.deleteProperty(globalThis, 'ytInitialData');
     document.body.replaceChildren();
-  });
-
-  it('emits sanitized data from requested messages, dedupes repeats, and retries late renderer data', async () => {
-    vi.resetModules();
-    vi.useFakeTimers();
-    document.body.replaceChildren();
-    const events: CustomEvent<string>[] = [];
-    window.addEventListener(YOUTUBE_MESSAGE_DATA_EVENT, (event) => {
-      if (event instanceof CustomEvent && typeof event.detail === 'string') events.push(event);
-    });
-    await import('./message-data-page');
-
-    const message = document.createElement('yt-live-chat-text-message-renderer') as HTMLElement & { data?: unknown };
-    message.id = 'msg-1';
-    message.data = {
-      authorExternalChannelId: 'UC123',
-      authorName: { runs: [{ text: '@Example' }] },
-      authorPhoto: {
-        thumbnails: [
-          { url: 'https://example.test/small.jpg' },
-          { url: 'https://example.test/large.jpg' }
-        ]
-      },
-      ignored: { raw: true },
-      timestampUsec: '1782000000000000'
-    };
-    document.body.append(message);
-
-    expect(events).toEqual([]);
-
-    message.dispatchEvent(new CustomEvent(YOUTUBE_MESSAGE_DATA_REQUEST_EVENT, {
-      bubbles: true,
-      composed: true
-    }));
-
-    expect(events).toHaveLength(1);
-    expect(events[0].target).toBe(message);
-    expect(JSON.parse(events[0].detail || '{}')).toEqual({
-      authorExternalChannelId: 'UC123',
-      authorName: '@Example',
-      authorPhotoUrl: 'https://example.test/large.jpg',
-      messageId: 'msg-1',
-      timestampUsec: '1782000000000000'
-    });
-
-    message.dispatchEvent(new CustomEvent(YOUTUBE_MESSAGE_DATA_REQUEST_EVENT, {
-      bubbles: true,
-      composed: true
-    }));
-
-    expect(events).toHaveLength(1);
-
-    const lateMessage = document.createElement('yt-live-chat-text-message-renderer') as HTMLElement & { data?: unknown };
-    lateMessage.id = 'msg-2';
-    document.body.append(lateMessage);
-    lateMessage.dispatchEvent(new CustomEvent(YOUTUBE_MESSAGE_DATA_REQUEST_EVENT, {
-      bubbles: true,
-      composed: true
-    }));
-
-    expect(events).toHaveLength(1);
-
-    lateMessage.data = {
-      authorName: { simpleText: '@Late' },
-      timestampUsec: '1782000000000001'
-    };
-    await vi.advanceTimersByTimeAsync(0);
-
-    expect(events).toHaveLength(2);
-    expect(events[1].target).toBe(lateMessage);
-    expect(JSON.parse(events[1].detail || '{}')).toEqual({
-      authorName: '@Late',
-      messageId: 'msg-2',
-      timestampUsec: '1782000000000001'
-    });
-
-    const liteMessage = document.createElement('div');
-    liteMessage.className = 'ytcq-lite-message';
-    document.body.append(liteMessage);
-    liteMessage.dispatchEvent(new CustomEvent(YOUTUBE_MESSAGE_DATA_REQUEST_EVENT, {
-      bubbles: true,
-      composed: true
-    }));
-    await vi.advanceTimersByTimeAsync(1_000);
-
-    expect(events).toHaveLength(2);
   });
 
   it('installs one serialized fetch tap and emits initial and live sanitized batches', async () => {
     vi.resetModules();
     document.body.replaceChildren();
-    const batches: LiteChatBatch[] = [];
+    const batches: YouTubeChatFeedTransportBatch[] = [];
     const listener = (event: Event) => {
       if (!(event instanceof CustomEvent) || typeof event.detail !== 'string') return;
-      batches.push(JSON.parse(event.detail) as LiteChatBatch);
+      batches.push(JSON.parse(event.detail) as YouTubeChatFeedTransportBatch);
     };
-    window.addEventListener(LITE_CHAT_BATCH_EVENT, listener);
+    window.addEventListener(YOUTUBE_CHAT_FEED_BATCH_EVENT, listener);
 
     Object.assign(globalThis, {
       ytInitialData: {
@@ -171,16 +81,16 @@ describe('YouTube message data page adapter', () => {
     });
     window.fetch = fetchMock as typeof window.fetch;
 
-    await import('./message-data-page');
+    await import('./page');
     const installedWrapper = window.fetch;
-    window.dispatchEvent(new CustomEvent(LITE_CHAT_CONTROL_EVENT, {
-      detail: { enabled: true, version: 1 }
+    window.dispatchEvent(new CustomEvent(YOUTUBE_CHAT_FEED_CONTROL_EVENT, {
+      detail: { consumer: 'lite', enabled: true, version: 1 }
     }));
     await flushAsyncWork();
     expect(batches).toEqual([]);
 
-    window.dispatchEvent(new CustomEvent(LITE_CHAT_CONTROL_EVENT, {
-      detail: JSON.stringify({ enabled: true, requestInitial: true, version: 1 })
+    window.dispatchEvent(new CustomEvent(YOUTUBE_CHAT_FEED_CONTROL_EVENT, {
+      detail: JSON.stringify({ consumer: 'lite', enabled: true, requestInitial: true, version: 1 })
     }));
     await flushAsyncWork();
 
@@ -196,7 +106,7 @@ describe('YouTube message data page adapter', () => {
     });
 
     const returnedPromise = window.fetch('https://www.youtube.com/youtubei/v1/live_chat/get_live_chat?prettyPrint=false');
-    expect(returnedPromise).not.toBe(originalPromise);
+    expect(returnedPromise).toBe(originalPromise);
     await returnedPromise;
     await flushAsyncWork();
 
@@ -214,29 +124,237 @@ describe('YouTube message data page adapter', () => {
     expect(JSON.stringify(batches)).not.toContain('must-not-cross');
 
     vi.resetModules();
-    await import('./message-data-page');
+    await import('./page');
     expect(window.fetch).toBe(installedWrapper);
 
-    window.dispatchEvent(new CustomEvent(LITE_CHAT_CONTROL_EVENT, {
-      detail: JSON.stringify({ enabled: false, version: 1 })
+    window.dispatchEvent(new CustomEvent(YOUTUBE_CHAT_FEED_CONTROL_EVENT, {
+      detail: JSON.stringify({ consumer: 'lite', enabled: false, version: 1 })
     }));
     await window.fetch('https://www.youtube.com/youtubei/v1/live_chat/get_live_chat');
     await flushAsyncWork();
     expect(batches).toHaveLength(2);
 
-    window.removeEventListener(LITE_CHAT_BATCH_EVENT, listener);
+    window.removeEventListener(YOUTUBE_CHAT_FEED_BATCH_EVENT, listener);
+  });
+
+  it('marks live client-message replacements as history snapshots', async () => {
+    vi.resetModules();
+    const batches: YouTubeChatFeedTransportBatch[] = [];
+    const listener = collectLiteChatBatches(batches);
+    window.addEventListener(YOUTUBE_CHAT_FEED_BATCH_EVENT, listener);
+    window.fetch = vi.fn(() => Promise.resolve(jsonResponse({
+      continuationContents: {
+        liveChatContinuation: {
+          actions: [textAction('refreshed-history', 'Refreshed history')],
+          clientMessages: []
+        }
+      }
+    }))) as typeof window.fetch;
+
+    await import('./page');
+    dispatchLiteChatControl(true);
+    await window.fetch('https://www.youtube.com/youtubei/v1/live_chat/get_live_chat');
+    await waitForLiteChatBatchCount(batches, 1);
+
+    expect(batches[0]).toMatchObject({
+      actions: [
+        { type: 'reset' },
+        { record: { id: 'refreshed-history' }, type: 'upsert' }
+      ],
+      snapshot: true,
+      source: 'live'
+    });
+    window.removeEventListener(YOUTUBE_CHAT_FEED_BATCH_EVENT, listener);
+  });
+
+  it('captures currently rendered native rows as additive existing records', async () => {
+    vi.resetModules();
+    document.body.replaceChildren();
+    const batches: YouTubeChatFeedTransportBatch[] = [];
+    const listener = collectLiteChatBatches(batches);
+    window.addEventListener(YOUTUBE_CHAT_FEED_BATCH_EVENT, listener);
+    window.fetch = vi.fn(() => Promise.resolve(jsonResponse({}))) as typeof window.fetch;
+
+    await import('./page');
+    window.dispatchEvent(new CustomEvent(YOUTUBE_CHAT_FEED_CONTROL_EVENT, {
+      detail: JSON.stringify({
+        consumer: 'records',
+        enabled: true,
+        requestInitial: true,
+        version: 1
+      })
+    }));
+    await waitForLiteChatBatchCount(batches, 1);
+    batches.length = 0;
+
+    document.body.append(
+      createNativeMessage('rendered-first', 'First rendered row'),
+      createNativeMessage('rendered-second', 'Second rendered row')
+    );
+    window.dispatchEvent(new CustomEvent(YOUTUBE_CHAT_FEED_CONTROL_EVENT, {
+      detail: JSON.stringify({
+        consumer: 'records',
+        enabled: true,
+        requestRendered: true,
+        version: 1
+      })
+    }));
+    await waitForLiteChatBatchCount(batches, 1);
+
+    expect(batches).toHaveLength(1);
+    expect(batches[0]).toMatchObject({
+      actions: [
+        { record: { id: 'rendered-first' }, type: 'upsert' },
+        { record: { id: 'rendered-second' }, type: 'upsert' }
+      ],
+      source: 'initial'
+    });
+    expect(batches[0].actions).not.toContainEqual({ type: 'reset' });
+    expect(batches[0].snapshot).toBeUndefined();
+    window.removeEventListener(YOUTUBE_CHAT_FEED_BATCH_EVENT, listener);
+  });
+
+  it('keeps one fetch tap active until Lite, Inbox, and record consumers all disable', async () => {
+    vi.resetModules();
+    const batches: YouTubeChatFeedTransportBatch[] = [];
+    const listener = collectLiteChatBatches(batches);
+    window.addEventListener(YOUTUBE_CHAT_FEED_BATCH_EVENT, listener);
+    const originalPromises: Array<Promise<Response>> = [];
+    let responseIndex = 0;
+    const fetchMock = vi.fn(() => {
+      responseIndex += 1;
+      const promise = Promise.resolve(jsonResponse({
+        continuationContents: {
+          liveChatContinuation: {
+            actions: [textAction(`shared-${responseIndex}`, `Shared ${responseIndex}`)]
+          }
+        }
+      }));
+      originalPromises.push(promise);
+      return promise;
+    });
+    window.fetch = fetchMock as typeof window.fetch;
+
+    await import('./page');
+    window.dispatchEvent(new CustomEvent(YOUTUBE_CHAT_FEED_CONTROL_EVENT, {
+      detail: JSON.stringify({ consumer: 'records', enabled: true, version: 1 })
+    }));
+    window.dispatchEvent(new CustomEvent(YOUTUBE_CHAT_FEED_CONTROL_EVENT, {
+      detail: JSON.stringify({ consumer: 'inbox', enabled: true, version: 1 })
+    }));
+    dispatchLiteChatControl(true);
+
+    const sharedFetch = window.fetch(
+      'https://www.youtube.com/youtubei/v1/live_chat/get_live_chat'
+    );
+    expect(sharedFetch).toBe(originalPromises[0]);
+    await sharedFetch;
+    await flushAsyncWork();
+
+    dispatchLiteChatControl(false);
+    const inboxOnlyFetch = window.fetch(
+      'https://www.youtube.com/youtubei/v1/live_chat/get_live_chat'
+    );
+    expect(inboxOnlyFetch).toBe(originalPromises[1]);
+    await inboxOnlyFetch;
+    await flushAsyncWork();
+
+    window.dispatchEvent(new CustomEvent(YOUTUBE_CHAT_FEED_CONTROL_EVENT, {
+      detail: JSON.stringify({ consumer: 'inbox', enabled: false, version: 1 })
+    }));
+    const recordsOnlyFetch = window.fetch(
+      'https://www.youtube.com/youtubei/v1/live_chat/get_live_chat'
+    );
+    expect(recordsOnlyFetch).toBe(originalPromises[2]);
+    await recordsOnlyFetch;
+    await flushAsyncWork();
+
+    window.dispatchEvent(new CustomEvent(YOUTUBE_CHAT_FEED_CONTROL_EVENT, {
+      detail: JSON.stringify({ consumer: 'records', enabled: false, version: 1 })
+    }));
+    const bypassedFetch = window.fetch(
+      'https://www.youtube.com/youtubei/v1/live_chat/get_live_chat'
+    );
+    expect(bypassedFetch).toBe(originalPromises[3]);
+    await bypassedFetch;
+    await flushAsyncWork();
+
+    expect(fetchMock).toHaveBeenCalledTimes(4);
+    expect(batches).toHaveLength(3);
+    expect(batches.flatMap((batch) => batch.actions).map((action) => (
+      action.type === 'upsert' ? action.record.id : action.type
+    ))).toEqual(['shared-1', 'shared-2', 'shared-3']);
+    window.removeEventListener(YOUTUBE_CHAT_FEED_BATCH_EVENT, listener);
+  });
+
+  it('replaces a retained legacy transport before installing consumer reference counting', async () => {
+    vi.resetModules();
+    const registry = window as unknown as Record<PropertyKey, unknown>;
+    const legacyOriginalFetch = vi.fn(() => Promise.resolve(jsonResponse({
+      continuationContents: {
+        liveChatContinuation: {
+          actions: [textAction('replacement-message', 'Replacement message')]
+        }
+      }
+    }))) as typeof window.fetch;
+    const legacyWrapper = vi.fn((...args: Parameters<typeof window.fetch>) => (
+      Reflect.apply(legacyOriginalFetch, window, args) as Promise<Response>
+    )) as typeof window.fetch;
+    const legacyHandleControl = vi.fn();
+    registry[LITE_CHAT_TRANSPORT_STATE_KEY] = {
+      controlResolved: true,
+      enabled: true,
+      handleControl: legacyHandleControl,
+      originalFetch: legacyOriginalFetch,
+      revision: 3,
+      sequence: 7,
+      wrapper: legacyWrapper
+    };
+    window.addEventListener(YOUTUBE_CHAT_FEED_CONTROL_EVENT, legacyHandleControl);
+    window.fetch = legacyWrapper;
+
+    const batches: YouTubeChatFeedTransportBatch[] = [];
+    const listener = collectLiteChatBatches(batches);
+    window.addEventListener(YOUTUBE_CHAT_FEED_BATCH_EVENT, listener);
+    await import('./page');
+
+    const replacementState = registry[LITE_CHAT_TRANSPORT_STATE_KEY] as {
+      consumers?: Set<string>;
+      revision?: number;
+      wrapper?: typeof window.fetch;
+    };
+    expect(replacementState.revision).toBe(4);
+    expect(replacementState.consumers).toBeInstanceOf(Set);
+    expect(window.fetch).toBe(replacementState.wrapper);
+    expect(window.fetch).not.toBe(legacyWrapper);
+
+    window.dispatchEvent(new CustomEvent(YOUTUBE_CHAT_FEED_CONTROL_EVENT, {
+      detail: JSON.stringify({ consumer: 'records', enabled: true, version: 1 })
+    }));
+    dispatchLiteChatControl(true);
+    dispatchLiteChatControl(false);
+    await window.fetch('https://www.youtube.com/youtubei/v1/live_chat/get_live_chat');
+    await flushAsyncWork();
+
+    expect(legacyHandleControl).not.toHaveBeenCalled();
+    expect(legacyWrapper).not.toHaveBeenCalled();
+    expect(legacyOriginalFetch).toHaveBeenCalledOnce();
+    expect(batches.flatMap((batch) => batch.actions)).toEqual([
+      expect.objectContaining({ record: expect.objectContaining({ id: 'replacement-message' }), type: 'upsert' })
+    ]);
+    window.removeEventListener(YOUTUBE_CHAT_FEED_BATCH_EVENT, listener);
   });
 
   it('seeds Lite mode from sanitized native rows when the initial global has no backlog', async () => {
     vi.resetModules();
     document.body.replaceChildren();
-    const batches: LiteChatBatch[] = [];
+    const batches: YouTubeChatFeedTransportBatch[] = [];
     const listener = (event: Event) => {
       if (event instanceof CustomEvent && typeof event.detail === 'string') {
-        batches.push(JSON.parse(event.detail) as LiteChatBatch);
+        batches.push(JSON.parse(event.detail) as YouTubeChatFeedTransportBatch);
       }
     };
-    window.addEventListener(LITE_CHAT_BATCH_EVENT, listener);
+    window.addEventListener(YOUTUBE_CHAT_FEED_BATCH_EVENT, listener);
     window.fetch = vi.fn(() => Promise.resolve(jsonResponse({}))) as typeof window.fetch;
 
     const nativeMessage = document.createElement('yt-live-chat-text-message-renderer') as MessageRendererFixture;
@@ -260,9 +378,9 @@ describe('YouTube message data page adapter', () => {
     };
     document.body.append(nativeMessage);
 
-    await import('./message-data-page');
-    window.dispatchEvent(new CustomEvent(LITE_CHAT_CONTROL_EVENT, {
-      detail: JSON.stringify({ enabled: true, requestInitial: true, version: 1 })
+    await import('./page');
+    window.dispatchEvent(new CustomEvent(YOUTUBE_CHAT_FEED_CONTROL_EVENT, {
+      detail: JSON.stringify({ consumer: 'lite', enabled: true, requestInitial: true, version: 1 })
     }));
     await flushAsyncWork();
 
@@ -285,18 +403,18 @@ describe('YouTube message data page adapter', () => {
       source: 'initial'
     });
     expect(JSON.stringify(batches)).not.toContain('must-not-cross');
-    window.removeEventListener(LITE_CHAT_BATCH_EVENT, listener);
+    window.removeEventListener(YOUTUBE_CHAT_FEED_BATCH_EVENT, listener);
   });
 
   it('uses native history when the optional initial-data global cannot be read', async () => {
     vi.resetModules();
-    const batches: LiteChatBatch[] = [];
+    const batches: YouTubeChatFeedTransportBatch[] = [];
     const listener = (event: Event) => {
       if (event instanceof CustomEvent && typeof event.detail === 'string') {
-        batches.push(JSON.parse(event.detail) as LiteChatBatch);
+        batches.push(JSON.parse(event.detail) as YouTubeChatFeedTransportBatch);
       }
     };
-    window.addEventListener(LITE_CHAT_BATCH_EVENT, listener);
+    window.addEventListener(YOUTUBE_CHAT_FEED_BATCH_EVENT, listener);
     window.fetch = vi.fn(() => Promise.resolve(jsonResponse({}))) as typeof window.fetch;
     Object.defineProperty(globalThis, 'ytInitialData', {
       configurable: true,
@@ -306,9 +424,9 @@ describe('YouTube message data page adapter', () => {
     });
     document.body.append(createNativeMessage('native-without-global', 'Native fallback history'));
 
-    await import('./message-data-page');
-    window.dispatchEvent(new CustomEvent(LITE_CHAT_CONTROL_EVENT, {
-      detail: JSON.stringify({ enabled: true, requestInitial: true, version: 1 })
+    await import('./page');
+    window.dispatchEvent(new CustomEvent(YOUTUBE_CHAT_FEED_CONTROL_EVENT, {
+      detail: JSON.stringify({ consumer: 'lite', enabled: true, requestInitial: true, version: 1 })
     }));
     await flushAsyncWork();
 
@@ -321,18 +439,18 @@ describe('YouTube message data page adapter', () => {
       source: 'initial'
     });
     expect(batches[0].fatalErrors).toBeUndefined();
-    window.removeEventListener(LITE_CHAT_BATCH_EVENT, listener);
+    window.removeEventListener(YOUTUBE_CHAT_FEED_BATCH_EVENT, listener);
   });
 
   it('buffers a replay response that finishes before the first storage control decision', async () => {
     vi.resetModules();
-    const batches: LiteChatBatch[] = [];
+    const batches: YouTubeChatFeedTransportBatch[] = [];
     const listener = (event: Event) => {
       if (event instanceof CustomEvent && typeof event.detail === 'string') {
-        batches.push(JSON.parse(event.detail) as LiteChatBatch);
+        batches.push(JSON.parse(event.detail) as YouTubeChatFeedTransportBatch);
       }
     };
-    window.addEventListener(LITE_CHAT_BATCH_EVENT, listener);
+    window.addEventListener(YOUTUBE_CHAT_FEED_BATCH_EVENT, listener);
     window.fetch = vi.fn(() => Promise.resolve(jsonResponse({
       continuationContents: {
         liveChatContinuation: {
@@ -341,7 +459,7 @@ describe('YouTube message data page adapter', () => {
       }
     }))) as typeof window.fetch;
 
-    await import('./message-data-page');
+    await import('./page');
     await window.fetch('https://www.youtube.com/youtubei/v1/live_chat/get_live_chat_replay');
     await flushAsyncWork();
     expect(batches).toEqual([]);
@@ -351,11 +469,12 @@ describe('YouTube message data page adapter', () => {
     expect(batches).toHaveLength(1);
     expect(batches[0]).toMatchObject({
       actions: [{ record: { id: 'pre-control-replay' }, type: 'upsert' }],
-      source: 'replay'
+      source: 'replay',
+      startup: true
     });
 
-    window.dispatchEvent(new CustomEvent(LITE_CHAT_CONTROL_EVENT, {
-      detail: JSON.stringify({ enabled: true, requestInitial: true, version: 1 })
+    window.dispatchEvent(new CustomEvent(YOUTUBE_CHAT_FEED_CONTROL_EVENT, {
+      detail: JSON.stringify({ consumer: 'lite', enabled: true, requestInitial: true, version: 1 })
     }));
     await flushAsyncWork();
     expect(batches.at(-2)).toMatchObject({
@@ -369,21 +488,21 @@ describe('YouTube message data page adapter', () => {
       actions: [],
       source: 'replay'
     });
-    window.removeEventListener(LITE_CHAT_BATCH_EVENT, listener);
+    window.removeEventListener(YOUTUBE_CHAT_FEED_BATCH_EVENT, listener);
   });
 
   it('resets replay state from YouTube’s player-seek continuation without resetting normal polls', async () => {
     vi.resetModules();
     window.history.replaceState({}, '', '/live_chat_replay');
-    const batches: LiteChatBatch[] = [];
+    const batches: YouTubeChatFeedTransportBatch[] = [];
     const listener = collectLiteChatBatches(batches);
-    window.addEventListener(LITE_CHAT_BATCH_EVENT, listener);
+    window.addEventListener(YOUTUBE_CHAT_FEED_BATCH_EVENT, listener);
     window.fetch = vi.fn()
       .mockResolvedValueOnce(replayResponse('baseline', 1_000, 'replay-1', 'seek-1'))
       .mockResolvedValueOnce(replayResponse('seek-result', 100_000, 'replay-2', 'seek-2'))
       .mockResolvedValueOnce(replayResponse('normal-result', 100_100, 'replay-3', 'seek-3')) as typeof window.fetch;
 
-    await import('./message-data-page');
+    await import('./page');
     dispatchLiteChatControl(true);
 
     await window.fetch(replayRequestInput('initial', 1_000));
@@ -412,15 +531,15 @@ describe('YouTube message data page adapter', () => {
       replayPlayerOffsetMs: 100_100,
       source: 'replay'
     });
-    window.removeEventListener(LITE_CHAT_BATCH_EVENT, listener);
+    window.removeEventListener(YOUTUBE_CHAT_FEED_BATCH_EVENT, listener);
   });
 
   it('drops a slow replay response after a newer seek starts', async () => {
     vi.resetModules();
     window.history.replaceState({}, '', '/live_chat_replay');
-    const batches: LiteChatBatch[] = [];
+    const batches: YouTubeChatFeedTransportBatch[] = [];
     const listener = collectLiteChatBatches(batches);
-    window.addEventListener(LITE_CHAT_BATCH_EVENT, listener);
+    window.addEventListener(YOUTUBE_CHAT_FEED_BATCH_EVENT, listener);
 
     let resolveSlowBody: (value: string) => void = () => undefined;
     let markSlowReadStarted: () => void = () => undefined;
@@ -436,7 +555,7 @@ describe('YouTube message data page adapter', () => {
       .mockResolvedValueOnce(replayResponse('current-seek', 200_000, 'replay-2', 'seek-2'));
     window.fetch = fetchMock as typeof window.fetch;
 
-    await import('./message-data-page');
+    await import('./page');
     dispatchLiteChatControl(true);
     await window.fetch(replayRequestInput('initial', 1_000));
     await waitForLiteChatBatchCount(batches, 1);
@@ -454,19 +573,19 @@ describe('YouTube message data page adapter', () => {
     await slowFetch;
     await flushAsyncWork();
     expect(batches).toHaveLength(2);
-    window.removeEventListener(LITE_CHAT_BATCH_EVENT, listener);
+    window.removeEventListener(YOUTUBE_CHAT_FEED_BATCH_EVENT, listener);
   });
 
   it('starts from document intent when its first control event preceded the page adapter', async () => {
     vi.resetModules();
-    const batches: LiteChatBatch[] = [];
+    const batches: YouTubeChatFeedTransportBatch[] = [];
     const listener = (event: Event) => {
       if (event instanceof CustomEvent && typeof event.detail === 'string') {
-        batches.push(JSON.parse(event.detail) as LiteChatBatch);
+        batches.push(JSON.parse(event.detail) as YouTubeChatFeedTransportBatch);
       }
     };
-    window.addEventListener(LITE_CHAT_BATCH_EVENT, listener);
-    document.documentElement.setAttribute(LITE_MODE_BOOTSTRAP_INTENT_ATTRIBUTE, 'true');
+    window.addEventListener(YOUTUBE_CHAT_FEED_BATCH_EVENT, listener);
+    document.documentElement.setAttribute(YOUTUBE_CHAT_FEED_BOOTSTRAP_INTENT_ATTRIBUTE, 'true');
     window.fetch = vi.fn(() => Promise.resolve(jsonResponse({
       continuationContents: {
         liveChatContinuation: {
@@ -475,7 +594,7 @@ describe('YouTube message data page adapter', () => {
       }
     }))) as typeof window.fetch;
 
-    await import('./message-data-page');
+    await import('./page');
     await window.fetch('https://www.youtube.com/youtubei/v1/live_chat/get_live_chat_replay');
     await flushAsyncWork();
 
@@ -484,34 +603,34 @@ describe('YouTube message data page adapter', () => {
       actions: [{ record: { id: 'intent-replay' }, type: 'upsert' }],
       source: 'replay'
     });
-    window.removeEventListener(LITE_CHAT_BATCH_EVENT, listener);
+    window.removeEventListener(YOUTUBE_CHAT_FEED_BATCH_EVENT, listener);
   });
 
-  it('drains document-start history after the controller attaches its receiver', async () => {
+  it('flushes document-start history without recapturing native rows', async () => {
     vi.resetModules();
     document.body.replaceChildren();
     window.fetch = vi.fn(() => Promise.resolve(jsonResponse({}))) as typeof window.fetch;
 
     const first = createNativeMessage('native-first', 'First history row');
     document.body.append(first);
-    await import('./message-data-page');
+    await import('./page');
 
-    window.dispatchEvent(new CustomEvent(LITE_CHAT_CONTROL_EVENT, {
-      detail: JSON.stringify({ enabled: true, version: 1 })
+    window.dispatchEvent(new CustomEvent(YOUTUBE_CHAT_FEED_CONTROL_EVENT, {
+      detail: JSON.stringify({ consumer: 'lite', enabled: true, version: 1 })
     }));
     await flushAsyncWork();
 
-    const batches: LiteChatBatch[] = [];
+    const batches: YouTubeChatFeedTransportBatch[] = [];
     const listener = (event: Event) => {
       if (event instanceof CustomEvent && typeof event.detail === 'string') {
-        batches.push(JSON.parse(event.detail) as LiteChatBatch);
+        batches.push(JSON.parse(event.detail) as YouTubeChatFeedTransportBatch);
       }
     };
-    window.addEventListener(LITE_CHAT_BATCH_EVENT, listener);
+    window.addEventListener(YOUTUBE_CHAT_FEED_BATCH_EVENT, listener);
     document.body.append(createNativeMessage('native-second', 'Second history row'));
 
-    window.dispatchEvent(new CustomEvent(LITE_CHAT_CONTROL_EVENT, {
-      detail: JSON.stringify({ enabled: true, requestInitial: true, version: 1 })
+    window.dispatchEvent(new CustomEvent(YOUTUBE_CHAT_FEED_CONTROL_EVENT, {
+      detail: JSON.stringify({ consumer: 'lite', enabled: true, requestInitial: true, version: 1 })
     }));
     // The controller discards native chat synchronously after the control event.
     document.body.replaceChildren();
@@ -521,25 +640,24 @@ describe('YouTube message data page adapter', () => {
     expect(batches[0]).toMatchObject({
       actions: [
         { type: 'reset' },
-        { record: { id: 'native-first', plainText: 'First history row' }, type: 'upsert' },
-        { record: { id: 'native-second', plainText: 'Second history row' }, type: 'upsert' }
+        { record: { id: 'native-first', plainText: 'First history row' }, type: 'upsert' }
       ],
       sequence: 1,
       source: 'initial'
     });
-    window.removeEventListener(LITE_CHAT_BATCH_EVENT, listener);
+    window.removeEventListener(YOUTUBE_CHAT_FEED_BATCH_EVENT, listener);
   });
 
   it('accepts incomplete native history as an empty non-fatal startup snapshot', async () => {
     vi.resetModules();
     document.body.replaceChildren();
-    const batches: LiteChatBatch[] = [];
+    const batches: YouTubeChatFeedTransportBatch[] = [];
     const listener = (event: Event) => {
       if (event instanceof CustomEvent && typeof event.detail === 'string') {
-        batches.push(JSON.parse(event.detail) as LiteChatBatch);
+        batches.push(JSON.parse(event.detail) as YouTubeChatFeedTransportBatch);
       }
     };
-    window.addEventListener(LITE_CHAT_BATCH_EVENT, listener);
+    window.addEventListener(YOUTUBE_CHAT_FEED_BATCH_EVENT, listener);
     window.fetch = vi.fn(() => Promise.resolve(jsonResponse({}))) as typeof window.fetch;
 
     const incomplete = document.createElement(
@@ -552,9 +670,9 @@ describe('YouTube message data page adapter', () => {
     };
     document.body.append(incomplete);
 
-    await import('./message-data-page');
-    window.dispatchEvent(new CustomEvent(LITE_CHAT_CONTROL_EVENT, {
-      detail: JSON.stringify({ enabled: true, requestInitial: true, version: 1 })
+    await import('./page');
+    window.dispatchEvent(new CustomEvent(YOUTUBE_CHAT_FEED_CONTROL_EVENT, {
+      detail: JSON.stringify({ consumer: 'lite', enabled: true, requestInitial: true, version: 1 })
     }));
     await flushAsyncWork();
 
@@ -564,18 +682,18 @@ describe('YouTube message data page adapter', () => {
       source: 'initial'
     });
     expect(batches[0].fatalErrors).toBeUndefined();
-    window.removeEventListener(LITE_CHAT_BATCH_EVENT, listener);
+    window.removeEventListener(YOUTUBE_CHAT_FEED_BATCH_EVENT, listener);
   });
 
   it('keeps a full native seed within the isolated-world 500-action boundary', async () => {
     vi.resetModules();
-    const batches: LiteChatBatch[] = [];
+    const batches: YouTubeChatFeedTransportBatch[] = [];
     const listener = (event: Event) => {
       if (event instanceof CustomEvent && typeof event.detail === 'string') {
-        batches.push(JSON.parse(event.detail) as LiteChatBatch);
+        batches.push(JSON.parse(event.detail) as YouTubeChatFeedTransportBatch);
       }
     };
-    window.addEventListener(LITE_CHAT_BATCH_EVENT, listener);
+    window.addEventListener(YOUTUBE_CHAT_FEED_BATCH_EVENT, listener);
     window.fetch = vi.fn(() => Promise.resolve(jsonResponse({}))) as typeof window.fetch;
 
     const fragment = document.createDocumentFragment();
@@ -593,9 +711,9 @@ describe('YouTube message data page adapter', () => {
     }
     document.body.append(fragment);
 
-    await import('./message-data-page');
-    window.dispatchEvent(new CustomEvent(LITE_CHAT_CONTROL_EVENT, {
-      detail: JSON.stringify({ enabled: true, requestInitial: true, version: 1 })
+    await import('./page');
+    window.dispatchEvent(new CustomEvent(YOUTUBE_CHAT_FEED_CONTROL_EVENT, {
+      detail: JSON.stringify({ consumer: 'lite', enabled: true, requestInitial: true, version: 1 })
     }));
     await flushAsyncWork();
 
@@ -606,22 +724,22 @@ describe('YouTube message data page adapter', () => {
       record: { id: 'native-499' },
       type: 'upsert'
     });
-    window.removeEventListener(LITE_CHAT_BATCH_EVENT, listener);
+    window.removeEventListener(YOUTUBE_CHAT_FEED_BATCH_EVENT, listener);
   });
 
   it('classifies only exact YouTube live, replay, and send endpoint paths', async () => {
     vi.resetModules();
-    const batches: LiteChatBatch[] = [];
+    const batches: YouTubeChatFeedTransportBatch[] = [];
     const listener = (event: Event) => {
       if (event instanceof CustomEvent && typeof event.detail === 'string') {
-        batches.push(JSON.parse(event.detail) as LiteChatBatch);
+        batches.push(JSON.parse(event.detail) as YouTubeChatFeedTransportBatch);
       }
     };
-    window.addEventListener(LITE_CHAT_BATCH_EVENT, listener);
+    window.addEventListener(YOUTUBE_CHAT_FEED_BATCH_EVENT, listener);
     window.fetch = vi.fn(() => Promise.resolve(jsonResponse({ actions: [] }))) as typeof window.fetch;
-    await import('./message-data-page');
-    window.dispatchEvent(new CustomEvent(LITE_CHAT_CONTROL_EVENT, {
-      detail: JSON.stringify({ enabled: true, version: 1 })
+    await import('./page');
+    window.dispatchEvent(new CustomEvent(YOUTUBE_CHAT_FEED_CONTROL_EVENT, {
+      detail: JSON.stringify({ consumer: 'lite', enabled: true, version: 1 })
     }));
 
     await Promise.all([
@@ -640,18 +758,18 @@ describe('YouTube message data page adapter', () => {
       ['response:unrecognized-chat-payload'],
       undefined
     ]);
-    window.removeEventListener(LITE_CHAT_BATCH_EVENT, listener);
+    window.removeEventListener(YOUTUBE_CHAT_FEED_BATCH_EVENT, listener);
   });
 
   it('emits unsupported feed rows as non-fatal compatibility metadata', async () => {
     vi.resetModules();
-    const batches: LiteChatBatch[] = [];
+    const batches: YouTubeChatFeedTransportBatch[] = [];
     const listener = (event: Event) => {
       if (event instanceof CustomEvent && typeof event.detail === 'string') {
-        batches.push(JSON.parse(event.detail) as LiteChatBatch);
+        batches.push(JSON.parse(event.detail) as YouTubeChatFeedTransportBatch);
       }
     };
-    window.addEventListener(LITE_CHAT_BATCH_EVENT, listener);
+    window.addEventListener(YOUTUBE_CHAT_FEED_BATCH_EVENT, listener);
     window.fetch = vi.fn(() => Promise.resolve(jsonResponse({
       continuationContents: {
         liveChatContinuation: {
@@ -663,7 +781,7 @@ describe('YouTube message data page adapter', () => {
         }
       }
     }))) as typeof window.fetch;
-    await import('./message-data-page');
+    await import('./page');
     dispatchLiteChatControl(true);
 
     await window.fetch('https://www.youtube.com/youtubei/v1/live_chat/get_live_chat');
@@ -677,18 +795,18 @@ describe('YouTube message data page adapter', () => {
       unreadableFeed: true
     });
     expect(batches[0].fatalErrors).toBeUndefined();
-    window.removeEventListener(LITE_CHAT_BATCH_EVENT, listener);
+    window.removeEventListener(YOUTUBE_CHAT_FEED_BATCH_EVENT, listener);
   });
 
   it('accepts large official feed responses without treating send failures as feed failures', async () => {
     vi.resetModules();
-    const batches: LiteChatBatch[] = [];
+    const batches: YouTubeChatFeedTransportBatch[] = [];
     const listener = (event: Event) => {
       if (event instanceof CustomEvent && typeof event.detail === 'string') {
-        batches.push(JSON.parse(event.detail) as LiteChatBatch);
+        batches.push(JSON.parse(event.detail) as YouTubeChatFeedTransportBatch);
       }
     };
-    window.addEventListener(LITE_CHAT_BATCH_EVENT, listener);
+    window.addEventListener(YOUTUBE_CHAT_FEED_BATCH_EVENT, listener);
     const largeOfficialBody = JSON.stringify({
       continuationContents: {
         liveChatContinuation: {
@@ -701,7 +819,7 @@ describe('YouTube message data page adapter', () => {
       .mockResolvedValueOnce(new Response('{broken'))
       .mockResolvedValueOnce(new Response(largeOfficialBody))
       .mockResolvedValueOnce(new Response('{broken')) as typeof window.fetch;
-    await import('./message-data-page');
+    await import('./page');
     dispatchLiteChatControl(true);
 
     await window.fetch('https://www.youtube.com/youtubei/v1/live_chat/get_live_chat');
@@ -720,19 +838,19 @@ describe('YouTube message data page adapter', () => {
         type: 'upsert'
       })
     ]);
-    window.removeEventListener(LITE_CHAT_BATCH_EVENT, listener);
+    window.removeEventListener(YOUTUBE_CHAT_FEED_BATCH_EVENT, listener);
   });
 
   it('splits large official action sets across valid isolated-world batches', async () => {
     vi.resetModules();
-    const batches: LiteChatBatch[] = [];
+    const batches: YouTubeChatFeedTransportBatch[] = [];
     const detailLengths: number[] = [];
     const listener = (event: Event) => {
       if (!(event instanceof CustomEvent) || typeof event.detail !== 'string') return;
       detailLengths.push(event.detail.length);
-      batches.push(JSON.parse(event.detail) as LiteChatBatch);
+      batches.push(JSON.parse(event.detail) as YouTubeChatFeedTransportBatch);
     };
-    window.addEventListener(LITE_CHAT_BATCH_EVENT, listener);
+    window.addEventListener(YOUTUBE_CHAT_FEED_BATCH_EVENT, listener);
     const longText = 'x'.repeat(4_000);
     window.fetch = vi.fn(() => Promise.resolve(jsonResponse({
       continuationContents: {
@@ -743,9 +861,9 @@ describe('YouTube message data page adapter', () => {
         }
       }
     }))) as typeof window.fetch;
-    await import('./message-data-page');
-    window.dispatchEvent(new CustomEvent(LITE_CHAT_CONTROL_EVENT, {
-      detail: JSON.stringify({ enabled: true, requestInitial: true, version: 1 })
+    await import('./page');
+    window.dispatchEvent(new CustomEvent(YOUTUBE_CHAT_FEED_CONTROL_EVENT, {
+      detail: JSON.stringify({ consumer: 'lite', enabled: true, requestInitial: true, version: 1 })
     }));
     await flushAsyncWork();
     batches.length = 0;
@@ -768,18 +886,18 @@ describe('YouTube message data page adapter', () => {
     expect(batches.every((batch) => batch.actions.length <= 500)).toBe(true);
     expect(detailLengths.every((length) => length <= 2_000_000)).toBe(true);
     expect(batches.every((batch) => batch.fatalErrors === undefined)).toBe(true);
-    window.removeEventListener(LITE_CHAT_BATCH_EVENT, listener);
+    window.removeEventListener(YOUTUBE_CHAT_FEED_BATCH_EVENT, listener);
   });
 
   it('calls native fetch before inspecting its input and drops parsing from an obsolete enable generation', async () => {
     vi.resetModules();
-    const batches: LiteChatBatch[] = [];
+    const batches: YouTubeChatFeedTransportBatch[] = [];
     const listener = (event: Event) => {
       if (event instanceof CustomEvent && typeof event.detail === 'string') {
-        batches.push(JSON.parse(event.detail) as LiteChatBatch);
+        batches.push(JSON.parse(event.detail) as YouTubeChatFeedTransportBatch);
       }
     };
-    window.addEventListener(LITE_CHAT_BATCH_EVENT, listener);
+    window.addEventListener(YOUTUBE_CHAT_FEED_BATCH_EVENT, listener);
 
     let resolvePayload: (value: string) => void = () => undefined;
     const payloadPromise = new Promise<string>((resolve) => {
@@ -803,9 +921,9 @@ describe('YouTube message data page adapter', () => {
       return originalPromise;
     });
     window.fetch = fetchMock as typeof window.fetch;
-    await import('./message-data-page');
-    window.dispatchEvent(new CustomEvent(LITE_CHAT_CONTROL_EVENT, {
-      detail: JSON.stringify({ enabled: true, version: 1 })
+    await import('./page');
+    window.dispatchEvent(new CustomEvent(YOUTUBE_CHAT_FEED_CONTROL_EVENT, {
+      detail: JSON.stringify({ consumer: 'lite', enabled: true, version: 1 })
     }));
 
     let getterObservedOriginalCall = false;
@@ -819,15 +937,15 @@ describe('YouTube message data page adapter', () => {
     expect(getterObservedOriginalCall).toBe(true);
 
     const matchedPromise = window.fetch('https://www.youtube.com/youtubei/v1/live_chat/get_live_chat');
-    expect(matchedPromise).not.toBe(originalPromise);
+    expect(matchedPromise).toBe(originalPromise);
     await Promise.resolve();
     await Promise.resolve();
 
-    window.dispatchEvent(new CustomEvent(LITE_CHAT_CONTROL_EVENT, {
-      detail: JSON.stringify({ enabled: false, version: 1 })
+    window.dispatchEvent(new CustomEvent(YOUTUBE_CHAT_FEED_CONTROL_EVENT, {
+      detail: JSON.stringify({ consumer: 'lite', enabled: false, version: 1 })
     }));
-    window.dispatchEvent(new CustomEvent(LITE_CHAT_CONTROL_EVENT, {
-      detail: JSON.stringify({ enabled: true, version: 1 })
+    window.dispatchEvent(new CustomEvent(YOUTUBE_CHAT_FEED_CONTROL_EVENT, {
+      detail: JSON.stringify({ consumer: 'lite', enabled: true, version: 1 })
     }));
     resolvePayload(JSON.stringify({
       actions: [textAction('obsolete-message', 'Must not render')]
@@ -836,18 +954,18 @@ describe('YouTube message data page adapter', () => {
     await flushAsyncWork();
 
     expect(batches).toEqual([]);
-    window.removeEventListener(LITE_CHAT_BATCH_EVENT, listener);
+    window.removeEventListener(YOUTUBE_CHAT_FEED_BATCH_EVENT, listener);
   });
 
   it('starts a fresh parse chain after disable and re-enable', async () => {
     vi.resetModules();
-    const batches: LiteChatBatch[] = [];
+    const batches: YouTubeChatFeedTransportBatch[] = [];
     const listener = (event: Event) => {
       if (event instanceof CustomEvent && typeof event.detail === 'string') {
-        batches.push(JSON.parse(event.detail) as LiteChatBatch);
+        batches.push(JSON.parse(event.detail) as YouTubeChatFeedTransportBatch);
       }
     };
-    window.addEventListener(LITE_CHAT_BATCH_EVENT, listener);
+    window.addEventListener(YOUTUBE_CHAT_FEED_BATCH_EVENT, listener);
 
     let resolveObsoletePayload: (value: string) => void = () => undefined;
     let markObsoleteParseStarted: () => void = () => undefined;
@@ -883,7 +1001,7 @@ describe('YouTube message data page adapter', () => {
       .mockResolvedValueOnce(currentResponse);
     window.fetch = fetchMock as typeof window.fetch;
 
-    await import('./message-data-page');
+    await import('./page');
     dispatchLiteChatControl(true);
 
     const obsoleteFetch = window.fetch(
@@ -916,14 +1034,14 @@ describe('YouTube message data page adapter', () => {
     await flushAsyncWork();
 
     expect(batches).toHaveLength(1);
-    window.removeEventListener(LITE_CHAT_BATCH_EVENT, listener);
+    window.removeEventListener(YOUTUBE_CHAT_FEED_BATCH_EVENT, listener);
   });
 
   it('serializes concurrent official responses without dropping any clones', async () => {
     vi.resetModules();
-    const batches: LiteChatBatch[] = [];
+    const batches: YouTubeChatFeedTransportBatch[] = [];
     const listener = collectLiteChatBatches(batches);
-    window.addEventListener(LITE_CHAT_BATCH_EVENT, listener);
+    window.addEventListener(YOUTUBE_CHAT_FEED_BATCH_EVENT, listener);
     const resolvers: Array<(value: string) => void> = [];
     const bodies = Array.from({ length: 2 }, () => new Promise<string>((resolve) => {
       resolvers.push(resolve);
@@ -953,7 +1071,7 @@ describe('YouTube message data page adapter', () => {
       .mockResolvedValueOnce({ clone: cloneSpies[2], url: '' } as unknown as Response)
       .mockResolvedValueOnce({ clone: cloneSpies[3], url: '' } as unknown as Response)
       .mockResolvedValueOnce({ clone: cloneSpies[4], url: '' } as unknown as Response) as typeof window.fetch;
-    await import('./message-data-page');
+    await import('./page');
     dispatchLiteChatControl(true);
 
     const fetches = Array.from({ length: 5 }, () => (
@@ -982,7 +1100,7 @@ describe('YouTube message data page adapter', () => {
       action.type === 'upsert' ? action.record.id : action.type
     ))).toEqual(['one', 'two', 'three', 'four', 'five']);
     expect(batches.every((batch) => batch.fatalErrors === undefined)).toBe(true);
-    window.removeEventListener(LITE_CHAT_BATCH_EVENT, listener);
+    window.removeEventListener(YOUTUBE_CHAT_FEED_BATCH_EVENT, listener);
   });
 });
 
@@ -1093,10 +1211,10 @@ function deferredResponse(
   } as Response;
 }
 
-function collectLiteChatBatches(batches: LiteChatBatch[]): EventListener {
+function collectLiteChatBatches(batches: YouTubeChatFeedTransportBatch[]): EventListener {
   return (event) => {
     if (event instanceof CustomEvent && typeof event.detail === 'string') {
-      batches.push(JSON.parse(event.detail) as LiteChatBatch);
+      batches.push(JSON.parse(event.detail) as YouTubeChatFeedTransportBatch);
     }
   };
 }
@@ -1131,8 +1249,8 @@ function textAction(id: string, text: string) {
 }
 
 function dispatchLiteChatControl(enabled: boolean): void {
-  window.dispatchEvent(new CustomEvent(LITE_CHAT_CONTROL_EVENT, {
-    detail: JSON.stringify({ enabled, version: 1 })
+  window.dispatchEvent(new CustomEvent(YOUTUBE_CHAT_FEED_CONTROL_EVENT, {
+    detail: JSON.stringify({ consumer: 'lite', enabled, version: 1 })
   }));
 }
 
@@ -1143,7 +1261,7 @@ async function flushAsyncWork(): Promise<void> {
 }
 
 async function waitForLiteChatBatchCount(
-  batches: readonly LiteChatBatch[],
+  batches: readonly YouTubeChatFeedTransportBatch[],
   count: number
 ): Promise<void> {
   await vi.waitFor(() => expect(batches).toHaveLength(count));
@@ -1157,7 +1275,7 @@ function cleanupLiteChatTransport(): void {
   } | undefined;
   if (state?.handleControl) {
     dispatchLiteChatControl(false);
-    window.removeEventListener(LITE_CHAT_CONTROL_EVENT, state.handleControl);
+    window.removeEventListener(YOUTUBE_CHAT_FEED_CONTROL_EVENT, state.handleControl);
   }
   Reflect.deleteProperty(registry, LITE_CHAT_TRANSPORT_STATE_KEY);
   if (originalWindowFetch) {

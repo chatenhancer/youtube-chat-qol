@@ -6,7 +6,7 @@
  * focused on DOM and scroll anchoring. The store retains more history than the
  * renderer mounts, but both limits are intentionally finite.
  */
-import type { LiteChatAction, LiteChatMessageRecord } from './protocol';
+import type { YouTubeChatFeedAction, YouTubeChatMessageRecord } from '../../youtube/chat-feed/protocol';
 
 export const DEFAULT_LITE_CHAT_RENDER_LIMIT = 150;
 export const DEFAULT_LITE_CHAT_STORE_LIMIT = 500;
@@ -23,11 +23,11 @@ export interface LiteChatStoreChange {
 }
 
 export interface LiteChatStore {
-  apply(actions: readonly LiteChatAction[]): LiteChatStoreChange;
+  apply(actions: readonly YouTubeChatFeedAction[]): LiteChatStoreChange;
   clear(): LiteChatStoreChange;
-  get(id: string): LiteChatMessageRecord | null;
-  getLatest(limit?: number): LiteChatMessageRecord[];
-  getRecords(): LiteChatMessageRecord[];
+  get(id: string): YouTubeChatMessageRecord | null;
+  getLatest(limit?: number): YouTubeChatMessageRecord[];
+  getRecords(): YouTubeChatMessageRecord[];
   getRetainedBytes(): number;
   getSize(): number;
   subscribe(listener: LiteChatStoreListener): () => void;
@@ -50,7 +50,7 @@ export function createLiteChatStore(options: CreateLiteChatStoreOptions = {}): L
   const storeLimit = normalizeLimit(options.storeLimit, DEFAULT_LITE_CHAT_STORE_LIMIT, 10_000);
   const storeByteLimit = normalizeByteLimit(options.storeByteLimit);
   const effectiveRenderLimit = Math.min(renderLimit, storeLimit);
-  const recordsById = new Map<string, LiteChatMessageRecord>();
+  const recordsById = new Map<string, YouTubeChatMessageRecord>();
   const recordBytesById = new Map<string, number>();
   const positionsById = new Map<string, number>();
   const orderedIds: Array<string | null> = [];
@@ -59,8 +59,8 @@ export function createLiteChatStore(options: CreateLiteChatStoreOptions = {}): L
   let retainedBytes = 0;
   let tombstoneCount = 0;
 
-  const getRecords = (): LiteChatMessageRecord[] => {
-    const records: LiteChatMessageRecord[] = [];
+  const getRecords = (): YouTubeChatMessageRecord[] => {
+    const records: YouTubeChatMessageRecord[] = [];
     for (let index = orderHead; index < orderedIds.length; index += 1) {
       const id = orderedIds[index];
       if (!id) continue;
@@ -75,7 +75,7 @@ export function createLiteChatStore(options: CreateLiteChatStoreOptions = {}): L
     listeners.forEach((listener) => listener(change));
   };
 
-  const apply = (actions: readonly LiteChatAction[]): LiteChatStoreChange => {
+  const apply = (actions: readonly YouTubeChatFeedAction[]): LiteChatStoreChange => {
     const addedIds = new Set<string>();
     const removedIds = new Set<string>();
     const updatedIds = new Set<string>();
@@ -165,7 +165,7 @@ export function createLiteChatStore(options: CreateLiteChatStoreOptions = {}): L
     get: (id) => recordsById.get(id) || null,
     getLatest: (limit = effectiveRenderLimit) => {
       const safeLimit = normalizeLimit(limit, effectiveRenderLimit, storeLimit);
-      const records: LiteChatMessageRecord[] = [];
+      const records: YouTubeChatMessageRecord[] = [];
       for (let index = orderedIds.length - 1; index >= orderHead; index -= 1) {
         const id = orderedIds[index];
         if (!id) continue;

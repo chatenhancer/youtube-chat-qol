@@ -24,7 +24,7 @@ import {
   type ChatInputSnapshot
 } from '../youtube/chat-input';
 import { translateTranslationPlan } from './chat-commands/translate-text';
-import { registerFeatureLifecycle } from '../content/lifecycle';
+import { registerFeature } from '../content/feature-runtime';
 import {
   createTranslationPlanFromNodes,
   type TranslationPlan
@@ -65,19 +65,17 @@ let draftTranslationAnimationLoopTimer = 0;
 let draftTranslationAnimationLooping = false;
 let composerTranslationListeners = new AbortController();
 
-registerFeatureLifecycle({
+registerFeature({
   page: {
     init: ({ saveOptions }) => initComposerTranslation(saveOptions),
     boot: refreshComposerTranslation,
-    cleanupStale: cleanupStaleComposerTranslation,
+    cleanup: cleanupStaleComposerTranslation,
     optionsChanged: refreshComposerTranslation,
     reset: resetComposerTranslation
   },
-  mutation: {
-    enhance: ({ addedElements }) => {
-      if (addedElements.some(shouldWireComposerTranslationForNode)) {
-        scheduleComposerTranslationWire();
-      }
+  mutation: ({ addedElements }) => {
+    if (addedElements.some(shouldWireComposerTranslationForNode)) {
+      scheduleComposerTranslationWire();
     }
   }
 });

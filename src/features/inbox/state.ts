@@ -32,6 +32,8 @@ import {
   sortAndTrimRecords
 } from './storage';
 import type { InboxRecord, LatestInboxRecord } from './types';
+import { CHAT_MESSAGE_SELECTOR } from '../../youtube/selectors';
+import { getMessageStableId } from '../../youtube/messages';
 
 export interface InboxRecordUpsertResult {
   changed: boolean;
@@ -203,7 +205,25 @@ export function upsertInboxRecord(incoming: InboxRecord, isReadNow: boolean): In
 
 export function getLiveInboxMessage(record: InboxRecord): HTMLElement | null {
   const message = record.messageRef?.deref() || null;
-  return message?.isConnected ? message : null;
+  if (message?.isConnected) return message;
+  if (!record.messageId) return null;
+
+  return Array.from(document.querySelectorAll<HTMLElement>(CHAT_MESSAGE_SELECTOR))
+    .find((candidate) => getMessageStableId(candidate) === record.messageId) || null;
+}
+
+export function attachLiveInboxMessage(message: HTMLElement): boolean {
+  const messageId = getMessageStableId(message);
+  if (!messageId) return false;
+
+  const index = records.findIndex((record) => record.messageId === messageId);
+  const currentMessage = index >= 0 ? records[index].messageRef?.deref() || null : null;
+  if (index < 0 || currentMessage === message) return false;
+  records[index] = {
+    ...records[index],
+    messageRef: new WeakRef(message)
+  };
+  return true;
 }
 
 export function saveInboxRecords(): Promise<void> {

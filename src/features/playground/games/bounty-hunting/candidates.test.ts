@@ -2,8 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   countBountyHuntingObservedCandidateTypes,
   createBountyHuntingBountiesFromMessages,
-  findBountyHuntingMatchingBounty,
-  getBountyHuntingObservedMessage
+  findBountyHuntingMatchingBounty
 } from './candidates';
 import type { BountyHuntingObservedMessage } from './types';
 
@@ -61,72 +60,6 @@ describe('Bounty Hunting bounty candidates', () => {
     expect(match?.amount).toBe(125);
   });
 
-  it('detects YouTube Top fan rank badges on chat messages', () => {
-    const chatMessage = document.createElement('yt-live-chat-text-message-renderer');
-    chatMessage.setAttribute('data-message-id', 'message-ranked');
-    chatMessage.innerHTML = `
-      <span id="author-name">@RankedFan</span>
-      <div id="before-content-buttons">
-        <yt-button-view-model>
-          <button-view-model>
-            <button class="ytSpecButtonShapeNextHost" aria-label="#2">
-              <div class="ytSpecButtonShapeNextButtonTextContent">#2</div>
-            </button>
-          </button-view-model>
-        </yt-button-view-model>
-      </div>
-      <span id="message">thanks for the stream</span>
-    `;
-
-    const observed = getBountyHuntingObservedMessage(chatMessage);
-
-    expect(observed).toMatchObject({
-      isTopFanAuthor: true,
-      messageId: 'message-ranked'
-    });
-  });
-
-  it('does not treat typed rank text as a Top fan badge', () => {
-    const chatMessage = document.createElement('yt-live-chat-text-message-renderer');
-    chatMessage.setAttribute('data-message-id', 'message-rank-text');
-    chatMessage.innerHTML = `
-      <span id="author-name">@RegularFan</span>
-      <span id="message">I am #2 today</span>
-    `;
-
-    const observed = getBountyHuntingObservedMessage(chatMessage);
-
-    expect(observed).toMatchObject({
-      isTopFanAuthor: false,
-      messageId: 'message-rank-text'
-    });
-  });
-
-  it('detects badges, Super Chats, custom emoji, and emoji-only messages locally', () => {
-    const message = document.createElement('yt-live-chat-paid-message-renderer');
-    message.setAttribute('data-message-id', 'message-2');
-    message.innerHTML = `
-      <yt-live-chat-author-badge-renderer type="member"></yt-live-chat-author-badge-renderer>
-      <yt-live-chat-author-badge-renderer type="moderator"></yt-live-chat-author-badge-renderer>
-      <yt-live-chat-author-badge-renderer aria-label="Channel owner"></yt-live-chat-author-badge-renderer>
-      <span id="message">
-        <img alt=":party_parrot:" data-emoji-id="custom-1">
-        <img alt="🤠">
-      </span>
-    `;
-
-    const observed = getBountyHuntingObservedMessage(message);
-
-    expect(observed).toMatchObject({
-      hasCustomEmoji: true,
-      hasOnlyEmojis: true,
-      isChannelMemberAuthor: true,
-      isChannelOwnerAuthor: true,
-      isModeratorAuthor: true,
-      isSuperChat: true,
-      messageId: 'message-2'
-    });
-  });
 });
 
 function message(

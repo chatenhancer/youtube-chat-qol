@@ -5,18 +5,7 @@
  * handles, and author-name fallbacks.
  */
 import { normalizeComparableText } from '../../shared/text';
-import {
-  getAuthorChannelId,
-  getAuthorName,
-} from '../../youtube/messages';
 import type { UserIdentity } from './types';
-
-export function getUserKey(message: HTMLElement): string {
-  return getUserKeyFromIdentity({
-    channelId: getAuthorChannelId(message),
-    authorName: getAuthorName(message)
-  });
-}
 
 export function getUserKeyFromIdentity(identity: UserIdentity): string {
   if (identity.channelId) return `channel:${identity.channelId}`;

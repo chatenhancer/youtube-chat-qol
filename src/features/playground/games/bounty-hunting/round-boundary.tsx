@@ -6,11 +6,6 @@ import { jsx, el } from '../../../../shared/jsx-dom';
 import { getBountyHuntingRoundStartTimestampUsec } from '../../../../shared/playground/bounty-hunting';
 import { getMessageStableId } from '../../../../youtube/messages';
 import { CHAT_MESSAGE_SELECTOR } from '../../../../youtube/selectors';
-import {
-  compareBountyHuntingTimestampUsec,
-  getBountyHuntingMessageTimestampUsec,
-  rememberBountyHuntingCachedMessageData
-} from './message-timestamps';
 import type { BountyHuntingPanelRuntime } from './types';
 
 type BountyHuntingStartDividerPlacement = 'after' | 'before';
@@ -40,15 +35,12 @@ export function hasBountyHuntingRoundStartBoundary(runtime: BountyHuntingPanelRu
   return /^\d{1,24}$/.test(runtime.game.roundStartTimestampUsec || '');
 }
 
-export function isBountyHuntingMessageEligibleForRound(
+export function isBountyHuntingTimestampEligibleForRound(
   runtime: BountyHuntingPanelRuntime,
-  message: HTMLElement
+  timestampUsec: string | undefined
 ): boolean {
   if (!hasBountyHuntingRoundStartBoundary(runtime)) return true;
-  rememberBountyHuntingCachedMessageData(runtime, message);
-  const messageId = getMessageStableId(message);
-  const timestampEligibility = getBountyHuntingTimestampEligibility(runtime, messageId);
-  return timestampEligibility === true;
+  return getBountyHuntingTimestampEligibility(runtime, timestampUsec || '') === true;
 }
 
 export function removeBountyHuntingRoundStartDivider(runtime: BountyHuntingPanelRuntime): void {
@@ -78,7 +70,6 @@ function findBountyHuntingRoundStartPlacement(runtime: BountyHuntingPanelRuntime
   let anchor: HTMLElement | null = null;
   let firstAfter: HTMLElement | null = null;
   for (const message of getBountyHuntingChatMessages()) {
-    rememberBountyHuntingCachedMessageData(runtime, message);
     const eligibility = getBountyHuntingMessageEligibility(runtime, message);
     if (eligibility === null) continue;
     if (!eligibility) {
@@ -111,18 +102,20 @@ function getBountyHuntingMessageEligibility(
   message: HTMLElement
 ): boolean | null {
   const messageId = getMessageStableId(message);
-  return messageId ? getBountyHuntingTimestampEligibility(runtime, messageId) : null;
+  const timestampUsec = messageId
+    ? runtime.chatFeed?.getMessage(messageId)?.messageTimestampUsec || ''
+    : '';
+  return getBountyHuntingTimestampEligibility(runtime, timestampUsec);
 }
 
 function getBountyHuntingTimestampEligibility(
   runtime: BountyHuntingPanelRuntime,
-  messageId: string
+  timestampUsec: string
 ): boolean | null {
   const cutoff = runtime.game.roundStartTimestampUsec;
-  const timestampUsec = messageId ? getBountyHuntingMessageTimestampUsec(runtime, messageId) : '';
   if (!cutoff || !/^\d{1,24}$/.test(cutoff)) return null;
-  if (!timestampUsec) return null;
-  return compareBountyHuntingTimestampUsec(timestampUsec, cutoff) > 0;
+  if (!/^\d{1,24}$/.test(timestampUsec)) return null;
+  return BigInt(timestampUsec) > BigInt(cutoff);
 }
 
 function getBountyHuntingChatMessages(): HTMLElement[] {

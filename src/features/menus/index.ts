@@ -5,7 +5,7 @@
  * renderer. This module classifies each popup after Polymer stamps its children
  * and routes it to the correct enhancer.
  */
-import { registerFeatureLifecycle } from '../../content/lifecycle';
+import { registerFeature } from '../../content/feature-runtime';
 import {
   cleanupStaleMessageMenuSurfaces,
   enhanceMessageContextMenu,
@@ -22,13 +22,13 @@ const LIVE_CHAT_MENU_MARKER_SELECTOR = [
 ].join(',');
 const LIVE_CHAT_MENU_SIZE_REPAIRED_CLASS = 'ytcq-live-chat-menu-size-repaired';
 
-registerFeatureLifecycle({
+registerFeature({
   page: {
     boot: initMenus,
-    cleanupStale: cleanupStaleMenuSurfaces,
+    cleanup: cleanupStaleMenuSurfaces,
     reset: refreshSettingsMenus
   },
-  mutation: { enhance: handleMenuMutations }
+  mutation: handleMenuMutations
 });
 
 function initMenus(): void {

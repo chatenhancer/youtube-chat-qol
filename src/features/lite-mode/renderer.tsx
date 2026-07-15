@@ -9,15 +9,19 @@
 import { jsx, el } from '../../shared/jsx-dom';
 import { t } from '../../shared/i18n';
 import { createLoadingSpinner } from '../../shared/loading-spinner';
+import {
+  CHAT_LIVE_EDGE_RELEASE_EVENT,
+  CHAT_LIVE_EDGE_RETURN_EVENT
+} from '../../youtube/chat-scroll';
 import { formatMessageTimestampUsec } from '../../youtube/messages';
 import type {
-  LiteChatAction,
-  LiteChatAuthor,
-  LiteChatBatchSource,
-  LiteChatMessageColors,
-  LiteChatMessageRecord,
-  LiteChatRichRun
-} from './protocol';
+  YouTubeChatFeedAction,
+  YouTubeChatAuthor,
+  YouTubeChatFeedBatchSource,
+  YouTubeChatMessageColors,
+  YouTubeChatMessageRecord,
+  YouTubeChatRichRun
+} from '../../youtube/chat-feed/protocol';
 import {
   DEFAULT_LITE_CHAT_RENDER_LIMIT,
   type LiteChatStore,
@@ -32,12 +36,21 @@ const LIVE_BATCH_MOTION_MS_PER_ROW = 55;
 const LIVE_BATCH_MOTION_MAX_VIEWPORTS = 2;
 const MAX_PENDING_MESSAGE_COUNT = 999;
 const SCROLLBACK_LOAD_THRESHOLD_PX = 48;
+const LIVE_EDGE_SCROLL_INTENT_MS = 500;
+const POINTER_SCROLL_DRAG_THRESHOLD_PX = 4;
+
+interface ActiveScrollPointer {
+  id: number;
+  lastScrollTop: number;
+  moved: boolean;
+  startY: number;
+}
 
 export type LiteChatRowSource = 'added' | 'changed' | 'existing';
 export type LiteChatConnectionState = 'connected' | 'connecting';
 export type LiteChatRowRenderedCallback = (
   row: HTMLElement,
-  record: LiteChatMessageRecord,
+  record: YouTubeChatMessageRecord,
   source: LiteChatRowSource
 ) => void;
 
@@ -50,7 +63,10 @@ export interface CreateLiteChatRendererOptions {
 export interface LiteChatRenderer {
   destroy(): void;
   getMessageElement(id: string): HTMLElement | null;
-  rememberActionSources(actions: readonly LiteChatAction[], origin: LiteChatBatchSource): void;
+  rememberActionSources(
+    actions: readonly YouTubeChatFeedAction[],
+    origin: YouTubeChatFeedBatchSource
+  ): void;
   render(): void;
   root: HTMLElement;
   scrollToLiveEdge(): void;
@@ -64,7 +80,7 @@ export function createLiteChatRenderer(
 ): LiteChatRenderer {
   const renderLimit = normalizeRenderLimit(options.renderLimit);
   const rowsById = new Map<string, HTMLElement>();
-  const renderedRecords = new Map<string, LiteChatMessageRecord>();
+  const renderedRecords = new Map<string, YouTubeChatMessageRecord>();
   const dispatchedRecordIds = new Set<string>();
   const pendingRowSources = new Map<string, LiteChatRowSource>();
   let stagedActionSources = new Map<string, LiteChatRowSource>();
@@ -73,6 +89,10 @@ export function createLiteChatRenderer(
   let pendingMessageCount = 0;
   let destroyed = false;
   let scrollFrame = 0;
+  let activeScrollPointer: ActiveScrollPointer | null = null;
+  let returnIntentPending = false;
+  let returnIntentTimer = 0;
+  const scrollListeners = new AbortController();
 
   const loadingSpinner = createLoadingSpinner('ytcq-lite-loading-spinner');
   const emptyStateLabel = el<HTMLSpanElement>(
@@ -118,7 +138,40 @@ export function createLiteChatRenderer(
 
   newMessagesButton.addEventListener('click', () => scrollToLiveEdge());
   items.addEventListener('animationend', handleItemsAnimationEnd);
-  scroller.addEventListener('scroll', handleScroll, { passive: true });
+  scroller.addEventListener('scroll', handleScroll, {
+    passive: true,
+    signal: scrollListeners.signal
+  });
+  scroller.addEventListener('wheel', handleWheel, {
+    passive: true,
+    signal: scrollListeners.signal
+  });
+  scroller.addEventListener('keydown', handleScrollKeyDown, {
+    signal: scrollListeners.signal
+  });
+  scroller.addEventListener('pointerdown', handlePointerDown, {
+    passive: true,
+    signal: scrollListeners.signal
+  });
+  window.addEventListener('pointermove', handlePointerMove, {
+    passive: true,
+    signal: scrollListeners.signal
+  });
+  window.addEventListener('pointerup', finishPointerScroll, {
+    passive: true,
+    signal: scrollListeners.signal
+  });
+  window.addEventListener('pointercancel', finishPointerScroll, {
+    passive: true,
+    signal: scrollListeners.signal
+  });
+  window.addEventListener('blur', resetPointerScroll, { signal: scrollListeners.signal });
+  scroller.addEventListener(CHAT_LIVE_EDGE_RELEASE_EVENT, requestLiveEdgeRelease, {
+    signal: scrollListeners.signal
+  });
+  scroller.addEventListener(CHAT_LIVE_EDGE_RETURN_EVENT, scrollToLiveEdge, {
+    signal: scrollListeners.signal
+  });
   const resizeObserver =
     typeof ResizeObserver === 'function'
       ? new ResizeObserver(() => {
@@ -152,8 +205,8 @@ export function createLiteChatRenderer(
   };
 
   function rememberActionSources(
-    actions: readonly LiteChatAction[],
-    origin: LiteChatBatchSource
+    actions: readonly YouTubeChatFeedAction[],
+    origin: YouTubeChatFeedBatchSource
   ): void {
     const source: LiteChatRowSource = origin === 'initial' ? 'existing' : 'added';
     stagedActionSources = new Map();
@@ -203,7 +256,7 @@ export function createLiteChatRenderer(
   }
 
   function getResetPendingMessageCount(
-    records: readonly LiteChatMessageRecord[],
+    records: readonly YouTubeChatMessageRecord[],
     previousEndId: string
   ): number {
     const endIndex = records.findIndex((record) => record.id === previousEndId);
@@ -338,7 +391,7 @@ export function createLiteChatRenderer(
     if (event.animationName === 'ytcq-lite-items-flow') clearLiveBatchMotion();
   }
 
-  function getDesiredRecords(): readonly LiteChatMessageRecord[] {
+  function getDesiredRecords(): readonly YouTubeChatMessageRecord[] {
     if (followingLiveEdge || !frozenEndId) {
       const latest = store.getLatest(renderLimit);
       frozenEndId = latest[latest.length - 1]?.id || '';
@@ -361,8 +414,112 @@ export function createLiteChatRenderer(
   }
 
   function handleScroll(): void {
-    if (followingLiveEdge && !isAtLiveEdge(scroller)) leaveLiveEdge();
+    updatePointerScrollIntent();
+    const atLiveEdge = isAtLiveEdge(scroller);
+    if (returnIntentPending && !followingLiveEdge && atLiveEdge) {
+      scrollToLiveEdge();
+      return;
+    }
     scheduleScrollStateUpdate();
+  }
+
+  function handleWheel(event: WheelEvent): void {
+    if (event.deltaY < 0) {
+      requestLiveEdgeRelease();
+    } else if (event.deltaY > 0) {
+      requestLiveEdgeReturn();
+    }
+  }
+
+  function handleScrollKeyDown(event: KeyboardEvent): void {
+    if (event.defaultPrevented) return;
+    if (
+      event.key === 'ArrowUp' ||
+      event.key === 'PageUp' ||
+      event.key === 'Home' ||
+      ((event.key === ' ' || event.key === 'Spacebar') && event.shiftKey)
+    ) {
+      requestLiveEdgeRelease();
+    } else if (
+      event.key === 'ArrowDown' ||
+      event.key === 'PageDown' ||
+      event.key === 'End' ||
+      ((event.key === ' ' || event.key === 'Spacebar') && !event.shiftKey)
+    ) {
+      requestLiveEdgeReturn();
+    }
+  }
+
+  function handlePointerDown(event: PointerEvent): void {
+    if (activeScrollPointer) return;
+    activeScrollPointer = {
+      id: event.pointerId,
+      lastScrollTop: scroller.scrollTop,
+      moved: false,
+      startY: event.clientY
+    };
+  }
+
+  function handlePointerMove(event: PointerEvent): void {
+    const pointer = activeScrollPointer;
+    if (!pointer || pointer.id !== event.pointerId || pointer.moved) return;
+    pointer.moved = Math.abs(event.clientY - pointer.startY) >= POINTER_SCROLL_DRAG_THRESHOLD_PX;
+  }
+
+  function finishPointerScroll(event: PointerEvent): void {
+    if (activeScrollPointer?.id !== event.pointerId) return;
+    resetPointerScroll();
+  }
+
+  function resetPointerScroll(): void {
+    activeScrollPointer = null;
+  }
+
+  function updatePointerScrollIntent(): void {
+    const pointer = activeScrollPointer;
+    if (!pointer?.moved) return;
+
+    const nextScrollTop = scroller.scrollTop;
+    const movedUp = nextScrollTop < pointer.lastScrollTop;
+    const movedDown = nextScrollTop > pointer.lastScrollTop;
+    pointer.lastScrollTop = nextScrollTop;
+    if (movedUp) requestLiveEdgeRelease();
+    else if (movedDown) requestLiveEdgeReturn();
+  }
+
+  function requestLiveEdgeRelease(): void {
+    if (!followingLiveEdge || scroller.scrollHeight <= scroller.clientHeight) return;
+    clearReturnIntent();
+    leaveLiveEdge();
+  }
+
+  function requestLiveEdgeReturn(): void {
+    if (followingLiveEdge) return;
+
+    clearReturnIntent();
+    returnIntentPending = true;
+    if (isAtLiveEdge(scroller)) {
+      scrollToLiveEdge();
+      return;
+    }
+
+    returnIntentTimer = window.setTimeout(() => {
+      returnIntentTimer = 0;
+      const shouldReturn = returnIntentPending;
+      returnIntentPending = false;
+      if (shouldReturn && !followingLiveEdge && isAtLiveEdge(scroller)) {
+        scrollToLiveEdge();
+        return;
+      }
+      scheduleScrollStateUpdate();
+    }, LIVE_EDGE_SCROLL_INTENT_MS);
+  }
+
+  function clearReturnIntent(): void {
+    returnIntentPending = false;
+    if (!returnIntentTimer) return;
+    window.clearTimeout(returnIntentTimer);
+    returnIntentTimer = 0;
   }
 
   function scheduleScrollStateUpdate(): void {
@@ -370,16 +527,16 @@ export function createLiteChatRenderer(
     scrollFrame = window.requestAnimationFrame(() => {
       scrollFrame = 0;
       const atLiveEdge = isAtLiveEdge(scroller);
-      if (atLiveEdge && !followingLiveEdge) {
-        setFollowingLiveEdge(true);
-        pendingMessageCount = 0;
-        renderRecords(null);
-        refreshNewMessagesButton();
-        pinScrollToBottom();
+      if (atLiveEdge && !followingLiveEdge && returnIntentPending) {
+        scrollToLiveEdge();
+        return;
       } else if (atLiveEdge) {
-        setFollowingLiveEdge(true);
+        if (followingLiveEdge) setFollowingLiveEdge(true);
       } else if (!atLiveEdge && followingLiveEdge) {
-        leaveLiveEdge();
+        // Scripted rendering and browser scroll anchoring can move the list
+        // without reader intent. Keep following until an input handler above
+        // explicitly releases the live edge.
+        pinScrollToBottom();
       }
       if (!followingLiveEdge && scroller.scrollTop <= SCROLLBACK_LOAD_THRESHOLD_PX) {
         loadEarlierRecords();
@@ -415,6 +572,7 @@ export function createLiteChatRenderer(
   }
 
   function scrollToLiveEdge(): void {
+    clearReturnIntent();
     setFollowingLiveEdge(true);
     frozenEndId = '';
     pendingMessageCount = 0;
@@ -464,8 +622,10 @@ export function createLiteChatRenderer(
     if (destroyed) return;
     destroyed = true;
     unsubscribe();
+    scrollListeners.abort();
     resizeObserver?.disconnect();
     if (scrollFrame) window.cancelAnimationFrame(scrollFrame);
+    clearReturnIntent();
     scrollFrame = 0;
     items.removeEventListener('animationend', handleItemsAnimationEnd);
     clearLiveBatchMotion();
@@ -478,13 +638,13 @@ export function createLiteChatRenderer(
   }
 }
 
-export function createLiteChatMessageRow(record: LiteChatMessageRecord): HTMLElement {
+export function createLiteChatMessageRow(record: YouTubeChatMessageRecord): HTMLElement {
   const row = el<HTMLElement>(<article class="ytcq-lite-message" />);
   renderLiteChatMessageRow(row, record);
   return row;
 }
 
-export function renderLiteChatMessageRow(row: HTMLElement, record: LiteChatMessageRecord): void {
+export function renderLiteChatMessageRow(row: HTMLElement, record: YouTubeChatMessageRecord): void {
   row.className = `ytcq-lite-message ytcq-lite-message-${record.kind}`;
   row.dataset.messageId = record.id;
   row.dataset.ytcqLiteKind = record.kind;
@@ -523,7 +683,7 @@ export function renderLiteChatMessageRow(row: HTMLElement, record: LiteChatMessa
   row.replaceChildren(avatar, content);
 }
 
-function createAuthorAvatar(author: LiteChatAuthor | undefined): HTMLElement {
+function createAuthorAvatar(author: YouTubeChatAuthor | undefined): HTMLElement {
   const channelUrl = getChannelUrl(author?.channelId);
   const host = channelUrl
     ? el<HTMLAnchorElement>(
@@ -555,7 +715,7 @@ function createAuthorAvatar(author: LiteChatAuthor | undefined): HTMLElement {
   return host;
 }
 
-function createAuthorChip(author: LiteChatAuthor | undefined): HTMLElement {
+function createAuthorChip(author: YouTubeChatAuthor | undefined): HTMLElement {
   const chip = el<HTMLSpanElement>(<span class="ytcq-lite-author-chip" />);
   const authorName = createAuthorName(author);
   const chipBadges = createAuthorBadges(author, 'chip');
@@ -568,7 +728,7 @@ function createAuthorChip(author: LiteChatAuthor | undefined): HTMLElement {
   return chip;
 }
 
-function createAuthorName(author: LiteChatAuthor | undefined): HTMLElement {
+function createAuthorName(author: YouTubeChatAuthor | undefined): HTMLElement {
   const className = `ytcq-lite-author-name${author?.isOwner ? ' owner' : ''}`;
   if (!author?.name) {
     return el<HTMLSpanElement>(
@@ -592,7 +752,7 @@ function createAuthorName(author: LiteChatAuthor | undefined): HTMLElement {
 }
 
 function createAuthorBadges(
-  author: LiteChatAuthor | undefined,
+  author: YouTubeChatAuthor | undefined,
   placement: 'chat' | 'chip'
 ): HTMLElement {
   const badges = el<HTMLSpanElement>(
@@ -665,7 +825,7 @@ function createAuthorBadges(
   return badges;
 }
 
-function appendKindMetadata(content: HTMLElement, record: LiteChatMessageRecord): void {
+function appendKindMetadata(content: HTMLElement, record: YouTubeChatMessageRecord): void {
   if (record.kind === 'paid' && record.paid?.amountText) {
     content.append(
       el<HTMLDivElement>(<div class="ytcq-lite-paid-amount">{record.paid.amountText}</div>)
@@ -748,7 +908,7 @@ function appendKindMetadata(content: HTMLElement, record: LiteChatMessageRecord)
 
 function appendLiteChatRuns(
   container: HTMLElement,
-  runs: readonly LiteChatRichRun[],
+  runs: readonly YouTubeChatRichRun[],
   fallbackText: string
 ): void {
   if (!runs.length) {
@@ -797,7 +957,7 @@ function appendLiteChatRuns(
   }
 }
 
-function getMessageAriaLabel(record: LiteChatMessageRecord): string {
+function getMessageAriaLabel(record: YouTubeChatMessageRecord): string {
   const authorName = record.author?.name || '';
   const amount = record.paid?.amountText || record.sticker?.amountText || '';
   const membershipHeader = record.membership?.headerText || '';
@@ -837,7 +997,7 @@ function getSafeHttpsUrl(value: string | undefined): string {
   }
 }
 
-function applyMessageColors(row: HTMLElement, colors: LiteChatMessageColors | undefined): void {
+function applyMessageColors(row: HTMLElement, colors: YouTubeChatMessageColors | undefined): void {
   setArgbColor(row, '--ytcq-lite-author-color', colors?.authorName);
   setArgbColor(row, '--ytcq-lite-background', colors?.background);
   setArgbColor(row, '--ytcq-lite-body-background', colors?.bodyBackground);

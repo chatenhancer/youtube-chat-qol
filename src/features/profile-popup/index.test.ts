@@ -84,7 +84,7 @@ import {
   wireParticipantProfileClick,
   wireProfileClick
 } from './index';
-import { suspendFeatures } from '../../content/lifecycle';
+import { suspendFeatures } from '../../content/feature-runtime';
 
 let resizeObserverCallbacks: ResizeObserverCallback[] = [];
 

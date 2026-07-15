@@ -3,22 +3,18 @@ import {
   getAuthorKey,
   getIdentityFromUserKey,
   getNormalizedHandle,
-  getUserKey,
   getUserKeyFromIdentity
 } from './identity';
 
 describe('user message identity helpers', () => {
   it('prefers channel IDs when available', () => {
-    const message = createMessage('@ExampleViewer', 'channel-123');
-
-    expect(getUserKey(message)).toBe('channel:channel-123');
     expect(getUserKeyFromIdentity({ authorName: '@ExampleViewer', channelId: 'channel-123' }))
       .toBe('channel:channel-123');
   });
 
   it('falls back to normalized author keys', () => {
     expect(getAuthorKey('  @Example.Viewer  ')).toBe('author:@example.viewer');
-    expect(getUserKey(createMessage('@ExampleViewer'))).toBe('author:@exampleviewer');
+    expect(getUserKeyFromIdentity({ authorName: '@ExampleViewer' })).toBe('author:@exampleviewer');
   });
 
   it('round-trips channel keys back to user identities', () => {
@@ -36,12 +32,3 @@ describe('user message identity helpers', () => {
     expect(getNormalizedHandle(' example-viewer ')).toBe('example-viewer');
   });
 });
-
-function createMessage(authorName: string, channelId = ''): HTMLElement {
-  const message = document.createElement('yt-live-chat-text-message-renderer');
-  const authorHtml = channelId
-    ? `<a href="/channel/${channelId}"><span id="author-name">${authorName}</span></a>`
-    : `<span id="author-name">${authorName}</span>`;
-  message.innerHTML = authorHtml;
-  return message;
-}

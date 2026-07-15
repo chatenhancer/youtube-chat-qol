@@ -1,15 +1,16 @@
 /**
  * Browser scenarios for incoming message translation.
  *
- * The mocked scenario verifies extension wiring deterministically. The real
- * Translate scenario leaves the endpoint unmocked so provider outages or
- * response-shape changes fail in one clearly named browser test.
+ * Endpoint mocks keep incoming-message checks deterministic on both fixture
+ * and real YouTube rows. The composer scenario owns the single fixed-input
+ * check against the real Google Translate service.
  */
-import { expect, test, type BrowserContext, type Locator } from '@playwright/test';
+import { expect, test, type BrowserContext, type Locator, type Route } from '@playwright/test';
+import { getExtensionId } from '../support/extension';
 import { withExtensionStorageValues } from '../support/extension-storage';
 import { closeFocusPromptIfPresent } from '../support/focus-panel';
 import { centerLocatorInViewport } from '../support/locator';
-import { appendMockFixtureMessage } from '../support/mock-page';
+import { appendMockFixtureMessage, pauseMockFixtureMessages } from '../support/mock-page';
 import { cleanVisibleText, getRichVisibleText } from '../support/text';
 import { withMockedTranslationEndpoint } from '../support/translation-endpoint';
 import { openSettingsMenu } from '../support/menu-openers';
@@ -21,10 +22,14 @@ import {
 
 const MOCKED_TARGET_LANGUAGE = 'cy';
 const MOCKED_TRANSLATED_TEXT = 'Helo fyd';
+const CONTENT_INSTANCE_ATTRIBUTE = 'data-ytcq-content-instance';
 const DISPLAY_TARGET_LANGUAGE = 'eo';
 const DISPLAY_TRANSLATED_TEXT = 'YTCQ display result';
-const REAL_TARGET_LANGUAGE = 'ga';
-const REAL_TOGGLE_TARGET_LANGUAGE = 'ka';
+const REAL_BATCH_SOURCE_TEXTS = ['good morning', 'thank you'];
+const REAL_BATCH_TARGET_LANGUAGE = 'ja';
+const REAL_BATCH_TRANSLATION_PATTERN = /[\u3040-\u30ff\u4e00-\u9faf]/u;
+const REAL_TRANSLATE_ENDPOINT_PATTERN = 'https://translate.googleapis.com/translate_a/*';
+const TRANSLATION_RENDER_TIMEOUT_MS = 20_000;
 const SETTINGS_TRANSLATED_TEXT = 'YTCQ settings result';
 const TOGGLE_TARGET_LANGUAGE = 'en';
 const TOGGLE_SOURCE_LANGUAGE = 'es';
@@ -32,13 +37,13 @@ const TOGGLE_TRANSLATED_TEXT = 'Browser translated toggle result';
 
 type TranslationDisplayMode = 'below' | 'replace';
 
-interface RealReplacedTranslationCandidate {
-  messageId: string;
-  sourceText: string;
-  sourceVisibleText: string;
-  translatedText: string;
-  translatedVisibleText: string;
-  translatedTitle: string;
+interface BatchTranslationResponse {
+  error?: string;
+  ok: boolean;
+  results?: Array<{
+    sourceLanguage: string;
+    translatedText: string;
+  }>;
 }
 
 export const mockedMessageTranslationScenario: BrowserScenario = async ({ chat, context }) => {
@@ -46,14 +51,34 @@ export const mockedMessageTranslationScenario: BrowserScenario = async ({ chat, 
   await expectMockedIncomingTranslation({ chat, context });
 };
 
-export const realMessageTranslationScenario: BrowserScenario = async ({ chat, context }) => {
+export const mockedReplacedTranslationToggleScenario: BrowserScenario = async ({ chat, context }) => {
   await waitForSourceChatMessage(chat);
-  await expectRealIncomingTranslation({ chat, context });
+  await expectMockedReplacedTranslationToggle({ chat, context });
 };
 
-export const realReplacedTranslationToggleScenario: BrowserScenario = async ({ chat, context }) => {
-  await waitForSourceChatMessage(chat);
-  await expectRealReplacedTranslationToggle({ chat, context });
+export const realBatchTranslationProviderScenario: BrowserScenario = async ({ context }) => {
+  await test.step('Translate a fixed batch through real Google Translate', async () => {
+    const requestedPaths: string[] = [];
+    const captureRequest = async (route: Route) => {
+      requestedPaths.push(new URL(route.request().url()).pathname);
+      await route.continue();
+    };
+    await context.route(REAL_TRANSLATE_ENDPOINT_PATTERN, captureRequest);
+    let response: BatchTranslationResponse;
+    try {
+      response = await requestRealBatchTranslation(context);
+    } finally {
+      await context.unroute(REAL_TRANSLATE_ENDPOINT_PATTERN, captureRequest);
+    }
+
+    expect(response.ok, response.error || 'Real batch translation should succeed.').toBe(true);
+    expect(response.results).toHaveLength(REAL_BATCH_SOURCE_TEXTS.length);
+    for (const result of response.results || []) {
+      expect(result.translatedText).toMatch(REAL_BATCH_TRANSLATION_PATTERN);
+    }
+    expect(requestedPaths).toContain('/translate_a/t');
+    expect(requestedPaths).not.toContain('/translate_a/single');
+  });
 };
 
 export const translationDisplayScenario: BrowserScenario = async ({ chat, context }) => {
@@ -95,22 +120,6 @@ async function expectMockedIncomingTranslation({
   });
 }
 
-async function expectRealIncomingTranslation({
-  chat,
-  context
-}: {
-  chat: ChatSurface;
-  context: BrowserContext;
-}): Promise<void> {
-  await test.step('Use real Google Translate response', async () => {
-    await enableTranslationAndExpectRendered({
-      chat,
-      context,
-      targetLanguage: REAL_TARGET_LANGUAGE
-    });
-  });
-}
-
 async function enableTranslationAndExpectRendered({
   chat,
   context,
@@ -123,6 +132,7 @@ async function enableTranslationAndExpectRendered({
   expectedText?: string;
 }): Promise<void> {
   await withTranslationCleared({ chat, context, targetLanguage, callback: async () => {
+    await reloadChatForMockedTranslation(chat);
     await findTranslatableSourceMessage(chat);
 
     await test.step(`Enable translation to ${targetLanguage}`, async () => {
@@ -238,6 +248,7 @@ async function expectReplacedTranslationToggleSurfaces({
   context: BrowserContext;
 }): Promise<void> {
   await test.step('Use mocked translation endpoint for replaced toggle surfaces', async () => {
+    await pauseMockFixtureMessages(chat);
     await withMockedTranslationEndpoint(context, TOGGLE_TRANSLATED_TEXT, async () => {
       await withTranslationCleared({ chat, context, targetLanguage: TOGGLE_TARGET_LANGUAGE, callback: async () => {
         await withTranslationEnabled({
@@ -256,140 +267,34 @@ async function expectReplacedTranslationToggleSurfaces({
   });
 }
 
-async function expectRealReplacedTranslationToggle({
+async function expectMockedReplacedTranslationToggle({
   chat,
   context
 }: {
   chat: ChatSurface;
   context: BrowserContext;
 }): Promise<void> {
-  await test.step('Use real Google Translate response for replaced toggle', async () => {
-    await withTranslationCleared({ chat, context, targetLanguage: REAL_TOGGLE_TARGET_LANGUAGE, callback: async () => {
-      await withTranslationEnabled({
-        context,
-        targetLanguage: REAL_TOGGLE_TARGET_LANGUAGE,
-        translationDisplay: 'replace',
-        callback: async () => {
-          const replaced = await findRealReplacedTranslation(chat, REAL_TOGGLE_TARGET_LANGUAGE);
-          await expectToggleableRealReplacement({
-            host: replaced.host,
-            originalTitle: /^Translated: .+/u,
-            sourceText: replaced.sourceText,
-            sourceVisibleText: replaced.sourceVisibleText,
-            text: replaced.text,
-            targetLanguage: REAL_TOGGLE_TARGET_LANGUAGE,
-            translatedTitle: replaced.translatedTitle
-          });
-        }
-      });
-    } });
+  await test.step('Use mocked translation endpoint for the real message row', async () => {
+    await withMockedTranslationEndpoint(context, TOGGLE_TRANSLATED_TEXT, async () => {
+      await withTranslationCleared({ chat, context, targetLanguage: TOGGLE_TARGET_LANGUAGE, callback: async () => {
+        await reloadChatForMockedTranslation(chat);
+        const { sourceMessage, sourceText } = await findTranslatableSourceMessage(chat);
+        await withTranslationEnabled({
+          context,
+          targetLanguage: TOGGLE_TARGET_LANGUAGE,
+          translationDisplay: 'replace',
+          callback: async () => {
+            await expectToggleableReplacement({
+              host: sourceMessage,
+              originalTitle: /^Translated: Browser translated toggle result(?:\s.*)?$/u,
+              sourceText,
+              text: sourceMessage.locator('#message').first()
+            });
+          }
+        });
+      } });
+    }, TOGGLE_SOURCE_LANGUAGE);
   });
-}
-
-async function findRealReplacedTranslation(
-  chat: ChatSurface,
-  targetLanguage: string
-): Promise<{
-  host: Locator;
-  sourceText: string;
-  sourceVisibleText: string;
-  text: Locator;
-  translatedText: string;
-  translatedVisibleText: string;
-  translatedTitle: string;
-}> {
-  return test.step('Find a real replaced translation with original-text metadata', async () => {
-    const messages = chat.locator(`${NORMAL_CHAT_MESSAGE_SELECTOR}.ytcq-translation-replaced`);
-    const candidate = await waitForRealReplacedTranslationCandidate(messages, targetLanguage);
-
-    const host = chat.locator(
-      `${NORMAL_CHAT_MESSAGE_SELECTOR}[id="${escapeCssAttributeValue(candidate.messageId)}"]`
-    ).first();
-    const text = host.locator('#message').first();
-
-    if (!candidate.sourceText || !candidate.translatedText) {
-      throw new Error('Real replaced translation was missing readable original or translated text.');
-    }
-
-    return {
-      host,
-      sourceText: candidate.sourceText,
-      sourceVisibleText: candidate.sourceVisibleText,
-      text,
-      translatedText: candidate.translatedText,
-      translatedVisibleText: candidate.translatedVisibleText,
-      translatedTitle: candidate.translatedTitle
-    };
-  });
-}
-
-async function waitForRealReplacedTranslationCandidate(
-  messages: Locator,
-  targetLanguage: string
-): Promise<RealReplacedTranslationCandidate> {
-  const deadline = Date.now() + 30_000;
-
-  while (Date.now() < deadline) {
-    const candidate = await findRealReplacedTranslationCandidate(messages, targetLanguage);
-    if (candidate) return candidate;
-    await messages.page().waitForTimeout(250);
-  }
-
-  throw new Error('Real Google Translate should replace at least one visible chat message.');
-}
-
-async function findRealReplacedTranslationCandidate(
-  messages: Locator,
-  targetLanguage: string
-): Promise<RealReplacedTranslationCandidate | null> {
-  const count = await messages.count();
-
-  for (let index = count - 1; index >= 0; index -= 1) {
-    const message = messages.nth(index);
-    const snapshot = await message.evaluate((element) => {
-      const text = element.querySelector<HTMLElement>('#message');
-      const icon = text?.querySelector<HTMLElement>('.ytcq-replaced-translation-icon');
-      const iconRect = icon?.getBoundingClientRect();
-      const iconInViewport = iconRect
-        ? iconRect.width > 0 &&
-          iconRect.height > 0 &&
-          iconRect.top >= 0 &&
-          iconRect.left >= 0 &&
-          iconRect.bottom <= window.innerHeight &&
-          iconRect.right <= window.innerWidth
-        : false;
-      return {
-        iconInViewport,
-        language: text?.getAttribute('lang') || '',
-        messageId: element.id || '',
-        translatedText: text?.innerText || text?.textContent || '',
-        translatedTitle: text?.getAttribute('title') || ''
-      };
-    }).catch(() => null);
-    if (!snapshot?.messageId || !snapshot.iconInViewport || snapshot.language !== targetLanguage) continue;
-
-    const { messageId, translatedTitle } = snapshot;
-    const sourceText = getOriginalTextFromReplacementTitle(translatedTitle);
-    if (!sourceText) continue;
-
-    const translatedText = cleanVisibleText(snapshot.translatedText);
-    if (!translatedText || translatedText === sourceText) continue;
-
-    const sourceVisibleText = getComparableVisibleText(sourceText);
-    const translatedVisibleText = getComparableVisibleText(translatedText);
-    if (!sourceVisibleText || !translatedVisibleText || sourceVisibleText === translatedVisibleText) continue;
-
-    return {
-      messageId,
-      sourceText,
-      sourceVisibleText,
-      translatedText,
-      translatedVisibleText,
-      translatedTitle
-    };
-  }
-
-  return null;
 }
 
 async function appendTranslatedToggleMessage(chat: ChatSurface): Promise<{
@@ -481,12 +386,13 @@ async function expectFocusPanelReplacementToggle(
     await expect(panel.locator('.ytcq-focus-author')).toContainText(source.authorName);
 
     const records = panel.locator('.ytcq-focus-message');
-    await expect.poll(async () => findLocatorIndexByText(records, TOGGLE_TRANSLATED_TEXT), {
-      message: 'Focus panel should contain the translated message record.',
-      timeout: 10_000
-    }).toBeGreaterThanOrEqual(0);
-
-    const record = records.nth(await findLocatorIndexByText(records, TOGGLE_TRANSLATED_TEXT));
+    const record = records.filter({
+      hasText: new RegExp(
+        `${escapeRegExp(TOGGLE_TRANSLATED_TEXT)}|${escapeRegExp(source.sourceText)}`,
+        'u'
+      )
+    }).first();
+    await expect(record).toBeVisible({ timeout: 10_000 });
     const text = record.locator('.ytcq-focus-bubble').first();
     await expectToggleableReplacement({
       host: record,
@@ -543,47 +449,6 @@ async function expectToggleableReplacement({
   await expect(text).toHaveAttribute('title', translatedTitle);
 }
 
-async function expectToggleableRealReplacement({
-  host,
-  originalTitle,
-  sourceText,
-  sourceVisibleText = sourceText,
-  targetLanguage,
-  text,
-  translatedTitle
-}: {
-  host: Locator;
-  originalTitle: RegExp | string;
-  sourceText: string;
-  sourceVisibleText?: string;
-  targetLanguage: string;
-  text: Locator;
-  translatedTitle: string;
-}): Promise<void> {
-  await expect(host).toHaveClass(/ytcq-translation-replaced/, { timeout: 20_000 });
-  await expect(host).toHaveAttribute('data-ytcq-translation-view', 'translated');
-  await expect(text).toHaveClass(/ytcq-translation-replaced-text/);
-  await expect(text).toHaveAttribute('lang', targetLanguage);
-  await expect(text).toHaveAttribute('title', translatedTitle);
-  await expectVisibleTextToDifferFrom(text, sourceVisibleText);
-
-  await clickReplacedTranslationIcon({ host, text });
-
-  await expect(host).toHaveAttribute('data-ytcq-translation-view', 'original');
-  await expectVisibleTextToMatchStoredOriginal(text, sourceVisibleText);
-  await expect(text).toHaveAttribute('title', originalTitle);
-  await expect.poll(async () => text.evaluate((element) => getComputedStyle(element).textDecorationLine), {
-    message: 'Original view should not keep the translated-message underline.',
-    timeout: 2_000
-  }).toBe('none');
-
-  await clickReplacedTranslationIcon({ host, text });
-
-  await expect(host).toHaveAttribute('data-ytcq-translation-view', 'translated');
-  await expect(text).toHaveAttribute('title', translatedTitle);
-  await expectVisibleTextToDifferFrom(text, sourceVisibleText);
-}
-
 async function expectVisibleTextToContain(locator: Locator, expectedText: string): Promise<void> {
   await expect.poll(async () => getComparableLocatorText(locator), {
     message: `Expected visible text to include ${expectedText}.`,
@@ -602,33 +467,6 @@ async function clickReplacedTranslationIcon({
   await centerLocatorInViewport(host);
   await centerLocatorInViewport(icon);
   await icon.click();
-}
-
-async function expectVisibleTextToMatchStoredOriginal(locator: Locator, expectedText: string): Promise<void> {
-  const comparableExpectedText = getComparableVisibleText(expectedText);
-  await expect.poll(async () => {
-    const comparableText = await getComparableLocatorText(locator);
-    return Boolean(comparableText)
-      && comparableText.length >= Math.min(6, comparableExpectedText.length)
-      && (
-        comparableText.includes(comparableExpectedText)
-        || comparableExpectedText.includes(comparableText)
-      );
-  }, {
-    message: `Expected visible original text to match stored original text ${expectedText}.`,
-    timeout: 15_000
-  }).toBe(true);
-}
-
-async function expectVisibleTextToDifferFrom(locator: Locator, unexpectedText: string): Promise<void> {
-  const comparableUnexpectedText = getComparableVisibleText(unexpectedText);
-  await expect.poll(async () => {
-    const comparableText = await getComparableLocatorText(locator);
-    return Boolean(comparableText) && comparableText !== comparableUnexpectedText;
-  }, {
-    message: `Expected visible text to differ from ${unexpectedText}.`,
-    timeout: 15_000
-  }).toBe(true);
 }
 
 async function expectTranslateSettingReactsLive({
@@ -740,7 +578,7 @@ async function expectRenderedTranslation({
   expectedText?: string;
 }): Promise<void> {
   await test.step('Wait for rendered translation', async () => {
-    await expect(translation).toBeVisible({ timeout: 20_000 });
+    await expect(translation).toBeVisible({ timeout: TRANSLATION_RENDER_TIMEOUT_MS });
   });
   if (sourceText) {
     await test.step('Verify rendered translation differs from source', async () => {
@@ -778,8 +616,13 @@ async function findTranslatableSourceMessage(chat: ChatSurface): Promise<{
       const candidate = messages.nth(index);
       if (!await candidate.isVisible().catch(() => false)) continue;
 
-      const sourceText = cleanVisibleText(await candidate.locator('#message').innerText().catch(() => ''));
-      if (!isLikelyTranslatableSource(sourceText)) continue;
+      const messageText = candidate.locator('#message').first();
+      const plainText = cleanVisibleText(await messageText.innerText().catch(() => ''));
+      if (!isLikelyTranslatableSource(plainText)) continue;
+
+      const sourceText = cleanVisibleText(
+        await getRichVisibleText(messageText).catch(() => '')
+      );
       if (await candidate.getAttribute('data-ytcq-translation-key').catch(() => null)) continue;
       if (await candidate.locator('.ytcq-translation').count().catch(() => 0)) continue;
 
@@ -838,8 +681,61 @@ async function withTranslationEnabled<T>({
 }
 
 function isLikelyTranslatableSource(text: string): boolean {
-  const letters = text.match(/\p{Letter}/gu) || [];
+  const textOutsideMentions = text.replace(/(^|\s)@[\p{Letter}\p{Number}_][^\s@]*/gu, '$1');
+  const letters = textOutsideMentions.match(/\p{Letter}/gu) || [];
   return letters.length >= 2;
+}
+
+async function requestRealBatchTranslation(
+  context: BrowserContext
+): Promise<BatchTranslationResponse> {
+  const extensionId = await getExtensionId(context);
+  const popup = await context.newPage();
+
+  try {
+    await popup.goto(`chrome-extension://${extensionId}/popup.html`);
+    return await popup.evaluate(
+      (request) => new Promise<BatchTranslationResponse>((resolve) => {
+        chrome.runtime.sendMessage(request, (response: BatchTranslationResponse | undefined) => {
+          const error = chrome.runtime.lastError;
+          if (error) {
+            resolve({ ok: false, error: error.message });
+            return;
+          }
+          resolve(response || { ok: false, error: 'The translation worker returned no response.' });
+        });
+      }),
+      {
+        type: 'ytcq:translateBatch',
+        texts: REAL_BATCH_SOURCE_TEXTS,
+        targetLanguage: REAL_BATCH_TARGET_LANGUAGE
+      }
+    );
+  } finally {
+    await popup.close().catch(() => undefined);
+  }
+}
+
+async function reloadChatForMockedTranslation(chat: ChatSurface): Promise<void> {
+  await test.step('Reload chat after disabling translation', async () => {
+    const html = chat.locator('html');
+    await expect(html).toHaveAttribute(CONTENT_INSTANCE_ATTRIBUTE, /.+/, { timeout: 15_000 });
+    const previousInstance = await html.getAttribute(CONTENT_INSTANCE_ATTRIBUTE);
+    await chat.locator('body').evaluate(() => {
+      window.location.reload();
+    });
+    await expect.poll(
+      () => html.getAttribute(CONTENT_INSTANCE_ATTRIBUTE),
+      {
+        message: 'Expected the reloaded chat document to claim a new extension instance.',
+        timeout: 45_000
+      }
+    ).not.toBe(previousInstance);
+    await expect(chat.locator('yt-live-chat-renderer')).toBeVisible({ timeout: 45_000 });
+    await expect(chat.locator(NORMAL_CHAT_MESSAGE_SELECTOR).first()).toBeVisible({
+      timeout: 45_000
+    });
+  });
 }
 
 async function waitForTranslationsCleared(chat: ChatSurface): Promise<void> {
@@ -861,20 +757,6 @@ function getSourceMessage(
   return chat.locator(`${NORMAL_CHAT_MESSAGE_SELECTOR}[id="${escapeCssAttributeValue(source.messageId)}"]`).first();
 }
 
-async function findLocatorIndexByText(locator: Locator, expectedText: string): Promise<number> {
-  const count = await locator.count();
-  for (let index = 0; index < count; index += 1) {
-    const text = cleanVisibleText(await locator.nth(index).innerText().catch(() => ''));
-    if (text.includes(expectedText)) return index;
-  }
-  return -1;
-}
-
-function getOriginalTextFromReplacementTitle(title: string): string {
-  const match = /^Original \([^)]+\):\s+([\s\S]+)$/u.exec(title);
-  return cleanVisibleText(match?.[1] || '');
-}
-
 function getComparableVisibleText(text: string): string {
   return cleanVisibleText(text)
     .replace(/\p{Extended_Pictographic}/gu, '')
@@ -890,6 +772,10 @@ async function getComparableLocatorText(locator: Locator): Promise<string> {
     ignoredSelector: '.ytcq-replaced-translation-icon'
   });
   return getComparableVisibleText(visibleText);
+}
+
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 function escapeCssAttributeValue(value: string): string {

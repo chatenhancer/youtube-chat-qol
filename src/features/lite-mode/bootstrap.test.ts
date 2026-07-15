@@ -78,6 +78,7 @@ describe('Lite mode document-start bootstrap', () => {
       liteModeEnabled: true
     });
     expect(controls.map((detail) => JSON.parse(detail))).toContainEqual({
+      consumer: 'lite',
       enabled: true,
       version: 1
     });

@@ -1,21 +1,21 @@
-/** Runtime validation for the page-world Lite chat event boundary. */
+/** Runtime validation for the page-world YouTube chat feed event boundary. */
 import {
-  LITE_CHAT_PROTOCOL_VERSION,
-  type LiteChatAction,
-  type LiteChatAuthor,
-  type LiteChatAuthorBadge,
-  type LiteChatBatch,
-  type LiteChatGiftMetadata,
-  type LiteChatMembershipMetadata,
-  type LiteChatMessageColors,
-  type LiteChatMessageRecord,
-  type LiteChatPaidMetadata,
-  type LiteChatRichRun,
-  type LiteChatStickerMetadata
+  YOUTUBE_CHAT_FEED_PROTOCOL_VERSION,
+  type YouTubeChatAuthor,
+  type YouTubeChatAuthorBadge,
+  type YouTubeChatFeedAction,
+  type YouTubeChatFeedTransportBatch,
+  type YouTubeChatGiftMetadata,
+  type YouTubeChatMembershipMetadata,
+  type YouTubeChatMessageColors,
+  type YouTubeChatMessageRecord,
+  type YouTubeChatPaidMetadata,
+  type YouTubeChatRichRun,
+  type YouTubeChatStickerMetadata
 } from './protocol';
 
-export const MAX_LITE_CHAT_BATCH_DETAIL_LENGTH = 2_000_000;
-export const MAX_LITE_CHAT_BATCH_ACTIONS = 500;
+export const MAX_YOUTUBE_CHAT_FEED_BATCH_DETAIL_LENGTH = 2_000_000;
+export const MAX_YOUTUBE_CHAT_FEED_BATCH_ACTIONS = 500;
 const MAX_DIAGNOSTIC_VALUES = 50;
 const MAX_MESSAGE_ID_LENGTH = 240;
 const MAX_CHANNEL_ID_LENGTH = 240;
@@ -24,13 +24,15 @@ const MAX_URL_LENGTH = 4_096;
 const MAX_RUNS = 500;
 const MAX_BADGES = 24;
 const MAX_SHORTCUTS = 24;
-export const MAX_LITE_CHAT_CONTINUATION_TIMEOUT_MS = 600_000;
+export const MAX_YOUTUBE_CHAT_FEED_CONTINUATION_TIMEOUT_MS = 600_000;
 
-export function parseLiteChatBatchDetail(detail: unknown): LiteChatBatch | null {
+export function parseYouTubeChatFeedBatchDetail(
+  detail: unknown
+): YouTubeChatFeedTransportBatch | null {
   if (
     typeof detail !== 'string' ||
     !detail ||
-    detail.length > MAX_LITE_CHAT_BATCH_DETAIL_LENGTH
+    detail.length > MAX_YOUTUBE_CHAT_FEED_BATCH_DETAIL_LENGTH
   ) return null;
 
   let parsed: unknown;
@@ -40,20 +42,20 @@ export function parseLiteChatBatchDetail(detail: unknown): LiteChatBatch | null 
     return null;
   }
   if (!isRecord(parsed)) return null;
-  if (parsed.version !== LITE_CHAT_PROTOCOL_VERSION) return null;
+  if (parsed.version !== YOUTUBE_CHAT_FEED_PROTOCOL_VERSION) return null;
   if (!Number.isSafeInteger(parsed.sequence) || Number(parsed.sequence) <= 0) return null;
   if (!Number.isFinite(parsed.receivedAt) || Number(parsed.receivedAt) < 0) return null;
   if (!isBatchSource(parsed.source)) return null;
   if (
     !Array.isArray(parsed.actions) ||
-    parsed.actions.length > MAX_LITE_CHAT_BATCH_ACTIONS
+    parsed.actions.length > MAX_YOUTUBE_CHAT_FEED_BATCH_ACTIONS
   ) return null;
-  if (!parsed.actions.every(isLiteChatAction)) return null;
+  if (!parsed.actions.every(isYouTubeChatFeedAction)) return null;
   if (
     parsed.continuationTimeoutMs !== undefined &&
     (!Number.isFinite(parsed.continuationTimeoutMs) ||
       Number(parsed.continuationTimeoutMs) < 0 ||
-      Number(parsed.continuationTimeoutMs) > MAX_LITE_CHAT_CONTINUATION_TIMEOUT_MS)
+      Number(parsed.continuationTimeoutMs) > MAX_YOUTUBE_CHAT_FEED_CONTINUATION_TIMEOUT_MS)
   ) {
     return null;
   }
@@ -69,8 +71,10 @@ export function parseLiteChatBatchDetail(detail: unknown): LiteChatBatch | null 
   ) {
     return null;
   }
+  if (parsed.snapshot !== undefined && typeof parsed.snapshot !== 'boolean') return null;
+  if (parsed.startup !== undefined && typeof parsed.startup !== 'boolean') return null;
   if (parsed.unreadableFeed !== undefined && typeof parsed.unreadableFeed !== 'boolean') return null;
-  return parsed as unknown as LiteChatBatch;
+  return parsed as unknown as YouTubeChatFeedTransportBatch;
 }
 
 function isDiagnosticList(value: unknown): boolean {
@@ -81,11 +85,11 @@ function isDiagnosticList(value: unknown): boolean {
   );
 }
 
-function isBatchSource(value: unknown): value is LiteChatBatch['source'] {
+function isBatchSource(value: unknown): value is YouTubeChatFeedTransportBatch['source'] {
   return value === 'initial' || value === 'live' || value === 'replay' || value === 'send';
 }
 
-function isLiteChatAction(value: unknown): value is LiteChatAction {
+function isYouTubeChatFeedAction(value: unknown): value is YouTubeChatFeedAction {
   if (!isRecord(value) || typeof value.type !== 'string') return false;
   if (
     value.replayOffsetMs !== undefined &&
@@ -96,19 +100,19 @@ function isLiteChatAction(value: unknown): value is LiteChatAction {
   if (value.type === 'reset') return true;
   if (value.type === 'remove') return isBoundedString(value.id, MAX_MESSAGE_ID_LENGTH);
   if (value.type === 'remove-author') return isBoundedString(value.channelId, MAX_CHANNEL_ID_LENGTH);
-  return value.type === 'upsert' && isLiteChatMessageRecord(value.record);
+  return value.type === 'upsert' && isYouTubeChatMessageRecord(value.record);
 }
 
-function isLiteChatMessageRecord(value: unknown): value is LiteChatMessageRecord {
+function isYouTubeChatMessageRecord(value: unknown): value is YouTubeChatMessageRecord {
   if (!isRecord(value)) return false;
   if (!isBoundedString(value.id, MAX_MESSAGE_ID_LENGTH)) return false;
   if (!isMessageKind(value.kind)) return false;
   if (!isStringWithin(value.plainText, MAX_TEXT_LENGTH)) return false;
-  if (!Array.isArray(value.runs) || value.runs.length > MAX_RUNS || !value.runs.every(isLiteChatRun)) {
+  if (!Array.isArray(value.runs) || value.runs.length > MAX_RUNS || !value.runs.every(isYouTubeChatRun)) {
     return false;
   }
-  if (value.author !== undefined && !isLiteChatAuthor(value.author)) return false;
-  if (value.colors !== undefined && !isLiteChatColors(value.colors)) return false;
+  if (value.author !== undefined && !isYouTubeChatAuthor(value.author)) return false;
+  if (value.colors !== undefined && !isYouTubeChatColors(value.colors)) return false;
   if (value.timestampText !== undefined && !isStringWithin(value.timestampText, 120)) return false;
   if (
     value.timestampUsec !== undefined &&
@@ -127,7 +131,7 @@ function isLiteChatMessageRecord(value: unknown): value is LiteChatMessageRecord
   return true;
 }
 
-function isLiteChatRun(value: unknown): value is LiteChatRichRun {
+function isYouTubeChatRun(value: unknown): value is YouTubeChatRichRun {
   if (!isRecord(value)) return false;
   if (value.type === 'text') {
     return isStringWithin(value.text, MAX_TEXT_LENGTH) &&
@@ -142,26 +146,39 @@ function isLiteChatRun(value: unknown): value is LiteChatRichRun {
     value.shortcuts.every((shortcut) => isStringWithin(shortcut, 500));
 }
 
-function isLiteChatAuthor(value: unknown): value is LiteChatAuthor {
+function isYouTubeChatAuthor(value: unknown): value is YouTubeChatAuthor {
   if (!isRecord(value) || !isBoundedString(value.name, 500)) return false;
   if (value.channelId !== undefined && !isStringWithin(value.channelId, MAX_CHANNEL_ID_LENGTH)) {
     return false;
   }
   if (value.avatarUrl !== undefined && !isSafeTransportUrl(value.avatarUrl)) return false;
   if (value.isOwner !== undefined && typeof value.isOwner !== 'boolean') return false;
+  if (
+    value.topFanRank !== undefined &&
+    value.topFanRank !== 1 &&
+    value.topFanRank !== 2 &&
+    value.topFanRank !== 3
+  ) {
+    return false;
+  }
   return Array.isArray(value.badges) &&
     value.badges.length <= MAX_BADGES &&
-    value.badges.every(isLiteChatBadge);
+    value.badges.every(isYouTubeChatBadge);
 }
 
-function isLiteChatBadge(value: unknown): value is LiteChatAuthorBadge {
+function isYouTubeChatBadge(value: unknown): value is YouTubeChatAuthorBadge {
   return isRecord(value) &&
     isBoundedString(value.label, 500) &&
-    (value.kind === undefined || value.kind === 'moderator' || value.kind === 'verified') &&
+    (
+      value.kind === undefined ||
+      value.kind === 'member' ||
+      value.kind === 'moderator' ||
+      value.kind === 'verified'
+    ) &&
     (value.iconUrl === undefined || isSafeTransportUrl(value.iconUrl));
 }
 
-function isLiteChatColors(value: unknown): value is LiteChatMessageColors {
+function isYouTubeChatColors(value: unknown): value is YouTubeChatMessageColors {
   if (!isRecord(value)) return false;
   return [
     value.authorName,
@@ -176,24 +193,24 @@ function isLiteChatColors(value: unknown): value is LiteChatMessageColors {
   ));
 }
 
-function isPaidMetadata(value: unknown): value is LiteChatPaidMetadata {
+function isPaidMetadata(value: unknown): value is YouTubeChatPaidMetadata {
   return isRecord(value) && isBoundedString(value.amountText, 500);
 }
 
-function isStickerMetadata(value: unknown): value is LiteChatStickerMetadata {
+function isStickerMetadata(value: unknown): value is YouTubeChatStickerMetadata {
   return isRecord(value) &&
     isBoundedString(value.alt, 500) &&
     isStringWithin(value.amountText, 500) &&
     isSafeTransportUrl(value.imageUrl);
 }
 
-function isMembershipMetadata(value: unknown): value is LiteChatMembershipMetadata {
+function isMembershipMetadata(value: unknown): value is YouTubeChatMembershipMetadata {
   return isRecord(value) &&
     isBoundedString(value.headerText, 2_000) &&
     (value.subtext === undefined || isStringWithin(value.subtext, 2_000));
 }
 
-function isGiftMetadata(value: unknown): value is LiteChatGiftMetadata {
+function isGiftMetadata(value: unknown): value is YouTubeChatGiftMetadata {
   return isRecord(value) &&
     (value.giftType === 'purchase' || value.giftType === 'redemption') &&
     isBoundedString(value.headerText, 2_000) &&
@@ -204,7 +221,7 @@ function isGiftMetadata(value: unknown): value is LiteChatGiftMetadata {
     ));
 }
 
-function isMessageKind(value: unknown): value is LiteChatMessageRecord['kind'] {
+function isMessageKind(value: unknown): value is YouTubeChatMessageRecord['kind'] {
   return value === 'text' || value === 'paid' || value === 'sticker' ||
     value === 'membership' || value === 'gift';
 }

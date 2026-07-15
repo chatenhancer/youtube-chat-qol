@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import type { LiteChatAction, LiteChatMessageRecord } from './protocol';
+import type { YouTubeChatFeedAction, YouTubeChatMessageRecord } from '../../youtube/chat-feed/protocol';
 import { createLiteChatStore } from './store';
 
 describe('Lite chat store', () => {
@@ -146,11 +146,11 @@ describe('Lite chat store', () => {
   });
 });
 
-function upsert(record: LiteChatMessageRecord): LiteChatAction {
+function upsert(record: YouTubeChatMessageRecord): YouTubeChatFeedAction {
   return { type: 'upsert', record };
 }
 
-function createRecord(id: string, plainText: string, channelId = 'channel'): LiteChatMessageRecord {
+function createRecord(id: string, plainText: string, channelId = 'channel'): YouTubeChatMessageRecord {
   return {
     id,
     kind: 'text',

@@ -1,83 +1,130 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import {
-  createInboxRecord,
+  createInboxRecordFromChatFeed,
   hasTransientRecordUpdate,
   mergeInboxRecords,
   recordsEqual
 } from './records';
+import type { YouTubeChatMessageRecord } from '../../youtube/chat-feed/protocol';
 import type { InboxRecord } from './types';
 
 describe('inbox records', () => {
-  afterEach(() => {
-    vi.restoreAllMocks();
-    vi.useRealTimers();
-  });
+  it('creates rich live Inbox records from normalized feed messages', () => {
+    const sourceRecord: YouTubeChatMessageRecord = {
+      author: {
+        avatarUrl: 'https://example.test/feed-avatar.jpg',
+        badges: [],
+        channelId: 'feed-channel',
+        name: '@FeedUser'
+      },
+      id: 'feed-live-1',
+      kind: 'text',
+      plainText: 'hello @CurrentViewer 🚀',
+      runs: [
+        { text: 'hello @CurrentViewer ', type: 'text' },
+        {
+          alt: '🚀',
+          emojiId: 'rocket',
+          imageUrl: 'https://example.test/feed-rocket.png',
+          shortcuts: [':rocket:'],
+          type: 'emoji'
+        }
+      ],
+      timestampText: '10:30 PM',
+      timestampUsec: '1780317000123000'
+    };
 
-  it('creates stored records from live YouTube message renderers', () => {
-    vi.useFakeTimers();
-    vi.setSystemTime(new Date('2026-06-01T12:00:00Z'));
-    vi.spyOn(Math, 'random').mockReturnValue(0.123456);
-
-    const message = createMessage();
-    const record = createInboxRecord(message, {
+    const record = createInboxRecordFromChatFeed(sourceRecord, {
       keywords: ['launch'],
-      mention: true
+      mention: true,
+      mentionHandles: ['@CurrentViewer']
     }, {
-      getMentionHandles: () => ['@CurrentViewer'],
+      receivedAt: 1_780_318_000_000,
+      source: 'live',
       sourceUrl: 'https://www.youtube.com/watch?v=stream'
     });
 
     expect(record).toMatchObject({
-      authorName: '@ExampleUser',
-      avatarSrc: 'https://example.test/avatar.jpg',
-      channelId: 'example-channel',
-      id: expect.stringMatching(/^\d+-4fzyo8$/),
+      authorName: '@FeedUser',
+      avatarSrc: 'https://example.test/feed-avatar.jpg',
+      channelId: 'feed-channel',
+      id: 'feed:feed-live-1',
       matchedKeywords: ['launch'],
       mention: true,
       mentionHandles: ['@CurrentViewer'],
-      messageId: 'message-1',
+      messageId: 'feed-live-1',
       read: false,
       sourceUrl: 'https://www.youtube.com/watch?v=stream',
       text: 'hello @CurrentViewer 🚀',
+      timestamp: 1_780_317_000_123,
       timestampText: '10:30 PM'
     });
     expect(record?.contentParts).toEqual([
-      { type: 'text', text: 'hello @CurrentViewer ' },
+      { text: 'hello @CurrentViewer ', type: 'text' },
       {
-        type: 'emoji',
         alt: '🚀',
-        className: 'emoji',
+        className: 'emoji yt-formatted-string style-scope yt-live-chat-text-message-renderer',
         emojiId: 'rocket',
-        src: 'https://example.test/rocket.png',
-        tooltip: ''
+        src: 'https://example.test/feed-rocket.png',
+        tooltip: ':rocket:',
+        type: 'emoji'
       }
     ]);
-    expect(record?.messageRef?.deref()).toBe(message);
   });
 
-  it('skips unreadable messages and preserves explicit mention handles', () => {
-    const emptyMessage = document.createElement('yt-live-chat-text-message-renderer');
-    const getMentionHandles = vi.fn(() => ['@FallbackViewer']);
+  it('derives replay timestamps from the replay offset instead of live wall-clock metadata', () => {
+    const receivedAt = new Date('2026-06-01T12:34:56Z').getTime();
+    const replayDay = new Date(receivedAt);
+    replayDay.setHours(0, 0, 0, 0);
+    const sourceRecord: YouTubeChatMessageRecord = {
+      author: {
+        badges: [],
+        name: '@ReplayUser'
+      },
+      id: 'feed-replay-1',
+      kind: 'text',
+      plainText: 'replay hello 👋',
+      runs: [
+        { text: 'replay hello ', type: 'text' },
+        {
+          alt: '👋',
+          imageUrl: 'https://example.test/feed-wave.png',
+          shortcuts: [':wave:'],
+          type: 'emoji'
+        }
+      ],
+      timestampUsec: '1780317000123000'
+    };
 
-    expect(createInboxRecord(emptyMessage, {
-      mention: true
+    const record = createInboxRecordFromChatFeed(sourceRecord, {
+      mention: false
     }, {
-      getMentionHandles,
-      sourceUrl: 'https://www.youtube.com/watch?v=stream'
-    })).toBeNull();
-
-    const record = createInboxRecord(createMessage(), {
-      keywords: ['launch', 'launch'],
-      mention: true,
-      mentionHandles: ['@ExplicitViewer']
-    }, {
-      getMentionHandles,
-      sourceUrl: 'https://www.youtube.com/watch?v=stream'
+      receivedAt,
+      replayOffsetMs: 3_723_999,
+      source: 'replay',
+      sourceUrl: 'https://www.youtube.com/watch?v=replay'
     });
 
-    expect(record?.matchedKeywords).toEqual(['launch']);
-    expect(record?.mentionHandles).toEqual(['@ExplicitViewer']);
-    expect(getMentionHandles).not.toHaveBeenCalled();
+    expect(record).toMatchObject({
+      authorName: '@ReplayUser',
+      id: 'feed:feed-replay-1',
+      messageId: 'feed-replay-1',
+      sourceUrl: 'https://www.youtube.com/watch?v=replay',
+      text: 'replay hello 👋',
+      timestamp: replayDay.getTime() + 3_723_000,
+      timestampText: '1:02:03'
+    });
+    expect(record?.contentParts).toEqual([
+      { text: 'replay hello ', type: 'text' },
+      {
+        alt: '👋',
+        className: 'emoji yt-formatted-string style-scope yt-live-chat-text-message-renderer',
+        emojiId: '',
+        src: 'https://example.test/feed-wave.png',
+        tooltip: ':wave:',
+        type: 'emoji'
+      }
+    ]);
   });
 
   it('merges mention and keyword matches for the same saved message', () => {
@@ -172,18 +219,6 @@ describe('inbox records', () => {
     expect(recordsEqual(first, record({ mentionHandles: ['@Viewer'], read: true }))).toBe(false);
   });
 });
-
-function createMessage(): HTMLElement {
-  const message = document.createElement('yt-live-chat-text-message-renderer');
-  message.setAttribute('data-message-id', 'message-1');
-  message.innerHTML = `
-    <a href="/channel/example-channel"><span id="author-name">@ExampleUser</span></a>
-    <span id="author-photo"><img src="https://example.test/avatar.jpg"></span>
-    <span id="timestamp">10:30 PM</span>
-    <span id="message">hello @CurrentViewer <img class="emoji" alt="🚀" data-emoji-id="rocket" src="https://example.test/rocket.png"></span>
-  `;
-  return message;
-}
 
 function record(overrides: Partial<InboxRecord> = {}): InboxRecord {
   return {

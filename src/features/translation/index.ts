@@ -1,24 +1,24 @@
 /**
  * Translation feature entrypoint.
  *
- * Loading this module registers translation lifecycle hooks. Queue/cache
+ * Loading this module registers translation runtime hooks. Queue/cache
  * behavior stays in `queue.ts`, while this entrypoint owns the feature wiring
  * so helper imports do not accidentally boot translation.
  */
 import type { Options } from '../../shared/options';
 import { getOptions } from '../../shared/state';
-import { registerFeatureLifecycle, type FeatureMessageContext } from '../../content/lifecycle';
+import { registerFeature, type FeatureMessageContext } from '../../content/feature-runtime';
 import { clearTranslations, queueMessageTranslation, queueRetroactiveTranslations } from './queue';
 
-registerFeatureLifecycle({
+registerFeature({
   page: {
     boot: queueRetroactiveTranslations,
-    cleanupStale: clearTranslations,
+    cleanup: clearTranslations,
     optionsChanged: handleTranslationOptionsChanged,
     reset: clearTranslations,
     visibleRecovery: queueRetroactiveTranslations
   },
-  message: { render: handleTranslationMessage }
+  message: handleTranslationMessage
 });
 
 function handleTranslationOptionsChanged(previousOptions: Options, nextOptions: Options): void {

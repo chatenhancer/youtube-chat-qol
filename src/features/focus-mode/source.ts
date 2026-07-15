@@ -14,6 +14,7 @@ import {
 import { CHAT_MESSAGE_SELECTOR } from '../../youtube/selectors';
 import { getAvatarSrcForIdentity } from '../user-message-history';
 import type { FocusSource } from './types';
+import type { UserIdentity } from '../user-message-history';
 
 export function getFocusSourceFromMessage(message: HTMLElement): FocusSource | null {
   const authorName = getAuthorName(message);
@@ -48,10 +49,16 @@ export function isSameFocusSource(a: FocusSource, b: FocusSource): boolean {
 }
 
 export function isSelectedFocusAuthor(message: HTMLElement, source: FocusSource): boolean {
-  const channelId = getAuthorChannelId(message);
-  if (source.channelId && channelId) return source.channelId === channelId;
+  return isSelectedFocusIdentity({
+    authorName: getAuthorName(message),
+    channelId: getAuthorChannelId(message)
+  }, source);
+}
 
-  return normalizeComparableText(getAuthorName(message)) === normalizeComparableText(source.authorName);
+export function isSelectedFocusIdentity(identity: UserIdentity, source: FocusSource): boolean {
+  if (source.channelId && identity.channelId) return source.channelId === identity.channelId;
+
+  return normalizeComparableText(identity.authorName || '') === normalizeComparableText(source.authorName);
 }
 
 export function startsWithFocusMention(text: string, source: FocusSource): boolean {

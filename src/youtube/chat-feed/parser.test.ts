@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { parseLiteChatPayload } from './lite-chat-parser';
+import { parseYouTubeChatFeedPayload } from './parser';
 
-describe('Lite chat InnerTube parser', () => {
+describe('YouTube chat feed parser', () => {
   it('normalizes a live text message, rich runs, author badges, and timeout without leaking transport data', () => {
-    const result = parseLiteChatPayload({
+    const result = parseYouTubeChatFeedPayload({
       continuationContents: {
         liveChatContinuation: {
           actions: [{
@@ -18,13 +18,29 @@ describe('Lite chat InnerTube parser', () => {
                   authorPhoto: {
                     thumbnails: [{ url: 'https://yt3.ggpht.com/avatar-small' }, { url: '//yt3.ggpht.com/avatar-large' }]
                   },
-                  authorBadges: [{
-                    liveChatAuthorBadgeRenderer: {
-                      tooltip: 'Moderator',
-                      icon: { iconType: 'MODERATOR' },
-                      customThumbnail: {
-                        thumbnails: [{ url: 'https://yt3.ggpht.com/badge' }]
+                  authorBadges: [
+                    {
+                      liveChatAuthorBadgeRenderer: {
+                        tooltip: 'Moderator',
+                        icon: { iconType: 'MODERATOR' },
+                        customThumbnail: {
+                          thumbnails: [{ url: 'https://yt3.ggpht.com/badge' }]
+                        }
                       }
+                    },
+                    {
+                      liveChatAuthorBadgeRenderer: {
+                        tooltip: 'Member',
+                        customThumbnail: {
+                          thumbnails: [{ url: 'https://yt3.ggpht.com/member-badge' }]
+                        }
+                      }
+                    }
+                  ],
+                  beforeContentButtons: [{
+                    buttonViewModel: {
+                      accessibilityText: 'Top fan',
+                      title: { content: '#2' }
                     }
                   }],
                   message: {
@@ -77,7 +93,12 @@ describe('Lite chat InnerTube parser', () => {
               label: 'Moderator',
               iconUrl: 'https://yt3.ggpht.com/badge',
               kind: 'moderator'
-            }]
+            }, {
+              label: 'Member',
+              iconUrl: 'https://yt3.ggpht.com/member-badge',
+              kind: 'member'
+            }],
+            topFanRank: 2
           },
           plainText: 'Visit the site :wave:',
           runs: [
@@ -107,7 +128,7 @@ describe('Lite chat InnerTube parser', () => {
   });
 
   it('normalizes paid messages, stickers, memberships, and both gift announcements', () => {
-    const result = parseLiteChatPayload({
+    const result = parseYouTubeChatFeedPayload({
       actions: [
         addItem('liveChatPaidMessageRenderer', {
           id: 'paid-1',
@@ -208,7 +229,7 @@ describe('Lite chat InnerTube parser', () => {
   });
 
   it('marks channel owners and keeps verified status as a native-style badge', () => {
-    const result = parseLiteChatPayload({
+    const result = parseYouTubeChatFeedPayload({
       actions: [addItem('liveChatTextMessageRenderer', {
         id: 'owner-message',
         authorName: { simpleText: '@Owner' },
@@ -238,7 +259,7 @@ describe('Lite chat InnerTube parser', () => {
   });
 
   it('normalizes current gift view models and ignores interactivity widget commands', () => {
-    const result = parseLiteChatPayload({
+    const result = parseYouTubeChatFeedPayload({
       continuationContents: {
         liveChatContinuation: {
           actions: [
@@ -291,7 +312,7 @@ describe('Lite chat InnerTube parser', () => {
   });
 
   it('seeds initial renderer contents and handles replay, replace, remove, and author deletion actions', () => {
-    const initial = parseLiteChatPayload({
+    const initial = parseYouTubeChatFeedPayload({
       contents: {
         liveChatRenderer: {
           contents: {
@@ -306,7 +327,7 @@ describe('Lite chat InnerTube parser', () => {
     expect(initial.actions.map((action) => action.type)).toEqual(['reset', 'upsert']);
     expect(getUpsert(initial.actions, 'initial-1')?.plainText).toBe('Initial message');
 
-    const replay = parseLiteChatPayload({
+    const replay = parseYouTubeChatFeedPayload({
       continuationContents: {
         liveChatContinuation: {
           actions: [{
@@ -341,7 +362,7 @@ describe('Lite chat InnerTube parser', () => {
       { channelId: 'UC-deleted', replayOffsetMs: 5000, type: 'remove-author' }
     ]);
 
-    const refresh = parseLiteChatPayload({
+    const refresh = parseYouTubeChatFeedPayload({
       continuationContents: {
         liveChatContinuation: {
           clientMessages: [],
@@ -357,7 +378,7 @@ describe('Lite chat InnerTube parser', () => {
   });
 
   it('skips unknown or malformed feed rows, ignores auxiliary actions, and rejects unsafe URLs', () => {
-    const result = parseLiteChatPayload({
+    const result = parseYouTubeChatFeedPayload({
       actions: [
         {
           addChatItemAction: {
@@ -434,7 +455,7 @@ describe('Lite chat InnerTube parser', () => {
   });
 
   it('does not mark malformed deletion metadata as an unreadable message feed', () => {
-    const result = parseLiteChatPayload({
+    const result = parseYouTubeChatFeedPayload({
       actions: [
         { removeChatItemAction: {} },
         { markChatItemsByAuthorAsDeletedAction: {} }
@@ -451,7 +472,7 @@ describe('Lite chat InnerTube parser', () => {
   });
 
   it('treats malformed action entries as unreadable but non-fatal feed data', () => {
-    const result = parseLiteChatPayload({ actions: [null, {}] });
+    const result = parseYouTubeChatFeedPayload({ actions: [null, {}] });
 
     expect(result.actions).toEqual([]);
     expect(result.compatibilityWarnings).toEqual(['feed-action:invalid']);
@@ -460,7 +481,7 @@ describe('Lite chat InnerTube parser', () => {
   });
 
   it('accepts complete official action arrays and ignores unrelated nested actions', () => {
-    const result = parseLiteChatPayload({
+    const result = parseYouTubeChatFeedPayload({
       actions: Array.from({ length: 550 }, (_, index) => (
         addItem('liveChatTextMessageRenderer', {
           id: `message-${index}`,
@@ -482,7 +503,7 @@ describe('Lite chat InnerTube parser', () => {
   });
 
   it('reserves room for reset while keeping the latest bounded initial backlog', () => {
-    const result = parseLiteChatPayload({
+    const result = parseYouTubeChatFeedPayload({
       contents: {
         liveChatRenderer: {
           contents: {
@@ -522,7 +543,7 @@ function textItem(id: string, text: string) {
   };
 }
 
-function getUpsert(actions: ReturnType<typeof parseLiteChatPayload>['actions'], id: string) {
+function getUpsert(actions: ReturnType<typeof parseYouTubeChatFeedPayload>['actions'], id: string) {
   const action = actions.find((candidate) => candidate.type === 'upsert' && candidate.record.id === id);
   return action?.type === 'upsert' ? action.record : undefined;
 }

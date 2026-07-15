@@ -1,6 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import {
-  getInboxTimestamp,
   loadInboxStoredState,
   saveInboxKeywords,
   saveInboxRecords,
@@ -164,24 +163,6 @@ describe('inbox storage', () => {
     expect(stored.records[0].timestamp).toBe(123_456);
   });
 
-  it('returns fallback timestamps when chat timestamp text cannot be parsed', () => {
-    const message = document.createElement('yt-live-chat-text-message-renderer');
-
-    expect(getInboxTimestamp(message, 'not a timestamp', 123_456)).toBe(123_456);
-  });
-
-  it('assigns stable increasing offsets for messages with the same parsed timestamp', () => {
-    const first = document.createElement('yt-live-chat-text-message-renderer');
-    const second = document.createElement('yt-live-chat-text-message-renderer');
-    const referenceTimestamp = new Date('2026-06-02T10:00:00Z').getTime();
-
-    const firstTimestamp = getInboxTimestamp(first, '10:00', referenceTimestamp);
-    const secondTimestamp = getInboxTimestamp(second, '10:00', referenceTimestamp);
-    const firstAgain = getInboxTimestamp(first, '10:00', referenceTimestamp);
-
-    expect(secondTimestamp).toBe(firstTimestamp + 1);
-    expect(firstAgain).toBe(firstTimestamp);
-  });
 });
 
 function createRecord(overrides: Partial<InboxRecord> = {}): InboxRecord {

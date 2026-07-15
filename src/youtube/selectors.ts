@@ -5,10 +5,14 @@
  * that code. This file is for selectors that define common YouTube surfaces
  * such as chat messages, participants, and tooltips.
  */
-export const CHAT_MESSAGE_SELECTOR = [
+export const NATIVE_CHAT_MESSAGE_SELECTOR = [
   'yt-live-chat-text-message-renderer',
   'yt-live-chat-paid-message-renderer',
-  'yt-live-chat-membership-item-renderer',
+  'yt-live-chat-membership-item-renderer'
+].join(',');
+
+export const CHAT_MESSAGE_SELECTOR = [
+  NATIVE_CHAT_MESSAGE_SELECTOR,
   '.ytcq-lite-message'
 ].join(',');
 

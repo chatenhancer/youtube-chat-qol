@@ -6,7 +6,7 @@ import { setOptions } from '../../../shared/state';
 import {
   handleFeatureMutations,
   handleFeatureOptionsChanged
-} from '../../../content/lifecycle';
+} from '../../../content/feature-runtime';
 
 const alertSoundMocks = vi.hoisted(() => ({
   playAlertSound: vi.fn()

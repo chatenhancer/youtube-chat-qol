@@ -46,6 +46,20 @@ export const loggedInMockReplayTest = mockTest.extend<BrowserScenarioFixtures>({
   }
 });
 
+export const loggedInMockStudioTest = mockTest.extend<BrowserScenarioFixtures>({
+  chat: async ({ mockStudioLoggedInSession }, use) => {
+    await use(mockStudioLoggedInSession.page);
+  },
+
+  context: async ({ mockStudioLoggedInSession }, use) => {
+    await use(mockStudioLoggedInSession.context);
+  },
+
+  page: async ({ mockStudioLoggedInSession }, use) => {
+    await use(mockStudioLoggedInSession.page);
+  }
+});
+
 export const loggedOutMockTest = mockTest.extend<BrowserScenarioFixtures>({
   chat: async ({ mockLoggedOutSession }, use) => {
     await use(mockLoggedOutSession.page);

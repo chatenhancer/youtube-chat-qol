@@ -3,16 +3,13 @@
  *
  * YouTube does not expose a stable extension API for the signed-in chat handle,
  * so this module derives likely @handle candidates from native chat identity
- * surfaces as the shared content lifecycle sees them. Feature modules can then
- * process message renderers through the same detection path without
- * duplicating selectors.
+ * surfaces as the shared content lifecycle sees them. Feed consumers use the
+ * normalized candidates without duplicating identity selectors.
  */
-import { registerFeatureLifecycle, type FeatureMutationBatch } from '../content/lifecycle';
+import { registerFeature, type FeatureMutationBatch } from '../content/feature-runtime';
 import { cleanText, normalizeComparableText } from '../shared/text';
 import { cleanAuthorNameText } from '../youtube/authors';
-import { getMessageDetails } from '../youtube/messages';
 
-const MAX_PENDING_MENTION_MESSAGES = 40;
 const IDENTITY_CONTAINER_SELECTOR = [
   'yt-live-chat-message-input-renderer',
   'yt-live-chat-viewer-engagement-message-renderer'
@@ -27,30 +24,32 @@ const IDENTITY_MATCH_SELECTOR = [
   ...IDENTITY_SELECTORS
 ].join(',');
 
-type MentionProcessor = (message: HTMLElement) => void;
+type MentionCandidatesChangedListener = (candidates: readonly string[]) => void;
 
 let cachedMentionKey = '';
 let cachedMentionCandidates: string[] = [];
 let mentionIdentityRefreshTimer: number | null = null;
-const pendingMentionMessages = new Set<HTMLElement>();
-const mentionProcessors = new Set<MentionProcessor>();
+const mentionCandidatesChangedListeners = new Set<MentionCandidatesChangedListener>();
 
-registerFeatureLifecycle({
+registerFeature({
   page: {
     init: initMentionDetection,
     boot: refreshMentionCandidates,
-    cleanupStale: resetMentionDetectionTimer,
+    cleanup: resetMentionDetectionTimer,
     reset: resetMentionDetectionTimer
   },
-  mutation: { collect: handleMentionIdentityMutations }
+  mutation: handleMentionIdentityMutations
 });
 
 export function initMentionDetection(): void {
   refreshMentionCandidates();
 }
 
-export function registerMentionProcessor(processor: MentionProcessor): void {
-  mentionProcessors.add(processor);
+export function onMentionCandidatesChanged(
+  listener: MentionCandidatesChangedListener
+): () => void {
+  mentionCandidatesChangedListeners.add(listener);
+  return () => mentionCandidatesChangedListeners.delete(listener);
 }
 
 export function getCurrentMentionCandidates(): string[] {
@@ -71,43 +70,12 @@ export function isCurrentUserAuthorName(authorName: string): boolean {
   return authorHandles.some((authorHandle) => candidates.includes(authorHandle));
 }
 
-export function processPotentialMentionForConsumer(
-  message: HTMLElement,
-  checkedDatasetKey: string,
-  onMention: () => void
-): void {
-  if (message.dataset[checkedDatasetKey] === 'true') return;
-  if (!message.isConnected) return;
-
-  const candidates = getMentionCandidates();
-  if (!candidates.length) {
-    trackPendingMentionMessage(message);
-    return;
-  }
-
-  pendingMentionMessages.delete(message);
-  message.dataset[checkedDatasetKey] = 'true';
-  if (!isMentionForCurrentUser(message, candidates)) return;
-  onMention();
-}
-
 function getMentionCandidates(): string[] {
   if (!cachedMentionCandidates.length) {
     refreshMentionCandidates();
   }
 
   return cachedMentionCandidates;
-}
-
-function isMentionForCurrentUser(message: HTMLElement, candidates: string[]): boolean {
-  const details = getMessageDetails(message);
-  if (!details.text) return false;
-  const authorHandles = getCandidateHandles(details.authorName, { allowPlainHandle: true });
-
-  const text = normalizeMessageText(details.text);
-  return candidates
-    .filter((candidate) => !authorHandles.includes(candidate))
-    .some((candidate) => textContainsHandle(text, candidate));
 }
 
 function refreshMentionCandidates(): void {
@@ -123,9 +91,8 @@ function refreshMentionCandidates(): void {
       .filter((candidate) => candidate.length >= 3)
   ));
 
-  if (cachedMentionCandidates.length) {
-    flushPendingMentionMessages();
-  }
+  const candidates = [...cachedMentionCandidates];
+  mentionCandidatesChangedListeners.forEach((listener) => listener(candidates));
 }
 
 function getRawMentionCandidates(): string[] {
@@ -193,27 +160,6 @@ function elementTouchesIdentity(element: Element): boolean {
   );
 }
 
-function trackPendingMentionMessage(message: HTMLElement): void {
-  pendingMentionMessages.add(message);
-  if (pendingMentionMessages.size <= MAX_PENDING_MENTION_MESSAGES) return;
-
-  const oldestMessage = pendingMentionMessages.values().next().value;
-  if (oldestMessage) {
-    pendingMentionMessages.delete(oldestMessage);
-  }
-}
-
-function flushPendingMentionMessages(): void {
-  const messages = Array.from(pendingMentionMessages);
-  pendingMentionMessages.clear();
-  messages.forEach((message) => {
-    if (!message.isConnected) return;
-    mentionProcessors.forEach((processor) => {
-      processor(message);
-    });
-  });
-}
-
 function getCandidateHandles(value: string, { allowPlainHandle }: { allowPlainHandle: boolean }): string[] {
   const clean = cleanText(value);
   const handles = [
@@ -229,28 +175,6 @@ function getCandidateHandles(value: string, { allowPlainHandle }: { allowPlainHa
 }
 
 function normalizeHandle(value: string): string {
-  const normalized = normalizeMessageText(value).replace(/^@+/, '');
+  const normalized = normalizeComparableText(value).replace(/^@+/, '');
   return normalized ? `@${normalized}` : '';
-}
-
-function normalizeMessageText(value: string): string {
-  return normalizeComparableText(value);
-}
-
-function textContainsHandle(text: string, handle: string): boolean {
-  if (!handle) return false;
-  let index = text.indexOf(handle);
-
-  while (index >= 0) {
-    const before = index > 0 ? text[index - 1] : '';
-    const after = text[index + handle.length] || '';
-    if (!isHandleCharacter(before) && !isHandleCharacter(after)) return true;
-    index = text.indexOf(handle, index + handle.length);
-  }
-
-  return false;
-}
-
-function isHandleCharacter(value: string): boolean {
-  return Boolean(value && /[\p{L}\p{N}._-]/u.test(value));
 }

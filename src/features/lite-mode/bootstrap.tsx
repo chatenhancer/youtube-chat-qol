@@ -7,14 +7,10 @@
  * observe YouTube's first chat responses. It never activates on YouTube Studio
  * during the initial beta.
  */
-import {
-  LITE_CHAT_CONTROL_EVENT,
-  LITE_CHAT_PROTOCOL_VERSION,
-  LITE_MODE_BOOTSTRAP_INTENT_ATTRIBUTE,
-  type LiteChatControl
-} from './protocol';
+import { YOUTUBE_CHAT_FEED_BOOTSTRAP_INTENT_ATTRIBUTE } from '../../youtube/chat-feed/protocol';
 import { jsx, el } from '../../shared/jsx-dom';
 import { CHAT_SCROLLER_SELECTOR } from '../../youtube/selectors';
+import { dispatchYouTubeChatFeedControl } from '../../youtube/chat-feed/control';
 import { NATIVE_LIST_SELECTOR } from './native-list';
 import { parseLiteModeFallbackCode, type LiteModeFallbackCode } from './fallback';
 
@@ -86,27 +82,21 @@ export function setLiteModeBootstrapIntent(enabled: boolean): void {
   if (!isSupportedLiteModePage()) return;
   ensureLiteModeBootstrapStyle();
   if (enabled) {
-    document.documentElement.setAttribute(LITE_MODE_BOOTSTRAP_INTENT_ATTRIBUTE, 'true');
+    document.documentElement.setAttribute(YOUTUBE_CHAT_FEED_BOOTSTRAP_INTENT_ATTRIBUTE, 'true');
   } else {
     clearLiteModeBootstrapIntent();
   }
 }
 
 export function clearLiteModeBootstrapIntent(): void {
-  document.documentElement?.removeAttribute(LITE_MODE_BOOTSTRAP_INTENT_ATTRIBUTE);
+  document.documentElement?.removeAttribute(YOUTUBE_CHAT_FEED_BOOTSTRAP_INTENT_ATTRIBUTE);
 }
 
-export function dispatchLiteChatControl(enabled: boolean, requestInitial = false): void {
-  const control: LiteChatControl = {
-    enabled,
-    version: LITE_CHAT_PROTOCOL_VERSION
-  };
-  if (requestInitial) control.requestInitial = true;
-  window.dispatchEvent(
-    new CustomEvent(LITE_CHAT_CONTROL_EVENT, {
-      detail: JSON.stringify(control)
-    })
-  );
+export function dispatchLiteChatControl(enabled: boolean): void {
+  dispatchYouTubeChatFeedControl({
+    consumer: 'lite',
+    enabled
+  });
 }
 
 export function hasLiteModeSessionCooldown(): boolean {
@@ -245,8 +235,8 @@ function ensureLiteModeBootstrapStyle(): void {
   if (document.getElementById(BOOTSTRAP_STYLE_ID)) return;
   const style = el<HTMLStyleElement>(
     <style id={BOOTSTRAP_STYLE_ID}>{`
-    html[${LITE_MODE_BOOTSTRAP_INTENT_ATTRIBUTE}="true"] yt-live-chat-item-list-renderer,
-    html[${LITE_MODE_BOOTSTRAP_INTENT_ATTRIBUTE}="true"] #chat > #item-list {
+    html[${YOUTUBE_CHAT_FEED_BOOTSTRAP_INTENT_ATTRIBUTE}="true"] yt-live-chat-item-list-renderer,
+    html[${YOUTUBE_CHAT_FEED_BOOTSTRAP_INTENT_ATTRIBUTE}="true"] #chat > #item-list {
       visibility: hidden !important;
     }
 

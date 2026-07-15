@@ -12,8 +12,10 @@ describe('background translation bridge', () => {
     const listener = getMessageListener();
 
     expect(listener({ type: 'other' }, {}, vi.fn())).toBe(false);
-    expect(listener({ type: 'ytcq:translate', text: 'hola', targetLanguage: 'en' }, {}, vi.fn())).toBe(true);
-    expect(listener({ type: 'ytcq:translateBatch', texts: ['hola'], targetLanguage: 'en' }, {}, vi.fn())).toBe(true);
+    expect(listener({ type: 'ytcq:translate', text: '', targetLanguage: 'en' }, {}, vi.fn())).toBe(true);
+    expect(listener({ type: 'ytcq:translateBatch', texts: [], targetLanguage: 'en' }, {}, vi.fn())).toBe(true);
+    await Promise.resolve();
+    expect(fetch).not.toHaveBeenCalled();
   });
 
   it('calls Google Translate without credentials and returns translated text', async () => {
@@ -180,6 +182,7 @@ describe('background translation bridge', () => {
         ok: false
       });
     });
+    expect(fetch).toHaveBeenCalledOnce();
   });
 
   it('returns stringified errors for non-Error translation failures', async () => {

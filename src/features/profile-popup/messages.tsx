@@ -29,6 +29,7 @@ export function renderProfileMessages(
   source: ProfileSource,
   onClose: () => void
 ): void {
+  const focusedControl = captureFocusedMessageControl(list);
   list.replaceChildren();
 
   if (recentMessages.length) {
@@ -64,6 +65,7 @@ export function renderProfileMessages(
       if (jumpButton) item.append(jumpButton);
       list.append(item);
     });
+    restoreFocusedMessageControl(list, focusedControl);
     return;
   }
 
@@ -74,6 +76,41 @@ export function renderProfileMessages(
       </div>
     )
   );
+}
+
+interface FocusedMessageControl {
+  recordId: string;
+  target: 'jump' | 'message';
+}
+
+function captureFocusedMessageControl(list: HTMLElement): FocusedMessageControl | null {
+  const activeElement = document.activeElement;
+  if (!(activeElement instanceof HTMLElement) || !list.contains(activeElement)) return null;
+
+  const message = activeElement.closest<HTMLElement>('.ytcq-profile-card-message');
+  const recordId = message?.dataset.ytcqMessageRecordId;
+  if (!message || !recordId) return null;
+  if (activeElement === message) return { recordId, target: 'message' };
+  if (activeElement.classList.contains('ytcq-profile-card-jump')) {
+    return { recordId, target: 'jump' };
+  }
+  return null;
+}
+
+function restoreFocusedMessageControl(
+  list: HTMLElement,
+  focusedControl: FocusedMessageControl | null
+): void {
+  if (!focusedControl) return;
+
+  const message = Array.from(list.querySelectorAll<HTMLElement>('.ytcq-profile-card-message')).find(
+    (candidate) => candidate.dataset.ytcqMessageRecordId === focusedControl.recordId
+  );
+  const target =
+    focusedControl.target === 'jump'
+      ? message?.querySelector<HTMLElement>('.ytcq-profile-card-jump')
+      : message;
+  target?.focus({ preventScroll: true });
 }
 
 export function shouldRefreshProfileMessages(

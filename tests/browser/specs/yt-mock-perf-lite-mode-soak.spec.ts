@@ -7,12 +7,12 @@
  */
 import type { BrowserContext, CDPSession, Page } from '@playwright/test';
 import {
-  LITE_CHAT_BATCH_EVENT,
-  LITE_CHAT_PROTOCOL_VERSION,
-  type LiteChatAction,
-  type LiteChatBatch,
-  type LiteChatMessageRecord
-} from '../../../src/features/lite-mode/protocol';
+  YOUTUBE_CHAT_FEED_BATCH_EVENT,
+  YOUTUBE_CHAT_FEED_PROTOCOL_VERSION,
+  type YouTubeChatFeedAction,
+  type YouTubeChatFeedTransportBatch,
+  type YouTubeChatMessageRecord
+} from '../../../src/youtube/chat-feed/protocol';
 import {
   DEFAULT_LITE_CHAT_RENDER_LIMIT,
   DEFAULT_LITE_CHAT_STORE_BYTE_LIMIT,
@@ -20,6 +20,7 @@ import {
 } from '../../../src/features/lite-mode/store';
 import { expect, mockTest as test } from '../support/browser-fixtures';
 import { withExtensionStorageValues } from '../support/extension-storage';
+import { pauseMockFixtureMessages } from '../support/mock-page';
 import {
   createPerformanceReport,
   delay,
@@ -74,6 +75,7 @@ test('youtube-mock performance: Lite mode heap plateaus across 11,000+ messages'
     },
     async () => {
       await reloadMockChatPageForStoredSettings(page);
+      await pauseMockFixtureMessages(page);
       await installLiteSequenceProbe(page);
       await page.locator('.ytcq-lite-mode-button').click();
       await expect(page.locator(LITE_ROOT_SELECTOR)).toBeVisible();
@@ -213,7 +215,7 @@ async function installLiteSequenceProbe(page: Page): Promise<void> {
         // The production receiver validates malformed details separately.
       }
     });
-  }, LITE_CHAT_BATCH_EVENT);
+  }, YOUTUBE_CHAT_FEED_BATCH_EVENT);
 }
 
 async function appendLiteMessages(page: Page, startIndex: number, count: number): Promise<void> {
@@ -228,7 +230,7 @@ async function appendLiteMessages(page: Page, startIndex: number, count: number)
   }
 }
 
-async function dispatchLiteBatch(page: Page, actions: LiteChatAction[]): Promise<void> {
+async function dispatchLiteBatch(page: Page, actions: YouTubeChatFeedAction[]): Promise<void> {
   await page.evaluate(
     ({ eventName, nextActions, version }) => {
       const state = (
@@ -237,11 +239,17 @@ async function dispatchLiteBatch(page: Page, actions: LiteChatAction[]): Promise
         }
       ).__ytcqLitePerfSequence;
       if (!state) throw new Error('Lite performance sequence probe is unavailable.');
-      const batch: LiteChatBatch = {
+      const transport = (
+        window as unknown as Record<PropertyKey, { sequence?: unknown } | undefined>
+      )[Symbol.for('ytcq:lite-chat-transport:v1')];
+      const transportSequence = typeof transport?.sequence === 'number' ? transport.sequence : 0;
+      const sequence = Math.max(state.sequence, transportSequence) + 1;
+      if (transport) transport.sequence = sequence;
+      const batch: YouTubeChatFeedTransportBatch = {
         actions: nextActions,
         continuationTimeoutMs: 1,
         receivedAt: Date.now(),
-        sequence: state.sequence + 1,
+        sequence,
         source: 'live',
         version
       };
@@ -252,14 +260,14 @@ async function dispatchLiteBatch(page: Page, actions: LiteChatAction[]): Promise
       );
     },
     {
-      eventName: LITE_CHAT_BATCH_EVENT,
+      eventName: YOUTUBE_CHAT_FEED_BATCH_EVENT,
       nextActions: actions,
-      version: LITE_CHAT_PROTOCOL_VERSION
+      version: YOUTUBE_CHAT_FEED_PROTOCOL_VERSION
     }
   );
 }
 
-function createLiteRecord(index: number): LiteChatMessageRecord {
+function createLiteRecord(index: number): YouTubeChatMessageRecord {
   const authorIndex = index % 240;
   const text = `Lite soak message ${index} from viewer ${authorIndex} with emoji :wave:`;
   return {
@@ -307,6 +315,7 @@ async function waitForLiteBacklogToDrain(page: Page): Promise<void> {
 async function leaveLiteLiveEdge(page: Page): Promise<void> {
   const scroller = page.locator(`${LITE_ROOT_SELECTOR} .ytcq-lite-scroller`);
   await scroller.evaluate((element) => {
+    element.dispatchEvent(new WheelEvent('wheel', { deltaY: -120 }));
     element.scrollTop = Math.max(0, element.scrollHeight - element.clientHeight - 120);
     element.dispatchEvent(new Event('scroll', { bubbles: true }));
   });

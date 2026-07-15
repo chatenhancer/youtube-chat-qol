@@ -1,15 +1,10 @@
 import {
-  countBountyHuntingTextEmojis,
   doesBountyHuntingBountyMatch,
-  isBountyHuntingAllCapsMessage,
   BOUNTY_HUNTING_BOUNTY_COUNT,
   type BountyHuntingBounty,
   type BountyHuntingBountyDescriptionKey,
   type BountyHuntingBountyMatcher
 } from '../../../../shared/playground/bounty-hunting';
-import { cleanText } from '../../../../shared/text';
-import { getMessageStableId, getMessageText } from '../../../../youtube/messages';
-import { PAID_CHAT_MESSAGE_SELECTOR } from '../../../../youtube/selectors';
 import type { BountyHuntingObservedMessage } from './types';
 
 interface BountyCandidate extends BountyHuntingBounty {
@@ -33,7 +28,6 @@ interface MessageStats {
   verifiedAuthors: number;
 }
 
-const TOP_FAN_RANK_PATTERN = /^#\s*[1-3]$/;
 const BOUNTY_HUNTING_ENGLISH_DESCRIPTIONS: Record<BountyHuntingBountyDescriptionKey, string> = {
   gamesBountyHuntingBountyAllCaps: 'a message in all caps',
   gamesBountyHuntingBountyChannelMember: 'a message from a channel member',
@@ -130,29 +124,6 @@ function createBountyHuntingCandidatePool(messages: readonly BountyHuntingObserv
   ];
 }
 
-export function getBountyHuntingObservedMessage(message: HTMLElement): BountyHuntingObservedMessage | null {
-  const text = getMessageText(message);
-  const isSuperChat = isBountyHuntingSuperChatMessage(message);
-  if (!text && !isSuperChat) return null;
-  const emojiCount = countBountyHuntingMessageEmojis(message);
-  return {
-    emojiCount,
-    hasAllCaps: isBountyHuntingAllCapsMessage(text),
-    hasCustomEmoji: hasBountyHuntingCustomEmoji(message),
-    hasMention: /(^|\s)@[\p{L}\p{N}._-]{2,}/u.test(text),
-    hasNumber: /\p{N}/u.test(text),
-    hasOnlyEmojis: isBountyHuntingOnlyEmojiMessage(message, text, emojiCount),
-    hasQuestion: /[?？]/u.test(text),
-    isChannelMemberAuthor: hasBountyHuntingAuthorBadge(message, 'member'),
-    isChannelOwnerAuthor: hasBountyHuntingAuthorBadge(message, 'owner'),
-    isModeratorAuthor: hasBountyHuntingAuthorBadge(message, 'moderator'),
-    isSuperChat,
-    isTopFanAuthor: hasBountyHuntingTopFanRankBadge(message),
-    isVerifiedAuthor: isBountyHuntingVerifiedAuthor(message),
-    messageId: getBountyHuntingMessageId(message)
-  };
-}
-
 export function findBountyHuntingMatchingBounty(
   bounties: readonly BountyHuntingBounty[],
   message: BountyHuntingObservedMessage
@@ -245,140 +216,4 @@ function getBountyHuntingFallbackBounties(): BountyCandidate[] {
     createCandidate('mention-user', 125, 'gamesBountyHuntingBountyMention', { kind: 'mention' }, 0),
     createCandidate('has-number', 75, 'gamesBountyHuntingBountyNumber', { kind: 'number' }, 0)
   ];
-}
-
-function hasBountyHuntingTopFanRankBadge(message: HTMLElement): boolean {
-  const buttonHost = message.querySelector<HTMLElement>('#before-content-buttons');
-  if (!buttonHost) return false;
-  const rankText = [
-    ...Array.from(buttonHost.querySelectorAll<HTMLElement>('.ytSpecButtonShapeNextButtonTextContent'))
-      .map((element) => element.textContent),
-    ...Array.from(buttonHost.querySelectorAll<HTMLElement>('button[aria-label], [title]')).flatMap((element) => [
-      element.getAttribute('aria-label'),
-      element.getAttribute('title')
-    ])
-  ];
-  return rankText.some((value) => TOP_FAN_RANK_PATTERN.test(cleanText(value)));
-}
-
-function countBountyHuntingMessageEmojis(message: HTMLElement): number {
-  const visualEmojiCount = message.querySelectorAll(
-    'img[alt], img[shared-tooltip-text], [data-emoji-id], [class*="emoji" i]'
-  ).length;
-  return Math.max(visualEmojiCount, countBountyHuntingTextEmojis(getMessageText(message)));
-}
-
-function hasBountyHuntingCustomEmoji(message: HTMLElement): boolean {
-  const selector = [
-    'img[shared-tooltip-text^=":"]',
-    'img[alt^=":"]',
-    '[data-emoji-id]'
-  ].join(',');
-  try {
-    return Boolean(message.querySelector(selector));
-  } catch {
-    return false;
-  }
-}
-
-function isBountyHuntingOnlyEmojiMessage(message: HTMLElement, text: string, emojiCount: number): boolean {
-  if (emojiCount <= 0) return false;
-
-  const messageText = message.querySelector<HTMLElement>('#message');
-  if (messageText) {
-    const nodes = Array.from(messageText.childNodes);
-    const hasNonEmojiNode = nodes.some((node) => {
-      if (node.nodeType === Node.TEXT_NODE) {
-        return hasBountyHuntingNonEmojiText(node.textContent || '');
-      }
-      if (node instanceof HTMLElement) {
-        return !node.matches('img[alt], img[shared-tooltip-text], [data-emoji-id], [class*="emoji" i]');
-      }
-      return false;
-    });
-    return !hasNonEmojiNode;
-  }
-
-  return !hasBountyHuntingNonEmojiText(text);
-}
-
-function hasBountyHuntingNonEmojiText(value: string): boolean {
-  return Boolean(cleanText(value.replace(/\p{Extended_Pictographic}/gu, '')).replace(/\s/g, ''));
-}
-
-function isBountyHuntingVerifiedAuthor(message: HTMLElement): boolean {
-  const badgeSelector = [
-    'yt-live-chat-author-badge-renderer[type="verified"]',
-    'yt-live-chat-author-badge-renderer[aria-label*="Verified" i]',
-    'yt-live-chat-author-badge-renderer[title*="Verified" i]',
-    '[aria-label*="Verified" i]',
-    '[title*="Verified" i]'
-  ].join(',');
-  try {
-    return Boolean(message.querySelector(badgeSelector));
-  } catch {
-    return false;
-  }
-}
-
-function hasBountyHuntingAuthorBadge(
-  message: HTMLElement,
-  type: 'member' | 'moderator' | 'owner'
-): boolean {
-  const labelPattern = getBountyHuntingAuthorBadgePattern(type);
-  const typeValues = getBountyHuntingAuthorBadgeTypeValues(type);
-  const badges = message.querySelectorAll<HTMLElement>('yt-live-chat-author-badge-renderer');
-
-  for (const badge of badges) {
-    const badgeType = cleanText(badge.getAttribute('type')).toLocaleLowerCase();
-    if (typeValues.includes(badgeType)) return true;
-    const label = cleanText([
-      badge.getAttribute('aria-label'),
-      badge.getAttribute('title')
-    ].join(' '));
-    if (labelPattern.test(label)) return true;
-  }
-
-  return false;
-}
-
-function getBountyHuntingAuthorBadgePattern(type: 'member' | 'moderator' | 'owner'): RegExp {
-  switch (type) {
-    case 'member':
-      return /\bmember\b/i;
-    case 'moderator':
-      return /\bmoderator\b/i;
-    case 'owner':
-      return /\b(?:owner|creator)\b/i;
-  }
-}
-
-function getBountyHuntingAuthorBadgeTypeValues(type: 'member' | 'moderator' | 'owner'): string[] {
-  switch (type) {
-    case 'member':
-      return ['member', 'membership'];
-    case 'moderator':
-      return ['moderator'];
-    case 'owner':
-      return ['owner', 'creator'];
-  }
-}
-
-function isBountyHuntingSuperChatMessage(message: HTMLElement): boolean {
-  return message.matches(PAID_CHAT_MESSAGE_SELECTOR);
-}
-
-function getBountyHuntingMessageId(message: HTMLElement): string {
-  const stableId = getMessageStableId(message);
-  if (stableId) return stableId;
-
-  const existingId = message.dataset.ytcqBountyHuntingMessageId;
-  if (existingId) return existingId;
-
-  const randomId = typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
-    ? crypto.randomUUID()
-    : Math.random().toString(36).slice(2, 12);
-  const generatedId = `local:${Date.now().toString(36)}:${randomId}`;
-  message.dataset.ytcqBountyHuntingMessageId = generatedId;
-  return generatedId;
 }

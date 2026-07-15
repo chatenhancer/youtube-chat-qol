@@ -14,27 +14,23 @@ import {
   wireScrollEdgeFades
 } from '../../shared/scroll';
 import { findChatInput, getChatInputText, replaceChatInput } from '../../youtube/chat-input';
-import {
-  CHAT_MESSAGE_SELECTOR,
-  PANEL_PAGES_SELECTOR,
-  SEND_BUTTON_SELECTOR
-} from '../../youtube/selectors';
+import { PANEL_PAGES_SELECTOR, SEND_BUTTON_SELECTOR } from '../../youtube/selectors';
 import { getChannelUrl, openChannelWindow } from '../channel-popup';
 import { applyMarkedUserRing } from '../marked-users';
 import { isCurrentUserAuthorName } from '../mention-detection';
-import { registerFeatureLifecycle } from '../../content/lifecycle';
-import {
-  onMessageTranslationCleared,
-  onMessageTranslationRendered,
-  onMessageTranslationsCleared,
-  type MessageTranslationRenderedEvent
-} from '../translation/events';
-import { cloneProtectedTokens } from '../translation/protected-placeholders';
+import { registerFeature } from '../../content/feature-runtime';
 import {
   createTranslationPriorityScope,
   type TranslationPriorityScope
 } from '../translation/queue';
-import { createFocusRecord, findFocusRecordForMessage } from './records';
+import {
+  getRecentMessagesForKey,
+  getUserKeyFromIdentity,
+  getUserMessageHistorySnapshot,
+  onUserMessagesChanged,
+  recordVisibleUserMessages
+} from '../user-message-history';
+import { createFocusRecordFromHistory } from './records';
 import {
   getAuthorInitial,
   getFocusMentionPrefix,
@@ -55,26 +51,24 @@ let activeScrollFadeCleanup: (() => void) | null = null;
 let activeTranslationPriorityScope: TranslationPriorityScope | null = null;
 let activeExpanded = false;
 let mentionRestoreTimer = 0;
-let nextRecordId = 1;
 let focusModeListeners = new AbortController();
+let historyScanInProgress = false;
+let unsubscribeUserMessages: (() => void) | null = null;
 const focusRecords: FocusRecord[] = [];
 
-registerFeatureLifecycle({
+registerFeature({
   page: {
     init: initFocusMode,
-    cleanupStale: cleanupStaleFocusMode,
+    cleanup: cleanupStaleFocusMode,
     reset: resetFocusMode
-  },
-  message: { collect: handlePotentialFocusMessage }
+  }
 });
 
 export function initFocusMode(): void {
   const options = { capture: true, signal: focusModeListeners.signal };
   document.addEventListener('keydown', handleDocumentKeydown, options);
   document.addEventListener('click', handleDocumentClick, options);
-  onMessageTranslationRendered(recordFocusMessageTranslation);
-  onMessageTranslationCleared(({ message }) => clearFocusMessageTranslation(message));
-  onMessageTranslationsCleared(clearFocusMessageTranslations);
+  unsubscribeUserMessages ||= onUserMessagesChanged(handleUserMessagesChanged);
 }
 
 export function resetFocusMode(): void {
@@ -84,6 +78,8 @@ export function resetFocusMode(): void {
 export function cleanupStaleFocusMode(): void {
   focusModeListeners.abort();
   focusModeListeners = new AbortController();
+  unsubscribeUserMessages?.();
+  unsubscribeUserMessages = null;
   closeFocusMode();
   document
     .querySelectorAll<HTMLElement>(`.${FOCUS_ANCHOR_CLASS}`)
@@ -118,56 +114,57 @@ export function openFocusModeForAuthor(source: FocusSource): boolean {
   return true;
 }
 
-export function handlePotentialFocusMessage(message: HTMLElement): void {
-  if (!activeExpanded || !activeSource || !activeList || !message.isConnected) return;
+function handleUserMessagesChanged(key: string): void {
+  if (historyScanInProgress || !activeExpanded || !activeSource || !activeList) return;
+  const source = activeSource;
 
-  const record = createFocusRecord(message, activeSource, focusRecords, () => nextRecordId++);
-  if (!record) return;
+  const selectedKeys = new Set([
+    getUserKeyFromIdentity(source),
+    getUserKeyFromIdentity({ authorName: source.authorName })
+  ]);
+  const hadFocusRecord = focusRecords.some((record) => record.historyKey === key);
+  const hasFocusRecord = getRecentMessagesForKey(key).some((record) =>
+    Boolean(createFocusRecordFromHistory(record, source))
+  );
+  if (!selectedKeys.has(key) && !hadFocusRecord && !hasFocusRecord) return;
 
-  focusRecords.push(record);
-  prioritizeFocusRecordTranslation(record);
-  refreshFocusMessages();
+  syncFocusRecordsFromHistory();
 }
 
-function recordFocusMessageTranslation({
-  message,
-  result,
-  originalText,
-  protectedTokens,
-  sourceText
-}: MessageTranslationRenderedEvent): void {
-  const record = findFocusRecordForMessage(focusRecords, message);
-  if (!record) return;
+function syncFocusRecordsFromHistory(refresh = true): void {
+  if (!activeSource) return;
+  const source = activeSource;
 
-  record.translation = {
-    result,
-    originalText,
-    sourceText,
-    protectedTokens: cloneProtectedTokens(protectedTokens)
-  };
-  refreshFocusMessages();
+  const nextRecords = getUserMessageHistorySnapshot()
+    .map((record) => createFocusRecordFromHistory(record, source))
+    .filter((record): record is FocusRecord => Boolean(record));
+  if (areFocusRecordListsEqual(focusRecords, nextRecords)) return;
+  focusRecords.splice(0, focusRecords.length, ...nextRecords);
   prioritizeFocusMessageTranslations();
+  if (refresh) refreshFocusMessages();
 }
 
-function clearFocusMessageTranslation(message: HTMLElement): void {
-  const record = findFocusRecordForMessage(focusRecords, message);
-  if (!record?.translation) return;
-
-  delete record.translation;
-  refreshFocusMessages();
-}
-
-function clearFocusMessageTranslations(): void {
-  let changed = false;
-  focusRecords.forEach((record) => {
-    if (!record.translation) return;
-    delete record.translation;
-    changed = true;
-  });
-  if (!changed) return;
-
-  refreshFocusMessages();
-  prioritizeFocusMessageTranslations();
+function areFocusRecordListsEqual(
+  currentRecords: readonly FocusRecord[],
+  nextRecords: readonly FocusRecord[]
+): boolean {
+  return (
+    currentRecords.length === nextRecords.length &&
+    currentRecords.every((record, index) => {
+      const nextRecord = nextRecords[index];
+      return (
+        record.id === nextRecord.id &&
+        record.authorName === nextRecord.authorName &&
+        record.contentParts === nextRecord.contentParts &&
+        record.historyKey === nextRecord.historyKey &&
+        record.messageRef?.deref() === nextRecord.messageRef?.deref() &&
+        record.side === nextRecord.side &&
+        record.text === nextRecord.text &&
+        record.timestampText === nextRecord.timestampText &&
+        record.translation === nextRecord.translation
+      );
+    })
+  );
 }
 
 function renderCollapsedFocusPrompt(): void {
@@ -248,21 +245,16 @@ function openFocusPanel(): void {
   mountFocusCard(card);
   activeList = list;
 
-  scanVisibleFocusInteractions();
-  prioritizeFocusMessageTranslations();
+  historyScanInProgress = true;
+  try {
+    recordVisibleUserMessages();
+  } finally {
+    historyScanInProgress = false;
+  }
+  syncFocusRecordsFromHistory(false);
   renderFocusMessages();
   if (activeList) scrollElementToBottom(activeList);
   scheduleEnsureFocusMentionPrefix();
-}
-
-function scanVisibleFocusInteractions(): void {
-  if (!activeSource) return;
-  const source = activeSource;
-
-  document.querySelectorAll<HTMLElement>(CHAT_MESSAGE_SELECTOR).forEach((message) => {
-    const record = createFocusRecord(message, source, focusRecords, () => nextRecordId++);
-    if (record) focusRecords.push(record);
-  });
 }
 
 function renderFocusMessages(): void {
@@ -351,10 +343,6 @@ function clearFocusRecords(): void {
 
 function prioritizeFocusMessageTranslations(): void {
   activeTranslationPriorityScope?.prioritize(focusRecords.map(getFocusRecordLiveMessage));
-}
-
-function prioritizeFocusRecordTranslation(record: FocusRecord): void {
-  activeTranslationPriorityScope?.prioritize([getFocusRecordLiveMessage(record)]);
 }
 
 function getFocusRecordLiveMessage(record: FocusRecord): HTMLElement | null {

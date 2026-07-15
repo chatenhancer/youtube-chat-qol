@@ -1,9 +1,9 @@
 /**
- * Tracks YouTube replay request chains without consuming or modifying them.
+ * Tracks replay request chains without consuming or modifying them.
  *
  * Normal polling uses `liveChatReplayContinuationData`; progress-bar seeks use
  * `playerSeekContinuationData`. YouTube currently sends the request as a
- * gzip-compressed `Request`, so Lite reads only a clone and never exposes the
+ * gzip-compressed `Request`, so the feed reads only a clone and never exposes
  * continuation values outside this page-world helper.
  */
 
@@ -13,22 +13,22 @@ const BACKWARD_SEEK_THRESHOLD_MS = 1_000;
 const FORWARD_SEEK_MINIMUM_MS = 15_000;
 const FORWARD_PLAYBACK_RATE_ALLOWANCE = 3;
 
-export interface LiteChatReplayRequestContext {
+export interface YouTubeChatFeedReplayRequestContext {
   epoch: number;
   playerOffsetMs?: number;
   reset: boolean;
 }
 
-export type LiteChatReplayRequest =
-  | LiteChatReplayRequestContext
-  | Promise<LiteChatReplayRequestContext | undefined>;
+export type YouTubeChatFeedReplayRequest =
+  | YouTubeChatFeedReplayRequestContext
+  | Promise<YouTubeChatFeedReplayRequestContext | undefined>;
 
-export interface LiteChatReplayRequestTracker {
+export interface YouTubeChatFeedReplayRequestTracker {
   capture: (
     request: Request | null,
     init?: RequestInit
-  ) => Promise<LiteChatReplayRequestContext | undefined>;
-  isObsolete: (request: LiteChatReplayRequestContext | undefined) => boolean;
+  ) => Promise<YouTubeChatFeedReplayRequestContext | undefined>;
+  isObsolete: (request: YouTubeChatFeedReplayRequestContext | undefined) => boolean;
   rememberResponse: (payload: unknown) => void;
   reset: () => void;
 }
@@ -43,7 +43,7 @@ interface ReplayContinuationTokens {
   seek?: string;
 }
 
-export function cloneLiteChatReplayRequest(input: RequestInfo | URL): Request | null {
+export function cloneYouTubeChatFeedReplayRequest(input: RequestInfo | URL): Request | null {
   if (!(input instanceof Request)) return null;
   try {
     return input.clone();
@@ -52,9 +52,9 @@ export function cloneLiteChatReplayRequest(input: RequestInfo | URL): Request | 
   }
 }
 
-export function createLiteChatReplayRequestTracker(
+export function createYouTubeChatFeedReplayRequestTracker(
   onSeek: () => void
-): LiteChatReplayRequestTracker {
+): YouTubeChatFeedReplayRequestTracker {
   let continuation: string | undefined;
   let epoch = 0;
   let lastPlayerOffsetMs: number | undefined;
@@ -66,7 +66,7 @@ export function createLiteChatReplayRequestTracker(
   const capture = (
     request: Request | null,
     init?: RequestInit
-  ): Promise<LiteChatReplayRequestContext | undefined> => {
+  ): Promise<YouTubeChatFeedReplayRequestContext | undefined> => {
     const requestGeneration = trackingGeneration;
     const context = requestChain
       .catch(() => undefined)

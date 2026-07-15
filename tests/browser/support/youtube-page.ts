@@ -10,6 +10,7 @@ import { defaultLiveUrl, defaultReplayUrl, getLiveProfileDir } from './paths';
 
 const CHAT_FRAME_SELECTOR = 'iframe#chatframe';
 const COMPOSER_TIMEOUT_MS = 30_000;
+const INITIAL_CHAT_FRAME_TIMEOUT_MS = 15_000;
 const LIVE_PAGE_TIMEOUT_MS = 60_000;
 const CONSENT_REJECT_BUTTON_NAMES = [
   /Reject all/i,
@@ -47,16 +48,36 @@ export function getReplayUrl(): string {
 }
 
 export async function openLiveChat(page: Page, liveUrl: string): Promise<FrameLocator> {
-  await gotoLiveChatPage(page, liveUrl);
-  await dismissYouTubeConsentIfPresent(page);
-  await ensureLiveChatFrameVisible(page);
-  await dismissYouTubeConsentIfPresent(page);
-  return page.frameLocator(CHAT_FRAME_SELECTOR);
+  for (const timeout of [INITIAL_CHAT_FRAME_TIMEOUT_MS, LIVE_PAGE_TIMEOUT_MS]) {
+    await gotoLiveChatPage(page, liveUrl);
+    await dismissYouTubeConsentIfPresent(page);
+    if (await ensureLiveChatReady(page, timeout)) {
+      await dismissYouTubeConsentIfPresent(page);
+      return page.frameLocator(CHAT_FRAME_SELECTOR);
+    }
+    // YouTube can mount the iframe with its own "Something went wrong" page.
+    // One same-URL navigation gives both the watch page and chat a fresh document.
+  }
+
+  const chat = page.frameLocator(CHAT_FRAME_SELECTOR);
+  await expect(page.locator(CHAT_FRAME_SELECTOR)).toBeVisible({ timeout: 1_000 });
+  await expect(chat.locator('yt-live-chat-renderer')).toBeVisible({ timeout: 1_000 });
+  return chat;
 }
 
-async function ensureLiveChatFrameVisible(page: Page): Promise<void> {
+async function ensureLiveChatReady(page: Page, timeout: number): Promise<boolean> {
+  if (!(await ensureLiveChatFrameVisible(page, timeout))) return false;
+  return page
+    .frameLocator(CHAT_FRAME_SELECTOR)
+    .locator('yt-live-chat-renderer')
+    .waitFor({ state: 'visible', timeout })
+    .then(() => true)
+    .catch(() => false);
+}
+
+async function ensureLiveChatFrameVisible(page: Page, timeout: number): Promise<boolean> {
   const chatFrame = page.locator(CHAT_FRAME_SELECTOR);
-  if (await chatFrame.isVisible({ timeout: 1_500 }).catch(() => false)) return;
+  if (await chatFrame.isVisible({ timeout: 1_500 }).catch(() => false)) return true;
 
   const openPanelButtons = [
     page.getByRole('button', { name: /^Open panel$/i }).first(),
@@ -69,12 +90,15 @@ async function ensureLiveChatFrameVisible(page: Page): Promise<void> {
       if (!(await button.isVisible({ timeout: 500 }).catch(() => false))) continue;
       if (!(await button.isEnabled().catch(() => false))) continue;
       await button.click({ timeout: 3_000 }).catch(() => undefined);
-      if (await chatFrame.isVisible({ timeout: 10_000 }).catch(() => false)) return;
+      if (await chatFrame.isVisible({ timeout: 10_000 }).catch(() => false)) return true;
     }
     await page.waitForTimeout(500);
   }
 
-  await expect(chatFrame).toBeVisible({ timeout: LIVE_PAGE_TIMEOUT_MS });
+  return chatFrame
+    .waitFor({ state: 'visible', timeout })
+    .then(() => true)
+    .catch(() => false);
 }
 
 async function gotoLiveChatPage(page: Page, liveUrl: string): Promise<void> {
@@ -136,7 +160,7 @@ export async function startVideoPlaybackIfPaused(page: Page): Promise<void> {
 export async function waitForYouTubeContentVideo(page: Page): Promise<void> {
   const player = page.locator('#movie_player').first();
   const skipAd = player.locator('.ytp-skip-ad-button, .ytp-ad-skip-button-modern').first();
-  await expect(player).toBeVisible({ timeout: 20_000 });
+  await player.waitFor({ state: 'attached', timeout: 20_000 });
   await expect
     .poll(
       async () => {

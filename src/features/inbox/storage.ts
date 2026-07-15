@@ -17,11 +17,6 @@ import type { InboxRecord } from './types';
 const INBOX_RECORDS_STORAGE_KEY_PREFIX = 'ytcqInboxRecords';
 const INBOX_KEYWORDS_STORAGE_KEY = 'ytcqInboxKeywords';
 const MAX_INBOX_RECORDS = 100;
-const MAX_TIMESTAMP_ORDER_OFFSET = 59_999;
-const MAX_TRACKED_TIMESTAMP_BASES = 720;
-
-const messageTimestampOffsets = new WeakMap<HTMLElement, number>();
-const nextTimestampOffsetByBase = new Map<number, number>();
 
 export interface InboxStoredState {
   keywords: string[];
@@ -88,15 +83,6 @@ export function sortAndTrimRecords(nextRecords: InboxRecord[]): InboxRecord[] {
     .slice(-MAX_INBOX_RECORDS);
 }
 
-export function getInboxTimestamp(message: HTMLElement, timestampText: string, fallbackTimestamp: number): number {
-  const parsedTimestamp = getChatTimestampValue(timestampText, fallbackTimestamp, {
-    preferElapsed: isLiveChatReplayUrl(message.ownerDocument?.location?.href || window.location.href)
-  });
-  if (parsedTimestamp === null) return fallbackTimestamp;
-
-  return parsedTimestamp + getMessageOrderOffset(message, parsedTimestamp);
-}
-
 function normalizeStoredRecords(value: unknown): InboxRecord[] {
   if (!Array.isArray(value)) return [];
 
@@ -154,32 +140,6 @@ function normalizeStoredRecord(value: unknown): InboxRecord | null {
     timestamp,
     timestampText
   };
-}
-
-function getMessageOrderOffset(message: HTMLElement, baseTimestamp: number): number {
-  const existingOffset = messageTimestampOffsets.get(message);
-  if (existingOffset !== undefined) return existingOffset;
-
-  const nextOffset = Math.min(
-    nextTimestampOffsetByBase.get(baseTimestamp) || 0,
-    MAX_TIMESTAMP_ORDER_OFFSET
-  );
-  messageTimestampOffsets.set(message, nextOffset);
-
-  if (nextOffset < MAX_TIMESTAMP_ORDER_OFFSET) {
-    nextTimestampOffsetByBase.set(baseTimestamp, nextOffset + 1);
-    pruneTimestampOffsetBases();
-  }
-
-  return nextOffset;
-}
-
-function pruneTimestampOffsetBases(): void {
-  while (nextTimestampOffsetByBase.size > MAX_TRACKED_TIMESTAMP_BASES) {
-    const oldestBase = nextTimestampOffsetByBase.keys().next().value;
-    if (oldestBase === undefined) return;
-    nextTimestampOffsetByBase.delete(oldestBase);
-  }
 }
 
 function getInboxRecordsStorageKey(sourceUrl: string): string {

@@ -214,6 +214,24 @@ describe('profile card message renderer', () => {
     expect(jumpMocks.jumpToChatMessage).toHaveBeenCalledWith(liveMessage);
   });
 
+  it('preserves jump-button focus when refreshed records replace the list', () => {
+    const list = document.createElement('div');
+    const liveMessage = document.createElement('yt-live-chat-text-message-renderer');
+    document.body.append(list, liveMessage);
+    userHistoryMocks.getLiveMessageForRecord.mockReturnValue(liveMessage);
+    const recentMessage = record();
+
+    renderProfileMessages(list, [recentMessage], source(), vi.fn());
+    const previousJumpButton = list.querySelector<HTMLButtonElement>('.ytcq-profile-card-jump')!;
+    previousJumpButton.focus();
+
+    renderProfileMessages(list, [recentMessage], source(), vi.fn());
+
+    const currentJumpButton = list.querySelector<HTMLButtonElement>('.ytcq-profile-card-jump')!;
+    expect(currentJumpButton).not.toBe(previousJumpButton);
+    expect(document.activeElement).toBe(currentJumpButton);
+  });
+
   it('refreshes when records for the same profile key or author name change', () => {
     expect(shouldRefreshProfileMessages('channel:focused-channel', source(), 'channel:focused-channel')).toBe(true);
 

@@ -4,7 +4,7 @@
  * Stores a browser-local list of globally marked chat users and applies a
  * stable username-derived avatar ring wherever those users appear.
  */
-import { registerFeatureLifecycle, type FeatureMessageContext } from '../../content/lifecycle';
+import { registerFeature } from '../../content/feature-runtime';
 import {
   BOOKMARK_FILLED_ICON_PATH,
   BOOKMARK_ICON_PATH,
@@ -25,7 +25,13 @@ import {
   type MarkedUserRecord
 } from '../../shared/marked-users';
 import { cleanText } from '../../shared/text';
-import { getAuthorChannelId, getAuthorName, getMessageAvatarSrc } from '../../youtube/messages';
+import {
+  getAuthorChannelId,
+  getAuthorName,
+  getMessageAvatarSrc,
+  getMessageStableId
+} from '../../youtube/messages';
+import { requestRenderedYouTubeChatFeedRecord } from '../../youtube/chat-feed/records';
 import {
   getParticipantAuthorName,
   getParticipantAvatarElement,
@@ -46,13 +52,13 @@ let ringAnimationId = 0;
 let ringTargetId = 0;
 let markedUsersActive = false;
 
-registerFeatureLifecycle({
+registerFeature({
   page: {
     init: initMarkedUsers,
-    cleanupStale: cleanupStaleMarkedUsers
+    cleanup: cleanupStaleMarkedUsers
   },
-  message: { render: renderMarkedUserMessageRing },
-  participant: { enhance: renderMarkedUserParticipantRing }
+  message: renderMarkedUserMessageRing,
+  participant: renderMarkedUserParticipantRing
 });
 
 export function initMarkedUsers(): void {
@@ -232,18 +238,21 @@ export function cleanupStaleMarkedUsers(): void {
     });
 }
 
-function renderMarkedUserMessageRing(message: HTMLElement, context: FeatureMessageContext): void {
+function renderMarkedUserMessageRing(message: HTMLElement): void {
   const identity = getMarkedUserIdentityFromMessage(message);
   const avatar = message.querySelector<HTMLElement>('#author-photo');
   if (!identity || !avatar) return;
 
   applyMarkedUserRing(avatar, identity);
-  void context.messageData.then((data) => {
-    if (!markedUsersActive || !message.isConnected || !avatar.isConnected || !data) return;
+  const messageId = getMessageStableId(message);
+  if (!messageId) return;
+  void requestRenderedYouTubeChatFeedRecord(message).then((record) => {
+    if (!markedUsersActive || !message.isConnected || !avatar.isConnected || !record) return;
+    if (record.id !== messageId || getMessageStableId(message) !== messageId) return;
     applyMarkedUserRing(avatar, {
-      authorName: data.authorName || identity.authorName,
-      avatarUrl: data.authorPhotoUrl || identity.avatarUrl,
-      channelId: data.authorExternalChannelId || identity.channelId
+      authorName: record.author?.name || identity.authorName,
+      avatarUrl: record.author?.avatarUrl || identity.avatarUrl,
+      channelId: record.author?.channelId || identity.channelId
     });
   });
 }
