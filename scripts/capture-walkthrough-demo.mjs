@@ -33,7 +33,6 @@ const interDisplayBoldFontPath = path.join(docsFontDir, 'InterDisplay-Bold.woff2
 const interDisplayExtraBoldFontPath = path.join(docsFontDir, 'InterDisplay-ExtraBold.woff2');
 const pointerCursorPath = path.join(demoCursorDir, 'pointer.svg');
 const handCursorPath = path.join(demoCursorDir, 'hand.svg');
-const cameraSwooshPath = path.join(demoAudioDir, 'swoosh.mp3');
 const clickSoundPath = path.join(demoAudioDir, 'click.mp3');
 const demoResultsDir = path.join(repoRoot, 'test-results', 'demos');
 const finalVideoDir = path.join(repoRoot, 'docs', 'public', 'videos');
@@ -54,7 +53,7 @@ let outputPath = path.resolve(process.env.YTCQ_DEMO_OUTPUT || path.join(videoOut
 const shouldHashFinalOutput = !previewMode && !process.env.YTCQ_DEMO_OUTPUT;
 const headless = shouldRunHeadlessDemo();
 const demoFps = readPositiveInteger(process.env.YTCQ_DEMO_FPS, getDefaultDemoFps());
-const estimatedDemoSeconds = readPositiveNumber(process.env.YTCQ_DEMO_ESTIMATED_SECONDS, 125);
+const estimatedDemoSeconds = readPositiveNumber(process.env.YTCQ_DEMO_ESTIMATED_SECONDS, 150);
 const estimatedDemoFrames = Math.max(demoFps, Math.round(estimatedDemoSeconds * demoFps));
 const progressUpdateMs = readPositiveInteger(process.env.YTCQ_DEMO_PROGRESS_MS, process.stdout.isTTY ? 1_000 : 5_000);
 const deviceScaleFactor = readPositiveNumber(process.env.YTCQ_DEMO_SCALE, getDefaultDemoScale());
@@ -71,7 +70,7 @@ let demoDocsFontFaceCssPromise = null;
 const normalChatMessageSelector = 'yt-live-chat-text-message-renderer';
 const demoChatMessageSelector = `${normalChatMessageSelector}.ytcq-demo-message`;
 const menuPopupSelector = 'ytd-menu-popup-renderer';
-const inboxRecordsStorageKey = `ytcqInboxRecords:${getSourceStorageKey(sourceUrl)}`;
+const quickEmojiPopoverSelector = '.ytcq-quick-emoji-popover:not(.ytcq-quick-emoji-popover-closing)';
 const markedUsersStorageKey = 'ytcqMarkedUsers';
 const emojiUsageStorageKey = 'ytcqEmojiUsage';
 const demoLuciaAvatarUrl = 'https://ytcq-demo.invalid/avatar/lucia-live.svg';
@@ -172,10 +171,20 @@ async function main() {
     const page = context.pages()[0] || await context.newPage();
     await setDemoViewport(page, viewport);
     await installDemoAssetRoutes(context);
-    console.log('[walkthrough] Seeding deterministic extension state...');
-    await withTimeout(seedWalkthroughExtensionState(context), 20_000, 'seed walkthrough extension state');
     console.log('[walkthrough] Opening live YouTube chat...');
-    const chat = await withTimeout(openWatchPageChatFrame(page, liveUrl), 140_000, 'open live chat');
+    let chat = await withTimeout(openWatchPageChatFrame(page, liveUrl), 140_000, 'open live chat');
+    const activeSourceUrl = await resolveWalkthroughSourceUrl(page);
+    console.log(`[walkthrough] Seeding deterministic extension state for: ${activeSourceUrl}`);
+    await withTimeout(
+      seedWalkthroughExtensionState(context, activeSourceUrl),
+      20_000,
+      'seed walkthrough extension state'
+    );
+    chat = await withTimeout(
+      openWatchPageChatFrame(page, activeSourceUrl),
+      140_000,
+      'reload seeded live chat'
+    );
     console.log('[walkthrough] Installing branding, privacy mask, and presentation overlays...');
     await withTimeout(installWatchPageBranding(page), 20_000, 'install watch page branding');
     await withTimeout(installLiveChatMask(chat), 20_000, 'install privacy mask');
@@ -188,7 +197,6 @@ async function main() {
     console.log('[walkthrough] Recording real extension walkthrough...');
     await withTimeout(recordWalkthrough(page, chat, context, recorder), 1_200_000, 'record walkthrough');
     const captureStats = await recorder.close();
-    const cameraSwooshCues = recorder.cameraSwooshCues;
     const clickCues = recorder.clickCues;
     recorder = null;
     await withTimeout(page.close(), 20_000, 'close demo page');
@@ -196,7 +204,6 @@ async function main() {
     closed = true;
     const encodeStartedAt = Date.now();
     await withTimeout(encodeCapturedVideo(captureStats.frameCount, {
-      cameraSwooshCues,
       clickCues,
       pipedVideoPath: captureStats.videoPath
     }), 180_000, 'encode walkthrough video');
@@ -225,10 +232,9 @@ async function recordWalkthrough(page, chat, context, recorder) {
     'Small tools appear where chat already happens, without replacing YouTube chat.'
   );
   await playDemoStartupEffect(page, recorder, 1_350);
-  await recorder.holdStill(2_450);
-  await hideDemoCaption(page);
-  await recorder.hold(360);
-  await recorder.holdStill(900);
+  await recorder.holdStill(1_800);
+  await fadeOutDemoCaption(page, recorder, 360);
+  await recorder.holdStill(360);
 
   recorder.setStage('Translate chat');
   await sectionTranslateChat(page, chat, context, recorder);
@@ -261,8 +267,8 @@ async function recordWalkthrough(page, chat, context, recorder) {
   );
   await recorder.hold(360);
   await recorder.holdStill(4_140);
-  await hideDemoCaption(page);
-  await recorder.hold(900);
+  await fadeOutDemoCaption(page, recorder, 420);
+  await recorder.holdStill(480);
 }
 
 async function sectionTranslateChat(page, chat, context, recorder) {
@@ -404,8 +410,7 @@ async function sectionComposerTranslation(page, chat, recorder) {
 
   await selectComposerLanguage(chat, 'ja');
   await recorder.hold(520);
-  await hideDemoCaption(page);
-  await recorder.hold(280);
+  await fadeOutDemoCaption(page, recorder, 280);
   await clearChatComposer(chat);
   await typeIntoComposerHuman(chat, recorder, 'Thanks for the stream @ChatDemo ✅');
   await waitForComposerTextToChange(chat, 'Thanks for the stream @ChatDemo ✅');
@@ -620,7 +625,7 @@ async function sectionMarkedUsers(page, chat, context, recorder) {
   await clickWithCursor(page, markAction, recorder, 'Mark action');
   await source.message.locator('#author-photo').first().waitFor({ state: 'visible', timeout: 10_000 });
   await recorder.settleThenHoldStill(1_000);
-  await hideDemoCaption(page);
+  await fadeOutDemoCaption(page, recorder, 320);
   await sectionPopupBookmarks(page, context, recorder);
 }
 
@@ -629,13 +634,20 @@ async function sectionEmojiAndCommands(page, chat, recorder) {
   const emojiButton = chat.locator('#emoji-picker-button yt-live-chat-icon-toggle-button-renderer#emoji button').first();
   await emojiButton.waitFor({ state: 'visible', timeout: 10_000 });
   await prepareDemoEmojiPicker(chat);
+  await hoverWithCursor(page, emojiButton, recorder, 'emoji picker button');
+  const quickPopover = chat.locator(quickEmojiPopoverSelector).first();
+  await quickPopover.waitFor({ state: 'visible', timeout: 5_000 });
+  await showDemoCaptionFor(
+    page,
+    recorder,
+    'Hover for your most-used emojis',
+    'The quick popover keeps common reactions one move away.',
+    { anchorLocator: quickPopover }
+  );
+
   await clickWithCursor(page, emojiButton, recorder, 'emoji picker button', {
-    afterFocusHoldMs: 240,
-    beforeFocusHoldMs: 360,
-    caption: {
-      title: 'Reuse frequent emojis',
-      body: 'A most-used row appears inside YouTube’s emoji picker.'
-    }
+    afterClickHoldMs: 240,
+    durationMs: 260
   });
   const picker = chat.locator('yt-emoji-picker-renderer').first();
   await picker.waitFor({ state: 'attached', timeout: 10_000 });
@@ -644,8 +656,8 @@ async function sectionEmojiAndCommands(page, chat, recorder) {
   await showDemoCaptionFor(
     page,
     recorder,
-    'Common reactions stay close',
-    'The row is built from your usage.',
+    'Reuse them in the full picker',
+    'Your most-used row also appears inside YouTube’s emoji picker.',
     { anchorLocator: chat.locator('.ytcq-frequent-emoji-row').first() }
   );
 
@@ -661,11 +673,10 @@ async function sectionEmojiAndCommands(page, chat, recorder) {
     { placement: 'side' }
   );
   await recorder.settleThenHoldStill(700);
-  await typeIntoComposerHuman(chat, recorder, 'the event is in /when 8pm', {
-    pace: 0.58
-  });
-  await hideDemoCaption(page);
-  await recorder.holdStill(760);
+  const whenTarget = getFutureDemoWhenTarget();
+  await typeIntoComposerHuman(chat, recorder, `the event is in /when ${whenTarget}`);
+  await fadeOutDemoCaption(page, recorder, 320);
+  await recorder.holdStill(440);
   await getChatComposerInput(chat).press('Tab');
   await poll(async () => {
     const text = await getComposerText(chat);
@@ -728,7 +739,6 @@ async function sectionPopupBookmarks(page, context, recorder) {
     );
     await highlightLocator(popup, popup.locator('.bookmark-row').first(), 10);
     await recorder.settleThenHoldStill(4_000);
-    await hideDemoCaption(popup);
     await clearDemoFocus(popup);
     await fadeDemoPopupOut(popup, recorder);
   } finally {
@@ -739,12 +749,17 @@ async function sectionPopupBookmarks(page, context, recorder) {
   await recorder.usePage(page);
 }
 
-async function seedWalkthroughExtensionState(context) {
+async function seedWalkthroughExtensionState(context, activeSourceUrl) {
   const extensionId = await getInstalledProfileExtensionId(profileDir);
   if (!extensionId) {
     throw new Error('Could not find Chat Enhancer in the demo Chrome profile.');
   }
 
+  const recordsKey = `ytcqInboxRecords:${getSourceStorageKey(activeSourceUrl)}`;
+  const inboxRecord = {
+    ...demoInboxRecord,
+    sourceUrl: activeSourceUrl
+  };
   const extensionPage = await context.newPage();
   try {
     await extensionPage.goto(`chrome-extension://${extensionId}/popup.html`, {
@@ -783,7 +798,7 @@ async function seedWalkthroughExtensionState(context) {
           text: emoji
         }));
       }
-    }, [inboxRecordsStorageKey, demoInboxRecord, emojiUsageStorageKey, markedUsersStorageKey]);
+    }, [recordsKey, inboxRecord, emojiUsageStorageKey, markedUsersStorageKey]);
   } finally {
     await extensionPage.close().catch(() => undefined);
   }
@@ -1015,6 +1030,36 @@ async function installFrameSteppedStartupEffect(page) {
   });
 }
 
+async function resolveWalkthroughSourceUrl(page) {
+  const sourceCandidates = await page.evaluate(() => {
+    const playerResponse = window.ytInitialPlayerResponse;
+    return {
+      canonicalUrl: document.querySelector('link[rel="canonical"]')?.href || '',
+      currentUrl: window.location.href,
+      openGraphUrl: document.querySelector('meta[property="og:url"]')?.content || '',
+      videoId: playerResponse?.videoDetails?.videoId || ''
+    };
+  }).catch(() => ({
+    canonicalUrl: '',
+    currentUrl: page.url(),
+    openGraphUrl: '',
+    videoId: ''
+  }));
+
+  for (const candidate of [
+    sourceCandidates.currentUrl,
+    sourceCandidates.canonicalUrl,
+    sourceCandidates.openGraphUrl
+  ]) {
+    const videoId = getVideoIdFromUrl(candidate);
+    if (videoId) return `https://www.youtube.com/watch?v=${encodeURIComponent(videoId)}`;
+  }
+  if (sourceCandidates.videoId) {
+    return `https://www.youtube.com/watch?v=${encodeURIComponent(sourceCandidates.videoId)}`;
+  }
+  return sourceUrl;
+}
+
 async function openWatchPageChatFrame(page, url) {
   await setDemoViewport(page, viewport);
   await page.goto(url, { timeout: 60_000, waitUntil: 'domcontentloaded' });
@@ -1078,8 +1123,7 @@ async function focusComposerArea(page, chat, recorder, options = {}) {
     focusYRatio: 1,
     scale: 1.28,
     screenXRatio: 0.84,
-    screenYRatio: 0.88,
-    swoosh: options.swoosh
+    screenYRatio: 0.88
   });
   await recorder.hold(options.afterHoldMs ?? 240);
   if (options.showFocus !== false) {
@@ -1110,8 +1154,7 @@ async function showComposerDraftResult(page, chat, recorder, durationMs, options
   if (options.moveCamera !== false) {
     await focusComposerArea(page, chat, recorder, {
       afterHoldMs: 180,
-      showFocus: false,
-      swoosh: false
+      showFocus: false
     });
   } else {
     await recorder.hold(180);
@@ -1419,12 +1462,15 @@ async function typeIntoComposerHuman(chat, recorder, text, options = {}) {
   await input.waitFor({ state: 'visible', timeout: 10_000 });
   await input.click();
   const graphemes = splitDemoGraphemes(text);
+  const pace = options.pace ?? 1.45;
   for (let index = 0; index < graphemes.length; index += 1) {
     const grapheme = graphemes[index];
+    const keyDelayMs = getHumanKeyDelayMs(grapheme, index);
     await input.pressSequentially(grapheme, {
-      delay: Math.max(4, Math.round(getHumanKeyDelayMs(grapheme, index) * (options.pace ?? 1)))
+      delay: Math.max(4, Math.round(keyDelayMs * pace))
     });
-    await recorder.captureThenHoldStill(Math.max(14, Math.round(getHumanTypingHoldMs(grapheme, index, graphemes) * (options.pace ?? 1))));
+    const recordedDelayMs = (keyDelayMs + getHumanTypingHoldMs(grapheme, index, graphemes)) * pace;
+    await recorder.captureThenHoldStill(Math.max(32, Math.round(recordedDelayMs)));
   }
 }
 
@@ -2119,7 +2165,7 @@ async function installWatchPageBranding(page) {
 
       html,
       body {
-        --ytcq-demo-chat-column-width: 400px;
+        --ytcq-demo-chat-column-width: 420px;
         overflow-x: clip !important;
       }
 
@@ -2396,7 +2442,7 @@ async function installLiveChatMask(chat) {
       ['@marco_vibes87', 'That close-up during the chorus was perfect.', 'That close-up during the chorus was perfect.'],
       ['@なおこ東京', '今の照明の切り替え、すごく自然だった。', 'That lighting change felt really natural.'],
       ['@CafeLuz', '@CamilaNube sí, fue justo después del solo.', '@CamilaNube yes, it was right after the solo.'],
-      ['@brunoRJ', 'Essa entrada do convidado ficou boa demais.', 'That guest entrance was really good.'],
+      ['@brunoRJ', 'Essa entrada do convidado ficou boa demais.', 'That guest entrance was great.'],
       ['@하나서울', '방금 드럼 들어오는 부분 다시 보고 싶다.', 'I want to see the drums come in again.'],
       ['@SoleneChat', '@marco_vibes87 oui, le timing était parfait.', '@marco_vibes87 yes, the timing was perfect.'],
       ['@रविमुंबई', 'यह गाना लाइव में और भी अच्छा लग रहा है।', 'This song sounds even better live.'],
@@ -2451,7 +2497,7 @@ async function installLiveChatMask(chat) {
         key: 'translate-2',
         handle: '@brunoRJ',
         message: 'Essa entrada do convidado ficou boa demais.',
-        translation: 'That guest entrance was really good.',
+        translation: 'That guest entrance was great.',
         timestamp: '3:10'
       },
       {
@@ -2605,25 +2651,41 @@ async function installLiveChatMask(chat) {
         }
 
         .ytcq-demo-message {
-          align-items: flex-start !important;
+          --ytcq-lite-row-background: transparent;
+          align-items: start !important;
+          background: var(--ytcq-lite-row-background) !important;
           box-sizing: border-box !important;
+          column-gap: 16px !important;
           color: var(--yt-live-chat-primary-text-color, var(--yt-spec-text-primary, #0f0f0f)) !important;
-          display: flex !important;
+          display: grid !important;
           font-family: Roboto, "YouTube Sans", Arial, sans-serif !important;
-          gap: 4px !important;
-          min-height: 40px !important;
-          padding: 5px 14px 5px 12px !important;
+          font-size: 13px !important;
+          grid-template-columns: 24px minmax(0, 1fr) !important;
+          line-height: 1.35 !important;
+          margin: 0 !important;
+          min-height: 0 !important;
+          padding: 4px 24px !important;
           position: relative !important;
           width: 100% !important;
         }
 
+        .ytcq-demo-message:hover,
+        .ytcq-demo-message:focus-within {
+          background: color-mix(in srgb, var(--ytcq-lite-row-background), currentColor 6%) !important;
+        }
+
         .ytcq-demo-message #author-photo {
+          align-items: center !important;
           border-radius: 50% !important;
-          display: block !important;
-          flex: 0 0 24px !important;
+          display: flex !important;
           height: 24px !important;
-          margin-top: 1px !important;
-          overflow: visible !important;
+          justify-content: center !important;
+          margin: 0 !important;
+          max-height: 24px !important;
+          max-width: 24px !important;
+          min-height: 24px !important;
+          min-width: 24px !important;
+          overflow: hidden !important;
           width: 24px !important;
         }
 
@@ -2635,42 +2697,74 @@ async function installLiveChatMask(chat) {
         }
 
         .ytcq-demo-message .ytcq-demo-message-content {
-          flex: 1 1 auto !important;
-          line-height: 20px !important;
+          align-self: center !important;
+          line-height: 16px !important;
+          margin: 0 !important;
           min-width: 0 !important;
+          overflow-wrap: anywhere !important;
+          padding: 0 !important;
+        }
+
+        .ytcq-demo-message .ytcq-demo-message-meta {
+          display: inline !important;
+          margin: 0 !important;
+          min-width: 0 !important;
+        }
+
+        .ytcq-demo-message .ytcq-demo-author-chip {
+          align-items: center !important;
+          display: inline-flex !important;
+          margin: 0 4px 0 0 !important;
+          vertical-align: bottom !important;
         }
 
         .ytcq-demo-message #timestamp {
           color: var(--yt-live-chat-secondary-text-color, var(--yt-spec-text-secondary, #606060)) !important;
           display: none !important;
-          font-size: 10px !important;
-          margin-right: 0 !important;
+          font-size: 11px !important;
+          line-height: 16px !important;
+          margin-right: 8px !important;
           white-space: nowrap !important;
         }
 
         .ytcq-demo-message #author-name {
           color: var(--yt-live-chat-secondary-text-color, var(--yt-spec-text-secondary, #606060)) !important;
           cursor: pointer !important;
-          font-size: 13px !important;
+          display: inline-block !important;
+          font: inherit !important;
           font-weight: 500 !important;
-          margin-right: 2px !important;
+          margin: 0 !important;
+          min-width: 0 !important;
+          padding: 0 !important;
+          vertical-align: bottom !important;
           white-space: nowrap !important;
+        }
+
+        .ytcq-demo-message .ytcq-demo-message-container {
+          display: inline !important;
         }
 
         .ytcq-demo-message #message {
           color: var(--yt-live-chat-primary-text-color, var(--yt-spec-text-primary, #0f0f0f)) !important;
-          font-size: 13px !important;
           overflow-wrap: anywhere !important;
+          white-space: pre-wrap !important;
         }
 
         .ytcq-demo-message #menu {
           align-items: center !important;
           display: flex !important;
-          flex: 0 0 28px !important;
           height: 28px !important;
           justify-content: center !important;
-          opacity: 1 !important;
+          opacity: 0 !important;
+          position: absolute !important;
+          right: 8px !important;
+          top: 2px !important;
           width: 28px !important;
+        }
+
+        .ytcq-demo-message:hover #menu,
+        .ytcq-demo-message:focus-within #menu {
+          opacity: 1 !important;
         }
 
         .ytcq-demo-message #menu button {
@@ -2838,18 +2932,29 @@ async function installLiveChatMask(chat) {
       avatar.append(image);
 
       const content = document.createElement('div');
+      const meta = document.createElement('div');
       const timestamp = document.createElement('span');
+      const authorChip = document.createElement('span');
       const author = document.createElement('span');
+      const messageContainer = document.createElement('span');
       const body = document.createElement('span');
       content.className = 'ytcq-demo-message-content';
       content.id = 'content';
+      meta.className = 'ytcq-demo-message-meta';
       timestamp.id = 'timestamp';
       timestamp.textContent = entry.timestamp || '';
+      authorChip.className = 'ytcq-demo-author-chip';
       author.id = 'author-name';
       author.textContent = profile.handle;
+      messageContainer.className = 'ytcq-demo-message-container';
+      messageContainer.id = 'message-container';
       body.id = 'message';
+      body.dir = 'auto';
       body.textContent = entry.message || profile.message;
-      content.append(timestamp, author, body);
+      authorChip.append(author);
+      meta.append(timestamp, authorChip);
+      messageContainer.append(body);
+      content.append(meta, messageContainer);
 
       const menu = document.createElement('div');
       const button = document.createElement('button');
@@ -3310,6 +3415,95 @@ async function installDemoPresentationLayer(page) {
         transform: translateY(0);
       }
 
+      .ytcq-demo-caption::before,
+      .ytcq-demo-caption::after {
+        content: "";
+        display: none;
+        height: 0;
+        position: absolute;
+        width: 0;
+      }
+
+      .ytcq-demo-caption[data-pointer="right"]::before,
+      .ytcq-demo-caption[data-pointer="right"]::after,
+      .ytcq-demo-caption[data-pointer="left"]::before,
+      .ytcq-demo-caption[data-pointer="left"]::after {
+        top: var(--ytcq-demo-pointer-offset, 50%);
+        transform: translateY(-50%);
+      }
+
+      .ytcq-demo-caption[data-pointer="right"]::before {
+        border-bottom: 9px solid transparent;
+        border-left: 11px solid #e2e6ee;
+        border-top: 9px solid transparent;
+        display: block;
+        right: -11px;
+      }
+
+      .ytcq-demo-caption[data-pointer="right"]::after {
+        border-bottom: 8px solid transparent;
+        border-left: 10px solid #fff;
+        border-top: 8px solid transparent;
+        display: block;
+        right: -9px;
+      }
+
+      .ytcq-demo-caption[data-pointer="left"]::before {
+        border-bottom: 9px solid transparent;
+        border-right: 11px solid #e2e6ee;
+        border-top: 9px solid transparent;
+        display: block;
+        left: -11px;
+      }
+
+      .ytcq-demo-caption[data-pointer="left"]::after {
+        border-bottom: 8px solid transparent;
+        border-right: 10px solid #fff;
+        border-top: 8px solid transparent;
+        display: block;
+        left: -9px;
+      }
+
+      .ytcq-demo-caption[data-pointer="top"]::before,
+      .ytcq-demo-caption[data-pointer="top"]::after,
+      .ytcq-demo-caption[data-pointer="bottom"]::before,
+      .ytcq-demo-caption[data-pointer="bottom"]::after {
+        left: var(--ytcq-demo-pointer-offset, 50%);
+        transform: translateX(-50%);
+      }
+
+      .ytcq-demo-caption[data-pointer="top"]::before {
+        border-bottom: 11px solid #e2e6ee;
+        border-left: 9px solid transparent;
+        border-right: 9px solid transparent;
+        display: block;
+        top: -11px;
+      }
+
+      .ytcq-demo-caption[data-pointer="top"]::after {
+        border-bottom: 10px solid #fff;
+        border-left: 8px solid transparent;
+        border-right: 8px solid transparent;
+        display: block;
+        top: -9px;
+      }
+
+      .ytcq-demo-caption[data-pointer="bottom"]::before {
+        border-left: 9px solid transparent;
+        border-right: 9px solid transparent;
+        border-top: 11px solid #e2e6ee;
+        bottom: -11px;
+        display: block;
+      }
+
+      .ytcq-demo-caption[data-pointer="bottom"]::after {
+        border-left: 8px solid transparent;
+        border-right: 8px solid transparent;
+        border-top: 10px solid #fff;
+        bottom: -9px;
+        display: block;
+      }
+
       .ytcq-demo-caption strong {
         color: #17191f;
         display: block;
@@ -3330,9 +3524,15 @@ async function installDemoPresentationLayer(page) {
       }
 
       .ytcq-demo-focus {
-        border: 3px solid rgba(47, 128, 237, 0.95);
+        background: rgba(47, 128, 237, 0.035);
+        border: 2px solid rgba(74, 155, 255, 0.95);
         border-radius: 18px;
-        box-shadow: 0 0 0 9999px rgba(2, 6, 23, 0.08), 0 0 0 8px rgba(47, 128, 237, 0.12), 0 14px 40px rgba(47, 128, 237, 0.30);
+        box-shadow:
+          0 0 0 9999px rgba(2, 6, 23, 0.07),
+          0 0 0 4px rgba(74, 155, 255, 0.30),
+          0 0 0 10px rgba(74, 155, 255, 0.14),
+          0 0 28px 12px rgba(47, 128, 237, 0.38),
+          inset 0 0 22px rgba(74, 155, 255, 0.12);
         box-sizing: border-box;
         opacity: 0;
         transform: scale(0.96);
@@ -3416,7 +3616,7 @@ async function fadeDemoPopupIn(page, recorder) {
 }
 
 async function fadeDemoPopupOut(page, recorder) {
-  await hideDemoCaption(page);
+  await fadeOutDemoCaption(page, recorder, 280);
   await animateDemoPopupOpacity(page, recorder, 1, 0, 420);
 }
 
@@ -3510,9 +3710,9 @@ async function createScreencastFrameRecorder(page) {
   let currentSource = null;
   let frameCount = 0;
   let latestFrameBuffer = null;
+  let latestFrameSequence = 0;
+  let lastFrameBuffer = null;
   let lastProgressAt = 0;
-  let lastCameraSwooshAtMs = -Infinity;
-  let outputLoopPromise = null;
   let restartPromise = null;
   let restartScheduled = false;
   let stage = 'Preparing';
@@ -3520,28 +3720,17 @@ async function createScreencastFrameRecorder(page) {
   let nextActionFrameAt = Date.now();
   let lastLoggedFrameSize = '';
   const startedAt = Date.now();
-  const cameraSwooshCues = [];
   const clickCues = [];
   const frameWaiters = new Set();
 
   await startScreencastSource(page);
-  outputLoopPromise = runOutputLoop();
 
   return {
-    get cameraSwooshCues() {
-      return [...cameraSwooshCues];
-    },
     get clickCues() {
       return [...clickCues];
     },
     get frameCount() {
       return frameCount;
-    },
-    cueCameraSwoosh({ minGapMs = 4_200 } = {}) {
-      const cueMs = Math.max(0, (frameCount / demoFps) * 1_000);
-      if (cueMs - lastCameraSwooshAtMs < minGapMs) return;
-      lastCameraSwooshAtMs = cueMs;
-      cameraSwooshCues.push(cueMs);
     },
     cueClick() {
       clickCues.push(Math.max(0, (frameCount / demoFps) * 1_000));
@@ -3559,6 +3748,7 @@ async function createScreencastFrameRecorder(page) {
     async usePage(nextPage) {
       await syncDemoCursorToStoredPosition(nextPage);
       await restartScreencastSource(nextPage, { clearLatestFrame: true });
+      lastFrameBuffer = null;
     },
     async refreshCaptureSource() {
       const page = currentSource?.page;
@@ -3566,26 +3756,43 @@ async function createScreencastFrameRecorder(page) {
       await restartScreencastSource(page, { clearLatestFrame: false });
     },
     async captureFrame() {
-      await waitForNextActionFrame();
+      await capturePaintedFrame();
     },
     async abort() {
       stopped = true;
       resolveFrameWaiters(null);
       await stopScreencastSource();
       await videoEncoder?.abort();
-      await outputLoopPromise?.catch(() => undefined);
     },
     async captureThenHoldStill(durationMs) {
-      await this.hold(durationMs);
+      if (durationMs <= 0) return;
+      const frames = durationToFrames(durationMs);
+      await capturePaintedFrame();
+      await writeRepeatedLastFrame(Math.max(0, frames - 1));
+      resetActionFrameClock();
     },
     async hold(durationMs) {
-      await delayAndResetActionFrameClock(durationMs);
+      const frames = durationToFrames(durationMs);
+      for (let frame = 0; frame < frames; frame += 1) {
+        await captureDynamicFrame();
+      }
     },
     async holdStill(durationMs) {
-      await delayAndResetActionFrameClock(durationMs);
+      if (durationMs <= 0) return;
+      const frames = durationToFrames(durationMs);
+      if (!lastFrameBuffer) {
+        await captureDynamicFrame();
+        await writeRepeatedLastFrame(Math.max(0, frames - 1));
+      } else {
+        await writeRepeatedLastFrame(frames);
+      }
+      resetActionFrameClock();
     },
-    async settleThenHoldStill(durationMs) {
-      await delayAndResetActionFrameClock(durationMs);
+    async settleThenHoldStill(durationMs, settleMs = 240) {
+      if (durationMs <= 0) return;
+      const dynamicMs = Math.min(durationMs, settleMs);
+      await this.hold(dynamicMs);
+      await this.holdStill(durationMs - dynamicMs);
     },
     async close() {
       const capturedAt = Date.now();
@@ -3599,7 +3806,6 @@ async function createScreencastFrameRecorder(page) {
         startedAt
       });
       await stopScreencastSource();
-      await outputLoopPromise;
       const flushedAt = Date.now();
       await videoEncoder?.close();
       const finishedAt = Date.now();
@@ -3629,6 +3835,7 @@ async function createScreencastFrameRecorder(page) {
       }
 
       latestFrameBuffer = buffer;
+      latestFrameSequence += 1;
       resolveFrameWaiters(latestFrameBuffer);
     };
 
@@ -3687,22 +3894,6 @@ async function createScreencastFrameRecorder(page) {
     await restartPromise;
   }
 
-  async function runOutputLoop() {
-    let nextFrameAt = Date.now();
-    while (!stopped) {
-      const buffer = latestFrameBuffer || await waitForLatestFrame();
-      if (!buffer || stopped) break;
-      await writeFrameBuffer(buffer);
-      nextFrameAt += getFrameDurationMs();
-      const waitMs = nextFrameAt - Date.now();
-      if (waitMs > 0) {
-        await delay(waitMs);
-      } else if (waitMs < -getFrameDurationMs() * 5) {
-        nextFrameAt = Date.now();
-      }
-    }
-  }
-
   function waitForLatestFrame() {
     if (latestFrameBuffer) return Promise.resolve(latestFrameBuffer);
     if (stopped) return Promise.resolve(null);
@@ -3717,6 +3908,38 @@ async function createScreencastFrameRecorder(page) {
     waiters.forEach((resolve) => resolve(buffer));
   }
 
+  async function captureDynamicFrame() {
+    await waitForNextActionFrame();
+    const buffer = latestFrameBuffer || await waitForLatestFrame();
+    if (!buffer || stopped) return;
+    lastFrameBuffer = buffer;
+    await writeFrameBuffer(buffer);
+  }
+
+  async function capturePaintedFrame() {
+    const sequenceBeforePaint = latestFrameSequence;
+    await currentSource?.page.evaluate(() => {
+      return new Promise((resolve) => window.requestAnimationFrame(() => resolve()));
+    }).catch(() => undefined);
+    await waitForNextActionFrame();
+    const freshFrame = await waitForFrameAfter(
+      sequenceBeforePaint,
+      Math.max(48, Math.round(getFrameDurationMs() * 4))
+    );
+    const buffer = freshFrame || latestFrameBuffer || await waitForLatestFrame();
+    if (!buffer || stopped) return;
+    lastFrameBuffer = buffer;
+    await writeFrameBuffer(buffer);
+  }
+
+  async function waitForFrameAfter(sequence, timeoutMs) {
+    const deadline = Date.now() + timeoutMs;
+    while (!stopped && latestFrameSequence <= sequence && Date.now() < deadline) {
+      await delay(Math.min(6, Math.max(1, deadline - Date.now())));
+    }
+    return latestFrameSequence > sequence ? latestFrameBuffer : null;
+  }
+
   async function waitForNextActionFrame() {
     const frameDurationMs = getFrameDurationMs();
     nextActionFrameAt += frameDurationMs;
@@ -3727,11 +3950,6 @@ async function createScreencastFrameRecorder(page) {
     }
 
     if (waitMs < -frameDurationMs * 4) resetActionFrameClock();
-  }
-
-  async function delayAndResetActionFrameClock(durationMs) {
-    if (durationMs > 0) await delay(durationMs);
-    resetActionFrameClock();
   }
 
   function resetActionFrameClock() {
@@ -3752,6 +3970,13 @@ async function createScreencastFrameRecorder(page) {
       });
     }
     await videoEncoder.writeFrame(buffer);
+  }
+
+  async function writeRepeatedLastFrame(frameTotal) {
+    if (!lastFrameBuffer) return;
+    for (let frame = 0; frame < frameTotal; frame += 1) {
+      await writeFrameBuffer(lastFrameBuffer);
+    }
   }
 
   function logFrameSizeIfNeeded(buffer, metadata, dimensions = getImageDimensions(buffer)) {
@@ -3930,6 +4155,19 @@ async function applyCaptureMetrics(session, size) {
   }).catch(() => undefined);
 }
 
+async function hoverWithCursor(page, locator, recorder, label, options = {}) {
+  const box = await getLocatorBox(locator, label);
+  const hoverPoint = getHumanTargetPoint(box, label);
+  await setDemoFocusOnLocator(page, locator, options.padding ?? 8);
+  await moveCursor(page, hoverPoint.x, hoverPoint.y, options.durationMs, recorder, {
+    label,
+    hoverBox: box
+  });
+  await recorder.hold(options.afterHoverHoldMs ?? 260);
+  await clearDemoFocus(page);
+  return box;
+}
+
 async function clickWithCursor(page, locator, recorder, label, options = {}) {
   if (options.beforeFocusHoldMs) {
     await recorder.hold(options.beforeFocusHoldMs);
@@ -3996,9 +4234,8 @@ async function showDemoCaptionFor(page, recorder, title, body, options = {}) {
   const animationMs = Math.min(360, durationMs);
   await recorder.hold(animationMs);
   await recorder.holdStill(durationMs - animationMs);
-  await hideDemoCaption(page);
+  await fadeOutDemoCaption(page, recorder, 320);
   await clearDemoFocus(page);
-  await recorder.hold(320);
 }
 
 async function setDemoCaption(page, title, body, anchorBox = null, options = {}) {
@@ -4052,6 +4289,21 @@ async function setDemoCaption(page, title, body, anchorBox = null, options = {})
       );
       caption.style.left = `${left}px`;
       caption.style.top = `${top}px`;
+
+      const captionCenterX = left + captionWidth / 2;
+      const captionCenterY = top + captionHeight / 2;
+      const targetCenterX = targetBox.x + targetBox.width / 2;
+      const targetCenterY = targetBox.y + targetBox.height / 2;
+      const deltaX = targetCenterX - captionCenterX;
+      const deltaY = targetCenterY - captionCenterY;
+      const pointerSide = Math.abs(deltaX) >= Math.abs(deltaY)
+        ? (deltaX >= 0 ? 'right' : 'left')
+        : (deltaY >= 0 ? 'bottom' : 'top');
+      const pointerOffset = pointerSide === 'left' || pointerSide === 'right'
+        ? Math.max(24, Math.min(captionHeight - 24, targetCenterY - top))
+        : Math.max(24, Math.min(captionWidth - 24, targetCenterX - left));
+      caption.dataset.pointer = pointerSide;
+      caption.style.setProperty('--ytcq-demo-pointer-offset', `${pointerOffset}px`);
     } else {
       const maxCaptionWidth = captionOptions?.maxWidth ?? 320;
       const captionBox = caption.getBoundingClientRect();
@@ -4066,15 +4318,42 @@ async function setDemoCaption(page, title, body, anchorBox = null, options = {})
         : 150;
       caption.style.left = `${left}px`;
       caption.style.top = `${top}px`;
+      delete caption.dataset.pointer;
+      caption.style.removeProperty('--ytcq-demo-pointer-offset');
     }
 
     caption.classList.add('is-visible');
   }, [title, body, anchorBox, options]);
 }
 
-async function hideDemoCaption(page) {
+async function fadeOutDemoCaption(page, recorder, durationMs = 320) {
+  const frames = Math.max(1, durationToFrames(durationMs));
+  const hasVisibleCaption = await page.evaluate(() => {
+    const caption = document.querySelector('.ytcq-demo-caption');
+    if (!(caption instanceof HTMLElement) || !caption.classList.contains('is-visible')) return false;
+    caption.style.transition = 'none';
+    return true;
+  }).catch(() => false);
+  if (!hasVisibleCaption) return;
+
+  for (let frame = 1; frame <= frames; frame += 1) {
+    const progress = easeInOutCubic(frame / frames);
+    await page.evaluate((nextProgress) => {
+      const caption = document.querySelector('.ytcq-demo-caption');
+      if (!(caption instanceof HTMLElement)) return;
+      caption.style.opacity = String(1 - nextProgress);
+      caption.style.transform = `translateY(${nextProgress * 10}px)`;
+    }, progress);
+    await recorder.captureFrame();
+  }
+
   await page.evaluate(() => {
-    document.querySelector('.ytcq-demo-caption')?.classList.remove('is-visible');
+    const caption = document.querySelector('.ytcq-demo-caption');
+    if (!(caption instanceof HTMLElement)) return;
+    caption.classList.remove('is-visible');
+    caption.style.removeProperty('opacity');
+    caption.style.removeProperty('transform');
+    caption.style.removeProperty('transition');
   });
 }
 
@@ -4186,10 +4465,6 @@ async function setDemoCameraForBox(page, recorder, box, options = {}) {
     await recorder.hold(options.durationMs ?? 220);
     return;
   }
-  if (shouldCueCameraSwoosh(currentCamera, transform, options)) {
-    recorder.cueCameraSwoosh();
-  }
-
   await page.evaluate((camera) => {
     const app = document.querySelector('ytd-app');
     if (!(app instanceof HTMLElement)) return;
@@ -4197,13 +4472,6 @@ async function setDemoCameraForBox(page, recorder, box, options = {}) {
     app.style.transform = `translate(${camera.x}px, ${camera.y}px) scale(${camera.scale})`;
   }, transform);
   await recorder.hold(options.durationMs ?? getCameraTransitionDurationMs(currentCamera, transform));
-}
-
-function shouldCueCameraSwoosh(currentCamera, nextCamera, options = {}) {
-  if (options.swoosh === false) return false;
-  const moveDistance = Math.hypot(nextCamera.x - currentCamera.x, nextCamera.y - currentCamera.y);
-  const scaleDelta = Math.abs(nextCamera.scale - currentCamera.scale);
-  return moveDistance >= 80 || scaleDelta >= 0.06;
 }
 
 function cameraTransformIsClose(currentCamera, nextCamera) {
@@ -4423,6 +4691,24 @@ function formatDuration(durationMs) {
   return `${minutes}:${String(seconds).padStart(2, '0')}`;
 }
 
+function getFutureDemoWhenTarget(now = new Date()) {
+  const target = new Date(now.getTime() + (45 * 60 * 1_000));
+  target.setSeconds(0, 0);
+  target.setMinutes(Math.ceil(target.getMinutes() / 5) * 5);
+
+  const hour = target.getHours();
+  const minute = target.getMinutes();
+  const time = `${hour % 12 || 12}${minute ? `:${String(minute).padStart(2, '0')}` : ''}${hour < 12 ? 'am' : 'pm'}`;
+  const isSameDay = target.getFullYear() === now.getFullYear()
+    && target.getMonth() === now.getMonth()
+    && target.getDate() === now.getDate();
+  if (isSameDay) return time;
+
+  const month = String(target.getMonth() + 1).padStart(2, '0');
+  const day = String(target.getDate()).padStart(2, '0');
+  return `${target.getFullYear()}-${month}-${day} ${time}`;
+}
+
 function getOutputLogLabel() {
   if (!shouldHashFinalOutput) return outputPath;
   return `${outputPath} -> ${path.join(finalVideoDir, `${finalVideoBaseName}-<hash>.mp4`)}`;
@@ -4517,16 +4803,15 @@ async function readFileDataUrl(filePath, mimeType) {
   return `data:${mimeType};base64,${contents.toString('base64')}`;
 }
 
-async function encodeCapturedVideo(frameCount, { cameraSwooshCues = [], clickCues = [], pipedVideoPath: inputVideoPath } = {}) {
+async function encodeCapturedVideo(frameCount, { clickCues = [], pipedVideoPath: inputVideoPath } = {}) {
   if (!inputVideoPath) throw new Error('No piped walkthrough video was captured.');
-  await muxPipedVideoToOutput(inputVideoPath, frameCount, { cameraSwooshCues, clickCues });
+  await muxPipedVideoToOutput(inputVideoPath, frameCount, { clickCues });
 }
 
-async function muxPipedVideoToOutput(inputVideoPath, frameCount, { cameraSwooshCues = [], clickCues = [] } = {}) {
+async function muxPipedVideoToOutput(inputVideoPath, frameCount, { clickCues = [] } = {}) {
   if (frameCount <= 0) throw new Error('No demo frames were captured.');
 
-  const hasAudioCues = cameraSwooshCues.length || clickCues.length;
-  if (!hasAudioCues) {
+  if (!clickCues.length) {
     await rename(inputVideoPath, outputPath);
     return;
   }
@@ -4539,13 +4824,13 @@ async function muxPipedVideoToOutput(inputVideoPath, frameCount, { cameraSwooshC
     '-i',
     inputVideoPath
   ];
-  appendAudioCueArgs(args, frameCount, { cameraSwooshCues, clickCues });
+  appendAudioCueArgs(args, frameCount, { clickCues });
   args.push('-c:v', 'copy', outputPath);
   await runProcess(process.env.YTCQ_FFMPEG || 'ffmpeg', args);
 }
 
-function appendAudioCueArgs(args, frameCount, { cameraSwooshCues = [], clickCues = [] } = {}) {
-  const availableAudioCueGroups = getAvailableAudioCueGroups({ cameraSwooshCues, clickCues });
+function appendAudioCueArgs(args, frameCount, { clickCues = [] } = {}) {
+  const availableAudioCueGroups = getAvailableAudioCueGroups({ clickCues });
   if (!availableAudioCueGroups.length) return;
 
   const videoDurationSeconds = frameCount / demoFps;
@@ -4590,15 +4875,8 @@ function appendAudioCueArgs(args, frameCount, { cameraSwooshCues = [], clickCues
   console.log(`[walkthrough] Mixing ${cueCounts.join(' and ')} cue${cueLabels.length === 1 ? '' : 's'} into the video.`);
 }
 
-function getAvailableAudioCueGroups({ cameraSwooshCues = [], clickCues = [] } = {}) {
+function getAvailableAudioCueGroups({ clickCues = [] } = {}) {
   return [
-    {
-      cues: cameraSwooshCues,
-      filePath: cameraSwooshPath,
-      label: 'camera swoosh',
-      tag: 'swoosh',
-      volume: previewMode ? '0.5' : '0.45'
-    },
     {
       cues: clickCues,
       filePath: clickSoundPath,
