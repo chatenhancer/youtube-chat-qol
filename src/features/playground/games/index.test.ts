@@ -11,8 +11,12 @@ import {
 const alertSoundMocks = vi.hoisted(() => ({
   playAlertSound: vi.fn()
 }));
+const minimizeAnimationMocks = vi.hoisted(() => ({
+  animateGameSurfaceToGamesButton: vi.fn(() => true)
+}));
 
 vi.mock('../../../shared/sounds/alert-sounds', () => alertSoundMocks);
+vi.mock('./minimize-animation', () => minimizeAnimationMocks);
 
 import {
   cleanupStaleGamesUi,
@@ -41,6 +45,7 @@ describe('playground games header button', () => {
     setOptions({ ...DEFAULT_OPTIONS });
     mockPorts.length = 0;
     alertSoundMocks.playAlertSound.mockClear();
+    minimizeAnimationMocks.animateGameSurfaceToGamesButton.mockClear();
     chrome.runtime.connect = vi.fn(() => createMockPort() as unknown as chrome.runtime.Port);
     vi.useFakeTimers();
   });
@@ -560,6 +565,7 @@ describe('playground games header button', () => {
     getActionButton('Hide').click();
     expect(document.querySelector('.ytcq-chess-game-panel')).toBeNull();
     expect(getActionButtonLabels()).toEqual(['Resume', 'Leave']);
+    expect(minimizeAnimationMocks.animateGameSurfaceToGamesButton).toHaveBeenCalledOnce();
     getActionButton('Resume').click();
     expect(document.querySelector('.ytcq-chess-game-panel')).not.toBeNull();
     expect(document.querySelector('.ytcq-games-card')).toBeNull();
@@ -569,6 +575,7 @@ describe('playground games header button', () => {
     document.querySelector<HTMLButtonElement>('.ytcq-chess-game-close')!.click();
     expect(document.querySelector('.ytcq-chess-game-panel')).toBeNull();
     expect(getActionButtonLabels()).toEqual(['Resume', 'Leave']);
+    expect(minimizeAnimationMocks.animateGameSurfaceToGamesButton).toHaveBeenCalledTimes(2);
     getActionButton('Resume').click();
     expect(document.querySelector('.ytcq-chess-game-panel')).not.toBeNull();
     expect(document.querySelector('.ytcq-games-card')).toBeNull();
@@ -576,6 +583,7 @@ describe('playground games header button', () => {
     getActionButton('Leave').click();
     expect(getActionButton('Leave').disabled).toBe(true);
     expect(getActionButton('Leave').querySelector('.ytcq-games-loading-spinner')).not.toBeNull();
+    expect(minimizeAnimationMocks.animateGameSurfaceToGamesButton).toHaveBeenCalledTimes(2);
     expect(lastMockPort()?.messages.at(-1)).toEqual({
       action: 'leave',
       gameId: 'game-1',
@@ -1137,12 +1145,15 @@ describe('playground games header button', () => {
     staleCard.className = 'ytcq-games-card';
     const stalePanel = document.createElement('section');
     stalePanel.className = 'ytcq-game-panel ytcq-chess-game-panel';
-    document.body.append(staleCard, stalePanel);
+    const staleAnimationGhost = document.createElement('section');
+    staleAnimationGhost.className = 'ytcq-game-overlay ytcq-game-minimize-ghost';
+    document.body.append(staleCard, stalePanel, staleAnimationGhost);
 
     cleanupStaleGamesUi();
 
     expect(document.querySelector('.ytcq-games-card')).toBeNull();
     expect(document.querySelector('.ytcq-game-panel')).toBeNull();
+    expect(document.querySelector('.ytcq-game-minimize-ghost')).toBeNull();
   });
 
   it('keeps the active games card positioned and closes it from an outside click listener', async () => {

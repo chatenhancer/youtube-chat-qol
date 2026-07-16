@@ -12,6 +12,7 @@ import type { PlaygroundClientState } from './client';
 import { ENABLED_GAMES } from './enabled-games';
 import type { AnyEnabledGame, AnyGamePanelAdapter, GameDefinition, GamePanelMount, SendGameAction } from './adapter';
 import { createGamePanelShell, type GamePanelShell, type GamePanelShellPosition } from './panel-shell';
+import { animateGameSurfaceToGamesButton } from './minimize-animation';
 
 const ENABLED_GAME_LIST: readonly AnyEnabledGame[] = ENABLED_GAMES;
 let activeGamePanel: ActiveGamePanel | null = null;
@@ -27,6 +28,11 @@ interface ActiveGamePanel {
 
 interface GamePanelPreferences {
   compactMode?: boolean;
+}
+
+interface CloseActiveGamePanelOptions {
+  animateToGamesButton?: boolean;
+  notify?: boolean;
 }
 
 export interface OpenSupportedGamePanelOptions {
@@ -101,12 +107,17 @@ export function getActiveGamePanelId(): string {
   return getConnectedActiveGamePanel()?.mount.gameId || '';
 }
 
-export function closeActiveGamePanel(options?: { notify?: boolean }): void {
+export function closeActiveGamePanel({
+  animateToGamesButton = false,
+  notify
+}: CloseActiveGamePanelOptions = {}): void {
   const panel = activeGamePanel;
   if (!panel) return;
 
   activeGamePanel = null;
-  disposeGamePanel(panel, options);
+  const surface = panel.shell?.panel || panel.mount.surface;
+  if (animateToGamesButton && surface) animateGameSurfaceToGamesButton(surface);
+  disposeGamePanel(panel, { notify });
 }
 
 export function isActiveGamePanelOpen(): boolean {
@@ -138,7 +149,10 @@ export function openSupportedGamePanel(
   if (definition.surface === 'chat-overlay') {
     if (!adapter.mountOverlay) return;
     const mount = adapter.mountOverlay(game, {
-      closePanel: closeActiveGamePanel,
+      closePanel: (closeOptions) => closeActiveGamePanel({
+        ...closeOptions,
+        animateToGamesButton: true
+      }),
       currentUserId,
       onPanelChange: () => {
         closeDisconnectedActiveGamePanel();
@@ -162,7 +176,7 @@ export function openSupportedGamePanel(
     classNamePrefix: definition.classNamePrefix,
     closeLabel: t('gamesHide'),
     icon: createGamesIcon(),
-    onClose: () => closeActiveGamePanel(),
+    onClose: () => closeActiveGamePanel({ animateToGamesButton: true }),
     signal: shellController.signal,
     subtitle: getGameOpponentLabel(game, currentUserId),
     title

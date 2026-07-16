@@ -11,6 +11,7 @@ import type {
 } from '../adapter';
 import {
   closeStickAroundOverlay,
+  getStickAroundOverlayElement,
   getStickAroundOverlayStatusOverlay,
   isStickAroundOverlayConnected,
   openStickAroundOverlay,
@@ -50,7 +51,8 @@ function mountStickAroundOverlay(game: PublicStickAroundGame, context: GameOverl
     close: closeStickAroundOverlay,
     gameId: game.gameId,
     isConnected: isStickAroundOverlayConnected,
-    statusOverlay: getStickAroundOverlayStatusOverlay()
+    statusOverlay: getStickAroundOverlayStatusOverlay(),
+    surface: getStickAroundOverlayElement()
   };
 }
 

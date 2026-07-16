@@ -53,6 +53,7 @@ export interface GamePanelMount {
   isConnected?(): boolean;
   setCompactMode?(compact: boolean): void;
   statusOverlay?: GamePanelStatusOverlay;
+  surface?: HTMLElement;
 }
 
 export interface GamePanelUpdateContext {

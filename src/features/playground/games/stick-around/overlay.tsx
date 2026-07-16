@@ -352,6 +352,10 @@ export function isStickAroundOverlayConnected(): boolean {
   return Boolean(activeStickAroundOverlay?.root.isConnected);
 }
 
+export function getStickAroundOverlayElement(): HTMLElement | undefined {
+  return activeStickAroundOverlay?.root;
+}
+
 export function getStickAroundOverlayStatusOverlay():
   | GameOverlayShell['statusOverlay']
   | undefined {

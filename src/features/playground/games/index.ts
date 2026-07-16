@@ -155,7 +155,9 @@ export function cleanupStaleGamesUi(): void {
 }
 
 function removeOrphanedGameSurfaces(): void {
-  document.querySelectorAll<HTMLElement>('.ytcq-games-card, .ytcq-game-panel').forEach((surface) => surface.remove());
+  document.querySelectorAll<HTMLElement>(
+    '.ytcq-games-card, .ytcq-game-panel, .ytcq-game-minimize-ghost'
+  ).forEach((surface) => surface.remove());
 }
 
 function handlePlaygroundOptionsChanged(_previousOptions: Options, nextOptions: Options): void {
@@ -359,7 +361,7 @@ function cancelPlayerInvite(player: PresenceUser): void {
 function toggleActiveGamePanel(game: PublicGame): void {
   if (!gamesPanelState?.transport.userId) return;
   if (isActiveGamePanelOpen() && getActiveGamePanelId() === game.gameId) {
-    closeActiveGamePanel();
+    closeActiveGamePanel({ animateToGamesButton: true });
     return;
   }
 
