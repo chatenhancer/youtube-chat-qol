@@ -177,7 +177,15 @@ function wireComposerTranslationControl(): void {
 
 function createButton(): HTMLButtonElement {
   button = el<HTMLButtonElement>(
-    <button type="button" class={BUTTON_CLASS}>
+    <button
+      type="button"
+      class={BUTTON_CLASS}
+      onClick={(event: MouseEvent) => {
+        event.preventDefault();
+        event.stopPropagation();
+        togglePanel();
+      }}
+    >
       {createSplitTranslateIcon({
         iconClassName: ICON_CLASS,
         sourceClassName: 'ytcq-translate-source-mark',
@@ -185,11 +193,6 @@ function createButton(): HTMLButtonElement {
       })}
     </button>
   );
-  button.addEventListener('click', (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-    togglePanel();
-  });
   updateDraftTranslationAnimation();
   return button;
 }
@@ -203,6 +206,11 @@ function createPanel(): HTMLElement {
         ref={(element: HTMLSelectElement) => (panelSelect = element)}
         class={SELECT_CLASS}
         aria-label={t('translateDraftTo')}
+        onChange={(event: Event) => {
+          const targetLanguage = (event.currentTarget as HTMLSelectElement).value || '';
+          saveOptions({ composerTranslateLanguage: targetLanguage });
+          if (targetLanguage) scheduleDraftTranslation(true);
+        }}
       >
         {createLanguageOption('', t('selectOff'))}
         {LANGUAGE_OPTIONS.map(([value, labelText]) =>
@@ -212,11 +220,6 @@ function createPanel(): HTMLElement {
     </div>
   );
   select = panelSelect;
-  panelSelect.addEventListener('change', () => {
-    const targetLanguage = panelSelect.value || '';
-    saveOptions({ composerTranslateLanguage: targetLanguage });
-    if (targetLanguage) scheduleDraftTranslation(true);
-  });
   return panel;
 }
 

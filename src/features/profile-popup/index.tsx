@@ -175,11 +175,30 @@ function showProfileCard(source: ProfileSource, anchor: HTMLElement): void {
     avatarUrl: source.avatarSrc
   });
 
+  let card!: HTMLElement;
+  const handleTitleClick = (event: MouseEvent): void => {
+    event.preventDefault();
+    event.stopPropagation();
+    mentionAuthorName(source.authorName, {
+      focusSource: {
+        authorName: source.authorName,
+        avatarSrc: source.avatarSrc,
+        channelId: source.identity.channelId
+      }
+    });
+    closeProfileCard(card);
+  };
+  const handleCloseClick = (event: MouseEvent): void => {
+    event.preventDefault();
+    event.stopPropagation();
+    closeProfileCard(card);
+  };
   const title = el<HTMLButtonElement>(
     <button
       type="button"
       class="ytcq-profile-card-title ytcq-profile-card-author"
       title={t('mentionUser')}
+      onClick={handleTitleClick}
     >
       {source.authorName}
     </button>
@@ -190,13 +209,14 @@ function showProfileCard(source: ProfileSource, anchor: HTMLElement): void {
       type="button"
       class="ytcq-profile-card-header-button ytcq-profile-card-close"
       aria-label={t('close')}
+      onClick={handleCloseClick}
     >
       {createCloseIcon()}
     </button>
   );
   let header!: HTMLDivElement;
   let list!: HTMLDivElement;
-  const card = el<HTMLElement>(
+  card = el<HTMLElement>(
     <section class="ytcq-profile-card" role="dialog" aria-label={t('recentMessagesFromThisUser')}>
       <div
         ref={(element: HTMLDivElement) => (header = element)}
@@ -223,23 +243,6 @@ function showProfileCard(source: ProfileSource, anchor: HTMLElement): void {
   );
   card.addEventListener('pointerdown', () => bringProfileCardToFront(card), {
     signal: cardListeners.signal
-  });
-  title.addEventListener('click', (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-    mentionAuthorName(source.authorName, {
-      focusSource: {
-        authorName: source.authorName,
-        avatarSrc: source.avatarSrc,
-        channelId: source.identity.channelId
-      }
-    });
-    closeProfileCard(card);
-  });
-  closeButton.addEventListener('click', (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-    closeProfileCard(card);
   });
   const scrollFadeCleanup = wireScrollEdgeFades(list);
 
@@ -410,15 +413,15 @@ function createProfileChannelButton(profileUrl: string): HTMLButtonElement {
       class="ytcq-profile-card-header-button ytcq-profile-card-channel"
       title={t('openChannel')}
       aria-label={t('openChannel')}
+      onClick={(event: MouseEvent) => {
+        event.preventDefault();
+        event.stopPropagation();
+        openChannelWindow(profileUrl);
+      }}
     >
       {createChannelIcon()}
     </button>
   );
-  channelButton.addEventListener('click', (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-    openChannelWindow(profileUrl);
-  });
   return channelButton;
 }
 

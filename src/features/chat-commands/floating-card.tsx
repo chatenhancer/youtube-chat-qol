@@ -28,11 +28,9 @@ export function positionFloatingCardAboveInput(card: HTMLElement): void {
 }
 
 export function createFloatingCardCloseButton(onClick: () => void): HTMLButtonElement {
-  const closeButton = el<HTMLButtonElement>(
-    <button type="button" class="ytcq-command-help-close" aria-label={t('close')}>
+  return el<HTMLButtonElement>(
+    <button type="button" class="ytcq-command-help-close" aria-label={t('close')} onClick={onClick}>
       {createCloseIcon()}
     </button>
   );
-  closeButton.addEventListener('click', onClick);
-  return closeButton;
 }

@@ -224,15 +224,14 @@ function createJumpToMessageButton(
       class="ytcq-profile-card-jump"
       title={t('jumpToMessage')}
       aria-label={t('jumpToMessage')}
+      onClick={(event: MouseEvent) => {
+        event.preventDefault();
+        event.stopPropagation();
+        jumpToChatMessage(liveMessage, messageId);
+      }}
     >
       {createJumpToMessageIcon()}
     </button>
   );
-  button.addEventListener('click', (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-    jumpToChatMessage(liveMessage, messageId);
-  });
-
   return button;
 }

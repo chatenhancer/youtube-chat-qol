@@ -25,16 +25,16 @@ export function createProfileAvatarButton(
       class="ytcq-profile-card-avatar-button"
       title={t('openChannel')}
       aria-label={t('openChannel')}
+      onClick={(event: MouseEvent) => {
+        event.preventDefault();
+        event.stopPropagation();
+        openChannelWindow(profileUrl);
+      }}
     >
       {avatar}
       {createProfileOpenInNewIcon()}
     </button>
   );
-  button.addEventListener('click', (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-    openChannelWindow(profileUrl);
-  });
   return button;
 }
 

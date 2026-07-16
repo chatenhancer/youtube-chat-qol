@@ -99,6 +99,13 @@ function createBookmarkedUserRow(
       class="bookmark-action-button"
       title={actionLabel}
       aria-label={actionLabel}
+      onClick={() => {
+        if (active) {
+          unmarkBookmarkedUser(key);
+        } else {
+          markBookmarkedUser(key, record);
+        }
+      }}
     >
       {createSvgIcon(
         MATERIAL_ICON_VIEW_BOX,
@@ -106,13 +113,6 @@ function createBookmarkedUserRow(
       )}
     </button>
   );
-  unmarkButton.addEventListener('click', () => {
-    if (active) {
-      unmarkBookmarkedUser(key);
-    } else {
-      markBookmarkedUser(key, record);
-    }
-  });
 
   return el<HTMLElement>(
     <article class={`bookmark-row${active ? '' : ' bookmark-row-unmarked'}`}>
@@ -141,6 +141,7 @@ function createBookmarkedUserAvatar(record: MarkedUserRecord, channelUrl: string
           class="bookmark-avatar bookmark-avatar-button"
           title={getExtensionMessage('openChannel')}
           aria-label={getExtensionMessage('openChannel')}
+          onClick={() => chrome.tabs.create({ url: channelUrl })}
         >
           {content}
           {createBookmarkedUserAvatarOpenIcon()}
@@ -148,12 +149,6 @@ function createBookmarkedUserAvatar(record: MarkedUserRecord, channelUrl: string
       )
     : el<HTMLSpanElement>(<span class="bookmark-avatar">{content}</span>);
   element.style.setProperty('--bookmark-user-color', getMarkedUserColor(record));
-
-  if (channelUrl && element instanceof HTMLButtonElement) {
-    element.addEventListener('click', () => {
-      chrome.tabs.create({ url: channelUrl });
-    });
-  }
 
   return element;
 }
@@ -183,14 +178,12 @@ function createBookmarkedUserSource(record: MarkedUserRecord): HTMLElement {
         class="bookmark-source bookmark-source-button"
         title={tooltip}
         aria-label={tooltip}
+        onClick={() => chrome.tabs.create({ url: sourceUrl })}
       >
         <span class="bookmark-source-label">{sourceText}</span>
         {createOpenInNewIcon()}
       </button>
     );
-    element.addEventListener('click', () => {
-      chrome.tabs.create({ url: sourceUrl });
-    });
     return element;
   }
 

@@ -184,6 +184,11 @@ function createReplyActionButton({
   iconViewBox?: string;
   onClick: () => void;
 }): HTMLButtonElement {
+  const handleActivation = (event: Event): void => {
+    event.preventDefault();
+    event.stopPropagation();
+    onClick();
+  };
   const button = el<HTMLButtonElement>(
     <button
       type="button"
@@ -191,21 +196,15 @@ function createReplyActionButton({
       data-ytcq-action={action}
       aria-label={label}
       title={label}
+      onClick={handleActivation}
+      onKeyDown={(event: KeyboardEvent) => {
+        if (event.key !== 'Enter' && event.key !== ' ') return;
+        handleActivation(event);
+      }}
     >
       <span class="ytcq-menu-icon">{createSvgIcon(iconViewBox || '0 0 24 24', iconPath)}</span>
     </button>
   );
-  button.addEventListener('click', (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-    onClick();
-  });
-  button.addEventListener('keydown', (event) => {
-    if (event.key !== 'Enter' && event.key !== ' ') return;
-    event.preventDefault();
-    event.stopPropagation();
-    onClick();
-  });
   return button;
 }
 

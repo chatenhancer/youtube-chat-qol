@@ -124,8 +124,9 @@ function createTransportNotice(state: GamesPanelState, actions: GamesViewActions
     );
   }
 
-  const refresh = createSmallActionButton(t('gamesReconnect'));
-  refresh.addEventListener('click', actions.onReconnect);
+  const refresh = createSmallActionButton(t('gamesReconnect'), {
+    onClick: actions.onReconnect
+  });
 
   return el<HTMLElement>(
     <section class="ytcq-games-connection-notice" role="alert" aria-live="polite">
@@ -151,6 +152,15 @@ function createAvailabilitySection(state: GamesPanelState, actions: GamesViewAct
       role="switch"
       aria-label={`${t('gamesAvailableToPlay')}. ${t('gamesAvailableHelper')}`}
       aria-checked={String(state.available)}
+      onClick={(event: MouseEvent) => {
+        const nextAvailable = !state.available;
+        state.available = nextAvailable;
+        actions.onSetAvailability(nextAvailable);
+        (event.currentTarget as HTMLButtonElement).setAttribute(
+          'aria-checked',
+          String(nextAvailable)
+        );
+      }}
     >
       <span class="ytcq-games-section-copy">
         <span class="ytcq-games-row-title">{t('gamesAvailableToPlay')}</span>
@@ -159,12 +169,6 @@ function createAvailabilitySection(state: GamesPanelState, actions: GamesViewAct
       {createGamesAvailabilityToggle()}
     </button>
   );
-  item.addEventListener('click', () => {
-    const nextAvailable = !state.available;
-    state.available = nextAvailable;
-    actions.onSetAvailability(nextAvailable);
-    item.setAttribute('aria-checked', String(nextAvailable));
-  });
   section.append(item);
   return section;
 }
@@ -237,14 +241,15 @@ function createActiveGameRow(
   actions: GamesViewActions
 ): HTMLElement {
   const isPanelOpen = getActiveGamePanelId() === game.gameId;
-  const togglePanel = createSmallActionButton(t(isPanelOpen ? 'gamesHide' : 'gamesResume'));
-  togglePanel.addEventListener('click', () => actions.onToggleActiveGame(game));
+  const togglePanel = createSmallActionButton(t(isPanelOpen ? 'gamesHide' : 'gamesResume'), {
+    onClick: () => actions.onToggleActiveGame(game)
+  });
   const isLeaving = state.leavingGameId === game.gameId;
   const leave = createSmallActionButton(t('gamesLeave'), {
     busy: isLeaving,
-    disabled: isLeaving
+    disabled: isLeaving,
+    onClick: () => actions.onLeaveGame(game)
   });
-  leave.addEventListener('click', () => actions.onLeaveGame(game));
   return el<HTMLDivElement>(
     <div class="ytcq-games-active-row">
       <span class="ytcq-games-section-copy">
@@ -280,10 +285,12 @@ function createInvitesSection(state: GamesPanelState, actions: GamesViewActions)
 }
 
 function createInviteRow(invite: PublicInvite, actions: GamesViewActions): HTMLElement {
-  const accept = createSmallActionButton(t('gamesAccept'));
-  accept.addEventListener('click', () => actions.onAcceptInvite(invite));
-  const ignore = createSmallActionButton(t('gamesIgnore'));
-  ignore.addEventListener('click', () => actions.onIgnoreInvite(invite));
+  const accept = createSmallActionButton(t('gamesAccept'), {
+    onClick: () => actions.onAcceptInvite(invite)
+  });
+  const ignore = createSmallActionButton(t('gamesIgnore'), {
+    onClick: () => actions.onIgnoreInvite(invite)
+  });
   return el<HTMLDivElement>(
     <div class="ytcq-games-invite-row">
       <span class="ytcq-games-section-copy">
@@ -319,6 +326,7 @@ function createGamesGrid(
           .join(' ')}
         aria-disabled={String(game.disabled)}
         aria-label={getGameCardAriaLabel(game)}
+        onClick={game.disabled ? undefined : () => actions.onSelectGame(game.id)}
       >
         {createGamePreview(game.id, game.renderPreview)}
         {createGameCardCopy(game.label, game.tagline)}
@@ -326,9 +334,6 @@ function createGamesGrid(
     );
     if (game.disabled && game.disabledReason) {
       card.title = game.disabledReason;
-    }
-    if (!game.disabled) {
-      card.addEventListener('click', () => actions.onSelectGame(game.id));
     }
     grid.append(card);
   });
@@ -349,8 +354,9 @@ function renderPlayWithView(
   state: GamesPanelState,
   actions: GamesViewActions
 ): void {
-  const back = createSmallActionButton(t('gamesBack'));
-  back.addEventListener('click', actions.onBackToLobby);
+  const back = createSmallActionButton(t('gamesBack'), {
+    onClick: actions.onBackToLobby
+  });
   const nav = el<HTMLDivElement>(<div class="ytcq-games-detail-nav">{back}</div>);
 
   const section = createGamesSection(t('gamesPlayers'));
@@ -376,15 +382,15 @@ function createPlayerRow(
     ? isPlayerInvitePending(state, state.selectedGameId, player.userId)
     : false;
   const action = createSmallActionButton(isInviting ? t('gamesCancelInvite') : t('gamesInvite'), {
-    busy: isInviting
-  });
-  action.addEventListener('click', () => {
-    if (isInviting) {
-      actions.onCancelInvite(player);
-      return;
-    }
+    busy: isInviting,
+    onClick: () => {
+      if (isInviting) {
+        actions.onCancelInvite(player);
+        return;
+      }
 
-    actions.onInvitePlayer(player);
+      actions.onInvitePlayer(player);
+    }
   });
   return el<HTMLDivElement>(
     <div class="ytcq-games-player-row">
@@ -425,6 +431,7 @@ function createGamesEmpty(textContent: string): HTMLElement {
 interface SmallActionButtonOptions {
   busy?: boolean;
   disabled?: boolean;
+  onClick?: () => void;
 }
 
 function createSmallActionButton(
@@ -439,6 +446,7 @@ function createSmallActionButton(
         .join(' ')}
       aria-busy={options.busy ? 'true' : undefined}
       disabled={options.disabled}
+      onClick={options.onClick}
     >
       {options.busy
         ? createLoadingSpinner('ytcq-games-loading-spinner ytcq-games-action-spinner')
@@ -461,13 +469,12 @@ function createCycleButton(
   onClick: () => void,
   direction: 'next' | 'previous' = 'previous'
 ): HTMLButtonElement {
-  const button = createSmallActionButton('');
+  const button = createSmallActionButton('', { onClick });
   button.classList.add('ytcq-games-cycle-action');
   if (direction === 'next') button.classList.add('ytcq-games-cycle-action-next');
   button.setAttribute('aria-label', targetLabel);
   button.title = targetLabel;
   button.append(createChevronBackwardIcon());
-  button.addEventListener('click', onClick);
   return button;
 }
 

@@ -241,6 +241,11 @@ export function createReplacedTranslationIcon({
         title={title}
         data-ytcq-translation-view={view}
         aria-label={title}
+        onClick={(event: MouseEvent) => {
+          event.preventDefault();
+          event.stopPropagation();
+          onToggle?.(event);
+        }}
       />
     ) : (
       <span
@@ -251,13 +256,6 @@ export function createReplacedTranslationIcon({
       />
     )
   );
-  if (icon instanceof HTMLButtonElement) {
-    icon.addEventListener('click', (event) => {
-      event.preventDefault();
-      event.stopPropagation();
-      onToggle?.(event);
-    });
-  }
   icon.appendChild(createTranslationSvgIcon());
   return icon;
 }

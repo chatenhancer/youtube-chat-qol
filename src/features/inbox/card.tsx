@@ -75,11 +75,11 @@ export function openInboxCardView(
       type="button"
       class="ytcq-profile-card-open ytcq-inbox-clear"
       disabled={getInboxRecordsSnapshot().length === 0}
+      onClick={callbacks.onClearRecords}
     >
       {t('clear')}
     </button>
   );
-  clearButton.addEventListener('click', callbacks.onClearRecords);
 
   const card = el<HTMLElement>(
     <section class="ytcq-profile-card ytcq-inbox-card" role="dialog" aria-label={t('inbox')}>
@@ -218,17 +218,20 @@ function renderInboxList(list: HTMLElement): void {
     );
 
     const author = el<HTMLButtonElement>(
-      <button type="button" class="ytcq-inbox-author">
+      <button
+        type="button"
+        class="ytcq-inbox-author"
+        onClick={(event: MouseEvent) => {
+          event.preventDefault();
+          event.stopPropagation();
+          mentionAuthorName(record.authorName);
+          closeInboxCard();
+        }}
+      >
         {record.authorName}
       </button>
     );
     highlightInboxAuthorMatches(author, record);
-    author.addEventListener('click', (event) => {
-      event.preventDefault();
-      event.stopPropagation();
-      mentionAuthorName(record.authorName);
-      closeInboxCard();
-    });
 
     const spacer = document.createTextNode(' ');
     const text = el<HTMLSpanElement>(<span />);
@@ -258,19 +261,17 @@ function createInboxAvatar(record: InboxRecord): HTMLElement | null {
           class="ytcq-inbox-avatar"
           title={t('openChannel')}
           aria-label={t('openChannel')}
+          onClick={(event: MouseEvent) => {
+            event.preventDefault();
+            event.stopPropagation();
+            openChannelWindow(channelUrl);
+          }}
         >
           {avatar}
           {createInboxAvatarOpenIcon()}
         </button>
       )
     : el<HTMLSpanElement>(<span class="ytcq-inbox-avatar">{avatar}</span>);
-  if (channelUrl) {
-    surface.addEventListener('click', (event) => {
-      event.preventDefault();
-      event.stopPropagation();
-      openChannelWindow(channelUrl);
-    });
-  }
   applyMarkedUserRing(surface, {
     authorName: record.authorName,
     avatarUrl: record.avatarSrc,
@@ -291,11 +292,11 @@ function createCardCloseButton(): HTMLButtonElement {
       type="button"
       class="ytcq-profile-card-header-button ytcq-profile-card-close"
       aria-label={t('close')}
+      onClick={closeInboxCard}
     >
       {createCloseIcon()}
     </button>
   );
-  closeButton.addEventListener('click', closeInboxCard);
   return closeButton;
 }
 
@@ -330,15 +331,15 @@ function createInboxJumpButton(record: InboxRecord): HTMLButtonElement | null {
       class="ytcq-profile-card-jump"
       title={t('jumpToMessage')}
       aria-label={t('jumpToMessage')}
+      onClick={(event: MouseEvent) => {
+        event.preventDefault();
+        event.stopPropagation();
+        jumpToInboxMessage(record);
+      }}
     >
       {createJumpToMessageIcon()}
     </button>
   );
-  button.addEventListener('click', (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-    jumpToInboxMessage(record);
-  });
 
   return button;
 }

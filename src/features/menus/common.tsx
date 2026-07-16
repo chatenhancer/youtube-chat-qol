@@ -36,6 +36,11 @@ export function createMenuActionItem({
   title,
   onClick
 }: MenuActionItemOptions): HTMLElement {
+  const handleActivation = (event: Event): void => {
+    event.preventDefault();
+    event.stopPropagation();
+    onClick();
+  };
   const item = el<HTMLDivElement>(
     <div
       class={`style-scope ytd-menu-popup-renderer ${className}`}
@@ -44,13 +49,18 @@ export function createMenuActionItem({
       use-icons
       tabIndex={-1}
       aria-selected="false"
+      onClick={handleActivation}
+      onKeyDown={(event: KeyboardEvent) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          handleActivation(event);
+        }
+      }}
     />
   );
   if (action) item.setAttribute('data-ytcq-action', action);
   if (setting) item.setAttribute('data-ytcq-setting', setting);
   if (title) item.title = title;
   item.appendChild(createPaperItem({ label, iconPath, iconViewBox, title }));
-  wireMenuItemClick(item, onClick);
   return item;
 }
 
@@ -128,20 +138,6 @@ export function clampMenuToViewport(menu: HTMLElement): void {
       menu.style.setProperty('--ytcq-context-shift-y', `${-Math.ceil(overflowBottom)}px`);
     } else if (overflowTop > 0) {
       menu.style.setProperty('--ytcq-context-shift-y', `${Math.ceil(overflowTop)}px`);
-    }
-  });
-}
-
-function wireMenuItemClick(item: HTMLElement, onClick: () => void): void {
-  const handler = (event: Event) => {
-    event.preventDefault();
-    event.stopPropagation();
-    onClick();
-  };
-  item.addEventListener('click', handler);
-  item.addEventListener('keydown', (event) => {
-    if (event.key === 'Enter' || event.key === ' ') {
-      handler(event);
     }
   });
 }

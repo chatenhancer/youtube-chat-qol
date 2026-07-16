@@ -145,7 +145,18 @@ export async function toggleMessageAuthorMark(message: HTMLElement): Promise<boo
 
 export function createMarkedUserToggleButton(identity: MarkedUserIdentity): HTMLButtonElement {
   const button = el<HTMLButtonElement>(
-    <button type="button" class="ytcq-profile-card-header-button ytcq-marked-user-toggle">
+    <button
+      type="button"
+      class="ytcq-profile-card-header-button ytcq-marked-user-toggle"
+      onClick={(event: MouseEvent) => {
+        event.preventDefault();
+        event.stopPropagation();
+        const targetButton = event.currentTarget as HTMLButtonElement;
+        void toggleMarkedUser(identity).then(() =>
+          updateMarkedUserToggleButton(targetButton, identity)
+        );
+      }}
+    >
       {createMarkedUserIcon()}
     </button>
   );
@@ -153,11 +164,6 @@ export function createMarkedUserToggleButton(identity: MarkedUserIdentity): HTML
   button.dataset.ytcqMarkedUserToggleAvatarUrl = cleanText(identity.avatarUrl);
   button.dataset.ytcqMarkedUserToggleChannelId = cleanText(identity.channelId);
   updateMarkedUserToggleButton(button, identity);
-  button.addEventListener('click', (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-    void toggleMarkedUser(identity).then(() => updateMarkedUserToggleButton(button, identity));
-  });
   return button;
 }
 

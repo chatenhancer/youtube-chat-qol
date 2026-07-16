@@ -39,8 +39,26 @@ export function createKeywordToggleButton(): HTMLButtonElement {
 export function createKeywordPanel({ onKeywordsChanged }: KeywordPanelOptions): HTMLElement {
   let input!: HTMLInputElement;
   let chips!: HTMLDivElement;
+  const handleSubmit = (event: Event): void => {
+    event.preventDefault();
+    const keyword = normalizeKeyword(input.value);
+    if (
+      !keyword ||
+      getInboxKeywordsSnapshot().some((existing) => keywordsEqual(existing, keyword))
+    ) {
+      input.value = '';
+      return;
+    }
+
+    const result = addInboxKeywordsToState([keyword]);
+    input.value = '';
+    if (!result.added.length) return;
+
+    renderKeywordChips(chips, { onKeywordsChanged });
+    onKeywordsChanged();
+  };
   const form = el<HTMLFormElement>(
-    <form class="ytcq-inbox-keyword-form">
+    <form class="ytcq-inbox-keyword-form" onSubmit={handleSubmit}>
       <input
         ref={(element: HTMLInputElement) => (input = element)}
         class="ytcq-inbox-keyword-input"
@@ -61,25 +79,6 @@ export function createKeywordPanel({ onKeywordsChanged }: KeywordPanelOptions): 
     </div>
   );
   renderKeywordChips(chips, { onKeywordsChanged });
-
-  form.addEventListener('submit', (event) => {
-    event.preventDefault();
-    const keyword = normalizeKeyword(input.value);
-    if (
-      !keyword ||
-      getInboxKeywordsSnapshot().some((existing) => keywordsEqual(existing, keyword))
-    ) {
-      input.value = '';
-      return;
-    }
-
-    const result = addInboxKeywordsToState([keyword]);
-    input.value = '';
-    if (!result.added.length) return;
-
-    renderKeywordChips(chips, { onKeywordsChanged });
-    onKeywordsChanged();
-  });
   return panel;
 }
 
@@ -122,17 +121,17 @@ function renderKeywordChips(
         type="button"
         class="ytcq-inbox-keyword-remove"
         aria-label={t('removeKeyword', { keyword })}
+        onClick={() => {
+          const result = removeInboxKeywordsFromState([keyword]);
+          if (!result.removed.length) return;
+
+          renderKeywordChips(container, { onKeywordsChanged });
+          onKeywordsChanged();
+        }}
       >
         {createCloseIcon()}
       </button>
     );
-    removeButton.addEventListener('click', () => {
-      const result = removeInboxKeywordsFromState([keyword]);
-      if (!result.removed.length) return;
-
-      renderKeywordChips(container, { onKeywordsChanged });
-      onKeywordsChanged();
-    });
 
     container.append(
       el<HTMLSpanElement>(

@@ -115,7 +115,12 @@ export function createLiteChatRenderer(
     </div>
   );
   const newMessagesButton = el<HTMLButtonElement>(
-    <button type="button" class="ytcq-lite-new-messages" hidden />
+    <button
+      type="button"
+      class="ytcq-lite-new-messages"
+      hidden
+      onClick={() => scrollToLiveEdge()}
+    />
   );
   const root = el<HTMLElement>(
     <section
@@ -132,7 +137,6 @@ export function createLiteChatRenderer(
     </section>
   );
 
-  newMessagesButton.addEventListener('click', () => scrollToLiveEdge());
   scroller.addEventListener('scroll', handleScroll, {
     passive: true,
     signal: scrollListeners.signal

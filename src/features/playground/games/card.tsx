@@ -80,10 +80,10 @@ function createGamesCardCloseButton(onClose: () => void): HTMLButtonElement {
       type="button"
       class="ytcq-profile-card-header-button ytcq-profile-card-close"
       aria-label={t('close')}
+      onClick={onClose}
     >
       {createCloseIcon()}
     </button>
   );
-  closeButton.addEventListener('click', onClose);
   return closeButton;
 }

@@ -176,11 +176,10 @@ function renderCollapsedFocusPrompt(): void {
 
   const author = createFocusAuthor(activeSource, { openChannel: false });
   const openButton = el<HTMLButtonElement>(
-    <button type="button" class="ytcq-focus-open">
+    <button type="button" class="ytcq-focus-open" onClick={openCollapsedFocusPanel}>
       {t('open')}
     </button>
   );
-  openButton.addEventListener('click', openCollapsedFocusPanel);
 
   const card = el<HTMLElement>(
     <section
@@ -188,6 +187,13 @@ function renderCollapsedFocusPrompt(): void {
       role="button"
       tabIndex={0}
       aria-label={t('focusMode')}
+      onClick={openCollapsedFocusPanel}
+      onKeyDown={(event: KeyboardEvent) => {
+        if (event.target !== event.currentTarget) return;
+        if (event.key === 'Enter' || event.key === ' ') {
+          openCollapsedFocusPanel(event);
+        }
+      }}
     >
       <div class="ytcq-focus-summary">
         <span class="ytcq-focus-label">{t('focusOn')}</span>
@@ -197,13 +203,6 @@ function renderCollapsedFocusPrompt(): void {
       {createFocusCloseButton(closeFocusMode)}
     </section>
   );
-  card.addEventListener('click', openCollapsedFocusPanel);
-  card.addEventListener('keydown', (event) => {
-    if (event.target !== card) return;
-    if (event.key === 'Enter' || event.key === ' ') {
-      openCollapsedFocusPanel(event);
-    }
-  });
   mountFocusCard(card);
   activeList = null;
 }
@@ -369,15 +368,15 @@ function createFocusAuthor(source: FocusSource, options: { openChannel: boolean 
         class="ytcq-focus-author ytcq-focus-author-button"
         title={t('openChannel')}
         aria-label={t('openChannel')}
+        onClick={(event: MouseEvent) => {
+          event.preventDefault();
+          event.stopPropagation();
+          openChannelWindow(channelUrl);
+        }}
       >
         {content}
       </button>
     );
-    author.addEventListener('click', (event) => {
-      event.preventDefault();
-      event.stopPropagation();
-      openChannelWindow(channelUrl);
-    });
     return author;
   }
 
@@ -414,15 +413,19 @@ function createFocusAvatar(source: FocusSource): HTMLElement {
 
 function createFocusCloseButton(onClick: () => void): HTMLButtonElement {
   const button = el<HTMLButtonElement>(
-    <button type="button" class="ytcq-focus-close" aria-label={t('close')}>
+    <button
+      type="button"
+      class="ytcq-focus-close"
+      aria-label={t('close')}
+      onClick={(event: MouseEvent) => {
+        event.preventDefault();
+        event.stopPropagation();
+        onClick();
+      }}
+    >
       {createCloseIcon()}
     </button>
   );
-  button.addEventListener('click', (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-    onClick();
-  });
   return button;
 }
 
