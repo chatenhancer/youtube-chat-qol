@@ -53,7 +53,7 @@ let outputPath = path.resolve(process.env.YTCQ_DEMO_OUTPUT || path.join(videoOut
 const shouldHashFinalOutput = !previewMode && !process.env.YTCQ_DEMO_OUTPUT;
 const headless = shouldRunHeadlessDemo();
 const demoFps = readPositiveInteger(process.env.YTCQ_DEMO_FPS, getDefaultDemoFps());
-const estimatedDemoSeconds = readPositiveNumber(process.env.YTCQ_DEMO_ESTIMATED_SECONDS, 150);
+const estimatedDemoSeconds = readPositiveNumber(process.env.YTCQ_DEMO_ESTIMATED_SECONDS, 200);
 const estimatedDemoFrames = Math.max(demoFps, Math.round(estimatedDemoSeconds * demoFps));
 const progressUpdateMs = readPositiveInteger(process.env.YTCQ_DEMO_PROGRESS_MS, process.stdout.isTTY ? 1_000 : 5_000);
 const deviceScaleFactor = readPositiveNumber(process.env.YTCQ_DEMO_SCALE, getDefaultDemoScale());
@@ -73,6 +73,8 @@ const menuPopupSelector = 'ytd-menu-popup-renderer';
 const quickEmojiPopoverSelector = '.ytcq-quick-emoji-popover:not(.ytcq-quick-emoji-popover-closing)';
 const markedUsersStorageKey = 'ytcqMarkedUsers';
 const emojiUsageStorageKey = 'ytcqEmojiUsage';
+const playgroundDisplayNameStorageKey = 'ytcqPlaygroundDisplayName:v1';
+const playgroundIdentityStorageKey = 'ytcqPlaygroundIdentity:v1';
 const demoLuciaAvatarUrl = 'https://ytcq-demo.invalid/avatar/lucia-live.svg';
 const activeChromeProfileFileNames = new Set([
   'SingletonCookie',
@@ -232,7 +234,7 @@ async function recordWalkthrough(page, chat, context, recorder) {
     'Small tools appear where chat already happens, without replacing YouTube chat.'
   );
   await playDemoStartupEffect(page, recorder, 1_350);
-  await recorder.holdStill(1_800);
+  await recorder.holdStill(3_900);
   await fadeOutDemoCaption(page, recorder, 360);
   await recorder.holdStill(360);
 
@@ -248,6 +250,8 @@ async function recordWalkthrough(page, chat, context, recorder) {
   await sectionFocusMode(page, chat, recorder);
   recorder.setStage('Inbox');
   await sectionInbox(page, chat, recorder);
+  recorder.setStage('Playground');
+  await sectionPlayground(page, chat, context, recorder);
   recorder.setStage('Marked users');
   await sectionMarkedUsers(page, chat, context, recorder);
   recorder.setStage('Emoji and commands');
@@ -263,10 +267,10 @@ async function recordWalkthrough(page, chat, context, recorder) {
   await setDemoCaption(
     page,
     'Chat Enhancer Demo',
-    'Translation, replies, context, Inbox, bookmarks, emojis, commands, and popup settings working together.'
+    'Translation, replies, context, Inbox, bookmarks, emojis, commands, Playground, and popup settings working together.'
   );
   await recorder.hold(360);
-  await recorder.holdStill(4_140);
+  await recorder.holdStill(4_640);
   await fadeOutDemoCaption(page, recorder, 420);
   await recorder.holdStill(480);
 }
@@ -604,6 +608,80 @@ async function ensureDemoInboxAvatar(chat) {
   });
 }
 
+async function sectionPlayground(page, chat, context, recorder) {
+  await closeInboxPanelIfPresent(chat);
+
+  const popup = await openExtensionPopupPage(context);
+  await setDemoViewport(popup, viewport);
+  await installPopupPresentationLayer(popup);
+  await installDemoPlaygroundBackend(context);
+  await recorder.usePage(popup);
+  try {
+    await fadeDemoPopupIn(popup, recorder);
+    await clickWithCursor(popup, popup.locator('#playgroundTab'), recorder, 'Playground tab');
+    const playgroundToggle = popup.locator('#playgroundEnabled');
+    await playgroundToggle.waitFor({ state: 'visible', timeout: 10_000 });
+    await clickWithCursor(popup, playgroundToggle, recorder, 'Join Playground toggle', {
+      caption: {
+        title: 'Games are opt-in',
+        body: 'Turn it on if you want to play games with other users.',
+        options: {
+          placement: 'right'
+        }
+      }
+    });
+    await popup.locator('#playgroundGamesSection').waitFor({ state: 'visible', timeout: 5_000 });
+    await recorder.settleThenHoldStill(2_200);
+    await fadeDemoPopupOut(popup, recorder);
+  } finally {
+    await popup.close().catch(() => undefined);
+  }
+
+  await setDemoViewport(page, viewport);
+  await recorder.usePage(page);
+  const gamesButton = chat.locator('.ytcq-games-button').first();
+  await gamesButton.waitFor({ state: 'visible', timeout: 15_000 });
+  await focusChatHeader(page, chat, recorder, { showFocus: false });
+  await clickWithCursor(page, gamesButton, recorder, 'Games button', {
+    afterClickHoldMs: 800,
+    caption: {
+      title: 'Games stay inside live chat',
+      body: 'After you opt in, the Playground button appears beside Inbox.'
+    }
+  });
+
+  const gamesCard = chat.locator('.ytcq-games-card').first();
+  await gamesCard.waitFor({ state: 'visible', timeout: 10_000 });
+  try {
+    await gamesCard.locator('.ytcq-games-grid').waitFor({
+      state: 'visible',
+      timeout: 30_000
+    });
+  } catch (error) {
+    const panelText = await cleanLocatorText(gamesCard).catch(() => 'unavailable');
+    const backendState = await readDemoPlaygroundBackendState(context).catch(() => null);
+    throw new Error(
+      `Playground game picker did not load. Panel: ${panelText}. ` +
+      `Mock backend: ${JSON.stringify(backendState)}.`,
+      { cause: error }
+    );
+  }
+  await fadeOutDemoCaption(page, recorder, 320);
+  await recorder.holdStill(600);
+  await showDemoCaptionFor(
+    page,
+    recorder,
+    'Browse before you play',
+    'See the available games first. Nothing starts until you choose one and select someone to play with.',
+    {
+      anchorLocator: gamesCard,
+      durationMs: 6_000
+    }
+  );
+  await recorder.holdStill(1_200);
+  await closeGamesPanelIfPresent(chat);
+}
+
 async function sectionMarkedUsers(page, chat, context, recorder) {
   await closeInboxPanelIfPresent(chat);
   await stabilizeDemoChatFeed(chat);
@@ -622,7 +700,7 @@ async function sectionMarkedUsers(page, chat, context, recorder) {
     markActionBox,
     { gap: 48, placement: 'side' }
   );
-  await recorder.settleThenHoldStill(900);
+  await recorder.settleThenHoldStill(2_700);
   await clickWithCursor(page, markAction, recorder, 'Mark action');
   await source.message.locator('#author-photo').first().waitFor({ state: 'visible', timeout: 10_000 });
   await recorder.settleThenHoldStill(1_000);
@@ -673,7 +751,7 @@ async function sectionEmojiAndCommands(page, chat, recorder) {
     composerBox,
     { placement: 'side' }
   );
-  await recorder.settleThenHoldStill(700);
+  await recorder.settleThenHoldStill(2_600);
   const whenTarget = getFutureDemoWhenTarget();
   await typeIntoComposerHuman(chat, recorder, `the event is in /when ${whenTarget}`);
   await fadeOutDemoCaption(page, recorder, 320);
@@ -710,7 +788,7 @@ async function sectionPopupStatus(page, context, recorder) {
       'Advanced settings live in the extension popup',
       'Check connection status, manage less-frequent options, review bookmarks, and use the reset button here.'
     );
-    await recorder.settleThenHoldStill(3_800);
+    await recorder.settleThenHoldStill(5_800);
     await clickWithCursor(popup, popup.locator('#bookmarksTab'), recorder, 'Bookmarks tab');
     await recorder.settleThenHoldStill(2_200);
     await clickWithCursor(popup, popup.locator('#settingsTab'), recorder, 'Settings tab');
@@ -739,7 +817,7 @@ async function sectionPopupBookmarks(page, context, recorder) {
       'Marked users are managed away from the crowded chat menu.'
     );
     await highlightLocator(popup, popup.locator('.bookmark-row').first(), 10);
-    await recorder.settleThenHoldStill(4_000);
+    await recorder.settleThenHoldStill(4_300);
     await clearDemoFocus(popup);
     await fadeDemoPopupOut(popup, recorder);
   } finally {
@@ -767,11 +845,20 @@ async function seedWalkthroughExtensionState(context, activeSourceUrl) {
       timeout: 15_000,
       waitUntil: 'domcontentloaded'
     });
-    await extensionPage.evaluate(([recordsKey, inboxRecord, emojiKey, markedKey]) => {
+    await extensionPage.evaluate(([
+      recordsKey,
+      inboxRecord,
+      emojiKey,
+      markedKey,
+      playgroundDisplayNameKey,
+      playgroundIdentityKey
+    ]) => {
       return Promise.all([
         new Promise((resolve) => chrome.storage.sync.set({
           composerTranslateLanguage: '',
           lastTranslationTarget: 'en',
+          playgroundEnabled: false,
+          playgroundGamesAvailable: false,
           sound: false,
           startupEffect: false,
           targetLanguage: '',
@@ -782,7 +869,11 @@ async function seedWalkthroughExtensionState(context, activeSourceUrl) {
           ytcqInboxKeywords: ['encore'],
           [emojiKey]: createDemoEmojiUsage(),
           [markedKey]: {}
-        }, resolve))
+        }, resolve)),
+        new Promise((resolve) => chrome.storage.local.remove([
+          playgroundDisplayNameKey,
+          playgroundIdentityKey
+        ], resolve))
       ]);
 
       function createDemoEmojiUsage() {
@@ -799,7 +890,14 @@ async function seedWalkthroughExtensionState(context, activeSourceUrl) {
           text: emoji
         }));
       }
-    }, [recordsKey, inboxRecord, emojiUsageStorageKey, markedUsersStorageKey]);
+    }, [
+      recordsKey,
+      inboxRecord,
+      emojiUsageStorageKey,
+      markedUsersStorageKey,
+      playgroundDisplayNameStorageKey,
+      playgroundIdentityStorageKey
+    ]);
   } finally {
     await extensionPage.close().catch(() => undefined);
   }
@@ -813,6 +911,137 @@ async function installDemoAssetRoutes(context) {
       status: 200
     });
   });
+}
+
+async function installDemoPlaygroundBackend(context) {
+  // Keep the capture out of the production lobby while exercising the real
+  // content-side client and Games UI with a deterministic empty snapshot.
+  const extensionId = await getInstalledProfileExtensionId(profileDir);
+  if (!extensionId) throw new Error('Could not find Chat Enhancer extension id.');
+  const serviceWorkerUrl = `chrome-extension://${extensionId}/background.js`;
+  const serviceWorker = context.serviceWorkers().find((worker) => worker.url() === serviceWorkerUrl) ||
+    await context.waitForEvent('serviceworker', {
+      predicate: (worker) => worker.url() === serviceWorkerUrl,
+      timeout: 10_000
+    });
+
+  await serviceWorker.evaluate(() => {
+    if (globalThis.__ytcqDemoPlaygroundBackendInstalled) return;
+    const backendState = {
+      clientMessages: [],
+      connections: 0,
+      portMessages: [],
+      ports: []
+    };
+    const demoUserId = 'walkthrough-demo-user';
+    const createDemoSnapshot = () => ({
+      games: [],
+      invites: [],
+      users: [{
+        availableGames: [],
+        displayName: 'Player WALK',
+        joinedAt: Date.now(),
+        userId: demoUserId
+      }]
+    });
+    chrome.runtime.onConnect.addListener((port) => {
+      backendState.ports.push(port.name);
+      port.onMessage.addListener((message) => {
+        backendState.portMessages.push(message?.type || 'unknown');
+        if (port.name !== 'ytcq:playground' || message?.type !== 'ytcq:playground:init') return;
+        setTimeout(() => {
+          try {
+            port.postMessage({
+              snapshot: createDemoSnapshot(),
+              type: 'ytcq:playground:snapshot',
+              userId: demoUserId
+            });
+          } catch {
+            // The capture may close the popup or tab before the queued response runs.
+          }
+        }, 0);
+      });
+    });
+
+    class DemoPlaygroundWebSocket extends EventTarget {
+      static CLOSED = 3;
+      static CLOSING = 2;
+      static CONNECTING = 0;
+      static OPEN = 1;
+
+      readyState = DemoPlaygroundWebSocket.OPEN;
+
+      constructor(url) {
+        super();
+        this.url = String(url);
+        backendState.connections += 1;
+        setTimeout(() => {
+          this.dispatchServerMessage({
+            challenge: 'walkthrough-demo-challenge',
+            issuedAt: Date.now(),
+            protocolVersion: 1,
+            type: 'challenge'
+          });
+        }, 0);
+      }
+
+      close() {
+        if (this.readyState === DemoPlaygroundWebSocket.CLOSED) return;
+        this.readyState = DemoPlaygroundWebSocket.CLOSED;
+        this.dispatchEvent(new Event('close'));
+      }
+
+      send(data) {
+        let message;
+        try {
+          message = JSON.parse(String(data));
+        } catch {
+          return;
+        }
+        backendState.clientMessages.push(message?.type || 'unknown');
+
+        if (message?.type === 'hello') {
+          setTimeout(() => {
+            this.dispatchServerMessage({
+              snapshot: createDemoSnapshot(),
+              type: 'helloAccepted',
+              userId: demoUserId
+            });
+          }, 0);
+          return;
+        }
+
+        if (message?.type === 'ping') {
+          setTimeout(() => {
+            this.dispatchServerMessage({
+              id: message.id,
+              type: 'pong'
+            });
+          }, 0);
+        }
+      }
+
+      dispatchServerMessage(message) {
+        if (this.readyState !== DemoPlaygroundWebSocket.OPEN) return;
+        this.dispatchEvent(new MessageEvent('message', {
+          data: JSON.stringify(message)
+        }));
+      }
+    }
+
+    globalThis.__ytcqDemoPlaygroundBackend = backendState;
+    globalThis.__ytcqDemoPlaygroundBackendInstalled = true;
+    globalThis.WebSocket = DemoPlaygroundWebSocket;
+  });
+}
+
+async function readDemoPlaygroundBackendState(context) {
+  const extensionId = await getInstalledProfileExtensionId(profileDir);
+  if (!extensionId) return null;
+  const serviceWorkerUrl = `chrome-extension://${extensionId}/background.js`;
+  const serviceWorker = context.serviceWorkers().find((worker) => worker.url() === serviceWorkerUrl);
+  if (!serviceWorker) return null;
+  return serviceWorker.evaluate(() => globalThis.__ytcqDemoPlaygroundBackend || null);
 }
 
 async function openExtensionPopupPage(context) {
@@ -1751,6 +1980,13 @@ async function closeProfileCardIfPresent(chat) {
 
 async function closeInboxPanelIfPresent(chat) {
   const close = chat.locator('.ytcq-inbox-card .ytcq-profile-card-close').first();
+  if (await close.isVisible({ timeout: 500 }).catch(() => false)) {
+    await close.click().catch(() => undefined);
+  }
+}
+
+async function closeGamesPanelIfPresent(chat) {
+  const close = chat.locator('.ytcq-games-card .ytcq-profile-card-close').first();
   if (await close.isVisible({ timeout: 500 }).catch(() => false)) {
     await close.click().catch(() => undefined);
   }
@@ -4187,8 +4423,13 @@ async function clickWithCursor(page, locator, recorder, label, options = {}) {
       options.caption.anchorBox || box,
       options.caption.options || {}
     );
-    await recorder.hold(260);
-    await recorder.holdStill(640);
+    const captionLeadMs = options.caption.durationMs ?? getClickCaptionLeadDuration(
+      options.caption.title,
+      options.caption.body
+    );
+    const captionAnimationMs = Math.min(360, captionLeadMs);
+    await recorder.hold(captionAnimationMs);
+    await recorder.holdStill(captionLeadMs - captionAnimationMs);
   }
   await moveCursor(page, clickPoint.x, clickPoint.y, options.durationMs, recorder, {
     label,
@@ -4223,6 +4464,7 @@ async function highlightLocator(page, locator, padding = 8) {
 }
 
 async function showDemoCaptionFor(page, recorder, title, body, options = {}) {
+  await fadeOutDemoCaption(page, recorder, 280);
   const box = options.anchorBox ||
     (options.anchorLocator ? await getLocatorBox(options.anchorLocator, title) : null);
   await setDemoCaption(page, title, body, box, options.captionOptions || {});
@@ -4259,7 +4501,8 @@ async function setDemoCaption(page, title, body, anchorBox = null, options = {})
       const captionWidth = Math.min(captionBox.width || maxCaptionWidth, maxCaptionWidth);
       const captionHeight = captionBox.height || 104;
       const targetIsLow = targetBox.y + targetBox.height > window.innerHeight * 0.72;
-      const shouldPlaceAbove = placement === 'above' || (placement !== 'side' && targetIsLow);
+      const horizontalPlacement = ['left', 'right', 'side'].includes(placement);
+      const shouldPlaceAbove = placement === 'above' || (!horizontalPlacement && targetIsLow);
       const fitsLeft = targetBox.x - captionWidth - gap >= viewportPadding;
       const fitsRight = targetBox.x + targetBox.width + captionWidth + gap <= window.innerWidth - viewportPadding;
       let left;
@@ -4273,6 +4516,10 @@ async function setDemoCaption(page, title, body, anchorBox = null, options = {})
           )
         );
         top = targetBox.y - captionHeight - verticalGap;
+      } else if (placement === 'right' && fitsRight) {
+        left = targetBox.x + targetBox.width + gap;
+      } else if (placement === 'left' && fitsLeft) {
+        left = targetBox.x - captionWidth - gap;
       } else if (fitsLeft) {
         left = targetBox.x - captionWidth - gap;
       } else if (fitsRight) {
@@ -4527,7 +4774,11 @@ function getCameraTransformForBox(box, scale, options = {}) {
 
 function getReadableCaptionDuration(title, body) {
   const words = `${title} ${body}`.trim().split(/\s+/).filter(Boolean).length;
-  return Math.min(4_600, Math.max(2_800, words * 235));
+  return Math.min(5_800, Math.max(3_600, 600 + words * 260));
+}
+
+function getClickCaptionLeadDuration(title, body) {
+  return Math.max(2_400, getReadableCaptionDuration(title, body) - 1_800);
 }
 
 function easeInOutCubic(value) {
