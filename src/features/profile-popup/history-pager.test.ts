@@ -48,6 +48,18 @@ describe('profile message pager', () => {
     expect(pager.hasLater()).toBe(false);
   });
 
+  it('grows a short latest window as new messages arrive', () => {
+    const pager = createProfileMessagePager();
+    pager.updateMessages(records(1), { followLatest: true });
+    expect(ids(pager.getVisibleMessages())).toEqual([0]);
+
+    pager.updateMessages(records(2), { followLatest: true });
+    expect(ids(pager.getVisibleMessages())).toEqual(range(0, 2));
+
+    pager.updateMessages(records(13), { followLatest: true });
+    expect(ids(pager.getVisibleMessages())).toEqual(range(1, 13));
+  });
+
   it('reanchors when a requested origin arrives after initialization', () => {
     const pager = createProfileMessagePager('message-15');
     pager.updateMessages(records(10));

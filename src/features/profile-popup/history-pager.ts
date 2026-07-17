@@ -55,7 +55,11 @@ export function createProfileMessagePager(
 
     if (followLatest) {
       endIndex = messages.length;
-      startIndex = Math.max(0, endIndex - Math.min(previousCount, messages.length));
+      const nextCount = Math.min(
+        messages.length,
+        Math.max(previousCount, normalizedPageSize)
+      );
+      startIndex = Math.max(0, endIndex - nextCount);
       return;
     }
 
