@@ -594,6 +594,59 @@ describe('profile popup coordinator', () => {
     expect(positioningMocks.keepProfileCardInViewport).toHaveBeenCalledTimes(2);
   });
 
+  it('shrinks a medium recent-messages handle to one line and restores its size when space returns', () => {
+    profileTestState.messageSource = source({ authorName: '@AHandleThatNeedsMoreHeaderSpace' });
+    const message = createMessage();
+    document.body.append(message);
+    wireProfileClick(message);
+    message.querySelector<HTMLElement>('#author-photo')!.click();
+
+    const author = document.querySelector<HTMLButtonElement>('.ytcq-profile-card-author')!;
+    let availableWidth = 140;
+    Object.defineProperties(author, {
+      clientWidth: {
+        configurable: true,
+        get: () => availableWidth
+      },
+      scrollWidth: {
+        configurable: true,
+        get: () => 160
+      }
+    });
+
+    resizeObserverCallbacks.at(-1)?.([], {} as ResizeObserver);
+    expect(author.style.fontSize).toBe('12.2px');
+    expect(author.classList.contains('ytcq-profile-card-author-wrap')).toBe(false);
+
+    availableWidth = 220;
+    resizeObserverCallbacks.at(-1)?.([], {} as ResizeObserver);
+    expect(author.style.fontSize).toBe('');
+  });
+
+  it('wraps an extra-long recent-messages handle instead of shrinking below 12px', () => {
+    profileTestState.messageSource = source({ authorName: '@AnExceptionallyLongHandleThatCannotFit' });
+    const message = createMessage();
+    document.body.append(message);
+    wireProfileClick(message);
+    message.querySelector<HTMLElement>('#author-photo')!.click();
+
+    const author = document.querySelector<HTMLButtonElement>('.ytcq-profile-card-author')!;
+    Object.defineProperties(author, {
+      clientWidth: {
+        configurable: true,
+        get: () => 140
+      },
+      scrollWidth: {
+        configurable: true,
+        get: () => 210
+      }
+    });
+
+    resizeObserverCallbacks.at(-1)?.([], {} as ResizeObserver);
+    expect(author.style.fontSize).toBe('12px');
+    expect(author.classList.contains('ytcq-profile-card-author-wrap')).toBe(true);
+  });
+
   it('ignores history updates after the active card closes', () => {
     const message = createMessage();
     document.body.append(message);

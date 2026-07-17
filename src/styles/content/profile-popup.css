@@ -148,14 +148,24 @@
 }
 
 .ytcq-profile-card-author {
-  display: inline-block;
+  display: block;
+  width: 100%;
   max-width: 100%;
   padding: 0;
   border: 0;
+  overflow: hidden;
   background: transparent;
   cursor: pointer;
   text-align: left;
+  text-overflow: ellipsis;
   vertical-align: top;
+  white-space: nowrap;
+}
+
+.ytcq-profile-card-author.ytcq-profile-card-author-wrap {
+  overflow-wrap: anywhere;
+  text-overflow: clip;
+  white-space: normal;
 }
 
 .ytcq-profile-card-author:hover,

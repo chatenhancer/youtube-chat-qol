@@ -42,6 +42,8 @@ const profileCardKeys = new WeakMap<HTMLElement, string>();
 const profileCardOriginMessageIds = new WeakMap<HTMLElement, string>();
 const stickyProfileCards = new WeakSet<HTMLElement>();
 const PROFILE_HISTORY_EDGE_TOLERANCE_PX = 12;
+const PROFILE_AUTHOR_MAX_FONT_SIZE_PX = 14;
+const PROFILE_AUTHOR_MIN_FONT_SIZE_PX = 12;
 let nextProfileCardZIndex = 10_000;
 let profileWiringListeners = new AbortController();
 
@@ -264,6 +266,7 @@ function showProfileCard(source: ProfileSource, anchor: HTMLElement): void {
   });
   renderVisibleMessages();
   document.body.append(card);
+  fitProfileCardAuthorText(title);
   profileCards.add(card);
   if (profileKey) {
     profileCardsByKey.set(profileKey, card);
@@ -320,7 +323,10 @@ function showProfileCard(source: ProfileSource, anchor: HTMLElement): void {
       }
     });
   };
-  const resizeObserver = new ResizeObserver(() => schedulePosition('viewport'));
+  const resizeObserver = new ResizeObserver(() => {
+    fitProfileCardAuthorText(title);
+    schedulePosition('viewport');
+  });
   resizeObserver.observe(card);
   schedulePosition('viewport');
   const originRecordId = messagePager.getOriginRecordId();
@@ -404,6 +410,22 @@ function showProfileCard(source: ProfileSource, anchor: HTMLElement): void {
     document.addEventListener('keydown', handleKeydown, options);
     window.addEventListener('resize', handleResize, options);
   }, 0);
+}
+
+function fitProfileCardAuthorText(author: HTMLButtonElement): void {
+  author.style.removeProperty('font-size');
+  author.classList.remove('ytcq-profile-card-author-wrap');
+  if (author.clientWidth <= 0 || author.scrollWidth <= author.clientWidth) return;
+
+  const idealFontSize = PROFILE_AUTHOR_MAX_FONT_SIZE_PX * (author.clientWidth / author.scrollWidth);
+  const fittedFontSize = Math.max(
+    PROFILE_AUTHOR_MIN_FONT_SIZE_PX,
+    Math.floor(idealFontSize * 10) / 10
+  );
+  author.style.fontSize = `${fittedFontSize}px`;
+  if (idealFontSize < PROFILE_AUTHOR_MIN_FONT_SIZE_PX) {
+    author.classList.add('ytcq-profile-card-author-wrap');
+  }
 }
 
 function createProfileChannelButton(profileUrl: string): HTMLButtonElement {

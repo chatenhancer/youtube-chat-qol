@@ -8,10 +8,15 @@
   --ytcq-aero-accent-strong: #005a93;
   --ytcq-aero-border: #73b9db;
   --ytcq-aero-surface: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(238, 253, 255, 0.94) 36%, rgba(203, 236, 249, 0.94) 100%);
-  --ytcq-aero-context-surface: var(--ytcq-aero-surface);
+  --ytcq-aero-context-surface: linear-gradient(145deg, rgba(255, 255, 255, 0.54) 0%, rgba(213, 245, 255, 0.42) 46%, rgba(45, 157, 203, 0.46) 100%);
+  --ytcq-aero-glass-legibility-field: radial-gradient(ellipse at center, rgba(246, 253, 255, 0.72) 0%, rgba(236, 250, 255, 0.64) 55%, rgba(203, 239, 252, 0.46) 80%, rgba(177, 226, 245, 0.2) 100%);
+  --ytcq-aero-glass-legibility-layer: linear-gradient(180deg, rgba(255, 255, 255, 0.78) 0%, rgba(239, 252, 255, 0.62) 64px, rgba(214, 245, 255, 0.28) 112px, transparent 150px);
+  --ytcq-aero-glass-specular: linear-gradient(180deg, rgba(255, 255, 255, 0.58) 0, rgba(255, 255, 255, 0.18) 2px, transparent 8px), linear-gradient(90deg, rgba(255, 255, 255, 0.3) 0, transparent 6px), linear-gradient(135deg, rgba(255, 255, 255, 0.44) 0%, rgba(255, 255, 255, 0.12) 14%, transparent 34%, transparent 74%, rgba(98, 208, 239, 0.16) 100%);
+  --ytcq-aero-glass-caustic: radial-gradient(ellipse at 88% 112%, rgba(80, 196, 233, 0.2) 0%, rgba(80, 196, 233, 0.05) 31%, transparent 58%);
+  --ytcq-aero-glass-filter: saturate(174%) contrast(1.1) brightness(1.04);
   --ytcq-aero-surface-deep: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(225, 248, 255, 0.96) 50%, rgba(181, 226, 245, 0.94) 100%);
-  --ytcq-aero-list-row-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(226, 247, 254, 0.52));
-  --ytcq-aero-list-row-hover-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(207, 240, 252, 0.72));
+  --ytcq-aero-list-row-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(226, 247, 254, 0.88));
+  --ytcq-aero-list-row-hover-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(207, 240, 252, 0.94));
   --ytcq-aero-list-row-border: rgba(100, 183, 219, 0.5);
   --ytcq-aero-hover: linear-gradient(180deg, #fff 0%, #dff6ff 45%, #bdefff 100%);
   --ytcq-aero-control-border: #8e8f8f;
@@ -30,7 +35,6 @@
   --ytcq-aero-input-bg: #fff;
   --ytcq-aero-input-radius: 6px;
   --ytcq-aero-picker-border: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, #73b9db 42%, #3f95bb 100%);
-  --ytcq-aero-picker-glow: rgba(255, 255, 255, 0.94);
   --ytcq-aero-page-bg: #fff;
   --ytcq-aero-panel-bg: #f6fdff;
   --ytcq-aero-panel-bg-soft: #eaf8fd;
@@ -72,7 +76,12 @@
   --ytcq-aero-accent-strong: #bdefff;
   --ytcq-aero-border: #5bb0ce;
   --ytcq-aero-surface: linear-gradient(180deg, rgba(69, 108, 124, 0.96) 0%, rgba(31, 72, 91, 0.96) 44%, rgba(9, 39, 58, 0.98) 100%);
-  --ytcq-aero-context-surface: linear-gradient(180deg, rgba(32, 57, 71, 0.98) 0%, rgba(17, 37, 52, 0.98) 44%, rgba(8, 27, 41, 0.99) 100%);
+  --ytcq-aero-context-surface: linear-gradient(145deg, rgba(31, 68, 86, 0.86) 0%, rgba(7, 31, 46, 0.88) 52%, rgba(2, 18, 29, 0.9) 100%);
+  --ytcq-aero-glass-legibility-field: radial-gradient(ellipse at center, rgba(7, 27, 40, 0.58) 0%, rgba(6, 27, 40, 0.55) 62%, rgba(9, 38, 53, 0.5) 84%, rgba(18, 65, 83, 0.45) 100%);
+  --ytcq-aero-glass-legibility-layer: linear-gradient(180deg, rgba(7, 27, 40, 0.58) 0%, rgba(7, 27, 40, 0.42) 72px, rgba(7, 27, 40, 0.16) 130px, transparent 190px);
+  --ytcq-aero-glass-specular: linear-gradient(180deg, rgba(224, 250, 255, 0.28) 0, rgba(224, 250, 255, 0.08) 2px, transparent 7px), linear-gradient(90deg, rgba(204, 245, 255, 0.12) 0, transparent 5px), linear-gradient(135deg, rgba(224, 250, 255, 0.1) 0%, transparent 24%, transparent 82%, rgba(68, 192, 228, 0.06) 100%);
+  --ytcq-aero-glass-caustic: radial-gradient(ellipse at 88% 112%, rgba(65, 199, 235, 0.07) 0%, transparent 54%);
+  --ytcq-aero-glass-filter: saturate(110%) brightness(0.65);
   --ytcq-aero-surface-deep: linear-gradient(180deg, rgba(82, 126, 141, 0.98) 0%, rgba(37, 80, 99, 0.98) 48%, rgba(6, 31, 47, 0.99) 100%);
   --ytcq-aero-list-row-bg: linear-gradient(180deg, rgba(211, 246, 255, 0.14), rgba(23, 60, 78, 0.38));
   --ytcq-aero-list-row-hover-bg: linear-gradient(180deg, rgba(226, 250, 255, 0.24), rgba(34, 92, 116, 0.52));
@@ -93,7 +102,6 @@
   --ytcq-aero-input-border-focus: #4fc3ef #8ee8ff #c1f7ff #6bcfea;
   --ytcq-aero-input-bg: #132733;
   --ytcq-aero-picker-border: linear-gradient(180deg, rgba(198, 241, 252, 0.58) 0%, #5bb0ce 45%, rgba(23, 68, 88, 0.95) 100%);
-  --ytcq-aero-picker-glow: rgba(223, 249, 255, 0.14);
   --ytcq-aero-page-bg: #08131f;
   --ytcq-aero-panel-bg: #0f2332;
   --ytcq-aero-panel-bg-soft: #182f40;
@@ -834,9 +842,14 @@
   padding-top: 4px !important;
   color: var(--ytcq-aero-text) !important;
   background:
-    radial-gradient(circle at 50% -20px, var(--ytcq-aero-picker-glow), transparent 72px) padding-box,
+    var(--ytcq-aero-glass-specular) padding-box,
+    var(--ytcq-aero-glass-caustic) padding-box,
+    var(--ytcq-aero-glass-legibility-field) padding-box,
+    var(--ytcq-aero-glass-legibility-layer) padding-box,
     var(--ytcq-aero-context-surface) padding-box,
     var(--ytcq-aero-picker-border) border-box !important;
+  -webkit-backdrop-filter: var(--ytcq-aero-glass-filter);
+  backdrop-filter: var(--ytcq-aero-glass-filter);
   transform: translateY(-4px);
   overflow: hidden !important;
   box-shadow: none !important;
@@ -1290,12 +1303,20 @@
   border-color: var(--ytcq-aero-border);
   color: var(--ytcq-aero-text);
   background:
-    radial-gradient(circle at 50% -24px, rgba(255, 255, 255, 0.94), transparent 70px),
+    var(--ytcq-aero-glass-specular),
+    var(--ytcq-aero-glass-caustic),
+    var(--ytcq-aero-glass-legibility-field),
+    var(--ytcq-aero-glass-legibility-layer),
     var(--ytcq-aero-context-surface);
+  -webkit-backdrop-filter: var(--ytcq-aero-glass-filter);
+  backdrop-filter: var(--ytcq-aero-glass-filter);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.96),
-    inset 0 -1px 0 rgba(83, 173, 214, 0.24),
-    0 6px 18px rgba(23, 105, 146, 0.24);
+    inset 1px 0 0 rgba(255, 255, 255, 0.48),
+    inset -1px 0 0 rgba(111, 203, 231, 0.2),
+    inset 0 -1px 0 rgba(54, 153, 198, 0.38),
+    0 12px 30px rgba(17, 85, 120, 0.26),
+    0 2px 7px rgba(23, 105, 146, 0.2);
   font-family: Tahoma, "Segoe UI", Arial, sans-serif;
 }
 
@@ -1465,7 +1486,33 @@
   .ytcq-game-sound-toggle,
   .ytcq-chess-game-close,
   .ytcq-chess-game-sound-toggle
-):where(:hover, :focus) {
+):where(:hover, :focus-visible) {
+  color: var(--ytcq-aero-accent-strong);
+  background: var(--ytcq-aero-hover);
+  box-shadow:
+    inset 0 0 0 1px rgba(92, 173, 214, 0.42),
+    inset 0 1px 0 rgba(255, 255, 255, 0.42);
+  outline: none;
+}
+
+/*
+ * The feed overlay has light/dark selectors with enough specificity to beat
+ * the shared skin controls above. Restate its two header actions here so they
+ * use the same Aero icon color and hover treatment as every other panel.
+ */
+:root[data-ytcq-chat-skin="aero"] .ytcq-game-overlay :where(
+  .ytcq-game-overlay-close,
+  .ytcq-game-sound-toggle
+) {
+  color: var(--ytcq-aero-accent-strong);
+  background: transparent;
+  box-shadow: none;
+}
+
+:root[data-ytcq-chat-skin="aero"] .ytcq-game-overlay :where(
+  .ytcq-game-overlay-close,
+  .ytcq-game-sound-toggle
+):is(:hover, :focus-visible) {
   color: var(--ytcq-aero-accent-strong);
   background: var(--ytcq-aero-hover);
   box-shadow:
@@ -2093,17 +2140,23 @@
   .ytcq-bounty-hunting-game-panel,
   .ytcq-toast
 ) {
-  --ytcq-aero-list-row-bg: linear-gradient(180deg, rgba(211, 246, 255, 0.07), rgba(9, 33, 47, 0.42));
-  --ytcq-aero-list-row-border: rgba(126, 204, 229, 0.24);
+  --ytcq-aero-list-row-bg: linear-gradient(180deg, rgba(116, 181, 200, 0.12), rgba(5, 29, 42, 0.48));
+  --ytcq-aero-list-row-hover-bg: linear-gradient(180deg, rgba(142, 211, 229, 0.2), rgba(10, 43, 59, 0.64));
+  --ytcq-aero-list-row-border: rgba(126, 204, 229, 0.28);
 
-  border-color: rgba(91, 176, 206, 0.56);
+  border-color: rgba(91, 176, 206, 0.48);
   background:
-    radial-gradient(circle at 50% -28px, rgba(223, 249, 255, 0.08), transparent 68px),
+    var(--ytcq-aero-glass-specular),
+    var(--ytcq-aero-glass-caustic),
+    var(--ytcq-aero-glass-legibility-field),
+    var(--ytcq-aero-glass-legibility-layer),
     var(--ytcq-aero-context-surface);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.18),
-    inset 0 -1px 0 rgba(151, 221, 242, 0.12),
-    0 8px 22px rgba(0, 14, 24, 0.54);
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    inset 1px 0 0 rgba(211, 246, 255, 0.08),
+    inset -1px 0 0 rgba(76, 187, 220, 0.05),
+    inset 0 -1px 0 rgba(99, 203, 231, 0.1),
+    0 12px 32px rgba(0, 14, 24, 0.55);
 }
 
 :root[data-ytcq-chat-skin="aero"][data-ytcq-chat-skin-theme="dark"] :where(
@@ -2162,7 +2215,7 @@
   .ytcq-game-sound-toggle,
   .ytcq-chess-game-close,
   .ytcq-chess-game-sound-toggle
-):where(:hover, :focus) {
+):where(:hover, :focus-visible) {
   box-shadow:
     inset 0 0 0 1px rgba(218, 248, 255, 0.38),
     inset 0 1px 0 rgba(255, 255, 255, 0.32);
@@ -2266,4 +2319,18 @@
   --ytcq-aero-marked-avatar-glow: color-mix(in srgb, var(--ytcq-marked-user-color, #8ad96a) 48%, transparent);
 
   color: var(--ytcq-marked-user-color, #8ad96a);
+}
+
+/* Respect platform transparency and contrast accessibility preferences. */
+@media (prefers-reduced-transparency: reduce) {
+  :root[data-ytcq-chat-skin="aero"] {
+    --ytcq-aero-context-surface: var(--ytcq-aero-surface-deep);
+    --ytcq-aero-glass-filter: saturate(125%);
+  }
+}
+
+@media (prefers-contrast: more) {
+  :root[data-ytcq-chat-skin="aero"] {
+    --ytcq-aero-context-surface: var(--ytcq-aero-surface-deep);
+  }
 }

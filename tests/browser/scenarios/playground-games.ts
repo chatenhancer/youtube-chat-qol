@@ -375,7 +375,10 @@ export const playgroundStickAroundComputerOverlayScenario: BrowserScenario = asy
     snapshot: createMockPlaygroundSnapshot()
   });
 
-  await withExtensionStorageValues(context, 'sync', PLAYGROUND_ENABLED_OPTIONS, async () => {
+  await withExtensionStorageValues(context, 'sync', {
+    ...PLAYGROUND_ENABLED_OPTIONS,
+    chatSkin: 'aero'
+  }, async () => {
     await page.evaluate(() => {
       const style = document.createElement('style');
       style.textContent = `
@@ -425,11 +428,18 @@ export const playgroundStickAroundComputerOverlayScenario: BrowserScenario = asy
     await expect(overlay.locator('.ytcq-game-overlay-icon')).toBeVisible();
     await expect(overlay.locator('.ytcq-game-overlay-title')).toHaveText('Stick Around!');
     await expect(overlay.locator('.ytcq-game-overlay-subtitle')).toHaveText('Computer (Stick Around!)');
-    await expect(overlay.getByRole('button', { name: 'Mute game sounds' })).toBeVisible();
+    const soundButton = overlay.getByRole('button', { name: 'Mute game sounds' });
+    await expect(soundButton).toBeVisible();
     const hideButton = overlay.getByRole('button', { name: 'Hide' });
     await expect(hideButton).toBeVisible();
-    await expect(hideButton).toHaveCSS('color', 'rgb(17, 17, 17)');
+    await expect(hideButton).toHaveCSS('color', 'rgb(0, 90, 147)');
     await expect(hideButton).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
+    await soundButton.hover();
+    const soundButtonStyle = await readButtonTreatment(soundButton);
+    await hideButton.hover();
+    expect(await readButtonTreatment(hideButton)).toEqual(soundButtonStyle);
+    expect(soundButtonStyle.color).toBe('rgb(0, 90, 147)');
+    expect(soundButtonStyle.backgroundImage).toContain('linear-gradient');
     const canvas = chat.locator('.ytcq-stick-around-canvas');
     await expect(canvas).toBeVisible();
     await expect(overlay.getByRole('button', { name: 'Ready' })).toHaveCount(0);
@@ -1094,6 +1104,25 @@ async function isChatScrolledToBottom(chat: ChatSurface): Promise<boolean> {
   return chat.locator('#item-scroller').evaluate((scroller) =>
     scroller.scrollTop + scroller.clientHeight >= scroller.scrollHeight - 2
   );
+}
+
+async function readButtonTreatment(button: Locator): Promise<{
+  backgroundColor: string;
+  backgroundImage: string;
+  borderRadius: string;
+  boxShadow: string;
+  color: string;
+}> {
+  return button.evaluate((element) => {
+    const style = getComputedStyle(element);
+    return {
+      backgroundColor: style.backgroundColor,
+      backgroundImage: style.backgroundImage,
+      borderRadius: style.borderRadius,
+      boxShadow: style.boxShadow,
+      color: style.color
+    };
+  });
 }
 
 async function findStickAroundReadyHitboxPoint(

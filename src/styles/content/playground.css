@@ -672,17 +672,17 @@
 }
 
 .ytcq-game-overlay .ytcq-game-overlay-close:hover,
-.ytcq-game-overlay .ytcq-game-overlay-close:focus,
+.ytcq-game-overlay .ytcq-game-overlay-close:focus-visible,
 .ytcq-game-overlay-header .ytcq-game-sound-toggle:hover,
-.ytcq-game-overlay-header .ytcq-game-sound-toggle:focus {
+.ytcq-game-overlay-header .ytcq-game-sound-toggle:focus-visible {
   color: #fff;
   background: rgba(255, 255, 255, 0.18);
 }
 
 .ytcq-game-overlay.ytcq-game-overlay-theme-light .ytcq-game-overlay-close:hover,
-.ytcq-game-overlay.ytcq-game-overlay-theme-light .ytcq-game-overlay-close:focus,
+.ytcq-game-overlay.ytcq-game-overlay-theme-light .ytcq-game-overlay-close:focus-visible,
 .ytcq-game-overlay.ytcq-game-overlay-theme-light .ytcq-game-sound-toggle:hover,
-.ytcq-game-overlay.ytcq-game-overlay-theme-light .ytcq-game-sound-toggle:focus {
+.ytcq-game-overlay.ytcq-game-overlay-theme-light .ytcq-game-sound-toggle:focus-visible {
   color: #111;
   background: rgba(0, 0, 0, 0.13);
 }
@@ -986,17 +986,17 @@
 }
 
 .ytcq-game-panel-close:hover,
-.ytcq-game-panel-close:focus,
+.ytcq-game-panel-close:focus-visible,
 .ytcq-game-overlay-close:hover,
-.ytcq-game-overlay-close:focus,
+.ytcq-game-overlay-close:focus-visible,
 .ytcq-game-panel-compact-toggle:hover,
-.ytcq-game-panel-compact-toggle:focus,
+.ytcq-game-panel-compact-toggle:focus-visible,
 .ytcq-game-sound-toggle:hover,
-.ytcq-game-sound-toggle:focus,
+.ytcq-game-sound-toggle:focus-visible,
 .ytcq-chess-game-close:hover,
-.ytcq-chess-game-close:focus,
+.ytcq-chess-game-close:focus-visible,
 .ytcq-chess-game-sound-toggle:hover,
-.ytcq-chess-game-sound-toggle:focus {
+.ytcq-chess-game-sound-toggle:focus-visible {
   color: var(--yt-spec-text-primary, var(--yt-live-chat-primary-text-color, #f1f1f1));
   background: var(--ytcq-hover-background);
   outline: none;
