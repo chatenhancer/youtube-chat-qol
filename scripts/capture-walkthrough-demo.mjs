@@ -679,6 +679,22 @@ async function sectionPlayground(page, chat, context, recorder) {
     }
   );
   await recorder.holdStill(1_200);
+  const replayTriviaCard = gamesCard.locator('.ytcq-games-game-card')
+    .filter({ hasText: 'HELP-A-FRIEND! Trivia' })
+    .first();
+  await replayTriviaCard.waitFor({ state: 'visible', timeout: 5_000 });
+  await showDemoCaptionFor(
+    page,
+    recorder,
+    'Games match the stream',
+    'HELP-A-FRIEND! Trivia works on replays after a stream ends. The Wild Wild Chat and Stick Around! work during live chat; Chess works in either.',
+    {
+      anchorLocator: replayTriviaCard,
+      durationMs: 8_000,
+      padding: 6
+    }
+  );
+  await recorder.holdStill(800);
   await closeGamesPanelIfPresent(chat);
 }
 
