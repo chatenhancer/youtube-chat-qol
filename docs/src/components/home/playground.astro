@@ -42,10 +42,15 @@ const playgroundGames = [
   <div class="playground-inner">
     <div class="playground-copy">
       <div class="playground-heading-row">
-        <span class="playground-section-icon" aria-hidden="true">
-          <Icon name="playground" />
-        </span>
-        <span class="playground-eyebrow">{m.playground.eyebrow}</span>
+        <img
+          class="playground-brand-logo"
+          src={`${rootPrefix}assets/playground/playground-logo.svg`}
+          alt={m.playgroundPage.logoAlt}
+          width="1746"
+          height="457"
+          loading="lazy"
+          decoding="async"
+        >
         <span class="playground-beta-badge">Beta</span>
       </div>
       <h2 id="playground-title" set:html={m.playground.title}></h2>
