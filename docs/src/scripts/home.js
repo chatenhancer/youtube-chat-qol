@@ -55,6 +55,7 @@
     unknown: "6b7280"
   };
   let walkthroughFeedbackTimer = 0;
+  let walkthroughPendingSeekTime = null;
 
   setupTopHeaderState();
   setupActiveNavigation();
@@ -281,13 +282,17 @@
       toggleWalkthroughPlayback();
     });
     walkthroughVideo.addEventListener("durationchange", updateWalkthroughTimeBadge);
-    walkthroughVideo.addEventListener("loadedmetadata", updateWalkthroughTimeBadge);
+    walkthroughVideo.addEventListener("loadedmetadata", () => {
+      applyPendingWalkthroughSeek();
+      updateWalkthroughTimeBadge();
+    });
     walkthroughVideo.addEventListener("timeupdate", updateWalkthroughTimeBadge);
   }
 
   walkthroughSeekButtons.forEach((button) => {
-    button.addEventListener("click", () => {
-      seekWalkthroughToKeyPoint(button);
+    button.addEventListener("click", (event) => {
+      event.preventDefault();
+      seekWalkthroughToKeyPoint(button, { updateHash: true });
     });
   });
 
@@ -912,7 +917,8 @@
       history.pushState(null, "", walkthroughHash);
     }
 
-    walkthroughVideo.currentTime = 0;
+    const walkthroughHashState = getWalkthroughHashState();
+    setWalkthroughCurrentTime(walkthroughHashState?.seconds ?? 0);
     updateWalkthroughTimeBadge();
     updateWalkthroughKeyPointState();
     setWalkthroughKeyPointPanelOpen(false);
@@ -929,7 +935,9 @@
       return;
     }
 
-    window.open(videoUrl.href, "_blank", "noopener");
+    const fallbackVideoUrl = new URL(videoUrl);
+    if (walkthroughHashState?.seconds) fallbackVideoUrl.hash = `t=${walkthroughHashState.seconds}`;
+    window.open(fallbackVideoUrl.href, "_blank", "noopener");
   }
 
   function preloadWalkthroughVideo(videoUrl) {
@@ -965,7 +973,7 @@
   }
 
   function isWalkthroughHash() {
-    return window.location.hash.toLowerCase() === walkthroughHash;
+    return getWalkthroughHashState() !== null;
   }
 
   function clearWalkthroughHash() {
@@ -992,20 +1000,62 @@
     updateWalkthroughTimeBadge();
   }
 
-  function seekWalkthroughToKeyPoint(button) {
+  function getWalkthroughHashState() {
+    const hash = window.location.hash.toLowerCase();
+    if (hash === walkthroughHash) return { button: null, seconds: 0 };
+
+    const button = walkthroughSeekButtons.find((candidate) => {
+      if (!(candidate instanceof HTMLElement)) return false;
+      const chapter = candidate.dataset.walkthroughChapter?.toLowerCase();
+      return Boolean(chapter) && hash === `${walkthroughHash}-${chapter}`;
+    });
+    if (!(button instanceof HTMLElement)) return null;
+
+    const seconds = Number(button.dataset.walkthroughSeek);
+    if (!Number.isFinite(seconds) || seconds < 0) return null;
+    return { button, seconds };
+  }
+
+  function setWalkthroughCurrentTime(nextTime) {
+    if (!(walkthroughVideo instanceof HTMLVideoElement)) return;
+    if (!Number.isFinite(nextTime) || nextTime < 0) return;
+
+    walkthroughPendingSeekTime = nextTime;
+    applyPendingWalkthroughSeek();
+  }
+
+  function applyPendingWalkthroughSeek() {
+    if (!(walkthroughVideo instanceof HTMLVideoElement)) return;
+    if (walkthroughPendingSeekTime === null || walkthroughVideo.readyState === 0) return;
+
+    const duration = Number.isFinite(walkthroughVideo.duration) ? walkthroughVideo.duration : 0;
+    walkthroughVideo.currentTime = duration
+      ? Math.min(duration, walkthroughPendingSeekTime)
+      : walkthroughPendingSeekTime;
+    walkthroughPendingSeekTime = null;
+  }
+
+  function seekWalkthroughToKeyPoint(button, options = {}) {
     if (!(button instanceof HTMLElement)) return;
     if (!(walkthroughVideo instanceof HTMLVideoElement)) return;
 
     const nextTime = Number(button.dataset.walkthroughSeek);
     if (!Number.isFinite(nextTime) || nextTime < 0) return;
 
-    const duration = Number.isFinite(walkthroughVideo.duration) ? walkthroughVideo.duration : 0;
-    walkthroughVideo.currentTime = duration
-      ? Math.min(duration, nextTime)
-      : nextTime;
+    setWalkthroughCurrentTime(nextTime);
+    if (options.updateHash) updateWalkthroughHash(button);
     updateWalkthroughTimeBadge();
     startWalkthroughPlayback({ allowMutedFallback: true });
     walkthroughVideo.focus({ preventScroll: true });
+  }
+
+  function updateWalkthroughHash(button) {
+    const chapter = button.dataset.walkthroughChapter;
+    if (!chapter) return;
+
+    const nextHash = `${walkthroughHash}-${chapter}`;
+    if (window.location.hash.toLowerCase() === nextHash) return;
+    history.replaceState(null, "", nextHash);
   }
 
   function toggleWalkthroughKeyPointPanel() {

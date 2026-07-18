@@ -1361,6 +1361,7 @@ html[dir="rtl"] .hero-blog-ticker-next svg {
   color: var(--muted);
   cursor: pointer;
   text-align: left;
+  text-decoration: none;
   background: transparent;
   border: 1px solid transparent;
   border-radius: var(--compact-icon-surface-corner-radius);
