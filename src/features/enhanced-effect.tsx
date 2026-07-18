@@ -11,9 +11,11 @@ import type { Options } from '../shared/options';
 
 const EFFECT_CLASS = 'ytcq-enhanced-effect';
 const ACTIVE_CLASS = 'ytcq-enhanced-effect-active';
-const ACTIVATION_MS = 1000;
+const ACTIVATION_MS = 1350;
 const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)';
 const CANVAS_SCALE = 0.7;
+// YouTube clips visual overflow at the chat iframe boundary, so keep the glow's energy inside it.
+const PERIMETER_INSET = 3;
 
 let activationTimer = 0;
 let animationFrame = 0;
@@ -167,7 +169,7 @@ function drawQuietPerimeter(
   width: number,
   height: number
 ): void {
-  drawPerimeterStroke(context, width, height, 'rgba(62, 166, 255, 0.16)', 4);
+  drawPerimeterStroke(context, width, height, 'rgba(62, 166, 255, 0.48)', 5);
 }
 
 function drawShimmerPerimeter(
@@ -181,7 +183,7 @@ function drawShimmerPerimeter(
     width,
     height,
     createShimmerGradient(context, width, height, progress),
-    11
+    13
   );
 }
 
@@ -192,7 +194,7 @@ function drawPerimeterStroke(
   strokeStyle: string | CanvasGradient,
   lineWidth: number
 ): void {
-  const inset = 2;
+  const inset = PERIMETER_INSET;
   const radius = Math.min(18, width / 2 - inset, height / 2 - inset);
 
   context.save();
@@ -215,11 +217,11 @@ function createShimmerGradient(
   );
   gradient.addColorStop(0, 'rgba(62, 166, 255, 0)');
   gradient.addColorStop(0.08, 'rgba(62, 166, 255, 0)');
-  gradient.addColorStop(0.12, 'rgba(62, 166, 255, 0.18)');
-  gradient.addColorStop(0.155, 'rgba(125, 211, 252, 0.62)');
-  gradient.addColorStop(0.175, 'rgba(255, 255, 255, 0.92)');
-  gradient.addColorStop(0.195, 'rgba(125, 211, 252, 0.62)');
-  gradient.addColorStop(0.25, 'rgba(126, 87, 255, 0.16)');
+  gradient.addColorStop(0.12, 'rgba(62, 166, 255, 0.5)');
+  gradient.addColorStop(0.155, 'rgba(125, 211, 252, 1)');
+  gradient.addColorStop(0.175, 'rgba(255, 255, 255, 1)');
+  gradient.addColorStop(0.195, 'rgba(125, 211, 252, 1)');
+  gradient.addColorStop(0.25, 'rgba(126, 87, 255, 0.42)');
   gradient.addColorStop(0.34, 'rgba(62, 166, 255, 0)');
   gradient.addColorStop(1, 'rgba(62, 166, 255, 0)');
   return gradient;

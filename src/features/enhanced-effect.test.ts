@@ -36,7 +36,7 @@ describe('enhanced startup effect', () => {
     expect(effect.dataset.ytcqManaged).toBe('true');
     expect(effect.classList.contains('ytcq-enhanced-effect-active')).toBe(false);
 
-    await vi.advanceTimersByTimeAsync(1_000);
+    await vi.advanceTimersByTimeAsync(1_350);
     expect(effect.classList.contains('ytcq-enhanced-effect-active')).toBe(false);
   });
 
@@ -57,6 +57,7 @@ describe('enhanced startup effect', () => {
   it('draws and clears the animated perimeter when startup animation is enabled', async () => {
     showEnhancedEffect({ animate: true });
     const canvas = document.querySelector<HTMLCanvasElement>('.ytcq-enhanced-effect canvas')!;
+    const effect = canvas.parentElement!;
 
     await vi.advanceTimersByTimeAsync(16);
 
@@ -65,7 +66,11 @@ describe('enhanced startup effect', () => {
     expect(canvas.width).toBe(224);
     expect(canvas.height).toBe(84);
 
-    await vi.advanceTimersByTimeAsync(1_000);
+    await vi.advanceTimersByTimeAsync(1_333);
+    expect(effect.classList.contains('ytcq-enhanced-effect-active')).toBe(true);
+
+    await vi.advanceTimersByTimeAsync(1);
+    expect(effect.classList.contains('ytcq-enhanced-effect-active')).toBe(false);
     expect(canvasContext.clearRect).toHaveBeenCalledWith(0, 0, canvas.width, canvas.height);
   });
 
@@ -89,7 +94,7 @@ describe('enhanced startup effect', () => {
 
     expect(document.querySelectorAll('.ytcq-enhanced-effect')).toHaveLength(1);
     expect(document.querySelector('.ytcq-enhanced-effect')).toBe(firstEffect);
-    await vi.advanceTimersByTimeAsync(999);
+    await vi.advanceTimersByTimeAsync(1_349);
     expect(firstEffect?.isConnected).toBe(true);
   });
 
