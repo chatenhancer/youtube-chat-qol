@@ -55,6 +55,7 @@
     "commandsTitle": "Lakukan lebih banyak dengan perintah Tab",
     "commandsBody": "Tekan Tab untuk mengubah perintah singkat menjadi mention, kutipan, bantuan waktu, terjemahan, pantauan Inbox, dan pengaturan.",
     "commandsLink": "Lihat referensi perintah",
+    "walkthroughClipCta": "Tonton",
     "walkthroughTitle": "Tonton panduan fitur",
     "walkthroughBody": "Lihat bagaimana terjemahan, Inbox, mode Focus, pengguna yang ditandai, emoji, perintah, dan pengaturan popup bekerja bersama.",
     "walkthroughCta": "Tonton panduan",
@@ -82,7 +83,7 @@
     "eyebrow": "Playground",
     "title": "<span class=\"title-emphasis\">Game ringan</span> untuk<br>jeda live chat",
     "copy": "Playground adalah ruang game opsional yang membuat siaran lebih interaktif. Pilih game: undang penonton yang tersedia*, mulai bermain, dan tetap ikuti chat di dekatnya.",
-    "primaryCta": "Coba di ekstensi",
+    "primaryCta": "Cara bermain",
     "secondaryCta": "Pelajari lebih lanjut",
     "imageAlt": "Panel game catur mengambang di dalam live chat YouTube",
     "note": "* Kedua pemain perlu memiliki ekstensi untuk bermain bersama"

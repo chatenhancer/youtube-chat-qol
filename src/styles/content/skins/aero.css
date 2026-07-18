@@ -1286,6 +1286,7 @@
   .ytcq-command-autocomplete-card,
   .ytcq-command-help-card,
   .ytcq-games-card,
+  .ytcq-game-overlay-header,
   .ytcq-chess-game-panel,
   .ytcq-replay-trivia-game-panel,
   .ytcq-bounty-hunting-game-panel,
@@ -1331,6 +1332,7 @@
   .ytcq-command-help-list dt,
   .ytcq-games-row-title,
   .ytcq-games-game-label,
+  .ytcq-game-overlay-title,
   .ytcq-game-status,
   .ytcq-chess-game-status
 ) {
@@ -1357,8 +1359,9 @@
   .ytcq-command-help-list dd,
   .ytcq-games-row-helper,
   .ytcq-games-section-empty,
-  .ytcq-games-active-count,
+  .ytcq-games-active-position,
   .ytcq-games-game-helper,
+  .ytcq-game-overlay-subtitle,
   .ytcq-composer-translate-label,
   .ytcq-inbox-keyword-empty
 ) {
@@ -1402,6 +1405,41 @@
   text-shadow: none;
 }
 
+:root[data-ytcq-chat-skin="aero"] .ytcq-games-active-controls {
+  --ytcq-games-active-control-radius: 4px;
+  --ytcq-games-active-action-radius: 3px;
+
+  border: 0;
+  border-radius: 4px;
+  color: var(--ytcq-aero-control-text);
+  background: color-mix(in srgb, var(--ytcq-aero-accent) 10%, transparent);
+  box-shadow: none;
+}
+
+:root[data-ytcq-chat-skin="aero"] .ytcq-games-active-position {
+  color: var(--ytcq-aero-muted-text);
+  background: transparent;
+  text-shadow: none;
+}
+
+:root[data-ytcq-chat-skin="aero"] .ytcq-games-active-dot-current {
+  color: var(--ytcq-aero-control-text);
+}
+
+:root[data-ytcq-chat-skin="aero"] .ytcq-games-active-controls .ytcq-games-cycle-action {
+  border-radius: var(--ytcq-games-active-action-radius);
+  color: var(--ytcq-aero-control-text);
+}
+
+:root[data-ytcq-chat-skin="aero"] .ytcq-games-active-controls .ytcq-games-cycle-action:where(
+  :hover,
+  :focus-visible
+) {
+  color: var(--ytcq-aero-accent-strong);
+  background: var(--ytcq-aero-hover);
+  box-shadow: none;
+}
+
 :root[data-ytcq-chat-skin="aero"] :where(
   .ytcq-profile-card-header-button,
   .ytcq-profile-card-author,
@@ -1427,7 +1465,8 @@
   .ytcq-games-small-action
 ) {
   box-sizing: border-box;
-  border: 1px solid var(--ytcq-aero-control-border);
+  border: 1px solid;
+  border-color: var(--ytcq-aero-control-border);
   border-radius: 3px;
   color: var(--ytcq-aero-control-text);
   background: var(--ytcq-aero-control-bg);
@@ -1459,6 +1498,10 @@
   border-color: var(--ytcq-aero-control-border-active);
   background: var(--ytcq-aero-control-bg-active);
   box-shadow: var(--ytcq-aero-control-shadow-active);
+}
+
+:root[data-ytcq-chat-skin="aero"] .ytcq-games-detail-actions {
+  padding-inline-end: 9px;
 }
 
 :root[data-ytcq-chat-skin="aero"] :where(
@@ -1512,11 +1555,7 @@
   outline: none;
 }
 
-/*
- * The feed overlay has light/dark selectors with enough specificity to beat
- * the shared skin controls above. Restate its two header actions here so they
- * use the same Aero icon color and hover treatment as every other panel.
- */
+/* Keep the feed-overlay header actions clear against both Aero glass variants. */
 :root[data-ytcq-chat-skin="aero"] .ytcq-game-overlay :where(
   .ytcq-game-overlay-close,
   .ytcq-game-sound-toggle
@@ -2152,6 +2191,7 @@
   .ytcq-command-autocomplete-card,
   .ytcq-command-help-card,
   .ytcq-games-card,
+  .ytcq-game-overlay-header,
   .ytcq-chess-game-panel,
   .ytcq-replay-trivia-game-panel,
   .ytcq-bounty-hunting-game-panel,

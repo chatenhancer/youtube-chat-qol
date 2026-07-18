@@ -1,6 +1,8 @@
 ---
 import '../styles/site.css';
 import homeScriptUrl from '../scripts/home.js?url';
+import walkthroughClipsScriptUrl from '../scripts/walkthrough-clips.js?url';
+import WalkthroughClipModal from '../components/common/walkthrough-clip-modal.astro';
 import type { Locale } from '../data/locales';
 import { canonicalUrlFor, htmlLangFor, localeMeta, locales } from '../data/locales';
 import { site, supportEmail } from '../data/site';
@@ -139,7 +141,9 @@ const structuredDataJson = resolvedStructuredData
   </head>
   <body>
     <slot />
+    <WalkthroughClipModal messages={messages} />
     <script is:inline type="application/json" data-docs-config set:html={JSON.stringify(docsConfig).replace(/</g, '\\u003c')}></script>
     <script is:inline src={homeScriptUrl}></script>
+    <script is:inline src={walkthroughClipsScriptUrl}></script>
   </body>
 </html>

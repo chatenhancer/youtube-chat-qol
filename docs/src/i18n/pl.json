@@ -55,6 +55,7 @@
     "commandsTitle": "Rób więcej dzięki poleceniom Tab",
     "commandsBody": "Naciśnij Tab, aby rozwinąć krótkie polecenia we wzmianki, cytaty, pomoc z czasem, tłumaczenia, obserwowane frazy w skrzynce i ustawienia.",
     "commandsLink": "Zobacz opis poleceń",
+    "walkthroughClipCta": "Obejrzyj",
     "walkthroughTitle": "Obejrzyj prezentację funkcji",
     "walkthroughBody": "Zobacz, jak tłumaczenie, skrzynka, tryb skupienia, użytkownicy w zakładkach, emoji, polecenia i ustawienia w oknie rozszerzenia działają razem.",
     "walkthroughCta": "Obejrzyj prezentację",
@@ -82,7 +83,7 @@
     "eyebrow": "Playground",
     "title": "<span class=\"title-emphasis\">Małe gry</span> na<br>przerwy w czacie na żywo",
     "copy": "Playground to opcjonalna przestrzeń z grami, która zwiększa interaktywność transmisji. Wybierz grę, zaproś dostępnego widza*, zacznij rozgrywkę i miej czat pod ręką.",
-    "primaryCta": "Wypróbuj w rozszerzeniu",
+    "primaryCta": "Jak grać",
     "secondaryCta": "Dowiedz się więcej",
     "imageAlt": "Pływający panel szachów w czacie na żywo YouTube",
     "note": "* Aby grać razem, obie osoby potrzebują rozszerzenia"

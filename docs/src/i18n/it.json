@@ -55,6 +55,7 @@
     "commandsTitle": "Fai di più con i comandi Tab",
     "commandsBody": "Premi Tab per trasformare comandi brevi in menzioni, citazioni, aiuti per l’ora, traduzioni, controlli della posta in arrivo e impostazioni.",
     "commandsLink": "Vedi riferimento comandi",
+    "walkthroughClipCta": "Guarda",
     "walkthroughTitle": "Guarda una panoramica delle funzioni",
     "walkthroughBody": "Scopri come traduzione, posta in arrivo, modalità Focus, utenti salvati, emoji, comandi e impostazioni della finestra popup lavorano insieme.",
     "walkthroughCta": "Guarda la panoramica",
@@ -82,7 +83,7 @@
     "eyebrow": "Playground",
     "title": "<span class=\"title-emphasis\">Mini giochi</span> per<br>le pause della chat live",
     "copy": "Playground è uno spazio di gioco opzionale che rende le live più interattive. Scegli un gioco: invita uno spettatore disponibile*, inizia a giocare e tieni la chat a portata.",
-    "primaryCta": "Provalo nell’estensione",
+    "primaryCta": "Come giocare",
     "secondaryCta": "Scopri di più",
     "imageAlt": "Pannello fluttuante di scacchi dentro la chat live di YouTube",
     "note": "* Entrambi i giocatori devono avere l’estensione per giocare insieme"

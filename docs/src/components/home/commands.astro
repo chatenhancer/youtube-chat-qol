@@ -1,5 +1,6 @@
 ---
 import Icon from '../common/icon.astro';
+import WalkthroughClipTag from '../common/walkthrough-clip-tag.astro';
 import type { Messages } from '../../data/site';
 
 const { messages: m } = Astro.props as { messages: Messages };
@@ -54,7 +55,12 @@ const commandCopyParagraphs = [m.commands.copy, m.commands.actionCopy].filter(Bo
 <section class="section commands" id="commands" aria-labelledby="commands-title">
   <div class="section-inner">
     <div class="commands-layout">
-      <div class="commands-copy">
+      <div class="commands-copy walkthrough-clip-tag-host">
+        <WalkthroughClipTag
+          chapter="use-tab-commands"
+          label={m.features.walkthroughClipCta}
+          title={m.features.walkthroughKeyPointCommands}
+        />
         <span class="section-icon" data-symbol="terminal" aria-hidden="true">
           <Icon name="terminal" />
         </span>

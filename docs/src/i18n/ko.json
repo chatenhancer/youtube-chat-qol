@@ -55,6 +55,7 @@
     "commandsTitle": "Tab 명령어로 더 빠르게",
     "commandsBody": "Tab을 누르면 짧은 명령어를 멘션, 인용, 시간 도우미, 번역, 받은 편지함 감시, 설정으로 펼칠 수 있습니다.",
     "commandsLink": "명령어 참고 보기",
+    "walkthroughClipCta": "보기",
     "walkthroughTitle": "기능 작동 방식 보기",
     "walkthroughBody": "번역, 받은 편지함, 포커스 모드, 북마크한 사용자, 이모지, 명령어, 팝업 설정이 함께 작동하는 모습을 확인하세요.",
     "walkthroughCta": "둘러보기 보기",
@@ -82,7 +83,7 @@
     "eyebrow": "Playground",
     "title": "라이브 채팅 쉬는 순간을 위한<br><span class=\"title-emphasis\">작은 게임</span>",
     "copy": "Playground는 스트림에 가벼운 상호작용을 더하는 선택형 게임 공간입니다. 게임을 고르고, 참여 가능한 시청자*를 초대해 플레이하면서 채팅도 곁에 둘 수 있습니다.",
-    "primaryCta": "확장 프로그램에서 사용해 보기",
+    "primaryCta": "플레이 방법",
     "secondaryCta": "자세히 보기",
     "imageAlt": "YouTube 라이브 채팅 안에 떠 있는 체스 게임 패널",
     "note": "* 함께 플레이하려면 두 플레이어 모두 확장 프로그램이 필요합니다"

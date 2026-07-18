@@ -55,6 +55,7 @@
     "commandsTitle": "Faça mais com comandos Tab",
     "commandsBody": "Pressione Tab para transformar comandos curtos em menções, citações, ajuda de horário, traduções, acompanhamentos da caixa de entrada e configurações.",
     "commandsLink": "Ver referência de comandos",
+    "walkthroughClipCta": "Assistir",
     "walkthroughTitle": "Assista a um tour pelos recursos",
     "walkthroughBody": "Veja tradução, caixa de entrada, modo Focus, usuários salvos, emojis, comandos e configurações do pop-up funcionando juntos.",
     "walkthroughCta": "Assistir ao tour",
@@ -82,7 +83,7 @@
     "eyebrow": "Playground",
     "title": "<span class=\"title-emphasis\">Minijogos</span> para<br>pausas no chat ao vivo",
     "copy": "Playground é um espaço opcional de jogos que deixa as transmissões mais interativas. Escolha um jogo: convide um espectador disponível*, comece a jogar e mantenha o chat por perto.",
-    "primaryCta": "Experimentar na extensão",
+    "primaryCta": "Como jogar",
     "secondaryCta": "Saiba mais",
     "imageAlt": "Painel flutuante de xadrez dentro do chat ao vivo do YouTube",
     "note": "* Os dois jogadores precisam da extensão para jogar juntos"

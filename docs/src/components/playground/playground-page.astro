@@ -28,11 +28,19 @@ interface PlaygroundPageCopy {
   taglineTail: string;
 }
 
-const { computerHref, copy, games, installHref } = Astro.props as {
+interface PlaygroundWalkthroughClip {
+  endSeconds?: number;
+  startSeconds: number;
+  title: string;
+}
+
+const { clipCta, computerHref, copy, games, installHref, walkthroughClip } = Astro.props as {
+  clipCta: string;
   computerHref: string;
   copy: PlaygroundPageCopy;
   games: PlaygroundGame[];
   installHref: string;
+  walkthroughClip: PlaygroundWalkthroughClip;
 };
 
 const gameLogoPattern = [
@@ -97,9 +105,16 @@ const marqueeGameLogos = Array.from({ length: 3 }, () => gameLogoPattern).flat()
         <span>{copy.introSecond}</span>
       </p>
       <div class="pg-hero-actions">
-        <a class="button button-primary" href={installHref}>
+        <a
+          class="button button-primary"
+          href={installHref}
+          data-walkthrough-clip-open
+          data-walkthrough-clip-start={walkthroughClip.startSeconds}
+          data-walkthrough-clip-end={walkthroughClip.endSeconds}
+          data-walkthrough-clip-title={walkthroughClip.title}
+        >
           <span class="button-icon" aria-hidden="true"><Icon name="extension" /></span>
-          {copy.primaryCta}
+          {clipCta}
         </a>
         <a class="button pg-button-secondary" href="#pg-games-title">{copy.exploreCta}</a>
       </div>

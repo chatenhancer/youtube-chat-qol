@@ -55,6 +55,7 @@
     "commandsTitle": "Do more with Tab commands",
     "commandsBody": "Press Tab to expand short commands into mentions, quotes, time helpers, translations, inbox watches, and settings.",
     "commandsLink": "View command reference",
+    "walkthroughClipCta": "Watch",
     "walkthroughTitle": "Watch a walkthrough of the features",
     "walkthroughBody": "See translation, Inbox, Focus mode, bookmarked users, emojis, commands, and popup settings working together.",
     "walkthroughCta": "Watch walkthrough",
@@ -82,7 +83,7 @@
     "eyebrow": "Playground",
     "title": "<span class=\"title-emphasis\">Tiny games</span> for<br>live chat breaks",
     "copy": "Playground is an opt-in games space that makes streams more interactive. Pick a game: invite an available viewer*, start playing, and keep chat nearby.",
-    "primaryCta": "Try it in the extension",
+    "primaryCta": "How to play",
     "secondaryCta": "Learn more",
     "imageAlt": "Floating chess game panel inside YouTube live chat",
     "note": "* Players both need the extension to play together"

@@ -22,6 +22,7 @@
   .ytcq-chess-game-panel,
   .ytcq-replay-trivia-game-panel,
   .ytcq-bounty-hunting-game-panel,
+  .ytcq-game-overlay-header,
   .ytcq-command-autocomplete-card,
   .ytcq-command-help-card {
     border-radius: var(--ytcq-squircle-radius-surface);
@@ -43,7 +44,6 @@
   .ytcq-games-game-card,
   .ytcq-games-preview,
   .ytcq-focus-author-button,
-  .ytcq-game-overlay-header,
   .ytcq-game-overlay-icon,
   .ytcq-chess-game-icon,
   .ytcq-replay-trivia-game-icon,

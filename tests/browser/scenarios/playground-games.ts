@@ -38,7 +38,10 @@ export const playgroundChessInviteAndMoveScenario: BrowserScenario = async ({ ch
     snapshot: createMockPlaygroundSnapshot()
   });
 
-  await withExtensionStorageValues(context, 'sync', PLAYGROUND_ENABLED_OPTIONS, async () => {
+  await withExtensionStorageValues(context, 'sync', {
+    ...PLAYGROUND_ENABLED_OPTIONS,
+    chatSkin: 'aero'
+  }, async () => {
     const card = await openGamesCard(chat, backend);
     await expect(card.locator('.ytcq-profile-card-title')).toHaveText('Games');
     await expect(card.locator('.ytcq-profile-card-subtitle')).toHaveText('2 players online');
@@ -51,6 +54,43 @@ export const playgroundChessInviteAndMoveScenario: BrowserScenario = async ({ ch
 
     await openGamePlayerList(card, 'Chess');
     await expect(card.locator('.ytcq-games-player-row')).toHaveCount(3);
+    const detailCancel = card.locator('.ytcq-games-detail-cancel');
+    const inviteAction = card
+      .locator('.ytcq-games-player-row')
+      .first()
+      .getByRole('button', { name: 'Invite' });
+    const root = chat.locator('html');
+    for (const theme of ['light', 'dark'] as const) {
+      await root.evaluate((element, value) => {
+        element.setAttribute('data-ytcq-chat-skin', 'aero');
+        element.setAttribute('data-ytcq-chat-skin-theme', value);
+      }, theme);
+      await expect(root).toHaveAttribute('data-ytcq-chat-skin', 'aero');
+      await expect(root).toHaveAttribute('data-ytcq-chat-skin-theme', theme);
+      await card.locator('.ytcq-games-section-title').hover();
+      expect(await readButtonTreatment(detailCancel)).toEqual(
+        await readButtonTreatment(inviteAction)
+      );
+      await inviteAction.hover();
+      const inviteHoverTreatment = await readButtonTreatment(inviteAction);
+      await detailCancel.hover();
+      expect(await readButtonTreatment(detailCancel)).toEqual(inviteHoverTreatment);
+    }
+    await expect(detailCancel).toHaveCSS('border-top-width', '1px');
+    await expect(inviteAction).toHaveCSS('border-top-width', '1px');
+    await expect(detailCancel).toHaveCSS('border-top-left-radius', '3px');
+    const detailCancelBox = await detailCancel.boundingBox();
+    const inviteActionBox = await inviteAction.boundingBox();
+    if (!detailCancelBox || !inviteActionBox) {
+      throw new Error('Expected the Cancel and Invite actions to be visible.');
+    }
+    expect(detailCancelBox.x + detailCancelBox.width).toBeCloseTo(
+      inviteActionBox.x + inviteActionBox.width,
+      5
+    );
+    await root.evaluate((element) => {
+      element.setAttribute('data-ytcq-chat-skin-theme', 'light');
+    });
 
     await invitePlayer(card, 'Luna Chat');
     const invite = await backend.waitForClientMessage('invite');
@@ -197,11 +237,12 @@ export const playgroundIncomingInviteIgnoreScenario: BrowserScenario = async ({ 
   });
 };
 
-export const playgroundActiveGameControlsScenario: BrowserScenario = async ({ chat, context }) => {
+export const playgroundActiveGameControlsScenario: BrowserScenario = async ({ chat, context, page }) => {
   const activeGame = createBrowserChessGame({ gameId: 'active-chess-game' });
+  const secondaryGame = createBrowserReplayTriviaGame();
   const backend = await installMockPlaygroundBackend(context, {
     snapshot: createMockPlaygroundSnapshot({
-      games: [activeGame]
+      games: [activeGame, secondaryGame]
     })
   });
 
@@ -209,6 +250,76 @@ export const playgroundActiveGameControlsScenario: BrowserScenario = async ({ ch
     const card = await openGamesCard(chat, backend);
     const activeRow = card.locator('.ytcq-games-active-row').filter({ hasText: 'Chess' });
     await expect(activeRow).toContainText('Luna Chat');
+    const activeControls = card.locator('.ytcq-games-active-controls');
+    await expect(activeControls).toHaveAttribute('role', 'group');
+    await expect(activeControls).toHaveAttribute('aria-label', 'Active games');
+    const activePosition = activeControls.locator('.ytcq-games-active-position');
+    const activeDots = activePosition.locator('.ytcq-games-active-dot');
+    await expect(activePosition).toHaveAttribute('aria-hidden', 'true');
+    await expect(activeDots).toHaveCount(2);
+    await expect(activeDots.nth(0)).toHaveClass(/ytcq-games-active-dot-current/);
+    await expect(activeControls.locator('.ytcq-games-cycle-action')).toHaveCount(2);
+    await expect(activeControls.locator('.ytcq-games-cycle-action').first()).not.toHaveClass(
+      /ytcq-games-small-action/
+    );
+    await expect(activeControls).toHaveCSS('display', 'grid');
+    await expect(activeControls).toHaveCSS('height', '20px');
+    await expect(activeControls).toHaveCSS('overflow', 'hidden');
+    await expect(activeControls).toHaveCSS('border-top-width', '0px');
+    await expect(activeControls).toHaveCSS('box-shadow', 'none');
+    const activeControlsBox = await activeControls.boundingBox();
+    expect(activeControlsBox?.width).toBeGreaterThanOrEqual(56);
+    await expect(activePosition).toHaveCSS('border-left-width', '0px');
+    await expect(activePosition).toHaveCSS('border-right-width', '0px');
+    await expect(activePosition).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
+    await expect(activeDots.nth(0)).toHaveCSS('opacity', '0.92');
+    await expect(activeDots.nth(1)).toHaveCSS('opacity', '0.32');
+    const previousControl = activeControls.locator('.ytcq-games-cycle-action-previous');
+    const nextControl = activeControls.locator('.ytcq-games-cycle-action-next');
+    await expect(previousControl).toHaveCSS('border-top-left-radius', '8px');
+    await expect(previousControl).toHaveCSS('border-top-right-radius', '8px');
+    await expect(nextControl).toHaveCSS('border-top-left-radius', '8px');
+    await expect(nextControl).toHaveCSS('border-top-right-radius', '8px');
+    await previousControl.hover();
+    await expect(previousControl).toHaveCSS('box-shadow', 'none');
+
+    const root = chat.locator('html');
+    const originalSkin = await root.getAttribute('data-ytcq-chat-skin');
+    const originalTheme = await root.getAttribute('data-ytcq-chat-skin-theme');
+    await root.evaluate((element) => {
+      element.setAttribute('data-ytcq-chat-skin', 'aero');
+      element.setAttribute('data-ytcq-chat-skin-theme', 'light');
+    });
+    const headerControl = card.locator('.ytcq-profile-card-header-button').first();
+    await headerControl.hover();
+    const headerHoverTreatment = await readButtonTreatment(headerControl);
+    await nextControl.hover();
+    await expect(nextControl).toHaveCSS('color', headerHoverTreatment.color);
+    const cycleHoverTreatment = await readButtonTreatment(nextControl);
+    expect(cycleHoverTreatment.backgroundImage).toBe(headerHoverTreatment.backgroundImage);
+    expect(cycleHoverTreatment.backgroundImage).not.toBe('none');
+    const nextControlBox = await nextControl.boundingBox();
+    if (!nextControlBox) throw new Error('Expected the active-game next button to be visible.');
+    await page.mouse.move(
+      nextControlBox.x + nextControlBox.width / 2,
+      nextControlBox.y + nextControlBox.height / 2
+    );
+    await page.mouse.down();
+    expect(await readButtonTreatment(nextControl)).toEqual(cycleHoverTreatment);
+    await page.mouse.up();
+    await expect(card.locator('.ytcq-games-active-row')).toContainText('HELP-A-FRIEND! Trivia');
+    await expect(activeDots.nth(1)).toHaveClass(/ytcq-games-active-dot-current/);
+    await root.evaluate((element, attributes) => {
+      for (const [name, value] of Object.entries(attributes)) {
+        if (value === null) element.removeAttribute(name);
+        else element.setAttribute(name, value);
+      }
+    }, {
+      'data-ytcq-chat-skin': originalSkin,
+      'data-ytcq-chat-skin-theme': originalTheme
+    });
+    await activeControls.locator('.ytcq-games-cycle-action-previous').click();
+    await expect(card.locator('.ytcq-games-active-row')).toContainText('Chess');
 
     await activeRow.getByRole('button', { name: 'Resume' }).click();
     await expect(chat.locator('.ytcq-chess-game-panel')).toBeVisible();
@@ -402,6 +513,17 @@ export const playgroundStickAroundComputerOverlayScenario: BrowserScenario = asy
     }
 
     const card = await openGamePlayerListFromChat(chat, backend, 'Stick Around!');
+    const root = chat.locator('html');
+    const aeroSurfaceTreatments = {} as Record<'dark' | 'light', SurfaceTreatment>;
+    for (const theme of ['light', 'dark'] as const) {
+      await root.evaluate((element, value) => {
+        element.setAttribute('data-ytcq-chat-skin-theme', value);
+      }, theme);
+      aeroSurfaceTreatments[theme] = await readSurfaceTreatment(card);
+    }
+    await root.evaluate((element) => {
+      element.setAttribute('data-ytcq-chat-skin-theme', 'light');
+    });
     await invitePlayer(card, 'Computer (Stick Around!)');
     const invite = await backend.waitForClientMessage('invite');
     expect(invite).toMatchObject({
@@ -424,7 +546,17 @@ export const playgroundStickAroundComputerOverlayScenario: BrowserScenario = asy
     await expect.poll(() => isChatScrolledToBottom(chat)).toBe(true);
     await expect(overlay).toHaveClass(/ytcq-game-overlay-theme-light/);
     await expect(overlay).toHaveCSS('background-color', 'rgba(255, 255, 255, 0.78)');
-    await expect(overlay.locator('.ytcq-game-overlay-header')).toBeVisible();
+    const overlayHeader = overlay.locator('.ytcq-game-overlay-header');
+    await expect(overlayHeader).toBeVisible();
+    for (const theme of ['light', 'dark'] as const) {
+      await root.evaluate((element, value) => {
+        element.setAttribute('data-ytcq-chat-skin-theme', value);
+      }, theme);
+      expect(await readSurfaceTreatment(overlayHeader)).toEqual(aeroSurfaceTreatments[theme]);
+    }
+    await root.evaluate((element) => {
+      element.setAttribute('data-ytcq-chat-skin-theme', 'light');
+    });
     await expect(overlay.locator('.ytcq-game-overlay-icon')).toBeVisible();
     await expect(overlay.locator('.ytcq-game-overlay-title')).toHaveText('Stick Around!');
     await expect(overlay.locator('.ytcq-game-overlay-subtitle')).toHaveText('Computer (Stick Around!)');
@@ -838,6 +970,13 @@ async function openGamesCard(
 async function openGamePlayerList(card: Locator, gameLabel: string): Promise<void> {
   await getGameCard(card, gameLabel).click();
   await expect(card.locator('.ytcq-profile-card-title')).toHaveText(gameLabel);
+  await expect(card.locator('.ytcq-games-section-title')).toHaveText('Players');
+  const detailActions = card.locator('.ytcq-games-detail-actions');
+  const cancel = detailActions.getByRole('button', { name: 'Cancel' });
+  await expect(detailActions).toHaveCSS('display', 'flex');
+  await expect(detailActions).toHaveCSS('justify-content', 'flex-end');
+  await expect(cancel).toBeVisible();
+  await expect(cancel).toHaveClass(/ytcq-profile-card-open/);
 }
 
 async function openGamePlayerListFromChat(
@@ -1118,6 +1257,31 @@ async function readButtonTreatment(button: Locator): Promise<{
     return {
       backgroundColor: style.backgroundColor,
       backgroundImage: style.backgroundImage,
+      borderRadius: style.borderRadius,
+      boxShadow: style.boxShadow,
+      color: style.color
+    };
+  });
+}
+
+interface SurfaceTreatment {
+  backdropFilter: string;
+  backgroundColor: string;
+  backgroundImage: string;
+  borderColor: string;
+  borderRadius: string;
+  boxShadow: string;
+  color: string;
+}
+
+async function readSurfaceTreatment(surface: Locator): Promise<SurfaceTreatment> {
+  return surface.evaluate((element) => {
+    const style = getComputedStyle(element);
+    return {
+      backdropFilter: style.backdropFilter,
+      backgroundColor: style.backgroundColor,
+      backgroundImage: style.backgroundImage,
+      borderColor: style.borderColor,
       borderRadius: style.borderRadius,
       boxShadow: style.boxShadow,
       color: style.color

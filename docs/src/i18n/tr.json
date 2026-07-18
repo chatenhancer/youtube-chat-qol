@@ -55,6 +55,7 @@
     "commandsTitle": "Tab komutlarıyla daha fazlasını yapın",
     "commandsBody": "Tab'a basarak kısa komutları bahsetmelere, alıntılara, zaman yardımcılarına, çevirilere, gelen kutusu takiplerine ve ayarlara dönüştürün.",
     "commandsLink": "Komut başvurusunu aç",
+    "walkthroughClipCta": "İzle",
     "walkthroughTitle": "Özelliklerin kısa tanıtımını izleyin",
     "walkthroughBody": "Çeviri, gelen kutusu, odak modu, yer işaretli kullanıcılar, emojiler, komutlar ve açılır pencere ayarlarının birlikte nasıl çalıştığını görün.",
     "walkthroughCta": "Tanıtımı izle",
@@ -82,7 +83,7 @@
     "eyebrow": "Playground",
     "title": "<span class=\"title-emphasis\">Küçük oyunlar</span><br>canlı sohbet molaları için",
     "copy": "Playground, yayınları daha etkileşimli hale getiren isteğe bağlı bir oyun alanıdır. Bir oyun seçin, uygun bir izleyiciyi* davet edin, oynamaya başlayın ve sohbeti yakında tutun.",
-    "primaryCta": "Uzantıda dene",
+    "primaryCta": "Nasıl oynanır",
     "secondaryCta": "Daha fazla bilgi",
     "imageAlt": "YouTube canlı sohbetinde yüzen satranç oyun paneli",
     "note": "* Birlikte oynayabilmek için iki oyuncuda da uzantı olmalıdır"

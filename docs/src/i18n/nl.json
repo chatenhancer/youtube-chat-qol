@@ -55,6 +55,7 @@
     "commandsTitle": "Meer doen met Tab-commando’s",
     "commandsBody": "Druk op Tab om korte commando’s uit te breiden tot vermeldingen, citaten, tijdhulpen, vertalingen, inboxbewaking en instellingen.",
     "commandsLink": "Commandoreferentie bekijken",
+    "walkthroughClipCta": "Bekijken",
     "walkthroughTitle": "Bekijk een rondleiding door de functies",
     "walkthroughBody": "Zie hoe vertaling, Inbox, Focusmodus, gebruikersbladwijzers, emoji’s, commando’s en pop-upinstellingen samen werken.",
     "walkthroughCta": "Rondleiding bekijken",
@@ -82,7 +83,7 @@
     "eyebrow": "Playground",
     "title": "<span class=\"title-emphasis\">Kleine games</span> voor<br>pauzes in de livechat",
     "copy": "Playground is een optionele speelruimte die streams interactiever maakt. Kies een game, nodig een beschikbare kijker* uit, begin met spelen en houd de chat in de buurt.",
-    "primaryCta": "Probeer het in de extensie",
+    "primaryCta": "Zo speel je",
     "secondaryCta": "Meer informatie",
     "imageAlt": "Zwevend schaakpaneel in YouTube-livechat",
     "note": "* Beide spelers hebben de extensie nodig om samen te spelen"

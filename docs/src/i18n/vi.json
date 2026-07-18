@@ -55,6 +55,7 @@
     "commandsTitle": "Làm được nhiều hơn với lệnh Tab",
     "commandsBody": "Nhấn Tab để mở rộng lệnh ngắn thành nhắc tên, trích dẫn, trợ giúp thời gian, bản dịch, theo dõi Inbox và cài đặt.",
     "commandsLink": "Xem tham chiếu lệnh",
+    "walkthroughClipCta": "Xem",
     "walkthroughTitle": "Xem video giới thiệu tính năng",
     "walkthroughBody": "Xem cách bản dịch, Inbox, chế độ Focus, người dùng đã đánh dấu, emoji, lệnh và cài đặt popup phối hợp với nhau.",
     "walkthroughCta": "Xem giới thiệu",
@@ -82,7 +83,7 @@
     "eyebrow": "Playground",
     "title": "<span class=\"title-emphasis\">Trò chơi nhỏ</span> cho<br>những lúc live chat nghỉ nhịp",
     "copy": "Playground là không gian chơi game tùy chọn giúp livestream tương tác hơn. Chọn một trò chơi: mời một người xem đang sẵn sàng*, bắt đầu chơi và vẫn giữ chat ở gần.",
-    "primaryCta": "Thử trong tiện ích",
+    "primaryCta": "Cách chơi",
     "secondaryCta": "Tìm hiểu thêm",
     "imageAlt": "Bảng chơi cờ vua nổi bên trong live chat YouTube",
     "note": "* Cả hai người chơi đều cần có tiện ích để chơi cùng nhau"

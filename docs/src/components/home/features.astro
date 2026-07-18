@@ -1,15 +1,52 @@
 ---
 import Icon from '../common/icon.astro';
+import WalkthroughClipTag from '../common/walkthrough-clip-tag.astro';
 import type { Messages } from '../../data/site';
 
 const { messages: m } = Astro.props as { messages: Messages };
 const features = [
-  ['translate', m.features.translationTitle, m.features.translationBody],
-  ['alternate_email', m.features.mentionTitle, m.features.mentionBody],
-  ['person_search', m.features.contextTitle, m.features.contextBody],
-  ['inbox', m.features.inboxTitle, m.features.inboxBody],
-  ['mood', m.features.emojisTitle, m.features.emojisBody],
-  ['terminal', m.features.commandsTitle, m.features.commandsBody]
+  {
+    body: m.features.translationBody,
+    chapter: 'translate-live-chat',
+    clipTitle: m.features.walkthroughKeyPointTranslation,
+    icon: 'translate',
+    title: m.features.translationTitle
+  },
+  {
+    body: m.features.mentionBody,
+    chapter: 'mention-and-quote',
+    clipTitle: m.features.walkthroughKeyPointMentions,
+    icon: 'alternate_email',
+    title: m.features.mentionTitle
+  },
+  {
+    body: m.features.contextBody,
+    chapter: 'review-user-profiles',
+    clipTitle: m.features.walkthroughKeyPointUserCards,
+    icon: 'person_search',
+    title: m.features.contextTitle
+  },
+  {
+    body: m.features.inboxBody,
+    chapter: 'never-miss-messages',
+    clipTitle: m.features.walkthroughKeyPointInbox,
+    icon: 'inbox',
+    title: m.features.inboxTitle
+  },
+  {
+    body: m.features.emojisBody,
+    chapter: 'keep-emojis-close',
+    clipTitle: m.features.walkthroughKeyPointEmojis,
+    icon: 'mood',
+    title: m.features.emojisTitle
+  },
+  {
+    body: m.features.commandsBody,
+    chapter: 'use-tab-commands',
+    clipTitle: m.features.walkthroughKeyPointCommands,
+    icon: 'terminal',
+    title: m.features.commandsTitle
+  }
 ] as const;
 ---
 
@@ -24,8 +61,13 @@ const features = [
     </span>
     <h2 id="features-title" set:html={m.features.title}></h2>
     <div class="feature-grid">
-      {features.map(([icon, title, body]) => (
-        <article class="feature">
+      {features.map(({ body, chapter, clipTitle, icon, title }) => (
+        <article class="feature walkthrough-clip-tag-host">
+          <WalkthroughClipTag
+            chapter={chapter}
+            label={m.features.walkthroughClipCta}
+            title={clipTitle}
+          />
           <span class:list={['feature-icon', icon === 'inbox' && 'feature-icon-inbox']} data-symbol={icon} aria-hidden="true">
             <Icon name={icon} viewBox={icon === 'inbox' ? '0 0 24 24' : '0 -960 960 960'} />
             {icon === 'inbox' && <span class="feature-icon-badge">1</span>}

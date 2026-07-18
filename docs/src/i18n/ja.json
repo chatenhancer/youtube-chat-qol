@@ -55,6 +55,7 @@
     "commandsTitle": "Tab コマンドでさらに効率よく",
     "commandsBody": "Tab を押すと、短いコマンドをメンション、引用、時刻ヘルパー、翻訳、受信トレイの監視、設定へ展開できます。",
     "commandsLink": "コマンドリファレンスを見る",
+    "walkthroughClipCta": "見る",
     "walkthroughTitle": "機能の動きを動画で確認",
     "walkthroughBody": "翻訳、受信トレイ、フォーカスモード、ブックマークしたユーザー、絵文字、コマンド、ポップアップ設定が連携する様子を確認できます。",
     "walkthroughCta": "紹介動画を見る",
@@ -82,7 +83,7 @@
     "eyebrow": "Playground",
     "title": "ライブチャットの休憩に<br><span class=\"title-emphasis\">小さなゲーム</span>",
     "copy": "Playground は、配信に軽いインタラクションを加える任意参加のゲームスペースです。ゲームを選び、参加可能な視聴者*を招待して遊びながら、チャットもそばに置いておけます。",
-    "primaryCta": "拡張機能で試す",
+    "primaryCta": "遊び方",
     "secondaryCta": "詳しく見る",
     "imageAlt": "YouTube ライブチャット内に浮かぶチェスゲームパネル",
     "note": "* 一緒に遊ぶには、両方のプレイヤーが拡張機能を入れている必要があります"

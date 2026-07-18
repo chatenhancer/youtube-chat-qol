@@ -55,6 +55,7 @@
     "commandsTitle": "Allez plus vite avec les commandes Tab",
     "commandsBody": "Appuyez sur Tab pour transformer de courtes commandes en mentions, citations, aides horaires, traductions, suivis de boîte de réception et réglages.",
     "commandsLink": "Voir la référence des commandes",
+    "walkthroughClipCta": "Regarder",
     "walkthroughTitle": "Regardez une présentation des fonctionnalités",
     "walkthroughBody": "Voyez comment la traduction, la boîte de réception, le mode Focus, les utilisateurs enregistrés, les emojis, les commandes et les réglages de la fenêtre contextuelle fonctionnent ensemble.",
     "walkthroughCta": "Voir la présentation",
@@ -82,7 +83,7 @@
     "eyebrow": "Playground",
     "title": "<span class=\"title-emphasis\">Petits jeux</span> pour<br>les pauses du chat en direct",
     "copy": "Playground est un espace de jeux optionnel qui rend les lives plus interactifs. Choisissez un jeu : invitez un spectateur disponible*, lancez la partie et gardez le chat à portée.",
-    "primaryCta": "L’essayer dans l’extension",
+    "primaryCta": "Comment jouer",
     "secondaryCta": "En savoir plus",
     "imageAlt": "Panneau d’échecs flottant dans le chat en direct YouTube",
     "note": "* Les deux joueurs doivent avoir l’extension pour jouer ensemble"

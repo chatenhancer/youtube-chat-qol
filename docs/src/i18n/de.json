@@ -55,6 +55,7 @@
     "commandsTitle": "Mehr erledigen mit Tab-Befehlen",
     "commandsBody": "Drücke Tab, um kurze Befehle zu Erwähnungen, Zitaten, Zeithilfen, Übersetzungen, Posteingangsregeln und Einstellungen zu erweitern.",
     "commandsLink": "Befehlsreferenz ansehen",
+    "walkthroughClipCta": "Ansehen",
     "walkthroughTitle": "Sieh dir die Funktionen im Überblick an",
     "walkthroughBody": "Sieh, wie Übersetzung, Posteingang, Fokusmodus, Nutzer-Lesezeichen, Emojis, Befehle und Popup-Einstellungen zusammenspielen.",
     "walkthroughCta": "Überblick ansehen",
@@ -82,7 +83,7 @@
     "eyebrow": "Playground",
     "title": "<span class=\"title-emphasis\">Kleine Spiele</span> für<br>Pausen im Livechat",
     "copy": "Playground ist ein optionaler Spielebereich, der Streams interaktiver macht. Wähle ein Spiel, lade einen verfügbaren Zuschauer* ein, leg los und behalte den Chat in der Nähe.",
-    "primaryCta": "In der Erweiterung ausprobieren",
+    "primaryCta": "So wird gespielt",
     "secondaryCta": "Mehr erfahren",
     "imageAlt": "Schwebendes Schachfenster im YouTube-Livechat",
     "note": "* Beide Personen brauchen die Erweiterung, um zusammen zu spielen"

@@ -1,6 +1,7 @@
 ---
 import Icon from '../common/icon.astro';
 import type { Messages } from '../../data/site';
+import { getWalkthroughClip } from '../../data/walkthrough';
 
 interface GamePostPaths {
   chess: string;
@@ -36,6 +37,7 @@ const playgroundGames = [
     src: 'assets/playground/replay-trivia-logo.png'
   }
 ];
+const gamesWalkthroughClip = getWalkthroughClip('games');
 ---
 
 <section class="playground-section" id="playground" aria-labelledby="playground-title">
@@ -51,12 +53,18 @@ const playgroundGames = [
           loading="lazy"
           decoding="async"
         >
-        <span class="playground-beta-badge">Beta</span>
       </div>
       <h2 id="playground-title" set:html={m.playground.title}></h2>
       <p>{m.playground.copy}</p>
       <div class="playground-actions">
-        <a class="button button-primary" href="#install">
+        <a
+          class="button button-primary"
+          href="#install"
+          data-walkthrough-clip-open
+          data-walkthrough-clip-start={gamesWalkthroughClip.startSeconds}
+          data-walkthrough-clip-end={gamesWalkthroughClip.endSeconds}
+          data-walkthrough-clip-title={m.features.walkthroughKeyPointGames}
+        >
           <span class="button-icon" data-symbol="extension" aria-hidden="true">
             <Icon name="extension" />
           </span>

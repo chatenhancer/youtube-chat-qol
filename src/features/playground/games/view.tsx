@@ -223,10 +223,14 @@ function createActiveGameHeader(
   );
   header.append(
     el<HTMLSpanElement>(
-      <span class="ytcq-games-active-controls">
+      <span class="ytcq-games-active-controls" role="group" aria-label={t('gamesActiveGame')}>
         {previous}
-        <span class="ytcq-games-active-count">
-          {gameIndex + 1}/{games.length}
+        <span class="ytcq-games-active-position" aria-hidden="true">
+          {games.map((_, index) => (
+            <span
+              class={`ytcq-games-active-dot${index === gameIndex ? ' ytcq-games-active-dot-current' : ''}`}
+            ></span>
+          ))}
         </span>
         {next}
       </span>
@@ -354,10 +358,18 @@ function renderPlayWithView(
   state: GamesPanelState,
   actions: GamesViewActions
 ): void {
-  const back = createSmallActionButton(t('gamesBack'), {
-    onClick: actions.onBackToLobby
-  });
-  const nav = el<HTMLDivElement>(<div class="ytcq-games-detail-nav">{back}</div>);
+  const cancel = el<HTMLButtonElement>(
+    <button
+      type="button"
+      class="ytcq-profile-card-open ytcq-games-detail-cancel"
+      onClick={actions.onBackToLobby}
+    >
+      {t('gamesCancelInvite')}
+    </button>
+  );
+  const detailActions = el<HTMLDivElement>(
+    <div class="ytcq-profile-card-actions ytcq-games-detail-actions">{cancel}</div>
+  );
 
   const section = createGamesSection(t('gamesPlayers'));
   const list = el<HTMLDivElement>(<div class="ytcq-games-player-list" />);
@@ -369,7 +381,7 @@ function renderPlayWithView(
     list.append(createPlayerRow(player, state, actions));
   });
   section.append(list);
-  body.append(nav, section);
+  body.append(section, detailActions);
 }
 
 function createPlayerRow(
@@ -469,13 +481,17 @@ function createCycleButton(
   onClick: () => void,
   direction: 'next' | 'previous' = 'previous'
 ): HTMLButtonElement {
-  const button = createSmallActionButton('', { onClick });
-  button.classList.add('ytcq-games-cycle-action');
-  if (direction === 'next') button.classList.add('ytcq-games-cycle-action-next');
-  button.setAttribute('aria-label', targetLabel);
-  button.title = targetLabel;
-  button.append(createChevronBackwardIcon());
-  return button;
+  return el<HTMLButtonElement>(
+    <button
+      type="button"
+      class={`ytcq-games-cycle-action ytcq-games-cycle-action-${direction}`}
+      aria-label={targetLabel}
+      title={targetLabel}
+      onClick={onClick}
+    >
+      {createChevronBackwardIcon()}
+    </button>
+  );
 }
 
 function getClampedActiveGameIndex(index: number, length: number): number {

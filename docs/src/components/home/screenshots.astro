@@ -1,5 +1,6 @@
 ---
 import Icon from '../common/icon.astro';
+import WalkthroughClipTag from '../common/walkthrough-clip-tag.astro';
 import type { Messages } from '../../data/site';
 
 const { messages: m, rootPrefix } = Astro.props as {
@@ -24,7 +25,12 @@ const { messages: m, rootPrefix } = Astro.props as {
       <figure class="showcase-figure">
         <div class="showcase-stack">
           <article class="showcase-panel" data-screenshot-panel="translation">
-            <div class="showcase-copy showcase-copy-balanced">
+            <div class="showcase-copy showcase-copy-balanced walkthrough-clip-tag-host">
+              <WalkthroughClipTag
+                chapter="translate-live-chat"
+                label={m.features.walkthroughClipCta}
+                title={m.features.walkthroughKeyPointTranslation}
+              />
               <div class="showcase-brand">
                 <img src={`${rootPrefix}assets/logo.png`} width="178" height="60" alt="Chat Enhancer for YouTube">
               </div>
@@ -73,7 +79,12 @@ const { messages: m, rootPrefix } = Astro.props as {
             <div class="showcase-media showcase-media-inbox-context">
               <img src={`${rootPrefix}assets/screenshots/hero-img2.png`} alt={m.screenshots.mentionAlt}>
             </div>
-            <div class="showcase-copy">
+            <div class="showcase-copy walkthrough-clip-tag-host">
+              <WalkthroughClipTag
+                chapter="mention-and-quote"
+                label={m.features.walkthroughClipCta}
+                title={m.features.walkthroughKeyPointMentions}
+              />
               <div class="showcase-brand">
                 <img src={`${rootPrefix}assets/logo.png`} width="178" height="60" alt="Chat Enhancer for YouTube">
               </div>
@@ -95,7 +106,12 @@ const { messages: m, rootPrefix } = Astro.props as {
           </article>
 
           <article class="showcase-panel" data-screenshot-panel="extras">
-            <div class="showcase-copy showcase-copy-balanced">
+            <div class="showcase-copy showcase-copy-balanced walkthrough-clip-tag-host">
+              <WalkthroughClipTag
+                chapter="review-user-profiles"
+                label={m.features.walkthroughClipCta}
+                title={m.features.walkthroughKeyPointUserCards}
+              />
               <div class="showcase-brand">
                 <img src={`${rootPrefix}assets/logo.png`} width="178" height="60" alt="Chat Enhancer for YouTube">
               </div>

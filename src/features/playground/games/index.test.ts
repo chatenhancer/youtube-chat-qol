@@ -244,9 +244,13 @@ describe('playground games header button', () => {
     getGameCards()[0].click();
     expect(document.querySelector('.ytcq-profile-card-title')?.textContent).toBe('Chess');
     expect(document.querySelector('.ytcq-profile-card-subtitle')?.textContent).toBe('Invite a player');
+    expect(getGamesSectionTitles()).toEqual(['Players']);
+    expect(getDetailCancelButton().textContent).toBe('Cancel');
+    expect(getDetailCancelButton().classList).toContain('ytcq-profile-card-open');
+    expect(document.querySelector('.ytcq-games-detail-header')).toBeNull();
     expect(document.querySelector('.ytcq-games-section-empty')?.textContent).toBe('There are no players available.');
     expect(document.querySelector('.ytcq-games-player-row')).toBeNull();
-    getActionButton('Back').click();
+    getDetailCancelButton().click();
 
     button.click();
 
@@ -474,7 +478,20 @@ describe('playground games header button', () => {
     gamesButton.click();
     expect(document.querySelector('.ytcq-games-active-row')?.textContent).toContain('Chess');
     expect(document.querySelector('.ytcq-games-active-row')?.textContent).toContain('Luna Chat');
-    expect(document.querySelector('.ytcq-games-active-count')?.textContent).toBe('1/2');
+    expect(document.querySelectorAll('.ytcq-games-active-dot')).toHaveLength(2);
+    expect(document.querySelector('.ytcq-games-active-dot-current')).toBe(
+      document.querySelectorAll('.ytcq-games-active-dot')[0]
+    );
+    expect(document.querySelector('.ytcq-games-active-position')?.getAttribute('aria-hidden')).toBe(
+      'true'
+    );
+    expect(document.querySelector('.ytcq-games-active-controls')?.getAttribute('role')).toBe('group');
+    expect(document.querySelector('.ytcq-games-active-controls')?.getAttribute('aria-label')).toBe('Active games');
+    expect(document.querySelector('.ytcq-games-cycle-action-previous')).not.toBeNull();
+    expect(document.querySelector('.ytcq-games-cycle-action-next')).not.toBeNull();
+    expect(document.querySelector('.ytcq-games-cycle-action')?.classList).not.toContain(
+      'ytcq-games-small-action'
+    );
     document.querySelectorAll<HTMLButtonElement>('.ytcq-games-cycle-action')[1].click();
     expect(document.querySelector('.ytcq-games-active-row')?.textContent).toContain('HELP-A-FRIEND! Trivia');
     expect(document.querySelector('.ytcq-games-active-row')?.textContent).toContain('Luna Chat');
@@ -497,7 +514,7 @@ describe('playground games header button', () => {
     getGameCards()[0].click();
     expect(getPlayerNames()).toEqual(['Marco Vibes']);
 
-    getActionButton('Back').click();
+    getDetailCancelButton().click();
     getGameCards()[2].click();
     expect(getPlayerNames()).toEqual(['Luna Chat', 'Marco Vibes']);
   });
@@ -616,7 +633,7 @@ describe('playground games header button', () => {
       type: 'ytcq:playground:invite'
     });
 
-    getActionButton('Back').click();
+    getDetailCancelButton().click();
     expect(document.querySelector('.ytcq-profile-card-title')?.textContent).toBe('Games');
     expect(document.querySelector('.ytcq-profile-card-subtitle')?.textContent).toBe('2 players online');
 
@@ -1731,6 +1748,12 @@ function getActionButton(label: string): HTMLButtonElement {
   const button = Array.from(document.querySelectorAll<HTMLButtonElement>('.ytcq-games-small-action'))
     .find((candidate) => candidate.textContent === label);
   if (!button) throw new Error(`Missing games action button: ${label}`);
+  return button;
+}
+
+function getDetailCancelButton(): HTMLButtonElement {
+  const button = document.querySelector<HTMLButtonElement>('.ytcq-games-detail-cancel');
+  if (!button) throw new Error('Missing games detail Cancel button.');
   return button;
 }
 

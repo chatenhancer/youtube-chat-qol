@@ -87,6 +87,8 @@
 .mobile-header-menu-panel,
 .mobile-header-menu-nav a,
 .walkthrough-modal,
+.walkthrough-clip-modal,
+.walkthrough-clip-video-frame,
 .walkthrough-video-frame,
 .walkthrough-key-points,
 .walkthrough-key-point-panel,
@@ -97,7 +99,6 @@
 .feature-grid::before,
 .feature-walkthrough,
 .feature-icon,
-.playground-beta-badge,
 .playground-game-logo-link,
 .playground-preview::before,
 .playground-preview-card,
@@ -1124,6 +1125,110 @@ html[dir="rtl"] .hero-blog-ticker-next svg {
   backdrop-filter: blur(3px);
 }
 
+.walkthrough-clip-modal {
+  width: min(760px, calc(100% - 32px));
+  max-height: calc(100dvh - 32px);
+  padding: 0;
+  overflow: hidden;
+  color: #fff;
+  background: #0b0d11;
+  border: 0;
+  border-radius: var(--modal-corner-radius);
+  box-shadow: 0 30px 90px rgba(15, 23, 42, 0.42);
+}
+
+.walkthrough-clip-modal::backdrop {
+  background: rgba(15, 23, 42, 0.58);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+}
+
+.walkthrough-clip-panel,
+.walkthrough-clip-video-frame {
+  position: relative;
+}
+
+.walkthrough-clip-title {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.walkthrough-clip-video-frame {
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: #0b0d11;
+  border-radius: inherit;
+}
+
+.walkthrough-clip-video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+.walkthrough-clip-tag-host {
+  position: relative;
+}
+
+.walkthrough-clip-tag {
+  position: absolute;
+  z-index: 3;
+  inset-block-start: 14px;
+  inset-inline-end: 14px;
+  display: inline-flex;
+  gap: 3px;
+  align-items: center;
+  min-height: 21px;
+  max-width: calc(100% - 28px);
+  margin: 0;
+  padding: 2px 6px 2px 4px;
+  color: var(--blue);
+  background: rgba(var(--blue-rgb), 0.08);
+  border: 0;
+  border-radius: var(--icon-surface-corner-radius);
+  box-shadow: none;
+  cursor: pointer;
+  font: inherit;
+  font-size: 10px;
+  font-weight: 650;
+  line-height: 1;
+  white-space: nowrap;
+  transition: color 150ms ease, background 150ms ease, transform 150ms ease;
+}
+
+.walkthrough-clip-tag-icon {
+  flex: 0 0 auto;
+  width: 12px;
+  height: 12px;
+  fill: currentColor;
+}
+
+.walkthrough-clip-tag:hover,
+.walkthrough-clip-tag:focus-visible {
+  color: var(--blue);
+  background: rgba(var(--blue-rgb), 0.14);
+  box-shadow: none;
+  transform: translateY(-1px);
+}
+
+.walkthrough-clip-tag:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--blue) 70%, white);
+  outline-offset: 2px;
+}
+
+.showcase-copy > .walkthrough-clip-tag,
+.commands-copy > .walkthrough-clip-tag {
+  inset-block-start: 0;
+  inset-inline-end: 0;
+}
+
 .walkthrough-modal-panel {
   display: grid;
   position: relative;
@@ -1835,23 +1940,6 @@ html[dir="rtl"] .hero-blog-ticker-next svg {
   height: auto;
 }
 
-.playground-beta-badge {
-  display: inline-flex;
-  align-items: center;
-  min-height: 13px;
-  margin: 0 0 5px -6px;
-  padding: 1px 6px;
-  border: 0;
-  border-radius: 5px;
-  color: var(--playground-accent);
-  background: color-mix(in srgb, var(--playground-accent) 14%, transparent);
-  font-size: 9px;
-  font-weight: 600;
-  letter-spacing: -0.025em;
-  line-height: 12px;
-  text-transform: uppercase;
-}
-
 .playground-copy h2 {
   max-width: 640px;
   margin: 0;
@@ -2437,6 +2525,11 @@ html[dir="rtl"] .forward-link-icon {
 .privacy-policy-body {
   min-width: 0;
   overflow-wrap: break-word;
+}
+
+.privacy-policy-body #playground {
+  display: inline-block;
+  scroll-margin-block-start: calc(var(--header-scroll-offset) + 24px);
 }
 
 .privacy-policy-body h1 {
@@ -4904,7 +4997,8 @@ figcaption {
     height: 39px;
   }
 
-  .walkthrough-modal {
+  .walkthrough-modal,
+  .walkthrough-clip-modal {
     width: 100vw;
     max-width: none;
     max-height: 100dvh;
@@ -4949,7 +5043,8 @@ figcaption {
     display: none;
   }
 
-  .walkthrough-video-frame {
+  .walkthrough-video-frame,
+  .walkthrough-clip-video-frame {
     border-radius: 0;
     clip-path: none;
   }

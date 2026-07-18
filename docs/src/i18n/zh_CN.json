@@ -55,6 +55,7 @@
     "commandsTitle": "用 Tab 命令做更多事",
     "commandsBody": "按 Tab 即可把短命令展开成提及、引用、时间辅助、翻译、收件箱监听和设置。",
     "commandsLink": "打开命令参考",
+    "walkthroughClipCta": "观看",
     "walkthroughTitle": "观看功能演示",
     "walkthroughBody": "看看翻译、收件箱、专注模式、收藏用户、表情、命令和弹出窗口设置如何配合工作。",
     "walkthroughCta": "观看演示",
@@ -82,7 +83,7 @@
     "eyebrow": "Playground",
     "title": "<span class=\"title-emphasis\">小游戏</span><br>陪你度过直播聊天间隙",
     "copy": "Playground 是一个可自行开启的游戏空间，让直播更有互动感。选择一个游戏，邀请一位可加入的观众*，开始游戏，同时让聊天保持在旁边。",
-    "primaryCta": "在扩展中试用",
+    "primaryCta": "如何玩",
     "secondaryCta": "了解更多",
     "imageAlt": "YouTube 直播聊天中的悬浮国际象棋游戏面板",
     "note": "* 两名玩家都需要安装扩展才能一起玩"

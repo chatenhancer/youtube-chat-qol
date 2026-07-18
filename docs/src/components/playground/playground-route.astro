@@ -5,14 +5,24 @@ import Header from '../home/header.astro';
 import PlaygroundPage from './playground-page.astro';
 import { getBlogPostPath, getLocalizedBlogPosts } from '../../data/blog';
 import { getLocaleUrl, getMessages, htmlLangFor, locales } from '../../data/locales';
+import { findLatestWalkthroughVideo } from '../../data/media';
 import type { Locale } from '../../data/locales';
 import { site } from '../../data/site';
+import { getWalkthroughClip } from '../../data/walkthrough';
 import BaseLayout from '../../layouts/base-layout.astro';
 
 const { locale, rootPrefix } = Astro.props as { locale: Locale; rootPrefix: string };
 const messages = getMessages(locale);
 const page = messages.playgroundPage;
 const posts = getLocalizedBlogPosts(await getCollection('blog'), locale);
+const walkthroughFileName = await findLatestWalkthroughVideo();
+const clientConfig = {
+  ...(walkthroughFileName ? { walkthrough: `${rootPrefix}videos/${walkthroughFileName}` } : {})
+};
+const gamesWalkthroughClip = {
+  ...getWalkthroughClip('games'),
+  title: messages.features.walkthroughKeyPointGames
+};
 
 function getRequiredPostPath(translationKey: string): string {
   const post = posts.find((candidate) => candidate.data.translationKey === translationKey);
@@ -72,6 +82,7 @@ const alternateLinks = locales.map((targetLocale) => ({
 <BaseLayout
   alternateLinks={alternateLinks}
   canonicalUrl={canonicalUrl}
+  clientConfig={clientConfig}
   description={page.metaDescription}
   imageAlt={page.metaImageAlt}
   locale={locale}
@@ -83,10 +94,12 @@ const alternateLinks = locales.map((targetLocale) => ({
   <Header languageUrls={languageUrls} locale={locale} messages={messages} />
   <main id="top">
     <PlaygroundPage
+      clipCta={messages.playground.primaryCta}
       computerHref={getRequiredPostPath('play-playground-games-against-the-computer')}
       copy={page}
       games={games}
       installHref={`${getLocaleUrl(locale)}#install`}
+      walkthroughClip={gamesWalkthroughClip}
     />
   </main>
   <Footer locale={locale} messages={messages} />

@@ -1,20 +1,12 @@
 ---
 import type { Messages } from '../../data/site';
+import { walkthroughChapters } from '../../data/walkthrough';
 
 const { messages: m } = Astro.props as { messages: Messages };
-const walkthroughKeyPoints = [
-  { label: m.features.walkthroughKeyPointTranslation, name: 'translate-live-chat', seconds: 6, time: '0:06' },
-  { label: m.features.walkthroughKeyPointDrafts, name: 'translate-what-you-type', seconds: 25, time: '0:25' },
-  { label: m.features.walkthroughKeyPointMentions, name: 'mention-and-quote', seconds: 40, time: '0:40' },
-  { label: m.features.walkthroughKeyPointUserCards, name: 'review-user-profiles', seconds: 63, time: '1:03' },
-  { label: m.features.walkthroughKeyPointFocus, name: 'use-focus-mode', seconds: 74, time: '1:14' },
-  { label: m.features.walkthroughKeyPointInbox, name: 'never-miss-messages', seconds: 85, time: '1:25' },
-  { label: m.features.walkthroughKeyPointGames, name: 'games', seconds: 105, time: '1:45' },
-  { label: m.features.walkthroughKeyPointBookmarks, name: 'bookmark-users', seconds: 135, time: '2:15' },
-  { label: m.features.walkthroughKeyPointEmojis, name: 'keep-emojis-close', seconds: 149, time: '2:29' },
-  { label: m.features.walkthroughKeyPointCommands, name: 'use-tab-commands', seconds: 164, time: '2:44' },
-  { label: m.features.walkthroughKeyPointPopup, name: 'advanced-settings', seconds: 176, time: '2:56' }
-];
+const walkthroughKeyPoints = walkthroughChapters.map((chapter) => ({
+  ...chapter,
+  label: m.features[chapter.labelKey]
+}));
 ---
 
 <dialog class="walkthrough-modal" id="walkthrough" data-walkthrough-modal aria-labelledby="walkthrough-modal-title">
