@@ -37,23 +37,28 @@ const sourceMocks = vi.hoisted(() => ({
 }));
 
 const messageMocks = vi.hoisted(() => ({
-  renderProfileMessages: vi.fn((
-    list: HTMLElement,
-    messages: MessageRecord[],
-    _source: unknown,
-    _onClose: () => void,
-    originRecordId: number | null
-  ) => {
-    list.replaceChildren(...messages.map((message) => {
-      const item = document.createElement('div');
-      item.className = message.id === originRecordId
-        ? 'ytcq-profile-card-message ytcq-profile-card-message-origin'
-        : 'ytcq-profile-card-message';
-      item.dataset.ytcqMessageRecordId = String(message.id);
-      item.textContent = message.text;
-      return item;
-    }));
-  }),
+  renderProfileMessages: vi.fn(
+    (
+      list: HTMLElement,
+      messages: MessageRecord[],
+      _source: unknown,
+      _onClose: () => void,
+      originRecordId: number | null
+    ) => {
+      list.replaceChildren(
+        ...messages.map((message) => {
+          const item = document.createElement('div');
+          item.className =
+            message.id === originRecordId
+              ? 'ytcq-profile-card-message ytcq-profile-card-message-origin'
+              : 'ytcq-profile-card-message';
+          item.dataset.ytcqMessageRecordId = String(message.id);
+          item.textContent = message.text;
+          return item;
+        })
+      );
+    }
+  ),
   shouldRefreshProfileMessages: vi.fn(() => true)
 }));
 
@@ -63,7 +68,9 @@ const positioningMocks = vi.hoisted(() => ({
 }));
 
 const channelMocks = vi.hoisted(() => ({
-  getChannelUrl: vi.fn((_channelId?: string, authorName?: string) => `https://www.youtube.com/${authorName}`),
+  getChannelUrl: vi.fn(
+    (_channelId?: string, authorName?: string) => `https://www.youtube.com/${authorName}`
+  ),
   openChannelWindow: vi.fn()
 }));
 
@@ -153,14 +160,11 @@ describe('profile popup coordinator', () => {
     expect(avatar.title).toBe('Show recent messages');
     expect(messageMocks.renderProfileMessages).toHaveBeenCalled();
     expect(positioningMocks.positionProfileCard).toHaveBeenCalledWith(card, avatar);
-    expect(markedUserMocks.applyMarkedUserRing).toHaveBeenCalledWith(
-      expect.any(HTMLElement),
-      {
-        authorName: '@ViewerOne',
-        avatarUrl: 'https://example.com/avatar.jpg',
-        channelId: 'viewer-channel'
-      }
-    );
+    expect(markedUserMocks.applyMarkedUserRing).toHaveBeenCalledWith(expect.any(HTMLElement), {
+      authorName: '@ViewerOne',
+      avatarUrl: 'https://example.com/avatar.jpg',
+      channelId: 'viewer-channel'
+    });
     expect(card.querySelector('.ytcq-marked-user-toggle')).not.toBeNull();
 
     card.querySelector<HTMLButtonElement>('.ytcq-profile-card-author')!.click();
@@ -181,7 +185,9 @@ describe('profile popup coordinator', () => {
     message.querySelector<HTMLElement>('#author-photo')!.click();
     document.querySelector<HTMLButtonElement>('.ytcq-profile-card-channel')!.click();
 
-    expect(channelMocks.openChannelWindow).toHaveBeenCalledWith('https://www.youtube.com/@ViewerOne');
+    expect(channelMocks.openChannelWindow).toHaveBeenCalledWith(
+      'https://www.youtube.com/@ViewerOne'
+    );
   });
 
   it('renders a profile card without channel actions when no profile URL exists', () => {
@@ -353,8 +359,9 @@ describe('profile popup coordinator', () => {
     message.querySelector<HTMLElement>('#author-photo')!.click();
 
     expect(renderedMessageIds()).toEqual(range(9, 21));
-    expect(document.querySelector('.ytcq-profile-card-message-origin')?.textContent)
-      .toBe('message 15');
+    expect(document.querySelector('.ytcq-profile-card-message-origin')?.textContent).toBe(
+      'message 15'
+    );
     await vi.runOnlyPendingTimersAsync();
 
     const list = document.querySelector<HTMLElement>('.ytcq-profile-card-messages')!;
@@ -382,14 +389,18 @@ describe('profile popup coordinator', () => {
     const list = document.querySelector<HTMLElement>('.ytcq-profile-card-messages')!;
     const origin = list.querySelector<HTMLElement>('.ytcq-profile-card-message-origin')!;
     setScrollMetrics(list, { clientHeight: 100, scrollHeight: 900 });
-    vi.spyOn(list, 'getBoundingClientRect').mockReturnValue(createRect({
-      height: 100,
-      top: 100
-    }));
-    vi.spyOn(origin, 'getBoundingClientRect').mockReturnValue(createRect({
-      height: 20,
-      top: 400
-    }));
+    vi.spyOn(list, 'getBoundingClientRect').mockReturnValue(
+      createRect({
+        height: 100,
+        top: 100
+      })
+    );
+    vi.spyOn(origin, 'getBoundingClientRect').mockReturnValue(
+      createRect({
+        height: 20,
+        top: 400
+      })
+    );
 
     await vi.runOnlyPendingTimersAsync();
 
@@ -413,7 +424,9 @@ describe('profile popup coordinator', () => {
     expect(Number(card.style.zIndex)).toBeGreaterThan(initialZIndex);
     expect(positioningMocks.positionProfileCard).toHaveBeenCalledOnce();
 
-    expect(openProfileCardForIdentity({ authorName: '@ViewerOne', channelId: 'viewer-channel' })).toBe(true);
+    expect(
+      openProfileCardForIdentity({ authorName: '@ViewerOne', channelId: 'viewer-channel' })
+    ).toBe(true);
     expect(document.querySelectorAll('.ytcq-profile-card:not(.ytcq-inbox-card)')).toHaveLength(1);
     expect(document.querySelector('.ytcq-profile-card')).toBe(card);
   });
@@ -464,23 +477,31 @@ describe('profile popup coordinator', () => {
 
     firstAvatar.click();
     await vi.runOnlyPendingTimersAsync();
-    const firstCard = document.querySelector<HTMLElement>('.ytcq-profile-card:not(.ytcq-inbox-card)')!;
+    const firstCard = document.querySelector<HTMLElement>(
+      '.ytcq-profile-card:not(.ytcq-inbox-card)'
+    )!;
     const firstHeader = firstCard.querySelector<HTMLElement>('.ytcq-profile-card-header')!;
-    firstHeader.dispatchEvent(createPointerEvent('pointerdown', {
-      clientX: 120,
-      clientY: 40,
-      pointerId: 3
-    }));
-    document.dispatchEvent(createPointerEvent('pointermove', {
-      clientX: 180,
-      clientY: 80,
-      pointerId: 3
-    }));
-    document.dispatchEvent(createPointerEvent('pointerup', {
-      clientX: 180,
-      clientY: 80,
-      pointerId: 3
-    }));
+    firstHeader.dispatchEvent(
+      createPointerEvent('pointerdown', {
+        clientX: 120,
+        clientY: 40,
+        pointerId: 3
+      })
+    );
+    document.dispatchEvent(
+      createPointerEvent('pointermove', {
+        clientX: 180,
+        clientY: 80,
+        pointerId: 3
+      })
+    );
+    document.dispatchEvent(
+      createPointerEvent('pointerup', {
+        clientX: 180,
+        clientY: 80,
+        pointerId: 3
+      })
+    );
     profileTestState.participantSource = source({
       authorName: '@ViewerTwo',
       identity: {
@@ -515,14 +536,16 @@ describe('profile popup coordinator', () => {
 
     const card = document.querySelector<HTMLElement>('.ytcq-profile-card')!;
     const header = card.querySelector<HTMLElement>('.ytcq-profile-card-header')!;
-    vi.spyOn(card, 'getBoundingClientRect').mockReturnValue(createRect({
-      bottom: 200,
-      height: 180,
-      left: 100,
-      right: 400,
-      top: 20,
-      width: 300
-    }));
+    vi.spyOn(card, 'getBoundingClientRect').mockReturnValue(
+      createRect({
+        bottom: 200,
+        height: 180,
+        left: 100,
+        right: 400,
+        top: 20,
+        width: 300
+      })
+    );
     card.setPointerCapture = vi.fn();
     card.releasePointerCapture = vi.fn();
     card.style.transform = 'translateX(-50%)';
@@ -552,19 +575,23 @@ describe('profile popup coordinator', () => {
     expect(card.style.transform).toBe('');
     expect(card.setPointerCapture).toHaveBeenCalledWith(7);
 
-    document.dispatchEvent(createPointerEvent('pointermove', {
-      clientX: 2_000,
-      clientY: -100,
-      pointerId: 7
-    }));
+    document.dispatchEvent(
+      createPointerEvent('pointermove', {
+        clientX: 2_000,
+        clientY: -100,
+        pointerId: 7
+      })
+    );
     expect(card.style.left).toBe('292px');
     expect(card.style.top).toBe('8px');
 
-    document.dispatchEvent(createPointerEvent('pointerup', {
-      clientX: 2_000,
-      clientY: -100,
-      pointerId: 7
-    }));
+    document.dispatchEvent(
+      createPointerEvent('pointerup', {
+        clientX: 2_000,
+        clientY: -100,
+        pointerId: 7
+      })
+    );
     expect(card.classList.contains('ytcq-profile-card-dragging')).toBe(false);
     expect(card.releasePointerCapture).toHaveBeenCalledWith(7);
   });
@@ -580,9 +607,13 @@ describe('profile popup coordinator', () => {
   });
 
   it('opens by identity from recent history and refreshes when matching history changes', () => {
-    expect(openProfileCardForIdentity({ authorName: '@ViewerOne', channelId: 'viewer-channel' })).toBe(true);
+    expect(
+      openProfileCardForIdentity({ authorName: '@ViewerOne', channelId: 'viewer-channel' })
+    ).toBe(true);
     expect(historyMocks.recordVisibleUserMessages).toHaveBeenCalled();
-    expect(document.querySelector('.ytcq-profile-card')?.textContent).toContain('hello from history');
+    expect(document.querySelector('.ytcq-profile-card')?.textContent).toContain(
+      'hello from history'
+    );
 
     profileTestState.recentMessages = [record({ text: 'updated history' })];
     profileTestState.userMessagesChanged?.('channel:viewer-channel');
@@ -685,7 +716,9 @@ describe('profile popup coordinator', () => {
 
     resizeObserverCallbacks.at(-1)?.([], {} as ResizeObserver);
     await vi.runOnlyPendingTimersAsync();
-    expect(positioningMocks.keepProfileCardInViewport).toHaveBeenCalledWith(expect.any(HTMLElement));
+    expect(positioningMocks.keepProfileCardInViewport).toHaveBeenCalledWith(
+      expect.any(HTMLElement)
+    );
 
     avatar.remove();
     resizeObserverCallbacks.at(-1)?.([], {} as ResizeObserver);
@@ -724,7 +757,9 @@ describe('profile popup coordinator', () => {
   });
 
   it('wraps an extra-long recent-messages handle instead of shrinking below 12px', () => {
-    profileTestState.messageSource = source({ authorName: '@AnExceptionallyLongHandleThatCannotFit' });
+    profileTestState.messageSource = source({
+      authorName: '@AnExceptionallyLongHandleThatCannotFit'
+    });
     const message = createMessage();
     document.body.append(message);
     wireProfileClick(message);
@@ -821,12 +856,14 @@ function record(overrides: Partial<MessageRecord> = {}): MessageRecord {
 }
 
 function records(count: number): MessageRecord[] {
-  return Array.from({ length: count }, (_, index) => record({
-    id: index + 1,
-    messageId: `message-${index}`,
-    text: `message ${index}`,
-    timestamp: index
-  }));
+  return Array.from({ length: count }, (_, index) =>
+    record({
+      id: index + 1,
+      messageId: `message-${index}`,
+      text: `message ${index}`,
+      timestamp: index
+    })
+  );
 }
 
 function renderedMessageIds(): number[] {
@@ -853,7 +890,9 @@ function setScrollMetrics(
   });
 }
 
-function createMessage({ includeAuthorName = true }: {
+function createMessage({
+  includeAuthorName = true
+}: {
   includeAuthorName?: boolean;
 } = {}): HTMLElement {
   const message = document.createElement('yt-live-chat-text-message-renderer');
@@ -880,11 +919,14 @@ function createRect(overrides: Partial<DOMRect>): DOMRect {
   } as DOMRect;
 }
 
-function createPointerEvent(type: string, options: {
-  clientX: number;
-  clientY: number;
-  pointerId: number;
-}): Event {
+function createPointerEvent(
+  type: string,
+  options: {
+    clientX: number;
+    clientY: number;
+    pointerId: number;
+  }
+): Event {
   const event = new Event(type, {
     bubbles: true,
     cancelable: true
