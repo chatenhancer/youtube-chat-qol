@@ -1338,6 +1338,7 @@ async function focusChatHeader(page, chat, recorder, options = {}) {
   const box = await getLocatorBox(chatFrame, 'chat frame');
   await setDemoCameraForBox(page, recorder, box, {
     focusYRatio: 0,
+    preserveRightEdge: true,
     scale: 1.26,
     screenXRatio: 0.82,
     screenYRatio: 0.02
@@ -1352,6 +1353,7 @@ async function focusMessageArea(page, chat, recorder, options = {}) {
   const box = await getLocatorBox(page.locator('iframe#chatframe').first(), 'chat frame');
   await setDemoCameraForBox(page, recorder, box, {
     focusXRatio: options.alignRight ? 1 : 0.5,
+    preserveRightEdge: true,
     scale: 1.22,
     screenXRatio: options.screenXRatio ?? (options.alignRight ? 0.93 : 0.84),
     screenYRatio: 0.52,
@@ -1367,6 +1369,7 @@ async function focusComposerArea(page, chat, recorder, options = {}) {
   const box = await getLocatorBox(composer, 'chat composer');
   await setDemoCameraForBox(page, recorder, box, {
     focusYRatio: 1,
+    preserveRightEdge: true,
     scale: 1.28,
     screenXRatio: 0.84,
     screenYRatio: 0.88
@@ -1382,6 +1385,7 @@ async function focusReplyComposerOverview(page, recorder) {
   await setDemoCameraForBox(page, recorder, box, {
     focusXRatio: 0.72,
     focusYRatio: 0.58,
+    preserveRightEdge: true,
     scale: 1.15,
     screenXRatio: 0.87,
     screenYRatio: 0.56,
@@ -4776,10 +4780,12 @@ function getCameraTransformForBox(box, scale, options = {}) {
   const screenYRatio = options.screenYRatio ?? 0.5;
   const targetX = box.x + box.width * focusXRatio;
   const targetY = box.y + box.height * focusYRatio;
-  const rawX = viewport.width * screenXRatio - targetX * scale;
-  const rawY = viewport.height * screenYRatio - targetY * scale;
   const minX = viewport.width - viewport.width * scale;
   const minY = viewport.height - viewport.height * scale;
+  const rawX = options.preserveRightEdge
+    ? minX
+    : viewport.width * screenXRatio - targetX * scale;
+  const rawY = viewport.height * screenYRatio - targetY * scale;
 
   return {
     scale,
