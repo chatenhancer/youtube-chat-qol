@@ -1397,6 +1397,11 @@
     inset 0 0 18px color-mix(in srgb, var(--ytcq-aero-accent) 18%, transparent);
 }
 
+:root[data-ytcq-chat-skin="aero"] .ytcq-profile-mention {
+  color: var(--ytcq-aero-accent-strong);
+  text-shadow: none;
+}
+
 :root[data-ytcq-chat-skin="aero"] :where(
   .ytcq-profile-card-header-button,
   .ytcq-profile-card-author,

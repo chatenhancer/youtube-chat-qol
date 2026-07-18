@@ -26,7 +26,8 @@ import {
   profileCardAeroOriginHighlightScenario,
   profileCardHistoryPagingScenario,
   profileCardReceivesNewMessagesScenario,
-  profileCardRecentMessagesScenario
+  profileCardRecentMessagesScenario,
+  profileMentionOpensRecentMessagesScenario
 } from '../scenarios/profile';
 import {
   popupSettingsBehaviorScenario,
@@ -55,4 +56,8 @@ test('logged-out mock: profile card pages through retained author history', prof
 test(
   'logged-out mock: Aero highlights the current message in the profile card',
   profileCardAeroOriginHighlightScenario
+);
+test(
+  'logged-out mock: clicking a mentioned handle opens that user’s recent messages',
+  profileMentionOpensRecentMessagesScenario
 );

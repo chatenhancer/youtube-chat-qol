@@ -10,7 +10,15 @@ const profileTestState = vi.hoisted(() => ({
 
 const historyMocks = vi.hoisted(() => ({
   getLiveMessageForRecord: vi.fn(() => null),
-  getUserMessagesForIdentity: vi.fn(() => profileTestState.recentMessages),
+  getUserMessagesForIdentity: vi.fn((identity: { authorName?: string; channelId?: string }) => {
+    const authorName = (identity.authorName || '').trim().toLowerCase();
+    return profileTestState.recentMessages.filter((record) =>
+      Boolean(
+        (identity.channelId && record.channelId === identity.channelId) ||
+        (authorName && record.authorName.trim().toLowerCase() === authorName)
+      )
+    );
+  }),
   getUserKeyFromIdentity: vi.fn((identity: { authorName?: string; channelId?: string }) => {
     if (identity.channelId) return `channel:${identity.channelId}`;
     const authorName = (identity.authorName || '').trim().toLowerCase();
@@ -201,6 +209,98 @@ describe('profile popup coordinator', () => {
     const noAvatar = document.createElement('yt-live-chat-text-message-renderer');
     wireProfileClick(noAvatar);
     expect(noAvatar.dataset.ytcqProfileWired).toBe('true');
+  });
+
+  it('opens recent messages for a clicked mention and uses its linked channel identity', () => {
+    profileTestState.recentMessages = [
+      record({
+        authorName: '@MentionedViewer',
+        channelId: 'mentioned-channel',
+        text: 'mentioned viewer history'
+      })
+    ];
+    const message = createMessage();
+    message.querySelector<HTMLElement>('#message')!.innerHTML =
+      'Ask <a href="/channel/mentioned-channel">@mentionedviewer</a> about it';
+    const rowClick = vi.fn();
+    message.addEventListener('click', rowClick);
+    document.body.append(message);
+
+    wireProfileClick(message);
+    const competingListeners = new AbortController();
+    const competingDocumentAction = vi.fn();
+    document.addEventListener('click', competingDocumentAction, {
+      capture: true,
+      signal: competingListeners.signal
+    });
+    const mention = message.querySelector<HTMLElement>('.ytcq-profile-mention')!;
+    const click = new MouseEvent('click', { bubbles: true, cancelable: true });
+    mention.dispatchEvent(click);
+    competingListeners.abort();
+
+    expect(historyMocks.getUserMessagesForIdentity).toHaveBeenCalledWith({
+      authorName: '@mentionedviewer',
+      channelId: 'mentioned-channel'
+    });
+    expect(document.querySelector('.ytcq-profile-card-title')?.textContent).toBe(
+      '@MentionedViewer'
+    );
+    expect(positioningMocks.positionProfileCard).toHaveBeenCalledWith(
+      expect.any(HTMLElement),
+      mention
+    );
+    expect(click.defaultPrevented).toBe(true);
+    expect(rowClick).not.toHaveBeenCalled();
+    expect(competingDocumentAction).not.toHaveBeenCalled();
+  });
+
+  it('does not highlight a mention when that user has no recent message history', () => {
+    const message = createMessage();
+    message.querySelector<HTMLElement>('#message')!.textContent = 'Ask @MissingViewer';
+    document.body.append(message);
+
+    wireProfileClick(message);
+
+    expect(message.querySelector('.ytcq-profile-mention')).toBeNull();
+    expect(message.querySelector('#message')?.textContent).toBe('Ask @MissingViewer');
+  });
+
+  it('consumes a mention click even if its matching history disappears before activation', () => {
+    profileTestState.recentMessages = [
+      record({
+        authorName: '@MentionedViewer',
+        channelId: 'mentioned-channel'
+      })
+    ];
+    const message = createMessage();
+    message.querySelector<HTMLElement>('#message')!.textContent = 'Ask @mentionedviewer';
+    const rowClick = vi.fn();
+    message.addEventListener('click', rowClick);
+    document.body.append(message);
+
+    wireProfileClick(message);
+    const mention = message.querySelector<HTMLElement>('.ytcq-profile-mention')!;
+    profileTestState.recentMessages = [];
+    const click = new MouseEvent('click', { bubbles: true, cancelable: true });
+    mention.dispatchEvent(click);
+
+    expect(click.defaultPrevented).toBe(true);
+    expect(rowClick).not.toHaveBeenCalled();
+    expect(document.querySelector('.ytcq-profile-card')).toBeNull();
+  });
+
+  it('decorates matching mentions in Lite message rows', () => {
+    profileTestState.recentMessages = [
+      record({ authorName: '@LiteViewer', channelId: 'lite-channel' })
+    ];
+    const message = createMessage();
+    message.className = 'ytcq-lite-message';
+    message.querySelector<HTMLElement>('#message')!.textContent = 'Ask @liteviewer';
+    document.body.append(message);
+
+    wireProfileClick(message);
+
+    expect(message.querySelector('.ytcq-profile-mention')?.textContent).toBe('@liteviewer');
   });
 
   it('opens profile cards from participant avatars and names', () => {

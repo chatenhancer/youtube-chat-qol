@@ -6,7 +6,8 @@ import type { ProfileSource } from './types';
 
 const userHistoryMocks = vi.hoisted(() => ({
   getLiveMessageForRecord: vi.fn(),
-  getRecentMessagesForKey: vi.fn()
+  getRecentMessagesForKey: vi.fn(),
+  getUserMessagesForIdentity: vi.fn()
 }));
 
 const jumpMocks = vi.hoisted(() => ({
@@ -31,6 +32,12 @@ describe('profile card message renderer', () => {
     vi.clearAllMocks();
     jumpMocks.canJumpToChatMessage.mockImplementation(
       (target: HTMLElement | null) => Boolean(target?.isConnected)
+    );
+    userHistoryMocks.getUserMessagesForIdentity.mockImplementation(
+      (identity: { authorName?: string }) =>
+        identity.authorName?.toLowerCase() === '@otherviewer'
+          ? [record({ authorName: '@OtherViewer', channelId: 'other-channel' })]
+          : []
     );
     setOptions({
       ...DEFAULT_OPTIONS,
@@ -90,6 +97,23 @@ describe('profile card message renderer', () => {
     const items = list.querySelectorAll<HTMLElement>('.ytcq-profile-card-message');
     expect(items[0]?.classList.contains('ytcq-profile-card-message-origin')).toBe(false);
     expect(items[1]?.classList.contains('ytcq-profile-card-message-origin')).toBe(true);
+  });
+
+  it('makes mentioned handles clickable inside recent-message rows', () => {
+    const list = document.createElement('div');
+
+    renderProfileMessages(
+      list,
+      [record({ text: 'Ask @OtherViewer, not @MissingViewer.' })],
+      source(),
+      vi.fn()
+    );
+
+    const mention = list.querySelector<HTMLElement>('.ytcq-profile-mention');
+    expect(mention?.textContent).toBe('@OtherViewer');
+    expect(mention?.dataset.ytcqProfileMention).toBe('@OtherViewer');
+    expect(list.querySelectorAll('.ytcq-profile-mention')).toHaveLength(1);
+    expect(list.textContent).toContain('@MissingViewer');
   });
 
   it('ignores profile message keyboard events from children or unrelated keys', () => {

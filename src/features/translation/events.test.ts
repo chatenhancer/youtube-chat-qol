@@ -3,9 +3,11 @@ import {
   emitMessageTranslationCleared,
   emitMessageTranslationRendered,
   emitMessageTranslationsCleared,
+  emitTranslationTextRendered,
   onMessageTranslationCleared,
   onMessageTranslationRendered,
-  onMessageTranslationsCleared
+  onMessageTranslationsCleared,
+  onTranslationTextRendered
 } from './events';
 
 describe('translation events', () => {
@@ -59,5 +61,18 @@ describe('translation events', () => {
     expect(cleared).toHaveBeenCalledTimes(1);
     expect(cleared.mock.calls[0][0].message).toBe(message);
     expect(allCleared).toHaveBeenCalledTimes(1);
+  });
+
+  it('notifies and unsubscribes translated message-text listeners', () => {
+    const listener = vi.fn();
+    const unsubscribe = onTranslationTextRendered(listener);
+    const messageText = document.createElement('span');
+
+    emitTranslationTextRendered(messageText);
+    unsubscribe();
+    emitTranslationTextRendered(messageText);
+
+    expect(listener).toHaveBeenCalledOnce();
+    expect(listener).toHaveBeenCalledWith(messageText);
   });
 });

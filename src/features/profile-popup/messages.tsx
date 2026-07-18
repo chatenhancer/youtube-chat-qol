@@ -21,6 +21,7 @@ import {
 } from '../user-message-history';
 import { canJumpToChatMessage, createJumpToMessageIcon, jumpToChatMessage } from '../message-jump';
 import { quoteAuthorRichText } from '../reply';
+import { decorateProfileMentions } from './mentions';
 import type { ProfileSource } from './types';
 
 export function renderProfileMessages(
@@ -64,6 +65,7 @@ export function renderProfileMessages(
 
       const text = el<HTMLDivElement>(<div class="ytcq-profile-card-message-text" />);
       renderProfileMessageText(item, text, recentMessage);
+      decorateProfileMentions(text);
 
       item.append(timestamp, text);
       const jumpButton = canJumpToChatMessage(liveMessage, recentMessage.messageId)

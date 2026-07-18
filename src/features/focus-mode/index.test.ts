@@ -241,6 +241,30 @@ describe('focus mode entrypoint', () => {
     expect(rows.at(-1)?.textContent).toBe('focused message 12');
   });
 
+  it('only decorates resolvable mentions inside Focus message bubbles', async () => {
+    const knownViewer = createMessage('@KnownViewer', 'known history', 'known-channel');
+    const focusedMessage = createMessage(
+      '@FocusedViewer',
+      'Ask @knownviewer, not @MissingViewer',
+      'focused-channel'
+    );
+    document.body.append(knownViewer, focusedMessage);
+    recordFeedMessage(knownViewer);
+    recordFeedMessage(focusedMessage);
+
+    expect(
+      openFocusModeForAuthor({ authorName: '@FocusedViewer', channelId: 'focused-channel' })
+    ).toBe(true);
+    await vi.runAllTimersAsync();
+
+    const bubble = document.querySelector<HTMLElement>('.ytcq-focus-bubble')!;
+    const mentions = bubble.querySelectorAll<HTMLElement>('.ytcq-profile-mention');
+    expect(mentions).toHaveLength(1);
+    expect(mentions[0]?.textContent).toBe('@knownviewer');
+    expect(mentions[0]?.dataset.ytcqProfileMention).toBe('@KnownViewer');
+    expect(bubble.textContent).toContain('@MissingViewer');
+  });
+
   it('quotes focused-user rows from keyboard activation only on the row itself', async () => {
     const focusedMessage = createMessage(
       '@KeyboardQuoteViewer',

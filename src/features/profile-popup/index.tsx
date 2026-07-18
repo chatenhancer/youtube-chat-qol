@@ -27,9 +27,23 @@ import {
   createTranslationPriorityScope,
   type TranslationPriorityScope
 } from '../translation/queue';
+import {
+  onMessageTranslationCleared,
+  onMessageTranslationsCleared,
+  onTranslationTextRendered
+} from '../translation/events';
 import { getChannelUrl, openChannelWindow } from '../channel-popup';
 import { createAvatarElement, createProfileAvatarButton } from './elements';
 import { createProfileMessagePager } from './history-pager';
+import {
+  clearProfileMentions,
+  decorateChatMessageProfileMentions,
+  decorateProfileMentions,
+  getProfileMentionAuthorName,
+  getProfileMentionChannelId,
+  refreshVisibleProfileMentions,
+  getProfileMentionTarget
+} from './mentions';
 import { renderProfileMessages, shouldRefreshProfileMessages } from './messages';
 import { keepProfileCardInViewport, positionProfileCard } from './positioning';
 import { getMessageProfileSource, getParticipantProfileSource } from './source';
@@ -46,9 +60,13 @@ const PROFILE_AUTHOR_MAX_FONT_SIZE_PX = 14;
 const PROFILE_AUTHOR_MIN_FONT_SIZE_PX = 12;
 let nextProfileCardZIndex = 10_000;
 let profileWiringListeners = new AbortController();
+let profileMentionListenersWired = false;
+let profileMentionRefreshFrame = 0;
+let profileMentionSurfaceCleanups: Array<() => void> = [];
 
 registerFeature({
   page: {
+    init: initProfilePopupSurfaces,
     cleanup: cleanupStaleProfilePopupSurfaces,
     reset: closeProfileCard
   },
@@ -57,6 +75,8 @@ registerFeature({
 });
 
 export function wireProfileClick(message: HTMLElement): void {
+  ensureProfileMentionListeners();
+  decorateChatMessageProfileMentions(message);
   if (message.dataset.ytcqProfileWired === 'true') return;
   message.dataset.ytcqProfileWired = 'true';
 
@@ -109,7 +129,13 @@ export function wireParticipantProfileClick(participant: HTMLElement): void {
 export function cleanupStaleProfilePopupSurfaces(): void {
   profileWiringListeners.abort();
   profileWiringListeners = new AbortController();
+  profileMentionListenersWired = false;
+  profileMentionSurfaceCleanups.forEach((cleanup) => cleanup());
+  profileMentionSurfaceCleanups = [];
+  if (profileMentionRefreshFrame) window.cancelAnimationFrame(profileMentionRefreshFrame);
+  profileMentionRefreshFrame = 0;
   closeProfileCard();
+  clearProfileMentions();
   document
     .querySelectorAll<HTMLElement>('.ytcq-profile-card:not(.ytcq-inbox-card)')
     .forEach((card) => card.remove());
@@ -137,21 +163,86 @@ export function openProfileCardForIdentity(
   if (!authorName) return false;
 
   const avatarSrc = latestMessage.avatarSrc || '';
+  const channelId = identity.channelId || latestMessage.channelId;
   const source: ProfileSource = {
     authorName,
     avatarSrc,
     identity: {
       authorName,
-      channelId: identity.channelId
+      channelId
     },
-    profileUrl: getChannelUrl(identity.channelId, authorName)
+    profileUrl: getChannelUrl(channelId, authorName)
   };
 
   showProfileCard(source, anchor || findChatInput() || document.body);
   return true;
 }
 
+function ensureProfileMentionListeners(): void {
+  if (profileMentionListenersWired) return;
+  profileMentionListenersWired = true;
+  const options = {
+    capture: true,
+    signal: profileWiringListeners.signal
+  };
+  document.addEventListener('click', handleProfileMentionActivation, options);
+  document.addEventListener('keydown', handleProfileMentionActivation, options);
+}
+
+function initProfilePopupSurfaces(): void {
+  ensureProfileMentionListeners();
+  if (profileMentionSurfaceCleanups.length) return;
+
+  profileMentionSurfaceCleanups = [
+    onUserMessagesChanged(scheduleProfileMentionRefresh),
+    onMessageTranslationCleared(({ message }) => decorateChatMessageProfileMentions(message)),
+    onMessageTranslationsCleared(scheduleProfileMentionRefresh),
+    onTranslationTextRendered((messageText) => decorateProfileMentions(messageText))
+  ];
+  refreshVisibleProfileMentions();
+}
+
+function scheduleProfileMentionRefresh(): void {
+  if (profileMentionRefreshFrame) return;
+  profileMentionRefreshFrame = window.requestAnimationFrame(() => {
+    profileMentionRefreshFrame = 0;
+    refreshVisibleProfileMentions();
+  });
+}
+
+function handleProfileMentionActivation(event: MouseEvent | KeyboardEvent): void {
+  if (event instanceof MouseEvent) {
+    if (event.button !== 0) return;
+  } else if (!['Enter', ' '].includes(event.key) || event.repeat) {
+    return;
+  }
+
+  const mention = getProfileMentionTarget(event.target);
+  if (!mention) return;
+  const modifiedNativeLinkClick =
+    event instanceof MouseEvent &&
+    (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) &&
+    Boolean(mention.closest('a[href]'));
+
+  event.stopImmediatePropagation();
+  if (!modifiedNativeLinkClick) event.preventDefault();
+  if (
+    event instanceof MouseEvent &&
+    (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey)
+  )
+    return;
+
+  const authorName = getProfileMentionAuthorName(mention);
+  if (!authorName) return;
+
+  openProfileCardForIdentity(
+    { authorName, channelId: getProfileMentionChannelId(mention) },
+    mention
+  );
+}
+
 function showProfileCard(source: ProfileSource, anchor: HTMLElement): void {
+  ensureProfileMentionListeners();
   recordVisibleUserMessages();
   const profileKey = getUserKeyFromIdentity(source.identity);
   const existingCard = profileKey ? profileCardsByKey.get(profileKey) : null;

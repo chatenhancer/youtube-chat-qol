@@ -17,6 +17,7 @@ import {
   restoreReplacedTranslation
 } from '../../youtube/messages';
 import { CHAT_SCROLLER_SELECTOR } from '../../youtube/selectors';
+import { emitTranslationTextRendered } from './events';
 import {
   createNodesWithPlaceholders,
   restorePlaceholdersToText,
@@ -100,14 +101,16 @@ function renderInlineTranslation(
 ): void {
   const content = message.querySelector('#content') || message;
   const existing = message.querySelector<HTMLElement>(':scope .ytcq-translation');
-  const translation = existing || createInlineTranslationElement(result, protectedTokens);
+  const translation = createInlineTranslationElement(result, protectedTokens);
 
   if (existing) {
-    existing.replaceWith(createInlineTranslationElement(result, protectedTokens));
+    existing.replaceWith(translation);
+    emitTranslationTextRendered(translation);
     return;
   }
 
-  if (!existing) content.appendChild(translation);
+  content.appendChild(translation);
+  emitTranslationTextRendered(translation);
 }
 
 function renderReplacementTranslation(
@@ -208,6 +211,7 @@ export function renderToggleableReplacementTranslation({
           view
         })
       );
+      emitTranslationTextRendered(textElement);
       return;
     }
 
@@ -220,6 +224,7 @@ export function renderToggleableReplacementTranslation({
         view
       })
     );
+    emitTranslationTextRendered(textElement);
   };
 
   renderView('translated');
@@ -296,6 +301,7 @@ function renderReplacedTranslationView(message: HTMLElement, view: ReplacedTrans
     }
     messageText.title = getOriginalReplacementTitle(state.result, state.protectedTokens);
     message.dataset.ytcqTranslationView = 'original';
+    emitTranslationTextRendered(messageText);
     return;
   }
 
@@ -310,6 +316,7 @@ function renderReplacedTranslationView(message: HTMLElement, view: ReplacedTrans
   messageText.lang = state.result.targetLanguage;
   messageText.title = getReplacementTranslationTitle(state.result, state.originalText);
   message.dataset.ytcqTranslationView = 'translated';
+  emitTranslationTextRendered(messageText);
 }
 
 function normalizeLanguageCode(language: string): string {

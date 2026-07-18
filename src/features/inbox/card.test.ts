@@ -57,12 +57,17 @@ const channelPopupMocks = vi.hoisted(() => ({
   openChannelWindow: vi.fn()
 }));
 
+const userHistoryMocks = vi.hoisted(() => ({
+  getUserMessagesForIdentity: vi.fn()
+}));
+
 vi.mock('./state', () => stateMocks);
 vi.mock('./keyword-panel', () => keywordPanelMocks);
 vi.mock('../reply', () => replyMocks);
 vi.mock('../message-jump', () => jumpMocks);
 vi.mock('../marked-users', () => markedUserMocks);
 vi.mock('../channel-popup', () => channelPopupMocks);
+vi.mock('../user-message-history', () => userHistoryMocks);
 
 import {
   cleanupStaleInboxCards,
@@ -82,6 +87,22 @@ describe('inbox card view', () => {
     vi.clearAllMocks();
     jumpMocks.canJumpToChatMessage.mockImplementation(
       (target: HTMLElement | null) => Boolean(target?.isConnected)
+    );
+    userHistoryMocks.getUserMessagesForIdentity.mockImplementation(
+      (identity: { authorName?: string }) =>
+        identity.authorName?.toLowerCase() === '@knownviewer'
+          ? [
+              {
+                authorName: '@KnownViewer',
+                channelId: 'known-channel',
+                contentParts: [],
+                id: 1,
+                text: 'known history',
+                timestamp: 1,
+                timestampText: '9:30 PM'
+              }
+            ]
+          : []
     );
   });
 
@@ -151,6 +172,20 @@ describe('inbox card view', () => {
     openInboxCardView(undefined, callbacks);
     document.querySelector<HTMLButtonElement>('.ytcq-inbox-clear')!.click();
     expect(callbacks.onClearRecords).toHaveBeenCalledOnce();
+  });
+
+  it('only decorates resolvable mentions inside Inbox message text', () => {
+    records = [record({ text: 'Ask @knownviewer, not @MissingViewer' })];
+
+    openInboxCardView(undefined, callbacksForCard());
+
+    const mentions = document.querySelectorAll<HTMLElement>('.ytcq-profile-mention');
+    expect(mentions).toHaveLength(1);
+    expect(mentions[0]?.textContent).toBe('@knownviewer');
+    expect(mentions[0]?.dataset.ytcqProfileMention).toBe('@KnownViewer');
+    expect(document.querySelector('.ytcq-inbox-message-body')?.textContent).toContain(
+      '@MissingViewer'
+    );
   });
 
   it('renders stored avatars for inbox rows and applies marked-user rings', () => {

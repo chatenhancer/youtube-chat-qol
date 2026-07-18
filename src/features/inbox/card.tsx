@@ -18,6 +18,7 @@ import { applyMarkedUserRing } from '../marked-users';
 import { canJumpToChatMessage, createJumpToMessageIcon, jumpToChatMessage } from '../message-jump';
 import { mentionAuthorName, quoteAuthorRichText } from '../reply';
 import { getChannelUrl, openChannelWindow } from '../channel-popup';
+import { decorateProfileMentions } from '../profile-popup/mentions';
 import { highlightInboxAuthorMatches, highlightInboxMatches } from './highlights';
 import { createInboxIcon, setInboxIcon } from './icons';
 import {
@@ -236,6 +237,7 @@ function renderInboxList(list: HTMLElement): void {
     const spacer = document.createTextNode(' ');
     const text = el<HTMLSpanElement>(<span />);
     appendRichMessageText(text, record.text, [], record.contentParts);
+    decorateProfileMentions(text);
     highlightInboxMatches(text, record);
 
     body.append(author, spacer, text);

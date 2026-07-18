@@ -41,6 +41,7 @@ import {
 } from './source';
 import { renderFocusMessageText } from './translation';
 import type { FocusRecord, FocusSource } from './types';
+import { decorateProfileMentions } from '../profile-popup/mentions';
 
 const FOCUS_ANCHOR_CLASS = 'ytcq-focus-anchor';
 
@@ -284,6 +285,7 @@ function renderFocusMessages(): void {
 
     const bubble = el<HTMLDivElement>(<div class="ytcq-focus-bubble" />);
     renderFocusMessageText(item, bubble, record);
+    decorateProfileMentions(bubble);
 
     item.append(meta, bubble);
     activeList?.append(item);

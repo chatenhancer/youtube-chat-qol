@@ -541,6 +541,22 @@ button.ytcq-inbox-avatar:focus .ytcq-inbox-avatar-open-icon {
   font: 400 12px/16px Roboto, Arial, sans-serif;
 }
 
+.ytcq-profile-mention {
+  border-radius: 2px;
+  color: var(--yt-spec-call-to-action, #3ea6ff);
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.ytcq-profile-mention:hover {
+  text-decoration: underline;
+}
+
+.ytcq-profile-mention:focus-visible {
+  outline: 1px solid currentColor;
+  outline-offset: 1px;
+}
+
 .ytcq-profile-card-message-text img {
   width: 16px;
   height: 16px;
