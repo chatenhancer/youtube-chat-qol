@@ -615,7 +615,10 @@ export const playgroundInviteCancelScenario: BrowserScenario = async ({ chat, co
       toUserId: 'luna-user'
     });
 
-    await card.getByRole('button', { name: 'Back' }).click();
+    await card
+      .locator('.ytcq-games-detail-actions')
+      .getByRole('button', { name: 'Cancel', exact: true })
+      .click();
     await expect(card.locator('.ytcq-profile-card-title')).toHaveText('Games');
     await openGamePlayerList(card, 'Chess');
     const player = card.locator('.ytcq-games-player-row').filter({ hasText: 'Luna Chat' });

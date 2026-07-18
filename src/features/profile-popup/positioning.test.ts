@@ -1,8 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import {
-  keepProfileCardInViewport,
-  positionProfileCard
-} from './positioning';
+import { keepProfileCardInViewport, positionProfileCard } from './positioning';
 
 describe('profile card positioning', () => {
   afterEach(() => {
@@ -14,7 +11,7 @@ describe('profile card positioning', () => {
     const anchor = elementWithRect({ left: 100, top: 40, width: 32, height: 32 });
     const card = elementWithRect({ left: 0, top: 0, width: 240, height: 180 });
 
-    positionProfileCard(card, anchor);
+    positionProfileCard(card, anchor.getBoundingClientRect());
 
     expect(card.style.left).toBe('140px');
     expect(card.style.top).toBe('40px');
@@ -25,7 +22,7 @@ describe('profile card positioning', () => {
     const anchor = elementWithRect({ left: 310, top: 220, width: 32, height: 32 });
     const card = elementWithRect({ left: 0, top: 0, width: 180, height: 120 });
 
-    positionProfileCard(card, anchor);
+    positionProfileCard(card, anchor.getBoundingClientRect());
 
     expect(card.style.left).toBe('122px');
     expect(card.style.top).toBe('132px');
@@ -46,7 +43,7 @@ describe('profile card positioning', () => {
     const anchor = elementWithRect({ left: 4, top: -20, width: 20, height: 20 });
     const card = elementWithRect({ left: -30, top: -15, width: 140, height: 80 });
 
-    positionProfileCard(card, anchor);
+    positionProfileCard(card, anchor.getBoundingClientRect());
     expect(card.style.left).toBe('32px');
     expect(card.style.top).toBe('8px');
 

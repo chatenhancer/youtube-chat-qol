@@ -183,15 +183,55 @@ export const profileMentionOpensRecentMessagesScenario: BrowserScenario = async 
       hasText: nestedMentionText
     });
     await expect(nestedMention).toBeVisible();
+    const nestedMentionRect = await nestedMention.evaluate((element) => {
+      const rect = element.getBoundingClientRect();
+      return { left: rect.left, right: rect.right, top: rect.top };
+    });
     await nestedMention.click();
 
     await expect(profileCard.locator('.ytcq-profile-card-title')).toHaveText(nestedAuthor);
     await expect(
       profileCard.locator('.ytcq-profile-card-message').filter({ hasText: nestedHistoryText })
     ).toBeVisible();
+    await expectProfileCardPositionedFromAnchor(profileCard, nestedMentionRect);
     await closeProfileCard(chat);
   });
 };
+
+async function expectProfileCardPositionedFromAnchor(
+  profileCard: Locator,
+  anchorRect: { left: number; right: number; top: number }
+): Promise<void> {
+  const position = await profileCard.evaluate((element, anchor) => {
+    const margin = 8;
+    const cardRect = element.getBoundingClientRect();
+    let expectedLeft = anchor.right + margin;
+    if (expectedLeft + cardRect.width + margin > window.innerWidth) {
+      expectedLeft = anchor.left - cardRect.width - margin;
+    }
+
+    let expectedTop = anchor.top;
+    if (expectedTop + cardRect.height + margin > window.innerHeight) {
+      expectedTop = window.innerHeight - cardRect.height - margin;
+    }
+
+    return {
+      actualLeft: Math.round(cardRect.left),
+      actualTop: Math.round(cardRect.top),
+      expectedLeft: Math.max(margin, Math.round(expectedLeft)),
+      expectedTop: Math.max(margin, Math.round(expectedTop))
+    };
+  }, anchorRect);
+
+  expect(
+    position.actualLeft,
+    'Nested profile card should use the clicked mention’s x position.'
+  ).toBe(position.expectedLeft);
+  expect(
+    position.actualTop,
+    'Nested profile card should use the clicked mention’s y position.'
+  ).toBe(position.expectedTop);
+}
 
 interface MessageSource {
   authorName: string;

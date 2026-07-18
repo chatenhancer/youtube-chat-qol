@@ -72,7 +72,19 @@ export const realComposerTranslationScenario: BrowserScenario = async ({ chat, c
 
 async function expectChatComposerVisible(chat: ChatSurface): Promise<void> {
   await test.step('Verify chat composer is visible', async () => {
-    await expect(chat.locator('yt-live-chat-message-input-renderer')).toBeVisible();
+    const composer = chat.locator('yt-live-chat-message-input-renderer');
+    const composerVisible = await composer.waitFor({ state: 'visible', timeout: 15_000 }).then(
+      () => true,
+      () => false
+    );
+    if (composerVisible) return;
+
+    const restrictedParticipation = chat.locator('yt-live-chat-restricted-participation-renderer');
+    test.skip(
+      await restrictedParticipation.isVisible(),
+      'YouTube live chat currently restricts participation, so the composer is unavailable.'
+    );
+    await expect(composer).toBeVisible({ timeout: 1_000 });
   });
 }
 

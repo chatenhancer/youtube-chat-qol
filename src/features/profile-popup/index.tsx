@@ -243,6 +243,7 @@ function handleProfileMentionActivation(event: MouseEvent | KeyboardEvent): void
 
 function showProfileCard(source: ProfileSource, anchor: HTMLElement): void {
   ensureProfileMentionListeners();
+  const initialAnchorRect = anchor.getBoundingClientRect();
   recordVisibleUserMessages();
   const profileKey = getUserKeyFromIdentity(source.identity);
   const existingCard = profileKey ? profileCardsByKey.get(profileKey) : null;
@@ -365,7 +366,7 @@ function showProfileCard(source: ProfileSource, anchor: HTMLElement): void {
   }
   profileCardOriginMessageIds.set(card, source.originMessageId || '');
   bringProfileCardToFront(card);
-  positionProfileCard(card, anchor);
+  positionProfileCard(card, initialAnchorRect);
   wireFloatingPanelDrag({
     draggingClassName: 'ytcq-profile-card-dragging',
     handle: header,
@@ -408,7 +409,7 @@ function showProfileCard(source: ProfileSource, anchor: HTMLElement): void {
       }
 
       if (modeToApply === 'anchor') {
-        positionProfileCard(card, anchor);
+        positionProfileCard(card, anchor.getBoundingClientRect());
       } else {
         keepProfileCardInViewport(card);
       }

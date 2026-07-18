@@ -159,7 +159,10 @@ describe('profile popup coordinator', () => {
     expect(message.dataset.ytcqProfileWired).toBe('true');
     expect(avatar.title).toBe('Show recent messages');
     expect(messageMocks.renderProfileMessages).toHaveBeenCalled();
-    expect(positioningMocks.positionProfileCard).toHaveBeenCalledWith(card, avatar);
+    expect(positioningMocks.positionProfileCard).toHaveBeenCalledWith(
+      card,
+      expect.objectContaining({ left: 0, right: 0, top: 0 })
+    );
     expect(markedUserMocks.applyMarkedUserRing).toHaveBeenCalledWith(expect.any(HTMLElement), {
       authorName: '@ViewerOne',
       avatarUrl: 'https://example.com/avatar.jpg',
@@ -253,11 +256,50 @@ describe('profile popup coordinator', () => {
     );
     expect(positioningMocks.positionProfileCard).toHaveBeenCalledWith(
       expect.any(HTMLElement),
-      mention
+      expect.objectContaining({ left: 0, right: 0, top: 0 })
     );
     expect(click.defaultPrevented).toBe(true);
     expect(rowClick).not.toHaveBeenCalled();
     expect(competingDocumentAction).not.toHaveBeenCalled();
+  });
+
+  it('positions a nested mention card from the mention geometry before closing its parent card', () => {
+    profileTestState.recentMessages = [
+      record(),
+      record({
+        authorName: '@NestedViewer',
+        channelId: 'nested-channel',
+        text: 'nested viewer history'
+      })
+    ];
+    const message = createMessage();
+    document.body.append(message);
+    wireProfileClick(message);
+    message.querySelector<HTMLElement>('#author-photo')!.click();
+
+    const parentCard = document.querySelector<HTMLElement>('.ytcq-profile-card')!;
+    const mention = document.createElement('span');
+    mention.className = 'ytcq-profile-mention';
+    mention.dataset.ytcqProfileMention = '@NestedViewer';
+    mention.dataset.ytcqProfileMentionChannelId = 'nested-channel';
+    mention.textContent = '@NestedViewer';
+    parentCard.querySelector('.ytcq-profile-card-messages')!.append(mention);
+    vi.spyOn(mention, 'getBoundingClientRect').mockImplementation(() =>
+      mention.isConnected
+        ? createRect({ left: 120, right: 230, top: 90, width: 110 })
+        : createRect({})
+    );
+
+    mention.dispatchEvent(new MouseEvent('click', { bubbles: true, button: 0, cancelable: true }));
+
+    const nestedCard = document.querySelector<HTMLElement>('.ytcq-profile-card')!;
+    expect(parentCard.isConnected).toBe(false);
+    expect(nestedCard).not.toBe(parentCard);
+    expect(nestedCard.querySelector('.ytcq-profile-card-title')?.textContent).toBe('@NestedViewer');
+    expect(positioningMocks.positionProfileCard).toHaveBeenLastCalledWith(
+      nestedCard,
+      expect.objectContaining({ left: 120, right: 230, top: 90 })
+    );
   });
 
   it('does not highlight a mention when that user has no recent message history', () => {
@@ -697,7 +739,11 @@ describe('profile popup coordinator', () => {
 
     window.dispatchEvent(new Event('resize'));
     await vi.runOnlyPendingTimersAsync();
-    expect(positioningMocks.positionProfileCard).toHaveBeenCalledWith(card, avatar);
+    expect(positioningMocks.positionProfileCard).toHaveBeenCalledTimes(2);
+    expect(positioningMocks.positionProfileCard).toHaveBeenLastCalledWith(
+      card,
+      expect.objectContaining({ left: 0, right: 0, top: 0 })
+    );
 
     avatar.remove();
     window.dispatchEvent(new Event('resize'));

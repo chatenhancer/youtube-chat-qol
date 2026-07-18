@@ -2418,7 +2418,7 @@ async function installWatchPageBranding(page) {
 
       html,
       body {
-        --ytcq-demo-chat-column-width: 420px;
+        --ytcq-demo-chat-column-width: 430px;
         overflow-x: clip !important;
       }
 

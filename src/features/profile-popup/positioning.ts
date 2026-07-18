@@ -1,11 +1,13 @@
 /**
  * Profile card positioning.
  *
- * Places the recent-messages card near the clicked avatar and nudges it back
- * into the visible chat viewport as content changes.
+ * Places the recent-messages card near the clicked avatar or mention and
+ * nudges it back into the visible chat viewport as content changes.
  */
-export function positionProfileCard(card: HTMLElement, anchor: HTMLElement): void {
-  const anchorRect = anchor.getBoundingClientRect();
+export function positionProfileCard(
+  card: HTMLElement,
+  anchorRect: Pick<DOMRectReadOnly, 'left' | 'right' | 'top'>
+): void {
   const cardRect = card.getBoundingClientRect();
   const margin = 8;
   const width = cardRect.width;
