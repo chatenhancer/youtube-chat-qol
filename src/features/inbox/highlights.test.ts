@@ -6,6 +6,8 @@ import {
   highlightInboxMatches
 } from './highlights';
 import { isExtensionManagedElement } from '../../shared/managed-dom';
+import { PRESERVED_MENTION_TOKEN_CLASS } from '../../shared/mention-tokens';
+import { decorateProfileMentions } from '../profile-popup/mentions';
 import type { InboxRecord } from './types';
 
 describe('inbox highlight helpers', () => {
@@ -53,6 +55,44 @@ describe('inbox highlight helpers', () => {
     expect(message.dataset.ytcqInboxKeywordHighlightKey).toBe('keyword-key');
     await vi.runAllTimersAsync();
     expect(message.dataset.ytcqInboxKeywordHighlighting).toBeUndefined();
+  });
+
+  it('preserves a whole profile mention when a live keyword matches part of its handle', () => {
+    const message = createMessage('@Host', 'Please ask @MentionedProfileViewer next');
+
+    applyChatKeywordHighlights(message, ['profile'], 'mention-key');
+
+    const messageText = message.querySelector<HTMLElement>('#message')!;
+    const highlight = messageText.querySelector<HTMLElement>('.ytcq-chat-keyword-highlight');
+    const preservedToken = messageText.querySelector<HTMLElement>(
+      `.${PRESERVED_MENTION_TOKEN_CLASS}`
+    );
+    expect(highlight?.textContent).toBe('Profile');
+    expect(preservedToken?.textContent).toBe('@MentionedProfileViewer');
+
+    decorateProfileMentions(messageText, (identity) => identity);
+
+    const mention = messageText.querySelector<HTMLElement>('.ytcq-profile-mention');
+    expect(mention).toBe(preservedToken);
+    expect(mention?.textContent).toBe('@MentionedProfileViewer');
+    expect(mention?.getAttribute('role')).toBe('button');
+    expect(mention?.querySelector('.ytcq-chat-keyword-highlight')?.textContent).toBe('Profile');
+    expect(messageText.textContent).toBe('Please ask @MentionedProfileViewer next');
+
+    clearChatKeywordHighlights(message);
+
+    expect(mention?.classList.contains(PRESERVED_MENTION_TOKEN_CLASS)).toBe(false);
+    expect(messageText.querySelector('.ytcq-chat-keyword-highlight')).toBeNull();
+    expect(messageText.querySelector('.ytcq-profile-mention')).toBe(mention);
+  });
+
+  it('does not expand live keyword highlights across email addresses', () => {
+    const message = createMessage('@Host', 'Email person@example.com for details');
+
+    applyChatKeywordHighlights(message, ['example'], 'email-key');
+
+    expect(message.querySelector('#message .ytcq-chat-keyword-highlight')?.textContent)
+      .toBe('example');
   });
 
   it('ignores live chat renderers without author or message text', () => {

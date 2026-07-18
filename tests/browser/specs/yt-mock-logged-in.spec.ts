@@ -23,6 +23,7 @@ import {
 import { frequentEmojiPersistenceScenario } from '../scenarios/frequent-emojis';
 import {
   inboxDirectMentionScenario,
+  inboxKeywordOverlapPreservesProfileMentionScenario,
   inboxOpensFromHeaderScenario,
   inboxRecordCreationAndJumpScenario
 } from '../scenarios/inbox';
@@ -129,6 +130,10 @@ test(
   inboxRecordCreationAndJumpScenario
 );
 test('logged-in mock: inbox saves direct mentions and highlights them', inboxDirectMentionScenario);
+test(
+  'logged-in mock: watched keyword overlapping a handle keeps the profile mention clickable',
+  inboxKeywordOverlapPreservesProfileMentionScenario
+);
 test('logged-in mock: profile card opens from a chat avatar', profileCardRecentMessagesScenario);
 test(
   'logged-in mock: profile card receives new messages from the selected author',

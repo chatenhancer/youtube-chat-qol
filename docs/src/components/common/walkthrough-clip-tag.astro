@@ -1,6 +1,6 @@
 ---
 import Icon from './icon.astro';
-import { getWalkthroughClip } from '../../data/walkthrough';
+import { getWalkthroughClip, getWalkthroughClipHash } from '../../data/walkthrough';
 import type { WalkthroughChapterName } from '../../data/walkthrough';
 
 const { chapter, label, title } = Astro.props as {
@@ -9,11 +9,12 @@ const { chapter, label, title } = Astro.props as {
   title: string;
 };
 const clip = getWalkthroughClip(chapter);
+const clipHash = getWalkthroughClipHash(chapter);
 ---
 
-<button
+<a
   class="walkthrough-clip-tag"
-  type="button"
+  href={clipHash}
   data-walkthrough-clip-open
   data-walkthrough-clip-chapter={chapter}
   data-walkthrough-clip-start={clip.startSeconds}
@@ -23,4 +24,4 @@ const clip = getWalkthroughClip(chapter);
 >
   <Icon class="walkthrough-clip-tag-icon" name="play_circle" />
   <span>{label}</span>
-</button>
+</a>

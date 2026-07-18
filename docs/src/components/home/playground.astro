@@ -1,7 +1,7 @@
 ---
 import Icon from '../common/icon.astro';
 import type { Messages } from '../../data/site';
-import { getWalkthroughClip } from '../../data/walkthrough';
+import { getWalkthroughClip, getWalkthroughClipHash } from '../../data/walkthrough';
 
 interface GamePostPaths {
   chess: string;
@@ -38,6 +38,7 @@ const playgroundGames = [
   }
 ];
 const gamesWalkthroughClip = getWalkthroughClip('games');
+const gamesWalkthroughClipHash = getWalkthroughClipHash('games');
 ---
 
 <section class="playground-section" id="playground" aria-labelledby="playground-title">
@@ -59,8 +60,9 @@ const gamesWalkthroughClip = getWalkthroughClip('games');
       <div class="playground-actions">
         <a
           class="button button-primary"
-          href="#install"
+          href={gamesWalkthroughClipHash}
           data-walkthrough-clip-open
+          data-walkthrough-clip-chapter="games"
           data-walkthrough-clip-start={gamesWalkthroughClip.startSeconds}
           data-walkthrough-clip-end={gamesWalkthroughClip.endSeconds}
           data-walkthrough-clip-title={m.features.walkthroughKeyPointGames}

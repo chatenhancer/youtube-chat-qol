@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { isExtensionManagedElement } from '../../shared/managed-dom';
+import { PRESERVED_MENTION_TOKEN_CLASS } from '../../shared/mention-tokens';
 import {
   clearProfileMentions,
   decorateProfileMentions,
@@ -96,6 +97,27 @@ describe('profile mention decoration', () => {
     expect(mention?.dataset.ytcqProfileMentionChannelId).toBe('known-channel');
     expect(root.textContent).toBe('Ask @KnownViewer or @MissingViewer');
     expect(root.querySelectorAll(`.${PROFILE_MENTION_CLASS}`)).toHaveLength(1);
+  });
+
+  it('upgrades a preserved highlighted handle without replacing its keyword markup', () => {
+    const root = document.createElement('span');
+    root.innerHTML = `Ask <span class="${PRESERVED_MENTION_TOKEN_CLASS}">@Known<span class="ytcq-chat-keyword-highlight">Viewer</span></span>`;
+    const preservedToken = root.querySelector<HTMLElement>(`.${PRESERVED_MENTION_TOKEN_CLASS}`)!;
+    let hasMatch = false;
+    const resolveMention: ProfileMentionResolver = (identity) => (hasMatch ? identity : null);
+
+    decorateProfileMentions(root, resolveMention);
+    expect(root.querySelector(`.${PROFILE_MENTION_CLASS}`)).toBeNull();
+
+    hasMatch = true;
+    decorateProfileMentions(root, resolveMention);
+
+    expect(root.querySelector(`.${PROFILE_MENTION_CLASS}`)).toBe(preservedToken);
+    expect(preservedToken.getAttribute('role')).toBe('button');
+    expect(preservedToken.querySelector('.ytcq-chat-keyword-highlight')?.textContent).toBe(
+      'Viewer'
+    );
+    expect(root.textContent).toBe('Ask @KnownViewer');
   });
 
   it('removes an existing mention control when its matching history disappears', () => {

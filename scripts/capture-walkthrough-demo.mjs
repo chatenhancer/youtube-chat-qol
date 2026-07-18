@@ -547,9 +547,11 @@ async function openCollapsedFocusPromptFromRecentMessage(page, chat, recorder) {
 
 async function sectionInbox(page, chat, recorder) {
   await closeFocusPromptIfPresent(chat);
-  await focusChatHeader(page, chat, recorder);
+  await fadeOutDemoCaption(page, recorder, 280);
+  await focusChatHeader(page, chat, recorder, { showFocus: false });
   const inboxButton = chat.locator('.ytcq-inbox-button').first();
   await clickWithCursor(page, inboxButton, recorder, 'Inbox button', {
+    afterClickHoldMs: 0,
     caption: {
       title: 'Open your Inbox',
       body: 'Mentions and watched keywords are saved locally per stream.'
@@ -558,6 +560,7 @@ async function sectionInbox(page, chat, recorder) {
   const inbox = chat.locator('.ytcq-inbox-card').first();
   await inbox.waitFor({ state: 'visible', timeout: 10_000 });
   await ensureDemoInboxAvatar(chat);
+  await fadeInDemoLocator(inbox, recorder, 360);
   await showDemoCaptionFor(
     page,
     recorder,
@@ -4499,6 +4502,40 @@ async function showDemoCaptionFor(page, recorder, title, body, options = {}) {
   await recorder.holdStill(durationMs - animationMs);
   await fadeOutDemoCaption(page, recorder, 320);
   await clearDemoFocus(page);
+}
+
+async function fadeInDemoLocator(locator, recorder, durationMs = 360) {
+  await locator.evaluate((element) => {
+    if (!(element instanceof HTMLElement)) return;
+    element.style.opacity = '0';
+    element.style.transform = 'translateY(-8px) scale(0.985)';
+    element.style.transformOrigin = 'top right';
+    element.style.transition = 'none';
+    element.style.willChange = 'opacity, transform';
+  });
+
+  const frames = Math.max(1, durationToFrames(durationMs));
+  for (let frame = 1; frame <= frames; frame += 1) {
+    const progress = easeInOutCubic(frame / frames);
+    await locator.evaluate((element, nextProgress) => {
+      if (!(element instanceof HTMLElement)) return;
+      element.style.opacity = String(nextProgress);
+      element.style.transform = [
+        `translateY(${(1 - nextProgress) * -8}px)`,
+        `scale(${0.985 + nextProgress * 0.015})`
+      ].join(' ');
+    }, progress);
+    await recorder.captureFrame();
+  }
+
+  await locator.evaluate((element) => {
+    if (!(element instanceof HTMLElement)) return;
+    element.style.removeProperty('opacity');
+    element.style.removeProperty('transform');
+    element.style.removeProperty('transform-origin');
+    element.style.removeProperty('transition');
+    element.style.removeProperty('will-change');
+  });
 }
 
 async function setDemoCaption(page, title, body, anchorBox = null, options = {}) {

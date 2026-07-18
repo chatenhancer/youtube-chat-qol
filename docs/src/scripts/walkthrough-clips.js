@@ -22,12 +22,15 @@
   );
   if (!clips.size) return;
 
+  const clipsByHash = new Map();
   const videoUrl = new URL(walkthroughPath, window.location.href);
   let activeClip = null;
+  let clearHashOnModalClose = true;
   let loopFrame = 0;
   let pendingStartTime = null;
 
-  clips.forEach((_, trigger) => {
+  clips.forEach((clip, trigger) => {
+    if (!clipsByHash.has(clip.hash)) clipsByHash.set(clip.hash, clip);
     trigger.setAttribute("aria-controls", clipModal.id || "walkthrough-clip");
     trigger.setAttribute("aria-haspopup", "dialog");
     trigger.addEventListener("click", (event) => {
@@ -36,14 +39,18 @@
       }
 
       event.preventDefault();
-      openClip(clips.get(trigger));
+      openClip(clips.get(trigger), { updateHash: true });
     });
   });
 
   clipModal.addEventListener("click", (event) => {
     if (event.target === clipModal) closeClip();
   });
-  clipModal.addEventListener("close", resetClip);
+  clipModal.addEventListener("close", () => {
+    if (clearHashOnModalClose) clearClipHash(activeClip);
+    clearHashOnModalClose = true;
+    resetClip();
+  });
 
   clipVideo.addEventListener("loadedmetadata", () => {
     applyPendingStartTime();
@@ -70,25 +77,35 @@
 
   clipVideo.src = videoUrl.href;
   clipVideo.load();
+  window.addEventListener("hashchange", syncClipToHash);
+
+  if (getClipFromHash()) {
+    window.requestAnimationFrame(syncClipToHash);
+  }
 
   function readClip(trigger) {
     if (!(trigger instanceof HTMLElement)) return null;
 
+    const chapter = trigger.dataset.walkthroughClipChapter?.trim().toLowerCase();
     const startSeconds = Number(trigger.dataset.walkthroughClipStart);
     const endValue = trigger.dataset.walkthroughClipEnd;
     const endSeconds = endValue === undefined ? null : Number(endValue);
+    if (!chapter || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(chapter)) return null;
     if (!Number.isFinite(startSeconds) || startSeconds < 0) return null;
     if (endSeconds !== null && (!Number.isFinite(endSeconds) || endSeconds <= startSeconds)) return null;
 
     return {
+      hash: `#clip-${chapter}`,
       endSeconds,
       startSeconds,
       title: trigger.dataset.walkthroughClipTitle?.trim() || ""
     };
   }
 
-  function openClip(clip) {
+  function openClip(clip, options = {}) {
     if (!clip) return;
+
+    if (options.updateHash) updateClipHash(clip);
 
     if (typeof clipModal.showModal !== "function") {
       const fallbackUrl = new URL(videoUrl);
@@ -106,9 +123,16 @@
     startPlayback();
   }
 
-  function closeClip() {
+  function closeClip(options = {}) {
     clipVideo.pause();
-    if (typeof clipModal.close === "function") clipModal.close();
+    if (typeof clipModal.close === "function" && clipModal.open) {
+      clearHashOnModalClose = options.clearHash !== false;
+      clipModal.close();
+      return;
+    }
+
+    if (options.clearHash !== false) clearClipHash(activeClip);
+    resetClip();
   }
 
   function resetClip() {
@@ -116,6 +140,30 @@
     stopLoopMonitor();
     pendingStartTime = null;
     activeClip = null;
+  }
+
+  function getClipFromHash() {
+    return clipsByHash.get(window.location.hash.toLowerCase()) || null;
+  }
+
+  function syncClipToHash() {
+    const clip = getClipFromHash();
+    if (clip) {
+      openClip(clip);
+      return;
+    }
+
+    if (clipModal.open) closeClip({ clearHash: false });
+  }
+
+  function updateClipHash(clip) {
+    if (window.location.hash.toLowerCase() === clip.hash) return;
+    history.pushState(null, "", clip.hash);
+  }
+
+  function clearClipHash(clip) {
+    if (!clip || window.location.hash.toLowerCase() !== clip.hash) return;
+    history.replaceState(null, "", `${window.location.pathname}${window.location.search}`);
   }
 
   function seekToClipStart() {

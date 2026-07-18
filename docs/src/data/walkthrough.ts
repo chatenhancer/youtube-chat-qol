@@ -30,6 +30,10 @@ export interface WalkthroughClip {
   startSeconds: number;
 }
 
+export function getWalkthroughClipHash(name: WalkthroughChapterName): `#clip-${WalkthroughChapterName}` {
+  return `#clip-${name}`;
+}
+
 export function getWalkthroughClip(name: WalkthroughChapterName): WalkthroughClip {
   const chapterIndex = walkthroughChapters.findIndex((chapter) => chapter.name === name);
   if (chapterIndex < 0) throw new Error(`Unknown walkthrough chapter: ${name}`);

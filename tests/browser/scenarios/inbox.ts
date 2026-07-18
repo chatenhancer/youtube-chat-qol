@@ -20,6 +20,7 @@ import type { BrowserScenario, ChatSurface } from './types';
 const INBOX_KEYWORD = 'browser-inbox-keyword';
 const CURRENT_VIEWER_MENTION = '@CurrentViewer';
 const DIRECT_MENTION_TEXT = `Direct browser mention for ${CURRENT_VIEWER_MENTION}`;
+const PROFILE_MENTION_OVERLAP_KEYWORD = 'handlepart';
 const REPLAY_PREFETCH_KEYWORD = 'browser-replay-prefetch-keyword';
 
 export const inboxOpensFromHeaderScenario: BrowserScenario = async ({ chat }) => {
@@ -62,6 +63,57 @@ export const inboxDirectMentionScenario: BrowserScenario = async ({ chat, contex
       await openInboxPanel(chat);
       await expectDirectMentionInboxRecord(chat);
       await closeInboxPanel(chat);
+    });
+  });
+};
+
+export const inboxKeywordOverlapPreservesProfileMentionScenario: BrowserScenario = async ({
+  chat,
+  context
+}) => {
+  if (!isMockPageSurface(chat)) {
+    throw new Error(
+      'inboxKeywordOverlapPreservesProfileMentionScenario requires the deterministic mock chat page.'
+    );
+  }
+
+  await withExtensionStorageSnapshot(context, 'local', async () => {
+    await withExtensionStorageValues(context, 'local', {
+      ytcqInboxKeywords: [PROFILE_MENTION_OVERLAP_KEYWORD]
+    }, async () => {
+      await reloadMockChat(chat, 'Reload mock chat with a handle-overlapping watched keyword');
+
+      const mentionedAuthor = '@InboxHandlePartTarget';
+      const mentionText = mentionedAuthor.toLowerCase();
+      const mentionMessageId = await appendMockFixtureMessage(chat, {
+        author: '@InboxOverlapSource',
+        text: `Please ask ${mentionText} next`
+      });
+      if (!mentionMessageId) throw new Error('Mock page did not append the mention message.');
+
+      const mentionMessage = chat.locator(`#${mentionMessageId}`);
+      await expect(
+        mentionMessage.locator('.ytcq-chat-keyword-highlight')
+      ).toHaveText(PROFILE_MENTION_OVERLAP_KEYWORD);
+      await expect(mentionMessage.locator('.ytcq-profile-mention')).toHaveCount(0);
+
+      await appendMockFixtureMessage(chat, {
+        author: mentionedAuthor,
+        channel: 'inbox-handle-part-target-channel',
+        text: 'Target profile history'
+      });
+
+      const mention = mentionMessage.locator('.ytcq-profile-mention');
+      await expect(mention).toHaveText(mentionText);
+      await expect(mention).toHaveAttribute('role', 'button');
+      await expect(mention.locator('.ytcq-chat-keyword-highlight'))
+        .toHaveText(PROFILE_MENTION_OVERLAP_KEYWORD);
+      await mention.click();
+
+      const profileCard = chat.locator('.ytcq-profile-card:not(.ytcq-inbox-card)');
+      await expect(profileCard.locator('.ytcq-profile-card-title')).toHaveText(mentionedAuthor);
+      await profileCard.locator('.ytcq-profile-card-close').click();
+      await expect(profileCard).toHaveCount(0);
     });
   });
 };

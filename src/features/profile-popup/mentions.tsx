@@ -6,6 +6,7 @@
  */
 import { t } from '../../shared/i18n';
 import { jsx, el } from '../../shared/jsx-dom';
+import { findMentionTokens, PRESERVED_MENTION_TOKEN_CLASS } from '../../shared/mention-tokens';
 import { CHAT_MESSAGE_SELECTOR, CHAT_TOOLTIP_SELECTOR } from '../../youtube/selectors';
 import { getUserMessagesForIdentity, type UserIdentity } from '../user-message-history';
 
@@ -13,7 +14,7 @@ export const PROFILE_MENTION_CLASS = 'ytcq-profile-mention';
 
 const PROFILE_MENTION_SELECTOR = `.${PROFILE_MENTION_CLASS}`;
 const PROFILE_MENTION_CREATED_ATTRIBUTE = 'data-ytcq-profile-mention-created';
-const MENTION_PATTERN = /(^|[^\p{L}\p{N}._-])(@[\p{L}\p{N}_](?:[\p{L}\p{N}._-]*[\p{L}\p{N}_])?)/gu;
+const PRESERVED_MENTION_TOKEN_SELECTOR = `.${PRESERVED_MENTION_TOKEN_CLASS}`;
 const CHAT_MESSAGE_TEXT_SELECTOR = '[id="message"], .ytcq-translation';
 const VISIBLE_MESSAGE_TEXT_SELECTOR = [
   `:is(${CHAT_MESSAGE_SELECTOR}) [id="message"]`,
@@ -31,6 +32,7 @@ export function decorateProfileMentions(
   if (!root) return;
 
   refreshExistingProfileMentions(root, resolveMention);
+  decoratePreservedProfileMentionTokens(root, resolveMention);
 
   const textNodes: Text[] = [];
   const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
@@ -61,6 +63,10 @@ export function refreshVisibleProfileMentions(root: ParentNode = document): void
 export function clearProfileMentions(root: ParentNode = document): void {
   const parents = new Set<Node>();
   root.querySelectorAll<HTMLElement>(PROFILE_MENTION_SELECTOR).forEach((mention) => {
+    if (mention.classList.contains(PRESERVED_MENTION_TOKEN_CLASS)) {
+      clearProfileMentionAttributes(mention);
+      return;
+    }
     if (!mention.hasAttribute(PROFILE_MENTION_CREATED_ATTRIBUTE)) {
       clearProfileMentionAttributes(mention);
       return;
@@ -112,6 +118,10 @@ function refreshExistingProfileMentions(
       return;
     }
 
+    if (mention.classList.contains(PRESERVED_MENTION_TOKEN_CLASS)) {
+      clearProfileMentionAttributes(mention);
+      return;
+    }
     if (!mention.hasAttribute(PROFILE_MENTION_CREATED_ATTRIBUTE)) {
       clearProfileMentionAttributes(mention);
       return;
@@ -122,13 +132,44 @@ function refreshExistingProfileMentions(
   parents.forEach((parent) => parent.normalize());
 }
 
+function decoratePreservedProfileMentionTokens(
+  root: HTMLElement,
+  resolveMention: ProfileMentionResolver
+): void {
+  root.querySelectorAll<HTMLElement>(PRESERVED_MENTION_TOKEN_SELECTOR).forEach((token) => {
+    const authorName = token.textContent?.trim() || '';
+    const [parsedToken] = findMentionTokens(authorName);
+    if (!parsedToken || parsedToken.index !== 0 || parsedToken.text.length !== authorName.length) {
+      return;
+    }
+
+    const link = token.closest<HTMLAnchorElement>('a[href]');
+    if (link && link.textContent?.trim() !== authorName) return;
+    const mention = link || token;
+    const identity = resolveMention({
+      authorName,
+      channelId: link ? getLinkedChannelId(link) : undefined
+    });
+    if (!identity) return;
+
+    mention.classList.add(PROFILE_MENTION_CLASS);
+    if (mention === token) {
+      mention.setAttribute('role', 'button');
+      mention.tabIndex = 0;
+      mention.title = t('showRecentMessages');
+      mention.setAttribute(PROFILE_MENTION_CREATED_ATTRIBUTE, 'true');
+    }
+    applyProfileMentionIdentity(mention, authorName, identity);
+  });
+}
+
 function shouldDecorateTextNode(node: Text): boolean {
   const parent = node.parentElement;
   if (!parent || parent.closest(PROFILE_MENTION_SELECTOR)) return false;
+  if (parent.closest(PRESERVED_MENTION_TOKEN_SELECTOR)) return false;
   if (parent.closest(CHAT_TOOLTIP_SELECTOR)) return false;
   if (parent.closest('.ytcq-replaced-translation-icon')) return false;
-  MENTION_PATTERN.lastIndex = 0;
-  return MENTION_PATTERN.test(node.nodeValue || '');
+  return findMentionTokens(node.nodeValue || '').length > 0;
 }
 
 function decorateProfileMentionTextNode(node: Text, resolveMention: ProfileMentionResolver): void {
@@ -148,12 +189,10 @@ function decorateProfileMentionTextNode(node: Text, resolveMention: ProfileMenti
 
   const fragment = document.createDocumentFragment();
   let cursor = 0;
-  MENTION_PATTERN.lastIndex = 0;
 
-  for (let match = MENTION_PATTERN.exec(text); match; match = MENTION_PATTERN.exec(text)) {
-    const prefix = match[1] || '';
-    const authorName = match[2] || '';
-    const authorStart = match.index + prefix.length;
+  for (const token of findMentionTokens(text)) {
+    const authorName = token.text;
+    const authorStart = token.index;
     const identity = resolveMention({ authorName });
     if (!identity) continue;
     if (authorStart > cursor) {
@@ -188,10 +227,9 @@ function getLinkedMention(
   const link = node.parentElement?.closest<HTMLAnchorElement>('a[href]');
   if (!link || link.textContent !== text) return null;
 
-  MENTION_PATTERN.lastIndex = 0;
-  const match = MENTION_PATTERN.exec(text);
-  if (!match || match.index !== 0 || match[0].length !== text.length || match[1]) return null;
-  const authorName = match[2] || '';
+  const [token] = findMentionTokens(text);
+  if (!token || token.index !== 0 || token.text.length !== text.length) return null;
+  const authorName = token.text;
   return authorName ? { authorName, link } : null;
 }
 
@@ -209,9 +247,14 @@ function applyProfileMentionIdentity(
 }
 
 function clearProfileMentionAttributes(mention: HTMLElement): void {
+  const isPreservedToken = mention.classList.contains(PRESERVED_MENTION_TOKEN_CLASS);
   mention.classList.remove(PROFILE_MENTION_CLASS);
   delete mention.dataset.ytcqProfileMention;
   delete mention.dataset.ytcqProfileMentionChannelId;
+  if (!isPreservedToken) return;
+  mention.removeAttribute('role');
+  mention.removeAttribute('tabindex');
+  if (mention.title === t('showRecentMessages')) mention.removeAttribute('title');
 }
 
 function getLinkedChannelId(mention: HTMLElement): string | undefined {

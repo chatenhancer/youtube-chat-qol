@@ -6,6 +6,7 @@
  */
 import { getAuthorNameElement, getMessageTextElement } from '../../youtube/messages';
 import { jsx, el } from '../../shared/jsx-dom';
+import { findMentionTokens, PRESERVED_MENTION_TOKEN_CLASS } from '../../shared/mention-tokens';
 import { normalizeComparableText } from '../../shared/text';
 import type { InboxRecord, InlineHighlightMatch, InlineHighlightTerm } from './types';
 
@@ -50,7 +51,7 @@ export function applyChatKeywordHighlights(
       priority: 1,
       text
     }));
-    if (messageText) highlightTerms(messageText, terms);
+    if (messageText) highlightTerms(messageText, terms, true);
     if (authorName) highlightTerms(authorName, terms);
     message.dataset.ytcqInboxKeywordHighlightKey = nextHighlightKey;
   } finally {
@@ -64,6 +65,13 @@ export function clearChatKeywordHighlights(message: HTMLElement): void {
   [getMessageTextElement(message), getAuthorNameElement(message)].forEach((root) => {
     root?.querySelectorAll<HTMLElement>(`.${CHAT_KEYWORD_HIGHLIGHT_CLASS}`).forEach((highlight) => {
       highlight.replaceWith(...Array.from(highlight.childNodes));
+    });
+    root?.querySelectorAll<HTMLElement>(`.${PRESERVED_MENTION_TOKEN_CLASS}`).forEach((token) => {
+      if (token.dataset.ytcqProfileMention) {
+        token.classList.remove(PRESERVED_MENTION_TOKEN_CLASS);
+        return;
+      }
+      token.replaceWith(...Array.from(token.childNodes));
     });
     root?.normalize();
   });
@@ -81,7 +89,11 @@ export function highlightInboxAuthorMatches(root: HTMLElement, record: InboxReco
   );
 }
 
-function highlightTerms(root: HTMLElement, terms: InlineHighlightTerm[]): void {
+function highlightTerms(
+  root: HTMLElement,
+  terms: InlineHighlightTerm[],
+  preserveMentionTokens = false
+): void {
   if (!terms.length) return;
 
   const textNodes: Text[] = [];
@@ -94,34 +106,81 @@ function highlightTerms(root: HTMLElement, terms: InlineHighlightTerm[]): void {
     current = walker.nextNode();
   }
 
-  textNodes.forEach((node) => highlightTextNode(node, terms));
+  textNodes.forEach((node) => highlightTextNode(node, terms, preserveMentionTokens));
 }
 
-function highlightTextNode(node: Text, terms: InlineHighlightTerm[]): void {
+function highlightTextNode(
+  node: Text,
+  terms: InlineHighlightTerm[],
+  preserveMentionTokens: boolean
+): void {
   const text = node.nodeValue || '';
+  const matches = getHighlightMatches(text, terms);
+  if (!matches.length) return;
+
   const fragment = document.createDocumentFragment();
+  const preservedTokens =
+    preserveMentionTokens && !node.parentElement?.closest('[data-ytcq-profile-mention]')
+      ? findMentionTokens(text).filter((token) => {
+          const tokenEnd = token.index + token.text.length;
+          return matches.some((match) => {
+            const matchEnd = match.index + match.length;
+            return match.index < tokenEnd && matchEnd > token.index;
+          });
+        })
+      : [];
   let cursor = 0;
 
+  preservedTokens.forEach((token) => {
+    appendHighlightedText(fragment, text, cursor, token.index, matches);
+    const preservedToken = el<HTMLSpanElement>(<span class={PRESERVED_MENTION_TOKEN_CLASS} />);
+    const tokenEnd = token.index + token.text.length;
+    appendHighlightedText(preservedToken, text, token.index, tokenEnd, matches);
+    fragment.append(preservedToken);
+    cursor = tokenEnd;
+  });
+
+  appendHighlightedText(fragment, text, cursor, text.length, matches);
+  node.replaceWith(fragment);
+}
+
+function getHighlightMatches(text: string, terms: InlineHighlightTerm[]): InlineHighlightMatch[] {
+  const matches: InlineHighlightMatch[] = [];
+  let cursor = 0;
   while (cursor < text.length) {
     const match = findNextHighlightMatch(text, cursor, terms);
     if (!match) break;
-
-    if (match.index > cursor) {
-      fragment.append(document.createTextNode(text.slice(cursor, match.index)));
-    }
-
-    const highlight = el<HTMLSpanElement>(
-      <span class={match.className}>{text.slice(match.index, match.index + match.length)}</span>
-    );
-    fragment.append(highlight);
+    matches.push(match);
     cursor = match.index + match.length;
   }
+  return matches;
+}
 
-  if (cursor === 0) return;
-  if (cursor < text.length) {
-    fragment.append(document.createTextNode(text.slice(cursor)));
-  }
-  node.replaceWith(fragment);
+function appendHighlightedText(
+  container: DocumentFragment | HTMLElement,
+  text: string,
+  start: number,
+  end: number,
+  matches: InlineHighlightMatch[]
+): void {
+  let cursor = start;
+  matches.forEach((match) => {
+    const highlightStart = Math.max(cursor, start, match.index);
+    const highlightEnd = Math.min(end, match.index + match.length);
+    if (highlightStart >= highlightEnd) return;
+
+    if (highlightStart > cursor) {
+      container.append(document.createTextNode(text.slice(cursor, highlightStart)));
+    }
+    container.append(
+      el<HTMLSpanElement>(
+        <span class={match.className}>{text.slice(highlightStart, highlightEnd)}</span>
+      )
+    );
+    cursor = highlightEnd;
+  });
+
+  if (cursor < end) container.append(document.createTextNode(text.slice(cursor, end)));
 }
 
 function findNextHighlightMatch(

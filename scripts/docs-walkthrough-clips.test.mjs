@@ -11,17 +11,19 @@ const walkthroughClipsScript = await readFile(
 
 describe('docs walkthrough clips', () => {
   afterEach(() => {
+    window.history.replaceState(null, '', `${window.location.pathname}${window.location.search}`);
     document.head.innerHTML = '';
     document.body.innerHTML = '';
     vi.restoreAllMocks();
   });
 
-  it('opens data-driven clips and loops each one within its bounds', () => {
+  it('opens shared clip hashes, updates the URL, and loops each clip within its bounds', () => {
     document.body.innerHTML = `
       <a
         id="games-clip"
-        href="/#install"
+        href="#clip-games"
         data-walkthrough-clip-open
+        data-walkthrough-clip-chapter="games"
         data-walkthrough-clip-start="105"
         data-walkthrough-clip-end="135"
         data-walkthrough-clip-title="Games"
@@ -30,6 +32,7 @@ describe('docs walkthrough clips', () => {
         id="drafts-clip"
         type="button"
         data-walkthrough-clip-open
+        data-walkthrough-clip-chapter="translate-what-you-type"
         data-walkthrough-clip-start="25"
         data-walkthrough-clip-end="40"
         data-walkthrough-clip-title="Draft translator"
@@ -38,6 +41,7 @@ describe('docs walkthrough clips', () => {
         id="commands-tag"
         type="button"
         data-walkthrough-clip-open
+        data-walkthrough-clip-chapter="use-tab-commands"
         data-walkthrough-clip-start="164"
         data-walkthrough-clip-end="176"
         data-walkthrough-clip-title="Use Tab commands"
@@ -54,6 +58,7 @@ describe('docs walkthrough clips', () => {
     const gamesTrigger = document.querySelector('#games-clip');
     const draftsTrigger = document.querySelector('#drafts-clip');
     const commandsTrigger = document.querySelector('#commands-tag');
+    const frameCallbacks = [];
     let currentTime = 0;
     let isPaused = true;
 
@@ -98,19 +103,31 @@ describe('docs walkthrough clips', () => {
         value: vi.fn(() => modal.setAttribute('open', ''))
       }
     });
-    vi.spyOn(window, 'requestAnimationFrame').mockImplementation(() => 1);
+    vi.spyOn(window, 'requestAnimationFrame').mockImplementation((callback) => {
+      frameCallbacks.push(callback);
+      return frameCallbacks.length;
+    });
     vi.spyOn(window, 'cancelAnimationFrame').mockImplementation(() => undefined);
 
+    window.history.replaceState(null, '', '#clip-translate-what-you-type');
     window.eval(walkthroughClipsScript);
+    frameCallbacks.shift()(0);
+
+    expect(modal.open).toBe(true);
+    expect(window.location.hash).toBe('#clip-translate-what-you-type');
+    expect(modal.querySelector('[data-walkthrough-clip-title]').textContent).toBe('Draft translator');
+    expect(video.currentTime).toBe(25);
+    expect(video.play).toHaveBeenCalledOnce();
 
     expect(gamesTrigger.getAttribute('aria-controls')).toBe('walkthrough-clip');
     expect(gamesTrigger.getAttribute('aria-haspopup')).toBe('dialog');
     expect(gamesTrigger.dispatchEvent(new MouseEvent('click', { bubbles: true, button: 0, cancelable: true }))).toBe(false);
+    expect(window.location.hash).toBe('#clip-games');
     expect(modal.open).toBe(true);
     expect(gamesTrigger.textContent).toBe('Games');
     expect(modal.querySelector('[data-walkthrough-clip-title]').textContent).toBe('Games');
     expect(video.currentTime).toBe(105);
-    expect(video.play).toHaveBeenCalledOnce();
+    expect(video.play).toHaveBeenCalledTimes(2);
 
     video.currentTime = 134.96;
     video.dispatchEvent(new Event('timeupdate'));
@@ -122,11 +139,13 @@ describe('docs walkthrough clips', () => {
     expect(video.pause).not.toHaveBeenCalled();
 
     draftsTrigger.dispatchEvent(new MouseEvent('click', { bubbles: true, button: 0, cancelable: true }));
+    expect(window.location.hash).toBe('#clip-translate-what-you-type');
     expect(draftsTrigger.textContent).toBe('Drafts');
     expect(modal.querySelector('[data-walkthrough-clip-title]').textContent).toBe('Draft translator');
     expect(video.currentTime).toBe(25);
 
     commandsTrigger.dispatchEvent(new MouseEvent('click', { bubbles: true, button: 0, cancelable: true }));
+    expect(window.location.hash).toBe('#clip-use-tab-commands');
     expect(commandsTrigger.textContent).toBe('Watch');
     expect(commandsTrigger.getAttribute('aria-controls')).toBe('walkthrough-clip');
     expect(modal.querySelector('[data-walkthrough-clip-title]').textContent).toBe('Use Tab commands');
@@ -134,6 +153,17 @@ describe('docs walkthrough clips', () => {
 
     modal.dispatchEvent(new MouseEvent('click', { bubbles: true, button: 0 }));
     expect(modal.open).toBe(false);
+    expect(window.location.hash).toBe('');
     expect(video.pause).toHaveBeenCalled();
+
+    window.history.pushState(null, '', '#clip-games');
+    window.dispatchEvent(new Event('hashchange'));
+    expect(modal.open).toBe(true);
+    expect(modal.querySelector('[data-walkthrough-clip-title]').textContent).toBe('Games');
+
+    window.history.replaceState(null, '', '#features');
+    window.dispatchEvent(new Event('hashchange'));
+    expect(modal.open).toBe(false);
+    expect(window.location.hash).toBe('#features');
   });
 });

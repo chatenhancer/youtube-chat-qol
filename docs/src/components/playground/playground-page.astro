@@ -1,5 +1,7 @@
 ---
 import Icon from '../common/icon.astro';
+import { getWalkthroughClipHash } from '../../data/walkthrough';
+import type { WalkthroughChapterName } from '../../data/walkthrough';
 
 interface PlaygroundGame {
   alt: string;
@@ -29,6 +31,7 @@ interface PlaygroundPageCopy {
 }
 
 interface PlaygroundWalkthroughClip {
+  chapter: WalkthroughChapterName;
   endSeconds?: number;
   startSeconds: number;
   title: string;
@@ -42,6 +45,7 @@ const { clipCta, computerHref, copy, games, installHref, walkthroughClip } = Ast
   installHref: string;
   walkthroughClip: PlaygroundWalkthroughClip;
 };
+const walkthroughClipHash = getWalkthroughClipHash(walkthroughClip.chapter);
 
 const gameLogoPattern = [
   { className: 'pg-logo-chess', kind: 'chess' },
@@ -107,8 +111,9 @@ const marqueeGameLogos = Array.from({ length: 3 }, () => gameLogoPattern).flat()
       <div class="pg-hero-actions">
         <a
           class="button button-primary"
-          href={installHref}
+          href={walkthroughClipHash}
           data-walkthrough-clip-open
+          data-walkthrough-clip-chapter={walkthroughClip.chapter}
           data-walkthrough-clip-start={walkthroughClip.startSeconds}
           data-walkthrough-clip-end={walkthroughClip.endSeconds}
           data-walkthrough-clip-title={walkthroughClip.title}
