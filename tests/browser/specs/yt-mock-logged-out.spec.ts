@@ -23,6 +23,7 @@ import {
 import { settingsMenuScenario } from '../scenarios/menus';
 import { popupResetScenario } from '../scenarios/popup-reset';
 import {
+  profileCardAeroOriginHighlightScenario,
   profileCardHistoryPagingScenario,
   profileCardReceivesNewMessagesScenario,
   profileCardRecentMessagesScenario
@@ -51,3 +52,7 @@ test('logged-out mock: inbox saves keyword matches, highlights them, and jumps b
 test('logged-out mock: profile card opens from a chat avatar', profileCardRecentMessagesScenario);
 test('logged-out mock: profile card receives new messages from the selected author', profileCardReceivesNewMessagesScenario);
 test('logged-out mock: profile card pages through retained author history', profileCardHistoryPagingScenario);
+test(
+  'logged-out mock: Aero highlights the current message in the profile card',
+  profileCardAeroOriginHighlightScenario
+);

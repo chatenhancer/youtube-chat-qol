@@ -85,6 +85,53 @@ export const profileCardHistoryPagingScenario: BrowserScenario = async ({ chat }
   });
 };
 
+export const profileCardAeroOriginHighlightScenario: BrowserScenario = async ({ chat }) => {
+  await test.step('Keep the profile origin message highlighted in Aero', async () => {
+    if (!isMockPageSurface(chat)) {
+      throw new Error('Aero profile origin styling requires the deterministic mock chat page.');
+    }
+
+    const root = chat.locator('html');
+    const previousSkin = await root.evaluate((element) => ({
+      skin: element.getAttribute('data-ytcq-chat-skin'),
+      theme: element.getAttribute('data-ytcq-chat-skin-theme')
+    }));
+
+    try {
+      await root.evaluate((element) => {
+        element.setAttribute('data-ytcq-chat-skin', 'aero');
+        element.setAttribute('data-ytcq-chat-skin-theme', 'light');
+      });
+
+      const source = await openStableProfileCardFromRecentMessage(chat);
+      const originRecord = await getProfileCardRecord(chat, source);
+      await expect(originRecord).toHaveClass(/ytcq-profile-card-message-origin/);
+
+      for (const theme of ['light', 'dark'] as const) {
+        await root.evaluate((element, value) => {
+          element.setAttribute('data-ytcq-chat-skin-theme', value);
+        }, theme);
+        const boxShadow = await originRecord.evaluate(
+          (element) => getComputedStyle(element).boxShadow
+        );
+        expect(boxShadow, `Expected an Aero ${theme} origin-message highlight.`).not.toBe('none');
+        expect(boxShadow).toContain('inset');
+      }
+    } finally {
+      await closeProfileCardIfPresent(chat);
+      await root.evaluate((element, attributes) => {
+        for (const [name, value] of Object.entries({
+          'data-ytcq-chat-skin': attributes.skin,
+          'data-ytcq-chat-skin-theme': attributes.theme
+        })) {
+          if (value === null) element.removeAttribute(name);
+          else element.setAttribute(name, value);
+        }
+      }, previousSkin);
+    }
+  });
+};
+
 interface MessageSource {
   authorName: string;
   channelId: string;

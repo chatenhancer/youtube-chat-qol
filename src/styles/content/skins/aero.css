@@ -1385,6 +1385,18 @@
   box-shadow: none;
 }
 
+:root[data-ytcq-chat-skin="aero"] .ytcq-profile-card-message.ytcq-profile-card-message-origin {
+  border-color: color-mix(
+    in srgb,
+    var(--ytcq-aero-accent) 72%,
+    var(--ytcq-aero-list-row-border)
+  );
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--ytcq-aero-accent) 34%, transparent),
+    inset 0 0 8px color-mix(in srgb, var(--ytcq-aero-accent) 36%, transparent),
+    inset 0 0 18px color-mix(in srgb, var(--ytcq-aero-accent) 18%, transparent);
+}
+
 :root[data-ytcq-chat-skin="aero"] :where(
   .ytcq-profile-card-header-button,
   .ytcq-profile-card-author,
