@@ -1936,7 +1936,7 @@ html[dir="rtl"] .hero-blog-ticker-next svg {
 
 .playground-brand-logo {
   display: block;
-  width: clamp(104px, 9vw, 116px);
+  width: 160px;
   height: auto;
 }
 
