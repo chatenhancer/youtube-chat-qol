@@ -227,6 +227,7 @@ export const liteModeMockRenderingAndFallbackScenario: BrowserScenario = async (
         );
         primaryRecord.author!.badges = [];
         primaryRecord.author!.avatarUrl = 'https://www.youtube.com/favicon.ico';
+        primaryRecord.author!.topFanRank = 3;
         const longModeratorRecord = createRecord(
           'lite-browser-message-long-moderator',
           'Long handles remain readable'
@@ -273,6 +274,16 @@ export const liteModeMockRenderingAndFallbackScenario: BrowserScenario = async (
         await expect(liteRow.locator('#author-photo')).toBeVisible();
         await expect(liteRow.locator('.ytcq-lite-content')).toHaveCSS('align-self', 'center');
         await expect(liteRow.locator('#author-name')).toContainText('@LiteViewer');
+        const topFanBadge = liteRow.locator('.ytcq-lite-top-fan-badge');
+        await expect(topFanBadge).toBeVisible();
+        await expect(topFanBadge).toHaveText('#3');
+        await expect(topFanBadge).toHaveAttribute('aria-label', '#3');
+        await expect(topFanBadge).toHaveAttribute('data-top-fan-rank', '3');
+        await expect(topFanBadge).toHaveCSS('height', '24px');
+        await expect(topFanBadge).toHaveCSS('border-radius', '12px');
+        await expect(topFanBadge).toHaveCSS('color', 'rgb(255, 255, 255)');
+        await expect(topFanBadge).toHaveCSS('background-color', 'rgb(54, 0, 140)');
+        await expect(topFanBadge.locator('.ytcq-lite-top-fan-badge-icon')).toBeVisible();
         const longModerator = chat.locator(
           '[data-message-id="lite-browser-message-long-moderator"]'
         );

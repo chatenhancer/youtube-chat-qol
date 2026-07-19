@@ -644,6 +644,7 @@ export function renderLiteChatMessageRow(row: HTMLElement, record: YouTubeChatMe
   );
   const authorChip = createAuthorChip(record.author);
   meta.append(timestamp, authorChip);
+  const topFanBadge = createTopFanBadge(record.author);
 
   const messageContainer = el<HTMLSpanElement>(
     <span id="message-container" class="ytcq-lite-message-container" />
@@ -653,6 +654,7 @@ export function renderLiteChatMessageRow(row: HTMLElement, record: YouTubeChatMe
   messageContainer.append(message);
 
   content.append(meta);
+  if (topFanBadge) content.append(topFanBadge);
   appendKindMetadata(content, record);
   if (
     (record.kind === 'text' || record.kind === 'paid') &&
@@ -707,6 +709,29 @@ function createAuthorChip(author: YouTubeChatAuthor | undefined): HTMLElement {
   authorName.append(chipBadges);
   chip.append(authorName, chatBadges);
   return chip;
+}
+
+function createTopFanBadge(author: YouTubeChatAuthor | undefined): HTMLElement | null {
+  const rank = author?.topFanRank;
+  if (!rank) return null;
+
+  const label = `#${rank}`;
+  return el<HTMLSpanElement>(
+    <span class="ytcq-lite-top-fan-badge" aria-label={label} data-top-fan-rank={rank}>
+      <svg
+        class="ytcq-lite-top-fan-badge-icon"
+        xmlns="http://www.w3.org/2000/svg"
+        height={16}
+        viewBox="0 0 24 24"
+        width={16}
+        focusable="false"
+        aria-hidden="true"
+      >
+        <path d="M12 2a1.5 1.5 0 00-1.296 2.253L7.64 9.617 3.996 7.432A1.498 1.498 0 102.19 8.967l1.833 8.25A1 1 0 005 18h14a1 1 0 00.977-.783l1.833-8.249a1.499 1.499 0 10-1.807-1.536l-3.642 2.185-3.065-5.364A1.5 1.5 0 0012 2Zm-3.132 9.496L12 6.015l3.132 5.482a1.002 1.002 0 001.383.36l3.003-1.802L18.198 16H5.801l-1.32-5.945 3.004 1.802a1 1 0 001.383-.361ZM19 20H5a1 1 0 000 2h14a1 1 0 000-2Z" />
+      </svg>
+      <span class="ytcq-lite-top-fan-badge-rank">{label}</span>
+    </span>
+  );
 }
 
 function createAuthorName(author: YouTubeChatAuthor | undefined): HTMLElement {

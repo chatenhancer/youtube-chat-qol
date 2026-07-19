@@ -95,6 +95,34 @@ describe('Lite chat renderer', () => {
     expect(row.querySelector('#chat-badges')?.childElementCount).toBe(0);
   });
 
+  it('renders Top-fan ranks between the author and message', () => {
+    for (const rank of [1, 2, 3] as const) {
+      const row = createLiteChatMessageRow({
+        ...createRecord(`top-fan-${rank}`, 'Hello'),
+        author: {
+          badges: [],
+          channelId: `UCTopFan${rank}`,
+          name: `@TopFan${rank}`,
+          topFanRank: rank
+        }
+      });
+      const badge = row.querySelector<HTMLElement>('.ytcq-lite-top-fan-badge')!;
+
+      expect(badge.textContent).toBe(`#${rank}`);
+      expect(badge.dataset.topFanRank).toBe(String(rank));
+      expect(badge.getAttribute('aria-label')).toBe(`#${rank}`);
+      expect(badge.querySelector('.ytcq-lite-top-fan-badge-icon path')?.getAttribute('d'))
+        .toContain('M12 2');
+      expect(badge.previousElementSibling?.classList).toContain('ytcq-lite-meta');
+      expect(badge.nextElementSibling?.id).toBe('message-container');
+    }
+
+    expect(
+      createLiteChatMessageRow(createRecord('not-a-top-fan', 'Hello'))
+        .querySelector('.ytcq-lite-top-fan-badge')
+    ).toBeNull();
+  });
+
   it('formats timestampUsec when the transport does not include display text', () => {
     const row = createLiteChatMessageRow({
       ...createRecord('timestamp-message', 'Hello'),

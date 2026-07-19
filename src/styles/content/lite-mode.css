@@ -202,6 +202,38 @@
   vertical-align: bottom;
 }
 
+.ytcq-lite-top-fan-badge {
+  display: inline-flex;
+  box-sizing: border-box;
+  align-items: center;
+  height: 24px;
+  margin: 0 8px 0 4px;
+  padding: 0 8px;
+  border-radius: 12px;
+  color: #fff;
+  background: #581fb4;
+  font: 500 12px/24px Roboto, Arial, sans-serif;
+  vertical-align: bottom;
+  white-space: nowrap;
+}
+
+.ytcq-lite-top-fan-badge[data-top-fan-rank="1"] {
+  background: #7b3edb;
+}
+
+.ytcq-lite-top-fan-badge[data-top-fan-rank="3"] {
+  background: #36008c;
+}
+
+.ytcq-lite-top-fan-badge-icon {
+  display: block;
+  flex: 0 0 auto;
+  width: 16px;
+  height: 16px;
+  margin: 0 2px 0 -2px;
+  fill: currentColor;
+}
+
 .ytcq-lite-message #author-name.ytcq-lite-author-name.owner {
   border-radius: 2px;
   padding: 2px 4px;
