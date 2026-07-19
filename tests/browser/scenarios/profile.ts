@@ -111,11 +111,10 @@ export const profileCardAeroOriginHighlightScenario: BrowserScenario = async ({ 
         await root.evaluate((element, value) => {
           element.setAttribute('data-ytcq-chat-skin-theme', value);
         }, theme);
-        const boxShadow = await originRecord.evaluate(
-          (element) => getComputedStyle(element).boxShadow
-        );
-        expect(boxShadow, `Expected an Aero ${theme} origin-message highlight.`).not.toBe('none');
-        expect(boxShadow).toContain('inset');
+        await expect(
+          originRecord,
+          `Expected an Aero ${theme} origin-message highlight.`
+        ).toHaveCSS('box-shadow', /inset/);
       }
     } finally {
       await closeProfileCardIfPresent(chat);
