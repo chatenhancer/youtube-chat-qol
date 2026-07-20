@@ -107,6 +107,7 @@ describe('YouTube rich text helpers', () => {
 
     appendRichMessageText(container, 'fallback text');
 
+    expect(container.dir).toBe('auto');
     expect(container.textContent).toBe('fallback text');
   });
 

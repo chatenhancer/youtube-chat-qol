@@ -1,17 +1,19 @@
-import { readdir, stat } from 'node:fs/promises';
-import path from 'node:path';
+import walkthroughMedia from './walkthrough-videos.json';
+import { defaultLocale } from './locales';
+import type { Locale } from './locales';
 
-export async function findLatestWalkthroughVideo(): Promise<string> {
-  const videosDir = path.join(process.cwd(), 'docs', 'public', 'videos');
-  const entries = await readdir(videosDir).catch(() => []);
-  const candidates = entries.filter((entry) => /^chat-enhancer-walkthrough-[a-f0-9]{8}\.mp4$/.test(entry));
-  if (!candidates.length) return '';
+const videos = walkthroughMedia.videos as Partial<Record<Locale, string>>;
 
-  const files = await Promise.all(candidates.map(async (fileName) => {
-    const fileStat = await stat(path.join(videosDir, fileName));
-    return { fileName, mtimeMs: fileStat.mtimeMs };
-  }));
+export function getWalkthroughVideoUrl(
+  locale: Locale,
+  publicBaseUrl = walkthroughMedia.publicBaseUrl
+): string {
+  const fileName = videos[locale] || videos[defaultLocale];
+  if (!fileName) return '';
 
-  files.sort((first, second) => second.mtimeMs - first.mtimeMs || first.fileName.localeCompare(second.fileName));
-  return files[0].fileName;
+  return new URL(fileName, ensureTrailingSlash(publicBaseUrl)).href;
+}
+
+function ensureTrailingSlash(value: string): string {
+  return value.endsWith('/') ? value : `${value}/`;
 }

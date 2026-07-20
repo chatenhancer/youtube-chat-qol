@@ -498,7 +498,7 @@
       "message": "Diğer uzantı kullanıcılarıyla oyun oynayın. Etkinken chatenhancer.com'a bağlanır."
     },
     "playgroundProfile": {
-      "message": "Your Playground identity"
+      "message": "Playground kimliğiniz"
     },
     "playgroundWins": {
       "message": "Galibiyetler"
@@ -507,19 +507,19 @@
       "message": "Playground kullanıcılarına gösterilir. YouTube kullanıcı adın toplanmaz veya paylaşılmaz."
     },
     "playgroundDisplayName": {
-      "message": "Display name"
+      "message": "Görünen ad"
     },
     "playgroundDisplayNameTitle": {
-      "message": "How you appear in Playground rooms."
+      "message": "Playground odalarında bu şekilde görünürsünüz."
     },
     "playgroundDisplayNameHelper": {
-      "message": "Leave blank to use your generated Player name."
+      "message": "Oluşturulan oyuncu adınızı kullanmak için boş bırakın."
     },
     "playgroundDisplayNameInvalid": {
-      "message": "Use 24 characters or fewer. URLs and reserved Playground names are not allowed."
+      "message": "En fazla 24 karakter kullanın. URL'lere ve ayrılmış Playground adlarına izin verilmez."
     },
     "playgroundDisplayNameSaveFailed": {
-      "message": "Could not save that display name."
+      "message": "Bu görünen ad kaydedilemedi."
     },
     "games": {
       "message": "Oyunlar"
@@ -534,16 +534,16 @@
       "message": "Daha fazla bilgi"
     },
     "chatSkin": {
-      "message": "Theme"
+      "message": "Tema"
     },
     "chatSkinTitle": {
-      "message": "Choose a custom theme for YouTube chat."
+      "message": "YouTube sohbeti için özel bir tema seçin."
     },
     "chatSkinHelper": {
-      "message": "Apply a custom theme to YouTube chat."
+      "message": "YouTube sohbetine özel bir tema uygulayın."
     },
     "chatSkinDefault": {
-      "message": "Default"
+      "message": "Varsayılan"
     },
     "chatSkinAero": {
       "message": "Aero"

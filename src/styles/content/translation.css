@@ -27,7 +27,7 @@ yt-live-chat-membership-item-renderer .ytcq-translation-prefix,
 .ytcq-profile-card-message .ytcq-translation-prefix,
 .ytcq-focus-message .ytcq-translation-prefix {
   opacity: 0.72;
-  margin-right: 4px;
+  margin-inline-end: 4px;
 }
 
 yt-live-chat-text-message-renderer .ytcq-translation img,

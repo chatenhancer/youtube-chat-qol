@@ -75,8 +75,6 @@
     startPlayback();
   });
 
-  clipVideo.src = videoUrl.href;
-  clipVideo.load();
   window.addEventListener("hashchange", syncClipToHash);
 
   if (getClipFromHash()) {
@@ -117,10 +115,18 @@
     }
 
     activeClip = clip;
+    ensureClipVideoSource();
     if (clipTitle instanceof HTMLElement && clip.title) clipTitle.textContent = clip.title;
     seekToClipStart();
     if (!clipModal.open) clipModal.showModal();
     startPlayback();
+  }
+
+  function ensureClipVideoSource() {
+    if (clipVideo.src === videoUrl.href) return;
+
+    clipVideo.src = videoUrl.href;
+    clipVideo.load();
   }
 
   function closeClip(options = {}) {

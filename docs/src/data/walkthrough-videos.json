@@ -1,0 +1,29 @@
+{
+  "bucket": "chat-enhancer-media",
+  "keyPrefix": "walkthrough",
+  "publicBaseUrl": "https://media.chatenhancer.com/walkthrough/",
+  "videos": {
+    "ar": "chat-enhancer-walkthrough-ar-377f0677.mp4",
+    "de": "chat-enhancer-walkthrough-de-a8b151ab.mp4",
+    "en": "chat-enhancer-walkthrough-en-6eebdefa.mp4",
+    "es": "chat-enhancer-walkthrough-es-3f0910a1.mp4",
+    "fa": "chat-enhancer-walkthrough-fa-5958b93c.mp4",
+    "fr": "chat-enhancer-walkthrough-fr-b2488431.mp4",
+    "he": "chat-enhancer-walkthrough-he-7188ac78.mp4",
+    "hi": "chat-enhancer-walkthrough-hi-56f800f1.mp4",
+    "id": "chat-enhancer-walkthrough-id-f301b702.mp4",
+    "it": "chat-enhancer-walkthrough-it-ae5df17d.mp4",
+    "ja": "chat-enhancer-walkthrough-ja-9d21015c.mp4",
+    "ko": "chat-enhancer-walkthrough-ko-2a658a7b.mp4",
+    "nl": "chat-enhancer-walkthrough-nl-2d3eb47e.mp4",
+    "pl": "chat-enhancer-walkthrough-pl-6dc37be0.mp4",
+    "pt": "chat-enhancer-walkthrough-pt-280e4bc3.mp4",
+    "ru": "chat-enhancer-walkthrough-ru-972e3fb1.mp4",
+    "th": "chat-enhancer-walkthrough-th-1a6a8e6f.mp4",
+    "tr": "chat-enhancer-walkthrough-tr-1f4fb568.mp4",
+    "uk": "chat-enhancer-walkthrough-uk-3fb173dc.mp4",
+    "vi": "chat-enhancer-walkthrough-vi-23890c59.mp4",
+    "zh_CN": "chat-enhancer-walkthrough-zh_CN-4adbfc79.mp4",
+    "zh_TW": "chat-enhancer-walkthrough-zh_TW-303d8f99.mp4"
+  }
+}

@@ -44,7 +44,7 @@
   grid-auto-rows: max-content;
   min-height: 0;
   overflow-y: auto;
-  padding-right: 2px;
+  padding-inline-end: 2px;
 }
 
 .bookmarks-list-empty {
@@ -80,8 +80,7 @@
 .bookmark-row + .bookmark-row::before {
   position: absolute;
   top: -2px;
-  right: 6px;
-  left: 43px;
+  inset-inline: 43px 6px;
   height: 1px;
   background: var(--ytcq-popup-control-border);
   opacity: 0.34;
@@ -196,7 +195,7 @@
   background: transparent;
   cursor: pointer;
   font: inherit;
-  text-align: left;
+  text-align: start;
 }
 
 .bookmark-source-button:hover,

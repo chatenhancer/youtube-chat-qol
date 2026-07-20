@@ -125,6 +125,7 @@ describe('focus mode entrypoint', () => {
     await vi.runAllTimersAsync();
 
     expect(document.querySelector('.ytcq-focus-card-expanded')).not.toBeNull();
+    expect(document.querySelector<HTMLElement>('.ytcq-focus-author-name')?.dir).toBe('auto');
     expect(document.querySelector('.ytcq-focus-empty')?.textContent).toBe('No messages yet');
     expect(chatState.text).toBe('@ViewerOne ');
   });

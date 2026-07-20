@@ -495,7 +495,7 @@
       "message": "Грайте з іншими користувачами розширення. Підключається до chatenhancer.com, доки увімкнено."
     },
     "playgroundProfile": {
-      "message": "Your Playground identity"
+      "message": "Ваш профіль у Playground"
     },
     "playgroundWins": {
       "message": "Перемоги"
@@ -504,19 +504,19 @@
       "message": "Видно користувачам Playground. Ваш YouTube-ідентифікатор не збирається й не передається."
     },
     "playgroundDisplayName": {
-      "message": "Display name"
+      "message": "Відображуване ім’я"
     },
     "playgroundDisplayNameTitle": {
-      "message": "How you appear in Playground rooms."
+      "message": "Так вас бачитимуть у кімнатах Playground."
     },
     "playgroundDisplayNameHelper": {
-      "message": "Leave blank to use your generated Player name."
+      "message": "Залиште поле порожнім, щоб використовувати згенероване ім’я гравця."
     },
     "playgroundDisplayNameInvalid": {
-      "message": "Use 24 characters or fewer. URLs and reserved Playground names are not allowed."
+      "message": "Використовуйте не більше 24 символів. URL-адреси та зарезервовані імена Playground заборонені."
     },
     "playgroundDisplayNameSaveFailed": {
-      "message": "Could not save that display name."
+      "message": "Не вдалося зберегти це відображуване ім’я."
     },
     "games": {
       "message": "Ігри"
@@ -531,16 +531,16 @@
       "message": "Докладніше"
     },
     "chatSkin": {
-      "message": "Theme"
+      "message": "Тема"
     },
     "chatSkinTitle": {
-      "message": "Choose a custom theme for YouTube chat."
+      "message": "Виберіть власну тему для чату YouTube."
     },
     "chatSkinHelper": {
-      "message": "Apply a custom theme to YouTube chat."
+      "message": "Застосуйте власну тему до чату YouTube."
     },
     "chatSkinDefault": {
-      "message": "Default"
+      "message": "За замовчуванням"
     },
     "chatSkinAero": {
       "message": "Aero"

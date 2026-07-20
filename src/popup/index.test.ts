@@ -601,6 +601,7 @@ describe('popup', () => {
     await import('./index');
 
     expect(document.documentElement.lang).toBe('es-ES');
+    expect(document.documentElement.dir).toBe('ltr');
     expect(document.querySelector('[data-i18n="translation"]')?.textContent).toBe('translation');
     expect(document.querySelector('[data-i18n="playgroundProfileHelper"]')?.textContent).toBe('playgroundProfileHelper');
     expect(document.querySelector('[data-i18n-title="openChannel"]')?.getAttribute('title')).toBe('openChannel');
@@ -608,6 +609,19 @@ describe('popup', () => {
     expect(document.querySelector('[data-i18n=""]')?.textContent).toBe('unchanged text');
     expect(document.querySelector('[data-i18n-title=""]')?.getAttribute('title')).toBe('unchanged title');
     expect(document.querySelector('[data-i18n-aria-label=""]')?.getAttribute('aria-label')).toBe('unchanged label');
+  });
+
+  it('mirrors the popup for right-to-left browser locales', async () => {
+    vi.mocked(chrome.i18n.getUILanguage).mockReturnValue('ar');
+    vi.mocked(chrome.tabs.query).mockImplementation(((_queryInfo: chrome.tabs.QueryInfo, callback?: (tabs: chrome.tabs.Tab[]) => void) => {
+      callback?.([]);
+      return Promise.resolve([]);
+    }) as never);
+
+    await import('./index');
+
+    expect(document.documentElement.lang).toBe('ar');
+    expect(document.documentElement.dir).toBe('rtl');
   });
 
   it('falls back to browser language and i18n keys when i18n helpers are unavailable', async () => {
@@ -631,6 +645,7 @@ describe('popup', () => {
       await import('./index');
 
       expect(document.documentElement.lang).toBe('pt-BR');
+      expect(document.documentElement.dir).toBe('ltr');
       expect(document.querySelector('[data-i18n="translation"]')?.textContent).toBe('translation');
     } finally {
       Object.defineProperty(chrome, 'i18n', {

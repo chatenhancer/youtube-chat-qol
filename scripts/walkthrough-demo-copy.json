@@ -1,0 +1,134 @@
+{
+  "ar": {
+    "composerDraft": "شكرًا على البث @ChatDemo ✅",
+    "incomingTranslation": "كانت إطلالة الضيف رائعة.",
+    "nativeBlock": "حظر",
+    "nativeReport": "إبلاغ"
+  },
+  "de": {
+    "composerDraft": "Danke für den Stream @ChatDemo ✅",
+    "incomingTranslation": "Der Auftritt des Gastes war großartig.",
+    "nativeBlock": "Blockieren",
+    "nativeReport": "Melden"
+  },
+  "en": {
+    "composerDraft": "Thanks for the stream @ChatDemo ✅",
+    "incomingTranslation": "That guest entrance was great.",
+    "nativeBlock": "Block",
+    "nativeReport": "Report"
+  },
+  "es": {
+    "composerDraft": "Gracias por la transmisión @ChatDemo ✅",
+    "incomingTranslation": "La entrada del invitado estuvo genial.",
+    "nativeBlock": "Bloquear",
+    "nativeReport": "Denunciar"
+  },
+  "fa": {
+    "composerDraft": "ممنون بابت پخش زنده @ChatDemo ✅",
+    "incomingTranslation": "ورود مهمان عالی بود.",
+    "nativeBlock": "مسدود کردن",
+    "nativeReport": "گزارش"
+  },
+  "fr": {
+    "composerDraft": "Merci pour le direct @ChatDemo ✅",
+    "incomingTranslation": "L’entrée de l’invité était géniale.",
+    "nativeBlock": "Bloquer",
+    "nativeReport": "Signaler"
+  },
+  "he": {
+    "composerDraft": "תודה על השידור @ChatDemo ✅",
+    "incomingTranslation": "הכניסה של האורח הייתה נהדרת.",
+    "nativeBlock": "חסימה",
+    "nativeReport": "דיווח"
+  },
+  "hi": {
+    "composerDraft": "स्ट्रीम के लिए धन्यवाद @ChatDemo ✅",
+    "incomingTranslation": "मेहमान की एंट्री शानदार थी।",
+    "nativeBlock": "ब्लॉक करें",
+    "nativeReport": "शिकायत करें"
+  },
+  "id": {
+    "composerDraft": "Terima kasih untuk siarannya @ChatDemo ✅",
+    "incomingTranslation": "Kemunculan tamunya keren sekali.",
+    "nativeBlock": "Blokir",
+    "nativeReport": "Laporkan"
+  },
+  "it": {
+    "composerDraft": "Grazie per la diretta @ChatDemo ✅",
+    "incomingTranslation": "L’ingresso dell’ospite è stato fantastico.",
+    "nativeBlock": "Blocca",
+    "nativeReport": "Segnala"
+  },
+  "ja": {
+    "composerDraft": "配信ありがとうございます @ChatDemo ✅",
+    "incomingTranslation": "ゲストの登場が最高でした。",
+    "nativeBlock": "ブロック",
+    "nativeReport": "報告"
+  },
+  "ko": {
+    "composerDraft": "방송 감사합니다 @ChatDemo ✅",
+    "incomingTranslation": "게스트의 등장이 정말 멋졌어요.",
+    "nativeBlock": "차단",
+    "nativeReport": "신고"
+  },
+  "nl": {
+    "composerDraft": "Bedankt voor de stream @ChatDemo ✅",
+    "incomingTranslation": "De entree van de gast was geweldig.",
+    "nativeBlock": "Blokkeren",
+    "nativeReport": "Melden"
+  },
+  "pl": {
+    "composerDraft": "Dzięki za transmisję @ChatDemo ✅",
+    "incomingTranslation": "Wejście gościa było świetne.",
+    "nativeBlock": "Zablokuj",
+    "nativeReport": "Zgłoś"
+  },
+  "pt": {
+    "composerDraft": "Obrigado pela transmissão @ChatDemo ✅",
+    "incomingTranslation": "A entrada do convidado foi ótima.",
+    "nativeBlock": "Bloquear",
+    "nativeReport": "Denunciar"
+  },
+  "ru": {
+    "composerDraft": "Спасибо за трансляцию @ChatDemo ✅",
+    "incomingTranslation": "Выход гостя был отличным.",
+    "nativeBlock": "Заблокировать",
+    "nativeReport": "Пожаловаться"
+  },
+  "th": {
+    "composerDraft": "ขอบคุณสำหรับสตรีม @ChatDemo ✅",
+    "incomingTranslation": "การปรากฏตัวของแขกรับเชิญยอดเยี่ยมมาก",
+    "nativeBlock": "บล็อก",
+    "nativeReport": "รายงาน"
+  },
+  "tr": {
+    "composerDraft": "Yayın için teşekkürler @ChatDemo ✅",
+    "incomingTranslation": "Konuğun girişi harikaydı.",
+    "nativeBlock": "Engelle",
+    "nativeReport": "Bildir"
+  },
+  "uk": {
+    "composerDraft": "Дякую за трансляцію @ChatDemo ✅",
+    "incomingTranslation": "Вихід гостя був чудовим.",
+    "nativeBlock": "Заблокувати",
+    "nativeReport": "Поскаржитися"
+  },
+  "vi": {
+    "composerDraft": "Cảm ơn bạn về buổi phát trực tiếp @ChatDemo ✅",
+    "incomingTranslation": "Màn xuất hiện của vị khách thật tuyệt.",
+    "nativeBlock": "Chặn",
+    "nativeReport": "Báo cáo"
+  },
+  "zh_CN": {
+    "composerDraft": "感谢直播 @ChatDemo ✅",
+    "incomingTranslation": "嘉宾的出场太棒了。",
+    "nativeBlock": "屏蔽",
+    "nativeReport": "举报"
+  },
+  "zh_TW": {
+    "composerDraft": "感謝直播 @ChatDemo ✅",
+    "incomingTranslation": "來賓的登場太精彩了。",
+    "nativeBlock": "封鎖",
+    "nativeReport": "檢舉"
+  }
+}

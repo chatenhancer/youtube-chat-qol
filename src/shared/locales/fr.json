@@ -495,7 +495,7 @@
       "message": "Jouez avec d’autres utilisateurs de l’extension. Se connecte à chatenhancer.com tant que c’est activé."
     },
     "playgroundProfile": {
-      "message": "Your Playground identity"
+      "message": "Votre identité Playground"
     },
     "playgroundWins": {
       "message": "Victoires"
@@ -504,19 +504,19 @@
       "message": "Visible par les utilisateurs de Playground. Votre pseudo YouTube n’est ni collecté ni partagé."
     },
     "playgroundDisplayName": {
-      "message": "Display name"
+      "message": "Nom d’affichage"
     },
     "playgroundDisplayNameTitle": {
-      "message": "How you appear in Playground rooms."
+      "message": "La façon dont vous apparaissez dans les salons Playground."
     },
     "playgroundDisplayNameHelper": {
-      "message": "Leave blank to use your generated Player name."
+      "message": "Laissez ce champ vide pour utiliser votre nom de joueur généré."
     },
     "playgroundDisplayNameInvalid": {
-      "message": "Use 24 characters or fewer. URLs and reserved Playground names are not allowed."
+      "message": "Utilisez 24 caractères maximum. Les URL et les noms Playground réservés ne sont pas autorisés."
     },
     "playgroundDisplayNameSaveFailed": {
-      "message": "Could not save that display name."
+      "message": "Impossible d’enregistrer ce nom d’affichage."
     },
     "games": {
       "message": "Jeux"
@@ -531,16 +531,16 @@
       "message": "En savoir plus"
     },
     "chatSkin": {
-      "message": "Theme"
+      "message": "Thème"
     },
     "chatSkinTitle": {
-      "message": "Choose a custom theme for YouTube chat."
+      "message": "Choisissez un thème personnalisé pour le chat YouTube."
     },
     "chatSkinHelper": {
-      "message": "Apply a custom theme to YouTube chat."
+      "message": "Appliquez un thème personnalisé au chat YouTube."
     },
     "chatSkinDefault": {
-      "message": "Default"
+      "message": "Par défaut"
     },
     "chatSkinAero": {
       "message": "Aero"

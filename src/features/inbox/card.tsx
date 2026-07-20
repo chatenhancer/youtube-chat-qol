@@ -222,6 +222,7 @@ function renderInboxList(list: HTMLElement): void {
       <button
         type="button"
         class="ytcq-inbox-author"
+        dir="auto"
         onClick={(event: MouseEvent) => {
           event.preventDefault();
           event.stopPropagation();

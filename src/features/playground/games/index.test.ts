@@ -266,6 +266,8 @@ describe('playground games header button', () => {
     expect(getGameCard('The Wild Wild Chat').querySelector('.ytcq-games-restriction-badge')).toBeNull();
     expect(getGameCard('The Wild Wild Chat').getAttribute('aria-label')).not.toContain('Can only be played');
     expect(getGameCard('Stick Around!').getAttribute('aria-disabled')).toBe('false');
+    expect(getGameCard('Stick Around!').querySelector<HTMLElement>('.ytcq-games-game-label')?.dir).toBe('auto');
+    expect(getGameCard('Stick Around!').querySelector<HTMLElement>('.ytcq-games-game-helper')?.dir).toBe('auto');
     expect(getGameCard('Stick Around!').querySelector('.ytcq-games-restriction-badge')).toBeNull();
     expect(getGameCard('Stick Around!').getAttribute('aria-label')).not.toContain('Can only be played');
     getGameCard('HELP-A-FRIEND! Trivia').click();

@@ -156,6 +156,7 @@ describe('inbox card view', () => {
 
     expect(card.querySelector('.ytcq-profile-card-subtitle')?.textContent).toBe('1 new message');
     expect(row.querySelector('time')?.textContent).toBe('9:30 PM');
+    expect(row.querySelector<HTMLElement>('.ytcq-inbox-author')?.dir).toBe('auto');
     expect(row.querySelector('.ytcq-inbox-message-body')?.textContent).toContain('@ViewerOne hello inbox');
 
     row.click();

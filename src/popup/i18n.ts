@@ -1,6 +1,7 @@
 export function localizePopup(): string {
   const popupLocale = getBrowserUiLocale();
   document.documentElement.lang = popupLocale;
+  document.documentElement.dir = getPopupTextDirection(popupLocale);
 
   document.querySelectorAll<HTMLElement>('[data-i18n]').forEach((element) => {
     const key = element.dataset.i18n;
@@ -18,6 +19,11 @@ export function localizePopup(): string {
   });
 
   return popupLocale;
+}
+
+export function getPopupTextDirection(locale: string): 'ltr' | 'rtl' {
+  const language = locale.trim().toLowerCase().replaceAll('_', '-').split('-')[0];
+  return ['ar', 'fa', 'he', 'iw', 'ur'].includes(language) ? 'rtl' : 'ltr';
 }
 
 export function getBrowserUiLocale(): string {

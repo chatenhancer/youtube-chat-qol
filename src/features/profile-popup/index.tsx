@@ -291,6 +291,7 @@ function showProfileCard(source: ProfileSource, anchor: HTMLElement): void {
     <button
       type="button"
       class="ytcq-profile-card-title ytcq-profile-card-author"
+      dir="auto"
       title={t('mentionUser')}
       onClick={handleTitleClick}
     >

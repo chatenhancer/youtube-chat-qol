@@ -29,6 +29,9 @@ describe('translation rendering', () => {
     expect(message.querySelector('#message')?.textContent).toBe('gracias');
     expect(message.querySelector('.ytcq-translation')?.textContent).toContain('ありがとう');
     expect(message.querySelector('.ytcq-translation')?.getAttribute('lang')).toBe('ja');
+    expect(message.querySelector('.ytcq-translation > span:last-child')?.getAttribute('dir')).toBe(
+      'auto'
+    );
   });
 
   it('replaces message text and can restore it later', () => {

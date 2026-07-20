@@ -25,7 +25,9 @@ describe('game overlay shell', () => {
     expect(shell.root.classList.contains('ytcq-game-overlay')).toBe(true);
     expect(shell.header.classList.contains('ytcq-game-overlay-header')).toBe(true);
     expect(shell.titleElement.textContent).toBe('Stick Around!');
+    expect(shell.titleElement.dir).toBe('auto');
     expect(shell.subtitleElement.textContent).toBe('Live');
+    expect(shell.subtitleElement.dir).toBe('auto');
     expect(shell.closeButton.getAttribute('aria-label')).toBe('Hide');
     expect(shell.closeButton.parentElement).toBe(shell.actions);
     expect(shell.statusOverlay.element.parentElement).toBe(shell.body);

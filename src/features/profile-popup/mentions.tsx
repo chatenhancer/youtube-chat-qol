@@ -238,6 +238,7 @@ function applyProfileMentionIdentity(
   fallbackAuthorName: string,
   identity: UserIdentity
 ): void {
+  mention.dir = 'auto';
   mention.dataset.ytcqProfileMention = identity.authorName || fallbackAuthorName;
   if (identity.channelId) {
     mention.dataset.ytcqProfileMentionChannelId = identity.channelId;

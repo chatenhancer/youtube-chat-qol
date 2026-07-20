@@ -495,7 +495,7 @@
       "message": "با دیگر کاربران افزونه بازی کنید. هنگام فعال بودن به chatenhancer.com وصل می‌شود."
     },
     "playgroundProfile": {
-      "message": "Your Playground identity"
+      "message": "هویت شما در Playground"
     },
     "playgroundWins": {
       "message": "بردها"
@@ -504,19 +504,19 @@
       "message": "برای کاربران Playground نمایش داده می‌شود. نام کاربری YouTube شما جمع‌آوری یا هم‌رسانی نمی‌شود."
     },
     "playgroundDisplayName": {
-      "message": "Display name"
+      "message": "نام نمایشی"
     },
     "playgroundDisplayNameTitle": {
-      "message": "How you appear in Playground rooms."
+      "message": "نحوه نمایش شما در اتاق‌های Playground."
     },
     "playgroundDisplayNameHelper": {
-      "message": "Leave blank to use your generated Player name."
+      "message": "برای استفاده از نام بازیکن تولیدشده، این قسمت را خالی بگذارید."
     },
     "playgroundDisplayNameInvalid": {
-      "message": "Use 24 characters or fewer. URLs and reserved Playground names are not allowed."
+      "message": "حداکثر از ۲۴ نویسه استفاده کنید. نشانی‌های اینترنتی و نام‌های رزروشده Playground مجاز نیستند."
     },
     "playgroundDisplayNameSaveFailed": {
-      "message": "Could not save that display name."
+      "message": "ذخیره این نام نمایشی ممکن نشد."
     },
     "games": {
       "message": "بازی‌ها"
@@ -531,16 +531,16 @@
       "message": "بیشتر بدانید"
     },
     "chatSkin": {
-      "message": "Theme"
+      "message": "طرح زمینه"
     },
     "chatSkinTitle": {
-      "message": "Choose a custom theme for YouTube chat."
+      "message": "یک طرح زمینه سفارشی برای گپ YouTube انتخاب کنید."
     },
     "chatSkinHelper": {
-      "message": "Apply a custom theme to YouTube chat."
+      "message": "یک طرح زمینه سفارشی روی گپ YouTube اعمال کنید."
     },
     "chatSkinDefault": {
-      "message": "Default"
+      "message": "پیش‌فرض"
     },
     "chatSkinAero": {
       "message": "Aero"

@@ -14,6 +14,7 @@ docs/sitemap.xml
 test-results/
 playwright-report/
 .chrome-test-profiles/
+assets/demo/walkthrough/
 *.zip
 __pycache__/
 *.py[cod]

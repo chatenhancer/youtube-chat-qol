@@ -498,7 +498,7 @@
       "message": "与其他扩展用户一起玩游戏。启用期间会连接到 chatenhancer.com。"
     },
     "playgroundProfile": {
-      "message": "Your Playground identity"
+      "message": "你的 Playground 身份"
     },
     "playgroundWins": {
       "message": "胜利"
@@ -507,19 +507,19 @@
       "message": "显示给 Playground 用户。你的 YouTube 账号名称不会被收集或分享。"
     },
     "playgroundDisplayName": {
-      "message": "Display name"
+      "message": "显示名称"
     },
     "playgroundDisplayNameTitle": {
-      "message": "How you appear in Playground rooms."
+      "message": "你在 Playground 房间中的显示方式。"
     },
     "playgroundDisplayNameHelper": {
-      "message": "Leave blank to use your generated Player name."
+      "message": "留空即可使用自动生成的玩家名称。"
     },
     "playgroundDisplayNameInvalid": {
-      "message": "Use 24 characters or fewer. URLs and reserved Playground names are not allowed."
+      "message": "请使用不超过 24 个字符。不能使用网址和保留的 Playground 名称。"
     },
     "playgroundDisplayNameSaveFailed": {
-      "message": "Could not save that display name."
+      "message": "无法保存该显示名称。"
     },
     "games": {
       "message": "游戏"
@@ -534,16 +534,16 @@
       "message": "了解更多"
     },
     "chatSkin": {
-      "message": "Theme"
+      "message": "主题"
     },
     "chatSkinTitle": {
-      "message": "Choose a custom theme for YouTube chat."
+      "message": "为 YouTube 聊天选择自定义主题。"
     },
     "chatSkinHelper": {
-      "message": "Apply a custom theme to YouTube chat."
+      "message": "将自定义主题应用到 YouTube 聊天。"
     },
     "chatSkinDefault": {
-      "message": "Default"
+      "message": "默认"
     },
     "chatSkinAero": {
       "message": "Aero"

@@ -498,7 +498,7 @@
       "message": "Main game dengan pengguna ekstensi lain. Terhubung ke chatenhancer.com saat diaktifkan."
     },
     "playgroundProfile": {
-      "message": "Your Playground identity"
+      "message": "Identitas Playground Anda"
     },
     "playgroundWins": {
       "message": "Kemenangan"
@@ -507,19 +507,19 @@
       "message": "Ditampilkan kepada pengguna Playground. Handle YouTube Anda tidak dikumpulkan atau dibagikan."
     },
     "playgroundDisplayName": {
-      "message": "Display name"
+      "message": "Nama tampilan"
     },
     "playgroundDisplayNameTitle": {
-      "message": "How you appear in Playground rooms."
+      "message": "Tampilan Anda di ruang Playground."
     },
     "playgroundDisplayNameHelper": {
-      "message": "Leave blank to use your generated Player name."
+      "message": "Kosongkan untuk menggunakan nama pemain yang dibuat otomatis."
     },
     "playgroundDisplayNameInvalid": {
-      "message": "Use 24 characters or fewer. URLs and reserved Playground names are not allowed."
+      "message": "Gunakan maksimal 24 karakter. URL dan nama Playground yang dicadangkan tidak diizinkan."
     },
     "playgroundDisplayNameSaveFailed": {
-      "message": "Could not save that display name."
+      "message": "Nama tampilan tersebut tidak dapat disimpan."
     },
     "games": {
       "message": "Game"
@@ -534,16 +534,16 @@
       "message": "Pelajari selengkapnya"
     },
     "chatSkin": {
-      "message": "Theme"
+      "message": "Tema"
     },
     "chatSkinTitle": {
-      "message": "Choose a custom theme for YouTube chat."
+      "message": "Pilih tema khusus untuk chat YouTube."
     },
     "chatSkinHelper": {
-      "message": "Apply a custom theme to YouTube chat."
+      "message": "Terapkan tema khusus pada chat YouTube."
     },
     "chatSkinDefault": {
-      "message": "Default"
+      "message": "Bawaan"
     },
     "chatSkinAero": {
       "message": "Aero"

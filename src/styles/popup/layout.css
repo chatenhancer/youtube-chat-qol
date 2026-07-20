@@ -68,7 +68,7 @@ main {
   color: var(--ytcq-popup-secondary-text);
   font-size: 11px;
   line-height: 14px;
-  text-align: left;
+  text-align: start;
   white-space: nowrap;
 }
 

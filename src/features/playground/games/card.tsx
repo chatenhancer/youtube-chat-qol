@@ -28,9 +28,13 @@ export function createGamesCard(onClose: () => void): GamesCardElements {
         <span class="ytcq-games-card-icon">{createGamesIcon()}</span>
         <div class="ytcq-profile-card-title-wrap">
           <div class="ytcq-games-title-row">
-            <div class="ytcq-profile-card-title">{t('games')}</div>
+            <div class="ytcq-profile-card-title" dir="auto">
+              {t('games')}
+            </div>
           </div>
-          <div class="ytcq-profile-card-subtitle">{t('playground')}</div>
+          <div class="ytcq-profile-card-subtitle" dir="auto">
+            {t('playground')}
+          </div>
         </div>
         {createGamesCardCloseButton(onClose)}
       </div>

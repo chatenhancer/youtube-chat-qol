@@ -498,7 +498,7 @@
       "message": "अन्य एक्सटेंशन उपयोगकर्ताओं के साथ गेम खेलें। चालू होने पर chatenhancer.com से कनेक्ट होता है."
     },
     "playgroundProfile": {
-      "message": "Your Playground identity"
+      "message": "आपकी Playground पहचान"
     },
     "playgroundWins": {
       "message": "जीतें"
@@ -507,19 +507,19 @@
       "message": "Playground उपयोगकर्ताओं को दिखता है। आपका YouTube हैंडल इकट्ठा या शेयर नहीं किया जाता."
     },
     "playgroundDisplayName": {
-      "message": "Display name"
+      "message": "दिखाया जाने वाला नाम"
     },
     "playgroundDisplayNameTitle": {
-      "message": "How you appear in Playground rooms."
+      "message": "Playground रूम में आप इस तरह दिखाई देंगे।"
     },
     "playgroundDisplayNameHelper": {
-      "message": "Leave blank to use your generated Player name."
+      "message": "अपने आप बनाए गए खिलाड़ी नाम का उपयोग करने के लिए इसे खाली छोड़ें।"
     },
     "playgroundDisplayNameInvalid": {
-      "message": "Use 24 characters or fewer. URLs and reserved Playground names are not allowed."
+      "message": "24 या उससे कम वर्णों का उपयोग करें। URL और आरक्षित Playground नामों की अनुमति नहीं है।"
     },
     "playgroundDisplayNameSaveFailed": {
-      "message": "Could not save that display name."
+      "message": "वह दिखाया जाने वाला नाम सेव नहीं किया जा सका।"
     },
     "games": {
       "message": "गेम"
@@ -534,16 +534,16 @@
       "message": "और जानें"
     },
     "chatSkin": {
-      "message": "Theme"
+      "message": "थीम"
     },
     "chatSkinTitle": {
-      "message": "Choose a custom theme for YouTube chat."
+      "message": "YouTube चैट के लिए कस्टम थीम चुनें।"
     },
     "chatSkinHelper": {
-      "message": "Apply a custom theme to YouTube chat."
+      "message": "YouTube चैट पर कस्टम थीम लागू करें।"
     },
     "chatSkinDefault": {
-      "message": "Default"
+      "message": "डिफ़ॉल्ट"
     },
     "chatSkinAero": {
       "message": "Aero"

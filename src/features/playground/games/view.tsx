@@ -590,8 +590,14 @@ function getWrappedIndex(index: number, length: number): number {
 function createGameCardCopy(label: string, helperText: string): HTMLElement {
   return el<HTMLSpanElement>(
     <span class="ytcq-games-game-copy">
-      <span class="ytcq-games-game-label">{label}</span>
-      {helperText ? <span class="ytcq-games-game-helper">{helperText}</span> : null}
+      <span class="ytcq-games-game-label" dir="auto">
+        {label}
+      </span>
+      {helperText ? (
+        <span class="ytcq-games-game-helper" dir="auto">
+          {helperText}
+        </span>
+      ) : null}
     </span>
   );
 }

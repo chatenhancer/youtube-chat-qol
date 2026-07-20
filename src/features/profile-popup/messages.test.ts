@@ -67,6 +67,7 @@ describe('profile card message renderer', () => {
 
     expect(item.getAttribute('role')).toBe('button');
     expect(item.querySelector('time')?.textContent).toBe('9:30 PM');
+    expect(item.querySelector<HTMLElement>('.ytcq-profile-card-message-text')?.dir).toBe('auto');
     expect(item.querySelector('.ytcq-profile-card-message-text')?.textContent).toBe('hello from chat');
 
     item.click();
@@ -111,6 +112,7 @@ describe('profile card message renderer', () => {
 
     const mention = list.querySelector<HTMLElement>('.ytcq-profile-mention');
     expect(mention?.textContent).toBe('@OtherViewer');
+    expect(mention?.dir).toBe('auto');
     expect(mention?.dataset.ytcqProfileMention).toBe('@OtherViewer');
     expect(list.querySelectorAll('.ytcq-profile-mention')).toHaveLength(1);
     expect(list.textContent).toContain('@MissingViewer');

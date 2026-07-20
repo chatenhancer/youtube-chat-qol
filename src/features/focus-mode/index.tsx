@@ -360,7 +360,11 @@ function createFocusAuthor(source: FocusSource, options: { openChannel: boolean 
   const channelUrl = getChannelUrl(source.channelId, source.authorName);
   const content = [
     createFocusAvatar(source),
-    el<HTMLSpanElement>(<span class="ytcq-focus-author-name">{source.authorName}</span>)
+    el<HTMLSpanElement>(
+      <span class="ytcq-focus-author-name" dir="auto">
+        {source.authorName}
+      </span>
+    )
   ];
 
   if (channelUrl && options.openChannel) {

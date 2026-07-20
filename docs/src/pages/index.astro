@@ -3,15 +3,15 @@ import { getCollection } from 'astro:content';
 import HomeLayout from '../layouts/home-layout.astro';
 import HomePage from '../components/home/home-page.astro';
 import { getLocalizedBlogPosts } from '../data/blog';
-import { findLatestWalkthroughVideo } from '../data/media';
+import { getWalkthroughVideoUrl } from '../data/media';
 import { getMessages } from '../data/locales';
 
 const locale = 'en';
 const messages = getMessages(locale);
 const posts = getLocalizedBlogPosts(await getCollection('blog'), locale);
-const walkthroughFileName = await findLatestWalkthroughVideo();
+const walkthroughUrl = getWalkthroughVideoUrl(locale);
 const clientConfig = {
-  ...(walkthroughFileName ? { walkthrough: `videos/${walkthroughFileName}` } : {})
+  ...(walkthroughUrl ? { walkthrough: walkthroughUrl } : {})
 };
 ---
 

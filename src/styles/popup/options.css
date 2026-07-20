@@ -65,7 +65,7 @@
 
 .option-helper {
   grid-column: 1;
-  margin-left: 23px;
+  margin-inline-start: 23px;
   color: var(--ytcq-popup-secondary-text);
   font-size: 11px;
   font-weight: 400;

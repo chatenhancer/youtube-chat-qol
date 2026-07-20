@@ -495,7 +495,7 @@
       "message": "다른 확장 프로그램 사용자와 게임을 플레이하세요. 활성화된 동안 chatenhancer.com에 연결됩니다."
     },
     "playgroundProfile": {
-      "message": "Your Playground identity"
+      "message": "내 Playground 프로필"
     },
     "playgroundWins": {
       "message": "승리"
@@ -504,19 +504,19 @@
       "message": "Playground 사용자에게 표시됩니다. YouTube 핸들은 수집되거나 공유되지 않습니다."
     },
     "playgroundDisplayName": {
-      "message": "Display name"
+      "message": "표시 이름"
     },
     "playgroundDisplayNameTitle": {
-      "message": "How you appear in Playground rooms."
+      "message": "Playground 방에서 표시되는 이름입니다."
     },
     "playgroundDisplayNameHelper": {
-      "message": "Leave blank to use your generated Player name."
+      "message": "자동 생성된 플레이어 이름을 사용하려면 비워 두세요."
     },
     "playgroundDisplayNameInvalid": {
-      "message": "Use 24 characters or fewer. URLs and reserved Playground names are not allowed."
+      "message": "24자 이하로 입력하세요. URL 및 예약된 Playground 이름은 사용할 수 없습니다."
     },
     "playgroundDisplayNameSaveFailed": {
-      "message": "Could not save that display name."
+      "message": "해당 표시 이름을 저장할 수 없습니다."
     },
     "games": {
       "message": "게임"
@@ -531,16 +531,16 @@
       "message": "자세히 알아보기"
     },
     "chatSkin": {
-      "message": "Theme"
+      "message": "테마"
     },
     "chatSkinTitle": {
-      "message": "Choose a custom theme for YouTube chat."
+      "message": "YouTube 채팅용 맞춤 테마를 선택하세요."
     },
     "chatSkinHelper": {
-      "message": "Apply a custom theme to YouTube chat."
+      "message": "YouTube 채팅에 맞춤 테마를 적용합니다."
     },
     "chatSkinDefault": {
-      "message": "Default"
+      "message": "기본값"
     },
     "chatSkinAero": {
       "message": "Aero"

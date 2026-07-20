@@ -151,7 +151,9 @@ export function createInlineTranslationElement(
 
   translation.append(
     el<HTMLSpanElement>(<span class="ytcq-translation-prefix">{t('translated')}</span>),
-    el<HTMLSpanElement>(<span>{createNodesWithPlaceholders(result.text, protectedTokens)}</span>)
+    el<HTMLSpanElement>(
+      <span dir="auto">{createNodesWithPlaceholders(result.text, protectedTokens)}</span>
+    )
   );
   return translation;
 }
@@ -198,6 +200,7 @@ export function renderToggleableReplacementTranslation({
   const renderView = (view: ReplacedTranslationView): void => {
     host.classList.add('ytcq-translation-replaced');
     host.dataset.ytcqTranslationView = view;
+    textElement.dir = 'auto';
     textElement.classList.add('ytcq-translation-replaced-text');
 
     if (view === 'original') {

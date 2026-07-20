@@ -39,6 +39,7 @@ export function appendRichMessageText(
   nodes: Node[] = [],
   segments: RichTextSegment[] = []
 ): void {
+  container.dir = 'auto';
   const richNodes = nodes.map(cloneSafeMessageNode).filter((node): node is Node => Boolean(node));
   if (richNodes.length) {
     container.append(...richNodes);

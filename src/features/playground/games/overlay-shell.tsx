@@ -64,12 +64,14 @@ export function createGameOverlayShell({
           <div
             ref={(element: HTMLDivElement) => (titleElement = element)}
             class={`ytcq-game-overlay-title ${classNamePrefix}-title`}
+            dir="auto"
           >
             {title}
           </div>
           <div
             ref={(element: HTMLDivElement) => (subtitleElement = element)}
             class={`ytcq-game-overlay-subtitle ${classNamePrefix}-subtitle`}
+            dir="auto"
           >
             {subtitle}
           </div>

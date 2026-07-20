@@ -159,6 +159,7 @@ describe('profile popup coordinator', () => {
     expect(message.dataset.ytcqProfileWired).toBe('true');
     expect(avatar.title).toBe('Show recent messages');
     expect(messageMocks.renderProfileMessages).toHaveBeenCalled();
+    expect(card.querySelector<HTMLElement>('.ytcq-profile-card-author')?.dir).toBe('auto');
     expect(positioningMocks.positionProfileCard).toHaveBeenCalledWith(
       card,
       expect.objectContaining({ left: 0, right: 0, top: 0 })

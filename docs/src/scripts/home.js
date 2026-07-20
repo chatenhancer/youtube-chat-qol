@@ -878,9 +878,6 @@
     }
 
     const videoUrl = new URL(walkthroughPath, window.location.href);
-    walkthroughVideo.src = videoUrl.href;
-    walkthroughVideo.load();
-    preloadWalkthroughVideo(videoUrl);
     updateWalkthroughTimeBadge();
     walkthroughCtas.forEach((cta) => {
       cta.hidden = false;
@@ -924,6 +921,7 @@
     setWalkthroughKeyPointPanelOpen(false);
     hideWalkthroughPlaybackFeedback();
     if (walkthroughModal && typeof walkthroughModal.showModal === "function") {
+      ensureWalkthroughVideoSource(videoUrl);
       if (walkthroughModal.open) {
         startWalkthroughPlayback({ allowMutedFallback: options.allowMutedFallback === true });
         return;
@@ -940,16 +938,12 @@
     window.open(fallbackVideoUrl.href, "_blank", "noopener");
   }
 
-  function preloadWalkthroughVideo(videoUrl) {
-    if (document.querySelector('link[data-walkthrough-video-preload]')) return;
+  function ensureWalkthroughVideoSource(videoUrl) {
+    if (!(walkthroughVideo instanceof HTMLVideoElement)) return;
+    if (walkthroughVideo.src === videoUrl.href) return;
 
-    const preload = document.createElement("link");
-    preload.rel = "preload";
-    preload.as = "video";
-    preload.href = videoUrl.href;
-    preload.type = "video/mp4";
-    preload.dataset.walkthroughVideoPreload = "";
-    document.head.append(preload);
+    walkthroughVideo.src = videoUrl.href;
+    walkthroughVideo.load();
   }
 
   function startWalkthroughPlayback(options = {}) {

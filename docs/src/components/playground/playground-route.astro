@@ -5,7 +5,7 @@ import Header from '../home/header.astro';
 import PlaygroundPage from './playground-page.astro';
 import { getBlogPostPath, getLocalizedBlogPosts } from '../../data/blog';
 import { getLocaleUrl, getMessages, htmlLangFor, locales } from '../../data/locales';
-import { findLatestWalkthroughVideo } from '../../data/media';
+import { getWalkthroughVideoUrl } from '../../data/media';
 import type { Locale } from '../../data/locales';
 import { site } from '../../data/site';
 import { getWalkthroughClip } from '../../data/walkthrough';
@@ -15,9 +15,9 @@ const { locale, rootPrefix } = Astro.props as { locale: Locale; rootPrefix: stri
 const messages = getMessages(locale);
 const page = messages.playgroundPage;
 const posts = getLocalizedBlogPosts(await getCollection('blog'), locale);
-const walkthroughFileName = await findLatestWalkthroughVideo();
+const walkthroughUrl = getWalkthroughVideoUrl(locale);
 const clientConfig = {
-  ...(walkthroughFileName ? { walkthrough: `${rootPrefix}videos/${walkthroughFileName}` } : {})
+  ...(walkthroughUrl ? { walkthrough: walkthroughUrl } : {})
 };
 const gamesWalkthroughClip = {
   ...getWalkthroughClip('games'),
