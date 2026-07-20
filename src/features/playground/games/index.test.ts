@@ -179,7 +179,7 @@ describe('playground games header button', () => {
     expect(header.querySelector('.ytcq-games-button')).not.toBe(button);
   });
 
-  it('toggles the games panel from the header button', () => {
+  it('toggles the games panel from the header button', async () => {
     const header = createHeader();
     document.body.append(header);
     setOptions({ ...DEFAULT_OPTIONS, playgroundEnabled: true, playgroundGamesAvailable: false });
@@ -227,10 +227,17 @@ describe('playground games header button', () => {
     const unavailableGames = document.querySelector<HTMLDetailsElement>(
       '.ytcq-games-unavailable-section'
     )!;
+    const gamesBody = document.querySelector<HTMLElement>('.ytcq-games-card-body')!;
+    Object.defineProperties(gamesBody, {
+      clientHeight: { configurable: true, value: 336 },
+      scrollHeight: { configurable: true, value: 520 }
+    });
     expect(unavailableGames.open).toBe(false);
     expect(getGameLabels(unavailableGames)).toEqual(['HELP-A-FRIEND! Trivia']);
     unavailableGames.querySelector<HTMLElement>('summary')!.click();
+    await vi.runOnlyPendingTimersAsync();
     expect(unavailableGames.open).toBe(true);
+    expect(gamesBody.scrollTop).toBe(gamesBody.scrollHeight);
     expect(document.querySelector('.ytcq-games-preview-chess .ytcq-games-preview-canvas')).not.toBeNull();
     expect(document.querySelector('.ytcq-games-preview-bounty-hunting .ytcq-games-preview-canvas')).not.toBeNull();
     expect(document.querySelector('.ytcq-games-preview-replay-trivia .ytcq-games-preview-canvas')).not.toBeNull();

@@ -62,6 +62,9 @@ export const playgroundChessInviteAndMoveScenario: BrowserScenario = async ({ ch
     await unavailableGames.locator('summary').click();
     await expect(unavailableGames).toHaveAttribute('open', '');
     await expect(unavailableGames).toHaveCSS('row-gap', '6px');
+    await expect.poll(() => card.locator('.ytcq-games-card-body').evaluate((body) =>
+      Math.max(0, body.scrollHeight - body.clientHeight - body.scrollTop)
+    )).toBeLessThanOrEqual(1);
     await expect(replayTriviaCard).toBeVisible();
     await expect(replayTriviaCard).toHaveAttribute('aria-disabled', 'true');
     await expect(replayTriviaCard).toHaveAttribute(

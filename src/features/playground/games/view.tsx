@@ -9,6 +9,7 @@ import { createChevronBackwardIcon, createLockIcon } from '../../../shared/icons
 import { t } from '../../../shared/i18n';
 import { jsx, el } from '../../../shared/jsx-dom';
 import { createLoadingSpinner } from '../../../shared/loading-spinner';
+import { scrollElementToBottom } from '../../../shared/scroll';
 import { getPlaygroundAvatarPresentation } from '../../../shared/playground/identity';
 import type {
   GameId,
@@ -406,13 +407,27 @@ function createGameSections(
 
   const unavailableSection = el<HTMLDetailsElement>(
     <details class="ytcq-games-section ytcq-games-unavailable-section" open={unavailableGamesOpen}>
-      <summary class="ytcq-games-section-title ytcq-games-unavailable-summary">
+      <summary
+        class="ytcq-games-section-title ytcq-games-unavailable-summary"
+        onClick={handleUnavailableGamesSummaryClick}
+      >
         {t('gamesUnavailableGames')}
       </summary>
       {unavailableGrid}
     </details>
   );
   return [availableSection, unavailableSection];
+}
+
+function handleUnavailableGamesSummaryClick(event: Event): void {
+  const summary = event.currentTarget;
+  if (!(summary instanceof HTMLElement)) return;
+
+  const section = summary.closest<HTMLDetailsElement>('.ytcq-games-unavailable-section');
+  if (!section || section.open) return;
+
+  const body = summary.closest<HTMLElement>('.ytcq-games-card-body');
+  if (body) scrollElementToBottom(body);
 }
 
 function getGameCardAriaLabel(
