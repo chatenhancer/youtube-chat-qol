@@ -797,8 +797,9 @@ export const playgroundReplayTriviaAnswerScenario: BrowserScenario = async ({ ch
       toUserId: 'luna-user'
     });
 
+    const phaseStartedAt = Date.now();
     await backend.sendServerMessage({
-      game: createBrowserReplayTriviaGame(),
+      game: createBrowserReplayTriviaGame(phaseStartedAt),
       type: 'gameStarted'
     });
 
@@ -813,9 +814,7 @@ export const playgroundReplayTriviaAnswerScenario: BrowserScenario = async ({ ch
       gameId: 'browser-replay-trivia-game',
       payload: {
         choiceIndex: 1,
-        expectedQuestionId: 'question-1',
-        expectedQuestionIndex: 0,
-        expectedStatus: 'question'
+        expectedPhaseStartedAt: phaseStartedAt
       }
     });
 
@@ -1487,7 +1486,7 @@ function createBrowserChessGame({
   } as PublicGame;
 }
 
-function createBrowserReplayTriviaGame(): PublicGame {
+function createBrowserReplayTriviaGame(phaseStartedAt = Date.now()): PublicGame {
   return {
     answers: {},
     currentQuestion: {
@@ -1501,7 +1500,7 @@ function createBrowserReplayTriviaGame(): PublicGame {
     currentQuestionIndex: 0,
     gameId: 'browser-replay-trivia-game',
     gameType: 'replay-trivia',
-    phaseStartedAt: Date.now(),
+    phaseStartedAt,
     players: {
       guest: {
         displayName: 'Luna Chat',
