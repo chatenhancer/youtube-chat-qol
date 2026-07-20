@@ -73,22 +73,20 @@ export function createGameSoundController({
 
   return {
     beep: (options) => {
-      if (enabled) playGameBeep(options);
+      if (enabled && !signal.aborted) playGameBeep(signal, options);
     },
     button,
     isEnabled: () => enabled,
     play: (path) => {
-      if (enabled) playGameSound(path);
+      if (enabled && !signal.aborted) playGameSound(signal, path);
     }
   };
 }
 
-function playGameBeep({
-  durationMs = 90,
-  frequency = 880,
-  type = 'sine',
-  volume = 0.04
-}: GameSoundToneOptions = {}): void {
+function playGameBeep(
+  signal: AbortSignal,
+  { durationMs = 90, frequency = 880, type = 'sine', volume = 0.04 }: GameSoundToneOptions = {}
+): void {
   const AudioContextConstructor = getAudioContextConstructor();
   if (!AudioContextConstructor) return;
 
@@ -107,12 +105,22 @@ function playGameBeep({
     gain.gain.exponentialRampToValueAtTime(0.001, now + durationSeconds);
     oscillator.connect(gain);
     gain.connect(audioContext.destination);
-    oscillator.start(now);
-    oscillator.stop(now + durationSeconds + 0.012);
-    oscillator.onended = () => {
-      oscillator.disconnect();
-      gain.disconnect();
-    };
+    const stop = bindGameSoundToPanel(
+      signal,
+      oscillator,
+      () => oscillator.stop(),
+      () => {
+        oscillator.disconnect();
+        gain.disconnect();
+      }
+    );
+    try {
+      oscillator.start(now);
+      oscillator.stop(now + durationSeconds + 0.012);
+    } catch {
+      stop();
+      return;
+    }
     void audioContext.resume?.().catch(() => undefined);
   } catch {
     // Game sounds should never affect game controls or rendering.
@@ -153,8 +161,8 @@ export function preloadGameSounds(paths: readonly string[]): void {
   });
 }
 
-function playGameSound(path: string): void {
-  if (playBufferedGameSound(path)) return;
+function playGameSound(signal: AbortSignal, path: string): void {
+  if (playBufferedGameSound(signal, path)) return;
 
   const audio = getPlayableHtmlGameSound(path);
   if (!audio) return;
@@ -165,14 +173,18 @@ function playGameSound(path: string): void {
     // Some browsers reject seeking before enough metadata is available.
   }
 
+  const stop = bindGameSoundToPanel(signal, audio, () => {
+    audio.pause();
+    audio.currentTime = 0;
+  });
   try {
-    void audio.play().catch(() => undefined);
+    void audio.play().catch(stop);
   } catch {
-    // Audio playback failures should never affect the game UI.
+    stop();
   }
 }
 
-function playBufferedGameSound(path: string): boolean {
+function playBufferedGameSound(signal: AbortSignal, path: string): boolean {
   const preload = preloadBufferedGameSound(path);
   if (!preload?.buffer) return false;
 
@@ -184,15 +196,52 @@ function playBufferedGameSound(path: string): boolean {
     const source = audioContext.createBufferSource();
     source.buffer = preload.buffer;
     source.connect(audioContext.destination);
-    source.start(0);
-    source.onended = () => {
-      source.disconnect();
-    };
+    const stop = bindGameSoundToPanel(
+      signal,
+      source,
+      () => source.stop(0),
+      () => {
+        source.disconnect();
+      }
+    );
+    try {
+      source.start(0);
+    } catch {
+      stop();
+      return false;
+    }
     void audioContext.resume?.().catch(() => undefined);
     return true;
   } catch {
     return false;
   }
+}
+
+function bindGameSoundToPanel(
+  signal: AbortSignal,
+  sound: HTMLAudioElement | AudioScheduledSourceNode,
+  stopSound: () => void,
+  disconnect: () => void = () => undefined
+): () => void {
+  let active = true;
+  const cleanUp = (): void => {
+    if (!active) return;
+    active = false;
+    signal.removeEventListener('abort', stop);
+    sound.onended = null;
+    disconnect();
+  };
+  const stop = (): void => {
+    try {
+      stopSound();
+    } catch {
+      // The sound may already have stopped naturally.
+    }
+    cleanUp();
+  };
+  sound.onended = cleanUp;
+  signal.addEventListener('abort', stop, { once: true });
+  return stop;
 }
 
 function getPlayableHtmlGameSound(path: string): HTMLAudioElement | null {

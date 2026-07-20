@@ -7,12 +7,19 @@
  */
 import {
   PLAYGROUND_BACKEND_ORIGIN,
+  PLAYGROUND_GAME_VERSIONS,
   PLAYGROUND_PORT_NAME,
   PLAYGROUND_PROTOCOL_VERSION,
+  SUPPORTED_GAMES,
+  filterCompatiblePlaygroundGames,
+  isPlaygroundGameVersionCompatible,
   type ClientMessage,
   type GameId,
+  type IncompatibleActiveGame,
+  type LobbySnapshot,
   type PlaygroundBackgroundMessage,
   type PlaygroundContentMessage,
+  type PlaygroundGameVersions,
   type ServerMessage,
   type SignedClientIdentity
 } from '../shared/playground/protocol';
@@ -35,17 +42,11 @@ import {
   type PlaygroundProfileUpdateResponse,
   type StoredPlaygroundIdentity
 } from '../shared/playground/identity';
-import {
-  REPLAY_TRIVIA_QUESTIONS_BACKGROUND_MESSAGE,
-  REPLAY_TRIVIA_QUESTIONS_ROUTE,
-  type ReplayTriviaQuestionsBackgroundMessage,
-  type ReplayTriviaQuestionsBackgroundResponse,
-  type ReplayTriviaQuestionsResponse
-} from '../shared/playground/trivia';
+import { handleReplayTriviaBackgroundMessage } from './playground-replay-trivia';
 
 const SIGNATURE_PREFIX = 'chat-enhancer-playground:';
-const MAX_QUEUED_CLIENT_MESSAGES = 20;
 const PLAYGROUND_HEARTBEAT_INTERVAL_MS = 20_000;
+const MAX_QUEUED_CLIENT_MESSAGES = 20;
 const PLAYGROUND_RECONNECT_DELAYS_MS = [750, 2_000, 5_000, 10_000] as const;
 const activePlaygroundSessions = new Set<PlaygroundBackgroundSession>();
 
@@ -106,10 +107,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     return true;
   }
 
-  if (!isReplayTriviaQuestionsBackgroundMessage(message)) return false;
-
-  void requestReplayTriviaQuestions(message).then(sendResponse);
-  return true;
+  return handleReplayTriviaBackgroundMessage(message, sendResponse);
 });
 
 class PlaygroundBackgroundSession {
@@ -126,6 +124,7 @@ class PlaygroundBackgroundSession {
   private heartbeatTimer: ReturnType<typeof setInterval> | null = null;
   private reconnectAttempt = 0;
   private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+  private serverGameVersions: PlaygroundGameVersions | null = null;
 
   constructor(port: chrome.runtime.Port) {
     this.port = port;
@@ -151,13 +150,17 @@ class PlaygroundBackgroundSession {
 
   private handlePortMessage = (message: PlaygroundContentMessage): void => {
     switch (message?.type) {
-      case 'ytcq:playground:init':
-        this.streamKey = this.senderStreamKey || message.streamKey;
+      case 'ytcq:playground:init': {
+        const nextStreamKey = this.senderStreamKey || message.streamKey;
+        const streamChanged = this.streamKey !== nextStreamKey;
+        this.streamKey = nextStreamKey;
+        if (streamChanged) this.pendingClientMessages = [];
         this.availableGames = message.availableGames;
         this.languageCode = normalizeLanguageCode(message.languageCode) || getDefaultPlaygroundLanguageCode();
         this.locale = normalizeLanguageCode(message.locale) || this.languageCode;
-        void this.connectSocket({ resetPendingMessages: true, resetReconnectAttempts: true });
+        void this.connectSocket({ resetReconnectAttempts: true });
         return;
+      }
       case 'ytcq:playground:set-availability':
         this.availableGames = message.availableGames;
         this.sendClientMessage({
@@ -195,6 +198,7 @@ class PlaygroundBackgroundSession {
         });
         return;
       case 'ytcq:playground:disconnect':
+        this.pendingClientMessages = [];
         this.closeSocket({ allowReconnect: false });
         return;
     }
@@ -209,15 +213,14 @@ class PlaygroundBackgroundSession {
   };
 
   private async connectSocket(options: {
-    resetPendingMessages?: boolean;
     resetReconnectAttempts?: boolean;
   } = {}): Promise<void> {
     if (!this.streamKey || !this.port) return;
     this.clearReconnectTimer();
     this.closeSocket({ allowReconnect: false });
-    if (options.resetPendingMessages) this.pendingClientMessages = [];
     if (options.resetReconnectAttempts) this.reconnectAttempt = 0;
     this.userId = '';
+    this.serverGameVersions = null;
     this.postPortMessage({
       status: 'connecting',
       type: 'ytcq:playground:status'
@@ -255,6 +258,7 @@ class PlaygroundBackgroundSession {
     if (!message) return;
 
     if (message.type === 'challenge') {
+      this.serverGameVersions = { ...(message.gameVersions || {}) };
       await this.respondToChallenge(socket, message.challenge);
       return;
     }
@@ -264,11 +268,9 @@ class PlaygroundBackgroundSession {
       this.reconnectAttempt = 0;
       this.startHeartbeat(socket);
       this.postPortMessage({
-        status: 'connected',
-        type: 'ytcq:playground:status'
-      });
-      this.postPortMessage({
-        snapshot: message.snapshot,
+        incompatibleActiveGames: this.getIncompatibleActiveGames(message.snapshot),
+        incompatibleGames: this.getIncompatibleGames(),
+        snapshot: this.sanitizeSnapshot(message.snapshot),
         type: 'ytcq:playground:snapshot',
         userId: message.userId
       });
@@ -280,7 +282,9 @@ class PlaygroundBackgroundSession {
 
     if (message.type === 'presenceSnapshot') {
       this.postPortMessage({
-        snapshot: message.snapshot,
+        incompatibleActiveGames: this.getIncompatibleActiveGames(message.snapshot),
+        incompatibleGames: this.getIncompatibleGames(),
+        snapshot: this.sanitizeSnapshot(message.snapshot),
         type: 'ytcq:playground:snapshot',
         userId: this.userId
       });
@@ -291,9 +295,13 @@ class PlaygroundBackgroundSession {
       this.postPortMessage({
         code: message.code,
         message: message.message,
+        ...(message.request ? { request: message.request } : {}),
         type: 'ytcq:playground:error'
       });
+      return;
     }
+
+    if (!this.isCompatibleServerMessage(message)) return;
 
     this.postPortMessage({
       message,
@@ -307,6 +315,7 @@ class PlaygroundBackgroundSession {
       this.sendSocketMessage(socket, {
         availableGames: this.availableGames,
         displayName: await getStoredPlaygroundSocketDisplayName(identity),
+        gameVersions: { ...PLAYGROUND_GAME_VERSIONS },
         identity: await createSignedPlaygroundIdentity(challenge, identity),
         languageCode: this.languageCode,
         locale: this.locale,
@@ -320,19 +329,66 @@ class PlaygroundBackgroundSession {
 
   private sendClientMessage(message: ClientMessage): void {
     const socket = this.socket;
-    if (!socket || socket.readyState !== WebSocket.OPEN || !this.userId) {
-      this.pendingClientMessages = [...this.pendingClientMessages, message].slice(-MAX_QUEUED_CLIENT_MESSAGES);
-      return;
-    }
-    if (!this.sendSocketMessage(socket, message)) {
-      this.pendingClientMessages = [...this.pendingClientMessages, message].slice(-MAX_QUEUED_CLIENT_MESSAGES);
-    }
+    if (
+      socket &&
+      socket.readyState === WebSocket.OPEN &&
+      this.userId &&
+      this.sendSocketMessage(socket, message)
+    ) return;
+    this.pendingClientMessages = [...this.pendingClientMessages, message].slice(-MAX_QUEUED_CLIENT_MESSAGES);
   }
 
   private flushPendingClientMessages(): void {
     const messages = this.pendingClientMessages;
     this.pendingClientMessages = [];
     messages.forEach((message) => this.sendClientMessage(message));
+  }
+
+  private canUseGame(gameId: GameId): boolean {
+    return this.serverGameVersions === null
+      || isPlaygroundGameVersionCompatible(gameId, this.serverGameVersions);
+  }
+
+  private getIncompatibleGames(): GameId[] {
+    const serverGameVersions = this.serverGameVersions;
+    if (serverGameVersions === null) return [];
+    return SUPPORTED_GAMES.filter((gameId) =>
+      !isPlaygroundGameVersionCompatible(gameId, serverGameVersions)
+    );
+  }
+
+  private getIncompatibleActiveGames(snapshot: LobbySnapshot): IncompatibleActiveGame[] {
+    return snapshot.games
+      .filter((game) => !this.canUseGame(game.gameType))
+      .map(({ gameId, gameType }) => ({ gameId, gameType }));
+  }
+
+  private sanitizeSnapshot(snapshot: LobbySnapshot): LobbySnapshot {
+    return {
+      games: snapshot.games.filter((game) => this.canUseGame(game.gameType)),
+      invites: snapshot.invites.filter((invite) => this.canUseGame(invite.gameId)),
+      users: snapshot.users.map((user) => ({
+        ...user,
+        availableGames: filterCompatiblePlaygroundGames(
+          user.availableGames,
+          this.serverGameVersions ?? undefined
+        )
+      }))
+    };
+  }
+
+  private isCompatibleServerMessage(message: ServerMessage): boolean {
+    switch (message.type) {
+      case 'inviteCreated':
+      case 'inviteReceived':
+      case 'inviteUpdated':
+        return this.canUseGame(message.invite.gameId);
+      case 'gameStarted':
+      case 'gameUpdated':
+        return this.canUseGame(message.game.gameType);
+      default:
+        return true;
+    }
   }
 
   private sendSocketMessage(socket: WebSocket, message: ClientMessage): boolean {
@@ -447,51 +503,6 @@ function getPlaygroundSocketUrl(streamKey: string): string {
   return url.toString();
 }
 
-async function requestReplayTriviaQuestions(
-  message: ReplayTriviaQuestionsBackgroundMessage
-): Promise<ReplayTriviaQuestionsBackgroundResponse> {
-  const streamKey = normalizeStreamKey(message.streamKey);
-  if (!streamKey) {
-    return {
-      error: 'A YouTube stream key is required for Replay Trivia.',
-      ok: false
-    };
-  }
-
-  const url = new URL(
-    `/v1/streams/${encodeURIComponent(streamKey)}/${REPLAY_TRIVIA_QUESTIONS_ROUTE}`,
-    PLAYGROUND_BACKEND_ORIGIN
-  );
-
-  try {
-    const response = await fetch(url.toString(), {
-      body: JSON.stringify(message.request),
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      method: 'POST'
-    });
-
-    if (!response.ok) {
-      return {
-        ...await getReplayTriviaError(response),
-        ok: false,
-        status: response.status
-      };
-    }
-
-    return {
-      ok: true,
-      response: await response.json() as ReplayTriviaQuestionsResponse
-    };
-  } catch (error) {
-    return {
-      error: error instanceof Error ? error.message : 'Replay Trivia request failed.',
-      ok: false
-    };
-  }
-}
-
 function getVideoIdFromUrl(value: string): string {
   if (!value) return '';
 
@@ -501,11 +512,6 @@ function getVideoIdFromUrl(value: string): string {
   } catch {
     return '';
   }
-}
-
-function normalizeStreamKey(value: string): string {
-  const trimmed = value.trim();
-  return /^[a-zA-Z0-9_-]{4,80}$/.test(trimmed) ? trimmed : '';
 }
 
 function normalizeLanguageCode(value: unknown): string {
@@ -518,20 +524,6 @@ function getDefaultPlaygroundLanguageCode(): string {
   return normalizeLanguageCode(chrome.i18n?.getUILanguage?.()) ||
     normalizeLanguageCode(navigator.language) ||
     'en';
-}
-
-async function getReplayTriviaError(response: Response): Promise<{ code?: string; error: string }> {
-  try {
-    const body = await response.json() as { error?: { code?: string; message?: string } };
-    return {
-      code: body.error?.code,
-      error: body.error?.message || `Replay Trivia request failed with ${response.status}.`
-    };
-  } catch {
-    return {
-      error: `Replay Trivia request failed with ${response.status}.`
-    };
-  }
 }
 
 async function createSignedPlaygroundIdentity(
@@ -710,13 +702,6 @@ function parseServerMessage(data: unknown): ServerMessage | null {
   } catch {
     return null;
   }
-}
-
-function isReplayTriviaQuestionsBackgroundMessage(value: unknown): value is ReplayTriviaQuestionsBackgroundMessage {
-  if (!isRecord(value)) return false;
-  return value.type === REPLAY_TRIVIA_QUESTIONS_BACKGROUND_MESSAGE &&
-    typeof value.streamKey === 'string' &&
-    isRecord(value.request);
 }
 
 function getWinCount(value: unknown): number {

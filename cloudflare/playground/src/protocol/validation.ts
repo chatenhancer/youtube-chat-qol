@@ -6,7 +6,8 @@ import {
   PLAYGROUND_PROTOCOL_VERSION,
   SUPPORTED_GAMES,
   type ClientMessage,
-  type GameId
+  type GameId,
+  type PlaygroundGameVersions
 } from './messages';
 
 export class ProtocolError extends Error {
@@ -97,6 +98,7 @@ function parseHelloMessage(value: Record<string, unknown>): ClientMessage {
   return {
     availableGames: parseGameList(value.availableGames || []),
     displayName: parseOptionalDisplayName(value.displayName),
+    gameVersions: parseGameVersions(value.gameVersions),
     identity: {
       publicKeyJwk: parsePublicKey(identity.publicKeyJwk),
       signature: getString(identity, 'signature')
@@ -106,6 +108,23 @@ function parseHelloMessage(value: Record<string, unknown>): ClientMessage {
     protocolVersion: PLAYGROUND_PROTOCOL_VERSION,
     type: 'hello'
   };
+}
+
+function parseGameVersions(value: unknown): PlaygroundGameVersions | undefined {
+  if (value === undefined) return undefined;
+  if (!isRecord(value)) {
+    throw new ProtocolError('invalid_field', 'gameVersions must be an object.');
+  }
+
+  const gameVersions: PlaygroundGameVersions = {};
+  Object.entries(value).forEach(([gameId, version]) => {
+    if (!SUPPORTED_GAMES.includes(gameId as GameId)) return;
+    if (typeof version !== 'number' || !Number.isSafeInteger(version) || version < 1) {
+      throw new ProtocolError('invalid_field', 'Game versions must be positive integers.');
+    }
+    gameVersions[gameId as GameId] = version;
+  });
+  return gameVersions;
 }
 
 function parseOptionalDisplayName(value: unknown): string | undefined {

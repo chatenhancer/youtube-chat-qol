@@ -8,11 +8,42 @@ export const PLAYGROUND_PORT_NAME = 'ytcq:playground';
 export const PLAYGROUND_PROTOCOL_VERSION = 1;
 export const SUPPORTED_GAMES = ['chess', 'bounty-hunting', 'replay-trivia', 'stick-around'] as const;
 
+export type GameId = typeof SUPPORTED_GAMES[number];
+export type PlaygroundGameVersions = Partial<Record<GameId, number>>;
+
+// Bump only for breaking per-game wire or state changes.
+export const PLAYGROUND_GAME_VERSIONS = {
+  'bounty-hunting': 2,
+  'chess': 1,
+  'replay-trivia': 2,
+  'stick-around': 1
+} as const satisfies Record<GameId, number>;
+
+function getPlaygroundGameVersion(
+  gameId: GameId,
+  gameVersions?: PlaygroundGameVersions
+): number {
+  return gameVersions?.[gameId] ?? 1;
+}
+
+export function isPlaygroundGameVersionCompatible(
+  gameId: GameId,
+  gameVersions?: PlaygroundGameVersions
+): boolean {
+  return getPlaygroundGameVersion(gameId, gameVersions) === PLAYGROUND_GAME_VERSIONS[gameId];
+}
+
+export function filterCompatiblePlaygroundGames(
+  gameIds: GameId[],
+  gameVersions?: PlaygroundGameVersions
+): GameId[] {
+  return gameIds.filter((gameId) => isPlaygroundGameVersionCompatible(gameId, gameVersions));
+}
+
 export function isPlaygroundComputerUserId(userId: string): boolean {
   return userId.startsWith('server:computer:');
 }
 
-export type GameId = typeof SUPPORTED_GAMES[number];
 export type GameEndReason = 'playerLeft';
 export type InviteStatus = 'accepted' | 'cancelled' | 'ignored' | 'pending';
 
@@ -54,6 +85,11 @@ export interface PublicGame {
   status: string;
 }
 
+export interface IncompatibleActiveGame {
+  gameId: string;
+  gameType: GameId;
+}
+
 export type ClientMessage =
   | HelloClientMessage
   | SetAvailabilityClientMessage
@@ -67,6 +103,7 @@ export type ClientMessage =
 export interface HelloClientMessage {
   availableGames?: GameId[];
   displayName?: string;
+  gameVersions?: PlaygroundGameVersions;
   identity: SignedClientIdentity;
   languageCode?: string;
   locale?: string;
@@ -114,6 +151,8 @@ export interface GameActionClientMessage {
   type: 'gameAction';
 }
 
+export type PlaygroundFailedRequest = Exclude<ClientMessage, HelloClientMessage>;
+
 export interface PingClientMessage {
   id?: string;
   type: 'ping';
@@ -135,6 +174,7 @@ export type ServerMessage =
 
 export interface ChallengeServerMessage {
   challenge: string;
+  gameVersions?: PlaygroundGameVersions;
   issuedAt: number;
   protocolVersion: typeof PLAYGROUND_PROTOCOL_VERSION;
   type: 'challenge';
@@ -190,9 +230,13 @@ export interface ReplayTriviaGenerationTokenServerMessage {
   type: 'replayTriviaGenerationToken';
 }
 
-export interface ErrorServerMessage {
+export interface PlaygroundActionError {
   code: string;
   message: string;
+  request?: PlaygroundFailedRequest;
+}
+
+export interface ErrorServerMessage extends PlaygroundActionError {
   type: 'error';
 }
 
@@ -265,6 +309,8 @@ export interface PlaygroundStatusMessage {
 }
 
 export interface PlaygroundSnapshotMessage {
+  incompatibleActiveGames: IncompatibleActiveGame[];
+  incompatibleGames: GameId[];
   snapshot: LobbySnapshot;
   type: 'ytcq:playground:snapshot';
   userId: string;
@@ -275,9 +321,7 @@ export interface PlaygroundServerEventMessage {
   type: 'ytcq:playground:server-message';
 }
 
-export interface PlaygroundBackgroundErrorMessage {
-  code: string;
-  message: string;
+export interface PlaygroundBackgroundErrorMessage extends PlaygroundActionError {
   type: 'ytcq:playground:error';
 }
 

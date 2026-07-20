@@ -68,7 +68,8 @@ import {
   playgroundInviteCancelScenario,
   playgroundStickAroundActiveOverlayControlsScenario,
   playgroundStickAroundComputerOverlayScenario,
-  playgroundStickAroundLiteOverlayScenario
+  playgroundStickAroundLiteOverlayScenario,
+  playgroundVersionMismatchScenario
 } from '../scenarios/playground-games';
 import { tabAlertScenario } from '../scenarios/tab-alert';
 import { loggedInMockTest as test } from '../support/scenario-fixtures';
@@ -186,6 +187,10 @@ test(
 test(
   'logged-in mock: Playground Games toggles lobby availability',
   playgroundAvailabilityToggleScenario
+);
+test(
+  'logged-in mock: Playground explains and blocks incompatible game versions',
+  playgroundVersionMismatchScenario
 );
 test(
   'logged-in mock: Stick Around opens as a chat feed overlay after inviting the computer',

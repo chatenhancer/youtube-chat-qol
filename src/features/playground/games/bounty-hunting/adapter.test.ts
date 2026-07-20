@@ -5,14 +5,20 @@ import type { PublicBountyHuntingGame } from './types';
 
 const panelMock = vi.hoisted(() => ({
   closeBountyHuntingGamePanel: vi.fn(),
+  handleBountyHuntingActionError: vi.fn(),
   openBountyHuntingGamePanel: vi.fn(),
+  resetBountyHuntingGameClientState: vi.fn(),
   setBountyHuntingCompactMode: vi.fn(),
   updateBountyHuntingGamePanel: vi.fn()
 }));
 
 vi.mock('./panel', () => panelMock);
 
-import { bountyHuntingGameAdapter, bountyHuntingGameDefinition } from './adapter';
+import {
+  bountyHuntingGame,
+  bountyHuntingGameAdapter,
+  bountyHuntingGameDefinition
+} from './adapter';
 
 describe('Bounty Hunting game adapter', () => {
   afterEach(() => {
@@ -28,10 +34,30 @@ describe('Bounty Hunting game adapter', () => {
       context.shell,
       game,
       'host-user',
-      context.sendGameAction,
+      expect.any(Function),
       context.onPanelChange,
       context.closePanel,
       context.controls
+    );
+    const sendAction = panelMock.openBountyHuntingGamePanel.mock.calls[0][3] as (
+      gameId: string,
+      action: string,
+      payload?: Record<string, unknown>
+    ) => void;
+    expect(sendAction).toBe(context.sendGameAction);
+    sendAction('game-1', 'shootBounty', { messageId: 'message-1' });
+    expect(context.sendGameAction).toHaveBeenCalledWith(
+      'game-1',
+      'shootBounty',
+      { messageId: 'message-1' }
+    );
+    sendAction('game-1', 'ready');
+    expect(context.sendGameAction).toHaveBeenCalledWith('game-1', 'ready');
+    sendAction('game-1', 'observeBountyMessage', { observations: [] });
+    expect(context.sendGameAction).toHaveBeenCalledWith(
+      'game-1',
+      'observeBountyMessage',
+      { observations: [] }
     );
     expect(handle.gameId).toBe('game-1');
     handle.setCompactMode?.(true);
@@ -49,8 +75,25 @@ describe('Bounty Hunting game adapter', () => {
     expect(panelMock.updateBountyHuntingGamePanel).toHaveBeenCalledWith(game, 'host-user');
   });
 
-  it('uses one game label key for lobby and panel surfaces', () => {
+  it('routes correlated action errors to the Bounty Hunting panel', () => {
+    panelMock.handleBountyHuntingActionError.mockReturnValue(true);
+    const error = {
+      code: 'rate_limited',
+      message: 'Slow down.',
+      request: {
+        action: 'shootBounty',
+        gameId: 'game-1',
+        type: 'gameAction' as const
+      }
+    };
+
+    expect(bountyHuntingGame.handleActionError?.(error)).toBe(true);
+    expect(panelMock.handleBountyHuntingActionError).toHaveBeenCalledWith(error);
+  });
+
+  it('uses one game label key and declares livestream availability', () => {
     expect(bountyHuntingGameDefinition.labelKey).toBe('gamesBountyHunting');
+    expect(bountyHuntingGameDefinition.availability).toBe('livestream');
     expect('panelTitleKey' in bountyHuntingGameDefinition).toBe(false);
   });
 });
@@ -108,9 +151,11 @@ function createUpdateContext(overrides: Partial<GamePanelUpdateContext> = {}): G
 function createClientState(overrides: Partial<PlaygroundClientState> = {}): PlaygroundClientState {
   return {
     available: false,
+    connectionError: '',
     endedGame: null,
-    error: '',
     games: [],
+    incompatibleActiveGames: [],
+    incompatibleGames: [],
     invites: [],
     status: 'connected',
     userId: '',

@@ -16,6 +16,7 @@ import type {
 export interface GameRecord {
   gameId: string;
   gameType: GameId;
+  gameVersion: number;
   status: string;
 }
 
@@ -71,6 +72,8 @@ export interface GameModule {
   getStatePersistence?(input: GameStatePersistenceInput): GameStatePersistence;
   getWinnerUserId?(game: GameRecord): string | null;
   isTerminal(game: GameRecord): boolean;
+  /** Validates the complete persisted record before it is restored. */
+  isStoredGameRecord(value: unknown): value is GameRecord;
   toPublicGame(game: GameRecord, getUser: (userId: string) => PublicUserIdentity, context?: PublicGameContext): PublicGame;
   validateGenerationToken?(game: GameRecord, input: GameGenerationTokenInput): void;
 }

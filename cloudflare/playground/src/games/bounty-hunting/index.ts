@@ -5,7 +5,12 @@
  * Both players ready up, then race to claim server-validated bounty matches
  * from live chat messages for one 60 second round.
  */
-import type { PublicGame, PublicUserIdentity } from '../../protocol/messages';
+import { z } from 'zod';
+import {
+  PLAYGROUND_GAME_VERSIONS,
+  type PublicGame,
+  type PublicUserIdentity
+} from '../../protocol/messages';
 import { ProtocolError } from '../../protocol/validation';
 import type {
   PublicBountyHuntingBounty,
@@ -14,32 +19,122 @@ import type {
   BountyHuntingBountyMatcher,
   BountyHuntingClaim,
   BountyHuntingGameStatus,
+  BountyHuntingMessageObservation,
   BountyHuntingPlayerRole
 } from '../../../../../src/shared/playground/bounty-hunting';
 import {
   BOUNTY_HUNTING_BOUNTY_COUNT,
   BOUNTY_HUNTING_BOUNTY_DESCRIPTION_KEYS,
   BOUNTY_HUNTING_COUNTDOWN_MS,
+  BOUNTY_HUNTING_MAX_WITNESS_OBSERVATIONS,
+  BOUNTY_HUNTING_MISS_COOLDOWN_MS,
   BOUNTY_HUNTING_ROUND_MS,
   BOUNTY_HUNTING_ROUND_OVER_MS,
   getBountyHuntingRoundStartTimestampUsec
 } from '../../../../../src/shared/playground/bounty-hunting';
-import type { GameActionInput, GameModule, GameRecord } from '../types';
+import type { GameActionInput, GameModule, GameRecord, PublicGameContext } from '../types';
 
 type PlayerRole = BountyHuntingPlayerRole;
 
 const MAX_DESCRIPTION_LENGTH = 96;
-const MAX_BOUNTY_WITNESS_OBSERVATIONS = 20;
 const MAX_BOUNTY_WITNESS_IDS = BOUNTY_HUNTING_BOUNTY_COUNT;
+const MAX_STORED_BOUNTY_WITNESSES = 240;
 const MAX_MESSAGE_ID_LENGTH = 160;
 const MIN_BOUNTY_AMOUNT = 25;
 const MAX_BOUNTY_AMOUNT = 500;
-const PENDING_CLAIM_MS = 2_000;
+const BOUNTY_HUNTING_OBSERVATION_BASE_RATE_COST = 3;
+const BOUNTY_HUNTING_OBSERVATION_RATE_COST_PER_MESSAGE = 0.1;
+const BOUNTY_HUNTING_SHOT_RATE_COST = 3;
+
+const BountyHuntingRoleSchema = z.enum(['guest', 'host']);
+const BountyHuntingMatcherSchema = z.union([
+  z.strictObject({
+    kind: z.enum([
+      'allCaps',
+      'channelMemberAuthor',
+      'channelOwnerAuthor',
+      'customEmoji',
+      'mention',
+      'moderatorAuthor',
+      'number',
+      'onlyEmojis',
+      'question',
+      'superChat',
+      'topFanAuthor',
+      'verifiedAuthor'
+    ])
+  }),
+  z.strictObject({
+    kind: z.literal('emojiCount'),
+    min: z.number().int().min(1).max(10)
+  })
+]);
+const BountyHuntingBountySchema = z.strictObject({
+  amount: z.number().int().min(MIN_BOUNTY_AMOUNT).max(MAX_BOUNTY_AMOUNT),
+  description: z.string().min(1),
+  descriptionKey: z.enum(BOUNTY_HUNTING_BOUNTY_DESCRIPTION_KEYS).optional(),
+  id: z.string().min(1),
+  matcher: BountyHuntingMatcherSchema
+});
+const BountyHuntingClaimSchema = z.strictObject({
+  bountyId: z.string().min(1),
+  claimedAt: z.number().finite(),
+  messageId: z.string().min(1),
+  role: BountyHuntingRoleSchema,
+  userId: z.string().min(1)
+});
+const BountyHuntingClaimWitnessSchema = z.strictObject({
+  bountyIds: z.array(z.string().min(1)).min(1).max(MAX_BOUNTY_WITNESS_IDS),
+  messageId: z.string().min(1),
+  messageTimestampUsec: z.string().regex(/^\d{1,24}$/).optional(),
+  observedAt: z.number().finite(),
+  role: BountyHuntingRoleSchema
+});
+const BountyHuntingPendingClaimSchema = z.strictObject({
+  bountyId: z.string().min(1),
+  messageId: z.string().min(1),
+  role: BountyHuntingRoleSchema
+});
+const BountyHuntingGameRecordSchema = z.strictObject({
+  bounties: z.array(BountyHuntingBountySchema).max(BOUNTY_HUNTING_BOUNTY_COUNT),
+  bountyProviderUserId: z.string().min(1),
+  claimWitnesses: z.array(BountyHuntingClaimWitnessSchema).max(MAX_STORED_BOUNTY_WITNESSES),
+  claims: z.array(BountyHuntingClaimSchema).max(BOUNTY_HUNTING_BOUNTY_COUNT),
+  gameId: z.string().min(1),
+  gameType: z.literal('bounty-hunting'),
+  gameVersion: z.literal(PLAYGROUND_GAME_VERSIONS['bounty-hunting']),
+  missCooldownUntilByRole: z.strictObject({
+    guest: z.number().finite().optional(),
+    host: z.number().finite().optional()
+  }),
+  pendingClaims: z.array(BountyHuntingPendingClaimSchema).max(2),
+  phaseStartedAt: z.number().finite(),
+  players: z.strictObject({
+    guest: z.string().min(1),
+    host: z.string().min(1)
+  }),
+  readyPlayers: z.strictObject({
+    guest: z.boolean().optional(),
+    host: z.boolean().optional()
+  }),
+  roundStartTimestampUsec: z.string().regex(/^\d{1,24}$/).optional(),
+  scores: z.strictObject({
+    guest: z.number().int().nonnegative(),
+    host: z.number().int().nonnegative()
+  }),
+  status: z.enum(['active', 'countdown', 'finished', 'preparing', 'ready', 'roundOver'])
+});
+
+export type BountyHuntingClaimWitness = z.infer<typeof BountyHuntingClaimWitnessSchema>;
+export type BountyHuntingPendingClaim = z.infer<typeof BountyHuntingPendingClaimSchema>;
+export type BountyHuntingGameRecord = z.infer<typeof BountyHuntingGameRecordSchema>;
 
 export interface PublicBountyHuntingGame extends PublicGame {
   bounties: PublicBountyHuntingBounty[];
   bountyProviderUserId: string;
   gameType: 'bounty-hunting';
+  missCooldownUntil?: number;
+  pendingClaimMessageId?: string;
   phaseStartedAt: number;
   players: Record<PlayerRole, PublicUserIdentity>;
   readyPlayers: Partial<Record<PlayerRole, boolean>>;
@@ -48,45 +143,6 @@ export interface PublicBountyHuntingGame extends PublicGame {
   scores: Record<PlayerRole, number>;
   status: BountyHuntingGameStatus;
   winnerUserId?: string | null;
-}
-
-interface BountyHuntingGameRecord extends GameRecord {
-  bounties: BountyHuntingBounty[];
-  bountyProviderUserId: string;
-  claimedMessageIds: string[];
-  claimWitnesses: BountyHuntingClaimWitness[];
-  claims: BountyHuntingClaim[];
-  gameType: 'bounty-hunting';
-  phaseStartedAt: number;
-  pendingClaims: BountyHuntingPendingClaim[];
-  players: Record<PlayerRole, string>;
-  readyPlayers: Partial<Record<PlayerRole, boolean>>;
-  roundStartTimestampUsec?: string;
-  scores: Record<PlayerRole, number>;
-  status: BountyHuntingGameStatus;
-}
-
-interface BountyHuntingClaimWitness {
-  bountyId: string;
-  messageId: string;
-  messageTimestampUsec?: string;
-  observedAt: number;
-  role: PlayerRole;
-  userId: string;
-}
-
-interface BountyHuntingPendingClaim {
-  bountyId: string;
-  messageId: string;
-  requestedAt: number;
-  role: PlayerRole;
-  userId: string;
-}
-
-interface BountyHuntingWitnessObservation {
-  bountyIds: string[];
-  messageId: string;
-  messageTimestampUsec?: string;
 }
 
 export const bountyHuntingGameModule: GameModule = {
@@ -99,8 +155,8 @@ export const bountyHuntingGameModule: GameModule = {
         return readyBountyHuntingPlayer(bountyGame, input.userId);
       case 'startRound':
         return startBountyHuntingRound(bountyGame, input);
-      case 'claimBounty':
-        return claimBountyHuntingBounty(bountyGame, input);
+      case 'shootBounty':
+        return shootBountyHuntingMessage(bountyGame, input);
       case 'observeBountyMessage':
         return observeBountyHuntingMessage(bountyGame, input);
       case 'timeout':
@@ -117,9 +173,30 @@ export const bountyHuntingGameModule: GameModule = {
   createGame(gameId, playerUserIds) {
     return createBountyHuntingGame(gameId, playerUserIds[0], playerUserIds[1]);
   },
+  getActionRateCost(input) {
+    const observationCost = (
+      BOUNTY_HUNTING_OBSERVATION_BASE_RATE_COST
+      + getBountyHuntingObservationCount(input.payload)
+        * BOUNTY_HUNTING_OBSERVATION_RATE_COST_PER_MESSAGE
+    );
+    if (input.action === 'observeBountyMessage') return observationCost;
+    if (input.action === 'shootBounty') {
+      return BOUNTY_HUNTING_SHOT_RATE_COST + observationCost;
+    }
+    return undefined;
+  },
   getRecipientUserIds(game) {
     const bountyGame = assertBountyHuntingGame(game);
     return [bountyGame.players.host, bountyGame.players.guest];
+  },
+  getStatePersistence({ action, nextGame, previousGame }) {
+    if (action.action !== 'observeBountyMessage') return 'immediate';
+    return hasBountyHuntingPublicProgressChanged(
+      assertBountyHuntingGame(previousGame),
+      assertBountyHuntingGame(nextGame)
+    )
+      ? 'immediate'
+      : 'deferred';
   },
   getWinnerUserId(game) {
     const bountyGame = assertBountyHuntingGame(game);
@@ -128,8 +205,11 @@ export const bountyHuntingGameModule: GameModule = {
   isTerminal(game) {
     return assertBountyHuntingGame(game).status === 'finished';
   },
-  toPublicGame(game, getUser) {
-    return toPublicBountyHuntingGame(assertBountyHuntingGame(game), getUser);
+  isStoredGameRecord(value): value is BountyHuntingGameRecord {
+    return BountyHuntingGameRecordSchema.safeParse(value).success;
+  },
+  toPublicGame(game, getUser, context) {
+    return toPublicBountyHuntingGame(assertBountyHuntingGame(game), getUser, context);
   }
 };
 
@@ -142,11 +222,12 @@ export function createBountyHuntingGame(
   return {
     bounties: [],
     bountyProviderUserId: hostUserId,
-    claimedMessageIds: [],
     claimWitnesses: [],
     claims: [],
     gameId,
     gameType: 'bounty-hunting',
+    gameVersion: PLAYGROUND_GAME_VERSIONS['bounty-hunting'],
+    missCooldownUntilByRole: {},
     phaseStartedAt: now,
     pendingClaims: [],
     players: {
@@ -173,9 +254,9 @@ export function submitBountyHunting(
   return {
     ...game,
     bounties,
-    claimedMessageIds: [],
     claimWitnesses: [],
     claims: [],
+    missCooldownUntilByRole: {},
     phaseStartedAt: now,
     pendingClaims: [],
     readyPlayers: {},
@@ -236,7 +317,7 @@ export function startBountyHuntingRound(
   };
 }
 
-export function claimBountyHuntingBounty(
+export function shootBountyHuntingMessage(
   game: BountyHuntingGameRecord,
   input: GameActionInput,
   now = Date.now()
@@ -244,37 +325,48 @@ export function claimBountyHuntingBounty(
   if (game.status !== 'active') throw new ProtocolError('not_active', 'This bounty round is not active.');
   if (isBountyHuntingDeadlinePassed(game, now)) return endBountyHuntingRound(game, now);
 
+  let resolvedGame = resolveBountyHuntingPendingClaims(game, now);
   const role = getRequiredBountyHuntingPlayerRole(game, input.userId);
-  const payload = input.payload || {};
-  const bountyId = getPayloadText(payload.bountyId, 'bountyId', 80);
-  const bounty = game.bounties.find((candidate) => candidate.id === bountyId);
-  if (!bounty) throw new ProtocolError('bounty_not_found', 'Bounty not found.');
-  if (game.claims.some((claim) => claim.bountyId === bountyId)) {
-    throw new ProtocolError('bounty_claimed', 'This bounty is already claimed.');
-  }
+  if (isBountyHuntingMissCooldownActive(resolvedGame, role, now)) return resolvedGame;
 
+  const payload = input.payload || {};
   const messageId = getPayloadText(payload.messageId, 'messageId', MAX_MESSAGE_ID_LENGTH);
-  const messageTimestampUsec = parseOptionalTimestampUsec(payload.messageTimestampUsec, 'messageTimestampUsec');
-  if (game.claimedMessageIds.includes(messageId)) {
-    throw new ProtocolError('message_claimed', 'This chat message already claimed a bounty.');
+  if (!Array.isArray(payload.observations)) {
+    throw new ProtocolError('invalid_bounty', 'A Bounty Hunting shot observation is required.');
   }
-  if (isBountyHuntingPreStartMessage(game, messageId, messageTimestampUsec)) {
-    throw new ProtocolError('message_before_round_start', 'This chat message was sent before the bounty hunt started.');
+  const observations = parseBountyHuntingWitnessObservations(payload);
+  if (observations.length !== 1 || observations[0].messageId !== messageId) {
+    throw new ProtocolError(
+      'invalid_bounty',
+      'A Bounty Hunting shot observation must match its messageId.'
+    );
   }
+  if (resolvedGame.claims.some((claim) => claim.messageId === messageId)) return resolvedGame;
+  resolvedGame = applyBountyHuntingWitnessObservations(
+    resolvedGame,
+    role,
+    observations,
+    now
+  );
+  if (resolvedGame.status !== 'active') return resolvedGame;
+
+  const pendingClaimForRole = resolvedGame.pendingClaims.find((candidate) => candidate.role === role);
+  if (pendingClaimForRole) return resolvedGame;
+
+  const witnessedBounty = findHighestValueWitnessedOpenBounty(resolvedGame, role, messageId);
+  if (!witnessedBounty) return startBountyHuntingMissCooldown(resolvedGame, role, now);
 
   const pendingClaim: BountyHuntingPendingClaim = {
-    bountyId,
+    bountyId: witnessedBounty.id,
     messageId,
-    requestedAt: now,
-    role,
-    userId: input.userId
+    role
   };
 
-  if (!hasBountyHuntingWitness(game, role, messageId, bountyId)) {
-    return queueBountyHuntingPendingClaim(game, pendingClaim, now);
+  if (!hasBountyHuntingWitness(resolvedGame, role, messageId, witnessedBounty.id)) {
+    return queueBountyHuntingPendingClaim(resolvedGame, pendingClaim);
   }
 
-  return commitBountyHuntingClaim(game, pendingClaim, now);
+  return commitBountyHuntingClaim(resolvedGame, pendingClaim, now);
 }
 
 export function observeBountyHuntingMessage(
@@ -283,9 +375,26 @@ export function observeBountyHuntingMessage(
   now = Date.now()
 ): BountyHuntingGameRecord {
   if (game.status !== 'active') return game;
+  if (isBountyHuntingDeadlinePassed(game, now)) return endBountyHuntingRound(game, now);
+
+  const resolvedGame = resolveBountyHuntingPendingClaims(game, now);
   const role = getRequiredBountyHuntingPlayerRole(game, input.userId);
   const payload = input.payload || {};
-  const observations = parseBountyHuntingWitnessObservations(payload)
+  return applyBountyHuntingWitnessObservations(
+    resolvedGame,
+    role,
+    parseBountyHuntingWitnessObservations(payload),
+    now
+  );
+}
+
+function applyBountyHuntingWitnessObservations(
+  game: BountyHuntingGameRecord,
+  role: PlayerRole,
+  observations: BountyHuntingMessageObservation[],
+  now: number
+): BountyHuntingGameRecord {
+  const eligibleObservations = observations
     .map((observation) => ({
       bountyIds: observation.bountyIds
         .filter((bountyId) => game.bounties.some((bounty) => bounty.id === bountyId))
@@ -298,26 +407,27 @@ export function observeBountyHuntingMessage(
       !isBountyHuntingPreStartMessage(game, observation.messageId, observation.messageTimestampUsec)
     );
 
-  if (!observations.length) return resolveBountyHuntingPendingClaims(game, now);
+  if (!eligibleObservations.length) return game;
 
-  const existingKeys = new Set(game.claimWitnesses.map(getBountyHuntingWitnessKey));
-  const witnesses = observations
-    .flatMap((observation) => observation.bountyIds.map((bountyId): BountyHuntingClaimWitness => ({
-      bountyId,
-      messageId: observation.messageId,
-      messageTimestampUsec: observation.messageTimestampUsec || undefined,
-      observedAt: now,
-      role,
-      userId: input.userId
-    })))
-    .filter((witness) => !existingKeys.has(getBountyHuntingWitnessKey(witness)));
+  const retainedWitnesses = pruneBountyHuntingWitnesses(game);
+  const witnesses = eligibleObservations.map((observation): BountyHuntingClaimWitness => ({
+    bountyIds: observation.bountyIds,
+    messageId: observation.messageId,
+    messageTimestampUsec: observation.messageTimestampUsec || undefined,
+    observedAt: now,
+    role
+  }));
+  const claimWitnesses = mergeBountyHuntingWitnesses(retainedWitnesses, witnesses);
 
-  if (!witnesses.length) return resolveBountyHuntingPendingClaims(game, now);
+  if (claimWitnesses === game.claimWitnesses) return game;
 
-  return resolveBountyHuntingPendingClaims({
-    ...game,
-    claimWitnesses: [...game.claimWitnesses, ...witnesses]
-  }, now);
+  return resolveBountyHuntingPendingClaims(
+    {
+      ...game,
+      claimWitnesses
+    },
+    now
+  );
 }
 
 function commitBountyHuntingClaim(
@@ -327,21 +437,27 @@ function commitBountyHuntingClaim(
 ): BountyHuntingGameRecord {
   const bounty = game.bounties.find((candidate) => candidate.id === pendingClaim.bountyId);
   if (!bounty) return game;
-  if (game.claims.some((claim) => claim.bountyId === pendingClaim.bountyId)) return game;
-  if (game.claimedMessageIds.includes(pendingClaim.messageId)) return game;
+  const gameWithoutPendingClaim = removeBountyHuntingPendingClaim(game, pendingClaim);
+  const existingClaim = game.claims.find((claim) => claim.bountyId === pendingClaim.bountyId);
+  if (existingClaim) {
+    return existingClaim.messageId === pendingClaim.messageId
+      ? gameWithoutPendingClaim
+      : startBountyHuntingMissCooldown(gameWithoutPendingClaim, pendingClaim.role, now);
+  }
+  if (game.claims.some((claim) => claim.messageId === pendingClaim.messageId)) return gameWithoutPendingClaim;
 
   const claim: BountyHuntingClaim = {
     bountyId: pendingClaim.bountyId,
     claimedAt: now,
     messageId: pendingClaim.messageId,
     role: pendingClaim.role,
-    userId: pendingClaim.userId
+    userId: game.players[pendingClaim.role]
   };
   const nextGame: BountyHuntingGameRecord = {
-    ...game,
-    claimedMessageIds: [...game.claimedMessageIds, pendingClaim.messageId],
+    ...gameWithoutPendingClaim,
+    claimWitnesses: removeClaimedBountyHuntingWitnesses(game.claimWitnesses, pendingClaim),
     claims: [...game.claims, claim],
-    pendingClaims: game.pendingClaims.filter((candidate) =>
+    pendingClaims: gameWithoutPendingClaim.pendingClaims.filter((candidate) =>
       candidate.bountyId !== pendingClaim.bountyId && candidate.messageId !== pendingClaim.messageId
     ),
     scores: {
@@ -357,24 +473,19 @@ function commitBountyHuntingClaim(
 
 function queueBountyHuntingPendingClaim(
   game: BountyHuntingGameRecord,
-  pendingClaim: BountyHuntingPendingClaim,
-  now: number
+  pendingClaim: BountyHuntingPendingClaim
 ): BountyHuntingGameRecord {
-  const pendingClaims = getLiveBountyHuntingPendingClaims(game, now);
-  if (pendingClaims.some((candidate) =>
-    candidate.userId === pendingClaim.userId &&
+  if (game.pendingClaims.some((candidate) =>
+    candidate.role === pendingClaim.role &&
     candidate.bountyId === pendingClaim.bountyId &&
     candidate.messageId === pendingClaim.messageId
   )) {
-    return {
-      ...game,
-      pendingClaims
-    };
+    return game;
   }
 
   return {
     ...game,
-    pendingClaims: [...pendingClaims, pendingClaim]
+    pendingClaims: [...game.pendingClaims, pendingClaim]
   };
 }
 
@@ -382,29 +493,32 @@ function resolveBountyHuntingPendingClaims(
   game: BountyHuntingGameRecord,
   now: number
 ): BountyHuntingGameRecord {
-  let nextGame = {
-    ...game,
-    pendingClaims: getLiveBountyHuntingPendingClaims(game, now)
-  };
+  if (!game.pendingClaims.length) return game;
+  let nextGame = game;
+  const unresolvedClaims = [...game.pendingClaims];
 
-  for (const pendingClaim of [...nextGame.pendingClaims].sort((a, b) => a.requestedAt - b.requestedAt)) {
-    if (nextGame.status !== 'active') return nextGame;
-    if (!hasBountyHuntingWitness(nextGame, pendingClaim.role, pendingClaim.messageId, pendingClaim.bountyId)) continue;
+  while (unresolvedClaims.length && nextGame.status === 'active') {
+    const pendingClaimIndex = unresolvedClaims.findIndex((pendingClaim) =>
+      nextGame.claims.some((claim) => claim.bountyId === pendingClaim.bountyId)
+      || nextGame.claims.some((claim) => claim.messageId === pendingClaim.messageId)
+      || hasBountyHuntingWitness(nextGame, pendingClaim.role, pendingClaim.messageId, pendingClaim.bountyId)
+    );
+    if (pendingClaimIndex < 0) break;
+    const [pendingClaim] = unresolvedClaims.splice(pendingClaimIndex, 1);
     nextGame = commitBountyHuntingClaim(nextGame, pendingClaim, now);
   }
 
   return nextGame;
 }
 
-function getLiveBountyHuntingPendingClaims(
+function removeBountyHuntingPendingClaim(
   game: BountyHuntingGameRecord,
-  now: number
-): BountyHuntingPendingClaim[] {
-  return game.pendingClaims.filter((pendingClaim) =>
-    now - pendingClaim.requestedAt <= PENDING_CLAIM_MS &&
-    !game.claims.some((claim) => claim.bountyId === pendingClaim.bountyId) &&
-    !game.claimedMessageIds.includes(pendingClaim.messageId)
-  );
+  pendingClaim: BountyHuntingPendingClaim
+): BountyHuntingGameRecord {
+  const pendingClaims = game.pendingClaims.filter((candidate) => candidate !== pendingClaim);
+  return pendingClaims.length === game.pendingClaims.length
+    ? game
+    : { ...game, pendingClaims };
 }
 
 function hasBountyHuntingWitness(
@@ -416,12 +530,125 @@ function hasBountyHuntingWitness(
   return game.claimWitnesses.some((witness) =>
     witness.role !== claimingRole &&
     witness.messageId === messageId &&
-    witness.bountyId === bountyId
+    witness.bountyIds.includes(bountyId)
   );
 }
 
+function hasBountyHuntingWitnessForRole(
+  game: BountyHuntingGameRecord,
+  role: PlayerRole,
+  messageId: string,
+  bountyId: string
+): boolean {
+  return game.claimWitnesses.some((witness) =>
+    witness.role === role &&
+    witness.messageId === messageId &&
+    witness.bountyIds.includes(bountyId)
+  );
+}
+
+function findHighestValueWitnessedOpenBounty(
+  game: BountyHuntingGameRecord,
+  role: PlayerRole,
+  messageId: string
+): BountyHuntingBounty | undefined {
+  let selectedBounty: BountyHuntingBounty | undefined;
+  for (const bounty of game.bounties) {
+    if (game.claims.some((claim) => claim.bountyId === bounty.id)) continue;
+    if (!hasBountyHuntingWitnessForRole(game, role, messageId, bounty.id)) continue;
+    if (!selectedBounty || bounty.amount > selectedBounty.amount) selectedBounty = bounty;
+  }
+  return selectedBounty;
+}
+
 function getBountyHuntingWitnessKey(witness: BountyHuntingClaimWitness): string {
-  return `${witness.role}:${witness.messageId}:${witness.bountyId}`;
+  return `${witness.role}:${witness.messageId}`;
+}
+
+function pruneBountyHuntingWitnesses(game: BountyHuntingGameRecord): BountyHuntingClaimWitness[] {
+  const claimedBountyIds = new Set(game.claims.map((claim) => claim.bountyId));
+  const claimedMessageIds = new Set(game.claims.map((claim) => claim.messageId));
+  let changed = false;
+  const claimWitnesses = game.claimWitnesses.flatMap((witness) => {
+    if (claimedMessageIds.has(witness.messageId)) {
+      changed = true;
+      return [];
+    }
+    const bountyIds = witness.bountyIds.filter((bountyId) => !claimedBountyIds.has(bountyId));
+    if (!bountyIds.length) {
+      changed = true;
+      return [];
+    }
+    if (bountyIds.length === witness.bountyIds.length) return [witness];
+    changed = true;
+    return [{ ...witness, bountyIds }];
+  });
+  return !changed
+    ? game.claimWitnesses
+    : claimWitnesses;
+}
+
+function mergeBountyHuntingWitnesses(
+  retainedWitnesses: BountyHuntingClaimWitness[],
+  witnesses: BountyHuntingClaimWitness[]
+): BountyHuntingClaimWitness[] {
+  if (!witnesses.length) return retainedWitnesses;
+  const witnessesByKey = new Map(retainedWitnesses.map((witness) => [
+    getBountyHuntingWitnessKey(witness),
+    witness
+  ]));
+  let changed = false;
+
+  witnesses.forEach((witness) => {
+    const key = getBountyHuntingWitnessKey(witness);
+    const existing = witnessesByKey.get(key);
+    const bountyIds = existing
+      ? [...new Set([...existing.bountyIds, ...witness.bountyIds])]
+      : witness.bountyIds;
+    if (existing && bountyIds.length === existing.bountyIds.length) return;
+    witnessesByKey.delete(key);
+    witnessesByKey.set(key, existing ? { ...witness, bountyIds } : witness);
+    changed = true;
+  });
+
+  if (!changed) return retainedWitnesses;
+  return [...witnessesByKey.values()].slice(-MAX_STORED_BOUNTY_WITNESSES);
+}
+
+function removeClaimedBountyHuntingWitnesses(
+  witnesses: BountyHuntingClaimWitness[],
+  claim: BountyHuntingPendingClaim
+): BountyHuntingClaimWitness[] {
+  return witnesses.flatMap((witness) => {
+    if (witness.messageId === claim.messageId) return [];
+    const bountyIds = witness.bountyIds.filter((bountyId) => bountyId !== claim.bountyId);
+    if (!bountyIds.length) return [];
+    return bountyIds.length === witness.bountyIds.length
+      ? [witness]
+      : [{ ...witness, bountyIds }];
+  });
+}
+
+function getBountyHuntingObservationCount(payload?: Record<string, unknown>): number {
+  if (!Array.isArray(payload?.observations)) return 1;
+  return Math.max(
+    1,
+    Math.min(payload.observations.length, BOUNTY_HUNTING_MAX_WITNESS_OBSERVATIONS)
+  );
+}
+
+function hasBountyHuntingPublicProgressChanged(
+  previousGame: BountyHuntingGameRecord,
+  nextGame: BountyHuntingGameRecord
+): boolean {
+  return previousGame.status !== nextGame.status
+    || previousGame.claims.length !== nextGame.claims.length
+    || previousGame.scores.host !== nextGame.scores.host
+    || previousGame.scores.guest !== nextGame.scores.guest
+    || getBountyHuntingMissCooldownUntil(previousGame, 'host')
+      !== getBountyHuntingMissCooldownUntil(nextGame, 'host')
+    || getBountyHuntingMissCooldownUntil(previousGame, 'guest')
+      !== getBountyHuntingMissCooldownUntil(nextGame, 'guest');
 }
 
 export function timeoutBountyHuntingGame(
@@ -457,9 +684,19 @@ export function finishBountyHuntingGame(
 
 export function toPublicBountyHuntingGame(
   game: BountyHuntingGameRecord,
-  getUser: (userId: string) => PublicUserIdentity
+  getUser: (userId: string) => PublicUserIdentity,
+  context?: PublicGameContext
 ): PublicBountyHuntingGame {
   const claimsByBounty = new Map(game.claims.map((claim) => [claim.bountyId, claim]));
+  const recipientRole = context?.recipientUserId
+    ? getBountyHuntingPlayerRole(game, context.recipientUserId)
+    : null;
+  const missCooldownUntil = recipientRole
+    ? getBountyHuntingMissCooldownUntil(game, recipientRole)
+    : undefined;
+  const pendingClaimMessageId = recipientRole
+    ? game.pendingClaims.find((claim) => claim.role === recipientRole)?.messageId
+    : undefined;
   return {
     bounties: game.bounties.map((bounty) => ({
       ...bounty,
@@ -468,6 +705,8 @@ export function toPublicBountyHuntingGame(
     bountyProviderUserId: game.bountyProviderUserId,
     gameId: game.gameId,
     gameType: 'bounty-hunting',
+    ...(missCooldownUntil === undefined ? {} : { missCooldownUntil }),
+    ...(pendingClaimMessageId === undefined ? {} : { pendingClaimMessageId }),
     phaseStartedAt: game.phaseStartedAt,
     players: {
       guest: getUser(game.players.guest),
@@ -482,9 +721,60 @@ export function toPublicBountyHuntingGame(
   };
 }
 
+function startBountyHuntingMissCooldown(
+  game: BountyHuntingGameRecord,
+  role: PlayerRole,
+  now: number
+): BountyHuntingGameRecord {
+  return setBountyHuntingMissCooldownUntil(
+    game,
+    role,
+    now + BOUNTY_HUNTING_MISS_COOLDOWN_MS,
+    now
+  );
+}
+
+function setBountyHuntingMissCooldownUntil(
+  game: BountyHuntingGameRecord,
+  role: PlayerRole,
+  missCooldownUntil: number,
+  now: number
+): BountyHuntingGameRecord {
+  if (isBountyHuntingMissCooldownActive(game, role, now)) return game;
+
+  return {
+    ...game,
+    missCooldownUntilByRole: {
+      ...game.missCooldownUntilByRole,
+      [role]: missCooldownUntil
+    }
+  };
+}
+
+function isBountyHuntingMissCooldownActive(
+  game: BountyHuntingGameRecord,
+  role: PlayerRole,
+  now: number
+): boolean {
+  const missCooldownUntil = getBountyHuntingMissCooldownUntil(game, role);
+  return missCooldownUntil !== undefined && now < missCooldownUntil;
+}
+
+function getBountyHuntingMissCooldownUntil(
+  game: BountyHuntingGameRecord,
+  role: PlayerRole
+): number | undefined {
+  const missCooldownUntil = game.missCooldownUntilByRole[role];
+  return typeof missCooldownUntil === 'number' && Number.isFinite(missCooldownUntil)
+    ? missCooldownUntil
+    : undefined;
+}
+
 function endBountyHuntingRound(game: BountyHuntingGameRecord, now: number): BountyHuntingGameRecord {
   return {
     ...game,
+    claimWitnesses: [],
+    pendingClaims: [],
     phaseStartedAt: now,
     status: 'roundOver'
   };
@@ -599,33 +889,28 @@ function getPayloadTextArray(value: unknown, field: string, itemMaxLength: numbe
   return [...new Set(texts)];
 }
 
-function parseBountyHuntingWitnessObservations(payload: Record<string, unknown>): BountyHuntingWitnessObservation[] {
-  if (Array.isArray(payload.observations)) {
-    return payload.observations
-      .slice(0, MAX_BOUNTY_WITNESS_OBSERVATIONS)
-      .map((item, index) => {
-        const observation = getRecord(item, `witness observation ${index + 1}`);
-        return {
-          bountyIds: getPayloadTextArray(
-            observation.bountyIds,
-            `witness observation ${index + 1} bountyIds`,
-            80,
-            MAX_BOUNTY_WITNESS_IDS
-          ),
-          messageId: getPayloadText(observation.messageId, `witness observation ${index + 1} messageId`, MAX_MESSAGE_ID_LENGTH),
-          messageTimestampUsec: parseOptionalTimestampUsec(
-            observation.messageTimestampUsec,
-            `witness observation ${index + 1} messageTimestampUsec`
-          )
-        };
-      });
+function parseBountyHuntingWitnessObservations(payload: Record<string, unknown>): BountyHuntingMessageObservation[] {
+  if (!Array.isArray(payload.observations)) {
+    throw new ProtocolError('invalid_bounty', 'Bounty Hunting observations are required.');
   }
-
-  return [{
-    bountyIds: getPayloadTextArray(payload.bountyIds, 'bountyIds', 80, MAX_BOUNTY_WITNESS_IDS),
-    messageId: getPayloadText(payload.messageId, 'messageId', MAX_MESSAGE_ID_LENGTH),
-    messageTimestampUsec: parseOptionalTimestampUsec(payload.messageTimestampUsec, 'messageTimestampUsec')
-  }];
+  return payload.observations
+    .slice(0, BOUNTY_HUNTING_MAX_WITNESS_OBSERVATIONS)
+    .map((item, index) => {
+      const observation = getRecord(item, `witness observation ${index + 1}`);
+      return {
+        bountyIds: getPayloadTextArray(
+          observation.bountyIds,
+          `witness observation ${index + 1} bountyIds`,
+          80,
+          MAX_BOUNTY_WITNESS_IDS
+        ),
+        messageId: getPayloadText(observation.messageId, `witness observation ${index + 1} messageId`, MAX_MESSAGE_ID_LENGTH),
+        messageTimestampUsec: parseOptionalTimestampUsec(
+          observation.messageTimestampUsec,
+          `witness observation ${index + 1} messageTimestampUsec`
+        )
+      };
+    });
 }
 
 function parseOptionalTimestampUsec(value: unknown, field: string): string {

@@ -1,11 +1,15 @@
 import { TokenBucket } from '../../rate-limit';
-import type {
-  GameId,
-  LobbySnapshot,
-  PlaygroundUserLanguage,
-  PresenceUser,
-  PublicUserIdentity,
-  ServerMessage
+import {
+  PLAYGROUND_GAME_VERSIONS,
+  filterCompatiblePlaygroundGames,
+  isPlaygroundGameVersionCompatible,
+  type GameId,
+  type LobbySnapshot,
+  type PlaygroundGameVersions,
+  type PlaygroundUserLanguage,
+  type PresenceUser,
+  type PublicUserIdentity,
+  type ServerMessage
 } from '../../protocol/messages';
 
 const DEFAULT_USER_LANGUAGE: PlaygroundUserLanguage = { languageCode: 'en' };
@@ -15,6 +19,7 @@ export interface ClientSession {
   challenge: string;
   connectionId: string;
   displayName: string;
+  gameVersions: PlaygroundGameVersions;
   joinedAt: number;
   languageCode: string;
   locale?: string;
@@ -25,7 +30,6 @@ export interface ClientSession {
 
 export class SessionManager {
   private readonly sessions = new Map<string, ClientSession>();
-  private readonly userAvailableGames = new Map<string, GameId[]>();
   private readonly userDisplayNames = new Map<string, string>();
   private readonly userLanguages = new Map<string, PlaygroundUserLanguage>();
 
@@ -34,17 +38,18 @@ export class SessionManager {
     userId: string,
     availableGames: GameId[],
     displayName = getPlayerDisplayName(userId),
-    language: PlaygroundUserLanguage = DEFAULT_USER_LANGUAGE
+    language: PlaygroundUserLanguage = DEFAULT_USER_LANGUAGE,
+    gameVersions: PlaygroundGameVersions = PLAYGROUND_GAME_VERSIONS
   ): void {
     const resolvedDisplayName = displayName || this.userDisplayNames.get(userId) || getPlayerDisplayName(userId);
     session.userId = userId;
     session.displayName = resolvedDisplayName;
-    session.availableGames = new Set(availableGames);
+    session.gameVersions = { ...gameVersions };
+    session.availableGames = new Set(filterCompatiblePlaygroundGames(availableGames, session.gameVersions));
     session.joinedAt = Date.now();
     session.languageCode = language.languageCode || DEFAULT_USER_LANGUAGE.languageCode;
     session.locale = language.locale;
     this.sessions.set(session.connectionId, session);
-    this.userAvailableGames.set(userId, availableGames);
     this.userDisplayNames.set(userId, resolvedDisplayName);
     this.userLanguages.set(userId, {
       languageCode: session.languageCode,
@@ -66,8 +71,10 @@ export class SessionManager {
     this.sessions.forEach((session) => {
       if (!session.userId) return;
       const existing = users.get(session.userId);
+      const availableGames = new Set(existing?.availableGames || []);
+      session.availableGames.forEach((gameId) => availableGames.add(gameId));
       users.set(session.userId, {
-        availableGames: this.userAvailableGames.get(session.userId) || [...session.availableGames],
+        availableGames: [...availableGames],
         displayName: this.userDisplayNames.get(session.userId) || session.displayName || existing?.displayName || 'Player',
         joinedAt: Math.min(existing?.joinedAt || session.joinedAt, session.joinedAt),
         userId: session.userId
@@ -93,13 +100,25 @@ export class SessionManager {
     return [...this.sessions.values()].some((session) => session.userId === userId);
   }
 
+  hasCompatibleGameSession(userId: string, gameId: GameId): boolean {
+    return [...this.sessions.values()].some((session) =>
+      session.userId === userId &&
+      isPlaygroundGameVersionCompatible(gameId, session.gameVersions)
+    );
+  }
+
+  isUserAvailableForGame(userId: string, gameId: GameId): boolean {
+    return [...this.sessions.values()].some((session) =>
+      session.userId === userId && session.availableGames.has(gameId)
+    );
+  }
+
   remove(connectionId: string): ClientSession | undefined {
     const session = this.sessions.get(connectionId);
     if (!session) return undefined;
 
     this.sessions.delete(connectionId);
     if (session.userId && !this.hasConnectedUser(session.userId)) {
-      this.userAvailableGames.delete(session.userId);
       this.userLanguages.delete(session.userId);
     }
     return session;
@@ -112,8 +131,7 @@ export class SessionManager {
   }
 
   setAvailability(session: ClientSession, availableGames: GameId[]): void {
-    session.availableGames = new Set(availableGames);
-    this.userAvailableGames.set(session.userId, availableGames);
+    session.availableGames = new Set(filterCompatiblePlaygroundGames(availableGames, session.gameVersions));
   }
 
   setDisplayName(session: ClientSession, displayName: string): void {

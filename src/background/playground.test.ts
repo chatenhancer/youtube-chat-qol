@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
+  PLAYGROUND_GAME_VERSIONS,
   PLAYGROUND_PORT_NAME,
   PLAYGROUND_PROTOCOL_VERSION,
   type ClientMessage,
@@ -99,7 +100,7 @@ describe('background playground bridge', () => {
     getConnectListener()(port as unknown as chrome.runtime.Port);
 
     port.emit({
-      availableGames: ['chess'],
+      availableGames: ['chess', 'bounty-hunting'],
       streamKey: 'stream-a',
       type: 'ytcq:playground:init'
     });
@@ -112,6 +113,7 @@ describe('background playground bridge', () => {
 
     FakeWebSocket.instances[0].emit('message', {
       challenge: 'challenge-1',
+      gameVersions: { ...PLAYGROUND_GAME_VERSIONS },
       issuedAt: Date.now(),
       protocolVersion: PLAYGROUND_PROTOCOL_VERSION,
       type: 'challenge'
@@ -121,7 +123,8 @@ describe('background playground bridge', () => {
       expect(FakeWebSocket.instances[0].sent).toHaveLength(1);
     });
     expect(FakeWebSocket.instances[0].sent[0]).toMatchObject({
-      availableGames: ['chess'],
+      availableGames: ['chess', 'bounty-hunting'],
+      gameVersions: PLAYGROUND_GAME_VERSIONS,
       protocolVersion: PLAYGROUND_PROTOCOL_VERSION,
       type: 'hello'
     });
@@ -131,29 +134,330 @@ describe('background playground bridge', () => {
       snapshot: {
         games: [],
         invites: [],
-        users: []
+        users: [
+          {
+            availableGames: ['chess', 'bounty-hunting'],
+            displayName: 'Player One',
+            joinedAt: 1,
+            userId: 'user-1'
+          }
+        ]
       },
       type: 'helloAccepted',
       userId: 'user-1'
     });
 
-    expect(port.messages.at(-2)).toEqual({
-      status: 'connected',
-      type: 'ytcq:playground:status'
-    });
     expect(port.messages.at(-1)).toEqual({
+      incompatibleActiveGames: [],
+      incompatibleGames: [],
       snapshot: {
         games: [],
         invites: [],
-        users: []
+        users: [
+          {
+            availableGames: ['chess', 'bounty-hunting'],
+            displayName: 'Player One',
+            joinedAt: 1,
+            userId: 'user-1'
+          }
+        ]
       },
       type: 'ytcq:playground:snapshot',
       userId: 'user-1'
+    });
+    expect(port.messages).not.toContainEqual({
+      status: 'connected',
+      type: 'ytcq:playground:status'
     });
     const stored = await chrome.storage.local.get('ytcqPlaygroundIdentity:v1');
     expect(stored['ytcqPlaygroundIdentity:v1']).toMatchObject({
       privateKeyJwk: expect.any(Object),
       publicKeyJwk: expect.any(Object)
+    });
+  });
+
+  it('hides incompatible games locally while letting the backend validate outbound commands', async () => {
+    await import('./playground');
+    const port = createFakePort();
+    getConnectListener()(port as unknown as chrome.runtime.Port);
+
+    port.emit({
+      availableGames: ['chess', 'bounty-hunting'],
+      streamKey: 'stream-a',
+      type: 'ytcq:playground:init'
+    });
+    port.emit({
+      availableGames: ['bounty-hunting', 'chess'],
+      type: 'ytcq:playground:set-availability'
+    });
+    port.emit({
+      gameId: 'bounty-hunting',
+      toUserId: 'user-2',
+      type: 'ytcq:playground:invite'
+    });
+    port.emit({
+      gameId: 'chess',
+      toUserId: 'user-2',
+      type: 'ytcq:playground:invite'
+    });
+
+    const socket = FakeWebSocket.instances[0];
+    socket.emit('message', {
+      challenge: 'challenge-old-server',
+      issuedAt: Date.now(),
+      protocolVersion: PLAYGROUND_PROTOCOL_VERSION,
+      type: 'challenge'
+    });
+
+    await vi.waitFor(() => {
+      expect(socket.sent).toHaveLength(1);
+    });
+    expect(socket.sent[0]).toMatchObject({
+      availableGames: ['bounty-hunting', 'chess'],
+      gameVersions: PLAYGROUND_GAME_VERSIONS,
+      type: 'hello'
+    });
+
+    const bountyGame = {
+      gameId: 'game-bounty',
+      gameType: 'bounty-hunting' as const,
+      status: 'active'
+    };
+    const chessGame = {
+      gameId: 'game-chess',
+      gameType: 'chess' as const,
+      status: 'active'
+    };
+    const playerOne = {
+      displayName: 'Player One',
+      userId: 'user-1'
+    };
+    const playerTwo = {
+      displayName: 'Player Two',
+      userId: 'user-2'
+    };
+    const bountyInvite = {
+      createdAt: 1,
+      expiresAt: 10,
+      fromUser: playerOne,
+      gameId: 'bounty-hunting' as const,
+      inviteId: 'invite-bounty',
+      status: 'pending' as const,
+      toUser: playerTwo
+    };
+    const chessInvite = {
+      ...bountyInvite,
+      gameId: 'chess' as const,
+      inviteId: 'invite-chess'
+    };
+    socket.emit('message', {
+      snapshot: {
+        games: [bountyGame, chessGame],
+        invites: [bountyInvite, chessInvite],
+        users: [
+          {
+            availableGames: ['bounty-hunting', 'chess'],
+            ...playerOne,
+            joinedAt: 1
+          }
+        ]
+      },
+      type: 'helloAccepted',
+      userId: 'user-1'
+    });
+
+    expect(socket.sent).toEqual([
+      expect.objectContaining({
+        availableGames: ['bounty-hunting', 'chess'],
+        type: 'hello'
+      }),
+      {
+        availableGames: ['bounty-hunting', 'chess'],
+        type: 'setAvailability'
+      },
+      {
+        gameId: 'bounty-hunting',
+        toUserId: 'user-2',
+        type: 'invite'
+      },
+      {
+        gameId: 'chess',
+        toUserId: 'user-2',
+        type: 'invite'
+      }
+    ]);
+    expect(port.messages).toContainEqual({
+      incompatibleActiveGames: [{
+        gameId: 'game-bounty',
+        gameType: 'bounty-hunting'
+      }],
+      incompatibleGames: ['bounty-hunting', 'replay-trivia'],
+      snapshot: {
+        games: [chessGame],
+        invites: [chessInvite],
+        users: [
+          {
+            availableGames: ['chess'],
+            ...playerOne,
+            joinedAt: 1
+          }
+        ]
+      },
+      type: 'ytcq:playground:snapshot',
+      userId: 'user-1'
+    });
+    socket.emit('message', {
+      snapshot: {
+        games: [bountyGame, chessGame],
+        invites: [bountyInvite, chessInvite],
+        users: [
+          {
+            availableGames: ['bounty-hunting', 'chess'],
+            ...playerOne,
+            joinedAt: 1
+          }
+        ]
+      },
+      type: 'presenceSnapshot'
+    });
+    expect(port.messages.at(-1)).toEqual({
+      incompatibleActiveGames: [{
+        gameId: 'game-bounty',
+        gameType: 'bounty-hunting'
+      }],
+      incompatibleGames: ['bounty-hunting', 'replay-trivia'],
+      snapshot: {
+        games: [chessGame],
+        invites: [chessInvite],
+        users: [
+          {
+            availableGames: ['chess'],
+            ...playerOne,
+            joinedAt: 1
+          }
+        ]
+      },
+      type: 'ytcq:playground:snapshot',
+      userId: 'user-1'
+    });
+    const forwardedEventCount = port.messages.filter((message) =>
+      message.type === 'ytcq:playground:server-message'
+    ).length;
+    socket.emit('message', {
+      invite: bountyInvite,
+      type: 'inviteReceived'
+    });
+    socket.emit('message', {
+      game: bountyGame,
+      type: 'gameUpdated'
+    });
+    expect(port.messages.filter((message) =>
+      message.type === 'ytcq:playground:server-message'
+    )).toHaveLength(forwardedEventCount);
+
+    socket.emit('message', {
+      game: chessGame,
+      type: 'gameUpdated'
+    });
+    expect(port.messages.at(-1)).toEqual({
+      message: {
+        game: chessGame,
+        type: 'gameUpdated'
+      },
+      type: 'ytcq:playground:server-message'
+    });
+
+    port.emit({
+      gameId: 'bounty-hunting',
+      toUserId: 'user-2',
+      type: 'ytcq:playground:cancel-invite'
+    });
+    port.emit({
+      accept: false,
+      inviteId: 'invite-bounty',
+      type: 'ytcq:playground:respond-invite'
+    });
+    expect(socket.sent.slice(-2)).toEqual([
+      {
+        gameId: 'bounty-hunting',
+        toUserId: 'user-2',
+        type: 'cancelInvite'
+      },
+      {
+        accept: false,
+        inviteId: 'invite-bounty',
+        type: 'respondInvite'
+      }
+    ]);
+
+    const sentCount = socket.sent.length;
+    const portMessageCount = port.messages.length;
+    port.emit({
+      gameId: 'bounty-hunting',
+      toUserId: 'user-2',
+      type: 'ytcq:playground:invite'
+    });
+    port.emit({
+      action: 'shootBounty',
+      gameId: 'game-bounty',
+      payload: { messageId: 'message-1' },
+      type: 'ytcq:playground:game-action'
+    });
+    expect(socket.sent).toHaveLength(sentCount + 2);
+    expect(socket.sent.slice(-2)).toEqual([
+      {
+        gameId: 'bounty-hunting',
+        toUserId: 'user-2',
+        type: 'invite'
+      },
+      {
+        action: 'shootBounty',
+        gameId: 'game-bounty',
+        payload: { messageId: 'message-1' },
+        type: 'gameAction'
+      }
+    ]);
+    expect(port.messages).toHaveLength(portMessageCount);
+
+    port.emit({
+      action: 'leave',
+      gameId: 'game-bounty',
+      type: 'ytcq:playground:game-action'
+    });
+    expect(socket.sent).toHaveLength(sentCount + 3);
+    expect(socket.sent.at(-1)).toEqual({
+      action: 'leave',
+      gameId: 'game-bounty',
+      type: 'gameAction'
+    });
+
+    socket.emit('message', {
+      gameId: 'game-bounty',
+      reason: 'playerLeft',
+      type: 'gameEnded',
+      userId: 'user-1'
+    });
+    expect(port.messages.at(-1)).toEqual({
+      message: {
+        gameId: 'game-bounty',
+        reason: 'playerLeft',
+        type: 'gameEnded',
+        userId: 'user-1'
+      },
+      type: 'ytcq:playground:server-message'
+    });
+
+    port.emit({
+      action: 'move',
+      gameId: 'game-chess',
+      payload: { from: 'e2', to: 'e4' },
+      type: 'ytcq:playground:game-action'
+    });
+    expect(socket.sent.at(-1)).toEqual({
+      action: 'move',
+      gameId: 'game-chess',
+      payload: { from: 'e2', to: 'e4' },
+      type: 'gameAction'
     });
   });
 
@@ -612,10 +916,17 @@ describe('background playground bridge', () => {
     socket.emit('message', {
       code: 'bad_action',
       message: 'Bad action.',
+      request: {
+        action: 'move',
+        gameId: 'game-1',
+        type: 'gameAction'
+      },
       type: 'error'
     });
 
-    expect(port.messages.at(-3)).toEqual({
+    expect(port.messages.at(-2)).toEqual({
+      incompatibleActiveGames: [],
+      incompatibleGames: [],
       snapshot: {
         games: [],
         invites: [],
@@ -631,18 +942,15 @@ describe('background playground bridge', () => {
       type: 'ytcq:playground:snapshot',
       userId: 'user-1'
     });
-    expect(port.messages.at(-2)).toEqual({
+    expect(port.messages.at(-1)).toEqual({
       code: 'bad_action',
       message: 'Bad action.',
-      type: 'ytcq:playground:error'
-    });
-    expect(port.messages.at(-1)).toEqual({
-      message: {
-        code: 'bad_action',
-        message: 'Bad action.',
-        type: 'error'
+      request: {
+        action: 'move',
+        gameId: 'game-1',
+        type: 'gameAction'
       },
-      type: 'ytcq:playground:server-message'
+      type: 'ytcq:playground:error'
     });
   });
 
@@ -664,6 +972,12 @@ describe('background playground bridge', () => {
       gameId: 'chess',
       toUserId: 'user-2',
       type: 'ytcq:playground:invite'
+    });
+    port.emit({
+      action: 'shootBounty',
+      gameId: 'game-bounty',
+      payload: { messageId: 'message-1' },
+      type: 'ytcq:playground:game-action'
     });
     port.emit({
       gameId: 'chess',
@@ -717,6 +1031,12 @@ describe('background playground bridge', () => {
         gameId: 'chess',
         toUserId: 'user-2',
         type: 'invite'
+      },
+      {
+        action: 'shootBounty',
+        gameId: 'game-bounty',
+        payload: { messageId: 'message-1' },
+        type: 'gameAction'
       },
       {
         gameId: 'chess',
@@ -1035,6 +1355,12 @@ describe('background playground bridge', () => {
       toUserId: 'user-2',
       type: 'ytcq:playground:invite'
     });
+    port.emit({
+      action: 'shootBounty',
+      gameId: 'game-bounty',
+      payload: { messageId: 'message-1' },
+      type: 'ytcq:playground:game-action'
+    });
 
     expect(port.messages.at(-1)).toEqual({
       status: 'connecting',
@@ -1081,11 +1407,73 @@ describe('background playground bridge', () => {
         gameId: 'chess',
         toUserId: 'user-2',
         type: 'invite'
+      },
+      {
+        action: 'shootBounty',
+        gameId: 'game-bounty',
+        payload: { messageId: 'message-1' },
+        type: 'gameAction'
       }
     ]);
   });
 
-  it('clears a scheduled reconnect when a fresh init message arrives', async () => {
+  it('keeps only the newest 20 commands while disconnected', async () => {
+    vi.useFakeTimers();
+    await import('./playground');
+    const port = createFakePort();
+    getConnectListener()(port as unknown as chrome.runtime.Port);
+    port.emit({
+      availableGames: ['bounty-hunting'],
+      streamKey: 'stream-a',
+      type: 'ytcq:playground:init'
+    });
+    FakeWebSocket.instances[0].emit('close');
+
+    for (let index = 0; index < 25; index += 1) {
+      port.emit({
+        action: 'observeBountyMessage',
+        gameId: 'game-bounty',
+        payload: {
+          observations: [{
+            bountyIds: [],
+            messageId: `later-message-${index}`
+          }]
+        },
+        type: 'ytcq:playground:game-action'
+      });
+    }
+
+    await vi.advanceTimersByTimeAsync(750);
+    const socket = FakeWebSocket.instances[1];
+    await authenticateSocket(socket);
+
+    const queuedMessages = socket.sent.slice(1);
+    expect(queuedMessages).toHaveLength(20);
+    expect(queuedMessages[0]).toEqual({
+      action: 'observeBountyMessage',
+      gameId: 'game-bounty',
+      payload: {
+        observations: [{
+          bountyIds: [],
+          messageId: 'later-message-5'
+        }]
+      },
+      type: 'gameAction'
+    });
+    expect(queuedMessages.at(-1)).toEqual({
+      action: 'observeBountyMessage',
+      gameId: 'game-bounty',
+      payload: {
+        observations: [{
+          bountyIds: [],
+          messageId: 'later-message-24'
+        }]
+      },
+      type: 'gameAction'
+    });
+  });
+
+  it('clears a scheduled reconnect without dropping same-stream queued commands', async () => {
     vi.useFakeTimers();
     await import('./playground');
     const port = createFakePort();
@@ -1096,15 +1484,57 @@ describe('background playground bridge', () => {
       type: 'ytcq:playground:init'
     });
     FakeWebSocket.instances[0].emit('close');
+    port.emit({
+      action: 'shootBounty',
+      gameId: 'game-bounty',
+      payload: { messageId: 'message-1' },
+      type: 'ytcq:playground:game-action'
+    });
 
     port.emit({
-      availableGames: ['chess'],
+      availableGames: ['chess', 'bounty-hunting'],
       streamKey: 'stream-a',
       type: 'ytcq:playground:init'
     });
     await vi.advanceTimersByTimeAsync(750);
 
     expect(FakeWebSocket.instances).toHaveLength(2);
+    const socket = FakeWebSocket.instances[1];
+    await authenticateSocket(socket);
+    expect(socket.sent.at(-1)).toEqual({
+      action: 'shootBounty',
+      gameId: 'game-bounty',
+      payload: { messageId: 'message-1' },
+      type: 'gameAction'
+    });
+  });
+
+  it('drops queued commands when a fresh init switches streams', async () => {
+    await import('./playground');
+    const port = createFakePort();
+    getConnectListener()(port as unknown as chrome.runtime.Port);
+    port.emit({
+      availableGames: ['bounty-hunting'],
+      streamKey: 'stream-a',
+      type: 'ytcq:playground:init'
+    });
+    FakeWebSocket.instances[0].emit('close');
+    port.emit({
+      action: 'shootBounty',
+      gameId: 'game-bounty',
+      payload: { messageId: 'message-1' },
+      type: 'ytcq:playground:game-action'
+    });
+
+    port.emit({
+      availableGames: ['bounty-hunting'],
+      streamKey: 'stream-b',
+      type: 'ytcq:playground:init'
+    });
+    const socket = FakeWebSocket.instances[1];
+    expect(socket.url).toBe('wss://playground.chatenhancer.com/v1/streams/stream-b/socket');
+    await authenticateSocket(socket);
+    expect(socket.sent).toHaveLength(1);
   });
 
   it('does not reconnect after an explicit playground disconnect', async () => {
@@ -1224,6 +1654,28 @@ function getConnectListener(): (port: chrome.runtime.Port) => void {
   const listener = vi.mocked(chrome.runtime.onConnect.addListener).mock.calls.at(-1)?.[0];
   if (!listener) throw new Error('No runtime connect listener registered.');
   return listener as (port: chrome.runtime.Port) => void;
+}
+
+async function authenticateSocket(socket: FakeWebSocket): Promise<void> {
+  socket.emit('message', {
+    challenge: 'challenge-current',
+    gameVersions: { ...PLAYGROUND_GAME_VERSIONS },
+    issuedAt: Date.now(),
+    protocolVersion: PLAYGROUND_PROTOCOL_VERSION,
+    type: 'challenge'
+  });
+  await vi.waitFor(() => {
+    expect(socket.sent).toHaveLength(1);
+  });
+  socket.emit('message', {
+    snapshot: {
+      games: [],
+      invites: [],
+      users: []
+    },
+    type: 'helloAccepted',
+    userId: 'user-1'
+  });
 }
 
 function getMessageListener(): (

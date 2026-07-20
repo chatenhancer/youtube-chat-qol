@@ -60,14 +60,15 @@ export class GameState {
     if (!games) return;
 
     games.forEach((game) => {
-      if (!isSupportedStoredGame(game)) {
+      const restoredGame = restoreStoredGame(game);
+      if (!restoredGame) {
         this.logEvent('stored_game_ignored', {
           game: isRecord(game) && typeof game.gameId === 'string' ? shortLogId(game.gameId) : undefined
         }, 'warn');
         return;
       }
 
-      this.games.set(game.gameId, game);
+      this.games.set(restoredGame.gameId, restoredGame);
     });
 
     if (this.games.size > 0) {
@@ -118,17 +119,16 @@ function getStoredGames(value: unknown): unknown[] | null {
   return Array.isArray(value.games) ? value.games : null;
 }
 
-function isSupportedStoredGame(value: unknown): value is GameRecord {
-  if (!isRecord(value)) return false;
-  if (typeof value.gameId !== 'string' || typeof value.gameType !== 'string' || typeof value.status !== 'string') {
-    return false;
-  }
+function restoreStoredGame(value: unknown): GameRecord | null {
+  if (!isRecord(value) || typeof value.gameType !== 'string') return null;
 
   try {
-    getGameModuleForRecord(value as unknown as GameRecord);
-    return true;
+    const game = value as unknown as GameRecord;
+    const gameModule = getGameModuleForRecord(game);
+    if (!gameModule.isStoredGameRecord(value)) return null;
+    return game;
   } catch {
-    return false;
+    return null;
   }
 }
 

@@ -94,6 +94,15 @@ export type ReplayTriviaQuestionsBackgroundResponse =
 export type ReplayTriviaGameStatus = 'preparing' | 'countdown' | 'question' | 'reveal' | 'score' | 'finished';
 export type ReplayTriviaPlayerRole = 'guest' | 'host';
 
+export function parseReplayTriviaExpectedPhaseStartedAt(
+  payload: Record<string, unknown> | undefined
+): number | null {
+  const value = payload?.expectedPhaseStartedAt;
+  return typeof value === 'number' && Number.isSafeInteger(value) && value >= 0
+    ? value
+    : null;
+}
+
 export interface ReplayTriviaPublicQuestion {
   choices: [string, string, string, string];
   correctChoiceIndex?: 0 | 1 | 2 | 3;

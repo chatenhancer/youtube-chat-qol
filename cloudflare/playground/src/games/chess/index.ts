@@ -5,19 +5,54 @@
  * room. The transport layer only sees the generic `GameModule` contract.
  */
 import { Chess } from 'chess.js';
-import type { PublicGame, PublicUserIdentity } from '../../protocol/messages';
+import { z } from 'zod';
+import {
+  PLAYGROUND_GAME_VERSIONS,
+  type PublicGame,
+  type PublicUserIdentity
+} from '../../protocol/messages';
 import { ProtocolError } from '../../protocol/validation';
 import type { GameActionInput, GameModule, GameRecord } from '../types';
 
-export type PlayerColor = 'black' | 'white';
-export type ChessGameStatus = 'active' | 'checkmate' | 'draw' | 'resigned';
-export type ChessPromotionPiece = 'b' | 'n' | 'q' | 'r';
+const PlayerColorSchema = z.enum(['black', 'white']);
+const ChessGameStatusSchema = z.enum(['active', 'checkmate', 'draw', 'resigned']);
+const ChessPromotionPieceSchema = z.enum(['b', 'n', 'q', 'r']);
+const ChessSquareSchema = z.string().regex(/^[a-h][1-8]$/);
+const ChessLastMoveSchema = z.strictObject({
+  from: ChessSquareSchema,
+  promotion: ChessPromotionPieceSchema.optional(),
+  to: ChessSquareSchema
+});
+const ChessFenSchema = z.string().refine((value) => {
+  try {
+    new Chess(value);
+    return true;
+  } catch {
+    return false;
+  }
+});
+const ChessGameRecordSchema = z.strictObject({
+  fen: ChessFenSchema,
+  gameId: z.string().min(1),
+  gameType: z.literal('chess'),
+  gameVersion: z.literal(PLAYGROUND_GAME_VERSIONS.chess),
+  lastMove: ChessLastMoveSchema.optional(),
+  lastMoveSan: z.string().optional(),
+  pgn: z.string(),
+  players: z.strictObject({
+    black: z.string().min(1),
+    white: z.string().min(1)
+  }),
+  status: ChessGameStatusSchema,
+  turn: PlayerColorSchema,
+  winner: PlayerColorSchema.optional()
+});
 
-export interface ChessLastMove {
-  from: string;
-  promotion?: ChessPromotionPiece;
-  to: string;
-}
+export type PlayerColor = z.infer<typeof PlayerColorSchema>;
+export type ChessGameStatus = z.infer<typeof ChessGameStatusSchema>;
+export type ChessPromotionPiece = z.infer<typeof ChessPromotionPieceSchema>;
+export type ChessLastMove = z.infer<typeof ChessLastMoveSchema>;
+export type ChessGameRecord = z.infer<typeof ChessGameRecordSchema>;
 
 export interface PublicChessGame extends PublicGame {
   fen: string;
@@ -26,18 +61,6 @@ export interface PublicChessGame extends PublicGame {
   lastMoveSan?: string;
   pgn: string;
   players: Record<PlayerColor, PublicUserIdentity>;
-  status: ChessGameStatus;
-  turn: PlayerColor;
-  winner?: PlayerColor;
-}
-
-export interface ChessGameRecord extends GameRecord {
-  fen: string;
-  gameType: 'chess';
-  lastMove?: ChessLastMove;
-  lastMoveSan?: string;
-  pgn: string;
-  players: Record<PlayerColor, string>;
   status: ChessGameStatus;
   turn: PlayerColor;
   winner?: PlayerColor;
@@ -78,6 +101,9 @@ export const chessGameModule: GameModule = {
   isTerminal(game) {
     return assertChessGame(game).status !== 'active';
   },
+  isStoredGameRecord(value): value is ChessGameRecord {
+    return ChessGameRecordSchema.safeParse(value).success;
+  },
   toPublicGame(game, getUser) {
     return toPublicChessGame(assertChessGame(game), getUser);
   }
@@ -88,6 +114,7 @@ export function createChessGame(gameId: string, whiteUserId: string, blackUserId
   return {
     fen: chess.fen(),
     gameType: 'chess',
+    gameVersion: PLAYGROUND_GAME_VERSIONS.chess,
     gameId,
     pgn: chess.pgn(),
     players: {
@@ -139,6 +166,9 @@ export function applyChessMove(game: ChessGameRecord, input: ChessMoveInput): Ch
 }
 
 export function resignChessGame(game: ChessGameRecord, userId: string): ChessGameRecord {
+  if (game.status !== 'active') {
+    throw new ProtocolError('game_finished', 'This chess game is already finished.');
+  }
   const color = getPlayerColor(game, userId);
   const winner = color === 'white' ? 'black' : 'white';
 

@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { PLAYGROUND_GAME_VERSIONS } from '../../protocol/messages';
 import { ProtocolError } from '../../protocol/validation';
 import {
   advanceReplayTriviaGame,
@@ -32,6 +33,7 @@ describe('playground replay trivia game rules', () => {
   it('starts in preparing until the question provider submits a pack', () => {
     const game = createReplayTriviaGame('game-1', 'host-user', 'guest-user', 1_000);
 
+    expect(game.gameVersion).toBe(2);
     expect(game.status).toBe('preparing');
     expect(game.questionProviderUserId).toBe('host-user');
     expect(game.players.host).toBe('host-user');
@@ -46,6 +48,16 @@ describe('playground replay trivia game rules', () => {
     expect(nextGame.status).toBe('countdown');
     expect(nextGame.questions).toHaveLength(1);
     expect(nextGame.phaseStartedAt).toBe(2_000);
+  });
+
+  it('does not restore Replay Trivia records from the previous game version', () => {
+    const game = createReplayTriviaGame('game-1', 'host-user', 'guest-user', 1_000);
+
+    expect(replayTriviaGameModule.isStoredGameRecord(game)).toBe(true);
+    expect(replayTriviaGameModule.isStoredGameRecord({
+      ...game,
+      gameVersion: 1
+    })).toBe(false);
   });
 
   it('rejects question packs from the invited player', () => {
@@ -110,12 +122,15 @@ describe('playground replay trivia game rules', () => {
       userId: 'host-user'
     }, 0);
 
-    game = advanceReplayTriviaGame(game, 3_000);
+    game = advanceReplayTriviaGame(game, createReplayTriviaAction(game, 'advance'), 3_000);
     expect(game.status).toBe('question');
 
     game = answerReplayTriviaQuestion(game, {
       action: 'answer',
-      payload: { choiceIndex: 0 },
+      payload: {
+        ...expectedReplayTriviaPhase(game),
+        choiceIndex: 0
+      },
       userId: 'host-user'
     }, 4_000);
     let publicGame = toPublicReplayTriviaGame(game, (userId) => ({ displayName: userId, userId }));
@@ -124,7 +139,10 @@ describe('playground replay trivia game rules', () => {
 
     game = answerReplayTriviaQuestion(game, {
       action: 'answer',
-      payload: { choiceIndex: 1 },
+      payload: {
+        ...expectedReplayTriviaPhase(game),
+        choiceIndex: 1
+      },
       userId: 'guest-user'
     }, 5_000);
     expect(game.status).toBe('reveal');
@@ -171,48 +189,34 @@ describe('playground replay trivia game rules', () => {
     expect(spanishGame.currentQuestion?.correctChoiceIndex).toBeUndefined();
   });
 
-  it('serializes restored questions that predate localizations', () => {
-    const game = submitReplayTriviaQuestions(createReplayTriviaGame('game-1', 'host-user', 'guest-user', 0), {
-      action: 'submitQuestions',
-      payload: { questions: [createQuestion()] },
-      userId: 'host-user'
-    }, 0);
-    const legacyQuestion = { ...game.questions[0] } as Partial<typeof game.questions[number]>;
-    delete legacyQuestion.localizations;
-    const legacyGame = {
-      ...game,
-      questions: [legacyQuestion as typeof game.questions[number]]
-    };
-
-    const publicGame = toPublicReplayTriviaGame(legacyGame, (userId) => ({ displayName: userId, userId }), {
-      getUserLanguage: () => ({ languageCode: 'es' }),
-      recipientUserId: 'guest-user'
-    });
-
-    expect(publicGame.currentQuestion?.prompt).toBe('Which game won Game of the Year in this segment?');
-  });
-
   it('times out unanswered rounds and marks the final winner', () => {
     let game = submitReplayTriviaQuestions(createReplayTriviaGame('game-1', 'host-user', 'guest-user', 0), {
       action: 'submitQuestions',
       payload: { questions: [createQuestion()] },
       userId: 'host-user'
     }, 0);
-    game = advanceReplayTriviaGame(game, 3_000);
+    game = advanceReplayTriviaGame(game, createReplayTriviaAction(game, 'advance'), 3_000);
     game = answerReplayTriviaQuestion(game, {
       action: 'answer',
-      payload: { choiceIndex: 0 },
+      payload: {
+        ...expectedReplayTriviaPhase(game),
+        choiceIndex: 0
+      },
       userId: 'host-user'
     }, 4_000);
 
-    expect(() => timeoutReplayTriviaQuestion(game, 4_100)).toThrowError(new ProtocolError(
+    expect(() => timeoutReplayTriviaQuestion(
+      game,
+      createReplayTriviaAction(game, 'timeout'),
+      4_100
+    )).toThrowError(new ProtocolError(
       'answer_time_remaining',
       'This round still has answer time remaining.'
     ));
 
-    game = timeoutReplayTriviaQuestion(game, 14_900);
-    game = advanceReplayTriviaGame(game, 19_200);
-    game = advanceReplayTriviaGame(game, 21_400);
+    game = timeoutReplayTriviaQuestion(game, createReplayTriviaAction(game, 'timeout'), 14_900);
+    game = advanceReplayTriviaGame(game, createReplayTriviaAction(game, 'advance'), 19_200);
+    game = advanceReplayTriviaGame(game, createReplayTriviaAction(game, 'advance'), 21_400);
     expect(game.status).toBe('finished');
 
     const publicGame = toPublicReplayTriviaGame(game, (userId) => ({ displayName: userId, userId }));
@@ -234,6 +238,62 @@ describe('playground replay trivia game rules', () => {
     expect(replayTriviaGameModule.canUserAccessGame(nextGame, 'other-user')).toBe(false);
   });
 
+  it('rejects missing and stale phase tokens before they can affect another phase or question', () => {
+    let game = submitReplayTriviaQuestions(createReplayTriviaGame('game-1', 'host-user', 'guest-user', 0), {
+      action: 'submitQuestions',
+      payload: {
+        questions: [
+          createQuestion(),
+          createQuestion({ id: 'q_2', correctChoiceIndex: 1 })
+        ]
+      },
+      userId: 'host-user'
+    }, 0);
+
+    (['advance', 'answer', 'timeout'] as const).forEach((action) => {
+      expect(() => replayTriviaGameModule.applyAction(game, {
+        action,
+        payload: action === 'answer' ? { choiceIndex: 0 } : {},
+        userId: 'host-user'
+      })).toThrowError(new ProtocolError(
+        'invalid_action_context',
+        'Replay Trivia actions must identify their phase.'
+      ));
+    });
+
+    const firstCountdownAdvance = createReplayTriviaAction(game, 'advance');
+    game = advanceReplayTriviaGame(game, firstCountdownAdvance, 3_000);
+    const firstQuestionAnswer = createReplayTriviaAction(game, 'answer', { choiceIndex: 0 });
+    const firstQuestionTimeout = createReplayTriviaAction(game, 'timeout');
+
+    expect(() => advanceReplayTriviaGame(game, firstCountdownAdvance, 3_001)).toThrowError(new ProtocolError(
+      'stale_action',
+      'This Replay Trivia action belongs to an earlier question or phase.'
+    ));
+
+    game = answerReplayTriviaQuestion(game, firstQuestionAnswer, 4_000);
+    game = answerReplayTriviaQuestion(
+      game,
+      createReplayTriviaAction(game, 'answer', { choiceIndex: 1 }, 'guest-user'),
+      4_100
+    );
+
+    expect(() => timeoutReplayTriviaQuestion(game, firstQuestionTimeout, 14_900)).toThrowError(new ProtocolError(
+      'stale_action',
+      'This Replay Trivia action belongs to an earlier question or phase.'
+    ));
+
+    game = advanceReplayTriviaGame(game, createReplayTriviaAction(game, 'advance'), 8_400);
+    game = advanceReplayTriviaGame(game, createReplayTriviaAction(game, 'advance'), 10_600);
+    expect(game.status).toBe('countdown');
+    expect(game.currentQuestionIndex).toBe(1);
+
+    expect(() => advanceReplayTriviaGame(game, firstCountdownAdvance, 13_600)).toThrowError(new ProtocolError(
+      'stale_action',
+      'This Replay Trivia action belongs to an earlier question or phase.'
+    ));
+  });
+
   it('rejects unsupported actions, unsupported games, and invalid question packs', () => {
     const game = createReplayTriviaGame('game-1', 'host-user', 'guest-user');
 
@@ -244,6 +304,7 @@ describe('playground replay trivia game rules', () => {
     expect(() => replayTriviaGameModule.applyAction({
       gameId: 'game-1',
       gameType: 'chess',
+      gameVersion: PLAYGROUND_GAME_VERSIONS.chess,
       status: 'active'
     }, {
       action: 'advance',
@@ -259,6 +320,14 @@ describe('playground replay trivia game rules', () => {
       payload: { questions: new Array(11).fill(createQuestion()) },
       userId: 'host-user'
     })).toThrowError(new ProtocolError('too_many_questions', 'At most 10 Replay Trivia questions are allowed.'));
+    expect(() => submitReplayTriviaQuestions(game, {
+      action: 'submitQuestions',
+      payload: { questions: [createQuestion(), createQuestion()] },
+      userId: 'host-user'
+    })).toThrowError(new ProtocolError(
+      'duplicate_question_id',
+      'Replay Trivia question IDs must be unique.'
+    ));
     expect(() => submitReplayTriviaQuestions(game, {
       action: 'submitQuestions',
       payload: { questions: [null] },
@@ -288,24 +357,46 @@ describe('playground replay trivia game rules', () => {
       userId: 'host-user'
     }, 0);
 
-    expect(() => advanceReplayTriviaGame(game, 2_999)).toThrowError(new ProtocolError('countdown_active', 'Countdown is still active.'));
-    game = advanceReplayTriviaGame(game, 3_000);
-    expect(() => advanceReplayTriviaGame(game, 3_001)).toThrowError(new ProtocolError('cannot_advance', 'Replay Trivia cannot advance from this phase.'));
+    expect(() => advanceReplayTriviaGame(
+      game,
+      createReplayTriviaAction(game, 'advance'),
+      2_999
+    )).toThrowError(new ProtocolError('countdown_active', 'Countdown is still active.'));
+    game = advanceReplayTriviaGame(game, createReplayTriviaAction(game, 'advance'), 3_000);
+    expect(() => advanceReplayTriviaGame(
+      game,
+      createReplayTriviaAction(game, 'advance'),
+      3_001
+    )).toThrowError(new ProtocolError('cannot_advance', 'Replay Trivia cannot advance from this phase.'));
 
     game = answerReplayTriviaQuestion(game, {
       action: 'answer',
-      payload: { choiceIndex: 0 },
+      payload: {
+        ...expectedReplayTriviaPhase(game),
+        choiceIndex: 0
+      },
       userId: 'host-user'
     }, 4_000);
     game = answerReplayTriviaQuestion(game, {
       action: 'answer',
-      payload: { choiceIndex: 0 },
+      payload: {
+        ...expectedReplayTriviaPhase(game),
+        choiceIndex: 0
+      },
       userId: 'guest-user'
     }, 4_100);
-    expect(() => advanceReplayTriviaGame(game, 8_399)).toThrowError(new ProtocolError('reveal_active', 'Reveal is still active.'));
-    game = advanceReplayTriviaGame(game, 8_400);
-    expect(() => advanceReplayTriviaGame(game, 10_599)).toThrowError(new ProtocolError('score_active', 'Score is still active.'));
-    game = advanceReplayTriviaGame(game, 10_600);
+    expect(() => advanceReplayTriviaGame(
+      game,
+      createReplayTriviaAction(game, 'advance'),
+      8_399
+    )).toThrowError(new ProtocolError('reveal_active', 'Reveal is still active.'));
+    game = advanceReplayTriviaGame(game, createReplayTriviaAction(game, 'advance'), 8_400);
+    expect(() => advanceReplayTriviaGame(
+      game,
+      createReplayTriviaAction(game, 'advance'),
+      10_599
+    )).toThrowError(new ProtocolError('score_active', 'Score is still active.'));
+    game = advanceReplayTriviaGame(game, createReplayTriviaAction(game, 'advance'), 10_600);
 
     expect(game.status).toBe('countdown');
     expect(game.currentQuestionIndex).toBe(1);
@@ -318,34 +409,53 @@ describe('playground replay trivia game rules', () => {
       userId: 'host-user'
     }, 0);
 
-    expect(timeoutReplayTriviaQuestion(game, 10_000)).toBe(game);
+    expect(timeoutReplayTriviaQuestion(
+      game,
+      createReplayTriviaAction(game, 'timeout'),
+      10_000
+    )).toBe(game);
     expect(() => answerReplayTriviaQuestion(game, {
       action: 'answer',
-      payload: { choiceIndex: 0 },
+      payload: {
+        ...expectedReplayTriviaPhase(game),
+        choiceIndex: 0
+      },
       userId: 'host-user'
     }, 1_000)).toThrowError(new ProtocolError('not_answering', 'This round is not accepting answers.'));
 
-    game = advanceReplayTriviaGame(game, 3_000);
+    game = advanceReplayTriviaGame(game, createReplayTriviaAction(game, 'advance'), 3_000);
     expect(() => answerReplayTriviaQuestion(game, {
       action: 'answer',
-      payload: { choiceIndex: 0 },
+      payload: {
+        ...expectedReplayTriviaPhase(game),
+        choiceIndex: 0
+      },
       userId: 'other-user'
     }, 4_000)).toThrowError(new ProtocolError('not_in_game', 'You are not a player in this game.'));
 
     game = answerReplayTriviaQuestion(game, {
       action: 'answer',
-      payload: { choiceIndex: 0 },
+      payload: {
+        ...expectedReplayTriviaPhase(game),
+        choiceIndex: 0
+      },
       userId: 'host-user'
     }, 4_000);
     expect(() => answerReplayTriviaQuestion(game, {
       action: 'answer',
-      payload: { choiceIndex: 1 },
+      payload: {
+        ...expectedReplayTriviaPhase(game),
+        choiceIndex: 1
+      },
       userId: 'host-user'
     }, 4_100)).toThrowError(new ProtocolError('answer_locked', 'Your answer is already locked.'));
 
     const revealed = answerReplayTriviaQuestion(game, {
       action: 'answer',
-      payload: { choiceIndex: 1 },
+      payload: {
+        ...expectedReplayTriviaPhase(game),
+        choiceIndex: 1
+      },
       userId: 'guest-user'
     }, 14_900);
     expect(revealed.status).toBe('reveal');
@@ -366,27 +476,33 @@ describe('playground replay trivia game rules', () => {
       userId: 'host-user'
     }, 0);
 
-    game = advanceReplayTriviaGame(game, 3_000);
-    game = timeoutReplayTriviaQuestion(game, 14_900);
+    game = advanceReplayTriviaGame(game, createReplayTriviaAction(game, 'advance'), 3_000);
+    game = timeoutReplayTriviaQuestion(game, createReplayTriviaAction(game, 'timeout'), 14_900);
     let publicGame = toPublicReplayTriviaGame(game, (userId) => ({ displayName: userId, userId }));
     expect(publicGame.answers).toEqual({});
     expect(publicGame.winnerUserId).toBeUndefined();
 
-    game = advanceReplayTriviaGame(game, 19_200);
-    game = advanceReplayTriviaGame(game, 21_400);
-    game = advanceReplayTriviaGame(game, 24_400);
+    game = advanceReplayTriviaGame(game, createReplayTriviaAction(game, 'advance'), 19_200);
+    game = advanceReplayTriviaGame(game, createReplayTriviaAction(game, 'advance'), 21_400);
+    game = advanceReplayTriviaGame(game, createReplayTriviaAction(game, 'advance'), 24_400);
     game = answerReplayTriviaQuestion(game, {
       action: 'answer',
-      payload: { choiceIndex: 0 },
+      payload: {
+        ...expectedReplayTriviaPhase(game),
+        choiceIndex: 0
+      },
       userId: 'host-user'
     }, 25_000);
     game = answerReplayTriviaQuestion(game, {
       action: 'answer',
-      payload: { choiceIndex: 1 },
+      payload: {
+        ...expectedReplayTriviaPhase(game),
+        choiceIndex: 1
+      },
       userId: 'guest-user'
     }, 25_100);
-    game = advanceReplayTriviaGame(game, 29_400);
-    game = advanceReplayTriviaGame(game, 31_600);
+    game = advanceReplayTriviaGame(game, createReplayTriviaAction(game, 'advance'), 29_400);
+    game = advanceReplayTriviaGame(game, createReplayTriviaAction(game, 'advance'), 31_600);
 
     publicGame = replayTriviaGameModule.toPublicGame(game, (userId) => ({ displayName: userId, userId })) as typeof publicGame;
     expect(publicGame.status).toBe('finished');
@@ -414,5 +530,29 @@ function createQuestion(overrides: Partial<QuestionFixture> = {}): QuestionFixtu
     rightReply: 'wow, you knew the trophy one.',
     wrongReply: 'you missed it. it was God of War.',
     ...overrides
+  };
+}
+
+function expectedReplayTriviaPhase(game: {
+  phaseStartedAt: number;
+}) {
+  return {
+    expectedPhaseStartedAt: game.phaseStartedAt
+  };
+}
+
+function createReplayTriviaAction(
+  game: Parameters<typeof expectedReplayTriviaPhase>[0],
+  action: string,
+  payload: Record<string, unknown> = {},
+  userId = 'host-user'
+) {
+  return {
+    action,
+    payload: {
+      ...expectedReplayTriviaPhase(game),
+      ...payload
+    },
+    userId
   };
 }

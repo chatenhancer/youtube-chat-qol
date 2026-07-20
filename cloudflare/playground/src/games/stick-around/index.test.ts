@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  advanceStickAroundGame,
   applyStickAroundInput,
   createStickAroundGame,
   finishStickAroundRound,
@@ -234,6 +235,25 @@ describe('playground Stick Around game rules', () => {
 
     expect(publicGame.simulation?.fighters['host-user'].label).toBe('Host name');
     expect(publicGame.simulation?.fighters['guest-user'].label).toBe('Guest name');
+  });
+
+  it('drops spawned hazard ids after their capped hazard records roll out', () => {
+    const game = startActiveGame();
+    const nextGame = advanceStickAroundGame({
+      ...game,
+      hazards: [{
+        id: 'hazard-retained',
+        seed: 1,
+        spawnAt: 100_000,
+        weight: 1
+      }],
+      simulation: game.simulation && {
+        ...game.simulation,
+        spawnedHazardIds: ['hazard-expired', 'hazard-retained']
+      }
+    }, 4_300);
+
+    expect(nextGame.simulation?.spawnedHazardIds).toEqual(['hazard-retained']);
   });
 });
 

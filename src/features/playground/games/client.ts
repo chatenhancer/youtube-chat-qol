@@ -9,7 +9,9 @@ import {
   PLAYGROUND_PORT_NAME,
   type GameEndReason,
   type GameId,
+  type IncompatibleActiveGame,
   type LobbySnapshot,
+  type PlaygroundActionError,
   type PlaygroundBackgroundMessage,
   type PlaygroundContentMessage,
   type PublicGame,
@@ -17,9 +19,11 @@ import {
   type ServerMessage
 } from '../../../shared/playground/protocol';
 import { getUiLocale } from '../../../shared/i18n';
+import { showToast } from '../../../shared/toast';
 import { getCurrentYouTubeChatStreamKey } from '../../../youtube/source-url';
 import {
   getAvailableGameIds,
+  handleGameActionError,
   handleGameServerMessage,
   notifyGameClientReset,
   notifyGameEnded
@@ -27,9 +31,11 @@ import {
 
 export interface PlaygroundClientState {
   available: boolean;
+  connectionError: string;
   endedGame: PlaygroundEndedGame | null;
-  error: string;
   games: PublicGame[];
+  incompatibleActiveGames: IncompatibleActiveGame[];
+  incompatibleGames: GameId[];
   invites: PublicInvite[];
   status: 'connected' | 'connecting' | 'disconnected';
   users: LobbySnapshot['users'];
@@ -43,12 +49,17 @@ export interface PlaygroundEndedGame {
 }
 
 type PlaygroundClientListener = (state: PlaygroundClientState) => void;
+type PlaygroundActionErrorListener = (error: PlaygroundActionError) => void;
+
+const ACTION_ERROR_TOAST_DURATION_MS = 5_000;
 
 const DEFAULT_STATE: PlaygroundClientState = {
   available: false,
+  connectionError: '',
   endedGame: null,
-  error: '',
   games: [],
+  incompatibleActiveGames: [],
+  incompatibleGames: [],
   invites: [],
   status: 'disconnected',
   users: [],
@@ -58,6 +69,7 @@ const DEFAULT_STATE: PlaygroundClientState = {
 let available = false;
 let availabilityStreamKey = '';
 let currentStreamKey = '';
+let actionErrorListeners = new Set<PlaygroundActionErrorListener>();
 let listeners = new Set<PlaygroundClientListener>();
 let playgroundPort: chrome.runtime.Port | null = null;
 let state: PlaygroundClientState = { ...DEFAULT_STATE };
@@ -67,6 +79,15 @@ export function subscribePlaygroundClient(listener: PlaygroundClientListener): (
   listener(state);
   return () => {
     listeners.delete(listener);
+  };
+}
+
+export function subscribePlaygroundActionErrors(
+  listener: PlaygroundActionErrorListener
+): () => void {
+  actionErrorListeners.add(listener);
+  return () => {
+    actionErrorListeners.delete(listener);
   };
 }
 
@@ -85,7 +106,7 @@ export function startPlaygroundClient(defaultAvailable = available): void {
     notifyGameClientReset();
     setState({
       ...DEFAULT_STATE,
-      error: 'Stream unavailable.'
+      connectionError: 'Stream unavailable.'
     });
     return;
   }
@@ -105,7 +126,9 @@ export function startPlaygroundClient(defaultAvailable = available): void {
   setState({
     ...state,
     available,
-    error: '',
+    connectionError: '',
+    incompatibleActiveGames: [],
+    incompatibleGames: [],
     status: 'connecting'
   });
 
@@ -116,7 +139,7 @@ export function startPlaygroundClient(defaultAvailable = available): void {
       notifyGameClientReset();
       setState({
         ...DEFAULT_STATE,
-        error: error instanceof Error ? error.message : 'Playground unavailable.'
+        connectionError: error instanceof Error ? error.message : 'Playground unavailable.'
       });
       return;
     }
@@ -173,7 +196,6 @@ export function sendPlaygroundInvite(gameId: GameId, toUserId: string): void {
 }
 
 export function cancelPlaygroundInvite(gameId: GameId, toUserId: string): void {
-  markOutgoingInviteCancelled(gameId, toUserId);
   postPlaygroundMessage({
     gameId,
     toUserId,
@@ -189,7 +211,11 @@ export function respondToPlaygroundInvite(inviteId: string, accept: boolean): vo
   });
 }
 
-export function sendPlaygroundGameAction(gameId: string, action: string, payload?: Record<string, unknown>): void {
+export function sendPlaygroundGameAction(
+  gameId: string,
+  action: string,
+  payload?: Record<string, unknown>
+): void {
   postPlaygroundMessage({
     action,
     gameId,
@@ -204,7 +230,9 @@ function handleBackgroundMessage(message: PlaygroundBackgroundMessage): void {
       setState({
         ...state,
         available,
-        error: message.error || '',
+        connectionError: message.error || '',
+        incompatibleActiveGames: message.status === 'connected' ? state.incompatibleActiveGames : [],
+        incompatibleGames: message.status === 'connected' ? state.incompatibleGames : [],
         status: message.status
       });
       return;
@@ -213,9 +241,11 @@ function handleBackgroundMessage(message: PlaygroundBackgroundMessage): void {
       setState({
         ...state,
         available,
+        connectionError: '',
         endedGame: null,
-        error: '',
         games: message.snapshot.games,
+        incompatibleActiveGames: message.incompatibleActiveGames,
+        incompatibleGames: message.incompatibleGames,
         invites: message.snapshot.invites,
         status: 'connected',
         users: message.snapshot.users,
@@ -223,44 +253,30 @@ function handleBackgroundMessage(message: PlaygroundBackgroundMessage): void {
       });
       return;
     case 'ytcq:playground:error':
-      setState({
-        ...state,
-        error: message.message
-      });
+      if (state.status === 'connected') {
+        const error: PlaygroundActionError = message;
+        actionErrorListeners.forEach((listener) => listener(error));
+        if (message.code === 'game_version') return;
+        if (handleGameActionError(error)) {
+          notifyListeners();
+          return;
+        }
+        showToast(message.message, {
+          durationMs: ACTION_ERROR_TOAST_DURATION_MS,
+          tone: 'error'
+        });
+      } else {
+        if (message.code === 'game_version') return;
+        setState({
+          ...state,
+          connectionError: message.message
+        });
+      }
       return;
     case 'ytcq:playground:server-message':
       handleServerMessage(message.message);
       return;
   }
-}
-
-function markOutgoingInviteCancelled(gameId: GameId, toUserId: string): void {
-  const currentUserId = state.userId;
-  if (!currentUserId) return;
-
-  let changed = false;
-  const invites = state.invites.map((invite) => {
-    if (
-      invite.status !== 'pending' ||
-      invite.gameId !== gameId ||
-      invite.fromUser.userId !== currentUserId ||
-      invite.toUser.userId !== toUserId
-    ) {
-      return invite;
-    }
-
-    changed = true;
-    return {
-      ...invite,
-      status: 'cancelled' as const
-    };
-  });
-  if (!changed) return;
-
-  setState({
-    ...state,
-    invites
-  });
 }
 
 function handleServerMessage(message: ServerMessage): void {
@@ -296,13 +312,10 @@ function handleServerMessage(message: ServerMessage): void {
           reason: message.reason,
           userId: message.userId
         },
-        games: state.games.filter((game) => game.gameId !== message.gameId)
-      });
-      return;
-    case 'error':
-      setState({
-        ...state,
-        error: message.message
+        games: state.games.filter((game) => game.gameId !== message.gameId),
+        incompatibleActiveGames: state.incompatibleActiveGames.filter((game) =>
+          game.gameId !== message.gameId
+        )
       });
       return;
   }
@@ -312,6 +325,9 @@ function handlePortDisconnect(): void {
   playgroundPort = null;
   setState({
     ...state,
+    connectionError: '',
+    incompatibleActiveGames: [],
+    incompatibleGames: [],
     status: 'disconnected'
   });
 }

@@ -5,12 +5,14 @@ import {
   ICON_VIEW_BOX,
   INBOX_ICON_PATH,
   INBOX_TEXT_ICON_PATH,
+  LOCK_ICON_PATH,
   MATERIAL_ICON_VIEW_BOX,
   TRANSLATE_ICON_PATH,
   createAddIcon,
   createBoltIcon,
   createChannelIcon,
   createInboxIcon,
+  createLockIcon,
   createSplitTranslateIcon,
   createSvgIcon,
   createTranslateIcon
@@ -39,6 +41,8 @@ describe('shared SVG icon factories', () => {
     expect(createBoltIcon().getAttribute('viewBox')).toBe(MATERIAL_ICON_VIEW_BOX);
     expect(createBoltIcon().querySelector('path')?.getAttribute('d')).toBe(BOLT_ICON_PATH);
     expect(createBoltIcon().getAttribute('fill')).toBeNull();
+    expect(createLockIcon().getAttribute('viewBox')).toBe(MATERIAL_ICON_VIEW_BOX);
+    expect(createLockIcon().querySelector('path')?.getAttribute('d')).toBe(LOCK_ICON_PATH);
   });
 
   it('creates split translate icons with configurable classes', () => {

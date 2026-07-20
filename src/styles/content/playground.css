@@ -92,6 +92,56 @@
   min-width: 0;
 }
 
+.ytcq-games-unavailable-section {
+  gap: 0;
+  padding-top: 8px;
+  border-top: 1px solid rgba(128, 128, 128, 0.16);
+}
+
+.ytcq-games-unavailable-section[open] {
+  gap: 6px;
+}
+
+.ytcq-games-unavailable-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 2px 0;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+
+.ytcq-games-unavailable-summary::-webkit-details-marker {
+  display: none;
+}
+
+.ytcq-games-unavailable-summary::after {
+  width: 6px;
+  height: 6px;
+  margin-right: 3px;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  content: "";
+  transform: rotate(-45deg);
+  transition: transform 120ms ease;
+}
+
+.ytcq-games-unavailable-section[open] .ytcq-games-unavailable-summary::after {
+  transform: rotate(45deg);
+}
+
+.ytcq-games-unavailable-summary:hover {
+  color: var(--yt-spec-text-primary, var(--yt-live-chat-primary-text-color, #f1f1f1));
+}
+
+.ytcq-games-unavailable-summary:focus-visible {
+  border-radius: 3px;
+  outline: 2px solid var(--yt-spec-call-to-action, #3ea6ff);
+  outline-offset: 2px;
+}
+
 .ytcq-games-active-controls {
   --ytcq-games-active-control-radius: 10px;
   --ytcq-games-active-action-radius: 8px;
@@ -405,14 +455,17 @@
 }
 
 .ytcq-games-game-card-disabled {
-  cursor: default;
-  opacity: 0.48;
+  color: var(--yt-live-chat-secondary-text-color, var(--yt-spec-text-secondary, #aaa));
+  background:
+    linear-gradient(rgba(128, 128, 128, 0.05), rgba(128, 128, 128, 0.05)),
+    var(--yt-spec-badge-chip-background, transparent);
+  cursor: not-allowed;
 }
 
 .ytcq-games-game-card-disabled:hover,
 .ytcq-games-game-card-disabled:focus {
   background:
-    linear-gradient(rgba(128, 128, 128, 0.1), rgba(128, 128, 128, 0.1)),
+    linear-gradient(rgba(128, 128, 128, 0.05), rgba(128, 128, 128, 0.05)),
     var(--yt-spec-badge-chip-background, transparent);
 }
 
@@ -437,6 +490,47 @@
   overflow-wrap: anywhere;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
+}
+
+.ytcq-games-game-card-disabled .ytcq-games-game-copy {
+  opacity: 0.62;
+}
+
+.ytcq-games-game-card-disabled .ytcq-games-preview-canvas {
+  filter: grayscale(0.9) saturate(0.3);
+}
+
+.ytcq-games-game-card-disabled .ytcq-games-preview::before {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: rgba(0, 0, 0, 0.34);
+  content: "";
+}
+
+.ytcq-games-restriction-badge {
+  position: absolute;
+  right: 4px;
+  bottom: 3px;
+  left: 4px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  overflow: hidden;
+  color: #fff;
+  fill: currentColor;
+  font: 500 8px/10px Roboto, Arial, sans-serif;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.95), 0 0 2px rgba(0, 0, 0, 0.85);
+  white-space: nowrap;
+}
+
+.ytcq-games-restriction-badge svg {
+  width: 8px;
+  height: 8px;
+  flex: 0 0 auto;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.9));
 }
 
 .ytcq-games-preview {
@@ -1167,9 +1261,94 @@
   animation: ytcq-game-feedback-float 1.1s ease-out forwards;
 }
 
+.ytcq-bounty-hunting-miss-feedback {
+  --ytcq-bounty-hunting-reload-duration: 5000ms;
+  --ytcq-bounty-hunting-miss-color: var(--yt-spec-text-primary, #f1f1f1);
+  --ytcq-bounty-hunting-miss-background: #3d3224;
+  --ytcq-bounty-hunting-miss-progress-background: #5b4526;
+
+  position: fixed;
+  z-index: 2147483647;
+  display: inline-flex;
+  box-sizing: border-box;
+  align-items: center;
+  gap: 3px;
+  width: max-content;
+  max-width: min(190px, calc(100vw - 16px));
+  min-height: 18px;
+  padding: 1px 5px 1px 3px;
+  border-radius: 999px;
+  color: var(--ytcq-bounty-hunting-miss-color);
+  background: var(--ytcq-bounty-hunting-miss-background);
+  font: 500 11px/14px Roboto, Arial, sans-serif;
+  letter-spacing: 0;
+  overflow: hidden;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.ytcq-bounty-hunting-miss-feedback::before {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  background: var(--ytcq-bounty-hunting-miss-progress-background);
+  content: "";
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+
+.ytcq-bounty-hunting-miss-feedback > * {
+  position: relative;
+  z-index: 1;
+}
+
+.ytcq-bounty-hunting-miss-feedback.ytcq-bounty-hunting-reload-progress::before {
+  animation: ytcq-bounty-hunting-reload-progress
+    var(--ytcq-bounty-hunting-reload-duration) linear forwards;
+}
+
+.ytcq-bounty-hunting-miss-feedback[hidden] {
+  display: inline-flex !important;
+  visibility: hidden;
+}
+
+html.ytcq-bounty-hunting-reloading :is(
+  yt-live-chat-text-message-renderer,
+  yt-live-chat-paid-message-renderer,
+  yt-live-chat-membership-item-renderer,
+  .ytcq-lite-message
+),
+html.ytcq-bounty-hunting-reloading :is(
+  yt-live-chat-text-message-renderer,
+  yt-live-chat-paid-message-renderer,
+  yt-live-chat-membership-item-renderer,
+  .ytcq-lite-message
+) * {
+  cursor: not-allowed !important;
+}
+
+html:not([dark]) .ytcq-bounty-hunting-miss-feedback {
+  --ytcq-bounty-hunting-miss-color: #473000;
+  --ytcq-bounty-hunting-miss-background: #f8edcf;
+  --ytcq-bounty-hunting-miss-progress-background: #f1d89d;
+}
+
+.ytcq-bounty-hunting-miss-copy {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ytcq-bounty-hunting-miss-icon {
+  flex: 0 0 auto;
+  width: 1em;
+  height: 1em;
+  fill: currentColor;
+}
+
 .ytcq-bounty-hunting-claim-indicator {
   --ytcq-bounty-hunting-claim-indicator-background: rgba(170, 124, 47, 0.22);
-  --ytcq-bounty-hunting-claim-indicator-border: rgba(220, 176, 88, 0.42);
   --ytcq-bounty-hunting-claim-indicator-color: var(--yt-spec-text-primary, #f1f1f1);
 
   display: inline-flex;
@@ -1181,7 +1360,6 @@
   border-radius: 999px;
   color: var(--ytcq-bounty-hunting-claim-indicator-color);
   background: var(--ytcq-bounty-hunting-claim-indicator-background);
-  box-shadow: inset 0 0 0 1px var(--ytcq-bounty-hunting-claim-indicator-border);
   font: 500 11px/14px Roboto, Arial, sans-serif;
   letter-spacing: 0;
   vertical-align: text-bottom;
@@ -1189,7 +1367,6 @@
 
 html:not([dark]) .ytcq-bounty-hunting-claim-indicator {
   --ytcq-bounty-hunting-claim-indicator-background: #f1d89d;
-  --ytcq-bounty-hunting-claim-indicator-border: rgba(114, 77, 14, 0.34);
   --ytcq-bounty-hunting-claim-indicator-color: #473000;
 }
 
@@ -1265,5 +1442,18 @@ html:not([dark]) .ytcq-bounty-hunting-claim-indicator {
   100% {
     opacity: 0;
     transform: translate(-50%, -170%) scale(0.98);
+  }
+}
+
+@keyframes ytcq-bounty-hunting-reload-progress {
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ytcq-bounty-hunting-miss-feedback.ytcq-bounty-hunting-reload-progress::before {
+    animation: none;
+    transform: scaleX(1);
   }
 }

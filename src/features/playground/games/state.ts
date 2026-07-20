@@ -7,6 +7,7 @@
 import {
   isPlaygroundComputerUserId,
   type GameId,
+  type InviteClientMessage,
   type PresenceUser,
   type PublicGame,
   type PublicInvite
@@ -19,10 +20,9 @@ export type GamesPanelMode = 'lobby' | 'players';
 export interface GamesPanelState {
   activeGameIndex: number;
   available: boolean;
-  invitedGameId: GameId | null;
-  invitedPlayer: string;
   leavingGameId: string;
   mode: GamesPanelMode;
+  pendingInvite: InviteClientMessage | null;
   selectedGameId: GameId | null;
   transport: PlaygroundClientState;
 }
@@ -31,10 +31,9 @@ export function createInitialGamesPanelState(available: boolean, transport: Play
   return {
     activeGameIndex: 0,
     available,
-    invitedGameId: null,
-    invitedPlayer: '',
     leavingGameId: '',
     mode: 'lobby',
+    pendingInvite: null,
     selectedGameId: null,
     transport
   };
@@ -58,6 +57,10 @@ export function isCurrentUserAvailable(state: PlaygroundClientState, fallbackAva
   return currentUser ? isUserAvailableForSupportedGame(currentUser) : fallbackAvailable;
 }
 
+export function isGameVersionIncompatible(state: PlaygroundClientState, gameId: GameId): boolean {
+  return state.incompatibleGames.includes(gameId);
+}
+
 export function getPendingInvites(state: GamesPanelState): PublicInvite[] {
   return getPendingInvitesForCurrentUser(state.transport);
 }
@@ -67,8 +70,9 @@ export function getPendingInviteCount(state: PlaygroundClientState): number {
 }
 
 export function isPlayerInvitePending(state: GamesPanelState, gameId: GameId, toUserId: string): boolean {
+  const pendingInvite = state.pendingInvite;
   return (
-    (state.invitedGameId === gameId && state.invitedPlayer === toUserId) ||
+    (pendingInvite?.gameId === gameId && pendingInvite.toUserId === toUserId) ||
     Boolean(getPendingOutgoingInvite(state, gameId, toUserId))
   );
 }
@@ -77,9 +81,13 @@ export function getActiveGameCount(state: PlaygroundClientState): number {
   const currentUserId = state.userId || '';
   if (!currentUserId) return 0;
 
-  return getSupportedGames(state.games)
+  const activeGameIds = getSupportedGames(state.games)
     .filter((game) => isCurrentUserGame(game, currentUserId))
-    .length;
+    .map((game) => game.gameId);
+  state.incompatibleActiveGames
+    .filter((game) => isSupportedGameId(game.gameType))
+    .forEach((game) => activeGameIds.push(game.gameId));
+  return new Set(activeGameIds).size;
 }
 
 function getPendingInvitesForCurrentUser(state: PlaygroundClientState): PublicInvite[] {
@@ -141,14 +149,18 @@ export function getGamesPanelViewKey(state: GamesPanelState, activeGamePanelId: 
   return [
     state.mode,
     state.selectedGameId || '',
-    state.invitedGameId || '',
-    state.invitedPlayer,
+    state.pendingInvite?.gameId || '',
+    state.pendingInvite?.toUserId || '',
     state.leavingGameId,
     String(state.activeGameIndex),
     activeGamePanelId,
     String(state.available),
     transport.status,
-    transport.error,
+    transport.connectionError,
+    transport.incompatibleActiveGames
+      .map((game) => `${game.gameId}:${game.gameType}`)
+      .join(','),
+    transport.incompatibleGames.join(','),
     transport.userId,
     String(transport.available),
     transport.users.map(getPresenceRenderKey).join('\n'),

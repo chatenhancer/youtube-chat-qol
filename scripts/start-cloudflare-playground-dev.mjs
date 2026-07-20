@@ -16,17 +16,20 @@ if (process.env[DOCKER_SHIM_ENV] === '1') {
 const proxyImage = getWranglerContainerEgressImage();
 const { digestRef, tagRef } = getImageRefs(proxyImage);
 
+ensureDockerAvailable();
 if (process.env.YTCQ_SKIP_CONTAINER_EGRESS_IMAGE_CHECK !== '1') {
   ensureDockerImage();
 }
 
 const wranglerBin = getWranglerBinPath();
+const wranglerArgs = process.argv.slice(2);
 const wrangler = spawnSync(process.execPath, [
   wranglerBin,
   'dev',
   '--config',
   'cloudflare/playground/wrangler.toml',
-  ...process.argv.slice(2)
+  ...getLocalDevArgs(wranglerArgs),
+  ...wranglerArgs
 ], {
   env: {
     ...process.env,
@@ -43,6 +46,31 @@ if (wrangler.error) {
   process.exit(1);
 }
 process.exit(wrangler.status ?? 1);
+
+function getLocalDevArgs(args) {
+  if (args.some((arg) => arg === '--remote' || arg === '-r' || arg === '--remote=true')) return [];
+
+  // Keep Wrangler from rewriting local Origin headers to the production custom domain.
+  return ['--local-upstream', '127.0.0.1:8787'];
+}
+
+function ensureDockerAvailable() {
+  if (runDocker(['info']).ok) return;
+  if (startColima() && runDocker(['info']).ok) return;
+
+  exitWithDockerHelp('Docker is unavailable.');
+}
+
+function startColima() {
+  if (process.platform !== 'darwin') return false;
+
+  const version = spawnSync('colima', ['version'], { stdio: 'ignore' });
+  if (version.error || version.status !== 0) return false;
+
+  console.log('[playground] Docker is unavailable; starting Colima...');
+  const colima = spawnSync('colima', ['start'], { stdio: 'inherit' });
+  return !colima.error && colima.status === 0;
+}
 
 function ensureDockerImage() {
   if (hasDockerImage(tagRef)) return;

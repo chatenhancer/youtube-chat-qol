@@ -8,7 +8,14 @@
  */
 import { registerFeature, type FeatureMutationBatch } from '../../../content/feature-runtime';
 import type { Options } from '../../../shared/options';
-import type { GameId, PresenceUser, PublicGame, PublicInvite } from '../../../shared/playground/protocol';
+import type {
+  GameId,
+  PlaygroundActionError,
+  PlaygroundFailedRequest,
+  PresenceUser,
+  PublicGame,
+  PublicInvite
+} from '../../../shared/playground/protocol';
 import { playAlertSound } from '../../../shared/sounds/alert-sounds';
 import { getOptions } from '../../../shared/state';
 import { updateScrollEdgeFades, wireScrollEdgeFades } from '../../../shared/scroll';
@@ -52,6 +59,7 @@ import {
   setPlaygroundAvailability,
   startPlaygroundClient,
   stopPlaygroundClient,
+  subscribePlaygroundActionErrors,
   subscribePlaygroundClient,
   type PlaygroundClientState
 } from './client';
@@ -79,7 +87,13 @@ interface GamesPointerPosition {
 interface PendingStartedGameOpen {
   gameType: GameId;
   knownGameIds: Set<string>;
+  request: GameStartRequest;
 }
+
+type GameStartRequest = Extract<
+  PlaygroundFailedRequest,
+  { type: 'invite' | 'respondInvite' }
+>;
 
 registerFeature({
   page: {
@@ -156,7 +170,7 @@ export function cleanupStaleGamesUi(): void {
 
 function removeOrphanedGameSurfaces(): void {
   document.querySelectorAll<HTMLElement>(
-    '.ytcq-games-card, .ytcq-game-panel, .ytcq-game-minimize-ghost'
+    '.ytcq-games-card, .ytcq-game-panel, .ytcq-game-minimize-ghost, .ytcq-bounty-hunting-miss-feedback'
   ).forEach((surface) => surface.remove());
 }
 
@@ -226,7 +240,50 @@ function closeGamesCard(): void {
 }
 
 function ensureGamesClientSubscription(): void {
-  activeGamesClientCleanup ||= subscribePlaygroundClient(handlePlaygroundClientStateChanged);
+  if (activeGamesClientCleanup) return;
+  const clientCleanup = subscribePlaygroundClient(handlePlaygroundClientStateChanged);
+  const errorCleanup = subscribePlaygroundActionErrors(handlePlaygroundActionError);
+  activeGamesClientCleanup = () => {
+    clientCleanup();
+    errorCleanup();
+  };
+}
+
+function handlePlaygroundActionError(error: PlaygroundActionError): void {
+  const request = error.request;
+  if (!request) return;
+
+  if (pendingStartedGameOpen && isSameGameStartRequest(pendingStartedGameOpen.request, request)) {
+    pendingStartedGameOpen = null;
+  }
+
+  const state = gamesPanelState;
+  if (!state) return;
+  if (state.pendingInvite && isSameGameStartRequest(state.pendingInvite, request)) {
+    state.pendingInvite = null;
+  } else if (
+    request.type === 'gameAction' &&
+    request.action === 'leave' &&
+    state.leavingGameId === request.gameId
+  ) {
+    state.leavingGameId = '';
+  } else return;
+
+  renderGamesPanel();
+}
+
+function isSameGameStartRequest(
+  expected: GameStartRequest,
+  actual: PlaygroundFailedRequest
+): boolean {
+  if (expected.type === 'invite') {
+    return actual.type === 'invite' &&
+      expected.gameId === actual.gameId &&
+      expected.toUserId === actual.toUserId;
+  }
+  return actual.type === 'respondInvite' &&
+    expected.accept === actual.accept &&
+    expected.inviteId === actual.inviteId;
 }
 
 function handlePlaygroundClientStateChanged(nextState: PlaygroundClientState): void {
@@ -315,7 +372,11 @@ function getIncomingPendingInviteIds(state: PlaygroundClientState): Set<string> 
 }
 
 function acceptInvite(invite: PublicInvite): void {
-  queueStartedGameOpen(invite.gameId);
+  queueStartedGameOpen(invite.gameId, {
+    accept: true,
+    inviteId: invite.inviteId,
+    type: 'respondInvite'
+  });
   respondToPlaygroundInvite(invite.inviteId, true);
 }
 
@@ -339,10 +400,14 @@ function showLobbyView(): void {
 
 function invitePlayer(player: PresenceUser): void {
   if (!gamesPanelState?.selectedGameId) return;
-  gamesPanelState.invitedGameId = gamesPanelState.selectedGameId;
-  gamesPanelState.invitedPlayer = player.userId;
-  queueStartedGameOpen(gamesPanelState.selectedGameId);
-  sendPlaygroundInvite(gamesPanelState.selectedGameId, player.userId);
+  const request = {
+    gameId: gamesPanelState.selectedGameId,
+    toUserId: player.userId,
+    type: 'invite'
+  } satisfies GameStartRequest;
+  gamesPanelState.pendingInvite = request;
+  queueStartedGameOpen(request.gameId, request);
+  sendPlaygroundInvite(request.gameId, request.toUserId);
   renderGamesPanel();
 }
 
@@ -350,9 +415,9 @@ function cancelPlayerInvite(player: PresenceUser): void {
   const gameId = gamesPanelState?.selectedGameId;
   if (!gamesPanelState || !gameId || !isPlayerInvitePending(gamesPanelState, gameId, player.userId)) return;
   cancelPlaygroundInvite(gameId, player.userId);
-  if (gamesPanelState.invitedGameId === gameId && gamesPanelState.invitedPlayer === player.userId) {
-    gamesPanelState.invitedGameId = null;
-    gamesPanelState.invitedPlayer = '';
+  const pendingInvite = gamesPanelState.pendingInvite;
+  if (pendingInvite?.gameId === gameId && pendingInvite.toUserId === player.userId) {
+    gamesPanelState.pendingInvite = null;
   }
   pendingStartedGameOpen = null;
   renderGamesPanel();
@@ -370,29 +435,46 @@ function toggleActiveGamePanel(game: PublicGame): void {
   if (isActiveGamePanelOpen() && getActiveGamePanelId() === game.gameId) closeGamesCard();
 }
 
-function leaveGame(game: PublicGame): void {
-  if (!isSupportedPublicGame(game)) return;
-  if (gamesPanelState?.leavingGameId === game.gameId) return;
+function leaveGame(gameId: string): void {
+  if (!gamesPanelState || gamesPanelState.leavingGameId === gameId) return;
+  const isCurrentGame = gamesPanelState.transport.games.some((game) =>
+    game.gameId === gameId && isSupportedPublicGame(game)
+  ) || gamesPanelState.transport.incompatibleActiveGames.some((game) => game.gameId === gameId);
+  if (!isCurrentGame) return;
 
-  closeActiveGamePanel({ notify: false });
-  if (gamesPanelState) {
-    gamesPanelState.leavingGameId = game.gameId;
-    renderGamesPanel();
-  }
-  sendPlaygroundGameAction(game.gameId, 'leave');
+  if (getActiveGamePanelId() === gameId) closeActiveGamePanel({ notify: false });
+  gamesPanelState.leavingGameId = gameId;
+  renderGamesPanel();
+  sendPlaygroundGameAction(gameId, 'leave');
 }
 
 function clearPendingLobbyActions(state: GamesPanelState, transport: PlaygroundClientState): void {
-  if (transport.status !== 'connected' || transport.error) {
-    state.invitedGameId = null;
-    state.invitedPlayer = '';
+  if (transport.status !== 'connected' || transport.connectionError) {
+    state.pendingInvite = null;
     state.leavingGameId = '';
     pendingStartedGameOpen = null;
     return;
   }
 
-  if (state.leavingGameId && !transport.games.some((game) => game.gameId === state.leavingGameId)) {
+  if (
+    state.leavingGameId
+    && !transport.games.some((game) => game.gameId === state.leavingGameId)
+    && !transport.incompatibleActiveGames.some((game) => game.gameId === state.leavingGameId)
+  ) {
     state.leavingGameId = '';
+  }
+
+  const pendingInvite = state.pendingInvite;
+  if (
+    pendingInvite &&
+    transport.invites.some((invite) =>
+      invite.status === 'pending' &&
+      invite.gameId === pendingInvite.gameId &&
+      invite.fromUser.userId === transport.userId &&
+      invite.toUser.userId === pendingInvite.toUserId
+    )
+  ) {
+    state.pendingInvite = null;
   }
 }
 
@@ -411,11 +493,15 @@ function openGamePanel(
   });
 }
 
-function queueStartedGameOpen(gameType: GameId): void {
+function queueStartedGameOpen(
+  gameType: GameId,
+  request: PendingStartedGameOpen['request']
+): void {
   const games = gamesPanelState?.transport.games || getPlaygroundClientState().games;
   pendingStartedGameOpen = {
     gameType,
-    knownGameIds: new Set(games.map((game) => game.gameId))
+    knownGameIds: new Set(games.map((game) => game.gameId)),
+    request
   };
 }
 

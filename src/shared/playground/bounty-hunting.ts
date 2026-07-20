@@ -2,6 +2,8 @@ import { cleanText } from '../text';
 
 export const BOUNTY_HUNTING_BOUNTY_COUNT = 6;
 export const BOUNTY_HUNTING_COUNTDOWN_MS = 3_000;
+export const BOUNTY_HUNTING_MISS_COOLDOWN_MS = 5_000;
+export const BOUNTY_HUNTING_MAX_WITNESS_OBSERVATIONS = 20;
 export const BOUNTY_HUNTING_ROUND_MS = 60_000;
 export const BOUNTY_HUNTING_ROUND_OVER_MS = 2_000;
 export const BOUNTY_HUNTING_BOUNTY_DESCRIPTION_KEYS = [
@@ -77,6 +79,12 @@ export interface BountyHuntingMessageFacts {
   isSuperChat: boolean;
   isTopFanAuthor: boolean;
   isVerifiedAuthor: boolean;
+}
+
+export interface BountyHuntingMessageObservation {
+  bountyIds: string[];
+  messageId: string;
+  messageTimestampUsec?: string;
 }
 
 export function doesBountyHuntingBountyMatch(

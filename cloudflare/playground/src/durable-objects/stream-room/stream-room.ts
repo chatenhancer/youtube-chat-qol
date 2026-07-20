@@ -14,10 +14,13 @@ import {
   verifySignedIdentity
 } from '../../protocol/identity';
 import {
+  PLAYGROUND_GAME_VERSIONS,
   PLAYGROUND_PROTOCOL_VERSION,
+  isPlaygroundGameVersionCompatible,
   type ClientMessage,
   type GameId,
   type LobbySnapshot,
+  type PlaygroundFailedRequest,
   type ServerMessage,
   isPlaygroundComputerUserId
 } from '../../protocol/messages';
@@ -86,9 +89,7 @@ export class StreamRoom {
       waitUntil: (promise) => this.state.waitUntil(promise)
     });
 
-    this.state.blockConcurrencyWhile(async () => {
-      await this.gameState.load();
-    });
+    this.state.blockConcurrencyWhile(() => this.gameState.load());
   }
 
   async fetch(request: Request): Promise<Response> {
@@ -126,6 +127,7 @@ export class StreamRoom {
       challenge,
       connectionId,
       displayName: 'Player',
+      gameVersions: {},
       joinedAt: Date.now(),
       languageCode: 'en',
       rateLimit: new TokenBucket(CONNECTION_RATE_LIMIT),
@@ -151,6 +153,7 @@ export class StreamRoom {
 
     sendMessage(socket, {
       challenge,
+      gameVersions: { ...PLAYGROUND_GAME_VERSIONS },
       issuedAt: Date.now(),
       protocolVersion: PLAYGROUND_PROTOCOL_VERSION,
       type: 'challenge'
@@ -163,11 +166,13 @@ export class StreamRoom {
   }
 
   private async handleSocketMessage(session: ClientSession, data: unknown): Promise<void> {
+    let request: PlaygroundFailedRequest | undefined;
     try {
       if (typeof data !== 'string') throw new ProtocolError('invalid_message', 'Messages must be strings.');
       if (data.length > MAX_MESSAGE_BYTES) throw new ProtocolError('message_too_large', 'Message is too large.');
 
       const message = parseClientMessage(data);
+      if (message.type !== 'hello') request = message;
       this.assertWithinRateLimit(session, message);
       if (message.type !== 'hello' && !session.userId) {
         throw new ProtocolError('hello_required', 'Send hello before other messages.');
@@ -180,6 +185,7 @@ export class StreamRoom {
       if (session.socket) sendMessage(session.socket, {
         code: protocolError.code,
         message: protocolError.message,
+        ...(request ? { request } : {}),
         type: 'error'
       });
       if (protocolError.code === 'hello_required' || protocolError.code === 'invalid_signature') {
@@ -196,7 +202,7 @@ export class StreamRoom {
       case 'setAvailability':
         this.sessions.setAvailability(session, message.availableGames);
         this.logEvent('availability_changed', {
-          availableGameCount: message.availableGames.length,
+          availableGameCount: session.availableGames.size,
           connection: shortLogId(session.connectionId),
           user: hashLogValue(session.userId)
         });
@@ -239,7 +245,7 @@ export class StreamRoom {
     this.sessions.authenticate(session, identity.userId, message.availableGames || [], message.displayName, {
       languageCode: message.languageCode || 'en',
       locale: message.locale
-    });
+    }, message.gameVersions ?? {});
     this.logEvent('client_authenticated', {
       availableGameCount: session.availableGames.size,
       connection: shortLogId(session.connectionId),
@@ -255,13 +261,12 @@ export class StreamRoom {
   }
 
   private handleInvite(session: ClientSession, gameId: GameId, toUserId: string): void {
+    this.assertCompatibleGameVersion(session, gameId);
     if (session.userId === toUserId) throw new ProtocolError('self_invite', 'Choose another player.');
 
     const target = this.sessions.getPresenceUser(toUserId);
     if (!target) throw new ProtocolError('user_not_found', 'That player is not connected.');
-    if (!target.availableGames.includes(gameId)) {
-      throw new ProtocolError('user_unavailable', 'That player is not available for this game.');
-    }
+    this.assertUserAvailableForGame(toUserId, gameId);
     this.assertNoActiveGameBetweenUsers(gameId, session.userId, toUserId);
 
     const now = Date.now();
@@ -306,15 +311,15 @@ export class StreamRoom {
   }
 
   private handleInviteResponse(session: ClientSession, inviteId: string, accept: boolean): void {
-    this.handleInviteResponseForUser(session.userId, inviteId, accept);
-  }
-
-  private handleInviteResponseForUser(userId: string, inviteId: string, accept: boolean): void {
     const invite = this.invites.getPendingInvite(inviteId);
-    if (invite.toUserId !== userId) {
+    if (invite.toUserId !== session.userId) {
       throw new ProtocolError('not_your_invite', 'That invite is not for you.');
     }
-    if (accept) this.assertNoActiveGameBetweenUsers(invite.gameId, invite.fromUserId, invite.toUserId);
+    if (accept) {
+      this.assertCompatibleGameVersion(session, invite.gameId);
+      this.assertUserConnectedForGame(invite.fromUserId, invite.gameId);
+      this.assertNoActiveGameBetweenUsers(invite.gameId, invite.fromUserId, invite.toUserId);
+    }
 
     this.invites.setInviteStatus(invite, accept ? 'accepted' : 'ignored');
     this.logEvent(accept ? 'invite_accepted' : 'invite_ignored', {
@@ -347,16 +352,42 @@ export class StreamRoom {
   ): void {
     const game = this.gameState.get(gameId);
     if (!game) throw new ProtocolError('game_not_found', 'Game not found.');
+    const gameModule = getGameModuleForRecord(game);
+    if (!gameModule.canUserAccessGame(game, session.userId)) {
+      throw new ProtocolError('not_in_game', 'You are not a player in this game.');
+    }
     if (action.action === 'leave') {
       this.handleLeaveGame(session.userId, game);
       return;
     }
+    this.assertCompatibleGameVersion(session, game.gameType);
     if (action.action === 'requestGenerationToken') {
       this.handleGenerationTokenRequest(session, game);
       return;
     }
 
     this.applyGameAction(game, action);
+  }
+
+  private assertCompatibleGameVersion(session: ClientSession, gameId: GameId): void {
+    if (!isPlaygroundGameVersionCompatible(gameId, session.gameVersions)) {
+      throw new ProtocolError(
+        'game_version',
+        'Chat Enhancer and Playground versions do not match for this game.'
+      );
+    }
+  }
+
+  private assertUserAvailableForGame(userId: string, gameId: GameId): void {
+    if (!this.sessions.isUserAvailableForGame(userId, gameId)) {
+      throw new ProtocolError('user_unavailable', 'That player is not available for this game.');
+    }
+  }
+
+  private assertUserConnectedForGame(userId: string, gameId: GameId): void {
+    if (!this.sessions.hasCompatibleGameSession(userId, gameId)) {
+      throw new ProtocolError('user_unavailable', 'That player is not available for this game.');
+    }
   }
 
   private assertNoActiveGameBetweenUsers(gameId: GameId, userA: string, userB: string): void {
@@ -377,14 +408,14 @@ export class StreamRoom {
   ): void {
     const gameModule = getGameModuleForRecord(game);
     const nextGame = gameModule.applyAction(game, action);
+    if (nextGame === game) return;
+    const persistence = gameModule.getStatePersistence?.({
+      action,
+      nextGame,
+      previousGame: game
+    }) ?? 'immediate';
     const nextGameModule = getGameModuleForRecord(nextGame);
-    this.gameState.set(nextGame, {
-      persistence: gameModule.getStatePersistence?.({
-        action,
-        nextGame,
-        previousGame: game
-      }) ?? 'immediate'
-    });
+    this.gameState.set(nextGame, { persistence });
     const recordedWin = this.recordTerminalGameWin(game, nextGame);
     if (game.status !== nextGame.status && nextGameModule.isTerminal(nextGame)) {
       this.logEvent('game_ended', {
@@ -406,7 +437,10 @@ export class StreamRoom {
   }
 
   private recordGlobalGameWin(game: GameRecord, winnerUserId: string): void {
-    if (isPlaygroundComputerUserId(winnerUserId)) {
+    const hasComputerPlayer = getGameModuleForRecord(game)
+      .getRecipientUserIds(game)
+      .some(isPlaygroundComputerUserId);
+    if (hasComputerPlayer) {
       this.logEvent('game_win_record_skipped', {
         game: shortLogId(game.gameId),
         gameType: game.gameType,
@@ -440,10 +474,6 @@ export class StreamRoom {
 
   private handleLeaveGame(userId: string, game: GameRecord): void {
     const gameModule = getGameModuleForRecord(game);
-    if (!gameModule.canUserAccessGame(game, userId)) {
-      throw new ProtocolError('not_in_game', 'You are not a player in this game.');
-    }
-
     this.gameState.delete(game.gameId);
     this.logEvent('game_ended', {
       game: shortLogId(game.gameId),

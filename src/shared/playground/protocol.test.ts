@@ -45,4 +45,31 @@ describe('playground protocol backend origin', () => {
     expect(protocol.isPlaygroundComputerUserId('server:computer')).toBe(false);
     expect(protocol.isPlaygroundComputerUserId('human-user')).toBe(false);
   });
+
+  it('matches game versions exactly and treats missing versions as version one', async () => {
+    vi.resetModules();
+
+    const protocol = await import('./protocol');
+
+    expect(protocol.PLAYGROUND_PROTOCOL_VERSION).toBe(1);
+    expect(protocol.PLAYGROUND_GAME_VERSIONS).toEqual({
+      'bounty-hunting': 2,
+      chess: 1,
+      'replay-trivia': 2,
+      'stick-around': 1
+    });
+    expect(protocol.isPlaygroundGameVersionCompatible('bounty-hunting')).toBe(false);
+    expect(protocol.isPlaygroundGameVersionCompatible('chess')).toBe(true);
+    expect(protocol.isPlaygroundGameVersionCompatible('bounty-hunting', {
+      'bounty-hunting': 2
+    })).toBe(true);
+    expect(protocol.isPlaygroundGameVersionCompatible('bounty-hunting', {
+      'bounty-hunting': 3
+    })).toBe(false);
+    expect(protocol.isPlaygroundGameVersionCompatible('replay-trivia')).toBe(false);
+    expect(protocol.isPlaygroundGameVersionCompatible('replay-trivia', {
+      'replay-trivia': 2
+    })).toBe(true);
+    expect(protocol.filterCompatiblePlaygroundGames(['chess', 'bounty-hunting'], undefined)).toEqual(['chess']);
+  });
 });

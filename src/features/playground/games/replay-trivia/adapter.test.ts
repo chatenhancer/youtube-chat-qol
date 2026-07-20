@@ -5,19 +5,31 @@ import type { PublicReplayTriviaGame } from './types';
 
 const panelMock = vi.hoisted(() => ({
   closeReplayTriviaGamePanel: vi.fn(),
+  handleReplayTriviaPanelActionError: vi.fn(() => false),
   openReplayTriviaGamePanel: vi.fn(),
+  resetReplayTriviaGamePanelClientState: vi.fn(),
   updateReplayTriviaGamePanel: vi.fn()
 }));
 
 vi.mock('./panel', () => panelMock);
 
-import { replayTriviaGameAdapter } from './adapter';
-import { handleReplayTriviaServerMessage, resetReplayTriviaClientData } from './client-data';
+import { replayTriviaGameAdapter, replayTriviaGameDefinition } from './adapter';
+import {
+  handleReplayTriviaActionError,
+  handleReplayTriviaServerMessage,
+  resetReplayTriviaClientData,
+  takeReplayTriviaGenerationToken,
+  takeReplayTriviaPreparationError
+} from './client-data';
 
 describe('Replay Trivia game adapter', () => {
   afterEach(() => {
     resetReplayTriviaClientData();
     vi.clearAllMocks();
+  });
+
+  it('declares replay-only availability', () => {
+    expect(replayTriviaGameDefinition.availability).toBe('replay');
   });
 
   it('opens Replay Trivia panels and returns a handle', () => {
@@ -37,7 +49,11 @@ describe('Replay Trivia game adapter', () => {
       'host-user',
       sendGameAction,
       onPanelChange,
-      context.closePanel
+      context.closePanel,
+      {
+        generationToken: undefined,
+        preparationError: undefined
+      }
     );
     expect(handle.gameId).toBe('game-1');
     handle.close();
@@ -70,16 +86,30 @@ describe('Replay Trivia game adapter', () => {
         gameId: 'game-1',
         generationToken: 'rtg_1234567890abcdef'
       },
-      ''
+      undefined
+    );
+
+    panelMock.updateReplayTriviaGamePanel.mockClear();
+    replayTriviaGameAdapter.updatePanel(game, createUpdateContext({
+      clientState,
+      currentUserId: 'host-user'
+    }));
+    expect(panelMock.updateReplayTriviaGamePanel).toHaveBeenCalledWith(
+      game,
+      'host-user',
+      undefined,
+      undefined
     );
   });
 
-  it('passes preparation errors from the update state', () => {
-    const game = createReplayTriviaGame();
-    const clientState = createClientState({
-      error: 'Replay Trivia questions must include friendIntro.',
-      userId: 'host-user'
+  it('clears unused generation tokens once preparation finishes', () => {
+    handleReplayTriviaServerMessage({
+      expiresAt: 123,
+      gameId: 'game-1',
+      generationToken: 'rtg_1234567890abcdef',
+      type: 'replayTriviaGenerationToken'
     });
+    expect(takeReplayTriviaGenerationToken('game-1')).toBeDefined();
     handleReplayTriviaServerMessage({
       expiresAt: 123,
       gameId: 'game-1',
@@ -87,21 +117,93 @@ describe('Replay Trivia game adapter', () => {
       type: 'replayTriviaGenerationToken'
     });
 
+    handleReplayTriviaServerMessage({
+      game: createReplayTriviaGame({ status: 'countdown' }),
+      type: 'gameUpdated'
+    });
+
+    expect(takeReplayTriviaGenerationToken('game-1')).toBeUndefined();
+  });
+
+  it('passes only correlated Replay Trivia preparation errors to the panel', () => {
+    const game = createReplayTriviaGame({ status: 'preparing' });
+
+    expect(handleReplayTriviaActionError({
+      code: 'bad_action',
+      message: 'Unrelated action failed.'
+    })).toBe(false);
+    expect(handleReplayTriviaActionError({
+      code: 'bad_action',
+      message: 'Unrelated game action failed.',
+      request: {
+        action: 'move',
+        gameId: 'game-1',
+        type: 'gameAction'
+      }
+    })).toBe(false);
+    expect(handleReplayTriviaActionError({
+      code: 'invalid_question',
+      message: 'Replay Trivia questions must include friendIntro.',
+      request: {
+        action: 'submitQuestions',
+        gameId: 'game-1',
+        type: 'gameAction'
+      }
+    })).toBe(true);
+
     replayTriviaGameAdapter.updatePanel(game, createUpdateContext({
-      clientState,
       currentUserId: 'host-user'
     }));
 
     expect(panelMock.updateReplayTriviaGamePanel).toHaveBeenCalledWith(
       game,
       'host-user',
-      {
-        expiresAt: 123,
-        gameId: 'game-1',
-        generationToken: 'rtg_1234567890abcdef'
-      },
+      undefined,
       'Replay Trivia questions must include friendIntro.'
     );
+    expect(takeReplayTriviaPreparationError('game-1')).toBeUndefined();
+  });
+
+  it('mounts a closed preparation panel with its correlated error before retrying', () => {
+    const game = createReplayTriviaGame({ status: 'preparing' });
+    handleReplayTriviaActionError({
+      code: 'rate_limited',
+      message: 'Slow down before requesting more generated content.',
+      request: {
+        action: 'requestGenerationToken',
+        gameId: 'game-1',
+        type: 'gameAction'
+      }
+    });
+    const context = createMountContext();
+
+    replayTriviaGameAdapter.mountPanel(game, context);
+
+    expect(panelMock.openReplayTriviaGamePanel).toHaveBeenCalledWith(
+      context.shell,
+      game,
+      'host-user',
+      context.sendGameAction,
+      context.onPanelChange,
+      context.closePanel,
+      {
+        generationToken: undefined,
+        preparationError: 'Slow down before requesting more generated content.'
+      }
+    );
+  });
+
+  it('leaves game-version errors to generic compatibility handling', () => {
+    expect(handleReplayTriviaActionError({
+      code: 'game_version',
+      message: 'Chat Enhancer and Playground versions do not match for this game.',
+      request: {
+        action: 'requestGenerationToken',
+        gameId: 'game-1',
+        type: 'gameAction'
+      }
+    })).toBe(false);
+    expect(takeReplayTriviaPreparationError('game-1')).toBeUndefined();
   });
 });
 
@@ -159,9 +261,11 @@ function createUpdateContext(overrides: Partial<GamePanelUpdateContext> = {}): G
 function createClientState(overrides: Partial<PlaygroundClientState> = {}): PlaygroundClientState {
   return {
     available: false,
+    connectionError: '',
     endedGame: null,
-    error: '',
     games: [],
+    incompatibleActiveGames: [],
+    incompatibleGames: [],
     invites: [],
     status: 'connected',
     userId: '',

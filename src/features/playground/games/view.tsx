@@ -5,13 +5,14 @@
  * DOM for the Games panel. All mutations that affect network or panel state are
  * delegated through `GamesViewActions`.
  */
-import { createChevronBackwardIcon } from '../../../shared/icons';
+import { createChevronBackwardIcon, createLockIcon } from '../../../shared/icons';
 import { t } from '../../../shared/i18n';
 import { jsx, el } from '../../../shared/jsx-dom';
 import { createLoadingSpinner } from '../../../shared/loading-spinner';
 import { getPlaygroundAvatarPresentation } from '../../../shared/playground/identity';
 import type {
   GameId,
+  IncompatibleActiveGame,
   PresenceUser,
   PublicGame,
   PublicInvite
@@ -27,6 +28,7 @@ import {
   getOnlinePlayerCount,
   getPendingInvites,
   getSupportedGames,
+  isGameVersionIncompatible,
   isPlayerInvitePending,
   shouldShowTransportNotice,
   type GamesPanelState
@@ -39,7 +41,7 @@ export interface GamesViewActions {
   onCycleActiveGame: (step: number) => void;
   onIgnoreInvite: (invite: PublicInvite) => void;
   onInvitePlayer: (player: PresenceUser) => void;
-  onLeaveGame: (game: PublicGame) => void;
+  onLeaveGame: (gameId: string) => void;
   onReconnect: () => void;
   onSelectGame: (gameId: GameId) => void;
   onSetAvailability: (available: boolean) => void;
@@ -74,6 +76,8 @@ export function renderGamesPanelBody(
   state: GamesPanelState,
   actions: GamesViewActions
 ): void {
+  const unavailableGamesOpen =
+    body.querySelector<HTMLDetailsElement>('.ytcq-games-unavailable-section')?.open ?? false;
   body.replaceChildren();
   if (shouldShowTransportNotice(state)) {
     body.append(createTransportNotice(state, actions));
@@ -85,19 +89,20 @@ export function renderGamesPanelBody(
     return;
   }
 
-  renderLobbyView(body, state, actions);
+  renderLobbyView(body, state, actions, unavailableGamesOpen);
 }
 
 function renderLobbyView(
   body: HTMLElement,
   state: GamesPanelState,
-  actions: GamesViewActions
+  actions: GamesViewActions,
+  unavailableGamesOpen: boolean
 ): void {
   body.append(
     createAvailabilitySection(state, actions),
     createActiveGameSection(state, actions),
     createInvitesSection(state, actions),
-    createGamesGrid(actions)
+    ...createGameSections(state, actions, unavailableGamesOpen)
   );
 }
 
@@ -139,7 +144,7 @@ function createTransportNotice(state: GamesPanelState, actions: GamesViewActions
 
 function getUnavailableNoticeHelper(state: GamesPanelState): string {
   const helper = t('gamesUnavailableHelper');
-  const error = state.transport.error.trim();
+  const error = state.transport.connectionError.trim();
   return error ? `${error} ${helper}` : helper;
 }
 
@@ -184,17 +189,29 @@ function createGamesAvailabilityToggle(): HTMLElement {
 function createActiveGameSection(state: GamesPanelState, actions: GamesViewActions): HTMLElement {
   const section = createGamesSection();
   const games = getSupportedGames(state.transport.games);
-  if (!games.length || !state.transport.userId) {
+  const incompatibleGames = state.transport.incompatibleActiveGames;
+  if ((!games.length && !incompatibleGames.length) || !state.transport.userId) {
     section.hidden = true;
     return section;
   }
 
-  const gameIndex = getClampedActiveGameIndex(state.activeGameIndex, games.length);
-  const game = games[gameIndex];
-  section.append(
-    createActiveGameHeader(games, gameIndex, state.transport.userId, actions),
-    createActiveGameRow(game, state, actions)
-  );
+  if (games.length) {
+    const gameIndex = getClampedActiveGameIndex(state.activeGameIndex, games.length);
+    const game = games[gameIndex];
+    section.append(
+      createActiveGameHeader(games, gameIndex, state.transport.userId, actions),
+      createActiveGameRow(game, state, actions)
+    );
+  } else {
+    section.append(
+      el<HTMLDivElement>(
+        <div class="ytcq-games-section-header">{createGamesSectionTitle(t('gamesActiveGame'))}</div>
+      )
+    );
+  }
+  incompatibleGames.forEach((game) => {
+    section.append(createIncompatibleActiveGameRow(game, state, actions));
+  });
   return section;
 }
 
@@ -252,7 +269,7 @@ function createActiveGameRow(
   const leave = createSmallActionButton(t('gamesLeave'), {
     busy: isLeaving,
     disabled: isLeaving,
-    onClick: () => actions.onLeaveGame(game)
+    onClick: () => actions.onLeaveGame(game.gameId)
   });
   return el<HTMLDivElement>(
     <div class="ytcq-games-active-row">
@@ -266,6 +283,28 @@ function createActiveGameRow(
         {togglePanel}
         {leave}
       </span>
+    </div>
+  );
+}
+
+function createIncompatibleActiveGameRow(
+  game: IncompatibleActiveGame,
+  state: GamesPanelState,
+  actions: GamesViewActions
+): HTMLElement {
+  const isLeaving = state.leavingGameId === game.gameId;
+  const leave = createSmallActionButton(t('gamesLeave'), {
+    busy: isLeaving,
+    disabled: isLeaving,
+    onClick: () => actions.onLeaveGame(game.gameId)
+  });
+  return el<HTMLDivElement>(
+    <div class="ytcq-games-active-row ytcq-games-incompatible-active-row">
+      <span class="ytcq-games-section-copy">
+        <span class="ytcq-games-row-title">{getGameLabel(game.gameType)}</span>
+        <span class="ytcq-games-row-helper">{t('gamesVersionMismatchActiveHelper')}</span>
+      </span>
+      <span class="ytcq-games-row-actions">{leave}</span>
     </div>
   );
 }
@@ -314,43 +353,73 @@ function createInviteRow(invite: PublicInvite, actions: GamesViewActions): HTMLE
   );
 }
 
-function createGamesGrid(
+function createGameSections(
+  state: GamesPanelState,
   actions: GamesViewActions,
-  { includeRealtime = true }: { includeRealtime?: boolean } = {}
-): HTMLElement {
-  const section = createGamesSection(t('gamesStartGame'));
-  const grid = el<HTMLDivElement>(<div class="ytcq-games-grid" />);
+  unavailableGamesOpen: boolean
+): HTMLElement[] {
+  const availableSection = createGamesSection(t('gamesStartGame'));
+  const availableGrid = el<HTMLDivElement>(<div class="ytcq-games-grid" />);
+  const unavailableGrid = el<HTMLDivElement>(<div class="ytcq-games-grid" />);
 
-  getGamePickerCards({ includeRealtime }).forEach((game) => {
+  getGamePickerCards().forEach((game) => {
+    const contextDisabled = game.disabled;
+    const versionIncompatible =
+      !contextDisabled && isGameVersionIncompatible(state.transport, game.id);
+    const disabled = contextDisabled || versionIncompatible;
+    let badgeLabel = '';
+    let disabledReason = '';
+    let restriction: 'context' | 'version' | null = null;
+    if (contextDisabled) {
+      disabledReason = game.disabledReason;
+      if (game.disabledBadge) {
+        badgeLabel = game.disabledBadge;
+        restriction = 'context';
+      }
+    } else if (versionIncompatible) {
+      badgeLabel = t('gamesUpdateRequired');
+      disabledReason = t('gamesVersionMismatchHelper', { game: game.label });
+      restriction = 'version';
+    }
     const card = el<HTMLButtonElement>(
       <button
         type="button"
-        class={['ytcq-games-game-card', game.disabled ? 'ytcq-games-game-card-disabled' : '']
-          .filter(Boolean)
-          .join(' ')}
-        aria-disabled={String(game.disabled)}
-        aria-label={getGameCardAriaLabel(game)}
-        onClick={game.disabled ? undefined : () => actions.onSelectGame(game.id)}
+        class={`ytcq-games-game-card${disabled ? ' ytcq-games-game-card-disabled' : ''}`}
+        aria-disabled={String(disabled)}
+        aria-label={getGameCardAriaLabel(game, disabledReason)}
+        title={disabledReason || undefined}
+        onClick={disabled ? undefined : () => actions.onSelectGame(game.id)}
       >
-        {createGamePreview(game.id, game.renderPreview)}
+        {createGamePreview(
+          game.id,
+          game.renderPreview,
+          restriction ? createGameRestrictionBadge(badgeLabel, restriction) : null
+        )}
         {createGameCardCopy(game.label, game.tagline)}
       </button>
     );
-    if (game.disabled && game.disabledReason) {
-      card.title = game.disabledReason;
-    }
-    grid.append(card);
+    (disabled ? unavailableGrid : availableGrid).append(card);
   });
 
-  section.append(grid);
-  return section;
+  availableSection.append(availableGrid);
+  if (!unavailableGrid.childElementCount) return [availableSection];
+
+  const unavailableSection = el<HTMLDetailsElement>(
+    <details class="ytcq-games-section ytcq-games-unavailable-section" open={unavailableGamesOpen}>
+      <summary class="ytcq-games-section-title ytcq-games-unavailable-summary">
+        {t('gamesUnavailableGames')}
+      </summary>
+      {unavailableGrid}
+    </details>
+  );
+  return [availableSection, unavailableSection];
 }
 
-function getGameCardAriaLabel(game: ReturnType<typeof getGamePickerCards>[number]): string {
-  if (game.disabled && game.disabledReason) {
-    return `${game.label}. ${game.tagline}. ${game.disabledReason}`;
-  }
-  return `${game.label}. ${game.tagline}`;
+function getGameCardAriaLabel(
+  game: ReturnType<typeof getGamePickerCards>[number],
+  disabledReason: string
+): string {
+  return [game.label, game.tagline, disabledReason].filter(Boolean).join('. ');
 }
 
 function renderPlayWithView(
@@ -512,13 +581,27 @@ function createGameCardCopy(label: string, helperText: string): HTMLElement {
   );
 }
 
+function createGameRestrictionBadge(
+  label: string,
+  restriction: 'context' | 'version'
+): HTMLElement {
+  return el<HTMLSpanElement>(
+    <span class={`ytcq-games-restriction-badge ytcq-games-${restriction}-badge`}>
+      {createLockIcon()}
+      <span>{label}</span>
+    </span>
+  );
+}
+
 function createGamePreview(
   gameId: string,
-  renderPreview: (container: HTMLElement) => void
+  renderPreview: (container: HTMLElement) => void,
+  restrictionBadge: HTMLElement | null
 ): HTMLElement {
   const preview = el<HTMLSpanElement>(
     <span class={`ytcq-games-preview ytcq-games-preview-${gameId}`} />
   );
   renderPreview(preview);
+  if (restrictionBadge) preview.append(restrictionBadge);
   return preview;
 }

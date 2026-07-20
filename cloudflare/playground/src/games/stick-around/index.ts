@@ -5,14 +5,12 @@
  * winner resolution. Clients send controls and chat traffic counts, then render
  * the authoritative world snapshot.
  */
-import type { PublicUserIdentity } from '../../protocol/messages';
+import { z } from 'zod';
+import { PLAYGROUND_GAME_VERSIONS, type PublicUserIdentity } from '../../protocol/messages';
 import { ProtocolError } from '../../protocol/validation';
 import type {
-  StickAroundArenaDimensions,
   PublicStickAroundGame,
   StickAroundControls,
-  StickAroundFinishReport,
-  StickAroundGameStatus,
   StickAroundHazardEvent,
   StickAroundInputSnapshot,
   StickAroundPlayerRole,
@@ -50,23 +48,133 @@ const HAZARD_DIMENSIONS = [
   { bubbleHeight: 58, bubbleWidth: 172 }
 ] as const;
 
-export interface StickAroundGameRecord extends GameRecord {
-  arena: StickAroundArenaDimensions;
-  finishReports: Record<string, StickAroundFinishReport>;
-  gameType: 'stick-around';
-  hazardSequence: number;
-  hazards: StickAroundHazardEvent[];
-  inputs: Record<string, StickAroundInputSnapshot>;
-  observedMessageIds: string[];
-  phaseStartedAt: number;
-  players: Record<PlayerRole, string>;
-  readyPlayers: Partial<Record<PlayerRole, boolean>>;
-  roundSeed: number;
-  roundStartedAt?: number;
-  simulation?: StickAroundSimulationSnapshot;
-  status: StickAroundGameStatus;
-  winnerUserId?: string | null;
-}
+const FiniteNumberSchema = z.number().finite();
+const IntegerSchema = z.number().int();
+const NonNegativeIntegerSchema = IntegerSchema.nonnegative();
+const PositiveNumberSchema = FiniteNumberSchema.positive();
+const NonEmptyStringSchema = z.string().min(1);
+const StickAroundRoleSchema = z.enum(['guest', 'host']);
+const StickAroundArenaSchema = z.strictObject({
+  height: PositiveNumberSchema,
+  width: PositiveNumberSchema
+});
+const StickAroundFinishReportSchema = z.strictObject({
+  frame: NonNegativeIntegerSchema,
+  reportedAt: FiniteNumberSchema,
+  userId: NonEmptyStringSchema,
+  winnerUserId: NonEmptyStringSchema.nullable()
+});
+const StickAroundHazardSchema = z.strictObject({
+  bubbleHeight: PositiveNumberSchema.optional(),
+  bubbleWidth: PositiveNumberSchema.optional(),
+  id: NonEmptyStringSchema,
+  messageId: NonEmptyStringSchema.optional(),
+  seed: IntegerSchema,
+  spawnAt: FiniteNumberSchema,
+  weight: PositiveNumberSchema
+});
+const StickAroundInputSchema = z.strictObject({
+  frame: NonNegativeIntegerSchema,
+  jump: z.boolean(),
+  left: z.boolean(),
+  right: z.boolean(),
+  sentAt: FiniteNumberSchema,
+  seq: NonNegativeIntegerSchema,
+  userId: NonEmptyStringSchema
+});
+const StickAroundFighterSchema = z.strictObject({
+  attackUntil: FiniteNumberSchema,
+  collisionUntil: FiniteNumberSchema,
+  damage: FiniteNumberSchema,
+  facing: z.union([z.literal(-1), z.literal(1)]),
+  grounded: z.boolean(),
+  hurtUntil: FiniteNumberSchema,
+  invulnerableUntil: FiniteNumberSchema,
+  label: z.string(),
+  lastAttackAt: FiniteNumberSchema,
+  koUntil: FiniteNumberSchema,
+  respawnUntil: FiniteNumberSchema,
+  role: StickAroundRoleSchema,
+  stocks: IntegerSchema,
+  userId: NonEmptyStringSchema,
+  vx: FiniteNumberSchema,
+  vy: FiniteNumberSchema,
+  x: FiniteNumberSchema,
+  y: FiniteNumberSchema
+});
+const StickAroundPlatformSchema = z.strictObject({
+  height: PositiveNumberSchema,
+  kind: z.enum(['center', 'side']),
+  width: PositiveNumberSchema,
+  x: FiniteNumberSchema,
+  y: FiniteNumberSchema
+});
+const StickAroundBubbleSchema = z.strictObject({
+  angle: FiniteNumberSchema,
+  height: PositiveNumberSchema,
+  hitUserIds: z.array(NonEmptyStringSchema),
+  id: NonEmptyStringSchema,
+  messageId: NonEmptyStringSchema.optional(),
+  seed: IntegerSchema,
+  spin: FiniteNumberSchema,
+  text: z.string(),
+  vx: FiniteNumberSchema,
+  vy: FiniteNumberSchema,
+  width: PositiveNumberSchema,
+  x: FiniteNumberSchema,
+  y: FiniteNumberSchema
+});
+const StickAroundParticleSchema = z.strictObject({
+  color: NonEmptyStringSchema,
+  life: FiniteNumberSchema,
+  maxLife: FiniteNumberSchema,
+  size: PositiveNumberSchema,
+  vx: FiniteNumberSchema,
+  vy: FiniteNumberSchema,
+  x: FiniteNumberSchema,
+  y: FiniteNumberSchema
+});
+const StickAroundSimulationSchema = z.strictObject({
+  bubbles: z.array(StickAroundBubbleSchema),
+  fighters: z.record(z.string(), StickAroundFighterSchema),
+  flash: FiniteNumberSchema,
+  frame: NonNegativeIntegerSchema,
+  height: PositiveNumberSchema,
+  lastTime: FiniteNumberSchema,
+  particles: z.array(StickAroundParticleSchema),
+  platforms: z.array(StickAroundPlatformSchema),
+  roundSeed: IntegerSchema,
+  shake: FiniteNumberSchema,
+  spawnedHazardIds: z.array(NonEmptyStringSchema).max(STICK_AROUND_MAX_STORED_HAZARDS),
+  width: PositiveNumberSchema
+});
+const StickAroundGameRecordSchema = z.strictObject({
+  arena: StickAroundArenaSchema,
+  finishReports: z.record(z.string(), StickAroundFinishReportSchema),
+  gameId: NonEmptyStringSchema,
+  gameType: z.literal('stick-around'),
+  gameVersion: z.literal(PLAYGROUND_GAME_VERSIONS['stick-around']),
+  hazards: z.array(StickAroundHazardSchema).max(STICK_AROUND_MAX_STORED_HAZARDS),
+  hazardSequence: NonNegativeIntegerSchema,
+  inputs: z.record(z.string(), StickAroundInputSchema),
+  observedMessageIds: z.array(NonEmptyStringSchema.max(MAX_MESSAGE_ID_LENGTH)).max(400),
+  phaseStartedAt: FiniteNumberSchema,
+  players: z.strictObject({
+    guest: NonEmptyStringSchema,
+    host: NonEmptyStringSchema
+  }),
+  readyPlayers: z.strictObject({
+    guest: z.boolean().optional(),
+    host: z.boolean().optional()
+  }),
+  roundSeed: IntegerSchema,
+  roundStartedAt: FiniteNumberSchema.optional(),
+  simulation: StickAroundSimulationSchema.optional(),
+  status: z.enum(['ready', 'countdown', 'active', 'finished']),
+  winnerUserId: NonEmptyStringSchema.nullable().optional()
+});
+
+export type StickAroundGameRecord = z.infer<typeof StickAroundGameRecordSchema>;
 
 export const stickAroundGameModule: GameModule = {
   applyAction(game, input) {
@@ -119,6 +227,9 @@ export const stickAroundGameModule: GameModule = {
   isTerminal(game) {
     return assertStickAroundGame(game).status === 'finished';
   },
+  isStoredGameRecord(value): value is StickAroundGameRecord {
+    return StickAroundGameRecordSchema.safeParse(value).success;
+  },
   toPublicGame(game, getUser) {
     return toPublicStickAroundGame(assertStickAroundGame(game), getUser);
   }
@@ -138,6 +249,7 @@ export function createStickAroundGame(
     finishReports: {},
     gameId,
     gameType: 'stick-around',
+    gameVersion: PLAYGROUND_GAME_VERSIONS['stick-around'],
     arena: {
       height: STICK_AROUND_ARENA_HEIGHT,
       width: STICK_AROUND_ARENA_WIDTH
@@ -382,6 +494,7 @@ export function advanceStickAroundGame(
     now
   );
 
+  retainCurrentStickAroundSpawnedHazardIds(simulation, game.hazards);
   const simulationSnapshot = serializeStickAroundSimulation(simulation);
   const winnerUserId = getStickAroundWinnerUserId(simulation);
   if (winnerUserId !== undefined) {
@@ -398,6 +511,16 @@ export function advanceStickAroundGame(
     ...game,
     simulation: simulationSnapshot
   };
+}
+
+function retainCurrentStickAroundSpawnedHazardIds(
+  simulation: StickAroundSimulation,
+  hazards: StickAroundHazardEvent[]
+): void {
+  const retainedIds = new Set(hazards.map((hazard) => hazard.id));
+  simulation.spawnedHazardIds.forEach((hazardId) => {
+    if (!retainedIds.has(hazardId)) simulation.spawnedHazardIds.delete(hazardId);
+  });
 }
 
 function toSimulationPublicGame(game: StickAroundGameRecord, now: number): PublicStickAroundGame {

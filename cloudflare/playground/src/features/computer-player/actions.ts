@@ -12,18 +12,20 @@ import {
 import type { ChessGameRecord, ChessMoveInput } from '../../games/chess';
 import {
   REPLAY_TRIVIA_ANSWER_TIME_MS,
-  REPLAY_TRIVIA_QUESTION_READ_MS
+  REPLAY_TRIVIA_QUESTION_READ_MS,
+  type ReplayTriviaGameRecord
 } from '../../games/replay-trivia';
-import {
-  STICK_AROUND_COUNTDOWN_MS,
-  type StickAroundGameStatus
-} from '../../../../../src/shared/playground/stick-around';
+import type {
+  BountyHuntingClaimWitness,
+  BountyHuntingGameRecord
+} from '../../games/bounty-hunting';
+import type { StickAroundGameRecord } from '../../games/stick-around';
+import { STICK_AROUND_COUNTDOWN_MS } from '../../../../../src/shared/playground/stick-around';
 import type { GameActionInput, GameRecord } from '../../games/types';
 import {
+  BOUNTY_HUNTING_MAX_WITNESS_OBSERVATIONS,
   BOUNTY_HUNTING_ROUND_MS,
   type BountyHuntingBounty,
-  type BountyHuntingClaim,
-  type BountyHuntingGameStatus,
   type BountyHuntingPlayerRole
 } from '../../../../../src/shared/playground/bounty-hunting';
 import { DEFAULT_COMPUTER_PLAYER_PROFILE } from './profiles';
@@ -54,7 +56,6 @@ const BOUNTY_HUNTING_CLAIM_MIN_DELAY_MS = 450;
 const BOUNTY_HUNTING_CLAIM_MAX_DELAY_MS = 1_200;
 const BOUNTY_HUNTING_WITNESS_MIN_DELAY_MS = 80;
 const BOUNTY_HUNTING_WITNESS_MAX_DELAY_MS = 120;
-const BOUNTY_HUNTING_WITNESS_OBSERVATIONS_PER_ACTION = 20;
 const BOUNTY_HUNTING_RECENT_MESSAGE_WINDOW = 20;
 const BOUNTY_HUNTING_RECENT_CLAIM_POOL_SIZE = 5;
 const BOUNTY_HUNTING_TOP_CLAIM_RATE = 0.7;
@@ -229,7 +230,10 @@ export function createReplayTriviaBotAnswerAction(
 
   return {
     action: 'answer',
-    payload: { choiceIndex },
+    payload: {
+      choiceIndex,
+      expectedPhaseStartedAt: triviaGame.phaseStartedAt
+    },
     userId
   };
 }
@@ -271,11 +275,16 @@ export function createBountyHuntingBotAction(
   if (!candidate) return null;
 
   return {
-    action: 'claimBounty',
+    action: 'shootBounty',
     payload: {
-      bountyId: candidate.bountyId,
       messageId: candidate.messageId,
-      ...(candidate.messageTimestampUsec ? { messageTimestampUsec: candidate.messageTimestampUsec } : {})
+      observations: [{
+        bountyIds: candidate.bountyIds,
+        messageId: candidate.messageId,
+        ...(candidate.messageTimestampUsec
+          ? { messageTimestampUsec: candidate.messageTimestampUsec }
+          : {})
+      }]
     },
     userId
   };
@@ -357,44 +366,26 @@ function toChessMovePayload(move: ChessBotMove): Record<string, unknown> {
     : { from: move.from, to: move.to };
 }
 
-interface ReplayTriviaBotGame extends GameRecord {
-  answers: Record<string, ChoiceIndex | null | undefined>;
-  currentQuestionIndex: number;
-  gameType: 'replay-trivia';
-  phaseStartedAt: number;
-  players: Record<string, string>;
-  questions: ReplayTriviaBotQuestion[];
-}
-
-interface ReplayTriviaBotQuestion {
-  correctChoiceIndex: ChoiceIndex;
-}
-
-function getReplayTriviaBotGame(game: GameRecord): ReplayTriviaBotGame | null {
+function getReplayTriviaBotGame(game: GameRecord): ReplayTriviaGameRecord | null {
   if (game.gameType !== 'replay-trivia') return null;
-  return game as ReplayTriviaBotGame;
+  return game as ReplayTriviaGameRecord;
 }
 
-interface StickAroundBotGame extends GameRecord {
-  gameType: 'stick-around';
-  phaseStartedAt: number;
-  players: Record<'guest' | 'host', string>;
-  readyPlayers: Partial<Record<'guest' | 'host', boolean>>;
-  status: StickAroundGameStatus;
-}
-
-function getStickAroundBotGame(game: GameRecord): StickAroundBotGame | null {
+function getStickAroundBotGame(game: GameRecord): StickAroundGameRecord | null {
   if (game.gameType !== 'stick-around') return null;
-  return game as StickAroundBotGame;
+  return game as StickAroundGameRecord;
 }
 
-function getStickAroundPlayerRole(game: StickAroundBotGame, userId: string): 'guest' | 'host' | null {
+function getStickAroundPlayerRole(
+  game: StickAroundGameRecord,
+  userId: string
+): 'guest' | 'host' | null {
   if (game.players.host === userId) return 'host';
   if (game.players.guest === userId) return 'guest';
   return null;
 }
 
-function isReplayTriviaQuestionDeadlinePassed(game: ReplayTriviaBotGame, now: number): boolean {
+function isReplayTriviaQuestionDeadlinePassed(game: ReplayTriviaGameRecord, now: number): boolean {
   return now - game.phaseStartedAt >= REPLAY_TRIVIA_QUESTION_READ_MS + REPLAY_TRIVIA_ANSWER_TIME_MS;
 }
 
@@ -404,30 +395,9 @@ function pickWrongChoiceIndex(correctChoiceIndex: ChoiceIndex, random: () => num
   return wrongChoices[index];
 }
 
-interface BountyHuntingBotGame extends GameRecord {
-  bounties: BountyHuntingBounty[];
-  claimedMessageIds: string[];
-  claimWitnesses: BountyHuntingBotClaimWitness[];
-  claims: BountyHuntingClaim[];
-  gameType: 'bounty-hunting';
-  phaseStartedAt: number;
-  players: Record<BountyHuntingPlayerRole, string>;
-  readyPlayers: Partial<Record<BountyHuntingPlayerRole, boolean>>;
-  status: BountyHuntingGameStatus;
-}
-
-interface BountyHuntingBotClaimWitness {
-  bountyId: string;
-  messageId: string;
-  messageTimestampUsec?: string;
-  observedAt: number;
-  role: BountyHuntingPlayerRole;
-  userId: string;
-}
-
 interface BountyHuntingBotClaimCandidate {
   amount: number;
-  bountyId: string;
+  bountyIds: string[];
   messageId: string;
   messageTimestampUsec?: string;
   observedAt: number;
@@ -439,13 +409,13 @@ interface BountyHuntingBotWitnessObservation {
   messageTimestampUsec?: string;
 }
 
-function getBountyHuntingBotGame(game: GameRecord): BountyHuntingBotGame | null {
+function getBountyHuntingBotGame(game: GameRecord): BountyHuntingGameRecord | null {
   if (game.gameType !== 'bounty-hunting') return null;
-  return game as BountyHuntingBotGame;
+  return game as BountyHuntingGameRecord;
 }
 
 function getBountyHuntingPlayerRole(
-  game: BountyHuntingBotGame,
+  game: BountyHuntingGameRecord,
   userId: string
 ): BountyHuntingPlayerRole | null {
   if (!game.players || typeof game.players !== 'object') return null;
@@ -454,39 +424,35 @@ function getBountyHuntingPlayerRole(
   return null;
 }
 
-function isBountyHuntingDeadlinePassed(game: BountyHuntingBotGame, now: number): boolean {
+function isBountyHuntingDeadlinePassed(game: BountyHuntingGameRecord, now: number): boolean {
   return now - game.phaseStartedAt >= BOUNTY_HUNTING_ROUND_MS;
 }
 
 function getBountyHuntingClaimCandidates(
-  game: BountyHuntingBotGame,
+  game: BountyHuntingGameRecord,
   botRole: BountyHuntingPlayerRole
 ): BountyHuntingBotClaimCandidate[] {
   const bountiesById = new Map(game.bounties.map((bounty) => [bounty.id, bounty]));
   const witnesses = getBountyHuntingEligibleOpponentWitnesses(game, botRole, bountiesById);
   const recentMessageIds = getBountyHuntingRecentOpponentMessageIds(witnesses);
-  const candidateKeys = new Set<string>();
 
   return witnesses
     .flatMap((witness): BountyHuntingBotClaimCandidate[] => {
       if (!recentMessageIds.has(witness.messageId)) return [];
-      const bounty = bountiesById.get(witness.bountyId);
-      if (!bounty) return [];
-      const key = `${witness.messageId}:${witness.bountyId}`;
-      if (candidateKeys.has(key)) return [];
-      candidateKeys.add(key);
-      return [{
-        amount: bounty.amount,
-        bountyId: witness.bountyId,
+      const amounts = witness.bountyIds
+        .map((bountyId) => bountiesById.get(bountyId)?.amount)
+        .filter((amount): amount is number => amount !== undefined);
+      return amounts.length ? [{
+        amount: Math.max(...amounts),
+        bountyIds: witness.bountyIds,
         messageId: witness.messageId,
         messageTimestampUsec: witness.messageTimestampUsec,
         observedAt: witness.observedAt
-      }];
+      }] : [];
     })
     .sort((a, b) =>
       b.observedAt - a.observedAt ||
       b.amount - a.amount ||
-      a.bountyId.localeCompare(b.bountyId) ||
       a.messageId.localeCompare(b.messageId)
     );
 }
@@ -503,28 +469,29 @@ function getBountyHuntingWitnessObservations(
   const bountiesById = new Map(bountyGame.bounties.map((bounty) => [bounty.id, bounty]));
   const witnesses = getBountyHuntingEligibleOpponentWitnesses(bountyGame, botRole, bountiesById);
   const recentMessageIds = getBountyHuntingRecentOpponentMessageIds(witnesses);
-  const botWitnessKeys = new Set(
-    bountyGame.claimWitnesses
-      .filter((witness) => witness.role === botRole)
-      .map((witness) => getBountyHuntingWitnessKey(witness))
-  );
+  const botWitnessBountiesByMessage = new Map<string, Set<string>>();
+  bountyGame.claimWitnesses
+    .filter((witness) => witness.role === botRole)
+    .forEach((witness) => {
+      botWitnessBountiesByMessage.set(witness.messageId, new Set(witness.bountyIds));
+    });
   const observations = new Map<string, { bountyIds: Set<string>; messageTimestampUsec?: string }>();
 
   for (const witness of witnesses) {
     if (!recentMessageIds.has(witness.messageId)) continue;
     if (!witness.messageTimestampUsec) continue;
-    if (botWitnessKeys.has(getBountyHuntingWitnessKey({
-      ...witness,
-      role: botRole
-    }))) continue;
+    const witnessedBountyIds = botWitnessBountiesByMessage.get(witness.messageId);
 
     const observation = observations.get(witness.messageId) || {
       bountyIds: new Set<string>(),
       messageTimestampUsec: witness.messageTimestampUsec
     };
-    observation.bountyIds.add(witness.bountyId);
+    witness.bountyIds
+      .filter((bountyId) => !witnessedBountyIds?.has(bountyId))
+      .forEach((bountyId) => observation.bountyIds.add(bountyId));
+    if (!observation.bountyIds.size) continue;
     observations.set(witness.messageId, observation);
-    if (observations.size >= BOUNTY_HUNTING_WITNESS_OBSERVATIONS_PER_ACTION) break;
+    if (observations.size >= BOUNTY_HUNTING_MAX_WITNESS_OBSERVATIONS) break;
   }
 
   return [...observations.entries()].map(([messageId, observation]) => ({
@@ -535,24 +502,25 @@ function getBountyHuntingWitnessObservations(
 }
 
 function getBountyHuntingEligibleOpponentWitnesses(
-  game: BountyHuntingBotGame,
+  game: BountyHuntingGameRecord,
   botRole: BountyHuntingPlayerRole,
   bountiesById: Map<string, BountyHuntingBounty>
-): BountyHuntingBotClaimWitness[] {
+): BountyHuntingClaimWitness[] {
   const claimedBountyIds = new Set(game.claims.map((claim) => claim.bountyId));
-  const claimedMessageIds = new Set(game.claimedMessageIds);
+  const claimedMessageIds = new Set(game.claims.map((claim) => claim.messageId));
   return game.claimWitnesses
-    .filter((witness) =>
-      witness.role !== botRole &&
-      !claimedBountyIds.has(witness.bountyId) &&
-      !claimedMessageIds.has(witness.messageId) &&
-      bountiesById.has(witness.bountyId)
-    )
+    .flatMap((witness) => {
+      if (witness.role === botRole || claimedMessageIds.has(witness.messageId)) return [];
+      const bountyIds = witness.bountyIds.filter((bountyId) =>
+        !claimedBountyIds.has(bountyId) && bountiesById.has(bountyId)
+      );
+      return bountyIds.length ? [{ ...witness, bountyIds }] : [];
+    })
     .sort(compareBountyHuntingWitnessRecency);
 }
 
 function getBountyHuntingRecentOpponentMessageIds(
-  witnesses: BountyHuntingBotClaimWitness[]
+  witnesses: BountyHuntingClaimWitness[]
 ): Set<string> {
   const messageIds = new Set<string>();
   for (const witness of witnesses) {
@@ -563,16 +531,10 @@ function getBountyHuntingRecentOpponentMessageIds(
 }
 
 function compareBountyHuntingWitnessRecency(
-  a: BountyHuntingBotClaimWitness,
-  b: BountyHuntingBotClaimWitness
+  a: BountyHuntingClaimWitness,
+  b: BountyHuntingClaimWitness
 ): number {
   return b.observedAt - a.observedAt;
-}
-
-function getBountyHuntingWitnessKey(
-  witness: Pick<BountyHuntingBotClaimWitness, 'bountyId' | 'messageId' | 'role'>
-): string {
-  return `${witness.role}:${witness.messageId}:${witness.bountyId}`;
 }
 
 function pickBountyHuntingClaimCandidate(

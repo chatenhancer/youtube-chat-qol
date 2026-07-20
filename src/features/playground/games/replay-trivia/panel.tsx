@@ -5,10 +5,12 @@
  * answer/phase intents back to the Playground room state machine.
  */
 import { jsx, el } from '../../../../shared/jsx-dom';
-import type {
-  ReplayTriviaGenerationToken,
-  ReplayTriviaQuestion
+import {
+  parseReplayTriviaExpectedPhaseStartedAt,
+  type ReplayTriviaGenerationToken,
+  type ReplayTriviaQuestion
 } from '../../../../shared/playground/trivia';
+import type { PlaygroundActionError } from '../../../../shared/playground/protocol';
 import { t } from '../../../../shared/i18n';
 import { drawGameLoadingSpinner } from '../loading-spinner';
 import type { GamePanelShell } from '../panel-shell';
@@ -79,6 +81,19 @@ const REPLAY_TRIVIA_SOUND_PATHS = [MESSAGE_SOUND_PATH, STAMP_SOUND_PATH] as cons
 const REPLAY_TRIVIA_ACCENT_BLUE = '#2290FF';
 const COUNTDOWN_BEEP_WINDOW_MS = 260;
 const FRIEND_BUBBLE_MIN_HEIGHT = 45;
+const MAX_REPLAY_TRIVIA_MESSAGE_CHARACTERS = 32_768;
+const MAX_SUBMITTED_CHOICE_CHARACTERS = 120;
+const MAX_SUBMITTED_FRIEND_INTRO_CHARACTERS = 140;
+const MAX_SUBMITTED_ID_CHARACTERS = 80;
+const MAX_SUBMITTED_LANGUAGE_CODE_CHARACTERS = 16;
+// A two-player match needs at most one localization beyond the provider's language.
+const MAX_SUBMITTED_LOCALIZATIONS = 1;
+const MAX_SUBMITTED_PROMPT_CHARACTERS = 260;
+const MAX_SUBMITTED_QUESTIONS = 10;
+const MAX_SUBMITTED_RIGHT_REPLY_CHARACTERS = 180;
+const MAX_SUBMITTED_WRONG_REPLY_CHARACTERS = 220;
+const ACTION_RETRY_DELAYS_MS = [5_000, 15_000, 45_000] as const;
+const RETRYABLE_ACTION_ERROR_CODES = new Set(['internal_error', 'rate_limited']);
 
 interface FriendBubbleTextSegment {
   bold?: boolean;
@@ -88,6 +103,11 @@ interface FriendBubbleTextSegment {
 interface PickAnswerPromptSegment {
   highlighted?: boolean;
   text: string;
+}
+
+interface ReplayTriviaPanelInitialData {
+  generationToken?: ReplayTriviaGenerationToken;
+  preparationError?: string;
 }
 
 interface FriendBubbleTextLine {
@@ -104,7 +124,8 @@ export function openReplayTriviaGamePanel(
   currentUserId: string,
   onAction: (gameId: string, action: string, payload?: Record<string, unknown>) => void,
   onVisibilityChanged: (() => void) | undefined,
-  closePanel: ReplayTriviaClosePanel
+  closePanel: ReplayTriviaClosePanel,
+  initialData: ReplayTriviaPanelInitialData = {}
 ): void {
   closeReplayTriviaGamePanel({ notify: false });
 
@@ -152,6 +173,7 @@ export function openReplayTriviaGamePanel(
 
   activeReplayTriviaPanel = {
     assets: EMPTY_REPLAY_TRIVIA_ASSETS,
+    automaticActionDelivery: null,
     canvas,
     closePanel,
     closeButtonRect: null,
@@ -166,17 +188,18 @@ export function openReplayTriviaGamePanel(
     hoveredAnswerIndex: null,
     hoveredCloseButton: false,
     listeners,
+    lastGenerationTokenValue: '',
     onAction,
     onVisibilityChanged: onVisibilityChanged || null,
     opponentAnswerIndex: null,
     opponentScore: getReplayTriviaRoleScore(game, getOpponentRole(game, currentUserId)),
+    pendingAnswer: null,
     phase: game.status,
     phaseStartedAt: getNow(),
     pixelRatio: configureReplayTriviaCanvas(canvas),
     playedSoundIds: new Set<string>(),
     preparationError: '',
-    questionGenerationStarted: false,
-    sentActionIds: new Set<string>(),
+    questionGeneration: null,
     selectedAt: null,
     soundController,
     statusOverlay,
@@ -185,6 +208,7 @@ export function openReplayTriviaGamePanel(
   };
 
   syncReplayTriviaPanelFromGame(activeReplayTriviaPanel, game, currentUserId, {
+    ...initialData,
     resetPhaseClock: false
   });
   maybeGenerateReplayTriviaQuestions(activeReplayTriviaPanel);
@@ -258,6 +282,101 @@ export function updateReplayTriviaGamePanel(
   renderReplayTriviaGame(getNow());
 }
 
+export function resetReplayTriviaGamePanelClientState(): void {
+  const state = activeReplayTriviaPanel;
+  if (!state) return;
+
+  resetReplayTriviaActionDelivery(state);
+  state.pendingAnswer = null;
+  state.userAnswerIndex = getPublicReplayTriviaAnswerIndex(
+    state.game,
+    getCurrentUserRole(state.game, state.currentUserId)
+  );
+  if (state.userAnswerIndex === null) state.selectedAt = null;
+  if (state.game.status !== 'preparing') return;
+
+  state.generationToken = null;
+  state.generationTokenRequested = false;
+  state.lastGenerationTokenValue = '';
+  state.preparationError = '';
+  state.questionGeneration = null;
+}
+
+export function handleReplayTriviaPanelActionError(error: PlaygroundActionError): boolean {
+  const request = error.request;
+  const state = activeReplayTriviaPanel;
+  if (request?.type !== 'gameAction' || !state || request.gameId !== state.game.gameId) {
+    return false;
+  }
+  if (error.code === 'stale_action') return true;
+
+  const expectedPhaseStartedAt = parseReplayTriviaExpectedPhaseStartedAt(request.payload);
+  if (expectedPhaseStartedAt !== state.game.phaseStartedAt) return false;
+  if (request.action === 'answer') {
+    return rollbackRejectedReplayTriviaAnswer(
+      state,
+      expectedPhaseStartedAt,
+      request.payload?.choiceIndex
+    );
+  }
+  if (request.action !== 'advance' && request.action !== 'timeout') return false;
+
+  const delivery = state.automaticActionDelivery;
+  if (
+    !delivery?.sent ||
+    delivery.action !== request.action ||
+    delivery.phaseStartedAt !== expectedPhaseStartedAt
+  )
+    return false;
+  if (!isRetryableReplayTriviaActionError(error, request.action)) return false;
+
+  const delayMs = ACTION_RETRY_DELAYS_MS[delivery.retryCount];
+  if (delayMs === undefined) return false;
+
+  delivery.retryAt = getNow() + delayMs;
+  delivery.retryCount += 1;
+  delivery.sent = false;
+  return true;
+}
+
+function rollbackRejectedReplayTriviaAnswer(
+  state: ReplayTriviaPanelRuntime,
+  expectedPhaseStartedAt: number,
+  choiceIndex: unknown
+): boolean {
+  const pendingAnswer = state.pendingAnswer;
+  if (
+    !pendingAnswer ||
+    pendingAnswer.expectedPhaseStartedAt !== expectedPhaseStartedAt ||
+    choiceIndex !== pendingAnswer.choiceIndex
+  )
+    return false;
+
+  state.pendingAnswer = null;
+  state.userAnswerIndex = getPublicReplayTriviaAnswerIndex(
+    state.game,
+    getCurrentUserRole(state.game, state.currentUserId)
+  );
+  state.selectedAt = null;
+  state.hoveredAnswerIndex = null;
+  state.canvas.style.cursor = 'default';
+  renderReplayTriviaGame(getNow());
+  return false;
+}
+
+function isRetryableReplayTriviaActionError(
+  error: PlaygroundActionError,
+  action: 'advance' | 'timeout'
+): boolean {
+  if (RETRYABLE_ACTION_ERROR_CODES.has(error.code)) return true;
+  if (action === 'timeout') return error.code === 'answer_time_remaining';
+  return (
+    error.code === 'countdown_active' ||
+    error.code === 'reveal_active' ||
+    error.code === 'score_active'
+  );
+}
+
 function startReplayTriviaLoop(): void {
   const state = activeReplayTriviaPanel;
   if (!state) return;
@@ -287,23 +406,29 @@ function syncReplayTriviaPanelFromGame(
   const previousStatus = state.game.status;
   const previousQuestionIndex = state.game.currentQuestionIndex;
   const phaseChanged =
-    previousStatus !== game.status || previousQuestionIndex !== game.currentQuestionIndex;
+    state.game.phaseStartedAt !== game.phaseStartedAt ||
+    previousStatus !== game.status ||
+    previousQuestionIndex !== game.currentQuestionIndex;
   state.game = game;
   state.currentUserId = currentUserId;
-  if (
+  const receivedGenerationToken = Boolean(
     generationToken?.gameId === game.gameId &&
-    generationToken.generationToken !== state.generationToken?.generationToken
-  ) {
+    generationToken.generationToken !== state.lastGenerationTokenValue
+  );
+  if (receivedGenerationToken && generationToken) {
     state.generationToken = generationToken;
     state.generationTokenRequested = false;
+    state.lastGenerationTokenValue = generationToken.generationToken;
+    state.preparationError = '';
   }
   state.currentQuestionIndex = game.currentQuestionIndex;
   state.userScore = getReplayTriviaRoleScore(game, getCurrentUserRole(game, currentUserId));
   state.opponentScore = getReplayTriviaRoleScore(game, getOpponentRole(game, currentUserId));
   if (game.status !== 'preparing') {
     state.preparationError = '';
-  } else if (preparationError) {
-    state.preparationError = getReplayTriviaPreparationError(preparationError);
+    state.questionGeneration = null;
+  } else if (!receivedGenerationToken && preparationError) {
+    setReplayTriviaPreparationError(state, preparationError);
   }
 
   if (phaseChanged) {
@@ -327,9 +452,21 @@ function syncReplayTriviaPanelFromGame(
   }
 
   state.phase = game.status;
-  state.userAnswerIndex =
-    getPublicReplayTriviaAnswerIndex(game, getCurrentUserRole(game, currentUserId)) ??
-    state.userAnswerIndex;
+  const confirmedUserAnswerIndex = getPublicReplayTriviaAnswerIndex(
+    game,
+    getCurrentUserRole(game, currentUserId)
+  );
+  if (confirmedUserAnswerIndex !== null) {
+    state.userAnswerIndex = confirmedUserAnswerIndex;
+    state.pendingAnswer = null;
+  } else if (
+    !state.pendingAnswer ||
+    state.pendingAnswer.expectedPhaseStartedAt !== game.phaseStartedAt
+  ) {
+    state.userAnswerIndex = null;
+    state.pendingAnswer = null;
+    state.selectedAt = null;
+  }
   state.opponentAnswerIndex = getPublicReplayTriviaAnswerIndex(
     game,
     getOpponentRole(game, currentUserId)
@@ -339,8 +476,7 @@ function syncReplayTriviaPanelFromGame(
 function maybeGenerateReplayTriviaQuestions(state: ReplayTriviaPanelRuntime): void {
   if (state.game.status !== 'preparing') return;
   if (state.preparationError) return;
-  if (state.questionGenerationStarted || state.currentUserId !== state.game.questionProviderUserId)
-    return;
+  if (state.questionGeneration || state.currentUserId !== state.game.questionProviderUserId) return;
 
   if (
     !state.generationToken ||
@@ -354,29 +490,50 @@ function maybeGenerateReplayTriviaQuestions(state: ReplayTriviaPanelRuntime): vo
     return;
   }
 
-  state.questionGenerationStarted = true;
   state.preparationError = '';
-  void generateReplayTriviaQuestions({
+  const questionGeneration = generateReplayTriviaQuestions({
     gameId: state.game.gameId,
     generationToken: state.generationToken.generationToken,
     questionCount: 10,
     userId: state.currentUserId
-  })
+  });
+  state.questionGeneration = questionGeneration;
+  void questionGeneration
     .then((response) => {
-      if (!activeReplayTriviaPanel || activeReplayTriviaPanel.game.gameId !== state.game.gameId)
+      if (!isCurrentReplayTriviaQuestionGeneration(state, questionGeneration)) return;
+      const payload = {
+        questions: response.questions
+          .slice(0, MAX_SUBMITTED_QUESTIONS)
+          .map(toReplayTriviaQuestionPayload)
+      };
+      if (!isReplayTriviaSubmissionWithinLimit(state.game.gameId, payload)) {
+        setReplayTriviaPreparationError(state, t('gamesReplayTriviaCouldNotPrepare'));
         return;
-      activeReplayTriviaPanel.onAction(activeReplayTriviaPanel.game.gameId, 'submitQuestions', {
-        questions: response.questions.map(toReplayTriviaQuestionPayload)
-      });
+      }
+      state.onAction(state.game.gameId, 'submitQuestions', payload);
     })
     .catch((error) => {
-      if (!activeReplayTriviaPanel || activeReplayTriviaPanel.game.gameId !== state.game.gameId)
-        return;
-      activeReplayTriviaPanel.preparationError = getReplayTriviaPreparationError(error);
-      activeReplayTriviaPanel.generationToken = null;
-      activeReplayTriviaPanel.generationTokenRequested = false;
-      activeReplayTriviaPanel.questionGenerationStarted = false;
+      if (!isCurrentReplayTriviaQuestionGeneration(state, questionGeneration)) return;
+      setReplayTriviaPreparationError(state, error);
     });
+}
+
+function isCurrentReplayTriviaQuestionGeneration(
+  state: ReplayTriviaPanelRuntime,
+  questionGeneration: NonNullable<ReplayTriviaPanelRuntime['questionGeneration']>
+): boolean {
+  return (
+    activeReplayTriviaPanel === state &&
+    state.game.status === 'preparing' &&
+    state.questionGeneration === questionGeneration
+  );
+}
+
+function setReplayTriviaPreparationError(state: ReplayTriviaPanelRuntime, error: unknown): void {
+  state.preparationError = getReplayTriviaPreparationError(error);
+  state.generationToken = null;
+  state.generationTokenRequested = false;
+  state.questionGeneration = null;
 }
 
 function getReplayTriviaPreparationError(error: unknown): string {
@@ -393,33 +550,70 @@ function getReplayTriviaPreparationError(error: unknown): string {
 
 function toReplayTriviaQuestionPayload(question: ReplayTriviaQuestion): Record<string, unknown> {
   return {
-    choices: question.choices,
+    choices: question.choices.map((choice) =>
+      truncateReplayTriviaSubmissionText(choice, MAX_SUBMITTED_CHOICE_CHARACTERS)
+    ),
     correctChoiceIndex: question.correctChoiceIndex,
-    friendIntro: question.friendIntro,
-    id: question.id,
-    localizations: question.localizations?.map((localization) => ({
-      choices: localization.choices,
-      friendIntro: localization.friendIntro,
-      languageCode: localization.languageCode,
-      prompt: localization.prompt,
-      rightReply: localization.rightReply,
-      wrongReply: localization.wrongReply
-    })),
-    prompt: question.prompt,
-    rightReply: question.rightReply,
-    wrongReply: question.wrongReply
+    friendIntro: truncateReplayTriviaSubmissionText(
+      question.friendIntro,
+      MAX_SUBMITTED_FRIEND_INTRO_CHARACTERS
+    ),
+    id: truncateReplayTriviaSubmissionText(question.id, MAX_SUBMITTED_ID_CHARACTERS),
+    localizations: question.localizations
+      ?.slice(0, MAX_SUBMITTED_LOCALIZATIONS)
+      .map((localization) => ({
+        choices: localization.choices.map((choice) =>
+          truncateReplayTriviaSubmissionText(choice, MAX_SUBMITTED_CHOICE_CHARACTERS)
+        ),
+        friendIntro: truncateReplayTriviaSubmissionText(
+          localization.friendIntro,
+          MAX_SUBMITTED_FRIEND_INTRO_CHARACTERS
+        ),
+        languageCode: truncateReplayTriviaSubmissionText(
+          localization.languageCode,
+          MAX_SUBMITTED_LANGUAGE_CODE_CHARACTERS
+        ),
+        prompt: truncateReplayTriviaSubmissionText(
+          localization.prompt,
+          MAX_SUBMITTED_PROMPT_CHARACTERS
+        ),
+        rightReply: truncateReplayTriviaSubmissionText(
+          localization.rightReply,
+          MAX_SUBMITTED_RIGHT_REPLY_CHARACTERS
+        ),
+        wrongReply: truncateReplayTriviaSubmissionText(
+          localization.wrongReply,
+          MAX_SUBMITTED_WRONG_REPLY_CHARACTERS
+        )
+      })),
+    prompt: truncateReplayTriviaSubmissionText(question.prompt, MAX_SUBMITTED_PROMPT_CHARACTERS),
+    rightReply: truncateReplayTriviaSubmissionText(
+      question.rightReply,
+      MAX_SUBMITTED_RIGHT_REPLY_CHARACTERS
+    ),
+    wrongReply: truncateReplayTriviaSubmissionText(
+      question.wrongReply,
+      MAX_SUBMITTED_WRONG_REPLY_CHARACTERS
+    )
   };
 }
 
-function sendReplayTriviaActionOnce(
-  state: ReplayTriviaPanelRuntime,
-  id: string,
-  action: string,
-  payload?: Record<string, unknown>
-): void {
-  if (state.sentActionIds.has(id)) return;
-  state.sentActionIds.add(id);
-  state.onAction(state.game.gameId, action, payload);
+function truncateReplayTriviaSubmissionText(value: string, maxCharacters: number): string {
+  return value.trim().slice(0, maxCharacters);
+}
+
+function isReplayTriviaSubmissionWithinLimit(
+  gameId: string,
+  payload: Record<string, unknown>
+): boolean {
+  return (
+    JSON.stringify({
+      action: 'submitQuestions',
+      gameId,
+      payload,
+      type: 'gameAction'
+    }).length <= MAX_REPLAY_TRIVIA_MESSAGE_CHARACTERS
+  );
 }
 
 function advanceReplayTriviaGame(now: number): void {
@@ -429,23 +623,46 @@ function advanceReplayTriviaGame(now: number): void {
 
   const elapsed = now - state.phaseStartedAt;
   if (state.phase === 'countdown' && elapsed >= COUNTDOWN_MS) {
-    sendReplayTriviaActionOnce(state, `advance:countdown:${state.currentQuestionIndex}`, 'advance');
+    sendReplayTriviaAutomaticAction(state, 'advance', now);
     return;
   }
 
   if (state.phase === 'question' && getQuestionAnswerElapsed(state, now) >= ANSWER_TIME_MS) {
-    sendReplayTriviaActionOnce(state, `timeout:${state.currentQuestionIndex}`, 'timeout');
+    sendReplayTriviaAutomaticAction(state, 'timeout', now);
     return;
   }
 
   if (state.phase === 'reveal' && elapsed >= REVEAL_MS) {
-    sendReplayTriviaActionOnce(state, `advance:reveal:${state.currentQuestionIndex}`, 'advance');
+    sendReplayTriviaAutomaticAction(state, 'advance', now);
     return;
   }
 
   if (state.phase === 'score' && elapsed >= SCORE_MS) {
-    sendReplayTriviaActionOnce(state, `advance:score:${state.currentQuestionIndex}`, 'advance');
+    sendReplayTriviaAutomaticAction(state, 'advance', now);
   }
+}
+
+function sendReplayTriviaAutomaticAction(
+  state: ReplayTriviaPanelRuntime,
+  action: 'advance' | 'timeout',
+  now: number
+): void {
+  const phaseStartedAt = state.game.phaseStartedAt;
+  let delivery = state.automaticActionDelivery;
+  if (!delivery || delivery.action !== action || delivery.phaseStartedAt !== phaseStartedAt) {
+    delivery = {
+      action,
+      phaseStartedAt,
+      retryAt: 0,
+      retryCount: 0,
+      sent: false
+    };
+    state.automaticActionDelivery = delivery;
+  }
+  if (delivery.sent || now < delivery.retryAt) return;
+
+  delivery.sent = true;
+  state.onAction(state.game.gameId, action, { expectedPhaseStartedAt: phaseStartedAt });
 }
 
 function setReplayTriviaPhase(
@@ -459,7 +676,12 @@ function setReplayTriviaPhase(
   state.closeButtonRect = null;
   state.hoveredCloseButton = false;
   state.playedSoundIds.clear();
-  state.sentActionIds.clear();
+  resetReplayTriviaActionDelivery(state);
+  state.pendingAnswer = null;
+}
+
+function resetReplayTriviaActionDelivery(state: ReplayTriviaPanelRuntime): void {
+  state.automaticActionDelivery = null;
 }
 
 function isQuestionAnswerUiReady(state: ReplayTriviaPanelRuntime, now: number): boolean {
@@ -597,11 +819,21 @@ function selectReplayTriviaAnswer(
   userAnswerIndex: number,
   now: number
 ): void {
+  if (state.game.status !== 'question') return;
+  const expectedPhaseStartedAt = state.game.phaseStartedAt;
+
   state.userAnswerIndex = userAnswerIndex;
+  state.pendingAnswer = {
+    choiceIndex: userAnswerIndex,
+    expectedPhaseStartedAt
+  };
   state.selectedAt = now;
   state.hoveredAnswerIndex = null;
   state.canvas.style.cursor = 'default';
-  state.onAction(state.game.gameId, 'answer', { choiceIndex: userAnswerIndex });
+  state.onAction(state.game.gameId, 'answer', {
+    choiceIndex: userAnswerIndex,
+    expectedPhaseStartedAt
+  });
 }
 
 function renderReplayTriviaGame(now: number): void {

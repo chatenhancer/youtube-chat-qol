@@ -6,12 +6,15 @@
  * content-script internals.
  */
 import { expect, type BrowserContext, type Worker } from '@playwright/test';
-import type {
-  ClientMessage,
-  GameId,
-  LobbySnapshot,
-  PresenceUser,
-  ServerMessage
+import {
+  PLAYGROUND_GAME_VERSIONS,
+  PLAYGROUND_PROTOCOL_VERSION,
+  type ClientMessage,
+  type GameId,
+  type LobbySnapshot,
+  type PlaygroundGameVersions,
+  type PresenceUser,
+  type ServerMessage
 } from '../../../src/shared/playground/protocol';
 import { getExtensionServiceWorker } from './extension';
 
@@ -24,6 +27,7 @@ export interface MockPlaygroundBackend {
 }
 
 interface MockPlaygroundBackendOptions {
+  gameVersions?: PlaygroundGameVersions;
   snapshot?: LobbySnapshot;
   userId?: string;
 }
@@ -31,12 +35,13 @@ interface MockPlaygroundBackendOptions {
 export async function installMockPlaygroundBackend(
   context: BrowserContext,
   {
+    gameVersions = { ...PLAYGROUND_GAME_VERSIONS },
     snapshot = createMockPlaygroundSnapshot(),
     userId = 'browser-user'
   }: MockPlaygroundBackendOptions = {}
 ): Promise<MockPlaygroundBackend> {
   const serviceWorker = await getExtensionServiceWorker(context);
-  await installServiceWorkerWebSocketMock(serviceWorker, { snapshot, userId });
+  await installServiceWorkerWebSocketMock(serviceWorker, { gameVersions, snapshot, userId });
 
   return {
     getClientMessages: () => readServiceWorkerClientMessages(serviceWorker),
@@ -101,7 +106,7 @@ async function installServiceWorkerWebSocketMock(
   serviceWorker: Worker,
   options: Required<MockPlaygroundBackendOptions>
 ): Promise<void> {
-  await serviceWorker.evaluate(({ snapshot, userId }) => {
+  await serviceWorker.evaluate(({ gameVersions, protocolVersion, snapshot, userId }) => {
     const mock = {
       clientMessages: [] as ClientMessage[],
       sendServerMessage: (_message: ServerMessage) => undefined as void,
@@ -125,10 +130,12 @@ async function installServiceWorkerWebSocketMock(
           this.dispatchMessage(message);
         };
         setTimeout(() => {
+          // Missing entries resolve to v1, matching servers from before per-game versioning.
           this.dispatchMessage({
             challenge: 'browser-test-challenge',
+            gameVersions,
             issuedAt: Date.now(),
-            protocolVersion: 1,
+            protocolVersion: protocolVersion as typeof PLAYGROUND_PROTOCOL_VERSION,
             type: 'challenge'
           });
         }, 0);
@@ -188,7 +195,10 @@ async function installServiceWorkerWebSocketMock(
     (globalThis as typeof globalThis & {
       WebSocket: typeof WebSocket;
     }).WebSocket = MockPlaygroundWebSocket as unknown as typeof WebSocket;
-  }, options);
+  }, {
+    ...options,
+    protocolVersion: PLAYGROUND_PROTOCOL_VERSION
+  });
 }
 
 async function readServiceWorkerClientMessages(serviceWorker: Worker): Promise<ClientMessage[]> {

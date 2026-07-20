@@ -15,8 +15,10 @@ vi.mock('./assets', () => ({
 import {
   closeReplayTriviaGamePanel,
   getActiveReplayTriviaGameId,
+  handleReplayTriviaPanelActionError,
   isReplayTriviaGamePanelOpen,
   openReplayTriviaGamePanel as mountReplayTriviaGamePanel,
+  resetReplayTriviaGamePanelClientState,
   updateReplayTriviaGamePanel
 } from './panel';
 import esCatalog from '../../../../shared/locales/es.json';
@@ -264,14 +266,78 @@ describe('Replay Trivia panel', () => {
     expect(generateReplayTriviaQuestionsMock).not.toHaveBeenCalled();
   });
 
-  it('ignores stale updates and clears preparation errors once play starts', () => {
-    openReplayTriviaGamePanel(createReplayTriviaGame({ status: 'preparing' }), 'host-user', vi.fn());
+  it('starts generation when a fresh token replaces a preparation failure', async () => {
+    const onAction = vi.fn();
+    generateReplayTriviaQuestionsMock.mockResolvedValue({
+      generatedAt: '2026-06-16T00:00:00.000Z',
+      languageCode: 'en',
+      model: 'test-model',
+      questions: [createGeneratedQuestion()],
+      transcriptWindow: {
+        endSeconds: 120,
+        items: [],
+        startSeconds: 60
+      }
+    });
+    const game = createReplayTriviaGame({ status: 'preparing' });
+    openReplayTriviaGamePanel(game, 'host-user', onAction);
+
     updateReplayTriviaGamePanel(
-      createReplayTriviaGame({ status: 'preparing' }),
+      game,
       'host-user',
       undefined,
-      'Replay Trivia service is unavailable.'
+      'Slow down before requesting more generated content.'
     );
+    expect(generateReplayTriviaQuestionsMock).not.toHaveBeenCalled();
+
+    updateReplayTriviaGamePanel(game, 'host-user', {
+      expiresAt: 101_000,
+      gameId: 'game-replay-trivia',
+      generationToken: 'fresh-token'
+    });
+    await flushPromises();
+
+    expect(generateReplayTriviaQuestionsMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        generationToken: 'fresh-token'
+      })
+    );
+    expect(
+      onAction.mock.calls.filter(([, action]) => action === 'requestGenerationToken')
+    ).toHaveLength(1);
+  });
+
+  it('shows preparation action failures without repeating token requests', () => {
+    const onAction = vi.fn();
+    const game = createReplayTriviaGame({ status: 'preparing' });
+    openReplayTriviaGamePanel(game, 'host-user', onAction);
+    context.fillText.mockClear();
+    updateReplayTriviaGamePanel(
+      game,
+      'host-user',
+      undefined,
+      'The submitted questions were rejected.'
+    );
+
+    expect(
+      onAction.mock.calls.filter(([, action]) => action === 'requestGenerationToken')
+    ).toHaveLength(1);
+    expect(drawnText()).toContain('The submitted questions were rejected.');
+  });
+
+  it('ignores stale updates and clears preparation errors once play starts', async () => {
+    generateReplayTriviaQuestionsMock.mockRejectedValueOnce(new Error('Replay Trivia service is unavailable.'));
+    openReplayTriviaGamePanel(
+      createReplayTriviaGame({ status: 'preparing' }),
+      'host-user',
+      vi.fn()
+    );
+    updateReplayTriviaGamePanel(createReplayTriviaGame({ status: 'preparing' }), 'host-user', {
+      expiresAt: 101_000,
+      gameId: 'game-replay-trivia',
+      generationToken: 'token-123456'
+    });
+    await flushPromises();
     context.fillText.mockClear();
 
     updateReplayTriviaGamePanel(createReplayTriviaGame({
@@ -389,6 +455,146 @@ describe('Replay Trivia panel', () => {
     await flushPromises();
 
     expect(onAction).not.toHaveBeenCalledWith('game-replay-trivia', 'submitQuestions', expect.anything());
+  });
+
+  it('ignores stale question generation after reopening the same game', async () => {
+    const onAction = vi.fn();
+    let resolveQuestions: (value: unknown) => void = () => undefined;
+    generateReplayTriviaQuestionsMock.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          resolveQuestions = resolve;
+        })
+    );
+
+    const game = createReplayTriviaGame({ status: 'preparing' });
+    openReplayTriviaGamePanel(game, 'host-user', onAction);
+    updateReplayTriviaGamePanel(game, 'host-user', {
+      expiresAt: 101_000,
+      gameId: 'game-replay-trivia',
+      generationToken: 'token-123456'
+    });
+    closeReplayTriviaGamePanel({ notify: false });
+    openReplayTriviaGamePanel(game, 'host-user', onAction);
+
+    resolveQuestions({
+      generatedAt: '2026-06-16T00:00:00.000Z',
+      languageCode: 'en',
+      model: 'test-model',
+      questions: [createGeneratedQuestion()],
+      transcriptWindow: {
+        endSeconds: 120,
+        items: [],
+        startSeconds: 60
+      }
+    });
+    await flushPromises();
+
+    expect(onAction).not.toHaveBeenCalledWith(
+      'game-replay-trivia',
+      'submitQuestions',
+      expect.anything()
+    );
+  });
+
+  it('invalidates pending generation and requests fresh authorization after reconnect', async () => {
+    const onAction = vi.fn();
+    let resolveQuestions: (value: unknown) => void = () => undefined;
+    generateReplayTriviaQuestionsMock.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          resolveQuestions = resolve;
+        })
+    );
+
+    const game = createReplayTriviaGame({ status: 'preparing' });
+    openReplayTriviaGamePanel(game, 'host-user', onAction);
+    updateReplayTriviaGamePanel(game, 'host-user', {
+      expiresAt: 101_000,
+      gameId: 'game-replay-trivia',
+      generationToken: 'token-123456'
+    });
+
+    resetReplayTriviaGamePanelClientState();
+    updateReplayTriviaGamePanel(game, 'host-user');
+    resolveQuestions({
+      generatedAt: '2026-06-16T00:00:00.000Z',
+      languageCode: 'en',
+      model: 'test-model',
+      questions: [createGeneratedQuestion()],
+      transcriptWindow: {
+        endSeconds: 120,
+        items: [],
+        startSeconds: 60
+      }
+    });
+    await flushPromises();
+
+    expect(
+      onAction.mock.calls.filter(([, action]) => action === 'requestGenerationToken')
+    ).toHaveLength(2);
+    expect(onAction).not.toHaveBeenCalledWith(
+      'game-replay-trivia',
+      'submitQuestions',
+      expect.anything()
+    );
+  });
+
+  it('bounds generated question submissions below the socket message limit', async () => {
+    const onAction = vi.fn();
+    const oversizedText = 'x'.repeat(2_000);
+    const languageCodes = ['es-ES', 'fr-FR', 'de-DE', 'it-IT'];
+    const oversizedQuestion = {
+      ...createGeneratedQuestion(),
+      choices: [oversizedText, oversizedText, oversizedText, oversizedText],
+      friendIntro: oversizedText,
+      id: oversizedText,
+      localizations: Array.from({ length: 4 }, (_, index) => ({
+        choices: [oversizedText, oversizedText, oversizedText, oversizedText],
+        friendIntro: oversizedText,
+        languageCode: languageCodes[index],
+        prompt: oversizedText,
+        rightReply: oversizedText,
+        wrongReply: oversizedText
+      })),
+      prompt: oversizedText,
+      rightReply: oversizedText,
+      wrongReply: oversizedText
+    };
+    generateReplayTriviaQuestionsMock.mockResolvedValue({
+      generatedAt: '2026-06-16T00:00:00.000Z',
+      languageCode: 'en',
+      model: 'test-model',
+      questions: Array.from({ length: 12 }, () => oversizedQuestion),
+      transcriptWindow: {
+        endSeconds: 120,
+        items: [],
+        startSeconds: 60
+      }
+    });
+
+    const game = createReplayTriviaGame({ status: 'preparing' });
+    openReplayTriviaGamePanel(game, 'host-user', onAction);
+    updateReplayTriviaGamePanel(game, 'host-user', {
+      expiresAt: 101_000,
+      gameId: 'game-replay-trivia',
+      generationToken: 'token-123456'
+    });
+    await flushPromises();
+
+    const submitCall = onAction.mock.calls.find(([, action]) => action === 'submitQuestions');
+    expect(submitCall).toBeDefined();
+    const payload = submitCall?.[2] as { questions: Array<Record<string, unknown>> };
+    const message = JSON.stringify({
+      action: 'submitQuestions',
+      gameId: 'game-replay-trivia',
+      payload,
+      type: 'gameAction'
+    });
+    expect(message.length).toBeLessThanOrEqual(32_768);
+    expect(payload.questions).toHaveLength(10);
+    expect(payload.questions[0].localizations).toHaveLength(1);
+    expect(String(payload.questions[0].prompt)).toHaveLength(260);
   });
 
   it('continues rendering when optional assets fail to load', async () => {
@@ -527,7 +733,10 @@ describe('Replay Trivia panel', () => {
     canvas.dispatchEvent(event);
 
     expect(event.defaultPrevented).toBe(true);
-    expect(onAction).toHaveBeenCalledWith('game-replay-trivia', 'answer', { choiceIndex: 1 });
+    expect(onAction).toHaveBeenCalledWith('game-replay-trivia', 'answer', {
+      choiceIndex: 1,
+      expectedPhaseStartedAt: 0
+    });
     expect(canvas.style.cursor).not.toBe('pointer');
   });
 
@@ -610,7 +819,10 @@ describe('Replay Trivia panel', () => {
       clientY: 260
     }));
 
-    expect(onAction).toHaveBeenCalledWith('game-replay-trivia', 'answer', { choiceIndex: 2 });
+    expect(onAction).toHaveBeenCalledWith('game-replay-trivia', 'answer', {
+      choiceIndex: 2,
+      expectedPhaseStartedAt: 0
+    });
     canvas.dispatchEvent(new MouseEvent('mousemove', {
       bubbles: true,
       clientX: 40,
@@ -630,6 +842,121 @@ describe('Replay Trivia panel', () => {
 
     canvas.dispatchEvent(new MouseEvent('mouseleave', { bubbles: true }));
     expect(canvas.style.cursor).not.toBe('pointer');
+  });
+
+  it('rolls back an optimistic answer after a correlated rejection', () => {
+    const onAction = vi.fn();
+    const game = createReplayTriviaGame({ status: 'question' });
+    openReplayTriviaGamePanel(game, 'host-user', onAction);
+    setNow(ANSWER_UI_DELAY_MS + 25);
+    updateReplayTriviaGamePanel(game, 'host-user');
+
+    getCanvas().dispatchEvent(new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      key: '2'
+    }));
+    expect(handleReplayTriviaPanelActionError({
+      code: 'rate_limited',
+      message: 'Slow down.',
+      request: {
+        action: 'answer',
+        gameId: game.gameId,
+        payload: {
+          choiceIndex: 1,
+          expectedPhaseStartedAt: 0
+        },
+        type: 'gameAction'
+      }
+    })).toBe(false);
+
+    getCanvas().dispatchEvent(new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      key: '3'
+    }));
+
+    const answerCalls = onAction.mock.calls.filter(([, action]) => action === 'answer');
+    expect(answerCalls).toHaveLength(2);
+    expect(answerCalls[1]?.[2]).toMatchObject({
+      choiceIndex: 2,
+      expectedPhaseStartedAt: 0
+    });
+  });
+
+  it('does not roll back a newer answer for a delayed rejection from an earlier question', () => {
+    const onAction = vi.fn();
+    const firstGame = createReplayTriviaGame({ status: 'question' });
+    openReplayTriviaGamePanel(firstGame, 'host-user', onAction);
+    setNow(ANSWER_UI_DELAY_MS + 25);
+    updateReplayTriviaGamePanel(firstGame, 'host-user');
+    getCanvas().dispatchEvent(new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      key: '2'
+    }));
+
+    const secondGame = createReplayTriviaGame({
+      currentQuestion: {
+        ...createReplayTriviaQuestion(),
+        id: 'q_2'
+      },
+      currentQuestionIndex: 1,
+      phaseStartedAt: 1,
+      status: 'question',
+      totalQuestions: 2
+    });
+    updateReplayTriviaGamePanel(secondGame, 'host-user');
+    setNow((ANSWER_UI_DELAY_MS * 2) + 50);
+    getCanvas().dispatchEvent(new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      key: '3'
+    }));
+
+    expect(handleReplayTriviaPanelActionError({
+      code: 'rate_limited',
+      message: 'Slow down.',
+      request: {
+        action: 'answer',
+        gameId: firstGame.gameId,
+        payload: {
+          choiceIndex: 1,
+          expectedPhaseStartedAt: 0
+        },
+        type: 'gameAction'
+      }
+    })).toBe(false);
+    getCanvas().dispatchEvent(new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      key: '4'
+    }));
+
+    expect(onAction.mock.calls.filter(([, action]) => action === 'answer')).toHaveLength(2);
+  });
+
+  it('restores authoritative answer state after reconnecting to the same question', () => {
+    const onAction = vi.fn();
+    const game = createReplayTriviaGame({ status: 'question' });
+    openReplayTriviaGamePanel(game, 'host-user', onAction);
+    setNow(ANSWER_UI_DELAY_MS + 25);
+    updateReplayTriviaGamePanel(game, 'host-user');
+
+    getCanvas().dispatchEvent(new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      key: '2'
+    }));
+    resetReplayTriviaGamePanelClientState();
+    updateReplayTriviaGamePanel(game, 'host-user');
+    getCanvas().dispatchEvent(new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      key: '3'
+    }));
+
+    expect(onAction.mock.calls.filter(([, action]) => action === 'answer')).toHaveLength(2);
   });
 
   it('ignores answer controls outside the question phase', () => {
@@ -722,7 +1049,9 @@ describe('Replay Trivia panel', () => {
     runNextFrame(COUNTDOWN_MS + 50);
 
     expect(onAction).toHaveBeenCalledTimes(1);
-    expect(onAction).toHaveBeenCalledWith('game-replay-trivia', 'advance', undefined);
+    expect(onAction).toHaveBeenCalledWith('game-replay-trivia', 'advance', {
+      expectedPhaseStartedAt: 0
+    });
     closeReplayTriviaGamePanel({ notify: false });
     onAction.mockClear();
     setNow(1);
@@ -730,7 +1059,9 @@ describe('Replay Trivia panel', () => {
     openReplayTriviaGamePanel(createReplayTriviaGame({ status: 'question' }), 'host-user', onAction);
     runNextFrame(ANSWER_UI_DELAY_MS + ANSWER_TIME_MS + 1);
 
-    expect(onAction).toHaveBeenCalledWith('game-replay-trivia', 'timeout', undefined);
+    expect(onAction).toHaveBeenCalledWith('game-replay-trivia', 'timeout', {
+      expectedPhaseStartedAt: 0
+    });
     closeReplayTriviaGamePanel({ notify: false });
     onAction.mockClear();
     setNow(1);
@@ -738,7 +1069,9 @@ describe('Replay Trivia panel', () => {
     openReplayTriviaGamePanel(createReplayTriviaGame({ status: 'reveal' }), 'host-user', onAction);
     runNextFrame(REVEAL_MS + 1);
 
-    expect(onAction).toHaveBeenCalledWith('game-replay-trivia', 'advance', undefined);
+    expect(onAction).toHaveBeenCalledWith('game-replay-trivia', 'advance', {
+      expectedPhaseStartedAt: 0
+    });
     closeReplayTriviaGamePanel({ notify: false });
     onAction.mockClear();
     setNow(1);
@@ -746,7 +1079,116 @@ describe('Replay Trivia panel', () => {
     openReplayTriviaGamePanel(createReplayTriviaGame({ status: 'score' }), 'host-user', onAction);
     runNextFrame(SCORE_MS + 1);
 
-    expect(onAction).toHaveBeenCalledWith('game-replay-trivia', 'advance', undefined);
+    expect(onAction).toHaveBeenCalledWith('game-replay-trivia', 'advance', {
+      expectedPhaseStartedAt: 0
+    });
+  });
+
+  it('releases automatic transition latches after reconnecting to the same phase', () => {
+    const onAction = vi.fn();
+    const game = createReplayTriviaGame({ status: 'countdown' });
+    openReplayTriviaGamePanel(game, 'host-user', onAction);
+    runNextFrame(COUNTDOWN_MS + 1);
+
+    resetReplayTriviaGamePanelClientState();
+    updateReplayTriviaGamePanel(game, 'host-user');
+    runNextFrame(COUNTDOWN_MS + 2);
+
+    expect(onAction.mock.calls.filter(([, action]) => action === 'advance')).toHaveLength(2);
+  });
+
+  it('retries transient automatic transition errors with bounded backoff', () => {
+    const onAction = vi.fn();
+    const game = createReplayTriviaGame({ status: 'countdown' });
+    openReplayTriviaGamePanel(game, 'host-user', onAction);
+    runNextFrame(COUNTDOWN_MS + 1);
+
+    expect(handleReplayTriviaPanelActionError({
+      code: 'countdown_active',
+      message: 'Countdown is still active.',
+      request: {
+        action: 'advance',
+        gameId: game.gameId,
+        payload: {
+          expectedPhaseStartedAt: 0
+        },
+        type: 'gameAction'
+      }
+    })).toBe(true);
+    runNextFrame(COUNTDOWN_MS + 5_000);
+    expect(onAction.mock.calls.filter(([, action]) => action === 'advance')).toHaveLength(1);
+    runNextFrame(COUNTDOWN_MS + 5_001);
+    expect(onAction.mock.calls.filter(([, action]) => action === 'advance')).toHaveLength(2);
+
+    expect(handleReplayTriviaPanelActionError({
+      code: 'internal_error',
+      message: 'Try again.',
+      request: {
+        action: 'advance',
+        gameId: game.gameId,
+        payload: {
+          expectedPhaseStartedAt: 0
+        },
+        type: 'gameAction'
+      }
+    })).toBe(true);
+    runNextFrame(COUNTDOWN_MS + 20_000);
+    expect(onAction.mock.calls.filter(([, action]) => action === 'advance')).toHaveLength(2);
+    runNextFrame(COUNTDOWN_MS + 20_001);
+    expect(onAction.mock.calls.filter(([, action]) => action === 'advance')).toHaveLength(3);
+  });
+
+  it('does not release a newer automatic transition for a delayed earlier-phase error', () => {
+    const onAction = vi.fn();
+    const countdownGame = createReplayTriviaGame({ status: 'countdown' });
+    openReplayTriviaGamePanel(countdownGame, 'host-user', onAction);
+    runNextFrame(COUNTDOWN_MS + 1);
+
+    updateReplayTriviaGamePanel(createReplayTriviaGame({
+      phaseStartedAt: 1,
+      status: 'reveal'
+    }), 'host-user');
+    runNextFrame(COUNTDOWN_MS + REVEAL_MS + 2);
+    expect(onAction.mock.calls.filter(([, action]) => action === 'advance')).toHaveLength(2);
+
+    expect(handleReplayTriviaPanelActionError({
+      code: 'internal_error',
+      message: 'Try again.',
+      request: {
+        action: 'advance',
+        gameId: countdownGame.gameId,
+        payload: {
+          expectedPhaseStartedAt: 0
+        },
+        type: 'gameAction'
+      }
+    })).toBe(false);
+    runNextFrame(COUNTDOWN_MS + REVEAL_MS + 60_000);
+
+    expect(onAction.mock.calls.filter(([, action]) => action === 'advance')).toHaveLength(2);
+  });
+
+  it('keeps permanent automatic transition errors terminal', () => {
+    const onAction = vi.fn();
+    const game = createReplayTriviaGame({ status: 'countdown' });
+    openReplayTriviaGamePanel(game, 'host-user', onAction);
+    runNextFrame(COUNTDOWN_MS + 1);
+
+    expect(handleReplayTriviaPanelActionError({
+      code: 'invalid_action_context',
+      message: 'Invalid action context.',
+      request: {
+        action: 'advance',
+        gameId: game.gameId,
+        payload: {
+          expectedPhaseStartedAt: 0
+        },
+        type: 'gameAction'
+      }
+    })).toBe(false);
+    runNextFrame(COUNTDOWN_MS + 60_000);
+
+    expect(onAction.mock.calls.filter(([, action]) => action === 'advance')).toHaveLength(1);
   });
 
   it('lets an already queued frame exit cleanly after the panel closes', () => {
@@ -1267,20 +1709,24 @@ describe('Replay Trivia panel', () => {
     }
   });
 
-  it('shows a preparation error instead of staying on loading', () => {
+  it('shows a preparation error instead of staying on loading', async () => {
+    generateReplayTriviaQuestionsMock.mockRejectedValueOnce(
+      new Error('Replay Trivia questions must include friendIntro.')
+    );
     openReplayTriviaGamePanel(
       createReplayTriviaGame({ status: 'preparing' }),
       'host-user',
       vi.fn()
     );
+    updateReplayTriviaGamePanel(createReplayTriviaGame({ status: 'preparing' }), 'host-user', {
+      expiresAt: 101_000,
+      gameId: 'game-replay-trivia',
+      generationToken: 'token-123456'
+    });
+    await flushPromises();
     context.fillText.mockClear();
 
-    updateReplayTriviaGamePanel(
-      createReplayTriviaGame({ status: 'preparing' }),
-      'host-user',
-      undefined,
-      'Replay Trivia questions must include friendIntro.'
-    );
+    updateReplayTriviaGamePanel(createReplayTriviaGame({ status: 'preparing' }), 'host-user');
 
     const drawnText = context.fillText.mock.calls.map(([text]) => String(text)).join(' ');
     expect(drawnText).toContain('Could not prepare trivia.');

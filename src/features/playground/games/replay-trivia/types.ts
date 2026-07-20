@@ -6,7 +6,8 @@ import type {
   ReplayTriviaGameStatus,
   ReplayTriviaPublicAnswer,
   ReplayTriviaPublicQuestion,
-  ReplayTriviaPlayerRole
+  ReplayTriviaPlayerRole,
+  ReplayTriviaQuestionsResponse
 } from '../../../../shared/playground/trivia';
 
 export type { ReplayTriviaGameStatus, ReplayTriviaPlayerRole } from '../../../../shared/playground/trivia';
@@ -92,8 +93,17 @@ export interface FriendBubbleOptions {
 
 export type ReplayTriviaClosePanel = (options?: { notify?: boolean }) => void;
 
+interface ReplayTriviaAutomaticActionDelivery {
+  action: 'advance' | 'timeout';
+  phaseStartedAt: number;
+  retryAt: number;
+  retryCount: number;
+  sent: boolean;
+}
+
 export interface ReplayTriviaPanelRuntime {
   assets: ReplayTriviaAssets;
+  automaticActionDelivery: ReplayTriviaAutomaticActionDelivery | null;
   canvas: HTMLCanvasElement;
   closePanel: ReplayTriviaClosePanel;
   closeButtonRect: Rect | null;
@@ -104,6 +114,7 @@ export interface ReplayTriviaPanelRuntime {
   game: PublicReplayTriviaGame;
   generationToken: ReplayTriviaGenerationToken | null;
   generationTokenRequested: boolean;
+  lastGenerationTokenValue: string;
   hitboxes: AnswerHitbox[];
   hoveredAnswerIndex: number | null;
   hoveredCloseButton: boolean;
@@ -112,18 +123,23 @@ export interface ReplayTriviaPanelRuntime {
   onVisibilityChanged: (() => void) | null;
   opponentAnswerIndex: number | null;
   opponentScore: number;
+  pendingAnswer: ReplayTriviaPendingAnswer | null;
   phase: ReplayTriviaGameStatus;
   phaseStartedAt: number;
   pixelRatio: number;
   playedSoundIds: Set<string>;
   preparationError: string;
-  questionGenerationStarted: boolean;
-  sentActionIds: Set<string>;
+  questionGeneration: Promise<ReplayTriviaQuestionsResponse> | null;
   selectedAt: number | null;
   soundController: GameSoundController;
   statusOverlay: GamePanelStatusOverlay;
   userAnswerIndex: number | null;
   userScore: number;
+}
+
+interface ReplayTriviaPendingAnswer {
+  choiceIndex: number;
+  expectedPhaseStartedAt: number;
 }
 
 export interface ReplayTriviaFallbackRuntime {

@@ -36,6 +36,7 @@ import {
   startStickAroundRound
 } from '../../games/stick-around';
 import type { GameRecord } from '../../games/types';
+import { PLAYGROUND_GAME_VERSIONS } from '../../protocol/messages';
 
 vi.mock('../../durable-objects/stockfish-container/client', () => ({
   getStockfishBestMove: vi.fn(() => Promise.resolve(createStockfishResult(null)))
@@ -195,18 +196,24 @@ describe('computer player', () => {
       payload: { questions: [createQuestion()] },
       userId: 'host-user'
     }, 0);
-    game = advanceReplayTriviaGame(game, 3_000);
+    game = advanceReplayTriviaGame(game, createReplayTriviaAdvanceAction(game), 3_000);
 
     expect(createReplayTriviaBotAnswerAction(game, 'bot-user', () => 0.1, 4_000)).toEqual({
       action: 'answer',
-      payload: { choiceIndex: 0 },
+      payload: {
+        choiceIndex: 0,
+        expectedPhaseStartedAt: 3_000
+      },
       userId: 'bot-user'
     });
 
     const randomValues = [0.9, 0.99];
     expect(createReplayTriviaBotAnswerAction(game, 'bot-user', () => randomValues.shift() ?? 0, 4_000)).toEqual({
       action: 'answer',
-      payload: { choiceIndex: 3 },
+      payload: {
+        choiceIndex: 3,
+        expectedPhaseStartedAt: 3_000
+      },
       userId: 'bot-user'
     });
   });
@@ -223,7 +230,7 @@ describe('computer player', () => {
       payload: { questions: [createQuestion()] },
       userId: 'host-user'
     }, 0);
-    triviaGame = advanceReplayTriviaGame(triviaGame, 3_000);
+    triviaGame = advanceReplayTriviaGame(triviaGame, createReplayTriviaAdvanceAction(triviaGame), 3_000);
     let bountyGame = submitBountyHunting(
       createBountyHuntingGame('bounty-1', 'host-user', BOUNTY_HUNTING_COMPUTER_PLAYER_PROFILE.userId, 0),
       {
@@ -248,9 +255,11 @@ describe('computer player', () => {
     bountyGame = observeBountyHuntingMessage(bountyGame, {
       action: 'observeBountyMessage',
       payload: {
-        bountyIds: ['question'],
-        messageId: 'msg-question-1',
-        messageTimestampUsec: '5500001'
+        observations: [{
+          bountyIds: ['question'],
+          messageId: 'msg-question-1',
+          messageTimestampUsec: '5500001'
+        }]
       },
       userId: 'host-user'
     }, 6_000);
@@ -299,9 +308,11 @@ describe('computer player', () => {
     bountyWitnessGame = observeBountyHuntingMessage(bountyWitnessGame, {
       action: 'observeBountyMessage',
       payload: {
-        bountyIds: ['question'],
-        messageId: 'msg-question-1',
-        messageTimestampUsec: '5000001'
+        observations: [{
+          bountyIds: ['question'],
+          messageId: 'msg-question-1',
+          messageTimestampUsec: '5000001'
+        }]
       },
       userId: 'host-user'
     }, 6_000);
@@ -309,26 +320,31 @@ describe('computer player', () => {
     expect(getComputerPlayerActionDelayMs({
       gameId: 'chess-1',
       gameType: 'chess',
+      gameVersion: PLAYGROUND_GAME_VERSIONS.chess,
       status: 'active'
     }, () => 0)).toBe(700);
     expect(getComputerPlayerActionDelayMs({
       gameId: 'chess-1',
       gameType: 'chess',
+      gameVersion: PLAYGROUND_GAME_VERSIONS.chess,
       status: 'active'
     }, () => 1)).toBe(1_500);
     expect(getComputerPlayerActionDelayMs({
       gameId: 'trivia-1',
       gameType: 'replay-trivia',
+      gameVersion: PLAYGROUND_GAME_VERSIONS['replay-trivia'],
       status: 'question'
     }, () => 0.5)).toBe(3_650);
     expect(getComputerPlayerActionDelayMs({
       gameId: 'bounty-1',
       gameType: 'bounty-hunting',
+      gameVersion: PLAYGROUND_GAME_VERSIONS['bounty-hunting'],
       status: 'active'
     }, () => 0.5)).toBe(825);
     expect(getComputerPlayerActionDelayMs({
       gameId: 'bounty-1',
       gameType: 'bounty-hunting',
+      gameVersion: PLAYGROUND_GAME_VERSIONS['bounty-hunting'],
       status: 'ready'
     }, () => 0.5)).toBe(250);
     expect(getComputerPlayerActionDelayMs(
@@ -356,7 +372,7 @@ describe('computer player', () => {
       payload: { questions: [createQuestion()] },
       userId: 'host-user'
     }, 0);
-    triviaGame = advanceReplayTriviaGame(triviaGame, 3_000);
+    triviaGame = advanceReplayTriviaGame(triviaGame, createReplayTriviaAdvanceAction(triviaGame), 3_000);
     let bountyGame = submitBountyHunting(
       createBountyHuntingGame('bounty-1', 'host-user', BOUNTY_HUNTING_COMPUTER_PLAYER_PROFILE.userId, 0),
       {
@@ -383,7 +399,10 @@ describe('computer player', () => {
       random: () => 0.1
     })).toEqual({
       action: 'answer',
-      payload: { choiceIndex: 0 },
+      payload: {
+        choiceIndex: 0,
+        expectedPhaseStartedAt: 3_000
+      },
       userId: REPLAY_TRIVIA_COMPUTER_PLAYER_PROFILE.userId
     });
     expect(createComputerPlayerAction(bountyGame, {
@@ -478,11 +497,14 @@ describe('computer player', () => {
       random: () => 0.1,
       userId: BOUNTY_HUNTING_COMPUTER_PLAYER_PROFILE.userId
     })).toEqual({
-      action: 'claimBounty',
+      action: 'shootBounty',
       payload: {
-        bountyId: 'verified',
         messageId: 'msg-verified-1',
-        messageTimestampUsec: '5000002'
+        observations: [{
+          bountyIds: ['verified'],
+          messageId: 'msg-verified-1',
+          messageTimestampUsec: '5000002'
+        }]
       },
       userId: BOUNTY_HUNTING_COMPUTER_PLAYER_PROFILE.userId
     });
@@ -554,17 +576,20 @@ describe('computer player', () => {
       random: () => 0.1,
       userId: BOUNTY_HUNTING_COMPUTER_PLAYER_PROFILE.userId
     })).toEqual({
-      action: 'claimBounty',
+      action: 'shootBounty',
       payload: {
-        bountyId: 'question',
         messageId: 'msg-question-1',
-        messageTimestampUsec: '5000001'
+        observations: [{
+          bountyIds: ['question'],
+          messageId: 'msg-question-1',
+          messageTimestampUsec: '5000001'
+        }]
       },
       userId: BOUNTY_HUNTING_COMPUTER_PLAYER_PROFILE.userId
     });
   });
 
-  it('sometimes chooses a lower-value witnessed Bounty Hunting claim', () => {
+  it('treats a message matching multiple bounties as one claim candidate', () => {
     let game = submitBountyHunting(
       createBountyHuntingGame('bounty-1', 'host-user', BOUNTY_HUNTING_COMPUTER_PLAYER_PROFILE.userId, 0),
       {
@@ -587,7 +612,7 @@ describe('computer player', () => {
             messageTimestampUsec: '5000001'
           },
           {
-            bountyIds: ['verified'],
+            bountyIds: ['question', 'verified'],
             messageId: 'msg-verified-1',
             messageTimestampUsec: '5000002'
           }
@@ -605,7 +630,7 @@ describe('computer player', () => {
             messageTimestampUsec: '5000001'
           },
           {
-            bountyIds: ['verified'],
+            bountyIds: ['question', 'verified'],
             messageId: 'msg-verified-1',
             messageTimestampUsec: '5000002'
           }
@@ -614,18 +639,21 @@ describe('computer player', () => {
       userId: BOUNTY_HUNTING_COMPUTER_PLAYER_PROFILE.userId
     }, 6_100);
 
-    const randomValues = [0.9, 0];
+    const randomValues = [0.9, 0.99];
     expect(createBountyHuntingBotAction(
       game,
       BOUNTY_HUNTING_COMPUTER_PLAYER_PROFILE.userId,
       () => randomValues.shift() ?? 0,
       7_000
     )).toEqual({
-      action: 'claimBounty',
+      action: 'shootBounty',
       payload: {
-        bountyId: 'question',
         messageId: 'msg-question-1',
-        messageTimestampUsec: '5000001'
+        observations: [{
+          bountyIds: ['question'],
+          messageId: 'msg-question-1',
+          messageTimestampUsec: '5000001'
+        }]
       },
       userId: BOUNTY_HUNTING_COMPUTER_PLAYER_PROFILE.userId
     });
@@ -748,11 +776,14 @@ describe('computer player', () => {
       () => 0.1,
       8_200
     )).toEqual({
-      action: 'claimBounty',
+      action: 'shootBounty',
       payload: {
-        bountyId: 'question',
         messageId: 'msg-question-new',
-        messageTimestampUsec: '8000001'
+        observations: [{
+          bountyIds: ['question'],
+          messageId: 'msg-question-new',
+          messageTimestampUsec: '8000001'
+        }]
       },
       userId: BOUNTY_HUNTING_COMPUTER_PLAYER_PROFILE.userId
     });
@@ -799,11 +830,14 @@ describe('computer player', () => {
       () => randomValues.shift() ?? 0,
       12_100
     )).toEqual({
-      action: 'claimBounty',
+      action: 'shootBounty',
       payload: {
-        bountyId: 'mention',
         messageId: 'msg-recent-mention',
-        messageTimestampUsec: '7000001'
+        observations: [{
+          bountyIds: ['mention'],
+          messageId: 'msg-recent-mention',
+          messageTimestampUsec: '7000001'
+        }]
       },
       userId: BOUNTY_HUNTING_COMPUTER_PLAYER_PROFILE.userId
     });
@@ -815,7 +849,7 @@ describe('computer player', () => {
       payload: { questions: [createQuestion()] },
       userId: 'host-user'
     }, 0);
-    game = advanceReplayTriviaGame(game, 3_000);
+    game = advanceReplayTriviaGame(game, createReplayTriviaAdvanceAction(game), 3_000);
 
     expect(createReplayTriviaBotAnswerAction({
       ...game,
@@ -855,6 +889,18 @@ function createQuestion() {
     prompt: 'Which game won Game of the Year in this segment?',
     rightReply: 'wow, you knew the trophy one.',
     wrongReply: 'you missed it. it was God of War.'
+  };
+}
+
+function createReplayTriviaAdvanceAction(game: {
+  phaseStartedAt: number;
+}) {
+  return {
+    action: 'advance',
+    payload: {
+      expectedPhaseStartedAt: game.phaseStartedAt
+    },
+    userId: 'host-user'
   };
 }
 

@@ -6,23 +6,31 @@
  * content into the shared panel shell and translate game actions.
  */
 import type { MessageKey } from '../../../shared/i18n';
-import type { GameId, PublicGame, ServerMessage } from '../../../shared/playground/protocol';
+import type {
+  GameId,
+  PlaygroundActionError,
+  PublicGame,
+  ServerMessage
+} from '../../../shared/playground/protocol';
 import type { PlaygroundClientState } from './client';
 import type { GamePanelStatusOverlay } from './panel-feedback';
 import type { GamePanelShell, GamePanelShellPosition } from './panel-shell';
 
 export interface GameDefinition {
+  availability?: 'livestream' | 'replay';
   classNamePrefix: string;
-  disabledReasonKey?: MessageKey;
   id: GameId;
-  isPlayable?: () => boolean;
   labelKey: MessageKey;
   renderPreview: (container: HTMLElement) => void;
   surface?: 'chat-overlay' | 'panel';
   taglineKey: MessageKey;
 }
 
-export type SendGameAction = (gameId: string, action: string, payload?: Record<string, unknown>) => void;
+export type SendGameAction = (
+  gameId: string,
+  action: string,
+  payload?: Record<string, unknown>
+) => void;
 
 export type CloseGamePanel = (options?: { notify?: boolean }) => void;
 
@@ -79,6 +87,7 @@ export interface EnabledGame<TGame extends PublicGame = PublicGame> {
   adapter: GamePanelAdapter<TGame>;
   definition: GameDefinition;
   getOpponentLabel?(game: TGame, currentUserId: string): string;
+  handleActionError?: (error: PlaygroundActionError) => boolean;
   handleServerMessage?: (message: ServerMessage) => boolean;
   onClientReset?: () => void;
   onGameEnded?: (gameId: string) => void;

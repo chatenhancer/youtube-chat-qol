@@ -21,9 +21,9 @@ describe('playground games panel state selectors', () => {
     expect(createInitialGamesPanelState(true, connected)).toMatchObject({
       activeGameIndex: 0,
       available: true,
-      invitedPlayer: '',
       leavingGameId: '',
       mode: 'lobby',
+      pendingInvite: null,
       selectedGameId: null,
       transport: connected
     });
@@ -136,9 +136,11 @@ describe('playground games panel state selectors', () => {
 function createTransport(overrides: Partial<PlaygroundClientState> = {}): PlaygroundClientState {
   return {
     available: false,
+    connectionError: '',
     endedGame: null,
-    error: '',
     games: [],
+    incompatibleActiveGames: [],
+    incompatibleGames: [],
     invites: [],
     status: 'connected',
     userId: 'me-user',

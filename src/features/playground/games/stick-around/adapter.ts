@@ -1,5 +1,4 @@
 import { t } from '../../../../shared/i18n';
-import { isLiveChatReplayUrl } from '../../../../youtube/timestamps';
 import type {
   EnabledGame,
   GameDefinition,
@@ -21,10 +20,9 @@ import { renderStickAroundPreview } from './preview';
 import type { PublicStickAroundGame } from './types';
 
 export const stickAroundGameDefinition: GameDefinition = {
+  availability: 'livestream',
   classNamePrefix: 'ytcq-stick-around-game',
-  disabledReasonKey: 'gamesStickAroundLiveOnly',
   id: 'stick-around',
-  isPlayable: () => !isLiveChatReplayUrl(),
   labelKey: 'gamesStickAround',
   renderPreview: renderStickAroundPreview,
   surface: 'chat-overlay',

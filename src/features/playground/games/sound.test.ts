@@ -9,6 +9,8 @@ interface AudioMock {
   cloneNode: ReturnType<typeof vi.fn>;
   currentTime: number;
   ended: boolean;
+  onended: (() => void) | null;
+  pause: ReturnType<typeof vi.fn>;
   paused: boolean;
   play: ReturnType<typeof vi.fn>;
   preload: string;
@@ -32,6 +34,7 @@ interface AudioBufferSourceMock {
   disconnect: ReturnType<typeof vi.fn>;
   onended: (() => void) | null;
   start: ReturnType<typeof vi.fn>;
+  stop: ReturnType<typeof vi.fn>;
 }
 
 interface OscillatorMock {
@@ -114,6 +117,17 @@ describe('playground game sounds', () => {
     expect(clone.play).toHaveBeenCalledOnce();
   });
 
+  it('stops HTML audio when its game panel closes', () => {
+    installAudioMock();
+    const listeners = new AbortController();
+    const controller = createGameSoundController({ signal: listeners.signal });
+
+    controller.play('games/chess/move.mp3');
+    listeners.abort();
+
+    expect(getAudioMock('games/chess/move.mp3').pause).toHaveBeenCalledOnce();
+  });
+
   it('plays decoded Web Audio buffers once preload finishes', async () => {
     installAudioMock();
     const decodedBuffer = {} as AudioBuffer;
@@ -127,9 +141,8 @@ describe('playground game sounds', () => {
     await flushPromises();
     await (audioContextMocks[0]?.decodeAudioData.mock.results[0]?.value as Promise<AudioBuffer>);
     await flushPromises();
-    const controller = createGameSoundController({
-      signal: new AbortController().signal
-    });
+    const listeners = new AbortController();
+    const controller = createGameSoundController({ signal: listeners.signal });
 
     controller.play('games/bounty-hunting/claim-ricochet-01.mp3');
 
@@ -141,6 +154,9 @@ describe('playground game sounds', () => {
     expect(audioBufferSourceMocks[0]?.start).toHaveBeenCalledWith(0);
     expect(audioContextMocks[0]?.resume).toHaveBeenCalledOnce();
     expect(getAudioMock('games/bounty-hunting/claim-ricochet-01.mp3').play).not.toHaveBeenCalled();
+
+    listeners.abort();
+    expect(audioBufferSourceMocks[0]?.stop).toHaveBeenCalledWith(0);
   });
 
   it('ignores seek and playback failures', () => {
@@ -203,6 +219,17 @@ describe('playground game sounds', () => {
 
     expect(oscillatorMocks).toHaveLength(1);
   });
+
+  it('stops synthesized beeps when their game panel closes', () => {
+    installAudioContextMock();
+    const listeners = new AbortController();
+    const controller = createGameSoundController({ signal: listeners.signal });
+
+    controller.beep();
+    listeners.abort();
+
+    expect(oscillatorMocks[0]?.stop).toHaveBeenCalledTimes(2);
+  });
 });
 
 function installAudioMock(factory = createAudioMock): void {
@@ -216,6 +243,8 @@ function createAudioMock(src: string): AudioMock {
     cloneNode: vi.fn(() => createAudioMock(src)),
     currentTime: 0,
     ended: false,
+    onended: null,
+    pause: vi.fn(),
     paused: true,
     play: vi.fn(() => Promise.resolve()),
     preload: '',
@@ -264,7 +293,8 @@ function createAudioBufferSourceMock(): AudioBufferSourceMock {
     connect: vi.fn(),
     disconnect: vi.fn(),
     onended: null,
-    start: vi.fn()
+    start: vi.fn(),
+    stop: vi.fn()
   };
   audioBufferSourceMocks.push(source);
   return source;

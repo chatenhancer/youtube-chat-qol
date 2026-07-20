@@ -6,9 +6,19 @@
  */
 import { jsx, el } from './jsx-dom';
 
+const DEFAULT_TOAST_DURATION_MS = 2_400;
+
+export interface ToastOptions {
+  durationMs?: number;
+  tone?: 'default' | 'error';
+}
+
 let toastTimer = 0;
 
-export function showToast(message: string): void {
+export function showToast(
+  message: string,
+  { durationMs = DEFAULT_TOAST_DURATION_MS, tone = 'default' }: ToastOptions = {}
+): void {
   let toast = document.querySelector<HTMLElement>('.ytcq-toast');
   if (!toast) {
     toast = el<HTMLDivElement>(<div class="ytcq-toast" />);
@@ -16,8 +26,11 @@ export function showToast(message: string): void {
   }
 
   toast.textContent = message;
+  toast.dataset.tone = tone;
+  toast.setAttribute('role', tone === 'error' ? 'alert' : 'status');
+  toast.setAttribute('aria-live', tone === 'error' ? 'assertive' : 'polite');
   window.clearTimeout(toastTimer);
-  toastTimer = window.setTimeout(() => toast.remove(), 2400);
+  toastTimer = window.setTimeout(() => toast.remove(), durationMs);
 }
 
 export function clearToast(): void {

@@ -7,10 +7,22 @@
  */
 import { createGamesIcon } from '../../../shared/icons';
 import { t } from '../../../shared/i18n';
-import type { GameId, PublicGame, ServerMessage } from '../../../shared/playground/protocol';
+import type {
+  GameId,
+  PlaygroundActionError,
+  PublicGame,
+  ServerMessage
+} from '../../../shared/playground/protocol';
+import { isLiveChatReplayUrl } from '../../../youtube/timestamps';
 import type { PlaygroundClientState } from './client';
 import { ENABLED_GAMES } from './enabled-games';
-import type { AnyEnabledGame, AnyGamePanelAdapter, GameDefinition, GamePanelMount, SendGameAction } from './adapter';
+import type {
+  AnyEnabledGame,
+  AnyGamePanelAdapter,
+  GameDefinition,
+  GamePanelMount,
+  SendGameAction
+} from './adapter';
 import { createGamePanelShell, type GamePanelShell, type GamePanelShellPosition } from './panel-shell';
 import { animateGameSurfaceToGamesButton } from './minimize-animation';
 
@@ -46,6 +58,7 @@ export type GamePickerCard = RealtimeGamePickerCard;
 
 interface RealtimeGamePickerCard {
   disabled: boolean;
+  disabledBadge: string;
   disabledReason: string;
   id: GameId;
   label: string;
@@ -66,15 +79,22 @@ export function getGameLabel(gameId: GameId): string {
 
 export function getGamePickerCards({ includeRealtime = true }: { includeRealtime?: boolean } = {}): GamePickerCard[] {
   return includeRealtime
-    ? GAMES.map((game) => ({
-      disabled: !isGameDefinitionPlayable(game),
-      disabledReason: game.disabledReasonKey ? t(game.disabledReasonKey) : '',
-      id: game.id,
-      label: getGameLabel(game.id),
-      renderPreview: game.renderPreview,
-      tagline: t(game.taglineKey),
-      type: 'realtime' as const
-    }))
+    ? GAMES.map((game) => {
+      const disabled = !isGameDefinitionPlayable(game);
+      const restriction = disabled
+        ? getGameAvailabilityRestriction(game.availability)
+        : null;
+      return {
+        disabled,
+        disabledBadge: restriction?.badge || '',
+        disabledReason: restriction?.reason || '',
+        id: game.id,
+        label: getGameLabel(game.id),
+        renderPreview: game.renderPreview,
+        tagline: t(game.taglineKey),
+        type: 'realtime' as const
+      };
+    })
     : [];
 }
 
@@ -92,6 +112,10 @@ export function notifyGameEnded(gameId: string): void {
 
 export function handleGameServerMessage(message: ServerMessage): boolean {
   return ENABLED_GAME_LIST.some((game) => game.handleServerMessage?.(message));
+}
+
+export function handleGameActionError(error: PlaygroundActionError): boolean {
+  return ENABLED_GAME_LIST.some((game) => game.handleActionError?.(error));
 }
 
 export function isSupportedGameId(gameId: GameId): boolean {
@@ -358,5 +382,31 @@ function releaseGamePanelShell({
 }
 
 function isGameDefinitionPlayable(game: GameDefinition): boolean {
-  return game.isPlayable ? game.isPlayable() : true;
+  switch (game.availability) {
+    case 'livestream':
+      return !isLiveChatReplayUrl();
+    case 'replay':
+      return isLiveChatReplayUrl();
+    default:
+      return true;
+  }
+}
+
+function getGameAvailabilityRestriction(
+  availability: GameDefinition['availability']
+): { badge: string; reason: string } | null {
+  switch (availability) {
+    case 'livestream':
+      return {
+        badge: t('gamesLivestreamOnly'),
+        reason: t('gamesLivestreamOnlyHelper')
+      };
+    case 'replay':
+      return {
+        badge: t('gamesReplayOnly'),
+        reason: t('gamesReplayOnlyHelper')
+      };
+    default:
+      return null;
+  }
 }

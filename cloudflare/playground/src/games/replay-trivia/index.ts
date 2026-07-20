@@ -5,17 +5,23 @@
  * the active match and owns answers, scoring, round transitions, and public
  * serialization for both players.
  */
-import type { PlaygroundUserLanguage, PublicGame, PublicUserIdentity } from '../../protocol/messages';
+import { z } from 'zod';
+import {
+  PLAYGROUND_GAME_VERSIONS,
+  type PlaygroundUserLanguage,
+  type PublicGame,
+  type PublicUserIdentity
+} from '../../protocol/messages';
 import { ProtocolError } from '../../protocol/validation';
-import type {
-  ReplayTriviaGameStatus,
-  ReplayTriviaPublicAnswer,
-  ReplayTriviaPublicQuestion,
-  ReplayTriviaQuestion
+import {
+  parseReplayTriviaExpectedPhaseStartedAt,
+  type ReplayTriviaGameStatus,
+  type ReplayTriviaPublicAnswer,
+  type ReplayTriviaPublicQuestion,
+  type ReplayTriviaQuestion
 } from '../../../../../src/shared/playground/trivia';
 import type { GameActionInput, GameModule, GameRecord, PublicGameContext } from '../types';
 
-type ChoiceIndex = 0 | 1 | 2 | 3;
 type PlayerRole = 'guest' | 'host';
 
 const COUNTDOWN_MS = 3_000;
@@ -27,6 +33,64 @@ const MAX_QUESTIONS = 10;
 
 export const REPLAY_TRIVIA_QUESTION_READ_MS = 2_900;
 export const REPLAY_TRIVIA_ANSWER_TIME_MS = 9_000;
+
+const ReplayTriviaChoiceSchema = z.union([
+  z.literal(0),
+  z.literal(1),
+  z.literal(2),
+  z.literal(3)
+]);
+const ReplayTriviaChoicesSchema = z.tuple([
+  z.string().min(1),
+  z.string().min(1),
+  z.string().min(1),
+  z.string().min(1)
+]);
+const ReplayTriviaStoredQuestionLocalizationSchema = z.strictObject({
+  choices: ReplayTriviaChoicesSchema,
+  friendIntro: z.string().min(1),
+  languageCode: z.string().regex(/^[a-zA-Z]{2,3}(?:[-_][a-zA-Z0-9]{2,8})?$/),
+  prompt: z.string().min(1),
+  rightReply: z.string().min(1),
+  wrongReply: z.string().min(1)
+});
+const ReplayTriviaStoredQuestionSchema = z.strictObject({
+  choices: ReplayTriviaChoicesSchema,
+  correctChoiceIndex: ReplayTriviaChoiceSchema,
+  friendIntro: z.string().min(1),
+  id: z.string().min(1),
+  localizations: z.array(ReplayTriviaStoredQuestionLocalizationSchema),
+  prompt: z.string().min(1),
+  rightReply: z.string().min(1),
+  wrongReply: z.string().min(1)
+});
+const ReplayTriviaGameRecordSchema = z.strictObject({
+  answers: z.record(z.string(), ReplayTriviaChoiceSchema.nullable().optional()),
+  currentQuestionIndex: z.number().int().nonnegative(),
+  gameId: z.string().min(1),
+  gameType: z.literal('replay-trivia'),
+  gameVersion: z.literal(PLAYGROUND_GAME_VERSIONS['replay-trivia']),
+  phaseStartedAt: z.number().int().nonnegative(),
+  players: z.strictObject({
+    guest: z.string().min(1),
+    host: z.string().min(1)
+  }),
+  questionProviderUserId: z.string().min(1),
+  questions: z.array(ReplayTriviaStoredQuestionSchema).max(MAX_QUESTIONS),
+  scoredQuestionIndexes: z.array(z.number().int().nonnegative()).max(MAX_QUESTIONS),
+  scores: z.strictObject({
+    guest: z.number().int().nonnegative(),
+    host: z.number().int().nonnegative()
+  }),
+  status: z.enum(['preparing', 'countdown', 'question', 'reveal', 'score', 'finished'])
+});
+
+type ChoiceIndex = z.infer<typeof ReplayTriviaChoiceSchema>;
+type ReplayTriviaStoredQuestionLocalization = z.infer<
+  typeof ReplayTriviaStoredQuestionLocalizationSchema
+>;
+export type ReplayTriviaStoredQuestion = z.infer<typeof ReplayTriviaStoredQuestionSchema>;
+export type ReplayTriviaGameRecord = z.infer<typeof ReplayTriviaGameRecordSchema>;
 
 export interface PublicReplayTriviaGame extends PublicGame {
   answers: Partial<Record<PlayerRole, ReplayTriviaPublicAnswer>>;
@@ -42,39 +106,6 @@ export interface PublicReplayTriviaGame extends PublicGame {
   winnerUserId?: string | null;
 }
 
-interface ReplayTriviaStoredQuestion {
-  choices: [string, string, string, string];
-  correctChoiceIndex: ChoiceIndex;
-  friendIntro: string;
-  id: string;
-  localizations: ReplayTriviaStoredQuestionLocalization[];
-  prompt: string;
-  rightReply: string;
-  wrongReply: string;
-}
-
-interface ReplayTriviaStoredQuestionLocalization {
-  choices: [string, string, string, string];
-  friendIntro: string;
-  languageCode: string;
-  prompt: string;
-  rightReply: string;
-  wrongReply: string;
-}
-
-interface ReplayTriviaGameRecord extends GameRecord {
-  answers: Record<string, ChoiceIndex | null | undefined>;
-  currentQuestionIndex: number;
-  gameType: 'replay-trivia';
-  phaseStartedAt: number;
-  players: Record<PlayerRole, string>;
-  questionProviderUserId: string;
-  questions: ReplayTriviaStoredQuestion[];
-  scores: Record<PlayerRole, number>;
-  scoredQuestionIndexes: number[];
-  status: ReplayTriviaGameStatus;
-}
-
 export const replayTriviaGameModule: GameModule = {
   applyAction(game, input) {
     const triviaGame = assertReplayTriviaGame(game);
@@ -82,11 +113,11 @@ export const replayTriviaGameModule: GameModule = {
       case 'submitQuestions':
         return submitReplayTriviaQuestions(triviaGame, input);
       case 'advance':
-        return advanceReplayTriviaGame(triviaGame);
+        return advanceReplayTriviaGame(triviaGame, input);
       case 'answer':
         return answerReplayTriviaQuestion(triviaGame, input);
       case 'timeout':
-        return timeoutReplayTriviaQuestion(triviaGame);
+        return timeoutReplayTriviaQuestion(triviaGame, input);
       default:
         throw new ProtocolError('unsupported_action', 'Unsupported Replay Trivia action.');
     }
@@ -121,6 +152,9 @@ export const replayTriviaGameModule: GameModule = {
   isTerminal(game) {
     return assertReplayTriviaGame(game).status === 'finished';
   },
+  isStoredGameRecord(value): value is ReplayTriviaGameRecord {
+    return ReplayTriviaGameRecordSchema.safeParse(value).success;
+  },
   toPublicGame(game, getUser, context) {
     return toPublicReplayTriviaGame(assertReplayTriviaGame(game), getUser, context);
   },
@@ -140,6 +174,7 @@ export function createReplayTriviaGame(
     currentQuestionIndex: 0,
     gameId,
     gameType: 'replay-trivia',
+    gameVersion: PLAYGROUND_GAME_VERSIONS['replay-trivia'],
     phaseStartedAt: now,
     players: {
       guest: guestUserId,
@@ -187,10 +222,11 @@ export function answerReplayTriviaQuestion(
   input: GameActionInput,
   now = Date.now()
 ): ReplayTriviaGameRecord {
+  assertExpectedReplayTriviaPhase(game, input);
   if (game.status !== 'question') throw new ProtocolError('not_answering', 'This round is not accepting answers.');
-  if (isQuestionDeadlinePassed(game, now)) return revealReplayTriviaRound(game, now);
 
   const role = getRequiredReplayTriviaPlayerRole(game, input.userId);
+  if (isQuestionDeadlinePassed(game, now)) return revealReplayTriviaRound(game, now);
   if (game.answers[input.userId] !== undefined) {
     throw new ProtocolError('answer_locked', 'Your answer is already locked.');
   }
@@ -211,8 +247,10 @@ export function answerReplayTriviaQuestion(
 
 export function timeoutReplayTriviaQuestion(
   game: ReplayTriviaGameRecord,
+  input: GameActionInput,
   now = Date.now()
 ): ReplayTriviaGameRecord {
+  assertExpectedReplayTriviaPhase(game, input);
   if (game.status !== 'question') return game;
   if (!isQuestionDeadlinePassed(game, now)) {
     throw new ProtocolError('answer_time_remaining', 'This round still has answer time remaining.');
@@ -223,8 +261,10 @@ export function timeoutReplayTriviaQuestion(
 
 export function advanceReplayTriviaGame(
   game: ReplayTriviaGameRecord,
+  input: GameActionInput,
   now = Date.now()
 ): ReplayTriviaGameRecord {
+  assertExpectedReplayTriviaPhase(game, input);
   switch (game.status) {
     case 'countdown':
       if (now - game.phaseStartedAt < COUNTDOWN_MS) {
@@ -267,6 +307,25 @@ export function advanceReplayTriviaGame(
       return game;
     default:
       throw new ProtocolError('cannot_advance', 'Replay Trivia cannot advance from this phase.');
+  }
+}
+
+function assertExpectedReplayTriviaPhase(
+  game: ReplayTriviaGameRecord,
+  input: GameActionInput
+): void {
+  const expectedPhaseStartedAt = parseReplayTriviaExpectedPhaseStartedAt(input.payload);
+  if (expectedPhaseStartedAt === null) {
+    throw new ProtocolError(
+      'invalid_action_context',
+      'Replay Trivia actions must identify their phase.'
+    );
+  }
+  if (expectedPhaseStartedAt !== game.phaseStartedAt) {
+    throw new ProtocolError(
+      'stale_action',
+      'This Replay Trivia action belongs to an earlier question or phase.'
+    );
   }
 }
 
@@ -370,7 +429,15 @@ function parseQuestionPack(value: unknown): ReplayTriviaStoredQuestion[] {
     throw new ProtocolError('too_many_questions', `At most ${MAX_QUESTIONS} Replay Trivia questions are allowed.`);
   }
 
-  return value.map(parseQuestion);
+  const questions = value.map(parseQuestion);
+  const questionIds = new Set(questions.map((question) => question.id));
+  if (questionIds.size !== questions.length) {
+    throw new ProtocolError(
+      'duplicate_question_id',
+      'Replay Trivia question IDs must be unique.'
+    );
+  }
+  return questions;
 }
 
 function parseQuestion(value: unknown): ReplayTriviaStoredQuestion {
@@ -481,7 +548,7 @@ function getLocalizedQuestionText(
 ): ReplayTriviaStoredQuestionLocalization | ReplayTriviaStoredQuestion {
   if (!language) return question;
 
-  const localizations = Array.isArray(question.localizations) ? question.localizations : [];
+  const localizations = question.localizations;
   const preferredCodes = [
     language.locale,
     language.languageCode,

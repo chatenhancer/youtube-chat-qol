@@ -2,6 +2,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { StreamRoom } from './stream-room';
 import { GAME_STATE_DEFERRED_PERSIST_MS } from './game-state';
 import type { PublicChessGame } from '../../games/chess';
+import type { PublicBountyHuntingGame } from '../../games/bounty-hunting';
+import {
+  BOUNTY_HUNTING_COUNTDOWN_MS,
+  BOUNTY_HUNTING_MISS_COOLDOWN_MS
+} from '../../../../../src/shared/playground/bounty-hunting';
 import {
   createChallenge,
   createSignaturePayload,
@@ -13,10 +18,12 @@ import {
   CHESS_COMPUTER_PLAYER_PROFILES
 } from '../../features/computer-player/profiles';
 import {
+  PLAYGROUND_GAME_VERSIONS,
   PLAYGROUND_PROTOCOL_VERSION,
   type ClientMessage,
   type GameId,
   type LobbySnapshot,
+  type PlaygroundGameVersions,
   type ServerMessage,
   type SignedClientIdentity
 } from '../../protocol/messages';
@@ -28,6 +35,7 @@ interface TestSession {
   challenge: string;
   connectionId: string;
   displayName: string;
+  gameVersions: PlaygroundGameVersions;
   joinedAt: number;
   rateLimit: TokenBucket;
   socket: FakeSocket;
@@ -69,9 +77,14 @@ class FakeSocket {
 
 class FakeDurableObjectStorage {
   private readonly records = new Map<string, unknown>();
+  private putCalls = 0;
 
   async deleteAll(): Promise<void> {
     this.records.clear();
+  }
+
+  getPutCallCount(): number {
+    return this.putCalls;
   }
 
   async get<T = unknown>(key: string): Promise<T | undefined> {
@@ -79,6 +92,7 @@ class FakeDurableObjectStorage {
   }
 
   async put<T = unknown>(key: string, value: T): Promise<void> {
+    this.putCalls += 1;
     this.records.set(key, cloneStoredValue(value));
   }
 }
@@ -319,11 +333,12 @@ describe('playground stream room', () => {
     ));
   });
 
-  it('uses the built-in Computer players for presence and games', async () => {
+  it('starts built-in Computer games without advertising the inviter as available', async () => {
     const { room, state } = createRoomHarness();
     const alice = createSession('alice-connection');
 
-    await room.handleHello(alice, await createHello(alice.challenge, 'Alice', ['chess']));
+    await room.handleHello(alice, await createHello(alice.challenge, 'Alice', []));
+    expect(alice.availableGames).toEqual(new Set());
     const chessComputerUsers = room.createSnapshot(alice.userId).users
       .filter((user) => user.userId !== alice.userId && user.availableGames.includes('chess'));
     expect(chessComputerUsers.map((user) => user.displayName)).toEqual(
@@ -439,6 +454,24 @@ describe('playground stream room', () => {
     expect(room.createSnapshot(bob.userId).games).toHaveLength(0);
   });
 
+  it('reports an unavailable sender when accepting an invite after they disconnect', async () => {
+    const room = createRoom();
+    const alice = createSession('alice-connection');
+    const bob = createSession('bob-connection');
+
+    await room.handleHello(alice, await createHello(alice.challenge, 'Alice', ['chess']));
+    await room.handleHello(bob, await createHello(bob.challenge, 'Bob', ['chess']));
+    room.handleInvite(alice, 'chess', bob.userId);
+    const inviteId = lastMessage(bob, 'inviteReceived').invite.inviteId;
+
+    room.removeClient(alice.connectionId);
+
+    expect(() => room.handleInviteResponse(bob, inviteId, true)).toThrowError(new ProtocolError(
+      'user_unavailable',
+      'That player is not available for this game.'
+    ));
+  });
+
   it('keeps active games resumable when a player disconnects', async () => {
     const room = createRoom();
     const alice = createSession('alice-connection');
@@ -456,7 +489,7 @@ describe('playground stream room', () => {
     expect(room.createSnapshot(alice.userId).games.map((game) => game.gameId)).toEqual([gameId]);
   });
 
-  it('records completed game wins by user and game type', async () => {
+  it('records completed human-versus-human wins by user and game type', async () => {
     const storage = new FakeDurableObjectStorage();
     const { playerStats, room, state } = createRoomHarness(storage);
     const alice = createSession('alice-connection');
@@ -485,6 +518,53 @@ describe('playground stream room', () => {
     }));
   });
 
+  it('does not allow resignation to rewrite a checkmate or record a second chess win', async () => {
+    const storage = new FakeDurableObjectStorage();
+    const { playerStats, room, state } = createRoomHarness(storage);
+    const alice = createSession('alice-connection');
+    const bob = createSession('bob-connection');
+
+    await room.handleHello(alice, await createHello(alice.challenge, 'Alice', ['chess']));
+    await room.handleHello(bob, await createHello(bob.challenge, 'Bob', ['chess']));
+    room.handleInvite(alice, 'chess', bob.userId);
+    room.handleInviteResponse(bob, lastMessage(bob, 'inviteReceived').invite.inviteId, true);
+    const gameId = lastMessage(alice, 'gameStarted').game.gameId;
+
+    room.handleGameAction(alice, gameId, {
+      action: 'move',
+      payload: { from: 'f2', to: 'f3' },
+      userId: alice.userId
+    });
+    room.handleGameAction(bob, gameId, {
+      action: 'move',
+      payload: { from: 'e7', to: 'e5' },
+      userId: bob.userId
+    });
+    room.handleGameAction(alice, gameId, {
+      action: 'move',
+      payload: { from: 'g2', to: 'g4' },
+      userId: alice.userId
+    });
+    room.handleGameAction(bob, gameId, {
+      action: 'move',
+      payload: { from: 'd8', to: 'h4' },
+      userId: bob.userId
+    });
+    await state.flushWaitUntil();
+
+    expect(() => room.handleGameAction(bob, gameId, {
+      action: 'resign',
+      userId: bob.userId
+    })).toThrowError(new ProtocolError(
+      'game_finished',
+      'This chess game is already finished.'
+    ));
+    await state.flushWaitUntil();
+
+    expect(playerStats.getWins(alice.userId, 'chess')).toBe(0);
+    expect(playerStats.getWins(bob.userId, 'chess')).toBe(1);
+  });
+
   it('skips global win stats for built-in Computer players', async () => {
     const storage = new FakeDurableObjectStorage();
     const { playerStats, room, state } = createRoomHarness(storage);
@@ -510,6 +590,40 @@ describe('playground stream room', () => {
       service: 'chat-enhancer-playground'
     }));
     expect(console.warn).not.toHaveBeenCalledWith('[playground] game_win_record_failed', expect.anything());
+  });
+
+  it('also skips a human win when the game includes a built-in Computer player', async () => {
+    const storage = new FakeDurableObjectStorage();
+    const { playerStats, room, state } = createRoomHarness(storage);
+    const alice = createSession('alice-connection');
+
+    await room.handleHello(alice, await createHello(alice.challenge, 'Alice', ['chess']));
+    room.handleInvite(alice, 'chess', CHESS_COMPUTER_PLAYER_CLUB_PROFILE.userId);
+    await state.flushWaitUntil();
+    const gameId = lastMessage(alice, 'gameStarted').game.gameId;
+    const computer = {
+      ...alice,
+      connectionId: 'computer-connection',
+      userId: CHESS_COMPUTER_PLAYER_CLUB_PROFILE.userId
+    };
+
+    room.handleGameAction(computer, gameId, {
+      action: 'resign',
+      userId: computer.userId
+    });
+
+    await state.flushWaitUntil();
+
+    expect(playerStats.getWins(alice.userId, 'chess')).toBe(0);
+    expect(console.info).toHaveBeenCalledWith('[playground] game_win_record_skipped', expect.objectContaining({
+      event: 'game_win_record_skipped',
+      gameType: 'chess',
+      reason: 'computerPlayer',
+      service: 'chat-enhancer-playground'
+    }));
+    expect(console.info).not.toHaveBeenCalledWith('[playground] game_win_recorded', expect.objectContaining({
+      gameType: 'chess'
+    }));
   });
 
   it('restores active games from Durable Object storage after restart', async () => {
@@ -556,6 +670,252 @@ describe('playground stream room', () => {
       to: 'e4'
     });
     expect(updatedChessGame.lastMoveSan).toBe('e4');
+  });
+
+  it('keeps Bounty Hunting miss cooldowns recipient-private and skips blocked no-op updates', async () => {
+    const now = 100_000;
+    const dateNow = vi.spyOn(Date, 'now').mockReturnValue(now);
+    const storage = new FakeDurableObjectStorage();
+    const first = createRoomHarness(storage);
+    const alice = createSession('alice-connection');
+    const bob = createSession('bob-connection');
+    const aliceKeyPair = await createIdentityKeyPair();
+    const bobKeyPair = await createIdentityKeyPair();
+
+    await first.room.handleHello(
+      alice,
+      await createHello(alice.challenge, 'Alice', ['bounty-hunting'], aliceKeyPair)
+    );
+    await first.room.handleHello(
+      bob,
+      await createHello(bob.challenge, 'Bob', ['bounty-hunting'], bobKeyPair)
+    );
+    first.room.handleInvite(alice, 'bounty-hunting', bob.userId);
+    first.room.handleInviteResponse(bob, lastMessage(bob, 'inviteReceived').invite.inviteId, true);
+    const gameId = lastMessage(alice, 'gameStarted').game.gameId;
+
+    first.room.handleGameAction(alice, gameId, {
+      action: 'submitBounties',
+      payload: { bounties: createBountyHuntingBounties() },
+      userId: alice.userId
+    });
+    first.room.handleGameAction(alice, gameId, {
+      action: 'ready',
+      userId: alice.userId
+    });
+    first.room.handleGameAction(bob, gameId, {
+      action: 'ready',
+      userId: bob.userId
+    });
+
+    dateNow.mockReturnValue(now + BOUNTY_HUNTING_COUNTDOWN_MS);
+    first.room.handleGameAction(alice, gameId, {
+      action: 'startRound',
+      userId: alice.userId
+    });
+
+    const missedAt = now + BOUNTY_HUNTING_COUNTDOWN_MS + 250;
+    const missCooldownUntil = missedAt + BOUNTY_HUNTING_MISS_COOLDOWN_MS;
+    dateNow.mockReturnValue(missedAt);
+    first.room.handleGameAction(alice, gameId, {
+      action: 'shootBounty',
+      payload: createBountyHuntingShotPayload('message-with-no-bounty-witness'),
+      userId: alice.userId
+    });
+
+    expect(lastMessage(alice, 'gameUpdated').game).toMatchObject({
+      gameId,
+      missCooldownUntil
+    });
+    expect(lastMessage(bob, 'gameUpdated').game).not.toHaveProperty('missCooldownUntil');
+
+    await first.state.flushWaitUntil();
+    expect(await getStoredGame(storage, gameId)).toMatchObject({
+      missCooldownUntilByRole: {
+        host: missCooldownUntil
+      }
+    });
+
+    const persistedWriteCount = storage.getPutCallCount();
+    const aliceMessageCount = alice.socket.messages.length;
+    const bobMessageCount = bob.socket.messages.length;
+    first.room.handleGameAction(alice, gameId, {
+      action: 'shootBounty',
+      payload: createBountyHuntingShotPayload('another-message-during-cooldown'),
+      userId: alice.userId
+    });
+    await first.state.flushWaitUntil();
+
+    expect(storage.getPutCallCount()).toBe(persistedWriteCount);
+    expect(alice.socket.messages).toHaveLength(aliceMessageCount);
+    expect(bob.socket.messages).toHaveLength(bobMessageCount);
+
+    const restarted = createRoomHarness(storage);
+    await restarted.state.flushWaitUntil();
+    const reconnectedAlice = createSession('alice-reconnected');
+    const reconnectedBob = createSession('bob-reconnected');
+    await restarted.room.handleHello(
+      reconnectedAlice,
+      await createHello(reconnectedAlice.challenge, 'Alice', ['bounty-hunting'], aliceKeyPair)
+    );
+    await restarted.room.handleHello(
+      reconnectedBob,
+      await createHello(reconnectedBob.challenge, 'Bob', ['bounty-hunting'], bobKeyPair)
+    );
+
+    expect(reconnectedAlice.userId).toBe(alice.userId);
+    expect(reconnectedBob.userId).toBe(bob.userId);
+    const restoredAliceGame = (
+      lastMessage(reconnectedAlice, 'helloAccepted').snapshot.games[0]
+    ) as PublicBountyHuntingGame;
+    const restoredBobGame = (
+      lastMessage(reconnectedBob, 'helloAccepted').snapshot.games[0]
+    ) as PublicBountyHuntingGame;
+    expect(restoredAliceGame).toMatchObject({
+      gameId,
+      missCooldownUntil
+    });
+    expect(restoredBobGame).not.toHaveProperty('missCooldownUntil');
+  });
+
+  it('restores pending Bounty Hunting claims and resolves them after delayed peer confirmation', async () => {
+    const now = 100_000;
+    const dateNow = vi.spyOn(Date, 'now').mockReturnValue(now);
+    const storage = new FakeDurableObjectStorage();
+    const first = createRoomHarness(storage);
+    const alice = createSession('alice-connection');
+    const bob = createSession('bob-connection');
+    const aliceKeyPair = await createIdentityKeyPair();
+    const bobKeyPair = await createIdentityKeyPair();
+
+    await first.room.handleHello(
+      alice,
+      await createHello(alice.challenge, 'Alice', ['bounty-hunting'], aliceKeyPair)
+    );
+    await first.room.handleHello(
+      bob,
+      await createHello(bob.challenge, 'Bob', ['bounty-hunting'], bobKeyPair)
+    );
+    first.room.handleInvite(alice, 'bounty-hunting', bob.userId);
+    first.room.handleInviteResponse(bob, lastMessage(bob, 'inviteReceived').invite.inviteId, true);
+    const gameId = lastMessage(alice, 'gameStarted').game.gameId;
+
+    first.room.handleGameAction(alice, gameId, {
+      action: 'submitBounties',
+      payload: { bounties: createBountyHuntingBounties() },
+      userId: alice.userId
+    });
+    first.room.handleGameAction(alice, gameId, {
+      action: 'ready',
+      userId: alice.userId
+    });
+    first.room.handleGameAction(bob, gameId, {
+      action: 'ready',
+      userId: bob.userId
+    });
+
+    const roundStartedAt = now + BOUNTY_HUNTING_COUNTDOWN_MS;
+    dateNow.mockReturnValue(roundStartedAt);
+    first.room.handleGameAction(alice, gameId, {
+      action: 'startRound',
+      userId: alice.userId
+    });
+
+    const shotAt = roundStartedAt + 250;
+    dateNow.mockReturnValue(shotAt);
+    first.room.handleGameAction(alice, gameId, {
+      action: 'observeBountyMessage',
+      payload: {
+        observations: [{
+          bountyIds: ['question'],
+          messageId: 'self-witnessed-message',
+          messageTimestampUsec: String(roundStartedAt * 1_000 + 1)
+        }]
+      },
+      userId: alice.userId
+    });
+    first.room.handleGameAction(alice, gameId, {
+      action: 'shootBounty',
+      payload: createBountyHuntingShotPayload('self-witnessed-message'),
+      userId: alice.userId
+    });
+    await first.state.flushWaitUntil();
+
+    expect(lastMessage(alice, 'gameUpdated').game).toMatchObject({
+      gameId,
+      pendingClaimMessageId: 'self-witnessed-message',
+      scores: { host: 0 }
+    });
+    expect(lastMessage(bob, 'gameUpdated').game).not.toHaveProperty('pendingClaimMessageId');
+    expect(await getStoredGame(storage, gameId)).toMatchObject({
+      pendingClaims: [expect.objectContaining({
+        messageId: 'self-witnessed-message'
+      })]
+    });
+
+    dateNow.mockReturnValue(shotAt + 5_000);
+    const restarted = createRoomHarness(storage);
+    await restarted.state.flushWaitUntil();
+    const reconnectedAlice = createSession('alice-reconnected');
+    const reconnectedBob = createSession('bob-reconnected');
+    await restarted.room.handleHello(
+      reconnectedAlice,
+      await createHello(
+        reconnectedAlice.challenge,
+        'Alice',
+        ['bounty-hunting'],
+        aliceKeyPair
+      )
+    );
+    await restarted.room.handleHello(
+      reconnectedBob,
+      await createHello(reconnectedBob.challenge, 'Bob', ['bounty-hunting'], bobKeyPair)
+    );
+
+    expect(reconnectedAlice.userId).toBe(alice.userId);
+    expect(reconnectedBob.userId).toBe(bob.userId);
+    expect(lastMessage(reconnectedAlice, 'helloAccepted').snapshot.games[0]).toMatchObject({
+      gameId,
+      pendingClaimMessageId: 'self-witnessed-message',
+      scores: { host: 0 }
+    });
+    expect(lastMessage(reconnectedBob, 'helloAccepted').snapshot.games[0]).not.toHaveProperty(
+      'pendingClaimMessageId'
+    );
+
+    dateNow.mockReturnValue(shotAt + 10_000);
+    restarted.room.handleGameAction(reconnectedBob, gameId, {
+      action: 'observeBountyMessage',
+      payload: {
+        observations: [{
+          bountyIds: ['question'],
+          messageId: 'self-witnessed-message',
+          messageTimestampUsec: String(roundStartedAt * 1_000 + 1)
+        }]
+      },
+      userId: reconnectedBob.userId
+    });
+    await restarted.state.flushWaitUntil();
+
+    expect(lastMessage(reconnectedAlice, 'gameUpdated').game).toMatchObject({
+      gameId,
+      scores: { host: 75 }
+    });
+    expect(lastMessage(reconnectedAlice, 'gameUpdated').game).not.toHaveProperty(
+      'pendingClaimMessageId'
+    );
+    expect(lastMessage(reconnectedBob, 'gameUpdated').game).toMatchObject({
+      gameId,
+      scores: { host: 75 }
+    });
+    expect(await getStoredGame(storage, gameId)).toMatchObject({
+      claims: [expect.objectContaining({
+        bountyId: 'question',
+        messageId: 'self-witnessed-message',
+        role: 'host'
+      })],
+      pendingClaims: []
+    });
   });
 
   it('defers storage writes for active Stick Around realtime updates', async () => {
@@ -634,7 +994,7 @@ describe('playground stream room', () => {
     }
   });
 
-  it('restores legacy Replay Trivia questions without localizations', async () => {
+  it('ignores stored Replay Trivia questions missing the current localization shape', async () => {
     const storage = new FakeDurableObjectStorage();
     const first = createRoomHarness(storage);
     const room = first.room;
@@ -684,13 +1044,7 @@ describe('playground stream room', () => {
       await createHello(reconnectedAlice.challenge, 'Alice', ['replay-trivia'], aliceKeyPair)
     );
 
-    const restoredGame = lastMessage(reconnectedAlice, 'helloAccepted').snapshot.games[0];
-    expect(restoredGame).toMatchObject({
-      currentQuestion: {
-        prompt: 'Which game won?'
-      },
-      gameId
-    });
+    expect(lastMessage(reconnectedAlice, 'helloAccepted').snapshot.games).toEqual([]);
     expect(console.error).not.toHaveBeenCalled();
   });
 
@@ -755,6 +1109,64 @@ describe('playground stream room', () => {
     });
     expect(room.createSnapshot(alice.userId).games).toHaveLength(0);
     expect(room.createSnapshot(bob.userId).games).toHaveLength(0);
+  });
+
+  it('rejects automatic game transitions from users outside the game', async () => {
+    const startedAt = 100_000;
+    const dateNow = vi.spyOn(Date, 'now').mockReturnValue(startedAt);
+    const room = createRoom();
+    const alice = createSession('alice-connection');
+    const bob = createSession('bob-connection');
+    const charlie = createSession('charlie-connection');
+    const games: GameId[] = ['bounty-hunting', 'replay-trivia'];
+
+    await room.handleHello(alice, await createHello(alice.challenge, 'Alice', games));
+    await room.handleHello(bob, await createHello(bob.challenge, 'Bob', games));
+    await room.handleHello(charlie, await createHello(charlie.challenge, 'Charlie', games));
+
+    room.handleInvite(alice, 'bounty-hunting', bob.userId);
+    room.handleInviteResponse(bob, lastMessage(bob, 'inviteReceived').invite.inviteId, true);
+    const bountyGameId = lastMessage(alice, 'gameStarted').game.gameId;
+    room.handleGameAction(alice, bountyGameId, {
+      action: 'submitBounties',
+      payload: { bounties: createBountyHuntingBounties() },
+      userId: alice.userId
+    });
+    room.handleGameAction(alice, bountyGameId, {
+      action: 'ready',
+      userId: alice.userId
+    });
+    room.handleGameAction(bob, bountyGameId, {
+      action: 'ready',
+      userId: bob.userId
+    });
+
+    room.handleInvite(alice, 'replay-trivia', bob.userId);
+    room.handleInviteResponse(bob, lastMessage(bob, 'inviteReceived').invite.inviteId, true);
+    const triviaGameId = lastMessage(alice, 'gameStarted').game.gameId;
+    room.handleGameAction(alice, triviaGameId, {
+      action: 'submitQuestions',
+      payload: { questions: [createReplayTriviaQuestion()] },
+      userId: alice.userId
+    });
+
+    dateNow.mockReturnValue(startedAt + BOUNTY_HUNTING_COUNTDOWN_MS);
+    expect(() => room.handleGameAction(charlie, bountyGameId, {
+      action: 'startRound',
+      userId: charlie.userId
+    })).toThrowError(new ProtocolError('not_in_game', 'You are not a player in this game.'));
+    expect(() => room.handleGameAction(charlie, triviaGameId, {
+      action: 'advance',
+      payload: {
+        expectedPhaseStartedAt: startedAt
+      },
+      userId: charlie.userId
+    })).toThrowError(new ProtocolError('not_in_game', 'You are not a player in this game.'));
+
+    expect(room.createSnapshot(alice.userId).games).toEqual(expect.arrayContaining([
+      expect.objectContaining({ gameId: bountyGameId, status: 'countdown' }),
+      expect.objectContaining({ gameId: triviaGameId, status: 'countdown' })
+    ]));
   });
 
   it('rejects self invites, unavailable players, and wrong-turn moves', async () => {
@@ -865,6 +1277,52 @@ describe('playground stream room', () => {
     })).toThrowError(new ProtocolError('not_in_game', 'You are not a player in this game.'));
   });
 
+  it('identifies the client action that caused a socket error', async () => {
+    const room = createRoom();
+    const alice = createSession('alice-connection');
+
+    await room.handleHello(alice, await createHello(alice.challenge, 'Alice', ['chess']));
+    await room.handleSocketMessage(alice, JSON.stringify({
+      gameId: 'chess',
+      toUserId: 'missing-user',
+      type: 'invite'
+    }));
+
+    expect(lastMessage(alice, 'error')).toEqual({
+      code: 'user_not_found',
+      message: 'That player is not connected.',
+      request: {
+        gameId: 'chess',
+        toUserId: 'missing-user',
+        type: 'invite'
+      },
+      type: 'error'
+    });
+
+    await room.handleSocketMessage(alice, JSON.stringify({
+      action: 'leave',
+      gameId: 'missing-game',
+      payload: {
+        expectedPhaseStartedAt: 1
+      },
+      type: 'gameAction'
+    }));
+
+    expect(lastMessage(alice, 'error')).toEqual({
+      code: 'game_not_found',
+      message: 'Game not found.',
+      request: {
+        action: 'leave',
+        gameId: 'missing-game',
+        payload: {
+          expectedPhaseStartedAt: 1
+        },
+        type: 'gameAction'
+      },
+      type: 'error'
+    });
+  });
+
   it('authenticates hello messages without advertised games through socket parsing', async () => {
     const room = createRoom();
     const session = createSession('alice-connection');
@@ -877,6 +1335,7 @@ describe('playground stream room', () => {
 
     expect(session.userId).not.toBe('');
     expect(session.availableGames.size).toBe(0);
+    expect(session.gameVersions).toEqual({});
     expect(lastMessage(session, 'helloAccepted').snapshot.users).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ userId: session.userId })
@@ -927,6 +1386,10 @@ describe('playground stream room', () => {
     expect(lastMessage(alice, 'error')).toEqual({
       code: 'internal_error',
       message: 'Something went wrong.',
+      request: {
+        id: 'ping-internal',
+        type: 'ping'
+      },
       type: 'error'
     });
     expect(console.error).toHaveBeenCalledWith('[playground] internal_error', expect.objectContaining({
@@ -961,6 +1424,10 @@ describe('playground stream room', () => {
     expect(lastMessage(session, 'error')).toEqual({
       code: 'hello_required',
       message: 'Send hello before other messages.',
+      request: {
+        id: 'ping-1',
+        type: 'ping'
+      },
       type: 'error'
     });
     expect(session.socket.closed).toBe(true);
@@ -996,6 +1463,10 @@ describe('playground stream room', () => {
     expect(lastMessage(alice, 'error')).toEqual({
       code: 'rate_limited',
       message: 'Slow down before sending more playground messages.',
+      request: {
+        id: 'ping-rate-limited',
+        type: 'ping'
+      },
       type: 'error'
     });
     expect(alice.socket.closed).toBe(false);
@@ -1038,6 +1509,11 @@ describe('playground stream room', () => {
     expect(lastMessage(aliceTwo, 'error')).toEqual({
       code: 'rate_limited',
       message: 'Slow down before sending more playground messages.',
+      request: {
+        gameId: 'chess',
+        toUserId: bob.userId,
+        type: 'invite'
+      },
       type: 'error'
     });
     expect(console.warn).toHaveBeenCalledWith('[playground] rate_limit_rejected', expect.objectContaining({
@@ -1049,7 +1525,7 @@ describe('playground stream room', () => {
     expect(lastMessage(bob, 'inviteReceived').invite.fromUser.userId).toBe(aliceOne.userId);
   });
 
-  it('uses the latest availability for the same user across multiple connections', async () => {
+  it('unions availability for the same user across multiple connections', async () => {
     const room = createRoom();
     const aliceOne = createSession('alice-connection-1');
     const aliceTwo = createSession('alice-connection-2');
@@ -1067,6 +1543,13 @@ describe('playground stream room', () => {
       type: 'setAvailability'
     }));
 
+    expect(getPresenceUser(room, bob.userId, aliceOne.userId)?.availableGames).toEqual(['chess']);
+
+    await room.handleSocketMessage(aliceOne, JSON.stringify({
+      availableGames: [],
+      type: 'setAvailability'
+    }));
+
     expect(getPresenceUser(room, bob.userId, aliceOne.userId)?.availableGames).toEqual([]);
     expect(() => room.handleInvite(bob, 'chess', aliceOne.userId)).toThrowError(new ProtocolError(
       'user_unavailable',
@@ -1074,11 +1557,141 @@ describe('playground stream room', () => {
     ));
   });
 
+  it('filters incompatible game availability and rejects incompatible invite senders', async () => {
+    const room = createRoom();
+    const legacy = createSession('legacy-connection');
+    const current = createSession('current-connection');
+
+    await room.handleHello(
+      legacy,
+      await createHello(legacy.challenge, 'Legacy', ['chess', 'bounty-hunting'], undefined, {})
+    );
+    await room.handleHello(
+      current,
+      await createHello(current.challenge, 'Current', ['bounty-hunting'])
+    );
+
+    expect(legacy.availableGames).toEqual(new Set(['chess']));
+    expect(getPresenceUser(room, current.userId, legacy.userId)?.availableGames).toEqual(['chess']);
+    expect(() => room.handleInvite(legacy, 'bounty-hunting', current.userId)).toThrowError(new ProtocolError(
+      'game_version',
+      'Chat Enhancer and Playground versions do not match for this game.'
+    ));
+
+    await room.handleSocketMessage(legacy, JSON.stringify({
+      availableGames: ['bounty-hunting'],
+      type: 'setAvailability'
+    }));
+    expect(legacy.availableGames).toEqual(new Set());
+  });
+
+  it('rejects an invite when a target loses their only compatible game session', async () => {
+    const room = createRoom();
+    const alice = createSession('alice-current');
+    const bobLegacy = createSession('bob-legacy');
+    const bobCurrent = createSession('bob-current');
+    const bobKeyPair = await createIdentityKeyPair();
+
+    await room.handleHello(
+      alice,
+      await createHello(alice.challenge, 'Alice', ['bounty-hunting'])
+    );
+    await room.handleHello(
+      bobLegacy,
+      await createHello(bobLegacy.challenge, 'Bob', ['bounty-hunting'], bobKeyPair, {})
+    );
+    await room.handleHello(
+      bobCurrent,
+      await createHello(bobCurrent.challenge, 'Bob', ['bounty-hunting'], bobKeyPair)
+    );
+
+    expect(bobLegacy.userId).toBe(bobCurrent.userId);
+    expect(getPresenceUser(room, alice.userId, bobCurrent.userId)?.availableGames).toEqual(['bounty-hunting']);
+
+    room.removeClient(bobCurrent.connectionId);
+
+    expect(getPresenceUser(room, alice.userId, bobCurrent.userId)?.availableGames).toEqual([]);
+    expect(() => room.handleInvite(alice, 'bounty-hunting', bobCurrent.userId)).toThrowError(new ProtocolError(
+      'user_unavailable',
+      'That player is not available for this game.'
+    ));
+  });
+
+  it('rejects incompatible invite acceptors and game actions while still allowing leave', async () => {
+    const room = createRoom();
+    const alice = createSession('alice-current');
+    const bobLegacy = createSession('bob-legacy');
+    const bobCurrent = createSession('bob-current');
+    const aliceKeyPair = await createIdentityKeyPair();
+    const bobKeyPair = await createIdentityKeyPair();
+
+    await room.handleHello(alice, await createHello(
+      alice.challenge,
+      'Alice',
+      ['bounty-hunting'],
+      aliceKeyPair
+    ));
+    await room.handleHello(bobLegacy, await createHello(
+      bobLegacy.challenge,
+      'Bob',
+      ['bounty-hunting'],
+      bobKeyPair,
+      {}
+    ));
+    await room.handleHello(bobCurrent, await createHello(
+      bobCurrent.challenge,
+      'Bob',
+      ['bounty-hunting'],
+      bobKeyPair
+    ));
+
+    room.handleInvite(alice, 'bounty-hunting', bobCurrent.userId);
+    const inviteId = lastMessage(bobLegacy, 'inviteReceived').invite.inviteId;
+    expect(() => room.handleInviteResponse(bobLegacy, inviteId, true)).toThrowError(new ProtocolError(
+      'game_version',
+      'Chat Enhancer and Playground versions do not match for this game.'
+    ));
+
+    await room.handleSocketMessage(alice, JSON.stringify({
+      availableGames: [],
+      type: 'setAvailability'
+    }));
+    room.handleInviteResponse(bobCurrent, inviteId, true);
+    const gameId = lastMessage(alice, 'gameStarted').game.gameId;
+    const aliceLegacy = createSession('alice-legacy');
+    await room.handleHello(aliceLegacy, await createHello(
+      aliceLegacy.challenge,
+      'Alice',
+      [],
+      aliceKeyPair,
+      {}
+    ));
+
+    expect(() => room.handleGameAction(aliceLegacy, gameId, {
+      action: 'ready',
+      userId: aliceLegacy.userId
+    })).toThrowError(new ProtocolError(
+      'game_version',
+      'Chat Enhancer and Playground versions do not match for this game.'
+    ));
+
+    room.handleGameAction(aliceLegacy, gameId, {
+      action: 'leave',
+      userId: aliceLegacy.userId
+    });
+    expect(lastMessage(bobCurrent, 'gameEnded')).toMatchObject({
+      gameId,
+      reason: 'playerLeft',
+      userId: aliceLegacy.userId
+    });
+  });
+
   it('serves snapshots and rejects non-WebSocket socket requests through fetch', async () => {
     const room = createRoom();
 
     const snapshotResponse = await room.fetch(new Request('https://playground.chatenhancer.com/snapshot?streamKey=stream-a'));
-    await expect(snapshotResponse.json()).resolves.toMatchObject({
+    const snapshotBody = await snapshotResponse.json() as LobbySnapshot;
+    expect(snapshotBody).toMatchObject({
       games: [],
       invites: [],
       users: expect.arrayContaining([
@@ -1091,6 +1704,9 @@ describe('playground stream room', () => {
           userId: 'server:computer:chess:club'
         })
       ])
+    });
+    expect(snapshotBody.users.find((user) => user.userId === 'server:computer:bounty-hunting')).toMatchObject({
+      availableGames: ['bounty-hunting']
     });
 
     const socketResponse = await room.fetch(new Request('https://playground.chatenhancer.com/socket?streamKey=stream-a'));
@@ -1349,12 +1965,66 @@ function getStoredStickAroundFrame(game: Record<string, unknown>): number {
   return frame;
 }
 
+function createBountyHuntingBounties() {
+  return [
+    {
+      amount: 50,
+      description: 'a message that has 3+ emojis',
+      id: 'emoji-3',
+      matcher: { kind: 'emojiCount', min: 3 }
+    },
+    {
+      amount: 50,
+      description: 'a message in all caps',
+      id: 'all-caps',
+      matcher: { kind: 'allCaps' }
+    },
+    {
+      amount: 75,
+      description: 'a message that asks a question',
+      id: 'question',
+      matcher: { kind: 'question' }
+    },
+    {
+      amount: 125,
+      description: 'a message that mentions a user',
+      id: 'mention-user',
+      matcher: { kind: 'mention' }
+    },
+    {
+      amount: 75,
+      description: 'a message with a number',
+      id: 'has-number',
+      matcher: { kind: 'number' }
+    },
+    {
+      amount: 100,
+      description: 'a message from a top fan',
+      id: 'top-chatters',
+      matcher: { kind: 'topFanAuthor' }
+    }
+  ];
+}
+
+function createReplayTriviaQuestion() {
+  return {
+    choices: ['God of War', 'Celeste', 'Monster Hunter', 'Red Dead Redemption 2'],
+    correctChoiceIndex: 0,
+    friendIntro: 'chat emergency',
+    id: 'q_1',
+    prompt: 'Which game won?',
+    rightReply: 'nice save.',
+    wrongReply: 'you missed it. it was God of War.'
+  };
+}
+
 function createSession(connectionId: string): TestSession {
   return {
     availableGames: new Set(),
     challenge: createChallenge(),
     connectionId,
     displayName: 'Player',
+    gameVersions: {},
     joinedAt: Date.now(),
     rateLimit: new TokenBucket({
       capacity: 30,
@@ -1379,14 +2049,23 @@ function consumeGenerationToken(room: PrivateStreamRoom, gameId: string, generat
   }));
 }
 
+function createBountyHuntingShotPayload(messageId: string): Record<string, unknown> {
+  return {
+    messageId,
+    observations: [{ bountyIds: [], messageId }]
+  };
+}
+
 async function createHello(
   challenge: string,
   _displayName: string,
   availableGames: GameId[],
-  keyPair?: CryptoKeyPair
+  keyPair?: CryptoKeyPair,
+  gameVersions: PlaygroundGameVersions = PLAYGROUND_GAME_VERSIONS
 ): Promise<Extract<ClientMessage, { type: 'hello' }>> {
   return {
     availableGames,
+    gameVersions: { ...gameVersions },
     identity: await createSignedIdentity(challenge, keyPair),
     protocolVersion: PLAYGROUND_PROTOCOL_VERSION,
     type: 'hello'

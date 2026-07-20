@@ -72,9 +72,9 @@ function findBountyHuntingRoundStartPlacement(runtime: BountyHuntingPanelRuntime
   for (const message of getBountyHuntingChatMessages()) {
     const eligibility = getBountyHuntingMessageEligibility(runtime, message);
     if (eligibility === null) continue;
-    if (!eligibility) {
+    if (!eligibility && !firstAfter) {
+      // YouTube can append older rows later, so never move past an eligible message.
       anchor = message;
-      firstAfter = null;
     } else if (!firstAfter) {
       firstAfter = message;
     }
@@ -103,7 +103,7 @@ function getBountyHuntingMessageEligibility(
 ): boolean | null {
   const messageId = getMessageStableId(message);
   const timestampUsec = messageId
-    ? runtime.chatFeed?.getMessage(messageId)?.messageTimestampUsec || ''
+    ? runtime.clientSession.getMessage(messageId)?.messageTimestampUsec || ''
     : '';
   return getBountyHuntingTimestampEligibility(runtime, timestampUsec);
 }

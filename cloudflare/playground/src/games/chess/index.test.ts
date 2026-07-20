@@ -112,6 +112,18 @@ describe('playground chess game rules', () => {
     expect(() => resignChessGame(game, 'spectator-user')).toThrowError(new ProtocolError('not_in_game', 'You are not a player in this game.'));
   });
 
+  it('rejects resigning after a chess game has already ended', () => {
+    const game = resignChessGame(
+      createChessGame('game-1', 'white-user', 'black-user'),
+      'white-user'
+    );
+
+    expect(() => resignChessGame(game, 'black-user')).toThrowError(new ProtocolError(
+      'game_finished',
+      'This chess game is already finished.'
+    ));
+  });
+
   it('serializes public chess game state with public user identities', () => {
     const game = applyChessMove(createChessGame('game-1', 'white-user', 'black-user'), {
       from: 'e2',

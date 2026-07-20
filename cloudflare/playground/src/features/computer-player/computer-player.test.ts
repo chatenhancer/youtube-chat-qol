@@ -9,10 +9,10 @@ import {
 } from './profiles';
 import { applyChessMove, createChessGame, toPublicChessGame, type ChessGameRecord } from '../../games/chess';
 import {
-  claimBountyHuntingBounty,
   createBountyHuntingGame,
   observeBountyHuntingMessage,
   readyBountyHuntingPlayer,
+  shootBountyHuntingMessage,
   startBountyHuntingRound,
   submitBountyHunting,
   toPublicBountyHuntingGame
@@ -223,16 +223,6 @@ describe('in-room computer player', () => {
     game = readyBountyHuntingPlayer(game, harness.player.userId, 2_000);
     game = readyBountyHuntingPlayer(game, 'human-user', 2_000);
     game = startBountyHuntingRound(game, 5_000);
-    game = claimBountyHuntingBounty(game, {
-      action: 'claimBounty',
-      payload: {
-        bountyId: 'question',
-        messageId: 'msg-question-1',
-        messageTimestampUsec: '5000001'
-      },
-      userId: 'human-user'
-    }, 6_050);
-    expect(game.scores.host).toBe(0);
     game = observeBountyHuntingMessage(game, {
       action: 'observeBountyMessage',
       payload: {
@@ -250,7 +240,20 @@ describe('in-room computer player', () => {
         ]
       },
       userId: 'human-user'
-    }, 6_100);
+    }, 6_040);
+    game = shootBountyHuntingMessage(game, {
+      action: 'shootBounty',
+      payload: {
+        messageId: 'msg-question-1',
+        observations: [{
+          bountyIds: ['question'],
+          messageId: 'msg-question-1',
+          messageTimestampUsec: '5000001'
+        }]
+      },
+      userId: 'human-user'
+    }, 6_050);
+    expect(game.scores.host).toBe(0);
     harness.games.set(game.gameId, game);
     vi.setSystemTime(6_100);
 
@@ -304,12 +307,15 @@ describe('in-room computer player', () => {
     await harness.flushWaitUntil();
 
     expect(harness.sentMessages.at(-1)).toEqual({
-      action: 'claimBounty',
+      action: 'shootBounty',
       gameId: 'game_bounty_1',
       payload: {
-        bountyId: 'verified',
         messageId: 'msg-verified-1',
-        messageTimestampUsec: '5000002'
+        observations: [{
+          bountyIds: ['verified'],
+          messageId: 'msg-verified-1',
+          messageTimestampUsec: '5000002'
+        }]
       },
       type: 'gameAction'
     });
@@ -385,12 +391,15 @@ describe('in-room computer player', () => {
     await harness.flushWaitUntil();
 
     expect(harness.sentMessages.at(-1)).toEqual({
-      action: 'claimBounty',
+      action: 'shootBounty',
       gameId: 'game_bounty_1',
       payload: {
-        bountyId: 'question',
         messageId: 'msg-question-1',
-        messageTimestampUsec: '5000001'
+        observations: [{
+          bountyIds: ['question'],
+          messageId: 'msg-question-1',
+          messageTimestampUsec: '5000001'
+        }]
       },
       type: 'gameAction'
     });

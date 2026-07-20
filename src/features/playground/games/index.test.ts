@@ -3,6 +3,7 @@ import { DEFAULT_OPTIONS } from '../../../shared/options';
 import type { LobbySnapshot, PlaygroundBackgroundMessage, PublicGame } from '../../../shared/playground/protocol';
 import type { PublicStickAroundGame } from '../../../shared/playground/stick-around';
 import { setOptions } from '../../../shared/state';
+import { clearToast } from '../../../shared/toast';
 import {
   handleFeatureMutations,
   handleFeatureOptionsChanged
@@ -52,6 +53,7 @@ describe('playground games header button', () => {
 
   afterEach(() => {
     cleanupStaleGamesUi();
+    clearToast();
     vi.useRealTimers();
     delete (chrome.runtime as Partial<typeof chrome.runtime>).connect;
   });
@@ -218,30 +220,51 @@ describe('playground games header button', () => {
     expect(document.querySelector('.ytcq-profile-card-subtitle')?.textContent).toBe('No players online');
     expect(document.querySelector('.ytcq-games-availability')?.getAttribute('aria-checked')).toBe('false');
     expect(document.querySelector('.ytcq-games-availability-toggle .ytcq-menu-toggle')).not.toBeNull();
-    expect(getGamesSectionTitles()).toEqual(['Start a game']);
+    expect(getGamesSectionTitles()).toEqual(['Start a game', 'Unavailable games']);
     expect(document.querySelector('.ytcq-games-invite-row')).toBeNull();
     expect(document.querySelector('.ytcq-games-section-empty')).toBeNull();
     expect(getGameCards()).toHaveLength(4);
+    const unavailableGames = document.querySelector<HTMLDetailsElement>(
+      '.ytcq-games-unavailable-section'
+    )!;
+    expect(unavailableGames.open).toBe(false);
+    expect(getGameLabels(unavailableGames)).toEqual(['HELP-A-FRIEND! Trivia']);
+    unavailableGames.querySelector<HTMLElement>('summary')!.click();
+    expect(unavailableGames.open).toBe(true);
     expect(document.querySelector('.ytcq-games-preview-chess .ytcq-games-preview-canvas')).not.toBeNull();
     expect(document.querySelector('.ytcq-games-preview-bounty-hunting .ytcq-games-preview-canvas')).not.toBeNull();
     expect(document.querySelector('.ytcq-games-preview-replay-trivia .ytcq-games-preview-canvas')).not.toBeNull();
     expect(document.querySelector('.ytcq-games-preview-stick-around .ytcq-games-preview-canvas')).not.toBeNull();
-    expect(getGameLabels()).toEqual(['Chess', 'The Wild Wild Chat', 'HELP-A-FRIEND! Trivia', 'Stick Around!']);
+    expect(getGameLabels()).toEqual(['Chess', 'The Wild Wild Chat', 'Stick Around!', 'HELP-A-FRIEND! Trivia']);
     expect(getGameCardHelpers()).toEqual([
       'Classic chess, three difficulty levels.',
       'Time to take care of some bounties.',
-      'Do you have the knowledge?',
-      "It's raining bubbles."
+      "It's raining bubbles.",
+      'Do you have the knowledge?'
     ]);
-    expect(getGameCards()[0].getAttribute('aria-disabled')).toBe('false');
-    expect(getGameCards()[1].getAttribute('aria-disabled')).toBe('false');
-    expect(getGameCards()[2].getAttribute('aria-disabled')).toBe('true');
-    expect(getGameCards()[2].title).toBe('Can only be played during a live replay (a stream that has already ended).');
-    expect(getGameCards()[3].getAttribute('aria-disabled')).toBe('false');
-    getGameCards()[2].click();
+    expect(getGameCard('Chess').getAttribute('aria-disabled')).toBe('false');
+    expect(getGameCard('The Wild Wild Chat').getAttribute('aria-disabled')).toBe('false');
+    expect(getGameCard('HELP-A-FRIEND! Trivia').getAttribute('aria-disabled')).toBe('true');
+    expect(getGameCard('HELP-A-FRIEND! Trivia').title).toBe(
+      'Can only be played during a live replay (a stream that has already ended).'
+    );
+    expect(getGameCard('HELP-A-FRIEND! Trivia').getAttribute('aria-label')).toContain(
+      'Can only be played during a live replay (a stream that has already ended).'
+    );
+    const replayBadge = getGameCard('HELP-A-FRIEND! Trivia')
+      .querySelector<HTMLElement>('.ytcq-games-context-badge');
+    expect(replayBadge?.textContent).toBe('Replay only');
+    expect(replayBadge?.parentElement?.classList).toContain('ytcq-games-preview');
+    expect(replayBadge?.title).toBe('');
+    expect(getGameCard('The Wild Wild Chat').querySelector('.ytcq-games-restriction-badge')).toBeNull();
+    expect(getGameCard('The Wild Wild Chat').getAttribute('aria-label')).not.toContain('Can only be played');
+    expect(getGameCard('Stick Around!').getAttribute('aria-disabled')).toBe('false');
+    expect(getGameCard('Stick Around!').querySelector('.ytcq-games-restriction-badge')).toBeNull();
+    expect(getGameCard('Stick Around!').getAttribute('aria-label')).not.toContain('Can only be played');
+    getGameCard('HELP-A-FRIEND! Trivia').click();
     expect(document.querySelector('.ytcq-profile-card-title')?.textContent).toBe('Games');
 
-    getGameCards()[0].click();
+    getGameCard('Chess').click();
     expect(document.querySelector('.ytcq-profile-card-title')?.textContent).toBe('Chess');
     expect(document.querySelector('.ytcq-profile-card-subtitle')?.textContent).toBe('Invite a player');
     expect(getGamesSectionTitles()).toEqual(['Players']);
@@ -256,6 +279,316 @@ describe('playground games header button', () => {
 
     expect(button.getAttribute('aria-expanded')).toBe('false');
     expect(document.querySelector('.ytcq-games-card')).toBeNull();
+  });
+
+  it('keeps incompatible games visible with a disabled update badge and tooltip', () => {
+    const header = createHeader();
+    document.body.append(header);
+    setOptions({ ...DEFAULT_OPTIONS, playgroundEnabled: true, playgroundGamesAvailable: true });
+
+    wireGamesButton();
+    header.querySelector<HTMLButtonElement>('.ytcq-games-button')!.click();
+    lastMockPort()?.emit({
+      ...createSnapshotMessage(createLobbySnapshot()),
+      incompatibleGames: ['bounty-hunting']
+    });
+
+    const cards = getGameCards();
+    const bountyCard = getGameCard('The Wild Wild Chat');
+    expect(cards).toHaveLength(4);
+    expect(getGameCard('Chess').getAttribute('aria-disabled')).toBe('false');
+    expect(bountyCard.getAttribute('aria-disabled')).toBe('true');
+    expect(bountyCard.title).toBe(
+      'The Wild Wild Chat is temporarily unavailable because Chat Enhancer and Playground versions do not match. Try again when the versions match.'
+    );
+    const badge = bountyCard.querySelector<HTMLElement>('.ytcq-games-version-badge');
+    expect(badge?.classList).toContain('ytcq-games-restriction-badge');
+    expect(badge?.textContent).toBe('Update required');
+    expect(badge?.parentElement?.classList).toContain('ytcq-games-preview');
+    expect(badge?.title).toBe('');
+    expect(badge?.querySelector('svg')).not.toBeNull();
+    expect(document.querySelector('.ytcq-games-version-notice')).toBeNull();
+
+    bountyCard.click();
+    expect(document.querySelector('.ytcq-profile-card-title')?.textContent).toBe('Games');
+    getGameCard('Chess').click();
+    expect(document.querySelector('.ytcq-profile-card-title')?.textContent).toBe('Chess');
+  });
+
+  it('offers a leave-only row for an incompatible active game without mounting its UI', () => {
+    const header = createHeader();
+    document.body.append(header);
+    setOptions({ ...DEFAULT_OPTIONS, playgroundEnabled: true, playgroundGamesAvailable: true });
+
+    wireGamesButton();
+    const gamesButton = header.querySelector<HTMLButtonElement>('.ytcq-games-button')!;
+    gamesButton.click();
+    lastMockPort()?.emit({
+      ...createSnapshotMessage({
+        ...createLobbySnapshot(),
+        games: [],
+        invites: []
+      }),
+      incompatibleActiveGames: [{
+        gameId: 'incompatible-bounty-game',
+        gameType: 'bounty-hunting'
+      }],
+      incompatibleGames: ['bounty-hunting']
+    });
+
+    const row = document.querySelector<HTMLElement>('.ytcq-games-incompatible-active-row');
+    expect(row?.textContent).toContain('The Wild Wild Chat');
+    expect(row?.textContent).toContain(
+      'Update required. Chat Enhancer and Playground versions do not match.'
+    );
+    expect(row?.querySelectorAll('button')).toHaveLength(1);
+    expect(row?.querySelector('button')?.textContent).toBe('Leave');
+    expect(document.querySelector('.ytcq-bounty-hunting-game-panel')).toBeNull();
+    expect(document.querySelector('.ytcq-bounty-hunting-canvas')).toBeNull();
+    expect(gamesButton.querySelector('.ytcq-games-badge')?.textContent).toBe('1');
+
+    row?.querySelector<HTMLButtonElement>('button')?.click();
+
+    expect(
+      document.querySelector<HTMLButtonElement>('.ytcq-games-incompatible-active-row button')
+        ?.hasAttribute('disabled')
+    ).toBe(true);
+    expect(lastMockPort()?.messages.at(-1)).toEqual({
+      action: 'leave',
+      gameId: 'incompatible-bounty-game',
+      payload: undefined,
+      type: 'ytcq:playground:game-action'
+    });
+
+    lastMockPort()?.emit({
+      message: {
+        gameId: 'incompatible-bounty-game',
+        reason: 'playerLeft',
+        type: 'gameEnded',
+        userId: 'me-user'
+      },
+      type: 'ytcq:playground:server-message'
+    });
+    expect(document.querySelector('.ytcq-games-incompatible-active-row')).toBeNull();
+  });
+
+  it('suppresses version errors and shows generic action errors in a global toast', () => {
+    const header = createHeader();
+    document.body.append(header);
+    setOptions({ ...DEFAULT_OPTIONS, playgroundEnabled: true, playgroundGamesAvailable: true });
+
+    wireGamesButton();
+    header.querySelector<HTMLButtonElement>('.ytcq-games-button')!.click();
+    lastMockPort()?.emit(createSnapshotMessage(createLobbySnapshot()));
+    lastMockPort()?.emit({
+      code: 'game_version',
+      message: 'This game needs matching Chat Enhancer and Playground versions.',
+      type: 'ytcq:playground:error'
+    });
+
+    expect(document.querySelector('.ytcq-toast')).toBeNull();
+
+    lastMockPort()?.emit({
+      code: 'bad_action',
+      message: 'That action is no longer available.',
+      type: 'ytcq:playground:error'
+    });
+
+    const alert = document.querySelector<HTMLElement>('.ytcq-toast');
+    expect(alert?.getAttribute('role')).toBe('alert');
+    expect(alert?.dataset.tone).toBe('error');
+    expect(alert?.textContent).toBe('That action is no longer available.');
+    expect(document.querySelector('.ytcq-games-connection-notice')).toBeNull();
+    expect(document.querySelector('.ytcq-games-action-error')).toBeNull();
+    expect(getGameCards()).toHaveLength(4);
+
+    document.querySelector<HTMLButtonElement>('.ytcq-games-availability')?.click();
+    expect(document.querySelector('.ytcq-toast')?.textContent).toBe(
+      'That action is no longer available.'
+    );
+
+    vi.advanceTimersByTime(4_000);
+
+    lastMockPort()?.emit({
+      code: 'bad_action',
+      message: 'That action is still unavailable.',
+      type: 'ytcq:playground:error'
+    });
+    expect(document.querySelector('.ytcq-toast')?.textContent).toBe(
+      'That action is still unavailable.'
+    );
+    lastMockPort()?.emit({
+      message: {
+        game: createChessGame(),
+        type: 'gameUpdated'
+      },
+      type: 'ytcq:playground:server-message'
+    });
+    expect(document.querySelector('.ytcq-toast')?.textContent).toBe(
+      'That action is still unavailable.'
+    );
+
+    vi.advanceTimersByTime(1_000);
+    expect(document.querySelector('.ytcq-toast')?.textContent).toBe(
+      'That action is still unavailable.'
+    );
+
+    vi.advanceTimersByTime(3_999);
+    expect(document.querySelector('.ytcq-toast')?.textContent).toBe(
+      'That action is still unavailable.'
+    );
+
+    vi.advanceTimersByTime(1);
+    expect(document.querySelector('.ytcq-toast')).toBeNull();
+  });
+
+  it('does not clear unrelated optimistic lobby state for a generic action error', () => {
+    const header = createHeader();
+    document.body.append(header);
+    setOptions({ ...DEFAULT_OPTIONS, playgroundEnabled: true, playgroundGamesAvailable: true });
+
+    wireGamesButton();
+    header.querySelector<HTMLButtonElement>('.ytcq-games-button')!.click();
+    lastMockPort()?.emit(createSnapshotMessage(createLobbySnapshot()));
+    getGameCard('Chess').click();
+    getActionButton('Invite').click();
+
+    expect(document.querySelector('.ytcq-games-player-row')?.textContent).toContain('Waiting for reply...');
+
+    lastMockPort()?.emit({
+      code: 'bad_action',
+      message: 'That action is no longer available.',
+      type: 'ytcq:playground:error'
+    });
+
+    expect(document.querySelector('.ytcq-toast')?.textContent).toBe(
+      'That action is no longer available.'
+    );
+    expect(document.querySelector('.ytcq-games-player-row')?.textContent).toContain(
+      'Waiting for reply...'
+    );
+  });
+
+  it('clears only the invite spinner matched by a correlated action error', () => {
+    const header = createHeader();
+    document.body.append(header);
+    setOptions({ ...DEFAULT_OPTIONS, playgroundEnabled: true, playgroundGamesAvailable: true });
+
+    wireGamesButton();
+    header.querySelector<HTMLButtonElement>('.ytcq-games-button')!.click();
+    lastMockPort()?.emit(createSnapshotMessage(createLobbySnapshot()));
+    getGameCard('Chess').click();
+    getActionButton('Invite').click();
+
+    expect(document.querySelector('.ytcq-games-player-row')?.textContent).toContain(
+      'Waiting for reply...'
+    );
+
+    lastMockPort()?.emit({
+      code: 'user_unavailable',
+      message: 'That player is not available for this game.',
+      request: {
+        gameId: 'chess',
+        toUserId: 'other-user',
+        type: 'invite'
+      },
+      type: 'ytcq:playground:error'
+    } as PlaygroundBackgroundMessage);
+    expect(document.querySelector('.ytcq-games-player-row')?.textContent).toContain(
+      'Waiting for reply...'
+    );
+
+    lastMockPort()?.emit({
+      code: 'game_version',
+      message: 'Chat Enhancer and Playground versions do not match for this game.',
+      request: {
+        gameId: 'chess',
+        toUserId: 'luna-user',
+        type: 'invite'
+      },
+      type: 'ytcq:playground:error'
+    } as PlaygroundBackgroundMessage);
+
+    expect(document.querySelector('.ytcq-games-player-row')?.textContent).toContain('Available now');
+    expect(getActionButton('Invite')).not.toBeNull();
+    expect(document.querySelector('.ytcq-toast')?.textContent).toBe(
+      'That player is not available for this game.'
+    );
+
+    lastMockPort()?.emit({
+      message: {
+        game: createChessGame(),
+        type: 'gameStarted'
+      },
+      type: 'ytcq:playground:server-message'
+    });
+    expect(document.querySelector('.ytcq-chess-game-panel')).toBeNull();
+    expect(document.querySelector('.ytcq-games-card')).not.toBeNull();
+  });
+
+  it('keeps auto-open queued when an older same-game invite fails', () => {
+    const header = createHeader();
+    document.body.append(header);
+    setOptions({ ...DEFAULT_OPTIONS, playgroundEnabled: true, playgroundGamesAvailable: true });
+
+    wireGamesButton();
+    header.querySelector<HTMLButtonElement>('.ytcq-games-button')!.click();
+    lastMockPort()?.emit(createSnapshotMessage(createLobbySnapshot()));
+    getGameCard('Chess').click();
+    getActionButton('Invite').click();
+
+    lastMockPort()?.emit({
+      code: 'user_unavailable',
+      message: 'That player is not available for this game.',
+      request: {
+        gameId: 'chess',
+        toUserId: 'other-user',
+        type: 'invite'
+      },
+      type: 'ytcq:playground:error'
+    });
+    lastMockPort()?.emit({
+      message: {
+        game: createChessGame(),
+        type: 'gameStarted'
+      },
+      type: 'ytcq:playground:server-message'
+    });
+
+    expect(document.querySelector('.ytcq-chess-game-panel')).not.toBeNull();
+    expect(document.querySelector('.ytcq-games-card')).toBeNull();
+  });
+
+  it('cancels pending auto-open only for a failed accepted invite response', () => {
+    const header = createHeader();
+    document.body.append(header);
+    setOptions({ ...DEFAULT_OPTIONS, playgroundEnabled: true, playgroundGamesAvailable: true });
+
+    wireGamesButton();
+    header.querySelector<HTMLButtonElement>('.ytcq-games-button')!.click();
+    lastMockPort()?.emit(createSnapshotMessage(createLobbySnapshot()));
+    getActionButton('Accept').click();
+
+    lastMockPort()?.emit({
+      code: 'not_your_invite',
+      message: 'That invite is not for you.',
+      request: {
+        accept: true,
+        inviteId: 'invite-1',
+        type: 'respondInvite'
+      },
+      type: 'ytcq:playground:error'
+    } as PlaygroundBackgroundMessage);
+    lastMockPort()?.emit({
+      message: {
+        game: createChessGame(),
+        type: 'gameStarted'
+      },
+      type: 'ytcq:playground:server-message'
+    });
+
+    expect(document.querySelector('.ytcq-chess-game-panel')).toBeNull();
+    expect(document.querySelector('.ytcq-games-card')).not.toBeNull();
   });
 
   it('shows pending invite and active game counts on the header button', async () => {
@@ -368,18 +701,61 @@ describe('playground games header button', () => {
       streamKey: 'stream-a',
       type: 'ytcq:playground:init'
     });
-    expect(getGameCards()[1].getAttribute('aria-disabled')).toBe('true');
-    expect(getGameCards()[1].title).toBe('Can only be played during live chat.');
-    expect(getGameCards()[2].getAttribute('aria-disabled')).toBe('false');
-    expect(getGameCards()[2].title).toBe('');
-    expect(getGameCards()[3].getAttribute('aria-disabled')).toBe('true');
-    expect(getGameCards()[3].title).toBe('Can only be played during live chat.');
+    const bountyCard = getGameCard('The Wild Wild Chat');
+    const replayCard = getGameCard('HELP-A-FRIEND! Trivia');
+    const stickAroundCard = getGameCard('Stick Around!');
+    expect(bountyCard.getAttribute('aria-disabled')).toBe('true');
+    expect(bountyCard.title).toBe('Can only be played during live chat.');
+    expect(bountyCard.querySelector('.ytcq-games-context-badge')?.textContent)
+      .toBe('Livestream only');
+    expect(bountyCard.querySelector<HTMLElement>('.ytcq-games-context-badge')?.title).toBe('');
+    expect(replayCard.getAttribute('aria-disabled')).toBe('false');
+    expect(replayCard.title).toBe('');
+    expect(replayCard.querySelector('.ytcq-games-restriction-badge')).toBeNull();
+    expect(stickAroundCard.getAttribute('aria-disabled')).toBe('true');
+    expect(stickAroundCard.title).toBe('Can only be played during live chat.');
+    expect(stickAroundCard.querySelector('.ytcq-games-context-badge')?.textContent)
+      .toBe('Livestream only');
+    expect(stickAroundCard.querySelector<HTMLElement>('.ytcq-games-context-badge')?.title).toBe('');
     expect(getGameCardHelpers()).toEqual([
       'Classic chess, three difficulty levels.',
-      'Time to take care of some bounties.',
       'Do you have the knowledge?',
+      'Time to take care of some bounties.',
       "It's raining bubbles."
     ]);
+  });
+
+  it('prioritizes context restrictions over version mismatches with one badge per card', () => {
+    window.history.replaceState({}, '', '/live_chat_replay?video_id=stream-a');
+    const header = createHeader();
+    document.body.append(header);
+    setOptions({ ...DEFAULT_OPTIONS, playgroundEnabled: true, playgroundGamesAvailable: true });
+
+    wireGamesButton();
+    header.querySelector<HTMLButtonElement>('.ytcq-games-button')!.click();
+    lastMockPort()?.emit({
+      ...createSnapshotMessage(createLobbySnapshot()),
+      incompatibleGames: ['bounty-hunting', 'replay-trivia']
+    });
+
+    const bountyCard = getGameCard('The Wild Wild Chat');
+    expect(bountyCard.querySelectorAll('.ytcq-games-restriction-badge')).toHaveLength(1);
+    expect(bountyCard.querySelector('.ytcq-games-context-badge')?.textContent)
+      .toBe('Livestream only');
+    expect(bountyCard.querySelector('.ytcq-games-version-badge')).toBeNull();
+    expect(bountyCard.getAttribute('aria-label')).toContain('Can only be played during live chat.');
+    expect(bountyCard.getAttribute('aria-label')).not.toContain('temporarily unavailable');
+
+    const replayCard = getGameCard('HELP-A-FRIEND! Trivia');
+    expect(replayCard.querySelectorAll('.ytcq-games-restriction-badge')).toHaveLength(1);
+    expect(replayCard.querySelector('.ytcq-games-context-badge')).toBeNull();
+    expect(replayCard.querySelector('.ytcq-games-version-badge')?.textContent)
+      .toBe('Update required');
+    expect(replayCard.title).toContain(
+      'HELP-A-FRIEND! Trivia is temporarily unavailable because Chat Enhancer and Playground versions do not match.'
+    );
+    expect(replayCard.querySelector<HTMLElement>('.ytcq-games-version-badge')?.title).toBe('');
+    expect(replayCard.getAttribute('aria-disabled')).toBe('true');
   });
 
   it('offers replay trivia through the normal invite flow', () => {
@@ -392,8 +768,8 @@ describe('playground games header button', () => {
     header.querySelector<HTMLButtonElement>('.ytcq-games-button')!.click();
     lastMockPort()?.emit(createSnapshotMessage(createLobbySnapshot()));
 
-    expect(getGameLabels()).toEqual(['Chess', 'The Wild Wild Chat', 'HELP-A-FRIEND! Trivia', 'Stick Around!']);
-    getGameCards()[2].click();
+    expect(getGameLabels()).toEqual(['Chess', 'HELP-A-FRIEND! Trivia', 'The Wild Wild Chat', 'Stick Around!']);
+    getGameCard('HELP-A-FRIEND! Trivia').click();
 
     expect(document.querySelector('.ytcq-profile-card-title')?.textContent).toBe('HELP-A-FRIEND! Trivia');
     expect(document.querySelectorAll('.ytcq-games-player-row')).toHaveLength(2);
@@ -432,7 +808,7 @@ describe('playground games header button', () => {
 
     expect(document.querySelector('.ytcq-profile-card-subtitle')?.textContent).toBe('No players online');
 
-    getGameCards()[0].click();
+    getGameCard('Chess').click();
     expect(getPlayerNames()).toEqual([
       'Computer (Beginner)',
       'Computer (Club)',
@@ -455,7 +831,7 @@ describe('playground games header button', () => {
       invites: []
     }));
 
-    getGameCards()[2].click();
+    getGameCard('HELP-A-FRIEND! Trivia').click();
     getActionButton('Invite').click();
     expect(lastMockPort()?.messages.at(-1)).toMatchObject({
       gameId: 'replay-trivia',
@@ -497,6 +873,38 @@ describe('playground games header button', () => {
     expect(document.querySelector('.ytcq-games-active-row')?.textContent).toContain('Luna Chat');
   });
 
+  it('keeps another active game panel open when leaving the selected game', () => {
+    window.history.replaceState({}, '', '/live_chat_replay?video_id=stream-a');
+    const header = createHeader();
+    document.body.append(header);
+    setOptions({ ...DEFAULT_OPTIONS, playgroundEnabled: true, playgroundGamesAvailable: true });
+
+    wireGamesButton();
+    const gamesButton = header.querySelector<HTMLButtonElement>('.ytcq-games-button')!;
+    gamesButton.click();
+    lastMockPort()?.emit(createSnapshotMessage({
+      ...createLobbySnapshot(),
+      games: [createChessGame(), createReplayTriviaGame()],
+      invites: []
+    }));
+
+    document.querySelector<HTMLButtonElement>('.ytcq-games-cycle-action-next')!.click();
+    getActionButton('Resume').click();
+    expect(document.querySelector('.ytcq-replay-trivia-game-panel')).not.toBeNull();
+
+    gamesButton.click();
+    expect(document.querySelector('.ytcq-games-active-row')?.textContent).toContain('Chess');
+    getActionButton('Leave').click();
+
+    expect(document.querySelector('.ytcq-replay-trivia-game-panel')).not.toBeNull();
+    expect(lastMockPort()?.messages.at(-1)).toEqual({
+      action: 'leave',
+      gameId: 'game-1',
+      payload: undefined,
+      type: 'ytcq:playground:game-action'
+    });
+  });
+
   it('does not offer duplicate active game invites for the same player', () => {
     window.history.replaceState({}, '', '/live_chat_replay?video_id=stream-a');
     const header = createHeader();
@@ -511,11 +919,11 @@ describe('playground games header button', () => {
       invites: []
     }));
 
-    getGameCards()[0].click();
+    getGameCard('Chess').click();
     expect(getPlayerNames()).toEqual(['Marco Vibes']);
 
     getDetailCancelButton().click();
-    getGameCards()[2].click();
+    getGameCard('HELP-A-FRIEND! Trivia').click();
     expect(getPlayerNames()).toEqual(['Luna Chat', 'Marco Vibes']);
   });
 
@@ -573,7 +981,7 @@ describe('playground games header button', () => {
     expect(canvas?.getAttribute('aria-label')).toBe('Chess');
 
     gamesButton.click();
-    expect(getGamesSectionTitles()).toEqual(['Active games', 'Start a game']);
+    expect(getGamesSectionTitles()).toEqual(['Active games', 'Start a game', 'Unavailable games']);
     expect(document.querySelector('.ytcq-games-active-row')?.textContent).toContain('Chess');
     expect(document.querySelector('.ytcq-games-active-row')?.textContent).toContain('Luna Chat');
     expect(document.querySelector('.ytcq-games-invite-row')).toBeNull();
@@ -608,6 +1016,31 @@ describe('playground games header button', () => {
       type: 'ytcq:playground:game-action'
     });
     lastMockPort()?.emit({
+      code: 'not_in_game',
+      message: 'You are not a player in this game.',
+      request: {
+        action: 'leave',
+        gameId: 'other-game',
+        type: 'gameAction'
+      },
+      type: 'ytcq:playground:error'
+    } as PlaygroundBackgroundMessage);
+    expect(getActionButton('Leave').disabled).toBe(true);
+
+    lastMockPort()?.emit({
+      code: 'not_in_game',
+      message: 'You are not a player in this game.',
+      request: {
+        action: 'leave',
+        gameId: 'game-1',
+        type: 'gameAction'
+      },
+      type: 'ytcq:playground:error'
+    } as PlaygroundBackgroundMessage);
+    expect(getActionButton('Leave').disabled).toBe(false);
+    expect(getActionButton('Leave').querySelector('.ytcq-games-loading-spinner')).toBeNull();
+
+    lastMockPort()?.emit({
       message: {
         gameId: 'game-1',
         reason: 'playerLeft',
@@ -616,7 +1049,7 @@ describe('playground games header button', () => {
       },
       type: 'ytcq:playground:server-message'
     });
-    getGameCards()[0].click();
+    getGameCard('Chess').click();
 
     expect(document.querySelector('.ytcq-profile-card-title')?.textContent).toBe('Chess');
     expect(document.querySelector('.ytcq-profile-card-subtitle')?.textContent).toBe('Invite a player');
@@ -637,7 +1070,7 @@ describe('playground games header button', () => {
     expect(document.querySelector('.ytcq-profile-card-title')?.textContent).toBe('Games');
     expect(document.querySelector('.ytcq-profile-card-subtitle')?.textContent).toBe('2 players online');
 
-    getGameCards()[0].click();
+    getGameCard('Chess').click();
     expect(document.querySelector('.ytcq-games-player-row')?.textContent).toContain('Waiting for reply...');
     expect(getActionButton('Cancel')).not.toBeNull();
     expect(lastMockPort()?.messages.filter((message) =>
@@ -1122,7 +1555,7 @@ describe('playground games header button', () => {
     header.querySelector<HTMLButtonElement>('.ytcq-games-button')!.click();
     lastMockPort()?.emit(createSnapshotMessage(createLobbySnapshot()));
 
-    getGameCards()[0].click();
+    getGameCard('Chess').click();
     expect(document.querySelector('.ytcq-profile-card-title')?.textContent).toBe('Chess');
     expect(document.querySelector('.ytcq-profile-card-subtitle')?.textContent).toBe('Invite a player');
 
@@ -1164,13 +1597,16 @@ describe('playground games header button', () => {
     stalePanel.className = 'ytcq-game-panel ytcq-chess-game-panel';
     const staleAnimationGhost = document.createElement('section');
     staleAnimationGhost.className = 'ytcq-game-overlay ytcq-game-minimize-ghost';
-    document.body.append(staleCard, stalePanel, staleAnimationGhost);
+    const staleMissFeedback = document.createElement('div');
+    staleMissFeedback.className = 'ytcq-bounty-hunting-miss-feedback';
+    document.body.append(staleCard, stalePanel, staleAnimationGhost, staleMissFeedback);
 
     cleanupStaleGamesUi();
 
     expect(document.querySelector('.ytcq-games-card')).toBeNull();
     expect(document.querySelector('.ytcq-game-panel')).toBeNull();
     expect(document.querySelector('.ytcq-game-minimize-ghost')).toBeNull();
+    expect(document.querySelector('.ytcq-bounty-hunting-miss-feedback')).toBeNull();
   });
 
   it('keeps the active games card positioned and closes it from an outside click listener', async () => {
@@ -1370,7 +1806,7 @@ describe('playground games header button', () => {
       type: 'ytcq:playground:respond-invite'
     });
 
-    getGameCards()[0].click();
+    getGameCard('Chess').click();
     getActionButton('Invite').click();
     expect(document.querySelector('.ytcq-games-player-row')?.textContent).toContain('Waiting for reply...');
     getActionButton('Cancel').click();
@@ -1384,32 +1820,78 @@ describe('playground games header button', () => {
     expect(getActionButton('Invite')).not.toBeNull();
   });
 
-  it('shows and cancels server-backed outgoing invites in the player list', () => {
+  it('hands an optimistic invite spinner over to the server invite lifecycle', () => {
+    const header = createHeader();
+    document.body.append(header);
+    setOptions({ ...DEFAULT_OPTIONS, playgroundEnabled: true, playgroundGamesAvailable: true });
+    wireGamesButton();
+    header.querySelector<HTMLButtonElement>('.ytcq-games-button')!.click();
+    lastMockPort()?.emit(createSnapshotMessage(createLobbySnapshot()));
+
+    getGameCard('Chess').click();
+    getActionButton('Invite').click();
+    const outgoingInvite = {
+      ...createLobbySnapshot().invites[0],
+      fromUser: {
+        displayName: 'Me',
+        userId: 'me-user'
+      },
+      inviteId: 'invite-out-1',
+      toUser: {
+        displayName: 'Luna Chat',
+        userId: 'luna-user'
+      }
+    };
+    lastMockPort()?.emit({
+      message: {
+        invite: outgoingInvite,
+        type: 'inviteCreated'
+      },
+      type: 'ytcq:playground:server-message'
+    });
+    expect(document.querySelector('.ytcq-games-player-row')?.textContent).toContain(
+      'Waiting for reply...'
+    );
+
+    lastMockPort()?.emit({
+      message: {
+        invite: {
+          ...outgoingInvite,
+          status: 'ignored'
+        },
+        type: 'inviteUpdated'
+      },
+      type: 'ytcq:playground:server-message'
+    });
+
+    expect(document.querySelector('.ytcq-games-player-row')?.textContent).toContain('Available now');
+  });
+
+  it('waits for the server to confirm outgoing invite cancellations', () => {
     const header = createHeader();
     document.body.append(header);
     setOptions({ ...DEFAULT_OPTIONS, playgroundEnabled: true, playgroundGamesAvailable: true });
     wireGamesButton();
     header.querySelector<HTMLButtonElement>('.ytcq-games-button')!.click();
     const incomingInvite = createLobbySnapshot().invites[0];
+    const outgoingInvite = {
+      ...incomingInvite,
+      fromUser: {
+        displayName: 'Me',
+        userId: 'me-user'
+      },
+      inviteId: 'invite-out-1',
+      toUser: {
+        displayName: 'Luna Chat',
+        userId: 'luna-user'
+      }
+    };
     lastMockPort()?.emit(createSnapshotMessage({
       ...createLobbySnapshot(),
-      invites: [
-        {
-          ...incomingInvite,
-          fromUser: {
-            displayName: 'Me',
-            userId: 'me-user'
-          },
-          inviteId: 'invite-out-1',
-          toUser: {
-            displayName: 'Luna Chat',
-            userId: 'luna-user'
-          }
-        }
-      ]
+      invites: [outgoingInvite]
     }));
 
-    getGameCards()[0].click();
+    getGameCard('Chess').click();
     expect(document.querySelector('.ytcq-games-player-row')?.textContent).toContain('Waiting for reply...');
     getActionButton('Cancel').click();
 
@@ -1418,6 +1900,21 @@ describe('playground games header button', () => {
       toUserId: 'luna-user',
       type: 'ytcq:playground:cancel-invite'
     });
+    expect(document.querySelector('.ytcq-games-player-row')?.textContent).toContain(
+      'Waiting for reply...'
+    );
+
+    lastMockPort()?.emit({
+      message: {
+        invite: {
+          ...outgoingInvite,
+          status: 'cancelled'
+        },
+        type: 'inviteUpdated'
+      },
+      type: 'ytcq:playground:server-message'
+    });
+
     expect(document.querySelector('.ytcq-games-player-row')?.textContent).toContain('Available now');
     expect(getActionButton('Invite')).not.toBeNull();
   });
@@ -1501,8 +1998,12 @@ function createCurrentUserInput({
   return input;
 }
 
-function createSnapshotMessage(snapshot: LobbySnapshot): PlaygroundBackgroundMessage {
+function createSnapshotMessage(
+  snapshot: LobbySnapshot
+): Extract<PlaygroundBackgroundMessage, { type: 'ytcq:playground:snapshot' }> {
   return {
+    incompatibleActiveGames: [],
+    incompatibleGames: [],
     snapshot,
     type: 'ytcq:playground:snapshot',
     userId: 'me-user'
@@ -1766,8 +2267,16 @@ function getGameCards(): HTMLButtonElement[] {
   return Array.from(document.querySelectorAll<HTMLButtonElement>('.ytcq-games-game-card'));
 }
 
-function getGameLabels(): string[] {
-  return Array.from(document.querySelectorAll<HTMLElement>('.ytcq-games-game-label'))
+function getGameCard(label: string): HTMLButtonElement {
+  const card = getGameCards().find((candidate) =>
+    candidate.querySelector('.ytcq-games-game-label')?.textContent === label
+  );
+  if (!card) throw new Error(`Missing game card: ${label}`);
+  return card;
+}
+
+function getGameLabels(root: ParentNode = document): string[] {
+  return Array.from(root.querySelectorAll<HTMLElement>('.ytcq-games-game-label'))
     .map((label) => label.textContent || '');
 }
 

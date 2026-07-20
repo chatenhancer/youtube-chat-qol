@@ -47,9 +47,28 @@ export const playgroundChessInviteAndMoveScenario: BrowserScenario = async ({ ch
     await expect(card.locator('.ytcq-profile-card-subtitle')).toHaveText('2 players online');
     await expect(card.locator('.ytcq-games-availability')).toHaveAttribute('aria-checked', 'true');
     await expect(card.locator('.ytcq-games-availability-toggle')).toBeVisible();
-    await expect(card.locator('.ytcq-games-game-label')).toHaveText(['Chess', 'The Wild Wild Chat', 'HELP-A-FRIEND! Trivia', 'Stick Around!']);
+    await expect(card.locator('.ytcq-games-game-label')).toHaveText([
+      'Chess',
+      'The Wild Wild Chat',
+      'Stick Around!',
+      'HELP-A-FRIEND! Trivia'
+    ]);
     await expect(getGameCard(card, 'The Wild Wild Chat')).toHaveAttribute('aria-disabled', 'false');
-    await expect(getGameCard(card, 'HELP-A-FRIEND! Trivia')).toHaveAttribute('aria-disabled', 'true');
+    const replayTriviaCard = getGameCard(card, 'HELP-A-FRIEND! Trivia');
+    const unavailableGames = card.locator('.ytcq-games-unavailable-section');
+    await expect(unavailableGames).not.toHaveAttribute('open', '');
+    await expect(unavailableGames).toHaveCSS('row-gap', '0px');
+    await expect(replayTriviaCard).not.toBeVisible();
+    await unavailableGames.locator('summary').click();
+    await expect(unavailableGames).toHaveAttribute('open', '');
+    await expect(unavailableGames).toHaveCSS('row-gap', '6px');
+    await expect(replayTriviaCard).toBeVisible();
+    await expect(replayTriviaCard).toHaveAttribute('aria-disabled', 'true');
+    await expect(replayTriviaCard).toHaveAttribute(
+      'title',
+      'Can only be played during a live replay (a stream that has already ended).'
+    );
+    await expect(replayTriviaCard.locator('.ytcq-games-context-badge')).toHaveText('Replay only');
     await expect(getGameCard(card, 'Stick Around!')).toHaveAttribute('aria-disabled', 'false');
 
     await openGamePlayerList(card, 'Chess');
@@ -481,6 +500,83 @@ export const playgroundAvailabilityToggleScenario: BrowserScenario = async ({ ch
   });
 };
 
+export const playgroundVersionMismatchScenario: BrowserScenario = async ({ chat, context }) => {
+  const backend = await installMockPlaygroundBackend(context, {
+    gameVersions: {
+      'bounty-hunting': 1,
+      chess: 1,
+      'replay-trivia': 2,
+      'stick-around': 1
+    },
+    snapshot: createMockPlaygroundSnapshot({
+      games: [createBrowserBountyHuntingGame({ gameId: 'incompatible-bounty-game' })]
+    })
+  });
+
+  await withExtensionStorageValues(context, 'sync', PLAYGROUND_ENABLED_OPTIONS, async () => {
+    const card = await openGamesCard(chat, backend);
+    const bountyCard = getGameCard(card, 'The Wild Wild Chat');
+    await chat.locator('html').evaluate((element) => {
+      element.setAttribute('data-ytcq-chat-skin', 'aero');
+      element.setAttribute('data-ytcq-chat-skin-theme', 'dark');
+    });
+
+    await expect(bountyCard).toHaveAttribute('aria-disabled', 'true');
+    await expect(bountyCard).toHaveAttribute(
+      'title',
+      'The Wild Wild Chat is temporarily unavailable because Chat Enhancer and Playground versions do not match. Try again when the versions match.'
+    );
+    const updateBadge = bountyCard.locator('.ytcq-games-version-badge');
+    await expect(updateBadge).toHaveText('Update required');
+    await expect(card.locator('.ytcq-games-version-notice')).toHaveCount(0);
+    await expect(getGameCard(card, 'Chess')).toHaveAttribute('aria-disabled', 'false');
+
+    const activeRow = card.locator('.ytcq-games-incompatible-active-row');
+    await expect(activeRow).toContainText('The Wild Wild Chat');
+    await expect(activeRow).toContainText(
+      'Update required. Chat Enhancer and Playground versions do not match.'
+    );
+    await expect(activeRow.getByRole('button')).toHaveCount(1);
+    await expect(activeRow.getByRole('button', { name: 'Leave' })).toBeVisible();
+    await expect(chat.locator('.ytcq-bounty-hunting-game-panel')).toHaveCount(0);
+    await expect(chat.locator('.ytcq-bounty-hunting-canvas')).toHaveCount(0);
+
+    await activeRow.getByRole('button', { name: 'Leave' }).click();
+    const leave = await backend.waitForClientMessage('gameAction');
+    expect(leave).toMatchObject({
+      action: 'leave',
+      gameId: 'incompatible-bounty-game'
+    });
+    await backend.sendServerMessage({
+      gameId: 'incompatible-bounty-game',
+      reason: 'playerLeft',
+      type: 'gameEnded',
+      userId: 'browser-user'
+    });
+    await expect(card.locator('.ytcq-games-incompatible-active-row')).toHaveCount(0);
+
+    await backend.sendServerMessage({
+      code: 'game_version',
+      message: 'Chat Enhancer and Playground versions do not match for this game.',
+      type: 'error'
+    });
+    await expect(chat.locator('.ytcq-toast')).toHaveCount(0);
+
+    await backend.sendServerMessage({
+      code: 'bad_action',
+      message: 'That action is no longer available.',
+      type: 'error'
+    });
+    await expect(chat.locator('.ytcq-toast')).toContainText(
+      'That action is no longer available.'
+    );
+    await expect(card.locator('.ytcq-games-action-error')).toHaveCount(0);
+
+    await openGamePlayerList(card, 'Chess');
+    await expect(card.locator('.ytcq-games-player-row')).not.toHaveCount(0);
+  });
+};
+
 export const playgroundStickAroundComputerOverlayScenario: BrowserScenario = async ({ chat, context, page }) => {
   const backend = await installMockPlaygroundBackend(context, {
     snapshot: createMockPlaygroundSnapshot()
@@ -644,10 +740,27 @@ export const playgroundReplayTriviaInviteScenario: BrowserScenario = async ({ ch
 
   await withExtensionStorageValues(context, 'sync', PLAYGROUND_ENABLED_OPTIONS, async () => {
     const card = await openGamesCard(chat, backend);
-    await expect(card.locator('.ytcq-games-game-label')).toHaveText(['Chess', 'The Wild Wild Chat', 'HELP-A-FRIEND! Trivia', 'Stick Around!']);
-    await expect(getGameCard(card, 'The Wild Wild Chat')).toHaveAttribute('aria-disabled', 'true');
-    await expect(getGameCard(card, 'HELP-A-FRIEND! Trivia')).toHaveAttribute('aria-disabled', 'false');
-    await expect(getGameCard(card, 'Stick Around!')).toHaveAttribute('aria-disabled', 'true');
+    await expect(card.locator('.ytcq-games-game-label')).toHaveText([
+      'Chess',
+      'HELP-A-FRIEND! Trivia',
+      'The Wild Wild Chat',
+      'Stick Around!'
+    ]);
+    const bountyCard = getGameCard(card, 'The Wild Wild Chat');
+    const replayTriviaCard = getGameCard(card, 'HELP-A-FRIEND! Trivia');
+    const stickAroundCard = getGameCard(card, 'Stick Around!');
+    await expect(bountyCard).toHaveAttribute('aria-disabled', 'true');
+    await expect(stickAroundCard).toHaveAttribute('aria-disabled', 'true');
+    for (const livestreamOnlyCard of [bountyCard, stickAroundCard]) {
+      const contextBadge = livestreamOnlyCard.locator('.ytcq-games-context-badge');
+      await expect(contextBadge).toHaveText('Livestream only');
+      await expect(livestreamOnlyCard).toHaveAttribute(
+        'title',
+        'Can only be played during live chat.'
+      );
+    }
+    await expect(replayTriviaCard).toHaveAttribute('aria-disabled', 'false');
+    await expect(replayTriviaCard.locator('.ytcq-games-context-badge')).toHaveCount(0);
 
     await openGamePlayerList(card, 'HELP-A-FRIEND! Trivia');
     await expect(card.locator('.ytcq-games-player-row')).toHaveCount(2);
@@ -699,7 +812,10 @@ export const playgroundReplayTriviaAnswerScenario: BrowserScenario = async ({ ch
       action: 'answer',
       gameId: 'browser-replay-trivia-game',
       payload: {
-        choiceIndex: 1
+        choiceIndex: 1,
+        expectedQuestionId: 'question-1',
+        expectedQuestionIndex: 0,
+        expectedStatus: 'question'
       }
     });
 
@@ -792,6 +908,11 @@ export const playgroundBountyHuntingRoundStartScenario: BrowserScenario = async 
     await expect(chat.locator('.ytcq-bounty-hunting-game-panel'))
       .toHaveClass(/ytcq-game-panel-compact/);
 
+    const missedMessageId = await appendMockFixtureMessage(chat, {
+      author: '@BountyMiss',
+      text: 'nothing to claim here'
+    });
+    if (!missedMessageId) throw new Error('Could not append Bounty Hunting miss message.');
     const messageId = await appendMockFixtureMessage(chat, {
       author: '@BountyFan',
       text: 'claim this @Marco'
@@ -799,21 +920,211 @@ export const playgroundBountyHuntingRoundStartScenario: BrowserScenario = async 
     if (!messageId) throw new Error('Could not append Bounty Hunting claim message.');
     expect(messageId).toMatch(/^fixture-message-/);
 
+    const missedMessage = chat.locator(
+      `yt-live-chat-text-message-renderer[id="${missedMessageId}"]`
+    );
     const message = chat.locator(`yt-live-chat-text-message-renderer[id="${messageId}"]`);
+    await expect(missedMessage).toBeVisible();
     await expect(message).toBeVisible();
-    await message.evaluate((element) => element.scrollIntoView({ block: 'start' }));
-    await message.click();
+    await missedMessage.evaluate((element) => element.scrollIntoView({ block: 'start' }));
+    const initialMissState = await missedMessage.evaluate((element, validMessageId) => {
+      const validMessage = document.getElementById(validMessageId);
+      if (!validMessage) throw new Error('Could not find Bounty Hunting claim message.');
+      const openNativeMessageMenu = () => {
+        const menu = document.createElement('ytd-menu-popup-renderer');
+        menu.className = 'ytcq-fixture-native-body-menu';
+        document.body.append(menu);
+      };
+      element.addEventListener('click', openNativeMessageMenu);
+      validMessage.addEventListener('click', openNativeMessageMenu);
+      const missedBody = element.querySelector('[id="message"]') || element;
+      missedBody.dispatchEvent(new MouseEvent('click', {
+        bubbles: true,
+        cancelable: true,
+        clientX: 40,
+        clientY: 50
+      }));
+      const feedback = document.querySelector<HTMLElement>(
+        '.ytcq-bounty-hunting-miss-feedback'
+      );
+      return {
+        hidden: feedback?.hidden,
+        nativeMenuCount: document.querySelectorAll('.ytcq-fixture-native-body-menu').length
+      };
+    }, messageId);
+    expect(initialMissState).toEqual({ hidden: true, nativeMenuCount: 0 });
 
-    const claim = await waitForGameAction(backend, 'claimBounty');
-    expect(claim).toMatchObject({
-      action: 'claimBounty',
-      gameId: 'browser-bounty-game',
-      payload: {
-        bountyId: 'mention-user',
-        messageId,
-        messageTimestampUsec: getFixtureMessageTimestampUsec(messageId)
+    const miss = await waitForGameAction(backend, 'shootBounty', (clientMessage) =>
+      clientMessage.payload?.messageId === missedMessageId
+    );
+    expect(miss).toMatchObject({
+      action: 'shootBounty',
+      gameId: 'browser-bounty-game'
+    });
+    expect(miss.payload).toEqual({
+      messageId: missedMessageId,
+      observations: [{
+        bountyIds: [],
+        messageId: missedMessageId,
+        messageTimestampUsec: getFixtureMessageTimestampUsec(missedMessageId)
+      }]
+    });
+    await backend.sendServerMessage({
+      game: createBrowserBountyHuntingGame({
+        missCooldownUntil: Date.now() + 5_000,
+        roundStartTimestampUsec: getFixtureMessageTimestampUsec('fixture-message-1')
+      }),
+      type: 'gameUpdated'
+    });
+
+    const missFeedback = chat.locator('.ytcq-bounty-hunting-miss-feedback');
+    await expect(missFeedback).toBeVisible();
+    await expect(missFeedback).toHaveText('MISS! Reloading...');
+    await expect(missedMessage).toHaveCSS('cursor', 'not-allowed');
+    expect(
+      await missFeedback.evaluate((element) => ({
+        left: (element as HTMLElement).style.left,
+        top: (element as HTMLElement).style.top
+      }))
+    ).toEqual({ left: '52px', top: '41px' });
+    const missFeedbackHeight = await missFeedback.evaluate(
+      (element) => element.getBoundingClientRect().height
+    );
+    const missIconMetrics = await missFeedback
+      .locator('.ytcq-bounty-hunting-miss-icon')
+      .evaluate((element) => {
+        const bounds = element.getBoundingClientRect();
+        return {
+          fontSize: Number.parseFloat(getComputedStyle(element.parentElement!).fontSize),
+          height: bounds.height,
+          width: bounds.width
+        };
+      });
+    expect(missIconMetrics).toEqual({ fontSize: 11, height: 11, width: 11 });
+    await expect(missFeedback.locator('.ytcq-bounty-hunting-miss-countdown')).toHaveCount(0);
+    await expect(chat.locator('.ytcq-fixture-native-body-menu')).toHaveCount(0);
+    const missFeedbackState = await missFeedback.evaluate((element) => {
+      const feedback = element as HTMLElement;
+      const icon = feedback.querySelector<HTMLElement>('.ytcq-bounty-hunting-miss-icon');
+      if (!icon) throw new Error('Expected the Bounty Hunting miss icon.');
+      const readTheme = () => ({
+        backgroundColor: getComputedStyle(feedback).backgroundColor,
+        borderStyle: getComputedStyle(feedback).borderStyle,
+        color: getComputedStyle(feedback).color,
+        iconBackgroundColor: getComputedStyle(icon).backgroundColor,
+        iconBorderRadius: getComputedStyle(icon).borderRadius,
+        progressBackgroundColor: getComputedStyle(feedback, '::before').backgroundColor
+      });
+      const root = document.documentElement;
+      const wasDark = root.hasAttribute('dark');
+      root.removeAttribute('dark');
+      const lightTheme = readTheme();
+      root.setAttribute('dark', '');
+      const darkTheme = readTheme();
+      if (!wasDark) root.removeAttribute('dark');
+      return {
+        darkTheme,
+        lightTheme,
+        iconAnimationName: getComputedStyle(icon).animationName,
+        progressAnimationName: getComputedStyle(feedback, '::before').animationName
+      };
+    });
+    expect(missFeedbackState).toMatchObject({
+      darkTheme: {
+        backgroundColor: 'rgb(61, 50, 36)',
+        color: 'rgb(241, 241, 241)',
+        iconBackgroundColor: 'rgba(0, 0, 0, 0)',
+        iconBorderRadius: '0px',
+        progressBackgroundColor: 'rgb(91, 69, 38)'
+      },
+      lightTheme: {
+        backgroundColor: 'rgb(248, 237, 207)',
+        borderStyle: 'none',
+        color: 'rgb(71, 48, 0)',
+        iconBackgroundColor: 'rgba(0, 0, 0, 0)',
+        iconBorderRadius: '0px',
+        progressBackgroundColor: 'rgb(241, 216, 157)'
       }
     });
+    expect(missFeedbackState.iconAnimationName).toBe('none');
+    expect(missFeedbackState.progressAnimationName).toContain(
+      'ytcq-bounty-hunting-reload-progress'
+    );
+
+    // The backend cooldown is authoritative, so clicks during it are consumed
+    // without sending another shot or opening YouTube's native message menu.
+    await dispatchMessageClick(message);
+    await expectGameActionCount(
+      backend,
+      'shootBounty',
+      1,
+      (clientMessage) => clientMessage.gameId === 'browser-bounty-game',
+      100
+    );
+    await expect(chat.locator('.ytcq-fixture-native-body-menu')).toHaveCount(0);
+    await backend.sendServerMessage({
+      game: createBrowserBountyHuntingGame({
+        roundStartTimestampUsec: getFixtureMessageTimestampUsec('fixture-message-1')
+      }),
+      type: 'gameUpdated'
+    });
+    await expect(missFeedback).toBeHidden();
+    await expect(missedMessage).not.toHaveCSS('cursor', 'not-allowed');
+    await dispatchMessageClick(message);
+
+    const claim = await waitForGameAction(backend, 'shootBounty', (clientMessage) =>
+      clientMessage.payload?.messageId === messageId
+    );
+    expect(claim).toMatchObject({
+      action: 'shootBounty',
+      gameId: 'browser-bounty-game'
+    });
+    expect(claim.payload).toEqual({
+      messageId,
+      observations: [{
+        bountyIds: ['mention-user'],
+        messageId,
+        messageTimestampUsec: getFixtureMessageTimestampUsec(messageId)
+      }]
+    });
+
+    const validShotMessages = await backend.getClientMessages();
+    const validShotIndex = validShotMessages.findIndex((clientMessage) =>
+      clientMessage.type === 'gameAction' &&
+      clientMessage.action === 'shootBounty' &&
+      clientMessage.payload?.messageId === messageId
+    );
+    expect(validShotIndex).toBeGreaterThan(0);
+    const validWitnessIndexes = validShotMessages.flatMap((clientMessage, index) =>
+      index < validShotIndex &&
+      clientMessage.type === 'gameAction' &&
+      clientMessage.action === 'observeBountyMessage' &&
+      getBountyObservationPayloads(clientMessage).some((observation) =>
+        observation.messageId === messageId &&
+        Array.isArray(observation.bountyIds) &&
+        observation.bountyIds.includes('mention-user')
+      )
+        ? [index]
+        : []
+    );
+    const validWitnessIndex = validWitnessIndexes.at(-1) ?? -1;
+    expect(validWitnessIndex).toBeGreaterThanOrEqual(0);
+    expect(validWitnessIndex).toBeLessThan(validShotIndex);
+    const validWitness = validShotMessages[validWitnessIndex];
+    expect(validWitness).toMatchObject({
+      action: 'observeBountyMessage',
+      gameId: 'browser-bounty-game',
+      type: 'gameAction'
+    });
+    if (validWitness?.type !== 'gameAction') {
+      throw new Error('Expected a Bounty Hunting witness immediately before the shot.');
+    }
+    expect(getBountyObservationPayloads(validWitness)).toEqual([
+      expect.objectContaining({
+        bountyIds: ['mention-user'],
+        messageId
+      })
+    ]);
 
     await backend.sendServerMessage({
       game: createBrowserBountyHuntingGame({
@@ -823,9 +1134,64 @@ export const playgroundBountyHuntingRoundStartScenario: BrowserScenario = async 
       type: 'gameUpdated'
     });
     await expect(chat.locator('.ytcq-bounty-hunting-claimed-feed')).toHaveCount(0);
-    await expect(message.locator('.ytcq-bounty-hunting-claim-indicator')).toHaveText('B$125');
-    await message.locator('.ytcq-bounty-hunting-claim-indicator').evaluate((indicator) => indicator.remove());
-    await expect(message.locator('.ytcq-bounty-hunting-claim-indicator')).toHaveText('B$125');
+    const claimIndicator = message.locator('.ytcq-bounty-hunting-claim-indicator');
+    await expect(claimIndicator).toHaveText('B$125');
+    expect(await claimIndicator.evaluate((element) => element.getBoundingClientRect().height)).toBe(
+      missFeedbackHeight
+    );
+    await expect(claimIndicator).toHaveCSS('box-shadow', 'none');
+    await claimIndicator.evaluate((indicator) => indicator.remove());
+    await expect(claimIndicator).toHaveText('B$125');
+    await expect(claimIndicator).toHaveCSS('box-shadow', 'none');
+    await expect(chat.locator('.ytcq-fixture-native-body-menu')).toHaveCount(0);
+
+    const claimedOnlyMessageId = await appendRequiredMockFixtureMessage(chat, {
+      author: '@LateBountyFan',
+      text: 'another message for @Marco'
+    });
+    const claimedOnlyMissState = await chat
+      .locator(`yt-live-chat-text-message-renderer[id="${claimedOnlyMessageId}"]`)
+      .evaluate((element) => {
+        const messageBody = element.querySelector('[id="message"]') || element;
+        messageBody.dispatchEvent(new MouseEvent('click', {
+          bubbles: true,
+          cancelable: true
+        }));
+        const feedback = document.querySelector<HTMLElement>(
+          '.ytcq-bounty-hunting-miss-feedback'
+        );
+        return { hidden: feedback?.hidden };
+      });
+    expect(claimedOnlyMissState).toEqual({ hidden: true });
+
+    const claimedOnlyShot = await waitForGameAction(backend, 'shootBounty', (clientMessage) =>
+      clientMessage.payload?.messageId === claimedOnlyMessageId
+    );
+    expect(claimedOnlyShot.payload).toEqual({
+      messageId: claimedOnlyMessageId,
+      observations: [{
+        bountyIds: [],
+        messageId: claimedOnlyMessageId,
+        messageTimestampUsec: getFixtureMessageTimestampUsec(claimedOnlyMessageId)
+      }]
+    });
+    await backend.sendServerMessage({
+      game: createBrowserBountyHuntingGame({
+        claimedMessageId: messageId,
+        missCooldownUntil: Date.now() + 5_000,
+        roundStartTimestampUsec: getFixtureMessageTimestampUsec('fixture-message-1')
+      }),
+      type: 'gameUpdated'
+    });
+    await expect(missFeedback).toBeVisible();
+    await expect(missFeedback).toHaveClass(/ytcq-bounty-hunting-reload-progress/);
+
+    await expectGameActionCount(
+      backend,
+      'shootBounty',
+      3,
+      (message) => message.gameId === 'browser-bounty-game'
+    );
   });
 };
 
@@ -859,7 +1225,12 @@ export const playgroundBountyHuntingCutoffScenario: BrowserScenario = async ({ c
     const oldMessage = chat.locator(`yt-live-chat-text-message-renderer[id="${oldMessageId}"]`);
     await expect(oldMessage).toBeVisible();
     await dispatchMessageClick(oldMessage);
-    await expectNoGameAction(backend, 'claimBounty', 1_200);
+    await expectNoGameAction(
+      backend,
+      'shootBounty',
+      1_200,
+      (message) => message.payload?.messageId === oldMessageId
+    );
 
     const newMessageId = await appendRequiredMockFixtureMessage(chat, {
       author: '@NewBountyFan',
@@ -869,17 +1240,20 @@ export const playgroundBountyHuntingCutoffScenario: BrowserScenario = async ({ c
     await expect(newMessage).toBeVisible();
     await dispatchMessageClick(newMessage);
 
-    const claim = await waitForGameAction(backend, 'claimBounty', (message) =>
+    const claim = await waitForGameAction(backend, 'shootBounty', (message) =>
       message.payload?.messageId === newMessageId
     );
     expect(claim).toMatchObject({
-      action: 'claimBounty',
-      gameId: 'browser-bounty-game',
-      payload: {
-        bountyId: 'mention-user',
+      action: 'shootBounty',
+      gameId: 'browser-bounty-game'
+    });
+    expect(claim.payload).toEqual({
+      messageId: newMessageId,
+      observations: [{
+        bountyIds: ['mention-user'],
         messageId: newMessageId,
         messageTimestampUsec: getFixtureMessageTimestampUsec(newMessageId)
-      }
+      }]
     });
   });
 };
@@ -1151,6 +1525,7 @@ function createBrowserReplayTriviaGame(): PublicGame {
 interface BrowserBountyHuntingGameOptions {
   claimedMessageId?: string;
   gameId?: string;
+  missCooldownUntil?: number;
   phaseStartedAt?: number;
   roundStartTimestampUsec?: string;
   status?: 'active' | 'countdown';
@@ -1159,6 +1534,7 @@ interface BrowserBountyHuntingGameOptions {
 function createBrowserBountyHuntingGame({
   claimedMessageId,
   gameId = 'browser-bounty-game',
+  missCooldownUntil,
   phaseStartedAt,
   roundStartTimestampUsec,
   status = 'active'
@@ -1186,6 +1562,7 @@ function createBrowserBountyHuntingGame({
     bountyProviderUserId: 'browser-user',
     gameId,
     gameType: 'bounty-hunting',
+    ...(missCooldownUntil ? { missCooldownUntil } : {}),
     phaseStartedAt: startedAt,
     players: {
       guest: {

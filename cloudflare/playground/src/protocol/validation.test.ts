@@ -30,6 +30,10 @@ describe('playground protocol validation', () => {
     const message = parseClientMessage(JSON.stringify({
       availableGames: ['chess', 'replay-trivia'],
       displayName: '  Luna Chat  ',
+      gameVersions: {
+        'bounty-hunting': 2,
+        chess: 1
+      },
       identity: {
         publicKeyJwk: {
           crv: 'P-256',
@@ -46,7 +50,49 @@ describe('playground protocol validation', () => {
     expect(message).toMatchObject({
       availableGames: ['chess', 'replay-trivia'],
       displayName: 'Luna Chat',
+      gameVersions: {
+        'bounty-hunting': 2,
+        chess: 1
+      },
       type: 'hello'
+    });
+  });
+
+  it('validates optional hello game versions', () => {
+    const hello = {
+      identity: {
+        publicKeyJwk: {
+          crv: 'P-256',
+          kty: 'EC',
+          x: 'x-value',
+          y: 'y-value'
+        },
+        signature: 'signature'
+      },
+      protocolVersion: PLAYGROUND_PROTOCOL_VERSION,
+      type: 'hello'
+    };
+
+    expect(parseClientMessage(JSON.stringify(hello))).toMatchObject({
+      type: 'hello'
+    });
+    expect(() => parseClientMessage(JSON.stringify({
+      ...hello,
+      gameVersions: []
+    }))).toThrowError(new ProtocolError('invalid_field', 'gameVersions must be an object.'));
+    expect(() => parseClientMessage(JSON.stringify({
+      ...hello,
+      gameVersions: { chess: 0 }
+    }))).toThrowError(new ProtocolError('invalid_field', 'Game versions must be positive integers.'));
+    expect(() => parseClientMessage(JSON.stringify({
+      ...hello,
+      gameVersions: { chess: 1.5 }
+    }))).toThrowError(new ProtocolError('invalid_field', 'Game versions must be positive integers.'));
+    expect(parseClientMessage(JSON.stringify({
+      ...hello,
+      gameVersions: { chess: 1, 'future-game': 4 }
+    }))).toMatchObject({
+      gameVersions: { chess: 1 }
     });
   });
 

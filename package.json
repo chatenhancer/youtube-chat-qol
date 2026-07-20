@@ -1,6 +1,6 @@
 {
   "name": "youtube-chat-qol",
-  "version": "0.19.8",
+  "version": "0.20.0",
   "private": true,
   "license": "GPL-3.0-or-later",
   "browser": {
@@ -98,6 +98,7 @@
   },
   "dependencies": {
     "@cloudflare/containers": "^0.3.7",
-    "chess.js": "^1.4.0"
+    "chess.js": "^1.4.0",
+    "zod": "^4.4.3"
   }
 }

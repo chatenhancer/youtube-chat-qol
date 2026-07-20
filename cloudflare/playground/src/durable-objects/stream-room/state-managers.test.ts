@@ -1,6 +1,15 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { ProtocolError } from '../../protocol/validation';
 import type { GameRecord } from '../../games/types';
+import { createBountyHuntingGame } from '../../games/bounty-hunting';
+import { createChessGame } from '../../games/chess';
+import { createReplayTriviaGame } from '../../games/replay-trivia';
+import {
+  createStickAroundGame,
+  readyStickAroundPlayer,
+  startStickAroundRound
+} from '../../games/stick-around';
+import { PLAYGROUND_GAME_VERSIONS, type GameId } from '../../protocol/messages';
 import { GAME_STATE_DEFERRED_PERSIST_MS, GameState } from './game-state';
 import { GenerationTokens } from './generation-token';
 import { InviteManager } from './invite-manager';
@@ -17,13 +26,14 @@ describe('stream room state managers', () => {
     vi.useRealTimers();
   });
 
-  it('restores only supported stored games and logs ignored entries', async () => {
+  it('restores only supported versioned stored games and logs ignored entries', async () => {
     const logEvent = vi.fn();
     const state = createDurableObjectState({
       games: [
-        createStoredGame('game-1', 'chess'),
-        { gameId: 'unsupported-1', gameType: 'unknown-game', status: 'active' },
-        { gameId: 123, gameType: 'chess', status: 'active' },
+        createChessGame('game-1', 'alice', 'bob'),
+        { gameId: 'missing-version', gameType: 'chess', status: 'active' },
+        { gameId: 'unsupported-1', gameType: 'unknown-game', gameVersion: 1, status: 'active' },
+        { gameId: 123, gameType: 'chess', gameVersion: 1, status: 'active' },
         null
       ]
     });
@@ -33,7 +43,8 @@ describe('stream room state managers', () => {
 
     expect(games.get('game-1')).toMatchObject({
       gameId: 'game-1',
-      gameType: 'chess'
+      gameType: 'chess',
+      gameVersion: 1
     });
     expect(games.values()).toHaveLength(1);
     expect(logEvent).toHaveBeenCalledWith('stored_game_ignored', {
@@ -41,6 +52,122 @@ describe('stream room state managers', () => {
     }, 'warn');
     expect(logEvent).toHaveBeenCalledWith('stored_game_ignored', {
       game: undefined
+    }, 'warn');
+    expect(logEvent).toHaveBeenCalledWith('room_state_restored', {
+      gameCount: 1
+    });
+  });
+
+  it('restores complete current records for every enabled game', async () => {
+    const currentGames = [
+      createChessGame('chess-game', 'alice', 'bob'),
+      createBountyHuntingGame('bounty-game', 'alice', 'bob', 0),
+      createReplayTriviaGame('trivia-game', 'alice', 'bob', 0),
+      createStickAroundGame('stick-game', 'alice', 'bob', 0)
+    ];
+    const state = createDurableObjectState({ games: currentGames });
+    const games = new GameState(state, vi.fn());
+
+    await games.load();
+
+    expect(games.values()).toEqual(currentGames);
+  });
+
+  it.each([
+    ['chess', () => ({
+      ...createChessGame('broken-chess', 'alice', 'bob'),
+      players: { white: 'alice' }
+    })],
+    ['bounty-hunting', () => ({
+      ...createBountyHuntingGame('broken-bounty', 'alice', 'bob', 0),
+      missCooldownUntilByRole: { host: 'later' }
+    })],
+    ['bounty-hunting legacy fields', () => ({
+      ...createBountyHuntingGame('legacy-bounty', 'alice', 'bob', 0),
+      claimedMessageIds: []
+    })],
+    ['replay-trivia', () => ({
+      ...createReplayTriviaGame('broken-trivia', 'alice', 'bob', 0),
+      questions: [{ id: 'missing-question-fields' }]
+    })],
+    ['stick-around', () => ({
+      ...createStickAroundGame('broken-stick', 'alice', 'bob', 0),
+      hazards: [{ id: 'missing-hazard-fields' }]
+    })]
+  ])('ignores malformed current-version %s records', async (_gameType, createMalformedGame) => {
+    const logEvent = vi.fn();
+    const state = createDurableObjectState({ games: [createMalformedGame()] });
+    const games = new GameState(state, logEvent);
+
+    await games.load();
+
+    expect(games.values()).toEqual([]);
+    expect(logEvent).toHaveBeenCalledWith('stored_game_ignored', {
+      game: expect.any(String)
+    }, 'warn');
+  });
+
+  it('rejects restored Stick Around simulations with unbounded spawned hazard ids', async () => {
+    let activeGame = createStickAroundGame('stick-game', 'alice', 'bob', 0);
+    activeGame = readyStickAroundPlayer(activeGame, 'alice', 0);
+    activeGame = readyStickAroundPlayer(activeGame, 'bob', 0);
+    activeGame = startStickAroundRound(activeGame, 3_000);
+    const malformedGame = {
+      ...activeGame,
+      hazards: [{
+        id: 'hazard-1',
+        seed: 1,
+        spawnAt: 4_000,
+        weight: 1
+      }],
+      simulation: activeGame.simulation && {
+        ...activeGame.simulation,
+        spawnedHazardIds: Array.from({ length: 161 }, () => 'hazard-1')
+      }
+    };
+    const state = createDurableObjectState({ games: [malformedGame] });
+    const games = new GameState(state, vi.fn());
+
+    await games.load();
+
+    expect(games.values()).toEqual([]);
+  });
+
+  it('restores only records matching the current per-game version', async () => {
+    const logEvent = vi.fn();
+    const currentGame = createBountyHuntingGame('current-bounty', 'host-user', 'guest-user', 0);
+    const { gameVersion: currentVersion, ...unversionedGame } = currentGame;
+    const state = createDurableObjectState({
+      games: [
+        {
+          ...currentGame,
+          gameId: 'older-bounty',
+          gameVersion: currentVersion - 1
+        },
+        {
+          ...currentGame,
+          gameId: 'newer-bounty',
+          gameVersion: currentVersion + 1
+        },
+        {
+          ...currentGame,
+          gameId: 'invalid-version-bounty',
+          gameVersion: null
+        },
+        {
+          ...unversionedGame,
+          gameId: 'unversioned-bounty'
+        },
+        currentGame
+      ]
+    });
+    const games = new GameState(state, logEvent);
+
+    await games.load();
+
+    expect(games.values()).toEqual([currentGame]);
+    expect(logEvent).toHaveBeenCalledWith('stored_game_ignored', {
+      game: expect.any(String)
     }, 'warn');
     expect(logEvent).toHaveBeenCalledWith('room_state_restored', {
       gameCount: 1
@@ -244,7 +371,7 @@ describe('stream room state managers', () => {
     ));
   });
 
-  it('deduplicates sessions into presence users and preserves availability while a user remains connected', () => {
+  it('deduplicates sessions into presence users and unions per-session availability', () => {
     vi.spyOn(Date, 'now').mockReturnValue(1_000);
     const sessions = new SessionManager();
     const first = createSession('connection-1');
@@ -255,7 +382,7 @@ describe('stream room state managers', () => {
 
     expect(sessions.get('connection-1')).toBe(first);
     expect(sessions.getPresenceUser('alice')).toEqual({
-      availableGames: ['replay-trivia'],
+      availableGames: ['chess', 'replay-trivia'],
       displayName: 'Alice',
       joinedAt: 1_000,
       userId: 'alice'
@@ -275,13 +402,56 @@ describe('stream room state managers', () => {
     });
     expect(sessions.remove('missing')).toBeUndefined();
     expect(sessions.remove('connection-1')).toBe(first);
-    expect(sessions.getPresenceUser('alice')?.availableGames).toEqual(['chess', 'replay-trivia']);
+    expect(sessions.getPresenceUser('alice')?.availableGames).toEqual(['replay-trivia']);
     expect(sessions.remove('connection-2')).toBe(second);
     expect(sessions.getPresenceUser('alice')).toBeUndefined();
     expect(sessions.getPublicUser('alice')).toEqual({
       displayName: 'Luna Chat',
       userId: 'alice'
     });
+  });
+
+  it('filters availability by exact game version and defaults internal sessions to current versions', () => {
+    const sessions = new SessionManager();
+    const current = createSession('current-connection');
+    const legacy = createSession('legacy-connection');
+
+    sessions.authenticate(current, 'current-user', ['chess', 'bounty-hunting'], 'Current');
+    sessions.authenticate(legacy, 'legacy-user', ['chess', 'bounty-hunting'], 'Legacy', undefined, {});
+
+    expect(current.gameVersions).toMatchObject({
+      'bounty-hunting': 2
+    });
+    expect(sessions.isUserAvailableForGame('current-user', 'bounty-hunting')).toBe(true);
+    expect(sessions.isUserAvailableForGame('legacy-user', 'bounty-hunting')).toBe(false);
+    expect(sessions.getPresenceUser('current-user')?.availableGames).toEqual(['chess', 'bounty-hunting']);
+    expect(sessions.getPresenceUser('legacy-user')?.availableGames).toEqual(['chess']);
+
+    sessions.setAvailability(current, []);
+    expect(sessions.isUserAvailableForGame('current-user', 'bounty-hunting')).toBe(false);
+    expect(sessions.hasCompatibleGameSession('current-user', 'bounty-hunting')).toBe(true);
+
+    sessions.setAvailability(legacy, ['bounty-hunting']);
+    expect(sessions.hasCompatibleGameSession('legacy-user', 'bounty-hunting')).toBe(false);
+    expect(sessions.getPresenceUser('legacy-user')?.availableGames).toEqual([]);
+  });
+
+  it('stops advertising a game when only an incompatible session remains connected', () => {
+    const sessions = new SessionManager();
+    const current = createSession('current-connection');
+    const legacy = createSession('legacy-connection');
+
+    sessions.authenticate(current, 'same-user', ['bounty-hunting'], 'Same user');
+    sessions.authenticate(legacy, 'same-user', ['bounty-hunting'], 'Same user', undefined, {});
+
+    expect(sessions.getPresenceUser('same-user')?.availableGames).toEqual(['bounty-hunting']);
+    expect(sessions.isUserAvailableForGame('same-user', 'bounty-hunting')).toBe(true);
+
+    sessions.remove(current.connectionId);
+
+    expect(sessions.hasConnectedUser('same-user')).toBe(true);
+    expect(sessions.isUserAvailableForGame('same-user', 'bounty-hunting')).toBe(false);
+    expect(sessions.getPresenceUser('same-user')?.availableGames).toEqual([]);
   });
 
   it('sends direct and broadcast messages only to authenticated socket sessions', () => {
@@ -336,12 +506,13 @@ describe('stream room state managers', () => {
   });
 });
 
-function createStoredGame(gameId: string, gameType: string): GameRecord {
+function createStoredGame(gameId: string, gameType: GameId): GameRecord {
   return {
     gameId,
     gameType,
+    gameVersion: PLAYGROUND_GAME_VERSIONS[gameType],
     status: 'active'
-  } as GameRecord;
+  };
 }
 
 function createDurableObjectState(
@@ -395,6 +566,7 @@ function createSession(connectionId: string, socket?: ReturnType<typeof createSo
     challenge: `${connectionId}:challenge`,
     connectionId,
     displayName: '',
+    gameVersions: {},
     joinedAt: 0,
     languageCode: 'en',
     rateLimit: {} as ClientSession['rateLimit'],

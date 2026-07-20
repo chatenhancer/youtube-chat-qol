@@ -4,7 +4,6 @@
  * Connects the generic Games lobby to the bounty-hunt canvas panel and keeps
  * live-chat-only availability separate from Replay Trivia's replay-only flow.
  */
-import { isLiveChatReplayUrl } from '../../../../youtube/timestamps';
 import { t } from '../../../../shared/i18n';
 import type {
   EnabledGame,
@@ -17,17 +16,18 @@ import type {
 import { renderBountyHuntingPreview } from './preview';
 import {
   closeBountyHuntingGamePanel,
+  handleBountyHuntingActionError,
   openBountyHuntingGamePanel,
+  resetBountyHuntingGameClientState,
   setBountyHuntingCompactMode,
   updateBountyHuntingGamePanel
 } from './panel';
 import type { PublicBountyHuntingGame } from './types';
 
 export const bountyHuntingGameDefinition: GameDefinition = {
+  availability: 'livestream',
   classNamePrefix: 'ytcq-bounty-hunting-game',
-  disabledReasonKey: 'gamesBountyHuntingLiveOnly',
   id: 'bounty-hunting',
-  isPlayable: () => !isLiveChatReplayUrl(),
   labelKey: 'gamesBountyHunting',
   renderPreview: renderBountyHuntingPreview,
   taglineKey: 'gamesBountyHuntingTagline'
@@ -41,12 +41,22 @@ export const bountyHuntingGameAdapter: GamePanelAdapter<PublicBountyHuntingGame>
 export const bountyHuntingGame: EnabledGame<PublicBountyHuntingGame> = {
   adapter: bountyHuntingGameAdapter,
   definition: bountyHuntingGameDefinition,
-  getOpponentLabel: getBountyHuntingOpponentLabel
+  getOpponentLabel: getBountyHuntingOpponentLabel,
+  handleActionError: handleBountyHuntingActionError,
+  onClientReset: resetBountyHuntingGameClientState
 };
 
 function mountBountyHuntingPanel(game: PublicBountyHuntingGame, context: GamePanelMountContext): GamePanelMount {
   const { closePanel, controls, currentUserId, onPanelChange, sendGameAction, shell } = context;
-  openBountyHuntingGamePanel(shell, game, currentUserId, sendGameAction, onPanelChange, closePanel, controls);
+  openBountyHuntingGamePanel(
+    shell,
+    game,
+    currentUserId,
+    sendGameAction,
+    onPanelChange,
+    closePanel,
+    controls
+  );
   return {
     close: closeBountyHuntingGamePanel,
     gameId: game.gameId,

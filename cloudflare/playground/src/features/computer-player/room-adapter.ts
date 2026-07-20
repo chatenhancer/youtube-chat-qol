@@ -5,7 +5,11 @@
  * to attach the feature once.
  */
 import type { GameRecord } from '../../games/types';
-import type { LobbySnapshot, ClientMessage } from '../../protocol/messages';
+import {
+  PLAYGROUND_GAME_VERSIONS,
+  type ClientMessage,
+  type LobbySnapshot
+} from '../../protocol/messages';
 import { TokenBucket, type TokenBucketOptions } from '../../rate-limit';
 import {
   type ClientSession,
@@ -46,6 +50,7 @@ export function attachComputerPlayerToRoom(options: AttachComputerPlayerToRoomOp
       challenge: '',
       connectionId: computerPlayer.connectionId,
       displayName: computerPlayer.displayName,
+      gameVersions: { ...PLAYGROUND_GAME_VERSIONS },
       joinedAt: Date.now(),
       languageCode: 'en',
       rateLimit: new TokenBucket(options.connectionRateLimitOptions),

@@ -122,9 +122,11 @@ function createUpdateContext(overrides: Partial<GamePanelUpdateContext> = {}): G
 function createClientState(overrides: Partial<PlaygroundClientState> = {}): PlaygroundClientState {
   return {
     available: false,
+    connectionError: '',
     endedGame: null,
-    error: '',
     games: [],
+    incompatibleActiveGames: [],
+    incompatibleGames: [],
     invites: [],
     status: 'connected',
     userId: '',
