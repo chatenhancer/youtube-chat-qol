@@ -18,6 +18,11 @@ export async function GET() {
       lastmod: latestPostLastmod,
       loc: canonicalUrlFor(locale)
     })),
+    ...locales.map((locale) => ({
+      changefreq: 'weekly',
+      lastmod: latestPostLastmod,
+      loc: `${canonicalUrlFor(locale)}playground/`
+    })),
     {
       changefreq: 'weekly',
       lastmod: latestPostLastmod,
