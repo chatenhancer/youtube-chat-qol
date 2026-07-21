@@ -41,17 +41,11 @@ Load it in a Chromium browser:
 
 After source changes, run `npm run build` again and reload the unpacked extension.
 
-For Firefox 140+ development, build the Firefox package and load `dist/extension-firefox` from `about:debugging#/runtime/this-firefox`:
+For Firefox 140+ development, build the Firefox package, then choose **Load Temporary Add-on** at `about:debugging#/runtime/this-firefox` and select `dist/extension-firefox/manifest.json`:
 
 ```sh
 npm run build:firefox
 ```
-
-Useful commands:
-
-- `npm run check` runs typecheck and lint.
-- `npm run test` runs the Vitest unit tests.
-- `npm run verify` runs the CI-style gate.
 
 ## License
 
