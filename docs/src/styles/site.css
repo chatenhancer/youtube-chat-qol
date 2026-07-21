@@ -88,6 +88,7 @@
 .mobile-header-menu-nav a,
 .walkthrough-modal,
 .walkthrough-clip-modal,
+.walkthrough-clip-preview,
 .walkthrough-clip-video-frame,
 .walkthrough-video-frame,
 .walkthrough-key-points,
@@ -1143,6 +1144,40 @@ html[dir="rtl"] .hero-blog-ticker-next svg {
   backdrop-filter: blur(4px);
 }
 
+.walkthrough-clip-preview {
+  position: fixed;
+  z-index: 40;
+  width: min(480px, calc(100vw - 24px));
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  color: #fff;
+  background: transparent;
+  border: 0;
+  border-radius: var(--modal-corner-radius);
+  box-shadow: 0 30px 90px rgba(15, 23, 42, 0.42);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 140ms ease;
+}
+
+.walkthrough-clip-preview.is-visible {
+  opacity: 1;
+}
+
+.walkthrough-clip-preview[hidden] {
+  display: none;
+}
+
+.walkthrough-clip-preview .walkthrough-clip-video-frame {
+  position: absolute;
+  inset: -1px;
+  width: auto;
+  height: auto;
+  overflow: visible;
+  background: #fff;
+  border-radius: 0;
+}
+
 .walkthrough-clip-panel,
 .walkthrough-clip-video-frame {
   position: relative;
@@ -1203,6 +1238,13 @@ html[dir="rtl"] .hero-blog-ticker-next svg {
   transition: color 150ms ease, background 150ms ease, transform 150ms ease;
 }
 
+.walkthrough-clip-tag::before {
+  content: "";
+  position: absolute;
+  inset: -5px;
+  border-radius: inherit;
+}
+
 .walkthrough-clip-tag-icon {
   flex: 0 0 auto;
   width: 12px;
@@ -1227,6 +1269,18 @@ html[dir="rtl"] .hero-blog-ticker-next svg {
 .commands-copy > .walkthrough-clip-tag {
   inset-block-start: 0;
   inset-inline-end: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .walkthrough-clip-preview {
+    transition: none;
+  }
+}
+
+@media (hover: none), (pointer: coarse) {
+  .walkthrough-clip-preview {
+    display: none;
+  }
 }
 
 .walkthrough-modal-panel {

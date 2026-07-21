@@ -4,17 +4,23 @@ import type { Messages } from '../../data/site';
 const { messages: m } = Astro.props as { messages: Messages };
 ---
 
+<div
+  class="walkthrough-clip-preview"
+  data-walkthrough-clip-preview
+  aria-hidden="true"
+  hidden
+></div>
 <dialog
   class="walkthrough-clip-modal"
   id="walkthrough-clip"
   data-walkthrough-clip-modal
   aria-labelledby="walkthrough-clip-title"
 >
-  <div class="walkthrough-clip-panel">
+  <div class="walkthrough-clip-panel" data-walkthrough-clip-modal-panel>
     <h2 class="walkthrough-clip-title" id="walkthrough-clip-title" data-walkthrough-clip-title>
       {m.features.walkthroughModalTitle}
     </h2>
-    <div class="walkthrough-clip-video-frame">
+    <div class="walkthrough-clip-video-frame" data-walkthrough-clip-frame>
       <video
         class="walkthrough-clip-video"
         data-walkthrough-clip-video

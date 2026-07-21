@@ -11,6 +11,7 @@ const walkthroughClipsScript = await readFile(
 
 describe('docs walkthrough clips', () => {
   afterEach(() => {
+    vi.useRealTimers();
     window.history.replaceState(null, '', `${window.location.pathname}${window.location.search}`);
     document.head.innerHTML = '';
     document.body.innerHTML = '';
@@ -57,6 +58,128 @@ describe('docs walkthrough clips', () => {
     trigger.dispatchEvent(new Event('pointerenter'));
     expect(video.preload).toBe('auto');
     expect(video.load).toHaveBeenCalledTimes(2);
+  });
+
+  it('shows a delayed desktop hover preview and promotes the same player into the modal', () => {
+    vi.useFakeTimers();
+    document.body.innerHTML = `
+      <button
+        id="games-clip"
+        type="button"
+        data-walkthrough-clip-open
+        data-walkthrough-clip-chapter="games"
+        data-walkthrough-clip-start="122"
+        data-walkthrough-clip-end="154"
+        data-walkthrough-clip-title="Games"
+      >Watch</button>
+      <div data-walkthrough-clip-preview aria-hidden="true" hidden></div>
+      <dialog id="walkthrough-clip" data-walkthrough-clip-modal>
+        <div data-walkthrough-clip-modal-panel>
+          <h2 data-walkthrough-clip-title>Feature walkthrough</h2>
+          <div data-walkthrough-clip-frame>
+            <video data-walkthrough-clip-video preload="none"></video>
+          </div>
+        </div>
+      </dialog>
+      <script type="application/json" data-docs-config>{"walkthrough":"../videos/walkthrough.mp4"}</script>
+    `;
+
+    const trigger = document.querySelector('#games-clip');
+    const preview = document.querySelector('[data-walkthrough-clip-preview]');
+    const modal = document.querySelector('[data-walkthrough-clip-modal]');
+    const modalPanel = document.querySelector('[data-walkthrough-clip-modal-panel]');
+    const frame = document.querySelector('[data-walkthrough-clip-frame]');
+    const video = document.querySelector('[data-walkthrough-clip-video]');
+    let currentTime = 0;
+    let isPaused = true;
+
+    vi.stubGlobal('matchMedia', vi.fn((query) => ({
+      matches: query === '(hover: hover) and (pointer: fine)'
+    })));
+    vi.spyOn(trigger, 'getBoundingClientRect').mockReturnValue({
+      bottom: 330,
+      height: 30,
+      left: 500,
+      right: 600,
+      top: 300,
+      width: 100,
+      x: 500,
+      y: 300,
+      toJSON: () => ({})
+    });
+    vi.spyOn(preview, 'getBoundingClientRect').mockReturnValue({
+      bottom: 270,
+      height: 270,
+      left: 0,
+      right: 480,
+      top: 0,
+      width: 480,
+      x: 0,
+      y: 0,
+      toJSON: () => ({})
+    });
+    vi.spyOn(window, 'requestAnimationFrame').mockReturnValue(1);
+    Object.defineProperties(video, {
+      currentTime: {
+        configurable: true,
+        get: () => currentTime,
+        set: (value) => {
+          currentTime = value;
+        }
+      },
+      duration: { configurable: true, get: () => 221 },
+      load: { configurable: true, value: vi.fn() },
+      pause: {
+        configurable: true,
+        value: vi.fn(() => {
+          isPaused = true;
+          video.dispatchEvent(new Event('pause'));
+        })
+      },
+      paused: { configurable: true, get: () => isPaused },
+      play: {
+        configurable: true,
+        value: vi.fn(() => {
+          isPaused = false;
+          video.dispatchEvent(new Event('play'));
+          return Promise.resolve();
+        })
+      },
+      readyState: { configurable: true, get: () => 1 }
+    });
+    Object.defineProperty(modal, 'showModal', {
+      configurable: true,
+      value: vi.fn(() => modal.setAttribute('open', ''))
+    });
+
+    window.eval(walkthroughClipsScript);
+    trigger.dispatchEvent(new Event('pointerenter'));
+
+    vi.advanceTimersByTime(249);
+    expect(preview.hidden).toBe(true);
+
+    vi.advanceTimersByTime(1);
+    expect(preview.hidden).toBe(false);
+    expect(preview.classList.contains('is-visible')).toBe(true);
+    expect(preview.dataset.placement).toBe('above');
+    expect(preview.style.left).toBe('310px');
+    expect(preview.style.top).toBe('20px');
+    expect(frame.parentElement).toBe(preview);
+    expect(video.currentTime).toBe(122);
+    expect(video.muted).toBe(true);
+    expect(video.play).toHaveBeenCalledOnce();
+
+    trigger.style.direction = 'rtl';
+    window.dispatchEvent(new Event('resize'));
+    expect(preview.style.left).toBe('310px');
+
+    trigger.dispatchEvent(new MouseEvent('click', { bubbles: true, button: 0, cancelable: true }));
+    expect(modal.open).toBe(true);
+    expect(preview.hidden).toBe(true);
+    expect(frame.parentElement).toBe(modalPanel);
+    expect(video.currentTime).toBe(122);
+    expect(video.muted).toBe(false);
+    expect(video.play).toHaveBeenCalledTimes(2);
   });
 
   it('opens shared clip hashes, updates the URL, and loops each clip within its bounds', () => {
