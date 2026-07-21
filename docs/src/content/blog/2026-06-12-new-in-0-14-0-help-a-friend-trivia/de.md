@@ -36,7 +36,7 @@ Jedes Match wird aus dem Transkript des Replays generiert, das du gerade ansiehs
 
 :::media-left
 
-![HELP-A-FRIEND! Trivia-Screenshot](./f6e02e23a9bb8118.png)
+![HELP-A-FRIEND! Trivia — Spieler einladen](./replay-trivia-invite-de.webp)
 
 ## Probier es aus
 

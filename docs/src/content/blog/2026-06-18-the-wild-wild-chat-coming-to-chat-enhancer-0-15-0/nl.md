@@ -56,7 +56,7 @@ Net als Schaken en HELP-A-FRIEND! Trivia leeft The Wild Wild Chat binnen Playgro
 
 :::media-left
 
-![Playground-instellingen in de Chat Enhancer-popup](./c99cee6a87fb4253.png)
+![The Wild Wild Chat — Speler uitnodigen](./bounty-hunting-invite-nl.webp)
 
 Playground blijft opt-in. Zet **Deelnemen aan Playground** aan in de extensie-instellingen, open een livestream met chat en zoek naar de Games-knop zodra de update er is.
 

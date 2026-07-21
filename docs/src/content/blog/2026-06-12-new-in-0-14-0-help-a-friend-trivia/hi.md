@@ -36,7 +36,7 @@ Game शुरू होते ही आपका “दोस्त” replay 
 
 :::media-left
 
-![HELP-A-FRIEND! Trivia screenshot](./f6e02e23a9bb8118.png)
+![HELP-A-FRIEND! Trivia — खिलाड़ी को आमंत्रित करें](./replay-trivia-invite-hi.webp)
 
 ## इसे आज़माएँ
 

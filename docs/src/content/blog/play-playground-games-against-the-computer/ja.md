@@ -35,7 +35,7 @@ Playground は、一緒に遊ぶ相手が近くにいるときが一番楽しい
 
 :::media-left
 
-![Chat Enhancer ポップアップ内の Playground 設定](./extension-settings.png)
+![チェス — プレイヤーを招待](./chess-invite-ja.webp)
 
 Playground は引き続き任意参加です。拡張機能の設定で **Playground に参加** を有効にし、チャットでゲームパネルを開いて、対戦したいときに Computer の相手を招待してください。
 

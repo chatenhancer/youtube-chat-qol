@@ -38,7 +38,7 @@ YouTubeの一部機能は、まだLiteモードで対応していない場合が
 
 :::media-right
 
-![スクリーンショット eojazq9s 2x](./52a61e9ac7ef3f55.png){width=95%;rotate=-4.5deg}
+![軽量モード](./lite-mode-ja.webp){width=95%;rotate=-4.5deg}
 
 ## 有効にする方法
 拡張機能のポップアップにある**外観**セクションで**Liteモード**をオンにします。すばやく切り替えたいときは、チャットヘッダーの稲妻ボタンも使えます。

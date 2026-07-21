@@ -35,7 +35,7 @@ Playground è più divertente quando c’è qualcuno con cui giocare, ma la live
 
 :::media-left
 
-![Impostazioni di Playground nel popup Chat Enhancer](./extension-settings.png)
+![Scacchi — Invita un giocatore](./chess-invite-it.webp)
 
 Playground resta facoltativo. Attiva **Partecipa a Playground** dalle impostazioni dell’estensione, apri il pannello Giochi nella chat e invita un avversario Computer quando vuoi fare una partita.
 

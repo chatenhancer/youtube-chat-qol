@@ -38,7 +38,7 @@ Certaines fonctionnalités de YouTube ne sont peut-être pas encore prises en ch
 
 :::media-right
 
-![capture d’écran eojazq9s 2x](./52a61e9ac7ef3f55.png){width=95%;rotate=-4.5deg}
+![Mode léger](./lite-mode-fr.webp){width=95%;rotate=-4.5deg}
 
 ## Comment l’activer
 Activez le **mode Lite** dans la section **Apparence** de la fenêtre contextuelle de l’extension. Vous pouvez aussi utiliser le bouton en forme d’éclair dans l’en-tête du chat pour basculer rapidement.

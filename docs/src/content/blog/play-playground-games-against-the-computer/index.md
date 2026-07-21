@@ -36,7 +36,7 @@ Computer keeps Playground available during quiet streams, replays, or whenever a
 
 :::media-left
 
-![Playground settings in the Chat Enhancer popup](./extension-settings.png)
+![Chess — Invite a player](./chess-invite-en.webp)
 
 Playground is still opt-in. Enable **Join Playground** from the extension settings, open the Games panel in chat, and invite a Computer opponent when you want a match.
 

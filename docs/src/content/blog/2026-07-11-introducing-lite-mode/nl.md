@@ -38,7 +38,7 @@ Sommige YouTube-functies worden mogelijk nog niet ondersteund in de Lite-modus, 
 
 :::media-right
 
-![schermafbeelding eojazq9s 2x](./52a61e9ac7ef3f55.png){width=95%;rotate=-4.5deg}
+![Lite-modus](./lite-mode-nl.webp){width=95%;rotate=-4.5deg}
 
 ## Zo schakel je de functie in
 Schakel de **Lite-modus** in via het gedeelte **Weergave** in de pop-up van de extensie. Je kunt ook de knop met het bliksemsymbool in de chatkop gebruiken om snel te wisselen.

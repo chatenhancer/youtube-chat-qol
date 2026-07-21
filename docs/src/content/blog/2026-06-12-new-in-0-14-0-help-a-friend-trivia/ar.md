@@ -36,7 +36,7 @@ tags:
 
 :::media-left
 
-![لقطة شاشة للعبة HELP-A-FRIEND! Trivia](./f6e02e23a9bb8118.png)
+![HELP-A-FRIEND! Trivia — ادعُ لاعبًا](./replay-trivia-invite-ar.webp)
 
 ## جرّبها
 

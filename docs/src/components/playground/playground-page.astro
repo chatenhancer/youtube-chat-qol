@@ -25,7 +25,6 @@ interface PlaygroundPageCopy {
   primaryCta: string;
   readyTitle: string;
   seeHow: string;
-  settingsAlt: string;
   taglineLead: string;
   taglineTail: string;
 }
@@ -37,12 +36,13 @@ interface PlaygroundWalkthroughClip {
   title: string;
 }
 
-const { clipCta, computerHref, copy, games, installHref, walkthroughClip } = Astro.props as {
+const { clipCta, computerHref, copy, games, installHref, locale, walkthroughClip } = Astro.props as {
   clipCta: string;
   computerHref: string;
   copy: PlaygroundPageCopy;
   games: PlaygroundGame[];
   installHref: string;
+  locale: string;
   walkthroughClip: PlaygroundWalkthroughClip;
 };
 const walkthroughClipHash = getWalkthroughClipHash(walkthroughClip.chapter);
@@ -162,10 +162,10 @@ const marqueeGameLogos = Array.from({ length: 3 }, () => gameLogoPattern).flat()
     <div class="pg-computer-inner">
       <img
         class="pg-settings-image"
-        src="/assets/playground/page/settings.png"
-        alt={copy.settingsAlt}
-        width="686"
-        height="654"
+        src={`/assets/playground/page/chess-invite-${locale}.webp`}
+        alt={`${copy.computerTitle}: ${games[0]?.title || 'Chess'}`}
+        width="680"
+        height="562"
         loading="lazy"
         decoding="async"
       >

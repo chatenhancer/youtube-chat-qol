@@ -36,7 +36,7 @@ Her maç, izlediğin tekrarın dökümünden oluşturulur. Böylece oyun o yayı
 
 :::media-left
 
-![HELP-A-FRIEND! Trivia ekran görüntüsü](./f6e02e23a9bb8118.png)
+![HELP-A-FRIEND! Trivia — Oyuncu davet et](./replay-trivia-invite-tr.webp)
 
 ## Dene!
 

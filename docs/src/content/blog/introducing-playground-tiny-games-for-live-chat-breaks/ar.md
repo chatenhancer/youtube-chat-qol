@@ -44,7 +44,7 @@ Playground ليس غرفة ألعاب كاملة ملحقة بـ YouTube. إنه
 
 :::media-left
 
-![إعدادات Playground في نافذة Chat Enhancer المنبثقة](./c99cee6a87fb4253.png)
+![شطرنج — ادعُ لاعبًا](./chess-invite-ar.webp)
 
 فعّل **الانضمام إلى ساحة التجارب** ليظهر رمز الألعاب في الدردشة.
 

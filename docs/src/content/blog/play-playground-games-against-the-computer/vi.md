@@ -35,7 +35,7 @@ Playground vui nhất khi có ai đó để chơi cùng, nhưng live chat không
 
 :::media-left
 
-![Cài đặt Playground trong popup Chat Enhancer](./extension-settings.png)
+![Cờ vua — Mời người chơi](./chess-invite-vi.webp)
 
 Playground vẫn là tính năng opt-in. Bật **Tham gia Playground** trong cài đặt tiện ích, mở bảng Trò chơi trong chat và mời một đối thủ Computer khi bạn muốn chơi một trận.
 

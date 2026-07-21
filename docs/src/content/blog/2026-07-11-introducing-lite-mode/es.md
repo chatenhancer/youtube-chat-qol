@@ -38,7 +38,7 @@ Algunas acciones de YouTube, como denunciar o bloquear a una persona, todavía n
 
 :::media-right
 
-![captura de pantalla eojazq9s 2x](./52a61e9ac7ef3f55.png){width=95%;rotate=-4.5deg}
+![Modo ligero](./lite-mode-es.webp){width=95%;rotate=-4.5deg}
 
 ## Cómo activarlo
 Activa el **modo Lite** desde la sección **Apariencia** de la ventana emergente de la extensión. También puedes usar el botón con forma de rayo del encabezado del chat cuando quieras cambiar rápidamente.

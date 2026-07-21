@@ -36,7 +36,7 @@ Każdy mecz jest generowany z transkrypcji oglądanej powtórki, więc gra może
 
 :::media-left
 
-![Zrzut ekranu HELP-A-FRIEND! Trivia](./f6e02e23a9bb8118.png)
+![HELP-A-FRIEND! Trivia — Zaproś gracza](./replay-trivia-invite-pl.webp)
 
 ## Wypróbuj
 

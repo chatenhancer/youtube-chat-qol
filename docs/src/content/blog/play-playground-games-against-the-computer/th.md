@@ -35,7 +35,7 @@ Playground สนุกที่สุดเมื่อมีคนเล่น
 
 :::media-left
 
-![การตั้งค่า Playground ในป๊อปอัปของ Chat Enhancer](./extension-settings.png)
+![หมากรุก — เชิญผู้เล่น](./chess-invite-th.webp)
 
 Playground ยังคงเป็นตัวเลือกที่ต้องเปิดเอง เปิด **เข้าร่วม Playground** จากการตั้งค่าส่วนขยาย เปิดแผงเกมในแชท แล้วเชิญคู่แข่ง Computer เมื่อคุณอยากเริ่มแมตช์
 

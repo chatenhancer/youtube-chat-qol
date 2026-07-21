@@ -44,7 +44,7 @@ Playground قرار نیست یک اتاق بازی کامل روی YouTube با
 
 :::media-left
 
-![تنظیمات Playground در پنجره Chat Enhancer](./c99cee6a87fb4253.png)
+![شطرنج — دعوت از بازیکن](./chess-invite-fa.webp)
 
 **پیوستن به محیط آزمایشی** را فعال کنید تا آیکن بازی‌ها در چت ظاهر شود.
 

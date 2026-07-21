@@ -35,7 +35,7 @@ Computer mantiene Playground disponible en directos tranquilos, reproducciones o
 
 :::media-left
 
-![Ajustes de Playground en el popup de Chat Enhancer](./extension-settings.png)
+![Ajedrez — Invitar a un jugador](./chess-invite-es.webp)
 
 Playground sigue siendo opcional. Activa **Unirse a Playground** desde los ajustes de la extensión, abre el panel de Juegos en el chat e invita a un rival Computer cuando quieras una partida.
 

@@ -56,7 +56,7 @@ Tak jak Szachy i HELP-A-FRIEND! Trivia, The Wild Wild Chat działa wewnątrz Pla
 
 :::media-left
 
-![Ustawienia Playground w popupie Chat Enhancer](./c99cee6a87fb4253.png)
+![The Wild Wild Chat — Zaproś gracza](./bounty-hunting-invite-pl.webp)
 
 Playground nadal jest opcjonalny. Włącz **Dołącz do Playground** w ustawieniach rozszerzenia, otwórz transmisję na żywo z czatem i wypatruj przycisku Gry, gdy aktualizacja będzie dostępna.
 

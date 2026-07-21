@@ -56,7 +56,7 @@ tags:
 
 :::media-left
 
-![إعدادات Playground في نافذة Chat Enhancer المنبثقة](./c99cee6a87fb4253.png)
+![The Wild Wild Chat — ادعُ لاعبًا](./bounty-hunting-invite-ar.webp)
 
 لا يزال Playground اختياريًا. فعّل **الانضمام إلى ساحة التجارب** من إعدادات الإضافة، وافتح بثًا مباشرًا فيه دردشة، وابحث عن زر الألعاب عند وصول التحديث.
 

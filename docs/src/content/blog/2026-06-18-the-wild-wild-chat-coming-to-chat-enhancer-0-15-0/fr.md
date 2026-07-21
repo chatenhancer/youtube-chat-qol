@@ -56,7 +56,7 @@ Comme Échecs et HELP-A-FRIEND! Trivia, The Wild Wild Chat vit dans Playground. 
 
 :::media-left
 
-![Paramètres Playground dans le popup Chat Enhancer](./c99cee6a87fb4253.png)
+![The Wild Wild Chat — Inviter un joueur](./bounty-hunting-invite-fr.webp)
 
 Playground reste optionnel. Activez **Rejoindre Playground** dans les paramètres de l’extension, ouvrez un direct avec chat et cherchez le bouton Jeux quand la mise à jour arrivera.
 

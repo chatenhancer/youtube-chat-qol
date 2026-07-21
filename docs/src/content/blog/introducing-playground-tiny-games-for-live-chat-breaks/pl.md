@@ -44,7 +44,7 @@ Playground nie jest pełnym pokojem gier doklejonym do YouTube. Jest na spokojni
 
 :::media-left
 
-![Ustawienia Playground w popupie Chat Enhancer](./c99cee6a87fb4253.png)
+![Szachy — Zaproś gracza](./chess-invite-pl.webp)
 
 Włącz **Dołącz do Playground**, aby ikona Gry pojawiła się w czacie.
 

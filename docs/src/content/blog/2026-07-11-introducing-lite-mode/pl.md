@@ -38,7 +38,7 @@ Niektóre funkcje YouTube mogą nie być jeszcze obsługiwane w trybie Lite, na 
 
 :::media-right
 
-![zrzut ekranu eojazq9s 2x](./52a61e9ac7ef3f55.png){width=95%;rotate=-4.5deg}
+![Tryb lekki](./lite-mode-pl.webp){width=95%;rotate=-4.5deg}
 
 ## Jak go włączyć
 Włącz **tryb Lite** w sekcji **Wygląd** okna podręcznego rozszerzenia. Aby szybko przełączać tryb, możesz też użyć przycisku z błyskawicą w nagłówku czatu.

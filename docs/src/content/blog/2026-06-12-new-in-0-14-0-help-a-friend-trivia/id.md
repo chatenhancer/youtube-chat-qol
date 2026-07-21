@@ -36,7 +36,7 @@ Setiap pertandingan dibuat dari transkrip replay yang sedang Anda tonton, jadi g
 
 :::media-left
 
-![Tangkapan layar HELP-A-FRIEND! Trivia](./f6e02e23a9bb8118.png)
+![HELP-A-FRIEND! Trivia — Undang pemain](./replay-trivia-invite-id.webp)
 
 ## Coba sekarang
 

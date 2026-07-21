@@ -35,7 +35,7 @@ tags:
 
 :::media-left
 
-![إعدادات Playground في نافذة Chat Enhancer المنبثقة](./extension-settings.png)
+![شطرنج — ادعُ لاعبًا](./chess-invite-ar.webp)
 
 يبقى Playground اختياريًا. فعّل **الانضمام إلى Playground** من إعدادات الإضافة، وافتح لوحة الألعاب في الدردشة، وادعُ خصمًا من Computer عندما تريد مباراة.
 

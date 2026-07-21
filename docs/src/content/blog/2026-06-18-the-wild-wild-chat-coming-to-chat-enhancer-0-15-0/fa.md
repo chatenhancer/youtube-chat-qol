@@ -56,7 +56,7 @@ The Wild Wild Chat فقط هنگام چت زنده در دسترس است، چو
 
 :::media-left
 
-![تنظیمات Playground در پنجره Chat Enhancer](./c99cee6a87fb4253.png)
+![The Wild Wild Chat — دعوت از بازیکن](./bounty-hunting-invite-fa.webp)
 
 Playground هنوز اختیاری است. از تنظیمات افزونه **پیوستن به محیط آزمایشی** را فعال کنید، یک پخش زنده با چت باز کنید و وقتی به‌روزرسانی رسید دنبال دکمه بازی‌ها بگردید.
 

@@ -36,7 +36,7 @@ Cada partida é gerada a partir da transcrição do replay que você está assis
 
 :::media-left
 
-![Captura de tela do HELP-A-FRIEND! Trivia](./f6e02e23a9bb8118.png)
+![HELP-A-FRIEND! Trivia — Convidar jogador](./replay-trivia-invite-pt.webp)
 
 ## Jogue!
 

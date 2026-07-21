@@ -161,7 +161,6 @@
     "computerTitle": "Jouez contre Computer",
     "computerBody": "Chaque jeu Playground comprend un adversaire Computer : vous pouvez donc lancer une partie sans attendre un autre spectateur. Choisissez un jeu, sélectionnez Computer et gardez le stream à proximité.",
     "readyTitle": "Prêt à jouer ?",
-    "settingsAlt": "Réglages de Playground dans le popup de l’extension Chat Enhancer",
     "logoAlt": "Chat Enhancer Playground",
     "primaryCta": "L’essayer dans l’extension",
     "games": {

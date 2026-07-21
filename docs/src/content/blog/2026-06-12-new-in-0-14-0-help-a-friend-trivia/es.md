@@ -36,7 +36,7 @@ Cada partida se genera a partir de la transcripción de la reproducción que est
 
 :::media-left
 
-![Captura de HELP-A-FRIEND! Trivia](./f6e02e23a9bb8118.png)
+![HELP-A-FRIEND! Trivia — Invitar a un jugador](./replay-trivia-invite-es.webp)
 
 ## ¡Pruébalo!
 

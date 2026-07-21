@@ -36,7 +36,7 @@ tags:
 
 :::media-left
 
-![Скриншот HELP-A-FRIEND! Trivia](./f6e02e23a9bb8118.png)
+![HELP-A-FRIEND! Trivia — Пригласить игрока](./replay-trivia-invite-ru.webp)
 
 ## Попробуй!
 

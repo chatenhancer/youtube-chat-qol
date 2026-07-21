@@ -38,7 +38,7 @@ Bir sohbet kullanıcısını bildirme veya engelleme gibi bazı YouTube özellik
 
 :::media-right
 
-![ekran görüntüsü eojazq9s 2x](./52a61e9ac7ef3f55.png){width=95%;rotate=-4.5deg}
+![Lite mod](./lite-mode-tr.webp){width=95%;rotate=-4.5deg}
 
 ## Nasıl açılır?
 Uzantı açılır penceresindeki **Görünüm** bölümünden **Lite modunu** açın. Hızlı geçiş yapmak istediğinizde sohbet başlığındaki şimşek düğmesini de kullanabilirsiniz.

@@ -35,7 +35,7 @@ Playground सबसे मजेदार तब होता है जब ख
 
 :::media-left
 
-![Chat Enhancer popup में Playground settings](./extension-settings.png)
+![शतरंज — खिलाड़ी को आमंत्रित करें](./chess-invite-hi.webp)
 
 Playground अभी भी opt-in है। Extension settings से **Playground से जुड़ें** enable करें, chat में गेम पैनल खोलें, और match खेलना हो तो किसी Computer opponent को invite करें।
 

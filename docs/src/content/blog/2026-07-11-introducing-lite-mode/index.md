@@ -38,7 +38,7 @@ Some YouTube actions, including reporting or blocking a chatter, are not yet ava
 
 :::media-right
 
-![screenshot eojazq9s 2x](./52a61e9ac7ef3f55.png){width=95%;rotate=-4.5deg}
+![Lite mode](./lite-mode-en.webp){width=95%;rotate=-4.5deg}
 
 ## How to turn it on
 Turn on **Lite mode** from the **Appearance** section of the extension popup. You can also use the lightning-bolt button in the chat header when you want to switch quickly.

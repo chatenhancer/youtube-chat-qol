@@ -56,7 +56,7 @@ The Wild Wild Chat सिर्फ live chat के दौरान उपलब
 
 :::media-left
 
-![Chat Enhancer popup में Playground settings](./c99cee6a87fb4253.png)
+![The Wild Wild Chat — खिलाड़ी को आमंत्रित करें](./bounty-hunting-invite-hi.webp)
 
 Playground अभी भी opt-in है। Extension settings से **Playground से जुड़ें** enable करें, chat वाला live stream खोलें, और update आने पर गेम बटन देखें।
 

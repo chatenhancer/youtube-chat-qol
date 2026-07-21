@@ -35,7 +35,7 @@ Playground macht am meisten Spaß, wenn jemand zum Mitspielen da ist, aber Livec
 
 :::media-left
 
-![Playground-Einstellungen im Chat Enhancer-Popup](./extension-settings.png)
+![Schach — Spieler einladen](./chess-invite-de.webp)
 
 Playground bleibt optional. Aktiviere **Playground beitreten** in den Erweiterungseinstellungen, öffne das Spiele-Panel im Chat und lade einen Computer-Gegner ein, wenn du eine Partie spielen möchtest.
 

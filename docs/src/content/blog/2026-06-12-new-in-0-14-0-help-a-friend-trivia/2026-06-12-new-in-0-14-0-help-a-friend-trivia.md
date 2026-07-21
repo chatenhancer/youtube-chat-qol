@@ -36,7 +36,7 @@ Each match is generated from the transcript of the replay you are watching, so t
 
 :::media-left
 
-![screenshot ktkl8myt 2x](./f6e02e23a9bb8118.png)
+![HELP-A-FRIEND! Trivia — Invite a player](./replay-trivia-invite-en.webp)
 
 ## Try it
 

@@ -56,7 +56,7 @@ Giống như Cờ vua và HELP-A-FRIEND! Trivia, The Wild Wild Chat nằm trong 
 
 :::media-left
 
-![Cài đặt Playground trong popup Chat Enhancer](./c99cee6a87fb4253.png)
+![The Wild Wild Chat — Mời người chơi](./bounty-hunting-invite-vi.webp)
 
 Playground vẫn là tính năng chọn tham gia. Bật **Tham gia Playground** trong cài đặt tiện ích, mở một live stream có chat và tìm nút Trò chơi khi bản cập nhật đến.
 

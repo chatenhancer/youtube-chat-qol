@@ -44,7 +44,7 @@ Playground ไม่ใช่ห้องเกมเต็มรูปแบบ
 
 :::media-left
 
-![การตั้งค่า Playground ในป๊อปอัปของ Chat Enhancer](./c99cee6a87fb4253.png)
+![หมากรุก — เชิญผู้เล่น](./chess-invite-th.webp)
 
 เปิด **เข้าร่วม Playground** เพื่อให้ไอคอนเกมปรากฏในแชท
 

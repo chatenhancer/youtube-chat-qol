@@ -36,7 +36,7 @@ tags:
 
 :::media-left
 
-![ภาพหน้าจอ HELP-A-FRIEND! Trivia](./f6e02e23a9bb8118.png)
+![HELP-A-FRIEND! Trivia — เชิญผู้เล่น](./replay-trivia-invite-th.webp)
 
 ## ลองเล่นเลย
 

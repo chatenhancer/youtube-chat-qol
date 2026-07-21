@@ -44,7 +44,7 @@ Playground is designed for quiet moments in a stream, so it keeps YouTube visibl
 
 :::media-left
 
-![Playground settings in the Chat Enhancer popup](./c99cee6a87fb4253.png)
+![Chess — Invite a player](./chess-invite-en.webp)
 
 Enable **Join Playground** for the Games icon to appear in chat.
 

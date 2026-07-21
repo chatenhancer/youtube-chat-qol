@@ -35,7 +35,7 @@ Playground עובד הכי טוב כשיש מישהו זמין לשחק איתו
 
 :::media-left
 
-![הגדרות Playground בפופאפ של Chat Enhancer](./extension-settings.png)
+![שחמט — הזמנת שחקן](./chess-invite-he.webp)
 
 Playground עדיין אופציונלי. הפעילו את **הצטרפות ל-Playground** מהגדרות התוסף, פתחו את לוח המשחקים בצ'אט והזמינו יריב Computer כשמתחשק לכם לשחק.
 

@@ -207,7 +207,7 @@ function getBlogBlockSignature(block, locales) {
   if (/^:::[\w-]*$/.test(block) || block === ':::') return `directive:${block}`;
 
   const image = block.match(/^!\[[^\]]*\]\(([^)]+)\)(.*)$/);
-  if (image) return `image:${image[1]}${image[2] || ''}`;
+  if (image) return `image:${normalizeLocalizedImageHref(image[1], locales)}${image[2] || ''}`;
 
   const unorderedItems = block.split('\n').filter((line) => /^[-*]\s+/.test(line)).length;
   if (unorderedItems) return `ul:${unorderedItems}:${getInlineStructureSignature(block, locales)}`;
@@ -243,6 +243,14 @@ function normalizeBlogHref(href, locales) {
   }
 
   return normalized;
+}
+
+function normalizeLocalizedImageHref(href, locales) {
+  for (const locale of locales) {
+    const localizedSuffix = new RegExp(`-${escapeRegExp(locale)}\\.webp$`);
+    if (localizedSuffix.test(href)) return href.replace(localizedSuffix, '-{locale}.webp');
+  }
+  return href;
 }
 
 function getDocsLocalePath(locale) {

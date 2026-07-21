@@ -56,7 +56,7 @@ The Wild Wild Chat доступна только во время live chat, по
 
 :::media-left
 
-![Настройки Playground в popup Chat Enhancer](./c99cee6a87fb4253.png)
+![The Wild Wild Chat — Пригласить игрока](./bounty-hunting-invite-ru.webp)
 
 Playground по-прежнему включается по желанию. Включите **Присоединиться к Playground** в настройках расширения, откройте live-трансляцию с чатом и ищите кнопку Игры, когда выйдет обновление.
 

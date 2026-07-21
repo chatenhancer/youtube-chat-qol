@@ -38,7 +38,7 @@ Chat Enhancer 的功能也会继续在轻量消息行中运行，包括翻译、
 
 :::media-right
 
-![屏幕截图 eojazq9s 2x](./52a61e9ac7ef3f55.png){width=95%;rotate=-4.5deg}
+![轻量模式](./lite-mode-zh_CN.webp){width=95%;rotate=-4.5deg}
 
 ## 如何开启
 在扩展程序弹出窗口的**外观**部分开启 **Lite 模式**。需要快速切换时，也可以使用聊天标题栏中的闪电按钮。

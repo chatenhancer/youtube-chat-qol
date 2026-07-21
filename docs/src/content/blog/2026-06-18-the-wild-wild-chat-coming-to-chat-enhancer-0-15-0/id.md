@@ -56,7 +56,7 @@ Seperti Catur dan HELP-A-FRIEND! Trivia, The Wild Wild Chat berada di dalam Play
 
 :::media-left
 
-![Pengaturan Playground di popup Chat Enhancer](./c99cee6a87fb4253.png)
+![The Wild Wild Chat — Undang pemain](./bounty-hunting-invite-id.webp)
 
 Playground masih opt-in. Aktifkan **Gabung Playground** dari pengaturan ekstensi, buka live stream dengan chat, lalu cari tombol Game saat pembaruan tiba.
 

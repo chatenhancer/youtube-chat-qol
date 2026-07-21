@@ -56,7 +56,7 @@ Satranç ve HELP-A-FRIEND! Trivia gibi The Wild Wild Chat de Playground içinde 
 
 :::media-left
 
-![Chat Enhancer popup’ında Playground ayarları](./c99cee6a87fb4253.png)
+![The Wild Wild Chat — Oyuncu davet et](./bounty-hunting-invite-tr.webp)
 
 Playground hâlâ isteğe bağlı. Uzantı ayarlarından **Playground’a katıl** seçeneğini aç, sohbetli bir canlı yayın aç ve güncelleme geldiğinde Oyunlar Oyunlar düğmesi ara.
 

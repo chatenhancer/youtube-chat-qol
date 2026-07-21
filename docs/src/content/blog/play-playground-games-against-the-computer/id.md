@@ -35,7 +35,7 @@ Playground paling seru saat ada orang lain untuk diajak bermain, tetapi live cha
 
 :::media-left
 
-![Pengaturan Playground di popup Chat Enhancer](./extension-settings.png)
+![Catur — Undang pemain](./chess-invite-id.webp)
 
 Playground tetap opt-in. Aktifkan **Gabung Playground** dari pengaturan ekstensi, buka panel Game di chat, dan undang lawan Computer saat Anda ingin bermain.
 

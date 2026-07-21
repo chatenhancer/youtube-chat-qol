@@ -38,7 +38,7 @@ Ada fitur YouTube yang mungkin belum didukung dalam mode Lite, misalnya kemampua
 
 :::media-right
 
-![tangkapan layar eojazq9s 2x](./52a61e9ac7ef3f55.png){width=95%;rotate=-4.5deg}
+![Mode ringan](./lite-mode-id.webp){width=95%;rotate=-4.5deg}
 
 ## Cara mengaktifkannya
 Aktifkan **mode Lite** dari bagian **Tampilan** pada pop-up ekstensi. Anda juga dapat menggunakan tombol bergambar petir di header chat saat ingin beralih dengan cepat.

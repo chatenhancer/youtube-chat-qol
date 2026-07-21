@@ -35,7 +35,7 @@ Playground веселее всего, когда рядом есть живой 
 
 :::media-left
 
-![Настройки Playground в popup Chat Enhancer](./extension-settings.png)
+![Шахматы — Пригласить игрока](./chess-invite-ru.webp)
 
 Playground по-прежнему включается по желанию. Включите **Присоединиться к Playground** в настройках расширения, откройте панель «Игры» в чате и пригласите Computer, когда захотите сыграть матч.
 

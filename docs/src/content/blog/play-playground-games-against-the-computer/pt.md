@@ -35,7 +35,7 @@ O Playground é mais divertido quando há alguém por perto para jogar, mas o ch
 
 :::media-left
 
-![Configurações do Playground no popup do Chat Enhancer](./extension-settings.png)
+![Xadrez — Convidar jogador](./chess-invite-pt.webp)
 
 O Playground continua sendo opcional. Ative **Entrar no Playground** nas configurações da extensão, abra o painel Jogos no chat e convide um oponente Computer quando quiser uma partida.
 

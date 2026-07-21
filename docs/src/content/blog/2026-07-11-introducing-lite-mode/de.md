@@ -38,7 +38,7 @@ Einige YouTube-Funktionen werden im Lite-Modus möglicherweise noch nicht unters
 
 :::media-right
 
-![Screenshot eojazq9s 2x](./52a61e9ac7ef3f55.png){width=95%;rotate=-4.5deg}
+![Lite-Modus](./lite-mode-de.webp){width=95%;rotate=-4.5deg}
 
 ## So aktivierst du ihn
 Aktiviere den **Lite-Modus** im Bereich **Darstellung** des Erweiterungs-Pop-ups. Für einen schnellen Wechsel kannst du auch die Schaltfläche mit dem Blitzsymbol in der Chat-Kopfzeile verwenden.

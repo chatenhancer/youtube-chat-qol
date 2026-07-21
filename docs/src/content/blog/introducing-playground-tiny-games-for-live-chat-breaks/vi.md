@@ -44,7 +44,7 @@ Playground không phải một phòng game đầy đủ gắn thêm vào YouTube
 
 :::media-left
 
-![Cài đặt Playground trong popup Chat Enhancer](./c99cee6a87fb4253.png)
+![Cờ vua — Mời người chơi](./chess-invite-vi.webp)
 
 Bật **Tham gia Playground** để biểu tượng Trò chơi xuất hiện trong chat.
 

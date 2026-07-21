@@ -36,7 +36,7 @@ tags:
 
 :::media-left
 
-![HELP-A-FRIEND! Trivia 截圖](./f6e02e23a9bb8118.png)
+![HELP-A-FRIEND! Trivia — 邀請玩家](./replay-trivia-invite-zh_TW.webp)
 
 ## 試試看
 

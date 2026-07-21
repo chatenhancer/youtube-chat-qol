@@ -56,7 +56,7 @@ The Wild Wild Chat은 라이브 채팅 중에만 사용할 수 있습니다. 스
 
 :::media-left
 
-![Chat Enhancer 팝업의 Playground 설정](./c99cee6a87fb4253.png)
+![The Wild Wild Chat — 플레이어 초대](./bounty-hunting-invite-ko.webp)
 
 Playground는 아직 선택 참여 방식입니다. 확장 프로그램 설정에서 **Playground 참여**를 켜고, 채팅이 있는 라이브 스트림을 연 뒤 업데이트가 도착하면 게임 버튼을 찾아보세요.
 

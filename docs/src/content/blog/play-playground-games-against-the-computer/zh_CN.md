@@ -35,7 +35,7 @@ Playground 在有人一起玩时最有趣，但直播聊天并不总是可预测
 
 :::media-left
 
-![Chat Enhancer 弹窗中的 Playground 设置](./extension-settings.png)
+![国际象棋 — 邀请玩家](./chess-invite-zh_CN.webp)
 
 Playground 仍然需要主动开启。在扩展设置中启用 **加入 Playground**，在聊天中打开游戏面板，想开始对局时邀请 Computer 对手即可。
 

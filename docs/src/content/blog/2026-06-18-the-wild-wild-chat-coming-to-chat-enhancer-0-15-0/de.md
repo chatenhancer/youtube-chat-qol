@@ -56,7 +56,7 @@ Wie Schach und HELP-A-FRIEND! Trivia läuft The Wild Wild Chat in Playground. Es
 
 :::media-left
 
-![Playground-Einstellungen im Chat Enhancer-Popup](./c99cee6a87fb4253.png)
+![The Wild Wild Chat — Spieler einladen](./bounty-hunting-invite-de.webp)
 
 Playground bleibt optional. Aktiviere **Playground beitreten** in den Erweiterungseinstellungen, öffne einen Livestream mit Chat und halte nach dem Spiele-Button Ausschau, sobald das Update da ist.
 

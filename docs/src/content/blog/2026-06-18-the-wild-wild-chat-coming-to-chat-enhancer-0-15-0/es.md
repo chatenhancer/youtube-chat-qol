@@ -56,7 +56,7 @@ The Wild Wild Chat usa el panel de Juegos, las invitaciones y la ventana flotant
 
 :::media-left
 
-![Ajustes de Playground en el popup de Chat Enhancer](./c99cee6a87fb4253.png)
+![The Wild Wild Chat — Invitar a un jugador](./bounty-hunting-invite-es.webp)
 
 Playground sigue siendo opcional. Activa **Unirse a Playground** desde los ajustes de la extensión, abre un directo con chat y busca el botón Juegos cuando llegue la actualización.
 

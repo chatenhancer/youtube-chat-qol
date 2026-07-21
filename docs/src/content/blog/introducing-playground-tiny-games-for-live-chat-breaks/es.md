@@ -44,7 +44,7 @@ Playground está pensado para los momentos tranquilos de un directo y mantiene Y
 
 :::media-left
 
-![Ajustes de Playground en el popup de Chat Enhancer](./c99cee6a87fb4253.png)
+![Ajedrez — Invitar a un jugador](./chess-invite-es.webp)
 
 Activa **Unirse a Playground** para que aparezca el icono Juegos en el chat.
 

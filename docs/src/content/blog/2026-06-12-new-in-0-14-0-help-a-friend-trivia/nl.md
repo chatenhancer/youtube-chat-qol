@@ -36,7 +36,7 @@ Elke match wordt gegenereerd uit het transcript van de replay die je bekijkt. Da
 
 :::media-left
 
-![Screenshot van HELP-A-FRIEND! Trivia](./f6e02e23a9bb8118.png)
+![HELP-A-FRIEND! Trivia — Speler uitnodigen](./replay-trivia-invite-nl.webp)
 
 ## Probeer het
 

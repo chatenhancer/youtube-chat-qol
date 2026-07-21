@@ -56,7 +56,7 @@ Assim como Xadrez e HELP-A-FRIEND! Trivia, The Wild Wild Chat fica dentro do Pla
 
 :::media-left
 
-![Configurações do Playground no popup do Chat Enhancer](./c99cee6a87fb4253.png)
+![The Wild Wild Chat — Convidar jogador](./bounty-hunting-invite-pt.webp)
 
 O Playground ainda é opcional. Ative **Entrar no Playground** nas configurações da extensão, abra uma transmissão ao vivo com chat e procure o botão Jogos quando a atualização chegar.
 

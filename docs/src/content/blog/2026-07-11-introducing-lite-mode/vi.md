@@ -38,7 +38,7 @@ Một số tính năng của YouTube có thể chưa được hỗ trợ trong c
 
 :::media-right
 
-![ảnh chụp màn hình eojazq9s 2x](./52a61e9ac7ef3f55.png){width=95%;rotate=-4.5deg}
+![Chế độ nhẹ](./lite-mode-vi.webp){width=95%;rotate=-4.5deg}
 
 ## Cách bật
 Bật **chế độ Lite** trong phần **Giao diện** của cửa sổ bật lên của tiện ích mở rộng. Bạn cũng có thể dùng nút hình tia chớp trong tiêu đề trò chuyện khi muốn chuyển đổi nhanh.

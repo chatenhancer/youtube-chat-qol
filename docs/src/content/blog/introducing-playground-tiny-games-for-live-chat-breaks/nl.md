@@ -44,7 +44,7 @@ Playground is geen volledige gameroom die op YouTube is geplakt. Het is bedoeld 
 
 :::media-left
 
-![Playground-instellingen in de Chat Enhancer-popup](./c99cee6a87fb4253.png)
+![Schaken — Speler uitnodigen](./chess-invite-nl.webp)
 
 Schakel **Deelnemen aan Playground** in om het Games-pictogram in de chat te laten verschijnen.
 

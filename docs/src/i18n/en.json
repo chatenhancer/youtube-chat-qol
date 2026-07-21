@@ -163,7 +163,6 @@
     "computerTitle": "Play against the Computer",
     "computerBody": "Every Playground game includes a Computer opponent, so you can start a match without waiting for another viewer. Pick a game, choose Computer, and keep the stream close.",
     "readyTitle": "Ready to play?",
-    "settingsAlt": "Playground settings in the Chat Enhancer extension popup",
     "games": {
       "chess": {
         "title": "Good Ol' Chess",

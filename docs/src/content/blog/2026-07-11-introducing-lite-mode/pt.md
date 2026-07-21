@@ -38,7 +38,7 @@ Alguns recursos do YouTube talvez ainda não sejam compatíveis com o modo Lite,
 
 :::media-right
 
-![captura de tela eojazq9s 2x](./52a61e9ac7ef3f55.png){width=95%;rotate=-4.5deg}
+![Modo leve](./lite-mode-pt.webp){width=95%;rotate=-4.5deg}
 
 ## Como ativar
 Ative o **modo Lite** na seção **Aparência** do pop-up da extensão. Você também pode usar o botão com o ícone de raio no cabeçalho do chat quando quiser alternar rapidamente.

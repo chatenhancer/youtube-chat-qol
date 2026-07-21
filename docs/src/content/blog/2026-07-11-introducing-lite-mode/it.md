@@ -38,7 +38,7 @@ Alcune funzionalità di YouTube potrebbero non essere ancora supportate nella mo
 
 :::media-right
 
-![schermata eojazq9s 2x](./52a61e9ac7ef3f55.png){width=95%;rotate=-4.5deg}
+![Modalità leggera](./lite-mode-it.webp){width=95%;rotate=-4.5deg}
 
 ## Come attivarla
 Attiva la **modalità Lite** dalla sezione **Aspetto** del popup dell’estensione. Per passare rapidamente da una modalità all’altra puoi anche usare il pulsante con il fulmine nell’intestazione della chat.

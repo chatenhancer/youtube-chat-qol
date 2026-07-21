@@ -56,7 +56,7 @@ The Wild Wild Chat uses Playground’s Games panel, invite flow, and floating wi
 
 :::media-left
 
-![Playground settings in the Chat Enhancer popup](./c99cee6a87fb4253.png)
+![The Wild Wild Chat — Invite a player](./bounty-hunting-invite-en.webp)
 
 Playground is still opt-in. Enable **Join Playground** from the extension settings, open a live stream with chat, and look for the Games button when the update arrives.
 

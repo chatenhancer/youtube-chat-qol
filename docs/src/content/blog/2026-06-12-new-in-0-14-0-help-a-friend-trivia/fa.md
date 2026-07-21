@@ -36,7 +36,7 @@ tags:
 
 :::media-left
 
-![اسکرین‌شات HELP-A-FRIEND! Trivia](./f6e02e23a9bb8118.png)
+![HELP-A-FRIEND! Trivia — دعوت از بازیکن](./replay-trivia-invite-fa.webp)
 
 ## امتحانش کنید
 

@@ -36,7 +36,7 @@ YouTube のリプレイから Playground のマッチを始め、もう 1 人の
 
 :::media-left
 
-![HELP-A-FRIEND! Trivia のスクリーンショット](./f6e02e23a9bb8118.png)
+![HELP-A-FRIEND! Trivia — プレイヤーを招待](./replay-trivia-invite-ja.webp)
 
 ## 試してみる
 

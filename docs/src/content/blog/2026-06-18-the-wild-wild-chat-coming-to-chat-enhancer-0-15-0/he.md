@@ -56,7 +56,7 @@ The Wild Wild Chat זמין רק בזמן צ'אט חי, כי המשחק מבוס
 
 :::media-left
 
-![הגדרות Playground בפופאפ של Chat Enhancer](./c99cee6a87fb4253.png)
+![The Wild Wild Chat — הזמנת שחקן](./bounty-hunting-invite-he.webp)
 
 Playground עדיין אופציונלי. הפעילו את **הצטרפות למגרש הניסויים** בהגדרות התוסף, פתחו שידור חי עם צ'אט וחפשו את כפתור משחקים כשהעדכון יגיע.
 
