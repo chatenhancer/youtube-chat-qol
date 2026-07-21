@@ -169,6 +169,21 @@ describe('docs walkthrough clips', () => {
     expect(video.muted).toBe(true);
     expect(video.play).toHaveBeenCalledOnce();
 
+    trigger.dispatchEvent(new Event('pointerleave'));
+    vi.advanceTimersByTime(100);
+    preview.dispatchEvent(new Event('pointerenter'));
+    vi.advanceTimersByTime(100);
+    expect(preview.hidden).toBe(false);
+    expect(video.pause).not.toHaveBeenCalled();
+
+    preview.dispatchEvent(new Event('pointerleave'));
+    vi.advanceTimersByTime(100);
+    trigger.dispatchEvent(new Event('pointerenter'));
+    vi.advanceTimersByTime(100);
+    expect(preview.hidden).toBe(false);
+    expect(video.currentTime).toBe(122);
+    expect(video.play).toHaveBeenCalledOnce();
+
     trigger.style.direction = 'rtl';
     window.dispatchEvent(new Event('resize'));
     expect(preview.style.left).toBe('310px');

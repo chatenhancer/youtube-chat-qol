@@ -44,6 +44,7 @@
   let hoveredTrigger = null;
   let loopFrame = 0;
   let pendingStartTime = null;
+  let previewCloseTimer = 0;
   let previewTimer = 0;
   let previewTrigger = null;
 
@@ -53,13 +54,14 @@
     trigger.setAttribute("aria-haspopup", "dialog");
     const prepareVideo = () => prepareClipVideo("auto");
     trigger.addEventListener("pointerenter", () => {
+      cancelPreviewCloseTimer();
       hoveredTrigger = trigger;
       prepareVideo();
       scheduleClipPreview(trigger);
     });
     trigger.addEventListener("pointerleave", () => {
       if (hoveredTrigger === trigger) hoveredTrigger = null;
-      closeClipPreview();
+      scheduleClipPreviewClose();
     });
     trigger.addEventListener("pointerdown", () => {
       cancelPreviewTimer();
@@ -116,6 +118,8 @@
   });
 
   if (canPreviewOnHover) {
+    clipPreview.addEventListener("pointerenter", cancelPreviewCloseTimer);
+    clipPreview.addEventListener("pointerleave", scheduleClipPreviewClose);
     window.addEventListener("resize", positionClipPreview);
     window.addEventListener("scroll", positionClipPreview, true);
   }
@@ -177,7 +181,11 @@
   }
 
   function scheduleClipPreview(trigger) {
-    if (!canPreviewOnHover || clipModal.open) return;
+    if (
+      !canPreviewOnHover ||
+      clipModal.open ||
+      (previewTrigger === trigger && isClipPreviewOpen())
+    ) return;
 
     cancelPreviewTimer();
     previewTimer = window.setTimeout(() => {
@@ -190,6 +198,7 @@
   function openClipPreview(trigger, clip) {
     if (!canPreviewOnHover || !clip || hoveredTrigger !== trigger || clipModal.open) return;
 
+    cancelPreviewCloseTimer();
     activeClip = clip;
     previewTrigger = trigger;
     prepareClipVideo("auto");
@@ -204,6 +213,7 @@
 
   function closeClipPreview(options = {}) {
     cancelPreviewTimer();
+    cancelPreviewCloseTimer();
     if (!isClipPreviewOpen()) return;
 
     clipPreview.classList.remove("is-visible");
@@ -223,6 +233,21 @@
 
     window.clearTimeout(previewTimer);
     previewTimer = 0;
+  }
+
+  function scheduleClipPreviewClose() {
+    cancelPreviewCloseTimer();
+    previewCloseTimer = window.setTimeout(() => {
+      previewCloseTimer = 0;
+      closeClipPreview();
+    }, 180);
+  }
+
+  function cancelPreviewCloseTimer() {
+    if (!previewCloseTimer) return;
+
+    window.clearTimeout(previewCloseTimer);
+    previewCloseTimer = 0;
   }
 
   function isClipPreviewOpen() {
