@@ -33,6 +33,10 @@
     if (!clipsByHash.has(clip.hash)) clipsByHash.set(clip.hash, clip);
     trigger.setAttribute("aria-controls", clipModal.id || "walkthrough-clip");
     trigger.setAttribute("aria-haspopup", "dialog");
+    const prepareVideo = () => prepareClipVideo("auto");
+    trigger.addEventListener("pointerenter", prepareVideo);
+    trigger.addEventListener("pointerdown", prepareVideo);
+    trigger.addEventListener("focus", prepareVideo);
     trigger.addEventListener("click", (event) => {
       if (event instanceof MouseEvent && (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey)) {
         return;
@@ -42,6 +46,10 @@
       openClip(clips.get(trigger), { updateHash: true });
     });
   });
+
+  if (!document.querySelector("[data-walkthrough-video]")) {
+    scheduleClipMetadataPreload();
+  }
 
   clipModal.addEventListener("click", (event) => {
     if (event.target === clipModal) closeClip();
@@ -115,18 +123,37 @@
     }
 
     activeClip = clip;
-    ensureClipVideoSource();
+    prepareClipVideo("auto");
     if (clipTitle instanceof HTMLElement && clip.title) clipTitle.textContent = clip.title;
     seekToClipStart();
     if (!clipModal.open) clipModal.showModal();
     startPlayback();
   }
 
-  function ensureClipVideoSource() {
-    if (clipVideo.src === videoUrl.href) return;
+  function prepareClipVideo(preload) {
+    if (preload !== "auto" && clipVideo.preload === "auto") return;
 
-    clipVideo.src = videoUrl.href;
+    const sourceChanged = clipVideo.src !== videoUrl.href;
+    const preloadChanged = clipVideo.preload !== preload;
+    if (!sourceChanged && !preloadChanged) return;
+
+    clipVideo.preload = preload;
+    if (sourceChanged) clipVideo.src = videoUrl.href;
     clipVideo.load();
+  }
+
+  function scheduleClipMetadataPreload() {
+    const preloadMetadata = () => {
+      if (document.hidden) return;
+      prepareClipVideo("metadata");
+    };
+
+    if (typeof window.requestIdleCallback === "function") {
+      window.requestIdleCallback(preloadMetadata, { timeout: 4_000 });
+      return;
+    }
+
+    window.setTimeout(preloadMetadata, 2_000);
   }
 
   function closeClip(options = {}) {

@@ -884,10 +884,16 @@
     });
 
     walkthroughOpenButtons.forEach((button) => {
+      const prepareVideo = () => prepareWalkthroughVideo(videoUrl, "auto");
+      button.addEventListener("pointerenter", prepareVideo);
+      button.addEventListener("pointerdown", prepareVideo);
+      button.addEventListener("focus", prepareVideo);
       button.addEventListener("click", () => {
         openWalkthroughModal(videoUrl, { updateHash: true });
       });
     });
+
+    scheduleWalkthroughMetadataPreload(videoUrl);
 
     window.addEventListener("hashchange", () => {
       if (isWalkthroughHash()) {
@@ -921,7 +927,7 @@
     setWalkthroughKeyPointPanelOpen(false);
     hideWalkthroughPlaybackFeedback();
     if (walkthroughModal && typeof walkthroughModal.showModal === "function") {
-      ensureWalkthroughVideoSource(videoUrl);
+      prepareWalkthroughVideo(videoUrl, "auto");
       if (walkthroughModal.open) {
         startWalkthroughPlayback({ allowMutedFallback: options.allowMutedFallback === true });
         return;
@@ -938,12 +944,31 @@
     window.open(fallbackVideoUrl.href, "_blank", "noopener");
   }
 
-  function ensureWalkthroughVideoSource(videoUrl) {
+  function prepareWalkthroughVideo(videoUrl, preload) {
     if (!(walkthroughVideo instanceof HTMLVideoElement)) return;
-    if (walkthroughVideo.src === videoUrl.href) return;
+    if (preload !== "auto" && walkthroughVideo.preload === "auto") return;
 
-    walkthroughVideo.src = videoUrl.href;
+    const sourceChanged = walkthroughVideo.src !== videoUrl.href;
+    const preloadChanged = walkthroughVideo.preload !== preload;
+    if (!sourceChanged && !preloadChanged) return;
+
+    walkthroughVideo.preload = preload;
+    if (sourceChanged) walkthroughVideo.src = videoUrl.href;
     walkthroughVideo.load();
+  }
+
+  function scheduleWalkthroughMetadataPreload(videoUrl) {
+    const preloadMetadata = () => {
+      if (document.hidden) return;
+      prepareWalkthroughVideo(videoUrl, "metadata");
+    };
+
+    if (typeof window.requestIdleCallback === "function") {
+      window.requestIdleCallback(preloadMetadata, { timeout: 4_000 });
+      return;
+    }
+
+    window.setTimeout(preloadMetadata, 2_000);
   }
 
   function startWalkthroughPlayback(options = {}) {

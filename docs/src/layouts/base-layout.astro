@@ -65,6 +65,10 @@ const docsConfig = {
   supportEmail,
   ...clientConfig
 };
+const siteOrigin = new URL(site.url).origin;
+const walkthroughMediaOrigin = typeof clientConfig.walkthrough === 'string'
+  ? new URL(clientConfig.walkthrough, site.url).origin
+  : '';
 const defaultStructuredData = ogType === 'website' ? {
   '@context': 'https://schema.org',
   '@type': 'SoftwareApplication',
@@ -128,6 +132,9 @@ const structuredDataJson = resolvedStructuredData
     {resolvedXDefaultUrl && <link rel="alternate" hreflang="x-default" href={resolvedXDefaultUrl} />}
     <link rel="icon" href={`${rootPrefix}assets/icons/icon-128.png`}>
     <link rel="apple-touch-icon" href={`${rootPrefix}assets/icons/icon-128.png`}>
+    {walkthroughMediaOrigin && walkthroughMediaOrigin !== siteOrigin && (
+      <link rel="preconnect" href={walkthroughMediaOrigin} />
+    )}
     {fontPreloads.map((href) => <link rel="preload" href={href} as="font" type="font/woff2" crossorigin />)}
     <script is:inline>
       (() => {

@@ -14,7 +14,49 @@ describe('docs walkthrough clips', () => {
     window.history.replaceState(null, '', `${window.location.pathname}${window.location.search}`);
     document.head.innerHTML = '';
     document.body.innerHTML = '';
+    vi.unstubAllGlobals();
     vi.restoreAllMocks();
+  });
+
+  it('loads metadata when idle and upgrades to full preload on intent', () => {
+    document.body.innerHTML = `
+      <button
+        id="games-clip"
+        type="button"
+        data-walkthrough-clip-open
+        data-walkthrough-clip-chapter="games"
+        data-walkthrough-clip-start="105"
+        data-walkthrough-clip-end="135"
+      >Games</button>
+      <dialog id="walkthrough-clip" data-walkthrough-clip-modal>
+        <video data-walkthrough-clip-video preload="none"></video>
+      </dialog>
+      <script type="application/json" data-docs-config>{"walkthrough":"../videos/walkthrough.mp4"}</script>
+    `;
+
+    const trigger = document.querySelector('#games-clip');
+    const video = document.querySelector('[data-walkthrough-clip-video]');
+    const idleCallbacks = [];
+    Object.defineProperty(video, 'load', { configurable: true, value: vi.fn() });
+    vi.stubGlobal('requestIdleCallback', vi.fn((callback) => {
+      idleCallbacks.push(callback);
+      return idleCallbacks.length;
+    }));
+
+    window.eval(walkthroughClipsScript);
+
+    expect(video.src).toBe('');
+    expect(video.preload).toBe('none');
+    expect(video.load).not.toHaveBeenCalled();
+
+    idleCallbacks.shift()();
+    expect(video.src).toBe(new URL('../videos/walkthrough.mp4', window.location.href).href);
+    expect(video.preload).toBe('metadata');
+    expect(video.load).toHaveBeenCalledOnce();
+
+    trigger.dispatchEvent(new Event('pointerenter'));
+    expect(video.preload).toBe('auto');
+    expect(video.load).toHaveBeenCalledTimes(2);
   });
 
   it('opens shared clip hashes, updates the URL, and loops each clip within its bounds', () => {
@@ -59,6 +101,7 @@ describe('docs walkthrough clips', () => {
     const draftsTrigger = document.querySelector('#drafts-clip');
     const commandsTrigger = document.querySelector('#commands-tag');
     const frameCallbacks = [];
+    const idleCallbacks = [];
     let currentTime = 0;
     let isPaused = true;
 
@@ -108,9 +151,14 @@ describe('docs walkthrough clips', () => {
       return frameCallbacks.length;
     });
     vi.spyOn(window, 'cancelAnimationFrame').mockImplementation(() => undefined);
+    vi.stubGlobal('requestIdleCallback', vi.fn((callback) => {
+      idleCallbacks.push(callback);
+      return idleCallbacks.length;
+    }));
 
     window.history.replaceState(null, '', '#clip-translate-what-you-type');
     window.eval(walkthroughClipsScript);
+    expect(window.requestIdleCallback).toHaveBeenCalledOnce();
     frameCallbacks.shift()(0);
 
     expect(modal.open).toBe(true);
@@ -118,6 +166,11 @@ describe('docs walkthrough clips', () => {
     expect(modal.querySelector('[data-walkthrough-clip-title]').textContent).toBe('Draft translator');
     expect(video.currentTime).toBe(25);
     expect(video.play).toHaveBeenCalledOnce();
+    expect(video.preload).toBe('auto');
+    expect(video.src).toBe(new URL('../videos/walkthrough.mp4', window.location.href).href);
+
+    idleCallbacks.shift()();
+    expect(video.preload).toBe('auto');
 
     expect(gamesTrigger.getAttribute('aria-controls')).toBe('walkthrough-clip');
     expect(gamesTrigger.getAttribute('aria-haspopup')).toBe('dialog');
