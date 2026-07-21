@@ -15,8 +15,12 @@ const scriptPath = fileURLToPath(import.meta.url);
 const repoRoot = path.resolve(path.dirname(scriptPath), '..');
 const defaultInputDir = path.join(repoRoot, 'assets', 'demo', 'walkthrough');
 const defaultManifestPath = path.join(repoRoot, 'docs', 'src', 'data', 'walkthrough-videos.json');
+const defaultSiteBaseUrl = 'https://chatenhancer.com/';
 const videoNamePattern = /^chat-enhancer-walkthrough-([a-z]{2}|zh_(?:CN|TW))-([a-f0-9]{8})\.mp4$/;
+const videoNameSearchPattern = /chat-enhancer-walkthrough-(?:[a-z]{2}|zh_(?:CN|TW))-[a-f0-9]{8}\.mp4/g;
 const cacheControl = 'public, max-age=31536000, immutable';
+const retainedVersionCount = 2;
+const retentionDeleteWorkerCount = 2;
 
 if (process.argv[1] && path.resolve(process.argv[1]) === scriptPath) {
   await publishWalkthroughVideos(readOptions(process.argv.slice(2)));
@@ -26,8 +30,8 @@ export async function publishWalkthroughVideos(options = {}) {
   const inputDir = path.resolve(options.inputDir || defaultInputDir);
   const manifestPath = path.resolve(options.manifestPath || defaultManifestPath);
   const supportedLocales = await getWalkthroughLocales();
-  const requestedLocales = readRequestedLocales(options.locales, supportedLocales);
   const manifest = await readManifest(manifestPath, supportedLocales);
+  const requestedLocales = readRequestedLocales(options.locales, supportedLocales);
   const localVideos = await collectLocalVideos(inputDir, supportedLocales);
   const videosToPublish = requestedLocales
     ? requestedLocales.map((locale) => requireLocalVideo(localVideos, locale, inputDir))
@@ -37,37 +41,73 @@ export async function publishWalkthroughVideos(options = {}) {
     throw new Error(`No localized walkthrough videos found in ${inputDir}.`);
   }
 
-  const nextVideos = { ...manifest.videos };
-  videosToPublish.forEach(({ fileName, locale }) => {
-    nextVideos[locale] = fileName;
-  });
-  validateCompleteManifest(nextVideos, supportedLocales);
+  const publication = buildWalkthroughPublicationPlan(manifest, videosToPublish);
+  validateCompleteManifest(publication.manifest.videos, supportedLocales);
 
   if (options.dryRun) {
     videosToPublish.forEach((video) => {
       console.log(`[walkthrough:${video.locale}] Would upload ${getObjectPath(manifest, video.fileName)}.`);
     });
+    publication.obsoleteVideos.forEach(({ fileName, locale }) => {
+      console.log(`[walkthrough:${locale}] Would delete ${getObjectPath(manifest, fileName)} after checking the live site.`);
+    });
     console.log(`[walkthrough] Validated ${videosToPublish.length} video${videosToPublish.length === 1 ? '' : 's'}; no changes made.`);
-    return { manifest: { ...manifest, videos: nextVideos }, videos: videosToPublish };
+    return { ...publication, videos: videosToPublish };
+  }
+
+  if (publication.obsoleteVideos.length) {
+    await verifyLiveWalkthroughReferences(
+      options.siteBaseUrl || defaultSiteBaseUrl,
+      manifest.videos,
+      publication.obsoleteVideos.map(({ locale }) => locale)
+    );
   }
 
   const workerCount = Math.min(readWorkerCount(options.workers), videosToPublish.length);
-  let nextVideoIndex = 0;
-  await Promise.all(Array.from({ length: workerCount }, async () => {
-    while (nextVideoIndex < videosToPublish.length) {
-      const video = videosToPublish[nextVideoIndex];
-      nextVideoIndex += 1;
-      await uploadVideo(manifest, video);
-    }
-  }));
+  await runWorkerPool(videosToPublish, workerCount, async (video) => {
+    await uploadVideo(manifest, video);
+  });
 
-  const nextManifest = { ...manifest, videos: sortRecord(nextVideos) };
-  await writeJsonAtomically(manifestPath, nextManifest);
+  await runWorkerPool(publication.obsoleteVideos, retentionDeleteWorkerCount, async ({ fileName }) => {
+    await deleteVideoWithRetry(manifest, fileName);
+  });
+
+  await writeJsonAtomically(manifestPath, publication.manifest);
   console.log(
     `[walkthrough] Published ${videosToPublish.length} localized video${videosToPublish.length === 1 ? '' : 's'} ` +
     `and updated ${path.relative(repoRoot, manifestPath)}.`
   );
-  return { manifest: nextManifest, videos: videosToPublish };
+  return { ...publication, videos: videosToPublish };
+}
+
+export function buildWalkthroughPublicationPlan(manifest, videosToPublish) {
+  const nextVideos = { ...manifest.videos };
+  const previousVideos = { ...(manifest.retention?.previousVideos || {}) };
+  const obsoleteVideos = [];
+
+  videosToPublish.forEach(({ fileName, locale }) => {
+    const currentFileName = nextVideos[locale];
+    if (fileName === currentFileName) return;
+
+    const previousFileName = previousVideos[locale];
+    if (previousFileName && previousFileName !== fileName) {
+      obsoleteVideos.push({ fileName: previousFileName, locale });
+    }
+    if (currentFileName) previousVideos[locale] = currentFileName;
+    nextVideos[locale] = fileName;
+  });
+
+  return {
+    manifest: {
+      ...manifest,
+      retention: {
+        keepVersionsPerLocale: retainedVersionCount,
+        previousVideos: sortRecord(previousVideos)
+      },
+      videos: sortRecord(nextVideos)
+    },
+    obsoleteVideos: obsoleteVideos.sort((first, second) => first.locale.localeCompare(second.locale))
+  };
 }
 
 export async function collectLocalVideos(inputDir, supportedLocales) {
@@ -116,6 +156,22 @@ async function readManifest(manifestPath, supportedLocales) {
   if (!isNonEmptyString(manifest.publicBaseUrl)) throw new Error(`${manifestPath} must define publicBaseUrl.`);
   if (!manifest.videos || typeof manifest.videos !== 'object' || Array.isArray(manifest.videos)) {
     throw new Error(`${manifestPath} must define a videos object.`);
+  }
+  if (manifest.retention !== undefined) {
+    if (
+      !manifest.retention ||
+      typeof manifest.retention !== 'object' ||
+      Array.isArray(manifest.retention) ||
+      manifest.retention.keepVersionsPerLocale !== retainedVersionCount ||
+      !manifest.retention.previousVideos ||
+      typeof manifest.retention.previousVideos !== 'object' ||
+      Array.isArray(manifest.retention.previousVideos)
+    ) {
+      throw new Error(
+        `${manifestPath} retention must keep ${retainedVersionCount} versions per locale and define previousVideos.`
+      );
+    }
+    validateManifestEntries(manifest.retention.previousVideos, supportedLocales);
   }
 
   const publicUrl = new URL(manifest.publicBaseUrl);
@@ -184,9 +240,82 @@ async function uploadVideo(manifest, video) {
   ]);
 }
 
+async function deleteVideoWithRetry(manifest, fileName) {
+  const objectPath = getObjectPath(manifest, fileName);
+  const retryDelaysMs = [0, 1_000, 2_500];
+  let lastError;
+
+  for (let attempt = 0; attempt < retryDelaysMs.length; attempt += 1) {
+    if (retryDelaysMs[attempt]) await delay(retryDelaysMs[attempt]);
+    try {
+      console.log(
+        `[walkthrough] Deleting ${objectPath}${attempt ? ` (attempt ${attempt + 1})` : ''}.`
+      );
+      await runProcess(getWranglerPath(), [
+        'r2',
+        'object',
+        'delete',
+        objectPath,
+        '--remote',
+        '--force'
+      ]);
+      return;
+    } catch (error) {
+      lastError = error;
+    }
+  }
+
+  throw new Error(`Could not delete ${objectPath} after ${retryDelaysMs.length} attempts.`, {
+    cause: lastError
+  });
+}
+
+export async function verifyLiveWalkthroughReferences(siteBaseUrl, currentVideos, locales) {
+  const cacheBust = Date.now().toString(36);
+  await Promise.all([...new Set(locales)].map(async (locale) => {
+    const localePath = locale === 'en'
+      ? ''
+      : `${locale.replace('_', '-')}/`;
+    const pageUrl = new URL(localePath, ensureTrailingSlash(siteBaseUrl));
+    pageUrl.searchParams.set('walkthrough-retention', cacheBust);
+    const response = await fetch(pageUrl, {
+      headers: { 'cache-control': 'no-cache' }
+    });
+    if (!response.ok) {
+      throw new Error(`${pageUrl.href} returned HTTP ${response.status}.`);
+    }
+
+    const html = await response.text();
+    const matches = [...new Set(html.match(videoNameSearchPattern) || [])]
+      .filter((fileName) => videoNamePattern.exec(fileName)?.[1] === locale);
+    if (matches.length !== 1 || matches[0] !== currentVideos[locale]) {
+      throw new Error(
+        `${pageUrl.href} does not reference the current ${locale} walkthrough; wait for Pages to deploy before publishing again.`
+      );
+    }
+  }));
+
+  console.log(`[walkthrough] Verified ${locales.length} live locale reference${locales.length === 1 ? '' : 's'} before pruning.`);
+}
+
+async function runWorkerPool(items, workerCount, runItem) {
+  let nextIndex = 0;
+  await Promise.all(Array.from({ length: Math.min(workerCount, items.length) }, async () => {
+    while (nextIndex < items.length) {
+      const item = items[nextIndex];
+      nextIndex += 1;
+      await runItem(item);
+    }
+  }));
+}
+
 function getObjectPath(manifest, fileName) {
   const keyPrefix = manifest.keyPrefix.replace(/^\/+|\/+$/g, '');
   return `${manifest.bucket}/${keyPrefix}/${fileName}`;
+}
+
+function ensureTrailingSlash(value) {
+  return value.endsWith('/') ? value : `${value}/`;
 }
 
 function getWranglerPath() {
@@ -212,6 +341,10 @@ function runProcess(command, args) {
       reject(new Error(`${command} failed with ${signal || `exit code ${code}`}.`));
     });
   });
+}
+
+function delay(durationMs) {
+  return new Promise((resolve) => setTimeout(resolve, durationMs));
 }
 
 async function hashFile(filePath) {
@@ -242,6 +375,7 @@ function readOptions(args) {
     if (name === '--input-dir' && value) options.inputDir = value;
     else if (name === '--manifest' && value) options.manifestPath = value;
     else if (name === '--locales' && value) options.locales = value;
+    else if (name === '--site-base-url' && value) options.siteBaseUrl = value;
     else if (name === '--workers' && value) options.workers = value;
     else throw new Error(`Unknown walkthrough publish argument: ${argument}.`);
   }
