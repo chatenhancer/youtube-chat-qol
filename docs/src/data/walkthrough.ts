@@ -11,16 +11,16 @@ interface WalkthroughChapter {
 
 export const walkthroughChapters = [
   { labelKey: 'walkthroughKeyPointTranslation', name: 'translate-live-chat', seconds: 6, time: '0:06' },
-  { labelKey: 'walkthroughKeyPointDrafts', name: 'translate-what-you-type', seconds: 25, time: '0:25' },
-  { labelKey: 'walkthroughKeyPointMentions', name: 'mention-and-quote', seconds: 40, time: '0:40' },
-  { labelKey: 'walkthroughKeyPointUserCards', name: 'review-user-profiles', seconds: 63, time: '1:03' },
-  { labelKey: 'walkthroughKeyPointFocus', name: 'use-focus-mode', seconds: 74, time: '1:14' },
-  { labelKey: 'walkthroughKeyPointInbox', name: 'never-miss-messages', seconds: 85, time: '1:25' },
-  { labelKey: 'walkthroughKeyPointGames', name: 'games', seconds: 105, time: '1:45' },
-  { labelKey: 'walkthroughKeyPointBookmarks', name: 'bookmark-users', seconds: 135, time: '2:15' },
-  { labelKey: 'walkthroughKeyPointEmojis', name: 'keep-emojis-close', seconds: 149, time: '2:29' },
-  { labelKey: 'walkthroughKeyPointCommands', name: 'use-tab-commands', seconds: 164, time: '2:44' },
-  { labelKey: 'walkthroughKeyPointPopup', name: 'advanced-settings', seconds: 176, time: '2:56' }
+  { labelKey: 'walkthroughKeyPointDrafts', name: 'translate-what-you-type', seconds: 28, time: '0:28' },
+  { labelKey: 'walkthroughKeyPointMentions', name: 'mention-and-quote', seconds: 45, time: '0:45' },
+  { labelKey: 'walkthroughKeyPointUserCards', name: 'review-user-profiles', seconds: 72, time: '1:12' },
+  { labelKey: 'walkthroughKeyPointFocus', name: 'use-focus-mode', seconds: 85, time: '1:25' },
+  { labelKey: 'walkthroughKeyPointInbox', name: 'never-miss-messages', seconds: 98, time: '1:38' },
+  { labelKey: 'walkthroughKeyPointGames', name: 'games', seconds: 122, time: '2:02' },
+  { labelKey: 'walkthroughKeyPointBookmarks', name: 'bookmark-users', seconds: 154, time: '2:34' },
+  { labelKey: 'walkthroughKeyPointEmojis', name: 'keep-emojis-close', seconds: 171, time: '2:51' },
+  { labelKey: 'walkthroughKeyPointCommands', name: 'use-tab-commands', seconds: 185, time: '3:05' },
+  { labelKey: 'walkthroughKeyPointPopup', name: 'advanced-settings', seconds: 200, time: '3:20' }
 ] as const satisfies readonly WalkthroughChapter[];
 
 export type WalkthroughChapterName = typeof walkthroughChapters[number]['name'];

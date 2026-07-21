@@ -10,9 +10,7 @@ const captureScriptPath = path.join(scriptDir, 'capture-walkthrough-demo.mjs');
 const supportedLocales = await getWalkthroughLocales();
 const locales = readRequestedLocales(process.argv.slice(2), supportedLocales);
 const previewMode = process.argv.includes('--preview');
-const workerCount = previewMode
-  ? readWorkerCount(process.argv.slice(2), locales.length)
-  : 1;
+const workerCount = readWorkerCount(process.argv.slice(2), locales.length);
 const captureArgs = previewMode ? ['--preview'] : [];
 const maxAttemptsPerLocale = 2;
 let nextLocaleIndex = 0;
@@ -24,7 +22,7 @@ console.log(
     ? `[walkthrough] Rendering ${locales.length} preview locale${locales.length === 1 ? '' : 's'} ` +
       `with ${workerCount} parallel profile${workerCount === 1 ? '' : 's'}.`
     : `[walkthrough] Rendering ${locales.length} final locale${locales.length === 1 ? '' : 's'} ` +
-      'sequentially at 1080p60.'
+      `with ${workerCount} parallel profile${workerCount === 1 ? '' : 's'} at 1080p60.`
 );
 
 await Promise.all(Array.from({ length: workerCount }, runWorker));

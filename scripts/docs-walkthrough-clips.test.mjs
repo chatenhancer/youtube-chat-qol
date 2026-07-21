@@ -25,8 +25,8 @@ describe('docs walkthrough clips', () => {
         type="button"
         data-walkthrough-clip-open
         data-walkthrough-clip-chapter="games"
-        data-walkthrough-clip-start="105"
-        data-walkthrough-clip-end="135"
+        data-walkthrough-clip-start="122"
+        data-walkthrough-clip-end="154"
       >Games</button>
       <dialog id="walkthrough-clip" data-walkthrough-clip-modal>
         <video data-walkthrough-clip-video preload="none"></video>
@@ -66,8 +66,8 @@ describe('docs walkthrough clips', () => {
         href="#clip-games"
         data-walkthrough-clip-open
         data-walkthrough-clip-chapter="games"
-        data-walkthrough-clip-start="105"
-        data-walkthrough-clip-end="135"
+        data-walkthrough-clip-start="122"
+        data-walkthrough-clip-end="154"
         data-walkthrough-clip-title="Games"
       >Games</a>
       <button
@@ -75,8 +75,8 @@ describe('docs walkthrough clips', () => {
         type="button"
         data-walkthrough-clip-open
         data-walkthrough-clip-chapter="translate-what-you-type"
-        data-walkthrough-clip-start="25"
-        data-walkthrough-clip-end="40"
+        data-walkthrough-clip-start="28"
+        data-walkthrough-clip-end="45"
         data-walkthrough-clip-title="Draft translator"
       >Drafts</button>
       <button
@@ -84,8 +84,8 @@ describe('docs walkthrough clips', () => {
         type="button"
         data-walkthrough-clip-open
         data-walkthrough-clip-chapter="use-tab-commands"
-        data-walkthrough-clip-start="164"
-        data-walkthrough-clip-end="176"
+        data-walkthrough-clip-start="185"
+        data-walkthrough-clip-end="200"
         data-walkthrough-clip-title="Use Tab commands"
       >Watch</button>
       <dialog id="walkthrough-clip" data-walkthrough-clip-modal>
@@ -113,7 +113,7 @@ describe('docs walkthrough clips', () => {
           currentTime = value;
         }
       },
-      duration: { configurable: true, get: () => 198 },
+      duration: { configurable: true, get: () => 221 },
       load: { configurable: true, value: vi.fn() },
       pause: {
         configurable: true,
@@ -164,7 +164,7 @@ describe('docs walkthrough clips', () => {
     expect(modal.open).toBe(true);
     expect(window.location.hash).toBe('#clip-translate-what-you-type');
     expect(modal.querySelector('[data-walkthrough-clip-title]').textContent).toBe('Draft translator');
-    expect(video.currentTime).toBe(25);
+    expect(video.currentTime).toBe(28);
     expect(video.play).toHaveBeenCalledOnce();
     expect(video.preload).toBe('auto');
     expect(video.src).toBe(new URL('../videos/walkthrough.mp4', window.location.href).href);
@@ -179,12 +179,12 @@ describe('docs walkthrough clips', () => {
     expect(modal.open).toBe(true);
     expect(gamesTrigger.textContent).toBe('Games');
     expect(modal.querySelector('[data-walkthrough-clip-title]').textContent).toBe('Games');
-    expect(video.currentTime).toBe(105);
+    expect(video.currentTime).toBe(122);
     expect(video.play).toHaveBeenCalledTimes(2);
 
-    video.currentTime = 134.96;
+    video.currentTime = 153.96;
     video.dispatchEvent(new Event('timeupdate'));
-    expect(video.currentTime).toBe(105);
+    expect(video.currentTime).toBe(122);
 
     video.dispatchEvent(new MouseEvent('click', { bubbles: true, button: 0 }));
     modal.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: ' ' }));
@@ -195,14 +195,14 @@ describe('docs walkthrough clips', () => {
     expect(window.location.hash).toBe('#clip-translate-what-you-type');
     expect(draftsTrigger.textContent).toBe('Drafts');
     expect(modal.querySelector('[data-walkthrough-clip-title]').textContent).toBe('Draft translator');
-    expect(video.currentTime).toBe(25);
+    expect(video.currentTime).toBe(28);
 
     commandsTrigger.dispatchEvent(new MouseEvent('click', { bubbles: true, button: 0, cancelable: true }));
     expect(window.location.hash).toBe('#clip-use-tab-commands');
     expect(commandsTrigger.textContent).toBe('Watch');
     expect(commandsTrigger.getAttribute('aria-controls')).toBe('walkthrough-clip');
     expect(modal.querySelector('[data-walkthrough-clip-title]').textContent).toBe('Use Tab commands');
-    expect(video.currentTime).toBe(164);
+    expect(video.currentTime).toBe(185);
 
     modal.dispatchEvent(new MouseEvent('click', { bubbles: true, button: 0 }));
     expect(modal.open).toBe(false);
