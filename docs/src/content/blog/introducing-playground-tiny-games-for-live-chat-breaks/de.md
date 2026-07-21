@@ -44,7 +44,7 @@ Playground ist kein vollständiger Spielraum, der nachträglich an YouTube angek
 
 :::media-left
 
-![Schach — Spieler einladen](./chess-invite-de.webp)
+![Playground beitreten](./playground-setting-de.webp)
 
 Aktiviere **Playground beitreten**, damit das Spiele-Symbol im Chat erscheint.
 

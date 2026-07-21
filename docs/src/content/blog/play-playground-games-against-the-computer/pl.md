@@ -35,7 +35,7 @@ Playground daje najwięcej frajdy, gdy jest ktoś do wspólnej gry, ale czat na 
 
 :::media-left
 
-![Szachy — Zaproś gracza](./chess-invite-pl.webp)
+![Dołącz do Playground](./playground-setting-pl.webp)
 
 Playground nadal jest opcjonalny. Włącz **Dołącz do Playground** w ustawieniach rozszerzenia, otwórz panel Gry na czacie i zaproś przeciwnika Computer, gdy chcesz rozegrać mecz.
 

@@ -16,7 +16,7 @@ tags: []
 
 :::media-left
 
-![Aero テーマのチャット画面のスクリーンショット](./2026-07-07-themes-are-here-assets/055231c0965487a1.png){width=77%;rotate=3.5deg}
+![テーマ — Aero](./theme-setting-ja.webp){width=77%;rotate=3.5deg}
 
 テーマを有効にするには、拡張機能の設定で **外観** セクションに移動します。利用できるテーマの中から選んで、チャット画面に変化を加えてみてください！
 

@@ -44,7 +44,7 @@ Playground 不是硬塞進 YouTube 的完整遊戲房間。它是為直播裡節
 
 :::media-left
 
-![西洋棋 — 邀請玩家](./chess-invite-zh_TW.webp)
+![加入 Playground](./playground-setting-zh_TW.webp)
 
 啟用 **加入 Playground** 後，遊戲 圖示就會出現在聊天室中。
 

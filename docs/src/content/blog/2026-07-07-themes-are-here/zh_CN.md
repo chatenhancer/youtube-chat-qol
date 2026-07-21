@@ -16,7 +16,7 @@ tags: []
 
 :::media-left
 
-![使用 Aero 主题的聊天界面截图](./2026-07-07-themes-are-here-assets/055231c0965487a1.png){width=77%;rotate=3.5deg}
+![主题 — Aero](./theme-setting-zh_CN.webp){width=77%;rotate=3.5deg}
 
 要启用主题，请前往扩展设置中的 **外观** 部分。选择一个可用主题，为聊天界面增添一点新鲜感！
 

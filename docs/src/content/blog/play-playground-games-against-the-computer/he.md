@@ -35,7 +35,7 @@ Playground עובד הכי טוב כשיש מישהו זמין לשחק איתו
 
 :::media-left
 
-![שחמט — הזמנת שחקן](./chess-invite-he.webp)
+![הצטרפות למגרש הניסויים](./playground-setting-he.webp)
 
 Playground עדיין אופציונלי. הפעילו את **הצטרפות ל-Playground** מהגדרות התוסף, פתחו את לוח המשחקים בצ'אט והזמינו יריב Computer כשמתחשק לכם לשחק.
 

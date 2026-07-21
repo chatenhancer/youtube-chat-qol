@@ -44,7 +44,7 @@ Playground, YouTube’a sonradan yapıştırılmış tam bir oyun odası değild
 
 :::media-left
 
-![Satranç — Oyuncu davet et](./chess-invite-tr.webp)
+![Playground’a katıl](./playground-setting-tr.webp)
 
 Sohbette Oyunlar simgesinin görünmesi için **Playground’a katıl** seçeneğini etkinleştirin.
 

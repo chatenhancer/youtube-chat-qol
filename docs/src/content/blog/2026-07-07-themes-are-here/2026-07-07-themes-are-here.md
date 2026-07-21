@@ -16,7 +16,7 @@ Themes make chat more personal. We are starting with a set of ready-made themes,
 
 :::media-left
 
-![screenshot yoiapjpu 2x](./2026-07-07-themes-are-here-assets/055231c0965487a1.png){width=77%;rotate=3.5deg}
+![Theme — Aero](./theme-setting-en.webp){width=77%;rotate=3.5deg}
 
 To enable a theme, open **Appearance** in the extension settings and choose one from the list.
 

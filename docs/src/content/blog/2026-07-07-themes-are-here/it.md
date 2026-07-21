@@ -16,7 +16,7 @@ I temi servono a rendere la chat più personale per te. Per ora pubblicheremo un
 
 :::media-left
 
-![Screenshot dell’interfaccia della chat con il tema Aero](./2026-07-07-themes-are-here-assets/055231c0965487a1.png){width=77%;rotate=3.5deg}
+![Tema — Aero](./theme-setting-it.webp){width=77%;rotate=3.5deg}
 
 Per attivare un tema, vai alla sezione **Aspetto** nelle impostazioni dell’estensione. Scegli uno dei temi disponibili per dare più carattere all’interfaccia della chat!
 

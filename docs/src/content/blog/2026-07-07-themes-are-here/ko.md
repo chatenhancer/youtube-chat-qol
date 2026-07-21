@@ -16,7 +16,7 @@ tags: []
 
 :::media-left
 
-![Aero 테마가 적용된 채팅 인터페이스 스크린샷](./2026-07-07-themes-are-here-assets/055231c0965487a1.png){width=77%;rotate=3.5deg}
+![테마 — Aero](./theme-setting-ko.webp){width=77%;rotate=3.5deg}
 
 테마를 활성화하려면 확장 프로그램 설정의 **모양** 섹션으로 이동하세요. 사용 가능한 테마 중 하나를 골라 채팅 인터페이스에 새로운 느낌을 더해 보세요!
 

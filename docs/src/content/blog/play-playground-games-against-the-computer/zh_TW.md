@@ -35,7 +35,7 @@ Playground 在有人一起玩時最有趣，但直播聊天室並不總是可預
 
 :::media-left
 
-![西洋棋 — 邀請玩家](./chess-invite-zh_TW.webp)
+![加入 Playground](./playground-setting-zh_TW.webp)
 
 Playground 仍然需要主動開啟。在擴充功能設定中啟用 **加入 Playground**，在聊天中打開遊戲面板，想開始對局時邀請 Computer 對手即可。
 

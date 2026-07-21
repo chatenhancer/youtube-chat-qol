@@ -16,7 +16,7 @@ Themes sollen den Chat persönlicher für dich machen. Vorerst veröffentlichen 
 
 :::media-left
 
-![Screenshot der Chat-Oberfläche mit Aero-Theme](./2026-07-07-themes-are-here-assets/055231c0965487a1.png){width=77%;rotate=3.5deg}
+![Design — Aero](./theme-setting-de.webp){width=77%;rotate=3.5deg}
 
 Um ein Theme zu aktivieren, gehe in den Erweiterungseinstellungen zum Abschnitt **Darstellung**. Wähle eines der verfügbaren Themes, um die Chat-Oberfläche aufzufrischen!
 

@@ -35,7 +35,7 @@ Playground, oynayacak biri olduğunda en eğlenceli hâlini alır; ancak canlı 
 
 :::media-left
 
-![Satranç — Oyuncu davet et](./chess-invite-tr.webp)
+![Playground’a katıl](./playground-setting-tr.webp)
 
 Playground hâlâ isteğe bağlıdır. Uzantı ayarlarından **Playground’a katıl** seçeneğini açın, sohbette Oyunlar paneli açın ve bir maç istediğinizde Computer’ı davet edin.
 

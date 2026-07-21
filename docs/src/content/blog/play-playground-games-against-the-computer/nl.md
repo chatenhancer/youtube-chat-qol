@@ -35,7 +35,7 @@ Playground is het leukst wanneer er iemand is om mee te spelen, maar livechat is
 
 :::media-left
 
-![Schaken — Speler uitnodigen](./chess-invite-nl.webp)
+![Deelnemen aan Playground](./playground-setting-nl.webp)
 
 Playground blijft opt-in. Schakel **Deelnemen aan Playground** in via de extensie-instellingen, open het Games-paneel in de chat en nodig een Computer-tegenstander uit wanneer je een match wilt spelen.
 

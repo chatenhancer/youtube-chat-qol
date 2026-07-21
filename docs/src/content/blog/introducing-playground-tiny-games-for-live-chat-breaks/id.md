@@ -44,7 +44,7 @@ Playground bukan ruang game penuh yang ditempelkan ke YouTube. Fitur ini dibuat 
 
 :::media-left
 
-![Catur — Undang pemain](./chess-invite-id.webp)
+![Gabung Playground](./playground-setting-id.webp)
 
 Aktifkan **Gabung Playground** agar ikon Game muncul di chat.
 

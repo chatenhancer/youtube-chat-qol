@@ -16,7 +16,7 @@ Motywy mają sprawić, że czat będzie bardziej osobisty. Na razie będziemy ud
 
 :::media-left
 
-![Zrzut ekranu interfejsu czatu z motywem Aero](./2026-07-07-themes-are-here-assets/055231c0965487a1.png){width=77%;rotate=3.5deg}
+![Motyw — Aero](./theme-setting-pl.webp){width=77%;rotate=3.5deg}
 
 Aby włączyć motyw, przejdź do sekcji **Wygląd** w ustawieniach rozszerzenia. Wybierz jeden z dostępnych motywów, żeby odświeżyć interfejs czatu!
 

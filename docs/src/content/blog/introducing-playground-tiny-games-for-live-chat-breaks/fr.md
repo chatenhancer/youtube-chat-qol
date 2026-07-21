@@ -44,7 +44,7 @@ Playground n’est pas une salle de jeux complète ajoutée à YouTube. Il exist
 
 :::media-left
 
-![Échecs — Inviter un joueur](./chess-invite-fr.webp)
+![Rejoindre Playground](./playground-setting-fr.webp)
 
 Activez **Rejoindre Playground** pour faire apparaître l’icône Jeux dans le chat.
 

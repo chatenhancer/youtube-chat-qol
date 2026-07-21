@@ -44,7 +44,7 @@ Playground ไม่ใช่ห้องเกมเต็มรูปแบบ
 
 :::media-left
 
-![หมากรุก — เชิญผู้เล่น](./chess-invite-th.webp)
+![เข้าร่วม Playground](./playground-setting-th.webp)
 
 เปิด **เข้าร่วม Playground** เพื่อให้ไอคอนเกมปรากฏในแชท
 

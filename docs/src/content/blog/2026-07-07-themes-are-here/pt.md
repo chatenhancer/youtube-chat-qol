@@ -16,7 +16,7 @@ Os temas foram feitos para deixar o chat mais pessoal para você. Por enquanto, 
 
 :::media-left
 
-![Captura de tela da interface de chat com o tema Aero](./2026-07-07-themes-are-here-assets/055231c0965487a1.png){width=77%;rotate=3.5deg}
+![Tema — Aero](./theme-setting-pt.webp){width=77%;rotate=3.5deg}
 
 Para ativar um tema, vá até a seção **Aparência** nas configurações da extensão. Escolha um dos temas disponíveis para dar mais estilo à interface do chat!
 

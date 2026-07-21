@@ -44,7 +44,7 @@ Playground कोई पूरा game room नहीं है जिसे You
 
 :::media-left
 
-![शतरंज — खिलाड़ी को आमंत्रित करें](./chess-invite-hi.webp)
+![Playground से जुड़ें](./playground-setting-hi.webp)
 
 Chat में गेम आइकन दिखाने के लिए **Playground से जुड़ें** enable करें.
 

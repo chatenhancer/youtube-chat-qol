@@ -35,7 +35,7 @@ Playground est plus amusant quand quelqu’un est là pour jouer avec vous, mais
 
 :::media-left
 
-![Échecs — Inviter un joueur](./chess-invite-fr.webp)
+![Rejoindre Playground](./playground-setting-fr.webp)
 
 Playground reste facultatif. Activez **Rejoindre Playground** dans les réglages de l’extension, ouvrez le panneau Jeux dans le chat et invitez un adversaire Computer quand vous voulez lancer une partie.
 

@@ -16,7 +16,7 @@ Chủ đề được tạo ra để khiến chat trở nên cá nhân hơn với
 
 :::media-left
 
-![Ảnh chụp giao diện chat với chủ đề Aero](./2026-07-07-themes-are-here-assets/055231c0965487a1.png){width=77%;rotate=3.5deg}
+![Chủ đề — Aero](./theme-setting-vi.webp){width=77%;rotate=3.5deg}
 
 Để bật một chủ đề, hãy vào phần **Giao diện** trong cài đặt tiện ích. Chọn một trong các chủ đề có sẵn để làm giao diện chat sinh động hơn!
 

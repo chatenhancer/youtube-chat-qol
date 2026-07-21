@@ -44,7 +44,7 @@ Playground nie jest pełnym pokojem gier doklejonym do YouTube. Jest na spokojni
 
 :::media-left
 
-![Szachy — Zaproś gracza](./chess-invite-pl.webp)
+![Dołącz do Playground](./playground-setting-pl.webp)
 
 Włącz **Dołącz do Playground**, aby ikona Gry pojawiła się w czacie.
 

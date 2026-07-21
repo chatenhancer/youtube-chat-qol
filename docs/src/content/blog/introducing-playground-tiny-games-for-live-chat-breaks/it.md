@@ -44,7 +44,7 @@ Playground non è una sala giochi completa agganciata a YouTube. Esiste per i mo
 
 :::media-left
 
-![Scacchi — Invita un giocatore](./chess-invite-it.webp)
+![Partecipa a Playground](./playground-setting-it.webp)
 
 Attiva **Partecipa a Playground** per far comparire l’icona Giochi nella chat.
 

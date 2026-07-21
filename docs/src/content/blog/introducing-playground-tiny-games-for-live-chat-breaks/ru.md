@@ -44,7 +44,7 @@ Playground — не полноценная игровая комната, при
 
 :::media-left
 
-![Шахматы — Пригласить игрока](./chess-invite-ru.webp)
+![Присоединиться к Playground](./playground-setting-ru.webp)
 
 Включите **Присоединиться к Playground**, чтобы в чате появился значок «Игры».
 

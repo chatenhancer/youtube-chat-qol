@@ -44,7 +44,7 @@ Playground não é uma sala de jogos completa grudada no YouTube. Ele existe par
 
 :::media-left
 
-![Xadrez — Convidar jogador](./chess-invite-pt.webp)
+![Entrar no Playground](./playground-setting-pt.webp)
 
 Ative **Entrar no Playground** para que o ícone Jogos apareça no chat.
 
