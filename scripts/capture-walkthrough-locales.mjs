@@ -9,16 +9,22 @@ const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const captureScriptPath = path.join(scriptDir, 'capture-walkthrough-demo.mjs');
 const supportedLocales = await getWalkthroughLocales();
 const locales = readRequestedLocales(process.argv.slice(2), supportedLocales);
-const workerCount = readWorkerCount(process.argv.slice(2), locales.length);
-const captureArgs = process.argv.includes('--preview') ? ['--preview'] : [];
+const previewMode = process.argv.includes('--preview');
+const workerCount = previewMode
+  ? readWorkerCount(process.argv.slice(2), locales.length)
+  : 1;
+const captureArgs = previewMode ? ['--preview'] : [];
 const maxAttemptsPerLocale = 2;
 let nextLocaleIndex = 0;
 let completedLocales = 0;
 const failures = [];
 
 console.log(
-  `[walkthrough] Rendering ${locales.length} locale${locales.length === 1 ? '' : 's'} ` +
-  `with ${workerCount} parallel profile${workerCount === 1 ? '' : 's'}.`
+  previewMode
+    ? `[walkthrough] Rendering ${locales.length} preview locale${locales.length === 1 ? '' : 's'} ` +
+      `with ${workerCount} parallel profile${workerCount === 1 ? '' : 's'}.`
+    : `[walkthrough] Rendering ${locales.length} final locale${locales.length === 1 ? '' : 's'} ` +
+      'sequentially at 1080p60.'
 );
 
 await Promise.all(Array.from({ length: workerCount }, runWorker));
@@ -68,6 +74,10 @@ function runProcess(command, args) {
     const child = spawn(command, args, {
       env: {
         ...process.env,
+        ...(previewMode ? {} : {
+          YTCQ_DEMO_FPS: '60',
+          YTCQ_DEMO_SCALE: '1.5'
+        }),
         YTCQ_DEMO_CLEANUP_PROFILE: '1',
         YTCQ_DEMO_PROGRESS_LINES: '1',
         YTCQ_DEMO_PROGRESS_MS: process.env.YTCQ_DEMO_PROGRESS_MS || '5000'

@@ -74,6 +74,10 @@ let outputPath = path.resolve(process.env.YTCQ_DEMO_OUTPUT || path.join(videoOut
 const shouldHashFinalOutput = !previewMode && !process.env.YTCQ_DEMO_OUTPUT;
 const headless = shouldRunHeadlessDemo();
 const demoFps = readPositiveInteger(process.env.YTCQ_DEMO_FPS, getDefaultDemoFps());
+const freshFrameTimeoutMs = readPositiveInteger(
+  process.env.YTCQ_DEMO_FRESH_FRAME_TIMEOUT_MS,
+  2_000
+);
 const estimatedDemoSeconds = readPositiveNumber(process.env.YTCQ_DEMO_ESTIMATED_SECONDS, 200);
 const estimatedDemoFrames = Math.max(demoFps, Math.round(estimatedDemoSeconds * demoFps));
 const progressUpdateMs = readPositiveInteger(process.env.YTCQ_DEMO_PROGRESS_MS, process.stdout.isTTY ? 1_000 : 5_000);
@@ -89,6 +93,7 @@ const pipedVideoPath = path.join(
 );
 const viewport = { width: 1280, height: 720 };
 const extensionPopupSize = { width: 350, height: 465 };
+const captionRevealDurationMs = 180;
 const cursorHotspot = { x: 16, y: 12 };
 const defaultDemoCursorPosition = { x: 28, y: 36 };
 let demoCursorPosition = { ...defaultDemoCursorPosition };
@@ -318,7 +323,7 @@ function createWalkthroughTranslationDemo(demoCopy, extensionMessages) {
 async function recordWalkthrough(page, chat, context, recorder) {
   recorder.setStage('Intro');
   await page.waitForTimeout(800);
-  await setWalkthroughCaption(page, 'intro');
+  await setWalkthroughCaption(page, recorder, 'intro');
   await playDemoStartupEffect(page, recorder, 1_350);
   await recorder.holdStill(3_900);
   await fadeOutDemoCaption(page, recorder, 360);
@@ -348,11 +353,10 @@ async function recordWalkthrough(page, chat, context, recorder) {
   recorder.setStage('Outro');
   await setDemoCameraForBox(page, recorder, null);
   await scrollWatchPageToTop(page, recorder);
-  await clearDemoFocus(page);
+  await clearDemoFocus(page, recorder);
   await parkDemoCursorForOutro(page, recorder);
-  await setWalkthroughCaption(page, 'outro');
-  await recorder.hold(360);
-  await recorder.holdStill(4_640);
+  await setWalkthroughCaption(page, recorder, 'outro');
+  await recorder.holdStill(4_820);
   await fadeOutDemoCaption(page, recorder, 420);
   await recorder.holdStill(480);
 }
@@ -370,7 +374,7 @@ async function sectionTranslateChat(page, chat, context, recorder) {
   });
   await keepMenuWithinFrameViewport(settingsMenu);
   const translateSetting = settingsMenu.locator('.ytcq-settings-item[data-ytcq-setting="targetLanguage"]').first();
-  await highlightLocator(page, translateSetting, 8);
+  await highlightLocator(page, translateSetting, recorder, 8);
   await recorder.hold(240);
   await recorder.holdStill(760);
   if (await translateSetting.getAttribute('aria-checked').catch(() => '') !== 'true') {
@@ -431,6 +435,7 @@ async function openChatSettingsMenu(page, chat, recorder, settingsButton, firstC
     const menu = await findVisibleMenu(chat, markerSelector).catch(() => null);
     if (menu) {
       await keepMenuWithinFrameViewport(menu);
+      await captureStableLocatorState(menu, recorder, 'chat settings menu');
       return menu;
     }
 
@@ -438,6 +443,7 @@ async function openChatSettingsMenu(page, chat, recorder, settingsButton, firstC
     const fallbackMenu = await findVisibleMenu(chat, markerSelector).catch(() => null);
     if (fallbackMenu) {
       await keepMenuWithinFrameViewport(fallbackMenu);
+      await captureStableLocatorState(fallbackMenu, recorder, 'chat settings fallback menu');
       return fallbackMenu;
     }
   }
@@ -512,7 +518,10 @@ async function openComposerTranslationPanel(page, chat, recorder, button, firstC
     await clickWithCursor(page, button, recorder, 'composer translate button', attempt === 0
       ? firstClickOptions
       : { afterClickHoldMs: 260, durationMs: 420 });
-    if (await panel.isVisible({ timeout: 1_500 }).catch(() => false)) return panel;
+    if (await panel.isVisible({ timeout: 1_500 }).catch(() => false)) {
+      await captureStableLocatorState(panel, recorder, 'composer translation panel');
+      return panel;
+    }
   }
 
   throw new Error('Timed out waiting for composer translation panel.');
@@ -526,7 +535,7 @@ async function sectionReplyFaster(page, chat, recorder) {
   const splitActions = mentionMenu.menu.locator('.ytcq-context-item[data-ytcq-action="reply-actions"]').first();
   await splitActions.waitFor({ state: 'visible', timeout: 10_000 });
   await recorder.hold(240);
-  await highlightLocator(page, splitActions, 8);
+  await highlightLocator(page, splitActions, recorder, 8);
   await showWalkthroughCaptionFor(
     page,
     recorder,
@@ -572,7 +581,7 @@ async function sectionRecentMessages(page, chat, recorder) {
     caption: getWalkthroughClickCaption('recentMessages')
   });
   const card = chat.locator('.ytcq-profile-card:not(.ytcq-inbox-card)').first();
-  await card.waitFor({ state: 'visible', timeout: 10_000 });
+  await captureStableLocatorState(card, recorder, 'recent messages card');
   await showWalkthroughCaptionFor(
     page,
     recorder,
@@ -587,7 +596,7 @@ async function sectionFocusMode(page, chat, recorder) {
   const collapsed = chat.locator('.ytcq-focus-card-collapsed').first();
   await clickWithCursor(page, collapsed, recorder, 'collapsed focus panel');
   const expanded = chat.locator('.ytcq-focus-card-expanded').first();
-  await expanded.waitFor({ state: 'visible', timeout: 10_000 });
+  await captureStableLocatorState(expanded, recorder, 'expanded focus card');
   await showWalkthroughCaptionFor(
     page,
     recorder,
@@ -605,7 +614,7 @@ async function openCollapsedFocusPromptFromRecentMessage(page, chat, recorder) {
   });
 
   const collapsed = chat.locator('.ytcq-focus-card-collapsed').first();
-  await collapsed.waitFor({ state: 'visible', timeout: 5_000 });
+  await captureStableLocatorState(collapsed, recorder, 'collapsed focus card');
 }
 
 async function sectionInbox(page, chat, recorder) {
@@ -621,24 +630,27 @@ async function sectionInbox(page, chat, recorder) {
   await inbox.waitFor({ state: 'visible', timeout: 10_000 });
   await ensureDemoInboxAvatar(chat);
   await fadeInDemoLocator(inbox, recorder, 360);
+  await captureStableLocatorState(inbox, recorder, 'Inbox card');
   await showWalkthroughCaptionFor(
     page,
     recorder,
     'findMessages',
-    { anchorLocator: inbox }
+    { anchorLocator: inbox, durationMs: 6_000 }
   );
+  await recorder.holdStill(1_200);
   const keywordButton = inbox.locator('.ytcq-inbox-keyword-toggle').first();
   await clickWithCursor(page, keywordButton, recorder, 'Inbox keyword button', {
     caption: getWalkthroughClickCaption('manageKeywords')
   });
   const keywordPanel = inbox.locator('.ytcq-inbox-keyword-panel').first();
-  await keywordPanel.waitFor({ state: 'visible', timeout: 5_000 });
+  await captureStableLocatorState(keywordPanel, recorder, 'Inbox keyword card');
   await showWalkthroughCaptionFor(
     page,
     recorder,
     'selectedKeywords',
-    { anchorLocator: keywordPanel }
+    { anchorLocator: keywordPanel, durationMs: 6_000 }
   );
+  await recorder.holdStill(1_200);
 }
 
 async function ensureDemoInboxAvatar(chat) {
@@ -711,6 +723,7 @@ async function sectionPlayground(page, chat, context, recorder) {
       state: 'visible',
       timeout: 30_000
     });
+    await captureStableLocatorState(gamesCard, recorder, 'games card');
   } catch (error) {
     const panelText = await cleanLocatorText(gamesCard).catch(() => 'unavailable');
     const backendState = await readDemoPlaygroundBackendState(context).catch(() => null);
@@ -768,11 +781,12 @@ async function sectionMarkedUsers(page, chat, context, recorder) {
   const markActionBox = await getLocatorBox(markAction, 'Mark action');
   await setWalkthroughCaption(
     page,
+    recorder,
     'addBookmark',
     markActionBox,
     { gap: 48, placement: 'side' }
   );
-  await recorder.settleThenHoldStill(2_700);
+  await recorder.settleThenHoldStill(2_520);
   await clickWithCursor(page, markAction, recorder, 'Mark action');
   await source.message.locator('#author-photo').first().waitFor({ state: 'visible', timeout: 10_000 });
   await recorder.settleThenHoldStill(1_000);
@@ -787,7 +801,7 @@ async function sectionEmojiAndCommands(page, chat, recorder) {
   await prepareDemoEmojiPicker(chat);
   await hoverWithCursor(page, emojiButton, recorder, 'emoji picker button');
   const quickPopover = chat.locator(quickEmojiPopoverSelector).first();
-  await quickPopover.waitFor({ state: 'visible', timeout: 5_000 });
+  await captureStableLocatorState(quickPopover, recorder, 'quick emoji card', { timeout: 5_000 });
   await showWalkthroughCaptionFor(
     page,
     recorder,
@@ -803,6 +817,7 @@ async function sectionEmojiAndCommands(page, chat, recorder) {
   await picker.waitFor({ state: 'attached', timeout: 10_000 });
   await scrubDemoEmojiPicker(chat);
   await ensureDemoEmojiPickerVisible(chat, emojiButton);
+  await captureStableLocatorState(picker, recorder, 'emoji picker card');
   await showWalkthroughCaptionFor(
     page,
     recorder,
@@ -816,11 +831,12 @@ async function sectionEmojiAndCommands(page, chat, recorder) {
   const composerBox = await getLocatorBox(composer, 'chat composer');
   await setWalkthroughCaption(
     page,
+    recorder,
     'commands',
     composerBox,
     { placement: 'side' }
   );
-  await recorder.settleThenHoldStill(2_600);
+  await recorder.settleThenHoldStill(2_420);
   const whenTarget = getFutureDemoWhenTarget();
   await typeIntoComposerHuman(chat, recorder, `the event is in /when ${whenTarget}`);
   await fadeOutDemoCaption(page, recorder, 320);
@@ -851,8 +867,8 @@ async function sectionPopupStatus(page, context, recorder) {
   await recorder.usePage(popup);
   try {
     await fadeDemoPopupIn(popup, recorder);
-    await setWalkthroughCaption(popup, 'popupSettings');
-    await recorder.settleThenHoldStill(5_800);
+    await setWalkthroughCaption(popup, recorder, 'popupSettings');
+    await recorder.settleThenHoldStill(5_620);
     await clickWithCursor(popup, popup.locator('#bookmarksTab'), recorder, 'Bookmarks tab');
     await recorder.settleThenHoldStill(2_200);
     await clickWithCursor(popup, popup.locator('#settingsTab'), recorder, 'Settings tab');
@@ -874,11 +890,15 @@ async function sectionPopupBookmarks(page, context, recorder) {
   try {
     await fadeDemoPopupIn(popup, recorder);
     await popup.locator('#bookmarksTab').click();
-    await popup.locator('.bookmark-row').first().waitFor({ state: 'visible', timeout: 10_000 });
-    await setWalkthroughCaption(popup, 'bookmarksPopup');
-    await highlightLocator(popup, popup.locator('.bookmark-row').first(), 10);
-    await recorder.settleThenHoldStill(4_300);
-    await clearDemoFocus(popup);
+    await captureStableLocatorState(
+      popup.locator('.bookmark-row').first(),
+      recorder,
+      'bookmarked user row'
+    );
+    await setWalkthroughCaption(popup, recorder, 'bookmarksPopup');
+    await highlightLocator(popup, popup.locator('.bookmark-row').first(), recorder, 10);
+    await recorder.settleThenHoldStill(4_120);
+    await clearDemoFocus(popup, recorder);
     await fadeDemoPopupOut(popup, recorder);
   } finally {
     await popup.close().catch(() => undefined);
@@ -1443,7 +1463,7 @@ async function focusChatHeader(page, chat, recorder, options = {}) {
   });
   await recorder.hold(240);
   if (options.showFocus !== false) {
-    await setDemoFocusOnLocator(page, chat.locator('yt-live-chat-header-renderer').first(), 10);
+    await setDemoFocusOnLocator(page, chat.locator('yt-live-chat-header-renderer').first(), recorder, 10);
   }
 }
 
@@ -1458,7 +1478,7 @@ async function focusMessageArea(page, chat, recorder, options = {}) {
     durationMs: options.durationMs
   });
   await recorder.hold(options.afterHoldMs ?? 240);
-  await clearDemoFocus(page);
+  await clearDemoFocus(page, recorder);
 }
 
 async function focusComposerArea(page, chat, recorder, options = {}) {
@@ -1474,7 +1494,7 @@ async function focusComposerArea(page, chat, recorder, options = {}) {
   });
   await recorder.hold(options.afterHoldMs ?? 240);
   if (options.showFocus !== false) {
-    await setDemoFocusOnLocator(page, composer, 10);
+    await setDemoFocusOnLocator(page, composer, recorder, 10);
   }
 }
 
@@ -1490,7 +1510,7 @@ async function focusReplyComposerOverview(page, recorder) {
     durationMs: 840
   });
   await recorder.hold(220);
-  await clearDemoFocus(page);
+  await clearDemoFocus(page, recorder);
 }
 
 async function showComposerDraftResult(page, chat, recorder, durationMs, options = {}) {
@@ -1507,10 +1527,10 @@ async function showComposerDraftResult(page, chat, recorder, durationMs, options
   } else {
     await recorder.hold(180);
   }
-  await setDemoFocusOnLocator(page, input, 8);
+  await setDemoFocusOnLocator(page, input, recorder, 8);
   await recorder.hold(220);
   await recorder.holdStill(durationMs);
-  await clearDemoFocus(page);
+  await clearDemoFocus(page, recorder);
   await recorder.hold(160);
 }
 
@@ -1972,7 +1992,9 @@ async function openMessageMenuWithVisibleClick(page, chat, recorder, messageKey,
       padding: 6
     }
   );
-  return openMessageMenu(chat, messageKey);
+  const menu = await openMessageMenu(chat, messageKey);
+  await captureStableLocatorState(menu.menu, recorder, 'message action menu');
+  return menu;
 }
 
 async function ensureDemoNativeMenuRows(menu, translationDemo) {
@@ -3847,7 +3869,7 @@ async function installDemoPresentationLayer(page) {
         text-align: start;
         top: 150px;
         transform: translateY(10px);
-        transition: opacity 180ms ease, transform 180ms ease;
+        transition: none;
         z-index: 2147483620;
       }
 
@@ -3948,7 +3970,7 @@ async function installDemoPresentationLayer(page) {
         box-sizing: border-box;
         opacity: 0;
         transform: scale(0.96);
-        transition: opacity 160ms ease, transform 180ms ease;
+        transition: none;
         z-index: 2147483600;
       }
 
@@ -3966,7 +3988,7 @@ async function installDemoPresentationLayer(page) {
 
       ytd-app {
         min-height: 100vh !important;
-        transition: transform 960ms cubic-bezier(0.2, 0, 0, 1) !important;
+        transition: none !important;
         transform-origin: 0 0 !important;
         width: 100vw !important;
         will-change: transform !important;
@@ -4036,11 +4058,11 @@ async function fadeDemoPopupOut(page, recorder) {
 
 async function animateDemoPopupOpacity(page, recorder, fromOpacity, toOpacity, durationMs) {
   const frames = durationToFrames(durationMs);
-  for (let frame = 0; frame <= frames; frame += 1) {
+  for (let frame = 1; frame <= frames; frame += 1) {
     const progress = easeInOutCubic(frame / frames);
     const opacity = fromOpacity + (toOpacity - fromOpacity) * progress;
     await setDemoPopupOpacity(page, opacity);
-    await recorder.captureFrame();
+    await recorder.captureFrame(`popup opacity frame ${frame}/${frames}`);
   }
 }
 
@@ -4125,6 +4147,7 @@ async function createScreencastFrameRecorder(page) {
   let frameCount = 0;
   let latestFrameBuffer = null;
   let latestFrameSequence = 0;
+  let latestFrameTimestamp = Number.NEGATIVE_INFINITY;
   let lastFrameBuffer = null;
   let lastProgressAt = 0;
   let restartPromise = null;
@@ -4169,8 +4192,8 @@ async function createScreencastFrameRecorder(page) {
       if (!page) return;
       await restartScreencastSource(page, { clearLatestFrame: false });
     },
-    async captureFrame() {
-      await capturePaintedFrame();
+    async captureFrame(label = 'updated state') {
+      await capturePaintedFrame(label);
     },
     async abort() {
       stopped = true;
@@ -4181,25 +4204,21 @@ async function createScreencastFrameRecorder(page) {
     async captureThenHoldStill(durationMs) {
       if (durationMs <= 0) return;
       const frames = durationToFrames(durationMs);
-      await capturePaintedFrame();
+      await capturePaintedFrame('state before repeated still');
       await writeRepeatedLastFrame(Math.max(0, frames - 1));
       resetActionFrameClock();
     },
     async hold(durationMs) {
       const frames = durationToFrames(durationMs);
       for (let frame = 0; frame < frames; frame += 1) {
-        await captureDynamicFrame();
+        await capturePaintedFrame('dynamic hold');
       }
     },
     async holdStill(durationMs) {
       if (durationMs <= 0) return;
       const frames = durationToFrames(durationMs);
-      if (!lastFrameBuffer) {
-        await captureDynamicFrame();
-        await writeRepeatedLastFrame(Math.max(0, frames - 1));
-      } else {
-        await writeRepeatedLastFrame(frames);
-      }
+      await capturePaintedFrame('final state before repeated still');
+      await writeRepeatedLastFrame(Math.max(0, frames - 1));
       resetActionFrameClock();
     },
     async settleThenHoldStill(durationMs, settleMs = 240) {
@@ -4250,6 +4269,7 @@ async function createScreencastFrameRecorder(page) {
 
       latestFrameBuffer = buffer;
       latestFrameSequence += 1;
+      latestFrameTimestamp = Number(event.metadata?.timestamp);
       resolveFrameWaiters(latestFrameBuffer);
     };
 
@@ -4297,6 +4317,7 @@ async function createScreencastFrameRecorder(page) {
     restartPromise = (async () => {
       if (clearLatestFrame) {
         latestFrameBuffer = null;
+        latestFrameTimestamp = Number.NEGATIVE_INFINITY;
         resolveFrameWaiters(null);
       }
       await stopScreencastSource();
@@ -4322,36 +4343,74 @@ async function createScreencastFrameRecorder(page) {
     waiters.forEach((resolve) => resolve(buffer));
   }
 
-  async function captureDynamicFrame() {
-    await waitForNextActionFrame();
-    const buffer = latestFrameBuffer || await waitForLatestFrame();
-    if (!buffer || stopped) return;
-    lastFrameBuffer = buffer;
-    await writeFrameBuffer(buffer);
-  }
-
-  async function capturePaintedFrame() {
+  async function capturePaintedFrame(label) {
+    const source = currentSource;
+    if (!source || stopped) return;
     const sequenceBeforePaint = latestFrameSequence;
-    await currentSource?.page.evaluate(() => {
-      return new Promise((resolve) => window.requestAnimationFrame(() => resolve()));
-    }).catch(() => undefined);
+    const freshnessBoundarySeconds = Date.now() / 1_000;
+    await source.page.evaluate(() => {
+      return new Promise((resolve) => {
+        window.requestAnimationFrame(() => window.requestAnimationFrame(() => resolve()));
+      });
+    });
     await waitForNextActionFrame();
+    const screencastGraceMs = Math.min(50, freshFrameTimeoutMs);
     const freshFrame = await waitForFrameAfter(
       sequenceBeforePaint,
-      Math.max(48, Math.round(getFrameDurationMs() * 4))
-    );
-    const buffer = freshFrame || latestFrameBuffer || await waitForLatestFrame();
-    if (!buffer || stopped) return;
-    lastFrameBuffer = buffer;
-    await writeFrameBuffer(buffer);
+      freshnessBoundarySeconds,
+      screencastGraceMs
+    ) ||
+      await captureCurrentChromeFrame(source, freshFrameTimeoutMs - screencastGraceMs, label);
+    if (!freshFrame) {
+      throw new Error(
+        `Timed out waiting for a fresh Chrome frame after ${label} during ${stage}; ` +
+        `refusing to reuse frame sequence ${sequenceBeforePaint}.`
+      );
+    }
+    lastFrameBuffer = freshFrame;
+    await writeFrameBuffer(freshFrame);
   }
 
-  async function waitForFrameAfter(sequence, timeoutMs) {
+  async function captureCurrentChromeFrame(source, timeoutMs, label) {
+    if (currentSource !== source || stopped || timeoutMs <= 0) return null;
+    const options = {
+      captureBeyondViewport: false,
+      format: frameFormat,
+      fromSurface: true
+    };
+    if (frameFormat === 'jpeg') options.quality = frameQuality;
+    const result = await withTimeout(
+      source.session.send('Page.captureScreenshot', options),
+      timeoutMs,
+      `capture a fresh Chrome frame after ${label}`
+    );
+    if (currentSource !== source || stopped) return null;
+    const buffer = Buffer.from(result.data, 'base64');
+    const dimensions = getImageDimensions(buffer);
+    if (!frameMatchesCaptureSize(dimensions)) {
+      throw new Error(
+        `Fresh Chrome frame after ${label} has ${dimensions?.width || '?'}x${dimensions?.height || '?'} ` +
+        `pixels; expected ${getCaptureSizeLabel()}.`
+      );
+    }
+    logFrameSizeIfNeeded(buffer, null, dimensions);
+    return buffer;
+  }
+
+  async function waitForFrameAfter(sequence, minimumTimestamp, timeoutMs) {
     const deadline = Date.now() + timeoutMs;
-    while (!stopped && latestFrameSequence <= sequence && Date.now() < deadline) {
+    while (
+      !stopped &&
+      (latestFrameSequence <= sequence ||
+        !Number.isFinite(latestFrameTimestamp) ||
+        latestFrameTimestamp < minimumTimestamp) &&
+      Date.now() < deadline
+    ) {
       await delay(Math.min(6, Math.max(1, deadline - Date.now())));
     }
-    return latestFrameSequence > sequence ? latestFrameBuffer : null;
+    return latestFrameSequence > sequence && latestFrameTimestamp >= minimumTimestamp
+      ? latestFrameBuffer
+      : null;
   }
 
   async function waitForNextActionFrame() {
@@ -4572,13 +4631,13 @@ async function applyCaptureMetrics(session, size) {
 async function hoverWithCursor(page, locator, recorder, label, options = {}) {
   const box = await getLocatorBox(locator, label);
   const hoverPoint = getHumanTargetPoint(box, label);
-  await setDemoFocusOnLocator(page, locator, options.padding ?? 8);
+  await setDemoFocusOnLocator(page, locator, recorder, options.padding ?? 8);
   await moveCursor(page, hoverPoint.x, hoverPoint.y, options.durationMs, recorder, {
     label,
     hoverBox: box
   });
   await recorder.hold(options.afterHoverHoldMs ?? 260);
-  await clearDemoFocus(page);
+  await clearDemoFocus(page, recorder);
   return box;
 }
 
@@ -4588,10 +4647,15 @@ async function clickWithCursor(page, locator, recorder, label, options = {}) {
   }
   const box = await getLocatorBox(locator, label);
   const clickPoint = getHumanTargetPoint(box, label);
-  await setDemoFocusOnLocator(page, locator, options.padding ?? 8);
+  await setDemoFocusOnLocator(page, locator, recorder, options.padding ?? 8);
   if (options.afterFocusHoldMs) {
     await recorder.hold(options.afterFocusHoldMs);
   }
+  await moveCursor(page, clickPoint.x, clickPoint.y, options.durationMs, recorder, {
+    label,
+    hoverBox: box
+  });
+  await recorder.holdStill(options.clickSettleMs ?? getHumanClickSettleMs(label));
   if (options.caption) {
     await setDemoCaption(
       page,
@@ -4600,19 +4664,11 @@ async function clickWithCursor(page, locator, recorder, label, options = {}) {
       options.caption.anchorBox || box,
       options.caption.options || {}
     );
-    const captionLeadMs = options.caption.durationMs ?? getClickCaptionLeadDuration(
-      options.caption.title,
-      options.caption.body
-    );
-    const captionAnimationMs = Math.min(360, captionLeadMs);
-    await recorder.hold(captionAnimationMs);
+    const captionLeadMs = options.caption.durationMs ?? getClickCaptionLeadDuration();
+    const captionAnimationMs = Math.min(captionRevealDurationMs, captionLeadMs);
+    await fadeInDemoCaption(page, recorder, captionAnimationMs);
     await recorder.holdStill(captionLeadMs - captionAnimationMs);
   }
-  await moveCursor(page, clickPoint.x, clickPoint.y, options.durationMs, recorder, {
-    label,
-    hoverBox: box
-  });
-  await recorder.hold(options.clickSettleMs ?? getHumanClickSettleMs(label));
   const modifiers = options.modifiers || [];
   recorder.cueClick();
   await recorder.hold(options.pressMs ?? getHumanPressMs(label));
@@ -4632,18 +4688,19 @@ async function clickWithCursor(page, locator, recorder, label, options = {}) {
       shiftKey: activeModifiers.includes('Shift')
     }));
   }, modifiers);
-  await clearDemoFocus(page);
-  await setCursorVariant(page, 'pointer');
+  await clearDemoFocus(page, recorder);
+  await setCursorVariant(page, 'pointer', recorder);
   await recorder.hold(options.afterClickHoldMs ?? 360);
 }
 
-async function highlightLocator(page, locator, padding = 8) {
-  return setDemoFocusOnLocator(page, locator, padding);
+async function highlightLocator(page, locator, recorder, padding = 8) {
+  return setDemoFocusOnLocator(page, locator, recorder, padding);
 }
 
-async function setWalkthroughCaption(page, id, anchorBox = null, options = {}) {
+async function setWalkthroughCaption(page, recorder, id, anchorBox = null, options = {}) {
   const caption = getWalkthroughCaption(id);
   await setDemoCaption(page, caption.title, caption.body, anchorBox, options);
+  await fadeInDemoCaption(page, recorder);
 }
 
 async function showWalkthroughCaptionFor(page, recorder, id, options = {}) {
@@ -4658,7 +4715,7 @@ function getWalkthroughClickCaption(id) {
   const caption = getWalkthroughCaption(id);
   return {
     body: caption.body,
-    durationMs: getClickCaptionLeadDuration(caption.englishTitle, caption.englishBody),
+    durationMs: getClickCaptionLeadDuration(),
     title: caption.title
   };
 }
@@ -4687,16 +4744,16 @@ async function showDemoCaptionFor(page, recorder, title, body, options = {}) {
     (options.anchorLocator ? await getLocatorBox(options.anchorLocator, title) : null);
   await setDemoCaption(page, title, body, box, options.captionOptions || {});
   if (options.anchorLocator) {
-    await setDemoFocusOnLocator(page, options.anchorLocator, options.padding ?? 8);
+    await setDemoFocusOnLocator(page, options.anchorLocator, recorder, options.padding ?? 8);
   } else if (box) {
-    await setDemoFocusBox(page, box, options.padding ?? 8);
+    await setDemoFocusBox(page, box, recorder, options.padding ?? 8);
   }
   const durationMs = options.durationMs || getReadableCaptionDuration(title, body);
-  const animationMs = Math.min(360, durationMs);
-  await recorder.hold(animationMs);
+  const animationMs = Math.min(captionRevealDurationMs, durationMs);
+  await fadeInDemoCaption(page, recorder, animationMs);
   await recorder.holdStill(durationMs - animationMs);
   await fadeOutDemoCaption(page, recorder, 320);
-  await clearDemoFocus(page);
+  await clearDemoFocus(page, recorder);
 }
 
 async function fadeInDemoLocator(locator, recorder, durationMs = 360) {
@@ -4741,6 +4798,9 @@ async function setDemoCaption(page, title, body, anchorBox = null, options = {})
     const titleElement = caption.querySelector('strong');
     const bodyElement = caption.querySelector('span');
     caption.classList.remove('is-visible');
+    caption.style.opacity = '0';
+    caption.style.transform = 'translateY(10px)';
+    caption.style.transition = 'none';
     if (titleElement) titleElement.textContent = nextTitle;
     if (bodyElement) bodyElement.textContent = nextBody;
 
@@ -4826,6 +4886,36 @@ async function setDemoCaption(page, title, body, anchorBox = null, options = {})
   }, [title, body, anchorBox, options]);
 }
 
+async function fadeInDemoCaption(page, recorder, durationMs = captionRevealDurationMs) {
+  const frames = Math.max(1, durationToFrames(durationMs));
+  for (let frame = 1; frame <= frames; frame += 1) {
+    const progress = easeInOutCubic(frame / frames);
+    await page.evaluate((nextProgress) => {
+      const caption = document.querySelector('.ytcq-demo-caption');
+      if (!(caption instanceof HTMLElement) || !caption.classList.contains('is-visible')) return;
+      caption.style.opacity = String(nextProgress);
+      caption.style.transform = `translateY(${(1 - nextProgress) * 10}px)`;
+    }, progress);
+    await recorder.captureFrame(`caption reveal frame ${frame}/${frames}`);
+  }
+
+  const finalState = await page.evaluate(() => {
+    const caption = document.querySelector('.ytcq-demo-caption');
+    if (!(caption instanceof HTMLElement) || !caption.classList.contains('is-visible')) return null;
+    caption.style.removeProperty('opacity');
+    caption.style.removeProperty('transform');
+    caption.style.removeProperty('transition');
+    const style = getComputedStyle(caption);
+    return {
+      opacity: Number.parseFloat(style.opacity),
+      visibility: style.visibility
+    };
+  });
+  if (!finalState || finalState.opacity < 0.99 || finalState.visibility === 'hidden') {
+    throw new Error('Demo caption did not reach its final visible state.');
+  }
+}
+
 async function fadeOutDemoCaption(page, recorder, durationMs = 320) {
   const frames = Math.max(1, durationToFrames(durationMs));
   const hasVisibleCaption = await page.evaluate(() => {
@@ -4857,44 +4947,188 @@ async function fadeOutDemoCaption(page, recorder, durationMs = 320) {
   });
 }
 
-async function setDemoFocusOnLocator(page, locator, padding = 8) {
+async function setDemoFocusOnLocator(page, locator, recorder, padding = 8) {
   const box = await locator.boundingBox();
   if (!box) {
-    await clearDemoFocus(page);
+    await clearDemoFocus(page, recorder);
     return null;
   }
-  await setDemoFocusBox(page, box, padding);
+  await setDemoFocusBox(page, box, recorder, padding);
   return box;
 }
 
-async function setDemoFocusBox(page, box, padding = 8) {
-  await page.evaluate(([targetBox, targetPadding, shouldAnimate]) => {
+async function setDemoFocusBox(page, box, recorder, padding = 8) {
+  await page.evaluate(([targetBox, targetPadding]) => {
     const focus = document.querySelector('.ytcq-demo-focus');
     if (!(focus instanceof HTMLElement)) return;
-    if (shouldAnimate) focus.classList.remove('is-visible');
     focus.style.left = `${targetBox.x - targetPadding}px`;
     focus.style.top = `${targetBox.y - targetPadding}px`;
     focus.style.width = `${targetBox.width + targetPadding * 2}px`;
     focus.style.height = `${targetBox.height + targetPadding * 2}px`;
-    if (shouldAnimate || !focus.classList.contains('is-visible')) void focus.offsetWidth;
+    focus.style.opacity = '0';
+    focus.style.transform = 'scale(0.96)';
     focus.classList.add('is-visible');
-  }, [box, padding, true]);
+  }, [box, padding]);
+
+  const frames = durationToFrames(180);
+  for (let frame = 1; frame <= frames; frame += 1) {
+    const progress = easeInOutCubic(frame / frames);
+    await page.evaluate((nextProgress) => {
+      const focus = document.querySelector('.ytcq-demo-focus');
+      if (!(focus instanceof HTMLElement)) return;
+      focus.style.opacity = String(nextProgress);
+      focus.style.transform = `scale(${0.96 + nextProgress * 0.04})`;
+    }, progress);
+    await recorder.captureFrame(`focus reveal frame ${frame}/${frames}`);
+  }
+  await verifyDemoFocus(page, { box, padding, visible: true });
 }
 
-async function clearDemoFocus(page) {
-  await hideDemoFocusBox(page);
+async function clearDemoFocus(page, recorder) {
+  await hideDemoFocusBox(page, recorder);
 }
 
-async function hideDemoFocusBox(page) {
+async function hideDemoFocusBox(page, recorder) {
+  const isVisible = await page.evaluate(() => {
+    return document.querySelector('.ytcq-demo-focus')?.classList.contains('is-visible') === true;
+  }).catch(() => false);
+  if (!isVisible) return;
+
+  const frames = durationToFrames(160);
+  for (let frame = 1; frame <= frames; frame += 1) {
+    const progress = easeInOutCubic(frame / frames);
+    await page.evaluate((nextProgress) => {
+      const focus = document.querySelector('.ytcq-demo-focus');
+      if (!(focus instanceof HTMLElement)) return;
+      focus.style.opacity = String(1 - nextProgress);
+      focus.style.transform = `scale(${1 - nextProgress * 0.04})`;
+    }, progress);
+    await recorder.captureFrame(`focus hide frame ${frame}/${frames}`);
+  }
+
   await page.evaluate(() => {
-    document.querySelector('.ytcq-demo-focus')?.classList.remove('is-visible');
+    const focus = document.querySelector('.ytcq-demo-focus');
+    if (!(focus instanceof HTMLElement)) return;
+    focus.classList.remove('is-visible');
+    focus.style.removeProperty('opacity');
+    focus.style.removeProperty('transform');
   });
+  await recorder.captureFrame('final hidden focus state');
+  await verifyDemoFocus(page, { visible: false });
+}
+
+async function verifyDemoFocus(page, expected) {
+  const state = await page.evaluate(() => {
+    const focus = document.querySelector('.ytcq-demo-focus');
+    if (!(focus instanceof HTMLElement)) return null;
+    const rect = focus.getBoundingClientRect();
+    return {
+      height: rect.height,
+      opacity: Number.parseFloat(getComputedStyle(focus).opacity),
+      visible: focus.classList.contains('is-visible'),
+      width: rect.width,
+      x: rect.x,
+      y: rect.y
+    };
+  });
+  if (!state || state.visible !== expected.visible) {
+    throw new Error(`Focus overlay did not reach its requested ${expected.visible ? 'visible' : 'hidden'} state.`);
+  }
+  if (!expected.visible) {
+    if (state.opacity > 0.01) throw new Error(`Hidden focus overlay remained at opacity ${state.opacity}.`);
+    return;
+  }
+
+  const target = {
+    height: expected.box.height + expected.padding * 2,
+    width: expected.box.width + expected.padding * 2,
+    x: expected.box.x - expected.padding,
+    y: expected.box.y - expected.padding
+  };
+  const geometryMatches = ['height', 'width', 'x', 'y'].every((key) => {
+    return Math.abs(state[key] - target[key]) <= 1;
+  });
+  if (!geometryMatches || state.opacity < 0.99) {
+    throw new Error(
+      `Focus overlay final state was not stable. Expected ${JSON.stringify(target)}, ` +
+      `received ${JSON.stringify(state)}.`
+    );
+  }
 }
 
 async function getLocatorBox(locator, label) {
   const box = await locator.boundingBox();
   if (!box) throw new Error(`Could not find visible bounding box for ${label}.`);
   return box;
+}
+
+async function captureStableLocatorState(locator, recorder, label, options = {}) {
+  const timeout = options.timeout ?? 10_000;
+  await locator.waitFor({ state: 'visible', timeout });
+  let previousState = null;
+  let stableSamples = 0;
+  let finalState = null;
+
+  await poll(async () => {
+    const state = await readLocatorVisualState(locator);
+    if (!state || state.opacity < 0.99) {
+      previousState = state;
+      stableSamples = 0;
+      return false;
+    }
+
+    stableSamples = locatorVisualStatesMatch(previousState, state) ? stableSamples + 1 : 0;
+    previousState = state;
+    if (stableSamples < 2) return false;
+    finalState = state;
+    return true;
+  }, {
+    interval: 50,
+    label: `stable ${label}`,
+    timeout
+  });
+
+  await recorder.captureFrame(`verified ${label}`);
+  const capturedState = await readLocatorVisualState(locator);
+  if (!locatorVisualStatesMatch(finalState, capturedState)) {
+    throw new Error(
+      `${label} changed while its final frame was captured. ` +
+      `Before ${JSON.stringify(finalState)}, after ${JSON.stringify(capturedState)}.`
+    );
+  }
+  return capturedState;
+}
+
+async function readLocatorVisualState(locator) {
+  return locator.evaluate((element) => {
+    if (!(element instanceof HTMLElement) || !element.isConnected) return null;
+    const style = getComputedStyle(element);
+    const rect = element.getBoundingClientRect();
+    if (
+      style.display === 'none' ||
+      style.visibility === 'hidden' ||
+      rect.width <= 0 ||
+      rect.height <= 0
+    ) {
+      return null;
+    }
+
+    return {
+      height: Number(rect.height.toFixed(2)),
+      opacity: Number.parseFloat(style.opacity),
+      transform: style.transform,
+      width: Number(rect.width.toFixed(2)),
+      x: Number(rect.x.toFixed(2)),
+      y: Number(rect.y.toFixed(2))
+    };
+  }).catch(() => null);
+}
+
+function locatorVisualStatesMatch(first, second) {
+  if (!first || !second || first.transform !== second.transform) return false;
+  return ['height', 'opacity', 'width', 'x', 'y'].every((key) => {
+    return Math.abs(first[key] - second[key]) <= 0.01;
+  });
 }
 
 async function parkDemoCursorForOutro(page, recorder) {
@@ -4912,7 +5146,6 @@ async function moveCursor(page, x, y, durationMs, recorder, options = {}) {
   const moveDurationMs = durationMs ?? getHumanCursorDurationMs(start, { x, y });
   const steps = durationToFrames(moveDurationMs);
   let activeVariant = pointIsInsideBox(start, options.hoverBox) ? 'hand' : 'pointer';
-  await setCursorVariant(page, activeVariant);
   const controlPoints = getHumanCursorControlPoints(start, { x, y }, options.label || '');
 
   for (let step = 1; step <= steps; step += 1) {
@@ -4925,53 +5158,94 @@ async function moveCursor(page, x, y, durationMs, recorder, options = {}) {
     const nextVariant = pointIsInsideBox({ x: nextX, y: nextY }, options.hoverBox) ? 'hand' : 'pointer';
     if (nextVariant !== activeVariant) {
       activeVariant = nextVariant;
-      await setCursorVariant(page, activeVariant);
     }
     if (step === steps || step % 6 === 0) {
       await page.mouse.move(nextX, nextY);
     }
     demoCursorPosition = { x: nextX, y: nextY };
-    await page.evaluate(([cursorX, cursorY]) => {
+    await page.evaluate(([cursorX, cursorY, cursorVariant]) => {
       window.__ytcqDemoCursorPosition = { x: cursorX, y: cursorY };
       const cursor = document.querySelector('.ytcq-demo-cursor');
+      const image = cursor?.querySelector('img');
+      const cursorImages = window.__ytcqDemoCursorImages || {};
       const hotspot = window.__ytcqDemoCursorHotspot || { x: 16, y: 12 };
       if (cursor instanceof HTMLElement) {
         cursor.style.transform = `translate(${cursorX - hotspot.x}px, ${cursorY - hotspot.y}px)`;
       }
-    }, [nextX, nextY]);
-    await recorder.captureFrame();
+      const src = cursorImages[cursorVariant] || cursorImages.pointer;
+      if (image instanceof HTMLImageElement && src) image.src = src;
+    }, [nextX, nextY, activeVariant]);
+    await recorder.captureFrame(`cursor frame ${step}/${steps}`);
   }
 }
 
-async function setCursorVariant(page, variant) {
-  await page.evaluate((nextVariant) => {
+async function setCursorVariant(page, variant, recorder) {
+  const changed = await page.evaluate((nextVariant) => {
     const image = document.querySelector('.ytcq-demo-cursor img');
     const cursorImages = window.__ytcqDemoCursorImages || {};
     const src = cursorImages[nextVariant] || cursorImages.pointer;
-    if (image instanceof HTMLImageElement && src) image.src = src;
+    if (!(image instanceof HTMLImageElement) || !src || image.src === src) return false;
+    image.src = src;
+    return true;
   }, variant);
+  if (changed) await recorder.captureFrame(`cursor variant ${variant}`);
 }
 
 async function setDemoCameraForBox(page, recorder, box, options = {}) {
   const scale = box ? options.scale || 1.16 : 1;
-  await clearDemoFocus(page);
-  await recorder.hold(options.preHoldMs ?? 100);
+  await clearDemoFocus(page, recorder);
+  await recorder.holdStill(options.preHoldMs ?? 100);
   const currentCamera = await getDemoCamera(page);
   const logicalBox = box ? unprojectCameraBox(box, currentCamera) : null;
   const transform = box
     ? getCameraTransformForBox(logicalBox, scale, options)
     : getDefaultCamera();
   if (cameraTransformIsClose(currentCamera, transform)) {
-    await recorder.hold(options.durationMs ?? 220);
+    await applyDemoCameraFrame(page, transform);
+    await verifyDemoCamera(page, transform);
+    await recorder.captureThenHoldStill(options.durationMs ?? 220);
     return;
   }
-  await page.evaluate((camera) => {
+
+  const durationMs = options.durationMs ?? getCameraTransitionDurationMs(currentCamera, transform);
+  const frames = durationToFrames(durationMs);
+  for (let frame = 1; frame <= frames; frame += 1) {
+    const progress = easeInOutCubic(frame / frames);
+    const camera = interpolateCameraTransform(currentCamera, transform, progress);
+    await applyDemoCameraFrame(page, camera);
+    await recorder.captureFrame(`camera frame ${frame}/${frames}`);
+  }
+  await verifyDemoCamera(page, transform);
+}
+
+async function applyDemoCameraFrame(page, camera) {
+  await page.evaluate((nextCamera) => {
     const app = document.querySelector('ytd-app');
     if (!(app instanceof HTMLElement)) return;
-    window.__ytcqDemoCamera = camera;
-    app.style.transform = `translate(${camera.x}px, ${camera.y}px) scale(${camera.scale})`;
-  }, transform);
-  await recorder.hold(options.durationMs ?? getCameraTransitionDurationMs(currentCamera, transform));
+    window.__ytcqDemoCamera = nextCamera;
+    app.style.transform = `translate(${nextCamera.x}px, ${nextCamera.y}px) scale(${nextCamera.scale})`;
+  }, camera);
+}
+
+async function verifyDemoCamera(page, expectedCamera) {
+  const actualCamera = await getDemoCamera(page);
+  const valuesMatch = ['scale', 'x', 'y'].every((key) => {
+    return Math.abs(actualCamera[key] - expectedCamera[key]) < 0.0001;
+  });
+  if (!valuesMatch) {
+    throw new Error(
+      `Camera did not reach its requested final state. ` +
+      `Expected ${JSON.stringify(expectedCamera)}, received ${JSON.stringify(actualCamera)}.`
+    );
+  }
+}
+
+function interpolateCameraTransform(start, end, progress) {
+  return {
+    scale: start.scale + (end.scale - start.scale) * progress,
+    x: start.x + (end.x - start.x) * progress,
+    y: start.y + (end.y - start.y) * progress
+  };
 }
 
 function cameraTransformIsClose(currentCamera, nextCamera) {
@@ -5032,8 +5306,8 @@ function getReadableCaptionDuration(title, body) {
   return Math.min(5_800, Math.max(3_600, 600 + words * 260));
 }
 
-function getClickCaptionLeadDuration(title, body) {
-  return Math.max(2_400, getReadableCaptionDuration(title, body) - 1_800);
+function getClickCaptionLeadDuration() {
+  return 800;
 }
 
 function easeInOutCubic(value) {
