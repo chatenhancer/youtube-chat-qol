@@ -79,6 +79,7 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.9",
+    "@astrojs/markdown-remark": "^7.2.1",
     "@cloudflare/workers-types": "^4.20260615.1",
     "@eslint/js": "^9.27.0",
     "@playwright/test": "^1.60.0",
