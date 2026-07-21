@@ -16,7 +16,7 @@ tags: []
 
 :::media-left
 
-![主題 — Aero](./theme-setting-zh_TW.webp){width=77%;rotate=3.5deg}
+![主題 — Aero](./theme-setting-zh_TW.webp){rotate=3.5deg}
 
 若要啟用主題，請前往擴充功能設定中的 **外觀** 區段。選擇其中一個可用主題，讓聊天介面更有風格！
 

@@ -16,7 +16,7 @@ tags: []
 
 :::media-left
 
-![ערכת נושא — Aero](./theme-setting-he.webp){width=77%;rotate=3.5deg}
+![ערכת נושא — Aero](./theme-setting-he.webp){rotate=3.5deg}
 
 כדי להפעיל ערכת עיצוב, עברו אל אזור **מראה** בהגדרות התוסף. בחרו אחת מערכות העיצוב הזמינות כדי לרענן את ממשק הצ'אט!
 

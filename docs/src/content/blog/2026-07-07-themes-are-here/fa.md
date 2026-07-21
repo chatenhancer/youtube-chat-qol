@@ -16,7 +16,7 @@ tags: []
 
 :::media-left
 
-![طرح زمینه — Aero](./theme-setting-fa.webp){width=77%;rotate=3.5deg}
+![طرح زمینه — Aero](./theme-setting-fa.webp){rotate=3.5deg}
 
 برای فعال کردن یک تم، به بخش **ظاهر** در تنظیمات افزونه برو. یکی از تم‌های موجود را انتخاب کن تا حال‌وهوای رابط چت را تازه کنی!
 

@@ -16,7 +16,7 @@ Tema dibuat agar chat terasa lebih personal untukmu. Untuk saat ini, kami akan m
 
 :::media-left
 
-![Tema — Aero](./theme-setting-id.webp){width=77%;rotate=3.5deg}
+![Tema — Aero](./theme-setting-id.webp){rotate=3.5deg}
 
 Untuk mengaktifkan tema, buka bagian **Tampilan** di pengaturan ekstensi. Pilih salah satu tema yang tersedia untuk membuat antarmuka chat terasa lebih hidup!
 

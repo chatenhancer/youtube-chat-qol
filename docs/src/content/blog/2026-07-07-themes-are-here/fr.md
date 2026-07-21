@@ -16,7 +16,7 @@ Les thèmes servent à rendre le chat plus personnel pour vous. Pour l’instant
 
 :::media-left
 
-![Thème — Aero](./theme-setting-fr.webp){width=77%;rotate=3.5deg}
+![Thème — Aero](./theme-setting-fr.webp){rotate=3.5deg}
 
 Pour activer un thème, allez dans la section **Apparence** des paramètres de l’extension. Choisissez l’un des thèmes disponibles pour donner un peu plus de style à l’interface du chat !
 

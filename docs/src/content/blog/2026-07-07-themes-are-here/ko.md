@@ -16,7 +16,7 @@ tags: []
 
 :::media-left
 
-![테마 — Aero](./theme-setting-ko.webp){width=77%;rotate=3.5deg}
+![테마 — Aero](./theme-setting-ko.webp){rotate=3.5deg}
 
 테마를 활성화하려면 확장 프로그램 설정의 **모양** 섹션으로 이동하세요. 사용 가능한 테마 중 하나를 골라 채팅 인터페이스에 새로운 느낌을 더해 보세요!
 

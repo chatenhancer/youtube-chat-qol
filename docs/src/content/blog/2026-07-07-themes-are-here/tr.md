@@ -16,7 +16,7 @@ Temalar, sohbeti senin için daha kişisel hissettirmek için var. Şimdilik haz
 
 :::media-left
 
-![Tema — Aero](./theme-setting-tr.webp){width=77%;rotate=3.5deg}
+![Tema — Aero](./theme-setting-tr.webp){rotate=3.5deg}
 
 Bir temayı etkinleştirmek için uzantı ayarlarında **Görünüm** bölümüne git. Sohbet arayüzüne biraz renk katmak için mevcut temalardan birini seç!
 

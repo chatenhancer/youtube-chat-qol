@@ -16,7 +16,7 @@ tags: []
 
 :::media-left
 
-![थीम — Aero](./theme-setting-hi.webp){width=77%;rotate=3.5deg}
+![थीम — Aero](./theme-setting-hi.webp){rotate=3.5deg}
 
 किसी थीम को चालू करने के लिए एक्सटेंशन सेटिंग्स में **दिखावट** सेक्शन पर जाएं. चैट इंटरफेस को नया रंग देने के लिए उपलब्ध थीम में से कोई एक चुनें!
 

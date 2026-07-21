@@ -16,7 +16,7 @@ Thema's zijn bedoeld om chat persoonlijker voor je te maken. Voorlopig brengen w
 
 :::media-left
 
-![Thema — Aero](./theme-setting-nl.webp){width=77%;rotate=3.5deg}
+![Thema — Aero](./theme-setting-nl.webp){rotate=3.5deg}
 
 Ga naar het onderdeel **Uiterlijk** in de instellingen van de extensie om een thema in te schakelen. Kies een van de beschikbare thema's om de chatinterface wat extra sfeer te geven!
 

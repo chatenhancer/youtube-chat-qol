@@ -16,7 +16,7 @@ Los temas permiten personalizar el chat. Empezamos con una selección de diseño
 
 :::media-left
 
-![Tema — Aero](./theme-setting-es.webp){width=77%;rotate=3.5deg}
+![Tema — Aero](./theme-setting-es.webp){rotate=3.5deg}
 
 Para activar un tema, abre **Apariencia** en los ajustes de la extensión y elige uno de la lista.
 

@@ -16,7 +16,7 @@ tags: []
 
 :::media-left
 
-![المظهر — Aero](./theme-setting-ar.webp){width=77%;rotate=3.5deg}
+![المظهر — Aero](./theme-setting-ar.webp){rotate=3.5deg}
 
 لتفعيل سمة، انتقل إلى قسم **المظهر** في إعدادات الإضافة. اختر إحدى السمات المتاحة لإضفاء لمسة جديدة على واجهة الدردشة!
 
