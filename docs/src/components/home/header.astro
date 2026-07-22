@@ -33,44 +33,9 @@ const { languageUrls = {}, locale: currentLocale, messages: m } = Astro.props as
       <span>{m.nav.github}</span>
     </a>
   </nav>
-  <div class="site-header-actions">
-    <label class="language-switcher">
-      <select data-language-switcher aria-label={m.nav.language}>
-        {locales.map((locale) => (
-          <option data-locale={locale} selected={locale === currentLocale} value={languageUrls[locale] || getLocaleUrl(locale)}>
-            {localeMeta[locale].label}
-          </option>
-        ))}
-      </select>
-    </label>
-    <a class="button header-install" href={`${getLocaleUrl(currentLocale)}#install`}>
-      <span class="button-icon" data-symbol="install_desktop" aria-hidden="true">
-        <Icon name="install_desktop" />
-      </span>
-      <span>{m.nav.install}</span>
-    </a>
-  </div>
-  <details class="mobile-header-menu" data-mobile-header-menu>
-    <summary class="mobile-header-menu-toggle" aria-label={`${m.nav.language} / ${m.nav.install}`}>
-      <span class="mobile-header-menu-icon" aria-hidden="true">
-        <Icon name="menu" />
-      </span>
-    </summary>
-    <div class="mobile-header-menu-panel">
-      <nav class="mobile-header-menu-nav">
-        <a href={`${getLocaleUrl(currentLocale)}#features`} data-nav-section="features">{m.nav.features}</a>
-        <a href={`${getLocaleUrl(currentLocale)}#screenshots`} data-nav-section="screenshots">{m.nav.screenshots}</a>
-        <a href={`${getLocaleUrl(currentLocale)}#privacy`} data-nav-section="privacy">{m.nav.privacy}</a>
-        <a href={`${getLocaleUrl(currentLocale)}#commands`} data-nav-section="commands">{m.nav.commands}</a>
-        <a href={`${getLocaleUrl(currentLocale)}playground/`} data-nav-page="playground">{m.playground.eyebrow}</a>
-        <a href={getBlogIndexPath(currentLocale)} data-nav-page="blog">{m.blog.updates}</a>
-        <a class="mobile-header-menu-github" href={site.sourceUrl}>
-          <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
-            <path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.56v-2.14c-3.2.7-3.87-1.36-3.87-1.36-.52-1.33-1.28-1.68-1.28-1.68-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.76 2.7 1.25 3.36.96.1-.75.4-1.25.73-1.54-2.56-.29-5.25-1.28-5.25-5.69 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.04 0 0 .97-.31 3.17 1.18A10.9 10.9 0 0 1 12 6.05c.98 0 1.96.13 2.88.39 2.2-1.49 3.17-1.18 3.17-1.18.63 1.58.23 2.75.11 3.04.74.81 1.19 1.83 1.19 3.09 0 4.42-2.7 5.4-5.27 5.68.42.36.78 1.07.78 2.16v3.12c0 .31.21.67.8.56A11.52 11.52 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z"></path>
-          </svg>
-          <span>{m.nav.github}</span>
-        </a>
-      </nav>
+  <div class="site-header-tools">
+    <div class="site-header-actions">
+      <pagefind-modal-trigger class="site-search-trigger" compact hide-shortcut></pagefind-modal-trigger>
       <label class="language-switcher">
         <select data-language-switcher aria-label={m.nav.language}>
           {locales.map((locale) => (
@@ -87,5 +52,43 @@ const { languageUrls = {}, locale: currentLocale, messages: m } = Astro.props as
         <span>{m.nav.install}</span>
       </a>
     </div>
-  </details>
+    <details class="mobile-header-menu" data-mobile-header-menu>
+      <summary class="mobile-header-menu-toggle" aria-label={`${m.nav.language} / ${m.nav.install}`}>
+        <span class="mobile-header-menu-icon" aria-hidden="true">
+          <Icon name="menu" />
+        </span>
+      </summary>
+      <div class="mobile-header-menu-panel">
+        <nav class="mobile-header-menu-nav">
+          <a href={`${getLocaleUrl(currentLocale)}#features`} data-nav-section="features">{m.nav.features}</a>
+          <a href={`${getLocaleUrl(currentLocale)}#screenshots`} data-nav-section="screenshots">{m.nav.screenshots}</a>
+          <a href={`${getLocaleUrl(currentLocale)}#privacy`} data-nav-section="privacy">{m.nav.privacy}</a>
+          <a href={`${getLocaleUrl(currentLocale)}#commands`} data-nav-section="commands">{m.nav.commands}</a>
+          <a href={`${getLocaleUrl(currentLocale)}playground/`} data-nav-page="playground">{m.playground.eyebrow}</a>
+          <a href={getBlogIndexPath(currentLocale)} data-nav-page="blog">{m.blog.updates}</a>
+          <a class="mobile-header-menu-github" href={site.sourceUrl}>
+            <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+              <path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.56v-2.14c-3.2.7-3.87-1.36-3.87-1.36-.52-1.33-1.28-1.68-1.28-1.68-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.76 2.7 1.25 3.36.96.1-.75.4-1.25.73-1.54-2.56-.29-5.25-1.28-5.25-5.69 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.04 0 0 .97-.31 3.17 1.18A10.9 10.9 0 0 1 12 6.05c.98 0 1.96.13 2.88.39 2.2-1.49 3.17-1.18 3.17-1.18.63 1.58.23 2.75.11 3.04.74.81 1.19 1.83 1.19 3.09 0 4.42-2.7 5.4-5.27 5.68.42.36.78 1.07.78 2.16v3.12c0 .31.21.67.8.56A11.52 11.52 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z"></path>
+            </svg>
+            <span>{m.nav.github}</span>
+          </a>
+        </nav>
+        <label class="language-switcher">
+          <select data-language-switcher aria-label={m.nav.language}>
+            {locales.map((locale) => (
+              <option data-locale={locale} selected={locale === currentLocale} value={languageUrls[locale] || getLocaleUrl(locale)}>
+                {localeMeta[locale].label}
+              </option>
+            ))}
+          </select>
+        </label>
+        <a class="button header-install" href={`${getLocaleUrl(currentLocale)}#install`}>
+          <span class="button-icon" data-symbol="install_desktop" aria-hidden="true">
+            <Icon name="install_desktop" />
+          </span>
+          <span>{m.nav.install}</span>
+        </a>
+      </div>
+    </details>
+  </div>
 </header>

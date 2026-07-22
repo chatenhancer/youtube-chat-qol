@@ -132,6 +132,7 @@ const structuredDataJson = resolvedStructuredData
     {resolvedXDefaultUrl && <link rel="alternate" hreflang="x-default" href={resolvedXDefaultUrl} />}
     <link rel="icon" href={`${rootPrefix}assets/icons/icon-128.png`}>
     <link rel="apple-touch-icon" href={`${rootPrefix}assets/icons/icon-128.png`}>
+    <link rel="stylesheet" href="/pagefind/pagefind-component-ui.css">
     {walkthroughMediaOrigin && walkthroughMediaOrigin !== siteOrigin && (
       <link rel="preconnect" href={walkthroughMediaOrigin} />
     )}
@@ -149,8 +150,34 @@ const structuredDataJson = resolvedStructuredData
   <body>
     <slot />
     <WalkthroughClipModal messages={messages} />
+    <pagefind-config excerpt-length="24"></pagefind-config>
+    <pagefind-modal reset-on-close>
+      <pagefind-modal-header>
+        <pagefind-input></pagefind-input>
+      </pagefind-modal-header>
+      <pagefind-modal-body>
+        <p class="site-search-empty-state" data-site-search-empty-state aria-hidden="true"></p>
+        <pagefind-summary></pagefind-summary>
+        <pagefind-results></pagefind-results>
+      </pagefind-modal-body>
+      <pagefind-modal-footer>
+        <pagefind-keyboard-hints></pagefind-keyboard-hints>
+      </pagefind-modal-footer>
+    </pagefind-modal>
     <script is:inline type="application/json" data-docs-config set:html={JSON.stringify(docsConfig).replace(/</g, '\\u003c')}></script>
     <script is:inline src={homeScriptUrl}></script>
     <script is:inline src={walkthroughClipsScriptUrl}></script>
+    <script is:inline type="module" src="/pagefind/pagefind-component-ui.js"></script>
+    <script is:inline type="module">
+      customElements.whenDefined('pagefind-input').then(() => {
+        const modal = document.querySelector('pagefind-modal');
+        const inputHint = modal?.querySelector('.pf-input-wrapper > span[data-pf-sr-hidden]');
+        const emptyState = modal?.querySelector('[data-site-search-empty-state]');
+
+        if (inputHint && emptyState) {
+          emptyState.textContent = inputHint.textContent;
+        }
+      });
+    </script>
   </body>
 </html>

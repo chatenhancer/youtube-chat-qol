@@ -1,5 +1,50 @@
 import { defineConfig } from 'astro/config';
 import { unified } from '@astrojs/markdown-remark';
+import { readFile } from 'node:fs/promises';
+
+// Pagefind indexes built HTML, so docs:dev prepares this directory before Astro starts.
+const pagefindDevRoot = new URL('./dist/docs/pagefind/', import.meta.url);
+
+function pagefindDevAssets() {
+  return {
+    name: 'pagefind-dev-assets',
+    hooks: {
+      'astro:server:setup': ({ server }) => {
+        server.middlewares.use('/pagefind', async (request, response, next) => {
+          if (!['GET', 'HEAD'].includes(request.method || 'GET')) return next();
+
+          let assetUrl;
+          try {
+            const pathname = decodeURIComponent(new URL(request.url || '/', 'http://localhost').pathname);
+            assetUrl = new URL(`.${pathname}`, pagefindDevRoot);
+          } catch {
+            return next();
+          }
+
+          if (!assetUrl.href.startsWith(pagefindDevRoot.href)) return next();
+
+          try {
+            const contents = await readFile(assetUrl);
+            response.statusCode = 200;
+            response.setHeader('Cache-Control', 'no-store');
+            response.setHeader('Content-Type', getPagefindContentType(assetUrl.pathname));
+            response.end(request.method === 'HEAD' ? undefined : contents);
+          } catch (error) {
+            if (error?.code === 'ENOENT' || error?.code === 'EISDIR') return next();
+            return next(error);
+          }
+        });
+      }
+    }
+  };
+}
+
+function getPagefindContentType(pathname) {
+  if (pathname.endsWith('.css')) return 'text/css; charset=utf-8';
+  if (pathname.endsWith('.js')) return 'text/javascript; charset=utf-8';
+  if (pathname.endsWith('.pagefind')) return 'application/wasm';
+  return 'application/octet-stream';
+}
 
 function remarkBlogImages() {
   return (tree) => {
@@ -276,6 +321,7 @@ export default defineConfig({
     format: 'directory'
   },
   compressHTML: true,
+  integrations: [pagefindDevAssets()],
   markdown: {
     processor: unified({
       remarkPlugins: [remarkBlogImages],

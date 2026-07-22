@@ -92,7 +92,7 @@ const alternateLinks = locales.map((targetLocale) => ({
   xDefaultUrl={getPlaygroundUrl('en')}
 >
   <Header languageUrls={languageUrls} locale={locale} messages={messages} />
-  <main id="top">
+  <main id="top" data-pagefind-body>
     <PlaygroundPage
       clipCta={messages.playground.primaryCta}
       computerHref={getRequiredPostPath('play-playground-games-against-the-computer')}
