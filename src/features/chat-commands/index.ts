@@ -22,7 +22,7 @@ import { SEND_BUTTON_SELECTOR } from '../../youtube/selectors';
 import { createCommandAutocomplete } from './autocomplete';
 import { createCommandCards } from './cards';
 import { createChatCommands } from './commands';
-import { registerFeature } from '../../content/feature-runtime';
+import { registerFeature } from '../../content/dispatcher';
 import { parseCommand, parseInlineTextCommand } from './parser';
 import type {
   ChatCommandDefinition,

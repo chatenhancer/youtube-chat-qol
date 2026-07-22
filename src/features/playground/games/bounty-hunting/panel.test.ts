@@ -40,7 +40,7 @@ vi.mock('../../../../youtube/chat-feed/source', () => ({
   subscribeYouTubeChatFeed: chatFeedMock.subscribe
 }));
 
-import { handleFeatureMessage } from '../../../../content/feature-runtime';
+import { handleFeatureMessage } from '../../../../content/dispatcher';
 import { initMentionDetection } from '../../../mention-detection';
 import { createGamePanelShell } from '../panel-shell';
 import {

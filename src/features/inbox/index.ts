@@ -20,7 +20,7 @@ import {
   isCurrentUserAuthorName,
   onMentionCandidatesChanged
 } from '../mention-detection';
-import { registerFeature, type FeatureMessageContext } from '../../content/feature-runtime';
+import { registerFeature, type FeatureMessageContext } from '../../content/dispatcher';
 import {
   cleanupInboxTabAlertListeners,
   clearInboxTabAlert,

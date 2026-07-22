@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { DEFAULT_OPTIONS } from '../shared/options';
-import type { FeatureMutationBatch } from './feature-runtime';
+import type { FeatureMutationBatch } from './dispatcher';
 
 const lifecycleMocks = vi.hoisted(() => ({
   bootFeatures: vi.fn(),
@@ -24,7 +24,7 @@ const chatFeedRecordStoreMocks = vi.hoisted(() => ({
 }));
 
 vi.mock('./enabled-features', () => ({}));
-vi.mock('./feature-runtime', () => lifecycleMocks);
+vi.mock('./dispatcher', () => lifecycleMocks);
 vi.mock('../youtube/chat-feed/records', () => chatFeedRecordStoreMocks);
 
 describe('content script entrypoint wiring', () => {

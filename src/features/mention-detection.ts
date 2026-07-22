@@ -6,7 +6,7 @@
  * surfaces as the shared content lifecycle sees them. Feed consumers use the
  * normalized candidates without duplicating identity selectors.
  */
-import { registerFeature, type FeatureMutationBatch } from '../content/feature-runtime';
+import { registerFeature, type FeatureMutationBatch } from '../content/dispatcher';
 import { cleanText, normalizeComparableText } from '../shared/text';
 import { cleanAuthorNameText } from '../youtube/authors';
 

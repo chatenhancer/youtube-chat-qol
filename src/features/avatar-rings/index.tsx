@@ -1,5 +1,5 @@
 /** Browser-local avatar rings selected explicitly from recent-message profiles. */
-import { registerFeature } from '../../content/feature-runtime';
+import { registerFeature } from '../../content/dispatcher';
 import {
   AVATAR_RINGS_STORAGE_KEY,
   getAvatarRingColor,

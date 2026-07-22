@@ -6,7 +6,7 @@
  *
  * `enabled-features` is imported for feature registration side effects. This
  * entrypoint owns the single MutationObserver; features should register
- * runtime hooks rather than creating their own observers.
+ * feature hooks rather than creating their own observers.
  */
 import './enabled-features';
 import {
@@ -25,7 +25,7 @@ import {
   suspendFeatures,
   type FeatureMessageSource,
   type FeatureMutationBatch
-} from './feature-runtime';
+} from './dispatcher';
 import { DEFAULT_OPTIONS, getTargetLanguageUpdate, normalizeOptions, type Options } from '../shared/options';
 import {
   DEFAULT_CHAT_SKIN,

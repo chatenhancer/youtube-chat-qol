@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { DEFAULT_OPTIONS } from '../../shared/options';
-import type { ContentFeature } from '../../content/feature-runtime';
+import type { ContentFeature } from '../../content/dispatcher';
 
 const lifecycleMocks = vi.hoisted(() => ({
   registerFeature: vi.fn()
@@ -12,10 +12,10 @@ const queueMocks = vi.hoisted(() => ({
   queueRetroactiveTranslations: vi.fn()
 }));
 
-vi.mock('../../content/feature-runtime', () => lifecycleMocks);
+vi.mock('../../content/dispatcher', () => lifecycleMocks);
 vi.mock('./queue', () => queueMocks);
 
-describe('translation feature runtime wiring', () => {
+describe('translation feature dispatcher wiring', () => {
   let feature: ContentFeature;
   let setCurrentOptions: typeof import('../../shared/state').setOptions;
 

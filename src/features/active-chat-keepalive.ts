@@ -5,7 +5,7 @@
  */
 import { findChatInput, getChatInputText, replaceChatInput } from '../youtube/chat-input';
 import { hideEnhancedEffect } from './enhanced-effect';
-import { registerFeature, suspendFeatures } from '../content/feature-runtime';
+import { registerFeature, suspendFeatures } from '../content/dispatcher';
 
 const ACTIVE_CHAT_PORT_NAME = 'ytcq:active-chat';
 const ACTIVE_CHAT_PING_TYPE = 'ytcq:active-chat-ping';

@@ -5,7 +5,7 @@
  * renderer. This module classifies each popup after Polymer stamps its children
  * and routes it to the correct enhancer.
  */
-import { registerFeature } from '../../content/feature-runtime';
+import { registerFeature } from '../../content/dispatcher';
 import {
   cleanupStaleMessageMenuSurfaces,
   enhanceMessageContextMenu,

@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { DEFAULT_OPTIONS } from '../../shared/options';
 import { setOptions } from '../../shared/state';
 import { replaceChatInput } from '../../youtube/chat-input';
-import { cleanupFeatures, initFeatures } from '../../content/feature-runtime';
+import { cleanupFeatures, initFeatures } from '../../content/dispatcher';
 import {
   emitMessageTranslationCleared,
   emitMessageTranslationRendered,

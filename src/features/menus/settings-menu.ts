@@ -16,7 +16,7 @@ import {
   createSplitTranslateIcon
 } from '../../shared/icons';
 import { playAlertSoundPreview } from '../../shared/sounds/alert-sounds';
-import { registerFeature } from '../../content/feature-runtime';
+import { registerFeature } from '../../content/dispatcher';
 import { clampMenuToViewport, createMenuToggleItem } from './common';
 
 type SaveOptions = (values: Partial<Options>) => void;

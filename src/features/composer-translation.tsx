@@ -24,7 +24,7 @@ import {
   type ChatInputSnapshot
 } from '../youtube/chat-input';
 import { translateTranslationPlan } from './chat-commands/translate-text';
-import { registerFeature } from '../content/feature-runtime';
+import { registerFeature } from '../content/dispatcher';
 import {
   createTranslationPlanFromNodes,
   type TranslationPlan

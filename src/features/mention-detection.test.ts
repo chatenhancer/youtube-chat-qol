@@ -73,7 +73,7 @@ describe('current-user mention detection', () => {
 
   it('refreshes candidates from lifecycle mutation batches', async () => {
     const mentionDetection = await import('./mention-detection');
-    const { handleFeatureMutations } = await import('../content/feature-runtime');
+    const { handleFeatureMutations } = await import('../content/dispatcher');
     mentionDetection.initMentionDetection();
     expect(mentionDetection.getCurrentMentionCandidates()).toEqual([]);
 
@@ -101,7 +101,7 @@ describe('current-user mention detection', () => {
   it('ignores unrelated mutations and coalesces pending identity refreshes', async () => {
     const setTimeoutSpy = vi.spyOn(window, 'setTimeout');
     const mentionDetection = await import('./mention-detection');
-    const { handleFeatureMutations } = await import('../content/feature-runtime');
+    const { handleFeatureMutations } = await import('../content/dispatcher');
     const unrelated = document.createElement('div');
     document.body.append(unrelated);
 
@@ -147,7 +147,7 @@ describe('current-user mention detection', () => {
     const author = surface.querySelector('#author-name')!;
     document.body.append(surface);
     const mentionDetection = await import('./mention-detection');
-    const { handleFeatureMutations } = await import('../content/feature-runtime');
+    const { handleFeatureMutations } = await import('../content/dispatcher');
     mentionDetection.initMentionDetection();
 
     author.textContent = '@AfterViewer';
@@ -172,7 +172,7 @@ describe('current-user mention detection', () => {
 
   it('refreshes identity when the identity container itself is the mutation target', async () => {
     const mentionDetection = await import('./mention-detection');
-    const { handleFeatureMutations } = await import('../content/feature-runtime');
+    const { handleFeatureMutations } = await import('../content/dispatcher');
     const surface = createIdentitySurface('@TargetViewer');
     document.body.append(surface);
 
@@ -197,7 +197,7 @@ describe('current-user mention detection', () => {
 
   it('refreshes identity when an added wrapper contains an identity surface', async () => {
     const mentionDetection = await import('./mention-detection');
-    const { handleFeatureMutations } = await import('../content/feature-runtime');
+    const { handleFeatureMutations } = await import('../content/dispatcher');
     const wrapper = document.createElement('div');
     wrapper.append(createIdentitySurface('@WrappedViewer'));
     document.body.append(wrapper);
@@ -223,7 +223,7 @@ describe('current-user mention detection', () => {
 
   it('cancels a pending mention identity refresh during stale cleanup', async () => {
     const mentionDetection = await import('./mention-detection');
-    const { cleanupFeatures, handleFeatureMutations } = await import('../content/feature-runtime');
+    const { cleanupFeatures, handleFeatureMutations } = await import('../content/dispatcher');
     const surface = createIdentitySurface('@CanceledViewer');
     document.body.append(surface);
 

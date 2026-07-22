@@ -3,7 +3,7 @@ import {
   bootFeatures,
   handleFeatureMutations,
   resetFeatures
-} from '../../content/feature-runtime';
+} from '../../content/dispatcher';
 
 const menuMocks = vi.hoisted(() => ({
   cleanupStaleMessageMenuSurfaces: vi.fn(),

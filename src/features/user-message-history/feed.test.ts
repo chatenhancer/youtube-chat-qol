@@ -447,7 +447,7 @@ describe('feed-backed user message history', () => {
 
   async function initHistory(): Promise<typeof import('./index')> {
     const history = await import('./index');
-    const runtime = await import('../../content/feature-runtime');
+    const runtime = await import('../../content/dispatcher');
     runtime.initFeatures({ saveOptions: vi.fn() });
     cleanupFeatures = runtime.cleanupFeatures;
     return history;

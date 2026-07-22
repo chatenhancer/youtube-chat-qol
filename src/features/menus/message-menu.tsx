@@ -18,7 +18,7 @@ import {
 import { jsx, el } from '../../shared/jsx-dom';
 import { getChatBookmarkTitle, isChatBookmarked, toggleChatBookmark } from '../bookmarks';
 import { replyToMessage } from '../reply';
-import { registerFeature } from '../../content/feature-runtime';
+import { registerFeature } from '../../content/dispatcher';
 import { closeMenu, createMenuActionItem } from './common';
 
 let activeContextMessage: HTMLElement | null = null;

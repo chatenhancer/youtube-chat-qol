@@ -9,10 +9,10 @@
 import {
   handleFeatureMessage,
   registerFeature,
-  type FeatureRuntimeContext,
+  type FeatureInitContext,
   type FeatureMutationBatch,
   type SaveOptions
-} from '../../content/feature-runtime';
+} from '../../content/dispatcher';
 import { t } from '../../shared/i18n';
 import { getOptions } from '../../shared/state';
 import { showToast } from '../../shared/toast';
@@ -58,7 +58,7 @@ registerFeature({
   mutation: handleLiteModeMutations
 });
 
-function initLiteMode(context: FeatureRuntimeContext): void {
+function initLiteMode(context: FeatureInitContext): void {
   if (!isSupportedLiteModePage()) return;
   saveOptions = context.saveOptions;
   initLiteModeButton(saveOptions);

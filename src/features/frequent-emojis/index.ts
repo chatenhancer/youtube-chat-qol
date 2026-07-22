@@ -5,7 +5,7 @@
  * YouTube's emoji picker, and exposes the same emojis from a composer-adjacent
  * quick popover. Both surfaces insert directly into the native chat input.
  */
-import { registerFeature } from '../../content/feature-runtime';
+import { registerFeature } from '../../content/dispatcher';
 import { getEmojiUsageData, isVariantParentEmoji } from './data';
 import { insertEmojiIntoChat } from './insert';
 import {

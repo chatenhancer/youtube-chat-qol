@@ -9,7 +9,7 @@ import { cleanText, normalizeComparableText } from '../../shared/text';
 import { getMessageStableId } from '../../youtube/messages';
 import { CHAT_MESSAGE_SELECTOR } from '../../youtube/selectors';
 import { requestRenderedYouTubeChatFeedRecord } from '../../youtube/chat-feed/records';
-import { registerFeature } from '../../content/feature-runtime';
+import { registerFeature } from '../../content/dispatcher';
 import {
   onMessageTranslationCleared,
   onMessageTranslationRendered,

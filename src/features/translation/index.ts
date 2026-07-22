@@ -1,13 +1,13 @@
 /**
  * Translation feature entrypoint.
  *
- * Loading this module registers translation runtime hooks. Queue/cache
+ * Loading this module registers translation feature hooks. Queue/cache
  * behavior stays in `queue.ts`, while this entrypoint owns the feature wiring
  * so helper imports do not accidentally boot translation.
  */
 import type { Options } from '../../shared/options';
 import { getOptions } from '../../shared/state';
-import { registerFeature, type FeatureMessageContext } from '../../content/feature-runtime';
+import { registerFeature, type FeatureMessageContext } from '../../content/dispatcher';
 import { clearTranslations, queueMessageTranslation, queueRetroactiveTranslations } from './queue';
 
 registerFeature({

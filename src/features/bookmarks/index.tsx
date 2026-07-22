@@ -1,5 +1,5 @@
 /** Browser-local chat message bookmarks. */
-import { registerFeature } from '../../content/feature-runtime';
+import { registerFeature } from '../../content/dispatcher';
 import {
   BOOKMARK_FILLED_ICON_PATH,
   BOOKMARK_ICON_PATH,

@@ -157,7 +157,7 @@ describe('avatar rings', () => {
 
   it('wires message avatars and upgrades them with stable feed channel metadata', async () => {
     const feature = await import('./index');
-    const lifecycle = await import('../../content/feature-runtime');
+    const lifecycle = await import('../../content/dispatcher');
     feature.initAvatarRings();
     await flushAsyncWork();
     await feature.toggleAvatarRing({

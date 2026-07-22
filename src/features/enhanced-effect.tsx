@@ -4,7 +4,7 @@
  * Shows a short edge shimmer when the extension attaches, then leaves a quiet
  * ambient glow so the chat feels enhanced without competing with messages.
  */
-import { registerFeature } from '../content/feature-runtime';
+import { registerFeature } from '../content/dispatcher';
 import { jsx, el } from '../shared/jsx-dom';
 import { getOptions } from '../shared/state';
 import type { Options } from '../shared/options';

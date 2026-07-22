@@ -137,7 +137,7 @@ import {
   handleFeatureMutations,
   shouldIgnoreFeatureAddedNode,
   shouldIgnoreFeatureMutation
-} from '../../content/feature-runtime';
+} from '../../content/dispatcher';
 import { createInboxRecordFromChatFeed } from './records';
 import {
   addInboxKeywords,
@@ -238,7 +238,7 @@ describe('inbox coordinator', () => {
     expect(tabAlertMocks.showInboxTabAlert).toHaveBeenCalledWith(1);
   });
 
-  it('handles added and existing rows through the feature runtime', async () => {
+  it('handles added and existing rows through the feature dispatcher', async () => {
     inboxTestState.keywords = ['alpha'];
     inboxTestState.matchingKeywords = ['alpha'];
     const addedMessage = createMessage('@ViewerLifecycle', 'hello alpha');

@@ -113,7 +113,7 @@ import {
   wireParticipantProfileClick,
   wireProfileClick
 } from './index';
-import { suspendFeatures } from '../../content/feature-runtime';
+import { suspendFeatures } from '../../content/dispatcher';
 
 let resizeObserverCallbacks: ResizeObserverCallback[] = [];
 

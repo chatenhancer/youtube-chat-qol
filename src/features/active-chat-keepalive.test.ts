@@ -139,7 +139,7 @@ describe('active chat keepalive', () => {
 
   it('ignores visibility changes when no reconnect is pending', async () => {
     chrome.runtime.connect = vi.fn(() => createMockPort() as unknown as chrome.runtime.Port);
-    const { handleFeatureVisibilityChanged } = await import('../content/feature-runtime');
+    const { handleFeatureVisibilityChanged } = await import('../content/dispatcher');
     const { startActiveChatKeepAlive } = await import('./active-chat-keepalive');
 
     startActiveChatKeepAlive();
@@ -162,7 +162,7 @@ describe('active chat keepalive', () => {
         throw new Error('Extension context invalidated.');
       });
     chrome.runtime.connect = connect;
-    const lifecycle = await import('../content/feature-runtime');
+    const lifecycle = await import('../content/dispatcher');
     const messageHook = vi.fn();
     lifecycle.registerFeature({
       page: {
@@ -218,7 +218,7 @@ describe('active chat keepalive', () => {
         throw new Error('Extension context invalidated.');
       });
     chrome.runtime.connect = connect;
-    const { handleFeatureVisibilityChanged } = await import('../content/feature-runtime');
+    const { handleFeatureVisibilityChanged } = await import('../content/dispatcher');
     const { startActiveChatKeepAlive } = await import('./active-chat-keepalive');
 
     startActiveChatKeepAlive();

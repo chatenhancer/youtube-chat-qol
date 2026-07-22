@@ -20,7 +20,7 @@ import {
   type MessageRecord,
   type UserIdentity
 } from '../user-message-history';
-import { registerFeature } from '../../content/feature-runtime';
+import { registerFeature } from '../../content/dispatcher';
 import { mentionAuthorName } from '../reply';
 import { applyAvatarRing, createAvatarRingToggleButton } from '../avatar-rings';
 import {

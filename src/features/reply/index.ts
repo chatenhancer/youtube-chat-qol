@@ -11,7 +11,7 @@ import { cleanText } from '../../shared/text';
 import { showToast } from '../../shared/toast';
 import { getMessageContentNodes, getMessageDetails } from '../../youtube/messages';
 import { showFocusPromptForAuthor, showFocusPromptForMessage } from '../focus-mode';
-import { registerFeature } from '../../content/feature-runtime';
+import { registerFeature } from '../../content/dispatcher';
 import { formatMentionText, formatQuoteText } from './format';
 import { insertMentionText, replaceInputWithQuoteNodes, replaceInputWithQuoteText } from './input';
 import { createQuoteContentNodes } from './quote-content';

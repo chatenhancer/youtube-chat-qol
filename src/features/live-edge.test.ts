@@ -9,7 +9,7 @@ describe('live edge recovery', () => {
   });
 
   it('scrolls chat to the live edge when the background reports that the user left', async () => {
-    const lifecycle = await import('../content/feature-runtime');
+    const lifecycle = await import('../content/dispatcher');
     await import('./live-edge');
     const scroller = createScroller();
     const jumpToBottom = createJumpToBottomButton();
@@ -33,7 +33,7 @@ describe('live edge recovery', () => {
   });
 
   it('does not participate in visible-page lifecycle recovery', async () => {
-    const lifecycle = await import('../content/feature-runtime');
+    const lifecycle = await import('../content/dispatcher');
     await import('./live-edge');
     const scroller = createScroller();
     const jumpToBottom = createJumpToBottomButton();
@@ -47,7 +47,7 @@ describe('live edge recovery', () => {
   });
 
   it('ignores missing scrollers and hidden jump buttons', async () => {
-    const lifecycle = await import('../content/feature-runtime');
+    const lifecycle = await import('../content/dispatcher');
     await import('./live-edge');
     const jumpToBottom = createJumpToBottomButton();
     jumpToBottom.button.getBoundingClientRect = () => ({

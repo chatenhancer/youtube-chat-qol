@@ -5,7 +5,7 @@
  * candidates from live chat, and lets players shoot at live chat messages for
  * backend-evaluated bounty claims.
  */
-import { registerFeature } from '../../../../content/feature-runtime';
+import { registerFeature } from '../../../../content/dispatcher';
 import {
   t,
   tWithEnglishFallbackWhenUnsupported,

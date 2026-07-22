@@ -6,7 +6,7 @@
  * modules so future games can be added without growing this file into a second
  * application entry point.
  */
-import { registerFeature, type FeatureMutationBatch } from '../../../content/feature-runtime';
+import { registerFeature, type FeatureMutationBatch } from '../../../content/dispatcher';
 import type { Options } from '../../../shared/options';
 import type {
   GameId,

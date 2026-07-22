@@ -19,7 +19,7 @@ import { getChannelUrl, openChannelWindow } from '../channel-popup';
 import { applyAvatarRing } from '../avatar-rings';
 import { createBookmarkToggleButton } from '../bookmarks';
 import { isCurrentUserAuthorName } from '../mention-detection';
-import { registerFeature } from '../../content/feature-runtime';
+import { registerFeature } from '../../content/dispatcher';
 import {
   createTranslationPriorityScope,
   type TranslationPriorityScope

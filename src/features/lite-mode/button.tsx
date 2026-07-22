@@ -4,7 +4,7 @@
  * Keeps the always-available performance toggle ordered with Chat Enhancer's
  * other header controls while tolerating YouTube replacing the chat header.
  */
-import type { FeatureMutationBatch, SaveOptions } from '../../content/feature-runtime';
+import type { FeatureMutationBatch, SaveOptions } from '../../content/dispatcher';
 import { createBoltIcon } from '../../shared/icons';
 import { t } from '../../shared/i18n';
 import { jsx, el } from '../../shared/jsx-dom';

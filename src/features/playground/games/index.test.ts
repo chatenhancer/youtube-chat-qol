@@ -7,7 +7,7 @@ import { clearToast } from '../../../shared/toast';
 import {
   handleFeatureMutations,
   handleFeatureOptionsChanged
-} from '../../../content/feature-runtime';
+} from '../../../content/dispatcher';
 
 const alertSoundMocks = vi.hoisted(() => ({
   playAlertSound: vi.fn()

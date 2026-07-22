@@ -5,7 +5,7 @@
  * backgrounded. Move to the live edge when the user leaves the tab or browser
  * window, then leave foreground scrolling entirely under the reader's control.
  */
-import { registerFeature } from '../content/feature-runtime';
+import { registerFeature } from '../content/dispatcher';
 import { LIVE_EDGE_LEAVE_MESSAGE_TYPE } from '../shared/live-edge';
 import { keepChatAtLiveEdge } from '../youtube/chat-scroll';
 

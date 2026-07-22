@@ -5,7 +5,7 @@
  * page refresh. Drafts are scoped per YouTube stream so text from one live chat
  * does not appear in another.
  */
-import { registerFeature } from '../../content/feature-runtime';
+import { registerFeature } from '../../content/dispatcher';
 import {
   findChatInput,
   getChatInputSnapshot,
