@@ -26,13 +26,13 @@ export function createGamesCard(onClose: () => void): GamesCardElements {
     <section class="ytcq-profile-card ytcq-games-card" role="dialog" aria-label={t('games')}>
       <div class="ytcq-profile-card-header ytcq-games-card-header">
         <span class="ytcq-games-card-icon">{createGamesIcon()}</span>
-        <div class="ytcq-profile-card-title-wrap">
+        <div class="ytcq-profile-card-title-wrap ytcq-games-title-wrap">
           <div class="ytcq-games-title-row">
             <div class="ytcq-profile-card-title" dir="auto">
               {t('games')}
             </div>
           </div>
-          <div class="ytcq-profile-card-subtitle" dir="auto">
+          <div class="ytcq-profile-card-subtitle ytcq-games-card-subtitle" dir="auto">
             {t('playground')}
           </div>
         </div>

@@ -217,7 +217,10 @@ describe('playground games header button', () => {
 
     expect(document.querySelector('.ytcq-games-connection-notice')).toBeNull();
     expect(document.querySelector('.ytcq-profile-card-title')?.textContent).toBe('Games');
-    expect(document.querySelector('.ytcq-profile-card-subtitle')?.textContent).toBe('No players online');
+    expect(document.querySelector('.ytcq-profile-card-subtitle')?.getAttribute('aria-hidden')).toBe('true');
+    expect(document.querySelector('.ytcq-games-title-wrap')?.classList).toContain(
+      'ytcq-games-title-wrap-collapsed'
+    );
     expect(document.querySelector('.ytcq-games-availability')?.getAttribute('aria-checked')).toBe('false');
     expect(document.querySelector('.ytcq-games-availability-toggle .ytcq-menu-toggle')).not.toBeNull();
     expect(getGamesSectionTitles()).toEqual(['Start a game', 'Unavailable games']);
@@ -815,7 +818,11 @@ describe('playground games header button', () => {
       ]
     }));
 
-    expect(document.querySelector('.ytcq-profile-card-subtitle')?.textContent).toBe('No players online');
+    const subtitle = document.querySelector<HTMLElement>('.ytcq-profile-card-subtitle')!;
+    expect(subtitle.getAttribute('aria-hidden')).toBe('true');
+    expect(subtitle.closest('.ytcq-games-title-wrap')?.classList).toContain(
+      'ytcq-games-title-wrap-collapsed'
+    );
 
     getGameCard('Chess').click();
     expect(getPlayerNames()).toEqual([
@@ -823,6 +830,37 @@ describe('playground games header button', () => {
       'Computer (Club)',
       'Computer (Master)'
     ]);
+  });
+
+  it('smoothly reveals the player count when the first human player comes online', () => {
+    const header = createHeader();
+    document.body.append(header);
+    setOptions({ ...DEFAULT_OPTIONS, playgroundEnabled: true, playgroundGamesAvailable: true });
+
+    wireGamesButton();
+    header.querySelector<HTMLButtonElement>('.ytcq-games-button')!.click();
+    const onlyCurrentUser = createLobbySnapshot().users[0];
+    lastMockPort()?.emit(createSnapshotMessage({
+      games: [],
+      invites: [],
+      users: [onlyCurrentUser]
+    }));
+
+    const subtitle = document.querySelector<HTMLElement>('.ytcq-profile-card-subtitle')!;
+    const titleWrap = subtitle.closest('.ytcq-games-title-wrap')!;
+    expect(subtitle.textContent).not.toBe('No players online');
+    expect(subtitle.getAttribute('aria-hidden')).toBe('true');
+    expect(titleWrap.classList).toContain('ytcq-games-title-wrap-collapsed');
+
+    lastMockPort()?.emit(createSnapshotMessage({
+      games: [],
+      invites: [],
+      users: [onlyCurrentUser, createLobbySnapshot().users[1]]
+    }));
+
+    expect(subtitle.textContent).toBe('1 player online');
+    expect(subtitle.getAttribute('aria-hidden')).toBe('false');
+    expect(titleWrap.classList).not.toContain('ytcq-games-title-wrap-collapsed');
   });
 
   it('opens the newly invited game when another game is already active', () => {

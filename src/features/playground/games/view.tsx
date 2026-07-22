@@ -56,20 +56,37 @@ export function updateGamesCardHeader(card: HTMLElement, state: GamesPanelState)
 
   if (state.mode === 'players' && state.selectedGameId) {
     title.textContent = getGameLabel(state.selectedGameId);
-    subtitle.textContent = t('gamesPlayWith');
+    updateGamesCardSubtitle(subtitle, t('gamesPlayWith'));
     return;
   }
 
   title.textContent = t('games');
   if (shouldShowTransportNotice(state)) {
-    subtitle.textContent =
+    updateGamesCardSubtitle(
+      subtitle,
       state.transport.status === 'connecting'
         ? t('gamesConnectingTitle')
-        : t('gamesUnavailableTitle');
+        : t('gamesUnavailableTitle')
+    );
     return;
   }
 
-  subtitle.textContent = t('gamesPlayersOnline', { count: getOnlinePlayerCount(state) });
+  const onlinePlayerCount = getOnlinePlayerCount(state);
+  if (onlinePlayerCount === 0) {
+    updateGamesCardSubtitle(subtitle, null);
+    return;
+  }
+
+  updateGamesCardSubtitle(subtitle, t('gamesPlayersOnline', { count: onlinePlayerCount }));
+}
+
+function updateGamesCardSubtitle(subtitle: HTMLElement, text: string | null): void {
+  const hidden = text === null;
+  if (text !== null) subtitle.textContent = text;
+  subtitle.setAttribute('aria-hidden', String(hidden));
+  subtitle
+    .closest('.ytcq-games-title-wrap')
+    ?.classList.toggle('ytcq-games-title-wrap-collapsed', hidden);
 }
 
 export function renderGamesPanelBody(

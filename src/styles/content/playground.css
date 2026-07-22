@@ -39,6 +39,27 @@
   min-width: 0;
 }
 
+.ytcq-games-title-wrap {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  transition: grid-template-rows 160ms ease;
+}
+
+.ytcq-games-title-wrap-collapsed {
+  grid-template-rows: auto 0fr;
+}
+
+.ytcq-games-card-subtitle {
+  min-height: 0;
+  overflow: hidden;
+  opacity: 1;
+  transition: opacity 120ms ease;
+}
+
+.ytcq-games-title-wrap-collapsed .ytcq-games-card-subtitle {
+  opacity: 0;
+}
+
 .ytcq-games-card-body {
   gap: 10px;
   max-height: 336px;
@@ -369,6 +390,11 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .ytcq-games-title-wrap,
+  .ytcq-games-card-subtitle {
+    transition: none;
+  }
+
   .ytcq-loading-spinner {
     animation: none;
   }
