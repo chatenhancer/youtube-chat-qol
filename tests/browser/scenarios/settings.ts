@@ -178,6 +178,10 @@ async function openExtensionPopup(context: BrowserContext): Promise<Page> {
     const extensionId = await getExtensionId(context);
     const popup = await context.newPage();
     await popup.goto(`chrome-extension://${extensionId}/popup.html`);
+    const settingsTab = popup.locator('#settingsTab');
+    await expect(settingsTab).toBeVisible({ timeout: 10_000 });
+    await settingsTab.click();
+    await expect(settingsTab).toHaveAttribute('aria-selected', 'true');
     return popup;
   });
 }

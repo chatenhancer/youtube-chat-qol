@@ -54,13 +54,13 @@ async function resetExtensionFromPopup(context: BrowserContext): Promise<void> {
     try {
       await popup.locator('#resetExtension').click();
       await expect(popup.locator('.popup-reset-dialog-message')).toBeVisible();
-      await expect(popup.locator('.popup-reset-dialog-list li')).toHaveCount(8);
+      await expect(popup.locator('.popup-reset-dialog-list li')).toHaveCount(9);
       await popup.locator('.popup-reset-dialog-backdrop').click({ position: { x: 2, y: 2 } });
       await expect(popup.locator('.popup-reset-dialog-backdrop')).toHaveCount(0);
 
       await popup.locator('#resetExtension').click();
       await expect(popup.locator('.popup-reset-dialog-message')).toBeVisible();
-      await expect(popup.locator('.popup-reset-dialog-list li')).toHaveCount(8);
+      await expect(popup.locator('.popup-reset-dialog-list li')).toHaveCount(9);
       await popup.locator('.popup-reset-dialog-confirm').click();
       await expect(popup.locator('.popup-reset-dialog-close')).toBeVisible();
     } finally {
