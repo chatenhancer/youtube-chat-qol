@@ -36,7 +36,7 @@ YouTube-livechat geeft geen melding wanneer iemand je noemt. Chat Enhancer voegt
 
 ## Betere gebruikerscontext
 
-Met Chat Enhancer opent een klik op iemands avatar een profielpaneel met recente berichten van die gebruiker. Je kunt ook het YouTube-kanaal openen in een zijvenster en gebruikers bookmarken die je later wilt herkennen.
+Klik op iemands avatar om recente berichten te bekijken of het YouTube-kanaal in een zijpaneel te openen. Vanuit dat profiel kun je een lokale avatarring toevoegen of verwijderen, zodat die persoon opvalt in de chat. Je kunt nuttige berichten opslaan vanuit de rijen met recente berichten, Inbox en Focusmodus, of via het berichtenmenu van YouTube. Elke bladwijzer bewaart het bericht en de streamcontext.
 
 ## Meestgebruikte emoji’s
 
@@ -44,7 +44,7 @@ Chat Enhancer voegt een rij met je meestgebruikte emoji’s toe, zodat de emoji�
 
 ## Andere kleine verbeteringen
 
-Er zijn nog meer kleine verbeteringen: snelle vermeldingen en citaten, gebruikersbookmarks, chatcommando’s, conceptherstel en andere details waardoor livechat minder kaal aanvoelt.
+Er zijn nog meer kleine verbeteringen: snelle vermeldingen en citaten, berichtbladwijzers, chatcommando’s, conceptherstel en andere details waardoor livechat minder kaal aanvoelt.
 
 Chat Enhancer for YouTube is gratis, open-source, vereist geen account en gebruikt geen analytics.
 

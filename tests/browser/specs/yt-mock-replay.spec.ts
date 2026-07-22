@@ -13,7 +13,7 @@ import {
 } from '../scenarios/inbox';
 import { liteModeToggleAndRestoreScenario } from '../scenarios/lite-mode';
 import { liteModeAeroBehaviorScenario } from '../scenarios/lite-mode-native-surfaces';
-import { markedUserMessageMenuScenario } from '../scenarios/marked-users';
+import { bookmarkMessageMenuScenario } from '../scenarios/bookmarks';
 import {
   mockedMessageTranslationScenario,
   replacedTranslationToggleSurfacesScenario
@@ -32,12 +32,12 @@ test(
 );
 test('logged-in mock replay: chat settings menu receives extension controls', settingsMenuScenario);
 test(
-  'logged-in mock replay: message context menu receives mark, quote, and mention actions',
+  'logged-in mock replay: message context menu receives save, quote, and mention actions',
   messageMenuScenario
 );
 test(
-  'logged-in mock replay: mark user from message menu persists and shows avatar ring',
-  markedUserMessageMenuScenario
+  'logged-in mock replay: saved message persists and appears in Bookmarks',
+  bookmarkMessageMenuScenario
 );
 test(
   'logged-in mock replay: incoming chat messages are translated',

@@ -40,10 +40,10 @@
     "jumpToMessage": "Aller au message",
     "keywordOrPhrase": "Mot-clé ou expression",
     "lessThanOneMinute": "moins de 1 min",
-    "markUser": "Marquer",
-    "unmarkUser": "Retirer",
-    "bookmarkUser": "Ajouter aux favoris",
-    "removeBookmark": "Retirer des favoris",
+    "addAvatarRing": "Ajouter un anneau à l’avatar",
+    "removeAvatarRing": "Retirer l’anneau de l’avatar",
+    "bookmarkAddedDate": "Favori ajouté le {date}",
+    "avatarRingAddedDate": "Anneau d’avatar ajouté le {date}",
     "mention": "Mentionner",
     "mentionUser": "Mentionner l'utilisateur",
     "mentionUserTitle": "Mentionner l'utilisateur. Alt/Option-clic pour citer.",
@@ -290,7 +290,14 @@
     "gamesChooseOwnPiece": "Choisis ta pièce",
     "gamesMuteSounds": "Couper les sons du jeu",
     "gamesUnmuteSounds": "Rétablir les sons du jeu",
-    "gamesUnavailableNoticeTitle": "Connexion impossible"
+    "gamesUnavailableNoticeTitle": "Connexion impossible",
+    "save": "Enregistrer",
+    "remove": "Retirer",
+    "saveMessage": "Enregistrer le message",
+    "removeSavedMessage": "Retirer le message enregistré",
+    "savedToBookmarks": "Enregistré dans les favoris",
+    "removedFromBookmarks": "Retiré des favoris",
+    "couldNotSaveBookmark": "Impossible de mettre à jour les favoris."
   },
   "extension": {
     "close": {
@@ -425,9 +432,6 @@
     "popupResetItemUnsentDrafts": {
       "message": "Brouillons non envoyés"
     },
-    "popupResetItemBookmarkedUsers": {
-      "message": "Utilisateurs ajoutés aux favoris"
-    },
     "popupResetItemPlaygroundIdentity": {
       "message": "Identité et nom d’affichage Playground"
     },
@@ -446,21 +450,6 @@
     "popupSections": {
       "message": "Sections du popup"
     },
-    "noBookmarkedUsers": {
-      "message": "Aucun favori pour le moment"
-    },
-    "bookmarkedUsersCount": {
-      "message": "{count} favoris"
-    },
-    "bookmarkedUsersEmpty": {
-      "message": "Les utilisateurs que vous ajoutez aux favoris depuis le chat YouTube apparaîtront ici."
-    },
-    "markedUserDate": {
-      "message": "Ajouté aux favoris le {date}"
-    },
-    "markedDateUnknown": {
-      "message": "Date d’ajout aux favoris inconnue"
-    },
     "unknownStream": {
       "message": "Stream inconnu"
     },
@@ -472,15 +461,6 @@
     },
     "openChannel": {
       "message": "Ouvrir la chaîne"
-    },
-    "unmarkUser": {
-      "message": "Retirer"
-    },
-    "markUser": {
-      "message": "Marquer"
-    },
-    "bookmarkUser": {
-      "message": "Ajouter aux favoris"
     },
     "removeBookmark": {
       "message": "Retirer des favoris"
@@ -544,6 +524,27 @@
     },
     "chatSkinAero": {
       "message": "Aero"
+    },
+    "popupResetItemBookmarks": {
+      "message": "Favoris"
+    },
+    "popupResetItemAvatarRings": {
+      "message": "Anneaux d’avatar"
+    },
+    "noBookmarks": {
+      "message": "Aucun favori pour le moment"
+    },
+    "bookmarksCount": {
+      "message": "{count} favoris"
+    },
+    "bookmarksEmpty": {
+      "message": "Les messages enregistrés depuis le chat YouTube apparaîtront ici."
+    },
+    "bookmarkMessagePostedDate": {
+      "message": "Message publié le {date}"
+    },
+    "restoreBookmark": {
+      "message": "Restaurer le favori"
     }
   }
 }

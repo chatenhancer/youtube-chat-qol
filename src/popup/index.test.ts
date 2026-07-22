@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { MARKED_USERS_STORAGE_KEY } from '../shared/marked-users';
+import { BOOKMARKS_STORAGE_KEY, LEGACY_BOOKMARKS_STORAGE_KEY } from '../shared/bookmarks';
 import {
   PLAYGROUND_PROFILE_MESSAGE_TYPE,
   PLAYGROUND_PROFILE_STATS_MESSAGE_TYPE,
@@ -76,9 +76,13 @@ describe('popup', () => {
       </footer>
     `;
     await chrome.storage.local.clear();
+    await chrome.storage.session.clear();
     await chrome.storage.sync.clear();
     vi.mocked(chrome.action.getTitle).mockReset();
-    vi.mocked(chrome.action.getTitle).mockImplementation(((_details: chrome.action.TabDetails, callback?: (title: string) => void) => {
+    vi.mocked(chrome.action.getTitle).mockImplementation(((
+      _details: chrome.action.TabDetails,
+      callback?: (title: string) => void
+    ) => {
       callback?.('');
       return Promise.resolve('');
     }) as never);
@@ -87,6 +91,7 @@ describe('popup', () => {
     vi.mocked(chrome.storage.local.clear).mockClear();
     vi.mocked(chrome.storage.local.get).mockClear();
     vi.mocked(chrome.storage.onChanged.addListener).mockClear();
+    vi.mocked(chrome.storage.session.clear).mockClear();
     vi.mocked(chrome.storage.sync.clear).mockClear();
     vi.mocked(chrome.storage.sync.get).mockClear();
     vi.mocked(chrome.storage.sync.set).mockClear();
@@ -99,62 +104,94 @@ describe('popup', () => {
   });
 
   it('summarizes active chat status for the current tab', async () => {
-    vi.mocked(chrome.tabs.query).mockImplementation(((queryInfo: chrome.tabs.QueryInfo, callback?: (tabs: chrome.tabs.Tab[]) => void) => {
+    vi.mocked(chrome.tabs.query).mockImplementation(((
+      queryInfo: chrome.tabs.QueryInfo,
+      callback?: (tabs: chrome.tabs.Tab[]) => void
+    ) => {
       const tabs = queryInfo.active ? [{ id: 10 } as chrome.tabs.Tab] : [];
       callback?.(tabs);
       return Promise.resolve(tabs);
     }) as never);
-    vi.mocked(chrome.tabs.sendMessage).mockImplementation(((_tabId: number, _message: unknown, callback?: (response: unknown) => void) => {
+    vi.mocked(chrome.tabs.sendMessage).mockImplementation(((
+      _tabId: number,
+      _message: unknown,
+      callback?: (response: unknown) => void
+    ) => {
       callback?.({ attached: true });
       return Promise.resolve();
     }) as never);
 
     await import('./index');
 
-    expect(document.querySelector('[data-extension-status]')?.getAttribute('data-extension-status')).toBe('active');
+    expect(
+      document.querySelector('[data-extension-status]')?.getAttribute('data-extension-status')
+    ).toBe('active');
     expect(document.querySelector('[data-extension-status]')?.getAttribute('title')).toBe(
       'extensionStatusConnected'
     );
     expect(document.querySelector('[data-extension-status]')?.getAttribute('aria-label')).toBe(
       'extensionStatusActiveCurrent. extensionStatusConnected'
     );
-    expect(document.querySelector('[data-extension-status-text]')?.textContent).toBe('extensionStatusActiveCurrent');
+    expect(document.querySelector('[data-extension-status-text]')?.textContent).toBe(
+      'extensionStatusActiveCurrent'
+    );
   });
 
   it('uses disconnected helper copy when no active content scripts respond', async () => {
-    vi.mocked(chrome.tabs.query).mockImplementation(((queryInfo: chrome.tabs.QueryInfo, callback?: (tabs: chrome.tabs.Tab[]) => void) => {
+    vi.mocked(chrome.tabs.query).mockImplementation(((
+      queryInfo: chrome.tabs.QueryInfo,
+      callback?: (tabs: chrome.tabs.Tab[]) => void
+    ) => {
       const tabs = queryInfo.active ? [{ id: 10 } as chrome.tabs.Tab] : [];
       callback?.(tabs);
       return Promise.resolve(tabs);
     }) as never);
-    vi.mocked(chrome.tabs.sendMessage).mockImplementation(((_tabId: number, _message: unknown, callback?: (response: unknown) => void) => {
+    vi.mocked(chrome.tabs.sendMessage).mockImplementation(((
+      _tabId: number,
+      _message: unknown,
+      callback?: (response: unknown) => void
+    ) => {
       callback?.(undefined);
       return Promise.resolve();
     }) as never);
 
     await import('./index');
 
-    expect(document.querySelector('[data-extension-status]')?.getAttribute('data-extension-status')).toBe('inactive');
+    expect(
+      document.querySelector('[data-extension-status]')?.getAttribute('data-extension-status')
+    ).toBe('inactive');
     expect(document.querySelector('[data-extension-status]')?.getAttribute('title')).toBe(
       'extensionStatusDisconnected'
     );
     expect(document.querySelector('[data-extension-status]')?.getAttribute('aria-label')).toBe(
       'extensionStatusInactiveAll. extensionStatusDisconnected'
     );
-    expect(document.querySelector('[data-extension-status-text]')?.textContent).toBe('extensionStatusInactiveAll');
+    expect(document.querySelector('[data-extension-status-text]')?.textContent).toBe(
+      'extensionStatusInactiveAll'
+    );
   });
 
   it('uses the tab action title when Safari does not deliver popup messages to the live chat frame', async () => {
-    vi.mocked(chrome.tabs.query).mockImplementation(((queryInfo: chrome.tabs.QueryInfo, callback?: (tabs: chrome.tabs.Tab[]) => void) => {
+    vi.mocked(chrome.tabs.query).mockImplementation(((
+      queryInfo: chrome.tabs.QueryInfo,
+      callback?: (tabs: chrome.tabs.Tab[]) => void
+    ) => {
       const tabs = queryInfo.active ? [{ id: 10 } as chrome.tabs.Tab] : [];
       callback?.(tabs);
       return Promise.resolve(tabs);
     }) as never);
-    vi.mocked(chrome.tabs.sendMessage).mockImplementation(((_tabId: number, _message: unknown, callback?: (response: unknown) => void) => {
+    vi.mocked(chrome.tabs.sendMessage).mockImplementation(((
+      _tabId: number,
+      _message: unknown,
+      callback?: (response: unknown) => void
+    ) => {
       callback?.(undefined);
       return Promise.resolve();
     }) as never);
-    vi.mocked(chrome.action.getTitle).mockImplementation(((_details: chrome.action.TabDetails, callback?: (title: string) => void) => {
+    vi.mocked(chrome.action.getTitle).mockImplementation(((
+      _details: chrome.action.TabDetails,
+      callback?: (title: string) => void
+    ) => {
       callback?.('extensionActiveTitle');
       return Promise.resolve('extensionActiveTitle');
     }) as never);
@@ -162,21 +199,35 @@ describe('popup', () => {
     await import('./index');
 
     expect(chrome.action.getTitle).toHaveBeenCalledWith({ tabId: 10 }, expect.any(Function));
-    expect(document.querySelector('[data-extension-status]')?.getAttribute('data-extension-status')).toBe('active');
-    expect(document.querySelector('[data-extension-status-text]')?.textContent).toBe('extensionStatusActiveCurrent');
+    expect(
+      document.querySelector('[data-extension-status]')?.getAttribute('data-extension-status')
+    ).toBe('active');
+    expect(document.querySelector('[data-extension-status-text]')?.textContent).toBe(
+      'extensionStatusActiveCurrent'
+    );
   });
 
   it('uses the global action title when Safari does not return a tab action title', async () => {
-    vi.mocked(chrome.tabs.query).mockImplementation(((queryInfo: chrome.tabs.QueryInfo, callback?: (tabs: chrome.tabs.Tab[]) => void) => {
+    vi.mocked(chrome.tabs.query).mockImplementation(((
+      queryInfo: chrome.tabs.QueryInfo,
+      callback?: (tabs: chrome.tabs.Tab[]) => void
+    ) => {
       const tabs = queryInfo.active ? [{ id: 10 } as chrome.tabs.Tab] : [];
       callback?.(tabs);
       return Promise.resolve(tabs);
     }) as never);
-    vi.mocked(chrome.tabs.sendMessage).mockImplementation(((_tabId: number, _message: unknown, callback?: (response: unknown) => void) => {
+    vi.mocked(chrome.tabs.sendMessage).mockImplementation(((
+      _tabId: number,
+      _message: unknown,
+      callback?: (response: unknown) => void
+    ) => {
       callback?.(undefined);
       return Promise.resolve();
     }) as never);
-    vi.mocked(chrome.action.getTitle).mockImplementation(((details: chrome.action.TabDetails, callback?: (title: string) => void) => {
+    vi.mocked(chrome.action.getTitle).mockImplementation(((
+      details: chrome.action.TabDetails,
+      callback?: (title: string) => void
+    ) => {
       const title = typeof details.tabId === 'number' ? '' : 'extensionActiveTitle';
       callback?.(title);
       return Promise.resolve(title);
@@ -186,30 +237,50 @@ describe('popup', () => {
 
     expect(chrome.action.getTitle).toHaveBeenCalledWith({ tabId: 10 }, expect.any(Function));
     expect(chrome.action.getTitle).toHaveBeenCalledWith({}, expect.any(Function));
-    expect(document.querySelector('[data-extension-status]')?.getAttribute('data-extension-status')).toBe('active');
-    expect(document.querySelector('[data-extension-status-text]')?.textContent).toBe('extensionStatusActiveCurrent');
+    expect(
+      document.querySelector('[data-extension-status]')?.getAttribute('data-extension-status')
+    ).toBe('active');
+    expect(document.querySelector('[data-extension-status-text]')?.textContent).toBe(
+      'extensionStatusActiveCurrent'
+    );
   });
 
   it('only checks the current tab for liveness', async () => {
-    vi.mocked(chrome.tabs.query).mockImplementation(((queryInfo: chrome.tabs.QueryInfo, callback?: (tabs: chrome.tabs.Tab[]) => void) => {
+    vi.mocked(chrome.tabs.query).mockImplementation(((
+      queryInfo: chrome.tabs.QueryInfo,
+      callback?: (tabs: chrome.tabs.Tab[]) => void
+    ) => {
       const tabs = queryInfo.active ? [{ id: 99 } as chrome.tabs.Tab] : [];
       callback?.(tabs);
       return Promise.resolve(tabs);
     }) as never);
-    vi.mocked(chrome.tabs.sendMessage).mockImplementation(((tabId: number, _message: unknown, callback?: (response: unknown) => void) => {
+    vi.mocked(chrome.tabs.sendMessage).mockImplementation(((
+      tabId: number,
+      _message: unknown,
+      callback?: (response: unknown) => void
+    ) => {
       callback?.(tabId === 99 ? { attached: true } : undefined);
       return Promise.resolve();
     }) as never);
 
     await import('./index');
 
-    expect(document.querySelector('[data-extension-status]')?.getAttribute('data-extension-status')).toBe('active');
-    expect(document.querySelector('[data-extension-status-text]')?.textContent).toBe('extensionStatusActiveCurrent');
+    expect(
+      document.querySelector('[data-extension-status]')?.getAttribute('data-extension-status')
+    ).toBe('active');
+    expect(document.querySelector('[data-extension-status-text]')?.textContent).toBe(
+      'extensionStatusActiveCurrent'
+    );
   });
 
   it('renders the compact manifest version in the footer', async () => {
-    vi.mocked(chrome.runtime.getManifest).mockReturnValue({ version: '1.2.3' } as chrome.runtime.Manifest);
-    vi.mocked(chrome.tabs.query).mockImplementation(((queryInfo: chrome.tabs.QueryInfo, callback?: (tabs: chrome.tabs.Tab[]) => void) => {
+    vi.mocked(chrome.runtime.getManifest).mockReturnValue({
+      version: '1.2.3'
+    } as chrome.runtime.Manifest);
+    vi.mocked(chrome.tabs.query).mockImplementation(((
+      queryInfo: chrome.tabs.QueryInfo,
+      callback?: (tabs: chrome.tabs.Tab[]) => void
+    ) => {
       callback?.([]);
       return Promise.resolve([]);
     }) as never);
@@ -220,45 +291,72 @@ describe('popup', () => {
   });
 
   it('ignores malformed active chat responses', async () => {
-    vi.mocked(chrome.tabs.query).mockImplementation(((queryInfo: chrome.tabs.QueryInfo, callback?: (tabs: chrome.tabs.Tab[]) => void) => {
+    vi.mocked(chrome.tabs.query).mockImplementation(((
+      queryInfo: chrome.tabs.QueryInfo,
+      callback?: (tabs: chrome.tabs.Tab[]) => void
+    ) => {
       const tabs = queryInfo.active ? [{ id: 10 } as chrome.tabs.Tab] : [];
       callback?.(tabs);
       return Promise.resolve(tabs);
     }) as never);
-    vi.mocked(chrome.tabs.sendMessage).mockImplementation(((_tabId: number, _message: unknown, callback?: (response: unknown) => void) => {
+    vi.mocked(chrome.tabs.sendMessage).mockImplementation(((
+      _tabId: number,
+      _message: unknown,
+      callback?: (response: unknown) => void
+    ) => {
       callback?.({ attached: 'yes' });
       return Promise.resolve();
     }) as never);
 
     await import('./index');
 
-    expect(document.querySelector('[data-extension-status]')?.getAttribute('data-extension-status')).toBe('inactive');
+    expect(
+      document.querySelector('[data-extension-status]')?.getAttribute('data-extension-status')
+    ).toBe('inactive');
   });
 
   it('treats missing active tab responses as disconnected', async () => {
-    vi.mocked(chrome.tabs.query).mockImplementation(((queryInfo: chrome.tabs.QueryInfo, callback?: (tabs: chrome.tabs.Tab[]) => void) => {
+    vi.mocked(chrome.tabs.query).mockImplementation(((
+      queryInfo: chrome.tabs.QueryInfo,
+      callback?: (tabs: chrome.tabs.Tab[]) => void
+    ) => {
       const tabs = queryInfo.active ? [{ id: 10 } as chrome.tabs.Tab] : [];
       callback?.(tabs);
       return Promise.resolve(tabs);
     }) as never);
-    vi.mocked(chrome.tabs.sendMessage).mockImplementation(((_tabId: number, _message: unknown, callback?: (response: unknown) => void) => {
+    vi.mocked(chrome.tabs.sendMessage).mockImplementation(((
+      _tabId: number,
+      _message: unknown,
+      callback?: (response: unknown) => void
+    ) => {
       callback?.(undefined);
       return Promise.resolve();
     }) as never);
 
     await import('./index');
 
-    expect(document.querySelector('[data-extension-status]')?.getAttribute('data-extension-status')).toBe('inactive');
-    expect(document.querySelector('[data-extension-status]')?.getAttribute('title')).toBe('extensionStatusDisconnected');
+    expect(
+      document.querySelector('[data-extension-status]')?.getAttribute('data-extension-status')
+    ).toBe('inactive');
+    expect(document.querySelector('[data-extension-status]')?.getAttribute('title')).toBe(
+      'extensionStatusDisconnected'
+    );
   });
 
   it('treats active chat lookup errors as disconnected', async () => {
-    vi.mocked(chrome.tabs.query).mockImplementation(((queryInfo: chrome.tabs.QueryInfo, callback?: (tabs: chrome.tabs.Tab[]) => void) => {
+    vi.mocked(chrome.tabs.query).mockImplementation(((
+      queryInfo: chrome.tabs.QueryInfo,
+      callback?: (tabs: chrome.tabs.Tab[]) => void
+    ) => {
       const tabs = queryInfo.active ? [{ id: 10 } as chrome.tabs.Tab] : [];
       callback?.(tabs);
       return Promise.resolve(tabs);
     }) as never);
-    vi.mocked(chrome.tabs.sendMessage).mockImplementation(((_tabId: number, _message: unknown, callback?: (response: unknown) => void) => {
+    vi.mocked(chrome.tabs.sendMessage).mockImplementation(((
+      _tabId: number,
+      _message: unknown,
+      callback?: (response: unknown) => void
+    ) => {
       Object.defineProperty(chrome.runtime, 'lastError', {
         configurable: true,
         value: { message: 'Could not establish connection.' }
@@ -273,30 +371,46 @@ describe('popup', () => {
 
     await import('./index');
 
-    expect(document.querySelector('[data-extension-status]')?.getAttribute('data-extension-status')).toBe('inactive');
+    expect(
+      document.querySelector('[data-extension-status]')?.getAttribute('data-extension-status')
+    ).toBe('inactive');
   });
 
   it('opens the support page from the popup', async () => {
-    vi.mocked(chrome.tabs.query).mockImplementation(((_queryInfo: chrome.tabs.QueryInfo, callback?: (tabs: chrome.tabs.Tab[]) => void) => {
+    vi.mocked(chrome.tabs.query).mockImplementation(((
+      _queryInfo: chrome.tabs.QueryInfo,
+      callback?: (tabs: chrome.tabs.Tab[]) => void
+    ) => {
       callback?.([]);
       return Promise.resolve([]);
     }) as never);
-    vi.mocked(chrome.runtime.sendMessage).mockImplementation(((_message: unknown, callback?: (response: unknown) => void) => {
+    vi.mocked(chrome.runtime.sendMessage).mockImplementation(((
+      _message: unknown,
+      callback?: (response: unknown) => void
+    ) => {
       callback?.({ activeTabIds: [] });
       return Promise.resolve({ activeTabIds: [] });
     }) as never);
     await import('./index');
     document.querySelector<HTMLAnchorElement>('#supportLink')?.click();
 
-    expect(chrome.tabs.create).toHaveBeenCalledWith({ url: 'https://www.chatenhancer.com/support' });
+    expect(chrome.tabs.create).toHaveBeenCalledWith({
+      url: 'https://www.chatenhancer.com/support'
+    });
   });
 
   it('does not reset state when opening support from the popup', async () => {
-    vi.mocked(chrome.tabs.query).mockImplementation(((_queryInfo: chrome.tabs.QueryInfo, callback?: (tabs: chrome.tabs.Tab[]) => void) => {
+    vi.mocked(chrome.tabs.query).mockImplementation(((
+      _queryInfo: chrome.tabs.QueryInfo,
+      callback?: (tabs: chrome.tabs.Tab[]) => void
+    ) => {
       callback?.([]);
       return Promise.resolve([]);
     }) as never);
-    vi.mocked(chrome.runtime.sendMessage).mockImplementation(((_message: unknown, callback?: (response: unknown) => void) => {
+    vi.mocked(chrome.runtime.sendMessage).mockImplementation(((
+      _message: unknown,
+      callback?: (response: unknown) => void
+    ) => {
       callback?.({ activeTabIds: [] });
       return Promise.resolve({ activeTabIds: [] });
     }) as never);
@@ -304,13 +418,18 @@ describe('popup', () => {
     document.querySelector<HTMLAnchorElement>('#supportLink')?.click();
     document.querySelector<HTMLButtonElement>('#resetExtension')?.click();
 
-    expect(chrome.tabs.create).toHaveBeenCalledWith({ url: 'https://www.chatenhancer.com/support' });
+    expect(chrome.tabs.create).toHaveBeenCalledWith({
+      url: 'https://www.chatenhancer.com/support'
+    });
     expect(chrome.storage.local.clear).not.toHaveBeenCalled();
     expect(chrome.storage.sync.clear).not.toHaveBeenCalled();
   });
 
   it('opens landing and source links from the popup', async () => {
-    vi.mocked(chrome.tabs.query).mockImplementation(((_queryInfo: chrome.tabs.QueryInfo, callback?: (tabs: chrome.tabs.Tab[]) => void) => {
+    vi.mocked(chrome.tabs.query).mockImplementation(((
+      _queryInfo: chrome.tabs.QueryInfo,
+      callback?: (tabs: chrome.tabs.Tab[]) => void
+    ) => {
       callback?.([]);
       return Promise.resolve([]);
     }) as never);
@@ -323,20 +442,31 @@ describe('popup', () => {
     expect(chrome.tabs.create).toHaveBeenCalledWith({ url: 'https://www.chatenhancer.com/source' });
   });
 
-  it('switches to bookmarks and manages marked users', async () => {
+  it('switches to bookmarks and manages saved messages', async () => {
     await chrome.storage.local.set({
-      [MARKED_USERS_STORAGE_KEY]: {
-        'channel:viewer-channel': {
+      [BOOKMARKS_STORAGE_KEY]: {
+        'message:stream-a:message-1': {
           authorName: '@ViewerOne',
           avatarUrl: 'https://yt3.ggpht.com/avatar=s88-c-k',
           channelId: 'viewer-channel',
-          markedAt: 1_700_000_000_000,
-          markedSourceTitle: 'Example stream',
-          markedSourceUrl: 'https://www.youtube.com/watch?v=stream-a'
+          message: {
+            contentParts: [{ text: 'Saved chat message', type: 'text' }],
+            messageId: 'message-1',
+            text: 'Saved chat message',
+            timestamp: 1_699_999_999_000,
+            timestampText: '10:00 PM'
+          },
+          savedAt: 1_700_000_000_000,
+          sourceKey: 'stream-a',
+          sourceTitle: 'Example stream',
+          sourceUrl: 'https://www.youtube.com/watch?v=stream-a'
         }
       }
     });
-    vi.mocked(chrome.tabs.query).mockImplementation(((_queryInfo: chrome.tabs.QueryInfo, callback?: (tabs: chrome.tabs.Tab[]) => void) => {
+    vi.mocked(chrome.tabs.query).mockImplementation(((
+      _queryInfo: chrome.tabs.QueryInfo,
+      callback?: (tabs: chrome.tabs.Tab[]) => void
+    ) => {
       callback?.([]);
       return Promise.resolve([]);
     }) as never);
@@ -348,52 +478,133 @@ describe('popup', () => {
     expect(document.querySelector<HTMLElement>('#playgroundPanel')?.hidden).toBe(true);
     document.querySelector<HTMLButtonElement>('#bookmarksTab')?.click();
 
-    expect(document.querySelector<HTMLButtonElement>('#bookmarksTab')?.getAttribute('aria-selected')).toBe('true');
+    expect(
+      document.querySelector<HTMLButtonElement>('#bookmarksTab')?.getAttribute('aria-selected')
+    ).toBe('true');
     expect(document.querySelector<HTMLElement>('#settingsPanel')?.hidden).toBe(true);
     expect(document.querySelector<HTMLElement>('#bookmarksPanel')?.hidden).toBe(false);
     expect(document.querySelector<HTMLElement>('#playgroundPanel')?.hidden).toBe(true);
-    expect(document.querySelector('#bookmarksCount')?.textContent).toBe('bookmarkedUsersCount:1');
+    expect(document.querySelector('#bookmarksCount')?.textContent).toBe('bookmarksCount:1');
     expect(document.querySelector('.bookmark-name')?.textContent).toBe('@ViewerOne');
-    expect(document.querySelector<HTMLImageElement>('.bookmark-avatar img')?.src).toBe('https://yt3.ggpht.com/avatar=s88-c-k');
+    expect(document.querySelector('.bookmark-message')?.textContent).toBe('Saved chat message');
+    expect(document.querySelector<HTMLImageElement>('.bookmark-avatar img')?.src).toBe(
+      'https://yt3.ggpht.com/avatar=s88-c-k'
+    );
     expect(document.querySelector('.bookmark-avatar-open-icon')).not.toBeNull();
-    expect(document.querySelector('.bookmark-date')?.textContent).toContain('markedUserDate:');
+    const bookmarkTime = document.querySelector<HTMLTimeElement>('.bookmark-message-time');
+    expect(bookmarkTime?.parentElement?.classList.contains('bookmark-message-header')).toBe(true);
+    expect(bookmarkTime?.dateTime).toBe(new Date(1_699_999_999_000).toISOString());
+    expect(bookmarkTime?.textContent).toBe(
+      new Intl.DateTimeFormat(undefined, {
+        hour: '2-digit',
+        minute: '2-digit'
+      }).format(1_699_999_999_000)
+    );
+    const fullPostedTime = new Intl.DateTimeFormat(undefined, {
+      dateStyle: 'medium',
+      timeStyle: 'short'
+    }).format(1_699_999_999_000);
+    expect(bookmarkTime?.title).toBe(`bookmarkMessagePostedDate:${fullPostedTime}`);
+    expect(bookmarkTime?.getAttribute('aria-label')).toBe(bookmarkTime?.title);
+    expect(document.querySelector('.bookmark-metadata .bookmark-message-time')).toBeNull();
     expect(document.querySelector('.bookmark-source')?.textContent).toBe('Example stream');
     expect(document.querySelector('.bookmark-source-button')?.textContent).toBe('Example stream');
-    expect(document.querySelector<HTMLButtonElement>('.bookmark-source-button')?.title).toBe('openStreamInNewWindow:Example stream');
+    expect(document.querySelector<HTMLButtonElement>('.bookmark-source-button')?.title).toBe(
+      'openStreamInNewWindow:Example stream'
+    );
     expect(document.querySelector('.bookmark-name-button')).toBeNull();
 
     document.querySelector<HTMLButtonElement>('.bookmark-avatar-button')?.click();
-    expect(chrome.tabs.create).toHaveBeenCalledWith({ url: 'https://www.youtube.com/channel/viewer-channel' });
+    expect(chrome.tabs.create).toHaveBeenCalledWith({
+      url: 'https://www.youtube.com/channel/viewer-channel'
+    });
     document.querySelector<HTMLButtonElement>('.bookmark-source-button')?.click();
-    expect(chrome.tabs.create).toHaveBeenCalledWith({ url: 'https://www.youtube.com/watch?v=stream-a' });
+    expect(chrome.tabs.create).toHaveBeenCalledWith({
+      url: 'https://www.youtube.com/watch?v=stream-a'
+    });
 
-    const actionButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('.bookmark-action-button'));
+    const actionButtons = Array.from(
+      document.querySelectorAll<HTMLButtonElement>('.bookmark-action-button')
+    );
     expect(actionButtons).toHaveLength(1);
     actionButtons[0]?.click();
-    await expect(chrome.storage.local.get(MARKED_USERS_STORAGE_KEY)).resolves.toEqual({
-      [MARKED_USERS_STORAGE_KEY]: {}
+    await expect(chrome.storage.local.get(BOOKMARKS_STORAGE_KEY)).resolves.toEqual({
+      [BOOKMARKS_STORAGE_KEY]: {}
     });
-    expect(document.querySelector('.bookmark-row')?.classList.contains('bookmark-row-unmarked')).toBe(true);
-    expect(document.querySelector<HTMLButtonElement>('.bookmark-action-button')?.title).toBe('bookmarkUser');
+    expect(
+      document.querySelector('.bookmark-row')?.classList.contains('bookmark-row-removed')
+    ).toBe(true);
+    expect(document.querySelector<HTMLButtonElement>('.bookmark-action-button')?.title).toBe(
+      'restoreBookmark'
+    );
 
     document.querySelector<HTMLButtonElement>('.bookmark-action-button')?.click();
-    await expect(chrome.storage.local.get(MARKED_USERS_STORAGE_KEY)).resolves.toEqual({
-      [MARKED_USERS_STORAGE_KEY]: {
-        'channel:viewer-channel': {
+    await expect(chrome.storage.local.get(BOOKMARKS_STORAGE_KEY)).resolves.toEqual({
+      [BOOKMARKS_STORAGE_KEY]: {
+        'message:stream-a:message-1': {
           authorName: '@ViewerOne',
           avatarUrl: 'https://yt3.ggpht.com/avatar=s88-c-k',
           channelId: 'viewer-channel',
-          markedAt: 1_700_000_000_000,
-          markedSourceTitle: 'Example stream',
-          markedSourceUrl: 'https://www.youtube.com/watch?v=stream-a'
+          message: {
+            contentParts: [{ text: 'Saved chat message', type: 'text' }],
+            messageId: 'message-1',
+            text: 'Saved chat message',
+            timestamp: 1_699_999_999_000,
+            timestampText: '10:00 PM'
+          },
+          savedAt: 1_700_000_000_000,
+          sourceKey: 'stream-a',
+          sourceTitle: 'Example stream',
+          sourceUrl: 'https://www.youtube.com/watch?v=stream-a'
         }
       }
     });
-    expect(document.querySelector('.bookmark-row')?.classList.contains('bookmark-row-unmarked')).toBe(false);
+    expect(
+      document.querySelector('.bookmark-row')?.classList.contains('bookmark-row-removed')
+    ).toBe(false);
+  });
+
+  it('restores and remembers the last selected popup tab', async () => {
+    await chrome.storage.session.set({ ytcqPopupLastTab: 'bookmarksPanel' });
+
+    await import('./index');
+
+    expect(
+      document.querySelector<HTMLButtonElement>('#bookmarksTab')?.getAttribute('aria-selected')
+    ).toBe('true');
+    expect(document.querySelector<HTMLElement>('#settingsPanel')?.hidden).toBe(true);
+    expect(document.querySelector<HTMLElement>('#bookmarksPanel')?.hidden).toBe(false);
+
+    document.querySelector<HTMLButtonElement>('#playgroundTab')?.click();
+
+    await expect(chrome.storage.session.get('ytcqPopupLastTab')).resolves.toEqual({
+      ytcqPopupLastTab: 'playgroundPanel'
+    });
+    expect(
+      document.querySelector<HTMLButtonElement>('#playgroundTab')?.getAttribute('aria-selected')
+    ).toBe('true');
+    expect(document.querySelector<HTMLElement>('#bookmarksPanel')?.hidden).toBe(true);
+    expect(document.querySelector<HTMLElement>('#playgroundPanel')?.hidden).toBe(false);
+  });
+
+  it('ignores a remembered popup tab that is no longer available', async () => {
+    await chrome.storage.session.set({ ytcqPopupLastTab: 'missingPanel' });
+
+    await import('./index');
+
+    expect(
+      document.querySelector<HTMLButtonElement>('#settingsTab')?.getAttribute('aria-selected')
+    ).toBe('true');
+    expect(document.querySelector<HTMLElement>('#settingsPanel')?.hidden).toBe(false);
+    expect(document.querySelector<HTMLElement>('#bookmarksPanel')?.hidden).toBe(true);
+    expect(document.querySelector<HTMLElement>('#playgroundPanel')?.hidden).toBe(true);
   });
 
   it('shows popup scroll fades only when the active panel has hidden content beyond that edge', async () => {
-    vi.mocked(chrome.tabs.query).mockImplementation(((_queryInfo: chrome.tabs.QueryInfo, callback?: (tabs: chrome.tabs.Tab[]) => void) => {
+    vi.mocked(chrome.tabs.query).mockImplementation(((
+      _queryInfo: chrome.tabs.QueryInfo,
+      callback?: (tabs: chrome.tabs.Tab[]) => void
+    ) => {
       callback?.([]);
       return Promise.resolve([]);
     }) as never);
@@ -433,7 +644,7 @@ describe('popup', () => {
 
   it('renders bookmark fallback rows, profile handles, and storage-change refreshes', async () => {
     await chrome.storage.local.set({
-      [MARKED_USERS_STORAGE_KEY]: {
+      [LEGACY_BOOKMARKS_STORAGE_KEY]: {
         'author:@alphauser': {
           authorName: '@AlphaUser',
           markedAt: 2_000,
@@ -451,7 +662,10 @@ describe('popup', () => {
         }
       }
     });
-    vi.mocked(chrome.tabs.query).mockImplementation(((_queryInfo: chrome.tabs.QueryInfo, callback?: (tabs: chrome.tabs.Tab[]) => void) => {
+    vi.mocked(chrome.tabs.query).mockImplementation(((
+      _queryInfo: chrome.tabs.QueryInfo,
+      callback?: (tabs: chrome.tabs.Tab[]) => void
+    ) => {
       callback?.([]);
       return Promise.resolve([]);
     }) as never);
@@ -466,13 +680,15 @@ describe('popup', () => {
       '@bad handle',
       'unknownUser'
     ]);
-    expect(rows[0].querySelector('.bookmark-source')?.textContent).toBe('https://www.youtube.com/watch?v=stream-a');
+    expect(rows[0].querySelector('.bookmark-source')?.textContent).toBe(
+      'https://www.youtube.com/watch?v=stream-a'
+    );
     expect(rows[1].querySelector('.bookmark-source')?.textContent).toBe('No channel stream');
     expect(rows[2].querySelector('.bookmark-source')?.textContent).toBe('unknownStream');
     expect(rows[0].querySelector('.bookmark-source-button')).not.toBeNull();
     expect(rows[1].querySelector('.bookmark-source-button')).toBeNull();
     expect(rows[2].querySelector('.bookmark-source-button')).toBeNull();
-    expect(rows[2].querySelector('.bookmark-date')?.textContent).toBe('markedDateUnknown');
+    expect(rows[2].querySelector('.bookmark-message-time')).toBeNull();
 
     const handleAvatar = rows[0].querySelector<HTMLButtonElement>('.bookmark-avatar-button');
     const plainAvatar = rows[1].querySelector<HTMLElement>('.bookmark-avatar');
@@ -487,37 +703,49 @@ describe('popup', () => {
 
     expect(rows[0].querySelector('.bookmark-name-button')).toBeNull();
     rows[0].querySelector<HTMLButtonElement>('.bookmark-source-button')?.click();
-    expect(chrome.tabs.create).toHaveBeenCalledWith({ url: 'https://www.youtube.com/watch?v=stream-a' });
+    expect(chrome.tabs.create).toHaveBeenCalledWith({
+      url: 'https://www.youtube.com/watch?v=stream-a'
+    });
 
     const storageListener = vi.mocked(chrome.storage.onChanged.addListener).mock.calls.at(-1)?.[0];
-    storageListener?.({
-      [MARKED_USERS_STORAGE_KEY]: {
-        newValue: {
-          'author:@freshuser': {
-            authorName: '@FreshUser',
-            markedAt: 3_000
+    storageListener?.(
+      {
+        [BOOKMARKS_STORAGE_KEY]: {
+          newValue: {
+            'author:@freshuser': {
+              authorName: '@FreshUser',
+              message: null,
+              savedAt: 3_000,
+              sourceKey: ''
+            }
           }
-        }
-      } as chrome.storage.StorageChange
-    }, 'sync');
+        } as chrome.storage.StorageChange
+      },
+      'sync'
+    );
     expect(document.querySelector('.bookmark-name')?.textContent).toBe('@AlphaUser');
 
-    storageListener?.({
-      [MARKED_USERS_STORAGE_KEY]: {
-        newValue: {
-          'author:@freshuser': {
-            authorName: '@FreshUser',
-            markedAt: 3_000
+    storageListener?.(
+      {
+        [BOOKMARKS_STORAGE_KEY]: {
+          newValue: {
+            'author:@freshuser': {
+              authorName: '@FreshUser',
+              message: null,
+              savedAt: 3_000,
+              sourceKey: ''
+            }
           }
-        }
-      } as chrome.storage.StorageChange
-    }, 'local');
+        } as chrome.storage.StorageChange
+      },
+      'local'
+    );
     expect(document.querySelector('.bookmark-name')?.textContent).toBe('@FreshUser');
   });
 
   it('does not make chat-frame bookmark source urls clickable', async () => {
     await chrome.storage.local.set({
-      [MARKED_USERS_STORAGE_KEY]: {
+      [LEGACY_BOOKMARKS_STORAGE_KEY]: {
         'author:@framesourceuser': {
           authorName: '@FrameSourceUser',
           markedAt: 2_000,
@@ -532,7 +760,10 @@ describe('popup', () => {
         }
       }
     });
-    vi.mocked(chrome.tabs.query).mockImplementation(((_queryInfo: chrome.tabs.QueryInfo, callback?: (tabs: chrome.tabs.Tab[]) => void) => {
+    vi.mocked(chrome.tabs.query).mockImplementation(((
+      _queryInfo: chrome.tabs.QueryInfo,
+      callback?: (tabs: chrome.tabs.Tab[]) => void
+    ) => {
       callback?.([]);
       return Promise.resolve([]);
     }) as never);
@@ -557,29 +788,36 @@ describe('popup', () => {
 
   it('keeps bookmark removal safe when the stored record has already disappeared', async () => {
     await chrome.storage.local.set({
-      [MARKED_USERS_STORAGE_KEY]: {
+      [LEGACY_BOOKMARKS_STORAGE_KEY]: {
         'author:@vanishinguser': {
           authorName: '@VanishingUser',
           markedAt: 2_000
         }
       }
     });
-    vi.mocked(chrome.tabs.query).mockImplementation(((_queryInfo: chrome.tabs.QueryInfo, callback?: (tabs: chrome.tabs.Tab[]) => void) => {
+    vi.mocked(chrome.tabs.query).mockImplementation(((
+      _queryInfo: chrome.tabs.QueryInfo,
+      callback?: (tabs: chrome.tabs.Tab[]) => void
+    ) => {
       callback?.([]);
       return Promise.resolve([]);
     }) as never);
 
     await import('./index');
-    vi.mocked(chrome.storage.local.get).mockImplementationOnce(((keys: unknown, callback?: (items: Record<string, unknown>) => void) => {
-      const result = typeof keys === 'object' && keys !== null ? keys as Record<string, unknown> : {};
+    vi.mocked(chrome.storage.local.get).mockImplementationOnce(((
+      keys: unknown,
+      callback?: (items: Record<string, unknown>) => void
+    ) => {
+      const result =
+        typeof keys === 'object' && keys !== null ? (keys as Record<string, unknown>) : {};
       callback?.(result);
       return Promise.resolve(result);
     }) as never);
     document.querySelector<HTMLButtonElement>('.bookmark-action-button')?.click();
 
     expect(document.querySelector('.bookmark-row')).toBeNull();
-    await expect(chrome.storage.local.get(MARKED_USERS_STORAGE_KEY)).resolves.toEqual({
-      [MARKED_USERS_STORAGE_KEY]: {}
+    await expect(chrome.storage.local.get(BOOKMARKS_STORAGE_KEY)).resolves.toEqual({
+      [BOOKMARKS_STORAGE_KEY]: {}
     });
   });
 
@@ -593,7 +831,10 @@ describe('popup', () => {
       <button data-i18n-aria-label="" aria-label="unchanged label"></button>
     `;
     vi.mocked(chrome.i18n.getUILanguage).mockReturnValue('es-ES');
-    vi.mocked(chrome.tabs.query).mockImplementation(((_queryInfo: chrome.tabs.QueryInfo, callback?: (tabs: chrome.tabs.Tab[]) => void) => {
+    vi.mocked(chrome.tabs.query).mockImplementation(((
+      _queryInfo: chrome.tabs.QueryInfo,
+      callback?: (tabs: chrome.tabs.Tab[]) => void
+    ) => {
       callback?.([]);
       return Promise.resolve([]);
     }) as never);
@@ -603,17 +844,30 @@ describe('popup', () => {
     expect(document.documentElement.lang).toBe('es-ES');
     expect(document.documentElement.dir).toBe('ltr');
     expect(document.querySelector('[data-i18n="translation"]')?.textContent).toBe('translation');
-    expect(document.querySelector('[data-i18n="playgroundProfileHelper"]')?.textContent).toBe('playgroundProfileHelper');
-    expect(document.querySelector('[data-i18n-title="openChannel"]')?.getAttribute('title')).toBe('openChannel');
-    expect(document.querySelector('[data-i18n-aria-label="close"]')?.getAttribute('aria-label')).toBe('Close');
+    expect(document.querySelector('[data-i18n="playgroundProfileHelper"]')?.textContent).toBe(
+      'playgroundProfileHelper'
+    );
+    expect(document.querySelector('[data-i18n-title="openChannel"]')?.getAttribute('title')).toBe(
+      'openChannel'
+    );
+    expect(
+      document.querySelector('[data-i18n-aria-label="close"]')?.getAttribute('aria-label')
+    ).toBe('Close');
     expect(document.querySelector('[data-i18n=""]')?.textContent).toBe('unchanged text');
-    expect(document.querySelector('[data-i18n-title=""]')?.getAttribute('title')).toBe('unchanged title');
-    expect(document.querySelector('[data-i18n-aria-label=""]')?.getAttribute('aria-label')).toBe('unchanged label');
+    expect(document.querySelector('[data-i18n-title=""]')?.getAttribute('title')).toBe(
+      'unchanged title'
+    );
+    expect(document.querySelector('[data-i18n-aria-label=""]')?.getAttribute('aria-label')).toBe(
+      'unchanged label'
+    );
   });
 
   it('mirrors the popup for right-to-left browser locales', async () => {
     vi.mocked(chrome.i18n.getUILanguage).mockReturnValue('ar');
-    vi.mocked(chrome.tabs.query).mockImplementation(((_queryInfo: chrome.tabs.QueryInfo, callback?: (tabs: chrome.tabs.Tab[]) => void) => {
+    vi.mocked(chrome.tabs.query).mockImplementation(((
+      _queryInfo: chrome.tabs.QueryInfo,
+      callback?: (tabs: chrome.tabs.Tab[]) => void
+    ) => {
       callback?.([]);
       return Promise.resolve([]);
     }) as never);
@@ -636,7 +890,10 @@ describe('popup', () => {
       value: 'pt-BR'
     });
     document.body.innerHTML += '<span data-i18n="translation"></span>';
-    vi.mocked(chrome.tabs.query).mockImplementation(((_queryInfo: chrome.tabs.QueryInfo, callback?: (tabs: chrome.tabs.Tab[]) => void) => {
+    vi.mocked(chrome.tabs.query).mockImplementation(((
+      _queryInfo: chrome.tabs.QueryInfo,
+      callback?: (tabs: chrome.tabs.Tab[]) => void
+    ) => {
       callback?.([]);
       return Promise.resolve([]);
     }) as never);
@@ -679,43 +936,49 @@ describe('popup', () => {
       targetLanguage: 'ja',
       translationDisplay: 'below'
     });
-    vi.mocked(chrome.tabs.query).mockImplementation(((_queryInfo: chrome.tabs.QueryInfo, callback?: (tabs: chrome.tabs.Tab[]) => void) => {
+    vi.mocked(chrome.tabs.query).mockImplementation(((
+      _queryInfo: chrome.tabs.QueryInfo,
+      callback?: (tabs: chrome.tabs.Tab[]) => void
+    ) => {
       callback?.([]);
       return Promise.resolve([]);
     }) as never);
-    vi.mocked(chrome.runtime.sendMessage).mockImplementation(((message: unknown, callback?: (response: unknown) => void) => {
-      const type = typeof message === 'object' && message !== null
-        ? (message as { type?: string }).type
-        : '';
-      const response = type === PLAYGROUND_PROFILE_MESSAGE_TYPE
-        ? {
-            ok: true,
-            profile: {
-              customDisplayName: '',
-              displayName: 'Player TEST',
-              generatedDisplayName: 'Player TEST',
-              userId: 'test-user',
-              wins: null
-            }
-          }
-        : type === PLAYGROUND_PROFILE_STATS_MESSAGE_TYPE
-          ? {
-              ok: true,
-              userId: 'test-user',
-              wins: 7
-            }
-        : type === PLAYGROUND_PROFILE_UPDATE_MESSAGE_TYPE
+    vi.mocked(chrome.runtime.sendMessage).mockImplementation(((
+      message: unknown,
+      callback?: (response: unknown) => void
+    ) => {
+      const type =
+        typeof message === 'object' && message !== null ? (message as { type?: string }).type : '';
+      const response =
+        type === PLAYGROUND_PROFILE_MESSAGE_TYPE
           ? {
               ok: true,
               profile: {
-                customDisplayName: 'Luna Chat',
-                displayName: 'Luna Chat',
+                customDisplayName: '',
+                displayName: 'Player TEST',
                 generatedDisplayName: 'Player TEST',
                 userId: 'test-user',
                 wins: null
               }
             }
-          : { activeTabIds: [] };
+          : type === PLAYGROUND_PROFILE_STATS_MESSAGE_TYPE
+            ? {
+                ok: true,
+                userId: 'test-user',
+                wins: 7
+              }
+            : type === PLAYGROUND_PROFILE_UPDATE_MESSAGE_TYPE
+              ? {
+                  ok: true,
+                  profile: {
+                    customDisplayName: 'Luna Chat',
+                    displayName: 'Luna Chat',
+                    generatedDisplayName: 'Player TEST',
+                    userId: 'test-user',
+                    wins: null
+                  }
+                }
+              : { activeTabIds: [] };
       callback?.(response);
       return Promise.resolve(response);
     }) as never);
@@ -728,18 +991,32 @@ describe('popup', () => {
     const liteModeEnabled = document.querySelector<HTMLInputElement>('#liteModeEnabled')!;
     const playgroundEnabled = document.querySelector<HTMLInputElement>('#playgroundEnabled')!;
     const playgroundProfile = document.querySelector<HTMLElement>('#playgroundProfile')!;
-    const playgroundProfileAvatar = document.querySelector<HTMLElement>('#playgroundProfileAvatar')!;
-    const playgroundProfileDetails = document.querySelector<HTMLElement>('#playgroundProfileDetails')!;
-    const playgroundDisplayName = document.querySelector<HTMLInputElement>('#playgroundDisplayName')!;
+    const playgroundProfileAvatar = document.querySelector<HTMLElement>(
+      '#playgroundProfileAvatar'
+    )!;
+    const playgroundProfileDetails = document.querySelector<HTMLElement>(
+      '#playgroundProfileDetails'
+    )!;
+    const playgroundDisplayName =
+      document.querySelector<HTMLInputElement>('#playgroundDisplayName')!;
     const playgroundProfileName = document.querySelector<HTMLElement>('#playgroundProfileName')!;
-    const playgroundProfileToggle = document.querySelector<HTMLButtonElement>('#playgroundProfileToggle')!;
+    const playgroundProfileToggle = document.querySelector<HTMLButtonElement>(
+      '#playgroundProfileToggle'
+    )!;
     const playgroundProfileWins = document.querySelector<HTMLElement>('#playgroundProfileWins')!;
-    const playgroundProfileWinsCount = document.querySelector<HTMLElement>('#playgroundProfileWinsCount')!;
+    const playgroundProfileWinsCount = document.querySelector<HTMLElement>(
+      '#playgroundProfileWinsCount'
+    )!;
     const playgroundGamesSection = document.querySelector<HTMLElement>('#playgroundGamesSection')!;
-    const playgroundGamesAvailable = document.querySelector<HTMLInputElement>('#playgroundGamesAvailable')!;
+    const playgroundGamesAvailable = document.querySelector<HTMLInputElement>(
+      '#playgroundGamesAvailable'
+    )!;
     const chatSkin = document.querySelector<HTMLSelectElement>('#chatSkin')!;
     const translationIcon = document.querySelector<SVGSVGElement>('.translation-target-icon')!;
-    const skinOptions = Array.from(chatSkin.options).map((option) => [option.value, option.textContent]);
+    const skinOptions = Array.from(chatSkin.options).map((option) => [
+      option.value,
+      option.textContent
+    ]);
 
     expect(skinOptions).toEqual([
       ['system', 'chatSkinDefault'],
@@ -757,7 +1034,9 @@ describe('popup', () => {
     expect(playgroundProfile.hidden).toBe(false);
     expect(playgroundProfileDetails.hidden).toBe(true);
     expect(playgroundProfileAvatar.textContent).toBe('T');
-    expect(playgroundProfileAvatar.style.getPropertyValue('--playground-profile-avatar-bg')).toBe('hsl(255 45% 37%)');
+    expect(playgroundProfileAvatar.style.getPropertyValue('--playground-profile-avatar-bg')).toBe(
+      'hsl(255 45% 37%)'
+    );
     expect(playgroundProfileName.textContent).toBe('Player TEST');
     expect(playgroundDisplayName.value).toBe('');
     expect(playgroundDisplayName.placeholder).toBe('Player TEST');
@@ -777,10 +1056,13 @@ describe('popup', () => {
 
     playgroundDisplayName.value = '  Luna Chat  ';
     playgroundDisplayName.dispatchEvent(new Event('change', { bubbles: true }));
-    expect(chrome.runtime.sendMessage).toHaveBeenCalledWith({
-      displayName: 'Luna Chat',
-      type: PLAYGROUND_PROFILE_UPDATE_MESSAGE_TYPE
-    }, expect.any(Function));
+    expect(chrome.runtime.sendMessage).toHaveBeenCalledWith(
+      {
+        displayName: 'Luna Chat',
+        type: PLAYGROUND_PROFILE_UPDATE_MESSAGE_TYPE
+      },
+      expect.any(Function)
+    );
     expect(playgroundProfileAvatar.textContent).toBe('L');
     expect(playgroundProfileName.textContent).toBe('Luna Chat');
     expect(playgroundDisplayName.value).toBe('Luna Chat');
@@ -788,10 +1070,12 @@ describe('popup', () => {
 
     targetLanguage.value = '';
     targetLanguage.dispatchEvent(new Event('change', { bubbles: true }));
-    expect(chrome.storage.sync.set).toHaveBeenLastCalledWith(expect.objectContaining({
-      lastTranslationTarget: 'ko',
-      targetLanguage: ''
-    }));
+    expect(chrome.storage.sync.set).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        lastTranslationTarget: 'ko',
+        targetLanguage: ''
+      })
+    );
 
     targetLanguage.value = 'fr';
     targetLanguage.dispatchEvent(new Event('change', { bubbles: true }));
@@ -808,11 +1092,23 @@ describe('popup', () => {
     playgroundEnabled.checked = false;
     playgroundEnabled.dispatchEvent(new Event('change', { bubbles: true }));
 
-    expect(document.querySelector('.translation-target-icon')?.classList.contains('ytcq-translation-pulse')).toBe(true);
-    expect(document.querySelector('.translation-display-icon')?.classList.contains('ytcq-display-reflow')).toBe(true);
-    expect(document.querySelector('.chat-skin-icon')?.classList.contains('ytcq-palette-pop')).toBe(true);
-    expect(document.querySelector('.sound-icon')?.classList.contains('ytcq-bell-ringing')).toBe(true);
-    expect(document.querySelector('.startup-effect-icon')?.classList.contains('ytcq-sparkle-burst')).toBe(true);
+    expect(
+      document
+        .querySelector('.translation-target-icon')
+        ?.classList.contains('ytcq-translation-pulse')
+    ).toBe(true);
+    expect(
+      document.querySelector('.translation-display-icon')?.classList.contains('ytcq-display-reflow')
+    ).toBe(true);
+    expect(document.querySelector('.chat-skin-icon')?.classList.contains('ytcq-palette-pop')).toBe(
+      true
+    );
+    expect(document.querySelector('.sound-icon')?.classList.contains('ytcq-bell-ringing')).toBe(
+      true
+    );
+    expect(
+      document.querySelector('.startup-effect-icon')?.classList.contains('ytcq-sparkle-burst')
+    ).toBe(true);
     expect(chrome.storage.sync.set).toHaveBeenCalledWith({ chatSkin: 'system' });
     expect(chrome.storage.sync.set).toHaveBeenCalledWith({ liteModeEnabled: false });
     expect(playgroundGamesSection.hidden).toBe(false);
@@ -821,7 +1117,9 @@ describe('popup', () => {
     expect(playgroundProfileDetails.hidden).toBe(true);
     expect(playgroundProfileToggle.getAttribute('aria-expanded')).toBe('false');
     expect(playgroundProfileAvatar.textContent).toBe('');
-    expect(playgroundProfileAvatar.style.getPropertyValue('--playground-profile-avatar-bg')).toBe('');
+    expect(playgroundProfileAvatar.style.getPropertyValue('--playground-profile-avatar-bg')).toBe(
+      ''
+    );
     expect(playgroundDisplayName.value).toBe('');
     expect(playgroundDisplayName.placeholder).toBe('');
     expect(playgroundProfileName.textContent).toBe('');
@@ -841,8 +1139,12 @@ describe('popup', () => {
     await vi.advanceTimersByTimeAsync(180);
     expect(playgroundGamesSection.hidden).toBe(true);
     await vi.advanceTimersByTimeAsync(1000);
-    expect(document.querySelector('.chat-skin-icon')?.classList.contains('ytcq-palette-pop')).toBe(false);
-    expect(document.querySelector('.startup-effect-icon')?.classList.contains('ytcq-sparkle-burst')).toBe(false);
+    expect(document.querySelector('.chat-skin-icon')?.classList.contains('ytcq-palette-pop')).toBe(
+      false
+    );
+    expect(
+      document.querySelector('.startup-effect-icon')?.classList.contains('ytcq-sparkle-burst')
+    ).toBe(false);
   });
 
   it('shows the Playground identity while remote wins are loading', async () => {
@@ -851,14 +1153,19 @@ describe('popup', () => {
     await chrome.storage.sync.set({
       playgroundEnabled: true
     });
-    vi.mocked(chrome.tabs.query).mockImplementation(((_queryInfo: chrome.tabs.QueryInfo, callback?: (tabs: chrome.tabs.Tab[]) => void) => {
+    vi.mocked(chrome.tabs.query).mockImplementation(((
+      _queryInfo: chrome.tabs.QueryInfo,
+      callback?: (tabs: chrome.tabs.Tab[]) => void
+    ) => {
       callback?.([]);
       return Promise.resolve([]);
     }) as never);
-    vi.mocked(chrome.runtime.sendMessage).mockImplementation(((message: unknown, callback?: RuntimeCallback) => {
-      const type = typeof message === 'object' && message !== null
-        ? (message as { type?: string }).type
-        : '';
+    vi.mocked(chrome.runtime.sendMessage).mockImplementation(((
+      message: unknown,
+      callback?: RuntimeCallback
+    ) => {
+      const type =
+        typeof message === 'object' && message !== null ? (message as { type?: string }).type : '';
       if (type === PLAYGROUND_PROFILE_MESSAGE_TYPE) {
         callback?.({
           ok: true,
@@ -885,8 +1192,12 @@ describe('popup', () => {
     const playgroundProfile = document.querySelector<HTMLElement>('#playgroundProfile')!;
     const playgroundProfileName = document.querySelector<HTMLElement>('#playgroundProfileName')!;
     const playgroundProfileWins = document.querySelector<HTMLElement>('#playgroundProfileWins')!;
-    const playgroundProfileWinsCount = document.querySelector<HTMLElement>('#playgroundProfileWinsCount')!;
-    const spinner = playgroundProfileWins.querySelector<HTMLElement>('.playground-profile-wins-spinner')!;
+    const playgroundProfileWinsCount = document.querySelector<HTMLElement>(
+      '#playgroundProfileWinsCount'
+    )!;
+    const spinner = playgroundProfileWins.querySelector<HTMLElement>(
+      '.playground-profile-wins-spinner'
+    )!;
 
     expect(playgroundProfile.hidden).toBe(false);
     expect(playgroundProfileName.textContent).toBe('Player SLOW');
@@ -915,14 +1226,22 @@ describe('popup', () => {
     await chrome.storage.sync.set({
       playgroundEnabled: true
     });
-    vi.mocked(chrome.tabs.query).mockImplementation(((_queryInfo: chrome.tabs.QueryInfo, callback?: (tabs: chrome.tabs.Tab[]) => void) => {
+    vi.mocked(chrome.tabs.query).mockImplementation(((
+      _queryInfo: chrome.tabs.QueryInfo,
+      callback?: (tabs: chrome.tabs.Tab[]) => void
+    ) => {
       callback?.([]);
       return Promise.resolve([]);
     }) as never);
-    vi.mocked(chrome.runtime.sendMessage).mockImplementation(((message: unknown, callback?: RuntimeCallback) => {
-      if (typeof message === 'object' &&
+    vi.mocked(chrome.runtime.sendMessage).mockImplementation(((
+      message: unknown,
+      callback?: RuntimeCallback
+    ) => {
+      if (
+        typeof message === 'object' &&
         message !== null &&
-        (message as { type?: string }).type === PLAYGROUND_PROFILE_MESSAGE_TYPE) {
+        (message as { type?: string }).type === PLAYGROUND_PROFILE_MESSAGE_TYPE
+      ) {
         if (callback) profileCallbacks.push(callback);
         return Promise.resolve(undefined);
       }
@@ -965,33 +1284,40 @@ describe('popup', () => {
     await chrome.storage.sync.set({
       playgroundEnabled: true
     });
-    vi.mocked(chrome.tabs.query).mockImplementation(((_queryInfo: chrome.tabs.QueryInfo, callback?: (tabs: chrome.tabs.Tab[]) => void) => {
+    vi.mocked(chrome.tabs.query).mockImplementation(((
+      _queryInfo: chrome.tabs.QueryInfo,
+      callback?: (tabs: chrome.tabs.Tab[]) => void
+    ) => {
       callback?.([]);
       return Promise.resolve([]);
     }) as never);
-    vi.mocked(chrome.runtime.sendMessage).mockImplementation(((message: unknown, callback?: (response: unknown) => void) => {
-      const response = typeof message === 'object' &&
+    vi.mocked(chrome.runtime.sendMessage).mockImplementation(((
+      message: unknown,
+      callback?: (response: unknown) => void
+    ) => {
+      const response =
+        typeof message === 'object' &&
         message !== null &&
         (message as { type?: string }).type === PLAYGROUND_PROFILE_MESSAGE_TYPE
-        ? {
-            ok: true,
-            profile: {
-              customDisplayName: '',
-              displayName: 'Player TEST',
-              generatedDisplayName: 'Player TEST',
-              userId: 'test-user',
-              wins: null
-            }
-          }
-        : typeof message === 'object' &&
-          message !== null &&
-          (message as { type?: string }).type === PLAYGROUND_PROFILE_STATS_MESSAGE_TYPE
           ? {
               ok: true,
-              userId: 'test-user',
-              wins: 0
+              profile: {
+                customDisplayName: '',
+                displayName: 'Player TEST',
+                generatedDisplayName: 'Player TEST',
+                userId: 'test-user',
+                wins: null
+              }
             }
-        : { activeTabIds: [] };
+          : typeof message === 'object' &&
+              message !== null &&
+              (message as { type?: string }).type === PLAYGROUND_PROFILE_STATS_MESSAGE_TYPE
+            ? {
+                ok: true,
+                userId: 'test-user',
+                wins: 0
+              }
+            : { activeTabIds: [] };
       callback?.(response);
       return Promise.resolve(response);
     }) as never);
@@ -1006,13 +1332,19 @@ describe('popup', () => {
 
     expect(reportValidity).toHaveBeenCalled();
     expect(displayName.validationMessage).toBe('playgroundDisplayNameInvalid');
-    expect(chrome.runtime.sendMessage).not.toHaveBeenCalledWith(expect.objectContaining({
-      type: PLAYGROUND_PROFILE_UPDATE_MESSAGE_TYPE
-    }), expect.any(Function));
+    expect(chrome.runtime.sendMessage).not.toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: PLAYGROUND_PROFILE_UPDATE_MESSAGE_TYPE
+      }),
+      expect.any(Function)
+    );
   });
 
   it('lets the Playground helper text toggle while the helper link stays a link', async () => {
-    vi.mocked(chrome.tabs.query).mockImplementation(((_queryInfo: chrome.tabs.QueryInfo, callback?: (tabs: chrome.tabs.Tab[]) => void) => {
+    vi.mocked(chrome.tabs.query).mockImplementation(((
+      _queryInfo: chrome.tabs.QueryInfo,
+      callback?: (tabs: chrome.tabs.Tab[]) => void
+    ) => {
       callback?.([]);
       return Promise.resolve([]);
     }) as never);
@@ -1041,7 +1373,10 @@ describe('popup', () => {
     await chrome.storage.sync.set({
       startupEffect: true
     });
-    vi.mocked(chrome.tabs.query).mockImplementation(((_queryInfo: chrome.tabs.QueryInfo, callback?: (tabs: chrome.tabs.Tab[]) => void) => {
+    vi.mocked(chrome.tabs.query).mockImplementation(((
+      _queryInfo: chrome.tabs.QueryInfo,
+      callback?: (tabs: chrome.tabs.Tab[]) => void
+    ) => {
       callback?.([]);
       return Promise.resolve([]);
     }) as never);
@@ -1056,39 +1391,57 @@ describe('popup', () => {
 
     expect(document.querySelector<HTMLInputElement>('#startupEffect')?.disabled).toBe(true);
     expect(document.querySelector<HTMLInputElement>('#startupEffect')?.checked).toBe(false);
-    expect(document.querySelector('.translation-target-icon')?.classList.contains('ytcq-translation-pulse')).toBe(false);
-    expect(document.querySelector('.chat-skin-icon')?.classList.contains('ytcq-palette-pop')).toBe(false);
+    expect(
+      document
+        .querySelector('.translation-target-icon')
+        ?.classList.contains('ytcq-translation-pulse')
+    ).toBe(false);
+    expect(document.querySelector('.chat-skin-icon')?.classList.contains('ytcq-palette-pop')).toBe(
+      false
+    );
   });
 
   it('falls back to static language labels and skips missing animation icons', async () => {
     vi.useFakeTimers();
-    const displayNamesSpy = vi.spyOn(Intl, 'DisplayNames').mockImplementation((class {
+    const displayNamesSpy = vi.spyOn(Intl, 'DisplayNames').mockImplementation(
+      class {
         of(): string {
           throw new Error('display names unavailable');
         }
-      }) as never);
+      } as never
+    );
     await chrome.storage.sync.set({
       sound: false,
       startupEffect: false,
       targetLanguage: '',
       translationDisplay: 'below'
     });
-    vi.mocked(chrome.tabs.query).mockImplementation(((_queryInfo: chrome.tabs.QueryInfo, callback?: (tabs: chrome.tabs.Tab[]) => void) => {
+    vi.mocked(chrome.tabs.query).mockImplementation(((
+      _queryInfo: chrome.tabs.QueryInfo,
+      callback?: (tabs: chrome.tabs.Tab[]) => void
+    ) => {
       callback?.([]);
       return Promise.resolve([]);
     }) as never);
 
     await import('./index');
-    const japanese = Array.from(document.querySelectorAll<HTMLOptionElement>('#targetLanguage option'))
-      .find((option) => option.value === 'ja');
+    const japanese = Array.from(
+      document.querySelectorAll<HTMLOptionElement>('#targetLanguage option')
+    ).find((option) => option.value === 'ja');
     expect(japanese?.textContent).toBe('Japanese');
 
     document.querySelector<HTMLSelectElement>('#translationDisplay')!.value = 'replace';
-    document.querySelector<HTMLSelectElement>('#translationDisplay')!.dispatchEvent(new Event('change', { bubbles: true }));
+    document
+      .querySelector<HTMLSelectElement>('#translationDisplay')!
+      .dispatchEvent(new Event('change', { bubbles: true }));
     document.querySelector<HTMLInputElement>('#sound')!.checked = false;
-    document.querySelector<HTMLInputElement>('#sound')!.dispatchEvent(new Event('change', { bubbles: true }));
+    document
+      .querySelector<HTMLInputElement>('#sound')!
+      .dispatchEvent(new Event('change', { bubbles: true }));
     document.querySelector<HTMLInputElement>('#startupEffect')!.checked = false;
-    document.querySelector<HTMLInputElement>('#startupEffect')!.dispatchEvent(new Event('change', { bubbles: true }));
+    document
+      .querySelector<HTMLInputElement>('#startupEffect')!
+      .dispatchEvent(new Event('change', { bubbles: true }));
 
     expect(chrome.storage.sync.set).toHaveBeenCalledWith({ translationDisplay: 'replace' });
     expect(chrome.storage.sync.set).toHaveBeenCalledWith({ sound: false });
@@ -1097,14 +1450,20 @@ describe('popup', () => {
   });
 
   it('resets extension storage, updates controls, broadcasts page reset, and shows completion', async () => {
-    vi.mocked(chrome.tabs.query).mockImplementation(((queryInfo: chrome.tabs.QueryInfo, callback?: (tabs: chrome.tabs.Tab[]) => void) => {
+    vi.mocked(chrome.tabs.query).mockImplementation(((
+      queryInfo: chrome.tabs.QueryInfo,
+      callback?: (tabs: chrome.tabs.Tab[]) => void
+    ) => {
       const tabs = queryInfo.active
         ? [{ id: 10 } as chrome.tabs.Tab]
         : [{ id: 10 } as chrome.tabs.Tab, { id: undefined } as chrome.tabs.Tab];
       callback?.(tabs);
       return Promise.resolve(tabs);
     }) as never);
-    vi.mocked(chrome.runtime.sendMessage).mockImplementation(((_message: unknown, callback?: (response: unknown) => void) => {
+    vi.mocked(chrome.runtime.sendMessage).mockImplementation(((
+      _message: unknown,
+      callback?: (response: unknown) => void
+    ) => {
       callback?.({ activeTabIds: [] });
       return Promise.resolve({ activeTabIds: [] });
     }) as never);
@@ -1114,31 +1473,52 @@ describe('popup', () => {
     document.querySelector<HTMLInputElement>('#sound')!.checked = false;
     document.querySelector<HTMLButtonElement>('#resetExtension')?.click();
     expect(chrome.storage.local.clear).not.toHaveBeenCalled();
-    expect(document.querySelector('.popup-reset-dialog-message')?.textContent).toBe('popupResetConfirm');
-    expect(document.querySelector('.popup-reset-dialog-list-label')?.textContent).toBe('popupResetConfirmIncludes');
-    expect(Array.from(document.querySelectorAll('.popup-reset-dialog-list li')).map((item) => item.textContent)).toEqual([
+    expect(document.querySelector('.popup-reset-dialog-message')?.textContent).toBe(
+      'popupResetConfirm'
+    );
+    expect(document.querySelector('.popup-reset-dialog-list-label')?.textContent).toBe(
+      'popupResetConfirmIncludes'
+    );
+    expect(
+      Array.from(document.querySelectorAll('.popup-reset-dialog-list li')).map(
+        (item) => item.textContent
+      )
+    ).toEqual([
       'popupResetItemSettings',
       'popupResetItemInboxMessages',
       'popupResetItemWatchedKeywords',
       'popupResetItemFrequentEmojis',
       'popupResetItemUnsentDrafts',
-      'popupResetItemBookmarkedUsers',
+      'popupResetItemBookmarks',
+      'popupResetItemAvatarRings',
       'popupResetItemPlaygroundIdentity',
       'popupResetItemGamePreferences'
     ]);
     expect(document.querySelector('.popup-reset-dialog-cancel')?.textContent).toBe('Close');
-    expect(document.querySelector('.popup-reset-dialog-confirm')?.textContent).toBe('resetExtension');
+    expect(document.querySelector('.popup-reset-dialog-confirm')?.textContent).toBe(
+      'resetExtension'
+    );
 
     document.querySelector<HTMLButtonElement>('.popup-reset-dialog-confirm')?.click();
 
     expect(chrome.storage.local.clear).toHaveBeenCalled();
+    expect(chrome.storage.session.clear).toHaveBeenCalled();
     expect(chrome.storage.sync.clear).toHaveBeenCalled();
-    expect(chrome.storage.sync.set).toHaveBeenCalledWith(expect.objectContaining({
-      sound: true,
-      targetLanguage: ''
-    }), expect.any(Function));
-    expect(chrome.tabs.sendMessage).toHaveBeenCalledWith(10, { type: 'ytcq:reset-page' }, expect.any(Function));
-    expect(document.querySelector('.popup-reset-dialog-message')?.textContent).toBe('popupResetComplete');
+    expect(chrome.storage.sync.set).toHaveBeenCalledWith(
+      expect.objectContaining({
+        sound: true,
+        targetLanguage: ''
+      }),
+      expect.any(Function)
+    );
+    expect(chrome.tabs.sendMessage).toHaveBeenCalledWith(
+      10,
+      { type: 'ytcq:reset-page' },
+      expect.any(Function)
+    );
+    expect(document.querySelector('.popup-reset-dialog-message')?.textContent).toBe(
+      'popupResetComplete'
+    );
     expect(document.querySelector('.popup-reset-dialog-list')).toBeNull();
     expect(document.querySelector('.popup-reset-dialog-close')?.textContent).toBe('Close');
     expect(document.querySelector<HTMLInputElement>('#sound')?.checked).toBe(true);
@@ -1166,7 +1546,10 @@ describe('popup', () => {
   });
 
   it('completes reset immediately when there are no tab ids to notify', async () => {
-    vi.mocked(chrome.tabs.query).mockImplementation(((queryInfo: chrome.tabs.QueryInfo, callback?: (tabs: chrome.tabs.Tab[]) => void) => {
+    vi.mocked(chrome.tabs.query).mockImplementation(((
+      queryInfo: chrome.tabs.QueryInfo,
+      callback?: (tabs: chrome.tabs.Tab[]) => void
+    ) => {
       const tabs = queryInfo.active ? [] : [{ id: undefined } as chrome.tabs.Tab];
       callback?.(tabs);
       return Promise.resolve(tabs);
@@ -1176,23 +1559,35 @@ describe('popup', () => {
     document.querySelector<HTMLButtonElement>('.popup-reset-dialog-confirm')?.click();
 
     expect(chrome.tabs.sendMessage).not.toHaveBeenCalled();
-    expect(document.querySelector('.popup-reset-dialog-message')?.textContent).toBe('popupResetComplete');
+    expect(document.querySelector('.popup-reset-dialog-message')?.textContent).toBe(
+      'popupResetComplete'
+    );
   });
 
   it('waits for every tab reset response before reporting completion', async () => {
     const resetCallbacks: (() => void)[] = [];
-    vi.mocked(chrome.tabs.query).mockImplementation(((queryInfo: chrome.tabs.QueryInfo, callback?: (tabs: chrome.tabs.Tab[]) => void) => {
+    vi.mocked(chrome.tabs.query).mockImplementation(((
+      queryInfo: chrome.tabs.QueryInfo,
+      callback?: (tabs: chrome.tabs.Tab[]) => void
+    ) => {
       const tabs = queryInfo.active
         ? [{ id: 10 } as chrome.tabs.Tab]
         : [{ id: 10 } as chrome.tabs.Tab, { id: 20 } as chrome.tabs.Tab];
       callback?.(tabs);
       return Promise.resolve(tabs);
     }) as never);
-    vi.mocked(chrome.runtime.sendMessage).mockImplementation(((_message: unknown, callback?: (response: unknown) => void) => {
+    vi.mocked(chrome.runtime.sendMessage).mockImplementation(((
+      _message: unknown,
+      callback?: (response: unknown) => void
+    ) => {
       callback?.({ activeTabIds: [] });
       return Promise.resolve({ activeTabIds: [] });
     }) as never);
-    vi.mocked(chrome.tabs.sendMessage).mockImplementation(((_tabId: number, message: unknown, callback?: () => void) => {
+    vi.mocked(chrome.tabs.sendMessage).mockImplementation(((
+      _tabId: number,
+      message: unknown,
+      callback?: () => void
+    ) => {
       if ((message as { type?: string })?.type === 'ytcq:reset-page') {
         resetCallbacks.push(() => callback?.());
       } else {
@@ -1205,18 +1600,27 @@ describe('popup', () => {
     document.querySelector<HTMLButtonElement>('.popup-reset-dialog-confirm')?.click();
 
     expect(resetCallbacks).toHaveLength(2);
-    expect(document.querySelector('.popup-reset-dialog-message')?.textContent).toBe('popupResetConfirm');
+    expect(document.querySelector('.popup-reset-dialog-message')?.textContent).toBe(
+      'popupResetConfirm'
+    );
 
     resetCallbacks[0]();
-    expect(document.querySelector('.popup-reset-dialog-message')?.textContent).toBe('popupResetConfirm');
+    expect(document.querySelector('.popup-reset-dialog-message')?.textContent).toBe(
+      'popupResetConfirm'
+    );
 
     resetCallbacks[1]();
-    expect(document.querySelector('.popup-reset-dialog-message')?.textContent).toBe('popupResetComplete');
+    expect(document.querySelector('.popup-reset-dialog-message')?.textContent).toBe(
+      'popupResetComplete'
+    );
   });
 
   it('skips popup wiring when required controls are missing', async () => {
     document.body.innerHTML = '<section data-extension-status></section>';
-    vi.mocked(chrome.tabs.query).mockImplementation(((_queryInfo: chrome.tabs.QueryInfo, callback?: (tabs: chrome.tabs.Tab[]) => void) => {
+    vi.mocked(chrome.tabs.query).mockImplementation(((
+      _queryInfo: chrome.tabs.QueryInfo,
+      callback?: (tabs: chrome.tabs.Tab[]) => void
+    ) => {
       callback?.([]);
       return Promise.resolve([]);
     }) as never);

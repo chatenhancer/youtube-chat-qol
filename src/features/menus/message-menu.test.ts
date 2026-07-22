@@ -4,14 +4,14 @@ const replyMocks = vi.hoisted(() => ({
   replyToMessage: vi.fn()
 }));
 
-const markedUserMocks = vi.hoisted(() => ({
-  getMessageAuthorMarkTitle: vi.fn(() => 'Mark'),
-  isMessageAuthorMarked: vi.fn(() => false),
-  toggleMessageAuthorMark: vi.fn()
+const bookmarkMocks = vi.hoisted(() => ({
+  getChatBookmarkTitle: vi.fn(() => 'Save message'),
+  isChatBookmarked: vi.fn(() => false),
+  toggleChatBookmark: vi.fn()
 }));
 
 vi.mock('../reply', () => replyMocks);
-vi.mock('../marked-users', () => markedUserMocks);
+vi.mock('../bookmarks', () => bookmarkMocks);
 
 import { BOOKMARK_FILLED_ICON_PATH, BOOKMARK_ICON_PATH, MATERIAL_ICON_VIEW_BOX } from '../../shared/icons';
 import {
@@ -26,9 +26,9 @@ describe('message context menu integration', () => {
   beforeEach(() => {
     document.body.replaceChildren();
     replyMocks.replyToMessage.mockClear();
-    markedUserMocks.getMessageAuthorMarkTitle.mockReturnValue('Mark');
-    markedUserMocks.isMessageAuthorMarked.mockReturnValue(false);
-    markedUserMocks.toggleMessageAuthorMark.mockClear();
+    bookmarkMocks.getChatBookmarkTitle.mockReturnValue('Save message');
+    bookmarkMocks.isChatBookmarked.mockReturnValue(false);
+    bookmarkMocks.toggleChatBookmark.mockClear();
     vi.spyOn(Date, 'now').mockReturnValue(1_000);
   });
 
@@ -69,7 +69,7 @@ describe('message context menu integration', () => {
     expect(isRecentActiveContextMessage()).toBe(true);
   });
 
-  it('injects mark plus split quote and mention actions that target the active message', () => {
+  it('injects save plus split quote and mention actions that target the active message', () => {
     const message = createChatMessage();
     const menu = createContextMenu();
     document.body.append(message, menu);
@@ -80,9 +80,9 @@ describe('message context menu integration', () => {
     const items = menu.querySelectorAll<HTMLElement>('.ytcq-context-item');
 
     expect(items).toHaveLength(2);
-    expect(items[0].getAttribute('data-ytcq-action')).toBe('mark-user');
-    expect(items[0].querySelector('.ytcq-menu-label')?.textContent).toBe('Mark');
-    expect(items[0].title).toBe('Mark');
+    expect(items[0].getAttribute('data-ytcq-action')).toBe('save-message');
+    expect(items[0].querySelector('.ytcq-menu-label')?.textContent).toBe('Save');
+    expect(items[0].title).toBe('Save message');
     expect(items[0].querySelector('svg')?.getAttribute('viewBox')).toBe(MATERIAL_ICON_VIEW_BOX);
     expect(items[0].querySelector('path')?.getAttribute('d')).toBe(BOOKMARK_ICON_PATH);
     expect(items[1].getAttribute('data-ytcq-action')).toBe('reply-actions');
@@ -97,7 +97,7 @@ describe('message context menu integration', () => {
     items[1].querySelector<HTMLElement>('[data-ytcq-action="quote"]')!.click();
     items[1].querySelector<HTMLElement>('[data-ytcq-action="mention"]')!.click();
 
-    expect(markedUserMocks.toggleMessageAuthorMark).toHaveBeenCalledWith(message);
+    expect(bookmarkMocks.toggleChatBookmark).toHaveBeenCalledWith(message);
     expect(replyMocks.replyToMessage).toHaveBeenNthCalledWith(1, message, { quote: true });
     expect(replyMocks.replyToMessage).toHaveBeenNthCalledWith(2, message, { quote: false });
   });
@@ -129,19 +129,19 @@ describe('message context menu integration', () => {
     expect(replyMocks.replyToMessage).toHaveBeenNthCalledWith(2, message, { quote: true });
   });
 
-  it('does not toggle marks when no active connected message is available', () => {
+  it('does not toggle bookmarks when no active connected message is available', () => {
     const menu = createContextMenu();
     document.body.append(menu);
 
     enhanceMessageContextMenu(menu);
-    menu.querySelector<HTMLElement>('[data-ytcq-action="mark-user"]')!.click();
+    menu.querySelector<HTMLElement>('[data-ytcq-action="save-message"]')!.click();
 
-    expect(markedUserMocks.toggleMessageAuthorMark).not.toHaveBeenCalled();
+    expect(bookmarkMocks.toggleChatBookmark).not.toHaveBeenCalled();
   });
 
-  it('shows the unmark label when the active message author is already marked', () => {
-    markedUserMocks.isMessageAuthorMarked.mockReturnValue(true);
-    markedUserMocks.getMessageAuthorMarkTitle.mockReturnValue('Unmark\nNov 14, 2023, 10:13 PM\nExample Stream');
+  it('shows the remove label when the active message is already saved', () => {
+    bookmarkMocks.isChatBookmarked.mockReturnValue(true);
+    bookmarkMocks.getChatBookmarkTitle.mockReturnValue('Remove saved message');
     const message = createChatMessage();
     const menu = createContextMenu();
     document.body.append(message, menu);
@@ -150,9 +150,9 @@ describe('message context menu integration', () => {
 
     enhanceMessageContextMenu(menu);
 
-    expect(menu.querySelector('[data-ytcq-action="mark-user"] .ytcq-menu-label')?.textContent).toBe('Unmark');
-    expect(menu.querySelector<HTMLElement>('[data-ytcq-action="mark-user"]')?.title).toContain('Example Stream');
-    expect(menu.querySelector('[data-ytcq-action="mark-user"] path')?.getAttribute('d')).toBe(BOOKMARK_FILLED_ICON_PATH);
+    expect(menu.querySelector('[data-ytcq-action="save-message"] .ytcq-menu-label')?.textContent).toBe('Remove');
+    expect(menu.querySelector<HTMLElement>('[data-ytcq-action="save-message"]')?.title).toBe('Remove saved message');
+    expect(menu.querySelector('[data-ytcq-action="save-message"] path')?.getAttribute('d')).toBe(BOOKMARK_FILLED_ICON_PATH);
   });
 
   it('does not duplicate injected menu items and removes stale wiring on cleanup', () => {

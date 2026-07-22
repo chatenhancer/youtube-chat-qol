@@ -7,6 +7,8 @@ export const ICON_VIEW_BOX = '0 0 24 24';
 export const MATERIAL_ICON_VIEW_BOX = '0 -960 960 960';
 
 export const ADD_ICON_PATH = 'M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2Z';
+export const AVATAR_RING_ADD_BADGE_PATH = 'M18 15.9v4.2M15.9 18h4.2';
+export const AVATAR_RING_ACTIVE_BADGE_PATH = 'm15.9 18 1.35 1.35 2.85-3.05';
 export const BOOKMARK_FILLED_ICON_PATH =
   'M600-680v-80h280v80H600ZM200-120v-640q0-33 23.5-56.5T280-840h280q-20 30-30 57.5T520-720q0 72 45.5 127T680-524q23 3 40 3t40-3v404L480-240 200-120Z';
 export const BOOKMARK_ICON_PATH =
@@ -80,6 +82,48 @@ export function createSplitTranslateIcon({
     >
       {createSvgPath(TRANSLATE_SOURCE_ICON_PATH, sourceClassName)}
       {createSvgPath(TRANSLATE_TARGET_ICON_PATH, targetClassName)}
+    </svg>
+  );
+}
+
+export function createAvatarRingIcon(active = false): SVGSVGElement {
+  return el<SVGSVGElement>(
+    <svg viewBox={ICON_VIEW_BOX} focusable="false" aria-hidden="true" class="ytcq-avatar-ring-icon">
+      <circle
+        class="ytcq-avatar-ring-icon-outline"
+        cx="10.5"
+        cy="10.5"
+        r="7.4"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.6"
+      />
+      <circle cx="10.5" cy="8.2" r="2.2" />
+      <path
+        d="M6.6 15.25c.72-2.02 2.02-3.03 3.9-3.03s3.18 1.01 3.9 3.03"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.6"
+        stroke-linecap="round"
+      />
+      <circle
+        class="ytcq-avatar-ring-icon-badge"
+        cx="18"
+        cy="18"
+        r="3.65"
+        fill="var(--yt-spec-raised-background, var(--yt-live-chat-background-color, #282828))"
+        stroke="currentColor"
+        stroke-width="1.5"
+      />
+      <path
+        class="ytcq-avatar-ring-icon-badge-symbol"
+        d={active ? AVATAR_RING_ACTIVE_BADGE_PATH : AVATAR_RING_ADD_BADGE_PATH}
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.65"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
     </svg>
   );
 }

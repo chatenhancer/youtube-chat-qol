@@ -38,7 +38,9 @@ Dane wymienione w tej sekcji są przechowywane przez rozszerzenie w Twoim własn
 
 - **Dane częstych emoji:** zapisywane za pomocą lokalnego magazynu rozszerzenia (`chrome.storage.local`). Obejmuje to lokalne liczniki użycia i informacje wyświetlania emoji używane do budowy wiersza częstych emoji.
 
-- **Dane zapisanych użytkowników:** zapisywane za pomocą lokalnego magazynu rozszerzenia (`chrome.storage.local`). Obejmuje to handle zapisanego użytkownika, ID kanału, jeśli jest dostępne, oraz czas utworzenia zakładki. Zapisani użytkownicy są globalni między streamami w bieżącym profilu przeglądarki i służą do wyświetlania kolorowych pierścieni awatarów.
+- **Dane zakładek:** są zapisywane w lokalnym magazynie rozszerzenia (`chrome.storage.local`). Mogą obejmować tekst zapisanej wiadomości i dane wyświetlania emoji, nazwę autora, adres awatara i dostępny identyfikator kanału, czas wiadomości i zapisu oraz tytuł i adres transmisji. Zakładki pozostają dostępne między transmisjami w bieżącym profilu przeglądarki.
+
+- **Dane obwódek awatarów:** są zapisywane w lokalnym magazynie rozszerzenia (`chrome.storage.local`). Obejmują nazwę autora, jeśli jest dostępny identyfikator kanału oraz czas dodania obwódki dla użytkowników, którym wyraźnie dodasz obwódkę z profilu ostatnich wiadomości. Wybór pozostaje dostępny między transmisjami w bieżącym profilu przeglądarki i służy wyłącznie do ozdabiania pasujących awatarów; nie sprawdza, czy użytkownik jest online.
 
 - **Niewysłane szkice czatu:** zapisywane za pomocą lokalnego magazynu rozszerzenia (`chrome.storage.local`) dla każdego streamu. Są przywracane po odświeżeniu strony. Szkice są usuwane, gdy pole czatu zostanie wyczyszczone, wiadomość zostanie wysłana lub dane rozszerzenia zostaną zresetowane.
 

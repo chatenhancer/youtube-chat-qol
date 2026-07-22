@@ -225,9 +225,41 @@
   align-items: flex-end;
 }
 
+.ytcq-focus-message-meta-row {
+  display: inline-flex;
+  min-height: 20px;
+  align-items: center;
+  gap: 2px;
+}
+
+.ytcq-focus-message-us .ytcq-focus-message-meta-row {
+  flex-direction: row-reverse;
+}
+
 .ytcq-focus-message-meta {
   color: var(--yt-live-chat-secondary-text-color, var(--yt-spec-text-secondary, #aaa));
   font: 400 11px/14px Roboto, Arial, sans-serif;
+}
+
+.ytcq-focus-message .ytcq-message-row-action {
+  width: 20px;
+  height: 20px;
+  opacity: 0.42;
+  pointer-events: auto;
+  transition:
+    color 120ms ease,
+    opacity 120ms ease;
+}
+
+.ytcq-focus-message:hover .ytcq-message-row-action,
+.ytcq-focus-message:focus-within .ytcq-message-row-action,
+.ytcq-focus-message .ytcq-bookmark-toggle-active {
+  opacity: 1;
+}
+
+.ytcq-focus-message .ytcq-message-row-action svg {
+  width: 15px;
+  height: 15px;
 }
 
 .ytcq-focus-bubble {

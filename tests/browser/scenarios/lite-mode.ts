@@ -13,7 +13,6 @@ import {
   type YouTubeChatFeedTransportBatch,
   type YouTubeChatMessageRecord
 } from '../../../src/youtube/chat-feed/protocol';
-import { MARKED_USERS_STORAGE_KEY } from '../../../src/shared/marked-users';
 import { clearChatComposerIfVisible, getChatComposerText } from '../support/composer';
 import {
   getExtensionStorageValues,
@@ -317,27 +316,6 @@ export const liteModeMockRenderingAndFallbackScenario: BrowserScenario = async (
         await expect(liteRow.locator('#timestamp')).toBeHidden();
         await expect(chat.locator(NATIVE_LIST_SELECTOR)).toHaveCount(0);
         await expect(chat.locator('html')).toHaveAttribute(LITE_NATIVE_DISCARDED_ATTRIBUTE, 'true');
-      });
-
-      await test.step('Keep bookmarked Lite avatars circular in the default theme', async () => {
-        await withExtensionStorageValues(
-          context,
-          'local',
-          {
-            [MARKED_USERS_STORAGE_KEY]: {
-              'channel:UCLiteBrowserViewer': {
-                authorName: '@LiteViewer',
-                channelId: 'UCLiteBrowserViewer',
-                markedAt: Date.now()
-              }
-            }
-          },
-          async () => {
-            const avatar = liteRow.locator('#author-photo');
-            await expect(avatar).toHaveClass(/ytcq-marked-user-avatar/);
-            await expect(avatar.locator('img')).toHaveCSS('border-radius', '50%');
-          }
-        );
       });
 
       await test.step('Style replacement translations like native chat', async () => {

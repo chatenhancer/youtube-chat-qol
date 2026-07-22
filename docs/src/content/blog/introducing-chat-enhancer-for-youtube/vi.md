@@ -36,7 +36,7 @@ Live chat YouTube không thông báo khi ai đó mention bạn. Chat Enhancer th
 
 ## Ngữ cảnh người dùng tốt hơn
 
-Với Chat Enhancer, nhấp vào avatar của người dùng sẽ mở bảng hồ sơ kèm các tin nhắn gần đây của họ. Bạn cũng có thể mở kênh YouTube của họ trong popup bên cạnh và bookmark những người muốn nhận ra về sau.
+Nhấp vào ảnh đại diện của người dùng để xem tin nhắn gần đây hoặc mở kênh YouTube của họ trong bảng bên. Từ hồ sơ đó, bạn có thể thêm hoặc xóa vòng ảnh đại diện cục bộ để người dùng nổi bật trong cuộc trò chuyện. Bạn có thể lưu tin nhắn hữu ích từ các hàng tin nhắn gần đây, Inbox và chế độ Focus, hoặc từ menu tin nhắn của YouTube. Mỗi dấu trang giữ lại tin nhắn và ngữ cảnh stream.
 
 ## Emoji dùng nhiều nhất
 
@@ -44,7 +44,7 @@ Chat Enhancer thêm một hàng dành cho các emoji bạn dùng nhiều nhất,
 
 ## Những cải tiến nhỏ khác
 
-Còn có thêm vài cải tiến nhỏ khác: mention và trích dẫn nhanh, bookmark người dùng, lệnh chat, khôi phục bản nháp, cùng những chi tiết nhỏ giúp live chat bớt sơ sài.
+Còn có thêm vài cải tiến nhỏ khác: mention và trích dẫn nhanh, dấu trang tin nhắn, lệnh chat, khôi phục bản nháp, cùng những chi tiết nhỏ giúp live chat bớt sơ sài.
 
 Chat Enhancer for YouTube miễn phí, mã nguồn mở, không yêu cầu tài khoản và không chạy analytics.
 

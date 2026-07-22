@@ -109,6 +109,7 @@ function record(overrides: Partial<FocusRecord> = {}): FocusRecord {
     id: 1,
     side: 'them',
     text: 'hello',
+    timestamp: 1,
     timestampText: '10:00 PM',
     ...overrides
   };

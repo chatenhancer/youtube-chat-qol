@@ -16,7 +16,8 @@ import {
 import { findChatInput, getChatInputText, replaceChatInput } from '../../youtube/chat-input';
 import { PANEL_PAGES_SELECTOR, SEND_BUTTON_SELECTOR } from '../../youtube/selectors';
 import { getChannelUrl, openChannelWindow } from '../channel-popup';
-import { applyMarkedUserRing } from '../marked-users';
+import { applyAvatarRing } from '../avatar-rings';
+import { createBookmarkToggleButton } from '../bookmarks';
 import { isCurrentUserAuthorName } from '../mention-detection';
 import { registerFeature } from '../../content/feature-runtime';
 import {
@@ -156,11 +157,15 @@ function areFocusRecordListsEqual(
       return (
         record.id === nextRecord.id &&
         record.authorName === nextRecord.authorName &&
+        record.avatarSrc === nextRecord.avatarSrc &&
+        record.channelId === nextRecord.channelId &&
         record.contentParts === nextRecord.contentParts &&
         record.historyKey === nextRecord.historyKey &&
+        record.messageId === nextRecord.messageId &&
         record.messageRef?.deref() === nextRecord.messageRef?.deref() &&
         record.side === nextRecord.side &&
         record.text === nextRecord.text &&
+        record.timestamp === nextRecord.timestamp &&
         record.timestampText === nextRecord.timestampText &&
         record.translation === nextRecord.translation
       );
@@ -282,12 +287,19 @@ function renderFocusMessages(): void {
     const meta = el<HTMLDivElement>(
       <div class="ytcq-focus-message-meta">{record.timestampText}</div>
     );
+    const saveButton = createBookmarkToggleButton(record);
+    const metaRow = el<HTMLDivElement>(
+      <div class="ytcq-focus-message-meta-row">
+        {meta}
+        {saveButton}
+      </div>
+    );
 
     const bubble = el<HTMLDivElement>(<div class="ytcq-focus-bubble" />);
     renderFocusMessageText(item, bubble, record);
     decorateProfileMentions(bubble);
 
-    item.append(meta, bubble);
+    item.append(metaRow, bubble);
     activeList?.append(item);
   });
 }
@@ -396,11 +408,7 @@ function createFocusAvatar(source: FocusSource): HTMLElement {
         <img src={source.avatarSrc} alt="" referrerPolicy="no-referrer" />
       </span>
     );
-    applyMarkedUserRing(surface, {
-      authorName: source.authorName,
-      avatarUrl: source.avatarSrc,
-      channelId: source.channelId
-    });
+    applyAvatarRing(surface, source);
     return surface;
   }
 
@@ -409,11 +417,7 @@ function createFocusAvatar(source: FocusSource): HTMLElement {
       {getAuthorInitial(source.authorName)}
     </span>
   );
-  applyMarkedUserRing(fallback, {
-    authorName: source.authorName,
-    avatarUrl: source.avatarSrc,
-    channelId: source.channelId
-  });
+  applyAvatarRing(fallback, source);
   return fallback;
 }
 

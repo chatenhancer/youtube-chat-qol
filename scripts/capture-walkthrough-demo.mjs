@@ -111,7 +111,7 @@ const normalChatMessageSelector = 'yt-live-chat-text-message-renderer';
 const demoChatMessageSelector = `${normalChatMessageSelector}.ytcq-demo-message`;
 const menuPopupSelector = 'ytd-menu-popup-renderer';
 const quickEmojiPopoverSelector = '.ytcq-quick-emoji-popover:not(.ytcq-quick-emoji-popover-closing)';
-const markedUsersStorageKey = 'ytcqMarkedUsers';
+const bookmarksStorageKey = 'ytcqBookmarks';
 const emojiUsageStorageKey = 'ytcqEmojiUsage';
 const playgroundDisplayNameStorageKey = 'ytcqPlaygroundDisplayName:v1';
 const playgroundIdentityStorageKey = 'ytcqPlaygroundIdentity:v1';
@@ -351,8 +351,8 @@ async function recordWalkthrough(page, chat, context, recorder) {
   await sectionInbox(page, chat, recorder);
   recorder.setStage('Playground');
   await sectionPlayground(page, chat, context, recorder);
-  recorder.setStage('Marked users');
-  await sectionMarkedUsers(page, chat, context, recorder);
+  recorder.setStage('Bookmarks');
+  await sectionBookmarks(page, chat, context, recorder);
   recorder.setStage('Emoji and commands');
   await sectionEmojiAndCommands(page, chat, recorder);
   recorder.setStage('Popup');
@@ -776,17 +776,17 @@ async function sectionPlayground(page, chat, context, recorder) {
   await closeGamesPanelIfPresent(chat);
 }
 
-async function sectionMarkedUsers(page, chat, context, recorder) {
+async function sectionBookmarks(page, chat, context, recorder) {
   await closeInboxPanelIfPresent(chat);
   await stabilizeDemoChatFeed(chat);
   await recorder.hold(180);
-  await smoothScrollDemoChatToMessage(chat, 'mark', recorder);
-  const source = await openMessageMenuWithVisibleClick(page, chat, recorder, 'mark', {
+  await smoothScrollDemoChatToMessage(chat, 'bookmark', recorder);
+  const source = await openMessageMenuWithVisibleClick(page, chat, recorder, 'bookmark', {
     cameraDurationMs: 980,
     screenXRatio: 0.9
   });
-  const markAction = source.menu.locator('.ytcq-context-item[data-ytcq-action="mark-user"]').first();
-  await clickWithCursor(page, markAction, recorder, 'Mark action', {
+  const saveAction = source.menu.locator('.ytcq-context-item[data-ytcq-action="save-message"]').first();
+  await clickWithCursor(page, saveAction, recorder, 'Save action', {
     caption: {
       ...getWalkthroughClickCaption('addBookmark'),
       options: { gap: 48, placement: 'side' }
@@ -898,7 +898,7 @@ async function sectionPopupBookmarks(page, context, recorder) {
     await captureStableLocatorState(
       popup.locator('.bookmark-row').first(),
       recorder,
-      'bookmarked user row'
+      'bookmark row'
     );
     const bookmarksCaption = await setWalkthroughCaption(popup, recorder, 'bookmarksPopup');
     await highlightLocator(popup, popup.locator('.bookmark-row').first(), recorder, 10);
@@ -933,7 +933,7 @@ async function seedWalkthroughExtensionState(context, activeSourceUrl) {
       recordsKey,
       inboxRecord,
       emojiKey,
-      markedKey,
+      bookmarksKey,
       playgroundDisplayNameKey,
       playgroundIdentityKey,
       incomingTargetLanguage
@@ -953,7 +953,7 @@ async function seedWalkthroughExtensionState(context, activeSourceUrl) {
           [recordsKey]: [inboxRecord],
           ytcqInboxKeywords: ['encore'],
           [emojiKey]: createDemoEmojiUsage(),
-          [markedKey]: {}
+          [bookmarksKey]: {}
         }, resolve)),
         new Promise((resolve) => chrome.storage.local.remove([
           playgroundDisplayNameKey,
@@ -979,7 +979,7 @@ async function seedWalkthroughExtensionState(context, activeSourceUrl) {
       recordsKey,
       inboxRecord,
       emojiUsageStorageKey,
-      markedUsersStorageKey,
+      bookmarksStorageKey,
       playgroundDisplayNameStorageKey,
       playgroundIdentityStorageKey,
       walkthroughTranslationDemo.incomingTargetLanguage
@@ -2058,14 +2058,14 @@ async function ensureDemoNativeMenuRows(menu, translationDemo) {
     };
 
     list.querySelectorAll('.ytcq-demo-native-menu-item').forEach((row) => row.remove());
-    const markItem = list.querySelector('.ytcq-context-item[data-ytcq-action="mark-user"]');
+    const saveItem = list.querySelector('.ytcq-context-item[data-ytcq-action="save-message"]');
     const splitItem = list.querySelector('.ytcq-context-item[data-ytcq-action="reply-actions"]');
     const reportRow = makeNativeRow('report', demoTranslation.nativeReportLabel);
     const blockRow = makeNativeRow('block', demoTranslation.nativeBlockLabel);
 
     list.prepend(blockRow);
     list.prepend(reportRow);
-    if (markItem) list.insertBefore(markItem, splitItem || null);
+    if (saveItem) list.insertBefore(saveItem, splitItem || null);
     if (splitItem) list.append(splitItem);
     element.style.height = 'auto';
     element.style.maxHeight = 'none';
@@ -2790,7 +2790,7 @@ async function installWatchPageBranding(page) {
 
     const videoTitle = 'Chat Enhancer Demo';
     const channelName = 'Chat Enhancer for YouTube';
-    const streamDescription = 'A guided walkthrough of live chat translation, saved messages, quick replies, Focus mode, marked users, emojis, commands, and popup settings.';
+    const streamDescription = 'A guided walkthrough of live chat translation, saved messages, quick replies, Focus mode, bookmarks, emojis, commands, and popup settings.';
 
     const setText = (selectors, value) => {
       for (const selector of selectors) {
@@ -2919,8 +2919,8 @@ async function installLiveChatMask(chat, translationDemo) {
       return Math.abs(hash);
     };
 
-    const getMarkedUserColor = (identity) => {
-      const seed = cleanText(identity.authorName) || cleanText(identity.channelId) || 'marked-user';
+    const getBookmarkAuthorColor = (identity) => {
+      const seed = cleanText(identity.authorName) || cleanText(identity.channelId) || 'bookmark-author';
       return `hsl(${hashString(seed) % 360} 86% 58%)`;
     };
 
@@ -2953,7 +2953,7 @@ async function installLiveChatMask(chat, translationDemo) {
       ['@小林看直播', '这个镜头切得太准了。', 'That camera cut was perfectly timed.']
     ].map(([handle, message, translation]) => ({
       handle,
-      color: getMarkedUserColor({ authorName: handle }),
+      color: getBookmarkAuthorColor({ authorName: handle }),
       message,
       translation
     }));
@@ -2967,7 +2967,7 @@ async function installLiveChatMask(chat, translationDemo) {
       '@mint.frame',
       '@月光メモ'
     ].map((handle, index) => ({
-      color: getMarkedUserColor({ authorName: handle }),
+      color: getBookmarkAuthorColor({ authorName: handle }),
       handle,
       message: demoProfiles[index % demoProfiles.length].message,
       translation: demoProfiles[index % demoProfiles.length].translation
@@ -3037,35 +3037,35 @@ async function installLiveChatMask(chat, translationDemo) {
         timestamp: '3:18'
       },
       {
-        key: 'mark',
+        key: 'bookmark',
         handle: '@小林看直播',
         message: '这个镜头切得太准了。',
         translation: 'That camera cut was perfectly timed.',
         timestamp: '3:19'
       },
       {
-        key: 'after-mark-1',
+        key: 'after-bookmark-1',
         handle: '@RosaMarea',
         message: 'El público reaccionó justo a tiempo.',
         translation: 'The crowd reacted right on time.',
         timestamp: '3:20'
       },
       {
-        key: 'after-mark-2',
+        key: 'after-bookmark-2',
         handle: '@kiwi_notes',
         message: '@MikaAudio the bass sounds warmer now.',
         translation: '@MikaAudio the bass sounds warmer now.',
         timestamp: '3:21'
       },
       {
-        key: 'after-mark-3',
+        key: 'after-bookmark-3',
         handle: '@そら東京',
         message: '次の曲もこのカメラで見たい。',
         translation: 'I want to watch the next song with this camera too.',
         timestamp: '3:22'
       },
       {
-        key: 'after-mark-4',
+        key: 'after-bookmark-4',
         handle: '@LinaBerlin',
         message: 'Der zweite Sänger ist viel lauter als vorher.',
         translation: 'The second singer is much louder than before.',
@@ -3281,7 +3281,7 @@ async function installLiveChatMask(chat, translationDemo) {
 
         .ytcq-inbox-card .ytcq-demo-inbox-avatar-fallback {
           align-items: center !important;
-          background: ${getMarkedUserColor({ authorName: '@LuciaLive' })} !important;
+          background: ${getBookmarkAuthorColor({ authorName: '@LuciaLive' })} !important;
           color: #fff !important;
           display: inline-flex !important;
           font-family: Roboto, "YouTube Sans", Arial, sans-serif !important;
@@ -3550,11 +3550,11 @@ async function installLiveChatMask(chat, translationDemo) {
         });
       };
       const orderRows = (list) => {
-        const markItem = list.querySelector('.ytcq-context-item[data-ytcq-action="mark-user"]');
+        const saveItem = list.querySelector('.ytcq-context-item[data-ytcq-action="save-message"]');
         const splitItem = list.querySelector('.ytcq-context-item[data-ytcq-action="reply-actions"]');
         const nativeRows = Array.from(list.querySelectorAll('.ytcq-demo-native-menu-item'));
         nativeRows.reverse().forEach((row) => list.prepend(row));
-        if (markItem) list.insertBefore(markItem, splitItem || null);
+        if (saveItem) list.insertBefore(saveItem, splitItem || null);
         if (splitItem) list.append(splitItem);
       };
 
@@ -6000,7 +6000,7 @@ function createDemoAvatarSvg(handle) {
 }
 
 function getDemoAvatarColor(handle) {
-  return `hsl(${hashDemoString(String(handle || '').trim() || 'marked-user') % 360} 86% 58%)`;
+  return `hsl(${hashDemoString(String(handle || '').trim() || 'bookmark-author') % 360} 86% 58%)`;
 }
 
 function getVideoIdFromUrl(value) {

@@ -40,10 +40,10 @@
     "jumpToMessage": "Jump to message",
     "keywordOrPhrase": "Keyword or phrase",
     "lessThanOneMinute": "less than 1 min",
-    "markUser": "Mark",
-    "unmarkUser": "Unmark",
-    "bookmarkUser": "Bookmark",
-    "removeBookmark": "Remove bookmark",
+    "addAvatarRing": "Add avatar ring",
+    "removeAvatarRing": "Remove avatar ring",
+    "bookmarkAddedDate": "Bookmark added {date}",
+    "avatarRingAddedDate": "Avatar ring added {date}",
     "mention": "Mention",
     "mentionUser": "Mention user",
     "mentionUserTitle": "Mention user. Alt/Option-click to quote.",
@@ -290,7 +290,14 @@
     "gamesChooseOwnPiece": "Choose your piece",
     "gamesMuteSounds": "Mute game sounds",
     "gamesUnmuteSounds": "Unmute game sounds",
-    "gamesUnavailableNoticeTitle": "Unable to connect"
+    "gamesUnavailableNoticeTitle": "Unable to connect",
+    "save": "Save",
+    "remove": "Remove",
+    "saveMessage": "Save message",
+    "removeSavedMessage": "Remove saved message",
+    "savedToBookmarks": "Saved to Bookmarks",
+    "removedFromBookmarks": "Removed from Bookmarks",
+    "couldNotSaveBookmark": "Could not update Bookmarks."
   },
   "extension": {
     "close": {
@@ -428,9 +435,6 @@
     "popupResetItemUnsentDrafts": {
       "message": "Unsent drafts"
     },
-    "popupResetItemBookmarkedUsers": {
-      "message": "Bookmarked users"
-    },
     "popupResetItemPlaygroundIdentity": {
       "message": "Playground identity and display name"
     },
@@ -449,21 +453,6 @@
     "popupSections": {
       "message": "Popup sections"
     },
-    "noBookmarkedUsers": {
-      "message": "No bookmarks yet"
-    },
-    "bookmarkedUsersCount": {
-      "message": "{count} bookmarks"
-    },
-    "bookmarkedUsersEmpty": {
-      "message": "Users you bookmark from YouTube chat will appear here."
-    },
-    "markedUserDate": {
-      "message": "Bookmarked {date}"
-    },
-    "markedDateUnknown": {
-      "message": "Bookmark date unknown"
-    },
     "unknownStream": {
       "message": "Unknown stream"
     },
@@ -475,15 +464,6 @@
     },
     "openChannel": {
       "message": "Open channel"
-    },
-    "unmarkUser": {
-      "message": "Unmark"
-    },
-    "markUser": {
-      "message": "Mark"
-    },
-    "bookmarkUser": {
-      "message": "Bookmark"
     },
     "removeBookmark": {
       "message": "Remove bookmark"
@@ -547,6 +527,27 @@
     },
     "chatSkinAero": {
       "message": "Aero"
+    },
+    "popupResetItemBookmarks": {
+      "message": "Bookmarks"
+    },
+    "popupResetItemAvatarRings": {
+      "message": "Avatar rings"
+    },
+    "noBookmarks": {
+      "message": "No bookmarks yet"
+    },
+    "bookmarksCount": {
+      "message": "{count} bookmarks"
+    },
+    "bookmarksEmpty": {
+      "message": "Messages you save from YouTube chat will appear here."
+    },
+    "bookmarkMessagePostedDate": {
+      "message": "Message posted {date}"
+    },
+    "restoreBookmark": {
+      "message": "Restore bookmark"
     }
   }
 }

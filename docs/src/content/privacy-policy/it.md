@@ -38,7 +38,9 @@ I dati elencati in questa sezione sono archiviati dall’estensione nel tuo prof
 
 - **Dati degli emoji frequenti:** salvati usando l’archiviazione locale dell’estensione (`chrome.storage.local`). Includono conteggi d’uso locali e informazioni di visualizzazione emoji usate per creare la riga degli emoji frequenti.
 
-- **Dati degli utenti salvati:** salvati usando l’archiviazione locale dell’estensione (`chrome.storage.local`). Includono l’handle dell’utente salvato, l’ID canale quando disponibile e l’ora in cui il segnalibro è stato creato. Gli utenti salvati sono globali tra gli stream nel profilo browser corrente e vengono usati per mostrare anelli avatar colorati.
+- **Dati dei segnalibri:** salvati usando l’archiviazione locale dell’estensione (`chrome.storage.local`). Possono includere il testo del messaggio salvato e le informazioni per mostrare gli emoji, il nome, l’URL dell’avatar e, se disponibile, l’ID canale dell’autore, gli orari del messaggio e del salvataggio, oltre al titolo e all’URL dello stream. I segnalibri restano disponibili tra gli stream nel profilo browser corrente.
+
+- **Dati degli anelli avatar:** salvati usando l’archiviazione locale dell’estensione (`chrome.storage.local`). Includono il nome dell’autore, se disponibile l’ID canale e la data e l’ora in cui è stato aggiunto l’anello per gli utenti a cui aggiungi esplicitamente un anello dal profilo dei messaggi recenti. La selezione resta disponibile tra gli stream nel profilo browser corrente e serve solo a decorare gli avatar corrispondenti; non controlla se un utente è online.
 
 - **Bozze di chat non inviate:** salvate usando l’archiviazione locale dell’estensione (`chrome.storage.local`) per stream. Vengono ripristinate dopo un aggiornamento della pagina. Le bozze vengono rimosse quando il campo chat viene svuotato, il messaggio viene inviato o i dati dell’estensione vengono reimpostati.
 

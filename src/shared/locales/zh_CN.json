@@ -40,10 +40,10 @@
     "jumpToMessage": "跳到消息",
     "keywordOrPhrase": "关键词或短语",
     "lessThanOneMinute": "少于 1 分钟",
-    "markUser": "标记",
-    "unmarkUser": "取消",
-    "bookmarkUser": "加入书签",
-    "removeBookmark": "移除书签",
+    "addAvatarRing": "添加头像光环",
+    "removeAvatarRing": "移除头像光环",
+    "bookmarkAddedDate": "书签添加于 {date}",
+    "avatarRingAddedDate": "头像光环添加于 {date}",
     "mention": "提及",
     "mentionUser": "提及用户",
     "mentionUserTitle": "提及用户。Alt/Option 点击可引用。",
@@ -290,7 +290,14 @@
     "gamesChooseOwnPiece": "选择你的棋子",
     "gamesMuteSounds": "关闭游戏声音",
     "gamesUnmuteSounds": "开启游戏声音",
-    "gamesUnavailableNoticeTitle": "无法连接"
+    "gamesUnavailableNoticeTitle": "无法连接",
+    "save": "保存",
+    "remove": "移除",
+    "saveMessage": "保存消息",
+    "removeSavedMessage": "移除已保存的消息",
+    "savedToBookmarks": "已保存到书签",
+    "removedFromBookmarks": "已从书签移除",
+    "couldNotSaveBookmark": "无法更新书签。"
   },
   "extension": {
     "close": {
@@ -428,9 +435,6 @@
     "popupResetItemUnsentDrafts": {
       "message": "未发送草稿"
     },
-    "popupResetItemBookmarkedUsers": {
-      "message": "已加书签的用户"
-    },
     "popupResetItemPlaygroundIdentity": {
       "message": "Playground 身份和显示名称"
     },
@@ -449,21 +453,6 @@
     "popupSections": {
       "message": "弹出窗口分区"
     },
-    "noBookmarkedUsers": {
-      "message": "还没有书签"
-    },
-    "bookmarkedUsersCount": {
-      "message": "{count} 个书签"
-    },
-    "bookmarkedUsersEmpty": {
-      "message": "你从 YouTube 聊天中加入书签的用户会显示在这里。"
-    },
-    "markedUserDate": {
-      "message": "已于 {date} 加入书签"
-    },
-    "markedDateUnknown": {
-      "message": "书签日期未知"
-    },
     "unknownStream": {
       "message": "未知直播"
     },
@@ -475,15 +464,6 @@
     },
     "openChannel": {
       "message": "打开频道"
-    },
-    "unmarkUser": {
-      "message": "取消"
-    },
-    "markUser": {
-      "message": "标记"
-    },
-    "bookmarkUser": {
-      "message": "加入书签"
     },
     "removeBookmark": {
       "message": "移除书签"
@@ -547,6 +527,27 @@
     },
     "chatSkinAero": {
       "message": "Aero"
+    },
+    "popupResetItemBookmarks": {
+      "message": "书签"
+    },
+    "popupResetItemAvatarRings": {
+      "message": "头像光环"
+    },
+    "noBookmarks": {
+      "message": "还没有书签"
+    },
+    "bookmarksCount": {
+      "message": "{count} 个书签"
+    },
+    "bookmarksEmpty": {
+      "message": "你从 YouTube 聊天中保存的消息会显示在这里。"
+    },
+    "bookmarkMessagePostedDate": {
+      "message": "消息发布于 {date}"
+    },
+    "restoreBookmark": {
+      "message": "恢复书签"
     }
   }
 }

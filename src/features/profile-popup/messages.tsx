@@ -20,6 +20,7 @@ import {
   type MessageRecord
 } from '../user-message-history';
 import { canJumpToChatMessage, createJumpToMessageIcon, jumpToChatMessage } from '../message-jump';
+import { createBookmarkToggleButton } from '../bookmarks';
 import { quoteAuthorRichText } from '../reply';
 import { decorateProfileMentions } from './mentions';
 import type { ProfileSource } from './types';
@@ -68,10 +69,12 @@ export function renderProfileMessages(
       decorateProfileMentions(text);
 
       item.append(timestamp, text);
+      const saveButton = createBookmarkToggleButton(recentMessage);
       const jumpButton = canJumpToChatMessage(liveMessage, recentMessage.messageId)
         ? createJumpToMessageButton(liveMessage, recentMessage.messageId || '')
         : null;
-      if (jumpButton) item.append(jumpButton);
+      const actions = createMessageActions(saveButton, jumpButton);
+      if (actions) item.append(actions);
       list.append(item);
     });
     restoreFocusedMessageControl(list, focusedControl);
@@ -89,7 +92,7 @@ export function renderProfileMessages(
 
 interface FocusedMessageControl {
   recordId: string;
-  target: 'jump' | 'message';
+  target: 'jump' | 'message' | 'save';
 }
 
 function captureFocusedMessageControl(list: HTMLElement): FocusedMessageControl | null {
@@ -102,6 +105,9 @@ function captureFocusedMessageControl(list: HTMLElement): FocusedMessageControl 
   if (activeElement === message) return { recordId, target: 'message' };
   if (activeElement.classList.contains('ytcq-profile-card-jump')) {
     return { recordId, target: 'jump' };
+  }
+  if (activeElement.classList.contains('ytcq-bookmark-toggle')) {
+    return { recordId, target: 'save' };
   }
   return null;
 }
@@ -118,7 +124,9 @@ function restoreFocusedMessageControl(
   const target =
     focusedControl.target === 'jump'
       ? message?.querySelector<HTMLElement>('.ytcq-profile-card-jump')
-      : message;
+      : focusedControl.target === 'save'
+        ? message?.querySelector<HTMLElement>('.ytcq-bookmark-toggle')
+        : message;
   target?.focus({ preventScroll: true });
 }
 
@@ -223,7 +231,7 @@ function createJumpToMessageButton(
   const button = el<HTMLButtonElement>(
     <button
       type="button"
-      class="ytcq-profile-card-jump"
+      class="ytcq-message-row-action ytcq-profile-card-jump"
       title={t('jumpToMessage')}
       aria-label={t('jumpToMessage')}
       onClick={(event: MouseEvent) => {
@@ -236,4 +244,16 @@ function createJumpToMessageButton(
     </button>
   );
   return button;
+}
+
+function createMessageActions(
+  saveButton: HTMLButtonElement | null,
+  jumpButton: HTMLButtonElement | null
+): HTMLElement | null {
+  if (!saveButton && !jumpButton) return null;
+
+  const actions = el<HTMLSpanElement>(<span class="ytcq-profile-card-message-actions" />);
+  if (saveButton) actions.append(saveButton);
+  if (jumpButton) actions.append(jumpButton);
+  return actions;
 }

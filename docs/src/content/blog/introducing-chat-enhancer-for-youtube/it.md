@@ -36,7 +36,7 @@ La live chat di YouTube non ti avvisa quando qualcuno ti menziona. Chat Enhancer
 
 ## Più contesto sulle persone in chat
 
-Con Chat Enhancer, cliccando sull’avatar di un utente si apre un pannello profilo con i suoi messaggi recenti. Puoi anche aprire il suo canale YouTube in un popup laterale e segnare gli utenti che vuoi riconoscere più avanti.
+Fai clic sull’avatar di una persona per vedere i suoi messaggi recenti o aprire il suo canale YouTube in un pannello laterale. Da quel profilo puoi aggiungere o rimuovere un anello locale intorno all’avatar per far risaltare la persona nella chat. Puoi salvare i messaggi utili dalle righe dei messaggi recenti, della posta in arrivo e della modalità Focus, oppure dal menu dei messaggi di YouTube. Ogni segnalibro conserva il messaggio e il contesto dello stream.
 
 ## Emoji più usate
 
@@ -44,7 +44,7 @@ Chat Enhancer aggiunge una riga per le emoji più usate, così quelle che usi da
 
 ## Altri piccoli miglioramenti
 
-Ci sono anche altre funzioni pratiche: menzioni e citazioni rapide, utenti segnati, comandi chat, recupero delle bozze e altri piccoli dettagli pensati per rendere la live chat un po’ meno essenziale.
+Ci sono anche altre funzioni pratiche: menzioni e citazioni rapide, segnalibri per i messaggi, comandi chat, recupero delle bozze e altri piccoli dettagli pensati per rendere la live chat un po’ meno essenziale.
 
 Chat Enhancer for YouTube è gratuito, open-source, non richiede un account e non usa analytics.
 

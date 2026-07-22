@@ -36,7 +36,7 @@ Chat Enhancer adds an Inbox for mentions and watched keywords. If you look away 
 
 ## Better user context
 
-Click a user’s avatar to see their recent messages, open their YouTube channel in a side panel, or bookmark them for later. This makes replies easier to place and regular chatters easier to recognize.
+Click a user’s avatar to see their recent messages or open their YouTube channel in a side panel. From that profile, you can add or remove a local avatar ring to make the user stand out in chat. You can save useful messages from recent-message, Inbox, and Focus rows, or from YouTube’s message menu. Each bookmark keeps the message and stream context.
 
 ## Most-used emojis
 
@@ -44,7 +44,7 @@ Chat Enhancer adds a row for your most-used emojis, so you do not have to search
 
 ## Other small improvements
 
-Other tools include quick mentions and quotes, chat commands, and draft recovery—all designed to make the existing chat easier to use.
+Other tools include quick mentions and quotes, message bookmarks, chat commands, and draft recovery—all designed to make the existing chat easier to use.
 
 Chat Enhancer for YouTube is free, open-source, requires no account, and does not run analytics.
 

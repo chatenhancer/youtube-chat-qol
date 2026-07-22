@@ -14,7 +14,8 @@ import {
   wireScrollEdgeFades
 } from '../../shared/scroll';
 import { appendRichMessageText } from '../../youtube/rich-text';
-import { applyMarkedUserRing } from '../marked-users';
+import { applyAvatarRing } from '../avatar-rings';
+import { createBookmarkToggleButton } from '../bookmarks';
 import { canJumpToChatMessage, createJumpToMessageIcon, jumpToChatMessage } from '../message-jump';
 import { mentionAuthorName, quoteAuthorRichText } from '../reply';
 import { getChannelUrl, openChannelWindow } from '../channel-popup';
@@ -244,8 +245,10 @@ function renderInboxList(list: HTMLElement): void {
     body.append(author, spacer, text);
     if (avatar) item.append(avatar);
     item.append(timestamp, body);
+    const saveButton = createBookmarkToggleButton(record);
     const jumpButton = createInboxJumpButton(record);
-    if (jumpButton) item.append(jumpButton);
+    const actions = createInboxMessageActions(saveButton, jumpButton);
+    if (actions) item.append(actions);
     list.append(item);
   });
 }
@@ -275,11 +278,7 @@ function createInboxAvatar(record: InboxRecord): HTMLElement | null {
         </button>
       )
     : el<HTMLSpanElement>(<span class="ytcq-inbox-avatar">{avatar}</span>);
-  applyMarkedUserRing(surface, {
-    authorName: record.authorName,
-    avatarUrl: record.avatarSrc,
-    channelId: record.channelId
-  });
+  applyAvatarRing(surface, record);
   return surface;
 }
 
@@ -331,7 +330,7 @@ function createInboxJumpButton(record: InboxRecord): HTMLButtonElement | null {
   const button = el<HTMLButtonElement>(
     <button
       type="button"
-      class="ytcq-profile-card-jump"
+      class="ytcq-message-row-action ytcq-profile-card-jump"
       title={t('jumpToMessage')}
       aria-label={t('jumpToMessage')}
       onClick={(event: MouseEvent) => {
@@ -353,6 +352,18 @@ function jumpToInboxMessage(record: InboxRecord): void {
 
   jumpToChatMessage(target, record.messageId);
   closeInboxCard();
+}
+
+function createInboxMessageActions(
+  saveButton: HTMLButtonElement | null,
+  jumpButton: HTMLButtonElement | null
+): HTMLElement | null {
+  if (!saveButton && !jumpButton) return null;
+
+  const actions = el<HTMLSpanElement>(<span class="ytcq-profile-card-message-actions" />);
+  if (saveButton) actions.append(saveButton);
+  if (jumpButton) actions.append(jumpButton);
+  return actions;
 }
 
 function getInboxSubtitle(): string {

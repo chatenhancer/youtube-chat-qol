@@ -44,8 +44,16 @@ const jumpMocks = vi.hoisted(() => ({
   jumpToChatMessage: vi.fn()
 }));
 
-const markedUserMocks = vi.hoisted(() => ({
-  applyMarkedUserRing: vi.fn()
+const bookmarkMocks = vi.hoisted(() => ({
+  createBookmarkToggleButton: vi.fn(() => {
+    const button = document.createElement('button');
+    button.className = 'ytcq-bookmark-toggle';
+    return button;
+  })
+}));
+
+const avatarRingMocks = vi.hoisted(() => ({
+  applyAvatarRing: vi.fn()
 }));
 
 const channelPopupMocks = vi.hoisted(() => ({
@@ -65,7 +73,8 @@ vi.mock('./state', () => stateMocks);
 vi.mock('./keyword-panel', () => keywordPanelMocks);
 vi.mock('../reply', () => replyMocks);
 vi.mock('../message-jump', () => jumpMocks);
-vi.mock('../marked-users', () => markedUserMocks);
+vi.mock('../avatar-rings', () => avatarRingMocks);
+vi.mock('../bookmarks', () => bookmarkMocks);
 vi.mock('../channel-popup', () => channelPopupMocks);
 vi.mock('../user-message-history', () => userHistoryMocks);
 
@@ -158,6 +167,8 @@ describe('inbox card view', () => {
     expect(row.querySelector('time')?.textContent).toBe('9:30 PM');
     expect(row.querySelector<HTMLElement>('.ytcq-inbox-author')?.dir).toBe('auto');
     expect(row.querySelector('.ytcq-inbox-message-body')?.textContent).toContain('@ViewerOne hello inbox');
+    expect(row.querySelector('.ytcq-profile-card-message-actions .ytcq-bookmark-toggle')).not.toBeNull();
+    expect(bookmarkMocks.createBookmarkToggleButton).toHaveBeenCalledWith(records[0]);
 
     row.click();
     expect(replyMocks.quoteAuthorRichText).toHaveBeenCalledWith('@ViewerOne', 'hello inbox', {
@@ -189,7 +200,7 @@ describe('inbox card view', () => {
     );
   });
 
-  it('renders stored avatars for inbox rows and applies marked-user rings', () => {
+  it('renders stored avatars for inbox rows and applies selected-user ring state', () => {
     records = [record({
       authorName: '@ViewerOne',
       avatarSrc: 'https://example.com/avatar.jpg',
@@ -200,11 +211,7 @@ describe('inbox card view', () => {
 
     const avatar = document.querySelector<HTMLElement>('.ytcq-inbox-avatar')!;
     expect(avatar.querySelector('img')?.src).toBe('https://example.com/avatar.jpg');
-    expect(markedUserMocks.applyMarkedUserRing).toHaveBeenCalledWith(avatar, {
-      authorName: '@ViewerOne',
-      avatarUrl: 'https://example.com/avatar.jpg',
-      channelId: 'viewer-channel'
-    });
+    expect(avatarRingMocks.applyAvatarRing).toHaveBeenCalledWith(avatar, records[0]);
   });
 
   it('opens the channel popup from stored inbox avatars without quoting the row', () => {

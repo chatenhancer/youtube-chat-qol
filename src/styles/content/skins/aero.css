@@ -575,9 +575,9 @@
   yt-img-shadow#author-photo,
   yt-live-chat-participant-renderer yt-img-shadow,
   yt-live-chat-message-input-renderer yt-img-shadow#avatar
-).ytcq-marked-user-avatar::after {
-  background: var(--ytcq-aero-marked-avatar-frame);
-  filter: drop-shadow(0 0 4px var(--ytcq-aero-marked-avatar-glow));
+).ytcq-avatar-ring-active::after {
+  background: var(--ytcq-aero-avatar-ring-frame);
+  filter: drop-shadow(0 0 4px var(--ytcq-aero-avatar-ring-glow));
   mask: var(--ytcq-aero-avatar-frame-image) center / 100% 100% no-repeat;
   -webkit-mask: var(--ytcq-aero-avatar-frame-image) center / 100% 100% no-repeat;
 }
@@ -1578,6 +1578,18 @@
   outline: none;
 }
 
+:root[data-ytcq-chat-skin="aero"] .ytcq-profile-card-header-button:focus-visible:not(:hover) {
+  background: transparent;
+  box-shadow: none;
+  outline: 2px solid currentColor;
+  outline-offset: 1px;
+}
+
+:root[data-ytcq-chat-skin="aero"]
+  .ytcq-profile-card-header-button.ytcq-avatar-ring-toggle-active {
+  color: var(--ytcq-avatar-ring-color, #67bd3b);
+}
+
 /* Keep the feed-overlay header actions clear against both Aero glass variants. */
 :root[data-ytcq-chat-skin="aero"] .ytcq-game-overlay :where(
   .ytcq-game-overlay-close,
@@ -1768,9 +1780,9 @@
   .ytcq-inbox-avatar,
   .ytcq-games-player-avatar,
   .ytcq-bounty-hunting-claim-indicator-avatar
-).ytcq-marked-user-avatar::before {
-  background: var(--ytcq-aero-marked-avatar-frame);
-  filter: drop-shadow(0 0 4px var(--ytcq-aero-marked-avatar-glow));
+).ytcq-avatar-ring-active::before {
+  background: var(--ytcq-aero-avatar-ring-frame);
+  filter: drop-shadow(0 0 4px var(--ytcq-aero-avatar-ring-glow));
   mask: var(--ytcq-aero-avatar-frame-image) center / 100% 100% no-repeat;
   -webkit-mask: var(--ytcq-aero-avatar-frame-image) center / 100% 100% no-repeat;
 }
@@ -1781,9 +1793,8 @@
   .ytcq-inbox-avatar,
   .ytcq-games-player-avatar,
   .ytcq-bounty-hunting-claim-indicator-avatar
-).ytcq-marked-user-avatar {
+).ytcq-avatar-ring-active {
   box-shadow: none !important;
-  animation: none !important;
 }
 
 :root[data-ytcq-chat-skin="aero"] .ytcq-profile-card-avatar-button::before {
@@ -1865,25 +1876,15 @@
   color: var(--ytcq-aero-accent-strong);
 }
 
-:root[data-ytcq-chat-skin="aero"] :where(
-  .ytcq-marked-user-avatar,
-  .ytcq-marked-user-ring-animation
-) {
-  --ytcq-aero-marked-avatar-frame:
-    radial-gradient(circle at 34% 20%, color-mix(in srgb, var(--ytcq-marked-user-color, #67bd3b) 42%, white 58%) 0 18%, transparent 42%),
+:root[data-ytcq-chat-skin="aero"] .ytcq-avatar-ring-active {
+  --ytcq-aero-avatar-ring-frame:
+    radial-gradient(circle at 34% 20%, color-mix(in srgb, var(--ytcq-avatar-ring-color, #67bd3b) 42%, white 58%) 0 18%, transparent 42%),
     linear-gradient(
       180deg,
-      color-mix(in srgb, var(--ytcq-marked-user-color, #67bd3b) 70%, white 30%) 0%,
-      color-mix(in srgb, var(--ytcq-marked-user-color, #67bd3b) 88%, black 12%) 100%
+      color-mix(in srgb, var(--ytcq-avatar-ring-color, #67bd3b) 70%, white 30%) 0%,
+      color-mix(in srgb, var(--ytcq-avatar-ring-color, #67bd3b) 88%, black 12%) 100%
     );
-  --ytcq-aero-marked-avatar-glow: color-mix(in srgb, var(--ytcq-marked-user-color, #67bd3b) 42%, transparent);
-
-  color: var(--ytcq-marked-user-color, #67bd3b);
-}
-
-:root[data-ytcq-chat-skin="aero"] .ytcq-marked-user-ring-animation {
-  display: none !important;
-  animation: none !important;
+  --ytcq-aero-avatar-ring-glow: color-mix(in srgb, var(--ytcq-avatar-ring-color, #67bd3b) 42%, transparent);
 }
 
 :root[data-ytcq-chat-skin="aero"][data-ytcq-chat-skin-theme="dark"],
@@ -2669,20 +2670,15 @@
   filter: blur(6px) saturate(1.08) brightness(1.02) hue-rotate(-12deg);
 }
 
-:root[data-ytcq-chat-skin="aero"][data-ytcq-chat-skin-theme="dark"] :where(
-  .ytcq-marked-user-avatar,
-  .ytcq-marked-user-ring-animation
-) {
-  --ytcq-aero-marked-avatar-frame:
-    radial-gradient(circle at 34% 20%, color-mix(in srgb, var(--ytcq-marked-user-color, #8ad96a) 40%, white 60%) 0 18%, transparent 42%),
+:root[data-ytcq-chat-skin="aero"][data-ytcq-chat-skin-theme="dark"] .ytcq-avatar-ring-active {
+  --ytcq-aero-avatar-ring-frame:
+    radial-gradient(circle at 34% 20%, color-mix(in srgb, var(--ytcq-avatar-ring-color, #8ad96a) 40%, white 60%) 0 18%, transparent 42%),
     linear-gradient(
       180deg,
-      color-mix(in srgb, var(--ytcq-marked-user-color, #8ad96a) 72%, white 28%) 0%,
-      color-mix(in srgb, var(--ytcq-marked-user-color, #8ad96a) 84%, black 16%) 100%
+      color-mix(in srgb, var(--ytcq-avatar-ring-color, #8ad96a) 72%, white 28%) 0%,
+      color-mix(in srgb, var(--ytcq-avatar-ring-color, #8ad96a) 84%, black 16%) 100%
     );
-  --ytcq-aero-marked-avatar-glow: color-mix(in srgb, var(--ytcq-marked-user-color, #8ad96a) 48%, transparent);
-
-  color: var(--ytcq-marked-user-color, #8ad96a);
+  --ytcq-aero-avatar-ring-glow: color-mix(in srgb, var(--ytcq-avatar-ring-color, #8ad96a) 48%, transparent);
 }
 
 /* Respect platform transparency and contrast accessibility preferences. */

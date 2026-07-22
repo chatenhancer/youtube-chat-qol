@@ -20,9 +20,18 @@ const replyMocks = vi.hoisted(() => ({
   quoteAuthorRichText: vi.fn()
 }));
 
+const bookmarkMocks = vi.hoisted(() => ({
+  createBookmarkToggleButton: vi.fn(() => {
+    const button = document.createElement('button');
+    button.className = 'ytcq-bookmark-toggle';
+    return button;
+  })
+}));
+
 vi.mock('../user-message-history', () => userHistoryMocks);
 vi.mock('../message-jump', () => jumpMocks);
 vi.mock('../reply', () => replyMocks);
+vi.mock('../bookmarks', () => bookmarkMocks);
 
 import { renderProfileMessages, shouldRefreshProfileMessages } from './messages';
 
@@ -69,6 +78,8 @@ describe('profile card message renderer', () => {
     expect(item.querySelector('time')?.textContent).toBe('9:30 PM');
     expect(item.querySelector<HTMLElement>('.ytcq-profile-card-message-text')?.dir).toBe('auto');
     expect(item.querySelector('.ytcq-profile-card-message-text')?.textContent).toBe('hello from chat');
+    expect(item.querySelector('.ytcq-profile-card-message-actions .ytcq-bookmark-toggle')).not.toBeNull();
+    expect(bookmarkMocks.createBookmarkToggleButton).toHaveBeenCalledWith(recentMessage);
 
     item.click();
     expect(replyMocks.quoteAuthorRichText).toHaveBeenCalledWith('@ViewerOne', 'hello from chat', {

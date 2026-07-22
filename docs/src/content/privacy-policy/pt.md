@@ -38,7 +38,9 @@ Os dados listados nesta seção são armazenados pela extensão no seu próprio 
 
 - **Dados de emojis frequentes:** salvos usando o armazenamento local da extensão (`chrome.storage.local`). Isso inclui contagens locais de uso e informações de exibição de emoji usadas para montar a linha de emojis frequentes.
 
-- **Dados de usuários marcados:** salvos usando o armazenamento local da extensão (`chrome.storage.local`). Isso inclui o handle do usuário marcado, ID do canal quando disponível e o horário em que a marcação foi criada. Usuários marcados são globais entre streams no perfil atual do navegador e são usados para mostrar anéis coloridos no avatar.
+- **Dados dos marcadores:** salvos usando o armazenamento local da extensão (`chrome.storage.local`). Podem incluir o texto da mensagem salva e informações para exibir emojis, o nome, a URL do avatar e, quando disponível, o ID do canal do autor, os horários da mensagem e do salvamento, além do título e da URL da transmissão. Os marcadores continuam disponíveis entre streams no perfil atual do navegador.
+
+- **Dados dos anéis de avatar:** salvos usando o armazenamento local da extensão (`chrome.storage.local`). Incluem o nome do autor, quando disponível o ID do canal e a data e hora em que o anel foi adicionado para os usuários aos quais você adiciona explicitamente um anel pelo perfil de mensagens recentes. A seleção continua disponível entre streams no perfil atual do navegador e é usada apenas para decorar avatares correspondentes; ela não verifica se um usuário está online.
 
 - **Rascunhos de chat não enviados:** salvos usando o armazenamento local da extensão (`chrome.storage.local`) por stream. Eles são restaurados após uma atualização da página. Rascunhos são removidos quando a entrada de chat é limpa, a mensagem é enviada ou os dados da extensão são redefinidos.
 

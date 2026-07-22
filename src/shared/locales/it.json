@@ -40,10 +40,10 @@
     "jumpToMessage": "Vai al messaggio",
     "keywordOrPhrase": "Parola chiave o frase",
     "lessThanOneMinute": "meno di 1 min",
-    "markUser": "Contrassegna",
-    "unmarkUser": "Rimuovi",
-    "bookmarkUser": "Aggiungi segnalibro",
-    "removeBookmark": "Rimuovi segnalibro",
+    "addAvatarRing": "Aggiungi anello all’avatar",
+    "removeAvatarRing": "Rimuovi anello dall’avatar",
+    "bookmarkAddedDate": "Segnalibro aggiunto il {date}",
+    "avatarRingAddedDate": "Anello avatar aggiunto il {date}",
     "mention": "Menziona",
     "mentionUser": "Menziona utente",
     "mentionUserTitle": "Menziona utente. Alt/Option-clic per citare.",
@@ -290,7 +290,14 @@
     "gamesChooseOwnPiece": "Scegli il tuo pezzo",
     "gamesMuteSounds": "Disattiva suoni di gioco",
     "gamesUnmuteSounds": "Attiva suoni di gioco",
-    "gamesUnavailableNoticeTitle": "Impossibile connettersi"
+    "gamesUnavailableNoticeTitle": "Impossibile connettersi",
+    "save": "Salva",
+    "remove": "Rimuovi",
+    "saveMessage": "Salva messaggio",
+    "removeSavedMessage": "Rimuovi messaggio salvato",
+    "savedToBookmarks": "Salvato nei segnalibri",
+    "removedFromBookmarks": "Rimosso dai segnalibri",
+    "couldNotSaveBookmark": "Impossibile aggiornare i segnalibri."
   },
   "extension": {
     "close": {
@@ -428,9 +435,6 @@
     "popupResetItemUnsentDrafts": {
       "message": "Bozze non inviate"
     },
-    "popupResetItemBookmarkedUsers": {
-      "message": "Utenti salvati nei segnalibri"
-    },
     "popupResetItemPlaygroundIdentity": {
       "message": "Identità e nome visualizzato di Playground"
     },
@@ -449,21 +453,6 @@
     "popupSections": {
       "message": "Sezioni del popup"
     },
-    "noBookmarkedUsers": {
-      "message": "Ancora nessun segnalibro"
-    },
-    "bookmarkedUsersCount": {
-      "message": "{count} segnalibri"
-    },
-    "bookmarkedUsersEmpty": {
-      "message": "Gli utenti che aggiungi ai segnalibri dalla chat di YouTube appariranno qui."
-    },
-    "markedUserDate": {
-      "message": "Aggiunto ai segnalibri il {date}"
-    },
-    "markedDateUnknown": {
-      "message": "Data del segnalibro sconosciuta"
-    },
     "unknownStream": {
       "message": "Live sconosciuta"
     },
@@ -475,15 +464,6 @@
     },
     "openChannel": {
       "message": "Apri canale"
-    },
-    "unmarkUser": {
-      "message": "Rimuovi"
-    },
-    "markUser": {
-      "message": "Contrassegna"
-    },
-    "bookmarkUser": {
-      "message": "Aggiungi segnalibro"
     },
     "removeBookmark": {
       "message": "Rimuovi segnalibro"
@@ -547,6 +527,27 @@
     },
     "chatSkinAero": {
       "message": "Aero"
+    },
+    "popupResetItemBookmarks": {
+      "message": "Segnalibri"
+    },
+    "popupResetItemAvatarRings": {
+      "message": "Anelli avatar"
+    },
+    "noBookmarks": {
+      "message": "Ancora nessun segnalibro"
+    },
+    "bookmarksCount": {
+      "message": "{count} segnalibri"
+    },
+    "bookmarksEmpty": {
+      "message": "I messaggi salvati dalla chat di YouTube appariranno qui."
+    },
+    "bookmarkMessagePostedDate": {
+      "message": "Messaggio pubblicato il {date}"
+    },
+    "restoreBookmark": {
+      "message": "Ripristina segnalibro"
     }
   }
 }

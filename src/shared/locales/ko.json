@@ -40,10 +40,10 @@
     "jumpToMessage": "메시지로 이동",
     "keywordOrPhrase": "키워드 또는 문구",
     "lessThanOneMinute": "1분 미만",
-    "markUser": "표시",
-    "unmarkUser": "해제",
-    "bookmarkUser": "북마크",
-    "removeBookmark": "북마크 삭제",
+    "addAvatarRing": "아바타 링 추가",
+    "removeAvatarRing": "아바타 링 제거",
+    "bookmarkAddedDate": "북마크 추가: {date}",
+    "avatarRingAddedDate": "아바타 링 추가: {date}",
     "mention": "멘션",
     "mentionUser": "사용자 멘션",
     "mentionUserTitle": "사용자 멘션. Alt/Option 클릭으로 인용.",
@@ -290,7 +290,14 @@
     "gamesChooseOwnPiece": "내 말을 선택하세요",
     "gamesMuteSounds": "게임 소리 끄기",
     "gamesUnmuteSounds": "게임 소리 켜기",
-    "gamesUnavailableNoticeTitle": "연결할 수 없음"
+    "gamesUnavailableNoticeTitle": "연결할 수 없음",
+    "save": "저장",
+    "remove": "삭제",
+    "saveMessage": "메시지 저장",
+    "removeSavedMessage": "저장한 메시지 삭제",
+    "savedToBookmarks": "북마크에 저장됨",
+    "removedFromBookmarks": "북마크에서 삭제됨",
+    "couldNotSaveBookmark": "북마크를 업데이트할 수 없습니다."
   },
   "extension": {
     "close": {
@@ -425,9 +432,6 @@
     "popupResetItemUnsentDrafts": {
       "message": "보내지 않은 초안"
     },
-    "popupResetItemBookmarkedUsers": {
-      "message": "북마크한 사용자"
-    },
     "popupResetItemPlaygroundIdentity": {
       "message": "Playground ID 및 표시 이름"
     },
@@ -446,21 +450,6 @@
     "popupSections": {
       "message": "팝업 섹션"
     },
-    "noBookmarkedUsers": {
-      "message": "아직 북마크가 없습니다"
-    },
-    "bookmarkedUsersCount": {
-      "message": "북마크 {count}개"
-    },
-    "bookmarkedUsersEmpty": {
-      "message": "YouTube 채팅에서 북마크한 사용자가 여기에 표시됩니다."
-    },
-    "markedUserDate": {
-      "message": "{date}에 북마크됨"
-    },
-    "markedDateUnknown": {
-      "message": "북마크 날짜 알 수 없음"
-    },
     "unknownStream": {
       "message": "알 수 없는 스트림"
     },
@@ -472,15 +461,6 @@
     },
     "openChannel": {
       "message": "채널 열기"
-    },
-    "unmarkUser": {
-      "message": "해제"
-    },
-    "markUser": {
-      "message": "표시"
-    },
-    "bookmarkUser": {
-      "message": "북마크"
     },
     "removeBookmark": {
       "message": "북마크 삭제"
@@ -544,6 +524,27 @@
     },
     "chatSkinAero": {
       "message": "Aero"
+    },
+    "popupResetItemBookmarks": {
+      "message": "북마크"
+    },
+    "popupResetItemAvatarRings": {
+      "message": "아바타 링"
+    },
+    "noBookmarks": {
+      "message": "아직 북마크가 없습니다"
+    },
+    "bookmarksCount": {
+      "message": "북마크 {count}개"
+    },
+    "bookmarksEmpty": {
+      "message": "YouTube 채팅에서 저장한 메시지가 여기에 표시됩니다."
+    },
+    "bookmarkMessagePostedDate": {
+      "message": "메시지 게시: {date}"
+    },
+    "restoreBookmark": {
+      "message": "북마크 복원"
     }
   }
 }

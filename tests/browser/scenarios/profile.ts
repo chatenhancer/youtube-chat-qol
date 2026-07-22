@@ -6,21 +6,15 @@
  * Fixture-only update checks are exported separately.
  */
 import { expect, test, type BrowserContext, type Locator } from '@playwright/test';
-import {
-  appendMockFixtureMessage,
-  isMockPageSurface
-} from '../support/mock-page';
+import { appendMockFixtureMessage, isMockPageSurface } from '../support/mock-page';
 import { centerLocatorInViewport } from '../support/locator';
 import { cleanVisibleText, getRichVisibleText } from '../support/text';
-import {
-  NORMAL_CHAT_MESSAGE_SELECTOR,
-  type BrowserScenario,
-  type ChatSurface
-} from './types';
+import { NORMAL_CHAT_MESSAGE_SELECTOR, type BrowserScenario, type ChatSurface } from './types';
 
 export const profileCardRecentMessagesScenario: BrowserScenario = async ({ chat, context }) => {
   const source = await openStableProfileCardFromRecentMessage(chat);
   await expectProfileCardHasRecentMessages(chat, source);
+  await expectProfileAvatarRingToggle(chat, source);
   await expectProfileCardJumpToMessage(chat, source);
   await expectProfileChannelButtonOpensChannel(chat, context);
   await closeProfileCard(chat);
@@ -111,10 +105,10 @@ export const profileCardAeroOriginHighlightScenario: BrowserScenario = async ({ 
         await root.evaluate((element, value) => {
           element.setAttribute('data-ytcq-chat-skin-theme', value);
         }, theme);
-        await expect(
-          originRecord,
-          `Expected an Aero ${theme} origin-message highlight.`
-        ).toHaveCSS('box-shadow', /inset/);
+        await expect(originRecord, `Expected an Aero ${theme} origin-message highlight.`).toHaveCSS(
+          'box-shadow',
+          /inset/
+        );
       }
     } finally {
       await closeProfileCardIfPresent(chat);
@@ -253,22 +247,27 @@ async function openStableProfileCardFromRecentMessage(chat: ChatSurface): Promis
     for (let index = count - 1; index >= firstCandidate; index -= 1) {
       const targetId = await freezeProfileMessageTarget(messages.nth(index)).catch(() => '');
       if (!targetId) continue;
-      const sourceMessage = chat.locator(`[${PROFILE_TARGET_ATTRIBUTE}="${escapeCssString(targetId)}"]`).first();
+      const sourceMessage = chat
+        .locator(`[${PROFILE_TARGET_ATTRIBUTE}="${escapeCssString(targetId)}"]`)
+        .first();
       await centerLocatorInViewport(sourceMessage);
 
       const sourceBeforeClick = await readProfileMessageSource(sourceMessage, targetId);
       if (!sourceBeforeClick) continue;
 
       const avatar = sourceMessage.locator('#author-photo').first();
-      if (!await avatar.isVisible({ timeout: 500 }).catch(() => false)) continue;
+      if (!(await avatar.isVisible({ timeout: 500 }).catch(() => false))) continue;
 
       await avatar.click({ timeout: 2_000 }).catch(() => undefined);
       const profileCard = chat.locator('.ytcq-profile-card:not(.ytcq-inbox-card)');
-      if (!await profileCard.isVisible({ timeout: 5_000 }).catch(() => false)) continue;
+      if (!(await profileCard.isVisible({ timeout: 5_000 }).catch(() => false))) continue;
 
       const sourceAfterClick = await readProfileMessageSource(sourceMessage, targetId);
       const cardAuthor = cleanVisibleText(
-        await profileCard.locator('.ytcq-profile-card-title').innerText().catch(() => '')
+        await profileCard
+          .locator('.ytcq-profile-card-title')
+          .innerText()
+          .catch(() => '')
       );
       if (
         sourceAfterClick &&
@@ -285,24 +284,35 @@ async function openStableProfileCardFromRecentMessage(chat: ChatSurface): Promis
   });
 }
 
-async function readProfileMessageSource(message: Locator, targetId: string): Promise<MessageSource | null> {
-  const authorName = cleanVisibleText(await message.locator('#author-name').first().innerText().catch(() => ''));
+async function readProfileMessageSource(
+  message: Locator,
+  targetId: string
+): Promise<MessageSource | null> {
+  const authorName = cleanVisibleText(
+    await message
+      .locator('#author-name')
+      .first()
+      .innerText()
+      .catch(() => '')
+  );
   const messageText = await getRichVisibleText(message.locator('#message').first()).catch(() => '');
   if (!authorName || !messageText || !hasMeaningfulText(messageText)) return null;
 
-  const channelId = await message.evaluate((element) => {
-    const author = element.querySelector('#author-name');
-    const link = author?.closest('a[href]') || element.querySelector('a[href*="/channel/"]');
-    const href = link?.getAttribute('href') || '';
-    try {
-      const url = new URL(href, 'https://www.youtube.com');
-      const [kind, id] = url.pathname.split('/').filter(Boolean);
-      return kind === 'channel' ? id : '';
-    } catch {
-      return '';
-    }
-  }).catch(() => '');
-  const messageId = await message.getAttribute('id').catch(() => '') || '';
+  const channelId = await message
+    .evaluate((element) => {
+      const author = element.querySelector('#author-name');
+      const link = author?.closest('a[href]') || element.querySelector('a[href*="/channel/"]');
+      const href = link?.getAttribute('href') || '';
+      try {
+        const url = new URL(href, 'https://www.youtube.com');
+        const [kind, id] = url.pathname.split('/').filter(Boolean);
+        return kind === 'channel' ? id : '';
+      } catch {
+        return '';
+      }
+    })
+    .catch(() => '');
+  const messageId = (await message.getAttribute('id').catch(() => '')) || '';
 
   return {
     authorName,
@@ -315,29 +325,39 @@ async function readProfileMessageSource(message: Locator, targetId: string): Pro
 
 async function freezeProfileMessageTarget(message: Locator): Promise<string> {
   const targetId = `profile-card-${Date.now()}-${nextProfileTargetId++}`;
-  const didFreeze = await message.evaluate((element, { attribute, value }) => {
-    if (!(element instanceof HTMLElement) || !element.isConnected) return false;
-    element.setAttribute(attribute, value);
-    return true;
-  }, {
-    attribute: PROFILE_TARGET_ATTRIBUTE,
-    value: targetId
-  });
+  const didFreeze = await message.evaluate(
+    (element, { attribute, value }) => {
+      if (!(element instanceof HTMLElement) || !element.isConnected) return false;
+      element.setAttribute(attribute, value);
+      return true;
+    },
+    {
+      attribute: PROFILE_TARGET_ATTRIBUTE,
+      value: targetId
+    }
+  );
 
-  if (!didFreeze) throw new Error('Could not stabilize the live chat profile target before clicking it.');
+  if (!didFreeze)
+    throw new Error('Could not stabilize the live chat profile target before clicking it.');
   return targetId;
 }
 
 function isSameProfileMessageSource(first: MessageSource, second: MessageSource): boolean {
-  const messageIdMatches = !first.messageId || !second.messageId || first.messageId === second.messageId;
-  return messageIdMatches &&
+  const messageIdMatches =
+    !first.messageId || !second.messageId || first.messageId === second.messageId;
+  return (
+    messageIdMatches &&
     first.authorName === second.authorName &&
     first.channelId === second.channelId &&
     first.messageText === second.messageText &&
-    first.targetId === second.targetId;
+    first.targetId === second.targetId
+  );
 }
 
-async function expectProfileCardHasRecentMessages(chat: ChatSurface, source: MessageSource): Promise<void> {
+async function expectProfileCardHasRecentMessages(
+  chat: ChatSurface,
+  source: MessageSource
+): Promise<void> {
   await test.step('Verify profile card shows recent messages for the clicked author', async () => {
     const profileCard = chat.locator('.ytcq-profile-card:not(.ytcq-inbox-card)');
     await expect(profileCard.locator('.ytcq-profile-card-title')).toContainText(source.authorName);
@@ -345,7 +365,40 @@ async function expectProfileCardHasRecentMessages(chat: ChatSurface, source: Mes
   });
 }
 
-async function appendAuthorMessageAndVerifyProfileCardUpdates(chat: ChatSurface, source: MessageSource): Promise<void> {
+async function expectProfileAvatarRingToggle(
+  chat: ChatSurface,
+  source: MessageSource
+): Promise<void> {
+  await test.step('Add and remove an avatar ring from the profile header', async () => {
+    const profileCard = chat.locator('.ytcq-profile-card:not(.ytcq-inbox-card)');
+    const toggle = profileCard.locator('.ytcq-avatar-ring-toggle');
+    const sourceAvatar = getSourceMessage(chat, source).locator('#author-photo').first();
+
+    await expect(toggle).toHaveAttribute('aria-pressed', 'false');
+    await toggle.click();
+    await expect(toggle).toHaveAttribute('aria-pressed', 'true');
+    await expect(toggle).toHaveAttribute('title', /Remove avatar ring\nAvatar ring added .+/);
+    await expect(sourceAvatar).toHaveClass(/ytcq-avatar-ring-active/);
+
+    await profileCard.locator('.ytcq-profile-card-title').hover();
+    await expect
+      .poll(() => toggle.evaluate((element) => getComputedStyle(element).backgroundColor))
+      .toBe('rgba(0, 0, 0, 0)');
+    await toggle.hover();
+    await expect
+      .poll(() => toggle.evaluate((element) => getComputedStyle(element).backgroundColor))
+      .not.toBe('rgba(0, 0, 0, 0)');
+
+    await toggle.click();
+    await expect(toggle).toHaveAttribute('aria-pressed', 'false');
+    await expect(sourceAvatar).not.toHaveClass(/ytcq-avatar-ring-active/);
+  });
+}
+
+async function appendAuthorMessageAndVerifyProfileCardUpdates(
+  chat: ChatSurface,
+  source: MessageSource
+): Promise<void> {
   await test.step('Append a new author message and verify the card updates', async () => {
     const text = `Profile follow-up ${Date.now()}`;
     await appendMockFixtureMessage(chat, {
@@ -354,9 +407,14 @@ async function appendAuthorMessageAndVerifyProfileCardUpdates(chat: ChatSurface,
       text
     });
 
-    await expect(chat.locator('.ytcq-profile-card:not(.ytcq-inbox-card) .ytcq-profile-card-message').filter({
-      hasText: text
-    }).first()).toBeVisible({ timeout: 10_000 });
+    await expect(
+      chat
+        .locator('.ytcq-profile-card:not(.ytcq-inbox-card) .ytcq-profile-card-message')
+        .filter({
+          hasText: text
+        })
+        .first()
+    ).toBeVisible({ timeout: 10_000 });
   });
 }
 
@@ -367,11 +425,13 @@ async function expectProfileChannelButtonOpensChannel(
   const youtubeProfileUrlPattern = '**://www.youtube.com/**';
   await test.step('Click profile channel button and verify it opens YouTube', async () => {
     if (isMockPageSurface(chat)) {
-      await context.route(youtubeProfileUrlPattern, (route) => route.fulfill({
-        body: '<!doctype html><title>Mock channel</title>',
-        contentType: 'text/html',
-        status: 200
-      }));
+      await context.route(youtubeProfileUrlPattern, (route) =>
+        route.fulfill({
+          body: '<!doctype html><title>Mock channel</title>',
+          contentType: 'text/html',
+          status: 200
+        })
+      );
     }
 
     try {
@@ -380,10 +440,12 @@ async function expectProfileChannelButtonOpensChannel(
       const popup = await popupPromise;
 
       try {
-        await expect.poll(async () => getOpenedProfileUrl(popup.url()), {
-          message: 'Profile channel button should open the selected author channel.',
-          timeout: isMockPageSurface(chat) ? 5_000 : 15_000
-        }).toMatch(/^https:\/\/www\.youtube\.com\/(?:@|channel\/)/);
+        await expect
+          .poll(async () => getOpenedProfileUrl(popup.url()), {
+            message: 'Profile channel button should open the selected author channel.',
+            timeout: isMockPageSurface(chat) ? 5_000 : 15_000
+          })
+          .toMatch(/^https:\/\/www\.youtube\.com\/(?:@|channel\/)/);
       } finally {
         await popup.close().catch(() => undefined);
       }
@@ -395,7 +457,10 @@ async function expectProfileChannelButtonOpensChannel(
   });
 }
 
-async function expectProfileCardJumpToMessage(chat: ChatSurface, source: MessageSource): Promise<void> {
+async function expectProfileCardJumpToMessage(
+  chat: ChatSurface,
+  source: MessageSource
+): Promise<void> {
   await test.step('Jump from profile card record back to the live message', async () => {
     const sourceMessage = getSourceMessage(chat, source);
     const record = await getProfileCardRecord(chat, source);
@@ -411,16 +476,24 @@ async function expectProfileCardJumpToMessage(chat: ChatSurface, source: Message
 
 async function getProfileCardRecord(chat: ChatSurface, source: MessageSource): Promise<Locator> {
   if (source.messageId) {
-    const liveMessageRecord = chat.locator(`.ytcq-profile-card:not(.ytcq-inbox-card) .ytcq-profile-card-message[data-ytcq-live-message-id="${escapeCssString(source.messageId)}"]`).first();
+    const liveMessageRecord = chat
+      .locator(
+        `.ytcq-profile-card:not(.ytcq-inbox-card) .ytcq-profile-card-message[data-ytcq-live-message-id="${escapeCssString(source.messageId)}"]`
+      )
+      .first();
     if (await liveMessageRecord.count()) return liveMessageRecord;
   }
 
-  const records = chat.locator('.ytcq-profile-card:not(.ytcq-inbox-card) .ytcq-profile-card-message');
+  const records = chat.locator(
+    '.ytcq-profile-card:not(.ytcq-inbox-card) .ytcq-profile-card-message'
+  );
 
-  await expect.poll(async () => findProfileCardRecordIndex(records, source.messageText), {
-    message: 'Profile card should contain the exact recent message record.',
-    timeout: 10_000
-  }).toBeGreaterThanOrEqual(0);
+  await expect
+    .poll(async () => findProfileCardRecordIndex(records, source.messageText), {
+      message: 'Profile card should contain the exact recent message record.',
+      timeout: 10_000
+    })
+    .toBeGreaterThanOrEqual(0);
 
   const index = await findProfileCardRecordIndex(records, source.messageText);
   return records.nth(index);
@@ -430,9 +503,12 @@ async function findProfileCardRecordIndex(records: Locator, expectedText: string
   const count = await records.count();
 
   for (let index = 0; index < count; index += 1) {
-    const text = await getRichVisibleText(records.nth(index).locator('.ytcq-profile-card-message-text').first(), {
-      ignoredSelector: '.ytcq-translation, .ytcq-replaced-translation-icon'
-    }).catch(() => '');
+    const text = await getRichVisibleText(
+      records.nth(index).locator('.ytcq-profile-card-message-text').first(),
+      {
+        ignoredSelector: '.ytcq-translation, .ytcq-replaced-translation-icon'
+      }
+    ).catch(() => '');
     if (text === expectedText) return index;
   }
 
@@ -449,26 +525,42 @@ async function closeProfileCard(chat: ChatSurface): Promise<void> {
 
 async function closeProfileCardIfPresent(chat: ChatSurface): Promise<void> {
   const profileCard = chat.locator('.ytcq-profile-card:not(.ytcq-inbox-card)');
-  if (!await profileCard.isVisible({ timeout: 500 }).catch(() => false)) return;
+  if (!(await profileCard.isVisible({ timeout: 500 }).catch(() => false))) return;
 
-  await profileCard.locator('.ytcq-profile-card-close').click().catch(() => undefined);
-  await expect(profileCard).toHaveCount(0, { timeout: 2_000 }).catch(() => undefined);
+  await profileCard
+    .locator('.ytcq-profile-card-close')
+    .click()
+    .catch(() => undefined);
+  await expect(profileCard)
+    .toHaveCount(0, { timeout: 2_000 })
+    .catch(() => undefined);
 }
 
-function getSourceMessage(chat: ChatSurface, source: MessageSource): ReturnType<ChatSurface['locator']> {
+function getSourceMessage(
+  chat: ChatSurface,
+  source: MessageSource
+): ReturnType<ChatSurface['locator']> {
   if (source.targetId) {
-    return chat.locator(`[${PROFILE_TARGET_ATTRIBUTE}="${escapeCssString(source.targetId)}"]`).first();
+    return chat
+      .locator(`[${PROFILE_TARGET_ATTRIBUTE}="${escapeCssString(source.targetId)}"]`)
+      .first();
   }
 
   if (source.messageId) {
-    return chat.locator(`${NORMAL_CHAT_MESSAGE_SELECTOR}[id="${escapeCssString(source.messageId)}"]`).first();
+    return chat
+      .locator(`${NORMAL_CHAT_MESSAGE_SELECTOR}[id="${escapeCssString(source.messageId)}"]`)
+      .first();
   }
 
-  return chat.locator(NORMAL_CHAT_MESSAGE_SELECTOR).filter({
-    has: chat.locator('#author-name').filter({ hasText: source.authorName })
-  }).filter({
-    has: chat.locator('#message').filter({ hasText: source.messageText })
-  }).last();
+  return chat
+    .locator(NORMAL_CHAT_MESSAGE_SELECTOR)
+    .filter({
+      has: chat.locator('#author-name').filter({ hasText: source.authorName })
+    })
+    .filter({
+      has: chat.locator('#message').filter({ hasText: source.messageText })
+    })
+    .last();
 }
 
 function hasMeaningfulText(value: string): boolean {

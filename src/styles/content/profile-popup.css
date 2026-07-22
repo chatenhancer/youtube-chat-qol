@@ -1,5 +1,5 @@
 /*
- * Recent-message profile card, bookmark affordances, and profile card actions.
+ * Recent-message profile card, avatar rings, bookmark affordances, and row actions.
  */
 .ytcq-profile-card {
   --ytcq-profile-card-padding: 12px;
@@ -207,131 +207,39 @@
   height: 16px;
 }
 
-.ytcq-marked-user-toggle svg {
-  width: 17px;
-  height: 16px;
+.ytcq-avatar-ring-toggle svg {
+  width: 19px;
+  height: 19px;
 }
 
-.ytcq-profile-card-header-button:hover,
-.ytcq-profile-card-header-button:focus {
+.ytcq-profile-card-header-button:hover {
   color: var(--yt-spec-text-primary, var(--yt-live-chat-primary-text-color, #f1f1f1));
   background: var(--ytcq-hover-background);
+}
+
+.ytcq-profile-card-header-button:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 1px;
+}
+
+.ytcq-profile-card-header-button:focus:not(:focus-visible) {
   outline: none;
 }
 
-.ytcq-markable-user-avatar {
-  border-radius: 50%;
+.ytcq-profile-card-header-button.ytcq-avatar-ring-toggle-active {
+  color: var(--ytcq-avatar-ring-color, var(--yt-spec-call-to-action, #3ea6ff));
 }
 
-.ytcq-marked-user-avatar {
-  box-shadow: 0 0 0 2px var(--ytcq-marked-user-color, #3ea6ff);
+.ytcq-avatar-ring-target {
+  border-radius: 50%;
+  transition: box-shadow 160ms ease;
+}
+
+.ytcq-avatar-ring-active {
+  box-shadow: 0 0 0 2px var(--ytcq-avatar-ring-color, #3ea6ff);
   box-shadow:
-    0 0 0 2px var(--ytcq-marked-user-color, #3ea6ff),
-    0 0 0 4px color-mix(in srgb, var(--ytcq-marked-user-color, #3ea6ff) 22%, transparent),
-    0 0 10px color-mix(in srgb, var(--ytcq-marked-user-color, #3ea6ff) 42%, transparent);
-  animation: ytcq-marked-user-ring-pulse 2.8s ease-in-out infinite;
-}
-
-.ytcq-marked-user-avatar.ytcq-marked-user-avatar-entering {
-  box-shadow: none;
-  animation: none;
-}
-
-.ytcq-marked-user-ring-host {
-  position: relative;
-  overflow: visible;
-}
-
-.ytcq-marked-user-ring-animation-host {
-  position: relative;
-}
-
-.ytcq-marked-user-ring-animation {
-  position: absolute;
-  inset: -4px;
-  z-index: 1;
-  pointer-events: none;
-  border-radius: 50%;
-  color: var(--ytcq-marked-user-color, #3ea6ff);
-  transform: translateZ(0);
-}
-
-.ytcq-marked-user-ring-animation-positioned {
-  inset: auto;
-}
-
-.ytcq-marked-user-ring-animation svg {
-  display: block;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-  transform: rotate(-90deg);
-}
-
-.ytcq-marked-user-ring-animation circle {
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 6;
-  stroke-linecap: round;
-  stroke-dasharray: 100;
-  filter: drop-shadow(0 0 3px currentColor);
-}
-
-.ytcq-marked-user-ring-animation-enter circle {
-  animation: ytcq-marked-user-ring-enter 440ms cubic-bezier(0.2, 0, 0, 1) forwards;
-}
-
-.ytcq-marked-user-ring-animation-exit circle {
-  animation: ytcq-marked-user-ring-exit 360ms cubic-bezier(0.4, 0, 1, 1) forwards;
-}
-
-@keyframes ytcq-marked-user-ring-enter {
-  from {
-    opacity: 0.55;
-    stroke-dashoffset: 100;
-  }
-
-  to {
-    opacity: 1;
-    stroke-dashoffset: 0;
-  }
-}
-
-@keyframes ytcq-marked-user-ring-exit {
-  from {
-    opacity: 1;
-    stroke-dashoffset: 0;
-  }
-
-  to {
-    opacity: 0;
-    stroke-dashoffset: -100;
-  }
-}
-
-@keyframes ytcq-marked-user-ring-pulse {
-  0%,
-  100% {
-    box-shadow:
-      0 0 0 2px var(--ytcq-marked-user-color, #3ea6ff),
-      0 0 0 4px color-mix(in srgb, var(--ytcq-marked-user-color, #3ea6ff) 20%, transparent),
-      0 0 8px color-mix(in srgb, var(--ytcq-marked-user-color, #3ea6ff) 34%, transparent);
-  }
-
-  48% {
-    box-shadow:
-      0 0 0 2px var(--ytcq-marked-user-color, #3ea6ff),
-      0 0 0 5px color-mix(in srgb, var(--ytcq-marked-user-color, #3ea6ff) 28%, transparent),
-      0 0 13px color-mix(in srgb, var(--ytcq-marked-user-color, #3ea6ff) 50%, transparent);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .ytcq-marked-user-avatar,
-  .ytcq-marked-user-ring-animation-enter circle,
-  .ytcq-marked-user-ring-animation-exit circle {
-    animation: none;
-  }
+    0 0 0 2px var(--ytcq-avatar-ring-color, #3ea6ff),
+    0 0 0 4px color-mix(in srgb, var(--ytcq-avatar-ring-color, #3ea6ff) 22%, transparent);
 }
 
 .ytcq-inbox-keyword-toggle {
@@ -383,7 +291,7 @@
   column-gap: 8px;
   align-items: start;
   position: relative;
-  padding: 6px 36px 6px 9px;
+  padding: 6px 66px 6px 9px;
   border-radius: 6px;
   color: var(--yt-spec-text-primary, var(--yt-live-chat-primary-text-color, #f1f1f1));
   background:
@@ -471,10 +379,28 @@ button.ytcq-inbox-avatar:focus .ytcq-inbox-avatar-open-icon {
   outline: none;
 }
 
-.ytcq-profile-card-jump {
+.ytcq-profile-card-message-actions {
   position: absolute;
   top: 1px;
   right: 2px;
+  display: inline-flex;
+  pointer-events: auto;
+}
+
+.ytcq-profile-card-message-actions .ytcq-bookmark-toggle,
+.ytcq-profile-card-message-actions .ytcq-profile-card-jump {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.ytcq-profile-card-message:hover .ytcq-message-row-action,
+.ytcq-profile-card-message:focus-within .ytcq-message-row-action {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.ytcq-message-row-action {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -486,14 +412,12 @@ button.ytcq-inbox-avatar:focus .ytcq-inbox-avatar-open-icon {
   color: var(--yt-live-chat-secondary-text-color, var(--yt-spec-text-secondary, #aaa));
   background: transparent;
   cursor: pointer;
-  opacity: 0;
-  pointer-events: none;
   transition:
     color 120ms ease,
     opacity 120ms ease;
 }
 
-.ytcq-profile-card-jump::before {
+.ytcq-message-row-action::before {
   position: absolute;
   inset: 4px;
   border-radius: inherit;
@@ -503,24 +427,19 @@ button.ytcq-inbox-avatar:focus .ytcq-inbox-avatar-open-icon {
   transition: background-color 120ms ease;
 }
 
-.ytcq-profile-card-message:hover .ytcq-profile-card-jump,
-.ytcq-profile-card-message:focus-within .ytcq-profile-card-jump {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.ytcq-profile-card-jump:hover,
-.ytcq-profile-card-jump:focus {
+.ytcq-message-row-action:hover,
+.ytcq-message-row-action:focus,
+.ytcq-bookmark-toggle-active {
   color: var(--yt-spec-call-to-action, #3ea6ff);
   outline: none;
 }
 
-.ytcq-profile-card-jump:hover::before,
-.ytcq-profile-card-jump:focus::before {
+.ytcq-message-row-action:hover::before,
+.ytcq-message-row-action:focus::before {
   background: rgba(62, 166, 255, 0.18);
 }
 
-.ytcq-profile-card-jump svg {
+.ytcq-message-row-action svg {
   position: relative;
   z-index: 1;
   display: block;

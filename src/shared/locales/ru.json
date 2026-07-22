@@ -40,10 +40,10 @@
     "jumpToMessage": "Перейти к сообщению",
     "keywordOrPhrase": "Ключевое слово или фраза",
     "lessThanOneMinute": "меньше 1 мин",
-    "markUser": "Отметить",
-    "unmarkUser": "Снять",
-    "bookmarkUser": "Добавить в закладки",
-    "removeBookmark": "Удалить из закладок",
+    "addAvatarRing": "Добавить кольцо аватара",
+    "removeAvatarRing": "Убрать кольцо аватара",
+    "bookmarkAddedDate": "Закладка добавлена {date}",
+    "avatarRingAddedDate": "Кольцо аватара добавлено {date}",
     "mention": "Упомянуть",
     "mentionUser": "Упомянуть пользователя",
     "mentionUserTitle": "Упомянуть пользователя. Alt/Option-клик, чтобы процитировать.",
@@ -290,7 +290,14 @@
     "gamesChooseOwnPiece": "Выберите свою фигуру",
     "gamesMuteSounds": "Отключить звуки игры",
     "gamesUnmuteSounds": "Включить звуки игры",
-    "gamesUnavailableNoticeTitle": "Не удалось подключиться"
+    "gamesUnavailableNoticeTitle": "Не удалось подключиться",
+    "save": "Сохранить",
+    "remove": "Удалить",
+    "saveMessage": "Сохранить сообщение",
+    "removeSavedMessage": "Удалить сохранённое сообщение",
+    "savedToBookmarks": "Сохранено в закладки",
+    "removedFromBookmarks": "Удалено из закладок",
+    "couldNotSaveBookmark": "Не удалось обновить закладки."
   },
   "extension": {
     "close": {
@@ -428,9 +435,6 @@
     "popupResetItemUnsentDrafts": {
       "message": "Неотправленные черновики"
     },
-    "popupResetItemBookmarkedUsers": {
-      "message": "Пользователи в закладках"
-    },
     "popupResetItemPlaygroundIdentity": {
       "message": "Идентификатор и отображаемое имя Playground"
     },
@@ -449,21 +453,6 @@
     "popupSections": {
       "message": "Разделы всплывающего окна"
     },
-    "noBookmarkedUsers": {
-      "message": "Закладок пока нет"
-    },
-    "bookmarkedUsersCount": {
-      "message": "{count} закладок"
-    },
-    "bookmarkedUsersEmpty": {
-      "message": "Пользователи, которых вы добавите в закладки из чата YouTube, появятся здесь."
-    },
-    "markedUserDate": {
-      "message": "Добавлено в закладки {date}"
-    },
-    "markedDateUnknown": {
-      "message": "Дата закладки неизвестна"
-    },
     "unknownStream": {
       "message": "Неизвестная трансляция"
     },
@@ -475,15 +464,6 @@
     },
     "openChannel": {
       "message": "Открыть канал"
-    },
-    "unmarkUser": {
-      "message": "Снять"
-    },
-    "markUser": {
-      "message": "Отметить"
-    },
-    "bookmarkUser": {
-      "message": "Добавить в закладки"
     },
     "removeBookmark": {
       "message": "Удалить из закладок"
@@ -547,6 +527,27 @@
     },
     "chatSkinAero": {
       "message": "Aero"
+    },
+    "popupResetItemBookmarks": {
+      "message": "Закладки"
+    },
+    "popupResetItemAvatarRings": {
+      "message": "Кольца аватаров"
+    },
+    "noBookmarks": {
+      "message": "Закладок пока нет"
+    },
+    "bookmarksCount": {
+      "message": "{count} закладок"
+    },
+    "bookmarksEmpty": {
+      "message": "Сообщения, сохранённые из чата YouTube, появятся здесь."
+    },
+    "bookmarkMessagePostedDate": {
+      "message": "Сообщение отправлено {date}"
+    },
+    "restoreBookmark": {
+      "message": "Восстановить закладку"
     }
   }
 }

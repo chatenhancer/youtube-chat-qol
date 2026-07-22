@@ -40,10 +40,10 @@
     "jumpToMessage": "メッセージへ移動",
     "keywordOrPhrase": "キーワードまたはフレーズ",
     "lessThanOneMinute": "1分未満",
-    "markUser": "マーク",
-    "unmarkUser": "解除",
-    "bookmarkUser": "ブックマーク",
-    "removeBookmark": "ブックマーク解除",
+    "addAvatarRing": "アバターリングを追加",
+    "removeAvatarRing": "アバターリングを削除",
+    "bookmarkAddedDate": "{date} にブックマークを追加",
+    "avatarRingAddedDate": "{date} にアバターリングを追加",
     "mention": "メンション",
     "mentionUser": "ユーザーをメンション",
     "mentionUserTitle": "ユーザーをメンション。Alt/Option クリックで引用。",
@@ -290,7 +290,14 @@
     "gamesChooseOwnPiece": "自分の駒を選んでください",
     "gamesMuteSounds": "ゲーム音をミュート",
     "gamesUnmuteSounds": "ゲーム音のミュート解除",
-    "gamesUnavailableNoticeTitle": "接続できません"
+    "gamesUnavailableNoticeTitle": "接続できません",
+    "save": "保存",
+    "remove": "削除",
+    "saveMessage": "メッセージを保存",
+    "removeSavedMessage": "保存したメッセージを削除",
+    "savedToBookmarks": "ブックマークに保存しました",
+    "removedFromBookmarks": "ブックマークから削除しました",
+    "couldNotSaveBookmark": "ブックマークを更新できませんでした。"
   },
   "extension": {
     "close": {
@@ -428,9 +435,6 @@
     "popupResetItemUnsentDrafts": {
       "message": "未送信の下書き"
     },
-    "popupResetItemBookmarkedUsers": {
-      "message": "ブックマークしたユーザー"
-    },
     "popupResetItemPlaygroundIdentity": {
       "message": "Playground の ID と表示名"
     },
@@ -449,21 +453,6 @@
     "popupSections": {
       "message": "ポップアップのセクション"
     },
-    "noBookmarkedUsers": {
-      "message": "ブックマークはまだありません"
-    },
-    "bookmarkedUsersCount": {
-      "message": "{count} 件のブックマーク"
-    },
-    "bookmarkedUsersEmpty": {
-      "message": "YouTube チャットでブックマークしたユーザーがここに表示されます。"
-    },
-    "markedUserDate": {
-      "message": "{date} にブックマーク"
-    },
-    "markedDateUnknown": {
-      "message": "ブックマーク日時不明"
-    },
     "unknownStream": {
       "message": "不明な配信"
     },
@@ -475,15 +464,6 @@
     },
     "openChannel": {
       "message": "チャンネルを開く"
-    },
-    "unmarkUser": {
-      "message": "解除"
-    },
-    "markUser": {
-      "message": "マーク"
-    },
-    "bookmarkUser": {
-      "message": "ブックマーク"
     },
     "removeBookmark": {
       "message": "ブックマーク解除"
@@ -547,6 +527,27 @@
     },
     "chatSkinAero": {
       "message": "Aero"
+    },
+    "popupResetItemBookmarks": {
+      "message": "ブックマーク"
+    },
+    "popupResetItemAvatarRings": {
+      "message": "アバターリング"
+    },
+    "noBookmarks": {
+      "message": "ブックマークはまだありません"
+    },
+    "bookmarksCount": {
+      "message": "{count} 件のブックマーク"
+    },
+    "bookmarksEmpty": {
+      "message": "YouTube チャットから保存したメッセージがここに表示されます。"
+    },
+    "bookmarkMessagePostedDate": {
+      "message": "{date} にメッセージを投稿"
+    },
+    "restoreBookmark": {
+      "message": "ブックマークを復元"
     }
   }
 }

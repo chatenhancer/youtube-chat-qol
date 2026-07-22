@@ -40,10 +40,10 @@
     "jumpToMessage": "Mesaja git",
     "keywordOrPhrase": "Anahtar kelime veya ifade",
     "lessThanOneMinute": "1 dakikadan az",
-    "markUser": "İşaretle",
-    "unmarkUser": "Kaldır",
-    "bookmarkUser": "Yer işaretine ekle",
-    "removeBookmark": "Yer işaretini kaldır",
+    "addAvatarRing": "Avatar halkası ekle",
+    "removeAvatarRing": "Avatar halkasını kaldır",
+    "bookmarkAddedDate": "Yer işareti {date} tarihinde eklendi",
+    "avatarRingAddedDate": "Avatar halkası {date} tarihinde eklendi",
     "mention": "Bahset",
     "mentionUser": "Kullanıcıdan bahset",
     "mentionUserTitle": "Kullanıcıdan bahset. Alıntı yapmak için Alt/Option-tıkla.",
@@ -290,7 +290,14 @@
     "gamesChooseOwnPiece": "Kendi taşını seç",
     "gamesMuteSounds": "Oyun seslerini kapat",
     "gamesUnmuteSounds": "Oyun seslerini aç",
-    "gamesUnavailableNoticeTitle": "Bağlanılamıyor"
+    "gamesUnavailableNoticeTitle": "Bağlanılamıyor",
+    "save": "Kaydet",
+    "remove": "Kaldır",
+    "saveMessage": "Mesajı kaydet",
+    "removeSavedMessage": "Kaydedilen mesajı kaldır",
+    "savedToBookmarks": "Yer İşaretlerine kaydedildi",
+    "removedFromBookmarks": "Yer İşaretlerinden kaldırıldı",
+    "couldNotSaveBookmark": "Yer işaretleri güncellenemedi."
   },
   "extension": {
     "close": {
@@ -428,9 +435,6 @@
     "popupResetItemUnsentDrafts": {
       "message": "Gönderilmemiş taslaklar"
     },
-    "popupResetItemBookmarkedUsers": {
-      "message": "Yer imi eklenen kullanıcılar"
-    },
     "popupResetItemPlaygroundIdentity": {
       "message": "Playground kimliği ve görünen adı"
     },
@@ -449,21 +453,6 @@
     "popupSections": {
       "message": "Açılır pencere bölümleri"
     },
-    "noBookmarkedUsers": {
-      "message": "Henüz yer imi yok"
-    },
-    "bookmarkedUsersCount": {
-      "message": "{count} yer imi"
-    },
-    "bookmarkedUsersEmpty": {
-      "message": "YouTube sohbetinden yer işaretine eklediğiniz kullanıcılar burada görünür."
-    },
-    "markedUserDate": {
-      "message": "{date} tarihinde yer işaretine eklendi"
-    },
-    "markedDateUnknown": {
-      "message": "Yer işareti tarihi bilinmiyor"
-    },
     "unknownStream": {
       "message": "Bilinmeyen yayın"
     },
@@ -475,15 +464,6 @@
     },
     "openChannel": {
       "message": "Kanalı aç"
-    },
-    "unmarkUser": {
-      "message": "Kaldır"
-    },
-    "markUser": {
-      "message": "İşaretle"
-    },
-    "bookmarkUser": {
-      "message": "Yer işaretine ekle"
     },
     "removeBookmark": {
       "message": "Yer işaretini kaldır"
@@ -547,6 +527,27 @@
     },
     "chatSkinAero": {
       "message": "Aero"
+    },
+    "popupResetItemBookmarks": {
+      "message": "Yer imleri"
+    },
+    "popupResetItemAvatarRings": {
+      "message": "Avatar halkaları"
+    },
+    "noBookmarks": {
+      "message": "Henüz yer imi yok"
+    },
+    "bookmarksCount": {
+      "message": "{count} yer imi"
+    },
+    "bookmarksEmpty": {
+      "message": "YouTube sohbetinden kaydettiğiniz mesajlar burada görünür."
+    },
+    "bookmarkMessagePostedDate": {
+      "message": "Mesaj {date} tarihinde gönderildi"
+    },
+    "restoreBookmark": {
+      "message": "Yer işaretini geri yükle"
     }
   }
 }

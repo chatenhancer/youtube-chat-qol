@@ -22,6 +22,8 @@ export function createFocusRecordFromHistory(
 
   return {
     authorName: record.authorName,
+    avatarSrc: record.avatarSrc,
+    channelId: record.channelId,
     contentParts: record.contentParts,
     historyKey: getUserKeyFromIdentity(record),
     id: record.id,
@@ -29,6 +31,7 @@ export function createFocusRecordFromHistory(
     messageRef: record.messageRef,
     side: currentAuthor ? 'us' : 'them',
     text: record.text,
+    timestamp: record.timestamp,
     timestampText: record.timestampText,
     translation: record.translation
   };

@@ -36,7 +36,7 @@ Der YouTube-Livechat sagt dir nicht Bescheid, wenn dich jemand erwähnt. Chat En
 
 ## Besserer Nutzerkontext
 
-Mit Chat Enhancer öffnet ein Klick auf den Avatar einer Person ein Profilpanel mit ihren letzten Nachrichten. Du kannst außerdem ihren YouTube-Kanal in einem seitlichen Popup öffnen und Nutzer als Lesezeichen speichern, die du später wiedererkennen möchtest.
+Klicke auf den Avatar einer Person, um ihre letzten Nachrichten zu sehen oder ihren YouTube-Kanal in einem Seitenpanel zu öffnen. In diesem Profil kannst du einen lokalen Avatar-Ring hinzufügen oder entfernen, damit die Person im Chat hervorsticht. Nützliche Nachrichten kannst du in den Zeilen für letzte Nachrichten, Posteingang und Fokusmodus oder über das Nachrichtenmenü von YouTube speichern. Jedes Lesezeichen bewahrt die Nachricht und ihren Stream-Kontext.
 
 ## Meistgenutzte Emojis
 
@@ -44,7 +44,7 @@ Chat Enhancer fügt eine Zeile mit deinen meistgenutzten Emojis hinzu, damit gen
 
 ## Weitere kleine Verbesserungen
 
-Es gibt noch ein paar weitere Komfortfunktionen: schnelle Erwähnungen und Zitate, Nutzer-Lesezeichen, Chatbefehle, Entwurfswiederherstellung und andere kleine Details, durch die sich der Livechat weniger karg anfühlt.
+Es gibt noch ein paar weitere Komfortfunktionen: schnelle Erwähnungen und Zitate, Lesezeichen für Nachrichten, Chatbefehle, Entwurfswiederherstellung und andere kleine Details, durch die sich der Livechat weniger karg anfühlt.
 
 Chat Enhancer for YouTube ist kostenlos, Open Source, erfordert kein Konto und verwendet keine Analytics.
 

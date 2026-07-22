@@ -40,10 +40,10 @@
     "jumpToMessage": "Naar bericht springen",
     "keywordOrPhrase": "Trefwoord of zin",
     "lessThanOneMinute": "minder dan 1 min",
-    "markUser": "Markeren",
-    "unmarkUser": "Verwijderen",
-    "bookmarkUser": "Bladwijzer maken",
-    "removeBookmark": "Bladwijzer verwijderen",
+    "addAvatarRing": "Avatarring toevoegen",
+    "removeAvatarRing": "Avatarring verwijderen",
+    "bookmarkAddedDate": "Bladwijzer toegevoegd op {date}",
+    "avatarRingAddedDate": "Avatarring toegevoegd op {date}",
     "mention": "Vermelden",
     "mentionUser": "Gebruiker vermelden",
     "mentionUserTitle": "Gebruiker vermelden. Alt/Option-klik om te citeren.",
@@ -290,7 +290,14 @@
     "gamesChooseOwnPiece": "Kies je stuk",
     "gamesMuteSounds": "Spelgeluiden dempen",
     "gamesUnmuteSounds": "Spelgeluiden inschakelen",
-    "gamesUnavailableNoticeTitle": "Kan geen verbinding maken"
+    "gamesUnavailableNoticeTitle": "Kan geen verbinding maken",
+    "save": "Opslaan",
+    "remove": "Verwijderen",
+    "saveMessage": "Bericht opslaan",
+    "removeSavedMessage": "Opgeslagen bericht verwijderen",
+    "savedToBookmarks": "Opgeslagen in Bladwijzers",
+    "removedFromBookmarks": "Verwijderd uit Bladwijzers",
+    "couldNotSaveBookmark": "Bladwijzers konden niet worden bijgewerkt."
   },
   "extension": {
     "close": {
@@ -425,9 +432,6 @@
     "popupResetItemUnsentDrafts": {
       "message": "Niet-verzonden concepten"
     },
-    "popupResetItemBookmarkedUsers": {
-      "message": "Gebookmarkte gebruikers"
-    },
     "popupResetItemPlaygroundIdentity": {
       "message": "Playground-identiteit en weergavenaam"
     },
@@ -446,21 +450,6 @@
     "popupSections": {
       "message": "Popupsecties"
     },
-    "noBookmarkedUsers": {
-      "message": "Nog geen bladwijzers"
-    },
-    "bookmarkedUsersCount": {
-      "message": "{count} bladwijzers"
-    },
-    "bookmarkedUsersEmpty": {
-      "message": "Gebruikers die je vanuit YouTube-chat als bladwijzer opslaat, verschijnen hier."
-    },
-    "markedUserDate": {
-      "message": "Als bladwijzer opgeslagen op {date}"
-    },
-    "markedDateUnknown": {
-      "message": "Bladwijzerdatum onbekend"
-    },
     "unknownStream": {
       "message": "Onbekende stream"
     },
@@ -472,15 +461,6 @@
     },
     "openChannel": {
       "message": "Kanaal openen"
-    },
-    "unmarkUser": {
-      "message": "Verwijderen"
-    },
-    "markUser": {
-      "message": "Markeren"
-    },
-    "bookmarkUser": {
-      "message": "Bladwijzer maken"
     },
     "removeBookmark": {
       "message": "Bladwijzer verwijderen"
@@ -544,6 +524,27 @@
     },
     "chatSkinAero": {
       "message": "Aero"
+    },
+    "popupResetItemBookmarks": {
+      "message": "Bladwijzers"
+    },
+    "popupResetItemAvatarRings": {
+      "message": "Avatarringen"
+    },
+    "noBookmarks": {
+      "message": "Nog geen bladwijzers"
+    },
+    "bookmarksCount": {
+      "message": "{count} bladwijzers"
+    },
+    "bookmarksEmpty": {
+      "message": "Berichten die je vanuit YouTube-chat opslaat, verschijnen hier."
+    },
+    "bookmarkMessagePostedDate": {
+      "message": "Bericht geplaatst op {date}"
+    },
+    "restoreBookmark": {
+      "message": "Bladwijzer herstellen"
     }
   }
 }

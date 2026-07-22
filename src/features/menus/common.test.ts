@@ -37,15 +37,15 @@ describe('shared menu DOM helpers', () => {
   it('keeps action item titles and ignores unrelated keyboard keys', () => {
     const onClick = vi.fn();
     const item = createMenuActionItem({
-      action: 'mark-user',
+      action: 'save-message',
       iconPath: 'M0 0h24v24H0z',
-      label: 'Mark',
+      label: 'Save',
       onClick,
-      title: 'Marked on stream'
+      title: 'Save message'
     });
 
-    expect(item.title).toBe('Marked on stream');
-    expect(item.querySelector<HTMLElement>('.ytcq-paper-item')?.title).toBe('Marked on stream');
+    expect(item.title).toBe('Save message');
+    expect(item.querySelector<HTMLElement>('.ytcq-paper-item')?.title).toBe('Save message');
 
     item.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
 

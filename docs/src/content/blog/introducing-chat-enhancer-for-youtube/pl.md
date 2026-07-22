@@ -36,7 +36,7 @@ Czat na żywo YouTube nie daje znać, gdy ktoś cię wspomina. Chat Enhancer dod
 
 ## Lepszy kontekst użytkowników
 
-W Chat Enhancer kliknięcie awatara użytkownika otwiera panel profilu z jego ostatnimi wiadomościami. Możesz też otworzyć jego kanał YouTube w bocznym oknie i dodać do zakładek osoby, które chcesz później rozpoznawać.
+Kliknij awatar użytkownika, aby zobaczyć jego ostatnie wiadomości lub otworzyć kanał YouTube w bocznym panelu. Z tego profilu możesz dodać lub usunąć lokalną obwódkę awatara, aby użytkownik wyróżniał się na czacie. Przydatne wiadomości możesz zapisywać z wierszy ostatnich wiadomości, skrzynki i trybu skupienia albo z menu wiadomości YouTube. Każda zakładka zachowuje wiadomość i kontekst transmisji.
 
 ## Najczęściej używane emoji
 
@@ -44,7 +44,7 @@ Chat Enhancer dodaje rząd z najczęściej używanymi emoji, dzięki czemu te, p
 
 ## Inne małe usprawnienia
 
-Jest też kilka innych udogodnień: szybkie wzmianki i cytaty, zakładki użytkowników, komendy czatu, odzyskiwanie szkiców i inne drobiazgi, dzięki którym czat na żywo jest mniej surowy.
+Jest też kilka innych udogodnień: szybkie wzmianki i cytaty, zakładki wiadomości, komendy czatu, odzyskiwanie szkiców i inne drobiazgi, dzięki którym czat na żywo jest mniej surowy.
 
 Chat Enhancer for YouTube jest darmowy, open source, nie wymaga konta i nie korzysta z analytics.
 

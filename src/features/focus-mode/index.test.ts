@@ -43,6 +43,19 @@ const replyMocks = vi.hoisted(() => ({
   quoteAuthorRichText: vi.fn()
 }));
 
+const bookmarkMocks = vi.hoisted(() => ({
+  createBookmarkToggleButton: vi.fn((record: { messageId?: string }) => {
+    if (!record.messageId) return null;
+    const button = document.createElement('button');
+    button.className = 'ytcq-bookmark-toggle';
+    return button;
+  })
+}));
+
+const avatarRingMocks = vi.hoisted(() => ({
+  applyAvatarRing: vi.fn()
+}));
+
 const historyFeedMocks = vi.hoisted(() => ({
   nextTimestamp: 0,
   onBatch: null as ((updates: Array<{
@@ -73,6 +86,8 @@ vi.mock('../channel-popup', () => channelMocks);
 vi.mock('../translation/queue', () => queueMocks);
 vi.mock('../reply', () => replyMocks);
 vi.mock('../reply/index', () => replyMocks);
+vi.mock('../avatar-rings', () => avatarRingMocks);
+vi.mock('../bookmarks', () => bookmarkMocks);
 vi.mock('../user-message-history/feed', () => ({
   startUserMessageFeed: vi.fn((onBatch: NonNullable<typeof historyFeedMocks.onBatch>) => {
     historyFeedMocks.onBatch = onBatch;
@@ -120,6 +135,10 @@ describe('focus mode entrypoint', () => {
     expect(collapsed).not.toBeNull();
     expect(collapsed.textContent).toContain('Focus on');
     expect(collapsed.textContent).toContain('@ViewerOne');
+    expect(avatarRingMocks.applyAvatarRing).toHaveBeenCalledWith(
+      expect.any(HTMLElement),
+      expect.objectContaining({ authorName: '@ViewerOne', channelId: 'viewer-channel' })
+    );
 
     collapsed.click();
     await vi.runAllTimersAsync();
@@ -201,6 +220,10 @@ describe('focus mode entrypoint', () => {
     expect(rows).toHaveLength(2);
     expect(rows[0].classList.contains('ytcq-focus-message-them')).toBe(true);
     expect(rows[1].classList.contains('ytcq-focus-message-us')).toBe(true);
+    expect(document.querySelectorAll('.ytcq-focus-message-meta-row .ytcq-bookmark-toggle')).toHaveLength(2);
+    expect(bookmarkMocks.createBookmarkToggleButton).toHaveBeenCalledWith(
+      expect.objectContaining({ authorName: '@ViewerTwo', messageId: expect.any(String) })
+    );
 
     rows[0].click();
     await vi.runAllTimersAsync();

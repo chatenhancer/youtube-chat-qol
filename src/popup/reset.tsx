@@ -10,7 +10,8 @@ const RESET_CONFIRM_ITEM_KEYS = [
   'popupResetItemWatchedKeywords',
   'popupResetItemFrequentEmojis',
   'popupResetItemUnsentDrafts',
-  'popupResetItemBookmarkedUsers',
+  'popupResetItemBookmarks',
+  'popupResetItemAvatarRings',
   'popupResetItemPlaygroundIdentity',
   'popupResetItemGamePreferences'
 ];
@@ -41,24 +42,35 @@ function resetExtensionState(): void {
 
 function runResetExtensionState(): void {
   chrome.storage.local.clear(() => {
-    chrome.storage.sync.clear(() => {
-      chrome.storage.sync.set(DEFAULT_OPTIONS, () => {
-        applyOptionsToControls(DEFAULT_OPTIONS);
-        broadcastPageReset(() => {
-          showResetDialog({
-            actions: [
-              {
-                className: 'popup-reset-dialog-close',
-                label: getExtensionMessage('close'),
-                onClick: closeResetDialog
-              }
-            ],
-            message: getExtensionMessage('popupResetComplete')
+    clearSessionStorage(() => {
+      chrome.storage.sync.clear(() => {
+        chrome.storage.sync.set(DEFAULT_OPTIONS, () => {
+          applyOptionsToControls(DEFAULT_OPTIONS);
+          broadcastPageReset(() => {
+            showResetDialog({
+              actions: [
+                {
+                  className: 'popup-reset-dialog-close',
+                  label: getExtensionMessage('close'),
+                  onClick: closeResetDialog
+                }
+              ],
+              message: getExtensionMessage('popupResetComplete')
+            });
           });
         });
       });
     });
   });
+}
+
+function clearSessionStorage(callback: () => void): void {
+  const sessionStorage = chrome.storage.session;
+  if (sessionStorage) {
+    sessionStorage.clear(callback);
+  } else {
+    callback();
+  }
 }
 
 function broadcastPageReset(callback: () => void): void {

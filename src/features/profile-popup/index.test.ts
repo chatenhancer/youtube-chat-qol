@@ -78,11 +78,11 @@ const replyMocks = vi.hoisted(() => ({
   mentionAuthorName: vi.fn()
 }));
 
-const markedUserMocks = vi.hoisted(() => ({
-  applyMarkedUserRing: vi.fn(),
-  createMarkedUserToggleButton: vi.fn(() => {
+const avatarRingMocks = vi.hoisted(() => ({
+  applyAvatarRing: vi.fn(),
+  createAvatarRingToggleButton: vi.fn(() => {
     const button = document.createElement('button');
-    button.className = 'ytcq-marked-user-toggle';
+    button.className = 'ytcq-avatar-ring-toggle';
     return button;
   })
 }));
@@ -103,7 +103,7 @@ vi.mock('./messages', () => messageMocks);
 vi.mock('./positioning', () => positioningMocks);
 vi.mock('../channel-popup', () => channelMocks);
 vi.mock('../reply', () => replyMocks);
-vi.mock('../marked-users', () => markedUserMocks);
+vi.mock('../avatar-rings', () => avatarRingMocks);
 vi.mock('../translation/queue', () => queueMocks);
 
 import {
@@ -164,12 +164,16 @@ describe('profile popup coordinator', () => {
       card,
       expect.objectContaining({ left: 0, right: 0, top: 0 })
     );
-    expect(markedUserMocks.applyMarkedUserRing).toHaveBeenCalledWith(expect.any(HTMLElement), {
+    expect(avatarRingMocks.applyAvatarRing).toHaveBeenCalledWith(expect.any(HTMLElement), {
       authorName: '@ViewerOne',
-      avatarUrl: 'https://example.com/avatar.jpg',
       channelId: 'viewer-channel'
     });
-    expect(card.querySelector('.ytcq-marked-user-toggle')).not.toBeNull();
+    expect(avatarRingMocks.createAvatarRingToggleButton).toHaveBeenCalledWith({
+      authorName: '@ViewerOne',
+      channelId: 'viewer-channel'
+    });
+    expect(card.querySelector('.ytcq-avatar-ring-toggle')).not.toBeNull();
+    expect(card.querySelector('.ytcq-bookmark-toggle')).toBeNull();
 
     card.querySelector<HTMLButtonElement>('.ytcq-profile-card-author')!.click();
     expect(replyMocks.mentionAuthorName).toHaveBeenCalledWith('@ViewerOne', {

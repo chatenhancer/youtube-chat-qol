@@ -3,17 +3,38 @@ import { controls } from './controls';
 const SCROLL_FADE_TOP_CLASS = 'popup-scroll-fade-top';
 const SCROLL_FADE_BOTTOM_CLASS = 'popup-scroll-fade-bottom';
 const SCROLL_EDGE_TOLERANCE_PX = 1;
+const POPUP_LAST_TAB_STORAGE_KEY = 'ytcqPopupLastTab';
 let popupScrollFadeRegion: HTMLElement | null = null;
 let popupScrollFadeRefreshTimer = 0;
+let popupTabSelectedByUser = false;
 
 export function initPopupTabs(): void {
   initPopupScrollFades();
+  restoreLastPopupTab();
 
   controls.tabs.forEach((tab) => {
     tab.addEventListener('click', () => {
       const targetId = tab.dataset.popupTabTarget;
-      if (targetId) selectPopupTab(targetId);
+      if (!targetId) return;
+      popupTabSelectedByUser = true;
+      selectPopupTab(targetId);
+      chrome.storage.session?.set({ [POPUP_LAST_TAB_STORAGE_KEY]: targetId });
     });
+  });
+}
+
+function restoreLastPopupTab(): void {
+  chrome.storage.session?.get(POPUP_LAST_TAB_STORAGE_KEY, (stored) => {
+    if (popupTabSelectedByUser) return;
+
+    const targetId = stored?.[POPUP_LAST_TAB_STORAGE_KEY];
+    if (
+      typeof targetId === 'string' &&
+      controls.tabs.some((tab) => tab.dataset.popupTabTarget === targetId) &&
+      controls.tabPanels.some((panel) => panel.id === targetId)
+    ) {
+      selectPopupTab(targetId);
+    }
   });
 }
 

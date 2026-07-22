@@ -40,10 +40,10 @@
     "jumpToMessage": "Przejdź do wiadomości",
     "keywordOrPhrase": "Słowo kluczowe lub fraza",
     "lessThanOneMinute": "mniej niż 1 min",
-    "markUser": "Oznacz",
-    "unmarkUser": "Usuń",
-    "bookmarkUser": "Dodaj zakładkę",
-    "removeBookmark": "Usuń zakładkę",
+    "addAvatarRing": "Dodaj obwódkę awatara",
+    "removeAvatarRing": "Usuń obwódkę awatara",
+    "bookmarkAddedDate": "Zakładka dodana {date}",
+    "avatarRingAddedDate": "Obwódka awatara dodana {date}",
     "mention": "Wspomnij",
     "mentionUser": "Wspomnij użytkownika",
     "mentionUserTitle": "Wspomnij użytkownika. Alt/Option-klik, aby zacytować.",
@@ -290,7 +290,14 @@
     "gamesChooseOwnPiece": "Wybierz swoją figurę",
     "gamesMuteSounds": "Wycisz dźwięki gry",
     "gamesUnmuteSounds": "Włącz dźwięki gry",
-    "gamesUnavailableNoticeTitle": "Nie można połączyć"
+    "gamesUnavailableNoticeTitle": "Nie można połączyć",
+    "save": "Zapisz",
+    "remove": "Usuń",
+    "saveMessage": "Zapisz wiadomość",
+    "removeSavedMessage": "Usuń zapisaną wiadomość",
+    "savedToBookmarks": "Zapisano w zakładkach",
+    "removedFromBookmarks": "Usunięto z zakładek",
+    "couldNotSaveBookmark": "Nie udało się zaktualizować zakładek."
   },
   "extension": {
     "close": {
@@ -425,9 +432,6 @@
     "popupResetItemUnsentDrafts": {
       "message": "Niewysłane wersje robocze"
     },
-    "popupResetItemBookmarkedUsers": {
-      "message": "Użytkownicy dodani do zakładek"
-    },
     "popupResetItemPlaygroundIdentity": {
       "message": "Tożsamość i nazwa wyświetlana Playground"
     },
@@ -446,21 +450,6 @@
     "popupSections": {
       "message": "Sekcje popupu"
     },
-    "noBookmarkedUsers": {
-      "message": "Brak zakładek"
-    },
-    "bookmarkedUsersCount": {
-      "message": "{count} zakładek"
-    },
-    "bookmarkedUsersEmpty": {
-      "message": "Użytkownicy dodani do zakładek z czatu YouTube pojawią się tutaj."
-    },
-    "markedUserDate": {
-      "message": "Dodano do zakładek {date}"
-    },
-    "markedDateUnknown": {
-      "message": "Data zakładki nieznana"
-    },
     "unknownStream": {
       "message": "Nieznana transmisja"
     },
@@ -472,15 +461,6 @@
     },
     "openChannel": {
       "message": "Otwórz kanał"
-    },
-    "unmarkUser": {
-      "message": "Usuń"
-    },
-    "markUser": {
-      "message": "Oznacz"
-    },
-    "bookmarkUser": {
-      "message": "Dodaj zakładkę"
     },
     "removeBookmark": {
       "message": "Usuń zakładkę"
@@ -544,6 +524,27 @@
     },
     "chatSkinAero": {
       "message": "Aero"
+    },
+    "popupResetItemBookmarks": {
+      "message": "Zakładki"
+    },
+    "popupResetItemAvatarRings": {
+      "message": "Obwódki awatarów"
+    },
+    "noBookmarks": {
+      "message": "Brak zakładek"
+    },
+    "bookmarksCount": {
+      "message": "{count} zakładek"
+    },
+    "bookmarksEmpty": {
+      "message": "Wiadomości zapisane z czatu YouTube pojawią się tutaj."
+    },
+    "bookmarkMessagePostedDate": {
+      "message": "Wiadomość wysłana {date}"
+    },
+    "restoreBookmark": {
+      "message": "Przywróć zakładkę"
     }
   }
 }

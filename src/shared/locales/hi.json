@@ -40,10 +40,10 @@
     "jumpToMessage": "मैसेज पर जाएं",
     "keywordOrPhrase": "कीवर्ड या वाक्यांश",
     "lessThanOneMinute": "1 मिनट से कम",
-    "markUser": "मार्क",
-    "unmarkUser": "हटाएं",
-    "bookmarkUser": "बुकमार्क करें",
-    "removeBookmark": "बुकमार्क हटाएं",
+    "addAvatarRing": "अवतार रिंग जोड़ें",
+    "removeAvatarRing": "अवतार रिंग हटाएँ",
+    "bookmarkAddedDate": "बुकमार्क {date} को जोड़ा गया",
+    "avatarRingAddedDate": "अवतार रिंग {date} को जोड़ी गई",
     "mention": "मेंशन",
     "mentionUser": "यूज़र को मेंशन करें",
     "mentionUserTitle": "यूज़र को मेंशन करें. कोट करने के लिए Alt/Option-क्लिक करें.",
@@ -290,7 +290,14 @@
     "gamesChooseOwnPiece": "अपना मोहरा चुनें",
     "gamesMuteSounds": "गेम की आवाज़ बंद करें",
     "gamesUnmuteSounds": "गेम की आवाज़ चालू करें",
-    "gamesUnavailableNoticeTitle": "कनेक्ट नहीं हो सका"
+    "gamesUnavailableNoticeTitle": "कनेक्ट नहीं हो सका",
+    "save": "सहेजें",
+    "remove": "हटाएँ",
+    "saveMessage": "संदेश सहेजें",
+    "removeSavedMessage": "सहेजा गया संदेश हटाएँ",
+    "savedToBookmarks": "बुकमार्क में सहेजा गया",
+    "removedFromBookmarks": "बुकमार्क से हटाया गया",
+    "couldNotSaveBookmark": "बुकमार्क अपडेट नहीं हो सके।"
   },
   "extension": {
     "close": {
@@ -428,9 +435,6 @@
     "popupResetItemUnsentDrafts": {
       "message": "न भेजे गए ड्राफ़्ट"
     },
-    "popupResetItemBookmarkedUsers": {
-      "message": "बुकमार्क किए गए उपयोगकर्ता"
-    },
     "popupResetItemPlaygroundIdentity": {
       "message": "Playground पहचान और प्रदर्शन नाम"
     },
@@ -449,21 +453,6 @@
     "popupSections": {
       "message": "पॉपअप सेक्शन"
     },
-    "noBookmarkedUsers": {
-      "message": "अभी कोई बुकमार्क नहीं"
-    },
-    "bookmarkedUsersCount": {
-      "message": "{count} बुकमार्क"
-    },
-    "bookmarkedUsersEmpty": {
-      "message": "YouTube चैट से जिन उपयोगकर्ताओं को आप बुकमार्क करेंगे, वे यहां दिखेंगे."
-    },
-    "markedUserDate": {
-      "message": "{date} को बुकमार्क किया गया"
-    },
-    "markedDateUnknown": {
-      "message": "बुकमार्क की तारीख अज्ञात"
-    },
     "unknownStream": {
       "message": "अज्ञात स्ट्रीम"
     },
@@ -475,15 +464,6 @@
     },
     "openChannel": {
       "message": "चैनल खोलें"
-    },
-    "unmarkUser": {
-      "message": "हटाएं"
-    },
-    "markUser": {
-      "message": "मार्क"
-    },
-    "bookmarkUser": {
-      "message": "बुकमार्क करें"
     },
     "removeBookmark": {
       "message": "बुकमार्क हटाएं"
@@ -547,6 +527,27 @@
     },
     "chatSkinAero": {
       "message": "Aero"
+    },
+    "popupResetItemBookmarks": {
+      "message": "बुकमार्क"
+    },
+    "popupResetItemAvatarRings": {
+      "message": "अवतार रिंग"
+    },
+    "noBookmarks": {
+      "message": "अभी कोई बुकमार्क नहीं"
+    },
+    "bookmarksCount": {
+      "message": "{count} बुकमार्क"
+    },
+    "bookmarksEmpty": {
+      "message": "YouTube चैट से सहेजे गए संदेश यहाँ दिखाई देंगे।"
+    },
+    "bookmarkMessagePostedDate": {
+      "message": "संदेश {date} को पोस्ट किया गया"
+    },
+    "restoreBookmark": {
+      "message": "बुकमार्क बहाल करें"
     }
   }
 }

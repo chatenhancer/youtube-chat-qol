@@ -38,7 +38,9 @@ Die in diesem Abschnitt aufgeführten Daten werden von der Erweiterung in deinem
 
 - **Daten häufiger Emojis:** werden mit lokalem Erweiterungsspeicher (`chrome.storage.local`) gespeichert. Dazu gehören lokale Nutzungszähler und Emoji-Anzeigeinformationen, die zum Aufbau der Zeile häufiger Emojis verwendet werden.
 
-- **Daten markierter Nutzer:** werden mit lokalem Erweiterungsspeicher (`chrome.storage.local`) gespeichert. Dazu gehören der Handle des markierten Nutzers, die Kanal-ID, sofern verfügbar, und der Zeitpunkt, zu dem die Markierung erstellt wurde. Markierte Nutzer gelten streamübergreifend im aktuellen Browserprofil und werden zum Anzeigen farbiger Avatar-Ringe verwendet.
+- **Lesezeichendaten:** werden im lokalen Erweiterungsspeicher (`chrome.storage.local`) gespeichert. Sie können den gespeicherten Nachrichtentext und Emoji-Anzeigeinformationen, Name, Avatar-URL und – sofern verfügbar – Kanal-ID des Autors, Nachrichten- und Speicherzeit sowie Streamtitel und -URL enthalten. Lesezeichen bleiben streamübergreifend im aktuellen Browserprofil verfügbar.
+
+- **Avatarringdaten:** werden im lokalen Erweiterungsspeicher (`chrome.storage.local`) gespeichert. Sie enthalten den Autorennamen, sofern verfügbar die Kanal-ID und den Zeitpunkt, zu dem der Ring hinzugefügt wurde, für Nutzer, denen du ausdrücklich über ihr Profil mit aktuellen Nachrichten einen Avatarring hinzufügst. Die Auswahl bleibt streamübergreifend im aktuellen Browserprofil verfügbar und dient nur zur Kennzeichnung passender Avatare; sie prüft nicht, ob ein Nutzer online ist.
 
 - **Nicht gesendete Chatentwürfe:** werden pro Stream mit lokalem Erweiterungsspeicher (`chrome.storage.local`) gespeichert. Sie werden nach einer Seitenaktualisierung wiederhergestellt. Entwürfe werden entfernt, wenn das Chat-Eingabefeld geleert, die Nachricht gesendet oder Erweiterungsdaten zurückgesetzt werden.
 

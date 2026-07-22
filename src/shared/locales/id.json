@@ -40,10 +40,10 @@
     "jumpToMessage": "Lompat ke pesan",
     "keywordOrPhrase": "Kata kunci atau frasa",
     "lessThanOneMinute": "kurang dari 1 menit",
-    "markUser": "Tandai",
-    "unmarkUser": "Hapus",
-    "bookmarkUser": "Bookmark",
-    "removeBookmark": "Hapus bookmark",
+    "addAvatarRing": "Tambahkan cincin avatar",
+    "removeAvatarRing": "Hapus cincin avatar",
+    "bookmarkAddedDate": "Bookmark ditambahkan {date}",
+    "avatarRingAddedDate": "Cincin avatar ditambahkan {date}",
     "mention": "Sebut",
     "mentionUser": "Sebut pengguna",
     "mentionUserTitle": "Sebut pengguna. Alt/Option-klik untuk mengutip.",
@@ -290,7 +290,14 @@
     "gamesChooseOwnPiece": "Pilih bidakmu",
     "gamesMuteSounds": "Bisukan suara game",
     "gamesUnmuteSounds": "Aktifkan suara game",
-    "gamesUnavailableNoticeTitle": "Tidak dapat terhubung"
+    "gamesUnavailableNoticeTitle": "Tidak dapat terhubung",
+    "save": "Simpan",
+    "remove": "Hapus",
+    "saveMessage": "Simpan pesan",
+    "removeSavedMessage": "Hapus pesan tersimpan",
+    "savedToBookmarks": "Disimpan ke Bookmark",
+    "removedFromBookmarks": "Dihapus dari Bookmark",
+    "couldNotSaveBookmark": "Bookmark tidak dapat diperbarui."
   },
   "extension": {
     "close": {
@@ -428,9 +435,6 @@
     "popupResetItemUnsentDrafts": {
       "message": "Draf yang belum dikirim"
     },
-    "popupResetItemBookmarkedUsers": {
-      "message": "Pengguna yang dibookmark"
-    },
     "popupResetItemPlaygroundIdentity": {
       "message": "Identitas dan nama tampilan Playground"
     },
@@ -449,21 +453,6 @@
     "popupSections": {
       "message": "Bagian popup"
     },
-    "noBookmarkedUsers": {
-      "message": "Belum ada bookmark"
-    },
-    "bookmarkedUsersCount": {
-      "message": "{count} bookmark"
-    },
-    "bookmarkedUsersEmpty": {
-      "message": "Pengguna yang Anda bookmark dari chat YouTube akan muncul di sini."
-    },
-    "markedUserDate": {
-      "message": "Dibookmark {date}"
-    },
-    "markedDateUnknown": {
-      "message": "Tanggal bookmark tidak diketahui"
-    },
     "unknownStream": {
       "message": "Streaming tidak diketahui"
     },
@@ -475,15 +464,6 @@
     },
     "openChannel": {
       "message": "Buka channel"
-    },
-    "unmarkUser": {
-      "message": "Hapus"
-    },
-    "markUser": {
-      "message": "Tandai"
-    },
-    "bookmarkUser": {
-      "message": "Bookmark"
     },
     "removeBookmark": {
       "message": "Hapus bookmark"
@@ -547,6 +527,27 @@
     },
     "chatSkinAero": {
       "message": "Aero"
+    },
+    "popupResetItemBookmarks": {
+      "message": "Bookmark"
+    },
+    "popupResetItemAvatarRings": {
+      "message": "Cincin avatar"
+    },
+    "noBookmarks": {
+      "message": "Belum ada bookmark"
+    },
+    "bookmarksCount": {
+      "message": "{count} bookmark"
+    },
+    "bookmarksEmpty": {
+      "message": "Pesan yang Anda simpan dari chat YouTube akan muncul di sini."
+    },
+    "bookmarkMessagePostedDate": {
+      "message": "Pesan dikirim {date}"
+    },
+    "restoreBookmark": {
+      "message": "Pulihkan bookmark"
     }
   }
 }

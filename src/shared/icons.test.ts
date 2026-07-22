@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import {
   ADD_ICON_PATH,
+  AVATAR_RING_ACTIVE_BADGE_PATH,
+  AVATAR_RING_ADD_BADGE_PATH,
   BOLT_ICON_PATH,
   ICON_VIEW_BOX,
   INBOX_ICON_PATH,
@@ -9,6 +11,7 @@ import {
   MATERIAL_ICON_VIEW_BOX,
   TRANSLATE_ICON_PATH,
   createAddIcon,
+  createAvatarRingIcon,
   createBoltIcon,
   createChannelIcon,
   createInboxIcon,
@@ -56,5 +59,19 @@ describe('shared SVG icon factories', () => {
     expect(icon.getAttribute('class')).toBe('translate-icon');
     expect(icon.getAttribute('viewBox')).toBe(MATERIAL_ICON_VIEW_BOX);
     expect(paths.map((path) => path.getAttribute('class'))).toEqual(['translate-source', 'translate-target']);
+  });
+
+  it('creates an avatar-and-ring icon with add and active badge states', () => {
+    const addIcon = createAvatarRingIcon();
+    const activeIcon = createAvatarRingIcon(true);
+
+    expect(addIcon.getAttribute('viewBox')).toBe(ICON_VIEW_BOX);
+    expect(addIcon.querySelector('.ytcq-avatar-ring-icon-outline')).not.toBeNull();
+    expect(
+      addIcon.querySelector('.ytcq-avatar-ring-icon-badge-symbol')?.getAttribute('d')
+    ).toBe(AVATAR_RING_ADD_BADGE_PATH);
+    expect(
+      activeIcon.querySelector('.ytcq-avatar-ring-icon-badge-symbol')?.getAttribute('d')
+    ).toBe(AVATAR_RING_ACTIVE_BADGE_PATH);
   });
 });

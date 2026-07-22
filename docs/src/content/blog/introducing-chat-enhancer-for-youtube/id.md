@@ -36,7 +36,7 @@ Live chat YouTube tidak memberi tahu Anda ketika seseorang me-mention Anda. Chat
 
 ## Konteks pengguna yang lebih baik
 
-Dengan Chat Enhancer, klik avatar pengguna untuk membuka panel profil berisi pesan terbaru dari orang tersebut. Anda juga bisa membuka channel YouTube mereka di popup samping dan menandai pengguna yang ingin Anda kenali lagi nanti.
+Klik avatar pengguna untuk melihat pesan terbaru atau membuka channel YouTube mereka di panel samping. Dari profil itu, Anda dapat menambah atau menghapus cincin avatar lokal agar pengguna lebih menonjol di chat. Pesan berguna dapat disimpan dari baris pesan terbaru, Inbox, dan mode Focus, atau dari menu pesan YouTube. Setiap bookmark menyimpan pesan dan konteks stream.
 
 ## Emoji yang paling sering digunakan
 
@@ -44,7 +44,7 @@ Chat Enhancer menambahkan satu baris untuk emoji yang paling sering Anda gunakan
 
 ## Peningkatan kecil lainnya
 
-Ada juga beberapa fitur kecil lain: mention dan kutipan cepat, bookmark pengguna, perintah chat, pemulihan draf, dan sentuhan-sentuhan kecil yang membuat live chat terasa lebih lengkap.
+Ada juga beberapa fitur kecil lain: mention dan kutipan cepat, bookmark pesan, perintah chat, pemulihan draf, dan sentuhan-sentuhan kecil yang membuat live chat terasa lebih lengkap.
 
 Chat Enhancer for YouTube gratis, open-source, tidak membutuhkan akun, dan tidak menjalankan analytics.
 

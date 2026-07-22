@@ -12,6 +12,7 @@ type ContainerTestNamespace = {
 };
 
 const localStorageArea = createStorageArea();
+const sessionStorageArea = createStorageArea();
 const syncStorageArea = createStorageArea();
 
 const chromeMock = {
@@ -56,6 +57,7 @@ const chromeMock = {
       addListener: vi.fn(),
       removeListener: vi.fn()
     },
+    session: sessionStorageArea,
     sync: syncStorageArea
   },
   tabs: {

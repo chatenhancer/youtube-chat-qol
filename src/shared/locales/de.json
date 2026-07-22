@@ -40,10 +40,10 @@
     "jumpToMessage": "Zur Nachricht springen",
     "keywordOrPhrase": "Schlüsselwort oder Phrase",
     "lessThanOneMinute": "weniger als 1 Min.",
-    "markUser": "Markieren",
-    "unmarkUser": "Entfernen",
-    "bookmarkUser": "Lesezeichen setzen",
-    "removeBookmark": "Lesezeichen entfernen",
+    "addAvatarRing": "Avatarring hinzufügen",
+    "removeAvatarRing": "Avatarring entfernen",
+    "bookmarkAddedDate": "Lesezeichen hinzugefügt am {date}",
+    "avatarRingAddedDate": "Avatarring hinzugefügt am {date}",
     "mention": "Erwähnen",
     "mentionUser": "Nutzer erwähnen",
     "mentionUserTitle": "Nutzer erwähnen. Alt/Option-Klick zum Zitieren.",
@@ -290,7 +290,14 @@
     "gamesChooseOwnPiece": "Wähle deine Figur",
     "gamesMuteSounds": "Spielgeräusche stummschalten",
     "gamesUnmuteSounds": "Spielgeräusche einschalten",
-    "gamesUnavailableNoticeTitle": "Verbindung nicht möglich"
+    "gamesUnavailableNoticeTitle": "Verbindung nicht möglich",
+    "save": "Speichern",
+    "remove": "Entfernen",
+    "saveMessage": "Nachricht speichern",
+    "removeSavedMessage": "Gespeicherte Nachricht entfernen",
+    "savedToBookmarks": "Unter Lesezeichen gespeichert",
+    "removedFromBookmarks": "Aus Lesezeichen entfernt",
+    "couldNotSaveBookmark": "Lesezeichen konnten nicht aktualisiert werden."
   },
   "extension": {
     "close": {
@@ -425,9 +432,6 @@
     "popupResetItemUnsentDrafts": {
       "message": "Nicht gesendete Entwürfe"
     },
-    "popupResetItemBookmarkedUsers": {
-      "message": "Gespeicherte Nutzer"
-    },
     "popupResetItemPlaygroundIdentity": {
       "message": "Playground-Identität und Anzeigename"
     },
@@ -446,21 +450,6 @@
     "popupSections": {
       "message": "Popup-Bereiche"
     },
-    "noBookmarkedUsers": {
-      "message": "Noch keine Lesezeichen"
-    },
-    "bookmarkedUsersCount": {
-      "message": "{count} Lesezeichen"
-    },
-    "bookmarkedUsersEmpty": {
-      "message": "Nutzer, die du im YouTube-Chat als Lesezeichen speicherst, erscheinen hier."
-    },
-    "markedUserDate": {
-      "message": "Als Lesezeichen gespeichert am {date}"
-    },
-    "markedDateUnknown": {
-      "message": "Lesezeichendatum unbekannt"
-    },
     "unknownStream": {
       "message": "Unbekannter Stream"
     },
@@ -472,15 +461,6 @@
     },
     "openChannel": {
       "message": "Kanal öffnen"
-    },
-    "unmarkUser": {
-      "message": "Entfernen"
-    },
-    "markUser": {
-      "message": "Markieren"
-    },
-    "bookmarkUser": {
-      "message": "Lesezeichen setzen"
     },
     "removeBookmark": {
       "message": "Lesezeichen entfernen"
@@ -544,6 +524,27 @@
     },
     "chatSkinAero": {
       "message": "Aero"
+    },
+    "popupResetItemBookmarks": {
+      "message": "Lesezeichen"
+    },
+    "popupResetItemAvatarRings": {
+      "message": "Avatarringe"
+    },
+    "noBookmarks": {
+      "message": "Noch keine Lesezeichen"
+    },
+    "bookmarksCount": {
+      "message": "{count} Lesezeichen"
+    },
+    "bookmarksEmpty": {
+      "message": "Nachrichten, die du im YouTube-Chat speicherst, werden hier angezeigt."
+    },
+    "bookmarkMessagePostedDate": {
+      "message": "Nachricht gesendet am {date}"
+    },
+    "restoreBookmark": {
+      "message": "Lesezeichen wiederherstellen"
     }
   }
 }

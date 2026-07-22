@@ -70,8 +70,10 @@ describe('focus mode records', () => {
     const sourceRecord = createRecord({
       authorName: '@FocusedUser',
       channelId: 'focused-channel',
+      messageId: 'message-1',
       text: 'hola'
     });
+    sourceRecord.avatarSrc = 'https://example.test/avatar.png';
     sourceRecord.contentParts = [{ text: 'hola', type: 'text' }];
     sourceRecord.messageRef = new WeakRef(message);
     sourceRecord.translation = {
@@ -85,8 +87,12 @@ describe('focus mode records', () => {
       authorName: '@FocusedUser',
       channelId: 'focused-channel'
     })).toMatchObject({
+      avatarSrc: 'https://example.test/avatar.png',
+      channelId: 'focused-channel',
       contentParts: [{ text: 'hola', type: 'text' }],
+      messageId: 'message-1',
       messageRef: sourceRecord.messageRef,
+      timestamp: sourceRecord.timestamp,
       translation: { result: { text: 'hello' } }
     });
   });

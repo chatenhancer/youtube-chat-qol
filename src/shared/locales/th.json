@@ -40,10 +40,10 @@
     "jumpToMessage": "ข้ามไปยังข้อความ",
     "keywordOrPhrase": "คำสำคัญหรือวลี",
     "lessThanOneMinute": "น้อยกว่า 1 นาที",
-    "markUser": "ทำเครื่องหมาย",
-    "unmarkUser": "ยกเลิก",
-    "bookmarkUser": "บุ๊กมาร์ก",
-    "removeBookmark": "ลบบุ๊กมาร์ก",
+    "addAvatarRing": "เพิ่มวงแหวนอวาตาร์",
+    "removeAvatarRing": "นำวงแหวนอวาตาร์ออก",
+    "bookmarkAddedDate": "เพิ่มบุ๊กมาร์กเมื่อ {date}",
+    "avatarRingAddedDate": "เพิ่มวงแหวนอวาตาร์เมื่อ {date}",
     "mention": "กล่าวถึง",
     "mentionUser": "กล่าวถึงผู้ใช้",
     "mentionUserTitle": "กล่าวถึงผู้ใช้ กด Alt/Option-click เพื่ออ้างอิง",
@@ -290,7 +290,14 @@
     "gamesChooseOwnPiece": "เลือกตัวหมากของคุณ",
     "gamesMuteSounds": "ปิดเสียงเกม",
     "gamesUnmuteSounds": "เปิดเสียงเกม",
-    "gamesUnavailableNoticeTitle": "ไม่สามารถเชื่อมต่อได้"
+    "gamesUnavailableNoticeTitle": "ไม่สามารถเชื่อมต่อได้",
+    "save": "บันทึก",
+    "remove": "นำออก",
+    "saveMessage": "บันทึกข้อความ",
+    "removeSavedMessage": "นำข้อความที่บันทึกไว้ออก",
+    "savedToBookmarks": "บันทึกไปยังบุ๊กมาร์กแล้ว",
+    "removedFromBookmarks": "นำออกจากบุ๊กมาร์กแล้ว",
+    "couldNotSaveBookmark": "อัปเดตบุ๊กมาร์กไม่ได้"
   },
   "extension": {
     "close": {
@@ -425,9 +432,6 @@
     "popupResetItemUnsentDrafts": {
       "message": "ฉบับร่างที่ยังไม่ได้ส่ง"
     },
-    "popupResetItemBookmarkedUsers": {
-      "message": "ผู้ใช้ที่บุ๊กมาร์กไว้"
-    },
     "popupResetItemPlaygroundIdentity": {
       "message": "ตัวตนและชื่อที่แสดงของ Playground"
     },
@@ -446,21 +450,6 @@
     "popupSections": {
       "message": "ส่วนต่างๆ ของป๊อปอัป"
     },
-    "noBookmarkedUsers": {
-      "message": "ยังไม่มีบุ๊กมาร์ก"
-    },
-    "bookmarkedUsersCount": {
-      "message": "{count} บุ๊กมาร์ก"
-    },
-    "bookmarkedUsersEmpty": {
-      "message": "ผู้ใช้ที่คุณบุ๊กมาร์กจากแชท YouTube จะแสดงที่นี่"
-    },
-    "markedUserDate": {
-      "message": "บุ๊กมาร์กเมื่อ {date}"
-    },
-    "markedDateUnknown": {
-      "message": "ไม่ทราบวันที่บุ๊กมาร์ก"
-    },
     "unknownStream": {
       "message": "สตรีมไม่ทราบชื่อ"
     },
@@ -472,15 +461,6 @@
     },
     "openChannel": {
       "message": "เปิดช่อง"
-    },
-    "unmarkUser": {
-      "message": "ยกเลิก"
-    },
-    "markUser": {
-      "message": "ทำเครื่องหมาย"
-    },
-    "bookmarkUser": {
-      "message": "บุ๊กมาร์ก"
     },
     "removeBookmark": {
       "message": "ลบบุ๊กมาร์ก"
@@ -544,6 +524,27 @@
     },
     "chatSkinAero": {
       "message": "Aero"
+    },
+    "popupResetItemBookmarks": {
+      "message": "บุ๊กมาร์ก"
+    },
+    "popupResetItemAvatarRings": {
+      "message": "วงแหวนอวาตาร์"
+    },
+    "noBookmarks": {
+      "message": "ยังไม่มีบุ๊กมาร์ก"
+    },
+    "bookmarksCount": {
+      "message": "{count} บุ๊กมาร์ก"
+    },
+    "bookmarksEmpty": {
+      "message": "ข้อความที่คุณบันทึกจากแชท YouTube จะปรากฏที่นี่"
+    },
+    "bookmarkMessagePostedDate": {
+      "message": "โพสต์ข้อความเมื่อ {date}"
+    },
+    "restoreBookmark": {
+      "message": "กู้คืนบุ๊กมาร์ก"
     }
   }
 }

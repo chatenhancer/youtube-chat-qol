@@ -27,7 +27,7 @@ import {
   inboxOpensFromHeaderScenario,
   inboxRecordCreationAndJumpScenario
 } from '../scenarios/inbox';
-import { markedUserMessageMenuScenario } from '../scenarios/marked-users';
+import { bookmarkMessageMenuScenario } from '../scenarios/bookmarks';
 import {
   liteModeMockRenderingAndFallbackScenario,
   liteModeStoredPreferenceReloadScenario,
@@ -79,12 +79,12 @@ test(
   attachScenario
 );
 test(
-  'logged-in mock: message context menu receives mark, quote, and mention actions',
+  'logged-in mock: message context menu receives save, quote, and mention actions',
   messageMenuScenario
 );
 test(
-  'logged-in mock: mark user from message menu persists and shows avatar ring',
-  markedUserMessageMenuScenario
+  'logged-in mock: saved message persists and appears in Bookmarks',
+  bookmarkMessageMenuScenario
 );
 test('logged-in mock: mention menu action writes a draft only', mentionMenuDraftScenario);
 test('logged-in mock: quote menu action writes a draft only', quoteMenuDraftScenario);

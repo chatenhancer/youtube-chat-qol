@@ -40,10 +40,10 @@
     "jumpToMessage": "Ir al mensaje",
     "keywordOrPhrase": "Palabra clave o frase",
     "lessThanOneMinute": "menos de 1 min",
-    "markUser": "Marcar",
-    "unmarkUser": "Desmarcar",
-    "bookmarkUser": "Guardar marcador",
-    "removeBookmark": "Eliminar marcador",
+    "addAvatarRing": "Añadir aro al avatar",
+    "removeAvatarRing": "Quitar aro del avatar",
+    "bookmarkAddedDate": "Marcador añadido el {date}",
+    "avatarRingAddedDate": "Aro de avatar añadido el {date}",
     "mention": "Mencionar",
     "mentionUser": "Mencionar usuario",
     "mentionUserTitle": "Mencionar usuario. Alt/Opción-clic para citar.",
@@ -290,7 +290,14 @@
     "gamesChooseOwnPiece": "Elige tu pieza",
     "gamesMuteSounds": "Silenciar sonidos del juego",
     "gamesUnmuteSounds": "Activar sonidos del juego",
-    "gamesUnavailableNoticeTitle": "No se puede conectar"
+    "gamesUnavailableNoticeTitle": "No se puede conectar",
+    "save": "Guardar",
+    "remove": "Quitar",
+    "saveMessage": "Guardar mensaje",
+    "removeSavedMessage": "Quitar mensaje guardado",
+    "savedToBookmarks": "Guardado en Marcadores",
+    "removedFromBookmarks": "Quitado de Marcadores",
+    "couldNotSaveBookmark": "No se pudieron actualizar los marcadores."
   },
   "extension": {
     "close": {
@@ -425,9 +432,6 @@
     "popupResetItemUnsentDrafts": {
       "message": "Borradores sin enviar"
     },
-    "popupResetItemBookmarkedUsers": {
-      "message": "Usuarios guardados como marcadores"
-    },
     "popupResetItemPlaygroundIdentity": {
       "message": "Identidad y nombre para mostrar de Playground"
     },
@@ -446,21 +450,6 @@
     "popupSections": {
       "message": "Secciones del popup"
     },
-    "noBookmarkedUsers": {
-      "message": "Aún no hay marcadores"
-    },
-    "bookmarkedUsersCount": {
-      "message": "{count} marcadores"
-    },
-    "bookmarkedUsersEmpty": {
-      "message": "Los usuarios que guardes como marcador desde el chat de YouTube aparecerán aquí."
-    },
-    "markedUserDate": {
-      "message": "Guardado como marcador el {date}"
-    },
-    "markedDateUnknown": {
-      "message": "Fecha del marcador desconocida"
-    },
     "unknownStream": {
       "message": "Transmisión desconocida"
     },
@@ -472,15 +461,6 @@
     },
     "openChannel": {
       "message": "Abrir canal"
-    },
-    "unmarkUser": {
-      "message": "Desmarcar"
-    },
-    "markUser": {
-      "message": "Marcar"
-    },
-    "bookmarkUser": {
-      "message": "Guardar marcador"
     },
     "removeBookmark": {
       "message": "Eliminar marcador"
@@ -544,6 +524,27 @@
     },
     "chatSkinAero": {
       "message": "Aero"
+    },
+    "popupResetItemBookmarks": {
+      "message": "Marcadores"
+    },
+    "popupResetItemAvatarRings": {
+      "message": "Aros de avatar"
+    },
+    "noBookmarks": {
+      "message": "Aún no hay marcadores"
+    },
+    "bookmarksCount": {
+      "message": "{count} marcadores"
+    },
+    "bookmarksEmpty": {
+      "message": "Los mensajes que guardes del chat de YouTube aparecerán aquí."
+    },
+    "bookmarkMessagePostedDate": {
+      "message": "Mensaje publicado el {date}"
+    },
+    "restoreBookmark": {
+      "message": "Restaurar marcador"
     }
   }
 }

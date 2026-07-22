@@ -38,7 +38,9 @@ Gegevens in deze sectie worden door de extensie opgeslagen in je eigen browserpr
 
 - **Gegevens van veelgebruikte emoji:** opgeslagen met lokale extensieopslag (`chrome.storage.local`). Dit omvat lokale gebruikstellingen en emojiweergave-informatie die wordt gebruikt om de rij met veelgebruikte emoji te maken.
 
-- **Gegevens van gemarkeerde gebruikers:** opgeslagen met lokale extensieopslag (`chrome.storage.local`). Dit omvat de handle van de gemarkeerde gebruiker, kanaal-ID indien beschikbaar, en het tijdstip waarop de markering is gemaakt. Gemarkeerde gebruikers zijn globaal over streams in het huidige browserprofiel en worden gebruikt om gekleurde avatarringen te tonen.
+- **Bladwijzergegevens:** worden opgeslagen in de lokale extensieopslag (`chrome.storage.local`). Ze kunnen de opgeslagen berichttekst en emojiweergavegegevens, naam, avatar-URL en indien beschikbaar kanaal-ID van de auteur, bericht- en opslagtijd en streamtitel en -URL bevatten. Bladwijzers blijven tussen streams beschikbaar in het huidige browserprofiel.
+
+- **Avatarringgegevens:** worden opgeslagen in de lokale extensieopslag (`chrome.storage.local`). Ze bevatten de auteursnaam, indien beschikbaar de kanaal-ID en het tijdstip waarop de ring is toegevoegd van gebruikers aan wie je uitdrukkelijk een ring toevoegt vanuit hun profiel met recente berichten. De selectie blijft tussen streams beschikbaar in het huidige browserprofiel en wordt alleen gebruikt om overeenkomende avatars te versieren; er wordt niet gecontroleerd of een gebruiker online is.
 
 - **Niet-verzonden chatconcepten:** per stream opgeslagen met lokale extensieopslag (`chrome.storage.local`). Ze worden hersteld na het vernieuwen van de pagina. Concepten worden verwijderd wanneer de chatinvoer wordt gewist, het bericht wordt verzonden of extensiegegevens worden gereset.
 

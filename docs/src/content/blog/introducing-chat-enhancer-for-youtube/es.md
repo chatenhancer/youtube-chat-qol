@@ -36,7 +36,7 @@ Chat Enhancer añade un Inbox para menciones y palabras clave que sigues. Si apa
 
 ## Más contexto sobre usuarios
 
-Haz clic en un avatar para consultar los mensajes recientes de esa persona, abrir su canal de YouTube en un panel lateral o marcarla para reconocerla más adelante.
+Haz clic en el avatar de una persona para ver sus mensajes recientes o abrir su canal de YouTube en un panel lateral. Desde ese perfil puedes añadir o quitar un anillo de avatar local para que la persona destaque en el chat. Puedes guardar mensajes útiles desde las filas de mensajes recientes, Inbox y modo Focus, o desde el menú de mensajes de YouTube. Cada marcador conserva el mensaje y el contexto del stream.
 
 ## Emojis más usados
 
@@ -44,7 +44,7 @@ Chat Enhancer añade una fila con tus emojis más usados para que no tengas que 
 
 ## Otras pequeñas mejoras
 
-También incluye menciones y citas rápidas, comandos de chat y recuperación de borradores, todo pensado para hacer más cómodo el chat que ya existe.
+También incluye menciones y citas rápidas, marcadores de mensajes, comandos de chat y recuperación de borradores, todo pensado para hacer más cómodo el chat que ya existe.
 
 Chat Enhancer for YouTube es gratis, de código abierto, no requiere cuenta y no usa analíticas.
 

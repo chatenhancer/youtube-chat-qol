@@ -38,7 +38,9 @@ Les données listées dans cette section sont stockées par l’extension dans v
 
 - **Données d’emojis fréquents :** enregistrées avec le stockage local de l’extension (`chrome.storage.local`). Cela inclut les compteurs d’utilisation locaux et les informations d’affichage des emojis utilisées pour créer la rangée d’emojis fréquents.
 
-- **Données d’utilisateurs favoris :** enregistrées avec le stockage local de l’extension (`chrome.storage.local`). Cela inclut le handle de l’utilisateur favori, l’ID de chaîne lorsqu’il est disponible et l’heure de création du favori. Les utilisateurs favoris sont globaux entre les streams dans le profil de navigateur actuel et servent à afficher des anneaux d’avatar colorés.
+- **Données des favoris :** enregistrées dans le stockage local de l’extension (`chrome.storage.local`). Elles peuvent inclure le texte du message enregistré et les informations d’affichage des emojis, le nom, l’URL d’avatar et, si disponible, l’ID de chaîne de l’auteur, les heures du message et de l’enregistrement, ainsi que le titre et l’URL du stream. Les favoris restent disponibles entre les streams dans le profil de navigateur actuel.
+
+- **Données des anneaux d’avatar :** enregistrées dans le stockage local de l’extension (`chrome.storage.local`). Elles comprennent le nom de l’auteur, son ID de chaîne s’il est disponible, ainsi que la date et l’heure d’ajout de l’anneau pour les utilisateurs auxquels vous ajoutez explicitement un anneau depuis leur profil de messages récents. La sélection reste disponible entre les streams dans le profil de navigateur actuel et sert uniquement à décorer les avatars correspondants ; elle ne vérifie pas si un utilisateur est en ligne.
 
 - **Brouillons de chat non envoyés :** enregistrés avec le stockage local de l’extension (`chrome.storage.local`) par stream. Ils sont restaurés après l’actualisation d’une page. Les brouillons sont supprimés lorsque le champ de chat est vidé, que le message est envoyé ou que les données de l’extension sont réinitialisées.
 

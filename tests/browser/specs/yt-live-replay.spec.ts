@@ -12,7 +12,7 @@ import {
   liteModeAeroBehaviorScenario,
   liteModeReplayRapidSeekScenario
 } from '../scenarios/lite-mode-native-surfaces';
-import { markedUserMessageMenuScenario } from '../scenarios/marked-users';
+import { bookmarkMessageMenuScenario } from '../scenarios/bookmarks';
 import { mockedMessageTranslationScenario } from '../scenarios/message-translation';
 import { messageMenuScenario, settingsMenuScenario } from '../scenarios/menus';
 import { profileCardRecentMessagesScenario } from '../scenarios/profile';
@@ -24,12 +24,12 @@ test(
 );
 test('logged-in live replay: chat settings menu receives extension controls', settingsMenuScenario);
 test(
-  'logged-in live replay: message context menu receives mark, quote, and mention actions',
+  'logged-in live replay: message context menu receives save, quote, and mention actions',
   messageMenuScenario
 );
 test(
-  'logged-in live replay: mark user from message menu persists and shows avatar ring',
-  markedUserMessageMenuScenario
+  'logged-in live replay: saved message persists and appears in Bookmarks',
+  bookmarkMessageMenuScenario
 );
 test('logged-in live replay: incoming chat messages are translated', mockedMessageTranslationScenario);
 test(

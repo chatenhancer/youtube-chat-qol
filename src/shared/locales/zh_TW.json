@@ -40,10 +40,10 @@
     "jumpToMessage": "跳到訊息",
     "keywordOrPhrase": "關鍵字或片語",
     "lessThanOneMinute": "少於 1 分鐘",
-    "markUser": "標記",
-    "unmarkUser": "取消",
-    "bookmarkUser": "加入書籤",
-    "removeBookmark": "移除書籤",
+    "addAvatarRing": "新增頭像光環",
+    "removeAvatarRing": "移除頭像光環",
+    "bookmarkAddedDate": "書籤新增於 {date}",
+    "avatarRingAddedDate": "頭像光環新增於 {date}",
     "mention": "提及",
     "mentionUser": "提及使用者",
     "mentionUserTitle": "提及使用者。Alt/Option 點擊可引用。",
@@ -290,7 +290,14 @@
     "gamesChooseOwnPiece": "選擇你的棋子",
     "gamesMuteSounds": "關閉遊戲音效",
     "gamesUnmuteSounds": "開啟遊戲音效",
-    "gamesUnavailableNoticeTitle": "無法連線"
+    "gamesUnavailableNoticeTitle": "無法連線",
+    "save": "儲存",
+    "remove": "移除",
+    "saveMessage": "儲存訊息",
+    "removeSavedMessage": "移除已儲存的訊息",
+    "savedToBookmarks": "已儲存至書籤",
+    "removedFromBookmarks": "已從書籤移除",
+    "couldNotSaveBookmark": "無法更新書籤。"
   },
   "extension": {
     "close": {
@@ -425,9 +432,6 @@
     "popupResetItemUnsentDrafts": {
       "message": "未送出的草稿"
     },
-    "popupResetItemBookmarkedUsers": {
-      "message": "已加入書籤的使用者"
-    },
     "popupResetItemPlaygroundIdentity": {
       "message": "Playground 身分與顯示名稱"
     },
@@ -446,21 +450,6 @@
     "popupSections": {
       "message": "彈出視窗分區"
     },
-    "noBookmarkedUsers": {
-      "message": "還沒有書籤"
-    },
-    "bookmarkedUsersCount": {
-      "message": "{count} 個書籤"
-    },
-    "bookmarkedUsersEmpty": {
-      "message": "你從 YouTube 聊天中加入書籤的使用者會顯示在這裡。"
-    },
-    "markedUserDate": {
-      "message": "已於 {date} 加入書籤"
-    },
-    "markedDateUnknown": {
-      "message": "書籤日期未知"
-    },
     "unknownStream": {
       "message": "未知直播"
     },
@@ -472,15 +461,6 @@
     },
     "openChannel": {
       "message": "開啟頻道"
-    },
-    "unmarkUser": {
-      "message": "取消"
-    },
-    "markUser": {
-      "message": "標記"
-    },
-    "bookmarkUser": {
-      "message": "加入書籤"
     },
     "removeBookmark": {
       "message": "移除書籤"
@@ -544,6 +524,27 @@
     },
     "chatSkinAero": {
       "message": "Aero"
+    },
+    "popupResetItemBookmarks": {
+      "message": "書籤"
+    },
+    "popupResetItemAvatarRings": {
+      "message": "頭像光環"
+    },
+    "noBookmarks": {
+      "message": "還沒有書籤"
+    },
+    "bookmarksCount": {
+      "message": "{count} 個書籤"
+    },
+    "bookmarksEmpty": {
+      "message": "你從 YouTube 聊天儲存的訊息會顯示在這裡。"
+    },
+    "bookmarkMessagePostedDate": {
+      "message": "訊息發布於 {date}"
+    },
+    "restoreBookmark": {
+      "message": "還原書籤"
     }
   }
 }

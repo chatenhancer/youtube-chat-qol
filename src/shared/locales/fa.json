@@ -40,10 +40,10 @@
     "jumpToMessage": "پرش به پیام",
     "keywordOrPhrase": "کلیدواژه یا عبارت",
     "lessThanOneMinute": "کمتر از ۱ دقیقه",
-    "markUser": "علامت",
-    "unmarkUser": "برداشتن",
-    "bookmarkUser": "نشانک",
-    "removeBookmark": "حذف نشانک",
+    "addAvatarRing": "افزودن حلقهٔ آواتار",
+    "removeAvatarRing": "حذف حلقهٔ آواتار",
+    "bookmarkAddedDate": "نشانک در {date} اضافه شد",
+    "avatarRingAddedDate": "حلقهٔ آواتار در {date} اضافه شد",
     "mention": "منشن",
     "mentionUser": "منشن کاربر",
     "mentionUserTitle": "منشن کاربر. برای نقل‌قول Alt/Option-click کنید.",
@@ -290,7 +290,14 @@
     "gamesChooseOwnPiece": "مهره خودت را انتخاب کن",
     "gamesMuteSounds": "قطع صدای بازی",
     "gamesUnmuteSounds": "وصل صدای بازی",
-    "gamesUnavailableNoticeTitle": "امکان اتصال نیست"
+    "gamesUnavailableNoticeTitle": "امکان اتصال نیست",
+    "save": "ذخیره",
+    "remove": "حذف",
+    "saveMessage": "ذخیره پیام",
+    "removeSavedMessage": "حذف پیام ذخیره‌شده",
+    "savedToBookmarks": "در نشانک‌ها ذخیره شد",
+    "removedFromBookmarks": "از نشانک‌ها حذف شد",
+    "couldNotSaveBookmark": "نشانک‌ها به‌روزرسانی نشدند."
   },
   "extension": {
     "close": {
@@ -425,9 +432,6 @@
     "popupResetItemUnsentDrafts": {
       "message": "پیش‌نویس‌های ارسال‌نشده"
     },
-    "popupResetItemBookmarkedUsers": {
-      "message": "کاربران نشانک‌شده"
-    },
     "popupResetItemPlaygroundIdentity": {
       "message": "هویت و نام نمایشی Playground"
     },
@@ -446,21 +450,6 @@
     "popupSections": {
       "message": "بخش‌های پنجره"
     },
-    "noBookmarkedUsers": {
-      "message": "هنوز نشانکی نیست"
-    },
-    "bookmarkedUsersCount": {
-      "message": "{count} نشانک"
-    },
-    "bookmarkedUsersEmpty": {
-      "message": "کاربرانی که از چت YouTube نشانک می‌کنید اینجا نمایش داده می‌شوند."
-    },
-    "markedUserDate": {
-      "message": "در {date} نشانک شد"
-    },
-    "markedDateUnknown": {
-      "message": "تاریخ نشانک نامشخص است"
-    },
     "unknownStream": {
       "message": "پخش نامشخص"
     },
@@ -472,15 +461,6 @@
     },
     "openChannel": {
       "message": "باز کردن کانال"
-    },
-    "unmarkUser": {
-      "message": "برداشتن"
-    },
-    "markUser": {
-      "message": "علامت"
-    },
-    "bookmarkUser": {
-      "message": "نشانک"
     },
     "removeBookmark": {
       "message": "حذف نشانک"
@@ -544,6 +524,27 @@
     },
     "chatSkinAero": {
       "message": "Aero"
+    },
+    "popupResetItemBookmarks": {
+      "message": "نشانک‌ها"
+    },
+    "popupResetItemAvatarRings": {
+      "message": "حلقه‌های آواتار"
+    },
+    "noBookmarks": {
+      "message": "هنوز نشانکی نیست"
+    },
+    "bookmarksCount": {
+      "message": "{count} نشانک"
+    },
+    "bookmarksEmpty": {
+      "message": "پیام‌هایی که از گفت‌وگوی YouTube ذخیره می‌کنید اینجا نمایش داده می‌شوند."
+    },
+    "bookmarkMessagePostedDate": {
+      "message": "پیام در {date} ارسال شد"
+    },
+    "restoreBookmark": {
+      "message": "بازیابی نشانک"
     }
   }
 }

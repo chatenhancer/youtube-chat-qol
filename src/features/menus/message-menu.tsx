@@ -16,11 +16,7 @@ import {
   QUOTE_ICON_PATH
 } from '../../shared/icons';
 import { jsx, el } from '../../shared/jsx-dom';
-import {
-  getMessageAuthorMarkTitle,
-  isMessageAuthorMarked,
-  toggleMessageAuthorMark
-} from '../marked-users';
+import { getChatBookmarkTitle, isChatBookmarked, toggleChatBookmark } from '../bookmarks';
 import { replyToMessage } from '../reply';
 import { registerFeature } from '../../content/feature-runtime';
 import { closeMenu, createMenuActionItem } from './common';
@@ -81,23 +77,23 @@ export function enhanceMessageContextMenu(menu: HTMLElement): void {
     return;
   }
 
-  const markedUser = Boolean(activeContextMessage && isMessageAuthorMarked(activeContextMessage));
-  const markUserLabel = markedUser ? t('unmarkUser') : t('markUser');
-  const markUserTitle = activeContextMessage
-    ? getMessageAuthorMarkTitle(activeContextMessage)
-    : markUserLabel;
+  const saved = Boolean(activeContextMessage && isChatBookmarked(activeContextMessage));
+  const saveLabel = saved ? t('remove') : t('save');
+  const saveTitle = activeContextMessage
+    ? getChatBookmarkTitle(activeContextMessage)
+    : t('saveMessage');
 
   list.append(
     createMenuActionItem({
       className: 'ytcq-context-item',
-      action: 'mark-user',
-      label: markUserLabel,
-      title: markUserTitle,
-      iconPath: markedUser ? BOOKMARK_FILLED_ICON_PATH : BOOKMARK_ICON_PATH,
+      action: 'save-message',
+      label: saveLabel,
+      title: saveTitle,
+      iconPath: saved ? BOOKMARK_FILLED_ICON_PATH : BOOKMARK_ICON_PATH,
       iconViewBox: MATERIAL_ICON_VIEW_BOX,
       onClick: () => {
         if (activeContextMessage?.isConnected) {
-          void toggleMessageAuthorMark(activeContextMessage);
+          void toggleChatBookmark(activeContextMessage);
           closeMenu();
         }
       }

@@ -35,7 +35,7 @@ import {
   mentionMenuDraftScenario,
   quoteMenuDraftScenario
 } from '../scenarios/message-actions';
-import { markedUserMessageMenuScenario } from '../scenarios/marked-users';
+import { bookmarkMessageMenuScenario } from '../scenarios/bookmarks';
 import { mockedReplacedTranslationToggleScenario } from '../scenarios/message-translation';
 import { messageMenuScenario, settingsMenuScenario } from '../scenarios/menus';
 import { profileCardRecentMessagesScenario } from '../scenarios/profile';
@@ -46,12 +46,12 @@ test(
   attachScenario
 );
 test(
-  'logged-in live: message context menu receives mark, quote, and mention actions',
+  'logged-in live: message context menu receives save, quote, and mention actions',
   messageMenuScenario
 );
 test(
-  'logged-in live: mark user from message menu persists and shows avatar ring',
-  markedUserMessageMenuScenario
+  'logged-in live: saved message persists and appears in Bookmarks',
+  bookmarkMessageMenuScenario
 );
 test('logged-in live: mention menu action writes a draft only', mentionMenuDraftScenario);
 test('logged-in live: quote menu action writes a draft only', quoteMenuDraftScenario);

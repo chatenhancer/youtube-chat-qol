@@ -15,6 +15,8 @@ export interface FocusSource {
 
 export interface FocusRecord {
   authorName: string;
+  avatarSrc?: string;
+  channelId?: string;
   contentParts: RichTextSegment[];
   id: number;
   historyKey: string;
@@ -22,6 +24,7 @@ export interface FocusRecord {
   messageRef?: WeakRef<HTMLElement>;
   side: 'them' | 'us';
   text: string;
+  timestamp: number;
   timestampText: string;
   translation?: MessageTranslationRecord;
 }

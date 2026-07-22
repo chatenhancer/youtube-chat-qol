@@ -38,7 +38,9 @@ Los datos indicados en esta sección se almacenan por la extensión en tu propio
 
 - **Datos de emojis frecuentes:** se guardan usando el almacenamiento local de la extensión (`chrome.storage.local`). Esto incluye contadores de uso locales e información de visualización de emojis usada para construir la fila de emojis frecuentes.
 
-- **Datos de usuarios marcados:** se guardan usando el almacenamiento local de la extensión (`chrome.storage.local`). Esto incluye el handle del usuario marcado, el ID del canal cuando está disponible y la hora en que se creó el marcador. Los usuarios marcados son globales entre streams en el perfil actual del navegador y se usan para mostrar anillos de avatar de color.
+- **Datos de marcadores:** se guardan usando el almacenamiento local de la extensión (`chrome.storage.local`). Pueden incluir el texto del mensaje guardado y la información necesaria para mostrar emojis, el nombre, la URL del avatar y, cuando esté disponible, el ID del canal del autor, las horas del mensaje y del guardado, y el título y la URL del stream. Los marcadores siguen disponibles entre streams en el perfil actual del navegador.
+
+- **Datos de aros de avatar:** se guardan usando el almacenamiento local de la extensión (`chrome.storage.local`). Incluyen el nombre del autor, el ID del canal cuando está disponible y la fecha y hora en que se añadió el aro de los usuarios a los que añades expresamente un aro desde su perfil de mensajes recientes. La selección sigue disponible entre streams en el perfil actual del navegador y solo se usa para decorar avatares coincidentes; no comprueba si un usuario está conectado.
 
 - **Borradores de chat no enviados:** se guardan usando el almacenamiento local de la extensión (`chrome.storage.local`) por stream. Se restauran después de actualizar la página. Los borradores se eliminan cuando se limpia el cuadro de chat, se envía el mensaje o se restablecen los datos de la extensión.
 

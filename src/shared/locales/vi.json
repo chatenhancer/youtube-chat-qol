@@ -40,10 +40,10 @@
     "jumpToMessage": "Nhảy đến tin nhắn",
     "keywordOrPhrase": "Từ khóa hoặc cụm từ",
     "lessThanOneMinute": "dưới 1 phút",
-    "markUser": "Đánh dấu",
-    "unmarkUser": "Bỏ dấu",
-    "bookmarkUser": "Lưu dấu trang",
-    "removeBookmark": "Xóa dấu trang",
+    "addAvatarRing": "Thêm vòng ảnh đại diện",
+    "removeAvatarRing": "Xóa vòng ảnh đại diện",
+    "bookmarkAddedDate": "Dấu trang được thêm {date}",
+    "avatarRingAddedDate": "Vòng ảnh đại diện được thêm {date}",
     "mention": "Nhắc đến",
     "mentionUser": "Nhắc đến người dùng",
     "mentionUserTitle": "Nhắc đến người dùng. Alt/Option-click để trích dẫn.",
@@ -290,7 +290,14 @@
     "gamesChooseOwnPiece": "Chọn quân của bạn",
     "gamesMuteSounds": "Tắt âm thanh trò chơi",
     "gamesUnmuteSounds": "Bật âm thanh trò chơi",
-    "gamesUnavailableNoticeTitle": "Không thể kết nối"
+    "gamesUnavailableNoticeTitle": "Không thể kết nối",
+    "save": "Lưu",
+    "remove": "Xóa",
+    "saveMessage": "Lưu tin nhắn",
+    "removeSavedMessage": "Xóa tin nhắn đã lưu",
+    "savedToBookmarks": "Đã lưu vào Dấu trang",
+    "removedFromBookmarks": "Đã xóa khỏi Dấu trang",
+    "couldNotSaveBookmark": "Không thể cập nhật dấu trang."
   },
   "extension": {
     "close": {
@@ -425,9 +432,6 @@
     "popupResetItemUnsentDrafts": {
       "message": "Bản nháp chưa gửi"
     },
-    "popupResetItemBookmarkedUsers": {
-      "message": "Người dùng đã đánh dấu"
-    },
     "popupResetItemPlaygroundIdentity": {
       "message": "Danh tính và tên hiển thị Playground"
     },
@@ -446,21 +450,6 @@
     "popupSections": {
       "message": "Các phần của popup"
     },
-    "noBookmarkedUsers": {
-      "message": "Chưa có dấu trang"
-    },
-    "bookmarkedUsersCount": {
-      "message": "{count} dấu trang"
-    },
-    "bookmarkedUsersEmpty": {
-      "message": "Người dùng bạn lưu dấu trang từ chat YouTube sẽ xuất hiện ở đây."
-    },
-    "markedUserDate": {
-      "message": "Đã lưu dấu trang {date}"
-    },
-    "markedDateUnknown": {
-      "message": "Không rõ ngày lưu dấu trang"
-    },
     "unknownStream": {
       "message": "Livestream không rõ"
     },
@@ -472,15 +461,6 @@
     },
     "openChannel": {
       "message": "Mở kênh"
-    },
-    "unmarkUser": {
-      "message": "Bỏ dấu"
-    },
-    "markUser": {
-      "message": "Đánh dấu"
-    },
-    "bookmarkUser": {
-      "message": "Lưu dấu trang"
     },
     "removeBookmark": {
       "message": "Xóa dấu trang"
@@ -544,6 +524,27 @@
     },
     "chatSkinAero": {
       "message": "Aero"
+    },
+    "popupResetItemBookmarks": {
+      "message": "Dấu trang"
+    },
+    "popupResetItemAvatarRings": {
+      "message": "Vòng ảnh đại diện"
+    },
+    "noBookmarks": {
+      "message": "Chưa có dấu trang"
+    },
+    "bookmarksCount": {
+      "message": "{count} dấu trang"
+    },
+    "bookmarksEmpty": {
+      "message": "Tin nhắn bạn lưu từ cuộc trò chuyện YouTube sẽ xuất hiện ở đây."
+    },
+    "bookmarkMessagePostedDate": {
+      "message": "Tin nhắn được đăng {date}"
+    },
+    "restoreBookmark": {
+      "message": "Khôi phục dấu trang"
     }
   }
 }

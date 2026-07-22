@@ -36,7 +36,7 @@ YouTube canlı sohbeti, biri sizden bahsettiğinde size bildirim göndermez. Cha
 
 ## Daha iyi kullanıcı bağlamı
 
-Chat Enhancer’da bir kullanıcının avatarına tıkladığınızda, o kişinin son mesajlarını gösteren bir profil paneli açılır. YouTube kanalını yan pencerede açabilir ve daha sonra tanımak istediğiniz kullanıcıları yer imlerine ekleyebilirsiniz.
+Bir kullanıcının avatarına tıklayarak son mesajlarını görebilir veya YouTube kanalını yan panelde açabilirsiniz. Bu profilden, kullanıcının sohbette öne çıkması için yerel bir avatar halkası ekleyebilir veya kaldırabilirsiniz. Yararlı mesajları son mesajlar, Gelen Kutusu ve odak modu satırlarından ya da YouTube mesaj menüsünden kaydedebilirsiniz. Her yer işareti mesajı ve yayın bağlamını saklar.
 
 ## En çok kullanılan emojiler
 
@@ -44,7 +44,7 @@ Chat Enhancer, en çok kullandığınız emojiler için bir sıra ekler; gerçek
 
 ## Diğer küçük iyileştirmeler
 
-Hızlı bahsetme ve alıntılar, kullanıcı yer imleri, sohbet komutları, taslak kurtarma ve canlı sohbeti daha az boş hissettiren başka küçük dokunuşlar da var.
+Hızlı bahsetme ve alıntılar, mesaj yer işaretleri, sohbet komutları, taslak kurtarma ve canlı sohbeti daha az boş hissettiren başka küçük dokunuşlar da var.
 
 Chat Enhancer for YouTube ücretsizdir, açık kaynaklıdır, hesap gerektirmez ve analiz toplamaz.
 

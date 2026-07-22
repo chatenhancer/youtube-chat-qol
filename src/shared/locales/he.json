@@ -40,10 +40,10 @@
     "jumpToMessage": "קפיצה להודעה",
     "keywordOrPhrase": "מילת מפתח או ביטוי",
     "lessThanOneMinute": "פחות מדקה",
-    "markUser": "סמן",
-    "unmarkUser": "בטל",
-    "bookmarkUser": "הוסף לסימניות",
-    "removeBookmark": "הסר מסימניות",
+    "addAvatarRing": "הוספת טבעת לאווטאר",
+    "removeAvatarRing": "הסרת טבעת האווטאר",
+    "bookmarkAddedDate": "הסימנייה נוספה ב-{date}",
+    "avatarRingAddedDate": "טבעת האווטאר נוספה ב-{date}",
     "mention": "אזכור",
     "mentionUser": "אזכור משתמש",
     "mentionUserTitle": "אזכור משתמש. Alt/Option-קליק כדי לצטט.",
@@ -290,7 +290,14 @@
     "gamesChooseOwnPiece": "בחר את הכלי שלך",
     "gamesMuteSounds": "השתק צלילי משחק",
     "gamesUnmuteSounds": "בטל השתקת צלילי משחק",
-    "gamesUnavailableNoticeTitle": "לא ניתן להתחבר"
+    "gamesUnavailableNoticeTitle": "לא ניתן להתחבר",
+    "save": "שמירה",
+    "remove": "הסרה",
+    "saveMessage": "שמירת הודעה",
+    "removeSavedMessage": "הסרת הודעה שמורה",
+    "savedToBookmarks": "נשמר בסימניות",
+    "removedFromBookmarks": "הוסר מהסימניות",
+    "couldNotSaveBookmark": "לא ניתן לעדכן את הסימניות."
   },
   "extension": {
     "close": {
@@ -425,9 +432,6 @@
     "popupResetItemUnsentDrafts": {
       "message": "טיוטות שלא נשלחו"
     },
-    "popupResetItemBookmarkedUsers": {
-      "message": "משתמשים שסומנו בסימנייה"
-    },
     "popupResetItemPlaygroundIdentity": {
       "message": "זהות ושם תצוגה של Playground"
     },
@@ -446,21 +450,6 @@
     "popupSections": {
       "message": "חלקי החלונית"
     },
-    "noBookmarkedUsers": {
-      "message": "אין סימניות עדיין"
-    },
-    "bookmarkedUsersCount": {
-      "message": "{count} סימניות"
-    },
-    "bookmarkedUsersEmpty": {
-      "message": "משתמשים שתוסיפו לסימניות מצ׳אט YouTube יופיעו כאן."
-    },
-    "markedUserDate": {
-      "message": "נוסף לסימניות ב-{date}"
-    },
-    "markedDateUnknown": {
-      "message": "תאריך הסימנייה לא ידוע"
-    },
     "unknownStream": {
       "message": "שידור לא ידוע"
     },
@@ -472,15 +461,6 @@
     },
     "openChannel": {
       "message": "פתיחת ערוץ"
-    },
-    "unmarkUser": {
-      "message": "בטל"
-    },
-    "markUser": {
-      "message": "סמן"
-    },
-    "bookmarkUser": {
-      "message": "הוסף לסימניות"
     },
     "removeBookmark": {
       "message": "הסר מסימניות"
@@ -544,6 +524,27 @@
     },
     "chatSkinAero": {
       "message": "Aero"
+    },
+    "popupResetItemBookmarks": {
+      "message": "סימניות"
+    },
+    "popupResetItemAvatarRings": {
+      "message": "טבעות אווטאר"
+    },
+    "noBookmarks": {
+      "message": "אין סימניות עדיין"
+    },
+    "bookmarksCount": {
+      "message": "{count} סימניות"
+    },
+    "bookmarksEmpty": {
+      "message": "הודעות שתשמרו מהצ׳אט של YouTube יופיעו כאן."
+    },
+    "bookmarkMessagePostedDate": {
+      "message": "ההודעה פורסמה ב-{date}"
+    },
+    "restoreBookmark": {
+      "message": "שחזור סימנייה"
     }
   }
 }

@@ -183,7 +183,7 @@ function drawShimmerPerimeter(
     width,
     height,
     createShimmerGradient(context, width, height, progress),
-    13
+    10
   );
 }
 

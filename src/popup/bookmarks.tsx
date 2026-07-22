@@ -7,93 +7,119 @@ import {
 } from '../shared/icons';
 import { jsx, el } from '../shared/jsx-dom';
 import {
-  getMarkedUserColor,
-  MARKED_USERS_STORAGE_KEY,
-  normalizeStoredMarkedUsers,
-  serializeMarkedUsers,
-  type MarkedUserRecord
-} from '../shared/marked-users';
+  BOOKMARKS_STORAGE_KEY,
+  LEGACY_BOOKMARKS_STORAGE_KEY,
+  getBookmarkAuthorColor,
+  normalizeStoredBookmarks,
+  serializeBookmarks,
+  type BookmarkRecord
+} from '../shared/bookmarks';
+import { appendRichMessageText } from '../youtube/rich-text';
 import { controls } from './controls';
 import { getExtensionMessage } from './i18n';
 
-const recentlyUnmarkedBookmarks = new Map<string, MarkedUserRecord>();
+const recentlyRemovedBookmarks = new Map<string, BookmarkRecord>();
 
 export function initBookmarksPanel(): void {
-  if (!controls.bookmarksCount || !controls.bookmarksList) return;
+  const { bookmarksCount, bookmarksList } = controls;
+  if (!bookmarksCount || !bookmarksList) return;
 
-  refreshBookmarkedUsers();
+  refreshBookmarks();
   chrome.storage.onChanged.addListener((changes, areaName) => {
-    if (areaName === 'local' && changes[MARKED_USERS_STORAGE_KEY]) {
-      renderBookmarkedUsers(normalizeStoredMarkedUsers(changes[MARKED_USERS_STORAGE_KEY].newValue));
+    if (areaName === 'local' && changes[BOOKMARKS_STORAGE_KEY]) {
+      renderBookmarks(normalizeStoredBookmarks(changes[BOOKMARKS_STORAGE_KEY].newValue));
     }
   });
 }
 
-function refreshBookmarkedUsers(): void {
-  chrome.storage.local.get({ [MARKED_USERS_STORAGE_KEY]: {} }, (stored) => {
-    renderBookmarkedUsers(normalizeStoredMarkedUsers((stored || {})[MARKED_USERS_STORAGE_KEY]));
+function refreshBookmarks(): void {
+  chrome.storage.local.get([BOOKMARKS_STORAGE_KEY, LEGACY_BOOKMARKS_STORAGE_KEY], (stored) => {
+    const values = stored || {};
+    const hasBookmarks = Object.hasOwn(values, BOOKMARKS_STORAGE_KEY);
+    const hasLegacyBookmarks = Object.hasOwn(values, LEGACY_BOOKMARKS_STORAGE_KEY);
+    const records = normalizeStoredBookmarks(
+      hasBookmarks ? values[BOOKMARKS_STORAGE_KEY] : values[LEGACY_BOOKMARKS_STORAGE_KEY]
+    );
+    renderBookmarks(records);
+
+    if (hasBookmarks) {
+      if (hasLegacyBookmarks) chrome.storage.local.remove(LEGACY_BOOKMARKS_STORAGE_KEY);
+      return;
+    }
+
+    chrome.storage.local.set({ [BOOKMARKS_STORAGE_KEY]: serializeBookmarks(records) }, () => {
+      const migrationError = chrome.runtime.lastError;
+      if (!migrationError && hasLegacyBookmarks) {
+        chrome.storage.local.remove(LEGACY_BOOKMARKS_STORAGE_KEY);
+      }
+    });
   });
 }
 
-function renderBookmarkedUsers(records: Map<string, MarkedUserRecord>): void {
+function renderBookmarks(records: Map<string, BookmarkRecord>): void {
   if (!controls.bookmarksCount || !controls.bookmarksList) return;
 
-  const entries = getVisibleBookmarkedUserEntries(records).sort((firstEntry, secondEntry) => {
-    const first = firstEntry.record;
-    const second = secondEntry.record;
-    const firstTime = Number.isFinite(first.markedAt) ? first.markedAt : 0;
-    const secondTime = Number.isFinite(second.markedAt) ? second.markedAt : 0;
-    return secondTime - firstTime || first.authorName.localeCompare(second.authorName);
+  const entries = getVisibleBookmarkEntries(records).sort((firstEntry, secondEntry) => {
+    const firstTime = Number.isFinite(firstEntry.record.savedAt) ? firstEntry.record.savedAt : 0;
+    const secondTime = Number.isFinite(secondEntry.record.savedAt) ? secondEntry.record.savedAt : 0;
+    return (
+      secondTime - firstTime ||
+      firstEntry.record.authorName.localeCompare(secondEntry.record.authorName)
+    );
   });
 
-  controls.bookmarksCount.textContent = entries.length
-    ? getExtensionMessage('bookmarkedUsersCount', String(entries.length))
-    : getExtensionMessage('noBookmarkedUsers');
+  controls.bookmarksCount.textContent = records.size
+    ? getExtensionMessage('bookmarksCount', String(records.size))
+    : getExtensionMessage('noBookmarks');
   controls.bookmarksList.replaceChildren();
   controls.bookmarksList.classList.toggle('bookmarks-list-empty', entries.length === 0);
 
   if (!entries.length) {
     controls.bookmarksList.append(
       el<HTMLParagraphElement>(
-        <p class="bookmarks-empty">{getExtensionMessage('bookmarkedUsersEmpty')}</p>
+        <p class="bookmarks-empty">{getExtensionMessage('bookmarksEmpty')}</p>
       )
     );
     return;
   }
 
   controls.bookmarksList.append(
-    ...entries.map(({ key, record, active }) => createBookmarkedUserRow(key, record, active))
+    ...entries.map(({ key, record, active }) => createBookmarkRow(key, record, active))
   );
 }
 
-function getVisibleBookmarkedUserEntries(records: Map<string, MarkedUserRecord>): Array<{
+function getVisibleBookmarkEntries(records: Map<string, BookmarkRecord>): Array<{
   active: boolean;
   key: string;
-  record: MarkedUserRecord;
+  record: BookmarkRecord;
 }> {
   const entries = Array.from(records.entries()).map(([key, record]) => {
-    recentlyUnmarkedBookmarks.delete(key);
+    recentlyRemovedBookmarks.delete(key);
     return { active: true, key, record };
   });
 
-  recentlyUnmarkedBookmarks.forEach((record, key) => {
+  recentlyRemovedBookmarks.forEach((record, key) => {
     if (!records.has(key)) entries.push({ active: false, key, record });
   });
 
   return entries;
 }
 
-function createBookmarkedUserRow(
-  key: string,
-  record: MarkedUserRecord,
-  active: boolean
-): HTMLElement {
-  const channelUrl = getBookmarkedUserChannelUrl(record);
-  const avatar = createBookmarkedUserAvatar(record, channelUrl);
-  const name = createBookmarkedUserName(record);
-  const source = createBookmarkedUserSource(record);
-  const actionLabel = getExtensionMessage(active ? 'removeBookmark' : 'bookmarkUser');
-  const unmarkButton = el<HTMLButtonElement>(
+function createBookmarkRow(key: string, record: BookmarkRecord, active: boolean): HTMLElement {
+  const channelUrl = getBookmarkChannelUrl(record);
+  const avatar = createBookmarkAvatar(record, channelUrl);
+  const copy = el<HTMLSpanElement>(<span class="bookmark-copy" />);
+  copy.append(createBookmarkHeader(record));
+
+  if (record.message) {
+    const message = el<HTMLDivElement>(<div class="bookmark-message" dir="auto" />);
+    appendRichMessageText(message, record.message.text, [], record.message.contentParts);
+    copy.append(message);
+  }
+
+  copy.append(createBookmarkMetadata(record));
+  const actionLabel = getExtensionMessage(active ? 'removeBookmark' : 'restoreBookmark');
+  const actionButton = el<HTMLButtonElement>(
     <button
       type="button"
       class="bookmark-action-button"
@@ -101,9 +127,9 @@ function createBookmarkedUserRow(
       aria-label={actionLabel}
       onClick={() => {
         if (active) {
-          unmarkBookmarkedUser(key);
+          removeBookmark(key);
         } else {
-          markBookmarkedUser(key, record);
+          restoreBookmark(key, record);
         }
       }}
     >
@@ -115,25 +141,34 @@ function createBookmarkedUserRow(
   );
 
   return el<HTMLElement>(
-    <article class={`bookmark-row${active ? '' : ' bookmark-row-unmarked'}`}>
+    <article class={`bookmark-row${active ? '' : ' bookmark-row-removed'}`}>
       {avatar}
-      <span class="bookmark-copy">
-        {name}
-        <span class="bookmark-date">{formatBookmarkedUserDate(record.markedAt)}</span>
-        {source}
-      </span>
-      <span class="bookmark-actions">{unmarkButton}</span>
+      {copy}
+      <span class="bookmark-actions">{actionButton}</span>
     </article>
   );
 }
 
-function createBookmarkedUserAvatar(record: MarkedUserRecord, channelUrl: string): HTMLElement {
+function createBookmarkHeader(record: BookmarkRecord): HTMLElement {
+  const header = el<HTMLSpanElement>(<span class="bookmark-message-header" />);
+  header.append(
+    el<HTMLElement>(
+      <strong class="bookmark-name" dir="auto">
+        {record.authorName || getExtensionMessage('unknownUser')}
+      </strong>
+    )
+  );
+  const postedTime = createBookmarkPostedTime(record.message);
+  if (postedTime) header.append(postedTime);
+  return header;
+}
+
+function createBookmarkAvatar(record: BookmarkRecord, channelUrl: string): HTMLElement {
   const content = record.avatarUrl ? (
     <img src={record.avatarUrl} alt="" referrerPolicy="no-referrer" />
   ) : (
-    getBookmarkedUserInitial(record.authorName)
+    getBookmarkAuthorInitial(record.authorName)
   );
-
   const element = channelUrl
     ? el<HTMLButtonElement>(
         <button
@@ -144,35 +179,52 @@ function createBookmarkedUserAvatar(record: MarkedUserRecord, channelUrl: string
           onClick={() => chrome.tabs.create({ url: channelUrl })}
         >
           {content}
-          {createBookmarkedUserAvatarOpenIcon()}
+          {createBookmarkAvatarOpenIcon()}
         </button>
       )
     : el<HTMLSpanElement>(<span class="bookmark-avatar">{content}</span>);
-  element.style.setProperty('--bookmark-user-color', getMarkedUserColor(record));
-
+  element.style.setProperty('--bookmark-author-color', getBookmarkAuthorColor(record));
   return element;
 }
 
-function createBookmarkedUserAvatarOpenIcon(): SVGSVGElement {
+function createBookmarkAvatarOpenIcon(): SVGSVGElement {
   const icon = createOpenInNewIcon();
   icon.classList.add('bookmark-avatar-open-icon');
   return icon;
 }
 
-function createBookmarkedUserName(record: MarkedUserRecord): HTMLElement {
-  return el<HTMLElement>(
-    <strong class="bookmark-name">{record.authorName || getExtensionMessage('unknownUser')}</strong>
-  );
+function createBookmarkMetadata(record: BookmarkRecord): HTMLElement {
+  const metadata = el<HTMLSpanElement>(<span class="bookmark-metadata" />);
+  metadata.append(createBookmarkSource(record));
+  return metadata;
 }
 
-function createBookmarkedUserSource(record: MarkedUserRecord): HTMLElement {
-  const sourceText =
-    record.markedSourceTitle || record.markedSourceUrl || getExtensionMessage('unknownStream');
-  const sourceUrl = getBookmarkedUserSourceUrl(record);
+function createBookmarkPostedTime(message: BookmarkRecord['message']): HTMLElement | null {
+  if (!message) return null;
+
+  const timestamp = Number(message.timestamp);
+  const hasTimestamp = Number.isFinite(timestamp) && timestamp > 0;
+  const compactTime = hasTimestamp ? formatCompactTime(timestamp) : message.timestampText.trim();
+  if (!compactTime) return null;
+
+  const fullPostedTime = hasTimestamp ? formatFullDateTime(timestamp) : compactTime;
+  const tooltip = getExtensionMessage('bookmarkMessagePostedDate', fullPostedTime);
+  const time = el<HTMLTimeElement>(
+    <time class="bookmark-message-time" title={tooltip} aria-label={tooltip}>
+      {compactTime}
+    </time>
+  );
+  if (hasTimestamp) time.dateTime = new Date(timestamp).toISOString();
+  return time;
+}
+
+function createBookmarkSource(record: BookmarkRecord): HTMLElement {
+  const sourceText = record.sourceTitle || record.sourceUrl || getExtensionMessage('unknownStream');
+  const sourceUrl = getBookmarkSourceUrl(record);
 
   if (sourceUrl) {
     const tooltip = getExtensionMessage('openStreamInNewWindow', sourceText);
-    const element = el<HTMLButtonElement>(
+    return el<HTMLButtonElement>(
       <button
         type="button"
         class="bookmark-source bookmark-source-button"
@@ -184,54 +236,60 @@ function createBookmarkedUserSource(record: MarkedUserRecord): HTMLElement {
         {createOpenInNewIcon()}
       </button>
     );
-    return element;
   }
 
-  return el<HTMLSpanElement>(<span class="bookmark-source">{sourceText}</span>);
+  return el<HTMLSpanElement>(
+    <span class="bookmark-source" title={sourceText}>
+      {sourceText}
+    </span>
+  );
 }
 
-function unmarkBookmarkedUser(key: string): void {
-  chrome.storage.local.get({ [MARKED_USERS_STORAGE_KEY]: {} }, (stored) => {
-    const records = normalizeStoredMarkedUsers((stored || {})[MARKED_USERS_STORAGE_KEY]);
+function removeBookmark(key: string): void {
+  updateStoredBookmarks((records) => {
     const record = records.get(key);
-    if (record) {
-      recentlyUnmarkedBookmarks.set(key, record);
-    }
+    if (record) recentlyRemovedBookmarks.set(key, record);
     records.delete(key);
-    chrome.storage.local.set({ [MARKED_USERS_STORAGE_KEY]: serializeMarkedUsers(records) }, () => {
-      renderBookmarkedUsers(records);
-    });
   });
 }
 
-function markBookmarkedUser(key: string, record: MarkedUserRecord): void {
-  chrome.storage.local.get({ [MARKED_USERS_STORAGE_KEY]: {} }, (stored) => {
-    const records = normalizeStoredMarkedUsers((stored || {})[MARKED_USERS_STORAGE_KEY]);
+function restoreBookmark(key: string, record: BookmarkRecord): void {
+  updateStoredBookmarks((records) => {
     records.set(key, record);
-    recentlyUnmarkedBookmarks.delete(key);
-    chrome.storage.local.set({ [MARKED_USERS_STORAGE_KEY]: serializeMarkedUsers(records) }, () => {
-      renderBookmarkedUsers(records);
-    });
+    recentlyRemovedBookmarks.delete(key);
   });
 }
 
-function getBookmarkedUserInitial(authorName: string): string {
+function updateStoredBookmarks(update: (records: Map<string, BookmarkRecord>) => void): void {
+  chrome.storage.local.get({ [BOOKMARKS_STORAGE_KEY]: {} }, (stored) => {
+    const records = normalizeStoredBookmarks((stored || {})[BOOKMARKS_STORAGE_KEY]);
+    update(records);
+    chrome.storage.local.set({ [BOOKMARKS_STORAGE_KEY]: serializeBookmarks(records) }, () =>
+      renderBookmarks(records)
+    );
+  });
+}
+
+function getBookmarkAuthorInitial(authorName: string): string {
   const normalized = authorName.trim().replace(/^@/, '');
   return (normalized[0] || '?').toUpperCase();
 }
 
-function formatBookmarkedUserDate(timestamp: number): string {
-  if (!Number.isFinite(timestamp) || timestamp <= 0)
-    return getExtensionMessage('markedDateUnknown');
-
-  const formatted = new Intl.DateTimeFormat(undefined, {
+function formatFullDateTime(timestamp: number): string {
+  return new Intl.DateTimeFormat(undefined, {
     dateStyle: 'medium',
     timeStyle: 'short'
   }).format(timestamp);
-  return getExtensionMessage('markedUserDate', formatted);
 }
 
-function getBookmarkedUserChannelUrl(record: MarkedUserRecord): string {
+function formatCompactTime(timestamp: number): string {
+  return new Intl.DateTimeFormat(undefined, {
+    hour: '2-digit',
+    minute: '2-digit'
+  }).format(timestamp);
+}
+
+function getBookmarkChannelUrl(record: BookmarkRecord): string {
   if (record.channelId) {
     return `https://www.youtube.com/channel/${encodeURIComponent(record.channelId)}`;
   }
@@ -240,8 +298,8 @@ function getBookmarkedUserChannelUrl(record: MarkedUserRecord): string {
   return /^[A-Za-z0-9._-]+$/.test(handle) ? `https://www.youtube.com/@${handle}` : '';
 }
 
-function getBookmarkedUserSourceUrl(record: MarkedUserRecord): string {
-  const sourceUrl = (record.markedSourceUrl || '').trim();
+function getBookmarkSourceUrl(record: BookmarkRecord): string {
+  const sourceUrl = (record.sourceUrl || '').trim();
   if (!sourceUrl) return '';
 
   try {

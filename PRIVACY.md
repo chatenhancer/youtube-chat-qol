@@ -32,7 +32,9 @@ Data listed in this section is stored by the extension in your own browser profi
 
 - **Frequent emoji data:** saved using local extension storage (`chrome.storage.local`). This includes local usage counts and emoji display information used to build the frequent emoji row.
 
-- **Bookmarked user data:** saved using local extension storage (`chrome.storage.local`). This includes the bookmarked user's handle, channel ID when available, and the time the bookmark was created. Bookmarked users are global across streams in the current browser profile and are used to show colored avatar rings.
+- **Bookmark data:** saved using local extension storage (`chrome.storage.local`). This may include the saved message text and emoji display information, author name, avatar URL and channel ID when available, message and save times, and stream title and URL. Bookmarks remain available across streams in the current browser profile.
+
+- **Avatar ring data:** saved using local extension storage (`chrome.storage.local`). This includes the author name, channel ID when available, and the time the ring was added for users you explicitly add an avatar ring to from their recent-message profile. The selection remains available across streams in the current browser profile and is used only to decorate matching avatars.
 
 - **Unsent chat drafts:** saved using local extension storage (`chrome.storage.local`) per stream. They are restored after a page refresh. Drafts are removed when the chat input is cleared, the message is sent, or extension data is reset.
 

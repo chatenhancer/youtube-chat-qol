@@ -40,10 +40,10 @@
     "jumpToMessage": "الانتقال إلى الرسالة",
     "keywordOrPhrase": "كلمة مفتاحية أو عبارة",
     "lessThanOneMinute": "أقل من دقيقة واحدة",
-    "markUser": "تمييز",
-    "unmarkUser": "إزالة",
-    "bookmarkUser": "إشارة مرجعية",
-    "removeBookmark": "إزالة الإشارة المرجعية",
+    "addAvatarRing": "إضافة حلقة للصورة الرمزية",
+    "removeAvatarRing": "إزالة حلقة الصورة الرمزية",
+    "bookmarkAddedDate": "أُضيفت الإشارة المرجعية في {date}",
+    "avatarRingAddedDate": "أُضيفت حلقة الصورة الرمزية في {date}",
     "mention": "إشارة",
     "mentionUser": "الإشارة إلى المستخدم",
     "mentionUserTitle": "الإشارة إلى المستخدم. انقر مع Alt/Option للاقتباس.",
@@ -290,7 +290,14 @@
     "gamesChooseOwnPiece": "اختر قطعتك",
     "gamesMuteSounds": "كتم أصوات اللعبة",
     "gamesUnmuteSounds": "إلغاء كتم أصوات اللعبة",
-    "gamesUnavailableNoticeTitle": "تعذر الاتصال"
+    "gamesUnavailableNoticeTitle": "تعذر الاتصال",
+    "save": "حفظ",
+    "remove": "إزالة",
+    "saveMessage": "حفظ الرسالة",
+    "removeSavedMessage": "إزالة الرسالة المحفوظة",
+    "savedToBookmarks": "تم الحفظ في الإشارات المرجعية",
+    "removedFromBookmarks": "تمت الإزالة من الإشارات المرجعية",
+    "couldNotSaveBookmark": "تعذّر تحديث الإشارات المرجعية."
   },
   "extension": {
     "close": {
@@ -428,9 +435,6 @@
     "popupResetItemUnsentDrafts": {
       "message": "المسودات غير المرسلة"
     },
-    "popupResetItemBookmarkedUsers": {
-      "message": "المستخدمون المحفوظون في الإشارات المرجعية"
-    },
     "popupResetItemPlaygroundIdentity": {
       "message": "هوية Playground واسم العرض"
     },
@@ -449,21 +453,6 @@
     "popupSections": {
       "message": "أقسام النافذة المنبثقة"
     },
-    "noBookmarkedUsers": {
-      "message": "لا توجد إشارات بعد"
-    },
-    "bookmarkedUsersCount": {
-      "message": "{count} إشارة"
-    },
-    "bookmarkedUsersEmpty": {
-      "message": "سيظهر هنا المستخدمون الذين تضيفهم إلى الإشارات المرجعية من دردشة YouTube."
-    },
-    "markedUserDate": {
-      "message": "أُضيف إلى الإشارات المرجعية في {date}"
-    },
-    "markedDateUnknown": {
-      "message": "تاريخ الإشارة المرجعية غير معروف"
-    },
     "unknownStream": {
       "message": "بث غير معروف"
     },
@@ -475,15 +464,6 @@
     },
     "openChannel": {
       "message": "فتح القناة"
-    },
-    "unmarkUser": {
-      "message": "إزالة"
-    },
-    "markUser": {
-      "message": "تمييز"
-    },
-    "bookmarkUser": {
-      "message": "إشارة مرجعية"
     },
     "removeBookmark": {
       "message": "إزالة الإشارة المرجعية"
@@ -547,6 +527,27 @@
     },
     "chatSkinAero": {
       "message": "Aero"
+    },
+    "popupResetItemBookmarks": {
+      "message": "الإشارات"
+    },
+    "popupResetItemAvatarRings": {
+      "message": "حلقات الصور الرمزية"
+    },
+    "noBookmarks": {
+      "message": "لا توجد إشارات بعد"
+    },
+    "bookmarksCount": {
+      "message": "{count} إشارة"
+    },
+    "bookmarksEmpty": {
+      "message": "ستظهر هنا الرسائل التي تحفظها من دردشة YouTube."
+    },
+    "bookmarkMessagePostedDate": {
+      "message": "نُشرت الرسالة في {date}"
+    },
+    "restoreBookmark": {
+      "message": "استعادة الإشارة المرجعية"
     }
   }
 }

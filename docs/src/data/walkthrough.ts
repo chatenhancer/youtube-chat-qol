@@ -17,7 +17,7 @@ export const walkthroughChapters = [
   { labelKey: 'walkthroughKeyPointFocus', name: 'use-focus-mode', seconds: 85, time: '1:25' },
   { labelKey: 'walkthroughKeyPointInbox', name: 'never-miss-messages', seconds: 98, time: '1:38' },
   { labelKey: 'walkthroughKeyPointGames', name: 'games', seconds: 122, time: '2:02' },
-  { labelKey: 'walkthroughKeyPointBookmarks', name: 'bookmark-users', seconds: 154, time: '2:34' },
+  { labelKey: 'walkthroughKeyPointBookmarks', name: 'save-messages', seconds: 154, time: '2:34' },
   { labelKey: 'walkthroughKeyPointEmojis', name: 'keep-emojis-close', seconds: 171, time: '2:51' },
   { labelKey: 'walkthroughKeyPointCommands', name: 'use-tab-commands', seconds: 185, time: '3:05' },
   { labelKey: 'walkthroughKeyPointPopup', name: 'advanced-settings', seconds: 200, time: '3:20' }

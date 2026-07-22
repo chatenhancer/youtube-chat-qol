@@ -22,7 +22,7 @@ import {
 } from '../user-message-history';
 import { registerFeature } from '../../content/feature-runtime';
 import { mentionAuthorName } from '../reply';
-import { applyMarkedUserRing, createMarkedUserToggleButton } from '../marked-users';
+import { applyAvatarRing, createAvatarRingToggleButton } from '../avatar-rings';
 import {
   createTranslationPriorityScope,
   type TranslationPriorityScope
@@ -264,11 +264,7 @@ function showProfileCard(source: ProfileSource, anchor: HTMLElement): void {
   const avatarSurface = source.profileUrl
     ? createProfileAvatarButton(avatar, source.profileUrl)
     : avatar;
-  applyMarkedUserRing(avatarSurface, {
-    ...source.identity,
-    avatarUrl: source.avatarSrc
-  });
-
+  applyAvatarRing(avatarSurface, source.identity);
   let card!: HTMLElement;
   const handleTitleClick = (event: MouseEvent): void => {
     event.preventDefault();
@@ -326,10 +322,7 @@ function showProfileCard(source: ProfileSource, anchor: HTMLElement): void {
           {title}
           <div class="ytcq-profile-card-subtitle">{t('recentMessages')}</div>
         </div>
-        {createMarkedUserToggleButton({
-          ...source.identity,
-          avatarUrl: source.avatarSrc
-        })}
+        {createAvatarRingToggleButton(source.identity)}
         {channelButton}
         {closeButton}
       </div>

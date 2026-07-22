@@ -38,7 +38,9 @@ Bu bölümde listelenen veriler uzantı tarafından kendi tarayıcı profilinizd
 
 - **Sık kullanılan emoji verileri:** yerel uzantı depolaması (`chrome.storage.local`) kullanılarak kaydedilir. Bu, sık kullanılan emoji satırını oluşturmak için kullanılan yerel kullanım sayaçlarını ve emoji görüntüleme bilgilerini içerir.
 
-- **Yer işaretli kullanıcı verileri:** yerel uzantı depolaması (`chrome.storage.local`) kullanılarak kaydedilir. Bu, yer işaretli kullanıcının handle’ını, varsa kanal ID’sini ve yer işaretinin oluşturulduğu zamanı içerir. Yer işaretli kullanıcılar mevcut tarayıcı profilindeki stream’ler arasında geneldir ve renkli avatar halkaları göstermek için kullanılır.
+- **Yer işareti verileri:** yerel uzantı depolamasında (`chrome.storage.local`) saklanır. Kaydedilen mesaj metni ve emoji görüntüleme bilgileri, yazarın adı, avatar URL’si ve varsa kanal ID’si, mesaj ve kaydetme zamanları ile yayın başlığı ve URL’sini içerebilir. Yer işaretleri mevcut tarayıcı profilinde yayınlar arasında kullanılabilir kalır.
+
+- **Avatar halkası verileri:** yerel uzantı depolamasında (`chrome.storage.local`) saklanır. Son mesajlar profilinden açıkça halka eklediğiniz kullanıcıların yazar adını, varsa kanal ID’sini ve halkanın eklendiği zamanı içerir. Seçim mevcut tarayıcı profilinde yayınlar arasında kullanılabilir kalır ve yalnızca eşleşen avatarları süslemek için kullanılır; kullanıcının çevrimiçi olup olmadığını kontrol etmez.
 
 - **Gönderilmemiş sohbet taslakları:** stream başına yerel uzantı depolaması (`chrome.storage.local`) kullanılarak kaydedilir. Sayfa yenilemesinden sonra geri yüklenir. Taslaklar sohbet girişi temizlendiğinde, mesaj gönderildiğinde veya uzantı verileri sıfırlandığında kaldırılır.
 

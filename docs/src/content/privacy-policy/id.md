@@ -38,7 +38,9 @@ Data yang tercantum di bagian ini disimpan oleh ekstensi di profil browser Anda 
 
 - **Data emoji yang sering digunakan:** disimpan menggunakan penyimpanan ekstensi lokal (`chrome.storage.local`). Ini mencakup hitungan penggunaan lokal dan informasi tampilan emoji yang digunakan untuk membuat baris emoji sering digunakan.
 
-- **Data pengguna yang dibookmark:** disimpan menggunakan penyimpanan ekstensi lokal (`chrome.storage.local`). Ini mencakup handle pengguna yang dibookmark, ID channel jika tersedia, dan waktu bookmark dibuat. Pengguna yang dibookmark bersifat global di seluruh stream dalam profil browser saat ini dan digunakan untuk menampilkan cincin avatar berwarna.
+- **Data bookmark:** disimpan menggunakan penyimpanan ekstensi lokal (`chrome.storage.local`). Data ini dapat mencakup teks pesan tersimpan dan informasi tampilan emoji, nama penulis, URL avatar dan ID channel jika tersedia, waktu pesan dan penyimpanan, serta judul dan URL stream. Bookmark tetap tersedia di seluruh stream dalam profil browser saat ini.
+
+- **Data cincin avatar:** disimpan menggunakan penyimpanan ekstensi lokal (`chrome.storage.local`). Data ini mencakup nama penulis, ID channel jika tersedia, serta waktu cincin ditambahkan untuk pengguna yang secara khusus Anda tambahi cincin dari profil pesan terbaru mereka. Pilihan tetap tersedia di seluruh stream dalam profil browser saat ini dan hanya digunakan untuk menghias avatar yang cocok; pilihan ini tidak memeriksa apakah pengguna sedang online.
 
 - **Draft chat yang belum terkirim:** disimpan menggunakan penyimpanan ekstensi lokal (`chrome.storage.local`) per stream. Draft dipulihkan setelah refresh halaman. Draft dihapus saat input chat dikosongkan, pesan dikirim, atau data ekstensi direset.
 
