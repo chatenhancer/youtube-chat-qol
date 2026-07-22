@@ -40,10 +40,10 @@
     "jumpToMessage": "Przejdź do wiadomości",
     "keywordOrPhrase": "Słowo kluczowe lub fraza",
     "lessThanOneMinute": "mniej niż 1 min",
-    "addAvatarRing": "Dodaj obwódkę awatara",
-    "removeAvatarRing": "Usuń obwódkę awatara",
+    "rememberUser": "Zapamiętaj użytkownika",
+    "forgetUser": "Zapomnij użytkownika",
     "bookmarkAddedDate": "Zakładka dodana {date}",
-    "avatarRingAddedDate": "Obwódka awatara dodana {date}",
+    "userRememberedDate": "Użytkownik zapamiętany {date}",
     "mention": "Wspomnij",
     "mentionUser": "Wspomnij użytkownika",
     "mentionUserTitle": "Wspomnij użytkownika. Alt/Option-klik, aby zacytować.",
@@ -528,17 +528,29 @@
     "popupResetItemBookmarks": {
       "message": "Zakładki"
     },
-    "popupResetItemAvatarRings": {
-      "message": "Obwódki awatarów"
+    "popupResetItemRememberedUsers": {
+      "message": "Zapamiętani użytkownicy"
     },
-    "noBookmarks": {
-      "message": "Brak zakładek"
+    "noSavedItems": {
+      "message": "Brak zapisanych elementów"
     },
-    "bookmarksCount": {
-      "message": "{count} zakładek"
+    "savedItemsCount": {
+      "message": "{count} zapisanych elementów"
     },
-    "bookmarksEmpty": {
-      "message": "Wiadomości zapisane z czatu YouTube pojawią się tutaj."
+    "savedItemsEmpty": {
+      "message": "Zapisane wiadomości i zapamiętani użytkownicy pojawią się tutaj."
+    },
+    "rememberedUser": {
+      "message": "Zapamiętany użytkownik"
+    },
+    "userRememberedDate": {
+      "message": "Użytkownik zapamiętany {date}"
+    },
+    "forgetUser": {
+      "message": "Zapomnij użytkownika"
+    },
+    "rememberUser": {
+      "message": "Zapamiętaj użytkownika"
     },
     "bookmarkMessagePostedDate": {
       "message": "Wiadomość wysłana {date}"

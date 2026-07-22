@@ -40,10 +40,10 @@
     "jumpToMessage": "Mesaja git",
     "keywordOrPhrase": "Anahtar kelime veya ifade",
     "lessThanOneMinute": "1 dakikadan az",
-    "addAvatarRing": "Avatar halkası ekle",
-    "removeAvatarRing": "Avatar halkasını kaldır",
+    "rememberUser": "Kullanıcıyı hatırla",
+    "forgetUser": "Kullanıcıyı unut",
     "bookmarkAddedDate": "Yer işareti {date} tarihinde eklendi",
-    "avatarRingAddedDate": "Avatar halkası {date} tarihinde eklendi",
+    "userRememberedDate": "Kullanıcı {date} tarihinde hatırlandı",
     "mention": "Bahset",
     "mentionUser": "Kullanıcıdan bahset",
     "mentionUserTitle": "Kullanıcıdan bahset. Alıntı yapmak için Alt/Option-tıkla.",
@@ -531,17 +531,29 @@
     "popupResetItemBookmarks": {
       "message": "Yer imleri"
     },
-    "popupResetItemAvatarRings": {
-      "message": "Avatar halkaları"
+    "popupResetItemRememberedUsers": {
+      "message": "Hatırlanan kullanıcılar"
     },
-    "noBookmarks": {
-      "message": "Henüz yer imi yok"
+    "noSavedItems": {
+      "message": "Henüz kaydedilmiş öğe yok"
     },
-    "bookmarksCount": {
-      "message": "{count} yer imi"
+    "savedItemsCount": {
+      "message": "{count} kayıtlı öğe"
     },
-    "bookmarksEmpty": {
-      "message": "YouTube sohbetinden kaydettiğiniz mesajlar burada görünür."
+    "savedItemsEmpty": {
+      "message": "Kaydettiğiniz mesajlar ve hatırladığınız kullanıcılar burada görünür."
+    },
+    "rememberedUser": {
+      "message": "Hatırlanan kullanıcı"
+    },
+    "userRememberedDate": {
+      "message": "Kullanıcı {date} tarihinde hatırlandı"
+    },
+    "forgetUser": {
+      "message": "Kullanıcıyı unut"
+    },
+    "rememberUser": {
+      "message": "Kullanıcıyı hatırla"
     },
     "bookmarkMessagePostedDate": {
       "message": "Mesaj {date} tarihinde gönderildi"

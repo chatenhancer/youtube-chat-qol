@@ -40,10 +40,10 @@
     "jumpToMessage": "Aller au message",
     "keywordOrPhrase": "Mot-clé ou expression",
     "lessThanOneMinute": "moins de 1 min",
-    "addAvatarRing": "Ajouter un anneau à l’avatar",
-    "removeAvatarRing": "Retirer l’anneau de l’avatar",
+    "rememberUser": "Mémoriser l’utilisateur",
+    "forgetUser": "Oublier l’utilisateur",
     "bookmarkAddedDate": "Favori ajouté le {date}",
-    "avatarRingAddedDate": "Anneau d’avatar ajouté le {date}",
+    "userRememberedDate": "Utilisateur mémorisé le {date}",
     "mention": "Mentionner",
     "mentionUser": "Mentionner l'utilisateur",
     "mentionUserTitle": "Mentionner l'utilisateur. Alt/Option-clic pour citer.",
@@ -528,17 +528,29 @@
     "popupResetItemBookmarks": {
       "message": "Favoris"
     },
-    "popupResetItemAvatarRings": {
-      "message": "Anneaux d’avatar"
+    "popupResetItemRememberedUsers": {
+      "message": "Utilisateurs mémorisés"
     },
-    "noBookmarks": {
-      "message": "Aucun favori pour le moment"
+    "noSavedItems": {
+      "message": "Aucun élément enregistré pour le moment"
     },
-    "bookmarksCount": {
-      "message": "{count} favoris"
+    "savedItemsCount": {
+      "message": "{count} éléments enregistrés"
     },
-    "bookmarksEmpty": {
-      "message": "Les messages enregistrés depuis le chat YouTube apparaîtront ici."
+    "savedItemsEmpty": {
+      "message": "Les messages enregistrés et les utilisateurs mémorisés apparaîtront ici."
+    },
+    "rememberedUser": {
+      "message": "Utilisateur mémorisé"
+    },
+    "userRememberedDate": {
+      "message": "Utilisateur mémorisé le {date}"
+    },
+    "forgetUser": {
+      "message": "Oublier l’utilisateur"
+    },
+    "rememberUser": {
+      "message": "Mémoriser l’utilisateur"
     },
     "bookmarkMessagePostedDate": {
       "message": "Message publié le {date}"

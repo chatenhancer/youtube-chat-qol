@@ -40,10 +40,10 @@
     "jumpToMessage": "Nhảy đến tin nhắn",
     "keywordOrPhrase": "Từ khóa hoặc cụm từ",
     "lessThanOneMinute": "dưới 1 phút",
-    "addAvatarRing": "Thêm vòng ảnh đại diện",
-    "removeAvatarRing": "Xóa vòng ảnh đại diện",
+    "rememberUser": "Ghi nhớ người dùng",
+    "forgetUser": "Quên người dùng",
     "bookmarkAddedDate": "Dấu trang được thêm {date}",
-    "avatarRingAddedDate": "Vòng ảnh đại diện được thêm {date}",
+    "userRememberedDate": "Đã ghi nhớ người dùng {date}",
     "mention": "Nhắc đến",
     "mentionUser": "Nhắc đến người dùng",
     "mentionUserTitle": "Nhắc đến người dùng. Alt/Option-click để trích dẫn.",
@@ -528,17 +528,29 @@
     "popupResetItemBookmarks": {
       "message": "Dấu trang"
     },
-    "popupResetItemAvatarRings": {
-      "message": "Vòng ảnh đại diện"
+    "popupResetItemRememberedUsers": {
+      "message": "Người dùng đã ghi nhớ"
     },
-    "noBookmarks": {
-      "message": "Chưa có dấu trang"
+    "noSavedItems": {
+      "message": "Chưa có mục nào được lưu"
     },
-    "bookmarksCount": {
-      "message": "{count} dấu trang"
+    "savedItemsCount": {
+      "message": "{count} mục đã lưu"
     },
-    "bookmarksEmpty": {
-      "message": "Tin nhắn bạn lưu từ cuộc trò chuyện YouTube sẽ xuất hiện ở đây."
+    "savedItemsEmpty": {
+      "message": "Tin nhắn bạn lưu và người dùng bạn ghi nhớ sẽ xuất hiện ở đây."
+    },
+    "rememberedUser": {
+      "message": "Người dùng đã ghi nhớ"
+    },
+    "userRememberedDate": {
+      "message": "Đã ghi nhớ người dùng {date}"
+    },
+    "forgetUser": {
+      "message": "Quên người dùng"
+    },
+    "rememberUser": {
+      "message": "Ghi nhớ người dùng"
     },
     "bookmarkMessagePostedDate": {
       "message": "Tin nhắn được đăng {date}"

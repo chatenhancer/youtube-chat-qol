@@ -40,10 +40,10 @@
     "jumpToMessage": "Jump to message",
     "keywordOrPhrase": "Keyword or phrase",
     "lessThanOneMinute": "less than 1 min",
-    "addAvatarRing": "Add avatar ring",
-    "removeAvatarRing": "Remove avatar ring",
+    "rememberUser": "Remember user",
+    "forgetUser": "Forget user",
     "bookmarkAddedDate": "Bookmark added {date}",
-    "avatarRingAddedDate": "Avatar ring added {date}",
+    "userRememberedDate": "User remembered {date}",
     "mention": "Mention",
     "mentionUser": "Mention user",
     "mentionUserTitle": "Mention user. Alt/Option-click to quote.",
@@ -531,17 +531,29 @@
     "popupResetItemBookmarks": {
       "message": "Bookmarks"
     },
-    "popupResetItemAvatarRings": {
-      "message": "Avatar rings"
+    "popupResetItemRememberedUsers": {
+      "message": "Remembered users"
     },
-    "noBookmarks": {
-      "message": "No bookmarks yet"
+    "noSavedItems": {
+      "message": "No saved items yet"
     },
-    "bookmarksCount": {
-      "message": "{count} bookmarks"
+    "savedItemsCount": {
+      "message": "{count} saved items"
     },
-    "bookmarksEmpty": {
-      "message": "Messages you save from YouTube chat will appear here."
+    "savedItemsEmpty": {
+      "message": "Messages you save and users you remember will appear here."
+    },
+    "rememberedUser": {
+      "message": "Remembered user"
+    },
+    "userRememberedDate": {
+      "message": "User remembered {date}"
+    },
+    "forgetUser": {
+      "message": "Forget user"
+    },
+    "rememberUser": {
+      "message": "Remember user"
     },
     "bookmarkMessagePostedDate": {
       "message": "Message posted {date}"

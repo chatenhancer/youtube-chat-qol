@@ -40,10 +40,10 @@
     "jumpToMessage": "メッセージへ移動",
     "keywordOrPhrase": "キーワードまたはフレーズ",
     "lessThanOneMinute": "1分未満",
-    "addAvatarRing": "アバターリングを追加",
-    "removeAvatarRing": "アバターリングを削除",
+    "rememberUser": "ユーザーを記憶",
+    "forgetUser": "ユーザーを忘れる",
     "bookmarkAddedDate": "{date} にブックマークを追加",
-    "avatarRingAddedDate": "{date} にアバターリングを追加",
+    "userRememberedDate": "{date} にユーザーを記憶",
     "mention": "メンション",
     "mentionUser": "ユーザーをメンション",
     "mentionUserTitle": "ユーザーをメンション。Alt/Option クリックで引用。",
@@ -531,17 +531,29 @@
     "popupResetItemBookmarks": {
       "message": "ブックマーク"
     },
-    "popupResetItemAvatarRings": {
-      "message": "アバターリング"
+    "popupResetItemRememberedUsers": {
+      "message": "記憶したユーザー"
     },
-    "noBookmarks": {
-      "message": "ブックマークはまだありません"
+    "noSavedItems": {
+      "message": "保存済みアイテムはまだありません"
     },
-    "bookmarksCount": {
-      "message": "{count} 件のブックマーク"
+    "savedItemsCount": {
+      "message": "保存済みアイテム {count} 件"
     },
-    "bookmarksEmpty": {
-      "message": "YouTube チャットから保存したメッセージがここに表示されます。"
+    "savedItemsEmpty": {
+      "message": "保存したメッセージと記憶したユーザーがここに表示されます。"
+    },
+    "rememberedUser": {
+      "message": "記憶したユーザー"
+    },
+    "userRememberedDate": {
+      "message": "{date} にユーザーを記憶"
+    },
+    "forgetUser": {
+      "message": "ユーザーを忘れる"
+    },
+    "rememberUser": {
+      "message": "ユーザーを記憶"
     },
     "bookmarkMessagePostedDate": {
       "message": "{date} にメッセージを投稿"

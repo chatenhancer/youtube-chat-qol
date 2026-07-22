@@ -40,10 +40,10 @@
     "jumpToMessage": "跳到消息",
     "keywordOrPhrase": "关键词或短语",
     "lessThanOneMinute": "少于 1 分钟",
-    "addAvatarRing": "添加头像光环",
-    "removeAvatarRing": "移除头像光环",
+    "rememberUser": "记住用户",
+    "forgetUser": "忘记用户",
     "bookmarkAddedDate": "书签添加于 {date}",
-    "avatarRingAddedDate": "头像光环添加于 {date}",
+    "userRememberedDate": "已于 {date} 记住用户",
     "mention": "提及",
     "mentionUser": "提及用户",
     "mentionUserTitle": "提及用户。Alt/Option 点击可引用。",
@@ -531,17 +531,29 @@
     "popupResetItemBookmarks": {
       "message": "书签"
     },
-    "popupResetItemAvatarRings": {
-      "message": "头像光环"
+    "popupResetItemRememberedUsers": {
+      "message": "已记住用户"
     },
-    "noBookmarks": {
-      "message": "还没有书签"
+    "noSavedItems": {
+      "message": "还没有已保存的项目"
     },
-    "bookmarksCount": {
-      "message": "{count} 个书签"
+    "savedItemsCount": {
+      "message": "{count} 个已保存项目"
     },
-    "bookmarksEmpty": {
-      "message": "你从 YouTube 聊天中保存的消息会显示在这里。"
+    "savedItemsEmpty": {
+      "message": "你保存的消息和记住的用户会显示在这里。"
+    },
+    "rememberedUser": {
+      "message": "已记住用户"
+    },
+    "userRememberedDate": {
+      "message": "已于 {date} 记住用户"
+    },
+    "forgetUser": {
+      "message": "忘记用户"
+    },
+    "rememberUser": {
+      "message": "记住用户"
     },
     "bookmarkMessagePostedDate": {
       "message": "消息发布于 {date}"

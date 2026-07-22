@@ -40,10 +40,10 @@
     "jumpToMessage": "मैसेज पर जाएं",
     "keywordOrPhrase": "कीवर्ड या वाक्यांश",
     "lessThanOneMinute": "1 मिनट से कम",
-    "addAvatarRing": "अवतार रिंग जोड़ें",
-    "removeAvatarRing": "अवतार रिंग हटाएँ",
+    "rememberUser": "उपयोगकर्ता याद रखें",
+    "forgetUser": "उपयोगकर्ता को भूलें",
     "bookmarkAddedDate": "बुकमार्क {date} को जोड़ा गया",
-    "avatarRingAddedDate": "अवतार रिंग {date} को जोड़ी गई",
+    "userRememberedDate": "उपयोगकर्ता को {date} को याद रखा गया",
     "mention": "मेंशन",
     "mentionUser": "यूज़र को मेंशन करें",
     "mentionUserTitle": "यूज़र को मेंशन करें. कोट करने के लिए Alt/Option-क्लिक करें.",
@@ -531,17 +531,29 @@
     "popupResetItemBookmarks": {
       "message": "बुकमार्क"
     },
-    "popupResetItemAvatarRings": {
-      "message": "अवतार रिंग"
+    "popupResetItemRememberedUsers": {
+      "message": "याद रखे गए उपयोगकर्ता"
     },
-    "noBookmarks": {
-      "message": "अभी कोई बुकमार्क नहीं"
+    "noSavedItems": {
+      "message": "अभी कोई सहेजा गया आइटम नहीं"
     },
-    "bookmarksCount": {
-      "message": "{count} बुकमार्क"
+    "savedItemsCount": {
+      "message": "{count} सहेजे गए आइटम"
     },
-    "bookmarksEmpty": {
-      "message": "YouTube चैट से सहेजे गए संदेश यहाँ दिखाई देंगे।"
+    "savedItemsEmpty": {
+      "message": "आपके सहेजे गए संदेश और याद रखे गए उपयोगकर्ता यहाँ दिखाई देंगे।"
+    },
+    "rememberedUser": {
+      "message": "याद रखा गया उपयोगकर्ता"
+    },
+    "userRememberedDate": {
+      "message": "उपयोगकर्ता को {date} को याद रखा गया"
+    },
+    "forgetUser": {
+      "message": "उपयोगकर्ता को भूलें"
+    },
+    "rememberUser": {
+      "message": "उपयोगकर्ता याद रखें"
     },
     "bookmarkMessagePostedDate": {
       "message": "संदेश {date} को पोस्ट किया गया"

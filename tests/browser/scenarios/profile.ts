@@ -377,7 +377,7 @@ async function expectProfileAvatarRingToggle(
     await expect(toggle).toHaveAttribute('aria-pressed', 'false');
     await toggle.click();
     await expect(toggle).toHaveAttribute('aria-pressed', 'true');
-    await expect(toggle).toHaveAttribute('title', /Remove avatar ring\nAvatar ring added .+/);
+    await expect(toggle).toHaveAttribute('title', /Forget user\nUser remembered .+/);
     await expect(sourceAvatar).toHaveClass(/ytcq-avatar-ring-active/);
 
     await profileCard.locator('.ytcq-profile-card-title').hover();

@@ -40,10 +40,10 @@
     "jumpToMessage": "Zur Nachricht springen",
     "keywordOrPhrase": "Schlüsselwort oder Phrase",
     "lessThanOneMinute": "weniger als 1 Min.",
-    "addAvatarRing": "Avatarring hinzufügen",
-    "removeAvatarRing": "Avatarring entfernen",
+    "rememberUser": "Benutzer merken",
+    "forgetUser": "Benutzer vergessen",
     "bookmarkAddedDate": "Lesezeichen hinzugefügt am {date}",
-    "avatarRingAddedDate": "Avatarring hinzugefügt am {date}",
+    "userRememberedDate": "Benutzer gemerkt am {date}",
     "mention": "Erwähnen",
     "mentionUser": "Nutzer erwähnen",
     "mentionUserTitle": "Nutzer erwähnen. Alt/Option-Klick zum Zitieren.",
@@ -528,17 +528,29 @@
     "popupResetItemBookmarks": {
       "message": "Lesezeichen"
     },
-    "popupResetItemAvatarRings": {
-      "message": "Avatarringe"
+    "popupResetItemRememberedUsers": {
+      "message": "Gemerkte Nutzer"
     },
-    "noBookmarks": {
-      "message": "Noch keine Lesezeichen"
+    "noSavedItems": {
+      "message": "Noch keine gespeicherten Elemente"
     },
-    "bookmarksCount": {
-      "message": "{count} Lesezeichen"
+    "savedItemsCount": {
+      "message": "{count} gespeicherte Elemente"
     },
-    "bookmarksEmpty": {
-      "message": "Nachrichten, die du im YouTube-Chat speicherst, werden hier angezeigt."
+    "savedItemsEmpty": {
+      "message": "Nachrichten, die du speicherst, und Nutzer, die du dir merkst, werden hier angezeigt."
+    },
+    "rememberedUser": {
+      "message": "Gemerkter Nutzer"
+    },
+    "userRememberedDate": {
+      "message": "Benutzer gemerkt am {date}"
+    },
+    "forgetUser": {
+      "message": "Benutzer vergessen"
+    },
+    "rememberUser": {
+      "message": "Benutzer merken"
     },
     "bookmarkMessagePostedDate": {
       "message": "Nachricht gesendet am {date}"

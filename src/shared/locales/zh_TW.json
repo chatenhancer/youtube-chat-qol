@@ -40,10 +40,10 @@
     "jumpToMessage": "跳到訊息",
     "keywordOrPhrase": "關鍵字或片語",
     "lessThanOneMinute": "少於 1 分鐘",
-    "addAvatarRing": "新增頭像光環",
-    "removeAvatarRing": "移除頭像光環",
+    "rememberUser": "記住使用者",
+    "forgetUser": "忘記使用者",
     "bookmarkAddedDate": "書籤新增於 {date}",
-    "avatarRingAddedDate": "頭像光環新增於 {date}",
+    "userRememberedDate": "已於 {date} 記住使用者",
     "mention": "提及",
     "mentionUser": "提及使用者",
     "mentionUserTitle": "提及使用者。Alt/Option 點擊可引用。",
@@ -528,17 +528,29 @@
     "popupResetItemBookmarks": {
       "message": "書籤"
     },
-    "popupResetItemAvatarRings": {
-      "message": "頭像光環"
+    "popupResetItemRememberedUsers": {
+      "message": "已記住使用者"
     },
-    "noBookmarks": {
-      "message": "還沒有書籤"
+    "noSavedItems": {
+      "message": "還沒有已儲存的項目"
     },
-    "bookmarksCount": {
-      "message": "{count} 個書籤"
+    "savedItemsCount": {
+      "message": "{count} 個已儲存項目"
     },
-    "bookmarksEmpty": {
-      "message": "你從 YouTube 聊天儲存的訊息會顯示在這裡。"
+    "savedItemsEmpty": {
+      "message": "你儲存的訊息和記住的使用者會顯示在這裡。"
+    },
+    "rememberedUser": {
+      "message": "已記住使用者"
+    },
+    "userRememberedDate": {
+      "message": "已於 {date} 記住使用者"
+    },
+    "forgetUser": {
+      "message": "忘記使用者"
+    },
+    "rememberUser": {
+      "message": "記住使用者"
     },
     "bookmarkMessagePostedDate": {
       "message": "訊息發布於 {date}"

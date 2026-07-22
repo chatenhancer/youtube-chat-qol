@@ -11,7 +11,7 @@ const RESET_CONFIRM_ITEM_KEYS = [
   'popupResetItemFrequentEmojis',
   'popupResetItemUnsentDrafts',
   'popupResetItemBookmarks',
-  'popupResetItemAvatarRings',
+  'popupResetItemRememberedUsers',
   'popupResetItemPlaygroundIdentity',
   'popupResetItemGamePreferences'
 ];

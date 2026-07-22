@@ -789,6 +789,7 @@ async function sectionBookmarks(page, chat, context, recorder) {
   await clickWithCursor(page, saveAction, recorder, 'Save action', {
     caption: {
       ...getWalkthroughClickCaption('addBookmark'),
+      clickDelayMs: 2_500,
       options: { gap: 48, placement: 'side' }
     }
   });
@@ -4768,7 +4769,10 @@ async function clickWithCursor(page, locator, recorder, label, options = {}) {
       options.caption.title,
       options.caption.body
     );
-    const captionLeadMs = Math.min(clickCaptionLeadDurationMs, captionDurationMs);
+    const captionLeadMs = Math.min(
+      options.caption.clickDelayMs ?? clickCaptionLeadDurationMs,
+      captionDurationMs
+    );
     const captionAnimationMs = Math.min(captionRevealDurationMs, captionLeadMs);
     await fadeInDemoCaption(page, recorder, captionAnimationMs);
     await recorder.holdStill(captionLeadMs - captionAnimationMs);

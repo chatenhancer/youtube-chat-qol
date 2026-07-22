@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { AVATAR_RINGS_STORAGE_KEY } from '../shared/avatar-rings';
 import { BOOKMARKS_STORAGE_KEY, LEGACY_BOOKMARKS_STORAGE_KEY } from '../shared/bookmarks';
 import {
   PLAYGROUND_PROFILE_MESSAGE_TYPE,
@@ -484,7 +485,7 @@ describe('popup', () => {
     expect(document.querySelector<HTMLElement>('#settingsPanel')?.hidden).toBe(true);
     expect(document.querySelector<HTMLElement>('#bookmarksPanel')?.hidden).toBe(false);
     expect(document.querySelector<HTMLElement>('#playgroundPanel')?.hidden).toBe(true);
-    expect(document.querySelector('#bookmarksCount')?.textContent).toBe('bookmarksCount:1');
+    expect(document.querySelector('#bookmarksCount')?.textContent).toBe('savedItemsCount:1');
     expect(document.querySelector('.bookmark-name')?.textContent).toBe('@ViewerOne');
     expect(document.querySelector('.bookmark-message')?.textContent).toBe('Saved chat message');
     expect(document.querySelector<HTMLImageElement>('.bookmark-avatar img')?.src).toBe(
@@ -562,6 +563,102 @@ describe('popup', () => {
     expect(
       document.querySelector('.bookmark-row')?.classList.contains('bookmark-row-removed')
     ).toBe(false);
+  });
+
+  it('orders avatar rings with bookmarks and manages ring rows independently', async () => {
+    const ringAddedAt = 1_700_000_001_000;
+    const ringRecord = {
+      addedAt: ringAddedAt,
+      authorName: '@RingViewer',
+      avatarUrl: 'https://yt3.ggpht.com/ring-avatar=s88-c-k',
+      channelId: 'ring-viewer-channel',
+      sourceTitle: 'Ring stream',
+      sourceUrl: 'https://www.youtube.com/watch?v=ring-stream'
+    };
+    await chrome.storage.local.set({
+      [AVATAR_RINGS_STORAGE_KEY]: {
+        'channel:ring-viewer-channel': ringRecord
+      },
+      [BOOKMARKS_STORAGE_KEY]: {
+        'message:bookmark-stream:message-1': {
+          authorName: '@BookmarkViewer',
+          message: {
+            contentParts: [{ text: 'Older saved message', type: 'text' }],
+            messageId: 'message-1',
+            text: 'Older saved message',
+            timestamp: 1_699_999_999_000,
+            timestampText: '10:00 PM'
+          },
+          savedAt: 1_700_000_000_000,
+          sourceKey: 'bookmark-stream',
+          sourceTitle: 'Bookmark stream',
+          sourceUrl: 'https://www.youtube.com/watch?v=bookmark-stream'
+        }
+      }
+    });
+
+    await import('./index');
+    document.querySelector<HTMLButtonElement>('#bookmarksTab')?.click();
+
+    const rows = Array.from(document.querySelectorAll<HTMLElement>('.bookmark-row'));
+    expect(rows).toHaveLength(2);
+    expect(rows[0].classList.contains('avatar-ring-row')).toBe(true);
+    expect(rows.map((row) => row.querySelector('.bookmark-name')?.textContent)).toEqual([
+      '@RingViewer',
+      '@BookmarkViewer'
+    ]);
+    expect(document.querySelector('#bookmarksCount')?.textContent).toBe('savedItemsCount:2');
+
+    const ringRow = rows[0];
+    expect(ringRow.querySelector('.avatar-ring-label')?.textContent).toBe('rememberedUser');
+    expect(ringRow.querySelector('.avatar-ring-avatar img')).not.toBeNull();
+    expect(ringRow.style.getPropertyValue('--ytcq-popup-avatar-ring-color')).not.toBe('');
+    const ringTime = ringRow.querySelector<HTMLTimeElement>('.avatar-ring-added-time');
+    expect(ringTime?.dateTime).toBe(new Date(ringAddedAt).toISOString());
+    expect(ringTime?.textContent).toBe(
+      new Intl.DateTimeFormat(undefined, {
+        hour: '2-digit',
+        minute: '2-digit'
+      }).format(ringAddedAt)
+    );
+    expect(ringTime?.title).toBe(
+      `userRememberedDate:${new Intl.DateTimeFormat(undefined, {
+        dateStyle: 'medium',
+        timeStyle: 'short'
+      }).format(ringAddedAt)}`
+    );
+    expect(ringRow.querySelector('.bookmark-source')?.textContent).toBe('Ring stream');
+
+    ringRow.querySelector<HTMLButtonElement>('.bookmark-avatar-button')?.click();
+    expect(chrome.tabs.create).toHaveBeenCalledWith({
+      url: 'https://www.youtube.com/channel/ring-viewer-channel'
+    });
+    ringRow.querySelector<HTMLButtonElement>('.bookmark-source-button')?.click();
+    expect(chrome.tabs.create).toHaveBeenCalledWith({
+      url: 'https://www.youtube.com/watch?v=ring-stream'
+    });
+
+    const ringAction = ringRow.querySelector<HTMLButtonElement>('.avatar-ring-action-button')!;
+    expect(ringAction.title).toBe('forgetUser');
+    ringAction.click();
+    await expect(chrome.storage.local.get(AVATAR_RINGS_STORAGE_KEY)).resolves.toEqual({
+      [AVATAR_RINGS_STORAGE_KEY]: {}
+    });
+    expect(document.querySelector('#bookmarksCount')?.textContent).toBe('savedItemsCount:1');
+    expect(
+      document.querySelector('.avatar-ring-row')?.classList.contains('bookmark-row-removed')
+    ).toBe(true);
+    expect(document.querySelector<HTMLButtonElement>('.avatar-ring-action-button')?.title).toBe(
+      'rememberUser'
+    );
+
+    document.querySelector<HTMLButtonElement>('.avatar-ring-action-button')?.click();
+    await expect(chrome.storage.local.get(AVATAR_RINGS_STORAGE_KEY)).resolves.toEqual({
+      [AVATAR_RINGS_STORAGE_KEY]: {
+        'channel:ring-viewer-channel': ringRecord
+      }
+    });
+    expect(document.querySelector('#bookmarksCount')?.textContent).toBe('savedItemsCount:2');
   });
 
   it('restores and remembers the last selected popup tab', async () => {
@@ -1490,7 +1587,7 @@ describe('popup', () => {
       'popupResetItemFrequentEmojis',
       'popupResetItemUnsentDrafts',
       'popupResetItemBookmarks',
-      'popupResetItemAvatarRings',
+      'popupResetItemRememberedUsers',
       'popupResetItemPlaygroundIdentity',
       'popupResetItemGamePreferences'
     ]);

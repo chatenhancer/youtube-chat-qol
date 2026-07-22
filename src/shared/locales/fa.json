@@ -40,10 +40,10 @@
     "jumpToMessage": "پرش به پیام",
     "keywordOrPhrase": "کلیدواژه یا عبارت",
     "lessThanOneMinute": "کمتر از ۱ دقیقه",
-    "addAvatarRing": "افزودن حلقهٔ آواتار",
-    "removeAvatarRing": "حذف حلقهٔ آواتار",
+    "rememberUser": "به‌خاطر سپردن کاربر",
+    "forgetUser": "فراموش کردن کاربر",
     "bookmarkAddedDate": "نشانک در {date} اضافه شد",
-    "avatarRingAddedDate": "حلقهٔ آواتار در {date} اضافه شد",
+    "userRememberedDate": "کاربر در {date} به‌خاطر سپرده شد",
     "mention": "منشن",
     "mentionUser": "منشن کاربر",
     "mentionUserTitle": "منشن کاربر. برای نقل‌قول Alt/Option-click کنید.",
@@ -528,17 +528,29 @@
     "popupResetItemBookmarks": {
       "message": "نشانک‌ها"
     },
-    "popupResetItemAvatarRings": {
-      "message": "حلقه‌های آواتار"
+    "popupResetItemRememberedUsers": {
+      "message": "کاربران به‌خاطر سپرده‌شده"
     },
-    "noBookmarks": {
-      "message": "هنوز نشانکی نیست"
+    "noSavedItems": {
+      "message": "هنوز مورد ذخیره‌شده‌ای نیست"
     },
-    "bookmarksCount": {
-      "message": "{count} نشانک"
+    "savedItemsCount": {
+      "message": "{count} مورد ذخیره‌شده"
     },
-    "bookmarksEmpty": {
-      "message": "پیام‌هایی که از گفت‌وگوی YouTube ذخیره می‌کنید اینجا نمایش داده می‌شوند."
+    "savedItemsEmpty": {
+      "message": "پیام‌هایی که ذخیره می‌کنید و کاربرانی که به‌خاطر می‌سپارید اینجا نمایش داده می‌شوند."
+    },
+    "rememberedUser": {
+      "message": "کاربر به‌خاطر سپرده‌شده"
+    },
+    "userRememberedDate": {
+      "message": "کاربر در {date} به‌خاطر سپرده شد"
+    },
+    "forgetUser": {
+      "message": "فراموش کردن کاربر"
+    },
+    "rememberUser": {
+      "message": "به‌خاطر سپردن کاربر"
     },
     "bookmarkMessagePostedDate": {
       "message": "پیام در {date} ارسال شد"

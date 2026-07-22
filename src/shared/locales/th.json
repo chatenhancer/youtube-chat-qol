@@ -40,10 +40,10 @@
     "jumpToMessage": "ข้ามไปยังข้อความ",
     "keywordOrPhrase": "คำสำคัญหรือวลี",
     "lessThanOneMinute": "น้อยกว่า 1 นาที",
-    "addAvatarRing": "เพิ่มวงแหวนอวาตาร์",
-    "removeAvatarRing": "นำวงแหวนอวาตาร์ออก",
+    "rememberUser": "จดจำผู้ใช้",
+    "forgetUser": "ลืมผู้ใช้",
     "bookmarkAddedDate": "เพิ่มบุ๊กมาร์กเมื่อ {date}",
-    "avatarRingAddedDate": "เพิ่มวงแหวนอวาตาร์เมื่อ {date}",
+    "userRememberedDate": "จดจำผู้ใช้เมื่อ {date}",
     "mention": "กล่าวถึง",
     "mentionUser": "กล่าวถึงผู้ใช้",
     "mentionUserTitle": "กล่าวถึงผู้ใช้ กด Alt/Option-click เพื่ออ้างอิง",
@@ -528,17 +528,29 @@
     "popupResetItemBookmarks": {
       "message": "บุ๊กมาร์ก"
     },
-    "popupResetItemAvatarRings": {
-      "message": "วงแหวนอวาตาร์"
+    "popupResetItemRememberedUsers": {
+      "message": "ผู้ใช้ที่จดจำ"
     },
-    "noBookmarks": {
-      "message": "ยังไม่มีบุ๊กมาร์ก"
+    "noSavedItems": {
+      "message": "ยังไม่มีรายการที่บันทึก"
     },
-    "bookmarksCount": {
-      "message": "{count} บุ๊กมาร์ก"
+    "savedItemsCount": {
+      "message": "รายการที่บันทึก {count} รายการ"
     },
-    "bookmarksEmpty": {
-      "message": "ข้อความที่คุณบันทึกจากแชท YouTube จะปรากฏที่นี่"
+    "savedItemsEmpty": {
+      "message": "ข้อความที่คุณบันทึกและผู้ใช้ที่คุณจดจำจะปรากฏที่นี่"
+    },
+    "rememberedUser": {
+      "message": "ผู้ใช้ที่จดจำ"
+    },
+    "userRememberedDate": {
+      "message": "จดจำผู้ใช้เมื่อ {date}"
+    },
+    "forgetUser": {
+      "message": "ลืมผู้ใช้"
+    },
+    "rememberUser": {
+      "message": "จดจำผู้ใช้"
     },
     "bookmarkMessagePostedDate": {
       "message": "โพสต์ข้อความเมื่อ {date}"

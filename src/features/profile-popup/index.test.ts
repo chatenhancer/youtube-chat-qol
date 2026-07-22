@@ -170,6 +170,7 @@ describe('profile popup coordinator', () => {
     });
     expect(avatarRingMocks.createAvatarRingToggleButton).toHaveBeenCalledWith({
       authorName: '@ViewerOne',
+      avatarUrl: 'https://example.com/avatar.jpg',
       channelId: 'viewer-channel'
     });
     expect(card.querySelector('.ytcq-avatar-ring-toggle')).not.toBeNull();

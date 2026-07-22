@@ -1,4 +1,4 @@
-/* Message bookmark rows, avatars, metadata, and actions. */
+/* Message bookmark and avatar-ring rows, avatars, metadata, and actions. */
 .bookmarks-section {
   position: relative;
   display: flex;
@@ -211,6 +211,26 @@
   vertical-align: -3px;
 }
 
+.avatar-ring-avatar {
+  box-shadow:
+    0 0 0 2px var(--ytcq-popup-avatar-ring-color, var(--ytcq-popup-action)),
+    0 0 0 4px color-mix(in srgb, var(--ytcq-popup-avatar-ring-color, var(--ytcq-popup-action)) 22%, transparent);
+}
+
+.avatar-ring-label {
+  overflow: hidden;
+  color: color-mix(
+    in srgb,
+    var(--ytcq-popup-avatar-ring-color, var(--ytcq-popup-action)) 58%,
+    var(--ytcq-popup-text)
+  );
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .bookmark-metadata {
   display: flex;
   overflow: hidden;
@@ -308,7 +328,21 @@
 
 .bookmark-action-button svg {
   display: block;
-  width: 20px;
-  height: 20px;
+  width: 19px;
+  height: 19px;
   fill: currentColor;
+}
+
+.avatar-ring-action-button {
+  color: var(--ytcq-popup-avatar-ring-color, var(--ytcq-popup-action));
+  --yt-spec-raised-background: var(--ytcq-popup-row-bg);
+}
+
+.avatar-ring-action-button svg {
+  width: 22px;
+  height: 22px;
+}
+
+.avatar-ring-row-removed .avatar-ring-action-button {
+  color: var(--ytcq-popup-secondary-text);
 }

@@ -40,10 +40,10 @@
     "jumpToMessage": "메시지로 이동",
     "keywordOrPhrase": "키워드 또는 문구",
     "lessThanOneMinute": "1분 미만",
-    "addAvatarRing": "아바타 링 추가",
-    "removeAvatarRing": "아바타 링 제거",
+    "rememberUser": "사용자 기억",
+    "forgetUser": "사용자 잊기",
     "bookmarkAddedDate": "북마크 추가: {date}",
-    "avatarRingAddedDate": "아바타 링 추가: {date}",
+    "userRememberedDate": "사용자 기억: {date}",
     "mention": "멘션",
     "mentionUser": "사용자 멘션",
     "mentionUserTitle": "사용자 멘션. Alt/Option 클릭으로 인용.",
@@ -528,17 +528,29 @@
     "popupResetItemBookmarks": {
       "message": "북마크"
     },
-    "popupResetItemAvatarRings": {
-      "message": "아바타 링"
+    "popupResetItemRememberedUsers": {
+      "message": "기억된 사용자"
     },
-    "noBookmarks": {
-      "message": "아직 북마크가 없습니다"
+    "noSavedItems": {
+      "message": "아직 저장된 항목이 없습니다"
     },
-    "bookmarksCount": {
-      "message": "북마크 {count}개"
+    "savedItemsCount": {
+      "message": "저장된 항목 {count}개"
     },
-    "bookmarksEmpty": {
-      "message": "YouTube 채팅에서 저장한 메시지가 여기에 표시됩니다."
+    "savedItemsEmpty": {
+      "message": "저장한 메시지와 기억한 사용자가 여기에 표시됩니다."
+    },
+    "rememberedUser": {
+      "message": "기억된 사용자"
+    },
+    "userRememberedDate": {
+      "message": "사용자 기억: {date}"
+    },
+    "forgetUser": {
+      "message": "사용자 잊기"
+    },
+    "rememberUser": {
+      "message": "사용자 기억"
     },
     "bookmarkMessagePostedDate": {
       "message": "메시지 게시: {date}"

@@ -40,10 +40,10 @@
     "jumpToMessage": "Ir para a mensagem",
     "keywordOrPhrase": "Palavra-chave ou frase",
     "lessThanOneMinute": "menos de 1 min",
-    "addAvatarRing": "Adicionar anel ao avatar",
-    "removeAvatarRing": "Remover anel do avatar",
+    "rememberUser": "Lembrar usuário",
+    "forgetUser": "Esquecer usuário",
     "bookmarkAddedDate": "Marcador adicionado em {date}",
-    "avatarRingAddedDate": "Anel de avatar adicionado em {date}",
+    "userRememberedDate": "Usuário lembrado em {date}",
     "mention": "Mencionar",
     "mentionUser": "Mencionar usuário",
     "mentionUserTitle": "Mencionar usuário. Alt/Option-clique para citar.",
@@ -531,17 +531,29 @@
     "popupResetItemBookmarks": {
       "message": "Marcadores"
     },
-    "popupResetItemAvatarRings": {
-      "message": "Anéis de avatar"
+    "popupResetItemRememberedUsers": {
+      "message": "Usuários lembrados"
     },
-    "noBookmarks": {
-      "message": "Ainda não há marcadores"
+    "noSavedItems": {
+      "message": "Ainda não há itens salvos"
     },
-    "bookmarksCount": {
-      "message": "{count} marcadores"
+    "savedItemsCount": {
+      "message": "{count} itens salvos"
     },
-    "bookmarksEmpty": {
-      "message": "As mensagens salvas do chat do YouTube aparecerão aqui."
+    "savedItemsEmpty": {
+      "message": "As mensagens que você salvar e os usuários que lembrar aparecerão aqui."
+    },
+    "rememberedUser": {
+      "message": "Usuário lembrado"
+    },
+    "userRememberedDate": {
+      "message": "Usuário lembrado em {date}"
+    },
+    "forgetUser": {
+      "message": "Esquecer usuário"
+    },
+    "rememberUser": {
+      "message": "Lembrar usuário"
     },
     "bookmarkMessagePostedDate": {
       "message": "Mensagem publicada em {date}"

@@ -8,11 +8,20 @@ export interface AvatarRingIdentity {
   channelId?: string;
 }
 
-export interface AvatarRingRecord {
-  addedAt?: number;
-  authorName: string;
-  channelId?: string;
+export interface AvatarRingSource extends AvatarRingIdentity {
+  avatarUrl?: string;
 }
+
+export interface AvatarRingRecord {
+  addedAt: number;
+  authorName: string;
+  avatarUrl?: string;
+  channelId?: string;
+  sourceTitle?: string;
+  sourceUrl: string;
+}
+
+export type NormalizedAvatarRingIdentity = Pick<AvatarRingRecord, 'authorName' | 'channelId'>;
 
 export type StoredAvatarRings = Record<string, AvatarRingRecord>;
 
@@ -31,7 +40,7 @@ export function getAvatarRingColor(identity: AvatarRingIdentity): string {
 
 export function normalizeAvatarRingIdentity(
   identity: AvatarRingIdentity
-): AvatarRingRecord | null {
+): NormalizedAvatarRingIdentity | null {
   const authorName = cleanText(identity.authorName);
   const channelId = cleanText(identity.channelId);
   if (!authorName && !channelId) return null;
@@ -52,12 +61,15 @@ export function normalizeStoredAvatarRings(value: unknown): Map<string, AvatarRi
     const record = normalizeAvatarRingIdentity(candidate);
     if (!record || getAvatarRingKey(record) !== storedKey) return;
     const addedAtCandidate = Number(candidate.addedAt);
+    const sourceUrl = cleanText(candidate.sourceUrl);
+    if (!Number.isFinite(addedAtCandidate) || addedAtCandidate <= 0 || !sourceUrl) return;
+
     records.set(storedKey, {
       ...record,
-      addedAt:
-        Number.isFinite(addedAtCandidate) && addedAtCandidate > 0
-          ? addedAtCandidate
-          : undefined
+      addedAt: addedAtCandidate,
+      avatarUrl: normalizeAvatarRingAvatarUrl(candidate.avatarUrl) || undefined,
+      sourceTitle: cleanText(candidate.sourceTitle) || undefined,
+      sourceUrl
     });
   });
 
@@ -66,6 +78,12 @@ export function normalizeStoredAvatarRings(value: unknown): Map<string, AvatarRi
 
 export function serializeAvatarRings(records: Map<string, AvatarRingRecord>): StoredAvatarRings {
   return Object.fromEntries(records.entries());
+}
+
+export function normalizeAvatarRingAvatarUrl(value: unknown): string {
+  const avatarUrl = cleanText(value);
+  if (!avatarUrl || avatarUrl.startsWith('data:') || avatarUrl.startsWith('blob:')) return '';
+  return avatarUrl;
 }
 
 function hashString(value: string): number {

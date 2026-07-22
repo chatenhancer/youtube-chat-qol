@@ -40,10 +40,10 @@
     "jumpToMessage": "Lompat ke pesan",
     "keywordOrPhrase": "Kata kunci atau frasa",
     "lessThanOneMinute": "kurang dari 1 menit",
-    "addAvatarRing": "Tambahkan cincin avatar",
-    "removeAvatarRing": "Hapus cincin avatar",
+    "rememberUser": "Ingat pengguna",
+    "forgetUser": "Lupakan pengguna",
     "bookmarkAddedDate": "Bookmark ditambahkan {date}",
-    "avatarRingAddedDate": "Cincin avatar ditambahkan {date}",
+    "userRememberedDate": "Pengguna diingat {date}",
     "mention": "Sebut",
     "mentionUser": "Sebut pengguna",
     "mentionUserTitle": "Sebut pengguna. Alt/Option-klik untuk mengutip.",
@@ -531,17 +531,29 @@
     "popupResetItemBookmarks": {
       "message": "Bookmark"
     },
-    "popupResetItemAvatarRings": {
-      "message": "Cincin avatar"
+    "popupResetItemRememberedUsers": {
+      "message": "Pengguna yang diingat"
     },
-    "noBookmarks": {
-      "message": "Belum ada bookmark"
+    "noSavedItems": {
+      "message": "Belum ada item tersimpan"
     },
-    "bookmarksCount": {
-      "message": "{count} bookmark"
+    "savedItemsCount": {
+      "message": "{count} item tersimpan"
     },
-    "bookmarksEmpty": {
-      "message": "Pesan yang Anda simpan dari chat YouTube akan muncul di sini."
+    "savedItemsEmpty": {
+      "message": "Pesan yang Anda simpan dan pengguna yang Anda ingat akan muncul di sini."
+    },
+    "rememberedUser": {
+      "message": "Pengguna yang diingat"
+    },
+    "userRememberedDate": {
+      "message": "Pengguna diingat {date}"
+    },
+    "forgetUser": {
+      "message": "Lupakan pengguna"
+    },
+    "rememberUser": {
+      "message": "Ingat pengguna"
     },
     "bookmarkMessagePostedDate": {
       "message": "Pesan dikirim {date}"

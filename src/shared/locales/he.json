@@ -40,10 +40,10 @@
     "jumpToMessage": "קפיצה להודעה",
     "keywordOrPhrase": "מילת מפתח או ביטוי",
     "lessThanOneMinute": "פחות מדקה",
-    "addAvatarRing": "הוספת טבעת לאווטאר",
-    "removeAvatarRing": "הסרת טבעת האווטאר",
+    "rememberUser": "זכירת המשתמש",
+    "forgetUser": "שכחת המשתמש",
     "bookmarkAddedDate": "הסימנייה נוספה ב-{date}",
-    "avatarRingAddedDate": "טבעת האווטאר נוספה ב-{date}",
+    "userRememberedDate": "המשתמש נשמר בזיכרון ב-{date}",
     "mention": "אזכור",
     "mentionUser": "אזכור משתמש",
     "mentionUserTitle": "אזכור משתמש. Alt/Option-קליק כדי לצטט.",
@@ -528,17 +528,29 @@
     "popupResetItemBookmarks": {
       "message": "סימניות"
     },
-    "popupResetItemAvatarRings": {
-      "message": "טבעות אווטאר"
+    "popupResetItemRememberedUsers": {
+      "message": "משתמשים שנשמרו בזיכרון"
     },
-    "noBookmarks": {
-      "message": "אין סימניות עדיין"
+    "noSavedItems": {
+      "message": "אין פריטים שמורים עדיין"
     },
-    "bookmarksCount": {
-      "message": "{count} סימניות"
+    "savedItemsCount": {
+      "message": "{count} פריטים שמורים"
     },
-    "bookmarksEmpty": {
-      "message": "הודעות שתשמרו מהצ׳אט של YouTube יופיעו כאן."
+    "savedItemsEmpty": {
+      "message": "הודעות שתשמרו ומשתמשים שתזכרו יופיעו כאן."
+    },
+    "rememberedUser": {
+      "message": "משתמש שנשמר בזיכרון"
+    },
+    "userRememberedDate": {
+      "message": "המשתמש נשמר בזיכרון ב-{date}"
+    },
+    "forgetUser": {
+      "message": "שכחת המשתמש"
+    },
+    "rememberUser": {
+      "message": "זכירת המשתמש"
     },
     "bookmarkMessagePostedDate": {
       "message": "ההודעה פורסמה ב-{date}"

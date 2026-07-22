@@ -31,40 +31,83 @@ describe('avatar ring storage helpers', () => {
   it('normalizes only records whose stored key matches their identity', () => {
     expect(
       normalizeStoredAvatarRings({
-        'author:@viewerone': { authorName: ' @ViewerOne ' },
-        'channel:channel-a': { authorName: '@ViewerTwo', channelId: ' channel-a ' },
-        'author:@wrong': { authorName: '@ViewerThree' },
+        'author:@viewerone': {
+          addedAt: 1_700_000_000_000,
+          authorName: ' @ViewerOne ',
+          sourceUrl: ' https://www.youtube.com/watch?v=stream-a '
+        },
+        'channel:channel-a': {
+          addedAt: 1_700_000_001_000,
+          authorName: '@ViewerTwo',
+          channelId: ' channel-a ',
+          sourceUrl: 'https://www.youtube.com/watch?v=stream-b'
+        },
+        'author:@wrong': {
+          addedAt: 1_700_000_002_000,
+          authorName: '@ViewerThree',
+          sourceUrl: 'https://www.youtube.com/watch?v=stream-c'
+        },
         primitive: 'value'
       })
     ).toEqual(
       new Map<string, AvatarRingRecord>([
         [
           'author:@viewerone',
-          { addedAt: undefined, authorName: '@ViewerOne', channelId: undefined }
+          {
+            addedAt: 1_700_000_000_000,
+            authorName: '@ViewerOne',
+            avatarUrl: undefined,
+            channelId: undefined,
+            sourceTitle: undefined,
+            sourceUrl: 'https://www.youtube.com/watch?v=stream-a'
+          }
         ],
         [
           'channel:channel-a',
-          { addedAt: undefined, authorName: '@ViewerTwo', channelId: 'channel-a' }
+          {
+            addedAt: 1_700_000_001_000,
+            authorName: '@ViewerTwo',
+            avatarUrl: undefined,
+            channelId: 'channel-a',
+            sourceTitle: undefined,
+            sourceUrl: 'https://www.youtube.com/watch?v=stream-b'
+          }
         ]
       ])
     );
   });
 
-  it('preserves valid ring-added timestamps and discards invalid ones', () => {
+  it('requires the new timestamp and stream fields and preserves popup metadata', () => {
     expect(
       normalizeStoredAvatarRings({
-        'author:@viewerone': { addedAt: 1_700_000_000_000, authorName: '@ViewerOne' },
-        'author:@viewertwo': { addedAt: 'invalid', authorName: '@ViewerTwo' }
+        'author:@viewerone': {
+          addedAt: 1_700_000_000_000,
+          authorName: '@ViewerOne',
+          avatarUrl: ' https://example.com/avatar.png ',
+          sourceTitle: ' Example stream ',
+          sourceUrl: ' https://www.youtube.com/watch?v=stream-a '
+        },
+        'author:@missing-date': {
+          authorName: '@MissingDate',
+          sourceUrl: 'https://www.youtube.com/watch?v=stream-b'
+        },
+        'author:@missing-stream': {
+          addedAt: 1_700_000_001_000,
+          authorName: '@MissingStream'
+        }
       })
     ).toEqual(
       new Map<string, AvatarRingRecord>([
         [
           'author:@viewerone',
-          { addedAt: 1_700_000_000_000, authorName: '@ViewerOne', channelId: undefined }
-        ],
-        [
-          'author:@viewertwo',
-          { addedAt: undefined, authorName: '@ViewerTwo', channelId: undefined }
+          {
+            addedAt: 1_700_000_000_000,
+            authorName: '@ViewerOne',
+            avatarUrl: 'https://example.com/avatar.png',
+            channelId: undefined,
+            sourceTitle: 'Example stream',
+            sourceUrl: 'https://www.youtube.com/watch?v=stream-a'
+          }
         ]
       ])
     );
@@ -72,11 +115,22 @@ describe('avatar ring storage helpers', () => {
 
   it('serializes records and derives deterministic per-user colors', () => {
     const records = new Map<string, AvatarRingRecord>([
-      ['author:@viewerone', { authorName: '@ViewerOne' }]
+      [
+        'author:@viewerone',
+        {
+          addedAt: 1_700_000_000_000,
+          authorName: '@ViewerOne',
+          sourceUrl: 'https://www.youtube.com/watch?v=stream-a'
+        }
+      ]
     ]);
 
     expect(serializeAvatarRings(records)).toEqual({
-      'author:@viewerone': { authorName: '@ViewerOne' }
+      'author:@viewerone': {
+        addedAt: 1_700_000_000_000,
+        authorName: '@ViewerOne',
+        sourceUrl: 'https://www.youtube.com/watch?v=stream-a'
+      }
     });
     expect(getAvatarRingColor({ authorName: '@ViewerOne' })).toBe(
       getAvatarRingColor({ authorName: '@ViewerOne' })

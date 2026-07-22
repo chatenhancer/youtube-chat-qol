@@ -322,7 +322,10 @@ function showProfileCard(source: ProfileSource, anchor: HTMLElement): void {
           {title}
           <div class="ytcq-profile-card-subtitle">{t('recentMessages')}</div>
         </div>
-        {createAvatarRingToggleButton(source.identity)}
+        {createAvatarRingToggleButton({
+          ...source.identity,
+          avatarUrl: source.avatarSrc
+        })}
         {channelButton}
         {closeButton}
       </div>

@@ -1,11 +1,19 @@
 import {
   BOOKMARK_FILLED_ICON_PATH,
   BOOKMARK_ICON_PATH,
+  createAvatarRingIcon,
   createOpenInNewIcon,
   createSvgIcon,
   MATERIAL_ICON_VIEW_BOX
 } from '../shared/icons';
 import { jsx, el } from '../shared/jsx-dom';
+import {
+  AVATAR_RINGS_STORAGE_KEY,
+  getAvatarRingColor,
+  normalizeStoredAvatarRings,
+  serializeAvatarRings,
+  type AvatarRingRecord
+} from '../shared/avatar-rings';
 import {
   BOOKMARKS_STORAGE_KEY,
   LEGACY_BOOKMARKS_STORAGE_KEY,
@@ -19,95 +27,153 @@ import { controls } from './controls';
 import { getExtensionMessage } from './i18n';
 
 const recentlyRemovedBookmarks = new Map<string, BookmarkRecord>();
+const recentlyRemovedAvatarRings = new Map<string, AvatarRingRecord>();
+let currentBookmarks = new Map<string, BookmarkRecord>();
+let currentAvatarRings = new Map<string, AvatarRingRecord>();
+
+type SavedItemEntry =
+  | {
+      active: boolean;
+      key: string;
+      kind: 'avatar-ring';
+      record: AvatarRingRecord;
+    }
+  | {
+      active: boolean;
+      key: string;
+      kind: 'bookmark';
+      record: BookmarkRecord;
+    };
+
+type SavedItemAuthor = Pick<BookmarkRecord, 'authorName' | 'avatarUrl' | 'channelId'>;
+type SavedItemSource = Pick<BookmarkRecord, 'sourceTitle' | 'sourceUrl'>;
 
 export function initBookmarksPanel(): void {
   const { bookmarksCount, bookmarksList } = controls;
   if (!bookmarksCount || !bookmarksList) return;
 
-  refreshBookmarks();
-  chrome.storage.onChanged.addListener((changes, areaName) => {
-    if (areaName === 'local' && changes[BOOKMARKS_STORAGE_KEY]) {
-      renderBookmarks(normalizeStoredBookmarks(changes[BOOKMARKS_STORAGE_KEY].newValue));
-    }
-  });
+  refreshSavedItems();
+  chrome.storage.onChanged.addListener(handleSavedItemsStorageChange);
 }
 
-function refreshBookmarks(): void {
-  chrome.storage.local.get([BOOKMARKS_STORAGE_KEY, LEGACY_BOOKMARKS_STORAGE_KEY], (stored) => {
-    const values = stored || {};
-    const hasBookmarks = Object.hasOwn(values, BOOKMARKS_STORAGE_KEY);
-    const hasLegacyBookmarks = Object.hasOwn(values, LEGACY_BOOKMARKS_STORAGE_KEY);
-    const records = normalizeStoredBookmarks(
-      hasBookmarks ? values[BOOKMARKS_STORAGE_KEY] : values[LEGACY_BOOKMARKS_STORAGE_KEY]
-    );
-    renderBookmarks(records);
+function refreshSavedItems(): void {
+  chrome.storage.local.get(
+    [AVATAR_RINGS_STORAGE_KEY, BOOKMARKS_STORAGE_KEY, LEGACY_BOOKMARKS_STORAGE_KEY],
+    (stored) => {
+      const values = stored || {};
+      const hasBookmarks = Object.hasOwn(values, BOOKMARKS_STORAGE_KEY);
+      const hasLegacyBookmarks = Object.hasOwn(values, LEGACY_BOOKMARKS_STORAGE_KEY);
+      currentBookmarks = normalizeStoredBookmarks(
+        hasBookmarks ? values[BOOKMARKS_STORAGE_KEY] : values[LEGACY_BOOKMARKS_STORAGE_KEY]
+      );
+      currentAvatarRings = normalizeStoredAvatarRings(values[AVATAR_RINGS_STORAGE_KEY]);
+      renderSavedItems();
 
-    if (hasBookmarks) {
-      if (hasLegacyBookmarks) chrome.storage.local.remove(LEGACY_BOOKMARKS_STORAGE_KEY);
-      return;
-    }
-
-    chrome.storage.local.set({ [BOOKMARKS_STORAGE_KEY]: serializeBookmarks(records) }, () => {
-      const migrationError = chrome.runtime.lastError;
-      if (!migrationError && hasLegacyBookmarks) {
-        chrome.storage.local.remove(LEGACY_BOOKMARKS_STORAGE_KEY);
+      if (hasBookmarks) {
+        if (hasLegacyBookmarks) chrome.storage.local.remove(LEGACY_BOOKMARKS_STORAGE_KEY);
+        return;
       }
-    });
-  });
+
+      chrome.storage.local.set(
+        { [BOOKMARKS_STORAGE_KEY]: serializeBookmarks(currentBookmarks) },
+        () => {
+          const migrationError = chrome.runtime.lastError;
+          if (!migrationError && hasLegacyBookmarks) {
+            chrome.storage.local.remove(LEGACY_BOOKMARKS_STORAGE_KEY);
+          }
+        }
+      );
+    }
+  );
 }
 
-function renderBookmarks(records: Map<string, BookmarkRecord>): void {
+function handleSavedItemsStorageChange(
+  changes: Record<string, chrome.storage.StorageChange>,
+  areaName: string
+): void {
+  if (areaName !== 'local') return;
+
+  let changed = false;
+  if (changes[BOOKMARKS_STORAGE_KEY]) {
+    currentBookmarks = normalizeStoredBookmarks(changes[BOOKMARKS_STORAGE_KEY].newValue);
+    changed = true;
+  }
+  if (changes[AVATAR_RINGS_STORAGE_KEY]) {
+    currentAvatarRings = normalizeStoredAvatarRings(changes[AVATAR_RINGS_STORAGE_KEY].newValue);
+    changed = true;
+  }
+  if (changed) renderSavedItems();
+}
+
+function renderSavedItems(): void {
   if (!controls.bookmarksCount || !controls.bookmarksList) return;
 
-  const entries = getVisibleBookmarkEntries(records).sort((firstEntry, secondEntry) => {
-    const firstTime = Number.isFinite(firstEntry.record.savedAt) ? firstEntry.record.savedAt : 0;
-    const secondTime = Number.isFinite(secondEntry.record.savedAt) ? secondEntry.record.savedAt : 0;
+  const entries = getVisibleSavedItemEntries().sort((firstEntry, secondEntry) => {
+    const firstTime = getSavedItemAddedAt(firstEntry);
+    const secondTime = getSavedItemAddedAt(secondEntry);
     return (
       secondTime - firstTime ||
-      firstEntry.record.authorName.localeCompare(secondEntry.record.authorName)
+      firstEntry.record.authorName.localeCompare(secondEntry.record.authorName) ||
+      firstEntry.kind.localeCompare(secondEntry.kind)
     );
   });
 
-  controls.bookmarksCount.textContent = records.size
-    ? getExtensionMessage('bookmarksCount', String(records.size))
-    : getExtensionMessage('noBookmarks');
+  const activeCount = currentBookmarks.size + currentAvatarRings.size;
+  controls.bookmarksCount.textContent = activeCount
+    ? getExtensionMessage('savedItemsCount', String(activeCount))
+    : getExtensionMessage('noSavedItems');
   controls.bookmarksList.replaceChildren();
   controls.bookmarksList.classList.toggle('bookmarks-list-empty', entries.length === 0);
 
   if (!entries.length) {
     controls.bookmarksList.append(
       el<HTMLParagraphElement>(
-        <p class="bookmarks-empty">{getExtensionMessage('bookmarksEmpty')}</p>
+        <p class="bookmarks-empty">{getExtensionMessage('savedItemsEmpty')}</p>
       )
     );
     return;
   }
 
-  controls.bookmarksList.append(
-    ...entries.map(({ key, record, active }) => createBookmarkRow(key, record, active))
-  );
+  controls.bookmarksList.append(...entries.map(createSavedItemRow));
 }
 
-function getVisibleBookmarkEntries(records: Map<string, BookmarkRecord>): Array<{
-  active: boolean;
-  key: string;
-  record: BookmarkRecord;
-}> {
-  const entries = Array.from(records.entries()).map(([key, record]) => {
+function getVisibleSavedItemEntries(): SavedItemEntry[] {
+  const entries: SavedItemEntry[] = Array.from(currentBookmarks.entries()).map(([key, record]) => {
     recentlyRemovedBookmarks.delete(key);
-    return { active: true, key, record };
+    return { active: true, key, kind: 'bookmark' as const, record };
   });
 
   recentlyRemovedBookmarks.forEach((record, key) => {
-    if (!records.has(key)) entries.push({ active: false, key, record });
+    if (!currentBookmarks.has(key)) entries.push({ active: false, key, kind: 'bookmark', record });
+  });
+
+  currentAvatarRings.forEach((record, key) => {
+    recentlyRemovedAvatarRings.delete(key);
+    entries.push({ active: true, key, kind: 'avatar-ring', record });
+  });
+
+  recentlyRemovedAvatarRings.forEach((record, key) => {
+    if (!currentAvatarRings.has(key)) {
+      entries.push({ active: false, key, kind: 'avatar-ring', record });
+    }
   });
 
   return entries;
 }
 
+function getSavedItemAddedAt(entry: SavedItemEntry): number {
+  return entry.kind === 'bookmark' ? entry.record.savedAt : entry.record.addedAt;
+}
+
+function createSavedItemRow(entry: SavedItemEntry): HTMLElement {
+  return entry.kind === 'bookmark'
+    ? createBookmarkRow(entry.key, entry.record, entry.active)
+    : createAvatarRingRow(entry.key, entry.record, entry.active);
+}
+
 function createBookmarkRow(key: string, record: BookmarkRecord, active: boolean): HTMLElement {
-  const channelUrl = getBookmarkChannelUrl(record);
-  const avatar = createBookmarkAvatar(record, channelUrl);
+  const channelUrl = getSavedItemChannelUrl(record);
+  const avatar = createSavedItemAvatar(record, channelUrl);
   const copy = el<HTMLSpanElement>(<span class="bookmark-copy" />);
   copy.append(createBookmarkHeader(record));
 
@@ -149,31 +215,97 @@ function createBookmarkRow(key: string, record: BookmarkRecord, active: boolean)
   );
 }
 
-function createBookmarkHeader(record: BookmarkRecord): HTMLElement {
-  const header = el<HTMLSpanElement>(<span class="bookmark-message-header" />);
-  header.append(
-    el<HTMLElement>(
-      <strong class="bookmark-name" dir="auto">
-        {record.authorName || getExtensionMessage('unknownUser')}
-      </strong>
+function createAvatarRingRow(key: string, record: AvatarRingRecord, active: boolean): HTMLElement {
+  const channelUrl = getSavedItemChannelUrl(record);
+  const avatar = createSavedItemAvatar(record, channelUrl, true);
+  const copy = el<HTMLSpanElement>(<span class="bookmark-copy avatar-ring-copy" />);
+  copy.append(createAvatarRingHeader(record));
+  copy.append(
+    el<HTMLSpanElement>(
+      <span class="avatar-ring-label">{getExtensionMessage('rememberedUser')}</span>
     )
   );
+  copy.append(createSavedItemMetadata(record));
+
+  const actionLabel = getExtensionMessage(active ? 'forgetUser' : 'rememberUser');
+  const actionButton = el<HTMLButtonElement>(
+    <button
+      type="button"
+      class="bookmark-action-button avatar-ring-action-button"
+      title={actionLabel}
+      aria-label={actionLabel}
+      onClick={() => {
+        if (active) removeAvatarRing(key);
+        else restoreAvatarRing(key, record);
+      }}
+    >
+      {createAvatarRingIcon(active)}
+    </button>
+  );
+  const row = el<HTMLElement>(
+    <article
+      class={`bookmark-row avatar-ring-row${active ? '' : ' bookmark-row-removed avatar-ring-row-removed'}`}
+    >
+      {avatar}
+      {copy}
+      <span class="bookmark-actions">{actionButton}</span>
+    </article>
+  );
+  row.style.setProperty('--ytcq-popup-avatar-ring-color', getAvatarRingColor(record));
+  return row;
+}
+
+function createBookmarkHeader(record: BookmarkRecord): HTMLElement {
+  const header = createSavedItemHeader(record.authorName);
   const postedTime = createBookmarkPostedTime(record.message);
   if (postedTime) header.append(postedTime);
   return header;
 }
 
-function createBookmarkAvatar(record: BookmarkRecord, channelUrl: string): HTMLElement {
+function createAvatarRingHeader(record: AvatarRingRecord): HTMLElement {
+  const header = createSavedItemHeader(record.authorName);
+  const fullAddedTime = formatFullDateTime(record.addedAt);
+  const tooltip = getExtensionMessage('userRememberedDate', fullAddedTime);
+  const time = el<HTMLTimeElement>(
+    <time
+      class="bookmark-message-time avatar-ring-added-time"
+      dateTime={new Date(record.addedAt).toISOString()}
+      title={tooltip}
+      aria-label={tooltip}
+    >
+      {formatCompactTime(record.addedAt)}
+    </time>
+  );
+  header.append(time);
+  return header;
+}
+
+function createSavedItemHeader(authorName: string): HTMLElement {
+  return el<HTMLSpanElement>(
+    <span class="bookmark-message-header">
+      <strong class="bookmark-name" dir="auto">
+        {authorName || getExtensionMessage('unknownUser')}
+      </strong>
+    </span>
+  );
+}
+
+function createSavedItemAvatar(
+  record: SavedItemAuthor,
+  channelUrl: string,
+  avatarRing = false
+): HTMLElement {
   const content = record.avatarUrl ? (
     <img src={record.avatarUrl} alt="" referrerPolicy="no-referrer" />
   ) : (
-    getBookmarkAuthorInitial(record.authorName)
+    getSavedItemAuthorInitial(record.authorName)
   );
+  const avatarClass = `bookmark-avatar${avatarRing ? ' avatar-ring-avatar' : ''}`;
   const element = channelUrl
     ? el<HTMLButtonElement>(
         <button
           type="button"
-          class="bookmark-avatar bookmark-avatar-button"
+          class={`${avatarClass} bookmark-avatar-button`}
           title={getExtensionMessage('openChannel')}
           aria-label={getExtensionMessage('openChannel')}
           onClick={() => chrome.tabs.create({ url: channelUrl })}
@@ -182,7 +314,7 @@ function createBookmarkAvatar(record: BookmarkRecord, channelUrl: string): HTMLE
           {createBookmarkAvatarOpenIcon()}
         </button>
       )
-    : el<HTMLSpanElement>(<span class="bookmark-avatar">{content}</span>);
+    : el<HTMLSpanElement>(<span class={avatarClass}>{content}</span>);
   element.style.setProperty('--bookmark-author-color', getBookmarkAuthorColor(record));
   return element;
 }
@@ -194,8 +326,12 @@ function createBookmarkAvatarOpenIcon(): SVGSVGElement {
 }
 
 function createBookmarkMetadata(record: BookmarkRecord): HTMLElement {
+  return createSavedItemMetadata(record);
+}
+
+function createSavedItemMetadata(record: SavedItemSource): HTMLElement {
   const metadata = el<HTMLSpanElement>(<span class="bookmark-metadata" />);
-  metadata.append(createBookmarkSource(record));
+  metadata.append(createSavedItemSource(record));
   return metadata;
 }
 
@@ -218,12 +354,12 @@ function createBookmarkPostedTime(message: BookmarkRecord['message']): HTMLEleme
   return time;
 }
 
-function createBookmarkSource(record: BookmarkRecord): HTMLElement {
-  const sourceText = record.sourceTitle || record.sourceUrl || getExtensionMessage('unknownStream');
-  const sourceUrl = getBookmarkSourceUrl(record);
+function createSavedItemSource(record: SavedItemSource): HTMLElement {
+  const sourceName = record.sourceTitle || record.sourceUrl || getExtensionMessage('unknownStream');
+  const sourceUrl = getSavedItemSourceUrl(record);
 
   if (sourceUrl) {
-    const tooltip = getExtensionMessage('openStreamInNewWindow', sourceText);
+    const tooltip = getExtensionMessage('openStreamInNewWindow', sourceName);
     return el<HTMLButtonElement>(
       <button
         type="button"
@@ -232,15 +368,15 @@ function createBookmarkSource(record: BookmarkRecord): HTMLElement {
         aria-label={tooltip}
         onClick={() => chrome.tabs.create({ url: sourceUrl })}
       >
-        <span class="bookmark-source-label">{sourceText}</span>
+        <span class="bookmark-source-label">{sourceName}</span>
         {createOpenInNewIcon()}
       </button>
     );
   }
 
   return el<HTMLSpanElement>(
-    <span class="bookmark-source" title={sourceText}>
-      {sourceText}
+    <span class="bookmark-source" title={sourceName}>
+      {sourceName}
     </span>
   );
 }
@@ -260,17 +396,44 @@ function restoreBookmark(key: string, record: BookmarkRecord): void {
   });
 }
 
+function removeAvatarRing(key: string): void {
+  updateStoredAvatarRings((records) => {
+    const record = records.get(key);
+    if (record) recentlyRemovedAvatarRings.set(key, record);
+    records.delete(key);
+  });
+}
+
+function restoreAvatarRing(key: string, record: AvatarRingRecord): void {
+  updateStoredAvatarRings((records) => {
+    records.set(key, record);
+    recentlyRemovedAvatarRings.delete(key);
+  });
+}
+
 function updateStoredBookmarks(update: (records: Map<string, BookmarkRecord>) => void): void {
   chrome.storage.local.get({ [BOOKMARKS_STORAGE_KEY]: {} }, (stored) => {
     const records = normalizeStoredBookmarks((stored || {})[BOOKMARKS_STORAGE_KEY]);
     update(records);
+    currentBookmarks = records;
     chrome.storage.local.set({ [BOOKMARKS_STORAGE_KEY]: serializeBookmarks(records) }, () =>
-      renderBookmarks(records)
+      renderSavedItems()
     );
   });
 }
 
-function getBookmarkAuthorInitial(authorName: string): string {
+function updateStoredAvatarRings(update: (records: Map<string, AvatarRingRecord>) => void): void {
+  chrome.storage.local.get({ [AVATAR_RINGS_STORAGE_KEY]: {} }, (stored) => {
+    const records = normalizeStoredAvatarRings((stored || {})[AVATAR_RINGS_STORAGE_KEY]);
+    update(records);
+    currentAvatarRings = records;
+    chrome.storage.local.set({ [AVATAR_RINGS_STORAGE_KEY]: serializeAvatarRings(records) }, () =>
+      renderSavedItems()
+    );
+  });
+}
+
+function getSavedItemAuthorInitial(authorName: string): string {
   const normalized = authorName.trim().replace(/^@/, '');
   return (normalized[0] || '?').toUpperCase();
 }
@@ -289,7 +452,7 @@ function formatCompactTime(timestamp: number): string {
   }).format(timestamp);
 }
 
-function getBookmarkChannelUrl(record: BookmarkRecord): string {
+function getSavedItemChannelUrl(record: Pick<SavedItemAuthor, 'authorName' | 'channelId'>): string {
   if (record.channelId) {
     return `https://www.youtube.com/channel/${encodeURIComponent(record.channelId)}`;
   }
@@ -298,7 +461,7 @@ function getBookmarkChannelUrl(record: BookmarkRecord): string {
   return /^[A-Za-z0-9._-]+$/.test(handle) ? `https://www.youtube.com/@${handle}` : '';
 }
 
-function getBookmarkSourceUrl(record: BookmarkRecord): string {
+function getSavedItemSourceUrl(record: SavedItemSource): string {
   const sourceUrl = (record.sourceUrl || '').trim();
   if (!sourceUrl) return '';
 

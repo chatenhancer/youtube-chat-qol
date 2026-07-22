@@ -40,10 +40,10 @@
     "jumpToMessage": "Перейти к сообщению",
     "keywordOrPhrase": "Ключевое слово или фраза",
     "lessThanOneMinute": "меньше 1 мин",
-    "addAvatarRing": "Добавить кольцо аватара",
-    "removeAvatarRing": "Убрать кольцо аватара",
+    "rememberUser": "Запомнить пользователя",
+    "forgetUser": "Забыть пользователя",
     "bookmarkAddedDate": "Закладка добавлена {date}",
-    "avatarRingAddedDate": "Кольцо аватара добавлено {date}",
+    "userRememberedDate": "Пользователь запомнен {date}",
     "mention": "Упомянуть",
     "mentionUser": "Упомянуть пользователя",
     "mentionUserTitle": "Упомянуть пользователя. Alt/Option-клик, чтобы процитировать.",
@@ -531,17 +531,29 @@
     "popupResetItemBookmarks": {
       "message": "Закладки"
     },
-    "popupResetItemAvatarRings": {
-      "message": "Кольца аватаров"
+    "popupResetItemRememberedUsers": {
+      "message": "Запомненные пользователи"
     },
-    "noBookmarks": {
-      "message": "Закладок пока нет"
+    "noSavedItems": {
+      "message": "Сохранённых элементов пока нет"
     },
-    "bookmarksCount": {
-      "message": "{count} закладок"
+    "savedItemsCount": {
+      "message": "Сохранено элементов: {count}"
     },
-    "bookmarksEmpty": {
-      "message": "Сообщения, сохранённые из чата YouTube, появятся здесь."
+    "savedItemsEmpty": {
+      "message": "Сохранённые сообщения и запомненные пользователи появятся здесь."
+    },
+    "rememberedUser": {
+      "message": "Запомненный пользователь"
+    },
+    "userRememberedDate": {
+      "message": "Пользователь запомнен {date}"
+    },
+    "forgetUser": {
+      "message": "Забыть пользователя"
+    },
+    "rememberUser": {
+      "message": "Запомнить пользователя"
     },
     "bookmarkMessagePostedDate": {
       "message": "Сообщение отправлено {date}"

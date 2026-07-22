@@ -4,11 +4,13 @@ import {
   AVATAR_RINGS_STORAGE_KEY,
   getAvatarRingColor,
   getAvatarRingKey,
+  normalizeAvatarRingAvatarUrl,
   normalizeAvatarRingIdentity,
   normalizeStoredAvatarRings,
   serializeAvatarRings,
   type AvatarRingIdentity,
-  type AvatarRingRecord
+  type AvatarRingRecord,
+  type AvatarRingSource
 } from '../../shared/avatar-rings';
 import { createAvatarRingIcon } from '../../shared/icons';
 import { getUiLocale, t } from '../../shared/i18n';
@@ -21,6 +23,10 @@ import {
   getParticipantAvatarElement,
   getParticipantChannelId
 } from '../../youtube/participants';
+import {
+  getCurrentYouTubeChatSourceTitle,
+  getCurrentYouTubeChatSourceUrl
+} from '../../youtube/source-url';
 
 export { AVATAR_RINGS_STORAGE_KEY, getAvatarRingColor } from '../../shared/avatar-rings';
 
@@ -53,9 +59,9 @@ export function isAvatarRingEnabled(identity: AvatarRingIdentity): boolean {
   return Boolean(findAvatarRing(identity));
 }
 
-export async function toggleAvatarRing(identity: AvatarRingIdentity): Promise<boolean> {
+export async function toggleAvatarRing(source: AvatarRingSource): Promise<boolean> {
   await ensureAvatarRingsLoaded();
-  const normalized = normalizeAvatarRingIdentity(identity);
+  const normalized = normalizeAvatarRingIdentity(source);
   if (!normalized) return false;
 
   const key = getAvatarRingKey(normalized);
@@ -65,7 +71,15 @@ export async function toggleAvatarRing(identity: AvatarRingIdentity): Promise<bo
   if (matches.length) {
     matches.forEach(([matchedKey]) => avatarRings.delete(matchedKey));
   } else {
-    avatarRings.set(key, { ...normalized, addedAt: Date.now() });
+    const sourceUrl = getCurrentYouTubeChatSourceUrl();
+    if (!sourceUrl) return false;
+    avatarRings.set(key, {
+      ...normalized,
+      addedAt: Date.now(),
+      avatarUrl: normalizeAvatarRingAvatarUrl(source.avatarUrl) || undefined,
+      sourceTitle: getCurrentYouTubeChatSourceTitle() || undefined,
+      sourceUrl
+    });
   }
 
   await saveAvatarRings();
@@ -73,7 +87,11 @@ export async function toggleAvatarRing(identity: AvatarRingIdentity): Promise<bo
   return !matches.length;
 }
 
-export function createAvatarRingToggleButton(identity: AvatarRingIdentity): HTMLButtonElement {
+export function createAvatarRingToggleButton(source: AvatarRingSource): HTMLButtonElement {
+  const identity: AvatarRingIdentity = {
+    authorName: source.authorName,
+    channelId: source.channelId
+  };
   const button = el<HTMLButtonElement>(
     <button
       type="button"
@@ -82,7 +100,7 @@ export function createAvatarRingToggleButton(identity: AvatarRingIdentity): HTML
         event.preventDefault();
         event.stopPropagation();
         const target = event.currentTarget as HTMLButtonElement;
-        void toggleAvatarRing(identity).then(() => updateAvatarRingToggleButton(target, identity));
+        void toggleAvatarRing(source).then(() => updateAvatarRingToggleButton(target, identity));
       }}
     >
       {createAvatarRingIcon()}
@@ -206,11 +224,11 @@ function updateAvatarRingToggleButton(
 ): void {
   const match = findAvatarRing(identity);
   const enabled = Boolean(match);
-  const actionLabel = t(enabled ? 'removeAvatarRing' : 'addAvatarRing');
+  const actionLabel = t(enabled ? 'forgetUser' : 'rememberUser');
   const addedAt = Number(match?.[1].addedAt);
   const label =
     enabled && Number.isFinite(addedAt) && addedAt > 0
-      ? `${actionLabel}\n${t('avatarRingAddedDate', { date: formatAvatarRingActionDate(addedAt) })}`
+      ? `${actionLabel}\n${t('userRememberedDate', { date: formatAvatarRingActionDate(addedAt) })}`
       : actionLabel;
   button.title = label;
   button.setAttribute('aria-label', label);

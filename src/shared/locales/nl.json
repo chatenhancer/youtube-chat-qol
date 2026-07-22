@@ -40,10 +40,10 @@
     "jumpToMessage": "Naar bericht springen",
     "keywordOrPhrase": "Trefwoord of zin",
     "lessThanOneMinute": "minder dan 1 min",
-    "addAvatarRing": "Avatarring toevoegen",
-    "removeAvatarRing": "Avatarring verwijderen",
+    "rememberUser": "Gebruiker onthouden",
+    "forgetUser": "Gebruiker vergeten",
     "bookmarkAddedDate": "Bladwijzer toegevoegd op {date}",
-    "avatarRingAddedDate": "Avatarring toegevoegd op {date}",
+    "userRememberedDate": "Gebruiker onthouden op {date}",
     "mention": "Vermelden",
     "mentionUser": "Gebruiker vermelden",
     "mentionUserTitle": "Gebruiker vermelden. Alt/Option-klik om te citeren.",
@@ -528,17 +528,29 @@
     "popupResetItemBookmarks": {
       "message": "Bladwijzers"
     },
-    "popupResetItemAvatarRings": {
-      "message": "Avatarringen"
+    "popupResetItemRememberedUsers": {
+      "message": "Onthouden gebruikers"
     },
-    "noBookmarks": {
-      "message": "Nog geen bladwijzers"
+    "noSavedItems": {
+      "message": "Nog geen opgeslagen items"
     },
-    "bookmarksCount": {
-      "message": "{count} bladwijzers"
+    "savedItemsCount": {
+      "message": "{count} opgeslagen items"
     },
-    "bookmarksEmpty": {
-      "message": "Berichten die je vanuit YouTube-chat opslaat, verschijnen hier."
+    "savedItemsEmpty": {
+      "message": "Berichten die je opslaat en gebruikers die je onthoudt, verschijnen hier."
+    },
+    "rememberedUser": {
+      "message": "Onthouden gebruiker"
+    },
+    "userRememberedDate": {
+      "message": "Gebruiker onthouden op {date}"
+    },
+    "forgetUser": {
+      "message": "Gebruiker vergeten"
+    },
+    "rememberUser": {
+      "message": "Gebruiker onthouden"
     },
     "bookmarkMessagePostedDate": {
       "message": "Bericht geplaatst op {date}"

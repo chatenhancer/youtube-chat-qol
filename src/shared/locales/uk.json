@@ -40,10 +40,10 @@
     "jumpToMessage": "Перейти до повідомлення",
     "keywordOrPhrase": "Ключове слово або фраза",
     "lessThanOneMinute": "менше ніж 1 хв",
-    "addAvatarRing": "Додати кільце аватара",
-    "removeAvatarRing": "Прибрати кільце аватара",
+    "rememberUser": "Запам’ятати користувача",
+    "forgetUser": "Забути користувача",
     "bookmarkAddedDate": "Закладку додано {date}",
-    "avatarRingAddedDate": "Кільце аватара додано {date}",
+    "userRememberedDate": "Користувача запам’ятовано {date}",
     "mention": "Згадати",
     "mentionUser": "Згадати користувача",
     "mentionUserTitle": "Згадати користувача. Alt/Option-клік, щоб процитувати.",
@@ -528,17 +528,29 @@
     "popupResetItemBookmarks": {
       "message": "Закладки"
     },
-    "popupResetItemAvatarRings": {
-      "message": "Кільця аватарів"
+    "popupResetItemRememberedUsers": {
+      "message": "Запам’ятовані користувачі"
     },
-    "noBookmarks": {
-      "message": "Закладок поки немає"
+    "noSavedItems": {
+      "message": "Збережених елементів поки немає"
     },
-    "bookmarksCount": {
-      "message": "{count} закладок"
+    "savedItemsCount": {
+      "message": "Збережено елементів: {count}"
     },
-    "bookmarksEmpty": {
-      "message": "Повідомлення, збережені з чату YouTube, з’являться тут."
+    "savedItemsEmpty": {
+      "message": "Збережені повідомлення й запам’ятовані користувачі з’являться тут."
+    },
+    "rememberedUser": {
+      "message": "Запам’ятований користувач"
+    },
+    "userRememberedDate": {
+      "message": "Користувача запам’ятовано {date}"
+    },
+    "forgetUser": {
+      "message": "Забути користувача"
+    },
+    "rememberUser": {
+      "message": "Запам’ятати користувача"
     },
     "bookmarkMessagePostedDate": {
       "message": "Повідомлення надіслано {date}"

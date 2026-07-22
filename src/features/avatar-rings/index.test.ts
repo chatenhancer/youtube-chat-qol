@@ -7,7 +7,15 @@ const chatFeedRecordMocks = vi.hoisted(() => ({
   )
 }));
 
+const sourceUrlMocks = vi.hoisted(() => ({
+  getCurrentYouTubeChatSourceTitle: vi.fn(() => 'Example stream'),
+  getCurrentYouTubeChatSourceUrl: vi.fn(
+    () => 'https://www.youtube.com/watch?v=stream-a'
+  )
+}));
+
 vi.mock('../../youtube/chat-feed/records', () => chatFeedRecordMocks);
+vi.mock('../../youtube/source-url', () => sourceUrlMocks);
 
 describe('avatar rings', () => {
   beforeEach(async () => {
@@ -56,7 +64,9 @@ describe('avatar rings', () => {
         'channel:viewer-channel': {
           addedAt,
           authorName: '@ViewerOne',
-          channelId: 'viewer-channel'
+          channelId: 'viewer-channel',
+          sourceTitle: 'Example stream',
+          sourceUrl: 'https://www.youtube.com/watch?v=stream-a'
         }
       },
       ytcqBookmarks: {
@@ -68,10 +78,16 @@ describe('avatar rings', () => {
   it('matches author-only and channel identities and removes duplicate matches together', async () => {
     await chrome.storage.local.set({
       ytcqAvatarRings: {
-        'author:@viewerone': { authorName: '@ViewerOne' },
-        'channel:viewer-channel': {
+        'author:@viewerone': {
+          addedAt: 1_700_000_000_000,
           authorName: '@ViewerOne',
-          channelId: 'viewer-channel'
+          sourceUrl: 'https://www.youtube.com/watch?v=stream-a'
+        },
+        'channel:viewer-channel': {
+          addedAt: 1_700_000_001_000,
+          authorName: '@ViewerOne',
+          channelId: 'viewer-channel',
+          sourceUrl: 'https://www.youtube.com/watch?v=stream-a'
         }
       }
     });
@@ -108,9 +124,12 @@ describe('avatar rings', () => {
     feature.initAvatarRings();
     await flushAsyncWork();
 
-    const button = feature.createAvatarRingToggleButton({ authorName: '@ViewerOne' });
+    const button = feature.createAvatarRingToggleButton({
+      authorName: '@ViewerOne',
+      avatarUrl: 'https://example.com/avatar.png'
+    });
     document.body.append(button);
-    expect(button.title).toBe('Add avatar ring');
+    expect(button.title).toBe('Remember user');
     expect(button.getAttribute('aria-pressed')).toBe('false');
     expect(button.querySelector('.ytcq-avatar-ring-icon-badge-symbol')?.getAttribute('d')).toBe(
       AVATAR_RING_ADD_BADGE_PATH
@@ -120,7 +139,7 @@ describe('avatar rings', () => {
     await flushAsyncWork();
 
     expect(button.title).toBe(
-      `Remove avatar ring\nAvatar ring added ${new Intl.DateTimeFormat('en', {
+      `Forget user\nUser remembered ${new Intl.DateTimeFormat('en', {
         dateStyle: 'medium',
         timeStyle: 'short'
       }).format(addedAt)}`
@@ -179,7 +198,13 @@ describe('avatar rings', () => {
     listener?.(
       {
         [feature.AVATAR_RINGS_STORAGE_KEY]: {
-          newValue: { 'author:@viewerone': { authorName: '@ViewerOne' } }
+          newValue: {
+            'author:@viewerone': {
+              addedAt: 1_700_000_000_000,
+              authorName: '@ViewerOne',
+              sourceUrl: 'https://www.youtube.com/watch?v=stream-a'
+            }
+          }
         } as chrome.storage.StorageChange
       },
       'sync'
@@ -189,7 +214,13 @@ describe('avatar rings', () => {
     listener?.(
       {
         [feature.AVATAR_RINGS_STORAGE_KEY]: {
-          newValue: { 'author:@viewerone': { authorName: '@ViewerOne' } }
+          newValue: {
+            'author:@viewerone': {
+              addedAt: 1_700_000_000_000,
+              authorName: '@ViewerOne',
+              sourceUrl: 'https://www.youtube.com/watch?v=stream-a'
+            }
+          }
         } as chrome.storage.StorageChange
       },
       'local'

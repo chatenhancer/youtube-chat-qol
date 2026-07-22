@@ -40,10 +40,10 @@
     "jumpToMessage": "الانتقال إلى الرسالة",
     "keywordOrPhrase": "كلمة مفتاحية أو عبارة",
     "lessThanOneMinute": "أقل من دقيقة واحدة",
-    "addAvatarRing": "إضافة حلقة للصورة الرمزية",
-    "removeAvatarRing": "إزالة حلقة الصورة الرمزية",
+    "rememberUser": "تذكّر المستخدم",
+    "forgetUser": "نسيان المستخدم",
     "bookmarkAddedDate": "أُضيفت الإشارة المرجعية في {date}",
-    "avatarRingAddedDate": "أُضيفت حلقة الصورة الرمزية في {date}",
+    "userRememberedDate": "تم تذكّر المستخدم في {date}",
     "mention": "إشارة",
     "mentionUser": "الإشارة إلى المستخدم",
     "mentionUserTitle": "الإشارة إلى المستخدم. انقر مع Alt/Option للاقتباس.",
@@ -531,17 +531,29 @@
     "popupResetItemBookmarks": {
       "message": "الإشارات"
     },
-    "popupResetItemAvatarRings": {
-      "message": "حلقات الصور الرمزية"
+    "popupResetItemRememberedUsers": {
+      "message": "المستخدمون الذين تم تذكّرهم"
     },
-    "noBookmarks": {
-      "message": "لا توجد إشارات بعد"
+    "noSavedItems": {
+      "message": "لا توجد عناصر محفوظة بعد"
     },
-    "bookmarksCount": {
-      "message": "{count} إشارة"
+    "savedItemsCount": {
+      "message": "{count} عناصر محفوظة"
     },
-    "bookmarksEmpty": {
-      "message": "ستظهر هنا الرسائل التي تحفظها من دردشة YouTube."
+    "savedItemsEmpty": {
+      "message": "ستظهر هنا الرسائل التي تحفظها والمستخدمون الذين تتذكّرهم."
+    },
+    "rememberedUser": {
+      "message": "مستخدم تم تذكّره"
+    },
+    "userRememberedDate": {
+      "message": "تم تذكّر المستخدم في {date}"
+    },
+    "forgetUser": {
+      "message": "نسيان المستخدم"
+    },
+    "rememberUser": {
+      "message": "تذكّر المستخدم"
     },
     "bookmarkMessagePostedDate": {
       "message": "نُشرت الرسالة في {date}"
