@@ -367,8 +367,9 @@ export function observeStickAroundChatTraffic(
   const knownMessageIds = new Set(game.observedMessageIds);
   const newMessageIds = messageIds.filter((messageId) => !knownMessageIds.has(messageId));
   const reportedCount = getInteger(payload.count, 'count', 0, MAX_TRAFFIC_COUNT);
-  const anonymousCount = messageIds.length ? Math.max(0, reportedCount - messageIds.length) : reportedCount;
-  const observedCount = Math.min(MAX_TRAFFIC_COUNT, newMessageIds.length + anonymousCount);
+  // Only identifiable messages contribute to weather so reports from both
+  // players cannot count the same overflow traffic twice.
+  const observedCount = Math.min(reportedCount, newMessageIds.length);
   const hazardCount = Math.min(STICK_AROUND_MAX_HAZARDS_PER_OBSERVATION, Math.ceil(observedCount / 2));
   if (hazardCount <= 0) return advanceStickAroundGame(game, now);
 

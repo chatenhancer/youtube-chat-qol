@@ -15,7 +15,8 @@ import {
 import { ProtocolError } from '../../protocol/validation';
 import {
   STICK_AROUND_ARENA_HEIGHT,
-  STICK_AROUND_ARENA_WIDTH
+  STICK_AROUND_ARENA_WIDTH,
+  STICK_AROUND_MAX_OBSERVED_MESSAGE_IDS
 } from '../../../../../src/shared/playground/stick-around';
 
 describe('playground Stick Around game rules', () => {
@@ -70,14 +71,14 @@ describe('playground Stick Around game rules', () => {
     });
   });
 
-  it('turns chat traffic counts into deterministic hazards without chat text', () => {
+  it('turns unseen chat messages into deterministic hazards without chat text', () => {
     let game = startActiveGame();
 
     game = observeStickAroundChatTraffic(game, {
       action: 'observeChatTraffic',
       payload: {
         count: 3,
-        messageIds: ['message-1', 'message-2'],
+        messageIds: ['message-1', 'message-2', 'message-3'],
         windowStartedAt: 5_000
       },
       userId: 'host-user'
@@ -96,14 +97,46 @@ describe('playground Stick Around game rules', () => {
     game = observeStickAroundChatTraffic(game, {
       action: 'observeChatTraffic',
       payload: {
-        count: 2,
-        messageIds: ['message-1', 'message-2'],
+        count: 3,
+        messageIds: ['message-1', 'message-2', 'message-3'],
         windowStartedAt: 6_000
       },
       userId: 'guest-user'
     }, 6_100);
 
     expect(game.hazards).toHaveLength(2);
+  });
+
+  it('does not count unidentified overflow traffic again for the second player', () => {
+    let game = startActiveGame();
+    const messageIds = Array.from(
+      { length: STICK_AROUND_MAX_OBSERVED_MESSAGE_IDS },
+      (_, index) => `message-${index + 1}`
+    );
+
+    game = observeStickAroundChatTraffic(game, {
+      action: 'observeChatTraffic',
+      payload: {
+        count: 30,
+        messageIds,
+        windowStartedAt: 5_000
+      },
+      userId: 'host-user'
+    }, 5_100);
+
+    expect(game.hazards).toHaveLength(5);
+
+    game = observeStickAroundChatTraffic(game, {
+      action: 'observeChatTraffic',
+      payload: {
+        count: 30,
+        messageIds,
+        windowStartedAt: 5_000
+      },
+      userId: 'guest-user'
+    }, 5_200);
+
+    expect(game.hazards).toHaveLength(5);
   });
 
   it('ignores client finish reports and resolves the winner from server physics', () => {
