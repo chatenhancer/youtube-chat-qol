@@ -464,8 +464,7 @@ function dispatchActions(
     delivery: source === 'replay' ? 'replay-timeline' : 'transport',
     receivedAt: 1_780_318_000_000,
     sequence: 1,
-    source,
-    version: 1
+    source
   });
 }
 

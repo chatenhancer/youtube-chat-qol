@@ -34,7 +34,7 @@ describe('YouTube chat feed record store', () => {
     records.startYouTubeChatFeedRecordStore();
 
     expect(controls).toEqual([
-      { consumer: 'records', enabled: true, requestInitial: true, version: 1 }
+      { consumer: 'records', enabled: true, requestInitial: true }
     ]);
     expect(records.getYouTubeChatFeedRecordState()).toEqual({
       ready: false,
@@ -161,8 +161,7 @@ describe('YouTube chat feed record store', () => {
     expect(controls).toEqual([{
       consumer: 'records',
       enabled: true,
-      requestRendered: true,
-      version: 1
+      requestRendered: true
     }]);
 
     const first = createRecord('first', undefined, 'UC-first');
@@ -306,8 +305,7 @@ function createBatch(
     actions,
     receivedAt: Date.now(),
     sequence,
-    source,
-    version: 1
+    source
   };
 }
 

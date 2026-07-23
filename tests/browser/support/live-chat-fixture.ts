@@ -237,7 +237,7 @@ export function createLiveChatFixtureHtml({
   </head>
   <body>
     <yt-live-chat-app>
-      <yt-live-chat-renderer hide-timestamps>
+      <yt-live-chat-renderer id="chat" hide-timestamps>
         <yt-live-chat-header-renderer>
           <strong>Top chat</strong>
           <div id="live-chat-header-context-menu">
@@ -304,6 +304,23 @@ export function createLiveChatFixtureHtml({
       ];
 
       const getMessageId = (number) => \`fixture-message-\${number}\`;
+      const createContextMenuEndpoint = (id) => ({
+        clickTrackingParams: \`fixture-tracking-\${id}\`,
+        liveChatItemContextMenuEndpoint: {
+          params: \`fixture-menu-\${id}\`
+        }
+      });
+
+      if (!customElements.get('yt-live-chat-text-message-renderer')) {
+        customElements.define(
+          'yt-live-chat-text-message-renderer',
+          class extends HTMLElement {
+            fetchContextMenu() {
+              addMessageMenu(this);
+            }
+          }
+        );
+      }
 
       const createAvatarSrc = (label, index) => {
         const colors = ['3f8cff', 'ff7043', '7e57c2', '26a69a', 'ef5350', '8d6e63'];
@@ -343,6 +360,7 @@ export function createLiveChatFixtureHtml({
           authorExternalChannelId: channelId,
           authorName: { simpleText: fixtureMessage.author },
           authorPhoto: { thumbnails: [{ url: avatarSrc }] },
+          contextMenuEndpoint: createContextMenuEndpoint(id),
           message: { simpleText: fixtureMessage.text },
           timestampUsec: String(1780000000000000 + number)
         };
@@ -388,6 +406,7 @@ export function createLiveChatFixtureHtml({
           authorPhoto: {
             thumbnails: [{ url: initialMessage.querySelector('#author-photo img')?.src || '' }]
           },
+          contextMenuEndpoint: createContextMenuEndpoint('fixture-message-1'),
           message: { simpleText: fixtureMessages[0].text },
           timestampUsec: '1780000000000001'
         };
@@ -484,10 +503,14 @@ export function createLiveChatFixtureHtml({
         document.querySelector('yt-live-chat-renderer')?.append(picker);
       };
 
+      let activeContextMenuRenderer = null;
       const removeOpenMenus = () => {
         for (const menu of document.querySelectorAll('ytd-menu-popup-renderer')) {
           menu.remove();
         }
+        const renderer = activeContextMenuRenderer;
+        activeContextMenuRenderer = null;
+        renderer?.dispatchEvent(new CustomEvent('yt-live-chat-context-menu-closed'));
       };
 
       const updateTimestampToggle = (root = document) => {
@@ -525,19 +548,22 @@ export function createLiveChatFixtureHtml({
           ?.addEventListener('click', () => setTimestampsEnabled(!timestampsEnabled));
       };
 
-      const addMessageMenu = () => {
+      const addMessageMenu = (renderer) => {
         removeOpenMenus();
+        activeContextMenuRenderer = renderer;
         const menu = document.createElement('ytd-menu-popup-renderer');
         menu.innerHTML = '<div id="items"><ytd-menu-service-item-renderer><tp-yt-paper-item>Native item</tp-yt-paper-item></ytd-menu-service-item-renderer></div>';
         document.body.append(menu);
+        renderer?.dispatchEvent(new CustomEvent('yt-live-chat-context-menu-opened'));
       };
 
       document.querySelector('#live-chat-header-context-menu button').addEventListener('click', addSettingsMenu);
       document.querySelector('#emoji-picker-button button')?.addEventListener('click', addEmojiPicker);
       document.addEventListener('click', (event) => {
         const target = event.target instanceof Element ? event.target.closest('#menu') : null;
-        if (!target?.closest('yt-live-chat-text-message-renderer')) return;
-        addMessageMenu();
+        const renderer = target?.closest('yt-live-chat-text-message-renderer');
+        if (!renderer) return;
+        addMessageMenu(renderer);
       });
       document.addEventListener('keydown', (event) => {
         if (event.key === 'Escape') removeOpenMenus();

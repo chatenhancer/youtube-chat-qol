@@ -8,22 +8,9 @@ export type LiteModeAutomaticFailureReason =
   | 'sequence-gap'
   | 'unreadable-response'
   | 'unreadable-feed'
-  | 'action-backlog'
   | 'root-replaced';
 
-export type LiteModeFallbackCode =
-  | 'LM00'
-  | 'LM01'
-  | 'LM02'
-  | 'LM03'
-  | 'LM04'
-  | 'LM05'
-  | 'LM06'
-  | 'LM07'
-  | 'LM08'
-  | 'LM09';
-
-const FALLBACK_CODES: Record<LiteModeAutomaticFailureReason, LiteModeFallbackCode> = {
+const FALLBACK_CODES = {
   'startup-timeout': 'LM01',
   'source-timeout': 'LM02',
   'invalid-batch': 'LM03',
@@ -31,9 +18,12 @@ const FALLBACK_CODES: Record<LiteModeAutomaticFailureReason, LiteModeFallbackCod
   'sequence-gap': 'LM05',
   'unreadable-response': 'LM06',
   'unreadable-feed': 'LM07',
-  'action-backlog': 'LM08',
   'root-replaced': 'LM09'
-};
+} as const satisfies Record<LiteModeAutomaticFailureReason, string>;
+
+export type LiteModeFallbackCode =
+  | 'LM00'
+  | (typeof FALLBACK_CODES)[LiteModeAutomaticFailureReason];
 
 export function getLiteModeFallbackCode(
   reason: LiteModeAutomaticFailureReason
@@ -42,7 +32,10 @@ export function getLiteModeFallbackCode(
 }
 
 export function parseLiteModeFallbackCode(value: unknown): LiteModeFallbackCode | null {
-  return typeof value === 'string' && /^LM0\d$/.test(value)
+  return value === 'LM00' || (
+    typeof value === 'string' &&
+    Object.values(FALLBACK_CODES).some((code) => code === value)
+  )
     ? value as LiteModeFallbackCode
     : null;
 }
@@ -53,4 +46,3 @@ export function formatLiteModeFallbackMessage(
 ): string {
   return `${message} (${code})`;
 }
-

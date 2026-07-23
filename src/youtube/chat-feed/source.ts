@@ -10,7 +10,6 @@
 import { parseYouTubeChatFeedBatchDetail } from './batch';
 import {
   YOUTUBE_CHAT_FEED_BATCH_EVENT,
-  YOUTUBE_CHAT_FEED_PROTOCOL_VERSION,
   type YouTubeChatFeedAction,
   type YouTubeChatFeedTransportBatch,
   type YouTubeChatFeedConsumer
@@ -30,7 +29,6 @@ export type YouTubeChatFeedBatch = YouTubeChatFeedTransportBatch & {
   transportHadUpsert?: boolean;
 };
 export type YouTubeChatFeedError =
-  | 'action-backlog'
   | 'invalid-batch'
   | 'non-monotonic-sequence'
   | 'sequence-gap';
@@ -44,8 +42,6 @@ export interface YouTubeChatFeedSubscription {
 
 const subscriptions = new Set<YouTubeChatFeedSubscription>();
 const consumerCounts = new Map<YouTubeChatFeedConsumer, number>();
-const MAX_PENDING_REPLAY_ACTIONS = 2_000;
-const MAX_PENDING_REPLAY_ACTION_BYTES = 16 * 1024 * 1024;
 const REPLAY_BACKWARD_SEEK_THRESHOLD_MS = 1_000;
 const YOUTUBE_PLAYER_PROGRESS_KEY = 'yt-player-video-progress';
 
@@ -53,13 +49,11 @@ interface PendingReplayAction {
   action: YouTubeChatFeedAction;
   activity: YouTubeChatFeedActivity | null;
   batch: YouTubeChatFeedTransportBatch;
-  bytes: number;
 }
 
 let listening = false;
 let lastSequence = -1;
 let pendingReplayActions: PendingReplayAction[] = [];
-let pendingReplayActionBytes = 0;
 let replayProgressMs: number | null = null;
 let replayRequestsIdentifySeeks = false;
 
@@ -104,12 +98,8 @@ export function isYouTubeChatFeedPage(locationValue: Location = window.location)
   return isYouTubeChatFeedLocation(locationValue);
 }
 
-export function getYouTubeChatFeedReplayDiagnostics(): {
-  pendingActionBytes: number;
-  pendingActions: number;
-} {
+export function getYouTubeChatFeedReplayDiagnostics(): { pendingActions: number } {
   return {
-    pendingActionBytes: pendingReplayActionBytes,
     pendingActions: pendingReplayActions.length
   };
 }
@@ -210,14 +200,13 @@ function deliverYouTubeChatFeedBatch(batch: YouTubeChatFeedTransportBatch): void
     clearReplayActionQueue();
     const immediateActions = batch.actions.filter((action) => !hasReplayOffset(action));
     const timedActions = batch.actions.filter(hasReplayOffset);
-    const queued = enqueueReplayActions(timedActions, batch);
+    enqueueReplayActions(timedActions, batch);
     runFeedBatch(createTransportBatch(batch, immediateActions));
-    if (!queued) return;
     drainPendingReplayActions();
     return;
   }
 
-  if (!enqueueReplayActions(batch.actions, batch)) return;
+  enqueueReplayActions(batch.actions, batch);
   runFeedBatch(createTransportBatch(batch, []));
   drainPendingReplayActions();
 }
@@ -240,27 +229,14 @@ function createTransportBatch(
 function enqueueReplayActions(
   actions: readonly YouTubeChatFeedAction[],
   batch: YouTubeChatFeedTransportBatch
-): boolean {
-  if (!actions.length) return true;
+): void {
+  if (!actions.length) return;
   const entries = actions.map((action) => ({
     action,
     activity: getPendingReplayActivity(action, batch),
-    batch,
-    bytes: getYouTubeChatFeedActionBytes(action)
+    batch
   }));
-  const addedBytes = entries.reduce((total, entry) => total + entry.bytes, 0);
-  if (
-    pendingReplayActions.length + entries.length > MAX_PENDING_REPLAY_ACTIONS ||
-    pendingReplayActionBytes + addedBytes > MAX_PENDING_REPLAY_ACTION_BYTES
-  ) {
-    clearReplayActionQueue();
-    reportFeedError('action-backlog');
-    return false;
-  }
-
   pendingReplayActions.push(...entries);
-  pendingReplayActionBytes += addedBytes;
-  return true;
 }
 
 function drainPendingReplayActions(): void {
@@ -280,10 +256,6 @@ function drainPendingReplayActions(): void {
   if (!dueCount) return;
 
   const dueEntries = pendingReplayActions.splice(0, dueCount);
-  pendingReplayActionBytes = Math.max(
-    0,
-    pendingReplayActionBytes - dueEntries.reduce((total, entry) => total + entry.bytes, 0)
-  );
 
   let index = 0;
   while (index < dueEntries.length) {
@@ -304,8 +276,7 @@ function drainPendingReplayActions(): void {
       delivery: 'replay-timeline',
       receivedAt: batch.receivedAt,
       sequence: batch.sequence,
-      source: batch.source,
-      version: batch.version
+      source: batch.source
     });
   }
 }
@@ -330,8 +301,7 @@ function handleYouTubePlayerProgress(event: MessageEvent): void {
       delivery: 'replay-timeline',
       receivedAt: Date.now(),
       sequence: Math.max(0, lastSequence),
-      source: 'replay',
-      version: YOUTUBE_CHAT_FEED_PROTOCOL_VERSION
+      source: 'replay'
     });
   }
   replayProgressMs = nextProgressMs;
@@ -372,13 +342,8 @@ function hasReplayOffset(action: YouTubeChatFeedAction): boolean {
   return action.type !== 'reset' && action.replayOffsetMs !== undefined;
 }
 
-function getYouTubeChatFeedActionBytes(action: YouTubeChatFeedAction): number {
-  return JSON.stringify(action).length * 2;
-}
-
 function clearReplayActionQueue(): void {
   pendingReplayActions = [];
-  pendingReplayActionBytes = 0;
 }
 
 function clearReplayState(): void {

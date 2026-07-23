@@ -6,7 +6,6 @@
  * values, and service endpoints must never cross this boundary.
  */
 
-export const YOUTUBE_CHAT_FEED_PROTOCOL_VERSION = 1 as const;
 export const YOUTUBE_CHAT_FEED_CONTROL_EVENT = 'ytcq:lite-chat-control';
 export const YOUTUBE_CHAT_FEED_BATCH_EVENT = 'ytcq:lite-chat-batch';
 export const YOUTUBE_CHAT_FEED_BOOTSTRAP_INTENT_ATTRIBUTE = 'data-ytcq-lite-mode-intent';
@@ -21,7 +20,6 @@ export interface YouTubeChatFeedControl {
   requestInitial?: boolean;
   /** Capture connected native rows as additive existing-message records. */
   requestRendered?: boolean;
-  version: typeof YOUTUBE_CHAT_FEED_PROTOCOL_VERSION;
 }
 
 export interface YouTubeChatTextRun {
@@ -145,5 +143,4 @@ export interface YouTubeChatFeedTransportBatch {
   /** The response completed before the first feed consumer was ready. */
   startup?: boolean;
   unreadableFeed?: boolean;
-  version: typeof YOUTUBE_CHAT_FEED_PROTOCOL_VERSION;
 }

@@ -8,7 +8,6 @@
 import type { BrowserContext, CDPSession, Page } from '@playwright/test';
 import {
   YOUTUBE_CHAT_FEED_BATCH_EVENT,
-  YOUTUBE_CHAT_FEED_PROTOCOL_VERSION,
   type YouTubeChatFeedAction,
   type YouTubeChatFeedTransportBatch,
   type YouTubeChatMessageRecord
@@ -232,7 +231,7 @@ async function appendLiteMessages(page: Page, startIndex: number, count: number)
 
 async function dispatchLiteBatch(page: Page, actions: YouTubeChatFeedAction[]): Promise<void> {
   await page.evaluate(
-    ({ eventName, nextActions, version }) => {
+    ({ eventName, nextActions }) => {
       const state = (
         window as typeof window & {
           __ytcqLitePerfSequence?: { sequence: number };
@@ -250,8 +249,7 @@ async function dispatchLiteBatch(page: Page, actions: YouTubeChatFeedAction[]): 
         continuationTimeoutMs: 1,
         receivedAt: Date.now(),
         sequence,
-        source: 'live',
-        version
+        source: 'live'
       };
       window.dispatchEvent(
         new CustomEvent(eventName, {
@@ -261,8 +259,7 @@ async function dispatchLiteBatch(page: Page, actions: YouTubeChatFeedAction[]): 
     },
     {
       eventName: YOUTUBE_CHAT_FEED_BATCH_EVENT,
-      nextActions: actions,
-      version: YOUTUBE_CHAT_FEED_PROTOCOL_VERSION
+      nextActions: actions
     }
   );
 }

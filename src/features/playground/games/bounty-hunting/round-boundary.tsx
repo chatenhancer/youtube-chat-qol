@@ -32,7 +32,7 @@ export function ensureBountyHuntingRoundStartDivider(runtime: BountyHuntingPanel
 }
 
 export function hasBountyHuntingRoundStartBoundary(runtime: BountyHuntingPanelRuntime): boolean {
-  return /^\d{1,24}$/.test(runtime.game.roundStartTimestampUsec || '');
+  return /^\d+$/.test(runtime.game.roundStartTimestampUsec || '');
 }
 
 export function isBountyHuntingTimestampEligibleForRound(
@@ -113,8 +113,8 @@ function getBountyHuntingTimestampEligibility(
   timestampUsec: string
 ): boolean | null {
   const cutoff = runtime.game.roundStartTimestampUsec;
-  if (!cutoff || !/^\d{1,24}$/.test(cutoff)) return null;
-  if (!/^\d{1,24}$/.test(timestampUsec)) return null;
+  if (!cutoff || !/^\d+$/.test(cutoff)) return null;
+  if (!/^\d+$/.test(timestampUsec)) return null;
   return BigInt(timestampUsec) > BigInt(cutoff);
 }
 

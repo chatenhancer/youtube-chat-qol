@@ -96,7 +96,7 @@ export function formatMessageTimestamp(timestamp: number, locale?: string): stri
 }
 
 export function formatMessageTimestampUsec(timestampUsec: string | undefined): string {
-  if (!timestampUsec || !/^\d{1,24}$/.test(timestampUsec)) return '';
+  if (!timestampUsec || !/^\d+$/.test(timestampUsec)) return '';
   const milliseconds = Number(timestampUsec) / 1_000;
   return formatMessageTimestamp(milliseconds);
 }

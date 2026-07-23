@@ -2757,8 +2757,7 @@ function dispatchChatFeedActions(actions: YouTubeChatFeedAction[]): void {
     delivery: 'transport',
     receivedAt: Date.now(),
     sequence: 1,
-    source: 'live',
-    version: 1
+    source: 'live'
   });
 }
 

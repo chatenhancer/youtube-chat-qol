@@ -113,8 +113,7 @@ describe('Lite mode controller', () => {
     expect(document.querySelector('[data-message-id="first"]')).not.toBeNull();
     expect(controlDetails.map((detail) => JSON.parse(detail))).toContainEqual({
       consumer: 'lite',
-      enabled: true,
-      version: 1
+      enabled: true
     });
     expect(controlDetails.map((detail) => JSON.parse(detail))).not.toContainEqual(
       expect.objectContaining({ requestInitial: true })
@@ -173,8 +172,7 @@ describe('Lite mode controller', () => {
     expect(controlDetails.map((detail) => JSON.parse(detail))).toContainEqual({
       consumer: 'lite',
       enabled: true,
-      requestInitial: true,
-      version: 1
+      requestInitial: true
     });
     expect(nativeHistoryConnectedOnRequest).toBe(true);
     expect(nativeList.isConnected).toBe(false);
@@ -198,8 +196,7 @@ describe('Lite mode controller', () => {
       expect(controls).toContainEqual({
         consumer: 'lite',
         enabled: true,
-        requestInitial: true,
-        version: 1
+        requestInitial: true
       });
       expect(controls).not.toContainEqual(
         expect.objectContaining({ requestRendered: true })
@@ -260,8 +257,7 @@ describe('Lite mode controller', () => {
 
     expect(controls).toContainEqual({
       consumer: 'lite',
-      enabled: true,
-      version: 1
+      enabled: true
     });
     expect(controls).not.toContainEqual(
       expect.objectContaining({ requestInitial: true })
@@ -882,6 +878,27 @@ describe('Lite mode controller', () => {
     expect(isLiteModeActive()).toBe(true);
   });
 
+  it('honors YouTube continuation intervals beyond the former watchdog maximum', async () => {
+    window.history.replaceState({}, '', '/live_chat');
+    startLiteMode({ clearCooldown: true });
+    dispatchBatch({
+      ...createBatch(1, [{ type: 'upsert', record: createRecord('live', 'Live') }]),
+      continuationTimeoutMs: 15 * 60 * 1_000
+    });
+
+    await vi.advanceTimersByTimeAsync(20 * 60 * 1_000 + 5_000);
+    expect(isLiteModeActive()).toBe(true);
+    expect(requestNativeChatRestoreMock).not.toHaveBeenCalled();
+
+    await vi.advanceTimersByTimeAsync(10 * 60 * 1_000);
+    expect(isLiteModeActive()).toBe(false);
+    expect(requestNativeChatRestoreMock).toHaveBeenCalledWith({
+      automaticFailure: true,
+      fallbackCode: 'LM02',
+      message: 'Loading chat'
+    });
+  });
+
   it('defers a live source timeout while backgrounded', async () => {
     window.history.replaceState({}, '', '/live_chat');
     startLiteMode({ clearCooldown: true });
@@ -1174,7 +1191,6 @@ describe('Lite mode controller', () => {
     };
     expect(parseYouTubeChatFeedBatchDetail(JSON.stringify(diagnosticBatch))).toEqual(diagnosticBatch);
     expect(parseYouTubeChatFeedBatchDetail(valid)).toBeNull();
-    expect(parseYouTubeChatFeedBatchDetail(JSON.stringify({ ...valid, version: 2 }))).toBeNull();
     expect(parseYouTubeChatFeedBatchDetail(JSON.stringify({
       ...valid,
       compatibilityWarnings: [false]
@@ -1278,8 +1294,7 @@ function createBatch(sequence: number, actions: YouTubeChatFeedTransportBatch['a
     actions,
     receivedAt: Date.now(),
     sequence,
-    source: 'live',
-    version: 1
+    source: 'live'
   };
 }
 

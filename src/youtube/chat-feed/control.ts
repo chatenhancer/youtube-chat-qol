@@ -6,17 +6,12 @@
  */
 import {
   YOUTUBE_CHAT_FEED_CONTROL_EVENT,
-  YOUTUBE_CHAT_FEED_PROTOCOL_VERSION,
   type YouTubeChatFeedControl
 } from './protocol';
 
 export function dispatchYouTubeChatFeedControl(
-  values: Omit<YouTubeChatFeedControl, 'version'>
+  control: YouTubeChatFeedControl
 ): void {
-  const control: YouTubeChatFeedControl = {
-    ...values,
-    version: YOUTUBE_CHAT_FEED_PROTOCOL_VERSION
-  };
   window.dispatchEvent(new CustomEvent(YOUTUBE_CHAT_FEED_CONTROL_EVENT, {
     detail: JSON.stringify(control)
   }));

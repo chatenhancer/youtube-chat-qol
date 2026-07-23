@@ -112,7 +112,7 @@ function getFeedTimestamp(
   timestampText: string,
   context: { receivedAt: number; replay: boolean }
 ): number {
-  if (!context.replay && /^\d{1,24}$/.test(source.timestampUsec || '')) {
+  if (!context.replay && /^\d+$/.test(source.timestampUsec || '')) {
     const timestamp = Number(source.timestampUsec) / 1_000;
     if (Number.isFinite(timestamp) && timestamp > 0) return timestamp;
   }

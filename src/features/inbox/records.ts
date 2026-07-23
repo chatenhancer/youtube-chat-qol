@@ -104,7 +104,7 @@ function getChatFeedTimestamp(
   timestampText: string,
   options: InboxChatFeedRecordOptions
 ): number {
-  if (options.source === 'live' && /^\d{1,24}$/.test(record.timestampUsec || '')) {
+  if (options.source === 'live' && /^\d+$/.test(record.timestampUsec || '')) {
     const timestamp = Number(record.timestampUsec) / 1_000;
     if (Number.isFinite(timestamp) && timestamp > 0) return timestamp;
   }

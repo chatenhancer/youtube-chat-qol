@@ -195,8 +195,7 @@ describe('inbox coordinator', () => {
       delivery: 'transport',
       receivedAt: 1,
       sequence: 1,
-      source: 'replay',
-      version: 1
+      source: 'replay'
     });
     expect(stateMocks.upsertInboxRecord).not.toHaveBeenCalled();
 
@@ -207,8 +206,7 @@ describe('inbox coordinator', () => {
       delivery: 'replay-timeline',
       receivedAt: 1,
       sequence: 1,
-      source: 'initial',
-      version: 1
+      source: 'initial'
     });
     expect(stateMocks.upsertInboxRecord).not.toHaveBeenCalled();
 
@@ -603,7 +601,6 @@ function dispatchNewFeedRecord(id: string, plainText: string): void {
     delivery: 'transport',
     receivedAt: 1,
     sequence: 1,
-    source: 'live',
-    version: 1
+    source: 'live'
   });
 }

@@ -149,8 +149,7 @@ function dispatchActions(
     delivery: 'transport',
     receivedAt: 100_000,
     sequence: 1,
-    source: 'live',
-    version: 1
+    source: 'live'
   });
 }
 

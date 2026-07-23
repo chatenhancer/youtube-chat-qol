@@ -7,8 +7,6 @@
  * continuation values outside this page-world helper.
  */
 
-const MAX_REQUEST_BODY_LENGTH = 64 * 1024;
-const MAX_CONTINUATION_LENGTH = 4_096;
 const BACKWARD_SEEK_THRESHOLD_MS = 1_000;
 const FORWARD_SEEK_MINIMUM_MS = 15_000;
 const FORWARD_PLAYBACK_RATE_ALLOWANCE = 3;
@@ -147,29 +145,25 @@ async function readReplayRequestBody(
 ): Promise<string | null> {
   if (typeof init?.body === 'string') return init.body;
   if (!request) return null;
-  const contentLength = Number(request.headers.get('content-length'));
-  if (Number.isFinite(contentLength) && contentLength > MAX_REQUEST_BODY_LENGTH) return null;
 
   try {
     const contentEncoding = request.headers.get('content-encoding')?.trim().toLowerCase();
-    let body: string;
     if (!contentEncoding || contentEncoding === 'identity') {
-      body = await request.text();
-    } else if (contentEncoding === 'gzip' && request.body) {
-      body = await new Response(
+      return await request.text();
+    }
+    if (contentEncoding === 'gzip' && request.body) {
+      return await new Response(
         request.body.pipeThrough(new DecompressionStream('gzip'))
       ).text();
-    } else {
-      return null;
     }
-    return body.length <= MAX_REQUEST_BODY_LENGTH ? body : null;
+    return null;
   } catch {
     return null;
   }
 }
 
 function parseReplayRequestData(body: string): ReplayRequestData | null {
-  if (body.length === 0 || body.length > MAX_REQUEST_BODY_LENGTH) return null;
+  if (!body) return null;
   let parsed: unknown;
   try {
     parsed = JSON.parse(body);
@@ -179,7 +173,7 @@ function parseReplayRequestData(body: string): ReplayRequestData | null {
 
   const record = asRecord(parsed);
   if (!record) return null;
-  const continuation = getBoundedContinuation(record.continuation);
+  const continuation = getContinuation(record.continuation);
   const playerOffsetMs = parsePlayerOffsetMs(
     asRecord(record.currentPlayerState)?.playerOffsetMs
   );
@@ -204,23 +198,19 @@ function parseReplayContinuationTokens(payload: unknown): ReplayContinuationToke
   if (!Array.isArray(continuations)) return {};
 
   const tokens: ReplayContinuationTokens = {};
-  for (const value of continuations.slice(0, 20)) {
+  for (const value of continuations) {
     const item = asRecord(value);
     if (!item) continue;
     const replay = asRecord(item.liveChatReplayContinuationData);
     const seek = asRecord(item.playerSeekContinuationData);
-    tokens.replay ||= getBoundedContinuation(replay?.continuation);
-    tokens.seek ||= getBoundedContinuation(seek?.continuation);
+    tokens.replay ||= getContinuation(replay?.continuation);
+    tokens.seek ||= getContinuation(seek?.continuation);
   }
   return tokens;
 }
 
-function getBoundedContinuation(value: unknown): string | undefined {
-  return typeof value === 'string' &&
-    value.length > 0 &&
-    value.length <= MAX_CONTINUATION_LENGTH
-    ? value
-    : undefined;
+function getContinuation(value: unknown): string | undefined {
+  return typeof value === 'string' && value ? value : undefined;
 }
 
 function asRecord(value: unknown): Record<string, unknown> | null {

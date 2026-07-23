@@ -1,5 +1,8 @@
-/** Bounded startup snapshot and buffering for the page-world chat feed. */
-import { parseYouTubeChatFeedPayload } from './parser';
+/** Startup snapshot and buffering for the page-world chat feed. */
+import {
+  parseYouTubeChatFeedPayload,
+  type YouTubeChatContextMenuEndpointObserver
+} from './parser';
 import type { YouTubeChatFeedBatchValues } from './page-events';
 import type {
   YouTubeChatFeedAction,
@@ -18,8 +21,6 @@ type StartupMetadata = Pick<
   | 'unreadableFeed'
 >;
 
-export const MAX_YOUTUBE_CHAT_FEED_SEED_ACTIONS = 499;
-
 export interface YouTubeChatFeedInitialSnapshot extends StartupMetadata {
   actions: YouTubeChatFeedAction[];
 }
@@ -33,7 +34,6 @@ export interface YouTubeChatFeedStartupBuffer {
 }
 
 const YOUTUBE_INITIAL_DATA_ASSIGNMENT = 'window["ytInitialData"] = ';
-const MAX_YOUTUBE_INITIAL_DATA_SCRIPT_LENGTH = 8 * 1024 * 1024;
 const NATIVE_CHAT_FEED_RENDERER_KEYS: Record<string, string> = {
   'yt-gift-message-view-model': 'giftMessageViewModel',
   'yt-live-chat-membership-item-renderer': 'liveChatMembershipItemRenderer',
@@ -49,18 +49,22 @@ const NATIVE_CHAT_FEED_RENDERER_SELECTOR = Object.keys(
   NATIVE_CHAT_FEED_RENDERER_KEYS
 ).join(',');
 
-export function captureYouTubeChatFeedInitialSnapshot(): YouTubeChatFeedInitialSnapshot {
+export function captureYouTubeChatFeedInitialSnapshot(
+  observeContextMenuEndpoint?: YouTubeChatContextMenuEndpointObserver
+): YouTubeChatFeedInitialSnapshot {
   const embeddedInitialData = readEmbeddedYouTubeInitialData();
   const parsedInitial = embeddedInitialData === undefined
     ? null
-    : parseYouTubeChatFeedPayload(embeddedInitialData, { initial: true });
+    : parseYouTubeChatFeedPayload(embeddedInitialData, {
+        observeContextMenuEndpoint
+      });
   const initialActions =
     parsedInitial?.actions.filter((action) => action.type !== 'reset') || [];
   if (parsedInitial && initialActions.length) {
     return createYouTubeChatFeedInitialSnapshot(initialActions, parsedInitial);
   }
 
-  const parsedNativeRows = parseNativeChatFeedRows();
+  const parsedNativeRows = parseNativeChatFeedRows(observeContextMenuEndpoint);
   return createYouTubeChatFeedInitialSnapshot(
     parsedNativeRows.actions.filter((action) => action.type === 'upsert'),
     parsedNativeRows,
@@ -68,8 +72,10 @@ export function captureYouTubeChatFeedInitialSnapshot(): YouTubeChatFeedInitialS
   );
 }
 
-export function captureYouTubeChatFeedRenderedSnapshot(): YouTubeChatFeedInitialSnapshot {
-  const parsedNativeRows = parseNativeChatFeedRows();
+export function captureYouTubeChatFeedRenderedSnapshot(
+  observeContextMenuEndpoint?: YouTubeChatContextMenuEndpointObserver
+): YouTubeChatFeedInitialSnapshot {
+  const parsedNativeRows = parseNativeChatFeedRows(observeContextMenuEndpoint);
   return createYouTubeChatFeedInitialSnapshot(
     parsedNativeRows.actions.filter((action) => action.type === 'upsert'),
     parsedNativeRows
@@ -82,7 +88,7 @@ function createYouTubeChatFeedInitialSnapshot(
   fallback?: ReturnType<typeof parseYouTubeChatFeedPayload> | null
 ): YouTubeChatFeedInitialSnapshot {
   return {
-    actions: actions.slice(-MAX_YOUTUBE_CHAT_FEED_SEED_ACTIONS),
+    actions: [...actions],
     compatibilityWarnings: [
       ...primary.compatibilityWarnings,
       ...(fallback?.compatibilityWarnings || [])
@@ -121,13 +127,13 @@ export function createYouTubeChatFeedStartupBuffer(): YouTubeChatFeedStartupBuff
       preReadyCompatibilityWarnings = [...new Set([
         ...preReadyCompatibilityWarnings,
         ...values.compatibilityWarnings
-      ])].slice(0, 32);
+      ])];
     }
     if (values.fatalErrors?.length) {
       preReadyFatalErrors = [...new Set([
         ...preReadyFatalErrors,
         ...values.fatalErrors
-      ])].slice(0, 32);
+      ])];
     }
     if (values.unreadableFeed) preReadyUnreadableFeed = true;
   };
@@ -208,7 +214,6 @@ export function createYouTubeChatFeedStartupBuffer(): YouTubeChatFeedStartupBuff
         }
         preReadyActions.push(action);
       }
-      preReadyActions = preReadyActions.slice(-MAX_YOUTUBE_CHAT_FEED_SEED_ACTIONS);
       rememberMetadata(values);
     },
 
@@ -221,11 +226,10 @@ export function createYouTubeChatFeedStartupBuffer(): YouTubeChatFeedStartupBuff
 }
 
 function readEmbeddedYouTubeInitialData(): unknown {
-  for (const script of Array.from(document.scripts).slice(0, 64)) {
+  for (const script of Array.from(document.scripts)) {
     const text = script.textContent?.trim();
     if (
       !text ||
-      text.length > MAX_YOUTUBE_INITIAL_DATA_SCRIPT_LENGTH ||
       !text.startsWith(YOUTUBE_INITIAL_DATA_ASSIGNMENT) ||
       !text.endsWith(';')
     ) {
@@ -258,13 +262,15 @@ function mergeYouTubeChatFeedStartupActions(
     }
     merged.push(action);
   }
-  return merged.slice(-MAX_YOUTUBE_CHAT_FEED_SEED_ACTIONS);
+  return merged;
 }
 
-function parseNativeChatFeedRows(): ReturnType<typeof parseYouTubeChatFeedPayload> {
+function parseNativeChatFeedRows(
+  observeContextMenuEndpoint?: YouTubeChatContextMenuEndpointObserver
+): ReturnType<typeof parseYouTubeChatFeedPayload> {
   const actions = Array.from(
     document.querySelectorAll<NativeChatRenderer>(NATIVE_CHAT_FEED_RENDERER_SELECTOR)
-  ).slice(-MAX_YOUTUBE_CHAT_FEED_SEED_ACTIONS).flatMap((message) => {
+  ).flatMap((message) => {
     const rendererKey = NATIVE_CHAT_FEED_RENDERER_KEYS[message.tagName.toLowerCase()];
     if (!rendererKey) return [];
     const rendererData = asDataRecord(message.data);
@@ -279,7 +285,7 @@ function parseNativeChatFeedRows(): ReturnType<typeof parseYouTubeChatFeedPayloa
       }
     }];
   });
-  const parsed = parseYouTubeChatFeedPayload({ actions });
+  const parsed = parseYouTubeChatFeedPayload({ actions }, { observeContextMenuEndpoint });
   return {
     ...parsed,
     compatibilityWarnings: [],

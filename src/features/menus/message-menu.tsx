@@ -19,22 +19,21 @@ import { jsx, el } from '../../shared/jsx-dom';
 import { getChatBookmarkTitle, isChatBookmarked, toggleChatBookmark } from '../bookmarks';
 import { replyToMessage } from '../reply';
 import { registerFeature } from '../../content/dispatcher';
+import {
+  requestYouTubeChatContextMenu,
+  type YouTubeChatContextMenuStatus
+} from '../../youtube/chat-feed/context-menu';
 import { closeMenu, createMenuActionItem } from './common';
 
 let activeContextMessage: HTMLElement | null = null;
+let activeContextMessageSnapshot: HTMLElement | null = null;
 let activeContextMessageAt = 0;
 let messageMenuActivationListeners = new AbortController();
 let contextMenuWiringListeners = new AbortController();
-let liteContextMenuListeners = new AbortController();
-let liteContextMenu: HTMLElement | null = null;
-let liteContextAnchor: HTMLButtonElement | null = null;
-
-const LITE_CONTEXT_MENU_ID = 'ytcq-lite-context-menu';
-const LITE_CONTEXT_MENU_MARGIN_PX = 8;
-const LITE_CONTEXT_MENU_GAP_PX = 4;
+let nativeLiteContextMenuCleanup: (() => void) | null = null;
+let nativeLiteContextAnchor: HTMLButtonElement | null = null;
 
 type ContextMessageResolver = () => HTMLElement | null;
-type LiteContextMenuPoint = { x: number; y: number };
 
 registerFeature({
   page: { init: initMessageMenuActivation },
@@ -79,7 +78,7 @@ export function wireMessageContext(message: HTMLElement): void {
       event.preventDefault();
       event.stopPropagation();
       setActive();
-      toggleLiteContextMenu(message, liteButton, event.detail === 0);
+      openLiteContextMenu(message, liteButton);
     },
     { signal: contextMenuWiringListeners.signal }
   );
@@ -96,10 +95,7 @@ export function wireMessageContext(message: HTMLElement): void {
       }
 
       setActive();
-      toggleLiteContextMenu(message, liteButton, false, {
-        x: event.clientX,
-        y: event.clientY
-      });
+      openLiteContextMenu(message, liteButton);
     },
     { signal: contextMenuWiringListeners.signal }
   );
@@ -118,27 +114,30 @@ export function enhanceMessageContextMenu(menu: HTMLElement): void {
   if (!list) return;
 
   prepareContextMenu(menu);
+  if (activeContextMessageSnapshot) menu.append(activeContextMessageSnapshot);
   if (list.querySelector(':scope .ytcq-context-item')) {
     clampContextMenuVertically(menu);
     return;
   }
 
-  appendMessageContextActions(list, () => activeContextMessage);
+  appendMessageContextActions(list, resolveActiveContextMessage);
   clampContextMenuVertically(menu);
 }
 
 export function isRecentActiveContextMessage(): boolean {
-  if (!activeContextMessage?.isConnected) return false;
+  if (!activeContextMessage?.isConnected && !activeContextMessageSnapshot) return false;
   return Date.now() - activeContextMessageAt < 2500;
 }
 
 export function cleanupStaleMessageMenuSurfaces(): void {
-  closeLiteContextMenu();
+  closeNativeLiteContextMenuState();
   messageMenuActivationListeners.abort();
   messageMenuActivationListeners = new AbortController();
   contextMenuWiringListeners.abort();
   contextMenuWiringListeners = new AbortController();
   activeContextMessage = null;
+  activeContextMessageSnapshot?.remove();
+  activeContextMessageSnapshot = null;
   activeContextMessageAt = 0;
   document.querySelectorAll('.ytcq-context-item').forEach((item) => item.remove());
   document.querySelectorAll('[data-ytcq-context-wired]').forEach((element) => {
@@ -146,16 +145,22 @@ export function cleanupStaleMessageMenuSurfaces(): void {
   });
 }
 
-function setActiveContextMessage(message: HTMLElement): void {
+function setActiveContextMessage(message: HTMLElement, keepSnapshot = false): void {
+  activeContextMessageSnapshot?.remove();
+  activeContextMessageSnapshot = keepSnapshot ? createLiteContextMessageSnapshot(message) : null;
   activeContextMessage = message;
   activeContextMessageAt = Date.now();
 }
 
-function appendMessageContextActions(
-  list: Element,
-  resolveMessage: ContextMessageResolver,
-  dismissMenu: () => void = closeMenu
-): void {
+function resolveActiveContextMessage(): HTMLElement | null {
+  return activeContextMessage?.isConnected
+    ? activeContextMessage
+    : activeContextMessageSnapshot?.isConnected
+      ? activeContextMessageSnapshot
+      : null;
+}
+
+function appendMessageContextActions(list: Element, resolveMessage: ContextMessageResolver): void {
   const message = resolveMessage();
   const saved = Boolean(message && isChatBookmarked(message));
   const saveLabel = saved ? t('remove') : t('save');
@@ -174,17 +179,14 @@ function appendMessageContextActions(
         if (!target?.isConnected) return;
 
         void toggleChatBookmark(target);
-        dismissMenu();
+        closeMenu();
       }
     }),
-    createReplyActionSplitItem(resolveMessage, dismissMenu)
+    createReplyActionSplitItem(resolveMessage)
   );
 }
 
-function createReplyActionSplitItem(
-  resolveMessage: ContextMessageResolver,
-  dismissMenu: () => void
-): HTMLElement {
+function createReplyActionSplitItem(resolveMessage: ContextMessageResolver): HTMLElement {
   const row = el<HTMLDivElement>(
     <div
       class="ytcq-paper-item ytcq-context-split-row"
@@ -199,14 +201,14 @@ function createReplyActionSplitItem(
       label: t('mention'),
       iconPath: MENTION_ICON_PATH,
       iconViewBox: MATERIAL_ICON_VIEW_BOX,
-      onClick: () => handleReplyAction(resolveMessage, false, dismissMenu)
+      onClick: () => handleReplyAction(resolveMessage, false)
     }),
     createReplyActionDivider(),
     createReplyActionButton({
       action: 'quote',
       label: t('quote'),
       iconPath: QUOTE_ICON_PATH,
-      onClick: () => handleReplyAction(resolveMessage, true, dismissMenu)
+      onClick: () => handleReplyAction(resolveMessage, true)
     })
   );
 
@@ -266,183 +268,65 @@ function createReplyActionDivider(): HTMLElement {
   return el<HTMLSpanElement>(<span class="ytcq-context-split-divider" aria-hidden="true" />);
 }
 
-function handleReplyAction(
-  resolveMessage: ContextMessageResolver,
-  quote: boolean,
-  dismissMenu: () => void
-): void {
+function handleReplyAction(resolveMessage: ContextMessageResolver, quote: boolean): void {
   const message = resolveMessage();
   if (!message?.isConnected) return;
 
   replyToMessage(message, { quote });
-  dismissMenu();
+  closeMenu();
 }
 
-function toggleLiteContextMenu(
-  message: HTMLElement,
-  anchor: HTMLButtonElement,
-  focusFirstAction: boolean,
-  activationPoint?: LiteContextMenuPoint
+function openLiteContextMenu(message: HTMLElement, anchor: HTMLButtonElement): void {
+  closeNativeLiteContextMenuState();
+  const messageId = message.dataset.messageId;
+  if (!messageId) return;
+
+  const point = getLiteContextMenuAnchorPoint(anchor);
+  const stopListening = requestYouTubeChatContextMenu(messageId, point, (status) => {
+    if (status === 'opening') setActiveContextMessage(message, true);
+    handleNativeLiteContextMenuStatus(status, anchor);
+  });
+
+  if (stopListening) {
+    nativeLiteContextMenuCleanup = stopListening;
+    nativeLiteContextAnchor = anchor;
+  }
+}
+
+function handleNativeLiteContextMenuStatus(
+  status: YouTubeChatContextMenuStatus,
+  anchor: HTMLButtonElement
 ): void {
-  if (liteContextMenu?.isConnected && liteContextAnchor === anchor) {
-    closeLiteContextMenu();
+  if (status === 'opening' || status === 'opened') {
+    activeContextMessageAt = Date.now();
+    anchor.setAttribute('aria-expanded', 'true');
     return;
   }
 
-  closeLiteContextMenu();
-  setActiveContextMessage(message);
-
-  const items = el<HTMLDivElement>(<div id="items" />);
-  const messageSnapshot = createLiteContextMessageSnapshot(message);
-  const menu = el<HTMLDivElement>(
-    <div
-      id={LITE_CONTEXT_MENU_ID}
-      class="ytcq-lite-context-menu ytcq-context-expanded-menu"
-      role="menu"
-      aria-label={`${t('save')} / ${t('mention')} / ${t('quote')}`}
-    >
-      {items}
-    </div>
-  );
-  appendMessageContextActions(
-    items,
-    () => (message.isConnected ? message : messageSnapshot),
-    () => closeLiteContextMenu()
-  );
-  menu.append(messageSnapshot);
-
-  liteContextMenu = menu;
-  liteContextAnchor = anchor;
-  anchor.setAttribute('aria-controls', LITE_CONTEXT_MENU_ID);
-  anchor.setAttribute('aria-expanded', 'true');
-  menu.style.visibility = 'hidden';
-  document.body.append(menu);
-  positionLiteContextMenu(menu, anchor, activationPoint);
-  menu.style.visibility = '';
-
-  const signal = liteContextMenuListeners.signal;
-  document.addEventListener('pointerdown', handleLiteContextPointerDown, {
-    capture: true,
-    signal
-  });
-  document.addEventListener('focusin', handleLiteContextFocusIn, {
-    capture: true,
-    signal
-  });
-  document.addEventListener('keydown', handleLiteContextKeyDown, {
-    capture: true,
-    signal
-  });
-  if (focusFirstAction) {
-    getLiteContextFocusableItems(menu)[0]?.focus();
+  anchor.setAttribute('aria-expanded', 'false');
+  activeContextMessageSnapshot?.remove();
+  activeContextMessageSnapshot = null;
+  if (nativeLiteContextAnchor === anchor) {
+    nativeLiteContextMenuCleanup = null;
+    nativeLiteContextAnchor = null;
   }
 }
 
-function closeLiteContextMenu(restoreFocus = false): void {
-  const anchor = liteContextAnchor;
-  liteContextMenuListeners.abort();
-  liteContextMenuListeners = new AbortController();
-  liteContextMenu?.remove();
-  liteContextMenu = null;
-  liteContextAnchor = null;
-
-  if (anchor) {
-    anchor.setAttribute('aria-expanded', 'false');
-    anchor.removeAttribute('aria-controls');
-    if (restoreFocus && anchor.isConnected) anchor.focus();
+function closeNativeLiteContextMenuState(): void {
+  nativeLiteContextMenuCleanup?.();
+  nativeLiteContextMenuCleanup = null;
+  if (nativeLiteContextAnchor) {
+    nativeLiteContextAnchor.setAttribute('aria-expanded', 'false');
   }
+  nativeLiteContextAnchor = null;
 }
 
-function handleLiteContextPointerDown(event: Event): void {
-  const target = event.target instanceof Node ? event.target : null;
-  if (!target || liteContextMenu?.contains(target) || liteContextAnchor?.contains(target)) return;
-  closeLiteContextMenu();
-}
-
-function handleLiteContextFocusIn(event: FocusEvent): void {
-  const target = event.target instanceof Node ? event.target : null;
-  if (!target || liteContextMenu?.contains(target) || liteContextAnchor?.contains(target)) return;
-  closeLiteContextMenu();
-}
-
-function handleLiteContextKeyDown(event: KeyboardEvent): void {
-  const menu = liteContextMenu;
-  if (!menu) return;
-
-  if (event.key === 'Escape') {
-    event.preventDefault();
-    event.stopPropagation();
-    closeLiteContextMenu(true);
-    return;
-  }
-
-  if (!['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) return;
-  const focusableItems = getLiteContextFocusableItems(menu);
-  if (!focusableItems.length) return;
-
-  event.preventDefault();
-  event.stopPropagation();
-  const currentIndex = focusableItems.indexOf(document.activeElement as HTMLElement);
-  let nextIndex = 0;
-  if (event.key === 'End') {
-    nextIndex = focusableItems.length - 1;
-  } else if (event.key === 'ArrowUp') {
-    nextIndex = currentIndex <= 0 ? focusableItems.length - 1 : currentIndex - 1;
-  } else if (event.key === 'ArrowDown') {
-    nextIndex = currentIndex >= focusableItems.length - 1 ? 0 : currentIndex + 1;
-  }
-  focusableItems[nextIndex]?.focus();
-}
-
-function getLiteContextFocusableItems(menu: HTMLElement): HTMLElement[] {
-  return Array.from(
-    menu.querySelectorAll<HTMLElement>(
-      '[data-ytcq-action="save-message"] .ytcq-paper-item, .ytcq-context-split-button'
-    )
-  );
-}
-
-function positionLiteContextMenu(
-  menu: HTMLElement,
-  anchor: HTMLElement,
-  activationPoint?: LiteContextMenuPoint
-): void {
-  const anchorRect = anchor.getBoundingClientRect();
-  const menuRect = menu.getBoundingClientRect();
-  const viewportRight = window.innerWidth - LITE_CONTEXT_MENU_MARGIN_PX;
-  const viewportBottom = window.innerHeight - LITE_CONTEXT_MENU_MARGIN_PX;
-  const maxLeft = Math.max(LITE_CONTEXT_MENU_MARGIN_PX, viewportRight - menuRect.width);
-  if (activationPoint) {
-    const rightOfClick = activationPoint.x + LITE_CONTEXT_MENU_GAP_PX;
-    const leftOfClick = activationPoint.x - LITE_CONTEXT_MENU_GAP_PX - menuRect.width;
-    const belowClick = activationPoint.y + LITE_CONTEXT_MENU_GAP_PX;
-    const aboveClick = activationPoint.y - LITE_CONTEXT_MENU_GAP_PX - menuRect.height;
-    const left = rightOfClick + menuRect.width <= viewportRight ? rightOfClick : leftOfClick;
-    const top = belowClick + menuRect.height <= viewportBottom ? belowClick : aboveClick;
-
-    menu.style.left = `${Math.round(Math.min(Math.max(LITE_CONTEXT_MENU_MARGIN_PX, left), maxLeft))}px`;
-    menu.style.top = `${Math.round(
-      Math.min(
-        Math.max(LITE_CONTEXT_MENU_MARGIN_PX, top),
-        Math.max(LITE_CONTEXT_MENU_MARGIN_PX, viewportBottom - menuRect.height)
-      )
-    )}px`;
-    return;
-  }
-
-  const left = Math.min(
-    Math.max(LITE_CONTEXT_MENU_MARGIN_PX, anchorRect.right - menuRect.width),
-    maxLeft
-  );
-  const below = anchorRect.bottom + LITE_CONTEXT_MENU_GAP_PX;
-  const above = anchorRect.top - LITE_CONTEXT_MENU_GAP_PX - menuRect.height;
-  const top =
-    below + menuRect.height <= viewportBottom
-      ? below
-      : Math.max(LITE_CONTEXT_MENU_MARGIN_PX, above);
-
-  menu.style.left = `${Math.round(left)}px`;
-  menu.style.top = `${Math.round(top)}px`;
+function getLiteContextMenuAnchorPoint(anchor: HTMLElement): { x: number; y: number } {
+  const rect = anchor.getBoundingClientRect();
+  return {
+    x: rect.right || rect.left,
+    y: rect.bottom || rect.top
+  };
 }
 
 function createLiteContextMessageSnapshot(message: HTMLElement): HTMLElement {

@@ -9,7 +9,6 @@
  * reload.
  */
 import type { YouTubeChatFeedAction, YouTubeChatFeedTransportBatch } from '../../youtube/chat-feed/protocol';
-import { MAX_YOUTUBE_CHAT_FEED_CONTINUATION_TIMEOUT_MS } from '../../youtube/chat-feed/batch';
 import {
   cleanupStaleLiteModeDom,
   discardNativeList,
@@ -62,7 +61,6 @@ const NATIVE_TICKER_SELECTOR = 'yt-live-chat-ticker-renderer, #ticker';
 const STARTUP_TIMEOUT_MS = 20_000;
 const REPLAY_STARTUP_TIMEOUT_MS = 45_000;
 const DEFAULT_SOURCE_TIMEOUT_MS = 35_000;
-const MAX_SOURCE_WATCHDOG_MS = MAX_YOUTUBE_CHAT_FEED_CONTINUATION_TIMEOUT_MS * 2 + 5_000;
 // One-off YouTube message types are skipped without disrupting Lite mode. Three
 // independent unreadable feed batches without a supported message indicate
 // that the main feed schema, rather than one special row, is no longer usable.
@@ -603,7 +601,7 @@ function scheduleSourceWatchdog(continuationTimeoutMs: number | undefined): void
   if (window.location.pathname === '/live_chat_replay') return;
   const providerTimeout = continuationTimeoutMs || 0;
   const timeout = providerTimeout
-    ? Math.min(MAX_SOURCE_WATCHDOG_MS, Math.max(12_000, providerTimeout * 2 + 5_000))
+    ? Math.max(12_000, providerTimeout * 2 + 5_000)
     : DEFAULT_SOURCE_TIMEOUT_MS;
   sourceTimer = window.setTimeout(() => {
     sourceTimer = 0;
@@ -740,7 +738,6 @@ function refreshLiteMemoryDiagnostics(sampleNative = false): void {
   root.dataset.ytcqLitePendingLiveActions = '0';
   root.dataset.ytcqLitePendingLiveActionBytes = '0';
   root.dataset.ytcqLitePendingReplayActions = String(replayDiagnostics.pendingActions);
-  root.dataset.ytcqLitePendingReplayActionBytes = String(replayDiagnostics.pendingActionBytes);
   if (!sampleNative) return;
 
   const detached = inspectDetachedNativeLists();

@@ -1,8 +1,9 @@
 /**
- * Pure, bounded parser for the InnerTube live-chat subset used by feed-backed
+ * Pure parser for the InnerTube live-chat subset used by feed-backed
  * features. It deliberately discards continuations, tracking parameters, service
  * endpoints, request metadata, and every other value outside the shared
- * sanitized protocol.
+ * sanitized protocol. A page-world-only observer may retain YouTube's native
+ * message-menu endpoint without adding it to the returned result.
  */
 import type {
   YouTubeChatAuthor,
@@ -16,8 +17,15 @@ import type {
 type DataRecord = Record<string, unknown>;
 
 export interface YouTubeChatFeedParseOptions {
-  initial?: boolean;
+  observeContextMenuEndpoint?: YouTubeChatContextMenuEndpointObserver;
 }
+
+export type YouTubeChatContextMenuEndpoint = Record<string, unknown>;
+
+export type YouTubeChatContextMenuEndpointObserver = (
+  messageId: string,
+  endpoint: YouTubeChatContextMenuEndpoint | null
+) => void;
 
 export interface YouTubeChatFeedParseResult {
   actions: YouTubeChatFeedAction[];
@@ -27,23 +35,6 @@ export interface YouTubeChatFeedParseResult {
   foundChat: boolean;
   unreadableFeed: boolean;
 }
-
-const MAX_INITIAL_ACTIONS = 500;
-const MAX_WALK_ARRAY_ITEMS = 500;
-const MAX_BADGES = 16;
-const MAX_PARSE_DIAGNOSTICS = 32;
-const MAX_GIFT_COUNT = 10_000;
-const MAX_ID_LENGTH = 200;
-const MAX_PLAIN_TEXT_LENGTH = 8_000;
-const MAX_RUNS = 120;
-const MAX_SHORTCUTS = 16;
-const MAX_TEXT_LENGTH = 4_000;
-const MAX_TOP_FAN_SCAN_DEPTH = 6;
-const MAX_TOP_FAN_SCAN_NODES = 100;
-const MAX_URL_LENGTH = 2_048;
-const MAX_WALK_DEPTH = 12;
-const MAX_WALK_NODES = 2_500;
-const MAX_TIMEOUT_MS = 2 * 60 * 1_000;
 
 const MESSAGE_RENDERER_KEYS = new Set([
   'giftMessageViewModel',
@@ -95,10 +86,10 @@ interface ParserState {
   continuationTimeoutMs?: number;
   fatalErrors: Set<string>;
   foundChat: boolean;
+  observeContextMenuEndpoint?: YouTubeChatContextMenuEndpointObserver;
   processedActions: WeakSet<object>;
   unreadableFeed: boolean;
   visited: WeakSet<object>;
-  walkedNodes: number;
 }
 
 interface ParsedFormattedText {
@@ -120,19 +111,13 @@ export function parseYouTubeChatFeedPayload(
     compatibilityWarnings: new Set<string>(),
     fatalErrors: new Set<string>(),
     foundChat: false,
+    observeContextMenuEndpoint: options.observeContextMenuEndpoint,
     processedActions: new WeakSet<object>(),
     unreadableFeed: false,
-    visited: new WeakSet<object>(),
-    walkedNodes: 0
+    visited: new WeakSet<object>()
   };
 
-  walkForChatContainers(value, state, 0, options.initial !== true);
-
-  if (options.initial && state.foundChat) {
-    const latestActions = state.actions.slice(-(MAX_INITIAL_ACTIONS - 1));
-    state.actions.length = 0;
-    state.actions.push({ type: 'reset' }, ...latestActions);
-  }
+  walkForChatContainers(value, state, true);
 
   return {
     actions: state.actions,
@@ -147,21 +132,18 @@ export function parseYouTubeChatFeedPayload(
 function walkForChatContainers(
   value: unknown,
   state: ParserState,
-  depth: number,
   parseRootActions = false
 ): void {
-  if (depth > MAX_WALK_DEPTH || state.walkedNodes >= MAX_WALK_NODES) return;
   if (Array.isArray(value)) {
-    state.walkedNodes += 1;
-    value.slice(0, MAX_WALK_ARRAY_ITEMS)
-      .forEach((item) => walkForChatContainers(item, state, depth + 1));
+    for (const item of value) {
+      walkForChatContainers(item, state);
+    }
     return;
   }
 
   const record = asRecord(value);
   if (!record || state.visited.has(record)) return;
   state.visited.add(record);
-  state.walkedNodes += 1;
   if (parseRootActions) parseActionArray(record.actions, state);
 
   for (const [key, child] of Object.entries(record)) {
@@ -170,11 +152,11 @@ function walkForChatContainers(
       continue;
     }
     if (key === 'liveChatRenderer') {
-      parseInitialLiveChatRenderer(child, state, 0);
+      parseInitialLiveChatRenderer(child, state);
       continue;
     }
     if (key === 'actions') continue;
-    walkForChatContainers(child, state, depth + 1);
+    walkForChatContainers(child, state);
   }
 }
 
@@ -189,34 +171,31 @@ function parseLiveChatContinuation(value: unknown, state: ParserState): void {
   rememberContinuationTimeout(continuation.continuations, state);
 }
 
-function parseInitialLiveChatRenderer(value: unknown, state: ParserState, depth: number): void {
+function parseInitialLiveChatRenderer(value: unknown, state: ParserState): void {
   const record = asRecord(value);
   if (!record || state.visited.has(record)) return;
   state.visited.add(record);
-  state.walkedNodes += 1;
   state.foundChat = true;
 
   parseActionArray(record.actions, state);
   rememberContinuationTimeout(record.continuations, state);
   for (const [key, child] of Object.entries(record)) {
     if (key === 'actions' || key === 'continuations') continue;
-    findInitialItemLists(child, state, depth + 1);
+    findInitialItemLists(child, state);
   }
 }
 
-function findInitialItemLists(value: unknown, state: ParserState, depth: number): void {
-  if (depth > MAX_WALK_DEPTH || state.walkedNodes >= MAX_WALK_NODES) return;
+function findInitialItemLists(value: unknown, state: ParserState): void {
   if (Array.isArray(value)) {
-    state.walkedNodes += 1;
-    value.slice(0, MAX_WALK_ARRAY_ITEMS)
-      .forEach((item) => findInitialItemLists(item, state, depth + 1));
+    for (const item of value) {
+      findInitialItemLists(item, state);
+    }
     return;
   }
 
   const record = asRecord(value);
   if (!record || state.visited.has(record)) return;
   state.visited.add(record);
-  state.walkedNodes += 1;
 
   for (const [key, child] of Object.entries(record)) {
     if (key === 'liveChatItemListRenderer') {
@@ -230,7 +209,7 @@ function findInitialItemLists(value: unknown, state: ParserState, depth: number)
       }
       continue;
     }
-    findInitialItemLists(child, state, depth + 1);
+    findInitialItemLists(child, state);
   }
 }
 
@@ -278,7 +257,7 @@ function parseAction(value: unknown, state: ParserState, replayOffsetMs?: number
         rememberCompatibilityWarning(state, 'replaceChatItemAction:invalid', true);
         continue;
       }
-      const targetId = cleanInlineText(replacement.targetItemId, MAX_ID_LENGTH);
+      const targetId = getNonEmptyString(replacement.targetItemId);
       if (targetId) pushAction(state, { id: targetId, type: 'remove' }, replayOffsetMs);
       else rememberCompatibilityWarning(state, 'replaceChatItemAction:missing-target');
       parseFeedItem(replacement.replacementItem, state, replayOffsetMs);
@@ -286,18 +265,18 @@ function parseAction(value: unknown, state: ParserState, replayOffsetMs?: number
     }
 
     if (key === 'removeChatItemAction' || key === 'markChatItemAsDeletedAction') {
-      const targetId = cleanInlineText(asRecord(payload)?.targetItemId, MAX_ID_LENGTH);
+      const targetId = getNonEmptyString(asRecord(payload)?.targetItemId);
       if (targetId) pushAction(state, { id: targetId, type: 'remove' }, replayOffsetMs);
-      else rememberCompatibilityWarning(state, `${cleanInlineText(key, 120)}:missing-target`);
+      else rememberCompatibilityWarning(state, `${cleanInlineText(key)}:missing-target`);
       continue;
     }
 
     if (key === 'markChatItemsByAuthorAsDeletedAction' || key === 'removeChatItemByAuthorAction') {
-      const channelId = cleanInlineText(asRecord(payload)?.externalChannelId, MAX_ID_LENGTH);
+      const channelId = getNonEmptyString(asRecord(payload)?.externalChannelId);
       if (channelId) {
         pushAction(state, { channelId, type: 'remove-author' }, replayOffsetMs);
       }
-      else rememberCompatibilityWarning(state, `${cleanInlineText(key, 120)}:missing-author`);
+      else rememberCompatibilityWarning(state, `${cleanInlineText(key)}:missing-author`);
       continue;
     }
 
@@ -308,7 +287,7 @@ function parseAction(value: unknown, state: ParserState, replayOffsetMs?: number
     if (/ChatItems?.*Action$/.test(key)) {
       rememberCompatibilityWarning(
         state,
-        `feed-action:${cleanInlineText(key, 120)}`,
+        `feed-action:${cleanInlineText(key)}`,
         /^(?:add|append|insert|prepend|replace).*ChatItems?.*Action$/i.test(key)
       );
     }
@@ -330,15 +309,19 @@ function parseFeedItem(value: unknown, state: ParserState, replayOffsetMs?: numb
   const [rendererKey, rendererValue] = rendererEntry;
   if (KNOWN_IGNORED_ITEM_RENDERERS.has(rendererKey)) return;
   if (!MESSAGE_RENDERER_KEYS.has(rendererKey)) {
-    rememberCompatibilityWarning(state, `feed:${cleanInlineText(rendererKey, 120)}`, true);
+    rememberCompatibilityWarning(state, `feed:${cleanInlineText(rendererKey)}`, true);
     return;
   }
 
   const record = parseMessageRenderer(rendererKey, rendererValue);
   if (!record) {
-    rememberCompatibilityWarning(state, `${cleanInlineText(rendererKey, 120)}:invalid`, true);
+    rememberCompatibilityWarning(state, `${cleanInlineText(rendererKey)}:invalid`, true);
     return;
   }
+  state.observeContextMenuEndpoint?.(
+    record.id,
+    asRecord(asRecord(rendererValue)?.contextMenuEndpoint) || null
+  );
   pushAction(state, { record, type: 'upsert' }, replayOffsetMs);
 }
 
@@ -348,7 +331,7 @@ function parseMessageRenderer(
 ): YouTubeChatMessageRecord | null {
   const renderer = asRecord(value);
   if (!renderer) return null;
-  const id = cleanInlineText(renderer.id, MAX_ID_LENGTH);
+  const id = getNonEmptyString(renderer.id);
   if (!id) return null;
 
   const common = {
@@ -362,7 +345,7 @@ function parseMessageRenderer(
   if (rendererKey === 'giftMessageViewModel') {
     const message = parseFormattedText(renderer.text);
     const imageUrl = getThumbnailUrl(renderer.giftImage);
-    const alt = cleanInlineText(renderer.giftImageA11yLabel, 500);
+    const alt = cleanInlineText(renderer.giftImageA11yLabel);
     if (!message.runs.length && !imageUrl) return null;
     const headerText = message.plainText || alt || 'Gift';
     return compactRecord({
@@ -482,9 +465,8 @@ function parseAuthor(primary: DataRecord, fallback?: DataRecord): YouTubeChatAut
   const name = getFormattedPlainText(primary.authorName) || getFormattedPlainText(fallback?.authorName);
   if (!name) return undefined;
 
-  const channelId = cleanInlineText(
-    primary.authorExternalChannelId || fallback?.authorExternalChannelId,
-    MAX_ID_LENGTH
+  const channelId = getNonEmptyString(
+    primary.authorExternalChannelId || fallback?.authorExternalChannelId
   );
   const avatarUrl = getThumbnailUrl(primary.authorPhoto) ||
     getThumbnailUrl(primary.authorAvatar) ||
@@ -506,17 +488,17 @@ function parseAuthor(primary: DataRecord, fallback?: DataRecord): YouTubeChatAut
 function parseBadges(value: unknown): ParsedAuthorBadges {
   if (!Array.isArray(value)) return { badges: [], isOwner: false };
   let isOwner = false;
-  const badges = value.slice(0, MAX_BADGES)
+  const badges = value
     .map((badge): YouTubeChatAuthorBadge | null => {
       const renderer = asRecord(asRecord(badge)?.liveChatAuthorBadgeRenderer);
       if (!renderer) return null;
       const icon = asRecord(renderer.icon);
-      const iconType = cleanInlineText(icon?.iconType, 120).toUpperCase();
+      const iconType = cleanInlineText(icon?.iconType).toUpperCase();
       if (iconType === 'OWNER') {
         isOwner = true;
         return null;
       }
-      const label = cleanInlineText(renderer.tooltip, 200) ||
+      const label = cleanInlineText(renderer.tooltip) ||
         getAccessibilityLabel(renderer) ||
         getAccessibilityLabel(renderer.customThumbnail) ||
         iconType;
@@ -541,31 +523,24 @@ function parseBadges(value: unknown): ParsedAuthorBadges {
 
 function parseTopFanRank(value: unknown): 1 | 2 | 3 | undefined {
   const visited = new WeakSet<object>();
-  let scannedNodes = 0;
 
-  const scan = (candidate: unknown, depth: number): 1 | 2 | 3 | undefined => {
-    if (depth > MAX_TOP_FAN_SCAN_DEPTH || scannedNodes >= MAX_TOP_FAN_SCAN_NODES) {
-      return undefined;
-    }
+  const scan = (candidate: unknown): 1 | 2 | 3 | undefined => {
     if (typeof candidate === 'string') {
-      const match = cleanInlineText(candidate, 120).match(/^#\s*([1-3])$/);
+      const match = cleanInlineText(candidate).match(/^#\s*([1-3])$/);
       return match ? Number(match[1]) as 1 | 2 | 3 : undefined;
     }
     if (!candidate || typeof candidate !== 'object' || visited.has(candidate)) return undefined;
 
     visited.add(candidate);
-    scannedNodes += 1;
-    const children = Array.isArray(candidate)
-      ? candidate.slice(0, 20)
-      : Object.values(candidate).slice(0, 30);
+    const children = Array.isArray(candidate) ? candidate : Object.values(candidate);
     for (const child of children) {
-      const rank = scan(child, depth + 1);
+      const rank = scan(child);
       if (rank) return rank;
     }
     return undefined;
   };
 
-  return scan(value, 0);
+  return scan(value);
 }
 
 function parseColors(renderer: DataRecord): YouTubeChatMessageColors | undefined {
@@ -593,13 +568,13 @@ function assignColor(
 
 function parseFormattedText(value: unknown): ParsedFormattedText {
   if (typeof value === 'string') {
-    const text = cleanRunText(value, MAX_TEXT_LENGTH);
+    const text = cleanRunText(value);
     return text ? { plainText: cleanPlainText(text), runs: [{ text, type: 'text' }] } : emptyFormattedText();
   }
 
   const formatted = asRecord(value);
   if (!formatted) return emptyFormattedText();
-  const simpleText = cleanRunText(formatted.simpleText, MAX_TEXT_LENGTH);
+  const simpleText = cleanRunText(formatted.simpleText);
   if (simpleText) {
     return {
       plainText: cleanPlainText(simpleText),
@@ -607,7 +582,7 @@ function parseFormattedText(value: unknown): ParsedFormattedText {
     };
   }
 
-  const content = cleanRunText(formatted.content, MAX_TEXT_LENGTH);
+  const content = cleanRunText(formatted.content);
   if (content) {
     return {
       plainText: cleanPlainText(content),
@@ -617,12 +592,12 @@ function parseFormattedText(value: unknown): ParsedFormattedText {
 
   if (!Array.isArray(formatted.runs)) return emptyFormattedText();
   const runs: YouTubeChatRichRun[] = [];
-  for (const rawRun of formatted.runs.slice(0, MAX_RUNS)) {
+  for (const rawRun of formatted.runs) {
     const run = asRecord(rawRun);
     if (!run) continue;
     const emoji = asRecord(run.emoji);
     if (emoji) {
-      const emojiId = cleanInlineText(emoji.emojiId, 200);
+      const emojiId = getNonEmptyString(emoji.emojiId);
       const shortcuts = parseShortcuts(emoji.shortcuts);
       const imageUrl = getThumbnailUrl(emoji.image);
       const alt = shortcuts[0] || getAccessibilityLabel(emoji.image) || emojiId || 'Emoji';
@@ -640,7 +615,7 @@ function parseFormattedText(value: unknown): ParsedFormattedText {
       continue;
     }
 
-    const text = cleanRunText(run.text, MAX_TEXT_LENGTH);
+    const text = cleanRunText(run.text);
     if (!text) continue;
     const href = getSafeRunHref(run);
     runs.push(href ? { href, text, type: 'text' } : { text, type: 'text' });
@@ -670,8 +645,8 @@ function getFormattedPlainText(value: unknown): string {
 
 function parseShortcuts(value: unknown): string[] {
   if (!Array.isArray(value)) return [];
-  return value.slice(0, MAX_SHORTCUTS)
-    .map((shortcut) => cleanInlineText(shortcut, 120))
+  return value
+    .map((shortcut) => cleanInlineText(shortcut))
     .filter(Boolean);
 }
 
@@ -698,7 +673,7 @@ function getThumbnailUrl(value: unknown): string {
           : [];
   if (!Array.isArray(thumbnails)) return '';
 
-  for (let index = Math.min(thumbnails.length, 20) - 1; index >= 0; index -= 1) {
+  for (let index = thumbnails.length - 1; index >= 0; index -= 1) {
     const thumbnail = asRecord(thumbnails[index]);
     const url = getSafeHttpsUrl(thumbnail?.url);
     if (url) return url;
@@ -711,23 +686,22 @@ function getAccessibilityLabel(value: unknown): string {
   if (!record) return '';
   const accessibility = asRecord(record.accessibility);
   const accessibilityData = asRecord(accessibility?.accessibilityData) || asRecord(record.accessibilityData);
-  return cleanInlineText(accessibilityData?.label, 400);
+  return cleanInlineText(accessibilityData?.label);
 }
 
 function getSafeHttpsUrl(value: unknown): string {
-  const candidate = typeof value === 'string' ? value.trim().slice(0, MAX_URL_LENGTH) : '';
+  const candidate = typeof value === 'string' ? value.trim() : '';
   if (!candidate) return '';
   try {
     const url = new URL(candidate, 'https://www.youtube.com');
-    return url.protocol === 'https:' ? url.href.slice(0, MAX_URL_LENGTH) : '';
+    return url.protocol === 'https:' ? url.href : '';
   } catch {
     return '';
   }
 }
 
 function parseTimestampUsec(value: unknown): string | undefined {
-  const timestamp = cleanInlineText(value, 24);
-  return /^\d{1,24}$/.test(timestamp) ? timestamp : undefined;
+  return typeof value === 'string' && /^\d+$/.test(value) ? value : undefined;
 }
 
 function parseGiftCount(value: unknown): number | undefined {
@@ -738,12 +712,12 @@ function parseGiftCount(value: unknown): number | undefined {
       : NaN;
   if (!Number.isFinite(count)) return undefined;
   const integer = Math.trunc(count);
-  return integer >= 1 && integer <= MAX_GIFT_COUNT ? integer : undefined;
+  return Number.isSafeInteger(integer) && integer >= 1 ? integer : undefined;
 }
 
 function rememberContinuationTimeout(value: unknown, state: ParserState): void {
   if (!Array.isArray(value)) return;
-  for (const continuation of value.slice(0, 20)) {
+  for (const continuation of value) {
     const record = asRecord(continuation);
     if (!record) continue;
     for (const key of [
@@ -754,7 +728,7 @@ function rememberContinuationTimeout(value: unknown, state: ParserState): void {
       const data = asRecord(record[key]);
       if (!data) continue;
       const timeout = typeof data.timeoutMs === 'number' ? Math.trunc(data.timeoutMs) : NaN;
-      if (Number.isFinite(timeout) && timeout >= 0 && timeout <= MAX_TIMEOUT_MS) {
+      if (Number.isFinite(timeout) && timeout >= 0) {
         state.continuationTimeoutMs = timeout;
         return;
       }
@@ -792,21 +766,21 @@ function rememberCompatibilityWarning(
   unreadableFeed = false
 ): void {
   if (unreadableFeed) state.unreadableFeed = true;
-  if (!key || state.compatibilityWarnings.size >= MAX_PARSE_DIAGNOSTICS) return;
+  if (!key) return;
   state.compatibilityWarnings.add(key);
 }
 
-function cleanInlineText(value: unknown, maxLength: number): string {
+function cleanInlineText(value: unknown): string {
   return typeof value === 'string'
-    ? sanitizeControlCharacters(value.slice(0, maxLength * 2), false).replace(/\s+/g, ' ').trim().slice(0, maxLength)
+    ? sanitizeControlCharacters(value, false).replace(/\s+/g, ' ').trim()
     : typeof value === 'number' && Number.isFinite(value)
-      ? String(Math.trunc(value)).slice(0, maxLength)
+      ? String(Math.trunc(value))
       : '';
 }
 
-function cleanRunText(value: unknown, maxLength: number): string {
+function cleanRunText(value: unknown): string {
   return typeof value === 'string'
-    ? sanitizeControlCharacters(value.slice(0, maxLength * 2), true).slice(0, maxLength)
+    ? sanitizeControlCharacters(value, true)
     : '';
 }
 
@@ -829,7 +803,11 @@ function sanitizeControlCharacters(value: string, preserveWhitespace: boolean): 
 }
 
 function cleanPlainText(value: string): string {
-  return value.replace(/\s+/g, ' ').trim().slice(0, MAX_PLAIN_TEXT_LENGTH);
+  return value.replace(/\s+/g, ' ').trim();
+}
+
+function getNonEmptyString(value: unknown): string {
+  return typeof value === 'string' && value.length > 0 ? value : '';
 }
 
 function asRecord(value: unknown): DataRecord | null {

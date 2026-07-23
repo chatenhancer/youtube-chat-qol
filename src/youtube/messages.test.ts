@@ -57,7 +57,9 @@ describe('YouTube message adapter fixtures', () => {
   });
 
   it('formats microsecond transport timestamps and rejects invalid values', () => {
-    expect(formatMessageTimestampUsec('1782000000000000')).toMatch(/\d/);
+    const formatted = formatMessageTimestampUsec('1782000000000000');
+    expect(formatted).toMatch(/\d/);
+    expect(formatMessageTimestampUsec('0000000001782000000000000')).toBe(formatted);
     expect(formatMessageTimestampUsec('not-a-timestamp')).toBe('');
     expect(formatMessageTimestampUsec(undefined)).toBe('');
   });

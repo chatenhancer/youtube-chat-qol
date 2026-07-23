@@ -2,15 +2,15 @@
  * Page-world transport for the normalized YouTube chat feed.
  *
  * This owns the single fetch tap, parses sanitized chat actions, and emits
- * bounded batches to isolated-world consumers. It never exposes continuation
+ * complete batches to isolated-world consumers. It never exposes continuation
  * tokens, request bodies, credentials, or raw YouTube response objects.
- * Bounded startup and current-row snapshots may read already-rendered native
- * rows; there is no per-message DOM request bridge or renderer retry loop.
+ * Startup and current-row snapshots may read already-rendered native rows. A
+ * page-local map may delegate Lite message-menu opening to a short-lived native
+ * renderer without exposing its endpoint across worlds.
  */
 import {
   YOUTUBE_CHAT_FEED_BATCH_EVENT,
   YOUTUBE_CHAT_FEED_CONTROL_EVENT,
-  YOUTUBE_CHAT_FEED_PROTOCOL_VERSION,
   YOUTUBE_CHAT_FEED_BOOTSTRAP_INTENT_ATTRIBUTE,
   type YouTubeChatFeedBatchSource,
   type YouTubeChatFeedConsumer
@@ -23,7 +23,7 @@ import {
   type YouTubeChatFeedReplayRequestTracker
 } from './replay-requests';
 import {
-  createYouTubeChatFeedEventBatches,
+  createYouTubeChatFeedEventBatch,
   parseYouTubeChatFeedControl,
   type YouTubeChatFeedBatchValues
 } from './page-events';
@@ -31,15 +31,18 @@ import {
   captureYouTubeChatFeedInitialSnapshot,
   captureYouTubeChatFeedRenderedSnapshot,
   createYouTubeChatFeedStartupBuffer,
-  MAX_YOUTUBE_CHAT_FEED_SEED_ACTIONS,
   type YouTubeChatFeedStartupBuffer
 } from './page-startup';
+import {
+  createYouTubeChatContextMenuEndpointCapture,
+  createYouTubeChatContextMenuPageBridge,
+  type YouTubeChatContextMenuPageBridge
+} from './page-context-menu';
 import { isYouTubeChatFeedPath } from './pages';
 
 const YOUTUBE_CHAT_FEED_TRANSPORT_STATE_KEY = Symbol.for('ytcq:lite-chat-transport:v1');
 // Long-lived tabs replace an older adapter when its control behavior changes.
-const YOUTUBE_CHAT_FEED_TRANSPORT_REVISION = 5 as const;
-const MAX_UNRESOLVED_CHAT_FEED_RESPONSES = 2;
+const YOUTUBE_CHAT_FEED_TRANSPORT_REVISION = 6 as const;
 
 interface PendingChatFeedResponse {
   receivedAt: number;
@@ -49,6 +52,7 @@ interface PendingChatFeedResponse {
 }
 
 interface ChatFeedTransportState {
+  contextMenus: YouTubeChatContextMenuPageBridge;
   controlResolved: boolean;
   consumers: Set<YouTubeChatFeedConsumer>;
   enabled: boolean;
@@ -140,9 +144,6 @@ function startYouTubeChatFeedTransport(): void {
           response: clone,
           source
         });
-        state.pendingStartupResponses = state.pendingStartupResponses.slice(
-          -MAX_UNRESOLVED_CHAT_FEED_RESPONSES
-        );
         return response;
       }
       const generation = requestGeneration ?? state.generation;
@@ -161,6 +162,7 @@ function startYouTubeChatFeedTransport(): void {
   } as typeof window.fetch;
 
   Object.assign(state, {
+    contextMenus: createYouTubeChatContextMenuPageBridge(),
     controlResolved: false,
     consumers: new Set<YouTubeChatFeedConsumer>(),
     enabled: false,
@@ -189,8 +191,7 @@ function startYouTubeChatFeedTransport(): void {
     window.dispatchEvent(new CustomEvent(YOUTUBE_CHAT_FEED_CONTROL_EVENT, {
       detail: JSON.stringify({
         consumer: 'lite',
-        enabled: true,
-        version: YOUTUBE_CHAT_FEED_PROTOCOL_VERSION
+        enabled: true
       })
     }));
   }
@@ -218,6 +219,7 @@ function handleYouTubeChatFeedControl(event: Event, state: ChatFeedTransportStat
     // guard in emitYouTubeChatFeedBatch.
     state.parseChain = Promise.resolve();
     state.startup.reset();
+    state.contextMenus.clear();
     if (hadControlDecision) state.replayRequests.reset();
   }
   state.enabled = nextEnabled;
@@ -263,15 +265,22 @@ function queueInitialYouTubeChatFeedData(
   receiverReady: boolean
 ): void {
   const capture = state.startup.beginInitialSnapshot();
+  const contextMenus = createYouTubeChatContextMenuEndpointCapture();
   const snapshot = capture === 'bootstrap'
-    ? captureYouTubeChatFeedInitialSnapshot()
+    ? captureYouTubeChatFeedInitialSnapshot(contextMenus.observe)
     : capture === 'rendered'
       // A later re-seed must reflect the current document, not its stale
       // one-time ytInitialData bootstrap.
-      ? captureYouTubeChatFeedRenderedSnapshot()
+      ? captureYouTubeChatFeedRenderedSnapshot(contextMenus.observe)
       : null;
   enqueueYouTubeChatFeedParse(state, generation, () => {
-    if (snapshot) state.startup.addInitialSnapshot(snapshot);
+    if (snapshot) {
+      state.contextMenus.apply(
+        [{ type: 'reset' }, ...snapshot.actions],
+        contextMenus.endpoints
+      );
+      state.startup.addInitialSnapshot(snapshot);
+    }
     if (receiverReady) flushYouTubeChatFeedStartupBuffer(state, generation, receivedAt);
   });
 }
@@ -281,9 +290,11 @@ function queueRenderedYouTubeChatFeedData(
   generation: number,
   receivedAt: number
 ): void {
-  const snapshot = captureYouTubeChatFeedRenderedSnapshot();
-  void enqueueYouTubeChatFeedParse(state, generation, () =>
-    emitYouTubeChatFeedBatch(state, {
+  const contextMenus = createYouTubeChatContextMenuEndpointCapture();
+  const snapshot = captureYouTubeChatFeedRenderedSnapshot(contextMenus.observe);
+  void enqueueYouTubeChatFeedParse(state, generation, () => {
+    state.contextMenus.apply(snapshot.actions, contextMenus.endpoints);
+    return emitYouTubeChatFeedBatch(state, {
       actions: snapshot.actions,
       compatibilityWarnings: snapshot.compatibilityWarnings,
       continuationTimeoutMs: snapshot.continuationTimeoutMs,
@@ -294,8 +305,8 @@ function queueRenderedYouTubeChatFeedData(
         : {}),
       source: 'initial',
       unreadableFeed: snapshot.unreadableFeed
-    }, generation)
-  );
+    }, generation);
+  });
 }
 
 function flushYouTubeChatFeedStartupBuffer(
@@ -370,15 +381,21 @@ function queueYouTubeChatFeedResponse(
     if (state.replayRequests.isObsolete(resolvedReplayRequest)) return;
     if (source === 'replay') state.replayRequests.rememberResponse(payload);
 
-    const parsed = parseYouTubeChatFeedPayload(payload);
+    const contextMenus = createYouTubeChatContextMenuEndpointCapture();
+    const parsed = parseYouTubeChatFeedPayload(payload, {
+      observeContextMenuEndpoint: contextMenus.observe
+    });
     if (source !== 'send' && !parsed.foundChat) {
       parsed.fatalErrors.push('response:unrecognized-chat-payload');
     }
-    const snapshot = parsed.actions.some((action) => action.type === 'reset');
+    const parsedReset = parsed.actions.some((action) => action.type === 'reset');
+    const snapshot = parsedReset || Boolean(resolvedReplayRequest?.reset);
+    const actions = resolvedReplayRequest?.reset && !parsedReset
+      ? [{ type: 'reset' } as const, ...parsed.actions]
+      : parsed.actions;
+    state.contextMenus.apply(actions, contextMenus.endpoints);
     await emitAndRememberYouTubeChatFeedBatch(state, {
-      actions: resolvedReplayRequest?.reset && !parsed.actions.some((action) => action.type === 'reset')
-        ? [{ type: 'reset' }, ...parsed.actions.slice(-MAX_YOUTUBE_CHAT_FEED_SEED_ACTIONS)]
-        : parsed.actions,
+      actions,
       compatibilityWarnings: getFeedDiagnostics(source, ...parsed.compatibilityWarnings),
       continuationTimeoutMs: parsed.continuationTimeoutMs,
       fatalErrors: getFeedDiagnostics(source, ...parsed.fatalErrors),
@@ -467,14 +484,11 @@ function emitYouTubeChatFeedBatch(
   generation: number
 ): Promise<void> {
   if (!state.enabled || generation !== state.generation) return Promise.resolve();
-  const batches = createYouTubeChatFeedEventBatches(values, state.sequence);
-  for (const batch of batches) {
-    state.sequence = batch.sequence;
-    window.dispatchEvent(new CustomEvent(YOUTUBE_CHAT_FEED_BATCH_EVENT, {
-      detail: JSON.stringify(batch)
-    }));
-    if (!state.enabled || generation !== state.generation) return Promise.resolve();
-  }
+  const batch = createYouTubeChatFeedEventBatch(values, state.sequence);
+  state.sequence = batch.sequence;
+  window.dispatchEvent(new CustomEvent(YOUTUBE_CHAT_FEED_BATCH_EVENT, {
+    detail: JSON.stringify(batch)
+  }));
   return Promise.resolve();
 }
 
@@ -509,6 +523,8 @@ function isChatFeedTransportState(value: unknown): value is ChatFeedTransportSta
   if (!value || typeof value !== 'object') return false;
   const state = value as Partial<ChatFeedTransportState>;
   return state.revision === YOUTUBE_CHAT_FEED_TRANSPORT_REVISION &&
+    typeof state.contextMenus?.apply === 'function' &&
+    typeof state.contextMenus?.destroy === 'function' &&
     state.consumers instanceof Set &&
     typeof state.originalFetch === 'function' &&
     typeof state.wrapper === 'function' &&
@@ -521,6 +537,7 @@ function removePreviousYouTubeChatFeedTransport(value: unknown): void {
   const state = value as {
     controlResolved?: boolean;
     enabled?: boolean;
+    contextMenus?: { destroy?: () => void };
     handleControl?: EventListener;
     originalFetch?: typeof window.fetch;
     wrapper?: typeof window.fetch;
@@ -529,6 +546,7 @@ function removePreviousYouTubeChatFeedTransport(value: unknown): void {
   if (typeof state.handleControl === 'function') {
     window.removeEventListener(YOUTUBE_CHAT_FEED_CONTROL_EVENT, state.handleControl);
   }
+  state.contextMenus?.destroy?.();
   state.controlResolved = true;
   state.enabled = false;
   if (

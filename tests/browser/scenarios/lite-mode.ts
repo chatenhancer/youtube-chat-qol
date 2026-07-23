@@ -9,7 +9,6 @@ import { expect, test, type BrowserContext, type Locator, type Request } from '@
 import {
   YOUTUBE_CHAT_FEED_BATCH_EVENT,
   YOUTUBE_CHAT_FEED_CONTROL_EVENT,
-  YOUTUBE_CHAT_FEED_PROTOCOL_VERSION,
   type YouTubeChatFeedTransportBatch,
   type YouTubeChatMessageRecord
 } from '../../../src/youtube/chat-feed/protocol';
@@ -163,7 +162,9 @@ export const liteModeToggleAndRestoreScenario: BrowserScenario = async ({ chat, 
         );
         const row = root.locator(`[${targetAttribute}]`);
         const actionButton = row.locator('.ytcq-lite-message-menu-button');
-        const menu = chat.locator('.ytcq-lite-context-menu');
+        const menu = chat.locator('ytd-menu-popup-renderer').filter({
+          has: chat.locator('.ytcq-context-item[data-ytcq-action="save-message"]')
+        }).last();
         try {
           await row.hover();
           await expect(actionButton).toBeVisible();
@@ -1389,8 +1390,7 @@ function createBatch(actions: YouTubeChatFeedTransportBatch['actions']): Synthet
   return {
     actions,
     receivedAt: Date.now(),
-    source: 'live',
-    version: YOUTUBE_CHAT_FEED_PROTOCOL_VERSION
+    source: 'live'
   };
 }
 

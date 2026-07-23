@@ -69,12 +69,15 @@ describe('YouTube chat feed parser', () => {
               }
             }
           }],
-          continuations: [{
-            invalidationContinuationData: {
-              continuation: 'secret-continuation',
-              timeoutMs: 10_000
+          continuations: [
+            ...Array.from({ length: 20 }, () => ({})),
+            {
+              invalidationContinuationData: {
+                continuation: 'secret-continuation',
+                timeoutMs: 10_000
+              }
             }
-          }]
+          ]
         }
       }
     });
@@ -125,6 +128,128 @@ describe('YouTube chat feed parser', () => {
     });
     expect(JSON.stringify(result)).not.toContain('secret-continuation');
     expect(JSON.stringify(result)).not.toContain('must-not-cross');
+  });
+
+  it('preserves valid YouTube values without size ceilings', () => {
+    const messageId = `message-${'m'.repeat(300)}`;
+    const channelId = `UC-${'c'.repeat(300)}`;
+    const longText = 'x'.repeat(9_000);
+    const longUrl = `https://example.com/${'u'.repeat(4_500)}`;
+    const shortcuts = Array.from({ length: 17 }, (_value, index) => `:emoji-${index}:`);
+    const badges = Array.from({ length: 17 }, (_value, index) => ({
+      liveChatAuthorBadgeRenderer: {
+        tooltip: `Badge ${index} ${'b'.repeat(250)}`,
+        customThumbnail: {
+          thumbnails: [{ url: `https://yt3.ggpht.com/badge-${index}` }]
+        }
+      }
+    }));
+    const result = parseYouTubeChatFeedPayload({
+      continuationContents: {
+        liveChatContinuation: {
+          actions: [
+            addItem('liveChatTextMessageRenderer', {
+              id: messageId,
+              authorExternalChannelId: channelId,
+              authorName: { simpleText: `@${'a'.repeat(4_500)}` },
+              authorBadges: badges,
+              beforeContentButtons: [
+                ...Array.from({ length: 30 }, () => ({})),
+                { one: { two: { three: { four: { five: { six: { seven: '#3' } } } } } } }
+              ],
+              timestampUsec: '1234567890123456789012345',
+              message: {
+                runs: [
+                  { text: longText },
+                  ...Array.from({ length: 120 }, (_value, index) => ({ text: String(index % 10) })),
+                  {
+                    emoji: {
+                      emojiId: `emoji-${'e'.repeat(500)}`,
+                      shortcuts,
+                      image: {
+                        thumbnails: [
+                          ...Array.from({ length: 20 }, () => ({ url: 'javascript:unsafe' })),
+                          { url: longUrl }
+                        ]
+                      }
+                    }
+                  },
+                  {
+                    text: 'link',
+                    navigationEndpoint: { urlEndpoint: { url: longUrl } }
+                  }
+                ]
+              }
+            }),
+            addItem('liveChatSponsorshipsGiftPurchaseAnnouncementRenderer', {
+              id: 'large-gift-count',
+              giftMembershipsCount: 10_001,
+              message: { simpleText: 'Gifted memberships' }
+            })
+          ],
+          continuations: [{
+            timedContinuationData: {
+              timeoutMs: 600_001
+            }
+          }]
+        }
+      }
+    });
+
+    const message = getUpsert(result.actions, messageId);
+    expect(message).toMatchObject({
+      id: messageId,
+      timestampUsec: '1234567890123456789012345',
+      author: {
+        channelId,
+        topFanRank: 3
+      }
+    });
+    expect(message?.author?.name).toHaveLength(4_501);
+    expect(message?.author?.badges).toHaveLength(17);
+    expect(message?.author?.badges[16]?.label).toBe(`Badge 16 ${'b'.repeat(250)}`);
+    expect(message?.plainText.startsWith(longText)).toBe(true);
+    expect(message?.runs).toHaveLength(123);
+    expect(message?.runs[121]).toMatchObject({
+      imageUrl: longUrl,
+      shortcuts
+    });
+    expect(message?.runs[122]).toEqual({ href: longUrl, text: 'link', type: 'text' });
+    expect(getUpsert(result.actions, 'large-gift-count')?.gift?.count).toBe(10_001);
+    expect(result.continuationTimeoutMs).toBe(600_001);
+  });
+
+  it('reports the page-local native context-menu endpoint without adding it to sanitized output', () => {
+    const endpoints = new Map<string, unknown>();
+    const contextMenuEndpoint = {
+      clickTrackingParams: 'tracking-token',
+      commandMetadata: {
+        webCommandMetadata: {
+          apiUrl: '/youtubei/v1/live_chat/get_item_context_menu',
+          ignoreNavigation: true
+        }
+      },
+      liveChatItemContextMenuEndpoint: {
+        params: 'opaque-menu-params',
+        secret: 'page-local'
+      }
+    };
+    const result = parseYouTubeChatFeedPayload({
+      actions: [addItem('liveChatTextMessageRenderer', {
+        id: 'message-with-menu',
+        authorName: { simpleText: '@Example' },
+        message: { simpleText: 'Open my menu' },
+        contextMenuEndpoint
+      })]
+    }, {
+      observeContextMenuEndpoint: (messageId, endpoint) => {
+        endpoints.set(messageId, endpoint);
+      }
+    });
+
+    expect(endpoints.get('message-with-menu')).toBe(contextMenuEndpoint);
+    expect(JSON.stringify(result)).not.toContain('opaque-menu-params');
+    expect(JSON.stringify(result)).not.toContain('tracking-token');
   });
 
   it('normalizes paid messages, stickers, memberships, and both gift announcements', () => {
@@ -322,9 +447,9 @@ describe('YouTube chat feed parser', () => {
           }
         }
       }
-    }, { initial: true });
+    });
 
-    expect(initial.actions.map((action) => action.type)).toEqual(['reset', 'upsert']);
+    expect(initial.actions.map((action) => action.type)).toEqual(['upsert']);
     expect(getUpsert(initial.actions, 'initial-1')?.plainText).toBe('Initial message');
 
     const replay = parseYouTubeChatFeedPayload({
@@ -502,7 +627,29 @@ describe('YouTube chat feed parser', () => {
     expect(result.fatalErrors).toEqual([]);
   });
 
-  it('reserves room for reset while keeping the latest bounded initial backlog', () => {
+  it('finds chat containers without a traversal cutoff', () => {
+    const result = parseYouTubeChatFeedPayload({
+      wrappers: [
+        ...Array.from({ length: 2_501 }, () => 'unrelated'),
+        {
+          continuationContents: {
+            liveChatContinuation: {
+              actions: [addItem('liveChatTextMessageRenderer', {
+                id: 'after-large-wrapper',
+                authorName: { simpleText: '@Example' },
+                message: { simpleText: 'Still found' }
+              })]
+            }
+          }
+        }
+      ]
+    });
+
+    expect(getUpsert(result.actions, 'after-large-wrapper')?.plainText).toBe('Still found');
+    expect(result.fatalErrors).toEqual([]);
+  });
+
+  it('preserves complete initial contents for the startup retention policy', () => {
     const result = parseYouTubeChatFeedPayload({
       contents: {
         liveChatRenderer: {
@@ -515,11 +662,10 @@ describe('YouTube chat feed parser', () => {
           }
         }
       }
-    }, { initial: true });
+    });
 
     expect(result.actions).toHaveLength(500);
-    expect(result.actions[0]).toEqual({ type: 'reset' });
-    expect(getUpsert(result.actions, 'initial-0')).toBeUndefined();
+    expect(getUpsert(result.actions, 'initial-0')?.plainText).toBe('Initial 0');
     expect(getUpsert(result.actions, 'initial-499')?.plainText).toBe('Initial 499');
     expect(result.fatalErrors).toEqual([]);
   });

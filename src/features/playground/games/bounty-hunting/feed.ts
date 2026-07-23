@@ -110,7 +110,7 @@ export function createBountyHuntingChatFeedMessage(
     countBountyHuntingTextEmojis(text)
   );
   const badges = record.author?.badges || [];
-  const timestampUsec = /^\d{1,24}$/.test(record.timestampUsec || '')
+  const timestampUsec = /^\d+$/.test(record.timestampUsec || '')
     ? record.timestampUsec
     : undefined;
 

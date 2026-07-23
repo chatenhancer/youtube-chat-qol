@@ -98,6 +98,52 @@ describe('YouTube chat feed source', () => {
     expect(getYouTubeChatFeedReplayDiagnostics().pendingActions).toBe(0);
   });
 
+  it('retains every prefetched replay action regardless of queue count or serialized size', async () => {
+    window.history.replaceState({}, '', '/live_chat_replay');
+    const {
+      getYouTubeChatFeedReplayDiagnostics,
+      subscribeYouTubeChatFeed
+    } = await import('./source');
+    const errors = vi.fn();
+    const timelineDeliveries: number[] = [];
+
+    cleanups.push(subscribeYouTubeChatFeed({
+      consumer: 'lite',
+      onBatch: (batch) => {
+        if (batch.delivery === 'replay-timeline') {
+          timelineDeliveries.push(batch.actions.length);
+        }
+      },
+      onError: errors
+    }));
+
+    const largeAction = createUpsert('future-0', 6_000);
+    if (largeAction.type !== 'upsert') throw new Error('Expected an upsert fixture');
+    largeAction.record.plainText = 'x'.repeat(8 * 1024 * 1024);
+    largeAction.record.runs = [];
+    const actions = [
+      largeAction,
+      ...Array.from({ length: 2_000 }, (_value, index) =>
+        createUpsert(`future-${index + 1}`, 6_000)
+      )
+    ];
+
+    dispatchPlayerProgress(5);
+    dispatchBatch({
+      ...createBatch(1, actions),
+      replayPlayerOffsetMs: 5_000,
+      source: 'replay'
+    });
+
+    const queued = getYouTubeChatFeedReplayDiagnostics();
+    expect(queued.pendingActions).toBe(2_001);
+    expect(errors).not.toHaveBeenCalled();
+
+    dispatchPlayerProgress(6);
+    expect(timelineDeliveries).toEqual([2_001]);
+    expect(getYouTubeChatFeedReplayDiagnostics().pendingActions).toBe(0);
+  });
+
   it('advances through a replay message that YouTube has already rendered', async () => {
     window.history.replaceState({}, '', '/live_chat_replay');
     const {
@@ -274,7 +320,8 @@ describe('YouTube chat feed source', () => {
     expect(activities).toEqual(['existing', 'new']);
   });
 
-  it('keeps every chunk of a live replacement snapshot existing', async () => {
+  it('keeps offsetless replay seek history existing when the response is a snapshot', async () => {
+    window.history.replaceState({}, '', '/live_chat_replay');
     const { subscribeYouTubeChatFeed } = await import('./source');
     const deliveries: Array<{ activity: string; ids: string[] }> = [];
 
@@ -289,16 +336,16 @@ describe('YouTube chat feed source', () => {
     }));
 
     dispatchBatch({
-      ...createBatch(1, [{ type: 'reset' }]),
-      snapshot: true
-    });
-    dispatchBatch({
-      ...createBatch(2, [createUpsert('snapshot-history')]),
-      snapshot: true
+      ...createBatch(1, [
+        { type: 'reset' },
+        createUpsert('snapshot-history')
+      ]),
+      replayPlayerOffsetMs: 50_000,
+      snapshot: true,
+      source: 'replay'
     });
 
     expect(deliveries).toEqual([
-      { activity: 'existing', ids: [] },
       { activity: 'existing', ids: ['snapshot-history'] }
     ]);
   });
@@ -404,17 +451,17 @@ describe('YouTube chat feed source', () => {
     cleanups.push(unsubscribeInboxOne, unsubscribeInboxTwo, unsubscribeLite);
 
     expect(controls).toEqual([
-      { consumer: 'inbox', enabled: true, requestInitial: true, version: 1 },
-      { consumer: 'lite', enabled: true, version: 1 }
+      { consumer: 'inbox', enabled: true, requestInitial: true },
+      { consumer: 'lite', enabled: true }
     ]);
 
     unsubscribeInboxOne();
     expect(controls).toHaveLength(2);
     unsubscribeInboxTwo();
     unsubscribeInboxTwo();
-    expect(controls.at(-1)).toEqual({ consumer: 'inbox', enabled: false, version: 1 });
+    expect(controls.at(-1)).toEqual({ consumer: 'inbox', enabled: false });
     unsubscribeLite();
-    expect(controls.at(-1)).toEqual({ consumer: 'lite', enabled: false, version: 1 });
+    expect(controls.at(-1)).toEqual({ consumer: 'lite', enabled: false });
 
     dispatchBatch(createBatch(1));
     expect(inboxOne).not.toHaveBeenCalled();
@@ -465,8 +512,7 @@ function createBatch(sequence: number, actions: YouTubeChatFeedAction[] = []): Y
     actions,
     receivedAt: 1_000,
     sequence,
-    source: 'live',
-    version: 1
+    source: 'live'
   };
 }
 

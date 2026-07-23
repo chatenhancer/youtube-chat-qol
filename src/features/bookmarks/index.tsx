@@ -367,7 +367,7 @@ function getFeedMessageTimestamp(
   timestampText: string,
   receivedAt: number
 ): number {
-  if (!isLiveChatReplayUrl() && /^\d{1,24}$/.test(timestampUsec || '')) {
+  if (!isLiveChatReplayUrl() && /^\d+$/.test(timestampUsec || '')) {
     const timestamp = Number(timestampUsec) / 1_000;
     if (Number.isFinite(timestamp) && timestamp > 0) return timestamp;
   }
