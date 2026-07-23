@@ -14,9 +14,11 @@ import type {
 } from '../protocol/messages';
 
 export interface GameRecord {
+  finishedAt?: number;
   gameId: string;
   gameType: GameId;
   gameVersion: number;
+  startedAt?: number;
   status: string;
 }
 

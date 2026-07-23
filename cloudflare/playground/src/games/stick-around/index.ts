@@ -151,6 +151,7 @@ const StickAroundSimulationSchema = z.strictObject({
 const StickAroundGameRecordSchema = z.strictObject({
   arena: StickAroundArenaSchema,
   finishReports: z.record(z.string(), StickAroundFinishReportSchema),
+  finishedAt: NonNegativeIntegerSchema.optional(),
   gameId: NonEmptyStringSchema,
   gameType: z.literal('stick-around'),
   gameVersion: z.literal(PLAYGROUND_GAME_VERSIONS['stick-around']),
@@ -170,6 +171,7 @@ const StickAroundGameRecordSchema = z.strictObject({
   roundSeed: IntegerSchema,
   roundStartedAt: FiniteNumberSchema.optional(),
   simulation: StickAroundSimulationSchema.optional(),
+  startedAt: NonNegativeIntegerSchema.optional(),
   status: z.enum(['ready', 'countdown', 'active', 'finished']),
   winnerUserId: NonEmptyStringSchema.nullable().optional()
 });
@@ -265,6 +267,7 @@ export function createStickAroundGame(
     },
     readyPlayers: {},
     roundSeed: createRoundSeed(gameId, now),
+    startedAt: now,
     status: 'ready'
   };
 }

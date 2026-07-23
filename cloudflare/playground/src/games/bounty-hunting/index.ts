@@ -100,6 +100,7 @@ const BountyHuntingGameRecordSchema = z.strictObject({
   bountyProviderUserId: z.string().min(1),
   claimWitnesses: z.array(BountyHuntingClaimWitnessSchema).max(MAX_STORED_BOUNTY_WITNESSES),
   claims: z.array(BountyHuntingClaimSchema).max(BOUNTY_HUNTING_BOUNTY_COUNT),
+  finishedAt: z.number().int().nonnegative().optional(),
   gameId: z.string().min(1),
   gameType: z.literal('bounty-hunting'),
   gameVersion: z.literal(PLAYGROUND_GAME_VERSIONS['bounty-hunting']),
@@ -122,6 +123,7 @@ const BountyHuntingGameRecordSchema = z.strictObject({
     guest: z.number().int().nonnegative(),
     host: z.number().int().nonnegative()
   }),
+  startedAt: z.number().int().nonnegative().optional(),
   status: z.enum(['active', 'countdown', 'finished', 'preparing', 'ready', 'roundOver'])
 });
 
@@ -240,6 +242,7 @@ export function createBountyHuntingGame(
       guest: 0,
       host: 0
     },
+    startedAt: now,
     status: 'preparing'
   };
 }

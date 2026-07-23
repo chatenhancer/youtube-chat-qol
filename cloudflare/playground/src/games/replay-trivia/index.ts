@@ -67,6 +67,7 @@ const ReplayTriviaStoredQuestionSchema = z.strictObject({
 const ReplayTriviaGameRecordSchema = z.strictObject({
   answers: z.record(z.string(), ReplayTriviaChoiceSchema.nullable().optional()),
   currentQuestionIndex: z.number().int().nonnegative(),
+  finishedAt: z.number().int().nonnegative().optional(),
   gameId: z.string().min(1),
   gameType: z.literal('replay-trivia'),
   gameVersion: z.literal(PLAYGROUND_GAME_VERSIONS['replay-trivia']),
@@ -82,6 +83,7 @@ const ReplayTriviaGameRecordSchema = z.strictObject({
     guest: z.number().int().nonnegative(),
     host: z.number().int().nonnegative()
   }),
+  startedAt: z.number().int().nonnegative().optional(),
   status: z.enum(['preparing', 'countdown', 'question', 'reveal', 'score', 'finished'])
 });
 
@@ -187,6 +189,7 @@ export function createReplayTriviaGame(
       guest: 0,
       host: 0
     },
+    startedAt: now,
     status: 'preparing'
   };
 }

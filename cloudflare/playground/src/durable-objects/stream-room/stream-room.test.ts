@@ -43,6 +43,7 @@ interface TestSession {
 }
 
 interface PrivateStreamRoom {
+  alarm(): Promise<void>;
   createSnapshot(forUserId?: string): LobbySnapshot;
   fetch(request: Request): Promise<Response>;
   handleGameAction(
@@ -77,10 +78,27 @@ class FakeSocket {
 
 class FakeDurableObjectStorage {
   private readonly records = new Map<string, unknown>();
+  private alarmAt: number | null = null;
   private putCalls = 0;
+
+  async delete(key: string | string[]): Promise<boolean | number> {
+    if (Array.isArray(key)) {
+      return key.reduce((count, candidate) => count + Number(this.records.delete(candidate)), 0);
+    }
+    return this.records.delete(key);
+  }
 
   async deleteAll(): Promise<void> {
     this.records.clear();
+    this.alarmAt = null;
+  }
+
+  async deleteAlarm(): Promise<void> {
+    this.alarmAt = null;
+  }
+
+  async getAlarm(): Promise<number | null> {
+    return this.alarmAt;
   }
 
   getPutCallCount(): number {
@@ -91,9 +109,25 @@ class FakeDurableObjectStorage {
     return cloneStoredValue(this.records.get(key)) as T | undefined;
   }
 
+  async list<T = unknown>({ prefix = '' }: { prefix?: string } = {}): Promise<Map<string, T>> {
+    return new Map([...this.records.entries()]
+      .filter(([key]) => key.startsWith(prefix))
+      .map(([key, value]) => [key, cloneStoredValue(value) as T]));
+  }
+
   async put<T = unknown>(key: string, value: T): Promise<void> {
     this.putCalls += 1;
     this.records.set(key, cloneStoredValue(value));
+  }
+
+  async setAlarm(timestamp: number | Date): Promise<void> {
+    this.alarmAt = timestamp instanceof Date ? timestamp.getTime() : timestamp;
+  }
+
+  async transaction<T>(
+    callback: (transaction: DurableObjectTransaction) => Promise<T>
+  ): Promise<T> {
+    return callback(this as unknown as DurableObjectTransaction);
   }
 }
 
@@ -123,7 +157,10 @@ class FakeDurableObjectState {
 }
 
 class FakePlayerStatsNamespace {
-  private readonly wins = new Map<string, Map<string, number>>();
+  private readonly matches = new Map<string, {
+    gameType: GameId;
+    winnerUserId: string | null;
+  }>();
 
   idFromName(name: string): { toString(): string } {
     return {
@@ -138,35 +175,43 @@ class FakePlayerStatsNamespace {
   }
 
   getWins(userId: string, gameId: GameId): number {
-    return this.wins.get(userId)?.get(gameId) || 0;
+    if (userId.startsWith('server:computer:')) return 0;
+    return [...this.matches.values()].filter((match) =>
+      match.gameType === gameId && match.winnerUserId === userId
+    ).length;
+  }
+
+  getMatchCount(): number {
+    return this.matches.size;
   }
 
   private async handleFetch(request: RequestInfo | URL): Promise<Response> {
     const requestObject = request instanceof Request ? request : new Request(request);
     const url = new URL(requestObject.url);
-    if (url.pathname !== '/internal/player-stats/record-win') {
+    if (url.pathname !== '/internal/player-stats/record-match') {
       return Response.json({ error: { code: 'not_found', message: 'Not found.' } }, { status: 404 });
     }
 
-    const body = await requestObject.json() as { gameId?: GameId; userId?: string };
-    const userId = body.userId || '';
-    const gameId = body.gameId || 'chess';
-    let userWins = this.wins.get(userId);
-    if (!userWins) {
-      userWins = new Map();
-      this.wins.set(userId, userWins);
+    const body = await requestObject.json() as {
+      gameType?: GameId;
+      matchId?: string;
+      winnerUserId?: string | null;
+    };
+    const gameType = body.gameType || 'chess';
+    const matchId = body.matchId || '';
+    const winnerUserId = body.winnerUserId || null;
+    const recorded = !this.matches.has(matchId);
+    if (recorded) {
+      this.matches.set(matchId, {
+        gameType,
+        winnerUserId
+      });
     }
-    userWins.set(gameId, (userWins.get(gameId) || 0) + 1);
-
     return Response.json({
       ok: true,
-      stats: {
-        games: Object.fromEntries([...userWins.entries()].map(([storedGameId, wins]) => [
-          storedGameId,
-          { wins }
-        ])),
-        userId,
-        wins: [...userWins.values()].reduce((total, wins) => total + wins, 0)
+      result: {
+        matchId,
+        recorded
       }
     });
   }
@@ -185,6 +230,50 @@ class FailingPlayerStatsNamespace {
         throw new Error('stats unavailable');
       }
     };
+  }
+}
+
+class BlockingPlayerStatsNamespace {
+  readonly deliveryStarted: Promise<void>;
+  private readonly deliveryReleased: Promise<void>;
+  private resolveDelivery!: () => void;
+  private resolveStarted!: () => void;
+
+  constructor() {
+    this.deliveryStarted = new Promise((resolve) => {
+      this.resolveStarted = resolve;
+    });
+    this.deliveryReleased = new Promise((resolve) => {
+      this.resolveDelivery = resolve;
+    });
+  }
+
+  idFromName(name: string): { toString(): string } {
+    return {
+      toString: () => name
+    };
+  }
+
+  get(): { fetch: typeof fetch } {
+    return {
+      fetch: async (request) => {
+        const requestObject = request instanceof Request ? request : new Request(request);
+        const body = await requestObject.json() as { matchId: string };
+        this.resolveStarted();
+        await this.deliveryReleased;
+        return Response.json({
+          ok: true,
+          result: {
+            matchId: body.matchId,
+            recorded: true
+          }
+        });
+      }
+    };
+  }
+
+  releaseDelivery(): void {
+    this.resolveDelivery();
   }
 }
 
@@ -513,8 +602,7 @@ describe('playground stream room', () => {
       event: 'game_win_recorded',
       game: expect.stringMatching(/^game_[\w-]+$/),
       gameType: 'chess',
-      service: 'chat-enhancer-playground',
-      wins: 1
+      service: 'chat-enhancer-playground'
     }));
   });
 
@@ -565,7 +653,7 @@ describe('playground stream room', () => {
     expect(playerStats.getWins(bob.userId, 'chess')).toBe(1);
   });
 
-  it('skips global win stats for built-in Computer players', async () => {
+  it('stores a Computer victory without adding a Computer win', async () => {
     const storage = new FakeDurableObjectStorage();
     const { playerStats, room, state } = createRoomHarness(storage);
     const alice = createSession('alice-connection');
@@ -582,14 +670,16 @@ describe('playground stream room', () => {
 
     await state.flushWaitUntil();
 
+    expect(playerStats.getMatchCount()).toBe(1);
+    expect(playerStats.getWins(alice.userId, 'chess')).toBe(0);
     expect(playerStats.getWins(CHESS_COMPUTER_PLAYER_CLUB_PROFILE.userId, 'chess')).toBe(0);
-    expect(console.info).toHaveBeenCalledWith('[playground] game_win_record_skipped', expect.objectContaining({
-      event: 'game_win_record_skipped',
+    expect(console.info).toHaveBeenCalledWith('[playground] game_result_recorded', expect.objectContaining({
+      event: 'game_result_recorded',
       gameType: 'chess',
-      reason: 'computerPlayer',
+      reason: 'resigned',
       service: 'chat-enhancer-playground'
     }));
-    expect(console.warn).not.toHaveBeenCalledWith('[playground] game_win_record_failed', expect.anything());
+    expect(console.warn).not.toHaveBeenCalledWith('[playground] game_result_record_failed', expect.anything());
   });
 
   it('records a human win against a built-in Computer player', async () => {
@@ -619,12 +709,9 @@ describe('playground stream room', () => {
     expect(console.info).toHaveBeenCalledWith('[playground] game_win_recorded', expect.objectContaining({
       event: 'game_win_recorded',
       gameType: 'chess',
-      service: 'chat-enhancer-playground',
-      wins: 1
+      service: 'chat-enhancer-playground'
     }));
-    expect(console.info).not.toHaveBeenCalledWith('[playground] game_win_record_skipped', expect.objectContaining({
-      gameType: 'chess'
-    }));
+    expect(playerStats.getMatchCount()).toBe(1);
   });
 
   it('restores active games from Durable Object storage after restart', async () => {
@@ -1889,7 +1976,7 @@ describe('playground stream room', () => {
     });
   });
 
-  it('logs when completed game win recording fails', async () => {
+  it('keeps and schedules a retry when completed match recording fails', async () => {
     const storage = new FakeDurableObjectStorage();
     const { room, state } = createRoomHarness(storage, {
       playerStats: new FailingPlayerStatsNamespace() as unknown as DurableObjectNamespace
@@ -1909,13 +1996,86 @@ describe('playground stream room', () => {
     });
     await state.flushWaitUntil();
 
-    expect(console.warn).toHaveBeenCalledWith('[playground] game_win_record_failed', expect.objectContaining({
+    expect(console.warn).toHaveBeenCalledWith('[playground] game_result_record_failed', expect.objectContaining({
+      attempt: 1,
       errorMessage: 'stats unavailable',
       errorType: 'Error',
-      event: 'game_win_record_failed',
+      event: 'game_result_record_failed',
       gameType: 'chess',
+      retryAt: expect.any(Number),
       service: 'chat-enhancer-playground'
     }));
+    expect((await storage.list({ prefix: 'matchResultOutbox:' })).size).toBe(1);
+    expect(await storage.getAlarm()).toEqual(expect.any(Number));
+  });
+
+  it('persists a wake-up before the first match delivery finishes', async () => {
+    const storage = new FakeDurableObjectStorage();
+    const playerStats = new BlockingPlayerStatsNamespace();
+    const { room, state } = createRoomHarness(storage, {
+      playerStats: playerStats as unknown as DurableObjectNamespace
+    });
+    const alice = createSession('alice-connection');
+    const bob = createSession('bob-connection');
+
+    await room.handleHello(alice, await createHello(alice.challenge, 'Alice', ['chess']));
+    await room.handleHello(bob, await createHello(bob.challenge, 'Bob', ['chess']));
+    room.handleInvite(alice, 'chess', bob.userId);
+    room.handleInviteResponse(bob, lastMessage(bob, 'inviteReceived').invite.inviteId, true);
+    const gameId = lastMessage(alice, 'gameStarted').game.gameId;
+
+    room.handleGameAction(bob, gameId, {
+      action: 'resign',
+      userId: bob.userId
+    });
+    await playerStats.deliveryStarted;
+
+    expect((await storage.list({ prefix: 'matchResultOutbox:' })).size).toBe(1);
+    expect(await storage.getAlarm()).toEqual(expect.any(Number));
+
+    playerStats.releaseDelivery();
+    await state.flushWaitUntil();
+    expect((await storage.list({ prefix: 'matchResultOutbox:' })).size).toBe(0);
+    expect(await storage.getAlarm()).toBeNull();
+  });
+
+  it('resumes a pending match result after the room restarts', async () => {
+    const storage = new FakeDurableObjectStorage();
+    const first = createRoomHarness(storage, {
+      playerStats: new FailingPlayerStatsNamespace() as unknown as DurableObjectNamespace
+    });
+    const alice = createSession('alice-connection');
+    const bob = createSession('bob-connection');
+
+    await first.room.handleHello(alice, await createHello(alice.challenge, 'Alice', ['chess']));
+    await first.room.handleHello(bob, await createHello(bob.challenge, 'Bob', ['chess']));
+    first.room.handleInvite(alice, 'chess', bob.userId);
+    first.room.handleInviteResponse(bob, lastMessage(bob, 'inviteReceived').invite.inviteId, true);
+    const gameId = lastMessage(alice, 'gameStarted').game.gameId;
+    first.room.handleGameAction(bob, gameId, {
+      action: 'resign',
+      userId: bob.userId
+    });
+    await first.state.flushWaitUntil();
+
+    const retryAt = await storage.getAlarm();
+    expect(retryAt).toEqual(expect.any(Number));
+    const playerStats = new FakePlayerStatsNamespace();
+    vi.useFakeTimers();
+    vi.setSystemTime(retryAt || Date.now());
+    try {
+      const restarted = createRoomHarness(storage, {
+        playerStats: playerStats as unknown as DurableObjectNamespace
+      });
+      await restarted.state.flushWaitUntil();
+    } finally {
+      vi.useRealTimers();
+    }
+
+    expect(playerStats.getWins(alice.userId, 'chess')).toBe(1);
+    expect(playerStats.getMatchCount()).toBe(1);
+    expect((await storage.list({ prefix: 'matchResultOutbox:' })).size).toBe(0);
+    expect(await storage.getAlarm()).toBeNull();
   });
 });
 

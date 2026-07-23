@@ -95,50 +95,52 @@ Object.defineProperty(globalThis, 'chrome', {
   value: chromeMock
 });
 
-Object.defineProperty(window, 'matchMedia', {
-  configurable: true,
-  value: vi.fn((query: string) => ({
-    addEventListener: vi.fn(),
-    addListener: vi.fn(),
-    dispatchEvent: vi.fn(),
-    matches: false,
-    media: query,
-    onchange: null,
-    removeEventListener: vi.fn(),
-    removeListener: vi.fn()
-  }))
-});
+if (typeof window !== 'undefined') {
+  Object.defineProperty(window, 'matchMedia', {
+    configurable: true,
+    value: vi.fn((query: string) => ({
+      addEventListener: vi.fn(),
+      addListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+      matches: false,
+      media: query,
+      onchange: null,
+      removeEventListener: vi.fn(),
+      removeListener: vi.fn()
+    }))
+  });
 
-Object.defineProperty(window, 'requestAnimationFrame', {
-  configurable: true,
-  writable: true,
-  value: (callback: FrameRequestCallback) => window.setTimeout(() => callback(performance.now()), 0)
-});
+  Object.defineProperty(window, 'requestAnimationFrame', {
+    configurable: true,
+    writable: true,
+    value: (callback: FrameRequestCallback) => window.setTimeout(() => callback(performance.now()), 0)
+  });
 
-Object.defineProperty(window, 'cancelAnimationFrame', {
-  configurable: true,
-  writable: true,
-  value: (handle: number) => window.clearTimeout(handle)
-});
+  Object.defineProperty(window, 'cancelAnimationFrame', {
+    configurable: true,
+    writable: true,
+    value: (handle: number) => window.clearTimeout(handle)
+  });
 
-Object.defineProperty(HTMLCanvasElement.prototype, 'getContext', {
-  configurable: true,
-  value: vi.fn((contextId: string) => {
-    if (contextId !== '2d') return null;
+  Object.defineProperty(HTMLCanvasElement.prototype, 'getContext', {
+    configurable: true,
+    value: vi.fn((contextId: string) => {
+      if (contextId !== '2d') return null;
 
-    return {
-      clearRect: vi.fn(),
-      drawImage: vi.fn(),
-      fillRect: vi.fn(),
-      fillStyle: '',
-      imageSmoothingEnabled: false,
-      lineWidth: 1,
-      setTransform: vi.fn(),
-      strokeRect: vi.fn(),
-      strokeStyle: ''
-    } as unknown as CanvasRenderingContext2D;
-  })
-});
+      return {
+        clearRect: vi.fn(),
+        drawImage: vi.fn(),
+        fillRect: vi.fn(),
+        fillStyle: '',
+        imageSmoothingEnabled: false,
+        lineWidth: 1,
+        setTransform: vi.fn(),
+        strokeRect: vi.fn(),
+        strokeStyle: ''
+      } as unknown as CanvasRenderingContext2D;
+    })
+  });
+}
 
 function createStorageArea(): chrome.storage.StorageArea {
   const values = new Map<string, unknown>();

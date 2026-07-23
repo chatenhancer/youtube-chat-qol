@@ -33,6 +33,7 @@ const ChessFenSchema = z.string().refine((value) => {
 });
 const ChessGameRecordSchema = z.strictObject({
   fen: ChessFenSchema,
+  finishedAt: z.number().int().nonnegative().optional(),
   gameId: z.string().min(1),
   gameType: z.literal('chess'),
   gameVersion: z.literal(PLAYGROUND_GAME_VERSIONS.chess),
@@ -44,6 +45,7 @@ const ChessGameRecordSchema = z.strictObject({
     white: z.string().min(1)
   }),
   status: ChessGameStatusSchema,
+  startedAt: z.number().int().nonnegative().optional(),
   turn: PlayerColorSchema,
   winner: PlayerColorSchema.optional()
 });
@@ -109,7 +111,12 @@ export const chessGameModule: GameModule = {
   }
 };
 
-export function createChessGame(gameId: string, whiteUserId: string, blackUserId: string): ChessGameRecord {
+export function createChessGame(
+  gameId: string,
+  whiteUserId: string,
+  blackUserId: string,
+  now = Date.now()
+): ChessGameRecord {
   const chess = new Chess();
   return {
     fen: chess.fen(),
@@ -121,6 +128,7 @@ export function createChessGame(gameId: string, whiteUserId: string, blackUserId
       black: blackUserId,
       white: whiteUserId
     },
+    startedAt: now,
     status: 'active',
     turn: 'white'
   };

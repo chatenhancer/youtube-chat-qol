@@ -27,10 +27,15 @@ import {
 import { parseClientMessage, ProtocolError, sanitizeStreamKey } from '../../protocol/validation';
 import { TokenBucket, type TokenBucketOptions } from '../../rate-limit';
 import { attachComputerPlayerToRoom } from '../../features/computer-player/room-adapter';
-import { recordPlayerWin } from '../player-stats/client';
+import { recordPlayerMatch } from '../player-stats/client';
+import type {
+  PlayerMatchResultInput,
+  RecordPlayerMatchResult
+} from '../player-stats/types';
 import { GameState } from './game-state';
 import { GenerationTokens } from './generation-token';
 import { InviteManager } from './invite-manager';
+import { MatchResultOutbox } from './match-result-outbox';
 import { type ClientSession, sendMessage, SessionManager } from './session-manager';
 import type { Env } from '../../types';
 
@@ -72,12 +77,32 @@ export class StreamRoom {
     GENERATION_TOKEN_USER_RATE_LIMIT
   );
   private readonly invites = new InviteManager();
+  private readonly matchResultOutbox: MatchResultOutbox;
   private readonly sessions = new SessionManager();
   private readonly userRateLimits = new Map<string, TokenBucket>();
   private streamKey = '';
 
   constructor(private readonly state: DurableObjectState, private readonly env: Env) {
     this.gameState = new GameState(this.state, (event, details, level) => this.logEvent(event, details, level));
+    this.matchResultOutbox = new MatchResultOutbox(this.state, {
+      deliver: (match) => recordPlayerMatch(this.env, match),
+      onDelivered: (match, result) => this.logRecordedMatchResult(match, result),
+      onDeliveryFailed: (match, error, retry) => {
+        this.logEvent('game_result_record_failed', {
+          attempt: retry.attempt,
+          errorMessage: getLogErrorMessage(error),
+          errorType: getLogErrorType(error),
+          game: shortLogId(match.matchId),
+          gameType: match.gameType,
+          retryAt: retry.nextAttemptAt
+        }, 'warn');
+      },
+      onInvalidRecord: (key) => {
+        this.logEvent('game_result_outbox_invalid', {
+          record: shortLogId(key)
+        }, 'warn');
+      }
+    });
     attachComputerPlayerToRoom({
       connectionRateLimitOptions: CONNECTION_RATE_LIMIT,
       createSnapshot: (userId) => this.createSnapshot(userId),
@@ -89,7 +114,11 @@ export class StreamRoom {
       waitUntil: (promise) => this.state.waitUntil(promise)
     });
 
-    this.state.blockConcurrencyWhile(() => this.gameState.load());
+    this.state.blockConcurrencyWhile(async () => {
+      await this.gameState.load();
+      await this.restoreStoredMatchResults();
+      await this.matchResultOutbox.resume();
+    });
   }
 
   async fetch(request: Request): Promise<Response> {
@@ -112,6 +141,10 @@ export class StreamRoom {
     }
 
     return this.handleSocket();
+  }
+
+  async alarm(): Promise<void> {
+    await this.matchResultOutbox.alarm();
   }
 
   private handleSocket(): Response {
@@ -407,17 +440,24 @@ export class StreamRoom {
     action: GameActionInput
   ): void {
     const gameModule = getGameModuleForRecord(game);
-    const nextGame = gameModule.applyAction(game, action);
-    if (nextGame === game) return;
+    const appliedGame = gameModule.applyAction(game, action);
+    if (appliedGame === game) return;
+    const transitionedToTerminal =
+      game.status !== appliedGame.status &&
+      getGameModuleForRecord(appliedGame).isTerminal(appliedGame);
+    const nextGame: GameRecord = transitionedToTerminal
+      ? {
+          ...appliedGame,
+          finishedAt: appliedGame.finishedAt ?? Date.now()
+        }
+      : appliedGame;
     const persistence = gameModule.getStatePersistence?.({
       action,
       nextGame,
       previousGame: game
     }) ?? 'immediate';
-    const nextGameModule = getGameModuleForRecord(nextGame);
     this.gameState.set(nextGame, { persistence });
-    const recordedWin = this.recordTerminalGameWin(game, nextGame);
-    if (game.status !== nextGame.status && nextGameModule.isTerminal(nextGame)) {
+    if (transitionedToTerminal) {
       this.logEvent('game_ended', {
         game: shortLogId(nextGame.gameId),
         gameType: nextGame.gameType,
@@ -425,48 +465,58 @@ export class StreamRoom {
       });
     }
     this.broadcastGame(nextGame);
-    if (recordedWin) this.recordGlobalGameWin(nextGame, recordedWin);
+    if (transitionedToTerminal) this.queueMatchResult(createPlayerMatchResult(nextGame));
   }
 
-  private recordTerminalGameWin(previousGame: GameRecord, nextGame: GameRecord): string {
-    const gameModule = getGameModuleForRecord(nextGame);
-    if (previousGame.status === nextGame.status || !gameModule.isTerminal(nextGame)) return '';
-
-    const winnerUserId = gameModule.getWinnerUserId?.(nextGame);
-    return winnerUserId || '';
+  private queueMatchResult(match: PlayerMatchResultInput): void {
+    const write = this.matchResultOutbox.enqueue(match).catch((error: unknown) => {
+      this.logEvent('game_result_queue_failed', {
+        errorMessage: getLogErrorMessage(error),
+        errorType: getLogErrorType(error),
+        game: shortLogId(match.matchId),
+        gameType: match.gameType
+      }, 'warn');
+    });
+    this.state.waitUntil(write);
   }
 
-  private recordGlobalGameWin(game: GameRecord, winnerUserId: string): void {
-    if (isPlaygroundComputerUserId(winnerUserId)) {
-      this.logEvent('game_win_record_skipped', {
-        game: shortLogId(game.gameId),
-        gameType: game.gameType,
-        reason: 'computerPlayer',
-        user: hashLogValue(winnerUserId)
+  private async restoreStoredMatchResults(): Promise<void> {
+    for (const game of this.gameState.values()) {
+      if (!getGameModuleForRecord(game).isTerminal(game) || game.finishedAt === undefined) continue;
+      await this.matchResultOutbox.enqueue(createPlayerMatchResult(game));
+    }
+  }
+
+  private logRecordedMatchResult(
+    match: PlayerMatchResultInput,
+    result: RecordPlayerMatchResult
+  ): void {
+    if (!result.recorded) {
+      this.logEvent('game_result_reconciled', {
+        game: shortLogId(match.matchId),
+        gameType: match.gameType
       });
       return;
     }
 
-    const write = recordPlayerWin(this.env, {
-      gameId: game.gameType,
-      userId: winnerUserId
-    }).then((stats) => {
-      this.logEvent('game_win_recorded', {
-        game: shortLogId(game.gameId),
-        gameType: game.gameType,
-        user: hashLogValue(winnerUserId),
-        wins: stats.games[game.gameType]?.wins
+    const humanWinnerUserId = match.winnerUserId &&
+      !isPlaygroundComputerUserId(match.winnerUserId)
+      ? match.winnerUserId
+      : '';
+    if (!humanWinnerUserId) {
+      this.logEvent('game_result_recorded', {
+        game: shortLogId(match.matchId),
+        gameType: match.gameType,
+        reason: match.finishReason
       });
-    }).catch((error: unknown) => {
-      this.logEvent('game_win_record_failed', {
-        errorMessage: getLogErrorMessage(error),
-        errorType: getLogErrorType(error),
-        game: shortLogId(game.gameId),
-        gameType: game.gameType,
-        user: hashLogValue(winnerUserId)
-      }, 'warn');
+      return;
+    }
+
+    this.logEvent('game_win_recorded', {
+      game: shortLogId(match.matchId),
+      gameType: match.gameType,
+      user: hashLogValue(humanWinnerUserId)
     });
-    this.state.waitUntil(write);
   }
 
   private handleLeaveGame(userId: string, game: GameRecord): void {
@@ -757,6 +807,25 @@ function getProtocolLogEvent(code: string): string {
     default:
       return 'protocol_error';
   }
+}
+
+function createPlayerMatchResult(game: GameRecord): PlayerMatchResultInput {
+  const gameModule = getGameModuleForRecord(game);
+  const finishedAt = game.finishedAt;
+  if (finishedAt === undefined) {
+    throw new Error('Cannot record a match without a finish timestamp.');
+  }
+
+  return {
+    finishedAt,
+    finishReason: game.status,
+    gameType: game.gameType,
+    gameVersion: game.gameVersion,
+    matchId: game.gameId,
+    participantUserIds: gameModule.getRecipientUserIds(game),
+    startedAt: game.startedAt,
+    winnerUserId: gameModule.getWinnerUserId?.(game) || null
+  };
 }
 
 function createId(prefix: string): string {
