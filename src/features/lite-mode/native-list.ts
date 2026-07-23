@@ -4,11 +4,11 @@ export const NATIVE_LIST_SELECTOR = ['yt-live-chat-item-list-renderer', '#chat >
   ','
 );
 export const NATIVE_HIDDEN_CLASS = 'ytcq-lite-native-hidden';
+export const NATIVE_PENDING_SEED_CLASS = 'ytcq-lite-native-seed-pending';
 export const NATIVE_DISCARDED_ATTRIBUTE = 'data-ytcq-lite-native-discarded';
 
 // Kept only so a new extension build can recover DOM retained by an older one.
 export const NATIVE_RETAINER_ATTRIBUTE = 'data-ytcq-lite-native-retainer';
-const LEGACY_NATIVE_HANDOFF_CLASS = 'ytcq-lite-native-handoff';
 const MAX_TRACKED_DETACHED_NATIVE_LISTS = 8;
 
 const detachedNativeListRefs: Array<WeakRef<HTMLElement>> = [];
@@ -79,7 +79,10 @@ export function isNativeFeedDiscarded(): boolean {
 
 export function revealConnectedNativeLists(): void {
   document
-    .querySelectorAll<HTMLElement>(`.${NATIVE_HIDDEN_CLASS}, .${LEGACY_NATIVE_HANDOFF_CLASS}`)
+    .querySelectorAll<HTMLElement>([
+      `.${NATIVE_HIDDEN_CLASS}`,
+      `.${NATIVE_PENDING_SEED_CLASS}`
+    ].join(','))
     .forEach(revealNativeList);
 }
 
@@ -129,7 +132,10 @@ function mountNativeList(nativeList: HTMLElement): void {
 }
 
 function revealNativeList(nativeList: HTMLElement): void {
-  nativeList.classList.remove(NATIVE_HIDDEN_CLASS, LEGACY_NATIVE_HANDOFF_CLASS);
+  nativeList.classList.remove(
+    NATIVE_HIDDEN_CLASS,
+    NATIVE_PENDING_SEED_CLASS
+  );
   if (nativeList.getAttribute('aria-hidden') === 'true') {
     nativeList.removeAttribute('aria-hidden');
   }

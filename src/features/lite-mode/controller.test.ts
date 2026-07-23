@@ -184,19 +184,103 @@ describe('Lite mode controller', () => {
     expect(nativeList.isConnected).toBe(false);
   });
 
-  it('treats an initialized empty shared feed as completed replay startup', async () => {
+  it('waits for late replay hydration before capturing and discarding native history', () => {
+    window.history.replaceState({}, '', '/live_chat_replay');
+    const nativeList = document.querySelector<HTMLElement>('yt-live-chat-item-list-renderer')!;
+    const controls: Array<Record<string, unknown>> = [];
+    const onControl = (event: Event) => {
+      if (event instanceof CustomEvent && typeof event.detail === 'string') {
+        controls.push(JSON.parse(event.detail) as Record<string, unknown>);
+      }
+    };
+    window.addEventListener(YOUTUBE_CHAT_FEED_CONTROL_EVENT, onControl);
+
+    try {
+      startLiteMode({ clearCooldown: true });
+
+      expect(nativeList.isConnected).toBe(true);
+      expect(nativeList.classList.contains('ytcq-lite-native-seed-pending')).toBe(true);
+      expect(nativeList.getAttribute('aria-hidden')).toBe('true');
+      expect(document.documentElement.hasAttribute(
+        'data-ytcq-lite-native-discarded'
+      )).toBe(false);
+
+      const hydratedMessage = appendNativeMessage(nativeList, 'late-replay-seed');
+      handleLiteModeDomMutations([mutation({
+        addedNodes: [hydratedMessage],
+        target: nativeList,
+        type: 'childList'
+      })]);
+
+      expect(controls).toContainEqual({
+        consumer: 'lite',
+        enabled: true,
+        requestRendered: true,
+        version: 1
+      });
+      expect(nativeList.isConnected).toBe(true);
+
+      dispatchBatch({
+        ...createBatch(1, [{
+          type: 'upsert',
+          record: createRecord('late-replay-seed', 'Late replay history')
+        }]),
+        source: 'initial'
+      });
+
+      expect(document.querySelector('[data-message-id="late-replay-seed"]')).not.toBeNull();
+      expect(nativeList.isConnected).toBe(false);
+      expect(document.documentElement.getAttribute(
+        'data-ytcq-lite-native-discarded'
+      )).toBe('true');
+    } finally {
+      window.removeEventListener(YOUTUBE_CHAT_FEED_CONTROL_EVENT, onControl);
+    }
+  });
+
+  it('reveals retained replay history when Lite mode is disabled before hydration', () => {
+    window.history.replaceState({}, '', '/live_chat_replay');
+    const nativeList = document.querySelector<HTMLElement>('yt-live-chat-item-list-renderer')!;
+
+    startLiteMode({ clearCooldown: true });
+    stopLiteMode();
+
+    expect(isLiteModeActive()).toBe(false);
+    expect(nativeList.isConnected).toBe(true);
+    expect(nativeList.classList.contains('ytcq-lite-native-seed-pending')).toBe(false);
+    expect(nativeList.hasAttribute('aria-hidden')).toBe(false);
+    expect(document.querySelector('.ytcq-lite-root')).toBeNull();
+    expect(requestNativeChatRestoreMock).not.toHaveBeenCalled();
+  });
+
+  it('keeps an initialized empty replay loading until native history is captured', async () => {
     window.history.replaceState({}, '', '/live_chat_replay');
     getYouTubeChatFeedRecordStateMock.mockReturnValue({ ready: true, records: [] });
 
     startLiteMode({ clearCooldown: true });
     const root = document.querySelector<HTMLElement>('.ytcq-lite-root')!;
+    const spinner = root.querySelector<HTMLElement>('.ytcq-lite-loading-spinner')!;
+
+    expect(root.dataset.ytcqConnectionState).toBe('connecting');
+    expect(root.getAttribute('aria-busy')).toBe('true');
+    expect(spinner.hidden).toBe(false);
+    expect(document.querySelector('.ytcq-lite-empty-state')?.textContent)
+      .toContain('Waiting for chat');
+
+    dispatchBatch({
+      ...createBatch(1, [{
+        type: 'upsert',
+        record: createRecord('hydrated-replay', 'Hydrated replay history')
+      }]),
+      source: 'initial'
+    });
 
     expect(root.dataset.ytcqConnectionState).toBe('connected');
     expect(root.getAttribute('aria-busy')).toBe('false');
-    expect(document.querySelector('.ytcq-lite-empty-state')).not.toBeNull();
+    expect(spinner.hidden).toBe(true);
+    expect(document.querySelector('[data-message-id="hydrated-replay"]')).not.toBeNull();
 
     await vi.advanceTimersByTimeAsync(45_000);
-
     expect(isLiteModeActive()).toBe(true);
     expect(requestNativeChatRestoreMock).not.toHaveBeenCalled();
   });
@@ -645,11 +729,19 @@ describe('Lite mode controller', () => {
       ...createBatch(2, [{ type: 'upsert', record: createRecord('recovered', 'Recovered') }]),
       source: 'replay'
     });
+    dispatchBatch({
+      ...createBatch(3, [{
+        type: 'upsert',
+        record: createRecord('recovered-history', 'Recovered history')
+      }]),
+      source: 'initial'
+    });
     await vi.advanceTimersByTimeAsync(1);
 
     expect(isLiteModeActive()).toBe(true);
     expect(root.dataset.ytcqConnectionState).toBe('connected');
     expect(document.querySelector('[data-message-id="recovered"]')).not.toBeNull();
+    expect(document.querySelector('[data-message-id="recovered-history"]')).not.toBeNull();
     expect(requestNativeChatRestoreMock).not.toHaveBeenCalled();
   });
 
@@ -752,7 +844,10 @@ describe('Lite mode controller', () => {
   it('does not watchdog a paused replay', async () => {
     window.history.replaceState({}, '', '/live_chat_replay');
     startLiteMode({ clearCooldown: true });
-    dispatchBatch(createBatch(1, [{ type: 'upsert', record: createRecord('replay', 'Replay') }]));
+    dispatchBatch({
+      ...createBatch(1, [{ type: 'upsert', record: createRecord('replay', 'Replay') }]),
+      source: 'initial'
+    });
     await vi.advanceTimersByTimeAsync(120_000);
     expect(isLiteModeActive()).toBe(true);
   });

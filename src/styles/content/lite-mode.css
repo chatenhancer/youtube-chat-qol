@@ -4,6 +4,13 @@
   display: none !important;
 }
 
+.ytcq-lite-native-seed-pending {
+  position: absolute !important;
+  inset: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
 .ytcq-lite-root {
   position: relative;
   display: flex;
