@@ -7,8 +7,14 @@ const chatFeedRecordMocks = vi.hoisted(() => ({
     (_message: HTMLElement): Promise<unknown> => Promise.resolve(null)
   )
 }));
+const liteModeMocks = vi.hoisted(() => ({
+  hasRetainedLiteModeMessage: vi.fn(() => false),
+  isLiteModeActive: vi.fn(() => false),
+  revealRetainedLiteModeMessage: vi.fn(() => null as HTMLElement | null)
+}));
 
 vi.mock('../../youtube/chat-feed/records', () => chatFeedRecordMocks);
+vi.mock('../lite-mode/controller', () => liteModeMocks);
 
 describe('bookmarks', () => {
   beforeEach(async () => {
@@ -19,11 +25,15 @@ describe('bookmarks', () => {
     vi.clearAllMocks();
     chatFeedRecordMocks.requestRenderedYouTubeChatFeedRecord.mockReset();
     chatFeedRecordMocks.requestRenderedYouTubeChatFeedRecord.mockResolvedValue(null);
+    liteModeMocks.hasRetainedLiteModeMessage.mockReset().mockReturnValue(false);
+    liteModeMocks.isLiteModeActive.mockReset().mockReturnValue(false);
+    liteModeMocks.revealRetainedLiteModeMessage.mockReset().mockReturnValue(null);
     vi.resetModules();
   });
 
   afterEach(() => {
     vi.restoreAllMocks();
+    vi.useRealTimers();
   });
 
   it('stores and removes multiple messages from the same author independently', async () => {
@@ -115,6 +125,112 @@ describe('bookmarks', () => {
     expect(first.getAttribute('aria-label')).toBe(first.title);
     expect(first.querySelector('path')?.getAttribute('d')).toBe(BOOKMARK_FILLED_ICON_PATH);
     expect(second.classList.contains('ytcq-bookmark-toggle-active')).toBe(false);
+  });
+
+  it('stores the watch-page video offset for live bookmarks', async () => {
+    const video = document.createElement('video');
+    Object.defineProperty(video, 'currentTime', {
+      configurable: true,
+      value: 328.9
+    });
+    document.body.append(video);
+    const feature = await import('./index');
+    feature.initBookmarks();
+    await flushAsyncWork();
+
+    await feature.toggleBookmark(bookmark('message-1', {
+      // A 24-hour live clock must not be mistaken for a replay offset.
+      timestampText: '17:22'
+    }));
+
+    await expect(chrome.storage.local.get(BOOKMARKS_STORAGE_KEY)).resolves.toMatchObject({
+      [BOOKMARKS_STORAGE_KEY]: {
+        'message:stream-a:message-1': {
+          message: {
+            messageId: 'message-1',
+            videoOffsetSeconds: 328
+          }
+        }
+      }
+    });
+  });
+
+  it('jumps to and highlights a linked message when it appears', async () => {
+    vi.useFakeTimers();
+    window.history.replaceState({}, '', '/watch?v=stream-a#ytcq-message=message-1');
+    const feature = await import('./index');
+    feature.initBookmarks();
+    const dispatcher = await import('../../content/dispatcher');
+    const otherMessage = createChatMessage('message-2', 'Other message');
+    const targetMessage = createChatMessage('message-1', 'Linked message');
+    document.body.append(otherMessage, targetMessage);
+
+    dispatcher.handleFeatureMessage(otherMessage, { source: 'existing' });
+    expect(otherMessage.classList.contains('ytcq-message-jump-target')).toBe(false);
+
+    dispatcher.handleFeatureMessage(targetMessage, { source: 'existing' });
+    expect(targetMessage.classList.contains('ytcq-message-jump-target')).toBe(false);
+    await vi.advanceTimersByTimeAsync(20);
+    expect(targetMessage.classList.contains('ytcq-message-jump-target')).toBe(true);
+    await vi.advanceTimersByTimeAsync(1_600);
+    expect(targetMessage.classList.contains('ytcq-message-jump-target')).toBe(false);
+  });
+
+  it('waits for the visible Lite row instead of jumping to its hidden native source', async () => {
+    vi.useFakeTimers();
+    liteModeMocks.isLiteModeActive.mockReturnValue(true);
+    window.history.replaceState({}, '', '/watch?v=stream-a#ytcq-message=message-1');
+    const feature = await import('./index');
+    feature.initBookmarks();
+    const dispatcher = await import('../../content/dispatcher');
+    const nativeMessage = createChatMessage('message-1', 'Native source');
+    document.body.append(nativeMessage);
+
+    dispatcher.handleFeatureMessage(nativeMessage, { source: 'existing' });
+    expect(nativeMessage.classList.contains('ytcq-message-jump-target')).toBe(false);
+
+    const scroller = document.createElement('div');
+    const liteMessage = createChatMessage('message-1', 'Visible Lite row');
+    const scrollTo = vi.fn();
+    scroller.id = 'item-scroller';
+    liteMessage.className = 'ytcq-lite-message';
+    Object.defineProperty(scroller, 'scrollTo', {
+      configurable: true,
+      value: scrollTo
+    });
+    Object.defineProperties(scroller, {
+      clientHeight: { configurable: true, value: 100 },
+      scrollHeight: { configurable: true, value: 500 }
+    });
+    vi.spyOn(scroller, 'getBoundingClientRect').mockReturnValue(
+      rect({
+        left: 0,
+        top: 0,
+        width: 300,
+        height: 100
+      })
+    );
+    vi.spyOn(liteMessage, 'getBoundingClientRect').mockReturnValue(
+      rect({
+        left: 0,
+        top: 300,
+        width: 300,
+        height: 20
+      })
+    );
+    scroller.append(liteMessage);
+    document.body.append(scroller);
+
+    dispatcher.handleFeatureMessage(liteMessage, { source: 'added' });
+
+    expect(nativeMessage.classList.contains('ytcq-message-jump-target')).toBe(false);
+    expect(liteMessage.classList.contains('ytcq-message-jump-target')).toBe(true);
+    expect(scrollTo).toHaveBeenCalledWith({
+      behavior: 'smooth',
+      top: 260
+    });
+    await vi.advanceTimersByTimeAsync(20);
+    expect(liteMessage.classList.contains('ytcq-message-jump-target')).toBe(true);
   });
 
   it('saves normalized feed text and custom emoji instead of translated DOM text', async () => {
@@ -234,6 +350,30 @@ function createChatMessage(messageId: string, text: string): HTMLElement {
     <span id="message">${text}</span>
   `;
   return message;
+}
+
+function rect({
+  left,
+  top,
+  width,
+  height
+}: {
+  left: number;
+  top: number;
+  width: number;
+  height: number;
+}): DOMRect {
+  return {
+    bottom: top + height,
+    height,
+    left,
+    right: left + width,
+    toJSON: () => ({}),
+    top,
+    width,
+    x: left,
+    y: top
+  } as DOMRect;
 }
 
 async function flushAsyncWork(): Promise<void> {

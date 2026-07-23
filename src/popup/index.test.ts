@@ -455,7 +455,8 @@ describe('popup', () => {
             messageId: 'message-1',
             text: 'Saved chat message',
             timestamp: 1_699_999_999_000,
-            timestampText: '10:00 PM'
+            timestampText: '10:00 PM',
+            videoOffsetSeconds: 328
           },
           savedAt: 1_700_000_000_000,
           sourceKey: 'stream-a',
@@ -521,7 +522,8 @@ describe('popup', () => {
     });
     document.querySelector<HTMLButtonElement>('.bookmark-source-button')?.click();
     expect(chrome.tabs.create).toHaveBeenCalledWith({
-      url: 'https://www.youtube.com/watch?v=stream-a'
+      url:
+        'https://www.youtube.com/watch?v=stream-a&t=328s#ytcq-message=message-1'
     });
 
     const actionButtons = Array.from(
@@ -551,7 +553,8 @@ describe('popup', () => {
             messageId: 'message-1',
             text: 'Saved chat message',
             timestamp: 1_699_999_999_000,
-            timestampText: '10:00 PM'
+            timestampText: '10:00 PM',
+            videoOffsetSeconds: 328
           },
           savedAt: 1_700_000_000_000,
           sourceKey: 'stream-a',

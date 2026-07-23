@@ -16,7 +16,6 @@ import { parseLiteModeFallbackCode, type LiteModeFallbackCode } from './fallback
 
 export const LITE_MODE_SESSION_COOLDOWN_KEY = 'ytcqLiteModeSessionCooldown:v1';
 export const LITE_MODE_NATIVE_RESTORE_KEY = 'ytcqLiteModeNativeRestore:v1';
-export const LITE_MODE_REPLAY_START_KEY = 'ytcqLiteModeReplayStart:v1';
 
 const BOOTSTRAP_STYLE_ID = 'ytcq-lite-mode-bootstrap-style';
 const BOOTSTRAP_GLOBAL_FLAG = '__ytcqLiteModeBootstrapStarted';
@@ -47,7 +46,6 @@ export function initLiteModeBootstrap(): void {
   globalState[BOOTSTRAP_GLOBAL_FLAG] = true;
 
   const nativeRestore = consumeNativeRestoreRequest();
-  const replayStartRequested = consumeReplayLiteModeStartRequest();
   // An extension-initiated restore keeps a one-document cooldown so a delayed
   // sync-storage write cannot reactivate Lite during the reload. A normal user
   // reload clears the previous document's cooldown.
@@ -62,11 +60,6 @@ export function initLiteModeBootstrap(): void {
       );
     }
     showNativeRestoreOverlay(nativeRestore.message);
-  } else if (replayStartRequested) {
-    // The explicit handoff is persisted before reload, but this one-use marker
-    // also starts the page transport synchronously instead of waiting for the
-    // asynchronous storage read in the new replay document.
-    applyStoredLiteModeIntent(true, false);
   }
   if (!hasChromeStorage()) return;
 
@@ -156,37 +149,6 @@ export function requestNativeChatRestore({
   window.setTimeout(() => window.location.reload(), NATIVE_RESTORE_RELOAD_DELAY_MS);
 }
 
-/**
- * Replay chat prefetches future actions while native mode is active. Reloading
- * the chat document lets the document-start Lite transport own the next replay
- * response from its beginning instead of waiting for the following chunk.
- */
-export function requestReplayLiteModeReload(): void {
-  try {
-    window.sessionStorage.setItem(LITE_MODE_REPLAY_START_KEY, String(Date.now()));
-  } catch {
-    // The persisted extension option still starts Lite in the new document.
-  }
-  setLiteModeBootstrapIntent(true);
-  dispatchLiteChatControl(true);
-  const reload = () => {
-    window.setTimeout(() => window.location.reload());
-  };
-  if (!hasChromeStorage()) {
-    reload();
-    return;
-  }
-
-  // The normal option writer runs after feature callbacks. Confirm this one
-  // setting before navigation so the fresh document cannot observe the old
-  // value and briefly boot native chat.
-  try {
-    chrome.storage.sync.set({ liteModeEnabled: true }, reload);
-  } catch {
-    reload();
-  }
-}
-
 export function consumeLiteModeFallbackNotice(): LiteModeFallbackCode | null {
   const value = document.documentElement.getAttribute(NATIVE_RESTORE_FALLBACK_ATTRIBUTE);
   document.documentElement.removeAttribute(NATIVE_RESTORE_FALLBACK_ATTRIBUTE);
@@ -213,7 +175,6 @@ function handleLiteModeBootstrapStorageChange(
 
 function applyStoredLiteModeIntent(enabled: boolean, userInitiatedRetry: boolean): void {
   if (!enabled) {
-    clearReplayLiteModeStartRequest();
     clearLiteModeBootstrapIntent();
     dispatchLiteChatControl(false);
     return;
@@ -307,31 +268,6 @@ function consumeNativeRestoreRequest(): NativeRestoreRequest | null {
     };
   } catch {
     return null;
-  }
-}
-
-function consumeReplayLiteModeStartRequest(): boolean {
-  let requestedAt = NaN;
-  try {
-    requestedAt = Number(window.sessionStorage.getItem(LITE_MODE_REPLAY_START_KEY));
-    window.sessionStorage.removeItem(LITE_MODE_REPLAY_START_KEY);
-  } catch {
-    return false;
-  }
-  const age = Date.now() - requestedAt;
-  return (
-    Number.isFinite(requestedAt) &&
-    requestedAt > 0 &&
-    age >= 0 &&
-    age <= DOCUMENT_RELOAD_REQUEST_MAX_AGE_MS
-  );
-}
-
-function clearReplayLiteModeStartRequest(): void {
-  try {
-    window.sessionStorage.removeItem(LITE_MODE_REPLAY_START_KEY);
-  } catch {
-    // A missing session-storage cleanup cannot change the persisted preference.
   }
 }
 

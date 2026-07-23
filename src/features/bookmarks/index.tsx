@@ -13,6 +13,8 @@ import {
   LEGACY_BOOKMARKS_STORAGE_KEY,
   bookmarkAuthorsMatch,
   getBookmarkKey,
+  getBookmarkTargetMessageId,
+  getBookmarkVideoOffsetSeconds,
   normalizeBookmarkAuthor,
   normalizeStoredBookmarks,
   serializeBookmarks,
@@ -38,19 +40,25 @@ import {
   getCurrentYouTubeChatSourceTitle,
   getCurrentYouTubeChatSourceUrl
 } from '../../youtube/source-url';
+import { getCurrentYouTubeVideoOffsetSeconds } from '../../youtube/player';
 import { getChatTimestampValue, isLiveChatReplayUrl } from '../../youtube/timestamps';
+import { canJumpToChatMessage, jumpToChatMessage } from '../message-jump';
+import { isLiteModeActive } from '../lite-mode/controller';
 
 const bookmarks = new Map<string, BookmarkRecord>();
 let loadPromise: Promise<void> | null = null;
+let pendingTargetMessageId = '';
 
 registerFeature({
   page: {
     init: initBookmarks,
     cleanup: cleanupBookmarks
-  }
+  },
+  message: handleBookmarkTargetMessage
 });
 
 export function initBookmarks(): void {
+  pendingTargetMessageId = getBookmarkTargetMessageId(getWatchPageHash());
   void ensureBookmarksLoaded().then(refreshBookmarkButtons);
   chrome.storage.onChanged.addListener(handleBookmarksStorageChange);
 }
@@ -135,7 +143,35 @@ export function createBookmarkToggleButton(
 }
 
 export function cleanupBookmarks(): void {
+  pendingTargetMessageId = '';
   chrome.storage.onChanged.removeListener(handleBookmarksStorageChange);
+}
+
+function handleBookmarkTargetMessage(message: HTMLElement): void {
+  if (!pendingTargetMessageId || getMessageStableId(message) !== pendingTargetMessageId) return;
+
+  const messageId = pendingTargetMessageId;
+  if (message.classList.contains('ytcq-lite-message')) {
+    finishBookmarkTargetJump(message, messageId);
+    return;
+  }
+
+  window.requestAnimationFrame(() => {
+    if (pendingTargetMessageId !== messageId) return;
+    if (isLiteModeActive()) {
+      if (!canJumpToChatMessage(null, messageId)) return;
+      finishBookmarkTargetJump(null, messageId);
+      return;
+    }
+
+    finishBookmarkTargetJump(message, messageId);
+  });
+}
+
+function finishBookmarkTargetJump(target: HTMLElement | null, messageId: string): void {
+  if (pendingTargetMessageId !== messageId) return;
+  pendingTargetMessageId = '';
+  jumpToChatMessage(target, messageId);
 }
 
 function updateBookmarkToggleButton(button: HTMLButtonElement): void {
@@ -264,6 +300,10 @@ function createBookmarkRecord(message: BookmarkSourceMessage): BookmarkRecord | 
   const text = cleanText(message.text);
   const sourceKey = getCurrentYouTubeChatStreamKey();
   if (!identity || !messageId || !sourceKey || (!text && !message.contentParts.length)) return null;
+  const replayOffsetSeconds = isLiveChatReplayUrl()
+    ? getBookmarkVideoOffsetSeconds({ timestampText: message.timestampText })
+    : null;
+  const videoOffsetSeconds = replayOffsetSeconds ?? getCurrentYouTubeVideoOffsetSeconds();
 
   return {
     authorName: identity.authorName || '',
@@ -274,7 +314,8 @@ function createBookmarkRecord(message: BookmarkSourceMessage): BookmarkRecord | 
       messageId,
       text,
       timestamp: Number.isFinite(message.timestamp) ? message.timestamp : 0,
-      timestampText: cleanText(message.timestampText)
+      timestampText: cleanText(message.timestampText),
+      ...(videoOffsetSeconds !== null ? { videoOffsetSeconds } : {})
     },
     savedAt: Date.now(),
     sourceKey,
@@ -348,4 +389,12 @@ function refreshBookmarkButtons(): void {
   document
     .querySelectorAll<HTMLButtonElement>('.ytcq-bookmark-toggle')
     .forEach(updateBookmarkToggleButton);
+}
+
+function getWatchPageHash(): string {
+  try {
+    return window.top?.location.hash || window.location.hash;
+  } catch {
+    return window.location.hash;
+  }
 }

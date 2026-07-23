@@ -4,6 +4,9 @@ import {
   getBookmarkAuthorColor,
   getBookmarkAuthorKey,
   getBookmarkKey,
+  getBookmarkTargetMessageId,
+  getBookmarkTargetUrl,
+  getBookmarkVideoOffsetSeconds,
   normalizeBookmarkAuthor,
   normalizeBookmarkAvatarUrl,
   normalizeStoredBookmarks,
@@ -107,7 +110,8 @@ describe('bookmark storage helpers', () => {
           messageId: ' message-1 ',
           text: ' hello :wave: ',
           timestamp: '1700000000000',
-          timestampText: ' 10:00 PM '
+          timestampText: ' 10:00 PM ',
+          videoOffsetSeconds: '328.9'
         },
         savedAt: '1700000001000',
         sourceKey: ' stream-a ',
@@ -146,7 +150,8 @@ describe('bookmark storage helpers', () => {
           messageId: 'message-1',
           text: 'hello :wave:',
           timestamp: 1_700_000_000_000,
-          timestampText: '10:00 PM'
+          timestampText: '10:00 PM',
+          videoOffsetSeconds: 328
         },
         savedAt: 1_700_000_001_000,
         sourceKey: 'stream-a',
@@ -166,6 +171,29 @@ describe('bookmark storage helpers', () => {
     expect(serializeBookmarks(new Map([['author:@viewerone', record]]))).toEqual({
       'author:@viewerone': record
     });
+  });
+
+  it('builds and reads exact-message replay targets', () => {
+    const replayMessage = {
+      messageId: 'message+1',
+      timestampText: '5:28'
+    };
+    const targetUrl = getBookmarkTargetUrl(
+      'https://www.youtube.com/watch?v=stream-a',
+      replayMessage
+    );
+
+    expect(getBookmarkVideoOffsetSeconds(replayMessage)).toBe(328);
+    expect(getBookmarkVideoOffsetSeconds({
+      timestampText: '10:00 PM',
+      videoOffsetSeconds: 412.9
+    })).toBe(412);
+    expect(getBookmarkVideoOffsetSeconds({ timestampText: '1:02:03' })).toBe(3_723);
+    expect(getBookmarkVideoOffsetSeconds({ timestampText: '10:00 PM' })).toBeNull();
+    expect(targetUrl).toBe(
+      'https://www.youtube.com/watch?v=stream-a&t=328s#ytcq-message=message%2B1'
+    );
+    expect(getBookmarkTargetMessageId(new URL(targetUrl).hash)).toBe('message+1');
   });
 
   it('normalizes avatar URLs', () => {

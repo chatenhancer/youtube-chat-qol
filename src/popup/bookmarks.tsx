@@ -18,6 +18,7 @@ import {
   BOOKMARKS_STORAGE_KEY,
   LEGACY_BOOKMARKS_STORAGE_KEY,
   getBookmarkAuthorColor,
+  getBookmarkTargetUrl,
   normalizeStoredBookmarks,
   serializeBookmarks,
   type BookmarkRecord
@@ -46,7 +47,9 @@ type SavedItemEntry =
     };
 
 type SavedItemAuthor = Pick<BookmarkRecord, 'authorName' | 'avatarUrl' | 'channelId'>;
-type SavedItemSource = Pick<BookmarkRecord, 'sourceTitle' | 'sourceUrl'>;
+type SavedItemSource = Pick<BookmarkRecord, 'sourceTitle' | 'sourceUrl'> & {
+  message?: BookmarkRecord['message'];
+};
 
 export function initBookmarksPanel(): void {
   const { bookmarksCount, bookmarksList } = controls;
@@ -470,7 +473,10 @@ function getSavedItemSourceUrl(record: SavedItemSource): string {
     if (url.protocol !== 'https:' || !isYouTubeSourceHost(url.hostname)) return '';
 
     const videoId = getSourceVideoId(url);
-    return videoId ? `https://www.youtube.com/watch?v=${encodeURIComponent(videoId)}` : '';
+    const canonicalUrl = videoId
+      ? `https://www.youtube.com/watch?v=${encodeURIComponent(videoId)}`
+      : '';
+    return record.message ? getBookmarkTargetUrl(canonicalUrl, record.message) : canonicalUrl;
   } catch {
     return '';
   }

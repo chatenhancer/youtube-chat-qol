@@ -11,6 +11,7 @@ import { normalizeRichTextSegments, type RichTextSegment } from '../youtube/rich
 
 export const BOOKMARKS_STORAGE_KEY = 'ytcqBookmarks';
 export const LEGACY_BOOKMARKS_STORAGE_KEY = 'ytcqMarkedUsers';
+export const BOOKMARK_MESSAGE_HASH_PARAM = 'ytcq-message';
 
 export interface BookmarkAuthorIdentity {
   authorName?: string;
@@ -24,6 +25,7 @@ export interface BookmarkContent {
   text: string;
   timestamp: number;
   timestampText: string;
+  videoOffsetSeconds?: number;
 }
 
 export interface BookmarkRecord {
@@ -106,6 +108,55 @@ export function serializeBookmarks(records: Map<string, BookmarkRecord>): Stored
   return Object.fromEntries(records.entries());
 }
 
+export function getBookmarkVideoOffsetSeconds(
+  message: Pick<BookmarkContent, 'timestampText' | 'videoOffsetSeconds'> | null
+): number | null {
+  if (!message) return null;
+
+  const storedOffset = normalizeVideoOffsetSeconds(message.videoOffsetSeconds);
+  if (storedOffset !== null) return storedOffset;
+
+  const match = cleanText(message.timestampText).match(/^(\d{1,5}):(\d{2})(?::(\d{2}))?$/);
+  if (!match) return null;
+
+  const first = Number(match[1]);
+  const second = Number(match[2]);
+  const third = match[3] === undefined ? null : Number(match[3]);
+  if (second > 59 || (third !== null && third > 59)) return null;
+
+  return third === null
+    ? first * 60 + second
+    : first * 3_600 + second * 60 + third;
+}
+
+export function getBookmarkTargetMessageId(hash: string): string {
+  const normalizedHash = cleanText(hash).replace(/^#/, '');
+  if (!normalizedHash) return '';
+  return cleanText(new URLSearchParams(normalizedHash).get(BOOKMARK_MESSAGE_HASH_PARAM));
+}
+
+export function getBookmarkTargetUrl(
+  sourceUrl: string,
+  message: Pick<BookmarkContent, 'messageId' | 'timestampText' | 'videoOffsetSeconds'> | null
+): string {
+  const messageId = cleanText(message?.messageId);
+  if (!sourceUrl || !messageId || !message) return sourceUrl;
+
+  try {
+    const url = new URL(sourceUrl);
+    const videoOffsetSeconds = getBookmarkVideoOffsetSeconds(message);
+    if (videoOffsetSeconds !== null) {
+      url.searchParams.set('t', `${videoOffsetSeconds}s`);
+    }
+    url.hash = new URLSearchParams({
+      [BOOKMARK_MESSAGE_HASH_PARAM]: messageId
+    }).toString();
+    return url.toString();
+  } catch {
+    return sourceUrl;
+  }
+}
+
 export function normalizeBookmarkAvatarUrl(value: unknown): string {
   const avatarUrl = cleanText(value);
   if (!avatarUrl || avatarUrl.startsWith('data:') || avatarUrl.startsWith('blob:')) return '';
@@ -168,13 +219,22 @@ function normalizeBookmarkContent(value: unknown): BookmarkContent | null {
   if (!messageId || (!text && !contentParts.length)) return null;
 
   const timestampCandidate = Number(candidate.timestamp);
+  const videoOffsetSeconds = normalizeVideoOffsetSeconds(candidate.videoOffsetSeconds);
   return {
     contentParts,
     messageId,
     text,
     timestamp: Number.isFinite(timestampCandidate) ? timestampCandidate : 0,
-    timestampText: cleanText(candidate.timestampText)
+    timestampText: cleanText(candidate.timestampText),
+    ...(videoOffsetSeconds !== null ? { videoOffsetSeconds } : {})
   };
+}
+
+function normalizeVideoOffsetSeconds(value: unknown): number | null {
+  const seconds = Number(value);
+  return Number.isFinite(seconds) && seconds >= 0
+    ? Math.floor(seconds)
+    : null;
 }
 
 function hashString(value: string): number {

@@ -71,11 +71,58 @@ yt-live-chat-membership-item-renderer.ytcq-translation-replaced #content {
   padding-right: 30px;
 }
 
-yt-live-chat-text-message-renderer.ytcq-message-jump-target,
-yt-live-chat-paid-message-renderer.ytcq-message-jump-target,
-yt-live-chat-membership-item-renderer.ytcq-message-jump-target,
-.ytcq-lite-message.ytcq-message-jump-target {
-  background: var(--yt-live-chat-mention-background-color, transparent);
+:where(
+  yt-live-chat-text-message-renderer.ytcq-message-jump-target,
+  yt-live-chat-paid-message-renderer.ytcq-message-jump-target,
+  yt-live-chat-membership-item-renderer.ytcq-message-jump-target,
+  yt-live-chat-viewer-engagement-message-renderer.ytcq-message-jump-target,
+  yt-live-chat-mode-change-message-renderer.ytcq-message-jump-target,
+  yt-live-chat-placeholder-item-renderer.ytcq-message-jump-target,
+  .ytcq-lite-message.ytcq-message-jump-target
+) {
+  isolation: isolate;
+  position: relative;
+}
+
+:where(
+  yt-live-chat-text-message-renderer.ytcq-message-jump-target,
+  yt-live-chat-paid-message-renderer.ytcq-message-jump-target,
+  yt-live-chat-membership-item-renderer.ytcq-message-jump-target,
+  yt-live-chat-viewer-engagement-message-renderer.ytcq-message-jump-target,
+  yt-live-chat-mode-change-message-renderer.ytcq-message-jump-target,
+  yt-live-chat-placeholder-item-renderer.ytcq-message-jump-target,
+  .ytcq-lite-message.ytcq-message-jump-target
+)::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background: var(
+    --ytcq-message-jump-highlight-background,
+    var(--yt-live-chat-mention-background-color, transparent)
+  );
+  box-shadow: var(--ytcq-message-jump-highlight-shadow, none);
+  pointer-events: none;
+  animation: ytcq-message-jump-highlight 1600ms ease-in-out both;
+}
+
+@keyframes ytcq-message-jump-highlight {
+  0%,
+  100% {
+    opacity: 0;
+  }
+
+  14%,
+  70% {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ytcq-message-jump-target::before {
+    animation: none;
+    opacity: 1;
+  }
 }
 
 yt-live-chat-text-message-renderer .ytcq-replaced-translation-icon,

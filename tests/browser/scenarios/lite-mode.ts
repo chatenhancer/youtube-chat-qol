@@ -35,6 +35,7 @@ const NATIVE_MESSAGE_SELECTOR = [
 ].join(',');
 const LITE_MODE_FALLBACK_EVENT = 'ytcq:lite-mode-fallback';
 const LITE_BUTTON_SELECTOR = '.ytcq-lite-mode-button';
+const LITE_DOCUMENT_MARKER_ATTRIBUTE = 'data-ytcq-test-lite-document';
 const LITE_ROOT_SELECTOR = '.ytcq-lite-root';
 const LITE_NATIVE_DISCARDED_ATTRIBUTE = 'data-ytcq-lite-native-discarded';
 const LITE_NATIVE_RESTORE_SELECTOR = '#ytcq-lite-native-restore';
@@ -110,6 +111,13 @@ export const liteModeToggleAndRestoreScenario: BrowserScenario = async ({ chat, 
       await clearLiteTestCooldown(chat);
       await expect(chat.locator(NATIVE_LIST_SELECTOR).first()).toBeVisible({ timeout: 20_000 });
       await expect(chat.locator(NATIVE_MESSAGE_SELECTOR).first()).toBeVisible({ timeout: 30_000 });
+      const documentMarker = `${Date.now()}-${Math.random()}`;
+      await chat.locator('html').evaluate((html, marker) => {
+        html.setAttribute(marker.attribute, marker.value);
+      }, {
+        attribute: LITE_DOCUMENT_MARKER_ATTRIBUTE,
+        value: documentMarker
+      });
 
       await test.step('Enable Lite mode from the chat header', async () => {
         await expect(button).toBeVisible({ timeout: 20_000 });
@@ -118,6 +126,10 @@ export const liteModeToggleAndRestoreScenario: BrowserScenario = async ({ chat, 
         await expectStorageValue(context, true);
         await expect(button).toHaveAttribute('aria-pressed', 'true');
         await expect(root).toBeVisible({ timeout: 20_000 });
+        await expect(chat.locator('html')).toHaveAttribute(
+          LITE_DOCUMENT_MARKER_ATTRIBUTE,
+          documentMarker
+        );
         await expect(chat.locator('html')).toHaveAttribute(
           LITE_NATIVE_DISCARDED_ATTRIBUTE,
           'true',

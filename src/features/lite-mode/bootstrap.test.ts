@@ -5,10 +5,8 @@ import {
   hasLiteModeSessionCooldown,
   isSupportedLiteModePage,
   LITE_MODE_NATIVE_RESTORE_KEY,
-  LITE_MODE_REPLAY_START_KEY,
   LITE_MODE_SESSION_COOLDOWN_KEY,
-  requestNativeChatRestore,
-  requestReplayLiteModeReload
+  requestNativeChatRestore
 } from './bootstrap';
 
 afterEach(async () => {
@@ -59,30 +57,6 @@ describe('Lite mode document-start bootstrap', () => {
       message: 'Loading chat'
     });
     expect(stored.requestedAt).toEqual(expect.any(Number));
-  });
-
-  it('marks replay Lite intent before scheduling its fresh chat document', async () => {
-    vi.useFakeTimers();
-    const controls: string[] = [];
-    const listener: EventListener = (event) => {
-      if (event instanceof CustomEvent && typeof event.detail === 'string') {
-        controls.push(event.detail);
-      }
-    };
-    window.addEventListener('ytcq:lite-chat-control', listener);
-
-    requestReplayLiteModeReload();
-
-    expect(Number(window.sessionStorage.getItem(LITE_MODE_REPLAY_START_KEY))).toBeGreaterThan(0);
-    await expect(chrome.storage.sync.get('liteModeEnabled')).resolves.toEqual({
-      liteModeEnabled: true
-    });
-    expect(controls.map((detail) => JSON.parse(detail))).toContainEqual({
-      consumer: 'lite',
-      enabled: true,
-      version: 1
-    });
-    window.removeEventListener('ytcq:lite-chat-control', listener);
   });
 
   it('consumes a post-reload fallback notice once', () => {

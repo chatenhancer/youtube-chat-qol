@@ -2,12 +2,11 @@
  * Controller for the optional Lite chat surface.
  *
  * YouTube continues to own the header, composer, transport, and chat mode. The
- * controller replaces only the native item list. Replay startup keeps an empty
- * native list hidden and connected just long enough to capture YouTube's
- * hydrated bootstrap rows; otherwise Lite discards it immediately so the
- * browser can reclaim its subtree. Returning to native chat reloads only the
- * chat document while a loading surface remains visible. Automatic failures
- * retain a one-document cooldown across that reload.
+ * controller replaces only the native item list and discards it once the
+ * shared feed has synchronously captured its startup state. Returning to
+ * native chat reloads only the chat document while a loading surface remains
+ * visible. Automatic failures retain a one-document cooldown across that
+ * reload.
  */
 import type { YouTubeChatFeedAction, YouTubeChatFeedTransportBatch } from '../../youtube/chat-feed/protocol';
 import { MAX_YOUTUBE_CHAT_FEED_CONTINUATION_TIMEOUT_MS } from '../../youtube/chat-feed/batch';
@@ -31,7 +30,6 @@ import {
   hasLiteModeSessionCooldown,
   isSupportedLiteModePage,
   requestNativeChatRestore,
-  requestReplayLiteModeReload,
   setLiteModeBootstrapIntent,
   setLiteModeSessionCooldown
 } from './bootstrap';
@@ -52,7 +50,6 @@ import {
   type YouTubeChatFeedBatch,
   type YouTubeChatFeedError
 } from '../../youtube/chat-feed/source';
-import { dispatchYouTubeChatFeedControl } from '../../youtube/chat-feed/control';
 import { getYouTubeChatFeedRecordState } from '../../youtube/chat-feed/records';
 
 export const LITE_MODE_FALLBACK_EVENT = 'ytcq:lite-mode-fallback';
@@ -62,15 +59,6 @@ const NATIVE_HIDE_TIMESTAMPS_ATTRIBUTE = 'hide-timestamps';
 const NATIVE_TIMESTAMP_TOGGLE_SELECTOR =
   'yt-live-chat-toggle-renderer tp-yt-paper-toggle-button';
 const NATIVE_TICKER_SELECTOR = 'yt-live-chat-ticker-renderer, #ticker';
-const NATIVE_REPLAY_SEED_SELECTOR = [
-  'yt-gift-message-view-model',
-  'yt-live-chat-membership-item-renderer',
-  'yt-live-chat-paid-message-renderer',
-  'yt-live-chat-paid-sticker-renderer',
-  'yt-live-chat-sponsorships-gift-purchase-announcement-renderer',
-  'yt-live-chat-sponsorships-gift-redemption-announcement-renderer',
-  'yt-live-chat-text-message-renderer'
-].join(',');
 const STARTUP_TIMEOUT_MS = 20_000;
 const REPLAY_STARTUP_TIMEOUT_MS = 45_000;
 const DEFAULT_SOURCE_TIMEOUT_MS = 35_000;
@@ -116,8 +104,6 @@ let sourceTimer = 0;
 let timestampSyncTimer = 0;
 let feedReady = false;
 let unreadableFeedBatchesWithoutProgress = 0;
-let replayNativeSeedPending = false;
-let replayNativeSeedCaptureRequested = false;
 let rowRenderedCallback: LiteChatRowRenderedCallback | null = null;
 let batchListeners = new AbortController();
 let unsubscribeChatFeed: (() => void) | null = null;
@@ -145,8 +131,6 @@ export function startLiteMode(options: StartLiteModeOptions = {}): void {
   documentUnloading = false;
   feedReady = false;
   unreadableFeedBatchesWithoutProgress = 0;
-  replayNativeSeedPending = false;
-  replayNativeSeedCaptureRequested = false;
   setLiteModeBootstrapIntent(true);
   store = createLiteChatStore();
   renderer = createLiteChatRenderer(store, {
@@ -161,9 +145,6 @@ export function startLiteMode(options: StartLiteModeOptions = {}): void {
   mountLiteRoot();
   const initialFeedState = getYouTubeChatFeedRecordState();
   const initialRecords = initialFeedState.records;
-  replayNativeSeedPending =
-    window.location.pathname === '/live_chat_replay' &&
-    initialRecords.length === 0;
   if (initialRecords.length) {
     applyStoreActions(
       initialRecords.map((record) => ({ record, type: 'upsert' })),
@@ -183,10 +164,10 @@ export function startLiteMode(options: StartLiteModeOptions = {}): void {
     consumer: 'lite',
     onBatch: handleLiteChatBatch,
     onError: handleLiteChatFeedError,
-    // The record store can become ready before YouTube mounts its native
-    // startup rows. If it is still empty, capture those rows synchronously
-    // while the native list is connected, immediately before discarding it.
-    requestInitial: initialRecords.length === 0
+    // Only request a snapshot when the shared feed has not initialized yet.
+    // A ready-but-empty replay can still have timed bootstrap actions queued;
+    // requesting rendered rows here would reset and discard that queue.
+    requestInitial: !initialFeedState.ready
   });
   document.addEventListener('click', handleNativeTimestampToggleClick, {
     capture: true,
@@ -204,17 +185,8 @@ export function startLiteMode(options: StartLiteModeOptions = {}): void {
     capture: true,
     signal: batchListeners.signal
   });
-  // Reuse records already captured before feature boot. A replay whose shared
-  // store is still empty may be between YouTube consuming its document data and
-  // hydrating the corresponding native rows. Keep that list hidden and
-  // connected until a rendered snapshot has copied the rows.
-  if (replayNativeSeedPending) {
-    preparePendingReplayNativeSeed();
-  } else {
-    discardNativeListIfPresent();
-  }
-  // The root changes size when the native list disappears. Pin once against
-  // that final layout so restored history starts at the live edge.
+  discardNativeListIfPresent();
+  // Pin once after the native list has been removed.
   renderer?.scrollToLiveEdge();
   nativeUiObserver = new MutationObserver(handleNativeUiMutations);
   refreshNativeUiObserverTargets();
@@ -290,17 +262,6 @@ export function refreshLiteMode(
     stopLiteMode('explicit');
     return;
   }
-  if (
-    deliberateRetry &&
-    window.location.pathname === '/live_chat_replay' &&
-    !active &&
-    !isNativeFeedDiscarded()
-  ) {
-    clearLiteModeSessionCooldown();
-    sessionDisabled = false;
-    requestReplayLiteModeReload();
-    return;
-  }
   startLiteMode({ clearCooldown: deliberateRetry });
 }
 
@@ -364,28 +325,16 @@ function handleLiteChatBatch(batch: YouTubeChatFeedBatch): void {
       failLiteMode('unreadable-feed');
       return;
     }
-    if (isSourceHeartbeat(batch.source)) markLiteModeFeedReady();
-  }
-  if (
-    replayNativeSeedCaptureRequested &&
-    batch.source === 'initial' &&
-    isTransportDelivery
-  ) {
-    replayNativeSeedCaptureRequested = false;
   }
   applyStoreActions(batch.actions, batch.source);
   if (
-    replayNativeSeedPending &&
-    batch.source === 'initial' &&
-    batch.actions.some((action) => action.type === 'upsert')
+    (isTransportDelivery && isSourceHeartbeat(batch.source)) ||
+    (
+      window.location.pathname === '/live_chat_replay' &&
+      (batch.source === 'initial' || batch.delivery === 'replay-timeline')
+    )
   ) {
-    completePendingReplayNativeSeed();
-  } else if (
-    replayNativeSeedPending &&
-    isTransportDelivery &&
-    batch.source === 'replay'
-  ) {
-    requestPendingReplayNativeSeedCapture();
+    markLiteModeFeedReady(isTransportDelivery && batch.source === 'replay');
   }
   refreshLiteMemoryDiagnostics(isTransportDelivery);
   if (!active) return;
@@ -425,7 +374,7 @@ function applyStoreActions(
 }
 
 function discardNativeListIfPresent(): void {
-  if (!active || replayNativeSeedPending) return;
+  if (!active) return;
   const currentNativeList = findNativeList();
   if (!currentNativeList) return;
   const timestampsVisible = currentNativeList.classList.contains(NATIVE_PENDING_SEED_CLASS)
@@ -437,44 +386,6 @@ function discardNativeListIfPresent(): void {
   currentNativeList.setAttribute('aria-hidden', 'true');
   discardNativeList(currentNativeList);
   refreshLiteMemoryDiagnostics(true);
-}
-
-function preparePendingReplayNativeSeed(): void {
-  if (!active || !replayNativeSeedPending) return;
-  const nativeList = findNativeList();
-  if (!nativeList) return;
-  const root = renderer?.root;
-  if (root && root.nextSibling !== nativeList) nativeList.before(root);
-  nativeList.classList.add(NATIVE_PENDING_SEED_CLASS);
-  nativeList.setAttribute('aria-hidden', 'true');
-  requestPendingReplayNativeSeedCapture();
-}
-
-function requestPendingReplayNativeSeedCapture(): void {
-  if (
-    !active ||
-    !replayNativeSeedPending ||
-    replayNativeSeedCaptureRequested
-  ) {
-    return;
-  }
-  const nativeList = findNativeList();
-  if (!nativeList?.querySelector(NATIVE_REPLAY_SEED_SELECTOR)) return;
-
-  replayNativeSeedCaptureRequested = true;
-  dispatchYouTubeChatFeedControl({
-    consumer: 'lite',
-    enabled: true,
-    requestRendered: true
-  });
-}
-
-function completePendingReplayNativeSeed(): void {
-  replayNativeSeedPending = false;
-  replayNativeSeedCaptureRequested = false;
-  markLiteModeFeedReady();
-  discardNativeListIfPresent();
-  renderer?.scrollToLiveEdge();
 }
 
 export function handleLiteModeDomMutations(mutations: readonly MutationRecord[]): void {
@@ -493,9 +404,7 @@ export function handleLiteModeDomMutations(mutations: readonly MutationRecord[])
     failLiteMode('root-replaced');
     return;
   }
-  if (replayNativeSeedPending) {
-    preparePendingReplayNativeSeed();
-  } else if (mutations.some(mutationAddsNativeList)) {
+  if (mutations.some(mutationAddsNativeList)) {
     discardNativeListIfPresent();
   }
 }
@@ -746,8 +655,6 @@ function teardownLiteMode(clearIntent: boolean): void {
   resetDetachedNativeListDiagnostics();
   feedReady = false;
   unreadableFeedBatchesWithoutProgress = 0;
-  replayNativeSeedPending = false;
-  replayNativeSeedCaptureRequested = false;
   documentUnloading = false;
   if (clearIntent) clearLiteModeBootstrapIntent();
 }
@@ -775,10 +682,19 @@ function clearTimestampSyncTimer(): void {
   timestampSyncTimer = 0;
 }
 
-function markLiteModeFeedReady(): void {
-  if (feedReady || replayNativeSeedPending) return;
+function markLiteModeFeedReady(allowEmptyReplay = false): void {
   feedReady = true;
   clearStartupTimer();
+  // Parsing the replay bootstrap proves the feed works, but an empty bootstrap
+  // does not describe the requested player position. Keep the loading surface
+  // until a row arrives or YouTube answers that position's replay request.
+  if (
+    window.location.pathname === '/live_chat_replay' &&
+    !store?.getSize() &&
+    !allowEmptyReplay
+  ) {
+    return;
+  }
   renderer?.setConnectionState('connected');
 }
 

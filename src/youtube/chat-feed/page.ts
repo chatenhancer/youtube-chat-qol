@@ -29,6 +29,7 @@ import {
 } from './page-events';
 import {
   captureYouTubeChatFeedInitialSnapshot,
+  captureYouTubeChatFeedRenderedSnapshot,
   createYouTubeChatFeedStartupBuffer,
   MAX_YOUTUBE_CHAT_FEED_SEED_ACTIONS,
   type YouTubeChatFeedStartupBuffer
@@ -37,7 +38,7 @@ import { isYouTubeChatFeedPath } from './pages';
 
 const YOUTUBE_CHAT_FEED_TRANSPORT_STATE_KEY = Symbol.for('ytcq:lite-chat-transport:v1');
 // Long-lived tabs replace an older adapter when its control behavior changes.
-const YOUTUBE_CHAT_FEED_TRANSPORT_REVISION = 4 as const;
+const YOUTUBE_CHAT_FEED_TRANSPORT_REVISION = 5 as const;
 const MAX_UNRESOLVED_CHAT_FEED_RESPONSES = 2;
 
 interface PendingChatFeedResponse {
@@ -261,10 +262,14 @@ function queueInitialYouTubeChatFeedData(
   receivedAt: number,
   receiverReady: boolean
 ): void {
-  const snapshot = state.startup.beginInitialSnapshot()
-    // Read native renderer data synchronously while it is still connected.
+  const capture = state.startup.beginInitialSnapshot();
+  const snapshot = capture === 'bootstrap'
     ? captureYouTubeChatFeedInitialSnapshot()
-    : null;
+    : capture === 'rendered'
+      // A later re-seed must reflect the current document, not its stale
+      // one-time ytInitialData bootstrap.
+      ? captureYouTubeChatFeedRenderedSnapshot()
+      : null;
   enqueueYouTubeChatFeedParse(state, generation, () => {
     if (snapshot) state.startup.addInitialSnapshot(snapshot);
     if (receiverReady) flushYouTubeChatFeedStartupBuffer(state, generation, receivedAt);
@@ -276,7 +281,7 @@ function queueRenderedYouTubeChatFeedData(
   generation: number,
   receivedAt: number
 ): void {
-  const snapshot = captureYouTubeChatFeedInitialSnapshot();
+  const snapshot = captureYouTubeChatFeedRenderedSnapshot();
   void enqueueYouTubeChatFeedParse(state, generation, () =>
     emitYouTubeChatFeedBatch(state, {
       actions: snapshot.actions,

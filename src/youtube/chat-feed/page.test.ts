@@ -18,7 +18,6 @@ describe('YouTube chat feed page transport', () => {
     vi.useRealTimers();
     cleanupLiteChatTransport();
     document.documentElement.removeAttribute(YOUTUBE_CHAT_FEED_BOOTSTRAP_INTENT_ATTRIBUTE);
-    Reflect.deleteProperty(globalThis, 'ytInitialData');
     document.body.replaceChildren();
   });
 
@@ -32,20 +31,18 @@ describe('YouTube chat feed page transport', () => {
     };
     window.addEventListener(YOUTUBE_CHAT_FEED_BATCH_EVENT, listener);
 
-    Object.assign(globalThis, {
-      ytInitialData: {
-        contents: {
-          liveChatRenderer: {
-            contents: {
-              liveChatItemListRenderer: {
-                contents: [{
-                  liveChatTextMessageRenderer: {
-                    id: 'initial-message',
-                    authorName: { simpleText: '@Initial' },
-                    message: { simpleText: 'Initial text' }
-                  }
-                }]
-              }
+    appendYouTubeInitialData({
+      contents: {
+        liveChatRenderer: {
+          contents: {
+            liveChatItemListRenderer: {
+              contents: [{
+                liveChatTextMessageRenderer: {
+                  id: 'initial-message',
+                  authorName: { simpleText: '@Initial' },
+                  message: { simpleText: 'Initial text' }
+                }
+              }]
             }
           }
         }
@@ -137,6 +134,110 @@ describe('YouTube chat feed page transport', () => {
     window.removeEventListener(YOUTUBE_CHAT_FEED_BATCH_EVENT, listener);
   });
 
+  it('uses timed replay bootstrap data once, then re-seeds from current rendered rows', async () => {
+    vi.resetModules();
+    window.history.replaceState({}, '', '/live_chat_replay');
+    const batches: YouTubeChatFeedTransportBatch[] = [];
+    const listener = collectLiteChatBatches(batches);
+    window.addEventListener(YOUTUBE_CHAT_FEED_BATCH_EVENT, listener);
+    window.fetch = vi.fn(() => Promise.resolve(jsonResponse({}))) as typeof window.fetch;
+    appendYouTubeInitialData(replayPayload(
+      'bootstrap-future',
+      302_123,
+      'must-not-cross',
+      'must-not-cross'
+    ));
+    document.body.append(createNativeMessage('startup-rendered', 'Startup rendered row'));
+
+    await import('./page');
+    window.dispatchEvent(new CustomEvent(YOUTUBE_CHAT_FEED_CONTROL_EVENT, {
+      detail: JSON.stringify({
+        consumer: 'records',
+        enabled: true,
+        requestInitial: true,
+        version: 1
+      })
+    }));
+    await waitForLiteChatBatchCount(batches, 1);
+
+    expect(batches[0]).toMatchObject({
+      actions: [
+        { type: 'reset' },
+        {
+          record: { id: 'bootstrap-future' },
+          replayOffsetMs: 302_123,
+          type: 'upsert'
+        }
+      ],
+      source: 'initial'
+    });
+    expect(JSON.stringify(batches[0])).not.toContain('startup-rendered');
+
+    document.body.replaceChildren(createNativeMessage('seek-rendered', 'Current seek row'));
+    window.dispatchEvent(new CustomEvent(YOUTUBE_CHAT_FEED_CONTROL_EVENT, {
+      detail: JSON.stringify({
+        consumer: 'records',
+        enabled: true,
+        requestInitial: true,
+        version: 1
+      })
+    }));
+    await waitForLiteChatBatchCount(batches, 2);
+
+    expect(batches[1]).toMatchObject({
+      actions: [
+        { type: 'reset' },
+        { record: { id: 'seek-rendered' }, type: 'upsert' }
+      ],
+      source: 'initial'
+    });
+    expect(JSON.stringify(batches[1])).not.toContain('bootstrap-future');
+    window.removeEventListener(YOUTUBE_CHAT_FEED_BATCH_EVENT, listener);
+  });
+
+  it('recaptures embedded replay bootstrap data after an empty document-start snapshot', async () => {
+    vi.resetModules();
+    window.history.replaceState({}, '', '/live_chat_replay');
+    const batches: YouTubeChatFeedTransportBatch[] = [];
+    const listener = collectLiteChatBatches(batches);
+    window.addEventListener(YOUTUBE_CHAT_FEED_BATCH_EVENT, listener);
+    window.fetch = vi.fn(() => Promise.resolve(jsonResponse({}))) as typeof window.fetch;
+    document.documentElement.setAttribute(YOUTUBE_CHAT_FEED_BOOTSTRAP_INTENT_ATTRIBUTE, 'true');
+
+    await import('./page');
+    expect(batches).toEqual([]);
+
+    appendYouTubeInitialData(replayPayload(
+      'embedded-future',
+      301_310,
+      'must-not-cross',
+      'must-not-cross'
+    ));
+    window.dispatchEvent(new CustomEvent(YOUTUBE_CHAT_FEED_CONTROL_EVENT, {
+      detail: JSON.stringify({
+        consumer: 'records',
+        enabled: true,
+        requestInitial: true,
+        version: 1
+      })
+    }));
+    await waitForLiteChatBatchCount(batches, 1);
+
+    expect(batches[0]).toMatchObject({
+      actions: [
+        { type: 'reset' },
+        {
+          record: { id: 'embedded-future' },
+          replayOffsetMs: 301_310,
+          type: 'upsert'
+        }
+      ],
+      source: 'initial'
+    });
+    expect(JSON.stringify(batches)).not.toContain('must-not-cross');
+    window.removeEventListener(YOUTUBE_CHAT_FEED_BATCH_EVENT, listener);
+  });
+
   it('marks live client-message replacements as history snapshots', async () => {
     vi.resetModules();
     const batches: YouTubeChatFeedTransportBatch[] = [];
@@ -187,6 +288,12 @@ describe('YouTube chat feed page transport', () => {
     await waitForLiteChatBatchCount(batches, 1);
     batches.length = 0;
 
+    appendYouTubeInitialData(replayPayload(
+      'stale-bootstrap',
+      1_000,
+      'must-not-cross',
+      'must-not-cross'
+    ));
     document.body.append(
       createNativeMessage('rendered-first', 'First rendered row'),
       createNativeMessage('rendered-second', 'Second rendered row')
@@ -211,6 +318,7 @@ describe('YouTube chat feed page transport', () => {
     });
     expect(batches[0].actions).not.toContainEqual({ type: 'reset' });
     expect(batches[0].snapshot).toBeUndefined();
+    expect(JSON.stringify(batches[0])).not.toContain('stale-bootstrap');
     window.removeEventListener(YOUTUBE_CHAT_FEED_BATCH_EVENT, listener);
   });
 
@@ -323,7 +431,7 @@ describe('YouTube chat feed page transport', () => {
       revision?: number;
       wrapper?: typeof window.fetch;
     };
-    expect(replacementState.revision).toBe(4);
+    expect(replacementState.revision).toBe(5);
     expect(replacementState.consumers).toBeInstanceOf(Set);
     expect(window.fetch).toBe(replacementState.wrapper);
     expect(window.fetch).not.toBe(legacyWrapper);
@@ -345,7 +453,7 @@ describe('YouTube chat feed page transport', () => {
     window.removeEventListener(YOUTUBE_CHAT_FEED_BATCH_EVENT, listener);
   });
 
-  it('seeds Lite mode from sanitized native rows when the initial global has no backlog', async () => {
+  it('seeds Lite mode from sanitized native rows when embedded data has no backlog', async () => {
     vi.resetModules();
     document.body.replaceChildren();
     const batches: YouTubeChatFeedTransportBatch[] = [];
@@ -403,42 +511,6 @@ describe('YouTube chat feed page transport', () => {
       source: 'initial'
     });
     expect(JSON.stringify(batches)).not.toContain('must-not-cross');
-    window.removeEventListener(YOUTUBE_CHAT_FEED_BATCH_EVENT, listener);
-  });
-
-  it('uses native history when the optional initial-data global cannot be read', async () => {
-    vi.resetModules();
-    const batches: YouTubeChatFeedTransportBatch[] = [];
-    const listener = (event: Event) => {
-      if (event instanceof CustomEvent && typeof event.detail === 'string') {
-        batches.push(JSON.parse(event.detail) as YouTubeChatFeedTransportBatch);
-      }
-    };
-    window.addEventListener(YOUTUBE_CHAT_FEED_BATCH_EVENT, listener);
-    window.fetch = vi.fn(() => Promise.resolve(jsonResponse({}))) as typeof window.fetch;
-    Object.defineProperty(globalThis, 'ytInitialData', {
-      configurable: true,
-      get: () => {
-        throw new Error('Initial data is unavailable');
-      }
-    });
-    document.body.append(createNativeMessage('native-without-global', 'Native fallback history'));
-
-    await import('./page');
-    window.dispatchEvent(new CustomEvent(YOUTUBE_CHAT_FEED_CONTROL_EVENT, {
-      detail: JSON.stringify({ consumer: 'lite', enabled: true, requestInitial: true, version: 1 })
-    }));
-    await flushAsyncWork();
-
-    expect(batches).toHaveLength(1);
-    expect(batches[0]).toMatchObject({
-      actions: [
-        { type: 'reset' },
-        { record: { id: 'native-without-global' }, type: 'upsert' }
-      ],
-      source: 'initial'
-    });
-    expect(batches[0].fatalErrors).toBeUndefined();
     window.removeEventListener(YOUTUBE_CHAT_FEED_BATCH_EVENT, listener);
   });
 
@@ -1158,6 +1230,13 @@ function replayResponse(
     replayContinuation,
     seekContinuation
   ));
+}
+
+function appendYouTubeInitialData(payload: unknown): void {
+  const script = document.createElement('script');
+  script.type = 'application/json';
+  script.textContent = `window["ytInitialData"] = ${JSON.stringify(payload)};`;
+  document.body.append(script);
 }
 
 function replayPayload(
