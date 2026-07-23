@@ -154,6 +154,57 @@ export const liteModeToggleAndRestoreScenario: BrowserScenario = async ({ chat, 
         await expectLiteAtLiveEdge(root);
       });
 
+      await test.step('Open Lite message actions without leaving the chat viewport', async () => {
+        const targetAttribute = 'data-ytcq-test-lite-menu-target';
+        const latestRow = root.locator('.ytcq-lite-message-text').last();
+        await latestRow.evaluate(
+          (row, attribute) => row.setAttribute(attribute, ''),
+          targetAttribute
+        );
+        const row = root.locator(`[${targetAttribute}]`);
+        const actionButton = row.locator('.ytcq-lite-message-menu-button');
+        const menu = chat.locator('.ytcq-lite-context-menu');
+        try {
+          await row.hover();
+          await expect(actionButton).toBeVisible();
+          await expect(actionButton).toHaveAttribute('aria-haspopup', 'menu');
+          await expect(actionButton).toHaveAttribute('aria-expanded', 'false');
+
+          await row.locator('#message').click();
+          await expect(menu).toBeVisible();
+          await menu.locator('[data-ytcq-action="save-message"] .ytcq-paper-item').press('Escape');
+          await expect(menu).toHaveCount(0);
+
+          await actionButton.press('Enter');
+          await expect(menu).toBeVisible();
+          await expect(actionButton).toHaveAttribute('aria-expanded', 'true');
+          await expect(menu.locator('[data-ytcq-action="save-message"]')).toBeVisible();
+          await expect(menu.locator('[data-ytcq-action="mention"]')).toBeVisible();
+          await expect(menu.locator('[data-ytcq-action="quote"]')).toBeVisible();
+          const bounds = await menu.evaluate((element) => {
+            const rect = element.getBoundingClientRect();
+            return {
+              inside:
+                rect.left >= 0 &&
+                rect.top >= 0 &&
+                rect.right <= window.innerWidth &&
+                rect.bottom <= window.innerHeight
+            };
+          });
+          expect(bounds.inside).toBe(true);
+
+          await menu.locator('[data-ytcq-action="save-message"] .ytcq-paper-item').press('Escape');
+          await expect(menu).toHaveCount(0);
+          await expect(actionButton).toHaveAttribute('aria-expanded', 'false');
+        } finally {
+          await row
+            .evaluate((element, attribute) => {
+              element.removeAttribute(attribute);
+            }, targetAttribute)
+            .catch(() => undefined);
+        }
+      });
+
       await test.step('Disable Lite mode and restore native chat', async () => {
         await button.click();
         await expectStorageValue(context, false);

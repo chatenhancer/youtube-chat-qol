@@ -97,9 +97,10 @@
   column-gap: 16px;
   flex: 0 0 auto;
   margin: 0;
-  padding: 4px 24px;
+  padding: 4px 48px 4px 24px;
   color: var(--ytcq-lite-text, var(--yt-live-chat-primary-text-color, inherit));
   background: var(--ytcq-lite-row-background);
+  cursor: pointer;
 }
 
 .ytcq-lite-message-enter {
@@ -113,6 +114,66 @@
     var(--ytcq-lite-row-background, transparent),
     currentColor 6%
   );
+}
+
+.ytcq-lite-message-menu {
+  position: absolute;
+  top: 2px;
+  right: 12px;
+  display: inline-flex;
+}
+
+.ytcq-lite-message-menu-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 28px;
+  height: 28px;
+  padding: 4px;
+  border: 0;
+  border-radius: 50%;
+  color: var(--yt-live-chat-secondary-text-color, #606060);
+  background: transparent;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 120ms ease,
+    background-color 120ms ease;
+}
+
+.ytcq-lite-message:hover .ytcq-lite-message-menu-button,
+.ytcq-lite-message:focus-within .ytcq-lite-message-menu-button,
+.ytcq-lite-message-menu-button[aria-expanded="true"] {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.ytcq-lite-message-menu-button:hover,
+.ytcq-lite-message-menu-button:focus-visible {
+  color: var(--yt-live-chat-primary-text-color, currentColor);
+  background: var(--yt-spec-touch-response, rgba(128, 128, 128, 0.16));
+  outline: none;
+}
+
+.ytcq-lite-message-menu-button:focus-visible {
+  box-shadow: 0 0 0 2px var(--yt-spec-call-to-action, #065fd4);
+}
+
+.ytcq-lite-message-menu-button svg {
+  display: block;
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+  pointer-events: none;
+}
+
+@media (hover: none) {
+  .ytcq-lite-message-menu-button {
+    opacity: 0.72;
+    pointer-events: auto;
+  }
 }
 
 .ytcq-lite-author-photo {

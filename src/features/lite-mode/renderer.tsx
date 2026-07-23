@@ -8,6 +8,7 @@
  */
 import { jsx, el } from '../../shared/jsx-dom';
 import { t } from '../../shared/i18n';
+import { createSvgIcon, MATERIAL_ICON_VIEW_BOX, MORE_VERTICAL_ICON_PATH } from '../../shared/icons';
 import { createLoadingSpinner } from '../../shared/loading-spinner';
 import {
   CHAT_LIVE_EDGE_RELEASE_EVENT,
@@ -663,7 +664,21 @@ export function renderLiteChatMessageRow(row: HTMLElement, record: YouTubeChatMe
     content.append(messageContainer);
   }
 
-  row.replaceChildren(avatar, content);
+  const menu = el<HTMLSpanElement>(
+    <span id="menu" class="ytcq-lite-message-menu">
+      <button
+        type="button"
+        class="ytcq-lite-message-menu-button"
+        aria-haspopup="menu"
+        aria-expanded="false"
+        aria-label={`${t('saveMessage')} / ${t('mention')} / ${t('quote')}`}
+      >
+        {createSvgIcon(MATERIAL_ICON_VIEW_BOX, MORE_VERTICAL_ICON_PATH)}
+      </button>
+    </span>
+  );
+
+  row.replaceChildren(avatar, content, menu);
 }
 
 function createAuthorAvatar(author: YouTubeChatAuthor | undefined): HTMLElement {

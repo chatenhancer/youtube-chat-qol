@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { jumpToChatMessage } from '../message-jump';
+import { MATERIAL_ICON_VIEW_BOX, MORE_VERTICAL_ICON_PATH } from '../../shared/icons';
 import type { YouTubeChatMessageRecord } from '../../youtube/chat-feed/protocol';
 import { argbToCss, createLiteChatRenderer, createLiteChatMessageRow } from './renderer';
 import { createLiteChatStore } from './store';
@@ -50,6 +51,12 @@ describe('Lite chat renderer', () => {
       width: 24
     });
     expect(row.querySelector('.ytcq-lite-emoji')?.getAttribute('data-emoji-id')).toBe('wave-id');
+    const menuButton = row.querySelector<HTMLButtonElement>('.ytcq-lite-message-menu-button')!;
+    expect(menuButton.getAttribute('aria-haspopup')).toBe('menu');
+    expect(menuButton.getAttribute('aria-expanded')).toBe('false');
+    expect(menuButton.getAttribute('aria-label')).toBe('Save message / Mention / Quote');
+    expect(menuButton.querySelector('svg')?.getAttribute('viewBox')).toBe(MATERIAL_ICON_VIEW_BOX);
+    expect(menuButton.querySelector('path')?.getAttribute('d')).toBe(MORE_VERTICAL_ICON_PATH);
   });
 
   it('renders a native-style moderator shield instead of badge text', () => {

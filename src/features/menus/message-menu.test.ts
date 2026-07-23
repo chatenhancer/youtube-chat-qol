@@ -129,6 +129,153 @@ describe('message context menu integration', () => {
     expect(replyMocks.replyToMessage).toHaveBeenNthCalledWith(2, message, { quote: true });
   });
 
+  it('opens one keyboard-accessible Lite menu with the shared message actions', () => {
+    const firstMessage = createLiteChatMessage();
+    const secondMessage = createLiteChatMessage();
+    document.body.append(firstMessage, secondMessage);
+    wireMessageContext(firstMessage);
+    wireMessageContext(secondMessage);
+
+    const firstButton = firstMessage.querySelector<HTMLButtonElement>('button')!;
+    const secondButton = secondMessage.querySelector<HTMLButtonElement>('button')!;
+    firstButton.click();
+
+    const firstMenu = document.querySelector<HTMLElement>('.ytcq-lite-context-menu')!;
+    expect(firstButton.getAttribute('aria-expanded')).toBe('true');
+    expect(firstButton.getAttribute('aria-controls')).toBe('ytcq-lite-context-menu');
+    expect(firstMenu.getAttribute('role')).toBe('menu');
+    expect(firstMenu.querySelector('[data-ytcq-action="save-message"]')).not.toBeNull();
+    expect(firstMenu.querySelector('[data-ytcq-action="mention"]')).not.toBeNull();
+    expect(firstMenu.querySelector('[data-ytcq-action="quote"]')).not.toBeNull();
+    expect(document.activeElement).toBe(
+      firstMenu.querySelector('[data-ytcq-action="save-message"] .ytcq-paper-item')
+    );
+
+    secondButton.click();
+
+    expect(document.querySelectorAll('.ytcq-lite-context-menu')).toHaveLength(1);
+    expect([
+      firstButton.getAttribute('aria-expanded'),
+      secondButton.getAttribute('aria-expanded')
+    ]).toEqual(['false', 'true']);
+    expect(firstButton.hasAttribute('aria-controls')).toBe(false);
+  });
+
+  it('targets Lite messages and closes the custom menu after each action', () => {
+    const message = createLiteChatMessage();
+    document.body.append(message);
+    wireMessageContext(message);
+    const button = message.querySelector<HTMLButtonElement>('button')!;
+
+    button.click();
+    document.querySelector<HTMLElement>('[data-ytcq-action="save-message"]')!.click();
+    expect(bookmarkMocks.toggleChatBookmark).toHaveBeenCalledWith(message);
+    expect(document.querySelector('.ytcq-lite-context-menu')).toBeNull();
+
+    button.click();
+    document.querySelector<HTMLElement>('[data-ytcq-action="quote"]')!.click();
+    expect(replyMocks.replyToMessage).toHaveBeenNthCalledWith(1, message, { quote: true });
+    expect(document.querySelector('.ytcq-lite-context-menu')).toBeNull();
+
+    button.click();
+    document.querySelector<HTMLElement>('[data-ytcq-action="mention"]')!.click();
+    expect(replyMocks.replyToMessage).toHaveBeenNthCalledWith(2, message, { quote: false });
+    expect(document.querySelector('.ytcq-lite-context-menu')).toBeNull();
+    expect(button.getAttribute('aria-expanded')).toBe('false');
+  });
+
+  it('opens Lite actions beside a non-interactive click on the message row', () => {
+    const message = createLiteChatMessage();
+    document.body.append(message);
+    wireMessageContext(message);
+    vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function (
+      this: HTMLElement
+    ) {
+      return this.classList.contains('ytcq-lite-context-menu')
+        ? rect({ height: 80, width: 160 })
+        : rect({});
+    });
+
+    message
+      .querySelector<HTMLElement>('#message')!
+      .dispatchEvent(new MouseEvent('click', {
+        bubbles: true,
+        clientX: 120,
+        clientY: 150
+      }));
+    const menu = document.querySelector<HTMLElement>('.ytcq-lite-context-menu')!;
+    expect(menu.style.left).toBe('124px');
+    expect(menu.style.top).toBe('154px');
+
+    document.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Escape' }));
+    message
+      .querySelector<HTMLElement>('.row-control')!
+      .dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(document.querySelector('.ytcq-lite-context-menu')).toBeNull();
+  });
+
+  it('dismisses the Lite menu outside or with Escape and restores keyboard focus', () => {
+    const message = createLiteChatMessage();
+    const outside = document.createElement('button');
+    document.body.append(message, outside);
+    wireMessageContext(message);
+    const button = message.querySelector<HTMLButtonElement>('button')!;
+
+    button.click();
+    outside.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+    expect(document.querySelector('.ytcq-lite-context-menu')).toBeNull();
+
+    button.click();
+    document.dispatchEvent(
+      new KeyboardEvent('keydown', {
+        bubbles: true,
+        key: 'Escape'
+      })
+    );
+    expect(document.querySelector('.ytcq-lite-context-menu')).toBeNull();
+    expect(document.activeElement).toBe(button);
+  });
+
+  it('keeps the Lite menu fixed while the feed scrolls', () => {
+    const message = createLiteChatMessage();
+    document.body.append(message);
+    wireMessageContext(message);
+    const button = message.querySelector<HTMLButtonElement>('button')!;
+    button.getBoundingClientRect = () =>
+      rect({ bottom: 38, height: 28, left: 10, right: 38, top: 10, width: 28 });
+
+    button.click();
+    const menu = document.querySelector<HTMLElement>('.ytcq-lite-context-menu')!;
+    const initialPosition = { left: menu.style.left, top: menu.style.top };
+    button.getBoundingClientRect = () =>
+      rect({ bottom: 198, height: 28, left: 110, right: 138, top: 170, width: 28 });
+    document.dispatchEvent(new Event('scroll'));
+
+    expect(document.querySelector('.ytcq-lite-context-menu')).toBe(menu);
+    expect({ left: menu.style.left, top: menu.style.top }).toEqual(initialPosition);
+  });
+
+  it('keeps Lite actions usable when the bounded feed recycles the selected row', () => {
+    const message = createLiteChatMessage();
+    message.dataset.messageId = 'lite-message';
+    document.body.append(message);
+    wireMessageContext(message);
+    const button = message.querySelector<HTMLButtonElement>('button')!;
+
+    button.click();
+    message.remove();
+    document.dispatchEvent(new Event('scroll'));
+    expect(document.querySelector('.ytcq-lite-context-menu')).not.toBeNull();
+
+    document.querySelector<HTMLElement>('[data-ytcq-action="quote"]')!.click();
+
+    const target = replyMocks.replyToMessage.mock.calls[0]?.[0] as HTMLElement;
+    expect(target).not.toBe(message);
+    expect(target.dataset.messageId).toBe('lite-message');
+    expect(replyMocks.replyToMessage).toHaveBeenCalledWith(target, { quote: true });
+    expect(document.querySelector('.ytcq-lite-context-menu')).toBeNull();
+  });
+
   it('does not toggle bookmarks when no active connected message is available', () => {
     const menu = createContextMenu();
     document.body.append(menu);
@@ -293,6 +440,25 @@ function createChatMessage(): HTMLElement {
   const message = document.createElement('yt-live-chat-text-message-renderer');
   message.innerHTML = `
     <button id="menu"></button>
+    <span id="author-name">@ViewerOne</span>
+    <span id="message">hello chat</span>
+  `;
+  return message;
+}
+
+function createLiteChatMessage(): HTMLElement {
+  const message = document.createElement('article');
+  message.className = 'ytcq-lite-message';
+  message.innerHTML = `
+    <span id="menu">
+      <button
+        type="button"
+        class="ytcq-lite-message-menu-button"
+        aria-haspopup="menu"
+        aria-expanded="false"
+      ></button>
+    </span>
+    <button type="button" class="row-control"></button>
     <span id="author-name">@ViewerOne</span>
     <span id="message">hello chat</span>
   `;
