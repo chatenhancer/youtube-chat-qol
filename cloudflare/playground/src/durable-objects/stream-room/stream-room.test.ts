@@ -592,7 +592,7 @@ describe('playground stream room', () => {
     expect(console.warn).not.toHaveBeenCalledWith('[playground] game_win_record_failed', expect.anything());
   });
 
-  it('also skips a human win when the game includes a built-in Computer player', async () => {
+  it('records a human win against a built-in Computer player', async () => {
     const storage = new FakeDurableObjectStorage();
     const { playerStats, room, state } = createRoomHarness(storage);
     const alice = createSession('alice-connection');
@@ -614,14 +614,15 @@ describe('playground stream room', () => {
 
     await state.flushWaitUntil();
 
-    expect(playerStats.getWins(alice.userId, 'chess')).toBe(0);
-    expect(console.info).toHaveBeenCalledWith('[playground] game_win_record_skipped', expect.objectContaining({
-      event: 'game_win_record_skipped',
+    expect(playerStats.getWins(alice.userId, 'chess')).toBe(1);
+    expect(playerStats.getWins(computer.userId, 'chess')).toBe(0);
+    expect(console.info).toHaveBeenCalledWith('[playground] game_win_recorded', expect.objectContaining({
+      event: 'game_win_recorded',
       gameType: 'chess',
-      reason: 'computerPlayer',
-      service: 'chat-enhancer-playground'
+      service: 'chat-enhancer-playground',
+      wins: 1
     }));
-    expect(console.info).not.toHaveBeenCalledWith('[playground] game_win_recorded', expect.objectContaining({
+    expect(console.info).not.toHaveBeenCalledWith('[playground] game_win_record_skipped', expect.objectContaining({
       gameType: 'chess'
     }));
   });

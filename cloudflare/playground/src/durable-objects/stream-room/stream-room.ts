@@ -437,10 +437,7 @@ export class StreamRoom {
   }
 
   private recordGlobalGameWin(game: GameRecord, winnerUserId: string): void {
-    const hasComputerPlayer = getGameModuleForRecord(game)
-      .getRecipientUserIds(game)
-      .some(isPlaygroundComputerUserId);
-    if (hasComputerPlayer) {
+    if (isPlaygroundComputerUserId(winnerUserId)) {
       this.logEvent('game_win_record_skipped', {
         game: shortLogId(game.gameId),
         gameType: game.gameType,
