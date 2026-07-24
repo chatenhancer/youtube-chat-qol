@@ -196,6 +196,80 @@ describe('playground player stats', () => {
     });
   });
 
+  it('stores abandoned matches and excludes them from every player total', async () => {
+    const storage = new FakeDurableObjectStorage();
+    const state = new FakeDurableObjectState(storage);
+    const stats = new PlayerStats(state as unknown as DurableObjectState);
+    const match = createMatch({
+      abandonedByUserId: 'user-2',
+      finishReason: 'playerLeft',
+      matchId: 'match-abandoned',
+      winnerUserId: null
+    });
+
+    const first = await recordMatch(stats, match);
+    const repeated = await recordMatch(stats, match);
+    const conflictingQuitter = await readError(recordMatch(stats, {
+      ...match,
+      abandonedByUserId: 'user-1'
+    }));
+
+    await expect(first.json()).resolves.toMatchObject({
+      result: {
+        matchId: 'match-abandoned',
+        recorded: true
+      }
+    });
+    await expect(repeated.json()).resolves.toMatchObject({
+      result: {
+        matchId: 'match-abandoned',
+        recorded: false
+      }
+    });
+    expect(conflictingQuitter).toMatchObject({
+      body: {
+        error: {
+          code: 'match_conflict'
+        }
+      },
+      status: 409
+    });
+    await expect(getPlayerStats(createPlayerStatsEnv(stats), 'user-1')).resolves.toEqual({
+      draws: 0,
+      games: {},
+      losses: 0,
+      played: 0,
+      userId: 'user-1',
+      wins: 0
+    });
+    await expect(getPlayerStats(createPlayerStatsEnv(stats), 'user-2')).resolves.toEqual({
+      draws: 0,
+      games: {},
+      losses: 0,
+      played: 0,
+      userId: 'user-2',
+      wins: 0
+    });
+    expect(storage.fakeSql.query<{
+      outcome: string | null;
+      user_id: string;
+    }>(`
+      SELECT user_id, outcome
+      FROM match_participants_v1
+      WHERE match_id = ?
+      ORDER BY user_id
+    `, match.matchId)).toEqual([
+      {
+        outcome: null,
+        user_id: 'user-1'
+      },
+      {
+        outcome: 'abandoned',
+        user_id: 'user-2'
+      }
+    ]);
+  });
+
   it('validates durable object match requests', async () => {
     const storage = new FakeDurableObjectStorage();
     const state = new FakeDurableObjectState(storage);
@@ -240,6 +314,30 @@ describe('playground player stats', () => {
       ...createMatch(),
       finishedAt: 1_000,
       startedAt: 2_000
+    }))).resolves.toMatchObject({
+      status: 400,
+      body: {
+        error: {
+          code: 'invalid_request'
+        }
+      }
+    });
+    await expect(readError(recordMatch(stats, {
+      ...createMatch(),
+      finishReason: 'playerLeft',
+      winnerUserId: null
+    }))).resolves.toMatchObject({
+      status: 400,
+      body: {
+        error: {
+          code: 'invalid_request'
+        }
+      }
+    });
+    await expect(readError(recordMatch(stats, {
+      ...createMatch(),
+      abandonedByUserId: 'user-2',
+      finishReason: 'playerLeft'
     }))).resolves.toMatchObject({
       status: 400,
       body: {
@@ -426,6 +524,7 @@ describe('playground player stats', () => {
 
 function createMatch(overrides: Partial<PlayerMatchResultInput> = {}): PlayerMatchResultInput {
   return {
+    abandonedByUserId: null,
     finishedAt: 2_000,
     finishReason: 'checkmate',
     gameType: 'chess',

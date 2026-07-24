@@ -33,14 +33,14 @@ type StoredMatchRow = Record<string, SqlStorageValue> & {
 
 type StoredParticipantRow = Record<string, SqlStorageValue> & {
   match_id: string;
-  outcome: PlayerMatchOutcome;
+  outcome: PlayerMatchOutcome | null;
   user_id: string;
 };
 
 type StatsCountRow = Record<string, SqlStorageValue> & {
   count: number;
   game_type: string;
-  outcome: PlayerMatchOutcome;
+  outcome: Exclude<PlayerMatchOutcome, 'abandoned'>;
 };
 
 export class PlayerStats {
@@ -140,7 +140,7 @@ export class PlayerStats {
       CREATE TABLE IF NOT EXISTS match_participants_v1 (
         match_id TEXT NOT NULL,
         user_id TEXT NOT NULL,
-        outcome TEXT NOT NULL CHECK (outcome IN ('draw', 'loss', 'win')),
+        outcome TEXT,
         PRIMARY KEY (match_id, user_id),
         FOREIGN KEY (match_id) REFERENCES matches_v1(match_id) ON DELETE CASCADE
       )
@@ -217,7 +217,7 @@ export class PlayerStats {
         `,
         input.matchId,
         userId,
-        getPlayerMatchOutcome(userId, input.winnerUserId)
+        getPlayerMatchOutcome(userId, input.winnerUserId, input.abandonedByUserId)
       );
     });
   }
@@ -232,6 +232,7 @@ export class PlayerStats {
       INNER JOIN matches_v1
         ON matches_v1.match_id = match_participants_v1.match_id
       WHERE match_participants_v1.user_id = ?
+        AND match_participants_v1.outcome IN ('draw', 'loss', 'win')
       GROUP BY matches_v1.game_type, match_participants_v1.outcome
     `, userId).toArray();
 
@@ -299,7 +300,7 @@ function isSameMatchResult(
     .map((userId): StoredParticipantRow => {
       return {
         match_id: input.matchId,
-        outcome: getPlayerMatchOutcome(userId, input.winnerUserId),
+        outcome: getPlayerMatchOutcome(userId, input.winnerUserId, input.abandonedByUserId),
         user_id: userId
       };
     })

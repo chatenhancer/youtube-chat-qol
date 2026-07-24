@@ -77,6 +77,7 @@ export class StreamRoom {
     GENERATION_TOKEN_USER_RATE_LIMIT
   );
   private readonly invites = new InviteManager();
+  private readonly pendingGameLeaveIds = new Set<string>();
   private readonly matchResultOutbox: MatchResultOutbox;
   private readonly sessions = new SessionManager();
   private readonly userRateLimits = new Map<string, TokenBucket>();
@@ -385,6 +386,7 @@ export class StreamRoom {
   ): void {
     const game = this.gameState.get(gameId);
     if (!game) throw new ProtocolError('game_not_found', 'Game not found.');
+    if (this.pendingGameLeaveIds.has(gameId)) return;
     const gameModule = getGameModuleForRecord(game);
     if (!gameModule.canUserAccessGame(game, session.userId)) {
       throw new ProtocolError('not_in_game', 'You are not a player in this game.');
@@ -465,25 +467,29 @@ export class StreamRoom {
       });
     }
     this.broadcastGame(nextGame);
-    if (transitionedToTerminal) this.queueMatchResult(createPlayerMatchResult(nextGame));
+    if (transitionedToTerminal) this.queueMatchResult(createCompletedPlayerMatchResult(nextGame));
   }
 
   private queueMatchResult(match: PlayerMatchResultInput): void {
     const write = this.matchResultOutbox.enqueue(match).catch((error: unknown) => {
-      this.logEvent('game_result_queue_failed', {
-        errorMessage: getLogErrorMessage(error),
-        errorType: getLogErrorType(error),
-        game: shortLogId(match.matchId),
-        gameType: match.gameType
-      }, 'warn');
+      this.logMatchResultQueueFailure(match, error);
     });
     this.state.waitUntil(write);
+  }
+
+  private logMatchResultQueueFailure(match: PlayerMatchResultInput, error: unknown): void {
+    this.logEvent('game_result_queue_failed', {
+      errorMessage: getLogErrorMessage(error),
+      errorType: getLogErrorType(error),
+      game: shortLogId(match.matchId),
+      gameType: match.gameType
+    }, 'warn');
   }
 
   private async restoreStoredMatchResults(): Promise<void> {
     for (const game of this.gameState.values()) {
       if (!getGameModuleForRecord(game).isTerminal(game) || game.finishedAt === undefined) continue;
-      await this.matchResultOutbox.enqueue(createPlayerMatchResult(game));
+      await this.matchResultOutbox.enqueue(createCompletedPlayerMatchResult(game));
     }
   }
 
@@ -521,7 +527,30 @@ export class StreamRoom {
 
   private handleLeaveGame(userId: string, game: GameRecord): void {
     const gameModule = getGameModuleForRecord(game);
-    this.gameState.delete(game.gameId);
+    if (gameModule.isTerminal(game)) {
+      this.finishLeavingGame(userId, game);
+      return;
+    }
+
+    const match = createAbandonedPlayerMatchResult(game, userId);
+    this.pendingGameLeaveIds.add(game.gameId);
+    const leave = this.gameState.deleteWithTransaction(
+      game.gameId,
+      (transaction) => this.matchResultOutbox.enqueueInTransaction(match, transaction)
+    ).then(async () => {
+      this.finishLeavingGame(userId, game, false);
+      await this.matchResultOutbox.resume();
+    }).catch((error: unknown) => {
+      this.logMatchResultQueueFailure(match, error);
+    }).finally(() => {
+      this.pendingGameLeaveIds.delete(game.gameId);
+    });
+    this.state.waitUntil(leave);
+  }
+
+  private finishLeavingGame(userId: string, game: GameRecord, deleteGame = true): void {
+    const gameModule = getGameModuleForRecord(game);
+    if (deleteGame) this.gameState.delete(game.gameId);
     this.logEvent('game_ended', {
       game: shortLogId(game.gameId),
       gameType: game.gameType,
@@ -809,7 +838,7 @@ function getProtocolLogEvent(code: string): string {
   }
 }
 
-function createPlayerMatchResult(game: GameRecord): PlayerMatchResultInput {
+function createCompletedPlayerMatchResult(game: GameRecord): PlayerMatchResultInput {
   const gameModule = getGameModuleForRecord(game);
   const finishedAt = game.finishedAt;
   if (finishedAt === undefined) {
@@ -817,6 +846,7 @@ function createPlayerMatchResult(game: GameRecord): PlayerMatchResultInput {
   }
 
   return {
+    abandonedByUserId: null,
     finishedAt,
     finishReason: game.status,
     gameType: game.gameType,
@@ -825,6 +855,23 @@ function createPlayerMatchResult(game: GameRecord): PlayerMatchResultInput {
     participantUserIds: gameModule.getRecipientUserIds(game),
     startedAt: game.startedAt,
     winnerUserId: gameModule.getWinnerUserId?.(game) || null
+  };
+}
+
+function createAbandonedPlayerMatchResult(
+  game: GameRecord,
+  abandonedByUserId: string
+): PlayerMatchResultInput {
+  return {
+    abandonedByUserId,
+    finishedAt: Date.now(),
+    finishReason: 'playerLeft',
+    gameType: game.gameType,
+    gameVersion: game.gameVersion,
+    matchId: game.gameId,
+    participantUserIds: getGameModuleForRecord(game).getRecipientUserIds(game),
+    startedAt: game.startedAt,
+    winnerUserId: null
   };
 }
 

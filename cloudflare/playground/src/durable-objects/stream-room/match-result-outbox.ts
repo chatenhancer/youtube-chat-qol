@@ -34,29 +34,41 @@ export class MatchResultOutbox {
   ) {}
 
   async enqueue(value: PlayerMatchResultInput): Promise<void> {
-    const match = parsePlayerMatchResultInput(value);
-    if (!match) throw new Error('Cannot queue an invalid match result.');
-
-    const key = getOutboxKey(match.matchId);
-    // Persist the wake-up with the receipt so an eviction cannot strand queued work.
-    await this.state.storage.transaction(async (transaction) => {
-      const existing = parsePendingMatchResult(await transaction.get(key));
-      if (existing && !areQueuedMatchesEqual(existing.match, match)) {
-        throw new Error('Cannot replace a queued match with a different result.');
-      }
-      const pending = existing || {
-        attempts: 0,
-        match,
-        nextAttemptAt: Date.now()
-      } satisfies PendingMatchResult;
-      if (!existing) await transaction.put(key, pending);
-
-      const currentAlarm = await transaction.getAlarm();
-      if (currentAlarm === null || pending.nextAttemptAt < currentAlarm) {
-        await transaction.setAlarm(pending.nextAttemptAt);
-      }
-    });
+    const match = getValidMatchResult(value);
+    await this.state.storage.transaction((transaction) =>
+      this.enqueueParsedMatchInTransaction(match, transaction)
+    );
     await this.flush();
+  }
+
+  async enqueueInTransaction(
+    value: PlayerMatchResultInput,
+    transaction: DurableObjectTransaction
+  ): Promise<void> {
+    await this.enqueueParsedMatchInTransaction(getValidMatchResult(value), transaction);
+  }
+
+  private async enqueueParsedMatchInTransaction(
+    match: PlayerMatchResultInput,
+    transaction: DurableObjectTransaction
+  ): Promise<void> {
+    const key = getOutboxKey(match.matchId);
+    const existing = parsePendingMatchResult(await transaction.get(key));
+    if (existing && !areQueuedMatchesEqual(existing.match, match)) {
+      throw new Error('Cannot replace a queued match with a different result.');
+    }
+    const pending = existing || {
+      attempts: 0,
+      match,
+      nextAttemptAt: Date.now()
+    } satisfies PendingMatchResult;
+    if (!existing) await transaction.put(key, pending);
+
+    // Persist the wake-up with the receipt so an eviction cannot strand queued work.
+    const currentAlarm = await transaction.getAlarm();
+    if (currentAlarm === null || pending.nextAttemptAt < currentAlarm) {
+      await transaction.setAlarm(pending.nextAttemptAt);
+    }
   }
 
   async resume(): Promise<void> {
@@ -175,7 +187,8 @@ function getOutboxKey(matchId: string): string {
 }
 
 function areQueuedMatchesEqual(left: PlayerMatchResultInput, right: PlayerMatchResultInput): boolean {
-  return left.finishedAt === right.finishedAt &&
+  return left.abandonedByUserId === right.abandonedByUserId &&
+    left.finishedAt === right.finishedAt &&
     left.finishReason === right.finishReason &&
     left.gameType === right.gameType &&
     left.gameVersion === right.gameVersion &&
@@ -184,6 +197,12 @@ function areQueuedMatchesEqual(left: PlayerMatchResultInput, right: PlayerMatchR
     left.winnerUserId === right.winnerUserId &&
     [...left.participantUserIds].sort().join('\n') ===
       [...right.participantUserIds].sort().join('\n');
+}
+
+function getValidMatchResult(value: PlayerMatchResultInput): PlayerMatchResultInput {
+  const match = parsePlayerMatchResultInput(value);
+  if (!match) throw new Error('Cannot queue an invalid match result.');
+  return match;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

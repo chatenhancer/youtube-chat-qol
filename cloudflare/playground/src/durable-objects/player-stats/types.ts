@@ -4,9 +4,10 @@ import {
   type GameId
 } from '../../protocol/messages';
 
-export type PlayerMatchOutcome = 'draw' | 'loss' | 'win';
+export type PlayerMatchOutcome = 'abandoned' | 'draw' | 'loss' | 'win';
 
 export interface PlayerMatchResultInput {
+  abandonedByUserId: string | null;
   finishedAt: number;
   finishReason: string;
   gameType: GameId;
@@ -53,6 +54,10 @@ export function parsePlayerMatchResultInput(value: unknown): PlayerMatchResultIn
   const startedAt = value.startedAt === undefined ? undefined : parseTimestamp(value.startedAt);
   const participantUserIds = parseParticipantUserIds(value.participantUserIds);
   const winnerUserId = value.winnerUserId === null ? null : parseParticipantUserId(value.winnerUserId);
+  const abandonedByUserId = value.abandonedByUserId === undefined || value.abandonedByUserId === null
+    ? null
+    : parseParticipantUserId(value.abandonedByUserId);
+  const isAbandoned = abandonedByUserId !== null;
 
   if (
     !MATCH_ID_PATTERN.test(matchId) ||
@@ -63,12 +68,16 @@ export function parsePlayerMatchResultInput(value: unknown): PlayerMatchResultIn
     startedAt === null ||
     (startedAt !== undefined && startedAt > finishedAt) ||
     participantUserIds.length < 2 ||
-    (winnerUserId !== null && !participantUserIds.includes(winnerUserId))
+    (winnerUserId !== null && !participantUserIds.includes(winnerUserId)) ||
+    (abandonedByUserId !== null && !participantUserIds.includes(abandonedByUserId)) ||
+    (isAbandoned && (finishReason !== 'playerLeft' || winnerUserId !== null)) ||
+    (!isAbandoned && finishReason === 'playerLeft')
   ) {
     return null;
   }
 
   return {
+    abandonedByUserId,
     finishedAt,
     finishReason,
     gameType,
@@ -87,8 +96,12 @@ export function parsePlayerUserId(value: unknown): string {
 
 export function getPlayerMatchOutcome(
   participantUserId: string,
-  winnerUserId: string | null
-): PlayerMatchOutcome {
+  winnerUserId: string | null,
+  abandonedByUserId: string | null
+): PlayerMatchOutcome | null {
+  if (abandonedByUserId) {
+    return participantUserId === abandonedByUserId ? 'abandoned' : null;
+  }
   if (!winnerUserId) return 'draw';
   return participantUserId === winnerUserId ? 'win' : 'loss';
 }

@@ -27,6 +27,28 @@ export class GameState {
     this.queueImmediateWrite();
   }
 
+  deleteWithTransaction(
+    gameId: string,
+    update: (transaction: DurableObjectTransaction) => Promise<void>
+  ): Promise<void> {
+    this.cancelDeferredWrite();
+    const write = this.storageWriteQueue.then(async () => {
+      const games = this.values().filter((game) => game.gameId !== gameId);
+      await this.state.storage.transaction(async (transaction) => {
+        await update(transaction);
+        await transaction.put(ROOM_STATE_STORAGE_KEY, {
+          games
+        } satisfies StoredRoomState);
+      });
+      this.games.delete(gameId);
+    });
+    this.storageWriteQueue = write.catch((error: unknown) => {
+      this.logPersistFailure(error);
+    });
+    this.state.waitUntil(this.storageWriteQueue);
+    return write;
+  }
+
   get(gameId: string): GameRecord | undefined {
     return this.games.get(gameId);
   }
@@ -87,21 +109,21 @@ export class GameState {
   }
 
   private queueImmediateWrite(): void {
-    if (this.deferredWriteTimer !== null) {
-      clearTimeout(this.deferredWriteTimer);
-      this.deferredWriteTimer = null;
-    }
+    this.cancelDeferredWrite();
     this.queueWrite();
+  }
+
+  private cancelDeferredWrite(): void {
+    if (this.deferredWriteTimer === null) return;
+    clearTimeout(this.deferredWriteTimer);
+    this.deferredWriteTimer = null;
   }
 
   private queueWrite(): void {
     const write = this.storageWriteQueue
       .then(() => this.write())
       .catch((error: unknown) => {
-        this.logEvent('room_state_persist_failed', {
-          errorMessage: getLogErrorMessage(error),
-          errorType: getLogErrorType(error)
-        }, 'warn');
+        this.logPersistFailure(error);
       });
     this.storageWriteQueue = write.catch(() => undefined);
     this.state.waitUntil(write);
@@ -111,6 +133,13 @@ export class GameState {
     await this.state.storage.put(ROOM_STATE_STORAGE_KEY, {
       games: this.values()
     } satisfies StoredRoomState);
+  }
+
+  private logPersistFailure(error: unknown): void {
+    this.logEvent('room_state_persist_failed', {
+      errorMessage: getLogErrorMessage(error),
+      errorType: getLogErrorType(error)
+    }, 'warn');
   }
 }
 

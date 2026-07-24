@@ -158,7 +158,10 @@ class FakeDurableObjectState {
 
 class FakePlayerStatsNamespace {
   private readonly matches = new Map<string, {
+    abandonedByUserId: string | null;
+    finishReason: string;
     gameType: GameId;
+    participantUserIds: string[];
     winnerUserId: string | null;
   }>();
 
@@ -185,6 +188,10 @@ class FakePlayerStatsNamespace {
     return this.matches.size;
   }
 
+  getMatch(matchId: string) {
+    return this.matches.get(matchId);
+  }
+
   private async handleFetch(request: RequestInfo | URL): Promise<Response> {
     const requestObject = request instanceof Request ? request : new Request(request);
     const url = new URL(requestObject.url);
@@ -193,17 +200,26 @@ class FakePlayerStatsNamespace {
     }
 
     const body = await requestObject.json() as {
+      abandonedByUserId?: string | null;
+      finishReason?: string;
       gameType?: GameId;
       matchId?: string;
+      participantUserIds?: string[];
       winnerUserId?: string | null;
     };
+    const abandonedByUserId = body.abandonedByUserId || null;
+    const finishReason = body.finishReason || '';
     const gameType = body.gameType || 'chess';
     const matchId = body.matchId || '';
+    const participantUserIds = body.participantUserIds || [];
     const winnerUserId = body.winnerUserId || null;
     const recorded = !this.matches.has(matchId);
     if (recorded) {
       this.matches.set(matchId, {
+        abandonedByUserId,
+        finishReason,
         gameType,
+        participantUserIds,
         winnerUserId
       });
     }
@@ -1167,8 +1183,8 @@ describe('playground stream room', () => {
     });
   });
 
-  it('destroys an active game when a player explicitly leaves', async () => {
-    const room = createRoom();
+  it('stores an active game as abandoned without awarding either player when someone leaves', async () => {
+    const { playerStats, room, state } = createRoomHarness();
     const alice = createSession('alice-connection');
     const bob = createSession('bob-connection');
 
@@ -1182,6 +1198,7 @@ describe('playground stream room', () => {
       action: 'leave',
       userId: bob.userId
     });
+    await state.flushWaitUntil();
 
     expect(lastMessage(alice, 'gameEnded')).toEqual({
       gameId,
@@ -1197,6 +1214,46 @@ describe('playground stream room', () => {
     });
     expect(room.createSnapshot(alice.userId).games).toHaveLength(0);
     expect(room.createSnapshot(bob.userId).games).toHaveLength(0);
+    expect(playerStats.getMatch(gameId)).toEqual({
+      abandonedByUserId: bob.userId,
+      finishReason: 'playerLeft',
+      gameType: 'chess',
+      participantUserIds: [alice.userId, bob.userId],
+      winnerUserId: null
+    });
+    expect(playerStats.getWins(alice.userId, 'chess')).toBe(0);
+    expect(playerStats.getWins(bob.userId, 'chess')).toBe(0);
+  });
+
+  it('keeps the completed result when a player leaves a finished game', async () => {
+    const { playerStats, room, state } = createRoomHarness();
+    const alice = createSession('alice-connection');
+    const bob = createSession('bob-connection');
+
+    await room.handleHello(alice, await createHello(alice.challenge, 'Alice', ['chess']));
+    await room.handleHello(bob, await createHello(bob.challenge, 'Bob', ['chess']));
+    room.handleInvite(alice, 'chess', bob.userId);
+    room.handleInviteResponse(bob, lastMessage(bob, 'inviteReceived').invite.inviteId, true);
+    const gameId = lastMessage(alice, 'gameStarted').game.gameId;
+
+    room.handleGameAction(bob, gameId, {
+      action: 'resign',
+      userId: bob.userId
+    });
+    await state.flushWaitUntil();
+    room.handleGameAction(alice, gameId, {
+      action: 'leave',
+      userId: alice.userId
+    });
+    await state.flushWaitUntil();
+
+    expect(playerStats.getMatchCount()).toBe(1);
+    expect(playerStats.getMatch(gameId)).toMatchObject({
+      abandonedByUserId: null,
+      finishReason: 'resigned',
+      winnerUserId: alice.userId
+    });
+    expect(playerStats.getWins(alice.userId, 'chess')).toBe(1);
   });
 
   it('rejects automatic game transitions from users outside the game', async () => {
@@ -1706,7 +1763,7 @@ describe('playground stream room', () => {
   });
 
   it('rejects incompatible invite acceptors and game actions while still allowing leave', async () => {
-    const room = createRoom();
+    const { room, state } = createRoomHarness();
     const alice = createSession('alice-current');
     const bobLegacy = createSession('bob-legacy');
     const bobCurrent = createSession('bob-current');
@@ -1767,6 +1824,7 @@ describe('playground stream room', () => {
       action: 'leave',
       userId: aliceLegacy.userId
     });
+    await state.flushWaitUntil();
     expect(lastMessage(bobCurrent, 'gameEnded')).toMatchObject({
       gameId,
       reason: 'playerLeft',
@@ -1887,7 +1945,7 @@ describe('playground stream room', () => {
   });
 
   it('rejects consumed generation tokens after their game leaves the room', async () => {
-    const room = createRoom();
+    const { room, state } = createRoomHarness();
     const alice = createSession('alice-connection');
     const bob = createSession('bob-connection');
 
@@ -1905,6 +1963,7 @@ describe('playground stream room', () => {
       action: 'leave',
       userId: bob.userId
     });
+    await state.flushWaitUntil();
 
     const response = await consumeGenerationToken(room, gameId, tokenMessage.generationToken);
 
@@ -2006,6 +2065,45 @@ describe('playground stream room', () => {
       service: 'chat-enhancer-playground'
     }));
     expect((await storage.list({ prefix: 'matchResultOutbox:' })).size).toBe(1);
+    expect(await storage.getAlarm()).toEqual(expect.any(Number));
+  });
+
+  it('durably removes an abandoned game while retaining a failed result for retry', async () => {
+    const storage = new FakeDurableObjectStorage();
+    const { room, state } = createRoomHarness(storage, {
+      playerStats: new FailingPlayerStatsNamespace() as unknown as DurableObjectNamespace
+    });
+    const alice = createSession('alice-connection');
+    const bob = createSession('bob-connection');
+
+    await room.handleHello(alice, await createHello(alice.challenge, 'Alice', ['chess']));
+    await room.handleHello(bob, await createHello(bob.challenge, 'Bob', ['chess']));
+    room.handleInvite(alice, 'chess', bob.userId);
+    room.handleInviteResponse(bob, lastMessage(bob, 'inviteReceived').invite.inviteId, true);
+    const gameId = lastMessage(alice, 'gameStarted').game.gameId;
+
+    room.handleGameAction(bob, gameId, {
+      action: 'leave',
+      userId: bob.userId
+    });
+    await state.flushWaitUntil();
+
+    await expect(storage.get('roomState:v1')).resolves.toEqual({
+      games: []
+    });
+    expect(room.createSnapshot(alice.userId).games).toHaveLength(0);
+    const pending = await storage.list<{
+      match: {
+        abandonedByUserId?: string;
+        finishReason?: string;
+        winnerUserId?: string | null;
+      };
+    }>({ prefix: 'matchResultOutbox:' });
+    expect([...pending.values()][0]?.match).toMatchObject({
+      abandonedByUserId: bob.userId,
+      finishReason: 'playerLeft',
+      winnerUserId: null
+    });
     expect(await storage.getAlarm()).toEqual(expect.any(Number));
   });
 
