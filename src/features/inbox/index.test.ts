@@ -105,7 +105,7 @@ vi.mock('./card', () => cardMocks);
 vi.mock('./button', () => buttonMocks);
 vi.mock('./highlights', () => highlightMocks);
 vi.mock('../tab-alert', () => tabAlertMocks);
-vi.mock('./sound', () => soundMocks);
+vi.mock('../../shared/sounds/alert-sounds', () => soundMocks);
 vi.mock('../../youtube/chat-feed/source', () => chatFeedMocks);
 vi.mock('./records', () => ({
   createInboxRecordFromChatFeed: vi.fn((record: {
@@ -220,7 +220,7 @@ describe('inbox coordinator', () => {
       }),
       false
     );
-    expect(soundMocks.playAlertSound).toHaveBeenCalledOnce();
+    expect(soundMocks.playAlertSound).toHaveBeenCalledWith('message');
   });
 
   it('records feed mention and keyword matches, then alerts when the inbox is not open', async () => {

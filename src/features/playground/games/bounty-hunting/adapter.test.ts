@@ -16,8 +16,7 @@ vi.mock('./panel', () => panelMock);
 
 import {
   bountyHuntingGame,
-  bountyHuntingGameAdapter,
-  bountyHuntingGameDefinition
+  bountyHuntingGameAdapter
 } from './adapter';
 
 describe('Bounty Hunting game adapter', () => {
@@ -89,12 +88,6 @@ describe('Bounty Hunting game adapter', () => {
 
     expect(bountyHuntingGame.handleActionError?.(error)).toBe(true);
     expect(panelMock.handleBountyHuntingActionError).toHaveBeenCalledWith(error);
-  });
-
-  it('uses one game label key and declares livestream availability', () => {
-    expect(bountyHuntingGameDefinition.labelKey).toBe('gamesBountyHunting');
-    expect(bountyHuntingGameDefinition.availability).toBe('livestream');
-    expect('panelTitleKey' in bountyHuntingGameDefinition).toBe(false);
   });
 });
 

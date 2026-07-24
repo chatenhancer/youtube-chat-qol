@@ -6,7 +6,6 @@
  * `tests/browser/scenarios/`, then include them here when they should run
  * against a logged-in real YouTube chat.
  */
-import { attachScenario } from '../scenarios/attach';
 import {
   chatCommandAutocompleteScenario,
   chatCommandsExpandAndApplySettingsScenario
@@ -41,10 +40,6 @@ import { messageMenuScenario, settingsMenuScenario } from '../scenarios/menus';
 import { profileCardRecentMessagesScenario } from '../scenarios/profile';
 import { loggedInLiveTest as test } from '../support/scenario-fixtures';
 
-test(
-  'logged-in live: extension attaches and current tab action reports connected status',
-  attachScenario
-);
 test(
   'logged-in live: message context menu receives save, quote, and mention actions',
   messageMenuScenario

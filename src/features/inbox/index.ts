@@ -28,7 +28,7 @@ import {
   isCurrentTabActive,
   showInboxTabAlert
 } from '../tab-alert';
-import { playAlertSound } from './sound';
+import { playAlertSound } from '../../shared/sounds/alert-sounds';
 import {
   cleanupStaleInboxCards,
   closeInboxCard,
@@ -273,7 +273,7 @@ function commitInboxRecord(record: InboxRecord): void {
   if (isReadNow) {
     markInboxRead();
   } else {
-    playAlertSound();
+    playAlertSound('message');
     refreshInboxSurfaces(getUnreadInboxCount);
     showInboxTabAlert(getUnreadInboxCount());
   }

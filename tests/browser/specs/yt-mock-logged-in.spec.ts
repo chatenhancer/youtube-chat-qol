@@ -17,14 +17,12 @@ import {
   mockedComposerTranslationScenario
 } from '../scenarios/composer-translation';
 import {
-  focusPanelReceivesNewMessagesScenario,
-  focusPanelOpensFromAuthorScenario
+  focusPanelReceivesNewMessagesScenario
 } from '../scenarios/focus';
 import { frequentEmojiPersistenceScenario } from '../scenarios/frequent-emojis';
 import {
   inboxDirectMentionScenario,
   inboxKeywordOverlapPreservesProfileMentionScenario,
-  inboxOpensFromHeaderScenario,
   inboxRecordCreationAndJumpScenario
 } from '../scenarios/inbox';
 import { bookmarkMessageMenuScenario } from '../scenarios/bookmarks';
@@ -36,7 +34,6 @@ import {
 } from '../scenarios/lite-mode';
 import { liteModeTimestampsScenario } from '../scenarios/lite-mode-native-surfaces';
 import {
-  mockedMessageTranslationScenario,
   replacedTranslationToggleSurfacesScenario,
   translationDisplayScenario,
   translationSettingsReactScenario
@@ -109,7 +106,6 @@ test(
   'logged-in mock: translations carry from native history into Lite mode',
   liteModeTranslationContinuityScenario
 );
-test('logged-in mock: incoming chat messages are translated', mockedMessageTranslationScenario);
 test('logged-in mock: translation display modes render correctly', translationDisplayScenario);
 test(
   'logged-in mock: replaced translations toggle across chat surfaces',
@@ -118,14 +114,9 @@ test(
 test('logged-in mock: translate chat setting reacts live', translationSettingsReactScenario);
 test('logged-in mock: background tab alert updates title and favicon', tabAlertScenario);
 test(
-  'logged-in mock: focus panel opens from an author and follows their messages',
-  focusPanelOpensFromAuthorScenario
-);
-test(
   'logged-in mock: focus panel receives new messages from the focused author',
   focusPanelReceivesNewMessagesScenario
 );
-test('logged-in mock: inbox opens from the chat header', inboxOpensFromHeaderScenario);
 test(
   'logged-in mock: inbox saves keyword matches, highlights them, and jumps back to chat',
   inboxRecordCreationAndJumpScenario

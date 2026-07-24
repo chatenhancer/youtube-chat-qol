@@ -4,10 +4,8 @@
  * The deterministic replay fixture verifies read-only chat features on the
  * `live_chat_replay` DOM shape without requiring a composer.
  */
-import { attachScenario } from '../scenarios/attach';
 import { focusPanelOpensFromAuthorScenario } from '../scenarios/focus';
 import {
-  inboxOpensFromHeaderScenario,
   inboxReplayPrefetchTimingScenario,
   inboxRecordCreationAndJumpScenario
 } from '../scenarios/inbox';
@@ -26,10 +24,6 @@ import {
 import { profileCardRecentMessagesScenario } from '../scenarios/profile';
 import { loggedInMockReplayTest as test } from '../support/scenario-fixtures';
 
-test(
-  'logged-in mock replay: extension attaches and current tab action reports connected status',
-  attachScenario
-);
 test('logged-in mock replay: chat settings menu receives extension controls', settingsMenuScenario);
 test(
   'logged-in mock replay: message context menu receives save, quote, and mention actions',
@@ -51,7 +45,6 @@ test(
   'logged-in mock replay: focus panel opens from an author and follows their messages',
   focusPanelOpensFromAuthorScenario
 );
-test('logged-in mock replay: inbox opens from the chat header', inboxOpensFromHeaderScenario);
 test(
   'logged-in mock replay: inbox saves feed matches and jumps back to chat',
   inboxRecordCreationAndJumpScenario

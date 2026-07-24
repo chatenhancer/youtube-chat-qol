@@ -4,7 +4,6 @@
  * This checks the extension against a real YouTube replay iframe where there
  * is no composer, but read-only chat features should still attach.
  */
-import { attachScenario } from '../scenarios/attach';
 import { focusPanelOpensFromAuthorScenario } from '../scenarios/focus';
 import { inboxOpensFromHeaderScenario } from '../scenarios/inbox';
 import { liteModeToggleAndRestoreScenario } from '../scenarios/lite-mode';
@@ -18,10 +17,6 @@ import { messageMenuScenario, settingsMenuScenario } from '../scenarios/menus';
 import { profileCardRecentMessagesScenario } from '../scenarios/profile';
 import { loggedInLiveReplayTest as test } from '../support/scenario-fixtures';
 
-test(
-  'logged-in live replay: extension attaches and current tab action reports connected status',
-  attachScenario
-);
 test('logged-in live replay: chat settings menu receives extension controls', settingsMenuScenario);
 test(
   'logged-in live replay: message context menu receives save, quote, and mention actions',

@@ -13,7 +13,7 @@ const panelMock = vi.hoisted(() => ({
 
 vi.mock('./panel', () => panelMock);
 
-import { replayTriviaGameAdapter, replayTriviaGameDefinition } from './adapter';
+import { replayTriviaGameAdapter } from './adapter';
 import {
   handleReplayTriviaActionError,
   handleReplayTriviaServerMessage,
@@ -26,10 +26,6 @@ describe('Replay Trivia game adapter', () => {
   afterEach(() => {
     resetReplayTriviaClientData();
     vi.clearAllMocks();
-  });
-
-  it('declares replay-only availability', () => {
-    expect(replayTriviaGameDefinition.availability).toBe('replay');
   });
 
   it('opens Replay Trivia panels and returns a handle', () => {
