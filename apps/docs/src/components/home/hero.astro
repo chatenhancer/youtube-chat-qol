@@ -2,9 +2,12 @@
 import Icon from '../common/icon.astro';
 import type { CollectionEntry } from 'astro:content';
 import type { Messages } from '../../data/site';
+import type { Locale } from '../../data/locales';
+import { localizedImage } from '../../data/localized-images';
 import HeroBlogTicker from './hero-blog-ticker.astro';
 
-const { messages: m, posts, rootPrefix } = Astro.props as {
+const { locale, messages: m, posts, rootPrefix } = Astro.props as {
+  locale: Locale;
   messages: Messages;
   posts: CollectionEntry<'blog'>[];
   rootPrefix: string;
@@ -37,9 +40,9 @@ const { messages: m, posts, rootPrefix } = Astro.props as {
   </div>
   <div class="hero-media-column">
     <div class="hero-media" aria-hidden="true">
-      <img class="hero-chat hero-chat-side hero-chat-left" src={`${rootPrefix}assets/screenshots/hero-img3.png`} alt="">
-      <img class="hero-chat hero-chat-main" src={`${rootPrefix}assets/screenshots/hero-img2.png`} alt="">
-      <img class="hero-chat hero-chat-side hero-chat-right" src={`${rootPrefix}assets/screenshots/hero-img1.png`} alt="">
+      <img class="hero-chat hero-chat-side hero-chat-left" src={localizedImage(`${rootPrefix}assets/screenshots/hero-img3.png`, locale)} alt="">
+      <img class="hero-chat hero-chat-main" src={localizedImage(`${rootPrefix}assets/screenshots/hero-img2.png`, locale)} alt="">
+      <img class="hero-chat hero-chat-side hero-chat-right" src={localizedImage(`${rootPrefix}assets/screenshots/hero-img1.png`, locale)} alt="">
     </div>
     <div class="hero-walkthrough" hidden data-walkthrough-cta>
       <button class="hero-walkthrough-button" type="button" data-walkthrough-open>

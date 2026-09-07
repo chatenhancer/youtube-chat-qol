@@ -3,7 +3,7 @@ title: "Ваші емодзі — одне наведення"
 date: 2026-07-12
 description: "Нове швидке вікно емодзі показує найуживаніші реакції просто над полем введення в чаті YouTube."
 slug: "your-most-used-emojis-one-hover-away"
-image: "./cover.png"
+image: "./cover-uk.webp"
 locale: "uk"
 translationKey: "your-most-used-emojis-one-hover-away"
 tags:

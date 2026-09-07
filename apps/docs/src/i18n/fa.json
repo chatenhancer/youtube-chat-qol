@@ -226,6 +226,7 @@
     "title": "نصب Chat Enhancer",
     "copy": "آن را از Chrome Web Store، Firefox Add-ons یا Mac App Store دریافت کنید، یا برای توسعه محلی افزونه را از کد منبع بسازید. مرورگرهای دیگر مبتنی بر Chromium معمولاً می‌توانند از نسخه Chrome استفاده کنند.",
     "publishedVersions": "نسخه‌های منتشرشده",
+    "releaseLabel": "نسخه",
     "updatePendingTitle": "به‌روزرسانی فروشگاه در جریان است",
     "updatePendingBody": "آخرین نسخه هنوز برای {stores} در انتظار انتشار است.",
     "updatePendingAnd": "و",

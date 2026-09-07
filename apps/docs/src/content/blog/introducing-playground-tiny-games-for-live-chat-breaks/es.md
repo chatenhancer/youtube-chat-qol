@@ -5,7 +5,7 @@ description: "Playground añade juegos compactos al chat en directo de YouTube p
 locale: "es"
 slug: "introducing-playground-tiny-games-for-live-chat-breaks"
 translationKey: "introducing-playground-tiny-games-for-live-chat-breaks"
-image: "./90af004f7c5daeab.png"
+image: "./90af004f7c5daeab-es.webp"
 cover_width: 73
 video: "./ba98da5bf0abb611.mp4"
 tags:
@@ -20,7 +20,7 @@ Playground es una pequeña zona de juegos dentro de Chat Enhancer para disputar 
 
 :::media-right
 
-![Panel compacto de una partida de Ajedrez flotando sobre el chat en directo de YouTube](./f779ebcc57f8280d.png){shadow=smooth rotation=-2}
+![Panel compacto de una partida de Ajedrez flotando sobre el chat en directo de YouTube](./f779ebcc57f8280d-es.webp){shadow=smooth rotation=-2}
 
 Los juegos aparecen en un panel compacto que puedes mover para mantener el chat a la vista.
 

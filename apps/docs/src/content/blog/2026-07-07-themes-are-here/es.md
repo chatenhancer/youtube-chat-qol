@@ -3,7 +3,7 @@ title: "¡Ya están aquí los temas!"
 date: 2026-07-07
 description: "Los temas de chat ya están disponibles, empezando por Aero, para dar un toque más personal al chat en directo de YouTube."
 slug: "themes-are-here"
-image: "./2026-07-07-themes-are-here-assets/fc7c094f3fbf6ac2.png"
+image: "./2026-07-07-themes-are-here-assets/fc7c094f3fbf6ac2-es.webp"
 cover_width: 84
 locale: "es"
 translationKey: "themes-are-here"

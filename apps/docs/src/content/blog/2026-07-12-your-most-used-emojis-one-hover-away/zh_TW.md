@@ -3,7 +3,7 @@ title: "你的表情符號，懸停就能選"
 date: 2026-07-12
 description: "新的快速表情符號浮層，會把你最常用的反應放在 YouTube 直播聊天室輸入框正上方。"
 slug: "your-most-used-emojis-one-hover-away"
-image: "./cover.png"
+image: "./cover-zh_TW.webp"
 locale: "zh_TW"
 translationKey: "your-most-used-emojis-one-hover-away"
 tags:

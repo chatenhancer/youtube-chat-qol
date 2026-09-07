@@ -3,7 +3,7 @@ title: "Ваши эмодзи — одно наведение"
 date: 2026-07-12
 description: "Новое быстрое окно эмодзи показывает ваши любимые реакции прямо над полем ввода в чате YouTube."
 slug: "your-most-used-emojis-one-hover-away"
-image: "./cover.png"
+image: "./cover-ru.webp"
 locale: "ru"
 translationKey: "your-most-used-emojis-one-hover-away"
 tags:

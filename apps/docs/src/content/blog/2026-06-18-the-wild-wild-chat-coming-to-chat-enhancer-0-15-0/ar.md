@@ -18,7 +18,7 @@ tags:
 
 :::media-right
 
-![لوحة مطلوبين في Bounty Hunting](./64a11deb8049b2c9.png){shadow=smooth;rotate=-6deg}
+![لوحة مطلوبين في Bounty Hunting](./64a11deb8049b2c9-ar.webp){shadow=smooth;rotate=-6deg}
 
 ### طريقة اللعب
 

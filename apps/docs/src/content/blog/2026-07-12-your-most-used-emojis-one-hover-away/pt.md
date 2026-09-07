@@ -3,7 +3,7 @@ title: "Os seus emojis, a um gesto de distância"
 date: 2026-07-12
 description: "Um novo seletor rápido coloca as reações que mais usa diretamente acima da caixa de chat ao vivo do YouTube."
 slug: "your-most-used-emojis-one-hover-away"
-image: "./cover.png"
+image: "./cover-pt.webp"
 locale: "pt"
 translationKey: "your-most-used-emojis-one-hover-away"
 tags:

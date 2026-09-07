@@ -5,7 +5,7 @@ description: "Chat Enhancer for YouTube dodaje niewielkie, naturalnie pasujące 
 locale: "pl"
 slug: "introducing-chat-enhancer-for-youtube"
 translationKey: "introducing-chat-enhancer-for-youtube"
-image: "./cover.png"
+image: "./cover-pl.webp"
 tags:
   - "youtube"
   - "live-chat"

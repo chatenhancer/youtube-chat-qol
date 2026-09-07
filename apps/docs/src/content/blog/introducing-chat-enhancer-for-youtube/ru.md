@@ -5,7 +5,7 @@ description: "Chat Enhancer for YouTube добавляет в YouTube live chat 
 locale: "ru"
 slug: "introducing-chat-enhancer-for-youtube"
 translationKey: "introducing-chat-enhancer-for-youtube"
-image: "./cover.png"
+image: "./cover-ru.webp"
 tags:
   - "youtube"
   - "live-chat"

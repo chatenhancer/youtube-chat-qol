@@ -18,7 +18,7 @@ Si parte con **Bounty Hunting**, una caccia rapida in cui due giocatori guardano
 
 :::media-right
 
-![Bacheca dei ricercati di Bounty Hunting](./64a11deb8049b2c9.png){shadow=smooth;rotate=-6deg}
+![Bacheca dei ricercati di Bounty Hunting](./64a11deb8049b2c9-it.webp){shadow=smooth;rotate=-6deg}
 
 ### Come funziona
 

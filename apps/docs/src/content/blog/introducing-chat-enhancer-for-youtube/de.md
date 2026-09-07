@@ -5,7 +5,7 @@ description: "Chat Enhancer for YouTube ergänzt YouTube-Livechats um kleine, na
 locale: "de"
 slug: "introducing-chat-enhancer-for-youtube"
 translationKey: "introducing-chat-enhancer-for-youtube"
-image: "./cover.png"
+image: "./cover-de.webp"
 tags:
   - "youtube"
   - "live-chat"

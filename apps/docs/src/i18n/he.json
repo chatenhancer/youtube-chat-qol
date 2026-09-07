@@ -226,6 +226,7 @@
     "title": "התקנת Chat Enhancer",
     "copy": "קבלו אותו מ-Chrome Web Store, מ-Firefox Add-ons או מ-Mac App Store, או בנו את התוסף מהמקור לפיתוח מקומי. דפדפנים אחרים שמבוססים על Chromium יכולים בדרך כלל להשתמש בגרסת Chrome.",
     "publishedVersions": "גרסאות שפורסמו",
+    "releaseLabel": "גרסה",
     "updatePendingTitle": "עדכון החנות בתהליך",
     "updatePendingBody": "הגרסה האחרונה עדיין ממתינה ב-{stores}.",
     "updatePendingAnd": "ו",

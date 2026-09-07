@@ -24,7 +24,7 @@ Tujuannya sederhana: bergerak, lompat, pukul pemain lain menjauh, hindari chat y
 
 :::media-right
 
-![Stick Around! berjalan sebagai overlay seluruh chat dengan gelembung chat yang jatuh](./stickfightpreview.png){shadow=smooth rotation=1}
+![Stick Around! berjalan sebagai overlay seluruh chat dengan gelembung chat yang jatuh](./stickfightpreview-id.webp){shadow=smooth rotation=1}
 
 Stick Around! memakai seluruh feed chat sebagai ruang bermain. Header chat dan input normal tetap berada di tempatnya.
 

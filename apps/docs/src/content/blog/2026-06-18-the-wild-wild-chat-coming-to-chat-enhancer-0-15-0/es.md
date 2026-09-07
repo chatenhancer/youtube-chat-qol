@@ -18,7 +18,7 @@ Su primer modo es **Bounty Hunting**, una búsqueda rápida en la que dos jugado
 
 :::media-right
 
-![Tablero de buscados de Bounty Hunting](./64a11deb8049b2c9.png){shadow=smooth;rotate=-6deg}
+![Tablero de buscados de Bounty Hunting](./64a11deb8049b2c9-es.webp){shadow=smooth;rotate=-6deg}
 
 ### Cómo funciona
 

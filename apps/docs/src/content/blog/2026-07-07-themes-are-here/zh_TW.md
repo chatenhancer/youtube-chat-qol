@@ -3,7 +3,7 @@ title: "主題來了！"
 date: 2026-07-07
 description: "聊天主題現已推出，首先帶來 Aero，讓 YouTube 直播聊天更有你的風格。"
 slug: "themes-are-here"
-image: "./2026-07-07-themes-are-here-assets/fc7c094f3fbf6ac2.png"
+image: "./2026-07-07-themes-are-here-assets/fc7c094f3fbf6ac2-zh_TW.webp"
 cover_width: 84
 locale: "zh_TW"
 translationKey: "themes-are-here"

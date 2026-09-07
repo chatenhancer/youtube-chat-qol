@@ -3,7 +3,7 @@ title: "Przedstawiamy tryb Lite"
 date: 2026-07-11
 description: "Tryb Lite to opcjonalny, lekki strumień czatu zaprojektowany tak, aby zatłoczone czaty na żywo w YouTube działały płynniej i mniej obciążały przeglądarkę."
 slug: "introducing-lite-mode"
-image: "./a267721fcd28b8ba.png"
+image: "./a267721fcd28b8ba-pl.webp"
 cover_width: 88
 locale: "pl"
 translationKey: "introducing-lite-mode"

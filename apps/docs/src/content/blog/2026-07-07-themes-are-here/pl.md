@@ -3,7 +3,7 @@ title: "Motywy już są!"
 date: 2026-07-07
 description: "Motywy czatu są już dostępne, zaczynając od Aero, żeby czat na żywo w YouTube był bardziej twój."
 slug: "themes-are-here"
-image: "./2026-07-07-themes-are-here-assets/fc7c094f3fbf6ac2.png"
+image: "./2026-07-07-themes-are-here-assets/fc7c094f3fbf6ac2-pl.webp"
 cover_width: 84
 locale: "pl"
 translationKey: "themes-are-here"

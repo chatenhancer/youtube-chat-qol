@@ -5,7 +5,7 @@ description: "Playground 會在直播節奏變慢時，把精簡小遊戲帶進 
 locale: "zh_TW"
 slug: "introducing-playground-tiny-games-for-live-chat-breaks"
 translationKey: "introducing-playground-tiny-games-for-live-chat-breaks"
-image: "./90af004f7c5daeab.png"
+image: "./90af004f7c5daeab-zh_TW.webp"
 cover_width: 73
 video: "./ba98da5bf0abb611.mp4"
 tags:
@@ -20,7 +20,7 @@ Playground 是 Chat Enhancer 裡的小型遊戲中心。你可以和同樣安裝
 
 :::media-right
 
-![漂浮在 YouTube 直播聊天室上的精簡的西洋棋遊戲面板](./f779ebcc57f8280d.png){shadow=smooth rotation=-2}
+![漂浮在 YouTube 直播聊天室上的精簡的西洋棋遊戲面板](./f779ebcc57f8280d-zh_TW.webp){shadow=smooth rotation=-2}
 
 遊戲面板保持精簡，可以拖曳。聊天室又熱鬧起來時，你可以把它移到旁邊。
 

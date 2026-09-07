@@ -3,7 +3,7 @@ title: "Presentamos el modo Lite"
 date: 2026-07-11
 description: "El modo Lite es una lista de mensajes opcional y ligera, diseñada para que los chats en directo más activos funcionen con mayor fluidez."
 slug: "introducing-lite-mode"
-image: "./a267721fcd28b8ba.png"
+image: "./a267721fcd28b8ba-es.webp"
 cover_width: 88
 locale: "es"
 translationKey: "introducing-lite-mode"

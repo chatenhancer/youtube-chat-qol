@@ -5,7 +5,7 @@ description: "Chat Enhancer for YouTube 为 YouTube 直播聊天加入轻量、�
 locale: "zh_CN"
 slug: "introducing-chat-enhancer-for-youtube"
 translationKey: "introducing-chat-enhancer-for-youtube"
-image: "./cover.png"
+image: "./cover-zh_CN.webp"
 tags:
   - "youtube"
   - "live-chat"

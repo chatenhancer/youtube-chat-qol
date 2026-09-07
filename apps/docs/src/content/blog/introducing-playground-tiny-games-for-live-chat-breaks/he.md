@@ -5,7 +5,7 @@ description: "Playground מוסיף לצ'אט החי של YouTube משחקים �
 locale: "he"
 slug: "introducing-playground-tiny-games-for-live-chat-breaks"
 translationKey: "introducing-playground-tiny-games-for-live-chat-breaks"
-image: "./90af004f7c5daeab.png"
+image: "./90af004f7c5daeab-he.webp"
 cover_width: 73
 video: "./ba98da5bf0abb611.mp4"
 tags:
@@ -20,7 +20,7 @@ Playground הוא מרחב משחקים קטן בתוך Chat Enhancer. הוא מ
 
 :::media-right
 
-![פאנל שחמט קומפקטי שמרחף מעל הצ'אט החי של YouTube](./f779ebcc57f8280d.png){shadow=smooth rotation=-2}
+![פאנל שחמט קומפקטי שמרחף מעל הצ'אט החי של YouTube](./f779ebcc57f8280d-he.webp){shadow=smooth rotation=-2}
 
 המשחקים נשארים קומפקטיים. אפשר לגרור את הפאנל, כך שאפשר להזיז אותו הצידה כשהצ'אט מתעורר שוב.
 

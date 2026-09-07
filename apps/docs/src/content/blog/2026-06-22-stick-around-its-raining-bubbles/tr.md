@@ -24,7 +24,7 @@ Amaç basit: hareket et, zıpla, diğer oyuncuyu savur, düşen sohbetten kaç v
 
 :::media-right
 
-![Düşen sohbet baloncuklarıyla tam sohbet katmanı olarak çalışan Stick Around!](./stickfightpreview.png){shadow=smooth rotation=1}
+![Düşen sohbet baloncuklarıyla tam sohbet katmanı olarak çalışan Stick Around!](./stickfightpreview-tr.webp){shadow=smooth rotation=1}
 
 Stick Around! tüm sohbet akışını oyun alanı olarak kullanır. Normal sohbet başlığı ve giriş alanı yerinde kalır.
 

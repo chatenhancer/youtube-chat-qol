@@ -3,7 +3,7 @@ title: "आपके emoji, बस एक hover दूर"
 date: 2026-07-12
 description: "नया quick emoji popover आपके सबसे ज़्यादा इस्तेमाल होने वाले reactions को YouTube live chat composer के ठीक ऊपर रखता है।"
 slug: "your-most-used-emojis-one-hover-away"
-image: "./cover.png"
+image: "./cover-hi.webp"
 locale: "hi"
 translationKey: "your-most-used-emojis-one-hover-away"
 tags:

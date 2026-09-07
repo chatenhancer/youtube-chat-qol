@@ -3,7 +3,7 @@ title: "ขอแนะนำโหมด Lite"
 date: 2026-07-11
 description: "โหมด Lite คือฟีดแชทน้ำหนักเบาที่เลือกใช้ได้ ออกแบบมาเพื่อให้แชทสด YouTube ที่คึกคักทำงานได้ลื่นไหลขึ้นและลดภาระของเบราว์เซอร์"
 slug: "introducing-lite-mode"
-image: "./a267721fcd28b8ba.png"
+image: "./a267721fcd28b8ba-th.webp"
 cover_width: 88
 locale: "th"
 translationKey: "introducing-lite-mode"

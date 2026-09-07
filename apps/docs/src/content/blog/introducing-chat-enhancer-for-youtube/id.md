@@ -5,7 +5,7 @@ description: "Chat Enhancer for YouTube menambahkan alat-alat kecil yang terasa 
 locale: "id"
 slug: "introducing-chat-enhancer-for-youtube"
 translationKey: "introducing-chat-enhancer-for-youtube"
-image: "./cover.png"
+image: "./cover-id.webp"
 tags:
   - "youtube"
   - "live-chat"

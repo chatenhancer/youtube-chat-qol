@@ -3,7 +3,7 @@ title: "你的表情，悬停即可选择"
 date: 2026-07-12
 description: "新的快捷表情浮层会把你最常用的反应放在 YouTube 直播聊天输入框正上方。"
 slug: "your-most-used-emojis-one-hover-away"
-image: "./cover.png"
+image: "./cover-zh_CN.webp"
 locale: "zh_CN"
 translationKey: "your-most-used-emojis-one-hover-away"
 tags:

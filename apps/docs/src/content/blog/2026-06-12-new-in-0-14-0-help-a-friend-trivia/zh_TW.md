@@ -4,7 +4,7 @@ date: 2026-06-12
 description: "HELP-A-FRIEND! Trivia 會把 YouTube 重播片段變成一局聊天式快問答。"
 locale: "zh_TW"
 slug: "new-in-0-14-0-help-a-friend-trivia"
-image: "./0e5e4f69e6fa7b45.png"
+image: "./0e5e4f69e6fa7b45-zh_TW.webp"
 translationKey: "new-in-0-14-0-help-a-friend-trivia"
 tags:
   - "playground"

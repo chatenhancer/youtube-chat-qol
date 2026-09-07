@@ -3,7 +3,7 @@ title: "Vos emojis, à portée de survol"
 date: 2026-07-12
 description: "Un nouveau sélecteur rapide place vos réactions les plus utilisées juste au-dessus du champ de chat en direct de YouTube."
 slug: "your-most-used-emojis-one-hover-away"
-image: "./cover.png"
+image: "./cover-fr.webp"
 locale: "fr"
 translationKey: "your-most-used-emojis-one-hover-away"
 tags:

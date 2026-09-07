@@ -5,7 +5,7 @@ description: "Playground는 스트림이 잠시 느슨해지는 순간에 즐길
 locale: "ko"
 slug: "introducing-playground-tiny-games-for-live-chat-breaks"
 translationKey: "introducing-playground-tiny-games-for-live-chat-breaks"
-image: "./90af004f7c5daeab.png"
+image: "./90af004f7c5daeab-ko.webp"
 cover_width: 73
 video: "./ba98da5bf0abb611.mp4"
 tags:
@@ -20,7 +20,7 @@ Playground는 Chat Enhancer 안에 있는 작은 게임 허브입니다. 같은 
 
 :::media-right
 
-![YouTube 라이브 채팅 위에 떠 있는 작은 체스 패널](./f779ebcc57f8280d.png){shadow=smooth rotation=-2}
+![YouTube 라이브 채팅 위에 떠 있는 작은 체스 패널](./f779ebcc57f8280d-ko.webp){shadow=smooth rotation=-2}
 
 게임은 작게 유지됩니다. 패널은 드래그할 수 있어서 채팅이 다시 바빠지면 방해되지 않는 곳으로 옮기면 됩니다.
 

@@ -3,7 +3,7 @@ title: "Thema's zijn er!"
 date: 2026-07-07
 description: "Chatthema's zijn nu beschikbaar, te beginnen met Aero, zodat YouTube-livechat persoonlijker aanvoelt."
 slug: "themes-are-here"
-image: "./2026-07-07-themes-are-here-assets/fc7c094f3fbf6ac2.png"
+image: "./2026-07-07-themes-are-here-assets/fc7c094f3fbf6ac2-nl.webp"
 cover_width: 84
 locale: "nl"
 translationKey: "themes-are-here"

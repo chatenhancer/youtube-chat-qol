@@ -24,7 +24,7 @@ L’obiettivo è semplice: muoviti, salta, spingi via l’altro giocatore, schiv
 
 :::media-right
 
-![Stick Around! in esecuzione come overlay completo della chat con bolle della chat in caduta](./stickfightpreview.png){shadow=smooth rotation=1}
+![Stick Around! in esecuzione come overlay completo della chat con bolle della chat in caduta](./stickfightpreview-it.webp){shadow=smooth rotation=1}
 
 Stick Around! usa tutto il feed della chat come spazio di gioco. L’intestazione normale della chat e l’input restano al loro posto.
 

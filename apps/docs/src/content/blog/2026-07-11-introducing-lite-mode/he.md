@@ -3,7 +3,7 @@ title: "הכירו את מצב Lite"
 date: 2026-07-11
 description: "מצב Lite הוא פיד צ׳אט אופציונלי וקל משקל, שנועד לשמור על צ׳אטים עמוסים בשידורים חיים של YouTube חלקים יותר ולהקל על הדפדפן."
 slug: "introducing-lite-mode"
-image: "./a267721fcd28b8ba.png"
+image: "./a267721fcd28b8ba-he.webp"
 cover_width: 88
 locale: "he"
 translationKey: "introducing-lite-mode"

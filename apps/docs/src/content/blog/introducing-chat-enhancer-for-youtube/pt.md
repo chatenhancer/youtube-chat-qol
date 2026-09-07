@@ -5,7 +5,7 @@ description: "Chat Enhancer for YouTube adiciona pequenas ferramentas com cara n
 locale: "pt"
 slug: "introducing-chat-enhancer-for-youtube"
 translationKey: "introducing-chat-enhancer-for-youtube"
-image: "./cover.png"
+image: "./cover-pt.webp"
 tags:
   - "youtube"
   - "live-chat"

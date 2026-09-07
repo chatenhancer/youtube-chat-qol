@@ -18,7 +18,7 @@ Ele começa com **Bounty Hunting**, uma caça rápida em que dois jogadores acom
 
 :::media-right
 
-![Quadro de procurados de Bounty Hunting](./64a11deb8049b2c9.png){shadow=smooth;rotate=-6deg}
+![Quadro de procurados de Bounty Hunting](./64a11deb8049b2c9-pt.webp){shadow=smooth;rotate=-6deg}
 
 ### Como funciona
 

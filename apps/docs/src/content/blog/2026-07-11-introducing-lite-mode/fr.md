@@ -3,7 +3,7 @@ title: "Présentation du mode Lite"
 date: 2026-07-11
 description: "Le mode Lite est un fil de chat facultatif et allégé, conçu pour rendre les chats YouTube en direct très actifs plus fluides et moins exigeants pour votre navigateur."
 slug: "introducing-lite-mode"
-image: "./a267721fcd28b8ba.png"
+image: "./a267721fcd28b8ba-fr.webp"
 cover_width: 88
 locale: "fr"
 translationKey: "introducing-lite-mode"

@@ -5,7 +5,7 @@ description: "Playground menghadirkan game kecil di live chat YouTube untuk mome
 locale: "id"
 slug: "introducing-playground-tiny-games-for-live-chat-breaks"
 translationKey: "introducing-playground-tiny-games-for-live-chat-breaks"
-image: "./90af004f7c5daeab.png"
+image: "./90af004f7c5daeab-id.webp"
 cover_width: 73
 video: "./ba98da5bf0abb611.mp4"
 tags:
@@ -20,7 +20,7 @@ Playground adalah hub game kecil di dalam Chat Enhancer. Anda bisa bermain denga
 
 :::media-right
 
-![Panel Catur ringkas melayang di atas live chat YouTube](./f779ebcc57f8280d.png){shadow=smooth rotation=-2}
+![Panel Catur ringkas melayang di atas live chat YouTube](./f779ebcc57f8280d-id.webp){shadow=smooth rotation=-2}
 
 Game tetap ringkas. Panelnya bisa diseret, jadi Anda dapat memindahkannya saat chat kembali ramai.
 

@@ -24,7 +24,7 @@ L’objectif est simple : bouger, sauter, repousser l’autre joueur, éviter le
 
 :::media-right
 
-![Stick Around! lancé comme superposition complète du chat avec des bulles de chat qui tombent](./stickfightpreview.png){shadow=smooth rotation=1}
+![Stick Around! lancé comme superposition complète du chat avec des bulles de chat qui tombent](./stickfightpreview-fr.webp){shadow=smooth rotation=1}
 
 Stick Around! utilise tout le flux du chat comme espace de jeu. L’en-tête normal du chat et la zone de saisie restent à leur place.
 

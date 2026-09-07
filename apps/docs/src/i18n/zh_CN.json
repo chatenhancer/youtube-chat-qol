@@ -226,6 +226,7 @@
     "title": "安装 Chat Enhancer",
     "copy": "你可以从 Chrome Web Store、Firefox Add-ons 或 Mac App Store 安装，也可以从源代码构建扩展用于本地开发。其他基于 Chromium 的浏览器通常可以使用 Chrome 构建版本。",
     "publishedVersions": "已发布版本",
+    "releaseLabel": "版本",
     "updatePendingTitle": "商店更新正在处理",
     "updatePendingBody": "最新版本仍在 {stores} 等待发布。",
     "updatePendingAnd": "和",

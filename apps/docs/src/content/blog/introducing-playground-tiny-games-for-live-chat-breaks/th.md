@@ -5,7 +5,7 @@ description: "Playground เพิ่มเกมเล็ก ๆ ในแช�
 locale: "th"
 slug: "introducing-playground-tiny-games-for-live-chat-breaks"
 translationKey: "introducing-playground-tiny-games-for-live-chat-breaks"
-image: "./90af004f7c5daeab.png"
+image: "./90af004f7c5daeab-th.webp"
 cover_width: 73
 video: "./ba98da5bf0abb611.mp4"
 tags:
@@ -20,7 +20,7 @@ Playground คือศูนย์รวมเกมเล็ก ๆ ใน Cha
 
 :::media-right
 
-![แผงหมากรุกขนาดกะทัดรัดที่ลอยอยู่เหนือแชทสดของ YouTube](./f779ebcc57f8280d.png){shadow=smooth rotation=-2}
+![แผงหมากรุกขนาดกะทัดรัดที่ลอยอยู่เหนือแชทสดของ YouTube](./f779ebcc57f8280d-th.webp){shadow=smooth rotation=-2}
 
 เกมยังคงกะทัดรัด แผงลากย้ายได้ คุณจึงเลื่อนไปด้านข้างเมื่อแชทกลับมาคึกคักอีกครั้ง
 

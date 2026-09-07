@@ -3,7 +3,7 @@ title: "Lite मोड का परिचय"
 date: 2026-07-11
 description: "Lite मोड एक वैकल्पिक, हल्का चैट फ़ीड है, जिसे व्यस्त YouTube लाइव चैट को अधिक सुचारु रखने और आपके ब्राउज़र पर कम भार डालने के लिए बनाया गया है।"
 slug: "introducing-lite-mode"
-image: "./a267721fcd28b8ba.png"
+image: "./a267721fcd28b8ba-hi.webp"
 cover_width: 88
 locale: "hi"
 translationKey: "introducing-lite-mode"

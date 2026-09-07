@@ -5,7 +5,7 @@ description: "Playground, yayının sakin anlarında oynanacak kompakt oyunları
 locale: "tr"
 slug: "introducing-playground-tiny-games-for-live-chat-breaks"
 translationKey: "introducing-playground-tiny-games-for-live-chat-breaks"
-image: "./90af004f7c5daeab.png"
+image: "./90af004f7c5daeab-tr.webp"
 cover_width: 73
 video: "./ba98da5bf0abb611.mp4"
 tags:
@@ -20,7 +20,7 @@ Playground, Chat Enhancer içinde küçük bir oyun alanıdır. Uzantıyı kurmu
 
 :::media-right
 
-![YouTube canlı sohbet üzerinde yüzen kompakt satranç paneli](./f779ebcc57f8280d.png){shadow=smooth rotation=-2}
+![YouTube canlı sohbet üzerinde yüzen kompakt satranç paneli](./f779ebcc57f8280d-tr.webp){shadow=smooth rotation=-2}
 
 Oyunlar kompakt kalır. Panel sürüklenebilir, böylece sohbet yeniden hızlandığında onu kenara alabilirsiniz.
 

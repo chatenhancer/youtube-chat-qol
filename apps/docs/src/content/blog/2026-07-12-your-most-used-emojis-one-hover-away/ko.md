@@ -3,7 +3,7 @@ title: "이모지를 마우스 한 번으로"
 date: 2026-07-12
 description: "새로운 빠른 이모지 팝오버가 자주 쓰는 반응을 YouTube 라이브 채팅 입력창 바로 위에 보여 줍니다."
 slug: "your-most-used-emojis-one-hover-away"
-image: "./cover.png"
+image: "./cover-ko.webp"
 locale: "ko"
 translationKey: "your-most-used-emojis-one-hover-away"
 tags:

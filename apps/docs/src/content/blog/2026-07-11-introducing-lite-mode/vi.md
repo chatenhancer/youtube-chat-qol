@@ -3,7 +3,7 @@ title: "Giới thiệu chế độ Lite"
 date: 2026-07-11
 description: "Chế độ Lite là một bảng tin trò chuyện nhẹ, không bắt buộc, được thiết kế để các cuộc trò chuyện trực tiếp đông người trên YouTube hoạt động mượt hơn và giảm tải cho trình duyệt."
 slug: "introducing-lite-mode"
-image: "./a267721fcd28b8ba.png"
+image: "./a267721fcd28b8ba-vi.webp"
 cover_width: 88
 locale: "vi"
 translationKey: "introducing-lite-mode"

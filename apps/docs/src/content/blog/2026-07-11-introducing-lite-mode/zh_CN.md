@@ -3,7 +3,7 @@ title: "Lite 模式简介"
 date: 2026-07-11
 description: "Lite 模式是一种可选的轻量聊天消息流，旨在让繁忙的 YouTube 直播聊天更流畅，并减轻浏览器负担。"
 slug: "introducing-lite-mode"
-image: "./a267721fcd28b8ba.png"
+image: "./a267721fcd28b8ba-zh_CN.webp"
 cover_width: 88
 locale: "zh_CN"
 translationKey: "introducing-lite-mode"

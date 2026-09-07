@@ -226,6 +226,7 @@
     "title": "تثبيت Chat Enhancer",
     "copy": "احصل عليه من Chrome Web Store أو Firefox Add-ons أو Mac App Store، أو ابنِ الإضافة من المصدر للتطوير المحلي. تستطيع المتصفحات الأخرى المبنية على Chromium عادة استخدام نسخة Chrome.",
     "publishedVersions": "الإصدارات المنشورة",
+    "releaseLabel": "الإصدار",
     "updatePendingTitle": "تحديث المتجر قيد المعالجة",
     "updatePendingBody": "لا يزال أحدث إصدار بانتظار النشر في {stores}.",
     "updatePendingAnd": "و",

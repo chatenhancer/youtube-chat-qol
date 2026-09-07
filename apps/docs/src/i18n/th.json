@@ -226,6 +226,7 @@
     "title": "ติดตั้ง Chat Enhancer",
     "copy": "ติดตั้งจาก Chrome Web Store, Firefox Add-ons หรือ Mac App Store หรือสร้างส่วนขยายจากซอร์สโค้ดสำหรับการพัฒนาในเครื่อง เบราว์เซอร์อื่นที่ใช้ Chromium โดยทั่วไปสามารถใช้บิลด์ของ Chrome ได้",
     "publishedVersions": "เวอร์ชันที่เผยแพร่",
+    "releaseLabel": "รุ่น",
     "updatePendingTitle": "กำลังอัปเดตในสโตร์",
     "updatePendingBody": "รุ่นล่าสุดยังอยู่ระหว่างรอบน {stores}",
     "updatePendingAnd": "และ",

@@ -5,7 +5,7 @@ description: "Chat Enhancer for YouTube, yoğun YouTube canlı sohbetlerini taki
 locale: "tr"
 slug: "introducing-chat-enhancer-for-youtube"
 translationKey: "introducing-chat-enhancer-for-youtube"
-image: "./cover.png"
+image: "./cover-tr.webp"
 tags:
   - "youtube"
   - "live-chat"

@@ -24,7 +24,7 @@ Mục tiêu rất đơn giản: di chuyển, nhảy, hất người chơi kia, n
 
 :::media-right
 
-![Stick Around! chạy dưới dạng overlay toàn bộ chat với bong bóng chat đang rơi](./stickfightpreview.png){shadow=smooth rotation=1}
+![Stick Around! chạy dưới dạng overlay toàn bộ chat với bong bóng chat đang rơi](./stickfightpreview-vi.webp){shadow=smooth rotation=1}
 
 Stick Around! dùng toàn bộ chat feed làm không gian chơi, trong khi vẫn để nguyên chat header và ô input bình thường.
 

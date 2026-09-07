@@ -3,7 +3,7 @@ title: "Os temas chegaram!"
 date: 2026-07-07
 description: "Os temas de chat já estão disponíveis, começando pelo Aero, para deixar o chat ao vivo do YouTube mais com a sua cara."
 slug: "themes-are-here"
-image: "./2026-07-07-themes-are-here-assets/fc7c094f3fbf6ac2.png"
+image: "./2026-07-07-themes-are-here-assets/fc7c094f3fbf6ac2-pt.webp"
 cover_width: 84
 locale: "pt"
 translationKey: "themes-are-here"

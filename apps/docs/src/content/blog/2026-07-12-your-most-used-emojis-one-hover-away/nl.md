@@ -3,7 +3,7 @@ title: "Je emoji's, één hover van je vandaan"
 date: 2026-07-12
 description: "Een nieuwe snelle emoji-popover zet je meestgebruikte reacties direct boven het berichtveld van YouTube-livechat."
 slug: "your-most-used-emojis-one-hover-away"
-image: "./cover.png"
+image: "./cover-nl.webp"
 locale: "nl"
 translationKey: "your-most-used-emojis-one-hover-away"
 tags:

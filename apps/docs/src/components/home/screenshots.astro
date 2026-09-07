@@ -2,8 +2,11 @@
 import Icon from '../common/icon.astro';
 import WalkthroughClipTag from '../common/walkthrough-clip-tag.astro';
 import type { Messages } from '../../data/site';
+import type { Locale } from '../../data/locales';
+import { localizedImage } from '../../data/localized-images';
 
-const { messages: m, rootPrefix } = Astro.props as {
+const { locale, messages: m, rootPrefix } = Astro.props as {
+  locale: Locale;
   messages: Messages;
   rootPrefix: string;
 };
@@ -71,13 +74,13 @@ const { messages: m, rootPrefix } = Astro.props as {
               </div>
             </div>
             <div class="showcase-media showcase-media-translation">
-              <img src={`${rootPrefix}assets/screenshots/hero-img1.png`} alt={m.screenshots.translationAlt}>
+              <img src={localizedImage(`${rootPrefix}assets/screenshots/hero-img1.png`, locale)} alt={m.screenshots.translationAlt}>
             </div>
           </article>
 
           <article class="showcase-panel showcase-panel-reverse" data-screenshot-panel="inbox-context">
             <div class="showcase-media showcase-media-inbox-context">
-              <img src={`${rootPrefix}assets/screenshots/hero-img2.png`} alt={m.screenshots.mentionAlt}>
+              <img src={localizedImage(`${rootPrefix}assets/screenshots/hero-img2.png`, locale)} alt={m.screenshots.mentionAlt}>
             </div>
             <div class="showcase-copy walkthrough-clip-tag-host">
               <WalkthroughClipTag
@@ -145,7 +148,7 @@ const { messages: m, rootPrefix } = Astro.props as {
               </a>
             </div>
             <div class="showcase-media showcase-media-extras">
-              <img src={`${rootPrefix}assets/screenshots/hero-img3.png`} alt={m.screenshots.extrasAlt}>
+              <img src={localizedImage(`${rootPrefix}assets/screenshots/hero-img3.png`, locale)} alt={m.screenshots.extrasAlt}>
             </div>
           </article>
         </div>

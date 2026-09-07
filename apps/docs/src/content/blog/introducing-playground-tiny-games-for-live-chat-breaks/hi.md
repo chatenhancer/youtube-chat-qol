@@ -5,7 +5,7 @@ description: "Playground, stream के धीमे पलों में YouT
 locale: "hi"
 slug: "introducing-playground-tiny-games-for-live-chat-breaks"
 translationKey: "introducing-playground-tiny-games-for-live-chat-breaks"
-image: "./90af004f7c5daeab.png"
+image: "./90af004f7c5daeab-hi.webp"
 cover_width: 73
 video: "./ba98da5bf0abb611.mp4"
 tags:
@@ -20,7 +20,7 @@ Playground, Chat Enhancer के अंदर एक छोटा games hub ह�
 
 :::media-right
 
-![YouTube live chat के ऊपर तैरता compact शतरंज panel](./f779ebcc57f8280d.png){shadow=smooth rotation=-2}
+![YouTube live chat के ऊपर तैरता compact शतरंज panel](./f779ebcc57f8280d-hi.webp){shadow=smooth rotation=-2}
 
 गेम compact रहते हैं. Panel को drag किया जा सकता है, इसलिए chat फिर तेज़ होने लगे तो आप उसे रास्ते से हटा सकते हैं.
 

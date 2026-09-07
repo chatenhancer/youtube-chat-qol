@@ -5,7 +5,7 @@ description: "Chat Enhancer for YouTube는 붐비는 YouTube 라이브 채팅을
 locale: "ko"
 slug: "introducing-chat-enhancer-for-youtube"
 translationKey: "introducing-chat-enhancer-for-youtube"
-image: "./cover.png"
+image: "./cover-ko.webp"
 tags:
   - "youtube"
   - "live-chat"

@@ -4,7 +4,7 @@ date: 2026-06-12
 description: "HELP-A-FRIEND! Trivia 会把 YouTube 回放片段变成一局聊天式快问答。"
 locale: "zh_CN"
 slug: "new-in-0-14-0-help-a-friend-trivia"
-image: "./0e5e4f69e6fa7b45.png"
+image: "./0e5e4f69e6fa7b45-zh_CN.webp"
 translationKey: "new-in-0-14-0-help-a-friend-trivia"
 tags:
   - "playground"

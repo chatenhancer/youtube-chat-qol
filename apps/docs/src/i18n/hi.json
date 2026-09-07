@@ -226,6 +226,7 @@
     "title": "Chat Enhancer इंस्टॉल करें",
     "copy": "इसे Chrome Web Store, Firefox Add-ons या Mac App Store से लें, या स्थानीय डेवलपमेंट के लिए सोर्स से एक्सटेंशन बनाएँ। अन्य Chromium-आधारित ब्राउज़र आम तौर पर Chrome बिल्ड इस्तेमाल कर सकते हैं।",
     "publishedVersions": "प्रकाशित वर्जन",
+    "releaseLabel": "रिलीज़",
     "updatePendingTitle": "स्टोर अपडेट जारी है",
     "updatePendingBody": "नया रिलीज़ अभी {stores} पर लंबित है।",
     "updatePendingAnd": "और",

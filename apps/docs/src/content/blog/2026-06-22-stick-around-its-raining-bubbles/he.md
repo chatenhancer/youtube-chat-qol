@@ -24,7 +24,7 @@ tags:
 
 :::media-right
 
-![Stick Around! פועל כשכבת צ'אט מלאה עם בועות צ'אט נופלות](./stickfightpreview.png){shadow=smooth rotation=1}
+![Stick Around! פועל כשכבת צ'אט מלאה עם בועות צ'אט נופלות](./stickfightpreview-he.webp){shadow=smooth rotation=1}
 
 Stick Around! משתמש בכל פיד הצ'אט כמרחב המשחק, ומשאיר את כותרת הצ'אט ושדה הקלט הרגילים במקומם.
 

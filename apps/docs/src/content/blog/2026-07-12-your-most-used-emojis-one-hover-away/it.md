@@ -3,7 +3,7 @@ title: "Le tue emoji, a portata di hover"
 date: 2026-07-12
 description: "Un nuovo selettore rapido mette le reazioni che usi di più direttamente sopra il campo della live chat di YouTube."
 slug: "your-most-used-emojis-one-hover-away"
-image: "./cover.png"
+image: "./cover-it.webp"
 locale: "it"
 translationKey: "your-most-used-emojis-one-hover-away"
 tags:

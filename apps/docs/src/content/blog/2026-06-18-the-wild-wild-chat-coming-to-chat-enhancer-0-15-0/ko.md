@@ -18,7 +18,7 @@ tags:
 
 :::media-right
 
-![Bounty Hunting 현상수배 보드](./64a11deb8049b2c9.png){shadow=smooth;rotate=-6deg}
+![Bounty Hunting 현상수배 보드](./64a11deb8049b2c9-ko.webp){shadow=smooth;rotate=-6deg}
 
 ### 작동 방식
 

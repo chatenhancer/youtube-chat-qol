@@ -3,7 +3,7 @@ title: "تم‌ها رسیدند!"
 date: 2026-07-07
 description: "تم‌های چت حالا در دسترس‌اند، از Aero شروع می‌کنیم، تا چت زنده YouTube برایت شخصی‌تر به نظر برسد."
 slug: "themes-are-here"
-image: "./2026-07-07-themes-are-here-assets/fc7c094f3fbf6ac2.png"
+image: "./2026-07-07-themes-are-here-assets/fc7c094f3fbf6ac2-fa.webp"
 cover_width: 84
 locale: "fa"
 translationKey: "themes-are-here"

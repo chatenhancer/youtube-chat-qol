@@ -3,7 +3,7 @@ title: "Темы уже здесь!"
 date: 2026-07-07
 description: "Темы чата уже доступны, начиная с Aero, чтобы живой чат YouTube ощущался более личным."
 slug: "themes-are-here"
-image: "./2026-07-07-themes-are-here-assets/fc7c094f3fbf6ac2.png"
+image: "./2026-07-07-themes-are-here-assets/fc7c094f3fbf6ac2-ru.webp"
 cover_width: 84
 locale: "ru"
 translationKey: "themes-are-here"

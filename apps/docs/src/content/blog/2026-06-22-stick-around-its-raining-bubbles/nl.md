@@ -24,7 +24,7 @@ Het doel is simpel: bewegen, springen, de andere speler wegduwen, de vallende ch
 
 :::media-right
 
-![Stick Around! als volledige chatoverlay met vallende chatbubbels](./stickfightpreview.png){shadow=smooth rotation=1}
+![Stick Around! als volledige chatoverlay met vallende chatbubbels](./stickfightpreview-nl.webp){shadow=smooth rotation=1}
 
 Stick Around! gebruikt de hele chatfeed als speelruimte. De normale chatkop en invoer blijven gewoon staan.
 

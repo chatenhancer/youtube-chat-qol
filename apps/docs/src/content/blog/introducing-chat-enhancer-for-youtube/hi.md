@@ -5,7 +5,7 @@ description: "Chat Enhancer for YouTube छोटे-छोटे ऐसे ट�
 locale: "hi"
 slug: "introducing-chat-enhancer-for-youtube"
 translationKey: "introducing-chat-enhancer-for-youtube"
-image: "./cover.png"
+image: "./cover-hi.webp"
 tags:
   - "youtube"
   - "live-chat"

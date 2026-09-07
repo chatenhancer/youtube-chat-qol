@@ -18,7 +18,7 @@ Her şey **Bounty Hunting** ile başlıyor: iki oyuncu aynı yayın sohbetini iz
 
 :::media-right
 
-![Bounty Hunting arananlar panosu](./64a11deb8049b2c9.png){shadow=smooth;rotate=-6deg}
+![Bounty Hunting arananlar panosu](./64a11deb8049b2c9-tr.webp){shadow=smooth;rotate=-6deg}
 
 ### Nasıl çalışır
 

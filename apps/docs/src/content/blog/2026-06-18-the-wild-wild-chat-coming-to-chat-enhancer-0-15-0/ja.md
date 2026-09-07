@@ -18,7 +18,7 @@ tags:
 
 :::media-right
 
-![Bounty Hunting の指名手配ボード](./64a11deb8049b2c9.png){shadow=smooth;rotate=-6deg}
+![Bounty Hunting の指名手配ボード](./64a11deb8049b2c9-ja.webp){shadow=smooth;rotate=-6deg}
 
 ### 仕組み
 

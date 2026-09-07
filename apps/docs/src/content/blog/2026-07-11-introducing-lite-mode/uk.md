@@ -3,7 +3,7 @@ title: "Представляємо режим Lite"
 date: 2026-07-11
 description: "Режим Lite — це необов’язкова полегшена стрічка чату, створена для плавнішої роботи активних прямих чатів YouTube і меншого навантаження на браузер."
 slug: "introducing-lite-mode"
-image: "./a267721fcd28b8ba.png"
+image: "./a267721fcd28b8ba-uk.webp"
 cover_width: 88
 locale: "uk"
 translationKey: "introducing-lite-mode"

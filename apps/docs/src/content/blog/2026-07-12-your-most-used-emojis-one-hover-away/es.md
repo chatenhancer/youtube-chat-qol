@@ -3,7 +3,7 @@ title: "Tus emojis, a un solo gesto"
 date: 2026-07-12
 description: "Un nuevo selector rápido coloca las reacciones que más usas justo encima del cuadro de chat en directo de YouTube."
 slug: "your-most-used-emojis-one-hover-away"
-image: "./cover.png"
+image: "./cover-es.webp"
 locale: "es"
 translationKey: "your-most-used-emojis-one-hover-away"
 tags:

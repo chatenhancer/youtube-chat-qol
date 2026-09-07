@@ -5,7 +5,7 @@ description: "Playground thêm các trò chơi gọn nhẹ vào live chat YouTub
 locale: "vi"
 slug: "introducing-playground-tiny-games-for-live-chat-breaks"
 translationKey: "introducing-playground-tiny-games-for-live-chat-breaks"
-image: "./90af004f7c5daeab.png"
+image: "./90af004f7c5daeab-vi.webp"
 cover_width: 73
 video: "./ba98da5bf0abb611.mp4"
 tags:
@@ -20,7 +20,7 @@ Playground là một khu trò chơi nhỏ trong Chat Enhancer. Bạn có thể c
 
 :::media-right
 
-![Bảng Cờ vua nhỏ gọn nổi trên live chat YouTube](./f779ebcc57f8280d.png){shadow=smooth rotation=-2}
+![Bảng Cờ vua nhỏ gọn nổi trên live chat YouTube](./f779ebcc57f8280d-vi.webp){shadow=smooth rotation=-2}
 
 Các trò chơi vẫn gọn nhẹ. Bảng có thể kéo thả, nên bạn có thể đẩy nó sang một bên khi chat sôi động trở lại.
 

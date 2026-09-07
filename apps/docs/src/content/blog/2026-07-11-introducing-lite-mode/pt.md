@@ -3,7 +3,7 @@ title: "Apresentando o modo Lite"
 date: 2026-07-11
 description: "O modo Lite é um feed de chat opcional e leve, criado para manter chats ao vivo movimentados do YouTube mais fluidos e reduzir a carga no navegador."
 slug: "introducing-lite-mode"
-image: "./a267721fcd28b8ba.png"
+image: "./a267721fcd28b8ba-pt.webp"
 cover_width: 88
 locale: "pt"
 translationKey: "introducing-lite-mode"

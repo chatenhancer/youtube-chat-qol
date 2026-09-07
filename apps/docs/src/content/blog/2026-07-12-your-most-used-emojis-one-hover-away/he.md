@@ -3,7 +3,7 @@ title: "האימוג'ים שלך במרחק ריחוף אחד"
 date: 2026-07-12
 description: "חלונית אימוג'י מהירה חדשה מציבה את התגובות הנפוצות שלך ממש מעל תיבת הצ'אט החי של YouTube."
 slug: "your-most-used-emojis-one-hover-away"
-image: "./cover.png"
+image: "./cover-he.webp"
 locale: "he"
 translationKey: "your-most-used-emojis-one-hover-away"
 tags:

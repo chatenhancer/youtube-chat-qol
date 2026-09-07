@@ -226,6 +226,7 @@
     "title": "Instalar Chat Enhancer",
     "copy": "Instale pela Chrome Web Store, pelo Firefox Add-ons ou pela Mac App Store, ou compile a extensão a partir do código-fonte para desenvolvimento local. Outros navegadores baseados em Chromium geralmente podem usar a versão do Chrome.",
     "publishedVersions": "Versões publicadas",
+    "releaseLabel": "versão",
     "updatePendingTitle": "Atualização da loja em andamento",
     "updatePendingBody": "A versão mais recente ainda está pendente em {stores}.",
     "updatePendingAnd": "e",

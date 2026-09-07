@@ -3,7 +3,7 @@ title: "テーマが登場しました！"
 date: 2026-07-07
 description: "チャットテーマが Aero から利用可能になり、YouTube ライブチャットをもっと自分らしい空間にできます。"
 slug: "themes-are-here"
-image: "./2026-07-07-themes-are-here-assets/fc7c094f3fbf6ac2.png"
+image: "./2026-07-07-themes-are-here-assets/fc7c094f3fbf6ac2-ja.webp"
 cover_width: 84
 locale: "ja"
 translationKey: "themes-are-here"

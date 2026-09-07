@@ -3,7 +3,7 @@ title: "Tema sudah hadir!"
 date: 2026-07-07
 description: "Tema chat kini tersedia, dimulai dengan Aero, agar live chat YouTube terasa lebih personal."
 slug: "themes-are-here"
-image: "./2026-07-07-themes-are-here-assets/fc7c094f3fbf6ac2.png"
+image: "./2026-07-07-themes-are-here-assets/fc7c094f3fbf6ac2-id.webp"
 cover_width: 84
 locale: "id"
 translationKey: "themes-are-here"

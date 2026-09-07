@@ -31,7 +31,6 @@ interface CycleOptionOptions {
 }
 
 interface VersionBadgeSource {
-  image: string;
   json: string;
   showPendingState?: boolean;
 }
@@ -78,19 +77,15 @@ export function initializeDocsHome() {
   const walkthroughHash = "#walkthrough";
   const versionBadgeSources: Record<VersionBadgeKey, VersionBadgeSource> = {
     release: {
-      image: "https://img.shields.io/github/v/release/chat-enhancer-yt/youtube-chat-qol?label=release&logo=github",
       json: "https://img.shields.io/github/v/release/chat-enhancer-yt/youtube-chat-qol.json?label=release"
     },
     chrome: {
-      image: "https://img.shields.io/chrome-web-store/v/pkhaaipeppfpakofgpdpcpkflangpghf?label=chrome%20web%20store&logo=googlechrome",
       json: "https://img.shields.io/chrome-web-store/v/pkhaaipeppfpakofgpdpcpkflangpghf.json?label=chrome%20web%20store"
     },
     firefox: {
-      image: "https://img.shields.io/amo/v/chat-enhancer-for-youtube?label=firefox%20add-ons&logo=firefoxbrowser",
       json: "https://img.shields.io/amo/v/chat-enhancer-for-youtube.json?label=firefox%20add-ons"
     },
     safari: {
-      image: "https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fitunes.apple.com%2Flookup%3Fid%3D6783276323%26country%3Dus&query=%24.results%5B0%5D.version&label=mac%20app%20store&logo=apple&cacheSeconds=300",
       json: "https://img.shields.io/badge/dynamic/json.json?url=https%3A%2F%2Fitunes.apple.com%2Flookup%3Fid%3D6783276323%26country%3Dus&query=%24.results%5B0%5D.version&label=mac%20app%20store&cacheSeconds=300",
       // Apple's public lookup can lag behind App Store Connect after approval.
       // Keep the badge informational instead of treating a stale result as pending.
@@ -1311,10 +1306,11 @@ export function initializeDocsHome() {
 
   function setVersionBadgeColor(key: VersionBadgeKey, color: string) {
     const image = document.querySelector<HTMLImageElement>(`[data-version-badge="${key}"]`);
-    const source = versionBadgeSources[key];
-    if (!(image instanceof HTMLImageElement) || !source) return;
+    if (!(image instanceof HTMLImageElement)) return;
 
-    image.src = `${source.image}&color=${encodeURIComponent(color)}`;
+    const url = new URL(image.src);
+    url.searchParams.set("color", color);
+    image.src = url.href;
   }
 
   async function fetchShieldMessage(url: string) {

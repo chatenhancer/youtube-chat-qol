@@ -3,7 +3,7 @@ title: "رموزك التعبيرية على بُعد تمريرة واحدة"
 date: 2026-07-12
 description: "نافذة رموز تعبيرية سريعة جديدة تضع تفاعلاتك الأكثر استخدامًا مباشرة فوق مربع الدردشة المباشرة في YouTube."
 slug: "your-most-used-emojis-one-hover-away"
-image: "./cover.png"
+image: "./cover-ar.webp"
 locale: "ar"
 translationKey: "your-most-used-emojis-one-hover-away"
 tags:

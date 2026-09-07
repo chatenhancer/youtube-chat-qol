@@ -5,7 +5,7 @@ description: "Playground برای لحظه‌های آرام‌تر یک پخش�
 locale: "fa"
 slug: "introducing-playground-tiny-games-for-live-chat-breaks"
 translationKey: "introducing-playground-tiny-games-for-live-chat-breaks"
-image: "./90af004f7c5daeab.png"
+image: "./90af004f7c5daeab-fa.webp"
 cover_width: 73
 video: "./ba98da5bf0abb611.mp4"
 tags:
@@ -20,7 +20,7 @@ Playground یک فضای کوچک برای بازی داخل Chat Enhancer اس�
 
 :::media-right
 
-![پنل شطرنج جمع‌وجور که روی چت زنده YouTube شناور است](./f779ebcc57f8280d.png){shadow=smooth rotation=-2}
+![پنل شطرنج جمع‌وجور که روی چت زنده YouTube شناور است](./f779ebcc57f8280d-fa.webp){shadow=smooth rotation=-2}
 
 بازی‌ها جمع‌وجور می‌مانند. پنل را می‌توانید جابه‌جا کنید، پس وقتی چت دوباره شلوغ شد آن را کنار می‌زنید.
 

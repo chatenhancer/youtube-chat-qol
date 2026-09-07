@@ -4,7 +4,7 @@ date: 2026-06-12
 description: "HELP-A-FRIEND! Trivia는 YouTube 다시보기 속 순간을 짧은 채팅 스타일 퀴즈로 바꾸는 Playground 게임입니다."
 locale: "ko"
 slug: "new-in-0-14-0-help-a-friend-trivia"
-image: "./0e5e4f69e6fa7b45.png"
+image: "./0e5e4f69e6fa7b45-ko.webp"
 translationKey: "new-in-0-14-0-help-a-friend-trivia"
 tags:
   - "playground"

@@ -5,7 +5,7 @@ description: "Playground ajoute des jeux compacts au chat en direct de YouTube p
 locale: "fr"
 slug: "introducing-playground-tiny-games-for-live-chat-breaks"
 translationKey: "introducing-playground-tiny-games-for-live-chat-breaks"
-image: "./90af004f7c5daeab.png"
+image: "./90af004f7c5daeab-fr.webp"
 cover_width: 73
 video: "./ba98da5bf0abb611.mp4"
 tags:
@@ -20,7 +20,7 @@ Playground est un petit espace de jeux dans Chat Enhancer. Il vous permet de jou
 
 :::media-right
 
-![Panneau compact de Échecs flottant au-dessus du chat en direct de YouTube](./f779ebcc57f8280d.png){shadow=smooth rotation=-2}
+![Panneau compact de Échecs flottant au-dessus du chat en direct de YouTube](./f779ebcc57f8280d-fr.webp){shadow=smooth rotation=-2}
 
 Les jeux restent compacts. Le panneau se déplace facilement, vous pouvez donc le mettre de côté quand le chat reprend.
 

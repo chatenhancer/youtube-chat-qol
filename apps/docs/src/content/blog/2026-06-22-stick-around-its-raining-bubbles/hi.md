@@ -24,7 +24,7 @@ Goal सीधा है: चलें, jump करें, दूसरे playe
 
 :::media-right
 
-![गिरते chat bubbles के साथ full-chat overlay में चल रहा Stick Around!](./stickfightpreview.png){shadow=smooth rotation=1}
+![गिरते chat bubbles के साथ full-chat overlay में चल रहा Stick Around!](./stickfightpreview-hi.webp){shadow=smooth rotation=1}
 
 Stick Around! पूरे chat feed को खेलने की जगह की तरह इस्तेमाल करता है। सामान्य chat header और input अपनी जगह बने रहते हैं।
 

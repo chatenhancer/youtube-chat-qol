@@ -24,7 +24,7 @@ Muévete, salta, empuja al rival y esquiva el chat sin perder todas tus vidas.
 
 :::media-right
 
-![Stick Around! funcionando como una superposición de chat completo con burbujas de chat cayendo](./stickfightpreview.png){shadow=smooth rotation=1}
+![Stick Around! funcionando como una superposición de chat completo con burbujas de chat cayendo](./stickfightpreview-es.webp){shadow=smooth rotation=1}
 
 El feed se convierte en la zona de juego, mientras que el encabezado y el cuadro de texto siguen disponibles.
 

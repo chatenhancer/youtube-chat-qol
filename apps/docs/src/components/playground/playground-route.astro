@@ -6,6 +6,7 @@ import PlaygroundPage from './playground-page.astro';
 import { getBlogPostPath, getLocalizedBlogPosts } from '../../data/blog';
 import { getLocaleUrl, getMessages, htmlLangFor, locales } from '../../data/locales';
 import { getWalkthroughVideoUrl } from '../../data/media';
+import { localizedImage } from '../../data/localized-images';
 import type { Locale } from '../../data/locales';
 import { site } from '../../data/site';
 import { getWalkthroughClip } from '../../data/walkthrough';
@@ -42,28 +43,28 @@ const games = [
   {
     ...page.games.chess,
     href: getRequiredPostPath('introducing-playground-tiny-games-for-live-chat-breaks'),
-    image: '/assets/playground/page/chess.webp',
+    image: localizedImage('/assets/playground/page/chess.webp', locale),
     imageHeight: 1586,
     imageWidth: 1400
   },
   {
     ...page.games.trivia,
     href: getRequiredPostPath('new-in-0-14-0-help-a-friend-trivia'),
-    image: '/assets/playground/page/replay-trivia.webp',
+    image: localizedImage('/assets/playground/page/replay-trivia.webp', locale),
     imageHeight: 1570,
     imageWidth: 1400
   },
   {
     ...page.games.wild,
     href: getRequiredPostPath('the-wild-wild-chat-coming-to-chat-enhancer-0-15-0'),
-    image: '/assets/playground/page/wild-wild-chat.webp',
+    image: localizedImage('/assets/playground/page/wild-wild-chat.webp', locale),
     imageHeight: 1538,
     imageWidth: 1400
   },
   {
     ...page.games.stickAround,
     href: getRequiredPostPath('stick-around-its-raining-bubbles'),
-    image: '/assets/playground/page/stick-around.webp',
+    image: localizedImage('/assets/playground/page/stick-around.webp', locale),
     imageHeight: 1787,
     imageWidth: 1400
   }

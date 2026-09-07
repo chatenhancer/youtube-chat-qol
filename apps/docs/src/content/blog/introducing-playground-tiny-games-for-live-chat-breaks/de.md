@@ -5,7 +5,7 @@ description: "Playground bringt kompakte Spiele in den YouTube-Livechat, für ru
 locale: "de"
 slug: "introducing-playground-tiny-games-for-live-chat-breaks"
 translationKey: "introducing-playground-tiny-games-for-live-chat-breaks"
-image: "./90af004f7c5daeab.png"
+image: "./90af004f7c5daeab-de.webp"
 cover_width: 73
 video: "./ba98da5bf0abb611.mp4"
 tags:
@@ -20,7 +20,7 @@ Playground ist ein kleiner Spielebereich in Chat Enhancer. Dort kannst du mit an
 
 :::media-right
 
-![Kompaktes Schachpanel über dem YouTube-Livechat](./f779ebcc57f8280d.png){shadow=smooth rotation=-2}
+![Kompaktes Schachpanel über dem YouTube-Livechat](./f779ebcc57f8280d-de.webp){shadow=smooth rotation=-2}
 
 Die Spiele bleiben kompakt. Das Panel lässt sich verschieben, damit du es aus dem Weg ziehen kannst, sobald der Chat wieder anzieht.
 

@@ -24,7 +24,7 @@ tags:
 
 :::media-right
 
-![اجرای Stick Around! به‌صورت یک پوشش کامل روی چت با حباب‌های چت در حال سقوط](./stickfightpreview.png){shadow=smooth rotation=1}
+![اجرای Stick Around! به‌صورت یک پوشش کامل روی چت با حباب‌های چت در حال سقوط](./stickfightpreview-fa.webp){shadow=smooth rotation=1}
 
 Stick Around! از کل فید چت به‌عنوان فضای بازی استفاده می‌کند و هدر معمولی چت و ورودی پیام را سر جای خود نگه می‌دارد.
 

@@ -226,6 +226,7 @@
     "title": "Chat Enhancer installeren",
     "copy": "Download de extensie uit de Chrome Web Store, Firefox Add-ons of de Mac App Store, of bouw hem vanuit de broncode voor lokale ontwikkeling. Andere Chromium-gebaseerde browsers kunnen meestal de Chrome-build gebruiken.",
     "publishedVersions": "Gepubliceerde versies",
+    "releaseLabel": "versie",
     "updatePendingTitle": "Store-update in behandeling",
     "updatePendingBody": "De nieuwste release wacht nog op {stores}.",
     "updatePendingAnd": "en",

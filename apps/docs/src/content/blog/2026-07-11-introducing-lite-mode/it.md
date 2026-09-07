@@ -3,7 +3,7 @@ title: "Presentazione della modalità Lite"
 date: 2026-07-11
 description: "La modalità Lite è un feed della chat facoltativo e leggero, progettato per rendere più fluide le chat live di YouTube molto affollate e ridurre il carico sul browser."
 slug: "introducing-lite-mode"
-image: "./a267721fcd28b8ba.png"
+image: "./a267721fcd28b8ba-it.webp"
 cover_width: 88
 locale: "it"
 translationKey: "introducing-lite-mode"

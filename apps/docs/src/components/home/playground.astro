@@ -1,6 +1,8 @@
 ---
 import Icon from '../common/icon.astro';
 import type { Messages } from '../../data/site';
+import type { Locale } from '../../data/locales';
+import { localizedImage } from '../../data/localized-images';
 import { getWalkthroughClip, getWalkthroughClipHash } from '../../data/walkthrough';
 
 interface GamePostPaths {
@@ -10,7 +12,8 @@ interface GamePostPaths {
   wild: string;
 }
 
-const { messages: m, playgroundLearnMorePath, gamePostPaths, rootPrefix } = Astro.props as {
+const { locale, messages: m, playgroundLearnMorePath, gamePostPaths, rootPrefix } = Astro.props as {
+  locale: Locale;
   messages: Messages;
   playgroundLearnMorePath: string;
   gamePostPaths: GamePostPaths;
@@ -95,8 +98,8 @@ const gamesWalkthroughClipHash = getWalkthroughClipHash('games');
     </div>
     <figure class="playground-preview">
       <img class="playground-preview-card playground-preview-card-back playground-preview-card-back-right" src={`${rootPrefix}assets/playground/trivia-preview.png`} alt="" loading="lazy" decoding="async" aria-hidden="true">
-      <img class="playground-preview-card playground-preview-card-back playground-preview-card-back-left" src={`${rootPrefix}assets/playground/trivia-results-preview.png`} alt="" loading="lazy" decoding="async" aria-hidden="true">
-      <img class="playground-preview-card playground-preview-card-main" src={`${rootPrefix}assets/playground/chess-preview.png`} alt={m.playground.imageAlt} loading="lazy" decoding="async">
+      <img class="playground-preview-card playground-preview-card-back playground-preview-card-back-left" src={localizedImage(`${rootPrefix}assets/playground/trivia-results-preview.png`, locale)} alt="" loading="lazy" decoding="async" aria-hidden="true">
+      <img class="playground-preview-card playground-preview-card-main" src={localizedImage(`${rootPrefix}assets/playground/chess-preview.png`, locale)} alt={m.playground.imageAlt} loading="lazy" decoding="async">
     </figure>
   </div>
 </section>

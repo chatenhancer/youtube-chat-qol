@@ -24,7 +24,7 @@ tags:
 
 :::media-right
 
-![تشغيل Stick Around! كتراكب كامل فوق الدردشة مع فقاعات دردشة متساقطة](./stickfightpreview.png){shadow=smooth rotation=1}
+![تشغيل Stick Around! كتراكب كامل فوق الدردشة مع فقاعات دردشة متساقطة](./stickfightpreview-ar.webp){shadow=smooth rotation=1}
 
 تستخدم Stick Around! موجز الدردشة كله كمساحة لعب، بينما يبقى رأس الدردشة وحقل الإدخال المعتادان في مكانهما.
 

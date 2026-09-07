@@ -18,7 +18,7 @@ tags:
 
 :::media-right
 
-![לוח מבוקשים של Bounty Hunting](./64a11deb8049b2c9.png){shadow=smooth;rotate=-6deg}
+![לוח מבוקשים של Bounty Hunting](./64a11deb8049b2c9-he.webp){shadow=smooth;rotate=-6deg}
 
 ### איך זה עובד
 

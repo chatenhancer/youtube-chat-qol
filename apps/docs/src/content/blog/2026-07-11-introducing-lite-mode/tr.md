@@ -3,7 +3,7 @@ title: "Lite modunu tanıtıyoruz"
 date: 2026-07-11
 description: "Lite modu, yoğun YouTube canlı sohbetlerinin daha akıcı çalışmasını ve tarayıcınızı daha az yormasını sağlamak için tasarlanmış, isteğe bağlı ve hafif bir sohbet akışıdır."
 slug: "introducing-lite-mode"
-image: "./a267721fcd28b8ba.png"
+image: "./a267721fcd28b8ba-tr.webp"
 cover_width: 88
 locale: "tr"
 translationKey: "introducing-lite-mode"

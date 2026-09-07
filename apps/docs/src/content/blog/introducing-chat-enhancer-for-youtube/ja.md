@@ -5,7 +5,7 @@ description: "Chat Enhancer for YouTube は、混み合う YouTube ライブチ�
 locale: "ja"
 slug: "introducing-chat-enhancer-for-youtube"
 translationKey: "introducing-chat-enhancer-for-youtube"
-image: "./cover.png"
+image: "./cover-ja.webp"
 tags:
   - "youtube"
   - "live-chat"

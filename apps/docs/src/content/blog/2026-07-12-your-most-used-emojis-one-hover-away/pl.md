@@ -3,7 +3,7 @@ title: "Twoje emoji na jedno najechanie"
 date: 2026-07-12
 description: "Nowe szybkie okno emoji umieszcza najczęściej używane reakcje tuż nad polem czatu na żywo w YouTube."
 slug: "your-most-used-emojis-one-hover-away"
-image: "./cover.png"
+image: "./cover-pl.webp"
 locale: "pl"
 translationKey: "your-most-used-emojis-one-hover-away"
 tags:

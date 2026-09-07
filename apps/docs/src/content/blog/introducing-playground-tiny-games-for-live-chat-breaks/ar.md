@@ -5,7 +5,7 @@ description: "يضيف Playground ألعابًا مدمجة إلى دردشة Yo
 locale: "ar"
 slug: "introducing-playground-tiny-games-for-live-chat-breaks"
 translationKey: "introducing-playground-tiny-games-for-live-chat-breaks"
-image: "./90af004f7c5daeab.png"
+image: "./90af004f7c5daeab-ar.webp"
 cover_width: 73
 video: "./ba98da5bf0abb611.mp4"
 tags:
@@ -20,7 +20,7 @@ Playground هو مساحة ألعاب صغيرة داخل Chat Enhancer. يتي�
 
 :::media-right
 
-![لوحة شطرنج صغيرة عائمة فوق دردشة YouTube المباشرة](./f779ebcc57f8280d.png){shadow=smooth rotation=-2}
+![لوحة شطرنج صغيرة عائمة فوق دردشة YouTube المباشرة](./f779ebcc57f8280d-ar.webp){shadow=smooth rotation=-2}
 
 تبقى الألعاب مدمجة. اللوحة قابلة للسحب، لذلك يمكنك نقلها جانبًا عندما تنشط الدردشة من جديد.
 

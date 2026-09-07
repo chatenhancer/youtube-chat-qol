@@ -3,7 +3,7 @@ title: "Introductie van de Lite-modus"
 date: 2026-07-11
 description: "De Lite-modus is een optionele, lichte chatfeed die drukke YouTube-livechats soepeler laat verlopen en je browser minder belast."
 slug: "introducing-lite-mode"
-image: "./a267721fcd28b8ba.png"
+image: "./a267721fcd28b8ba-nl.webp"
 cover_width: 88
 locale: "nl"
 translationKey: "introducing-lite-mode"

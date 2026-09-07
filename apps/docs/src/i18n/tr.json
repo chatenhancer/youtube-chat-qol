@@ -226,6 +226,7 @@
     "title": "Chat Enhancer'ı yükle",
     "copy": "Chrome Web Store, Firefox Add-ons veya Mac App Store üzerinden yükleyin ya da yerel geliştirme için uzantıyı kaynak koddan derleyin. Diğer Chromium tabanlı tarayıcılar genellikle Chrome derlemesini kullanabilir.",
     "publishedVersions": "Yayınlanan sürümler",
+    "releaseLabel": "sürüm",
     "updatePendingTitle": "Mağaza güncellemesi sürüyor",
     "updatePendingBody": "En son sürüm hâlâ {stores} için onay bekliyor.",
     "updatePendingAnd": "ve",

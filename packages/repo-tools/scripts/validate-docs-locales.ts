@@ -1,4 +1,4 @@
-import { readdir, readFile } from 'node:fs/promises';
+import { access, readdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -98,7 +98,24 @@ async function validateBlogPostLocales(errors, locales) {
     }
 
     const englishStructure = getBlogStructureSignature(english.body, locales);
-    const invariantFrontmatter = getBlogInvariantFrontmatter(english.frontmatter);
+    const invariantFrontmatter = getBlogInvariantFrontmatter(english.frontmatter, locales);
+
+    for (const entry of entries) {
+      const images = [entry.frontmatter.image, ...[...entry.body.matchAll(/!\[[^\]]*\]\(([^)]+)\)/g)].map((match) => match[1])];
+      for (const href of images) {
+        if (typeof href !== 'string' || !href.startsWith('./')) continue;
+        const imageLocale = locales.find((locale) => href.endsWith(`-${locale}.webp`));
+        if (imageLocale && imageLocale !== entry.frontmatter.locale) {
+          errors.push(`blog/${postDir}/${entry.fileName} image uses ${imageLocale}: ${href}`);
+        }
+        const absoluteImage = path.resolve(postPath, href);
+        try {
+          await access(absoluteImage);
+        } catch {
+          errors.push(`blog/${postDir}/${entry.fileName} missing image: ${href}`);
+        }
+      }
+    }
 
     for (const locale of translatedLocales) {
       const translation = entries.find((entry) => entry.fileName === `${locale}.md`);
@@ -108,7 +125,7 @@ async function validateBlogPostLocales(errors, locales) {
         continue;
       }
 
-      validateBlogFrontmatter(errors, postDir, locale, invariantFrontmatter, translation.frontmatter);
+      validateBlogFrontmatter(errors, postDir, locale, invariantFrontmatter, translation.frontmatter, locales);
 
       const structure = getBlogStructureSignature(translation.body, locales);
       if (JSON.stringify(structure) !== JSON.stringify(englishStructure)) {
@@ -171,11 +188,11 @@ function cleanFrontmatterValue(value) {
   return trimmed;
 }
 
-function getBlogInvariantFrontmatter(frontmatter) {
+function getBlogInvariantFrontmatter(frontmatter, locales) {
   return {
     cover_width: frontmatter.cover_width || '',
     date: frontmatter.date || '',
-    image: frontmatter.image || '',
+    image: normalizeLocalizedImageHref(frontmatter.image || '', locales),
     slug: frontmatter.slug || '',
     tags: frontmatter.tags || [],
     translationKey: frontmatter.translationKey || '',
@@ -183,12 +200,12 @@ function getBlogInvariantFrontmatter(frontmatter) {
   };
 }
 
-function validateBlogFrontmatter(errors, postDir, locale, expected, actual) {
+function validateBlogFrontmatter(errors, postDir, locale, expected, actual, locales) {
   if (actual.locale !== locale) {
     errors.push(`blog/${postDir}/${locale}.md locale must be ${locale}, got ${actual.locale || '(missing)'}`);
   }
 
-  const actualInvariant = getBlogInvariantFrontmatter(actual);
+  const actualInvariant = getBlogInvariantFrontmatter(actual, locales);
   for (const [key, value] of Object.entries(expected)) {
     if (JSON.stringify(value) === JSON.stringify(actualInvariant[key])) continue;
     errors.push(`blog/${postDir}/${locale}.md ${key} differs from English source`);
@@ -250,9 +267,9 @@ function normalizeBlogHref(href, locales) {
 function normalizeLocalizedImageHref(href, locales) {
   for (const locale of locales) {
     const localizedSuffix = new RegExp(`-${escapeRegExp(locale)}\\.webp$`);
-    if (localizedSuffix.test(href)) return href.replace(localizedSuffix, '-{locale}.webp');
+    if (localizedSuffix.test(href)) return href.replace(localizedSuffix, '.{image}');
   }
-  return href;
+  return href.replace(/\.(png|webp)$/, '.{image}');
 }
 
 function getDocsLocalePath(locale) {

@@ -18,7 +18,7 @@ Los geht es mit **Bounty Hunting**, einer schnellen Suche, bei der zwei Spieler 
 
 :::media-right
 
-![Bounty Hunting-Steckbriefwand](./64a11deb8049b2c9.png){shadow=smooth;rotate=-6deg}
+![Bounty Hunting-Steckbriefwand](./64a11deb8049b2c9-de.webp){shadow=smooth;rotate=-6deg}
 
 ### So funktioniert es
 

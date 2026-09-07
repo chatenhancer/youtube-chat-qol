@@ -3,7 +3,7 @@ title: "Einführung des Lite-Modus"
 date: 2026-07-11
 description: "Der Lite-Modus ist ein optionaler, ressourcenschonender Chat-Feed, der stark frequentierte YouTube-Livechats flüssiger und weniger belastend für deinen Browser macht."
 slug: "introducing-lite-mode"
-image: "./a267721fcd28b8ba.png"
+image: "./a267721fcd28b8ba-de.webp"
 cover_width: 88
 locale: "de"
 translationKey: "introducing-lite-mode"

@@ -2,6 +2,7 @@
 import '../styles/site.css';
 import WalkthroughClipModal from '../components/common/walkthrough-clip-modal.astro';
 import { generatedDocsComment } from '../data/build-metadata';
+import { localizedImage } from '../data/localized-images';
 import type { Locale } from '../data/locales';
 import { canonicalUrlFor, htmlLangFor, localeMeta, locales } from '../data/locales';
 import { site, supportEmail } from '../data/site';
@@ -22,7 +23,7 @@ const {
   title = messages.meta.title,
   description = messages.meta.description,
   canonicalUrl = canonicalUrlFor(locale),
-  image = `${site.url}/assets/social-card.png`,
+  image = localizedImage(`${site.url}/assets/social-card.png`, locale),
   imageAlt = messages.meta.imageAlt,
   ogType = 'website',
   structuredData,
@@ -119,7 +120,7 @@ const structuredDataJson = resolvedStructuredData
     <meta property="og:locale" content={meta.ogLocale}>
     <meta property="og:image" content={image}>
     <meta property="og:image:secure_url" content={image}>
-    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:type" content={image.endsWith('.webp') ? 'image/webp' : 'image/png'}>
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta property="og:image:alt" content={imageAlt}>

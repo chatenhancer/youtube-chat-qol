@@ -18,7 +18,7 @@ tags:
 
 :::media-right
 
-![กระดานประกาศค่าหัวของ Bounty Hunting](./64a11deb8049b2c9.png){shadow=smooth;rotate=-6deg}
+![กระดานประกาศค่าหัวของ Bounty Hunting](./64a11deb8049b2c9-th.webp){shadow=smooth;rotate=-6deg}
 
 ### วิธีเล่น
 

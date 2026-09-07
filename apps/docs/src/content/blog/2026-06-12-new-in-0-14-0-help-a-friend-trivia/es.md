@@ -4,7 +4,7 @@ date: 2026-06-12
 description: "HELP-A-FRIEND! Trivia convierte momentos de una reproducción de YouTube en un cuestionario rápido con forma de chat."
 locale: "es"
 slug: "new-in-0-14-0-help-a-friend-trivia"
-image: "./0e5e4f69e6fa7b45.png"
+image: "./0e5e4f69e6fa7b45-es.webp"
 translationKey: "new-in-0-14-0-help-a-friend-trivia"
 tags:
   - "playground"

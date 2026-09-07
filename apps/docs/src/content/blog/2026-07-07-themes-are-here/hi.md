@@ -3,7 +3,7 @@ title: "थीम आ गए हैं!"
 date: 2026-07-07
 description: "चैट थीम अब उपलब्ध हैं, Aero से शुरुआत करते हुए, ताकि YouTube लाइव चैट आपको ज़्यादा अपना लगे."
 slug: "themes-are-here"
-image: "./2026-07-07-themes-are-here-assets/fc7c094f3fbf6ac2.png"
+image: "./2026-07-07-themes-are-here-assets/fc7c094f3fbf6ac2-hi.webp"
 cover_width: 84
 locale: "hi"
 translationKey: "themes-are-here"

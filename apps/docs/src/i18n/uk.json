@@ -226,6 +226,7 @@
     "title": "Встановіть Chat Enhancer",
     "copy": "Встановіть розширення з Chrome Web Store, Firefox Add-ons або Mac App Store чи зберіть його з вихідного коду для локальної розробки. Інші браузери на Chromium зазвичай можуть використовувати збірку Chrome.",
     "publishedVersions": "Опубліковані версії",
+    "releaseLabel": "версія",
     "updatePendingTitle": "Оновлення в магазині ще обробляється",
     "updatePendingBody": "Останній реліз поки очікує публікації в {stores}.",
     "updatePendingAnd": "і",

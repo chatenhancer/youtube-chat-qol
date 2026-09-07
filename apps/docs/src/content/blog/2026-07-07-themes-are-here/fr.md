@@ -3,7 +3,7 @@ title: "Les thèmes sont là !"
 date: 2026-07-07
 description: "Les thèmes de chat sont maintenant disponibles, à commencer par Aero, pour rendre le chat en direct YouTube plus personnel."
 slug: "themes-are-here"
-image: "./2026-07-07-themes-are-here-assets/fc7c094f3fbf6ac2.png"
+image: "./2026-07-07-themes-are-here-assets/fc7c094f3fbf6ac2-fr.webp"
 cover_width: 84
 locale: "fr"
 translationKey: "themes-are-here"

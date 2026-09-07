@@ -18,7 +18,7 @@ tags:
 
 :::media-right
 
-![تابلوی تحت تعقیب Bounty Hunting](./64a11deb8049b2c9.png){shadow=smooth;rotate=-6deg}
+![تابلوی تحت تعقیب Bounty Hunting](./64a11deb8049b2c9-fa.webp){shadow=smooth;rotate=-6deg}
 
 ### چطور کار می‌کند
 

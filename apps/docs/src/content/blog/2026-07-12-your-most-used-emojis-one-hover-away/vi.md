@@ -3,7 +3,7 @@ title: "Emoji của bạn, chỉ cần một lần rê chuột"
 date: 2026-07-12
 description: "Bảng emoji nhanh mới đặt những phản ứng bạn dùng nhiều nhất ngay phía trên ô chat trực tiếp của YouTube."
 slug: "your-most-used-emojis-one-hover-away"
-image: "./cover.png"
+image: "./cover-vi.webp"
 locale: "vi"
 translationKey: "your-most-used-emojis-one-hover-away"
 tags:

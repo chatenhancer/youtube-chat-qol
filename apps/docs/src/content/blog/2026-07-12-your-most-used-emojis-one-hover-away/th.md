@@ -3,7 +3,7 @@ title: "อีโมจิของคุณ แค่วางเมาส์�
 date: 2026-07-12
 description: "ป๊อปโอเวอร์อีโมจิแบบด่วนใหม่จะแสดงรีแอ็กชันที่คุณใช้บ่อยที่สุดเหนือช่องแชทสดของ YouTube โดยตรง"
 slug: "your-most-used-emojis-one-hover-away"
-image: "./cover.png"
+image: "./cover-th.webp"
 locale: "th"
 translationKey: "your-most-used-emojis-one-hover-away"
 tags:

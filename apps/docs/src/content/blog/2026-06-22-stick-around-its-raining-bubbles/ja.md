@@ -24,7 +24,7 @@ Stick Around! では、コメントが天気になります。
 
 :::media-right
 
-![落ちてくるチャットバブル付きのフルチャットオーバーレイとして動作する Stick Around!](./stickfightpreview.png){shadow=smooth rotation=1}
+![落ちてくるチャットバブル付きのフルチャットオーバーレイとして動作する Stick Around!](./stickfightpreview-ja.webp){shadow=smooth rotation=1}
 
 Stick Around! はチャットフィード全体をプレイ空間として使い、通常のチャットヘッダーと入力欄はそのまま残します。
 

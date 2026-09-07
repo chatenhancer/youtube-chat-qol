@@ -226,6 +226,7 @@
     "title": "Instal Chat Enhancer",
     "copy": "Dapatkan dari Chrome Web Store, Firefox Add-ons, atau Mac App Store, atau bangun ekstensi dari kode sumber untuk pengembangan lokal. Browser berbasis Chromium lainnya umumnya dapat memakai build Chrome.",
     "publishedVersions": "Versi yang diterbitkan",
+    "releaseLabel": "rilis",
     "updatePendingTitle": "Pembaruan toko sedang berlangsung",
     "updatePendingBody": "Rilis terbaru masih menunggu di {stores}.",
     "updatePendingAnd": "dan",

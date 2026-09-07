@@ -3,7 +3,7 @@ title: "Temalar geldi!"
 date: 2026-07-07
 description: "Sohbet temaları artık Aero ile başlayarak kullanılabilir; YouTube canlı sohbeti daha kişisel hissettirsin."
 slug: "themes-are-here"
-image: "./2026-07-07-themes-are-here-assets/fc7c094f3fbf6ac2.png"
+image: "./2026-07-07-themes-are-here-assets/fc7c094f3fbf6ac2-tr.webp"
 cover_width: 84
 locale: "tr"
 translationKey: "themes-are-here"

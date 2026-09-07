@@ -3,7 +3,7 @@ title: "Memperkenalkan mode Lite"
 date: 2026-07-11
 description: "Mode Lite adalah feed chat ringan yang bersifat opsional, dirancang agar live chat YouTube yang ramai tetap lebih lancar dan lebih ringan bagi browser Anda."
 slug: "introducing-lite-mode"
-image: "./a267721fcd28b8ba.png"
+image: "./a267721fcd28b8ba-id.webp"
 cover_width: 88
 locale: "id"
 translationKey: "introducing-lite-mode"

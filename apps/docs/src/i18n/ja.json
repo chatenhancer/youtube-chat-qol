@@ -226,6 +226,7 @@
     "title": "Chat Enhancer をインストール",
     "copy": "Chrome Web Store、Firefox Add-ons、Mac App Store から入手できます。ローカル開発用にソースからビルドすることもできます。その他の Chromium ベースのブラウザでは、通常 Chrome 版を利用できます。",
     "publishedVersions": "公開中のバージョン",
+    "releaseLabel": "リリース",
     "updatePendingTitle": "ストア更新中",
     "updatePendingBody": "最新リリースはまだ {stores} で審査または反映待ちです。",
     "updatePendingAnd": "と",

@@ -5,7 +5,7 @@ description: "Chat Enhancer for YouTube thêm những công cụ nhỏ có cảm
 locale: "vi"
 slug: "introducing-chat-enhancer-for-youtube"
 translationKey: "introducing-chat-enhancer-for-youtube"
-image: "./cover.png"
+image: "./cover-vi.webp"
 tags:
   - "youtube"
   - "live-chat"

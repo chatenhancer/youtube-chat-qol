@@ -3,7 +3,7 @@ title: "تقديم وضع Lite"
 date: 2026-07-11
 description: "وضع Lite هو موجز دردشة اختياري وخفيف صُمم للحفاظ على سلاسة دردشات YouTube المباشرة المزدحمة وتقليل العبء على متصفحك."
 slug: "introducing-lite-mode"
-image: "./a267721fcd28b8ba.png"
+image: "./a267721fcd28b8ba-ar.webp"
 cover_width: 88
 locale: "ar"
 translationKey: "introducing-lite-mode"

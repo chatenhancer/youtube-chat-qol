@@ -24,7 +24,7 @@ tags:
 
 :::media-right
 
-![Stick Around! працює як повночатовий оверлей із падаючими чат-бульбашками](./stickfightpreview.png){shadow=smooth rotation=1}
+![Stick Around! працює як повночатовий оверлей із падаючими чат-бульбашками](./stickfightpreview-uk.webp){shadow=smooth rotation=1}
 
 Stick Around! використовує всю стрічку чату як ігровий простір. Звичайний заголовок чату та поле введення залишаються на місці.
 

@@ -3,7 +3,7 @@ title: "테마가 도착했습니다!"
 date: 2026-07-07
 description: "채팅 테마가 Aero를 시작으로 제공되어 YouTube 실시간 채팅을 더 나만의 공간처럼 꾸밀 수 있습니다."
 slug: "themes-are-here"
-image: "./2026-07-07-themes-are-here-assets/fc7c094f3fbf6ac2.png"
+image: "./2026-07-07-themes-are-here-assets/fc7c094f3fbf6ac2-ko.webp"
 cover_width: 84
 locale: "ko"
 translationKey: "themes-are-here"

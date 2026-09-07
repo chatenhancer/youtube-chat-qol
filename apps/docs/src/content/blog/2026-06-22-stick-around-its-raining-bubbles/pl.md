@@ -24,7 +24,7 @@ Cel jest prosty: ruszaj się, skacz, odpychaj drugiego gracza, unikaj spadające
 
 :::media-right
 
-![Stick Around! jako pełna nakładka na czat ze spadającymi dymkami czatu](./stickfightpreview.png){shadow=smooth rotation=1}
+![Stick Around! jako pełna nakładka na czat ze spadającymi dymkami czatu](./stickfightpreview-pl.webp){shadow=smooth rotation=1}
 
 Stick Around! używa całego kanału czatu jako przestrzeni gry. Normalny nagłówek czatu i pole wpisywania zostają na miejscu.
 

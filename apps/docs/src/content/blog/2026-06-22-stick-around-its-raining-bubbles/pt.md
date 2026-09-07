@@ -24,7 +24,7 @@ O objetivo é simples: mova-se, pule, empurre o outro jogador, desvie do chat ca
 
 :::media-right
 
-![Stick Around! rodando como uma sobreposição de chat completa com bolhas de chat caindo](./stickfightpreview.png){shadow=smooth rotation=1}
+![Stick Around! rodando como uma sobreposição de chat completa com bolhas de chat caindo](./stickfightpreview-pt.webp){shadow=smooth rotation=1}
 
 Stick Around! usa todo o feed do chat como espaço de jogo. O cabeçalho normal do chat e a entrada de mensagens ficam no lugar.
 

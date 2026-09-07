@@ -5,7 +5,7 @@ description: "Playground は、配信が少し落ち着いた時間に楽しめ�
 locale: "ja"
 slug: "introducing-playground-tiny-games-for-live-chat-breaks"
 translationKey: "introducing-playground-tiny-games-for-live-chat-breaks"
-image: "./90af004f7c5daeab.png"
+image: "./90af004f7c5daeab-ja.webp"
 cover_width: 73
 video: "./ba98da5bf0abb611.mp4"
 tags:
@@ -20,7 +20,7 @@ Playground は、Chat Enhancer の中にある小さなゲームハブです。�
 
 :::media-right
 
-![YouTube ライブチャットの上に浮かぶコンパクトなチェスパネル](./f779ebcc57f8280d.png){shadow=smooth rotation=-2}
+![YouTube ライブチャットの上に浮かぶコンパクトなチェスパネル](./f779ebcc57f8280d-ja.webp){shadow=smooth rotation=-2}
 
 ゲームは場所を取りません。パネルはドラッグできるので、チャットがまた忙しくなったら邪魔にならない位置へ動かせます。
 

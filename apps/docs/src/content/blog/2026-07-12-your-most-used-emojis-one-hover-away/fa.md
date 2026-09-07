@@ -3,7 +3,7 @@ title: "ایموجی‌های شما، فقط با یک مکث نشانگر"
 date: 2026-07-12
 description: "پنجرهٔ سریع جدید، واکنش‌هایی را که بیشتر استفاده می‌کنید درست بالای کادر گفت‌وگوی زندهٔ YouTube قرار می‌دهد."
 slug: "your-most-used-emojis-one-hover-away"
-image: "./cover.png"
+image: "./cover-fa.webp"
 locale: "fa"
 translationKey: "your-most-used-emojis-one-hover-away"
 tags:

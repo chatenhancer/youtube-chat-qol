@@ -18,7 +18,7 @@ Playground का अगला game live chat में आ रहा है: **
 
 :::media-right
 
-![Bounty Hunting wanted board](./64a11deb8049b2c9.png){shadow=smooth;rotate=-6deg}
+![Bounty Hunting wanted board](./64a11deb8049b2c9-hi.webp){shadow=smooth;rotate=-6deg}
 
 ### यह कैसे काम करता है
 

@@ -3,7 +3,7 @@ title: "絵文字を、ホバーひとつで"
 date: 2026-07-12
 description: "新しいクイック絵文字ポップオーバーで、よく使うリアクションをYouTubeライブチャットの入力欄のすぐ上から選べます。"
 slug: "your-most-used-emojis-one-hover-away"
-image: "./cover.png"
+image: "./cover-ja.webp"
 locale: "ja"
 translationKey: "your-most-used-emojis-one-hover-away"
 tags:

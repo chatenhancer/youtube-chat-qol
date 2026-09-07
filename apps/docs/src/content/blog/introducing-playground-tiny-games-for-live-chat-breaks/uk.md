@@ -5,7 +5,7 @@ description: "Playground додає в YouTube live chat компактні іг
 locale: "uk"
 slug: "introducing-playground-tiny-games-for-live-chat-breaks"
 translationKey: "introducing-playground-tiny-games-for-live-chat-breaks"
-image: "./90af004f7c5daeab.png"
+image: "./90af004f7c5daeab-uk.webp"
 cover_width: 73
 video: "./ba98da5bf0abb611.mp4"
 tags:
@@ -20,7 +20,7 @@ Playground — це невеликий ігровий розділ у Chat Enhan
 
 :::media-right
 
-![Компактна шахова панель поверх живого чату YouTube](./f779ebcc57f8280d.png){shadow=smooth rotation=-2}
+![Компактна шахова панель поверх живого чату YouTube](./f779ebcc57f8280d-uk.webp){shadow=smooth rotation=-2}
 
 Ігри залишаються компактними. Панель можна перетягувати, тож її легко відсунути, коли чат знову оживе.
 

@@ -24,7 +24,7 @@ Das Ziel ist einfach: bewegen, springen, den anderen Spieler wegstoßen, dem fal
 
 :::media-right
 
-![Stick Around! als Full-Chat-Overlay mit fallenden Chatblasen](./stickfightpreview.png){shadow=smooth rotation=1}
+![Stick Around! als Full-Chat-Overlay mit fallenden Chatblasen](./stickfightpreview-de.webp){shadow=smooth rotation=1}
 
 Stick Around! nutzt den ganzen Chat-Feed als Spielfläche. Der normale Chat-Header und die Eingabe bleiben an ihrem Platz.
 

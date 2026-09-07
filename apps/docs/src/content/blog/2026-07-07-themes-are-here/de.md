@@ -3,7 +3,7 @@ title: "Themes sind da!"
 date: 2026-07-07
 description: "Chat-Themes sind jetzt verfügbar, beginnend mit Aero, damit sich der YouTube-Livechat persönlicher anfühlt."
 slug: "themes-are-here"
-image: "./2026-07-07-themes-are-here-assets/fc7c094f3fbf6ac2.png"
+image: "./2026-07-07-themes-are-here-assets/fc7c094f3fbf6ac2-de.webp"
 cover_width: 84
 locale: "de"
 translationKey: "themes-are-here"

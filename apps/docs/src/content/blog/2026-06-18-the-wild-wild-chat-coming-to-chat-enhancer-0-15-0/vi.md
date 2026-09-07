@@ -18,7 +18,7 @@ Trò chơi bắt đầu với **Bounty Hunting**, một màn săn tìm ngắn tr
 
 :::media-right
 
-![bảng wanted của Bounty Hunting](./64a11deb8049b2c9.png){shadow=smooth;rotate=-6deg}
+![bảng wanted của Bounty Hunting](./64a11deb8049b2c9-vi.webp){shadow=smooth;rotate=-6deg}
 
 ### Cách hoạt động
 

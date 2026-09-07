@@ -24,7 +24,7 @@ Stick Around!에서는 댓글이 날씨가 됩니다.
 
 :::media-right
 
-![떨어지는 채팅 버블이 있는 전체 채팅 오버레이로 실행 중인 Stick Around!](./stickfightpreview.png){shadow=smooth rotation=1}
+![떨어지는 채팅 버블이 있는 전체 채팅 오버레이로 실행 중인 Stick Around!](./stickfightpreview-ko.webp){shadow=smooth rotation=1}
 
 Stick Around!는 전체 채팅 피드를 플레이 공간으로 사용하며, 일반 채팅 헤더와 입력창은 그대로 둡니다.
 

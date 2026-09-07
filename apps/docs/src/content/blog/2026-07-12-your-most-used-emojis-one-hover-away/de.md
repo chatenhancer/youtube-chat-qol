@@ -3,7 +3,7 @@ title: "Deine Emojis – nur einen Hover entfernt"
 date: 2026-07-12
 description: "Ein neues schnelles Emoji-Popover zeigt deine häufigsten Reaktionen direkt über dem YouTube-Livechat-Eingabefeld."
 slug: "your-most-used-emojis-one-hover-away"
-image: "./cover.png"
+image: "./cover-de.webp"
 locale: "de"
 translationKey: "your-most-used-emojis-one-hover-away"
 tags:

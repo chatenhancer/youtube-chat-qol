@@ -18,7 +18,7 @@ tags:
 
 :::media-right
 
-![Доска розыска Bounty Hunting](./64a11deb8049b2c9.png){shadow=smooth;rotate=-6deg}
+![Доска розыска Bounty Hunting](./64a11deb8049b2c9-ru.webp){shadow=smooth;rotate=-6deg}
 
 ### Как это работает
 

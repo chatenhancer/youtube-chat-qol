@@ -3,7 +3,7 @@ title: "Emoji Anda, cukup satu hover"
 date: 2026-07-12
 description: "Popover emoji cepat baru menempatkan reaksi yang paling sering Anda gunakan tepat di atas kotak live chat YouTube."
 slug: "your-most-used-emojis-one-hover-away"
-image: "./cover.png"
+image: "./cover-id.webp"
 locale: "id"
 translationKey: "your-most-used-emojis-one-hover-away"
 tags:

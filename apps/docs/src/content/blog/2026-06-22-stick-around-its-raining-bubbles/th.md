@@ -24,7 +24,7 @@ tags:
 
 :::media-right
 
-![Stick Around! ทำงานเป็นโอเวอร์เลย์เต็มแชตพร้อมฟองแชตที่กำลังตกลงมา](./stickfightpreview.png){shadow=smooth rotation=1}
+![Stick Around! ทำงานเป็นโอเวอร์เลย์เต็มแชตพร้อมฟองแชตที่กำลังตกลงมา](./stickfightpreview-th.webp){shadow=smooth rotation=1}
 
 Stick Around! ใช้ฟีดแชททั้งหมดเป็นพื้นที่เล่น โดยปล่อยส่วนหัวแชทและช่องพิมพ์ข้อความตามปกติไว้เหมือนเดิม
 

@@ -3,7 +3,7 @@ title: "معرفی حالت Lite"
 date: 2026-07-11
 description: "حالت Lite یک فید گفت‌وگوی اختیاری و سبک است که برای روان‌تر ماندن گفت‌وگوهای زنده و شلوغ YouTube و کاهش فشار بر مرورگر شما طراحی شده است."
 slug: "introducing-lite-mode"
-image: "./a267721fcd28b8ba.png"
+image: "./a267721fcd28b8ba-fa.webp"
 cover_width: 88
 locale: "fa"
 translationKey: "introducing-lite-mode"

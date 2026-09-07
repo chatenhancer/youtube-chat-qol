@@ -18,7 +18,7 @@ Het begint met **Bounty Hunting**, een snelle speurtocht waarin twee spelers dez
 
 :::media-right
 
-![Bounty Hunting-wantedbord](./64a11deb8049b2c9.png){shadow=smooth;rotate=-6deg}
+![Bounty Hunting-wantedbord](./64a11deb8049b2c9-nl.webp){shadow=smooth;rotate=-6deg}
 
 ### Zo werkt het
 

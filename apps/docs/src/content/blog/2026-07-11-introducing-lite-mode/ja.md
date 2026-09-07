@@ -3,7 +3,7 @@ title: "Liteモードのご紹介"
 date: 2026-07-11
 description: "Liteモードは、混雑するYouTubeライブチャットをよりスムーズに保ち、ブラウザへの負荷を軽減するために設計された、任意で使える軽量チャットフィードです。"
 slug: "introducing-lite-mode"
-image: "./a267721fcd28b8ba.png"
+image: "./a267721fcd28b8ba-ja.webp"
 cover_width: 88
 locale: "ja"
 translationKey: "introducing-lite-mode"

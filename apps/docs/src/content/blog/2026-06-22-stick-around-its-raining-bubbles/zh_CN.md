@@ -24,7 +24,7 @@ Playground 的下一款游戏是 **Stick Around!**，一款不待在紧凑面板
 
 :::media-right
 
-![Stick Around! 作为全聊天覆盖层运行，带有下落的聊天泡泡](./stickfightpreview.png){shadow=smooth rotation=1}
+![Stick Around! 作为全聊天覆盖层运行，带有下落的聊天泡泡](./stickfightpreview-zh_CN.webp){shadow=smooth rotation=1}
 
 Stick Around! 会把整个聊天区当作游戏空间，同时保留正常的聊天标题栏和输入区。
 

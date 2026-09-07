@@ -3,7 +3,7 @@ title: "Lite 모드 소개"
 date: 2026-07-11
 description: "Lite 모드는 사람이 많은 YouTube 라이브 채팅을 더 부드럽게 유지하고 브라우저의 부담을 줄이도록 설계된 선택형 경량 채팅 피드입니다."
 slug: "introducing-lite-mode"
-image: "./a267721fcd28b8ba.png"
+image: "./a267721fcd28b8ba-ko.webp"
 cover_width: 88
 locale: "ko"
 translationKey: "introducing-lite-mode"

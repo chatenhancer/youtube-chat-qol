@@ -5,7 +5,7 @@ description: "Playground dodaje do czatu na żywo YouTube kompaktowe gry na spok
 locale: "pl"
 slug: "introducing-playground-tiny-games-for-live-chat-breaks"
 translationKey: "introducing-playground-tiny-games-for-live-chat-breaks"
-image: "./90af004f7c5daeab.png"
+image: "./90af004f7c5daeab-pl.webp"
 cover_width: 73
 video: "./ba98da5bf0abb611.mp4"
 tags:
@@ -20,7 +20,7 @@ Playground to mały hub gier w Chat Enhancer. Możesz w nim grać z innymi widza
 
 :::media-right
 
-![Kompaktowy panel szachów unoszący się nad czatem na żywo YouTube](./f779ebcc57f8280d.png){shadow=smooth rotation=-2}
+![Kompaktowy panel szachów unoszący się nad czatem na żywo YouTube](./f779ebcc57f8280d-pl.webp){shadow=smooth rotation=-2}
 
 Gry pozostają kompaktowe. Panel można przeciągać, więc łatwo odsunąć go na bok, gdy czat znowu przyspieszy.
 

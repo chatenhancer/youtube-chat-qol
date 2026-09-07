@@ -18,7 +18,7 @@ tags:
 
 :::media-right
 
-![Bounty Hunting 通緝板](./64a11deb8049b2c9.png){shadow=smooth;rotate=-6deg}
+![Bounty Hunting 通緝板](./64a11deb8049b2c9-zh_TW.webp){shadow=smooth;rotate=-6deg}
 
 ### 玩法
 

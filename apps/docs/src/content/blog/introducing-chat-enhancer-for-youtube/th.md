@@ -5,7 +5,7 @@ description: "Chat Enhancer for YouTube เพิ่มเครื่องม�
 locale: "th"
 slug: "introducing-chat-enhancer-for-youtube"
 translationKey: "introducing-chat-enhancer-for-youtube"
-image: "./cover.png"
+image: "./cover-th.webp"
 tags:
   - "youtube"
   - "live-chat"

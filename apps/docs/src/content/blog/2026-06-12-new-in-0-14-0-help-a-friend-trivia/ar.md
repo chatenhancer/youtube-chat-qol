@@ -4,7 +4,7 @@ date: 2026-06-12
 description: "تحوّل HELP-A-FRIEND! Trivia لحظات إعادة تشغيل YouTube إلى اختبار سريع بأسلوب الدردشة."
 locale: "ar"
 slug: "new-in-0-14-0-help-a-friend-trivia"
-image: "./0e5e4f69e6fa7b45.png"
+image: "./0e5e4f69e6fa7b45-ar.webp"
 translationKey: "new-in-0-14-0-help-a-friend-trivia"
 tags:
   - "playground"

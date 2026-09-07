@@ -226,6 +226,7 @@
     "title": "Cài đặt Chat Enhancer",
     "copy": "Tải từ Chrome Web Store, Firefox Add-ons hoặc Mac App Store, hoặc dựng tiện ích từ mã nguồn để phát triển cục bộ. Các trình duyệt dựa trên Chromium khác thường có thể dùng bản build Chrome.",
     "publishedVersions": "Phiên bản đã phát hành",
+    "releaseLabel": "phiên bản",
     "updatePendingTitle": "Bản cập nhật cửa hàng đang xử lý",
     "updatePendingBody": "Bản phát hành mới nhất vẫn đang chờ trên {stores}.",
     "updatePendingAnd": "và",

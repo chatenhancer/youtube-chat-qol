@@ -3,7 +3,7 @@ title: "Emojilerin, tek bir üzerine gelme uzağında"
 date: 2026-07-12
 description: "Yeni hızlı emoji penceresi, en sık kullandığın tepkileri YouTube canlı sohbet kutusunun hemen üstüne getiriyor."
 slug: "your-most-used-emojis-one-hover-away"
-image: "./cover.png"
+image: "./cover-tr.webp"
 locale: "tr"
 translationKey: "your-most-used-emojis-one-hover-away"
 tags:
