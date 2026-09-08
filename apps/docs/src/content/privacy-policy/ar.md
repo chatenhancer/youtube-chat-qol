@@ -52,13 +52,13 @@ Chat Enhancer for YouTube هو إضافة متصفح لدردشة YouTube الم
 
 لا تُرسل البيانات إلى هذه الخدمات إلا عند تفعيل الميزة المرتبطة بها واستخدامها:
 
-### Google Translate (`translate.googleapis.com`)
+### Google Translate (`translate-pa.googleapis.com`)
 
 ترسل ترجمة الدردشة نص رسالة الدردشة المرئي في الدردشة المباشرة والمؤهل للترجمة أثناء تفعيل الترجمة. وترسل ترجمة المسودات نص المسودة الذي تختار ترجمته من مربع الدردشة.
 
 تتضمن طلبات الترجمة النص المطلوب ترجمته واللغة الهدف. لا ترسل الإضافة ملفات تعريف ارتباط YouTube أو بيانات اعتماد YouTube الخاصة بك مع طلبات الترجمة.
 
-الوصول إلى Google Translate عبر `translate.googleapis.com` غير رسمي وقد يخضع لقيود معدل الاستخدام أو يتغير أو يصبح غير متاح.
+الوصول إلى Google Translate عبر `translate-pa.googleapis.com` غير رسمي وقد يخضع لقيود معدل الاستخدام أو يتغير أو يصبح غير متاح.
 
 ### <span id="playground"></span>Chat Enhancer Playground ([playground.chatenhancer.com](https://playground.chatenhancer.com))
 

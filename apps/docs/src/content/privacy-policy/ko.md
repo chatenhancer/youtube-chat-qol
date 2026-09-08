@@ -52,13 +52,13 @@ Chat Enhancer for YouTube는 YouTube 실시간 채팅용 브라우저 확장 프
 
 데이터는 관련 기능을 켜고 사용할 때만 다음 서비스로 전송됩니다.
 
-### Google Translate (`translate.googleapis.com`)
+### Google Translate (`translate-pa.googleapis.com`)
 
 채팅 번역은 번역이 켜져 있는 동안 실시간 채팅에 표시되고 번역 대상인 채팅 메시지 텍스트를 전송합니다. 초안 번역은 채팅 상자에서 번역하도록 선택한 초안 텍스트를 전송합니다.
 
 번역 요청에는 번역할 텍스트와 대상 언어가 포함됩니다. 확장 프로그램은 번역 요청과 함께 YouTube 쿠키나 YouTube 자격 증명을 보내지 않습니다.
 
-`translate.googleapis.com`을 통한 Google Translate 접근은 비공식이며, 속도 제한을 받거나 변경되거나 사용할 수 없게 될 수 있습니다.
+`translate-pa.googleapis.com`을 통한 Google Translate 접근은 비공식이며, 속도 제한을 받거나 변경되거나 사용할 수 없게 될 수 있습니다.
 
 ### <span id="playground"></span>Chat Enhancer Playground ([playground.chatenhancer.com](https://playground.chatenhancer.com))
 

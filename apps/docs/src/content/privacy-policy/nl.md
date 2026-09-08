@@ -52,13 +52,13 @@ Tenzij hieronder anders staat, blijven de gegevens in deze sectie in je browserp
 
 Gegevens worden alleen naar deze diensten verzonden wanneer de bijbehorende functie is ingeschakeld en wordt gebruikt:
 
-### Google Translate (`translate.googleapis.com`)
+### Google Translate (`translate-pa.googleapis.com`)
 
 Chatvertaling verzendt chatberichttekst die zichtbaar is in de livechat en in aanmerking komt voor vertaling terwijl vertaling is ingeschakeld. Conceptvertaling verzendt de concepttekst die je vanuit het chatvak kiest om te vertalen.
 
 Vertaalverzoeken bevatten de te vertalen tekst en de doeltaal. De extensie stuurt je YouTube-cookies of YouTube-inloggegevens niet mee met vertaalverzoeken.
 
-Toegang tot Google Translate via `translate.googleapis.com` is onofficieel en kan worden beperkt, gewijzigd of onbeschikbaar worden.
+Toegang tot Google Translate via `translate-pa.googleapis.com` is onofficieel en kan worden beperkt, gewijzigd of onbeschikbaar worden.
 
 ### <span id="playground"></span>Chat Enhancer Playground ([playground.chatenhancer.com](https://playground.chatenhancer.com))
 

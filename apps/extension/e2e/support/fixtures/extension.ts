@@ -2,6 +2,7 @@
 import { test as base, type BrowserContext } from '@playwright/test';
 import { closeExtensionContext, launchExtensionContext } from '../chrome';
 import { dumpDomOnFailure } from '../dom-dump';
+import { installDefaultTranslationMock } from '../translation-endpoint';
 import {
   getDisposableWorkerProfileDir,
   isolateBrowserPage,
@@ -26,6 +27,7 @@ export const extensionTest = base.extend<ExtensionTestFixtures, ExtensionWorkerF
         headless: shouldRunHeadlessBrowserTest(),
         profileDir: getDisposableWorkerProfileDir('extension', workerInfo)
       });
+      if (workerInfo.project.name !== 'integrations') await installDefaultTranslationMock(context);
       const page = await context.newPage();
 
       try {

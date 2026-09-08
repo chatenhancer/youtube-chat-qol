@@ -52,13 +52,13 @@ Trừ khi có ghi chú khác bên dưới, dữ liệu trong phần này vẫn n
 
 Dữ liệu chỉ được gửi đến các dịch vụ sau khi tính năng liên quan được bật và sử dụng:
 
-### Google Translate (`translate.googleapis.com`)
+### Google Translate (`translate-pa.googleapis.com`)
 
 Dịch chat gửi văn bản tin nhắn chat hiển thị trong live chat và đủ điều kiện dịch khi dịch được bật. Dịch bản nháp gửi văn bản bản nháp mà bạn chọn dịch từ ô chat.
 
 Yêu cầu dịch bao gồm văn bản cần dịch và ngôn ngữ đích. Tiện ích không gửi cookie YouTube hoặc thông tin xác thực YouTube của bạn cùng với yêu cầu dịch.
 
-Truy cập Google Translate qua `translate.googleapis.com` là không chính thức và có thể bị giới hạn tốc độ, thay đổi hoặc không khả dụng.
+Truy cập Google Translate qua `translate-pa.googleapis.com` là không chính thức và có thể bị giới hạn tốc độ, thay đổi hoặc không khả dụng.
 
 ### <span id="playground"></span>Chat Enhancer Playground ([playground.chatenhancer.com](https://playground.chatenhancer.com))
 

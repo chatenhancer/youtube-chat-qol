@@ -54,7 +54,7 @@ const handCursorPath = path.join(walkthroughCursorDir, 'hand.svg');
 const clickSoundPath = path.join(walkthroughAudioDir, 'click.mp3');
 const demoResultsDir = path.join(repoRoot, 'test-results', 'demos');
 const finalVideoDir = path.join(repoRoot, 'dist', 'walkthrough');
-const demoTranslationEndpoint = 'https://translate.googleapis.com/translate_a/*';
+const demoTranslationEndpoint = /^https:\/\/(?:translate|translate-pa)\.googleapis\.com\/(?:translate_a\/(?:t|single)|v1\/translateHtml)(?:\?|$)/;
 const chromeProfilesDir = path.resolve(process.env.YTCQ_CHROME_WORKING_PROFILES || path.join(repoRoot, '.chrome-test-profiles'));
 const sourceProfileDir = path.resolve(process.env.YTCQ_CHROME_PROFILE || path.join(chromeProfilesDir, 'pristine'));
 const walkthroughLocale = readWalkthroughLocale();
@@ -1005,53 +1005,29 @@ async function installDemoAssetRoutes(context) {
   });
   await context.route(demoTranslationEndpoint, async (route) => {
     const url = new URL(route.request().url());
-    const targetLanguage = url.searchParams.get('tl') || '';
-
-    if (url.pathname.endsWith('/t') && targetLanguage === walkthroughTranslationDemo.incomingTargetLanguage) {
-      const translations = url.searchParams.getAll('q').map((sourceText) => {
-        return sourceText === walkthroughTranslationDemo.incomingSourceText
-          ? [walkthroughTranslationDemo.incomingTranslatedText, walkthroughTranslationDemo.incomingSourceLanguage]
-          : [sourceText, targetLanguage];
-      });
-      await route.fulfill({
-        body: JSON.stringify(translations),
-        contentType: 'application/json',
-        status: 200
-      });
-      return;
-    }
-
-    if (!url.pathname.endsWith('/single')) {
-      await route.continue();
-      return;
-    }
-
-    const sourceText = url.searchParams.get('q') || '';
-    let translatedText = '';
-    let sourceLanguage = '';
-    if (targetLanguage === walkthroughTranslationDemo.composerTargetLanguage) {
-      const protectedPlaceholders = sourceText.match(/§\d+§/g) || [];
-      translatedText = [walkthroughTranslationDemo.composerTranslatedText, ...protectedPlaceholders].join(' ');
-      sourceLanguage = walkthroughTranslationDemo.composerSourceLanguage;
-    } else if (
-      targetLanguage === walkthroughTranslationDemo.incomingTargetLanguage &&
-      sourceText === walkthroughTranslationDemo.incomingSourceText
-    ) {
-      translatedText = walkthroughTranslationDemo.incomingTranslatedText;
-      sourceLanguage = walkthroughTranslationDemo.incomingSourceLanguage;
-    } else {
-      await route.continue();
-      return;
-    }
-
-    await route.fulfill({
-      body: JSON.stringify({
-        sentences: [{ trans: translatedText }],
-        src: sourceLanguage
-      }),
-      contentType: 'application/json',
-      status: 200
+    const isHtml = url.pathname === '/v1/translateHtml';
+    const input = isHtml ? route.request().postDataJSON()[0] : null;
+    const targetLanguage = isHtml ? input[2] : url.searchParams.get('tl') || '';
+    const texts = isHtml ? input[0] : url.searchParams.getAll('q');
+    const translations = texts.map((sourceText) => {
+      if (targetLanguage === walkthroughTranslationDemo.incomingTargetLanguage &&
+          sourceText === walkthroughTranslationDemo.incomingSourceText) {
+        return [walkthroughTranslationDemo.incomingTranslatedText, walkthroughTranslationDemo.incomingSourceLanguage];
+      }
+      if (targetLanguage === walkthroughTranslationDemo.composerTargetLanguage) {
+        const placeholders = sourceText.match(isHtml
+          ? /<span translate="no">\[\d+\]<\/span>/g
+          : /§\d+§/g) || [];
+        return [[walkthroughTranslationDemo.composerTranslatedText, ...placeholders].join(' '), walkthroughTranslationDemo.composerSourceLanguage];
+      }
+      return [sourceText, targetLanguage];
     });
+    const body = isHtml
+      ? [translations.map(([text]) => text), translations.map(([, source]) => source)]
+      : url.pathname.endsWith('/t')
+        ? translations
+        : { sentences: [{ trans: translations[0]?.[0] || '' }], src: translations[0]?.[1] || '' };
+    await route.fulfill({ body: JSON.stringify(body), contentType: 'application/json', status: 200 });
   });
 }
 

@@ -9,164 +9,143 @@ describe('background translation bridge', () => {
     await chrome.storage.session.clear();
   });
 
-  afterEach(() => vi.useRealTimers());
+  afterEach(() => { vi.useRealTimers(); vi.unstubAllGlobals(); });
 
-  it('registers only ytcq translation messages as asynchronous requests', async () => {
+  it('registers only translation messages and rejects missing data before fetching', async () => {
     await import('./translate');
-    const listener = getMessageListener();
-
-    expect(listener({ type: 'other' }, {}, vi.fn())).toBe(false);
-    expect(listener({ type: 'ytcq:translate', text: '', targetLanguage: 'en' }, {}, vi.fn())).toBe(true);
-    expect(listener({ type: 'ytcq:translateBatch', texts: [], targetLanguage: 'en' }, {}, vi.fn())).toBe(true);
-    await Promise.resolve();
+    expect(getMessageListener()({ type: 'other' }, {}, vi.fn())).toBe(false);
+    for (const message of [
+      { type: 'ytcq:translate', text: '' },
+      { type: 'ytcq:translateBatch', texts: [] },
+      { type: 'ytcq:translateBatch', texts: ['hello', ''] }
+    ]) {
+      const response = await new Promise((resolve) => {
+        expect(getMessageListener()(message, {}, resolve)).toBe(true);
+      });
+      expect(response).toEqual({ ok: false, error: 'Missing text or target language.' });
+    }
     expect(fetch).not.toHaveBeenCalled();
   });
 
-  it('calls Google Translate without credentials and returns translated text', async () => {
-    vi.mocked(fetch).mockResolvedValue({
-      json: () => Promise.resolve({
-        sentences: [{ trans: 'hello ' }, { trans: 'everyone' }],
-        src: 'es'
-      }),
-      ok: true
-    } as Response);
+  it('posts a single draft without cookies and preserves the existing message response', async () => {
+    vi.mocked(fetch).mockResolvedValue(new Response(JSON.stringify([['hello everyone'], ['es']])));
     await import('./translate');
-    const listener = getMessageListener();
-    const sendResponse = vi.fn();
-
-    listener({ type: 'ytcq:translate', text: 'hola a todos', targetLanguage: 'en' }, {}, sendResponse);
-
-    await vi.waitFor(() => {
-      expect(sendResponse).toHaveBeenCalledWith({
-        ok: true,
-        sourceLanguage: 'es',
-        translatedText: 'hello everyone'
-      });
-    });
-    expect(fetch).toHaveBeenCalledWith(
-      expect.stringContaining('https://translate.googleapis.com/translate_a/single'),
-      expect.objectContaining({
-        credentials: 'omit',
-        signal: expect.any(AbortSignal)
-      })
+    const response = await new Promise((resolve) =>
+      getMessageListener()({ type: 'ytcq:translate', text: 'hola a todos' }, {}, resolve)
     );
-    expect(String(vi.mocked(fetch).mock.calls[0][0])).toContain('tl=en');
-    expect(String(vi.mocked(fetch).mock.calls[0][0])).toContain('q=hola+a+todos');
+    expect(response).toEqual({ ok: true, translatedText: 'hello everyone', sourceLanguage: 'es' });
+    expect(fetch).toHaveBeenCalledWith('https://translate-pa.googleapis.com/v1/translateHtml', {
+      method: 'POST', credentials: 'omit', signal: expect.any(AbortSignal),
+      headers: { 'Content-Type': 'application/json+protobuf', 'X-Goog-Api-Key': expect.any(String) },
+      body: JSON.stringify([[['hola a todos'], 'auto', 'en'], 'wt_lib'])
+    });
   });
 
-  it('defaults missing target language to English and falls back to source text when no sentences return', async () => {
-    vi.mocked(fetch).mockResolvedValue({
-      json: () => Promise.resolve({
-        sentences: [],
-        src: ''
-      }),
-      ok: true
-    } as Response);
+  it('maps each translation and detected language to its original batch entry', async () => {
+    vi.mocked(fetch).mockResolvedValue(new Response(JSON.stringify([['hello', 'goodbye'], ['es', 'fr']])));
     await import('./translate');
-    const listener = getMessageListener();
-    const sendResponse = vi.fn();
-
-    listener({ type: 'ytcq:translate', text: 'hola' }, {}, sendResponse);
-
-    await vi.waitFor(() => {
-      expect(sendResponse).toHaveBeenCalledWith({
-        ok: true,
-        sourceLanguage: '',
-        translatedText: 'hola'
-      });
-    });
-    expect(String(vi.mocked(fetch).mock.calls[0][0])).toContain('tl=en');
-  });
-
-  it('returns a clear error for missing request data', async () => {
-    await import('./translate');
-    const listener = getMessageListener();
-    const sendResponse = vi.fn();
-
-    listener({ type: 'ytcq:translate', text: '', targetLanguage: 'en' }, {}, sendResponse);
-
-    await vi.waitFor(() => {
-      expect(sendResponse).toHaveBeenCalledWith({
-        error: 'Missing text or target language.',
-        ok: false
-      });
-    });
-    expect(fetch).not.toHaveBeenCalled();
-  });
-
-  it('calls the batch endpoint with repeated query values and returns per-text results', async () => {
-    vi.mocked(fetch).mockResolvedValue({
-      json: () => Promise.resolve([['hello', 'es'], ['bye', 'es']]),
-      ok: true
-    } as Response);
-    await import('./translate');
-    const listener = getMessageListener();
-    const sendResponse = vi.fn();
-
-    listener({ type: 'ytcq:translateBatch', texts: ['hola', 'adios'], targetLanguage: 'en' }, {}, sendResponse);
-
-    await vi.waitFor(() => {
-      expect(sendResponse).toHaveBeenCalledWith({
-        ok: true,
-        results: [
-          { sourceLanguage: 'es', translatedText: 'hello' },
-          { sourceLanguage: 'es', translatedText: 'bye' }
-        ]
-      });
-    });
-    expect(fetch).toHaveBeenCalledWith(
-      expect.stringContaining('https://translate.googleapis.com/translate_a/t'),
-      expect.objectContaining({
-        credentials: 'omit',
-        signal: expect.any(AbortSignal)
-      })
+    const response = await new Promise((resolve) =>
+      getMessageListener()({ type: 'ytcq:translateBatch', texts: ['hola', 'au revoir'], targetLanguage: 'en' }, {}, resolve)
     );
-    const url = String(vi.mocked(fetch).mock.calls[0][0]);
-    expect(url).toContain('sl=auto');
-    expect(url).toContain('tl=en');
-    expect(url).toContain('q=hola');
-    expect(url).toContain('q=adios');
+    expect(response).toEqual({ ok: true, results: [
+      { translatedText: 'hello', sourceLanguage: 'es' },
+      { translatedText: 'goodbye', sourceLanguage: 'fr' }
+    ] });
+    expect(fetch).toHaveBeenCalledOnce();
   });
 
-  it('falls back to single requests when a batch response cannot be mapped', async () => {
+  it.each([
+    { payload: [['hello'], ['en']], error: 'Translate batch response did not match the request.' },
+    { payload: [[], []], error: 'Translate batch response did not match the request.' },
+    { payload: [['', 'goodbye']], error: 'Translate response was empty.' },
+    { payload: [[null, 'goodbye']], error: 'Translate batch response entry was not readable.' }
+  ])('rejects unreadable batches without multiplying requests: $error', async ({ payload, error }) => {
+    vi.mocked(fetch).mockResolvedValue(new Response(JSON.stringify(payload)));
+    await import('./translate');
+    expect(await requestTranslation('ytcq:translateBatch')).toEqual({ ok: false, error });
+    expect(fetch).toHaveBeenCalledOnce();
+  });
+
+  it('keeps Chinese corrections batched and restores mixed-language result order', async () => {
     vi.mocked(fetch)
-      .mockResolvedValueOnce({
-        json: () => Promise.resolve([['hello', 'es']]),
-        ok: true
-      } as Response)
-      .mockResolvedValueOnce({
-        json: () => Promise.resolve({
-          sentences: [{ trans: 'hello' }],
-          src: 'es'
-        }),
-        ok: true
-      } as Response)
-      .mockResolvedValueOnce({
-        json: () => Promise.resolve({
-          sentences: [{ trans: 'bye' }],
-          src: 'es'
-        }),
-        ok: true
-      } as Response);
+      .mockResolvedValueOnce(new Response(JSON.stringify([
+        ['hello', '你是個好人', 'goodbye', '謝謝你的直播'], ['es', 'en', 'fr', 'en']
+      ])))
+      .mockResolvedValueOnce(new Response(JSON.stringify([['You are a good person', 'Thanks for the stream']])));
     await import('./translate');
-    const listener = getMessageListener();
-    const sendResponse = vi.fn();
+    const response = await new Promise((resolve) =>
+      getMessageListener()({
+        type: 'ytcq:translateBatch', texts: ['hola', '你是個好人', 'au revoir', '謝謝你的直播'], targetLanguage: 'en'
+      }, {}, resolve)
+    );
+    expect(response).toEqual({ ok: true, results: [
+      { translatedText: 'hello', sourceLanguage: 'es' },
+      { translatedText: 'You are a good person', sourceLanguage: 'zh-TW' },
+      { translatedText: 'goodbye', sourceLanguage: 'fr' },
+      { translatedText: 'Thanks for the stream', sourceLanguage: 'zh-TW' }
+    ] });
+    expect(fetch).toHaveBeenCalledTimes(2);
+    expect(JSON.parse(String(vi.mocked(fetch).mock.calls[1][1]?.body))[0])
+      .toEqual([['你是個好人', '謝謝你的直播'], 'zh-TW', 'en']);
+    expect(vi.mocked(fetch).mock.calls.every(([url]) => String(url) === 'https://translate-pa.googleapis.com/v1/translateHtml')).toBe(true);
+  });
 
-    listener({ type: 'ytcq:translateBatch', texts: ['hola', 'adios'], targetLanguage: 'en' }, {}, sendResponse);
+  it.each([
+    { text: '今日', source: 'ja' },
+    { text: '你好', source: 'zh-CN' },
+    { text: '今日は楽しい', source: 'en' },
+    { text: '오늘 漢字', source: 'en' },
+    { text: 'The symbol 愛 means love', source: 'en' }
+  ])('does not force Chinese over a detected language or another script: $text', async ({ text, source }) => {
+    vi.mocked(fetch).mockResolvedValue(new Response(JSON.stringify([[text], [source]])));
+    await import('./translate');
+    const response = await new Promise((resolve) =>
+      getMessageListener()({ type: 'ytcq:translate', text, targetLanguage: 'en' }, {}, resolve)
+    );
+    expect(response).toEqual({ ok: true, translatedText: text, sourceLanguage: source });
+    expect(fetch).toHaveBeenCalledOnce();
+  });
 
-    await vi.waitFor(() => {
-      expect(sendResponse).toHaveBeenCalledWith({
-        ok: true,
-        results: [
-          { sourceLanguage: 'es', translatedText: 'hello' },
-          { sourceLanguage: 'es', translatedText: 'bye' }
-        ]
-      });
+  it('splits a batch beyond 50 messages while preserving every entry', async () => {
+    vi.mocked(fetch).mockImplementation(async (_url, init) => {
+      const texts = JSON.parse(String(init?.body))[0][0] as string[];
+      return new Response(JSON.stringify([texts.map((text) => 'translated ' + text)]));
     });
-    expect(fetch).toHaveBeenCalledTimes(3);
-    expect(String(vi.mocked(fetch).mock.calls[0][0])).toContain('/translate_a/t');
-    expect(String(vi.mocked(fetch).mock.calls[1][0])).toContain('/translate_a/single');
-    expect(String(vi.mocked(fetch).mock.calls[2][0])).toContain('/translate_a/single');
+    await import('./translate');
+    const texts = Array.from({ length: 51 }, (_, index) => 'item ' + index);
+    const response = await new Promise((resolve) =>
+      getMessageListener()({ type: 'ytcq:translateBatch', texts, targetLanguage: 'es' }, {}, resolve)
+    );
+    expect(response).toEqual({ ok: true, results: texts.map((text) => ({
+      translatedText: 'translated ' + text, sourceLanguage: ''
+    })) });
+    expect(fetch).toHaveBeenCalledTimes(2);
+  });
+
+  it('bounds the Chinese correction to one request and preserves protected text', async () => {
+    const text = '你是個好人 §0§';
+    vi.mocked(fetch).mockImplementation(async () => new Response(JSON.stringify([
+      ['你是個好人 <span translate="no">[0]</span>'], ['en']
+    ])));
+    await import('./translate');
+    const response = await new Promise((resolve) =>
+      getMessageListener()({ type: 'ytcq:translate', text, targetLanguage: 'en' }, {}, resolve)
+    );
+    expect(response).toEqual({ ok: true, translatedText: text, sourceLanguage: 'zh-TW' });
+    expect(fetch).toHaveBeenCalledTimes(2);
+  });
+
+  it('keeps protected content private and restores only validated placeholders', async () => {
+    vi.mocked(fetch).mockResolvedValue(new Response(JSON.stringify([
+      ['Hola <span translate="no">[0]</span> &amp; adiós'], ['en']
+    ])));
+    await import('./translate');
+    const response = await new Promise((resolve) =>
+      getMessageListener()({ type: 'ytcq:translate', text: 'Hello §0§ & goodbye', targetLanguage: 'es' }, {}, resolve)
+    );
+    expect(response).toEqual({ ok: true, translatedText: 'Hola §0§ & adiós', sourceLanguage: 'en' });
+    expect(JSON.parse(String(vi.mocked(fetch).mock.calls[0][1]?.body))[0][0])
+      .toEqual(['Hello <span translate="no">[0]</span> &amp; goodbye']);
   });
 
   it('returns request errors from failed translation responses', async () => {
@@ -227,9 +206,7 @@ describe('background translation bridge', () => {
       expect(fetch).toHaveBeenCalledOnce();
 
       await vi.advanceTimersByTimeAsync(1);
-      vi.mocked(fetch).mockResolvedValueOnce(new Response(JSON.stringify({
-        sentences: [{ trans: 'こんにちは' }], src: 'en'
-      })));
+      vi.mocked(fetch).mockResolvedValueOnce(new Response(JSON.stringify([['こんにちは'], ['en']])));
       await expect(requestTranslation('ytcq:translate')).resolves.toMatchObject({
         ok: true, translatedText: 'こんにちは'
       });

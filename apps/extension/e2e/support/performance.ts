@@ -9,9 +9,9 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import type { ChatSurface } from './chat-surface';
 import { repoRoot } from './paths';
+import { fulfillTranslationRequest, getTranslationRequestTexts, TRANSLATE_ENDPOINT_PATTERN } from './translation-endpoint';
 
 const REPORT_DIR = path.join(repoRoot, 'test-results', 'performance');
-const TRANSLATE_ENDPOINT_PATTERN = 'https://translate.googleapis.com/translate_a/*';
 
 export interface BrowserPerfProbeSnapshot {
   durationMs: number;
@@ -178,10 +178,7 @@ export async function withMockedPerformanceTranslationEndpoint<T>(
   };
 
   const handler = async (route: Route) => {
-    const url = new URL(route.request().url());
-    const isBatchRequest = url.pathname.endsWith('/t');
-    const requestTexts = url.searchParams.getAll('q');
-    const responseItemCount = isBatchRequest ? Math.max(1, requestTexts.length) : 1;
+    const requestTexts = getTranslationRequestTexts(route.request());
     const countedTexts = countText ? requestTexts.filter(countText) : requestTexts;
     const requestNumber = ++stats.requestCount;
     if (delayMs) await delay(delayMs);
@@ -198,12 +195,7 @@ export async function withMockedPerformanceTranslationEndpoint<T>(
       const text = typeof translatedText === 'function'
         ? translatedText(requestNumber)
         : translatedText;
-      await route.fulfill({
-        body: JSON.stringify(isBatchRequest
-          ? Array.from({ length: responseItemCount }, () => [text, sourceLanguage])
-          : { sentences: [{ trans: text }], src: sourceLanguage }),
-        contentType: 'application/json'
-      });
+      await fulfillTranslationRequest(route, text, sourceLanguage);
       stats.successCount += 1;
       stats.translatedItemCount += countedTexts.length;
     }

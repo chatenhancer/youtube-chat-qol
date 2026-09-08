@@ -52,13 +52,13 @@ Chat Enhancer for YouTube 是一款用于 YouTube 实时聊天的浏览器扩展
 
 只有在启用并使用相关功能时，数据才会发送到以下服务：
 
-### Google Translate (`translate.googleapis.com`)
+### Google Translate (`translate-pa.googleapis.com`)
 
 聊天翻译会在翻译启用期间发送实时聊天中可见且符合翻译条件的聊天消息文本。草稿翻译会发送你从聊天框中选择翻译的草稿文本。
 
 翻译请求包括要翻译的文本和目标语言。扩展不会随翻译请求发送你的 YouTube cookie 或 YouTube 凭据。
 
-通过 `translate.googleapis.com` 访问 Google Translate 是非官方的，可能会受到速率限制、发生变化或不可用。
+通过 `translate-pa.googleapis.com` 访问 Google Translate 是非官方的，可能会受到速率限制、发生变化或不可用。
 
 ### <span id="playground"></span>Chat Enhancer Playground ([playground.chatenhancer.com](https://playground.chatenhancer.com))
 

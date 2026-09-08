@@ -52,13 +52,13 @@ O ile poniżej nie wskazano inaczej, dane z tej sekcji pozostają w Twoim profil
 
 Dane są wysyłane do tych usług tylko wtedy, gdy powiązana funkcja jest włączona i używana:
 
-### Google Translate (`translate.googleapis.com`)
+### Google Translate (`translate-pa.googleapis.com`)
 
 Tłumaczenie czatu wysyła tekst wiadomości czatu widoczny w czacie na żywo i kwalifikujący się do tłumaczenia, gdy tłumaczenie jest włączone. Tłumaczenie szkiców wysyła tekst szkicu, który wybierzesz do tłumaczenia z pola czatu.
 
 Żądania tłumaczenia zawierają tekst do przetłumaczenia i język docelowy. Rozszerzenie nie wysyła Twoich plików cookie YouTube ani danych logowania YouTube z żądaniami tłumaczenia.
 
-Dostęp do Google Translate przez `translate.googleapis.com` jest nieoficjalny i może być limitowany, zmieniony lub niedostępny.
+Dostęp do Google Translate przez `translate-pa.googleapis.com` jest nieoficjalny i może być limitowany, zmieniony lub niedostępny.
 
 ### <span id="playground"></span>Chat Enhancer Playground ([playground.chatenhancer.com](https://playground.chatenhancer.com))
 

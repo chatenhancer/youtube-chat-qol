@@ -52,13 +52,13 @@ Chat Enhancer for YouTube, YouTube लाइव चैट के लिए ए�
 
 Data इन सेवाओं को केवल तभी भेजा जाता है जब संबंधित feature चालू हो और उपयोग किया जाए:
 
-### Google Translate (`translate.googleapis.com`)
+### Google Translate (`translate-pa.googleapis.com`)
 
 Chat translation उस chat message text को भेजता है जो live chat में visible है और translation चालू होने के दौरान translation के लिए eligible है। Draft translation वह draft text भेजता है जिसे आप chat box से translate करना चुनते हैं।
 
 Translation requests में translate करने वाला text और target language शामिल होते हैं। एक्सटेंशन translation requests के साथ आपकी YouTube cookies या YouTube credentials नहीं भेजता।
 
-`translate.googleapis.com` के माध्यम से Google Translate access unofficial है और rate-limited, changed या unavailable हो सकता है।
+`translate-pa.googleapis.com` के माध्यम से Google Translate access unofficial है और rate-limited, changed या unavailable हो सकता है।
 
 ### <span id="playground"></span>Chat Enhancer Playground ([playground.chatenhancer.com](https://playground.chatenhancer.com))
 

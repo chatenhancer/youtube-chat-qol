@@ -52,13 +52,13 @@ Chat Enhancer for YouTube — это расширение браузера дл�
 
 Данные отправляются этим сервисам только тогда, когда соответствующая функция включена и используется:
 
-### Google Translate (`translate.googleapis.com`)
+### Google Translate (`translate-pa.googleapis.com`)
 
 Перевод чата отправляет текст сообщений, который виден в живом чате и подходит для перевода, пока перевод включен. Перевод черновиков отправляет текст черновика, который вы выбираете для перевода из поля чата.
 
 Запросы перевода включают текст для перевода и целевой язык. Расширение не отправляет ваши cookies YouTube или учетные данные YouTube вместе с запросами перевода.
 
-Доступ к Google Translate через `translate.googleapis.com` неофициальный и может быть ограничен по частоте, изменен или недоступен.
+Доступ к Google Translate через `translate-pa.googleapis.com` неофициальный и может быть ограничен по частоте, изменен или недоступен.
 
 ### <span id="playground"></span>Chat Enhancer Playground ([playground.chatenhancer.com](https://playground.chatenhancer.com))
 

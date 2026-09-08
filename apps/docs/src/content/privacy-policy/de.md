@@ -52,13 +52,13 @@ Sofern unten nicht anders angegeben, bleiben die Daten in diesem Abschnitt in de
 
 Nur wenn die zugehörige Funktion aktiviert und verwendet wird, werden Daten an diese Dienste gesendet:
 
-### Google Translate (`translate.googleapis.com`)
+### Google Translate (`translate-pa.googleapis.com`)
 
 Die Chatübersetzung sendet Chatnachrichtentext, der im Livechat sichtbar und für die Übersetzung geeignet ist, während Übersetzung aktiviert ist. Die Entwurfsübersetzung sendet den Entwurfstext, den du aus dem Chatfeld übersetzen lässt.
 
 Übersetzungsanfragen enthalten den zu übersetzenden Text und die Zielsprache. Die Erweiterung sendet keine YouTube-Cookies oder YouTube-Anmeldedaten mit Übersetzungsanfragen.
 
-Der Zugriff auf Google Translate über `translate.googleapis.com` ist inoffiziell und kann begrenzt, geändert oder nicht verfügbar sein.
+Der Zugriff auf Google Translate über `translate-pa.googleapis.com` ist inoffiziell und kann begrenzt, geändert oder nicht verfügbar sein.
 
 ### <span id="playground"></span>Chat Enhancer Playground ([playground.chatenhancer.com](https://playground.chatenhancer.com))
 

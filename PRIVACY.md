@@ -46,13 +46,13 @@ Unless stated below, data in this section stays in your browser profile and is n
 
 Data is sent to these services only when the related feature is enabled and used:
 
-### Google Translate (`translate.googleapis.com`)
+### Google Translate (`translate-pa.googleapis.com`)
 
 Chat translation sends chat message text that is visible in the live chat and eligible for translation while translation is enabled. Draft translation sends the draft text you choose to translate from the chat box.
 
 Translation requests include the text to translate and the target language. The extension does not send your YouTube cookies or YouTube credentials with translation requests.
 
-Google Translate access through `translate.googleapis.com` is unofficial and may be rate-limited, changed, or unavailable.
+Google Translate access through `translate-pa.googleapis.com` is unofficial and may be rate-limited, changed, or unavailable.
 
 ### <span id="playground"></span>Chat Enhancer Playground ([playground.chatenhancer.com](https://playground.chatenhancer.com))
 

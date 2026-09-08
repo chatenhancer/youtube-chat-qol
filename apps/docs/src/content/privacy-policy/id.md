@@ -52,13 +52,13 @@ Kecuali dinyatakan lain di bawah, data di bagian ini tetap berada di profil brow
 
 Data hanya dikirim ke layanan berikut saat fitur terkait diaktifkan dan digunakan:
 
-### Google Translate (`translate.googleapis.com`)
+### Google Translate (`translate-pa.googleapis.com`)
 
 Terjemahan chat mengirim teks pesan chat yang terlihat di live chat dan memenuhi syarat untuk diterjemahkan saat terjemahan diaktifkan. Terjemahan draft mengirim teks draft yang Anda pilih untuk diterjemahkan dari kotak chat.
 
 Permintaan terjemahan mencakup teks yang akan diterjemahkan dan bahasa target. Ekstensi tidak mengirim cookie YouTube atau kredensial YouTube Anda bersama permintaan terjemahan.
 
-Akses Google Translate melalui `translate.googleapis.com` tidak resmi dan dapat dibatasi, berubah, atau tidak tersedia.
+Akses Google Translate melalui `translate-pa.googleapis.com` tidak resmi dan dapat dibatasi, berubah, atau tidak tersedia.
 
 ### <span id="playground"></span>Chat Enhancer Playground ([playground.chatenhancer.com](https://playground.chatenhancer.com))
 

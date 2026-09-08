@@ -2,6 +2,7 @@
 import { expect, test as base } from '@playwright/test';
 import { closeExtensionContext, launchExtensionContext } from '../chrome';
 import { dumpDomOnFailure } from '../dom-dump';
+import { installDefaultTranslationMock } from '../translation-endpoint';
 import {
   createLiveChatFixtureHtml,
   fixtureLoggedOutLiveChatUrl,
@@ -36,6 +37,8 @@ export const youtubeMockTest = base.extend<YouTubeMockTestFixtures, YouTubeMockW
         headless: shouldRunHeadlessBrowserTest(),
         profileDir: getDisposableWorkerProfileDir('mock', workerInfo)
       });
+
+      if (workerInfo.project.name !== 'integrations') await installDefaultTranslationMock(context);
 
       await context.route(
         /^https:\/\/(?:studio|www)\.youtube\.com\/live_chat(?:_replay)?(?:\?|$)/,

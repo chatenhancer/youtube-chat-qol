@@ -65,10 +65,12 @@ export const mockedComposerTranslationProtectedDraftScenario: BrowserScenario = 
 
 export const realComposerTranslationScenario: BrowserScenario = async ({ chat, context }) => {
   await expectChatComposerVisible(chat);
-  const requestedUrls: URL[] = [];
+  const requestedBodies: unknown[] = [];
   const captureRequest = (request: Request) => {
     const url = new URL(request.url());
-    if (url.hostname === 'translate.googleapis.com') requestedUrls.push(url);
+    if (url.hostname === 'translate-pa.googleapis.com' && url.pathname === '/v1/translateHtml') {
+      requestedBodies.push(request.postDataJSON());
+    }
   };
   context.on('request', captureRequest);
   try {
@@ -81,11 +83,7 @@ export const realComposerTranslationScenario: BrowserScenario = async ({ chat, c
         sourceText: REAL_COMPOSER_SOURCE
       });
     });
-    expect(requestedUrls.some((url) =>
-      url.pathname === '/translate_a/single' &&
-      url.searchParams.get('tl') === 'ja' &&
-      url.searchParams.get('q') === REAL_COMPOSER_SOURCE
-    )).toBe(true);
+    expect(requestedBodies).toContainEqual([[[REAL_COMPOSER_SOURCE], 'auto', 'ja'], 'wt_lib']);
   } finally {
     context.off('request', captureRequest);
     await clearChatComposer(chat);

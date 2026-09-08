@@ -52,13 +52,13 @@ Chat Enhancer for YouTube یک افزونه مرورگر برای گفت‌وگ�
 
 داده‌ها فقط زمانی به این سرویس‌ها ارسال می‌شوند که قابلیت مربوطه فعال و استفاده شود:
 
-### Google Translate (`translate.googleapis.com`)
+### Google Translate (`translate-pa.googleapis.com`)
 
 ترجمه چت متن پیام چتی را که در گفت‌وگوی زنده قابل مشاهده و واجد شرایط ترجمه است، هنگام فعال بودن ترجمه ارسال می‌کند. ترجمه پیش‌نویس، متن پیش‌نویسی را که از کادر چت برای ترجمه انتخاب می‌کنید ارسال می‌کند.
 
 درخواست‌های ترجمه شامل متن برای ترجمه و زبان مقصد هستند. افزونه کوکی‌های YouTube یا اعتبارنامه‌های YouTube شما را با درخواست‌های ترجمه ارسال نمی‌کند.
 
-دسترسی به Google Translate از طریق `translate.googleapis.com` غیررسمی است و ممکن است محدود شود، تغییر کند یا در دسترس نباشد.
+دسترسی به Google Translate از طریق `translate-pa.googleapis.com` غیررسمی است و ممکن است محدود شود، تغییر کند یا در دسترس نباشد.
 
 ### <span id="playground"></span>Chat Enhancer Playground ([playground.chatenhancer.com](https://playground.chatenhancer.com))
 

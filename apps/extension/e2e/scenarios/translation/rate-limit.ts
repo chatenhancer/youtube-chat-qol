@@ -3,27 +3,27 @@ import { expect, test, type Route } from '@playwright/test';
 import { clearChatComposer, getChatComposerText, setChatComposerText } from '../../support/composer';
 import { requireControlledChat } from '../../support/controlled-chat';
 import { withExtensionStorageValues } from '../../support/extension-storage';
+import { fulfillTranslationRequest, getTranslationRequestTexts, TRANSLATE_ENDPOINT_PATTERN } from '../../support/translation-endpoint';
 import type { BrowserScenario } from '../types';
 
-const ENDPOINT = 'https://translate.googleapis.com/translate_a/*';
 const JAPANESE_TEXT = '配信ありがとうございます';
 
 export const rateLimitedTranslationScenario: BrowserScenario = async ({ chat, context, page, controlledChat }) => {
-  const requests: Array<{ path: string; at: number }> = [];
+  const requests: Array<{ texts: string[]; at: number }> = [];
   let rateLimited = true;
   const handleRequest = async (route: Route) => {
-    const url = new URL(route.request().url());
-    requests.push({ path: url.pathname, at: Date.now() });
+    requests.push({ texts: getTranslationRequestTexts(route.request()), at: Date.now() });
     if (rateLimited) {
-      await route.fulfill({ status: 429, headers: { 'Retry-After': '5' }, body: 'Too many requests' });
+      await route.fulfill({
+        status: 429,
+        headers: { 'Retry-After': '5', 'Access-Control-Expose-Headers': 'Retry-After' },
+        body: 'Too many requests'
+      });
       return;
     }
-    const body = url.pathname.endsWith('/t')
-      ? url.searchParams.getAll('q').map(() => [JAPANESE_TEXT, 'en'])
-      : { sentences: [{ trans: JAPANESE_TEXT }], src: 'en' };
-    await route.fulfill({ contentType: 'application/json', body: JSON.stringify(body) });
+    await fulfillTranslationRequest(route, JAPANESE_TEXT, 'en');
   };
-  await context.route(ENDPOINT, handleRequest);
+  await context.route(TRANSLATE_ENDPOINT_PATTERN, handleRequest);
   try {
     const messageId = await requireControlledChat(controlledChat).injectMessage({
       author: '@TranslationViewer', text: 'Thank you for the stream'
@@ -38,7 +38,6 @@ export const rateLimitedTranslationScenario: BrowserScenario = async ({ chat, co
         );
         await expect(message.locator('#message').first()).toHaveText('Thank you for the stream');
         expect(requests.length).toBeGreaterThan(0);
-        expect(requests.every((request) => request.path === '/translate_a/t')).toBe(true);
       });
 
       try {
@@ -60,8 +59,8 @@ export const rateLimitedTranslationScenario: BrowserScenario = async ({ chat, co
           await expect(message.locator('.ytcq-translation')).toContainText(JAPANESE_TEXT);
           await expect.poll(() => getChatComposerText(chat)).toBe(JAPANESE_TEXT);
           const recoveredRequests = requests.slice(pausedRequestCount);
-          expect(recoveredRequests.some((request) => request.path === '/translate_a/t')).toBe(true);
-          expect(recoveredRequests.some((request) => request.path === '/translate_a/single')).toBe(true);
+          expect(recoveredRequests.some((request) => request.texts.includes('Thank you for the stream'))).toBe(true);
+          expect(recoveredRequests.some((request) => request.texts.includes('Thank you'))).toBe(true);
           expect(recoveredRequests.every((request) => request.at >= earliestRetry)).toBe(true);
         });
       } finally {
@@ -69,6 +68,6 @@ export const rateLimitedTranslationScenario: BrowserScenario = async ({ chat, co
       }
     });
   } finally {
-    await context.unroute(ENDPOINT, handleRequest);
+    await context.unroute(TRANSLATE_ENDPOINT_PATTERN, handleRequest);
   }
 };

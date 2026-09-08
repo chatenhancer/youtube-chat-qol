@@ -52,13 +52,13 @@ Salvo indicação em contrário abaixo, os dados desta seção permanecem no seu
 
 Os dados são enviados a estes serviços somente quando o recurso relacionado está ativado e é usado:
 
-### Google Translate (`translate.googleapis.com`)
+### Google Translate (`translate-pa.googleapis.com`)
 
 A tradução do chat envia texto de mensagens de chat visíveis no chat ao vivo e elegíveis para tradução enquanto a tradução está ativada. A tradução de rascunhos envia o texto do rascunho que você escolhe traduzir a partir da caixa de chat.
 
 Solicitações de tradução incluem o texto a ser traduzido e o idioma de destino. A extensão não envia seus cookies do YouTube nem credenciais do YouTube com solicitações de tradução.
 
-O acesso ao Google Translate por meio de `translate.googleapis.com` não é oficial e pode ser limitado, alterado ou ficar indisponível.
+O acesso ao Google Translate por meio de `translate-pa.googleapis.com` não é oficial e pode ser limitado, alterado ou ficar indisponível.
 
 ### <span id="playground"></span>Chat Enhancer Playground ([playground.chatenhancer.com](https://playground.chatenhancer.com))
 

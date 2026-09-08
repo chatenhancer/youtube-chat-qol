@@ -52,13 +52,13 @@ Chat Enhancer for YouTube เป็นส่วนขยายเบราว์
 
 ข้อมูลจะถูกส่งไปยังบริการเหล่านี้เฉพาะเมื่อเปิดใช้และใช้งานฟีเจอร์ที่เกี่ยวข้อง:
 
-### Google Translate (`translate.googleapis.com`)
+### Google Translate (`translate-pa.googleapis.com`)
 
 การแปลแชทส่งข้อความแชทที่มองเห็นในแชทสดและเข้าเกณฑ์สำหรับการแปลในขณะที่เปิดใช้การแปล การแปลร่างส่งข้อความร่างที่คุณเลือกแปลจากกล่องแชท
 
 คำขอแปลมีข้อความที่จะถูกแปลและภาษาปลายทาง ส่วนขยายไม่ส่ง cookies ของ YouTube หรือ credentials ของ YouTube ของคุณไปกับคำขอแปล
 
-การเข้าถึง Google Translate ผ่าน `translate.googleapis.com` เป็นแบบไม่เป็นทางการ และอาจถูกจำกัด เปลี่ยนแปลง หรือไม่พร้อมใช้งาน
+การเข้าถึง Google Translate ผ่าน `translate-pa.googleapis.com` เป็นแบบไม่เป็นทางการ และอาจถูกจำกัด เปลี่ยนแปลง หรือไม่พร้อมใช้งาน
 
 ### <span id="playground"></span>Chat Enhancer Playground ([playground.chatenhancer.com](https://playground.chatenhancer.com))
 

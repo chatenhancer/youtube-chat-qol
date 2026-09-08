@@ -52,13 +52,13 @@ Chat Enhancer for YouTube は、YouTube ライブチャット向けのブラウ�
 
 データは、関連する機能を有効にして使用した場合にのみ、次のサービスへ送信されます。
 
-### Google Translate (`translate.googleapis.com`)
+### Google Translate (`translate-pa.googleapis.com`)
 
 チャット翻訳は、翻訳が有効な間にライブチャットで表示され、翻訳対象となるチャットメッセージ本文を送信します。下書き翻訳は、チャットボックスから翻訳することを選んだ下書きテキストを送信します。
 
 翻訳リクエストには、翻訳するテキストと対象言語が含まれます。拡張機能は、翻訳リクエストに YouTube Cookie や YouTube 認証情報を送信しません。
 
-`translate.googleapis.com` 経由の Google Translate アクセスは非公式であり、レート制限、変更、または利用不能になる場合があります。
+`translate-pa.googleapis.com` 経由の Google Translate アクセスは非公式であり、レート制限、変更、または利用不能になる場合があります。
 
 ### <span id="playground"></span>Chat Enhancer Playground ([playground.chatenhancer.com](https://playground.chatenhancer.com))
 

@@ -323,7 +323,7 @@ function createManifest(target) {
     const connectSources = [
       "'self'",
       PROFILE_AVATAR_CSP_SOURCE,
-      'https://translate.googleapis.com',
+      'https://translate-pa.googleapis.com',
       'https://playground.chatenhancer.com',
       'wss://playground.chatenhancer.com'
     ];

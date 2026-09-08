@@ -52,13 +52,13 @@ Sauf indication contraire ci-dessous, les données de cette section restent dans
 
 Les données ne sont envoyées à ces services que lorsque la fonction correspondante est activée et utilisée :
 
-### Google Translate (`translate.googleapis.com`)
+### Google Translate (`translate-pa.googleapis.com`)
 
 La traduction du chat envoie le texte des messages visibles dans le chat en direct et éligibles à la traduction pendant que la traduction est activée. La traduction des brouillons envoie le texte du brouillon que vous choisissez de traduire depuis le champ de chat.
 
 Les requêtes de traduction incluent le texte à traduire et la langue cible. L’extension n’envoie pas vos cookies YouTube ni vos identifiants YouTube avec les requêtes de traduction.
 
-L’accès à Google Translate via `translate.googleapis.com` est non officiel et peut être limité, modifié ou indisponible.
+L’accès à Google Translate via `translate-pa.googleapis.com` est non officiel et peut être limité, modifié ou indisponible.
 
 ### <span id="playground"></span>Chat Enhancer Playground ([playground.chatenhancer.com](https://playground.chatenhancer.com))
 

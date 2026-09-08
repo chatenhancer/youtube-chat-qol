@@ -52,13 +52,13 @@ Chat Enhancer for YouTube הוא תוסף דפדפן לצ׳אט חי ב-YouTube.
 
 נתונים נשלחים לשירותים האלה רק כאשר התכונה הקשורה מופעלת ונמצאת בשימוש:
 
-### Google Translate (`translate.googleapis.com`)
+### Google Translate (`translate-pa.googleapis.com`)
 
 תרגום צ׳אט שולח טקסט הודעת צ׳אט שנראה בצ׳אט החי ועומד בתנאי התרגום בזמן שהתרגום מופעל. תרגום טיוטות שולח את טקסט הטיוטה שבחרת לתרגם מתיבת הצ׳אט.
 
 בקשות תרגום כוללות את הטקסט לתרגום ואת שפת היעד. התוסף אינו שולח את קובצי ה-cookie של YouTube שלך או את אישורי YouTube שלך עם בקשות התרגום.
 
-הגישה ל-Google Translate דרך `translate.googleapis.com` אינה רשמית ועלולה להיות מוגבלת בקצב, להשתנות או לא להיות זמינה.
+הגישה ל-Google Translate דרך `translate-pa.googleapis.com` אינה רשמית ועלולה להיות מוגבלת בקצב, להשתנות או לא להיות זמינה.
 
 ### <span id="playground"></span>Chat Enhancer Playground ([playground.chatenhancer.com](https://playground.chatenhancer.com))
 

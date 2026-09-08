@@ -6,11 +6,14 @@
  * detected source language.
  */
 import { TranslationRateLimitError } from '../shared/translation-errors';
+import { decodeTranslationHtml, encodeTranslationHtml } from './translation-html';
 
-const TRANSLATE_ENDPOINT = 'https://translate.googleapis.com/translate_a/single';
-const TRANSLATE_BATCH_ENDPOINT = 'https://translate.googleapis.com/translate_a/t';
+const TRANSLATE_ENDPOINT = 'https://translate-pa.googleapis.com/v1/translateHtml';
+// Public web-client key supplied by Google's translation element, not a user's Cloud credential.
+// Source: https://translate.googleapis.com/_/translate_http/_/js/k=translate_http.tr.en_US.YusFYy3P_ro.O/am=AAg/d=1/exm=el_conf/ed=1/rs=AN8SPfq1Hb8iJRleQqQc8zhdzXmF9E56eQ/m=el_main
+const TRANSLATE_WEB_CLIENT_KEY = 'AIzaSyATBXajvzQLTDHEQbcpq0Ihe0vWDHmO520';
 const REQUEST_TIMEOUT_MS = 8000;
-const MAX_BATCH_URL_BYTES = 8000;
+const MAX_BATCH_BYTES = 8000;
 const MAX_BATCH_TEXTS = 50;
 const RATE_LIMIT_STORAGE_KEY = 'ytcqTranslationRetryAt';
 const RATE_LIMIT_DELAY_MS = 60_000;
@@ -63,39 +66,8 @@ async function translateText(text: unknown, targetLanguage: unknown): Promise<{
   translatedText?: string;
   sourceLanguage?: string;
 }> {
-  const cleanText = String(text || '').trim();
-  const target = String(targetLanguage || 'en').trim();
-
-  if (!cleanText || !target) {
-    return { ok: false, error: 'Missing text or target language.' };
-  }
-
-  const url = new URL(TRANSLATE_ENDPOINT);
-  url.searchParams.set('client', 'gtx');
-  url.searchParams.set('sl', 'auto');
-  url.searchParams.set('tl', target);
-  url.searchParams.set('dt', 't');
-  url.searchParams.set('dj', '1');
-  url.searchParams.set('q', cleanText);
-
-  const response = await fetchWithTimeout(url.toString());
-  if (!response.ok) {
-    throw new Error(`Translate request failed with ${response.status}`);
-  }
-
-  const payload = await response.json() as {
-    sentences?: { trans?: string }[];
-    src?: string;
-  };
-  const translatedText = Array.isArray(payload.sentences)
-    ? payload.sentences.map((sentence) => sentence.trans || '').join('')
-    : '';
-
-  return {
-    ok: true,
-    translatedText: translatedText || cleanText,
-    sourceLanguage: payload.src || ''
-  };
+  const response = await translateTexts([text], targetLanguage);
+  return response.ok ? { ok: true, ...response.results![0] } : response;
 }
 
 async function translateTexts(texts: unknown, targetLanguage: unknown): Promise<{
@@ -114,19 +86,19 @@ async function translateTexts(texts: unknown, targetLanguage: unknown): Promise<
 
   const results: BatchTranslationResult[] = [];
   for (const chunk of createTranslationChunks(cleanTexts, target)) {
-    if (chunk.length === 1 && getBatchUrlByteLength(chunk, target) > MAX_BATCH_URL_BYTES) {
-      results.push(await translateSingleTextForBatch(chunk[0], target));
-      continue;
+    const translated = await translateHtmlChunk(chunk, target, 'auto');
+    // Google sometimes returns Traditional Chinese unchanged and labels it English.
+    // Correct only that response, once, through the same endpoint. Kana/Hangul and
+    // correctly detected Japanese/Chinese messages keep Google's original result.
+    const missedChinese = chunk.map((text, index) => ({ text, index })).filter(({ text, index }) =>
+      translated[index].sourceLanguage === 'en' && translated[index].translatedText === text &&
+      /\p{Script=Han}/u.test(text) && !/[\p{Script=Latin}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Hangul}]/u.test(text)
+    );
+    if (missedChinese.length) {
+      const corrected = await translateHtmlChunk(missedChinese.map(({ text }) => text), target, 'zh-TW');
+      corrected.forEach((result, index) => { translated[missedChinese[index].index] = result; });
     }
-
-    try {
-      results.push(...await translateTextChunk(chunk, target));
-    } catch (error) {
-      if (error instanceof TranslationRateLimitError) throw error;
-      for (const text of chunk) {
-        results.push(await translateSingleTextForBatch(text, target));
-      }
-    }
+    results.push(...translated);
   }
 
   return { ok: true, results };
@@ -140,7 +112,7 @@ function createTranslationChunks(texts: string[], targetLanguage: string): strin
     const nextChunk = [...chunk, text];
     if (
       chunk.length &&
-      (nextChunk.length > MAX_BATCH_TEXTS || getBatchUrlByteLength(nextChunk, targetLanguage) > MAX_BATCH_URL_BYTES)
+      (nextChunk.length > MAX_BATCH_TEXTS || new TextEncoder().encode(createTranslationBody(nextChunk, targetLanguage, 'auto')).length > MAX_BATCH_BYTES)
     ) {
       chunks.push(chunk);
       chunk = [text];
@@ -154,62 +126,32 @@ function createTranslationChunks(texts: string[], targetLanguage: string): strin
   return chunks;
 }
 
-async function translateTextChunk(texts: string[], targetLanguage: string): Promise<BatchTranslationResult[]> {
-  const response = await fetchWithTimeout(createBatchUrl(texts, targetLanguage).toString());
-
-  if (!response.ok) {
-    throw new Error(`Translate batch request failed with ${response.status}`);
-  }
-
+async function translateHtmlChunk(texts: string[], targetLanguage: string, sourceLanguage: string): Promise<BatchTranslationResult[]> {
+  const response = await fetchWithTimeout(TRANSLATE_ENDPOINT, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json+protobuf', 'X-Goog-Api-Key': TRANSLATE_WEB_CLIENT_KEY },
+    body: createTranslationBody(texts, targetLanguage, sourceLanguage)
+  });
+  if (!response.ok) throw new Error(`Translate request failed with ${response.status}`);
   const payload = await response.json() as unknown;
-  if (!Array.isArray(payload) || payload.length !== texts.length) {
+  if (!Array.isArray(payload) || !Array.isArray(payload[0]) || payload[0].length !== texts.length) {
     throw new Error('Translate batch response did not match the request.');
   }
-
-  return payload.map((entry, index) => parseBatchTranslationEntry(entry, texts[index]));
-}
-
-function parseBatchTranslationEntry(entry: unknown, sourceText: string): BatchTranslationResult {
-  if (typeof entry === 'string') {
+  return payload[0].map((html: unknown, index: number) => {
+    if (typeof html !== 'string') throw new Error('Translate batch response entry was not readable.');
     return {
-      translatedText: entry || sourceText,
-      sourceLanguage: ''
+      translatedText: decodeTranslationHtml(html, texts[index]),
+      sourceLanguage: sourceLanguage !== 'auto' ? sourceLanguage
+        : Array.isArray(payload[1]) && typeof payload[1][index] === 'string' ? payload[1][index] : ''
     };
-  }
-
-  if (Array.isArray(entry) && typeof entry[0] === 'string') {
-    return {
-      translatedText: entry[0] || sourceText,
-      sourceLanguage: typeof entry[1] === 'string' ? entry[1] : ''
-    };
-  }
-
-  throw new Error('Translate batch response entry was not readable.');
+  });
 }
 
-async function translateSingleTextForBatch(text: string, targetLanguage: string): Promise<BatchTranslationResult> {
-  const result = await translateText(text, targetLanguage);
-  if (!result.ok) throw new Error(result.error || 'Translate request failed.');
-  return {
-    translatedText: result.translatedText || text,
-    sourceLanguage: result.sourceLanguage || ''
-  };
+function createTranslationBody(texts: string[], targetLanguage: string, sourceLanguage: string): string {
+  return JSON.stringify([[texts.map(encodeTranslationHtml), sourceLanguage, targetLanguage], 'wt_lib']);
 }
 
-function createBatchUrl(texts: string[], targetLanguage: string): URL {
-  const url = new URL(TRANSLATE_BATCH_ENDPOINT);
-  url.searchParams.set('client', 'gtx');
-  url.searchParams.set('sl', 'auto');
-  url.searchParams.set('tl', targetLanguage);
-  texts.forEach((text) => url.searchParams.append('q', text));
-  return url;
-}
-
-function getBatchUrlByteLength(texts: string[], targetLanguage: string): number {
-  return new TextEncoder().encode(createBatchUrl(texts, targetLanguage).toString()).length;
-}
-
-async function fetchWithTimeout(url: string): Promise<Response> {
+async function fetchWithTimeout(url: string, init: RequestInit = {}): Promise<Response> {
   await cooldownReady;
   if (retryAt > Date.now()) throw new TranslationRateLimitError(retryAt);
 
@@ -218,6 +160,7 @@ async function fetchWithTimeout(url: string): Promise<Response> {
 
   try {
     const response = await fetch(url, {
+      ...init,
       signal: controller.signal,
       credentials: 'omit'
     });

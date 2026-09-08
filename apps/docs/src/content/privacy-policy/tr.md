@@ -52,13 +52,13 @@ Aşağıda aksi belirtilmedikçe bu bölümdeki veriler tarayıcı profilinizde 
 
 Veriler bu hizmetlere yalnızca ilgili özellik etkinleştirilip kullanıldığında gönderilir:
 
-### Google Translate (`translate.googleapis.com`)
+### Google Translate (`translate-pa.googleapis.com`)
 
 Sohbet çevirisi, çeviri etkinken canlı sohbette görünen ve çevrilmeye uygun sohbet mesajı metnini gönderir. Taslak çevirisi, sohbet kutusundan çevirmeyi seçtiğiniz taslak metni gönderir.
 
 Çeviri istekleri çevrilecek metni ve hedef dili içerir. Uzantı, çeviri istekleriyle YouTube cookies veya YouTube credentials göndermez.
 
-`translate.googleapis.com` üzerinden Google Translate erişimi resmi değildir ve rate limit’e tabi olabilir, değişebilir veya kullanılamayabilir.
+`translate-pa.googleapis.com` üzerinden Google Translate erişimi resmi değildir ve rate limit’e tabi olabilir, değişebilir veya kullanılamayabilir.
 
 ### <span id="playground"></span>Chat Enhancer Playground ([playground.chatenhancer.com](https://playground.chatenhancer.com))
 
