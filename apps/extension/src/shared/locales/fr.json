@@ -122,6 +122,7 @@
     "couldNotOpenUserCard": "Impossible d’ouvrir cette fiche utilisateur.",
     "couldNotReadDateOrTime": "Impossible de lire cette date ou cette heure.",
     "couldNotTranslateText": "Impossible de traduire ce texte.",
+    "translationRateLimited": "Google Traduction limite temporairement les requêtes. La traduction est en pause. Patientez un instant.",
     "invalidLanguageCode": "Code de langue invalide.",
     "keywordNotFound": "Mot-clé introuvable : {keywords}.",
     "missingLanguageCode": "Code de langue manquant.",

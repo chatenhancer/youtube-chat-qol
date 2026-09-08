@@ -10,6 +10,7 @@
  */
 import { getOptions } from '../../shared/state';
 import { cleanText } from '../../shared/text';
+import { createTranslationError, TranslationRateLimitError } from '../../shared/translation-errors';
 import { getMessageDetails } from '../../youtube/messages';
 import { CHAT_MESSAGE_SELECTOR } from '../../youtube/selectors';
 import {
@@ -20,6 +21,7 @@ import {
 import { createTranslationPlan, hasTextOutsidePlaceholders, type ProtectedToken } from './protected-placeholders';
 import { clearTranslationRenderings, removeTranslation, renderTranslation } from './render';
 import type { TranslationResult } from './types';
+import { showTranslationError } from './feedback';
 
 interface PendingTranslationEntry {
   messageRef: WeakRef<HTMLElement>;
@@ -69,6 +71,7 @@ let liveTranslationQueue: TranslationJob[] = [];
 let backfillTranslationQueue: TranslationJob[] = [];
 let activeTranslations = 0;
 let translationDelayTimer = 0;
+let translationRetryAt = 0;
 let translationPumpScheduled = false;
 let pendingTranslationSequence = 0;
 
@@ -176,6 +179,7 @@ export function clearTranslations(): void {
   liveTranslationQueue = [];
   backfillTranslationQueue = [];
   pendingTranslations.clear();
+  translationRetryAt = 0;
   if (translationDelayTimer) {
     window.clearTimeout(translationDelayTimer);
     translationDelayTimer = 0;
@@ -251,7 +255,7 @@ function enqueueTranslationJob(job: TranslationJob, { backfill }: { backfill: bo
   }
 
   liveTranslationQueue.unshift(job);
-  if (translationDelayTimer) {
+  if (translationDelayTimer && translationRetryAt <= Date.now()) {
     window.clearTimeout(translationDelayTimer);
     translationDelayTimer = 0;
   }
@@ -262,7 +266,7 @@ function promoteBackfillTranslation(key: string): void {
   if (index < 0) return;
   const [job] = backfillTranslationQueue.splice(index, 1);
   liveTranslationQueue.unshift({ ...job, backfill: false });
-  if (translationDelayTimer) {
+  if (translationDelayTimer && translationRetryAt <= Date.now()) {
     window.clearTimeout(translationDelayTimer);
     translationDelayTimer = 0;
   }
@@ -405,11 +409,20 @@ function getPendingTranslationEntryCount(): number {
 function pumpTranslationQueue(): void {
   if (activeTranslations >= MAX_TRANSLATION_CONCURRENCY) return;
   if (translationDelayTimer) return;
+  if (translationRetryAt > Date.now()) {
+    translationDelayTimer = window.setTimeout(() => {
+      translationDelayTimer = 0;
+      pumpTranslationQueue();
+    }, Math.min(2_147_483_647, translationRetryAt - Date.now()));
+    return;
+  }
 
+  pruneDisconnectedPendingTranslations();
   const batch = takeNextTranslationBatch();
   if (!batch.length) return;
 
   activeTranslations += 1;
+  let retrying = false;
   translateBatch(batch)
     .then((results) => {
       batch.forEach((job, index) => {
@@ -439,7 +452,18 @@ function pumpTranslationQueue(): void {
         if (renderedAny) rememberTranslation(job.key, result);
       });
     })
-    .catch(() => {
+    .catch((error: unknown) => {
+      if (error instanceof TranslationRateLimitError && batch.some((job) => pendingTranslations.has(job.key))) {
+        retrying = true;
+        translationRetryAt = Math.max(translationRetryAt, error.retryAt);
+        for (const job of batch) {
+          if (!pendingTranslations.has(job.key)) continue;
+          removeQueuedTranslationJob(job.key);
+          enqueueTranslationJob(job, { backfill: job.backfill });
+        }
+        showTranslationError(error);
+        return;
+      }
       for (const job of batch) {
         for (const entry of pendingTranslations.get(job.key) || []) {
           const message = entry.messageRef.deref();
@@ -448,8 +472,9 @@ function pumpTranslationQueue(): void {
       }
     })
     .finally(() => {
-      batch.forEach((job) => pendingTranslations.delete(job.key));
+      if (!retrying) batch.forEach((job) => pendingTranslations.delete(job.key));
       activeTranslations -= 1;
+      if (translationDelayTimer) return;
       if (liveTranslationQueue.length) {
         pumpTranslationQueue();
         return;
@@ -535,7 +560,7 @@ function translateBatch(jobs: TranslationJob[]): Promise<TranslationResult[]> {
       }
 
       if (!response?.ok) {
-        reject(new Error(response?.error || 'Translate request failed.'));
+        reject(createTranslationError(response));
         return;
       }
 

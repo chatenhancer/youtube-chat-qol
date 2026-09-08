@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { DEFAULT_OPTIONS } from '../../shared/options';
 import { setOptions } from '../../shared/state';
+import { clearToast } from '../../shared/toast';
 import {
   onMessageTranslationCleared,
   onMessageTranslationRendered
@@ -30,7 +31,9 @@ describe('translation queue', () => {
 
   afterEach(() => {
     clearTranslations();
+    clearToast();
     vi.clearAllTimers();
+    vi.useRealTimers();
   });
 
   it('does not queue translations when translation is disabled', async () => {
@@ -86,6 +89,43 @@ describe('translation queue', () => {
 
     expect(message.dataset.ytcqTranslationKey).toBeUndefined();
     expect(message.querySelector('.ytcq-translation')).toBeNull();
+  });
+
+  it('pauses a rate-limited queue, preserves messages, and resumes after the cooldown', async () => {
+    vi.useFakeTimers();
+    setOptions({ ...DEFAULT_OPTIONS, targetLanguage: 'ja', translationDisplay: 'below' });
+    mockRuntimeSendMessage({ ok: false, code: 'rate_limited', retryAt: Date.now() + 2_000 });
+    const first = createTextMessage('Good morning everyone');
+    queueMessageTranslation(first);
+    await flushPromises();
+
+    expect(document.querySelector('.ytcq-toast')?.textContent).toContain('Google Translate');
+    expect(first.querySelector('#message')?.textContent).toBe('Good morning everyone');
+    expect(first.dataset.ytcqTranslationKey).toBeDefined();
+
+    const second = createTextMessage('Thank you for the stream');
+    queueMessageTranslation(second);
+    await vi.advanceTimersByTimeAsync(1_999);
+    expect(chrome.runtime.sendMessage).toHaveBeenCalledOnce();
+
+    mockRuntimeSendMessage({ ok: true, sourceLanguage: 'en', translatedText: 'こんにちは' });
+    await vi.advanceTimersByTimeAsync(1);
+    expect(chrome.runtime.sendMessage).toHaveBeenCalledTimes(2);
+    expect(first.querySelector('.ytcq-translation')?.textContent).toContain('こんにちは');
+    expect(second.querySelector('.ytcq-translation')?.textContent).toContain('こんにちは');
+  });
+
+  it('cancels a paused translation queue when translation is cleared', async () => {
+    vi.useFakeTimers();
+    mockRuntimeSendMessage({ ok: false, code: 'rate_limited', retryAt: Date.now() + 2_000 });
+    queueMessageTranslation(createTextMessage('Stop translating this message'));
+    await flushPromises();
+
+    clearTranslations();
+    await vi.advanceTimersByTimeAsync(2_000);
+
+    expect(chrome.runtime.sendMessage).toHaveBeenCalledOnce();
+    expect(document.querySelector('.ytcq-translation')).toBeNull();
   });
 
   it('drops the pending translation key when the runtime reports lastError', async () => {

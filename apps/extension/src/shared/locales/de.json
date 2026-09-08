@@ -122,6 +122,7 @@
     "couldNotOpenUserCard": "Diese Nutzerkarte konnte nicht geöffnet werden.",
     "couldNotReadDateOrTime": "Dieses Datum oder diese Uhrzeit konnte nicht gelesen werden.",
     "couldNotTranslateText": "Dieser Text konnte nicht übersetzt werden.",
+    "translationRateLimited": "Google Übersetzer begrenzt vorübergehend die Anfragen. Die Übersetzung ist pausiert. Bitte warte einen Moment.",
     "invalidLanguageCode": "Ungültiger Sprachcode.",
     "keywordNotFound": "Keyword nicht gefunden: {keywords}.",
     "missingLanguageCode": "Sprachcode fehlt.",

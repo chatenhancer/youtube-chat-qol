@@ -122,6 +122,7 @@
     "couldNotOpenUserCard": "उस यूज़र कार्ड को नहीं खोला जा सका.",
     "couldNotReadDateOrTime": "वह तारीख या समय पढ़ा नहीं जा सका.",
     "couldNotTranslateText": "वह टेक्स्ट अनुवाद नहीं हो सका.",
+    "translationRateLimited": "Google Translate फ़िलहाल अनुरोधों को सीमित कर रहा है। अनुवाद रुका हुआ है। कृपया थोड़ी देर प्रतीक्षा करें।",
     "invalidLanguageCode": "अमान्य भाषा कोड.",
     "keywordNotFound": "कीवर्ड नहीं मिला: {keywords}.",
     "missingLanguageCode": "भाषा कोड गायब है.",

@@ -122,6 +122,7 @@
     "couldNotOpenUserCard": "Không thể mở thẻ người dùng đó.",
     "couldNotReadDateOrTime": "Không thể đọc ngày hoặc giờ đó.",
     "couldNotTranslateText": "Không thể dịch văn bản đó.",
+    "translationRateLimited": "Google Dịch đang tạm thời giới hạn yêu cầu. Bản dịch đang tạm dừng. Vui lòng chờ một lát.",
     "invalidLanguageCode": "Mã ngôn ngữ không hợp lệ.",
     "keywordNotFound": "Không tìm thấy từ khóa: {keywords}.",
     "missingLanguageCode": "Thiếu mã ngôn ngữ.",

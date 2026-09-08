@@ -5,7 +5,7 @@
  * command span; it never auto-sends the result.
  */
 import { t } from '../../../shared/i18n';
-import { showToast } from '../../../shared/toast';
+import { showTranslationError } from '../../translation/feedback';
 import { createTranslationTextLanguageOptions } from './language-options';
 import { parseTranslateTextCommand, translateCommandText } from '../translate-text';
 import type {
@@ -36,8 +36,8 @@ async function executeTranslateTextCommand(parsed: ParsedCommand, runtime: ChatC
 
   try {
     runtime.replaceCommandText(await translateCommandText(request.text, request.targetLanguage), t('couldNotTranslateText'));
-  } catch {
-    showToast(t('couldNotTranslateText'));
+  } catch (error) {
+    showTranslationError(error);
   }
 }
 
@@ -54,7 +54,7 @@ async function executeInlineTranslateTextCommand(
       parsed,
       t('couldNotTranslateText')
     );
-  } catch {
-    showToast(t('couldNotTranslateText'));
+  } catch (error) {
+    showTranslationError(error);
   }
 }

@@ -122,6 +122,7 @@
     "couldNotOpenUserCard": "無法開啟該使用者卡片。",
     "couldNotReadDateOrTime": "無法讀取該日期或時間。",
     "couldNotTranslateText": "無法翻譯該文字。",
+    "translationRateLimited": "Google 翻譯正在暫時限制請求。翻譯已暫停，請稍候。",
     "invalidLanguageCode": "語言代碼無效。",
     "keywordNotFound": "找不到關鍵字：{keywords}。",
     "missingLanguageCode": "缺少語言代碼。",

@@ -1,8 +1,17 @@
 /** Google Translate contract kept separate from YouTube DOM compatibility. */
 import { realBatchTranslationProviderScenario } from '../../scenarios/translation/provider';
-import { extensionScenarioTest as test } from '../../support/scenario-fixtures';
+import { realComposerTranslationScenario } from '../../scenarios/translation/composer';
+import {
+  extensionScenarioTest,
+  mockLiveLoggedInTest
+} from '../../support/scenario-fixtures';
 
-test(
+extensionScenarioTest(
   'Google Translate integration: incoming translation batches reach the real provider',
   realBatchTranslationProviderScenario
+);
+
+mockLiveLoggedInTest(
+  'Google Translate integration: English composer drafts reach the real provider and become Japanese',
+  realComposerTranslationScenario
 );

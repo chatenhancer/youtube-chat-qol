@@ -122,6 +122,7 @@
     "couldNotOpenUserCard": "Kartu pengguna itu tidak dapat dibuka.",
     "couldNotReadDateOrTime": "Tanggal atau waktu itu tidak dapat dibaca.",
     "couldNotTranslateText": "Teks itu tidak dapat diterjemahkan.",
+    "translationRateLimited": "Google Terjemahan sedang membatasi permintaan untuk sementara. Terjemahan dijeda. Harap tunggu sebentar.",
     "invalidLanguageCode": "Kode bahasa tidak valid.",
     "keywordNotFound": "Kata kunci tidak ditemukan: {keywords}.",
     "missingLanguageCode": "Kode bahasa belum diisi.",

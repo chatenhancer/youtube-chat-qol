@@ -122,6 +122,7 @@
     "couldNotOpenUserCard": "Не вдалося відкрити картку цього користувача.",
     "couldNotReadDateOrTime": "Не вдалося прочитати цю дату або час.",
     "couldNotTranslateText": "Не вдалося перекласти цей текст.",
+    "translationRateLimited": "Google Перекладач тимчасово обмежує запити. Переклад призупинено. Зачекайте трохи.",
     "invalidLanguageCode": "Недійсний код мови.",
     "keywordNotFound": "Ключове слово не знайдено: {keywords}.",
     "missingLanguageCode": "Не вказано код мови.",

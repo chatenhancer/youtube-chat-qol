@@ -1,12 +1,15 @@
 // @vitest-environment node
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 describe('background translation bridge', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.resetModules();
     vi.clearAllMocks();
     vi.stubGlobal('fetch', vi.fn());
+    await chrome.storage.session.clear();
   });
+
+  afterEach(() => vi.useRealTimers());
 
   it('registers only ytcq translation messages as asynchronous requests', async () => {
     await import('./translate');
@@ -201,7 +204,80 @@ describe('background translation bridge', () => {
       });
     });
   });
+
+  it.each(['ytcq:translate', 'ytcq:translateBatch'])(
+    'shares a 429 cooldown from %s with both translation paths and recovers afterward',
+    async (type) => {
+      vi.useFakeTimers();
+      const now = Date.now();
+      vi.mocked(fetch).mockResolvedValueOnce(new Response('', {
+        status: 429,
+        headers: { 'Retry-After': '2' }
+      }));
+      await import('./translate');
+
+      const rateLimited = { ok: false, code: 'rate_limited', retryAt: now + 2_000 };
+      await expect(requestTranslation(type)).resolves.toMatchObject(rateLimited);
+      await expect(requestTranslation('ytcq:translate')).resolves.toMatchObject(rateLimited);
+      await expect(requestTranslation('ytcq:translateBatch')).resolves.toMatchObject(rateLimited);
+      expect(fetch).toHaveBeenCalledOnce();
+
+      await vi.advanceTimersByTimeAsync(1_999);
+      await expect(requestTranslation('ytcq:translate')).resolves.toMatchObject(rateLimited);
+      expect(fetch).toHaveBeenCalledOnce();
+
+      await vi.advanceTimersByTimeAsync(1);
+      vi.mocked(fetch).mockResolvedValueOnce(new Response(JSON.stringify({
+        sentences: [{ trans: 'こんにちは' }], src: 'en'
+      })));
+      await expect(requestTranslation('ytcq:translate')).resolves.toMatchObject({
+        ok: true, translatedText: 'こんにちは'
+      });
+      expect(fetch).toHaveBeenCalledTimes(2);
+    }
+  );
+
+  it.each([
+    { retryAfter: undefined, delay: 60_000 },
+    { retryAfter: 'invalid', delay: 60_000 },
+    { retryAfter: '0', delay: 1_000 },
+    { retryAfter: '5', delay: 5_000 },
+    { retryAfter: 'Tue, 01 Jan 2030 00:00:05 GMT', delay: 5_000 },
+    { retryAfter: 'Mon, 31 Dec 2029 23:59:59 GMT', delay: 60_000 }
+  ])('uses a safe cooldown for Retry-After=$retryAfter', async ({ retryAfter, delay }) => {
+    vi.useFakeTimers();
+    vi.setSystemTime(Date.UTC(2030, 0, 1));
+    vi.mocked(fetch).mockResolvedValueOnce(new Response('', {
+      status: 429,
+      headers: retryAfter === undefined ? {} : { 'Retry-After': retryAfter }
+    }));
+    await import('./translate');
+
+    await expect(requestTranslation('ytcq:translateBatch')).resolves.toMatchObject({
+      ok: false, code: 'rate_limited', retryAt: Date.now() + delay
+    });
+    expect(fetch).toHaveBeenCalledOnce();
+  });
+
+  it('preserves the cooldown when the extension service worker restarts', async () => {
+    vi.useFakeTimers();
+    vi.mocked(fetch).mockResolvedValueOnce(new Response('', { status: 429 }));
+    await import('./translate');
+    const firstResponse = await requestTranslation('ytcq:translateBatch');
+
+    vi.resetModules();
+    await import('./translate');
+
+    await expect(requestTranslation('ytcq:translate')).resolves.toEqual(firstResponse);
+    expect(fetch).toHaveBeenCalledOnce();
+  });
 });
+
+function requestTranslation(type: string): Promise<unknown> {
+  return new Promise((resolve) => {
+    getMessageListener()({ type, text: 'hello', texts: ['hello', 'thank you'], targetLanguage: 'ja' }, {}, resolve);
+  });
+}
 
 function getMessageListener(): (
   message: unknown,

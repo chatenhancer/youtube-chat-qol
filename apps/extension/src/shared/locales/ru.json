@@ -122,6 +122,7 @@
     "couldNotOpenUserCard": "Не удалось открыть карточку этого пользователя.",
     "couldNotReadDateOrTime": "Не удалось прочитать эту дату или время.",
     "couldNotTranslateText": "Не удалось перевести этот текст.",
+    "translationRateLimited": "Google Переводчик временно ограничивает запросы. Перевод приостановлен. Подождите немного.",
     "invalidLanguageCode": "Недопустимый код языка.",
     "keywordNotFound": "Ключевое слово не найдено: {keywords}.",
     "missingLanguageCode": "Не указан код языка.",

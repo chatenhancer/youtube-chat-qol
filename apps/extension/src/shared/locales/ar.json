@@ -122,6 +122,7 @@
     "couldNotOpenUserCard": "تعذر فتح بطاقة هذا المستخدم.",
     "couldNotReadDateOrTime": "تعذر قراءة ذلك التاريخ أو الوقت.",
     "couldNotTranslateText": "تعذرت ترجمة ذلك النص.",
+    "translationRateLimited": "تحدّ خدمة ترجمة Google من الطلبات مؤقتًا. الترجمة متوقفة مؤقتًا. يُرجى الانتظار قليلًا.",
     "invalidLanguageCode": "رمز اللغة غير صالح.",
     "keywordNotFound": "لم يتم العثور على الكلمة المفتاحية: {keywords}.",
     "missingLanguageCode": "رمز اللغة مفقود.",

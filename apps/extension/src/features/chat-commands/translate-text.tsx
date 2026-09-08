@@ -8,6 +8,7 @@ import { t } from '../../shared/i18n';
 import { jsx, el } from '../../shared/jsx-dom';
 import { cleanText } from '../../shared/text';
 import { showToast } from '../../shared/toast';
+import { createTranslationError } from '../../shared/translation-errors';
 import {
   createNodesWithPlaceholders,
   createTranslationPlanFromNodes,
@@ -92,7 +93,7 @@ function sendCommandTranslationRequest(
         }
 
         if (!response?.ok) {
-          reject(new Error(response?.error || 'Translate request failed.'));
+          reject(createTranslationError(response));
           return;
         }
 

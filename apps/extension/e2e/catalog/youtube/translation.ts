@@ -12,6 +12,7 @@ import {
   mockedReplacedTranslationToggleScenario
 } from '../../scenarios/translation/incoming';
 import { translationSettingsReactScenario } from '../../scenarios/translation/settings';
+import { rateLimitedTranslationScenario } from '../../scenarios/translation/rate-limit';
 import {
   youtubeScenarioPairs as pair,
   youtubeScenarioTargets as target,
@@ -19,6 +20,11 @@ import {
 } from './model';
 
 export const translationScenarios: readonly YouTubeScenario[] = [
+  {
+    title: 'HTTP 429 pauses chat and composer translation and recovers without losing text',
+    run: rateLimitedTranslationScenario,
+    on: pair.liveLoggedIn
+  },
   {
     title: 'translation display modes render for injected incoming messages',
     run: translationDisplayScenario,

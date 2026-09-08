@@ -5,11 +5,21 @@
  * remote endpoint, apply a timeout, and return only the translated text plus
  * detected source language.
  */
+import { TranslationRateLimitError } from '../shared/translation-errors';
+
 const TRANSLATE_ENDPOINT = 'https://translate.googleapis.com/translate_a/single';
 const TRANSLATE_BATCH_ENDPOINT = 'https://translate.googleapis.com/translate_a/t';
 const REQUEST_TIMEOUT_MS = 8000;
 const MAX_BATCH_URL_BYTES = 8000;
 const MAX_BATCH_TEXTS = 50;
+const RATE_LIMIT_STORAGE_KEY = 'ytcqTranslationRetryAt';
+const RATE_LIMIT_DELAY_MS = 60_000;
+// Keep the pause across service-worker suspension, including browsers without session storage.
+const cooldownStorage = chrome.storage.session || chrome.storage.local;
+let retryAt = 0;
+const cooldownReady = cooldownStorage.get(RATE_LIMIT_STORAGE_KEY).then((stored) => {
+  if (Number.isFinite(stored[RATE_LIMIT_STORAGE_KEY])) retryAt = stored[RATE_LIMIT_STORAGE_KEY];
+}).catch(() => undefined);
 
 interface TranslateMessage {
   type?: string;
@@ -32,7 +42,10 @@ chrome.runtime.onMessage.addListener((message: TranslateMessage, _sender, sendRe
     .catch((error: unknown) => {
       sendResponse({
         ok: false,
-        error: error instanceof Error ? error.message : String(error)
+        error: error instanceof Error ? error.message : String(error),
+        ...(error instanceof TranslationRateLimitError
+          ? { code: 'rate_limited', retryAt: error.retryAt }
+          : {})
       });
     });
 
@@ -108,7 +121,8 @@ async function translateTexts(texts: unknown, targetLanguage: unknown): Promise<
 
     try {
       results.push(...await translateTextChunk(chunk, target));
-    } catch {
+    } catch (error) {
+      if (error instanceof TranslationRateLimitError) throw error;
       for (const text of chunk) {
         results.push(await translateSingleTextForBatch(text, target));
       }
@@ -196,17 +210,37 @@ function getBatchUrlByteLength(texts: string[], targetLanguage: string): number 
 }
 
 async function fetchWithTimeout(url: string): Promise<Response> {
+  await cooldownReady;
+  if (retryAt > Date.now()) throw new TranslationRateLimitError(retryAt);
+
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
   try {
-    return await fetch(url, {
+    const response = await fetch(url, {
       signal: controller.signal,
       credentials: 'omit'
     });
+    if (response.status === 429) {
+      retryAt = Math.max(retryAt, getRetryAt(response.headers.get('Retry-After')));
+      await cooldownStorage.set({ [RATE_LIMIT_STORAGE_KEY]: retryAt }).catch(() => undefined);
+      throw new TranslationRateLimitError(retryAt);
+    }
+    return response;
   } finally {
     clearTimeout(timeoutId);
   }
+}
+
+function getRetryAt(retryAfter: string | null): number {
+  const now = Date.now();
+  const value = retryAfter?.trim() || '';
+  const requestedAt = /^\d+$/.test(value)
+    ? now + Number(value) * 1_000
+    : Date.parse(value);
+  return Number.isFinite(requestedAt) && requestedAt >= now
+    ? Math.max(now + 1_000, requestedAt)
+    : now + RATE_LIMIT_DELAY_MS;
 }
 
 export {};

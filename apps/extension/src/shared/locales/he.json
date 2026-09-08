@@ -122,6 +122,7 @@
     "couldNotOpenUserCard": "לא ניתן לפתוח את כרטיס המשתמש הזה.",
     "couldNotReadDateOrTime": "לא ניתן לקרוא את התאריך או השעה.",
     "couldNotTranslateText": "לא ניתן לתרגם את הטקסט הזה.",
+    "translationRateLimited": "Google Translate מגביל כרגע את הבקשות. התרגום מושהה. נא להמתין רגע.",
     "invalidLanguageCode": "קוד שפה לא תקין.",
     "keywordNotFound": "מילת מפתח לא נמצאה: {keywords}.",
     "missingLanguageCode": "חסר קוד שפה.",

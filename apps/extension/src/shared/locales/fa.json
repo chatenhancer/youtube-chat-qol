@@ -122,6 +122,7 @@
     "couldNotOpenUserCard": "کارت آن کاربر باز نشد.",
     "couldNotReadDateOrTime": "آن تاریخ یا زمان خوانده نشد.",
     "couldNotTranslateText": "آن متن ترجمه نشد.",
+    "translationRateLimited": "مترجم Google موقتاً درخواست‌ها را محدود کرده است. ترجمه متوقف شده است. لطفاً کمی صبر کنید.",
     "invalidLanguageCode": "کد زبان نامعتبر است.",
     "keywordNotFound": "کلمه کلیدی پیدا نشد: {keywords}.",
     "missingLanguageCode": "کد زبان وارد نشده است.",

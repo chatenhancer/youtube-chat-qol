@@ -122,6 +122,7 @@
     "couldNotOpenUserCard": "ไม่สามารถเปิดการ์ดผู้ใช้นั้นได้",
     "couldNotReadDateOrTime": "ไม่สามารถอ่านวันที่หรือเวลานั้นได้",
     "couldNotTranslateText": "ไม่สามารถแปลข้อความนั้นได้",
+    "translationRateLimited": "Google แปลภาษากำลังจำกัดคำขอชั่วคราว การแปลหยุดชั่วคราว โปรดรอสักครู่",
     "invalidLanguageCode": "รหัสภาษาไม่ถูกต้อง",
     "keywordNotFound": "ไม่พบคีย์เวิร์ด: {keywords}.",
     "missingLanguageCode": "ไม่มีรหัสภาษา",

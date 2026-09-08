@@ -122,6 +122,7 @@
     "couldNotOpenUserCard": "Die gebruikerskaart kon niet worden geopend.",
     "couldNotReadDateOrTime": "Die datum of tijd kon niet worden gelezen.",
     "couldNotTranslateText": "Die tekst kon niet worden vertaald.",
+    "translationRateLimited": "Google Translate beperkt tijdelijk het aantal verzoeken. De vertaling is gepauzeerd. Wacht even.",
     "invalidLanguageCode": "Ongeldige taalcode.",
     "keywordNotFound": "Trefwoord niet gevonden: {keywords}.",
     "missingLanguageCode": "Taalcode ontbreekt.",

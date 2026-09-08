@@ -14,7 +14,8 @@ import { jsx, el } from '../shared/jsx-dom';
 import type { Options } from '../shared/options';
 import { getOptions } from '../shared/state';
 import { cleanText } from '../shared/text';
-import { showToast } from '../shared/toast';
+import { TranslationRateLimitError } from '../shared/translation-errors';
+import { showTranslationError } from './translation/feedback';
 import {
   findChatInput,
   getChatInputNodesText,
@@ -51,6 +52,7 @@ let panel: HTMLElement | null = null;
 let select: HTMLSelectElement | null = null;
 let wireFrame = 0;
 let debounceTimer = 0;
+let translationRetryAt = 0;
 let requestSerial = 0;
 let activeLanguage = '';
 let replacingDraft = false;
@@ -137,6 +139,7 @@ export function cleanupStaleComposerTranslation(): void {
   }
   window.clearTimeout(debounceTimer);
   debounceTimer = 0;
+  translationRetryAt = 0;
   requestSerial += 1;
   replacingDraft = false;
   clearDraftTranslationAnimation();
@@ -301,7 +304,8 @@ function positionPanel(): void {
 
 function scheduleDraftTranslation(immediate = false): void {
   window.clearTimeout(debounceTimer);
-  debounceTimer = window.setTimeout(translateCurrentDraft, immediate ? 0 : TRANSLATION_DEBOUNCE_MS);
+  const delay = Math.max(immediate ? 0 : TRANSLATION_DEBOUNCE_MS, translationRetryAt - Date.now());
+  debounceTimer = window.setTimeout(translateCurrentDraft, Math.min(2_147_483_647, delay));
 }
 
 async function translateCurrentDraft(): Promise<void> {
@@ -329,8 +333,14 @@ async function translateCurrentDraft(): Promise<void> {
     lastSourcePlanText = candidate.plan.text;
     lastTranslatedText = translated.text;
     replaceNodesInChatInput(translated.nodes, translated.text);
-  } catch {
-    showToast(t('couldNotTranslateText'));
+  } catch (error) {
+    if (requestId !== requestSerial || getOptions().composerTranslateLanguage !== targetLanguage)
+      return;
+    showTranslationError(error);
+    if (error instanceof TranslationRateLimitError) {
+      translationRetryAt = error.retryAt;
+      scheduleDraftTranslation(true);
+    }
   } finally {
     stopDraftTranslationAnimation(requestId);
     window.setTimeout(() => {

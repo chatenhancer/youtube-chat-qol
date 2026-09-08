@@ -122,6 +122,7 @@
     "couldNotOpenUserCard": "そのユーザーカードを開けませんでした。",
     "couldNotReadDateOrTime": "その日付または時刻を読み取れませんでした。",
     "couldNotTranslateText": "そのテキストを翻訳できませんでした。",
+    "translationRateLimited": "Google 翻訳が一時的にリクエストを制限しています。翻訳を一時停止しています。しばらくお待ちください。",
     "invalidLanguageCode": "言語コードが無効です。",
     "keywordNotFound": "キーワードが見つかりません: {keywords}。",
     "missingLanguageCode": "言語コードがありません。",

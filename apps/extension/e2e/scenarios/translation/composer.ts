@@ -4,7 +4,7 @@
  * This scenario is logged-in only because YouTube exposes the composer only
  * when the current viewer can write in chat.
  */
-import { expect, test } from '@playwright/test';
+import { expect, test, type Request } from '@playwright/test';
 import {
   clearChatComposer,
   getChatComposerText,
@@ -65,15 +65,31 @@ export const mockedComposerTranslationProtectedDraftScenario: BrowserScenario = 
 
 export const realComposerTranslationScenario: BrowserScenario = async ({ chat, context }) => {
   await expectChatComposerVisible(chat);
-  await withExtensionStorageValues(context, 'sync', {
-    composerTranslateLanguage: 'ja'
-  }, async () => {
-    await translateComposerDraft({
-      chat,
-      expectedPattern: /[\u3040-\u30ff\u4e00-\u9faf]/,
-      sourceText: REAL_COMPOSER_SOURCE
+  const requestedUrls: URL[] = [];
+  const captureRequest = (request: Request) => {
+    const url = new URL(request.url());
+    if (url.hostname === 'translate.googleapis.com') requestedUrls.push(url);
+  };
+  context.on('request', captureRequest);
+  try {
+    await withExtensionStorageValues(context, 'sync', {
+      composerTranslateLanguage: 'ja'
+    }, async () => {
+      await translateComposerDraft({
+        chat,
+        expectedPattern: /[\u3040-\u30ff\u4e00-\u9faf]/,
+        sourceText: REAL_COMPOSER_SOURCE
+      });
     });
-  });
+    expect(requestedUrls.some((url) =>
+      url.pathname === '/translate_a/single' &&
+      url.searchParams.get('tl') === 'ja' &&
+      url.searchParams.get('q') === REAL_COMPOSER_SOURCE
+    )).toBe(true);
+  } finally {
+    context.off('request', captureRequest);
+    await clearChatComposer(chat);
+  }
 };
 
 async function expectChatComposerVisible(chat: ChatSurface): Promise<void> {

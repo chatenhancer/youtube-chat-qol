@@ -122,6 +122,7 @@
     "couldNotOpenUserCard": "Bu kullanıcı kartı açılamadı.",
     "couldNotReadDateOrTime": "Bu tarih veya saat okunamadı.",
     "couldNotTranslateText": "Bu metin çevrilemedi.",
+    "translationRateLimited": "Google Çeviri istekleri geçici olarak sınırlıyor. Çeviri duraklatıldı. Lütfen biraz bekleyin.",
     "invalidLanguageCode": "Geçersiz dil kodu.",
     "keywordNotFound": "Anahtar kelime bulunamadı: {keywords}.",
     "missingLanguageCode": "Dil kodu eksik.",

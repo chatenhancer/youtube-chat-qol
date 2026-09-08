@@ -275,6 +275,46 @@ describe('composer translation', () => {
     expect(document.querySelector('.ytcq-toast')?.textContent).toBe('Could not translate that text.');
   });
 
+  it.each([false, true])('preserves the latest draft during a cooldown and respects translation disabled=%s', async (disabled) => {
+    vi.useFakeTimers();
+    document.body.replaceChildren();
+    setOptions({ ...DEFAULT_OPTIONS, composerTranslateLanguage: 'ja' });
+    const input = createVisibleChatInput();
+    document.body.append(createComposerHost(input));
+    initComposerTranslation(vi.fn());
+    await vi.runOnlyPendingTimersAsync();
+    const retryAt = Date.now() + 3_000;
+    vi.mocked(chrome.runtime.sendMessage).mockImplementationOnce(((_message: unknown, callback?: (response: unknown) => void) => {
+      callback?.({ ok: false, code: 'rate_limited', retryAt });
+      return Promise.resolve();
+    }) as never);
+
+    input.textContent = 'Good morning';
+    input.dispatchEvent(new InputEvent('input', { bubbles: true }));
+    await vi.advanceTimersByTimeAsync(850);
+    expect(input.textContent).toBe('Good morning');
+    expect(document.querySelector('.ytcq-toast')?.textContent).toContain('Google Translate');
+
+    input.textContent = 'Thank you';
+    input.dispatchEvent(new InputEvent('input', { bubbles: true }));
+    if (disabled) {
+      setOptions({ ...DEFAULT_OPTIONS, composerTranslateLanguage: '' });
+      refreshComposerTranslation();
+    }
+    vi.mocked(chrome.runtime.sendMessage).mockImplementation(((message: unknown, callback?: (response: unknown) => void) => {
+      expect(message).toMatchObject({ text: 'Thank you', targetLanguage: 'ja' });
+      callback?.({ ok: true, translatedText: 'ありがとう', sourceLanguage: 'en' });
+      return Promise.resolve();
+    }) as never);
+
+    await vi.advanceTimersByTimeAsync(2_149);
+    expect(chrome.runtime.sendMessage).toHaveBeenCalledOnce();
+    expect(input.textContent).toBe('Thank you');
+    await vi.advanceTimersByTimeAsync(1);
+    expect(input.textContent).toBe(disabled ? 'Thank you' : 'ありがとう');
+    expect(chrome.runtime.sendMessage).toHaveBeenCalledTimes(disabled ? 1 : 2);
+  });
+
   it('opens draft translation and closes it outside or with Escape', async () => {
     vi.useFakeTimers();
     document.body.replaceChildren();

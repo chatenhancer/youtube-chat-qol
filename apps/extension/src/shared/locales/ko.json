@@ -122,6 +122,7 @@
     "couldNotOpenUserCard": "해당 사용자 카드를 열 수 없습니다.",
     "couldNotReadDateOrTime": "해당 날짜 또는 시간을 읽을 수 없습니다.",
     "couldNotTranslateText": "해당 텍스트를 번역할 수 없습니다.",
+    "translationRateLimited": "Google 번역이 일시적으로 요청을 제한하고 있습니다. 번역이 일시 중지되었습니다. 잠시 기다려 주세요.",
     "invalidLanguageCode": "잘못된 언어 코드입니다.",
     "keywordNotFound": "키워드를 찾을 수 없음: {keywords}.",
     "missingLanguageCode": "언어 코드가 없습니다.",
