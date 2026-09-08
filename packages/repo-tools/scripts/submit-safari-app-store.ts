@@ -3,7 +3,8 @@
  *
  * Run after the repo-tools `safari:distribute -- --upload` command. The script waits
  * for App Store Connect to finish processing that build, attaches it to the app
- * version, and submits the version for review.
+ * version, and submits the version for review. CI enables
+ * YTCQ_APP_STORE_REPLACE_PENDING to cancel and reuse an older pending version.
  */
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
@@ -13,6 +14,7 @@ import {
   appStoreConnectFetch,
   getAppStoreConnectConfig
 } from './lib/app-store-connect.ts';
+import { reusePendingAppStoreVersion } from './lib/app-store-pending-version.ts';
 import { loadLocalEnv, requireEnv, root } from './lib/local-env.ts';
 
 await loadLocalEnv();
@@ -29,6 +31,7 @@ const usesNonExemptEncryption = readBoolean(
 );
 const waitAttempts = readPositiveInteger('YTCQ_APP_STORE_BUILD_WAIT_ATTEMPTS', 20);
 const waitSeconds = readPositiveInteger('YTCQ_APP_STORE_BUILD_WAIT_SECONDS', 30);
+const replacePending = readBoolean('YTCQ_APP_STORE_REPLACE_PENDING', false);
 const projectPath = path.join(
   root,
   'dist',
@@ -56,8 +59,8 @@ console.log(`Preparing Mac App Store submission for ${marketingVersion} build ${
 
 const config = await getAppStoreConnectConfig();
 const app = await findApp(config);
-const appVersion = await getOrCreateAppStoreVersion(config, app.id);
-const currentState = normalizeState(appVersion.attributes?.appStoreState);
+const existingVersion = await findAppStoreVersion(config, app.id);
+const currentState = normalizeState(existingVersion?.attributes?.appStoreState);
 
 if (isAlreadySubmittedState(currentState)) {
   console.log(
@@ -66,10 +69,13 @@ if (isAlreadySubmittedState(currentState)) {
   process.exit(0);
 }
 
-await setReleaseType(config, appVersion);
-await setWhatsNew(config, appVersion.id);
+// Keep the previous release in review until Apple has a usable replacement.
 const build = await waitForProcessedBuild(config, app.id);
 await setBuildEncryptionCompliance(config, build.id);
+const appVersion = await getOrCreateAppStoreVersion(config, app.id);
+await skipIfAlreadySubmitted(config, appVersion.id);
+await setReleaseType(config, appVersion);
+await setWhatsNew(config, appVersion.id);
 await attachBuild(config, appVersion.id, build.id);
 await skipIfAlreadySubmitted(config, appVersion.id);
 await submitReviewSubmission(config, app.id, appVersion.id);
@@ -97,6 +103,15 @@ async function getOrCreateAppStoreVersion(config, appId) {
   if (existingVersion) {
     console.log(`Found Mac App Store version ${marketingVersion}.`);
     return existingVersion;
+  }
+
+  if (replacePending) {
+    const pendingVersion = await reusePendingAppStoreVersion(config, {
+      appId,
+      platform,
+      marketingVersion
+    });
+    if (pendingVersion) return pendingVersion;
   }
 
   const payload = await appStoreConnectFetch(config, '/v1/appStoreVersions', {
@@ -204,7 +219,7 @@ async function waitForProcessedBuild(config, appId) {
     if (build) {
       const processingState = normalizeState(build.attributes?.processingState);
 
-      if (!processingState || isProcessedBuildState(processingState)) {
+      if (isProcessedBuildState(processingState) || (!processingState && !replacePending)) {
         console.log(`Found processed Mac App Store build ${buildNumber}.`);
         return build;
       }
@@ -217,7 +232,7 @@ async function waitForProcessedBuild(config, appId) {
 
       console.log(
         `Waiting for Mac App Store build ${buildNumber} processing `
-        + `(${processingState}, attempt ${attempt}/${waitAttempts}).`
+        + `(${processingState || 'UNKNOWN'}, attempt ${attempt}/${waitAttempts}).`
       );
     } else {
       console.log(
@@ -299,7 +314,7 @@ function isMatchingBuild(payload, build) {
   const preReleaseVersion = getBuildMarketingVersion(payload, build);
 
   return version === buildNumber
-    && (!preReleaseVersion || preReleaseVersion === marketingVersion);
+    && (preReleaseVersion === marketingVersion || (!preReleaseVersion && !replacePending));
 }
 
 async function attachBuild(config, appStoreVersionId, buildId) {
