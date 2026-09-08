@@ -267,7 +267,7 @@
   display: inline-flex;
   align-items: center;
   margin-right: 4px;
-  vertical-align: bottom;
+  vertical-align: baseline;
 }
 
 .ytcq-lite-top-fan-badge {
@@ -281,7 +281,7 @@
   color: #fff;
   background: #581fb4;
   font: 500 12px/24px Roboto, Arial, sans-serif;
-  vertical-align: bottom;
+  vertical-align: middle;
   white-space: nowrap;
 }
 
