@@ -20,6 +20,6 @@
   },
   "devDependencies": {
     "@chatenhancer/eslint-config": "0.0.0",
-    "vitest": "^4.1.7"
+    "vitest": "^5.0.0"
   }
 }
