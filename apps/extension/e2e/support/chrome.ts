@@ -4,6 +4,7 @@
  * Fixture tests use Playwright's persistent Chromium context with the unpacked
  * extension loaded by flags. Logged-in YouTube tests use normal Chrome with a
  * prepared profile, then connect over CDP so Google login state is preserved.
+ * Keep transport selection at browser defaults, including QUIC/HTTP/3.
  */
 import {
   chromium,
@@ -19,7 +20,6 @@ import path from 'node:path';
 import { extensionDir } from './paths';
 
 const MUTE_AUDIO_ARG = '--mute-audio';
-const DISABLE_QUIC_ARG = '--disable-quic';
 
 interface LaunchExtensionContextOptions {
   channel?: string;
@@ -78,7 +78,6 @@ export async function launchExtensionContext({
         `--load-extension=${extensionDir}`,
         '--profile-directory=Default',
         '--no-first-run',
-        DISABLE_QUIC_ARG,
         MUTE_AUDIO_ARG
       ]
     });
@@ -123,7 +122,6 @@ export async function launchNormalChromeExtensionContext({
     '--profile-directory=Default',
     `--remote-debugging-port=${remoteDebuggingPort}`,
     '--no-first-run',
-    DISABLE_QUIC_ARG,
     MUTE_AUDIO_ARG,
     ...(headless ? [
       '--headless=new',
