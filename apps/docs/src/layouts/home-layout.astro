@@ -17,7 +17,9 @@ const { clientConfig = {}, locale, messages, rootPrefix } = Astro.props as {
 
 <BaseLayout clientConfig={clientConfig} locale={locale} messages={messages} rootPrefix={rootPrefix}>
   <Header locale={locale} messages={messages} />
-  <StoreVersionAlert messages={messages} />
+  <div class="store-version-alert-anchor">
+    <StoreVersionAlert messages={messages} />
+  </div>
   <main id="top" data-pagefind-body>
     <slot />
   </main>

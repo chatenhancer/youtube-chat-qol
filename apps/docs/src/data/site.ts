@@ -2,6 +2,7 @@ import contact from '@chatenhancer/product-config/contact.json';
 import en from '../i18n/en.json';
 
 export const site = {
+  announcementUrl: 'https://media.chatenhancer.com/announcement.json',
   chromeUrl: 'https://www.chatenhancer.com/chrome',
   firefoxUrl: 'https://www.chatenhancer.com/firefox',
   safariUrl: 'https://www.chatenhancer.com/safari',

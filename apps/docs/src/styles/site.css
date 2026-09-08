@@ -216,6 +216,21 @@ img {
   max-width: 100%;
 }
 
+.site-announcement {
+  margin: 0;
+  padding: 10px 20px;
+  border-bottom: 1px solid var(--line);
+  background: var(--blue-soft);
+  font-size: 14px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.site-announcement a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
 .site-header {
   position: sticky;
   z-index: 20;
@@ -3283,9 +3298,13 @@ html[dir="rtl"] .forward-link-icon {
   display: none;
 }
 
+.store-version-alert-anchor {
+  position: relative;
+}
+
 .store-version-alert-top {
-  position: fixed;
-  top: 100px;
+  position: absolute;
+  top: 16px;
   left: 50%;
   z-index: 30;
   width: fit-content;
@@ -4298,6 +4317,7 @@ html[data-screenshot-panel] body {
 }
 
 html[data-screenshot-panel] .site-header,
+html[data-screenshot-panel] .site-announcement,
 html[data-screenshot-panel] .store-version-alert,
 html[data-screenshot-panel] .site-footer,
 html[data-screenshot-panel] main > section:not(#screenshots),

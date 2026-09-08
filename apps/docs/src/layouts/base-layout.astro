@@ -149,6 +149,15 @@ const structuredDataJson = resolvedStructuredData
     {structuredDataJson && <script is:inline type="application/ld+json" set:html={structuredDataJson}></script>}
   </head>
   <body>
+    <p
+      class="site-announcement"
+      data-site-announcement
+      data-announcement-url={site.announcementUrl}
+      data-announcement-locale={locale}
+      data-pagefind-ignore
+      role="status"
+      hidden
+    ></p>
     <slot />
     <WalkthroughClipModal messages={messages} />
     <pagefind-config excerpt-length="24"></pagefind-config>
@@ -167,6 +176,10 @@ const structuredDataJson = resolvedStructuredData
     </pagefind-modal>
     <script is:inline type="application/json" data-docs-config set:html={JSON.stringify(docsConfig).replace(/</g, '\\u003c')}></script>
     <script src="../scripts/home.ts"></script>
+    <script>
+      import { loadSiteAnnouncement } from '../scripts/site-announcement';
+      void loadSiteAnnouncement();
+    </script>
     <script src="../scripts/walkthrough-clips.ts"></script>
     <script is:inline type="module" src="/pagefind/pagefind-component-ui.js"></script>
     <script is:inline type="module">
