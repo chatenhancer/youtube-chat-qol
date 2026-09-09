@@ -199,14 +199,10 @@ async function changePopupStartupEffect({
     await expect(moreSettings).toBeHidden();
     await expect(group).toBeVisible();
     await expect(option).toBeVisible();
-    const settingsPanel = popup.locator('#settingsPanel');
-    await expect
-      .poll(() =>
-        settingsPanel.evaluate(
-          (element) => element.scrollHeight - element.clientHeight - element.scrollTop
-        )
-      )
-      .toBeLessThanOrEqual(1);
+    // Verify the revealed control is usable before Playwright can scroll it.
+    // Animated layout and scroll anchoring can leave a few pixels of padding
+    // below it without hiding the control.
+    await expect(control).toBeInViewport({ ratio: 1 });
 
     if (!(await control.isDisabled())) {
       await control.setChecked(false);

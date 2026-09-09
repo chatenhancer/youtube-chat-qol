@@ -48,6 +48,19 @@ export function getReplayUrl(): string {
   return process.env.YTCQ_REPLAY_URL || defaultReplayUrl;
 }
 
+export async function resumeLiveChat(page: Page): Promise<void> {
+  const chat = page.frameLocator(CHAT_FRAME_SELECTOR);
+  // Closing menus can leave the pointer over a row, and translation layout
+  // changes can pause YouTube's feed between a fixture reset and delivery.
+  // Use the scroller so an open Focus/profile panel can keep covering the feed.
+  await page.mouse.move(0, 0);
+  await chat.locator('yt-live-chat-item-list-renderer #item-scroller').first()
+    .evaluate((element) => {
+      element.scrollTop = element.scrollHeight;
+      element.dispatchEvent(new Event('scroll', { bubbles: true }));
+    });
+}
+
 export async function openLiveChat(page: Page, liveUrl: string): Promise<FrameLocator> {
   for (const timeout of [INITIAL_CHAT_FRAME_TIMEOUT_MS, LIVE_PAGE_TIMEOUT_MS]) {
     await gotoLiveChatPage(page, liveUrl);

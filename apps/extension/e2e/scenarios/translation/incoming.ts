@@ -10,8 +10,7 @@ import {
 import {
   expectAnyRenderedTranslation,
   expectToggleableReplacement,
-  findTranslatableSourceMessage,
-  waitForSourceChatMessage
+  findTranslatableSourceMessage
 } from './rendering';
 import { withTranslationCleared, withTranslationEnabled } from './storage';
 import {
@@ -23,9 +22,8 @@ import {
   TOGGLE_TRANSLATED_TEXT
 } from './test-data';
 
-export const mockedMessageTranslationScenario: BrowserScenario = async ({ chat, context }) => {
-  await waitForSourceChatMessage(chat);
-  await expectMockedIncomingTranslation({ chat, context });
+export const mockedMessageTranslationScenario: BrowserScenario = async ({ chat, context, controlledChat }) => {
+  await expectMockedIncomingTranslation({ chat, context, controlledChat });
 };
 
 export const mockedReplacedTranslationToggleScenario: BrowserScenario = async ({ chat, context, controlledChat }) => {
@@ -38,16 +36,19 @@ export const mockedReplacedTranslationToggleScenario: BrowserScenario = async ({
 
 async function expectMockedIncomingTranslation({
   chat,
-  context
+  context,
+  controlledChat
 }: {
   chat: ChatSurface;
   context: BrowserContext;
+  controlledChat?: ControlledChat;
 }): Promise<void> {
   await test.step('Use mocked translation endpoint', async () => {
     await withMockedTranslationEndpoint(context, MOCKED_TRANSLATED_TEXT, async () => {
       await enableTranslationAndExpectRendered({
         chat,
         context,
+        controlledChat,
         targetLanguage: MOCKED_TARGET_LANGUAGE,
         expectedText: MOCKED_TRANSLATED_TEXT
       });
@@ -58,17 +59,23 @@ async function expectMockedIncomingTranslation({
 async function enableTranslationAndExpectRendered({
   chat,
   context,
+  controlledChat,
   targetLanguage,
   expectedText
 }: {
   chat: ChatSurface;
   context: BrowserContext;
+  controlledChat?: ControlledChat;
   targetLanguage: string;
-  expectedText?: string;
+  expectedText: string;
 }): Promise<void> {
   await withTranslationCleared({ chat, context, targetLanguage, callback: async () => {
-    await reloadChatForMockedTranslation(chat);
-    await findTranslatableSourceMessage(chat);
+    // Recorded replay has no controlled ingress. Live tests use known text
+    // instead of depending on the language/content of the current public chat.
+    if (!controlledChat) {
+      await reloadChatForMockedTranslation(chat);
+      await findTranslatableSourceMessage(chat);
+    }
 
     await test.step(`Enable translation to ${targetLanguage}`, async () => {
       await withTranslationEnabled({
@@ -77,7 +84,20 @@ async function enableTranslationAndExpectRendered({
         targetLanguage,
         translationDisplay: 'below',
         callback: async () => {
-          await expectAnyRenderedTranslation({ chat, targetLanguage, expectedText });
+          if (!controlledChat) {
+            await expectAnyRenderedTranslation({ chat, targetLanguage, expectedText });
+            return;
+          }
+          const sourceText = 'Gracias por probar la traducción de mensajes entrantes';
+          const messageId = await controlledChat.injectMessage({
+            author: '@IncomingTranslationViewer',
+            text: sourceText
+          });
+          const sourceMessage = chat.locator(`#${messageId}`);
+          const translation = sourceMessage.locator(`.ytcq-translation[lang="${targetLanguage}"]`);
+          await expect(translation).toBeVisible({ timeout: 20_000 });
+          await expect(translation).toContainText(expectedText);
+          await expect(sourceMessage.locator('#message')).toHaveText(sourceText);
         }
       });
     });

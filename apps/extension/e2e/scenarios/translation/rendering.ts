@@ -9,12 +9,6 @@ const TRANSLATION_RENDER_TIMEOUT_MS = 20_000;
 const TRANSLATION_TARGET_ATTRIBUTE = 'data-ytcq-e2e-translation-target';
 let nextTranslationTargetId = 0;
 
-export async function waitForSourceChatMessage(chat: ChatSurface): Promise<void> {
-  await test.step('Wait for a source chat message', async () => {
-    await expect(chat.locator(NORMAL_CHAT_MESSAGE_SELECTOR).first()).toBeVisible({ timeout: 45_000 });
-  });
-}
-
 export async function expectToggleableReplacement({
   expectedTranslatedText = TOGGLE_TRANSLATED_TEXT,
   expectedTranslatedVisibleText = expectedTranslatedText,

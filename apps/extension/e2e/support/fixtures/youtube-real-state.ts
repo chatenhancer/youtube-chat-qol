@@ -1,7 +1,7 @@
 /** Per-test cleanup for worker-scoped real YouTube sessions. */
 import type { FrameLocator, Locator } from '@playwright/test';
 import { clearChatComposerIfVisible } from '../composer';
-import { waitForYouTubeContentVideo } from '../youtube-page';
+import { resumeLiveChat, waitForYouTubeContentVideo } from '../youtube-page';
 import type { RealYouTubeSession } from './browser-session';
 
 const CHAT_MENU_POPUP_SELECTOR = 'ytd-menu-popup-renderer';
@@ -27,14 +27,7 @@ export async function resetRealYouTubeScenarioState(session: RealYouTubeSession)
 export async function restoreRealYouTubeChatLiveEdge(
   session: RealYouTubeSession
 ): Promise<void> {
-  await session.chat
-    .locator('yt-live-chat-item-list-renderer #item-scroller')
-    .first()
-    .evaluate((element) => {
-      element.scrollTop = element.scrollHeight;
-      element.dispatchEvent(new Event('scroll', { bubbles: true }));
-    })
-    .catch(() => undefined);
+  await resumeLiveChat(session.page);
 }
 
 async function closeChatNativeMenus(chat: FrameLocator): Promise<void> {

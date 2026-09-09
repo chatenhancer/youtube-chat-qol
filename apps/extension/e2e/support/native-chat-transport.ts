@@ -9,6 +9,7 @@
 import type { Frame, Page, Request, Route } from '@playwright/test';
 import { randomBytes } from 'node:crypto';
 import { brotliDecompressSync, gunzipSync, inflateSync } from 'node:zlib';
+import { resumeLiveChat } from './youtube-page';
 import type {
   ControlledChat,
   ControlledChatDelivery,
@@ -133,9 +134,17 @@ export class NativeChatTransport implements ControlledChat {
   }
 
   async injectMessage(message: ControlledChatMessage): Promise<string> {
+    // Establish live-following before arrival; do not repair scrolling after
+    // delivery, which could conceal a failure to render the incoming message.
+    await resumeLiveChat(this.page);
     const delivery = await this.injectMessages([message]);
     const messageId = delivery.deliveredIds[0];
     if (!messageId) throw new Error('Controlled chat message was not delivered.');
+    // A follow-up poll acknowledges the response, not its renderer. YouTube's
+    // smoothing queue can still hold the row after the next request starts.
+    await this.page.frameLocator('iframe#chatframe')
+      .locator(`yt-live-chat-text-message-renderer[id="${messageId}"]`)
+      .waitFor({ state: 'attached', timeout: DEFAULT_DELIVERY_TIMEOUT_MS });
     return messageId;
   }
 
