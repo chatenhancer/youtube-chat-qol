@@ -46,6 +46,8 @@ import { canJumpToChatMessage, jumpToChatMessage } from '../message-jump';
 import { isLiteModeActive } from '../lite-mode/controller';
 
 const bookmarks = new Map<string, BookmarkRecord>();
+const BOOKMARK_SAVED_CLASS = 'ytcq-bookmark-saved';
+const BOOKMARK_HIGHLIGHT_MS = 900;
 let loadPromise: Promise<void> | null = null;
 let pendingTargetMessageId = '';
 
@@ -58,6 +60,7 @@ registerFeature({
 });
 
 export function initBookmarks(): void {
+  clearBookmarkHighlights();
   pendingTargetMessageId = getBookmarkTargetMessageId(getWatchPageHash());
   void ensureBookmarksLoaded().then(refreshBookmarkButtons);
   chrome.storage.onChanged.addListener(handleBookmarksStorageChange);
@@ -82,7 +85,10 @@ export function getChatBookmarkTitle(message: HTMLElement): string {
   return isChatBookmarked(message) ? t('removeSavedMessage') : t('saveMessage');
 }
 
-export async function toggleBookmark(message: BookmarkSourceMessage): Promise<boolean | null> {
+export async function toggleBookmark(
+  message: BookmarkSourceMessage,
+  row: HTMLElement | null = null
+): Promise<boolean | null> {
   await ensureBookmarksLoaded();
   const nextRecord = createBookmarkRecord(message);
   if (!nextRecord) return null;
@@ -109,13 +115,14 @@ export async function toggleBookmark(message: BookmarkSourceMessage): Promise<bo
   }
 
   refreshBookmarkButtons();
+  if (saved) highlightBookmarkedMessage(row);
   showToast(t(saved ? 'savedToBookmarks' : 'removedFromBookmarks'));
   return saved;
 }
 
 export async function toggleChatBookmark(message: HTMLElement): Promise<boolean | null> {
   const bookmarkable = await getBookmarkableMessage(message);
-  return bookmarkable ? toggleBookmark(bookmarkable) : null;
+  return bookmarkable ? toggleBookmark(bookmarkable, message) : null;
 }
 
 export function createBookmarkToggleButton(
@@ -131,7 +138,10 @@ export function createBookmarkToggleButton(
       onClick={(event: MouseEvent) => {
         event.preventDefault();
         event.stopPropagation();
-        void toggleBookmark(message);
+        void toggleBookmark(
+          message,
+          button.closest<HTMLElement>('.ytcq-profile-card-message, .ytcq-focus-message')
+        );
       }}
     >
       {createBookmarkIcon()}
@@ -144,7 +154,21 @@ export function createBookmarkToggleButton(
 
 export function cleanupBookmarks(): void {
   pendingTargetMessageId = '';
+  clearBookmarkHighlights();
   chrome.storage.onChanged.removeListener(handleBookmarksStorageChange);
+}
+
+function highlightBookmarkedMessage(row: HTMLElement | null): void {
+  if (!row?.isConnected || row.classList.contains(BOOKMARK_SAVED_CLASS)) return;
+
+  row.classList.add(BOOKMARK_SAVED_CLASS);
+  window.setTimeout(() => row.classList.remove(BOOKMARK_SAVED_CLASS), BOOKMARK_HIGHLIGHT_MS);
+}
+
+function clearBookmarkHighlights(): void {
+  document
+    .querySelectorAll(`.${BOOKMARK_SAVED_CLASS}`)
+    .forEach((row) => row.classList.remove(BOOKMARK_SAVED_CLASS));
 }
 
 function handleBookmarkTargetMessage(

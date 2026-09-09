@@ -579,6 +579,14 @@ async function saveBookmarkFromMessageMenu(
     await expect(saveItem.locator('.ytcq-menu-label')).toHaveText('Save');
     await expect(saveAction).toBeVisible();
     await saveItem.press('Enter');
+    await expect(source.message).toHaveClass(/ytcq-bookmark-saved/);
+    await expect
+      .poll(() => source.message.evaluate((row) => getComputedStyle(row, '::after').opacity))
+      .not.toBe('0');
+    expect(
+      await source.message.evaluate((row) => getComputedStyle(row, '::after').pointerEvents)
+    ).toBe('none');
+    await expect(source.message).not.toHaveClass(/ytcq-bookmark-saved/);
   });
 
   return source;

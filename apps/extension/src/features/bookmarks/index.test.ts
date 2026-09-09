@@ -127,6 +127,63 @@ describe('bookmarks', () => {
     expect(second.classList.contains('ytcq-bookmark-toggle-active')).toBe(false);
   });
 
+  it('briefly highlights the saved chat row, but not removals or failed saves', async () => {
+    const feature = await import('./index');
+    feature.initBookmarks();
+    await flushAsyncWork();
+    vi.useFakeTimers();
+    const message = createChatMessage('message-1', 'Save this message');
+    const otherMessage = createChatMessage('message-2', 'Another message');
+    document.body.append(message, otherMessage);
+
+    await expect(feature.toggleChatBookmark(message)).resolves.toBe(true);
+    expect(message.classList.contains('ytcq-bookmark-saved')).toBe(true);
+    expect(otherMessage.classList.contains('ytcq-bookmark-saved')).toBe(false);
+    expect(message.querySelector('#message')?.textContent).toBe('Save this message');
+
+    await vi.advanceTimersByTimeAsync(900);
+    expect(message.classList.contains('ytcq-bookmark-saved')).toBe(false);
+    await expect(feature.toggleChatBookmark(message)).resolves.toBe(false);
+    expect(message.classList.contains('ytcq-bookmark-saved')).toBe(false);
+
+    vi.spyOn(chrome.storage.local, 'set').mockImplementationOnce(() => {
+      throw new Error('Storage unavailable');
+    });
+    await expect(feature.toggleChatBookmark(message)).resolves.toBeNull();
+    expect(message.classList.contains('ytcq-bookmark-saved')).toBe(false);
+    expect(feature.isChatBookmarked(message)).toBe(false);
+
+    await expect(feature.toggleChatBookmark(message)).resolves.toBe(true);
+    expect(message.classList.contains('ytcq-bookmark-saved')).toBe(true);
+  });
+
+  it.each(['ytcq-profile-card-message', 'ytcq-focus-message'])(
+    'highlights the containing %s when its bookmark button is clicked',
+    async (className) => {
+      const feature = await import('./index');
+      feature.initBookmarks();
+      await flushAsyncWork();
+      vi.useFakeTimers();
+      const row = document.createElement('div');
+      row.className = className;
+      const button = feature.createBookmarkToggleButton(bookmark('message-1'))!;
+      row.append(button);
+      document.body.append(row);
+
+      button.click();
+      await vi.advanceTimersByTimeAsync(0);
+      expect(button.getAttribute('aria-pressed')).toBe('true');
+      expect(row.classList.contains('ytcq-bookmark-saved')).toBe(true);
+
+      await vi.advanceTimersByTimeAsync(900);
+      expect(row.classList.contains('ytcq-bookmark-saved')).toBe(false);
+      button.click();
+      await vi.advanceTimersByTimeAsync(0);
+      expect(button.getAttribute('aria-pressed')).toBe('false');
+      expect(row.classList.contains('ytcq-bookmark-saved')).toBe(false);
+    }
+  );
+
   it('stores the watch-page video offset for live bookmarks', async () => {
     const video = document.createElement('video');
     Object.defineProperty(video, 'currentTime', {
@@ -304,6 +361,20 @@ describe('bookmarks', () => {
 
     feature.cleanupBookmarks();
     expect(chrome.storage.onChanged.removeListener).toHaveBeenCalledWith(expect.any(Function));
+  });
+
+  it('clears stale row highlights on startup and active highlights during cleanup', async () => {
+    const message = createChatMessage('message-1', 'Save this message');
+    message.classList.add('ytcq-bookmark-saved');
+    document.body.append(message);
+    const feature = await import('./index');
+    feature.initBookmarks();
+    expect(message.classList.contains('ytcq-bookmark-saved')).toBe(false);
+
+    await feature.toggleChatBookmark(message);
+    expect(message.classList.contains('ytcq-bookmark-saved')).toBe(true);
+    feature.cleanupBookmarks();
+    expect(message.classList.contains('ytcq-bookmark-saved')).toBe(false);
   });
 });
 
