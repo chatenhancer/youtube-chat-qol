@@ -310,6 +310,45 @@
     "email": "Email",
     "license": "License"
   },
+  "updatePage": {
+    "title": "Update the extension",
+    "description": "Get the latest version of Chat Enhancer for YouTube in Chrome, Edge, Firefox, or Safari on Mac.",
+    "automaticUpdateTitle": "Manual updates are optional",
+    "automaticUpdateCopy": "With automatic updates enabled, your browser or the App Store will install updates on its own. Use the steps below to check sooner.",
+    "chooseBrowser": "Choose your browser",
+    "chromeSteps": [
+      "Paste this address into Chrome’s address bar and press Enter:",
+      "Turn on Developer mode in the upper-right corner.",
+      "Click Update in the toolbar and wait for the update check to finish."
+    ],
+    "edgeSteps": [
+      "Paste this address into Edge’s address bar and press Enter:",
+      "Turn on Developer mode in the sidebar. If the sidebar is hidden, open the menu at the top left.",
+      "Click Update and wait for the update check to finish."
+    ],
+    "firefoxSteps": [
+      "Paste this address into Firefox’s address bar, press Enter, then select Extensions:",
+      "Open the gear menu near the top of the Extensions panel.",
+      "Select Check for Updates and install any available update for Chat Enhancer for YouTube."
+    ],
+    "safariTitle": "Safari on Mac",
+    "safariSteps": [
+      "Open the App Store on your Mac.",
+      "Select Updates in the sidebar.",
+      "Click Update next to Chat Enhancer for YouTube and wait for it to finish. Safari extensions update through their App Store app."
+    ],
+    "developerModeNote": "You can turn Developer mode off again after the update check if you enabled it just for this.",
+    "chromeImageAlt": "Chrome’s Extensions page with Developer mode enabled and the Update button visible in the toolbar.",
+    "edgeImageAlt": "Edge’s Extensions page with Developer mode enabled and the Update button visible.",
+    "screenshotNote": "Screenshot of the English browser interface. Select the image to enlarge it.",
+    "officialInstructions": "Official instructions",
+    "afterTitle": "After updating",
+    "afterCopy": "Wait for the update to finish, then reload your YouTube tabs. If the old version is still running, quit and reopen the browser.",
+    "keepData": "You don’t need to uninstall the extension. Updating it in place keeps your settings and locally saved data.",
+    "noUpdateTitle": "Still seeing the old version?",
+    "noUpdateCopy": "Updates may reach each browser’s store at different times. A manual check can only install a version the store has made available to you. If it isn’t offered yet, try again later.",
+    "contactSupport": "Contact support"
+  },
   "supportPage": {
     "title": "Support and feedback",
     "description": "Choose how to contact Chat Enhancer for YouTube for bug reports, feature ideas, and private questions.",

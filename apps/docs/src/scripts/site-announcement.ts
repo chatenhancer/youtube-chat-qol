@@ -27,8 +27,17 @@ export async function loadSiteAnnouncement(): Promise<void> {
     if (href) {
       const link = document.createElement("a");
       link.href = href;
-      link.textContent = message;
-      container.replaceChildren(link);
+      const labels = isRecord(announcement.linkLabels) ? announcement.linkLabels : {};
+      const labelLocale = readText(labels[locale]) ? locale : "en";
+      const label = readText(labels[labelLocale]);
+      link.textContent = label || message;
+      if (label) {
+        link.lang = labelLocale.replace("_", "-");
+        link.dir = "auto";
+        container.replaceChildren(`${message} `, link);
+      } else {
+        container.replaceChildren(link);
+      }
     } else {
       container.textContent = message;
     }

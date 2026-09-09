@@ -310,6 +310,45 @@
     "email": "Email",
     "license": "Giấy phép"
   },
+  "updatePage": {
+    "title": "Cập nhật tiện ích",
+    "description": "Nhận phiên bản mới nhất của Chat Enhancer for YouTube trên Chrome, Edge, Firefox hoặc Safari trên Mac.",
+    "automaticUpdateTitle": "Cập nhật thủ công là tùy chọn",
+    "automaticUpdateCopy": "Nếu bật cập nhật tự động, trình duyệt hoặc App Store sẽ tự cài đặt bản cập nhật. Làm theo các bước bên dưới nếu muốn kiểm tra sớm hơn.",
+    "chooseBrowser": "Chọn trình duyệt của bạn",
+    "chromeSteps": [
+      "Dán địa chỉ này vào thanh địa chỉ của Chrome rồi nhấn Enter:",
+      "Bật Chế độ dành cho nhà phát triển ở góc trên bên phải.",
+      "Nhấp vào Cập nhật trên thanh công cụ rồi chờ quá trình kiểm tra cập nhật hoàn tất."
+    ],
+    "edgeSteps": [
+      "Dán địa chỉ này vào thanh địa chỉ của Edge rồi nhấn Enter:",
+      "Bật Chế độ nhà phát triển trong thanh bên. Nếu thanh bên bị ẩn, hãy mở menu ở góc trên bên trái.",
+      "Nhấp vào Cập nhật rồi chờ quá trình kiểm tra cập nhật hoàn tất."
+    ],
+    "firefoxSteps": [
+      "Dán địa chỉ này vào thanh địa chỉ của Firefox, nhấn Enter rồi chọn Tiện ích mở rộng:",
+      "Mở menu hình bánh răng ở phía trên bảng tiện ích mở rộng.",
+      "Chọn Kiểm tra cập nhật và cài đặt mọi bản cập nhật có sẵn cho Chat Enhancer for YouTube."
+    ],
+    "safariTitle": "Safari trên Mac",
+    "safariSteps": [
+      "Mở App Store trên máy Mac.",
+      "Chọn Cập nhật trong thanh bên.",
+      "Nhấp vào Cập nhật bên cạnh Chat Enhancer for YouTube rồi chờ hoàn tất. Tiện ích Safari được cập nhật thông qua ứng dụng của chúng trên App Store."
+    ],
+    "developerModeNote": "Nếu chỉ bật chế độ nhà phát triển để kiểm tra lần này, bạn có thể tắt lại sau khi hoàn tất.",
+    "chromeImageAlt": "Trang tiện ích của Chrome với chế độ nhà phát triển được bật và nút Cập nhật hiển thị trên thanh công cụ.",
+    "edgeImageAlt": "Trang tiện ích của Edge với chế độ nhà phát triển được bật và nút Cập nhật hiển thị.",
+    "screenshotNote": "Ảnh chụp giao diện trình duyệt bằng tiếng Anh. Chọn ảnh để phóng to.",
+    "officialInstructions": "Hướng dẫn chính thức",
+    "afterTitle": "Sau khi cập nhật",
+    "afterCopy": "Chờ cập nhật hoàn tất rồi tải lại các thẻ YouTube. Nếu phiên bản cũ vẫn đang chạy, hãy thoát hoàn toàn trình duyệt rồi mở lại.",
+    "keepData": "Bạn không cần gỡ tiện ích. Cập nhật bản cài đặt hiện có sẽ giữ lại các tùy chọn và dữ liệu được lưu trên máy.",
+    "noUpdateTitle": "Vẫn thấy phiên bản cũ?",
+    "noUpdateCopy": "Bản cập nhật có thể xuất hiện trên cửa hàng của mỗi trình duyệt vào những thời điểm khác nhau. Việc kiểm tra thủ công chỉ có thể cài đặt phiên bản mà cửa hàng đã cung cấp cho bạn. Nếu chưa có bản cập nhật, hãy thử lại sau.",
+    "contactSupport": "Liên hệ hỗ trợ"
+  },
   "supportPage": {
     "title": "Hỗ trợ và phản hồi",
     "description": "Chọn cách liên hệ với Chat Enhancer for YouTube để báo lỗi, góp ý tính năng và đặt câu hỏi riêng.",

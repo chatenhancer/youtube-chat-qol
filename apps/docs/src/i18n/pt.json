@@ -310,6 +310,45 @@
     "email": "E-mail",
     "license": "Licença"
   },
+  "updatePage": {
+    "title": "Atualizar a extensão",
+    "description": "Obtenha a versão mais recente do Chat Enhancer for YouTube no Chrome, Edge, Firefox ou Safari no Mac.",
+    "automaticUpdateTitle": "Atualizar manualmente é opcional",
+    "automaticUpdateCopy": "Com as atualizações automáticas ativadas, o navegador ou a App Store instalará as atualizações por conta própria. Siga as etapas abaixo para verificar antes.",
+    "chooseBrowser": "Escolha seu navegador",
+    "chromeSteps": [
+      "Cole este endereço na barra de endereços do Chrome e pressione Enter:",
+      "Ative o modo do desenvolvedor no canto superior direito.",
+      "Clique em Atualizar na barra de ferramentas e aguarde a conclusão da busca por atualizações."
+    ],
+    "edgeSteps": [
+      "Cole este endereço na barra de endereços do Edge e pressione Enter:",
+      "Ative o modo de desenvolvedor na barra lateral. Se ela estiver oculta, abra o menu no canto superior esquerdo.",
+      "Clique em Atualizar e aguarde a conclusão da busca por atualizações."
+    ],
+    "firefoxSteps": [
+      "Cole este endereço na barra de endereços do Firefox, pressione Enter e selecione Extensões:",
+      "Abra o menu de engrenagem na parte superior do painel de extensões.",
+      "Selecione Verificar atualizações e instale as atualizações disponíveis para o Chat Enhancer for YouTube."
+    ],
+    "safariTitle": "Safari no Mac",
+    "safariSteps": [
+      "Abra a App Store no Mac.",
+      "Selecione Atualizações na barra lateral.",
+      "Clique em Atualizar ao lado de Chat Enhancer for YouTube e aguarde a conclusão. As extensões do Safari são atualizadas pelo seu app na App Store."
+    ],
+    "developerModeNote": "Se você ativou o modo de desenvolvedor apenas para essa verificação, pode desativá-lo depois.",
+    "chromeImageAlt": "Página de extensões do Chrome com o modo do desenvolvedor ativado e o botão Atualizar visível na barra de ferramentas.",
+    "edgeImageAlt": "Página de extensões do Edge com o modo de desenvolvedor ativado e o botão Atualizar visível.",
+    "screenshotNote": "Captura da interface do navegador em inglês. Selecione a imagem para ampliá-la.",
+    "officialInstructions": "Instruções oficiais",
+    "afterTitle": "Após atualizar",
+    "afterCopy": "Aguarde a conclusão da atualização e recarregue as abas do YouTube. Se a versão antiga continuar em execução, encerre o navegador e abra-o novamente.",
+    "keepData": "Não é necessário desinstalar a extensão. A atualização mantém suas configurações e os dados salvos localmente.",
+    "noUpdateTitle": "Ainda aparece a versão antiga?",
+    "noUpdateCopy": "As atualizações podem chegar à loja de cada navegador em momentos diferentes. Uma busca manual só pode instalar uma versão que a loja já disponibilizou para você. Se ela ainda não estiver disponível, tente novamente mais tarde.",
+    "contactSupport": "Entrar em contato com o suporte"
+  },
   "supportPage": {
     "title": "Suporte e feedback",
     "description": "Escolha como entrar em contato com o Chat Enhancer for YouTube para relatar bugs, sugerir recursos e fazer perguntas particulares.",

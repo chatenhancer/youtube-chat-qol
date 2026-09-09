@@ -68,8 +68,62 @@ describe("docs announcements", () => {
     expect(container.querySelector("a")?.textContent).toBe("Update available");
   });
 
+  it("keeps the message before a separate localized link", async () => {
+    fetchMock.mockResolvedValue(Response.json({
+      enabled: true,
+      messages: { en: "Update available.", es: "Actualización disponible." },
+      link: "/update/",
+      linkLabels: { en: "Learn how to check for updates", es: "Cómo buscar actualizaciones" }
+    }));
+
+    await loadSiteAnnouncement();
+
+    expect(container.textContent).toBe("Actualización disponible. Cómo buscar actualizaciones");
+    expect(container.firstChild?.textContent).toBe("Actualización disponible. ");
+    expect(container.querySelector("a")?.textContent).toBe("Cómo buscar actualizaciones");
+    expect(container.querySelector("a")?.href).toBe(new URL("/update/", window.location.origin).href);
+    expect(container.querySelector("a")?.lang).toBe("es");
+  });
+
+  it("falls back to an English link label without changing the message language", async () => {
+    container.dataset.announcementLocale = "ar";
+    fetchMock.mockResolvedValue(Response.json({
+      enabled: true,
+      messages: { ar: "يتوفر تحديث." },
+      link: "/update/",
+      linkLabels: { en: "Learn how to check for updates", ar: " " }
+    }));
+
+    await loadSiteAnnouncement();
+
+    expect(container.textContent).toBe("يتوفر تحديث. Learn how to check for updates");
+    expect(container.lang).toBe("ar");
+    expect(container.querySelector("a")?.lang).toBe("en");
+    expect(container.querySelector("a")?.dir).toBe("auto");
+  });
+
+  it("renders link label markup as plain text", async () => {
+    const label = "<strong>Learn how to check for updates</strong>";
+    fetchMock.mockResolvedValue(Response.json({
+      enabled: true,
+      messages: { en: "Update available." },
+      link: "/update/",
+      linkLabels: { en: label }
+    }));
+
+    await loadSiteAnnouncement();
+
+    expect(container.querySelector("a")?.textContent).toBe(label);
+    expect(container.querySelector("strong")).toBeNull();
+  });
+
   it.each(["javascript:alert(1)", "data:text/html,unsafe", "https://["])("ignores an unsafe or invalid link: %s", async (link) => {
-    fetchMock.mockResolvedValue(Response.json({ enabled: true, messages: { en: "Update available" }, link }));
+    fetchMock.mockResolvedValue(Response.json({
+      enabled: true,
+      messages: { en: "Update available" },
+      link,
+      linkLabels: { en: "Learn how to check for updates" }
+    }));
 
     await loadSiteAnnouncement();
 

@@ -5,7 +5,7 @@ const { messages: m } = Astro.props as { messages: Messages };
 ---
 
 <div
-  class="store-version-alert store-version-alert-top"
+  class="site-alert site-alert-warning store-version-alert store-version-alert-top"
   role="status"
   aria-live="polite"
   hidden
@@ -16,7 +16,7 @@ const { messages: m } = Astro.props as { messages: Messages };
   data-alert-firefox={m.install.firefoxAddons}
   data-alert-safari={m.install.safariAppStore}
 >
-  <span class="store-version-alert-icon" aria-hidden="true">
+  <span class="site-alert-icon" aria-hidden="true">
     <svg class="store-version-hourglass" viewBox="0 0 24 24" focusable="false">
       <defs>
         <clipPath id="store-version-hourglass-top-clip">
@@ -32,7 +32,7 @@ const { messages: m } = Astro.props as { messages: Messages };
       <path class="store-version-hourglass-stream" d="M12 10.8v4.7"></path>
     </svg>
   </span>
-  <span class="store-version-alert-copy">
+  <span class="site-alert-copy">
     <strong>{m.install.updatePendingTitle}</strong>
     <span data-store-version-alert-message></span>
   </span>

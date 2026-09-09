@@ -38,6 +38,11 @@ export async function GET() {
       lastmod: latestPostLastmod,
       loc: getSupportUrl(locale)
     })),
+    ...locales.map((locale) => ({
+      changefreq: 'yearly',
+      lastmod: undefined,
+      loc: `${canonicalUrlFor(locale)}update/`
+    })),
     ...locales
       .filter((locale) => locale !== 'en')
       .map((locale) => ({

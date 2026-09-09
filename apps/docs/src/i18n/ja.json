@@ -310,6 +310,45 @@
     "email": "メール",
     "license": "ライセンス"
   },
+  "updatePage": {
+    "title": "拡張機能を更新する",
+    "description": "Chrome、Edge、Firefox、または Mac の Safari で Chat Enhancer for YouTube を最新バージョンに更新できます。",
+    "automaticUpdateTitle": "手動での更新は必須ではありません",
+    "automaticUpdateCopy": "自動更新が有効であれば、ブラウザまたは App Store が自動で更新をインストールします。早めに確認したい場合は、以下の手順に従ってください。",
+    "chooseBrowser": "ブラウザを選択",
+    "chromeSteps": [
+      "Chrome のアドレスバーに次のアドレスを貼り付け、Enter キーを押します：",
+      "右上の「デベロッパー モード」をオンにします。",
+      "ツールバーの「更新」をクリックし、更新の確認が終わるまで待ちます。"
+    ],
+    "edgeSteps": [
+      "Edge のアドレスバーに次のアドレスを貼り付け、Enter キーを押します：",
+      "サイドバーの「開発者モード」をオンにします。サイドバーが非表示の場合は、左上のメニューを開きます。",
+      "「更新」をクリックし、更新の確認が終わるまで待ちます。"
+    ],
+    "firefoxSteps": [
+      "Firefox のアドレスバーに次のアドレスを貼り付け、Enter キーを押して「拡張機能」を選択します：",
+      "拡張機能パネル上部の歯車メニューを開きます。",
+      "「アドオンの更新を確認」を選択し、Chat Enhancer for YouTube の更新があればインストールします。"
+    ],
+    "safariTitle": "Mac の Safari",
+    "safariSteps": [
+      "Mac で App Store を開きます。",
+      "サイドバーの「アップデート」を選択します。",
+      "Chat Enhancer for YouTube の横にある「アップデート」をクリックし、完了まで待ちます。Safari の拡張機能は、App Store の対応するアプリを通じて更新されます。"
+    ],
+    "developerModeNote": "今回の確認のためだけに開発者モードをオンにした場合は、確認後にオフに戻せます。",
+    "chromeImageAlt": "デベロッパー モードが有効で、ツールバーに更新ボタンが表示されている Chrome の拡張機能ページ。",
+    "edgeImageAlt": "開発者モードが有効で、更新ボタンが表示されている Edge の拡張機能ページ。",
+    "screenshotNote": "英語版ブラウザの画面です。画像を選択すると拡大できます。",
+    "officialInstructions": "公式の手順",
+    "afterTitle": "更新したら",
+    "afterCopy": "更新の完了を待ってから、YouTube のタブを再読み込みしてください。古いバージョンがまだ動作している場合は、ブラウザを完全に終了して開き直してください。",
+    "keepData": "拡張機能をアンインストールする必要はありません。そのまま更新すれば、設定やローカルに保存したデータは保持されます。",
+    "noUpdateTitle": "まだ古いバージョンが表示されますか？",
+    "noUpdateCopy": "更新が公開されるタイミングは、ブラウザのストアごとに異なる場合があります。手動で確認しても、ストアがあなたに提供しているバージョンのみインストールできます。まだ更新が表示されない場合は、後でもう一度お試しください。",
+    "contactSupport": "サポートに問い合わせる"
+  },
   "supportPage": {
     "title": "サポートとフィードバック",
     "description": "バグ報告、機能の提案、非公開の質問について Chat Enhancer for YouTube に連絡する方法を選べます。",

@@ -1,0 +1,215 @@
+---
+import BlogLayout from '../../layouts/blog-layout.astro';
+import Icon from '../common/icon.astro';
+import { getLocaleUrl, getMessages, locales } from '../../data/locales';
+import type { Locale } from '../../data/locales';
+import { site } from '../../data/site';
+
+const { locale } = Astro.props as { locale: Locale };
+const messages = getMessages(locale);
+const guide = messages.updatePage;
+const languageUrls = Object.fromEntries(locales.map((entry) => [entry, `${getLocaleUrl(entry)}update/`]));
+const browsers = [
+  {
+    id: 'chrome',
+    title: 'Google Chrome',
+    address: 'chrome://extensions',
+    steps: guide.chromeSteps,
+    developerMode: true,
+    source: 'https://developer.chrome.com/docs/extensions/develop/concepts/extensions-update-lifecycle',
+    image: { src: '/assets/browser-updates/chrome.png', width: 2000, height: 276, alt: guide.chromeImageAlt }
+  },
+  {
+    id: 'edge',
+    title: 'Microsoft Edge',
+    address: 'edge://extensions',
+    steps: guide.edgeSteps,
+    developerMode: true,
+    source: 'https://learn.microsoft.com/en-us/troubleshoot/microsoft-edge/development/self-host-extension-update',
+    image: { src: '/assets/browser-updates/edge.png', width: 2560, height: 960, alt: guide.edgeImageAlt }
+  },
+  {
+    id: 'firefox',
+    title: 'Mozilla Firefox',
+    address: 'about:addons',
+    steps: guide.firefoxSteps,
+    source: 'https://support.mozilla.org/en-US/kb/how-update-add-ons'
+  },
+  {
+    id: 'safari',
+    title: guide.safariTitle,
+    steps: guide.safariSteps,
+    source: 'https://support.apple.com/en-us/102629'
+  }
+];
+---
+
+<BlogLayout
+  canonicalUrl={`${site.url}${languageUrls[locale]}`}
+  description={guide.description}
+  languageUrls={languageUrls}
+  locale={locale}
+  messages={messages}
+  rootPrefix={locale === 'en' ? '../' : '../../'}
+  title={guide.title}
+>
+  <article class="update-guide" aria-labelledby="update-title">
+    <header class="update-hero">
+      <a class="blog-back-link" href={getLocaleUrl(locale)}>{messages.blog.backToHome}</a>
+      <h1 id="update-title">{guide.title}</h1>
+      <p>{guide.description}</p>
+    </header>
+    <div class="site-alert site-alert-info update-guide-notice">
+      <span class="site-alert-icon" aria-hidden="true"><Icon name="refresh" /></span>
+      <span class="site-alert-copy">
+        <strong>{guide.automaticUpdateTitle}</strong>
+        <span>{guide.automaticUpdateCopy}</span>
+      </span>
+    </div>
+    <nav class="update-browser-nav" aria-label={guide.chooseBrowser}>
+      {browsers.map((browser) => <a href={`#${browser.id}`}>{browser.title}</a>)}
+    </nav>
+    <div class="blog-post-body update-body">
+      {browsers.map((browser) => (
+        <section id={browser.id} aria-labelledby={`${browser.id}-title`}>
+          <h2 id={`${browser.id}-title`}>{browser.title}</h2>
+          <ol>
+            {browser.steps.map((step, index) => (
+              <li>
+                {step}
+                {index === 0 && browser.address && <code class="update-address" dir="ltr">{browser.address}</code>}
+              </li>
+            ))}
+          </ol>
+          {browser.developerMode && <p class="update-note">{guide.developerModeNote}</p>}
+          {browser.image && (
+            <figure>
+              <a href={browser.image.src} target="_blank" rel="noopener">
+                <img {...browser.image} loading="lazy" decoding="async" />
+              </a>
+              <figcaption>{guide.screenshotNote}</figcaption>
+            </figure>
+          )}
+          <a class="update-source" href={browser.source}>{guide.officialInstructions}</a>
+        </section>
+      ))}
+      <section aria-labelledby="after-update-title">
+        <h2 id="after-update-title">{guide.afterTitle}</h2>
+        <p>{guide.afterCopy}</p>
+        <p>{guide.keepData}</p>
+      </section>
+      <section aria-labelledby="no-update-title">
+        <h2 id="no-update-title">{guide.noUpdateTitle}</h2>
+        <p>{guide.noUpdateCopy}</p>
+        <a href={`${getLocaleUrl(locale)}support/`}>{guide.contactSupport}</a>
+      </section>
+    </div>
+  </article>
+</BlogLayout>
+
+<style>
+  .update-guide {
+    max-width: 860px;
+    margin-inline: auto;
+  }
+
+  .update-hero h1 {
+    margin: 18px 0;
+    font-size: clamp(38px, 5vw, 60px);
+    line-height: 1.12;
+    overflow-wrap: anywhere;
+  }
+
+  .update-hero p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 19px;
+    line-height: 1.6;
+  }
+
+  .update-guide-notice {
+    align-items: start;
+    margin: 24px 0;
+  }
+
+  .update-guide-notice .site-alert-icon {
+    height: 1lh;
+  }
+
+  .update-browser-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .update-browser-nav a {
+    padding: 10px 16px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    color: var(--text);
+    font-size: 15px;
+    font-weight: 650;
+  }
+
+  .update-browser-nav a:hover {
+    color: var(--blue);
+    background: var(--blue-soft);
+  }
+
+  .update-body section {
+    padding-block: 32px;
+    border-bottom: 1px solid var(--line);
+    scroll-margin-block-start: calc(var(--header-scroll-offset) + 20px);
+  }
+
+  .update-body h2 {
+    margin: 0 0 20px;
+    font-size: clamp(26px, 4vw, 34px);
+  }
+
+  .update-body ol {
+    padding-inline-start: 26px;
+  }
+
+  .update-address {
+    display: block;
+    width: fit-content;
+    max-width: 100%;
+    margin-block: 10px 14px;
+    padding: 6px 12px;
+    background: var(--soft);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    font-size: 16px;
+    overflow-wrap: anywhere;
+    user-select: all;
+  }
+
+  .update-note,
+  .update-source,
+  figcaption {
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  figure {
+    margin: 22px 0 16px;
+  }
+
+  figure img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+  }
+
+  figcaption {
+    margin-block-start: 8px;
+  }
+
+  .update-body section > :last-child {
+    margin-bottom: 0;
+  }
+</style>

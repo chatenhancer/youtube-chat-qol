@@ -310,6 +310,45 @@
     "email": "이메일",
     "license": "라이선스"
   },
+  "updatePage": {
+    "title": "확장 프로그램 업데이트",
+    "description": "Chrome, Edge, Firefox 또는 Mac의 Safari에서 Chat Enhancer for YouTube를 최신 버전으로 업데이트하세요.",
+    "automaticUpdateTitle": "수동 업데이트는 선택 사항입니다",
+    "automaticUpdateCopy": "자동 업데이트가 켜져 있으면 브라우저나 App Store가 알아서 업데이트를 설치합니다. 더 빨리 확인하려면 아래 단계를 따르세요.",
+    "chooseBrowser": "브라우저 선택",
+    "chromeSteps": [
+      "Chrome 주소 표시줄에 다음 주소를 붙여넣고 Enter를 누르세요.",
+      "오른쪽 위에서 개발자 모드를 켜세요.",
+      "도구 모음에서 업데이트를 클릭하고 업데이트 확인이 끝날 때까지 기다리세요."
+    ],
+    "edgeSteps": [
+      "Edge 주소 표시줄에 다음 주소를 붙여넣고 Enter를 누르세요.",
+      "사이드바에서 개발자 모드를 켜세요. 사이드바가 숨겨져 있으면 왼쪽 위 메뉴를 여세요.",
+      "업데이트를 클릭하고 업데이트 확인이 끝날 때까지 기다리세요."
+    ],
+    "firefoxSteps": [
+      "Firefox 주소 표시줄에 다음 주소를 붙여넣고 Enter를 누른 다음 확장 기능을 선택하세요.",
+      "확장 기능 패널 위쪽의 톱니바퀴 메뉴를 여세요.",
+      "업데이트 확인을 선택하고 Chat Enhancer for YouTube에 사용 가능한 업데이트를 설치하세요."
+    ],
+    "safariTitle": "Mac의 Safari",
+    "safariSteps": [
+      "Mac에서 App Store를 여세요.",
+      "사이드바에서 업데이트를 선택하세요.",
+      "Chat Enhancer for YouTube 옆의 업데이트를 클릭하고 완료될 때까지 기다리세요. Safari 확장 프로그램은 App Store의 해당 앱을 통해 업데이트됩니다."
+    ],
+    "developerModeNote": "이번 확인을 위해서만 개발자 모드를 켰다면 확인 후 다시 꺼도 됩니다.",
+    "chromeImageAlt": "개발자 모드가 켜져 있고 도구 모음에 업데이트 버튼이 표시된 Chrome 확장 프로그램 페이지.",
+    "edgeImageAlt": "개발자 모드가 켜져 있고 업데이트 버튼이 표시된 Edge 확장 페이지.",
+    "screenshotNote": "영어 브라우저 인터페이스의 스크린샷입니다. 이미지를 선택하면 크게 볼 수 있습니다.",
+    "officialInstructions": "공식 안내",
+    "afterTitle": "업데이트 후",
+    "afterCopy": "업데이트가 완료되면 YouTube 탭을 새로고침하세요. 이전 버전이 계속 실행 중이면 브라우저를 완전히 종료했다가 다시 여세요.",
+    "keepData": "확장 프로그램을 삭제할 필요는 없습니다. 기존 설치를 업데이트하면 설정과 로컬에 저장된 데이터가 유지됩니다.",
+    "noUpdateTitle": "아직 이전 버전이 표시되나요?",
+    "noUpdateCopy": "업데이트가 각 브라우저 스토어에 제공되는 시점은 다를 수 있습니다. 수동으로 확인해도 스토어에서 현재 제공하는 버전만 설치할 수 있습니다. 업데이트가 아직 표시되지 않으면 나중에 다시 시도하세요.",
+    "contactSupport": "지원 문의"
+  },
   "supportPage": {
     "title": "지원 및 피드백",
     "description": "버그 신고, 기능 아이디어, 비공개 질문을 위해 Chat Enhancer for YouTube에 연락하는 방법을 선택하세요.",

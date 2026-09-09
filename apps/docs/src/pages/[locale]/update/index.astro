@@ -1,0 +1,17 @@
+---
+import UpdateGuide from '../../../components/update/update-guide.astro';
+import { localeMeta, locales } from '../../../data/locales';
+
+export function getStaticPaths() {
+  return locales
+    .filter((locale) => locale !== 'en')
+    .map((locale) => ({
+      params: { locale: localeMeta[locale].path },
+      props: { locale }
+    }));
+}
+
+const { locale } = Astro.props;
+---
+
+<UpdateGuide locale={locale} />

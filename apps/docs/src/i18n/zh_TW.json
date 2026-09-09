@@ -310,6 +310,45 @@
     "email": "電子郵件",
     "license": "授權"
   },
+  "updatePage": {
+    "title": "更新擴充功能",
+    "description": "在 Chrome、Edge、Firefox 或 Mac 上的 Safari 中取得最新版本的 Chat Enhancer for YouTube。",
+    "automaticUpdateTitle": "不一定要手動更新",
+    "automaticUpdateCopy": "只要開啟自動更新，瀏覽器或 App Store 就會自行安裝更新。如果想提早檢查，可以按照以下步驟操作。",
+    "chooseBrowser": "選擇瀏覽器",
+    "chromeSteps": [
+      "將以下網址貼到 Chrome 網址列，然後按 Enter：",
+      "開啟右上角的「開發人員模式」。",
+      "按一下工具列中的「更新」，然後等待更新檢查完成。"
+    ],
+    "edgeSteps": [
+      "將以下網址貼到 Edge 網址列，然後按 Enter：",
+      "開啟側邊欄中的「開發人員模式」。如果側邊欄已隱藏，請開啟左上角的選單。",
+      "按一下「更新」，然後等待更新檢查完成。"
+    ],
+    "firefoxSteps": [
+      "將以下網址貼到 Firefox 網址列，按 Enter，然後選擇「擴充套件」：",
+      "開啟擴充套件面板頂端的齒輪選單。",
+      "選擇「檢查更新」，並安裝 Chat Enhancer for YouTube 的可用更新。"
+    ],
+    "safariTitle": "Mac 上的 Safari",
+    "safariSteps": [
+      "在 Mac 上開啟 App Store。",
+      "在側邊欄中選擇「更新項目」。",
+      "按一下 Chat Enhancer for YouTube 旁的「更新」，然後等待完成。Safari 擴充功能會透過其在 App Store 中的 App 更新。"
+    ],
+    "developerModeNote": "如果只是為了這次檢查而啟用開發人員模式，檢查結束後可以將其關閉。",
+    "chromeImageAlt": "Chrome 擴充功能頁面，已開啟開發人員模式，工具列中顯示更新按鈕。",
+    "edgeImageAlt": "Edge 擴充功能頁面，已開啟開發人員模式，並顯示更新按鈕。",
+    "screenshotNote": "螢幕截圖使用瀏覽器的英文介面。選取圖片可放大檢視。",
+    "officialInstructions": "官方說明",
+    "afterTitle": "更新完成後",
+    "afterCopy": "等待更新完成，然後重新載入 YouTube 分頁。如果仍在執行舊版本，請完全結束瀏覽器後重新開啟。",
+    "keepData": "不需要解除安裝擴充功能。直接更新會保留你的設定和儲存在本機的資料。",
+    "noUpdateTitle": "仍然顯示舊版本？",
+    "noUpdateCopy": "更新在各瀏覽器商店中的推出時間可能不同。手動檢查只能安裝商店已向你提供的版本。如果更新尚未出現，請稍後再試。",
+    "contactSupport": "聯絡支援"
+  },
   "supportPage": {
     "title": "支援與意見回饋",
     "description": "選擇如何聯絡 Chat Enhancer for YouTube，以回報錯誤、提出功能想法或詢問私人問題。",

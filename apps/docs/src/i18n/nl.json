@@ -310,6 +310,45 @@
     "email": "E-mail",
     "license": "Licentie"
   },
+  "updatePage": {
+    "title": "De extensie bijwerken",
+    "description": "Krijg de nieuwste versie van Chat Enhancer for YouTube in Chrome, Edge, Firefox of Safari op de Mac.",
+    "automaticUpdateTitle": "Handmatig bijwerken is optioneel",
+    "automaticUpdateCopy": "Als automatische updates zijn ingeschakeld, installeert je browser of de App Store updates vanzelf. Volg de stappen hieronder als je eerder wilt controleren.",
+    "chooseBrowser": "Kies je browser",
+    "chromeSteps": [
+      "Plak dit adres in de adresbalk van Chrome en druk op Enter:",
+      "Schakel rechtsboven de ontwikkelaarsmodus in.",
+      "Klik op Updaten in de werkbalk en wacht tot de controle op updates klaar is."
+    ],
+    "edgeSteps": [
+      "Plak dit adres in de adresbalk van Edge en druk op Enter:",
+      "Schakel de ontwikkelaarsmodus in de zijbalk in. Is de zijbalk verborgen, open dan het menu linksboven.",
+      "Klik op Bijwerken en wacht tot de controle op updates klaar is."
+    ],
+    "firefoxSteps": [
+      "Plak dit adres in de adresbalk van Firefox, druk op Enter en selecteer Extensies:",
+      "Open het tandwielmenu bovenaan het paneel Extensies.",
+      "Selecteer Controleren op updates en installeer beschikbare updates voor Chat Enhancer for YouTube."
+    ],
+    "safariTitle": "Safari op de Mac",
+    "safariSteps": [
+      "Open de App Store op je Mac.",
+      "Selecteer Updates in de zijbalk.",
+      "Klik op Werk bij naast Chat Enhancer for YouTube en wacht tot dit klaar is. Safari-extensies worden bijgewerkt via hun app in de App Store."
+    ],
+    "developerModeNote": "Als je de ontwikkelaarsmodus alleen hiervoor hebt ingeschakeld, kun je deze na de controle weer uitschakelen.",
+    "chromeImageAlt": "De extensiepagina van Chrome met de ontwikkelaarsmodus ingeschakeld en de updateknop zichtbaar in de werkbalk.",
+    "edgeImageAlt": "De extensiepagina van Edge met de ontwikkelaarsmodus ingeschakeld en de updateknop zichtbaar.",
+    "screenshotNote": "Schermafbeelding van de Engelse browserinterface. Selecteer de afbeelding om deze te vergroten.",
+    "officialInstructions": "Officiële instructies",
+    "afterTitle": "Na het bijwerken",
+    "afterCopy": "Wacht tot de update klaar is en laad je YouTube-tabbladen opnieuw. Is de oude versie nog actief, sluit de browser dan volledig af en open deze opnieuw.",
+    "keepData": "Je hoeft de extensie niet te verwijderen. Bij het bijwerken blijven je instellingen en lokaal opgeslagen gegevens behouden.",
+    "noUpdateTitle": "Zie je nog steeds de oude versie?",
+    "noUpdateCopy": "Updates kunnen op verschillende momenten beschikbaar komen in de winkels van browsers. Een handmatige controle kan alleen een versie installeren die de winkel al aan je aanbiedt. Probeer het later opnieuw als de update nog niet beschikbaar is.",
+    "contactSupport": "Contact opnemen met ondersteuning"
+  },
   "supportPage": {
     "title": "Support en feedback",
     "description": "Kies hoe je contact opneemt met Chat Enhancer for YouTube voor bugmeldingen, ideeën voor functies en privévragen.",

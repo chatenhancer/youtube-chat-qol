@@ -310,6 +310,45 @@
     "email": "Email",
     "license": "Lisensi"
   },
+  "updatePage": {
+    "title": "Memperbarui ekstensi",
+    "description": "Dapatkan versi terbaru Chat Enhancer for YouTube di Chrome, Edge, Firefox, atau Safari di Mac.",
+    "automaticUpdateTitle": "Pembaruan manual bersifat opsional",
+    "automaticUpdateCopy": "Jika pembaruan otomatis aktif, browser atau App Store akan memasang pembaruan dengan sendirinya. Ikuti langkah di bawah jika ingin memeriksanya lebih cepat.",
+    "chooseBrowser": "Pilih browser Anda",
+    "chromeSteps": [
+      "Tempel alamat ini di kolom URL Chrome dan tekan Enter:",
+      "Aktifkan Mode developer di pojok kanan atas.",
+      "Klik Update di toolbar dan tunggu hingga pemeriksaan pembaruan selesai."
+    ],
+    "edgeSteps": [
+      "Tempel alamat ini di bilah alamat Edge dan tekan Enter:",
+      "Aktifkan Mode pengembang di bilah sisi. Jika bilah sisi tersembunyi, buka menu di kiri atas.",
+      "Klik Perbarui dan tunggu hingga pemeriksaan pembaruan selesai."
+    ],
+    "firefoxSteps": [
+      "Tempel alamat ini di bilah alamat Firefox, tekan Enter, lalu pilih Ekstensi:",
+      "Buka menu roda gigi di bagian atas panel Ekstensi.",
+      "Pilih Periksa Pembaruan dan instal pembaruan yang tersedia untuk Chat Enhancer for YouTube."
+    ],
+    "safariTitle": "Safari di Mac",
+    "safariSteps": [
+      "Buka App Store di Mac Anda.",
+      "Pilih Pembaruan di bilah sisi.",
+      "Klik Perbarui di samping Chat Enhancer for YouTube dan tunggu hingga selesai. Ekstensi Safari diperbarui melalui aplikasinya di App Store."
+    ],
+    "developerModeNote": "Jika Anda mengaktifkan mode pengembang hanya untuk pemeriksaan ini, Anda dapat menonaktifkannya kembali setelah selesai.",
+    "chromeImageAlt": "Halaman Ekstensi Chrome dengan mode developer aktif dan tombol Update terlihat di toolbar.",
+    "edgeImageAlt": "Halaman Ekstensi Edge dengan mode pengembang aktif dan tombol Perbarui terlihat.",
+    "screenshotNote": "Tangkapan layar antarmuka browser berbahasa Inggris. Pilih gambar untuk memperbesarnya.",
+    "officialInstructions": "Petunjuk resmi",
+    "afterTitle": "Setelah memperbarui",
+    "afterCopy": "Tunggu hingga pembaruan selesai, lalu muat ulang tab YouTube Anda. Jika versi lama masih berjalan, tutup browser sepenuhnya dan buka kembali.",
+    "keepData": "Anda tidak perlu menghapus ekstensi. Memperbarui instalasi yang ada akan mempertahankan pengaturan dan data yang disimpan secara lokal.",
+    "noUpdateTitle": "Masih melihat versi lama?",
+    "noUpdateCopy": "Pembaruan mungkin tersedia di toko setiap browser pada waktu yang berbeda. Pemeriksaan manual hanya dapat memasang versi yang sudah disediakan toko untuk Anda. Jika pembaruan belum tersedia, coba lagi nanti.",
+    "contactSupport": "Hubungi dukungan"
+  },
   "supportPage": {
     "title": "Dukungan dan masukan",
     "description": "Pilih cara menghubungi Chat Enhancer for YouTube untuk laporan bug, ide fitur, dan pertanyaan pribadi.",

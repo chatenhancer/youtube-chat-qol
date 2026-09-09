@@ -310,6 +310,45 @@
     "email": "E-posta",
     "license": "Lisans"
   },
+  "updatePage": {
+    "title": "Uzantıyı güncelleme",
+    "description": "Chrome, Edge, Firefox veya Mac’te Safari için Chat Enhancer for YouTube’un en son sürümünü edinin.",
+    "automaticUpdateTitle": "Elle güncellemek isteğe bağlıdır",
+    "automaticUpdateCopy": "Otomatik güncellemeler açıksa tarayıcınız veya App Store güncellemeleri kendiliğinden yükler. Daha erken kontrol etmek için aşağıdaki adımları izleyin.",
+    "chooseBrowser": "Tarayıcınızı seçin",
+    "chromeSteps": [
+      "Bu adresi Chrome’un adres çubuğuna yapıştırıp Enter’a basın:",
+      "Sağ üst köşedeki Geliştirici modu seçeneğini açın.",
+      "Araç çubuğundaki Güncelle düğmesine tıklayın ve güncelleme denetiminin bitmesini bekleyin."
+    ],
+    "edgeSteps": [
+      "Bu adresi Edge’in adres çubuğuna yapıştırıp Enter’a basın:",
+      "Kenar çubuğundaki Geliştirici modu seçeneğini açın. Kenar çubuğu gizliyse sol üstteki menüyü açın.",
+      "Güncelle düğmesine tıklayın ve güncelleme denetiminin bitmesini bekleyin."
+    ],
+    "firefoxSteps": [
+      "Bu adresi Firefox’un adres çubuğuna yapıştırın, Enter’a basın ve Uzantılar’ı seçin:",
+      "Uzantılar panelinin üst kısmındaki dişli menüsünü açın.",
+      "Güncellemeleri denetle seçeneğini seçin ve Chat Enhancer for YouTube için mevcut güncellemeleri yükleyin."
+    ],
+    "safariTitle": "Mac’te Safari",
+    "safariSteps": [
+      "Mac’inizde App Store’u açın.",
+      "Kenar çubuğundan Güncellemeler’i seçin.",
+      "Chat Enhancer for YouTube’un yanındaki Güncelle düğmesine tıklayın ve işlemin bitmesini bekleyin. Safari uzantıları App Store’daki uygulamaları üzerinden güncellenir."
+    ],
+    "developerModeNote": "Geliştirici modunu yalnızca bu işlem için açtıysanız denetimden sonra tekrar kapatabilirsiniz.",
+    "chromeImageAlt": "Geliştirici modu açık ve araç çubuğundaki Güncelle düğmesi görünür durumdayken Chrome’un Uzantılar sayfası.",
+    "edgeImageAlt": "Geliştirici modu açık ve Güncelle düğmesi görünür durumdayken Edge’in Uzantılar sayfası.",
+    "screenshotNote": "Tarayıcının İngilizce arayüzünün ekran görüntüsü. Büyütmek için görseli seçin.",
+    "officialInstructions": "Resmî talimatlar",
+    "afterTitle": "Güncellemeden sonra",
+    "afterCopy": "Güncellemenin bitmesini bekleyin, ardından YouTube sekmelerinizi yenileyin. Eski sürüm hâlâ çalışıyorsa tarayıcıdan tamamen çıkıp yeniden açın.",
+    "keepData": "Uzantıyı kaldırmanız gerekmez. Mevcut kurulumun güncellenmesi ayarlarınızı ve yerel olarak kaydedilen verilerinizi korur.",
+    "noUpdateTitle": "Hâlâ eski sürümü mü görüyorsunuz?",
+    "noUpdateCopy": "Güncellemeler her tarayıcının mağazasına farklı zamanlarda ulaşabilir. Elle denetim yalnızca mağazanın size sunduğu bir sürümü yükleyebilir. Güncelleme henüz sunulmuyorsa daha sonra tekrar deneyin.",
+    "contactSupport": "Destek ile iletişime geçin"
+  },
   "supportPage": {
     "title": "Destek ve geri bildirim",
     "description": "Hata bildirimleri, özellik fikirleri ve özel sorular için Chat Enhancer for YouTube ile nasıl iletişime geçeceğinizi seçin.",

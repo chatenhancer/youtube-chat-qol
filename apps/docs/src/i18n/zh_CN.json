@@ -310,6 +310,45 @@
     "email": "电子邮件",
     "license": "许可证"
   },
+  "updatePage": {
+    "title": "更新扩展程序",
+    "description": "在 Chrome、Edge、Firefox 或 Mac 上的 Safari 中获取最新版本的 Chat Enhancer for YouTube。",
+    "automaticUpdateTitle": "无需手动更新",
+    "automaticUpdateCopy": "只要开启了自动更新，浏览器或 App Store 就会自行安装更新。如果想更早检查，可以按照以下步骤操作。",
+    "chooseBrowser": "选择浏览器",
+    "chromeSteps": [
+      "将以下地址粘贴到 Chrome 地址栏，然后按 Enter：",
+      "打开右上角的“开发者模式”。",
+      "点击工具栏中的“更新”，然后等待更新检查完成。"
+    ],
+    "edgeSteps": [
+      "将以下地址粘贴到 Edge 地址栏，然后按 Enter：",
+      "打开侧边栏中的“开发人员模式”。如果侧边栏已隐藏，请打开左上角的菜单。",
+      "点击“更新”，然后等待更新检查完成。"
+    ],
+    "firefoxSteps": [
+      "将以下地址粘贴到 Firefox 地址栏，按 Enter，然后选择“扩展”：",
+      "打开扩展面板顶部的齿轮菜单。",
+      "选择“检查更新”，并安装 Chat Enhancer for YouTube 的可用更新。"
+    ],
+    "safariTitle": "Mac 上的 Safari",
+    "safariSteps": [
+      "在 Mac 上打开 App Store。",
+      "在侧边栏中选择“更新”。",
+      "点击 Chat Enhancer for YouTube 旁边的“更新”，然后等待完成。Safari 扩展通过其在 App Store 中的应用进行更新。"
+    ],
+    "developerModeNote": "如果只是为了此次检查而启用了开发者模式，检查结束后可以将其关闭。",
+    "chromeImageAlt": "Chrome 扩展程序页面，已开启开发者模式，工具栏中显示更新按钮。",
+    "edgeImageAlt": "Edge 扩展页面，已开启开发人员模式，并显示更新按钮。",
+    "screenshotNote": "截图使用浏览器的英文界面。选择图片可放大查看。",
+    "officialInstructions": "官方说明",
+    "afterTitle": "更新完成后",
+    "afterCopy": "等待更新完成，然后重新加载 YouTube 标签页。如果仍在运行旧版本，请完全退出浏览器后重新打开。",
+    "keepData": "无需卸载扩展程序。直接更新会保留你的设置和本地保存的数据。",
+    "noUpdateTitle": "仍然显示旧版本？",
+    "noUpdateCopy": "更新在不同浏览器商店中的上线时间可能不同。手动检查只能安装商店已向你提供的版本。如果更新尚未出现，请稍后重试。",
+    "contactSupport": "联系支持"
+  },
   "supportPage": {
     "title": "支持和反馈",
     "description": "选择如何联系 Chat Enhancer for YouTube，以报告错误、提出功能想法或咨询私密问题。",

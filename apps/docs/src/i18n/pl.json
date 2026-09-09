@@ -310,6 +310,45 @@
     "email": "E-mail",
     "license": "Licencja"
   },
+  "updatePage": {
+    "title": "Aktualizacja rozszerzenia",
+    "description": "Pobierz najnowszą wersję Chat Enhancer for YouTube w Chrome, Edge, Firefoksie lub Safari na Macu.",
+    "automaticUpdateTitle": "Ręczna aktualizacja jest opcjonalna",
+    "automaticUpdateCopy": "Jeśli automatyczne aktualizacje są włączone, przeglądarka lub App Store zainstaluje je samodzielnie. Wykonaj poniższe kroki, aby sprawdzić ich dostępność wcześniej.",
+    "chooseBrowser": "Wybierz przeglądarkę",
+    "chromeSteps": [
+      "Wklej ten adres w pasku adresu Chrome i naciśnij Enter:",
+      "Włącz tryb dewelopera w prawym górnym rogu.",
+      "Kliknij Aktualizuj na pasku narzędzi i poczekaj na zakończenie sprawdzania aktualizacji."
+    ],
+    "edgeSteps": [
+      "Wklej ten adres w pasku adresu Edge i naciśnij Enter:",
+      "Włącz tryb dewelopera na pasku bocznym. Jeśli pasek jest ukryty, otwórz menu w lewym górnym rogu.",
+      "Kliknij Aktualizuj i poczekaj na zakończenie sprawdzania aktualizacji."
+    ],
+    "firefoxSteps": [
+      "Wklej ten adres w pasku adresu Firefoksa, naciśnij Enter i wybierz Rozszerzenia:",
+      "Otwórz menu z ikoną koła zębatego u góry panelu rozszerzeń.",
+      "Wybierz Sprawdź dostępność aktualizacji i zainstaluj dostępne aktualizacje Chat Enhancer for YouTube."
+    ],
+    "safariTitle": "Safari na Macu",
+    "safariSteps": [
+      "Otwórz App Store na Macu.",
+      "Wybierz Uaktualnienia na pasku bocznym.",
+      "Kliknij Uaktualnij obok Chat Enhancer for YouTube i poczekaj na zakończenie. Rozszerzenia Safari są aktualizowane przez ich aplikacje w App Store."
+    ],
+    "developerModeNote": "Jeśli tryb dewelopera został włączony tylko w tym celu, możesz go wyłączyć po zakończeniu sprawdzania.",
+    "chromeImageAlt": "Strona rozszerzeń Chrome z włączonym trybem dewelopera i przyciskiem aktualizacji widocznym na pasku narzędzi.",
+    "edgeImageAlt": "Strona rozszerzeń Edge z włączonym trybem dewelopera i widocznym przyciskiem aktualizacji.",
+    "screenshotNote": "Zrzut ekranu angielskiego interfejsu przeglądarki. Wybierz obraz, aby go powiększyć.",
+    "officialInstructions": "Oficjalne instrukcje",
+    "afterTitle": "Po aktualizacji",
+    "afterCopy": "Poczekaj na zakończenie aktualizacji, a następnie odśwież karty YouTube. Jeśli stara wersja nadal działa, całkowicie zamknij przeglądarkę i otwórz ją ponownie.",
+    "keepData": "Nie musisz odinstalowywać rozszerzenia. Aktualizacja zachowuje ustawienia i dane zapisane lokalnie.",
+    "noUpdateTitle": "Nadal widzisz starą wersję?",
+    "noUpdateCopy": "Aktualizacje mogą pojawiać się w sklepach poszczególnych przeglądarek w różnym czasie. Ręczne sprawdzenie pozwala zainstalować tylko wersję już udostępnioną Ci przez sklep. Jeśli aktualizacja nie jest jeszcze dostępna, spróbuj później.",
+    "contactSupport": "Kontakt z pomocą techniczną"
+  },
   "supportPage": {
     "title": "Pomoc i opinie",
     "description": "Wybierz, jak skontaktować się z Chat Enhancer for YouTube w sprawie błędów, pomysłów na funkcje i prywatnych pytań.",
