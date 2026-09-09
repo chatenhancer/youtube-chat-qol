@@ -232,19 +232,19 @@ export const playgroundBountyHuntingRoundStartScenario: BrowserScenario = async 
     });
     expect(missFeedbackState).toMatchObject({
       darkTheme: {
-        backgroundColor: 'rgb(61, 50, 36)',
-        color: 'rgb(241, 241, 241)',
+        backgroundColor: 'rgb(91, 53, 40)',
+        color: 'rgb(255, 231, 196)',
         iconBackgroundColor: 'rgba(0, 0, 0, 0)',
         iconBorderRadius: '0px',
-        progressBackgroundColor: 'rgb(91, 69, 38)'
+        progressBackgroundColor: 'rgb(152, 81, 58)'
       },
       lightTheme: {
-        backgroundColor: 'rgb(248, 237, 207)',
+        backgroundColor: 'rgb(241, 219, 197)',
         borderStyle: 'none',
-        color: 'rgb(71, 48, 0)',
+        color: 'rgb(99, 46, 30)',
         iconBackgroundColor: 'rgba(0, 0, 0, 0)',
         iconBorderRadius: '0px',
-        progressBackgroundColor: 'rgb(241, 216, 157)'
+        progressBackgroundColor: 'rgb(221, 165, 129)'
       }
     });
     expect(missFeedbackState.iconAnimationName).toBe('none');
