@@ -22,7 +22,7 @@ import {
   type BookmarkRecord
 } from '../../shared/bookmarks';
 import { cleanText } from '../../shared/text';
-import { showToast } from '../../shared/toast';
+import { getToastAnchor, showToast, type ToastAnchor } from '../../shared/toast';
 import {
   getAuthorChannelId,
   getAuthorName,
@@ -87,7 +87,8 @@ export function getChatBookmarkTitle(message: HTMLElement): string {
 
 export async function toggleBookmark(
   message: BookmarkSourceMessage,
-  row: HTMLElement | null = null
+  row: HTMLElement | null = null,
+  toastAnchor?: ToastAnchor
 ): Promise<boolean | null> {
   await ensureBookmarksLoaded();
   const nextRecord = createBookmarkRecord(message);
@@ -116,13 +117,16 @@ export async function toggleBookmark(
 
   refreshBookmarkButtons();
   if (saved) highlightBookmarkedMessage(row);
-  showToast(t(saved ? 'savedToBookmarks' : 'removedFromBookmarks'));
+  showToast(t(saved ? 'savedToBookmarks' : 'removedFromBookmarks'), { anchor: toastAnchor });
   return saved;
 }
 
-export async function toggleChatBookmark(message: HTMLElement): Promise<boolean | null> {
+export async function toggleChatBookmark(
+  message: HTMLElement,
+  toastAnchor?: ToastAnchor
+): Promise<boolean | null> {
   const bookmarkable = await getBookmarkableMessage(message);
-  return bookmarkable ? toggleBookmark(bookmarkable, message) : null;
+  return bookmarkable ? toggleBookmark(bookmarkable, message, toastAnchor) : null;
 }
 
 export function createBookmarkToggleButton(
@@ -139,7 +143,11 @@ export function createBookmarkToggleButton(
         event.preventDefault();
         event.stopPropagation();
         const row = button.closest<HTMLElement>('.ytcq-profile-card-message, .ytcq-focus-message');
-        void toggleBookmark(message, row?.querySelector<HTMLElement>('.ytcq-focus-bubble') ?? row);
+        void toggleBookmark(
+          message,
+          row?.querySelector<HTMLElement>('.ytcq-focus-bubble') ?? row,
+          getToastAnchor(event)
+        );
       }}
     >
       {createBookmarkIcon()}

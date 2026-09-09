@@ -16,7 +16,7 @@ interface MenuActionItemOptions {
   iconPath: string;
   iconViewBox?: string;
   title?: string;
-  onClick: () => void;
+  onClick: (event: Event) => void;
 }
 
 interface PaperItemOptions {
@@ -39,7 +39,7 @@ export function createMenuActionItem({
   const handleActivation = (event: Event): void => {
     event.preventDefault();
     event.stopPropagation();
-    onClick();
+    onClick(event);
   };
   const item = el<HTMLDivElement>(
     <div

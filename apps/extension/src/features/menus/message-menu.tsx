@@ -16,6 +16,7 @@ import {
   QUOTE_ICON_PATH
 } from '../../shared/icons';
 import { jsx, el } from '../../shared/jsx-dom';
+import { getToastAnchor } from '../../shared/toast';
 import { getChatBookmarkTitle, isChatBookmarked, toggleChatBookmark } from '../bookmarks';
 import { replyToMessage } from '../reply';
 import { registerFeature, type FeatureMessageContext } from '../../content/dispatcher';
@@ -221,11 +222,11 @@ function appendMessageContextActions(list: Element, resolveMessage: ContextMessa
       title: saveTitle,
       iconPath: saved ? BOOKMARK_FILLED_ICON_PATH : BOOKMARK_ICON_PATH,
       iconViewBox: MATERIAL_ICON_VIEW_BOX,
-      onClick: () => {
+      onClick: (event) => {
         const target = resolveMessage();
         if (!target?.isConnected) return;
 
-        void toggleChatBookmark(target);
+        void toggleChatBookmark(target, getToastAnchor(event));
         closeMenu();
       }
     }),

@@ -158,7 +158,7 @@ describe('bookmarks', () => {
   });
 
   it.each(['ytcq-profile-card-message', 'ytcq-focus-message'])(
-    'highlights the message surface in %s when its bookmark button is clicked',
+    'shows nearby feedback and highlights the saved message in %s',
     async (className) => {
       const feature = await import('./index');
       feature.initBookmarks();
@@ -167,6 +167,7 @@ describe('bookmarks', () => {
       const row = document.createElement('div');
       row.className = className;
       const button = feature.createBookmarkToggleButton(bookmark('message-1'))!;
+      vi.spyOn(button, 'getBoundingClientRect').mockReturnValue(new DOMRect(40, 60, 24, 24));
       const isFocusMessage = className === 'ytcq-focus-message';
       const content = document.createElement('div');
       content.className = isFocusMessage
@@ -182,10 +183,13 @@ describe('bookmarks', () => {
       document.body.append(row);
       const highlightTarget = isFocusMessage ? content : row;
 
-      button.click();
+      button.dispatchEvent(new MouseEvent('click', { detail: 1, clientX: 45, clientY: 65 }));
       await vi.advanceTimersByTimeAsync(0);
       expect(button.getAttribute('aria-pressed')).toBe('true');
       expect(document.querySelector('.ytcq-bookmark-saved')).toBe(highlightTarget);
+      const toast = document.querySelector<HTMLElement>('.ytcq-toast')!;
+      expect(toast.style.left).toBe('61px');
+      expect(toast.style.top).toBe('81px');
 
       await vi.advanceTimersByTimeAsync(900);
       expect(document.querySelector('.ytcq-bookmark-saved')).toBeNull();
@@ -193,6 +197,8 @@ describe('bookmarks', () => {
       await vi.advanceTimersByTimeAsync(0);
       expect(button.getAttribute('aria-pressed')).toBe('false');
       expect(document.querySelector('.ytcq-bookmark-saved')).toBeNull();
+      expect(toast.style.left).toBe('68px');
+      expect(toast.style.top).toBe('100px');
     }
   );
 

@@ -98,13 +98,31 @@ describe('message context menu integration', () => {
     expect(items[1].querySelector('[data-ytcq-action="quote"]')?.getAttribute('aria-label')).toBe('Quote');
     expect(items[1].querySelector('[data-ytcq-action="mention"]')?.getAttribute('aria-label')).toBe('Mention');
 
-    items[0].click();
+    items[0].dispatchEvent(new MouseEvent('click', { detail: 1, clientX: 140, clientY: 80 }));
     items[1].querySelector<HTMLElement>('[data-ytcq-action="quote"]')!.click();
     items[1].querySelector<HTMLElement>('[data-ytcq-action="mention"]')!.click();
 
-    expect(bookmarkMocks.toggleChatBookmark).toHaveBeenCalledWith(message);
+    expect(bookmarkMocks.toggleChatBookmark).toHaveBeenCalledWith(message, { x: 140, y: 80 });
     expect(replyMocks.replyToMessage).toHaveBeenNthCalledWith(1, message, { quote: true });
     expect(replyMocks.replyToMessage).toHaveBeenNthCalledWith(2, message, { quote: false });
+  });
+
+  it('anchors keyboard bookmark feedback beside the activated menu item', () => {
+    const message = createChatMessage();
+    const menu = createContextMenu();
+    document.body.append(message, menu);
+    wireMessageContext(message);
+    message.querySelector<HTMLElement>('#menu')!.click();
+    enhanceMessageContextMenu(menu);
+    const saveAction = menu.querySelector<HTMLElement>('[data-ytcq-action="save-message"]')!;
+    vi.spyOn(saveAction, 'getBoundingClientRect').mockReturnValue(new DOMRect(40, 30, 200, 36));
+
+    saveAction.querySelector('.ytcq-paper-item')!.dispatchEvent(new KeyboardEvent('keydown', {
+      key: 'Enter',
+      bubbles: true
+    }));
+
+    expect(bookmarkMocks.toggleChatBookmark).toHaveBeenCalledWith(message, { x: 140, y: 66 });
   });
 
   it('supports keyboard activation on split reply actions', () => {
