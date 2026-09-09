@@ -1,4 +1,8 @@
 import { bookmarkPopupRenderingScenario } from '../../scenarios/bookmarks';
+import {
+  bookmarkReplayLinkScenario,
+  liteBookmarkReplayLinkScenario
+} from '../../scenarios/bookmarks-replay';
 import { delayedChatPanelNavigationScenario } from '../../scenarios/navigation';
 import { inboxStaysOpenOnWatchPageClickScenario } from '../../scenarios/inbox';
 import { nativeContinuationRendererScenario } from '../../scenarios/native-renderer';
@@ -19,6 +23,18 @@ const interceptedSendReason =
   'Requires a locally intercepted YouTube send response without posting a real message.';
 
 export const targetSpecificScenarios: readonly YouTubeScenario[] = [
+  {
+    title: 'bookmark link seeks to and highlights the saved replay message',
+    run: bookmarkReplayLinkScenario,
+    on: [target.replayLoggedIn],
+    reason: 'Requires a real replay, its message IDs, and a new watch tab opened from Bookmarks.'
+  },
+  {
+    title: 'bookmark link seeks to and highlights the saved replay message in Lite mode',
+    run: liteBookmarkReplayLinkScenario,
+    on: [target.replayLoggedIn],
+    reason: 'Requires a real replay, its message IDs, and a new watch tab opened from Bookmarks.'
+  },
   {
     title: 'popup fully renders saved messages and remembered rings',
     run: bookmarkPopupRenderingScenario,
