@@ -16,7 +16,7 @@
   --font-body: "Inter", sans-serif;
   --font-title: "Inter Display", "Inter", sans-serif;
   --font-playground: "Jersey 10", var(--font-title);
-  --header-scroll-offset: 67px;
+  --header-scroll-offset: 100px;
   --squircle-corner-shape: squircle;
   --squircle-radius-emphasis: 0.16em;
   --squircle-radius-inline-mark: 0.22em;
@@ -74,6 +74,7 @@
   }
 }
 
+.site-header,
 .language-switcher select,
 .title-emphasis,
 .site-nav::before,
@@ -237,15 +238,16 @@ img {
 .site-header {
   position: sticky;
   z-index: 20;
-  top: 0;
+  top: 12px;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
   gap: 24px;
-  padding: 16px 32px;
-  background: rgba(255, 255, 255, 0.9);
-  border-bottom: 1px solid var(--line);
-  backdrop-filter: blur(14px);
+  margin: 12px 16px;
+  padding: 16px 20px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--large-surface-corner-radius);
   transition: border-color 180ms ease, padding 180ms ease;
 }
 
@@ -265,7 +267,7 @@ img {
 }
 
 .site-header.site-header-top {
-  border-bottom-color: transparent;
+  border-color: transparent;
 }
 
 .site-header.site-header-top::after {
@@ -4770,8 +4772,6 @@ figcaption {
   .site-header {
     grid-template-columns: auto minmax(0, 1fr) auto;
     gap: 12px;
-    padding-right: 20px;
-    padding-left: 20px;
   }
 
   .brand span {
@@ -4921,13 +4921,13 @@ figcaption {
 
 @media (max-width: 640px) {
   :root {
-    --header-scroll-offset: 59px;
+    --header-scroll-offset: 88px;
   }
 
   .site-header {
     grid-template-columns: minmax(0, 1fr) auto;
     gap: 12px;
-    padding: 12px 18px;
+    padding: 12px;
   }
 
   .site-header-actions {
@@ -4983,7 +4983,7 @@ figcaption {
     position: absolute;
     z-index: 30;
     top: calc(100% + 10px);
-    right: 0;
+    inset-inline-end: 0;
     display: grid;
     gap: 10px;
     width: min(260px, calc(100vw - 36px));
