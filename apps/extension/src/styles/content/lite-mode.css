@@ -97,7 +97,7 @@
   column-gap: 16px;
   flex: 0 0 auto;
   margin: 0;
-  padding: 4px 48px 4px 24px;
+  padding: 4px 76px 4px 24px;
   color: var(--ytcq-lite-text, var(--yt-live-chat-primary-text-color, inherit));
   background: var(--ytcq-lite-row-background);
   cursor: pointer;
@@ -123,6 +123,11 @@
   display: inline-flex;
 }
 
+.ytcq-lite-message-menu > .ytcq-chat-bookmark-toggle {
+  opacity: 0;
+  pointer-events: none;
+}
+
 .ytcq-lite-message-menu-button {
   display: inline-flex;
   align-items: center;
@@ -145,6 +150,8 @@
 
 .ytcq-lite-message:hover .ytcq-lite-message-menu-button,
 .ytcq-lite-message:focus-within .ytcq-lite-message-menu-button,
+.ytcq-lite-message:hover .ytcq-chat-bookmark-toggle,
+.ytcq-lite-message:focus-within .ytcq-chat-bookmark-toggle,
 .ytcq-lite-message-menu-button[aria-expanded="true"] {
   opacity: 1;
   pointer-events: auto;
@@ -170,7 +177,8 @@
 }
 
 @media (hover: none) {
-  .ytcq-lite-message-menu-button {
+  .ytcq-lite-message-menu-button,
+  .ytcq-lite-message-menu > .ytcq-chat-bookmark-toggle {
     opacity: 0.72;
     pointer-events: auto;
   }

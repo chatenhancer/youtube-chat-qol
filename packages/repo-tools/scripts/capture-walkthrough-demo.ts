@@ -786,12 +786,15 @@ async function sectionBookmarks(page, chat, context, recorder) {
   await stabilizeDemoChatFeed(chat);
   await recorder.hold(180);
   await smoothScrollDemoChatToMessage(chat, 'bookmark', recorder);
-  const source = await openMessageMenuWithVisibleClick(page, chat, recorder, 'bookmark', {
-    cameraDurationMs: 980,
+  const source = await getDemoMessageSource(chat, 'bookmark', { center: false });
+  await focusMessageArea(page, chat, recorder, {
+    alignRight: true,
+    durationMs: 980,
     screenXRatio: 0.9
   });
-  const saveAction = source.menu.locator('.ytcq-context-item[data-ytcq-action="save-message"]').first();
-  await clickWithCursor(page, saveAction, recorder, 'Save action', {
+  await source.message.hover();
+  const saveAction = source.message.locator('.ytcq-chat-bookmark-toggle');
+  await clickWithCursor(page, saveAction, recorder, 'Bookmark action', {
     caption: {
       ...getWalkthroughClickCaption('addBookmark'),
       clickDelayMs: 2_500,
@@ -1958,7 +1961,7 @@ async function openMessageMenu(chat, messageKey = 'reply') {
     await centerLocatorInViewport(message);
     await message.hover({ timeout: 2_000 }).catch(() => undefined);
     const menuTargets = [
-      message.locator('#menu button').first(),
+      message.locator('#menu button:not(.ytcq-bookmark-toggle)').first(),
       message.locator('#menu yt-icon-button').first(),
       message.locator('#menu #button').first(),
       message.locator('#menu').first()
@@ -1998,7 +2001,7 @@ async function openMessageMenuWithVisibleClick(page, chat, recorder, messageKey,
     screenXRatio: options.screenXRatio
   });
   await source.message.hover({ timeout: 2_000 }).catch(() => undefined);
-  const menuButton = await getFirstVisibleLocator(source.message.locator('#menu button, #menu yt-icon-button, #menu #button'), 2_000);
+  const menuButton = await getFirstVisibleLocator(source.message.locator('#menu button:not(.ytcq-bookmark-toggle), #menu yt-icon-button, #menu #button'), 2_000);
   await clickWithCursor(
     page,
     menuButton,
@@ -2043,15 +2046,11 @@ async function ensureDemoNativeMenuRows(menu, translationDemo) {
     };
 
     list.querySelectorAll('.ytcq-demo-native-menu-item').forEach((row) => row.remove());
-    const saveItem = list.querySelector('.ytcq-context-item[data-ytcq-action="save-message"]');
-    const splitItem = list.querySelector('.ytcq-context-item[data-ytcq-action="reply-actions"]');
     const reportRow = makeNativeRow('report', demoTranslation.nativeReportLabel);
     const blockRow = makeNativeRow('block', demoTranslation.nativeBlockLabel);
 
     list.prepend(blockRow);
     list.prepend(reportRow);
-    if (saveItem) list.insertBefore(saveItem, splitItem || null);
-    if (splitItem) list.append(splitItem);
     element.style.height = 'auto';
     element.style.maxHeight = 'none';
   }, translationDemo);
@@ -3465,7 +3464,7 @@ async function installLiveChatMask(chat, translationDemo) {
       installFixtureStyles();
       const message = document.querySelector(`.ytcq-demo-message[data-ytcq-demo-key="${CSS.escape(messageKey)}"]`);
       if (!(message instanceof HTMLElement)) return false;
-      const menuButton = message.querySelector('#menu button, #menu');
+      const menuButton = message.querySelector('#menu button:not(.ytcq-bookmark-toggle)') || message.querySelector('#menu');
       if (!(menuButton instanceof HTMLElement)) return false;
 
       menuButton.dispatchEvent(new PointerEvent('pointerdown', {
@@ -3535,12 +3534,8 @@ async function installLiveChatMask(chat, translationDemo) {
         });
       };
       const orderRows = (list) => {
-        const saveItem = list.querySelector('.ytcq-context-item[data-ytcq-action="save-message"]');
-        const splitItem = list.querySelector('.ytcq-context-item[data-ytcq-action="reply-actions"]');
         const nativeRows = Array.from(list.querySelectorAll('.ytcq-demo-native-menu-item'));
         nativeRows.reverse().forEach((row) => list.prepend(row));
-        if (saveItem) list.insertBefore(saveItem, splitItem || null);
-        if (splitItem) list.append(splitItem);
       };
 
       shell.style.opacity = '0';

@@ -64,6 +64,7 @@ export function createLiveChatFixtureHtml({
       }
 
       yt-live-chat-text-message-renderer {
+        position: relative;
         align-items: flex-start;
         box-sizing: border-box;
         display: flex;
@@ -107,6 +108,12 @@ export function createLiveChatFixtureHtml({
 
       #menu {
         margin-left: auto;
+      }
+
+      yt-live-chat-text-message-renderer > #menu {
+        position: absolute;
+        top: 0;
+        right: 0;
       }
 
       #menu button {

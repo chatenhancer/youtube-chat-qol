@@ -61,7 +61,7 @@ describe('Lite chat renderer', () => {
     const menuButton = row.querySelector<HTMLButtonElement>('.ytcq-lite-message-menu-button')!;
     expect(menuButton.getAttribute('aria-haspopup')).toBe('menu');
     expect(menuButton.getAttribute('aria-expanded')).toBe('false');
-    expect(menuButton.getAttribute('aria-label')).toBe('Save message / Mention / Quote');
+    expect(menuButton.getAttribute('aria-label')).toBe('Mention / Quote');
     expect(menuButton.querySelector('svg')?.getAttribute('viewBox')).toBe(MATERIAL_ICON_VIEW_BOX);
     expect(menuButton.querySelector('path')?.getAttribute('d')).toBe(MORE_VERTICAL_ICON_PATH);
   });

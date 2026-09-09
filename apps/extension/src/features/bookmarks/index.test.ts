@@ -31,7 +31,9 @@ describe('bookmarks', () => {
     vi.resetModules();
   });
 
-  afterEach(() => {
+  afterEach(async () => {
+    const { clearToast } = await import('../../shared/toast');
+    clearToast();
     vi.restoreAllMocks();
     vi.useRealTimers();
   });
@@ -110,14 +112,14 @@ describe('bookmarks', () => {
     const second = feature.createBookmarkToggleButton(bookmark('message-2'))!;
     document.body.append(first, second);
     expect(first.classList.contains('ytcq-bookmark-toggle')).toBe(true);
-    expect(first.title).toBe('Save message');
+    expect(first.title).toBe('Bookmark');
     expect(first.querySelector('path')?.getAttribute('d')).toBe(BOOKMARK_ICON_PATH);
 
     await feature.toggleBookmark(bookmark('message-1'));
     expect(first.classList.contains('ytcq-bookmark-toggle-active')).toBe(true);
     expect(first.getAttribute('aria-pressed')).toBe('true');
     expect(first.title).toBe(
-      `Remove saved message\nBookmark added ${new Intl.DateTimeFormat('en', {
+      `Remove bookmark\nAdded ${new Intl.DateTimeFormat('en', {
         dateStyle: 'medium',
         timeStyle: 'short'
       }).format(savedAt)}`
@@ -125,6 +127,91 @@ describe('bookmarks', () => {
     expect(first.getAttribute('aria-label')).toBe(first.title);
     expect(first.querySelector('path')?.getAttribute('d')).toBe(BOOKMARK_FILLED_ICON_PATH);
     expect(second.classList.contains('ytcq-bookmark-toggle-active')).toBe(false);
+  });
+
+  it.each(['native', 'lite'])('saves and removes a %s feed message beside the dots without opening its menu', async (mode) => {
+    const feature = await import('./index');
+    const dispatcher = await import('../../content/dispatcher');
+    feature.initBookmarks();
+    await flushAsyncWork();
+    const message = createChatMessage('message-1', 'Save this message');
+    if (mode === 'lite') {
+      message.className = 'ytcq-lite-message';
+      message.dataset.messageId = 'message-1';
+    }
+    const menu = document.createElement('div');
+    menu.id = 'menu';
+    const dots = document.createElement('button');
+    const openMenu = vi.fn();
+    menu.append(dots);
+    menu.addEventListener('click', openMenu);
+    message.append(menu);
+    document.body.append(message);
+
+    dispatcher.handleFeatureMessage(message, { source: 'added' });
+    dispatcher.handleFeatureMessage(message, { source: 'changed' });
+    const save = menu.querySelector<HTMLButtonElement>('.ytcq-chat-bookmark-toggle')!;
+    expect(menu.querySelectorAll('.ytcq-chat-bookmark-toggle')).toHaveLength(1);
+    expect(save.nextElementSibling).toBe(dots);
+    expect(save.title).toBe('Bookmark');
+    expect(save.getAttribute('aria-pressed')).toBe('false');
+
+    save.click();
+    await flushAsyncWork();
+    expect(openMenu).not.toHaveBeenCalled();
+    expect(save.getAttribute('aria-pressed')).toBe('true');
+    expect(save.querySelector('path')?.getAttribute('d')).toBe(BOOKMARK_FILLED_ICON_PATH);
+    expect(save.title).toMatch(/^Remove bookmark\nAdded /);
+    expect(document.querySelector('.ytcq-toast')?.textContent).toBe('Saved to Bookmarks');
+    expect(message.classList.contains('ytcq-bookmark-saved')).toBe(true);
+    await expect(chrome.storage.local.get(BOOKMARKS_STORAGE_KEY)).resolves.toMatchObject({
+      [BOOKMARKS_STORAGE_KEY]: {
+        'message:stream-a:message-1': { message: { text: 'Save this message' } }
+      }
+    });
+
+    save.click();
+    await flushAsyncWork();
+    expect(save.getAttribute('aria-pressed')).toBe('false');
+    expect(save.querySelector('path')?.getAttribute('d')).toBe(BOOKMARK_ICON_PATH);
+    expect((await chrome.storage.local.get(BOOKMARKS_STORAGE_KEY))[BOOKMARKS_STORAGE_KEY]).toEqual({});
+    dots.click();
+    expect(openMenu).toHaveBeenCalledOnce();
+
+    feature.cleanupBookmarks();
+    expect(menu.children).toHaveLength(1);
+    expect(menu.firstElementChild).toBe(dots);
+    feature.initBookmarks();
+    dispatcher.handleFeatureMessage(message, { source: 'existing' });
+    expect(menu.querySelectorAll('.ytcq-chat-bookmark-toggle')).toHaveLength(1);
+  });
+
+  it('attaches Save when a menu arrives late and refreshes it for a reused message row', async () => {
+    const feature = await import('./index');
+    const dispatcher = await import('../../content/dispatcher');
+    feature.initBookmarks();
+    await feature.toggleBookmark(bookmark('message-1'));
+    const message = createChatMessage('message-1', 'Saved message');
+    document.body.append(message);
+    dispatcher.handleFeatureMessage(message, { source: 'added' });
+    expect(message.querySelector('.ytcq-chat-bookmark-toggle')).toBeNull();
+
+    const menu = document.createElement('div');
+    menu.id = 'menu';
+    message.append(menu);
+    dispatcher.handleFeatureMessage(message, { source: 'changed' });
+    expect(menu.querySelector('button')?.getAttribute('aria-pressed')).toBe('true');
+
+    message.id = 'message-2';
+    dispatcher.handleFeatureMessage(message, { source: 'changed' });
+    expect(menu.querySelectorAll('button')).toHaveLength(1);
+    expect(menu.querySelector('button')?.getAttribute('aria-pressed')).toBe('false');
+    menu.querySelector('button')!.click();
+    await flushAsyncWork();
+    expect(Object.keys((await chrome.storage.local.get(BOOKMARKS_STORAGE_KEY))[BOOKMARKS_STORAGE_KEY])).toEqual([
+      'message:stream-a:message-1',
+      'message:stream-a:message-2'
+    ]);
   });
 
   it('briefly highlights the saved chat row, but not removals or failed saves', async () => {
@@ -158,7 +245,7 @@ describe('bookmarks', () => {
   });
 
   it.each(['ytcq-profile-card-message', 'ytcq-focus-message'])(
-    'shows nearby feedback and highlights the saved message in %s',
+    'confirms saving and highlights the saved message in %s',
     async (className) => {
       const feature = await import('./index');
       feature.initBookmarks();
@@ -167,7 +254,6 @@ describe('bookmarks', () => {
       const row = document.createElement('div');
       row.className = className;
       const button = feature.createBookmarkToggleButton(bookmark('message-1'))!;
-      vi.spyOn(button, 'getBoundingClientRect').mockReturnValue(new DOMRect(40, 60, 24, 24));
       const isFocusMessage = className === 'ytcq-focus-message';
       const content = document.createElement('div');
       content.className = isFocusMessage
@@ -183,13 +269,12 @@ describe('bookmarks', () => {
       document.body.append(row);
       const highlightTarget = isFocusMessage ? content : row;
 
-      button.dispatchEvent(new MouseEvent('click', { detail: 1, clientX: 45, clientY: 65 }));
+      button.click();
       await vi.advanceTimersByTimeAsync(0);
       expect(button.getAttribute('aria-pressed')).toBe('true');
       expect(document.querySelector('.ytcq-bookmark-saved')).toBe(highlightTarget);
       const toast = document.querySelector<HTMLElement>('.ytcq-toast')!;
-      expect(toast.style.left).toBe('61px');
-      expect(toast.style.top).toBe('81px');
+      expect(toast.textContent).toBe('Saved to Bookmarks');
 
       await vi.advanceTimersByTimeAsync(900);
       expect(document.querySelector('.ytcq-bookmark-saved')).toBeNull();
@@ -197,8 +282,7 @@ describe('bookmarks', () => {
       await vi.advanceTimersByTimeAsync(0);
       expect(button.getAttribute('aria-pressed')).toBe('false');
       expect(document.querySelector('.ytcq-bookmark-saved')).toBeNull();
-      expect(toast.style.left).toBe('68px');
-      expect(toast.style.top).toBe('100px');
+      expect(toast.textContent).toBe('Removed from Bookmarks');
     }
   );
 

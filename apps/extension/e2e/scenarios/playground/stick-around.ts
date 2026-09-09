@@ -237,7 +237,7 @@ export const playgroundStickAroundComputerOverlayScenario: BrowserScenario = asy
     });
     await expect.poll(() => isChatScrolledToBottom(chat)).toBe(true);
 
-    const messageMenuButton = chat.locator('yt-live-chat-text-message-renderer #menu button').first();
+    const messageMenuButton = chat.locator('yt-live-chat-text-message-renderer #menu button:not(.ytcq-bookmark-toggle)').first();
     const box = await messageMenuButton.boundingBox();
     if (!box) throw new Error('Expected a visible message menu button under the Stick Around overlay.');
     await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);

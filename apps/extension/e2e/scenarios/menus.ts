@@ -131,10 +131,8 @@ export async function expectSettingsMenuControlsInjected(menu: Locator): Promise
 }
 
 export async function expectMessageMenuActionsInjected(menu: Locator): Promise<void> {
-  await test.step('Verify Save action is injected', async () => {
-    const saveAction = menu.locator('.ytcq-context-item[data-ytcq-action="save-message"]').first();
-    await expect(saveAction).toBeVisible();
-    await expect(saveAction.locator('.ytcq-menu-label')).toHaveText(/^(Save|Remove)$/);
+  await test.step('Verify Save is absent from the message menu', async () => {
+    await expect(menu.locator('[data-ytcq-action="save-message"]')).toHaveCount(0);
   });
 
   await test.step('Verify split Quote and Mention actions are injected', async () => {

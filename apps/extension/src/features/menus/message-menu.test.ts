@@ -4,16 +4,8 @@ const replyMocks = vi.hoisted(() => ({
   replyToMessage: vi.fn()
 }));
 
-const bookmarkMocks = vi.hoisted(() => ({
-  getChatBookmarkTitle: vi.fn(() => 'Save message'),
-  isChatBookmarked: vi.fn(() => false),
-  toggleChatBookmark: vi.fn()
-}));
-
 vi.mock('../reply', () => replyMocks);
-vi.mock('../bookmarks', () => bookmarkMocks);
 
-import { BOOKMARK_FILLED_ICON_PATH, BOOKMARK_ICON_PATH, MATERIAL_ICON_VIEW_BOX } from '../../shared/icons';
 import {
   dispatchYouTubeChatContextMenuResult,
   parseYouTubeChatContextMenuRequest,
@@ -31,9 +23,6 @@ describe('message context menu integration', () => {
   beforeEach(() => {
     document.body.replaceChildren();
     replyMocks.replyToMessage.mockClear();
-    bookmarkMocks.getChatBookmarkTitle.mockReturnValue('Save message');
-    bookmarkMocks.isChatBookmarked.mockReturnValue(false);
-    bookmarkMocks.toggleChatBookmark.mockClear();
     vi.spyOn(Date, 'now').mockReturnValue(1_000);
   });
 
@@ -74,7 +63,7 @@ describe('message context menu integration', () => {
     expect(isRecentActiveContextMessage()).toBe(true);
   });
 
-  it('injects save plus split quote and mention actions that target the active message', () => {
+  it('keeps Save out of the menu and injects split reply actions for the active message', () => {
     const message = createChatMessage();
     const menu = createContextMenu();
     document.body.append(message, menu);
@@ -84,45 +73,21 @@ describe('message context menu integration', () => {
     enhanceMessageContextMenu(menu);
     const items = menu.querySelectorAll<HTMLElement>('.ytcq-context-item');
 
-    expect(items).toHaveLength(2);
-    expect(items[0].getAttribute('data-ytcq-action')).toBe('save-message');
-    expect(items[0].querySelector('.ytcq-menu-label')?.textContent).toBe('Save');
-    expect(items[0].title).toBe('Save message');
-    expect(items[0].querySelector('svg')?.getAttribute('viewBox')).toBe(MATERIAL_ICON_VIEW_BOX);
-    expect(items[0].querySelector('path')?.getAttribute('d')).toBe(BOOKMARK_ICON_PATH);
-    expect(items[1].getAttribute('data-ytcq-action')).toBe('reply-actions');
-    expect(items[1].querySelector('.ytcq-context-split-row')?.getAttribute('aria-label')).toBe('Mention / Quote');
-    expect([...items[1].querySelectorAll<HTMLElement>('.ytcq-context-split-button')].map((button) => {
+    expect(items).toHaveLength(1);
+    expect(menu.querySelector('[data-ytcq-action="save-message"]')).toBeNull();
+    expect(items[0].getAttribute('data-ytcq-action')).toBe('reply-actions');
+    expect(items[0].querySelector('.ytcq-context-split-row')?.getAttribute('aria-label')).toBe('Mention / Quote');
+    expect([...items[0].querySelectorAll<HTMLElement>('.ytcq-context-split-button')].map((button) => {
       return button.getAttribute('data-ytcq-action');
     })).toEqual(['mention', 'quote']);
-    expect(items[1].querySelector('[data-ytcq-action="quote"]')?.getAttribute('aria-label')).toBe('Quote');
-    expect(items[1].querySelector('[data-ytcq-action="mention"]')?.getAttribute('aria-label')).toBe('Mention');
+    expect(items[0].querySelector('[data-ytcq-action="quote"]')?.getAttribute('aria-label')).toBe('Quote');
+    expect(items[0].querySelector('[data-ytcq-action="mention"]')?.getAttribute('aria-label')).toBe('Mention');
 
-    items[0].dispatchEvent(new MouseEvent('click', { detail: 1, clientX: 140, clientY: 80 }));
-    items[1].querySelector<HTMLElement>('[data-ytcq-action="quote"]')!.click();
-    items[1].querySelector<HTMLElement>('[data-ytcq-action="mention"]')!.click();
+    items[0].querySelector<HTMLElement>('[data-ytcq-action="quote"]')!.click();
+    items[0].querySelector<HTMLElement>('[data-ytcq-action="mention"]')!.click();
 
-    expect(bookmarkMocks.toggleChatBookmark).toHaveBeenCalledWith(message, { x: 140, y: 80 });
     expect(replyMocks.replyToMessage).toHaveBeenNthCalledWith(1, message, { quote: true });
     expect(replyMocks.replyToMessage).toHaveBeenNthCalledWith(2, message, { quote: false });
-  });
-
-  it('anchors keyboard bookmark feedback beside the activated menu item', () => {
-    const message = createChatMessage();
-    const menu = createContextMenu();
-    document.body.append(message, menu);
-    wireMessageContext(message);
-    message.querySelector<HTMLElement>('#menu')!.click();
-    enhanceMessageContextMenu(menu);
-    const saveAction = menu.querySelector<HTMLElement>('[data-ytcq-action="save-message"]')!;
-    vi.spyOn(saveAction, 'getBoundingClientRect').mockReturnValue(new DOMRect(40, 30, 200, 36));
-
-    saveAction.querySelector('.ytcq-paper-item')!.dispatchEvent(new KeyboardEvent('keydown', {
-      key: 'Enter',
-      bubbles: true
-    }));
-
-    expect(bookmarkMocks.toggleChatBookmark).toHaveBeenCalledWith(message, { x: 140, y: 66 });
   });
 
   it('supports keyboard activation on split reply actions', () => {
@@ -254,32 +219,6 @@ describe('message context menu integration', () => {
     expect(message.querySelector('button')?.getAttribute('aria-expanded')).toBe('false');
   });
 
-  it('does not toggle bookmarks when no active connected message is available', () => {
-    const menu = createContextMenu();
-    document.body.append(menu);
-
-    enhanceMessageContextMenu(menu);
-    menu.querySelector<HTMLElement>('[data-ytcq-action="save-message"]')!.click();
-
-    expect(bookmarkMocks.toggleChatBookmark).not.toHaveBeenCalled();
-  });
-
-  it('shows the remove label when the active message is already saved', () => {
-    bookmarkMocks.isChatBookmarked.mockReturnValue(true);
-    bookmarkMocks.getChatBookmarkTitle.mockReturnValue('Remove saved message');
-    const message = createChatMessage();
-    const menu = createContextMenu();
-    document.body.append(message, menu);
-    wireMessageContext(message);
-    message.querySelector<HTMLElement>('#menu')!.click();
-
-    enhanceMessageContextMenu(menu);
-
-    expect(menu.querySelector('[data-ytcq-action="save-message"] .ytcq-menu-label')?.textContent).toBe('Remove');
-    expect(menu.querySelector<HTMLElement>('[data-ytcq-action="save-message"]')?.title).toBe('Remove saved message');
-    expect(menu.querySelector('[data-ytcq-action="save-message"] path')?.getAttribute('d')).toBe(BOOKMARK_FILLED_ICON_PATH);
-  });
-
   it('does not duplicate injected menu items and removes stale wiring on cleanup', () => {
     const message = createChatMessage();
     const menu = createContextMenu();
@@ -289,7 +228,7 @@ describe('message context menu integration', () => {
 
     enhanceMessageContextMenu(menu);
     enhanceMessageContextMenu(menu);
-    expect(menu.querySelectorAll('.ytcq-context-item')).toHaveLength(2);
+    expect(menu.querySelectorAll('.ytcq-context-item')).toHaveLength(1);
 
     cleanupStaleMessageMenuSurfaces();
 

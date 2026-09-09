@@ -1,5 +1,5 @@
 import { attachScenario } from '../../scenarios/attach';
-import { bookmarkMessageMenuScenario } from '../../scenarios/bookmarks';
+import { bookmarkMessageButtonScenario } from '../../scenarios/bookmarks';
 import {
   chatCommandAutocompleteScenario,
   chatCommandsExpandAndApplySettingsScenario
@@ -61,13 +61,13 @@ export const chatScenarios: readonly YouTubeScenario[] = [
     reason: 'Requires deterministic overlapping panel and menu geometry.'
   },
   {
-    title: 'message context menu receives save, quote, and mention actions',
+    title: 'message context menu receives quote and mention actions without Save',
     run: messageMenuScenario,
     on: pair.replayLoggedIn
   },
   {
     title: 'saved message persists and appears in Bookmarks',
-    run: bookmarkMessageMenuScenario,
+    run: bookmarkMessageButtonScenario,
     on: menuSurfaces
   },
   {

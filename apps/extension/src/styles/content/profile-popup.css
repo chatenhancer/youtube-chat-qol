@@ -685,6 +685,47 @@ button.ytcq-inbox-avatar:focus .ytcq-inbox-avatar-open-icon {
   pointer-events: none;
 }
 
+/* Native menus overlay the row, so leave room for both controls before text wraps. */
+:is(yt-live-chat-text-message-renderer, yt-live-chat-membership-item-renderer):has(
+  > #menu > .ytcq-chat-bookmark-toggle
+) {
+  padding-right: 64px !important;
+}
+
+#menu:has(> .ytcq-chat-bookmark-toggle) {
+  display: inline-flex;
+  align-items: flex-start;
+}
+
+#menu > .ytcq-chat-bookmark-toggle {
+  flex: 0 0 28px;
+  color: inherit;
+}
+
+#menu > .ytcq-chat-bookmark-toggle::before {
+  inset: 0;
+  background: transparent;
+}
+
+#menu > .ytcq-chat-bookmark-toggle:hover::before,
+#menu > .ytcq-chat-bookmark-toggle:focus-visible::before {
+  background: var(--yt-spec-touch-response, rgba(128, 128, 128, 0.16));
+}
+
+#menu > .ytcq-chat-bookmark-toggle:focus-visible {
+  outline: 2px solid var(--yt-spec-call-to-action, #065fd4);
+  outline-offset: -2px;
+}
+
+#menu > .ytcq-chat-bookmark-toggle.ytcq-bookmark-toggle-active {
+  color: var(--yt-spec-call-to-action, #3ea6ff);
+}
+
+#menu > .ytcq-chat-bookmark-toggle svg {
+  width: 20px;
+  height: 20px;
+}
+
 .ytcq-bookmark-saved {
   position: relative;
 }

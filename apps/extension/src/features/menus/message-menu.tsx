@@ -8,23 +8,19 @@
 import { CHAT_MESSAGE_SELECTOR } from '../../youtube/selectors';
 import { t } from '../../shared/i18n';
 import {
-  BOOKMARK_FILLED_ICON_PATH,
-  BOOKMARK_ICON_PATH,
   createSvgIcon,
   MATERIAL_ICON_VIEW_BOX,
   MENTION_ICON_PATH,
   QUOTE_ICON_PATH
 } from '../../shared/icons';
 import { jsx, el } from '../../shared/jsx-dom';
-import { getToastAnchor } from '../../shared/toast';
-import { getChatBookmarkTitle, isChatBookmarked, toggleChatBookmark } from '../bookmarks';
 import { replyToMessage } from '../reply';
 import { registerFeature, type FeatureMessageContext } from '../../content/dispatcher';
 import {
   requestYouTubeChatContextMenu,
   type YouTubeChatContextMenuStatus
 } from '../../youtube/chat-feed/context-menu';
-import { closeMenu, createMenuActionItem } from './common';
+import { closeMenu } from './common';
 
 let activeContextMessage: HTMLElement | null = null;
 let activeContextMessageSnapshot: HTMLElement | null = null;
@@ -167,7 +163,7 @@ export function enhanceMessageContextMenu(menu: HTMLElement): void {
     return;
   }
 
-  appendMessageContextActions(list, resolveActiveContextMessage);
+  list.append(createReplyActionSplitItem(resolveActiveContextMessage));
   clampContextMenuVertically(menu);
 }
 
@@ -206,32 +202,6 @@ function resolveActiveContextMessage(): HTMLElement | null {
     : activeContextMessageSnapshot?.isConnected
       ? activeContextMessageSnapshot
       : null;
-}
-
-function appendMessageContextActions(list: Element, resolveMessage: ContextMessageResolver): void {
-  const message = resolveMessage();
-  const saved = Boolean(message && isChatBookmarked(message));
-  const saveLabel = saved ? t('remove') : t('save');
-  const saveTitle = message ? getChatBookmarkTitle(message) : t('saveMessage');
-
-  list.append(
-    createMenuActionItem({
-      className: 'ytcq-context-item',
-      action: 'save-message',
-      label: saveLabel,
-      title: saveTitle,
-      iconPath: saved ? BOOKMARK_FILLED_ICON_PATH : BOOKMARK_ICON_PATH,
-      iconViewBox: MATERIAL_ICON_VIEW_BOX,
-      onClick: (event) => {
-        const target = resolveMessage();
-        if (!target?.isConnected) return;
-
-        void toggleChatBookmark(target, getToastAnchor(event));
-        closeMenu();
-      }
-    }),
-    createReplyActionSplitItem(resolveMessage)
-  );
 }
 
 function createReplyActionSplitItem(resolveMessage: ContextMessageResolver): HTMLElement {

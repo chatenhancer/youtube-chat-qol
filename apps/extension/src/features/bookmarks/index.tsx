@@ -22,7 +22,7 @@ import {
   type BookmarkRecord
 } from '../../shared/bookmarks';
 import { cleanText } from '../../shared/text';
-import { getToastAnchor, showToast, type ToastAnchor } from '../../shared/toast';
+import { showToast } from '../../shared/toast';
 import {
   getAuthorChannelId,
   getAuthorName,
@@ -56,7 +56,10 @@ registerFeature({
     init: initBookmarks,
     cleanup: cleanupBookmarks
   },
-  message: handleBookmarkTargetMessage
+  message: (message, context) => {
+    wireChatBookmarkButton(message);
+    handleBookmarkTargetMessage(message, context);
+  }
 });
 
 export function initBookmarks(): void {
@@ -81,14 +84,9 @@ export function isChatBookmarked(message: HTMLElement): boolean {
   return bookmarks.has(getCurrentBookmarkKey(getMessageStableId(message)));
 }
 
-export function getChatBookmarkTitle(message: HTMLElement): string {
-  return isChatBookmarked(message) ? t('removeSavedMessage') : t('saveMessage');
-}
-
 export async function toggleBookmark(
   message: BookmarkSourceMessage,
-  row: HTMLElement | null = null,
-  toastAnchor?: ToastAnchor
+  row: HTMLElement | null = null
 ): Promise<boolean | null> {
   await ensureBookmarksLoaded();
   const nextRecord = createBookmarkRecord(message);
@@ -117,22 +115,21 @@ export async function toggleBookmark(
 
   refreshBookmarkButtons();
   if (saved) highlightBookmarkedMessage(row);
-  showToast(t(saved ? 'savedToBookmarks' : 'removedFromBookmarks'), { anchor: toastAnchor });
+  showToast(t(saved ? 'savedToBookmarks' : 'removedFromBookmarks'));
   return saved;
 }
 
-export async function toggleChatBookmark(
-  message: HTMLElement,
-  toastAnchor?: ToastAnchor
-): Promise<boolean | null> {
+export async function toggleChatBookmark(message: HTMLElement): Promise<boolean | null> {
   const bookmarkable = await getBookmarkableMessage(message);
-  return bookmarkable ? toggleBookmark(bookmarkable, message, toastAnchor) : null;
+  return bookmarkable ? toggleBookmark(bookmarkable, message) : null;
 }
 
 export function createBookmarkToggleButton(
-  message: BookmarkSourceMessage
+  message: BookmarkSourceMessage | HTMLElement
 ): HTMLButtonElement | null {
-  const bookmarkKey = getCurrentBookmarkKey(message.messageId);
+  const bookmarkKey = getCurrentBookmarkKey(
+    message instanceof HTMLElement ? getMessageStableId(message) : message.messageId
+  );
   if (!bookmarkKey) return null;
 
   const button = el<HTMLButtonElement>(
@@ -142,12 +139,12 @@ export function createBookmarkToggleButton(
       onClick={(event: MouseEvent) => {
         event.preventDefault();
         event.stopPropagation();
+        if (message instanceof HTMLElement) {
+          void toggleChatBookmark(message);
+          return;
+        }
         const row = button.closest<HTMLElement>('.ytcq-profile-card-message, .ytcq-focus-message');
-        void toggleBookmark(
-          message,
-          row?.querySelector<HTMLElement>('.ytcq-focus-bubble') ?? row,
-          getToastAnchor(event)
-        );
+        void toggleBookmark(message, row?.querySelector<HTMLElement>('.ytcq-focus-bubble') ?? row);
       }}
     >
       {createBookmarkIcon()}
@@ -161,7 +158,24 @@ export function createBookmarkToggleButton(
 export function cleanupBookmarks(): void {
   pendingTargetMessageId = '';
   clearBookmarkHighlights();
+  document.querySelectorAll('.ytcq-chat-bookmark-toggle').forEach((button) => button.remove());
   chrome.storage.onChanged.removeListener(handleBookmarksStorageChange);
+}
+
+function wireChatBookmarkButton(message: HTMLElement): void {
+  const menu = message.querySelector<HTMLElement>('[id="menu"]');
+  if (!menu) return;
+
+  const existing = menu.querySelector<HTMLButtonElement>('.ytcq-chat-bookmark-toggle');
+  if (existing?.dataset.ytcqBookmarkKey === getCurrentBookmarkKey(getMessageStableId(message))) {
+    return;
+  }
+  existing?.remove();
+
+  const button = createBookmarkToggleButton(message);
+  if (!button) return;
+  button.classList.add('ytcq-chat-bookmark-toggle');
+  menu.prepend(button);
 }
 
 function highlightBookmarkedMessage(row: HTMLElement | null): void {

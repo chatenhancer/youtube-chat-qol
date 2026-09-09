@@ -1071,7 +1071,7 @@ export function renderLiteChatMessageRow(row: HTMLElement, record: YouTubeChatMe
         class="ytcq-lite-message-menu-button"
         aria-haspopup="menu"
         aria-expanded="false"
-        aria-label={`${t('saveMessage')} / ${t('mention')} / ${t('quote')}`}
+        aria-label={`${t('mention')} / ${t('quote')}`}
       >
         {createSvgIcon(MATERIAL_ICON_VIEW_BOX, MORE_VERTICAL_ICON_PATH)}
       </button>

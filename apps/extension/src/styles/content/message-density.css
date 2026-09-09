@@ -6,7 +6,7 @@
   --ytcq-density-avatar-gap: 8px;
   --ytcq-density-avatar-size: 20px;
   --ytcq-density-content-offset: 2px;
-  --ytcq-density-feed-end-padding: 40px;
+  --ytcq-density-feed-end-padding: 68px;
   --ytcq-density-feed-inline-padding: 12px;
   --ytcq-density-items-block-padding: 4px;
   --ytcq-density-menu-top: -2px;
@@ -61,6 +61,14 @@
   padding-top: var(--ytcq-density-content-offset) !important;
 }
 
+/* Align YouTube's 32px control with the adjacent 28px bookmark. */
+:root[data-ytcq-message-density="compact"] :where(
+  yt-live-chat-text-message-renderer,
+  yt-live-chat-membership-item-renderer
+) > #menu:has(> .ytcq-chat-bookmark-toggle) > #menu-button {
+  top: var(--ytcq-density-menu-top);
+}
+
 :root[data-ytcq-message-density="compact"] .ytcq-lite-items {
   padding-block: var(--ytcq-density-items-block-padding);
 }
@@ -74,7 +82,7 @@
 }
 
 :root[data-ytcq-message-density="compact"] .ytcq-lite-message-menu {
-  top: var(--ytcq-density-menu-top);
+  top: 0;
 }
 
 :root[data-ytcq-message-density="compact"] :where(

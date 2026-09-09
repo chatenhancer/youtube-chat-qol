@@ -1,10 +1,12 @@
 /** Browser scenario for Lite mode's YouTube-backed message action menu. */
 import { expect, test } from '@playwright/test';
+import { BOOKMARKS_STORAGE_KEY } from '../../../src/shared/bookmarks';
 import {
   setExtensionStorageValues,
   withExtensionStorageValues
 } from '../../support/extension-storage';
 import type { BrowserScenario } from '../types';
+import { expectBookmarkToastAtBottom, expectFeedBookmarkLayout } from '../bookmarks';
 import { clearLiteTestCooldown, expectStoredLiteMode } from './assertions';
 import {
   LITE_BUTTON_SELECTOR,
@@ -26,7 +28,7 @@ export const liteModeMessageActionsScenario: BrowserScenario = async ({
       const targetMessageId = await controlledChat?.injectMessage({
         author: '@MenuFixture',
         channel: 'UCYtcqLiteMessageActions',
-        text: 'Open the Lite message actions'
+        text: 'Open the Lite message actions beside a long message that wraps across several lines without covering the bookmark or menu buttons.'.repeat(2)
       });
       await expect(chat.locator(NATIVE_MESSAGE_SELECTOR).first()).toBeVisible({ timeout: 30_000 });
       await expect(button).toBeVisible({ timeout: 20_000 });
@@ -40,6 +42,8 @@ export const liteModeMessageActionsScenario: BrowserScenario = async ({
           ? root.locator(`[data-message-id=${JSON.stringify(targetMessageId)}]`).first()
           : root.locator('.ytcq-lite-message-text').last();
         await expect(targetRow).toBeVisible({ timeout: 30_000 });
+        // Stop following new traffic while interacting with this retained message.
+        await root.locator('.ytcq-lite-scroller').press('ArrowUp');
         await targetRow.evaluate(
           (row, attribute) => row.setAttribute(attribute, ''),
           targetAttribute
@@ -49,7 +53,7 @@ export const liteModeMessageActionsScenario: BrowserScenario = async ({
         const menu = chat
           .locator('ytd-menu-popup-renderer')
           .filter({
-            has: chat.locator('.ytcq-context-item[data-ytcq-action="save-message"]')
+            has: chat.locator('.ytcq-context-item[data-ytcq-action="reply-actions"]')
           })
           .last();
         try {
@@ -60,13 +64,13 @@ export const liteModeMessageActionsScenario: BrowserScenario = async ({
 
           await row.locator('#message').click();
           await expect(menu).toBeVisible();
-          await menu.locator('[data-ytcq-action="save-message"] .ytcq-paper-item').press('Escape');
+          await menu.locator('[data-ytcq-action="mention"]').press('Escape');
           await expect(menu).toBeHidden();
 
           await actionButton.press('Enter');
           await expect(menu).toBeVisible();
           await expect(actionButton).toHaveAttribute('aria-expanded', 'true');
-          await expect(menu.locator('[data-ytcq-action="save-message"]')).toBeVisible();
+          await expect(menu.locator('[data-ytcq-action="save-message"]')).toHaveCount(0);
           await expect(menu.locator('[data-ytcq-action="mention"]')).toBeVisible();
           await expect(menu.locator('[data-ytcq-action="quote"]')).toBeVisible();
           const bounds = await menu.evaluate((element) => {
@@ -81,9 +85,25 @@ export const liteModeMessageActionsScenario: BrowserScenario = async ({
           });
           expect(bounds.inside).toBe(true);
 
-          await menu.locator('[data-ytcq-action="save-message"] .ytcq-paper-item').press('Escape');
+          await menu.locator('[data-ytcq-action="mention"]').press('Escape');
           await expect(menu).toBeHidden();
           await expect(actionButton).toHaveAttribute('aria-expanded', 'false');
+
+          await withExtensionStorageValues(context, 'local', { [BOOKMARKS_STORAGE_KEY]: {} }, async () => {
+            const save = row.locator('#menu > .ytcq-chat-bookmark-toggle');
+            await row.hover();
+            await expect(save).toHaveAttribute('aria-pressed', 'false');
+            await expectFeedBookmarkLayout(row);
+            await save.click();
+            await expect(save).toHaveAttribute('aria-pressed', 'true');
+            await expect(save).toHaveAttribute('title', /Remove bookmark\nAdded /);
+            await expectBookmarkToastAtBottom(chat);
+            await expect(menu).toBeHidden();
+            await expect(actionButton).toHaveAttribute('aria-expanded', 'false');
+            await save.press('Space');
+            await expect(save).toHaveAttribute('aria-pressed', 'false');
+            await expect(menu).toBeHidden();
+          });
         } finally {
           await row
             .evaluate((element, attribute) => {

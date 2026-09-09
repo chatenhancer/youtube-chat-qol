@@ -87,7 +87,7 @@ export async function openMessageMenu(chat: ChatSurface): Promise<OpenedMessageM
       }
 
       await message.hover({ timeout: 2_000 }).catch(() => undefined);
-      const menuButton = message.locator('#menu button').first();
+      const menuButton = message.locator('#menu button:not(.ytcq-bookmark-toggle)').first();
       if (!await menuButton.isVisible({ timeout: 500 }).catch(() => false)) {
         await releaseMessageTarget(message);
         continue;

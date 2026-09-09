@@ -17,14 +17,6 @@
   pointer-events: none;
 }
 
-.ytcq-toast-anchored {
-  bottom: auto;
-  transform: none;
-  box-sizing: border-box;
-  width: max-content;
-  overflow-wrap: anywhere;
-}
-
 .ytcq-toast[data-tone="error"] {
   background:
     linear-gradient(rgba(255, 112, 102, 0.18), rgba(255, 112, 102, 0.18)),

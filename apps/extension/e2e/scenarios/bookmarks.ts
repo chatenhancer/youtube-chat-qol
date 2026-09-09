@@ -1,7 +1,7 @@
 /**
  * Browser scenario for saving chat message bookmarks.
  *
- * Covers Save in YouTube's message menu, the rich message row in the popup,
+ * Covers Save beside YouTube's message menu, the rich message row in the popup,
  * and removing the bookmark again.
  */
 import { expect, test, type BrowserContext, type Locator, type Page } from '@playwright/test';
@@ -12,7 +12,7 @@ import {
   getExtensionStorageValues,
   withExtensionStorageValues
 } from '../support/extension-storage';
-import { openMessageMenu, type OpenedMessageMenu } from '../support/menu-openers';
+import { closeOpenMenus, openMessageMenu, type OpenedMessageMenu } from '../support/menu-openers';
 import { isMockPageSurface } from '../support/mock-page';
 import { getRichVisibleText } from '../support/text';
 import { expectMessageMenuActionsInjected } from './menus';
@@ -37,7 +37,7 @@ const LONG_BOOKMARK_MESSAGE = [
   'The final portion must remain readable without clipping or truncation.'
 ].join(' ');
 
-export const bookmarkMessageMenuScenario: BrowserScenario = async ({ chat, context }) => {
+export const bookmarkMessageButtonScenario: BrowserScenario = async ({ chat, context, controlledChat }) => {
   await withExtensionStorageValues(
     context,
     'local',
@@ -46,8 +46,12 @@ export const bookmarkMessageMenuScenario: BrowserScenario = async ({ chat, conte
     },
     async () => {
       await expectBookmarkCount(context, 0);
+      await controlledChat?.injectMessage({
+        author: '@BookmarkFixture',
+        text: 'Save this longer chat message with enough text to wrap across several lines without covering the bookmark or menu icons.'.repeat(2)
+      });
 
-      const source = await saveBookmarkFromMessageMenu(chat);
+      const source = await saveBookmarkFromMessageButton(chat);
       await expectBookmarkStored(context, source.authorName);
       await expectBookmarkMenuClosed(source.menu);
       await expectBookmarkIconShowsAddedTime(chat, source);
@@ -557,7 +561,7 @@ async function expectBookmarkIconShowsAddedTime(
     await expect(bookmarkAction).toHaveAttribute('aria-pressed', 'true');
     await expect(bookmarkAction).toHaveAttribute(
       'title',
-      /Remove saved message\nBookmark added .+/
+      /Remove bookmark\nAdded .+/
     );
 
     await profileCard.locator('.ytcq-profile-card-close').click();
@@ -565,20 +569,22 @@ async function expectBookmarkIconShowsAddedTime(
   });
 }
 
-async function saveBookmarkFromMessageMenu(
+async function saveBookmarkFromMessageButton(
   chat: Parameters<BrowserScenario>[0]['chat']
 ): Promise<OpenedMessageMenu> {
   const source = await openMessageMenu(chat);
   await expectMessageMenuActionsInjected(source.menu);
+  await closeOpenMenus(chat);
 
-  await test.step('Click Save in the message context menu', async () => {
-    const saveAction = source.menu
-      .locator('.ytcq-context-item[data-ytcq-action="save-message"]')
-      .first();
-    const saveItem = saveAction.locator('.ytcq-paper-item');
-    await expect(saveItem.locator('.ytcq-menu-label')).toHaveText('Save');
+  await test.step('Save directly beside the dots with the keyboard', async () => {
+    const saveAction = source.message.locator('#menu > .ytcq-chat-bookmark-toggle');
+    await source.message.hover();
     await expect(saveAction).toBeVisible();
-    await saveItem.press('Enter');
+    await expect(saveAction).toHaveAttribute('aria-label', 'Bookmark');
+    await expectFeedBookmarkLayout(source.message);
+    await saveAction.press('Enter');
+    await expect(saveAction).toHaveAttribute('aria-pressed', 'true');
+    await expectBookmarkToastAtBottom(chat);
     await expect(source.message).toHaveClass(/ytcq-bookmark-saved/);
     await expect
       .poll(() => source.message.evaluate((row) => getComputedStyle(row, '::after').opacity))
@@ -592,8 +598,36 @@ async function saveBookmarkFromMessageMenu(
   return source;
 }
 
+export async function expectBookmarkToastAtBottom(
+  chat: Parameters<BrowserScenario>[0]['chat']
+): Promise<void> {
+  const toast = chat.locator('.ytcq-toast');
+  await expect(toast).toHaveText('Saved to Bookmarks');
+  expect(await toast.evaluate(element => {
+    const bounds = element.getBoundingClientRect();
+    return Math.abs(bounds.left + bounds.width / 2 - window.innerWidth / 2) < 1 &&
+      Math.abs(window.innerHeight - bounds.bottom - 48) < 1;
+  })).toBe(true);
+}
+
+export async function expectFeedBookmarkLayout(message: Locator): Promise<void> {
+  await expect.poll(() => message.evaluate((row) => {
+    const save = row.querySelector('.ytcq-chat-bookmark-toggle');
+    const dots = row.querySelector('#menu button:not(.ytcq-bookmark-toggle)');
+    const content = row.querySelector('#content');
+    if (!save || !dots || !content) return false;
+    const saveBounds = save.getBoundingClientRect();
+    const dotsBounds = dots.getBoundingClientRect();
+    const text = document.createRange();
+    text.selectNodeContents(content);
+    return saveBounds.width > 0 &&
+      saveBounds.right <= dotsBounds.left + 1 &&
+      Array.from(text.getClientRects()).every((rect) => rect.right <= saveBounds.left - 2);
+  }), { message: 'Message text must wrap before the Save and menu buttons.' }).toBe(true);
+}
+
 async function expectBookmarkMenuClosed(menu: Locator): Promise<void> {
-  await test.step('Verify the message context menu closes after saving', async () => {
+  await test.step('Verify saving does not open the message context menu', async () => {
     await expect(menu).toBeHidden({ timeout: 5_000 });
   });
 }

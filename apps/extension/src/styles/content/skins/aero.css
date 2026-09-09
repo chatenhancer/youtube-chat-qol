@@ -665,6 +665,7 @@
   yt-live-chat-text-message-renderer #menu button,
   yt-live-chat-viewer-engagement-message-renderer #menu button,
   yt-live-chat-membership-item-renderer #menu button,
+  .ytcq-chat-bookmark-toggle,
   .ytcq-lite-message-menu-button
 ) {
   color: var(--ytcq-aero-accent-strong) !important;
@@ -676,6 +677,7 @@
   yt-live-chat-text-message-renderer #menu button,
   yt-live-chat-viewer-engagement-message-renderer #menu button,
   yt-live-chat-membership-item-renderer #menu button,
+  .ytcq-chat-bookmark-toggle,
   .ytcq-lite-message-menu-button
 ):where(:hover, :focus) {
   background: var(--ytcq-aero-hover) !important;
@@ -2175,6 +2177,7 @@
   yt-live-chat-text-message-renderer #menu button,
   yt-live-chat-viewer-engagement-message-renderer #menu button,
   yt-live-chat-membership-item-renderer #menu button,
+  .ytcq-chat-bookmark-toggle,
   .ytcq-lite-message-menu-button
 ):where(:hover, :focus) {
   box-shadow: inset 0 0 0 1px var(--ytcq-aero-focus-ring);
