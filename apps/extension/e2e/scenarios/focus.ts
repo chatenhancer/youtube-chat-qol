@@ -4,8 +4,10 @@
  * Controlled-message checks use the same scenario against the mock renderer
  * and YouTube's native continuation renderer.
  */
-import { expect, test, type Locator } from '@playwright/test';
+import { expect, test, type BrowserContext, type Locator } from '@playwright/test';
+import { BOOKMARKS_STORAGE_KEY } from '../../src/shared/bookmarks';
 import { clearChatComposerIfVisible } from '../support/composer';
+import { withExtensionStorageValues } from '../support/extension-storage';
 import {
   requireControlledChat,
   type ControlledChat
@@ -28,6 +30,7 @@ export const focusPanelOpensFromAuthorScenario: BrowserScenario = async ({ chat 
 
 export const focusPanelReceivesNewMessagesScenario: BrowserScenario = async ({
   chat,
+  context,
   controlledChat
 }) => {
   const incoming = requireControlledChat(controlledChat);
@@ -44,7 +47,7 @@ export const focusPanelReceivesNewMessagesScenario: BrowserScenario = async ({
   source.channelId = channelId;
   await expandFocusPanel(chat);
   await expectFocusPanelContainsSourceMessage(chat, source);
-  await expectFocusMessageActionsAndJump(chat, source);
+  await expectFocusMessageActionsAndJump(chat, context, source);
   await expectFocusHeaderActionsAndRingToggle(chat);
   await deliverFocusedAuthorMessageAndVerifyItAppears(chat, incoming, source);
   await cleanUpFocusPanel(chat);
@@ -174,6 +177,7 @@ async function expectFocusPanelContainsSourceMessage(chat: ChatSurface, source: 
 
 async function expectFocusMessageActionsAndJump(
   chat: ChatSurface,
+  context: BrowserContext,
   source: MessageSource
 ): Promise<void> {
   await test.step('Jump to the source message from its Focus row', async () => {
@@ -189,6 +193,19 @@ async function expectFocusMessageActionsAndJump(
     await row.hover();
     await expect(bookmarkButton).toHaveCSS('opacity', '1');
     await expect(jumpButton).toHaveCSS('opacity', '1');
+
+    await test.step('Flash only the message bubble when saving a Focus message', async () => {
+      await withExtensionStorageValues(context, 'local', { [BOOKMARKS_STORAGE_KEY]: {} }, async () => {
+        const bubble = row.locator('.ytcq-focus-bubble');
+        await expect(bookmarkButton).toHaveAttribute('aria-pressed', 'false');
+        await bookmarkButton.click();
+        await expect(bubble).toHaveClass(/ytcq-bookmark-saved/);
+        await expect(row).not.toHaveClass(/ytcq-bookmark-saved/);
+        await expect(row.locator('.ytcq-focus-message-meta-row')).not.toHaveClass(/ytcq-bookmark-saved/);
+        await expect(bubble).not.toHaveClass(/ytcq-bookmark-saved/);
+        await expect(bookmarkButton).toHaveAttribute('aria-pressed', 'true');
+      });
+    });
 
     await jumpButton.click();
     const sourceMessage = chat.locator(

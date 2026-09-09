@@ -158,7 +158,7 @@ describe('bookmarks', () => {
   });
 
   it.each(['ytcq-profile-card-message', 'ytcq-focus-message'])(
-    'highlights the containing %s when its bookmark button is clicked',
+    'highlights the message surface in %s when its bookmark button is clicked',
     async (className) => {
       const feature = await import('./index');
       feature.initBookmarks();
@@ -167,20 +167,32 @@ describe('bookmarks', () => {
       const row = document.createElement('div');
       row.className = className;
       const button = feature.createBookmarkToggleButton(bookmark('message-1'))!;
-      row.append(button);
+      const isFocusMessage = className === 'ytcq-focus-message';
+      const content = document.createElement('div');
+      content.className = isFocusMessage
+        ? 'ytcq-focus-bubble'
+        : 'ytcq-profile-card-message-text';
+      content.textContent = 'Save this message';
+      const actions = document.createElement('div');
+      actions.className = isFocusMessage
+        ? 'ytcq-focus-message-meta-row'
+        : 'ytcq-profile-card-message-actions';
+      actions.append(button);
+      row.append(actions, content);
       document.body.append(row);
+      const highlightTarget = isFocusMessage ? content : row;
 
       button.click();
       await vi.advanceTimersByTimeAsync(0);
       expect(button.getAttribute('aria-pressed')).toBe('true');
-      expect(row.classList.contains('ytcq-bookmark-saved')).toBe(true);
+      expect(document.querySelector('.ytcq-bookmark-saved')).toBe(highlightTarget);
 
       await vi.advanceTimersByTimeAsync(900);
-      expect(row.classList.contains('ytcq-bookmark-saved')).toBe(false);
+      expect(document.querySelector('.ytcq-bookmark-saved')).toBeNull();
       button.click();
       await vi.advanceTimersByTimeAsync(0);
       expect(button.getAttribute('aria-pressed')).toBe('false');
-      expect(row.classList.contains('ytcq-bookmark-saved')).toBe(false);
+      expect(document.querySelector('.ytcq-bookmark-saved')).toBeNull();
     }
   );
 

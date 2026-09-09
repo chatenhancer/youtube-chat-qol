@@ -138,10 +138,8 @@ export function createBookmarkToggleButton(
       onClick={(event: MouseEvent) => {
         event.preventDefault();
         event.stopPropagation();
-        void toggleBookmark(
-          message,
-          button.closest<HTMLElement>('.ytcq-profile-card-message, .ytcq-focus-message')
-        );
+        const row = button.closest<HTMLElement>('.ytcq-profile-card-message, .ytcq-focus-message');
+        void toggleBookmark(message, row?.querySelector<HTMLElement>('.ytcq-focus-bubble') ?? row);
       }}
     >
       {createBookmarkIcon()}
