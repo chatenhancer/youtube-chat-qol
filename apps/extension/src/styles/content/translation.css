@@ -128,8 +128,6 @@ yt-live-chat-membership-item-renderer .ytcq-replaced-translation-icon,
   align-items: center;
   justify-content: center;
   display: inline-flex;
-  position: relative;
-  z-index: 1;
   width: 18px;
   height: 18px;
   margin-left: 4px;
