@@ -1726,24 +1726,29 @@ async function waitForExtensionToastToClear(chat, recorder) {
     if (!(element instanceof HTMLElement)) return false;
     const clone = element.cloneNode(true);
     if (!(clone instanceof HTMLElement)) return false;
+    const style = getComputedStyle(element);
+    for (const property of style) clone.style.setProperty(property, style.getPropertyValue(property));
+    // Keep the captured toast outside the extension's timed .ytcq-toast cleanup.
+    clone.classList.remove('ytcq-toast');
     clone.dataset.ytcqDemoPinnedToast = 'true';
     clone.style.setProperty('opacity', '1', 'important');
     element.replaceWith(clone);
     return true;
   }).catch(() => false);
   if (!pinned) return;
+  const pinnedToast = chat.locator('[data-ytcq-demo-pinned-toast="true"]').first();
 
   await recorder.holdStill(commandToastReadDurationMs);
   const fadeFrames = durationToFrames(commandToastFadeDurationMs);
   for (let frame = 1; frame <= fadeFrames; frame += 1) {
     const progress = easeInOutCubic(frame / fadeFrames);
-    await toast.evaluate((element, nextOpacity) => {
+    await pinnedToast.evaluate((element, nextOpacity) => {
       if (!(element instanceof HTMLElement)) return;
       element.style.setProperty('opacity', String(nextOpacity), 'important');
     }, 1 - progress);
     await recorder.captureFrame(`command toast hide frame ${frame}/${fadeFrames}`);
   }
-  await toast.evaluate((element) => element.remove()).catch(() => undefined);
+  await pinnedToast.evaluate((element) => element.remove()).catch(() => undefined);
   await recorder.captureFrame('final hidden command toast state');
   await recorder.holdStill(240);
 }
