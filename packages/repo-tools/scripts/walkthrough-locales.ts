@@ -113,9 +113,13 @@ export function walkthroughLocaleMatches(value, locale) {
   );
 }
 
-export function withWalkthroughYouTubePreference(value, locale) {
+export function withWalkthroughYouTubePreference(value, locale, theme: 'light' | 'dark' = 'light') {
   const preferences = new URLSearchParams(value || '');
   preferences.set('hl', getWalkthroughBrowserLocale(locale));
+  // Select YouTube's native theme while preserving unrelated profile flags.
+  const appearanceFlags = BigInt(`0x${preferences.get('f6') || '0'}`);
+  const themeFlag = theme === 'dark' ? 0x400n : 0x800n;
+  preferences.set('f6', ((appearanceFlags & ~0xc00n) | themeFlag).toString(16));
   return preferences.toString();
 }
 

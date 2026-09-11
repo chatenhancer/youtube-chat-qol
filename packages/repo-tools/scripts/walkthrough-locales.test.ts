@@ -78,9 +78,31 @@ describe('walkthrough locales', () => {
     expect(walkthroughLocaleMatches('en-US', 'ja')).toBe(false);
 
     const preferences = new URLSearchParams(withWalkthroughYouTubePreference('f6=400&hl=en', 'ja'));
-    expect(preferences.get('f6')).toBe('400');
+    expect(preferences.get('f6')).toBe('800');
     expect(preferences.get('hl')).toBe('ja');
   });
+
+  it.each([
+    ['light', '', '800'],
+    ['light', 'f6=400', '800'],
+    ['light', 'f6=c00', '800'],
+    ['light', 'f6=10000000401&volume=35&hl=en', '10000000801'],
+    ['dark', '', '400'],
+    ['dark', 'f6=800', '400'],
+    ['dark', 'f6=c00', '400'],
+    ['dark', 'f6=10000000801&volume=35&hl=en', '10000000401']
+  ] as const)(
+    'uses native %s mode without losing other YouTube preferences: %s',
+    (theme, value, expectedFlags) => {
+      const previous = new URLSearchParams(value);
+      const preferences = new URLSearchParams(withWalkthroughYouTubePreference(value, 'es', theme));
+
+      expect(preferences.get('f6')).toBe(expectedFlags);
+      expect(preferences.get('volume')).toBe(previous.get('volume'));
+      expect(preferences.get('hl')).toBe('es');
+      expect(withWalkthroughYouTubePreference(preferences.toString(), 'es', theme)).toBe(preferences.toString());
+    }
+  );
 
   it('uses an isolated profile path and writes its locale preferences', async () => {
     const rootDir = await mkdtemp(path.join(tmpdir(), 'ytcq-walkthrough-profile-'));

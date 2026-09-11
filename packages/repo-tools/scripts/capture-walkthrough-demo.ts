@@ -67,6 +67,7 @@ const defaultLiveUrl = 'https://www.youtube.com/@LofiGirl/live';
 const liveUrl = process.env.YTCQ_LIVE_DEMO_URL || defaultLiveUrl;
 const sourceUrl = getCanonicalWatchUrl(liveUrl);
 const previewMode = process.argv.includes('--preview') || process.env.YTCQ_DEMO_PREVIEW === '1';
+const demoTheme = readEnum(process.env.YTCQ_DEMO_THEME, ['light', 'dark'], 'light');
 const finalVideoBaseName = 'chat-enhancer-walkthrough';
 const videoOutputDir = previewMode ? demoResultsDir : finalVideoDir;
 const defaultOutputFileName = previewMode
@@ -225,7 +226,7 @@ async function main() {
 
     console.log(
       `[walkthrough] Mode: ${getDemoModeLabel()} | ` +
-        `locale ${walkthroughLocale} | ` +
+        `locale ${walkthroughLocale} | ${demoTheme} theme | ` +
         `${demoFps}fps | ${getCaptureSizeLabel()} | scale ${deviceScaleFactor} | ` +
         `${getFrameCaptureLogLabel()} | ${getVideoEncodeLogLabel()} | output ${getOutputLogLabel()}`
     );
@@ -236,7 +237,7 @@ async function main() {
       userAgent: headless ? process.env.YTCQ_DEMO_USER_AGENT || headlessUserAgent : undefined
     });
     const { context } = chromeInstance;
-    await configureYouTubeProfileLocale(context);
+    await configureYouTubeProfilePreferences(context);
     const page = context.pages()[0] || await context.newPage();
     await setDemoViewport(page, viewport);
     await installDemoAssetRoutes(context);
@@ -259,6 +260,9 @@ async function main() {
       20_000,
       'verify native walkthrough locale'
     );
+    const themeSelector = demoTheme === 'dark' ? 'html[dark]' : 'html:not([dark])';
+    await page.locator(themeSelector).waitFor({ state: 'attached', timeout: 10_000 });
+    await chat.locator(themeSelector).waitFor({ state: 'attached', timeout: 10_000 });
     console.log('[walkthrough] Installing branding, privacy mask, and presentation overlays...');
     await withTimeout(installWatchPageBranding(page), 20_000, 'install watch page branding');
     await withTimeout(
@@ -793,16 +797,18 @@ async function sectionBookmarks(page, chat, context, recorder) {
     screenXRatio: 0.9
   });
   await source.message.hover();
-  const saveAction = source.message.locator('.ytcq-chat-bookmark-toggle');
+  const saveAction = source.message.locator('#menu > .ytcq-chat-bookmark-toggle');
+  const bookmarkCaption = getWalkthroughClickCaption('addBookmark');
   await clickWithCursor(page, saveAction, recorder, 'Bookmark action', {
+    afterClickHoldMs: 200,
     caption: {
-      ...getWalkthroughClickCaption('addBookmark'),
-      clickDelayMs: 2_500,
+      ...bookmarkCaption,
+      clickDelayMs: bookmarkCaption.durationMs,
       options: { gap: 48, placement: 'side' }
     }
   });
-  await source.message.locator('#author-photo').first().waitFor({ state: 'visible', timeout: 10_000 });
-  await recorder.settleThenHoldStill(1_000);
+  await source.message.locator('#menu > .ytcq-chat-bookmark-toggle[aria-pressed="true"]')
+    .waitFor({ state: 'visible', timeout: 10_000 });
   await sectionPopupBookmarks(page, context, recorder);
 }
 
@@ -1172,6 +1178,7 @@ async function openExtensionPopupPage(context) {
   const extensionId = await getInstalledProfileExtensionId(profileDir);
   if (!extensionId) throw new Error('Could not find Chat Enhancer extension id.');
   const popup = await context.newPage();
+  await popup.emulateMedia({ colorScheme: demoTheme });
   await popup.goto(`chrome-extension://${extensionId}/popup.html`, {
     timeout: 15_000,
     waitUntil: 'domcontentloaded'
@@ -2282,7 +2289,7 @@ async function dismissConsentIfPresent(page) {
   }
 }
 
-async function configureYouTubeProfileLocale(context) {
+async function configureYouTubeProfilePreferences(context) {
   const youtubeCookies = await context.cookies('https://www.youtube.com');
   const existingPreference = youtubeCookies.find((cookie) => cookie.name === 'PREF');
   const preferenceCookie = {
@@ -2292,7 +2299,7 @@ async function configureYouTubeProfileLocale(context) {
     path: existingPreference?.path || '/',
     sameSite: existingPreference?.sameSite || 'Lax',
     secure: existingPreference?.secure ?? true,
-    value: withWalkthroughYouTubePreference(existingPreference?.value, walkthroughLocale),
+    value: withWalkthroughYouTubePreference(existingPreference?.value, walkthroughLocale, demoTheme),
     ...(existingPreference?.expires && existingPreference.expires > 0
       ? { expires: existingPreference.expires }
       : {})
@@ -2618,6 +2625,7 @@ async function fileExists(filePath) {
 }
 
 async function setDemoViewport(page, size) {
+  await page.emulateMedia({ colorScheme: demoTheme });
   await page.setViewportSize(size);
   const session = await page.context().newCDPSession(page);
   await applyCaptureMetrics(session, size);
@@ -2674,10 +2682,10 @@ async function installWatchPageBranding(page) {
 
       .ytcq-demo-video-cover {
         align-items: center;
-        background: #fff;
+        background: ${demoTheme === 'dark' ? '#0f0f0f' : '#fff'};
         border-radius: inherit;
         box-sizing: border-box;
-        color: #17191f;
+        color: ${demoTheme === 'dark' ? '#f1f1f1' : '#17191f'};
         display: flex;
         flex-direction: column;
         font-family: "Inter", sans-serif;
@@ -2721,7 +2729,7 @@ async function installWatchPageBranding(page) {
       }
 
       .ytcq-demo-video-cover span {
-        color: #626b7a;
+        color: ${demoTheme === 'dark' ? '#aaa' : '#626b7a'};
         font-size: 18px;
         letter-spacing: 0;
         line-height: 1.55;
@@ -3146,6 +3154,11 @@ async function installLiveChatMask(chat, translationDemo) {
           background: color-mix(in srgb, var(--ytcq-lite-row-background), currentColor 6%) !important;
         }
 
+        .ytcq-demo-message:has(> #menu > .ytcq-chat-bookmark-toggle) {
+          padding-inline-start: 24px !important;
+          padding-inline-end: 64px !important;
+        }
+
         .ytcq-demo-message #author-photo {
           align-items: center !important;
           border-radius: 50% !important;
@@ -3230,11 +3243,11 @@ async function installLiveChatMask(chat, translationDemo) {
           justify-content: center !important;
           opacity: 0 !important;
           position: absolute !important;
-          inset-inline-end: 8px !important;
+          inset-inline-end: 4px !important;
           inset-inline-start: auto !important;
           top: 50% !important;
           transform: translateY(-50%) !important;
-          width: 28px !important;
+          width: auto !important;
         }
 
         .ytcq-demo-message:hover #menu,
@@ -3242,7 +3255,7 @@ async function installLiveChatMask(chat, translationDemo) {
           opacity: 1 !important;
         }
 
-        .ytcq-demo-message #menu button {
+        .ytcq-demo-message #menu button:not(.ytcq-bookmark-toggle) {
           align-items: center !important;
           background: transparent !important;
           border: 0 !important;
@@ -3250,13 +3263,14 @@ async function installLiveChatMask(chat, translationDemo) {
           color: currentColor !important;
           cursor: pointer !important;
           display: flex !important;
+          flex: 0 0 28px !important;
           height: 28px !important;
           justify-content: center !important;
           padding: 0 !important;
           width: 28px !important;
         }
 
-        .ytcq-demo-message #menu button svg {
+        .ytcq-demo-message #menu button:not(.ytcq-bookmark-toggle) svg {
           display: block !important;
           fill: currentColor !important;
           height: 24px !important;
@@ -3287,7 +3301,7 @@ async function installLiveChatMask(chat, translationDemo) {
           border-radius: 10px !important;
           box-shadow: 0 8px 24px rgba(0, 0, 0, 0.24) !important;
           box-sizing: border-box !important;
-          color: #0f0f0f !important;
+          color: var(--yt-live-chat-primary-text-color, #0f0f0f) !important;
           display: block !important;
           min-width: 164px !important;
           overflow: hidden !important;
@@ -3296,11 +3310,15 @@ async function installLiveChatMask(chat, translationDemo) {
           z-index: 2147483000 !important;
         }
 
+        html[dark] .ytcq-demo-menu-shell {
+          background: #282828 !important;
+        }
+
         .ytcq-demo-menu-shell .ytcq-context-item .ytcq-paper-item,
         .ytcq-demo-menu-shell .ytcq-context-split-button,
         .ytcq-demo-menu-shell .ytcq-menu-icon,
         .ytcq-demo-menu-shell .ytcq-menu-label {
-          color: #0f0f0f !important;
+          color: inherit !important;
         }
 
         .ytcq-demo-menu-shell #items {
@@ -3314,7 +3332,7 @@ async function installLiveChatMask(chat, translationDemo) {
         .ytcq-demo-native-menu-item {
           align-items: center !important;
           box-sizing: border-box !important;
-          color: #0f0f0f !important;
+          color: inherit !important;
           display: flex !important;
           font-family: Roboto, "YouTube Sans", Arial, sans-serif !important;
           font-size: 14px !important;
@@ -3335,7 +3353,7 @@ async function installLiveChatMask(chat, translationDemo) {
 
         .ytcq-demo-native-menu-icon {
           align-items: center !important;
-          color: #0f0f0f !important;
+          color: inherit !important;
           display: flex !important;
           flex: 0 0 24px !important;
           height: 24px !important;
@@ -3856,6 +3874,13 @@ async function installLiveChatMask(chat, translationDemo) {
 
 async function installDemoPresentationLayer(page) {
   const docsFontFaceCss = await getDemoDocsFontFaceCss();
+  const colors = {
+    background: demoTheme === 'dark' ? '#282828' : '#fff',
+    border: demoTheme === 'dark' ? '#484848' : '#e2e6ee',
+    text: demoTheme === 'dark' ? '#f1f1f1' : '#17191f',
+    secondaryText: demoTheme === 'dark' ? '#b8b8b8' : '#626b7a',
+    shadow: demoTheme === 'dark' ? 'rgba(0, 0, 0, 0.4)' : 'rgba(23, 25, 31, 0.14)'
+  };
   await page.addStyleTag({
     content: `
       ${docsFontFaceCss}
@@ -3878,12 +3903,12 @@ async function installDemoPresentationLayer(page) {
       }
 
       .ytcq-demo-caption {
-        background: #fff;
-        border: 1px solid #e2e6ee;
+        background: ${colors.background};
+        border: 1px solid ${colors.border};
         border-radius: 8px;
         box-sizing: border-box;
-        box-shadow: 0 18px 48px rgba(23, 25, 31, 0.14);
-        color: #17191f;
+        box-shadow: 0 18px 48px ${colors.shadow};
+        color: ${colors.text};
         line-height: 1.55;
         left: 48px;
         max-width: 320px;
@@ -3926,7 +3951,7 @@ async function installDemoPresentationLayer(page) {
       }
 
       .ytcq-demo-caption::before {
-        background: center / contain no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath fill='%23fff' d='M4 1L15.3 7.5Q20 10 15.3 12.5L4 19Z'/%3E%3Cpath fill='none' stroke='%23e2e6ee' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.25' d='M4 1L15.3 7.5Q20 10 15.3 12.5L4 19'/%3E%3C/svg%3E");
+        background: center / contain no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath fill='${encodeURIComponent(colors.background)}' d='M4 1L15.3 7.5Q20 10 15.3 12.5L4 19Z'/%3E%3Cpath fill='none' stroke='${encodeURIComponent(colors.border)}' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.25' d='M4 1L15.3 7.5Q20 10 15.3 12.5L4 19'/%3E%3C/svg%3E");
       }
 
       .ytcq-demo-caption[data-pointer="right"]::before,
@@ -3963,7 +3988,7 @@ async function installDemoPresentationLayer(page) {
       }
 
       .ytcq-demo-caption strong {
-        color: #17191f;
+        color: ${colors.text};
         display: block;
         font-family: "Inter Display", "Inter", sans-serif;
         font-size: 18px;
@@ -3974,7 +3999,7 @@ async function installDemoPresentationLayer(page) {
       }
 
       .ytcq-demo-caption span {
-        color: #626b7a;
+        color: ${colors.secondaryText};
         display: block;
         font-size: 14px;
         letter-spacing: 0;
@@ -4044,7 +4069,7 @@ async function installPopupPresentationLayer(page) {
     content: `
       html {
         align-items: center;
-        background: #f6f7f8 !important;
+        background: ${demoTheme === 'dark' ? '#0f0f0f' : '#f6f7f8'} !important;
         display: flex !important;
         justify-content: center;
       }
@@ -4060,7 +4085,7 @@ async function installPopupPresentationLayer(page) {
       main,
       .popup-shell {
         border-radius: 18px !important;
-        box-shadow: 0 18px 48px rgba(15, 23, 42, 0.18);
+        box-shadow: 0 18px 48px ${demoTheme === 'dark' ? 'rgba(0, 0, 0, 0.4)' : 'rgba(15, 23, 42, 0.18)'};
         box-sizing: border-box !important;
         height: ${extensionPopupSize.height}px !important;
         opacity: 0 !important;
