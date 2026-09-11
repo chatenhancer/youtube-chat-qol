@@ -10,7 +10,7 @@ declare global {
     __ytcqDemoCursorImages?: Partial<Record<'hand' | 'pointer', string>>;
     __ytcqDemoCursorPosition?: { x: number; y: number };
     __ytcqDemoDrawStartupEffect?: (progress: number) => void;
-    __ytcqDemoManualScrollUntil?: number;
+    __ytcqDemoManualScroll?: boolean;
     __ytcqDemoMaskInstalled?: boolean;
     __ytcqDemoOpenMessageMenu?: (key: string) => boolean;
     __ytcqDemoPresentationInstalled?: boolean;

@@ -11,16 +11,16 @@ interface WalkthroughChapter {
 
 export const walkthroughChapters = [
   { labelKey: 'walkthroughKeyPointTranslation', name: 'translate-live-chat', seconds: 6, time: '0:06' },
-  { labelKey: 'walkthroughKeyPointDrafts', name: 'translate-what-you-type', seconds: 28, time: '0:28' },
-  { labelKey: 'walkthroughKeyPointMentions', name: 'mention-and-quote', seconds: 45, time: '0:45' },
-  { labelKey: 'walkthroughKeyPointUserCards', name: 'review-user-profiles', seconds: 72, time: '1:12' },
-  { labelKey: 'walkthroughKeyPointFocus', name: 'use-focus-mode', seconds: 85, time: '1:25' },
-  { labelKey: 'walkthroughKeyPointInbox', name: 'never-miss-messages', seconds: 98, time: '1:38' },
+  { labelKey: 'walkthroughKeyPointDrafts', name: 'translate-what-you-type', seconds: 27, time: '0:27' },
+  { labelKey: 'walkthroughKeyPointMentions', name: 'mention-and-quote', seconds: 44, time: '0:44' },
+  { labelKey: 'walkthroughKeyPointUserCards', name: 'review-user-profiles', seconds: 71, time: '1:11' },
+  { labelKey: 'walkthroughKeyPointFocus', name: 'use-focus-mode', seconds: 84, time: '1:24' },
+  { labelKey: 'walkthroughKeyPointInbox', name: 'never-miss-messages', seconds: 97, time: '1:37' },
   { labelKey: 'walkthroughKeyPointGames', name: 'games', seconds: 122, time: '2:02' },
-  { labelKey: 'walkthroughKeyPointBookmarks', name: 'save-messages', seconds: 154, time: '2:34' },
-  { labelKey: 'walkthroughKeyPointEmojis', name: 'keep-emojis-close', seconds: 171, time: '2:51' },
-  { labelKey: 'walkthroughKeyPointCommands', name: 'use-tab-commands', seconds: 185, time: '3:05' },
-  { labelKey: 'walkthroughKeyPointPopup', name: 'advanced-settings', seconds: 200, time: '3:20' }
+  { labelKey: 'walkthroughKeyPointBookmarks', name: 'save-messages', seconds: 153, time: '2:33' },
+  { labelKey: 'walkthroughKeyPointEmojis', name: 'keep-emojis-close', seconds: 166, time: '2:46' },
+  { labelKey: 'walkthroughKeyPointCommands', name: 'use-tab-commands', seconds: 181, time: '3:01' },
+  { labelKey: 'walkthroughKeyPointPopup', name: 'advanced-settings', seconds: 197, time: '3:17' }
 ] as const satisfies readonly WalkthroughChapter[];
 
 export type WalkthroughChapterName = typeof walkthroughChapters[number]['name'];

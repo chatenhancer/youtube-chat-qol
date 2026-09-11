@@ -464,7 +464,8 @@ async function sectionComposerTranslation(page, chat, recorder) {
   await typeIntoComposerHuman(chat, recorder, walkthroughTranslationDemo.composerSourceText, {
     durationMs: 3_200
   });
-  await waitForComposerTextToChange(chat, walkthroughTranslationDemo.composerSourceText);
+  await waitForComposerText(chat, `${walkthroughTranslationDemo.composerTranslatedText} @ChatDemo ✅`);
+  await captureStableLocatorState(composer, recorder, 'translated composer');
   await showWalkthroughCaptionFor(
     page,
     recorder,
@@ -592,6 +593,7 @@ async function sectionInbox(page, chat, recorder) {
   });
   const inbox = chat.locator('.ytcq-inbox-card').first();
   await inbox.waitFor({ state: 'visible', timeout: 10_000 });
+  await assertDemoInboxContents(inbox);
   await ensureDemoInboxAvatar(chat);
   await captureStableLocatorState(inbox, recorder, 'Inbox card');
   await showWalkthroughCaptionFor(
@@ -614,6 +616,14 @@ async function sectionInbox(page, chat, recorder) {
     { anchorLocator: keywordPanel, durationMs: 4_800 }
   );
   await recorder.holdStill(600);
+  await assertDemoInboxContents(inbox);
+}
+
+async function assertDemoInboxContents(inbox) {
+  const messages = inbox.locator('.ytcq-inbox-message');
+  if (await messages.count() !== 1 || !(await messages.first().innerText()).includes(demoInboxRecord.text)) {
+    throw new Error('The walkthrough Inbox must contain only the seeded demo message.');
+  }
 }
 
 async function ensureDemoInboxAvatar(chat) {
@@ -750,7 +760,7 @@ async function sectionBookmarks(page, chat, context, recorder) {
     caption: {
       ...bookmarkCaption,
       clickDelayMs: bookmarkCaption.durationMs,
-      options: { gap: 48, placement: 'side' }
+      options: { placement: 'above', verticalGap: 28 }
     }
   });
   await source.message.locator('#menu > .ytcq-chat-bookmark-toggle[aria-pressed="true"]')
@@ -803,7 +813,10 @@ async function sectionEmojiAndCommands(page, chat, recorder) {
   );
   await recorder.settleThenHoldStill(Math.min(2_600, getRemainingCaptionReadDuration(commandsCaption)));
   const whenTarget = getFutureDemoWhenTarget();
-  await typeIntoComposerHuman(chat, recorder, `the event is in /when ${whenTarget}`);
+  await typeIntoComposerHuman(chat, recorder, `the event is in /when ${whenTarget}`, {
+    // Crossing midnight adds a date to the example without shifting later chapters.
+    durationMs: 3_200
+  });
   await fadeOutDemoCaptionAndFocus(page, recorder, 320);
   await recorder.holdStill(440);
   await getChatComposerInput(chat).press('Tab');
@@ -829,10 +842,15 @@ async function sectionPopupStatus(page, context, recorder) {
   const popup = await openExtensionPopupPage(context);
   await setDemoViewport(popup, viewport);
   await installPopupPresentationLayer(popup);
+  await popup.locator('#settingsTab').click();
+  await popup.locator('#settingsTab[aria-selected="true"]').waitFor({ state: 'visible' });
   await recorder.usePage(popup);
   try {
     await fadeDemoPopupIn(popup, recorder);
-    const popupSettingsCaption = await setWalkthroughCaption(popup, recorder, 'popupSettings');
+    const popupSettingsCaption = await setWalkthroughCaption(
+      popup, recorder, 'popupSettings', await getLocatorBox(popup.locator('main'), 'settings popup'),
+      { placement: walkthroughTextDirection === 'rtl' ? 'left' : 'right' }
+    );
     await recorder.settleThenHoldStill(getRemainingCaptionReadDuration(popupSettingsCaption));
     await fadeOutDemoCaptionAndFocus(popup, recorder, 320);
     await clickWithCursor(popup, popup.locator('#bookmarksTab'), recorder, 'Bookmarks tab');
@@ -861,7 +879,10 @@ async function sectionPopupBookmarks(page, context, recorder) {
       recorder,
       'bookmark row'
     );
-    const bookmarksCaption = await setWalkthroughCaption(popup, recorder, 'bookmarksPopup');
+    const bookmarksCaption = await setWalkthroughCaption(
+      popup, recorder, 'bookmarksPopup', await getLocatorBox(popup.locator('.bookmark-row').first(), 'saved bookmark'),
+      { placement: walkthroughTextDirection === 'rtl' ? 'left' : 'right' }
+    );
     await highlightLocator(popup, popup.locator('.bookmark-row').first(), recorder, 10);
     await recorder.settleThenHoldStill(getRemainingCaptionReadDuration(bookmarksCaption));
     await fadeDemoPopupOut(popup, recorder);
@@ -951,6 +972,33 @@ async function seedWalkthroughExtensionState(context, activeSourceUrl) {
 }
 
 async function installDemoAssetRoutes(context) {
+  // Hiding native rows does not stop keyword matches from reaching the Inbox.
+  // Remove startup history before YouTube or the extension can consume it.
+  await context.addInitScript(() => {
+    if (window.location.pathname !== '/live_chat') return;
+    Object.defineProperty(window, 'ytInitialData', {
+      configurable: true,
+      set(data) {
+        const chat = data?.continuationContents?.liveChatContinuation || data?.contents?.liveChatRenderer;
+        if (chat) chat.actions = [];
+        Object.defineProperty(window, 'ytInitialData', { configurable: true, writable: true, value: data });
+      }
+    });
+  });
+  // Keep native response metadata while excluding subsequent real arrivals.
+  await context.route('**/youtubei/v1/live_chat/get_live_chat?*', async (route) => {
+    try {
+      const response = await route.fetch();
+      const body = await response.json();
+      const continuation = body.continuationContents?.liveChatContinuation;
+      if (!continuation) throw new Error('Missing live-chat continuation in walkthrough capture.');
+      continuation.actions = [];
+      await route.fulfill({ response, json: body });
+    } catch {
+      // Navigation or shutdown can interrupt a response; never pass it through.
+      await route.abort('failed').catch(() => undefined);
+    }
+  });
   await context.route(demoLuciaAvatarUrl, async (route) => {
     await route.fulfill({
       body: createDemoAvatarSvg('@LuciaLive'),
@@ -973,6 +1021,9 @@ async function installDemoAssetRoutes(context) {
         const placeholders = sourceText.match(isHtml
           ? /<span translate="no">\[\d+\]<\/span>/g
           : /§\d+§/g) || [];
+        // Slow frame capture can trigger the real debounce between keystrokes.
+        // Translate only once both the complete mention and emoji are present.
+        if (placeholders.length < 2) return [sourceText, walkthroughTranslationDemo.composerSourceLanguage];
         return [[walkthroughTranslationDemo.composerTranslatedText, ...placeholders].join(' '), walkthroughTranslationDemo.composerSourceLanguage];
       }
       return [sourceText, targetLanguage];
@@ -1123,13 +1174,18 @@ async function readDemoPlaygroundBackendState(context) {
 async function openExtensionPopupPage(context) {
   const extensionId = await getInstalledProfileExtensionId(profileDir);
   if (!extensionId) throw new Error('Could not find Chat Enhancer extension id.');
+  const watchPage = context.pages().find((page) => page.url().startsWith('https://www.youtube.com/watch?'));
+  if (!watchPage) throw new Error('Could not find the walkthrough watch tab for popup status.');
   const popup = await context.newPage();
   await popup.emulateMedia({ colorScheme: demoTheme });
+  // A toolbar popup reads the selected YouTube tab, not a separate extension tab.
+  await watchPage.bringToFront();
   await popup.goto(`chrome-extension://${extensionId}/popup.html`, {
     timeout: 15_000,
     waitUntil: 'domcontentloaded'
   });
-  await popup.locator('[data-extension-status]').waitFor({ state: 'visible', timeout: 10_000 });
+  await popup.locator('[data-extension-status="active"]').waitFor({ state: 'visible', timeout: 10_000 });
+  await popup.bringToFront();
   return popup;
 }
 
@@ -1499,7 +1555,7 @@ async function waitForDemoMessageTranslation(chat, messageKey, { display = 'belo
 async function stabilizeDemoChatFeed(chat) {
   await chat.locator('body').evaluate((body) => {
     void body;
-    window.__ytcqDemoManualScrollUntil = 0;
+    window.__ytcqDemoManualScroll = false;
     window.__ytcqDemoStabilizeChat?.();
   }).catch(() => undefined);
 }
@@ -1507,7 +1563,8 @@ async function stabilizeDemoChatFeed(chat) {
 async function positionDemoChatAtMessage(chat, messageKey) {
   await chat.locator('body').evaluate((body, key) => {
     void body;
-    window.__ytcqDemoManualScrollUntil = Date.now() + 60_000;
+    // Full-quality rendering can take longer than the scene's video duration.
+    window.__ytcqDemoManualScroll = true;
     window.__ytcqDemoStabilizeChat?.();
     const scroller = document.querySelector('yt-live-chat-item-list-renderer #item-scroller');
     const message = document.querySelector(`.ytcq-demo-message[data-ytcq-demo-key="${CSS.escape(key)}"]`);
@@ -1527,7 +1584,7 @@ async function positionDemoChatAtMessage(chat, messageKey) {
 async function smoothScrollDemoChatToMessage(chat, messageKey, recorder) {
   const positions = await chat.locator('body').evaluate((body, key) => {
     void body;
-    window.__ytcqDemoManualScrollUntil = Date.now() + 60_000;
+    window.__ytcqDemoManualScroll = true;
     window.__ytcqDemoStabilizeChat?.();
     const scroller = document.querySelector('yt-live-chat-item-list-renderer #item-scroller');
     const message = document.querySelector(`.ytcq-demo-message[data-ytcq-demo-key="${CSS.escape(key)}"]`);
@@ -1549,9 +1606,6 @@ async function smoothScrollDemoChatToMessage(chat, messageKey, recorder) {
 
   if (!positions) return;
   const steps = durationToFrames(760);
-  await chat.locator('body').evaluate(() => {
-    window.__ytcqDemoManualScrollUntil = Date.now() + 60_000;
-  }).catch(() => undefined);
   for (let step = 1; step <= steps; step += 1) {
     const progress = easeInOutCubic(step / steps);
     const scrollTop = positions.start + (positions.end - positions.start) * progress;
@@ -1561,9 +1615,6 @@ async function smoothScrollDemoChatToMessage(chat, messageKey, recorder) {
     }, scrollTop).catch(() => undefined);
     await recorder.captureFrame();
   }
-  await chat.locator('body').evaluate(() => {
-    window.__ytcqDemoManualScrollUntil = Date.now() + 60_000;
-  }).catch(() => undefined);
 }
 
 async function scrollWatchPageToTop(page, recorder) {
@@ -1819,12 +1870,12 @@ async function typeIntoComposerHuman(chat, recorder, text, options: any = {}) {
   }
 }
 
-async function waitForComposerTextToChange(chat, originalText) {
+async function waitForComposerText(chat, expectedText) {
   await poll(async () => {
     const text = await getComposerText(chat);
-    return Boolean(text && text !== originalText);
+    return text.trim().replace(/\s+/gu, ' ') === expectedText;
   }, {
-    label: 'composer draft to translate',
+    label: 'complete composer translation with its mention and emoji',
     timeout: 25_000
   });
 }
@@ -3642,7 +3693,7 @@ async function installLiveChatMask(chat, translationDemo) {
       const stage = document.querySelector('.ytcq-demo-message-stage');
       if (!(scroller instanceof HTMLElement) || !(stage instanceof HTMLElement)) return;
       const lastMessageBottom = getDemoMessageListBottom(stage);
-      if (Date.now() < (window.__ytcqDemoManualScrollUntil || 0)) return;
+      if (window.__ytcqDemoManualScroll) return;
       setChatScrollTop(Math.max(0, lastMessageBottom - scroller.clientHeight));
     };
 
@@ -4289,12 +4340,13 @@ async function createScreencastFrameRecorder(page) {
   }
 
   function scheduleScreencastSourceRefresh() {
-    const page = currentSource?.page;
-    if (!page || restartPromise || restartScheduled) return;
+    const source = currentSource;
+    if (!source || restartPromise || restartScheduled) return;
     restartScheduled = true;
     void (async () => {
       await delay(40);
-      await restartScreencastSource(page, { clearLatestFrame: false });
+      if (currentSource !== source) return;
+      await restartScreencastSource(source.page, { clearLatestFrame: false });
     })().finally(() => {
       restartScheduled = false;
     });
@@ -4931,10 +4983,10 @@ async function setDemoCaption(page, title, body, anchorBox = null, options: any 
       const player = document.querySelector('#movie_player');
       const playerBox = player instanceof HTMLElement ? player.getBoundingClientRect() : null;
       const left = playerBox
-        ? Math.max(48, Math.min(window.innerWidth - captionWidth - 48, playerBox.right - captionWidth - 48))
+        ? Math.max(48, Math.min(window.innerWidth - captionWidth - 48, playerBox.left + 32))
         : Math.max(48, Math.min(window.innerWidth - captionWidth - 48, window.innerWidth * 0.58));
       const top = playerBox
-        ? Math.max(48, playerBox.top + 72)
+        ? Math.max(48, playerBox.top + 32)
         : 150;
       caption.style.left = `${left}px`;
       caption.style.top = `${top}px`;
@@ -5237,7 +5289,8 @@ function locatorVisualStatesMatch(first, second) {
 }
 
 async function parkDemoCursorForOutro(page, recorder) {
-  await moveCursor(page, viewport.width - 68, viewport.height - 72, 640, recorder, {
+  const player = await getLocatorBox(page.locator('#movie_player'), 'outro player');
+  await moveCursor(page, player.x + player.width * 0.85, player.y + player.height * 0.8, 640, recorder, {
     label: 'outro cursor park'
   });
   await recorder.hold(180);
