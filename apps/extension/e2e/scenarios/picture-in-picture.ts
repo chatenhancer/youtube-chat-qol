@@ -1,4 +1,4 @@
-import { expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 import type { BrowserScenario, BrowserScenarioSession } from './types';
 import { fixtureLoggedInLiveChatUrl } from '../support/live-chat-fixture';
 import { openChatEnhancerMenu } from '../support/menu-openers';
@@ -127,9 +127,26 @@ async function verifyNativePictureInPicture(
     const placeholder = page.locator('.ytcq-pip-video-placeholder');
     expect((await placeholder.boundingBox())!.height).toBeGreaterThan(100);
     expect((await page.locator('.ytcq-pip-chat-placeholder').boundingBox())!.height).toBeGreaterThan(100);
-    await expect(placeholder.locator('.ytcq-pip-return-button')).toHaveCSS('border-radius', '20px');
-    await expect(placeholder.locator('.ytcq-pip-return-button')).toHaveCSS('height', '40px');
-    await placeholder.getByRole('button', { name: 'Return to tab' }).click();
+    const returnButton = placeholder.locator('.ytcq-pip-return-button');
+    await expect(returnButton).toHaveCSS('border-radius', '20px');
+    await expect(returnButton).toHaveCSS('height', '40px');
+    // Keep CI diagnostics limited to this extension-owned control.
+    const returnButtonState = await returnButton.evaluate((button) => ({
+      label: button.textContent?.trim(),
+      language: document.documentElement.lang,
+      visibility: document.visibilityState,
+      ariaHidden: Boolean(button.closest('[aria-hidden="true"]')),
+      inert: Boolean(button.closest('[inert]'))
+    }));
+    test.info().annotations.push({
+      type: 'pip-return-button',
+      description: JSON.stringify({
+        ...returnButtonState,
+        englishNameMatches: await placeholder.getByRole('button', { name: 'Return to tab' }).count()
+      })
+    });
+    await page.bringToFront();
+    await returnButton.click();
     await expect.poll(() => pip.isClosed()).toBe(true);
     // A YouTube error can hide its video and controls while the player remains visible.
     await expect(page.locator('#movie_player')).toBeVisible();
@@ -251,6 +268,8 @@ export const pictureInPictureScenario: BrowserScenario = async ({ page, context 
     await pip.setViewportSize({ width: 460, height: 640 });
     await expect(page.locator('#movie_player')).toHaveCount(0);
     await expect(page.locator('.ytcq-pip-chat-placeholder')).toContainText('Video and chat are in picture-in-picture');
+    await expect(page.locator('.ytcq-pip-video-placeholder').getByRole('button', { name: 'Return to tab', exact: true }))
+      .toBeVisible();
     await pipChat.locator('#input[contenteditable]').fill('Unsent from PiP');
     await pip.close();
     await expect(chat.locator('.ytcq-inbox-button')).toBeVisible();
