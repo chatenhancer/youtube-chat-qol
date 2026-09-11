@@ -90,8 +90,9 @@ ytd-menu-popup-renderer .ytcq-context-item .ytcq-paper-item:hover {
 /* The back row is a compact navigation header, with hover on its arrow only. */
 ytd-menu-popup-renderer [data-ytcq-action="settings-back"] .ytcq-paper-item {
   padding-inline-start: 14px;
+  /* Balance YouTube's 8px inset above the row against the divider below. */
   padding-block-end: 8px;
-  gap: 14px;
+  gap: 8px;
 }
 
 ytd-menu-popup-renderer [data-ytcq-action="settings-back"] .ytcq-menu-icon {
@@ -99,11 +100,6 @@ ytd-menu-popup-renderer [data-ytcq-action="settings-back"] .ytcq-menu-icon {
   height: 28px;
   border-radius: 50%;
   opacity: 1;
-}
-
-ytd-menu-popup-renderer [data-ytcq-action="settings-back"] .ytcq-menu-icon svg {
-  width: 20px;
-  height: 20px;
 }
 
 ytd-menu-popup-renderer [data-ytcq-action="settings-back"] .ytcq-paper-item:is(:hover, :focus-visible) {

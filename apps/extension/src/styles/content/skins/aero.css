@@ -1164,6 +1164,11 @@
   text-shadow: none !important;
 }
 
+:root[data-ytcq-chat-skin="aero"] ytd-menu-popup-renderer.ytcq-live-chat-menu-size-repaired [data-ytcq-action="settings-back"] .ytcq-paper-item {
+  /* Aero has 2px of popup padding and a 1px border above the header. */
+  padding-block-end: 3px;
+}
+
 :root[data-ytcq-chat-skin="aero"] ytd-menu-popup-renderer.ytcq-live-chat-menu-size-repaired :where(
   ytd-menu-service-item-renderer,
   ytd-menu-navigation-item-renderer,
@@ -1248,8 +1253,8 @@
   ytd-menu-navigation-item-renderer tp-yt-paper-item:focus,
   yt-live-chat-toggle-renderer tp-yt-paper-item:hover,
   yt-live-chat-toggle-renderer tp-yt-paper-item:focus,
-  .ytcq-settings-item .ytcq-paper-item:hover,
-  .ytcq-settings-item .ytcq-paper-item:focus,
+  .ytcq-settings-item:not([data-ytcq-action="settings-back"]) .ytcq-paper-item:hover,
+  .ytcq-settings-item:not([data-ytcq-action="settings-back"]) .ytcq-paper-item:focus,
   .ytcq-context-item:not(.ytcq-context-split-item) .ytcq-paper-item:hover,
   .ytcq-context-item:not(.ytcq-context-split-item) .ytcq-paper-item:focus,
   .ytcq-context-split-button:hover,
@@ -1291,7 +1296,7 @@
   yt-icon,
   yt-icon *,
   .ytcq-menu-icon,
-  .ytcq-menu-icon *
+  .ytcq-menu-icon :not([fill="none"])
 ) {
   color: var(--ytcq-aero-text) !important;
   fill: currentColor !important;
