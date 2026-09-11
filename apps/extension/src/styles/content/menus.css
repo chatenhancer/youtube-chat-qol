@@ -6,27 +6,16 @@ ytd-menu-popup-renderer.ytcq-live-chat-menu-size-repaired {
   max-width: min(360px, calc(100vw - 16px)) !important;
 }
 
-.ytcq-settings-menu {
-  position: fixed;
-  z-index: var(--ytcq-layer-popover);
-  box-sizing: border-box;
-  width: max-content;
-  max-width: min(360px, calc(100vw - 16px));
-  max-height: min(80vh, 360px);
-  overflow: auto;
-  padding: 8px 0;
-  border-radius: 12px;
-  color: var(--yt-spec-text-primary, var(--yt-live-chat-primary-text-color, #0f0f0f));
-  background: var(--yt-spec-menu-background, var(--yt-sys-color-baseline--menu-background, var(--yt-live-chat-background-color, #fff)));
-  box-shadow: 0 4px 32px rgba(0, 0, 0, 0.1);
+ytd-menu-popup-renderer.ytcq-settings-grid-menu {
+  /* YouTube may measure its popup before our controls are appended. */
+  max-height: calc(100vh - 16px) !important;
+  transform: translateY(var(--ytcq-context-shift-y, 0px));
 }
 
-.ytcq-settings-menu .ytcq-settings-item {
-  outline: none;
-}
-
-.ytcq-settings-menu .ytcq-settings-item:focus-visible .ytcq-paper-item {
-  background: var(--ytcq-menu-hover-background);
+ytd-menu-popup-renderer.ytcq-settings-grid-menu #items {
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 ytd-menu-popup-renderer.ytcq-context-expanded-menu {
@@ -40,8 +29,8 @@ ytd-menu-popup-renderer.ytcq-context-expanded-menu #items {
   overflow-x: hidden;
 }
 
-:is(ytd-menu-popup-renderer, .ytcq-settings-menu) .ytcq-settings-item .ytcq-paper-item,
-:is(ytd-menu-popup-renderer, .ytcq-settings-menu) .ytcq-context-item .ytcq-paper-item {
+ytd-menu-popup-renderer .ytcq-settings-item .ytcq-paper-item,
+ytd-menu-popup-renderer .ytcq-context-item .ytcq-paper-item {
   --ytcq-menu-hover-background: var(--yt-spec-touch-response, var(--yt-spec-10-percent-layer, rgba(128, 128, 128, 0.16)));
   cursor: pointer;
   min-height: 40px;
@@ -60,25 +49,17 @@ ytd-menu-popup-renderer.ytcq-context-expanded-menu #items {
 }
 
 /* Keep quick settings as compact as YouTube's native menu rows. */
-:is(ytd-menu-popup-renderer, .ytcq-settings-menu) .ytcq-settings-item .ytcq-paper-item {
+ytd-menu-popup-renderer .ytcq-settings-item .ytcq-paper-item {
   min-height: 36px;
 }
 
-:is(ytd-menu-popup-renderer, .ytcq-settings-menu) .ytcq-settings-item .ytcq-paper-item:hover,
-:is(ytd-menu-popup-renderer, .ytcq-settings-menu) .ytcq-settings-item .ytcq-paper-item:focus-visible,
-:is(ytd-menu-popup-renderer, .ytcq-settings-menu) .ytcq-context-item .ytcq-paper-item:hover {
+ytd-menu-popup-renderer .ytcq-settings-item .ytcq-paper-item:hover,
+ytd-menu-popup-renderer .ytcq-settings-item .ytcq-paper-item:focus-visible,
+ytd-menu-popup-renderer .ytcq-context-item .ytcq-paper-item:hover {
   background: var(--ytcq-menu-hover-background);
 }
 
-.ytcq-settings-menu .ytcq-menu-label {
-  /* Pad wrapped labels while single-line rows keep YouTube's compact height. */
-  padding-block: 4px;
-  white-space: normal;
-  hyphens: auto;
-  overflow-wrap: anywhere;
-}
-
-:is(ytd-menu-popup-renderer, .ytcq-settings-menu) .ytcq-context-split-item .ytcq-paper-item {
+ytd-menu-popup-renderer .ytcq-context-split-item .ytcq-paper-item {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 9px minmax(0, 1fr);
   gap: 0;
@@ -87,15 +68,15 @@ ytd-menu-popup-renderer.ytcq-context-expanded-menu #items {
   cursor: default;
 }
 
-:is(ytd-menu-popup-renderer, .ytcq-settings-menu) .ytcq-context-split-item .ytcq-paper-item:hover {
+ytd-menu-popup-renderer .ytcq-context-split-item .ytcq-paper-item:hover {
   background: transparent;
 }
 
-:is(ytd-menu-popup-renderer, .ytcq-settings-menu) .ytcq-context-split-row {
+ytd-menu-popup-renderer .ytcq-context-split-row {
   justify-content: initial;
 }
 
-:is(ytd-menu-popup-renderer, .ytcq-settings-menu) .ytcq-context-split-button {
+ytd-menu-popup-renderer .ytcq-context-split-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -110,13 +91,13 @@ ytd-menu-popup-renderer.ytcq-context-expanded-menu #items {
   cursor: pointer;
 }
 
-:is(ytd-menu-popup-renderer, .ytcq-settings-menu) .ytcq-context-split-button:hover,
-:is(ytd-menu-popup-renderer, .ytcq-settings-menu) .ytcq-context-split-button:focus {
+ytd-menu-popup-renderer .ytcq-context-split-button:hover,
+ytd-menu-popup-renderer .ytcq-context-split-button:focus {
   background: var(--ytcq-menu-hover-background);
   outline: none;
 }
 
-:is(ytd-menu-popup-renderer, .ytcq-settings-menu) .ytcq-context-split-divider {
+ytd-menu-popup-renderer .ytcq-context-split-divider {
   width: 1px;
   height: 20px;
   margin: 0 4px;
@@ -124,7 +105,7 @@ ytd-menu-popup-renderer.ytcq-context-expanded-menu #items {
   flex: 0 0 auto;
 }
 
-:is(ytd-menu-popup-renderer, .ytcq-settings-menu) .ytcq-menu-icon {
+ytd-menu-popup-renderer .ytcq-menu-icon {
   width: 24px;
   height: 24px;
   color: var(--yt-spec-text-primary, var(--yt-live-chat-primary-text-color, currentColor));
@@ -136,50 +117,50 @@ ytd-menu-popup-renderer.ytcq-context-expanded-menu #items {
   opacity: 0.86;
 }
 
-:is(ytd-menu-popup-renderer, .ytcq-settings-menu) .ytcq-menu-icon svg {
+ytd-menu-popup-renderer .ytcq-menu-icon svg {
   display: block;
   width: 24px;
   height: 24px;
   pointer-events: none;
 }
 
-:is(ytd-menu-popup-renderer, .ytcq-settings-menu) .ytcq-menu-icon.ytcq-bell-ringing svg {
+ytd-menu-popup-renderer .ytcq-menu-icon.ytcq-bell-ringing svg {
   transform-origin: 50% 16%;
   animation: ytcq-bell-ring 620ms ease-in-out;
 }
 
-:is(ytd-menu-popup-renderer, .ytcq-settings-menu) .ytcq-menu-icon.ytcq-bell-ringing .ytcq-bell-clapper {
+ytd-menu-popup-renderer .ytcq-menu-icon.ytcq-bell-ringing .ytcq-bell-clapper {
   animation: ytcq-bell-clapper-swing 620ms ease-in-out;
 }
 
-:is(ytd-menu-popup-renderer, .ytcq-settings-menu) .ytcq-translate-menu-icon {
+ytd-menu-popup-renderer .ytcq-translate-menu-icon {
   transform-origin: center;
 }
 
-:is(ytd-menu-popup-renderer, .ytcq-settings-menu) .ytcq-translate-menu-icon .ytcq-translate-source-mark,
-:is(ytd-menu-popup-renderer, .ytcq-settings-menu) .ytcq-translate-menu-icon .ytcq-translate-target-mark {
+ytd-menu-popup-renderer .ytcq-translate-menu-icon .ytcq-translate-source-mark,
+ytd-menu-popup-renderer .ytcq-translate-menu-icon .ytcq-translate-target-mark {
   transform-box: fill-box;
   transform-origin: center;
 }
 
-:is(ytd-menu-popup-renderer, .ytcq-settings-menu) .ytcq-translate-menu-icon.ytcq-translation-pulse {
+ytd-menu-popup-renderer .ytcq-translate-menu-icon.ytcq-translation-pulse {
   animation: ytcq-translation-icon-pop 560ms cubic-bezier(0.18, 0.89, 0.32, 1.28);
 }
 
-:is(ytd-menu-popup-renderer, .ytcq-settings-menu) .ytcq-translate-menu-icon.ytcq-translation-pulse .ytcq-translate-source-mark {
+ytd-menu-popup-renderer .ytcq-translate-menu-icon.ytcq-translation-pulse .ytcq-translate-source-mark {
   animation: ytcq-translation-source-pop 560ms ease-out;
 }
 
-:is(ytd-menu-popup-renderer, .ytcq-settings-menu) .ytcq-translate-menu-icon.ytcq-translation-pulse .ytcq-translate-target-mark {
+ytd-menu-popup-renderer .ytcq-translate-menu-icon.ytcq-translation-pulse .ytcq-translate-target-mark {
   animation: ytcq-translation-target-pop 560ms ease-out 60ms;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  :is(ytd-menu-popup-renderer, .ytcq-settings-menu) .ytcq-menu-icon.ytcq-bell-ringing svg,
-  :is(ytd-menu-popup-renderer, .ytcq-settings-menu) .ytcq-menu-icon.ytcq-bell-ringing .ytcq-bell-clapper,
-  :is(ytd-menu-popup-renderer, .ytcq-settings-menu) .ytcq-translate-menu-icon.ytcq-translation-pulse,
-  :is(ytd-menu-popup-renderer, .ytcq-settings-menu) .ytcq-translate-menu-icon.ytcq-translation-pulse .ytcq-translate-source-mark,
-  :is(ytd-menu-popup-renderer, .ytcq-settings-menu) .ytcq-translate-menu-icon.ytcq-translation-pulse .ytcq-translate-target-mark,
+  ytd-menu-popup-renderer .ytcq-menu-icon.ytcq-bell-ringing svg,
+  ytd-menu-popup-renderer .ytcq-menu-icon.ytcq-bell-ringing .ytcq-bell-clapper,
+  ytd-menu-popup-renderer .ytcq-translate-menu-icon.ytcq-translation-pulse,
+  ytd-menu-popup-renderer .ytcq-translate-menu-icon.ytcq-translation-pulse .ytcq-translate-source-mark,
+  ytd-menu-popup-renderer .ytcq-translate-menu-icon.ytcq-translation-pulse .ytcq-translate-target-mark,
   .ytcq-composer-translate-icon.ytcq-translation-pulse,
   .ytcq-composer-translate-icon.ytcq-translation-pulse .ytcq-translate-source-mark,
   .ytcq-composer-translate-icon.ytcq-translation-pulse .ytcq-translate-target-mark {
@@ -187,18 +168,18 @@ ytd-menu-popup-renderer.ytcq-context-expanded-menu #items {
   }
 }
 
-:is(ytd-menu-popup-renderer, .ytcq-settings-menu) .ytcq-menu-label {
+ytd-menu-popup-renderer .ytcq-menu-label {
   flex: 1 1 auto;
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-:is(ytd-menu-popup-renderer, .ytcq-settings-menu) .ytcq-toggle-item .ytcq-paper-item {
+ytd-menu-popup-renderer .ytcq-toggle-item .ytcq-paper-item {
   gap: 16px;
 }
 
-:is(ytd-menu-popup-renderer, .ytcq-settings-menu) .ytcq-menu-toggle {
+ytd-menu-popup-renderer .ytcq-menu-toggle {
   position: relative;
   display: inline-flex;
   width: 34px;
@@ -210,7 +191,7 @@ ytd-menu-popup-renderer.ytcq-context-expanded-menu #items {
   opacity: 0.82;
 }
 
-:is(ytd-menu-popup-renderer, .ytcq-settings-menu) .ytcq-menu-toggle::after {
+ytd-menu-popup-renderer .ytcq-menu-toggle::after {
   content: "";
   position: absolute;
   top: -3px;
@@ -223,11 +204,98 @@ ytd-menu-popup-renderer.ytcq-context-expanded-menu #items {
   transition: transform 120ms ease, background 120ms ease;
 }
 
-:is(ytd-menu-popup-renderer, .ytcq-settings-menu) .ytcq-toggle-item[aria-checked="true"] .ytcq-menu-toggle {
+ytd-menu-popup-renderer .ytcq-toggle-item[aria-checked="true"] .ytcq-menu-toggle {
   background: var(--paper-toggle-button-checked-bar-color, rgba(62, 166, 255, 0.45));
 }
 
-:is(ytd-menu-popup-renderer, .ytcq-settings-menu) .ytcq-toggle-item[aria-checked="true"] .ytcq-menu-toggle::after {
+ytd-menu-popup-renderer .ytcq-toggle-item[aria-checked="true"] .ytcq-menu-toggle::after {
   transform: translateX(14px);
   background: var(--paper-toggle-button-checked-button-color, var(--yt-spec-call-to-action, #3ea6ff));
+}
+
+/* Compact tiles; their contents never determine the native menu width. */
+.ytcq-settings-grid {
+  --ytcq-grid-background: rgba(0, 0, 0, 0.045);
+  --ytcq-grid-hover: rgba(0, 0, 0, 0.075);
+  --ytcq-grid-active: rgba(6, 95, 212, 0.11);
+  --ytcq-grid-active-hover: rgba(6, 95, 212, 0.17);
+  --ytcq-grid-accent: #065fd4;
+  display: grid;
+  contain: inline-size;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-auto-rows: 1fr;
+  gap: 4px;
+  margin: 4px 8px 0;
+  outline: none;
+}
+
+:root:is([dark], [data-ytcq-chat-skin-theme="dark"]) .ytcq-settings-grid {
+  --ytcq-grid-background: rgba(255, 255, 255, 0.055);
+  --ytcq-grid-hover: rgba(255, 255, 255, 0.09);
+  --ytcq-grid-active: rgba(62, 166, 255, 0.18);
+  --ytcq-grid-active-hover: rgba(62, 166, 255, 0.25);
+  --ytcq-grid-accent: #70bbff;
+}
+
+ytd-menu-popup-renderer .ytcq-settings-grid .ytcq-settings-item {
+  display: flex;
+  min-width: 0;
+  outline: none;
+}
+
+ytd-menu-popup-renderer .ytcq-settings-grid .ytcq-paper-item {
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+  min-height: 40px;
+  gap: 1px;
+  padding: 2px;
+  border-radius: var(--ytcq-squircle-radius-control);
+  corner-shape: var(--ytcq-squircle-corner-shape);
+  color: inherit;
+  font-size: 12px;
+  line-height: 14px;
+  text-align: center;
+  background: var(--ytcq-grid-background);
+}
+
+@media (pointer: coarse) {
+  ytd-menu-popup-renderer .ytcq-settings-grid .ytcq-paper-item {
+    min-height: 44px;
+  }
+}
+
+ytd-menu-popup-renderer .ytcq-settings-grid .ytcq-settings-item:is(:hover, :focus-visible) .ytcq-paper-item {
+  background: var(--ytcq-grid-hover);
+}
+
+ytd-menu-popup-renderer .ytcq-settings-grid .ytcq-settings-item[aria-checked="true"] .ytcq-paper-item {
+  color: var(--ytcq-grid-accent);
+  background: var(--ytcq-grid-active);
+}
+
+ytd-menu-popup-renderer .ytcq-settings-grid .ytcq-settings-item[aria-checked="true"]:is(:hover, :focus-visible) .ytcq-paper-item {
+  background: var(--ytcq-grid-active-hover);
+}
+
+ytd-menu-popup-renderer .ytcq-settings-grid .ytcq-settings-item:focus-visible .ytcq-paper-item {
+  outline: 2px solid var(--ytcq-grid-accent);
+  outline-offset: -2px;
+}
+
+ytd-menu-popup-renderer .ytcq-settings-grid .ytcq-menu-icon,
+ytd-menu-popup-renderer .ytcq-settings-grid .ytcq-menu-icon svg {
+  width: 18px;
+  height: 18px;
+  color: inherit;
+  opacity: 1;
+}
+
+ytd-menu-popup-renderer .ytcq-settings-grid .ytcq-menu-label {
+  flex: 0 0 auto;
+  width: 100%;
+  white-space: normal;
+  overflow: visible;
+  overflow-wrap: anywhere;
 }

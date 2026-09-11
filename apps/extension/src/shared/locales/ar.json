@@ -7,7 +7,8 @@
     "onboardingMenuPopout": "فتح الدردشة في نافذة",
     "onboardingMenuFeedback": "إرسال ملاحظات",
     "back": "رجوع",
-    "videoChatPip": "الفيديو والدردشة في نافذة عائمة",
+    "videoChatPip": "مشغّل عائم",
+    "videoChatPipTooltip": "افتح الفيديو والدردشة في نافذة تبقى فوق النوافذ الأخرى.",
     "returnVideoChat": "العودة إلى علامة التبويب",
     "pipOpenFailed": "تعذّر فتح الفيديو والدردشة. حاول مجددًا.",
     "pipReloadRequired": "تم تحديث Chat Enhancer أو إعادة تحميله. أعد تحميل علامة تبويب YouTube هذه لاستخدام الفيديو والدردشة في نافذة عائمة.",
@@ -38,6 +39,10 @@
     "inboxAriaUnread": "صندوق الوارد، {count} غير مقروءة",
     "inboxEmpty": "صندوق الوارد فارغ",
     "liteMode": "الوضع الخفيف",
+    "enableChatTranslation": "تشغيل الترجمة",
+    "disableChatTranslation": "إيقاف الترجمة",
+    "enableAlertSounds": "تشغيل أصوات التنبيهات",
+    "disableAlertSounds": "إيقاف أصوات التنبيهات",
     "enableLiteMode": "تشغيل الوضع الخفيف",
     "disableLiteMode": "إيقاف الوضع الخفيف",
     "liteModeLoadingChat": "جارٍ تحميل الدردشة",
@@ -688,7 +693,7 @@
       "message": "استعادة الإشارة المرجعية"
     },
     "onboardingChatMenuTooltip": {
-      "message": "انقر على أيقونة Chat Enhancer لفتح الإعدادات السريعة."
+      "message": "افتح قائمة الدردشة للوصول إلى الإعدادات السريعة."
     },
     "onboardingBookmarkTooltip": {
       "message": "احفظ هذه الرسالة في تبويب الإشارات في الإضافة لتجدها حتى بعد مغادرة البث. انقر مجددًا لإزالتها."

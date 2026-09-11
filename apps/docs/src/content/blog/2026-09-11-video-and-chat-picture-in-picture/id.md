@@ -20,12 +20,12 @@ Pindahkan ke sudut yang nyaman dan lanjutkan menonton. Anda tetap bisa membaca d
 
 :::media-left
 
-![Menu Chat Enhancer yang menampilkan opsi video dan chat PiP dengan peserta chat fiktif](./menu.png) {shadow=smooth}
+![Menu YouTube yang menampilkan opsi video dan chat PiP dengan peserta chat fiktif](./menu.png) {shadow=smooth}
 
 Di halaman tontonan YouTube dengan live chat terbuka:
 
-1. Klik ikon **Chat Enhancer** di bagian atas chat.
-2. Pilih **Video + chat PiP**.
+1. Buka menu **⋮** di bagian atas chat.
+2. Pilih **Pemutar apung**.
 
 :::
 

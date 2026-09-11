@@ -20,12 +20,12 @@ Mova a janela para um canto conveniente e continue assistindo. Você pode ler e 
 
 :::media-left
 
-![O menu do Chat Enhancer com a opção Vídeo + chat PiP visível. Todos os nomes, avatares e mensagens do chat são fictícios.](./menu.png) {shadow=smooth}
+![O menu do YouTube com a opção Vídeo + chat PiP visível. Todos os nomes, avatares e mensagens do chat são fictícios.](./menu.png) {shadow=smooth}
 
 Em uma página de vídeo do YouTube com o chat ao vivo aberto:
 
-1. Clique no ícone do **Chat Enhancer** no topo do chat.
-2. Escolha **Vídeo + chat PiP**.
+1. Abra o menu **⋮** no topo do chat.
+2. Escolha **Janela flutuante**.
 
 :::
 

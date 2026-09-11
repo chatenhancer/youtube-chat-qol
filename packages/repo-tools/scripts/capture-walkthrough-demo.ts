@@ -381,7 +381,7 @@ async function recordWalkthrough(page, chat, context, recorder) {
 async function sectionTranslateChat(page, chat, context, recorder) {
   await focusChatHeader(page, chat, recorder, { showFocus: false });
   await positionDemoChatAtMessage(chat, 'translate-2');
-  const settingsButton = chat.locator('yt-live-chat-header-renderer .ytcq-settings-button');
+  const settingsButton = chat.locator('yt-live-chat-header-renderer #live-chat-header-context-menu').getByRole('button');
   const settingsMenu = await openChatSettingsMenu(page, chat, recorder, settingsButton, {
     caption: getWalkthroughClickCaption('translateLiveChat')
   });
@@ -431,10 +431,10 @@ async function sectionTranslateChat(page, chat, context, recorder) {
 
 async function openChatSettingsMenu(page, chat, recorder, settingsButton, firstClickOptions) {
   await closeNativeMenus(chat);
-  await clickWithCursor(page, settingsButton, recorder, 'Chat Enhancer button', firstClickOptions);
-  const menu = chat.locator('.ytcq-settings-menu');
-  await menu.waitFor({ state: 'visible', timeout: 3_000 });
-  await captureStableLocatorState(menu, recorder, 'Chat Enhancer menu');
+  await clickWithCursor(page, settingsButton, recorder, 'Chat menu button', firstClickOptions);
+  const menu = chat.locator(menuPopupSelector);
+  await menu.locator('.ytcq-settings-grid').waitFor({ state: 'visible', timeout: 3_000 });
+  await captureStableLocatorState(menu, recorder, 'Chat quick settings');
   return menu;
 }
 
@@ -2070,7 +2070,7 @@ async function closeNativeMenus(chat) {
   }).catch(() => undefined);
   for (let index = 0; index < 3; index += 1) {
     await chat.locator('body').press('Escape').catch(() => undefined);
-    const menu = await findVisibleMenuToClose(chat).catch(() => null);
+    const menu = await findVisibleNativeMenu(chat).catch(() => null);
     if (!menu) break;
     await menu.press('Escape').catch(() => undefined);
   }
@@ -2107,8 +2107,8 @@ async function closeGamesPanelIfPresent(chat) {
   }
 }
 
-async function findVisibleMenuToClose(chat) {
-  const menus = chat.locator(`${menuPopupSelector}, .ytcq-settings-menu`);
+async function findVisibleNativeMenu(chat) {
+  const menus = chat.locator(menuPopupSelector);
   const count = await menus.count();
   for (let index = count - 1; index >= 0; index -= 1) {
     const menu = menus.nth(index);

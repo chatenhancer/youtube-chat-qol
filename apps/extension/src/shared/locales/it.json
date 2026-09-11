@@ -7,7 +7,8 @@
     "onboardingMenuPopout": "Apri chat in una nuova finestra",
     "onboardingMenuFeedback": "Invia feedback",
     "back": "Indietro",
-    "videoChatPip": "Video + chat in finestra mobile",
+    "videoChatPip": "Lettore flottante",
+    "videoChatPipTooltip": "Apri il video e la chat in una finestra sempre in primo piano.",
     "returnVideoChat": "Torna alla scheda",
     "pipOpenFailed": "Impossibile aprire video e chat. Riprova.",
     "pipReloadRequired": "Chat Enhancer è stato aggiornato o ricaricato. Ricarica questa scheda YouTube per usare video + chat PiP.",
@@ -38,6 +39,10 @@
     "inboxAriaUnread": "Posta in arrivo, {count} non letti",
     "inboxEmpty": "Posta in arrivo vuota",
     "liteMode": "Modalità leggera",
+    "enableChatTranslation": "Attiva la traduzione",
+    "disableChatTranslation": "Disattiva la traduzione",
+    "enableAlertSounds": "Attiva i suoni di avviso",
+    "disableAlertSounds": "Disattiva i suoni di avviso",
     "enableLiteMode": "Attiva la modalità leggera",
     "disableLiteMode": "Disattiva la modalità leggera",
     "liteModeLoadingChat": "Caricamento della chat",
@@ -688,7 +693,7 @@
       "message": "Ripristina segnalibro"
     },
     "onboardingChatMenuTooltip": {
-      "message": "Fai clic sull’icona di Chat Enhancer per aprire le impostazioni rapide."
+      "message": "Apri il menu della chat per accedere alle impostazioni rapide."
     },
     "onboardingBookmarkTooltip": {
       "message": "Salva questo messaggio nella scheda Segnalibri dell’estensione per ritrovarlo anche dopo la diretta. Fai di nuovo clic per rimuoverlo."

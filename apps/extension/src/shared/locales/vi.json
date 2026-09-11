@@ -7,7 +7,8 @@
     "onboardingMenuPopout": "Mở cuộc trò chuyện trong cửa sổ mới",
     "onboardingMenuFeedback": "Gửi ý kiến phản hồi",
     "back": "Quay lại",
-    "videoChatPip": "Video + trò chuyện trong cửa sổ nổi",
+    "videoChatPip": "Trình phát nổi",
+    "videoChatPipTooltip": "Mở video và trò chuyện trong cửa sổ luôn nằm trên các cửa sổ khác.",
     "returnVideoChat": "Quay lại thẻ",
     "pipOpenFailed": "Không thể mở video và trò chuyện. Hãy thử lại.",
     "pipReloadRequired": "Chat Enhancer đã được cập nhật hoặc tải lại. Hãy làm mới thẻ YouTube này để dùng video + trò chuyện PiP.",
@@ -38,6 +39,10 @@
     "inboxAriaUnread": "Hộp thư, {count} chưa đọc",
     "inboxEmpty": "Hộp thư trống",
     "liteMode": "Chế độ nhẹ",
+    "enableChatTranslation": "Bật dịch",
+    "disableChatTranslation": "Tắt dịch",
+    "enableAlertSounds": "Bật âm thanh thông báo",
+    "disableAlertSounds": "Tắt âm thanh thông báo",
     "enableLiteMode": "Bật chế độ nhẹ",
     "disableLiteMode": "Tắt chế độ nhẹ",
     "liteModeLoadingChat": "Đang tải cuộc trò chuyện",
@@ -685,7 +690,7 @@
       "message": "Khôi phục dấu trang"
     },
     "onboardingChatMenuTooltip": {
-      "message": "Nhấp vào biểu tượng Chat Enhancer để mở cài đặt nhanh."
+      "message": "Mở menu trò chuyện để truy cập cài đặt nhanh."
     },
     "onboardingBookmarkTooltip": {
       "message": "Lưu tin nhắn này trong thẻ Dấu trang của tiện ích để tìm lại ngay cả khi đã rời buổi phát. Nhấp lần nữa để xóa."

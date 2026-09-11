@@ -7,7 +7,8 @@
     "onboardingMenuPopout": "פתיחת הצ׳אט בחלון",
     "onboardingMenuFeedback": "שליחת משוב",
     "back": "חזרה",
-    "videoChatPip": "וידאו וצ׳אט בחלון צף",
+    "videoChatPip": "נגן צף",
+    "videoChatPipTooltip": "פתחו את הווידאו והצ׳אט בחלון שנשאר תמיד מעל חלונות אחרים.",
     "returnVideoChat": "חזרה לכרטיסייה",
     "pipOpenFailed": "לא ניתן לפתוח את הווידאו והצ׳אט. נסו שוב.",
     "pipReloadRequired": "Chat Enhancer עודכן או נטען מחדש. יש לרענן את כרטיסיית YouTube הזו כדי להשתמש בווידאו וצ׳אט בתמונה בתוך תמונה.",
@@ -38,6 +39,10 @@
     "inboxAriaUnread": "תיבה, {count} לא נקראו",
     "inboxEmpty": "התיבה ריקה",
     "liteMode": "מצב קל",
+    "enableChatTranslation": "הפעלת תרגום",
+    "disableChatTranslation": "כיבוי תרגום",
+    "enableAlertSounds": "הפעלת צלילי התראה",
+    "disableAlertSounds": "כיבוי צלילי התראה",
     "enableLiteMode": "הפעלת מצב קל",
     "disableLiteMode": "כיבוי מצב קל",
     "liteModeLoadingChat": "הצ'אט נטען",
@@ -685,7 +690,7 @@
       "message": "שחזור סימנייה"
     },
     "onboardingChatMenuTooltip": {
-      "message": "לחצו על הסמל של Chat Enhancer כדי לפתוח את ההגדרות המהירות."
+      "message": "פתחו את תפריט הצ׳אט כדי לגשת להגדרות המהירות."
     },
     "onboardingBookmarkTooltip": {
       "message": "שמרו את ההודעה בלשונית הסימניות של התוסף, גם לאחר עזיבת השידור. לחצו שוב כדי להסיר אותה."

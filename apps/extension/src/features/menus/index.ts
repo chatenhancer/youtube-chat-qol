@@ -3,7 +3,7 @@
  *
  * YouTube renders chat settings and message context actions with the same popup
  * renderer. This module recognizes message menus after Polymer stamps their
- * children, keeping the native chat settings menu separate.
+ * children, appending quick controls only to the chat settings menu.
  */
 import { registerFeature } from '../../content/dispatcher';
 import { CHAT_HEADER_SELECTOR } from '../../youtube/selectors';
@@ -12,7 +12,8 @@ import {
   enhanceMessageContextMenu,
   isRecentActiveContextMessage
 } from './message-menu';
-import './settings-button';
+import { cleanupStaleSettingsMenuSurfaces, enhanceSettingsMenu } from './settings-menu';
+import { handleSettingsGridBoundaryKeyDown } from './settings-grid';
 
 const LIVE_CHAT_MENU_MARKER_SELECTOR = [
   'yt-live-chat-toggle-renderer',
@@ -28,6 +29,9 @@ let headerMenuRequested = false;
 registerFeature({
   page: {
     init: () => {
+      document.addEventListener('keydown', handleSettingsGridBoundaryKeyDown, {
+        capture: true, signal: menuListeners.signal
+      });
       // New YouTube menus can omit the timestamps toggle. Remember the native
       // trigger instead of depending on localized labels or private commands.
       document.addEventListener('click', (event) => {
@@ -54,7 +58,9 @@ export function enhanceMenu(menu: Element): void {
   if (!(menu instanceof HTMLElement)) return;
   window.setTimeout(() => {
     const repairedLiveChatMenu = repairLiveChatMenuSize(menu);
-    if (isMessageContextMenu(menu)) {
+    if (isChatSettingsMenu(menu)) {
+      enhanceSettingsMenu(menu);
+    } else if (isMessageContextMenu(menu)) {
       enhanceMessageContextMenu(menu);
     }
     if (repairedLiveChatMenu) {
@@ -68,6 +74,7 @@ export function cleanupStaleMenuSurfaces(): void {
   menuListeners = new AbortController();
   headerMenuRequested = false;
   cleanupStaleMessageMenuSurfaces();
+  cleanupStaleSettingsMenuSurfaces();
 }
 
 function handleMenuMutations({ addedElements, mutations }: {

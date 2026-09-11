@@ -20,12 +20,12 @@ Placez-la dans un coin pratique et continuez à regarder. Vous pouvez lire le ch
 
 :::media-left
 
-![Le menu de Chat Enhancer avec l’option Vidéo + chat PiP. Les noms, avatars et messages du chat sont fictifs.](./menu.png) {shadow=smooth}
+![Le menu de YouTube avec l’option Vidéo + chat PiP. Les noms, avatars et messages du chat sont fictifs.](./menu.png) {shadow=smooth}
 
 Sur une page de vidéo YouTube dont le chat en direct est ouvert :
 
-1. Cliquez sur l’icône **Chat Enhancer** en haut du chat.
-2. Choisissez **Vidéo + chat PiP**.
+1. Ouvrez le menu **⋮** en haut du chat.
+2. Choisissez **Lecteur flottant**.
 
 :::
 

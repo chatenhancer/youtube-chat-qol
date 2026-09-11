@@ -7,7 +7,8 @@
     "onboardingMenuPopout": "Popout chat",
     "onboardingMenuFeedback": "Send feedback",
     "back": "Back",
-    "videoChatPip": "Video + chat PiP",
+    "videoChatPip": "Floating player",
+    "videoChatPipTooltip": "Open video and chat in an always-on-top window.",
     "returnVideoChat": "Return to tab",
     "pipOpenFailed": "Could not open video + chat. Please try again.",
     "pipReloadRequired": "Chat Enhancer was updated or reloaded. Refresh this YouTube tab to use video + chat PiP.",
@@ -38,6 +39,10 @@
     "inboxAriaUnread": "Inbox, {count} unread",
     "inboxEmpty": "Inbox empty",
     "liteMode": "Lite mode",
+    "enableChatTranslation": "Turn on translation",
+    "disableChatTranslation": "Turn off translation",
+    "enableAlertSounds": "Turn on alert sounds",
+    "disableAlertSounds": "Turn off alert sounds",
     "enableLiteMode": "Turn on Lite mode",
     "disableLiteMode": "Turn off Lite mode",
     "liteModeLoadingChat": "Loading chat",
@@ -688,7 +693,7 @@
       "message": "Restore bookmark"
     },
     "onboardingChatMenuTooltip": {
-      "message": "Click the Chat Enhancer icon to open quick settings."
+      "message": "Open the chat menu to access quick settings."
     },
     "onboardingBookmarkTooltip": {
       "message": "Save this message in the extension’s Bookmarks tab, even after leaving the stream. Click again to remove it."

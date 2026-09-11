@@ -723,13 +723,16 @@ optgroup {
   line-height: 22px;
 }
 
-.ytcq-settings-menu.preview-settings-menu {
+ytd-menu-popup-renderer.preview-settings-menu {
   position: absolute;
   z-index: 6;
   top: 52px;
   display: block;
   width: max-content;
+  min-width: min(200px, calc(100% - 16px));
   max-width: calc(100% - 16px);
+  box-sizing: border-box;
+  padding: 8px 0;
   /* The preview scrolls with the page; keep its menu anchored inside the chat. */
   transform: none;
   border: 1px solid var(--preview-border);
@@ -1543,4 +1546,8 @@ optgroup {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
   }
+}
+
+.preview-native-menu-item .ytcq-paper-item {
+  cursor: default;
 }

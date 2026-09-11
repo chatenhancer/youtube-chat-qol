@@ -378,7 +378,7 @@ function hasSelectedLiteMessageText(message: HTMLElement): boolean {
 
 function prepareContextMenu(menu: HTMLElement): void {
   menu.classList.add('ytcq-context-expanded-menu');
-  menu.classList.remove('ytcq-settings-expanded-menu');
+  menu.classList.remove('ytcq-settings-expanded-menu', 'ytcq-settings-grid-menu');
   menu.style.setProperty('--ytcq-context-shift-y', '0px');
   menu.style.removeProperty('width');
   menu.style.removeProperty('min-width');

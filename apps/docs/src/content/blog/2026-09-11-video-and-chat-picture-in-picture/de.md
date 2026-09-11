@@ -20,12 +20,12 @@ Verschiebe es in eine passende Ecke und schau weiter. Du kannst im Chat lesen un
 
 :::media-left
 
-![Das Menü von Chat Enhancer mit der Option Video + Chat PiP. Alle Chatnamen, Avatare und Nachrichten sind erfunden.](./menu.png) {shadow=smooth}
+![Das Menü von YouTube mit der Option Video + Chat PiP. Alle Chatnamen, Avatare und Nachrichten sind erfunden.](./menu.png) {shadow=smooth}
 
 Auf einer YouTube-Videoseite mit geöffnetem Livechat:
 
-1. Klicke oben im Chat auf das **Chat Enhancer**-Symbol.
-2. Wähle **Video + Chat PiP**.
+1. Öffne das **⋮**-Menü oben im Chat.
+2. Wähle **Schwebefenster**.
 
 :::
 

@@ -7,7 +7,8 @@
     "onboardingMenuPopout": "在新窗口中打开聊天",
     "onboardingMenuFeedback": "发送反馈",
     "back": "返回",
-    "videoChatPip": "视频和聊天悬浮窗",
+    "videoChatPip": "悬浮播放器",
+    "videoChatPipTooltip": "在始终置顶的窗口中打开视频和聊天。",
     "returnVideoChat": "返回标签页",
     "pipOpenFailed": "无法打开视频和聊天，请重试。",
     "pipReloadRequired": "Chat Enhancer 已更新或重新加载。请刷新此 YouTube 标签页，以使用视频 + 聊天画中画。",
@@ -38,6 +39,10 @@
     "inboxAriaUnread": "收件箱，{count} 条未读",
     "inboxEmpty": "收件箱为空",
     "liteMode": "轻量模式",
+    "enableChatTranslation": "开启翻译",
+    "disableChatTranslation": "关闭翻译",
+    "enableAlertSounds": "开启提醒音效",
+    "disableAlertSounds": "关闭提醒音效",
     "enableLiteMode": "开启轻量模式",
     "disableLiteMode": "关闭轻量模式",
     "liteModeLoadingChat": "正在加载聊天",
@@ -688,7 +693,7 @@
       "message": "恢复书签"
     },
     "onboardingChatMenuTooltip": {
-      "message": "点击 Chat Enhancer 图标以打开快捷设置。"
+      "message": "打开聊天菜单即可使用快捷设置。"
     },
     "onboardingBookmarkTooltip": {
       "message": "将此消息保存在扩展程序的“书签”标签页中，离开直播后也能找到。再次点击即可移除。"

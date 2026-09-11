@@ -7,7 +7,8 @@
     "onboardingMenuPopout": "Chat in eigenem Fenster",
     "onboardingMenuFeedback": "Feedback senden",
     "back": "Zurück",
-    "videoChatPip": "Video + Chat im Bild-in-Bild",
+    "videoChatPip": "Schwebefenster",
+    "videoChatPipTooltip": "Öffne Video und Chat in einem Fenster, das immer im Vordergrund bleibt.",
     "returnVideoChat": "Zurück zum Tab",
     "pipOpenFailed": "Video und Chat konnten nicht geöffnet werden. Bitte erneut versuchen.",
     "pipReloadRequired": "Chat Enhancer wurde aktualisiert oder neu geladen. Lade diesen YouTube-Tab neu, um Video + Chat PiP zu verwenden.",
@@ -38,6 +39,10 @@
     "inboxAriaUnread": "Posteingang, {count} ungelesen",
     "inboxEmpty": "Posteingang leer",
     "liteMode": "Lite-Modus",
+    "enableChatTranslation": "Übersetzung einschalten",
+    "disableChatTranslation": "Übersetzung ausschalten",
+    "enableAlertSounds": "Hinweistöne einschalten",
+    "disableAlertSounds": "Hinweistöne ausschalten",
     "enableLiteMode": "Lite-Modus einschalten",
     "disableLiteMode": "Lite-Modus ausschalten",
     "liteModeLoadingChat": "Chat wird geladen",
@@ -685,7 +690,7 @@
       "message": "Lesezeichen wiederherstellen"
     },
     "onboardingChatMenuTooltip": {
-      "message": "Klicke auf das Chat Enhancer-Symbol, um die Schnelleinstellungen zu öffnen."
+      "message": "Öffne das Chatmenü, um auf die Schnelleinstellungen zuzugreifen."
     },
     "onboardingBookmarkTooltip": {
       "message": "Speichere diese Nachricht im Tab „Lesezeichen“ der Erweiterung, auch über den Stream hinaus. Klicke erneut, um sie zu entfernen."

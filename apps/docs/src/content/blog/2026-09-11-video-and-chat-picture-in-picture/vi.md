@@ -20,12 +20,12 @@ Di chuyển cửa sổ đến một góc thuận tiện rồi tiếp tục xem. 
 
 :::media-left
 
-![Menu Chat Enhancer với tùy chọn video và trò chuyện PiP cùng những người tham gia hư cấu](./menu.png) {shadow=smooth}
+![Menu YouTube với tùy chọn video và trò chuyện PiP cùng những người tham gia hư cấu](./menu.png) {shadow=smooth}
 
 Trên trang xem YouTube có trò chuyện trực tiếp đang mở:
 
-1. Nhấp vào biểu tượng **Chat Enhancer** ở đầu khung trò chuyện.
-2. Chọn **Video + trò chuyện PiP**.
+1. Mở menu **⋮** ở đầu khung trò chuyện.
+2. Chọn **Trình phát nổi**.
 
 :::
 

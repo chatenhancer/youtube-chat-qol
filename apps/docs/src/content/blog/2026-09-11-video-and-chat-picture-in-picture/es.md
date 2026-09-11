@@ -20,12 +20,12 @@ Muévela a un rincón cómodo y sigue viendo. Puedes leer y responder en el chat
 
 :::media-left
 
-![El menú de Chat Enhancer con la opción Vídeo + chat PiP visible. Los nombres, avatares y mensajes del chat son ficticios.](./menu.png) {shadow=smooth}
+![El menú de YouTube con la opción Vídeo + chat PiP visible. Los nombres, avatares y mensajes del chat son ficticios.](./menu.png) {shadow=smooth}
 
 En una página de vídeo de YouTube con el chat en directo abierto:
 
-1. Haz clic en el icono de **Chat Enhancer** en la parte superior del chat.
-2. Elige **Vídeo + chat PiP**.
+1. Abre el menú **⋮** en la parte superior del chat.
+2. Elige **Ventana flotante**.
 
 :::
 

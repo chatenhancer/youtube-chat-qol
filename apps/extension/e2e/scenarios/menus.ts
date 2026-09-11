@@ -13,41 +13,36 @@ import {
 } from '../support/menu-openers';
 import type { BrowserScenario, ChatSurface } from './types';
 export const settingsMenuScenario: BrowserScenario = async ({ chat }) => {
-  const nativeMenu = await openSettingsMenu(chat);
-  await expect(nativeMenu.locator('.ytcq-settings-item')).toHaveCount(0);
-  const nativeRow = (await nativeMenu.locator('#items > *').first().boundingBox())!;
-  await closeOpenMenus(chat);
-  const button = chat.locator('.ytcq-settings-button');
-  await expect(button).toHaveCount(1);
-  await button.hover();
-  await expect(chat.locator('.ytcq-settings-menu')).toHaveCount(0);
-  await button.press('Enter');
-  const menu = chat.locator('.ytcq-settings-menu');
+  const menu = await openChatEnhancerMenu(chat);
   await expectSettingsMenuControlsInjected(menu);
-  await expect(button).toHaveAttribute('aria-expanded', 'true');
-  await expect(menu.locator('[data-ytcq-action="settings-back"]')).toHaveCount(0);
-  const translate = menu.locator('[data-ytcq-setting="targetLanguage"]');
-  await expect(translate).toBeFocused();
-  const settingRowHeights = await menu.locator('[data-ytcq-setting]').evaluateAll(rows =>
-    rows.map(row => row.getBoundingClientRect().height)
+  await expect(chat.locator('.ytcq-settings-button')).toHaveCount(0);
+  await expect(menu.locator('#items > :not(.ytcq-settings-grid)').first()).toBeVisible();
+  await expect(menu.locator('.ytcq-settings-grid')).toHaveCount(1);
+  const measurements = await menu.locator('.ytcq-settings-grid .ytcq-settings-item').evaluateAll(items =>
+    items.map(item => {
+      const bounds = item.getBoundingClientRect();
+      const icon = item.querySelector('.ytcq-menu-icon')!.getBoundingClientRect();
+      const label = item.querySelector('.ytcq-menu-label')!.getBoundingClientRect();
+      return { width: bounds.width, height: bounds.height, center: (icon.top + label.bottom - bounds.top - bounds.bottom) / 2 };
+    })
   );
-  for (const height of settingRowHeights) expect(height).toBeCloseTo(nativeRow.height, 0);
-  await translate.press('ArrowDown');
+  for (const item of measurements) {
+    expect(item.width).toBeCloseTo(measurements[0].width, 1);
+    expect(item.height).toBeCloseTo(measurements[0].height, 1);
+    expect(item.center).toBeCloseTo(0, 1);
+  }
+  const translate = menu.locator('[data-ytcq-setting="targetLanguage"]');
+  await menu.locator('#items > :not(.ytcq-settings-grid)').last().press('ArrowDown');
+  await expect(translate).toBeFocused();
+  await translate.press('ArrowRight');
   const sound = menu.locator('[data-ytcq-setting="sound"]');
   await expect(sound).toBeFocused();
-  await sound.press('Escape');
-  await expect(menu).toHaveCount(0);
-  await expect(button).toBeFocused();
-  await button.press('ArrowDown');
+  await sound.press('Home');
   await expect(translate).toBeFocused();
-  await button.click();
-  await expect(menu).toHaveCount(0);
-  await button.click();
-  await chat.locator('#live-chat-header-context-menu').getByRole('button').click();
-  await expect(menu).toHaveCount(0);
-  await expect(nativeMenu).toBeVisible();
-  await expect(nativeMenu.locator('.ytcq-settings-item')).toHaveCount(0);
+  await translate.press('ArrowDown');
+  await expect(menu.locator('[data-ytcq-setting="liteModeEnabled"]')).toBeFocused();
   await closeOpenMenus(chat);
+  await expect(menu).not.toBeVisible();
 };
 
 export const settingsMenuButtonTargetScenario: BrowserScenario = async ({ chat }) => {

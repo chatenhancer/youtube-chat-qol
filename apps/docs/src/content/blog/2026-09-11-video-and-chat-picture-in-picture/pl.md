@@ -20,12 +20,12 @@ Przesuń je w wygodne miejsce i oglądaj dalej. Nadal możesz czytać wiadomośc
 
 :::media-left
 
-![Menu Chat Enhancer z opcją wideo i czatu PiP oraz fikcyjnymi uczestnikami czatu](./menu.png) {shadow=smooth}
+![Menu YouTube z opcją wideo i czatu PiP oraz fikcyjnymi uczestnikami czatu](./menu.png) {shadow=smooth}
 
 Na stronie oglądania YouTube z otwartym czatem na żywo:
 
-1. Kliknij ikonę **Chat Enhancer** u góry czatu.
-2. Wybierz **Wideo i czat PiP**.
+1. Otwórz menu **⋮** u góry czatu.
+2. Wybierz **Okno pływające**.
 
 :::
 

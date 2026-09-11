@@ -20,12 +20,12 @@ tags:
 
 :::media-left
 
-![가상의 채팅 참여자와 동영상 및 채팅 PiP 옵션을 보여 주는 Chat Enhancer 메뉴](./menu.png) {shadow=smooth}
+![가상의 채팅 참여자와 동영상 및 채팅 PiP 옵션을 보여 주는 YouTube 메뉴](./menu.png) {shadow=smooth}
 
 실시간 채팅이 열린 YouTube 시청 페이지에서 다음과 같이 선택하세요.
 
-1. 채팅 상단의 **Chat Enhancer** 아이콘을 클릭합니다.
-2. **동영상 + 채팅 PiP**를 선택합니다.
+1. 채팅 상단의 **⋮** 메뉴를 엽니다.
+2. **플로팅 플레이어**를 선택합니다.
 
 :::
 

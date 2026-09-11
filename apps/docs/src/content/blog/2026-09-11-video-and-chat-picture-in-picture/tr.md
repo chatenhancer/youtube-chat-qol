@@ -20,12 +20,12 @@ Pencereyi uygun bir köşeye taşıyıp izlemeye devam edin. YouTube sekmesine d
 
 :::media-left
 
-![Kurgusal sohbet katılımcılarıyla video ve sohbet PiP seçeneğini gösteren Chat Enhancer menüsü](./menu.png) {shadow=smooth}
+![Kurgusal sohbet katılımcılarıyla video ve sohbet PiP seçeneğini gösteren YouTube menüsü](./menu.png) {shadow=smooth}
 
 Canlı sohbetin açık olduğu bir YouTube izleme sayfasında:
 
-1. Sohbetin üst kısmındaki **Chat Enhancer** simgesine tıklayın.
-2. **Video + sohbet PiP** seçeneğini seçin.
+1. Sohbetin üst kısmındaki **⋮** menüsünü açın.
+2. **Yüzen oynatıcı** seçeneğini seçin.
 
 :::
 

@@ -52,12 +52,8 @@ export async function openSettingsMenu(chat: ChatSurface): Promise<Locator> {
 }
 
 export async function openChatEnhancerMenu(chat: ChatSurface): Promise<Locator> {
-  await closeOpenMenus(chat);
-  const menu = chat.locator('.ytcq-settings-menu');
-  await test.step('Open the Chat Enhancer header menu', async () => {
-    await chat.locator('yt-live-chat-header-renderer .ytcq-settings-button').click();
-    await expect(menu).toBeVisible();
-  });
+  const menu = await openSettingsMenu(chat);
+  await expect(menu.locator('.ytcq-settings-grid')).toBeVisible();
   return menu;
 }
 
@@ -143,7 +139,7 @@ async function releaseMessageTarget(message: Locator): Promise<void> {
 
 export async function closeOpenMenus(chat: ChatSurface): Promise<void> {
   for (let attempt = 0; attempt < 3; attempt += 1) {
-    const menu = await findVisibleMenuToClose(chat);
+    const menu = await findVisibleNativeMenu(chat);
     if (!menu) return;
     await menu.press('Escape').catch(() => undefined);
     await chat.locator('body').press('Escape').catch(() => undefined);
@@ -151,8 +147,8 @@ export async function closeOpenMenus(chat: ChatSurface): Promise<void> {
   }
 }
 
-async function findVisibleMenuToClose(chat: ChatSurface): Promise<Locator | null> {
-  const menus = chat.locator(`${MENU_POPUP_SELECTOR}, .ytcq-settings-menu`);
+async function findVisibleNativeMenu(chat: ChatSurface): Promise<Locator | null> {
+  const menus = chat.locator(MENU_POPUP_SELECTOR);
   const count = await menus.count();
 
   for (let index = count - 1; index >= 0; index -= 1) {

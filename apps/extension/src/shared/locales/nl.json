@@ -7,7 +7,8 @@
     "onboardingMenuPopout": "Chat in nieuw venster",
     "onboardingMenuFeedback": "Feedback sturen",
     "back": "Terug",
-    "videoChatPip": "Video + chat in zwevend venster",
+    "videoChatPip": "Zwevende speler",
+    "videoChatPipTooltip": "Open video en chat in een venster dat altijd op de voorgrond blijft.",
     "returnVideoChat": "Terug naar tabblad",
     "pipOpenFailed": "Video en chat konden niet worden geopend. Probeer het opnieuw.",
     "pipReloadRequired": "Chat Enhancer is bijgewerkt of opnieuw geladen. Vernieuw dit YouTube-tabblad om video + chat PiP te gebruiken.",
@@ -38,6 +39,10 @@
     "inboxAriaUnread": "Inbox, {count} ongelezen",
     "inboxEmpty": "Inbox leeg",
     "liteMode": "Lite-modus",
+    "enableChatTranslation": "Vertaling inschakelen",
+    "disableChatTranslation": "Vertaling uitschakelen",
+    "enableAlertSounds": "Meldingsgeluiden inschakelen",
+    "disableAlertSounds": "Meldingsgeluiden uitschakelen",
     "enableLiteMode": "Lite-modus inschakelen",
     "disableLiteMode": "Lite-modus uitschakelen",
     "liteModeLoadingChat": "Chat laden",
@@ -685,7 +690,7 @@
       "message": "Bladwijzer herstellen"
     },
     "onboardingChatMenuTooltip": {
-      "message": "Klik op het Chat Enhancer-pictogram om de snelle instellingen te openen."
+      "message": "Open het chatmenu voor de snelle instellingen."
     },
     "onboardingBookmarkTooltip": {
       "message": "Bewaar dit bericht op het tabblad Bladwijzers van de extensie, ook nadat je de stream verlaat. Klik nogmaals om het te verwijderen."

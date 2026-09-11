@@ -7,7 +7,8 @@
     "onboardingMenuPopout": "Chat en ventana emergente",
     "onboardingMenuFeedback": "Enviar comentarios",
     "back": "Atrás",
-    "videoChatPip": "Vídeo + chat en ventana flotante",
+    "videoChatPip": "Ventana flotante",
+    "videoChatPipTooltip": "Abre el vídeo y el chat en una ventana que permanece siempre visible.",
     "returnVideoChat": "Volver a la pestaña",
     "pipOpenFailed": "No se pudieron abrir el vídeo y el chat. Inténtalo de nuevo.",
     "pipReloadRequired": "Chat Enhancer se ha actualizado o recargado. Actualiza esta pestaña de YouTube para usar vídeo + chat PiP.",
@@ -38,6 +39,10 @@
     "inboxAriaUnread": "Bandeja, {count} sin leer",
     "inboxEmpty": "Bandeja vacía",
     "liteMode": "Modo ligero",
+    "enableChatTranslation": "Activar la traducción",
+    "disableChatTranslation": "Desactivar la traducción",
+    "enableAlertSounds": "Activar los sonidos de alerta",
+    "disableAlertSounds": "Desactivar los sonidos de alerta",
     "enableLiteMode": "Activar el modo ligero",
     "disableLiteMode": "Desactivar el modo ligero",
     "liteModeLoadingChat": "Cargando chat",
@@ -685,7 +690,7 @@
       "message": "Restaurar marcador"
     },
     "onboardingChatMenuTooltip": {
-      "message": "Haz clic en el icono de Chat Enhancer para abrir los ajustes rápidos."
+      "message": "Abre el menú del chat para acceder a los ajustes rápidos."
     },
     "onboardingBookmarkTooltip": {
       "message": "Guarda este mensaje en la pestaña Marcadores de la extensión, incluso después de salir de la transmisión. Haz clic de nuevo para quitarlo."

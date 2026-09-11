@@ -7,7 +7,8 @@
     "onboardingMenuPopout": "채팅창 새 창으로 열기",
     "onboardingMenuFeedback": "의견 보내기",
     "back": "뒤로",
-    "videoChatPip": "동영상 + 채팅을 작은 창으로",
+    "videoChatPip": "플로팅 플레이어",
+    "videoChatPipTooltip": "동영상과 채팅을 항상 다른 창 위에 표시되는 창으로 여세요.",
     "returnVideoChat": "탭으로 돌아가기",
     "pipOpenFailed": "동영상과 채팅을 열지 못했습니다. 다시 시도해 주세요.",
     "pipReloadRequired": "Chat Enhancer가 업데이트되거나 다시 로드되었습니다. 동영상 + 채팅 PiP를 사용하려면 이 YouTube 탭을 새로고침하세요.",
@@ -38,6 +39,10 @@
     "inboxAriaUnread": "받은 편지함, 읽지 않은 메시지 {count}개",
     "inboxEmpty": "받은 편지함 비어 있음",
     "liteMode": "라이트 모드",
+    "enableChatTranslation": "번역 켜기",
+    "disableChatTranslation": "번역 끄기",
+    "enableAlertSounds": "알림 소리 켜기",
+    "disableAlertSounds": "알림 소리 끄기",
     "enableLiteMode": "라이트 모드 켜기",
     "disableLiteMode": "라이트 모드 끄기",
     "liteModeLoadingChat": "채팅을 불러오는 중",
@@ -685,7 +690,7 @@
       "message": "북마크 복원"
     },
     "onboardingChatMenuTooltip": {
-      "message": "Chat Enhancer 아이콘을 클릭하여 빠른 설정을 엽니다."
+      "message": "빠른 설정을 사용하려면 채팅 메뉴를 여세요."
     },
     "onboardingBookmarkTooltip": {
       "message": "이 메시지를 확장 프로그램의 북마크 탭에 저장하면 스트림을 떠난 후에도 찾을 수 있습니다. 다시 클릭하면 삭제됩니다."

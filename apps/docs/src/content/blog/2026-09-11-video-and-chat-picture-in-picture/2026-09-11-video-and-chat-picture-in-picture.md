@@ -20,12 +20,12 @@ Move it to a convenient corner and keep watching. You can still read and reply i
 
 :::media-left
 
-![The Chat Enhancer menu with the Video + chat PiP option visible. All chat names, avatars, and messages are fictional.](./menu.png) {shadow=smooth}
+![The YouTube menu with the Floating player option visible. All chat names, avatars, and messages are fictional.](./menu.png) {shadow=smooth}
 
 On a YouTube watch page with live chat open:
 
-1. Click the **Chat Enhancer** icon at the top of chat.
-2. Choose **Video + chat PiP**.
+1. Open the **⋮** menu at the top of the chat.
+2. Choose **Floating player**.
 
 :::
 

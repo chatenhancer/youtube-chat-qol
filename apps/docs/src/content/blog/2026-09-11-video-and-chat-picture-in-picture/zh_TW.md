@@ -20,12 +20,12 @@ tags:
 
 :::media-left
 
-![顯示影片和聊天子母畫面選項的 Chat Enhancer 選單，聊天參與者均為虛構](./menu.png) {shadow=smooth}
+![顯示影片和聊天子母畫面選項的 YouTube 選單，聊天參與者均為虛構](./menu.png) {shadow=smooth}
 
 在已開啟即時聊天的 YouTube 觀看頁面上：
 
-1. 點選聊天頂端的 **Chat Enhancer** 圖示。
-2. 選取**影片 + 聊天子母畫面**。
+1. 開啟聊天頂端的 **⋮** 選單。
+2. 選取**懸浮播放器**。
 
 :::
 

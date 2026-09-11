@@ -7,7 +7,8 @@
     "onboardingMenuPopout": "باز کردن گپ در پنجره",
     "onboardingMenuFeedback": "ارسال بازخورد",
     "back": "بازگشت",
-    "videoChatPip": "ویدیو و گپ در پنجرهٔ شناور",
+    "videoChatPip": "پخش‌کنندهٔ شناور",
+    "videoChatPipTooltip": "ویدیو و گپ را در پنجره‌ای باز کنید که همیشه روی پنجره‌های دیگر می‌ماند.",
     "returnVideoChat": "بازگشت به برگه",
     "pipOpenFailed": "ویدیو و گپ باز نشدند. دوباره تلاش کنید.",
     "pipReloadRequired": "Chat Enhancer به‌روزرسانی یا دوباره بارگذاری شده است. برای استفاده از ویدیو و چت شناور، این برگهٔ YouTube را دوباره بارگذاری کنید.",
@@ -38,6 +39,10 @@
     "inboxAriaUnread": "صندوق ورودی، {count} خوانده‌نشده",
     "inboxEmpty": "صندوق ورودی خالی است",
     "liteMode": "حالت سبک",
+    "enableChatTranslation": "روشن کردن ترجمه",
+    "disableChatTranslation": "خاموش کردن ترجمه",
+    "enableAlertSounds": "روشن کردن صداهای هشدار",
+    "disableAlertSounds": "خاموش کردن صداهای هشدار",
     "enableLiteMode": "روشن کردن حالت سبک",
     "disableLiteMode": "خاموش کردن حالت سبک",
     "liteModeLoadingChat": "در حال بارگیری گفت‌وگو",
@@ -685,7 +690,7 @@
       "message": "بازیابی نشانک"
     },
     "onboardingChatMenuTooltip": {
-      "message": "برای باز کردن تنظیمات سریع، روی نماد Chat Enhancer کلیک کنید."
+      "message": "برای دسترسی به تنظیمات سریع، منوی گپ را باز کنید."
     },
     "onboardingBookmarkTooltip": {
       "message": "این پیام را در زبانهٔ نشانک‌ها در افزونه ذخیره کنید تا پس از ترک پخش هم در دسترس باشد. برای حذف، دوباره کلیک کنید."

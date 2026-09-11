@@ -20,8 +20,8 @@ export const onboardingFeaturePreviewScenario: ExtensionScenario = async ({ cont
     await expect(onboarding.locator('#onboardingTargetLanguage')).toHaveValue('ja');
     await onboarding.locator('#previewMenuButton').click();
     const menu = onboarding.locator('#previewSettingsMenu');
-    await expect(menu.locator('[data-ytcq-setting="targetLanguage"]')).toBeFocused();
-    await expect(menu.locator('.preview-native-menu-item')).toHaveCount(0);
+    await expect(menu.locator('.preview-native-menu-item').first()).toBeFocused();
+    await expect(menu.locator('.preview-native-menu-item')).toHaveCount(3);
     const lite = menu.locator('[data-ytcq-setting="liteModeEnabled"]');
     await expect(lite).toHaveAttribute('aria-checked', 'true');
     const translate = menu.locator('[data-ytcq-setting="targetLanguage"]');

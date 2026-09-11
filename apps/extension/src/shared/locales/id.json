@@ -7,7 +7,8 @@
     "onboardingMenuPopout": "Buka chat di jendela baru",
     "onboardingMenuFeedback": "Kirim masukan",
     "back": "Kembali",
-    "videoChatPip": "Video + chat dalam PiP",
+    "videoChatPip": "Pemutar apung",
+    "videoChatPipTooltip": "Buka video dan chat di jendela yang selalu berada di atas jendela lain.",
     "returnVideoChat": "Kembali ke tab",
     "pipOpenFailed": "Tidak dapat membuka video dan chat. Coba lagi.",
     "pipReloadRequired": "Chat Enhancer telah diperbarui atau dimuat ulang. Muat ulang tab YouTube ini untuk menggunakan video + chat PiP.",
@@ -38,6 +39,10 @@
     "inboxAriaUnread": "Kotak masuk, {count} belum dibaca",
     "inboxEmpty": "Kotak masuk kosong",
     "liteMode": "Mode ringan",
+    "enableChatTranslation": "Aktifkan terjemahan",
+    "disableChatTranslation": "Nonaktifkan terjemahan",
+    "enableAlertSounds": "Aktifkan suara peringatan",
+    "disableAlertSounds": "Nonaktifkan suara peringatan",
     "enableLiteMode": "Aktifkan mode ringan",
     "disableLiteMode": "Nonaktifkan mode ringan",
     "liteModeLoadingChat": "Memuat chat",
@@ -688,7 +693,7 @@
       "message": "Pulihkan bookmark"
     },
     "onboardingChatMenuTooltip": {
-      "message": "Klik ikon Chat Enhancer untuk membuka pengaturan cepat."
+      "message": "Buka menu chat untuk mengakses pengaturan cepat."
     },
     "onboardingBookmarkTooltip": {
       "message": "Simpan pesan ini di tab Bookmark ekstensi agar tetap tersedia setelah meninggalkan siaran. Klik lagi untuk menghapusnya."

@@ -7,7 +7,8 @@
     "onboardingMenuPopout": "Ouvrir le chat dans une fenêtre",
     "onboardingMenuFeedback": "Envoyer des commentaires",
     "back": "Retour",
-    "videoChatPip": "Vidéo + chat en fenêtre flottante",
+    "videoChatPip": "Lecteur flottant",
+    "videoChatPipTooltip": "Ouvrez la vidéo et le chat dans une fenêtre qui reste au premier plan.",
     "returnVideoChat": "Revenir à l’onglet",
     "pipOpenFailed": "Impossible d’ouvrir la vidéo et le chat. Réessayez.",
     "pipReloadRequired": "Chat Enhancer a été mis à jour ou rechargé. Actualisez cet onglet YouTube pour utiliser la vidéo + le chat en PiP.",
@@ -38,6 +39,10 @@
     "inboxAriaUnread": "Boîte de réception, {count} non lu(s)",
     "inboxEmpty": "Boîte de réception vide",
     "liteMode": "Mode léger",
+    "enableChatTranslation": "Activer la traduction",
+    "disableChatTranslation": "Désactiver la traduction",
+    "enableAlertSounds": "Activer les sons d’alerte",
+    "disableAlertSounds": "Désactiver les sons d’alerte",
     "enableLiteMode": "Activer le mode léger",
     "disableLiteMode": "Désactiver le mode léger",
     "liteModeLoadingChat": "Chargement du chat",
@@ -685,7 +690,7 @@
       "message": "Restaurer le favori"
     },
     "onboardingChatMenuTooltip": {
-      "message": "Cliquez sur l’icône Chat Enhancer pour ouvrir les réglages rapides."
+      "message": "Ouvrez le menu du chat pour accéder aux réglages rapides."
     },
     "onboardingBookmarkTooltip": {
       "message": "Enregistrez ce message dans l’onglet Favoris de l’extension pour le retrouver après le direct. Cliquez à nouveau pour le retirer."

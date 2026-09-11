@@ -20,12 +20,12 @@ tags:
 
 :::media-left
 
-![显示视频和聊天画中画选项的 Chat Enhancer 菜单，聊天参与者均为虚构](./menu.png) {shadow=smooth}
+![显示视频和聊天画中画选项的 YouTube 菜单，聊天参与者均为虚构](./menu.png) {shadow=smooth}
 
 在已打开实时聊天的 YouTube 观看页面上：
 
-1. 点击聊天顶部的 **Chat Enhancer** 图标。
-2. 选择**视频 + 聊天画中画**。
+1. 打开聊天顶部的 **⋮** 菜单。
+2. 选择**悬浮播放器**。
 
 :::
 

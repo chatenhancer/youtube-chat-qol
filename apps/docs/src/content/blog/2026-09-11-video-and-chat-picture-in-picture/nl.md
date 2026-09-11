@@ -20,12 +20,12 @@ Zet het in een handige hoek en kijk verder. Je kunt de chat lezen en beantwoorde
 
 :::media-left
 
-![Het menu van Chat Enhancer met de optie Video + chat PiP. Alle chatnamen, avatars en berichten zijn verzonnen.](./menu.png) {shadow=smooth}
+![Het menu van YouTube met de optie Video + chat PiP. Alle chatnamen, avatars en berichten zijn verzonnen.](./menu.png) {shadow=smooth}
 
 Op een YouTube-videopagina met de livechat geopend:
 
-1. Klik op het **Chat Enhancer**-pictogram bovenaan de chat.
-2. Kies **Video + chat PiP**.
+1. Open het **⋮**-menu bovenaan de chat.
+2. Kies **Zwevende speler**.
 
 :::
 

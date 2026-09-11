@@ -1,5 +1,5 @@
 /**
- * Quick settings shared by the dedicated Chat Enhancer menu.
+ * Quick settings in YouTube's native chat menu.
  * Detailed settings remain in the browser extension popup.
  */
 import { getTargetLanguageUpdate, getTranslationToggleTarget, type Options } from '../../shared/options';
@@ -18,7 +18,8 @@ import { isSupportedLiteModePage } from '../lite-mode/bootstrap';
 import { playAlertSoundPreview } from '../../shared/sounds/alert-sounds';
 import { animateSettingIcon, SETTING_ICON_ANIMATIONS } from '../../shared/setting-icon-animations';
 import { registerFeature } from '../../content/dispatcher';
-import { createMenuActionItem, createMenuToggleItem } from './common';
+import { clampMenuToViewport, closeMenu, createMenuActionItem, createMenuToggleItem } from './common';
+import { createSettingsGrid, setSettingsToggleChecked } from './settings-grid';
 import {
   canTogglePictureInPicture,
   isPictureInPictureChat,
@@ -42,7 +43,16 @@ export function configureSettingsMenu(callback: SaveOptions): void {
   saveOptions = callback;
 }
 
-export function createSettingsMenuItems(close: () => void): HTMLElement[] {
+export function enhanceSettingsMenu(menu: HTMLElement): void {
+  const list = menu.querySelector('#items');
+  if (!list || list.querySelector('.ytcq-settings-grid')) return;
+  menu.classList.add('ytcq-settings-grid-menu');
+  menu.classList.remove('ytcq-context-expanded-menu');
+  list.append(createSettingsGrid(createSettingsMenuItems()));
+  clampMenuToViewport(menu);
+}
+
+function createSettingsMenuItems(): HTMLElement[] {
   const options = getOptions();
   let translateItem: HTMLElement | null = null;
   translateItem = createMenuToggleItem({
@@ -105,9 +115,10 @@ export function createSettingsMenuItems(close: () => void): HTMLElement[] {
     items.push(createMenuActionItem({
       action: 'picture-in-picture',
       label: t(isPictureInPictureChat() ? 'returnVideoChat' : 'videoChatPip'),
+      title: t(isPictureInPictureChat() ? 'returnVideoChat' : 'videoChatPipTooltip'),
       iconPath: PIP_ICON_PATH,
       onClick: () => {
-        close();
+        closeMenu();
         togglePictureInPicture();
       }
     }));
@@ -124,27 +135,28 @@ export function refreshSettingsMenus(): void {
 
     if (setting === 'targetLanguage') {
       label.textContent = t('translateChat');
-      item.setAttribute('aria-checked', String(Boolean(options.targetLanguage)));
+      setSettingsToggleChecked(item, Boolean(options.targetLanguage));
     } else if (setting === 'sound') {
       label.textContent = t('alertSounds');
-      item.setAttribute('aria-checked', String(options.sound));
+      setSettingsToggleChecked(item, options.sound);
       renderSoundMenuIcon(item, options.sound);
     } else if (setting === 'liteModeEnabled') {
       label.textContent = t('liteMode');
-      item.setAttribute('aria-checked', String(options.liteModeEnabled));
+      setSettingsToggleChecked(item, options.liteModeEnabled);
     }
   });
 }
 
 export function cleanupStaleSettingsMenuSurfaces(): void {
   // Firefox can keep the previous extension's injected submenu after reload.
-  document.querySelectorAll('.ytcq-settings-expanded-menu').forEach((menu) => {
-    menu.classList.remove('ytcq-settings-expanded-menu', 'ytcq-settings-submenu-open');
+  document.querySelectorAll('.ytcq-settings-expanded-menu, .ytcq-settings-grid-menu').forEach((menu) => {
+    menu.classList.remove('ytcq-settings-expanded-menu', 'ytcq-settings-submenu-open', 'ytcq-settings-grid-menu');
     for (const animation of menu.querySelector('#items')?.getAnimations?.() || []) {
       if (animation.id === 'ytcq-settings-page') animation.cancel();
     }
   });
-  document.querySelectorAll('.ytcq-settings-item').forEach((item) => item.remove());
+  document.querySelectorAll('.ytcq-settings-item, .ytcq-settings-grid, .ytcq-settings-button, .ytcq-settings-menu')
+    .forEach((item) => item.remove());
 }
 
 function animateSoundMenuIcon(item: HTMLElement): void {
@@ -152,7 +164,7 @@ function animateSoundMenuIcon(item: HTMLElement): void {
   if (!icon) return;
 
   renderSoundMenuIcon(item, true);
-  item.setAttribute('aria-checked', 'true');
+  setSettingsToggleChecked(item, true);
   animateSettingIcon(icon, SETTING_ICON_ANIMATIONS.bell);
 }
 

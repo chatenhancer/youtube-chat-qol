@@ -7,7 +7,8 @@
     "onboardingMenuPopout": "彈出聊天室",
     "onboardingMenuFeedback": "傳送意見回饋",
     "back": "返回",
-    "videoChatPip": "影片與聊天室懸浮視窗",
+    "videoChatPip": "懸浮播放器",
+    "videoChatPipTooltip": "在一律置頂的視窗中開啟影片與聊天室。",
     "returnVideoChat": "返回分頁",
     "pipOpenFailed": "無法開啟影片與聊天室，請再試一次。",
     "pipReloadRequired": "Chat Enhancer 已更新或重新載入。請重新整理此 YouTube 分頁，以使用影片 + 聊天子母畫面。",
@@ -38,6 +39,10 @@
     "inboxAriaUnread": "收件匣，{count} 則未讀",
     "inboxEmpty": "收件匣是空的",
     "liteMode": "輕量模式",
+    "enableChatTranslation": "開啟翻譯",
+    "disableChatTranslation": "關閉翻譯",
+    "enableAlertSounds": "開啟提示音效",
+    "disableAlertSounds": "關閉提示音效",
     "enableLiteMode": "開啟輕量模式",
     "disableLiteMode": "關閉輕量模式",
     "liteModeLoadingChat": "正在載入聊天室",
@@ -685,7 +690,7 @@
       "message": "還原書籤"
     },
     "onboardingChatMenuTooltip": {
-      "message": "點選 Chat Enhancer 圖示以開啟快速設定。"
+      "message": "開啟聊天選單即可使用快速設定。"
     },
     "onboardingBookmarkTooltip": {
       "message": "將這則訊息儲存在擴充功能的「書籤」分頁中，離開直播後也能找到。再次點擊即可移除。"

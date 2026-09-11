@@ -20,12 +20,12 @@ Spostala in un angolo comodo e continua a guardare. Puoi leggere e rispondere in
 
 :::media-left
 
-![Il menu di Chat Enhancer con l’opzione Video + chat PiP visibile. Nomi, avatar e messaggi della chat sono inventati.](./menu.png) {shadow=smooth}
+![Il menu di YouTube con l’opzione Video + chat PiP visibile. Nomi, avatar e messaggi della chat sono inventati.](./menu.png) {shadow=smooth}
 
 Su una pagina video di YouTube con la chat dal vivo aperta:
 
-1. Fai clic sull’icona di **Chat Enhancer** in cima alla chat.
-2. Scegli **Video + chat PiP**.
+1. Apri il menu **⋮** nella parte superiore della chat.
+2. Scegli **Lettore flottante**.
 
 :::
 

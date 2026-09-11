@@ -7,7 +7,8 @@
     "onboardingMenuPopout": "पॉप-आउट चैट",
     "onboardingMenuFeedback": "सुझाव भेजें",
     "back": "वापस",
-    "videoChatPip": "वीडियो + चैट फ़्लोटिंग विंडो में",
+    "videoChatPip": "फ़्लोटिंग प्लेयर",
+    "videoChatPipTooltip": "वीडियो और चैट को ऐसी विंडो में खोलें जो हमेशा दूसरी विंडो के ऊपर रहे।",
     "returnVideoChat": "टैब पर वापस जाएँ",
     "pipOpenFailed": "वीडियो और चैट नहीं खुल सके। फिर से कोशिश करें।",
     "pipReloadRequired": "Chat Enhancer अपडेट या फिर से लोड हुआ है। वीडियो + चैट PiP इस्तेमाल करने के लिए यह YouTube टैब रीफ़्रेश करें।",
@@ -38,6 +39,10 @@
     "inboxAriaUnread": "इनबॉक्स, {count} अपठित",
     "inboxEmpty": "इनबॉक्स खाली है",
     "liteMode": "लाइट मोड",
+    "enableChatTranslation": "अनुवाद चालू करें",
+    "disableChatTranslation": "अनुवाद बंद करें",
+    "enableAlertSounds": "अलर्ट ध्वनियाँ चालू करें",
+    "disableAlertSounds": "अलर्ट ध्वनियाँ बंद करें",
     "enableLiteMode": "लाइट मोड चालू करें",
     "disableLiteMode": "लाइट मोड बंद करें",
     "liteModeLoadingChat": "चैट लोड हो रही है",
@@ -688,7 +693,7 @@
       "message": "बुकमार्क बहाल करें"
     },
     "onboardingChatMenuTooltip": {
-      "message": "त्वरित सेटिंग खोलने के लिए Chat Enhancer आइकन पर क्लिक करें।"
+      "message": "त्वरित सेटिंग्स खोलने के लिए चैट मेन्यू खोलें।"
     },
     "onboardingBookmarkTooltip": {
       "message": "इस संदेश को एक्सटेंशन के बुकमार्क टैब में सहेजें, ताकि स्ट्रीम छोड़ने के बाद भी यह मिल सके। हटाने के लिए फिर क्लिक करें।"

@@ -7,7 +7,8 @@
     "onboardingMenuPopout": "Sohbeti yeni pencerede aç",
     "onboardingMenuFeedback": "Geri bildirim gönder",
     "back": "Geri",
-    "videoChatPip": "Video + sohbet yüzen pencerede",
+    "videoChatPip": "Yüzen oynatıcı",
+    "videoChatPipTooltip": "Videoyu ve sohbeti her zaman diğer pencerelerin üstünde kalan bir pencerede açın.",
     "returnVideoChat": "Sekmeye dön",
     "pipOpenFailed": "Video ve sohbet açılamadı. Tekrar deneyin.",
     "pipReloadRequired": "Chat Enhancer güncellendi veya yeniden yüklendi. Video + sohbet PiP kullanmak için bu YouTube sekmesini yenileyin.",
@@ -38,6 +39,10 @@
     "inboxAriaUnread": "Gelen kutusu, {count} okunmamış",
     "inboxEmpty": "Gelen kutusu boş",
     "liteMode": "Lite mod",
+    "enableChatTranslation": "Çeviriyi aç",
+    "disableChatTranslation": "Çeviriyi kapat",
+    "enableAlertSounds": "Uyarı seslerini aç",
+    "disableAlertSounds": "Uyarı seslerini kapat",
     "enableLiteMode": "Lite modu aç",
     "disableLiteMode": "Lite modu kapat",
     "liteModeLoadingChat": "Sohbet yükleniyor",
@@ -688,7 +693,7 @@
       "message": "Yer işaretini geri yükle"
     },
     "onboardingChatMenuTooltip": {
-      "message": "Hızlı ayarları açmak için Chat Enhancer simgesine tıklayın."
+      "message": "Hızlı ayarlara erişmek için sohbet menüsünü açın."
     },
     "onboardingBookmarkTooltip": {
       "message": "Bu mesajı, yayından ayrıldıktan sonra da bulabilmek için uzantının Yer imleri sekmesine kaydedin. Kaldırmak için tekrar tıklayın."

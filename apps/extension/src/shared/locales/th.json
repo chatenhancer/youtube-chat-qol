@@ -7,7 +7,8 @@
     "onboardingMenuPopout": "แชทแบบป๊อปเอาต์",
     "onboardingMenuFeedback": "ส่งความคิดเห็น",
     "back": "ย้อนกลับ",
-    "videoChatPip": "วิดีโอ + แชทในหน้าต่างลอย",
+    "videoChatPip": "เครื่องเล่นลอย",
+    "videoChatPipTooltip": "เปิดวิดีโอและแชทในหน้าต่างที่อยู่เหนือหน้าต่างอื่นเสมอ",
     "returnVideoChat": "กลับไปที่แท็บ",
     "pipOpenFailed": "เปิดวิดีโอและแชทไม่ได้ โปรดลองอีกครั้ง",
     "pipReloadRequired": "Chat Enhancer ได้รับการอัปเดตหรือโหลดใหม่แล้ว รีเฟรชแท็บ YouTube นี้เพื่อใช้วิดีโอ + แชต PiP",
@@ -38,6 +39,10 @@
     "inboxAriaUnread": "กล่องข้อความ มี {count} รายการที่ยังไม่ได้อ่าน",
     "inboxEmpty": "กล่องข้อความว่าง",
     "liteMode": "โหมดเบา",
+    "enableChatTranslation": "เปิดการแปล",
+    "disableChatTranslation": "ปิดการแปล",
+    "enableAlertSounds": "เปิดเสียงแจ้งเตือน",
+    "disableAlertSounds": "ปิดเสียงแจ้งเตือน",
     "enableLiteMode": "เปิดโหมดเบา",
     "disableLiteMode": "ปิดโหมดเบา",
     "liteModeLoadingChat": "กำลังโหลดแชท",
@@ -685,7 +690,7 @@
       "message": "กู้คืนบุ๊กมาร์ก"
     },
     "onboardingChatMenuTooltip": {
-      "message": "คลิกไอคอน Chat Enhancer เพื่อเปิดการตั้งค่าด่วน"
+      "message": "เปิดเมนูแชตเพื่อเข้าถึงการตั้งค่าด่วน"
     },
     "onboardingBookmarkTooltip": {
       "message": "บันทึกข้อความนี้ในแท็บบุ๊กมาร์กของส่วนขยาย เพื่อให้ค้นหาได้แม้ออกจากสตรีมแล้ว คลิกอีกครั้งเพื่อลบออก"

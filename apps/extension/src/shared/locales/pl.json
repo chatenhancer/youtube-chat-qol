@@ -7,7 +7,8 @@
     "onboardingMenuPopout": "Czat w nowym oknie",
     "onboardingMenuFeedback": "Prześlij opinię",
     "back": "Wstecz",
-    "videoChatPip": "Wideo + czat w oknie PiP",
+    "videoChatPip": "Okno pływające",
+    "videoChatPipTooltip": "Otwórz wideo i czat w oknie, które pozostaje zawsze na wierzchu.",
     "returnVideoChat": "Wróć do karty",
     "pipOpenFailed": "Nie udało się otworzyć wideo i czatu. Spróbuj ponownie.",
     "pipReloadRequired": "Chat Enhancer został zaktualizowany lub ponownie załadowany. Odśwież tę kartę YouTube, aby użyć wideo i czatu PiP.",
@@ -38,6 +39,10 @@
     "inboxAriaUnread": "Skrzynka, {count} nieprzeczytanych",
     "inboxEmpty": "Skrzynka pusta",
     "liteMode": "Tryb lekki",
+    "enableChatTranslation": "Włącz tłumaczenie",
+    "disableChatTranslation": "Wyłącz tłumaczenie",
+    "enableAlertSounds": "Włącz dźwięki powiadomień",
+    "disableAlertSounds": "Wyłącz dźwięki powiadomień",
     "enableLiteMode": "Włącz tryb lekki",
     "disableLiteMode": "Wyłącz tryb lekki",
     "liteModeLoadingChat": "Wczytywanie czatu",
@@ -685,7 +690,7 @@
       "message": "Przywróć zakładkę"
     },
     "onboardingChatMenuTooltip": {
-      "message": "Kliknij ikonę Chat Enhancer, aby otworzyć szybkie ustawienia."
+      "message": "Otwórz menu czatu, aby uzyskać dostęp do szybkich ustawień."
     },
     "onboardingBookmarkTooltip": {
       "message": "Zapisz tę wiadomość w karcie Zakładki rozszerzenia, aby znaleźć ją także po opuszczeniu transmisji. Kliknij ponownie, aby ją usunąć."

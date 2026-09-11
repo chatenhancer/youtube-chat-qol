@@ -7,7 +7,8 @@
     "onboardingMenuPopout": "チャットをポップアウト",
     "onboardingMenuFeedback": "フィードバックを送信",
     "back": "戻る",
-    "videoChatPip": "動画とチャットを小窓で表示",
+    "videoChatPip": "小窓プレーヤー",
+    "videoChatPipTooltip": "動画とチャットを常に最前面に表示されるウィンドウで開きます。",
     "returnVideoChat": "タブに戻る",
     "pipOpenFailed": "動画とチャットを開けませんでした。もう一度お試しください。",
     "pipReloadRequired": "Chat Enhancer が更新または再読み込みされました。動画＋チャット PiP を使うには、この YouTube タブを再読み込みしてください。",
@@ -38,6 +39,10 @@
     "inboxAriaUnread": "受信トレイ、未読 {count} 件",
     "inboxEmpty": "受信トレイは空です",
     "liteMode": "軽量モード",
+    "enableChatTranslation": "翻訳をオンにする",
+    "disableChatTranslation": "翻訳をオフにする",
+    "enableAlertSounds": "通知音をオンにする",
+    "disableAlertSounds": "通知音をオフにする",
     "enableLiteMode": "軽量モードをオンにする",
     "disableLiteMode": "軽量モードをオフにする",
     "liteModeLoadingChat": "チャットを読み込んでいます",
@@ -688,7 +693,7 @@
       "message": "ブックマークを復元"
     },
     "onboardingChatMenuTooltip": {
-      "message": "Chat Enhancer アイコンをクリックすると、クイック設定が開きます。"
+      "message": "チャットメニューを開くと、クイック設定にアクセスできます。"
     },
     "onboardingBookmarkTooltip": {
       "message": "このメッセージを拡張機能の「ブックマーク」タブに保存すると、配信を離れた後も見返せます。もう一度クリックすると削除できます。"

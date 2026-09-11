@@ -7,7 +7,8 @@
     "onboardingMenuPopout": "Відкрити чат в окремому вікні",
     "onboardingMenuFeedback": "Надіслати відгук",
     "back": "Назад",
-    "videoChatPip": "Відео й чат у плаваючому вікні",
+    "videoChatPip": "Плаваючий плеєр",
+    "videoChatPipTooltip": "Відкрийте відео й чат у вікні, яке завжди залишається поверх інших вікон.",
     "returnVideoChat": "Повернутися на вкладку",
     "pipOpenFailed": "Не вдалося відкрити відео й чат. Спробуйте ще раз.",
     "pipReloadRequired": "Chat Enhancer оновлено або перезавантажено. Оновіть цю вкладку YouTube, щоб використовувати відео й чат у режимі PiP.",
@@ -38,6 +39,10 @@
     "inboxAriaUnread": "Вхідні, {count} непрочитаних",
     "inboxEmpty": "Вхідні порожні",
     "liteMode": "Полегшений режим",
+    "enableChatTranslation": "Увімкнути переклад",
+    "disableChatTranslation": "Вимкнути переклад",
+    "enableAlertSounds": "Увімкнути звуки сповіщень",
+    "disableAlertSounds": "Вимкнути звуки сповіщень",
     "enableLiteMode": "Увімкнути полегшений режим",
     "disableLiteMode": "Вимкнути полегшений режим",
     "liteModeLoadingChat": "Завантаження чату",
@@ -685,7 +690,7 @@
       "message": "Відновити закладку"
     },
     "onboardingChatMenuTooltip": {
-      "message": "Натисніть значок Chat Enhancer, щоб відкрити швидкі налаштування."
+      "message": "Відкрийте меню чату, щоб перейти до швидких налаштувань."
     },
     "onboardingBookmarkTooltip": {
       "message": "Збережіть це повідомлення на вкладці «Закладки» розширення, щоб знайти його навіть після виходу з трансляції. Натисніть ще раз, щоб видалити його."

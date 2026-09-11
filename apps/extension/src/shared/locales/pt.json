@@ -7,7 +7,8 @@
     "onboardingMenuPopout": "Abrir chat em nova janela",
     "onboardingMenuFeedback": "Enviar feedback",
     "back": "Voltar",
-    "videoChatPip": "Vídeo + chat em janela flutuante",
+    "videoChatPip": "Janela flutuante",
+    "videoChatPipTooltip": "Abra o vídeo e o chat em uma janela que fica sempre em primeiro plano.",
     "returnVideoChat": "Voltar à aba",
     "pipOpenFailed": "Não foi possível abrir o vídeo e o chat. Tente novamente.",
     "pipReloadRequired": "O Chat Enhancer foi atualizado ou recarregado. Atualize esta aba do YouTube para usar vídeo + chat PiP.",
@@ -38,6 +39,10 @@
     "inboxAriaUnread": "Caixa de entrada, {count} não lidas",
     "inboxEmpty": "Caixa de entrada vazia",
     "liteMode": "Modo leve",
+    "enableChatTranslation": "Ativar a tradução",
+    "disableChatTranslation": "Desativar a tradução",
+    "enableAlertSounds": "Ativar os sons de alerta",
+    "disableAlertSounds": "Desativar os sons de alerta",
     "enableLiteMode": "Ativar o modo leve",
     "disableLiteMode": "Desativar o modo leve",
     "liteModeLoadingChat": "Carregando chat",
@@ -688,7 +693,7 @@
       "message": "Restaurar favorito"
     },
     "onboardingChatMenuTooltip": {
-      "message": "Clique no ícone do Chat Enhancer para abrir as configurações rápidas."
+      "message": "Abra o menu do chat para acessar os ajustes rápidos."
     },
     "onboardingBookmarkTooltip": {
       "message": "Salve esta mensagem na aba Marcadores da extensão para encontrá-la mesmo depois de sair da transmissão. Clique novamente para removê-la."
