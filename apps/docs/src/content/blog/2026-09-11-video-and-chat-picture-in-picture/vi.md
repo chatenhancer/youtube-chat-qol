@@ -3,7 +3,7 @@ title: "PiP video + trò chuyện hiện đã có trong phiên bản 1.1.0"
 date: 2026-09-11
 description: "Giữ buổi phát trên YouTube và trò chuyện trực tiếp trong một cửa sổ nổi khi bạn dùng các thẻ và ứng dụng khác."
 slug: "video-and-chat-picture-in-picture"
-image: "./pip-wide.png"
+image: "./cover.png"
 locale: "vi"
 translationKey: "video-and-chat-picture-in-picture"
 tags:
@@ -33,6 +33,8 @@ Trên trang xem YouTube có trò chuyện trực tiếp đang mở:
 ## Một cửa sổ nhỏ đủ chỗ cho cả hai
 
 Cửa sổ mở với video phía trên khung trò chuyện gọn hơn. Thay đổi kích thước cho phù hợp với màn hình; khi mở rộng cửa sổ, video và trò chuyện sẽ nằm cạnh nhau.
+
+![Cửa sổ hình trong hình rộng với video và cuộc trò chuyện trực tiếp hư cấu nằm cạnh nhau.](./pip-wide.png) {shadow=smooth}
 
 :::media-right
 

@@ -3,7 +3,7 @@ title: "וידאו וצ׳אט ב-PiP זמינים עכשיו בגרסה 1.1.0"
 date: 2026-09-11
 description: "השאירו את השידור ב-YouTube ואת הצ׳אט בשידור חי יחד בחלון צף בזמן השימוש בכרטיסיות ובאפליקציות אחרות."
 slug: "video-and-chat-picture-in-picture"
-image: "./pip-wide.png"
+image: "./cover.png"
 locale: "he"
 translationKey: "video-and-chat-picture-in-picture"
 tags:
@@ -33,6 +33,8 @@ tags:
 ## חלון קטן עם מקום לשניהם
 
 החלון נפתח כשהווידאו מעל צ׳אט קומפקטי. התאימו את הגודל למסך שלכם; כשתרחיבו את החלון, הווידאו והצ׳אט יוצגו זה לצד זה.
+
+![חלון תמונה בתוך תמונה רחב עם וידאו וצ׳אט חי בדיוני זה לצד זה.](./pip-wide.png) {shadow=smooth}
 
 :::media-right
 

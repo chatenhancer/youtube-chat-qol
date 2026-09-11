@@ -3,7 +3,7 @@ title: "Le PiP vidéo + chat est disponible dans la version 1.1.0"
 date: 2026-09-11
 description: "Gardez un direct YouTube et son chat ensemble dans une fenêtre flottante pendant que vous utilisez d’autres onglets et applications."
 slug: "video-and-chat-picture-in-picture"
-image: "./pip-wide.png"
+image: "./cover.png"
 locale: "fr"
 translationKey: "video-and-chat-picture-in-picture"
 tags:
@@ -33,6 +33,8 @@ Sur une page de vidéo YouTube dont le chat en direct est ouvert :
 ## Une petite fenêtre pour les deux
 
 La fenêtre s’ouvre avec la vidéo au-dessus d’un chat compact. Adaptez sa taille à votre écran : en l’élargissant, vous placez la vidéo et le chat côte à côte.
+
+![Une fenêtre d’image dans l’image élargie avec la vidéo et un chat en direct fictif côte à côte.](./pip-wide.png) {shadow=smooth}
 
 :::media-right
 

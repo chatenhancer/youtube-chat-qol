@@ -3,7 +3,7 @@ title: "حالت PiP ویدیو و چت اکنون در نسخهٔ 1.1.0 در د
 date: 2026-09-11
 description: "هنگام استفاده از برگه‌ها و برنامه‌های دیگر، پخش YouTube و چت زنده را در یک پنجرهٔ شناور کنار هم نگه دارید."
 slug: "video-and-chat-picture-in-picture"
-image: "./pip-wide.png"
+image: "./cover.png"
 locale: "fa"
 translationKey: "video-and-chat-picture-in-picture"
 tags:
@@ -33,6 +33,8 @@ tags:
 ## پنجره‌ای کوچک با جا برای هر دو
 
 پنجره با ویدیو در بالای یک چت فشرده باز می‌شود. اندازهٔ آن را متناسب با نمایشگرتان تغییر دهید؛ با پهن‌ترکردن پنجره، ویدیو و چت کنار هم قرار می‌گیرند.
+
+![پنجرهٔ عریض تصویر در تصویر با ویدیو و چت زندهٔ خیالی در کنار هم.](./pip-wide.png) {shadow=smooth}
 
 :::media-right
 

@@ -3,7 +3,7 @@ title: "バージョン1.1.0で動画＋チャットのPiPが利用可能に"
 date: 2026-09-11
 description: "ほかのタブやアプリを使いながら、YouTube の配信とライブチャットをひとつのフローティングウィンドウで楽しめます。"
 slug: "video-and-chat-picture-in-picture"
-image: "./pip-wide.png"
+image: "./cover.png"
 locale: "ja"
 translationKey: "video-and-chat-picture-in-picture"
 tags:
@@ -33,6 +33,8 @@ tags:
 ## 小さなウィンドウに、両方の居場所を
 
 ウィンドウを開くと、コンパクトなチャットの上に動画が表示されます。画面に合わせてサイズを変えられます。横幅を広げると、動画とチャットが横に並びます。
+
+![動画と架空のライブチャットが横に並ぶ、横長のピクチャーインピクチャーウィンドウ。](./pip-wide.png) {shadow=smooth}
 
 :::media-right
 

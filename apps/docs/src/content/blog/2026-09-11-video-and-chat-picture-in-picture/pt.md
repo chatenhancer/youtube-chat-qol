@@ -3,7 +3,7 @@ title: "PiP de vídeo + chat já está disponível na versão 1.1.0"
 date: 2026-09-11
 description: "Mantenha uma transmissão do YouTube e seu chat ao vivo juntos em uma janela flutuante enquanto usa outras abas e aplicativos."
 slug: "video-and-chat-picture-in-picture"
-image: "./pip-wide.png"
+image: "./cover.png"
 locale: "pt"
 translationKey: "video-and-chat-picture-in-picture"
 tags:
@@ -33,6 +33,8 @@ Em uma página de vídeo do YouTube com o chat ao vivo aberto:
 ## Uma janela pequena com espaço para os dois
 
 A janela abre com o vídeo acima de um chat compacto. Ajuste o tamanho à sua tela: ao alargá-la, o vídeo e o chat ficam lado a lado.
+
+![Uma janela ampla de picture-in-picture com vídeo e um chat ao vivo fictício lado a lado.](./pip-wide.png) {shadow=smooth}
 
 :::media-right
 

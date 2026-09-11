@@ -3,7 +3,7 @@ title: "PiP z wideo i czatem jest już dostępne w wersji 1.1.0"
 date: 2026-09-11
 description: "Oglądaj transmisję na YouTube i śledź czat na żywo w jednym pływającym oknie, korzystając z innych kart i aplikacji."
 slug: "video-and-chat-picture-in-picture"
-image: "./pip-wide.png"
+image: "./cover.png"
 locale: "pl"
 translationKey: "video-and-chat-picture-in-picture"
 tags:
@@ -33,6 +33,8 @@ Na stronie oglądania YouTube z otwartym czatem na żywo:
 ## Małe okno z miejscem na jedno i drugie
 
 Okno otwiera się z wideo nad kompaktowym czatem. Dostosuj jego rozmiar do ekranu; po poszerzeniu okna wideo i czat ustawią się obok siebie.
+
+![Szerokie okno obrazu w obrazie z wideo i fikcyjnym czatem na żywo obok siebie.](./pip-wide.png) {shadow=smooth}
 
 :::media-right
 

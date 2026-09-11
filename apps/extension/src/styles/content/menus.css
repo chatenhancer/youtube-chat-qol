@@ -87,6 +87,33 @@ ytd-menu-popup-renderer .ytcq-context-item .ytcq-paper-item:hover {
   background: var(--ytcq-menu-hover-background);
 }
 
+/* The back row is a compact navigation header, with hover on its arrow only. */
+ytd-menu-popup-renderer [data-ytcq-action="settings-back"] .ytcq-paper-item {
+  padding-inline-start: 14px;
+  padding-block-end: 8px;
+  gap: 14px;
+}
+
+ytd-menu-popup-renderer [data-ytcq-action="settings-back"] .ytcq-menu-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  opacity: 1;
+}
+
+ytd-menu-popup-renderer [data-ytcq-action="settings-back"] .ytcq-menu-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+ytd-menu-popup-renderer [data-ytcq-action="settings-back"] .ytcq-paper-item:is(:hover, :focus-visible) {
+  background: transparent;
+}
+
+ytd-menu-popup-renderer [data-ytcq-action="settings-back"] .ytcq-paper-item:is(:hover, :focus-visible) .ytcq-menu-icon {
+  background: var(--ytcq-menu-hover-background);
+}
+
 ytd-menu-popup-renderer [data-ytcq-action="picture-in-picture"] .ytcq-menu-label {
   white-space: normal;
   overflow-wrap: anywhere;

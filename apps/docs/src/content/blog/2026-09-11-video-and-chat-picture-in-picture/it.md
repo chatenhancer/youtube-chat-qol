@@ -3,7 +3,7 @@ title: "PiP con video + chat ora disponibile nella versione 1.1.0"
 date: 2026-09-11
 description: "Tieni una diretta YouTube e la sua chat insieme in una finestra mobile mentre usi altre schede e applicazioni."
 slug: "video-and-chat-picture-in-picture"
-image: "./pip-wide.png"
+image: "./cover.png"
 locale: "it"
 translationKey: "video-and-chat-picture-in-picture"
 tags:
@@ -33,6 +33,8 @@ Su una pagina video di YouTube con la chat dal vivo aperta:
 ## Una piccola finestra con spazio per entrambi
 
 La finestra si apre con il video sopra una chat compatta. Ridimensionala per adattarla allo schermo: allargandola, video e chat si dispongono fianco a fianco.
+
+![Una finestra picture-in-picture ampia con il video e una chat dal vivo inventata affiancati.](./pip-wide.png) {shadow=smooth}
 
 :::media-right
 

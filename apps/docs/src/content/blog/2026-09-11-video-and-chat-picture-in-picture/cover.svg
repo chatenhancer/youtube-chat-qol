@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="280 145 1040 585" role="img" aria-labelledby="title description">
+  <title id="title">Video and chat picture-in-picture</title>
+  <desc id="description">A compact video player and an anonymous live chat together in a floating window, above a larger browser window.</desc>
+  <defs>
+    <clipPath id="avatar-circle">
+      <circle cx="60" cy="60" r="60"/>
+    </clipPath>
+    <symbol id="chat-avatar" viewBox="0 0 120 120">
+      <g clip-path="url(#avatar-circle)">
+        <circle cx="60" cy="60" r="60" fill="#cfcfcf"/>
+        <g fill="#919191">
+          <circle cx="60" cy="47.5" r="19"/>
+          <ellipse cx="60" cy="104" rx="40" ry="27"/>
+        </g>
+      </g>
+    </symbol>
+    <clipPath id="front-window">
+      <rect x="450" y="250" width="830" height="440" rx="4"/>
+    </clipPath>
+    <filter id="window-shadow" x="-10%" y="-10%" width="120%" height="130%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#17191f" flood-opacity="0.06"/>
+    </filter>
+  </defs>
+
+  <rect width="1600" height="900" fill="#fff"/>
+
+  <g>
+    <rect x="315" y="165" width="720" height="435" rx="4" fill="#fff" stroke="#d9dde3" stroke-width="2"/>
+    <path d="M319 166H1031Q1034 166 1034 169V209H316V169Q316 166 319 166Z" fill="#f8f9fa"/>
+    <path d="M316 209H1034" fill="none" stroke="#e9ecf0"/>
+    <rect x="347" y="241" width="656" height="327" rx="2" fill="#fafbfc"/>
+  </g>
+
+  <rect x="450" y="250" width="830" height="440" rx="4" fill="#fff" filter="url(#window-shadow)"/>
+  <g clip-path="url(#front-window)">
+    <rect x="450" y="250" width="830" height="44" fill="#f6f7f9"/>
+    <path d="M450 294H1280" fill="none" stroke="#e2e6ee"/>
+
+    <rect x="478" y="330" width="406" height="284" rx="3" fill="#f5f6f8"/>
+    <path d="M651 424L735 472L651 520Z" fill="#fe0031"/>
+    <rect x="478" y="638" width="406" height="4" fill="#e2e6ee"/>
+    <rect x="478" y="638" width="143" height="4" fill="#fe0031"/>
+    <path d="M910 330V644" fill="none" stroke="#e2e6ee" stroke-width="2"/>
+
+    <g opacity="0.82">
+      <use href="#chat-avatar" x="932" y="338" width="30" height="30"/>
+      <use href="#chat-avatar" x="932" y="386" width="30" height="30"/>
+      <use href="#chat-avatar" x="932" y="434" width="30" height="30"/>
+      <use href="#chat-avatar" x="932" y="482" width="30" height="30"/>
+      <use href="#chat-avatar" x="932" y="530" width="30" height="30"/>
+      <use href="#chat-avatar" x="932" y="578" width="30" height="30"/>
+      <g fill="#c8c8c8">
+        <rect x="980" y="349" width="52" height="8" rx="1"/>
+        <rect x="980" y="397" width="33" height="8" rx="1"/>
+        <rect x="980" y="445" width="41" height="8" rx="1"/>
+        <rect x="980" y="493" width="52" height="8" rx="1"/>
+        <rect x="980" y="541" width="33" height="8" rx="1"/>
+        <rect x="980" y="589" width="41" height="8" rx="1"/>
+      </g>
+      <g fill="#dedede">
+        <rect x="1044" y="349" width="198" height="8" rx="1"/>
+        <rect x="1025" y="397" width="126" height="8" rx="1"/>
+        <rect x="1033" y="445" width="154" height="8" rx="1"/>
+        <rect x="1044" y="493" width="198" height="8" rx="1"/>
+        <rect x="1025" y="541" width="126" height="8" rx="1"/>
+        <rect x="1033" y="589" width="154" height="8" rx="1"/>
+      </g>
+    </g>
+  </g>
+  <rect x="450" y="250" width="830" height="440" rx="4" fill="none" stroke="#bbc2cc" stroke-width="2"/>
+</svg>

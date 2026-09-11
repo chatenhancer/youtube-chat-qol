@@ -80,7 +80,7 @@
 .site-nav::before,
 .hero-walkthrough-button,
 .hero-blog-ticker-track,
-.hero-blog-ticker-media,
+.hero-blog-ticker-slide,
 .hero-blog-ticker-controls,
 .hero-blog-ticker-control,
 .button,
@@ -938,6 +938,7 @@ h3 {
   overflow: hidden;
   color: inherit;
   background: transparent;
+  border-radius: inherit;
   opacity: 0;
   pointer-events: none;
 }
@@ -1015,8 +1016,6 @@ html[dir="rtl"] .hero-blog-ticker.is-moving-previous .hero-blog-ticker-slide.is-
   min-width: 0;
   overflow: hidden;
   background: #fff;
-  border-start-end-radius: var(--large-surface-corner-radius);
-  border-end-end-radius: var(--large-surface-corner-radius);
 }
 
 .hero-blog-ticker-media img {
@@ -1037,7 +1036,6 @@ html[dir="rtl"] .hero-blog-ticker.is-moving-previous .hero-blog-ticker-slide.is-
   min-height: 20px;
   padding: 1px 2px;
   color: #090a0c;
-  filter: drop-shadow(0 1px 1px rgba(9, 10, 12, 0.65));
   transform: rotate(-10deg);
   transform-origin: center;
 }

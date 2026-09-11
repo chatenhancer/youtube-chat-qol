@@ -3,7 +3,7 @@ title: "视频 + 聊天画中画现已在 1.1.0 中推出"
 date: 2026-09-11
 description: "使用其他标签页和应用时，也能在一个悬浮窗口中同时观看 YouTube 直播和实时聊天。"
 slug: "video-and-chat-picture-in-picture"
-image: "./pip-wide.png"
+image: "./cover.png"
 locale: "zh_CN"
 translationKey: "video-and-chat-picture-in-picture"
 tags:
@@ -33,6 +33,8 @@ tags:
 ## 小窗口，也能容纳两者
 
 窗口打开后，视频显示在紧凑的聊天区域上方。你可以根据屏幕调整大小；将窗口加宽后，视频和聊天会并排显示。
+
+![宽幅画中画窗口，视频与虚构的直播聊天并排显示。](./pip-wide.png) {shadow=smooth}
 
 :::media-right
 

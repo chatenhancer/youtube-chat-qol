@@ -3,7 +3,7 @@ title: "Video + sohbet PiP artık 1.1.0 sürümünde"
 date: 2026-09-11
 description: "Diğer sekmeleri ve uygulamaları kullanırken YouTube yayınını ve canlı sohbeti tek bir yüzen pencerede tutun."
 slug: "video-and-chat-picture-in-picture"
-image: "./pip-wide.png"
+image: "./cover.png"
 locale: "tr"
 translationKey: "video-and-chat-picture-in-picture"
 tags:
@@ -33,6 +33,8 @@ Canlı sohbetin açık olduğu bir YouTube izleme sayfasında:
 ## İkisine de yer açan küçük bir pencere
 
 Pencere, video kompakt sohbetin üzerinde olacak şekilde açılır. Ekranınıza göre yeniden boyutlandırın; pencereyi genişlettiğinizde video ve sohbet yan yana yerleşir.
+
+![Video ile kurgusal canlı sohbeti yan yana gösteren geniş bir resim içinde resim penceresi.](./pip-wide.png) {shadow=smooth}
 
 :::media-right
 

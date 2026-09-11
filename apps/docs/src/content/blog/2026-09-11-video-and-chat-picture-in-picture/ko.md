@@ -3,7 +3,7 @@ title: "1.1.0에서 동영상 + 채팅 PiP를 사용할 수 있습니다"
 date: 2026-09-11
 description: "다른 탭과 앱을 사용하면서도 YouTube 스트림과 실시간 채팅을 하나의 플로팅 창에서 함께 볼 수 있습니다."
 slug: "video-and-chat-picture-in-picture"
-image: "./pip-wide.png"
+image: "./cover.png"
 locale: "ko"
 translationKey: "video-and-chat-picture-in-picture"
 tags:
@@ -33,6 +33,8 @@ tags:
 ## 작은 창에 둘 다 담기
 
 창을 열면 간결해진 채팅 위에 동영상이 표시됩니다. 화면에 맞게 크기를 조절하세요. 창을 넓히면 동영상과 채팅이 나란히 배치됩니다.
+
+![동영상과 가상의 실시간 채팅이 나란히 표시되는 넓은 PIP 창.](./pip-wide.png) {shadow=smooth}
 
 :::media-right
 

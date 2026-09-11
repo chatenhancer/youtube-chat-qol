@@ -3,7 +3,7 @@ title: "Video + chat PiP now available in 1.1.0"
 date: 2026-09-11
 description: "Keep a YouTube stream and its live chat together in a floating window while you use other tabs and apps."
 slug: "video-and-chat-picture-in-picture"
-image: "./pip-wide.png"
+image: "./cover.png"
 locale: "en"
 translationKey: "video-and-chat-picture-in-picture"
 tags:
@@ -33,6 +33,8 @@ On a YouTube watch page with live chat open:
 ## A small window that makes room for both
 
 The window opens with the video above a compact chat. Resize it to suit your screen; make it wider and the video and chat sit side by side.
+
+![A wide picture-in-picture window with video and a fictional live chat side by side.](./pip-wide.png) {shadow=smooth}
 
 :::media-right
 

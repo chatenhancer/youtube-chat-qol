@@ -3,7 +3,7 @@ title: "PiP video + chat kini tersedia di versi 1.1.0"
 date: 2026-09-11
 description: "Tonton siaran YouTube dan ikuti live chat dalam satu jendela mengambang sambil menggunakan tab dan aplikasi lain."
 slug: "video-and-chat-picture-in-picture"
-image: "./pip-wide.png"
+image: "./cover.png"
 locale: "id"
 translationKey: "video-and-chat-picture-in-picture"
 tags:
@@ -33,6 +33,8 @@ Di halaman tontonan YouTube dengan live chat terbuka:
 ## Jendela kecil dengan ruang untuk keduanya
 
 Jendela terbuka dengan video di atas chat yang ringkas. Ubah ukurannya agar sesuai dengan layar; saat diperlebar, video dan chat akan tampil berdampingan.
+
+![Jendela picture-in-picture lebar dengan video dan percakapan live chat fiktif berdampingan.](./pip-wide.png) {shadow=smooth}
 
 :::media-right
 

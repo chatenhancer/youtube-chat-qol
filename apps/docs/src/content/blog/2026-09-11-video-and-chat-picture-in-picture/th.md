@@ -3,7 +3,7 @@ title: "PiP วิดีโอ + แชตพร้อมใช้งานแ�
 date: 2026-09-11
 description: "ดูสตรีม YouTube และแชตสดพร้อมกันในหน้าต่างลอย ขณะใช้แท็บและแอปอื่น ๆ"
 slug: "video-and-chat-picture-in-picture"
-image: "./pip-wide.png"
+image: "./cover.png"
 locale: "th"
 translationKey: "video-and-chat-picture-in-picture"
 tags:
@@ -33,6 +33,8 @@ tags:
 ## หน้าต่างเล็กที่มีพื้นที่ให้ทั้งคู่
 
 หน้าต่างจะเปิดโดยมีวิดีโออยู่เหนือแชตขนาดกะทัดรัด ปรับขนาดให้เหมาะกับหน้าจอได้ และเมื่อขยายหน้าต่างให้กว้างขึ้น วิดีโอกับแชตจะวางเคียงข้างกัน
+
+![หน้าต่างภาพซ้อนภาพแบบกว้างที่แสดงวิดีโอและแชตสดสมมติเคียงข้างกัน](./pip-wide.png) {shadow=smooth}
 
 :::media-right
 

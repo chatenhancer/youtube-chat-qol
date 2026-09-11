@@ -3,7 +3,7 @@ title: "Video + Chat PiP ist jetzt in Version 1.1.0 verfügbar"
 date: 2026-09-11
 description: "Behalte einen YouTube-Stream und seinen Livechat in einem schwebenden Fenster im Blick, während du andere Tabs und Apps nutzt."
 slug: "video-and-chat-picture-in-picture"
-image: "./pip-wide.png"
+image: "./cover.png"
 locale: "de"
 translationKey: "video-and-chat-picture-in-picture"
 tags:
@@ -33,6 +33,8 @@ Auf einer YouTube-Videoseite mit geöffnetem Livechat:
 ## Ein kleines Fenster mit Platz für beides
 
 Das Fenster öffnet sich mit dem Video über einem kompakten Chat. Passe seine Größe an deinen Bildschirm an. Wenn du es breiter ziehst, stehen Video und Chat nebeneinander.
+
+![Ein breites Bild-im-Bild-Fenster mit Video und einem erfundenen Livechat nebeneinander.](./pip-wide.png) {shadow=smooth}
 
 :::media-right
 

@@ -3,7 +3,7 @@ title: "影片 + 聊天子母畫面現已在 1.1.0 中推出"
 date: 2026-09-11
 description: "使用其他分頁和應用程式時，也能在同一個浮動視窗中觀看 YouTube 直播和即時聊天。"
 slug: "video-and-chat-picture-in-picture"
-image: "./pip-wide.png"
+image: "./cover.png"
 locale: "zh_TW"
 translationKey: "video-and-chat-picture-in-picture"
 tags:
@@ -33,6 +33,8 @@ tags:
 ## 小視窗，也放得下兩者
 
 視窗開啟後，影片會顯示在精簡的聊天區域上方。你可以依照螢幕調整大小；將視窗加寬後，影片和聊天就會並排顯示。
+
+![寬版子母畫面視窗，影片與虛構的直播聊天室並排顯示。](./pip-wide.png) {shadow=smooth}
 
 :::media-right
 

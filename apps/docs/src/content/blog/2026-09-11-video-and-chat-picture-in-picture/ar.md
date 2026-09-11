@@ -3,7 +3,7 @@ title: "وضع PiP للفيديو والدردشة متاح الآن في الإ
 date: 2026-09-11
 description: "تابع بث YouTube والدردشة المباشرة معًا في نافذة عائمة أثناء استخدام علامات تبويب وتطبيقات أخرى."
 slug: "video-and-chat-picture-in-picture"
-image: "./pip-wide.png"
+image: "./cover.png"
 locale: "ar"
 translationKey: "video-and-chat-picture-in-picture"
 tags:
@@ -33,6 +33,8 @@ tags:
 ## نافذة صغيرة تتسع لكليهما
 
 تفتح النافذة ويظهر الفيديو فوق دردشة مدمجة. غيّر حجمها بما يناسب شاشتك؛ وعند توسيعها، يظهر الفيديو والدردشة جنبًا إلى جنب.
+
+![نافذة عائمة عريضة تعرض الفيديو ودردشة مباشرة خيالية جنبًا إلى جنب.](./pip-wide.png) {shadow=smooth}
 
 :::media-right
 
