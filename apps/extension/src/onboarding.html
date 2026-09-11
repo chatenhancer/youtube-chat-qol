@@ -129,12 +129,12 @@
             <span data-i18n="onboardingChatPreview">Chat preview</span>
           </h2>
           <p class="preview-hover-hint" data-i18n="onboardingPreviewHoverHint">
-            Hover over icons for more information.
+            Explore the preview. Hover for tips, click to try features.
           </p>
         </div>
 
         <div id="chatPreview" class="chat-preview" data-chat-skin="system" data-chat-theme="dark" data-lite-mode-enabled="false" data-playground-enabled="false" data-translation-state="idle" role="group" aria-labelledby="previewTitle">
-          <yt-live-chat-renderer class="preview-chat-renderer" aria-hidden="true">
+          <yt-live-chat-renderer class="preview-chat-renderer">
           <yt-live-chat-header-renderer class="preview-chat-header">
             <span id="view-selector" class="preview-top-chat">
               <span id="label-text" data-i18n="onboardingTopChat">Top chat</span>
@@ -142,11 +142,10 @@
                 <path d="m7.4 8.6 4.6 4.6 4.6-4.6L18 10l-6 6-6-6 1.4-1.4Z"></path>
               </svg>
             </span>
-            <span class="preview-header-actions" aria-hidden="true">
-              <button id="previewLiteIcon" class="preview-header-icon preview-lite-icon ytcq-lite-mode-button" type="button" tabindex="-1"></button>
+            <span class="preview-header-actions">
               <button id="previewGamesIcon" class="preview-header-icon ytcq-games-button" type="button" tabindex="-1" aria-hidden="true"></button>
-              <button id="previewInboxIcon" class="preview-header-icon ytcq-inbox-button" type="button" tabindex="-1"></button>
-              <button class="preview-header-icon preview-native-header-icon" type="button" tabindex="-1">
+              <button id="previewInboxIcon" class="preview-header-icon ytcq-inbox-button" type="button"></button>
+              <button id="previewMenuButton" class="preview-header-icon preview-native-header-icon" type="button" aria-label="Chat Enhancer">
                 <svg viewBox="0 -960 960 960" focusable="false">
                   <path d="M480-160q-33 0-56.5-23.5T400-240q0-33 23.5-56.5T480-320q33 0 56.5 23.5T560-240q0 33-23.5 56.5T480-160Zm0-240q-33 0-56.5-23.5T400-480q0-33 23.5-56.5T480-560q33 0 56.5 23.5T560-480q0 33-23.5 56.5T480-400Zm0-240q-33 0-56.5-23.5T400-720q0-33 23.5-56.5T480-800q33 0 56.5 23.5T560-720q0 33-23.5 56.5T480-640Z"></path>
                 </svg>
@@ -244,7 +243,7 @@
             <div id="container" class="preview-composer-container">
               <div id="input-container" class="preview-composer-field">
                 <yt-live-chat-text-input-field-renderer id="input">
-                  <span id="label" class="preview-placeholder" data-i18n="onboardingChatPlaceholder">Chat…</span>
+                  <input id="previewDraft" class="preview-placeholder" type="text" placeholder="Chat…" aria-label="Chat…" data-i18n-placeholder="onboardingChatPlaceholder" data-i18n-aria-label="onboardingChatPlaceholder" autocomplete="off" />
                 </yt-live-chat-text-input-field-renderer>
                 <span id="buttons" class="preview-composer-actions" aria-hidden="true">
                   <span class="ytcq-composer-translate-host">
@@ -272,25 +271,13 @@
           </yt-live-chat-message-input-renderer>
           </yt-live-chat-renderer>
 
-          <svg id="previewCalloutConnectors" class="preview-callout-connectors" aria-hidden="true" focusable="false">
-            <path id="previewLiteCalloutConnector" class="preview-callout-connector preview-lite-callout-connector"></path>
-            <path id="previewPlaygroundCalloutConnector" class="preview-callout-connector preview-playground-callout-connector"></path>
-          </svg>
-
-          <div class="preview-feature-callouts">
-            <div id="previewLiteCallout" class="preview-feature-callout preview-lite-callout" aria-hidden="true">
-              <p><a class="preview-callout-link" href="https://www.chatenhancer.com/blog/introducing-lite-mode/" target="_blank" rel="noopener noreferrer" data-i18n="liteMode">Lite mode</a><span data-i18n="onboardingLiteModeCallout">, when enabled, will make live chat use less resources. You can always switch back to native by clicking this toggle.</span></p>
+          <div class="preview-tooltip-layer">
+            <div id="previewChatMenuTooltip" class="preview-tooltip preview-chat-menu-tooltip" data-i18n="onboardingChatMenuTooltip">This menu contains quick toggles for Chat Enhancer settings alongside YouTube’s own settings.</div>
+            <div id="previewPipTooltip" class="preview-tooltip preview-pip-tooltip">
+              <span data-i18n="onboardingPipTooltip">Keep the video and chat in an always-on-top window while you use other tabs.</span>
+              <a href="https://chatenhancer.com/blog/video-and-chat-picture-in-picture/" target="_blank" rel="noopener noreferrer" data-i18n="learnMore">Learn more</a>
             </div>
-            <div id="previewPlaygroundCallout" class="preview-feature-callout preview-playground-callout" aria-hidden="true">
-              <p>
-                <span data-i18n="onboardingPlaygroundCallout">This will take you to the Games lobby, where you can start a new game with a real player that also has the extension, or a Computer (bot) player.</span>
-                <a class="preview-callout-link" href="https://playground.chatenhancer.com/" target="_blank" rel="noopener noreferrer" data-i18n="learnMore">Learn more</a>
-              </p>
-            </div>
-          </div>
-
-          <div class="preview-tooltip-layer" aria-hidden="true">
-            <div id="previewLiteModeTooltip" class="preview-tooltip preview-lite-mode-tooltip"><span data-i18n="liteMode">Lite mode</span><span data-i18n="onboardingLiteModeCallout">, when enabled, will make live chat use less resources. You can always switch back to native by clicking this toggle.</span></div>
+            <div id="previewGamesTooltip" class="preview-tooltip preview-games-tooltip" data-i18n="onboardingGamesTooltip">This opens the Games lobby, where you can start a new game with a real player that also has the extension, or a Computer (bot) player.</div>
             <div id="previewInboxTooltip" class="preview-tooltip preview-inbox-tooltip" data-i18n="onboardingInboxTooltip">
               This opens your Inbox. When people mention you in chat, their messages appear here so you don’t miss them. You can also set up custom Inbox keywords to watch for.
             </div>

@@ -1,5 +1,17 @@
 {
   "messages": {
+    "chatEnhancer": "Chat Enhancer",
+    "onboardingMenuParticipants": "참여자",
+    "onboardingMenuTimestamps": "타임스탬프",
+    "onboardingMenuReactions": "반응",
+    "onboardingMenuPopout": "채팅창 새 창으로 열기",
+    "onboardingMenuFeedback": "의견 보내기",
+    "back": "뒤로",
+    "videoChatPip": "동영상 + 채팅을 작은 창으로",
+    "returnVideoChat": "탭으로 돌아가기",
+    "pipOpenFailed": "동영상과 채팅을 열지 못했습니다. 다시 시도해 주세요.",
+    "pipReloadRequired": "Chat Enhancer가 업데이트되거나 다시 로드되었습니다. 동영상 + 채팅 PiP를 사용하려면 이 YouTube 탭을 새로고침하세요.",
+    "playingInPip": "동영상과 채팅이 작은 창에 표시됩니다",
     "add": "추가",
     "addKeywords": "키워드 추가",
     "addKeywordsCount": {
@@ -327,14 +339,11 @@
     "onboardingPlaygroundHelper": {
       "message": "다른 확장 프로그램 사용자와 게임을 플레이하세요."
     },
-    "onboardingPlaygroundCallout": {
-      "message": "게임 로비로 이동하여 이 확장 프로그램을 사용하는 실제 플레이어 또는 컴퓨터(봇) 플레이어와 새 게임을 시작할 수 있습니다."
-    },
     "onboardingLiteModeHelper": {
       "message": "성능 향상을 위해 더 빠르고 가벼운 채팅 피드를 사용합니다."
     },
-    "onboardingLiteModeCallout": {
-      "message": "를 사용하면 실시간 채팅이 더 적은 리소스를 사용합니다. 이 토글을 클릭하면 언제든지 기본 채팅으로 돌아갈 수 있습니다."
+    "onboardingGamesTooltip": {
+      "message": "게임 로비를 열어 이 확장 프로그램을 사용하는 실제 플레이어 또는 컴퓨터(봇) 플레이어와 새 게임을 시작할 수 있습니다."
     },
     "onboardingInboxTooltip": {
       "message": "받은편지함을 엽니다. 채팅에서 누군가 나를 멘션하면 놓치지 않도록 해당 메시지가 여기에 표시됩니다. 감시할 사용자 지정 받은편지함 키워드도 설정할 수 있습니다."
@@ -364,7 +373,7 @@
       "message": "채팅 미리보기"
     },
     "onboardingPreviewHoverHint": {
-      "message": "자세한 내용을 보려면 아이콘 위에 마우스를 올리세요."
+      "message": "미리보기를 살펴보세요. 마우스를 올리면 도움말이 표시되고, 클릭하면 기능을 체험할 수 있습니다."
     },
     "onboardingTopChat": {
       "message": "인기 채팅"
@@ -674,6 +683,27 @@
     },
     "restoreBookmark": {
       "message": "북마크 복원"
+    },
+    "onboardingChatMenuTooltip": {
+      "message": "이 메뉴에는 YouTube 기본 설정과 함께 Chat Enhancer 설정을 빠르게 켜고 끄는 스위치가 있습니다."
+    },
+    "onboardingBookmarkTooltip": {
+      "message": "이 메시지를 확장 프로그램의 북마크 탭에 저장하면 스트림을 떠난 후에도 찾을 수 있습니다. 다시 클릭하면 삭제됩니다."
+    },
+    "onboardingRememberUserTooltip": {
+      "message": "이 사용자를 북마크하면 채팅에서 강조 표시되고 북마크 탭에서 찾을 수 있습니다. 다시 클릭하면 삭제됩니다."
+    },
+    "onboardingOpenChannelTooltip": {
+      "message": "이 사용자의 YouTube 채널을 채팅 옆의 작은 창에서 엽니다."
+    },
+    "onboardingJumpToMessageTooltip": {
+      "message": "채팅에서 이 메시지로 이동합니다. 메시지가 채팅에 남아 있는 동안 사용할 수 있습니다."
+    },
+    "onboardingProfileTooltip": {
+      "message": "아바타를 클릭하면 사용자 프로필에서 최근 메시지를 보고, 사용자를 멘션하거나 메시지를 인용하거나 사용자를 북마크할 수 있습니다."
+    },
+    "onboardingPipTooltip": {
+      "message": "다른 탭을 사용하는 동안 동영상과 채팅을 항상 위에 표시되는 창에 유지하세요."
     }
   }
 }

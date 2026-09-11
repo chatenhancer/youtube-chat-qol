@@ -10,7 +10,7 @@ import {
   getExtensionStorageValues,
   withExtensionStorageValues
 } from '../support/extension-storage';
-import { openSettingsMenu } from '../support/menu-openers';
+import { openChatEnhancerMenu } from '../support/menu-openers';
 import { expectSettingsMenuControlsInjected } from './menus';
 import type { BrowserScenario, ChatSurface } from './types';
 
@@ -27,7 +27,7 @@ const SETTINGS_INITIAL_VALUES = {
 
 export const settingsMenuBehaviorScenario: BrowserScenario = async ({ chat, context }) => {
   await withExtensionStorageValues(context, 'sync', SETTINGS_INITIAL_VALUES, async () => {
-    const menu = await openSettingsMenu(chat);
+    const menu = await openChatEnhancerMenu(chat);
     await expectSettingsMenuControlsInjected(menu);
     await toggleTranslationFromChatSettings({ context, menu });
     await toggleAlertSoundsFromChatSettings({ context, menu });

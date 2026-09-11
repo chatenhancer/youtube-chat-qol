@@ -1,5 +1,17 @@
 {
   "messages": {
+    "chatEnhancer": "Chat Enhancer",
+    "onboardingMenuParticipants": "Katılımcılar",
+    "onboardingMenuTimestamps": "Zaman damgaları",
+    "onboardingMenuReactions": "Tepkiler",
+    "onboardingMenuPopout": "Sohbeti yeni pencerede aç",
+    "onboardingMenuFeedback": "Geri bildirim gönder",
+    "back": "Geri",
+    "videoChatPip": "Video + sohbet yüzen pencerede",
+    "returnVideoChat": "Sekmeye dön",
+    "pipOpenFailed": "Video ve sohbet açılamadı. Tekrar deneyin.",
+    "pipReloadRequired": "Chat Enhancer güncellendi veya yeniden yüklendi. Video + sohbet PiP kullanmak için bu YouTube sekmesini yenileyin.",
+    "playingInPip": "Video ve sohbet yüzen pencerede",
     "add": "Ekle",
     "addKeywords": "Anahtar kelime ekle",
     "addKeywordsCount": {
@@ -328,14 +340,11 @@
     "onboardingPlaygroundHelper": {
       "message": "Diğer uzantı kullanıcılarıyla oyun oynayın."
     },
-    "onboardingPlaygroundCallout": {
-      "message": "Bu seçenek sizi Oyunlar lobisine götürür. Burada uzantıyı kullanan gerçek bir oyuncuyla veya Bilgisayar (bot) oyuncusuyla yeni bir oyun başlatabilirsiniz."
-    },
     "onboardingLiteModeHelper": {
       "message": "Performansı artırmak için daha hızlı ve hafif bir sohbet akışı kullanın."
     },
-    "onboardingLiteModeCallout": {
-      "message": " etkinleştirildiğinde canlı sohbetin daha az kaynak kullanmasını sağlar. Bu düğmeye tıklayarak istediğiniz zaman yerel sohbete dönebilirsiniz."
+    "onboardingGamesTooltip": {
+      "message": "Bu seçenek Oyunlar lobisini açar. Burada uzantıyı kullanan gerçek bir oyuncuyla veya Bilgisayar (bot) oyuncusuyla yeni bir oyun başlatabilirsiniz."
     },
     "onboardingInboxTooltip": {
       "message": "Bu, Gelen Kutunuzu açar. Sohbette biri sizden bahsettiğinde mesajı burada görünür, böylece kaçırmazsınız. İzlemek için özel Gelen Kutusu anahtar kelimeleri de ayarlayabilirsiniz."
@@ -365,7 +374,7 @@
       "message": "Sohbet önizlemesi"
     },
     "onboardingPreviewHoverHint": {
-      "message": "Daha fazla bilgi için simgelerin üzerine gelin."
+      "message": "Önizlemeyi keşfedin. İpuçları için üzerine gelin, özellikleri denemek için tıklayın."
     },
     "onboardingTopChat": {
       "message": "En popüler sohbet"
@@ -677,6 +686,27 @@
     },
     "restoreBookmark": {
       "message": "Yer işaretini geri yükle"
+    },
+    "onboardingChatMenuTooltip": {
+      "message": "Bu menü, YouTube’un kendi ayarlarının yanı sıra Chat Enhancer ayarlarını hızla açıp kapatabileceğiniz düğmeler içerir."
+    },
+    "onboardingBookmarkTooltip": {
+      "message": "Bu mesajı, yayından ayrıldıktan sonra da bulabilmek için uzantının Yer imleri sekmesine kaydedin. Kaldırmak için tekrar tıklayın."
+    },
+    "onboardingRememberUserTooltip": {
+      "message": "Bu kullanıcıyı sohbette vurgulamak ve Yer imleri sekmesinde bulmak için yer imlerine ekleyin. Kaldırmak için tekrar tıklayın."
+    },
+    "onboardingOpenChannelTooltip": {
+      "message": "Bu kullanıcının YouTube kanalını sohbetin yanında küçük bir pencerede açın."
+    },
+    "onboardingJumpToMessageTooltip": {
+      "message": "Sohbette bu mesaja gidin. Mesaj hâlâ sohbetteyken kullanılabilir."
+    },
+    "onboardingProfileTooltip": {
+      "message": "Kullanıcının profilini açmak, son mesajlarını görmek, kullanıcıdan bahsetmek, mesajlarını alıntılamak veya kullanıcıyı yer imlerine eklemek için avatara tıklayın."
+    },
+    "onboardingPipTooltip": {
+      "message": "Diğer sekmeleri kullanırken video ve sohbeti her zaman üstte kalan bir pencerede tutun."
     }
   }
 }

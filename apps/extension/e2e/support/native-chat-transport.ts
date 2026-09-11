@@ -558,10 +558,14 @@ function cloneJson<T extends JsonValue>(value: T): T {
 
 function createAvatarDataUrl(author: string): string {
   const initial = author.replace(/^@/, '').slice(0, 1).toUpperCase() || 'T';
+  let colorHash = 0;
+  for (const character of author.replace(/^@/, '')) {
+    colorHash = Math.imul(colorHash ^ character.charCodeAt(0), 16777619);
+  }
   const svg = [
     '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32">',
-    '<rect width="32" height="32" rx="16" fill="#3f8cff"/>',
-    `<text x="16" y="21" text-anchor="middle" fill="white" font-size="16">${escapeXml(initial)}</text>`,
+    `<rect width="32" height="32" rx="16" fill="hsl(${Math.abs(colorHash) % 360} 86% 58%)"/>`,
+    `<text x="16" y="21" text-anchor="middle" fill="white" font-family="Roboto, Arial, sans-serif" font-size="16">${escapeXml(initial)}</text>`,
     '</svg>'
   ].join('');
   return `data:image/svg+xml,${encodeURIComponent(svg)}`;

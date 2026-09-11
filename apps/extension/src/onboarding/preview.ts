@@ -8,19 +8,12 @@ interface PreviewSourceMessage {
 }
 
 interface PreviewElements {
-  calloutConnectors: SVGSVGElement;
   featuredMessage: HTMLElement;
   gamesIcon: HTMLElement;
   inlineTranslateIcon: HTMLElement;
-  liteCallout: HTMLElement;
-  liteCalloutConnector: SVGPathElement;
-  liteIcon: HTMLElement;
-  playgroundCallout: HTMLElement;
-  playgroundCalloutConnector: SVGPathElement;
   primaryText: HTMLElement;
   primaryTextLead: HTMLElement;
   primaryTextTail: HTMLElement;
-  previewHeader: HTMLElement;
   secondaryText: HTMLElement;
   translationLine: HTMLElement;
 }
@@ -71,8 +64,6 @@ export function createOnboardingPreview(
 
   const colorScheme = window.matchMedia(DARK_COLOR_SCHEME_QUERY);
   let translationRequestToken = 0;
-  let calloutLayoutFrame: number | null = null;
-  let calloutLayoutAnimationDeadline = 0;
   const state: PreviewState = {
     chatSkin: 'system',
     liteModeEnabled: false,
@@ -84,30 +75,8 @@ export function createOnboardingPreview(
     translationDisplay: 'replace'
   };
 
-  const queueCalloutLayout = (followFeatureAnimation = false): void => {
-    if (followFeatureAnimation) {
-      calloutLayoutAnimationDeadline = performance.now() + 340;
-    }
-    if (calloutLayoutFrame !== null) return;
-
-    const updateLayout = (timestamp: number): void => {
-      const hasLayout = updateCalloutConnectors(root, elements);
-      if (hasLayout && timestamp < calloutLayoutAnimationDeadline) {
-        calloutLayoutFrame = window.requestAnimationFrame(updateLayout);
-        return;
-      }
-
-      calloutLayoutFrame = null;
-    };
-
-    calloutLayoutFrame = window.requestAnimationFrame(updateLayout);
-  };
-
   const render = (): void => {
     const chatSkinTheme: ChatSkinTheme = colorScheme.matches ? 'dark' : 'light';
-    const featureVisibilityChanged =
-      root.dataset.liteModeEnabled !== String(state.liteModeEnabled) ||
-      root.dataset.playgroundEnabled !== String(state.playgroundEnabled);
     root.dataset.chatSkin = state.chatSkin;
     root.dataset.chatTheme = chatSkinTheme;
     root.dataset.liteModeEnabled = String(state.liteModeEnabled);
@@ -115,11 +84,6 @@ export function createOnboardingPreview(
     root.dataset.translationState = state.status;
     applyChatSkinTheme(root, state.chatSkin, chatSkinTheme);
     setPreviewElementVisible(elements.gamesIcon, state.playgroundEnabled);
-    setPreviewElementVisible(elements.liteCallout, state.liteModeEnabled);
-    setPreviewElementVisible(elements.playgroundCallout, state.playgroundEnabled);
-    elements.liteIcon.classList.toggle('preview-icon-active', state.liteModeEnabled);
-    elements.liteIcon.classList.toggle('ytcq-lite-mode-button-active', state.liteModeEnabled);
-    queueCalloutLayout(featureVisibilityChanged);
     elements.featuredMessage.classList.toggle(
       'ytcq-translation-replaced',
       state.status === 'translated' && state.translationDisplay === 'replace'
@@ -174,7 +138,6 @@ export function createOnboardingPreview(
   };
 
   colorScheme.addEventListener('change', render);
-  window.addEventListener('resize', () => queueCalloutLayout());
   render();
 
   const setTargetLanguage = (targetLanguage: string): void => {
@@ -270,40 +233,22 @@ export function translatePreviewText(text: string, targetLanguage: string): Prom
 }
 
 function getPreviewElements(root: HTMLElement): PreviewElements | null {
-  const calloutConnectors = root.querySelector<SVGSVGElement>('#previewCalloutConnectors');
   const featuredMessage = root.querySelector<HTMLElement>('#previewFeaturedMessage');
   const gamesIcon = root.querySelector<HTMLElement>('#previewGamesIcon');
   const inlineTranslateIcon = root.querySelector<HTMLElement>('#previewInlineTranslateIcon');
-  const liteCallout = root.querySelector<HTMLElement>('#previewLiteCallout');
-  const liteCalloutConnector = root.querySelector<SVGPathElement>(
-    '#previewLiteCalloutConnector'
-  );
-  const liteIcon = root.querySelector<HTMLElement>('#previewLiteIcon');
-  const playgroundCallout = root.querySelector<HTMLElement>('#previewPlaygroundCallout');
-  const playgroundCalloutConnector = root.querySelector<SVGPathElement>(
-    '#previewPlaygroundCalloutConnector'
-  );
   const primaryText = root.querySelector<HTMLElement>('#previewPrimaryText');
   const primaryTextLead = root.querySelector<HTMLElement>('#previewPrimaryTextLead');
   const primaryTextTail = root.querySelector<HTMLElement>('#previewPrimaryTextTail');
-  const previewHeader = root.querySelector<HTMLElement>('.preview-chat-header');
   const secondaryText = root.querySelector<HTMLElement>('#previewSecondaryText');
   const translationLine = root.querySelector<HTMLElement>('#previewTranslationLine');
 
   if (
-    !calloutConnectors ||
     !featuredMessage ||
     !gamesIcon ||
     !inlineTranslateIcon ||
-    !liteCallout ||
-    !liteCalloutConnector ||
-    !liteIcon ||
-    !playgroundCallout ||
-    !playgroundCalloutConnector ||
     !primaryText ||
     !primaryTextLead ||
     !primaryTextTail ||
-    !previewHeader ||
     !secondaryText ||
     !translationLine
   ) {
@@ -311,80 +256,15 @@ function getPreviewElements(root: HTMLElement): PreviewElements | null {
   }
 
   return {
-    calloutConnectors,
     featuredMessage,
     gamesIcon,
     inlineTranslateIcon,
-    liteCallout,
-    liteCalloutConnector,
-    liteIcon,
-    playgroundCallout,
-    playgroundCalloutConnector,
     primaryText,
     primaryTextLead,
     primaryTextTail,
-    previewHeader,
     secondaryText,
     translationLine
   };
-}
-
-function updateCalloutConnectors(root: HTMLElement, elements: PreviewElements): boolean {
-  const rootBounds = root.getBoundingClientRect();
-  if (!rootBounds.width || !rootBounds.height) return false;
-
-  elements.calloutConnectors.setAttribute(
-    'viewBox',
-    `0 0 ${roundLayoutCoordinate(rootBounds.width)} ${roundLayoutCoordinate(rootBounds.height)}`
-  );
-  updateCalloutConnector(
-    rootBounds,
-    elements.previewHeader.getBoundingClientRect(),
-    elements.liteIcon.getBoundingClientRect(),
-    elements.liteCallout.getBoundingClientRect(),
-    elements.liteCalloutConnector
-  );
-  updateCalloutConnector(
-    rootBounds,
-    elements.previewHeader.getBoundingClientRect(),
-    elements.gamesIcon.getBoundingClientRect(),
-    elements.playgroundCallout.getBoundingClientRect(),
-    elements.playgroundCalloutConnector
-  );
-  return true;
-}
-
-function updateCalloutConnector(
-  rootBounds: DOMRect,
-  headerBounds: DOMRect,
-  iconBounds: DOMRect,
-  cardBounds: DOMRect,
-  connector: SVGPathElement
-): void {
-  const rootCenter = rootBounds.left + rootBounds.width / 2;
-  const cardCenter = cardBounds.left + cardBounds.width / 2;
-  const cardIsOnLeft = cardCenter < rootCenter;
-  const startX = iconBounds.left - rootBounds.left + iconBounds.width / 2;
-  const startY = iconBounds.bottom - rootBounds.top - 2;
-  const routeY = headerBounds.bottom - rootBounds.top + 10;
-  const routeX = cardIsOnLeft ? 9 : rootBounds.width - 9;
-  const endX = (cardIsOnLeft ? cardBounds.left : cardBounds.right) - rootBounds.left;
-  const endY = cardBounds.top - rootBounds.top + cardBounds.height / 2;
-
-  connector.setAttribute(
-    'd',
-    [
-      `M ${roundLayoutCoordinate(startX)} ${roundLayoutCoordinate(startY)}`,
-      `V ${roundLayoutCoordinate(routeY)}`,
-      `H ${roundLayoutCoordinate(routeX)}`,
-      `V ${roundLayoutCoordinate(endY)}`,
-      `H ${roundLayoutCoordinate(endX)}`
-    ].join(' ')
-  );
-}
-
-function roundLayoutCoordinate(value: number): number {
-  return Math.round(value * 10) / 10;
 }
 
 function setPreviewPrimaryText(elements: PreviewElements, text: string): void {

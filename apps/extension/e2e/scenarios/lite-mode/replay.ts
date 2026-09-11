@@ -1,5 +1,6 @@
 /** Browser scenario for Lite mode replay behavior. */
 import { expect, test } from '@playwright/test';
+import { toggleLiteModeFromMenu } from './menu';
 import { setExtensionStorageValues } from '../../support/extension-storage';
 import { waitForYouTubeContentVideo } from '../../support/youtube-page';
 import type { BrowserScenario } from '../types';
@@ -9,14 +10,12 @@ import {
   expectStoredLiteMode
 } from './assertions';
 import {
-  LITE_BUTTON_SELECTOR,
   LITE_ROOT_SELECTOR,
   NATIVE_LIST_SELECTOR
 } from './selectors';
 
 export const liteModeReplayRapidSeekScenario: BrowserScenario = async ({ chat, context, page }) => {
   test.setTimeout(180_000);
-  const button = chat.locator(LITE_BUTTON_SELECTOR).first();
   const root = chat.locator(LITE_ROOT_SELECTOR);
   let initialReplayTime: number | null = null;
 
@@ -28,9 +27,8 @@ export const liteModeReplayRapidSeekScenario: BrowserScenario = async ({ chat, c
       .locator(NATIVE_LIST_SELECTOR)
       .first()
       .waitFor({ state: 'attached', timeout: 20_000 });
-    await expect(button).toBeVisible({ timeout: 20_000 });
 
-    await button.click();
+    await toggleLiteModeFromMenu(chat);
     await expectStoredLiteMode(context, true);
     await expect(root).toHaveAttribute('data-ytcq-connection-state', 'connected', {
       timeout: 50_000

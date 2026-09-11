@@ -27,6 +27,7 @@ import {
   stopNativeChatPerfProbe
 } from '../../support/native-performance';
 import type { NativeChatTransport } from '../../support/native-chat-transport';
+import { toggleLiteModeFromMenu } from '../../scenarios/lite-mode/menu';
 
 const WARMUP_MESSAGES = getPositiveIntegerEnv('YTCQ_PERF_LITE_WARMUP_MESSAGES', 1_000);
 const LIVE_EDGE_MESSAGES = getPositiveIntegerEnv('YTCQ_PERF_LITE_LIVE_MESSAGES', 5_000);
@@ -76,7 +77,7 @@ test('youtube-native performance: Lite mode heap plateaus across 11,000+ message
     },
     async () => {
       const chat = await openChat();
-      await chat.locator('.ytcq-lite-mode-button').click();
+      await toggleLiteModeFromMenu(chat);
       await expect(chat.locator(LITE_ROOT_SELECTOR)).toBeVisible();
 
       const cdp = await createHeapSession(context, page);

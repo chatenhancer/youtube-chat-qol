@@ -6,12 +6,14 @@
  * and routes it to the correct enhancer.
  */
 import { registerFeature } from '../../content/dispatcher';
+import { CHAT_HEADER_SELECTOR } from '../../youtube/selectors';
 import {
   cleanupStaleMessageMenuSurfaces,
   enhanceMessageContextMenu,
   isRecentActiveContextMessage
 } from './message-menu';
 import { cleanupStaleSettingsMenuSurfaces, enhanceSettingsMenu, refreshSettingsMenus } from './settings-menu';
+import { handleSettingsSubmenuKeyDown, resetSettingsSubmenus } from './settings-submenu';
 
 const LIVE_CHAT_MENU_MARKER_SELECTOR = [
   'yt-live-chat-toggle-renderer',
@@ -21,9 +23,29 @@ const LIVE_CHAT_MENU_MARKER_SELECTOR = [
   '.ytcq-context-item'
 ].join(',');
 const LIVE_CHAT_MENU_SIZE_REPAIRED_CLASS = 'ytcq-live-chat-menu-size-repaired';
+let menuListeners = new AbortController();
+let headerMenuRequested = false;
 
 registerFeature({
   page: {
+    init: () => {
+      window.addEventListener('keydown', handleSettingsSubmenuKeyDown, {
+        capture: true, signal: menuListeners.signal
+      });
+      // New YouTube menus can omit the timestamps toggle. Remember the native
+      // trigger instead of depending on localized labels or private commands.
+      document.addEventListener('click', (event) => {
+        if (event.target instanceof Element && event.target.closest('ytd-menu-popup-renderer')) return;
+        resetSettingsSubmenus();
+        headerMenuRequested = event.target instanceof Element && Boolean(
+          event.target.closest(`${CHAT_HEADER_SELECTOR} #live-chat-header-context-menu`)
+        );
+      }, { capture: true, signal: menuListeners.signal });
+      document.addEventListener('contextmenu', () => {
+        headerMenuRequested = false;
+        resetSettingsSubmenus();
+      }, { capture: true, signal: menuListeners.signal });
+    },
     boot: initMenus,
     cleanup: cleanupStaleMenuSurfaces,
     reset: refreshSettingsMenus
@@ -51,6 +73,9 @@ export function enhanceMenu(menu: Element): void {
 }
 
 export function cleanupStaleMenuSurfaces(): void {
+  menuListeners.abort();
+  menuListeners = new AbortController();
+  headerMenuRequested = false;
   cleanupStaleMessageMenuSurfaces();
   cleanupStaleSettingsMenuSurfaces();
 }
@@ -83,7 +108,7 @@ function handleMenuMutations({ addedElements, mutations }: {
 function isChatSettingsMenu(menu: HTMLElement): boolean {
   return Boolean(
     menu.querySelector('#items') &&
-    menu.querySelector('yt-live-chat-toggle-renderer')
+    (headerMenuRequested || menu.querySelector('yt-live-chat-toggle-renderer'))
   );
 }
 

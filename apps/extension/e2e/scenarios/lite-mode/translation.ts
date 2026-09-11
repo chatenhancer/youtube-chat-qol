@@ -1,5 +1,6 @@
 /** Browser scenarios for Lite mode translation behavior. */
 import { expect, type Locator } from '@playwright/test';
+import { toggleLiteModeFromMenu } from './menu';
 import {
   setExtensionStorageValues,
   withExtensionStorageValues
@@ -8,7 +9,6 @@ import { getRichVisibleText } from '../../support/text';
 import { withMockedTranslationEndpoint } from '../../support/translation-endpoint';
 import type { BrowserScenario, ChatSurface } from '../types';
 import {
-  LITE_BUTTON_SELECTOR,
   LITE_NATIVE_RESTORE_SELECTOR,
   LITE_ROOT_SELECTOR
 } from './selectors';
@@ -36,8 +36,7 @@ export const liteModeTranslationContinuityScenario: BrowserScenario = async ({ c
           { timeout: 20_000 }
         );
 
-        const button = chat.locator(LITE_BUTTON_SELECTOR).first();
-        await button.click();
+        await toggleLiteModeFromMenu(chat);
         await expect(chat.locator(LITE_ROOT_SELECTOR)).toBeVisible();
 
         const liteRow = chat.locator(

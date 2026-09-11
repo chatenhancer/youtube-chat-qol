@@ -280,7 +280,7 @@
   #live-chat-header-context-menu button,
   yt-icon-button button,
   tp-yt-paper-icon-button,
-  button:not(.ytcq-inbox-button):not(.ytcq-games-button):not(.ytcq-lite-mode-button):not(#viewer-leaderboard-entry-point button)
+  button:not(.ytcq-inbox-button):not(.ytcq-games-button):not(#viewer-leaderboard-entry-point button)
 ):not(ytd-menu-popup-renderer *) {
   border: 0 !important;
   border-radius: 4px !important;
@@ -290,7 +290,7 @@
   #live-chat-header-context-menu button,
   yt-icon-button button,
   tp-yt-paper-icon-button,
-  button:not(.ytcq-inbox-button):not(.ytcq-games-button):not(.ytcq-lite-mode-button):not(#viewer-leaderboard-entry-point button)
+  button:not(.ytcq-inbox-button):not(.ytcq-games-button):not(#viewer-leaderboard-entry-point button)
 ):not(ytd-menu-popup-renderer *):where(:hover, :focus) {
   background: transparent !important;
   box-shadow: none !important;
@@ -318,7 +318,7 @@
 :root[data-ytcq-chat-skin="aero"] yt-live-chat-header-renderer :where(
   yt-icon-button yt-interaction,
   tp-yt-paper-icon-button yt-interaction,
-  button:not(.ytcq-inbox-button):not(.ytcq-games-button):not(.ytcq-lite-mode-button) yt-touch-feedback-shape
+  button:not(.ytcq-inbox-button):not(.ytcq-games-button) yt-touch-feedback-shape
 ):not(ytd-menu-popup-renderer *) {
   display: none !important;
 }
@@ -1751,8 +1751,7 @@
 
 :root[data-ytcq-chat-skin="aero"] yt-live-chat-header-renderer :where(
   .ytcq-inbox-button,
-  .ytcq-games-button,
-  .ytcq-lite-mode-button
+  .ytcq-games-button
 ) {
   color: #fff !important;
   fill: currentColor !important;
@@ -1761,8 +1760,7 @@
 
 :root[data-ytcq-chat-skin="aero"] yt-live-chat-header-renderer :where(
   .ytcq-inbox-button,
-  .ytcq-games-button,
-  .ytcq-lite-mode-button
+  .ytcq-games-button
 ):where(:hover, :focus) {
   background: transparent !important;
   box-shadow: none !important;
@@ -1772,28 +1770,16 @@
 :root[data-ytcq-chat-skin="aero"] yt-live-chat-header-renderer :where(
   #live-chat-header-context-menu button,
   yt-icon-button button,
-  button:not(.ytcq-inbox-button):not(.ytcq-games-button):not(.ytcq-lite-mode-button):not(#viewer-leaderboard-entry-point button)
+  button:not(.ytcq-inbox-button):not(.ytcq-games-button):not(#viewer-leaderboard-entry-point button)
 ):not(ytd-menu-popup-renderer *):where(:hover, :focus) :where(yt-icon, .yt-icon-shape, svg),
 :root[data-ytcq-chat-skin="aero"] yt-live-chat-header-renderer :where(
   tp-yt-paper-icon-button
 ):not(ytd-menu-popup-renderer *):where(:hover, :focus),
 :root[data-ytcq-chat-skin="aero"] yt-live-chat-header-renderer :where(
   .ytcq-inbox-button,
-  .ytcq-games-button,
-  .ytcq-lite-mode-button
+  .ytcq-games-button
 ):where(:hover, :focus) svg {
   filter: var(--ytcq-aero-header-icon-hover-filter);
-}
-
-:root[data-ytcq-chat-skin="aero"] yt-live-chat-header-renderer .ytcq-lite-mode-button-active {
-  color: #fff59d !important;
-  fill: currentColor !important;
-}
-
-:root[data-ytcq-chat-skin="aero"] yt-live-chat-header-renderer .ytcq-lite-mode-button-active svg {
-  filter:
-    drop-shadow(0 0 2px rgba(255, 255, 255, 0.88))
-    drop-shadow(0 0 6px rgba(255, 222, 71, 0.82));
 }
 
 :root[data-ytcq-chat-skin="aero"] :where(
@@ -2088,12 +2074,11 @@
   #live-chat-header-context-menu button,
   yt-icon-button button,
   tp-yt-paper-icon-button,
-  button:not(.ytcq-inbox-button):not(.ytcq-games-button):not(.ytcq-lite-mode-button):not(#viewer-leaderboard-entry-point button)
+  button:not(.ytcq-inbox-button):not(.ytcq-games-button):not(#viewer-leaderboard-entry-point button)
 ):not(ytd-menu-popup-renderer *):where(:hover, :focus),
 :root[data-ytcq-chat-skin="aero"][data-ytcq-chat-skin-theme="dark"] yt-live-chat-header-renderer :where(
   .ytcq-inbox-button,
-  .ytcq-games-button,
-  .ytcq-lite-mode-button
+  .ytcq-games-button
 ):not(ytd-menu-popup-renderer *):where(:hover, :focus) {
   background: transparent !important;
   box-shadow: none !important;
@@ -2544,16 +2529,6 @@
 :root[data-ytcq-chat-skin="aero"][data-ytcq-chat-skin-theme="dark"] .ytcq-composer-translate-button:focus-visible {
   outline: 2px solid var(--ytcq-aero-accent) !important;
   outline-offset: -2px;
-}
-
-:root[data-ytcq-chat-skin="aero"][data-ytcq-chat-skin-theme="dark"] yt-live-chat-header-renderer .ytcq-lite-mode-button-active {
-  color: #ffedb5 !important;
-}
-
-:root[data-ytcq-chat-skin="aero"][data-ytcq-chat-skin-theme="dark"] yt-live-chat-header-renderer .ytcq-lite-mode-button-active svg {
-  filter:
-    drop-shadow(0 0 2px rgba(255, 248, 220, 0.82))
-    drop-shadow(0 0 6px rgba(224, 185, 67, 0.65));
 }
 
 :root[data-ytcq-chat-skin="aero"][data-ytcq-chat-skin-theme="dark"] yt-live-chat-header-renderer :where(

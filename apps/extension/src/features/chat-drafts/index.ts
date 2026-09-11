@@ -16,6 +16,7 @@ import { createRichTextSegmentNodes } from '../../youtube/rich-text';
 import { getCurrentYouTubeChatSourceUrl } from '../../youtube/source-url';
 import { SEND_BUTTON_SELECTOR } from '../../youtube/selectors';
 import {
+  CHAT_INPUT_DRAFT_READY_ATTRIBUTE,
   createChatInputDraftContent,
   type ChatInputDraftContent,
   loadChatInputDraft,
@@ -65,6 +66,7 @@ export function resetChatInputDrafts(): void {
   clearRestoreVerificationTimer();
   restoreAttempt = 0;
   restoreFinished = false;
+  document.documentElement.removeAttribute(CHAT_INPUT_DRAFT_READY_ATTRIBUTE);
   replacingDraft = false;
 }
 
@@ -97,7 +99,7 @@ export async function restoreChatInputDraft(sourceUrl = getCurrentYouTubeChatSou
   }
 
   if (getChatInputText().trim()) {
-    if (!restoreVerificationTimer) restoreFinished = true;
+    if (!restoreVerificationTimer) finishDraftRestore();
     return false;
   }
 
@@ -123,17 +125,19 @@ export async function saveCurrentChatInputDraft(sourceUrl = getCurrentYouTubeCha
 
 function handleDocumentInput(event: Event): void {
   if (replacingDraft || !isFromChatInput(event.target)) return;
-  restoreFinished = true;
+  finishDraftRestore();
   scheduleChatInputDraftSave();
 }
 
 function handleDocumentKeydown(event: KeyboardEvent): void {
   if (event.key !== 'Enter' || event.shiftKey || !isFromChatInput(event.target)) return;
+  finishDraftRestore();
   schedulePostSendDraftSave();
 }
 
 function handleDocumentClick(event: MouseEvent): void {
   if (!(event.target instanceof Element) || !event.target.closest(SEND_BUTTON_SELECTOR)) return;
+  finishDraftRestore();
   schedulePostSendDraftSave();
 }
 
@@ -197,7 +201,7 @@ function scheduleRestoredDraftVerification(draft: ChatInputDraftContent, attempt
 
   const delay = DRAFT_RESTORE_VERIFY_DELAYS_MS[attempt];
   if (delay === undefined) {
-    restoreFinished = true;
+    finishDraftRestore();
     return;
   }
 
@@ -211,7 +215,7 @@ function scheduleRestoredDraftVerification(draft: ChatInputDraftContent, attempt
       return;
     }
     if (currentText.trim()) {
-      restoreFinished = true;
+      finishDraftRestore();
       return;
     }
 
@@ -221,6 +225,12 @@ function scheduleRestoredDraftVerification(draft: ChatInputDraftContent, attempt
       scheduleChatInputDraftRestore();
     }
   }, delay);
+}
+
+function finishDraftRestore(): void {
+  restoreFinished = true;
+  // The PiP owner must distinguish a cleared draft from a still-loading input.
+  document.documentElement.setAttribute(CHAT_INPUT_DRAFT_READY_ATTRIBUTE, '');
 }
 
 function isFromChatInput(target: EventTarget | null): boolean {

@@ -1,5 +1,17 @@
 {
   "messages": {
+    "chatEnhancer": "Chat Enhancer",
+    "onboardingMenuParticipants": "ผู้เข้าร่วม",
+    "onboardingMenuTimestamps": "การประทับเวลา",
+    "onboardingMenuReactions": "รีแอ็กชัน",
+    "onboardingMenuPopout": "แชทแบบป๊อปเอาต์",
+    "onboardingMenuFeedback": "ส่งความคิดเห็น",
+    "back": "ย้อนกลับ",
+    "videoChatPip": "วิดีโอ + แชทในหน้าต่างลอย",
+    "returnVideoChat": "กลับไปที่แท็บ",
+    "pipOpenFailed": "เปิดวิดีโอและแชทไม่ได้ โปรดลองอีกครั้ง",
+    "pipReloadRequired": "Chat Enhancer ได้รับการอัปเดตหรือโหลดใหม่แล้ว รีเฟรชแท็บ YouTube นี้เพื่อใช้วิดีโอ + แชต PiP",
+    "playingInPip": "วิดีโอและแชทอยู่ในหน้าต่างลอย",
     "add": "เพิ่ม",
     "addKeywords": "เพิ่มคำสำคัญ",
     "addKeywordsCount": {
@@ -327,14 +339,11 @@
     "onboardingPlaygroundHelper": {
       "message": "เล่นเกมกับผู้ใช้ส่วนขยายคนอื่น ๆ"
     },
-    "onboardingPlaygroundCallout": {
-      "message": "ตัวเลือกนี้จะพาคุณไปยังล็อบบี้เกม ซึ่งคุณสามารถเริ่มเกมใหม่กับผู้เล่นจริงที่ใช้ส่วนขยายนี้เช่นกัน หรือผู้เล่นคอมพิวเตอร์ (บอต)"
-    },
     "onboardingLiteModeHelper": {
       "message": "ใช้ฟีดแชทที่เร็วและเบากว่าเพื่อเพิ่มประสิทธิภาพ"
     },
-    "onboardingLiteModeCallout": {
-      "message": "เมื่อเปิดใช้แล้วจะช่วยให้แชทสดใช้ทรัพยากรน้อยลง คุณสามารถกลับไปใช้แชทแบบเดิมได้ทุกเมื่อโดยคลิกสวิตช์นี้"
+    "onboardingGamesTooltip": {
+      "message": "ตัวเลือกนี้เปิดล็อบบี้เกม ซึ่งคุณสามารถเริ่มเกมใหม่กับผู้เล่นจริงที่ใช้ส่วนขยายนี้เช่นกัน หรือผู้เล่นคอมพิวเตอร์ (บอต)"
     },
     "onboardingInboxTooltip": {
       "message": "ปุ่มนี้จะเปิดกล่องจดหมาย เมื่อมีคนพูดถึงคุณในแชท ข้อความของพวกเขาจะปรากฏที่นี่เพื่อให้คุณไม่พลาด คุณยังตั้งค่าคีย์เวิร์ดของกล่องจดหมายแบบกำหนดเองเพื่อติดตามได้ด้วย"
@@ -364,7 +373,7 @@
       "message": "ตัวอย่างแชท"
     },
     "onboardingPreviewHoverHint": {
-      "message": "วางเมาส์เหนือไอคอนเพื่อดูข้อมูลเพิ่มเติม"
+      "message": "ลองสำรวจตัวอย่าง วางเมาส์เพื่อดูคำแนะนำ แล้วคลิกเพื่อลองใช้ฟีเจอร์"
     },
     "onboardingTopChat": {
       "message": "แชทยอดนิยม"
@@ -674,6 +683,27 @@
     },
     "restoreBookmark": {
       "message": "กู้คืนบุ๊กมาร์ก"
+    },
+    "onboardingChatMenuTooltip": {
+      "message": "เมนูนี้มีสวิตช์สำหรับเปิดหรือปิดการตั้งค่า Chat Enhancer อย่างรวดเร็ว ควบคู่กับการตั้งค่าของ YouTube เอง"
+    },
+    "onboardingBookmarkTooltip": {
+      "message": "บันทึกข้อความนี้ในแท็บบุ๊กมาร์กของส่วนขยาย เพื่อให้ค้นหาได้แม้ออกจากสตรีมแล้ว คลิกอีกครั้งเพื่อลบออก"
+    },
+    "onboardingRememberUserTooltip": {
+      "message": "เพิ่มผู้ใช้นี้ในบุ๊กมาร์กเพื่อไฮไลต์ในแชทและค้นหาได้ในแท็บบุ๊กมาร์ก คลิกอีกครั้งเพื่อลบออก"
+    },
+    "onboardingOpenChannelTooltip": {
+      "message": "เปิดช่อง YouTube ของผู้ใช้นี้ในหน้าต่างเล็กข้างแชท"
+    },
+    "onboardingJumpToMessageTooltip": {
+      "message": "ข้ามไปยังข้อความนี้ในแชท ใช้ได้ตราบใดที่ข้อความยังอยู่ในแชท"
+    },
+    "onboardingProfileTooltip": {
+      "message": "คลิกอวาตาร์เพื่อเปิดโปรไฟล์ผู้ใช้ ดูข้อความล่าสุด และกล่าวถึง อ้างอิงข้อความ หรือเพิ่มผู้ใช้ในบุ๊กมาร์ก"
+    },
+    "onboardingPipTooltip": {
+      "message": "ให้วิดีโอและแชทอยู่ในหน้าต่างที่แสดงด้านบนเสมอขณะใช้แท็บอื่น"
     }
   }
 }

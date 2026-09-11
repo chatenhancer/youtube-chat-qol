@@ -9,8 +9,7 @@ yt-live-chat-participant-renderer .ytcq-profile-enabled {
 }
 
 yt-live-chat-header-renderer .ytcq-inbox-button,
-yt-live-chat-header-renderer .ytcq-games-button,
-yt-live-chat-header-renderer .ytcq-lite-mode-button {
+yt-live-chat-header-renderer .ytcq-games-button {
   position: relative;
   display: inline-flex;
   align-items: center;
@@ -31,16 +30,13 @@ yt-live-chat-header-renderer .ytcq-lite-mode-button {
 yt-live-chat-header-renderer .ytcq-inbox-button:hover,
 yt-live-chat-header-renderer .ytcq-inbox-button:focus,
 yt-live-chat-header-renderer .ytcq-games-button:hover,
-yt-live-chat-header-renderer .ytcq-games-button:focus,
-yt-live-chat-header-renderer .ytcq-lite-mode-button:hover,
-yt-live-chat-header-renderer .ytcq-lite-mode-button:focus {
+yt-live-chat-header-renderer .ytcq-games-button:focus {
   background: var(--ytcq-chat-header-icon-hover-background);
   outline: none;
 }
 
 yt-live-chat-header-renderer .ytcq-inbox-button svg,
-yt-live-chat-header-renderer .ytcq-games-button svg,
-yt-live-chat-header-renderer .ytcq-lite-mode-button svg {
+yt-live-chat-header-renderer .ytcq-games-button svg {
   display: block;
   width: 24px;
   height: 24px;
@@ -48,10 +44,6 @@ yt-live-chat-header-renderer .ytcq-lite-mode-button svg {
 }
 
 yt-live-chat-header-renderer .ytcq-inbox-button-has-unread {
-  color: var(--yt-spec-call-to-action, #3ea6ff);
-}
-
-yt-live-chat-header-renderer .ytcq-lite-mode-button-active {
   color: var(--yt-spec-call-to-action, #3ea6ff);
 }
 

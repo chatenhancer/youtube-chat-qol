@@ -1,5 +1,17 @@
 {
   "messages": {
+    "chatEnhancer": "Chat Enhancer",
+    "onboardingMenuParticipants": "Uczestnicy",
+    "onboardingMenuTimestamps": "Sygnatury czasowe",
+    "onboardingMenuReactions": "Reakcje",
+    "onboardingMenuPopout": "Czat w nowym oknie",
+    "onboardingMenuFeedback": "Prześlij opinię",
+    "back": "Wstecz",
+    "videoChatPip": "Wideo + czat w oknie PiP",
+    "returnVideoChat": "Wróć do karty",
+    "pipOpenFailed": "Nie udało się otworzyć wideo i czatu. Spróbuj ponownie.",
+    "pipReloadRequired": "Chat Enhancer został zaktualizowany lub ponownie załadowany. Odśwież tę kartę YouTube, aby użyć wideo i czatu PiP.",
+    "playingInPip": "Wideo i czat są w pływającym oknie",
     "add": "Dodaj",
     "addKeywords": "Dodaj słowa kluczowe",
     "addKeywordsCount": {
@@ -327,14 +339,11 @@
     "onboardingPlaygroundHelper": {
       "message": "Graj z innymi użytkownikami rozszerzenia."
     },
-    "onboardingPlaygroundCallout": {
-      "message": "Przeniesie Cię to do lobby Gier, gdzie możesz rozpocząć nową grę z prawdziwym graczem, który również ma rozszerzenie, albo z graczem Komputerowym (botem)."
-    },
     "onboardingLiteModeHelper": {
       "message": "Użyj szybszego, lekkiego kanału czatu, aby poprawić wydajność."
     },
-    "onboardingLiteModeCallout": {
-      "message": " po włączeniu sprawi, że czat na żywo będzie zużywać mniej zasobów. Zawsze możesz wrócić do natywnego czatu, klikając ten przełącznik."
+    "onboardingGamesTooltip": {
+      "message": "To otwiera lobby Gier, gdzie możesz rozpocząć nową grę z prawdziwym graczem, który również ma rozszerzenie, albo z graczem Komputerowym (botem)."
     },
     "onboardingInboxTooltip": {
       "message": "To otwiera Twoją Skrzynkę odbiorczą. Gdy ktoś wspomni o Tobie na czacie, jego wiadomości pojawią się tutaj, aby nic Cię nie ominęło. Możesz też ustawić własne słowa kluczowe Skrzynki odbiorczej do obserwowania."
@@ -364,7 +373,7 @@
       "message": "Podgląd czatu"
     },
     "onboardingPreviewHoverHint": {
-      "message": "Najedź na ikony, aby uzyskać więcej informacji."
+      "message": "Poznaj podgląd. Najedź kursorem, by zobaczyć wskazówki, i kliknij, by wypróbować funkcje."
     },
     "onboardingTopChat": {
       "message": "Najlepszy czat"
@@ -674,6 +683,27 @@
     },
     "restoreBookmark": {
       "message": "Przywróć zakładkę"
+    },
+    "onboardingChatMenuTooltip": {
+      "message": "To menu zawiera przełączniki do szybkiej zmiany ustawień Chat Enhancer obok własnych ustawień YouTube."
+    },
+    "onboardingBookmarkTooltip": {
+      "message": "Zapisz tę wiadomość w karcie Zakładki rozszerzenia, aby znaleźć ją także po opuszczeniu transmisji. Kliknij ponownie, aby ją usunąć."
+    },
+    "onboardingRememberUserTooltip": {
+      "message": "Dodaj tego użytkownika do Zakładek, aby wyróżnić go na czacie i znaleźć w karcie Zakładki. Kliknij ponownie, aby go usunąć."
+    },
+    "onboardingOpenChannelTooltip": {
+      "message": "Otwórz kanał YouTube tego użytkownika w małym oknie obok czatu."
+    },
+    "onboardingJumpToMessageTooltip": {
+      "message": "Przejdź do tej wiadomości na czacie. Dostępne, dopóki wiadomość nadal znajduje się na czacie."
+    },
+    "onboardingProfileTooltip": {
+      "message": "Kliknij awatar, aby otworzyć profil użytkownika, zobaczyć jego ostatnie wiadomości oraz wspomnieć o nim, zacytować go lub dodać do Zakładek."
+    },
+    "onboardingPipTooltip": {
+      "message": "Zachowaj wideo i czat w oknie zawsze na wierzchu podczas korzystania z innych kart."
     }
   }
 }

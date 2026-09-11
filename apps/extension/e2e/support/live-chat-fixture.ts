@@ -42,6 +42,10 @@ export function createLiveChatFixtureHtml({
         height: 100%;
       }
 
+      yt-live-chat-app {
+        min-height: 320px;
+      }
+
       yt-live-chat-header-renderer {
         align-items: center;
         border-bottom: 1px solid #333;
@@ -193,7 +197,7 @@ export function createLiveChatFixtureHtml({
         cursor: pointer;
         display: flex;
         gap: 12px;
-        min-height: 40px;
+        min-height: 36px;
         padding: 0 12px;
       }
 

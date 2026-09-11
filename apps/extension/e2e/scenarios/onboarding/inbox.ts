@@ -1,0 +1,74 @@
+/** The read-only Inbox sample demonstrates keyword matches without saving anything. */
+import { expect } from '@playwright/test';
+import { getExtensionStorageValues } from '../../support/extension-storage';
+import type { ExtensionScenario } from '../types';
+import { withOnboardingPage } from './fixture';
+
+export const onboardingInboxPreviewScenario: ExtensionScenario = async ({ context }) => {
+  await withOnboardingPage(context, async (onboarding) => {
+    const savedKeys = ['ytcqInboxKeywords', 'ytcqAvatarRings', 'ytcqBookmarks'];
+    const storedBefore = await getExtensionStorageValues(context, 'local', savedKeys);
+    const trigger = onboarding.locator('#previewInboxIcon');
+    const card = onboarding.locator('.preview-inbox-card');
+    const chatMessage = onboarding.locator('.preview-message').last();
+    const originalText = await chatMessage.locator('#message').innerText();
+    for (const theme of ['light', 'dark'] as const) {
+      await onboarding.emulateMedia({ colorScheme: theme });
+      await trigger.click();
+      await expect(card).toBeVisible();
+      const initial = (await card.boundingBox())!;
+      const anchor = (await trigger.boundingBox())!;
+      expect(Math.abs(initial.x + initial.width - anchor.x - anchor.width)).toBeLessThanOrEqual(1);
+      expect(Math.abs(initial.y - anchor.y - anchor.height - 8)).toBeLessThanOrEqual(1);
+      await expect(trigger).toHaveAttribute('aria-expanded', 'true');
+      await expect(onboarding.locator('#previewInboxTooltip')).toBeHidden();
+      await expect(card.locator('.ytcq-inbox-keyword-chip > span')).toHaveText('welcome');
+      await expect(chatMessage.locator('.ytcq-chat-keyword-highlight')).toHaveText('welcome');
+      await expect(card.locator('.ytcq-chat-keyword-highlight')).toHaveText('welcome');
+      await expect(chatMessage.locator('#message')).toHaveText(originalText);
+      await expect(card.locator('button:enabled')).toHaveCount(1);
+      await expect(card.locator('button:enabled')).toHaveAccessibleName('Close');
+      await expect(card.locator('input')).toBeDisabled();
+      await card.locator('.ytcq-inbox-message').click();
+      await expect(card).toBeVisible();
+      await expect(onboarding.locator('#previewDraft')).toHaveValue('');
+      await expect(card).toHaveCSS('color', theme === 'dark' ? 'rgb(255, 255, 255)' : 'rgb(15, 15, 15)');
+      const grip = (await card.locator('.ytcq-panel-drag-grip').boundingBox())!;
+      await onboarding.mouse.move(grip.x + grip.width / 2, grip.y + grip.height / 2);
+      await onboarding.mouse.down();
+      await onboarding.mouse.move(grip.x + grip.width / 2 - 60, grip.y + grip.height / 2 + 30);
+      await onboarding.mouse.up();
+      const moved = (await card.boundingBox())!;
+      expect(Math.abs(moved.x - initial.x)).toBeGreaterThan(40);
+      await onboarding.setViewportSize({ width: 1260, height: 720 });
+      expect((await card.boundingBox())!.x).toBeCloseTo(moved.x, 0);
+      await onboarding.setViewportSize({ width: 1280, height: 720 });
+      await onboarding.locator('#previewDraft').click();
+      await expect(card).toHaveCount(0);
+      await expect(onboarding.locator('#previewDraft')).toBeFocused();
+      await expect(trigger).toHaveAttribute('aria-expanded', 'false');
+      await expect(chatMessage.locator('.ytcq-chat-keyword-highlight')).toHaveCount(0);
+      await trigger.click();
+      await expect(card).toBeVisible();
+      await trigger.click();
+      await expect(card).toHaveCount(0);
+      await trigger.click();
+      await card.getByRole('button', { name: 'Close', exact: true }).click();
+      await expect(trigger).toBeFocused();
+      await expect(trigger).toHaveAttribute('aria-expanded', 'false');
+      await expect(chatMessage.locator('.ytcq-chat-keyword-highlight')).toHaveCount(0);
+      await expect(chatMessage.locator('#message')).toHaveText(originalText);
+    }
+    await onboarding.setViewportSize({ width: 390, height: 844 });
+    await onboarding.evaluate(() => { document.documentElement.dir = 'rtl'; });
+    await trigger.click();
+    const bounds = (await card.boundingBox())!;
+    expect(bounds.x).toBeGreaterThanOrEqual(0);
+    expect(bounds.x + bounds.width).toBeLessThanOrEqual(390);
+    expect(bounds.y + bounds.height).toBeLessThanOrEqual(844);
+    await card.getByRole('button', { name: 'Close', exact: true }).press('Escape');
+    await expect(card).toHaveCount(0);
+    await expect(chatMessage.locator('.ytcq-chat-keyword-highlight')).toHaveCount(0);
+    expect(await getExtensionStorageValues(context, 'local', savedKeys)).toEqual(storedBefore);
+  });
+};

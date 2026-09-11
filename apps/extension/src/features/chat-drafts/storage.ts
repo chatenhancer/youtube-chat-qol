@@ -13,6 +13,7 @@ import {
 } from '../../youtube/rich-text';
 
 export const CHAT_INPUT_DRAFTS_STORAGE_KEY = 'ytcqChatInputDrafts';
+export const CHAT_INPUT_DRAFT_READY_ATTRIBUTE = 'data-ytcq-draft-ready';
 
 const MAX_STORED_DRAFTS = 50;
 const MAX_DRAFT_TEXT_LENGTH = 2000;

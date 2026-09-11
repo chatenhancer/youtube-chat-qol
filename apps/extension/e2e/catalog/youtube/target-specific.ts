@@ -15,6 +15,7 @@ import {
 } from '../../scenarios/safe-send';
 import { popupSettingsBehaviorScenario } from '../../scenarios/settings';
 import { tabAlertScenario } from '../../scenarios/tab-alert';
+import { pictureInPictureLiveScenario, pictureInPictureScenario } from '../../scenarios/picture-in-picture';
 import { youtubeScenarioTargets as target, type YouTubeScenario } from './model';
 
 const popupReason =
@@ -23,6 +24,18 @@ const interceptedSendReason =
   'Requires a locally intercepted YouTube send response without posting a real message.';
 
 export const targetSpecificScenarios: readonly YouTubeScenario[] = [
+  {
+    title: 'video + chat PiP works with native YouTube chat and returns to the player',
+    run: pictureInPictureLiveScenario,
+    on: [target.liveLoggedOut, target.liveLoggedIn, target.replayLoggedIn],
+    reason: 'Checks real YouTube iframe reconnection in a Document PiP window without sending messages.'
+  },
+  {
+    title: 'video + chat PiP preserves playback, drafts, and normal chat sizing',
+    run: pictureInPictureScenario,
+    on: [target.mockLiveLoggedIn],
+    reason: 'Requires a deterministic watch page and a real Document PiP window.'
+  },
   {
     title: 'bookmark link seeks to and highlights the saved replay message',
     run: bookmarkReplayLinkScenario,

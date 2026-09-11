@@ -1,5 +1,17 @@
 {
   "messages": {
+    "chatEnhancer": "Chat Enhancer",
+    "onboardingMenuParticipants": "Teilnehmer",
+    "onboardingMenuTimestamps": "Zeitstempel",
+    "onboardingMenuReactions": "Reaktionen",
+    "onboardingMenuPopout": "Chat in eigenem Fenster",
+    "onboardingMenuFeedback": "Feedback senden",
+    "back": "Zurück",
+    "videoChatPip": "Video + Chat im Bild-in-Bild",
+    "returnVideoChat": "Zurück zum Tab",
+    "pipOpenFailed": "Video und Chat konnten nicht geöffnet werden. Bitte erneut versuchen.",
+    "pipReloadRequired": "Chat Enhancer wurde aktualisiert oder neu geladen. Lade diesen YouTube-Tab neu, um Video + Chat PiP zu verwenden.",
+    "playingInPip": "Video und Chat sind im Bild-in-Bild-Fenster",
     "add": "Hinzufügen",
     "addKeywords": "Schlüsselwörter hinzufügen",
     "addKeywordsCount": {
@@ -327,14 +339,11 @@
     "onboardingPlaygroundHelper": {
       "message": "Spiele mit anderen Erweiterungsnutzern."
     },
-    "onboardingPlaygroundCallout": {
-      "message": "Dies führt dich zur Spiele-Lobby, wo du ein neues Spiel mit einem echten Spieler, der die Erweiterung ebenfalls installiert hat, oder einem Computergegner (Bot) starten kannst."
-    },
     "onboardingLiteModeHelper": {
       "message": "Nutze einen schnelleren, schlanken Chat-Feed, um die Leistung zu verbessern."
     },
-    "onboardingLiteModeCallout": {
-      "message": ", wenn aktiviert, sorgt dafür, dass der Livechat weniger Ressourcen verbraucht. Über diesen Schalter kannst du jederzeit zum nativen Chat zurückkehren."
+    "onboardingGamesTooltip": {
+      "message": "Dies öffnet die Spiele-Lobby, wo du ein neues Spiel mit einem echten Spieler, der die Erweiterung ebenfalls installiert hat, oder einem Computergegner (Bot) starten kannst."
     },
     "onboardingInboxTooltip": {
       "message": "Damit öffnest du deinen Posteingang. Wenn dich jemand im Chat erwähnt, erscheinen die entsprechenden Nachrichten hier, damit du sie nicht verpasst. Du kannst auch eigene Posteingang-Schlüsselwörter festlegen, auf die geachtet werden soll."
@@ -364,7 +373,7 @@
       "message": "Chatvorschau"
     },
     "onboardingPreviewHoverHint": {
-      "message": "Fahre für weitere Informationen mit der Maus über die Symbole."
+      "message": "Erkunde die Vorschau. Fahre mit der Maus darüber für Tipps und klicke, um Funktionen auszuprobieren."
     },
     "onboardingTopChat": {
       "message": "Top-Chat"
@@ -674,6 +683,27 @@
     },
     "restoreBookmark": {
       "message": "Lesezeichen wiederherstellen"
+    },
+    "onboardingChatMenuTooltip": {
+      "message": "Dieses Menü enthält Schnellschalter für Chat Enhancer sowie die eigenen Einstellungen von YouTube."
+    },
+    "onboardingBookmarkTooltip": {
+      "message": "Speichere diese Nachricht im Tab „Lesezeichen“ der Erweiterung, auch über den Stream hinaus. Klicke erneut, um sie zu entfernen."
+    },
+    "onboardingRememberUserTooltip": {
+      "message": "Speichere diesen Nutzer als Lesezeichen, um ihn im Chat hervorzuheben und im Tab „Lesezeichen“ wiederzufinden. Klicke erneut, um ihn zu entfernen."
+    },
+    "onboardingOpenChannelTooltip": {
+      "message": "Öffne den YouTube-Kanal dieses Nutzers in einem kleinen Fenster neben dem Chat."
+    },
+    "onboardingJumpToMessageTooltip": {
+      "message": "Springe zu dieser Nachricht im Chat. Verfügbar, solange die Nachricht noch im Chatverlauf steht."
+    },
+    "onboardingProfileTooltip": {
+      "message": "Klicke auf einen Avatar, um das Nutzerprofil und die letzten Nachrichten zu sehen. Dort kannst du den Nutzer erwähnen, zitieren oder als Lesezeichen speichern."
+    },
+    "onboardingPipTooltip": {
+      "message": "Behalte Video und Chat in einem immer sichtbaren Fenster, während du andere Tabs nutzt."
     }
   }
 }

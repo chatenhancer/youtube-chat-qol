@@ -75,13 +75,11 @@ export const onboardingRenderingScenario: ExtensionScenario = async ({ context }
     await expect(onboarding.locator('#onboardingTargetLanguage')).toHaveValue('');
     await expect(onboarding.locator('#onboardingTranslationDisplayRow')).toBeHidden();
     await expect(onboarding.locator('#previewGamesIcon')).toBeHidden();
-    await expect(onboarding.locator('#previewLiteCallout')).toBeHidden();
-    await expect(onboarding.locator('#previewPlaygroundCallout')).toBeHidden();
-    await expect(onboarding.locator('#previewLiteModeTooltip')).toBeHidden();
+    await expect(onboarding.locator('#previewChatMenuTooltip')).toBeHidden();
     await expect(onboarding.locator('#previewInboxTooltip')).toBeHidden();
     await expect(onboarding.locator('#previewDraftTranslatorTooltip')).toBeHidden();
     await expect(onboarding.locator('#previewEmojiPickerTooltip')).toBeHidden();
-    await expect(onboarding.locator('#previewLiteIcon')).not.toHaveClass(/preview-icon-active/u);
+    await expect(onboarding.locator('.ytcq-lite-mode-button')).toHaveCount(0);
     for (const theme of ['light', 'dark'] as const) {
       await onboarding.emulateMedia({ colorScheme: theme });
       const preview = onboarding.locator('#chatPreview');

@@ -121,6 +121,7 @@ export function clampMenuToViewport(menu: HTMLElement): void {
     menu.style.setProperty('--ytcq-context-shift-y', '0px');
 
     const rect = menu.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
     const overflowRight = rect.right - (window.innerWidth - 8);
     const overflowLeft = 8 - rect.left;
     const overflowBottom = rect.bottom - (window.innerHeight - 8);

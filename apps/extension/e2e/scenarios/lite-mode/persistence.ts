@@ -1,5 +1,6 @@
 /** Browser scenarios for Lite mode persistence behavior. */
 import { expect, test } from '@playwright/test';
+import { expectLiteModeMenuState } from './menu';
 import {
   getExtensionStorageValues,
   setExtensionStorageValues,
@@ -13,7 +14,6 @@ import {
 } from './assertions';
 import { installLiteDiagnostics, uninstallLiteDiagnostics } from './diagnostics';
 import {
-  LITE_BUTTON_SELECTOR,
   LITE_NATIVE_DISCARDED_ATTRIBUTE,
   LITE_ROOT_SELECTOR,
   LITE_SESSION_COOLDOWN_KEY,
@@ -50,10 +50,7 @@ export const liteModeStoredPreferenceReloadScenario: BrowserScenario = async ({
       await test.step('Reload directly into stored Lite mode with its history', async () => {
         await page.reload({ timeout: 15_000, waitUntil: 'commit' });
         await expect(chat.locator('yt-live-chat-renderer')).toBeVisible({ timeout: 15_000 });
-        await expect(chat.locator(LITE_BUTTON_SELECTOR).first()).toHaveAttribute(
-          'aria-pressed',
-          'true'
-        );
+        await expectLiteModeMenuState(chat, true);
         await expect(root)
           .toBeVisible({ timeout: 15_000 })
           .catch(async (error) => {

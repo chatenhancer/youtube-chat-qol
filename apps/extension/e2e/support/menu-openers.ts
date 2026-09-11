@@ -51,6 +51,15 @@ export async function openSettingsMenu(chat: ChatSurface): Promise<Locator> {
   ));
 }
 
+export async function openChatEnhancerMenu(chat: ChatSurface): Promise<Locator> {
+  const menu = await openSettingsMenu(chat);
+  await test.step('Open Chat Enhancer submenu', async () => {
+    await menu.locator('[data-ytcq-action="chat-enhancer"]').click();
+    await expect(menu.locator('[data-ytcq-action="settings-back"]')).toBeVisible();
+  });
+  return menu;
+}
+
 export async function openMessageMenu(chat: ChatSurface): Promise<OpenedMessageMenu> {
   await test.step('Close any open native menus', async () => {
     await closeOpenMenus(chat);

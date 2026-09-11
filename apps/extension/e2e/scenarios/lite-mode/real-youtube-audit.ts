@@ -1,7 +1,7 @@
 /** Real YouTube surface diagnostics used by Lite Aero and participant scenarios. */
-import { test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 import type { ChatSurface } from '../types';
-import { LITE_BUTTON_SELECTOR } from './selectors';
+import { closeOpenMenus, openChatEnhancerMenu } from '../../support/menu-openers';
 
 const LITE_BATCH_EVENT = 'ytcq:lite-chat-batch';
 const LITE_FALLBACK_EVENT = 'ytcq:lite-mode-fallback';
@@ -137,7 +137,7 @@ export async function uninstallRealYouTubeSurfaceAudit(chat: ChatSurface): Promi
   });
 }
 
-export async function sampleHeaderIconThemes(
+export async function sampleMenuIconThemes(
   chat: ChatSurface,
   active: boolean,
   captureScreenshots = false
@@ -148,15 +148,16 @@ export async function sampleHeaderIconThemes(
       element.setAttribute('data-ytcq-chat-skin', 'aero');
       element.setAttribute('data-ytcq-chat-skin-theme', value);
     }, theme);
+    const menu = await openChatEnhancerMenu(chat);
     const snapshot = await chat
-      .locator(LITE_BUTTON_SELECTOR)
+      .locator('[data-ytcq-setting="liteModeEnabled"] .ytcq-paper-item')
       .first()
       .evaluate(
         (button, values) => {
-          const header = button.closest('yt-live-chat-header-renderer');
+          const header = document.querySelector('yt-live-chat-header-renderer');
           const svg = button.querySelector('svg');
           if (!header || !svg) {
-            throw new Error('Lite header icon is missing its native header or SVG.');
+            throw new Error('Lite menu icon or native header is missing.');
           }
           const buttonStyle = getComputedStyle(button);
           const headerStyle = getComputedStyle(header);
@@ -178,6 +179,7 @@ export async function sampleHeaderIconThemes(
         { active, theme }
       );
     snapshots.push(snapshot);
+    await expect(menu.locator('[data-ytcq-setting="liteModeEnabled"]')).toHaveAttribute('aria-checked', String(active));
     if (captureScreenshots) {
       const screenshot = await chat
         .locator('yt-live-chat-renderer')
@@ -191,5 +193,6 @@ export async function sampleHeaderIconThemes(
       }
     }
   }
+  await closeOpenMenus(chat);
   return snapshots;
 }

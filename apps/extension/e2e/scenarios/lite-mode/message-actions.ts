@@ -1,5 +1,6 @@
 /** Browser scenario for Lite mode's YouTube-backed message action menu. */
 import { expect, test } from '@playwright/test';
+import { toggleLiteModeFromMenu } from './menu';
 import { BOOKMARKS_STORAGE_KEY } from '../../../src/shared/bookmarks';
 import {
   setExtensionStorageValues,
@@ -9,7 +10,6 @@ import type { BrowserScenario } from '../types';
 import { expectBookmarkToastAtBottom, expectFeedBookmarkLayout } from '../bookmarks';
 import { clearLiteTestCooldown, expectStoredLiteMode } from './assertions';
 import {
-  LITE_BUTTON_SELECTOR,
   LITE_ROOT_SELECTOR,
   NATIVE_MESSAGE_SELECTOR
 } from './selectors';
@@ -21,7 +21,6 @@ export const liteModeMessageActionsScenario: BrowserScenario = async ({
 }) => {
   test.setTimeout(120_000);
   await withExtensionStorageValues(context, 'sync', { liteModeEnabled: false }, async () => {
-    const button = chat.locator(LITE_BUTTON_SELECTOR).first();
     const root = chat.locator(LITE_ROOT_SELECTOR);
     try {
       await clearLiteTestCooldown(chat);
@@ -31,8 +30,8 @@ export const liteModeMessageActionsScenario: BrowserScenario = async ({
         text: 'Open the Lite message actions beside a long message that wraps across several lines without covering the bookmark or menu buttons.'.repeat(2)
       });
       await expect(chat.locator(NATIVE_MESSAGE_SELECTOR).first()).toBeVisible({ timeout: 30_000 });
-      await expect(button).toBeVisible({ timeout: 20_000 });
-      await button.click();
+
+      await toggleLiteModeFromMenu(chat);
       await expectStoredLiteMode(context, true);
       await expect(root).toBeVisible({ timeout: 20_000 });
 

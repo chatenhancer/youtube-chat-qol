@@ -1,5 +1,6 @@
 /** Browser scenario for Lite mode aero behavior. */
 import { expect, test } from '@playwright/test';
+import { expectLiteModeMenuState, toggleLiteModeFromMenu } from './menu';
 import {
   setExtensionStorageValues,
   withExtensionStorageValues
@@ -7,7 +8,7 @@ import {
 import type { BrowserScenario } from '../types';
 import {
   SHOULD_CAPTURE_AERO_SCREENSHOTS,
-  sampleHeaderIconThemes
+  sampleMenuIconThemes
 } from './real-youtube-audit';
 import type { AeroEvidence } from './real-youtube-audit';
 import {
@@ -15,7 +16,6 @@ import {
   expectStoredLiteMode
 } from './assertions';
 import {
-  LITE_BUTTON_SELECTOR,
   LITE_NATIVE_DISCARDED_ATTRIBUTE,
   LITE_NATIVE_RESTORE_SELECTOR,
   LITE_ROOT_SELECTOR,
@@ -24,7 +24,6 @@ import {
 
 export const liteModeAeroBehaviorScenario: BrowserScenario = async ({ chat, context }) => {
   test.setTimeout(120_000);
-  const button = chat.locator(LITE_BUTTON_SELECTOR).first();
   const root = chat.locator(LITE_ROOT_SELECTOR);
   let evidence: AeroEvidence | null = null;
 
@@ -35,18 +34,17 @@ export const liteModeAeroBehaviorScenario: BrowserScenario = async ({ chat, cont
     async () => {
       try {
         await clearLiteTestCooldown(chat);
-        await expect(button).toBeVisible({ timeout: 20_000 });
-        await expect(button).toHaveAttribute('aria-pressed', 'false');
+        await expectLiteModeMenuState(chat, false);
         await expect(chat.locator('html')).toHaveAttribute('data-ytcq-chat-skin', 'aero');
         await chat
           .locator('yt-live-chat-text-message-renderer')
           .last()
           .waitFor({ state: 'visible', timeout: 30_000 });
 
-        const inactiveIcons = await sampleHeaderIconThemes(chat, false);
+        const inactiveIcons = await sampleMenuIconThemes(chat, false);
 
         const startupAt = Date.now();
-        await button.click();
+        await toggleLiteModeFromMenu(chat);
         await expectStoredLiteMode(context, true);
         await expect(root).toBeVisible({ timeout: 20_000 });
         const liteText = root.locator('.ytcq-lite-message-text').last();
@@ -59,7 +57,7 @@ export const liteModeAeroBehaviorScenario: BrowserScenario = async ({ chat, cont
         );
         await expect(chat.locator(NATIVE_LIST_SELECTOR)).toHaveCount(0);
 
-        const activeIcons = await sampleHeaderIconThemes(
+        const activeIcons = await sampleMenuIconThemes(
           chat,
           true,
           SHOULD_CAPTURE_AERO_SCREENSHOTS
@@ -80,20 +78,15 @@ export const liteModeAeroBehaviorScenario: BrowserScenario = async ({ chat, cont
         };
 
         for (const icon of [...inactiveIcons, ...activeIcons]) {
-          expect(icon.buttonColor).not.toBe('rgb(0, 0, 0)');
-          expect(icon.svgFill).not.toBe('rgb(0, 0, 0)');
+          expect(icon.svgFill).toBe(icon.buttonColor);
           expect(icon.headerBackgroundImage).not.toBe('none');
           expect(icon.headerBoxShadow).not.toBe('none');
           expect(icon.headerPosition).toBe('relative');
           expect(icon.headerZIndex).toBe('1');
         }
-        for (const icon of activeIcons) {
-          expect(icon.buttonColor).not.toBe('rgb(255, 255, 255)');
-          expect(icon.svgFilter).not.toBe('none');
-        }
 
         await test.step('Restore native chat without losing the selected skin', async () => {
-          await button.click();
+          await toggleLiteModeFromMenu(chat);
           await expectStoredLiteMode(context, false);
           await expect(root).toHaveCount(0, { timeout: 20_000 });
           await expect(chat.locator(NATIVE_LIST_SELECTOR).first()).toBeVisible({
@@ -106,7 +99,7 @@ export const liteModeAeroBehaviorScenario: BrowserScenario = async ({ chat, cont
             timeout: 20_000
           });
           await expect(chat.locator('html')).toHaveAttribute('data-ytcq-chat-skin', 'aero');
-          await expect(button).toHaveAttribute('aria-pressed', 'false');
+          await expectLiteModeMenuState(chat, false);
         });
       } finally {
         await setExtensionStorageValues(context, 'sync', { liteModeEnabled: false }).catch(

@@ -1,5 +1,6 @@
 /** Browser scenarios for Lite mode live behavior. */
 import { expect, test, type Request } from '@playwright/test';
+import { expectLiteModeMenuState, toggleLiteModeFromMenu } from './menu';
 import { DEFAULT_LITE_CHAT_RENDER_LIMIT } from '../../../src/features/lite-mode/store';
 import { clearChatComposerIfVisible } from '../../support/composer';
 import { setExtensionStorageValues } from '../../support/extension-storage';
@@ -17,7 +18,6 @@ import {
 } from './diagnostics';
 import type { LiteClientDiagnostics, LiteNetworkRequestDiagnostic } from './diagnostics';
 import {
-  LITE_BUTTON_SELECTOR,
   LITE_NATIVE_DISCARDED_ATTRIBUTE,
   LITE_NATIVE_RESTORE_SELECTOR,
   LITE_ROOT_SELECTOR,
@@ -41,7 +41,6 @@ export const liteModeLiveSustainedScenario: BrowserScenario = async ({ chat, con
   page.on('request', onRequest);
 
   const nativeList = chat.locator(NATIVE_LIST_SELECTOR).first();
-  const button = chat.locator(LITE_BUTTON_SELECTOR).first();
   const root = chat.locator(LITE_ROOT_SELECTOR);
   let continuationEvidence: { batches: number; requests: number } | null = null;
   let continuityEvidence: LiteContinuityEvidence | null = null;
@@ -56,12 +55,12 @@ export const liteModeLiveSustainedScenario: BrowserScenario = async ({ chat, con
     await expect(nativeList.locator(NATIVE_MESSAGE_SELECTOR).first()).toBeVisible({
       timeout: 20_000
     });
-    await expect(button).toBeVisible({ timeout: 20_000 });
-    await expect(button).toHaveAttribute('aria-pressed', 'false');
+
+    await expectLiteModeMenuState(chat, false);
     const nativeHistoryBeforeEnable = await getLiteContinuitySnapshot(chat);
     expect(nativeHistoryBeforeEnable.nativeIds.length).toBeGreaterThan(0);
 
-    await button.click();
+    await toggleLiteModeFromMenu(chat);
     await expectStoredLiteMode(context, true);
     await expect(root).toBeVisible({ timeout: 20_000 });
     await expect(root.locator('.ytcq-lite-toolbar')).toHaveCount(0);
@@ -145,7 +144,7 @@ export const liteModeLiveSustainedScenario: BrowserScenario = async ({ chat, con
     );
     await expect(root).toBeVisible();
 
-    await button.click();
+    await toggleLiteModeFromMenu(chat);
     await expectStoredLiteMode(context, false);
     await expect(root).toHaveCount(0, { timeout: 8_000 });
     await expect(chat.locator(NATIVE_LIST_SELECTOR).first()).toBeVisible({

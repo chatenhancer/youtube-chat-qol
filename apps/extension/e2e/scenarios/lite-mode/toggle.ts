@@ -1,5 +1,6 @@
 /** Browser scenarios for Lite mode toggle behavior. */
 import { expect, test } from '@playwright/test';
+import { expectLiteModeMenuState, toggleLiteModeFromMenu } from './menu';
 import {
   setExtensionStorageValues,
   withExtensionStorageValues
@@ -11,7 +12,6 @@ import {
   expectStoredLiteMode
 } from './assertions';
 import {
-  LITE_BUTTON_SELECTOR,
   LITE_DOCUMENT_MARKER_ATTRIBUTE,
   LITE_NATIVE_DISCARDED_ATTRIBUTE,
   LITE_NATIVE_RESTORE_SELECTOR,
@@ -23,9 +23,9 @@ import {
 export const liteModeToggleAndRestoreScenario: BrowserScenario = async ({ chat, context }) => {
   test.setTimeout(120_000);
   await withExtensionStorageValues(context, 'sync', { liteModeEnabled: false }, async () => {
-    const button = chat.locator(LITE_BUTTON_SELECTOR).first();
     const root = chat.locator(LITE_ROOT_SELECTOR);
     try {
+      await expect(chat.locator('.ytcq-lite-mode-button')).toHaveCount(0);
       await clearLiteTestCooldown(chat);
       await expect(chat.locator(NATIVE_LIST_SELECTOR).first()).toBeVisible({ timeout: 20_000 });
       await expect(chat.locator(NATIVE_MESSAGE_SELECTOR).first()).toBeVisible({ timeout: 30_000 });
@@ -37,12 +37,11 @@ export const liteModeToggleAndRestoreScenario: BrowserScenario = async ({ chat, 
         value: documentMarker
       });
 
-      await test.step('Enable Lite mode from the chat header', async () => {
-        await expect(button).toBeVisible({ timeout: 20_000 });
-        await expect(button).toHaveAttribute('aria-pressed', 'false');
-        await button.click();
+      await test.step('Enable Lite mode from the Chat Enhancer menu', async () => {
+        await expectLiteModeMenuState(chat, false);
+        await toggleLiteModeFromMenu(chat);
         await expectStoredLiteMode(context, true);
-        await expect(button).toHaveAttribute('aria-pressed', 'true');
+        await expectLiteModeMenuState(chat, true);
         await expect(root).toBeVisible({ timeout: 20_000 });
         await expect(chat.locator('html')).toHaveAttribute(
           LITE_DOCUMENT_MARKER_ATTRIBUTE,
@@ -68,12 +67,12 @@ export const liteModeToggleAndRestoreScenario: BrowserScenario = async ({ chat, 
         await expect.poll(() => author.innerText()).not.toBe('');
         await expect.poll(() => message.innerText()).not.toBe('');
         await expect(root.locator('.ytcq-lite-toolbar')).toHaveCount(0);
-        await expect(button).toBeVisible();
+
         await expectLiteAtLiveEdge(root);
       });
 
       await test.step('Disable Lite mode and restore native chat', async () => {
-        await button.click();
+        await toggleLiteModeFromMenu(chat);
         await expectStoredLiteMode(context, false);
         await expect(root).toHaveCount(0, { timeout: 20_000 });
         await expect(chat.locator(NATIVE_LIST_SELECTOR).first()).toBeVisible({ timeout: 30_000 });
@@ -87,7 +86,7 @@ export const liteModeToggleAndRestoreScenario: BrowserScenario = async ({ chat, 
           LITE_NATIVE_DISCARDED_ATTRIBUTE,
           'true'
         );
-        await expect(button).toHaveAttribute('aria-pressed', 'false');
+        await expectLiteModeMenuState(chat, false);
       });
     } finally {
       await setExtensionStorageValues(context, 'sync', { liteModeEnabled: false }).catch(

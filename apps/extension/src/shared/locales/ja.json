@@ -1,5 +1,17 @@
 {
   "messages": {
+    "chatEnhancer": "Chat Enhancer",
+    "onboardingMenuParticipants": "参加者",
+    "onboardingMenuTimestamps": "タイムスタンプ",
+    "onboardingMenuReactions": "リアクション",
+    "onboardingMenuPopout": "チャットをポップアウト",
+    "onboardingMenuFeedback": "フィードバックを送信",
+    "back": "戻る",
+    "videoChatPip": "動画とチャットを小窓で表示",
+    "returnVideoChat": "タブに戻る",
+    "pipOpenFailed": "動画とチャットを開けませんでした。もう一度お試しください。",
+    "pipReloadRequired": "Chat Enhancer が更新または再読み込みされました。動画＋チャット PiP を使うには、この YouTube タブを再読み込みしてください。",
+    "playingInPip": "動画とチャットを小窓で表示しています",
     "add": "追加",
     "addKeywords": "キーワードを追加",
     "addKeywordsCount": {
@@ -328,14 +340,11 @@
     "onboardingPlaygroundHelper": {
       "message": "他の拡張機能ユーザーとゲームをプレイします。"
     },
-    "onboardingPlaygroundCallout": {
-      "message": "ゲームロビーが開き、同じ拡張機能を利用している実際のプレイヤーまたはコンピューター（ボット）プレイヤーと新しいゲームを開始できます。"
-    },
     "onboardingLiteModeHelper": {
       "message": "パフォーマンスを向上させるため、より高速で軽量なチャットフィードを使用します。"
     },
-    "onboardingLiteModeCallout": {
-      "message": "を有効にすると、ライブチャットが使用するリソースを抑えられます。この切り替えをクリックすれば、いつでも標準のチャットに戻せます。"
+    "onboardingGamesTooltip": {
+      "message": "ゲームロビーが開き、同じ拡張機能を利用している実際のプレイヤーまたはコンピューター（ボット）プレイヤーと新しいゲームを開始できます。"
     },
     "onboardingInboxTooltip": {
       "message": "受信トレイを開きます。チャットであなたがメンションされると、見逃さないようにそのメッセージがここに表示されます。監視する受信トレイのカスタムキーワードも設定できます。"
@@ -365,7 +374,7 @@
       "message": "チャットのプレビュー"
     },
     "onboardingPreviewHoverHint": {
-      "message": "詳しい情報を見るには、アイコンにカーソルを合わせます。"
+      "message": "プレビューを試してみましょう。カーソルを合わせるとヒントが表示され、クリックすると機能を試せます。"
     },
     "onboardingTopChat": {
       "message": "上位のチャット"
@@ -677,6 +686,27 @@
     },
     "restoreBookmark": {
       "message": "ブックマークを復元"
+    },
+    "onboardingChatMenuTooltip": {
+      "message": "このメニューには、YouTube 標準の設定に加えて、Chat Enhancer の設定をすばやく切り替えるスイッチがあります。"
+    },
+    "onboardingBookmarkTooltip": {
+      "message": "このメッセージを拡張機能の「ブックマーク」タブに保存すると、配信を離れた後も見返せます。もう一度クリックすると削除できます。"
+    },
+    "onboardingRememberUserTooltip": {
+      "message": "このユーザーをブックマークすると、チャットで強調表示され、「ブックマーク」タブから見つけられます。もう一度クリックすると削除できます。"
+    },
+    "onboardingOpenChannelTooltip": {
+      "message": "このユーザーの YouTube チャンネルを、チャットの隣の小さなウィンドウで開きます。"
+    },
+    "onboardingJumpToMessageTooltip": {
+      "message": "チャット内のこのメッセージに移動します。メッセージがまだチャットに残っている間だけ利用できます。"
+    },
+    "onboardingProfileTooltip": {
+      "message": "アバターをクリックするとユーザーのプロフィールが開き、最近のメッセージの確認や、メンション、引用、ユーザーのブックマークができます。"
+    },
+    "onboardingPipTooltip": {
+      "message": "ほかのタブを使っている間も、動画とチャットを常に最前面のウィンドウに表示します。"
     }
   }
 }

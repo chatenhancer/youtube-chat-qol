@@ -28,6 +28,9 @@ import {
   localizeExtensionPage
 } from '../shared/extension-page-i18n';
 import { createOnboardingPreview } from './preview';
+import { initMenuPreview } from './menu-preview';
+import { initProfilePreview } from './profile-preview';
+import { initInboxPreview } from './inbox-preview';
 
 interface OnboardingControls {
   chatPreview: HTMLElement;
@@ -72,6 +75,13 @@ export function initOnboarding(): void {
       Boolean(options.targetLanguage)
     );
     preview.applyOptions(options);
+    // The menu reads these controls, so initialize it after saved options load.
+    void initMenuPreview(controls.chatPreview, controls, () => {
+      controls.targetLanguage.value = controls.targetLanguage.value ? '' : lastKnownTranslationTarget;
+      controls.targetLanguage.dispatchEvent(new Event('change'));
+    });
+    void initProfilePreview(controls.chatPreview);
+    void initInboxPreview(controls.chatPreview);
   });
 
   controls.targetLanguage.addEventListener('change', () => {
@@ -135,10 +145,6 @@ export function initOnboarding(): void {
     if (liteModeEnabled) {
       animateSettingIcon(
         document.querySelector('#onboardingLiteIcon .lite-mode-icon'),
-        SETTING_ICON_ANIMATIONS.liteMode
-      );
-      animateSettingIcon(
-        document.querySelector('#previewLiteIcon .lite-mode-icon'),
         SETTING_ICON_ANIMATIONS.liteMode
       );
     }
@@ -259,11 +265,6 @@ function installIcons(): void {
   replaceIcon(
     'onboardingLiteIcon',
     createBoltIcon({ drawMaskId: 'ytcq-onboarding-lite-mode-draw-mask' }),
-    'lite-mode-icon'
-  );
-  replaceIcon(
-    'previewLiteIcon',
-    createBoltIcon({ drawMaskId: 'ytcq-preview-lite-mode-draw-mask' }),
     'lite-mode-icon'
   );
   replaceIcon('previewGamesIcon', createGamesIcon(), 'game-invites-icon');

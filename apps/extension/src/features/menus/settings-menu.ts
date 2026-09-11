@@ -9,16 +9,25 @@ import { getTargetLanguageUpdate, getTranslationToggleTarget, type Options } fro
 import { getOptions } from '../../shared/state';
 import { t } from '../../shared/i18n';
 import {
+  BOLT_ICON_PATH,
   MATERIAL_ICON_VIEW_BOX,
   SOUND_BELL_ICON_PATH,
   TRANSLATE_ICON_PATH,
   createSoundBellIcon,
   createSplitTranslateIcon
 } from '../../shared/icons';
+import { isSupportedLiteModePage } from '../lite-mode/bootstrap';
 import { playAlertSoundPreview } from '../../shared/sounds/alert-sounds';
 import { animateSettingIcon, SETTING_ICON_ANIMATIONS } from '../../shared/setting-icon-animations';
 import { registerFeature } from '../../content/dispatcher';
-import { clampMenuToViewport, createMenuToggleItem } from './common';
+import { clampMenuToViewport, closeMenu, createMenuActionItem, createMenuToggleItem } from './common';
+import {
+  canTogglePictureInPicture,
+  isPictureInPictureChat,
+  togglePictureInPicture
+} from '../picture-in-picture/bridge';
+import { PIP_ICON_PATH } from '../picture-in-picture/ui';
+import { appendSettingsSubmenu, resetSettingsSubmenus } from './settings-submenu';
 
 type SaveOptions = (values: Partial<Options>) => void;
 
@@ -77,7 +86,29 @@ export function enhanceSettingsMenu(menu: HTMLElement): void {
     }
   });
   renderSoundMenuIcon(soundItem, options.sound);
-  list.append(translateItem, soundItem);
+  const items = [translateItem, soundItem];
+  if (isSupportedLiteModePage()) {
+    items.push(createMenuToggleItem({
+      setting: 'liteModeEnabled',
+      label: t('liteMode'),
+      checked: options.liteModeEnabled,
+      iconPath: BOLT_ICON_PATH,
+      iconViewBox: MATERIAL_ICON_VIEW_BOX,
+      onClick: () => saveOptions({ liteModeEnabled: !getOptions().liteModeEnabled })
+    }));
+  }
+  if (canTogglePictureInPicture()) {
+    items.push(createMenuActionItem({
+      action: 'picture-in-picture',
+      label: t(isPictureInPictureChat() ? 'returnVideoChat' : 'videoChatPip'),
+      iconPath: PIP_ICON_PATH,
+      onClick: () => {
+        closeMenu();
+        togglePictureInPicture();
+      }
+    }));
+  }
+  appendSettingsSubmenu(menu, items);
   refreshSettingsMenus();
   clampMenuToViewport(menu);
 }
@@ -96,11 +127,15 @@ export function refreshSettingsMenus(): void {
       label.textContent = t('alertSounds');
       item.setAttribute('aria-checked', String(options.sound));
       renderSoundMenuIcon(item, options.sound);
+    } else if (setting === 'liteModeEnabled') {
+      label.textContent = t('liteMode');
+      item.setAttribute('aria-checked', String(options.liteModeEnabled));
     }
   });
 }
 
 export function cleanupStaleSettingsMenuSurfaces(): void {
+  resetSettingsSubmenus();
   document.querySelectorAll('.ytcq-settings-item').forEach((item) => item.remove());
 }
 

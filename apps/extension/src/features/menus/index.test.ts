@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   bootFeatures,
+  initFeatures,
   handleFeatureMutations,
   resetFeatures
 } from '../../content/dispatcher';
@@ -41,7 +42,28 @@ describe('menu router', () => {
   });
 
   afterEach(() => {
+    cleanupStaleMenuSurfaces();
     vi.useRealTimers();
+  });
+
+  it('recognizes header menus without a toggle and resets for message actions', async () => {
+    initFeatures({ saveOptions: vi.fn() });
+    document.body.innerHTML = '<yt-live-chat-header-renderer>'
+      + '<div id="live-chat-header-context-menu"><button>More options</button></div>'
+      + '</yt-live-chat-header-renderer><button id="message-menu">Message actions</button>';
+    document.querySelector<HTMLButtonElement>('#live-chat-header-context-menu button')!.click();
+    const headerMenu = createMenu('<div id="items"><ytd-menu-service-item-renderer></ytd-menu-service-item-renderer></div>');
+    enhanceMenu(headerMenu);
+    await vi.runAllTimersAsync();
+    expect(menuMocks.enhanceSettingsMenu).toHaveBeenCalledWith(headerMenu);
+
+    document.querySelector<HTMLButtonElement>('#message-menu')!.click();
+    menuMocks.isRecentActiveContextMessage.mockReturnValue(true);
+    const messageMenu = createMenu('<div id="items"><ytd-menu-service-item-renderer></ytd-menu-service-item-renderer></div>');
+    enhanceMenu(messageMenu);
+    await vi.runAllTimersAsync();
+    expect(menuMocks.enhanceMessageContextMenu).toHaveBeenCalledWith(messageMenu);
+    expect(menuMocks.enhanceSettingsMenu).toHaveBeenCalledTimes(1);
   });
 
   it('routes chat settings menus to the settings enhancer', async () => {

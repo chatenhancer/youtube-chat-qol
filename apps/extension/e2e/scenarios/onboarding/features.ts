@@ -1,5 +1,6 @@
 /** Feature, theme, and persistence coverage for the extension onboarding preview. */
 import { expect } from '@playwright/test';
+import { getExtensionStorageValues } from '../../support/extension-storage';
 import type { ExtensionScenario } from '../types';
 import { expectStoredOnboardingOptions, withOnboardingPage } from './fixture';
 
@@ -10,21 +11,53 @@ export const onboardingFeaturePreviewScenario: ExtensionScenario = async ({ cont
     await onboarding.locator('#onboardingTranslationDisplay').selectOption('below');
     await onboarding.locator('#onboardingPlaygroundEnabled').check();
     await onboarding.locator('#onboardingLiteModeEnabled').check();
+    await expect.poll(() => getExtensionStorageValues(context, 'sync', [
+      'liteModeEnabled', 'targetLanguage'
+    ])).toEqual({ liteModeEnabled: true, targetLanguage: 'ja' });
+    // Reopening onboarding must initialize both surfaces from saved options.
+    await onboarding.reload();
+    await expect(onboarding.locator('#onboardingLiteModeEnabled')).toBeChecked();
+    await expect(onboarding.locator('#onboardingTargetLanguage')).toHaveValue('ja');
+    await onboarding.locator('#previewMenuButton').click();
+    const menu = onboarding.locator('#previewSettingsMenu');
+    const nativeRows = menu.locator('.preview-native-menu-item');
+    await expect(nativeRows).toHaveText([
+      'Participants', 'Timestamps', 'Reactions', 'Popout chat', 'Send feedback'
+    ]);
+    for (const row of await nativeRows.all()) await expect(row).toBeDisabled();
+    const entry = menu.locator('[data-ytcq-action="chat-enhancer"]');
+    await expect(entry.locator('.ytcq-paper-item')).toBeFocused();
+    const timestamps = menu.getByRole('menuitemcheckbox', { name: 'Timestamps', exact: true });
+    const bounds = await timestamps.boundingBox();
+    if (!bounds) throw new Error('Native menu preview is not visible.');
+    await onboarding.mouse.click(bounds.x + bounds.width - 20, bounds.y + bounds.height / 2);
+    await expect(timestamps).toHaveAttribute('aria-checked', 'false');
+    await expect(entry).toHaveAttribute('aria-expanded', 'false');
+    await menu.locator('[data-ytcq-action="chat-enhancer"]').click();
+    await expect(menu.locator('.preview-native-menu-item:visible')).toHaveCount(0);
+    const lite = menu.locator('[data-ytcq-setting="liteModeEnabled"]');
+    await expect(lite).toHaveAttribute('aria-checked', 'true');
+    const translate = menu.locator('[data-ytcq-setting="targetLanguage"]');
+    await expect(translate).toHaveAttribute('aria-checked', 'true');
+    await translate.click();
+    await expect(onboarding.locator('#onboardingTargetLanguage')).toHaveValue('');
+    await expect(translate).toHaveAttribute('aria-checked', 'false');
+    await translate.click();
+    await expect(onboarding.locator('#onboardingTargetLanguage')).toHaveValue('ja');
+    await expect(translate).toHaveAttribute('aria-checked', 'true');
+    await lite.click();
+    await expect(onboarding.locator('#onboardingLiteModeEnabled')).not.toBeChecked();
+    await expect(lite).toHaveAttribute('aria-checked', 'false');
+    await lite.click();
+    await expect(onboarding.locator('#onboardingLiteModeEnabled')).toBeChecked();
+    await menu.locator('[data-ytcq-action="settings-back"]').click();
+    await expect(menu.locator('.preview-native-menu-item:visible')).toHaveCount(5);
+    await expect(menu.locator('[data-ytcq-action="chat-enhancer"]')).toBeVisible();
+    await menu.locator('[data-ytcq-action="chat-enhancer"]').press('Escape');
+    await expect(menu).toBeHidden();
     await expect(onboarding.locator('#chatPreview')).toHaveAttribute('data-chat-skin', 'system');
     await expect(onboarding.locator('#chatPreview')).toHaveAttribute('data-chat-theme', 'light');
-    await expect(onboarding.locator('#previewLiteIcon')).toHaveCSS(
-      'color',
-      'rgb(62, 166, 255)'
-    );
-    await onboarding.locator('#previewLiteIcon').hover();
-    await expect(onboarding.locator('#previewLiteIcon')).toHaveCSS(
-      'color',
-      'rgb(62, 166, 255)'
-    );
-    await expect(onboarding.locator('#previewLiteIcon')).toHaveCSS(
-      'background-color',
-      'rgba(0, 0, 0, 0.2)'
-    );
+    await expect(onboarding.locator('.ytcq-lite-mode-button')).toHaveCount(0);
     await expect(onboarding.locator('#previewGamesIcon')).toHaveCSS('color', 'rgb(15, 15, 15)');
     await onboarding.locator('#previewGamesIcon').hover();
     await expect(onboarding.locator('#previewGamesIcon')).toHaveCSS('color', 'rgb(15, 15, 15)');
@@ -39,127 +72,8 @@ export const onboardingFeaturePreviewScenario: ExtensionScenario = async ({ cont
       'animation-name',
       'preview-icon-enter'
     );
-    await expect(onboarding.locator('#previewLiteIcon')).toHaveClass(/preview-icon-active/u);
-    await expect(onboarding.locator('#previewLiteIcon')).toHaveCSS('transform', 'none');
-    await expect(onboarding.locator('#previewLiteIcon svg')).toHaveCSS(
-      'animation-name',
-      'preview-icon-bounce'
-    );
-    await expect(onboarding.locator('#previewLiteCallout')).toBeVisible();
-    await expect(onboarding.locator('#previewLiteCallout')).toHaveAttribute('aria-hidden', 'false');
-    await expect(onboarding.locator('#previewLiteCallout')).toHaveCSS(
-      'animation-name',
-      'preview-callout-enter'
-    );
-    await expect(onboarding.locator('#previewLiteCallout')).toHaveText(
-      'Lite mode, when enabled, will make live chat use less resources. You can always switch back to native by clicking this toggle.'
-    );
-    await expect(onboarding.locator('#previewLiteCallout .preview-callout-link')).toHaveText(
-      'Lite mode'
-    );
-    await expect(onboarding.locator('#previewLiteCallout .preview-callout-link')).toHaveAttribute(
-      'href',
-      'https://www.chatenhancer.com/blog/introducing-lite-mode/'
-    );
-    await expect(onboarding.locator('#previewLiteCallout .preview-callout-link')).toHaveAttribute(
-      'target',
-      '_blank'
-    );
-    await expect(onboarding.locator('#previewLiteCallout .preview-callout-link')).toHaveCSS(
-      'pointer-events',
-      'auto'
-    );
     await expect(onboarding.locator('#chatPreview')).toHaveAttribute('role', 'group');
-    await expect(onboarding.locator('.preview-chat-renderer')).toHaveAttribute(
-      'aria-hidden',
-      'true'
-    );
-    await expect(onboarding.locator('#previewPlaygroundCallout')).toBeVisible();
-    await expect(onboarding.locator('#previewPlaygroundCallout')).toHaveAttribute(
-      'aria-hidden',
-      'false'
-    );
-    await expect(onboarding.locator('#previewPlaygroundCallout')).toHaveCSS(
-      'animation-name',
-      'preview-callout-enter'
-    );
-    await expect(onboarding.locator('[data-i18n="onboardingPlaygroundCallout"]')).toHaveText(
-      'This will take you to the Games lobby, where you can start a new game with a real player that also has the extension, or a Computer (bot) player.'
-    );
-    await expect(onboarding.locator('#previewPlaygroundCallout .preview-callout-link')).toHaveText(
-      'Learn more'
-    );
-    await expect(
-      onboarding.locator('#previewPlaygroundCallout .preview-callout-link')
-    ).toHaveAttribute('href', 'https://playground.chatenhancer.com/');
-    await expect(
-      onboarding.locator('#previewPlaygroundCallout .preview-callout-link')
-    ).toHaveAttribute('target', '_blank');
-    await expect
-      .poll(() =>
-        onboarding.locator('#chatPreview').evaluate((preview) => {
-          const header = preview.querySelector<HTMLElement>('.preview-chat-header');
-          const composer = preview.querySelector<HTMLElement>('.preview-composer');
-          const liteCard = preview.querySelector<HTMLElement>('#previewLiteCallout');
-          const playgroundCard = preview.querySelector<HTMLElement>('#previewPlaygroundCallout');
-          if (!header || !composer || !liteCard || !playgroundCard) return false;
-
-          const headerBounds = header.getBoundingClientRect();
-          const composerBounds = composer.getBoundingClientRect();
-          const liteBounds = liteCard.getBoundingClientRect();
-          const playgroundBounds = playgroundCard.getBoundingClientRect();
-          return (
-            liteBounds.top >= headerBounds.bottom + 20 &&
-            playgroundBounds.top >= liteBounds.bottom + 40 &&
-            playgroundBounds.bottom <= composerBounds.top - 20
-          );
-        })
-      )
-      .toBe(true);
-    await expect
-      .poll(() =>
-        onboarding.locator('#chatPreview').evaluate((preview) => {
-          const rootBounds = preview.getBoundingClientRect();
-          const connectors = [
-            {
-              card: preview.querySelector<HTMLElement>('#previewLiteCallout'),
-              icon: preview.querySelector<HTMLElement>('#previewLiteIcon'),
-              path: preview.querySelector<SVGPathElement>('#previewLiteCalloutConnector')
-            },
-            {
-              card: preview.querySelector<HTMLElement>('#previewPlaygroundCallout'),
-              icon: preview.querySelector<HTMLElement>('#previewGamesIcon'),
-              path: preview.querySelector<SVGPathElement>('#previewPlaygroundCalloutConnector')
-            }
-          ];
-
-          return connectors.every(({ card, icon, path }) => {
-            if (!card || !icon || !path || !path.getTotalLength()) return false;
-            const cardBounds = card.getBoundingClientRect();
-            const iconBounds = icon.getBoundingClientRect();
-            const pathStart = path.getPointAtLength(0);
-            const pathEnd = path.getPointAtLength(path.getTotalLength());
-            const cardIsOnLeft =
-              cardBounds.left + cardBounds.width / 2 < rootBounds.left + rootBounds.width / 2;
-            const expectedEndX =
-              (cardIsOnLeft ? cardBounds.left : cardBounds.right) - rootBounds.left;
-            const expectedEndY = cardBounds.top - rootBounds.top + cardBounds.height / 2;
-            const expectedStartX = iconBounds.left - rootBounds.left + iconBounds.width / 2;
-            const expectedStartY = iconBounds.bottom - rootBounds.top - 2;
-
-            return (
-              Math.abs(pathStart.x - expectedStartX) < 2 &&
-              Math.abs(pathStart.y - expectedStartY) < 2 &&
-              Math.abs(pathEnd.x - expectedEndX) < 2 &&
-              Math.abs(pathEnd.y - expectedEndY) < 2 &&
-              getComputedStyle(path).strokeDasharray === 'none' &&
-              Number.parseFloat(getComputedStyle(path).strokeWidth) >= 3 &&
-              Number.parseFloat(getComputedStyle(path).opacity) === 1
-            );
-          });
-        })
-      )
-      .toBe(true);
+    await expect(onboarding.locator('.preview-chat-feed')).not.toHaveAttribute('aria-hidden', 'true');
     await expect(onboarding.locator('#chatPreview')).toHaveAttribute('data-chat-skin', 'aero');
     await expect(onboarding.locator('#chatPreview')).toHaveAttribute('data-chat-theme', 'light');
     await expect(onboarding.locator('html')).toHaveAttribute('data-ytcq-chat-skin', 'aero');

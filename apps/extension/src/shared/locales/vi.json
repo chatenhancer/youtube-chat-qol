@@ -1,5 +1,17 @@
 {
   "messages": {
+    "chatEnhancer": "Chat Enhancer",
+    "onboardingMenuParticipants": "Người tham gia",
+    "onboardingMenuTimestamps": "Dấu thời gian",
+    "onboardingMenuReactions": "Cảm xúc",
+    "onboardingMenuPopout": "Mở cuộc trò chuyện trong cửa sổ mới",
+    "onboardingMenuFeedback": "Gửi ý kiến phản hồi",
+    "back": "Quay lại",
+    "videoChatPip": "Video + trò chuyện trong cửa sổ nổi",
+    "returnVideoChat": "Quay lại thẻ",
+    "pipOpenFailed": "Không thể mở video và trò chuyện. Hãy thử lại.",
+    "pipReloadRequired": "Chat Enhancer đã được cập nhật hoặc tải lại. Hãy làm mới thẻ YouTube này để dùng video + trò chuyện PiP.",
+    "playingInPip": "Video và trò chuyện đang ở cửa sổ nổi",
     "add": "Thêm",
     "addKeywords": "Thêm từ khóa",
     "addKeywordsCount": {
@@ -327,14 +339,11 @@
     "onboardingPlaygroundHelper": {
       "message": "Chơi game với người dùng tiện ích khác."
     },
-    "onboardingPlaygroundCallout": {
-      "message": "Thao tác này sẽ đưa bạn đến sảnh Trò chơi, nơi bạn có thể bắt đầu trò chơi mới với một người chơi thật cũng dùng tiện ích này hoặc với người chơi Máy tính (bot)."
-    },
     "onboardingLiteModeHelper": {
       "message": "Sử dụng bảng tin trò chuyện nhanh và nhẹ hơn để cải thiện hiệu suất."
     },
-    "onboardingLiteModeCallout": {
-      "message": " khi được bật sẽ giúp cuộc trò chuyện trực tiếp sử dụng ít tài nguyên hơn. Bạn luôn có thể quay lại cuộc trò chuyện gốc bằng cách nhấp vào nút chuyển này."
+    "onboardingGamesTooltip": {
+      "message": "Thao tác này mở sảnh Trò chơi, nơi bạn có thể bắt đầu trò chơi mới với một người chơi thật cũng dùng tiện ích này hoặc với người chơi Máy tính (bot)."
     },
     "onboardingInboxTooltip": {
       "message": "Thao tác này mở Hộp thư đến của bạn. Khi có người nhắc đến bạn trong cuộc trò chuyện, tin nhắn của họ sẽ xuất hiện ở đây để bạn không bỏ lỡ. Bạn cũng có thể thiết lập từ khóa Hộp thư đến tùy chỉnh để theo dõi."
@@ -364,7 +373,7 @@
       "message": "Bản xem trước cuộc trò chuyện"
     },
     "onboardingPreviewHoverHint": {
-      "message": "Di chuột qua các biểu tượng để biết thêm thông tin."
+      "message": "Khám phá bản xem trước. Di chuột để xem gợi ý, nhấp để thử các tính năng."
     },
     "onboardingTopChat": {
       "message": "Trò chuyện hàng đầu"
@@ -674,6 +683,27 @@
     },
     "restoreBookmark": {
       "message": "Khôi phục dấu trang"
+    },
+    "onboardingChatMenuTooltip": {
+      "message": "Menu này có các nút bật/tắt nhanh cài đặt Chat Enhancer bên cạnh các cài đặt riêng của YouTube."
+    },
+    "onboardingBookmarkTooltip": {
+      "message": "Lưu tin nhắn này trong thẻ Dấu trang của tiện ích để tìm lại ngay cả khi đã rời buổi phát. Nhấp lần nữa để xóa."
+    },
+    "onboardingRememberUserTooltip": {
+      "message": "Thêm người dùng này vào Dấu trang để làm nổi bật họ trong trò chuyện và tìm họ trong thẻ Dấu trang. Nhấp lần nữa để xóa."
+    },
+    "onboardingOpenChannelTooltip": {
+      "message": "Mở kênh YouTube của người dùng này trong một cửa sổ nhỏ bên cạnh trò chuyện."
+    },
+    "onboardingJumpToMessageTooltip": {
+      "message": "Chuyển đến tin nhắn này trong trò chuyện. Có thể dùng khi tin nhắn vẫn còn trong cuộc trò chuyện."
+    },
+    "onboardingProfileTooltip": {
+      "message": "Nhấp vào ảnh đại diện để mở hồ sơ người dùng, xem tin nhắn gần đây và nhắc đến, trích dẫn hoặc thêm họ vào Dấu trang."
+    },
+    "onboardingPipTooltip": {
+      "message": "Giữ video và trò chuyện trong cửa sổ luôn ở trên cùng khi bạn sử dụng các thẻ khác."
     }
   }
 }

@@ -4,6 +4,8 @@
  * Uploads the Chrome release zip and submits it for review using the Chrome Web
  * Store API v2. The script intentionally exits successfully when credentials
  * are not configured so tagged releases can still produce GitHub artifacts.
+ * Set CHROME_WEBSTORE_REPLACE_PENDING=true to replace an older pending review;
+ * local publishing retains the existing upload-and-submit behavior by default.
  */
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -32,15 +34,17 @@ if (missingEnv.length) {
 const chromeConfig = getChromeWebStoreConfig();
 const token = await getAccessToken(chromeConfig.serviceAccount);
 
-await submitChromeWebStorePackage({
+const submitted = await submitChromeWebStorePackage({
   token,
   publisherId: chromeConfig.publisherId,
   extensionId: chromeConfig.extensionId,
   zipPath,
-  publishType: chromeConfig.publishType
+  publishType: chromeConfig.publishType,
+  releaseVersion,
+  replacePending: chromeConfig.replacePending
 });
 
-console.log(`Submitted Chrome Web Store release ${releaseVersion}.`);
+if (submitted) console.log(`Submitted Chrome Web Store release ${releaseVersion}.`);
 
 function normalizeVersion(version) {
   return String(version).replace(/^v/, '');

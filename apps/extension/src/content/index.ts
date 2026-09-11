@@ -32,6 +32,7 @@ import {
   type ChatSkinTheme
 } from '../shared/chat-skins';
 import { DEFAULT_MESSAGE_DENSITY } from '../shared/message-density';
+import { isPictureInPictureChat } from '../features/picture-in-picture/bridge';
 import { getOptions, setOptions } from '../shared/state';
 import { initUiLocaleFromDocument } from '../shared/i18n';
 import { OBSERVED_MANAGED_REMOVAL_ATTRIBUTE } from '../shared/managed-dom';
@@ -338,12 +339,13 @@ function resolveChatSkinTheme(): ChatSkinTheme {
 }
 
 function applyMessageDensity(options: Pick<Options, 'messageDensity'>): void {
-  if (options.messageDensity === DEFAULT_MESSAGE_DENSITY) {
+  const density = isPictureInPictureChat() ? 'compact' : options.messageDensity;
+  if (density === DEFAULT_MESSAGE_DENSITY) {
     document.documentElement.removeAttribute(MESSAGE_DENSITY_ATTRIBUTE);
     return;
   }
 
-  document.documentElement.setAttribute(MESSAGE_DENSITY_ATTRIBUTE, options.messageDensity);
+  document.documentElement.setAttribute(MESSAGE_DENSITY_ATTRIBUTE, density);
 }
 
 function notifyFeatureOptionsChanged(previousOptions: Options, nextOptions: Options): void {

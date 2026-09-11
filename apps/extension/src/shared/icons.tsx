@@ -18,6 +18,10 @@ export const BOLT_ICON_PATH =
 const BOLT_DRAW_MASK_MAIN_PATH = 'M515-790 258-432 406-400 404-156 687-487 515-520';
 const BOLT_DRAW_MASK_END_PATH = 'M515-520 515-790';
 const BOLT_DRAW_MASK_END_BLOCKER_PATH = 'M502-900H620V-560H560L469-480 498-707Z';
+// Outline adaptation of the two chat bubbles and play mark in assets/icons/icon.svg.
+export const CHAT_ENHANCER_ICON_VIEW_BOX = '11 6 37 37';
+export const CHAT_ENHANCER_ICON_PATH =
+  'M25.6 10.5c-4.7 0-8.3 1.2-9.8 3.1-2.8 3.2-2.8 11.7 0 15 .6.6 1.3 1.1 2.3 1.6l.6 3.2q.2 1.5 1.9.5l4-2.6q.5-.3 1.2-.3c4.4 0 8.1-1.2 9.5-2.8 2.8-3.2 2.8-11.4 0-14.6-1.6-1.9-5.2-3.1-9.7-3.1ZM41 20c1.4.6 2.5 1.3 3.2 2.2 2.2 2.7 2.2 9.1 0 11.8-.6.7-1.4 1.3-2.3 1.7l-.6 2.9q-.3 1.4-1.6.5l-3.2-2.1q-.3-.2-.8-.2c-3 0-5.7-.7-7.5-2';
 export const CHEVRON_BACKWARD_ICON_PATH =
   'm432-480 156 156q11 11 11 28t-11 28q-11 11-28 11t-28-11L348-452q-6-6-8.5-13t-2.5-15q0-8 2.5-15t8.5-13l184-184q11-11 28-11t28 11q11 11 11 28t-11 28L432-480Z';
 export const CLOSE_ICON_PATH =
@@ -74,6 +78,22 @@ export function createSvgIcon(viewBox: string, pathData: string): SVGSVGElement 
   return el<SVGSVGElement>(
     <svg viewBox={viewBox} focusable="false" aria-hidden="true">
       {createSvgPath(pathData)}
+    </svg>
+  );
+}
+
+export function createChatEnhancerIcon(): SVGSVGElement {
+  return el<SVGSVGElement>(
+    <svg viewBox={CHAT_ENHANCER_ICON_VIEW_BOX} focusable="false" aria-hidden="true">
+      <path
+        d={CHAT_ENHANCER_ICON_PATH}
+        fill="none"
+        stroke="currentColor"
+        stroke-width="3"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path d="M23 17.5v7.7l7.8-3.85Z" fill="currentColor" />
     </svg>
   );
 }

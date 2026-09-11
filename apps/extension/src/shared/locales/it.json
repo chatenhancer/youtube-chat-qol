@@ -1,5 +1,17 @@
 {
   "messages": {
+    "chatEnhancer": "Chat Enhancer",
+    "onboardingMenuParticipants": "Partecipanti",
+    "onboardingMenuTimestamps": "Timestamp",
+    "onboardingMenuReactions": "Reazioni",
+    "onboardingMenuPopout": "Apri chat in una nuova finestra",
+    "onboardingMenuFeedback": "Invia feedback",
+    "back": "Indietro",
+    "videoChatPip": "Video + chat in finestra mobile",
+    "returnVideoChat": "Torna alla scheda",
+    "pipOpenFailed": "Impossibile aprire video e chat. Riprova.",
+    "pipReloadRequired": "Chat Enhancer è stato aggiornato o ricaricato. Ricarica questa scheda YouTube per usare video + chat PiP.",
+    "playingInPip": "Video e chat sono in una finestra mobile",
     "add": "Aggiungi",
     "addKeywords": "Aggiungi parole chiave",
     "addKeywordsCount": {
@@ -328,14 +340,11 @@
     "onboardingPlaygroundHelper": {
       "message": "Gioca con altri utenti dell’estensione."
     },
-    "onboardingPlaygroundCallout": {
-      "message": "Verrai portato nella lobby Giochi, dove potrai iniziare una nuova partita con un giocatore reale che usa l’estensione oppure con un giocatore Computer (bot)."
-    },
     "onboardingLiteModeHelper": {
       "message": "Usa un feed della chat più veloce e leggero per migliorare le prestazioni."
     },
-    "onboardingLiteModeCallout": {
-      "message": ", quando è attiva, fa sì che la chat dal vivo usi meno risorse. Puoi sempre tornare alla chat nativa facendo clic su questo interruttore."
+    "onboardingGamesTooltip": {
+      "message": "Questo apre la lobby Giochi, dove potrai iniziare una nuova partita con un giocatore reale che usa l’estensione oppure con un giocatore Computer (bot)."
     },
     "onboardingInboxTooltip": {
       "message": "Apre la tua Posta in arrivo. Quando qualcuno ti menziona nella chat, i suoi messaggi vengono mostrati qui per non farteli perdere. Puoi anche impostare parole chiave personalizzate da monitorare nella Posta in arrivo."
@@ -365,7 +374,7 @@
       "message": "Anteprima chat"
     },
     "onboardingPreviewHoverHint": {
-      "message": "Passa il puntatore sulle icone per maggiori informazioni."
+      "message": "Esplora l’anteprima. Passa il puntatore per i suggerimenti, fai clic per provare le funzioni."
     },
     "onboardingTopChat": {
       "message": "Chat principali"
@@ -677,6 +686,27 @@
     },
     "restoreBookmark": {
       "message": "Ripristina segnalibro"
+    },
+    "onboardingChatMenuTooltip": {
+      "message": "Questo menu include comandi rapidi per attivare o disattivare le impostazioni di Chat Enhancer, insieme alle impostazioni di YouTube."
+    },
+    "onboardingBookmarkTooltip": {
+      "message": "Salva questo messaggio nella scheda Segnalibri dell’estensione per ritrovarlo anche dopo la diretta. Fai di nuovo clic per rimuoverlo."
+    },
+    "onboardingRememberUserTooltip": {
+      "message": "Aggiungi questo utente ai Segnalibri per evidenziarlo nella chat e ritrovarlo nella scheda Segnalibri. Fai di nuovo clic per rimuoverlo."
+    },
+    "onboardingOpenChannelTooltip": {
+      "message": "Apri il canale YouTube di questo utente in una piccola finestra accanto alla chat."
+    },
+    "onboardingJumpToMessageTooltip": {
+      "message": "Vai a questo messaggio nella chat. Disponibile finché il messaggio è ancora presente nella chat."
+    },
+    "onboardingProfileTooltip": {
+      "message": "Fai clic su un avatar per aprire il profilo dell’utente, vedere i suoi messaggi recenti e menzionarlo, citarlo o aggiungerlo ai Segnalibri."
+    },
+    "onboardingPipTooltip": {
+      "message": "Mantieni video e chat in una finestra sempre in primo piano mentre usi altre schede."
     }
   }
 }

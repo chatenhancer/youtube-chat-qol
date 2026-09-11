@@ -1,5 +1,17 @@
 {
   "messages": {
+    "chatEnhancer": "Chat Enhancer",
+    "onboardingMenuParticipants": "Peserta",
+    "onboardingMenuTimestamps": "Stempel waktu",
+    "onboardingMenuReactions": "Reaksi",
+    "onboardingMenuPopout": "Buka chat di jendela baru",
+    "onboardingMenuFeedback": "Kirim masukan",
+    "back": "Kembali",
+    "videoChatPip": "Video + chat dalam PiP",
+    "returnVideoChat": "Kembali ke tab",
+    "pipOpenFailed": "Tidak dapat membuka video dan chat. Coba lagi.",
+    "pipReloadRequired": "Chat Enhancer telah diperbarui atau dimuat ulang. Muat ulang tab YouTube ini untuk menggunakan video + chat PiP.",
+    "playingInPip": "Video dan chat ada di jendela mengambang",
     "add": "Tambah",
     "addKeywords": "Tambah kata kunci",
     "addKeywordsCount": {
@@ -328,14 +340,11 @@
     "onboardingPlaygroundHelper": {
       "message": "Main game dengan pengguna ekstensi lain."
     },
-    "onboardingPlaygroundCallout": {
-      "message": "Ini akan membawa Anda ke lobi Game, tempat Anda dapat memulai game baru dengan pemain sungguhan yang juga menggunakan ekstensi ini, atau pemain Komputer (bot)."
-    },
     "onboardingLiteModeHelper": {
       "message": "Gunakan feed chat yang lebih cepat dan ringan untuk meningkatkan performa."
     },
-    "onboardingLiteModeCallout": {
-      "message": ", saat diaktifkan, akan membuat chat live menggunakan lebih sedikit sumber daya. Anda selalu dapat kembali ke chat bawaan dengan mengeklik tombol ini."
+    "onboardingGamesTooltip": {
+      "message": "Ini membuka lobi Game, tempat Anda dapat memulai game baru dengan pemain sungguhan yang juga menggunakan ekstensi ini, atau pemain Komputer (bot)."
     },
     "onboardingInboxTooltip": {
       "message": "Ini membuka Kotak Masuk Anda. Saat seseorang menyebut Anda di chat, pesannya akan muncul di sini agar tidak terlewat. Anda juga dapat mengatur kata kunci Kotak Masuk khusus untuk dipantau."
@@ -365,7 +374,7 @@
       "message": "Pratinjau chat"
     },
     "onboardingPreviewHoverHint": {
-      "message": "Arahkan kursor ke ikon untuk informasi selengkapnya."
+      "message": "Jelajahi pratinjau. Arahkan kursor untuk tips, klik untuk mencoba fitur."
     },
     "onboardingTopChat": {
       "message": "Chat teratas"
@@ -677,6 +686,27 @@
     },
     "restoreBookmark": {
       "message": "Pulihkan bookmark"
+    },
+    "onboardingChatMenuTooltip": {
+      "message": "Menu ini berisi tombol untuk mengaktifkan atau menonaktifkan pengaturan Chat Enhancer dengan cepat, di samping pengaturan bawaan YouTube."
+    },
+    "onboardingBookmarkTooltip": {
+      "message": "Simpan pesan ini di tab Bookmark ekstensi agar tetap tersedia setelah meninggalkan siaran. Klik lagi untuk menghapusnya."
+    },
+    "onboardingRememberUserTooltip": {
+      "message": "Tambahkan pengguna ini ke Bookmark agar disorot di chat dan dapat ditemukan di tab Bookmark. Klik lagi untuk menghapusnya."
+    },
+    "onboardingOpenChannelTooltip": {
+      "message": "Buka channel YouTube pengguna ini di jendela kecil di samping chat."
+    },
+    "onboardingJumpToMessageTooltip": {
+      "message": "Lompat ke pesan ini di chat. Tersedia selama pesan masih ada di chat."
+    },
+    "onboardingProfileTooltip": {
+      "message": "Klik avatar untuk membuka profil pengguna, melihat pesan terbarunya, serta menyebut, mengutip, atau menambahkannya ke Bookmark."
+    },
+    "onboardingPipTooltip": {
+      "message": "Pertahankan video dan chat di jendela yang selalu di atas saat menggunakan tab lain."
     }
   }
 }

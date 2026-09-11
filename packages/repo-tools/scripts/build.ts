@@ -56,6 +56,7 @@ const contentCssSources = [
   ['features', 'src/styles/content/toast.css'],
   ...contentSkinCssSources,
   ['features', 'src/styles/content/message-density.css'],
+  ['features', 'src/styles/content/picture-in-picture.css'],
   ['browser-fixes', 'src/styles/content/browser-fixes.css']
 ];
 const popupCssSources = [
@@ -127,6 +128,12 @@ async function buildTarget(target) {
   await mkdir(extensionDir, { recursive: true });
 
   await Promise.all([
+    build({
+      ...getBuildOptions(target),
+      entryPoints: [path.join(extensionRoot, 'src', 'content', 'watch-page.ts')],
+      outfile: path.join(extensionDir, 'watch-page.js'),
+      format: 'iife'
+    }),
     build({
       ...getBuildOptions(target),
       entryPoints: [path.join(extensionRoot, 'src', 'content', 'index.ts')],

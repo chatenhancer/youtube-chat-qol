@@ -1,7 +1,7 @@
 /** Browser scenarios for settings translation behavior. */
 import { expect, test, type BrowserContext } from '@playwright/test';
 import { requireControlledChat, type ControlledChat } from '../../support/controlled-chat';
-import { openSettingsMenu } from '../../support/menu-openers';
+import { openChatEnhancerMenu } from '../../support/menu-openers';
 import { withMockedTranslationEndpoint } from '../../support/translation-endpoint';
 import type { BrowserScenario, ChatSurface } from '../types';
 import { withTranslationCleared } from './storage';
@@ -41,7 +41,7 @@ async function expectTranslateSettingReactsLive({
         await expect(sourceMessage.locator('#message')).toHaveText(sourceText);
         const translation = sourceMessage.locator(`.ytcq-translation[lang="${MOCKED_TARGET_LANGUAGE}"]`);
         await expect(translation).toHaveCount(0);
-        const menu = await openSettingsMenu(chat);
+        const menu = await openChatEnhancerMenu(chat);
         const translateItem = menu.locator('.ytcq-settings-item[data-ytcq-setting="targetLanguage"]').first();
 
         await test.step('Enable Translate and verify existing message translates', async () => {

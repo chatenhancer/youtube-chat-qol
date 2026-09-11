@@ -1,5 +1,17 @@
 {
   "messages": {
+    "chatEnhancer": "Chat Enhancer",
+    "onboardingMenuParticipants": "參與者",
+    "onboardingMenuTimestamps": "時間戳記",
+    "onboardingMenuReactions": "回應",
+    "onboardingMenuPopout": "彈出聊天室",
+    "onboardingMenuFeedback": "傳送意見回饋",
+    "back": "返回",
+    "videoChatPip": "影片與聊天室懸浮視窗",
+    "returnVideoChat": "返回分頁",
+    "pipOpenFailed": "無法開啟影片與聊天室，請再試一次。",
+    "pipReloadRequired": "Chat Enhancer 已更新或重新載入。請重新整理此 YouTube 分頁，以使用影片 + 聊天子母畫面。",
+    "playingInPip": "影片與聊天室正在懸浮視窗中顯示",
     "add": "新增",
     "addKeywords": "新增關鍵字",
     "addKeywordsCount": {
@@ -327,14 +339,11 @@
     "onboardingPlaygroundHelper": {
       "message": "與其他擴充功能使用者一起玩遊戲。"
     },
-    "onboardingPlaygroundCallout": {
-      "message": "這會帶你前往遊戲大廳，你可以與同樣安裝此擴充功能的真人玩家或電腦（機器人）玩家開始新遊戲。"
-    },
     "onboardingLiteModeHelper": {
       "message": "使用更快、更輕量的聊天動態以提升效能。"
     },
-    "onboardingLiteModeCallout": {
-      "message": "啟用後會讓直播聊天室使用較少的資源。按一下此切換開關即可隨時切換回原生聊天室。"
+    "onboardingGamesTooltip": {
+      "message": "點擊即可開啟遊戲大廳，你可以與同樣安裝此擴充功能的真人玩家或電腦（機器人）玩家開始新遊戲。"
     },
     "onboardingInboxTooltip": {
       "message": "這會開啟你的收件匣。當有人在聊天室提及你時，他們的訊息會顯示在這裡，避免你錯過。你也可以設定要監測的自訂收件匣關鍵字。"
@@ -364,7 +373,7 @@
       "message": "聊天室預覽"
     },
     "onboardingPreviewHoverHint": {
-      "message": "將游標停在圖示上以查看更多資訊。"
+      "message": "探索預覽：將游標移上去查看提示，點擊試用功能。"
     },
     "onboardingTopChat": {
       "message": "熱門聊天室"
@@ -674,6 +683,27 @@
     },
     "restoreBookmark": {
       "message": "還原書籤"
+    },
+    "onboardingChatMenuTooltip": {
+      "message": "此選單除了 YouTube 內建的設定，還提供可快速切換 Chat Enhancer 設定的開關。"
+    },
+    "onboardingBookmarkTooltip": {
+      "message": "將這則訊息儲存在擴充功能的「書籤」分頁中，離開直播後也能找到。再次點擊即可移除。"
+    },
+    "onboardingRememberUserTooltip": {
+      "message": "將這位使用者加入書籤，即可在聊天室中醒目顯示，並在「書籤」分頁中找到。再次點擊即可移除。"
+    },
+    "onboardingOpenChannelTooltip": {
+      "message": "在聊天室旁的小視窗中開啟這位使用者的 YouTube 頻道。"
+    },
+    "onboardingJumpToMessageTooltip": {
+      "message": "跳至聊天室中的這則訊息。僅在訊息仍位於聊天記錄中時可用。"
+    },
+    "onboardingProfileTooltip": {
+      "message": "點擊頭像即可開啟使用者個人資料，查看其最近的訊息，並提及、引用或將該使用者加入書籤。"
+    },
+    "onboardingPipTooltip": {
+      "message": "使用其他分頁時，讓影片和聊天保留在一律置頂的視窗中。"
     }
   }
 }

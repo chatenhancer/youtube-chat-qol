@@ -1,5 +1,17 @@
 {
   "messages": {
+    "chatEnhancer": "Chat Enhancer",
+    "onboardingMenuParticipants": "Participants",
+    "onboardingMenuTimestamps": "Timestamps",
+    "onboardingMenuReactions": "Reactions",
+    "onboardingMenuPopout": "Popout chat",
+    "onboardingMenuFeedback": "Send feedback",
+    "back": "Back",
+    "videoChatPip": "Video + chat PiP",
+    "returnVideoChat": "Return to tab",
+    "pipOpenFailed": "Could not open video + chat. Please try again.",
+    "pipReloadRequired": "Chat Enhancer was updated or reloaded. Refresh this YouTube tab to use video + chat PiP.",
+    "playingInPip": "Video and chat are in picture-in-picture",
     "add": "Add",
     "addKeywords": "Add keywords",
     "addKeywordsCount": {
@@ -328,14 +340,11 @@
     "onboardingPlaygroundHelper": {
       "message": "Play games with other extension users."
     },
-    "onboardingPlaygroundCallout": {
-      "message": "This will take you to the Games lobby, where you can start a new game with a real player that also has the extension, or a Computer (bot) player."
-    },
     "onboardingLiteModeHelper": {
       "message": "Use a faster, lightweight chat feed to improve performance."
     },
-    "onboardingLiteModeCallout": {
-      "message": ", when enabled, will make live chat use less resources. You can always switch back to native by clicking this toggle."
+    "onboardingGamesTooltip": {
+      "message": "This opens the Games lobby, where you can start a new game with a real player that also has the extension, or a Computer (bot) player."
     },
     "onboardingInboxTooltip": {
       "message": "This opens your Inbox. When people mention you in chat, their messages appear here so you don’t miss them. You can also set up custom Inbox keywords to watch for."
@@ -365,7 +374,7 @@
       "message": "Chat preview"
     },
     "onboardingPreviewHoverHint": {
-      "message": "Hover over icons for more information."
+      "message": "Explore the preview. Hover for tips, click to try features."
     },
     "onboardingTopChat": {
       "message": "Top chat"
@@ -677,6 +686,27 @@
     },
     "restoreBookmark": {
       "message": "Restore bookmark"
+    },
+    "onboardingChatMenuTooltip": {
+      "message": "This menu contains quick toggles for Chat Enhancer settings alongside YouTube’s own settings."
+    },
+    "onboardingBookmarkTooltip": {
+      "message": "Save this message in the extension’s Bookmarks tab, even after leaving the stream. Click again to remove it."
+    },
+    "onboardingRememberUserTooltip": {
+      "message": "Bookmark this user to highlight them in chat and find them in the Bookmarks tab. Click again to remove them."
+    },
+    "onboardingOpenChannelTooltip": {
+      "message": "Open this user’s YouTube channel in a small window beside the chat."
+    },
+    "onboardingJumpToMessageTooltip": {
+      "message": "Jump to this message in the chat. Available while the message is still in the feed."
+    },
+    "onboardingProfileTooltip": {
+      "message": "Click an avatar to open the user’s profile, see their recent messages, and mention, quote, or bookmark them."
+    },
+    "onboardingPipTooltip": {
+      "message": "Keep the video and chat in an always-on-top window while you use other tabs."
     }
   }
 }

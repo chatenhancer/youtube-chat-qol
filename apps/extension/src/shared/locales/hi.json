@@ -1,5 +1,17 @@
 {
   "messages": {
+    "chatEnhancer": "Chat Enhancer",
+    "onboardingMenuParticipants": "प्रतिभागी",
+    "onboardingMenuTimestamps": "टाइमस्टैंप",
+    "onboardingMenuReactions": "प्रतिक्रियाएं",
+    "onboardingMenuPopout": "पॉप-आउट चैट",
+    "onboardingMenuFeedback": "सुझाव भेजें",
+    "back": "वापस",
+    "videoChatPip": "वीडियो + चैट फ़्लोटिंग विंडो में",
+    "returnVideoChat": "टैब पर वापस जाएँ",
+    "pipOpenFailed": "वीडियो और चैट नहीं खुल सके। फिर से कोशिश करें।",
+    "pipReloadRequired": "Chat Enhancer अपडेट या फिर से लोड हुआ है। वीडियो + चैट PiP इस्तेमाल करने के लिए यह YouTube टैब रीफ़्रेश करें।",
+    "playingInPip": "वीडियो और चैट फ़्लोटिंग विंडो में हैं",
     "add": "जोड़ें",
     "addKeywords": "कीवर्ड जोड़ें",
     "addKeywordsCount": {
@@ -328,14 +340,11 @@
     "onboardingPlaygroundHelper": {
       "message": "अन्य एक्सटेंशन उपयोगकर्ताओं के साथ गेम खेलें।"
     },
-    "onboardingPlaygroundCallout": {
-      "message": "यह आपको गेम लॉबी में ले जाएगा, जहाँ आप इस एक्सटेंशन का उपयोग करने वाले किसी असली खिलाड़ी या कंप्यूटर (बॉट) खिलाड़ी के साथ नया गेम शुरू कर सकते हैं।"
-    },
     "onboardingLiteModeHelper": {
       "message": "बेहतर प्रदर्शन के लिए तेज़, हल्की चैट फ़ीड का उपयोग करें।"
     },
-    "onboardingLiteModeCallout": {
-      "message": " चालू होने पर लाइव चैट कम संसाधनों का उपयोग करेगी। इस टॉगल पर क्लिक करके आप कभी भी मूल चैट पर वापस जा सकते हैं।"
+    "onboardingGamesTooltip": {
+      "message": "यह गेम लॉबी खोलता है, जहाँ आप इस एक्सटेंशन का उपयोग करने वाले किसी असली खिलाड़ी या कंप्यूटर (बॉट) खिलाड़ी के साथ नया गेम शुरू कर सकते हैं।"
     },
     "onboardingInboxTooltip": {
       "message": "यह आपका इनबॉक्स खोलता है। जब लोग चैट में आपका उल्लेख करते हैं, तो उनके संदेश यहाँ दिखाई देते हैं ताकि वे आपसे छूट न जाएँ। आप नज़र रखने के लिए कस्टम इनबॉक्स कीवर्ड भी सेट कर सकते हैं।"
@@ -365,7 +374,7 @@
       "message": "चैट पूर्वावलोकन"
     },
     "onboardingPreviewHoverHint": {
-      "message": "अधिक जानकारी के लिए आइकन पर होवर करें।"
+      "message": "पूर्वावलोकन आज़माएँ। सुझावों के लिए होवर करें और सुविधाएँ आज़माने के लिए क्लिक करें।"
     },
     "onboardingTopChat": {
       "message": "टॉप चैट"
@@ -677,6 +686,27 @@
     },
     "restoreBookmark": {
       "message": "बुकमार्क बहाल करें"
+    },
+    "onboardingChatMenuTooltip": {
+      "message": "इस मेन्यू में YouTube की अपनी सेटिंग के साथ Chat Enhancer की सेटिंग को तुरंत चालू या बंद करने के विकल्प हैं।"
+    },
+    "onboardingBookmarkTooltip": {
+      "message": "इस संदेश को एक्सटेंशन के बुकमार्क टैब में सहेजें, ताकि स्ट्रीम छोड़ने के बाद भी यह मिल सके। हटाने के लिए फिर क्लिक करें।"
+    },
+    "onboardingRememberUserTooltip": {
+      "message": "इस उपयोगकर्ता को बुकमार्क करें ताकि वह चैट में हाइलाइट हो और बुकमार्क टैब में मिले। हटाने के लिए फिर क्लिक करें।"
+    },
+    "onboardingOpenChannelTooltip": {
+      "message": "इस उपयोगकर्ता का YouTube चैनल चैट के पास एक छोटी विंडो में खोलें।"
+    },
+    "onboardingJumpToMessageTooltip": {
+      "message": "चैट में इस संदेश पर जाएँ। यह विकल्प तभी उपलब्ध है जब संदेश अभी भी चैट में हो।"
+    },
+    "onboardingProfileTooltip": {
+      "message": "उपयोगकर्ता की प्रोफ़ाइल खोलने, हाल के संदेश देखने और उसका उल्लेख करने, संदेश उद्धृत करने या उसे बुकमार्क करने के लिए अवतार पर क्लिक करें।"
+    },
+    "onboardingPipTooltip": {
+      "message": "दूसरे टैब इस्तेमाल करते समय वीडियो और चैट को हमेशा ऊपर रहने वाली विंडो में रखें।"
     }
   }
 }

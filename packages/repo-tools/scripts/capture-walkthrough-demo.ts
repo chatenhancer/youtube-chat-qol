@@ -389,6 +389,8 @@ async function sectionTranslateChat(page, chat, context, recorder) {
   const settingsMenu = await openChatSettingsMenu(page, chat, recorder, settingsButton, {
     caption: getWalkthroughClickCaption('translateLiveChat')
   });
+  await clickWithCursor(page, settingsMenu.locator('[data-ytcq-action="chat-enhancer"]'), recorder, 'Chat Enhancer menu');
+  await captureStableLocatorState(settingsMenu, recorder, 'Chat Enhancer submenu');
   await keepMenuWithinFrameViewport(settingsMenu);
   const translateSetting = settingsMenu.locator('.ytcq-settings-item[data-ytcq-setting="targetLanguage"]').first();
   await highlightLocator(page, translateSetting, recorder, 8);
@@ -435,7 +437,7 @@ async function sectionTranslateChat(page, chat, context, recorder) {
 }
 
 async function openChatSettingsMenu(page, chat, recorder, settingsButton, firstClickOptions) {
-  const markerSelector = '.ytcq-settings-item[data-ytcq-setting="targetLanguage"]';
+  const markerSelector = '[data-ytcq-action="chat-enhancer"]';
   for (let attempt = 0; attempt < 3; attempt += 1) {
     await closeNativeMenus(chat);
     await clickWithCursor(page, settingsButton, recorder, 'chat settings button', attempt === 0

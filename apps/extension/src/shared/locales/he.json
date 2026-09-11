@@ -1,5 +1,17 @@
 {
   "messages": {
+    "chatEnhancer": "Chat Enhancer",
+    "onboardingMenuParticipants": "משתתפים",
+    "onboardingMenuTimestamps": "חותמות זמן",
+    "onboardingMenuReactions": "תגובות",
+    "onboardingMenuPopout": "פתיחת הצ׳אט בחלון",
+    "onboardingMenuFeedback": "שליחת משוב",
+    "back": "חזרה",
+    "videoChatPip": "וידאו וצ׳אט בחלון צף",
+    "returnVideoChat": "חזרה לכרטיסייה",
+    "pipOpenFailed": "לא ניתן לפתוח את הווידאו והצ׳אט. נסו שוב.",
+    "pipReloadRequired": "Chat Enhancer עודכן או נטען מחדש. יש לרענן את כרטיסיית YouTube הזו כדי להשתמש בווידאו וצ׳אט בתמונה בתוך תמונה.",
+    "playingInPip": "הווידאו והצ׳אט בחלון צף",
     "add": "הוספה",
     "addKeywords": "הוספת מילות מפתח",
     "addKeywordsCount": {
@@ -327,14 +339,11 @@
     "onboardingPlaygroundHelper": {
       "message": "שחקו עם משתמשי הרחבה אחרים."
     },
-    "onboardingPlaygroundCallout": {
-      "message": "פעולה זו תעביר אותך ללובי המשחקים, שבו אפשר להתחיל משחק חדש עם שחקן אמיתי שגם משתמש בתוסף, או עם שחקן מחשב (בוט)."
-    },
     "onboardingLiteModeHelper": {
       "message": "השתמשו בעדכון צ'אט מהיר וקל יותר כדי לשפר את הביצועים."
     },
-    "onboardingLiteModeCallout": {
-      "message": ", כשהוא מופעל, גורם לצ׳אט החי להשתמש בפחות משאבים. תמיד אפשר לחזור לצ׳אט המקורי בלחיצה על המתג הזה."
+    "onboardingGamesTooltip": {
+      "message": "פעולה זו פותחת את לובי המשחקים, שבו אפשר להתחיל משחק חדש עם שחקן אמיתי שגם משתמש בתוסף, או עם שחקן מחשב (בוט)."
     },
     "onboardingInboxTooltip": {
       "message": "פעולה זו פותחת את תיבת הדואר הנכנס. כשאנשים מזכירים אותך בצ׳אט, ההודעות שלהם מופיעות כאן כדי שלא יתפספסו. אפשר גם להגדיר מילות מפתח מותאמות אישית למעקב בתיבת הדואר הנכנס."
@@ -364,7 +373,7 @@
       "message": "תצוגה מקדימה של הצ׳אט"
     },
     "onboardingPreviewHoverHint": {
-      "message": "יש להעביר את הסמן מעל הסמלים לקבלת מידע נוסף."
+      "message": "גלו את התצוגה המקדימה. העבירו את הסמן לקבלת טיפים, ולחצו כדי לנסות את התכונות."
     },
     "onboardingTopChat": {
       "message": "צ׳אט מוביל"
@@ -674,6 +683,27 @@
     },
     "restoreBookmark": {
       "message": "שחזור סימנייה"
+    },
+    "onboardingChatMenuTooltip": {
+      "message": "תפריט זה מכיל מתגים לשינוי מהיר של הגדרות Chat Enhancer, לצד ההגדרות של YouTube עצמו."
+    },
+    "onboardingBookmarkTooltip": {
+      "message": "שמרו את ההודעה בלשונית הסימניות של התוסף, גם לאחר עזיבת השידור. לחצו שוב כדי להסיר אותה."
+    },
+    "onboardingRememberUserTooltip": {
+      "message": "הוסיפו את המשתמש לסימניות כדי להדגיש אותו בצ׳אט ולמצוא אותו בלשונית הסימניות. לחצו שוב כדי להסיר אותו."
+    },
+    "onboardingOpenChannelTooltip": {
+      "message": "פתחו את ערוץ ה־YouTube של המשתמש בחלון קטן לצד הצ׳אט."
+    },
+    "onboardingJumpToMessageTooltip": {
+      "message": "עברו להודעה הזו בצ׳אט. האפשרות זמינה כל עוד ההודעה עדיין מופיעה בצ׳אט."
+    },
+    "onboardingProfileTooltip": {
+      "message": "לחצו על תמונת משתמש כדי לפתוח את הפרופיל, לראות את הודעותיו האחרונות ולהזכיר, לצטט או להוסיף אותו לסימניות."
+    },
+    "onboardingPipTooltip": {
+      "message": "השאירו את הווידאו והצ׳אט בחלון שתמיד נמצא מעל חלונות אחרים בזמן השימוש בכרטיסיות אחרות."
     }
   }
 }

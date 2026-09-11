@@ -1,5 +1,6 @@
 /** Browser scenario for Lite mode timestamps behavior. */
 import { expect, test } from '@playwright/test';
+import { expectLiteModeMenuState, toggleLiteModeFromMenu } from './menu';
 import { setExtensionStorageValues } from '../../support/extension-storage';
 import type { BrowserScenario } from '../types';
 import {
@@ -13,7 +14,6 @@ import {
   expectStoredLiteMode
 } from './assertions';
 import {
-  LITE_BUTTON_SELECTOR,
   LITE_NATIVE_DISCARDED_ATTRIBUTE,
   LITE_ROOT_SELECTOR,
   NATIVE_LIST_SELECTOR
@@ -21,7 +21,6 @@ import {
 
 export const liteModeTimestampsScenario: BrowserScenario = async ({ chat, context }) => {
   test.setTimeout(120_000);
-  const button = chat.locator(LITE_BUTTON_SELECTOR).first();
   const root = chat.locator(LITE_ROOT_SELECTOR);
   let originalTimestamps: boolean | null = null;
   let timestampEvidence: Record<string, unknown> | null = null;
@@ -34,10 +33,10 @@ export const liteModeTimestampsScenario: BrowserScenario = async ({ chat, contex
       .locator(NATIVE_LIST_SELECTOR)
       .first()
       .waitFor({ state: 'attached', timeout: 20_000 });
-    await expect(button).toBeVisible({ timeout: 20_000 });
-    await expect(button).toHaveAttribute('aria-pressed', 'false');
 
-    await button.click();
+    await expectLiteModeMenuState(chat, false);
+
+    await toggleLiteModeFromMenu(chat);
     await expectStoredLiteMode(context, true);
     await expect(root).toBeVisible({ timeout: 20_000 });
     await expect(chat.locator('html')).toHaveAttribute(LITE_NATIVE_DISCARDED_ATTRIBUTE, 'true', {

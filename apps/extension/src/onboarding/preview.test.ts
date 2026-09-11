@@ -15,16 +15,8 @@ describe('onboarding preview', () => {
   it('updates translation display, theme, Playground, and Lite mode live', async () => {
     document.body.innerHTML = `
       <div id="preview">
-        <div class="preview-chat-header"></div>
-        <svg id="previewCalloutConnectors">
-          <path id="previewLiteCalloutConnector"></path>
-          <path id="previewPlaygroundCalloutConnector"></path>
-        </svg>
         <span id="previewFeaturedMessage"></span>
         <span id="previewGamesIcon" hidden></span>
-        <span id="previewLiteIcon"></span>
-        <span id="previewLiteCallout"></span>
-        <span id="previewPlaygroundCallout"></span>
         <span id="previewPrimaryText"><span id="previewPrimaryTextLead"></span><span class="preview-inline-translation-tail"><span id="previewPrimaryTextTail"></span><span id="previewInlineTranslateIcon" hidden></span></span></span>
         <p id="previewTranslationLine" hidden>
           <span id="previewSecondaryText"></span>
@@ -93,24 +85,8 @@ describe('onboarding preview', () => {
         .querySelector('#previewGamesIcon')
         ?.classList.contains('preview-element-visible')
     ).toBe(true);
-    expect(document.querySelector('#previewLiteIcon')?.classList.contains('preview-icon-active')).toBe(true);
-    expect(
-      document
-        .querySelector('#previewLiteIcon')
-        ?.classList.contains('ytcq-lite-mode-button-active')
-    ).toBe(true);
     expect(root.dataset.liteModeEnabled).toBe('true');
     expect(root.dataset.playgroundEnabled).toBe('true');
-    expect(
-      document
-        .querySelector('#previewLiteCallout')
-        ?.classList.contains('preview-element-visible')
-    ).toBe(true);
-    expect(
-      document
-        .querySelector('#previewPlaygroundCallout')
-        ?.classList.contains('preview-element-visible')
-    ).toBe(true);
 
     preview.setPlaygroundEnabled(false);
     expect(
@@ -118,19 +94,9 @@ describe('onboarding preview', () => {
         .querySelector('#previewGamesIcon')
         ?.classList.contains('preview-element-exiting')
     ).toBe(true);
-    expect(
-      document
-        .querySelector('#previewPlaygroundCallout')
-        ?.classList.contains('preview-element-exiting')
-    ).toBe(true);
     expect(root.dataset.playgroundEnabled).toBe('false');
 
     preview.setLiteModeEnabled(false);
-    expect(
-      document
-        .querySelector('#previewLiteCallout')
-        ?.classList.contains('preview-element-exiting')
-    ).toBe(true);
     expect(root.dataset.liteModeEnabled).toBe('false');
 
     preview.setChatSkin('system');
@@ -141,16 +107,8 @@ describe('onboarding preview', () => {
   it('ignores an outdated translation response after the target changes', async () => {
     document.body.innerHTML = `
       <div id="preview">
-        <div class="preview-chat-header"></div>
-        <svg id="previewCalloutConnectors">
-          <path id="previewLiteCalloutConnector"></path>
-          <path id="previewPlaygroundCalloutConnector"></path>
-        </svg>
         <span id="previewFeaturedMessage"></span>
         <span id="previewGamesIcon" hidden></span>
-        <span id="previewLiteIcon"></span>
-        <span id="previewLiteCallout"></span>
-        <span id="previewPlaygroundCallout"></span>
         <span id="previewPrimaryText"><span id="previewPrimaryTextLead"></span><span class="preview-inline-translation-tail"><span id="previewPrimaryTextTail"></span><span id="previewInlineTranslateIcon" hidden></span></span></span>
         <p id="previewTranslationLine" hidden>
           <span id="previewSecondaryText"></span>
@@ -177,16 +135,8 @@ describe('onboarding preview', () => {
   it('keeps the preview skin in sync with the system color scheme', () => {
     document.body.innerHTML = `
       <div id="preview">
-        <div class="preview-chat-header"></div>
-        <svg id="previewCalloutConnectors">
-          <path id="previewLiteCalloutConnector"></path>
-          <path id="previewPlaygroundCalloutConnector"></path>
-        </svg>
         <span id="previewFeaturedMessage"></span>
         <span id="previewGamesIcon"></span>
-        <span id="previewLiteIcon"></span>
-        <span id="previewLiteCallout"></span>
-        <span id="previewPlaygroundCallout"></span>
         <span id="previewPrimaryText"><span id="previewPrimaryTextLead"></span><span class="preview-inline-translation-tail"><span id="previewPrimaryTextTail"></span><span id="previewInlineTranslateIcon"></span></span></span>
         <p id="previewTranslationLine">
           <span id="previewSecondaryText"></span>

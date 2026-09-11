@@ -3,15 +3,12 @@
  *
  * The page-world transport and reversible controller stay independent from
  * the normal content lifecycle. This entrypoint joins them to shared options,
- * the chat-header toggle, localization, and the existing message feature
- * pipeline.
+ * localization, and the existing message feature pipeline.
  */
 import {
   handleFeatureMessage,
   registerFeature,
-  type FeatureInitContext,
-  type FeatureMutationBatch,
-  type SaveOptions
+  type FeatureMutationBatch
 } from '../../content/dispatcher';
 import { t } from '../../shared/i18n';
 import { getOptions } from '../../shared/state';
@@ -20,13 +17,6 @@ import {
   consumeLiteModeFallbackNotice,
   isSupportedLiteModePage
 } from './bootstrap';
-import {
-  cleanupLiteModeButton,
-  initLiteModeButton,
-  refreshLiteModeButton,
-  scheduleLiteModeButtonWire,
-  shouldWireLiteModeButton
-} from './button';
 import {
   cleanupLiteMode,
   handleLiteModeDomMutations,
@@ -44,7 +34,6 @@ import {
   type LiteModeFallbackCode
 } from './fallback';
 
-let saveOptions: SaveOptions = () => {};
 let pageListenersInitialized = false;
 let pageListeners = new AbortController();
 
@@ -60,10 +49,8 @@ registerFeature({
   mutation: handleLiteModeMutations
 });
 
-function initLiteMode(context: FeatureInitContext): void {
+function initLiteMode(): void {
   if (!isSupportedLiteModePage()) return;
-  saveOptions = context.saveOptions;
-  initLiteModeButton(saveOptions);
   setLiteModeRowRenderedCallback(handleLiteModeRowRendered);
   const fallbackCode = consumeLiteModeFallbackNotice();
   if (fallbackCode) showLiteModeFallback(fallbackCode);
@@ -77,7 +64,6 @@ function initLiteMode(context: FeatureInitContext): void {
 
 function bootLiteMode(): void {
   if (!isSupportedLiteModePage()) return;
-  scheduleLiteModeButtonWire();
   refreshLiteMode(getOptions().liteModeEnabled);
 }
 
@@ -86,8 +72,6 @@ function handleLiteModeOptionsChanged(
   nextOptions: ReturnType<typeof getOptions>
 ): void {
   if (!isSupportedLiteModePage()) return;
-  const activated = nextOptions.liteModeEnabled && !previousOptions.liteModeEnabled;
-  refreshLiteModeButton(nextOptions, activated);
   if (previousOptions.liteModeEnabled === nextOptions.liteModeEnabled) return;
   refreshLiteMode(nextOptions.liteModeEnabled, {
     userInitiatedRetry: nextOptions.liteModeEnabled && !previousOptions.liteModeEnabled
@@ -97,7 +81,6 @@ function handleLiteModeOptionsChanged(
 function handleLiteModeMutations(batch: FeatureMutationBatch): void {
   if (!isSupportedLiteModePage()) return;
   handleLiteModeDomMutations(batch.mutations);
-  if (shouldWireLiteModeButton(batch)) scheduleLiteModeButtonWire();
 }
 
 function handleLiteModeRowRendered(
@@ -127,13 +110,12 @@ function showLiteModeFallback(code: LiteModeFallbackCode): void {
 
 function resetLiteMode(): void {
   stopLiteMode('explicit');
-  refreshLiteModeButton({ liteModeEnabled: false });
-  scheduleLiteModeButtonWire();
 }
 
 function cleanupStaleLiteMode(): void {
   cleanupLiteMode({ preserveBootstrapIntent: true });
-  cleanupLiteModeButton();
+  // Extension reloads can leave the former header shortcut in an existing frame.
+  document.querySelectorAll('.ytcq-lite-mode-button').forEach((button) => button.remove());
   setLiteModeRowRenderedCallback(null);
   if (!pageListenersInitialized) return;
   pageListenersInitialized = false;

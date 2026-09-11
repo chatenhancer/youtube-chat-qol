@@ -1,5 +1,17 @@
 {
   "messages": {
+    "chatEnhancer": "Chat Enhancer",
+    "onboardingMenuParticipants": "المشاركون",
+    "onboardingMenuTimestamps": "الطوابع الزمنية",
+    "onboardingMenuReactions": "التفاعلات",
+    "onboardingMenuPopout": "فتح الدردشة في نافذة",
+    "onboardingMenuFeedback": "إرسال ملاحظات",
+    "back": "رجوع",
+    "videoChatPip": "الفيديو والدردشة في نافذة عائمة",
+    "returnVideoChat": "العودة إلى علامة التبويب",
+    "pipOpenFailed": "تعذّر فتح الفيديو والدردشة. حاول مجددًا.",
+    "pipReloadRequired": "تم تحديث Chat Enhancer أو إعادة تحميله. أعد تحميل علامة تبويب YouTube هذه لاستخدام الفيديو والدردشة في نافذة عائمة.",
+    "playingInPip": "الفيديو والدردشة في نافذة عائمة",
     "add": "إضافة",
     "addKeywords": "إضافة كلمات مفتاحية",
     "addKeywordsCount": {
@@ -328,14 +340,11 @@
     "onboardingPlaygroundHelper": {
       "message": "العب ألعابًا مع مستخدمي الإضافة الآخرين."
     },
-    "onboardingPlaygroundCallout": {
-      "message": "سينقلك هذا إلى ردهة الألعاب، حيث يمكنك بدء لعبة جديدة مع لاعب حقيقي يستخدم الإضافة أيضًا، أو مع لاعب كمبيوتر (روبوت)."
-    },
     "onboardingLiteModeHelper": {
       "message": "استخدم موجز دردشة أسرع وأخف لتحسين الأداء."
     },
-    "onboardingLiteModeCallout": {
-      "message": "، عند تفعيله، سيجعل الدردشة المباشرة تستخدم موارد أقل. ويمكنك دائمًا العودة إلى الدردشة الأصلية بالنقر على زر التبديل هذا."
+    "onboardingGamesTooltip": {
+      "message": "يفتح هذا ردهة الألعاب، حيث يمكنك بدء لعبة جديدة مع لاعب حقيقي يستخدم الإضافة أيضًا، أو مع لاعب كمبيوتر (روبوت)."
     },
     "onboardingInboxTooltip": {
       "message": "هذا يفتح صندوق الوارد. عندما يذكرك أشخاص في الدردشة، تظهر رسائلهم هنا حتى لا تفوتك. ويمكنك أيضًا إعداد كلمات مفتاحية مخصصة لصندوق الوارد لمراقبتها."
@@ -365,7 +374,7 @@
       "message": "معاينة الدردشة"
     },
     "onboardingPreviewHoverHint": {
-      "message": "مرّر المؤشر فوق الأيقونات لمزيد من المعلومات."
+      "message": "استكشف المعاينة. مرّر المؤشر لعرض التلميحات، وانقر لتجربة الميزات."
     },
     "onboardingTopChat": {
       "message": "أهم الرسائل"
@@ -677,6 +686,27 @@
     },
     "restoreBookmark": {
       "message": "استعادة الإشارة المرجعية"
+    },
+    "onboardingChatMenuTooltip": {
+      "message": "تحتوي هذه القائمة على خيارات سريعة لتبديل إعدادات Chat Enhancer إلى جانب إعدادات YouTube الأصلية."
+    },
+    "onboardingBookmarkTooltip": {
+      "message": "احفظ هذه الرسالة في تبويب الإشارات في الإضافة لتجدها حتى بعد مغادرة البث. انقر مجددًا لإزالتها."
+    },
+    "onboardingRememberUserTooltip": {
+      "message": "أضف هذا المستخدم إلى الإشارات لتمييزه في الدردشة والعثور عليه في تبويب الإشارات. انقر مجددًا لإزالته."
+    },
+    "onboardingOpenChannelTooltip": {
+      "message": "افتح قناة هذا المستخدم على YouTube في نافذة صغيرة بجانب الدردشة."
+    },
+    "onboardingJumpToMessageTooltip": {
+      "message": "انتقل إلى هذه الرسالة في الدردشة. يتوفر هذا الخيار ما دامت الرسالة موجودة في الدردشة."
+    },
+    "onboardingProfileTooltip": {
+      "message": "انقر على الصورة الرمزية لفتح ملف المستخدم ورؤية رسائله الأخيرة والإشارة إليه أو اقتباس رسائله أو إضافته إلى الإشارات."
+    },
+    "onboardingPipTooltip": {
+      "message": "أبقِ الفيديو والدردشة في نافذة تظهر دائمًا في المقدمة أثناء استخدام علامات تبويب أخرى."
     }
   }
 }

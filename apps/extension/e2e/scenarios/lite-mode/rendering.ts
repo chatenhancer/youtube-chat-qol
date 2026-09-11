@@ -1,5 +1,6 @@
 /** Browser scenarios for Lite mode rendering behavior. */
 import { expect, test } from '@playwright/test';
+import { expectLiteModeMenuState, toggleLiteModeFromMenu } from './menu';
 import { clearChatComposerIfVisible, getChatComposerText } from '../../support/composer';
 import { closeFocusPromptIfPresent } from '../../support/focus-panel';
 import {
@@ -20,7 +21,6 @@ import {
   waitForRequestedLiteInitialSnapshot
 } from './diagnostics';
 import {
-  LITE_BUTTON_SELECTOR,
   LITE_NATIVE_DISCARDED_ATTRIBUTE,
   LITE_NATIVE_RESTORE_SELECTOR,
   LITE_ROOT_SELECTOR,
@@ -52,14 +52,13 @@ export const liteModeMockRenderingAndFallbackScenario: BrowserScenario = async (
         await expect(nativeTimestamp).toBeHidden();
       });
 
-      const button = chat.locator(LITE_BUTTON_SELECTOR).first();
       const liteRow = chat.locator('[data-message-id="lite-browser-message-1"]');
-      await expect(button).toHaveAttribute('aria-pressed', 'false');
+      await expectLiteModeMenuState(chat, false);
 
-      await test.step('Enable Lite mode from the chat header', async () => {
-        await button.click();
+      await test.step('Enable Lite mode from the Chat Enhancer menu', async () => {
+        await toggleLiteModeFromMenu(chat);
         await expectStoredLiteMode(context, true);
-        await expect(button).toHaveAttribute('aria-pressed', 'true');
+        await expectLiteModeMenuState(chat, true);
         await expect(chat.locator(LITE_ROOT_SELECTOR))
           .toBeVisible()
           .catch(async (error) => {
@@ -300,12 +299,12 @@ export const liteModeMockRenderingAndFallbackScenario: BrowserScenario = async (
           LITE_NATIVE_DISCARDED_ATTRIBUTE,
           'true'
         );
-        await expect(button).toHaveAttribute('aria-pressed', 'true');
+        await expectLiteModeMenuState(chat, true);
 
         await expect(restored.locator('#timestamp').first()).toBeHidden();
-        await button.click();
+        await toggleLiteModeFromMenu(chat);
         await expectStoredLiteMode(context, false);
-        await expect(button).toHaveAttribute('aria-pressed', 'false');
+        await expectLiteModeMenuState(chat, false);
       });
     } finally {
       await setExtensionStorageValues(context, 'sync', { liteModeEnabled: false }).catch(

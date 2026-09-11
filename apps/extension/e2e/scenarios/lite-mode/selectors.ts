@@ -1,5 +1,4 @@
 /** Shared Lite mode and native YouTube selectors. */
-export const LITE_BUTTON_SELECTOR = '.ytcq-lite-mode-button';
 export const LITE_DOCUMENT_MARKER_ATTRIBUTE = 'data-ytcq-test-lite-document';
 export const LITE_NATIVE_DISCARDED_ATTRIBUTE = 'data-ytcq-lite-native-discarded';
 export const LITE_NATIVE_RESTORE_SELECTOR = '#ytcq-lite-native-restore';

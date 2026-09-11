@@ -1,5 +1,17 @@
 {
   "messages": {
+    "chatEnhancer": "Chat Enhancer",
+    "onboardingMenuParticipants": "Deelnemers",
+    "onboardingMenuTimestamps": "Tijdstempels",
+    "onboardingMenuReactions": "Reacties",
+    "onboardingMenuPopout": "Chat in nieuw venster",
+    "onboardingMenuFeedback": "Feedback sturen",
+    "back": "Terug",
+    "videoChatPip": "Video + chat in zwevend venster",
+    "returnVideoChat": "Terug naar tabblad",
+    "pipOpenFailed": "Video en chat konden niet worden geopend. Probeer het opnieuw.",
+    "pipReloadRequired": "Chat Enhancer is bijgewerkt of opnieuw geladen. Vernieuw dit YouTube-tabblad om video + chat PiP te gebruiken.",
+    "playingInPip": "Video en chat staan in een zwevend venster",
     "add": "Toevoegen",
     "addKeywords": "Trefwoorden toevoegen",
     "addKeywordsCount": {
@@ -327,14 +339,11 @@
     "onboardingPlaygroundHelper": {
       "message": "Speel games met andere extensiegebruikers."
     },
-    "onboardingPlaygroundCallout": {
-      "message": "Hiermee ga je naar de Games-lobby, waar je een nieuw spel kunt starten met een echte speler die de extensie ook heeft, of met een Computerspeler (bot)."
-    },
     "onboardingLiteModeHelper": {
       "message": "Gebruik een snellere, lichte chatfeed om de prestaties te verbeteren."
     },
-    "onboardingLiteModeCallout": {
-      "message": " zorgt er na inschakeling voor dat de livechat minder systeembronnen gebruikt. Je kunt altijd teruggaan naar de native chat door op deze schakelaar te klikken."
+    "onboardingGamesTooltip": {
+      "message": "Hiermee open je de Games-lobby, waar je een nieuw spel kunt starten met een echte speler die de extensie ook heeft, of met een Computerspeler (bot)."
     },
     "onboardingInboxTooltip": {
       "message": "Hiermee open je je Inbox. Wanneer mensen je in de chat vermelden, verschijnen hun berichten hier zodat je ze niet mist. Je kunt ook aangepaste Inbox-trefwoorden instellen om op te letten."
@@ -364,7 +373,7 @@
       "message": "Chatvoorbeeld"
     },
     "onboardingPreviewHoverHint": {
-      "message": "Beweeg over de pictogrammen voor meer informatie."
+      "message": "Verken het voorbeeld. Beweeg de muis voor tips en klik om functies uit te proberen."
     },
     "onboardingTopChat": {
       "message": "Topchat"
@@ -674,6 +683,27 @@
     },
     "restoreBookmark": {
       "message": "Bladwijzer herstellen"
+    },
+    "onboardingChatMenuTooltip": {
+      "message": "Dit menu bevat schakelaars om Chat Enhancer-instellingen snel aan of uit te zetten, naast de eigen instellingen van YouTube."
+    },
+    "onboardingBookmarkTooltip": {
+      "message": "Bewaar dit bericht op het tabblad Bladwijzers van de extensie, ook nadat je de stream verlaat. Klik nogmaals om het te verwijderen."
+    },
+    "onboardingRememberUserTooltip": {
+      "message": "Voeg deze gebruiker toe aan Bladwijzers om die in de chat te markeren en op het tabblad Bladwijzers terug te vinden. Klik nogmaals om de gebruiker te verwijderen."
+    },
+    "onboardingOpenChannelTooltip": {
+      "message": "Open het YouTube-kanaal van deze gebruiker in een klein venster naast de chat."
+    },
+    "onboardingJumpToMessageTooltip": {
+      "message": "Ga naar dit bericht in de chat. Beschikbaar zolang het bericht nog in de chat staat."
+    },
+    "onboardingProfileTooltip": {
+      "message": "Klik op een avatar om het profiel en de recente berichten van de gebruiker te bekijken. Je kunt de gebruiker ook vermelden, citeren of aan Bladwijzers toevoegen."
+    },
+    "onboardingPipTooltip": {
+      "message": "Houd video en chat in een venster dat altijd bovenaan blijft terwijl je andere tabbladen gebruikt."
     }
   }
 }

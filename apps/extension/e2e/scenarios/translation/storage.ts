@@ -1,7 +1,7 @@
 /** Temporary extension-storage state used by translation scenarios. */
 import { expect, test, type BrowserContext, type Locator } from '@playwright/test';
 import { withExtensionStorageValues } from '../../support/extension-storage';
-import { closeOpenMenus, openSettingsMenu } from '../../support/menu-openers';
+import { closeOpenMenus, openChatEnhancerMenu } from '../../support/menu-openers';
 import { NORMAL_CHAT_MESSAGE_SELECTOR, type ChatSurface } from '../types';
 
 type TranslationDisplayMode = 'below' | 'replace';
@@ -63,7 +63,7 @@ export async function withTranslationEnabled<T>({
 
 async function reactivateTranslationThroughSettings(chat: ChatSurface): Promise<void> {
   await test.step('Reactivate Translate through chat settings', async () => {
-    const menu = await openSettingsMenu(chat);
+    const menu = await openChatEnhancerMenu(chat);
     try {
       const translateItem = getTranslationSettingItem(menu);
       await expect(translateItem).toHaveAttribute('aria-checked', 'true', {
@@ -87,7 +87,7 @@ async function waitForTranslationSettingState(
   enabled: boolean
 ): Promise<void> {
   await test.step(`Wait for Translate setting to become ${enabled ? 'enabled' : 'disabled'}`, async () => {
-    const menu = await openSettingsMenu(chat);
+    const menu = await openChatEnhancerMenu(chat);
     try {
       const translateItem = getTranslationSettingItem(menu);
       // Both translation fields are written together and applied by one storage-change handler.

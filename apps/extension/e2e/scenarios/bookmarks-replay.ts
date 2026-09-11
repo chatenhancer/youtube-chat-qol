@@ -8,7 +8,8 @@ import {
 } from '../support/extension-storage';
 import { getRichVisibleText } from '../support/text';
 import { getReplayUrl, openLiveChat, startVideoPlaybackIfPaused } from '../support/youtube-page';
-import { LITE_BUTTON_SELECTOR, LITE_ROOT_SELECTOR } from './lite-mode/selectors';
+import { LITE_ROOT_SELECTOR } from './lite-mode/selectors';
+import { toggleLiteModeFromMenu } from './lite-mode/menu';
 import {
   NORMAL_CHAT_MESSAGE_SELECTOR,
   type BrowserScenario,
@@ -71,7 +72,7 @@ async function followBookmarkReplayLink(
   await test.step('Read an actual message from the chat replay', async () => {
     await expect(chat.locator('.ytcq-inbox-button')).toBeVisible();
     if (liteMode) {
-      await chat.locator(LITE_BUTTON_SELECTOR).click();
+      await toggleLiteModeFromMenu(chat);
       await expect(chat.locator(LITE_ROOT_SELECTOR)).toBeVisible();
     }
     await expect(chat.locator(messageSelector).last()).toBeVisible({ timeout: 45_000 });

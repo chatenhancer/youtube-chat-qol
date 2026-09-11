@@ -220,6 +220,10 @@ jobs:
     needs: verify
     if: startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
+    # Keep cancellation, upload, and submission together across release tags.
+    concurrency:
+      group: chrome-web-store-release
+      cancel-in-progress: false
     permissions:
       contents: read
     steps:
@@ -238,6 +242,7 @@ jobs:
           CHROME_WEBSTORE_EXTENSION_ID: ${{ secrets.CHROME_WEBSTORE_EXTENSION_ID }}
           CHROME_WEBSTORE_PUBLISHER_ID: ${{ secrets.CHROME_WEBSTORE_PUBLISHER_ID }}
           CHROME_WEBSTORE_SERVICE_ACCOUNT_JSON: ${{ secrets.CHROME_WEBSTORE_SERVICE_ACCOUNT_JSON }}
+          CHROME_WEBSTORE_REPLACE_PENDING: 'true'
 
   publish-firefox:
     name: Publish to Firefox Add-ons

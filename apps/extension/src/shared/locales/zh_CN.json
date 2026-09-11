@@ -1,5 +1,17 @@
 {
   "messages": {
+    "chatEnhancer": "Chat Enhancer",
+    "onboardingMenuParticipants": "参与者",
+    "onboardingMenuTimestamps": "时间戳",
+    "onboardingMenuReactions": "回应",
+    "onboardingMenuPopout": "在新窗口中打开聊天",
+    "onboardingMenuFeedback": "发送反馈",
+    "back": "返回",
+    "videoChatPip": "视频和聊天悬浮窗",
+    "returnVideoChat": "返回标签页",
+    "pipOpenFailed": "无法打开视频和聊天，请重试。",
+    "pipReloadRequired": "Chat Enhancer 已更新或重新加载。请刷新此 YouTube 标签页，以使用视频 + 聊天画中画。",
+    "playingInPip": "视频和聊天正在悬浮窗中显示",
     "add": "添加",
     "addKeywords": "添加关键词",
     "addKeywordsCount": {
@@ -328,14 +340,11 @@
     "onboardingPlaygroundHelper": {
       "message": "与其他扩展用户一起玩游戏。"
     },
-    "onboardingPlaygroundCallout": {
-      "message": "这会带你进入游戏大厅，你可以与同样安装了此扩展程序的真人玩家或电脑（机器人）玩家开始新游戏。"
-    },
     "onboardingLiteModeHelper": {
       "message": "使用更快、更轻量的聊天信息流以提升性能。"
     },
-    "onboardingLiteModeCallout": {
-      "message": "启用后会让直播聊天占用更少的资源。点击此开关即可随时切换回原生聊天。"
+    "onboardingGamesTooltip": {
+      "message": "点击即可打开游戏大厅，你可以与同样安装了此扩展程序的真人玩家或电脑（机器人）玩家开始新游戏。"
     },
     "onboardingInboxTooltip": {
       "message": "这会打开你的收件箱。当有人在聊天中提及你时，他们的消息会显示在这里，以免你错过。你还可以设置要监测的自定义收件箱关键词。"
@@ -365,7 +374,7 @@
       "message": "聊天预览"
     },
     "onboardingPreviewHoverHint": {
-      "message": "将鼠标悬停在图标上可查看更多信息。"
+      "message": "探索预览：悬停查看提示，点击试用功能。"
     },
     "onboardingTopChat": {
       "message": "热门聊天"
@@ -677,6 +686,27 @@
     },
     "restoreBookmark": {
       "message": "恢复书签"
+    },
+    "onboardingChatMenuTooltip": {
+      "message": "此菜单除了 YouTube 自带的设置，还提供可快速切换 Chat Enhancer 设置的开关。"
+    },
+    "onboardingBookmarkTooltip": {
+      "message": "将此消息保存在扩展程序的“书签”标签页中，离开直播后也能找到。再次点击即可移除。"
+    },
+    "onboardingRememberUserTooltip": {
+      "message": "将此用户加入书签，即可在聊天中突出显示，并在“书签”标签页中找到。再次点击即可移除。"
+    },
+    "onboardingOpenChannelTooltip": {
+      "message": "在聊天旁的小窗口中打开此用户的 YouTube 频道。"
+    },
+    "onboardingJumpToMessageTooltip": {
+      "message": "跳转到聊天中的这条消息。仅当消息仍在聊天记录中时可用。"
+    },
+    "onboardingProfileTooltip": {
+      "message": "点击头像即可打开用户资料，查看其最近的消息，并提及、引用或将该用户加入书签。"
+    },
+    "onboardingPipTooltip": {
+      "message": "使用其他标签页时，让视频和聊天保持在始终置顶的窗口中。"
     }
   }
 }
