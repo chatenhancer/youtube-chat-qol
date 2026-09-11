@@ -89,8 +89,12 @@ async function verifyNativePictureInPicture(
     expect(wideChat!.x).toBeCloseTo(widePlayer!.width);
     expect(wideChat!.height).toBe(650);
     await expect(pip.locator('#chatframe')).toHaveCSS('border-width', '0px 0px 0px 1px');
-    const controls = await player.locator('.ytp-chrome-bottom').boundingBox();
-    expect(controls!.x + controls!.width).toBeLessThanOrEqual(widePlayer!.width);
+    if (testPlayback) {
+      const controls = player.locator('.ytp-chrome-bottom');
+      await expect(controls).toBeVisible();
+      const bounds = await controls.boundingBox();
+      expect(bounds!.x + bounds!.width).toBeLessThanOrEqual(widePlayer!.width);
+    }
     const replay = await pipChat.locator('html').evaluate(
       (element) => element.ownerDocument.location.pathname === '/live_chat_replay'
     );
@@ -127,7 +131,9 @@ async function verifyNativePictureInPicture(
     await expect(placeholder.locator('.ytcq-pip-return-button')).toHaveCSS('height', '40px');
     await placeholder.getByRole('button', { name: 'Return to tab' }).click();
     await expect.poll(() => pip.isClosed()).toBe(true);
-    await expect(page.locator('#movie_player video')).toBeVisible();
+    // A YouTube error can hide its video and controls while the player remains visible.
+    await expect(page.locator('#movie_player')).toBeVisible();
+    if (testPlayback) await expect(page.locator('#movie_player video')).toBeVisible();
     expect(await nativePlayer.evaluate((element) => document.querySelector('#movie_player') === element)).toBe(true);
     await expect(page.locator('#movie_player video')).toHaveJSProperty('paused', !testPlayback);
     await expect(page.locator('#movie_player video')).toHaveJSProperty('controls', false);
@@ -227,6 +233,10 @@ export const pictureInPictureScenario: BrowserScenario = async ({ page, context 
     const wideChat = await pip.locator('#chatframe').boundingBox();
     expect(wideChat!.x).toBeCloseTo(wideVideo!.width);
     expect(wideChat!.height).toBe(500);
+    const controls = pip.locator('.ytp-chrome-bottom');
+    await expect(controls).toBeVisible();
+    const controlsBounds = await controls.boundingBox();
+    expect(controlsBounds!.x + controlsBounds!.width).toBeLessThanOrEqual(wideVideo!.width);
     await expect(pip.locator('#chatframe')).toHaveCSS('border-width', '0px 0px 0px 1px');
     await expect(pip.locator('#chatframe')).toHaveCSS('border-left-color', 'rgba(255, 255, 255, 0.2)');
 
