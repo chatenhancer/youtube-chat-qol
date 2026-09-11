@@ -80,9 +80,7 @@
 .site-nav::before,
 .hero-walkthrough-button,
 .hero-blog-ticker-track,
-.hero-blog-ticker-slide,
 .hero-blog-ticker-media,
-.hero-blog-ticker-new,
 .hero-blog-ticker-controls,
 .hero-blog-ticker-control,
 .button,
@@ -937,11 +935,9 @@ h3 {
   grid-template-columns: 148px minmax(0, 1fr);
   min-width: 0;
   min-height: 104px;
-  padding-inline-start: 15px;
   overflow: hidden;
   color: inherit;
   background: transparent;
-  border-radius: inherit;
   opacity: 0;
   pointer-events: none;
 }
@@ -1016,17 +1012,18 @@ html[dir="rtl"] .hero-blog-ticker.is-moving-previous .hero-blog-ticker-slide.is-
 
 .hero-blog-ticker-media {
   display: block;
-  align-self: center;
   min-width: 0;
   overflow: hidden;
   background: #fff;
-  border-radius: var(--icon-surface-corner-radius);
+  border-start-end-radius: var(--large-surface-corner-radius);
+  border-end-end-radius: var(--large-surface-corner-radius);
 }
 
 .hero-blog-ticker-media img {
   display: block;
   width: 100%;
-  height: auto;
+  height: 100%;
+  object-fit: cover;
 }
 
 .hero-blog-ticker-new {
@@ -1040,8 +1037,7 @@ html[dir="rtl"] .hero-blog-ticker.is-moving-previous .hero-blog-ticker-slide.is-
   min-height: 20px;
   padding: 1px 2px;
   color: #090a0c;
-  background: rgba(255, 255, 255, 0.94);
-  border-radius: var(--badge-corner-radius);
+  filter: drop-shadow(0 1px 1px rgba(9, 10, 12, 0.65));
   transform: rotate(-10deg);
   transform-origin: center;
 }
@@ -1052,6 +1048,15 @@ html[dir="rtl"] .hero-blog-ticker.is-moving-previous .hero-blog-ticker-slide.is-
   font-weight: 800;
   line-height: 1;
   letter-spacing: -0.04em;
+  text-shadow:
+    -1px -1px 0 #fff,
+    0 -1px 0 #fff,
+    1px -1px 0 #fff,
+    -1px 0 0 #fff,
+    1px 0 0 #fff,
+    -1px 1px 0 #fff,
+    0 1px 0 #fff,
+    1px 1px 0 #fff;
 }
 
 .hero-blog-ticker-new-decor {
@@ -1067,6 +1072,7 @@ html[dir="rtl"] .hero-blog-ticker.is-moving-previous .hero-blog-ticker-slide.is-
   width: 4px;
   height: 3px;
   border-radius: 1px;
+  box-shadow: 0 0 0 1px #fff;
 }
 
 .hero-blog-ticker-new-decor span:nth-child(1) {
@@ -5102,7 +5108,6 @@ figcaption {
 
   .hero-blog-ticker-slide {
     grid-template-columns: 112px minmax(0, 1fr);
-    padding-inline-start: 12px;
   }
 
   .hero-blog-ticker-copy {
