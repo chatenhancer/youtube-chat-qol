@@ -1668,7 +1668,7 @@ html[dir="rtl"] .hero-blog-ticker-next svg {
 
   position: absolute;
   top: 16px;
-  left: 16px;
+  inset-inline-start: 16px;
   z-index: 4;
   width: min(198px, calc(100% - 24px));
   padding: 0;
@@ -5384,9 +5384,9 @@ figcaption {
 
   .walkthrough-key-points {
     top: 8px;
-    right: auto;
     bottom: auto;
-    left: 8px;
+    inset-inline-start: 8px;
+    inset-inline-end: auto;
     width: min(198px, calc(100% - 16px));
     padding: 0;
     background: transparent;
