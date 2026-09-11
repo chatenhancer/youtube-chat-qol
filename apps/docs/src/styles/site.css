@@ -1023,7 +1023,7 @@ html[dir="rtl"] .hero-blog-ticker.is-moving-previous .hero-blog-ticker-slide.is-
   display: block;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
 }
 
 .hero-blog-ticker-new {
