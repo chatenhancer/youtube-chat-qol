@@ -205,7 +205,6 @@ export const pictureInPictureScenario: BrowserScenario = async ({ page, context 
     (element as HTMLElement).style.minHeight = '0';
   });
   await chat.locator('#input[contenteditable]').fill('Unsent before PiP');
-  const originalInput = await chat.locator('#input[contenteditable]').evaluateHandle((element) => element);
   const originalPlayer = await page.locator('#movie_player').evaluateHandle((element) => element);
   const instance = await chat.locator('html').getAttribute('data-ytcq-content-instance');
   const extensionId = await getExtensionId(context);
@@ -226,8 +225,8 @@ export const pictureInPictureScenario: BrowserScenario = async ({ page, context 
   await expect(chat.locator('html')).not.toHaveAttribute('data-ytcq-content-instance', instance!);
   await expect(chat.locator('.ytcq-inbox-button')).toBeVisible();
   await expect(chat.locator('#input[contenteditable]')).toHaveText('Unsent before PiP');
-  expect(await originalInput.evaluate((element) => element.isConnected)).toBe(true);
-  await originalInput.dispose();
+  // A slow extension restart can use chat-only recovery. The draft and the
+  // original player must survive either recovery path.
   expect(await originalPlayer.evaluate((element) => document.querySelector('#movie_player') === element)).toBe(true);
   await originalPlayer.dispose();
   await expect(page.locator('#movie_player video')).toHaveJSProperty('paused', false);

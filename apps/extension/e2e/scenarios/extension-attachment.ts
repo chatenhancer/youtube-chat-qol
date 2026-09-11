@@ -59,6 +59,9 @@ async function runAttachmentScenario(
   try {
     if (!reconnect) {
       // First attachment cannot rely on a previous content script helping.
+      // Leave the fixture chat before disabling so its cleanup cannot reload
+      // that document while this scenario navigates to the new watch page.
+      await page.goto('about:blank');
       await toggle.click();
       await expect(toggle).toHaveJSProperty('checked', false);
     }

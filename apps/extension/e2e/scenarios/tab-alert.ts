@@ -6,7 +6,7 @@
  * Headless Chromium otherwise keeps pages visible when another page is
  * foregrounded.
  */
-import { expect, test, type CDPSession, type Page } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 import {
   requireControlledChat,
   type ControlledChat
@@ -15,7 +15,7 @@ import {
   withExtensionStorageSnapshot,
   withExtensionStorageValues
 } from '../support/extension-storage';
-import { getExtensionId } from '../support/extension';
+import { getExtensionContentScriptContextId } from '../support/extension';
 import { isMockPageSurface } from '../support/mock-page';
 import type { BrowserScenario } from './types';
 
@@ -87,7 +87,7 @@ async function setContentScriptVisibility(page: Page, state: 'hidden' | 'visible
     const client = await page.context().newCDPSession(page);
 
     try {
-      const executionContextId = await getContentScriptContextId(page, client);
+      const executionContextId = await getExtensionContentScriptContextId(page, client);
       const result = await client.send('Runtime.evaluate', {
         contextId: executionContextId,
         expression: [
@@ -108,43 +108,4 @@ async function setContentScriptVisibility(page: Page, state: 'hidden' | 'visible
       await client.detach().catch(() => undefined);
     }
   });
-}
-
-async function getContentScriptContextId(
-  page: Page,
-  client: CDPSession
-): Promise<number> {
-  const extensionId = await getExtensionId(page.context());
-  const contexts: RuntimeExecutionContextDescription[] = [];
-
-  client.on('Runtime.executionContextCreated', (event: RuntimeExecutionContextCreatedEvent) => {
-    contexts.push(event.context);
-  });
-
-  await client.send('Runtime.enable');
-  const deadline = Date.now() + 5_000;
-
-  while (Date.now() < deadline) {
-    const context = contexts.find((candidate) => isExtensionContext(candidate, extensionId));
-    if (context) return context.id;
-    await page.waitForTimeout(50);
-  }
-
-  throw new Error(`Could not find extension content-script context for ${extensionId}.`);
-}
-
-function isExtensionContext(context: RuntimeExecutionContextDescription, extensionId: string): boolean {
-  return context.origin === `chrome-extension://${extensionId}` ||
-    context.name === extensionId ||
-    Boolean(context.name?.includes(extensionId));
-}
-
-interface RuntimeExecutionContextCreatedEvent {
-  context: RuntimeExecutionContextDescription;
-}
-
-interface RuntimeExecutionContextDescription {
-  id: number;
-  name?: string;
-  origin?: string;
 }

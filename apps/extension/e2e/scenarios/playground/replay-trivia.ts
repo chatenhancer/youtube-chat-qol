@@ -1,6 +1,6 @@
 /** Browser scenarios for Playground Games. */
 import { expect } from '@playwright/test';
-import { getExtensionId } from '../../support/extension';
+import { getExtensionContentScriptContextId } from '../../support/extension';
 import {
   createMockPlaygroundSnapshot,
   installMockPlaygroundBackend
@@ -94,17 +94,9 @@ export const playgroundReplayTriviaAnswerScenario: BrowserScenario = async ({ ch
     const canvas = chat.locator('.ytcq-replay-trivia-canvas');
     await expect(canvas).toBeVisible();
     // Scope the clock to this content script; browser-wide virtual time survives navigation.
-    const extensionId = await getExtensionId(context);
     const cdp = await context.newCDPSession(page);
-    let executionContextId: number | undefined;
-    cdp.on('Runtime.executionContextCreated', ({ context: executionContext }) => {
-      if (executionContext.origin === `chrome-extension://${extensionId}`) {
-        executionContextId = executionContext.id;
-      }
-    });
     try {
-      await cdp.send('Runtime.enable');
-      expect(executionContextId, 'The extension content-script context must exist.').toBeDefined();
+      const executionContextId = await getExtensionContentScriptContextId(page, cdp);
       const { result } = await cdp.send('Runtime.evaluate', {
         contextId: executionContextId,
         expression: `(() => {

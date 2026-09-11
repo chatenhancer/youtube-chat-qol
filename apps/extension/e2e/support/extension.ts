@@ -5,7 +5,7 @@
  * smoke also validates that Chat Enhancer is installed in the persistent
  * Chrome profile before it opens a real livestream.
  */
-import type { BrowserContext, Worker } from '@playwright/test';
+import type { BrowserContext, CDPSession, Page, Worker } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { extensionDir } from './paths';
@@ -19,6 +19,38 @@ export async function getExtensionId(context: BrowserContext): Promise<string> {
   }
 
   return match[1];
+}
+
+export async function getExtensionContentScriptContextId(page: Page, client: CDPSession): Promise<number> {
+  const extensionId = await getExtensionId(page.context());
+  const contexts: Array<{ id: number; origin: string }> = [];
+  const onContextCreated = ({ context }: { context: { id: number; origin: string } }): void => {
+    contexts.push(context);
+  };
+  client.on('Runtime.executionContextCreated', onContextCreated);
+
+  try {
+    await client.send('Runtime.enable');
+    const deadline = Date.now() + 5_000;
+
+    while (Date.now() < deadline) {
+      for (const context of contexts) {
+        if (context.origin !== `chrome-extension://${extensionId}`) continue;
+        // Reloads leave isolated worlds with the same origin but an invalid runtime.
+        const { result } = await client.send('Runtime.evaluate', {
+          contextId: context.id,
+          expression: 'chrome.runtime?.id',
+          returnByValue: true
+        });
+        if (result.value === extensionId) return context.id;
+      }
+      await page.waitForTimeout(50);
+    }
+
+    throw new Error(`Could not find an active extension content-script context for ${extensionId}.`);
+  } finally {
+    client.off('Runtime.executionContextCreated', onContextCreated);
+  }
 }
 
 export async function getExtensionServiceWorker(context: BrowserContext): Promise<Worker> {
